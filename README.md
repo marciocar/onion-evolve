@@ -1,72 +1,88 @@
-# Onion
+<div align="center">
 
-**Um jeito de organizar produto, engenharia e governança no mesmo ritmo: menos ruído, mais clareza e entregas previsíveis.**
+# 🧅 Onion
+
+### Organize produto, engenharia e governança no mesmo ritmo — nativo do **Claude Code**.
+
+[![Licença: MIT](https://img.shields.io/github/license/marciocar/onion-claude?color=success)](LICENSE)
+![Plataforma](https://img.shields.io/badge/plataforma-Claude_Code-D97757)
+![Metodologia](https://img.shields.io/badge/metodologia-Spec--as--Code_%2B_SDD-blue)
+[![Família Onion](https://img.shields.io/badge/família-Onion-8A2BE2)](https://github.com/marciocar/onion)
+
+**[O que é](#-o-que-é) · [Início rápido](#-início-rápido) · [Família Onion](#-família-onion) · [Documentação](#-documentação) · [Contribuir](#-contribuir)**
+
+</div>
 
 ---
 
-## 🧅 Parte da família Onion
+> [!NOTE]
+> Esta é a porta **Claude Code** da família Onion — a mesma metodologia, expressa no primitivo nativo da plataforma. Conheça as outras 5 portas no hub: **[github.com/marciocar/onion](https://github.com/marciocar/onion)**.
 
-Esta é a porta **Claude Code** do Onion — a mesma metodologia (Spec-as-Code + SDD), expressa no primitivo nativo da plataforma. Veja a história completa e as outras 5 portas no hub:
-**[onion (hub)](https://github.com/marciocar/onion)**.
-
----
-
-## O que é
+## 🎯 O que é
 
 O Onion é um **framework template em `.claude/`** que se instala em qualquer projeto — novo, legado ou regulado — para orquestrar o ciclo completo de desenvolvimento com Claude Code. Separa **decisão de negócio**, **execução técnica** e **governança/compliance** em contextos distintos, conectados por fluxos e padrões repetíveis. Comandos, agentes especializados e documentação passam a conversar entre si em vez de competir por atenção no chat ou em arquivos soltos.
 
 O Onion **não é produto npm**, **não é distribuído publicamente** e **não tem CLI standalone**. Plataforma única: Claude Code.
 
----
+## ⚡ Início rápido
 
-## Para quem é
+1. Abra um projeto que já tenha o Onion instalado (`.claude/` + `CLAUDE.md` na raiz) no **Claude Code**.
+2. Rode **`/onion`** para orientação inteligente, ou **`/warm-up`** para carregar o contexto do projeto.
 
-- Squads de **produto, engenharia e compliance** que precisam alinhar prioridade, implementação, qualidade e conformidade.
-- Times que sentem **falta de contexto compartilhado** entre quem define o quê, quem entrega o como e quem responde por governança.
-- Organizações que querem **padrão sem burocracia** — menos improviso, mais previsibilidade.
-- Projetos **novos** (greenfield), **legados** (com engenharia reversa) e **regulados** (ISO 27001, ISO 22301, SOC2, PMBOK).
+**Como invocar:**
 
----
+| Primitivo | Sintaxe | Exemplo |
+|---|---|---|
+| Comando | `/categoria:comando` | `/engineer:start`, `/product:task` |
+| Agente | `@agente` | `@code-reviewer`, `@gitflow-specialist` |
 
-## O que muda no dia a dia
+## 🧩 O que muda no dia a dia
 
 - Menos retrabalho por decisões perdidas ou mal comunicadas.
 - **Contexto explícito** antes de cada ação: todo mundo sabe em qual dimensão está trabalhando (produto, engenharia ou compliance).
-- **Workflows faseados retomáveis** para especificar, desenvolver, validar e documentar — com sessões persistentes que permitem pausar e continuar.
+- **Workflows faseados retomáveis** com sessões persistentes (`.claude/sessions/`) que permitem pausar e continuar.
 - Documentação e fluxo de trabalho **mais próximos do que o time realmente faz**.
-- Práticas de **configuração e segurança** integradas ao processo (credenciais fora do repositório, templates seguros).
+- Práticas de **configuração e segurança** integradas (credenciais fora do repositório, templates seguros).
 
----
+## 🌐 Família Onion
 
-## Como funciona em três passos
+| Porta | Plataforma | Repositório |
+|---|---|---|
+| 🌐 onion (hub) | a história de todas | [onion](https://github.com/marciocar/onion) |
+| 🟠 **claude** | **Claude Code** | **◀ você está aqui** |
+| 🔵 cursor | Cursor | [onion-cursor](https://github.com/marciocar/onion-cursor) |
+| 🟣 antigravity | Google Antigravity | [onion-antigravity](https://github.com/marciocar/onion-antigravity) |
+| ⚡ zed | Zed | [onion-zed](https://github.com/marciocar/onion-zed) |
+| 🟢 codex | OpenAI Codex | [onion-codex](https://github.com/marciocar/onion-codex) |
+| 🐙 copilot | GitHub Copilot + VS Code | [onion-copilot](https://github.com/marciocar/onion-copilot) |
+
+## 📚 Documentação
+
+- **[Índice geral de docs](docs/INDEX.md)** · **[Guia Onion](docs/onion/)** — conceitos e referências operacionais.
+
+<details>
+<summary><b>Mais: para quem é e como funciona em três passos</b></summary>
+
+<br>
+
+**Para quem é** — squads de produto, engenharia e compliance que precisam alinhar prioridade, implementação, qualidade e conformidade; times que sentem falta de contexto compartilhado; organizações que querem padrão sem burocracia; projetos novos, legados ou regulados (ISO 27001, ISO 22301, SOC2, PMBOK).
+
+**Como funciona em três passos**
 
 1. **Definir a intenção** no contexto certo — produto (descoberta e spec), engenharia (implementação e entrega) ou compliance (governança e conformidade).
 2. **Executar com apoio** de comandos padronizados e agentes especializados, em ciclos faseados retomáveis (`product/collect→feature` e `engineer/plan→pr-update`).
 3. **Validar e registrar** — qualidade, segurança e conhecimento ficam sincronizados para o próximo ciclo.
 
----
+</details>
 
-## Próximo passo
+## 🤝 Contribuir
 
-Explore a documentação do projeto:
+Veja **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
-- **[Documentação geral](docs/)** — visão geral e materiais de apoio.
-- **[Guia Onion](docs/onion/)** — instalação, conceitos e referências operacionais.
+## 📄 Licença
 
-Quer contribuir? Veja **[CONTRIBUTING.md](CONTRIBUTING.md)**.
-
----
-
-## Créditos
+Distribuído sob a licença **MIT** — veja **[LICENSE](LICENSE)**.
 
 O Onion se inspira em ideias de **interface unificada** para orquestração com IA; referência conceitual: [Esperanto, de Luis Novo](https://github.com/lfnovo/esperanto).
 
----
-
-## Licença
-
-Distribuído sob a licença MIT. Veja [LICENSE](LICENSE).
-
----
-
-**Onion — contexto certo, decisão melhor, entrega contínua.**
+<div align="center"><sub>🧅 Onion — contexto certo, decisão melhor, entrega contínua.</sub></div>
