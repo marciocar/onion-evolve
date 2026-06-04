@@ -9,7 +9,7 @@
 ![Metodologia](https://img.shields.io/badge/metodologia-Spec--as--Code_%2B_SDD-blue)
 [![Família Onion](https://img.shields.io/badge/família-Onion-8A2BE2)](https://github.com/marciocar/onion)
 
-**[O que é](#-o-que-é) · [Início rápido](#-início-rápido) · [Família Onion](#-família-onion) · [Documentação](#-documentação) · [Contribuir](#-contribuir)**
+**[O que é](#-o-que-é) · [Início rápido](#-início-rápido) · [Contexto](#-arquitetura-de-contexto) · [Família Onion](#-família-onion) · [Documentação](#-documentação) · [Contribuir](#-contribuir)**
 
 </div>
 
@@ -43,6 +43,19 @@ O Onion **não é produto npm**, **não é distribuído publicamente** e **não 
 - **Workflows faseados retomáveis** com sessões persistentes (`.claude/sessions/`) que permitem pausar e continuar.
 - Documentação e fluxo de trabalho **mais próximos do que o time realmente faz**.
 - Práticas de **configuração e segurança** integradas (credenciais fora do repositório, templates seguros).
+
+## 🏛️ Arquitetura de contexto
+
+O Onion separa o conhecimento do projeto em **três contextos peer** + uma **base de conhecimento reutilizável** — tudo em Markdown versionado no Git. É essa a matéria-prima que a IA lê para gerar e manter código com qualidade: o núcleo do **Spec-as-Code**.
+
+| Contexto | O que captura | Gerado por |
+|---|---|---|
+| 💼 **Negócio** · [`docs/business-context/`](docs/business-context/) | clientes, mercado, produto, estratégia e comunicação | `/docs:build-business-docs` |
+| ⚙️ **Técnica** · [`docs/technical-context/`](docs/technical-context/) | codebase, arquitetura (C4/ADR), decisões e workflows técnicos | `/docs:build-tech-docs` |
+| 🛡️ **Compliance** · [`docs/compliance-context/`](docs/compliance-context/) | frameworks regulatórios, segurança, continuidade e governança (ISO 27001/22301, SOC2, PMBOK) | `/docs:build-compliance-docs` |
+| 📚 **Knowledge Base** · [`docs/knowledge-base/`](docs/knowledge-base/) | conceitos, frameworks, padrões e ferramentas reutilizáveis entre projetos | `/meta:create-knowledge-base` |
+
+> Os três contextos alimentam a hierarquia de specs (**L0 meta-specs → L1 domínio → L2 feature → L3 task**); a Knowledge Base é a camada de referência que sustenta a autoria deles. **As specs são a fonte de verdade; o código é a saída gerada.**
 
 ## 🌐 Família Onion
 
