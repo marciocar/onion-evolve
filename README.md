@@ -4,6 +4,13 @@
 
 ---
 
+## 🧅 Parte da família Onion
+
+Esta é a porta **Claude Code** do Onion — a mesma metodologia (Spec-as-Code + SDD), expressa no primitivo nativo da plataforma. Veja a história completa e as outras 5 portas no hub:
+**[onion (hub)](https://github.com/marciocar/onion)**.
+
+---
+
 ## O que é
 
 O Onion é um **framework template em `.claude/`** que se instala em qualquer projeto — novo, legado ou regulado — para orquestrar o ciclo completo de desenvolvimento com Claude Code. Separa **decisão de negócio**, **execução técnica** e **governança/compliance** em contextos distintos, conectados por fluxos e padrões repetíveis. Comandos, agentes especializados e documentação passam a conversar entre si em vez de competir por atenção no chat ou em arquivos soltos.
