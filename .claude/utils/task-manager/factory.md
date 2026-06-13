@@ -441,12 +441,13 @@ const taskManager = getTaskManager({ forceProvider: 'linear' });
 |----------|:-----------------:|:-----------------:|-----------|
 | ClickUp  | ✅ default         | ✅ opcional        | Requer `TASK_MANAGER_TRANSPORT=mcp` |
 | Linear   | ✅ default         | ✅ opcional        | Requer `TASK_MANAGER_TRANSPORT=mcp` |
-| Asana    | ✅ sempre          | ❌ N/A             | Sem servidor MCP — forçado para `api` |
-| Jira     | ✅ sempre          | ❌ N/A             | Sem servidor MCP — forçado para `api` |
+| Asana    | ✅ default         | ✅ opcional        | MCP via conector claude.ai (runtime) |
+| Jira     | ✅ default         | ✅ opcional        | MCP via conector Atlassian (runtime) |
 | none     | — (offline)       | — (offline)       | NoProviderAdapter; sem chamadas externas |
 
-> Regra: quando `TASK_MANAGER_TRANSPORT=mcp` e o provider não suporta MCP, o detector já
-> retorna `transport='api'` — a factory apenas consome o valor resolvido, sem lógica extra.
+> Regra: o detector resolve `transport` (api default | mcp opcional) **uniformemente** para
+> todos os providers; a factory apenas consome o valor. Se o servidor MCP não responder em
+> runtime, o adapter cai para `api`.
 
 ---
 

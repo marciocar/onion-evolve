@@ -329,9 +329,9 @@ interface ProviderConfig {
 
   /**
    * Transporte efetivo escolhido pelo detector.
-   * Reflete TASK_MANAGER_TRANSPORT com fallback para 'api' quando o provider
-   * não suporta MCP. Adapters devem consultar este campo — nunca ler a env var
-   * diretamente — para garantir o comportamento de fallback correto.
+   * Reflete TASK_MANAGER_TRANSPORT; o adapter cai para 'api' em runtime quando o
+   * servidor MCP do provider não está disponível. Adapters devem consultar este
+   * campo — nunca ler a env var diretamente — para garantir o fallback correto.
    */
   transport: TaskManagerTransport;
 

@@ -69,7 +69,7 @@ function detectProvider(): ProviderConfig {
 
     asana: {
       provider: 'asana',
-      transport: 'api',  // Asana não possui servidor MCP — sempre API
+      transport: resolveTransport('asana'),
       isConfigured: !!process.env.ASANA_ACCESS_TOKEN,
       requiredEnvVars: ['ASANA_ACCESS_TOKEN'],
       optionalEnvVars: ['ASANA_WORKSPACE_ID', 'ASANA_DEFAULT_PROJECT_ID'],
@@ -92,7 +92,7 @@ function detectProvider(): ProviderConfig {
 
       return {
         provider: 'jira' as TaskManagerProvider,
-        transport: 'api' as TaskManagerTransport,  // Jira não possui servidor MCP — sempre API
+        transport: resolveTransport('jira'),
         isConfigured,
         requiredEnvVars: ['JIRA_HOST', 'JIRA_API_TOKEN', 'JIRA_EMAIL'],
         optionalEnvVars: ['JIRA_PROJECT_KEY', 'JIRA_AUTH_TYPE', 'JIRA_API_VERSION'],
@@ -385,10 +385,7 @@ console.log(status.message);
 | `TASK_MANAGER_TRANSPORT` | Provider | Transporte efetivo | Motivo |
 |--------------------------|----------|--------------------|--------|
 | `api` (ou ausente)       | qualquer | `api`              | default |
-| `mcp`                    | `clickup` | `mcp`             | suporte MCP disponível |
-| `mcp`                    | `linear`  | `mcp`             | suporte MCP disponível |
-| `mcp`                    | `asana`   | `api`             | sem servidor MCP — fallback |
-| `mcp`                    | `jira`    | `api`             | sem servidor MCP — fallback |
+| `mcp`                    | `clickup`/`asana`/`jira`/`linear` | `mcp` | usa MCP se disponível em runtime; senão fallback p/ `api` |
 | `mcp`                    | `none`    | `api`             | modo offline — sem transporte real |
 
 > Os adapters consultam `config.transport` para decidir qual via usar internamente
