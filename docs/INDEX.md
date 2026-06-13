@@ -27,7 +27,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **11 arquivos** em `docs/onion/` (Sistema Onion)
 - **25 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
   - 14 arquivos em `concepts/` (Conceitos fundamentais)
-  - 7 arquivos em `frameworks/` (Frameworks e metodologias)
+  - 8 arquivos em `frameworks/` (Frameworks e metodologias)
   - 3 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
   - 1 arquivo em `platforms/` (Plataformas)
   - 1 `index.md`
@@ -99,7 +99,8 @@ docs/
 │   │   ├── spec-driven-development.md  # ✨ NOVO
 │   │   ├── specification-driven-ai-abstraction-layer.md
 │   │   └── task-manager-abstraction.md
-│   ├── frameworks/             # Frameworks e metodologias (7 arquivos)
+│   ├── frameworks/             # Frameworks e metodologias (8 arquivos)
+│   │   ├── agent-orchestration-landscape-2026.md  # ✨ NOVO
 │   │   ├── framework_story_points.md
 │   │   ├── framework_testes.md
 │   │   ├── onion-complete-cycle-understanding.md
@@ -192,7 +193,8 @@ Knowledge Bases estruturadas para consumo por IA e referência técnica:
 - **Meeting Transcription to Knowledge Base** - Processamento de reuniões
 - **Specification-Driven AI Abstraction Layer** - Camada de abstração orientada a especificações
 
-### Frameworks e Metodologias (7 arquivos)
+### Frameworks e Metodologias (8 arquivos)
+- **Agent Orchestration Landscape 2026** - Comparativo de 5 correntes (Anthropic/coding-agents/OSS/enterprise/academia) com verificação adversarial ✨ NOVO
 - **Framework de Story Points** - Estimativas ágeis
 - **Framework de Testes** - White-box, Grey-box, Black-box
 - **Onion Complete Cycle Understanding** - Sistema completo de 5 camadas
