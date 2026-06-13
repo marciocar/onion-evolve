@@ -6,7 +6,7 @@ version: "1.0.0"
 updated: "2026-06-02"
 maintained_by: Sistema Onion
 related:
-  - docs/knowledge-base/frameworks/framework_testes.md
+  - docs/knowledge-base/frameworks/framework-testes.md
   - docs/knowledge-base/frameworks/test-strategy-scoring.md
   - .claude/commands/validate/qa-points/estimate.md
 ---
@@ -15,7 +15,7 @@ related:
 
 Knowledge base de referência com as **tabelas determinísticas de cálculo**, **mapas de detecção de keywords**, **distribuição por perspectiva por tipo de teste** e **técnicas sugeridas por tipo** usadas pelo comando `/validate/qa-points/estimate`.
 
-O **framework canônico** (definição conceitual das 3 dimensões, fórmula, escala de conversão para horas, padrões de colaboração) vive em [`framework_testes.md`](framework_testes.md), seção "QA Story Points - Sistema de Estimativa". A operacionalização para auditoria de estratégias está em [`test-strategy-scoring.md`](test-strategy-scoring.md). Esta KB **não duplica** o conceito — apenas fornece os valores pontuais que o comando usa para cálculo automático e reprodutível.
+O **framework canônico** (definição conceitual das 3 dimensões, fórmula, escala de conversão para horas, padrões de colaboração) vive em [`framework-testes.md`](framework-testes.md), seção "QA Story Points - Sistema de Estimativa". A operacionalização para auditoria de estratégias está em [`test-strategy-scoring.md`](test-strategy-scoring.md). Esta KB **não duplica** o conceito — apenas fornece os valores pontuais que o comando usa para cálculo automático e reprodutível.
 
 ```
 Fórmula (do framework): QA Points = Complexidade Base + Ajuste de Risco + Ajuste de Tipo
@@ -60,7 +60,7 @@ Para garantir cálculo reprodutível, o comando usa o **valor médio do range do
 
 ### Conversão para horas
 
-Usar a escala "QA POINTS TO TIME CONVERSION" e os "FATORES DE AJUSTE" do framework (`framework_testes.md`). Resumo: 1pt≈1-2h, 2pt≈2-4h, 3pt≈4-6h, 5pt≈6-10h, 8pt≈10-16h, 13pt≈16-24h, 20+pt → quebrar.
+Usar a escala "QA POINTS TO TIME CONVERSION" e os "FATORES DE AJUSTE" do framework (`framework-testes.md`). Resumo: 1pt≈1-2h, 2pt≈2-4h, 3pt≈4-6h, 5pt≈6-10h, 8pt≈10-16h, 13pt≈16-24h, 20+pt → quebrar.
 
 ---
 
@@ -118,7 +118,7 @@ Percentuais White-box / Grey-box / Black-box usados no `--breakdown`. (A distrib
 
 ## 4. Técnicas Sugeridas por Tipo de Teste
 
-Usadas no `--suggest-techniques`. Detalhe técnico de cada técnica está no framework (`framework_testes.md`, seção "Padrões de Teste por Perspectiva").
+Usadas no `--suggest-techniques`. Detalhe técnico de cada técnica está no framework (`framework-testes.md`, seção "Padrões de Teste por Perspectiva").
 
 | Tipo | Técnicas |
 |------|----------|

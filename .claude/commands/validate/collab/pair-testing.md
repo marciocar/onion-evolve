@@ -55,7 +55,7 @@ related_agents:
 
 Organiza sessões de pair testing multi-perspectiva para validação colaborativa de features.
 
-Este comando é um **orquestrador**: os protocolos detalhados (agendas por perspectiva, template de documentação, checklist de execução, formatos de comentário) vivem na KB de referência [`docs/knowledge-base/frameworks/collaborative-testing-patterns.md`](../../../../docs/knowledge-base/frameworks/collaborative-testing-patterns.md). O framework canônico de testes (perspectivas, QA Story Points, técnicas) vive em [`framework_testes.md`](../../../../docs/knowledge-base/frameworks/framework_testes.md).
+Este comando é um **orquestrador**: os protocolos detalhados (agendas por perspectiva, template de documentação, checklist de execução, formatos de comentário) vivem na KB de referência [`docs/knowledge-base/frameworks/collaborative-testing-patterns.md`](../../../../docs/knowledge-base/frameworks/collaborative-testing-patterns.md). O framework canônico de testes (perspectivas, QA Story Points, técnicas) vive em [`framework-testes.md`](../../../../docs/knowledge-base/frameworks/framework-testes.md).
 
 ## 🎯 Objetivo
 
@@ -73,7 +73,7 @@ Estruturar e facilitar sessões de pair testing que resultem em:
 
 Antes de organizar a sessão, ler:
 1. `docs/knowledge-base/frameworks/collaborative-testing-patterns.md` — protocolo, agendas, templates e checklists.
-2. `docs/knowledge-base/frameworks/framework_testes.md` — framework canônico (perspectivas White/Grey/Black-box, QA Story Points, técnicas).
+2. `docs/knowledge-base/frameworks/framework-testes.md` — framework canônico (perspectivas White/Grey/Black-box, QA Story Points, técnicas).
 
 ```markdown
 SE alguma KB não for encontrada:
@@ -158,7 +158,7 @@ Instanciar o **checklist §4 da KB**. Salvar como `pair-testing-checklist-{{feat
 ## 🔗 Referências
 
 - **Padrões de Testing Colaborativo (protocolo, agendas, templates, checklists):** `docs/knowledge-base/frameworks/collaborative-testing-patterns.md`
-- **Framework de Testes (canônico):** `docs/knowledge-base/frameworks/framework_testes.md`
+- **Framework de Testes (canônico):** `docs/knowledge-base/frameworks/framework-testes.md`
 - **Three Amigos:** `/validate/collab/three-amigos`
 - **Test Strategy:** `/validate/test-strategy/create`
 

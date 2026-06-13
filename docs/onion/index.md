@@ -154,7 +154,7 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 - [Task Manager Abstraction](../knowledge-base/concepts/task-manager-abstraction.md)
 - [Spec-Driven Development](../knowledge-base/concepts/spec-driven-development.md)
 - [AI Agent Design Patterns](../knowledge-base/concepts/ai-agent-design-patterns.md)
-- [Framework de Story Points](../knowledge-base/frameworks/framework_story_points.md)
+- [Framework de Story Points](../knowledge-base/frameworks/framework-story-points.md)
 
 ### Configuração
 - [Getting Started](getting-started.md)

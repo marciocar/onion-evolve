@@ -213,7 +213,7 @@ graph TD
 ## 📚 Referências
 
 - **Agente:** @story-points-framework-specialist
-- **Framework:** `docs/knowledge-base/frameworks/framework_story_points.md`
+- **Framework:** `docs/knowledge-base/frameworks/framework-story-points.md`
 - **Integração:** `.claude/docs/product/story-points-integration.md`
 
 ---

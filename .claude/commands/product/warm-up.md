@@ -68,7 +68,7 @@ Estabelecer contexto focado em:
 - `/docs/consolidate-documents` - Consolidar documentos de produto/negócio
 
 ### 4. Knowledge Bases de Produto
-- ✅ Revisar `docs/knowledge-base/frameworks/framework_story_points.md`
+- ✅ Revisar `docs/knowledge-base/frameworks/framework-story-points.md`
 - ✅ Revisar `docs/knowledge-base/concepts/task-manager-abstraction.md`
 - ✅ Revisar `docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md`
 - ✅ Revisar `docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md`
@@ -99,7 +99,7 @@ Estabelecer contexto focado em:
 ### Documentação Essencial
 - `docs/onion/commands-guide.md` - Comandos de produto
 - `docs/onion/practical-examples.md` - Exemplos práticos
-- `docs/knowledge-base/frameworks/framework_story_points.md` - Framework de estimativas
+- `docs/knowledge-base/frameworks/framework-story-points.md` - Framework de estimativas
 - `docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md` - Processamento de reuniões
 
 ### Workflows de Produto

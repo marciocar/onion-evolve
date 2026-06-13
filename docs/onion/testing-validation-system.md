@@ -13,7 +13,7 @@ O Sistema de Testes e Validação é composto por **4 camadas integradas** que t
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  📚 KNOWLEDGE BASE (Framework de Testes)                    │
-│  └─ framework_testes.md - Fonte de verdade                 │
+│  └─ framework-testes.md - Fonte de verdade                 │
 └─────────────────────────────────────────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -45,7 +45,7 @@ O Sistema de Testes e Validação é composto por **4 camadas integradas** que t
 
 ## 📚 Camada 1: Knowledge Base - Framework de Testes
 
-### 📄 `docs/knowledge-base/frameworks/framework_testes.md`
+### 📄 `docs/knowledge-base/frameworks/framework-testes.md`
 
 **Propósito**: Fonte de verdade única para todas as práticas de teste.
 
@@ -186,7 +186,7 @@ Escala:
 ```
 
 **Integração**:
-- Usa `framework_testes.md` para padrões White-box
+- Usa `framework-testes.md` para padrões White-box
 - Integra com `@test-engineer` para validação
 - Gera testes seguindo padrão AAA (Arrange, Act, Assert)
 
@@ -209,7 +209,7 @@ Escala:
 ```
 
 **Integração**:
-- Usa `framework_testes.md` para técnicas Grey-box
+- Usa `framework-testes.md` para técnicas Grey-box
 - Foca em contratos de API e integrações
 - Valida tratamento de erros e limites
 
@@ -232,7 +232,7 @@ Escala:
 ```
 
 **Integração**:
-- Usa `framework_testes.md` para técnicas Black-box
+- Usa `framework-testes.md` para técnicas Black-box
 - Foca em jornada do usuário
 - Valida experiência completa
 
@@ -285,7 +285,7 @@ Escala:
 ```
 
 **Integração**:
-- **OBRIGATORIAMENTE** lê `framework_testes.md` antes de executar
+- **OBRIGATORIAMENTE** lê `framework-testes.md` antes de executar
 - Usa `@test-agent` para validação de estratégia
 - Cria tasks no task manager com QA points calculados
 
@@ -322,7 +322,7 @@ Escala:
 ```
 
 **Integração**:
-- **OBRIGATORIAMENTE** lê `framework_testes.md` para fórmula exata
+- **OBRIGATORIAMENTE** lê `framework-testes.md` para fórmula exata
 - Usa análise contextual para auto-detectar complexidade/risco
 - Pode atualizar task manager automaticamente
 
@@ -398,7 +398,7 @@ Escala:
 
 ```
 1. /validate/test-strategy/create checkout --risk-level alto
-   → Lê framework_testes.md
+   → Lê framework-testes.md
    → Calcula QA points automaticamente
    → Cria épico no ClickUp com subtasks
    ↓
@@ -414,7 +414,7 @@ Escala:
 
 ```
 1. /validate/qa-points/estimate "Testar sistema de pagamentos" --breakdown
-   → Lê framework_testes.md
+   → Lê framework-testes.md
    → Analisa contexto
    → Calcula: Complexidade (8) + Risco (5) + Tipo (4) = 17 pontos
    → Breakdown:
@@ -539,8 +539,8 @@ Comandos de teste geram:
 ## 📚 Referências
 
 ### Knowledge Bases
-- [`framework_testes.md`](../knowledge-base/frameworks/framework_testes.md) - Framework completo
-- [`framework_story_points.md`](../knowledge-base/frameworks/framework_story_points.md) - Sistema de estimativas
+- [`framework-testes.md`](../knowledge-base/frameworks/framework-testes.md) - Framework completo
+- [`framework-story-points.md`](../knowledge-base/frameworks/framework-story-points.md) - Sistema de estimativas
 
 ### Comandos Relacionados
 - `/product/task` - Criar tasks
@@ -563,7 +563,7 @@ Comandos de teste geram:
 1. **Entender o Framework**:
    ```bash
    # Ler framework completo
-   cat docs/knowledge-base/frameworks/framework_testes.md
+   cat docs/knowledge-base/frameworks/framework-testes.md
    ```
 
 2. **Criar Primeira Estratégia**:

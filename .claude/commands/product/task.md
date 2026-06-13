@@ -125,7 +125,7 @@ Após decompor, **SEMPRE** estimar via `@story-points-framework-specialist`:
    - Se `soma(subtasks) > task_principal` → ajustar task principal para a soma.
    - Se `task_principal > 13 pontos` → alertar **ÉPICO** e propor quebra em tasks menores.
 
-> Framework: `docs/knowledge-base/frameworks/framework_story_points.md`.
+> Framework: `docs/knowledge-base/frameworks/framework-story-points.md`.
 
 ### Passo 5: Apresentar Plano e Obter Confirmação (OBRIGATÓRIO ANTES DE CRIAR)
 
@@ -286,7 +286,7 @@ Se houve execução no Passo 7:
 - **Adapters (mapeamento MCP por provedor):** `.claude/utils/task-manager/adapters/{clickup,asana,linear}.md`
 - **Decomposição:** `@task-specialist`
 - **Estimativas:** `@story-points-framework-specialist`, `/product/estimate`,
-  `docs/knowledge-base/frameworks/framework_story_points.md`
+  `docs/knowledge-base/frameworks/framework-story-points.md`
 - **Formatação ClickUp:** skill `common:prompts:clickup-patterns`
 
 ## ⚠️ Notas

@@ -6,7 +6,7 @@ version: "1.0.0"
 updated: "2026-06-02"
 maintained_by: Sistema Onion
 related:
-  - docs/knowledge-base/frameworks/framework_testes.md
+  - docs/knowledge-base/frameworks/framework-testes.md
   - .claude/commands/validate/collab/pair-testing.md
   - .claude/commands/validate/collab/three-amigos.md
 ---
@@ -15,7 +15,7 @@ related:
 
 Knowledge base de referência com os **protocolos de colaboração**, **definições de papel**, **agendas detalhadas**, **templates de documentação** e **checklists de execução** usados pelas sessões de teste colaborativo do Sistema Onion.
 
-Esta KB é consumida pelos comandos `/validate/collab/pair-testing` e `/validate/collab/three-amigos`. Os comandos atuam como **orquestradores** — carregam estes padrões quando precisam montar a agenda, gerar o template de documentação ou guiar a execução. O **framework canônico** de testes (perspectivas White/Grey/Black-box, QA Story Points, técnicas, casos de teste) vive em [`framework_testes.md`](framework_testes.md) — esta KB **não duplica** esse conteúdo, apenas operacionaliza a colaboração.
+Esta KB é consumida pelos comandos `/validate/collab/pair-testing` e `/validate/collab/three-amigos`. Os comandos atuam como **orquestradores** — carregam estes padrões quando precisam montar a agenda, gerar o template de documentação ou guiar a execução. O **framework canônico** de testes (perspectivas White/Grey/Black-box, QA Story Points, técnicas, casos de teste) vive em [`framework-testes.md`](framework-testes.md) — esta KB **não duplica** esse conteúdo, apenas operacionaliza a colaboração.
 
 ---
 

@@ -60,7 +60,7 @@ related_agents:
 
 Orquestra geração e execução de testes de integração com detecção inteligente de framework, perspectiva **Grey-box** (dev testando outro dev).
 
-> **Teoria e padrões Grey-box** (White/Grey/Black-box, contract testing, boundary, fuzzing, métricas de integração): ver `docs/knowledge-base/frameworks/framework_testes.md` — seções "Diferenças White/Black/Grey-box", "Padrões Grey-box (Cross-Testing)" e "Técnicas Grey-box". Este comando não duplica essa teoria; apenas a aplica.
+> **Teoria e padrões Grey-box** (White/Grey/Black-box, contract testing, boundary, fuzzing, métricas de integração): ver `docs/knowledge-base/frameworks/framework-testes.md` — seções "Diferenças White/Black/Grey-box", "Padrões Grey-box (Cross-Testing)" e "Técnicas Grey-box". Este comando não duplica essa teoria; apenas a aplica.
 
 ## 🎯 Objetivo
 
@@ -219,7 +219,7 @@ describe('API Integration: {{api-endpoint}}', () => {
 });
 ```
 
-> Para Pact, contract testing detalhado e fuzzing, reutilize os padrões prontos em `docs/knowledge-base/frameworks/framework_testes.md` (seção "Padrões Grey-box (Cross-Testing)" e "Técnicas Grey-box").
+> Para Pact, contract testing detalhado e fuzzing, reutilize os padrões prontos em `docs/knowledge-base/frameworks/framework-testes.md` (seção "Padrões Grey-box (Cross-Testing)" e "Técnicas Grey-box").
 
 **Validação:** ✅ Arquivo gerado: {{test-file-path}}, [N] testes (contract: X, boundary: Y, fuzzing: Z)
 
@@ -336,7 +336,7 @@ describe('API Integration: {{api-endpoint}}', () => {
 
 ## 📚 Referências
 
-- **Framework de Testes (teoria/padrões Grey-box):** `docs/knowledge-base/frameworks/framework_testes.md`
+- **Framework de Testes (teoria/padrões Grey-box):** `docs/knowledge-base/frameworks/framework-testes.md`
 - **Agentes:** @test-engineer, @test-agent
 - **Docs:** [Supertest](https://github.com/visionmedia/supertest) · [Pact](https://docs.pact.io) · [Wiremock](https://wiremock.org)
 

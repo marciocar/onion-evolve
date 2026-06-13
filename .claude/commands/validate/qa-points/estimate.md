@@ -63,7 +63,7 @@ related_agents:
 Calcula QA Story Points usando a fórmula exata do Framework de Testes, com análise contextual inteligente, breakdown por perspectiva e sugestões de técnicas.
 
 > **Base de conhecimento (carregue antes de calcular):**
-> - **Conceito canônico** — `docs/knowledge-base/frameworks/framework_testes.md`, seção "QA Story Points - Sistema de Estimativa" (3 dimensões, fórmula, escala de conversão para horas, padrões White/Grey/Black-box).
+> - **Conceito canônico** — `docs/knowledge-base/frameworks/framework-testes.md`, seção "QA Story Points - Sistema de Estimativa" (3 dimensões, fórmula, escala de conversão para horas, padrões White/Grey/Black-box).
 > - **Tabelas determinísticas de cálculo, keywords, distribuição por tipo e técnicas** — `docs/knowledge-base/frameworks/qa-story-points.md`.
 > - **Operacionalização para auditoria** (validação de discrepância, distribuição por complexidade) — `docs/knowledge-base/frameworks/test-strategy-scoring.md`.
 
@@ -83,11 +83,11 @@ Fornecer estimativas precisas de esforço de teste através de:
 Ler antes de qualquer cálculo:
 
 ```bash
-read_file docs/knowledge-base/frameworks/framework_testes.md       # conceito + fórmula + conversão p/ horas
+read_file docs/knowledge-base/frameworks/framework-testes.md       # conceito + fórmula + conversão p/ horas
 read_file docs/knowledge-base/frameworks/qa-story-points.md        # tabelas de cálculo, keywords, técnicas
 ```
 
-SE `framework_testes.md` não encontrado:
+SE `framework-testes.md` não encontrado:
 > ❌ ERRO: Framework de testes não encontrado. 💡 Verifique se o arquivo existe e tente novamente.
 
 ### Passo 2: Análise contextual da descrição
@@ -99,7 +99,7 @@ SE `framework_testes.md` não encontrado:
 
 Aplicar a fórmula `QA Points = Complexidade Base + Ajuste de Risco + Ajuste de Tipo` usando os **valores determinísticos** da `qa-story-points.md` §1 (sem desvios). Somar ajustes contextuais de keywords (ex.: `third-party integration` +1 complexity; `legacy system` +1 complexity +1 risk).
 
-Converter o total para horas pela escala do framework (`framework_testes.md`), aplicando os fatores de ajuste quando relevantes.
+Converter o total para horas pela escala do framework (`framework-testes.md`), aplicando os fatores de ajuste quando relevantes.
 
 **Exemplo:** medium (4) + context (+1) + high risk (+3) + integration (+2) = **10 QA Story Points** ≈ 14-18h.
 
