@@ -7,7 +7,7 @@ description: |
 model: opus
 category: meta
 tags: [fleet, orchestration, parallel, workflow]
-version: "1.0.0"
+version: "1.1.0"
 updated: "2026-06-13"
 allowed-tools: Read Grep Glob
 argument-hint: "<tarefa a paralelizar>"
@@ -59,6 +59,10 @@ A orquestração mora **sempre no nível principal** (este comando + a skill
 > resultado e desperdiça budget. Na dúvida sobre independência, mantenha serial.
 
 ## ⚡ Etapas
+
+### Passo 0 — Health-check do substrato
+
+Antes de tudo, confirme que a ferramenta nativa **Workflow** está disponível. Se não estiver, acione imediatamente o **Fallback serial** (abaixo) de forma determinística — não dependa de inferência. Degrade com aviso ao usuário em pt-BR.
 
 ### Passo 1 — Receber a tarefa
 

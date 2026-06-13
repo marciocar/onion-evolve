@@ -7,13 +7,13 @@ description: >
   Ative também quando o usuário perguntar "o que faço agora?", "próximos passos",
   "como funciona o sistema?", "qual agente para X?", "como crio Y?", mesmo sem
   mencionar "onion" explicitamente.
-allowed-tools: Bash(cat .env*) Bash(ls .claude/*) Bash(git branch*)
+allowed-tools: Bash(grep * .env) Bash(ls .claude/*) Bash(git branch*)
 ---
 
 ## Estado Atual do Projeto
 
 Provider ativo:
-!`cat .env 2>/dev/null | grep TASK_MANAGER_PROVIDER | head -1 || echo "TASK_MANAGER_PROVIDER=não configurado"`
+!`grep -E '^TASK_MANAGER_PROVIDER=' .env 2>/dev/null | head -1 || echo "TASK_MANAGER_PROVIDER=não configurado"`
 
 Sessões abertas:
 !`ls .claude/sessions/ 2>/dev/null || echo "(nenhuma sessão ativa)"`
@@ -191,10 +191,18 @@ Contexto persistente de feature em `.claude/sessions/<feature-slug>/` com `conte
 - Jira Cloud REST v3: descriptions e comments → ADF (JSON estruturado obrigatório)
 - Jira Server/DC (v2): wiki markup ou plain text
 
-**Commands vs Skills vs Agentes**
-- `/nome` → comando (`.claude/commands/`) ou skill (`.claude/skills/`) — workflows
-- `@nome` → agente (`.claude/agents/`) — subagent especializado
-- Skills são o padrão novo; comandos legados continuam funcionando
+**Como me invocar (sintaxes)**
+
+| Sintaxe | Real? | O que faz |
+|---|---|---|
+| `/onion` | ✅ | Executa o comando `.claude/commands/onion.md` (ponto de entrada). |
+| `onion` / `Onion` no texto | ✅ | Menção em linguagem natural → ativa a **skill** `onion` por match semântico (case-insensitive). |
+| `@onion` | ✅ | Delega ao **agente** orquestrador `.claude/agents/meta/onion.md` (subagente). |
+| `/Onion` | ❌ | Slash-command é case-sensitive no Linux: não acha `onion.md`. Use `/onion`. |
+| `$onion` | ❌ | `$` não é prefixo de invocação (`$ARGUMENTS` só existe dentro de arquivos de comando). |
+| `#onion` | ❌ | `#` é atalho de **memória** do Claude Code (anexa ao `CLAUDE.md`); não invoca nada. |
+
+Regra geral: `/nome` → comando/skill · `@nome` → agente · nome no texto → skill por match semântico. `#` e `$` **não** invocam.
 
 **Search Jira 2025**
 `GET /rest/api/3/search` foi removido em maio/2025. Usar `POST /rest/api/3/search/jql` com `nextPageToken`.
