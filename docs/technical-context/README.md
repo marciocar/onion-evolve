@@ -76,4 +76,4 @@ O comando faz três fases:
 ---
 
 **Comando responsável**: `/docs:build-tech-docs`
-**Template-base**: `.claude/commands/common/templates/technical_context_template.md`
+**Template-base**: `.claude/commands/common/templates/technical-context-template.md`

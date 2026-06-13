@@ -38,14 +38,14 @@ Inventário geral: **49 agentes** (29.637 linhas) · **93 arquivos de comando**
 |---|---|---|
 | `.claude/commands/validate/test-strategy/analyze.md` | 1.134 | 🔴 HARD (>800) |
 | `.claude/commands/meta/create-abstraction.md` | 859 | 🔴 HARD (>800) |
-| `.claude/commands/common/templates/business_context_template.md` | 747 | 🟡 soft · template* |
+| `.claude/commands/common/templates/business-context-template.md` | 747 | 🟡 soft · template* |
 | `.claude/commands/product/analyze-pain-price.md` | 694 | 🟡 soft |
 | `.claude/commands/validate/qa-points/estimate.md` | 660 | 🟡 soft |
 | `.claude/commands/validate/collab/pair-testing.md` | 632 | 🟡 soft |
 | `.claude/commands/git/README.md` | 605 | 🟡 soft · README* |
 | `.claude/commands/product/transform-consolidated.md` | 577 | 🟡 soft |
 | `.claude/commands/product/task.md` | 555 | 🟡 soft |
-| `.claude/commands/common/templates/technical_context_template.md` | 525 | 🟡 soft · template* |
+| `.claude/commands/common/templates/technical-context-template.md` | 525 | 🟡 soft · template* |
 | `.claude/commands/test/integration.md` | 508 | 🟡 soft |
 | `.claude/commands/validate/collab/three-amigos.md` | 504 | 🟡 soft |
 

@@ -9,6 +9,8 @@ description: >
 allowed-tools: Read Grep Glob
 ---
 
+# Padrões de Idioma e Documentação
+
 ## Regras Fundamentais
 
 ### Inglês (en-US) — SEMPRE
@@ -17,14 +19,14 @@ allowed-tools: Read Grep Glob
 - **Mensagens de commit** (Conventional Commits: `feat: add user auth`)
 - **Nomes de branches** Git (`feature/user-dashboard`, `fix/auth-bug`)
 - **Documentação técnica de API** (schemas, endpoints, response shapes)
+- **Logs e mensagens de debug** (`Error: provider not configured`)
 
 ### Português brasileiro (pt-BR) — SEMPRE
 - **Comentários no código** (inline e JSDoc)
 - **Respostas e explicações** do assistente IA
 - **Documentação de processos e workflows**
 - **READMEs e guias de uso**
-- **Mensagens de erro** para usuário final
-- **Logs de aplicação** voltados para debugging
+- **Mensagens de erro** para usuário final (UI/UX)
 
 ## Quick Reference
 
@@ -37,7 +39,7 @@ allowed-tools: Read Grep Glob
 | Documentação técnica | PT-BR | `## Instalação` |
 | Respostas do assistente | PT-BR | `Vou criar o componente...` |
 | Nomes de arquivos | EN | `user-profile.tsx` |
-| Logs de debug | PT-BR | `console.log('Usuário autenticado')` |
+| Logs de debug | EN | `logger.info('User authenticated')` |
 | Mensagens de erro UI | PT-BR | `throw new Error('Usuário não encontrado')` |
 
 ## Exemplo correto

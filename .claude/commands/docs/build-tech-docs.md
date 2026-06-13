@@ -41,7 +41,7 @@ Você é um arquiteto de documentação técnica que produz **contexto otimizado
 
 ## 🎯 Objetivo
 
-Gerar a arquitetura de contexto técnico seguindo o template `.claude/commands/common/templates/technical_context_template.md`, na pasta canônica `docs/technical-context/`, organizada em 4 camadas (Núcleo / AI-Context / Domínio / Workflow).
+Gerar a arquitetura de contexto técnico seguindo o template `.claude/commands/common/templates/technical-context-template.md`, na pasta canônica `docs/technical-context/`, organizada em 4 camadas (Núcleo / AI-Context / Domínio / Workflow).
 
 Resultado esperado: documentação modular que permite que novos devs entendam o projeto em horas e que IA forneça assistência contextual precisa.
 
@@ -140,7 +140,7 @@ Gere os arquivos em `docs/technical-context/` seguindo a estrutura abaixo. Crie 
 > **Convenção de nomes (esta seção tem precedência sobre o template-base).** Use
 > **kebab-case minúsculo** para todos os arquivos (`codebase-guide.md`,
 > `project-charter.md`), exatamente como na estrutura abaixo. Se o
-> `technical_context_template.md` sugerir nomes em UPPERCASE, **ignore** — a
+> `technical-context-template.md` sugerir nomes em UPPERCASE, **ignore** — a
 > estrutura deste comando é a autoritativa.
 
 ```
@@ -236,7 +236,7 @@ docs/technical-context/
 
 ## 🔗 Referências
 
-- **Template-base**: `.claude/commands/common/templates/technical_context_template.md`
+- **Template-base**: `.claude/commands/common/templates/technical-context-template.md`
 - **Pasta-alvo**: `docs/technical-context/`
 - **Comando complementar**: `/docs:build-business-docs`
 - **Knowledge base**: `docs/knowledge-base/`

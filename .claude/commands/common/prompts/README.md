@@ -155,8 +155,8 @@ Os prompts são projetados para serem flexíveis e podem ser adaptados para:
 ## Integração com Templates
 
 Estes prompts funcionam em conjunto com:
-- `.claude/commands/common/templates/technical_context_template.md`
-- `.claude/commands/common/templates/business_context_template.md`
+- `.claude/commands/common/templates/technical-context-template.md`
+- `.claude/commands/common/templates/business-context-template.md`
 
 Os templates fornecem a estrutura e frameworks, enquanto estes prompts fornecem a metodologia de análise e estratégia de execução.
 

@@ -40,8 +40,8 @@ poluir o repo-mãe.
   system-documentation-orchestrator, mermaid-specialist; compliance:
   security-information-master, iso-27001/22301, soc2, pmbok,
   corporate-compliance-specialist em `review/`).
-- **2/2 templates** resolvem (`business_context_template.md`,
-  `technical_context_template.md`).
+- **2/2 templates** resolvem (`business-context-template.md`,
+  `technical-context-template.md`).
 
 ### `build-index` — ✅ EXECUTÁVEL
 

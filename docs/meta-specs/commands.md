@@ -221,8 +221,8 @@ O limite acima aplica-se a **comandos invocáveis** (`/categoria/nome`). São
 **isentos** por natureza, seguindo guidance própria:
 
 - **Fragmentos de template** em `.claude/commands/common/templates/` — são
-  estruturas de referência (ex.: `business_context_template.md`,
-  `technical_context_template.md`), auto-registrados como skills
+  estruturas de referência (ex.: `business-context-template.md`,
+  `technical-context-template.md`), auto-registrados como skills
   `common:templates:*` e referenciados por múltiplos agentes/comandos. Tamanho é
   inerente ao template; **não relocar** sem atualizar o registro de skill e
   todas as referências.

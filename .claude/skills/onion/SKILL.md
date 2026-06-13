@@ -161,13 +161,13 @@ Branch atual:
 
 ## Agentes por Categoria
 
-**development/** (20): `@react-developer`, `@nodejs-specialist`, `@clickup-specialist`, `@jira-specialist`, `@docker-specialist`, `@claude-code-specialist`, `@c4-architecture-specialist`, `@mermaid-specialist`, `@nx-monorepo-specialist`, `@zen-engine-specialist` e outros.
+**development/** (20): `@react-developer`, `@nodejs-specialist`, `@clickup-specialist`, `@jira-specialist`, `@claude-code-specialist`, `@c4-architecture-specialist`, `@mermaid-specialist`, `@nx-monorepo-specialist`, `@zen-engine-specialist` e outros. **deployment/** (1): `@docker-specialist`.
 
-**product/** (8): `@product-agent`, `@story-points-framework-specialist`, `@whisper-specialist`, `@storytelling-business-specialist`, `@branding-positioning-specialist`, `@extract-meeting-specialist`, `@meeting-consolidator`, `@pain-price-specialist`.
+**product/** (8): `@product-agent`, `@story-points-framework-specialist`, `@presentation-orchestrator`, `@storytelling-business-specialist`, `@branding-positioning-specialist`, `@extract-meeting-specialist`, `@meeting-consolidator`, `@pain-price-specialist`. (`@whisper-specialist` vive em development/.)
 
 **meta/** (5): `@onion`, `@metaspec-gate-keeper`, `@agent-creator-specialist`, `@command-creator-specialist`, `@agent-skills-specialist`.
 
-**compliance/** (5): `@iso-27001-specialist`, `@iso-22301-specialist`, `@soc2-specialist`, `@pmbok-specialist`, `@corporate-compliance-specialist`.
+**compliance/** (5): `@iso-27001-specialist`, `@iso-22301-specialist`, `@soc2-specialist`, `@pmbok-specialist`, `@security-information-master`. (`@corporate-compliance-specialist` vive em review/.)
 
 **git/** (4): `@branch-code-reviewer`, `@branch-documentation-writer`, `@branch-test-planner`, `@branch-metaspec-checker`.
 

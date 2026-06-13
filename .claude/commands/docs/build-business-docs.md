@@ -40,7 +40,7 @@ Você é um analista de negócios e estrategista de produto que produz **intelig
 
 ## 🎯 Objetivo
 
-Gerar a arquitetura de contexto de negócio seguindo o template `.claude/commands/common/templates/business_context_template.md`, na pasta canônica `docs/business-context/`, organizada em 4 camadas (Cliente / Produto / Mercado / Operacional).
+Gerar a arquitetura de contexto de negócio seguindo o template `.claude/commands/common/templates/business-context-template.md`, na pasta canônica `docs/business-context/`, organizada em 4 camadas (Cliente / Produto / Mercado / Operacional).
 
 Resultado esperado: documentação modular que permite que IA e humanos entendam clientes, dinâmica de mercado e estratégia.
 
@@ -215,7 +215,7 @@ docs/business-context/
 
 ## 🔗 Referências
 
-- **Template-base**: `.claude/commands/common/templates/business_context_template.md`
+- **Template-base**: `.claude/commands/common/templates/business-context-template.md`
 - **Pasta-alvo**: `docs/business-context/`
 - **Comando complementar**: `/docs:build-tech-docs`
 - **Knowledge base**: `docs/knowledge-base/`
