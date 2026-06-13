@@ -14,7 +14,7 @@ name: nome-em-kebab-case
 description: |
   Descrição clara em 1-2 linhas do propósito do agente.
   Use para [caso de uso principal]. Relacionado: @agente1, @agente2.
-model: sonnet                    # sonnet | opus | gpt-4
+model: sonnet                    # sonnet | opus | haiku | fable
 tools:                           # Ferramentas GENÉRICAS (agnóstico)
   - read_file
   - write
@@ -70,7 +70,7 @@ updated: "2025-11-24"
 |-------|------|-----------|---------|
 | `name` | string | Identificador único kebab-case | `code-reviewer` |
 | `description` | string | Descrição em 1-2 linhas | `Especialista em revisão...` |
-| `model` | enum | Modelo de IA | `sonnet`, `opus`, `gpt-4` |
+| `model` | enum | Modelo de IA | `sonnet`, `opus`, `haiku`, `fable` |
 | `tools` | array | Ferramentas disponíveis | `[read_file, write, ...]` |
 | `version` | semver | Versão do agente | `"1.0.0"` |
 | `updated` | date | Data da última atualização | `"2025-11-24"` |
@@ -85,6 +85,14 @@ updated: "2025-11-24"
 | `expertise` | array | Áreas de expertise | `[]` |
 | `related_agents` | array | Agentes relacionados | `[]` |
 | `related_commands` | array | Comandos relacionados | `[]` |
+
+### Model tiering em fleet
+
+Ao orquestrar frota (fan-out via ferramenta Workflow nativa), distribua tiers:
+o orquestrador roda em `opus`; workers de alto volume e baixa complexidade vão
+para `sonnet` ou `haiku`. Em caso de dúvida, **herde do parent** omitindo o campo
+`model`. Esse tiering reduz custo agregado em fan-out, onde dezenas de subagentes
+executam em paralelo.
 
 ---
 
@@ -217,7 +225,7 @@ Consulte `docs/knowledge-base/concepts/configuration-management.md` para setup.
 ### Header YAML
 - [ ] `name` único e em kebab-case
 - [ ] `description` clara em 1-2 linhas
-- [ ] `model` definido (sonnet/opus/gpt-4)
+- [ ] `model` definido (sonnet/opus/haiku/fable)
 - [ ] `tools` apenas genéricas (exceto especializados)
 - [ ] `version` em formato semver
 - [ ] `updated` com data atual

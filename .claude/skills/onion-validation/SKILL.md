@@ -35,6 +35,15 @@ allowed-tools: Bash(find .claude/*) Bash(wc -l*) Bash(grep*)
 - [ ] Seção "Processo" ou "Fluxo de Execução" presente
 - [ ] Sem duplicação de nome
 
+### Validação de Fleet (commands.md §10)
+Para comandos/skills de orquestração de frota:
+- [ ] Orquestração reside em skill/comando, **nunca** em agente (architecture.md §4.2)
+- [ ] Fan-out só com independência real; fan-in/consolidação obrigatório
+- [ ] Trata falha parcial de worker (`.filter(Boolean)`) e reporta descartes
+- [ ] `isolation:'worktree'` quando há mutação concorrente de arquivos
+- [ ] `budget`/model tiering declarados; verificação adversarial em alto risco
+- [ ] Fallback serial determinístico se o substrato Workflow faltar
+
 ## Validação de Agentes
 
 ### Campos adicionais

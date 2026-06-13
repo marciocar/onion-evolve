@@ -1,0 +1,34 @@
+name: Onion Artifact Linter
+
+on:
+  pull_request:
+    paths:
+      - '.claude/**'
+      - 'docs/meta-specs/**'
+
+permissions:
+  contents: read
+
+jobs:
+  lint-onion-artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Executar linter determinístico de artefatos Onion
+        run: bash .claude/validation/lint-artifacts.sh
+
+      - name: Lembrete — checagens semânticas são locais
+        run: |
+          echo "---"
+          echo "AVISO: Este job cobre apenas validações DETERMINÍSTICAS (estrutura, YAML, frontmatter, nomenclatura)."
+          echo "Checagens SEMÂNTICAS de conformidade arquitetural (metaspec, invariantes de framework)"
+          echo "devem ser executadas localmente via o comando /meta:metaspec-validate,"
+          echo "orquestrado pelo agente @metaspec-gate-keeper — fora do escopo do CI."
+          echo "---"

@@ -10,9 +10,9 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- 🤖 **78 comandos invocáveis** Claude Code em 9 categorias (+ 12 fragmentos compartilhados em `common/` e 3 READMEs)
+- 🤖 **80 comandos invocáveis** Claude Code em 9 categorias (+ 13 fragmentos compartilhados em `common/` e 3 READMEs)
 - 🎯 **49 agentes de IA especializados** em 9 categorias
-- 🧩 **4 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`)
+- 🧩 **5 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-fleet` — orquestração de frota)
 - 📚 **Knowledge Bases estruturadas** para consumo por IA
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente com ativação automática
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
@@ -26,8 +26,8 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **66 arquivos markdown** em `docs/`
 - **11 arquivos** em `docs/onion/` (Sistema Onion)
 - **25 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
-  - 13 arquivos em `concepts/` (Conceitos fundamentais)
-  - 7 arquivos em `frameworks/` (Frameworks e metodologias)
+  - 14 arquivos em `concepts/` (Conceitos fundamentais)
+  - 8 arquivos em `frameworks/` (Frameworks e metodologias)
   - 3 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
   - 1 arquivo em `platforms/` (Plataformas)
   - 1 `index.md`
@@ -35,18 +35,18 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - Arquivos adicionais em `docs/analysis/`, `docs/plans/`, `docs/business-context/`, `docs/technical-context/`
 
 ### Sistema Onion (`.claude/`)
-- **78 comandos invocáveis** Claude Code distribuídos em:
+- **80 comandos invocáveis** Claude Code distribuídos em:
   - 20 em `product/` (gestão de produto e descoberta)
   - 12 em `git/` (GitFlow e versionamento)
   - 11 em `engineer/` (engenharia e desenvolvimento)
   - 11 em `docs/` (geração e validação de documentação)
-  - 11 em `meta/` (meta-comandos, criadores e validação)
+  - 13 em `meta/` (meta-comandos, criadores, validação, orquestração de frota e frescor de KB)
   - 6 em `validate/` (validação e testes)
   - 3 em `test/` (unit, integration, e2e)
   - 1 em `development/`, 1 em `quick/`
   - 2 no root: `onion.md`, `warm-up.md`
-  - **não-invocáveis**: 12 fragmentos em `common/` (5 templates + 7 prompts) e 3 READMEs de categoria
-- **4 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`)
+  - **não-invocáveis**: 13 fragmentos em `common/` (5 templates + 8 prompts) e 3 READMEs de categoria
+- **5 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-fleet`)
 - **49 agentes** IA distribuídos em:
   - 20 em `development/` (frontend, backend, infra, integrações)
   - 8 em `product/` (gestão e narrativa)
@@ -58,9 +58,9 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 
 ### Total
 - **66 arquivos** de documentação markdown
-- **78 comandos invocáveis** em 9 categorias + root (+ 12 fragmentos `common/` + 3 READMEs)
+- **80 comandos invocáveis** em 9 categorias + root (+ 13 fragmentos `common/` + 3 READMEs)
 - **49 agentes** especializados em 9 categorias
-- **4 skills** (`.claude/skills/`)
+- **5 skills** (`.claude/skills/`)
 
 ---
 
@@ -84,8 +84,9 @@ docs/
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
 ├── knowledge-base/             # Knowledge Bases (25 arquivos)
-│   ├── concepts/               # Conceitos fundamentais (13 arquivos)
+│   ├── concepts/               # Conceitos fundamentais (14 arquivos)
 │   │   ├── abstraction-patterns-catalog.md
+│   │   ├── agent-fleet-orchestration.md  # ✨ NOVO
 │   │   ├── ai-agent-design-patterns.md
 │   │   ├── branding-posicionamento-marca.md
 │   │   ├── configuration-management.md
@@ -98,7 +99,8 @@ docs/
 │   │   ├── spec-driven-development.md  # ✨ NOVO
 │   │   ├── specification-driven-ai-abstraction-layer.md
 │   │   └── task-manager-abstraction.md
-│   ├── frameworks/             # Frameworks e metodologias (7 arquivos)
+│   ├── frameworks/             # Frameworks e metodologias (8 arquivos)
+│   │   ├── agent-orchestration-landscape-2026.md  # ✨ NOVO
 │   │   ├── framework_story_points.md
 │   │   ├── framework_testes.md
 │   │   ├── onion-complete-cycle-understanding.md
@@ -111,7 +113,7 @@ docs/
 │   ├── providers/              # Provedores de serviços (1 arquivo)
 │   │   └── microsoft-graph-teams-api-guia-completo.md
 │   └── tools/                  # Ferramentas e recursos (2 arquivos)
-│       ├── claude-code-commands-best-practices-2025.md
+│       ├── claude-code-commands-best-practices-2026.md
 │       └── whisper.md          # Knowledge base do Whisper
 │
 ├── meta-specs/                 # Meta Especificações (1 arquivo)
@@ -175,13 +177,14 @@ docs/
 
 Knowledge Bases estruturadas para consumo por IA e referência técnica:
 
-### Conceitos Fundamentais (13 arquivos)
+### Conceitos Fundamentais (14 arquivos)
 - **Task Manager Abstraction** - Abstração de gerenciadores de tarefas
 - **Framework de Story Points** - Sistema de estimativas ágeis
 - **Framework de Testes** - Metodologias de teste completas
 - **Spec-as-Code Strategy** - Estratégia de especificações como código
 - **Spec-Driven Development** - Metodologia emergente de desenvolvimento com IA ✨ NOVO
 - **AI Agent Design Patterns** - Padrões de design para agentes IA
+- **Agent Fleet Orchestration** - Orquestração de frota: 6 padrões canônicos sobre primitivas nativas (Workflow/Agent) ✨ NOVO
 - **Abstraction Patterns Catalog** - Catálogo de padrões de abstração
 - **Context Window Optimization** - Otimização de contexto para IA
 - **Configuration Management** - Gestão de configurações
@@ -190,7 +193,8 @@ Knowledge Bases estruturadas para consumo por IA e referência técnica:
 - **Meeting Transcription to Knowledge Base** - Processamento de reuniões
 - **Specification-Driven AI Abstraction Layer** - Camada de abstração orientada a especificações
 
-### Frameworks e Metodologias (7 arquivos)
+### Frameworks e Metodologias (8 arquivos)
+- **Agent Orchestration Landscape 2026** - Comparativo de 5 correntes (Anthropic/coding-agents/OSS/enterprise/academia) com verificação adversarial ✨ NOVO
 - **Framework de Story Points** - Estimativas ágeis
 - **Framework de Testes** - White-box, Grey-box, Black-box
 - **Onion Complete Cycle Understanding** - Sistema completo de 5 camadas

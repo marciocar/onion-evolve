@@ -14,9 +14,9 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
 
 **Inventário atual**:
 
-- 77 comandos invocáveis por categoria (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `development`, `quick`) + `onion.md` e `warm-up.md` no root; `common/` guarda 12 fragmentos compartilhados (templates/prompts) e há 3 READMEs de categoria
+- 79 comandos invocáveis por categoria (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `development`, `quick`) + `onion.md` e `warm-up.md` no root; `common/` guarda 13 fragmentos compartilhados (templates/prompts) e há 3 READMEs de categoria
 - 49 agentes especializados de IA em 9 categorias (`compliance`, `deployment`, `development`, `git`, `meta`, `product`, `research`, `review`, `testing`)
-- 4 skills em `.claude/skills/` (`onion` — orquestrador; `onion-patterns`; `onion-validation`; `language-standards`)
+- 5 skills em `.claude/skills/` (`onion` — orquestrador; `onion-patterns`; `onion-validation`; `language-standards`; `onion-fleet` — orquestração de frota)
 - **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear) via `.claude/utils/task-manager/`
 - Workflows automatizados de desenvolvimento (GitFlow + sessions persistentes em `.claude/sessions/`)
 

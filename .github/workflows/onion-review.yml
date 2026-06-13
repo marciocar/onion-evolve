@@ -1,0 +1,67 @@
+name: Onion Code Review (Claude)
+
+# Revisor de PR NATIVO do Sistema Onion — Claude + doutrina do @metaspec-gate-keeper.
+# Complementa o linter determinístico (onion-validate.yml) com a checagem SEMÂNTICA
+# de conformidade. Torna redundante o revisor de terceiros baseado em GPT-4o
+# (code-review.yml), alinhando o CI ao lineup Claude-only do framework.
+#
+# Pré-requisitos (configurar uma vez):
+#   1. Secret ANTHROPIC_API_KEY em Settings -> Secrets and variables -> Actions.
+#   2. GitHub App do Claude instalado (`/install-github-app` no Claude Code, ou
+#      https://github.com/apps/claude).
+# Sem o secret, o step de review é pulado (degrada graciosamente); o linter
+# determinístico segue cobrindo estrutura/YAML/naming.
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  onion-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Forks não têm acesso a secrets — pular para evitar check falho.
+    if: ${{ github.event.pull_request.head.repo.fork == false }}
+    env:
+      HAS_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Revisor Onion (gate-keeper + code review)
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Você é o revisor nativo do Sistema Onion. Revise o diff deste Pull Request
+            aplicando a doutrina do @metaspec-gate-keeper contra a constituição em
+            docs/meta-specs/ (descubra as meta-specs dinamicamente; não assuma nomes fixos):
+
+            - Conformidade com agents.md, commands.md, architecture.md, code-standards.md,
+              integrations.md — cite a regra como `meta-spec:linha` ao apontar violação.
+            - Regras de FLEET (commands.md §10): orquestração reside em skill/comando, NUNCA
+              em agente (architecture.md §4.2); invariante de workflows faseados preservada;
+              resiliência exigida quando há fan-out (falha parcial, timeout, fan-in, fallback).
+            - Código/idioma (code-standards.md): pt-BR em docs/conteúdo, inglês em código/commits;
+              lineup de modelo SÓ Claude (Fable 5 / Opus 4.8 / Sonnet 4.6 / Haiku 4.5) — sinalize
+              qualquer "gpt-4" em campo `model:` de frontmatter.
+            - Ausência de vaporware (ex.: `mcp_onion-orchestrator`).
+
+            Poste comentários inline nos pontos problemáticos, citando a regra e a evidência.
+            Seja conciso e factual; se o diff estiver conforme, aprove explicitamente.
+          claude_args: |
+            --model claude-sonnet-4-6
+            --max-turns 8
+
+      - name: Aviso — revisor Onion pulado (sem ANTHROPIC_API_KEY)
+        if: ${{ env.HAS_ANTHROPIC_KEY != 'true' }}
+        run: |
+          echo "Revisor Onion pulado: configure o secret ANTHROPIC_API_KEY e instale o GitHub App do Claude."
+          echo "A validação determinística (onion-validate.yml) continua cobrindo estrutura/YAML/naming."

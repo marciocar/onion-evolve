@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões para Comandos do Sistema Onion
 date: 2026-05-18
-version: 1.0.0
+version: 1.1.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -310,3 +310,28 @@ Mudanças nesta spec exigem:
 2. Atualização do campo `version` no frontmatter
 3. Validação por `@metaspec-gate-keeper` em comandos existentes
 4. Especificamente para mudança em workflows canônicos (Seção 3.1): aprovação registrada em commit message com link para issue de discussão
+
+---
+
+## 10. Orquestração em fleet (fan-out paralelo)
+
+Complementa a Seção 3: enquanto workflows faseados coordenam trabalho **sequencial e retomável**, a orquestração em **fleet** coordena trabalho **paralelo** (fan-out → fan-in) sobre o substrato nativo do Claude Code (ferramenta `Workflow`). Doutrina, padrões canônicos e mapeamento às primitivas: [docs/knowledge-base/concepts/agent-fleet-orchestration.md](../knowledge-base/concepts/agent-fleet-orchestration.md).
+
+### 10.1 Onde a orquestração de fleet pode residir
+
+- **Permitido**: em `skills/*` e `commands/*` — executam no contexto principal e podem orquestrar as ferramentas `Workflow`/`Agent`.
+- **Proibido**: criar um **agente** orquestrador de fleet. Por [architecture.md §4.2](./architecture.md), `agents/* → commands/*` é proibido e subagentes não devem disparar a frota — a orquestração mora no nível principal. A camada canônica é a skill `onion-fleet` + o comando `/meta:fleet`.
+
+### 10.2 Regras normativas
+
+1. **Opt-in**: fan-out é explícito, nunca o comportamento default. Trabalho serial dependente permanece sequencial.
+2. **Independência**: só paralelizar subtarefas sem dependência cruzada de dados.
+3. **Fan-in obrigatório**: todo fan-out termina em consolidação num resultado único (não N saídas soltas).
+4. **Isolamento**: quando workers mutam arquivos concorrentemente, usar isolamento por worktree (`isolation: 'worktree'`).
+5. **Verificação**: achados de alto risco passam por verificação adversarial / judge-panel antes de serem aceitos.
+6. **Budget e tiers**: respeitar teto de tokens (`budget`) e model tiering (orquestrador em opus; workers em sonnet/haiku).
+7. **Invariante preservada**: a frota paraleliza *dentro* de uma fase; **não funde** os workflows faseados canônicos da Seção 3 (`engineer/*`, `product/*`).
+
+### 10.3 Padrões canônicos
+
+Os seis padrões canônicos (classify-and-act, fan-out-and-synthesize, adversarial verification, generate-and-filter, tournament, loop-until-done) e seu mapeamento às primitivas `agent()`/`parallel()`/`pipeline()` são normalizados na KB de fleet orchestration (link acima).

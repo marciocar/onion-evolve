@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões para Agentes do Sistema Onion
 date: 2026-05-18
-version: 1.0.0
+version: 1.1.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -48,7 +48,7 @@ tools: [<lista de tools necessárias>]
 
 | Campo | Tipo | Uso |
 |---|---|---|
-| `model` | string | Override de modelo (`opus`, `sonnet`, `haiku`). Omitir para herdar do parent |
+| `model` | string | Override de modelo (`opus`, `sonnet`, `haiku`, `fable`). Omitir para herdar do parent |
 | `color` | string | Hint visual de categoria |
 
 ### Exemplos
@@ -127,6 +127,10 @@ Justificativa válida exige **pelo menos um** dos critérios:
 - Decomposição genérica de tarefas → `@task-specialist`
 - Análise de produto sem framework específico → `@product-agent`
 - Pesquisa multi-fonte → `@research-agent`
+
+### Proibido: agente orquestrador de frota
+
+**Não crie um agente "fleet-orchestrator".** A orquestração de frota (fan-out paralelo) reside em **skill/comando** (`onion-fleet` + `/meta:fleet`), nunca em agente — por [architecture.md §4.2](./architecture.md), `agents/* → commands/*` é proibido e subagentes não disparam a frota. Ver [commands.md §10](./commands.md).
 
 ### Regra para o YAML `description`
 

@@ -4,8 +4,8 @@ description: Validação completa antes do PR. Verifica padrões e qualidade.
 model: sonnet
 category: engineer
 tags: [validation, pr, quality]
-version: "3.0.0"
-updated: "2025-11-24"
+version: "3.1.0"
+updated: "2026-06-13"
 ---
 
 # Pre-PR - Validação Completa Antes do Pull Request
@@ -47,11 +47,19 @@ O comentário de validação deve conter: resultado da validação de critérios
 3. **Gerar relatório** - Criar lista de critérios validados
 4. **Bloquear se incompleto** - Se algum critério não estiver marcado, indicar no comentário
 
-### 🔧 Validações Técnicas:
-1. Invoque o agente `branch-metaspec-checker` para verificar se a branch está alinhada com as meta specs do projeto.
-2. Invoque o agente `branch-code-reviewer` para revisar o código e garantir que está bom para lançar.
-3. Invoque o agente `branch-documentation-writer` para atualizar a documentação do projeto.
-4. Invoque o agente `branch-test-planner` para finalizar a escrita de testes para a branch.
+### 🔧 Validações Técnicas (fan-out paralelo):
+
+Os quatro agentes abaixo são **independentes** — execute-os como uma **frota em paralelo** (fan-out) e depois **consolide** o feedback num relatório único (fan-in). Padrão na skill `onion-fleet` e na KB `agent-fleet-orchestration`.
+
+**Fan-out (paralelo)** — dispare simultaneamente, cada um com saída estruturada:
+- `branch-metaspec-checker` — alinhamento da branch com as meta-specs do projeto.
+- `branch-code-reviewer` — qualidade do código, pronto para lançar.
+- `branch-documentation-writer` — documentação do projeto atualizada.
+- `branch-test-planner` — testes finalizados para a branch.
+
+**Fan-in (consolidação)** — mescle os quatro retornos num **relatório único** de pré-PR, deduplicando achados e ordenando por severidade.
+
+> **Fallback sequencial:** se o substrato de fan-out paralelo não estiver disponível, invoque os quatro agentes em sequência (1→4) e consolide ao final — mesmo resultado, mais lento. Padrão canônico de degradação: `common/prompts/fleet-fallback.md`.
 
 ### 📋 AUTO-UPDATE:
 5. **Validar critérios de aceitação** - Verificar todos os checkboxes
