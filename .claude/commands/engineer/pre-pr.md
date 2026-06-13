@@ -29,7 +29,7 @@ O comentário de validação deve conter: resultado da validação de critérios
 
 **Roteamento por provider** (carregar `.env` → ler `TASK_MANAGER_PROVIDER` → seguir o adapter):
 
-- **`clickup`** → comentário em formatação Unicode via `@clickup-specialist`. Adapter: `.claude/utils/task-manager/adapters/clickup.md`. Padrões: `.claude/commands/common/prompts/clickup-patterns.md`. Abstrações MCP de referência: `validateAcceptanceCriteria()` (linhas 534-600) e `commentPrePRValidation()` (linhas 603-629) em `.claude/utils/clickup-mcp-wrappers.md`.
+- **`clickup`** → comentário em formatação Unicode via `@clickup-specialist`. Adapter: `.claude/utils/task-manager/adapters/clickup.md` (API-first; MCP opcional). Padrões: `.claude/commands/common/prompts/clickup-patterns.md`.
 - **`jira`** → comentário em ADF via `@jira-specialist`. Adapter: `.claude/utils/task-manager/adapters/jira.md`.
 - **`asana`** → comentário (story) via `@task-specialist`. Adapter: `.claude/utils/task-manager/adapters/asana.md`.
 - **`linear`** → comentário em Markdown via `@task-specialist`. Adapter: `.claude/utils/task-manager/adapters/linear.md`.

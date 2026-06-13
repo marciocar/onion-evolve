@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões de Integração do Sistema Onion
 date: 2026-05-18
-version: 1.0.0
+version: 1.1.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -36,12 +36,16 @@ A Task Manager Abstraction é o padrão **SDAAL** (Specification-Driven AI Abstr
 ├── detector.md          # Detecção automática de provider
 └── adapters/
     ├── jira.md          # Adapter Jira (REST v3, ADF)
-    ├── clickup.md       # Adapter ClickUp (MCP)
-    ├── asana.md         # Adapter Asana (HTML notes)
-    └── linear.md        # Adapter Linear (Markdown)
+    ├── clickup.md       # Adapter ClickUp (API-first; MCP opcional)
+    ├── asana.md         # Adapter Asana (API-first; MCP opcional)
+    └── linear.md        # Adapter Linear (API-first; MCP opcional)
 ```
 
 Toda nova integração (ex: novo Task Manager, novo serviço de comunicação) deve replicar essa estrutura.
+
+### 1.1 Transporte: API-first, MCP opcional
+
+Cada adapter usa a **REST API** do provider como transporte **padrão e preferencial**. O **MCP é opcional e ativável** via `TASK_MANAGER_TRANSPORT` (`api` | `mcp`; **default `api`**): quando `mcp` e o provider tiver servidor MCP disponível, o adapter usa MCP; caso contrário, cai para API. Isso é coerente com o SDAAL — a *spec* define **o quê** (operações de `ITaskManager`); o adapter define **o como** (API ou MCP). Não há wrappers MCP específicos por provider.
 
 ---
 
@@ -141,7 +145,9 @@ Para operar offline, defina TASK_MANAGER_PROVIDER=none no .env.
 
 ---
 
-## 4. MCPs (Model Context Protocol) suportados
+## 4. MCPs (Model Context Protocol) — transporte opcional
+
+> MCP é um **transporte opcional** dos adapters, não o padrão. O default é API (Seção 1.1). Use MCP apenas quando `TASK_MANAGER_TRANSPORT=mcp` e o provider tiver servidor MCP.
 
 ### 4.1 MCPs declarados em agentes
 
@@ -190,9 +196,9 @@ Cada provider tem formato preferido para descrições, comentários e payloads. 
 |---|---|---|---|
 | Jira Cloud (v3) | ADF (Atlassian Document Format) — JSON estruturado | ADF | Bulk via `/issue/bulk` |
 | Jira Server/DC (v2) | Wiki markup ou plain text (string) | Wiki markup | Search via `/search` (paginated) |
-| ClickUp | Markdown nativo em `markdown_description` | Unicode visual em `commentText` (`━━━`, `∟`, `▶`, `◆`, `✅`) | API REST + MCP |
-| Asana | HTML notes (subset) ou plain text | HTML | API REST |
-| Linear | Markdown nativo (suporte rico) | Markdown | API GraphQL |
+| ClickUp | Markdown nativo em `markdown_description` | Unicode visual em `commentText` (`━━━`, `∟`, `▶`, `◆`, `✅`) | API REST (default) · MCP opcional |
+| Asana | HTML notes (subset) ou plain text | HTML | API REST (default) · MCP opcional |
+| Linear | Markdown nativo (suporte rico) | Markdown | API GraphQL (default) · MCP opcional |
 
 ### 5.1 Templates por provider
 

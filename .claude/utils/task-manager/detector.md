@@ -2,35 +2,74 @@
 
 ## 🎯 Propósito
 
-Detecta e valida o provedor de gerenciamento de tarefas configurado, além de identificar a origem de IDs de tasks para garantir compatibilidade.
+Detecta e valida o provedor de gerenciamento de tarefas configurado e o transporte a usar (API REST ou MCP), além de identificar a origem de IDs de tasks para garantir compatibilidade.
 
 ---
 
 ## 📋 Funções Principais
 
+### detectTransport()
+
+```typescript
+/**
+ * Detecta o transporte configurado via variável de ambiente.
+ *
+ * TASK_MANAGER_TRANSPORT controla como o adapter se comunica com o provider:
+ *   'api'  (default) — REST API direta; sempre disponível.
+ *   'mcp'            — MCP server do provider; usado apenas quando disponível
+ *                      para o provider ativo. Cai para 'api' se indisponível.
+ *
+ * @returns 'api' | 'mcp'
+ */
+function detectTransport(): TaskManagerTransport {
+  const raw = (process.env.TASK_MANAGER_TRANSPORT || 'api').toLowerCase();
+  return raw === 'mcp' ? 'mcp' : 'api';
+}
+```
+
+---
+
 ### detectProvider()
 
 ```typescript
 /**
- * Detecta o provedor configurado via variáveis de ambiente.
- * @returns Configuração do provedor ativo
+ * Detecta o provedor configurado via variáveis de ambiente e resolve o
+ * transporte ativo. O campo `transport` no ProviderConfig retornado reflete
+ * a decisão final. Todos os providers honram o transporte solicitado
+ * (api default; mcp opcional); a disponibilidade real do servidor MCP é
+ * verificada em RUNTIME pelo adapter, que cai para 'api' se o MCP não responder.
+ * 'none' opera offline (transport='api').
+ *
+ * @returns Configuração do provedor ativo (inclui campo `transport`)
  */
 function detectProvider(): ProviderConfig {
   const provider = (process.env.TASK_MANAGER_PROVIDER || 'none') as TaskManagerProvider;
-  
+  const requestedTransport = detectTransport();
+
+  /**
+   * Resolve o transporte efetivo (uniforme para todos os providers):
+   * 'none' opera offline (api); os demais honram o solicitado (api default | mcp).
+   * A disponibilidade real do MCP é verificada em runtime pelo adapter (fallback → api).
+   */
+  function resolveTransport(p: TaskManagerProvider): TaskManagerTransport {
+    return p === 'none' ? 'api' : requestedTransport;
+  }
+
   const configs: Record<TaskManagerProvider, ProviderConfig> = {
     clickup: {
       provider: 'clickup',
+      transport: resolveTransport('clickup'),
       isConfigured: !!process.env.CLICKUP_API_TOKEN,
       requiredEnvVars: ['CLICKUP_API_TOKEN'],
       optionalEnvVars: ['CLICKUP_WORKSPACE_ID', 'CLICKUP_DEFAULT_LIST_ID'],
-      errorMessage: !process.env.CLICKUP_API_TOKEN 
+      errorMessage: !process.env.CLICKUP_API_TOKEN
         ? '❌ CLICKUP_API_TOKEN não configurado. Execute /meta/setup-integration'
         : undefined
     },
-    
+
     asana: {
       provider: 'asana',
+      transport: 'api',  // Asana não possui servidor MCP — sempre API
       isConfigured: !!process.env.ASANA_ACCESS_TOKEN,
       requiredEnvVars: ['ASANA_ACCESS_TOKEN'],
       optionalEnvVars: ['ASANA_WORKSPACE_ID', 'ASANA_DEFAULT_PROJECT_ID'],
@@ -53,6 +92,7 @@ function detectProvider(): ProviderConfig {
 
       return {
         provider: 'jira' as TaskManagerProvider,
+        transport: 'api' as TaskManagerTransport,  // Jira não possui servidor MCP — sempre API
         isConfigured,
         requiredEnvVars: ['JIRA_HOST', 'JIRA_API_TOKEN', 'JIRA_EMAIL'],
         optionalEnvVars: ['JIRA_PROJECT_KEY', 'JIRA_AUTH_TYPE', 'JIRA_API_VERSION'],
@@ -64,6 +104,7 @@ function detectProvider(): ProviderConfig {
 
     linear: {
       provider: 'linear',
+      transport: resolveTransport('linear'),
       isConfigured: !!process.env.LINEAR_API_KEY,
       requiredEnvVars: ['LINEAR_API_KEY'],
       optionalEnvVars: ['LINEAR_TEAM_ID'],
@@ -71,16 +112,17 @@ function detectProvider(): ProviderConfig {
         ? '❌ LINEAR_API_KEY não configurado. Execute /meta/setup-integration'
         : undefined
     },
-    
+
     none: {
       provider: 'none',
+      transport: 'api',  // Modo offline; sem transporte real
       isConfigured: true,  // Sempre "configurado" pois é o fallback
       requiredEnvVars: [],
       optionalEnvVars: [],
       errorMessage: undefined
     }
   };
-  
+
   return configs[provider] || configs.none;
 }
 ```
@@ -232,31 +274,39 @@ function validateProviderMatch(
 
 ```typescript
 /**
- * Verifica a configuração completa do provedor.
- * @returns Objeto com status e mensagens
+ * Verifica a configuração completa do provedor e do transporte.
+ * @returns Objeto com status, transporte ativo e mensagens
  */
 function checkProviderConfiguration(): {
   provider: TaskManagerProvider;
+  transport: TaskManagerTransport;
   isConfigured: boolean;
   missingVars: string[];
   optionalVars: { name: string; set: boolean }[];
   message: string;
 } {
   const config = detectProvider();
-  
+
   const missingVars = config.requiredEnvVars.filter(
     varName => !process.env[varName]
   );
-  
+
   const optionalVars = config.optionalEnvVars.map(varName => ({
     name: varName,
     set: !!process.env[varName]
   }));
-  
+
+  // Informa o transporte escolhido (a disponibilidade real do MCP é runtime)
+  const requestedTransport = detectTransport();
+  const transportNote = (requestedTransport === 'mcp' && config.transport === 'mcp')
+    ? `\nℹ️ TASK_MANAGER_TRANSPORT=mcp: o adapter usará MCP se o servidor estiver disponível em runtime; senão, cai para API.`
+    : '';
+
   let message: string;
-  
+
   if (config.provider === 'none') {
     message = `ℹ️ Nenhum gerenciador de tarefas configurado.\n` +
+              `Transporte: ${config.transport} (modo offline).\n` +
               `Comandos funcionarão em modo offline.\n` +
               `Execute /meta/setup-integration para configurar.`;
   } else if (!config.isConfigured) {
@@ -267,13 +317,15 @@ function checkProviderConfiguration(): {
     const optionalStatus = optionalVars
       .map(v => `   ${v.set ? '✅' : '⚪'} ${v.name}`)
       .join('\n');
-    
+
     message = `✅ ${config.provider.toUpperCase()} configurado corretamente.\n` +
+              `Transporte ativo: ${config.transport}${transportNote}\n` +
               `Variáveis opcionais:\n${optionalStatus}`;
   }
-  
+
   return {
     provider: config.provider,
+    transport: config.transport,
     isConfigured: config.isConfigured,
     missingVars,
     optionalVars,
@@ -301,10 +353,14 @@ function checkProviderConfiguration(): {
 ## 🧪 Exemplos de Uso
 
 ```typescript
-// Detectar provedor configurado
+// Detectar provedor e transporte configurados
 const config = detectProvider();
-console.log(`Provedor: ${config.provider}`);
+console.log(`Provedor:   ${config.provider}`);
+console.log(`Transporte: ${config.transport}`);   // 'api' | 'mcp'
 console.log(`Configurado: ${config.isConfigured}`);
+
+// Detectar apenas o transporte
+const transport = detectTransport();  // lê TASK_MANAGER_TRANSPORT; default 'api'
 
 // Validar ID de task
 const taskId = '86adfe9eb';
@@ -316,20 +372,39 @@ if (!validation.valid) {
   // Perguntar ao usuário o que fazer
 }
 
-// Verificar configuração completa
+// Verificar configuração completa (inclui campo `transport` no retorno)
 const status = checkProviderConfiguration();
 console.log(status.message);
+// Ex: "✅ CLICKUP configurado corretamente.\nTransporte ativo: mcp\n..."
 ```
+
+---
+
+## 🔀 Lógica de Transporte
+
+| `TASK_MANAGER_TRANSPORT` | Provider | Transporte efetivo | Motivo |
+|--------------------------|----------|--------------------|--------|
+| `api` (ou ausente)       | qualquer | `api`              | default |
+| `mcp`                    | `clickup` | `mcp`             | suporte MCP disponível |
+| `mcp`                    | `linear`  | `mcp`             | suporte MCP disponível |
+| `mcp`                    | `asana`   | `api`             | sem servidor MCP — fallback |
+| `mcp`                    | `jira`    | `api`             | sem servidor MCP — fallback |
+| `mcp`                    | `none`    | `api`             | modo offline — sem transporte real |
+
+> Os adapters consultam `config.transport` para decidir qual via usar internamente
+> (REST direto vs. chamadas ao servidor MCP). Ver cada adapter doc para detalhes.
 
 ---
 
 ## 📚 Referências
 
-- [Types](./types.md) - Definições de tipos
+- [Types](./types.md) - Definições de tipos (inclui `TaskManagerTransport` e campo `transport` em `ProviderConfig`)
 - [Factory](./factory.md) - Criação de adapters
+- [SDAAL](../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md) - Padrão-pai
 
 ---
 
-**Versão**: 1.0.0
+**Versão**: 1.1.0
 **Criado em**: 2025-11-24
+**Atualizado em**: 2026-06-13
 

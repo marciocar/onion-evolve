@@ -1,8 +1,17 @@
 # 🏭 Factory - Task Manager
 
+> Instância concreta do padrão **SDAAL** (Specification-Driven AI Abstraction Layer).
+> Referência canônica: `docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md`
+
 ## 🎯 Propósito
 
-Fornece uma factory para instanciar o adapter correto baseado na configuração do ambiente, abstraindo a criação e permitindo uso simplificado nos comandos.
+Instanciar o adapter correto para o provider e transporte configurados, abstraindo a criação e permitindo uso uniforme nos comandos.
+
+**Regra de transporte (invariante):**
+- `TASK_MANAGER_TRANSPORT=api` (default) → REST API direta; sempre disponível.
+- `TASK_MANAGER_TRANSPORT=mcp` → MCP server do provider; ativado apenas quando o provider suporta MCP (`clickup`, `linear`). Se não suportado, cai automaticamente para `api`.
+
+A decisão final de transporte é resolvida pelo `detectProvider()` (ver `detector.md`) e exposta em `ProviderConfig.transport`. A factory lê esse campo — nunca relê `TASK_MANAGER_TRANSPORT` diretamente.
 
 ---
 
@@ -13,54 +22,68 @@ Fornece uma factory para instanciar o adapter correto baseado na configuração 
 ```typescript
 /**
  * Retorna uma instância do TaskManager configurado.
- * Baseado em TASK_MANAGER_PROVIDER no .env
- * 
+ *
+ * Fluxo:
+ *   1. detectProvider() → resolve provider + transporte efetivo
+ *   2. Se não configurado → fallback ou erro (conforme options)
+ *   3. Instancia o adapter passando { transport } no config
+ *      - transport='api'  → adapter usa REST API direta
+ *      - transport='mcp'  → adapter usa MCP server (apenas providers capazes)
+ *
  * @param options - Opções de configuração (opcional)
  * @returns Instância do adapter apropriado
- * 
+ *
  * @example
  * const tm = getTaskManager();
  * const task = await tm.createTask({ name: 'Nova Task' });
  */
 function getTaskManager(options?: FactoryOptions): ITaskManager {
   const config = detectProvider();
-  
+  // config.transport já é o transporte EFETIVO (api | mcp), após fallback do detector
+
   // Log de debug (se habilitado)
   if (options?.debug) {
-    console.log(`[TaskManager] Provider: ${config.provider}`);
+    console.log(`[TaskManager] Provider:   ${config.provider}`);
+    console.log(`[TaskManager] Transport:  ${config.transport}`);
     console.log(`[TaskManager] Configured: ${config.isConfigured}`);
   }
-  
-  // Se não está configurado, decidir comportamento
+
+  // Provedor selecionado mas não configurado — decidir comportamento
   if (!config.isConfigured) {
     if (options?.throwOnMisconfigured) {
       throw new Error(config.errorMessage || 'Provider not configured');
     }
-    
-    // Aviso e fallback para NoProviderAdapter
     console.warn(`⚠️ ${config.errorMessage}`);
     console.warn(`💡 Continuando em modo offline...`);
     return new NoProviderAdapter();
   }
-  
-  // Instanciar adapter apropriado
+
+  // Instanciar adapter com transporte resolvido
   switch (config.provider) {
+
     case 'clickup':
+      // transport='api'  → REST API  (https://api.clickup.com/api/v2)
+      // transport='mcp'  → MCP server ClickUp (quando TASK_MANAGER_TRANSPORT=mcp)
       return new ClickUpAdapter({
+        transport: config.transport,          // <- ciente do transporte
         apiToken: process.env.CLICKUP_API_TOKEN!,
         workspaceId: process.env.CLICKUP_WORKSPACE_ID,
         defaultListId: process.env.CLICKUP_DEFAULT_LIST_ID
       });
-      
+
     case 'asana':
+      // transport='api' (REST) | 'mcp' (Asana via conector claude.ai)
       return new AsanaAdapter({
+        transport: config.transport,
         accessToken: process.env.ASANA_ACCESS_TOKEN!,
         workspaceId: process.env.ASANA_WORKSPACE_ID,
         defaultProjectId: process.env.ASANA_DEFAULT_PROJECT_ID
       });
 
     case 'jira':
+      // transport='api' (REST v3/v2, ADF) | 'mcp' (Atlassian via conector claude.ai)
       return new JiraAdapter({
+        transport: config.transport,
         host: process.env.JIRA_HOST!,
         email: process.env.JIRA_EMAIL,
         apiToken: process.env.JIRA_API_TOKEN!,
@@ -70,11 +93,14 @@ function getTaskManager(options?: FactoryOptions): ITaskManager {
       });
 
     case 'linear':
+      // transport='api'  → GraphQL API  (https://api.linear.app/graphql)
+      // transport='mcp'  → MCP server Linear (quando TASK_MANAGER_TRANSPORT=mcp)
       return new LinearAdapter({
+        transport: config.transport,          // <- ciente do transporte
         apiKey: process.env.LINEAR_API_KEY!,
         teamId: process.env.LINEAR_TEAM_ID
       });
-      
+
     case 'none':
     default:
       return new NoProviderAdapter();
@@ -91,20 +117,30 @@ function getTaskManager(options?: FactoryOptions): ITaskManager {
  * Opções para a factory.
  */
 interface FactoryOptions {
-  /** Habilita logs de debug */
+  /** Habilita logs de debug (provider + transporte resolvido) */
   debug?: boolean;
-  
-  /** Lança erro se provedor não configurado (ao invés de fallback) */
+
+  /** Lança erro se provedor não configurado (ao invés de fallback silencioso) */
   throwOnMisconfigured?: boolean;
-  
-  /** Força um provedor específico (ignora .env) */
+
+  /** Força um provedor específico (ignora .env) — uso em testes / scripts */
   forceProvider?: TaskManagerProvider;
 }
 
 /**
- * Configuração para ClickUp Adapter.
+ * Configuração base compartilhada por todos os adapters.
+ * O campo `transport` determina a via de comunicação efetiva.
  */
-interface ClickUpAdapterConfig {
+interface BaseAdapterConfig {
+  /** Transporte efetivo resolvido pelo detector. */
+  transport: TaskManagerTransport;  // 'api' | 'mcp'
+}
+
+/**
+ * Configuração para ClickUp Adapter.
+ * Suporta transport='api' (REST) e transport='mcp' (MCP server).
+ */
+interface ClickUpAdapterConfig extends BaseAdapterConfig {
   apiToken: string;
   workspaceId?: string;
   defaultListId?: string;
@@ -112,8 +148,9 @@ interface ClickUpAdapterConfig {
 
 /**
  * Configuração para Asana Adapter.
+ * Suporta apenas transport='api' (REST).
  */
-interface AsanaAdapterConfig {
+interface AsanaAdapterConfig extends BaseAdapterConfig {
   accessToken: string;
   workspaceId?: string;
   defaultProjectId?: string;
@@ -121,8 +158,9 @@ interface AsanaAdapterConfig {
 
 /**
  * Configuração para Jira Adapter.
+ * Suporta apenas transport='api' (REST v3 Cloud / v2 Server).
  */
-interface JiraAdapterConfig {
+interface JiraAdapterConfig extends BaseAdapterConfig {
   /** Hostname do Jira (ex: 'empresa.atlassian.net') */
   host: string;
   /** Email Atlassian (obrigatório em Basic Auth / Cloud) */
@@ -139,8 +177,9 @@ interface JiraAdapterConfig {
 
 /**
  * Configuração para Linear Adapter.
+ * Suporta transport='api' (GraphQL) e transport='mcp' (MCP server).
  */
-interface LinearAdapterConfig {
+interface LinearAdapterConfig extends BaseAdapterConfig {
   apiKey: string;
   teamId?: string;
 }
@@ -154,9 +193,9 @@ interface LinearAdapterConfig {
 
 ```typescript
 /**
- * Versão da factory que lança erro se não configurado.
- * Útil para comandos que REQUEREM um provedor.
- * 
+ * Versão da factory que lança erro se o provedor não estiver configurado.
+ * Útil para comandos que REQUEREM um provedor ativo.
+ *
  * @throws Error se provedor não configurado
  */
 function getTaskManagerOrFail(): ITaskManager {
@@ -168,22 +207,24 @@ function getTaskManagerOrFail(): ITaskManager {
 
 ```typescript
 /**
- * Versão da factory que mostra warning formatado.
- * Útil para comandos que podem funcionar sem provedor.
- * 
- * @returns Adapter + flag indicando se está em modo offline
+ * Versão da factory que expõe aviso formatado quando em modo offline.
+ * Útil para comandos que podem funcionar sem provedor (degraded mode).
+ *
+ * @returns Adapter + flag indicando se está em modo offline + transporte ativo
  */
 function getTaskManagerWithWarning(): {
   taskManager: ITaskManager;
+  transport: TaskManagerTransport;
   isOffline: boolean;
   warning?: string;
 } {
   const config = detectProvider();
   const taskManager = getTaskManager();
-  
+
   if (config.provider === 'none' || !config.isConfigured) {
     return {
       taskManager,
+      transport: 'api',
       isOffline: true,
       warning: `⚠️ MODO OFFLINE ATIVADO
 ━━━━━━━━━━━━━━━━━━━━━━━━
@@ -200,9 +241,10 @@ Funcionalidades disponíveis:
 ━━━━━━━━━━━━━━━━━━━━━━━━`
     };
   }
-  
+
   return {
     taskManager,
+    transport: config.transport,
     isOffline: false
   };
 }
@@ -332,10 +374,9 @@ class NoProviderAdapter implements ITaskManager {
 ### Uso Básico
 
 ```typescript
-// Obter adapter configurado
+// Obter adapter configurado (transporte resolvido automaticamente)
 const taskManager = getTaskManager();
 
-// Verificar se está online
 if (taskManager.isConfigured) {
   const task = await taskManager.createTask({
     name: 'Minha Task',
@@ -343,49 +384,81 @@ if (taskManager.isConfigured) {
   });
   console.log(`✅ Task criada: ${task.url}`);
 } else {
-  console.log('⚠️ Modo offline - task não será sincronizada');
+  console.log('⚠️ Modo offline — task não será sincronizada');
 }
 ```
 
-### Uso com Validação
+### Uso com Debug de Transporte
 
 ```typescript
-// Requer provedor configurado
+// Inspecionar qual transporte foi resolvido
+const taskManager = getTaskManager({ debug: true });
+// Saída de exemplo (ClickUp com MCP ativado):
+//   [TaskManager] Provider:   clickup
+//   [TaskManager] Transport:  mcp
+//   [TaskManager] Configured: true
+```
+
+### Uso com Validação Estrita
+
+```typescript
+// Requer provedor configurado; lança erro se ausente
 try {
   const taskManager = getTaskManagerOrFail();
   await taskManager.updateStatus(taskId, 'done');
 } catch (error) {
-  console.error('❌ Provedor não configurado');
-  // Sugerir /meta/setup-integration
+  console.error('❌ Provedor não configurado — execute /meta/setup-integration');
 }
 ```
 
-### Uso com Warning
+### Uso com Warning (degraded mode)
 
 ```typescript
-// Mostrar warning se offline
-const { taskManager, isOffline, warning } = getTaskManagerWithWarning();
+// Continua mesmo sem provedor; expõe transporte ativo
+const { taskManager, transport, isOffline, warning } = getTaskManagerWithWarning();
 
 if (isOffline) {
   console.log(warning);
+} else {
+  console.log(`Transporte ativo: ${transport}`); // 'api' ou 'mcp'
 }
 
-// Continuar com funcionalidade limitada
-const task = await taskManager.createTask({
-  name: 'Task pode ser local'
-});
+const task = await taskManager.createTask({ name: 'Task pode ser local' });
 ```
+
+### Forçar Provider em Testes
+
+```typescript
+// Sobreposição do .env para scripts / testes isolados
+const taskManager = getTaskManager({ forceProvider: 'linear' });
+```
+
+---
+
+## 📊 Mapa de Suporte a Transporte por Provider
+
+| Provider | `transport='api'` | `transport='mcp'` | Observação |
+|----------|:-----------------:|:-----------------:|-----------|
+| ClickUp  | ✅ default         | ✅ opcional        | Requer `TASK_MANAGER_TRANSPORT=mcp` |
+| Linear   | ✅ default         | ✅ opcional        | Requer `TASK_MANAGER_TRANSPORT=mcp` |
+| Asana    | ✅ sempre          | ❌ N/A             | Sem servidor MCP — forçado para `api` |
+| Jira     | ✅ sempre          | ❌ N/A             | Sem servidor MCP — forçado para `api` |
+| none     | — (offline)       | — (offline)       | NoProviderAdapter; sem chamadas externas |
+
+> Regra: quando `TASK_MANAGER_TRANSPORT=mcp` e o provider não suporta MCP, o detector já
+> retorna `transport='api'` — a factory apenas consome o valor resolvido, sem lógica extra.
 
 ---
 
 ## 📚 Referências
 
 - [Interface ITaskManager](./interface.md)
-- [Detector](./detector.md)
-- [Adapters](./adapters/)
+- [Detector](./detector.md) — resolve provider + transporte efetivo
+- [Adapters](./adapters/) — documentam vias API (default) e MCP (opcional) de forma uniforme
+- [SDAAL — padrão-pai](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
 
 ---
 
-**Versão**: 1.0.0
-**Criado em**: 2025-11-24
+**Versão**: 2.0.0
+**Atualizado em**: 2026-06-13
 

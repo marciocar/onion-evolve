@@ -6,9 +6,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2025-11-25 |
-| **Última Atualização** | 2025-11-25 |
+| **Última Atualização** | 2026-06-13 |
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Padrões de Desenvolvimento de IA |
 | **Tags** | `ai-patterns`, `abstraction-layer`, `spec-as-code`, `claude-code-development` |
@@ -421,50 +421,95 @@ function validateProviderMatch(taskId, currentProvider): ValidationResult {
 
 ---
 
-## 🧪 Exemplo Prático: Task Manager
+## 🏆 Instância Canônica: Task Manager Abstraction
 
-### Estrutura Implementada
+O **Task Manager Abstraction** (`.claude/utils/task-manager/`) é a **implementação de referência** do padrão SDAAL no Sistema Onion. Toda nova abstraction layer deve tomar esta implementação como modelo.
+
+> Documentação completa: [`docs/knowledge-base/concepts/task-manager-abstraction.md`](task-manager-abstraction.md)
+> Código-fonte: [`.claude/utils/task-manager/`](../../../.claude/utils/task-manager/)
+
+### Por que é canônica?
+
+| Princípio SDAAL | Como o Task Manager exemplifica |
+|-----------------|--------------------------------|
+| **Spec define o quê** | `interface.md` + `types.md` descrevem o contrato independente de provider |
+| **Adapter define o como** | Cada `adapters/<provider>.md` decide como chegar ao provider (transporte) |
+| **Factory/Detector** | `factory.md` + `detector.md` isolam a decisão de qual adapter usar |
+| **Null Object** | `adapters/none.md` garante modo offline gracioso |
+| **Portabilidade** | Mesmo comando funciona em Jira, ClickUp, Asana e Linear sem alteração |
+
+### Modelo de Transporte: API-first + MCP opcional
+
+A instância canônica introduz uma dimensão extra ao padrão: **o adapter também decide o transporte**, não apenas o mapeamento de campos. Isso é controlado pela variável `TASK_MANAGER_TRANSPORT`:
+
+```
+TASK_MANAGER_TRANSPORT=api   ← padrão; REST API direta
+TASK_MANAGER_TRANSPORT=mcp   ← opcional; MCP quando disponível, fallback para API
+```
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    CAMADAS DO TASK MANAGER                       │
+│                                                                  │
+│  SPEC (o quê)                                                    │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐ │
+│  │ interface  │  │   types    │  │  factory   │  │  detector  │ │
+│  └────────────┘  └────────────┘  └────────────┘  └────────────┘ │
+│                           │                                      │
+│  ADAPTER (como)           ▼                                      │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  adapter.md  →  lê TASK_MANAGER_TRANSPORT                  │  │
+│  │                                                            │  │
+│  │   api (default) ──► REST API do provider                  │  │
+│  │   mcp (opcional) ──► MCP server → ou fallback para API    │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│                           │                                      │
+│  EXECUÇÃO                 ▼                                      │
+│  ┌───────────────────────────────────────────────────────────┐   │
+│  │  POST /api/v3/tasks   |   mcp_ClickUp_clickup_create_task │   │
+│  └───────────────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Regra de ouro**: a spec (interface/types) nunca menciona transporte — isso é responsabilidade exclusiva do adapter. Quem consome a abstração não sabe (e não precisa saber) se a chamada foi via REST ou MCP.
+
+### Estrutura de Arquivos (referência)
 
 ```
 .claude/utils/task-manager/
-├── README.md           # Introdução + uso rápido
-├── interface.md        # ITaskManager completo
-├── types.md            # CreateTaskInput, TaskOutput, etc
-├── factory.md          # getTaskManager(), NoProviderAdapter
-├── detector.md         # detectProvider(), detectProviderFromTaskId()
+├── README.md           # Visão geral e uso rápido
+├── interface.md        # ITaskManager — contrato agnóstico
+├── types.md            # CreateTaskInput, TaskOutput, etc.
+├── factory.md          # getTaskManager() + NoProviderAdapter
+├── detector.md         # detectProvider(), TASK_MANAGER_TRANSPORT
 └── adapters/
-    ├── clickup.md      # ClickUpAdapter (completo)
-    ├── asana.md        # AsanaAdapter (completo)
-    └── linear.md       # LinearAdapter (stub)
+    ├── jira.md         # REST v3/v2, ADF, JQL, transitions
+    ├── clickup.md      # REST API; MCP opcional
+    ├── asana.md        # REST API; MCP opcional
+    ├── linear.md       # GraphQL API; MCP opcional
+    └── none.md         # Null Object — modo offline
 ```
 
-### Fluxo Real de Uso
+### Fluxo de execução com transporte explícito
 
-```markdown
-## Comando Onion Executa
-
-1. Usuário: `/engineer/start TASK-123`
-
-2. IA lê factory.md:
-   - "Preciso chamar getTaskManager()"
-   - "Vou detectar o provedor configurado"
-
-3. IA lê detector.md:
-   - "TASK_MANAGER_PROVIDER=clickup no .env"
-   - "Provedor é ClickUp"
-
-4. IA lê adapters/clickup.md:
-   - "Para getTask, uso mcp_ClickUp_clickup_get_task"
-   - "ID deve ter 9 caracteres alfanuméricos"
-
-5. IA executa MCP call:
-   - mcp_ClickUp_clickup_get_task({ task_id: "TASK-123" })
-
-6. IA normaliza resposta conforme types.md:
-   - Mapeia status "in progress" → "in_progress"
-   - Formata datas para ISO 8601
-
-7. Retorna TaskOutput padronizado
+```
+1. /engineer/start TASK-123
+          │
+          ▼
+2. factory.md → detectProvider()
+          │  TASK_MANAGER_PROVIDER=clickup
+          ▼
+3. adapters/clickup.md carregado
+          │  lê TASK_MANAGER_TRANSPORT
+          ├─ api (default) → POST https://api.clickup.com/api/v2/task
+          └─ mcp           → mcp_ClickUp_clickup_get_task(...)
+          │
+          ▼
+4. resposta normalizada conforme types.md
+   status "in progress" → TaskStatus.in_progress
+          │
+          ▼
+5. TaskOutput padronizado devolvido ao comando
 ```
 
 ---
@@ -545,7 +590,7 @@ SDAAL complementa [AI Agent Design Patterns](ai-agent-design-patterns.md) fornec
 
 ### Task Manager Abstraction
 
-O [Task Manager Abstraction](task-manager-abstraction.md) é a implementação de referência do padrão SDAAL no Sistema Onion.
+O [Task Manager Abstraction](task-manager-abstraction.md) é a **instância canônica** do padrão SDAAL no Sistema Onion. Ilustra o modelo **transporte API-first + MCP opcional** (`TASK_MANAGER_TRANSPORT`): a spec define o contrato; cada adapter decide o transporte (REST por padrão, MCP quando ativado). Ver seção [🏆 Instância Canônica](#-instância-canônica-task-manager-abstraction) para detalhes.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -601,7 +646,7 @@ O [Task Manager Abstraction](task-manager-abstraction.md) é a implementação d
 
 ---
 
-**Próxima Atualização Planejada**: Janeiro 2026
+**Última Atualização**: 2026-06-13 — adicionada seção instância canônica (Task Manager) com modelo transporte API-first + MCP opcional.
 **Responsável**: Sistema Onion
 
 
