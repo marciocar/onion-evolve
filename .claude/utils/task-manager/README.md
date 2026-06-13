@@ -34,7 +34,7 @@ task-manager/
     ├── clickup.md     # Adapter ClickUp
     ├── asana.md       # Adapter Asana
     ├── jira.md        # Adapter Jira
-    └── linear.md      # Adapter Linear (stub)
+    └── linear.md      # Adapter Linear (API-first; MCP opcional)
 ```
 
 ## Uso Rápido
@@ -73,7 +73,7 @@ const task = await taskManager.createTask({
 | ClickUp | Completo | REST API | Sim (opcional via `TASK_MANAGER_TRANSPORT=mcp`) |
 | Asana | Completo | REST API | Sim (opcional via `TASK_MANAGER_TRANSPORT=mcp`) |
 | Jira | Completo | REST API v3 (Cloud) / v2 (Server/DC) | Sim (opcional via `TASK_MANAGER_TRANSPORT=mcp`) |
-| Linear | Stub | REST API | Sim (opcional via `TASK_MANAGER_TRANSPORT=mcp`) |
+| Linear | Completo | GraphQL API | Sim (opcional via `TASK_MANAGER_TRANSPORT=mcp`) |
 | None | Funcional | — (modo offline) | — |
 
 ## Fluxo de Execução

@@ -200,7 +200,7 @@ related_commands:                          ✅ Comandos relacionados corretos
 **Adapters:**
 - ✅ ClickUp adapter documentado
 - ✅ Asana adapter documentado
-- ✅ Linear adapter (stub) documentado
+- ✅ Linear adapter (completo, API-first + MCP opcional) documentado
 - ✅ None adapter (modo offline) funcional
 
 **Score:** 70/80 ✅

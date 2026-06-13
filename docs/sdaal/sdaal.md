@@ -615,7 +615,7 @@ last_reviewed: 2026-05-10
 review_cadence: trimestral
 status: active
 providers_validated: [clickup, jira]
-providers_stub: [asana, linear]
+providers_stub: []
 ---
 ```
 
