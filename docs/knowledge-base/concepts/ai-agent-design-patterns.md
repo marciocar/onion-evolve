@@ -205,12 +205,12 @@ Doutrina associada (era da orquestração): **control before autonomy** (control
 
 Padrão de custo-eficiência: usar **modelos diferentes por papel** no grafo de orquestração.
 
-- **Lead (orquestrador)** → **Opus 4.8**: raciocínio sobre o grafo, decomposição, síntese final.
-- **Workers** → **Sonnet 4.6** / **Haiku 4.5**: trabalho paralelo de alto volume, onde o tier mais barato basta.
+- **Lead (orquestrador)** → tier **opus** (o modelo Claude mais capaz): raciocínio sobre o grafo, decomposição, síntese final.
+- **Workers** → tiers **sonnet** / **haiku**: trabalho paralelo de alto volume, onde o tier mais barato basta.
 
-A ferramenta Workflow permite fixar o modelo por chamada de `agent(...)`, então o lead Opus pode despachar dezenas de workers Sonnet/Haiku sob `budget`, mantendo qualidade de coordenação sem pagar Opus em cada folha.
+A ferramenta Workflow permite fixar o modelo por chamada de `agent(...)`, então o lead opus pode despachar dezenas de workers sonnet/haiku sob `budget`, mantendo qualidade de coordenação sem pagar opus em cada folha.
 
-> Lineup atual do Claude Code: **Fable 5**, **Opus 4.8**, **Sonnet 4.6**, **Haiku 4.5**. Não existe "gpt-4" nem qualquer modelo OpenAI como opção de modelo de agente no Claude Code.
+> Tiers disponíveis no Claude Code: **fable**, **opus**, **sonnet**, **haiku** (à época jun/2026: Fable 5 / Opus 4.8 / Sonnet 4.6 / Haiku 4.5). Não existe "gpt-4" nem qualquer modelo OpenAI como opção de modelo de agente no Claude Code.
 
 ### Nesting de subagentes (5 níveis)
 

@@ -77,15 +77,16 @@ await pipeline(
 
 - **Opus orquestra** no nível principal (decisão, roteamento, síntese);
   **Sonnet/Haiku são os workers** — tier por dificuldade da subtarefa.
-  Workers mecânicos (extração, classificação, varredura) → Haiku 4.5;
-  raciocínio de média complexidade → Sonnet 4.6; reservar Opus 4.8 para
+  Workers mecânicos (extração, classificação, varredura) → haiku;
+  raciocínio de média complexidade → sonnet; reservar opus para
   orquestração e juízes adversariais críticos.
 - **Loops budget-gated**: `loop-until-done` sempre com teto via `budget`
   (tokens) — sem teto não há loop.
 - **Prompt caching**: instruções/contexto comuns aos workers entram no prefixo
   cacheável, cortando custo no fan-out.
-- Lineup válido: **Fable 5, Opus 4.8, Sonnet 4.6, Haiku 4.5**. Nunca ofereça
-  modelo de outro provider como worker.
+- Tiers de worker (uso geral): **opus, sonnet, haiku**. `fable` apenas onde
+  permitido — **disponibilidade restrita** (ver KB de frota → "Disponibilidade
+  de modelos", fonte única). Nunca ofereça modelo de outro provider como worker.
 
 ## Gotchas
 

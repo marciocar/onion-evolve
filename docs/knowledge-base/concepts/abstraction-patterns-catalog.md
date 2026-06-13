@@ -192,7 +192,7 @@ Agentes hardcoded para Anthropic Claude. Usuários podem preferir OpenAI, Google
 
 | Provedor | Prioridade | Modelos |
 |----------|------------|---------|
-| Anthropic | ✅ Padrão | Claude 3.5 Sonnet, Opus |
+| Anthropic | ✅ Padrão | família sonnet / opus (modelo Claude vigente) |
 | OpenAI | 🔴 Alta | GPT-4o, GPT-4 Turbo |
 | Google | 🟡 Média | Gemini Pro, Gemini Ultra |
 | Ollama | 🟡 Média | Llama 3, Mistral, etc |
@@ -243,7 +243,7 @@ interface ChatOptions {
 ```bash
 # .env
 LLM_PROVIDER=anthropic  # anthropic | openai | google | ollama | azure
-LLM_MODEL=claude-3-5-sonnet-20241022  # modelo específico
+LLM_MODEL=claude-sonnet-latest  # alias de tier evergreen; ex. jun/2026: claude-sonnet-4-6
 
 # Anthropic
 ANTHROPIC_API_KEY=sk-ant-xxxxx

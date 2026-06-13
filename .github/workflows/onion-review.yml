@@ -51,8 +51,8 @@ jobs:
               em agente (architecture.md §4.2); invariante de workflows faseados preservada;
               resiliência exigida quando há fan-out (falha parcial, timeout, fan-in, fallback).
             - Código/idioma (code-standards.md): pt-BR em docs/conteúdo, inglês em código/commits;
-              lineup de modelo SÓ Claude (Fable 5 / Opus 4.8 / Sonnet 4.6 / Haiku 4.5) — sinalize
-              qualquer "gpt-4" em campo `model:` de frontmatter.
+              use famílias Claude por tier (opus/sonnet/haiku/fable) — sinalize modelos RETIRADOS
+              (Claude 3.x) ou de outro provider (gpt/gemini/llama) citados como modelo de agente.
             - Ausência de vaporware (ex.: `mcp_onion-orchestrator`).
 
             Poste comentários inline nos pontos problemáticos, citando a regra e a evidência.
