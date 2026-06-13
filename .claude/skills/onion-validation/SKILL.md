@@ -30,15 +30,17 @@ allowed-tools: Bash(find .claude/*) Bash(wc -l*) Bash(grep*)
 - [ ] Descrição clara e concisa
 - [ ] Categoria válida (lista acima)
 - [ ] Tags relevantes (3-7)
-- [ ] < 400 linhas total
+- [ ] Dentro do limite (soft 500 / hard 800 linhas — ver `docs/meta-specs/commands.md §5`)
 - [ ] Seção "Objetivo" presente
 - [ ] Seção "Processo" ou "Fluxo de Execução" presente
 - [ ] Sem duplicação de nome
 
-### Validação de Fleet (commands.md §10)
+### Validação de Fleet (`docs/meta-specs/commands.md` §10)
 Para comandos/skills de orquestração de frota:
 - [ ] Orquestração reside em skill/comando, **nunca** em agente (architecture.md §4.2)
+- [ ] Fan-out é **opt-in**, nunca comportamento default (§10.2 regra 1)
 - [ ] Fan-out só com independência real; fan-in/consolidação obrigatório
+- [ ] Frota paraleliza **dentro** de uma fase; não funde workflows faseados canônicos (§10.2 invariante)
 - [ ] Trata falha parcial de worker (`.filter(Boolean)`) e reporta descartes
 - [ ] `isolation:'worktree'` quando há mutação concorrente de arquivos
 - [ ] `budget`/model tiering declarados; verificação adversarial em alto risco
@@ -57,7 +59,7 @@ Para comandos/skills de orquestração de frota:
 - [ ] Descrição da especialização clara
 - [ ] Categoria válida
 - [ ] Expertise definida (3-5 áreas)
-- [ ] < 300 linhas total
+- [ ] Dentro do limite (soft 1200 / hard 1500 linhas — ver `docs/meta-specs/agents.md §4`)
 - [ ] Seção "Identidade" ou "Propósito" presente
 - [ ] Seção "Expertise" ou "Conhecimento" presente
 
@@ -70,7 +72,7 @@ Para comandos/skills de orquestração de frota:
 
 ### Checklist
 - [ ] Description com verbo imperativo + contexto de uso
-- [ ] < 500 linhas (lifecycle persistente)
+- [ ] Conciso (sem limite rígido; preferir < 200 linhas)
 - [ ] Sem duplicação de SKILL.md em outras pastas
 - [ ] Frontmatter YAML válido
 - [ ] Sem prompts interativos em scripts (agentes não respondem TTY)
@@ -88,14 +90,14 @@ find .claude/agents -name "*.md" -exec grep -l "^name:" {} \; | \
 
 ### Verificar limites de linhas
 ```bash
-# Comandos > 400 linhas
-find .claude/commands -name "*.md" -exec wc -l {} \; | awk '$1 > 400'
+# Comandos > 800 linhas (hard limit — commands.md §5)
+find .claude/commands -name "*.md" -exec wc -l {} \; | awk '$1 > 800'
 
-# Agentes > 300 linhas
-find .claude/agents -name "*.md" -exec wc -l {} \; | awk '$1 > 300'
+# Agentes > 1500 linhas (hard limit — agents.md §4)
+find .claude/agents -name "*.md" -exec wc -l {} \; | awk '$1 > 1500'
 
-# Skills > 500 linhas
-find .claude/skills -name "SKILL.md" -exec wc -l {} \; | awk '$1 > 500'
+# Skills (sem hard limit; heurística de concisão)
+find .claude/skills -name "SKILL.md" -exec wc -l {} \; | awk '$1 > 300'
 ```
 
 ### Verificar campos obrigatórios
@@ -110,7 +112,7 @@ done
 # Lista agentes referenciados em texto que não existem como arquivos
 grep -rho "@[a-z-]\+" .claude/commands docs/ | sort -u | while read ref; do
   name="${ref#@}"
-  find .claude/agents -name "${name}.md" -q || echo "FANTASMA: $ref"
+  find .claude/agents -name "${name}.md" | grep -q . || echo "FANTASMA: $ref"
 done
 ```
 

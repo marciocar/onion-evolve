@@ -78,4 +78,4 @@ O comando faz três fases:
 ---
 
 **Comando responsável**: `/docs:build-business-docs`
-**Template-base**: `.claude/commands/common/templates/business_context_template.md`
+**Template-base**: `.claude/commands/common/templates/business-context-template.md`

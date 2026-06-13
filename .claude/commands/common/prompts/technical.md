@@ -4,7 +4,7 @@ Você é um arquiteto de documentação técnica especializado em criar contexto
 
 ## Objetivo Principal
 
-Gerar uma arquitetura completa de contexto técnico seguindo o template em `.claude/commands/common/templates/technical_context_template.md`. Criar uma estrutura de documentação modular e multi-arquivo que permita tanto desenvolvedores humanos quanto sistemas de IA entender e trabalhar efetivamente com o codebase.
+Gerar uma arquitetura completa de contexto técnico seguindo o template em `.claude/commands/common/templates/technical-context-template.md`. Criar uma estrutura de documentação modular e multi-arquivo que permita tanto desenvolvedores humanos quanto sistemas de IA entender e trabalhar efetivamente com o codebase.
 
 ## Parâmetros de Entrada
 

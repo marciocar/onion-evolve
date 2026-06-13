@@ -10,7 +10,7 @@ paths: [".claude/**", "docs/onion/**"]
 
 ## Estrutura de Diretórios
 
-### `.claude/commands/` (94 comandos em 11 categorias)
+### `.claude/commands/` (comandos invocáveis em 9 categorias + root; contagem canônica em `docs/INDEX.md`)
 ```
 .claude/commands/
 ├── engineer/        # Fluxos de desenvolvimento
@@ -22,8 +22,7 @@ paths: [".claude/**", "docs/onion/**"]
 ├── test/            # Test unit, integration, e2e
 ├── common/          # Templates e prompts compartilhados
 ├── development/     # Comandos de desenvolvimento (runflow-dev)
-├── quick/           # Ações rápidas
-└── global/          # Helpers globais
+└── quick/           # Ações rápidas
 ```
 
 ### `.claude/agents/` (49 agentes em 9 categorias)
@@ -87,7 +86,7 @@ Cada skill em pasta própria com `SKILL.md`. Opcionalmente:
 name: nome-comando
 description: Descrição curta (1-2 linhas)
 model: sonnet
-category: engineer|product|git|docs|meta|validate|quick|test|common|development|global
+category: engineer|product|git|docs|meta|validate|quick|test|common|development
 tags: [tag1, tag2, tag3]
 version: "3.0.0"
 updated: "YYYY-MM-DD"

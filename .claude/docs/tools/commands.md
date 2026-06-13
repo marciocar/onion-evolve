@@ -476,21 +476,21 @@ command: '/all-tools'
 
 #### Business Context Template
 ```typescript
-template: 'business_context_template'
+template: 'business-context-template'
 // Propósito: Template para contexto de negócio
 // Uso: Base para documentação de requisitos
 ```
 
-**Localização:** `.claude/commands/common/templates/business_context_template.md`
+**Localização:** `.claude/commands/common/templates/business-context-template.md`
 
 #### Technical Context Template
 ```typescript
-template: 'technical_context_template'
+template: 'technical-context-template'
 // Propósito: Template para contexto técnico
 // Uso: Base para documentação técnica
 ```
 
-**Localização:** `.claude/commands/common/templates/technical_context_template.md`
+**Localização:** `.claude/commands/common/templates/technical-context-template.md`
 
 ### Common Prompts
 
