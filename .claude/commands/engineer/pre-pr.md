@@ -59,7 +59,7 @@ Os quatro agentes abaixo são **independentes** — execute-os como uma **frota 
 
 **Fan-in (consolidação)** — mescle os quatro retornos num **relatório único** de pré-PR, deduplicando achados e ordenando por severidade.
 
-> **Fallback sequencial:** se o substrato de fan-out paralelo não estiver disponível, invoque os quatro agentes em sequência (1→4) e consolide ao final — mesmo resultado, mais lento.
+> **Fallback sequencial:** se o substrato de fan-out paralelo não estiver disponível, invoque os quatro agentes em sequência (1→4) e consolide ao final — mesmo resultado, mais lento. Padrão canônico de degradação: `common/prompts/fleet-fallback.md`.
 
 ### 📋 AUTO-UPDATE:
 5. **Validar critérios de aceitação** - Verificar todos os checkboxes

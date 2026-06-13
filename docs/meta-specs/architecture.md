@@ -66,7 +66,11 @@ CONTRIBUTING.md             # Guidelines para evolução
 │   └── warm-up.md          # Preparação geral de contexto
 │
 ├── skills/                 # Skills (cérebro)
-│   └── onion/              # Orquestrador master
+│   ├── onion/              # Orquestrador master
+│   ├── onion-fleet/        # Orquestração de frota (fan-out paralelo)
+│   ├── onion-patterns/     # Padrões e nomenclatura
+│   ├── onion-validation/   # Regras de validação
+│   └── language-standards/ # Padrões de idioma
 │
 ├── sessions/               # Estado persistente de workflows faseados
 │   └── <feature>/          # Por feature em desenvolvimento

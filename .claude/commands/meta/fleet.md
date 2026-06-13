@@ -177,9 +177,11 @@ ferramenta `Agent`:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ▶ Tarefa: <descrição>
+◆ Run ID: <id-do-run>
 ◆ Padrão: fan-out-and-synthesize
-◆ Workers: 12 (haiku) + 1 verificador adversarial (opus)
+◆ Workers: 12 (haiku) + 1 verificador adversarial (opus) · 0 descartados
 ◆ Budget gasto: ~X tokens
+◆ Agent View: <referência do trace para inspeção>
 
 ∟ Resultado consolidado:
   ✅ [achado/decisão 1]

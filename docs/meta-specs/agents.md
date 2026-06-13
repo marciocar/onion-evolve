@@ -128,6 +128,10 @@ Justificativa válida exige **pelo menos um** dos critérios:
 - Análise de produto sem framework específico → `@product-agent`
 - Pesquisa multi-fonte → `@research-agent`
 
+### Proibido: agente orquestrador de frota
+
+**Não crie um agente "fleet-orchestrator".** A orquestração de frota (fan-out paralelo) reside em **skill/comando** (`onion-fleet` + `/meta:fleet`), nunca em agente — por [architecture.md §4.2](./architecture.md), `agents/* → commands/*` é proibido e subagentes não disparam a frota. Ver [commands.md §10](./commands.md).
+
 ### Regra para o YAML `description`
 
 A descrição deve indicar **quando** invocar (gatilho), não apenas **o que** faz. Padrão:

@@ -111,7 +111,8 @@ await pipeline(
 
 ## Resiliência (versão confiável)
 
-- **Passo 0 — health-check do substrato.** Antes de autorar o script, confirme que a ferramenta `Workflow` está disponível. Se não estiver, acione o **fallback serial** de `/meta:fleet` de forma determinística — não dependa de o modelo "perceber".
+- **Passo 0 — health-check do substrato.** Antes de autorar o script, confirme que a ferramenta `Workflow` está disponível. Se não estiver, acione o **fallback serial** de forma determinística (padrão canônico: `common:prompts:fleet-fallback`) — não dependa de o modelo "perceber".
+- **Completeness critic.** Antes do fan-in final, um crítico verifica se a frota cobriu todo o escopo (modalidade não rodada, item não coberto) — evita lacunas silenciosas em varreduras amplas.
 - **Falha parcial de worker.** `parallel()` pode retornar `null` (worker morto, timeout, ou output que falhou no `schema`). **Sempre** `.filter(Boolean)` antes do fan-in e **reporte** quantos foram descartados (`SKIP — <motivo>`). Um worker morto nunca deve silenciar nem corromper o relatório.
 - **Timeout por worker.** `budget` limita tokens, não tempo. Para workers que tocam I/O externo, aplique um teto de tempo (campo nativo quando existir; senão `Promise.race` com timer) e trate o estouro como SKIP.
 - **Budget em todo fan-out.** Exija `budget` por worker também em `parallel()`/`pipeline()`, não só em `loop-until-done`.
