@@ -2,8 +2,8 @@ name: Onion Code Review (Claude)
 
 # Revisor de PR NATIVO do Sistema Onion — Claude + doutrina do @metaspec-gate-keeper.
 # Complementa o linter determinístico (onion-validate.yml) com a checagem SEMÂNTICA
-# de conformidade. Torna redundante o revisor de terceiros baseado em GPT-4o
-# (code-review.yml), alinhando o CI ao lineup Claude-only do framework.
+# de conformidade. Substitui o antigo revisor de terceiros baseado em GPT-4o
+# (removido), alinhando o CI ao lineup Claude-only do framework.
 #
 # Pré-requisitos (configurar uma vez):
 #   1. Secret ANTHROPIC_API_KEY em Settings -> Secrets and variables -> Actions.
