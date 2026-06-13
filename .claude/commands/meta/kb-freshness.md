@@ -3,7 +3,7 @@ name: kb-freshness
 description: |
   Audita cada KB em docs/knowledge-base/ contra o fluxo ATUAL do Sistema Onion
   (ferramenta Workflow nativa, padrões canônicos 2026, lineup de modelos Claude
-  vigente — Fable 5/Opus 4.8/Sonnet 4.6/Haiku 4.5). Usa fan-out-and-synthesize
+  vigente referenciado por tier (opus/sonnet/haiku/fable) ou "mais recente"). Usa fan-out-and-synthesize
   via onion-fleet: um worker por KB (ou por diretório), retornando veredito
   CURRENT/STALE/HISTORICAL + pontos desatualizados + direção de atualização.
   Consolida tudo num relatório priorizado de ações de refresh.
@@ -63,7 +63,7 @@ Cada worker avalia a KB contra os itens abaixo. Qualquer falha em item marcado
 
 | # | Item | Critério |
 |---|------|----------|
-| 1 | **Lineup de modelos (!)** | Menciona apenas modelos Claude ativos: Fable 5, Opus 4.8, Sonnet 4.6, Haiku 4.5. Referências a GPT-*, Gemini, Claude 3.x, claude-v1/v2 = STALE. |
+| 1 | **Lineup de modelos (!)** | Usa o lineup Claude vigente referenciado por tier (opus/sonnet/haiku/fable) ou "mais recente" — não fixa versão exata como única referência. FALHA = famílias retiradas (Claude 3.x, claude-v1/v2) ou modelo de outro provider (GPT-*, Gemini, Llama) citado como modelo Claude. |
 | 2 | **Ferramenta Workflow (!)** | Se a KB trata de orquestração de agentes, frota ou paralelismo: deve referenciar a ferramenta nativa `Workflow` (research preview mai/2026). Ausência = STALE. |
 | 3 | **Itens formalmente abandonados (!)** | Não contém referências positivas a `.onion/`, CLI standalone, plano v4.0 FASES 5-9, multi-IDE — itens abandonados em 2026-05-18. |
 | 4 | **Plataforma única** | Afirma Claude Code como plataforma única (não "qualquer IDE"). |
@@ -138,10 +138,10 @@ const FreshnessSchema = {
 ```
 
 **Model tiering:**
-- Workers de leitura/classificação → **Haiku 4.5** (custo mínimo, alta
+- Workers de leitura/classificação → **haiku** (custo mínimo, alta
   throughput).
-- Fan-in de síntese → **Sonnet 4.6** (raciocínio adequado, custo controlado).
-- Verificação adversarial (se acionada) → **Opus 4.8**.
+- Fan-in de síntese → **sonnet** (raciocínio adequado, custo controlado).
+- Verificação adversarial (se acionada) → **opus**.
 - Nunca use modelos de outros providers como workers.
 
 Teto: até **16 workers concorrentes**. Para frotas maiores (>16 KBs),
@@ -173,7 +173,7 @@ No contexto principal (custo 0 tokens de modelo), consolide `findings`:
 - Mais de 30% das KBs retornam STALE ou HISTORICAL.
 - Algum `failed_item` é o item 1 (lineup de modelos) ou item 3 (vaporware).
 
-Nesse caso, passe o conjunto de findings para um agente adversarial (Opus 4.8)
+Nesse caso, passe o conjunto de findings para um agente adversarial (opus)
 que tenta refutar vereditos, detectar falsos positivos e apontar lacunas antes
 de consolidar.
 
@@ -198,7 +198,7 @@ KB FRESHNESS REPORT — 2026-06-13
 
 ◆ KBs auditadas : 35
 ◆ Padrão usado  : fan-out-and-synthesize
-◆ Workers       : 35 × Haiku 4.5 + 1 fan-in Sonnet 4.6
+◆ Workers       : 35 × haiku + 1 fan-in sonnet
 ◆ Budget gasto  : ~X tokens
 
 ─── HISTÓRICAL (arquivar ou reescrever) ───────
@@ -215,7 +215,7 @@ KB FRESHNESS REPORT — 2026-06-13
 ⚠  concepts/context-window-optimization.md
    Falhou: #1 (menciona "claude-3-opus")
    Trecho: "use claude-3-opus-20240229 para tarefas complexas"
-   Ação  : substituir lineup por Fable 5/Opus 4.8/Sonnet 4.6/Haiku 4.5
+   Ação  : substituir lineup por tiers evergreen opus/sonnet/haiku/fable (sem fixar versão exata)
 
 ⚠  concepts/ai-agent-design-patterns.md
    Falhou: #2 (trata orquestração sem mencionar ferramenta Workflow)

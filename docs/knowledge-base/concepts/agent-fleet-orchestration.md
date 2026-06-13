@@ -217,12 +217,23 @@ const approved = verdicts.filter((v) => v.approve).length > verdicts.length / 2;
 
 Padrão de custo-eficiência: **modelos diferentes por papel** no grafo.
 
-- **Lead (orquestrador)** → **Opus 4.8**: raciocínio sobre o grafo, decomposição, síntese final.
-- **Workers** → **Sonnet 4.6** / **Haiku 4.5**: trabalho paralelo de alto volume, onde o tier mais barato basta.
+- **Lead (orquestrador)** → tier **opus**: raciocínio sobre o grafo, decomposição, síntese final.
+- **Workers** → tiers **sonnet** / **haiku**: trabalho paralelo de alto volume, onde o tier mais barato basta.
 
-A ferramenta Workflow permite fixar o `model` por chamada de `agent(...)`, então o lead Opus despacha dezenas de workers Sonnet/Haiku sob `budget`, mantendo a qualidade da coordenação sem pagar Opus em cada folha.
+A ferramenta Workflow permite fixar o `model` por chamada de `agent(...)`, então o lead opus despacha dezenas de workers sonnet/haiku sob `budget`, mantendo a qualidade da coordenação sem pagar opus em cada folha.
 
-> Lineup atual do Claude Code: **Fable 5**, **Opus 4.8**, **Sonnet 4.6**, **Haiku 4.5**. Não existe "gpt-4" nem qualquer modelo OpenAI como opção de modelo de agente no Claude Code.
+### Disponibilidade de modelos (fonte única)
+
+> **Atualize o lineup SÓ aqui.** Os demais artefatos referenciam modelos por **tier** (evergreen), nunca por versão exata, e apontam para esta seção. Quando um modelo é adicionado, deprecado ou **bloqueado** (regional/política), basta atualizar esta nota — o resto continua válido.
+
+| Tier | Uso típico | Disponibilidade (jun/2026) |
+|---|---|---|
+| `opus` | orquestrador, juízes adversariais | geral |
+| `sonnet` | raciocínio de média complexidade | geral |
+| `haiku` | workers mecânicos, alto volume | geral |
+| `fable` | — | **restrita** — bloqueio do governo dos EUA (jun/2026); verificar antes de usar |
+
+Tiers de **worker** recomendados (uso geral): **opus / sonnet / haiku**. Snapshot de versões à época (jun/2026, apenas referência histórica, não normativa): Opus 4.8 / Sonnet 4.6 / Haiku 4.5 / Fable 5. Não existe "gpt-4" nem qualquer modelo de outro provider como opção de modelo de agente no Claude Code.
 
 ### Outras alavancas de eficiência
 

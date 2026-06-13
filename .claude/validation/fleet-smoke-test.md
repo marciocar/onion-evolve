@@ -99,9 +99,9 @@ independente que a contesta, produzindo um **veredito estruturado** com campos
 
 1. A skill `onion-fleet` detecta o padrão **`adversarial verification`**: uma
    afirmação a verificar com contestação independente.
-2. O gerador (worker A, Haiku 4.5) lê os arquivos de `.claude/commands/meta/`
+2. O gerador (worker A, tier haiku) lê os arquivos de `.claude/commands/meta/`
    e lista quais têm o campo `version` no frontmatter.
-3. O verificador (worker B, Opus 4.8) recebe o resultado do worker A e tenta
+3. O verificador (worker B, tier opus) recebe o resultado do worker A e tenta
    **refutá-lo**: busca arquivos sem `version`, verifica se a lista está
    incompleta ou contém falsos positivos.
 4. O fan-in produz **1 veredito estruturado** no formato:
@@ -231,8 +231,8 @@ Padrão canônico              Coberto neste smoke test  Última validação
       aqui escreve, então este item só se aplica a testes estendidos.
 - [ ] Workers com falha retornam `null` e são descartados com `.filter(Boolean)`,
       relatando `SKIP — <motivo>` no fan-in.
-- [ ] Lineup de modelos restrito a Fable 5, Opus 4.8, Sonnet 4.6, Haiku 4.5 —
-      nenhum modelo de outro provider.
+- [ ] Lineup de modelos restrito a tiers Claude (fable, opus, sonnet, haiku) —
+      nenhum modelo de outro provider (GPT, Gemini, Llama etc.).
 - [ ] `run-id` presente no relatório final para rastreabilidade.
 
 ---

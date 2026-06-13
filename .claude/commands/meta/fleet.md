@@ -107,11 +107,12 @@ Com o padrão escolhido, autore um script da ferramenta **Workflow**. Use:
   (evita corrida de escrita; consolide os diffs no fan-in).
 - `budget` (teto de tokens) — **obrigatório** em qualquer `loop-until-done`.
 
-Aplique **model tiering**: Opus orquestra no nível principal; workers mecânicos
-(extração, classificação, varredura) vão para Haiku 4.5; raciocínio médio para
-Sonnet 4.6; reserve Opus 4.8 para orquestração e juízes adversariais críticos.
-Lineup válido: **Fable 5, Opus 4.8, Sonnet 4.6, Haiku 4.5** — nunca ofereça
-modelo de outro provider como worker. Tetos: até **16 subagentes concorrentes** e
+Aplique **model tiering**: opus orquestra no nível principal; workers mecânicos
+(extração, classificação, varredura) vão para haiku; raciocínio médio para
+sonnet; reserve opus para orquestração e juízes adversariais críticos.
+Tiers de worker (uso geral): **opus, sonnet, haiku**; `fable` só onde permitido
+(disponibilidade restrita — ver `agent-fleet-orchestration.md` → "Disponibilidade
+de modelos", fonte única). Nunca ofereça modelo de outro provider como worker. Tetos: até **16 subagentes concorrentes** e
 **1.000 agregados** por run.
 
 ```javascript

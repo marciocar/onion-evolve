@@ -78,7 +78,7 @@ Comando meta que [ação] do sistema.
 **Padrões:**
 - Integram com ClickUp MCP (tasks)
 - Gerenciam sessions (.claude/sessions/)
-- Coordenam múltiplos agentes
+- Coordenam múltiplos agentes — quando as subtarefas são **independentes**, use a camada de frota (fan-out/fan-in) sobre a ferramenta nativa **Workflow**; ver `docs/knowledge-base/concepts/agent-fleet-orchestration.md` e o comando `/meta:fleet`
 - Workflows complexos e iterativos
 
 **Exemplos:**
