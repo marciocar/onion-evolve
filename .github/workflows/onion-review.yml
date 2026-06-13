@@ -19,6 +19,7 @@ on:
 permissions:
   pull-requests: write
   contents: read
+  id-token: write   # exigido pela claude-code-action@v1 (token OIDC)
 
 jobs:
   onion-review:
