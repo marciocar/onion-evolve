@@ -6,25 +6,34 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2025-11-24 |
-| **Última Atualização** | 2025-11-24 |
+| **Última Atualização** | 2026-06-13 (refresh frota de agentes) |
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Design de Agentes |
 
 ### Fontes
 
+**Substrato nativo (Claude Code, 2026):**
+
+- [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code) — ferramenta Workflow (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`), research preview (28/mai/2026)
+- [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — relatório sobre doutrina de orquestração de frota
+- Padrões canônicos de orquestração da Anthropic (2026)
+- Práticas do Sistema Onion
+
+**Influências históricas (frameworks externos):**
+
 - [LangChain Agent Documentation](https://python.langchain.com/docs/modules/agents/)
 - [CrewAI Framework](https://www.crewai.com/)
 - [AutoGen Multi-Agent Framework](https://microsoft.github.io/autogen/)
-- [Anthropic Claude Agent Patterns](https://docs.anthropic.com/)
-- Práticas do Sistema Onion
 
 ---
 
 ## 🎯 Visão Geral
 
 Este documento define patterns de design para agentes de IA, focando em arquitetura, especialização, delegação e orquestração para sistemas multi-agente eficientes.
+
+> **Atualização 2026-06-13**: a orquestração multi-agente deixou de ser conceitual e passou a assentar sobre primitivas **nativas do Claude Code** — a ferramenta **Workflow** (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`). A seção de orquestração foi reescrita para refletir esse substrato. Para o aprofundamento operacional de **frota** (até 16 subagentes concorrentes, 1.000 agregados por run, custo e tiers), consulte a KB irmã [`agent-fleet-orchestration.md`](agent-fleet-orchestration.md).
 
 ### Definição de Agente
 
@@ -86,6 +95,8 @@ Agente = Identidade + Especialização + Ferramentas + Protocolo de Ação
 
 **Exemplo:** Orquestrador de documentação delegando para especialistas.
 
+> **No Claude Code (2026)** este pattern materializa-se na ferramenta **Workflow**: o orquestrador chama `parallel([thunks])` (fan-out com barreira) ou `pipeline(items, stage1, stage2)` (esteira sem barreira entre itens), e cada worker é um `agent(prompt, opts)`. Veja a seção [Orquestração nativa](#-orquestração-nativa-ferramenta-workflow).
+
 ### Pattern 3: Pipeline (Sequencial)
 
 ```
@@ -130,6 +141,82 @@ Agente = Identidade + Especialização + Ferramentas + Protocolo de Ação
 - Redução de erros e alucinações
 
 **Exemplo:** Code-reviewer revisando output de developer.
+
+---
+
+## 🚀 Orquestração nativa (ferramenta Workflow)
+
+No Claude Code, a coordenação multi-agente não é mais "promptware": ela assenta na ferramenta **Workflow** (research preview, 28/mai/2026). A lógica de coordenação roda em **JavaScript** e custa **0 tokens de modelo** — só os subagentes consomem tokens. Isso muda o eixo de design: o orquestrador descreve o **grafo de execução** em código, não em prosa.
+
+### Primitivas
+
+| Primitiva | Papel | Semântica |
+|-----------|-------|-----------|
+| `agent(prompt, opts)` | Dispara **1 subagente** especializado | Unidade de trabalho |
+| `parallel([thunks])` | **Fan-out com barreira** | Aguarda todos terminarem antes de prosseguir |
+| `pipeline(items, stage1, stage2, ...)` | Esteira por itens | **Sem barreira** entre itens — cada item flui pelos estágios |
+| `schema` | Structured output validado | Garante shape do retorno de cada agente |
+| `isolation: 'worktree'` | Isolamento por git worktree | Cada agente em sua própria árvore de trabalho |
+| `budget` | Teto de tokens | Limite de custo por agente/run |
+
+**Limites operacionais (jun/2026):** até **16 subagentes concorrentes** e **1.000 agregados por run**.
+
+### Snippet: fan-out + síntese
+
+```javascript
+// Lead Opus despacha 3 workers em paralelo (barreira), depois sintetiza.
+const findings = await parallel([
+  () => agent("Audite segurança do módulo de auth", { schema: FindingSchema }),
+  () => agent("Audite performance das queries", { schema: FindingSchema }),
+  () => agent("Audite cobertura de testes", { schema: FindingSchema }),
+]);
+
+// Barreira liberada: todos os 3 retornaram. Agora consolida.
+const report = await agent(
+  `Sintetize um relatório único a partir destes achados: ${JSON.stringify(findings)}`,
+  { schema: ReportSchema }
+);
+```
+
+> **Onde mora a orquestração:** na arquitetura do Onion (architecture.md §4.2), `agents/*` **NÃO pode** invocar `commands/*` — um agente sugere, não orquestra. Quem orquestra frota é **skill + comando** (`skills/* → commands/*, agents/*`). Portanto, **nunca** crie um agente `fleet-orchestrator`; a coordenação de frota vive no **nível principal** (skill/comando), onde é mais barata e limpa.
+
+---
+
+## 🧩 Padrões canônicos de orquestração (Anthropic 2026)
+
+Seis padrões de referência mapeados às primitivas nativas da ferramenta Workflow:
+
+| Padrão | Definição (1 linha) | Primitiva |
+|--------|---------------------|-----------|
+| **classify-and-act** | Classifica a entrada e roteia para o handler correto. | `agent` (classificador) → `agent` (handler escolhido) |
+| **fan-out-and-synthesize** | Dispara N workers em paralelo e consolida os resultados. | `parallel([...])` + `agent` de síntese |
+| **adversarial verification** | Um agente produz, outro contesta para reduzir erro/alucinação. | `agent` (gerador) + `agent` (crítico) |
+| **generate-and-filter** | Gera muitos candidatos e filtra os que passam no critério. | `parallel([...])` gera + `agent`/JS filtra |
+| **tournament** | Compara candidatos em rodadas até eleger o melhor. | `pipeline(...)` de rodadas eliminatórias |
+| **loop-until-done** | Itera um agente até satisfazer uma condição de parada. | `agent` em loop JS com guarda de `budget` |
+
+Doutrina associada (era da orquestração): **control before autonomy** (controle antes de autonomia), atenção ao **delegation gap** (lacuna de delegação entre intenção e execução) e uso de **prompt caching** para conter custo de runs longos.
+
+---
+
+## 🏔️ Hierarchical model tiers e nesting
+
+### Hierarchical model tiers
+
+Padrão de custo-eficiência: usar **modelos diferentes por papel** no grafo de orquestração.
+
+- **Lead (orquestrador)** → **Opus 4.8**: raciocínio sobre o grafo, decomposição, síntese final.
+- **Workers** → **Sonnet 4.6** / **Haiku 4.5**: trabalho paralelo de alto volume, onde o tier mais barato basta.
+
+A ferramenta Workflow permite fixar o modelo por chamada de `agent(...)`, então o lead Opus pode despachar dezenas de workers Sonnet/Haiku sob `budget`, mantendo qualidade de coordenação sem pagar Opus em cada folha.
+
+> Lineup atual do Claude Code: **Fable 5**, **Opus 4.8**, **Sonnet 4.6**, **Haiku 4.5**. Não existe "gpt-4" nem qualquer modelo OpenAI como opção de modelo de agente no Claude Code.
+
+### Nesting de subagentes (5 níveis)
+
+Desde **10/jun/2026 (v2.1.172)**, subagentes podem aninhar **até 5 níveis** de profundidade — antes, o fan-out era de nível único.
+
+Mesmo com nesting disponível, a recomendação permanece: **orquestrar no nível principal** (skill/comando), não dentro de um subagente. Coordenar frota a partir do nível principal é mais barato (coordenação JS = 0 tokens) e mais limpo (respeita a regra `agents/* ↛ commands/*`). Reserve o nesting profundo para sub-decomposições legítimas, não para esconder a orquestração dentro de um agente.
 
 ---
 
@@ -540,19 +627,22 @@ Faça o que achar melhor.
 ## 📚 Recursos Adicionais
 
 ### Internos (Sistema Onion)
+- [Agent Fleet Orchestration](agent-fleet-orchestration.md) - **KB irmã**: aprofundamento operacional de frota (Workflow nativo, tiers, custo, isolamento)
 - [Specification-Driven AI Abstraction Layer](specification-driven-ai-abstraction-layer.md) - Padrão para abstrações documentais
 - [Task Manager Abstraction](task-manager-abstraction.md) - Implementação de referência do SDAAL
 - [Spec-as-Code Strategy](spec-as-code-strategy.md) - Metodologia de especificações
 
-### Externos
+### Substrato nativo (Claude Code, 2026)
+- [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code)
+- [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/)
+
+### Influências históricas (frameworks externos)
 - [LangChain Agents](https://python.langchain.com/docs/modules/agents/)
 - [CrewAI Documentation](https://docs.crewai.com/)
 - [AutoGen](https://microsoft.github.io/autogen/)
-- [Anthropic Prompting Guide](https://docs.anthropic.com/claude/docs/prompt-engineering)
-- [OpenAI Best Practices](https://platform.openai.com/docs/guides/prompt-engineering)
 
 ---
 
-**Próxima Atualização Planejada**: Janeiro 2026
+**Próxima Atualização Planejada**: Dezembro 2026
 **Responsável**: Sistema Onion
 

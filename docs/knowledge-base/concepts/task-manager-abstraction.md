@@ -350,5 +350,5 @@ Provedor configurado: clickup
 - [AI Agent Design Patterns](ai-agent-design-patterns.md)
 - [Spec-as-Code Strategy](spec-as-code-strategy.md)
 - [Configuration Management](configuration-management.md)
-- [Claude Code Commands Best Practices](../tools/claude-code-commands-best-practices-2025.md)
+- [Claude Code Commands Best Practices](../tools/claude-code-commands-best-practices-2026.md)
 

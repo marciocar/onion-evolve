@@ -98,6 +98,16 @@ Branch atual:
 | Nova knowledge base | `/meta:create-knowledge-base` |
 | Configurar integração (task manager, APIs) | `/meta:setup-integration` |
 | Análise de problema complexo | `/meta:analyze-complex-problem` |
+| Orquestrar frota de agentes (fan-out paralelo) | `/meta:fleet` (skill `onion-fleet`) |
+
+---
+
+### Orquestração de Frota (paralelo)
+| Intenção | Comando / Skill |
+|----------|-----------------|
+| Auditoria/migração/review amplos em paralelo | `/meta:fleet` |
+| Decompor → delegar → sintetizar/verificar | skill `onion-fleet` (autora `Workflow`) |
+| Doutrina e padrões canônicos | KB `agent-fleet-orchestration` |
 
 ---
 

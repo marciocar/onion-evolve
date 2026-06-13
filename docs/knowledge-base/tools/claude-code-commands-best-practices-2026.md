@@ -1,4 +1,4 @@
-# Claude Code Commands Best Practices 2025
+# Claude Code Commands Best Practices (atualizado em 2026-06-13)
 
 ---
 
@@ -6,25 +6,27 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2025-11-24 |
-| **Última Atualização** | 2025-11-24 |
+| **Última Atualização** | 2026-06-13 |
 | **Categoria** | Tools |
 | **Aplicação** | Sistema Onion - Comandos e Agentes |
 
 ### Fontes
 
-- [Claude Code Official Documentation](https://docs.claude.com/en/docs/claude-code/overview)
-- [Claude Code 1.7 Update - Skywork.ai](https://skywork.ai/blog/cursor-1-7-vibe-coding-workflow-2025/)
-- [Claude Code Best Practices - GitHub](https://github.com/digitalchild/cursor-best-practices)
-- [Maximizing Claude Code Use - Medium](https://extremelysunnyyk.medium.com/)
-- [Claude Code AI Review 2025 - Skywork.ai](https://skywork.ai/blog/cursor-ai-review-2025-agent-refactors-privacy/)
+- [Claude Code Official Documentation](https://docs.claude.com/en/docs/claude-code/overview) (acessado jun/2026)
+- [Claude Code Changelog / Release Notes](https://docs.claude.com/en/release-notes/claude-code) (jun/2026)
+- [Dynamic Workflows — research preview (28/mai/2026)](https://docs.claude.com/en/docs/claude-code/workflows) (jun/2026)
+- [Padrões canônicos de orquestração multiagente — Anthropic Engineering (2026)](https://www.anthropic.com/engineering/multi-agent-orchestration) (jun/2026)
+- [Agent View — observabilidade de sessões (GA mai/2026)](https://docs.claude.com/en/docs/claude-code/agent-view) (jun/2026)
 
 ---
 
 ## 🎯 Visão Geral
 
-Este documento consolida as melhores práticas para criação e uso de comandos personalizados no Claude Code em 2025, focando em eficiência, manutenibilidade e integração com sistemas de IA.
+Este documento consolida as melhores práticas para criação e uso de comandos personalizados no Claude Code, focando em eficiência, manutenibilidade e integração com sistemas de IA.
+
+> **Refresh 2026-06-13 (v1.1.0)**: além das práticas de comandos individuais, esta KB agora cobre o substrato nativo de orquestração de frota — a ferramenta **Workflow** (Dynamic Workflows, research preview de 28/mai/2026), a ferramenta **Agent** (subagente único, com nesting até 5 níveis desde 10/jun/2026) e o papel das **Skills** como ponto de orquestração no nível principal. O lineup de modelos vigente é **Fable 5, Opus 4.8, Sonnet 4.6 e Haiku 4.5**.
 
 ---
 
@@ -168,6 +170,84 @@ Fornecem contexto adicional e ferramentas para o modelo.
 
 ---
 
+## 🚢 Orquestração de Frota (Claude Code 2026)
+
+A partir de meados de 2026, o Claude Code traz orquestração de frota **nativa**. Em vez de descrever delegação em prosa e disparar subagentes um a um de forma manual e sequencial, o desenvolvedor declara a topologia da frota em código e a engine executa o fan-out, a sincronização e a validação por você.
+
+### Ferramenta Workflow (Dynamic Workflows, 28/mai/2026)
+
+A ferramenta **Workflow** (research preview, lançada em 28/mai/2026) é o substrato nativo de orquestração de frota no Claude Code. A coordenação roda em **JavaScript** e custa **0 tokens de modelo** — só os subagentes consomem tokens. Isso torna topologias complexas baratas e determinísticas.
+
+Primitivas expostas:
+
+| Primitiva | Assinatura | O que faz |
+|-----------|------------|-----------|
+| `agent` | `agent(prompt, opts)` | Dispara **1 subagente** com o prompt e opções fornecidas |
+| `parallel` | `parallel([thunks])` | **Barreira / fan-out**: executa thunks concorrentemente e aguarda todos terminarem |
+| `pipeline` | `pipeline(items, stage1, stage2, ...)` | Processa itens em estágios encadeados **sem barreira entre itens** (streaming por item) |
+| `schema` | — | Define **structured output validado** na saída de um agente ou do workflow |
+| `isolation` | `isolation: 'worktree'` | Isola cada execução em um **git worktree** dedicado (evita colisão de arquivos entre subagentes) |
+| `budget` | — | Define um **teto de tokens** para o run, evitando estouro de custo |
+
+Limites de concorrência: até **16 subagentes concorrentes** e **1.000 agregados por run**.
+
+```javascript
+// Fan-out-and-synthesize: revisar N módulos em paralelo, depois consolidar.
+const reviews = await parallel(
+  modules.map((mod) => () =>
+    agent(`Revise o módulo ${mod.path} buscando bugs e dívida técnica.`, {
+      isolation: 'worktree',
+      schema: reviewSchema,
+    })
+  )
+);
+
+// A barreira garante que todos os reviews terminem antes da síntese.
+const summary = await agent(
+  `Consolide os ${reviews.length} reviews em um relatório priorizado.`,
+  { schema: reportSchema, budget: 200_000 }
+);
+```
+
+```javascript
+// Pipeline: cada arquivo flui por estágios sem esperar os demais (sem barreira).
+await pipeline(
+  files,
+  (file) => agent(`Extraia símbolos públicos de ${file}.`, { schema: symbolSchema }),
+  (symbols) => agent(`Gere docs em pt-BR para ${symbols.length} símbolos.`)
+);
+```
+
+Padrões canônicos de orquestração da Anthropic (2026) que mapeiam diretamente nessas primitivas: **classify-and-act**, **fan-out-and-synthesize**, **adversarial verification**, **generate-and-filter**, **tournament** e **loop-until-done**. A doutrina da "orchestration era" recomenda **control before autonomy**, atenção ao **delegation gap**, **hierarchical model tiers** (Opus orquestrando + Sonnet/Haiku como workers) e **prompt caching** para reduzir custo.
+
+### Ferramenta Agent e subagentes
+
+A ferramenta **Agent** dispara **1 subagente especializado** — é a unidade básica de delegação. Desde **10/jun/2026 (v2.1.172)**, subagentes suportam **nesting de até 5 níveis**; antes disso, o fan-out era de nível único (um subagente não conseguia disparar outros).
+
+Contraste prático:
+
+| Aspecto | Ferramenta **Agent** | Ferramenta **Workflow** |
+|---------|----------------------|--------------------------|
+| Cardinalidade | 1 subagente por chamada | Frota (até 16 concorrentes / 1.000 agregados) |
+| Concorrência | Sequencial (uma chamada por vez) | Fan-out paralelo nativo (`parallel`) |
+| Coordenação | Implícita no modelo (consome tokens) | JavaScript (0 tokens de modelo) |
+| Isolamento / budget / schema | Manual | Declarativo (`isolation`, `budget`, `schema`) |
+| Quando usar | Delegar uma tarefa pontual | Distribuir/sincronizar trabalho em escala |
+
+Regra de ouro: orquestração de frota é **mais barata e mais limpa no nível principal** (skill/comando), não dentro de um subagente. Use `Agent` quando precisa de uma delegação única; use `Workflow` quando precisa de paralelismo, barreiras ou pipelines.
+
+### Skills como ponto de orquestração
+
+No nível principal, **Skills** são o lugar canônico para orquestrar frotas. Uma skill pode invocar comandos e agentes e, portanto, hospedar a lógica de `Workflow`/`Agent`. No Sistema Onion (port do Claude Code), a arquitetura (architecture.md §4.2) **proíbe** `agents/* → commands/*` — um agente **sugere**, mas não invoca um comando. Skills, por outro lado, **podem orquestrar** (`skills/* → commands/*, agents/*`).
+
+Consequência direta: a orquestração de frota mora em **SKILL + COMANDO**, nunca em um agente. **Não** crie um agente do tipo `fleet-orchestrator` — ele seria incapaz de invocar comandos e violaria a §4.2.
+
+### Observabilidade: Agent View (GA mai/2026)
+
+Com frotas rodando em paralelo, a visibilidade de cada sessão é essencial. O **Agent View** (GA desde mai/2026) oferece observabilidade de sessões paralelas — acompanhar o que cada subagente está fazendo, custo por sessão e estado da frota em tempo real. Superfícies relacionadas: **Managed Agents** (beta, abr/2026) e **Routines** (research preview, mai/2026).
+
+---
+
 ## ✨ Boas Práticas de Prompt Engineering
 
 ### 1. Especificidade
@@ -234,6 +314,8 @@ crie um componente similar para Card.
 
 ### Pattern 1: Comando com Delegação
 
+**Delegação sequencial manual** (legado) — uma tarefa por vez, descrita em prosa:
+
 ```markdown
 # Comando Principal
 
@@ -243,6 +325,25 @@ crie um componente similar para Card.
 3. Validar resultado
 4. Retornar output
 ```
+
+**Paralelismo nativo via Workflow** (recomendado a partir de 2026) — quando o trabalho se divide em itens independentes, declare a frota e deixe a engine fazer o fan-out e a barreira. A coordenação roda em JavaScript (0 tokens) e o `schema` valida cada saída:
+
+```javascript
+// Em vez de N delegações sequenciais ao @agente-especialista,
+// distribua os N itens em paralelo e sincronize com a barreira.
+const results = await parallel(
+  items.map((item) => () =>
+    agent(`Processe o item ${item.id} segundo o padrão do projeto.`, {
+      schema: itemSchema,
+    })
+  )
+);
+const consolidated = await agent('Consolide os resultados em um único output.', {
+  schema: outputSchema,
+});
+```
+
+Use a delegação sequencial quando há **dependência de ordem** ou uma **única** tarefa; use `Workflow`/`parallel` quando os itens são **independentes** e o paralelismo reduz latência e custo.
 
 ### Pattern 2: Comando com Contexto Externo
 
@@ -418,11 +519,12 @@ Se Z e X mas não Y, faça C.
 
 - [Claude Code Documentation](https://docs.claude.com/en/docs/claude-code/overview)
 - [Claude Code Changelog](https://docs.claude.com/en/release-notes/claude-code)
-- [Community Best Practices](https://github.com/digitalchild/cursor-best-practices)
-- [Prompt Engineering Guide](https://www.promptingguide.ai)
+- [Dynamic Workflows — research preview](https://docs.claude.com/en/docs/claude-code/workflows)
+- [Agent View — observabilidade de sessões](https://docs.claude.com/en/docs/claude-code/agent-view)
+- [Padrões de orquestração multiagente — Anthropic Engineering](https://www.anthropic.com/engineering/multi-agent-orchestration)
 
 ---
 
-**Próxima Atualização Planejada**: Janeiro 2026
+**Próxima Atualização Planejada**: Dezembro 2026
 **Responsável**: Sistema Onion
 

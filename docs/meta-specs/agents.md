@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões para Agentes do Sistema Onion
 date: 2026-05-18
-version: 1.0.0
+version: 1.1.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -48,7 +48,7 @@ tools: [<lista de tools necessárias>]
 
 | Campo | Tipo | Uso |
 |---|---|---|
-| `model` | string | Override de modelo (`opus`, `sonnet`, `haiku`). Omitir para herdar do parent |
+| `model` | string | Override de modelo (`opus`, `sonnet`, `haiku`, `fable`). Omitir para herdar do parent |
 | `color` | string | Hint visual de categoria |
 
 ### Exemplos

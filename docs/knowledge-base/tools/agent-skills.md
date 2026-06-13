@@ -411,7 +411,7 @@ python3 ${CLAUDE_SKILL_DIR}/scripts/visualize.py .
 - [Client Implementation](https://agentskills.io/client-implementation/adding-skills-support)
 - [Exemplos reais (Anthropic)](https://github.com/anthropics/skills)
 - [skill-creator skill (automação de evals)](https://github.com/anthropics/skills/tree/main/skills/skill-creator)
-- KBs relacionadas: [claude-code-commands-best-practices-2025](./claude-code-commands-best-practices-2025.md)
+- KBs relacionadas: [claude-code-commands-best-practices-2026](./claude-code-commands-best-practices-2026.md)
 
 ---
 

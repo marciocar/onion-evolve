@@ -1,4 +1,15 @@
+---
+status: historical
+replaced-by: docs/analysis/onion-review-2026-05.md
+---
+
 # Sistema Onion - Estratégia de Integração com IDEs
+
+> ⚠️ **AVISO — DOCUMENTO HISTÓRICO**
+>
+> Este documento descreve uma estratégia **multi-IDE abandonada em 2026-05-18**. O Sistema Onion roda **exclusivamente no Claude Code**, e a pasta `.claude/` permanece a estrutura **canônica** do framework. A estrutura agnóstica `.onion/` discutida aqui não foi adotada.
+>
+> O conteúdo abaixo é mantido apenas como **registro histórico** das discussões originais. Para o estado atual e as decisões vigentes, consulte [docs/analysis/onion-review-2026-05.md](../../analysis/onion-review-2026-05.md).
 
 > **Versão**: 1.0.0 | **Última atualização**: 2025-12-20 | **Categoria**: Frameworks  
 > Como diferentes IDEs (Claude Code, Claude Code, Windsurf) descobrem e carregam recursos do `.onion/`
@@ -14,7 +25,7 @@
 | **Última Atualização** | 2025-12-20 |
 | **Categoria** | Frameworks |
 | **Aplicação** | IDE Integration Strategy |
-| **Status** | Para Discussão |
+| **Status** | Histórico (estratégia abandonada em 2026-05-18) |
 
 ---
 

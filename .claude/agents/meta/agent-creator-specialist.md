@@ -362,8 +362,7 @@ playwright: mcp_playwright_browser_* (20+ ferramentas)
 # Análise de Código
 code-understanding: mcp_code-understanding_* (10+ ferramentas)
 
-# Orquestração
-onion: mcp_onion-orchestrator_* (4 ferramentas)
+# Orquestração de frota: nativa via ferramenta Workflow do Claude Code (sem MCP) — ver /meta:fleet
 
 # Raciocínio Complexo
 sequential-thinking: mcp_sequential-thinking_* (1 ferramenta)

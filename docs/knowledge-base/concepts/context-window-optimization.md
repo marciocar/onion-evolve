@@ -6,17 +6,19 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2025-11-24 |
-| **Última Atualização** | 2025-11-24 |
+| **Última Atualização** | 2026-06-13 (refresh: caching + custo multi-agente) |
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Otimização de Tokens |
 
 ### Fontes
 
-- [Anthropic Claude Documentation](https://docs.anthropic.com/)
-- [OpenAI Token Best Practices](https://platform.openai.com/docs/)
-- [Claude Code Optimization](https://docs.claude.com/en/docs/claude-code/overview)
+- [Anthropic Claude Documentation](https://docs.anthropic.com/) (jun/2026)
+- [Prompt Caching — Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (jun/2026)
+- [Claude Code — Dynamic Workflows (research preview)](https://docs.claude.com/en/docs/claude-code/workflows) (28/mai/2026)
+- [Claude Code Optimization](https://docs.claude.com/en/docs/claude-code/overview) (jun/2026)
+- [Padrões canônicos de orquestração de agentes — Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system) (2026)
 - Práticas do Sistema Onion
 - Experiência prática com LLMs
 
@@ -35,16 +37,20 @@
 | **Qualidade** | Contexto focado = respostas melhores |
 | **Limites** | Context windows têm tamanho máximo |
 
-### Context Windows por Modelo (2025)
+### Context Windows por Modelo (jun/2026)
 
-| Modelo | Context Window | ~Linhas de Código |
-|--------|----------------|-------------------|
-| GPT-4o | 128K tokens | ~50K linhas |
-| Claude Sonnet | 200K tokens | ~80K linhas |
-| Claude Opus | 200K tokens | ~80K linhas |
-| Gemini 1.5 Pro | 1M tokens | ~400K linhas |
+Lineup atual do Claude no Claude Code — use estes modelos; não há modelos OpenAI/Gemini como opções de agente no Onion.
+
+| Modelo | Papel típico em frota | Context Window | ~Linhas de Código |
+|--------|-----------------------|----------------|-------------------|
+| Claude Fable 5 | Orquestração de raciocínio profundo | 1M tokens | ~400K linhas |
+| Claude Opus 4.8 | Orquestrador (planeja, sintetiza, decide) | 200K tokens (1M na variante `[1m]`) | ~80K–400K linhas |
+| Claude Sonnet 4.6 | Worker de uso geral (implementação, análise) | 200K tokens | ~80K linhas |
+| Claude Haiku 4.5 | Worker barato/rápido (classificação, extração, filtro) | 200K tokens | ~80K linhas |
 
 **Nota**: 1 token ≈ 4 caracteres em inglês, ~3 em código.
+
+**Tiering de modelos** (doutrina "orchestration era"): o orquestrador roda em Opus 4.8 (ou Fable 5 quando o raciocínio domina); os workers paralelos rodam em Sonnet 4.6 ou Haiku 4.5. Reservar o modelo caro só para o nível que decide reduz custo agregado sem perder qualidade no resultado final. Veja [Custo em Frota (Multi-Agente)](#-custo-em-frota-multi-agente).
 
 ---
 
@@ -212,6 +218,47 @@ ETAPA 1: Prompt inicial (mínimo)
 │  - Erros recentes                           │
 └─────────────────────────────────────────────┘
 ```
+
+Para o mecanismo concreto de cache de prompt entre chamadas e entre subagentes, veja [Prompt Caching](#-prompt-caching).
+
+---
+
+## 💾 Prompt Caching
+
+**Prompt caching** é a maior alavanca de custo quando o mesmo prefixo de contexto se repete entre chamadas. Em vez de reprocessar (e re-cobrar integralmente) o bloco repetido a cada turno, o provider materializa um cache do prefixo; chamadas seguintes que compartilham esse prefixo leem do cache a uma fração do custo.
+
+### O que vale a pena cachear
+
+| Bloco | Estabilidade | Cacheável? |
+|-------|--------------|------------|
+| System prompt / identidade do agente | Alta (não muda no run) | ✅ Sim — prefixo ideal |
+| Regras do projeto (CLAUDE.md, padrões) | Alta | ✅ Sim |
+| Documentação de referência / KB injetada | Alta | ✅ Sim |
+| Spec/plano compartilhado entre workers | Alta dentro do run | ✅ Sim |
+| Arquivo sendo editado | Baixa (muda por turno) | ❌ Não — fica fora do prefixo cacheado |
+| Erros/saída recentes | Baixa | ❌ Não |
+
+**Regra de ouro:** ordene o contexto do **mais estável para o mais volátil**. O cache cobre apenas o prefixo comum; qualquer mudança no início invalida o que vem depois. System prompt e blocos compartilhados primeiro, conteúdo volátil (arquivo atual, tarefa, erros) por último.
+
+### Caching em frota (fan-out)
+
+Em um fan-out, N subagentes recebem o **mesmo prefixo** (system prompt do worker + spec/plano + KB de referência) e diferem apenas na fatia volátil (o item que cada um processa). Esse prefixo idêntico é exatamente o caso de uso do prompt caching: paga-se o processamento do prefixo essencialmente uma vez e os N workers o reutilizam.
+
+```
+┌────────────────────────────────────────────────────────┐
+│  PREFIXO COMPARTILHADO (cacheado, processado ~1x)        │
+│  - System prompt do worker                               │
+│  - Spec / plano da feature                               │
+│  - Padrões do projeto + KB                               │
+├────────────────────────────────────────────────────────┤
+│  worker 1 │ worker 2 │ worker 3 │ ... │ worker N         │
+│  + item 1 │ + item 2 │ + item 3 │ ... │ + item N  (vol.) │
+└────────────────────────────────────────────────────────┘
+```
+
+> **A coordenação custa 0 tokens de modelo.** Na ferramenta nativa **Workflow** (Dynamic Workflows, research preview de 28/mai/2026), a lógica de orquestração — `agent(...)`, `parallel([...])`, `pipeline(...)`, agregação e validação de `schema` — roda em **JavaScript**, não consome tokens do modelo. Apenas as chamadas de subagente (`agent`) gastam tokens. Combinado com prompt caching no prefixo compartilhado, o overhead de coordenar uma frota grande tende a zero: você paga pelos workers e pelo prefixo (uma vez), não por orquestrar.
+
+Detalhamento de custo e alocação de budget entre orquestrador e workers em [Custo em Frota (Multi-Agente)](#-custo-em-frota-multi-agente). Para os padrões de orquestração em si (fan-out, pipeline, isolamento por worktree), veja [agent-fleet-orchestration.md](agent-fleet-orchestration.md).
 
 ---
 
@@ -403,6 +450,74 @@ budget:
 
 ---
 
+## 🚀 Custo em Frota (Multi-Agente)
+
+Quando o trabalho é distribuído entre vários subagentes, a otimização de contexto deixa de ser "um budget" e passa a ser **alocação de budget entre o orquestrador e N workers**. O objetivo é o mesmo — gastar menos tokens por resultado — mas as alavancas mudam.
+
+> No Sistema Onion a orquestração de frota mora em **skill + comando** (que podem invocar `commands/*` e `agents/*`), nunca dentro de um agente — `architecture.md` §4.2 proíbe `agents/* → commands/*`. Não existe e não se deve criar um agente "fleet-orchestrator".
+
+### 1. Token budgeting por worker
+
+Cada subagente disparado por `agent(...)` recebe seu próprio budget (parâmetro `budget` da ferramenta Workflow define o teto de tokens). Defina o teto por worker pelo trabalho que ele realmente faz — não pelo budget do orquestrador.
+
+| Worker | Trabalho típico | Budget sugerido |
+|--------|-----------------|-----------------|
+| Classificador / roteador | Lê pouco, decide rótulo | Baixo |
+| Extrator / filtro | Lê um item, devolve campos | Baixo–médio |
+| Implementador | Lê + edita arquivos | Médio–alto |
+| Verificador adversarial | Relê e contesta um output | Médio |
+
+### 2. Model tiering
+
+Não use o modelo do orquestrador em todo worker. O orquestrador (que planeja, sintetiza e decide) roda em **Opus 4.8** — ou **Fable 5** quando o raciocínio domina; os workers paralelos rodam em **Sonnet 4.6** (uso geral) ou **Haiku 4.5** (classificação, extração, filtro, tarefas mecânicas). Reservar o tier caro para o nível de decisão é o que torna a frota economicamente viável.
+
+```
+Opus 4.8 (orquestrador)  ── planeja, distribui, sintetiza
+   │
+   ├── Sonnet 4.6  (worker — implementa / analisa)
+   ├── Sonnet 4.6  (worker — implementa / analisa)
+   ├── Haiku 4.5   (worker — classifica / extrai)
+   └── Haiku 4.5   (worker — classifica / extrai)
+```
+
+### 3. Alocação de budget: orquestrador + N workers
+
+O custo agregado de um run não é o budget de um agente, e sim a soma do orquestrador com os workers. Um modelo grosseiro de alocação:
+
+```yaml
+fleet_budget:
+  total_run: 200000          # teto agregado do run (tokens de modelo)
+  orchestrator:
+    model: opus-4.8
+    budget: 40000            # plano + síntese final + roteamento
+  workers:
+    count: 8
+    model: sonnet-4.6        # ou haiku-4.5 para tarefas mecânicas
+    budget_each: 18000       # 8 × 18000 = 144000
+  # coordenação (parallel/pipeline/schema) = 0 tokens de modelo (roda em JS)
+  # prefixo compartilhado (system + spec + KB) cacheado → cobrado ~1x
+```
+
+Limites operacionais da ferramenta Workflow: até **16 subagentes concorrentes** e **1.000 agregados por run**; nesting de subagentes até **5 níveis** (v2.1.172, 10/jun/2026). Mesmo assim, prefira orquestrar a frota no **nível principal** (skill/comando): é mais barato e limpo do que aninhar fan-out dentro de um subagente.
+
+### 4. Quando paralelizar compensa
+
+Paralelizar tem custo fixo (o budget do orquestrador para fan-out e síntese). Compensa quando:
+
+| Situação | Paralelizar? | Por quê |
+|----------|--------------|---------|
+| Muitos itens independentes (arquivos, fontes, casos) | ✅ Sim | `parallel([...])` / `pipeline(...)` ganham em wall-clock; prefixo cacheado dilui o custo |
+| Tarefa única e sequencial (uma edição pontual) | ❌ Não | Overhead de orquestração > ganho |
+| Itens com dependência forte entre si | ⚠️ Parcial | Use `pipeline` (sem barreira entre itens) ou um único agente |
+| Verificação adversarial de um output crítico | ✅ Sim | Worker barato (Haiku) contesta o resultado — `generate-and-filter` / adversarial verification |
+| Volume pequeno (2–3 itens triviais) | ❌ Não | O custo de coordenar não se paga |
+
+**Heurística:** paralelize quando o trabalho é divisível em itens independentes **e** o prefixo compartilhado (cacheável) é grande em relação à fatia volátil de cada worker — aí o caching + a coordenação em JS (0 tokens) fazem o custo marginal de cada worker tender só ao seu trabalho real.
+
+> Os padrões de orquestração citados (fan-out-and-synthesize, pipeline, classify-and-act, generate-and-filter, adversarial verification, tournament, loop-until-done) estão detalhados em [agent-fleet-orchestration.md](agent-fleet-orchestration.md).
+
+---
+
 ## ⚠️ Anti-Patterns
 
 ### 1. Context Dump
@@ -480,13 +595,18 @@ Estamos trabalhando com React.
 
 ## 📚 Recursos Adicionais
 
-- [Anthropic Context Guide](https://docs.anthropic.com/)
-- [OpenAI Token Counter](https://platform.openai.com/tokenizer)
-- [Claude Code Performance Tips](https://docs.claude.com/en/docs/claude-code/overview)
-- [Tiktoken Library](https://github.com/openai/tiktoken)
+- [Anthropic Context Guide](https://docs.anthropic.com/) (jun/2026)
+- [Prompt Caching — Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (jun/2026)
+- [Claude Code — Dynamic Workflows (research preview)](https://docs.claude.com/en/docs/claude-code/workflows) (28/mai/2026)
+- [Claude Code Performance Tips](https://docs.claude.com/en/docs/claude-code/overview) (jun/2026)
+
+### Conceitos Relacionados
+
+- [agent-fleet-orchestration.md](agent-fleet-orchestration.md) — padrões de orquestração de frota (fan-out, pipeline, isolamento por worktree) e onde o custo multi-agente desta KB se aplica
+- [ai-agent-design-patterns.md](ai-agent-design-patterns.md) — padrões de design de agentes de IA
 
 ---
 
-**Próxima Atualização Planejada**: Janeiro 2026
+**Próxima Atualização Planejada**: Dezembro 2026
 **Responsável**: Sistema Onion
 

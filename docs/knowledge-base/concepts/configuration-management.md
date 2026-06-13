@@ -124,7 +124,7 @@ ONION_SESSION_AUTO_SAVE=true         # Salvar sessões automaticamente
 # ADVANCED (geralmente não precisa alterar)
 # ─────────────────────────────────────────────────────────────────────────────────
 
-# AI_MODEL_PREFERENCE=sonnet         # sonnet, opus, gpt-4
+# AI_MODEL_PREFERENCE=sonnet         # sonnet, opus, haiku, fable
 # MAX_CONTEXT_TOKENS=128000          # Limite de tokens por contexto
 ```
 
