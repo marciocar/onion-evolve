@@ -62,7 +62,7 @@ Os **protocolos de colaboração**, **agendas detalhadas**, **templates** e **ch
   - Seção 8.3 — Checklist de Outputs
   - Seção 8.4 — Comentário de conclusão + regras de integração com task manager
   - Seção 6 — Integração com Calendar
-- **Framework canônico de testes** (White/Grey/Black-box, QA Story Points): [`framework_testes.md`](../../../../docs/knowledge-base/frameworks/framework_testes.md)
+- **Framework canônico de testes** (White/Grey/Black-box, QA Story Points): [`framework-testes.md`](../../../../docs/knowledge-base/frameworks/framework-testes.md)
 
 > **Não duplique** o conteúdo da KB neste comando. Sempre referencie e instancie os templates com `{{story_id}}` / `{{task_manager}}`.
 

@@ -26,7 +26,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **66 arquivos markdown** em `docs/`
 - **11 arquivos** em `docs/onion/` (Sistema Onion)
 - **25 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
-  - 14 arquivos em `concepts/` (Conceitos fundamentais)
+  - 12 arquivos em `concepts/` (Conceitos fundamentais)
   - 8 arquivos em `frameworks/` (Frameworks e metodologias)
   - 3 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
   - 1 arquivo em `platforms/` (Plataformas)
@@ -84,15 +84,13 @@ docs/
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
 ├── knowledge-base/             # Knowledge Bases (25 arquivos)
-│   ├── concepts/               # Conceitos fundamentais (14 arquivos)
+│   ├── concepts/               # Conceitos fundamentais (12 arquivos)
 │   │   ├── abstraction-patterns-catalog.md
 │   │   ├── agent-fleet-orchestration.md  # ✨ NOVO
 │   │   ├── ai-agent-design-patterns.md
 │   │   ├── branding-posicionamento-marca.md
 │   │   ├── configuration-management.md
 │   │   ├── context-window-optimization.md
-│   │   ├── framework_story_points.md
-│   │   ├── framework_testes.md
 │   │   ├── identificar-precificar-dor-cliente.md
 │   │   ├── meeting-transcription-to-knowledge-base.md
 │   │   ├── spec-as-code-strategy.md
@@ -101,8 +99,8 @@ docs/
 │   │   └── task-manager-abstraction.md
 │   ├── frameworks/             # Frameworks e metodologias (8 arquivos)
 │   │   ├── agent-orchestration-landscape-2026.md  # ✨ NOVO
-│   │   ├── framework_story_points.md
-│   │   ├── framework_testes.md
+│   │   ├── framework-story-points.md
+│   │   ├── framework-testes.md
 │   │   ├── onion-complete-cycle-understanding.md
 │   │   ├── onion-ide-integration-strategy.md
 │   │   ├── onion-multi-context-orchestrator-vision.md
@@ -177,10 +175,8 @@ docs/
 
 Knowledge Bases estruturadas para consumo por IA e referência técnica:
 
-### Conceitos Fundamentais (14 arquivos)
+### Conceitos Fundamentais (12 arquivos)
 - **Task Manager Abstraction** - Abstração de gerenciadores de tarefas
-- **Framework de Story Points** - Sistema de estimativas ágeis
-- **Framework de Testes** - Metodologias de teste completas
 - **Spec-as-Code Strategy** - Estratégia de especificações como código
 - **Spec-Driven Development** - Metodologia emergente de desenvolvimento com IA ✨ NOVO
 - **AI Agent Design Patterns** - Padrões de design para agentes IA
@@ -289,7 +285,7 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 **Comece com:**
 1. [Guia de Comandos](onion/commands-guide.md) - Seção "Comandos de Produto"
 2. [Exemplos Práticos](onion/practical-examples.md)
-3. [Knowledge Base - Story Points](knowledge-base/frameworks/framework_story_points.md)
+3. [Knowledge Base - Story Points](knowledge-base/frameworks/framework-story-points.md)
 4. [Knowledge Base - Spec-Driven Development](knowledge-base/concepts/spec-driven-development.md) ✨ NOVO
 
 **Comandos essenciais:**
@@ -315,7 +311,7 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 
 **Comece com:**
 1. [Sistema de Testes e Validação](onion/testing-validation-system.md)
-2. [Framework de Testes](knowledge-base/frameworks/framework_testes.md)
+2. [Framework de Testes](knowledge-base/frameworks/framework-testes.md)
 3. [Guia de Comandos](onion/commands-guide.md) - Seção "Comandos de Validação"
 
 **Comandos essenciais:**
@@ -420,8 +416,8 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 
 ### Knowledge Bases
 - [Task Manager Abstraction](knowledge-base/concepts/task-manager-abstraction.md)
-- [Framework de Story Points](knowledge-base/frameworks/framework_story_points.md)
-- [Framework de Testes](knowledge-base/frameworks/framework_testes.md)
+- [Framework de Story Points](knowledge-base/frameworks/framework-story-points.md)
+- [Framework de Testes](knowledge-base/frameworks/framework-testes.md)
 - [AI Agent Design Patterns](knowledge-base/concepts/ai-agent-design-patterns.md)
 - [Spec-as-Code Strategy](knowledge-base/concepts/spec-as-code-strategy.md)
 - [Spec-Driven Development](knowledge-base/concepts/spec-driven-development.md) ✨ NOVO

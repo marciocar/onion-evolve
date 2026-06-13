@@ -51,7 +51,7 @@ Analisa estratégias de teste existentes e sugere melhorias baseadas no Framewor
 
 Este comando é um **orquestrador**. Ele não duplica o framework nem as matrizes de scoring — carrega ambos por referência:
 
-- **Framework canônico** (perspectivas White/Grey/Black-box, fórmula de QA Story Points, técnicas, templates, padrões de colaboração): `docs/knowledge-base/frameworks/framework_testes.md`
+- **Framework canônico** (perspectivas White/Grey/Black-box, fórmula de QA Story Points, técnicas, templates, padrões de colaboração): `docs/knowledge-base/frameworks/framework-testes.md`
 - **Matrizes de scoring, thresholds, regras de gap e fórmulas de impacto:** `docs/knowledge-base/frameworks/test-strategy-scoring.md`
 
 ## 🎯 Objetivo
@@ -70,7 +70,7 @@ Auditar e melhorar estratégias de teste existentes através de:
 **CRÍTICO:** Sempre carregar antes de qualquer análise.
 
 ```bash
-read_file docs/knowledge-base/frameworks/framework_testes.md
+read_file docs/knowledge-base/frameworks/framework-testes.md
 read_file docs/knowledge-base/frameworks/test-strategy-scoring.md
 ```
 
@@ -81,7 +81,7 @@ Da **KB de scoring** extrair: matriz de discrepância de QA points, score multi-
 ```markdown
 SE algum arquivo não encontrado:
   ❌ ERRO: Arquivo de referência não encontrado
-  💡 Verifique docs/knowledge-base/frameworks/framework_testes.md e test-strategy-scoring.md
+  💡 Verifique docs/knowledge-base/frameworks/framework-testes.md e test-strategy-scoring.md
 ```
 
 ### Passo 2: Detectar e Configurar Task Manager
@@ -241,7 +241,7 @@ Saída em console com blocos: identificação da feature/provedor, data collecti
 
 ## 🔗 Referências
 
-- **Framework canônico:** `docs/knowledge-base/frameworks/framework_testes.md`
+- **Framework canônico:** `docs/knowledge-base/frameworks/framework-testes.md`
 - **Matrizes de scoring / gap analysis:** `docs/knowledge-base/frameworks/test-strategy-scoring.md`
 - **Comando relacionado:** `/validate/test-strategy/create`
 - **Task Manager:** `.claude/utils/task-manager/`

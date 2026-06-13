@@ -100,12 +100,12 @@ Conceitos essenciais que fundamentam o Sistema Onion e desenvolvimento com IA:
 
 ### Produto e Negócio
 
-9. **[Framework de Story Points](concepts/framework_story_points.md)** - Sistema de estimativas ágeis
+9. **[Framework de Story Points](frameworks/framework-story-points.md)** - Sistema de estimativas ágeis
    - Escala Fibonacci (1-13)
    - Checklist detalhado por ponto
    - Integração com Task Managers
 
-10. **[Framework de Testes](concepts/framework_testes.md)** - Metodologias de teste completas
+10. **[Framework de Testes](frameworks/framework-testes.md)** - Metodologias de teste completas
     - Modelo V de testes
     - White-box, Grey-box, Black-box
     - QA Story Points
@@ -135,12 +135,12 @@ Frameworks completos e metodologias aplicáveis:
 
 ### Frameworks de Desenvolvimento
 
-1. **[Framework de Story Points](frameworks/framework_story_points.md)** - Estimativas ágeis
+1. **[Framework de Story Points](frameworks/framework-story-points.md)** - Estimativas ágeis
    - Escala Fibonacci completa
    - Checklist por ponto
    - Calibração de equipe
 
-2. **[Framework de Testes](frameworks/framework_testes.md)** - White-box, Grey-box, Black-box
+2. **[Framework de Testes](frameworks/framework-testes.md)** - White-box, Grey-box, Black-box
    - Modelo V completo
    - Técnicas por perspectiva
    - QA Story Points
@@ -230,9 +230,9 @@ Documentação de provedores de serviços integrados:
 
 ### Metodologias Ágeis
 
-- [Framework de Story Points](frameworks/framework_story_points.md)
-- [Framework de Testes](frameworks/framework_testes.md)
-- [QA Story Points](concepts/framework_testes.md#qa-story-points)
+- [Framework de Story Points](frameworks/framework-story-points.md)
+- [Framework de Testes](frameworks/framework-testes.md)
+- [QA Story Points](frameworks/framework-testes.md#qa-story-points)
 
 ### Arquitetura e Padrões
 
@@ -267,7 +267,7 @@ Documentação de provedores de serviços integrados:
 - [Configuration Management](concepts/configuration-management.md)
 
 **Frameworks:**
-- [Framework de Testes](frameworks/framework_testes.md)
+- [Framework de Testes](frameworks/framework-testes.md)
 - [Onion IDE Integration Strategy](frameworks/onion-ide-integration-strategy.md)
 
 **Ferramentas:**
@@ -277,13 +277,13 @@ Documentação de provedores de serviços integrados:
 ### 📋 Product Owners
 
 **Conceitos essenciais:**
-- [Framework de Story Points](concepts/framework_story_points.md)
+- [Framework de Story Points](frameworks/framework-story-points.md)
 - [Identificar e Precificar Dor do Cliente](concepts/identificar-precificar-dor-cliente.md)
 - [Branding e Posicionamento](concepts/branding-posicionamento-marca.md)
 - [Meeting Transcription to Knowledge Base](concepts/meeting-transcription-to-knowledge-base.md)
 
 **Frameworks:**
-- [Framework de Story Points](frameworks/framework_story_points.md)
+- [Framework de Story Points](frameworks/framework-story-points.md)
 - [Spec-Driven Development Tools](frameworks/spec-driven-development-tools-2025.md)
 
 ### 🏗️ Arquitetos
@@ -302,11 +302,11 @@ Documentação de provedores de serviços integrados:
 ### 🧪 QA/Test Engineers
 
 **Conceitos essenciais:**
-- [Framework de Testes](concepts/framework_testes.md)
-- [QA Story Points](concepts/framework_testes.md#qa-story-points)
+- [Framework de Testes](frameworks/framework-testes.md)
+- [QA Story Points](frameworks/framework-testes.md#qa-story-points)
 
 **Frameworks:**
-- [Framework de Testes](frameworks/framework_testes.md) - Guia completo
+- [Framework de Testes](frameworks/framework-testes.md) - Guia completo
 
 ---
 

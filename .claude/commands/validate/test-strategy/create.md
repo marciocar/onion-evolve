@@ -48,7 +48,7 @@ related_agents:
 
 # 🧪 Criação de Estratégia de Teste
 
-Cria estratégias completas de teste baseadas no Framework de Testes (`docs/knowledge-base/frameworks/framework_testes.md`), gerando automaticamente estratégias multi-perspectiva com cálculo de QA Story Points.
+Cria estratégias completas de teste baseadas no Framework de Testes (`docs/knowledge-base/frameworks/framework-testes.md`), gerando automaticamente estratégias multi-perspectiva com cálculo de QA Story Points.
 
 ## 🎯 Objetivo
 
@@ -66,7 +66,7 @@ Democratizar o uso do framework de testes, automatizando a criação de estraté
 
 ```bash
 # Ler framework completo
-read_file docs/knowledge-base/frameworks/framework_testes.md
+read_file docs/knowledge-base/frameworks/framework-testes.md
 ```
 
 **Extrair e armazenar em memória:**
@@ -79,7 +79,7 @@ read_file docs/knowledge-base/frameworks/framework_testes.md
 **Validar leitura:**
 ```markdown
 SE arquivo não encontrado:
-  ❌ ERRO: Framework de testes não encontrado em docs/knowledge-base/frameworks/framework_testes.md
+  ❌ ERRO: Framework de testes não encontrado em docs/knowledge-base/frameworks/framework-testes.md
   💡 Verifique se o arquivo existe e tente novamente
 ```
 
@@ -279,7 +279,7 @@ SENÃO:
 
 🎯 Feature: {{feature-name}}
 📊 Framework Analysis:
-∟ ✓ Framework carregado: framework_testes.md
+∟ ✓ Framework carregado: framework-testes.md
 ∟ Risk Level: {{risk-level}} (+X points)
 ∟ Complexity: {{complexity}} (X-Y base points)
 
@@ -343,9 +343,9 @@ SENÃO:
 
 1. **Framework deve existir:**
    ```markdown
-   SE framework_testes.md não encontrado:
+   SE framework-testes.md não encontrado:
      ❌ ERRO: Framework não encontrado
-     💡 Verifique: docs/knowledge-base/frameworks/framework_testes.md
+     💡 Verifique: docs/knowledge-base/frameworks/framework-testes.md
    ```
 
 2. **Feature name não vazio:**
@@ -370,14 +370,14 @@ SENÃO:
 
 ## 🔗 Referências
 
-- **Framework:** `docs/knowledge-base/frameworks/framework_testes.md`
+- **Framework:** `docs/knowledge-base/frameworks/framework-testes.md`
 - **Task Manager:** `.claude/utils/task-manager/`
 - **Comandos relacionados:** `/product/task`, `/product/estimate`
 - **Agentes relacionados:** @test-engineer, @test-planner
 
 ## ⚠️ Notas Importantes
 
-- **Framework é obrigatório:** Comando falha se `framework_testes.md` não existir
+- **Framework é obrigatório:** Comando falha se `framework-testes.md` não existir
 - **Cálculo preciso:** QA Story Points seguem fórmula exata do framework
 - **Multi-perspectiva:** Sempre gera estratégias para todas as 3 perspectivas
 - **Dry-run útil:** Use `--dry-run` para validar antes de criar tasks

@@ -6,22 +6,22 @@ version: "1.0.0"
 updated: "2026-06-02"
 maintained_by: Sistema Onion
 related:
-  - docs/knowledge-base/frameworks/framework_testes.md
+  - docs/knowledge-base/frameworks/framework-testes.md
   - .claude/commands/validate/test-strategy/analyze.md
   - .claude/commands/validate/test-strategy/create.md
 ---
 
 # Matrizes de Scoring e Gap Analysis de Estratégia de Teste
 
-Knowledge base de referência com as **matrizes de pontuação**, **thresholds**, **regras de detecção de gaps** e **fórmulas de impacto** usadas para auditar estratégias de teste contra o [Framework de Testes](framework_testes.md).
+Knowledge base de referência com as **matrizes de pontuação**, **thresholds**, **regras de detecção de gaps** e **fórmulas de impacto** usadas para auditar estratégias de teste contra o [Framework de Testes](framework-testes.md).
 
-Esta KB é consumida pelo comando `/validate/test-strategy/analyze`. O comando atua como orquestrador e carrega estas matrizes quando precisa pontuar conformidade, classificar gaps ou estimar impacto. O **framework canônico** (perspectivas White/Grey/Black-box, fórmula de QA Story Points, técnicas, templates, padrões de colaboração) vive em [`framework_testes.md`](framework_testes.md) — esta KB **não duplica** esse conteúdo, apenas o operacionaliza para análise.
+Esta KB é consumida pelo comando `/validate/test-strategy/analyze`. O comando atua como orquestrador e carrega estas matrizes quando precisa pontuar conformidade, classificar gaps ou estimar impacto. O **framework canônico** (perspectivas White/Grey/Black-box, fórmula de QA Story Points, técnicas, templates, padrões de colaboração) vive em [`framework-testes.md`](framework-testes.md) — esta KB **não duplica** esse conteúdo, apenas o operacionaliza para análise.
 
 ---
 
 ## 1. Validação de QA Story Points
 
-Para cada task, comparar pontos atribuídos vs. calculados pela fórmula do framework (seção "QA Story Points - Sistema de Estimativa" em `framework_testes.md`):
+Para cada task, comparar pontos atribuídos vs. calculados pela fórmula do framework (seção "QA Story Points - Sistema de Estimativa" em `framework-testes.md`):
 
 ```
 QA Points = Complexidade Base + Risco + Tipo de Teste

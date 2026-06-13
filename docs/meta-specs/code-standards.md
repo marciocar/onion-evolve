@@ -167,7 +167,7 @@ Quando o Onion gerar ou validar testes (em projeto-alvo):
 - Estrutura AAA (Arrange-Act-Assert) ou Given-When-Then quando aplicável
 - Cobertura de happy path + edge cases + erro
 
-Framework de testes documentado em: [docs/knowledge-base/frameworks/framework_testes.md](../knowledge-base/frameworks/framework_testes.md).
+Framework de testes documentado em: [docs/knowledge-base/frameworks/framework-testes.md](../knowledge-base/frameworks/framework-testes.md).
 
 ---
 
