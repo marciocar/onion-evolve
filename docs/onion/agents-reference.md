@@ -1,28 +1,16 @@
 # 🤖 Referência de Agentes
 
-> **Versão**: 4.0 | **Última atualização**: 2026-06-14 | **Total**: 49 agentes em 9 categorias
+> **Versão**: 4.0 | **Última atualização**: 2026-06-14
 
-Este guia documenta todos os agentes especializados disponíveis no sistema `.claude/`, suas capacidades e quando utilizá-los.
+Este guia documenta os agentes especializados disponíveis no sistema `.claude/`, suas capacidades e quando utilizá-los.
 
 ## 📊 Resumo
 
-| Categoria | Agentes | Descrição |
-|-----------|---------|-----------|
-| `development/` | 18 | Desenvolvimento (Python, React, Postgres, etc.) |
-| `product/` | 9 | Produto (product-agent, task-specialist, etc.) |
-| `compliance/` | 5 | Compliance e regulatório |
-| `git/` | 5 | Git (branch review, documentation) |
-| `meta/` | 5 | Meta (Onion, criadores, gate-keeper) |
-| `testing/` | 3 | Testes (engineer, planner) |
-| `review/` | 2 | Code review |
-| `research/` | 1 | Pesquisa |
-| `deployment/` | 1 | Deployment |
-| **Total** | **49** | |
+> **Contagens canônicas por categoria e total:** [docs/onion/inventory.md](inventory.md) — **SSOT gerada do filesystem** (`/meta:inventory`), validada no CI. Categorias: `development/`, `product/`, `compliance/`, `git/`, `meta/`, `testing/`, `review/`, `research/`, `deployment/`.
 
 ## 📋 Índice de Agentes
 
-> As contagens canônicas por categoria estão na tabela **Resumo** acima (49 agentes em 9 categorias).
-> Os títulos abaixo refletem as seções deste guia; alguns agentes podem aparecer agrupados por afinidade temática, não estritamente por diretório.
+> Os títulos abaixo refletem as seções deste guia; alguns agentes podem aparecer agrupados por afinidade temática, não estritamente por diretório. Para a contagem oficial por diretório, ver [inventory.md](inventory.md).
 
 - [🔵 Agentes de Desenvolvimento](#-agentes-de-desenvolvimento)
 - [🔷 Agentes de Testes](#-agentes-de-testes)
@@ -38,7 +26,30 @@ Este guia documenta todos os agentes especializados disponíveis no sistema `.cl
 
 ## 🔵 Agentes de Desenvolvimento
 
-> A categoria `development/` tem **18 agentes** no filesystem (ver tabela **Resumo**). Este guia destaca os mais usados; consulte `.claude/agents/development/` para a lista completa (c4-architecture-specialist, jira-specialist, linux-security-specialist, nx-monorepo-specialist, postgres-specialist, zen-engine-specialist, entre outros).
+Catálogo completo da categoria `development/` (18 agentes — descrições derivadas do frontmatter de cada agente; ver [inventory.md](inventory.md) para a contagem canônica):
+
+| Agente | Modelo | Para que serve |
+|--------|--------|----------------|
+| `react-developer` | Sonnet | React/Next.js moderno, shadcn/ui, TypeScript, a11y _(destaque abaixo)_ |
+| `nodejs-specialist` | Sonnet | Backend Node.js/TypeScript, PNPM, performance optimization |
+| `postgres-specialist` | Sonnet | PostgreSQL 17: triggers, functions, schema, performance |
+| `clickup-specialist` | Sonnet | ClickUp MCP técnico: automações, bulk, webhooks _(destaque abaixo)_ |
+| `jira-specialist` | Sonnet | Jira REST API v3/v2: JQL, ADF, transitions, bulk |
+| `nx-monorepo-specialist` | Sonnet | NX Monorepo: libs/apps, estrutura tier/scope/type enterprise |
+| `nx-migration-specialist` | Sonnet | Migração segura de NX Monorepo (v19+ → v21+) |
+| `c4-architecture-specialist` | Sonnet | Diagramas C4 (Context/Container/Component) com Mermaid |
+| `c4-documentation-specialist` | Sonnet | Documentação textual C4 + ADRs (complementa diagramas) |
+| `mermaid-specialist` | Sonnet | Diagramas Mermaid em documentação/Markdown renderizado |
+| `system-documentation-orchestrator` | Sonnet | Orquestra docs técnicas (coordena mermaid + c4) |
+| `docs-reverse-engineer` | Sonnet | Engenharia reversa: detecção de stack + docs de qualquer projeto |
+| `claude-code-specialist` | Sonnet | Otimização, configuração e troubleshooting do Claude Code |
+| `runflow-specialist` | Sonnet | Runflow SDK: agentes IA, workflows e integrações |
+| `zen-engine-specialist` | Sonnet | ZEN Engine / JDM: regras de negócio, Decision Tables |
+| `gamma-api-specialist` | Sonnet | Gamma.App API: apresentações e conteúdo com IA |
+| `whisper-specialist` | Sonnet | Transcrição de áudio com Whisper (OpenAI) |
+| `linux-security-specialist` | Sonnet | Hardening, auditoria e resposta a incidentes Linux |
+
+**Destaques** (perfis detalhados):
 
 ### **react-developer**
 **Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Blue

@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **33 arquivos** de knowledge base (exceto `index.md`)
-- **13** em `concepts/` · **12** em `frameworks/` · **4** em `tools/` · **1** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
+- **34 arquivos** de knowledge base (exceto `index.md`)
+- **14** em `concepts/` · **12** em `frameworks/` · **4** em `tools/` · **1** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
 
 ---
 

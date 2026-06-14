@@ -1,24 +1,14 @@
 # 🎯 Guia Completo de Comandos
 
-> **Versão**: 4.0 | **Última atualização**: 2026-06-14 | **Total**: 76 comandos invocáveis (94 arquivos `.md` incl. fragmentos `common/` e READMEs)
+> **Versão**: 4.0 | **Última atualização**: 2026-06-14
 
 Este guia documenta todos os comandos disponíveis no sistema `.claude/`, organizados por categoria e função.
 
 ## 📊 Resumo
 
-| Categoria | Comandos | Descrição |
-|-----------|----------|-----------|
-| `product/` | 20 | Gestão de produto |
-| `meta/` | 15 | Meta-comandos (criadores, evolução, fleet) |
-| `docs/` | 11 | Documentação |
-| `engineer/` | 11 | Fluxos de desenvolvimento |
-| `git/` | 6 | Operações Git (GitFlow) |
-| `validate/` | 6 | Validações (test-strategy, qa-points) |
-| `test/` | 3 | Testes |
-| `development/` | 1 | Desenvolvimento |
-| `quick/` | 1 | Ações rápidas |
-| _root_ | 2 | `onion`, `warm-up` |
-| **Total** | **76** | Comandos invocáveis |
+> **Contagens canônicas por categoria e total:** [docs/onion/inventory.md](inventory.md) — **SSOT gerada do filesystem** (`/meta:inventory`), validada no CI. Este guia descreve os comandos; os números vivem na SSOT para nunca drifarem.
+
+Categorias: `product/`, `meta/`, `docs/`, `engineer/`, `git/`, `validate/`, `test/`, `development/`, `quick/` + root (`onion`, `warm-up`).
 
 ## 📋 Índice por Categoria
 

@@ -47,6 +47,7 @@ Qualquer proposta de modernização é **rejeitada** se ferir:
 | **Workflow fan-out vs prosa sequencial** | **Fan-out** (`Workflow` nativo) se largura × independência alta E sem estado mutável compartilhado. **Sequencial / `pipeline`** se há dependência de ordem. **Default = serial** — fan-out é opt-in ([commands.md §10](../../meta-specs/commands.md), [agent-fleet-orchestration.md](agent-fleet-orchestration.md)). | ✅ frota paraleliza *dentro* da fase |
 | **Shed ceremony → KB** | Boilerplate, troubleshooting exaustivo, fundamentos teóricos e exemplos longos saem do comando/agente e vão para a KB; o comando mantém só o **grafo executável** que cita a KB ([commands.md §5/§6](../../meta-specs/commands.md)). | n/a |
 | **Reposicionar agente "detentor de conhecimento"** | Se um agente é re-delegado N vezes por comandos para fornecer *conhecimento* (não execução), extraia o conhecimento para uma **KB citável** e reposicione o agente como **mentor ad-hoc**. Comandos citam a KB; param de re-delegar. | ✅ remove acoplamento command→agent desnecessário |
+| **Inventário/contagem (comandos, agentes, skills, KBs)** | **Nunca hardcode** contagens duplicadas em prosa — elas entropizam a cada recurso criado. O inventário é **derivado do filesystem** (SSOT em `docs/onion/inventory.md`, gerado por `/meta:inventory`) e **validado no CI** (lint Regra 8 + 9). Docs **referenciam** a SSOT; não a repetem. Drift detectado → o atuador é `/meta:inventory`, não edição manual. | ✅ drift vira erro de CI, não dívida silenciosa |
 
 ---
 
