@@ -192,7 +192,7 @@ Seis padrões de referência mapeados às primitivas nativas da ferramenta Workf
 | **fan-out-and-synthesize** | Dispara N workers em paralelo e consolida os resultados. | `parallel([...])` + `agent` de síntese |
 | **adversarial verification** | Um agente produz, outro contesta para reduzir erro/alucinação. | `agent` (gerador) + `agent` (crítico) |
 | **generate-and-filter** | Gera muitos candidatos e filtra os que passam no critério. | `parallel([...])` gera + `agent`/JS filtra |
-| **tournament** | Compara candidatos em rodadas até eleger o melhor. | `pipeline(...)` de rodadas eliminatórias |
+| **tournament** | Compara candidatos em rodadas até eleger o melhor. | `parallel()` por rodada (barreira entre rodadas) + redução JS |
 | **loop-until-done** | Itera um agente até satisfazer uma condição de parada. | `agent` em loop JS com guarda de `budget` |
 
 Doutrina associada (era da orquestração): **control before autonomy** (controle antes de autonomia), atenção ao **delegation gap** (lacuna de delegação entre intenção e execução) e uso de **prompt caching** para conter custo de runs longos.

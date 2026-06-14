@@ -200,6 +200,163 @@ Code, simule a condição usando o argumento explícito de fallback:
 
 ---
 
+## Cenário 4 — frota mutante (partição-primeiro)
+
+### Objetivo
+
+Validar a **frota que ESCREVE** arquivos em paralelo: partição-primeiro (sem
+worktree quando os alvos são disjuntos), detecção de colisão de paths no fan-in,
+consolidação numa **única branch** e gate humano em conflito.
+
+### Comando de invocação
+
+```
+/meta:fleet adicionar `version: "1.0.0"` ao frontmatter dos comandos sem o campo
+```
+
+### Comportamento esperado
+
+1. **Levantamento** dos alvos (comandos sem `version:`) via `Glob`/`Grep`.
+2. **Partição por arquivos disjuntos** — cada worker recebe um subconjunto que
+   **nenhum outro** toca → o relatório declara "partição-primeiro, sem worktree".
+3. Workers retornam `DiffSchema`; o fan-in **cruza os `files[].path` em JS** e
+   confirma **partição limpa** (zero paths repetidos).
+4. **Consolidação numa única branch** (ex.: `fleet/add-version-field`) — não N
+   branches soltas; a branch entra no fluxo normal (`/git:flow feature finish` ou
+   `/engineer:pr`).
+5. Worker morto → `null` → `.filter(Boolean)` + `SKIP — <motivo>` no relatório.
+
+### Variante worktree (sobreposição) + gate
+
+Se a partição **não** for possível (workers tocam o mesmo arquivo), o esperado é:
+`isolation:'worktree'` por worker **OU** colisão detectada → **gate humano**
+(reportar os paths em conflito, **não** auto-merge). Operação irreversível →
+gate humano.
+
+### Critério de PASS/FAIL
+
+| Critério | PASS | FAIL |
+|----------|------|------|
+| Decisão partição-vs-worktree explícita | declara "partição-primeiro, sem worktree" quando alvos disjuntos | usa worktree sem necessidade, ou não decide |
+| Detecção de colisão no fan-in | cruza paths em JS antes de consolidar | aplica diffs às cegas |
+| Saída = 1 branch | uma branch de consolidação → fluxo de PR | N branches soltas / bypass do gate de PR |
+| Gate em conflito/irreversível | pausa e pede confirmação humana | auto-merge de conflito |
+| Invariante de fase | não funde `engineer/*`/`product/*` | propõe fusão de fases |
+
+---
+
+## Cenário 5 — classify-and-act
+
+### Objetivo
+Validar que a frota executa UM passo de classificação centralizado antes de qualquer roteamento, e que cada item é entregue exclusivamente ao handler do seu bucket correto (`bug`, `feature` ou `docs`), com fan-in em um único relatório consolidado.
+
+### Comando de invocação
+```
+/meta:fleet triar as issues abaixo em buckets bug | feature | docs e rotear cada uma ao handler especializado: ["Login falha com OAuth", "Adicionar exportação CSV", "Atualizar guia de instalação", "NullPointerException no checkout", "Documentar endpoint /health", "Permitir login por magic link"]
+```
+
+### Comportamento esperado
+1. O orquestrador (opus) instancia UM agente classificador (sonnet) que recebe todas as 6 issues e retorna um mapa `{ issue -> bucket }` antes de qualquer handler ser disparado.
+2. O resultado da classificação é inspecionado em JavaScript (0 tokens) para agrupar as issues por bucket e construir as filas de roteamento.
+3. Os handlers especializados (workers sonnet/haiku, um por bucket) são disparados em paralelo via `parallel()`, cada um recebendo somente as issues do seu bucket.
+4. Workers que falham retornam `null` e são descartados com `.filter(Boolean)`, registrando `SKIP — <motivo>` no relatório.
+5. Os resultados dos handlers convergem em UM único relatório consolidado com `run-id` rastreável, listando o bucket e o resultado de cada issue.
+
+### Critério de PASS/FAIL
+| Critério | PASS | FAIL |
+|----------|------|------|
+| Classificação única e anterior ao roteamento | O classificador roda uma vez e conclui antes de qualquer handler iniciar | Handlers disparam antes/junto da classificação, ou há mais de um classificador |
+| Roteamento por bucket correto | Cada issue chega só ao handler do seu bucket (ex.: "NullPointerException" → bug, nunca docs) | Issue entregue ao handler errado ou a múltiplos handlers |
+| Model tiering | Orquestrador opus; classificador e handlers em sonnet/haiku | Workers em opus sem necessidade, ou modelo de outro provider |
+| Fan-in obrigatório | Um único artefato consolidado cobrindo todos os buckets | N saídas soltas, uma por handler |
+| `run-id` presente | Relatório final contém o `run-id` da execução | `run-id` ausente |
+
+---
+
+## Cenário 6 — generate-and-filter
+
+### Objetivo
+Validar que o padrão generate-and-filter gera N candidatos em paralelo e aplica o critério de aceitação em JavaScript puro (0 tokens), descartando reprovados e reportando a contagem de aprovados e rejeitados.
+
+### Comando de invocação
+```
+/meta:fleet gere 5 variações de esquema JSON para o recurso "Pedido" e filtre apenas as que passam na validação de schema (ajv); reporte aprovados, reprovados e run-id
+```
+
+### Comportamento esperado
+1. O orquestrador (opus) emite um `parallel([...])` com 5 workers sonnet, cada um gerando uma variação distinta do schema JSON para "Pedido".
+2. Cada worker retorna seu candidato (string JSON) ou `null` em caso de falha (com log `SKIP — <motivo>`). **Após o `parallel()` retornar**, os `null` são descartados via `.filter(Boolean)` em JavaScript — **sem nenhuma chamada de modelo adicional** (0 tokens).
+3. O filtro JavaScript executa a validação de schema (ajv ou equivalente) sobre os candidatos restantes, sem consumir tokens, separando aprovados de reprovados.
+4. O orquestrador consolida em UM único relatório de fan-in: schemas aprovados, contagem de reprovados (com motivo) e o `run-id`.
+5. O relatório final é a saída única; nenhuma saída solta por candidato é exposta.
+
+### Critério de PASS/FAIL
+| Critério | PASS | FAIL |
+|----------|------|------|
+| Filtro de aceitação | Executado em JavaScript (0 chamadas de modelo adicionais) | Candidato enviado a um agente/modelo para ser julgado |
+| Candidatos reprovados | Descartados com contagem e motivo no relatório final | Reprovados silenciados ou contados como aprovados |
+| Workers com falha | Retornam `null` + `SKIP — <motivo>`, descartados via `.filter(Boolean)` | Falha propaga erro não tratado ou trava o fan-out |
+| Fan-in | Exatamente 1 relatório consolidado | N saídas soltas ou nenhuma |
+| `run-id` | Presente e único no relatório final | Ausente ou duplicado |
+
+---
+
+## Cenário 7 — tournament
+
+### Objetivo
+Validar que o padrão tournament reduz o campo pela metade a cada rodada eliminatória par-a-par, com **barreira entre rodadas** (a Final depende dos vencedores), convergindo em UM único vencedor consolidado.
+
+### Comando de invocação
+```
+/meta:fleet comparar as 4 abordagens de cache (in-memory, Redis, CDN edge, banco de dados) em rodadas eliminatórias 2-a-2 e eleger a melhor para um contexto de alta leitura
+```
+
+### Comportamento esperado
+1. O orquestrador (opus) monta o chaveamento e dispara a Rodada 1 com `parallel([par A, par B])` (**barreira por rodada**): par A (in-memory vs Redis) e par B (CDN edge vs banco), cada confronto avaliado por um worker sonnet. A coordenação JavaScript aplica `.filter(Boolean)` e retém os 2 vencedores.
+2. Worker que falhar num confronto retorna `null`, é descartado com `.filter(Boolean)` e o adversário avança; o motivo vira `SKIP — <motivo>` no relatório parcial.
+3. Rodada 2 (Final): os 2 vencedores se enfrentam num confronto único, avaliado por um juiz adversarial opus.
+4. O orquestrador consolida fan-in único: relatório com `run-id`, placar por rodada, justificativa do vencedor e recomendação — nunca 4 saídas soltas.
+5. Toda coordenação (filtros, roteamento de rodadas, agregação) roda em JavaScript = 0 tokens, no nível principal; nenhum subagente orquestra rodadas.
+
+### Critério de PASS/FAIL
+| Critério | PASS | FAIL |
+|----------|------|------|
+| Redução por rodada | Campo cai de 4 → 2 → 1 a cada rodada | Rodada termina com nº inesperado de finalistas |
+| Primitivo correto | Rodadas usam `parallel()` com barreira (a Final depende dos vencedores) | Uso de `pipeline()` (sem barreira) entre rodadas dependentes |
+| Fan-in único | Exatamente 1 relatório consolidado com `run-id` | Múltiplos relatórios soltos ou `run-id` ausente |
+| Descarte de falhas | Worker falho → `null`, adversário avança, `SKIP — <motivo>` presente | Falha interrompe o torneio ou avança sem registrar motivo |
+| Orquestração no nível principal | Nenhum subagente coordena rodadas | Subagente age como "fleet-orchestrator" interno |
+
+---
+
+## Cenário 8 — loop-until-done
+
+### Objetivo
+Validar que `loop-until-done` corrige erros de lint em lotes sucessivos até zerar ou atingir o teto de budget, e que a **ausência de budget é regressão bloqueante**.
+
+### Comando de invocação
+```
+/meta:fleet corrigir o próximo lote de erros de lint repetidamente até zerar (loop-until-dry), com teto de 8 iterações e budget máximo de 200 000 tokens
+```
+
+### Comportamento esperado
+1. O orquestrador (nível principal, opus) lê o relatório de lint inicial e registra o `run-id` no cabeçalho do relatório final.
+2. A cada iteração, um worker sonnet recebe o lote de erros restantes, aplica as correções e retorna `{ errosRestantes, tokensUsados }` — ou `null` em caso de falha (descartado via `.filter(Boolean)`, reportado como `SKIP — <motivo>`).
+3. O orquestrador avalia em JavaScript (0 tokens) se `errosRestantes === 0` (parada por conclusão) ou se `iterações >= 8` / `tokensAcumulados >= 200000` (parada por budget).
+4. O loop encerra pelo primeiro critério atingido; consolida UM único relatório final com erros corrigidos, iterações, tokens consumidos e `run-id`.
+5. Se invocado **sem** teto de iterações ou budget, a skill **recusa a execução** com erro bloqueante antes de criar qualquer agente.
+
+### Critério de PASS/FAIL
+| Critério | PASS | FAIL |
+|----------|------|------|
+| Budget obrigatório | Execução recusada com erro explícito quando o teto está ausente | Loop iniciado sem teto de iterações/tokens |
+| Parada por condição | Loop encerra quando `errosRestantes === 0` antes do teto | Loop continua após zerar os erros |
+| Parada por budget | Loop encerra ao atingir 8 iterações ou 200 000 tokens, o que vier primeiro | Loop ultrapassa o teto |
+| Fan-in consolidado | Relatório único com `run-id`, erros corrigidos e tokens consumidos | N relatórios soltos ou `run-id` ausente |
+| Worker com falha | Worker falho → `null`, descartado com `.filter(Boolean)`, `SKIP — <motivo>` | Falha aborta todo o loop ou é silenciada |
+
+---
+
 ## Checklist de regressão — 6 padrões canônicos
 
 Execute após qualquer alteração em `fleet.md` ou `SKILL.md`. Marque cada item
@@ -210,16 +367,19 @@ Padrão canônico              Coberto neste smoke test  Última validação
 ─────────────────────────────────────────────────────────────────────────
 [ ] fan-out-and-synthesize   Cenário 1                 ____________
 [ ] adversarial verification  Cenário 2                 ____________
-[ ] fallback serial          Cenário 3                 ____________
-[ ] classify-and-act         — (não coberto aqui)      ____________
-[ ] generate-and-filter      — (não coberto aqui)      ____________
-[ ] tournament               — (não coberto aqui)      ____________
-[ ] loop-until-done          — (não coberto aqui)      ____________
+[ ] fallback serial          Cenário 3 (transversal)   ____________
+[ ] frota mutante (worktree) Cenário 4 (transversal)   ____________
+[ ] classify-and-act         Cenário 5                 ____________
+[ ] generate-and-filter      Cenário 6                 ____________
+[ ] tournament               Cenário 7                 ____________
+[ ] loop-until-done          Cenário 8                 ____________
 ```
 
-> Os padrões `classify-and-act`, `generate-and-filter`, `tournament` e
-> `loop-until-done` não possuem cenário neste smoke test. Para cobertura
-> completa, crie cenários adicionais em `fleet-smoke-test-extended.md`.
+> **Cobertura completa (6/6 padrões canônicos).** Os 6 padrões canônicos têm
+> cenário (1, 2, 5, 6, 7, 8); `fallback serial` (3) e `frota mutante` (4) são
+> cenários transversais adicionais. Cenários 5-8 foram **autorados pela própria
+> frota** (`/meta:fleet`, fan-out-and-synthesize + verificação adversarial) —
+> dogfooding em 2026-06-14.
 
 ### Invariantes transversais (verificar em todos os cenários)
 
@@ -227,8 +387,10 @@ Padrão canônico              Coberto neste smoke test  Última validação
       um subagente.
 - [ ] `budget` é especificado em qualquer `loop-until-done`; ausência é
       regressão bloqueante.
-- [ ] `isolation:'worktree'` é exigido quando workers escrevem — nenhum cenário
-      aqui escreve, então este item só se aplica a testes estendidos.
+- [ ] Mutação: **partição-primeiro** (sem worktree p/ alvos disjuntos);
+      `isolation:'worktree'` só p/ sobreposição real; saída = **1 branch**
+      consolidada → fluxo de PR; conflito/irreversível → gate humano. Coberto
+      pelo **Cenário 4**.
 - [ ] Workers com falha retornam `null` e são descartados com `.filter(Boolean)`,
       relatando `SKIP — <motivo>` no fan-in.
 - [ ] Lineup de modelos restrito a tiers Claude (fable, opus, sonnet, haiku) —

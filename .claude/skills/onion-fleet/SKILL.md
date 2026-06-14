@@ -32,13 +32,21 @@ A coordenação roda em JavaScript e custa **0 tokens de modelo**. O teto é de
    **barreira** (todos terminam antes do fan-in) e `pipeline(items, ...)` quando
    o fluxo corre **sem barreira** entre itens (estágios encadeados por item).
    Defina `schema` por worker para output estruturado e validado.
-4. **Verificação adversarial / judge-panel quando alto risco.** Mudanças amplas,
+4. **Modo mutação (quando os workers ESCREVEM).** Decida partição-vs-worktree:
+   workers em arquivos **disjuntos** → particione, **sem** worktree; sobreposição
+   real / branches independentes → `isolation:'worktree'` por worker. No fan-in:
+   colete `DiffSchema`, **detecte colisão de paths em JS**; partição limpa → aplique
+   tudo numa **branch de consolidação**; colisão → **gate humano** (ou judge-panel
+   p/ abordagens concorrentes). A branch consolidada entra no fluxo normal
+   (`/git:flow feature finish` / `/engineer:pr` via forge) — nunca N branches
+   soltas. (Playbook: KB de frota §7.)
+5. **Verificação adversarial / judge-panel quando alto risco.** Mudanças amplas,
    irreversíveis ou de compliance ganham uma etapa de verificação por um agente
    independente (ou painel de juízes) sobre a saída agregada.
-5. **Fan-in / consolidação.** Todo fan-out termina em **um único resultado**
+6. **Fan-in / consolidação.** Todo fan-out termina em **um único resultado**
    consolidado — nunca N saídas soltas. Agregue, deduplique e ranqueie no
    contexto principal (custo 0 tokens).
-6. **Relatório ao usuário** em pt-BR: padrão escolhido, nº de workers, tier de
+7. **Relatório ao usuário** em pt-BR: padrão escolhido, nº de workers, tier de
    modelo, budget gasto e o resultado consolidado.
 
 ## Padrões → primitivas
@@ -73,6 +81,21 @@ await pipeline(
 );
 ```
 
+```javascript
+// MUTAÇÃO partição-primeiro: workers em arquivos DISJUNTOS → sem worktree
+const results = (await parallel(
+  partitions.map((files) => agent(
+    `Aplique a transformação SOMENTE nestes arquivos: ${files.join(", ")}. Retorne DiffSchema.`,
+    { schema: DiffSchema, model: "haiku" }
+  ))
+)).filter(Boolean);
+// detectar colisão de paths em JS (0 tokens); partição limpa → 1 branch de consolidação
+const paths = results.flatMap(r => r.files.map(f => f.path));
+const collided = paths.filter((p, i) => paths.indexOf(p) !== i);
+if (collided.length) return gateHumano(collided, results);  // partição falhou
+// sem colisão → consolida numa branch → /git:flow feature finish | /engineer:pr
+```
+
 ## Model tiering & budget
 
 - **Opus orquestra** no nível principal (decisão, roteamento, síntese);
@@ -93,9 +116,12 @@ await pipeline(
 - **Fan-out só com independência real.** Dependência de ordem ou estado
   compartilhado mutável → mantenha serial. Paralelizar trabalho dependente
   corrompe resultado e desperdiça budget.
-- **Mutação concorrente de arquivos exige `isolation:'worktree'`.** Quando
-  múltiplos workers escrevem no repositório, isole cada um em seu git worktree;
-  consolide os diffs no fan-in. Sem isolamento, há corrida de escrita.
+- **Mutação concorrente: partição-primeiro, worktree só p/ sobreposição.** Antes
+  de paralelizar escrita, **particione por arquivos disjuntos** — sem corrida →
+  **dispensa worktree** (worktree custa ~200-500ms + disco/agente). Use
+  `isolation:'worktree'` **só** quando há sobreposição real ou branches
+  independentes a fundir. Consolide numa **única branch** → fluxo normal
+  (`/git:flow` / `/engineer:pr`). Playbook completo: KB de frota §7.
 - **Fleet é OPT-IN, nunca default.** Fan-out é decisão explícita. Trabalho
   serial e os workflows faseados canônicos (`engineer/*`, `product/*`)
   permanecem sequenciais — a frota paraleliza *dentro* de uma fase, não funde

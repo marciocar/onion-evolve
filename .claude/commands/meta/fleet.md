@@ -103,8 +103,10 @@ Com o padrão escolhido, autore um script da ferramenta **Workflow**. Use:
 - `pipeline(items, stage1, stage2, ...)` quando o fluxo corre **sem barreira**
   entre itens (estágios encadeados por item).
 - `schema` por worker para **output estruturado e validado**.
-- `isolation:'worktree'` quando múltiplos workers **escrevem** no repositório
-  (evita corrida de escrita; consolide os diffs no fan-in).
+- **Mutação (workers escrevem):** **particione por arquivos disjuntos** (sem
+  corrida → **dispensa worktree**); use `isolation:'worktree'` **só** quando há
+  sobreposição real ou branches independentes a fundir. Consolide numa **única
+  branch** → fluxo normal. Playbook completo + `DiffSchema`: [agent-fleet-orchestration.md §7](../../../docs/knowledge-base/concepts/agent-fleet-orchestration.md).
 - `budget` (teto de tokens) — **obrigatório** em qualquer `loop-until-done`.
 
 Aplique **model tiering**: opus orquestra no nível principal; workers mecânicos
@@ -143,9 +145,37 @@ await pipeline(
 );
 ```
 
+```javascript
+// MUTAÇÃO partição-primeiro (prova operacional): adicionar `version:` ao
+// frontmatter de N comandos sem ele. Cada worker cuida de arquivos DISJUNTOS →
+// sem corrida → SEM worktree. Consolida numa única branch → fluxo normal de PR.
+const targets = glob(".claude/commands/**/*.md").filter(noVersionField);     // levantado no Passo 1
+const partitions = chunk(targets, Math.ceil(targets.length / 8));            // ≤16 workers; aqui 8
+const results = (await parallel(
+  partitions.map((files) => agent(
+    `Adicione \`version: "1.0.0"\` ao frontmatter SOMENTE destes arquivos (não toque em outros): ${files.join(", ")}. Retorne DiffSchema.`,
+    { schema: DiffSchema, model: "haiku", budget: 50_000 }
+  ))
+)).filter(Boolean);                                                          // worker morto → null
+
+// fan-in em JS (0 tokens): garantir partição limpa antes de consolidar
+const paths = results.flatMap((r) => r.files.map((f) => f.path));
+const collided = paths.filter((p, i) => paths.indexOf(p) !== i);
+if (collided.length) return gateHumano(collided, results);                  // partição falhou → humano decide
+
+// partição limpa → 1 branch de consolidação → entra no fluxo faseado normal:
+//   /git:flow feature finish   ou   /engineer:pr  (via forge adapter)
+return { branch: "fleet/add-version-field", changed: paths.length };
+
+// Variante worktree (só quando há sobreposição): trocar a chamada acima por
+//   agent(..., { isolation: "worktree", schema: DiffSchema })
+// e fundir as worktrees na branch de consolidação após a barreira (KB §7.4).
+```
+
 Mudanças amplas, irreversíveis ou de compliance ganham obrigatoriamente a etapa
 de **verificação adversarial** (ou painel de juízes) sobre a saída agregada — um
-agente independente tenta refutar o resultado antes de consolidá-lo.
+agente independente tenta refutar o resultado antes de consolidá-lo. Mutação com
+conflito de partição ou operação irreversível → **gate humano** (KB §7.5).
 
 ### Passo 4 — Consolidar (fan-in)
 
@@ -199,7 +229,7 @@ ferramenta `Agent`:
 # Auditoria de conformidade ampla (fan-out-and-synthesize + verificação adversarial)
 /meta:fleet auditar conformidade de todos os agentes contra as meta-specs
 
-# Migração mecânica multi-arquivo (parallel + isolation:'worktree')
+# Migração mecânica multi-arquivo (mutação partição-primeiro → 1 branch; ver script no Passo 3)
 /meta:fleet adicionar o campo `version` ao frontmatter de todos os comandos sem versão
 
 # Pesquisa fan-out citada (fan-out-and-synthesize)
