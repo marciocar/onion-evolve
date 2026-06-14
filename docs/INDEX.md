@@ -25,11 +25,11 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ### Documentação Principal
 - **66 arquivos markdown** em `docs/`
 - **11 arquivos** em `docs/onion/` (Sistema Onion)
-- **25 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
-  - 12 arquivos em `concepts/` (Conceitos fundamentais)
-  - 8 arquivos em `frameworks/` (Frameworks e metodologias)
+- **32 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
+  - 13 arquivos em `concepts/` (Conceitos fundamentais)
+  - 12 arquivos em `frameworks/` (Frameworks e metodologias)
   - 3 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
-  - 1 arquivo em `platforms/` (Plataformas)
+  - 1 arquivo em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 1 em `meta/`
   - 1 `index.md`
 - **1 arquivo** em `docs/meta-specs/` (Meta Especificações)
 - Arquivos adicionais em `docs/analysis/`, `docs/plans/`, `docs/business-context/`, `docs/technical-context/`
@@ -83,8 +83,8 @@ docs/
 │   ├── end-to-end-validation-tests.md  # Testes de validação E2E
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
-├── knowledge-base/             # Knowledge Bases (25 arquivos)
-│   ├── concepts/               # Conceitos fundamentais (12 arquivos)
+├── knowledge-base/             # Knowledge Bases (32 arquivos)
+│   ├── concepts/               # Conceitos fundamentais (13 arquivos)
 │   │   ├── abstraction-patterns-catalog.md
 │   │   ├── agent-fleet-orchestration.md  # ✨ NOVO
 │   │   ├── ai-agent-design-patterns.md
@@ -97,7 +97,7 @@ docs/
 │   │   ├── spec-driven-development.md  # ✨ NOVO
 │   │   ├── specification-driven-ai-abstraction-layer.md
 │   │   └── task-manager-abstraction.md
-│   ├── frameworks/             # Frameworks e metodologias (8 arquivos)
+│   ├── frameworks/             # Frameworks e metodologias (12 arquivos)
 │   │   ├── agent-orchestration-landscape-2026.md  # ✨ NOVO
 │   │   ├── framework-story-points.md
 │   │   ├── framework-testes.md
@@ -108,11 +108,16 @@ docs/
 │   │   └── spec-driven-development-tools-2025.md
 │   ├── platforms/              # Plataformas e tecnologias (1 arquivo)
 │   │   └── runflow.md
-│   ├── providers/              # Provedores de serviços (1 arquivo)
-│   │   └── microsoft-graph-teams-api-guia-completo.md
-│   └── tools/                  # Ferramentas e recursos (2 arquivos)
-│       ├── claude-code-commands-best-practices-2026.md
-│       └── whisper.md          # Knowledge base do Whisper
+│   ├── tools/                  # Ferramentas e recursos (3 arquivos)
+│   │   ├── agent-skills.md
+│   │   ├── claude-code-commands-best-practices-2026.md
+│   │   └── whisper.md          # Knowledge base do Whisper
+│   ├── patterns/               # Padrões de implementação (1 arquivo)
+│   │   └── sdaal-examples.md
+│   ├── architectures/          # C4 + ADR (1 arquivo)
+│   │   └── c4-adr-patterns.md
+│   └── meta/                   # Criação de comandos (1 arquivo)
+│       └── command-creation-patterns.md
 │
 ├── meta-specs/                 # Meta Especificações (1 arquivo)
 │   └── index.md                # Índice de meta specs
@@ -175,7 +180,7 @@ docs/
 
 Knowledge Bases estruturadas para consumo por IA e referência técnica:
 
-### Conceitos Fundamentais (12 arquivos)
+### Conceitos Fundamentais (13 arquivos)
 - **Task Manager Abstraction** - Abstração de gerenciadores de tarefas
 - **Spec-as-Code Strategy** - Estratégia de especificações como código
 - **Spec-Driven Development** - Metodologia emergente de desenvolvimento com IA ✨ NOVO
@@ -189,7 +194,7 @@ Knowledge Bases estruturadas para consumo por IA e referência técnica:
 - **Meeting Transcription to Knowledge Base** - Processamento de reuniões
 - **Specification-Driven AI Abstraction Layer** - Camada de abstração orientada a especificações
 
-### Frameworks e Metodologias (8 arquivos)
+### Frameworks e Metodologias (12 arquivos)
 - **Agent Orchestration Landscape 2026** - Comparativo de 5 correntes (Anthropic/coding-agents/OSS/enterprise/academia) com verificação adversarial ✨ NOVO
 - **Framework de Story Points** - Estimativas ágeis
 - **Framework de Testes** - White-box, Grey-box, Black-box
