@@ -62,9 +62,12 @@ Se variáveis obrigatórias do provider estiverem ausentes ou inválidas:
 ---
 
 ## 📝 Diretrizes de Linguagem
-- **Comentários e documentação**: Português brasileiro (pt-BR)
-- **Código, variáveis, funções**: Inglês
-- **Commits**: Português brasileiro
+
+A skill **`language-standards`** é a **autoridade canônica** (alinhada à meta-spec [`code-standards.md`](docs/meta-specs/code-standards.md)). Resumo:
+
+- **Chat, comentários, instruções, documentação, READMEs, mensagens ao usuário**: Português brasileiro (pt-BR)
+- **Código, variáveis, funções, nomes de arquivo/branch**: Inglês
+- **Commits**: Inglês (Conventional Commits — `feat:`, `fix:`, `refactor:`, `docs:`, `chore:` …)
 - **Logs e debugging**: Inglês
 
 ---
