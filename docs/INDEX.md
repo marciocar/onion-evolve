@@ -98,14 +98,14 @@ docs/
 │   │   ├── spec-driven-development.md  # ✨ NOVO
 │   │   ├── specification-driven-ai-abstraction-layer.md
 │   │   └── task-manager-abstraction.md
-│   ├── frameworks/             # Frameworks e metodologias (12 arquivos)
-│   │   ├── agent-orchestration-landscape-2026.md  # ✨ NOVO
+│   ├── frameworks/             # Frameworks e metodologias (8 arquivos)
+│   │   ├── agent-orchestration-landscape-2026.md
 │   │   ├── framework-story-points.md
 │   │   ├── framework-testes.md
-│   │   ├── onion-complete-cycle-understanding.md
-│   │   ├── onion-ide-integration-strategy.md
-│   │   ├── onion-multi-context-orchestrator-vision.md
-│   │   ├── onion-system-critical-analysis-2025.md
+│   │   ├── gitflow-patterns.md
+│   │   ├── qa-story-points.md
+│   │   ├── collaborative-testing-patterns.md
+│   │   ├── test-strategy-scoring.md
 │   │   └── spec-driven-development-tools-2025.md
 │   ├── platforms/              # Plataformas e tecnologias (1 arquivo)
 │   │   └── runflow.md
@@ -123,11 +123,10 @@ docs/
 ├── meta-specs/                 # Meta Especificações (1 arquivo)
 │   └── index.md                # Índice de meta specs
 │
-├── analysis/                   # Análises
-│   └── unleash-alternatives-analysis.md
-│
-├── plans/                      # Planos de execução
-│   └── [arquivos de planejamento]
+├── analysis/                   # Análises ativas (baselines; itens efêmeros são removidos pós-execução — ver analysis/README.md)
+│   ├── onion-review-2026-05.md         # SSOT de identidade
+│   ├── onion-vv-baseline-2026-06.md    # baseline de V&V (usada por /meta:evolve)
+│   └── onion-evolution-2026-06-14-v2.md # auditoria mais recente
 │
 ├── sdaal/                      # Specification-Driven AI Abstraction Layer
 │   └── [documentação SDAAL]
@@ -245,20 +244,13 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 
 ---
 
-## 📊 Análises e Planos
+## 📊 Análises
 
-### Análises
-- **[Revisão Analítica do Sistema Onion — Maio/2026](analysis/onion-review-2026-05.md)** ✨ NOVO - Análise crítica completa sob a lente "framework template instalável"; documenta abandono de `.onion/`, plano v4.0 e `packages/onion-cli/`
-- **[Retrospectiva T2.6 — Validação das Meta-specs](analysis/metaspec-validation-2026-05-18.md)** ✨ NOVO - Validação das 5 meta-specs contra artefatos reais
-- **[Retrospectiva P1 — Saneamento Estrutural](analysis/p1-saneamento-retrospectiva-2026-05-18.md)** ✨ NOVO - Decisões registradas das tarefas T1.1-T1.5
-- **[Baseline de Verificação e Validação — Junho/2026](analysis/onion-vv-baseline-2026-06.md)** ✨ NOVO - Estado "antes" (tamanhos + conformidade de plataforma) do plano de V&V
-- **[Retrospectiva T3.2 — Validação de build-*-docs](analysis/t32-pilot-retrospectiva-2026-06.md)** ✨ NOVO - Auto-piloto que validou os comandos de geração de docs; resolve T3.6
-- **[Análise de Alternativas Unleash](analysis/unleash-alternatives-analysis.md)** - Análise comparativa
+> **Ciclo de vida** (ver [analysis/README.md](analysis/README.md)): análises e planos são **efêmeros** — uma vez executados, são removidos (git é o arquivo). Permanecem apenas os **baselines ativos** abaixo. As retrospectivas P1/T2.6/T3.2, o plano de saneamento e a análise de vendor Unleash foram **executados/curados e removidos em 2026-06-14** (recuperáveis via git history).
 
-### Planos de Execução
-- **[Plano de Saneamento Onion 2026-05](plans/onion-saneamento-plan-2026-05.md)** - Roadmap executável das 19 recomendações da análise de maio/2026 (status: executado-parcialmente)
-
-> Os planos `onion-v4-epic` e `onion-v4-migration-plan` (visão v4.0/CLI) foram **abandonados em 2026-05-18** e removidos em 2026-06-03 (recuperáveis via histórico git).
+- **[Revisão Analítica do Sistema Onion — Maio/2026](analysis/onion-review-2026-05.md)** — SSOT de identidade: documenta o abandono de `.onion/`, plano v4.0 e `packages/onion-cli/`; sintetiza as análises-fonte de 2025.
+- **[Baseline de Verificação e Validação — Junho/2026](analysis/onion-vv-baseline-2026-06.md)** — baseline de V&V (tamanhos + conformidade de plataforma); usada por `/meta:evolve`.
+- **[Onion Evolution v2 — Junho/2026](analysis/onion-evolution-2026-06-14-v2.md)** — auditoria de evolução mais recente (backlog v2, executado nos PRs #22–#27).
 
 ---
 
