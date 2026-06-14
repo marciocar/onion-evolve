@@ -32,7 +32,8 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 arquivo em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 1 em `meta/`
   - 1 `index.md`
 - **1 arquivo** em `docs/meta-specs/` (Meta Especificações)
-- Arquivos adicionais em `docs/analysis/`, `docs/plans/`, `docs/business-context/`, `docs/technical-context/`
+- Arquivos adicionais em `docs/analysis/`, `docs/plans/`, `docs/applying/`, `docs/sdaal/`
+- **3 contextos spec-as-code** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`
 
 ### Sistema Onion (`.claude/`)
 - **80 comandos invocáveis** Claude Code distribuídos em:
