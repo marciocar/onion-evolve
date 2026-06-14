@@ -2,14 +2,14 @@
 
 > **Última atualização**: 2026-06-14 | **Gerado por**: `/docs:build-index onion` | **Revisado**: auditoria manual
 
-Bem-vindo ao índice da documentação do **Sistema Onion**. Este documento organiza os 12 documentos de documentação operacional do sistema em `docs/onion/`.
+Bem-vindo ao índice da documentação do **Sistema Onion**. Este documento organiza os 13 documentos de documentação operacional do sistema em `docs/onion/`.
 
 ---
 
 ## 🎯 Visão Geral
 
 O **Sistema Onion** é um **framework template em `.claude/`** — instalável em qualquer projeto (novo, legado ou regulado), plataforma única Claude Code, sem produto npm e sem CLI standalone. Inclui:
-- 🤖 **76 comandos invocáveis** Claude Code em 9 categorias
+- 🤖 **77 comandos invocáveis** Claude Code em 9 categorias
 - 🎯 **49 agentes de IA especializados** em 9 categorias
 - 🧩 **5 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-fleet`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente
@@ -20,8 +20,10 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 
 ## 📊 Estatísticas
 
-- **12 documentos** em `docs/onion/`
-- **76 comandos invocáveis** Claude Code em `.claude/commands/`
+> **Contagens canônicas (SSOT):** [inventory.md](inventory.md) — gerado do filesystem por `/meta:inventory` e validado no CI. Os números abaixo derivam dele.
+
+- **13 documentos** em `docs/onion/`
+- **77 comandos invocáveis** Claude Code em `.claude/commands/`
 - **49 agentes** IA em `.claude/agents/`
 - **5 skills** em `.claude/skills/`
 
@@ -34,7 +36,7 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 **Comece aqui se você é novo no Sistema Onion:**
 
 1. **[Guia de Comandos](commands-guide.md)** - Documentação dos comandos disponíveis
-   - 76 comandos invocáveis em 9 categorias
+   - 77 comandos invocáveis em 9 categorias
    - Exemplos de uso e workflows
    - Integrações com Task Managers
 
@@ -90,6 +92,11 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
    - Workflows de integração contínua
    - Testes automatizados
    - Deploy pipeline
+
+5. **[Inventário Canônico](inventory.md)** - SSOT de comandos/agentes/skills/KBs
+   - Gerado do filesystem (`/meta:inventory`)
+   - Validado no CI (lint Regra 8 + 9)
+   - Contagens nunca hardcoded de memória
 
 ### 📚 Documentação Avançada
 

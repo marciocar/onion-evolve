@@ -27,6 +27,8 @@
 #      (exceções: README.md, SKILL.md, ESPERANTO.md e templates com underscore
 #       em common/templates)
 #   7. Nenhum agente pode ter name: contendo 'fleet-orchestrator' [HARD]
+#   8. Inventário canônico (docs/onion/inventory.md) em sincronia com o
+#      filesystem [HARD] — gerado por inventory.sh; drift bloqueia merge
 # =============================================================================
 
 set -euo pipefail
@@ -212,6 +214,71 @@ check_no_fleet_orchestrator_agent() {
 }
 
 # ===========================================================================
+# REGRA 8 — Inventário canônico sincronizado com o filesystem [HARD]
+#           docs/onion/inventory.md é gerado por inventory.sh (SSOT).
+#           Regenera para um temp e compara: se divergir, alguém alterou
+#           comandos/agentes/skills/KBs sem regenerar o inventário.
+# ===========================================================================
+check_inventory_sync() {
+  local inv_script="${SCRIPT_DIR}/inventory.sh"
+  local inv_file="${REPO_ROOT}/docs/onion/inventory.md"
+
+  if [ ! -f "${inv_script}" ]; then
+    violation "HARD" "${inv_script}" "inventory.sh ausente (SSOT do inventário não pode ser computada)"
+    return
+  fi
+  if [ ! -f "${inv_file}" ]; then
+    violation "HARD" "${inv_file}" "docs/onion/inventory.md ausente — rode 'bash .claude/validation/inventory.sh --markdown > docs/onion/inventory.md'"
+    return
+  fi
+
+  local tmp
+  tmp="$(mktemp)"
+  bash "${inv_script}" --markdown > "${tmp}" 2>/dev/null || true
+
+  if ! diff -q "${inv_file}" "${tmp}" >/dev/null 2>&1; then
+    violation "HARD" "${inv_file}" "inventário desatualizado vs filesystem — regenere com '/meta:inventory' (bash .claude/validation/inventory.sh --markdown > docs/onion/inventory.md)"
+  fi
+  rm -f "${tmp}"
+}
+
+# ===========================================================================
+# REGRA 9 — Contagens no CLAUDE.md em sincronia com a SSOT [HARD]
+#           Extrai "N comandos invocáveis", "N agentes", "N skills" do CLAUDE.md
+#           e compara com os totais computados por inventory.sh. Impede que a
+#           constituição volte a drifar (foi onde o drift 79≠76 vivia).
+# ===========================================================================
+check_claude_md_counts() {
+  local claude_md="${REPO_ROOT}/CLAUDE.md"
+  local inv_script="${SCRIPT_DIR}/inventory.sh"
+  [ -f "${claude_md}" ] || return
+  [ -f "${inv_script}" ] || return
+
+  # Totais canônicos do filesystem
+  local env_out cmd_truth agent_truth skill_truth
+  env_out="$(bash "${inv_script}" --env 2>/dev/null || true)"
+  cmd_truth="$(echo "${env_out}"   | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
+  agent_truth="$(echo "${env_out}" | grep '^ONION_AGENTS_TOTAL='   | cut -d= -f2)"
+  skill_truth="$(echo "${env_out}" | grep '^ONION_SKILLS_TOTAL='   | cut -d= -f2)"
+
+  # Números declarados no CLAUDE.md (primeira ocorrência de cada padrão)
+  local cmd_claim agent_claim skill_claim
+  cmd_claim="$(grep -oE '[0-9]+ comandos invocáveis' "${claude_md}"      | head -1 | grep -oE '^[0-9]+' || true)"
+  agent_claim="$(grep -oE '[0-9]+ agentes' "${claude_md}"               | head -1 | grep -oE '^[0-9]+' || true)"
+  skill_claim="$(grep -oE '[0-9]+ skills' "${claude_md}"                | head -1 | grep -oE '^[0-9]+' || true)"
+
+  if [ -n "${cmd_claim}" ] && [ "${cmd_claim}" != "${cmd_truth}" ]; then
+    violation "HARD" "${claude_md}" "CLAUDE.md afirma ${cmd_claim} comandos, filesystem tem ${cmd_truth} — alinhe à SSOT (/meta:inventory)"
+  fi
+  if [ -n "${agent_claim}" ] && [ "${agent_claim}" != "${agent_truth}" ]; then
+    violation "HARD" "${claude_md}" "CLAUDE.md afirma ${agent_claim} agentes, filesystem tem ${agent_truth} — alinhe à SSOT (/meta:inventory)"
+  fi
+  if [ -n "${skill_claim}" ] && [ "${skill_claim}" != "${skill_truth}" ]; then
+    violation "HARD" "${claude_md}" "CLAUDE.md afirma ${skill_claim} skills, filesystem tem ${skill_truth} — alinhe à SSOT (/meta:inventory)"
+  fi
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -224,6 +291,8 @@ check_no_mcp_onion_orchestrator
 check_line_limits
 check_kebab_case_filenames
 check_no_fleet_orchestrator_agent
+check_inventory_sync
+check_claude_md_counts
 
 # ===========================================================================
 # SUMÁRIO FINAL

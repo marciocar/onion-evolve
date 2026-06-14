@@ -72,7 +72,7 @@ existentes, **não** reimplementam (e não aninham frota dentro de frota).
 | D5 | **Conformidade meta-spec** | **DELEGA a `/meta:metaspec-validate`** por artefato de alto risco — ingere os vereditos estruturados. Não reimplementar a constituição. | (metaspec-validate) |
 | D6 | **Moderna vs legada** | Prosa/delegação sequencial que deveria ser `Workflow` fan-out; resíduo `.onion`/CLI/npm/multi-IDE ([architecture.md §7](../../../docs/meta-specs/architecture.md)). | sonnet |
 | D7 | **Cross-refs / links** | `find .claude -xtype l` (symlinks quebrados) + links relativos `[..](..)` que apontam para arquivos inexistentes. | haiku |
-| D8 | **Plataforma/frontmatter** | Cobertura de `allowed-tools`/`model:`, frontmatter completo, kebab-case ([commands.md §1](../../../docs/meta-specs/commands.md), [agents.md](../../../docs/meta-specs/agents.md)). | haiku |
+| D8 | **Plataforma/frontmatter + inventário** | Cobertura de `allowed-tools`/`model:`, frontmatter completo, kebab-case ([commands.md §1](../../../docs/meta-specs/commands.md), [agents.md](../../../docs/meta-specs/agents.md)). **Inventário:** roda `bash .claude/validation/inventory.sh --markdown` e compara com `docs/onion/inventory.md` + contagens em `CLAUDE.md`; divergência = achado (atuador `/meta:inventory`, **não** edição manual — ver doutrina §regra de inventário). | haiku |
 
 ## ⚡ Etapas de Execução
 

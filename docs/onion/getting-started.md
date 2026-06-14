@@ -8,10 +8,10 @@ Bem-vindo ao sistema Onion v3.0! Este guia vai te ajudar a começar rapidamente 
 
 | Componente | Quantidade | Descrição |
 |------------|------------|-----------|
-| Comandos | 76 | Organizados em 9 categorias |
+| Comandos | 77 | Organizados em 9 categorias |
 | Agentes | 49 | 9 categorias especializadas |
 | Skills | 5 | Orquestração e validação |
-| Knowledge Bases | 33 | Documentação estruturada |
+| Knowledge Bases | 34 | Documentação estruturada |
 
 ## 📋 Checklist de Setup
 
