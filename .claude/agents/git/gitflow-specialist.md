@@ -16,7 +16,7 @@ tools:
 
 color: teal
 priority: alta
-category: development
+category: git
 
 expertise:
   - branch-management

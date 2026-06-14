@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões para Comandos do Sistema Onion
 date: 2026-05-18
-version: 1.3.0
+version: 1.4.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -33,14 +33,17 @@ Todo comando em `.claude/commands/<categoria>/<nome>.md` deve conter:
 ```yaml
 ---
 description: <descrição em uma linha — aparece na lista de comandos>
+name: <slug kebab-case — opcional; quando presente, deve casar o nome do arquivo>
 allowed-tools: [<tools permitidas, ou omitir para herdar contexto>]
 argument-hint: <hint opcional sobre argumentos esperados>
 ---
 ```
 
 - `description` é obrigatório
+- `name` opcional; quando presente, **deve** ser kebab-case (ver §8) e casar o nome do arquivo
 - `allowed-tools` opcional, mas recomendado para comandos que executam ações sensíveis
 - `argument-hint` opcional, melhora UX da invocação
+- **Schema aberto**: campos organizacionais adicionais (`model`, `category`, `tags`, `version`, `updated`) são **permitidos** e não invalidam o comando — a regra normativa cobre apenas os campos acima
 
 ### 1.2 Corpo do comando
 
