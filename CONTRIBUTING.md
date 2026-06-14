@@ -115,7 +115,7 @@ Pontos-chave:
 ## 🔀 Fluxo de Pull Request
 
 1. **Branch** a partir de `main` (GitFlow): `feature/...` ou `fix/...`
-   (ou use `/git:feature:start`).
+   (ou use `/git:flow feature start`).
 2. **Mude** seguindo as meta-specs; atualize docs/índices afetados.
 3. **Valide** localmente (ver abaixo).
 4. **Commit** com Conventional Commits **em pt-BR** (ver próxima seção).

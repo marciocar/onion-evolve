@@ -93,7 +93,7 @@ Estabelecer contexto focado em:
 
 ### 9. Git e Versionamento
 - ✅ Revisar comandos Git disponíveis:
-  - `/git/feature/start` - Criar branch de feature
+  - `/git:flow feature start` - Criar branch de feature
   - `/git/sync` - Sincronizar após merge
 - ✅ Entender workflow Git do projeto
 - ✅ Conhecer convenções de branching

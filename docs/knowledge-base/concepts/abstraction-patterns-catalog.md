@@ -173,7 +173,7 @@ AZURE_DEVOPS_PROJECT=myproject
 
 - `/git/pr` - Criar pull requests
 - `/git/sync` - Sincronizar branches
-- `/git/feature/start` - Criar branches
+- `/git:flow feature start` - Criar branches
 - `/engineer/pre-pr` - Preparar PR
 - `/engineer/pr` - Abrir PR
 

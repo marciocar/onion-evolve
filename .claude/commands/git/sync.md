@@ -4,6 +4,7 @@ description: |
   Sincronização automática de branches com GitFlow e proteção de branches críticas.
   Use após merge de PRs para manter branches atualizadas.
 model: sonnet
+allowed-tools: Bash(git *) Read Bash(cat .env*)
 
 parameters:
   - name: branch
@@ -17,12 +18,12 @@ tags:
   - gitflow
   - branch-protection
 
-version: "3.0.0"
-updated: "2025-11-24"
+version: "3.1.0"
+updated: "2026-06-13"
 
 related_commands:
   - /engineer/pr
-  - /git/feature/finish
+  - /git/flow
 
 related_agents:
   - gitflow-specialist
@@ -30,170 +31,38 @@ related_agents:
 
 # 🔄 Git Sync - Sincronização com GitFlow
 
-Sincronização pós-merge de branches com proteção automática.
+Sincronização pós-merge de branches com proteção automática. Orquestrador fino sobre o **motor GitFlow** (git local).
 
 ## 🎯 Objetivo
 
-Automatizar sincronização após merge de PRs seguindo GitFlow.
-
-## 🛡️ Branches Protegidas
-
-| Branch | Push Direto | Fast-Forward |
-|--------|-------------|--------------|
-| `main` | ❌ Bloqueado | ✅ Permitido |
-| `master` | ❌ Bloqueado | ✅ Permitido |
-| `develop` | ❌ Bloqueado | ✅ Permitido |
+Automatizar a sincronização após merge de PRs, respeitando a proteção de branches.
 
 ## ⚡ Fluxo de Execução
 
-### Passo 1: Detectar Contexto
+Segue a [Matriz de Branches Protegidas e Estratégia de Sync](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync) — **fonte única** da proteção e da estratégia por contexto.
 
-```bash
-# Branch atual
-CURRENT=$(git branch --show-current)
-
-# Target branch
-TARGET="${{branch:-develop}}"
-
-# Verificar se target é protegida
-if [[ "$TARGET" =~ ^(main|master|develop)$ ]]; then
-  PROTECTED=true
-fi
-```
-
-### Passo 2: Validar Estado
-
-```bash
-# Verificar alterações não commitadas
-if [[ -n $(git status --porcelain) ]]; then
-  echo "⚠️ Alterações não commitadas"
-  echo "Commit ou stash antes de continuar"
-  exit 1
-fi
-
-# Fetch remoto
-git fetch origin --prune
-```
-
-### Passo 3: Análise GitFlow
-
-Consultar @gitflow-specialist para estratégia:
-
-| Branch Atual | Target | Estratégia |
-|--------------|--------|------------|
-| `feature/*` | `develop` | `feature-cleanup` |
-| `release/*` | `main` | `release-sync` |
-| `hotfix/*` | `main` | `hotfix-sync` |
-| `develop` | `main` | `protected-sync` |
-
-Referência: `common/prompts/git-workflow-patterns.md`
-
-### Passo 4: Executar Sync
-
-#### Para Branches Normais
-
-```bash
-git checkout $TARGET
-git pull origin $TARGET
-git checkout $CURRENT
-git merge $TARGET --no-edit
-```
-
-#### Para Branches Protegidas
-
-```bash
-# Apenas fast-forward permitido
-git checkout $TARGET
-git merge origin/$TARGET --ff-only
-
-# Se falhar, instruir PR workflow
-if [[ $? -ne 0 ]]; then
-  echo "❌ Fast-forward não possível"
-  echo "Use PR workflow: /engineer/pr"
-fi
-```
-
-### Passo 5: Cleanup (se feature finalizada)
-
-```bash
-# Se branch feature foi merged
-if git branch -r | grep -q "origin/$CURRENT"; then
-  echo "Branch $CURRENT ainda existe no remote"
-else
-  echo "✅ Branch $CURRENT deletada no remote"
-  # Perguntar se quer deletar local
-fi
-```
-
-### Passo 6: Atualizar ClickUp
-
-SE sessão ativa com task_id:
-- Comentário de sync realizado
-- Atualizar status se necessário
+1. **Detectar contexto** — `CURRENT=$(git branch --show-current)`, `TARGET=${branch:-develop}`.
+2. **Validar estado** — abortar se houver mudanças não commitadas; `git fetch origin --prune`.
+3. **Aplicar estratégia** (da matriz da KB): `feature/* → develop` (merge normal), branch protegida (`main`/`master`/`develop`) → **fast-forward apenas**; se FF falhar, instruir `/engineer/pr` (nunca forçar).
+4. **Cleanup** — se a feature já foi merged no remote, oferecer deletar a branch local.
+5. **Task Manager (opcional)** — se `TASK_MANAGER_PROVIDER` != `none`, registrar o sync via o adapter ([utils/task-manager/factory.md](../../utils/task-manager/factory.md)). Roteamento por provider é do adapter — **não reimplementar aqui**.
 
 ## 📤 Output Esperado
-
-### Sync Sucesso
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ SYNC CONCLUÍDO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📊 Resumo:
-∟ Branch atual: feature/user-auth
-∟ Sincronizado com: develop
-∟ Commits atualizados: 5
-∟ Conflitos: 0
-
+∟ Branch atual: feature/user-auth   ∟ Sincronizado com: develop
+∟ Commits atualizados: 5            ∟ Conflitos: 0
 🚀 Próximo: /engineer/work
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-### Branch Protegida - Bloqueio
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🛡️ BRANCH PROTEGIDA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-❌ Push direto em 'develop' bloqueado
-
-📋 Workflow Correto:
-1. git checkout -b feature/my-changes
-2. [fazer alterações]
-3. /engineer/pr
-4. [merge via GitHub/GitLab]
-5. /git/sync develop
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-### Conflito Detectado
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ CONFLITOS DETECTADOS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📁 Arquivos em conflito:
-∟ src/components/Button.tsx
-∟ src/utils/helpers.ts
-
-💡 Resolução:
-1. Editar arquivos manualmente
-2. git add [arquivos]
-3. git commit
-4. /git/sync (novamente)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
+Em branch protegida sem FF possível, reportar bloqueio e o workflow correto (`/engineer/pr` → merge via host → `/git/sync develop`). Em conflito, listar arquivos e instruir resolução manual + nova execução.
 
 ## 🔗 Referências
 
-- Padrões: `common/prompts/git-workflow-patterns.md`
-- Agente: @gitflow-specialist
-
-## ⚠️ Notas
-
-- Sempre fazer `git fetch` antes
-- Branches protegidas só aceitam fast-forward
-- Em caso de conflito, resolver manualmente
+- Proteção e estratégia: [gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync)
+- Sync de task: [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
+- Mentor (conflitos, troubleshooting): `@gitflow-specialist`

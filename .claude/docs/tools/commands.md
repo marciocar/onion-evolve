@@ -276,72 +276,72 @@ command: '/git/help'
 
 ### Feature Workflow
 
-#### `/git/feature/start`
+#### `/git:flow feature start`
 ```typescript
-command: '/git/feature/start'
+command: '/git:flow feature start'
 // Propósito: Inicia nova feature branch
 // Ação: Create branch from develop, setup tracking
 ```
 
-**Localização:** `.claude/commands/git/feature/start.md`
+**Localização:** `.claude/commands/git/flow.md`
 
-#### `/git/feature/publish`
+#### `/git:flow feature publish`
 ```typescript
-command: '/git/feature/publish'
+command: '/git:flow feature publish'
 // Propósito: Publica feature branch para remote
 // Ação: Push branch, setup tracking
 ```
 
-**Localização:** `.claude/commands/git/feature/publish.md`
+**Localização:** `.claude/commands/git/flow.md`
 
-#### `/git/feature/finish`
+#### `/git:flow feature finish`
 ```typescript
-command: '/git/feature/finish'
+command: '/git:flow feature finish'
 // Propósito: Finaliza feature branch
 // Ação: Merge to develop, cleanup, close task
 ```
 
-**Localização:** `.claude/commands/git/feature/finish.md`
+**Localização:** `.claude/commands/git/flow.md`
 
 ### Release Workflow
 
-#### `/git/release/start`
+#### `/git:flow release start`
 ```typescript
-command: '/git/release/start'
+command: '/git:flow release start'
 // Propósito: Inicia release branch
 // Ação: Create release branch, version bump
 ```
 
-**Localização:** `.claude/commands/git/release/start.md`
+**Localização:** `.claude/commands/git/flow.md`
 
-#### `/git/release/finish`
+#### `/git:flow release finish`
 ```typescript
-command: '/git/release/finish'
+command: '/git:flow release finish'
 // Propósito: Finaliza release
 // Ação: Merge to main, tag, deploy
 ```
 
-**Localização:** `.claude/commands/git/release/finish.md`
+**Localização:** `.claude/commands/git/flow.md`
 
 ### Hotfix Workflow
 
-#### `/git/hotfix/start`
+#### `/git:flow hotfix start`
 ```typescript
-command: '/git/hotfix/start'
+command: '/git:flow hotfix start'
 // Propósito: Inicia hotfix de produção
 // Ação: Branch from main, emergency setup
 ```
 
-**Localização:** `.claude/commands/git/hotfix/start.md`
+**Localização:** `.claude/commands/git/flow.md`
 
-#### `/git/hotfix/finish`
+#### `/git:flow hotfix finish`
 ```typescript
-command: '/git/hotfix/finish'
+command: '/git:flow hotfix finish'
 // Propósito: Finaliza hotfix
 // Ação: Merge to main and develop, tag, deploy
 ```
 
-**Localização:** `.claude/commands/git/hotfix/finish.md`
+**Localização:** `.claude/commands/git/flow.md`
 
 ---
 
@@ -517,7 +517,7 @@ prompts: 'technical_prompts'
 - `/engineer/start`
 - `/engineer/plan`
 - `/engineer/work`
-- `/git/feature/start`
+- `/git:flow feature start`
 
 ### 3️⃣ Testing & Review
 - `/engineer/pre-pr`
@@ -526,18 +526,18 @@ prompts: 'technical_prompts'
 
 ### 4️⃣ Integration
 - `/engineer/pr`
-- `/git/feature/finish`
+- `/git:flow feature finish`
 - `/git/sync`
 
 ### 5️⃣ Release
-- `/git/release/start`
+- `/git:flow release start`
 - `/engineer/bump`
-- `/git/release/finish`
+- `/git:flow release finish`
 
 ### 🚨 Emergency
 - `/engineer/hotfix`
-- `/git/hotfix/start`
-- `/git/hotfix/finish`
+- `/git:flow hotfix start`
+- `/git:flow hotfix finish`
 
 ### 📚 Documentation
 - `/docs/*` (todos os comandos de docs)
@@ -556,19 +556,19 @@ prompts: 'technical_prompts'
 ```bash
 1. /product/feature          # Planejar feature
 2. /engineer/start           # Iniciar desenvolvimento
-3. /git/feature/start        # Criar branch
+3. /git:flow feature start        # Criar branch
 4. /engineer/work            # Desenvolver
 5. /engineer/pre-pr          # Validar
 6. /engineer/pr              # Criar PR
-7. /git/feature/finish       # Merge e cleanup
+7. /git:flow feature finish       # Merge e cleanup
 ```
 
 ### Workflow de Hotfix
 ```bash
-1. /git/hotfix/start         # Criar hotfix branch
+1. /git:flow hotfix start         # Criar hotfix branch
 2. /engineer/work            # Fix rápido
 3. /engineer/pr              # PR emergencial
-4. /git/hotfix/finish        # Deploy urgente
+4. /git:flow hotfix finish        # Deploy urgente
 ```
 
 ### Workflow de Documentação
@@ -588,7 +588,7 @@ prompts: 'technical_prompts'
 |-----------|----------|------------|
 | **Product** | 10 | `/product/feature` |
 | **Engineer** | 11 | `/engineer/work` |
-| **Git** | 11 | `/git/feature/start` |
+| **Git** | 11 | `/git:flow feature start` |
 | **Docs** | 9 | `/docs/build-tech-docs` |
 | **Validation** | 1 | `/validate/workflow` |
 | **Common** | 3 | `/warm-up` |

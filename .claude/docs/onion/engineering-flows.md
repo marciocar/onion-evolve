@@ -105,7 +105,7 @@ flowchart TD
 2. ✅ Identificação de complexidade e pattern
 3. ✅ Apresentação do plano para confirmação
 4. ✅ Criação no ClickUp (Task + Subtasks + Action Items)
-5. ✅ Integração Git automática (`/git/feature/start` ou branch direta)
+5. ✅ Integração Git automática (`/git:flow feature start` ou branch direta)
 6. ✅ Setup de sessão (`.claude/sessions/<feature-slug>/`)
 7. ✅ Criação de context files
 
@@ -248,9 +248,9 @@ flowchart LR
 | Comando | Responsabilidade | Quando Usar |
 |---------|------------------|-------------|
 | `/docs/sync-sessions` | Sincronização de Sessão | Após merge (manual ou automático) |
-| `/git/feature/start` | Criar feature branch | **Chamado internamente** por `/product/task` |
-| `/git/hotfix/start` | Criar hotfix branch | **Chamado internamente** por `/engineer/hotfix` |
-| `/git/hotfix/finish` | Finalizar hotfix | Após merge do PR de hotfix |
+| `/git:flow feature start` | Criar feature branch | **Chamado internamente** por `/product/task` |
+| `/git:flow hotfix start` | Criar hotfix branch | **Chamado internamente** por `/engineer/hotfix` |
+| `/git:flow hotfix finish` | Finalizar hotfix | Após merge do PR de hotfix |
 
 ---
 
@@ -279,7 +279,7 @@ flowchart TD
     J -->|Nao| E
     J -->|Sim| K[Merge]
     
-    K --> L["/git/hotfix/finish"]
+    K --> L["/git:flow hotfix finish"]
     L --> M[Deploy Producao]
     
     style A fill:#ffebee
@@ -298,12 +298,12 @@ flowchart TD
 /engineer/pr
 
 # 3. Finalizar hotfix após merge (merge + deploy)
-/git/hotfix/finish
+/git:flow hotfix finish
 ```
 
-**💡 Nota:** `/engineer/hotfix` **cria automaticamente** a branch `hotfix/fix-name` a partir de `main`. Não é necessário executar `/git/hotfix/start` manualmente.
+**💡 Nota:** `/engineer/hotfix` **cria automaticamente** a branch `hotfix/fix-name` a partir de `main`. Não é necessário executar `/git:flow hotfix start` manualmente.
 
-**O que `/git/hotfix/finish` faz:**
+**O que `/git:flow hotfix finish` faz:**
 - ✅ Merge emergencial para main/master
 - ✅ Back-merge automático para develop
 - ✅ Criação de tag de patch
@@ -329,7 +329,7 @@ Fluxo para preparação e publicação de versões.
 
 ```mermaid
 flowchart TD
-    A[Preparar Release] --> B["/git/release/start"]
+    A[Preparar Release] --> B["/git:flow release start"]
     B --> C["Branch release/v1.2.0"]
     
     C --> D[Ajustes Finais]
@@ -346,7 +346,7 @@ flowchart TD
     K -->|Nao| D
     K -->|Sim| L[Merge]
     
-    L --> M["/git/release/finish"]
+    L --> M["/git:flow release finish"]
     M --> N["Merge main + develop"]
     N --> O[Tag v1.2.0]
     O --> P[Deploy Producao]
@@ -359,7 +359,7 @@ flowchart TD
 
 ```bash
 # 1. Criar release branch
-/git/release/start "v1.2.0"
+/git:flow release start "v1.2.0"
 
 # 2. Fazer ajustes finais
 # (correções de bugs, atualização de docs)
@@ -371,7 +371,7 @@ flowchart TD
 /engineer/pr
 
 # 5. Após merge, finalizar release
-/git/release/finish
+/git:flow release finish
 ```
 
 ---
@@ -520,7 +520,7 @@ flowchart TD
     
     B -->|Bug Critico| F["/engineer/hotfix"]
     
-    B -->|Release| G["/git/release/start"]
+    B -->|Release| G["/git:flow release start"]
     
     B -->|Documentacao| H{Tipo?}
     H -->|Negocio| I["/docs/build-business-docs"]
@@ -577,7 +577,7 @@ flowchart TD
 
 ### Problema: Branch já existe
 
-**Sintoma:** Erro ao criar branch com `/git/feature/start`
+**Sintoma:** Erro ao criar branch com `/git:flow feature start`
 
 **Solução:**
 ```bash
@@ -586,7 +586,7 @@ git checkout feature/nome-existente
 
 # Opção 2: Deletar e recriar
 git branch -D feature/nome-existente
-/git/feature/start "nome-existente"
+/git:flow feature start "nome-existente"
 ```
 
 ---
@@ -682,8 +682,8 @@ Use comandos Git **apenas** nestas situações:
 
 | Comando | Uso | Quando Usar |
 |---------|-----|-------------|
-| `/git/feature/start` | Criar feature branch | **Automático** via `/product/task` |
-| `/git/feature/finish` | Finalizar feature | Após merge do PR |
+| `/git:flow feature start` | Criar feature branch | **Automático** via `/product/task` |
+| `/git:flow feature finish` | Finalizar feature | Após merge do PR |
 
 **💡 Nota:** `/product/task` e `/engineer/start` gerenciam feature branches automaticamente.
 
@@ -693,8 +693,8 @@ Use comandos Git **apenas** nestas situações:
 
 | Comando | Uso | Quando Usar |
 |---------|-----|-------------|
-| `/git/hotfix/start` | Criar hotfix branch | **Automático** via `/engineer/hotfix` |
-| `/git/hotfix/finish` | Finalizar hotfix | Após merge do PR de hotfix |
+| `/git:flow hotfix start` | Criar hotfix branch | **Automático** via `/engineer/hotfix` |
+| `/git:flow hotfix finish` | Finalizar hotfix | Após merge do PR de hotfix |
 
 **Fluxo Completo de Hotfix:**
 ```bash
@@ -705,10 +705,10 @@ Use comandos Git **apenas** nestas situações:
 /engineer/pr
 
 # 3. Após merge, finalizar
-/git/hotfix/finish
+/git:flow hotfix finish
 ```
 
-**O que `/git/hotfix/finish` faz:**
+**O que `/git:flow hotfix finish` faz:**
 - ✅ Merge para main/master
 - ✅ Back-merge para develop
 - ✅ Criação de tag de patch
@@ -722,25 +722,25 @@ Use comandos Git **apenas** nestas situações:
 
 | Comando | Uso | Quando Usar |
 |---------|-----|-------------|
-| `/git/release/start` | Criar release | Preparar nova versão |
-| `/git/release/finish` | Finalizar release | Deploy para produção |
+| `/git:flow release start` | Criar release | Preparar nova versão |
+| `/git:flow release finish` | Finalizar release | Deploy para produção |
 
 **Fluxo de Release:**
 ```bash
 # 1. Criar release com versionamento
-/git/release/start "v2.1.0"
+/git:flow release start "v2.1.0"
 # ou auto-bump:
-/git/release/start "patch"  # 2.0.1 → 2.0.2
-/git/release/start "minor"  # 2.0.1 → 2.1.0
-/git/release/start "major"  # 2.0.1 → 3.0.0
+/git:flow release start "patch"  # 2.0.1 → 2.0.2
+/git:flow release start "minor"  # 2.0.1 → 2.1.0
+/git:flow release start "major"  # 2.0.1 → 3.0.0
 
 # 2. Testar release
 
 # 3. Finalizar (merge + tag + deploy)
-/git/release/finish
+/git:flow release finish
 ```
 
-**O que `/git/release/finish` faz:**
+**O que `/git:flow release finish` faz:**
 - ✅ Merge para main
 - ✅ Back-merge para develop
 - ✅ Tag anotada com metadata
@@ -764,18 +764,18 @@ Use comandos Git **apenas** nestas situações:
 
 ```mermaid
 flowchart LR
-    A["/product/task"] -->|chama| B["/git/feature/start"]
+    A["/product/task"] -->|chama| B["/git:flow feature start"]
     B -->|cria| C["Branch feature/name"]
     
-    D["/engineer/hotfix"] -->|chama| E["/git/hotfix/start"]
+    D["/engineer/hotfix"] -->|chama| E["/git:flow hotfix start"]
     E -->|cria| F["Branch hotfix/name"]
     
     G["/engineer/pr"] -->|usa| C
     G -->|usa| F
     
     H["Merge PR"] --> I{Tipo?}
-    I -->|Feature| J["/git/feature/finish"]
-    I -->|Hotfix| K["/git/hotfix/finish"]
+    I -->|Feature| J["/git:flow feature finish"]
+    I -->|Hotfix| K["/git:flow hotfix finish"]
     
     style A fill:#fff3cd
     style D fill:#fff3cd
@@ -802,7 +802,7 @@ git branch -D feature/nome
 git push origin --delete feature/nome
 
 # Recriar
-/git/feature/start "nome"
+/git:flow feature start "nome"
 ```
 
 #### **Problema: Conflitos de merge**
@@ -830,7 +830,7 @@ git tag -d v1.0.0
 git push origin --delete v1.0.0
 
 # Recriar release
-/git/release/start "v1.0.0"
+/git:flow release start "v1.0.0"
 ```
 
 ---

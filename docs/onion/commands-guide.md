@@ -37,7 +37,7 @@ Este guia documenta todos os comandos disponíveis no sistema `.claude/`, organi
 ```markdown
 # ✅ CORRETO - No chat da Claude Code:
 /git/init                       # GitFlow setup inteligente
-/git/feature/start "login"      # Iniciar feature branch
+/git:flow feature start "login"      # Iniciar feature branch
 /engineer/start                 # Ambiente de desenvolvimento
 /product/task "implementar login"
 

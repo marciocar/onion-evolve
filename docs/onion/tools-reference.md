@@ -1050,16 +1050,16 @@ Sistema completo de comandos Git com workflows Gitflow integrados ao Sistema Oni
 '/git/init': void;           // Setup Gitflow automático
 
 // Feature Development  
-'/git/feature/start': (nome: string) => void;    // Criar feature backlog ClickUp
-'/git/feature/finish': void;                     // Merge + cleanup automático
+'/git:flow feature start': (nome: string) => void;    // Criar feature backlog ClickUp
+'/git:flow feature finish': void;                     // Merge + cleanup automático
 
 // Release Management
-'/git/release/start': (version: string) => void; // Release + versionamento
-'/git/release/finish': void;                     // Deploy production + tags
+'/git:flow release start': (version: string) => void; // Release + versionamento
+'/git:flow release finish': void;                     // Deploy production + tags
 
 // Emergency Hotfix
-'/git/hotfix/start': (nome: string) => void;     // Emergency setup < 2h SLA  
-'/git/hotfix/finish': void;                      // Deploy crítico emergencial
+'/git:flow hotfix start': (nome: string) => void;     // Emergency setup < 2h SLA  
+'/git:flow hotfix finish': void;                      // Deploy crítico emergencial
 
 // Workflow Híbrido
 '/engineer/hotfix': (desc: string, params?: {
@@ -1087,19 +1087,19 @@ Sistema completo de comandos Git com workflows Gitflow integrados ao Sistema Oni
 /git/init
 
 # Feature development
-/git/feature/start "oauth-authentication"
+/git:flow feature start "oauth-authentication"
 /engineer/start oauth-authentication  
-/git/feature/finish
+/git:flow feature finish
 
 # Release workflow  
-/git/release/start "minor"    # 2.0.1 → 2.1.0
+/git:flow release start "minor"    # 2.0.1 → 2.1.0
 # ... testing ...
-/git/release/finish
+/git:flow release finish
 
 # Emergency hotfix
 /engineer/hotfix "Critical payment timeout" --related-tasks="123,456" --tags="urgent"
 # ... fix implementation ...
-/git/hotfix/finish
+/git:flow hotfix finish
 
 # Synchronization
 /git/sync develop

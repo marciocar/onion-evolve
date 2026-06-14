@@ -202,7 +202,7 @@ O Sistema Onion oferece **56 comandos especializados** organizados em categorias
 **Funcionalidades:**
 - Análise profunda e compreensão da tarefa
 - Decomposição hierárquica (Task → Subtasks → Action Items)
-- Integração automática com Git (`/git/feature/start` ou branch direta)
+- Integração automática com Git (`/git:flow feature start` ou branch direta)
 - Setup automático de sessão
 - Criação de context files
 
@@ -366,8 +366,8 @@ O Sistema Onion oferece **56 comandos especializados** organizados em categorias
 
 ---
 
-### `/git/feature/start`
-**Sintaxe:** `/git/feature/start "<feature-name>"`
+### `/git:flow feature start`
+**Sintaxe:** `/git:flow feature start "<feature-name>"`
 
 **Descrição:** Cria feature branch GitFlow com setup automático de sessão.
 
@@ -380,7 +380,7 @@ O Sistema Onion oferece **56 comandos especializados** organizados em categorias
 
 **Exemplo:**
 ```bash
-/git/feature/start "implement-oauth-authentication"
+/git:flow feature start "implement-oauth-authentication"
 ```
 
 **Estrutura Criada:**
@@ -394,74 +394,74 @@ feature/implement-oauth-authentication ← nova branch
 
 ---
 
-### `/git/feature/publish`
-**Sintaxe:** `/git/feature/publish`
+### `/git:flow feature publish`
+**Sintaxe:** `/git:flow feature publish`
 
 **Descrição:** Publica feature branch para code review.
 
 **Exemplo:**
 ```bash
-/git/feature/publish
+/git:flow feature publish
 ```
 
 ---
 
-### `/git/feature/finish`
-**Sintaxe:** `/git/feature/finish`
+### `/git:flow feature finish`
+**Sintaxe:** `/git:flow feature finish`
 
 **Descrição:** Finaliza feature branch e merge para develop.
 
 **Exemplo:**
 ```bash
-/git/feature/finish
+/git:flow feature finish
 ```
 
 ---
 
-### `/git/hotfix/start`
-**Sintaxe:** `/git/hotfix/start "<hotfix-name>"`
+### `/git:flow hotfix start`
+**Sintaxe:** `/git:flow hotfix start "<hotfix-name>"`
 
 **Descrição:** Cria hotfix branch para correções urgentes.
 
 **Exemplo:**
 ```bash
-/git/hotfix/start "fix-payment-timeout"
+/git:flow hotfix start "fix-payment-timeout"
 ```
 
 ---
 
-### `/git/hotfix/finish`
-**Sintaxe:** `/git/hotfix/finish`
+### `/git:flow hotfix finish`
+**Sintaxe:** `/git:flow hotfix finish`
 
 **Descrição:** Finaliza hotfix e merge para main e develop.
 
 **Exemplo:**
 ```bash
-/git/hotfix/finish
+/git:flow hotfix finish
 ```
 
 ---
 
-### `/git/release/start`
-**Sintaxe:** `/git/release/start "<version>"`
+### `/git:flow release start`
+**Sintaxe:** `/git:flow release start "<version>"`
 
 **Descrição:** Cria release branch para preparação de versão.
 
 **Exemplo:**
 ```bash
-/git/release/start "v1.2.0"
+/git:flow release start "v1.2.0"
 ```
 
 ---
 
-### `/git/release/finish`
-**Sintaxe:** `/git/release/finish`
+### `/git:flow release finish`
+**Sintaxe:** `/git:flow release finish`
 
 **Descrição:** Finaliza release e merge para main e develop.
 
 **Exemplo:**
 ```bash
-/git/release/finish
+/git:flow release finish
 ```
 
 ---
@@ -755,13 +755,13 @@ docs/technical-context/
 /engineer/pr
 
 # 5. Finalizar feature
-/git/feature/finish
+/git:flow feature finish
 ```
 
 ### Fluxo de Hotfix
 ```bash
 # 1. Criar hotfix
-/git/hotfix/start "fix-critical-bug"
+/git:flow hotfix start "fix-critical-bug"
 
 # 2. Implementar correção
 /engineer/hotfix "fix-critical-bug"
@@ -770,7 +770,7 @@ docs/technical-context/
 /engineer/pr
 
 # 4. Finalizar hotfix
-/git/hotfix/finish
+/git:flow hotfix finish
 ```
 
 ### Fluxo de Documentação

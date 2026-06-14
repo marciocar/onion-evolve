@@ -61,6 +61,26 @@ Se variáveis obrigatórias do provider estiverem ausentes ou inválidas:
 
 ---
 
+## 🐙 Forge - Operações de Host Remoto (PR, review, CI, Release)
+
+Assim como o Task Manager, o **forge** (host de código remoto) é abstraído via **SDAAL** em `.claude/utils/forge/` — adapter-irmão do task-manager. Comandos `/git/*` e `/engineer/pr` **nunca** chamam `gh`/API do host diretamente; passam pelo adapter (integrations.md §9).
+
+**Fronteira**: o adapter cobre **só host remoto** (PR, review, CI/checks, Release). Git local (branch, merge, tag, **push**) é `git` direto, orientado pelo motor GitFlow ([gitflow-patterns.md](docs/knowledge-base/frameworks/gitflow-patterns.md)).
+
+### Mapa Provider → Variáveis → Transporte → Adapter
+
+| Provider | Variáveis | Transporte | Adapter doc |
+|----------|-----------|------------|-------------|
+| **`github`** | `GH_TOKEN` ou `GITHUB_TOKEN` (ou `gh auth login`) | `cli` (default, `gh`) · `api` (REST fallback) | `.claude/utils/forge/adapters/github.md` |
+| **`gitlab`** / **`bitbucket`** | — | — | 🔜 costura pronta (não implementado) |
+| **`none`** | — | — | NoForgeAdapter (modo local; push funciona, PR/CI degradam) |
+
+- `FORGE_PROVIDER` (default: detecta pelo remote `origin`) e `FORGE_TRANSPORT` (`cli` default | `api`) no `.env`.
+- **Divergência intencional vs Task Manager**: forge default = `cli` (a CLI `gh` embute auth/paginação/rate-limit e é o caminho idiomático do Claude Code); task-manager default = `api`. Ver `forge/factory.md`.
+- Fallback gracioso idêntico: variável ausente → avisar em pt-BR + sugerir `/meta:setup-integration`; nunca inventar.
+
+---
+
 ## 📝 Diretrizes de Linguagem
 
 A skill **`language-standards`** é a **autoridade canônica** (alinhada à meta-spec [`code-standards.md`](docs/meta-specs/code-standards.md)). Resumo:

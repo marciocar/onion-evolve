@@ -63,7 +63,7 @@ Você precisa implementar um sistema completo de autenticação JWT com refresh 
 4. Após confirmação (`y`):
    - Cria task no ClickUp (ID: `86xyz123`)
    - Cria 4 subtasks com parent relationship
-   - Executa `/git/feature/start jwt-authentication`
+   - Executa `/git:flow feature start jwt-authentication`
    - Cria sessão `.claude/sessions/jwt-authentication/`
    - Gera context files
 
@@ -346,7 +346,7 @@ Bug crítico em produção: timeout na API de pagamentos causando perda de trans
 
 #### Passo 1: Criar Hotfix
 ```bash
-/git/hotfix/start "fix-payment-timeout"
+/git:flow hotfix start "fix-payment-timeout"
 ```
 
 **Saída:**
@@ -433,7 +433,7 @@ artillery quick --count 100 --num 10 http://localhost:3000/api/payments
 #### Passo 5: Merge e Deploy
 ```bash
 # Após aprovação
-/git/hotfix/finish
+/git:flow hotfix finish
 ```
 
 **O que acontece:**
@@ -462,7 +462,7 @@ Preparar release v1.2.0 com 15 features e 8 bugfixes.
 
 #### Passo 1: Criar Release Branch
 ```bash
-/git/release/start "v1.2.0"
+/git:flow release start "v1.2.0"
 ```
 
 ---
@@ -496,7 +496,7 @@ npm run test:integration
 
 #### Passo 4: Merge e Tag
 ```bash
-/git/release/finish
+/git:flow release finish
 ```
 
 **O que acontece:**
@@ -725,7 +725,7 @@ Error: Branch feature/x already exists
 git checkout feature/x  # Usar existente
 # OU
 git branch -D feature/x  # Deletar e recriar
-/git/feature/start "x"
+/git:flow feature start "x"
 ```
 
 ---

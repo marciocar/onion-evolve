@@ -6,7 +6,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2026-06-13 |
 | **Última Atualização** | 2026-06-13 |
 | **Categoria** | Concepts |
@@ -132,12 +132,23 @@ const passing = candidates.filter((c) => c.compiles && c.testsPass); // filtro e
 **Quando usar:** muitos candidatos viáveis sem critério booleano simples — a comparação relativa decide.
 
 ```javascript
-// Cada rodada reduz o campo pela metade; pipeline sem barreira entre pares.
-const winner = await pipeline(
-  pairs,
-  ([a, b]) => agent(`Escolha o melhor entre A e B`, { schema: WinnerSchema })
-);
+// Rodadas eliminatórias com BARREIRA entre rodadas (a próxima depende dos
+// vencedores). Cada rodada usa parallel() (confrontos independentes ENTRE SI);
+// a redução do campo acontece em JS (0 tokens) antes da rodada seguinte.
+let field = candidates;
+while (field.length > 1) {
+  const pairs = chunk(field, 2);
+  field = (await parallel(
+    pairs.map(([a, b]) => () => agent(`Escolha o melhor entre A e B`, { schema: WinnerSchema }))
+  )).filter(Boolean);                       // redução: N → N/2
+}
+const winner = field[0];
 ```
+
+> **Primitivo:** `parallel()` **por rodada** (com barreira entre rodadas), **não**
+> `pipeline()`. As rodadas são **dependentes** (a Final precisa dos vencedores), o
+> que exige barreira; `pipeline` é sem barreira e serve a itens independentes. A
+> redução N→N/2 entre rodadas roda em JS.
 
 ### 6. loop-until-done (loop-until-dry)
 
@@ -159,7 +170,7 @@ while (!state.done && tokensUsed < budget) {
 | fan-out-and-synthesize | Fan-out/Fan-in, Supervisor/Orchestrator-Worker, Map-Reduce (informal) | `parallel([...])` + `agent` de síntese |
 | adversarial verification | Generator-Critic, Peer Review | `agent` (gerador) + `agent` (crítico) |
 | generate-and-filter | — | `parallel([...])` + filtro JS/`agent` |
-| tournament | Bracket | `pipeline(...)` de rodadas |
+| tournament | Bracket | `parallel()` por rodada (barreira entre rodadas) + redução JS |
 | loop-until-done | loop-until-dry | `agent` em loop JS + guarda de `budget` |
 
 ---
@@ -244,23 +255,130 @@ Tiers de **worker** recomendados (uso geral): **opus / sonnet / haiku**. Snapsho
 
 ---
 
-## 🔒 Isolamento e Segurança
+## 🔒 Frota Mutante: Isolamento, Consolidação e Autonomia
 
-Quando workers **mutam** o repositório em paralelo, eles precisam de `isolation: 'worktree'`: cada subagente opera em uma git worktree própria, eliminando corrida de escrita sobre os mesmos arquivos. O orquestrador faz o merge/seleção depois da barreira.
+Até aqui os padrões foram **read-only** (auditar, pesquisar, verificar). Quando a
+frota **muta** o repositório em paralelo, há corrida de escrita — e a forma de
+evitá-la **com eficiência** é a parte que distingue uma frota mutante operacional
+de um blueprint. Regra-mãe: **particione primeiro; isole por worktree só quando
+precisar; consolide numa única branch.**
 
-```javascript
-const branches = await parallel([
-  () => agent("Implemente a feature X", { isolation: "worktree", schema: DiffSchema }),
-  () => agent("Implemente a feature Y", { isolation: "worktree", schema: DiffSchema }),
-]);
-// Cada worker em sua worktree; sem colisão. Merge decidido após a barreira.
+### 7.1 Decisão: partição-primeiro vs. worktree
+
+```
+Os workers tocam conjuntos de arquivos DISJUNTOS?
+├── SIM → particione por arquivo/módulo. Sem corrida → NÃO use worktree.
+│         (mais barato: sem custo de setup de worktree; consolidação trivial)
+└── NÃO → há sobreposição real OU são branches independentes a fundir?
+          └── SIM → isolation: 'worktree' por worker; orquestrador funde após a barreira.
 ```
 
-**Doutrina da era da orquestração:**
+**Por que partição primeiro:** criar uma git worktree custa **~200-500 ms + disco
+por agente**. Se o orquestrador consegue dividir o trabalho em conjuntos de
+arquivos disjuntos (ex.: "adicione `version:` em cada um destes 40 comandos"),
+**não há colisão** e o worktree é desperdício. Worktree só ganha quando os workers
+inevitavelmente tocam o mesmo arquivo, ou quando cada um produz uma **branch
+independente** (ex.: duas implementações concorrentes da mesma feature a comparar).
 
-- **Control before autonomy** — controle antes de autonomia. Estabeleça gates e limites antes de delegar trabalho amplo.
-- **Gates humanos** — operações irreversíveis (deploy, merge em produção, mudança regulada) passam por aprovação humana, mesmo numa frota autônoma. A frota propõe; o humano confirma o passo crítico.
-- **Atenção ao delegation gap** — a lacuna entre a intenção do orquestrador e o que os workers de fato executam cresce com a profundidade; verificação fecha essa lacuna.
+> **Regra de break-even:** use `isolation: 'worktree'` apenas quando a corrida de
+> escrita é **inevitável** por partição. Caso contrário, partição-primeiro é mais
+> rápido e mais simples de consolidar.
+
+### 7.2 `DiffSchema` (output estruturado do worker mutante)
+
+Todo worker mutante retorna seu resultado neste shape — o fan-in opera sobre ele
+em JS (0 tokens):
+
+```javascript
+const DiffSchema = {
+  worker: "string",            // id/rótulo do worker
+  files: [                     // arquivos que o worker alterou
+    { path: "string", action: "create|edit|delete", summary: "string" }
+  ],
+  branch: "string|null",       // nome da worktree/branch efêmera (quando isolation='worktree')
+  status: "done|skipped|failed",
+  notes: "string"              // contexto p/ o gate humano, se houver
+};
+```
+
+### 7.3 Playbook de consolidação (o "merge" que faltava)
+
+O fan-in de uma frota mutante roda no orquestrador (JS, 0 tokens):
+
+1. **Coletar** — `results.filter(Boolean)` (worker morto → `null`; reporte os SKIP).
+2. **Detectar sobreposição** — em JS, cruze os `files[].path` de todos os workers.
+   - **Partição limpa** (nenhum path repetido) → aplicar todos os diffs na branch
+     de consolidação; sem conflito possível.
+   - **Sobreposição** (2+ workers no mesmo path) → **não** auto-mesclar às cegas:
+     - geração-e-seleção (abordagens concorrentes) → **judge-panel** escolhe/funde;
+     - mutação que deveria ser disjunta mas colidiu → **gate humano** (a partição
+       falhou; o humano decide).
+3. **Aplicar numa única branch de consolidação** — uma branch (ex.:
+   `fleet/<tarefa>-<data>`), não N branches soltas.
+4. **Verificação adversarial** em alto risco — um crítico contesta o diff agregado
+   (lint, testes, coerência) antes de aceitar.
+5. **Gate humano** para irreversível/conflito (ver 7.5).
+
+```javascript
+// Partição-primeiro: workers em conjuntos disjuntos → SEM worktree
+const results = (await parallel(
+  partitions.map((files) => agent(
+    `Aplique a transformação X SOMENTE nestes arquivos: ${files.join(", ")}. Retorne DiffSchema.`,
+    { schema: DiffSchema, model: "haiku" }
+  ))
+)).filter(Boolean);
+
+// fan-in em JS (0 tokens): detectar colisão entre partições
+const seen = new Map();
+const collisions = [];
+for (const r of results) for (const f of r.files) {
+  if (seen.has(f.path)) collisions.push(f.path);
+  seen.set(f.path, r.worker);
+}
+if (collisions.length) {
+  // partição falhou → gate humano, NÃO auto-merge
+  return reportConflict(collisions, results);
+}
+// partição limpa → tudo numa branch de consolidação → fluxo normal de PR
+```
+
+### 7.4 Worktree efêmero → 1 branch (ciclo de vida + saída)
+
+- **Ciclo de vida automático:** o param `isolation: 'worktree'` da ferramenta
+  Workflow **cria e limpa** a worktree por agente (auto-removida se inalterada).
+  **Não** se usa `EnterWorktree`/`ExitWorktree` manual — a ferramenta gerencia.
+- **Worker morto** → o `agent()` retorna `null`; `.filter(Boolean)` antes do fan-in.
+- **Saída = uma branch consolidada**, nunca N branches persistentes. Essa branch
+  entra no **fluxo normal**: `/git:flow feature finish` ou `/engineer:pr` (via
+  forge adapter, `.claude/utils/forge/`) → **gate de PR**. A frota paraleliza
+  *dentro* da fase de implementação; **não** funde fases nem cria branches que
+  contornem o gate (invariante — `commands.md §10.3`).
+
+```javascript
+// Worktree só quando há sobreposição/branches independentes a comparar:
+const branches = (await parallel([
+  () => agent("Implemente a abordagem A da feature", { isolation: "worktree", schema: DiffSchema }),
+  () => agent("Implemente a abordagem B da feature", { isolation: "worktree", schema: DiffSchema }),
+])).filter(Boolean);
+// judge-panel escolhe a melhor; orquestrador consolida UMA branch → /git:flow / /engineer:pr
+```
+
+### 7.5 Autonomia e gates (control before autonomy)
+
+A frota **propõe**; o humano **confirma** o passo crítico. Exija **gate humano**
+quando:
+
+- a operação é **irreversível** (deploy, merge em produção, mudança regulada);
+- a consolidação detectou **conflito** de partição (7.3, passo 2);
+- o raio de alcance excede um limiar (ex.: > N arquivos mutados, ou toca
+  `engineer/*`/`product/*`).
+
+Doutrina da era da orquestração:
+
+- **Control before autonomy** — gates e limites antes de delegar trabalho amplo.
+- **Gates humanos** — irreversível passa por aprovação, mesmo em frota autônoma.
+- **Delegation gap** — a lacuna entre a intenção do orquestrador e o que os
+  workers executam cresce com a profundidade; verificação adversarial a fecha.
 
 ---
 

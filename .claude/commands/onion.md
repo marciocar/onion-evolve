@@ -22,7 +22,7 @@ updated: "2025-11-24"
 related_commands:
   - /product/task
   - /engineer/start
-  - /git/feature/start
+  - /git/flow
 
 related_agents:
   - onion
@@ -89,7 +89,7 @@ Delegar para o agente com contexto coletado.
 ∟ /product/task - Criar tasks
 ∟ /engineer/start - Iniciar feature
 ∟ /engineer/work - Continuar trabalho
-∟ /git/feature/start - Criar branch
+∟ /git:flow feature start - Criar branch
 
 💡 Use: /onion "sua pergunta"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -125,7 +125,7 @@ Para: "criar task no ClickUp"
 📋 Sequência:
 1. /product/task [nome]
 2. /engineer/start [feature-slug]
-3. /git/feature/start
+3. /git:flow feature start
 4. /engineer/work
 5. /engineer/pre-pr
 6. /engineer/pr

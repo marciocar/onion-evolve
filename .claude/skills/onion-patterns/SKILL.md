@@ -67,7 +67,7 @@ Cada skill em pasta própria com `SKILL.md`. Opcionalmente:
 ### Comandos
 - Arquivo: `nome-comando.md` em kebab-case
 - Caminho de invocação: `/categoria/nome-comando` ou `/categoria:subcategoria:nome`
-- Ex: `/engineer/start`, `/product/task`, `/git/feature/start`, `/meta:create-skill`
+- Ex: `/engineer/start`, `/product/task`, `/git:flow feature start`, `/meta:create-skill`
 
 ### Agentes
 - Arquivo: `nome-especialista.md` em kebab-case
@@ -163,7 +163,7 @@ Para Jira (`TASK_MANAGER_PROVIDER=jira`), usar **ADF** (JSON estruturado) — n�
 
 ### Hotfix
 ```
-/engineer/hotfix → /engineer/work → /engineer/pr → /git:hotfix:finish
+/engineer/hotfix → /engineer/work → /engineer/pr → /git:flow hotfix finish
 ```
 
 ### Criação de componentes Onion

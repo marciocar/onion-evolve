@@ -36,14 +36,9 @@ Fornecer ajuda contextual e interativa para todos os comandos GitFlow do Sistema
 /git/help init              # Ajuda para inicialização
 ```
 
-## 🤖 Integração com @gitflow-specialist
+## 📚 Fontes
 
-Para cada solicitação de ajuda:
-
-1. **Consultar @gitflow-specialist** para análise contextual do repositório
-2. **Receber guidance** específica baseada no estado atual
-3. **Apresentar recomendações** personalizadas para o desenvolvedor  
-4. **Fornecer exemplos práticos** para a situação detectada
+A ajuda detecta o estado do repositório e aponta para a **fonte única** de cada workflow em [gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md) (Templates 1-6, semver, sessão). Para dúvidas ad-hoc/recovery, o mentor é `@gitflow-specialist`. Operações de host remoto (PR/CI/Release) → [`utils/forge/`](../../utils/forge/README.md).
 
 ## 📋 Comandos Disponíveis
 
@@ -51,21 +46,16 @@ Para cada solicitação de ajuda:
 - `/git/init` - Configurar Git Flow no repositório
 - `/git/help` - Este sistema de ajuda
 
-### Workflow de Features
-- `/git/feature/start "nome"` - Iniciar nova feature
-- `/git/feature/finish` - Finalizar e mergear feature
-- `/git/feature/publish` - Compartilhar feature em desenvolvimento
+### Ciclo de vida GitFlow — dispatcher único `/git:flow`
+- `/git:flow feature start "nome"` · `/git:flow feature publish` · `/git:flow feature finish`
+- `/git:flow release start "versão"` · `/git:flow release finish`
+- `/git:flow hotfix start "nome"` · `/git:flow hotfix finish`
 
-### Workflow de Releases
-- `/git/release/start "versão"` - Iniciar processo de release
-- `/git/release/finish` - Finalizar e deployar release
+> `<tipo>` = feature|release|hotfix · `<ação>` = start|publish(só feature)|finish. Matriz completa em [`flow.md`](flow.md).
 
-### Workflow de Hotfixes
-- `/git/hotfix/start "nome"` - Iniciar correção urgente
-- `/git/hotfix/finish` - Finalizar e deployar hotfix
-
-### Sincronização
+### Sincronização e commit
 - `/git/sync [branch]` - Sincronizar após merge de PR
+- `/git/fast-commit` - Adicionar tudo e commit rápido
 
 ## ⚠️ Troubleshooting Comum
 
@@ -83,18 +73,18 @@ Para cada solicitação de ajuda:
 
 ### Estado inconsistente
 **Problema**: Operação GitFlow interrompida
-**Solução**: Consulte @gitflow-specialist para análise e recovery
+**Solução**: ver [§Template 6 — Resolução de Conflitos](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-6-resolução-de-conflitos); recovery complexo → `@gitflow-specialist`
 
 ## 💡 Próximos Passos Sugeridos
 
 O sistema detectará automaticamente sua situação atual e sugerirá:
 
 - **Se Git Flow não inicializado**: `/git/init`
-- **Se em develop**: `/git/feature/start "nome-da-feature"`  
-- **Se em feature branch**: `/git/feature/finish` ou `/git/feature/publish`
-- **Se pronto para release**: `/git/release/start "versão"`
-- **Se problema em produção**: `/git/hotfix/start "correção"`
+- **Se em develop**: `/git:flow feature start "nome-da-feature"`
+- **Se em feature branch**: `/git:flow feature finish` ou `/git:flow feature publish`
+- **Se pronto para release**: `/git:flow release start "versão"`
+- **Se problema em produção**: `/git:flow hotfix start "correção"`
 
 ---
 
-*Este comando sempre consulta @gitflow-specialist para fornecer guidance contextual e personalizada.*
+*Fonte canônica dos workflows: [gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md). Mentor para guidance contextual: `@gitflow-specialist`.*

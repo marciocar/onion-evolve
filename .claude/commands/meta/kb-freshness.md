@@ -272,6 +272,11 @@ KB FRESHNESS REPORT — 2026-06-13
   executa diretamente com `Agent` (sem overhead de Workflow).
 - Orquestre **sempre no nível principal** — nunca dentro de um subagente e
   **não crie** um agente "kb-freshness-worker".
+- **Contrato de composição (D4 do `/meta:evolve`)**: quando invocado por
+  `/meta:evolve`, retorne o **array `FreshnessSchema[]` cru** (não apenas o
+  relatório Unicode), para que o `evolve` mescle os vereditos direto no backlog
+  sem reparsear. O schema (acima) é o contrato. `/meta:evolve` chama este comando
+  no **fluxo principal** e ingere o array — nunca aninha esta frota dentro da dele.
 
 ---
 

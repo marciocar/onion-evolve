@@ -41,7 +41,7 @@ related_commands:
   - /engineer/start
   - /engineer/work
   - /engineer/pr
-  - /git/feature/start
+  - /git/flow
 
 version: "3.0.0"
 updated: "2025-11-24"
@@ -226,12 +226,12 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 #### **🌿 Git (15 comandos)**
 - `/git/init` - Inicializa GitFlow
-- `/git/feature/start` - Inicia feature branch
-- `/git/feature/finish` - Finaliza feature
-- `/git/hotfix/start` - Inicia hotfix
-- `/git/hotfix/finish` - Finaliza hotfix
-- `/git/release/start` - Inicia release
-- `/git/release/finish` - Finaliza release
+- `/git:flow feature start` - Inicia feature branch
+- `/git:flow feature finish` - Finaliza feature
+- `/git:flow hotfix start` - Inicia hotfix
+- `/git:flow hotfix finish` - Finaliza hotfix
+- `/git:flow release start` - Inicia release
+- `/git:flow release finish` - Finaliza release
 - `/git/sync` - Sincroniza branches
 - `/git/status` - Status do repositório
 - `/git/log` - Log de commits
@@ -281,7 +281,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 #### **2. Hotfix Flow (Urgente)**
 ```
-/engineer/hotfix → /engineer/work → /engineer/pr → /git/hotfix/finish
+/engineer/hotfix → /engineer/work → /engineer/pr → /git:flow hotfix finish
 ```
 
 #### **3. Documentation Flow**
@@ -296,7 +296,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 #### **5. Release Flow**
 ```
-/git/release/start → /engineer/test → /validate/tests → /git/release/finish
+/git:flow release start → /engineer/test → /validate/tests → /git:flow release finish
 ```
 
 ## 📋 Protocolo de Operação
