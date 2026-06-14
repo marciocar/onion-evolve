@@ -419,5 +419,4 @@ graph TD
 - [Ferramentas MCP](./mcps.md)
 - [Agentes Especializados](./agents.md)
 - [Comandos .claude/](./commands.md)
-- [Workflows](./workflows.md)
 
