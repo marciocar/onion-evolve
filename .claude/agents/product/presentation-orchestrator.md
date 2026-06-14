@@ -151,14 +151,16 @@ Comando:
 #### **`@clickup-specialist`** 📋 [DADOS DE TAREFAS]
 ```yaml
 Quando chamar:
-  - Quando apresentação for baseada em task do ClickUp
+  - Quando apresentação for baseada em task de qualquer provider ativo
   - Para puxar dados de projetos, sprints, milestones
   - Para comentar task com link da apresentação gerada
   
-Uso via MCP direto ou delegação:
-  - mcp_clickup-mcp-server_get_task (você mesmo chama)
-  - mcp_clickup-mcp-server_get_workspace_tasks (você mesmo chama)
-  - @clickup-specialist para operações complexas
+Delegação via adapter (REST API; MCP opcional):
+  - taskManager.getTask(taskId) — buscar dados de task específica
+  - taskManager.getTaskList(filters) — buscar múltiplas tasks
+  - taskManager.addComment(taskId, text) — comentar na task
+  - Para operações avançadas ou em lote: delegar ao especialista do provider ativo
+    (clickup→@clickup-specialist, jira→@jira-specialist, demais→@task-specialist)
   
 Saída:
   - Dados estruturados da task
@@ -233,8 +235,8 @@ graph TD
 
 2. **Buscar dados necessários (se aplicável):**
    ```yaml
-   Se mencionado ClickUp task:
-     - Use: mcp_clickup-mcp-server_get_task
+   Se mencionado task do gerenciador ativo:
+     - Use: taskManager.getTask(taskId)  # via adapter (REST API; MCP opcional)
      - Extraia: descrição, status, custom fields, comentários
      - Contextualize dados para apresentação
    
@@ -620,22 +622,21 @@ graph TD
    [Qualquer insight ou ajuste que foi necessário]
    ```
 
-2. **Atualizar ClickUp (se aplicável):**
+2. **Atualizar task no gerenciador ativo (se aplicável):**
    ```typescript
-   // Se apresentação foi baseada em task
-   mcp_clickup-mcp-server_create_task_comment({
-     taskId: [id],
-     commentText: `
-       ✅ Apresentação gerada com sucesso!
-       
-       🔗 Visualizar: [viewLink]
-       ✏️ Editar: [editLink]
-       
-       📊 ${numSlides} slides | Tema: ${theme}
-       
-       ID: ${generationId}
-     `
-   })
+   // Se apresentação foi baseada em task — via adapter (REST API; MCP opcional)
+   taskManager.addComment(taskId, `
+     ✅ Apresentação gerada com sucesso!
+     
+     🔗 Visualizar: [viewLink]
+     ✏️ Editar: [editLink]
+     
+     📊 ${numSlides} slides | Tema: ${theme}
+     
+     ID: ${generationId}
+   `)
+   // Para formatação avançada (ADF no Jira, Unicode no ClickUp, etc.),
+   // delegar ao especialista do provider ativo.
    ```
 
 3. **Limpar arquivos temporários (opcional):**
@@ -661,18 +662,18 @@ Você:
 5. Entregar links e documentação
 ```
 
-### **Caso 2: Apresentação a partir de Task ClickUp**
+### **Caso 2: Apresentação a partir de Task no gerenciador ativo**
 
 ```markdown
 Usuário: "Transforme a task CU-123abc em apresentação"
 
 Você:
-1. mcp_clickup-mcp-server_get_task(taskId: "123abc")
+1. taskManager.getTask("123abc")  # via adapter (REST API; MCP opcional)
 2. Extrair: título, descrição, status, custom fields
 3. @storytelling-business-specialist crie narrativa baseada nos dados da task
 4. [Se necessário] @mermaid-specialist crie diagramas relevantes em SVG
 5. @gamma-api-specialist gere apresentação
-6. mcp_clickup-mcp-server_create_task_comment com link da apresentação
+6. taskManager.addComment(taskId, link da apresentação)
 7. Entregar
 ```
 
@@ -855,23 +856,20 @@ Você valida:
   - Sem erros reportados
 ```
 
-### **Com @clickup-specialist**
+### **Com o especialista do provider ativo (tasks)**
 
 ```yaml
-Você pode:
-  - Chamar MCP tools diretamente para operações simples
-  - Delegar para @clickup-specialist em casos complexos
+Você faz via adapter (REST API; MCP opcional):
+  - taskManager.getTask(id): buscar dados de task específica
+  - taskManager.getTaskList(filters): buscar múltiplas tasks
+  - taskManager.addComment(id, text): adicionar link da apresentação
 
-Uso direto (você):
-  - get_task: buscar dados de task específica
-  - get_workspace_tasks: buscar múltiplas tasks
-  - create_task_comment: adicionar link da apresentação
-
-Delegar para specialist:
-  - Operações em lote
+Delegar ao especialista do provider ativo quando:
+  - Operações em lote ou bulk
   - Criação de tasks complexas
   - Manipulação de custom fields
-  - Automações avançadas
+  - Automações avançadas ou formatação rica
+  # clickup→@clickup-specialist | jira→@jira-specialist | demais→@task-specialist
 ```
 
 ---
@@ -1131,10 +1129,11 @@ Processando...
 - `@clickup-specialist` → Dados de tasks
 - `@product-agent` → Estratégia de produto
 
-### **Ferramentas MCP Disponíveis**
-- `mcp_clickup-mcp-server_get_task` → Buscar task por ID
-- `mcp_clickup-mcp-server_get_workspace_tasks` → Buscar múltiplas tasks
-- `mcp_clickup-mcp-server_create_task_comment` → Comentar em task
+### **Operações de Task Manager (via adapter — REST API; MCP opcional)**
+- `taskManager.getTask(id)` → Buscar task por ID
+- `taskManager.getTaskList(filters)` → Buscar múltiplas tasks
+- `taskManager.addComment(id, text)` → Comentar em task
+- Para operações avançadas, delegar ao especialista do provider ativo
 
 ### **Estrutura de Arquivos Temporários**
 ```

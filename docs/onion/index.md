@@ -2,7 +2,7 @@
 
 > **Última atualização**: 2026-06-14 | **Gerado por**: `/docs:build-index onion` | **Revisado**: auditoria manual
 
-Bem-vindo ao índice da documentação do **Sistema Onion**. Este documento organiza os 17 documentos de documentação operacional do sistema em `docs/onion/`.
+Bem-vindo ao índice da documentação do **Sistema Onion**. Este documento organiza os 16 documentos de documentação operacional do sistema em `docs/onion/`.
 
 ---
 
@@ -22,7 +22,7 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 
 > **Contagens canônicas (SSOT):** [inventory.md](inventory.md) — gerado do filesystem por `/meta:inventory` e validado no CI. Os números abaixo derivam dele.
 
-- **17 documentos** em `docs/onion/`
+- **16 documentos** em `docs/onion/`
 - **77 comandos invocáveis** Claude Code em `.claude/commands/`
 - **49 agentes** IA em `.claude/agents/`
 - **5 skills** em `.claude/skills/`

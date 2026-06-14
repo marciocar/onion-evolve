@@ -57,7 +57,7 @@ modo offline.
 
 ```markdown
 SE project_name fornecido:
-  - Buscar no provedor pelo nome (ClickUp get_list / Asana get_projects / Linear teams)
+  - Buscar o projeto/lista pelo nome via `taskManager.getProjectList()` (o adapter resolve por provedor)
   - Se não encontrado: perguntar ao usuário
 SE project_name NÃO fornecido:
   - Usar default do .env (CLICKUP_DEFAULT_LIST_ID / ASANA_DEFAULT_PROJECT_ID / LINEAR_TEAM_ID)
@@ -209,8 +209,9 @@ Sequência (idêntica em todos os provedores, variando só o adapter):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-> Convenções de formatação de comentários ClickUp (Unicode, timestamp, status):
-> skill `common:prompts:clickup-patterns` / `.claude/commands/common/prompts/clickup-patterns.md`.
+> Convenções de formatação de comentários: variam conforme o provedor ativo e são
+> resolvidas pelo adapter (ex.: Unicode no ClickUp via `common:prompts:clickup-patterns`;
+> ADF no Jira; Markdown no Linear). Detalhes em `.claude/utils/task-manager/adapters/`.
 
 **Modo offline (`none`):** gerar `id` local (`local-{timestamp}`), criar documento em
 `.claude/sessions/tasks/{id}.md` (subtasks em `.../{parent-id}/subtasks/`), anexar o
@@ -273,7 +274,7 @@ Se houve execução no Passo 7:
 - **Decomposição:** `@task-specialist`
 - **Estimativas:** `@story-points-framework-specialist`, `/product/estimate`,
   `docs/knowledge-base/frameworks/framework-story-points.md`
-- **Formatação ClickUp:** skill `common:prompts:clickup-patterns`
+- **Formatação por provedor:** resolvida pelo adapter ativo em `.claude/utils/task-manager/adapters/` (ex.: `common:prompts:clickup-patterns` para ClickUp)
 
 ## ⚠️ Notas
 

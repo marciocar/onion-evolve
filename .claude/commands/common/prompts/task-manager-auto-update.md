@@ -37,17 +37,17 @@ Use `updateStatus(taskId, ...)` via adapter quando o evento muda o estado da tas
 - **Timestamp + status** obrigatórios no rodapé.
 - Estrutura visual: cabeçalho + separador + conteúdo + rodapé.
 
-## 🎨 Formatação por provedor (roteamento)
+## 🎨 Formatação por provedor (responsabilidade do adapter)
 
-O **conteúdo** é o mesmo; só a **sintaxe** muda conforme o adapter do provedor ativo:
+O comando passa o **conteúdo** agnóstico para `taskManager.addComment(...)`; **o adapter do provedor ativo resolve a sintaxe** (e, internamente, pode acionar o especialista do provider quando a API exige). O comando **não** escolhe formato nem especialista — só chama o método agnóstico. Para referência, o formato de cada adapter:
 
-| Provedor | Formato | Quem formata | Adapter / padrões |
-|----------|---------|--------------|-------------------|
-| `clickup` | Unicode (`━━━`, `∟`, `▶`) | `@clickup-specialist` | `adapters/clickup.md` · `common:prompts:clickup-patterns` |
-| `jira` | ADF (Atlassian Document Format) | `@jira-specialist` | `adapters/jira.md` |
-| `asana` | HTML/Markdown (story) | `@task-specialist` | `adapters/asana.md` |
-| `linear` | Markdown | `@task-specialist` | `adapters/linear.md` |
-| `none` | — (local, sem persistir) | — | — |
+| Provedor | Formato (resolvido pelo adapter) | Adapter |
+|----------|----------------------------------|---------|
+| `clickup` | Unicode (`━━━`, `∟`, `▶`) | `adapters/clickup.md` · `common:prompts:clickup-patterns` |
+| `jira` | ADF (Atlassian Document Format) | `adapters/jira.md` |
+| `asana` | HTML/Markdown (story) | `adapters/asana.md` |
+| `linear` | Markdown | `adapters/linear.md` |
+| `none` | — (local, sem persistir) | — |
 
 ## 📋 Identificação da Task
 
@@ -56,8 +56,21 @@ O **conteúdo** é o mesmo; só a **sintaxe** muda conforme o adapter do provedo
 3. **Branch git** atual (quando aplicável).
 4. Não identificada → perguntar ao usuário.
 
+## 🔁 Pontos de auto-update no ciclo (agnóstico)
+
+Os eventos do ciclo de engenharia disparam o mecanismo via adapter (transporte default = REST API; MCP opcional). O **padrão** é idêntico para qualquer provider — só os métodos agnósticos abaixo:
+
+| Evento | Ação (agnóstica via adapter) |
+|--------|------------------------------|
+| `/engineer:start` | `getTask(id, {subtasks:true})` → `updateStatus(id,'in_progress')` → `addComment(id, '🚀 …')` → criar mapeamento fase→subtask no `context.md` |
+| `/engineer:work` (fim de fase) | `updateStatus(subtaskId,'done')` → `addComment(mainTaskId, '🔧 progresso …')` → atualizar `plan.md` |
+| `/engineer:pr` | `updateStatus(id,'in_progress')` + tag `under-review` → `addComment(id, '🚀 PR …')` |
+| `/git:sync` (pós-merge) | `updateStatus(id,'done')` → `addComment(id, '✅ concluída/merged …')` |
+
+> Exemplos de transporte específico (ClickUp/Jira/etc.) vivem no respectivo adapter — ex.: `adapters/clickup.md` (Hierarquia, Checklists, formatação Unicode). O comando **nunca** chama o MCP/SDK do provider direto.
+
 ## 🔗 Referências
 
 - Abstração: [`.claude/utils/task-manager/`](../../../utils/task-manager/) (factory · detector)
 - Detecção de provedor: `common:prompts:task-manager-provider-detection`
-- Formatação ClickUp: `common:prompts:clickup-patterns`
+- Formatação/transporte por provider: o adapter ativo (ex.: `adapters/clickup.md` · `common:prompts:clickup-patterns`)

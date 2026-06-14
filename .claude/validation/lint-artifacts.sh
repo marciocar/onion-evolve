@@ -29,6 +29,10 @@
 #   7. Nenhum agente pode ter name: contendo 'fleet-orchestrator' [HARD]
 #   8. Inventário canônico (docs/onion/inventory.md) em sincronia com o
 #      filesystem [HARD] — gerado por inventory.sh; drift bloqueia merge
+#   9. Contagens no CLAUDE.md em sincronia com a SSOT [HARD]
+#  10. SDAAL: sem chamada direta a provider (mcp_<provider>_* / clickup_mcp /
+#      $CLICKUP_TASK_ID) em commands/agents fora de adapters e especialistas
+#      [HARD] — consumo de task manager é agnóstico e API-first (integrations §9)
 # =============================================================================
 
 set -euo pipefail
@@ -279,6 +283,39 @@ check_claude_md_counts() {
 }
 
 # ===========================================================================
+# REGRA 10 — SDAAL: sem chamada direta a provider no consumidor [HARD]
+#            Comandos/agentes devem operar via abstração (taskManager.*),
+#            não chamar o MCP/SDK do provider direto nem usar var de roteamento
+#            específica. Provider-specific só vive em adapters/ e nos
+#            especialistas. (integrations.md §9 — API-first, agnóstico)
+# ===========================================================================
+check_no_direct_provider_calls() {
+  # Padrão de chamada direta a provider (não confundir com menção a @agente)
+  local pattern='mcp_ClickUp_|mcp_clickup-mcp-server_|clickup_mcp\.|mcp_asana_|mcp_jira_|CLICKUP_TASK_ID'
+
+  while IFS= read -r -d '' file; do
+    # Allowlist: onde provider-specific é legítimo
+    case "${file}" in
+      */utils/task-manager/adapters/*) continue ;;
+      */utils/forge/adapters/*)        continue ;;
+      */agents/development/clickup-specialist.md) continue ;;
+      */agents/development/jira-specialist.md)    continue ;;
+      */commands/common/prompts/clickup-patterns.md) continue ;;
+      */commands/common/templates/*)  continue ;;
+    esac
+
+    if grep -qE "${pattern}" "${file}"; then
+      local lines
+      lines=$(grep -nE "${pattern}" "${file}" | head -3 | sed 's/^/      /')
+      violation "HARD" "${file}" "chamada direta a provider (use taskManager.* via adapter — SDAAL §9). Ocorrências:
+${lines}"
+    fi
+  done < <(
+    find "${CLAUDE_DIR}/commands" "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null
+  )
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -293,6 +330,7 @@ check_kebab_case_filenames
 check_no_fleet_orchestrator_agent
 check_inventory_sync
 check_claude_md_counts
+check_no_direct_provider_calls
 
 # ===========================================================================
 # SUMÁRIO FINAL

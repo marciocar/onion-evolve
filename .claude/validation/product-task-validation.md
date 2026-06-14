@@ -300,9 +300,9 @@ Nenhum problema crítico identificado.
          │
          └─→ Task Manager Abstraction
                 │
-                ├─→ ClickUp (via MCP)
-                ├─→ Asana (via MCP)
-                ├─→ Linear (via API)
+                ├─→ ClickUp (REST API)
+                ├─→ Asana (REST API)
+                ├─→ Linear (REST API)
                 └─→ None (modo offline)
 ```
 

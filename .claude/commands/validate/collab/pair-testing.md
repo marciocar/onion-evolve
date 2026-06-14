@@ -103,8 +103,7 @@ SE perspective inválida:
 ### Passo 4: Buscar Contexto da Feature (Opcional)
 
 **SE** `{{feature-id}}` fornecido:
-- `clickup` → buscar via ClickUp MCP: descrição, critérios de aceitação, test strategy, bugs conhecidos, comentários.
-- `jira` → buscar via Jira API: summary, description, acceptance criteria, test cases.
+- buscar via adapter do Task Manager (REST API; MCP opcional): descrição, critérios de aceitação, test strategy, bugs conhecidos, comentários.
 
 **SENÃO** → buscar arquivos relacionados no código (testes, documentação, especificações).
 
