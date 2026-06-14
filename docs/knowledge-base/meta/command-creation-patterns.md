@@ -187,9 +187,9 @@ TASK_ID=$(clickup_create_task "$TASK_NAME" "$LIST_ID")
 
 **Exemplos:**
 - `/git/init` - Inicializar Git Flow
-- `/git/feature/start` - Iniciar feature branch
-- `/git/feature/finish` - Finalizar feature
-- `/git/hotfix/start` - Iniciar hotfix
+- `/git:flow feature start` - Iniciar feature branch
+- `/git:flow feature finish` - Finalizar feature
+- `/git:flow hotfix start` - Iniciar hotfix
 
 **Template:**
 ```markdown

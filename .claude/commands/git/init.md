@@ -32,14 +32,9 @@ Configurar repositório Git com GitFlow seguindo as melhores práticas. Detectar
 /git/init                    # Inicialização completa automática
 ```
 
-## 🤖 Integração com @gitflow-specialist
+## 📚 Motor GitFlow
 
-Para cada inicialização:
-
-1. **Consultar @gitflow-specialist** para análise do repositório atual
-2. **Receber estratégia** de inicialização baseada no contexto
-3. **Executar setup** seguindo as recomendações do especialista
-4. **Validar configuração** final e fornecer próximos passos
+O setup segue [gitflow-patterns.md §Template 1](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-1-setup-inicial-gitflow) — **fonte única** da detecção de branch principal, prefixos e validações. Para dúvidas ad-hoc ou recovery de estado inconsistente, consulte o mentor `@gitflow-specialist` (não é dependência de runtime do comando).
 
 ## 📋 Processo de Inicialização
 
@@ -84,7 +79,7 @@ Após execução bem-sucedida:
 
 Após inicialização, o sistema recomendará:
 
-- **Primeira feature**: `/git/feature/start "nome-da-funcionalidade"`
+- **Primeira feature**: `/git:flow feature start "nome-da-funcionalidade"`
 - **Sincronização**: `/git/sync` se houver repositório remoto
 - **Ajuda contextual**: `/git/help` para entender os workflows disponíveis
 
@@ -100,7 +95,7 @@ Após inicialização, o sistema recomendará:
 
 ### Branch develop conflitante
 **Problema**: Já existe branch develop com conteúdo divergente
-**Solução**: @gitflow-specialist fornecerá estratégia de resolução
+**Solução**: ver [§Template 6 — Resolução de Conflitos](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-6-resolução-de-conflitos) ou consultar `@gitflow-specialist`
 
 ### Repositório remoto não configurado
 **Problema**: Não há origin configurado
@@ -108,4 +103,4 @@ Após inicialização, o sistema recomendará:
 
 ---
 
-*Este comando sempre consulta @gitflow-specialist para garantir inicialização otimizada para seu contexto específico.*
+*Lógica canônica em [gitflow-patterns.md §Template 1](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-1-setup-inicial-gitflow). Mentor para dúvidas: `@gitflow-specialist`.*

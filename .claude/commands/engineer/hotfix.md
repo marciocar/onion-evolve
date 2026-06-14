@@ -4,6 +4,7 @@ description: |
   Emergency workflow completo: task no Task Manager + branch hotfix + desenvolvimento.
   Use para correções urgentes em produção.
 model: sonnet
+allowed-tools: Bash(git *) Read Edit Write Bash(cat .env*)
 
 parameters:
   - name: description
@@ -22,163 +23,87 @@ tags:
   - emergency
   - gitflow
 
-version: "3.0.0"
-updated: "2025-11-24"
+version: "3.1.0"
+updated: "2026-06-13"
 
 related_commands:
-  - /git/hotfix/start
-  - /git/hotfix/finish
+  - /git/flow
   - /product/task
 
 related_agents:
   - gitflow-specialist
-  - clickup-specialist
 ---
 
 # 🔥 Engineer Hotfix
 
-Emergency workflow completo: Task + Branch + Desenvolvimento.
+Emergency workflow completo: Task + Branch + Desenvolvimento, em um comando. **Provider-agnóstico** (Jira, ClickUp, Asana, Linear ou none).
 
 ## 🎯 Objetivo
 
-Executar workflow de hotfix end-to-end em um único comando.
+Executar o setup de hotfix end-to-end. Orquestrador fino sobre o **adapter Task Manager**, o **motor GitFlow** (git local) e o **contrato de sessão**.
 
 ## ⚡ Fluxo de Execução
 
-### Passo 1: Validar Input
+### Passo 1: Validar input
 
 ```bash
-# Verificar descrição
-if [ -z "{{description}}" ]; then
-  echo "❌ Descrição obrigatória"
-  exit 1
-fi
-
-# Verificar branch atual
+[ -z "{{description}}" ] && { echo "❌ Descrição obrigatória"; exit 1; }
 CURRENT=$(git branch --show-current)
-if [[ ! "$CURRENT" =~ ^(main|master|develop)$ ]]; then
-  echo "⚠️ Recomendado: iniciar de main/master"
-fi
+[[ "$CURRENT" =~ ^(main|master|develop)$ ]] || echo "⚠️ Recomendado iniciar de main/master"
 ```
 
-### Passo 2: Criar Task Emergencial
+### Passo 2: Criar task emergencial (opcional — provider-agnóstico)
 
-Via ClickUp MCP:
+Se `TASK_MANAGER_PROVIDER` != `none`, criar a task via o adapter ([utils/task-manager/factory.md](../../utils/task-manager/factory.md)) — **não** acoplar a provider específico:
 
-```yaml
-name: "🔥 HOTFIX: {{description}}"
-list_id: [lista de hotfixes]
-priority: urgent
-tags:
-  - hotfix
-  - urgent
-  - {{tags}}
-status: "In Progress"
-markdown_description: |
-  ## 🚨 Emergency Hotfix
-  
-  **Descrição**: {{description}}
-  
-  ## 📋 Checklist
-  - [ ] Diagnóstico
-  - [ ] Implementação
-  - [ ] Testes
-  - [ ] Deploy
+```typescript
+const tm = getTaskManager();                 // resolve provider do .env
+const task = await tm.createTask({
+  name: `🔥 HOTFIX: {{description}}`,
+  priority: 'urgent',
+  tags: ['hotfix', 'urgent', ...'{{tags}}'.split(',').filter(Boolean)],
+  markdownDescription: `## 🚨 Emergency Hotfix\n\n**Descrição**: {{description}}\n\n## 📋 Checklist\n- [ ] Diagnóstico\n- [ ] Implementação\n- [ ] Testes\n- [ ] Deploy`
+});
+await tm.updateStatus(task.id, 'in_progress');
 ```
 
-### Passo 3: Criar Branch Hotfix
+Roteamento, formatação (ADF/Markdown/Unicode/HTML) e mapeamento de status/prioridade são responsabilidade do adapter. Em modo offline (`none`), a task é local e o fluxo segue.
+
+### Passo 3: Criar branch hotfix (git local)
+
+Segue [gitflow-patterns.md §Template 4](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-4-emergency-hotfix); o patch bump usa o [Algoritmo Unificado de Semver](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#algoritmo-unificado-de-auto-bump-semver) (hotfix = sempre `patch`):
 
 ```bash
-# Garantir main atualizada
-git checkout main
-git pull origin main
-
-# Criar hotfix branch
-VERSION=$(cat package.json | grep version | head -1 | awk -F'"' '{print $4}')
-PATCH=$(echo $VERSION | awk -F. '{print $1"."$2"."$3+1}')
+git checkout main && git pull origin main
+# PATCH = última tag semver + 1 no patch (ver Algoritmo Unificado de Semver)
 BRANCH="hotfix/$PATCH-$(echo '{{description}}' | tr ' ' '-' | tr '[:upper:]' '[:lower:]' | head -c 30)"
-
-git checkout -b $BRANCH
+git checkout -b "$BRANCH"
 ```
 
-### Passo 4: Setup Session
+### Passo 4: Setup de sessão
 
-```bash
-# Criar sessão de desenvolvimento
-mkdir -p .claude/sessions/hotfix-$(date +%Y%m%d)/
+Criar `.claude/sessions/<slug>/` conforme o [Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) (`context.md` com task vinculada, branch, base; `plan.md`; `notes.md`).
 
-# Criar context.md
-cat > .claude/sessions/hotfix-$(date +%Y%m%d)/context.md << EOF
-# Hotfix Context
-
-## Task
-- ID: [task_id criado]
-- URL: [url do clickup]
-
-## Branch
-- Nome: $BRANCH
-- Base: main
-
-## Descrição
-{{description}}
-EOF
-```
-
-### Passo 5: Iniciar Desenvolvimento
+### Passo 5: Iniciar desenvolvimento
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔥 HOTFIX INICIADO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 Task: [URL do ClickUp]
-🌿 Branch: hotfix/X.X.X-description
-
-⚡ Próximos Passos:
-1. Implementar correção
-2. Testar localmente
-3. /engineer/pre-pr
-4. /git/hotfix/finish
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-## 📤 Output Esperado
-
-### Sucesso
-
-```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ HOTFIX SETUP COMPLETO
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 ClickUp:
-∟ Task: 🔥 HOTFIX: {{description}}
-∟ ID: 86adfxxxx
-∟ Status: In Progress
-∟ Priority: Urgent
-
-🌿 Git:
-∟ Branch: hotfix/1.2.3-fix-description
-∟ Base: main
-∟ Remote: origin
-
-📁 Session:
-∟ Path: .claude/sessions/hotfix-20251124/
-
-🚀 Comandos:
-∟ Desenvolver: /engineer/work
-∟ Pre-PR: /engineer/pre-pr
-∟ Finalizar: /git/hotfix/finish
+∟ Task: <ID/URL no provider ativo, ou "local">
+∟ Branch: hotfix/X.Y.Z-description   ∟ Base: main
+∟ Sessão: .claude/sessions/<slug>/
+⚡ Próximos: implementar → /engineer/pre-pr → /git:flow hotfix finish
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ## 🔗 Referências
 
-- Padrões: `common/prompts/git-workflow-patterns.md`
-- Agente: @gitflow-specialist
+- Motor GitFlow (hotfix, semver): [gitflow-patterns.md §Template 4](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-4-emergency-hotfix)
+- Task Manager (criação provider-agnóstica): [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
+- Contrato de sessão: [gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
+- Mentor: `@gitflow-specialist`
 
 ## ⚠️ Notas
 
-- Sempre parte de `main` ou `master`
-- Task criada com prioridade máxima
-- Merge automático para main E develop no finish
+- Sempre parte de `main`/`master`; merge dual (main + develop) no `/git:flow hotfix finish`.
+- Task criada com prioridade `urgent` (mapeada pelo adapter ao vocabulário do provider).

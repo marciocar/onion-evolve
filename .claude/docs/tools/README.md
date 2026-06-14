@@ -87,7 +87,7 @@ search_replace()              # Editar código
 #### 4️⃣ Integration & Deploy
 ```bash
 /engineer/pr                  # Criar PR
-/git/feature/finish           # Merge
+/git:flow feature finish           # Merge
 @deployment-specialist        # Deploy
 ```
 
@@ -125,7 +125,7 @@ search_replace()              # Editar código
 #### Comandos
 1. `/engineer/work`
 2. `/product/feature`
-3. `/git/feature/start`
+3. `/git:flow feature start`
 4. `/engineer/pr`
 5. `/docs/build-tech-docs`
 
@@ -261,7 +261,7 @@ search_replace()              # Editar código
 
 # 4. Finalize
 /engineer/pr
-/git/feature/finish
+/git:flow feature finish
 ```
 
 ### Warm-up Rápido

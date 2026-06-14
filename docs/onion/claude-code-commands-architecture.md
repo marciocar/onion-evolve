@@ -10,17 +10,17 @@ Claude Code Commands são comandos personalizados executados diretamente no **ch
 ### ✅ **Como Usar (CORRETO)**
 ```markdown
 # No chat da Claude Code:
-/git/init                      # Inicializar Git Flow
-/git/feature/start "login"     # Criar feature branch
-/engineer/work "implement API" # Iniciar desenvolvimento
-/product/task "add dashboard"  # Criar task no ClickUp
+/git/init                        # Inicializar Git Flow
+/git:flow feature start "login"  # Criar feature branch (dispatcher GitFlow)
+/engineer/work "implement API"   # Iniciar desenvolvimento
+/product/task "add dashboard"    # Criar task no ClickUp
 ```
 
 ### ❌ **Como NÃO Usar (INCORRETO)**
 ```bash
 # ❌ NO TERMINAL - NÃO FUNCIONA:
 $ /git/init                    # Comando não encontrado
-$ ./git/feature/start          # Arquivo não executável
+$ ./git/flow                   # Arquivo não executável
 $ bash /git/init               # Não é script bash direto
 ```
 
@@ -34,10 +34,8 @@ $ bash /git/init               # Não é script bash direto
 ├── git/
 │   ├── init.md               # Define /git/init command
 │   ├── help.md               # Define /git/help command
-│   └── feature/
-│       ├── start.md          # Define /git/feature/start command
-│       ├── publish.md        # Define /git/feature/publish command
-│       └── finish.md         # Define /git/feature/finish command
+│   ├── sync.md               # Define /git/sync command
+│   └── flow.md               # Dispatcher: /git:flow <feature|release|hotfix> <start|publish|finish>
 ├── engineer/
 │   ├── start.md              # Define /engineer/start command
 │   └── work.md               # Define /engineer/work command

@@ -1,7 +1,11 @@
 # GitFlow Patterns - Catálogo de Referência
 
-> **Versão**: 1.0.0 | **Última atualização**: 2026-06-02 | **Categoria**: Frameworks
+> **Versão**: 1.1.0 | **Última atualização**: 2026-06-13 | **Categoria**: Frameworks
 > Catálogo de referência de comandos, templates e workflows GitFlow do Sistema Onion. Extraído do agente `@gitflow-specialist` para reduzir o tamanho do agente e centralizar o material de consulta.
+
+> 🧭 **Esta KB é o motor GitFlow canônico (git local).** Os comandos `/git/*` e `/engineer/*` **citam** esta KB para lógica de branching/merge/tag/semver em vez de re-delegar ad-hoc ao `@gitflow-specialist`. O especialista permanece como **mentor para dúvidas interativas**, não como dependência de runtime por comando.
+>
+> Operações de **host remoto** (Pull Request, review, CI/checks, Release) **não** vivem aqui — pertencem ao adapter `.claude/utils/forge/` (SDAAL). Esta KB cobre só o **git local** (branch, merge, tag, push). Ver [interface.md §Fronteira local-vs-remoto](../../../.claude/utils/forge/interface.md).
 
 ---
 
@@ -9,11 +13,12 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2026-06-02 |
-| **Última Atualização** | 2026-06-02 |
+| **Última Atualização** | 2026-06-13 |
 | **Categoria** | Frameworks |
-| **Agente relacionado** | `@gitflow-specialist` |
+| **Agente relacionado** | `@gitflow-specialist` (mentor) |
+| **Adapter relacionado** | `.claude/utils/forge/` (operações de host remoto) |
 
 ---
 
@@ -29,6 +34,9 @@
 8. [Changelog Generation](#changelog-generation)
 9. [Team Onboarding & Training](#team-onboarding--training)
 10. [Monitoring & Analytics](#monitoring--analytics)
+11. [Contrato de Sessão de Desenvolvimento](#contrato-de-sessão-de-desenvolvimento)
+12. [Matriz de Branches Protegidas e Estratégia de Sync](#matriz-de-branches-protegidas-e-estratégia-de-sync)
+13. [Algoritmo Unificado de Auto-Bump Semver](#algoritmo-unificado-de-auto-bump-semver)
 
 ---
 
@@ -859,4 +867,138 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-**Catálogo de referência GitFlow do Sistema Onion. Para orquestração e guidance interativo, use `@gitflow-specialist`. 🌿**
+## Contrato de Sessão de Desenvolvimento
+
+> **Fonte única** para a estrutura de sessão que os comandos GitFlow criam ao iniciar trabalho (antes citada inline em `git/feature/start.md`). Comandos **citam** este contrato em vez de re-descrevê-lo.
+
+Ao iniciar uma feature/hotfix/release, o comando cria `.claude/sessions/<slug>/` com os arquivos abaixo. O `<slug>` é o nome da branch sem o prefixo GitFlow (ex.: branch `feature/oauth2` → slug `oauth2`), em kebab-case.
+
+```
+.claude/sessions/<slug>/
+├── context.md     # Metadados e objetivos: task vinculada, branch, base, escopo
+├── plan.md        # Plano de desenvolvimento em fases (consumido por /engineer/work)
+└── notes.md       # Notas e decisões durante o desenvolvimento
+```
+
+### Conteúdo mínimo de cada arquivo
+
+**`context.md`** — metadados estáveis da sessão:
+
+```markdown
+# Contexto — <slug>
+
+- **Branch**: feature/<slug>
+- **Base**: develop
+- **Task vinculada**: <ID no provider ativo, ou "—" se offline>
+- **Criada em**: <YYYY-MM-DD>
+- **Objetivo**: <uma frase>
+```
+
+**`plan.md`** — fases de implementação (cada fase com input/output claros; é o estado que `/engineer/work` retoma).
+
+**`notes.md`** — log livre de decisões, links e pendências.
+
+### Regras
+
+- **Slug determinístico**: derivado da branch; nunca inventar nome divergente da branch.
+- **Idempotência**: se a sessão já existe, não sobrescrever `notes.md`/`plan.md` — apenas complementar.
+- **Vínculo com task é opcional**: se `TASK_MANAGER_PROVIDER=none`, o campo "Task vinculada" fica `—` e a sessão opera offline (ver dedup de Task Manager nos comandos).
+- **Versionamento**: `.claude/sessions/` é estado runtime; em projetos-alvo normalmente entra no `.gitignore` (ver `architecture.md` §6.2).
+
+---
+
+## Matriz de Branches Protegidas e Estratégia de Sync
+
+> **Fonte única** para proteção de branch e estratégia de sincronização pós-merge (antes inline em `git/sync.md`).
+
+### Matriz de proteção
+
+| Branch | Push direto | Merge permitido | Observação |
+|--------|-------------|-----------------|------------|
+| `main` | ❌ Bloqueado | ✅ Fast-forward apenas | Produção; entra só via release/hotfix |
+| `master` | ❌ Bloqueado | ✅ Fast-forward apenas | Equivalente clássico de `main` |
+| `develop` | ❌ Bloqueado | ✅ Fast-forward apenas | Integração; entra via PR |
+| `feature/*` | ✅ Permitido | merge normal | Branch de trabalho |
+| `hotfix/*`, `release/*` | ✅ Permitido | merge normal | Branches temporárias |
+
+> A enforcement "hard" (impedir push) vive nas **branch protection rules** do host remoto (lidas via `forge.validateRepo()`). Esta matriz é a **convenção local** que os comandos respeitam antes de tentar qualquer operação.
+
+### Estratégia de sync por contexto (git local)
+
+| Branch atual | Target | Estratégia | Comando local |
+|--------------|--------|------------|---------------|
+| `feature/*` | `develop` | `feature-cleanup` | `git merge develop --no-edit` na feature |
+| `release/*` | `main` | `release-sync` | fast-forward; conflitos → resolver no release |
+| `hotfix/*` | `main` | `hotfix-sync` | dual-merge (ver Template 4) |
+| `develop` | `main` | `protected-sync` | `git merge origin/main --ff-only` |
+
+### Sync seguro — passos canônicos
+
+```bash
+# 1. Estado limpo
+[[ -z $(git status --porcelain) ]] || { echo "⚠️ commit/stash antes"; exit 1; }
+
+# 2. Fetch com prune
+git fetch origin --prune
+
+# 3. Target protegida → só fast-forward
+if [[ "$TARGET" =~ ^(main|master|develop)$ ]]; then
+  git checkout "$TARGET" && git merge "origin/$TARGET" --ff-only \
+    || echo "❌ FF impossível — use PR workflow: /engineer/pr"
+fi
+```
+
+> Se o fast-forward falhar numa branch protegida, **nunca** forçar — instruir o fluxo de PR (`/engineer/pr`), que passa pelo `forge` adapter.
+
+---
+
+## Algoritmo Unificado de Auto-Bump Semver
+
+> **Fonte única** do cálculo de versão, antes duplicada entre esta KB, `git/release/start.md` e `engineer/hotfix.md`. Comandos **citam** este algoritmo.
+
+### Entrada → decisão
+
+```bash
+# 1. Última tag semver (vazio se nenhuma → assume v0.0.0)
+LAST=$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || echo "v0.0.0")
+
+# 2. Tipo de bump explícito OU inferido por Conventional Commits desde LAST
+#    Precedência: BREAKING CHANGE / "!" → major ; feat: → minor ; fix:/outros → patch
+BREAKING=$(git log "$LAST"..HEAD --grep='!:' --grep='BREAKING CHANGE' -E --oneline | wc -l)
+FEATS=$(git log "$LAST"..HEAD --grep='^feat' -E --oneline | wc -l)
+
+if   [[ "$ARG" == "major" || $BREAKING -gt 0 ]]; then BUMP=major
+elif [[ "$ARG" == "minor" || $FEATS    -gt 0 ]]; then BUMP=minor
+else BUMP=patch   # default: ARG=patch, fix:, chore:, docs:, etc.
+fi
+```
+
+### Aplicação do bump
+
+| `BUMP` | `v1.4.2` vira | Quando |
+|--------|---------------|--------|
+| `major` | `v2.0.0` | breaking change / `feat!:` / `BREAKING CHANGE:` |
+| `minor` | `v1.5.0` | nova feature (`feat:`) backward-compatible |
+| `patch` | `v1.4.3` | fix, chore, docs, hotfix |
+
+### Detecção de versão em arquivos de projeto (opcional)
+
+Quando existir manifest, sincronizar a versão calculada:
+
+| Arquivo | Campo |
+|---------|-------|
+| `package.json` | `"version"` |
+| `pyproject.toml` | `[project] version` / `[tool.poetry] version` |
+| `Cargo.toml` | `[package] version` |
+| `*.csproj` | `<Version>` |
+
+### Regras
+
+- **Prefixo `v`**: tags usam `vMAJOR.MINOR.PATCH`; aceitar entrada com ou sem `v` e normalizar.
+- **Conflito de tag**: se a tag calculada já existe, abortar e reportar (não sobrescrever).
+- **Hotfix sempre patch**, salvo override explícito (`engineer/hotfix` e `git/hotfix/finish` citam esta regra).
+- **Tag é git local** (`git tag -a`); o **Release no host** (notas, assets) é criado via `forge.createRelease()` — operação distinta.
+
+---
+
+**Catálogo de referência GitFlow do Sistema Onion. Para orquestração e guidance interativo, use `@gitflow-specialist`. Operações de host remoto: `.claude/utils/forge/`. 🌿**

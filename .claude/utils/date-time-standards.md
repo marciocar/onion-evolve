@@ -116,9 +116,8 @@ sed -i 's/\$(date +'\''%Y-%m-%d %H:%M'\'')/\$(date +'\''%d\/%m\/%Y %H:%M'\'')/g'
 ## 📚 **Referências**
 
 ### **Documentos Corrigidos:**
-- ✅ `.claude/commands/git/feature/start.md`
+- ✅ `.claude/commands/git/flow.md`
 - ✅ `.claude/commands/engineer/hotfix.md`
-- ✅ `.claude/commands/git/hotfix/start.md`
 
 ### **Documentos Já Corretos:**
 - ✅ `.claude/commands/git/README.md` (linha 464)

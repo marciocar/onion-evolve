@@ -186,13 +186,13 @@ release/v2.1.0-beta
 ### Comandos Git
 ```bash
 # Feature branch (chamado automaticamente)
-/git/feature/start user-authentication
+/git:flow feature start user-authentication
 
 # Hotfix branch (chamado automaticamente)
-/git/hotfix/start fix-payment-timeout
+/git:flow hotfix start fix-payment-timeout
 
 # Release
-/git/release/start v2.1.0
+/git:flow release start v2.1.0
 ```
 
 ---

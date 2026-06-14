@@ -550,9 +550,9 @@ O mapeamento fase→subtask existe em todos os provedores, com nomenclatura pró
 @gitflow-specialist "Configurar strategy de branching para equipe"
 
 # Comandos especializados
-/git/release/start
-/git/hotfix/start
-/git/feature/finish
+/git:flow release start
+/git:flow hotfix start
+/git:flow feature finish
 ```
 
 #### **Task Manager Specialist Integration (específico do provedor ativo)**

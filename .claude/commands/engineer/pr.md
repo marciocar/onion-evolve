@@ -2,104 +2,84 @@
 name: pr
 description: Criar Pull Request com integração GitFlow e sync automático.
 model: sonnet
-allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Grep Glob
+allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Grep Glob Bash(cat .env*)
 category: engineer
 tags: [pr, gitflow, workflow]
-version: "3.0.0"
-updated: "2025-11-24"
+version: "3.1.0"
+updated: "2026-06-13"
+related_agents:
+  - gitflow-specialist
 ---
 
 # 🚀 Engineer PR - GitFlow Integrated
 
-Você é um assistente especializado em **criação de Pull Requests** com integração automática ao novo sistema `/git/sync` otimizado do Sistema Onion.
+Você é um assistente especializado em **criação de Pull Requests**, fase 5 do workflow faseado de engenharia (`plan → start → work → pre-pr → **pr** → pr-update`).
 
-## 🤖 **Nova Integração GitFlow**
-Este comando agora inclui **sync automático pós-merge** usando:
-- **GitFlow Analysis** via @gitflow-specialist
-- **Performance otimizada** (cache + operações paralelas) 
-- **Cleanup inteligente** baseado na estratégia de branch
-- **Session archiving** automático
-- **Task Manager auto-update** para status "Done" (no provider configurado em `TASK_MANAGER_PROVIDER`)
+## 🤖 Integração via adapters (modernizada)
+
+- **Operações de host remoto** (abrir/atualizar PR, ler comentários de review, status de CI) passam **sempre** pelo adapter forge ([`.claude/utils/forge/`](../../utils/forge/interface.md)) — **nunca** `gh`/API direto (integrations.md §9). O adapter usa `gh` (default) ou REST (fallback) internamente.
+- **Git local** (criar branch, commit, push) é `git` direto, orientado pelo motor GitFlow ([gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md)).
+- **Sync de task** passa pelo adapter Task Manager ([`utils/task-manager/factory.md`](../../utils/task-manager/factory.md)) — roteamento e formatação por provider são do adapter.
 
 ---
 
-Agora é solicitado que você faça um PR. Siga estes passos cuidadosamente para completar a tarefa:
+Siga estes passos para criar o PR:
 
-1. Primeiro, garanta que todos os testes estão funcionando para a branch atual. Execute a suíte de testes apropriada para seu projeto e confirme que todos os testes passam. Se algum teste falhar, corrija os problemas antes de prosseguir.
+1. **Testes verdes**: execute a suíte de testes da branch atual e confirme que todos passam. Se algum falhar, corrija antes de prosseguir.
 
-2. **CRÍTICO - Criar Feature Branch PRIMEIRO:**
-   a. Crie uma feature branch a partir da branch base (develop/main):
-      ```bash
-      git checkout -b feature/[descricao-sucinta]
-      git push -u origin feature/[descricao-sucinta]
-      ```
-   b. Faça commit das mudanças que você fez. Use uma mensagem de commit clara e concisa que resuma as alterações.
-   c. Push dos commits para a feature branch.
+2. **CRÍTICO — Feature branch primeiro (git local):**
+   ```bash
+   git checkout -b feature/[descricao-sucinta]
+   git push -u origin feature/[descricao-sucinta]   # push é git local
+   ```
+   Faça commit apenas dos arquivos alterados (ver Regra de Ouro) e push para a feature branch.
 
-3. Mova a task associada no **Task Manager configurado** para o status "in progress" e adicione a tag "under-review". Antes, carregue o `.env` e leia `TASK_MANAGER_PROVIDER` (`jira` | `clickup` | `asana` | `linear` | `none`) para saber qual provider operar. Se `none`, pule esta etapa (não há persistência remota).
+3. **Task → in progress + under-review**: se `TASK_MANAGER_PROVIDER` != `none`, via o adapter Task Manager — `updateStatus(taskId, 'in_progress')` + tag `under-review`. Carregue `.env` e leia o provider; em `none`, pule (sem persistência remota). **Não reimplementar** roteamento aqui — é responsabilidade do adapter.
 
-4. Adicione um comentário na task documentando o PR, no **Task Manager configurado**:
+4. **Comentário na task** documentando o PR (via adapter Task Manager): URL do PR, branch, descrição das mudanças e status dos testes (passing | review | pending). A **formatação por provider** (ADF/Jira, Markdown/ClickUp-Linear, HTML/Asana, Unicode em comments ClickUp) é resolvida pelo adapter / especialista do provider — o comando não formata manualmente.
 
-**Roteamento por provider** (carregar `.env` → ler `TASK_MANAGER_PROVIDER` → seguir o adapter):
+5. **Abrir o PR via adapter forge:**
+   ```typescript
+   const forge = getForge();                       // .claude/utils/forge/factory.md
+   const pr = await forge.createPR({
+     head: 'feature/[descricao]', base: 'develop',  // ou main, conforme o fluxo
+     title: '[título]', body: '[resumo + link da task]'
+   });
+   ```
+   Não mencione IA/assistentes no conteúdo do PR. **Não** usar `gh pr create` em prosa — sempre pelo adapter.
 
-- **`clickup`** → comentário em formatação Unicode via `@clickup-specialist`. Adapter: `.claude/utils/task-manager/adapters/clickup.md` (API-first; MCP opcional). Padrões: `.claude/commands/common/prompts/clickup-patterns.md`.
-- **`jira`** → comentário em ADF via `@jira-specialist`. Adapter: `.claude/utils/task-manager/adapters/jira.md`.
-- **`asana`** → comentário (story) via `@task-specialist`. Adapter: `.claude/utils/task-manager/adapters/asana.md`.
-- **`linear`** → comentário em Markdown via `@task-specialist`. Adapter: `.claude/utils/task-manager/adapters/linear.md`.
-- **`none`** → não persistir comentário remoto.
+6. **Aguardar feedback do code review automatizado**: após abrir o PR, aguarde ~3 min e leia comentários via `forge.getReviewComments({ number: pr.number })`. Se vazio, aguarde mais 3 min e tente de novo. Confirme CI com `forge.getPRStatus(...)`.
 
-O conteúdo do comentário deve documentar: URL do PR, branch, descrição das mudanças e status dos testes (passing | review | pending).
+7. **Triagem dos comentários**: analise cada comentário; separe os que exigem correção dos que podem ser ignorados/explicados. Apresente as sugestões ao usuário e peça permissão antes de aplicar.
 
-5. Abra um Pull Request (PR) com os detalhes da implementação:
+8. **Aplicar correções aprovadas** (git local): editar → commit com mensagem clara → push para a mesma branch.
 
-   Importante: Não mencione nenhum código relacionado a AI ou assistentes de IA no PR.
+9. **Aguardar confirmação de merge** do PR.
 
-6. Após abrir o PR, aguarde 3 minutos e então verifique comentários da ferramenta automatizada de code review. Se nenhum comentário aparecer, aguarde mais 3 minutos e verifique novamente.
+10. **Sync automático pós-merge**: uma vez merged, execute `/git/sync` (fase seguinte do fluxo). O sync segue a [Matriz de Branches Protegidas e Estratégia de Sync](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync), faz cleanup, arquiva a sessão e, se `TASK_MANAGER_PROVIDER` != `none`, atualiza a task para `done` via adapter.
 
-7. Uma vez que você receba comentários da ferramenta automatizada de code review, analise cada comentário cuidadosamente. Determine quais comentários requerem correções e quais podem ser ignorados com segurança ou explicados. Apresente suas sugestões ao usuário e peça permissão para fazer as mudanças.
+REGRA DE OURO: faça commit APENAS dos arquivos que você alterou. Se houver outros, pergunte ao usuário antes. Não use `git add .` sem confirmação.
 
-8. Para os comentários que requerem correções:
-   a. Faça as mudanças necessárias no código
-   b. Faça commit dessas mudanças com uma mensagem de commit clara
-   c. Faça push do(s) novo(s) commit(s) para a mesma branch
-
-9. Após abordar os comentários e fazer push das atualizações, aguarde a confirmação de merge do PR.
-
-10. **NOVO - Sync Automático Pós-Merge**: Uma vez que o PR for merged, execute automaticamente:
-    ```bash
-    /git/sync
-    ```
-    Este comando agora inclui:
-    - 🤖 **GitFlow Analysis** com @gitflow-specialist 
-    - ⚡ **Performance otimizada** (cache + operações paralelas)
-    - 🧹 **Cleanup inteligente** baseado na estratégia GitFlow
-    - 📁 **Session management** automático com archiving
-    - 🔗 **Task Manager auto-update** para status "Done" (no provider configurado em `TASK_MANAGER_PROVIDER`)
-    
-    O sync será executado automaticamente com a estratégia otimizada baseada no tipo de branch e workflow detectado.
-
-REGRA DE OURO: Sempre faça commit APENAS dos arquivos que você alterou. SE houver mais arquivos, pergunte ao usuário se eels devem ser incluidos. Não use `git add .` para prevenir commits de arquivos que não deveriam ser commitados, a não ser que o usuario confirme.
-
-Seu output final deve ser uma mensagem para o usuário, formatada da seguinte forma:
+Seu output final deve ser:
 
 <task_completion_message>
 Tarefa completada:
-- Testes estão passando
+- Testes passando
 - Mudanças commitadas
-- Task [INSERT TASK ID] movida para "in progress" com tag "under-review" no Task Manager configurado ([INSERT PROVIDER])
-- PR aberto: [INSERT PR TITLE]
-- Comentários do code review automatizado abordados e correções pushed
-- 🤖 GitFlow integration: Auto-sync configurado para pós-merge
+- Task [TASK ID] movida para "in progress" + tag "under-review" no Task Manager ([PROVIDER]) via adapter
+- PR aberto via forge adapter: [PR TITLE]
+- Comentários do code review automatizado abordados e pushed
 
-O PR está agora pronto para sua revisão final e merge manual.
+O PR está pronto para revisão final e merge manual.
 
-🚀 APÓS O MERGE: O comando `/git/sync` será executado automaticamente com:
-   ∟ GitFlow analysis via @gitflow-specialist
-   ∟ Performance otimizada (cache + operações paralelas)
-   ∟ Cleanup inteligente baseado na estratégia GitFlow
-   ∟ Session archiving automático
-   ∟ Task Manager auto-update para status "Done" (provider configurado em TASK_MANAGER_PROVIDER)
+🚀 APÓS O MERGE: `/git/sync` será executado (cleanup + session archiving + task → "done" via adapter, conforme a matriz de proteção da KB).
 
-[INSERT PR LINK]
+[PR LINK]
 </task_completion_message>
 
+## 📚 Referências
+
+- Forge (PR, review, CI): [utils/forge/interface.md](../../utils/forge/interface.md)
+- Sync de task: [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
+- Motor GitFlow (branch, sync): [gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md)
+- Mentor: `@gitflow-specialist`

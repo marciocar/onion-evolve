@@ -60,7 +60,7 @@ Claude Code Commands são comandos personalizados executados no **chat da Claude
 **✅ Como Funciona:**
 ```markdown
 # No chat da Claude Code:
-/git/feature/start "login"     # ✅ CORRETO
+/git:flow feature start "login"     # ✅ CORRETO
 /engineer/work "implement API" # ✅ CORRETO
 /product/task "add dashboard"  # ✅ CORRETO
 ```
@@ -68,7 +68,7 @@ Claude Code Commands são comandos personalizados executados no **chat da Claude
 **❌ O Que NÃO É:**
 ```bash
 # NO TERMINAL - NÃO FUNCIONA:
-$ /git/feature/start           # ❌ Comando não encontrado
+$ /git:flow feature start           # ❌ Comando não encontrado
 $ ./engineer/work              # ❌ Não é executável
 ```
 
@@ -300,7 +300,7 @@ Após o diálogo, construa o comando seguindo esta estrutura:
 /categoria/sub-categoria/comando
 
 Exemplos:
-✅ /git/feature/start
+✅ /git:flow feature start
 ✅ /engineer/work
 ✅ /product/task
 ✅ /compliance/audit/iso27001

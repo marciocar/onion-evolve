@@ -30,8 +30,7 @@ related_agents:
 
 related_commands:
   - /git/init
-  - /git/feature/start
-  - /git/release/start
+  - /git/flow
 
 version: "3.0.0"
 updated: "2025-11-24"
@@ -60,12 +59,12 @@ O Sistema Onion agora oferece **comandos Gitflow automatizados** que executam os
 #### **Para EXECUÇÃO rápida e automatizada:**
 - `/git/help` - Sistema de ajuda e referência
 - `/git/init` - Setup automático Gitflow  
-- `/git/feature/start` - Criar feature backlog ClickUp
-- `/git/feature/finish` - Merge + cleanup automático
-- `/git/release/start` - Release + versionamento semântico
-- `/git/release/finish` - Deploy production + tags
-- `/git/hotfix/start` - Emergency setup < 2h SLA
-- `/git/hotfix/finish` - Deploy crítico emergencial  
+- `/git:flow feature start` - Criar feature backlog ClickUp
+- `/git:flow feature finish` - Merge + cleanup automático
+- `/git:flow release start` - Release + versionamento semântico
+- `/git:flow release finish` - Deploy production + tags
+- `/git:flow hotfix start` - Emergency setup < 2h SLA
+- `/git:flow hotfix finish` - Deploy crítico emergencial  
 - `/engineer/hotfix` - Workflow híbrido completo
 - `/git/sync` - Pós-merge synchronization
 
