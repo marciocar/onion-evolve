@@ -117,7 +117,10 @@ DESENVOLVIMENTO          ←→          TESTE                    QA POINTS
 
 #### **3. QA Story Points**
 
-> Para cálculo detalhado de QA Story Points (fórmula, escala de horas, breakdown por perspectiva e integração com task manager), use `/validate/qa-points/estimate`.
+Fórmula resumida: `QA Points = Complexidade Base + Ajuste de Risco + Ajuste de Tipo`
+(simples 1-2 · médio 3-5 · complexo 5-8 · épico 8-13; risco +0-4; tipo +1-5)
+
+> Para cálculo completo (tabelas determinísticas, keywords, breakdown por perspectiva, integração com task manager), use `/validate/qa-points/estimate`.
 
 **Sempre referencie:** Seção "QA Story Points - Sistema de Estimativa" ao estimar esforço.
 
