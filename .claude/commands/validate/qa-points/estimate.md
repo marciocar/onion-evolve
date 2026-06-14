@@ -5,6 +5,7 @@ description: |
   Use para estimar esforço de teste com precisão, incluindo breakdown por perspectiva e sugestões de técnicas.
   Integra com task managers para atualizar story points automaticamente.
 model: sonnet
+allowed-tools: Read
 
 parameters:
   - name: task-description

@@ -4,8 +4,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Criado** | 2025-11-24 |
+| **Última Atualização** | 2026-06-14 |
 | **Categoria** | Architecture |
 | **Tags** | `task-manager`, `adapter-pattern`, `abstraction` |
 
@@ -13,7 +14,7 @@
 
 ## 🎯 Visão Geral
 
-O **Task Manager Abstraction** é uma camada de abstração que permite ao Sistema Onion funcionar com diferentes gerenciadores de tarefas (ClickUp, Asana, Linear) sem modificar comandos ou agentes.
+O **Task Manager Abstraction** é uma camada de abstração que permite ao Sistema Onion funcionar com diferentes gerenciadores de tarefas (ClickUp, Asana, Jira, Linear) sem modificar comandos ou agentes.
 
 ### Problema Resolvido
 
@@ -35,32 +36,33 @@ Uma camada de abstração baseada no **Adapter Pattern** que:
 ## 🏗️ Arquitetura
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    COMANDOS ONION                           │
-│  /product/task  │  /engineer/start  │  /engineer/work       │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    ABSTRACTION LAYER                        │
+┌──────────────────────────────────────────────────────────────┐
+│                     COMANDOS ONION                           │
+│   /product/task  │  /engineer/start  │  /engineer/work       │
+└─────────────────────────┬────────────────────────────────────┘
+                          │
+                          ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    ABSTRACTION LAYER                         │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
 │  │   Factory   │→ │  Detector   │→ │  Interface  │          │
 │  └─────────────┘  └─────────────┘  └─────────────┘          │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-         ┌───────────────┼───────────────┬───────────────┐
-         ▼               ▼               ▼               ▼
-┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
-│   ClickUp   │  │   Asana     │  │   Linear    │  │    None     │
-│   Adapter   │  │   Adapter   │  │   (Stub)    │  │   Adapter   │
-└─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘
-         │               │               │               │
-         ▼               ▼               ▼               ▼
-┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐
-│  ClickUp    │  │   Asana     │  │   Linear    │  │    Local    │
-│    MCP      │  │    MCP      │  │    API      │  │   (Offline) │
-└─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘
+└─────────────────────────┬────────────────────────────────────┘
+                          │
+     ┌──────────┬─────────┼──────────┬──────────┬──────────┐
+     ▼          ▼         ▼          ▼          ▼          ▼
+┌─────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+│ClickUp  │ │ Asana  │ │  Jira  │ │ Linear │ │  None  │
+│ Adapter │ │Adapter │ │Adapter │ │Adapter │ │Adapter │
+└────┬────┘ └───┬────┘ └───┬────┘ └───┬────┘ └───┬────┘
+     ▼          ▼          ▼          ▼          ▼
+ REST API    REST API   REST API   REST API  (offline)
+(MCP opt.)  (MCP opt.)
 ```
+
+**Doutrina de transporte**: API-first. MCP é transporte opcional (via
+`TASK_MANAGER_TRANSPORT=mcp`), não o default. Ver
+[integrations.md](../../../docs/meta-specs/integrations.md).
 
 ---
 
@@ -146,7 +148,7 @@ JIRA_EMAIL=voce@empresa.com
 JIRA_API_TOKEN=ATATT3xFfGF0...
 JIRA_PROJECT_KEY=PROJ
 
-# Linear (futuro)
+# Linear
 LINEAR_API_KEY=lin_api_xxxxx
 LINEAR_DEFAULT_TEAM=abc123
 ```
@@ -169,15 +171,15 @@ const taskManager = getTaskManager();
 
 A abstração usa 7 status genéricos que são mapeados para cada provedor:
 
-| Status Normalizado | ClickUp | Asana | Linear |
-|--------------------|---------|-------|--------|
-| `backlog` | Open | - | Backlog |
-| `todo` | To Do | - | Todo |
-| `in_progress` | In Progress | In Progress | In Progress |
-| `in_review` | In Review | - | In Review |
-| `done` | Done/Complete | Completed | Done |
-| `cancelled` | Closed | - | Cancelled |
-| `blocked` | Blocked | On Hold | - |
+| Status Normalizado | ClickUp | Asana | Jira | Linear |
+|--------------------|---------|-------|------|--------|
+| `backlog` | Open | - | Backlog | Backlog |
+| `todo` | To Do | - | To Do | Todo |
+| `in_progress` | In Progress | In Progress | In Progress | In Progress |
+| `in_review` | In Review | - | In Review | In Review |
+| `done` | Done/Complete | Completed | Done | Done |
+| `cancelled` | Closed | - | Closed | Cancelled |
+| `blocked` | Blocked | On Hold | Blocked | - |
 
 ---
 
@@ -318,20 +320,20 @@ Provedor configurado: clickup
 
 ## 📊 Cobertura de Métodos
 
-| Método | ClickUp | Asana | Linear |
-|--------|---------|-------|--------|
-| `createTask` | ✅ | ✅ | 📝 |
-| `getTask` | ✅ | ✅ | 📝 |
-| `updateTask` | ✅ | ✅ | 📝 |
-| `deleteTask` | ✅ | ✅ | 📝 |
-| `createSubtask` | ✅ | ✅ | 📝 |
-| `getSubtasks` | ✅ | ✅ | 📝 |
-| `addComment` | ✅ | ✅ | 📝 |
-| `getComments` | ✅ | ✅ | 📝 |
-| `updateStatus` | ✅ | ✅ | 📝 |
-| `searchTasks` | ✅ | ✅ | 📝 |
+| Método | ClickUp | Asana | Jira | Linear |
+|--------|---------|-------|------|--------|
+| `createTask` | ✅ | ✅ | ✅ | ✅ |
+| `getTask` | ✅ | ✅ | ✅ | ✅ |
+| `updateTask` | ✅ | ✅ | ✅ | ✅ |
+| `deleteTask` | ✅ | ✅ | ✅ | ✅ |
+| `createSubtask` | ✅ | ✅ | ✅ | ✅ |
+| `getSubtasks` | ✅ | ✅ | ✅ | ✅ |
+| `addComment` | ✅ | ✅ | ✅ | ✅ |
+| `getComments` | ✅ | ✅ | ✅ | ✅ |
+| `updateStatus` | ✅ | ✅ | ✅ | ✅ |
+| `searchTasks` | ✅ | ✅ | ✅ | ✅ |
 
-✅ Implementado | 📝 Stub (documentado)
+✅ Implementado
 
 ---
 
