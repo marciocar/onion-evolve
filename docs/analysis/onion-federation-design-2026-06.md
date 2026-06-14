@@ -1,5 +1,7 @@
 # 🧅 Onion Federation — Design + Backlog (Orquestração Multi-Repo Contract-Safe)
 
+> **⚠️ SUPERSEDED (2026-06-14):** esta é a **v1 (topologia hub)**. Após a [review adversarial](onion-federation-design-review-2026-06.md) (24/36 achados; SA-3 spike não-verificado, SA-1 viola meta-spec L0) e decisão do usuário (topologia peer + comunicação simplificada), o design vigente passou a ser **[onion-federation-design-v2-2026-06.md](onion-federation-design-v2-2026-06.md)**. Este v1 fica como **trilha de racional do pivô** — não executar.
+>
 > **Status:** efêmero / forward-looking (segue [analysis/README.md](README.md)) — **design e backlog** de uma capacidade nova, pronto para a próxima `/meta:evolve` (ou execução manual faseada) consumir. Remover/curar após executado; as conclusões duradouras migram para a KB `multi-repo-federation.md` e a meta-spec do formato de contrato (criadas na execução).
 >
 > **Data:** 2026-06-14 · **Origem:** pedido do usuário ("próxima auto-evolução") · **Pesquisa:** 3 Explore agents sobre frota/evolve, onboarding/forge, identidade/SDAAL.
