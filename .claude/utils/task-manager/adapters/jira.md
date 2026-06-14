@@ -2,9 +2,11 @@
 
 ## 🎯 Propósito
 
-Implementação completa do `ITaskManager` para Jira (Cloud e Server/DC) usando a REST API v3 da Atlassian. Funciona standalone via `fetch`, sem dependência de MCP.
+Implementação completa do `ITaskManager` para Jira (Cloud e Server/DC). É uma instância concreta do padrão **SDAAL** (Specification-Driven AI Abstraction Layer) — consulte [`docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md`](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md) para o contrato arquitetural pai.
 
-> ✅ **Completo**: Todos os métodos do `ITaskManager` estão implementados. Suporta Jira Cloud, Server e Data Center.
+**Transporte**: REST API é o **padrão e preferencial** (`TASK_MANAGER_TRANSPORT=api`, default). Atlassian MCP é **opcional e ativável** via `TASK_MANAGER_TRANSPORT=mcp` — quando configurado, o adapter delega para as ferramentas `mcp__claude_ai_Atlassian__*`; caso contrário, cai automaticamente para API.
+
+> ✅ **Completo**: Todos os métodos do `ITaskManager` estão implementados. Suporta Jira Cloud (REST v3), Server e Data Center (REST v2).
 
 ---
 
@@ -22,6 +24,9 @@ JIRA_API_TOKEN=ATATT3xFfGF0...            # API Token (Cloud) ou Personal Access
 JIRA_PROJECT_KEY=PROJ                     # Project key padrão para novas issues
 JIRA_AUTH_TYPE=basic                      # basic (Cloud, default) | bearer (Server/DC com PAT)
 JIRA_API_VERSION=3                        # 3 (Cloud, default) | 2 (Server antigo)
+
+# Transporte (padrão: api)
+TASK_MANAGER_TRANSPORT=api                # api (default, REST direto via fetch) | mcp (Atlassian MCP, requer configuração)
 ```
 
 ### Obter Token
@@ -64,12 +69,14 @@ Authorization: Bearer {api_token}
 
 ```typescript
 /**
- * Adapter Jira implementando ITaskManager.
- * Usa Jira REST API v3 (Cloud) ou v2 (Server/DC) via fetch direto.
+ * Adapter Jira implementando ITaskManager (padrão SDAAL).
+ *
+ * Transporte padrão: Jira REST API v3 (Cloud) ou v2 (Server/DC) via fetch direto.
+ * Transporte opcional: Atlassian MCP (ativar com TASK_MANAGER_TRANSPORT=mcp).
  *
  * Suporte:
- * - Jira Cloud (Basic Auth com email + API token)
- * - Jira Server/Data Center (Bearer Token com PAT)
+ * - Jira Cloud (Basic Auth com email + API token; REST v3)
+ * - Jira Server/Data Center (Bearer Token com PAT; REST v2)
  */
 class JiraAdapter implements ITaskManager {
   readonly provider: TaskManagerProvider = 'jira';
@@ -820,6 +827,7 @@ const inProgress = await tm.searchTasks({
 1. **Configurar `.env`**:
    ```bash
    TASK_MANAGER_PROVIDER=jira
+   TASK_MANAGER_TRANSPORT=api          # api (default) | mcp
    JIRA_HOST=suaempresa.atlassian.net
    JIRA_EMAIL=voce@suaempresa.com
    JIRA_API_TOKEN=ATATT3xFfGF0...
@@ -841,15 +849,22 @@ const inProgress = await tm.searchTasks({
 
 ---
 
-## 🔌 Alternativa via Atlassian MCP
+## 🔌 Transporte: API (default) vs MCP (opcional)
 
-Claude Code também oferece um **MCP server oficial da Atlassian** que pode substituir o `fetch` direto. Para usar:
+O adapter suporta dois transportes, controlados por `TASK_MANAGER_TRANSPORT` no `.env`:
 
-1. Configurar MCP: `claude mcp add atlassian` (ou via interface)
-2. Autenticar: ferramentas `mcp__claude_ai_Atlassian__authenticate` e `mcp__claude_ai_Atlassian__complete_authentication`
-3. Substituir as chamadas `this.rest(...)` por `mcp_atlassian_*` correspondentes
+| `TASK_MANAGER_TRANSPORT` | Transporte | Quando usar |
+|--------------------------|------------|-------------|
+| `api` (**default**) | REST direto via `fetch` — `https://{JIRA_HOST}/rest/api/{version}/` | Automação, CI/CD, uso geral — sem dependências externas |
+| `mcp` | Atlassian MCP (`mcp__claude_ai_Atlassian__*`) | Ambientes interativos com MCP já configurado; OAuth gerenciado pelo servidor |
 
-Vantagem: OAuth gerenciado, sem `.env` para tokens. Desvantagem: requer MCP configurado, menos portável que REST direto.
+**Regra de fallback**: se `TASK_MANAGER_TRANSPORT=mcp` mas o servidor Atlassian MCP não estiver disponível, o adapter cai automaticamente para `api`.
+
+### Ativar MCP (quando necessário)
+
+1. Configurar o servidor: `claude mcp add atlassian` (ou via interface Claude Code)
+2. Autenticar via `mcp__claude_ai_Atlassian__authenticate` + `mcp__claude_ai_Atlassian__complete_authentication`
+3. Definir `TASK_MANAGER_TRANSPORT=mcp` no `.env`
 
 ---
 
@@ -862,9 +877,11 @@ Vantagem: OAuth gerenciado, sem `.env` para tokens. Desvantagem: requer MCP conf
 - [Personal Access Tokens (Server/DC)](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html)
 - [Interface ITaskManager](../interface.md)
 - [Types](../types.md)
+- [Padrão SDAAL](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
 
 ---
 
-**Versão**: 1.0.0
+**Versão**: 1.1.0
 **Criado em**: 2026-05-15
+**Atualizado em**: 2026-06-13
 **Status**: ✅ Implementação completa

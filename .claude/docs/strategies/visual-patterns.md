@@ -297,7 +297,7 @@ Use checkboxes para rastreamento:
 ## 📚 Relacionado
 
 - **Padrões de Formatação ClickUp**: `.claude/commands/common/prompts/clickup-patterns.md`
-- **Abstrações MCP**: `.claude/utils/clickup-mcp-wrappers.md`
+- **Adapter ClickUp**: `.claude/utils/task-manager/adapters/clickup.md` (API-first; MCP opcional)
 
 ---
 

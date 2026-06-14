@@ -72,7 +72,7 @@ Todos os padrões seguem a mesma arquitetura:
 |----------|--------|--------------|
 | ClickUp | ✅ Completo | `TASK_MANAGER_PROVIDER=clickup` |
 | Asana | ✅ Completo | `TASK_MANAGER_PROVIDER=asana` |
-| Linear | 📝 Stub | `TASK_MANAGER_PROVIDER=linear` |
+| Linear | ✅ Completo | `TASK_MANAGER_PROVIDER=linear` |
 | Jira | 🔮 Futuro | `TASK_MANAGER_PROVIDER=jira` |
 
 ### Interface Principal

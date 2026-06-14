@@ -77,7 +77,7 @@ Uma camada de abstração baseada no **Adapter Pattern** que:
     ├── clickup.md      # Adapter ClickUp (completo)
     ├── asana.md        # Adapter Asana (completo)
     ├── jira.md         # Adapter Jira (completo, REST API)
-    └── linear.md       # Adapter Linear (stub)
+    └── linear.md       # Adapter Linear (API-first; MCP opcional)
 ```
 
 ---

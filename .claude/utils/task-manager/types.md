@@ -15,6 +15,18 @@ Define os tipos TypeScript compartilhados entre todos os adapters, garantindo co
 type TaskManagerProvider = 'clickup' | 'asana' | 'jira' | 'linear' | 'none';
 
 /**
+ * Transporte usado pelo adapter para se comunicar com o provider.
+ *
+ * 'api' (default) — REST API direta; sempre disponível.
+ * 'mcp'           — MCP server do provider; ativado via
+ *                   TASK_MANAGER_TRANSPORT=mcp apenas quando o provider
+ *                   suporta MCP (clickup, linear). Cai para 'api' nos demais.
+ *
+ * Controlado por: TASK_MANAGER_TRANSPORT (valores: 'api' | 'mcp'; default 'api').
+ */
+type TaskManagerTransport = 'api' | 'mcp';
+
+/**
  * Status genéricos (mapeados internamente por cada adapter).
  */
 type TaskStatus = 
@@ -314,16 +326,24 @@ interface ProjectOutput {
 interface ProviderConfig {
   /** Nome do provedor */
   provider: TaskManagerProvider;
-  
+
+  /**
+   * Transporte efetivo escolhido pelo detector.
+   * Reflete TASK_MANAGER_TRANSPORT; o adapter cai para 'api' em runtime quando o
+   * servidor MCP do provider não está disponível. Adapters devem consultar este
+   * campo — nunca ler a env var diretamente — para garantir o fallback correto.
+   */
+  transport: TaskManagerTransport;
+
   /** Se está configurado corretamente */
   isConfigured: boolean;
-  
+
   /** Variáveis de ambiente obrigatórias */
   requiredEnvVars: string[];
-  
+
   /** Variáveis de ambiente opcionais */
   optionalEnvVars: string[];
-  
+
   /** Mensagem de erro se não configurado */
   errorMessage?: string;
 }
@@ -413,6 +433,7 @@ const STATUS_MAPPING: Record<TaskManagerProvider, Record<TaskStatus, string>> = 
 
 ---
 
-**Versão**: 1.0.0
+**Versão**: 1.1.0
 **Criado em**: 2025-11-24
+**Atualizado em**: 2026-06-13
 

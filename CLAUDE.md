@@ -24,14 +24,14 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
 
 ## 🔌 Task Manager - Detecção e Roteamento
 
-O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas. Antes de operar com tasks, **sempre verifique qual provider está ativo** lendo a variável `TASK_MANAGER_PROVIDER` em `.env`.
+O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas — uma **instância do padrão SDAAL** (ver [integrations.md](docs/meta-specs/integrations.md)). Adapters são **API-first**; o MCP é um transporte **opcional**. Antes de operar com tasks, **sempre verifique qual provider está ativo** lendo `TASK_MANAGER_PROVIDER` em `.env`.
 
 ### Fluxo obrigatório antes de operar com tasks
 
 1. **Carregar** variáveis do `.env` (ex: `set -a; source .env; set +a`)
-2. **Ler** `TASK_MANAGER_PROVIDER` → valor possível: `jira` | `clickup` | `asana` | `linear` | `none`
+2. **Ler** `TASK_MANAGER_PROVIDER` (`jira` | `clickup` | `asana` | `linear` | `none`) e `TASK_MANAGER_TRANSPORT` (`api` default | `mcp` opcional)
 3. **Conferir** variáveis específicas do provider ativo (tabela abaixo)
-4. **Delegar** ao agente correto e usar formatação adequada
+4. **Delegar** ao agente correto — via API (default) ou MCP (se ativado) — e usar formatação adequada
 
 ### Mapa Provider → Variáveis → Agente → Adapter
 
@@ -49,7 +49,7 @@ O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas. Antes 
 - **Decomposição hierárquica de tasks** (agnóstico) → `@task-specialist`
 - **Operação técnica do provider ativo** → especialista do provider:
   - `jira` → `@jira-specialist` (JQL, ADF, transitions, bulk, sprints/boards)
-  - `clickup` → `@clickup-specialist` (MCP, listas, custom fields, comentários Unicode)
+  - `clickup` → `@clickup-specialist` (API-first; MCP opcional, listas, custom fields, comentários Unicode)
 - **Sem provider configurado** (`none`) → operar offline com `@task-specialist`; **não** tentar API calls
 
 ### Fallback gracioso
