@@ -114,7 +114,6 @@ Comandos devem residir em uma das categorias abaixo. Categorias com asterisco re
 | `test/` | Estratégias de teste (unit, integration, e2e) | 3 |
 | `development/` | Comandos de desenvolvimento específicos | 1+ |
 | `quick/` | Análises pontuais rápidas | 1+ |
-| `global/` | Comandos transversais | 1+ |
 | (root) | `onion.md` e `warm-up.md` — pontos de entrada | 2 |
 
 Categorias podem ter subdiretórios quando agrupam variantes (ex: `validate/test-strategy/`, `validate/qa-points/`). Subdiretórios são para **variantes genuinamente distintas**; **não** para fases/verbos de um mesmo fluxo — estas devem ser argumentos de um dispatcher (ver §4.1, padrão `/git:flow`).

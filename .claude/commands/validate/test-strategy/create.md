@@ -1,5 +1,5 @@
 ---
-name: test-strategy-create
+name: create
 description: |
   Cria estratégias completas de teste baseadas no Framework de Testes.
   Use para gerar estratégias multi-perspectiva (White-box, Grey-box, Black-box) com cálculo automático de QA Story Points.

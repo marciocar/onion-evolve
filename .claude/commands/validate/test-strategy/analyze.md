@@ -1,5 +1,5 @@
 ---
-name: test-strategy-analyze
+name: analyze
 description: |
   Analisa estratégias de teste existentes e sugere melhorias baseadas no Framework de Testes.
   Use para auditar conformidade, identificar gaps e otimizar estratégias de teste com base no framework.

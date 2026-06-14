@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Arquitetura do Sistema Onion
 date: 2026-05-18
-version: 1.0.0
+version: 1.1.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -56,7 +56,6 @@ CONTRIBUTING.md             # Guidelines para evolução
 │   ├── docs/               # Geração e validação de documentação
 │   ├── engineer/           # Workflow faseado de implementação
 │   ├── git/                # GitFlow (feature/, hotfix/, release/)
-│   ├── global/             # Comandos transversais
 │   ├── meta/               # Criação de artefatos do Onion
 │   ├── product/            # Workflow faseado de descoberta e spec
 │   ├── quick/              # Análises pontuais
@@ -75,8 +74,10 @@ CONTRIBUTING.md             # Guidelines para evolução
 ├── sessions/               # Estado persistente de workflows faseados
 │   └── <feature>/          # Por feature em desenvolvimento
 │
-├── utils/                  # Abstrações e utilitários
-│   └── task-manager/       # Task Manager Abstraction (factory, interface, types, detector, adapters/)
+├── utils/                  # Abstrações e utilitários (SDAAL)
+│   ├── task-manager/       # Task Manager Abstraction (factory, interface, types, detector, adapters/)
+│   ├── forge/              # Forge Abstraction — PR/review/CI/Release no host remoto (GitHub; gh-first, REST fallback)
+│   └── date-time-standards.md  # Padrões de data/hora
 │
 ├── rules/                  # Regras complementares (opcional)
 ├── docs/                   # Documentação interna do .claude/ (opcional)
@@ -168,7 +169,7 @@ graph TD
     Commands[commands/*]
     Agents[agents/*]
     Skills[skills/*]
-    Utils[utils/task-manager]
+    Utils[utils/* — task-manager + forge]
     Docs[docs/knowledge-base/*]
     Sessions[sessions/*]
 

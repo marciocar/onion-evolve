@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões para Agentes do Sistema Onion
 date: 2026-05-18
-version: 1.1.0
+version: 1.1.1
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -75,7 +75,7 @@ Agentes devem residir em uma das **9 categorias** abaixo. Criação de nova cate
 | `product/` | Discovery, especificação, decomposição, branding, reuniões | `product-agent`, `task-specialist`, `extract-meeting-specialist` |
 | `compliance/` | Frameworks regulatórios, segurança, governança | `iso-27001-specialist`, `soc2-specialist`, `pmbok-specialist` |
 | `meta/` | Criação, validação e orquestração de artefatos do próprio Onion | `command-creator-specialist`, `agent-creator-specialist`, `metaspec-gate-keeper`, `onion` |
-| `git/` | GitFlow, code review, branch-specific tasks | `gitflow-specialist`, `code-reviewer`, `branch-code-reviewer` |
+| `git/` | GitFlow, code review, branch-specific tasks | `gitflow-specialist`, `branch-code-reviewer` |
 | `testing/` | Estratégia, planejamento e implementação de testes | `test-agent`, `test-engineer`, `test-planner` |
 | `review/` | Code review pós-implementação | `code-reviewer` |
 | `research/` | Pesquisa multi-fonte, análise semântica | `research-agent` |

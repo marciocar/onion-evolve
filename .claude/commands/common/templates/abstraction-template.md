@@ -391,7 +391,7 @@ class NoProviderAdapter implements {{InterfaceName}} {
 
 - [SDAAL Pattern](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
 - [Task Manager (Exemplo)](../../../utils/task-manager/)
-- [Comando create-abstraction](../meta/create-abstraction.md)
+- [Comando create-abstraction](../../meta/create-abstraction.md)
 
 ---
 

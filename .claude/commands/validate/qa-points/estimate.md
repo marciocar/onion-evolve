@@ -1,5 +1,5 @@
 ---
-name: qa-points-estimate
+name: estimate
 description: |
   Calcula QA Story Points usando a fórmula exata do Framework de Testes.
   Use para estimar esforço de teste com precisão, incluindo breakdown por perspectiva e sugestões de técnicas.
