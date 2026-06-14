@@ -1,7 +1,7 @@
 ---
 title: "Referência Completa de Ferramentas"
 description: "Todas as ferramentas do Sistema Onion organizadas por categoria"
-last_updated: "2025-10-03"
+last_updated: "2026-06-14"
 category: "onion"
 tags: [tools, reference, onion, esperanto, ai-agents]
 ---
@@ -22,12 +22,6 @@ Este documento lista todas as ferramentas disponíveis no sistema Onion em forma
 - [✅ Gestão de Tarefas](#-gestão-de-tarefas)
 - [🔌 MCP Resources](#-mcp-resources)
 - [📋 ClickUp MCP](#-clickup-mcp-gestão-de-projetos)
-- [📚 Context7 MCP](#-context7-mcp-documentação)
-- [🧭 Sequential Thinking MCP](#-sequential-thinking-mcp-análise-complexa)
-- [💻 Code Understanding MCP](#-code-understanding-mcp-análise-de-repositórios)
-- [🕷️ Firecrawl MCP](#️-firecrawl-mcp-web-scraping)
-- [🖥️ Chrome DevTools MCP](#️-chrome-devtools-mcp-automação-browser)
-- [⚙️ NX Extension MCP](#️-nx-extension-mcp-framework-nx)
 - [🌿 Comandos Git Gitflow](#-comandos-git-gitflow)
 
 ---
@@ -653,348 +647,25 @@ function mcp_clickup_resolve_assignees(
 
 ---
 
-## 📚 Context7 MCP (Documentação)
-
-### `mcp_context7_resolve_library_id`
-```typescript
-function mcp_context7_resolve_library_id(
-  libraryName: string
-): Promise<LibraryResolution>
-```
-**Propósito**: Resolução de nomes de bibliotecas para IDs compatíveis com Context7
-
-**Uso obrigatório**: Deve ser chamado antes de `get_library_docs` para obter ID válido
-
-### `mcp_context7_get_library_docs`
-```typescript
-function mcp_context7_get_library_docs(
-  context7CompatibleLibraryID: string, // ex: "/mongodb/docs", "/vercel/next.js"
-  tokens?: number, // máximo de tokens (default: 10000)
-  topic?: string // foco específico, ex: "hooks", "routing"
-): Promise<LibraryDocs>
-```
-**Propósito**: Obtenção de documentação atualizada de bibliotecas
-
----
-
-## 🧭 Sequential Thinking MCP (Análise Complexa)
-
-### `mcp_sequential_thinking_sequentialthinking`
-```typescript
-function mcp_sequential_thinking_sequentialthinking(
-  thought: string,
-  nextThoughtNeeded: boolean,
-  thoughtNumber: number,
-  totalThoughts: number,
-  isRevision?: boolean,
-  revisesThought?: number,
-  branchFromThought?: number,
-  branchId?: string,
-  needsMoreThoughts?: boolean
-): Promise<ThinkingResult>
-```
-**Propósito**: Ferramenta de resolução de problemas dinâmica e reflexiva
-
-**Características únicas**:
-- Processo de pensamento adaptável que evolui
-- Suporte a revisão e branching de pensamentos
-- Geração e verificação de hipóteses
-- Controle dinâmico de total de pensamentos
-
-**Quando usar**:
-- Problemas complexos multi-etapas
-- Planejamento e design com necessidade de revisão
-- Análise que pode precisar de correção de curso
-- Problemas onde o escopo completo não é claro inicialmente
-
----
-
-## 💻 Code Understanding MCP (Análise de Repositórios)
-
-### Gestão de Repositórios
-```typescript
-// Status sem operações
-function mcp_code_understanding_get_repo_status(
-  repo_path: string,
-  branch?: string,
-  cache_strategy?: "shared" | "per-branch"
-): Promise<RepoStatus>
-
-// Listar repositórios em cache
-function mcp_code_understanding_list_repos(
-  random_string: string
-): Promise<RepoList>
-
-// Listar branches de repositório
-function mcp_code_understanding_list_repository_branches(
-  repo_url: string
-): Promise<BranchList>
-
-// Clonar/inicializar repositório
-function mcp_code_understanding_clone_repo(
-  url: string,
-  branch?: string,
-  cache_strategy?: "shared" | "per-branch"
-): Promise<CloneResult>
-
-// Atualizar repositório (manual apenas)
-function mcp_code_understanding_refresh_repo(
-  repo_path: string,
-  branch?: string,
-  cache_strategy?: string
-): Promise<RefreshResult>
-
-// Deletar repositório do cache
-function mcp_code_understanding_delete_repo(
-  repo_identifier: string
-): Promise<DeleteResult>
-```
-
-### Análise de Conteúdo
-```typescript
-// Obter arquivos ou listagem
-function mcp_code_understanding_get_repo_file_content(
-  repo_path: string,
-  resource_path?: string,
-  branch?: string,
-  cache_strategy?: string
-): Promise<FileContent>
-
-// Mapa semântico do código
-function mcp_code_understanding_get_source_repo_map(
-  repo_path: string,
-  max_tokens?: number,
-  files?: string[],
-  directories?: string[],
-  branch?: string,
-  cache_strategy?: string
-): Promise<RepoMap>
-
-// Estrutura de diretórios
-function mcp_code_understanding_get_repo_structure(
-  repo_path: string,
-  directories?: string[],
-  include_files?: boolean,
-  branch?: string,
-  cache_strategy?: string
-): Promise<RepoStructure>
-
-// Arquivos mais importantes
-function mcp_code_understanding_get_repo_critical_files(
-  repo_path: string,
-  directories?: string[],
-  files?: string[],
-  limit?: number,
-  include_metrics?: boolean
-): Promise<CriticalFiles>
-
-// Documentação do repositório
-function mcp_code_understanding_get_repo_documentation(
-  repo_path: string
-): Promise<Documentation>
-```
-
-**Estratégias de Cache**:
-- `shared` (padrão): Um cache por repo, pode alternar branches
-- `per-branch`: Cache separado por branch, útil para comparar branches
-
----
-
-## 🕷️ Firecrawl MCP (Web Scraping)
-
-### Operações Básicas
-```typescript
-// Scrape de página única
-function mcp_firecrawl_scrape(
-  url: string,
-  formats?: ("markdown" | "html" | "rawHtml" | "screenshot" | "links" | "summary")[],
-  maxAge?: number, // cache em ms
-  onlyMainContent?: boolean,
-  includeTags?: string[],
-  excludeTags?: string[],
-  waitFor?: number,
-  mobile?: boolean,
-  actions?: Action[], // click, wait, scroll, etc.
-  location?: { country?: string; languages?: string[] },
-  removeBase64Images?: boolean,
-  skipTlsVerification?: boolean,
-  storeInCache?: boolean
-): Promise<ScrapeResult>
-
-// Mapear website
-function mcp_firecrawl_map(
-  url: string,
-  search?: string,
-  limit?: number,
-  includeSubdomains?: boolean,
-  ignoreQueryParameters?: boolean,
-  sitemap?: "include" | "skip" | "only"
-): Promise<UrlMap>
-
-// Busca na web com scraping
-function mcp_firecrawl_search(
-  query: string,
-  limit?: number,
-  sources?: { type: "web" | "images" | "news" }[],
-  filter?: string,
-  location?: string,
-  tbs?: string,
-  scrapeOptions?: ScrapeOptions
-): Promise<SearchResults>
-```
-
-### Crawling Avançado
-```typescript
-// Iniciar crawling
-function mcp_firecrawl_crawl(
-  url: string,
-  limit?: number,
-  maxDiscoveryDepth?: number,
-  allowExternalLinks?: boolean,
-  allowSubdomains?: boolean,
-  crawlEntireDomain?: boolean,
-  deduplicateSimilarURLs?: boolean,
-  delay?: number,
-  maxConcurrency?: number,
-  includePaths?: string[],
-  excludePaths?: string[],
-  ignoreQueryParameters?: boolean,
-  sitemap?: "skip" | "include" | "only",
-  scrapeOptions?: ScrapeOptions,
-  prompt?: string,
-  webhook?: Webhook
-): Promise<CrawlJob>
-
-// Verificar status do crawling
-function mcp_firecrawl_check_crawl_status(
-  id: string
-): Promise<CrawlStatus>
-
-// Extrair dados estruturados
-function mcp_firecrawl_extract(
-  urls: string[],
-  prompt?: string,
-  schema?: object,
-  allowExternalLinks?: boolean,
-  enableWebSearch?: boolean,
-  includeSubdomains?: boolean
-): Promise<ExtractionResult>
-```
-
-**Dica de Performance**: Use `maxAge` para scraping 500% mais rápido com cache
-
----
-
-## 🖥️ Chrome DevTools MCP (Automação Browser)
-
-### `mcp_chrome-devtools_navigate_page`
-```typescript
-function mcp_chrome-devtools_navigate_page(url: string): void
-```
-**Propósito**: Navega para URL específica no browser controlado
-
-### `mcp_chrome-devtools_take_snapshot`
-```typescript
-function mcp_chrome-devtools_take_snapshot(): PageSnapshot
-```
-**Propósito**: Captura snapshot textual da página atual com elementos identificados
-
-### `mcp_chrome-devtools_click`
-```typescript
-function mcp_chrome-devtools_click(uid: string, dblClick?: boolean): void
-```
-**Propósito**: Clica em elementos específicos da página usando UID
-
-### `mcp_chrome-devtools_fill`
-```typescript
-function mcp_chrome-devtools_fill(uid: string, value: string): void
-```
-**Propósito**: Preenche campos de formulário identificados por UID
-
-### `mcp_chrome-devtools_evaluate_script`
-```typescript
-function mcp_chrome-devtools_evaluate_script(function: string, args?: object[]): any
-```
-**Propósito**: Executa JavaScript personalizado na página atual
-
-### `mcp_chrome-devtools_take_screenshot`
-```typescript
-function mcp_chrome-devtools_take_screenshot(uid?: string, fullPage?: boolean): Image
-```
-**Propósito**: Captura screenshots da página completa ou elementos específicos
-
-**Recursos do Chrome DevTools MCP**:
--  **Automação completa** de browsers Chrome/Chromium
--  **Interação com elementos** via UID únicos
--  **Execução de JavaScript** customizado
--  **Screenshots e snapshots** para debug
--  **Navegação programática** entre páginas
--  **Preenchimento de formulários** automático
-
-**Casos de uso típicos**:
-- 🔧 **Testes E2E** automatizados
-- 📊 **Scraping inteligente** de dados
-- 🔄 **Automação de workflows** web
-- 📸 **Documentação visual** de interfaces
-- 🧪 **Validação de funcionalidades** web
-
-**Exemplo de uso**:
-```bash
-# Navegar e capturar informações
-mcp_chrome-devtools_navigate_page("https://example.com")
-mcp_chrome-devtools_take_snapshot()  # Ver elementos disponíveis
-mcp_chrome-devtools_click("button_uid_123")
-mcp_chrome-devtools_take_screenshot()  # Capturar resultado
-```
-
-**Pré-requisitos**:
--  **Node.js v22.14.0+** instalado
--  **chrome-devtools-mcp@0.4.0+** disponível via npx
--  **Browser Chrome/Chromium** instalado
-
----
-
-## ⚙️ NX Extension MCP (Framework NX)
-
-### `mcp_extension_nx_docs`
-```typescript
-function mcp_extension_nx_docs(
-  userQuery: string
-): Promise<NxDocs>
-```
-**Propósito**: Obtenção de seções de documentação relevantes do NX
-
-**Uso crítico**: SEMPRE use esta função para perguntas sobre NX. Nunca assuma conhecimento sobre NX pois pode estar desatualizado.
-
-### `mcp_extension_nx_available_plugins`
-```typescript
-function mcp_extension_nx_available_plugins(
-  random_string: string
-): Promise<PluginList>
-```
-**Propósito**: Listagem de plugins disponíveis do NX (core team + workspace local)
-
----
-
 ## 💡 Dicas de Uso das Ferramentas
 
 ### **🚀 Para Máxima Performance**
 1. **Use ferramentas paralelas**: Execute múltiplas operações read-only simultaneamente
-2. **Cache inteligente**: Aproveite `maxAge` no Firecrawl e cache strategies no Code Understanding
-3. **Bulk operations**: Prefira operações bulk do ClickUp para múltiplas tasks
-4. **Filtros server-side**: Use filtros avançados em `get_workspace_tasks`
+2. **Bulk operations**: Prefira operações bulk do ClickUp para múltiplas tasks (evita N+1 calls)
+3. **Filtros server-side**: Use filtros avançados em `get_workspace_tasks`
+4. **Field selection**: Especifique apenas campos necessários nas buscas para reduzir payload
 
 ### **🎯 Para Precisão**
 1. **Busca semântica primeiro**: Use `codebase_search` para exploração, `grep` para símbolos específicos
 2. **IDs sempre preferidos**: Use taskId/listId ao invés de nomes quando possível
-3. **Context window otimização**: Ajuste `max_tokens` e `detail_level` conforme necessidade
-4. **Validação de estados**: Use `get_repo_status` antes de operações complexas
+3. **Context window otimização**: Ajuste `limit` e `detail_level` conforme necessidade
+4. **Leitura incremental**: Use `offset`/`limit` em `read_file` para arquivos grandes
 
 ### **🔄 Para Workflows**
-1. **Sequential thinking**: Para problemas complexos que podem mudar de direção
-2. **Todo management**: Para rastreamento de progresso em tarefas multi-etapa
-3. **Memory persistence**: Para informações importantes que devem persistir entre sessões
-4. **Multi-edit atômico**: Para mudanças coordenadas em um arquivo
+1. **Todo management**: Para rastreamento de progresso em tarefas multi-etapa
+2. **Memory persistence**: Para informações importantes que devem persistir entre sessões
+3. **Multi-edit atômico**: Para mudanças coordenadas em um arquivo
+4. **Comentários em tasks**: Registre decisões técnicas e progresso via `create_task_comment`
 
 ---
 
@@ -1003,11 +674,10 @@ function mcp_extension_nx_available_plugins(
 ### **Pipeline Típico de Análise de Código**
 ```mermaid
 graph TD
-    A[clone_repo] --> B[get_repo_structure]
-    B --> C[get_repo_critical_files]
-    C --> D[get_source_repo_map]
-    D --> E[codebase_search específicos]
-    E --> F[read_file detalhes]
+    A[codebase_search exploração] --> B[grep símbolos específicos]
+    B --> C[glob_file_search padrões]
+    C --> D[read_file detalhes]
+    D --> E[MultiEdit correções]
 ```
 
 ### **Workflow de Desenvolvimento com ClickUp**
@@ -1023,10 +693,9 @@ graph TD
 ### **Pesquisa e Documentação**
 ```mermaid
 graph TD
-    A[web_search contexto] --> B[resolve_library_id]
-    B --> C[get_library_docs]
-    C --> D[write documentação]
-    D --> E[update_memory persistir]
+    A[web_search contexto] --> B[read_file referências locais]
+    B --> C[write documentação]
+    C --> D[update_memory persistir]
 ```
 
 ---

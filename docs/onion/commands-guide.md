@@ -1,21 +1,24 @@
 # 🎯 Guia Completo de Comandos
 
-> **Versão**: 4.1.0-beta.1 | **Última atualização**: 2026-05-15 | **Total**: 75 comandos (94 arquivos .md incl. templates/helpers)
+> **Versão**: 4.0 | **Última atualização**: 2026-06-14 | **Total**: 76 comandos invocáveis (94 arquivos `.md` incl. fragmentos `common/` e READMEs)
 
 Este guia documenta todos os comandos disponíveis no sistema `.claude/`, organizados por categoria e função.
 
-## 📊 Resumo v3.0
+## 📊 Resumo
 
 | Categoria | Comandos | Descrição |
 |-----------|----------|-----------|
+| `product/` | 20 | Gestão de produto |
+| `meta/` | 15 | Meta-comandos (criadores, evolução, fleet) |
+| `docs/` | 11 | Documentação |
 | `engineer/` | 11 | Fluxos de desenvolvimento |
-| `product/` | 12 | Gestão de produto |
-| `git/` | 11 | Operações Git (GitFlow) |
-| `docs/` | 10 | Documentação |
-| `meta/` | 8 | Meta-comandos (criadores) |
-| `validate/` | 1 | Validações |
+| `git/` | 6 | Operações Git (GitFlow) |
+| `validate/` | 6 | Validações (test-strategy, qa-points) |
+| `test/` | 3 | Testes |
+| `development/` | 1 | Desenvolvimento |
 | `quick/` | 1 | Ações rápidas |
-| **Total** | **56** | |
+| _root_ | 2 | `onion`, `warm-up` |
+| **Total** | **76** | Comandos invocáveis |
 
 ## 📋 Índice por Categoria
 
@@ -46,7 +49,7 @@ $ /git/init                    # Comando não encontrado
 $ ./engineer/start             # Não é executável
 ```
 
-### 🚀 **Padronização v3.0 (Novembro 2025)**
+### 🚀 **Padronização v3.0**
 **Todos os comandos foram padronizados** com:
 - Headers YAML obrigatórios (`name`, `description`, `version: "3.0.0"`)
 - Limite de 400 linhas (otimização de tokens)
