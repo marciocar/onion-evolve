@@ -33,23 +33,24 @@ O template para o plan.md é:
 
 Se você está trabalhando nesta funcionalidade, atualize este plan.md E o `STATE.md.NEXT` conforme progride (ver checkpoint em [worklog-protocol.md §7](../../../docs/knowledge-base/concepts/worklog-protocol.md)).
 
-## FASE 1 [DONE]
+> **Estado inicial:** num plano recém-criado, a Fase 1 nasce `[ACTIVE]` (igual a `STATE.md.NEXT.phase = 1`) e as demais `[TODO]`. Ao concluir uma fase, marque-a `[DONE]`, promova a próxima a `[ACTIVE]` e atualize o `STATE.md.NEXT` (transição em [worklog-protocol.md §6-7](../../../docs/knowledge-base/concepts/worklog-protocol.md)). Invariante: **exatamente uma** fase `[ACTIVE]`.
+
+## FASE 1 [ACTIVE]
 
 Detalhes desta parte da funcionalidade
-
-### Uma tarefa que foi feita [DONE]
-
-Detalhes sobre a tarefa
-
-### Comentários:
-- Algo que aconteceu e nos forçou a mudar de direção
-- Algo que aprendemos durante o desenvolvimento
-
-## FASE 2 [ACTIVE]
 
 ### Uma tarefa que precisa ser feita [ACTIVE]
 
 Detalhes sobre a tarefa
+
+### Uma tarefa que precisa ser feita [TODO]
+
+Detalhes sobre a tarefa
+
+### Comentários:
+- (preencher conforme progride) decisões, mudanças de direção, aprendizados
+
+## FASE 2 [TODO]
 
 ### Uma tarefa que precisa ser feita [TODO]
 
