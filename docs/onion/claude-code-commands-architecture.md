@@ -53,8 +53,7 @@ $ bash /git/init               # Não é script bash direto
 | 3 | **Carregamento** | File System | Lê `.claude/commands/git/init.md` |
 | 4 | **Interpretação** | Claude Code AI | Analisa workflow definido |
 | 5 | **Execução** | Scripts | Executa bash/python dentro do workflow |
-| 6 | **UX** | Modern CLI | `.claude/utils/modern-cli-ux.sh` |
-| 7 | **Feedback** | Claude Code Chat | Resposta rica e educativa |
+| 6 | **Feedback** | Claude Code Chat | Resposta rica e educativa |
 
 ---
 
@@ -130,27 +129,7 @@ User: /git/init
 ```
 
 ### 🎨 **Padrões UX**
-```bash
-# Usar funções da biblioteca UX:
-source "$HOME/.claude/utils/modern-cli-ux.sh"
-
-cli_header "TITLE" "color"          # Headers consistentes
-cli_success_box "TITLE" "message"   # Success feedback  
-cli_error_box "TITLE" "message"     # Error handling
-cli_progress_start "message"        # Progress indicators
-```
-
-### 🔗 **Integrações**
-```bash
-# ClickUp MCP
-clickup_get_task_id_from_session    # Detectar task ativa
-clickup_add_comment $TASK_ID        # Adicionar comentário
-clickup_update_task $TASK_ID        # Atualizar status
-
-# Session Management  
-session_create $NAME                # Criar sessão desenvolvimento
-session_update $NAME                # Atualizar contexto
-```
+Os comandos do Sistema Onion utilizam bibliotecas de formatação e UX integradas ao Claude Code para fornecer feedback visual consistente e educativo durante a execução dos workflows.
 
 ---
 
@@ -163,7 +142,7 @@ session_update $NAME                # Atualizar contexto
 
 ### 🎯 **Exemplos Práticos**
 - [Practical Examples](practical-examples.md)
-- [ClickUp Integration](clickup-integration.md)
+- [Task Manager Adapters](.claude/utils/task-manager/)
 - [Tools Reference](tools-reference.md)
 
 ### 🚀 **Getting Started**

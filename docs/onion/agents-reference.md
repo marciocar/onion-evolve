@@ -1,74 +1,44 @@
 # 🤖 Referência de Agentes
 
-> **Versão**: 4.1.0-beta.1 | **Última atualização**: 2026-05-15 | **Total**: 49 agentes em 9 categorias
+> **Versão**: 4.0 | **Última atualização**: 2026-06-14 | **Total**: 49 agentes em 9 categorias
 
 Este guia documenta todos os agentes especializados disponíveis no sistema `.claude/`, suas capacidades e quando utilizá-los.
 
-## 📊 Resumo v3.0
+## 📊 Resumo
 
 | Categoria | Agentes | Descrição |
 |-----------|---------|-----------|
-| `development/` | 16 | Desenvolvimento (Python, React, Postgres, etc.) |
+| `development/` | 18 | Desenvolvimento (Python, React, Postgres, etc.) |
+| `product/` | 9 | Produto (product-agent, task-specialist, etc.) |
 | `compliance/` | 5 | Compliance e regulatório |
-| `meta/` | 4 | Meta (Onion, criadores, gate-keeper) |
-| `git/` | 4 | Git (branch review, documentation) |
-| `product/` | 3 | Produto (product-agent, task-specialist) |
+| `git/` | 5 | Git (branch review, documentation) |
+| `meta/` | 5 | Meta (Onion, criadores, gate-keeper) |
+| `testing/` | 3 | Testes (engineer, planner) |
 | `review/` | 2 | Code review |
-| `testing/` | 2 | Testes (engineer, planner) |
 | `research/` | 1 | Pesquisa |
 | `deployment/` | 1 | Deployment |
-| **Total** | **38** | |
+| **Total** | **49** | |
 
 ## 📋 Índice de Agentes
 
-- [🔵 Agentes de Desenvolvimento](#-agentes-de-desenvolvimento) (16)
-- [🔷 Agentes de Testes](#-agentes-de-testes) (2)
-- [🟢 Agentes de Review](#-agentes-de-review) (2)
-- [🟣 Agentes de Pesquisa](#-agentes-de-pesquisa) (1)
-- [🔴 Agentes Meta](#-agentes-meta) (4)
-- [🌲 Agentes Git](#-agentes-git) (4)
-- [🛡️ Agentes de Compliance](#️-agentes-de-compliance) (5)
-- [🟡 Agentes de Produto](#-agentes-de-produto) (3)
+> As contagens canônicas por categoria estão na tabela **Resumo** acima (49 agentes em 9 categorias).
+> Os títulos abaixo refletem as seções deste guia; alguns agentes podem aparecer agrupados por afinidade temática, não estritamente por diretório.
+
+- [🔵 Agentes de Desenvolvimento](#-agentes-de-desenvolvimento)
+- [🔷 Agentes de Testes](#-agentes-de-testes)
+- [🟢 Agentes de Review](#-agentes-de-review)
+- [🟣 Agentes de Pesquisa](#-agentes-de-pesquisa)
+- [🔴 Agentes de Arquitetura](#-agentes-de-arquitetura)
+- [🟠 Agentes de Documentação](#-agentes-de-documentação)
+- [🛡️ Agentes de Compliance](#️-agentes-de-compliance-)
+- [🟡 Agentes de Produto](#-agentes-de-produto)
 - [⚙️ Como Escolher o Agente Certo](#️-como-escolher-o-agente-certo)
 
 ---
 
 ## 🔵 Agentes de Desenvolvimento
 
-### **python-developer**
-**Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Blue
-
-**Especialidades**: Python idiomático, AI/ML, backend, performance, type hints
-
-**Quando usar**:
--  Desenvolvimento Python backend
--  APIs REST/GraphQL em Python
--  Projetos de Machine Learning
--  Scripts e automações Python
-
-**Ferramentas disponíveis**: `read_file`, `write`, `search_replace`, `MultiEdit`, `run_terminal_cmd`, `read_lints`, `todo_write`, `codebase_search`
-
-> 📚 **Referência Completa**: Veja todas as ferramentas em detalhes em [tools-reference.md](tools-reference.md)
-
-**Exemplo de uso**:
-```bash
-# Para desenvolver API Python
-@python-developer "Implementar endpoint de autenticação com JWT"
-
-# Para análise de dados
-@python-developer "Criar pipeline de análise para dados de vendas"
-
-# Para otimização
-@python-developer "Otimizar consultas do banco de dados na função get_users"
-```
-
-**Principais recursos**:
-- 🐍 Python idiomático e PEP-8 compliant
-- 🧪 Testes com pytest e coverage
-- 📊 Type hints para melhor IDE support
-- ⚡ Performance optimization patterns
-- 🤖 AI/ML com bibliotecas populares
-- 📦 Gerenciamento com `uv` (package manager moderno)
+> A categoria `development/` tem **18 agentes** no filesystem (ver tabela **Resumo**). Este guia destaca os mais usados; consulte `.claude/agents/development/` para a lista completa (c4-architecture-specialist, jira-specialist, linux-security-specialist, nx-monorepo-specialist, postgres-specialist, zen-engine-specialist, entre outros).
 
 ### **react-developer**
 **Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Blue
@@ -205,7 +175,7 @@ Este guia documenta todos os agentes especializados disponíveis no sistema `.cl
 ### **research-agent**
 **Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Purple
 
-**Especialidades**: Pesquisa multi-fonte, web search, Context7, análise semântica
+**Especialidades**: Pesquisa multi-fonte, web search, análise semântica
 
 **Quando usar**:
 -  Pesquisar tecnologias e bibliotecas
@@ -213,7 +183,7 @@ Este guia documenta todos os agentes especializados disponíveis no sistema `.cl
 -  Análise de concorrentes
 -  Documentação de bibliotecas específicas
 
-**Ferramentas disponíveis**: `read_file`, `codebase_search`, `web_search`, `grep`, `list_dir`, `mcp_context7-mcp_resolve-library-id`, `mcp_context7-mcp_get-library-docs`, `MultiEdit`, `todo_write`
+**Ferramentas disponíveis**: `read_file`, `codebase_search`, `web_search`, `grep`, `list_dir`, `MultiEdit`, `todo_write`
 
 **Exemplo de uso**:
 ```bash
@@ -223,7 +193,7 @@ Este guia documenta todos os agentes especializados disponíveis no sistema `.cl
 ```
 
 **Metodologia única**:
-- 🔍 **Busca multi-fonte**: Web + Context7 + análise semântica
+- 🔍 **Busca multi-fonte**: Web + análise semântica
 - 📊 **Insights acionáveis**: Não apenas informação, mas recomendações
 - 🎯 **Evidência-baseada**: Toda claim apoiada por fontes
 - 🔄 **Múltiplas perspectivas**: Considera diferentes abordagens
@@ -533,39 +503,7 @@ Este guia documenta todos os agentes especializados disponíveis no sistema `.cl
 -  Adiciona comentários contextuais
 -  Gerencia tags e prioridades
 
-### **clickup-specialist**
-**Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Orange
-
-**Especialidades**: ClickUp MCP técnico, automações avançadas, performance, workflows
-
-**Quando usar**:
--  Otimizações técnicas do ClickUp (bulk operations, rate limiting)
--  Automações de workflow complexas (triggers, status changes)
--  Performance optimization (batching, caching, query optimization)
--  Configurações avançadas (webhooks, custom fields, templates)
--  Time tracking automation e análise de produtividade
--  Integração com comandos `/engineer/*` para automação
-
-**Ferramentas disponíveis**: `read_file`, `write`, `MultiEdit`, `run_terminal_cmd`, `codebase_search`, `web_search`, **todas as 15+ ferramentas ClickUp MCP**
-
-**Exemplo de uso**:
-```bash
-# Automações de workflow
-@clickup-specialist "Configurar automação: task 'in progress' → start time tracking + add tag 'development'"
-
-# Operações em bulk
-@clickup-specialist "Criar 20 tasks em lote com template feature e assignees automáticos"
-
-# Performance optimization  
-@clickup-specialist "Otimizar queries ClickUp usando filtros server-side e batching"
-```
-
-**Características únicas**:
-- 🚀 **Complementa product-agent**: Técnico vs Estratégico
-- ⚡ **Performance first**: Bulk operations, rate limiting, query optimization
-- 🔧 **Automação avançada**: Workflows inteligentes, triggers, status automation
-- 📊 **15+ ferramentas ClickUp MCP**: Cobertura completa da API ClickUp
-- 🎯 **7 especialidades técnicas**: workflow-automation, performance-optimization, webhooks
+> **clickup-specialist** está documentado na seção [Agentes de Desenvolvimento](#-agentes-de-desenvolvimento) — colabora com `@product-agent` (técnico vs. estratégico).
 
 ### **claude-code-specialist**
 **Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Light Blue
@@ -678,47 +616,6 @@ Este guia documenta todos os agentes especializados disponíveis no sistema `.cl
 - 🧪 **Modern testing**: Vitest preferred, supertest integration, coverage thresholds
 - 🔍 **Profiling tools**: clinic.js, memory leak detection, event loop monitoring
 - 🏗️ **Architecture patterns**: Layered design, dependency injection, microservices
-
-### **gitflow-specialist**
-**Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Light Green
-
-**Especialidades**: GitFlow workflows, branch management, release processes, team collaboration, semantic versioning
-
-**Quando usar**:
--  Setup inicial de repositórios GitFlow
--  Guidance para workflows de feature development
--  Processos de release estruturados
--  Emergency hotfix workflows
--  Migração master → main em projetos GitFlow
--  Resolução de conflitos GitFlow complexos
--  Onboarding de equipes em GitFlow
--  Otimização de workflows colaborativos
-
-**Ferramentas disponíveis**: `read_file`, `write`, `MultiEdit`, `run_terminal_cmd`, `codebase_search`, `grep`, `web_search`, `todo_write`
-
-**Exemplo de uso**:
-```bash
-# Para setup inicial
-@gitflow-specialist "Configurar GitFlow em repositório novo com detecção automática master/main"
-
-# Para workflows
-@gitflow-specialist "Orientar equipe no processo de release v2.1.0 com semantic versioning"
-
-# Para emergências
-@gitflow-specialist "Hotfix crítico em produção - orientar processo completo"
-
-# Para migração
-@gitflow-specialist "Migrar repositório de master para main mantendo GitFlow ativo"
-```
-
-**Características únicas**:
-- 🌿 **Flexibilidade master/main**: Detecção automática e suporte a ambas convenções
-- 🎯 **Guidance-focused**: Ensina e orienta ao invés de automatizar
-- 📚 **6 Templates completos**: Setup, feature, release, hotfix, migration, conflicts
-- 🧠 **Semantic versioning**: Conventional commits + análise automática de versioning
-- 👥 **Team enablement**: Onboarding em 3 níveis (iniciante, intermediário, avançado)
-- 📊 **Analytics integration**: Métricas de equipe e health checks
-- 🔗 **Complementaridade**: Integração perfeita com @mermaid-specialist (workflows vs diagramas)
 
 ---
 

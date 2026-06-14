@@ -1,17 +1,17 @@
 # 📚 Índice - Sistema Onion
 
-> **Última atualização**: 2026-06-03 | **Gerado por**: `/docs:build-index onion` | **Revisado**: auditoria manual
+> **Última atualização**: 2026-06-14 | **Gerado por**: `/docs:build-index onion` | **Revisado**: auditoria manual
 
-Bem-vindo ao índice da documentação do **Sistema Onion**. Este documento organiza os 11 documentos de documentação operacional do sistema em `docs/onion/`.
+Bem-vindo ao índice da documentação do **Sistema Onion**. Este documento organiza os 12 documentos de documentação operacional do sistema em `docs/onion/`.
 
 ---
 
 ## 🎯 Visão Geral
 
 O **Sistema Onion** é um **framework template em `.claude/`** — instalável em qualquer projeto (novo, legado ou regulado), plataforma única Claude Code, sem produto npm e sem CLI standalone. Inclui:
-- 🤖 **78 comandos invocáveis** Claude Code em 9 categorias
+- 🤖 **76 comandos invocáveis** Claude Code em 9 categorias
 - 🎯 **49 agentes de IA especializados** em 9 categorias
-- 🧩 **4 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`)
+- 🧩 **5 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-fleet`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
 - 🏗️ **Spec as Code Multi-Context** — business, technical e meta-specs
@@ -20,10 +20,10 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 
 ## 📊 Estatísticas
 
-- **11 documentos** em `docs/onion/`
-- **78 comandos invocáveis** Claude Code em `.claude/commands/`
+- **12 documentos** em `docs/onion/`
+- **76 comandos invocáveis** Claude Code em `.claude/commands/`
 - **49 agentes** IA em `.claude/agents/`
-- **4 skills** em `.claude/skills/`
+- **5 skills** em `.claude/skills/`
 
 ---
 
@@ -34,7 +34,7 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 **Comece aqui se você é novo no Sistema Onion:**
 
 1. **[Guia de Comandos](commands-guide.md)** - Documentação dos comandos disponíveis
-   - 78 comandos invocáveis em 9 categorias
+   - 76 comandos invocáveis em 9 categorias
    - Exemplos de uso e workflows
    - Integrações com Task Managers
 
@@ -86,6 +86,11 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
    - Estrutura de arquivos
    - Best practices
 
+4. **[CI/CD](ci.md)** - Validação automatizada via GitHub Actions
+   - Workflows de integração contínua
+   - Testes automatizados
+   - Deploy pipeline
+
 ### 📚 Documentação Avançada
 
 **Para usuários avançados e desenvolvedores do sistema:**
@@ -110,7 +115,7 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 |------|----------|-----------|
 | **Guias** | 4 | Guias essenciais de uso |
 | **Configuração** | 1 | Setup inicial |
-| **Referências** | 3 | Documentação técnica |
+| **Referências** | 4 | Documentação técnica |
 | **Avançado** | 2 | Para usuários avançados |
 
 ### Por Perfil de Usuário

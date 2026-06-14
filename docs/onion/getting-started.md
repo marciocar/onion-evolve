@@ -1,6 +1,6 @@
 # 🚀 Guia de Início Rápido
 
-> **Versão**: 3.0.0 | **Última atualização**: 2025-12-02
+> **Versão**: 3.0.1 | **Última atualização**: 2026-06-14
 
 Bem-vindo ao sistema Onion v3.0! Este guia vai te ajudar a começar rapidamente com os comandos `.claude/` e integração com gerenciadores de tarefas através do **Task Manager Abstraction**.
 
@@ -8,10 +8,10 @@ Bem-vindo ao sistema Onion v3.0! Este guia vai te ajudar a começar rapidamente 
 
 | Componente | Quantidade | Descrição |
 |------------|------------|-----------|
-| Comandos | 56 | Organizados em 8 categorias |
-| Agentes | 38 | 9 categorias especializadas |
-| Regras | 4 | Padrões e validações |
-| Knowledge Bases | 5 | Documentação estruturada |
+| Comandos | 76 | Organizados em 9 categorias |
+| Agentes | 49 | 9 categorias especializadas |
+| Skills | 5 | Orquestração e validação |
+| Knowledge Bases | 33 | Documentação estruturada |
 
 ## 📋 Checklist de Setup
 
@@ -116,7 +116,7 @@ O Sistema Onion v3.0 usa uma **camada de abstração** que permite trabalhar com
 | Provedor | Configuração | Agente / roteamento | Notas |
 |----------|--------------|---------------------|-------|
 | **Jira** | `TASK_MANAGER_PROVIDER=jira` | `@jira-specialist` | REST v3/v2, JQL, ADF, transitions, bulk |
-| **ClickUp** | `TASK_MANAGER_PROVIDER=clickup` | `@clickup-specialist` | Via ClickUp MCP, formatação Unicode |
+| **ClickUp** | `TASK_MANAGER_PROVIDER=clickup` | `@clickup-specialist` | API-first (transporte MCP opcional), formatação Unicode |
 | **Asana** | `TASK_MANAGER_PROVIDER=asana` | `@task-specialist` (agnóstico) | Notes HTML / plain text |
 | **Linear** | `TASK_MANAGER_PROVIDER=linear` | `@task-specialist` (agnóstico) | Markdown nativo |
 | **None** | `TASK_MANAGER_PROVIDER=none` | `@task-specialist` (offline) | Modo local sem sincronização |
@@ -446,92 +446,6 @@ Agora você tem tudo para ser produtivo com o sistema Onion:
 -  **Troubleshooting** na ponta da língua
 
 **Comece pequeno, pratique os fluxos básicos, e gradualmente explore funcionalidades mais avançadas!**
-
----
-
-## 🛠️ Troubleshooting Node.js v22.14.0+
-
-### **Problema**: chrome-devtools-mcp não funciona
-**Erro comum**: `chrome-devtools-mcp does not support Node v20.x.x`
-
-#### **Solução 1: Verificar versão do Node.js**
-```bash
-# Verificar versão atual
-node --version
-
-# Se for menor que v22.14.0, atualizar via NVM:
-nvm install v22.14.0
-nvm use v22.14.0
-nvm alias default v22.14.0
-
-# Confirmar atualização
-node --version  # Deve mostrar v22.14.0
-```
-
-#### **Solução 2: Limpar cache do NPX**
-```bash
-# Limpar cache do npx
-rm -rf ~/.npm/_npx/
-
-# Testar novamente
-npx chrome-devtools-mcp@latest --version
-```
-
-#### **Solução 3: Verificar instalação do Chrome**
-```bash
-# Ubuntu/Debian
-which google-chrome || which chromium-browser
-
-# Se não encontrar, instalar Chrome:
-sudo apt update
-sudo apt install google-chrome-stable
-```
-
-### **Problema**: Comandos `.claude/` não funcionam
-**Sintomas**: Comandos não são reconhecidos
-
-#### **Solução**:
-```bash
-# 1. Verificar estrutura .claude/
-ls -la .claude/commands/
-
-# 2. Verificar se está no diretório do projeto
-pwd  # Deve estar na raiz com .claude/
-
-# 3. Invocar agente claude-code-specialist
-@claude-code-specialist "comandos não funcionam"
-```
-
-### **Problema**: Integração Task Manager falha
-**Sintomas**: Tasks não são criadas/atualizadas
-
-#### **Soluções**:
-```bash
-# 1. Verificar provedor configurado
-echo $TASK_MANAGER_PROVIDER
-
-# 2. Verificar variáveis de ambiente conforme provedor ativo:
-
-# Se usando Jira:
-echo $JIRA_HOST; echo $JIRA_EMAIL; echo $JIRA_API_TOKEN
-
-# Se usando ClickUp:
-echo $CLICKUP_API_TOKEN; echo $CLICKUP_WORKSPACE_ID; echo $CLICKUP_DEFAULT_LIST_ID
-
-# Se usando Asana:
-echo $ASANA_ACCESS_TOKEN; echo $ASANA_WORKSPACE_ID
-
-# Se usando Linear:
-echo $LINEAR_API_KEY; echo $LINEAR_TEAM_ID
-
-# 3. Testar conectividade
-/warm-up
-
-# 4. Invocar roteamento conforme provedor ativo:
-@jira-specialist "integração não funciona"     # Para Jira
-@clickup-specialist "integração não funciona"  # Para ClickUp
-# Para Asana/Linear, use @task-specialist ou execute /meta/setup-integration <provedor>
-```
 
 ---
 
