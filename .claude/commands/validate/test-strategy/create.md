@@ -253,8 +253,7 @@ SENÃO:
     └── Exploratory Testing
 ```
 
-**ClickUp:** Criar Epic com `mcp_ClickUp_clickup_create_task`, depois subtasks por perspectiva com parent=epic.id  
-**Asana:** Criar Epic com `mcp_asana_asana_create_task`, estrutura hierárquica via parent  
+**Criar Epic via `taskManager.createTask({ name, description, points })` e subtasks via `taskManager.createSubtask(epicId, { name, points })` — o adapter resolve hierarquia e parent por provider (via adapter, REST API; MCP opcional).**  
 **None/Dry-run:** Salvar estrutura local em `.claude/sessions/test-strategies/[feature-name].md`
 
 ### Passo 8: Gerar Relatório Detalhado

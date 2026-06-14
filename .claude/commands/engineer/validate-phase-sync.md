@@ -10,14 +10,14 @@ updated: "2025-11-24"
 
 # 🔄 Validate Phase-Subtask Sync
 
-Validar e corrigir sincronização automática entre fases do plan.md e status das subtasks no ClickUp. Este comando identifica discrepâncias e corrige status desatualizados.
+Validar e corrigir sincronização automática entre fases do plan.md e status das subtasks do Task Manager ativo. Este comando identifica discrepâncias e corrige status desatualizados.
 
 ## 🎯 Funcionalidades
 
 ### Validação Automática de Status
 - Lê todas as fases do plan.md e identifica status atual (Completada ✅, Em Progresso ⏰, Não Iniciada ⏳)
-- Verifica status das subtasks correspondentes no ClickUp via Phase-Subtask Mapping
-- Identifica discrepâncias entre plan.md e ClickUp
+- Verifica status das subtasks correspondentes no Task Manager via Phase-Subtask Mapping
+- Identifica discrepâncias entre plan.md e Task Manager
 - Gera relatório de inconsistências encontradas
 
 ### Correção Automática de Status
@@ -45,12 +45,13 @@ Validar e corrigir sincronização automática entre fases do plan.md e status d
 /engineer/validate-phase-sync --report-only     # Apenas relatório, não aplica correções
 ```
 
-## 🤝 Integração ClickUp MCP
+## 🤝 Integração com o Task Manager
 
 ### Operações Automáticas
-- **Leitura de Task**: Usa `get_task` com `subtasks=true` para estrutura completa
-- **Update de Status**: Aplica `update_task` nos subtasks com status correto
-- **Comentários de Correção**: Usa `create_task_comment` para documentar ajustes
+Executadas via adapter (REST API default; MCP opcional — ativado com `TASK_MANAGER_TRANSPORT=mcp`):
+- **Leitura de Task**: Obtém a task com subtasks para estrutura completa
+- **Update de Status**: Atualiza subtasks com o status correto
+- **Comentários de Correção**: Cria comentário na subtask para documentar ajustes
 - **Validação de Integridade**: Verifica se mapeamento está correto e completo
 
 ### Mapeamento Phase-Subtask
@@ -72,8 +73,8 @@ Lê o mapeamento do arquivo `.claude/sessions/[slug]/context.md`:
 1. **Detecta Sessão Ativa**: Identifica sessão em `.claude/sessions/`
 2. **Lê Context.md**: Carrega mapeamento Phase-Subtask e task ID principal
 3. **Analisa Plan.md**: Extrai status atual de todas as fases
-4. **Consulta ClickUp**: Obtém status atual das subtasks via ClickUp MCP
-5. **Identifica Discrepâncias**: Compara status plan.md vs ClickUp
+4. **Consulta o Task Manager**: Obtém status atual das subtasks via adapter (REST API; MCP opcional)
+5. **Identifica Discrepâncias**: Compara status plan.md vs Task Manager
 6. **Aplica Correções**: Atualiza status das subtasks conforme necessário
 7. **Documenta Ações**: Registra todas correções aplicadas
 
@@ -86,9 +87,9 @@ Lê o mapeamento do arquivo `.claude/sessions/[slug]/context.md`:
 /engineer/create-phase-mapping
 ```
 
-### Problema: "Subtask não encontrada no ClickUp"
+### Problema: "Subtask não encontrada no Task Manager"
 **Solução**: IDs do mapeamento podem estar incorretos
-- Verificar IDs das subtasks no ClickUp
+- Verificar IDs das subtasks no Task Manager ativo
 - Atualizar mapeamento no context.md
 - Executar validação novamente
 
@@ -113,4 +114,4 @@ Este comando corrige o problema identificado onde `/engineer/work` não atualiza
 
 ---
 
-**🎯 CRITICAL FIX: Este comando resolve a falha arquitetural onde fases completadas não atualizavam automaticamente o status das subtasks correspondentes, garantindo sincronização perfeita entre plan.md e ClickUp.**
+**🎯 CRITICAL FIX: Este comando resolve a falha arquitetural onde fases completadas não atualizavam automaticamente o status das subtasks correspondentes, garantindo sincronização perfeita entre plan.md e Task Manager.**

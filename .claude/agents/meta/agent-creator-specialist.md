@@ -330,7 +330,7 @@ management: list_dir, glob_file_search
 ```yaml
 core: read_file, write, codebase_search
 management: todo_write, update_memory
-clickup: mcp_clickup-mcp-server_* (gestão de projetos)
+task-manager: via adapter (REST API; MCP opcional) — gestão de projetos agnóstica
 ```
 
 ##### 🟤 COMPLIANCE (brown/maroon)
@@ -348,27 +348,28 @@ advanced: update_memory, web_search
 discovery: glob_file_search
 ```
 
-**Ferramentas MCP Especializadas:**
+**Ferramentas Especializadas (via Adapter/MCP Opcional):**
 ```yaml
-# Gestão de Projetos
-clickup: mcp_clickup-mcp-server_* (50+ ferramentas)
+# Gestão de Projetos (provider-agnóstico via adapter)
+# Exemplo ClickUp: 50+ ferramentas MCP disponíveis quando TASK_MANAGER_TRANSPORT=mcp
+# Ver adapters/ em .claude/utils/task-manager/ para Jira/Asana/Linear
 
 # Versionamento
-github: mcp_github_* (30+ ferramentas)
+github: ~30 ferramentas REST API (transporte padrão: cli/gh)
 
 # Automação Web
-playwright: mcp_playwright_browser_* (20+ ferramentas)
+playwright: ~20 ferramentas MCP para browser automation
 
 # Análise de Código
-code-understanding: mcp_code-understanding_* (10+ ferramentas)
+code-understanding: ~10 ferramentas MCP para análise
 
 # Orquestração de frota: nativa via ferramenta Workflow do Claude Code (sem MCP) — ver /meta:fleet
 
 # Raciocínio Complexo
-sequential-thinking: mcp_sequential-thinking_* (1 ferramenta)
+sequential-thinking: 1 ferramenta MCP para CoT
 
-# Issues
-linear: mcp_linear_* (1+ ferramentas)
+# Issues (exemplo; múltiplos providers)
+# Linear, Jira, ClickUp via adapter (TASK_MANAGER_PROVIDER + transporte)
 ```
 
 **Princípio: Minimalismo Inteligente**
@@ -878,10 +879,10 @@ description: Revisa código e valida qualidade
 ### ❌ Anti-Pattern 3: Toolkit Completo Desnecessário
 ```yaml
 # RUIM
-tools: read_file, write, search_replace, grep, codebase_search, list_dir, glob_file_search, web_search, run_terminal_cmd, read_lints, todo_write, update_memory, delete_file, edit_notebook, mcp_clickup-mcp-server_*, mcp_github_*, ...
+tools: read_file, write, search_replace, grep, codebase_search, list_dir, glob_file_search, web_search, run_terminal_cmd, read_lints, todo_write, update_memory, delete_file, edit_notebook, [múltiplas ferramentas MCP desorganizadas], ...
 ```
 
-**Por quê:** Excesso de ferramentas sem justificativa
+**Por quê:** Excesso de ferramentas sem justificativa — use adapter/abstração em vez de MCP direto
 **Correto:** Apenas ferramentas realmente necessárias
 
 ### ❌ Anti-Pattern 4: Falta de Integração
@@ -1063,18 +1064,18 @@ autonomy: alta
 ---
 ```
 
-### Template 3: Agente de Integração MCP
+### Template 3: Agente de Integração (Adapter/Abstração)
 ```yaml
 ---
 name: [servico]-[acao]-manager
-description: Especialista em [serviço MCP] que [ação principal]. Use para [workflows].
+description: Especialista em [serviço] que [ação principal]. Use para [workflows]. Acessa via adapter (API ou MCP opcional).
 model: sonnet
-tools: read_file, write, codebase_search, todo_write, mcp_[servico]_*
+tools: read_file, write, codebase_search, todo_write, update_memory
 color: orange
 priority: alta
 expertise: ["[servico]", "automation", "integration"]
-related_agents: ["product-agent"]
-related_commands: ["/product/task"]
+related_agents: ["product-agent", "task-specialist"]
+related_commands: ["/product/task", "/meta/setup-integration"]
 mcp_servers: ["[servico]"]
 autonomy: alta
 ---

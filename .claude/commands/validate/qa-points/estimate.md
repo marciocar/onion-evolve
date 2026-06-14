@@ -114,12 +114,10 @@ Listar as técnicas do tipo de teste a partir de `qa-story-points.md` §4 (detal
 
 ### Passo 6: Integração com Task Manager (SE `--task-id`)
 
-1. **Detectar provedor:** usar `{{task-manager}}` se explícito; senão inferir pelo formato do task-id (`CU-` → clickup, `PROJ-` → jira) ou por `TASK_MANAGER_PROVIDER` no `.env`. Se nada detectado → continuar apenas com output local.
-2. **Buscar a task** pelo adapter apropriado e validar que existe; ler story points atuais.
-3. **Atualizar (SE `--update`):** gravar o custom field "QA Story Points" (ou "Story Points") via MCP do provedor:
-   - ClickUp: `mcp_ClickUp_clickup_get_task` para obter o ID do custom field, depois `mcp_ClickUp_clickup_update_task` com `custom_fields: [{ id, value: totalPoints }]`; comentar a análise com `mcp_ClickUp_clickup_create_task_comment`.
-   - Asana/Jira: usar as tools `mcp_asana_*` / API Jira com custom field equivalente, seguindo o mesmo padrão.
-   - Se o custom field não existir: comentar a estimativa e sugerir criar o campo.
+1. **Detectar provedor:** usar `{{task-manager}}` se explícito; senão delegar a `detector.detectProviderFromTaskId(taskId)` (o detector/factory resolve o provider — não inferir manualmente pelo prefixo do ID) ou ler `TASK_MANAGER_PROVIDER` no `.env`. Se nada detectado → continuar apenas com output local.
+2. **Buscar a task** via `taskManager.getTask(taskId)` e validar que existe; ler story points atuais.
+3. **Atualizar (SE `--update`):** chamar `taskManager.updateTask(taskId, { customField: "QA Story Points", value: totalPoints })` (REST API default; o adapter resolve o nome/ID do custom field por provider e aciona o especialista quando necessário); comentar a análise via `taskManager.addComment(taskId, commentText)`.
+   - Se o custom field não existir: comentar a estimativa e sugerir criar o campo (o adapter/especialista orienta o formato correto por provider).
 
 **Template de comentário (Unicode):**
 

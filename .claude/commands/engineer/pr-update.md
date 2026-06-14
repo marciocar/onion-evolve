@@ -60,12 +60,10 @@ Antes de operar com a task, carregue o `.env` e leia `TASK_MANAGER_PROVIDER` (`j
 
 O comentário de atualização deve documentar: tipo do commit (fix | feat | refactor | docs | chore), hash do commit, arquivos modificados, linhas adicionadas/removidas e descrição das mudanças.
 
-**Roteamento por provider** (carregar `.env` → ler `TASK_MANAGER_PROVIDER` → seguir o adapter):
+**Adicionar comentário via abstração agnóstica** (carregar `.env` → ler `TASK_MANAGER_PROVIDER`):
 
-- **`clickup`** → comentário em formatação Unicode via `@clickup-specialist`. Adapter: `.claude/utils/task-manager/adapters/clickup.md` (API-first; MCP opcional). Padrões: `.claude/commands/common/prompts/clickup-patterns.md`.
-- **`jira`** → comentário em ADF via `@jira-specialist`. Adapter: `.claude/utils/task-manager/adapters/jira.md`.
-- **`asana`** → comentário (story) via `@task-specialist`. Adapter: `.claude/utils/task-manager/adapters/asana.md`.
-- **`linear`** → comentário em Markdown via `@task-specialist`. Adapter: `.claude/utils/task-manager/adapters/linear.md`.
+Chamar `taskManager.addComment(taskId, conteudo)` e `taskManager.updateStatus(taskId, status)` — o adapter resolve automaticamente formato (ADF / Unicode / Markdown), transporte (REST API por padrão; MCP opcional via `TASK_MANAGER_TRANSPORT=mcp`) e qual especialista acionar por provider. Referências: `docs/meta-specs/integrations.md` e `.claude/utils/task-manager/adapters/`.
+
 - **`none`** → não persistir comentário remoto.
 
 ## ⚙️ Processo Automático

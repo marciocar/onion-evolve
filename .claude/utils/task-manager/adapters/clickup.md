@@ -679,6 +679,99 @@ await tm.addComment(task.id, [
 
 ---
 
+## ⚡ Operações em Lote (Bulk)
+
+> Detalhe específico do ClickUp. Via abstração, o consumidor usa `createTask`/`createSubtask`; o adapter aplica internamente a regra abaixo.
+
+**Quando usar bulk:** criar múltiplas tasks **independentes no mesmo nível**; atualizar status de várias tasks.
+
+**Limitação crítica — bulk NÃO suporta hierarquia.** O endpoint de criação em lote **ignora** o `parent`. Para hierarquia (task → subtasks), use criação **sequencial** com `parent`:
+
+```javascript
+// ❌ ERRADO — parent ignorado no bulk
+await create_bulk_tasks({ tasks: [{ name: 'Sub 1', parent: mainId }, { name: 'Sub 2', parent: mainId }] });
+
+// ✅ CORRETO — sequencial preserva hierarquia
+const sub1 = await create_task({ name: 'Sub 1', parent: mainId });
+const sub2 = await create_task({ name: 'Sub 2', parent: mainId });
+```
+
+✅ bulk para: tasks independentes no mesmo nível · ❌ bulk para: hierarquia.
+
+---
+
+## 🏗️ Hierarquia de Tasks (3 níveis)
+
+```
+📋 TASK (objetivo de alto nível)
+├── 🔧 Subtask 1 (componente)
+│   ├── ✅ Checklist item 1.1
+│   └── ✅ Checklist item 1.2
+└── 🔧 Subtask 2
+    └── ✅ Checklist item 2.1
+```
+
+**Implementação correta** — transporte default = **REST API** do adapter (`create_task` mapeia para `POST /list/{id}/task`); o `mcp_ClickUp_*` é apenas o transporte **opcional** via `TASK_MANAGER_TRANSPORT=mcp`:
+
+```javascript
+// 1. Task principal
+const mainTask = await create_task({
+  name: '🎯 Implementar Autenticação JWT',
+  listId: '<list_id>',
+  markdown_description: '## 🎯 Objetivo\nImplementar JWT...\n\n## ✅ Critérios\n- [ ] Login retorna JWT\n- [ ] Refresh funciona',
+  tags: ['feature', 'security'], priority: 'high'
+});
+
+// 2. Subtasks com parent (← CRITICAL para hierarquia)
+const sub1 = await create_task({ name: '🔧 Backend JWT Service', listId: '<list_id>', parent: mainTask.id, tags: ['subtask', 'backend'] });
+const sub2 = await create_task({ name: '🔧 Frontend Integration', listId: '<list_id>', parent: mainTask.id, tags: ['subtask', 'frontend'] });
+
+// 3. Comentário de setup (formatação Unicode — ver seção de Formatação)
+await create_task_comment({ task_id: mainTask.id, comment_text: '🚀 TASK SETUP COMPLETO\n━━━━━━━━━━━━\n▶ Subtasks: 2\n⏰ ' + new Date().toISOString() });
+```
+
+---
+
+## ✅ Checklists Nativos
+
+Checklists nativos do ClickUp (diferentes de checkboxes em markdown) oferecem tracking interativo (resolved/unresolved), progresso visual e leitura via API. O Sistema Onion suporta estrutura híbrida: checkboxes em markdown (documentação) + checklists nativos (tracking).
+
+**Leitura e cálculo de progresso** (incluir `subtasks: true` no get para trazer checklists):
+
+```javascript
+const task = await getTask({ task_id: '<id>', subtasks: true });
+
+function calculateProgress(task) {
+  let total = 0, resolved = 0;
+  (task.checklists || []).forEach(c => { total += c.unresolved + c.resolved; resolved += c.resolved; });
+  return total > 0 ? (resolved / total * 100).toFixed(1) : 0;
+}
+// Progresso: `${calculateProgress(task)}%`
+```
+
+---
+
+## 🔧 Troubleshooting (ClickUp)
+
+| Problema | Causa | Solução |
+|---|---|---|
+| Subtasks aparecem como tasks independentes | uso de `create_bulk_tasks` com `parent` | criar sequencial com `create_task({ parent })` (ver Hierarquia) |
+| Formatação quebrada em comments | markdown em comentário | usar Unicode visual (`━━━`, `▶`, `∟`); markdown só em `markdown_description` |
+| Auto-update não funciona | `context.md` sem task-id ou mapeamento fase→subtask ausente | validar com `/engineer/validate-phase-sync`; conferir `TASK_MANAGER_PROVIDER` e credenciais |
+| Checklists não aparecem | `get_task` sem `subtasks: true` | passar `subtasks: true` na leitura |
+
+---
+
+## 💡 Best Practices (ClickUp)
+
+1. **Hierarquia na ordem certa**: task principal → subtasks com `parent` → comentário de setup.
+2. **Formatação por contexto**: `markdown_description` em Markdown; comentários em Unicode visual.
+3. **Sempre timestamp + status** em comentários de progresso.
+4. **Mapeamento fase→subtask** obrigatório no `context.md` da sessão.
+5. **Validar estrutura** após criação (`getTask({ subtasks: true })` → conferir `subtasks.length`).
+
+---
+
 ## ⚠️ Notas Operacionais
 
 - **`CLICKUP_WORKSPACE_ID`** é obrigatório para busca (`searchTasks`) e listagem de projetos (`getProjectList`). Se ausente, essas operações lançam erro descritivo.

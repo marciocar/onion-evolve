@@ -160,9 +160,9 @@ Quando usar comandos que criam tasks (`/product/task`, `/product/feature`):
 6. ❌ **NUNCA** ignorar o provedor configurado no `.env`
 
 **Provedores suportados:**
-- ClickUp (via MCP) - `TASK_MANAGER_PROVIDER=clickup`
-- Asana (via MCP) - `TASK_MANAGER_PROVIDER=asana`
-- Linear (via API) - `TASK_MANAGER_PROVIDER=linear`
+- ClickUp (REST API; MCP opcional) - `TASK_MANAGER_PROVIDER=clickup`
+- Asana (REST API; MCP opcional) - `TASK_MANAGER_PROVIDER=asana`
+- Linear (REST API; MCP opcional) - `TASK_MANAGER_PROVIDER=linear`
 - None (modo offline) - `TASK_MANAGER_PROVIDER=none`
 
 **Esta regra é OBRIGATÓRIA e será sempre executada.**

@@ -10,12 +10,12 @@
    (valores: `jira` | `clickup` | `asana` | `linear` | `none`).
 2. **Validar a variável obrigatória do provedor ativo:**
 
-   | Provedor | Variável obrigatória | Ferramentas MCP / Adapter |
+   | Provedor | Variável obrigatória | Adapter (transporte: REST API default; MCP opcional) |
    |----------|----------------------|----------------------------|
    | `jira` | `JIRA_HOST`, `JIRA_EMAIL`, `JIRA_API_TOKEN` | `.claude/utils/task-manager/adapters/jira.md` |
-   | `clickup` | `CLICKUP_API_TOKEN` | `mcp_ClickUp_*` / `.claude/utils/task-manager/adapters/clickup.md` |
-   | `asana` | `ASANA_ACCESS_TOKEN` | `mcp_asana_*` / `.claude/utils/task-manager/adapters/asana.md` |
-   | `linear` | `LINEAR_API_KEY` | `mcp_Linear_*` / `.claude/utils/task-manager/adapters/linear.md` |
+   | `clickup` | `CLICKUP_API_TOKEN` | `.claude/utils/task-manager/adapters/clickup.md` |
+   | `asana` | `ASANA_ACCESS_TOKEN` | `.claude/utils/task-manager/adapters/asana.md` |
+   | `linear` | `LINEAR_API_KEY` | `.claude/utils/task-manager/adapters/linear.md` |
    | `none` / ausente | — | modo offline (sessões locais em `.claude/sessions/`) |
 
 3. **(Quando o comando recebe um `task-id`)** Validar compatibilidade do task-id

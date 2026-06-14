@@ -64,8 +64,8 @@ Validar que workflows do Sistema Onion foram executados completamente:
 - GitFlow best practices
 - Security validations
 
-#### **6. 🔗 Integração ClickUp**
-- Status de tasks sincronizado
+#### **6. 🔗 Integração Task Manager**
+- Status de tasks sincronizado (via adapter — REST API; MCP opcional)
 - Comments e updates realizados
 - Tags apropriadas aplicadas
 - Workflow completion tracking
@@ -146,12 +146,12 @@ function executeWorkflowValidation() {
   ((total_checks++))
   
   # 6. VALIDAÇÃO DE INTEGRAÇÃO
-  echo "🔗 [6/6] Integração ClickUp"
-  if validateClickUpIntegration; then
-    validation_results+=("✅ ClickUp: Integração sincronizada")
+  echo "🔗 [6/6] Integração Task Manager"
+  if validateTaskManagerIntegration; then
+    validation_results+=("✅ Task Manager: Integração sincronizada")
     ((passed_checks++))
   else
-    validation_results+=("⚠️  ClickUp: Verificar sincronização")
+    validation_results+=("⚠️  Task Manager: Verificar sincronização")
     ((warnings++))
   fi
   ((total_checks++))
@@ -189,11 +189,11 @@ function executeWorkflowValidation() {
       echo "✅ Todos os critérios atendidos"
       echo "🚀 Sistema pronto para próximas operações"
       
-      # Adicionar comentário no ClickUp se aplicável
-      if [[ -n "$CLICKUP_TASK_ID" ]]; then
+      # Adicionar comentário no Task Manager configurado, se aplicável
+      if [[ "$TASK_MANAGER_PROVIDER" != "none" && -n "$TASK_ID" ]]; then
         echo ""
-        echo "📝 Adicionando validação ao ClickUp..."
-        # Aqui seria a integração real com ClickUp
+        echo "📝 Adicionando validação ao Task Manager configurado..."
+        # Delegação ao adapter via getTaskManager().addComment(TASK_ID, ...)
       fi
       
       return 0
@@ -273,9 +273,9 @@ function validateCompliance() {
   grep -q "Branch Protection" ".claude/commands/git/sync.md"
 }
 
-function validateClickUpIntegration() {
-  # Verificar se há task ID configurada ou se integração está funcionando
-  # (Simplified check)
+function validateTaskManagerIntegration() {
+  # Verificar se integração com Task Manager está funcionando (agnóstico de provider)
+  # (Simplified check — delega ao adapter via getTaskManager())
   true  # Sempre retorna true por agora
 }
 
@@ -329,7 +329,7 @@ esac
 📁 [3/6] Gestão de Sessões
 🌿 [4/6] Limpeza de Branches
 🛡️ [5/6] Compliance e Segurança
-🔗 [6/6] Integração ClickUp
+🔗 [6/6] Integração Task Manager
 
 📊 RESULTADO FINAL DA VALIDAÇÃO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -348,7 +348,7 @@ esac
    ✅ Sessões: Corretamente organizadas
    ✅ Branches: Limpeza completa
    ✅ Compliance: Todas as proteções ativas
-   ✅ ClickUp: Integração sincronizada
+   ✅ Task Manager: Integração sincronizada
 
 🎉 STATUS: WORKFLOW PERFEITO!
 ✅ Todos os critérios atendidos

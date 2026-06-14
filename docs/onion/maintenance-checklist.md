@@ -172,7 +172,7 @@
   - `engineering-flows.md` - Se fluxos mudaram
   - `practical-examples.md` - Se exemplos mudaram
   - `getting-started.md` - Se setup mudou
-  - `clickup-integration.md` - Se integração mudou
+  - `.claude/utils/task-manager/adapters/*.md` - Se integração de task manager mudou
   - `naming-conventions.md` - Se nomenclatura mudou
 
 - [ ] **3. Atualizar Exemplos Práticos**
@@ -364,7 +364,6 @@ find .claude/agents -name "*.md" -type f ! -name "README.md" | wc -l
 │   ├── engineering-flows.md
 │   ├── practical-examples.md
 │   ├── getting-started.md
-│   ├── clickup-integration.md
 │   ├── naming-conventions.md
 │   └── maintenance-checklist.md (este arquivo)
 └── sessions/         # Sessões de trabalho
@@ -377,7 +376,7 @@ find .claude/agents -name "*.md" -type f ! -name "README.md" | wc -l
 - [Fluxos de Engenharia](engineering-flows.md)
 - [Exemplos Práticos](practical-examples.md)
 - [Configuração Inicial](getting-started.md)
-- [Integração ClickUp](clickup-integration.md)
+- [Adapters de Task Manager](../../.claude/utils/task-manager/adapters/)
 - [Padrões de Nomenclatura](naming-conventions.md)
 
 ---

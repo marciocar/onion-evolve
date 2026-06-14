@@ -48,7 +48,7 @@ Analisar `{{topic}}` para determinar fonte:
 
 | Pattern | Tipo | Ação |
 |---------|------|------|
-| `86adf...` | Task ID | Buscar dados no ClickUp |
+| `86adf...` | Task ID (ClickUp/Jira/Asana/Linear) | Buscar dados via Task Manager |
 | `docs/...` | Documento | Ler arquivo |
 | Texto livre | Tema | Pesquisar codebase |
 
@@ -67,10 +67,10 @@ SENÃO → inferir do contexto:
 
 ### Passo 3: Coletar Dados
 
-#### Task ClickUp
+#### Task (provider ativo)
 
 ```
-Buscar via mcp_clickup:
+Buscar a task via adapter do Task Manager ativo (getTaskManager().getTask) — REST API default:
 - Nome e descrição
 - Subtasks e progresso
 - Comentários relevantes
