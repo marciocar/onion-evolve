@@ -8,8 +8,8 @@ model: opus
 category: meta
 tags: [evolve, audit, fleet, self-evolution, modernization]
 version: "1.0.0"
-updated: "2026-06-13"
-allowed-tools: Read Grep Glob Bash(find *) Bash(wc *) Bash(git log*) Bash(cat .env*)
+updated: "2026-06-14"
+allowed-tools: Read Write Grep Glob Bash(find *) Bash(wc *) Bash(git log*) Bash(cat .env*)
 argument-hint: "[dimensão específica (D1..D8) | vazio = auditoria completa]"
 related_commands:
   - /meta:fleet
