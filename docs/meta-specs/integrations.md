@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões de Integração do Sistema Onion
 date: 2026-05-18
-version: 1.1.0
+version: 1.2.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -42,6 +42,15 @@ A Task Manager Abstraction é o padrão **SDAAL** (Specification-Driven AI Abstr
 ```
 
 Toda nova integração (ex: novo Task Manager, novo serviço de comunicação) deve replicar essa estrutura.
+
+### 1.0 Segunda instância de referência: Forge Abstraction
+
+A **Forge Abstraction** (`.claude/utils/forge/`) é a segunda instância concreta do SDAAL, adicionada em 2026-06-13. Abstrai o **host de código remoto** (GitHub, GitLab, Bitbucket) para operações de **PR, review, CI/checks e Release**. Replica a estrutura canônica (factory/interface/types/detector/adapters + Null Object) e comprova que o padrão generaliza além de Task Managers.
+
+Particularidades documentadas no próprio adapter:
+
+- **Escopo restrito a host remoto**: git local (branch/merge/tag/push) **não** passa pelo adapter — é `git` direto orientado pelo motor GitFlow (`gitflow-patterns.md`). A fronteira está em `forge/interface.md`.
+- **Transporte default `cli`** (não `api`): a CLI oficial (`gh`/`glab`) embute auth, paginação e rate-limit — é o caminho padronizado para forges, com REST como fallback (`FORGE_TRANSPORT=api`). Divergência **deliberada e documentada** em `forge/factory.md`; coerente com o princípio SDAAL ("padronizar a via preferencial do domínio").
 
 ### 1.1 Transporte: API-first, MCP opcional
 
@@ -171,6 +180,8 @@ tools:
 | `claude_ai_Slack__*` | Anthropic-managed | Notificações (opcional) |
 | `claude_ai_Notion__*` | Anthropic-managed | Documentação externa (opcional) |
 
+> **Forge não usa MCP.** O adapter `.claude/utils/forge/` usa transporte `cli` (CLI oficial `gh`/`glab`, default) ou `api` (REST/GraphQL, fallback). Não há servidor MCP envolvido — auth é gerenciada pela própria CLI ou por `GH_TOKEN`/`GITHUB_TOKEN`.
+
 ### 4.3 Configuração
 
 - **MCP servers stdio** (ex.: ClickUp) são declarados em `.mcp.json` na raiz do
@@ -199,6 +210,13 @@ Cada provider tem formato preferido para descrições, comentários e payloads. 
 | ClickUp | Markdown nativo em `markdown_description` | Unicode visual em `commentText` (`━━━`, `∟`, `▶`, `◆`, `✅`) | API REST (default) · MCP opcional |
 | Asana | HTML notes (subset) ou plain text | HTML | API REST (default) · MCP opcional |
 | Linear | Markdown nativo (suporte rico) | Markdown | API GraphQL (default) · MCP opcional |
+
+**Forge** (domínio de host remoto, não Task Manager):
+
+| Provider | Corpo de PR / Release | Comentários de review | Estrutura |
+|---|---|---|---|
+| GitHub | Markdown nativo | Markdown nativo | CLI `gh` (default) · REST `gh api`/curl (fallback) |
+| GitLab / Bitbucket | Markdown nativo | Markdown nativo | 🔜 costura (não implementado) |
 
 ### 5.1 Templates por provider
 
