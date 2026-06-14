@@ -26,6 +26,24 @@
             "command": "test -f .env && p=$(grep -E \"^TASK_MANAGER_PROVIDER=\" .env | head -1 | cut -d= -f2 | tr -d \"[:space:]\") && printf '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Onion: TASK_MANAGER_PROVIDER ativo = %s\"}}\\n' \"${p:-none}\" || true",
             "timeout": 5,
             "statusMessage": "Detectando Task Manager provider (Onion)"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/worklog-capture-session.sh",
+            "timeout": 5,
+            "statusMessage": "Capturando session_id no worklog (Onion)"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/worklog-precompact-breadcrumb.sh",
+            "timeout": 5,
+            "statusMessage": "Breadcrumb de compaction no worklog (Onion)"
           }
         ]
       }

@@ -45,7 +45,7 @@ A **estrutura** do worklog (quais arquivos, ACTIVE vs ARCHIVED, versionamento) �
 - **Resume quente** (mesma máquina, transcript vivo): `claude --resume <id>` restaura o raciocínio; depois `/engineer/work <slug>` re-sincroniza o estado de arquivo. Mais rico e barato.
 - **Resume frio** (máquina nova / transcript perdido / após `/clear`): `/engineer/work <slug>` sozinho. O `STATE.md` **tem** que bastar.
 
-> ⚠️ **Caveat honesto:** um slash command **não** consegue auto-popular o session id nativo atual. O campo `resume_command` no `STATE.md` é conveniência **colada pelo usuário** ou populada por um hook `SessionStart`/`Stop` que o usuário configure (domínio da skill `update-config`) — nunca uma dependência do resume frio.
+> ✅ **Hook que fecha o gap:** um slash command não consegue auto-popular o session id, mas um **hook** sim. O framework ships `.claude/hooks/worklog-capture-session.sh` (wired em `.claude/settings.json` no evento `SessionStart`): captura o `session_id` nativo e grava/atualiza o `resume_command` no `STATE.md` do worklog ACTIVE — idempotente, e no-op fora de branch `feature/hotfix/release` ou sem `STATE.md`. Ainda assim, o resume frio **nunca depende** desse campo — é conveniência; os arquivos do worklog bastam.
 
 ---
 
@@ -145,7 +145,7 @@ Amarre as escritas do worklog aos limites de `/compact` para não perder nada na
 
 **Drift guard:** no resume, se `STATE.md.last_checkpoint` for mais antigo que a edição mais recente do `plan.md`, avisar "STATE.md pode estar defasado — reconciliar antes de prosseguir".
 
-> ⚠️ **Caveat honesto:** não há intercept confiável de `/compact`/auto-compaction por um comando. A **garantia** é checkpoint em todo limite de fase (frequente, determinístico) + o hábito documentado de "checkpoint antes de `/compact`". Um hook `PreCompact` *poderia* forçar o flush, mas é config opcional (skill `update-config`), não capacidade de comando.
+> ⚠️ **Caveat honesto (confirmado):** a saída de um hook `PreCompact` é **ignorada** pós-compactação — não dá para injetar um lembrete que sobreviva, e **nenhum hook "faz o flush"** (escrever o `STATE.md` com o raciocínio é coisa que só o Claude faz). A **garantia** continua sendo checkpoint em todo limite de fase (determinístico) + o hábito de "checkpoint antes de `/compact`". O que o framework ships é o único side-effect útil possível: `.claude/hooks/worklog-precompact-breadcrumb.sh` (wired no evento `PreCompact`) grava um **breadcrumb datado** no `notes.md` do worklog ACTIVE; na retomada, o drift-guard do `/engineer/work` cruza esse marcador com `STATE.md.last_checkpoint` para alertar se você compactou sem checkpointar.
 
 ---
 
