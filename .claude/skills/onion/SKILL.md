@@ -44,7 +44,7 @@ Branch atual:
 
 **Sequência de hotfix:**
 ```
-/engineer/hotfix → /engineer/work → /engineer/pr → /git:hotfix:finish
+/engineer/hotfix → /engineer/work → /engineer/pr → /git:flow hotfix finish
 ```
 
 ---
@@ -111,6 +111,15 @@ Branch atual:
 
 ---
 
+### Auto-Evolução do Framework
+| Intenção | Comando / KB |
+|----------|--------------|
+| "Auditar o Onion", "como melhoro o framework?", "está desatualizado/pesado?" | `/meta:evolve` (fleet, read-only → backlog priorizado) |
+| Qual padrão de refatoração aplicar (consolidar/adapter/KB/skill/fan-out) | KB `onion-modernization-doctrine` |
+| Frescor de KBs · conformidade meta-spec | `/meta:kb-freshness` · `/meta:metaspec-validate` (compostos pelo `/meta:evolve`) |
+
+---
+
 ### Qualidade e Revisão
 | Intenção | Comando / Agente |
 |----------|-----------------|
@@ -128,12 +137,12 @@ Branch atual:
 ### Git e Versionamento
 | Intenção | Comando |
 |----------|---------|
-| Iniciar feature branch | `/git:feature:start` |
-| Finalizar feature | `/git:feature:finish` |
-| Publicar branch remota | `/git:feature:publish` |
+| Iniciar feature branch | `/git:flow feature start` |
+| Finalizar feature | `/git:flow feature finish` |
+| Publicar branch remota | `/git:flow feature publish` |
 | Sincronizar com GitFlow | `/git:sync` |
-| Iniciar release | `/git:release:start` |
-| Finalizar release | `/git:release:finish` |
+| Iniciar release | `/git:flow release start` |
+| Finalizar release | `/git:flow release finish` |
 | Commit rápido | `/git:fast-commit` |
 
 ---
