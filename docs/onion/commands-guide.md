@@ -417,6 +417,67 @@ $ ./engineer/start             # Não é executável
 # → Define ferramentas e modelo apropriados
 ```
 
+### `/meta:evolve`
+**Propósito**: Auto-auditoria do próprio Sistema Onion via frota (fan-out-and-synthesize) que produz um backlog priorizado de refatorações de modernização, com evidência citada (`arquivo:linha`)  
+**Input**: Dimensão específica (`D1`..`D8`) ou vazio para auditoria completa (8 dimensões)  
+**Natureza**: Read-only — propõe, não muta `.claude/`; a única escrita é o relatório em `docs/analysis/onion-evolution-<data>.md`
+
+```bash
+# Exemplo de uso
+/meta:evolve            # auditoria completa → backlog priorizado
+/meta:evolve D1         # só outliers de peso/tamanho
+```
+
+### `/meta:fleet`
+**Propósito**: Orquestra uma frota de agentes em paralelo (fan-out/fan-in) sobre uma tarefa, via a ferramenta nativa Workflow  
+**Input**: Descrição da tarefa elegível a paralelização (auditoria, migração, review ou pesquisa ampla)  
+**Padrões canônicos**: classify-and-act · fan-out-and-synthesize · adversarial verification · generate-and-filter · tournament · loop-until-done (skill `onion-fleet`)
+
+```bash
+# Exemplo de uso
+/meta:fleet contar agentes por categoria em .claude/agents/ e retornar resumo consolidado
+```
+
+> Outros meta-comandos disponíveis: `/meta:create-command`, `/meta:create-skill`, `/meta:create-knowledge-base`, `/meta:create-abstraction`, `/meta:kb-freshness`, `/meta:metaspec-validate`, `/meta:setup-integration`, `/meta:setup-code-review`.
+
+---
+
+## 🌲 Comandos Git
+
+Operações Git do Sistema Onion, orientadas pelo **motor GitFlow** ([gitflow-patterns.md](../knowledge-base/frameworks/gitflow-patterns.md)). Operações de host remoto (PR, review, CI, Release) passam pelo **forge adapter** ([utils/forge/](../../.claude/utils/forge/README.md)); git local (branch, merge, tag, push) é `git` direto.
+
+### `/git:flow`
+**Propósito**: Dispatcher **único** do ciclo de vida GitFlow — `feature` | `release` | `hotfix` × `start` | `publish` | `finish`. Substitui os 7 antigos sub-comandos (`git/{feature,release,hotfix}/{start,publish,finish}`) por um único ponto de entrada arg-driven  
+**Input**: `<type> <action> [nome|versão]`  
+**Integração**: Forge adapter (PR/CI/Release) + Task Manager adapter (sync opcional via `TASK_MANAGER_PROVIDER`)
+
+```bash
+# Exemplos de uso
+/git:flow feature start "user-auth"   # cria feature/user-auth de develop + sessão
+/git:flow feature publish             # push + review (forge)
+/git:flow feature finish              # merge → develop + cleanup
+/git:flow release start "minor"       # release/<versão> com auto-bump semver
+/git:flow release finish              # merge main+develop, tag, Release no host
+/git:flow hotfix start "fix-pay"      # hotfix a partir de main + task urgente
+/git:flow hotfix finish               # dual-merge + tag + Release + CI
+```
+
+> **Migração**: os caminhos antigos `/git:feature:start`, `/git:release:finish`, etc. foram consolidados — use sempre `/git:flow <type> <action>`.
+
+### `/git:init`
+**Propósito**: Inicializar repositório com GitFlow e convenções padrão do Sistema Onion  
+**Input**: Repositório (novo ou existente)
+
+### `/git:sync`
+**Propósito**: Sincronizar branch atual com o remoto seguindo a estratégia GitFlow (fast-forward em branches protegidas, rebase seguro)  
+**Input**: `[branch]` (default: branch atual)
+
+### `/git:fast-commit`
+**Propósito**: Adicionar todas as mudanças e fazer commit rápido seguindo Conventional Commits  
+**Input**: Mensagem de commit (ou gerada a partir do diff)
+
+> Comandos auxiliares: `/git:help` (ajuda contextual), `/git:code-review` (alias → `/meta:setup-code-review`).
+
 ---
 
 ## 🌟 Comandos Globais
