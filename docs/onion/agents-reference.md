@@ -1,17 +1,18 @@
 # 🤖 Referência de Agentes
 
-> **Versão**: 4.0 | **Última atualização**: 2026-06-14
+> **Versão**: 4.1 | **Última atualização**: 2026-06-14
 
 Este guia documenta os agentes especializados disponíveis no sistema `.claude/`, suas capacidades e quando utilizá-los.
 
 ## 📊 Resumo
 
-> **Contagens canônicas por categoria e total:** [docs/onion/inventory.md](inventory.md) — **SSOT gerada do filesystem** (`/meta:inventory`), validada no CI. Categorias: `development/`, `product/`, `compliance/`, `git/`, `meta/`, `testing/`, `review/`, `research/`, `deployment/`.
+> **Contagens canônicas por categoria e total:** [docs/onion/inventory.md](inventory.md) — **SSOT gerada do filesystem** (`/meta:inventory`), validada no CI. Sistema Onion: **77 comandos** em 9 categorias, **49 agentes** em 9 categorias, **5 skills**, **34 knowledge bases**. Categorias de agentes: `development/`, `product/`, `compliance/`, `git/`, `meta/`, `testing/`, `review/`, `research/`, `deployment/`.
 
 ## 📋 Índice de Agentes
 
 > Os títulos abaixo refletem as seções deste guia; alguns agentes podem aparecer agrupados por afinidade temática, não estritamente por diretório. Para a contagem oficial por diretório, ver [inventory.md](inventory.md).
 
+- [🧅 Agente Principal](#-agente-principal)
 - [🔵 Agentes de Desenvolvimento](#-agentes-de-desenvolvimento)
 - [🔷 Agentes de Testes](#-agentes-de-testes)
 - [🟢 Agentes de Review](#-agentes-de-review)
@@ -20,7 +21,44 @@ Este guia documenta os agentes especializados disponíveis no sistema `.claude/`
 - [🟠 Agentes de Documentação](#-agentes-de-documentação)
 - [🛡️ Agentes de Compliance](#️-agentes-de-compliance-)
 - [🟡 Agentes de Produto](#-agentes-de-produto)
+- [🔧 Agentes Meta](#-agentes-meta)
+- [🌿 Agentes de Branch (Git Review)](#-agentes-de-branch-git-review)
 - [⚙️ Como Escolher o Agente Certo](#️-como-escolher-o-agente-certo)
+- [📊 Combinações Eficazes](#-combinações-eficazes)
+- [💡 Melhores Práticas](#-melhores-práticas)
+
+---
+
+## 🧅 Agente Principal
+
+### **onion**
+**Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Purple
+
+**Especialidades**: Orquestração master do Sistema Onion, navegação, recomendação de comandos/agentes, troubleshooting geral
+
+**Quando usar**:
+- Navegar e se orientar no sistema
+- Dúvidas sobre qual comando ou agente usar
+- Orquestração de workflows complexos (feature, hotfix, PR, compliance)
+- Troubleshooting geral
+- Coordenação de tarefas multi-etapas
+- Qualquer dúvida sobre o Sistema Onion
+
+**Exemplo de uso**:
+```bash
+@onion "Como desenvolver uma feature completa do zero?"
+@onion "Qual comando usar para criar uma task no ClickUp?"
+@onion "Preciso gerar documentação de compliance para Serasa"
+```
+
+**Capacidades**:
+- Conhecimento completo: 77 comandos, 49 agentes, 5 skills, 34 knowledge bases
+- Análise inteligente de contexto e recomendação de abordagem
+- Orquestração de workflows end-to-end
+- Delegação para agentes especializados
+- Troubleshooting e diagnóstico de problemas no framework
+
+**Diferencial**: O `@onion` é o **ponto de entrada inteligente** do Sistema Onion. Use-o quando não souber por onde começar ou precisar coordenar tarefas complexas envolvendo múltiplos domínios.
 
 ---
 
@@ -48,6 +86,8 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 | `gamma-api-specialist` | Sonnet | Gamma.App API: apresentações e conteúdo com IA |
 | `whisper-specialist` | Sonnet | Transcrição de áudio com Whisper (OpenAI) |
 | `linux-security-specialist` | Sonnet | Hardening, auditoria e resposta a incidentes Linux |
+| `task-specialist` | Sonnet | Decomposição hierárquica de tasks (agnóstico de provider) _(destaque abaixo)_ |
+| `docker-specialist` | Sonnet | Docker, containers, Dockerfiles otimizados, Docker Compose |
 
 **Destaques** (perfis detalhados):
 
@@ -107,6 +147,48 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 **Complementaridade**:
 - **product-agent**: Estratégia, coordenação, especificação (O QUE fazer)
 - **clickup-specialist**: Implementação técnica, automação, performance (COMO otimizar)
+
+### **task-specialist**
+**Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Teal
+
+**Especialidades**: Decomposição hierárquica de tasks, estimativas, critérios de aceitação — **agnóstico de provider**
+
+**Quando usar**:
+- Quebrar tasks complexas em subtasks acionáveis
+- Criar estrutura hierárquica com estimativas de esforço
+- Definir critérios de aceitação e action items
+- Operar sem provider configurado (`TASK_MANAGER_PROVIDER=none`)
+
+**Exemplo de uso**:
+```bash
+@task-specialist "Decompor feature de autenticação JWT em subtasks"
+@task-specialist "Criar estrutura de tasks para migração de banco de dados"
+@task-specialist "Estimar esforço para implementação de sistema de notificações"
+```
+
+**Capacidades**:
+- Decomposição inteligente com patterns (Feature / Bug / Tech Debt / Research)
+- Estimativas de esforço calibradas
+- Critérios de aceitação claros e testáveis
+- Dependency mapping entre tasks
+
+### **docker-specialist**
+**Modelo**: Sonnet | **Prioridade**: Média | **Cor**: Blue
+
+**Especialidades**: Docker, containers, Dockerfiles otimizados, Docker Compose, CI/CD containerizado
+
+**Quando usar**:
+- Criar ou otimizar Dockerfiles
+- Configurar Docker Compose para ambientes multi-serviço
+- Troubleshooting de containers
+- Otimizar imagens (multi-stage builds, layer caching)
+
+**Exemplo de uso**:
+```bash
+@docker-specialist "Criar Dockerfile otimizado para Node.js com multi-stage build"
+@docker-specialist "Configurar Docker Compose para stack Postgres + Redis + API"
+@docker-specialist "Container não inicia — diagnosticar problema de permissões"
+```
 
 ---
 
@@ -491,6 +573,23 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 
 **Status**: ✅ 8/8 requisitos cobertos (100%)
 
+### **corporate-compliance-specialist**
+**Modelo**: Sonnet | **Prioridade**: Média | **Cor**: Blue
+
+**Especialidades**: Compliance corporativa, políticas e procedimentos, governança, auditoria interna
+
+**Quando usar**:
+- Review de compliance corporativo
+- Políticas internas e procedimentos
+- Auditoria interna de práticas
+- Governance organizacional
+
+**Exemplo de uso**:
+```bash
+@corporate-compliance-specialist "Review de compliance corporativo do projeto"
+@corporate-compliance-specialist "Verificar aderência a políticas internas de segurança de dados"
+```
+
 ---
 
 ## 🟡 Agentes de Produto
@@ -515,6 +614,37 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Gerencia tags e prioridades
 
 > **clickup-specialist** está documentado na seção [Agentes de Desenvolvimento](#-agentes-de-desenvolvimento) — colabora com `@product-agent` (técnico vs. estratégico).
+
+### **storytelling-business-specialist**
+**Modelo**: Sonnet | **Prioridade**: Média | **Cor**: Yellow
+
+**Especialidades**: Storytelling de produto, comunicação de valor de negócio, apresentações executivas
+
+**Quando usar**:
+- Criar narrativas de produto para stakeholders
+- Comunicar valor de negócio de features
+- Estruturar apresentações de produto
+- Documentar contexto de negócio de forma persuasiva
+
+**Exemplo de uso**:
+```bash
+@storytelling-business-specialist "Criar narrativa da nova feature de pagamentos para apresentação ao board"
+```
+
+### **presentation-orchestrator**
+**Modelo**: Sonnet | **Prioridade**: Média | **Cor**: Orange
+
+**Especialidades**: Orquestração de apresentações, integração de múltiplas fontes, geração automatizada
+
+**Quando usar**:
+- Coordenar criação de apresentações multi-fonte
+- Estruturar e automatizar geração de slides/docs executivos
+- Integrar dados técnicos com narrativa de negócio
+
+**Exemplo de uso**:
+```bash
+@presentation-orchestrator "Gerar apresentação executiva do projeto com dados de sprint + roadmap"
+```
 
 ### **claude-code-specialist**
 **Modelo**: Sonnet | **Prioridade**: Alta | **Cor**: Light Blue
@@ -630,17 +760,131 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 
 ---
 
+## 🔧 Agentes Meta
+
+Agentes para extensão e customização do próprio Sistema Onion:
+
+### **agent-creator-specialist**
+**Modelo**: Sonnet | **Prioridade**: Média | **Cor**: Purple
+
+**Especialidades**: Criação de novos agentes especializados, estruturação de frontmatter YAML, boas práticas de agentes
+
+**Quando usar**:
+- Criar agente customizado para domínio específico
+- Definir especialidade, tools e prompts de um novo agente
+- Revisar e melhorar agentes existentes
+
+**Exemplo de uso**:
+```bash
+@agent-creator-specialist "Criar agente especializado em GraphQL com suporte a Federation"
+```
+
+### **command-creator-specialist**
+**Modelo**: Sonnet | **Prioridade**: Média | **Cor**: Orange
+
+**Especialidades**: Criação de novos comandos (workflows), estruturação de steps, parâmetros e integrações
+
+**Quando usar**:
+- Criar comando customizado para workflow recorrente
+- Estruturar novos fluxos para o sistema `.claude/commands/`
+- Definir parâmetros e integrações de um novo comando
+
+**Exemplo de uso**:
+```bash
+@command-creator-specialist "Criar comando para deploy automatizado com rollback"
+```
+
+---
+
+## 🌿 Agentes de Branch (Git Review)
+
+Agentes especializados em review e validação ao nível de branch, usados como gates antes de merge:
+
+### **branch-code-reviewer**
+**Especialidades**: Code review completo de uma branch — analisa todas as mudanças, identifica code smells e sugere melhorias
+
+**Exemplo**: `@branch-code-reviewer "Review da branch feature/jwt-auth"`
+
+### **branch-documentation-writer**
+**Especialidades**: Documenta mudanças de uma branch — gera changelog, release notes e atualiza docs técnicas conforme as alterações
+
+**Exemplo**: `@branch-documentation-writer "Documentar mudanças da branch feature/payments"`
+
+### **branch-metaspec-checker**
+**Especialidades**: Valida conformidade da branch com as meta-specs arquiteturais — atua como gate keeper para merges estruturais
+
+**Exemplo**: `@branch-metaspec-checker "Validar compliance arquitetural da branch"`
+
+### **branch-test-planner**
+**Especialidades**: Define estratégia de testes para uma branch — analisa cobertura existente e identifica gaps antes do merge
+
+**Exemplo**: `@branch-test-planner "Planejar testes para branch feature/auth"`
+
+---
+
 ## ⚙️ Como Escolher o Agente Certo
+
+### **Matriz de Decisão Rápida**
+
+| Situação | Agente Recomendado |
+|----------|-------------------|
+| Não sei por onde começar | `@onion` |
+| Criar task estruturada | `@task-specialist` |
+| Otimizar ClickUp tecnicamente | `@clickup-specialist` |
+| Problemas Git / GitFlow | `@gitflow-specialist` |
+| Documentar arquitetura C4 | `@c4-architecture-specialist` |
+| Code review geral | `@code-reviewer` |
+| Review de branch completa | `@branch-code-reviewer` |
+| Testes / TDD | `@test-engineer` |
+| Frontend React/Next.js | `@react-developer` |
+| Backend Node.js | `@nodejs-specialist` |
+| Containers / Docker | `@docker-specialist` |
+| PostgreSQL / banco de dados | `@postgres-specialist` |
+| Segurança / compliance | `@security-information-master` |
+| ISO 27001 | `@iso-27001-specialist` |
+| SOC2 | `@soc2-specialist` |
+| Estratégia de produto | `@product-agent` |
+| Criar novo agente | `@agent-creator-specialist` |
+| Criar novo comando | `@command-creator-specialist` |
+
+### **Fluxo de Decisão**
+
+```mermaid
+flowchart TD
+    A[Preciso de ajuda] --> B{Tipo de problema?}
+
+    B -->|Não sei qual usar| Z[onion]
+    B -->|ClickUp| C[clickup-specialist]
+    B -->|Git| D[gitflow-specialist]
+    B -->|Arquitetura C4| E[c4-architecture-specialist]
+    B -->|Code Review| F[code-reviewer]
+    B -->|Review de branch| FB[branch-code-reviewer]
+    B -->|Testes| G[test-engineer]
+    B -->|Produto| H[product-agent]
+    B -->|Tasks / decomposição| T[task-specialist]
+    B -->|Compliance| I{Qual padrão?}
+    B -->|Meta / criar agente| M[agent-creator-specialist]
+
+    I -->|ISO 27001| J[iso-27001-specialist]
+    I -->|SOC 2| K[soc2-specialist]
+    I -->|PMBOK| L[pmbok-specialist]
+
+    B -->|Desenvolvimento| N{Tecnologia?}
+    N -->|React| R[react-developer]
+    N -->|Node.js| O[nodejs-specialist]
+    N -->|Docker| P[docker-specialist]
+    N -->|PostgreSQL| Q[postgres-specialist]
+```
 
 ### **Por Tipo de Tarefa**
 
 #### **🔧 Desenvolvimento**
 ```bash
-# Python backend
-@python-developer "implementar API REST"
-
 # Frontend React
 @react-developer "criar componente de dashboard"
+
+# Backend Node.js
+@nodejs-specialist "implementar API REST com Fastify"
 
 # Full-stack (coordenação automática)
 /engineer/work "sistema completo de notificações"
@@ -660,7 +904,10 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 # Code review geral
 @code-reviewer "revisar implementação de cache Redis"
 
-# Validação arquitetural  
+# Review de branch completa (pre-merge)
+@branch-code-reviewer "Review da branch feature/payments"
+
+# Validação arquitetural
 @metaspec-gate-keeper "validar uso de microservices"
 ```
 
@@ -677,6 +924,9 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 ```bash
 # Gestão de produto
 @product-agent "refinar requisitos da feature de chat"
+
+# Decomposição de tasks
+@task-specialist "decompor feature de autenticação em subtasks"
 ```
 
 ### **Por Complexidade**
@@ -689,8 +939,8 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 #### **🟡 Tarefa Média** (2-3 agentes sequenciais)
 ```bash
 # Sequência típica:
-@research-agent "pesquisar padrões OAuth2" 
-→ @python-developer "implementar OAuth2"
+@research-agent "pesquisar padrões OAuth2"
+→ @nodejs-specialist "implementar OAuth2"
 → @test-engineer "testar fluxo OAuth2"
 ```
 
@@ -700,44 +950,56 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 # → Coordenação automática de múltiplos agentes
 ```
 
+### **Boas Práticas de Invocação**
+
+```bash
+# Use o agente mais específico disponível
+# Menos específico:
+@code-reviewer "Como fazer autenticação?"
+# Mais específico:
+@nodejs-specialist "Como implementar JWT com refresh tokens em Node.js?"
+
+# Forneça contexto adequado
+# Vago:
+@clickup-specialist "Ajuda com tasks"
+# Concreto:
+@clickup-specialist "Como criar hierarquia de tasks com parent/child via bulk API?"
+
+# Combine agentes para workflows completos
+@task-specialist "Decompor feature"
+@c4-architecture-specialist "Documentar arquitetura"
+@test-engineer "Criar estratégia de testes"
+
+# Workflow completo com comandos
+/product/task "Nova feature"
+@task-specialist "Refinar decomposição"
+/engineer/start feature-name
+@c4-architecture-specialist "Documentar decisões"
+```
+
 ### **Por Prioridade do Modelo**
 
 #### **🚀 Sonnet (Eficiência)**
-- `python-developer`, `react-developer`, `test-engineer`, `research-agent`
--  Tarefas de implementação diretas
--  Testes e validações
--  Pesquisa e documentação
+- `react-developer`, `nodejs-specialist`, `test-engineer`, `research-agent`, `task-specialist`
+- Tarefas de implementação diretas
+- Testes e validações
+- Pesquisa e documentação
 
 #### **🎯 Opus (Análise Complexa)**
 - `code-reviewer`, `metaspec-gate-keeper`, `product-agent`
--  Decisões arquiteturais críticas
--  Reviews complexos
--  Coordenação de produto
+- Decisões arquiteturais críticas
+- Reviews complexos
+- Coordenação de produto
 
-### **Padrões de Delegação Automática**
-
-O sistema escolhe agentes automaticamente baseado em:
-
-#### **Análise de Contexto**
-```python
-# Exemplo interno (não visível ao usuário)
-if task.contains("test") or task.contains("spec"):
-    delegate_to("test-engineer")
-elif task.contains("react") or task.contains("frontend"):  
-    delegate_to("react-developer")
-elif task.contains("review") or task.contains("quality"):
-    delegate_to("code-reviewer")
-```
-
-#### **Coordenação Multi-Agente**
+### **Coordenação Multi-Agente**
 ```mermaid
 graph TD
     A[Task Complexa] --> B[Análise de Requisitos]
     B --> C{Múltiplos Domínios?}
     C -->|Sim| D[Coordenador Principal]
     C -->|Não| E[Agente Especializado]
-    D --> F[python-developer]
-    D --> G[react-developer]  
+    D --> F[nodejs-specialist]
+    D --> G[react-developer]
     D --> H[test-engineer]
     F --> I[Sincronização]
     G --> I
@@ -747,22 +1009,14 @@ graph TD
 
 ---
 
-## 📊 Métricas dos Agentes
+## 📊 Combinações Eficazes
 
-### **Performance por Agente**
-| Agente | Tempo Médio | Taxa Sucesso | Uso Frequente |
-|---------|-------------|--------------|---------------|
-| `python-developer` | 45min | 94% | 35% |
-| `react-developer` | 52min | 91% | 28% |
-| `test-engineer` | 28min | 96% | 15% |
-| `code-reviewer` | 15min | 89% | 12% |
-| `research-agent` | 22min | 92% | 8% |
-| `product-agent` | 35min | 87% | 2% |
-
-### **Combinações Eficazes**
-1. **Feature Development**: `product-agent` → `python-developer` → `test-engineer` → `code-reviewer`
-2. **Bug Fix**: `research-agent` → `python-developer` → `test-engineer`  
-3. **Refactoring**: `code-reviewer` → `metaspec-gate-keeper` → `python-developer`
+### **Workflows Recomendados**
+1. **Feature Development**: `product-agent` → `task-specialist` → `nodejs-specialist` / `react-developer` → `test-engineer` → `code-reviewer`
+2. **Bug Fix**: `research-agent` → `nodejs-specialist` → `test-engineer`
+3. **Refactoring**: `code-reviewer` → `metaspec-gate-keeper` → `nodejs-specialist`
+4. **Pre-Merge**: `branch-code-reviewer` → `branch-metaspec-checker` → `branch-test-planner`
+5. **Compliance**: `security-information-master` → `iso-27001-specialist` / `soc2-specialist` → `iso-22301-specialist`
 
 ### **Especialização vs Generalização**
 
@@ -770,38 +1024,49 @@ graph TD
 - `test-engineer`: Foco exclusivo em testes
 - `metaspec-gate-keeper`: Validação arquitetural apenas
 - `documentation-writer`: Só documentação
+- `task-specialist`: Só decomposição de tasks
 
 #### **🔄 Especialização Média**
-- `python-developer`: Python + relacionados (APIs, ML)
+- `nodejs-specialist`: Node.js + TypeScript backend
 - `react-developer`: React + ecosistema frontend
 - `research-agent`: Pesquisa + análise
 
 #### **🌐 Mais Generalista**
 - `code-reviewer`: Qualquer linguagem/framework
 - `product-agent`: Gestão geral de produto
+- `onion`: Orquestrador de todo o sistema
 
 ---
 
 ## 💡 Melhores Práticas
 
 ### **Para Máxima Eficiência**
-1. ✅ **Use agentes específicos** para tarefas claras
-2. ✅ **Deixe o sistema coordenar** tarefas complexas
-3. ✅ **Combine sequencialmente** para workflows
-4. ✅ **Monitore resultados** para ajustar delegação
+1. Use agentes específicos para tarefas claras
+2. Deixe o sistema coordenar tarefas complexas (`@onion` ou `/engineer/work`)
+3. Combine sequencialmente para workflows de feature
+4. Use `@task-specialist` antes de iniciar implementação para decompor bem o escopo
 
 ### **Para Qualidade**
-1. 🔍 **Sempre use code-reviewer** antes de PRs importantes
-2. 🏗️ **Valide com metaspec-gate-keeper** mudanças arquiteturais
-3. 🧪 **Inclua test-engineer** em features críticas
-4. 📚 **Use documentation-writer** para manter docs sincronizados
+1. Sempre use `@code-reviewer` antes de PRs importantes
+2. Valide com `@metaspec-gate-keeper` mudanças arquiteturais
+3. Inclua `@test-engineer` em features críticas
+4. Use `@documentation-writer` para manter docs sincronizados
+5. Use os agentes `@branch-*` como gate automático antes de merge
 
 ### **Para Produtividade**
-1. ⚡ **Delegação automática** para workflows conhecidos
-2. 🎯 **Agentes especializados** para tarefas específicas
-3. 🔄 **Reutilize padrões** de combinação que funcionam
-4. 📊 **Monitore métricas** para otimização contínua
+1. Use `@onion` quando não souber qual agente ou comando escolher
+2. Agentes especializados respondem mais rápido e melhor que o agente genérico
+3. Reutilize padrões de combinação que funcionam (ver Combinações Eficazes acima)
+4. Para compliance, deixe `@security-information-master` orquestrar — evita ativar specialists desnecessários
 
 ---
 
 **Próximo**: [Getting Started →](getting-started.md)
+
+---
+
+## 🔗 Documentos Relacionados
+
+- [inventory.md](inventory.md) — contagens canônicas SSOT por categoria
+- [commands-guide.md](commands-guide.md) — comandos que invocam agentes
+- [engineering-flows.md](engineering-flows.md) — workflows de desenvolvimento com agentes

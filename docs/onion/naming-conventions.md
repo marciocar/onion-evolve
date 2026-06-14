@@ -255,10 +255,10 @@ git push origin --delete feature/nome-antigo
 
 ## 📚 Referências
 
-- [Guia de Comandos](.claude/docs/onion/commands-guide.md)
-- [Fluxos de Engenharia](.claude/docs/onion/engineering-flows.md)
-- [Exemplos Práticos](.claude/docs/onion/practical-examples.md)
-- [Configuração Inicial](.claude/docs/onion/getting-started.md)
+- [Guia de Comandos](commands-guide.md)
+- [Fluxos de Engenharia](engineering-flows.md)
+- [Exemplos Práticos](practical-examples.md)
+- [Configuração Inicial](getting-started.md)
 
 ---
 

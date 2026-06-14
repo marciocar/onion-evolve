@@ -10,6 +10,10 @@ Este guia apresenta cenários reais de uso dos comandos `.claude/` com exemplos 
 - [🔧 Refatoração de Sistema](#-refatoração-de-sistema)
 - [⚡ Hotfix de Emergência](#-hotfix-de-emergência)
 - [🎯 Casos Especiais](#-casos-especiais)
+- [📦 Release e Deploy](#-release-e-deploy)
+- [❌ Anti-Patterns: O Que NÃO Fazer](#-anti-patterns-o-que-não-fazer)
+- [🔧 Troubleshooting Comum](#-troubleshooting-comum)
+- [📊 Métricas dos Exemplos](#-métricas-dos-exemplos)
 
 ---
 
@@ -339,7 +343,7 @@ Por favor, forneça essas informações.
 ```
 
 **Investigação**:
-```
+````
 🔍 Analisando commits recentes...
 
 **COMMIT SUSPEITO ENCONTRADO**: 
@@ -366,7 +370,7 @@ const items = response.items || [];
 ✅ Fix aplicado em 2 arquivos
 🧪 Testes locais: ✅ Dashboard carrega normalmente
 🧪 Testes edge case: ✅ Fallbacks funcionando
-```
+````
 
 #### **Passo 4: Deploy Urgente**
 ```bash
@@ -515,7 +519,7 @@ Sistema de pagamento está rejeitando todos os cartões válidos em produção.
 **Input**: `URGENT-999`
 
 **Resposta Ultra-Rápida**:
-```
+````
 🚨 **HOTFIX EMERGENCY MODE**
 
 📁 Sessão: .claude/sessions/hotfix-payment-outage/
@@ -536,7 +540,7 @@ const cardRegex = /^4[0-9]{12}(?:[0-9]{3})?$|^5[1-5][0-9]{14}$|^3[47][0-9]{13}$/
 ```
 
 ⚡ **DEPLOY EM 5 MINUTOS**
-```
+````
 
 ---
 
@@ -552,12 +556,12 @@ const cardRegex = /^4[0-9]{12}(?:[0-9]{3})?$|^5[1-5][0-9]{14}$|^3[47][0-9]{13}$/
 🤖 **Coordenação Multi-Agente Ativada**
 
 **Agentes Envolvidos**:
-- python-developer: Backend WebSocket server
+- nodejs-specialist: Backend WebSocket server
 - react-developer: Frontend chat components  
 - test-engineer: Testes de integração em tempo real
 
 **Fluxo Coordenado**:
-1. python-developer: Implementa WebSocket server + Redis pub/sub
+1. nodejs-specialist: Implementa WebSocket server + Redis pub/sub
 2. react-developer: Cria UI de chat + hooks WebSocket
 3. test-engineer: Testes E2E de messaging
 
@@ -586,6 +590,148 @@ Qual abordagem preferir?
 
 ---
 
+## 📦 Release e Deploy
+
+### **Cenário**: Preparar release v1.2.0 com múltiplas features e bugfixes
+
+#### **Passo 1: Criar Release Branch**
+```bash
+/git:flow release start "v1.2.0"
+```
+
+#### **Passo 2: Ajustes Finais**
+```bash
+# Atualizar CHANGELOG e versão
+/engineer/bump minor
+
+# Testes finais
+npm run test:e2e
+npm run test:integration
+```
+
+#### **Passo 3: PR e Aprovação**
+```bash
+/engineer/pr
+```
+
+**Checklist de Release**:
+- ✅ Todos os testes passam
+- ✅ CHANGELOG atualizado
+- ✅ Versão atualizada
+- ✅ Documentação atualizada
+- ✅ Breaking changes documentadas
+
+#### **Passo 4: Merge e Tag**
+```bash
+/git:flow release finish
+```
+
+**O que acontece**:
+1. Merge para `main`
+2. Merge para `develop`
+3. Tag `v1.2.0`
+4. Deploy para produção
+5. Release notes geradas
+
+---
+
+## ❌ Anti-Patterns: O Que NÃO Fazer
+
+### Anti-Pattern 1: Pular Análise
+```bash
+# ERRADO
+/engineer/work feature-x  # Sem /engineer/start antes!
+
+# CORRETO
+/engineer/start feature-x  # Análise primeiro
+/engineer/work feature-x   # Depois implementação
+```
+
+### Anti-Pattern 2: Commits Grandes
+```bash
+# ERRADO
+git add .
+git commit -m "Implementei tudo"
+
+# CORRETO
+git add src/services/jwt.service.ts
+git commit -m "feat: implement JWT generation"
+
+git add src/middleware/auth.middleware.ts
+git commit -m "feat: add auth middleware"
+```
+
+### Anti-Pattern 3: Pular Testes
+```bash
+# ERRADO
+/engineer/pr  # Sem rodar testes!
+
+# CORRETO
+npm test
+/engineer/pre-pr  # Validações
+/engineer/pr      # Depois PR
+```
+
+### Anti-Pattern 4: Não Usar Hierarquia de Tasks
+```bash
+# ERRADO - criar subtasks independentes sem parent
+# CORRETO - ao usar /product/task, o sistema cria a hierarquia automaticamente
+# com task principal + subtasks vinculadas pelo adapter do provider ativo
+```
+
+---
+
+## 🔧 Troubleshooting Comum
+
+### Problema 1: Branch já existe
+```bash
+# Sintoma
+Error: Branch feature/x already exists
+
+# Solução
+git checkout feature/x  # Usar existente
+# OU
+git branch -D feature/x  # Deletar e recriar
+/git:flow feature start "x"
+```
+
+### Problema 2: Task manager não atualiza
+```bash
+# Diagnóstico
+cat .claude/sessions/<feature-slug>/context.md | grep "Task ID"
+
+# Se task-id incorreto, corrigir manualmente no context.md
+# Se correto, verificar variáveis do provider em .env:
+#   jira: JIRA_HOST, JIRA_EMAIL, JIRA_API_TOKEN
+#   clickup: CLICKUP_API_TOKEN
+#   asana: ASANA_ACCESS_TOKEN
+#   linear: LINEAR_API_KEY
+# Se provider não configurado: /meta/setup-integration
+```
+
+### Problema 3: Sessão não encontrada
+```bash
+# Sintoma
+/engineer/work x
+Error: Session not found
+
+# Solução
+/engineer/start x  # Criar sessão primeiro
+```
+
+### Problema 4: Testes falhando antes do PR
+```bash
+# Diagnóstico
+npm test -- --verbose
+
+# Correção
+# 1. Corrigir o código ou testes
+# 2. Rodar novamente até passar
+# 3. Só então executar /engineer/pr
+```
+
+---
+
 ## 📊 Métricas dos Exemplos
 
 ### **Tempos Médios Observados**
@@ -599,13 +745,13 @@ Qual abordagem preferir?
 - **PRs approved first-time**: 85%
 - **Bugs fixed correctly**: 92%
 - **Documentação atualizada**: 100% (automático)
-- **ClickUp sync accuracy**: 98%
+- **Task manager sync accuracy**: 98%
 
 ### **Benefícios Observados**
 - ⚡ **50% mais rápido** que workflow manual
 - 🎯 **30% menos bugs** pós-deploy
 - 📚 **100% documentação** sempre atualizada  
-- 🔄 **Zero overhead** de sincronização ClickUp
+- 🔄 **Zero overhead** de sincronização com task manager
 
 ---
 

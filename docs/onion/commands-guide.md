@@ -10,13 +10,20 @@ Este guia documenta todos os comandos disponíveis no sistema `.claude/`, organi
 
 Categorias: `product/`, `meta/`, `docs/`, `engineer/`, `git/`, `validate/`, `test/`, `development/`, `quick/` + root (`onion`, `warm-up`).
 
+### Convenções de Nomenclatura
+
+- **`<feature-slug>`**: Nome da feature em kebab-case (ex: `user-authentication`)
+- **`[opcional]`**: Parâmetro opcional
+- **`<obrigatório>`**: Parâmetro obrigatório
+
 ## 📋 Índice por Categoria
 
 - [🔧 Comandos de Engenharia](#-comandos-de-engenharia)
-- [📋 Comandos de Produto](#-comandos-de-produto)
-- [📚 Comandos de Documentação](#-comandos-de-documentacao)
+- [📦 Comandos de Produto](#-comandos-de-produto)
+- [📚 Comandos de Documentação](#-comandos-de-documentação)
 - [⚙️ Meta Comandos](#️-meta-comandos)
 - [🌲 Comandos Git](#-comandos-git)
+- [✅ Comandos de Validação](#-comandos-de-validação)
 - [🌟 Comandos Globais](#-comandos-globais)
 
 ---
@@ -58,36 +65,35 @@ $ ./engineer/start             # Não é executável
 ## 🔧 Comandos de Engenharia
 
 ### `/engineer/start`
+**Sintaxe:** `/engineer/start [feature-slug]`  
 **Propósito**: Iniciar desenvolvimento de uma funcionalidade  
-**Input**: Tasks do ClickUp para trabalhar  
-**Integração ClickUp**: ✅ Lê tasks e context
+**Input**: Tasks do task manager para trabalhar
 
 ```bash
-# Exemplo de uso
-/engineer/start
-# → Sistema solicita ID da task ClickUp
-# → Analisa requisitos e dependências
-# → Configura ambiente de desenvolvimento
+/engineer/start user-authentication
+# → Cria/valida feature branch
+# → Gera context.md, architecture.md e plan.md em .claude/sessions/
+# → Atualiza status no task manager
 ```
 
 **Fluxo detalhado**:
 1. Verifica se está em feature branch (ou cria uma)
 2. Cria pasta `.claude/sessions/<feature_slug>`
-3. Solicita input de tasks ClickUp
+3. Solicita input de tasks do task manager ativo
 4. Analisa contexto, objetivos e abordagem
 5. Identifica dependências e requisitos de teste
 
 ### `/engineer/work`
+**Sintaxe:** `/engineer/work [feature-slug]`  
 **Propósito**: Trabalhar em uma funcionalidade específica  
-**Input**: Pasta ou especificação de trabalho  
-**Integração ClickUp**: ✅ Atualiza progresso
+**Input**: Pasta ou especificação de trabalho
 
 ```bash
-# Exemplo de uso
-/engineer/work "implementar autenticação JWT"
-# → Sistema analisa arquivos do projeto
-# → Identifica fase atual no plan.md
-# → Apresenta próximos passos
+/engineer/work user-authentication
+# → Lê arquivos da sessão (context, architecture, plan)
+# → Identifica fase atual em progresso
+# → Implementa código seguindo o plano
+# → Atualiza automaticamente status ao completar fase
 ```
 
 **Fluxo detalhado**:
@@ -98,54 +104,49 @@ $ ./engineer/start             # Não é executável
 5. Atualiza progresso no plan.md
 
 ### `/engineer/pr`
-**Propósito**: Criar Pull Request e atualizar ClickUp  
-**Input**: Branch com código para review  
-**Integração ClickUp**: ✅ Move para "in progress" + tag "under-review"
+**Sintaxe:** `/engineer/pr`  
+**Propósito**: Criar Pull Request e atualizar task manager  
+**Input**: Branch com código para review
 
 ```bash
-# Exemplo de uso
 /engineer/pr
 # → Executa testes automaticamente
 # → Faz commit das mudanças
-# → Atualiza status ClickUp
+# → Atualiza status no task manager
 # → Cria PR com detalhes
 ```
 
 **Fluxo detalhado**:
 1. Executa suíte de testes completa
 2. Faz commit com mensagem clara
-3. Move task ClickUp para "in progress" + tag "under-review"
+3. Move task para "in progress" + tag "under-review"
 4. Cria Pull Request com detalhes da implementação
 5. Aguarda e processa feedback automatizado
 
 ### `/engineer/pr-update` 🆕
-**Propósito**: Atualizar Pull Request existente com mudanças adicionais  
-**Input**: Mudanças pendentes após PR criado  
-**Integração ClickUp**: ✅ Documenta updates automáticos
+**Sintaxe:** `/engineer/pr-update`  
+**Propósito**: Atualizar Pull Request existente com mudanças adicionais
 
 ```bash
-# Exemplo de uso
 /engineer/pr-update
 # → Detecta mudanças pendentes automaticamente
-# → Commit inteligente com tipo contextual
+# → Commit inteligente com tipo contextual (fix/feat/docs/refactor)
 # → Push para branch do PR existente
-# → Atualiza ClickUp com detalhes
+# → Atualiza task manager com detalhes
 ```
 
 **Fluxo detalhado**:
 1. Detecta contexto (branch feature + PR existente)
 2. Analisa mudanças para categorização automática
-3. Gera commit inteligente (fix/feat/docs/refactor)
+3. Gera commit inteligente
 4. Push automático para atualizar PR
-5. Comentário detalhado no ClickUp
+5. Comentário detalhado no task manager
 
 ### `/engineer/validate-phase-sync` 🆕
-**Propósito**: Validar sincronização entre fases e subtasks ClickUp  
-**Input**: Sessão de desenvolvimento ativa  
-**Integração ClickUp**: ✅ Corrige inconsistências automaticamente
+**Sintaxe:** `/engineer/validate-phase-sync`  
+**Propósito**: Validar sincronização entre fases e subtasks do task manager
 
 ```bash
-# Exemplo de uso
 /engineer/validate-phase-sync
 # → Analisa plan.md vs status subtasks
 # → Identifica discrepâncias
@@ -159,12 +160,10 @@ $ ./engineer/start             # Não é executável
 - Corrigir status desatualizados retroativamente
 
 ### `/engineer/pre-pr`
-**Propósito**: Validações antes do Pull Request  
-**Input**: Código atual da branch  
-**Integração ClickUp**: ✅ Valida status da task
+**Sintaxe:** `/engineer/pre-pr`  
+**Propósito**: Validações antes do Pull Request
 
 ```bash
-# Exemplo de uso
 /engineer/pre-pr
 # → Executa validações de qualidade
 # → Verifica testes e cobertura
@@ -172,25 +171,29 @@ $ ./engineer/start             # Não é executável
 ```
 
 ### `/engineer/plan`
-**Propósito**: Criar ou revisar plano de desenvolvimento  
-**Input**: Especificações da funcionalidade  
-**Integração ClickUp**: ✅ Sincroniza com task details
+**Sintaxe:** `/engineer/plan`  
+**Propósito**: Criar ou revisar plano de desenvolvimento
 
 ```bash
-# Exemplo de uso
 /engineer/plan "feature: sistema de notificações"
 # → Cria plano estruturado em fases
 # → Define milestones e dependências
 # → Estima tempo e recursos
 ```
 
-### `/engineer/docs`
-**Propósito**: Gerar documentação técnica da implementação  
-**Input**: Código implementado  
-**Integração ClickUp**: ✅ Adiciona docs como comentário
+### `/engineer/hotfix`
+**Sintaxe:** `/engineer/hotfix <bug-description>`  
+**Propósito**: Cria hotfix urgente para correção de bugs críticos
 
 ```bash
-# Exemplo de uso
+/engineer/hotfix "memory-leak-notifications"
+```
+
+### `/engineer/docs`
+**Sintaxe:** `/engineer/docs`  
+**Propósito**: Gerar documentação técnica da implementação
+
+```bash
 /engineer/docs
 # → Analisa código implementado
 # → Gera documentação técnica
@@ -198,12 +201,10 @@ $ ./engineer/start             # Não é executável
 ```
 
 ### `/engineer/bump`
-**Propósito**: Atualizar versão e preparar release  
-**Input**: Tipo de versão (major/minor/patch)  
-**Integração ClickUp**: ✅ Cria task de release
+**Sintaxe:** `/engineer/bump [major|minor|patch]`  
+**Propósito**: Atualizar versão e preparar release (SemVer)
 
 ```bash
-# Exemplo de uso
 /engineer/bump patch
 # → Atualiza package.json/version
 # → Cria changelog
@@ -211,126 +212,153 @@ $ ./engineer/start             # Não é executável
 ```
 
 ### `/engineer/warm-up`
-**Propósito**: Aquecimento e configuração do ambiente de engenharia  
-**Input**: Contexto do projeto  
-**Integração ClickUp**: ✅ Verifica configuração workspace
+**Sintaxe:** `/engineer/warm-up`  
+**Propósito**: Aquecimento e configuração do ambiente de engenharia
 
 ---
 
-## 📋 Comandos de Produto
+## 📦 Comandos de Produto
 
 ### `/product/task`
-**Propósito**: Criar nova task no ClickUp  
-**Input**: Descrição da funcionalidade/bug  
-**Integração ClickUp**: ✅ Cria task completa com detalhes
+**Sintaxe:** `/product/task "<descrição-da-task>"`  
+**Propósito**: Criar task estruturada no task manager com decomposição hierárquica inteligente
 
 ```bash
-# Exemplo de uso
 /product/task "Implementar sistema de autenticação OAuth2"
-# → Analisa requisitos
-# → Cria task estruturada no ClickUp
-# → Define critérios de aceitação
+# → Analisa documentação do projeto (README.md, docs/)
+# → Apresenta plano para confirmação
+# → Cria task principal + subtasks + action items
+# → Integração Git automática (/git:flow feature start)
 ```
+
+**Patterns Suportados**:
+- Feature Development: Backend + Frontend + Quality
+- Bug Fix: Investigation + Fix + Validation
+- Technical Debt: Analysis + Refactoring + Optimization
+- Research/Spike: Discovery + PoC + Decision
 
 **Fluxo detalhado**:
 1. Compreende descrição da tarefa
 2. Analisa documentação existente do projeto
 3. Formula perguntas para esclarecer ambiguidades
 4. Confirma entendimento com usuário
-5. Cria task no ClickUp com:
-   - Título claro e descritivo
-   - Descrição detalhada
-   - Critérios de aceitação
-   - Estimativa de esforço
-   - Etiquetas relevantes
+5. Cria task com título, descrição, critérios de aceitação, estimativa e etiquetas
 
-### `/product/collect`
-**Propósito**: Coletar e salvar ideias/bugs  
-**Input**: Descrição da ideia ou problema  
-**Integração ClickUp**: ✅ Salva no backlog ClickUp
+### `/product/feature`
+**Sintaxe:** `/product/feature "<descrição-da-feature>"`  
+**Propósito**: Cria feature completa com especificação detalhada
 
 ```bash
-# Exemplo de uso
-/product/collect "Usuários reportam lentidão no carregamento da dashboard"
-# → Esclarece detalhes do problema
-# → Categoriza o tipo (bug/feature)
-# → Salva no ClickUp com prioridade apropriada
+/product/feature "Dashboard analytics interativo"
 ```
 
-**Fluxo detalhado**:
-1. Entende a solicitação através de perguntas
-2. Classifica como funcionalidade ou bug
-3. Determina prioridade e urgência
-4. Salva no ClickUp com informações estruturadas
-
-### `/product/refine`
-**Propósito**: Refinar requisitos de uma funcionalidade  
-**Input**: Task existente ou especificação inicial  
-**Integração ClickUp**: ✅ Atualiza task com refinamentos
+### `/product/collect`
+**Sintaxe:** `/product/collect`  
+**Propósito**: Coletar e salvar ideias/bugs no backlog
 
 ```bash
-# Exemplo de uso
-/product/refine 
-# → Analisa task atual do ClickUp
+/product/collect
+# → Entende a solicitação através de perguntas
+# → Classifica como funcionalidade ou bug
+# → Determina prioridade e urgência
+# → Salva no task manager com informações estruturadas
+```
+
+### `/product/refine`
+**Sintaxe:** `/product/refine`  
+**Propósito**: Refinar requisitos de uma funcionalidade
+
+```bash
+/product/refine
+# → Revisa especificação existente
 # → Identifica gaps nos requisitos
 # → Adiciona detalhes e esclarecimentos
 ```
 
-**Fluxo detalhado**:
-1. Revisa especificação existente
-2. Identifica áreas que precisam de refinamento
-3. Faz perguntas específicas sobre funcionalidade
-4. Atualiza task ClickUp ou arquivo local
-
 ### `/product/light-arch`
-**Propósito**: Esboçar arquitetura inicial  
-**Input**: Requisitos da funcionalidade  
-**Integração ClickUp**: ✅ Adiciona detalhes como comentário
+**Sintaxe:** `/product/light-arch`  
+**Propósito**: Esboçar arquitetura inicial para features
 
 ```bash
-# Exemplo de uso
 /product/light-arch
 # → Discute abordagem arquitetural
 # → Define componentes principais
-# → Salva decisões no ClickUp
+# → Salva decisões no task manager
 ```
 
 ### `/product/spec`
-**Propósito**: Criar especificação técnica detalhada  
-**Input**: Requisitos refinados  
-**Integração ClickUp**: ✅ Vincula spec à task
+**Sintaxe:** `/product/spec`  
+**Propósito**: Criar especificação técnica detalhada
 
 ### `/product/check`
-**Propósito**: Verificar qualidade e completude dos requisitos  
-**Input**: Documentação de requisitos  
-**Integração ClickUp**: ✅ Adiciona checklist de validação
+**Sintaxe:** `/product/check`  
+**Propósito**: Verificar qualidade e completude dos requisitos
+
+### `/product/task-check`
+**Sintaxe:** `/product/task-check <task-id>`  
+**Propósito**: Valida task do task manager quanto a completude e qualidade
+
+```bash
+/product/task-check 86acu8pdk
+```
+
+### `/product/validate-task`
+**Sintaxe:** `/product/validate-task <task-id>`  
+**Propósito**: Validação completa de task incluindo critérios de aceitação
+
+```bash
+/product/validate-task 86acu8pdk
+```
+
+### `/product/checklist-sync`
+**Sintaxe:** `/product/checklist-sync <task-id>`  
+**Propósito**: Sincroniza checklists do task manager com documentação local
+
+```bash
+/product/checklist-sync 86acu8pdk
+```
 
 ### `/product/warm-up`
-**Propósito**: Aquecimento do contexto de produto  
-**Input**: Informações do projeto/produto  
-**Integração ClickUp**: ✅ Sincroniza com workspace data
+**Sintaxe:** `/product/warm-up`  
+**Propósito**: Aquecimento do contexto de produto
 
 ---
 
 ## 📚 Comandos de Documentação
 
 ### `/docs/build-tech-docs`
-**Propósito**: Gerar documentação técnica abrangente  
-**Input**: Codebase e especificações  
-**Integração ClickUp**: ✅ Cria task de documentação
+**Sintaxe:** `/docs/build-tech-docs`  
+**Propósito**: Gerar documentação técnica abrangente
 
 ```bash
-# Exemplo de uso
 /docs/build-tech-docs
 # → Analisa estrutura do projeto
-# → Gera documentação multi-arquivo
-# → Cria contexto otimizado para IA
+# → Gera documentação multi-arquivo otimizada para IA
+```
+
+**Saída:**
+```
+docs/technical-context/
+├── architecture.md
+├── technology-stack.md
+└── constraints.md
 ```
 
 ### `/docs/build-business-docs`
-**Propósito**: Gerar documentação de negócio  
-**Input**: Informações de produto e mercado  
-**Integração ClickUp**: ✅ Organiza docs por workspace
+**Sintaxe:** `/docs/build-business-docs`  
+**Propósito**: Gerar documentação de negócio
+
+```bash
+/docs/build-business-docs
+```
+
+**Saída:**
+```
+docs/business-context/
+├── vision.md
+├── stakeholders.md
+└── business-model.md
+```
 
 ### `/docs/build-compliance` 🆕
 **Propósito**: Gerar documentação de compliance (ISO 27001, ISO 22301, PMBOK, SOC2)  
@@ -384,30 +412,92 @@ $ ./engineer/start             # Não é executável
 - Cross-references automáticos entre frameworks (ISO 27001 ↔ SOC2: ~70% overlap)
 
 ### `/docs/build-index`
-**Propósito**: Criar índice de projetos  
-**Input**: Múltiplos projetos  
-**Integração ClickUp**: ✅ Inclui IDs de space/workspace
+**Sintaxe:** `/docs/build-index`  
+**Propósito**: Criar índice de projetos
+
+```bash
+/docs/build-index
+```
+
+**Saída:** `docs/index.md`
 
 ### `/docs/refine-vision`
-**Propósito**: Refinar visão e estratégia do produto  
-**Input**: Visão atual e feedback  
-**Integração ClickUp**: ✅ Atualiza descrições de projeto
+**Sintaxe:** `/docs/refine-vision`  
+**Propósito**: Refinar visão e estratégia do produto
+
+```bash
+/docs/refine-vision
+```
+
+### `/docs/validate-docs`
+**Sintaxe:** `/docs/validate-docs`  
+**Propósito**: Valida completude e qualidade da documentação
+
+```bash
+/docs/validate-docs
+```
+
+### `/docs/docs-health`
+**Sintaxe:** `/docs/docs-health`  
+**Propósito**: Análise de saúde da documentação (links quebrados, inconsistências)
+
+```bash
+/docs/docs-health
+```
+
+### `/docs/sync-sessions`
+**Sintaxe:** `/docs/sync-sessions`  
+**Propósito**: Sincroniza documentação entre sessões
+
+```bash
+/docs/sync-sessions
+```
+
+### `/docs/reverse-consolidate`
+**Sintaxe:** `/docs/reverse-consolidate`  
+**Propósito**: Consolida documentação fragmentada
+
+```bash
+/docs/reverse-consolidate
+```
+
+### `/docs/help`
+**Sintaxe:** `/docs/help`  
+**Propósito**: Ajuda contextual com comandos de documentação
+
+```bash
+/docs/help
+```
 
 ---
 
 ## ⚙️ Meta Comandos
 
 ### `/meta/create-agent`
-**Propósito**: Criar novo agente especializado  
-**Input**: Requisitos e especialidade do agente  
-**Integração ClickUp**: ➖ Não aplicável
+**Sintaxe:** `/meta/create-agent "<especialidade>"`  
+**Propósito**: Criar novo agente especializado
 
 ```bash
-# Exemplo de uso
 /meta/create-agent "especialista em testes de performance"
 # → Analisa requisitos do agente
 # → Cria arquivo .md com configuração
 # → Define ferramentas e modelo apropriados
+```
+
+### `/meta/create-agent-express`
+**Sintaxe:** `/meta/create-agent-express`  
+**Propósito**: Cria agente de forma rápida com template simplificado
+
+```bash
+/meta/create-agent-express
+```
+
+### `/meta/analyze-complex-problem`
+**Sintaxe:** `/meta/analyze-complex-problem "<descrição>"`  
+**Propósito**: Análise profunda de problemas complexos
+
+```bash
+/meta/analyze-complex-problem "Performance degradation in production"
 ```
 
 ### `/meta:evolve`
@@ -440,12 +530,11 @@ $ ./engineer/start             # Não é executável
 Operações Git do Sistema Onion, orientadas pelo **motor GitFlow** ([gitflow-patterns.md](../knowledge-base/frameworks/gitflow-patterns.md)). Operações de host remoto (PR, review, CI, Release) passam pelo **forge adapter** ([utils/forge/](../../.claude/utils/forge/README.md)); git local (branch, merge, tag, push) é `git` direto.
 
 ### `/git:flow`
-**Propósito**: Dispatcher **único** do ciclo de vida GitFlow — `feature` | `release` | `hotfix` × `start` | `publish` | `finish`. Substitui os 7 antigos sub-comandos (`git/{feature,release,hotfix}/{start,publish,finish}`) por um único ponto de entrada arg-driven  
-**Input**: `<type> <action> [nome|versão]`  
+**Sintaxe:** `/git:flow <type> <action> [nome|versão]`  
+**Propósito**: Dispatcher **único** do ciclo de vida GitFlow — `feature` | `release` | `hotfix` × `start` | `publish` | `finish`. Substitui os 7 antigos sub-comandos por um único ponto de entrada arg-driven  
 **Integração**: Forge adapter (PR/CI/Release) + Task Manager adapter (sync opcional via `TASK_MANAGER_PROVIDER`)
 
 ```bash
-# Exemplos de uso
 /git:flow feature start "user-auth"   # cria feature/user-auth de develop + sessão
 /git:flow feature publish             # push + review (forge)
 /git:flow feature finish              # merge → develop + cleanup
@@ -455,21 +544,51 @@ Operações Git do Sistema Onion, orientadas pelo **motor GitFlow** ([gitflow-pa
 /git:flow hotfix finish               # dual-merge + tag + Release + CI
 ```
 
+**Estrutura criada por `feature start`:**
+```
+feature/user-auth ← nova branch
+.claude/sessions/user-auth/
+├── context.md
+├── plan.md
+└── notes.md
+```
+
 > **Migração**: os caminhos antigos `/git:feature:start`, `/git:release:finish`, etc. foram consolidados — use sempre `/git:flow <type> <action>`.
 
 ### `/git:init`
-**Propósito**: Inicializar repositório com GitFlow e convenções padrão do Sistema Onion  
-**Input**: Repositório (novo ou existente)
+**Sintaxe:** `/git:init`  
+**Propósito**: Inicializar repositório com GitFlow e convenções padrão do Sistema Onion
 
 ### `/git:sync`
-**Propósito**: Sincronizar branch atual com o remoto seguindo a estratégia GitFlow (fast-forward em branches protegidas, rebase seguro)  
-**Input**: `[branch]` (default: branch atual)
+**Sintaxe:** `/git:sync [branch]`  
+**Propósito**: Sincronizar branch atual com o remoto seguindo a estratégia GitFlow (fast-forward em branches protegidas, rebase seguro)
+
+```bash
+/git:sync
+# → GitFlow analysis + cleanup inteligente
+# → Session archiving automático
+# → Task manager auto-update para "Done" (se aplicável)
+```
 
 ### `/git:fast-commit`
-**Propósito**: Adicionar todas as mudanças e fazer commit rápido seguindo Conventional Commits  
-**Input**: Mensagem de commit (ou gerada a partir do diff)
+**Sintaxe:** `/git:fast-commit`  
+**Propósito**: Adicionar todas as mudanças e fazer commit rápido seguindo Conventional Commits
 
 > Comandos auxiliares: `/git:help` (ajuda contextual), `/git:code-review` (alias → `/meta:setup-code-review`).
+
+---
+
+## ✅ Comandos de Validação
+
+> 📚 **Documentação Completa**: Veja [Sistema de Testes e Validação](testing-validation-system.md) para guia completo de todos os comandos de teste e validação, incluindo `/test/unit`, `/test/integration`, `/test/e2e`, `/validate/test-strategy/create`, `/validate/qa-points/estimate` e mais.
+
+### `/validate/workflow`
+**Sintaxe:** `/validate/workflow`  
+**Propósito**: Valida workflow completo do projeto
+
+```bash
+/validate/workflow
+```
 
 ---
 
@@ -487,11 +606,63 @@ Operações Git do Sistema Onion, orientadas pelo **motor GitFlow** ([gitflow-pa
 
 ---
 
+## 🚀 Referência Rápida
+
+### Fluxo Completo de Feature
+```bash
+# 1. Criar task estruturada
+/product/task "Nova funcionalidade X"
+
+# 2. Iniciar desenvolvimento
+/engineer/start feature-x
+
+# 3. Trabalhar nas fases
+/engineer/work feature-x
+
+# 4. Criar Pull Request
+/engineer/pr
+
+# 5. Finalizar feature
+/git:flow feature finish
+```
+
+### Fluxo de Hotfix
+```bash
+# 1. Criar hotfix
+/git:flow hotfix start "fix-critical-bug"
+
+# 2. Implementar correção
+/engineer/hotfix "fix-critical-bug"
+
+# 3. Criar PR
+/engineer/pr
+
+# 4. Finalizar hotfix
+/git:flow hotfix finish
+```
+
+### Fluxo de Documentação
+```bash
+# 1. Gerar docs de negócio
+/docs/build-business-docs
+
+# 2. Gerar docs técnicos
+/docs/build-tech-docs
+
+# 3. Gerar índice
+/docs/build-index
+
+# 4. Validar documentação
+/docs/validate-docs
+```
+
+---
+
 ## 🔄 Fluxo Típico de Desenvolvimento
 
 ```mermaid
 graph TD
-    A[/product/task] --> B[Task criada no ClickUp]
+    A[/product/task] --> B[Task criada no task manager]
     B --> C[/engineer/start]
     C --> D[Análise e planejamento]
     D --> E[/engineer/work]
@@ -510,28 +681,39 @@ graph TD
     style J fill:#fff3e0
 ```
 
-## 📊 Status de Integração ClickUp
+## 📊 Status de Integração Task Manager
 
-| Comando | Status | Ação |
-|---------|--------|------|
-| `/engineer/start` | ✅ | Lê tasks + cria Phase-Subtask mapping |
-| `/engineer/work` | ✅ | Auto-sync de subtasks status |
-| `/engineer/pr` | ✅ | Move para "in progress" + tag "under-review" |
-| `/engineer/pr-update` | ✅ | Documenta updates automáticos |
-| `/engineer/validate-phase-sync` | ✅ | Corrige status inconsistentes |
-| `/product/task` | ✅ | Cria task |
-| `/product/collect` | ✅ | Salva no backlog |
-| `/product/refine` | ✅ | Atualiza task |
-| `/product/light-arch` | ✅ | Adiciona comentário |
-| `/docs/build-*` | ✅ | Organiza por workspace |
+| Comando | Ação |
+|---------|------|
+| `/engineer/start` | Lê tasks + cria Phase-Subtask mapping |
+| `/engineer/work` | Auto-sync de subtasks status |
+| `/engineer/pr` | Move para "in progress" + tag "under-review" |
+| `/engineer/pr-update` | Documenta updates automáticos |
+| `/engineer/validate-phase-sync` | Corrige status inconsistentes |
+| `/product/task` | Cria task hierárquica |
+| `/product/collect` | Salva no backlog |
+| `/product/refine` | Atualiza task |
+| `/product/light-arch` | Adiciona comentário arquitetural |
+| `/docs/build-*` | Organiza docs por contexto |
 
 ## 💡 Dicas de Uso
 
 1. **Sempre comece com `/product/task`** para funcionalidades novas
 2. **Use `/engineer/start`** para iniciar desenvolvimento organizado
 3. **Execute `/engineer/pr`** quando código estiver pronto para review
-4. **Aproveite a integração ClickUp** para rastreamento automático
-5. **Consulte `/all-tools`** quando não souber qual comando usar
+4. **Aproveite a integração com o task manager** para rastreamento automático
+5. **Consulte `/meta/all-tools`** quando não souber qual comando usar
+
+---
+
+## 🔗 Documentos Relacionados
+
+- [Fluxos de Engenharia Detalhados →](engineering-flows.md)
+- [Referência de Agentes](agents-reference.md) — catálogo dos 49 agentes especializados
+- [Exemplos Práticos](practical-examples.md) — casos de uso reais
+- [Sistema de Testes e Validação](testing-validation-system.md) — framework completo de testes
+- [Configuração Inicial](getting-started.md) — setup do sistema
+- [Inventário Canônico](inventory.md) — contagens SSOT geradas do filesystem
 
 ---
 

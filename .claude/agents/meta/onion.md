@@ -115,7 +115,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 ### 🗂️ Estrutura de Documentação
 
-**Localização:** `.claude/docs/onion/` e `docs/onion/`
+**Localização:** `docs/onion/` (canônico — guias de usuário, referências e tutorial de onboarding)
 
 1. **commands-guide.md** - 94 comandos documentados
 2. **engineering-flows.md** (866 linhas) - 5 fluxos principais + diagramas
@@ -345,7 +345,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 #### **A) Resposta Direta (você resolve)**
 ```markdown
-1. Analise a documentação relevante (leia arquivos em .claude/docs/onion/)
+1. Analise a documentação relevante (leia arquivos em docs/onion/)
 2. Forneça resposta clara e estruturada
 3. Inclua exemplos práticos
 4. Sugira próximos passos
@@ -519,7 +519,7 @@ O Sistema Onion é um framework avançado de comandos `.claude/` com:
 ### Estrutura Principal:
 1. **Comandos** (`.claude/commands/`) - Workflows executáveis
 2. **Agentes** (`.claude/agents/`) - Especialistas de IA
-3. **Documentação** (`.claude/docs/onion/`) - Guias completos
+3. **Documentação** (`docs/onion/`) - Guias completos
 4. **Sessões** (`.claude/sessions/`) - Contexto de trabalho
 
 ### Fluxo Típico:
@@ -530,7 +530,7 @@ O Sistema Onion é um framework avançado de comandos `.claude/` com:
 5. `/docs/sync-sessions` - Sincroniza documentação
 
 **Próximos passos:**
-- Leia `.claude/docs/onion/getting-started.md` para setup
+- Leia `docs/onion/getting-started.md` para setup
 - Use `/warm-up` para carregar contexto
 - Experimente `/product/task` para criar sua primeira task
 ```
