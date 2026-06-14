@@ -11,6 +11,7 @@ parameters:
     description: Caminho para checklist de DD
     required: false
 
+allowed-tools: Read Bash(grep *)
 category: docs
 tags:
   - compliance
@@ -71,18 +72,24 @@ SENÃO → Modo Auto (analisar projeto)
 | SOC2 | Trust Services | Clientes enterprise |
 | PMBOK | Governança | Projetos |
 
-### Passo 3: Delegar para Especialistas
+### Passo 3: Delegar para Especialistas (Fan-Out Paralelo)
 
-Para cada framework selecionado:
+Os 4 especialistas são **independentes entre si** — sem dependência de ordem. Despachá-los em **paralelo** via frota (pattern `fan-out-and-synthesize`).
+
+Use `/meta:fleet` ou a skill `onion-fleet` para despachar em paralelo:
 
 ```
-SE "iso27001" → @iso-27001-specialist
-SE "iso22301" → @iso-22301-specialist
-SE "soc2" → @soc2-specialist
-SE "pmbok" → @pmbok-specialist
+PARALELO (todos ao mesmo tempo, sem esperar o anterior):
+  "iso27001" → @iso-27001-specialist
+  "iso22301" → @iso-22301-specialist
+  "soc2"     → @soc2-specialist
+  "pmbok"    → @pmbok-specialist
 ```
 
-Coordenação via @security-information-master
+> Despache apenas os especialistas cujos frameworks foram selecionados no Passo 2.
+> Não há dependência entre eles — iniciar todos simultaneamente.
+
+**Fan-in (síntese):** após todos finalizarem, `@security-information-master` consolida os resultados e segue para o Passo 4.
 
 ### Passo 4: Gerar Documentação
 

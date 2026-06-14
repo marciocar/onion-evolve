@@ -3,6 +3,7 @@ name: whisper-specialist
 description: |
   Especialista em Whisper (OpenAI) para transcrição de áudio e processamento de fala.
   Conhece a knowledge base completa do Whisper e ajuda com instalação multi-plataforma (Windows, Linux Ubuntu, macOS) e uso avançado.
+  Use para transcrever audio com Whisper e processar fala em projetos locais.
 model: sonnet
 tools:
   - read_file

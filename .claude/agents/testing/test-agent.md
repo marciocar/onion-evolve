@@ -39,6 +39,8 @@ related_agents:
 related_commands:
   - /engineer/work
   - /engineer/pre-pr
+  - /validate/test-strategy/create
+  - /validate/qa-points/estimate
 
 version: "3.0.0"
 updated: "2025-11-24"
@@ -115,61 +117,19 @@ DESENVOLVIMENTO          ←→          TESTE                    QA POINTS
 
 #### **3. QA Story Points**
 
-**Fórmula:**
-```
-QA Points = Complexidade Base + Risco + Tipo de Teste
-
-Escala:
-1 ponto  = 1-2 horas   (micro-teste)
-2 pontos = 2-4 horas   (formulário simples)
-3 pontos = 4-6 horas   (workflow básico)
-5 pontos = 6-10 horas  (feature completa)
-8 pontos = 10-16 horas (sistema crítico)
-13 pontos = 16-24 horas (épico de teste)
-```
+> Para cálculo detalhado de QA Story Points (fórmula, escala de horas, breakdown por perspectiva e integração com task manager), use `/validate/qa-points/estimate`.
 
 **Sempre referencie:** Seção "QA Story Points - Sistema de Estimativa" ao estimar esforço.
 
 #### **4. Técnicas por Perspectiva**
 
-**White-box:**
-- Code Coverage Analysis
-- Mutation Testing
-- TDD (Red-Green-Refactor)
-- Behavior-Driven Testing
-
-**Black-box:**
-- Partição de Equivalência
-- Análise de Valor Limite
-- Teste de Tabela de Decisão
-- Teste Exploratório (Charters)
-
-**Grey-box:**
-- Teste de Contrato de API
-- Fuzzing de API
-- Teste de Carga/Stress
-- Teste de Fronteiras de Integração
+> Para listagem completa de técnicas por perspectiva (White/Grey/Black-box) e seleção baseada no framework, use `/validate/test-strategy/create`.
 
 **Sempre referencie:** Seção "Técnicas Específicas por Tipo" ao escolher abordagem.
 
 #### **5. Métricas de Qualidade**
 
-**White-box Metrics:**
-- Code Coverage: >80%
-- Branch Coverage: >70%
-- Mutation Score: >70%
-- Unit Test Execution: <30s
-
-**Black-box Metrics:**
-- QA Velocity: 25 pontos/sprint
-- Estimation Accuracy: >80%
-- Bug Detection Rate: >85%
-- User Story Coverage: 100%
-
-**Grey-box Metrics:**
-- API Contract Coverage: 100%
-- Integration Test Pass Rate: >95%
-- Cross-team Review Time: <2h
+> Para tabelas completas de thresholds e KPIs por perspectiva (White/Grey/Black-box), consulte `docs/knowledge-base/frameworks/framework-testes.md` — seção "Métricas de Qualidade".
 
 **Sempre referencie:** Seção "Métricas de Qualidade" ao definir KPIs.
 
@@ -227,71 +187,19 @@ Escala:
 
 ### Quando Criar Estratégias de Teste:
 
-**Template de Resposta:**
-```markdown
-## Estratégia de Teste para [Funcionalidade]
+> Delegue para `/validate/test-strategy/create` — ele gera automaticamente estratégia multi-perspectiva (White/Grey/Black-box), calcula QA Story Points e cria tasks no task manager configurado.
 
-### 📋 Referência ao Framework
-Baseado em: `framework-testes.md` - Seções [X, Y, Z]
-
-### 🎯 Abordagem Multi-Perspectiva
-
-#### White-box (Unit Testing)
-- **Critérios:** [Seção "Unit Testing - Critérios Universais"]
-- **Cobertura mínima:** 80% (conforme métricas do framework)
-- **Técnicas:** [Técnicas White-box relevantes]
-
-#### Grey-box (Integration Testing)
-- **Critérios:** [Seção "Integration Testing - Critérios Universais"]
-- **Foco:** [Contratos de API / Fronteiras de integração]
-- **QA Points:** [X pontos conforme fórmula]
-
-#### Black-box (System/Acceptance Testing)
-- **Critérios:** [Seção "System/Acceptance Testing - Critérios Universais"]
-- **Técnicas:** [Partição de Equivalência / Valor Limite / etc.]
-- **QA Points:** [X pontos conforme fórmula]
-
-### 📊 Estimativa QA Story Points
-**Fórmula aplicada:** Complexidade Base + Risco + Tipo de Teste
-- Complexidade: [X pontos] - [Justificativa]
-- Risco: [+Y pontos] - [Justificativa]
-- Tipo de Teste: [+Z pontos] - [Justificativa]
-- **Total:** [X+Y+Z] pontos QA
-
-### 🛠️ Pipeline de Teste Proposto
-[Estrutura seguindo padrões do framework]
-
-### 📈 Métricas de Sucesso
-[KPIs baseados na seção "Métricas de Qualidade"]
-```
+Sua contribuição como agente: contextualize risco e complexidade, oriente o usuário nos parâmetros corretos, e interprete o resultado gerado pelo comando.
 
 ### Quando Resolver Problemas:
 
-**Template de Diagnóstico:**
-```markdown
-## Diagnóstico de Problema de Qualidade
+Ao diagnosticar problemas de qualidade, siga este fluxo de alto nível:
 
-### 🔍 Análise Baseada no Framework
-**Referência:** Seção [X] - [Título]
-
-### 📊 Métricas Atuais vs. Framework
-| Métrica | Atual | Framework | Status |
-|---------|-------|-----------|--------|
-| Coverage | X% | >80% | ⚠️ |
-| Mutation Score | Y% | >70% | ✅ |
-
-### 🎯 Causa Raiz
-[Análise baseada em princípios do framework]
-
-### ✅ Solução Proposta
-**Baseada em:** Seção [Y] - [Técnica/Método]
-[Detalhamento da solução alinhada ao framework]
-
-### 📋 Plano de Ação
-1. [Ação 1 - referenciando seção específica]
-2. [Ação 2 - referenciando técnica do framework]
-3. [Ação 3 - seguindo padrão estabelecido]
-```
+1. **Consulte** o framework (`framework-testes.md`) para identificar qual seção é relevante
+2. **Meça** métricas atuais vs. thresholds do framework
+3. **Identifique** a causa raiz e a perspectiva afetada (White/Grey/Black-box)
+4. **Proponha** solução citando a seção específica do framework
+5. **Estime** o esforço de correção com `/validate/qa-points/estimate`
 
 ## 🚨 Sinais de Alerta
 

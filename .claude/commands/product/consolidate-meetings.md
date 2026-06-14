@@ -52,29 +52,16 @@ Transformar múltiplas reuniões em conhecimento estratégico consolidado, ident
 
 ### Passo 1: Detectar Tipo de Entrada
 
-Analisar o parâmetro `source` fornecido:
+Carregue o fragmento `common:prompts:consolidation-prep` (steps de preparação compartilhados — Passo 1) e execute a detecção de tipo de entrada conforme descrito nele.
 
-```bash
-# Verificar se é pasta ou arquivo(s)
-if [ -d "$source" ]; then
-  # É uma pasta
-  echo "📁 Pasta detectada: $source"
-elif [ -f "$source" ]; then
-  # É um arquivo único
-  echo "📄 Arquivo detectado: $source"
-else
-  # Múltiplos arquivos (separados por espaço)
-  echo "📄 Múltiplos arquivos detectados"
-fi
-```
+Complemento específico para reuniões:
 
 **Se for pasta:**
-- Listar arquivos de reuniões na pasta
-- Filtrar por extensões relevantes (.md, .txt, .transcript, etc)
+- Filtrar por extensões de reunião: `.md`, `.txt`, `.transcript`, `.json`
+- Padrões de nome relevantes: `*meeting*`, `*reunion*`, `*transcript*`, `*extract*`
 - Ordenar por data (se disponível no nome ou conteúdo)
 
 **Se for arquivo(s):**
-- Processar arquivo(s) diretamente
 - Validar que são arquivos de reunião válidos
 
 ### Passo 2: Coletar Arquivos de Reunião
@@ -101,23 +88,9 @@ fi
 
 ### Passo 3: Preparar Contexto para o Consolidador
 
-Antes de invocar @meeting-consolidator, preparar contexto estruturado:
+Carregue o fragmento `common:prompts:consolidation-prep` (steps de preparação compartilhados — Passo 3) e monte o contexto estruturado conforme descrito nele.
 
-```markdown
-## Contexto da Consolidação
-
-### Arquivos a Consolidar
-{{lista_de_arquivos}}
-
-### Foco da Análise
-{{focus}} (all|divergences|convergences|insights|gaps)
-
-### Informações dos Arquivos
-{{metadados_dos_arquivos}}
-```
-
-**Metadados a Coletar:**
-- Nome do arquivo
+Metadados adicionais específicos para reuniões:
 - Data da reunião (se disponível)
 - Participantes (se disponível)
 - Tipo de reunião (se identificável)
