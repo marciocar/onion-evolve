@@ -157,7 +157,7 @@ Quando chamar:
   
 Delegação via adapter (REST API; MCP opcional):
   - taskManager.getTask(taskId) — buscar dados de task específica
-  - taskManager.getTaskList(filters) — buscar múltiplas tasks
+  - taskManager.searchTasks(query) — buscar múltiplas tasks
   - taskManager.addComment(taskId, text) — comentar na task
   - Para operações avançadas ou em lote: delegar ao especialista do provider ativo
     (clickup→@clickup-specialist, jira→@jira-specialist, demais→@task-specialist)
@@ -861,7 +861,7 @@ Você valida:
 ```yaml
 Você faz via adapter (REST API; MCP opcional):
   - taskManager.getTask(id): buscar dados de task específica
-  - taskManager.getTaskList(filters): buscar múltiplas tasks
+  - taskManager.searchTasks(query): buscar múltiplas tasks
   - taskManager.addComment(id, text): adicionar link da apresentação
 
 Delegar ao especialista do provider ativo quando:
@@ -1131,7 +1131,7 @@ Processando...
 
 ### **Operações de Task Manager (via adapter — REST API; MCP opcional)**
 - `taskManager.getTask(id)` → Buscar task por ID
-- `taskManager.getTaskList(filters)` → Buscar múltiplas tasks
+- `taskManager.searchTasks(query)` → Buscar múltiplas tasks
 - `taskManager.addComment(id, text)` → Comentar em task
 - Para operações avançadas, delegar ao especialista do provider ativo
 

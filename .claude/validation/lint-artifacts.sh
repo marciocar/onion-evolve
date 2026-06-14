@@ -33,6 +33,9 @@
 #  10. SDAAL: sem chamada direta a provider (mcp_<provider>_* / clickup_mcp /
 #      $CLICKUP_TASK_ID) em commands/agents fora de adapters e especialistas
 #      [HARD] — consumo de task manager é agnóstico e API-first (integrations §9)
+#  11. SDAAL: método de taskManager./tm./forge. usado no consumidor deve EXISTIR
+#      na interface (ITaskManager/IForge) [HARD] — pega método agnóstico inventado
+#      (ex.: getTaskList em vez de searchTasks) que o grep anti-MCP não vê
 # =============================================================================
 
 set -euo pipefail
@@ -316,6 +319,49 @@ ${lines}"
 }
 
 # ===========================================================================
+# REGRA 11 — Método de abstração usado no consumidor deve existir na interface [HARD]
+#            Pega método agnóstico INVENTADO (ex.: taskManager.getTaskList(...)
+#            quando o canônico é searchTasks). Ancora em ".<metodo>(" — acessos a
+#            propriedade (taskManager.provider, .isConfigured) não têm paren e não
+#            são checados. A Regra 10 (anti-MCP) não vê isto: já está agnóstico.
+# ===========================================================================
+check_abstraction_methods_exist() {
+  local tm_iface="${CLAUDE_DIR}/utils/task-manager/interface.md"
+  local forge_iface="${CLAUDE_DIR}/utils/forge/interface.md"
+  [ -f "${tm_iface}" ] || return
+  [ -f "${forge_iface}" ] || return
+
+  # Conjunto canônico de métodos (assinaturas "  metodo(" nas interfaces)
+  local methods
+  methods=$(grep -hoE '^[[:space:]]+[a-zA-Z]+\(' "${tm_iface}" "${forge_iface}" 2>/dev/null \
+    | tr -d ' (' | sort -u)
+  [ -n "${methods}" ] || return
+
+  while IFS= read -r -d '' file; do
+    # Allowlist: adapters e especialistas podem usar pseudocódigo específico
+    case "${file}" in
+      */utils/*/adapters/*) continue ;;
+      */agents/development/clickup-specialist.md) continue ;;
+      */agents/development/jira-specialist.md)    continue ;;
+      */commands/common/templates/*) continue ;;
+    esac
+
+    # Extrai chamadas (taskManager|tm|forge).<metodo>( e valida cada método
+    local m
+    while IFS= read -r m; do
+      [ -z "${m}" ] && continue
+      if ! printf '%s\n' "${methods}" | grep -qx "${m}"; then
+        local where
+        where=$(grep -nE "(taskManager|tm|forge)\.${m}\(" "${file}" | head -2 | sed 's/^/      /')
+        violation "HARD" "${file}" "método de abstração inexistente na interface: '${m}()' (use um método de ITaskManager/IForge — ex.: searchTasks). Ocorrências:
+${where}"
+      fi
+    done < <(grep -hoE '(taskManager|tm|forge)\.[a-zA-Z]+\(' "${file}" 2>/dev/null \
+              | sed -E 's/.*\.([a-zA-Z]+)\(/\1/' | sort -u)
+  done < <(find "${CLAUDE_DIR}/commands" "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -331,6 +377,7 @@ check_no_fleet_orchestrator_agent
 check_inventory_sync
 check_claude_md_counts
 check_no_direct_provider_calls
+check_abstraction_methods_exist
 
 # ===========================================================================
 # SUMÁRIO FINAL

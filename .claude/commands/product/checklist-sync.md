@@ -58,11 +58,12 @@ Você é um assistente especializado em **sincronizar e monitorar checklists do 
 
 ### **1. Leitura Completa da Estrutura**
 ```python
-# Pseudocódigo do processo:
-task = taskManager.getTask(taskId, { subtasks: true })
+# Pseudocódigo do processo (métodos canônicos da ITaskManager):
+task = taskManager.getTask(taskId)
+subtasks = taskManager.getSubtasks(taskId)   # adapter resolve detalhes nativos (ex.: checklists no ClickUp)
 
-for subtask in task.subtasks:
-    # Lê checklists nativos
+for subtask in subtasks:
+    # Checklists nativos: capacidade resolvida pelo adapter do provider ativo
     checklists = subtask.checklists
     
     # Analisa descrição markdown
