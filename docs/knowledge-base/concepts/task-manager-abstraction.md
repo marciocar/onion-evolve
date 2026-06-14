@@ -235,6 +235,9 @@ Crie um novo arquivo em `.claude/utils/task-manager/adapters/`:
 ```markdown
 # Nome do Provedor Adapter
 
+> Instância do padrão SDAAL.
+> Transporte **padrão: REST API**. MCP opcional via `TASK_MANAGER_TRANSPORT=mcp`.
+
 ## Configuração
 - Variável: `PROVIDER_API_KEY`
 - Workspace: `PROVIDER_WORKSPACE_ID`
@@ -244,27 +247,37 @@ Crie um novo arquivo em `.claude/utils/task-manager/adapters/`:
 |-------------|-----------------|
 | backlog | ... |
 | todo | ... |
+| in_progress | ... |
+| done | ... |
 
 ## Métodos
 
 ### createTask
 \`\`\`typescript
-await mcp_provider_create_task({...});
+// Transporte padrão: REST API direta
+const res = await fetch('https://api.provider.com/tasks', {
+  method: 'POST',
+  headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name, description, status }),
+});
+// Transporte MCP (quando TASK_MANAGER_TRANSPORT=mcp e servidor ativo):
+// await mcp_provider_create_task({ name, description });
 \`\`\`
 
-// ... implementar todos os métodos da interface
+// ... implementar todos os métodos da ITaskManager
 ```
 
 ### 2. Atualizar Detector
 
-Adicione o novo provedor em `detector.md`:
+Adicione o padrão de ID em `detector.md`:
 
 ```typescript
 const PROVIDER_PATTERNS = {
-  clickup: /^[a-z0-9]{9}$/,
-  asana: /^[0-9]{16}$/,
-  linear: /^[A-Z]+-[0-9]+$/,
-  novo_provider: /^SEU_PATTERN$/  // ← Adicionar
+  clickup:       /^[a-z0-9]{9}$/,
+  asana:         /^[0-9]{15,}$/,
+  jira:          /^[A-Z][A-Z0-9_]*-[0-9]+$/,  // colide com Linear → desambigua via TASK_MANAGER_PROVIDER
+  linear:        /^[A-Z]+-[0-9]+$/,
+  novo_provider: /^SEU_PATTERN$/,              // ← Adicionar aqui
 };
 ```
 
@@ -274,10 +287,12 @@ Adicione a instanciação em `factory.md`:
 
 ```typescript
 switch (provider) {
-  case 'clickup': return new ClickUpAdapter();
-  case 'asana': return new AsanaAdapter();
-  case 'novo_provider': return new NovoProviderAdapter();  // ← Adicionar
-  default: return new NoProviderAdapter();
+  case 'clickup':       return new ClickUpAdapter();
+  case 'asana':         return new AsanaAdapter();
+  case 'jira':          return new JiraAdapter();
+  case 'linear':        return new LinearAdapter();
+  case 'novo_provider': return new NovoProviderAdapter();  // ← Adicionar aqui
+  default:              return new NoProviderAdapter();
 }
 ```
 
