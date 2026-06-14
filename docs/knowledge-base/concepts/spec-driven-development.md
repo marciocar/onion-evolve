@@ -11,7 +11,7 @@
 | **Última Atualização** | 2025-12-02 |
 | **Categoria** | Concepts |
 | **Aplicação** | Metodologia emergente de desenvolvimento com IA |
-| **Status** | Em evolução (2025) |
+| **Status** | Em evolução (revalidar periodicamente) |
 
 ### Fontes Principais
 

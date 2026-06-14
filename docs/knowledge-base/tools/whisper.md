@@ -6,6 +6,7 @@
 |-------|-------|
 | **Versão** | 1.0.0 |
 | **Criado** | 2025-12-02 |
+| **Última Atualização** | 2025-12-02 |
 | **Categoria** | Tools |
 | **Tags** | `transcription`, `speech-recognition`, `audio-processing`, `openai` |
 

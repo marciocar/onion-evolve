@@ -14,7 +14,7 @@
 | **Última Atualização** | 2025-12-16 |
 | **Categoria** | Frameworks |
 | **Aplicação** | Spec-Driven Development (SDD) |
-| **Status** | Atualizado para dezembro de 2025 |
+| **Status** | Snapshot de dezembro de 2025 — revalidar antes de citar |
 
 ### Fontes Principais
 

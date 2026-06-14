@@ -349,10 +349,9 @@ runflow-agent/
 - gpt-3.5-turbo
 
 **Anthropic (Claude):**
-- claude-3-5-sonnet
-- claude-3-opus
-- claude-3-sonnet
-- claude-3-haiku
+- Famílias por **tier**: opus, sonnet, haiku (e a linha Fable mais recente). Use sempre a versão **vigente** do tier conforme a disponibilidade no provider/Runflow — evite fixar um ID datado.
+
+> ℹ️ O conjunto de IDs específicos suportados muda com o tempo. Consulte a documentação oficial do Runflow/Anthropic para os IDs vigentes (snapshot desta página: 2025-11).
 
 **AWS Bedrock:**
 - Claude (Bedrock)
