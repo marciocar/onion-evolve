@@ -245,7 +245,7 @@ Apresente um resumo formatado:
 
 - **Task Manager Abstraction**: `.claude/utils/task-manager/README.md`
 - **Detector de Provedor**: `.claude/utils/task-manager/detector.md`
-- **Documentação ClickUp**: `.claude/docs/onion/clickup-integration.md`
+- **Documentação ClickUp**: `docs/onion/clickup-integration.md`
 - **Comando de Task**: `/product/task` - Criar tasks com decomposição
 
 ## ⚠️ Notas Importantes

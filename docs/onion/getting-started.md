@@ -16,10 +16,71 @@ Bem-vindo ao sistema Onion v3.0! Este guia vai te ajudar a começar rapidamente 
 ## 📋 Checklist de Setup
 
 ### **✅ Pré-requisitos**
+
+#### Software necessário
+
+| Ferramenta | Versão mínima | Verificar |
+|-----------|---------------|-----------|
+| **Claude Code** | v0.43+ | `claude --version` |
+| **Node.js** | v22.14.0+ | `node --version` |
+| **Git** | v2.30+ | `git --version` |
+
+```bash
+# Verificar todas as dependências de uma vez
+node --version   # v22.x.x
+git --version    # git version 2.30.x ou superior
+```
+
+#### Checklist de pré-requisitos
 - [ ] **Node.js v22.14.0+** instalado
 - [ ] Claude Code instalado e configurado
 - [ ] Git inicializado no projeto
 - [ ] Pasta `.claude/` presente no projeto
+
+### **📁 Estrutura de Diretórios**
+
+Após instalar o Sistema Onion no projeto, você deve ver a seguinte estrutura:
+
+```
+seu-projeto/
+├── .claude/
+│   ├── commands/           # 77 comandos em 9 categorias
+│   ├── agents/             # 49 agentes especializados
+│   ├── skills/             # 5 skills de orquestração
+│   ├── sessions/           # Sessões de desenvolvimento
+│   └── utils/              # Task Manager + Forge adapters
+├── docs/
+│   ├── onion/              # Documentação do framework
+│   ├── meta-specs/         # Constituição do sistema (L0)
+│   └── knowledge-base/     # 34 Knowledge Bases estruturadas
+├── .env                    # Variáveis de ambiente (NÃO commitar)
+├── .env.example            # Template de variáveis
+├── .claudeignore           # Otimização do context window
+└── CLAUDE.md               # Regras do projeto para Claude Code
+```
+
+> **Dica:** Se `.claudeignore` não existir, crie-o para melhorar a performance do Claude Code:
+> ```
+> node_modules/
+> .pnpm-store/
+> dist/
+> build/
+> .next/
+> .nuxt/
+> *.log
+> logs/
+> .DS_Store
+> .vscode/
+> .idea/
+> *.tmp
+> *.temp
+> .cache/
+> *.mp4
+> *.zip
+> *.tar.gz
+> ```
+
+---
 
 ### **✅ Configuração de Integrações**
 
@@ -145,6 +206,58 @@ Após configurar o Task Manager, valide a configuração:
 /warm-up  # Valida conectividade do Task Manager configurado
 ```
 
+#### Script de validação automática
+
+```bash
+#!/bin/bash
+# validate-onion.sh
+
+echo "Validando Sistema Onion..."
+
+# 1. Estrutura
+if [ -d ".claude/commands" ] && [ -d ".claude/agents" ]; then
+  echo "OK: Estrutura de diretórios"
+else
+  echo "ERRO: Estrutura de diretórios incompleta"
+  exit 1
+fi
+
+# 2. Contar comandos e agentes
+COMMANDS=$(find .claude/commands -name "*.md" | wc -l)
+AGENTS=$(find .claude/agents -name "*.md" | wc -l)
+echo "OK: $COMMANDS comandos encontrados"
+echo "OK: $AGENTS agentes encontrados"
+
+# 3. Git
+if git rev-parse --git-dir > /dev/null 2>&1; then
+  echo "OK: Git inicializado"
+else
+  echo "ERRO: Git não inicializado"
+  exit 1
+fi
+
+# 4. Node.js
+if command -v node > /dev/null 2>&1; then
+  echo "OK: Node.js $(node --version)"
+else
+  echo "AVISO: Node.js não encontrado"
+fi
+
+# 5. .env
+if [ -f ".env" ]; then
+  echo "OK: .env presente"
+else
+  echo "AVISO: .env não encontrado — execute /meta/setup-integration"
+fi
+
+echo "Validacao completa!"
+```
+
+```bash
+chmod +x validate-onion.sh
+./validate-onion.sh
+```
+
 **Se algo não funcionar:**
 - Execute `/meta/setup-integration` novamente para revisar configuração
 - Verifique se `.env` está no `.gitignore` (o comando faz isso automaticamente)
@@ -157,6 +270,51 @@ Após configurar o Task Manager, valide a configuração:
 
 ---
 
+## 📐 Padrões de Nomenclatura
+
+O Sistema Onion usa **kebab-case** (`feature-slug`) para todos os identificadores: branches, sessões e referências a features.
+
+### Formato `feature-slug`
+
+```
+<feature-slug>  →  minúsculas, palavras separadas por hífen, sem espaços
+```
+
+**Correto:**
+```bash
+user-authentication
+payment-integration
+api-v2-migration
+fix-payment-timeout
+```
+
+**Incorreto:**
+```bash
+user_authentication    # snake_case
+userAuthentication     # camelCase
+USER-AUTH              # maiúsculas
+user auth              # espaços
+```
+
+### Conversão automática
+
+O sistema converte o nome da task para `feature-slug` automaticamente:
+
+| Input (nome da task) | Output (feature-slug) |
+|---------------------|----------------------|
+| "Implementar Autenticação JWT" | `implementar-autenticacao-jwt` |
+| "Adicionar Filtros Avançados" | `adicionar-filtros-avancados` |
+| "Fix: Bug no Login" | `fix-bug-no-login` |
+
+### Onde cada identificador é usado
+
+| Identificador | Exemplo | Onde usar |
+|--------------|---------|-----------|
+| `feature-slug` | `user-authentication` | Branch Git, sessão `.claude/sessions/`, argumento de comandos |
+| `task-id` | `PROJ-123` (Jira), `86acu8pdk` (ClickUp) | API calls, `context.md`, referências diretas a tasks |
+
+---
+
 ## 🎯 Seus Primeiros 5 Minutos
 
 ### **1. Criar Sua Primeira Task (1 min)**
@@ -164,33 +322,59 @@ Após configurar o Task Manager, valide a configuração:
 /product/task "Implementar página de sobre da empresa"
 ```
 
-**Resultado esperado**: Task criada no gerenciador configurado com ID (ex: ABOUT-123)
+**Resultado esperado:**
+```
+Task criada no gerenciador configurado
+Branch sugerida: feature/implementar-pagina-sobre
+Sessão: .claude/sessions/implementar-pagina-sobre/
+ID no Task Manager: ABOUT-123 (ou equivalente do provedor)
+```
 
 ### **2. Iniciar Desenvolvimento (1 min)**
 ```bash
 /engineer/start
 ```
 
-**Input quando solicitado**: `ABOUT-123`
+**Input quando solicitado**: `ABOUT-123` (ou o ID gerado)
 
-**Resultado**: Ambiente configurado, sessão criada, plano gerado
+**O que acontece:**
+1. Análise da task no Task Manager
+2. Questões de clarificação (se necessário)
+3. Geração de arquitetura e plano
+4. Criação da sessão em `.claude/sessions/`
+5. Task Manager atualizado para `in_progress`
 
 ### **3. Desenvolver Funcionalidade (2 min)**
 ```bash
 /engineer/work .claude/sessions/about-page/
 ```
 
-**Resultado**: Implementação guiada passo-a-passo
+**Ciclo de desenvolvimento:**
+1. Lê plano da sessão
+2. Implementa fase atual
+3. Pede validação
+4. Atualiza Task Manager
+5. Próxima fase
 
 ### **4. Criar Pull Request (1 min)**
 ```bash
 /engineer/pr
 ```
 
-**Resultado**: PR criado, Task Manager atualizado com status "in_review"
+**Resultado**: PR criado, Task Manager atualizado com status `in_review`
 
-### **✨ Parabéns!** 
-Você completou seu primeiro ciclo completo de desenvolvimento com integração ao Task Manager! 🎉
+### **5. Finalizar após Merge**
+```bash
+/git/sync
+```
+
+**Resultado:**
+- Branches sincronizadas com `main`/`develop`
+- Sessão arquivada
+- Task Manager atualizado para `done`
+
+### **Parabéns!**
+Você completou seu primeiro ciclo completo de desenvolvimento com o Sistema Onion!
 
 ---
 
@@ -255,21 +439,30 @@ Você completou seu primeiro ciclo completo de desenvolvimento com integração 
 
 ### **🔵 Para Desenvolvimento**
 ```bash
-@python-developer "implementar API de usuários"    # Python backend
-@react-developer "criar dashboard interativo"      # React frontend  
+@nodejs-specialist "implementar API de usuários"   # Node.js backend
+@react-developer "criar dashboard interativo"      # React frontend
 ```
 
 ### **🧪 Para Testes**
 ```bash
 @test-engineer "adicionar testes para função X"    # Testes unitários
-@test-planner "estratégia de testes para módulo Y" # Plano de testes
+@test-agent "estratégia de testes para módulo Y"   # Plano de testes
 ```
 
-### **🔍 Para Pesquisa**
+### **🔍 Para Pesquisa e Review**
 ```bash
-@research-agent "melhores práticas OAuth2 2024"    # Pesquisa tecnológica
+@research-agent "melhores práticas OAuth2 2025"    # Pesquisa tecnológica
 @code-reviewer "revisar qualidade do código Z"     # Code review
 ```
+
+### **🗂️ Para Gerenciamento de Tasks**
+```bash
+@jira-specialist "criar épico de autenticação"     # Operações Jira (JQL, ADF, bulk)
+@clickup-specialist "mover tasks para In Progress" # Operações ClickUp
+@task-specialist "decompor feature em subtasks"    # Decomposição agnóstica
+```
+
+> **Referência completa**: [agents-reference.md](agents-reference.md) — 49 agentes em 9 categorias
 
 ---
 
@@ -308,15 +501,23 @@ graph LR
 ## 🔧 Troubleshooting Rápido
 
 ### **❌ Problema: Comando não encontrado**
+
+**Sintomas:** Comandos não são reconhecidos ou retornam "Command not found"
+
 ```bash
-# Verificar se está na pasta correta
-pwd  # Deve estar na raiz do projeto com .claude/
+# Verificar se está na pasta correta (deve ter .claude/ na raiz)
+pwd
+ls .claude/
 
 # Listar comandos disponíveis
-/all-tools
+/meta/all-tools
+
+# Se o problema persistir, recarregar o Claude Code
+# Cmd/Ctrl + Shift + P → "Reload Window"
 ```
 
 ### **❌ Problema: Task Manager não conecta**
+
 ```bash
 # Validar configuração
 /warm-up
@@ -339,11 +540,16 @@ echo $ASANA_ACCESS_TOKEN; echo $ASANA_WORKSPACE_ID
 echo $LINEAR_API_KEY; echo $LINEAR_TEAM_ID
 ```
 
+Se as variáveis estiverem corretas mas a conexão falhar, reexecute `/meta/setup-integration` para reconfigurar.
+
 ### **❌ Problema: Task não encontrada**
+
 ```
-# Verificar formato do ID
-Correto: AUTH-123, BUG-456, PROJ-789
-Incorreto: 123, auth123, AUTH123
+# Verificar formato do ID conforme o provedor
+Jira:    AUTH-123, BUG-456, PROJ-789  (PROJETO-NÚMERO)
+ClickUp: 86acu8pdk                    (alfanumérico)
+Asana:   1234567890123456             (numérico longo)
+Linear:  ABC-123                      (TEAM-NÚMERO)
 ```
 
 ### **❌ Problema: PR falha**
@@ -352,7 +558,51 @@ Incorreto: 123, auth123, AUTH123
 /engineer/pre-pr
 
 # Se testes falharem, corrigir primeiro
-npm test  # ou comando apropriado do projeto
+npm test  # ou o comando de testes do seu projeto
+```
+
+### **❌ Problema: GitFlow não inicializado**
+
+**Sintomas:** Erro ao criar feature branches, branch `develop` não existe
+
+```bash
+# Inicializar GitFlow via comando Onion
+/git/init
+
+# Ou manualmente:
+git flow init -d  # -d para defaults
+
+# Verificar branches criadas:
+git branch -a
+# Deve mostrar: * main, develop
+```
+
+### **❌ Problema: Sessão não criada / engineer/work falha**
+
+**Sintomas:** Diretório `.claude/sessions/` vazio, erro ao retomar trabalho
+
+```bash
+# Executar /engineer/start para criar a sessão
+/engineer/start <feature-slug>
+
+# Ou criar manualmente e reexecutar:
+mkdir -p .claude/sessions/<feature-slug>
+/engineer/start <feature-slug>
+```
+
+### **❌ Problema: Performance lenta do Claude Code**
+
+**Sintomas:** Indexação demorada, respostas lentas
+
+```bash
+# 1. Verificar se .claudeignore existe e inclui node_modules/, dist/, etc.
+cat .claudeignore
+
+# 2. Limpar cache
+# Cmd/Ctrl + Shift + P → "Clear Cache"
+
+# 3. Reduzir context window
+# Settings → Context → Reduce size
 ```
 
 ---
@@ -409,6 +659,14 @@ npm test  # ou comando apropriado do projeto
 2. Customizar templates de PR
 3. Criar dashboards/relatórios específicos no seu gerenciador
 4. Ajustar notificações e workflows
+5. **Adicionar comandos customizados**: `/meta/create-command`
+6. **Criar agentes especializados**: `/meta/create-agent`
+7. **Ajustar regras do projeto**: editar `CLAUDE.md`
+
+### **🔄 Integrar com CI/CD**
+- Configurar GitHub Actions / GitLab CI para testes automáticos
+- Deploy automático após merge
+- Notificações automáticas no Task Manager
 
 ---
 

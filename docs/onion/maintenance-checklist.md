@@ -245,10 +245,10 @@ find .claude/agents -name "*.md" -type f ! -name "README.md" | wc -l
 
 # Buscar nomenclatura antiga
 grep -r "task-slug\|task_slug\|feature_slug" .claude/commands/
-grep -r "task-slug\|task_slug\|feature_slug" .claude/docs/onion/
+grep -r "task-slug\|task_slug\|feature_slug" 
 
 # Listar arquivos de documentação
-ls -la .claude/docs/onion/*.md
+ls -la *.md
 
 # Verificar links quebrados (manual)
 # Abrir cada documento e testar links
@@ -300,7 +300,7 @@ ls -la .claude/docs/onion/*.md
 - Verificar caminho relativo correto
 - Confirmar que arquivo existe
 - Verificar nome do arquivo (case-sensitive)
-- Usar `.claude/docs/onion/` para docs do sistema
+- Usar `` para docs do sistema
 
 #### **2. Contadores Incorretos**
 **Problema:** Badges mostram números errados  
@@ -372,13 +372,13 @@ find .claude/agents -name "*.md" -type f ! -name "README.md" | wc -l
 ```
 
 ### **Links Úteis:**
-- [Guia de Comandos](.claude/docs/onion/commands-guide.md)
-- [Agentes Disponíveis](.claude/docs/onion/agents-reference.md)
-- [Fluxos de Engenharia](.claude/docs/onion/engineering-flows.md)
-- [Exemplos Práticos](.claude/docs/onion/practical-examples.md)
-- [Configuração Inicial](.claude/docs/onion/getting-started.md)
-- [Integração ClickUp](.claude/docs/onion/clickup-integration.md)
-- [Padrões de Nomenclatura](.claude/docs/onion/naming-conventions.md)
+- [Guia de Comandos](commands-guide.md)
+- [Agentes Disponíveis](agents-reference.md)
+- [Fluxos de Engenharia](engineering-flows.md)
+- [Exemplos Práticos](practical-examples.md)
+- [Configuração Inicial](getting-started.md)
+- [Integração ClickUp](clickup-integration.md)
+- [Padrões de Nomenclatura](naming-conventions.md)
 
 ---
 

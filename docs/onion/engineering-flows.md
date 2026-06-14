@@ -23,12 +23,78 @@ Este guia documenta os workflows completos de desenvolvimento, desde a concepç�
 - [📚 Fluxo de Documentação](#-fluxo-de-documentação)
 - [🔧 Fluxo de Refatoração](#-fluxo-de-refatoração)
 - [⚡ Fluxo de Hotfix](#-fluxo-de-hotfix)
+- [📦 Fluxo de Release](#-fluxo-de-release)
+- [✅ Fluxo de Validação](#-fluxo-de-validação)
 - [🎯 Integração com Task Manager por Fluxo](#-integração-com-task-manager-por-fluxo)
+- [🤔 Decision Trees](#-decision-trees)
+- [🩺 Troubleshooting](#-troubleshooting)
+- [🌿 Fluxos Git Avançado](#-fluxos-git-avançado)
 - [🤖 Workflows com Agentes Especializados](#-workflows-com-agentes-especializados)
 
 ---
 
 ## 🚀 Fluxo Completo: Feature Development
+
+### Diagrama do Fluxo
+
+```mermaid
+flowchart TD
+    A[Inicio] --> B["/product/task"]
+    B --> C{Task Criada?}
+    C -->|Sim| D["/engineer/start"]
+    C -->|Nao| B
+
+    D --> E{Analise OK?}
+    E -->|Nao| F[Clarificacoes]
+    F --> D
+    E -->|Sim| G[Arquitetura]
+
+    G --> H{Arquitetura OK?}
+    H -->|Nao| I[Ajustes]
+    I --> G
+    H -->|Sim| J["/engineer/work"]
+
+    J --> K[Implementar Fase]
+    K --> L{Fase Completa?}
+    L -->|Nao| K
+    L -->|Sim| M[Auto-Update Provedor]
+
+    M --> N{Mais Fases?}
+    N -->|Sim| J
+    N -->|Nao| O["/engineer/pre-pr"]
+
+    O --> P["/engineer/pr"]
+    P --> Q[Code Review]
+    Q --> R{Aprovado?}
+    R -->|Nao| S[Correcoes]
+    S --> P
+    R -->|Sim| T[Merge]
+
+    T --> U["/docs/sync-sessions"]
+    U --> V[Concluido]
+
+    style A fill:#e1f5e1
+    style V fill:#e1f5e1
+    style B fill:#fff3cd
+    style D fill:#fff3cd
+    style J fill:#fff3cd
+    style O fill:#fff3cd
+    style P fill:#fff3cd
+    style U fill:#fff3cd
+```
+
+### **Responsabilidades dos Comandos**
+
+| Comando | Responsabilidade | Cria Branch? | Cria Sessão? | Atualiza Provedor? |
+|---------|-----------------|--------------|--------------|-------------------|
+| `/product/task` | Criar task estruturada | Opcional | Sim | Sim |
+| `/engineer/start` | Análise + Arquitetura | Valida/Cria | Valida | Sim |
+| `/engineer/work` | Implementação | Não | Não | Sim (por fase) |
+| `/engineer/pre-pr` | Validação pré-PR | Não | Não | Não |
+| `/engineer/pr` | Pull Request | Se necessário | Não | Sim |
+| `/engineer/hotfix` | Correção emergencial | Não | Sim | Sim |
+
+> **Nota sobre Branches:** `/product/task` e `/engineer/start` **gerenciam Git internamente**, chamando `/git/*` automaticamente. O usuário não precisa executar comandos Git manualmente no fluxo normal.
 
 ### **Fase 1: Planejamento e Criação da Task**
 
@@ -113,7 +179,7 @@ Este guia documenta os workflows completos de desenvolvimento, desde a concepç�
 -  Lê plan.md e identifica fase atual
 -  Apresenta próximos passos específicos
 -  Delega trabalho para sub-agentes especializados:
-  - `python-developer` para backend
+  - `nodejs-specialist` para backend
   - `react-developer` para frontend
   - `test-engineer` para testes
 -  Atualiza progresso no plan.md
@@ -208,6 +274,23 @@ Após aprovação:
 - 🏷️ Adição de tags de conclusão
 - 📊 Atualização de métricas de tempo
 
+#### 5.3 Sincronização de Sessão (pós-merge)
+```bash
+/docs/sync-sessions
+```
+
+**O que acontece:**
+1. Analisa trabalho realizado na sessão
+2. Organiza documentação gerada durante o desenvolvimento
+3. Preserva contexto e decisões arquiteturais
+4. Gera estrutura consolidada da sessão:
+   - `README.md` (resumo)
+   - `context.md` (contexto inicial)
+   - `decisions.md` (decisões tomadas)
+   - `changes.md` (mudanças realizadas)
+5. Atualiza índice de sessões
+6. Atualiza provedor ativo para `done`
+
 ---
 
 ## 🐛 Fluxo de Correção de Bugs
@@ -275,6 +358,37 @@ Após aprovação:
 
 ## 📚 Fluxo de Documentação
 
+### Diagrama do Fluxo
+
+```mermaid
+flowchart TD
+    A[Documentar Projeto] --> B{Tipo de Docs?}
+
+    B -->|Negocio| C["/docs/build-business-docs"]
+    B -->|Tecnico| D["/docs/build-tech-docs"]
+    B -->|Compliance| E["/docs/build-compliance-docs"]
+
+    C --> F["docs/business-context/"]
+    D --> G["docs/technical-context/"]
+    E --> H["docs/compliance-context/"]
+
+    F --> I["/docs/build-index"]
+    G --> I
+    H --> I
+
+    I --> J["docs/index.md"]
+    J --> K["/docs/validate-docs"]
+
+    K --> L{Docs OK?}
+    L -->|Nao| M["/docs/docs-health"]
+    M --> N[Corrigir Problemas]
+    N --> K
+    L -->|Sim| O[Docs Completos]
+
+    style A fill:#fff3cd
+    style O fill:#e1f5e1
+```
+
 ### **Documentação Técnica**
 ```bash
 /docs/build-tech-docs
@@ -328,6 +442,35 @@ Após aprovação:
 
 ## ⚡ Fluxo de Hotfix
 
+### Diagrama do Fluxo
+
+```mermaid
+flowchart TD
+    A[Bug Critico] --> B["/engineer/hotfix"]
+    B --> C["Branch hotfix/fix-name"]
+
+    C --> D[Analise Rapida]
+    D --> E[Implementar Fix]
+
+    E --> F[Testes]
+    F --> G{Testes OK?}
+    G -->|Nao| E
+    G -->|Sim| H["/engineer/pr"]
+
+    H --> I[Code Review Urgente]
+    I --> J{Aprovado?}
+    J -->|Nao| E
+    J -->|Sim| K[Merge]
+
+    K --> L["/git:flow hotfix finish"]
+    L --> M[Deploy Producao]
+
+    style A fill:#ffebee
+    style M fill:#e1f5e1
+    style B fill:#fff3cd
+    style H fill:#fff3cd
+```
+
 ### **Hotfix Crítico (< 30min)**
 ```bash
 # Criação urgente
@@ -343,10 +486,138 @@ Após aprovação:
 
 **Características do fluxo de hotfix**:
 - 🚨 Prioridade máxima no provedor ativo
-- ⚡ Branch `hotfix/*` automaticamente
+- ⚡ Branch `hotfix/*` automaticamente a partir de `main`
 - 🧪 Testes mínimos mas críticos
 - 📢 Notificações para todos stakeholders
 - 📊 Deploy direto para produção após approve
+
+### **Passo a Passo**
+
+```bash
+# 1. Iniciar hotfix (cria branch + análise rápida)
+/engineer/hotfix "fix-payment-timeout"
+
+# 2. Criar PR após implementação
+/engineer/pr
+
+# 3. Após merge, finalizar hotfix
+/git:flow hotfix finish
+```
+
+> `/engineer/hotfix` **cria automaticamente** a branch `hotfix/fix-name` a partir de `main`. Não é necessário executar `/git:flow hotfix start` manualmente.
+
+**O que `/git:flow hotfix finish` faz:**
+- Merge emergencial para main/master
+- Back-merge automático para develop
+- Criação de tag de patch
+- Preparação para deploy de produção
+- Cleanup de branches
+- Atualização do provedor ativo
+
+**Diferenças do Fluxo de Feature:**
+- Análise mais rápida (foco no problema, não na arquitetura)
+- Menos fases no `plan.md`
+- Branch criada a partir de `main` (não `develop`)
+- Merge duplo automático (main + develop)
+- Deploy imediato após merge
+
+---
+
+## 📦 Fluxo de Release
+
+### Diagrama do Fluxo
+
+```mermaid
+flowchart TD
+    A[Preparar Release] --> B["/git:flow release start"]
+    B --> C["Branch release/v1.2.0"]
+
+    C --> D[Ajustes Finais]
+    D --> E[Atualizar CHANGELOG]
+    E --> F["/engineer/bump"]
+
+    F --> G[Testes Finais]
+    G --> H{Testes OK?}
+    H -->|Nao| D
+    H -->|Sim| I["/engineer/pr"]
+
+    I --> J[Code Review]
+    J --> K{Aprovado?}
+    K -->|Nao| D
+    K -->|Sim| L[Merge]
+
+    L --> M["/git:flow release finish"]
+    M --> N["Merge main + develop"]
+    N --> O[Tag v1.2.0]
+    O --> P[Deploy Producao]
+
+    style A fill:#e3f2fd
+    style P fill:#e1f5e1
+```
+
+### Passo a Passo
+
+```bash
+# 1. Criar release branch (suporta semver semântico)
+/git:flow release start "v1.2.0"
+# ou auto-bump:
+/git:flow release start "patch"  # 2.0.1 → 2.0.2
+/git:flow release start "minor"  # 2.0.1 → 2.1.0
+/git:flow release start "major"  # 2.0.1 → 3.0.0
+
+# 2. Fazer ajustes finais (correções de bugs, atualização de docs)
+
+# 3. Atualizar versão
+/engineer/bump minor
+
+# 4. Criar PR
+/engineer/pr
+
+# 5. Após merge, finalizar release
+/git:flow release finish
+```
+
+**O que `/git:flow release finish` faz:**
+- Merge para `main`
+- Back-merge para `develop`
+- Tag anotada com metadata
+- Preparação para deploy
+- Cleanup de branches
+- Atualização do provedor ativo
+
+---
+
+## ✅ Fluxo de Validação
+
+### Diagrama do Fluxo
+
+```mermaid
+flowchart TD
+    A[Validar Projeto] --> B["/validate/workflow"]
+
+    B --> C[Validar Estrutura]
+    C --> D[Validar Documentacao]
+    D --> E[Validar Git]
+    E --> F[Validar Provedor Ativo]
+
+    F --> G{Tudo OK?}
+    G -->|Nao| H[Listar Problemas]
+    H --> I[Corrigir]
+    I --> B
+    G -->|Sim| J[Projeto Valido]
+
+    style A fill:#e3f2fd
+    style J fill:#e1f5e1
+```
+
+### Passo a Passo
+
+```bash
+# Executar validação completa do projeto
+/validate/workflow
+```
+
+Usa internamente: estrutura de arquivos, consistência de documentação, estado Git e conectividade com o provedor ativo.
 
 ---
 
@@ -433,6 +704,74 @@ O mapeamento fase→subtask existe em todos os provedores, com nomenclatura pró
 
 ---
 
+## 🤔 Decision Trees
+
+### Qual comando usar para iniciar?
+
+```mermaid
+flowchart TD
+    A[Preciso iniciar algo] --> B{O que?}
+
+    B -->|Nova Feature| C{Task existe?}
+    C -->|Nao| D["/product/task"]
+    C -->|Sim| E["/engineer/start"]
+
+    B -->|Bug Critico| F["/engineer/hotfix"]
+
+    B -->|Release| G["/git:flow release start"]
+
+    B -->|Documentacao| H{Tipo?}
+    H -->|Negocio| I["/docs/build-business-docs"]
+    H -->|Tecnico| J["/docs/build-tech-docs"]
+
+    B -->|Validacao| K["/validate/workflow"]
+
+    style D fill:#fff3cd
+    style E fill:#fff3cd
+    style F fill:#ffebee
+    style G fill:#e3f2fd
+    style I fill:#f3e5f5
+    style J fill:#f3e5f5
+    style K fill:#e8f5e9
+```
+
+### Quando usar cada comando?
+
+#### Comandos de Produto
+
+| Cenário | Comando | Razão |
+|---------|---------|-------|
+| Criar nova feature | `/product/task` | Cria task estruturada no provedor + branch + sessão |
+| Refinar requisitos | `/product/refine` | Detalhamento quando requisitos não estão claros |
+| Planejar arquitetura | `/product/light-arch` | Mudanças que impactam arquitetura existente |
+
+#### Comandos de Engenharia
+
+| Cenário | Comando | Razão |
+|---------|---------|-------|
+| Iniciar desenvolvimento | `/engineer/start` | Análise + arquitetura + setup de sessão |
+| Implementar fase | `/engineer/work` | Implementa código seguindo `plan.md` |
+| Validar antes de PR | `/engineer/pre-pr` | Checklist de qualidade completo |
+| Criar Pull Request | `/engineer/pr` | Abre PR e atualiza provedor ativo |
+| Atualizar PR | `/engineer/pr-update` | Atualiza PR existente com novas mudanças |
+| Bug crítico em produção | `/engineer/hotfix` | Análise rápida + implementação urgente |
+| Validar fase | `/engineer/validate-phase-sync` | Valida sincronização fase ↔ subtask |
+
+#### Comandos de Documentação
+
+| Cenário | Comando | Razão |
+|---------|---------|-------|
+| Após merge concluído | `/docs/sync-sessions` | Arquiva sessão e atualiza provedor ativo |
+| Gerar docs de negócio | `/docs/build-business-docs` | Documentação de contexto de negócio |
+| Gerar docs técnicos | `/docs/build-tech-docs` | Documentação de arquitetura e stack |
+| Criar índice | `/docs/build-index` | Índice navegável de toda documentação |
+| Validar documentação | `/docs/validate-docs` | Verifica completude e consistência |
+| Verificar saúde | `/docs/docs-health` | Links quebrados, inconsistências |
+
+> **Regra de Ouro:** Use sempre `/product/*` e `/engineer/*` para desenvolvimento. Comandos Git são gerenciados automaticamente pelos fluxos de produto e engenharia.
+
+---
+
 ## 📊 Métricas e Relatórios
 
 ### **Métricas Coletadas Automaticamente**
@@ -447,6 +786,219 @@ O mapeamento fase→subtask existe em todos os provedores, com nomenclatura pró
 2. **Pipeline de Review**: PRs aguardando review + tempo de espera
 3. **Bugs e Hotfixes**: Tasks críticas + tempo de resolução
 4. **Documentação**: Status de docs por projeto
+
+---
+
+## 🩺 Troubleshooting
+
+### Problema: Branch já existe
+
+**Sintoma:** Erro ao criar branch com `/git:flow feature start`
+
+**Solução:**
+```bash
+# Opção 1: Usar branch existente
+git checkout feature/nome-existente
+
+# Opção 2: Verificar e recriar
+git branch -a
+git branch -D feature/nome-existente
+git push origin --delete feature/nome-existente
+/git:flow feature start "nome-existente"
+```
+
+---
+
+### Problema: Sessão não encontrada
+
+**Sintoma:** `/engineer/work` não encontra arquivos da sessão
+
+**Solução:**
+```bash
+# Verificar se sessão existe
+ls .claude/sessions/
+
+# Se não existe, criar com /engineer/start
+/engineer/start <feature-slug>
+```
+
+---
+
+### Problema: Provedor ativo não atualiza
+
+**Sintoma:** Comandos não atualizam status no provedor configurado
+
+**Diagnóstico:**
+1. Verificar se `context.md` tem `task-id` correto
+2. Verificar variáveis do provider no `.env` (ver CLAUDE.md — Tabela Provider → Variáveis)
+3. Verificar permissões do token de API
+
+```bash
+# Verificar task-id no context.md
+grep "task" .claude/sessions/<feature-slug>/context.md
+
+# Verificar provider ativo
+grep TASK_MANAGER_PROVIDER .env
+```
+
+Se variáveis ausentes → use `/meta:setup-integration` para reconfigurar.
+
+---
+
+### Problema: Mapeamento fase→subtask incorreto
+
+**Sintoma:** Subtask errada é atualizada ao completar fase
+
+**Solução:**
+```bash
+# Validar mapeamento
+/engineer/validate-phase-sync
+
+# Corrigir manualmente no context.md se necessário
+```
+
+---
+
+### Problema: Sessão não sincroniza após merge
+
+**Sintoma:** `/docs/sync-sessions` não detecta arquivos
+
+**Solução:**
+1. Verificar se há arquivos modificados
+2. Verificar `.gitignore` para exclusões acidentais
+
+```bash
+# Verificar arquivos modificados
+git status
+
+# Forçar sincronização
+/docs/sync-sessions --force
+
+# Validar estrutura
+/docs/sync-sessions --validate-only
+```
+
+---
+
+### Problema: Conflitos de merge
+
+**Sintoma:** Merge falha com conflitos
+
+**Solução:**
+```bash
+# Verificar conflitos
+git status
+
+# Resolver manualmente (editar arquivos com conflitos)
+# Marcar como resolvido
+git add <arquivo-resolvido>
+git commit -m "resolve merge conflicts"
+```
+
+---
+
+### Problema: Tag já existe (release)
+
+**Sintoma:** Erro ao tentar criar tag durante `/git:flow release finish`
+
+**Solução:**
+```bash
+# Listar tags existentes
+git tag
+
+# Deletar tag local (se incorreta)
+git tag -d v1.0.0
+
+# Deletar tag remota
+git push origin --delete v1.0.0
+
+# Recriar release
+/git:flow release start "v1.0.0"
+```
+
+---
+
+## 🌿 Fluxos Git Avançado
+
+> **IMPORTANTE:** Esta seção é para **uso avançado** ou **troubleshooting**. Os comandos Git são **chamados automaticamente** pelos comandos de engenharia e produto. Na maioria dos casos, você **não precisa** executá-los manualmente.
+
+### Quando Usar Comandos Git Diretamente
+
+Use comandos Git **apenas** nestas situações:
+
+1. **Troubleshooting:** Corrigir problemas de branch ou merge
+2. **Operações Manuais:** Quando comandos de engenharia não cobrem o caso
+3. **Releases:** Gerenciar releases e tags
+4. **Hotfix Finalização:** Após merge do PR de hotfix
+
+### Comandos Git Disponíveis
+
+#### Feature Branches
+
+| Comando | Uso | Quando Usar |
+|---------|-----|-------------|
+| `/git:flow feature start` | Criar feature branch | **Automático** via `/product/task` |
+| `/git:flow feature finish` | Finalizar feature | Após merge do PR |
+
+#### Hotfix Branches
+
+| Comando | Uso | Quando Usar |
+|---------|-----|-------------|
+| `/git:flow hotfix start` | Criar hotfix branch | **Automático** via `/engineer/hotfix` |
+| `/git:flow hotfix finish` | Finalizar hotfix | Após merge do PR de hotfix |
+
+#### Release Management
+
+| Comando | Uso | Quando Usar |
+|---------|-----|-------------|
+| `/git:flow release start` | Criar release | Preparar nova versão |
+| `/git:flow release finish` | Finalizar release | Deploy para produção |
+
+#### Operações Gerais
+
+| Comando | Uso | Quando Usar |
+|---------|-----|-------------|
+| `/git:init` | Inicializar Git | Novo projeto |
+| `/git:help` | Ajuda Git | Consultar comandos |
+| `/git:sync` | Sincronizar branches | Atualizar com remoto |
+
+### Integração Git ↔ Engenharia
+
+```mermaid
+flowchart LR
+    A["/product/task"] -->|chama| B["/git:flow feature start"]
+    B -->|cria| C["Branch feature/name"]
+
+    D["/engineer/hotfix"] -->|chama| E["/git:flow hotfix start"]
+    E -->|cria| F["Branch hotfix/name"]
+
+    G["/engineer/pr"] -->|usa| C
+    G -->|usa| F
+
+    H["Merge PR"] --> I{Tipo?}
+    I -->|Feature| J["/git:flow feature finish"]
+    I -->|Hotfix| K["/git:flow hotfix finish"]
+
+    style A fill:#fff3cd
+    style D fill:#fff3cd
+    style G fill:#fff3cd
+    style B fill:#e3f2fd
+    style E fill:#e3f2fd
+    style J fill:#e3f2fd
+    style K fill:#e3f2fd
+```
+
+### Checklist de Operações Git Manuais
+
+Antes de usar comandos Git diretamente, verifique:
+
+- [ ] O comando de engenharia equivalente não resolve?
+- [ ] É realmente necessário fazer manualmente?
+- [ ] Entendo o impacto da operação?
+- [ ] Fiz backup/commit das mudanças?
+- [ ] Estou na branch correta?
+
+> Na dúvida, use comandos de engenharia. Eles são mais seguros e integrados ao fluxo completo.
 
 ---
 
@@ -580,8 +1132,8 @@ O roteamento para o especialista depende de `TASK_MANAGER_PROVIDER`:
 #### **Exemplo: Feature Complexa com Múltiplos Agentes**
 ```bash
 # Sistema ativa automaticamente:
-# - @python-developer: Backend de pagamentos
-# - @react-developer: Interface de checkout  
+# - @nodejs-specialist: Backend de pagamentos
+# - @react-developer: Interface de checkout
 # - @test-engineer: Testes de integração
 # - @c4-architecture-specialist: Modelagem de segurança
 ```
@@ -595,4 +1147,12 @@ O roteamento para o especialista depende de `TASK_MANAGER_PROVIDER`:
 
 ---
 
-**Próximo**: [Task Manager Abstraction →](../knowledge-base/concepts/task-manager-abstraction.md) · Adapters por provedor em `.claude/utils/task-manager/adapters/` (`jira.md`, `clickup.md`, `asana.md`, `linear.md`)
+---
+
+## 🔗 Documentos Relacionados
+
+- [Guia de Comandos](./commands-guide.md) — Referência completa de comandos (77 comandos em 9 categorias)
+- [Referência de Agentes](./agents-reference.md) — 49 agentes especializados em 9 categorias
+- [Task Manager Abstraction](../knowledge-base/concepts/task-manager-abstraction.md) — Abstração provider-agnóstica
+- Adapters por provedor: `.claude/utils/task-manager/adapters/` (`jira.md`, `clickup.md`, `asana.md`, `linear.md`)
+- Adapter de forge (PR/CI): `.claude/utils/forge/adapters/github.md`
