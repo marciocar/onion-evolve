@@ -202,14 +202,12 @@ KB FRESHNESS REPORT — 2026-06-13
 ◆ Budget gasto  : ~X tokens
 
 ─── HISTÓRICAL (arquivar ou reescrever) ───────
-❌ frameworks/onion-ide-integration-strategy.md
-   Falhou: #3 (vaporware: multi-IDE), #4 (plataforma única)
+❌ frameworks/<kb-de-visão-abandonada>.md
+   Falhou: #3 (vaporware: multi-IDE / CLI standalone), #4 (plataforma única)
    Trecho: "suporte a Cursor, Zed e VS Code como alvos"
-   Ação  : remover ou converter em nota histórica com aviso explícito
-
-❌ frameworks/onion-multi-context-orchestrator-vision.md
-   Falhou: #3 (CLI standalone mencionado positivamente), #1 (claude-v2)
-   Ação  : adicionar header "DOCUMENTO HISTÓRICO — não aplicar como guia"
+   Ação  : remover (git arquiva) ou converter em nota histórica explícita
+   (Ex.: as KBs de visão multi-IDE/orchestrator de 2025 foram removidas
+    na curadoria de 2026-06-14 — ver onion-review-2026-05.md.)
 
 ─── STALE (atualizar) ─────────────────────────
 ⚠  concepts/context-window-optimization.md

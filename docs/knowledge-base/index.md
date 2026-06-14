@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **34 arquivos** de knowledge base (exceto `index.md`)
-- **14** em `concepts/` · **12** em `frameworks/` · **4** em `tools/` · **1** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
+- **30 arquivos** de knowledge base (exceto `index.md`)
+- **14** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **1** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
 
 ---
 
@@ -17,8 +17,8 @@
 
 ```
 docs/knowledge-base/
-├── concepts/          # 13 — Conceitos fundamentais
-├── frameworks/        # 12 — Frameworks e metodologias
+├── concepts/          # 14 — Conceitos fundamentais
+├── frameworks/        # 8  — Frameworks e metodologias
 ├── tools/             # 4  — Ferramentas e recursos
 ├── platforms/         # 1  — Plataformas e tecnologias
 ├── patterns/          # 1  — Padrões de implementação (SDAAL examples)
@@ -46,20 +46,18 @@ docs/knowledge-base/
 
 ---
 
-## 🏗️ Frameworks e Metodologias (12)
+## 🏗️ Frameworks e Metodologias (8)
 
 - [Agent Orchestration Landscape 2026](frameworks/agent-orchestration-landscape-2026.md) — comparativo de 5 correntes (verificação adversarial)
 - [Collaborative Testing Patterns](frameworks/collaborative-testing-patterns.md) — pair testing, three amigos
 - [Framework de Story Points](frameworks/framework-story-points.md) — estimativas ágeis (Fibonacci)
 - [Framework de Testes](frameworks/framework-testes.md) — White/Grey/Black-box, QA Story Points
 - [GitFlow Patterns](frameworks/gitflow-patterns.md) — branching, releases, versionamento
-- [Onion Complete Cycle Understanding](frameworks/onion-complete-cycle-understanding.md) — _(histórico)_
-- [Onion IDE Integration Strategy](frameworks/onion-ide-integration-strategy.md) — _(histórico — multi-IDE abandonado)_
-- [Onion Multi-Context Orchestrator Vision](frameworks/onion-multi-context-orchestrator-vision.md) — _(histórico)_
-- [Onion System Critical Analysis 2025](frameworks/onion-system-critical-analysis-2025.md) — _(histórico)_
 - [QA Story Points](frameworks/qa-story-points.md) — matrizes de pontuação de QA
 - [Spec-Driven Development Tools 2025](frameworks/spec-driven-development-tools-2025.md) — análise comparativa de ferramentas
 - [Test Strategy Scoring](frameworks/test-strategy-scoring.md) — thresholds e detecção de gaps de teste
+
+> _As 4 KBs de visões abandonadas (onion-complete-cycle, onion-ide-integration-strategy, onion-multi-context-orchestrator-vision, onion-system-critical-analysis-2025) foram removidas na curadoria de 2026-06-14 — suas conclusões estão sintetizadas em [onion-review-2026-05.md](../analysis/onion-review-2026-05.md); o conteúdo verboso é recuperável via git history._
 
 ---
 

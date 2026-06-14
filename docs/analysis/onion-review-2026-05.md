@@ -8,11 +8,11 @@ abandonado:
   - estrutura .onion/
   - plano de implementação v4.0 (FASES 5-9)
   - packages/onion-cli/ (a ser removido)
-predecessores-historicos:
-  - docs/knowledge-base/frameworks/onion-system-critical-analysis-2025.md
-  - docs/knowledge-base/frameworks/onion-complete-cycle-understanding.md
-  - docs/knowledge-base/frameworks/onion-multi-context-orchestrator-vision.md
-plano-execucao: docs/plans/onion-saneamento-plan-2026-05.md
+predecessores-historicos:  # removidos do repo (curadoria 2026-06-14); recuperáveis via git history
+  - onion-system-critical-analysis-2025.md
+  - onion-complete-cycle-understanding.md
+  - onion-multi-context-orchestrator-vision.md
+plano-execucao: onion-saneamento-plan-2026-05.md  # executado e removido; ver git history
 ---
 
 # Revisão Analítica do Sistema Onion — Maio/2026
@@ -89,7 +89,7 @@ Resolvendo as 19 recomendações priorizadas nas seções P0-P3, o framework pas
 
 ### Próximo passo concreto
 
-Aprovar o plano de execução em [docs/plans/onion-saneamento-plan-2026-05.md](../plans/onion-saneamento-plan-2026-05.md) e executar P0 nos próximos 7 dias.
+Aprovar o plano de execução `onion-saneamento-plan-2026-05.md` e executar P0 nos próximos 7 dias. _(Nota 2026-06-14: o plano foi 100% executado — P0–P3 e backlog v1/v2 nos PRs #16–#27 — e removido do repo; recuperável via git history.)_
 
 ---
 
@@ -394,11 +394,11 @@ Apenas **1 entrada substantiva** após meses de uso. Memória vazia significa qu
 
 ## 4. Heranças do Roadmap Abandonado
 
-Em 2025-12-20, três análises críticas foram produzidas em sequência:
+Em 2025-12-20, três análises críticas foram produzidas em sequência _(as KBs-fonte abaixo foram removidas do repo na curadoria de 2026-06-14 — esta síntese preserva suas conclusões; o conteúdo verboso é recuperável via git history)_:
 
-1. [onion-system-critical-analysis-2025.md](../knowledge-base/frameworks/onion-system-critical-analysis-2025.md) — análise comparativa contra ferramentas SDD (Kiro, Spec-Kit, OpenSpec). Conclusão: complexidade excessiva, onboarding inaceitável, propor cortar 70%.
-2. [onion-complete-cycle-understanding.md](../knowledge-base/frameworks/onion-complete-cycle-understanding.md) — reavaliação que reconhece o Onion como "metodologia completa de 5 camadas", reverte conclusões da análise anterior.
-3. [onion-multi-context-orchestrator-vision.md](../knowledge-base/frameworks/onion-multi-context-orchestrator-vision.md) — síntese final propondo identidade "Multi-Context Development Orchestrator" com estrutura `.onion/contexts/`, CLI standalone, suporte multi-IDE.
+1. `onion-system-critical-analysis-2025.md` — análise comparativa contra ferramentas SDD (Kiro, Spec-Kit, OpenSpec). Conclusão: complexidade excessiva, onboarding inaceitável, propor cortar 70%.
+2. `onion-complete-cycle-understanding.md` — reavaliação que reconhece o Onion como "metodologia completa de 5 camadas", reverte conclusões da análise anterior.
+3. `onion-multi-context-orchestrator-vision.md` — síntese final propondo identidade "Multi-Context Development Orchestrator" com estrutura `.onion/contexts/`, CLI standalone, suporte multi-IDE.
 
 Essas três análises geraram um **plano de implementação v4.0** de 9 fases. As fases 1-4 (Multi-Context structure, starter kit, levels system, beta release) foram parcialmente entregues. As fases 5-9 foram **descontinuadas em 2026-05-18**.
 
@@ -554,15 +554,15 @@ Os três bloqueios são tratados pelas recomendações P0, P2 e P3 da próxima s
 
 ## 6. Recomendações Priorizadas
 
-Priorização sob a lente "framework template instalável em projetos novos, legados ou regulados". O detalhamento executável de cada recomendação (com critérios de pronto, dependências e estimativas) vive no plano de saneamento — ver [docs/plans/onion-saneamento-plan-2026-05.md](../plans/onion-saneamento-plan-2026-05.md).
+Priorização sob a lente "framework template instalável em projetos novos, legados ou regulados". O detalhamento executável de cada recomendação vivia no plano de saneamento `onion-saneamento-plan-2026-05.md` — executado e removido do repo (recuperável via git history).
 
 ### P0 — Marcar o que mudou e parar de sangrar contexto
 
 Antes de qualquer outra coisa, fechar o gap entre **visão histórica** e **estado atual**. Sem isso, todo trabalho subsequente compete com narrativas obsoletas.
 
-**1. Marcar as 3 análises de 2025-12-20 como históricas**
+**1. Marcar as 3 análises de 2025-12-20 como históricas** _(✅ executado — superado: as 3 KBs foram removidas na curadoria de 2026-06-14, recuperáveis via git history; suas conclusões estão sintetizadas neste documento)_
 
-Adicionar ao frontmatter de [onion-system-critical-analysis-2025.md](../knowledge-base/frameworks/onion-system-critical-analysis-2025.md), [onion-complete-cycle-understanding.md](../knowledge-base/frameworks/onion-complete-cycle-understanding.md) e [onion-multi-context-orchestrator-vision.md](../knowledge-base/frameworks/onion-multi-context-orchestrator-vision.md):
+Ação original — adicionar ao frontmatter de `onion-system-critical-analysis-2025.md`, `onion-complete-cycle-understanding.md` e `onion-multi-context-orchestrator-vision.md`:
 
 ```yaml
 status: historical
@@ -786,7 +786,7 @@ A resposta a essa pergunta determina o cronograma realista de P3 e a confiança 
 
 ### Próximo passo concreto
 
-Revisar e aprovar o plano de execução em [docs/plans/onion-saneamento-plan-2026-05.md](../plans/onion-saneamento-plan-2026-05.md), que detalha cada uma das 19 recomendações em tarefas executáveis com critérios de pronto.
+Revisar e aprovar o plano de execução `onion-saneamento-plan-2026-05.md`, que detalhava cada uma das 19 recomendações em tarefas executáveis. _(✅ executado e removido na curadoria de 2026-06-14; recuperável via git history.)_
 
 ---
 

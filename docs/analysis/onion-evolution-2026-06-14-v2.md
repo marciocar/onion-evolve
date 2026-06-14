@@ -1,11 +1,11 @@
 ---
 title: Onion Evolution Backlog v2 (medição "depois") — 2026-06-14
 date: 2026-06-14
-status: backlog
+status: executado  # backlog v2 100% resolvido nos PRs #22–#27; mantido como baseline de auditoria mais recente
 gerado-por: /meta:evolve v1.1.0 (fan-out-and-synthesize + verificação adversarial, finding_id estável)
 run-id: wf_82ddb76e-21f
 escopo: re-auditoria completa (8 dimensões) pós-merge dos 5 PRs do ciclo v1
-compara-com: onion-evolution-2026-06-14.md (v1)
+compara-com: v1 (onion-evolution-2026-06-14.md — removido na curadoria 2026-06-14; ver git history)
 ---
 
 # Onion Evolution Backlog v2 — medição "depois"
@@ -102,5 +102,5 @@ E o ciclo v1 **criou** 1 conformance gap: a regra §1.1 que adicionei (#19,
 4. **Refactors maiores** (D1-0 docker, D2-4 test-agent, D6-13 docs cluster) — `/product:spec → /engineer:plan`.
 
 ## 6. Referências
-- Run: `wf_82ddb76e-21f` · v1: [onion-evolution-2026-06-14.md](onion-evolution-2026-06-14.md)
+- Run: `wf_82ddb76e-21f` · v1: `onion-evolution-2026-06-14.md` (removido na curadoria 2026-06-14; ver git history)
 - Doutrina: [onion-modernization-doctrine.md](../knowledge-base/concepts/onion-modernization-doctrine.md)

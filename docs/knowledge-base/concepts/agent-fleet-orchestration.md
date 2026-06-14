@@ -25,7 +25,6 @@
 **Relacionados no Onion:**
 
 - [`ai-agent-design-patterns.md`](ai-agent-design-patterns.md) — KB irmã (design de agentes)
-- [`onion-multi-context-orchestrator-vision.md`](../frameworks/onion-multi-context-orchestrator-vision.md) — visão histórica que antecipou este modelo
 
 ---
 
@@ -421,7 +420,6 @@ Logo, a camada de frota mora em **skill + comando**, **nunca** num agente:
 
 - [`docs/meta-specs/commands.md`](../../meta-specs/commands.md) — constituição L0 dos comandos (categoria `meta/` abriga `/meta:fleet`; o grafo de frota não é um workflow faseado retomável, e sim coordenação efêmera intra-run).
 - [`ai-agent-design-patterns.md`](ai-agent-design-patterns.md) — KB irmã: design do agente individual e os mesmos padrões sob a ótica de design.
-- [`onion-multi-context-orchestrator-vision.md`](../frameworks/onion-multi-context-orchestrator-vision.md) — registro histórico (status: historical, 2025-12-20) que **antecipou** este modelo de orquestração multi-contexto antes do substrato nativo existir.
 
 ---
 
