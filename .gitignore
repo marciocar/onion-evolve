@@ -2,10 +2,14 @@
 .history/
 
 # Worklogs de sessão (.claude/sessions/) — versionamento é ESCOLHA CONSCIENTE por projeto.
-# Default do Onion: gitignore (estado individual/efêmero). Para tratar worklogs como
-# artefato durável de time/auditoria, comente a linha abaixo (ou faça un-ignore de archived/).
+# Política do Onion: ACTIVE worklogs efêmeros (ignorados) + registro ARCHIVED durável (versionado).
+#   - .claude/sessions/<slug>/  → worklog ACTIVE: estado individual/efêmero, NÃO versionar.
+#   - .claude/sessions/archived/ → registro pós-merge: artefato de auditoria, VERSIONAR.
+#   - .claude/sessions/INDEX.md  → índice navegável dos arquivados, VERSIONAR.
 # Política: docs/knowledge-base/frameworks/gitflow-patterns.md §Contrato de Sessão → Versionamento de sessões.
-.claude/sessions/
+.claude/sessions/*
+!.claude/sessions/archived/
+!.claude/sessions/INDEX.md
 
 # Arquivos temporários
 *.tmp

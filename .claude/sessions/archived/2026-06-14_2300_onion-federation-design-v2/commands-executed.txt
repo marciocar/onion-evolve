@@ -1,0 +1,25 @@
+## Comandos Onion e Workflows executados nesta sessão
+
+### Skills invocadas
+- /validate:workflow    — executado por acidente (abortado imediatamente)
+- /docs:sync-sessions  — archiving desta sessão (comando atual)
+- /meta:evolve         — carregada em contexto (skill anterior à compactação)
+
+### Workflows (ferramenta Workflow nativa)
+- wf_dbfb2b91-cd3     federation-design-review
+                       6 lentes adversariais (review) + verify stage
+                       42 agents · ~1.46 M tokens · ~24 min
+                       36 raw → 24 confirmados (12 refutados)
+
+### Modos
+- EnterPlanMode / ExitPlanMode — design v2 planejado e aprovado pelo usuário
+
+### Operações git
+- git pull origin main          — sincronização após PR #36
+- gh pr create                  — PR #37
+- git pull origin main          — sincronização após PR #37
+- git branch -d / git push origin --delete — limpeza de branches
+
+### Agentes (Agent tool)
+- @branch-documentation-writer  — (implícito no sync-sessions)
+- Frota federation-design-review — 42 subagentes via Workflow

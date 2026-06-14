@@ -1,0 +1,18 @@
+## Arquivos modificados nesta sessão (PRs #36 e #37)
+
+### Criados
+docs/analysis/onion-federation-design-review-2026-06.md
+docs/analysis/onion-federation-design-v2-2026-06.md
+
+### Modificados
+docs/analysis/onion-federation-design-2026-06.md
+
+### Removidos (não rastreados por git — gitignored)
+.claude/sessions/allowed-tools-and-kb-content/context.md
+.claude/sessions/allowed-tools-and-kb-content/architecture.md
+.claude/sessions/allowed-tools-and-kb-content/ (diretório)
+
+## Git log das mudanças desta sessão
+
+a6c9083 docs(analysis): Onion Federation v2 — pivot to peer topology + git ledger (#37)
+4cebe5a docs(analysis): Onion Federation design + phased backlog (multi-repo orchestration) (#36)
