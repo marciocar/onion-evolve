@@ -35,3 +35,5 @@ node_modules/
 .tmp/
 # Claude Code local overrides (não versionar)
 .claude/settings.local.json
+# Registro MCP do projeto-alvo (cópia de .mcp.json.example; pode conter config específica)
+.mcp.json
