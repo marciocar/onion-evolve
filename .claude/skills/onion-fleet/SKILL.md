@@ -144,6 +144,9 @@ if (collided.length) return gateHumano(collided, results);  // partição falhou
 - **Timeout por worker.** `budget` limita tokens, não tempo. Para workers que tocam I/O externo, aplique um teto de tempo (campo nativo quando existir; senão `Promise.race` com timer) e trate o estouro como SKIP.
 - **Budget em todo fan-out.** Exija `budget` por worker também em `parallel()`/`pipeline()`, não só em `loop-until-done`.
 - **Run-id + trace.** Gere um identificador por run (custo 0 tokens) e inclua no relatório junto à referência do **Agent View**, para reprodutibilidade e inspeção.
+- **Falhar-alto em fase vazia (não no-op silencioso).** Se uma lista de trabalho **derivada** de uma fase fica vazia com entradas não-vazias (esperava N itens para julgar/processar, obteve 0), isso é **erro de orquestração**, não sucesso. Assert `derivada.length` antes de prosseguir e `log()` o descompasso — senão a fase no-opa e o run reporta "ok" tendo verificado nada. (Incidente real: filtro de juízes comparou caminho **absoluto** do worker com **relativo** → 0 juízes; o run reportou sucesso.)
+- **Correlação por chave estável, nunca por path.** Ao casar resultado-de-worker com configuração (qual julgar, qual estágio), use **label/índice** estável — não string-match de caminho, que quebra na fronteira absoluto-vs-relativo.
+- **Retomar a fase quebrada, não racionalizar.** Quando uma fase falha/no-opa, **corrija o script e retome** via `resumeFromRunId` (workers concluídos vêm do cache; só a fase corrigida roda) — não substitua a verificação perdida por um check **a jusante** (CI/lint) e a declare "equivalente". Um check determinístico cobre a dimensão *sintática*; verificadores semânticos cobrem *funcionalidade/qualidade* — **não são intercambiáveis**. Nomeie a dimensão não-verificada; quando possível, converta-a num **guard determinístico permanente**.
 
 ## Referências
 
