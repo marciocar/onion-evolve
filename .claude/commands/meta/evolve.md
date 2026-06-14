@@ -7,7 +7,7 @@ description: |
 model: opus
 category: meta
 tags: [evolve, audit, fleet, self-evolution, modernization]
-version: "1.0.0"
+version: "1.1.0"
 updated: "2026-06-14"
 allowed-tools: Read Write Grep Glob Bash(find *) Bash(wc *) Bash(git log*) Bash(cat .env*)
 argument-hint: "[dimensão específica (D1..D8) | vazio = auditoria completa]"
@@ -97,6 +97,7 @@ roda sua própria frota interna (aninhar violaria `onion-fleet`).
 
 ```javascript
 const FindingSchema = {
+  id: "string",                      // chave ESTÁVEL de correlação — atribuída no fan-in (`${dimension}-${ordinal}`)
   dimension: "D1|D2|D3|D4|D5|D6|D7|D8",
   severity: "blocker|recommended|opportunistic",   // 🔴 | 🟡 | 🟢
   finding: "string",                 // descrição
@@ -119,6 +120,11 @@ const scanFindings = await parallel(
 // Composição (NÃO fan-out): delega aos comandos existentes no fluxo principal
 const kbFindings = await runCommand("/meta:kb-freshness");        // ingere FreshnessSchema[]
 const specFindings = await runCommand("/meta:metaspec-validate"); // por artefato de alto risco
+
+// Atribuir id ESTÁVEL a cada achado — é a única chave confiável de correlação
+// entre achado e veredito no fan-in (o juiz reformula o texto; o id não muda).
+const allFindings = [...scanFindings.flat(), ...kbFindings, ...specFindings]
+  .map((f, i) => ({ ...f, id: `${f.dimension}-${i}` }));
 ```
 
 ### Passo 3.1 — Verificação adversarial (acionada automaticamente quando)
@@ -130,16 +136,34 @@ Um juiz (opus) tenta **refutar** o achado e, sobretudo, **veta qualquer proposta
 que funda fases de workflow faseado** ([commands.md §3](../../../docs/meta-specs/commands.md)) —
 falha de modo mais grave. Achados que sobrevivem entram no backlog.
 
+O veredito **DEVE ecoar o `id`** do achado (jamais reproduzir o texto como chave):
+
+```javascript
+const VerdictSchema = {
+  finding_id: "string",        // ECOA FindingSchema.id — única chave de correlação válida
+  refuted: "boolean",
+  vetoed_phase_merge: "boolean",
+  reasoning: "string"
+};
+```
+
 ### Passo 3.2 — Completeness critic (loop-until-done, budget-gated)
 Antes do fan-in, um crítico confirma que as 8 dimensões rodaram e nenhuma
 categoria de artefato foi pulada. O que faltar vira nova rodada.
 
 ### Passo 4 — Fan-in: consolidar e priorizar (0 tokens)
-No contexto principal, mescle `scanFindings` + `kbFindings` + `specFindings`:
-1. Agrupe por severidade: 🔴 blocker → 🟡 recommended → 🟢 opportunistic
+No contexto principal, parta de `allFindings` (já com `id` estável):
+1. **Remova refutados/vetados correlacionando por `id`** — **nunca** por texto:
+   ```javascript
+   const survived = allFindings.filter(f =>
+     !verdicts.some(v => v.finding_id === f.id && (v.refuted || v.vetoed_phase_merge)));
+   ```
+   ⚠️ Casar por `finding.slice(...)` falha: o juiz reformula o texto do achado e a
+   maioria dos refutados escaparia para o backlog (modo de falha real, jun/2026).
+2. Agrupe por severidade: 🔴 blocker → 🟡 recommended → 🟢 opportunistic
    (hierarquia do `@metaspec-gate-keeper`).
-2. Dedup transversal: 3+ achados com a mesma causa → **alerta sistêmico**.
-3. Escreva o relatório em `docs/analysis/onion-evolution-<YYYY-MM-DD>.md`
+3. Dedup transversal: 3+ achados com a mesma causa → **alerta sistêmico**.
+4. Escreva o relatório em `docs/analysis/onion-evolution-<YYYY-MM-DD>.md`
    (única escrita; **nunca** em `.claude/`).
 
 ### Passo 5 — Fallback serial (Workflow indisponível)
