@@ -6,6 +6,7 @@
 |-------|-------|
 | **Versão** | 1.0.0 |
 | **Criado** | 2025-11-25 |
+| **Última Atualização** | 2025-11-25 |
 | **Categoria** | Architecture |
 | **Tags** | `abstraction`, `adapter-pattern`, `multi-provider`, `catalog` |
 

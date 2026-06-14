@@ -12,6 +12,12 @@
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Configurações e MCPs |
 
+> ⚠️ **Provider-agnóstico**: os exemplos com ClickUp (`ONION_AUTO_CLICKUP_SYNC`,
+> `mcp_ClickUp_*`, etc.) são **ilustrativos**. O Task Manager do Onion é abstraído
+> via `TASK_MANAGER_PROVIDER` (jira | clickup | asana | linear | none) — ver
+> `.claude/utils/task-manager/` e [task-manager-abstraction.md](task-manager-abstraction.md).
+> Leia o provider ativo do `.env` antes de assumir ClickUp.
+
 ### Fontes
 
 - [12-Factor App - Config](https://12factor.net/config)
