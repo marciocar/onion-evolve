@@ -2,6 +2,7 @@
 name: pr-update
 description: Atualizar PR existente com mudanças adicionais.
 model: sonnet
+allowed-tools: Bash(git *) Read Edit Write
 category: engineer
 tags: [pr, update, git]
 version: "3.0.0"

@@ -2,6 +2,7 @@
 name: feature
 description: Criar task de feature no gerenciador configurado para planejamento e backlog.
 model: sonnet
+allowed-tools: Read Bash(cat .env*)
 category: product
 tags: [feature, task-manager, backlog]
 version: "3.0.0"

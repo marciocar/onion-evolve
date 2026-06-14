@@ -4,6 +4,7 @@ description: |
   Analisa estratégias de teste existentes e sugere melhorias baseadas no Framework de Testes.
   Use para auditar conformidade, identificar gaps e otimizar estratégias de teste com base no framework.
 model: sonnet
+allowed-tools: Read Write Bash(find *) Bash(grep *) Bash(mkdir *)
 
 parameters:
   - name: feature-id

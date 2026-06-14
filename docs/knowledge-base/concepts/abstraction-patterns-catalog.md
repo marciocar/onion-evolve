@@ -4,9 +4,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Criado** | 2025-11-25 |
-| **Última Atualização** | 2025-11-25 |
+| **Última Atualização** | 2026-06-14 |
 | **Categoria** | Architecture |
 | **Tags** | `abstraction`, `adapter-pattern`, `multi-provider`, `catalog` |
 
@@ -50,7 +50,7 @@ Todos os padrões seguem a mesma arquitetura:
 | # | Padrão | Categoria | Status | Prioridade | Valor |
 |---|--------|-----------|--------|------------|-------|
 | 1 | Task Manager | Produtividade | ✅ Implementado | - | ⭐⭐⭐⭐⭐ |
-| 2 | Git Provider | DevOps | 📝 Proposto | 🔴 Alta | ⭐⭐⭐⭐⭐ |
+| 2 | Forge (Git Provider) | DevOps | ✅ Implementado | - | ⭐⭐⭐⭐⭐ |
 | 3 | LLM Provider | IA | 📝 Proposto | 🔴 Alta | ⭐⭐⭐⭐⭐ |
 | 4 | Documentation | Docs | 📝 Proposto | 🟡 Média | ⭐⭐⭐⭐ |
 | 5 | CI/CD | DevOps | 📝 Proposto | 🟡 Média | ⭐⭐⭐⭐ |
@@ -74,7 +74,7 @@ Todos os padrões seguem a mesma arquitetura:
 | ClickUp | ✅ Completo | `TASK_MANAGER_PROVIDER=clickup` |
 | Asana | ✅ Completo | `TASK_MANAGER_PROVIDER=asana` |
 | Linear | ✅ Completo | `TASK_MANAGER_PROVIDER=linear` |
-| Jira | 🔮 Futuro | `TASK_MANAGER_PROVIDER=jira` |
+| Jira | ✅ Completo | `TASK_MANAGER_PROVIDER=jira` |
 
 ### Interface Principal
 
@@ -89,94 +89,46 @@ interface ITaskManager {
 
 ---
 
-## 2️⃣ Git Provider Abstraction 📝
+## 2️⃣ Forge Abstraction (Git Provider / Host Remoto) ✅
 
-**Status**: Proposto  
-**Prioridade**: 🔴 Alta
+**Status**: Implementado  
+**Documentação**: [`.claude/utils/forge/`](../../../.claude/utils/forge/)
 
-### Problema
+### Problema resolvido
 
-Comandos `/git/*` atualmente assumem GitHub. Empresas usam GitLab, Bitbucket, Azure DevOps.
+Comandos `/git/*` e `/engineer/pr` assumiam GitHub diretamente. O Forge Adapter
+abstrai operações de **host remoto** (PR, review, CI/checks, Release) para que
+GitLab, Bitbucket e outros possam ser suportados sem alterar os comandos.
 
-### Provedores Propostos
+> **Fronteira importante**: o adapter cobre **só host remoto**. Git local
+> (branch, merge, tag, push) usa `git` direto via motor GitFlow.
 
-| Provedor | Prioridade | API |
-|----------|------------|-----|
-| GitHub | ✅ MCP Existente | REST + GraphQL |
-| GitLab | 🔴 Alta | REST API |
-| Bitbucket | 🟡 Média | REST API |
-| Azure DevOps | 🟢 Baixa | REST API |
+### Provedores Suportados
 
-### Interface Proposta
-
-```typescript
-interface IGitProvider {
-  readonly provider: 'github' | 'gitlab' | 'bitbucket' | 'azure';
-  readonly isConfigured: boolean;
-
-  // Pull/Merge Requests
-  createPR(input: PRInput): Promise<PROutput>;
-  getPR(id: string | number): Promise<PROutput>;
-  updatePR(id: string | number, updates: PRUpdateInput): Promise<PROutput>;
-  mergePR(id: string | number, method?: 'merge' | 'squash' | 'rebase'): Promise<void>;
-  closePR(id: string | number): Promise<void>;
-
-  // Reviews
-  requestReview(prId: string, reviewers: string[]): Promise<void>;
-  approveReview(prId: string): Promise<void>;
-  addReviewComment(prId: string, comment: ReviewComment): Promise<void>;
-
-  // Branches
-  createBranch(name: string, fromRef?: string): Promise<void>;
-  deleteBranch(name: string): Promise<void>;
-  getBranches(): Promise<BranchOutput[]>;
-
-  // Commits
-  getCommits(branch?: string, limit?: number): Promise<CommitOutput[]>;
-
-  // CI Status
-  getCheckStatus(ref: string): Promise<CheckStatusOutput>;
-  
-  // Issues (opcional)
-  createIssue?(input: IssueInput): Promise<IssueOutput>;
-}
-```
+| Provedor | Status | Transporte padrão |
+|----------|--------|------------------|
+| GitHub | ✅ Implementado | `cli` (`gh`) — default |
+| GitLab | 🔜 Costura pronta | — |
+| Bitbucket | 🔜 Costura pronta | — |
+| NoForgeAdapter | ✅ Fallback | modo local (push funciona, PR/CI degradam) |
 
 ### Variáveis de Ambiente
 
 ```bash
 # .env
-GIT_PROVIDER=github  # github | gitlab | bitbucket | azure
+FORGE_PROVIDER=github    # github | gitlab | bitbucket | none
+FORGE_TRANSPORT=cli      # cli (default, usa gh) | api (REST fallback)
 
-# GitHub
-GITHUB_TOKEN=ghp_xxxxx
-GITHUB_OWNER=myorg
-GITHUB_REPO=myrepo
-
-# GitLab
-GITLAB_TOKEN=glpat-xxxxx
-GITLAB_PROJECT_ID=12345
-GITLAB_BASE_URL=https://gitlab.com  # ou self-hosted
-
-# Bitbucket
-BITBUCKET_USERNAME=myuser
-BITBUCKET_APP_PASSWORD=xxxxx
-BITBUCKET_WORKSPACE=myworkspace
-BITBUCKET_REPO_SLUG=myrepo
-
-# Azure DevOps
-AZURE_DEVOPS_PAT=xxxxx
-AZURE_DEVOPS_ORG=myorg
-AZURE_DEVOPS_PROJECT=myproject
+# GitHub (via gh auth login OU token explícito)
+GH_TOKEN=ghp_xxxxx       # alternativa: GITHUB_TOKEN
 ```
 
-### Comandos Afetados
+### Comandos que usam o adapter
 
-- `/git/pr` - Criar pull requests
-- `/git/sync` - Sincronizar branches
-- `/git:flow feature start` - Criar branches
-- `/engineer/pre-pr` - Preparar PR
-- `/engineer/pr` - Abrir PR
+- `/git:flow` — dispatcher GitFlow (feature/release/hotfix)
+- `/engineer/pr` — abrir PR
+- `/engineer/pr-update` — atualizar PR existente
+- `/git/sync` — sync pós-merge
 
 ---
 
