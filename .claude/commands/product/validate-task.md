@@ -14,29 +14,10 @@ Você é um especialista em produto e arquitetura encarregado de carregar, anali
 
 ## 🚨 PASSO 0 (OBRIGATÓRIO): Detectar Provedor
 
-**⚠️ CRÍTICO — EXECUTAR ANTES DE QUALQUER OUTRA AÇÃO. NUNCA assumir o provedor.**
-
-1. **Ler `.env`** (`read_file .env`) e extrair `TASK_MANAGER_PROVIDER`
-   (valores: `jira` | `clickup` | `asana` | `linear` | `none`).
-2. **Validar a variável obrigatória do provedor ativo:**
-
-   | Provedor | Variável obrigatória | Ferramentas MCP / Adapter |
-   |----------|----------------------|----------------------------|
-   | `jira` | `JIRA_HOST`, `JIRA_EMAIL`, `JIRA_API_TOKEN` | `.claude/utils/task-manager/adapters/jira.md` |
-   | `clickup` | `CLICKUP_API_TOKEN` | `mcp_ClickUp_*` / `.claude/utils/task-manager/adapters/clickup.md` |
-   | `asana` | `ASANA_ACCESS_TOKEN` | `mcp_asana_*` / `.claude/utils/task-manager/adapters/asana.md` |
-   | `linear` | `LINEAR_API_KEY` | `mcp_Linear_*` / `.claude/utils/task-manager/adapters/linear.md` |
-   | `none` / ausente | — | modo offline (sessões locais em `.claude/sessions/`) |
-
-3. **Validar compatibilidade do task-id** com o provedor ativo via
-   `detectProviderFromTaskId` / `validateProviderMatch` — se houver incompatibilidade,
-   avisar o usuário antes de prosseguir.
-4. **Fallback gracioso:** se a variável obrigatória faltar, avisar em pt-BR qual
-   variável está ausente, sugerir `/meta/setup-integration` e seguir em **modo offline**
-   (usar apenas o contexto local da sessão, sem chamadas de API).
-
-> Detalhes de detecção, parsing do `.env` e validação de ID:
-> `.claude/utils/task-manager/detector.md`.
+Detectar e validar o provedor ativo **antes de qualquer ação**, seguindo o
+fragmento canônico `common:prompts:task-manager-provider-detection`: ler `.env`,
+validar a variável obrigatória do provedor, **validar a compatibilidade do
+`task-id`** com o provedor e aplicar o fallback gracioso em modo offline.
 
 ## 📋 **Processo de Validação**
 
