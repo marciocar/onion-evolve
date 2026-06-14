@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões para Comandos do Sistema Onion
 date: 2026-05-18
-version: 1.1.0
+version: 1.3.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -114,7 +114,7 @@ Comandos devem residir em uma das categorias abaixo. Categorias com asterisco re
 | `global/` | Comandos transversais | 1+ |
 | (root) | `onion.md` e `warm-up.md` — pontos de entrada | 2 |
 
-Categorias podem ter subdiretórios quando agrupam variantes (ex: `git/feature/`, `git/hotfix/`, `git/release/`, `validate/test-strategy/`, `validate/qa-points/`).
+Categorias podem ter subdiretórios quando agrupam variantes (ex: `validate/test-strategy/`, `validate/qa-points/`). Subdiretórios são para **variantes genuinamente distintas**; **não** para fases/verbos de um mesmo fluxo — estas devem ser argumentos de um dispatcher (ver §4.1, padrão `/git:flow`).
 
 ---
 
@@ -185,8 +185,8 @@ Os nomes abaixo aparecem em múltiplas categorias por razões funcionais legíti
 |---|---|---|---|
 | `README` | `product/`, `git/`, `common/`, `docs/` | Específico por categoria (não há canônico) | Cada README descreve a categoria que o contém |
 | `warm-up` | `product/`, `engineer/`, root (`warm-up.md`) | root (`/warm-up`) | `product/warm-up`, `engineer/warm-up` são specializations contextuais |
-| `start` | `engineer/`, `git/feature/`, `git/hotfix/`, `git/release/` | `engineer/start` (sessão de desenvolvimento) | `git/feature/start`, `git/hotfix/start`, `git/release/start` são fluxos GitFlow específicos |
-| `finish` | `git/feature/`, `git/hotfix/`, `git/release/` | Específico por subcategoria GitFlow | Sempre invocar com path completo |
+| `start` | `engineer/` | `engineer/start` (sessão de desenvolvimento) | O ciclo de vida GitFlow **não** usa mais `git/feature/start` etc. — virou o dispatcher `/git:flow <tipo> <ação>` (consolidado em 2026-06-13) |
+| `finish` | — | n/a | Ações GitFlow `start`/`publish`/`finish` são **argumentos** de `/git:flow`, não comandos/subpastas distintos |
 | `help` | `git/`, `docs/` | Específico por categoria | Ajuda contextual da categoria |
 | `estimate` | `product/`, `validate/qa-points/` | `product/estimate` (story points de feature) | `validate/qa-points/estimate` é QA story points |
 | `plan` | `engineer/`, `product/light-arch` (similar) | `engineer/plan` (planejamento de implementação) | `product/light-arch` é design de arquitetura leve |
@@ -197,6 +197,14 @@ Os nomes abaixo aparecem em múltiplas categorias por razões funcionais legíti
 - Quando houver canônico, novos comandos com nome curto devem usar o canônico ou nome explícito
 - Quando não houver canônico, sempre invocar com path completo (`/<categoria>:<slug>`)
 - Renomes para resolver ambiguidade devem usar aliases temporários para não quebrar invocações existentes
+
+### 4.2 Padrão dispatcher para verbos de um mesmo fluxo
+
+Quando N comandos representam **verbos/fases de um mesmo fluxo** que não é workflow faseado retomável (§3), eles devem ser **um dispatcher arg-driven**, não N arquivos/subpastas. Exemplo canônico: o ciclo de vida GitFlow virou `/git:flow <tipo> <ação>` (`feature`/`release`/`hotfix` × `start`/`publish`/`finish`), consolidando 7 arquivos + 3 subpastas num único `git/flow.md` (2026-06-13). Critério (ver `docs/knowledge-base/concepts/onion-modernization-doctrine.md`): mesma intenção + sem estado faseado retomável + lógica canônica numa KB citável.
+
+> **Distinção da §3**: workflows faseados (`engineer/*`, `product/*`) são **invariantes** — cada fase é comando autônomo com estado de sessão; **não** viram dispatcher. O padrão dispatcher aplica-se a verbos sem estado retomável (GitFlow).
+
+> **Migração de caminho**: a consolidação num dispatcher altera os caminhos de invocação (ex.: `/git:feature:start` → `/git:flow feature start`). Documente o mapeamento antigo→novo no próprio dispatcher (ver `git/flow.md` §Migração); por ser framework interno (não distribuído), aceita-se a quebra documentada em vez de N stubs de alias.
 
 ---
 
@@ -327,7 +335,7 @@ Complementa a Seção 3: enquanto workflows faseados coordenam trabalho **sequen
 1. **Opt-in**: fan-out é explícito, nunca o comportamento default. Trabalho serial dependente permanece sequencial.
 2. **Independência**: só paralelizar subtarefas sem dependência cruzada de dados.
 3. **Fan-in obrigatório**: todo fan-out termina em consolidação num resultado único (não N saídas soltas).
-4. **Isolamento**: quando workers mutam arquivos concorrentemente, usar isolamento por worktree (`isolation: 'worktree'`).
+4. **Mutação — partição-primeiro, worktree só p/ sobreposição, 1 branch**: ao mutar arquivos em paralelo, o orquestrador **particiona por arquivos disjuntos** (sem corrida → dispensa worktree); usa `isolation: 'worktree'` **apenas** quando há sobreposição real ou branches independentes a fundir. A saída é **uma branch de consolidação** que entra no fluxo faseado normal (`/git:flow` ou `/engineer:pr` via forge) — **nunca** N branches persistentes contornando o gate de PR. Conflito de partição ou operação irreversível → **gate humano**. Playbook completo: [agent-fleet-orchestration.md §7](../knowledge-base/concepts/agent-fleet-orchestration.md).
 5. **Verificação**: achados de alto risco passam por verificação adversarial / judge-panel antes de serem aceitos.
 6. **Budget e tiers**: respeitar teto de tokens (`budget`) e model tiering (orquestrador em opus; workers em sonnet/haiku).
 7. **Invariante preservada**: a frota paraleliza *dentro* de uma fase; **não funde** os workflows faseados canônicos da Seção 3 (`engineer/*`, `product/*`).
