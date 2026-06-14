@@ -869,20 +869,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Contrato de Sessão de Desenvolvimento
 
-> **Fonte única** para a estrutura de sessão que os comandos GitFlow criam ao iniciar trabalho (antes citada inline em `git/feature/start.md`). Comandos **citam** este contrato em vez de re-descrevê-lo.
+> **Fonte única de verdade (SSOT)** para a estrutura de sessão que os comandos criam ao iniciar trabalho. **Todo** comando, agente, skill ou doc **cita** este contrato em vez de re-descrevê-lo. A mecânica de eficácia de IA (esquema do `STATE.md`, protocolo de leitura escalonado, prompt cache, checkpoint) vive no KB [worklog-protocol.md](../concepts/worklog-protocol.md), que esta seção referencia.
 
-Ao iniciar uma feature/hotfix/release, o comando cria `.claude/sessions/<slug>/` com os arquivos abaixo. O `<slug>` é o nome da branch sem o prefixo GitFlow (ex.: branch `feature/oauth2` → slug `oauth2`), em kebab-case.
+### Terminologia: worklog vs. transcript
+
+Dois conceitos distintos — historicamente ambos chamados "sessão", o que gerava ambiguidade:
+
+- **Worklog** = a pasta `.claude/sessions/<slug>/` (estado em **arquivo**, durável; sobrevive a `/clear` e a troca de máquina). É o que este contrato define.
+- **Transcript** = a conversa **nativa** do Claude Code (`claude --resume`/`-c`, armazenada em JSONL sob `~/.claude/projects/`).
+
+São **complementares**: o transcript guarda o *raciocínio* (perdido no `/clear`); o worklog guarda o *estado comprometido* (sobrevive a tudo). Ver [worklog-protocol.md](../concepts/worklog-protocol.md) para o fluxo de resume frio vs. quente.
+
+### Estado ACTIVE — worklog de trabalho (nomeado por slug)
+
+Ao iniciar uma feature/hotfix/release, o comando cria `.claude/sessions/<slug>/`. O `<slug>` é o nome da branch sem o prefixo GitFlow (ex.: branch `feature/oauth2` → slug `oauth2`), em kebab-case.
 
 ```
 .claude/sessions/<slug>/
-├── context.md     # Metadados e objetivos: task vinculada, branch, base, escopo
-├── plan.md        # Plano de desenvolvimento em fases (consumido por /engineer/work)
-└── notes.md       # Notas e decisões durante o desenvolvimento
+├── STATE.md         # Índice Tier-0 (~1KB): objetivo, constraints, map, ponteiro NEXT, bloco transcript
+├── context.md       # Metadados estáveis + ## 📋 Phase-Subtask Mapping
+├── architecture.md  # Decisões arquiteturais (opcional em hotfix)
+├── plan.md          # Plano em fases (vocabulário [DONE]/[ACTIVE]/[TODO]); cada fase = chunk auto-contido
+└── notes.md         # Log append-only de decisões, links e pendências
 ```
 
-### Conteúdo mínimo de cada arquivo
+**`STATE.md`** — o **ponto de entrada de resume**. É o único arquivo que `/engineer/work`, `/onion` e `/engineer/warm-up` precisam ler para saber o estado. Seu ponteiro `## NEXT` é **autoritativo**; os badges do `plan.md` são detalhe humano subordinado (se divergirem, `STATE.md` vence e o comando sinaliza drift). Esquema completo em [worklog-protocol.md](../concepts/worklog-protocol.md).
 
-**`context.md`** — metadados estáveis da sessão:
+**`context.md`** — metadados estáveis + mapeamento de fases para o task manager:
 
 ```markdown
 # Contexto — <slug>
@@ -892,18 +905,59 @@ Ao iniciar uma feature/hotfix/release, o comando cria `.claude/sessions/<slug>/`
 - **Task vinculada**: <ID no provider ativo, ou "—" se offline>
 - **Criada em**: <YYYY-MM-DD>
 - **Objetivo**: <uma frase>
+
+## 📋 Phase-Subtask Mapping
+- **Phase 1**: "Nome da fase" → Subtask ID: <id-1 ou "—" se offline>
+- **Phase 2**: "Nome da fase" → Subtask ID: <id-2>
 ```
 
-**`plan.md`** — fases de implementação (cada fase com input/output claros; é o estado que `/engineer/work` retoma).
+> O **Phase-Subtask Mapping** é o local canônico onde `/engineer/start` registra a relação fase↔subtask; `/engineer/work` e `/engineer/validate-phase-sync` o consomem para auto-atualizar status no provider. O formato acima é o contrato — não redefina em outros arquivos.
 
-**`notes.md`** — log livre de decisões, links e pendências.
+**`architecture.md`** — visão antes/depois, componentes afetados, padrões, trade-offs, arquivos-chave. Criado por `/engineer/start`; **opcional em hotfix** (correções urgentes pulam arquitetura profunda).
+
+**`plan.md`** — fases de implementação. Cada fase é um **chunk auto-contido** com input/output claros e marcador de estado ASCII `[DONE]` / `[ACTIVE]` / `[TODO]` (emoji é decorativo; o token entre colchetes é o que máquinas leem). Invariante: **exatamente uma** fase `[ACTIVE]`, igual a `STATE.md.NEXT.phase`.
+
+**`notes.md`** — log **append-only** (nunca editar no meio — preserva o prefixo cacheável; ver prompt cache no KB).
+
+### Estado ARCHIVED — registro histórico (nomeado por timestamp)
+
+Pós-merge, o worklog é consolidado num registro de auditoria, produzido **apenas** por `/docs/sync-sessions --archive` (e pelo arquivamento pós-merge de `/git/sync`):
+
+```
+.claude/sessions/archived/YYYY-MM-DD_HHMM_<slug>/
+├── README.md            # Resumo executivo
+├── context.md           # Herdado do worklog ACTIVE
+├── decisions.md         # Decisões consolidadas (de notes.md + architecture.md)
+├── changes.md           # Log de mudanças / arquivos
+├── notes.md             # Herdado
+├── files-changed.txt
+└── commands-executed.txt
+```
+
+> ACTIVE e ARCHIVED são artefatos **distintos**: o ACTIVE é estado vivo e retomável; o ARCHIVED é registro post-hoc com `files-changed.txt`/`commands-executed.txt` que não fazem sentido numa sessão viva. Não os funda numa estrutura só.
+
+### Namespaces reservados (não são worklogs)
+
+Sob `.claude/sessions/` existem dois namespaces que **não** seguem este contrato e não devem ser tratados como sessões de desenvolvimento:
+
+- `.claude/sessions/tasks/` — cache offline de tasks (`/product/task` quando `TASK_MANAGER_PROVIDER=none`).
+- `.claude/sessions/consolidated-transform/` — saída intermediária de `/product/transform-consolidated`.
+
+### Versionamento de sessões
+
+O versionamento de `.claude/sessions/` é uma **escolha consciente por projeto**, não um default forçado. Duas posturas sancionadas:
+
+- **Gitignored (estado individual/efêmero)** — default para trabalho solo/curto; o worklog é rascunho. É a postura que o `.gitignore` do Onion ships.
+- **Committed (artefato de conhecimento do time)** — válido quando o time trata worklogs como histórico durável de design/decisão (é o que o projeto-alvo `rhilo-app` faz). Ao commitar, prefira versionar `archived/` e gitignorar os dirs ACTIVE — ou commitar ambos deliberadamente.
+
+Decida uma postura por projeto e registre-a no `.gitignore` com um comentário. Ver `meta-specs/architecture.md` §6.2.
 
 ### Regras
 
 - **Slug determinístico**: derivado da branch; nunca inventar nome divergente da branch.
-- **Idempotência**: se a sessão já existe, não sobrescrever `notes.md`/`plan.md` — apenas complementar.
-- **Vínculo com task é opcional**: se `TASK_MANAGER_PROVIDER=none`, o campo "Task vinculada" fica `—` e a sessão opera offline (ver dedup de Task Manager nos comandos).
-- **Versionamento**: `.claude/sessions/` é estado runtime; em projetos-alvo normalmente entra no `.gitignore` (ver `architecture.md` §6.2).
+- **Idempotência**: se o worklog já existe, não sobrescrever `notes.md`/`plan.md`/`STATE.md` — apenas complementar.
+- **Vínculo com task é opcional**: se `TASK_MANAGER_PROVIDER=none`, "Task vinculada" e os Subtask IDs ficam `—` e o worklog opera offline.
+- **Resume barato**: leia `STATE.md` primeiro (Tier-0); só carregue `plan.md` (bloco da fase `[ACTIVE]`), `architecture.md` ou `context.md` sob demanda. Nunca faça `cat` da pasta inteira (anti-pattern "Context Dump"). Protocolo completo em [worklog-protocol.md](../concepts/worklog-protocol.md).
 
 ---
 

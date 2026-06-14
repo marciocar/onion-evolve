@@ -86,12 +86,13 @@ Com base na análise de ferramentas existentes, identificam-se **três níveis p
 - Funcionalidades que evoluem ao longo do tempo
 - Sistemas com múltiplas integrações
 
-**Exemplo**:
+**Exemplo** (worklog — estrutura canônica na [SSOT §Contrato de Sessão](../frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)):
 ```
 .claude/sessions/auth-oauth2/
-├── context.md      # Spec inicial
+├── STATE.md        # Índice de resume (ponteiro NEXT)
+├── context.md      # Spec inicial + Phase-Subtask Mapping
 ├── plan.md         # Plano de fases
-└── decisions.md    # Decisões arquiteturais
+└── notes.md        # Decisões arquiteturais (append-only)
 
 # Especificação é atualizada quando:
 # - Novos requisitos surgem

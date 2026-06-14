@@ -149,13 +149,14 @@ flowchart TD
 -  Identifica arquivos e componentes necessários
 -  Cria plan.md inicial
 
-**Estrutura criada**:
+**Estrutura criada** (worklog ACTIVE — definida pela [SSOT do Contrato de Sessão](../knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)):
 ```
 .claude/sessions/auth-oauth2/
-├── plan.md          # Plano de desenvolvimento em fases
-├── context.md       # Contexto e requisitos
-├── decisions.md     # Decisões arquiteturais
-└── progress.md      # Log de progresso
+├── STATE.md         # Índice Tier-0 (~1KB): objetivo, map, ponteiro NEXT — ponto de resume
+├── context.md       # Metadados + Phase-Subtask Mapping
+├── architecture.md  # Decisões arquiteturais (opcional em hotfix)
+├── plan.md          # Plano em fases ([DONE]/[ACTIVE]/[TODO])
+└── notes.md         # Log append-only
 ```
 
 #### 2.2 Análise Arquitetural (se necessário)
@@ -283,11 +284,9 @@ Após aprovação:
 1. Analisa trabalho realizado na sessão
 2. Organiza documentação gerada durante o desenvolvimento
 3. Preserva contexto e decisões arquiteturais
-4. Gera estrutura consolidada da sessão:
-   - `README.md` (resumo)
-   - `context.md` (contexto inicial)
-   - `decisions.md` (decisões tomadas)
-   - `changes.md` (mudanças realizadas)
+4. Gera o **registro ARCHIVED** em `.claude/sessions/archived/YYYY-MM-DD_HHMM_<slug>/` (estrutura na [SSOT](../knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)):
+   - `README.md` (resumo) · `context.md` · `decisions.md` · `changes.md` · `notes.md`
+   - `files-changed.txt` · `commands-executed.txt`
 5. Atualiza índice de sessões
 6. Atualiza provedor ativo para `done`
 

@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **30 arquivos** de knowledge base (exceto `index.md`)
-- **14** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **1** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
+- **31 arquivos** de knowledge base (exceto `index.md`)
+- **15** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **1** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
 
 ---
 
@@ -28,7 +28,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (13)
+## 🧠 Conceitos Fundamentais (15)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Fleet Orchestration](concepts/agent-fleet-orchestration.md) — orquestração de frota: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
@@ -39,10 +39,12 @@ docs/knowledge-base/
 - [Context Window Optimization](concepts/context-window-optimization.md) — otimização de contexto, prompt caching e custo multi-agente
 - [Identificar e Precificar Dor do Cliente](concepts/identificar-precificar-dor-cliente.md) — metodologias de produto
 - [Meeting Transcription to Knowledge Base](concepts/meeting-transcription-to-knowledge-base.md) — framework EXTRACT
+- [Onion Modernization Doctrine](concepts/onion-modernization-doctrine.md) — regra de inventário/SSOT e doutrina de modernização
 - [Spec-as-Code Strategy](concepts/spec-as-code-strategy.md) — hierarquia de especificações (L0-L3)
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA
 - [Specification-Driven AI Abstraction Layer (SDAAL)](concepts/specification-driven-ai-abstraction-layer.md) — padrão-pai das camadas de abstração
 - [Task Manager Abstraction](concepts/task-manager-abstraction.md) — instância canônica do SDAAL (API-first; MCP opcional)
+- [Worklog Protocol](concepts/worklog-protocol.md) — sessões retomáveis com eficácia de IA (STATE.md, leitura Tier 0→3, checkpoint)
 
 ---
 

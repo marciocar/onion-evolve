@@ -45,11 +45,8 @@ Cada skill em pasta própria com `SKILL.md`. Opcionalmente:
 - `references/` — docs adicionais carregadas sob demanda
 - `examples/` — exemplos de output
 
-### `.claude/sessions/<feature-slug>/`
-- `context.md` — objetivos e IDs do task manager
-- `architecture.md` — decisões arquiteturais
-- `plan.md` — plano de fases
-- `notes.md` — notas de desenvolvimento
+### `.claude/sessions/<feature-slug>/` (worklog)
+Estrutura definida pela **SSOT** — não redefina aqui: [gitflow-patterns.md §Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento). Worklog ACTIVE = `STATE.md` (índice Tier-0, ponto de resume) + `context.md` (+ Phase-Subtask Mapping) + `architecture.md` + `plan.md` + `notes.md`. Mecânica de leitura/resume: [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md).
 
 ## Nomenclatura
 

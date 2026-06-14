@@ -119,9 +119,10 @@ Estabelecer contexto focado em:
 5. **PR**: `/engineer/pr` → Criar Pull Request (testes, build, PR)
 6. **Sync**: `/git/sync` → Sincronizar após merge
 
-### Estrutura de Sessões
-- ✅ Entender `.claude/sessions/<feature>/` para contexto de trabalho
-- ✅ Conhecer formato de arquivos de sessão
+### Estrutura de Sessões (worklogs)
+- ✅ Entender `.claude/sessions/<feature>/` (o **worklog**) para contexto de trabalho — estrutura na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
+- ✅ Para reportar status ou retomar, ler **só o `STATE.md`** (índice Tier-0, ponteiro `NEXT`), não a pasta inteira — protocolo em [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md)
+- ✅ Distinguir **worklog** (estado em arquivo) do **transcript** nativo (`claude --resume`)
 
 ## 💡 Quando Usar Este Warm-up
 

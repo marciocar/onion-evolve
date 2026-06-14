@@ -7,6 +7,11 @@ description: >
   Ative também quando o usuário perguntar "o que faço agora?", "próximos passos",
   "como funciona o sistema?", "qual agente para X?", "como crio Y?", mesmo sem
   mencionar "onion" explicitamente.
+  Ative também quando a mensagem do usuário for essencialmente apenas a palavra
+  "onion" ou "Onion" (invocação isolada, como quem digita um comando) — trate como
+  pedido de orientação/entrada no sistema. NÃO ative por menções a "onion" dentro
+  de frases (nomes de arquivo, docs, código, esta base de código se chama onion),
+  apenas pela invocação isolada da palavra.
 allowed-tools: Bash(grep * .env) Bash(ls .claude/*) Bash(git branch*)
 ---
 
@@ -192,8 +197,8 @@ Antes de qualquer operação com tasks: ler `TASK_MANAGER_PROVIDER` no `.env`. P
 **Feature slug: sempre kebab-case**
 Correto: `user-authentication`. Errado: `user_authentication`, `UserAuth`, `userAuth`. O slug é usado tanto no nome da branch Git quanto na pasta de sessão `.claude/sessions/<feature-slug>/`.
 
-**Sessões de contexto**
-Contexto persistente de feature em `.claude/sessions/<feature-slug>/` com `context.md`, `plan.md`, `architecture.md`. `/engineer/start` cria; `/engineer/work` consume. Verificar se sessão existe antes de recomendar `/engineer/work`.
+**Worklog de feature (sessão em arquivo) ≠ transcript nativo**
+"Worklog" = a pasta `.claude/sessions/<feature-slug>/` (estado durável em arquivo); "transcript" = a conversa nativa do Claude Code (`claude --resume`). São complementares. Estrutura na SSOT: [gitflow-patterns.md §Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento). Para reportar status ou retomar, leia **só o `STATE.md`** (índice Tier-0 ~1KB), não a pasta inteira — protocolo em [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md). `/engineer/start` cria; `/engineer/work` consome. Verificar se o worklog existe antes de recomendar `/engineer/work`.
 
 **Formatação ClickUp vs Jira**
 - ClickUp: descriptions → Markdown nativo; comments → Unicode visual (`━━━`, `▶`, `◆`)

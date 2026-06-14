@@ -342,14 +342,17 @@ docs/
 │       └── agents.md       # Padrões de agentes
 ```
 
-### Sessions como Task Specs
+### Sessions (worklogs) como Task Specs
+
+O worklog `.claude/sessions/<feature>/` é a materialização do **Task Spec (L3)**. Estrutura canônica (incl. `STATE.md`) na [SSOT §Contrato de Sessão](../frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) — abaixo, só a leitura sob a ótica de spec:
 
 ```
 .claude/sessions/<feature>/
-├── context.md    # Spec da feature atual
-├── plan.md       # Decomposição em subtasks
-├── notes.md      # Decisões e observações
-└── architecture.md # Design decisions
+├── STATE.md      # Índice de resume (ponteiro NEXT)
+├── context.md    # Spec da feature atual + Phase-Subtask Mapping
+├── plan.md       # Decomposição em fases/subtasks
+├── architecture.md # Design decisions
+└── notes.md      # Decisões e observações
 ```
 
 ### Comandos Spec-Aware

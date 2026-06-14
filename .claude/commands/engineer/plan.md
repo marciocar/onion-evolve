@@ -18,53 +18,46 @@ Este é o comando para iniciar o planejamento de uma funcionalidade.
 
 ## Análise
 
-Leia os arquivos context.md e architecture.md na pasta .claude/sessions/<feature-slug> se ainda não tiver feito.
+Leia os arquivos context.md e architecture.md na pasta .claude/sessions/<feature-slug> se ainda não tiver feito (carregue só as seções necessárias — ver protocolo de leitura em [worklog-protocol.md §4](../../../docs/knowledge-base/concepts/worklog-protocol.md)).
 
 Sua tarefa agora é criar um plano de implementação detalhado (plan.md) para esta funcionalidade. O objetivo desta documentação é criar uma abordagem de implementação faseada que nos permita construir a funcionalidade incrementalmente, testando cada fase conforme avançamos. E também deve tornar possível retomar o trabalho caso nossa sessão seja interrompida.
 
-O plan.md deve dividir a implementação em fases, cada fase com um pedaço do trabalho que pode ser realizado por um humano em 2 horas.
+O plan.md deve dividir a implementação em fases, cada fase com um pedaço do trabalho que pode ser realizado por um humano em ~2 horas. Cada fase é um **chunk auto-contido** (100–300 linhas): ler a fase N não deve exigir as fases anteriores em contexto.
+
+**Vocabulário de estado (obrigatório):** use os tokens ASCII `[DONE]` / `[ACTIVE]` / `[TODO]` no header de cada fase e tarefa (definidos na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) e [worklog-protocol.md §6](../../../docs/knowledge-base/concepts/worklog-protocol.md)). Emoji é decorativo; o token entre colchetes é o que máquinas leem. Invariante: **exatamente uma** fase `[ACTIVE]`, e ela deve ser igual a `STATE.md.NEXT.phase` — o `STATE.md.NEXT` é o ponteiro **autoritativo** de resume; os badges abaixo são detalhe humano subordinado.
 
 O template para o plan.md é:
 
 <plan>
 # [NOME DA FUNCIONALIDADE]
 
-Se você está trabalhando nesta funcionalidade, certifique-se de atualizar este arquivo plan.md conforme progride.
+Se você está trabalhando nesta funcionalidade, atualize este plan.md E o `STATE.md.NEXT` conforme progride (ver checkpoint em [worklog-protocol.md §7](../../../docs/knowledge-base/concepts/worklog-protocol.md)).
 
-## FASE 1 [Completada ✅]
+## FASE 1 [DONE]
 
 Detalhes desta parte da funcionalidade
 
-### Uma tarefa que foi feita [Completada ✅]
-
-Detalhes sobre a tarefa
-
-### Uma tarefa que foi feita [Completada ✅]
+### Uma tarefa que foi feita [DONE]
 
 Detalhes sobre a tarefa
 
 ### Comentários:
 - Algo que aconteceu e nos forçou a mudar de direção
 - Algo que aprendemos durante o desenvolvimento
-- Algo que discutimos e concordamos
 
-## FASE 2 [Em Progresso ⏰]
+## FASE 2 [ACTIVE]
 
-### Uma tarefa que precisa ser feita [Em Progresso ⏰]
-
-Detalhes sobre a tarefa
-
-### Uma tarefa que precisa ser feita [Não Iniciada ⏳]
+### Uma tarefa que precisa ser feita [ACTIVE]
 
 Detalhes sobre a tarefa
 
-## FASE 3 [Não Iniciada ⏳]
-
-### Uma tarefa que precisa ser feita [Não Iniciada ⏳]
+### Uma tarefa que precisa ser feita [TODO]
 
 Detalhes sobre a tarefa
 
-### Uma tarefa que precisa ser feita [Não Iniciada ⏳]
+## FASE 3 [TODO]
+
+### Uma tarefa que precisa ser feita [TODO]
 
 Detalhes sobre a tarefa
 

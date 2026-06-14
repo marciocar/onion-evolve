@@ -29,85 +29,11 @@ Este diretório contém templates estruturados para documentação e execução 
 
 ## 📚 Templates Disponíveis
 
-### 🔧 Execução e Implementação
-
-#### 1. **execution-plan-template.md**
-```yaml
-type: execution-plan
-category: implementation
-complexity: Alta (89 linhas YAML)
-```
-
-**Uso:** Planos completos de implementação/migração com fases detalhadas
-
-**Principais Seções:**
-- Context (estado atual, base tecnológica)
-- Usage (instruções de uso)
-- Standards (status de tarefas, commits, comandos)
-- Critical Attention (avisos críticos)
-- Milestones (marcos por fase)
-- Success Metrics (métricas estruturadas)
-
-**Quando usar:**
-- ✅ Implementações complexas multi-fase
-- ✅ Migrações de sistemas
-- ✅ Projetos com >10h de trabalho
-- ✅ Precisa tracking detalhado de progresso
-
-**Exemplo:**
-```yaml
----
-template:
-  type: execution-plan
-  version: 2.0
-  category: implementation
-  
-context:
-  current_state: "Sistema 67% implementado"
-  base: "React 18, TypeScript, TailwindCSS"
-  
-success_metrics:
-  - metric: "📊 Performance"
-    target: "< 200ms"
-    criteria: "P95 response time"
----
-```
-
----
-
-#### 2. **phase-execution-prompt-template.md**
-```yaml
-type: phase-execution-prompt
-category: execution
-complexity: Alta (84 linhas YAML)
-architectural_pattern: Incluído
-```
-
-**Uso:** Execução sistemática de fases específicas de projeto
-
-**Principais Seções:**
-- Context (estado da fase, padrão arquitetural)
-- Usage (instruções passo a passo)
-- Standards (validação, documentação)
-- Critical Attention (validações obrigatórias)
-- Validation Criteria (critérios de sucesso)
-
-**Quando usar:**
-- ✅ Executar fase específica de projeto maior
-- ✅ Seguir padrão arquitetural rigoroso
-- ✅ Validações complexas necessárias
-- ✅ Conformidade com metodologia
-
-**Diferencial:**
-- Foco em **validação rigorosa**
-- **Architectural pattern** compliance
-- **Checkpoint system** estruturado
-
----
+> **Planejamento faseado e execução de fases** não usam mais templates daqui — o template de `plan.md` é definido inline em [`/engineer/plan`](../../commands/engineer/plan.md) e a estrutura de worklog/`STATE.md` vive na [SSOT do Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) + [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md).
 
 ### 📝 Documentação
 
-#### 3. **guide-template.md**
+#### 1. **guide-template.md**
 ```yaml
 type: guide
 category: documentation
@@ -135,7 +61,7 @@ complexity: Baixa (27 linhas YAML)
 
 ---
 
-#### 4. **analysis-template.md**
+#### 2. **analysis-template.md**
 ```yaml
 type: analysis
 category: documentation
@@ -183,7 +109,7 @@ tracking:
 
 ---
 
-#### 5. **reference-template.md**
+#### 3. **reference-template.md**
 ```yaml
 type: reference
 category: documentation
@@ -200,7 +126,7 @@ complexity: Baixa
 
 ---
 
-#### 6. **solution-template.md**
+#### 4. **solution-template.md**
 ```yaml
 type: solution
 category: troubleshooting
@@ -219,7 +145,7 @@ complexity: Baixa
 
 ### 🏛️ Arquitetura e Decisões
 
-#### 7. **adr-template.md**
+#### 5. **adr-template.md**
 ```yaml
 type: adr
 category: architecture-decision
@@ -274,12 +200,6 @@ Proposed → Accepted → [Superseded]
 ### 1. Escolher Template Apropriado
 
 ```bash
-# Para implementação complexa
-cp execution-plan-template.md plano-migracao-v2.md
-
-# Para fase específica
-cp phase-execution-prompt-template.md fase-1-setup.md
-
 # Para análise de sistema
 cp analysis-template.md analise-arquitetura-atual.md
 
@@ -354,8 +274,6 @@ ai_assistant:
 
 | Tipo | Category | Uso |
 |------|----------|-----|
-| `execution-plan` | implementation | Planos de implementação |
-| `phase-execution-prompt` | execution | Fases específicas |
 | `guide` | documentation | Guias e tutoriais |
 | `analysis` | documentation | Análises de sistemas |
 | `adr` | architecture-decision | Decisões arquiteturais |
@@ -393,19 +311,9 @@ ai_assistant:
 
 ## 💡 Casos de Uso
 
-### Caso 1: Implementação Multi-Fase
+> Planejamento/execução de implementação faseada é coberto por [`/engineer/plan`](../../commands/engineer/plan.md) → [`/engineer/work`](../../commands/engineer/work.md) (worklog + `STATE.md`), não por templates daqui.
 
-```yaml
-# 1. Criar plano geral
-execution-plan-template.md → plano-migracao-completa.md
-
-# 2. Criar prompt para cada fase
-phase-execution-prompt-template.md → fase-1-setup.md
-phase-execution-prompt-template.md → fase-2-core.md
-phase-execution-prompt-template.md → fase-3-integracao.md
-```
-
-### Caso 2: Análise e Correção
+### Caso 1: Análise e Correção
 
 ```yaml
 # 1. Fazer análise
@@ -414,12 +322,9 @@ analysis-template.md → analise-sistema-atual.md
 # 2. Documentar soluções encontradas
 solution-template.md → solucao-problema-x.md
 solution-template.md → solucao-problema-y.md
-
-# 3. Criar plano de correção
-execution-plan-template.md → plano-correcoes.md
 ```
 
-### Caso 3: Decisão Arquitetural
+### Caso 2: Decisão Arquitetural
 
 ```yaml
 # 1. Documentar decisão
@@ -427,12 +332,9 @@ adr-template.md → adr-001-escolha-database.md
 
 # 2. Criar guia de implementação
 guide-template.md → guia-setup-postgres.md
-
-# 3. Planejar implementação
-execution-plan-template.md → plano-migracao-database.md
 ```
 
-### Caso 4: Dashboard de Análises
+### Caso 3: Dashboard de Análises
 
 ```typescript
 // Buscar análises críticas
@@ -450,7 +352,7 @@ criticalAnalyses.forEach(a => {
 });
 ```
 
-### Caso 5: Grafo de ADRs
+### Caso 4: Grafo de ADRs
 
 ```typescript
 // Construir grafo de decisões
@@ -478,12 +380,10 @@ const obsolete = graph.filter(adr =>
 
 ```bash
 # Bom
-execution-plan-template.md → plano-migracao-react-19.md
 adr-template.md → adr-001-escolha-state-management.md
 analysis-template.md → analise-performance-2025-01.md
 
 # Evitar
-execution-plan-template.md → plano.md
 adr-template.md → decisao.md
 analysis-template.md → analise.md
 ```
@@ -551,7 +451,7 @@ ajv validate -s template-schema.json -d plano-*.md
 
 ```bash
 # Buscar templates por tipo
-rg "type: execution-plan" --glob "*.md"
+rg "type: analysis" --glob "*.md"
 
 # Buscar análises críticas
 rg "overall: \"CRÍTICO\"" --glob "*analysis*.md"
@@ -598,8 +498,7 @@ rg "version: 1\." --glob "*.md"
 
 | Preciso... | Use este template |
 |-----------|------------------|
-| 📋 Planejar implementação complexa | `execution-plan-template.md` |
-| 🎯 Executar fase específica | `phase-execution-prompt-template.md` |
+| 📋 Planejar implementação faseada | [`/engineer/plan`](../../commands/engineer/plan.md) (worklog + `STATE.md`) |
 | 📝 Criar guia/tutorial | `guide-template.md` |
 | 🔍 Analisar sistema | `analysis-template.md` |
 | 🏛️ Documentar decisão arquitetural | `adr-template.md` |
@@ -608,10 +507,10 @@ rg "version: 1\." --glob "*.md"
 
 ---
 
-**📦 Total de Templates:** 7  
+**📦 Total de Templates:** 5  
 **🎨 Versão YAML:** 2.0  
 **🤖 AI-Ready:** Todos  
-**📊 Última Atualização:** 2025-01-27
+**📊 Última Atualização:** 2026-06-14
 
 ---
 
