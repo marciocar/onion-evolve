@@ -1,6 +1,6 @@
 # 🟣 Linear Adapter
 
-> Instância do padrão [SDAAL](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md).
+> Instância do padrão [SDAAL](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md).
 > Transporte **padrão: GraphQL API**. MCP opcional via `TASK_MANAGER_TRANSPORT=mcp`.
 
 ---

@@ -601,6 +601,5 @@ prompts: 'technical_prompts'
 ## 🔗 Recursos Relacionados
 - [Ferramentas MCP](./mcps.md)
 - [Agentes Especializados](./agents.md)
-- [Workflows](./workflows.md)
 - [Regras do Workspace](./rules.md)
 

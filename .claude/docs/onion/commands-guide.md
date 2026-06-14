@@ -724,7 +724,7 @@ docs/technical-context/
 
 ## ✅ Comandos de Validação
 
-> 📚 **Documentação Completa**: Veja [Sistema de Testes e Validação](../onion/testing-validation-system.md) para guia completo de todos os comandos de teste e validação, incluindo `/test/unit`, `/test/integration`, `/test/e2e`, `/validate/test-strategy/create`, `/validate/qa-points/estimate` e mais.
+> 📚 **Documentação Completa**: Veja [Sistema de Testes e Validação](../../../docs/onion/testing-validation-system.md) para guia completo de todos os comandos de teste e validação, incluindo `/test/unit`, `/test/integration`, `/test/e2e`, `/validate/test-strategy/create`, `/validate/qa-points/estimate` e mais.
 
 ### `/validate/workflow`
 **Sintaxe:** `/validate/workflow`
@@ -796,7 +796,7 @@ docs/technical-context/
 - [Integração ClickUp](./clickup-integration.md) - Guia completo ClickUp MCP
 - [Referência de Agentes](./agents-reference.md) - Todos os agentes disponíveis
 - [Exemplos Práticos](./practical-examples.md) - Casos de uso reais
-- [Sistema de Testes e Validação](../onion/testing-validation-system.md) - Framework completo de testes e validação
+- [Sistema de Testes e Validação](../../../docs/onion/testing-validation-system.md) - Framework completo de testes e validação
 - [Configuração Inicial](./getting-started.md) - Setup do sistema
 
 ---

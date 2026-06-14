@@ -326,5 +326,4 @@ graph LR
 ## 📚 Recursos Relacionados
 - [Ferramentas MCP](./mcps.md)
 - [Comandos .claude/](./commands.md)
-- [Workflows](./workflows.md)
 
