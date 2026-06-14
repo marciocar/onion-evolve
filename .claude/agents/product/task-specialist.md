@@ -16,7 +16,7 @@ tools:
 
 color: purple
 priority: alta
-category: development
+category: product
 
 expertise:
   - task-decomposition
