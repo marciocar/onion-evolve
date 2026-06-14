@@ -27,42 +27,18 @@ Para trabalhar nisso, você deve:
 
 ## 🔄 **Auto-Update Task Manager**
 
-Este comando **automaticamente atualiza** a task durante desenvolvimento usando a abstração:
+Mecanismo de sincronização: `common:prompts:task-manager-auto-update` (provedor
+ativo via adapter; comentário DUAL detalhado-na-subtask + resumido-na-task;
+timestamp + status; offline → registrar em `plan.md`/`notes.md`, sem persistir).
 
-```typescript
-// Detectar provedor e obter adapter
-const config = detectProvider();
-const taskManager = getTaskManager();
-
-if (!taskManager.isConfigured) {
-  console.warn('⚠️ Modo offline - progresso não será sincronizado');
-}
-```
-
-### **✅ Updates Automáticos A CADA FASE:**
-- **Comentário de progresso** quando fase é completada
-- **SUBTASK STATUS UPDATE** - Atualiza status da subtask correspondente para "done"
-- **Atualização do plan.md** com status e decisões
-- **Progresso % estimado** baseado nas fases concluídas
-- **Timestamp de atividade** para tracking temporal
+**Gatilho deste comando:** a cada FASE concluída → comentário de progresso +
+`updateStatus(subtaskId, 'done')` + atualização do `plan.md` (status, decisões, progresso %).
 
 ### **🔗 CRITICAL: Phase→Subtask Mapping**
 **OBRIGATÓRIO**: Quando uma fase é completada, o sistema deve:
 1. **Identificar subtask correspondente** via mapeamento estabelecido no context.md
 2. **Atualizar status da subtask** para "done" automaticamente
 3. **Documentar conclusão** com timestamp e métricas da fase
-
-### **💬 Estratégia DUAL de Comentários:**
-
-Ao completar uma fase, o sistema automaticamente:
-
-1. **Cria comentário DETALHADO na SUBTASK**
-2. **Cria comentário RESUMIDO na TASK PRINCIPAL**
-
-### **📋 Identificação da Task:**
-1. **Context.md**: Lê task-id do arquivo de contexto da sessão
-2. **Sessão ativa**: Detecta automaticamente a sessão em `.claude/sessions/`
-3. **🆕 PHASE-SUBTASK MAPPING**: Lê mapeamento de context.md para correlacionar fases→subtasks
 
 ### **🗺️ SUBTASK MAPPING STRUCTURE (context.md):**
 ```markdown

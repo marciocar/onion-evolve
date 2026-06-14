@@ -14,30 +14,19 @@ Estamos nos aproximando de finalizar o trabalho nesta branch e nos preparar para
 
 ## 🔄 **Auto-Update do Task Manager**
 
-Este comando **automaticamente atualiza** a task no **Task Manager configurado** durante preparação para PR. Antes de operar, carregue o `.env` e leia `TASK_MANAGER_PROVIDER` (`jira` | `clickup` | `asana` | `linear` | `none`) para rotear ao provider e adapter corretos. Se `none`, gere o relatório de validação localmente sem persistir.
+Mecanismo de sincronização: `common:prompts:task-manager-auto-update` (provedor
+ativo via adapter; comentário formatado por provider; timestamp + status; offline
+→ gerar relatório local, sem persistir).
 
-### **✅ Updates Automáticos SEMPRE:**
-- **Validação de critérios de aceitação** - Verifica todos os checkboxes
-- **Comentário de preparação** com checklist completo
-- **Tag 'ready-for-pr'** quando todas verificações passam
-- **Tag 'needs-fixes'** se verificações falham
-- **Progresso estimado** para 90% (quase pronto)
+**Gatilho deste comando:** durante a preparação para PR.
 
-### **💬 Formato do Comentário de Pre-PR:**
+### **✅ Específico do pre-PR:**
+- Tag `ready-for-pr` quando todas as verificações passam; `needs-fixes` se alguma falha.
+- Progresso estimado ~90% (quase pronto).
 
-O comentário de validação deve conter: resultado da validação de critérios de aceitação (completo? cobertura? critérios pendentes?), checks técnicos (meta specs, code review, testes) e indicador `readyForPR`.
-
-**Roteamento por provider** (carregar `.env` → ler `TASK_MANAGER_PROVIDER` → seguir o adapter):
-
-- **`clickup`** → comentário em formatação Unicode via `@clickup-specialist`. Adapter: `.claude/utils/task-manager/adapters/clickup.md` (API-first; MCP opcional). Padrões: `.claude/commands/common/prompts/clickup-patterns.md`.
-- **`jira`** → comentário em ADF via `@jira-specialist`. Adapter: `.claude/utils/task-manager/adapters/jira.md`.
-- **`asana`** → comentário (story) via `@task-specialist`. Adapter: `.claude/utils/task-manager/adapters/asana.md`.
-- **`linear`** → comentário em Markdown via `@task-specialist`. Adapter: `.claude/utils/task-manager/adapters/linear.md`.
-- **`none`** → gerar relatório localmente, sem persistir.
-
-### **📋 Identificação da Task:**
-1. **Context.md**: Lê task-id da sessão ativa
-2. **Branch atual**: Detecta automaticamente pela branch git
+### **💬 Payload do comentário:**
+Resultado da validação de critérios de aceitação (completo? cobertura? critérios
+pendentes?), checks técnicos (meta specs, code review, testes) e indicador `readyForPR`.
 
 ## Checklist de Preparação:
 

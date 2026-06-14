@@ -192,9 +192,10 @@ Uma vez que tenha um bom entendimento do que está sendo construído, salve-o no
 
 ## 🔄 **Auto-Update Task Manager**
 
-Este comando **automaticamente atualiza** a task quando inicia:
+Mecanismo de sincronização: `common:prompts:task-manager-auto-update`.
+**Gatilho deste comando:** ao iniciar a sessão de desenvolvimento.
 
-### **✅ Updates Automáticos SEMPRE:**
+### **✅ Comentário de início (template):**
 ```typescript
 // Via abstração - funciona para qualquer provedor
 if (taskManager.isConfigured && taskId) {
@@ -224,11 +225,9 @@ if (taskManager.isConfigured && taskId) {
 ```
 
 ### **📋 Identificação da Task:**
-1. **Context.md**: Lê task-id do arquivo `.claude/sessions/[slug]/context.md`
-2. **Task Manager**: Usa `taskManager.getTask(taskId)` para estrutura completa
-3. **🆕 PHASE-SUBTASK MAPPING**: Cria mapeamento automático fase→subtask no context.md
-4. **Validação de ID**: Verifica compatibilidade do ID com provedor configurado
-5. **Não encontrada**: Pergunta ao usuário se deve vincular a uma task específica
+Identificação e validação conforme `common:prompts:task-manager-auto-update`
+(context.md / task-id / branch). Específico do `start`: usar `taskManager.getTask(taskId)`
+para obter a estrutura completa antes de criar o mapeamento fase→subtask abaixo.
 
 ### **🗺️ OBRIGATÓRIO: Criar Phase-Subtask Mapping**
 Quando subtasks existem, o sistema deve **automaticamente**:

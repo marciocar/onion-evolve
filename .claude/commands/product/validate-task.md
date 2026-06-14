@@ -249,18 +249,15 @@ O sistema irá:
 
 ## 🔄 **Auto-Update no Task Manager**
 
-Este comando **automaticamente atualiza** a task no **provedor ativo** quando executa
-(via adapter correspondente — `.claude/utils/task-manager/adapters/{provedor}.md`).
-No modo `none` (offline), os updates são gravados apenas no `notes.md` da sessão.
+Mecanismo de sincronização: `common:prompts:task-manager-auto-update` (provedor
+ativo via adapter; comentário formatado por provider; timestamp + status; offline
+→ registrar em `notes.md`, sem persistir).
 
-### **✅ Updates Automáticos SEMPRE:**
-- **Comentário de validação** com análise estratégica detalhada, na formatação do provedor:
-  - **ClickUp** → comentário Unicode (`━━━`, `∟`) conforme template abaixo
-  - **Jira** → comentário em ADF (Atlassian Document Format)
-  - **Asana / Linear** → comentário em HTML/Markdown conforme o adapter
-- **Tag/label 'validated'** após análise completa
-- **Tag/label 'needs-refinement'** se requisitos precisam ser melhorados
-- **Atualização do notes.md** da sessão com insights e decisões
+**Gatilho deste comando:** ao concluir a análise/validação da task.
+
+### **✅ Específico desta validação:**
+- Tag/label `validated` após análise completa; `needs-refinement` se requisitos precisam melhorar.
+- Atualizar `notes.md` da sessão com insights e decisões.
 
 ### **⚠️ Confirmação Necessária PARA:**
 - **Mudança de prioridade** baseada na análise de valor/complexidade
@@ -268,14 +265,7 @@ No modo `none` (offline), os updates são gravados apenas no `notes.md` da sess�
 - **Quebra em subtasks** se escopo for muito amplo
 - **Mudança de assignee** se requer skills específicos não disponíveis
 
-### **📋 Identificação da Task:**
-1. **Sessão ativa**: Usa task-id do arquivo `.claude/sessions/*/context.md`
-2. **Argumento fornecido**: Usa task-id passado pelo usuário
-3. **Não identificada**: Pergunta ao usuário qual task validar
-
-### **💬 Formato do Comentário Automático (exemplo ClickUp — Unicode):**
-> Para Jira use ADF, para Asana/Linear use HTML/Markdown; o conteúdo é o mesmo,
-> só a sintaxe muda conforme o adapter do provedor ativo.
+### **💬 Payload do comentário (template — ClickUp/Unicode; demais sintaxes via adapter):**
 ```
 📊 VALIDAÇÃO ESTRATÉGICA
 
