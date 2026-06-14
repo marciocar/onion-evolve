@@ -22,29 +22,10 @@ Realizar uma **verificação factual e técnica** para determinar se:
 
 ## 🚨 PASSO 0 (OBRIGATÓRIO): Detectar Provedor
 
-**⚠️ CRÍTICO — EXECUTAR ANTES DE QUALQUER OUTRA AÇÃO. NUNCA assumir o provedor.**
-
-1. **Ler `.env`** (`read_file .env`) e extrair `TASK_MANAGER_PROVIDER`
-   (valores: `jira` | `clickup` | `asana` | `linear` | `none`).
-2. **Validar a variável obrigatória do provedor ativo:**
-
-   | Provedor | Variável obrigatória | Ferramentas MCP / Adapter |
-   |----------|----------------------|----------------------------|
-   | `jira` | `JIRA_HOST`, `JIRA_EMAIL`, `JIRA_API_TOKEN` | `.claude/utils/task-manager/adapters/jira.md` |
-   | `clickup` | `CLICKUP_API_TOKEN` | `mcp_ClickUp_*` / `.claude/utils/task-manager/adapters/clickup.md` |
-   | `asana` | `ASANA_ACCESS_TOKEN` | `mcp_asana_*` / `.claude/utils/task-manager/adapters/asana.md` |
-   | `linear` | `LINEAR_API_KEY` | `mcp_Linear_*` / `.claude/utils/task-manager/adapters/linear.md` |
-   | `none` / ausente | — | modo offline (sessões locais em `.claude/sessions/`) |
-
-3. **Validar compatibilidade do task-id** com o provedor ativo via
-   `detectProviderFromTaskId` / `validateProviderMatch` — se houver incompatibilidade,
-   avisar o usuário antes de prosseguir.
-4. **Fallback gracioso:** se a variável obrigatória faltar, avisar em pt-BR qual
-   variável está ausente, sugerir `/meta/setup-integration` e seguir em **modo offline**
-   (usar apenas o contexto local da sessão, sem chamadas de API).
-
-> Detalhes de detecção, parsing do `.env` e validação de ID:
-> `.claude/utils/task-manager/detector.md`.
+Detectar e validar o provedor ativo **antes de qualquer ação**, seguindo o
+fragmento canônico `common:prompts:task-manager-provider-detection`: ler `.env`,
+validar a variável obrigatória do provedor, **validar a compatibilidade do
+`task-id`** com o provedor e aplicar o fallback gracioso em modo offline.
 
 ## 📋 **Processo de Verificação**
 
@@ -303,18 +284,15 @@ O sistema irá:
 
 ## 🔄 **Auto-Update no Task Manager**
 
-Este comando **automaticamente atualiza** a task no **provedor ativo** quando executa
-(via adapter correspondente — `.claude/utils/task-manager/adapters/{provedor}.md`).
-No modo `none` (offline), os updates são gravados apenas no `notes.md` da sessão.
+Mecanismo de sincronização: `common:prompts:task-manager-auto-update` (provedor
+ativo via adapter; comentário formatado por provider; timestamp + status; offline
+→ registrar em `notes.md`, sem persistir).
 
-### **✅ Updates Automáticos SEMPRE:**
-- **Comentário de verificação** com resultados detalhados, na formatação do provedor:
-  - **ClickUp** → comentário Unicode (`━━━`, `∟`) conforme template abaixo
-  - **Jira** → comentário em ADF (Atlassian Document Format)
-  - **Asana / Linear** → comentário em HTML/Markdown conforme o adapter
-- **Tag/label 'verified'** se verificação passou completamente
-- **Tag/label 'needs-work'** se há gaps críticos identificados
-- **Atualização do notes.md** da sessão com timestamp e resultados
+**Gatilho deste comando:** ao concluir a verificação de implementação.
+
+### **✅ Específico desta verificação:**
+- Tag/label `verified` se a verificação passou; `needs-work` se há gaps críticos.
+- Atualizar `notes.md` da sessão com timestamp e resultados.
 
 ### **⚠️ Confirmação Necessária PARA:**
 - **Mudança de status para 'Done'** quando verificação indica 100% completo
@@ -322,14 +300,7 @@ No modo `none` (offline), os updates são gravados apenas no `notes.md` da sess�
 - **Quebra em subtasks** se escopo for muito complexo
 - **Reatribuição** se detectar que precisa de skills diferentes
 
-### **📋 Identificação da Task:**
-1. **Sessão ativa**: Usa task-id do arquivo `.claude/sessions/*/context.md`
-2. **Argumento fornecido**: Usa task-id passado pelo usuário  
-3. **Não identificada**: Pergunta ao usuário qual task verificar
-
-### **💬 Formato do Comentário Automático (exemplo ClickUp — Unicode):**
-> Para Jira use ADF, para Asana/Linear use HTML/Markdown; o conteúdo é o mesmo,
-> só a sintaxe muda conforme o adapter do provedor ativo.
+### **💬 Payload do comentário (template — ClickUp/Unicode; demais sintaxes via adapter):**
 ```
 🔍 VERIFICAÇÃO DE IMPLEMENTAÇÃO
 

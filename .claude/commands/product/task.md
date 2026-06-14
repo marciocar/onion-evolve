@@ -46,24 +46,10 @@ antes de qualquer execução, com plano confirmado pelo usuário.
 
 ## 🚨 PASSO 0 (OBRIGATÓRIO): Detectar Provedor
 
-**⚠️ CRÍTICO — EXECUTAR ANTES DE QUALQUER OUTRA AÇÃO. NUNCA assumir o provedor.**
-
-1. **Ler `.env`** (`read_file .env`) e extrair `TASK_MANAGER_PROVIDER`
-   (valores: `clickup` | `asana` | `linear` | `none`).
-2. **Validar a variável obrigatória do provedor ativo:**
-
-   | Provedor | Variável obrigatória | Ferramentas MCP |
-   |----------|----------------------|-----------------|
-   | `clickup` | `CLICKUP_API_TOKEN` | `mcp_ClickUp_*` |
-   | `asana` | `ASANA_ACCESS_TOKEN` | `mcp_asana_*` |
-   | `linear` | `LINEAR_API_KEY` | `mcp_Linear_*` |
-   | `none` / ausente | — | modo offline (estrutura local) |
-
-3. **Fallback gracioso:** se a variável obrigatória faltar, avisar em pt-BR qual
-   variável está ausente, sugerir `/meta/setup-integration` e seguir em **modo offline**
-   (tasks não sincronizadas). Não inventar valores nem assumir outro provedor.
-
-> Detalhes de detecção e parsing do `.env`: `.claude/utils/task-manager/detector.md`.
+Detectar e validar o provedor ativo **antes de qualquer ação**, seguindo o
+fragmento canônico `common:prompts:task-manager-provider-detection`: ler `.env`,
+validar a variável obrigatória do provedor e aplicar o fallback gracioso em
+modo offline.
 
 ## ⚡ Fluxo de Execução
 
