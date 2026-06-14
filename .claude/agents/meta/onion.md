@@ -3,6 +3,7 @@ name: onion
 description: |
   Orquestrador master do Sistema Onion com conhecimento completo de 49 agentes e 94 comandos.
   Ponto de entrada inteligente para navegação, recomendações e coordenação de workflows complexos.
+  Use para navegar o Sistema Onion, recomendar comandos e coordenar workflows complexos.
 model: sonnet
 tools:
   - read_file

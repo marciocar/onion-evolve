@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **32 arquivos** de knowledge base (exceto `index.md`)
-- **13** em `concepts/` · **12** em `frameworks/` · **3** em `tools/` · **1** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
+- **33 arquivos** de knowledge base (exceto `index.md`)
+- **13** em `concepts/` · **12** em `frameworks/` · **4** em `tools/` · **1** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
 
 ---
 
@@ -19,7 +19,7 @@
 docs/knowledge-base/
 ├── concepts/          # 13 — Conceitos fundamentais
 ├── frameworks/        # 12 — Frameworks e metodologias
-├── tools/             # 3  — Ferramentas e recursos
+├── tools/             # 4  — Ferramentas e recursos
 ├── platforms/         # 1  — Plataformas e tecnologias
 ├── patterns/          # 1  — Padrões de implementação (SDAAL examples)
 ├── architectures/     # 1  — C4 + ADR patterns
@@ -63,10 +63,11 @@ docs/knowledge-base/
 
 ---
 
-## 🛠️ Ferramentas (3)
+## 🛠️ Ferramentas (4)
 
 - [Agent Skills](tools/agent-skills.md) — formato aberto de skills para agentes
 - [Claude Code Commands Best Practices 2026](tools/claude-code-commands-best-practices-2026.md) — boas práticas, ferramenta Workflow, Skill, subagentes
+- [Docker Deployment](tools/docker-deployment.md) — containerização Node.js/Next.js/NX Monorepo: Dockerfiles, Compose, segurança, troubleshooting
 - [Whisper](tools/whisper.md) — transcrição de áudio (OpenAI)
 
 ---

@@ -3,6 +3,7 @@ name: mermaid-specialist
 description: |
   Especialista em diagramas Mermaid para documentação Markdown renderizada
   em GitHub, IDEs (VS Code/Cursor com extensões) e Mermaid Live Editor.
+  Use para criar diagramas Mermaid em documentacao, arquitetura e Markdown renderizado.
 model: sonnet
 tools:
   - Read
