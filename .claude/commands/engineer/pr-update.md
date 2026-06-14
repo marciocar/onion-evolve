@@ -173,7 +173,7 @@ git pull origin [branch-name]  # Sincronizar primeiro
 - ✅ Funciona após `/engineer/pr`
 - ✅ Integra com `/engineer/work` progress tracking
 - ✅ Compatível com `/git/sync` automático pós-merge
-- ✅ Respeita mapeamento Phase→Subtask do context.md
+- ✅ Respeita mapeamento Phase→Subtask do context.md (formato canônico na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento))
 
 ---
 

@@ -59,13 +59,15 @@ Acessar o Sistema Onion para navegação, recomendações e orquestração.
 ### Passo 2: Preparar Contexto
 
 ```bash
-# Detectar sessões ativas
-ls .claude/sessions/*/context.md 2>/dev/null
+# Detectar worklogs ativos (presença do índice de resume)
+ls .claude/sessions/*/STATE.md 2>/dev/null
 
 # Verificar estado Git
 git branch --show-current
 git status --short
 ```
+
+> Para reportar status de um worklog, o agente lê **só o `STATE.md`** (índice Tier-0 ~1KB, ponteiro `NEXT`) — não a pasta inteira. Worklog ≠ transcript nativo (`claude --resume`). Ver [worklog-protocol.md](../../docs/knowledge-base/concepts/worklog-protocol.md).
 
 ### Passo 3: Invocar @onion
 

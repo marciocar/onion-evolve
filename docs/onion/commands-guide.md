@@ -544,11 +544,13 @@ Operações Git do Sistema Onion, orientadas pelo **motor GitFlow** ([gitflow-pa
 /git:flow hotfix finish               # dual-merge + tag + Release + CI
 ```
 
-**Estrutura criada por `feature start`:**
+**Estrutura criada por `feature start`** (worklog ACTIVE — [SSOT](../knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)):
 ```
 feature/user-auth ← nova branch
 .claude/sessions/user-auth/
+├── STATE.md      # índice Tier-0 (ponteiro NEXT)
 ├── context.md
+├── architecture.md
 ├── plan.md
 └── notes.md
 ```

@@ -239,9 +239,10 @@ Implicações:
 
 ### 6.2 Sessões e estado
 
-- `.claude/sessions/<feature>/` é estado runtime, não versionado por padrão
-- `.gitignore` deve excluir `.claude/sessions/` em projetos-alvo se o estado for individual
-- No repo do Onion (este repositório), `.claude/sessions/` pode ser preservado para teste/exemplo
+- A **estrutura** de `.claude/sessions/<slug>/` (worklog ACTIVE vs registro ARCHIVED, `STATE.md`, etc.) é definida pela SSOT em [`gitflow-patterns.md` §Contrato de Sessão](../knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento); a mecânica de eficácia de IA, em [`worklog-protocol.md`](../knowledge-base/concepts/worklog-protocol.md). Esta metaspec **não redefine** a estrutura.
+- **Versionamento é escolha consciente por projeto**, não um default imposto: pode ser *gitignored* (estado individual/efêmero) ou *committed* (artefato durável de time/auditoria — postura adotada, por exemplo, pelo projeto-alvo `rhilo-app`). Ver a sub-seção "Versionamento de sessões" na SSOT.
+- O `.gitignore` default do Onion ships a postura **gitignore-active** com comentário que aponta para a política, para o adotante flipar conscientemente; ao commitar, prefira versionar `archived/` e gitignorar os dirs ACTIVE.
+- No repo do Onion (este repositório), `.claude/sessions/` é gitignored (não há worklogs versionados aqui).
 
 ---
 

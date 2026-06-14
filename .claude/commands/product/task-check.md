@@ -333,12 +333,13 @@ Este comando se integra perfeitamente com:
 - **`/product/validate-task <task-id>`**: Para análise estratégica
 - **Sessions em `.claude/sessions/`**: Utiliza contexto das sessões ativas
 
-### **📁 Uso da Sessão Ativa**
-Se existir uma sessão ativa em `.claude/sessions/` relacionada à task:
-- Analise o arquivo `context.md` para entender o escopo original
-- Examine `architecture.md` para validar implementação vs design
-- Consulte `plan.md` para verificar progresso das fases
-- Atualize `notes.md` com resultados da verificação
+### **📁 Uso da Sessão Ativa (worklog)**
+Se existir um worklog ativo em `.claude/sessions/` relacionado à task, siga o protocolo de leitura escalonado ([worklog-protocol.md §4](../../../docs/knowledge-base/concepts/worklog-protocol.md)) — não faça `cat` da pasta inteira:
+- Leia o `STATE.md` primeiro (objetivo, `## Map`, progresso via `NEXT`)
+- Analise `context.md` para o escopo original e o Phase-Subtask Mapping
+- Examine `architecture.md` (só a seção relevante) para validar implementação vs design
+- Consulte o bloco da fase atual em `plan.md` para o progresso
+- Atualize `notes.md` (append-only) com resultados da verificação
 
 ---
 

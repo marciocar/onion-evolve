@@ -80,9 +80,9 @@ BRANCH="hotfix/$PATCH-$(echo '{{description}}' | tr ' ' '-' | tr '[:upper:]' '[:
 git checkout -b "$BRANCH"
 ```
 
-### Passo 4: Setup de sessão
+### Passo 4: Setup de sessão (worklog)
 
-Criar `.claude/sessions/<slug>/` conforme o [Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) (`context.md` com task vinculada, branch, base; `plan.md`; `notes.md`).
+Criar `.claude/sessions/<slug>/` conforme o [Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento): `STATE.md` (índice de resume, com `NEXT`→fase 1), `context.md` (task vinculada, branch, base + Phase-Subtask Mapping), `plan.md` ([DONE]/[ACTIVE]/[TODO]) e `notes.md`. Em hotfix o `architecture.md` é **opcional** (correção urgente pula arquitetura profunda).
 
 ### Passo 5: Iniciar desenvolvimento
 

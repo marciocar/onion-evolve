@@ -56,7 +56,7 @@ Siga estes passos para criar o PR:
 
 9. **Aguardar confirmação de merge** do PR.
 
-10. **Sync automático pós-merge**: uma vez merged, execute `/git/sync` (fase seguinte do fluxo). O sync segue a [Matriz de Branches Protegidas e Estratégia de Sync](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync), faz cleanup, arquiva a sessão e, se `TASK_MANAGER_PROVIDER` != `none`, atualiza a task para `done` via adapter.
+10. **Sync automático pós-merge**: uma vez merged, execute `/git/sync` (fase seguinte do fluxo). O sync segue a [Matriz de Branches Protegidas e Estratégia de Sync](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync), faz cleanup, arquiva o worklog ACTIVE como registro ARCHIVED (estrutura na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)) e, se `TASK_MANAGER_PROVIDER` != `none`, atualiza a task para `done` via adapter.
 
 REGRA DE OURO: faça commit APENAS dos arquivos que você alterou. Se houver outros, pergunte ao usuário antes. Não use `git add .` sem confirmação.
 

@@ -493,14 +493,16 @@ do Sistema Onion. Foque em [aspectos específicos]."
 - `<feature-slug>`: Nome kebab-case para branches/sessões
 - `<task-id>`: ID da task no Task Manager (ex: `PROJ-123` no Jira, `86acu8pdk` no ClickUp)
 
-### Estrutura de Sessões
+### Estrutura de Sessões (worklog)
 ```
-.claude/sessions/<feature-slug>/
-├── context.md          # Contexto e objetivos
-├── architecture.md     # Arquitetura técnica
-├── plan.md            # Plano de implementação por fases
-└── notes.md           # Notas e decisões
+.claude/sessions/<feature-slug>/    # worklog ACTIVE
+├── STATE.md            # Índice Tier-0 (~1KB): ponteiro NEXT, ponto de resume
+├── context.md          # Contexto, objetivos + Phase-Subtask Mapping
+├── architecture.md     # Arquitetura técnica (opcional em hotfix)
+├── plan.md             # Plano por fases ([DONE]/[ACTIVE]/[TODO])
+└── notes.md            # Notas e decisões (append-only)
 ```
+> Estrutura canônica na [SSOT §Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento); resume/leitura em [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md). Worklog ≠ transcript nativo (`claude --resume`). Para reportar status, leia só o `STATE.md`.
 
 ## 💡 Exemplos de Uso
 

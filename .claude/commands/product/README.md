@@ -33,8 +33,7 @@ flowchart TD
 **O que faz**:
 - ✅ Cria task estruturada no Task Manager configurado (conforme `TASK_MANAGER_PROVIDER`: ClickUp/Jira/Asana/Linear)
 - ✅ Cria feature branch `feature/<slug>`
-- ✅ Inicializa sessão em `.claude/sessions/<slug>/`
-- ✅ Cria arquivos: `context.md`, `plan.md`, `notes.md`
+- ✅ Inicializa o worklog em `.claude/sessions/<slug>/` (estrutura na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento): `STATE.md`, `context.md`, `plan.md`, `notes.md`)
 
 **Quando usar**: Início de qualquer nova funcionalidade
 
@@ -182,12 +181,14 @@ Todos os comandos seguem uma **estratégia consistente de atualização automát
 Quando você usa `/product/task`, é criada esta estrutura:
 
 ```
-.claude/sessions/<feature-slug>/
-├── context.md          # Contexto e objetivos
-├── architecture.md     # Arquitetura técnica (criado por /engineer/start)
-├── plan.md            # Plano de implementação por fases
-└── notes.md           # Notas e decisões
+.claude/sessions/<feature-slug>/    # worklog ACTIVE — estrutura na SSOT
+├── STATE.md            # Índice Tier-0 (~1KB): ponteiro NEXT, ponto de resume
+├── context.md          # Contexto, objetivos + Phase-Subtask Mapping
+├── architecture.md     # Arquitetura técnica (criado por /engineer/start; opcional em hotfix)
+├── plan.md             # Plano por fases ([DONE]/[ACTIVE]/[TODO])
+└── notes.md            # Notas e decisões (append-only)
 ```
+> Estrutura canônica: [gitflow-patterns.md §Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento). Não redefina aqui.
 
 ### **Integração com Comandos**:
 - **`/engineer/start <slug>`**: Usa e expande a sessão

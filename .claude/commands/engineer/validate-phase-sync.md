@@ -15,7 +15,7 @@ Validar e corrigir sincronização automática entre fases do plan.md e status d
 ## 🎯 Funcionalidades
 
 ### Validação Automática de Status
-- Lê todas as fases do plan.md e identifica status atual (Completada ✅, Em Progresso ⏰, Não Iniciada ⏳)
+- Lê todas as fases do plan.md e identifica status atual (`[DONE]`, `[ACTIVE]`, `[TODO]`)
 - Verifica status das subtasks correspondentes no Task Manager via Phase-Subtask Mapping
 - Identifica discrepâncias entre plan.md e Task Manager
 - Gera relatório de inconsistências encontradas
@@ -55,7 +55,7 @@ Executadas via adapter (REST API default; MCP opcional — ativado com `TASK_MAN
 - **Validação de Integridade**: Verifica se mapeamento está correto e completo
 
 ### Mapeamento Phase-Subtask
-Lê o mapeamento do arquivo `.claude/sessions/[slug]/context.md`:
+Lê o mapeamento do arquivo `.claude/sessions/[slug]/context.md` (formato canônico na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)):
 ```markdown
 ## 📋 Phase-Subtask Mapping
 - **Phase 1**: "Template Consolidation" → Subtask ID: [id-1]
@@ -64,9 +64,12 @@ Lê o mapeamento do arquivo `.claude/sessions/[slug]/context.md`:
 ```
 
 ### Correções Aplicadas
-- Fases "Completada ✅" → Subtask status "done"  
-- Fases "Em Progresso ⏰" → Subtask status "in progress"
-- Fases "Não Iniciada ⏳" → Subtask status "to do"
+Mapeie pelo token ASCII do `plan.md` (vocabulário em [worklog-protocol.md §6](../../../docs/knowledge-base/concepts/worklog-protocol.md)):
+- Fases `[DONE]` → Subtask status "done"
+- Fases `[ACTIVE]` → Subtask status "in progress"
+- Fases `[TODO]` → Subtask status "to do"
+
+> Se a fase atual (`[ACTIVE]`) divergir de `STATE.md.NEXT.phase`, o `STATE.md` é a fonte autoritativa — sinalize o drift antes de corrigir.
 
 ## ⚙️ Processo de Validação
 

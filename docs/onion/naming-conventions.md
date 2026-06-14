@@ -137,14 +137,14 @@ release/v2.1.0-beta
 ## 📁 Estrutura de Sessões
 
 ```
-.claude/sessions/<feature-slug>/
-├── context.md          # Task context + ClickUp info
-├── architecture.md     # Technical architecture
-├── plan.md            # Implementation plan
-├── temp/              # Temporary files
-├── artifacts/         # Generated artifacts
-└── decisions.md       # Technical decisions
+.claude/sessions/<feature-slug>/    # worklog ACTIVE — estrutura na SSOT
+├── STATE.md            # Índice Tier-0 (~1KB): ponteiro NEXT, ponto de resume
+├── context.md          # Metadados + Phase-Subtask Mapping
+├── architecture.md     # Decisões arquiteturais (opcional em hotfix)
+├── plan.md             # Plano por fases ([DONE]/[ACTIVE]/[TODO])
+└── notes.md            # Log append-only de decisões
 ```
+> Estrutura canônica: [gitflow-patterns.md §Contrato de Sessão](../knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) (worklog ACTIVE vs registro ARCHIVED). Não redefina aqui.
 
 **Exemplo:**
 ```

@@ -1,6 +1,12 @@
 # Histórico do Claude Code
 .history/
-.claude/sessions/*
+
+# Worklogs de sessão (.claude/sessions/) — versionamento é ESCOLHA CONSCIENTE por projeto.
+# Default do Onion: gitignore (estado individual/efêmero). Para tratar worklogs como
+# artefato durável de time/auditoria, comente a linha abaixo (ou faça un-ignore de archived/).
+# Política: docs/knowledge-base/frameworks/gitflow-patterns.md §Contrato de Sessão → Versionamento de sessões.
+.claude/sessions/
+
 # Arquivos temporários
 *.tmp
 *.temp
@@ -30,8 +36,6 @@ node_modules/
 *~
 .vscode/
 .idea/
-.claude/sessions/
-.history/
 .tmp/
 # Claude Code local overrides (não versionar)
 .claude/settings.local.json
