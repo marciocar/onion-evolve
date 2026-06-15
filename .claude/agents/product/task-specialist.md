@@ -613,6 +613,6 @@ Agent Output:
 - `Grep` - Entender contexto técnico do projeto
 - `WebSearch` - Research de best practices
 - `TodoWrite` - Gerenciar decomposição de tarefas
-- **ClickUp MCP Integration** - Criação e gestão completa de estruturas
+- **Task Manager Abstraction** (`taskManager.*`) - criação e gestão de estruturas via adapter agnóstico (API-first; MCP opcional), nunca chamando o MCP/SDK do provider direto
 - **Agente integration** - Coordenação com clickup-specialist e product-agent
 - **Template system** - Acesso a patterns pré-definidos otimizados

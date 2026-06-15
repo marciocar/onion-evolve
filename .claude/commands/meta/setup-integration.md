@@ -40,9 +40,9 @@ SE `{{integration}}` foi fornecido:
 SENÃO:
 - Pergunte qual integração configurar:
   - **task-manager** - Configurar gerenciador de tarefas (ClickUp, Asana, Linear) - **RECOMENDADO PRIMEIRO**
-  - **clickup** - ClickUp MCP para gestão de tarefas
-  - **asana** - Asana MCP para gestão de tarefas
-  - **linear** - Linear API para gestão de tarefas
+  - **clickup** - ClickUp (API-first; MCP opcional) para gestão de tarefas
+  - **asana** - Asana (API-first; MCP opcional) para gestão de tarefas
+  - **linear** - Linear (API-first) para gestão de tarefas
   - **gamma** - Gamma.App API para apresentações
   - **postgres** - PostgreSQL para banco de dados
 
@@ -82,7 +82,7 @@ TASK_MANAGER_PROVIDER=clickup  # clickup | asana | linear | none
 
 **2. Configurar ClickUp (se escolhido):**
 ```env
-# ClickUp MCP
+# ClickUp (API-first; MCP opcional)
 CLICKUP_API_TOKEN=pk_xxxxxxx_xxxxxxxxxxxxxxx
 CLICKUP_WORKSPACE_ID=your_workspace_id  # Opcional, detectado automaticamente
 CLICKUP_DEFAULT_LIST_ID=your_list_id  # Opcional, lista padrão
@@ -95,7 +95,7 @@ CLICKUP_DEFAULT_LIST_ID=your_list_id  # Opcional, lista padrão
 
 **3. Configurar Asana (alternativa):**
 ```env
-# Asana MCP
+# Asana (API-first; MCP opcional)
 ASANA_ACCESS_TOKEN=1/xxxxx_xxxxxxxxxxxxxxx
 ASANA_DEFAULT_WORKSPACE=1234567890  # Opcional
 ASANA_DEFAULT_PROJECT_ID=0987654321  # Opcional

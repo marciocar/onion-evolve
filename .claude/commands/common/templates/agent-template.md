@@ -297,7 +297,7 @@ updated: "2025-11-24"
 ---
 name: clickup-specialist
 description: |
-  Especialista em ClickUp MCP para otimizações técnicas e operações em bulk.
+  Especialista em ClickUp (API-first; MCP opcional) para otimizações técnicas e operações em bulk.
   Use para operações avançadas no ClickUp, automações e integrações.
 model: sonnet
 tools:
