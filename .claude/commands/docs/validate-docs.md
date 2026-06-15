@@ -3,6 +3,7 @@ name: validate-docs
 description: |
   Validação de completude e consistência da documentação.
   Use para verificar estrutura, links e padrões.
+  Diferença vs /docs:docs-health: este VALIDA + corrige (estrutura/links/padrões, com --fix); o docs-health é o diagnóstico read-only (saúde/gaps/recomendações).
 model: sonnet
 
 parameters:
