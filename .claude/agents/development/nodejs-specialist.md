@@ -5,14 +5,13 @@ description: |
   Use para APIs complexas, configurações backend e otimizações Node.js.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - run_terminal_cmd
-  - codebase_search
-  - grep
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - WebSearch
+  - TodoWrite
 
 color: teal
 priority: alta

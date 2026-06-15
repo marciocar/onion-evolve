@@ -5,15 +5,13 @@ description: |
   Use para análise e diagramas de arquitetura de projetos TypeScript/JavaScript.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - glob_file_search
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: blue
 priority: alta

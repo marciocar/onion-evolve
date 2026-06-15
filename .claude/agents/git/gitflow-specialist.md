@@ -5,14 +5,13 @@ description: |
   Use para guidance em workflows Git estruturados e colaborativos.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - run_terminal_cmd
-  - grep
-  - codebase_search
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - WebSearch
+  - TodoWrite
 
 color: teal
 priority: alta

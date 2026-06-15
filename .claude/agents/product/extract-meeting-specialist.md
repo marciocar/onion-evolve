@@ -5,14 +5,13 @@ description: |
   Use para processar transcrições, atas de reuniões e contextos brutos em artefatos de alto valor para humanos, sistemas e IA.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: teal
 priority: alta

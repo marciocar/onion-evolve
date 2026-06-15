@@ -6,15 +6,14 @@ description: |
   Use para containerizar apps Node.js/Next.js, gerenciar Docker Compose e integrar com PostgreSQL.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - list_dir
-  - glob_file_search
-  - run_terminal_cmd
-  - todo_write
-  - web_search
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - TodoWrite
+  - WebSearch
 
 color: blue
 priority: média

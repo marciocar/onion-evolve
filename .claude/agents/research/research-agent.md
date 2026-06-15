@@ -5,13 +5,11 @@ description: |
   Use para investigações complexas e insights acionáveis com múltiplas perspectivas.
 model: sonnet
 tools:
-  - read_file
-  - codebase_search
-  - web_search
-  - grep
-  - list_dir
-  - glob_file_search
-  - todo_write
+  - Read
+  - Grep
+  - WebSearch
+  - Glob
+  - TodoWrite
 
 color: indigo
 priority: alta

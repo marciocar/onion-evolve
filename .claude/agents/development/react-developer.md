@@ -5,14 +5,13 @@ description: |
   Use para componentes UI, estado complexo e desenvolvimento frontend React.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - run_terminal_cmd
-  - codebase_search
-  - grep
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - WebSearch
+  - TodoWrite
 
 color: blue
 priority: alta

@@ -5,15 +5,13 @@ description: |
   Use para criar novos agentes. Relacionado: @command-creator-specialist, @onion.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - list_dir
-  - glob_file_search
-  - codebase_search
-  - grep
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - WebSearch
+  - TodoWrite
 
 color: cyan
 priority: alta

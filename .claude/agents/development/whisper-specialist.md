@@ -6,15 +6,14 @@ description: |
   Use para transcrever audio com Whisper e processar fala em projetos locais.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
-  - run_terminal_cmd
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
+  - Bash
 
 color: blue
 priority: média
