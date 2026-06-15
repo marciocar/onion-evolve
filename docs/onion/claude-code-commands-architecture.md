@@ -143,7 +143,7 @@ Os comandos do Sistema Onion utilizam bibliotecas de formatação e UX integrada
 ### 🎯 **Exemplos Práticos**
 - [Practical Examples](practical-examples.md)
 - [Task Manager Adapters](.claude/utils/task-manager/)
-- [Tools Reference](tools-reference.md)
+- Tools Reference — comando `/meta:all-tools`
 
 ### 🚀 **Getting Started**
 - [Configuração Inicial](getting-started.md)

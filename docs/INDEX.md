@@ -79,7 +79,6 @@ docs/
 │   ├── practical-examples.md   # Exemplos práticos
 │   ├── getting-started.md      # Configuração inicial
 │   ├── testing-validation-system.md  # Sistema de testes e validação
-│   ├── tools-reference.md      # Referência de ferramentas
 │   ├── claude-code-commands-architecture.md  # Arquitetura de comandos
 │   ├── end-to-end-validation-tests.md  # Testes de validação E2E
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
@@ -154,7 +153,7 @@ docs/
 
 #### Referências Técnicas
 - **[Exemplos Práticos](onion/practical-examples.md)** - Casos de uso reais com exemplos
-- **[Referência de Ferramentas](onion/tools-reference.md)** - Todas as ferramentas disponíveis
+- **Referência de Ferramentas** - rode o comando `/meta:all-tools` para documentar todas as ferramentas disponíveis
 - **[Arquitetura de Comandos](onion/claude-code-commands-architecture.md)** - Estrutura interna dos comandos
 
 #### Documentação Avançada
@@ -342,7 +341,7 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 **Comece com:**
 1. [Configuração Inicial](onion/getting-started.md)
 2. [Guias de Aplicação](applying/README.md)
-3. [Referência de Ferramentas](onion/tools-reference.md)
+3. Referência de Ferramentas — comando `/meta:all-tools`
 
 **Comandos essenciais:**
 - `/meta:setup-integration` - Configurar Task Manager (Jira/ClickUp/Asana/Linear) e demais integrações

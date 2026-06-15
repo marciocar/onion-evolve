@@ -645,7 +645,7 @@ cat .claudeignore
 
 ### **📖 Aprofundar Conhecimento**
 1. **[Guia de Comandos](commands-guide.md)** - Documentação completa
-2. **[Referência de Ferramentas](tools-reference.md)** - Todas as ferramentas disponíveis em TypeScript
+2. **Referência de Ferramentas** - rode `/meta:all-tools` para documentar todas as ferramentas disponíveis
 3. **[Fluxos de Engenharia](engineering-flows.md)** - Workflows detalhados  
 4. **[Task Manager Abstraction](../knowledge-base/concepts/task-manager-abstraction.md)** - Entenda como funciona a abstração
 5. **Adapters por provedor** - Detalhes específicos de cada um em `.claude/utils/task-manager/adapters/` (`jira.md`, `clickup.md`, `asana.md`, `linear.md`)
