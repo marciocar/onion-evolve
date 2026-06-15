@@ -8,7 +8,7 @@ model: opus
 category: meta
 tags: [evolve, audit, fleet, self-evolution, modernization]
 version: "1.1.0"
-updated: "2026-06-14"
+updated: "2026-06-15"
 allowed-tools: Read Write Grep Glob Bash(find *) Bash(wc *) Bash(git log*) Bash(cat .env*)
 argument-hint: "[dimensão específica (D1..D8) | vazio = auditoria completa]"
 related_commands:
@@ -68,7 +68,7 @@ existentes, **não** reimplementam (e não aninham frota dentro de frota).
 | D1 | **Peso/tamanho** | `find .claude/{agents,commands} -name '*.md'` + `wc -l` vs limites (agentes 1200/1500; comandos 500/800). Classifica refactor vs isento (template/README). | haiku |
 | D2 | **Redundância/overlap** | Nomes + `description` próximos (clusters `branch-*`, testing-3, meta-creators). Agrupa por similaridade. | sonnet |
 | D3 | **Duplicação >50 linhas** | Blocos repetidos entre comandos → candidatos a `common/templates` ou `common/prompts` ([commands.md §6](../../../docs/meta-specs/commands.md)). | haiku |
-| D4 | **KBs stale** | **DELEGA a `/meta:kb-freshness`** — ingere o array `FreshnessSchema[]`. Não reimplementar. | (kb-freshness) |
+| D4 | **KBs stale** | **DELEGA a `/meta:kb-freshness`** — ingere o array `FreshnessSchema[]`. Não reimplementar. **Threshold canônico de data = item 6 da régua kb-freshness: ≤18 meses** (relativo a hoje); **NUNCA** usar ad-hoc tipo ">6 meses" (gera falso-positivo — calibração 2026-06-15). Se, por restrição de no-fleet-in-fleet, rodar como scan focado em vez de delegar, **herde o gate ≤18mo** explicitamente no prompt do worker. | (kb-freshness) |
 | D5 | **Conformidade meta-spec** | **DELEGA a `/meta:metaspec-validate`** por artefato de alto risco — ingere os vereditos estruturados. Não reimplementar a constituição. | (metaspec-validate) |
 | D6 | **Moderna vs legada + vazamento SDAAL** | Prosa/delegação sequencial que deveria ser `Workflow` fan-out; resíduo `.onion`/CLI/npm/multi-IDE ([architecture.md §7](../../../docs/meta-specs/architecture.md)). **Vazamento provider-specific / MCP-first:** chamada direta a provider (`mcp_<provider>_*`) ou "MCP como transporte default" em comandos/agentes fora de adapters/especialistas — viola API-first/agnosticismo (lint Regra 10; doutrina §consumo de integração). | sonnet |
 | D7 | **Cross-refs / links** | `find .claude -xtype l` (symlinks quebrados) + links relativos `[..](..)` que apontam para arquivos inexistentes. | haiku |
