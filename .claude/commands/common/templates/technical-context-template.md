@@ -49,7 +49,7 @@ Este template ajuda times de desenvolvimento de software a projetar sua **Arquit
 - **AI Tool Usage:**
   - [ ] GitHub Copilot
   - [ ] Claude Code AI for development
-  - [ ] Claude Code/Windsurf
+  - [ ] Claude Code
   - [ ] Other: `__________`
 
 **Development Constraints:**
@@ -390,7 +390,7 @@ Critical issue response procedures
 - Maintain current context summaries for long development sessions
 - Include relevant error logs and debugging context
 
-**For Claude Code/Windsurf:**
+**For Claude Code:**
 - Configure `CLAUDE.md` or equivalent with project-specific guidelines
 - Reference key documentation files in AI instructions
 - Maintain workspace-specific context configurations

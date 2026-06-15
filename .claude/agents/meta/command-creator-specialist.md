@@ -103,10 +103,11 @@ Glob .claude/commands/meta/
 Glob .claude/commands/engineer/
 Glob .claude/commands/product/
 Glob .claude/commands/git/
-Glob .claude/commands/compliance/
 Glob .claude/commands/docs/
-Glob .claude/commands/admin/
+Glob .claude/commands/meta/
 Glob .claude/commands/validate/
+Glob .claude/commands/test/
+Glob .claude/commands/development/
 Glob .claude/commands/common/
 
 # 2. Ler comandos similares
@@ -405,7 +406,7 @@ Este comando delega para o agente especializado.
 3. [Retornar resultado em formato X]
 ```
 
-**Pattern 2: Orquestração Sequencial**
+**Pattern 2: Orquestração Sequencial** (passos **dependentes**; para passos **independentes**, prefira fan-out via a ferramenta nativa Workflow — ver `/meta:fleet` / skill `onion-fleet`)
 ```markdown
 ## Execução
 

@@ -106,10 +106,10 @@ Glob .claude/commands/
 Glob .claude/commands/meta/
 Glob .claude/commands/product/
 Glob .claude/commands/engineer/
-Glob .claude/commands/compliance/
 Glob .claude/commands/docs/
 Glob .claude/commands/git/
-Glob .claude/commands/admin/
+Glob .claude/commands/validate/
+Glob .claude/commands/test/
 Glob .claude/commands/common/
 ```
 

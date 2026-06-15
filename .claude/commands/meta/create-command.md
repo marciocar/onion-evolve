@@ -152,7 +152,7 @@ if [[ ! "{{command_name}}" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]]; then
 fi
 
 # 3. CATEGORIA - Verificar categoria válida
-VALID_CATEGORIES="engineer product git docs meta validate quick general"
+VALID_CATEGORIES="engineer product git docs meta validate test development quick"
 if [[ ! " $VALID_CATEGORIES " =~ " {{category}} " ]]; then
   echo "❌ ERRO: Categoria '{{category}}' inválida!"
   echo "Válidas: $VALID_CATEGORIES"
@@ -163,7 +163,7 @@ fi
 **Checklist de Validação:**
 - [ ] Nome único (não existe em `.claude/commands/`)
 - [ ] Nome em kebab-case válido
-- [ ] Categoria válida (engineer|product|git|docs|meta|validate|quick|general)
+- [ ] Categoria válida (engineer|product|git|docs|meta|validate|test|development|quick)
 - [ ] YAML header completo
 - [ ] < 400 linhas
 - [ ] Seções obrigatórias (Objetivo, Fluxo, Output)
