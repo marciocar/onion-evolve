@@ -89,7 +89,7 @@
   name: nome-do-agente
   description: Descrição clara e concisa do agente
   model: sonnet
-  tools: read_file, write, search_replace, run_terminal_cmd, codebase_search
+  tools: Read, write, Edit, Bash, Grep
   color: lightblue
   priority: alta
   expertise: ["área-1", "área-2", "área-3"]

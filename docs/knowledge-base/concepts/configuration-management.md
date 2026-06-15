@@ -13,7 +13,7 @@
 | **Aplicação** | Sistema Onion - Configurações e MCPs |
 
 > ⚠️ **Provider-agnóstico**: os exemplos com ClickUp (`ONION_AUTO_CLICKUP_SYNC`,
-> `mcp_ClickUp_*`, etc.) são **ilustrativos**. O Task Manager do Onion é abstraído
+> `mcp__clickup__*`, etc.) são **ilustrativos**. O Task Manager do Onion é abstraído
 > via `TASK_MANAGER_PROVIDER` (jira | clickup | asana | linear | none) — ver
 > `.claude/utils/task-manager/` e [task-manager-abstraction.md](task-manager-abstraction.md).
 > Leia o provider ativo do `.env` antes de assumir ClickUp.
@@ -348,9 +348,9 @@ curl -H "Authorization: $CLICKUP_API_TOKEN" \
 ---
 name: clickup-specialist
 tools:
-  - read_file
+  - Read
   - write
-  - mcp_ClickUp_*  # MCP específico
+  - mcp__clickup__*  # MCP específico
 ---
 
 ## 🔧 Configurações Necessárias
@@ -375,9 +375,9 @@ Ao ser invocado, este agente:
 ---
 name: task-specialist
 tools:
-  - read_file
+  - Read
   - write
-  - codebase_search
+  - Grep
   - grep
 ---
 

@@ -111,7 +111,7 @@ Executado: VM/Runtime       Executado: Cognição do LLM
 │                    EXECUTION LAYER                              │
 │                  (MCP Tools / API Calls)                        │
 │                                                                 │
-│   mcp_ClickUp_*    mcp_asana_*    linear_api_*    local_store   │
+│   mcp__clickup__*   mcp__asana__*   linear_api_*   local_store  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -213,7 +213,7 @@ PROVIDER_WORKSPACE_ID=xxx
 class <Provider>Adapter implements I<Nome> {
   // Cada método com mapeamento específico
   async method(input): Promise<Output> {
-    const result = await mcp_provider_call({
+    const result = await mcp__provider__call({
       // Mapear campos de input → provider
     });
     return this.normalize(result);
@@ -274,8 +274,8 @@ Cada adapter implementa a mesma interface com estratégias diferentes:
 ```
 ITaskManager.createTask()
   │
-  ├── ClickUpAdapter: mcp_ClickUp_clickup_create_task
-  ├── AsanaAdapter: mcp_asana_asana_create_task
+  ├── ClickUpAdapter: mcp__clickup__create_task
+  ├── AsanaAdapter: mcp__asana__create_task
   └── NoProviderAdapter: retorna objeto local
 ```
 
@@ -466,7 +466,7 @@ TASK_MANAGER_TRANSPORT=mcp   ← opcional; MCP quando disponível, fallback para
 │                           │                                      │
 │  EXECUÇÃO                 ▼                                      │
 │  ┌───────────────────────────────────────────────────────────┐   │
-│  │  POST /api/v3/tasks   |   mcp_ClickUp_clickup_create_task │   │
+│  │  POST /api/v3/tasks   |   mcp__clickup__create_task       │   │
 │  └───────────────────────────────────────────────────────────┘   │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -502,7 +502,7 @@ TASK_MANAGER_TRANSPORT=mcp   ← opcional; MCP quando disponível, fallback para
 3. adapters/clickup.md carregado
           │  lê TASK_MANAGER_TRANSPORT
           ├─ api (default) → POST https://api.clickup.com/api/v2/task
-          └─ mcp           → mcp_ClickUp_clickup_get_task(...)
+          └─ mcp           → mcp__clickup__get_task(...)
           │
           ▼
 4. resposta normalizada conforme types.md
@@ -535,7 +535,7 @@ Faz coisas com o Provider X.
 ### createTask(input: CreateTaskInput): Promise<TaskOutput>
 Cria task no Provider X.
 \`\`\`typescript
-await mcp_provider_x_create({
+await mcp__provider__create({
   title: input.name,
   body: input.description
 });
