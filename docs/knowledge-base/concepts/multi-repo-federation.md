@@ -112,13 +112,15 @@ members:
    `.claude/validation/` — **nunca** um agente (ajuste 6a).
 5. **Coordenação + rollback:** maestro humano; PRs por repo (forge); ordem de merge; Rollback Protocol.
 
-## 5. Tooling (Fases 1-2)
+## 5. Tooling (Fases 1-3)
 
 **Scripts determinísticos** (`.claude/validation/`, sem LLM — ajuste 6a):
 - **`federation-contract-validate.sh`** (Fase 1) — o *"teste que falha se o contrato quebrar"*:
   valida as seções obrigatórias (incl. `tests`+`fixtures`), exit ≠0 acionável. Espelha `inventory.sh`.
 - **`federation-inbox-scan.sh`** (Fase 2) — lê o `CHANGELOG.md` e extrai, por consumer, os contratos
   endereçados na versão vigente + a classe do bump (BREAKING/COMPATIBLE/INITIAL). Saída `--json`.
+- **`federation-status-scan.sh`** (Fase 3) — detecção determinística de **contract-drift**: compara a
+  versão de cada `contracts/<id>.md` com a última PUBLISH no CHANGELOG (`in-sync`/`drift`/`unpublished`). `--json`.
 
 **Comandos** (`meta/`, orquestram no nível principal):
 - **`/meta:federation-register`** (Fase 1) — localiza/bootstrapa o ledger, valida e **grava+commita**
@@ -127,16 +129,44 @@ members:
   bump, aplica o **checkpoint do maestro**, endereça os consumers e sela a entrada de inbox + commit.
 - **`/meta:federation-check`** (Fase 2) — lado consumer: lê o inbox (`inbox-scan`), valida cada
   contrato em casa e emite o `MemberExpertSchema` **fail-safe** (BREAKING/inválido/ausência = veto).
+- **`/meta:federation-status`** (Fase 3) — monitor read-only: drift (via `status-scan`) + CI por
+  membro (via **forge adapter**). Veredito `SÃO`/`ATENÇÃO`.
+- **`/meta:federation-rollback`** (Fase 3) — Rollback Protocol guiado: pina a versão anterior no
+  ledger + entrada `ROLLBACK`, guia os reverts por repo (ordem inversa). **Human-gated.**
 
 > **Fronteira register × publish:** `register` atesta que um contrato **válido existe**; `publish` é
 > o **ato deliberado de anunciar** (com humano no loop). Só o `publish` toca o CHANGELOG.
 > O par **comando (orquestra) + script (valida)** é o padrão canônico do Onion para trabalho
 > determinístico validável — o mesmo do inventário. Mantém a validação fora de agente (6a).
 
-## 6. Limites (o que ainda NÃO está pronto)
+## 6. Fluxo cross-repo conduzido + Rollback Protocol (maestro — design §6/§5.5)
 
-- **`/meta:federation-status`** (monitor: CI por membro + contract-drift) — **Fase 3** do backlog.
-- Fluxo do maestro **completo** cross-repo (PRs coordenados + ordem de merge + Rollback Protocol) — **Fase 3**.
-- Ledger **real de produção** com **remote** + concorrência (lock/merge) — a Fase 2 valida o ciclo
-  `publish→check` num ledger scratch (cross-repo simulável num repo só).
-- Membros não-Onion / stacks heterogêneos — fases seguintes.
+A mudança que atravessa repos é **conduzida pelo maestro humano** (atomicidade multi-repo não existe
+no GitHub). O ciclo completo:
+
+```
+1. muda no PRODUCER (sessão normal) → /meta:federation-register  (valida + grava o contrato)
+2. /meta:federation-publish          → anuncia o bump (checkpoint do maestro)
+3. em cada CONSUMER: /meta:federation-check → veto de 1ª mão (breaking/ausência = bloqueia)
+4. /meta:federation-status           → SÃO/ATENÇÃO (drift + CI por membro) antes de mergear
+5. PRs coordenados (1/repo via /engineer:pr + forge); ORDEM DE MERGE: producer-compatível
+   primeiro, consumers depois (gate de CI verde)
+6. quebrou? /meta:federation-rollback → reverte coordenado (abaixo)
+```
+
+**Rollback Protocol (§5.5) — guiado, human-gated** (`/meta:federation-rollback`):
+- **Trigger:** check vetou pós-merge, ou CI de consumer vermelho após adotar o bump.
+- **Ordem inversa:** consumers primeiro, producer por último (oposto da ordem de merge).
+- **Pin no ledger** (única parte automatizada, reversível): contrato volta à versão anterior +
+  entrada `ROLLBACK` **append-only** no CHANGELOG.
+- **Reverts por repo:** o comando **lista** (não executa); o maestro aplica via forge.
+- **Falha parcial → gate humano:** se um repo não reverte limpo, **pare e escale** — não force consistência.
+- Confirme com `/meta:federation-status` que voltou a `SÃO`.
+
+## 7. Limites (o que ainda NÃO está pronto)
+
+- Ledger **real de produção** com **remote** + concorrência (lock/merge) — o MVP valida o ciclo
+  completo num ledger scratch (cross-repo simulável num repo só).
+- Membros **não-Onion** / stacks heterogêneos — fases seguintes.
+- **Instâncias vivas A2A / runtime distribuído** — **Fase 5 ABANDONADA** (design §2): linha vermelha.
+  A federação é **assíncrona via git + forge**, nunca IA-fala-IA em tempo real.
