@@ -125,7 +125,7 @@ docs/
 ├── analysis/                   # Análises ativas (baselines; itens efêmeros são removidos pós-execução — ver analysis/README.md)
 │   ├── onion-review-2026-05.md         # SSOT de identidade
 │   ├── onion-vv-baseline-2026-06.md    # baseline de V&V (usada por /meta:evolve)
-│   └── onion-evolution-2026-06-14-v2.md # auditoria mais recente
+│   └── onion-evolution-2026-06-15.md   # auditoria mais recente
 │
 ├── sdaal/                      # Specification-Driven AI Abstraction Layer
 │   └── [documentação SDAAL]
@@ -249,7 +249,7 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 
 - **[Revisão Analítica do Sistema Onion — Maio/2026](analysis/onion-review-2026-05.md)** — SSOT de identidade: documenta o abandono de `.onion/`, plano v4.0 e `packages/onion-cli/`; sintetiza as análises-fonte de 2025.
 - **[Baseline de Verificação e Validação — Junho/2026](analysis/onion-vv-baseline-2026-06.md)** — baseline de V&V (tamanhos + conformidade de plataforma); usada por `/meta:evolve`.
-- **[Onion Evolution v2 — Junho/2026](analysis/onion-evolution-2026-06-14-v2.md)** — auditoria de evolução mais recente (backlog v2, executado nos PRs #22–#27).
+- **[Onion Evolution — 2026-06-15](analysis/onion-evolution-2026-06-15.md)** — auditoria de evolução mais recente (backlog: 30 achados; sistêmicos = vazamento MCP-first e date-gate de KB).
 
 ---
 
