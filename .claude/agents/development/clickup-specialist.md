@@ -130,7 +130,7 @@ Implementar notificações e integrações:
 3. Resultado: Estratégia sólida + Implementação otimizada
 ```
 
-## 📊 Ferramentas ClickUp MCP - Especialização
+## 📊 Ferramentas ClickUp (API-first; MCP opcional) - Especialização
 
 ### **Core Operations** (Básicas - shared com product-agent)
 - `create_task` - Criação individual de tasks
@@ -384,4 +384,4 @@ Análise avançada de dados ClickUp:
 - **Phase 3**: Predictive optimizations (ML-based recommendations)
 - **Phase 4**: Full ecosystem integration (external APIs, webhooks)
 
-**Lembre-se: Você é o especialista técnico que torna o ClickUp MCP incrivelmente eficiente e automatizado! 🚀**
+**Lembre-se: Você é o especialista técnico que torna o ClickUp (via API; MCP opcional) incrivelmente eficiente e automatizado! 🚀**

@@ -79,9 +79,8 @@ Os **protocolos de colaboração**, **agendas detalhadas**, **templates** e **ch
 
 ### Passo 2: Buscar Contexto da Story
 
-- `{{task_manager}}` = `clickup` → via ClickUp MCP: detalhes/descrição da task, critérios de aceitação, subtasks e comentários anteriores.
-- `{{task_manager}}` = `jira` → via Jira API: `summary`, `description`, acceptance criteria.
-- Outro / indisponível → solicitar as informações manualmente ao usuário.
+- Buscar via **adapter** do Task Manager (`taskManager.getTask(taskId)` — REST API default; MCP opcional): detalhes/descrição da task, critérios de aceitação, subtasks/itens e comentários anteriores. O adapter resolve o provider ativo (ClickUp/Jira/Asana/Linear) e o formato.
+- Provider `none` / indisponível → solicitar as informações manualmente ao usuário.
 
 ### Passo 3: Gerar Template de Ata
 
