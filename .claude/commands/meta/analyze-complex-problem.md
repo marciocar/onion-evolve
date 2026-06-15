@@ -60,10 +60,10 @@ Analisar `{{problem}}` para determinar:
 
 ```bash
 # Buscar contexto
-codebase_search "{{problem}}"
+Grep "{{problem}}"
 
 # Estrutura relacionada
-list_dir caminho/relevante/
+Glob caminho/relevante/
 ```
 
 #### Análise de Sistema
@@ -80,8 +80,8 @@ grep "ERROR\|WARNING" logs/
 
 ```bash
 # Docs existentes
-read_file docs/relacionado.md
-read_file README.md
+Read docs/relacionado.md
+Read README.md
 ```
 
 ### Passo 3: Preencher Template

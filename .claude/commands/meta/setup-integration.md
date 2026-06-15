@@ -48,14 +48,14 @@ SENÃO:
 
 ### Passo 2: Verificar Estado Atual
 
-**CRÍTICO:** Usar `read_file` para ler `.env` sem expor valores sensíveis:
+**CRÍTICO:** Usar `Read` para ler `.env` sem expor valores sensíveis:
 
 ```bash
 # Verificar se .env existe
 test -f .env && echo "✅ .env existe" || echo "⚠️ .env não encontrado"
 
-# Ler .env usando read_file (não usar cat/grep que expõe valores)
-read_file .env
+# Ler .env usando Read (não usar cat/grep que expõe valores)
+Read .env
 
 # Verificar variáveis específicas (sem expor valores)
 # Usar apenas para detectar presença, não para exibir conteúdo
@@ -63,7 +63,7 @@ read_file .env
 
 **⚠️ REGRA DE SEGURANÇA:** 
 - **NUNCA** usar `cat .env` ou `grep` que mostre valores completos
-- **SEMPRE** usar `read_file` que permite análise sem exposição
+- **SEMPRE** usar `Read` que permite análise sem exposição
 - **NUNCA** exibir tokens/senhas no output
 
 ### Passo 3: Guiar Configuração por Integração
@@ -207,7 +207,7 @@ fi
 ## 🔒 Regras de Segurança
 
 1. **NUNCA** exiba tokens/senhas completos no output
-2. **SEMPRE** use `read_file` para ler `.env` (não `cat` ou `grep` que expõem valores)
+2. **SEMPRE** use `Read` para ler `.env` (não `cat` ou `grep` que expõem valores)
 3. **SEMPRE** verifique `.gitignore` antes de concluir
 4. **ALERTE** se detectar credenciais em arquivos não protegidos
 5. **SUGIRA** uso de vault/secrets manager para produção

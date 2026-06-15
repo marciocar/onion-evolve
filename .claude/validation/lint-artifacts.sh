@@ -39,6 +39,12 @@
 #  12. Nomes de tool de agente: estilo-Cursor (read_file, run_terminal_cmd, …)
 #      [HARD] — não existem no Claude Code, deixam o subagente sem ferramentas;
 #      MCP de underscore único (mcp_<Server>_…) [HARD] — formato é mcp__server__tool
+#  13. Templates canônicos (commands/common/templates/) dialeto-puro [HARD] —
+#      são copiados verbatim ao criar agentes/comandos; token Cursor ou MCP
+#      underscore-único aqui re-propaga o bug para toda nova frota
+#  14. Meta-specs (docs/meta-specs/) sem dialeto Cursor em exemplos de tools:
+#      [HARD] — autoridade L0; token Cursor como item de lista YAML ou MCP
+#      underscore-único. A lista de PROIBIÇÃO em prosa/blockquote é isenta
 # =============================================================================
 
 set -euo pipefail
@@ -399,6 +405,50 @@ check_agent_tool_names() {
 }
 
 # ===========================================================================
+# REGRA 13 — Templates canônicos devem ser dialeto-puro
+#   Templates em commands/common/templates/ são copiados verbatim ao criar
+#   agentes/comandos; qualquer nome de tool estilo-Cursor [HARD] ou MCP
+#   underscore-único [HARD] aqui re-propaga o bug para toda nova frota.
+#   Cobre tokens distintivos em QUALQUER lugar do template (não só frontmatter,
+#   pois o template demonstra YAML no corpo). 'write'/'grep' ficam de fora por
+#   ambiguidade com prosa/shell — no frontmatter real a REGRA 12 os pega.
+# ===========================================================================
+check_template_dialect() {
+  local CURSOR='read_file|search_replace|run_terminal_cmd|codebase_search|glob_file_search|list_dir|web_search|todo_write|read_lints|update_memory|edit_file|edit_notebook|MultiEdit'
+  local tdir="${CLAUDE_DIR}/commands/common/templates"
+  [ -d "${tdir}" ] || return 0
+  while IFS= read -r -d '' tpl; do
+    while IFS= read -r tok; do
+      [ -n "${tok}" ] && violation "HARD" "${tpl}" "dialeto Cursor no template: '${tok}' — copiado verbatim; use nome nativo (Read/Write/Edit/Bash/Grep/Glob/WebSearch/WebFetch/TodoWrite)"
+    done < <(grep -hoE "\\b(${CURSOR})\\b" "${tpl}" 2>/dev/null | sort -u)
+    while IFS= read -r m; do
+      [ -n "${m}" ] && violation "HARD" "${tpl}" "MCP em formato Cursor no template: '${m}' — use 'mcp__<server>__<tool>' (duplo underscore)"
+    done < <(grep -hoE 'mcp_[A-Za-z][A-Za-z_]*' "${tpl}" 2>/dev/null | grep -vE '^mcp__' | sort -u)
+  done < <(find "${tdir}" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
+}
+
+# ===========================================================================
+# REGRA 14 — Meta-specs (autoridade L0) sem dialeto Cursor em exemplos
+#   docs/meta-specs/ define o formato canônico que template e creator-agents
+#   espelham. Token Cursor declarado como ITEM DE LISTA YAML (- token) [HARD]
+#   e MCP underscore-único [HARD]. Tokens em prosa/blockquote (a lista de
+#   PROIBIÇÃO que cita os nomes de propósito) NÃO disparam.
+# ===========================================================================
+check_metaspec_dialect() {
+  local CURSOR='read_file|search_replace|run_terminal_cmd|codebase_search|glob_file_search|list_dir|web_search|todo_write|read_lints|update_memory|edit_file|edit_notebook|MultiEdit'
+  local mdir="docs/meta-specs"
+  [ -d "${mdir}" ] || return 0
+  while IFS= read -r -d '' spec; do
+    while IFS= read -r tok; do
+      [ -n "${tok}" ] && violation "HARD" "${spec}" "dialeto Cursor em exemplo de tools: '${tok}' — use nome nativo (Read/Write/Edit/Bash/Grep/Glob/WebSearch/WebFetch/TodoWrite)"
+    done < <(grep -hE "^[[:space:]]*-[[:space:]]+(${CURSOR})([[:space:]#].*)?$" "${spec}" 2>/dev/null | sed -E "s/^[[:space:]]*-[[:space:]]+//; s/[[:space:]#].*$//" | sort -u)
+    while IFS= read -r m; do
+      [ -n "${m}" ] && violation "HARD" "${spec}" "MCP em formato Cursor: '${m}' — use 'mcp__<server>__<tool>' (duplo underscore)"
+    done < <(grep -hoE 'mcp_[A-Za-z][A-Za-z_]*' "${spec}" 2>/dev/null | grep -vE '^mcp__' | sort -u)
+  done < <(find "${mdir}" -name "*.md" -print0 2>/dev/null)
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -406,6 +456,8 @@ echo ""
 
 check_agent_frontmatter
 check_agent_tool_names
+check_template_dialect
+check_metaspec_dialect
 check_command_description
 check_no_gpt4_model
 check_no_mcp_onion_orchestrator

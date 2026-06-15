@@ -71,8 +71,8 @@ Auditar e melhorar estratégias de teste existentes através de:
 **CRÍTICO:** Sempre carregar antes de qualquer análise.
 
 ```bash
-read_file docs/knowledge-base/frameworks/framework-testes.md
-read_file docs/knowledge-base/frameworks/test-strategy-scoring.md
+Read docs/knowledge-base/frameworks/framework-testes.md
+Read docs/knowledge-base/frameworks/test-strategy-scoring.md
 ```
 
 Do **framework** extrair: QA Story Points, perspectivas White/Grey/Black-box, técnicas por tipo, métricas de qualidade, template universal de caso de teste, padrões de colaboração.
@@ -90,7 +90,7 @@ SE algum arquivo não encontrado:
 **CRÍTICO:** Detectar provedor automaticamente do `.env` primeiro, depois usar fallback.
 
 ```bash
-read_file .env
+Read .env
 ```
 
 **Lógica de detecção (prioridade):**
@@ -133,11 +133,11 @@ Seguir o padrão de integração de `/product/task` (o `.env` já foi lido no Pa
 ### Passo 5: Coletar Dados do Código (se `--deep-scan`)
 
 ```bash
-glob_file_search "**/*test*.{js,ts,jsx,tsx,py}"
-glob_file_search "**/__tests__/**/*"; glob_file_search "**/tests/**/*"; glob_file_search "**/spec/**/*"
-glob_file_search "**/jest.config.*"; glob_file_search "**/pytest.ini"; glob_file_search "**/.nycrc*"
-glob_file_search "**/coverage/**/*"
-glob_file_search "**/.github/workflows/*test*.yml"; glob_file_search "**/.gitlab-ci.yml"
+Glob "**/*test*.{js,ts,jsx,tsx,py}"
+Glob "**/__tests__/**/*"; Glob "**/tests/**/*"; Glob "**/spec/**/*"
+Glob "**/jest.config.*"; Glob "**/pytest.ini"; Glob "**/.nycrc*"
+Glob "**/coverage/**/*"
+Glob "**/.github/workflows/*test*.yml"; Glob "**/.gitlab-ci.yml"
 ```
 
 Analisar: tipos de teste presentes (Unit/Integration/E2E) e contagem por tipo; métricas de cobertura (coverage-summary.json, lcov); quality gates e thresholds de CI/CD; histórico de falhas, testes flaky e tempo de execução.

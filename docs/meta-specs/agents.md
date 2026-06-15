@@ -157,9 +157,9 @@ Quando um agente depende de MCP (Model Context Protocol), declarar no campo `too
 tools:
   - Read
   - Write
-  - mcp_ClickUp_clickup_create_task
-  - mcp_ClickUp_clickup_update_task
-  - mcp_ClickUp_clickup_get_workspace_hierarchy
+  - mcp__clickup__create_task
+  - mcp__clickup__update_task
+  - mcp__clickup__get_workspace_hierarchy
 ```
 
 **Regras**:

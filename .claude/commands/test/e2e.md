@@ -207,7 +207,7 @@ SE --record:
 #### 7.3 Executar Testes
 
 ```bash
-run_terminal_cmd [comando construído]
+Bash [comando construído]
 ```
 
 **Capturar output:**

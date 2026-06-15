@@ -235,7 +235,7 @@ describe('API Integration: {{api-endpoint}}', () => {
 
 **Construir comando:** Base + flags específicas + execução
 
-**Executar:** `run_terminal_cmd [comando]` e capturar: resultados (pass/fail), contratos validados, erros, tempo
+**Executar:** `Bash [comando]` e capturar: resultados (pass/fail), contratos validados, erros, tempo
 
 ### Passo 7: Apresentar Resultados
 

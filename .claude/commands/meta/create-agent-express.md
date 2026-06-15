@@ -35,7 +35,7 @@ Com base nos requisitos, determine:
 Liste todas as ferramentas disponíveis e pergunte ao usuário quais o sub-agente deve ter acesso:
 
 Ferramentas disponíveis:
-- **Operações de Arquivo**: Read, Write, Edit, MultiEdit, NotebookRead, NotebookEdit
+- **Operações de Arquivo**: Read, Write, Edit, Edit, NotebookRead, NotebookEdit
 - **Pesquisa e Navegação**: Glob, Grep, LS
 - **Execução**: Bash, Task
 - **Web**: WebFetch, WebSearch

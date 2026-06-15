@@ -67,7 +67,7 @@ Democratizar o uso do framework de testes, automatizando a criação de estraté
 
 ```bash
 # Ler framework completo
-read_file docs/knowledge-base/frameworks/framework-testes.md
+Read docs/knowledge-base/frameworks/framework-testes.md
 ```
 
 **Extrair e armazenar em memória:**
@@ -200,7 +200,7 @@ Total verificado: 4 + 5 + 5 = 14 ✅
 
 ```bash
 # EXECUTAR PRIMEIRO: Ler .env
-read_file .env
+Read .env
 ```
 
 **Extrair do .env:**

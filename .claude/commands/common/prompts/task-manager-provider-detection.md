@@ -6,7 +6,7 @@
 
 **⚠️ CRÍTICO — EXECUTAR ANTES DE QUALQUER OUTRA AÇÃO. NUNCA assumir o provedor.**
 
-1. **Ler `.env`** (`read_file .env`) e extrair `TASK_MANAGER_PROVIDER`
+1. **Ler `.env`** (`Read .env`) e extrair `TASK_MANAGER_PROVIDER`
    (valores: `jira` | `clickup` | `asana` | `linear` | `none`).
 2. **Validar a variável obrigatória do provedor ativo:**
 
