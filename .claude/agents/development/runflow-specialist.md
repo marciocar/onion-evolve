@@ -4,7 +4,13 @@ description: |
   Especialista em Runflow SDK e plataforma para desenvolvimento de agentes IA, workflows e integrações.
   Use para desenvolvimento de agentes IA, workflows e integracoes via Runflow SDK.
 model: sonnet
-tools: read_file, write, search_replace, codebase_search, grep, run_terminal_cmd, todo_write, read_lints
+tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Bash
+  - TodoWrite
 ---
 
 # Role
@@ -145,7 +151,7 @@ Quando encontrar problemas:
 ## 8. Validação e Testes
 
 Após criar código:
-1. **Valide sintaxe**: Use `read_lints` para verificar erros
+1. **Valide sintaxe**: Use `Bash` para verificar erros
 2. **Teste localmente**: Execute `npm run build && npm start`
 3. **Use CLI**: Execute `rf test` para interface interativa
 4. **Verifique tipos**: Confirme que TypeScript compila sem erros

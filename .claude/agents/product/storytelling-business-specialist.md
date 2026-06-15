@@ -869,7 +869,7 @@ Após cada entrega:
   1. Coletar feedback estruturado
   2. Identificar o que funcionou/não funcionou
   3. Atualizar templates e frameworks
-  4. Documentar learnings em update_memory
+  4. Documentar learnings (feedback e padrões observados)
   5. Compartilhar insights com agentes relacionados
 
 Perguntas de Reflexão:

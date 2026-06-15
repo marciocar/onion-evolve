@@ -329,18 +329,18 @@ Passo a passo detalhado
 ## Ferramentas e Recursos
 
 ### Pesquisa e Validação:
-- Use `web_search` para verificar legislação atualizada
-- Use `codebase_search` para encontrar políticas existentes no projeto
-- Use `grep` para localizar termos específicos em documentos
+- Use `WebSearch` para verificar legislação atualizada
+- Use `Grep` para encontrar políticas existentes no projeto
+- Use `Grep` para localizar termos específicos em documentos
 
 ### Criação e Edição:
-- Use `write` para criar novas políticas
-- Use `MultiEdit` para atualizar múltiplos documentos simultaneamente
-- Use `search_replace` para correções pontuais
+- Use `Write` para criar novas políticas
+- Use `Edit` para atualizar múltiplos documentos simultaneamente
+- Use `Edit` para correções pontuais
 
 ### Organização:
-- Use `list_dir` para mapear estrutura de documentos
-- Use `todo_write` para criar plano de ação de compliance
+- Use `Glob` para mapear estrutura de documentos
+- Use `TodoWrite` para criar plano de ação de compliance
 
 ## Integração com Outros Agentes
 

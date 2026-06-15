@@ -556,26 +556,26 @@ Documentar processo de Incident Response conforme ISO 27001 Annex A 5.24-5.28.
 ## 🛠️ Tools e Estratégias
 
 ### Ferramentas Utilizadas
-- `read_file`: Ler contexto do projeto e template
-- `write`: Criar os 5 documentos
-- `search_replace`: Atualizar documentos se necessário
-- `codebase_search`: Buscar menções de security no código
-- `grep`: Buscar configurations específicas (MFA, encryption)
+- `Read`: Ler contexto do projeto e template
+- `Write`: Criar os 5 documentos
+- `Edit`: Atualizar documentos se necessário
+- `Grep`: Buscar menções de security no código
+- `Grep`: Buscar configurations específicas (MFA, encryption)
 
 ### Estratégia de Geração
 
 **1. Ler Template Primeiro:**
 ```bash
-read_file .claude/commands/common/templates/compliance_iso27001_template.md
+Read .claude/commands/common/templates/compliance_iso27001_template.md
 ```
 
 **2. Ler Contexto do Projeto:**
 ```bash
 # Dados sensíveis
-codebase_search "What types of sensitive data does the system handle?"
+Grep "What types of sensitive data does the system handle?"
 
 # Infraestrutura
-read_file docs/technical-context/system-architecture.md
+Read docs/technical-context/system-architecture.md
 
 # Controles existentes
 grep "authentication" --type=ts
@@ -584,11 +584,11 @@ grep "encryption" --type=ts
 
 **3. Gerar 5 Documentos Sequencialmente:**
 ```bash
-write docs/compliance-context/security/information-security-policy.md
-write docs/compliance-context/security/risk-assessment.md
-write docs/compliance-context/security/asset-management.md
-write docs/compliance-context/security/access-control.md
-write docs/compliance-context/security/incident-response.md
+Write docs/compliance-context/security/information-security-policy.md
+Write docs/compliance-context/security/risk-assessment.md
+Write docs/compliance-context/security/asset-management.md
+Write docs/compliance-context/security/access-control.md
+Write docs/compliance-context/security/incident-response.md
 ```
 
 **4. Confirmar Conclusão:**

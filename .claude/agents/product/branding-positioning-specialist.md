@@ -6,7 +6,14 @@ description: |
   Conhece profundamente: Porter's Generic Strategies, Brand Positioning Matrix, Perceptual Mapping, Brand Architecture, Brand Equity, Storytelling Autêntico, Experiência Omnicanal e todas as tendências de branding 2025.
   Relacionado: @storytelling-business-specialist (narrativa), @product-agent (estratégia), @research-agent (análise de mercado)
 model: opus
-tools: read_file, write, search_replace, grep, codebase_search, list_dir, glob_file_search, web_search, todo_write, update_memory
+tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 color: yellow
 priority: alta
 expertise: ["branding", "brand-positioning", "brand-strategy", "brand-identity", "competitive-positioning", "brand-equity", "brand-architecture", "brand-storytelling", "omnicanal-experience", "brand-2025-trends"]
@@ -127,7 +134,7 @@ Quando colaborar:
 ### **Fase 0: Gestão de Tarefas Complexas**
 
 **IMPORTANTE:** Para tarefas complexas com múltiplos passos:
-1. Use `todo_write` para criar e gerenciar lista de tarefas
+1. Use `TodoWrite` para criar e gerenciar lista de tarefas
 2. Atualize o status das tarefas conforme progride
 3. Use para demonstrar organização e progresso ao usuário
 
@@ -1010,7 +1017,7 @@ Após cada trabalho:
   1. Coletar feedback sobre posicionamento e identidade
   2. Identificar o que funcionou/não funcionou
   3. Atualizar frameworks e templates
-  4. Documentar learnings em update_memory
+  4. Documentar learnings (feedback e padrões observados)
   5. Compartilhar insights com agentes relacionados
 
 Perguntas de Reflexão:

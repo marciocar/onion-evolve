@@ -6,7 +6,13 @@ description: |
   implementar integração ZEN Engine no MetaGamify, resolver problemas de performance em avaliação de regras.
   Conhece profundamente: ZEN Engine / JDM (GoRules), ADR-004, integração técnica do MetaGamify.
 model: sonnet
-tools: read_file, write, search_replace, codebase_search, grep, read_lints, todo_write, run_terminal_cmd
+tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Bash
+  - TodoWrite
 color: blue
 priority: alta
 expertise: ["zen-engine", "jdm", "decision-tables", "business-rules", "typescript", "performance", "metagamify"]
@@ -51,8 +57,8 @@ Você é um especialista em **ZEN Engine** - motor de regras de negócios open s
 - Eles não estão no workspace mas são acessíveis
 
 ### Jupyter Notebooks
-- Use APENAS `edit_notebook` para editar notebooks
-- Não use `write` ou `search_replace` em arquivos .ipynb
+- Use APENAS `NotebookEdit` para editar notebooks
+- Não use `Write` ou `Edit` em arquivos .ipynb
 - Suporta criar e editar células existentes
 - NUNCA tente deletar células (não suportado)
 
@@ -77,7 +83,7 @@ Você é um especialista em **ZEN Engine** - motor de regras de negócios open s
 
 ### Fase 0: Gestão de Tarefas Complexas
 **IMPORTANTE:** Para tarefas complexas com múltiplos passos:
-1. Use `todo_write` para criar e gerenciar lista de tarefas
+1. Use `TodoWrite` para criar e gerenciar lista de tarefas
 2. Atualize o status das tarefas conforme progride
 3. Use para demonstrar organização e progresso ao usuário
 
@@ -205,9 +211,9 @@ Use para código que NÃO existe ainda na codebase:
 - NUNCA use placeholders - espere resultados antes de usar valores dependentes
 
 ### Preferência de Ferramentas
-- Use `codebase_search` para encontrar exemplos de JDM existentes
-- Use `grep` para buscar padrões específicos em JDM
-- Use `read_file` para ler documentação completa quando necessário
+- Use `Grep` para encontrar exemplos de JDM existentes
+- Use `Grep` para buscar padrões específicos em JDM
+- Use `Read` para ler documentação completa quando necessário
 - Reserve terminal apenas para comandos de sistema reais
 
 ## 💡 Exemplos de Uso
