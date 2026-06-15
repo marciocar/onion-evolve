@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **31 arquivos** de knowledge base (exceto `index.md`)
-- **15** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **1** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
+- **33 arquivos** de knowledge base (exceto `index.md`)
+- **16** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
 
 ---
 
@@ -17,10 +17,10 @@
 
 ```
 docs/knowledge-base/
-├── concepts/          # 14 — Conceitos fundamentais
+├── concepts/          # 16 — Conceitos fundamentais
 ├── frameworks/        # 8  — Frameworks e metodologias
 ├── tools/             # 4  — Ferramentas e recursos
-├── platforms/         # 1  — Plataformas e tecnologias
+├── platforms/         # 2  — Plataformas e tecnologias
 ├── patterns/          # 1  — Padrões de implementação (SDAAL examples)
 ├── architectures/     # 1  — C4 + ADR patterns
 └── meta/              # 1  — Padrões de criação de comandos
@@ -28,7 +28,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (15)
+## 🧠 Conceitos Fundamentais (16)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Fleet Orchestration](concepts/agent-fleet-orchestration.md) — orquestração de frota: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
@@ -39,6 +39,7 @@ docs/knowledge-base/
 - [Context Window Optimization](concepts/context-window-optimization.md) — otimização de contexto, prompt caching e custo multi-agente
 - [Identificar e Precificar Dor do Cliente](concepts/identificar-precificar-dor-cliente.md) — metodologias de produto
 - [Meeting Transcription to Knowledge Base](concepts/meeting-transcription-to-knowledge-base.md) — framework EXTRACT
+- [Multi-repo Federation](concepts/multi-repo-federation.md) — contratos spec-as-code + ledger git (topologia peer)
 - [Onion Modernization Doctrine](concepts/onion-modernization-doctrine.md) — regra de inventário/SSOT e doutrina de modernização
 - [Spec-as-Code Strategy](concepts/spec-as-code-strategy.md) — hierarquia de especificações (L0-L3)
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA
@@ -72,8 +73,9 @@ docs/knowledge-base/
 
 ---
 
-## 🌐 Plataformas (1)
+## 🌐 Plataformas (2)
 
+- [Git Ledger as Working Dir](platforms/git-ledger-as-working-dir.md) — ledger git como additional working directory (prova da Fase 0 da federation)
 - [Runflow](platforms/runflow.md) — SDK e plataforma de agentes/workflows
 
 ---
