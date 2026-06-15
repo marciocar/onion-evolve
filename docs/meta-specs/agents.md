@@ -59,9 +59,16 @@ tools: [<lista de tools necessárias>]
 ---
 name: product-agent
 description: Especialista em gestão de projetos e produtos AI que coordena iniciativas e especifica funcionalidades. Use para gerenciamento estratégico de produto e coordenação de equipes. Relacionado: @task-specialist, @clickup-specialist.
-tools: [read_file, write, codebase_search, grep, list_dir, web_search, todo_write, run_terminal_cmd]
+tools: [Read, Write, Grep, Glob, WebSearch, TodoWrite, Bash]
 ---
 ```
+
+> **Nomes de tool válidos (Claude Code):** `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob`,
+> `WebSearch`, `WebFetch`, `TodoWrite`, `NotebookEdit`, `Task` — mais tools MCP (`mcp_*`).
+> **NUNCA** use nomes de outras IDEs (`read_file`, `run_terminal_cmd`, `codebase_search`,
+> `list_dir`, `search_replace`, `web_search`, `todo_write`, `glob_file_search`): não existem no
+> Claude Code e o subagente fica **sem ferramentas** (`tool_uses:0` → abstém ou alucina).
+> Validado pelo lint (`check_agent_tool_names`).
 
 ---
 
@@ -148,8 +155,8 @@ Quando um agente depende de MCP (Model Context Protocol), declarar no campo `too
 
 ```yaml
 tools:
-  - read_file
-  - write
+  - Read
+  - Write
   - mcp_ClickUp_clickup_create_task
   - mcp_ClickUp_clickup_update_task
   - mcp_ClickUp_clickup_get_workspace_hierarchy

@@ -5,12 +5,11 @@ description: |
   Use para melhorias práticas, detecção de bugs e problemas reais.
 model: opus
 tools:
-  - read_file
-  - codebase_search
-  - grep
-  - run_terminal_cmd
-  - web_search
-  - todo_write
+  - Read
+  - Grep
+  - Bash
+  - WebSearch
+  - TodoWrite
 
 color: green
 priority: alta

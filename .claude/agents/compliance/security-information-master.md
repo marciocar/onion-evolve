@@ -5,13 +5,12 @@ description: |
   Use para análise de requisitos e coordenação de especialistas de compliance.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: blue
 priority: alta

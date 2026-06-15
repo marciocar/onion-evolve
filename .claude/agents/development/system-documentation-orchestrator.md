@@ -5,16 +5,14 @@ description: |
   Use para criar documentação completa de arquitetura e ambiente para projetos NX Monorepo.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - codebase_search
-  - list_dir
-  - glob_file_search
-  - web_search
-  - todo_write
-  - run_terminal_cmd
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
+  - Bash
 
 color: blue
 priority: alta

@@ -5,14 +5,13 @@ description: |
   Use para estimar tarefas, quebrar épicos e calibrar velocity do time. Relacionado: @product-agent, @task-specialist.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
-  - run_terminal_cmd
+  - Read
+  - Write
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
+  - Bash
 
 color: purple
 priority: alta

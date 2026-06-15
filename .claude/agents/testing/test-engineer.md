@@ -5,13 +5,12 @@ description: |
   Use para implementação de testes e verificação de qualidade de código.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - run_terminal_cmd
-  - grep
-  - codebase_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - TodoWrite
 
 color: cyan
 priority: média

@@ -36,6 +36,9 @@
 #  11. SDAAL: método de taskManager./tm./forge. usado no consumidor deve EXISTIR
 #      na interface (ITaskManager/IForge) [HARD] — pega método agnóstico inventado
 #      (ex.: getTaskList em vez de searchTasks) que o grep anti-MCP não vê
+#  12. Nomes de tool de agente: estilo-Cursor (read_file, run_terminal_cmd, …)
+#      [HARD] — não existem no Claude Code, deixam o subagente sem ferramentas;
+#      MCP de underscore único (mcp_<Server>_…) [HARD] — formato é mcp__server__tool
 # =============================================================================
 
 set -euo pipefail
@@ -362,12 +365,40 @@ ${where}"
 }
 
 # ===========================================================================
+# REGRA 12 — Nomes de tool de agente válidos no Claude Code
+#   Cursor-style (read_file, run_terminal_cmd, …) [HARD] — sem ferramentas;
+#   MCP underscore único (mcp_<Server>_…) [HARD] — formato é mcp__server__tool
+# ===========================================================================
+check_agent_tool_names() {
+  local CURSOR='read_file|write|search_replace|run_terminal_cmd|codebase_search|grep|glob_file_search|list_dir|web_search|todo_write|read_lints|update_memory'
+  while IFS= read -r -d '' agent; do
+    while IFS= read -r tool; do
+      [ -z "${tool}" ] && continue
+      if echo "${tool}" | grep -qE "^(${CURSOR})$"; then
+        violation "HARD" "${agent}" "tool name estilo-Cursor: '${tool}' — use nome nativo do Claude Code (Read/Write/Edit/Bash/Grep/Glob/WebSearch/WebFetch/TodoWrite)"
+      elif echo "${tool}" | grep -qE '^mcp_[A-Za-z]' && ! echo "${tool}" | grep -qE '^mcp__'; then
+        violation "HARD" "${agent}" "tool MCP em formato inválido: '${tool}' — Claude Code usa 'mcp__<server>__<tool>' (duplo underscore)"
+      fi
+    done < <(awk '
+      /^tools:[[:space:]]*\[/ {
+        s=$0; sub(/^tools:[[:space:]]*\[/,"",s); sub(/\].*$/,"",s);
+        n=split(s,a,","); for(i=1;i<=n;i++){ gsub(/[[:space:]"]/,"",a[i]); if(a[i]!="") print a[i] } next
+      }
+      /^tools:/ { inblk=1; next }
+      inblk && /^[^[:space:]#]/ { inblk=0 }
+      inblk && /^[[:space:]]*-/ { t=$0; sub(/^[[:space:]]*-[[:space:]]*/,"",t); sub(/[[:space:]#].*$/,"",t); if(t!="") print t }
+    ' "${agent}")
+  done < <(find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
 echo ""
 
 check_agent_frontmatter
+check_agent_tool_names
 check_command_description
 check_no_gpt4_model
 check_no_mcp_onion_orchestrator

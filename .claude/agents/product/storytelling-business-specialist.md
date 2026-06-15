@@ -5,15 +5,13 @@ description: |
   Use para pitches, case studies, reports executivos. Relacionado: @product-agent, @gamma-api-specialist.
 model: opus
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - codebase_search
-  - list_dir
-  - glob_file_search
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: yellow
 priority: alta

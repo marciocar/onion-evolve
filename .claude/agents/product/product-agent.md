@@ -5,14 +5,13 @@ description: |
   Use para gerenciamento estratégico de produto e coordenação de equipes. Relacionado: @task-specialist, @clickup-specialist.
 model: opus
 tools:
-  - read_file
-  - write
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
-  - run_terminal_cmd
+  - Read
+  - Write
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
+  - Bash
 
 color: yellow
 priority: alta

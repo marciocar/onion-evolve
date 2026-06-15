@@ -5,14 +5,13 @@ description: |
   Use para revisar políticas, analisar riscos e criar documentação de conformidade.
 model: opus
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: green
 priority: alta

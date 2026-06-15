@@ -5,15 +5,13 @@ description: |
   Use para documentação estruturada complementando diagramas do @c4-architecture-specialist.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - glob_file_search
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: blue
 priority: alta

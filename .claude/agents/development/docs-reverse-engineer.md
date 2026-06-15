@@ -5,15 +5,13 @@ description: |
   Use para detecção de stack e geração de docs consolidada de qualquer projeto.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - list_dir
-  - glob_file_search
-  - codebase_search
-  - grep
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - WebSearch
+  - TodoWrite
 
 color: purple
 priority: alta

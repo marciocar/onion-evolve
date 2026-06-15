@@ -5,16 +5,14 @@ description: |
   Use para resolver breaking changes, validar workspace e upgrades NX.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - codebase_search
-  - list_dir
-  - glob_file_search
-  - run_terminal_cmd
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - WebSearch
+  - TodoWrite
 
 color: teal
 priority: alta

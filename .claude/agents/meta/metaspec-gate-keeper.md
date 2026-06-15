@@ -5,13 +5,12 @@ description: |
   Use para validação de conformidade arquitetural e integridade de contexto.
 model: opus
 tools:
-  - read_file
-  - codebase_search
-  - grep
-  - list_dir
-  - run_terminal_cmd
-  - web_search
-  - todo_write
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - WebSearch
+  - TodoWrite
 
 color: red
 priority: alta

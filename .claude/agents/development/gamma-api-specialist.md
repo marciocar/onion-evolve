@@ -5,16 +5,14 @@ description: |
   Use para integrações técnicas e automações com Gamma. Relacionado: @presentation-orchestrator.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - codebase_search
-  - list_dir
-  - glob_file_search
-  - run_terminal_cmd
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - WebSearch
+  - TodoWrite
 
 color: blue
 priority: alta

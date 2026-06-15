@@ -5,12 +5,11 @@ description: |
   Use para garantir alinhamento arquitetural antes do merge.
 model: sonnet
 tools:
-  - read_file
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: red
 priority: alta

@@ -6,16 +6,14 @@ description: |
   Use para navegar o Sistema Onion, recomendar comandos e coordenar workflows complexos.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - codebase_search
-  - list_dir
-  - glob_file_search
-  - web_search
-  - run_terminal_cmd
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - Bash
+  - TodoWrite
 
 color: black
 priority: alta
