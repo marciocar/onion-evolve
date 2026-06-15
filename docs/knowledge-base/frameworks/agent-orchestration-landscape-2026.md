@@ -8,7 +8,7 @@
 |-------|-------|
 | **Versão** | 1.0.0 |
 | **Data de Criação** | 2026-06-13 |
-| **Última Atualização** | 2026-06-13 |
+| **Última Atualização** | 2026-06-15 |
 | **Categoria** | Frameworks |
 | **Método** | Pesquisa multi-fonte via `/meta:fleet` (fan-out-and-synthesize) + verificação adversarial (Opus) |
 | **Aplicação** | Posicionamento da camada de frota do Onion vs. estado da arte |
@@ -23,6 +23,7 @@
 - Gartner — press release "over 40% of agentic AI projects canceled by 2027" (25/jun/2025)
 - arXiv 2601.13671 — *The Orchestration of Multi-Agent Systems* (jan/2026); arXiv 2603.22386 — *From Static Templates to Dynamic Runtime Graphs*
 - Cursor 3 (Agents Window, worktree isolation) — InfoQ, jun/2026; Microsoft Agent Framework (MAF) GA — devblogs.microsoft.com (abr/2026); AWS Bedrock AgentCore — docs/announcements (2026)
+- [Linux Foundation — A2A Protocol Project](https://www.linuxfoundation.org/press/linux-foundation-launches-the-agent2agent-protocol-project-to-enable-secure-intelligent-communication-between-ai-agents); [Google Developers — Announcing A2A](https://developers.googleblog.com/en/a2a-a-new-era-of-agent-interoperability/) (A2A sob Linux Foundation; **150+ organizações em abr/2026**, adoção parcialmente self-report)
 
 ---
 
@@ -46,7 +47,7 @@ Em 2026, "orquestração de agentes" deixou de ser pesquisa e virou **infraestru
 
 ## ✅ Convergências (verificadas, cross-source)
 
-1. **MCP + A2A como backbone** — Model Context Protocol (ferramentas) + Agent2Agent (delegação peer), sob a Linux Foundation desde dez/2025. Aparece nas **5 correntes** (confirmado: arXiv 2601.13671).
+1. **MCP + A2A como backbone** — Model Context Protocol (ferramentas) + Agent2Agent (delegação peer), sob a Linux Foundation desde dez/2025. Aparece nas **5 correntes** (confirmado: arXiv 2601.13671). Atualização abr/2026: A2A passa de ~50 (lançamento, abr/2025) para **150+ organizações** (Atlassian, Salesforce, SAP, ServiceNow, MongoDB, PayPal…), com Agent Cards para descoberta de capacidade — consolidando-se como a **camada de interop entre vendors**.
 2. **Supervisor / orchestrator-worker é o padrão dominante** em produção (4 de 5 correntes); **swarm/peer-to-peer** é relegado a exploração/back-office por baixa controlabilidade.
 3. **Isolamento por sandbox / worktree / microVM** é a solução de design consensual contra colisão de estado entre agentes paralelos.
 4. **Risco de governança/custo é real** — Gartner: >40% dos projetos agentic cancelados até 2027 (press release primário, 25/jun/2025).
@@ -96,6 +97,12 @@ A camada de frota do Onion (ver [agent-fleet-orchestration.md](../concepts/agent
 - Mantém a orquestração no **nível principal** (skill/comando), respeitando `architecture.md §4.2`.
 
 **Onde o Onion deve avançar para uma versão confiável** (gaps transversais que ninguém resolve): guardrails de **segurança adversarial** em fan-out, **verificação automatizada** (não manual) e **modelo de custo/break-even**. Estes pontos são objeto de auditoria contínua via `/meta:fleet`.
+
+### Por que o Onion não adota A2A vivo (federação)
+
+A "multi-repo federation" do Onion (ver [multi-repo-federation.md](../concepts/multi-repo-federation.md)) **não é** federação A2A — é coordenação de **repositórios soberanos** via **git assíncrono + contratos spec-as-code**, com humano-maestro. Instâncias vivas A2A / runtime distribuído são **linha vermelha abandonada** (Fase 5, 2026-05-18). A escolha é **defensável para o escopo do Onion**: A2A vivo traria exatamente os modos de falha que este landscape marca como **não resolvidos por ninguém** (segurança adversarial cross-agent, break-even de custo, reprodutibilidade regulada, baixa rastreabilidade). O git como spine entrega a **trilha de auditoria durável** que falta às plataformas A2A.
+
+**Meio-termo ainda não explorado:** o A2A de jun/2026 padroniza também **descoberta de capacidade** (Agent Cards) — conceitualmente irmã de `members.yaml` + `contracts/`. Adotar o **formato** A2A de contrato/discovery (interop de formato, **não** de runtime) seria compatível com a filosofia git-async sem violar a linha vermelha. Candidato a ADR. Análise completa: [onion-federation-review-2026-06.md](../../analysis/onion-federation-review-2026-06.md).
 
 ---
 
