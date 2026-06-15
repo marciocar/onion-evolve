@@ -1,6 +1,6 @@
 # 📚 Índice Central de Documentação
 
-> **Última atualização**: 2026-05-18 | **Gerado por**: `/docs:build-index` | **Revisado**: auditoria manual
+> **Última atualização**: 2026-06-15 | **Gerado por**: `/docs:build-index` | **Revisado**: auditoria manual
 
 Bem-vindo ao índice central de documentação do projeto. Este documento serve como hub de navegação para toda a documentação disponível.
 
@@ -10,7 +10,7 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- 🤖 **77 comandos invocáveis** Claude Code em 9 categorias (+ 13 fragmentos compartilhados em `common/` e 3 READMEs)
+- 🤖 **82 comandos invocáveis** Claude Code em 9 categorias + root (+ 16 fragmentos compartilhados em `common/` e 3 READMEs)
 - 🎯 **49 agentes de IA especializados** em 9 categorias
 - 🧩 **5 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-fleet` — orquestração de frota)
 - 📚 **Knowledge Bases estruturadas** para consumo por IA
@@ -23,43 +23,43 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **66 arquivos markdown** em `docs/`
-- **11 arquivos** em `docs/onion/` (Sistema Onion)
-- **32 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
-  - 13 arquivos em `concepts/` (Conceitos fundamentais)
-  - 12 arquivos em `frameworks/` (Frameworks e metodologias)
-  - 3 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
-  - 1 arquivo em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 1 em `meta/`
+- **72 arquivos markdown** em `docs/`
+- **15 arquivos** em `docs/onion/` (Sistema Onion)
+- **34 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
+  - 16 arquivos em `concepts/` (Conceitos fundamentais)
+  - 8 arquivos em `frameworks/` (Frameworks e metodologias)
+  - 4 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
+  - 2 em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 1 em `meta/`
   - 1 `index.md`
 - **1 arquivo** em `docs/meta-specs/` (Meta Especificações)
 - Arquivos adicionais em `docs/analysis/`, `docs/plans/`, `docs/applying/`, `docs/sdaal/`
 - **3 contextos spec-as-code** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`
 
 ### Sistema Onion (`.claude/`)
-- **77 comandos invocáveis** Claude Code distribuídos em:
+- **82 comandos invocáveis** Claude Code distribuídos em:
+  - 21 em `meta/` (meta-comandos, criadores, validação, orquestração de frota, frescor de KB e federação)
   - 20 em `product/` (gestão de produto e descoberta)
-  - 12 em `git/` (GitFlow e versionamento)
   - 11 em `engineer/` (engenharia e desenvolvimento)
   - 11 em `docs/` (geração e validação de documentação)
-  - 13 em `meta/` (meta-comandos, criadores, validação, orquestração de frota e frescor de KB)
   - 6 em `validate/` (validação e testes)
+  - 6 em `git/` (GitFlow e versionamento)
   - 3 em `test/` (unit, integration, e2e)
   - 1 em `development/`, 1 em `quick/`
   - 2 no root: `onion.md`, `warm-up.md`
-  - **não-invocáveis**: 13 fragmentos em `common/` (5 templates + 8 prompts) e 3 READMEs de categoria
+  - **não-invocáveis**: 16 fragmentos em `common/` (5 templates + 11 prompts) e 3 READMEs de categoria
 - **5 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-fleet`)
 - **49 agentes** IA distribuídos em:
-  - 20 em `development/` (frontend, backend, infra, integrações)
-  - 8 em `product/` (gestão e narrativa)
+  - 18 em `development/` (frontend, backend, infra, integrações)
+  - 9 em `product/` (gestão e narrativa)
   - 5 em `compliance/` (ISO 27001, ISO 22301, SOC2, PMBOK, governance)
   - 5 em `meta/` (orquestração, criação, validação, skills)
-  - 4 em `git/` (review pré-PR)
+  - 5 em `git/` (review pré-PR)
   - 3 em `testing/`, 2 em `review/`
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **66 arquivos** de documentação markdown
-- **77 comandos invocáveis** em 9 categorias + root (+ 13 fragmentos `common/` + 3 READMEs)
+- **72 arquivos** de documentação markdown
+- **82 comandos invocáveis** em 9 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
 - **49 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
 
@@ -71,32 +71,41 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 docs/
 ├── INDEX.md                    # Este arquivo (hub central)
 │
-├── onion/                      # Sistema Onion (11 arquivos)
+├── onion/                      # Sistema Onion (15 arquivos)
 │   ├── index.md                # Índice da seção
+│   ├── inventory.md            # SSOT de contagens (gerado por /meta:inventory)
 │   ├── commands-guide.md       # Guia completo de comandos
 │   ├── agents-reference.md     # Referência de agentes
 │   ├── engineering-flows.md    # Fluxos de engenharia
 │   ├── practical-examples.md   # Exemplos práticos
 │   ├── getting-started.md      # Configuração inicial
+│   ├── naming-conventions.md   # Padrões de <feature-slug>
+│   ├── maintenance-checklist.md # Guia de manutenção
+│   ├── ci.md                   # CI / code-review automatizado
 │   ├── testing-validation-system.md  # Sistema de testes e validação
 │   ├── claude-code-commands-architecture.md  # Arquitetura de comandos
 │   ├── end-to-end-validation-tests.md  # Testes de validação E2E
+│   ├── ESPERANTO.md            # documento do framework
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
-├── knowledge-base/             # Knowledge Bases (32 arquivos)
-│   ├── concepts/               # Conceitos fundamentais (13 arquivos)
+├── knowledge-base/             # Knowledge Bases (34 arquivos, incl. index)
+│   ├── concepts/               # Conceitos fundamentais (16 arquivos)
 │   │   ├── abstraction-patterns-catalog.md
-│   │   ├── agent-fleet-orchestration.md  # ✨ NOVO
+│   │   ├── agent-fleet-orchestration.md
 │   │   ├── ai-agent-design-patterns.md
 │   │   ├── branding-posicionamento-marca.md
 │   │   ├── configuration-management.md
+│   │   ├── consolidated-to-tasks-patterns.md
 │   │   ├── context-window-optimization.md
 │   │   ├── identificar-precificar-dor-cliente.md
 │   │   ├── meeting-transcription-to-knowledge-base.md
+│   │   ├── multi-repo-federation.md          # federação (Fases 1-3)
+│   │   ├── onion-modernization-doctrine.md   # doutrina de /meta:evolve
 │   │   ├── spec-as-code-strategy.md
-│   │   ├── spec-driven-development.md  # ✨ NOVO
+│   │   ├── spec-driven-development.md
 │   │   ├── specification-driven-ai-abstraction-layer.md
-│   │   └── task-manager-abstraction.md
+│   │   ├── task-manager-abstraction.md
+│   │   └── worklog-protocol.md                # contrato de sessão
 │   ├── frameworks/             # Frameworks e metodologias (8 arquivos)
 │   │   ├── agent-orchestration-landscape-2026.md
 │   │   ├── framework-story-points.md
@@ -106,11 +115,13 @@ docs/
 │   │   ├── collaborative-testing-patterns.md
 │   │   ├── test-strategy-scoring.md
 │   │   └── spec-driven-development-tools-2025.md
-│   ├── platforms/              # Plataformas e tecnologias (1 arquivo)
+│   ├── platforms/              # Plataformas e tecnologias (2 arquivos)
+│   │   ├── git-ledger-as-working-dir.md  # ledger da federação (Fase 0)
 │   │   └── runflow.md
-│   ├── tools/                  # Ferramentas e recursos (3 arquivos)
+│   ├── tools/                  # Ferramentas e recursos (4 arquivos)
 │   │   ├── agent-skills.md
 │   │   ├── claude-code-commands-best-practices-2026.md
+│   │   ├── docker-deployment.md
 │   │   └── whisper.md          # Knowledge base do Whisper
 │   ├── patterns/               # Padrões de implementação (1 arquivo)
 │   │   └── sdaal-examples.md
