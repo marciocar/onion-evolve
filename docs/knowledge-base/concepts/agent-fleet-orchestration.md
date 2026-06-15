@@ -6,9 +6,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.1.0 |
+| **Versão** | 1.2.0 |
 | **Data de Criação** | 2026-06-13 |
-| **Última Atualização** | 2026-06-13 |
+| **Última Atualização** | 2026-06-15 |
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Camada de Frota de Agentes |
 
@@ -21,10 +21,12 @@
 - [Agent View — General Availability](https://docs.claude.com/en/docs/claude-code/agent-view) — observabilidade de frota (GA, mai/2026)
 - [Building Effective Agents — Anthropic](https://www.anthropic.com/engineering/building-effective-agents) — padrões canônicos de orquestração (2026)
 - [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — doutrina da "era da orquestração"
+- [Claude Code — Agent Teams](https://code.claude.com/docs/en/agent-teams) — substrato experimental de peers persistentes (`TeamCreate`/`SendMessage`/task list compartilhada), atrás de `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
 
 **Relacionados no Onion:**
 
 - [`ai-agent-design-patterns.md`](ai-agent-design-patterns.md) — KB irmã (design de agentes)
+- [`docs/analysis/onion-agent-teams-evaluation-2026-06.md`](../../analysis/onion-agent-teams-evaluation-2026-06.md) — decisão de framework sobre Agent Teams (opt-in, não padrão)
 
 ---
 
@@ -67,6 +69,52 @@ Frota **não é default**. Ela paga overhead de coordenação, multiplica custo 
 - **Contexto profundamente compartilhado** — quando todos os subagentes precisariam do mesmo contexto grande, replicá-lo por worker desperdiça tokens; um agente único com bom context boundary pode ganhar.
 
 **Regra de bolso:** frota se justifica quando `largura × independência` é alta o suficiente para amortizar o custo de coordenação e síntese.
+
+---
+
+## 🔀 Dois Substratos de Orquestração: Workflow vs Agent Teams
+
+> **Status (jun/2026):** Agent Teams é **experimental**, atrás da flag `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (off por default). O substrato **default e portável** da frota Onion é a ferramenta **Workflow**. Esta seção fixa a fronteira; a decisão de framework está registrada em [`docs/analysis/onion-agent-teams-evaluation-2026-06.md`](../../analysis/onion-agent-teams-evaluation-2026-06.md).
+
+Decididos a usar uma frota (acima), restam **dois substratos** com modelos de coordenação opostos. Não competem — cobrem **shapes de trabalho diferentes**:
+
+| | **Workflow** (default) | **Agent Teams** (opt-in, experimental) |
+|---|---|---|
+| Modelo | Fan-out de workers **stateless** | Peers **persistentes** + mailbox |
+| Coordenação | **Determinística** — script JS controla o grafo (loop/cond/`parallel`/`pipeline`) | **Emergente** — agentes negociam em runtime via `SendMessage` |
+| Estado | Efêmero; resultados retornam ao script | Idle entre turnos; **task list compartilhada** (`owner`/`blockedBy`) |
+| Retomável | Sim (journal de run) | Parcial (sem resumption de teammate in-process) |
+| Custo de coordenação | **0 tokens** (roda em JS) | Tokens (cada turno de teammate + lead) |
+| Auditável | Alto (grafo explícito, determinístico) | Menor (coordenação emergente) |
+| Substrato | ferramenta `Workflow` | `TeamCreate` / `SendMessage` / task list nativa |
+
+### Decisão: qual substrato
+
+```
+A forma do trabalho é CONHECIDA antes de começar (decompõe-se num grafo)?
+├── SIM → Workflow. Determinístico, 0-token de coordenação, retomável, auditável.
+│         (auditoria, migração, review, pesquisa, generate-and-filter, tournament…)
+└── NÃO → o trabalho exige NEGOCIAÇÃO VIVA entre sub-streams, ou redirecionamento
+          humano no meio do voo?
+          ├── SIM → Agent Teams — SE a flag estiver on; senão degrade p/ Workflow/serial.
+          │         (ex.: agente de front e de back acertando um contrato de API em tempo real)
+          └── NÃO → Workflow.
+```
+
+**Regra de bolso:** Workflow é o **default**. Agent Teams só ganha quando a coordenação **não pode ser pré-desenhada** como grafo — quando os agentes precisam *conversar* para decidir o próximo passo. Se você consegue escrever o grafo, Workflow é mais barato, mais auditável e portável.
+
+> **Sessões faseadas ≠ frota.** Lembre que os workflows faseados retomáveis (`.claude/sessions/`, p.ex. `engineer/plan→pr-update`) são o **backbone** de trabalho single-thread com humano no loop — outra camada, que **nenhum** dos dois substratos de frota substitui. Frota (Workflow ou Agent Teams) paraleliza *dentro* de uma fase, não funde fases.
+
+### Postura no Onion: capacidade opt-in com fallback gracioso
+
+Agent Teams entra como **terceiro modo opt-in**, nunca requisito duro — mesmo espírito **SDAAL** dos adapters de forge/task-manager:
+
+- **Detecção de capacidade:** `onion-fleet` verifica `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` antes de preferir Agent Teams.
+- **Fallback gracioso:** flag off → degrade para Workflow (ou serial), avisando em pt-BR; **nunca** assumir a flag ligada.
+- **Portabilidade preservada:** o Onion é template instalável em **qualquer** projeto; não pode depender de feature experimental gated → o default permanece Workflow.
+- **Mesma invariante arquitetural:** orquestre no **nível principal** (skill/comando) — o "lead" do time é a própria sessão principal. **Nunca** dentro de um agente (§4.2; ver [Aplicação no Onion](#-aplicação-no-onion)).
+
+> Reavaliar quando Agent Teams sair de experimental: a ressalva de portabilidade cai e a fronteira pode ser revista.
 
 ---
 
