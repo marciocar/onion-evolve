@@ -23,7 +23,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **74 arquivos markdown** em `docs/`
+- **80 arquivos markdown** em `docs/`
 - **15 arquivos** em `docs/onion/` (Sistema Onion)
 - **35 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
   - 16 arquivos em `concepts/` (Conceitos fundamentais)
@@ -32,6 +32,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 2 em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
   - 1 `index.md`
 - **1 arquivo** em `docs/meta-specs/` (Meta Especificações)
+- **6 arquivos** em `docs/materials/` (materiais derivados externos — Fase 4): landing page, manual, case studies, artigo crítico, press kit, README
 - Arquivos adicionais em `docs/analysis/`, `docs/plans/`, `docs/applying/`, `docs/sdaal/`
 - **3 contextos spec-as-code** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`
 
@@ -58,7 +59,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **74 arquivos** de documentação markdown
+- **80 arquivos** de documentação markdown
 - **82 comandos invocáveis** em 9 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
 - **49 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
@@ -138,6 +139,14 @@ docs/
 │   ├── onion-review-2026-05.md         # SSOT de identidade
 │   ├── onion-vv-baseline-2026-06.md    # baseline de V&V (usada por /meta:evolve)
 │   └── onion-evolution-2026-06-15.md   # auditoria mais recente
+│
+├── materials/                  # Materiais derivados externos (Fase 4 — 6 arquivos)
+│   ├── README.md               # Índice e guia de uso dos materiais
+│   ├── landing-page.md         # Esqueleto da landing page
+│   ├── manual-toc.md           # Sumário do manual técnico
+│   ├── case-studies.md         # 3 case studies desenvolvidos
+│   ├── critical-article-outline.md  # Outline de artigo crítico
+│   └── press-kit.md            # One-pager, FAQ imprensa, bio, citações
 │
 ├── sdaal/                      # Specification-Driven AI Abstraction Layer
 │   └── [documentação SDAAL]
@@ -387,6 +396,7 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 | 📊 **Análises** | `docs/analysis/` | Análises e estudos |
 | 📋 **Planos** | `docs/plans/` | Planos de execução |
 | 🔧 **SDAAL** | `docs/sdaal/` | Specification-Driven AI Abstraction Layer |
+| 🌐 **Materiais Externos** | `docs/materials/` | Landing page, manual, case studies, press kit (Fase 4) |
 
 ### Por Categoria de Comando
 
@@ -498,7 +508,7 @@ Este índice é gerado automaticamente pelo comando `/docs/build-index`.
 /docs/build-index onion        # Reconstruir índice da seção onion
 ```
 
-**Última atualização:** 2026-06-15
+**Última atualização:** 2026-06-15 (Fase 4 — materiais externos adicionados)
 **Mantido por:** Sistema Onion
 
 ---
