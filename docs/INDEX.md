@@ -23,13 +23,13 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **72 arquivos markdown** em `docs/`
+- **74 arquivos markdown** em `docs/`
 - **15 arquivos** em `docs/onion/` (Sistema Onion)
-- **34 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
+- **35 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
   - 16 arquivos em `concepts/` (Conceitos fundamentais)
   - 8 arquivos em `frameworks/` (Frameworks e metodologias)
   - 4 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
-  - 2 em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 1 em `meta/`
+  - 2 em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
   - 1 `index.md`
 - **1 arquivo** em `docs/meta-specs/` (Meta Especificações)
 - Arquivos adicionais em `docs/analysis/`, `docs/plans/`, `docs/applying/`, `docs/sdaal/`
@@ -58,7 +58,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **72 arquivos** de documentação markdown
+- **74 arquivos** de documentação markdown
 - **82 comandos invocáveis** em 9 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
 - **49 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
@@ -88,7 +88,7 @@ docs/
 │   ├── ESPERANTO.md            # documento do framework
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
-├── knowledge-base/             # Knowledge Bases (34 arquivos, incl. index)
+├── knowledge-base/             # Knowledge Bases (35 arquivos, incl. index)
 │   ├── concepts/               # Conceitos fundamentais (16 arquivos)
 │   │   ├── abstraction-patterns-catalog.md
 │   │   ├── agent-fleet-orchestration.md
@@ -127,8 +127,9 @@ docs/
 │   │   └── sdaal-examples.md
 │   ├── architectures/          # C4 + ADR (1 arquivo)
 │   │   └── c4-adr-patterns.md
-│   └── meta/                   # Criação de comandos (1 arquivo)
-│       └── command-creation-patterns.md
+│   └── meta/                   # Criação de comandos + identidade/produto (2 arquivos)
+│       ├── command-creation-patterns.md
+│       └── onion-framework-identity.md
 │
 ├── meta-specs/                 # Meta Especificações (1 arquivo)
 │   └── index.md                # Índice de meta specs
@@ -497,7 +498,7 @@ Este índice é gerado automaticamente pelo comando `/docs/build-index`.
 /docs/build-index onion        # Reconstruir índice da seção onion
 ```
 
-**Última atualização:** 2026-05-15
+**Última atualização:** 2026-06-15
 **Mantido por:** Sistema Onion
 
 ---
