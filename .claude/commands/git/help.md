@@ -2,6 +2,7 @@
 name: help
 description: Ajuda contextual para comandos GitFlow do Sistema Onion.
 model: sonnet
+allowed-tools: Read Bash(git *)
 category: git
 tags: [help, gitflow, documentation]
 version: "3.0.0"

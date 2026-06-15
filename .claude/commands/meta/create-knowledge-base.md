@@ -2,6 +2,7 @@
 name: create-knowledge-base
 description: Gerar knowledge base estruturada em `docs/knowledge-base/<category>/`.
 model: sonnet
+allowed-tools: Write Bash(test -d *) Bash(mkdir -p *) Bash(ls *)
 
 parameters:
   - name: topic

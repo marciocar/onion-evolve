@@ -2,6 +2,7 @@
 name: workflow
 description: Validar completude de workflows do Sistema Onion.
 model: sonnet
+allowed-tools: Read Bash(git *) Bash(find .claude/sessions*) Bash(ls .claude/sessions*) Bash(grep *)
 category: validate
 tags: [validation, workflow, completeness]
 version: "3.0.0"

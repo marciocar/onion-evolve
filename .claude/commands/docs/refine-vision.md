@@ -2,6 +2,7 @@
 name: refine-vision
 description: Refinar visão e estratégia do produto/projeto.
 model: sonnet
+allowed-tools: Read Write Bash(find *)
 category: docs
 tags: [vision, strategy, refinement]
 version: "3.0.0"

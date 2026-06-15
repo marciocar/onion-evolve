@@ -2,6 +2,7 @@
 name: plan
 description: Planejamento de feature. Analisa e cria plano estruturado.
 model: sonnet
+allowed-tools: Read Write WebSearch Bash(find *) Bash(ls *)
 category: engineer
 tags: [planning, architecture, design]
 version: "3.0.0"

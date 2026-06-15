@@ -5,6 +5,7 @@ description: |
   Trabalha identidade e posicionamento via @branding-positioning-specialist,
   usando docs/business-context/ como base de decisão.
 model: sonnet
+allowed-tools: Read Edit
 category: product
 tags: [branding, positioning, marketing]
 version: "3.0.0"

@@ -2,6 +2,7 @@
 name: build-tech-docs
 description: Gerar arquitetura de contexto técnico em `docs/technical-context/`.
 model: sonnet
+allowed-tools: Read Write Bash(git *) Bash(cat .env*) Bash(find *) Bash(ls *)
 
 parameters:
   - name: sources

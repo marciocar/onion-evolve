@@ -4,6 +4,7 @@ description: |
   Preparação de contexto técnico e de engenharia.
   Foca em arquitetura, padrões de código, estrutura do projeto, comandos de desenvolvimento e frameworks técnicos.
 model: sonnet
+allowed-tools: Read Grep Bash(find *)
 category: engineer
 tags: [warmup, context, engineering, technical]
 version: "3.0.0"
