@@ -70,7 +70,7 @@ fi
 
 ```bash
 # Ler transcrição(ões)
-read_file "{{source}}"
+Read "{{source}}"
 ```
 
 ### Passo 3: Aplicar Framework EXTRACT

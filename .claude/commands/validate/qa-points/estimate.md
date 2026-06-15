@@ -84,8 +84,8 @@ Fornecer estimativas precisas de esforço de teste através de:
 Ler antes de qualquer cálculo:
 
 ```bash
-read_file docs/knowledge-base/frameworks/framework-testes.md       # conceito + fórmula + conversão p/ horas
-read_file docs/knowledge-base/frameworks/qa-story-points.md        # tabelas de cálculo, keywords, técnicas
+Read docs/knowledge-base/frameworks/framework-testes.md       # conceito + fórmula + conversão p/ horas
+Read docs/knowledge-base/frameworks/qa-story-points.md        # tabelas de cálculo, keywords, técnicas
 ```
 
 SE `framework-testes.md` não encontrado:

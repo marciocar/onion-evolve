@@ -84,14 +84,14 @@ description: |
   Use para [caso de uso principal].
 model: sonnet
 tools:
-  - read_file
+  - Read
   - write
-  - search_replace
-  - codebase_search
+  - Edit
+  - Grep
   - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: [cor apropriada]
 priority: [alta/média/baixa]

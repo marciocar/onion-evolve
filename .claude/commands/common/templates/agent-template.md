@@ -15,17 +15,15 @@ description: |
   Descrição clara em 1-2 linhas do propósito do agente.
   Use para [caso de uso principal]. Relacionado: @agente1, @agente2.
 model: sonnet                    # sonnet | opus | haiku | fable
-tools:                           # Ferramentas GENÉRICAS (agnóstico)
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - glob_file_search
-  - web_search
-  - todo_write
-  - run_terminal_cmd
+tools:                           # Ferramentas nativas do Claude Code
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - WebSearch
+  - TodoWrite
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # METADATA
@@ -71,7 +69,7 @@ updated: "2025-11-24"
 | `name` | string | Identificador único kebab-case | `code-reviewer` |
 | `description` | string | Descrição em 1-2 linhas | `Especialista em revisão...` |
 | `model` | enum | Modelo de IA | `sonnet`, `opus`, `haiku`, `fable` |
-| `tools` | array | Ferramentas disponíveis | `[read_file, write, ...]` |
+| `tools` | array | Ferramentas disponíveis | `[Read, Write, Edit, ...]` |
 | `version` | semver | Versão do agente | `"1.0.0"` |
 | `updated` | date | Data da última atualização | `"2025-11-24"` |
 
@@ -118,24 +116,22 @@ executam em paralelo.
 
 ```yaml
 tools:
-  - read_file          # Ler arquivos
-  - write              # Escrever arquivos
-  - search_replace     # Editar arquivos
-  - codebase_search    # Busca semântica
-  - grep               # Busca por padrão
-  - list_dir           # Listar diretórios
-  - glob_file_search   # Buscar arquivos por glob
-  - web_search         # Pesquisa web
-  - todo_write         # Gerenciar TODOs
-  - run_terminal_cmd   # Executar comandos
+  - Read         # Ler arquivos
+  - Write        # Escrever arquivos
+  - Edit         # Editar arquivos
+  - Grep         # Busca por padrão / conteúdo
+  - Glob         # Listar e buscar arquivos por glob
+  - Bash         # Executar comandos
+  - WebSearch    # Pesquisa web
+  - TodoWrite    # Gerenciar TODOs
 ```
 
 ### Ferramentas por Especialidade
 
 | Especialidade | Ferramentas Adicionais |
 |---------------|------------------------|
-| Code Review | `read_lints`, `MultiEdit` |
-| Testes | `MultiEdit` |
+| Code Review | (apenas genéricas — lint via `Bash`) |
+| Testes | (apenas genéricas) |
 | Documentação | (apenas genéricas) |
 
 ### ⚠️ MCPs - Regra de Ouro
@@ -145,7 +141,7 @@ tools:
 - MCPs listados em seção "Integrações Opcionais"
 
 **Agentes Especializados** (exceções):
-- `clickup-specialist` → inclui `mcp_ClickUp_*`
+- `clickup-specialist` → API-first (`Bash`/`WebFetch` p/ REST); MCP é transporte opcional via adapter
 - Outros especialistas MCP → incluem seus MCPs
 
 ---
@@ -183,7 +179,7 @@ Este agente pode ser potencializado com MCPs quando disponíveis:
 
 | MCP | Ferramentas | Uso |
 |-----|-------------|-----|
-| ClickUp | `mcp_ClickUp_*` | Gestão de tasks |
+| ClickUp | `Bash`/`WebFetch` (REST; MCP opcional via adapter) | Gestão de tasks |
 
 Consulte `docs/knowledge-base/concepts/configuration-management.md` para setup.
 
@@ -255,11 +251,10 @@ description: |
   Use para reviews de PRs, validação de código e identificação de problemas.
 model: opus
 tools:
-  - read_file
-  - codebase_search
-  - grep
-  - read_lints
-  - todo_write
+  - Read
+  - Grep
+  - Bash
+  - TodoWrite
 
 color: orange
 priority: alta
@@ -306,14 +301,14 @@ description: |
   Use para operações avançadas no ClickUp, automações e integrações.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - codebase_search
-  - mcp_ClickUp_clickup_search
-  - mcp_ClickUp_clickup_create_task
-  - mcp_ClickUp_clickup_update_task
-  - mcp_ClickUp_clickup_get_task
-  - mcp_ClickUp_clickup_create_task_comment
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - WebSearch
+  - WebFetch
+  - TodoWrite
+  - Bash        # REST da ClickUp API (curl) — API-first; MCP é transporte OPCIONAL via adapter
 
 color: orange
 priority: alta

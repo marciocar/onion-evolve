@@ -164,9 +164,9 @@ Quando um agente depende de MCP, declarar nas `tools`:
 
 ```yaml
 tools:
-  - read_file
-  - mcp_ClickUp_clickup_create_task
-  - mcp_ClickUp_clickup_update_task
+  - Read
+  - mcp__clickup__create_task
+  - mcp__clickup__update_task
 ```
 
 ### 4.2 MCPs comuns no framework atual
