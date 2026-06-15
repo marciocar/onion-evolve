@@ -4,6 +4,7 @@ description: |
   Ponto de entrada inteligente para o Sistema Onion.
   Use para navegação, recomendações e orquestração de workflows.
 model: sonnet
+allowed-tools: Read Bash(git *) Bash(ls .claude/sessions*)
 
 parameters:
   - name: query

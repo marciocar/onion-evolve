@@ -5,6 +5,7 @@ description: |
   Use para diagnóstico de qualidade, gaps e recomendações.
   Diferença vs /docs:validate-docs: este é DIAGNÓSTICO read-only (saúde/gaps/recomendações); o validate-docs valida estrutura/links/padrões e pode CORRIGIR (--fix).
 model: sonnet
+allowed-tools: Read Bash(find *) Bash(ls *) Bash(wc *)
 
 parameters:
   - name: path

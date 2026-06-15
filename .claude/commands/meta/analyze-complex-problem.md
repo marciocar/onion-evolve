@@ -4,6 +4,7 @@ description: |
   Análise estruturada de problemas complexos com template oficial.
   Use para análises críticas, migrações, arquitetura ou performance.
 model: opus
+allowed-tools: Read Grep Glob Write
 
 parameters:
   - name: problem

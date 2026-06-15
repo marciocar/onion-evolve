@@ -4,6 +4,7 @@ description: |
   Configura integrações do Sistema Onion (Task Managers, Gamma, etc).
   Guia o usuário na configuração segura de variáveis de ambiente para MCPs e APIs.
 model: sonnet
+allowed-tools: Read Bash(test -f *) Bash(grep *) Bash(git ls-files*)
 parameters:
   - name: integration
     description: Nome da integração (task-manager, clickup, asana, linear, gamma, postgres)

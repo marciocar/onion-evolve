@@ -2,6 +2,7 @@
 name: analisys
 description: Análise rápida usando template padrão.
 model: sonnet
+allowed-tools: Read Write
 category: quick
 tags: [analysis, quick, template]
 version: "3.0.0"

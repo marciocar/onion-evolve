@@ -4,6 +4,7 @@ description: |
   Preparação geral do projeto - contexto completo do Sistema Onion.
   Revisa README, estrutura de documentação e meta especificações.
 model: sonnet
+allowed-tools: Read Bash(ls *) Bash(find docs*)
 category: general
 tags: [warmup, context, preparation, overview]
 version: "3.0.0"

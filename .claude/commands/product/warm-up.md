@@ -4,6 +4,7 @@ description: |
   Preparação de contexto de produto e negócio.
   Foca em documentação de produto, especificações, knowledge bases de negócio e frameworks de produto.
 model: sonnet
+allowed-tools: Read Glob
 category: product
 tags: [warmup, context, product, business]
 version: "3.0.0"

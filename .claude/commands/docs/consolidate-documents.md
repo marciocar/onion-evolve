@@ -5,6 +5,7 @@ description: |
   Aceita pasta ou arquivos individuais para criar conhecimento consolidado e unificado.
   Use para transformar múltiplos documentos em conhecimento estratégico consolidado.
 model: sonnet
+allowed-tools: Read Write Bash(find *) Bash(ls *) Bash(stat *)
 
 parameters:
   - name: source
