@@ -23,7 +23,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **80 arquivos markdown** em `docs/`
+- **81 arquivos markdown** em `docs/`
 - **15 arquivos** em `docs/onion/` (Sistema Onion)
 - **35 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
   - 16 arquivos em `concepts/` (Conceitos fundamentais)
@@ -59,7 +59,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **80 arquivos** de documentação markdown
+- **81 arquivos** de documentação markdown
 - **82 comandos invocáveis** em 9 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
 - **49 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
@@ -269,6 +269,19 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 
 ---
 
+## 🌐 Materiais Externos
+
+Esqueletos de materiais externos derivados da KB canônica de identidade ([onion-framework-identity.md](knowledge-base/meta/onion-framework-identity.md), SSOT):
+
+- **[Materiais — README](materials/README.md)** - Índice e mapa de uso (KB → material) por perfil
+- **[Landing Page](materials/landing-page.md)** - Esqueleto de 7 seções (hero → CTA)
+- **[Manual — Sumário](materials/manual-toc.md)** - TOC de 11 capítulos (conteúdo existente ✅ / a escrever 🔲)
+- **[Estudos de Caso](materials/case-studies.md)** - 3 casos desenvolvidos (Federation v2, /meta:evolve, Cursor→Native)
+- **[Artigo Crítico — Outline](materials/critical-article-outline.md)** - Análise honesta (trade-offs, perguntas duras)
+- **[Press Kit](materials/press-kit.md)** - One-pager, FAQ imprensa, bio, citações
+
+---
+
 ## 📊 Análises
 
 > **Ciclo de vida** (ver [analysis/README.md](analysis/README.md)): análises e planos são **efêmeros** — uma vez executados, são removidos (git é o arquivo). Permanecem apenas os **baselines ativos** abaixo. As retrospectivas P1/T2.6/T3.2, o plano de saneamento e a análise de vendor Unleash foram **executados/curados e removidos em 2026-06-14** (recuperáveis via git history).
@@ -276,6 +289,7 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 - **[Revisão Analítica do Sistema Onion — Maio/2026](analysis/onion-review-2026-05.md)** — SSOT de identidade: documenta o abandono de `.onion/`, plano v4.0 e `packages/onion-cli/`; sintetiza as análises-fonte de 2025.
 - **[Baseline de Verificação e Validação — Junho/2026](analysis/onion-vv-baseline-2026-06.md)** — baseline de V&V (tamanhos + conformidade de plataforma); usada por `/meta:evolve`.
 - **[Onion Evolution — 2026-06-15](analysis/onion-evolution-2026-06-15.md)** — auditoria de evolução mais recente (backlog: 30 achados; sistêmicos = vazamento MCP-first e date-gate de KB).
+- **[Revisão da Federação — Junho/2026](analysis/onion-federation-review-2026-06.md)** — federação multi-repo do Onion vs. A2A e padrões de coordenação multi-agente (jun/2026): alinhamento mainstream + por que não A2A vivo + recomendações de nomenclatura/interop.
 
 ---
 
@@ -513,7 +527,7 @@ Este índice é gerado automaticamente pelo comando `/docs/build-index`.
 /docs/build-index onion        # Reconstruir índice da seção onion
 ```
 
-**Última atualização:** 2026-06-15 (Fase 4 — materiais externos adicionados)
+**Última atualização:** 2026-06-15 (`/docs:build-index` — contagens escaneadas do filesystem + seção de navegação Materiais Externos)
 **Mantido por:** Sistema Onion
 
 ---
