@@ -122,7 +122,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Configurações avançadas (webhooks, custom fields)
 -  Time tracking e análise de produtividade
 
-**Ferramentas disponíveis**: `read_file`, `write`, `MultiEdit`, `run_terminal_cmd`, `codebase_search`, `web_search`, **todas as 15+ ferramentas ClickUp MCP** (bulk operations, webhooks, time tracking, etc.)
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Bash`, `Grep`, `WebSearch`, **todas as 15+ ferramentas ClickUp MCP** (bulk operations, webhooks, time tracking, etc.)
 
 **Exemplo de uso**:
 ```bash
@@ -205,7 +205,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Identificar gaps de cobertura
 -  Validar funcionalidade sem modificar implementação
 
-**Ferramentas disponíveis**: `read_file`, `write`, `MultiEdit`, `run_terminal_cmd`, `grep`, `codebase_search`, `read_lints`, `todo_write`
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Grep`, `Bash`, `TodoWrite`
 
 **Exemplo de uso**:
 ```bash
@@ -246,7 +246,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Identificação de padrões problemáticos
 -  Sugestões de melhoria
 
-**Ferramentas disponíveis**: `read_file`, `codebase_search`, `grep`, `read_lints`, `MultiEdit`, `todo_write`, `run_terminal_cmd`
+**Ferramentas disponíveis**: `Read`, `Grep`, `Grep`, `Bash`, `Edit`, `TodoWrite`, `Bash`
 
 **Exemplo de uso**:
 ```bash
@@ -276,7 +276,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Análise de concorrentes
 -  Documentação de bibliotecas específicas
 
-**Ferramentas disponíveis**: `read_file`, `codebase_search`, `web_search`, `grep`, `list_dir`, `MultiEdit`, `todo_write`
+**Ferramentas disponíveis**: `Read`, `Grep`, `WebSearch`, `Grep`, `Glob`, `Edit`, `TodoWrite`
 
 **Exemplo de uso**:
 ```bash
@@ -306,7 +306,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Garantir consistência de design
 -  Aprovação/rejeição de mudanças estruturais
 
-**Ferramentas disponíveis**: `read_file`, `codebase_search`, `grep`, `MultiEdit`, `todo_write`, `web_search`
+**Ferramentas disponíveis**: `Read`, `Grep`, `Grep`, `Edit`, `TodoWrite`, `WebSearch`
 
 **Exemplo de uso**:
 ```bash
@@ -336,7 +336,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Sincronizar docs com estado atual
 -  Análise de gaps de documentação
 
-**Ferramentas disponíveis**: `read_file`, `write`, `search_replace`, `MultiEdit`, `codebase_search`, `web_search`, `grep`, `list_dir`
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Edit`, `Grep`, `WebSearch`, `Grep`, `Glob`
 
 **Exemplo de uso**:
 ```bash
@@ -360,7 +360,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Preparar documentação para auditorias e certificações
 -  Consolidar outputs de frameworks diferentes
 
-**Ferramentas disponíveis**: `read_file`, `write`, `codebase_search`, `grep`, `list_dir`, `web_search`, `todo_write`
+**Ferramentas disponíveis**: `Read`, `Write`, `Grep`, `Grep`, `Glob`, `WebSearch`, `TodoWrite`
 
 **Agentes delegados**: `@iso-27001-specialist`, `@iso-22301-specialist`, `@pmbok-specialist`, `@soc2-specialist`
 
@@ -403,7 +403,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Preparação para certificação ISO 27001
 -  Integração com SOC2 (cross-references)
 
-**Ferramentas disponíveis**: `read_file`, `write`, `search_replace`, `codebase_search`, `grep`
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Grep`, `Grep`
 
 **Exemplo de uso**:
 ```bash
@@ -445,7 +445,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  **Due Diligence Serasa Experian** (5 de 8 requisitos cobertos) 🔥
 -  Documentação de RTOs/RPOs por criticidade de sistema
 
-**Ferramentas disponíveis**: `read_file`, `write`, `search_replace`, `codebase_search`, `grep`
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Grep`, `Grep`
 
 **Exemplo de uso**:
 ```bash
@@ -487,7 +487,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Integração com NX monorepo (governança técnica)
 -  Evidências de workshops e treinamentos
 
-**Ferramentas disponíveis**: `read_file`, `write`, `search_replace`, `codebase_search`, `grep`
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Grep`, `Grep`
 
 **Exemplo de uso**:
 ```bash
@@ -529,7 +529,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Estratégia de coleta de evidências (12 meses)
 -  Integração com ISO 27001 (~70% overlap)
 
-**Ferramentas disponíveis**: `read_file`, `write`, `search_replace`, `codebase_search`, `grep`
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Grep`, `Grep`
 
 **Exemplo de uso**:
 ```bash
@@ -605,7 +605,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Análise de requisitos
 -  Gestão de roadmap
 
-**Ferramentas disponíveis**: `read_file`, `write`, `codebase_search`, `web_search`, `todo_write`, `mcp_clickup-mcp-server_create_task`, `mcp_clickup-mcp-server_update_task`, `mcp_clickup-mcp-server_get_task`, `mcp_clickup-mcp-server_create_task_comment`
+**Ferramentas disponíveis**: `Read`, `Write`, `Grep`, `WebSearch`, `TodoWrite`, `mcp_clickup-mcp-server_create_task`, `mcp_clickup-mcp-server_update_task`, `mcp_clickup-mcp-server_get_task`, `mcp_clickup-mcp-server_create_task_comment`
 
 **Integração ClickUp**:
 -  Cria tasks estruturadas
@@ -659,7 +659,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Criar `CLAUDE.md` e `.claudeignore` templates
 -  Setup automation para comandos `/engineer/*`
 
-**Ferramentas disponíveis**: `read_file`, `write`, `MultiEdit`, `run_terminal_cmd`, `codebase_search`, `list_dir`, `glob_file_search`, `web_search`, `read_lints`, `todo_write`
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob`, `Glob`, `WebSearch`, `Bash`, `TodoWrite`
 
 **Exemplo de uso**:
 ```bash
@@ -695,7 +695,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Onboarding de equipes em GitFlow
 -  Otimização de workflows colaborativos
 
-**Ferramentas disponíveis**: `read_file`, `write`, `MultiEdit`, `run_terminal_cmd`, `codebase_search`, `grep`, `web_search`, `todo_write`
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Grep`, `WebSearch`, `TodoWrite`
 
 **Exemplo de uso**:
 ```bash
@@ -735,7 +735,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Testing strategies (Jest/Vitest, integration, E2E)
 -  Microserviços e arquiteturas escaláveis
 
-**Ferramentas disponíveis**: `read_file`, `write`, `MultiEdit`, `run_terminal_cmd`, `codebase_search`, `read_lints`, `todo_write`, `web_search`
+**Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Bash`, `TodoWrite`, `WebSearch`
 
 **Exemplo de uso**:
 ```bash

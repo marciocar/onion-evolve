@@ -233,7 +233,7 @@ Usuário: /product:task "Implementar feature X"
 [4] Mapeamento: { name: "X" } → { name: "X", list_id: $CLICKUP_DEFAULT_LIST_ID }
   │
   ▼
-[5] IA chama mcp_ClickUp_clickup_create_task(payload)
+[5] IA chama mcp__clickup__create_task(payload)
   │
   ▼
 [6] Resposta crua do ClickUp → normalize() → TaskOutput { id, url, provider, ... }
@@ -242,7 +242,7 @@ Usuário: /product:task "Implementar feature X"
 [7] Comando devolve TaskOutput padronizado, alheio a qual provedor respondeu
 ```
 
-**O ponto crucial**: o comando `/product:task` **não tem nenhum conhecimento sobre ClickUp**. Se amanhã o time migrar para Jira, basta trocar `TASK_MANAGER_PROVIDER=jira` no `.env`. Os passos [3]–[6] passam a usar `adapters/jira.md` e a interface `mcp_atlassian_*` automaticamente. O comando permanece intocado.
+**O ponto crucial**: o comando `/product:task` **não tem nenhum conhecimento sobre ClickUp**. Se amanhã o time migrar para Jira, basta trocar `TASK_MANAGER_PROVIDER=jira` no `.env`. Os passos [3]–[6] passam a usar `adapters/jira.md` e a interface `mcp__atlassian__*` automaticamente. O comando permanece intocado.
 
 ---
 
@@ -273,7 +273,7 @@ A abstração `.claude/utils/task-manager/` é o caso canônico de SDAAL no Onio
 
 A interface `ITaskManager` (ver [interface.md](../../.claude/utils/task-manager/interface.md)) define ~15 métodos cobrindo CRUD de tasks, subtasks, comentários, status, busca, projetos e validação. Cada adapter em `adapters/` materializa esses métodos para o seu provedor:
 
-- `clickup.md` → chama `mcp_ClickUp_clickup_*`
+- `clickup.md` → chama `mcp__clickup__*`
 - `jira.md` → chama Jira REST API v3 com ADF
 - `asana.md` → chama Asana API
 - `linear.md` → chama Linear GraphQL
@@ -444,7 +444,7 @@ Faz coisas com o Provider X.
 Cria task no Provider X.
 
 \`\`\`typescript
-await mcp_provider_x_create({
+await mcp__provider__create({
   title: input.name,
   body: input.description
 });
