@@ -6,6 +6,7 @@
 |-------|-------|
 | **Versão** | 1.0.0 |
 | **Criado** | 2026-06-02 |
+| **Última Atualização** | 2026-06-15 |
 | **Categoria** | Patterns |
 | **Tags** | `sdaal`, `abstraction-layer`, `templates`, `adapter-pattern`, `factory` |
 

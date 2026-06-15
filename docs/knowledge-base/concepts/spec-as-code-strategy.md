@@ -172,19 +172,22 @@ login social para simplificar o acesso.
 
 ### Ciclo de Vida
 
+A spec é um **artefato de handoff** entre **duas fases faseadas retomáveis e independentes** (invariantes do framework — ver CLAUDE.md): a fase **produto** (`/product/*`, descoberta → spec congelada) e a fase **engenharia** (`/engineer/*`, planejamento → entrega). A spec aprovada é a **fronteira** entre elas — **não** um pipeline linear único.
+
 ```
-┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-│  DRAFT   │───▶│  REVIEW  │───▶│ APPROVED │───▶│IMPLEMENTED│
-└──────────┘    └──────────┘    └──────────┘    └──────────┘
-     │               │               │               │
-     ▼               ▼               ▼               ▼
-   Autor          Review         Validação        Geração
-   escreve        por pares      automática       de código
+══ Fase PRODUTO (/product/*) ═══════════════╗   ╔══ Fase ENGENHARIA (/engineer/*) ══
+┌──────────┐   ┌──────────┐   ┌──────────┐  ║   ║  ┌───────────┐
+│  DRAFT   │──▶│  REVIEW  │──▶│ APPROVED │  ║──▶║  │IMPLEMENTED│  (plan→work→pr, retomável)
+└──────────┘   └──────────┘   └──────────┘  ║   ║  └───────────┘
+   Autor          Review          Gate       ╚═══╝    Geração de código
+   escreve       por pares      (congela)    handoff: spec congelada
 ```
 
 ### Etapas Detalhadas
 
-#### 1. DRAFT (Rascunho)
+> As duas fases têm **sessões/estado próprios** e são retomáveis de forma independente; a spec congelada (APPROVED) é o único acoplamento entre elas. Ver [gitflow-patterns.md](../frameworks/gitflow-patterns.md) §Contrato de Sessão.
+
+#### Fase PRODUTO — 1. DRAFT (Rascunho)
 ```bash
 /product/spec "Nova funcionalidade X"
 ```
@@ -192,7 +195,7 @@ login social para simplificar o acesso.
 - Estrutura básica preenchida
 - Requisitos preliminares
 
-#### 2. REVIEW (Revisão)
+#### Fase PRODUTO — 2. REVIEW (Revisão)
 ```bash
 /product/refine spec-x.md
 ```
@@ -200,19 +203,19 @@ login social para simplificar o acesso.
 - Identificam gaps e ambiguidades
 - Refinam requisitos
 
-#### 3. APPROVED (Aprovado)
+#### Fase PRODUTO — 3. APPROVED (Aprovado) — fronteira de handoff
 ```bash
 /product/check spec-x.md
 ```
 - Gate-keeper valida conformidade
-- Spec está pronta para implementação
+- Spec **congelada** — pronta para handoff à engenharia
 - Critérios de aceitação claros
 
-#### 4. IMPLEMENTED (Implementado)
+#### Fase ENGENHARIA — 4. IMPLEMENTED (Implementado)
 ```bash
-/engineer/start spec-x
+/engineer/start spec-x   # inicia a fase própria de engenharia (plan → work → pr), retomável
 ```
-- IA gera código baseado na spec
+- IA gera código baseado na spec congelada
 - Testes validam critérios de aceitação
 - Código referencia spec de origem
 
