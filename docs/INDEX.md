@@ -31,7 +31,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 4 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
   - 2 em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
   - 1 `index.md`
-- **1 arquivo** em `docs/meta-specs/` (Meta Especificações)
+- **6 arquivos** em `docs/meta-specs/` (Meta Especificações: 5 meta-specs L0 + `index.md`)
 - **6 arquivos** em `docs/materials/` (materiais derivados externos — Fase 4): landing page, manual, case studies, artigo crítico, press kit, README
 - Arquivos adicionais em `docs/analysis/`, `docs/plans/`, `docs/applying/`, `docs/sdaal/`
 - **3 contextos spec-as-code** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`
@@ -132,8 +132,13 @@ docs/
 │       ├── command-creation-patterns.md
 │       └── onion-framework-identity.md
 │
-├── meta-specs/                 # Meta Especificações (1 arquivo)
-│   └── index.md                # Índice de meta specs
+├── meta-specs/                 # Meta Especificações (6 arquivos — constituição L0)
+│   ├── index.md                # Índice de meta specs
+│   ├── agents.md               # Padrões obrigatórios para agentes
+│   ├── commands.md             # Padrões para comandos + workflows faseados (invariante)
+│   ├── architecture.md         # Estrutura de diretórios, framework instalável
+│   ├── code-standards.md       # Idioma, formatação, naming, estilo
+│   └── integrations.md         # Task Manager Abstraction, padrão de adapter, MCPs
 │
 ├── analysis/                   # Análises ativas (baselines; itens efêmeros são removidos pós-execução — ver analysis/README.md)
 │   ├── onion-review-2026-05.md         # SSOT de identidade
