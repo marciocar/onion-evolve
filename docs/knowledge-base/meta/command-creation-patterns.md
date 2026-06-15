@@ -76,7 +76,7 @@ Comando meta que [ação] do sistema.
 **Propósito:** Comandos para workflows de desenvolvimento (start, work, pr, etc.)
 
 **Padrões:**
-- Integram com ClickUp MCP (tasks)
+- Integram com o task manager ativo via abstração `TASK_MANAGER_PROVIDER` (o adapter resolve Jira/ClickUp/Asana/Linear; nunca chamam a API/MCP do provider direto)
 - Gerenciam sessions (.claude/sessions/)
 - Coordenam múltiplos agentes — quando as subtarefas são **independentes**, use a camada de frota (fan-out/fan-in) sobre a ferramenta nativa **Workflow**; ver `docs/knowledge-base/concepts/agent-fleet-orchestration.md` e o comando `/meta:fleet`
 - Workflows complexos e iterativos
@@ -101,9 +101,10 @@ CURRENT_BRANCH=$(git branch --show-current)
 [validações]
 ```
 
-### Verificar Task ClickUp
+### Verificar Task (provider-agnóstico)
 ```bash
-TASK_ID=$(clickup_get_task_id_from_session)
+set -a; source .env; set +a                       # carrega TASK_MANAGER_PROVIDER
+TASK_ID=$(taskManager_get_task_id_from_session)    # abstração resolve o provider ativo
 [validações]
 ```
 
@@ -129,7 +130,7 @@ TASK_ID=$(clickup_get_task_id_from_session)
 **Propósito:** Comandos para gestão de produto e criação de tasks
 
 **Padrões:**
-- Focam em ClickUp MCP
+- Operam sobre o task manager ativo (via `TASK_MANAGER_PROVIDER`; delegam ao `@task-specialist` ou ao especialista do provider, nunca à API/MCP direta)
 - Criam/atualizam tasks, checklists, subtasks
 - Invocam `@product-agent` ou `@task-specialist`
 - Workflows de decomposição e especificação
@@ -163,10 +164,10 @@ Decomponha [funcionalidade] em:
 - Checklists
 ```
 
-### Step 2: Criação no ClickUp
+### Step 2: Criação no task manager ativo
 ```bash
-# Criar task principal
-TASK_ID=$(clickup_create_task "$TASK_NAME" "$LIST_ID")
+# Criar task principal via abstração agnóstica (o adapter resolve o provider do .env)
+TASK_ID=$(taskManager_create_task "$TASK_NAME")
 
 # Criar subtasks
 [lógica de criação]

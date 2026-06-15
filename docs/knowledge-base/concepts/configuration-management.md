@@ -12,11 +12,11 @@
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Configurações e MCPs |
 
-> ⚠️ **Provider-agnóstico**: os exemplos com ClickUp (`ONION_AUTO_CLICKUP_SYNC`,
-> `mcp__clickup__*`, etc.) são **ilustrativos**. O Task Manager do Onion é abstraído
-> via `TASK_MANAGER_PROVIDER` (jira | clickup | asana | linear | none) — ver
-> `.claude/utils/task-manager/` e [task-manager-abstraction.md](task-manager-abstraction.md).
-> Leia o provider ativo do `.env` antes de assumir ClickUp.
+> ⚠️ **Provider-agnóstico**: o Task Manager do Onion é abstraído via
+> `TASK_MANAGER_PROVIDER` (jira | clickup | asana | linear | none). Onde o ClickUp
+> aparece abaixo (variáveis, validação curl) é **um** provider de exemplo — os demais
+> vivem em `.claude/utils/task-manager/adapters/`. Leia o provider ativo do `.env`
+> antes de assumir ClickUp. Ver [task-manager-abstraction.md](task-manager-abstraction.md).
 
 ### Fontes
 
@@ -89,14 +89,26 @@ credentials.json
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # ─────────────────────────────────────────────────────────────────────────────────
-# CLICKUP INTEGRATION
+# TASK MANAGER (provider-agnóstico — abstração SDAAL)
 # ─────────────────────────────────────────────────────────────────────────────────
-# Obter em: https://app.clickup.com/settings/apps
-# Documentação: https://clickup.com/api
+# Escolha o provider ATIVO; preencha SÓ as variáveis dele. O adapter em
+# .claude/utils/task-manager/ resolve transporte/formato. Ver CLAUDE.md §Task Manager.
 
+TASK_MANAGER_PROVIDER=clickup        # jira | clickup | asana | linear | none
+TASK_MANAGER_TRANSPORT=api           # api (default) | mcp (opcional)
+
+# --- jira ---      (obrigatórias se PROVIDER=jira)
+# JIRA_HOST=
+# JIRA_EMAIL=
+# JIRA_API_TOKEN=
+# --- clickup ---   (obrigatórias se PROVIDER=clickup) — https://app.clickup.com/settings/apps
 CLICKUP_API_TOKEN=
-CLICKUP_WORKSPACE_ID=
-# CLICKUP_DEFAULT_LIST_ID=           # Opcional: lista padrão para tasks
+# CLICKUP_WORKSPACE_ID=
+# CLICKUP_DEFAULT_LIST_ID=
+# --- asana ---     (obrigatórias se PROVIDER=asana)
+# ASANA_ACCESS_TOKEN=
+# --- linear ---    (obrigatórias se PROVIDER=linear)
+# LINEAR_API_KEY=
 
 # ─────────────────────────────────────────────────────────────────────────────────
 # GITHUB INTEGRATION
@@ -122,7 +134,7 @@ CONTEXT7_ENABLED=false               # true para ativar
 # Configurações do Sistema Onion
 
 ONION_DEFAULT_LANGUAGE=pt-BR         # Idioma padrão (pt-BR, en-US)
-ONION_AUTO_CLICKUP_SYNC=true         # Sincronizar automaticamente com ClickUp
+TASK_MANAGER_AUTO_SYNC=true          # Sincronizar com o task manager ativo (qualquer provider)
 ONION_SESSION_AUTO_SAVE=true         # Salvar sessões automaticamente
 # ONION_LOG_LEVEL=info               # debug, info, warn, error
 
@@ -218,28 +230,31 @@ ONION_SESSION_AUTO_SAVE=true         # Salvar sessões automaticamente
 ```
 ⚠️ Arquivo .env não encontrado.
 
-Este comando usa a integração ClickUp para gerenciar tasks.
+Este comando usa o task manager configurado (via TASK_MANAGER_PROVIDER).
 Para configurar:
 
 1. Copie o template: cp .env.example .env
-2. Obtenha seu API token em: https://app.clickup.com/settings/apps
-3. Configure: CLICKUP_API_TOKEN=seu_token_aqui
+2. Defina TASK_MANAGER_PROVIDER (jira | clickup | asana | linear | none)
+3. Preencha as variáveis do provider escolhido
+   (ex.: jira → JIRA_HOST/JIRA_EMAIL/JIRA_API_TOKEN; clickup → CLICKUP_API_TOKEN)
 
 Deseja:
-(a) Configurar agora (vou te guiar)
-(b) Continuar sem integração
+(a) Configurar agora (vou te guiar pelo /meta:setup-integration)
+(b) Continuar sem integração (provider=none)
 (c) Abortar
 ```
 
 **Quando variável não configurada:**
 ```
-⚠️ CLICKUP_API_TOKEN não configurado.
+⚠️ Variável obrigatória do provider ativo não configurada.
 
-Para usar a integração ClickUp:
-1. Obtenha um token em: https://app.clickup.com/settings/apps
-2. Adicione ao .env: CLICKUP_API_TOKEN=seu_token
+Detecte TASK_MANAGER_PROVIDER no .env e configure as variáveis dele:
+- jira    → JIRA_HOST, JIRA_EMAIL, JIRA_API_TOKEN
+- clickup → CLICKUP_API_TOKEN (https://app.clickup.com/settings/apps)
+- asana   → ASANA_ACCESS_TOKEN
+- linear  → LINEAR_API_KEY
 
-Deseja continuar sem a integração ClickUp?
+Deseja continuar sem a integração (provider=none)?
 ```
 
 ---
@@ -285,7 +300,7 @@ async function validateToken(service: string, token: string): Promise<Validation
 | Erro | Fallback | Mensagem |
 |------|----------|----------|
 | Token inválido | Perguntar ao usuário | "Token inválido. Reconfigure?" |
-| Serviço indisponível | Retry ou skip | "ClickUp indisponível. Continuar sem?" |
+| Serviço indisponível | Retry ou skip | "Task manager indisponível. Continuar sem?" |
 | Permissão negada | Guiar reconfiguração | "Permissões insuficientes. Veja..." |
 | .env ausente | Criar ou skip | "Criar .env agora?" |
 
@@ -293,7 +308,9 @@ async function validateToken(service: string, token: string): Promise<Validation
 
 ## 🔌 Integrações Suportadas
 
-### ClickUp MCP
+> **Task Manager é plugável**: o ClickUp abaixo é **um** dos providers (`jira` | `clickup` | `asana` | `linear`), selecionado por `TASK_MANAGER_PROVIDER`. O consumo é sempre via a abstração (`taskManager.*`) — o adapter resolve transporte (REST API default; MCP opcional). Variáveis dos demais providers: ver `.claude/utils/task-manager/adapters/`.
+
+### ClickUp (provider de Task Manager)
 
 **Variáveis:**
 | Variável | Obrigatória | Descrição |
