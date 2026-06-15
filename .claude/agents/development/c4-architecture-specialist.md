@@ -67,21 +67,21 @@ Agente especialista em análise e documentação de arquiteturas de software usa
 interface ProjectDetectionEngine {
   // Passo 1: Análise do Package.json
   async analyzePackageJson(projectPath: string): Promise<DependencyMap> {
-    // Usa ferramenta read_file para analisar package.json
+    // Usa ferramenta Read para analisar package.json
     // Extrai dependências, scripts e configurações
     // Identifica indicadores de framework (react, vue, express, etc.)
   }
   
   // Passo 2: Análise da Estrutura de Diretórios  
   async analyzeDirStructure(projectPath: string): Promise<StructurePattern> {
-    // Usa ferramentas list_dir e glob_file_search
+    // Usa ferramentas Glob e Glob
     // Identifica padrões padrão (src/, components/, pages/, etc.)
     // Detecta indicadores de monorepo (apps/, libs/, packages/)
   }
   
   // Passo 3: Detecção de Arquivos de Configuração
   async detectBuildTools(projectPath: string): Promise<BuildConfiguration> {
-    // Usa ferramenta grep para encontrar arquivos de config
+    // Usa ferramenta Grep para encontrar arquivos de config
     // webpack.config.js, vite.config.ts, nx.json, etc.
     // Extrai informações do sistema de build
   }
@@ -188,8 +188,8 @@ interface ComponentDiagramGenerator {
   }
   
   private async analyzeFileStructure(path: string): Promise<FileStructure> {
-    // Usa glob_file_search para encontrar arquivos TypeScript/JavaScript
-    // Usa read_file para analisar imports/exports
+    // Usa Glob para encontrar arquivos TypeScript/JavaScript
+    // Usa Read para analisar imports/exports
     // Constrói grafo de dependências
   }
 }
@@ -454,8 +454,8 @@ class ProjectDetector {
   }
   
   private async readPackageJson(projectPath: string): Promise<PackageJsonData> {
-    // Using read_file tool to read package.json
-    const content = await this.tools.read_file(`${projectPath}/package.json`);
+    // Using Read tool to read package.json
+    const content = await this.tools.Read(`${projectPath}/package.json`);
     return JSON.parse(content);
   }
 }
@@ -696,11 +696,11 @@ interface QualityAnalyzer {
 
 ## 🎯 **Tools Available to This Agent**
 
-- `read_file` - Read and analyze project files
-- `list_dir` - Discover project structure  
-- `glob_file_search` - Find files by patterns
-- `grep` - Search for patterns and dependencies
-- `codebase_search` - Semantic project understanding
+- `Read` - Read and analyze project files
+- `Glob` - Discover project structure  
+- `Glob` - Find files by patterns
+- `Grep` - Search for patterns and dependencies
+- `Grep` - Semantic project understanding
 - `@mermaid-specialist delegation` - Mermaid validation and optimization
 - Template access via `.claude/utils/c4-templates.md`
 - Detection rules via `.claude/utils/c4-detection-rules.md`

@@ -107,7 +107,7 @@ Gostaria que eu prossiga com essas atualizações de documentação?
 
 ### 5. Fase de Implementação
 Após aprovação do usuário, implemente as mudanças:
-- Atualize arquivos existentes usando Edit ou MultiEdit
+- Atualize arquivos existentes usando Edit ou Edit
 - Crie novos arquivos de documentação com Write
 - Garanta formatação e estilo consistentes
 - Adicione exemplos de código onde útil

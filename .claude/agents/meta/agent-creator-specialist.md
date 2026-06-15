@@ -75,14 +75,14 @@ Todo agente deve ser:
 #### 1.1. Análise de Agentes Existentes
 ```bash
 # 1. Listar TODOS os agentes
-list_dir .claude/agents/
-list_dir .claude/agents/compliance/
-list_dir .claude/agents/development/
-list_dir .claude/agents/review/
-list_dir .claude/agents/meta/
+Glob .claude/agents/
+Glob .claude/agents/compliance/
+Glob .claude/agents/development/
+Glob .claude/agents/review/
+Glob .claude/agents/meta/
 
 # 2. Ler headers de agentes similares
-read_file .claude/agents/[categoria]/[agente-similar].md
+Read .claude/agents/[categoria]/[agente-similar].md
 
 # 3. Identificar padrões e categorias
 ```
@@ -102,15 +102,15 @@ read_file .claude/agents/[categoria]/[agente-similar].md
 #### 1.2. Análise de Comandos Existentes
 ```bash
 # Listar comandos disponíveis
-list_dir .claude/commands/
-list_dir .claude/commands/meta/
-list_dir .claude/commands/product/
-list_dir .claude/commands/engineer/
-list_dir .claude/commands/compliance/
-list_dir .claude/commands/docs/
-list_dir .claude/commands/git/
-list_dir .claude/commands/admin/
-list_dir .claude/commands/common/
+Glob .claude/commands/
+Glob .claude/commands/meta/
+Glob .claude/commands/product/
+Glob .claude/commands/engineer/
+Glob .claude/commands/compliance/
+Glob .claude/commands/docs/
+Glob .claude/commands/git/
+Glob .claude/commands/admin/
+Glob .claude/commands/common/
 ```
 
 **Identificar:**
@@ -121,11 +121,11 @@ list_dir .claude/commands/common/
 #### 1.3. Análise de Ferramentas Disponíveis
 ```bash
 # Ler catálogo completo de ferramentas
-read_file docs/tools.md
+Read docs/tools.md
 ```
 
 **Mapear ferramentas por categoria:**
-- **System** (12): read_file, write, search_replace, list_dir, grep, etc.
+- **Core (nativas)**: Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch, TodoWrite
 - **ClickUp** (50+): Gestão de projetos e tarefas
 - **GitHub** (30+): Versionamento e colaboração
 - **Playwright** (20+): Automação web
@@ -135,10 +135,10 @@ read_file docs/tools.md
 #### 1.4. Análise de Duplicação (CRÍTICO)
 ```bash
 # Buscar agentes com propósito similar
-codebase_search "agente que faz [propósito similar]" []
+Grep "agente que faz [propósito similar]" []
 
 # Verificar nomes existentes
-grep "name: [nome-proposto]" .claude/agents/
+Grep "name: [nome-proposto]" .claude/agents/
 ```
 
 **Validar:**
@@ -225,7 +225,7 @@ Ferramentas MCP detectadas que podem ser úteis:
 - [listar ferramentas MCP relevantes baseadas no propósito]
 
 O agente precisa de acesso a:
-- **Ferramentas básicas** (read_file, write, grep, etc.)
+- **Ferramentas básicas** (Read, Write, Grep, Bash, etc.)
 - **Ferramentas MCP** (ClickUp, GitHub, Playwright, etc.)
 - **Ferramentas especializadas** (especificar)
 
@@ -284,66 +284,65 @@ Exemplo:
 
 ##### 🔵 DEVELOPMENT (blue/lightblue)
 ```yaml
-core: read_file, write, search_replace, grep, codebase_search
-execution: run_terminal_cmd, read_lints
-management: todo_write, update_memory
+core: Read, Write, Edit, Grep
+execution: Bash
+management: TodoWrite
 ```
 
 ##### 🔷 TESTING (cyan)
 ```yaml
-core: read_file, write, grep, codebase_search
-execution: run_terminal_cmd, read_lints
-analysis: list_dir, glob_file_search
+core: Read, Write, Grep
+execution: Bash
+analysis: Glob
 ```
 
 ##### 🟢 REVIEW (green)
 ```yaml
-core: read_file, grep, codebase_search, read_lints
-documentation: write, search_replace
-management: todo_write, update_memory
+core: Read, Grep, Bash
+documentation: Write, Edit
+management: TodoWrite
 ```
 
 ##### 🟣 RESEARCH (purple)
 ```yaml
-core: read_file, codebase_search, grep
-discovery: web_search, list_dir, glob_file_search
-management: todo_write, update_memory
+core: Read, Grep
+discovery: WebSearch, Glob
+management: TodoWrite
 ```
 
 ##### 🔴 ARCHITECTURE (red)
 ```yaml
-core: read_file, codebase_search, grep
-analysis: list_dir, glob_file_search, web_search
-documentation: write, search_replace, todo_write
+core: Read, Grep
+analysis: Glob, WebSearch
+documentation: Write, Edit, TodoWrite
 ```
 
 ##### 🟠 DOCUMENTATION (orange)
 ```yaml
-core: read_file, write, search_replace
-search: codebase_search, grep, web_search
-management: list_dir, glob_file_search
+core: Read, Write, Edit
+search: Grep, WebSearch
+management: Glob
 ```
 
 ##### 🟡 PRODUCT (yellow)
 ```yaml
-core: read_file, write, codebase_search
-management: todo_write, update_memory
+core: Read, Write, Grep
+management: TodoWrite
 task-manager: via adapter (REST API; MCP opcional) — gestão de projetos agnóstica
 ```
 
 ##### 🟤 COMPLIANCE (brown/maroon)
 ```yaml
-core: read_file, grep, codebase_search, list_dir
-analysis: glob_file_search, web_search
-documentation: write, search_replace, todo_write
+core: Read, Grep, Glob
+analysis: WebSearch
+documentation: Write, Edit, TodoWrite
 ```
 
 ##### ⚫ META/ORCHESTRATOR (black)
 ```yaml
-core: read_file, list_dir, grep, codebase_search
-execution: run_terminal_cmd, todo_write
-advanced: update_memory, web_search
-discovery: glob_file_search
+core: Read, Glob, Grep
+execution: Bash, TodoWrite
+discovery: WebSearch
 ```
 
 **Ferramentas Especializadas (via Adapter/MCP Opcional):**
@@ -652,7 +651,7 @@ Apenas se:
 #### 4.3. Criar Arquivo
 
 ```bash
-write .claude/agents/[categoria]/[nome-agente].md
+Write .claude/agents/[categoria]/[nome-agente].md
 ```
 
 ---
@@ -739,7 +738,7 @@ Para testar o novo agente, use:
 grep "name:" .claude/agents/**/*.md | grep "[termo-chave]"
 
 # Buscar descrições similares
-codebase_search "agente que [propósito similar]" []
+Grep "agente que [propósito similar]" []
 
 # Validar unicidade
 ```
@@ -877,7 +876,7 @@ description: Revisa código e valida qualidade
 ### ❌ Anti-Pattern 3: Toolkit Completo Desnecessário
 ```yaml
 # RUIM
-tools: read_file, write, search_replace, grep, codebase_search, list_dir, glob_file_search, web_search, run_terminal_cmd, read_lints, todo_write, update_memory, delete_file, edit_notebook, [múltiplas ferramentas MCP desorganizadas], ...
+tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch, TodoWrite, mcp__clickup__*, mcp__github__*, mcp__playwright__*, [dezenas de MCP sem justificativa], ...
 ```
 
 **Por quê:** Excesso de ferramentas sem justificativa — use adapter/abstração em vez de MCP direto
@@ -1034,7 +1033,7 @@ graph TD
 name: [tecnologia]-[acao]-specialist
 description: Especialista em [tecnologia] que [ação principal]. Use para [casos de uso].
 model: sonnet
-tools: read_file, write, search_replace, codebase_search, grep, run_terminal_cmd, read_lints
+tools: Read, Write, Edit, Grep, Bash
 color: blue
 priority: media
 expertise: ["[tecnologia]", "[domínio]", "[skill]"]
@@ -1051,7 +1050,7 @@ autonomy: media
 name: [standard]-[tipo]-specialist
 description: Especialista em [standard] que [ação principal]. Gera [artefatos] audit-ready.
 model: sonnet
-tools: read_file, write, search_replace, codebase_search, grep, list_dir, glob_file_search
+tools: Read, Write, Edit, Grep, Glob
 color: maroon
 priority: alta
 expertise: ["[standard]", "compliance", "audit", "[domain]"]
@@ -1068,7 +1067,7 @@ autonomy: alta
 name: [servico]-[acao]-manager
 description: Especialista em [serviço] que [ação principal]. Use para [workflows]. Acessa via adapter (API ou MCP opcional).
 model: sonnet
-tools: read_file, write, codebase_search, todo_write, update_memory
+tools: Read, Write, Grep, TodoWrite
 color: orange
 priority: alta
 expertise: ["[servico]", "automation", "integration"]
@@ -1085,7 +1084,7 @@ autonomy: alta
 name: [dominio]-orchestrator
 description: Meta-orquestrador de [domínio] que [ação principal]. Coordena [agentes].
 model: sonnet
-tools: read_file, list_dir, codebase_search, grep, todo_write, update_memory
+tools: Read, Glob, Grep, TodoWrite
 color: black
 priority: alta
 expertise: ["meta-architecture", "orchestration", "[domain]"]

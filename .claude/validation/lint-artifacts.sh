@@ -380,11 +380,18 @@ check_agent_tool_names() {
         violation "HARD" "${agent}" "tool MCP em formato inválido: '${tool}' — Claude Code usa 'mcp__<server>__<tool>' (duplo underscore)"
       fi
     done < <(awk '
+      # Escopa ao 1º bloco de frontmatter (---...---); ignora exemplos no corpo.
+      /^---[[:space:]]*$/ { fmcount++; next }
+      fmcount!=1 { next }
       /^tools:[[:space:]]*\[/ {
         s=$0; sub(/^tools:[[:space:]]*\[/,"",s); sub(/\].*$/,"",s);
         n=split(s,a,","); for(i=1;i<=n;i++){ gsub(/[[:space:]"]/,"",a[i]); if(a[i]!="") print a[i] } next
       }
-      /^tools:/ { inblk=1; next }
+      /^tools:/ {
+        rest=$0; sub(/^tools:[[:space:]]*/,"",rest); sub(/[[:space:]]*#.*$/,"",rest);
+        if (rest=="") { inblk=1; next }
+        n=split(rest,a,","); for(i=1;i<=n;i++){ gsub(/[[:space:]"]/,"",a[i]); if(a[i]!="") print a[i] } next
+      }
       inblk && /^[^[:space:]#]/ { inblk=0 }
       inblk && /^[[:space:]]*-/ { t=$0; sub(/^[[:space:]]*-[[:space:]]*/,"",t); sub(/[[:space:]#].*$/,"",t); if(t!="") print t }
     ' "${agent}")

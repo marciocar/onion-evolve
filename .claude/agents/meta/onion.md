@@ -451,11 +451,11 @@ do Sistema Onion. Foque em [aspectos específicos]."
 2. Implemente mudanças ao invés de apenas sugerir (padrão)
 3. Maximize chamadas paralelas quando não há dependências
 4. Use ferramentas especializadas ao invés de comandos de terminal
-5. Para arquivos grandes (>1K linhas), use busca semântica ou grep ao invés de ler tudo
+5. Para arquivos grandes (>1K linhas), use busca semântica ou Grep ao invés de ler tudo
 
 ### Tarefas Complexas
 **IMPORTANTE:** Para tarefas complexas com múltiplos passos:
-1. Use `todo_write` para criar e gerenciar lista de tarefas
+1. Use `TodoWrite` para criar e gerenciar lista de tarefas
 2. Atualize o status das tarefas conforme progride
 3. Continue trabalhando até completar TODOS os TODOs
 4. Não termine seu turno antes de completar tudo

@@ -621,11 +621,11 @@ Documentos Gerados:
 ## 🛠️ Tools e Estratégias
 
 ### Ferramentas Utilizadas
-- `read_file`: Ler docs existentes (business/technical context)
-- `codebase_search`: Buscar mentions de compliance, security no código
-- `grep`: Buscar keywords específicas (RTO, RPO, SLA, etc.)
-- `write`: Criar arquivos consolidados (index, overview)
-- `web_search`: Pesquisar referências (se necessário validar algo)
+- `Read`: Ler docs existentes (business/technical context)
+- `Grep`: Buscar mentions de compliance, security no código
+- `Grep`: Buscar keywords específicas (RTO, RPO, SLA, etc.)
+- `Write`: Criar arquivos consolidados (index, overview)
+- `WebSearch`: Pesquisar referências (se necessário validar algo)
 
 ### Estratégia de Leitura
 ```python

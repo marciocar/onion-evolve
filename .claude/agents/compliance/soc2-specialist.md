@@ -722,18 +722,18 @@ aws s3 sync . $BUCKET/
 ## 🛠️ Tools e Estratégias
 
 ### Ferramentas Utilizadas
-- `read_file`: Ler contexto, template, ISO 27001 docs
-- `write`: Criar os 5 documentos
-- `codebase_search`: Buscar menções de encryption, MFA, SLA
-- `grep`: Buscar configs específicas (TLS, encryption)
+- `Read`: Ler contexto, template, ISO 27001 docs
+- `Write`: Criar os 5 documentos
+- `Grep`: Buscar menções de encryption, MFA, SLA
+- `Grep`: Buscar configs específicas (TLS, encryption)
 
 ### Estratégia de Geração
 
 **1. Ler Template + ISO 27001 Overlap:**
 ```bash
-read_file .claude/commands/common/templates/compliance_soc2_template.md
-read_file docs/compliance-context/security/access-control.md
-codebase_search "What encryption is used?"
+Read .claude/commands/common/templates/compliance_soc2_template.md
+Read docs/compliance-context/security/access-control.md
+Grep "What encryption is used?"
 ```
 
 **2. Identificar Controles Overlapping:**
@@ -746,11 +746,11 @@ grep "encryption" docs/compliance-context/security/
 
 **3. Gerar 5 Documentos:**
 ```bash
-write docs/compliance-context/soc2/trust-services-criteria.md
-write docs/compliance-context/soc2/security-controls.md
-write docs/compliance-context/soc2/availability-controls.md
-write docs/compliance-context/soc2/confidentiality-controls.md
-write docs/compliance-context/soc2/evidence-collection.md
+Write docs/compliance-context/soc2/trust-services-criteria.md
+Write docs/compliance-context/soc2/security-controls.md
+Write docs/compliance-context/soc2/availability-controls.md
+Write docs/compliance-context/soc2/confidentiality-controls.md
+Write docs/compliance-context/soc2/evidence-collection.md
 ```
 
 **4. Confirmar Conclusão com Serasa Mapping:**
