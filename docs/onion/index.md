@@ -78,7 +78,7 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
    - Cenários de uso
    - Melhores práticas
 
-2. **[Referência de Ferramentas](tools-reference.md)** - Todas as ferramentas disponíveis
+2. **Referência de Ferramentas** - rode `/meta:all-tools` para documentar todas as ferramentas disponíveis
    - Ferramentas integradas
    - Configuração
    - Uso e exemplos
