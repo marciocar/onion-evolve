@@ -1,6 +1,8 @@
 # Framework de Padronização de Story Points
 ## Guia Completo para Times de Desenvolvimento
 
+*Última atualização: 2026-06-15*
+
 ---
 
 ## 📋 Índice
@@ -566,35 +568,15 @@ Velocity por Fase:
 - **Asana Planning Poker** - Via integrações de terceiros
 - **Azure DevOps Planning Poker** - Extensão (se usarem Azure também)
 
-### Para Tracking e Dashboards:
-- **Asana** - Ferramenta principal para gestão e tracking
-  - Custom fields para story points
-  - Dashboards para velocity tracking
-  - Goals para commitment vs delivery
-  - Timeline view para fases do modelo V
-- **Asana API** - Para dashboards customizados
-- **Monday.com** - Alternativa com custom dashboards
-- **Linear** - Story point tracking nativo
+### Para Tracking e Dashboards (provider-agnóstico):
 
-### Como Configurar no Asana:
+Story points são rastreados no **task manager ativo** — o Sistema Onion é agnóstico via `TASK_MANAGER_PROVIDER` (`jira` | `clickup` | `asana` | `linear` | `none`). **Não acople** a metodologia a um provider:
 
-#### 1. Custom Fields para Story Points:
-```
-1. Vá em Project Settings
-2. Adicione Custom Field "Story Points"
-3. Tipo: Number
-4. Use nos templates de task
-```
+- **Detecte** o provider lendo `TASK_MANAGER_PROVIDER` no `.env` antes de operar.
+- **Custom field "Story Points"**, dashboards de velocity e automações são **capacidades resolvidas pelo adapter** em `.claude/utils/task-manager/adapters/`: Jira (custom field + JQL), ClickUp (custom field + dashboards), Asana (custom field + Goals), Linear (estimate nativo).
+- **Delegue a operação técnica** ao especialista do provider ativo (`@jira-specialist`, `@clickup-specialist`) ou ao `@task-specialist` (agnóstico). Nunca chame a API/MCP do provider direto. Ver CLAUDE.md §Task Manager.
 
-#### 2. Dashboard de Velocity:
-```
-1. Use Asana Goals para tracking
-2. Configure meta mensal/semanal de pontos
-3. Track progress automaticamente
-4. Gere relatórios de tendência
-```
-
-#### 3. Template de Sprint no Asana:
+#### Template de Sprint (conceitual, neutro de provider):
 ```
 📋 Sprint [X] - [Data]
 ├── 🎯 Meta: [X] pontos
@@ -611,46 +593,33 @@ Velocity por Fase:
     └── Accuracy: [X]%
 ```
 
-#### 4. Automação no Asana:
+#### Automação (via adapter):
 ```
-Rules para automatizar:
-- Quando task é marcada como completa → somar pontos no dashboard
-- Quando task >13 pontos → alertar para quebrar em épico
-- Quando sprint inicia → criar template automático
-- Quando deadline se aproxima → alertar sobre commitment
+Rules típicas (cada provider expõe via seu adapter):
+- Task marcada como completa → somar pontos no tracking de velocity
+- Task >13 pontos → alertar para quebrar em épico
+- Sprint inicia → criar template
+- Deadline se aproxima → alertar sobre commitment
 ```
 
 ### Dashboards Customizados:
-Para relatórios mais avançados, use Asana API com:
-- **Google Data Studio** - Dashboards visuais
-- **Power BI** - Análises detalhadas
-- **Tableau** - Visualizações avançadas
+Para relatórios avançados, exporte via a abstração `taskManager.*` (o adapter resolve o provider ativo) para ferramentas de BI: **Google Data Studio**, **Power BI**, **Tableau**.
 
-### Exemplo de Query via Asana API:
+### Exemplo de cálculo de velocity (pseudo-código agnóstico):
 ```javascript
-// Buscar tasks completadas com story points
-const completedTasks = await asana.tasks.findByProject(projectId, {
-  opt_fields: 'name,completed,custom_fields',
-  completed_since: startDate
-});
+// Via a abstração taskManager.* — o adapter resolve o provider ativo.
+// NUNCA chamar a API/SDK de um provider direto (Asana/ClickUp/Jira/Linear).
+const completed = await taskManager.searchTasks({ completedSince: startDate });
 
 // Calcular velocity
-const velocity = completedTasks.data
-  .filter(task => task.completed)
-  .reduce((sum, task) => {
-    const storyPoints = task.custom_fields.find(f => f.name === 'Story Points');
-    return sum + (storyPoints?.number_value || 0);
-  }, 0);
+const velocity = completed
+  .filter((t) => t.completed)
+  .reduce((sum, t) => sum + (t.storyPoints ?? 0), 0);
 
 // Detectar épicos (tasks >13 pontos)
-const epics = completedTasks.data
-  .filter(task => {
-    const storyPoints = task.custom_fields.find(f => f.name === 'Story Points');
-    return storyPoints?.number_value > 13;
-  });
-
+const epics = completed.filter((t) => (t.storyPoints ?? 0) > 13);
 if (epics.length > 0) {
-  console.log('⚠️ Épicos detectados - considere quebrar:', epics.map(e => e.name));
+  console.log('⚠️ Épicos detectados — considere quebrar:', epics.map((e) => e.name));
 }
 ```
 
@@ -696,17 +665,16 @@ if (epics.length > 0) {
 - **"User Story Mapping"** - Jeff Patton
 
 ### Ferramentas Mencionadas:
-- **Asana** - Ferramenta principal para gestão e tracking
+- **Task manager ativo** (via `TASK_MANAGER_PROVIDER`: Jira/ClickUp/Asana/Linear) - gestão e tracking de story points
 - **PlanITPoker** - Planning poker online
-- **Google Data Studio** - Dashboards customizados
-- **Linear** - Alternativa com story points nativos
+- **Google Data Studio** - Dashboards customizados (via export `taskManager.*`)
 
 ---
 
 ## 📞 Implementação Prática
 
-### Semana 1: Configuração no Asana + Checklists
-- [ ] Criar custom field "Story Points" nos projetos
+### Semana 1: Configuração no task manager ativo + Checklists
+- [ ] Criar custom field "Story Points" nos projetos (via adapter do provider ativo)
 - [ ] Configurar template de sprint
 - [ ] Imprimir/digitalizar checklists de 3, 5, 8, 13 pontos
 - [ ] Definir histórias de referência para cada nível
@@ -714,10 +682,10 @@ if (epics.length > 0) {
 
 ### Semana 2: Calibração + Épicos
 - [ ] Aplicar framework no primeiro sprint
-- [ ] Configurar Goals no Asana para velocity
+- [ ] Configurar metas de velocity no task manager ativo (Goals/Sprints, via adapter)
 - [ ] Identificar e quebrar primeiro épico
 - [ ] Estabelecer baseline de velocity
-- [ ] Documentar reference stories no Asana
+- [ ] Documentar reference stories no task manager ativo
 
 ### Semana 3-4: Estabilização + Automação
 - [ ] Refinar processo baseado no feedback
@@ -739,7 +707,7 @@ if (epics.length > 0) {
 - **Sprint 3:** "Nossas estimativas estão mais consistentes?"
 - **Sprint 4:** "Velocity está estabilizando? Accuracy melhorando?"
 
-### Checklist de Configuração do Asana + Épicos:
+### Checklist de Configuração do task manager ativo + Épicos:
 ```
 📋 SETUP INICIAL:
 - [ ] Custom field "Story Points" criado
@@ -759,9 +727,9 @@ if (epics.length > 0) {
 - [ ] Critério >13 pontos = épico estabelecido
 - [ ] Template de quebra de épicos criado
 - [ ] Processo de validação de épicos quebrados
-- [ ] Tracking de épicos no Asana configurado
+- [ ] Tracking de épicos no task manager ativo configurado
 
-📈 MÉTRICAS NO ASANA:
+📈 MÉTRICAS NO TASK MANAGER ATIVO:
 - [ ] Tracking de velocity por sprint
 - [ ] Goals para commitment vs delivery
 - [ ] Custom fields para accuracy tracking
