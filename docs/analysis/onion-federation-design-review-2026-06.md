@@ -1,6 +1,6 @@
 # Onion Federation — Review Adversarial do Design (2026-06-14)
 
-> **Alvo:** [onion-federation-design-2026-06.md](onion-federation-design-2026-06.md) (PR #36)
+> **Alvo:** `onion-federation-design-2026-06.md` (v1, PR #36 — **removido** do repo após execução; recuperável via git history). Supersedido por [onion-federation-design-v2-2026-06.md](onion-federation-design-v2-2026-06.md).
 > **Método:** frota de 6 lentes críticas independentes → refutação adversarial achado a achado → consolidação.
 > **Contrato:** read-only sobre o design; este relatório é a única escrita. **Não** executa nada — propõe ajustes ao design **antes** de construir.
 

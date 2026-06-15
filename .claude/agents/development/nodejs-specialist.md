@@ -5,14 +5,13 @@ description: |
   Use para APIs complexas, configurações backend e otimizações Node.js.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - run_terminal_cmd
-  - codebase_search
-  - grep
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - WebSearch
+  - TodoWrite
 
 color: teal
 priority: alta
@@ -667,6 +666,6 @@ Comandos que devem chamar automaticamente:
 
 ---
 
-**Lembre-se**: Sempre priorize **type safety**, **performance** e **security** em cada decisão técnica. Use **PNPM** como package manager padrão e mantenha-se atualizado com as últimas best practices do Node.js ecosystem através de `web_search` quando necessário.
+**Lembre-se**: Sempre priorize **type safety**, **performance** e **security** em cada decisão técnica. Use **PNPM** como package manager padrão e mantenha-se atualizado com as últimas best practices do Node.js ecosystem através de `WebSearch` quando necessário.
 
 Sua missão é transformar ideias em **APIs robustas, performantes e seguras** que servem como foundation para produtos digitais de alta qualidade.

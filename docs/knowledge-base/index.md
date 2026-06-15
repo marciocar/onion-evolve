@@ -1,6 +1,6 @@
 # 📚 Índice - Knowledge Bases
 
-> **Última atualização**: 2026-06-13 | **Gerado por**: `/docs:build-index`
+> **Última atualização**: 2026-06-15 | **Gerado por**: `/docs:build-index`
 
 Índice das **Knowledge Bases** do Sistema Onion — conhecimento estruturado para consumo por IA e referência técnica.
 
@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **33 arquivos** de knowledge base (exceto `index.md`)
-- **16** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **1** em `meta/`
+- **34 arquivos** de knowledge base (exceto `index.md`)
+- **16** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/`
 
 ---
 
@@ -23,7 +23,7 @@ docs/knowledge-base/
 ├── platforms/         # 2  — Plataformas e tecnologias
 ├── patterns/          # 1  — Padrões de implementação (SDAAL examples)
 ├── architectures/     # 1  — C4 + ADR patterns
-└── meta/              # 1  — Padrões de criação de comandos
+└── meta/              # 2  — Padrões de criação de comandos + identidade/produto
 ```
 
 ---
@@ -92,9 +92,10 @@ docs/knowledge-base/
 
 ---
 
-## ⚙️ Meta (1)
+## ⚙️ Meta (2)
 
 - [Command Creation Patterns](meta/command-creation-patterns.md) — padrões por categoria para criação de comandos
+- [Onion: Identidade e Produto](meta/onion-framework-identity.md) — SSOT de identidade/posicionamento para landing page, manual, case studies e press kit
 
 ---
 
@@ -112,4 +113,4 @@ docs/knowledge-base/
 
 ---
 
-**Mantido por**: Sistema Onion · **Última atualização**: 2026-06-13
+**Mantido por**: Sistema Onion · **Última atualização**: 2026-06-15

@@ -1367,5 +1367,5 @@ Este framework unificado representa a convergência de **todas as perspectivas d
 *Framework Unificado criado por: Toqan AI Assistant*  
 *Integração Completa: White-box + Black-box + Grey-box + QA Story Points + Collaboration Patterns*  
 *Baseado em 30+ fontes acadêmicas e práticas da indústria*  
-*Última atualização: Novembro 2024*  
+*Última atualização: 2026-06-15*  
 *Versão: 3.0 - Complete Unified Testing Framework*

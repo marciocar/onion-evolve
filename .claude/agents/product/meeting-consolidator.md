@@ -6,14 +6,13 @@ description: |
   Use para análise profunda de reuniões e síntese de conhecimento organizacional.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: purple
 priority: alta

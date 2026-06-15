@@ -5,6 +5,7 @@ description: |
   Use para estimar tarefas, quebrar épicos e calibrar velocity do time.
   Integra com @story-points-framework-specialist e framework completo.
 model: sonnet
+allowed-tools: Read Bash(cat .env*)
 
 parameters:
   - name: task_description
@@ -60,11 +61,11 @@ Fornecer estimativas precisas e acionáveis de story points para tarefas de dese
 
 ```bash
 # Carregar framework completo de story points
-read_file docs/knowledge-base/frameworks/framework-story-points.md
+Read docs/knowledge-base/frameworks/framework-story-points.md
 
 # Verificar se há métricas históricas disponíveis
 # (velocity, accuracy rate, reference stories)
-codebase_search "velocity tracking metrics historical data"
+Grep "velocity tracking metrics historical data"
 ```
 
 **Objetivo:** Garantir que o agente tem acesso ao framework completo e contexto histórico.

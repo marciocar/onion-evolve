@@ -4,6 +4,7 @@ description: |
   Criação inteligente de agentes Claude Code com análise de contexto.
   Use para criar novos agentes que se integram ao ecossistema Onion.
 model: sonnet
+allowed-tools: Read Grep Write Bash(ls *) Bash(grep *)
 
 parameters:
   - name: agent_name
@@ -84,14 +85,14 @@ description: |
   Use para [caso de uso principal].
 model: sonnet
 tools:
-  - read_file
+  - Read
   - write
-  - search_replace
-  - codebase_search
+  - Edit
+  - Grep
   - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: [cor apropriada]
 priority: [alta/média/baixa]

@@ -44,7 +44,7 @@ Após instalar o Sistema Onion no projeto, você deve ver a seguinte estrutura:
 ```
 seu-projeto/
 ├── .claude/
-│   ├── commands/           # 77 comandos em 9 categorias
+│   ├── commands/           # 82 comandos em 9 categorias
 │   ├── agents/             # 49 agentes especializados
 │   ├── skills/             # 5 skills de orquestração
 │   ├── sessions/           # Sessões de desenvolvimento
@@ -645,7 +645,7 @@ cat .claudeignore
 
 ### **📖 Aprofundar Conhecimento**
 1. **[Guia de Comandos](commands-guide.md)** - Documentação completa
-2. **[Referência de Ferramentas](tools-reference.md)** - Todas as ferramentas disponíveis em TypeScript
+2. **Referência de Ferramentas** - rode `/meta:all-tools` para documentar todas as ferramentas disponíveis
 3. **[Fluxos de Engenharia](engineering-flows.md)** - Workflows detalhados  
 4. **[Task Manager Abstraction](../knowledge-base/concepts/task-manager-abstraction.md)** - Entenda como funciona a abstração
 5. **Adapters por provedor** - Detalhes específicos de cada um em `.claude/utils/task-manager/adapters/` (`jira.md`, `clickup.md`, `asana.md`, `linear.md`)

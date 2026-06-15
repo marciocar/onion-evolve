@@ -9,16 +9,14 @@ description: |
   Relacionado: @command-creator-specialist, @agent-creator-specialist, @claude-code-specialist.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - list_dir
-  - glob_file_search
-  - codebase_search
-  - grep
-  - web_search
-  - todo_write
-  - run_terminal_cmd
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - WebSearch
+  - TodoWrite
+  - Bash
 
 color: cyan
 priority: alta

@@ -5,14 +5,13 @@ description: |
   Use para decompor requisitos em tasks/subtasks/action items. Agnóstico: funciona com ClickUp, Jira, Asana, etc.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: purple
 priority: alta
@@ -608,12 +607,12 @@ Agent Output:
 
 ## 🎯 **Tools Available to This Agent**
 
-- `read_file` - Analisar estruturas de projeto existentes
-- `write` - Criar documentação de estruturas 
-- `search_replace`, `MultiEdit` - Modificar estruturas existentes
-- `codebase_search` - Entender contexto técnico do projeto
-- `web_search` - Research de best practices
-- `todo_write` - Gerenciar decomposição de tarefas
-- **ClickUp MCP Integration** - Criação e gestão completa de estruturas
+- `Read` - Analisar estruturas de projeto existentes
+- `Write` - Criar documentação de estruturas 
+- `Edit`, `Edit` - Modificar estruturas existentes
+- `Grep` - Entender contexto técnico do projeto
+- `WebSearch` - Research de best practices
+- `TodoWrite` - Gerenciar decomposição de tarefas
+- **Task Manager Abstraction** (`taskManager.*`) - criação e gestão de estruturas via adapter agnóstico (API-first; MCP opcional), nunca chamando o MCP/SDK do provider direto
 - **Agente integration** - Coordenação com clickup-specialist e product-agent
 - **Template system** - Acesso a patterns pré-definidos otimizados

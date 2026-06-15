@@ -5,14 +5,13 @@ description: |
   Use para identificar testes ausentes e recomendar estratégia de testing.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - run_terminal_cmd
-  - grep
-  - codebase_search
-  - list_dir
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
+  - TodoWrite
 
 color: cyan
 priority: média

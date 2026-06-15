@@ -58,8 +58,10 @@ evolui").
 
 ## Régua de Frescor Canônica (2026)
 
-Cada worker avalia a KB contra os itens abaixo. Qualquer falha em item marcado
-**(!)** eleva o veredito para STALE ou HISTORICAL.
+Cada worker avalia a KB contra os itens abaixo. **Só itens marcados (!) são GATES**
+— a falha neles eleva o veredito para STALE/HISTORICAL. Itens **sem (!)** (4 e 7) são
+**pontos menores**: registre em `stale_excerpts`, mas **não** rebaixe o veredito por
+eles sozinhos — uma KB que só falha em item menor permanece **CURRENT**.
 
 | # | Item | Critério |
 |---|------|----------|
@@ -67,17 +69,23 @@ Cada worker avalia a KB contra os itens abaixo. Qualquer falha em item marcado
 | 2 | **Ferramenta Workflow (!)** | Se a KB trata de orquestração de agentes, frota ou paralelismo: deve referenciar a ferramenta nativa `Workflow` (research preview mai/2026). Ausência = STALE. |
 | 3 | **Itens formalmente abandonados (!)** | Não contém referências positivas a `.onion/`, CLI standalone, plano v4.0 FASES 5-9, multi-IDE — itens abandonados em 2026-05-18. |
 | 4 | **Plataforma única** | Afirma Claude Code como plataforma única (não "qualquer IDE"). |
-| 5 | **Task Manager Abstraction** | Se menciona task manager: cita a camada plugável (Jira/ClickUp/Asana/Linear) via `TASK_MANAGER_PROVIDER`. Referência a provider único hardcoded = STALE. |
-| 6 | **Data de atualização** | Campo `Última Atualização` presente e ≤ 18 meses atrás (relativo a 2026-06-13). Ausente ou > 18 meses = STALE. |
-| 7 | **Fontes rastreáveis** | Toda afirmação não-trivial tem URL ou marcação `[INFERÊNCIA]`. KB sem nenhuma fonte = STALE. |
-| 8 | **Workflows canônicos** | Se descreve workflows `engineer/*` ou `product/*`: não os funde — são faseados retomáveis. Fusão = STALE. |
+| 5 | **Task Manager Abstraction (!)** | Se menciona task manager: cita a camada plugável (Jira/ClickUp/Asana/Linear) via `TASK_MANAGER_PROVIDER`. Referência a provider único hardcoded = STALE. |
+| 6 | **Data de atualização (!)** | Campo `Última Atualização` presente e ≤ 18 meses atrás (relativo a 2026-06-13). Ausente ou > 18 meses = STALE. |
+| 7 | **Fontes rastreáveis** _(ponto menor — não gate)_ | Exige fonte (URL ou `[INFERÊNCIA]`) **apenas para afirmações factuais EXTERNAS verificáveis** (claim de mercado, dado quantitativo, citação de terceiro, "tendência 20XX"). Convenções, templates, exemplos e processos **internos do Onion NÃO exigem URL**. FALHA só se houver afirmação externa **sem nenhuma** fonte — e mesmo assim é ponto menor (não eleva a STALE sozinho). |
+| 8 | **Workflows canônicos (!)** | Se descreve workflows `engineer/*` ou `product/*`: não os funde — são faseados retomáveis. Fusão = STALE. |
 
 **Vereditos possíveis:**
 
-- **CURRENT** — passa em todos os itens obrigatórios (!); pode ter pontos menores.
-- **STALE** — falha em 1-2 itens (!); conteúdo ainda válido mas desatualizado.
-- **HISTORICAL** — falha em 3+ itens (!) ou trata exclusivamente de vaporware
+- **CURRENT** — passa em todos os itens GATE (!); pode ter pontos menores (itens 4/7).
+- **STALE** — falha em 1-2 itens GATE (!); conteúdo ainda válido mas desatualizado.
+- **HISTORICAL** — falha em 3+ itens GATE (!) ou trata exclusivamente de vaporware
   abandonado (ex.: CLI standalone, `.onion/`); candidata a arquivamento.
+
+> ⚠️ **Anti-ruído** (calibração 2026-06-15): GATES = itens (!) = {1,2,3,5,6,8}. Itens
+> **4** (plataforma única) e **7** (fontes) são **pontos menores** — sozinhos nunca
+> produzem STALE; só descrevem polimento. Isso impede o falso-positivo recorrente de
+> worker `haiku` (flagar template/convenção/exemplo interno por "falta de URL", ou
+> tratar descrição de ferramenta externa como violação de plataforma única).
 
 ---
 

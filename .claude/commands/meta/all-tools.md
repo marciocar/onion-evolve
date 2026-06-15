@@ -2,6 +2,7 @@
 name: all-tools
 description: Documentação de todas as ferramentas disponíveis no Claude Code.
 model: sonnet
+allowed-tools: Read Write Bash(find *)
 category: meta
 tags: [tools, documentation, reference]
 version: "3.0.0"

@@ -5,15 +5,13 @@ description: |
   Use para pitches, case studies, reports executivos. Relacionado: @product-agent, @gamma-api-specialist.
 model: opus
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - codebase_search
-  - list_dir
-  - glob_file_search
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: yellow
 priority: alta
@@ -871,7 +869,7 @@ Após cada entrega:
   1. Coletar feedback estruturado
   2. Identificar o que funcionou/não funcionou
   3. Atualizar templates e frameworks
-  4. Documentar learnings em update_memory
+  4. Documentar learnings (feedback e padrões observados)
   5. Compartilhar insights com agentes relacionados
 
 Perguntas de Reflexão:

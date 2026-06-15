@@ -5,14 +5,13 @@ description: |
   Use para manter documentação atualizada com alterações de código.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: orange
 priority: média
@@ -108,7 +107,7 @@ Gostaria que eu prossiga com essas atualizações de documentação?
 
 ### 5. Fase de Implementação
 Após aprovação do usuário, implemente as mudanças:
-- Atualize arquivos existentes usando Edit ou MultiEdit
+- Atualize arquivos existentes usando Edit ou Edit
 - Crie novos arquivos de documentação com Write
 - Garanta formatação e estilo consistentes
 - Adicione exemplos de código onde útil

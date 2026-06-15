@@ -1,7 +1,8 @@
 ---
 name: create-agent-express
-description: Criar agente de forma rápida e simplificada.
+description: Criar agente de forma rápida e simplificada. Diferença vs /meta:create-agent: este é o caminho RÁPIDO (mínimo de prompts, sem descoberta de contexto profunda); o create-agent faz análise completa do ecossistema antes de criar.
 model: sonnet
+allowed-tools: Read Write
 category: meta
 tags: [agent, creation, quick]
 version: "3.0.0"
@@ -35,7 +36,7 @@ Com base nos requisitos, determine:
 Liste todas as ferramentas disponíveis e pergunte ao usuário quais o sub-agente deve ter acesso:
 
 Ferramentas disponíveis:
-- **Operações de Arquivo**: Read, Write, Edit, MultiEdit, NotebookRead, NotebookEdit
+- **Operações de Arquivo**: Read, Write, Edit, Edit, NotebookRead, NotebookEdit
 - **Pesquisa e Navegação**: Glob, Grep, LS
 - **Execução**: Bash, Task
 - **Web**: WebFetch, WebSearch

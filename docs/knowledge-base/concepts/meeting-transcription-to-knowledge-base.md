@@ -371,7 +371,7 @@ Revise a extração abaixo e identifique:
          │
          ▼
 ┌─────────────────┐
-│ 6. INTEGRAÇÃO   │ Exportar para sistemas (Notion, Jira, CRM)
+│ 6. INTEGRAÇÃO   │ Exportar p/ KB (Notion/Obsidian) + task manager (abstração TASK_MANAGER_PROVIDER)
 └────────┬────────┘
          │
          ▼
@@ -425,9 +425,8 @@ Revise a extração abaixo e identifique:
 - **Transkriptor**: 100+ idiomas, timestamps
 
 ### Processamento LLM
-- **GPT-4**: Melhor para extração estruturada
-- **Claude**: Excelente para contexto longo
-- **Llama 3**: Open-source, auto-hospedado
+- **Claude** — recomendação primária (no Sistema Onion, plataforma única Claude Code). Use por **tier**: `opus` p/ análise profunda, `sonnet` p/ extração estruturada de alto volume, `haiku` p/ classificação. Contexto longo nativo.
+- *Fora do Onion*, outras famílias (GPT-*, Llama 3 auto-hospedado) podem servir; dentro do Onion o substrato é Claude Code.
 
 ### Armazenamento
 - **Notion**: Bases de dados flexíveis

@@ -4,6 +4,7 @@ description: |
   Decomposição de tarefas complexas em estrutura hierárquica.
   Use para criar estrutura organizada de subtarefas.
 model: sonnet
+allowed-tools: Read
 
 parameters:
   - name: task

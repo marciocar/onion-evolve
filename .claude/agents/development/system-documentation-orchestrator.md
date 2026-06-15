@@ -5,16 +5,14 @@ description: |
   Use para criar documentação completa de arquitetura e ambiente para projetos NX Monorepo.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - codebase_search
-  - list_dir
-  - glob_file_search
-  - web_search
-  - todo_write
-  - run_terminal_cmd
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
+  - Bash
 
 color: blue
 priority: alta
@@ -152,28 +150,28 @@ Para orquestração paralela de múltiplos especialistas, use a ferramenta **Wor
 
 ```bash
 # 1. Estrutura de Workspace
-list_dir → "." (root do projeto)
-read_file → "nx.json" (configuração NX)
-read_file → "package.json" (dependências)
-read_file → "README.md" (overview existente)
+Glob → "." (root do projeto)
+Read → "nx.json" (configuração NX)
+Read → "package.json" (dependências)
+Read → "README.md" (overview existente)
 
 # 2. Mapeamento de Aplicações
-list_dir → "apps/" (aplicações deployáveis)
+Glob → "apps/" (aplicações deployáveis)
 # Para cada app encontrado:
-  list_dir → "apps/[app-name]/"
-  read_file → "apps/[app-name]/project.json"
+  Glob → "apps/[app-name]/"
+  Read → "apps/[app-name]/project.json"
 
 # 3. Mapeamento de Bibliotecas
-list_dir → "libs/" (bibliotecas compartilhadas)
+Glob → "libs/" (bibliotecas compartilhadas)
 # Identificar categorias principais (server/, web/, common/)
-list_dir → "libs/server/"
-list_dir → "libs/web/"
-list_dir → "libs/common/"
+Glob → "libs/server/"
+Glob → "libs/web/"
+Glob → "libs/common/"
 
 # 4. Análise de Documentação Existente
-glob_file_search → "**/*.md" (buscar docs existentes)
-glob_file_search → "**/README*.md"
-list_dir → "docs/" (se existir)
+Glob → "**/*.md" (buscar docs existentes)
+Glob → "**/README*.md"
+Glob → "docs/" (se existir)
 ```
 
 #### 1.3. Análise Profunda com Code Understanding
@@ -253,10 +251,10 @@ diagrams, ADRs) na sequência; 🟢 MÉDIOS (Sequence diagrams, Troubleshooting)
 
 #### 2.3. Criar TODO List
 
-**Use `todo_write` para trackear:**
+**Use `TodoWrite` para trackear:**
 
 ```typescript
-todo_write(merge: false, todos: [
+TodoWrite(merge: false, todos: [
   {id: "1", content: "Análise completa do NX Monorepo", status: "completed"},
   {id: "2", content: "Criar estrutura de diretórios docs/architecture/", status: "in_progress"},
   {id: "3", content: "Escrever system-overview.md", status: "pending"},

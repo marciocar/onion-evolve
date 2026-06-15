@@ -5,15 +5,13 @@ description: |
   Use para detecção de stack e geração de docs consolidada de qualquer projeto.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - list_dir
-  - glob_file_search
-  - codebase_search
-  - grep
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - WebSearch
+  - TodoWrite
 
 color: purple
 priority: alta
@@ -410,8 +408,8 @@ analyzer.save_consolidated_doc(doc, "output/consolidated.md")
 4. Integrar com comando orquestrador
 
 **Tools Available to This Agent**:
-- `read_file`, `list_dir`, `glob_file_search` - Análise de arquivos e estrutura
-- `codebase_search` - Busca semântica por patterns
-- `write`, `MultiEdit`, `search_replace` - Geração de documentação
-- `web_search` - Research de melhores práticas por stack
-- `todo_write` - Tracking de progresso de análise
+- `Read`, `Glob`, `Glob` - Análise de arquivos e estrutura
+- `Grep` - Busca semântica por patterns
+- `Write`, `Edit`, `Edit` - Geração de documentação
+- `WebSearch` - Research de melhores práticas por stack
+- `TodoWrite` - Tracking de progresso de análise

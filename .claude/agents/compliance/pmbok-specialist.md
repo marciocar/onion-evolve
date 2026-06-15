@@ -5,14 +5,13 @@ description: |
   Use para change management, quality management, stakeholder e risk management.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: yellow
 priority: média
@@ -585,35 +584,35 @@ Se API down > 30min:
 ## 🛠️ Tools e Estratégias
 
 ### Ferramentas Utilizadas
-- `read_file`: Ler contexto, template, NX configs
-- `write`: Criar os 5 documentos
-- `codebase_search`: Buscar menções de governance, quality gates
-- `grep`: Buscar CODEOWNERS, nx.json, package.json
+- `Read`: Ler contexto, template, NX configs
+- `Write`: Criar os 5 documentos
+- `Grep`: Buscar menções de governance, quality gates
+- `Grep`: Buscar CODEOWNERS, nx.json, package.json
 
 ### Estratégia de Geração
 
 **1. Ler Template + NX Context:**
 ```bash
-read_file .claude/commands/common/templates/compliance_pmbok_template.md
-read_file nx.json
-read_file .github/CODEOWNERS
-codebase_search "What is the NX monorepo structure?"
+Read .claude/commands/common/templates/compliance_pmbok_template.md
+Read nx.json
+Read .github/CODEOWNERS
+Grep "What is the NX monorepo structure?"
 ```
 
 **2. Identificar Governança Existente:**
 ```bash
 grep "boundary" nx.json
 grep "tags" nx.json
-codebase_search "What quality gates exist?"
+Grep "What quality gates exist?"
 ```
 
 **3. Gerar 5 Documentos:**
 ```bash
-write docs/compliance-context/project-management/project-governance.md
-write docs/compliance-context/project-management/change-management.md
-write docs/compliance-context/project-management/quality-management.md
-write docs/compliance-context/project-management/stakeholder-management.md
-write docs/compliance-context/project-management/risk-management.md
+Write docs/compliance-context/project-management/project-governance.md
+Write docs/compliance-context/project-management/change-management.md
+Write docs/compliance-context/project-management/quality-management.md
+Write docs/compliance-context/project-management/stakeholder-management.md
+Write docs/compliance-context/project-management/risk-management.md
 ```
 
 **4. Confirmar Conclusão:**

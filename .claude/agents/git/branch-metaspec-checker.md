@@ -3,14 +3,14 @@ name: branch-metaspec-checker
 description: |
   Especialista em validação de conformidade com metaspecs para o branch atual.
   Use para garantir alinhamento arquitetural antes do merge.
+  Diferença vs @metaspec-gate-keeper: este é DIFF-SCOPED (só as mudanças do branch, gate pré-PR); o gate-keeper é a validação geral/constitucional (L0/L1+). Mesmo padrão de branch-code-reviewer vs code-reviewer.
 model: sonnet
 tools:
-  - read_file
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: red
 priority: alta

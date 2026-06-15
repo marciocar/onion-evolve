@@ -4,6 +4,7 @@ description: |
   Gera e executa testes end-to-end automaticamente com detecção de framework.
   Use para criar testes E2E seguindo padrões do projeto e executá-los com gravação.
 model: sonnet
+allowed-tools: Read Glob Write Bash(npx *)
 
 parameters:
   - name: feature-name
@@ -207,7 +208,7 @@ SE --record:
 #### 7.3 Executar Testes
 
 ```bash
-run_terminal_cmd [comando construído]
+Bash [comando construído]
 ```
 
 **Capturar output:**

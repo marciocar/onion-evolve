@@ -5,13 +5,12 @@ description: |
   Use para análise de requisitos e coordenação de especialistas de compliance.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: blue
 priority: alta
@@ -468,47 +467,49 @@ Após todos specialists concluírem, consolidar em 2 arquivos principais:
 
 ---
 
+> **Nota:** os caminhos abaixo são a **estrutura de saída gerada** no projeto-alvo (relativos a `docs/compliance-context/`, produzidos por `/docs:build-compliance-docs`). São paths de *output*, **não** links navegáveis do framework — por isso aparecem como código, não como links.
+
 ## 🔒 ISO 27001:2022 - Segurança da Informação
 [Se gerado]
 
-- [Política de Segurança da Informação](security/information-security-policy.md)
-- [Risk Assessment (Avaliação de Riscos)](security/risk-assessment.md)
-- [Gestão de Ativos](security/asset-management.md)
-- [Controle de Acesso (Access Control)](security/access-control.md)
-- [Resposta a Incidentes](security/incident-response.md)
+- Política de Segurança da Informação — `security/information-security-policy.md`
+- Risk Assessment (Avaliação de Riscos) — `security/risk-assessment.md`
+- Gestão de Ativos — `security/asset-management.md`
+- Controle de Acesso (Access Control) — `security/access-control.md`
+- Resposta a Incidentes — `security/incident-response.md`
 
 ## 🏥 ISO 22301:2019 - Continuidade de Negócios
 [Se gerado]
 
-- [Business Continuity Plan (BCP)](business-continuity/business-continuity-plan.md)
-- [Disaster Recovery Plan (DRP)](business-continuity/disaster-recovery-plan.md)
-- [Plano de Gerenciamento de Crise](business-continuity/crisis-management.md)
-- [Testes de Resiliência](business-continuity/resilience-testing.md)
-- [Recovery Time Objectives (RTOs) e RPOs](business-continuity/recovery-objectives.md)
+- Business Continuity Plan (BCP) — `business-continuity/business-continuity-plan.md`
+- Disaster Recovery Plan (DRP) — `business-continuity/disaster-recovery-plan.md`
+- Plano de Gerenciamento de Crise — `business-continuity/crisis-management.md`
+- Testes de Resiliência — `business-continuity/resilience-testing.md`
+- Recovery Time Objectives (RTOs) e RPOs — `business-continuity/recovery-objectives.md`
 
 ## 📊 PMBOK® 7th - Governança de Projetos
 [Se gerado]
 
-- [Governança de Projetos](project-management/project-governance.md)
-- [Gestão de Mudanças (Change Management)](project-management/change-management.md)
-- [Gestão de Qualidade](project-management/quality-management.md)
-- [Gestão de Stakeholders](project-management/stakeholder-management.md)
-- [Gestão de Riscos](project-management/risk-management.md)
+- Governança de Projetos — `project-management/project-governance.md`
+- Gestão de Mudanças (Change Management) — `project-management/change-management.md`
+- Gestão de Qualidade — `project-management/quality-management.md`
+- Gestão de Stakeholders — `project-management/stakeholder-management.md`
+- Gestão de Riscos — `project-management/risk-management.md`
 
 ## ✅ SOC2 Type II - Trust Services Criteria
 [Se gerado]
 
-- [Trust Services Criteria (TSC)](soc2/trust-services-criteria.md)
-- [Controles de Segurança](soc2/security-controls.md)
-- [Controles de Disponibilidade](soc2/availability-controls.md)
-- [Controles de Confidencialidade](soc2/confidentiality-controls.md)
-- [Estratégia de Coleta de Evidências](soc2/evidence-collection.md)
+- Trust Services Criteria (TSC) — `soc2/trust-services-criteria.md`
+- Controles de Segurança — `soc2/security-controls.md`
+- Controles de Disponibilidade — `soc2/availability-controls.md`
+- Controles de Confidencialidade — `soc2/confidentiality-controls.md`
+- Estratégia de Coleta de Evidências — `soc2/evidence-collection.md`
 
 ---
 
 ## 📋 Documentação Consolidada
 
-- [COMPLIANCE OVERVIEW - Status Geral](COMPLIANCE_OVERVIEW.md)
+- COMPLIANCE OVERVIEW - Status Geral — `COMPLIANCE_OVERVIEW.md`
 
 ---
 
@@ -622,11 +623,11 @@ Documentos Gerados:
 ## 🛠️ Tools e Estratégias
 
 ### Ferramentas Utilizadas
-- `read_file`: Ler docs existentes (business/technical context)
-- `codebase_search`: Buscar mentions de compliance, security no código
-- `grep`: Buscar keywords específicas (RTO, RPO, SLA, etc.)
-- `write`: Criar arquivos consolidados (index, overview)
-- `web_search`: Pesquisar referências (se necessário validar algo)
+- `Read`: Ler docs existentes (business/technical context)
+- `Grep`: Buscar mentions de compliance, security no código
+- `Grep`: Buscar keywords específicas (RTO, RPO, SLA, etc.)
+- `Write`: Criar arquivos consolidados (index, overview)
+- `WebSearch`: Pesquisar referências (se necessário validar algo)
 
 ### Estratégia de Leitura
 ```python

@@ -252,9 +252,9 @@ expertise:
   - Testes com Testing Library
   - Performance optimization
 tools:
-  - read_file
+  - Read
   - write
-  - codebase_search
+  - Grep
 ```
 
 ### Pattern: Meta Agent
@@ -269,9 +269,9 @@ expertise:
   - Prompt engineering
   - Estruturação de conhecimento
 tools:
-  - read_file
+  - Read
   - write
-  - codebase_search
+  - Grep
 related_agents:
   - command-creator-specialist
 ```
@@ -390,11 +390,11 @@ context:
 
 | Tipo de Agente | Ferramentas Recomendadas |
 |----------------|--------------------------|
-| **Pesquisa** | `codebase_search`, `web_search`, `grep`, `read_file` |
-| **Desenvolvimento** | `read_file`, `write`, `search_replace`, `run_terminal_cmd` |
-| **Review** | `read_file`, `codebase_search`, `grep` |
-| **Documentação** | `read_file`, `write`, `codebase_search` |
-| **Teste** | `read_file`, `write`, `run_terminal_cmd` |
+| **Pesquisa** | `Grep`, `WebSearch`, `Grep`, `Read` |
+| **Desenvolvimento** | `Read`, `Write`, `Edit`, `Bash` |
+| **Review** | `Read`, `Grep`, `Grep` |
+| **Documentação** | `Read`, `Write`, `Grep` |
+| **Teste** | `Read`, `Write`, `Bash` |
 
 ### Pattern: Agnostic Tools
 
@@ -403,20 +403,20 @@ context:
 **✅ Agente Agnóstico:**
 ```yaml
 tools:
-  - read_file
+  - Read
   - write
-  - codebase_search
+  - Grep
   - grep
-  - web_search
+  - WebSearch
 # Sem MCPs específicos - portável para qualquer projeto
 ```
 
 **⚠️ Agente Especializado:**
 ```yaml
 tools:
-  - read_file
+  - Read
   - write
-  - mcp_ClickUp_*      # Acoplado ao ClickUp
+  - mcp__clickup__*      # Acoplado ao ClickUp
 # Útil, mas menos portável
 ```
 
@@ -548,7 +548,7 @@ name: agent-name
 description: |
   Descrição clara em 1-2 linhas.
 model: sonnet
-tools: [read_file, write, codebase_search, grep]
+tools: [Read, write, Grep, grep]
 
 color: purple
 priority: alta

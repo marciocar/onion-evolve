@@ -261,7 +261,7 @@ const res = await fetch('https://api.provider.com/tasks', {
   body: JSON.stringify({ name, description, status }),
 });
 // Transporte MCP (quando TASK_MANAGER_TRANSPORT=mcp e servidor ativo):
-// await mcp_provider_create_task({ name, description });
+// await mcp__provider__create_task({ name, description });
 \`\`\`
 
 // ... implementar todos os métodos da ITaskManager

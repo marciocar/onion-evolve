@@ -4,6 +4,7 @@ description: |
   Gera e executa testes de integração automaticamente com detecção de framework.
   Use para criar testes de integração (Grey-box) seguindo padrões do projeto, incluindo API contract testing, boundary testing e fuzzing.
 model: sonnet
+allowed-tools: Read Glob Write Bash(find *) Bash(cat *) Bash(npm *) Bash(pnpm *) Bash(npx *)
 
 parameters:
   - name: api-endpoint
@@ -235,7 +236,7 @@ describe('API Integration: {{api-endpoint}}', () => {
 
 **Construir comando:** Base + flags específicas + execução
 
-**Executar:** `run_terminal_cmd [comando]` e capturar: resultados (pass/fail), contratos validados, erros, tempo
+**Executar:** `Bash [comando]` e capturar: resultados (pass/fail), contratos validados, erros, tempo
 
 ### Passo 7: Apresentar Resultados
 

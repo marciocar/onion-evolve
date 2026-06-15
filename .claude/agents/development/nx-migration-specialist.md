@@ -5,16 +5,14 @@ description: |
   Use para resolver breaking changes, validar workspace e upgrades NX.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - codebase_search
-  - list_dir
-  - glob_file_search
-  - run_terminal_cmd
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - WebSearch
+  - TodoWrite
 
 color: teal
 priority: alta
@@ -137,7 +135,7 @@ cat package.json | grep "@nx/"
 ### 1.3 Criar Checklist de Migração
 
 ```typescript
-// Use todo_write para criar checklist
+// Use TodoWrite para criar checklist
 [
   { id: "backup", content: "Criar backup e branch", status: "completed" },
   { id: "migrate", content: "Executar nx migrate", status: "pending" },
@@ -403,7 +401,7 @@ nx affected --target=lint --fix
 ### 4.5 Verificar Linter Errors
 
 ```bash
-# Usar tool read_lints para verificar erros persistentes
+# Usar tool Bash para verificar erros persistentes
 # Focar em erros relacionados a imports e configs
 ```
 
@@ -594,7 +592,7 @@ grep -r "@nx/webpack:webpack" --include="project.json"
 # apps/my-app/project.json:      "executor": "@nx/webpack:webpack",
 
 # 2. SUBSTITUIR
-# Use search_replace tool:
+# Use Edit tool:
 # OLD: "@nx/webpack:webpack"
 # NEW: "@nx/webpack:build"
 

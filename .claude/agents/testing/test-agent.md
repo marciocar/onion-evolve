@@ -6,15 +6,13 @@ description: |
   Use para criação de estratégias, pipelines automatizados e resolução de problemas de qualidade.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - run_terminal_cmd
-  - grep
-  - codebase_search
-  - list_dir
-  - todo_write
-  - glob_file_search
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
+  - TodoWrite
 
 color: cyan
 priority: alta

@@ -2,6 +2,7 @@
 name: refine
 description: Refinar requisitos através de perguntas de esclarecimento.
 model: sonnet
+allowed-tools: Read Write Edit WebSearch
 category: product
 tags: [requirements, refinement, clarification]
 version: "3.0.0"

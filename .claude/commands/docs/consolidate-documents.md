@@ -5,6 +5,7 @@ description: |
   Aceita pasta ou arquivos individuais para criar conhecimento consolidado e unificado.
   Use para transformar múltiplos documentos em conhecimento estratégico consolidado.
 model: sonnet
+allowed-tools: Read Write Bash(find *) Bash(ls *) Bash(stat *)
 
 parameters:
   - name: source
@@ -43,6 +44,8 @@ related_agents:
 # 📚 Consolidar Documentos
 
 Comando para consolidar múltiplos documentos relacionados, identificando padrões, divergências, convergências e insights estratégicos.
+
+> **Diferença vs `/product:consolidate-meetings`:** este consolida **documentos** gerais (business-context, tech-docs, etc.); o de meetings consolida **transcrições de reunião** (via `@meeting-consolidator`).
 
 ## 🎯 Objetivo
 

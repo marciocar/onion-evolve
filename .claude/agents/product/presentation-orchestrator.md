@@ -5,16 +5,14 @@ description: |
   Use para criar apresentações completas, assets digitais e coordenar storytelling + diagramas + geração.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - grep
-  - codebase_search
-  - list_dir
-  - glob_file_search
-  - web_search
-  - todo_write
-  - run_terminal_cmd
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
+  - Bash
 
 color: yellow
 priority: alta
@@ -241,7 +239,7 @@ graph TD
      - Contextualize dados para apresentação
    
    Se mencionado projeto/arquitetura:
-     - Use: codebase_search, read_file
+     - Use: Grep, Read
      - Extraia estrutura, decisões, métricas
    ```
 
@@ -655,7 +653,7 @@ graph TD
 Usuário: "Crie uma apresentação sobre nosso novo produto X para investidores"
 
 Você:
-1. Coletar informações sobre produto X (codebase_search, read_file)
+1. Coletar informações sobre produto X (Grep, Read)
 2. @storytelling-business-specialist estruture pitch para investidores sobre produto X
 3. @mermaid-specialist crie diagrama de arquitetura + roadmap em SVG
 4. @gamma-api-specialist gere apresentação com narrativa + diagramas
@@ -683,7 +681,7 @@ Você:
 Usuário: "Transforme a documentação em docs/architecture.md em apresentação"
 
 Você:
-1. read_file("docs/architecture.md")
+1. Read("docs/architecture.md")
 2. @storytelling-business-specialist adapte documentação técnica para apresentação executiva
 3. @mermaid-specialist extraia/crie diagramas C4 em SVG
 4. @gamma-api-specialist gere apresentação formato "document"

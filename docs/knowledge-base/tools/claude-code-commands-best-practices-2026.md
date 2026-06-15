@@ -1,4 +1,4 @@
-# Claude Code Commands Best Practices (atualizado em 2026-06-13)
+# Claude Code Commands Best Practices (atualizado em 2026-06-15)
 
 ---
 
@@ -8,7 +8,7 @@
 |-------|-------|
 | **Versão** | 1.1.0 |
 | **Data de Criação** | 2025-11-24 |
-| **Última Atualização** | 2026-06-13 |
+| **Última Atualização** | 2026-06-15 |
 | **Categoria** | Tools |
 | **Aplicação** | Sistema Onion - Comandos e Agentes |
 
@@ -153,7 +153,7 @@ claude://prompt?text=<encoded-prompt>&files=<file-list>
 
 Fornecem contexto adicional e ferramentas para o modelo.
 
-**Integração:**
+**Integração (transporte opcional).** No Onion, task managers são consumidos pela **Task Manager Abstraction** plugável (`TASK_MANAGER_PROVIDER` = jira|clickup|asana|linear|none): o consumidor chama `taskManager.*` via o adapter (`.claude/utils/task-manager/`) — **REST API por default; MCP é transporte opcional**. O exemplo de MCP abaixo é **um** transporte de **um** provider (ClickUp), não o caminho canônico:
 ```json
 {
   "mcpServers": {
@@ -167,6 +167,7 @@ Fornecem contexto adicional e ferramentas para o modelo.
   }
 }
 ```
+> Nunca hardcode um provider no comando/agente — roteie pela abstração. Ver [task-manager-abstraction.md](../concepts/task-manager-abstraction.md).
 
 ---
 
@@ -238,7 +239,7 @@ Regra de ouro: orquestração de frota é **mais barata e mais limpa no nível p
 
 ### Skills como ponto de orquestração
 
-No nível principal, **Skills** são o lugar canônico para orquestrar frotas. Uma skill pode invocar comandos e agentes e, portanto, hospedar a lógica de `Workflow`/`Agent`. No Sistema Onion (port do Claude Code), a arquitetura (architecture.md §4.2) **proíbe** `agents/* → commands/*` — um agente **sugere**, mas não invoca um comando. Skills, por outro lado, **podem orquestrar** (`skills/* → commands/*, agents/*`).
+No nível principal, **Skills** são o lugar canônico para orquestrar frotas. Uma skill pode invocar comandos e agentes e, portanto, hospedar a lógica de `Workflow`/`Agent`. No Sistema Onion (framework template em `.claude/` sobre Claude Code), a arquitetura (architecture.md §4.2) **proíbe** `agents/* → commands/*` — um agente **sugere**, mas não invoca um comando. Skills, por outro lado, **podem orquestrar** (`skills/* → commands/*, agents/*`).
 
 Consequência direta: a orquestração de frota mora em **SKILL + COMANDO**, nunca em um agente. **Não** crie um agente do tipo `fleet-orchestrator` — ele seria incapaz de invocar comandos e violaria a §4.2.
 
@@ -351,9 +352,9 @@ Use a delegação sequencial quando há **dependência de ordem** ou uma **únic
 # Comando com Integração
 
 ## Integrações Opcionais
-Se disponível, utilize:
-- MCP ClickUp para gestão de tasks
-- MCP GitHub para PRs
+Se disponível, utilize (sempre via adapter, nunca o provider direto):
+- Task Manager via adapter agnóstico (`TASK_MANAGER_PROVIDER`: jira|clickup|asana|linear) para gestão de tasks
+- Forge via adapter (GitHub/GitLab) para PRs
 
 ## Fallback
 Sem integrações, gere output em formato compatível.
@@ -505,9 +506,10 @@ Se Z e X mas não Y, faça C.
 [O que retorna]
 
 ## 🔌 Integrações Opcionais
-| MCP | Uso |
+| Integração (via adapter) | Uso |
 |-----|-----|
-| ClickUp | Gestão de tasks |
+| Task Manager (`TASK_MANAGER_PROVIDER`) | Gestão de tasks |
+| Forge | PRs / CI |
 
 ## 💡 Exemplos
 [Casos de uso]

@@ -5,15 +5,13 @@ description: |
   Use para documentação estruturada complementando diagramas do @c4-architecture-specialist.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - glob_file_search
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: blue
 priority: alta
@@ -68,7 +66,7 @@ Agente especialista em documentação textual completa do C4 Model, complementan
 interface CacheIntegrationEngine {
   // Passo 1: Carrega Análise Cached do Agente de Arquitetura
   async loadCachedAnalysis(projectPath: string): Promise<ArchitectureAnalysis> {
-    // Usa read_file para carregar análise cached do @c4-architecture-specialist
+    // Usa Read para carregar análise cached do @c4-architecture-specialist
     // Faz parse dos resultados da análise (tipo projeto, estruturas, dependências, padrões)
     // Valida frescor e completude do cache
     return cachedAnalysis;
@@ -647,11 +645,11 @@ Agent Process:
 
 ## 🎯 **Tools Available to This Agent**
 
-- `read_file` - Load cached analysis and existing documentation
-- `write` - Create and save documentation files
-- `list_dir` - Discover project structure for documentation organization
-- `grep` - Search for architectural patterns and decisions
-- `codebase_search` - Semantic understanding for documentation context
+- `Read` - Load cached analysis and existing documentation
+- `Write` - Create and save documentation files
+- `Glob` - Discover project structure for documentation organization
+- `Grep` - Search for architectural patterns and decisions
+- `Grep` - Semantic understanding for documentation context
 - `@c4-architecture-specialist integration` - Master-slave coordination
 - Template access via `.claude/utils/c4-documentation-templates.md`
 - Cache integration for analysis consistency

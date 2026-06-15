@@ -2,6 +2,7 @@
 name: create-knowledge-base
 description: Gerar knowledge base estruturada em `docs/knowledge-base/<category>/`.
 model: sonnet
+allowed-tools: Write Bash(test -d *) Bash(mkdir -p *) Bash(ls *)
 
 parameters:
   - name: topic
@@ -90,7 +91,7 @@ Se já existir KB sobre o tema, perguntar ao usuário: atualizar a existente, cr
 
 ### Fase 2 — Pesquisa
 
-Use `@research-agent` ou `web_search` para coletar:
+Use `@research-agent` ou `WebSearch` para coletar:
 
 1. **Documentação oficial** — fonte primária do tema
 2. **Best practices 2025-2026** — recomendações atuais da comunidade

@@ -5,15 +5,13 @@ description: |
   Use para criar novos comandos. Relacionado: @agent-creator-specialist, @claude-code-specialist.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - list_dir
-  - glob_file_search
-  - codebase_search
-  - grep
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - WebSearch
+  - TodoWrite
 
 color: cyan
 priority: alta
@@ -100,22 +98,23 @@ Todo comando deve ser:
 
 ```bash
 # 1. Listar TODOS os comandos por categoria
-list_dir .claude/commands/
-list_dir .claude/commands/meta/
-list_dir .claude/commands/engineer/
-list_dir .claude/commands/product/
-list_dir .claude/commands/git/
-list_dir .claude/commands/compliance/
-list_dir .claude/commands/docs/
-list_dir .claude/commands/admin/
-list_dir .claude/commands/validate/
-list_dir .claude/commands/common/
+Glob .claude/commands/
+Glob .claude/commands/meta/
+Glob .claude/commands/engineer/
+Glob .claude/commands/product/
+Glob .claude/commands/git/
+Glob .claude/commands/docs/
+Glob .claude/commands/meta/
+Glob .claude/commands/validate/
+Glob .claude/commands/test/
+Glob .claude/commands/development/
+Glob .claude/commands/common/
 
 # 2. Ler comandos similares
-read_file .claude/commands/[categoria]/[comando-similar].md
+Read .claude/commands/[categoria]/[comando-similar].md
 
 # 3. Identificar padrões
-codebase_search "padrão de workflow similar" [".claude/commands/"]
+Grep "padrão de workflow similar" [".claude/commands/"]
 ```
 
 **Extrair para cada comando:**
@@ -134,13 +133,13 @@ codebase_search "padrão de workflow similar" [".claude/commands/"]
 
 ```bash
 # Listar agentes que podem ser invocados
-list_dir .claude/agents/
-list_dir .claude/agents/meta/
-list_dir .claude/agents/development/
-list_dir .claude/agents/compliance/
+Glob .claude/agents/
+Glob .claude/agents/meta/
+Glob .claude/agents/development/
+Glob .claude/agents/compliance/
 
 # Ler agentes relevantes
-read_file .claude/agents/[categoria]/[agente-relevante].md
+Read .claude/agents/[categoria]/[agente-relevante].md
 ```
 
 **Identificar:**
@@ -152,8 +151,8 @@ read_file .claude/agents/[categoria]/[agente-relevante].md
 
 ```bash
 # Ler documentação de arquitetura
-read_file docs/onion/claude-code-commands-architecture.md
-read_file docs/onion/commands-guide.md
+Read docs/onion/claude-code-commands-architecture.md
+Read docs/onion/commands-guide.md
 ```
 
 **Compreender:**
@@ -167,7 +166,7 @@ read_file docs/onion/commands-guide.md
 
 ```bash
 # Buscar comandos com propósito similar
-codebase_search "comando que faz [propósito similar]" [".claude/commands/"]
+Grep "comando que faz [propósito similar]" [".claude/commands/"]
 
 # Verificar nomes existentes
 grep "# " .claude/commands/**/*.md | grep "[nome-proposto]"
@@ -407,7 +406,7 @@ Este comando delega para o agente especializado.
 3. [Retornar resultado em formato X]
 ```
 
-**Pattern 2: Orquestração Sequencial**
+**Pattern 2: Orquestração Sequencial** (passos **dependentes**; para passos **independentes**, prefira fan-out via a ferramenta nativa Workflow — ver `/meta:fleet` / skill `onion-fleet`)
 ```markdown
 ## Execução
 
@@ -717,9 +716,9 @@ Apenas se:
 #### 4.3. Criar Arquivo
 
 ```bash
-write .claude/commands/[categoria]/[comando].md
+Write .claude/commands/[categoria]/[comando].md
 # ou
-write .claude/commands/[categoria]/[sub-categoria]/[comando].md
+Write .claude/commands/[categoria]/[sub-categoria]/[comando].md
 ```
 
 ---
@@ -816,10 +815,10 @@ Para testar o novo comando, use no **chat da Claude Code**:
 grep -r "# " .claude/commands/ | grep "[termo-chave]"
 
 # Buscar workflows similares
-codebase_search "workflow similar a [descrição]" [".claude/commands/"]
+Grep "workflow similar a [descrição]" [".claude/commands/"]
 
 # Validar unicidade na categoria
-list_dir .claude/commands/[categoria]/
+Glob .claude/commands/[categoria]/
 ```
 
 **Se detectar duplicação:**

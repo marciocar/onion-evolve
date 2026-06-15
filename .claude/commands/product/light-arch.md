@@ -2,6 +2,7 @@
 name: light-arch
 description: Design de arquitetura leve para features.
 model: sonnet
+allowed-tools: Read WebSearch
 category: product
 tags: [architecture, design, planning]
 version: "3.0.0"

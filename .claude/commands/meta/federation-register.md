@@ -1,10 +1,10 @@
 ---
 name: federation-register
-description: Registra e valida um contrato de federação (spec-as-code) localmente em UM repo, contra o ledger git. Bootstrapa o ledger se ausente, roda a validação determinística (tests:+fixtures obrigatórios) e, em sucesso, anexa a entrada no CHANGELOG. É o "átomo" da Onion Federation (Fase 1) — testável num repo só.
+description: Registra e valida um contrato de federação (spec-as-code) localmente em UM repo, contra o ledger git. Bootstrapa o ledger se ausente, roda a validação determinística (tests:+fixtures obrigatórios) e, em sucesso, grava+commita o contrato em contracts/<id>.md. NÃO anuncia aos consumers — o CHANGELOG/inbox é responsabilidade do /meta:federation-publish. É o "átomo" da Onion Federation (Fase 1) — testável num repo só.
 model: sonnet
 category: meta
 tags: [federation, contract, spec-as-code, ledger, validation, sdaal]
-version: "1.0.0"
+version: "1.1.0"
 updated: "2026-06-15"
 allowed-tools: Read Write Edit Grep Glob Bash(cat .env*) Bash(bash .claude/validation/federation-contract-validate.sh*) Bash(git *) Bash(mkdir *)
 argument-hint: "<path-do-contrato> [--ledger <path>]  (ledger também via .env FEDERATION_LEDGER)"
@@ -57,18 +57,18 @@ bash .claude/validation/federation-contract-validate.sh "<ledger>/contracts/<id>
 - `valid:true` → segue. `valid:false` → **parar** e reportar os `errors[]` como **blocker**
   (sem teste/fixture = blocker; semver inválido = blocker). Não registrar contrato inválido.
 
-### Passo 4 — Selar no CHANGELOG (só em sucesso)
-- Anexar entrada datada no `<ledger>/CHANGELOG.md`:
-  `## <data> · <id> · <version> · <producer> · PUBLISH|UPDATE` + 1 linha de resumo + consumers afetados.
-- Commitar no ledger (`git -C <ledger> add -A && commit`) com mensagem
-  `publish(<id>): v<version> [producer <member-id>]`.
+### Passo 4 — Commitar o contrato (sem anunciar)
+- `git -C <ledger> add contracts/<id>.md && git -C <ledger> commit -m "register(<id>): v<version> [producer <member-id>]"`.
+- **NÃO** escrever no `CHANGELOG.md` nem anunciar aos consumers — isso é do
+  `/meta:federation-publish` (que carrega o checkpoint do maestro). O `register` apenas **atesta que
+  um contrato válido existe** no ledger; o **anúncio** é um ato deliberado separado.
 
 ## 📤 Saída esperada
 
 ```
 ✅ contrato <id> v<version> registrado em <ledger>/contracts/<id>.md
    ◆ validação: OK (tests:N, fixtures:M)
-   ◆ CHANGELOG: entrada PUBLISH adicionada + commit <sha>
+   ◆ commit <sha> (register) — anuncie aos consumers com /meta:federation-publish
 ```
 ou, em falha:
 ```
@@ -81,8 +81,9 @@ ou, em falha:
 - **2a (sem path absoluto):** ledger e contrato resolvidos por argumento / `members.yaml` / `.env` /
   path relativo. Nenhum caminho absoluto embutido neste comando nem no script.
 - **6a (validação não-agente):** a regra dura vive no script de `.claude/validation/`.
-- **Átomo num repo só:** não exige outros membros vivos; `publish`/`check`/`status` cross-repo são
-  Fase 2/3 do backlog. Este comando **não** funde nem dispara workflows faseados.
+- **Átomo num repo só:** não exige outros membros vivos. O **anúncio** aos consumers (CHANGELOG/inbox)
+  é do `/meta:federation-publish`; `check`/`status` completam o ciclo cross-repo. Este comando **não**
+  funde nem dispara workflows faseados.
 - **Idempotente na validação:** revalidar o mesmo contrato não muda nada; só o bump gera nova entrada.
 
 ## 🔗 Referências

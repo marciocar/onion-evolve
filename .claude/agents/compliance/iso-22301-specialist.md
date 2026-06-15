@@ -5,14 +5,13 @@ description: |
   Use para disaster recovery, crisis management, BCP/DRP e RTOs/RPOs.
 model: sonnet
 tools:
-  - read_file
-  - write
-  - search_replace
-  - codebase_search
-  - grep
-  - list_dir
-  - web_search
-  - todo_write
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - WebSearch
+  - TodoWrite
 
 color: green
 priority: alta
@@ -824,25 +823,25 @@ Quantidade máxima de dados (tempo) que é aceitável perder após disrupção.
 ## 🛠️ Tools e Estratégias
 
 ### Ferramentas Utilizadas
-- `read_file`: Ler contexto do projeto, infraestrutura, template
-- `write`: Criar os 5 documentos
-- `search_replace`: Atualizar documentos
-- `codebase_search`: Buscar menções de backup, HA, DR
-- `grep`: Buscar configs específicas (RTO, RPO, replication)
+- `Read`: Ler contexto do projeto, infraestrutura, template
+- `Write`: Criar os 5 documentos
+- `Edit`: Atualizar documentos
+- `Grep`: Buscar menções de backup, HA, DR
+- `Grep`: Buscar configs específicas (RTO, RPO, replication)
 
 ### Estratégia de Geração
 
 **1. Ler Template + Contexto:**
 ```bash
-read_file .claude/commands/common/templates/compliance_iso22301_template.md
-read_file docs/technical-context/system-architecture.md
-codebase_search "What is the infrastructure architecture? Multi-AZ? Multi-region?"
+Read .claude/commands/common/templates/compliance_iso22301_template.md
+Read docs/technical-context/system-architecture.md
+Grep "What is the infrastructure architecture? Multi-AZ? Multi-region?"
 ```
 
 **2. Identificar RTOs/RPOs Realistas:**
 ```bash
 # Analisar criticidade de cada componente
-codebase_search "What are the mission-critical services?"
+Grep "What are the mission-critical services?"
 
 # Buscar menções de SLA
 grep "sla" --type=md
@@ -853,11 +852,11 @@ grep "availability" --type=md
 
 **3. Gerar 5 Documentos:**
 ```bash
-write docs/compliance-context/business-continuity/business-continuity-plan.md
-write docs/compliance-context/business-continuity/disaster-recovery-plan.md
-write docs/compliance-context/business-continuity/crisis-management.md
-write docs/compliance-context/business-continuity/resilience-testing.md
-write docs/compliance-context/business-continuity/recovery-objectives.md
+Write docs/compliance-context/business-continuity/business-continuity-plan.md
+Write docs/compliance-context/business-continuity/disaster-recovery-plan.md
+Write docs/compliance-context/business-continuity/crisis-management.md
+Write docs/compliance-context/business-continuity/resilience-testing.md
+Write docs/compliance-context/business-continuity/recovery-objectives.md
 ```
 
 **4. Confirmar Conclusão com Serasa Mapping:**

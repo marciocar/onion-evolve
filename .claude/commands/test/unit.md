@@ -4,6 +4,7 @@ description: |
   Gera e executa testes unitários automaticamente com detecção de framework.
   Use para criar testes seguindo padrões do projeto e executá-los com coverage.
 model: sonnet
+allowed-tools: Read Write Bash(find *) Bash(ls *) Bash(npm *) Bash(pnpm *) Bash(pytest *) Bash(go *) Bash(cargo *) Bash(mvn *)
 
 parameters:
   - name: file-path
@@ -114,7 +115,7 @@ SE arquivo não é código fonte suportado:
 #### 3.1 Ler Arquivo Fonte
 
 ```bash
-read_file {{file-path}}
+Read {{file-path}}
 ```
 
 #### 3.2 Extrair Funções/Métodos Públicos
@@ -199,7 +200,7 @@ describe('nomeFuncao', () => {
 
 **Construir comando:** Base + `--coverage` (se flag) + `--watch` (se flag) + execução única (se não watch)
 
-**Executar:** `run_terminal_cmd [comando]` e capturar: resultados (pass/fail), coverage (se aplicável), erros, tempo
+**Executar:** `Bash [comando]` e capturar: resultados (pass/fail), coverage (se aplicável), erros, tempo
 
 ### Passo 7: Apresentar Resultados
 
