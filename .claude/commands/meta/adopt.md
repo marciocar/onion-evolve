@@ -129,7 +129,9 @@ if [ -z "$IN_PLACE" ] && [ ! -d "$TARGET/.git" ]; then git -C "$TARGET" init -q;
 #     (não rodar o checkout abaixo no legacy) — isola a árvore de trabalho do legado.
 if [ "$MODE" = legacy ]; then
   INSTALL_DIR="$(dirname "$TARGET")/onion-adopt-$(basename "$TARGET")"
-  git -C "$TARGET" worktree add "$INSTALL_DIR" -b onion/adopt
+  # [retomável/idempotente] cria worktree+branch; numa retomada, reusa a worktree/branch já existentes.
+  git -C "$TARGET" worktree add "$INSTALL_DIR" -b onion/adopt 2>/dev/null \
+    || git -C "$TARGET" worktree add "$INSTALL_DIR" onion/adopt 2>/dev/null || true
 else
   git -C "$TARGET" checkout -b onion/adopt 2>/dev/null || git -C "$TARGET" checkout onion/adopt
   INSTALL_DIR="$TARGET"
@@ -237,8 +239,9 @@ git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
 - Aplicar via o **Procedimento de cópia segura** (`DEST="$TARGET"`) — diff revela customizações locais.
 - **Re-carimbar** com a identidade NOVA da fonte (re-derivar — não há PASSO 0 aqui):
   ```bash
-  SRC_ID="$(bash "$SOURCE_ROOT/.claude/validation/onion-version.sh")"   # novo commit/date p/ o stamp
-  # reescrever .onion-version com framework/commit/commit_date de SRC_ID + adopted_at=$(date +%F)
+  SRC_ID="$(bash "$SOURCE_ROOT/.claude/validation/onion-version.sh")"   # novo commit/date
+  # Reusar o heredoc da Fase 5 mapeando commit→source_commit e commit_date→source_commit_date,
+  # PRESERVANDO adopted_from/mode do stamp antigo; atualizar source_commit/date + adopted_at=$(date +%F).
   ```
 - **Tie com a federação:** o `source_commit` do stamp **é** a versão de cada membro (member-version
   awareness — [multi-repo-federation.md](../../../docs/knowledge-base/concepts/multi-repo-federation.md)).
