@@ -125,8 +125,9 @@ Glob .claude/commands/common/
 
 #### 1.3. Análise de Ferramentas Disponíveis
 ```bash
-# Ler catálogo completo de ferramentas
-Read docs/tools.md
+# Catálogo de ferramentas: rode /meta:all-tools (gera a doc das tools disponíveis).
+# Tools nativas válidas e nomenclatura: docs/meta-specs/agents.md §6.
+Read docs/meta-specs/agents.md
 ```
 
 **Mapear ferramentas por categoria:**
