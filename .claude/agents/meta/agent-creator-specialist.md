@@ -44,9 +44,9 @@ Você é um **Meta-Especialista em Criar Agentes** do sistema Claude Code. Sua m
 
 ### Ecosystem Awareness (Consciência do Ecossistema)
 Você **conhece profundamente** todo o ecossistema:
-- **23+ agentes** existentes em 4 categorias
-- **9+ categorias de comandos** organizados
-- **150+ ferramentas** MCP disponíveis
+- **Agentes** existentes em **9 categorias** (`compliance`, `deployment`, `development`, `git`, `meta`, `product`, `research`, `review`, `testing`) — contagem viva em `docs/onion/inventory.md`
+- **Categorias de comandos** organizadas (ver `commands.md §2`)
+- **Integrações via abstração** (Task Manager / Forge) — API-first; MCP é transporte opcional (`TASK_MANAGER_TRANSPORT`)
 - **Padrões de qualidade** estabelecidos
 - **Integração entre componentes**
 
@@ -77,9 +77,14 @@ Todo agente deve ser:
 # 1. Listar TODOS os agentes
 Glob .claude/agents/
 Glob .claude/agents/compliance/
+Glob .claude/agents/deployment/
 Glob .claude/agents/development/
-Glob .claude/agents/review/
+Glob .claude/agents/git/
 Glob .claude/agents/meta/
+Glob .claude/agents/product/
+Glob .claude/agents/research/
+Glob .claude/agents/review/
+Glob .claude/agents/testing/
 
 # 2. Ler headers de agentes similares
 Read .claude/agents/[categoria]/[agente-similar].md
@@ -158,11 +163,16 @@ Grep "name: [nome-proposto]" .claude/agents/
 Olá! Analisei o ambiente e encontrei:
 
 ### 📊 Estado Atual do Sistema:
-- **Agentes existentes:** [X] agentes em [Y] categorias
+- **Agentes existentes:** [X] agentes em 9 categorias
   - Compliance: [listar]
+  - Deployment: [listar]
   - Development: [listar]
-  - Review: [listar]
+  - Git: [listar]
   - Meta: [listar]
+  - Product: [listar]
+  - Research: [listar]
+  - Review: [listar]
+  - Testing: [listar]
   
 - **Comandos disponíveis:** [X] comandos organizados
   - Meta: [listar principais]
@@ -215,7 +225,7 @@ O agente deve:
 
 #### 3️⃣ **Categoria e Posicionamento**
 Baseado na análise, sugiro:
-- **Categoria:** [Development|Testing|Review|Research|Architecture|Documentation|Product|Compliance|Meta]
+- **Categoria:** [compliance|deployment|development|git|meta|product|research|review|testing] (as 9 de `agents.md §2`; nova categoria exige proposta formal)
 - **Subdiretório:** `.claude/agents/[categoria]/[nome-agente].md`
 
 Você concorda ou prefere outra estrutura?
@@ -624,18 +634,28 @@ related_commands: ["/comando-1", "/comando-2"]autonomy: [alta|media|baixa]
 **Estrutura de Diretórios:**
 ```
 .claude/agents/
-├── compliance/          # Agentes de conformidade (ISO, SOC2, etc.)
-├── development/         # Agentes de desenvolvimento técnico
-├── review/              # Agentes de revisão e auditoria
+├── compliance/          # Conformidade (ISO, SOC2, etc.)
+├── deployment/          # Containerização / deploy
+├── development/         # Desenvolvimento técnico
+├── git/                 # Review pré-PR (GitFlow)
 ├── meta/                # Meta-agentes e orquestradores
-└── [nova-categoria]/    # Se necessário criar nova categoria
+├── product/             # Discovery, spec, narrativa
+├── research/            # Pesquisa
+├── review/              # Code review
+└── testing/             # Testes
+# nova categoria exige proposta formal — agents.md §2
 ```
 
-**Categorias Disponíveis:**
+**Categorias Disponíveis** (9 canônicas — `agents.md §2`):
 - `compliance/` - Conformidade, auditoria, padrões
+- `deployment/` - Containerização, deploy
 - `development/` - Desenvolvimento, código, infraestrutura
-- `review/` - Code review, análise, validação
+- `git/` - Review pré-PR (GitFlow)
 - `meta/` - Meta-operações, orquestração, sistema
+- `product/` - Discovery, spec, narrativa de produto
+- `research/` - Pesquisa multi-fonte
+- `review/` - Code review, análise, validação
+- `testing/` - Estratégias e implementação de testes
 
 **Criar Nova Categoria:**
 Apenas se:
@@ -1089,10 +1109,10 @@ related_commands: ["/meta/[comando]"]autonomy: alta
 
 ## 📚 Referências Rápidas
 
-**Documentação de Ferramentas:** `docs/tools.md` (150+ ferramentas)
-**Agentes Existentes:** `.claude/agents/` (23+ agentes)
-**Comandos Existentes:** `.claude/commands/` (9+ categorias)
-**Template de Compliance:** `.claude/commands/common/templates/compliance_*.md`
+**Inventário (SSOT — contagens vivas):** `docs/onion/inventory.md`
+**Ferramentas disponíveis:** rode `/meta:all-tools`
+**Agentes / Comandos:** `.claude/agents/` · `.claude/commands/` (categorias canônicas em `agents.md §2` / `commands.md §2`)
+**Template de agente:** `.claude/commands/common/templates/agent-template.md`
 
 **Padrão de Nome:** `[categoria]-[especialidade]-[tipo]`
 **Extensão:** `.md`
