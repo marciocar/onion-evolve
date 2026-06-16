@@ -79,7 +79,7 @@ Este template ajuda times de desenvolvimento de software a projetar sua **Arquit
 
 ### Create an Index File First
 
-**Create: `index.md` (or `technical_context.md`)**
+**Create: `index.md` (or `technical-context.md`)**
 ```markdown
 ## Project Context Profile
 
@@ -90,30 +90,30 @@ Este template ajuda times de desenvolvimento de software a projetar sua **Arquit
 
 ## Layer 1: Core Project Context
 
-- [Project Charter](project_charter.md)
+- [Project Charter](project-charter.md)
 - [Architecture Decision Records](adr/)
 
 ## Layer 2: AI-Optimized Context Files
 
-- [AI Development Guide](CLAUDE.meta.md) - Example CLAUDE CODE.md file for project level  
-- [Codebase Navigation Guide](CODEBASE_GUIDE.md)
+- [AI Development Guide](ai-development-guide.md) - equivalente a um `CLAUDE.md` de nível de projeto
+- [Codebase Navigation Guide](codebase-guide.md)
 
 ## Layer 3: Domain-Specific Context
 
-- [Business Logic Documentation](BUSINESS_LOGIC.md)
-- [API Specifications](API_SPECIFICATION.md)
+- [Business Logic Documentation](business-logic.md)
+- [API Specifications](api-specification.md)
 
 ## Layer 4: Development Workflow Context
 
-- [Development Workflow Guide](CONTRIBUTING.md)
-- [Troubleshooting Guide](TROUBLESHOOTING.md)
+- [Development Workflow Guide](contributing.md)
+- [Troubleshooting Guide](troubleshooting.md)
 
 [Include remaining sections: Context Maintenance Strategy, AI Integration Guidelines, Success Metrics, Implementation Validation]
 ```
 
 ### Layer 1: Core Project Context
 
-**Create: `project_charter.md`**
+**Create: `project-charter.md`**
 ```markdown
 # Project Charter: [Project Name]
 
@@ -159,7 +159,7 @@ What other options did we evaluate?
 
 ### Layer 2: AI-Optimized Context Files
 
-**Create: `CLAUDE.meta.md` (AI Development Guide)**
+**Create: `ai-development-guide.md` (AI Development Guide)**
 ```markdown
 # AI Development Guide
 
@@ -188,7 +188,7 @@ What other options did we evaluate?
 - Integration pitfalls
 ```
 
-**Create: `CODEBASE_GUIDE.md`**
+**Create: `codebase-guide.md`**
 ```markdown
 # Codebase Navigation Guide
 
@@ -219,7 +219,7 @@ How the application is deployed and scaled
 
 ### Layer 3: Domain-Specific Context
 
-**Create: `BUSINESS_LOGIC.md` (CONDITIONAL)**
+**Create: `business-logic.md` (CONDITIONAL)**
 ```markdown
 Required if:
 - [ ] Complex business rules exist
@@ -245,7 +245,7 @@ Step-by-step business processes
 Known edge cases and how to handle them
 ```
 
-**Create: `API_SPECIFICATION.md` (CONDITIONAL)**
+**Create: `api-specification.md` (CONDITIONAL)**
 ```markdown
 Required if:
 - [ ] Building APIs for external consumption
@@ -273,7 +273,7 @@ Usage limits and performance expectations
 
 ### Layer 4: Development Workflow Context
 
-**Create: `CONTRIBUTING.md` (Development Workflow Guide)**
+**Create: `contributing.md` (Development Workflow Guide)**
 ```markdown
 # Development Workflow
 
@@ -296,7 +296,7 @@ Local development environment setup
 Common debugging scenarios and tools
 ```
 
-**Create: `TROUBLESHOOTING.md`**
+**Create: `troubleshooting.md`**
 ```markdown
 # Troubleshooting Guide
 
@@ -360,16 +360,16 @@ Critical issue response procedures
 ```
 /specs/technical/               # or /docs/context/
   index.md                     # Main index with links to all layers
-  project_charter.md           # Layer 1: Core context
+  project-charter.md           # Layer 1: Core context
   /adr/                        # Layer 1: Architecture decisions
     001-database-choice.md
     002-authentication-strategy.md
-  CLAUDE.meta.md              # Layer 2: AI development guide
-  CODEBASE_GUIDE.md           # Layer 2: Navigation guide
-  BUSINESS_LOGIC.md           # Layer 3: Domain knowledge
-  API_SPECIFICATION.md        # Layer 3: API documentation
-  CONTRIBUTING.md             # Layer 4: Development workflow
-  TROUBLESHOOTING.md          # Layer 4: Issue resolution
+  ai-development-guide.md              # Layer 2: AI development guide
+  codebase-guide.md           # Layer 2: Navigation guide
+  business-logic.md           # Layer 3: Domain knowledge
+  api-specification.md        # Layer 3: API documentation
+  contributing.md             # Layer 4: Development workflow
+  troubleshooting.md          # Layer 4: Issue resolution
 ```
 
 **Key Benefits of This Structure:**
@@ -443,13 +443,13 @@ Critical issue response procedures
 
 ### Phase 1: Foundation (Week 1-2)
 - [ ] Complete Project Context Profile
-- [ ] Create PROJECT_CHARTER.md
+- [ ] Create project-charter.md
 - [ ] Set up ADR structure and process
 - [ ] Assign documentation ownership
 
 ### Phase 2: AI Optimization (Week 2-3)
-- [ ] Create AI_DEVELOPMENT_GUIDE.md
-- [ ] Create CODEBASE_GUIDE.md
+- [ ] Create ai-development-guide.md
+- [ ] Create codebase-guide.md
 - [ ] Configure AI tools with project context
 - [ ] Test AI effectiveness with new context
 

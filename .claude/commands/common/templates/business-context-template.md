@@ -58,7 +58,7 @@ Este template ajuda times de produto a projetar sua **Arquitetura de Contexto de
 
 ### Create an Index File First
 
-**Create: `index.md` (or `business_context.md`)**
+**Create: `index.md` (or `business-context.md`)**
 ```markdown
 ## Business Context Profile
 
@@ -69,26 +69,26 @@ Este template ajuda times de produto a projetar sua **Arquitetura de Contexto de
 
 ## Layer 1: Customer Context Architecture
 
-- [Customer Personas](CUSTOMER_PERSONAS.md)
-- [Customer Journey](CUSTOMER_JOURNEY.md)
-- [Voice of Customer](VOICE_OF_CUSTOMER.md)
+- [Customer Personas](customer-personas.md)
+- [Customer Journey](customer-journey.md)
+- [Voice of Customer](voice-of-customer.md)
 
 ## Layer 2: Product Context Architecture
 
-- [Product Strategy](PRODUCT_STRATEGY.md)
-- [Feature Catalog](FEATURE_CATALOG.md)
-- [Product Metrics](PRODUCT_METRICS.md)
+- [Product Strategy](product-strategy.md)
+- [Feature Catalog](feature-catalog.md)
+- [Product Metrics](product-metrics.md)
 
 ## Layer 3: Market and Competitive Context
 
-- [Competitive Landscape](COMPETITIVE_LANDSCAPE.md)
-- [Industry Trends](INDUSTRY_TRENDS.md)
+- [Competitive Landscape](competitive-landscape.md)
+- [Industry Trends](industry-trends.md)
 
 ## Layer 4: Operational Business Context
 
-- [Sales Process](SALES_PROCESS.md)
-- [Messaging Framework](MESSAGING_FRAMEWORK.md)
-- [Customer Communication Guidelines](CUSTOMER_COMMUNICATION.md)
+- [Sales Process](sales-process.md)
+- [Messaging Framework](messaging-framework.md)
+- [Customer Communication Guidelines](customer-communication.md)
 
 [Include remaining sections: Context Integration, Success Measurement, Implementation Strategy]
 ```
@@ -97,7 +97,7 @@ Este template ajuda times de produto a projetar sua **Arquitetura de Contexto de
 
 ### Customer Intelligence Framework
 
-**Create: `CUSTOMER_PERSONAS.md`**
+**Create: `customer-personas.md`**
 ```markdown
 # Customer Personas
 
@@ -134,7 +134,7 @@ Este template ajuda times de produto a projetar sua **Arquitetura de Contexto de
 - What topics should AI avoid or emphasize?
 ```
 
-**Create: `CUSTOMER_JOURNEY.md`**
+**Create: `customer-journey.md`**
 ```markdown
 # Customer Journey Map
 
@@ -197,7 +197,7 @@ What motivates customers to continue/expand?
 
 ### Customer Feedback Intelligence
 
-**Create: `VOICE_OF_CUSTOMER.md`**
+**Create: `voice-of-customer.md`**
 ```markdown
 # Voice of Customer Intelligence
 
@@ -230,7 +230,7 @@ How do customers compare us to alternatives?
 
 ### Product Intelligence Framework
 
-**Create: `PRODUCT_STRATEGY.md`**
+**Create: `product-strategy.md`**
 ```markdown
 # Product Strategy
 
@@ -276,7 +276,7 @@ How do you prioritize competing demands?
 What level of quality is required?
 ```
 
-**Create: `FEATURE_CATALOG.md`**
+**Create: `feature-catalog.md`**
 ```markdown
 # Feature Catalog
 
@@ -312,7 +312,7 @@ How do customers get data in and out?
 
 ### Product Performance Intelligence
 
-**Create: `PRODUCT_METRICS.md`**
+**Create: `product-metrics.md`**
 ```markdown
 # Product Metrics Framework
 
@@ -351,7 +351,7 @@ Which features are used together successfully?
 
 ### Market Intelligence Framework
 
-**Create: `COMPETITIVE_LANDSCAPE.md` (CONDITIONAL)**
+**Create: `competitive-landscape.md` (CONDITIONAL)**
 ```markdown
 Required if:
 - [ ] Competitive market with multiple players
@@ -381,7 +381,7 @@ How should AI position the product against competitors?
 Common competitive objections and responses
 ```
 
-**Create: `INDUSTRY_TRENDS.md`**
+**Create: `industry-trends.md`**
 ```markdown
 # Industry and Market Trends
 
@@ -419,7 +419,7 @@ How might regulations change?
 
 ### Sales and Marketing Intelligence
 
-**Create: `SALES_PROCESS.md`**
+**Create: `sales-process.md`**
 ```markdown
 # Sales Process and Methodology
 
@@ -457,7 +457,7 @@ When and how do customers typically expand?
 What ensures customers renew/continue?
 ```
 
-**Create: `MESSAGING_FRAMEWORK.md`**
+**Create: `messaging-framework.md`**
 ```markdown
 # Messaging and Brand Framework
 
@@ -514,7 +514,7 @@ How formal/informal should AI communications be?
 
 ### AI Interaction Guidelines
 
-**Create: `CUSTOMER_COMMUNICATION.md`**
+**Create: `customer-communication.md`**
 ```markdown
 # AI Customer Communication Guidelines
 
@@ -564,7 +564,7 @@ How should AI contribute to long-term customer relationships?
 
 **Business Context Quality Metrics**
 ```markdown
-File: `/business-context/measurement/QUALITY_METRICS.md`
+File: `/business-context/measurement/quality-metrics.md`
 Purpose: Measuring business context effectiveness
 
 Template:
@@ -618,17 +618,17 @@ Template:
 ```
 /specs/business/                 # or /docs/business-context/
   index.md                      # Main index with links to all layers
-  CUSTOMER_PERSONAS.md          # Layer 1: Customer intelligence
-  CUSTOMER_JOURNEY.md           # Layer 1: Customer lifecycle
-  VOICE_OF_CUSTOMER.md          # Layer 1: Customer feedback
-  PRODUCT_STRATEGY.md           # Layer 2: Product context
-  FEATURE_CATALOG.md            # Layer 2: Feature details
-  PRODUCT_METRICS.md            # Layer 2: Performance data
-  COMPETITIVE_LANDSCAPE.md      # Layer 3: Market intelligence
-  INDUSTRY_TRENDS.md            # Layer 3: Market evolution
-  SALES_PROCESS.md              # Layer 4: Sales methodology
-  MESSAGING_FRAMEWORK.md        # Layer 4: Brand guidelines
-  CUSTOMER_COMMUNICATION.md     # Layer 4: AI interaction guide
+  customer-personas.md          # Layer 1: Customer intelligence
+  customer-journey.md           # Layer 1: Customer lifecycle
+  voice-of-customer.md          # Layer 1: Customer feedback
+  product-strategy.md           # Layer 2: Product context
+  feature-catalog.md            # Layer 2: Feature details
+  product-metrics.md            # Layer 2: Performance data
+  competitive-landscape.md      # Layer 3: Market intelligence
+  industry-trends.md            # Layer 3: Market evolution
+  sales-process.md              # Layer 4: Sales methodology
+  messaging-framework.md        # Layer 4: Brand guidelines
+  customer-communication.md     # Layer 4: AI interaction guide
 ```
 
 **Key Benefits of This Business Structure:**
