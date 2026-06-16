@@ -14,6 +14,7 @@ documentação ativa contém só o que é canônico ou usado em runtime; o resto
 | `onion-vv-baseline-2026-06.md` | Baseline de V&V — lida por `/meta:evolve` como referência da auditoria automatizada. |
 | `onion-evolution-<data>.md` (a mais recente) | Última auditoria de evolução — ponto de comparação para a próxima rodada de `/meta:evolve`. Versões anteriores são removidas, **exceto** se viraram âncora de citação (abaixo). |
 | `onion-evolution-2026-06-15.md` | **Exceção — retido apesar de superseded por 2026-06-16.** Virou proof-point citado por `docs/materials/*`, `press-kit.md`, `case-studies.md` e `onion-framework-identity.md` (métricas §0: 28 agentes · 1.27M · ~26 min · 30 achados). Remover quebraria citações duráveis. Só removível após migrar as citações para outro run. |
+| `onion-adr-repo-adoption-2026-06.md` | **ADR durável** — decisão doutrinária (adoção de repo = comando in-platform `/meta:adopt`, não CLI; stamp de versão; rampa da federação). ADRs são *superseded*, **nunca removidos**. |
 | `onion-federation-adr-a2a-format-interop-2026-06.md` | **ADR durável** — decisão doutrinária (linha vermelha A2A partida: runtime proibido, formato permitido como projeção one-way). ADRs são *superseded*, **nunca removidos**. |
 
 ## O que é REMOVIDO (efêmero — git arquiva)
