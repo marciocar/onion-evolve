@@ -74,8 +74,9 @@ faseado**: apontar o Onion para um repo/pasta e "assumir o controle" — **insta
 ### Fase 1 — Engenharia reversa (se houver código)
 
 - **greenfield:** pular (nada a reverter).
-- **legacy/regulated:** rodar o fluxo de `/docs:reverse-consolidate <target>` (delega a
-  `@docs-reverse-engineer`) → consolida stack/estrutura; alimenta `technical-context`.
+- **legacy/regulated:** rodar o fluxo de `/docs:reverse-consolidate <target>` (que **internamente**
+  delega a `@docs-reverse-engineer` — **não** invocar o agente em paralelo) → consolida
+  stack/estrutura; alimenta `technical-context`.
 
 ### Fase 2 — Instalar o framework  _(modelo "instalar"; pular se `--in-place`)_
 
@@ -138,9 +139,11 @@ faseado**: apontar o Onion para um repo/pasta e "assumir o controle" — **insta
 
 ## Operar in-place (`--in-place`)
 
-Não copia nada. Adiciona `<target>` como **working directory auxiliar** e opera com agentes/comandos
-Onion sobre ele. Controle **efêmero** — o repo **não** vira Onion. Ideal para análise/relatório one-off
-(ex.: `@docs-reverse-engineer` + relatório) antes de decidir instalar.
+Não copia nada. **Mecanismo:** instruir o usuário a adicionar `<target>` como *additional working
+directory* da sessão Claude Code (recurso nativo da plataforma — ex.: `/add-dir <target>` ou via
+configurações do projeto) e confirmar que o diretório está acessível. O Onion então roda
+agentes/comandos sobre ele. Controle **efêmero** — o repo **não** vira Onion. Ideal para
+análise/relatório one-off (ex.: `@docs-reverse-engineer` + relatório) antes de decidir instalar.
 
 ## Idempotência / re-adoção
 
