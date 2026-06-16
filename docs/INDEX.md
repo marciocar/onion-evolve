@@ -1,6 +1,6 @@
 # 📚 Índice Central de Documentação
 
-> **Última atualização**: 2026-06-15 | **Gerado por**: `/docs:build-index` | **Revisado**: auditoria manual
+> **Última atualização**: 2026-06-16 | **Gerado por**: `/docs:build-index` | **Revisado**: auditoria manual
 
 Bem-vindo ao índice central de documentação do projeto. Este documento serve como hub de navegação para toda a documentação disponível.
 
@@ -23,10 +23,10 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **81 arquivos markdown** em `docs/`
+- **86 arquivos markdown** em `docs/`
 - **15 arquivos** em `docs/onion/` (Sistema Onion)
 - **35 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
-  - 16 arquivos em `concepts/` (Conceitos fundamentais)
+  - 17 arquivos em `concepts/` (Conceitos fundamentais)
   - 8 arquivos em `frameworks/` (Frameworks e metodologias)
   - 4 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
   - 2 em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
@@ -59,7 +59,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **81 arquivos** de documentação markdown
+- **86 arquivos** de documentação markdown
 - **83 comandos invocáveis** em 9 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
 - **49 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
@@ -89,8 +89,8 @@ docs/
 │   ├── ESPERANTO.md            # documento do framework
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
-├── knowledge-base/             # Knowledge Bases (35 arquivos, incl. index)
-│   ├── concepts/               # Conceitos fundamentais (16 arquivos)
+├── knowledge-base/             # Knowledge Bases (36 arquivos, incl. index)
+│   ├── concepts/               # Conceitos fundamentais (17 arquivos)
 │   │   ├── abstraction-patterns-catalog.md
 │   │   ├── agent-fleet-orchestration.md
 │   │   ├── ai-agent-design-patterns.md
@@ -98,6 +98,7 @@ docs/
 │   │   ├── configuration-management.md
 │   │   ├── consolidated-to-tasks-patterns.md
 │   │   ├── context-window-optimization.md
+│   │   ├── domain-context-lifecycle.md        # contexto de domínio = SSOT viva (Tijolo 1)
 │   │   ├── identificar-precificar-dor-cliente.md
 │   │   ├── meeting-transcription-to-knowledge-base.md
 │   │   ├── multi-repo-federation.md          # federação (Fases 1-3)
@@ -209,39 +210,43 @@ docs/
 
 Knowledge Bases estruturadas para consumo por IA e referência técnica:
 
-### Conceitos Fundamentais (14 arquivos)
+### Conceitos Fundamentais (17 arquivos)
 - **Domain Context Lifecycle** - Contexto de domínio como SSOT viva (ciclo CRUD+); pesos derivados, remover/validar como gate ✨ NOVO
 - **Task Manager Abstraction** - Abstração de gerenciadores de tarefas
 - **Spec-as-Code Strategy** - Estratégia de especificações como código
-- **Spec-Driven Development** - Metodologia emergente de desenvolvimento com IA ✨ NOVO
+- **Spec-Driven Development** - Metodologia emergente de desenvolvimento com IA
+- **Specification-Driven AI Abstraction Layer** - Camada de abstração orientada a especificações
 - **AI Agent Design Patterns** - Padrões de design para agentes IA
-- **Agent Fleet Orchestration** - Orquestração de frota: 6 padrões canônicos sobre primitivas nativas (Workflow/Agent) ✨ NOVO
+- **Agent Fleet Orchestration** - Orquestração de frota: 6 padrões canônicos sobre primitivas nativas
 - **Abstraction Patterns Catalog** - Catálogo de padrões de abstração
 - **Context Window Optimization** - Otimização de contexto para IA
 - **Configuration Management** - Gestão de configurações
+- **Consolidated to Tasks Patterns** - Conversão de documentos consolidados em tasks
+- **Multi-Repo Federation** - Federação multi-repo (Fases 1-3)
+- **Onion Modernization Doctrine** - Doutrina de modernização (`/meta:evolve`)
+- **Worklog Protocol** - Contrato de sessão de trabalho
 - **Branding e Posicionamento** - Estratégias de marca
 - **Identificar e Precificar Dor do Cliente** - Metodologias de produto
 - **Meeting Transcription to Knowledge Base** - Processamento de reuniões
-- **Specification-Driven AI Abstraction Layer** - Camada de abstração orientada a especificações
 
-### Frameworks e Metodologias (12 arquivos)
-- **Agent Orchestration Landscape 2026** - Comparativo de 5 correntes (Anthropic/coding-agents/OSS/enterprise/academia) com verificação adversarial ✨ NOVO
+### Frameworks e Metodologias (8 arquivos)
+- **Agent Orchestration Landscape 2026** - Comparativo de 5 correntes (Anthropic/coding-agents/OSS/enterprise/academia) com verificação adversarial
 - **Framework de Story Points** - Estimativas ágeis
 - **Framework de Testes** - White-box, Grey-box, Black-box
-- **Onion Complete Cycle Understanding** - Sistema completo de 5 camadas
-- **Onion IDE Integration Strategy** - Estratégia multi-IDE
-- **Onion Multi-Context Orchestrator Vision** - Visão arquitetural
-- **Onion System Critical Analysis 2025** - Análise crítica do sistema
+- **GitFlow Patterns** - Motor GitFlow (branching, releases, versionamento)
+- **QA Story Points** - Estimativas de QA
+- **Collaborative Testing Patterns** - Three Amigos, pair testing
+- **Test Strategy Scoring** - Scoring de estratégia de teste
 - **Spec-Driven Development Tools 2025** - Ferramentas e análise
 
-### Plataformas e Tecnologias (1 arquivo)
+### Plataformas e Tecnologias (2 arquivos)
+- **Git Ledger as Working Dir** - Ledger da federação (Fase 0)
 - **Runflow** - Documentação da plataforma
 
-### Provedores de Serviços (1 arquivo)
-- **Microsoft Graph Teams API** - Guia completo de integração
-
-### Ferramentas (2 arquivos)
-- **Claude Code Commands Best Practices 2025** - Boas práticas de comandos Claude Code
+### Ferramentas (4 arquivos)
+- **Agent Skills** - Formato aberto de skills para agentes IA
+- **Claude Code Commands Best Practices 2026** - Boas práticas de comandos Claude Code
+- **Docker Deployment** - Containerização e deploy
 - **Whisper** - Sistema de transcrição de áudio (OpenAI)
 
 **Localização:** `docs/knowledge-base/`
@@ -536,7 +541,7 @@ Este índice é gerado automaticamente pelo comando `/docs/build-index`.
 /docs/build-index onion        # Reconstruir índice da seção onion
 ```
 
-**Última atualização:** 2026-06-15 (`/docs:build-index` — contagens escaneadas do filesystem + seção de navegação Materiais Externos)
+**Última atualização:** 2026-06-16 (`/docs:build-index` — contagens reescaneadas do filesystem: concepts 16→17, docs 81→86, frameworks 12→8, tools 2→4, platforms 1→2; remoção de entradas-fantasma do nav de KBs)
 **Mantido por:** Sistema Onion
 
 ---
