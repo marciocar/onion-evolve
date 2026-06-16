@@ -11,7 +11,7 @@ parameters:
     description: Caminho para checklist de DD
     required: false
 
-allowed-tools: Read Write Task Bash(grep *) Bash(find *) Bash(ls *)
+allowed-tools: Read Write Grep Glob Bash(grep *) Bash(find *) Bash(ls *)
 category: docs
 tags:
   - compliance
