@@ -227,11 +227,12 @@ O comando deve estar em:
 - **B) engineer/** - Workflows de desenvolvimento
 - **C) product/** - Gestão de produto e tasks
 - **D) git/** - Operações Git Flow
-- **E) compliance/** - Conformidade e auditoria
-- **F) docs/** - Documentação
-- **G) admin/** - Administração
-- **H) validate/** - Validações
-- **I) common/** - Utilitários comuns
+- **E) docs/** - Documentação (compliance via `/docs:build-compliance-docs`)
+- **F) validate/** - Validações
+- **G) test/** - Estratégias de teste (unit/integration/e2e)
+- **H) development/** - Comandos de desenvolvimento
+- **I) quick/** - Análises pontuais
+- **J) common/** - Fragmentos compartilhados (templates/prompts — não-invocáveis)
 
 [SE DETECTAR COMANDOS RELACIONADOS:]
 Identifiquei estes comandos relacionados:
@@ -302,7 +303,7 @@ Exemplos:
 ✅ /git:flow feature start
 ✅ /engineer/work
 ✅ /product/task
-✅ /compliance/audit/iso27001
+✅ /docs:build-compliance-docs
 ✅ /meta/create-command
 
 ❌ /do-stuff (muito genérico)
@@ -688,22 +689,24 @@ Após executar este comando, você pode:
 ├── engineer/          # Workflows de desenvolvimento
 ├── product/           # Gestão de produto e tasks
 ├── git/               # Operações Git Flow
-├── compliance/        # Conformidade e auditoria
-├── docs/              # Documentação
-├── admin/             # Administração
+├── docs/              # Documentação (compliance via /docs:build-compliance-docs)
 ├── validate/          # Validações
-└── common/            # Utilitários e templates
+├── test/              # Estratégias de teste
+├── development/       # Comandos de desenvolvimento
+├── quick/             # Análises pontuais
+└── common/            # Fragmentos compartilhados (templates/prompts)
 ```
 
-**Categorias Disponíveis:**
+**Categorias Disponíveis** (canônicas — `commands.md §2`):
 - `meta/` - Meta-operações do sistema
 - `engineer/` - Development workflows
 - `product/` - Product management
 - `git/` - Git Flow operations
-- `compliance/` - Compliance and audit
-- `docs/` - Documentation generation
-- `admin/` - Administrative tasks
+- `docs/` - Documentation generation (compliance via /docs:build-compliance-docs)
 - `validate/` - Validation workflows
+- `test/` - Test strategies (unit/integration/e2e)
+- `development/` - Development commands
+- `quick/` - Quick analyses
 - `common/` - Common utilities and templates
 
 **Criar Nova Categoria:**
@@ -910,14 +913,13 @@ Após criar o comando, **SEMPRE** documente:
 
 ## 🎯 Categorias de Comandos e Padrões
 
-Cada categoria (`meta`, `engineer`, `product`, `git`, `compliance`, `docs`) tem propósito, padrões de integração e template de comando próprios. Ao criar um comando, **identifique a categoria** e aplique o template correspondente.
+Cada categoria (`meta`, `engineer`, `product`, `git`, `docs`, `validate`, `test`) tem propósito, padrões de integração e template de comando próprios. Ao criar um comando, **identifique a categoria** e aplique o template correspondente.
 
 - **meta/** — manipula o próprio sistema; invoca agentes meta; gera artefatos `.md`.
 - **engineer/** — workflows de dev; integra Task Manager (provider ativo) + sessions; orquestra múltiplos agentes.
 - **product/** — gestão de produto; integra o Task Manager configurado; invoca `@product-agent` / `@task-specialist`.
 - **git/** — operações Git Flow; invoca `@gitflow-specialist`; valida estado do repositório.
-- **compliance/** — docs de conformidade; segue frameworks (ISO, SOC2); output em `docs/compliance-context/`.
-- **docs/** — geração de documentação; invoca agentes de docs; output em `docs/`.
+- **docs/** — geração de documentação; invoca agentes de docs; output em `docs/` (inclui compliance via `/docs:build-compliance-docs` → `docs/compliance-context/`).
 
 ➡️ **Templates completos por categoria** (com exemplos e estrutura de comando): `docs/knowledge-base/meta/command-creation-patterns.md` — seção "Categorias de Comandos e Padrões". **LEIA o KB** antes de instanciar o comando.
 
