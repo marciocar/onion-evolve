@@ -13,6 +13,7 @@ documentação ativa contém só o que é canônico ou usado em runtime; o resto
 | `onion-review-2026-05.md` | **SSOT de identidade** — citado por `CLAUDE.md`. Sintetiza as análises-fonte de 2025 (que foram removidas). |
 | `onion-vv-baseline-2026-06.md` | Baseline de V&V — lida por `/meta:evolve` como referência da auditoria automatizada. |
 | `onion-evolution-<data>.md` (a mais recente) | Última auditoria de evolução — ponto de comparação para a próxima rodada de `/meta:evolve`. Versões anteriores são removidas. |
+| `onion-federation-adr-a2a-format-interop-2026-06.md` | **ADR durável** — decisão doutrinária (linha vermelha A2A partida: runtime proibido, formato permitido como projeção one-way). ADRs são *superseded*, **nunca removidos**. |
 
 ## O que é REMOVIDO (efêmero — git arquiva)
 
