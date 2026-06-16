@@ -146,7 +146,8 @@ docs/
 │   ├── onion-evolution-2026-06-16.md   # auditoria mais recente (backlog ativo)
 │   ├── onion-evolution-2026-06-15.md   # run citado por materiais/identidade (proof-point retido)
 │   ├── onion-federation-adr-a2a-format-interop-2026-06.md  # ADR durável (federação A2A)
-│   └── onion-adr-repo-adoption-2026-06.md  # ADR durável (adoção de repo / /meta:adopt)
+│   ├── onion-adr-repo-adoption-2026-06.md  # ADR durável (adoção de repo / /meta:adopt)
+│   └── onion-adr-domain-context-lifecycle-2026-06.md  # ADR durável (contexto de domínio = SSOT viva)
 │
 ├── materials/                  # Materiais derivados externos (Fase 4 — 6 arquivos)
 │   ├── README.md               # Índice e guia de uso dos materiais
@@ -208,7 +209,8 @@ docs/
 
 Knowledge Bases estruturadas para consumo por IA e referência técnica:
 
-### Conceitos Fundamentais (13 arquivos)
+### Conceitos Fundamentais (14 arquivos)
+- **Domain Context Lifecycle** - Contexto de domínio como SSOT viva (ciclo CRUD+); pesos derivados, remover/validar como gate ✨ NOVO
 - **Task Manager Abstraction** - Abstração de gerenciadores de tarefas
 - **Spec-as-Code Strategy** - Estratégia de especificações como código
 - **Spec-Driven Development** - Metodologia emergente de desenvolvimento com IA ✨ NOVO
@@ -295,6 +297,7 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 - **[Onion Evolution — 2026-06-15](analysis/onion-evolution-2026-06-15.md)** — run **retido como proof-point** citado por materiais/identidade (métricas §0: 28 agentes · 1.27M tokens · ~26 min · 30 achados). Não é o backlog ativo.
 - **[ADR — A2A formato vs runtime — Junho/2026](analysis/onion-federation-adr-a2a-format-interop-2026-06.md)** — decisão durável: linha vermelha A2A partida (runtime proibido / formato permitido como projeção one-way).
 - **[ADR — Adoção de repositório — Junho/2026](analysis/onion-adr-repo-adoption-2026-06.md)** — decisão durável: adoção = comando in-platform `/meta:adopt` (não CLI); stamp de versão; rampa da federação.
+- **[ADR — Contexto de domínio: SSOT viva — Junho/2026](analysis/onion-adr-domain-context-lifecycle-2026-06.md)** — decisão durável: contexto de domínio = SSOT viva com ciclo CRUD+ (não snapshot); 3 domínios peer + critério de promoção; pesos derivados; camada *Manage* executável = Tijolo 2.
 - **[Revisão da Federação — Junho/2026](analysis/onion-federation-review-2026-06.md)** — federação multi-repo do Onion vs. A2A e padrões de coordenação multi-agente (jun/2026): alinhamento mainstream + por que não A2A vivo + recomendações de nomenclatura/interop.
 
 ---

@@ -75,7 +75,7 @@ Resultado esperado: documentação modular que permite que IA e humanos entendam
 - Entender modelo de negócio (preço, monetização, fluxos de receita)
 
 **1.2 Pesquisa de mercado**
-- Pesquisar panorama competitivo (web search ou agente `@research-agent`)
+- Pesquisar panorama competitivo (via `WebSearch`)
 - Identificar tendências do setor e dinâmicas de mercado
 - Analisar segmentos de cliente e casos de uso
 - Mapear ambiente regulatório quando relevante
@@ -121,6 +121,12 @@ Faça múltiplas rodadas se necessário. Ao final, apresente um **resumo dos pon
 ### Fase 3 — Geração
 
 Gere os arquivos em `docs/business-context/` seguindo a estrutura abaixo. Crie apenas os arquivos relevantes ao projeto (não é obrigatório preencher todas as camadas).
+
+> **Convenção de nomes (esta seção tem precedência sobre o template-base).** Use
+> **kebab-case minúsculo** para todos os arquivos (`personas.md`,
+> `competitive-landscape.md`), exatamente como na estrutura abaixo. Se o
+> `business-context-template.md` sugerir nomes em UPPERCASE, **ignore** — a
+> estrutura deste comando é a autoritativa.
 
 ```
 docs/business-context/
@@ -199,7 +205,7 @@ docs/business-context/
 - [ ] Toda afirmação tem fonte rastreável (issue, depoimento, métrica, web search)
 - [ ] Análise competitiva usa informação verificável e atual
 - [ ] Modelo de negócio reflete realidade (não inventado)
-- [ ] Pontos não verificáveis estão marcados como `[RESEARCH NEEDED]`
+- [ ] Pontos não verificáveis estão marcados como `[TO BE COMPLETED]`
 
 ### Otimização para IA
 - [ ] Personas incluem guidelines de interação com IA
@@ -226,6 +232,6 @@ docs/business-context/
 ## ⚠️ Notas
 
 - Não criar um único arquivo grande — sempre multi-arquivo linkado pelo `index.md`
-- Marcar gaps como `[RESEARCH NEEDED]` com hipóteses e passos de validação
+- Marcar gaps como `[TO BE COMPLETED]` com hipóteses e passos de validação
 - Regenerar quando contexto muda (pivot, PMF, expansão)
 - Cross-link com `docs/technical-context/` quando feature técnica tem impacto de negócio

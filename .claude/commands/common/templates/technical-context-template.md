@@ -73,8 +73,8 @@ Este template ajuda times de desenvolvimento de software a projetar sua **Arquit
 3. **Finally**: Ensure all links in the index work correctly
 
 **File Naming Convention:**
-- Use UPPERCASE for generic documentation files (e.g., `CODEBASE_GUIDE.md`)
-- Use lowercase for project-specific files (e.g., `project_charter.md`) 
+- Use **lowercase kebab-case** for all files (e.g., `codebase-guide.md`, `project-charter.md`)
+- No spaces, underscores, or UPPERCASE
 - Keep filenames descriptive and consistent
 
 ### Create an Index File First

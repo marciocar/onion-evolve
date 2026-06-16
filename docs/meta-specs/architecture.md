@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Arquitetura do Sistema Onion
-date: 2026-05-18
-version: 1.2.0
+date: 2026-06-16
+version: 1.3.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -286,7 +286,36 @@ Adicionar este **arquivo** (não diretório) não fere §7. Consumidores: `/meta
 
 ---
 
-## 8. Versionamento e mudanças
+## 8. Ciclo de vida de documentação de contexto
+
+Os contextos de domínio (`docs/business-context/`, `docs/technical-context/`,
+`docs/compliance-context/`) são **SSOT viva com ciclo de vida CRUD+**, não artefatos gerados uma
+única vez. A geração pelos comandos `/docs:build-*-docs` é o **primeiro tick**; manter o contexto
+fiel à realidade é parte da sua definição. A gramática completa vive na KB
+[domain-context-lifecycle.md](../knowledge-base/concepts/domain-context-lifecycle.md); a decisão,
+no [ADR de ciclo de vida de contexto](../analysis/onion-adr-domain-context-lifecycle-2026-06.md).
+
+Regras normativas:
+
+1. **Frescor obrigatório.** Cada arquivo de contexto carrega uma marcação `Última Atualização`. O
+   threshold de frescor é herdado de [`/meta:kb-freshness`](../../.claude/commands/meta/kb-freshness.md):
+   marcação ausente ou **> 18 meses** torna o arquivo candidato a `STALE`. (Gancho para a barreira
+   de staleness do CI — Tijolo 2.)
+2. **Pesos derivados, não declarados.** A relevância de um fragmento é *derivada* (posição na
+   progressive-disclosure + frescor + tier de evidência). **Proibido** número mágico de prioridade
+   no frontmatter (ex.: `priority: 0.8` manual).
+3. **Remover e Validar são de primeira classe.** Documentação de contexto stale **engana
+   ativamente** (pior que ausente); removê-la é operação de frescor, não perda. Validar
+   (rastreabilidade + frescor + ausência de contradição cross-domínio) é o portão de confiança.
+4. **Três domínios peer + critério de promoção.** Business/technical/compliance são peers; as
+   sub-camadas Decisional (ADRs) e Operacional/Runtime vivem dentro de `technical-context/`.
+   Promove-se uma sub-camada a peer (pasta `*-context/` própria) **apenas** quando valem juntos
+   **dono distinto × ritmo de mudança distinto × decisão distinta que informam** — nunca por
+   organograma.
+
+---
+
+## 9. Versionamento e mudanças
 
 Mudanças nesta spec exigem:
 

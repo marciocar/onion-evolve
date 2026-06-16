@@ -23,27 +23,20 @@ Este template ajuda times de produto a projetar sua **Arquitetura de Contexto de
 **Visão Geral da Empresa:**
 - **Company Name:** `[Your Company]`
 - **Industry:** `__________`
-- **Company Stage:** 
-  - [ ] Startup (Pre-Product Market Fit)
-  - [ ] Growth (Post-PMF, Scaling)
-  - [ ] Enterprise (Mature, Multiple Products)
-  - [ ] Legacy (Established, Optimizing)
+- **Maturity Stage:** 
+  - [ ] Early (validating problem/solution)
+  - [ ] Growth (scaling adoption)
+  - [ ] Mature (established, optimizing)
+  - [ ] Other: `__________`
 
 **Product Information:**
 - **Primary Product:** `__________`
 - **Product Category:** `__________`
 - **Target Market Size:** `__________`
-- **Business Model:** 
-  - [ ] SaaS Subscription
-  - [ ] Marketplace
-  - [ ] E-commerce
-  - [ ] Freemium
-  - [ ] Enterprise Licensing
-  - [ ] Other: `__________`
+- **Business Model:** `__________` (e.g., subscription, marketplace, e-commerce, licensing, open source, internal/non-commercial)
 
-**Revenue and Scale:**
-- **Annual Revenue Range:** `$________`
-- **Customer Count:** `________`
+**Scale (fill only what is relevant to the project):**
+- **Scale Indicators:** `__________` (e.g., users, revenue, transactions — per the model)
 - **Team Size:** `____` people
 - **Primary Growth Metrics:** `__________`
 
@@ -59,8 +52,8 @@ Este template ajuda times de produto a projetar sua **Arquitetura de Contexto de
 3. **Finally**: Ensure all links in the index work correctly
 
 **File Naming Convention:**
-- Use UPPERCASE for generic business documentation files (e.g., `CUSTOMER_PERSONAS.md`)
-- Use lowercase for business-specific files (e.g., `business_profile.md`) 
+- Use **lowercase kebab-case** for all files (e.g., `customer-personas.md`, `business-profile.md`)
+- No spaces, underscores, or UPPERCASE
 - Keep filenames descriptive and business-focused
 
 ### Create an Index File First
