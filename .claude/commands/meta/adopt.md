@@ -60,6 +60,12 @@ faseado**: apontar o Onion para um repo/pasta e "assumir o controle" — **insta
 
 > Sessão `<SOURCE_ROOT>/.claude/sessions/adopt-<slug>/STATE.md` — **cada fase atualiza o ponteiro
 > `NEXT`** (checkpoint), permitindo retomar. Protocolo: [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md).
+>
+> ⚠️ **Modelo de execução — leia antes de rodar:** cada fase é um **shell novo** (estado Bash **NÃO
+> persiste** entre chamadas no Claude Code). `$SOURCE_ROOT`, `$SRC_*`, `$TARGET`, `$MODE`, `$IN_PLACE`
+> nos snippets são valores que o **orquestrador carrega entre fases via `STATE.md`** — em cada fase,
+> **substitua o valor concreto** (não confie em env persistido). Persistir esses valores no `STATE.md`
+> no PASSO 0 é o que torna a retomada (e o stamp da Fase 5) possível.
 
 ### PASSO 0 — Precondições, identidade da fonte e resolução do alvo
 
@@ -79,8 +85,9 @@ SRC_COMMIT_DATE="$(awk '/^commit_date:/{print $2}' <<<"$SRC_ID")"
 #   - URL git                 → TARGET="${dest:-$(dirname "$SOURCE_ROOT")/<repo-name>}"
 #                               git clone "$1" "$TARGET"   # NUNCA dentro de $SOURCE_ROOT
 
-# 0c. Garantir git no alvo (greenfield pode não ter):
-[ -d "$TARGET/.git" ] || git -C "$TARGET" init -q
+# 0c. Garantir git no alvo (greenfield pode não ter) — APENAS no modelo "instalar".
+#     NUNCA no --in-place: ele "não copia nada / efêmero", não pode modificar o alvo.
+if [ -z "$IN_PLACE" ] && [ ! -d "$TARGET/.git" ]; then git -C "$TARGET" init -q; fi
 
 # 0d. Detectar MODO (ou --mode): greenfield (sem código) | legacy (tem) | regulated (marcadores/flag)
 ```
@@ -142,7 +149,8 @@ Ver [🔁 Transição de Contexto](#-transição-de-contexto-fonte--alvo). No al
 ### Fase 5 — Carimbar versão (da identidade da FONTE capturada no PASSO 0)
 
 ```bash
-# USAR os SRC_* do PASSO 0 — NÃO re-rodar onion-version.sh a partir do alvo (daria a identidade errada).
+# USAR os SRC_* do PASSO 0 (carregados via STATE.md — shell não persiste; substitua os valores
+# concretos). NÃO re-rodar onion-version.sh a partir do alvo (daria a identidade errada).
 cat > "$TARGET/.claude/.onion-version" <<EOF
 framework: ${SRC_FRAMEWORK}
 source_commit: ${SRC_COMMIT}
