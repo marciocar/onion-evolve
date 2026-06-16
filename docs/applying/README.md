@@ -49,4 +49,14 @@ Projetos podem combinar cenários (ex: greenfield em setor regulado segue greenf
 
 ---
 
+## Automação (planejada) — `/meta:adopt`
+
+Hoje a aplicação é **manual** (copiar `.claude/` + seguir o guia). A decisão de **operacionalizar
+esta doutrina como um comando faseado in-platform** (`/meta:adopt <path|git-url>` — **não** CLI) está
+registrada no [ADR de Adoção de Repositório](../analysis/onion-adr-repo-adoption-2026-06.md): modelos
+de controle (instalar / operar in-place / worktree), stamp de versão e reuso de
+`/docs:reverse-consolidate` + `/meta:setup-integration`. Até o comando existir, siga os guias abaixo.
+
+---
+
 **Próximo passo**: abrir o guia correspondente ao seu cenário.
