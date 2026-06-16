@@ -143,7 +143,9 @@ docs/
 ├── analysis/                   # Análises ativas (baselines; itens efêmeros são removidos pós-execução — ver analysis/README.md)
 │   ├── onion-review-2026-05.md         # SSOT de identidade
 │   ├── onion-vv-baseline-2026-06.md    # baseline de V&V (usada por /meta:evolve)
-│   └── onion-evolution-2026-06-15.md   # auditoria mais recente
+│   ├── onion-evolution-2026-06-16.md   # auditoria mais recente (backlog ativo)
+│   ├── onion-evolution-2026-06-15.md   # run citado por materiais/identidade (proof-point retido)
+│   └── onion-federation-adr-a2a-format-interop-2026-06.md  # ADR durável (federação A2A)
 │
 ├── materials/                  # Materiais derivados externos (Fase 4 — 6 arquivos)
 │   ├── README.md               # Índice e guia de uso dos materiais
@@ -288,7 +290,9 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 
 - **[Revisão Analítica do Sistema Onion — Maio/2026](analysis/onion-review-2026-05.md)** — SSOT de identidade: documenta o abandono de `.onion/`, plano v4.0 e `packages/onion-cli/`; sintetiza as análises-fonte de 2025.
 - **[Baseline de Verificação e Validação — Junho/2026](analysis/onion-vv-baseline-2026-06.md)** — baseline de V&V (tamanhos + conformidade de plataforma); usada por `/meta:evolve`.
-- **[Onion Evolution — 2026-06-15](analysis/onion-evolution-2026-06-15.md)** — auditoria de evolução mais recente (backlog: 30 achados; sistêmicos = vazamento MCP-first e date-gate de KB).
+- **[Onion Evolution — 2026-06-16](analysis/onion-evolution-2026-06-16.md)** — auditoria de evolução **mais recente** (backlog ativo: ~20 acionáveis; sistêmicos = MCP-first ainda aberto, categorias fantasma, ambiguidade de threshold de tamanho).
+- **[Onion Evolution — 2026-06-15](analysis/onion-evolution-2026-06-15.md)** — run **retido como proof-point** citado por materiais/identidade (métricas §0: 28 agentes · 1.27M tokens · ~26 min · 30 achados). Não é o backlog ativo.
+- **[ADR — A2A formato vs runtime — Junho/2026](analysis/onion-federation-adr-a2a-format-interop-2026-06.md)** — decisão durável: linha vermelha A2A partida (runtime proibido / formato permitido como projeção one-way).
 - **[Revisão da Federação — Junho/2026](analysis/onion-federation-review-2026-06.md)** — federação multi-repo do Onion vs. A2A e padrões de coordenação multi-agente (jun/2026): alinhamento mainstream + por que não A2A vivo + recomendações de nomenclatura/interop.
 
 ---
