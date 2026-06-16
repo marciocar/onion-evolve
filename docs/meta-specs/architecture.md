@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Arquitetura do Sistema Onion
 date: 2026-05-18
-version: 1.1.0
+version: 1.2.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -81,7 +81,7 @@ CONTRIBUTING.md             # Guidelines para evolução
 │
 ├── rules/                  # Regras complementares (opcional)
 ├── docs/                   # Documentação interna do .claude/ (opcional)
-└── validation/             # Scripts de validação (opcional)
+└── validation/             # Scripts de validação: inventory.sh, onion-version.sh, lint, federation-*
 ```
 
 ### 1.3 Estrutura de `docs/`
@@ -236,6 +236,36 @@ Implicações:
 - Versão do framework: implícita no estado do branch `main` (não há semver formal)
 - Versão de meta-specs: campo `version` no frontmatter, semver simples (`1.0.0`)
 - Releases significativas: registradas em `docs/onion/RELEASE-NOTES-*.md` quando aplicável
+
+#### Stamp de versão (proveniência de repos adotados)
+
+A identidade do framework é **derivada do git** (commit + data), **não** um semver — coerente com
+"versão implícita no `main`" acima. O script `.claude/validation/onion-version.sh` (irmão de
+`inventory.sh`) a emite ao vivo:
+
+```yaml
+framework: onion-claude
+commit: <ref-curta>
+commit_date: <YYYY-MM-DD>
+role: source
+```
+
+O repo-**fonte** (este) **não** carrega stamp committado — evita auto-referência arquivo↔commit e churn.
+Em repos **adotados**, `/meta:adopt` escreve `.claude/.onion-version` com a identidade da fonte + campos
+de **proveniência**:
+
+```yaml
+framework: onion-claude
+source_commit: <ref-curta da fonte na adoção>
+source_commit_date: <YYYY-MM-DD>
+role: adopted
+adopted_from: <repo/URL da fonte>
+adopted_at: <YYYY-MM-DD>
+mode: greenfield | legacy | regulated
+```
+
+Adicionar este **arquivo** (não diretório) não fere §7. Consumidores: `/meta:adopt` (escreve), a
+**federação** (versão de cada membro) e o CI. Decisão: [ADR de Adoção](../analysis/onion-adr-repo-adoption-2026-06.md).
 
 ### 6.2 Sessões e estado
 
