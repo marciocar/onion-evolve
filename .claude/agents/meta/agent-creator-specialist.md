@@ -391,9 +391,7 @@ color: [cor da categoria]
 priority: [alta|media|baixa]
 expertise: ["tag1", "tag2", "tag3"]
 related_agents: ["agente-1", "agente-2"]
-related_commands: ["/comando-1", "/comando-2"]
-mcp_servers: ["clickup", "github"]
-autonomy: [alta|media|baixa]
+related_commands: ["/comando-1", "/comando-2"]autonomy: [alta|media|baixa]
 ---
 
 # 🎯 [Nome do Agente]
@@ -609,9 +607,7 @@ color: [cor da categoria]
 priority: [alta|media|baixa]
 expertise: ["tag1", "tag2", "tag3"]
 related_agents: ["agente-1", "agente-2"]
-related_commands: ["/comando-1", "/comando-2"]
-mcp_servers: ["servidor1", "servidor2"]
-autonomy: [alta|media|baixa]
+related_commands: ["/comando-1", "/comando-2"]autonomy: [alta|media|baixa]
 ---
 ```
 
@@ -1039,7 +1035,6 @@ priority: media
 expertise: ["[tecnologia]", "[domínio]", "[skill]"]
 related_agents: []
 related_commands: []
-mcp_servers: []
 autonomy: media
 ---
 ```
@@ -1055,8 +1050,7 @@ color: maroon
 priority: alta
 expertise: ["[standard]", "compliance", "audit", "[domain]"]
 related_agents: ["security-information-master"]
-related_commands: ["/compliance/generate"]
-mcp_servers: []
+related_commands: ["/docs:build-compliance-docs"]
 autonomy: alta
 ---
 ```
@@ -1072,9 +1066,7 @@ color: orange
 priority: alta
 expertise: ["[servico]", "automation", "integration"]
 related_agents: ["product-agent", "task-specialist"]
-related_commands: ["/product/task", "/meta/setup-integration"]
-mcp_servers: ["[servico]"]
-autonomy: alta
+related_commands: ["/product/task", "/meta/setup-integration"]autonomy: alta
 ---
 ```
 
@@ -1089,9 +1081,7 @@ color: black
 priority: alta
 expertise: ["meta-architecture", "orchestration", "[domain]"]
 related_agents: ["agente-1", "agente-2", "agente-3"]
-related_commands: ["/meta/[comando]"]
-mcp_servers: ["onion-orchestrator"]
-autonomy: alta
+related_commands: ["/meta/[comando]"]autonomy: alta
 ---
 ```
 

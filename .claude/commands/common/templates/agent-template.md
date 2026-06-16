@@ -173,13 +173,14 @@ Este agente requer as seguintes variáveis de ambiente:
 | `VAR_NAME` | ✅ | Descrição | [Link](url) |
 
 ## 🔌 Integrações Opcionais
-<!-- APENAS para agentes agnósticos (sem MCPs) -->
+<!-- APENAS para agentes agnósticos (sem adapter dedicado) -->
 
-Este agente pode ser potencializado com MCPs quando disponíveis:
+Este agente integra serviços externos via **abstração API-first** (Task Manager / Forge); o MCP é
+**transporte opcional** resolvido pelo adapter (`TASK_MANAGER_TRANSPORT=mcp`), **nunca** chamado direto:
 
-| MCP | Ferramentas | Uso |
+| Integração | Acesso (API-first) | Uso |
 |-----|-------------|-----|
-| ClickUp | `Bash`/`WebFetch` (REST; MCP opcional via adapter) | Gestão de tasks |
+| ClickUp | adapter `taskManager.*` (REST default; MCP opcional via `TASK_MANAGER_TRANSPORT`) | Gestão de tasks |
 
 Consulte `docs/knowledge-base/concepts/configuration-management.md` para setup.
 

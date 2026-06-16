@@ -165,7 +165,7 @@ Após decompor, **SEMPRE** estimar via `@story-points-framework-specialist`:
 #### 6.1. Preparar dados normalizados
 
 Seguir a interface `ITaskManager` (entrada/saída padronizadas, priority
-`urgent|high|normal|low`). Mesmo usando MCP diretamente, normalizar os dados.
+`urgent|high|normal|low`). O adapter resolve o transporte (REST default; MCP opcional); normalizar os dados antes de chamá-lo.
 
 ```markdown
 Task Principal:
@@ -179,11 +179,12 @@ Cada Subtask:
 
 > Formato completo de entrada/saída: `.claude/utils/task-manager/interface.md`.
 
-#### 6.2. Criar task principal, subtasks e comentário (Executar MCP)
+#### 6.2. Criar task principal, subtasks e comentário (via Task Manager Adapter)
 
-Usar as ferramentas MCP do provedor ativo. **Os mapeamentos exatos de campos,
-nomes de ferramentas, conversão de markdown e construção de URL estão nos adapters
-— NÃO duplicar aqui:**
+Chamar a abstração agnóstica (`taskManager.createTask(...)`, `createSubtask`, `addComment`); o
+adapter resolve o transporte (REST default; MCP opcional via `TASK_MANAGER_TRANSPORT`). **Os
+mapeamentos exatos de campos, nomes de ferramentas, conversão de markdown e construção de URL
+estão nos adapters — NÃO duplicar aqui:**
 
 - ClickUp → `.claude/utils/task-manager/adapters/clickup.md`
 - Asana → `.claude/utils/task-manager/adapters/asana.md`
@@ -270,7 +271,7 @@ Se houve execução no Passo 7:
 - **Detecção de provedor:** `.claude/utils/task-manager/detector.md`
 - **Interface (entrada/saída normalizada):** `.claude/utils/task-manager/interface.md`
 - **Tipos compartilhados:** `.claude/utils/task-manager/types.md`
-- **Adapters (mapeamento MCP por provedor):** `.claude/utils/task-manager/adapters/{clickup,asana,linear}.md`
+- **Adapters (API-first; transporte por provedor — REST default, MCP opcional):** `.claude/utils/task-manager/adapters/{clickup,asana,linear}.md`
 - **Decomposição:** `@task-specialist`
 - **Estimativas:** `@story-points-framework-specialist`, `/product/estimate`,
   `docs/knowledge-base/frameworks/framework-story-points.md`
