@@ -103,7 +103,7 @@ Padrões para comandos:
 - Política de duplicação de nomes
 - Limites de tamanho (500 recomendado, 800 hard)
 
-### 🏗️ [architecture.md](./architecture.md) — ATIVA (v1.0.0, 2026-05-18)
+### 🏗️ [architecture.md](./architecture.md) — ATIVA (v1.2.0, 2026-05-18)
 Padrões arquiteturais:
 - Estrutura obrigatória de `.claude/` e `docs/`
 - Separação operacional vs documentação
