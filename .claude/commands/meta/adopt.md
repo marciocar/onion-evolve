@@ -7,9 +7,9 @@ description: |
   Relacionado: /docs:reverse-consolidate, /meta:setup-integration, /docs:build-tech-docs.
 model: sonnet
 allowed-tools: Bash Read Write Edit Glob Grep
-argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--in-place] [--dry-run]"
+argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--in-place] [--update] [--dry-run]"
 category: meta
-version: "1.1.0"
+version: "1.2.0"
 updated: "2026-06-16"
 ---
 
@@ -184,9 +184,32 @@ continue lá. O comando **não** executa comandos "no alvo" a partir da fonte �
 
 | Modo | Diferença | Status |
 |---|---|---|
-| **greenfield** | scaffold + instalação; reverse-eng mínima | ✅ MVP (este comando) |
-| **legacy** | reverse-eng pesada, migração gradual, **worktree obrigatório**, never-clobber reforçado | 🔜 iteração 2 |
-| **regulated** | + `compliance-context` populado + agentes de compliance (ISO/SOC2/PMBOK) | 🔜 iteração 2 |
+| **greenfield** | scaffold + instalação; reverse-eng mínima | ✅ |
+| **legacy** | reverse-eng pesada, **worktree obrigatório**, never-clobber reforçado | ✅ |
+| **regulated** | + `compliance-context` populado + frameworks (ISO/SOC2/PMBOK) | ✅ |
+
+### Detalhe dos modos — deltas vs greenfield
+
+Os modos compartilham as 6 fases; abaixo só o que **muda**.
+
+**legacy** (repo com código existente):
+- **Fase 1:** reverse-eng **obrigatória** (`/docs:reverse-consolidate <TARGET>`) — `technical-context`
+  sai do código real, não de template vazio.
+- **Fase 2 — worktree obrigatório** (não tocar a árvore de trabalho do legado):
+  ```bash
+  SOURCE_ROOT="$(git rev-parse --show-toplevel)"   # re-derivar (shell novo)
+  TARGET="<path do alvo>"
+  git -C "$TARGET" worktree add ../onion-adopt-$(basename "$TARGET") -b onion/adopt
+  # extrair a superfície NA worktree; revisar; só então abrir PR onion/adopt → default
+  ```
+- **Never-clobber reforçado:** `CLAUDE.md`/`docs/` provavelmente **já existem** → **mesclar, não
+  sobrescrever**: gravar `CLAUDE.onion.md` (ou anexar seção Onion) e deixar o merge ao maestro.
+
+**regulated** (sujeito a compliance) — tudo do modo aplicável **+**:
+- **Detectar frameworks** (ISO 27001 / ISO 22301 / SOC2 / PMBOK) por marcadores ou `--mode regulated`.
+- **Fase 3:** popular `docs/compliance-context/` via `/docs:build-compliance-docs` (não deixar vazio).
+- Agentes de compliance já vêm no manifesto (`.claude/agents/{compliance,review}/`) — confirmar presença.
+- Coordenação compliance↔engenharia **via `meta/`/docs**, nunca acoplamento direto (`architecture.md §4.3`).
 
 ## Operar in-place (`--in-place`)
 
@@ -200,6 +223,29 @@ ex.: `/add-dir <target>`). Controle **efêmero** — o repo **não** vira Onion.
 Alvo com `.claude/` existente → **re-adoção**: extrair a superfície nova para tmp, **diff** vs o alvo,
 aplicar só o delta, re-carimbar `.onion-version` (novo `source_commit`/`adopted_at`). **Nunca**
 duplicar nem clobrar.
+
+## Atualizar um repo adotado (`--update`)
+
+Repo já adotado (tem `.claude/.onion-version`) → trazer atualizações do framework. **Reusa o stamp**
+(snippet self-contained — shell novo a cada fase):
+
+```bash
+SOURCE_ROOT="$(git rev-parse --show-toplevel)"
+TARGET="<path do alvo>"
+manifest=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation
+          docs/meta-specs docs/knowledge-base docs/sdaal .env.example)
+# commit da fonte gravado na adoção:
+ADOPTED_COMMIT="$(awk '/^source_commit:/{print $2}' "$TARGET/.claude/.onion-version")"
+# delta do framework desde então (na superfície instalável) — DRY-RUN:
+git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
+```
+
+- `ADOPTED_COMMIT` == HEAD da fonte → **já atualizado**; parar.
+- Senão: apresentar o delta → confirmar → aplicar via `git archive` (mesma Fase 2, **never-clobber**) →
+  **re-carimbar** `.onion-version`.
+- **Tie com a federação:** o `source_commit` do stamp é o que dá à federação a **versão de cada membro**
+  (member-version awareness — [multi-repo-federation.md](../../../docs/knowledge-base/concepts/multi-repo-federation.md));
+  `--update` é como um membro acompanha o framework.
 
 ---
 
