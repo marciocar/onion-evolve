@@ -6,6 +6,7 @@ status: active
 related:
   - ../platforms/git-ledger-as-working-dir.md
   - ../../analysis/onion-federation-design-v2-2026-06.md
+  - ../../analysis/onion-federation-adr-a2a-format-interop-2026-06.md
   - ../../sdaal/
 ---
 
@@ -168,5 +169,11 @@ no GitHub). O ciclo completo:
 - Ledger **real de produção** com **remote** + concorrência (lock/merge) — o MVP valida o ciclo
   completo num ledger scratch (cross-repo simulável num repo só).
 - Membros **não-Onion** / stacks heterogêneos — fases seguintes.
-- **Instâncias vivas A2A / runtime distribuído** — **Fase 5 ABANDONADA** (design §2): linha vermelha.
-  A federação é **assíncrona via git + forge**, nunca IA-fala-IA em tempo real.
+- **A2A — distinção de camadas** (refinada em 2026-06-15; razão, mapeamento e gatilho no
+  [ADR A2A](../../analysis/onion-federation-adr-a2a-format-interop-2026-06.md)):
+  - 🔴 **Runtime A2A / instâncias vivas distribuídas** — **linha vermelha** (Fase 5 ABANDONADA, design §2):
+    a federação é **assíncrona via git + forge**, **nunca IA-fala-IA em tempo real**. Inegociável.
+  - 🟢 **Formato/vocabulário A2A (Agent Card) como projeção one-way** — **permitido em princípio**:
+    exportar a camada de manifesto (`members.yaml`) num formato Agent Card-compatível, **sem** transporte
+    vivo. **Não implementado** — diferido até o gatilho do ADR (1º consumer não-Onion / interop real). Os
+    `contracts/` permanecem nativos (o Agent Card não os cobre — ver mapeamento no ADR).

@@ -84,4 +84,21 @@ supersede: onion-evolution-2026-06-14-v2.md
 4. **🟡 Corrigir categorias fantasma** (D5) + links quebrados (D7, começar pelos 21 de security-information-master).
 5. **🟢 Oportunístico:** `allowed-tools` em mais comandos; extrações `common/templates` (warm-up, test commands).
 
+---
+
+## 6. Addendum — itens registrados manualmente (pós-run)
+
+> Itens **não** produzidos pelo run `wf_7c50cb89-ceb` — **não** contam nos 30 sobreviventes nem nas
+> contagens por dimensão (§0/§2). Registrados à mão entre rodadas de `/meta:evolve`. Cada um tem
+> **gatilho**: só viram trabalho quando o gatilho dispara; até lá **não são dívida ativa**.
+
+| # | Sev | Tema | Item | Gatilho | Atuador |
+|---|-----|------|------|---------|---------|
+| A1 | 🟢 | Federação / interop | Implementar **projeção export-only Agent Card** do `members.yaml` (formato A2A, **sem runtime**) — decisão em [ADR A2A](onion-federation-adr-a2a-format-interop-2026-06.md) | **1º consumer não-Onion** na federação **ou** necessidade nomeada de interop com registry/ferramenta A2A externa | script emissor em `.claude/validation/` + **revalidar campos contra o spec A2A vigente** antes de codar |
+
+> **Por que oportunístico e não ativo:** a doutrina **já permite** (linha vermelha partida em
+> [`multi-repo-federation.md §7`](../knowledge-base/concepts/multi-repo-federation.md)); construir antes
+> do gatilho seria especulação — não há consumer não-Onion hoje (review §4). O ADR carrega a razão, o
+> mapeamento Agent Card→Onion e o caveat de frescor.
+
 > **Ciclo de vida:** este relatório supersede `onion-evolution-2026-06-14-v2.md` (removido neste mesmo PR, conforme [analysis/README.md](README.md)). Os itens executados saem do backlog na próxima rodada de `/meta:evolve`.
