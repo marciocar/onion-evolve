@@ -10,7 +10,7 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- 🤖 **82 comandos invocáveis** Claude Code em 9 categorias + root (+ 16 fragmentos compartilhados em `common/` e 3 READMEs)
+- 🤖 **83 comandos invocáveis** Claude Code em 9 categorias + root (+ 16 fragmentos compartilhados em `common/` e 3 READMEs)
 - 🎯 **49 agentes de IA especializados** em 9 categorias
 - 🧩 **5 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-fleet` — orquestração de frota)
 - 📚 **Knowledge Bases estruturadas** para consumo por IA
@@ -37,8 +37,8 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **3 contextos spec-as-code** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`
 
 ### Sistema Onion (`.claude/`)
-- **82 comandos invocáveis** Claude Code distribuídos em:
-  - 21 em `meta/` (meta-comandos, criadores, validação, orquestração de frota, frescor de KB e federação)
+- **83 comandos invocáveis** Claude Code distribuídos em:
+  - 22 em `meta/` (meta-comandos, criadores, validação, orquestração de frota, frescor de KB, federação e adoção)
   - 20 em `product/` (gestão de produto e descoberta)
   - 11 em `engineer/` (engenharia e desenvolvimento)
   - 11 em `docs/` (geração e validação de documentação)
@@ -60,7 +60,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 
 ### Total
 - **81 arquivos** de documentação markdown
-- **82 comandos invocáveis** em 9 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
+- **83 comandos invocáveis** em 9 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
 - **49 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
 
@@ -145,7 +145,8 @@ docs/
 │   ├── onion-vv-baseline-2026-06.md    # baseline de V&V (usada por /meta:evolve)
 │   ├── onion-evolution-2026-06-16.md   # auditoria mais recente (backlog ativo)
 │   ├── onion-evolution-2026-06-15.md   # run citado por materiais/identidade (proof-point retido)
-│   └── onion-federation-adr-a2a-format-interop-2026-06.md  # ADR durável (federação A2A)
+│   ├── onion-federation-adr-a2a-format-interop-2026-06.md  # ADR durável (federação A2A)
+│   └── onion-adr-repo-adoption-2026-06.md  # ADR durável (adoção de repo / /meta:adopt)
 │
 ├── materials/                  # Materiais derivados externos (Fase 4 — 6 arquivos)
 │   ├── README.md               # Índice e guia de uso dos materiais
@@ -293,6 +294,7 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 - **[Onion Evolution — 2026-06-16](analysis/onion-evolution-2026-06-16.md)** — auditoria de evolução **mais recente** (backlog ativo: ~20 acionáveis; sistêmicos = MCP-first ainda aberto, categorias fantasma, ambiguidade de threshold de tamanho).
 - **[Onion Evolution — 2026-06-15](analysis/onion-evolution-2026-06-15.md)** — run **retido como proof-point** citado por materiais/identidade (métricas §0: 28 agentes · 1.27M tokens · ~26 min · 30 achados). Não é o backlog ativo.
 - **[ADR — A2A formato vs runtime — Junho/2026](analysis/onion-federation-adr-a2a-format-interop-2026-06.md)** — decisão durável: linha vermelha A2A partida (runtime proibido / formato permitido como projeção one-way).
+- **[ADR — Adoção de repositório — Junho/2026](analysis/onion-adr-repo-adoption-2026-06.md)** — decisão durável: adoção = comando in-platform `/meta:adopt` (não CLI); stamp de versão; rampa da federação.
 - **[Revisão da Federação — Junho/2026](analysis/onion-federation-review-2026-06.md)** — federação multi-repo do Onion vs. A2A e padrões de coordenação multi-agente (jun/2026): alinhamento mainstream + por que não A2A vivo + recomendações de nomenclatura/interop.
 
 ---

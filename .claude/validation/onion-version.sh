@@ -44,12 +44,16 @@ case "${FORMAT}" in
     printf '{"framework":"%s","commit":"%s","commit_date":"%s","role":"source"}\n' \
       "${framework}" "${commit}" "${commit_date}"
     ;;
-  --yaml | *)
+  --yaml)
     cat <<YAML
 framework: ${framework}
 commit: ${commit}
 commit_date: ${commit_date}
 role: source
 YAML
+    ;;
+  *)
+    echo "uso: bash .claude/validation/onion-version.sh [--yaml|--json]" >&2
+    exit 2
     ;;
 esac

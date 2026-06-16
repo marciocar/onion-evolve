@@ -7,6 +7,11 @@
 # Política: docs/knowledge-base/frameworks/gitflow-patterns.md §Contrato de Sessão → Versionamento de sessões.
 .claude/sessions/
 
+# Stamp de versão de repo ADOTADO — o repo-fonte (este) não carrega stamp committado
+# (architecture.md §6.1: identidade lida ao vivo via onion-version.sh). Backstop p/ o caso
+# de /meta:adopt apontar para este próprio repo, ou cópia acidental do stamp.
+.claude/.onion-version
+
 # Arquivos temporários
 *.tmp
 *.temp
