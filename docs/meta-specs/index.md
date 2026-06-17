@@ -73,7 +73,7 @@ Meta Specs definem:
 
 O gate-keeper opera em **dois modos**, escolhendo a régua conforme o artefato:
 
-- **Modo Framework (L0)** — no `onion-claude`, valida artefatos `.claude/**`
+- **Modo Framework (L0)** — no `onion-evolve`, valida artefatos `.claude/**`
   contra as **5 meta-specs L0** (agents/commands/architecture/code-standards/integrations).
 - **Modo Projeto-alvo (L1+)** — quando o Onion está instalado num projeto, valida
   artefatos de **domínio/feature/ADR** contra as metaspecs **daquele projeto**.

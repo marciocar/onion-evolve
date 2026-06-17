@@ -4,7 +4,7 @@
 
 ### Organize produto, engenharia e governança no mesmo ritmo — nativo do **Claude Code**.
 
-[![Licença: MIT](https://img.shields.io/github/license/marciocar/onion-claude?color=success)](LICENSE)
+![Licença: MIT](https://img.shields.io/badge/licença-MIT-success)
 ![Plataforma](https://img.shields.io/badge/plataforma-Claude_Code-D97757)
 ![Metodologia](https://img.shields.io/badge/metodologia-Spec--as--Code_%2B_SDD-blue)
 [![Família Onion](https://img.shields.io/badge/família-Onion-8A2BE2)](https://github.com/marciocar/onion)
@@ -16,7 +16,7 @@
 ---
 
 > [!NOTE]
-> Esta é a porta **Claude Code** da família Onion — a mesma metodologia, expressa no primitivo nativo da plataforma. Conheça as outras 5 portas no hub: **[github.com/marciocar/onion](https://github.com/marciocar/onion)**.
+> **`onion-evolve`** é um **fork privado de evolução** da porta Claude Code do Onion — onde novas capacidades (auto-auditoria `/meta:evolve`, federação multi-repo, auto-teste de guardas) são incubadas. **Não é** a porta pública canônica da família; o hub público fica em **[github.com/marciocar/onion](https://github.com/marciocar/onion)**.
 
 ## 🎯 O que é
 
@@ -62,7 +62,7 @@ O Onion separa o conhecimento do projeto em **três contextos peer** + uma **bas
 | Porta | Plataforma | Repositório |
 |---|---|---|
 | 🌐 onion (hub) | a história de todas | [onion](https://github.com/marciocar/onion) |
-| 🟠 **claude** | **Claude Code** | **◀ você está aqui** |
+| 🟠 **claude** | **Claude Code** | **◀ você está aqui** — `onion-evolve` (fork privado de evolução) |
 | 🔵 cursor | Cursor | [onion-cursor](https://github.com/marciocar/onion-cursor) |
 | 🟣 antigravity | Google Antigravity | [onion-antigravity](https://github.com/marciocar/onion-antigravity) |
 | ⚡ zed | Zed | [onion-zed](https://github.com/marciocar/onion-zed) |

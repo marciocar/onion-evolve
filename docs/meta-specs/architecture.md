@@ -244,7 +244,7 @@ A identidade do framework é **derivada do git** (commit + data), **não** um se
 `inventory.sh`) a emite ao vivo:
 
 ```yaml
-framework: onion-claude
+framework: onion-evolve
 commit: <ref-curta>
 commit_date: <YYYY-MM-DD>
 role: source
@@ -255,7 +255,7 @@ Em repos **adotados**, `/meta:adopt` escreve `.claude/.onion-version` com a iden
 de **proveniência**:
 
 ```yaml
-framework: onion-claude
+framework: onion-evolve
 source_commit: <ref-curta da fonte na adoção>
 source_commit_date: <YYYY-MM-DD>
 role: adopted
