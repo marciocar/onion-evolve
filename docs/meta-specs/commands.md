@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões para Comandos do Sistema Onion
-date: 2026-05-18
-version: 1.4.0
+date: 2026-06-17
+version: 1.5.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -309,6 +309,7 @@ Arquivo hipotético: `.claude/commands/misc/MyCommand.md`
 - **Proibido** criar categoria fora da lista válida
 - **Proibido** criar comando sem frontmatter
 - **Proibido** comando com `name` em formato diferente de kebab-case
+- **Proibido** adicionar/alterar uma guarda determinística (regra em `lint-artifacts.sh` ou validador irmão em `.claude/validation/`) sem a fixture de failure-mode correspondente registrada no manifest do auto-teste (ver Seção 11)
 
 ---
 
@@ -345,3 +346,20 @@ Complementa a Seção 3: enquanto workflows faseados coordenam trabalho **sequen
 ### 10.3 Padrões canônicos
 
 Os seis padrões canônicos (classify-and-act, fan-out-and-synthesize, adversarial verification, generate-and-filter, tournament, loop-until-done) e seu mapeamento às primitivas `agent()`/`parallel()`/`pipeline()` são normalizados na KB de fleet orchestration (link acima).
+
+---
+
+## 11. Guardas determinísticas testam a si mesmas
+
+As guardas determinísticas do framework (`.claude/validation/lint-artifacts.sh` e validadores irmãos como `federation-contract-validate.sh`) são a primeira linha de defesa do CI. Uma guarda que silenciosamente para de funcionar — regex quebrada, allowlist larga demais — é a meta-falha "guarda parcial" aplicada às próprias guardas: nada pega, e a regressão degrada em silêncio.
+
+### 11.1 Regra normativa
+
+Toda guarda determinística **nova** (ou alteração de uma existente) nasce com:
+
+1. **Fixture de failure-mode** em `.claude/validation/fixtures/`, registrada no `manifest.tsv`, isolando a regra: ao menos um caso `bad` (input ruim → guarda **deve** flagrar) e, quando houver allowlist/exceção, um caso `good`/`exempt` (input legítimo → guarda **não** flagra).
+2. **Revisão independente** de prompt neutro antes do PR (ex.: `@branch-code-reviewer` ou um reviewer sem o contexto de quem escreveu a guarda) — a disciplina ad-hoc que pegou bugs reais (tool-names estilo-Cursor, MCP de provider no frontmatter, drift de contagem) vira padrão escrito.
+
+### 11.2 Contrato executável
+
+`.claude/validation/lint-selftest.sh` é o **contrato executável** desta regra: injeta cada fixture do manifest, roda a guarda como caixa-preta e assere o veredito real contra o esperado. Roda no CI logo após o linter (ver [ci.md](../onion/ci.md)). Uma guarda quebrada faz o selftest — e portanto o CI — falhar, em vez de degradar em silêncio. Escopo deliberadamente determinístico: não testa comportamento de LLM (coberto, não-deterministicamente, por `/meta:metaspec-validate` + `onion-review.yml`).

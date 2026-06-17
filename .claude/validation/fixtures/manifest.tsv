@@ -1,0 +1,23 @@
+# Manifesto de fixtures do auto-teste de guardas (lint-selftest.sh)
+# Colunas TAB-separadas: kind	fixture	target	verdict	keyword
+#   kind    : lint | contract
+#   fixture : caminho relativo sob .claude/validation/fixtures/
+#   target  : subdir do repo onde injetar (só kind=lint; use '-' p/ contract).
+#             Evite campos vazios no MEIO da linha: IFS=tab colapsa tabs
+#             consecutivos. Campos vazios só no FIM (ex.: keyword) são seguros.
+#   verdict : lint -> bad|good|exempt ; contract -> pass|fail
+#   keyword : substring esperada na violação (só verdict=bad; vazio caso contrário)
+# Linhas iniciadas por '#' e linhas em branco são ignoradas.
+kind	fixture	target	verdict	keyword
+lint	r12-tool-names/bad-provider-mcp.md	.claude/agents/development	bad	mcp__clickup__
+lint	r12-tool-names/bad-managed-mcp.md	.claude/agents/development	bad	mcp__claude_ai_Asana__
+lint	r12-tool-names/bad-cursor-toolname.md	.claude/agents/development	bad	estilo-Cursor
+lint	r12-tool-names/bad-single-underscore-mcp.md	.claude/agents/development	bad	formato inválido
+lint	r12-tool-names/good-native.md	.claude/agents/development	good
+lint	r15-context-stamp/bad-no-stamp.md	docs/business-context	bad	carimbo de frescor
+lint	r15-context-stamp/good-stamped.md	docs/business-context	good
+lint	r16-count-drift/bad-cmd-count.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/good-cmd-count.md	docs	good
+lint	r16-count-drift/exempt-snapshot.md	docs	exempt
+contract	contracts/bad-no-fixtures.md	-	fail
+contract	contracts/good-contract.md	-	pass

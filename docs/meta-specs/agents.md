@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Padrões para Agentes do Sistema Onion
-date: 2026-05-18
-version: 1.1.1
+date: 2026-06-17
+version: 1.2.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -236,7 +236,18 @@ Arquivo hipotético: `.claude/agents/misc/MyAgent.md`
 
 ---
 
-## 9. Versionamento e mudanças
+## 9. Guardas determinísticas que tocam agentes testam a si mesmas
+
+Várias guardas de `lint-artifacts.sh` protegem agentes — frontmatter obrigatório (Regra 1), nomes de tool válidos / proibição de MCP de provider no frontmatter (Regra 12), limites de tamanho (Regra 5), proibição de agente fleet-orchestrator (Regra 7). Pela simetria com [commands.md §11](./commands.md), toda guarda **nova** (ou alteração) que valide agentes nasce com:
+
+1. **Fixture de failure-mode** em `.claude/validation/fixtures/`, registrada no `manifest.tsv`, isolando a regra (caso `bad` obrigatório; `good`/`exempt` quando houver allowlist — ex.: a allowlist de especialistas de provider da Regra 12).
+2. **Revisão independente** de prompt neutro antes do PR.
+
+O contrato executável é `.claude/validation/lint-selftest.sh`, que injeta cada fixture num sandbox e confere o veredito real — uma guarda de agente que parar de reagir faz o CI falhar em vez de degradar em silêncio. Ver [commands.md §11](./commands.md) para a doutrina completa.
+
+---
+
+## 10. Versionamento e mudanças
 
 Mudanças nesta spec exigem:
 
