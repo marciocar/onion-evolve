@@ -94,4 +94,8 @@ Esta KB define a **doutrina**. A execução da fase *Manage* (auditar frescor de
 - **Fan-out** via [`onion-fleet`](../../../.claude/skills/onion-fleet/SKILL.md) (pattern `fan-out-and-synthesize`): worker por arquivo/diretório (tier haiku) → fan-in (tier sonnet) → retorno no formato `FreshnessSchema[]`.
 - **Composição** no [`/meta:evolve`](../../../.claude/commands/meta/evolve.md) como dimensão **no fluxo principal** — como D4/D5 hoje delegam a `kb-freshness`/`metaspec-validate` sem aninhar frota dentro de frota.
 
-> A construção dessa camada é o **Tijolo 2** (ver [ADR §Gatilho de Implementação](../../analysis/onion-adr-domain-context-lifecycle-2026-06.md)). Esta KB é o Tijolo 1: a doutrina que aquela camada vai executar.
+> **Tijolo 2 entregue (2026-06-17):** a fase *Manage* é executada pelo comando
+> [`/meta:context-freshness`](../../../.claude/commands/meta/context-freshness.md) (veredito
+> CURRENT/STALE/HISTORICAL, fan-out via `onion-fleet`, contradição cross-domínio no fan-in),
+> com a Regra 15 do lint exigindo o carimbo de frescor e a dimensão D9 do `/meta:evolve`
+> compondo a auditoria. Esta KB é a doutrina (Tijolo 1) que esse comando executa.

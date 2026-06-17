@@ -8,7 +8,7 @@
 
 | Recurso | Quantidade |
 |---------|-----------:|
-| Comandos invocáveis | **83** |
+| Comandos invocáveis | **84** |
 | Agentes | **49** |
 | Skills | **5** |
 | Knowledge Bases | **35** |
@@ -17,7 +17,7 @@
 
 | Categoria | Comandos |
 |-----------|---------:|
-| `meta/` | 22 |
+| `meta/` | 23 |
 | `product/` | 20 |
 | `engineer/` | 11 |
 | `docs/` | 11 |
@@ -27,7 +27,7 @@
 | `quick/` | 1 |
 | `development/` | 1 |
 | _root_ (`onion`, `warm-up`) | 2 |
-| **Total** | **83** |
+| **Total** | **84** |
 
 ## Agentes por categoria (9 categorias)
 
@@ -43,3 +43,13 @@
 | `research/` | 1 |
 | `deployment/` | 1 |
 | **Total** | **49** |
+
+## Contextos de domínio (spec-as-code — populados no projeto-alvo)
+
+> Arquivos de conteúdo (exclui README/index). No framework são **templates** (0 = só README).
+
+| Contexto | Arquivos |
+|----------|---------:|
+| `business-context/` | 0 |
+| `technical-context/` | 0 |
+| `compliance-context/` | 0 |

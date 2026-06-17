@@ -45,6 +45,9 @@
 #  14. Meta-specs (docs/meta-specs/) sem dialeto Cursor em exemplos de tools:
 #      [HARD] — autoridade L0; token Cursor como item de lista YAML ou MCP
 #      underscore-único. A lista de PROIBIÇÃO em prosa/blockquote é isenta
+#  15. Frescor de contexto de domínio [SOFT] — arquivo POPULADO em docs/*-context/
+#      (exclui README/index) deve carregar carimbo 'Última Atualização'/'updated:';
+#      habilita a fase Manage (/meta:context-freshness). No framework = no-op (templates)
 # =============================================================================
 
 set -euo pipefail
@@ -449,6 +452,30 @@ check_metaspec_dialect() {
 }
 
 # ===========================================================================
+# REGRA 15 — Frescor de contexto de domínio: carimbo de atualização [SOFT]
+#   Cada arquivo POPULADO de docs/*-context/ (exclui README/index) deve carregar
+#   um carimbo de frescor ('Última Atualização' ou 'updated:'/'date:'). Habilita a
+#   fase Manage (/meta:context-freshness): sem carimbo não há como auditar staleness.
+#   No framework os contextos são templates (só README) → no-op. A idade (>18 meses)
+#   é avaliada pelo comando LLM, não pelo lint determinístico (que seria
+#   não-reproduzível no tempo). Aqui exigimos apenas a PRESENÇA do carimbo.
+# ===========================================================================
+check_context_freshness_stamp() {
+  local ctx base
+  for ctx in business-context technical-context compliance-context; do
+    base="${REPO_ROOT}/docs/${ctx}"
+    [ -d "${base}" ] || continue
+    while IFS= read -r -d '' f; do
+      # Casa pelo radical ASCII 'Atualiza' (sem -i): robusto a locale C (case-fold de
+      # 'Ú' multibyte) e a NBSP/espaço duplo entre as palavras. Frontmatter via âncora.
+      if ! grep -qE 'Atualiza|^[Uu]pdated:|^[Dd]ate:' "${f}"; then
+        violation "SOFT" "${f}" "contexto de domínio sem carimbo de frescor ('Última Atualização'/'updated:') — exigido pela fase Manage (/meta:context-freshness)"
+      fi
+    done < <(find "${base}" -name "*.md" ! -iname "readme.md" ! -iname "index.md" -print0 2>/dev/null)
+  done
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -468,6 +495,7 @@ check_inventory_sync
 check_claude_md_counts
 check_no_direct_provider_calls
 check_abstraction_methods_exist
+check_context_freshness_stamp
 
 # ===========================================================================
 # SUMÁRIO FINAL

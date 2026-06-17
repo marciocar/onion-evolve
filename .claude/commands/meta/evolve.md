@@ -7,13 +7,14 @@ description: |
 model: opus
 category: meta
 tags: [evolve, audit, fleet, self-evolution, modernization]
-version: "1.1.0"
-updated: "2026-06-15"
+version: "1.2.0"
+updated: "2026-06-17"
 allowed-tools: Read Write Grep Glob Bash(find *) Bash(wc *) Bash(git log*) Bash(cat .env*)
-argument-hint: "[dimensão específica (D1..D8) | vazio = auditoria completa]"
+argument-hint: "[dimensão específica (D1..D9) | vazio = auditoria completa]"
 related_commands:
   - /meta:fleet
   - /meta:kb-freshness
+  - /meta:context-freshness
   - /meta:metaspec-validate
   - /meta:create-command
 related_agents:
@@ -53,14 +54,14 @@ A orquestração roda **sempre no nível principal** (este comando + skill
 ## 📥 Input
 
 ```
-/meta:evolve            # auditoria completa (8 dimensões)
+/meta:evolve            # auditoria completa (9 dimensões)
 /meta:evolve D2         # só uma dimensão (ex.: redundância)
 ```
 
 ## 🔬 Dimensões de auditoria (fan-out)
 
 Top-level = **fan-out-and-synthesize** (1 worker por dimensão, barrier, fan-in em
-JS no contexto principal). **D4 e D5 são composição** — delegam a comandos
+JS no contexto principal). **D4, D5 e D9 são composição** — delegam a comandos
 existentes, **não** reimplementam (e não aninham frota dentro de frota).
 
 | # | Dimensão | O que escaneia (evidência) | Tier |
@@ -73,6 +74,7 @@ existentes, **não** reimplementam (e não aninham frota dentro de frota).
 | D6 | **Moderna vs legada + vazamento SDAAL** | Prosa/delegação sequencial que deveria ser `Workflow` fan-out; resíduo `.onion`/CLI/npm/multi-IDE ([architecture.md §7](../../../docs/meta-specs/architecture.md)). **Vazamento provider-specific / MCP-first:** chamada direta a provider (`mcp_<provider>_*`) ou "MCP como transporte default" em comandos/agentes fora de adapters/especialistas — viola API-first/agnosticismo (lint Regra 10; doutrina §consumo de integração). | sonnet |
 | D7 | **Cross-refs / links** | `find .claude -xtype l` (symlinks quebrados) + links relativos `[..](..)` que apontam para arquivos inexistentes. | haiku |
 | D8 | **Plataforma/frontmatter + inventário** | Cobertura de `allowed-tools`/`model:`, frontmatter completo, kebab-case ([commands.md §1](../../../docs/meta-specs/commands.md), [agents.md](../../../docs/meta-specs/agents.md)). **Inventário:** roda `bash .claude/validation/inventory.sh --markdown` e compara com `docs/onion/inventory.md` + contagens em `CLAUDE.md`; divergência = achado (atuador `/meta:inventory`, **não** edição manual — ver doutrina §regra de inventário). | haiku |
+| D9 | **Frescor de contexto de domínio** | **DELEGA a `/meta:context-freshness`** — ingere `FreshnessSchema[]` dos `docs/*-context/`. Herda o threshold ≤18mo (item 1 da régua de contexto). No framework = **no-op** (contextos são templates, só README); o valor é em projeto-alvo que populou os contextos. Não reimplementar; não aninhar frota. | (context-freshness) |
 
 ## ⚡ Etapas de Execução
 
@@ -81,24 +83,24 @@ Confirme a ferramenta nativa **Workflow**. Se ausente → **fallback serial**
 (Passo 5) com aviso em pt-BR. Determinístico, não inferido.
 
 ### Passo 1 — Escopo
-- `$ARGUMENTS` preenchido com `D1..D8` → roda só aquela dimensão.
-- Vazio → roda as 8. Levante os alvos com `Glob`/`find`/`Grep`.
+- `$ARGUMENTS` preenchido com `D1..D9` → roda só aquela dimensão.
+- Vazio → roda as 9. Levante os alvos com `Glob`/`find`/`Grep`.
 
 ### Passo 2 — Delegar padrão à skill `onion-fleet`
-Acione **`onion-fleet`** com: tarefa = "auditar o Onion em 8 dimensões
+Acione **`onion-fleet`** com: tarefa = "auditar o Onion em 9 dimensões
 independentes"; independência = alta (cada dimensão é autônoma); padrão esperado
 = **fan-out-and-synthesize**. A skill confirma elegibilidade e tiering.
 
-### Passo 3 — Fan-out (workers de dimensão) + composição (D4/D5)
+### Passo 3 — Fan-out (workers de dimensão) + composição (D4/D5/D9)
 Autore o script `Workflow`. Cada worker de dimensão recebe a régua da sua linha e
-devolve `FindingSchema[]`. **D4 e D5 NÃO são workers** — são chamados no fluxo
+devolve `FindingSchema[]`. **D4, D5 e D9 NÃO são workers** — são chamados no fluxo
 principal (sequencialmente) e seus resultados mesclados, pois `kb-freshness` já
 roda sua própria frota interna (aninhar violaria `onion-fleet`).
 
 ```javascript
 const FindingSchema = {
   id: "string",                      // chave ESTÁVEL de correlação — atribuída no fan-in (`${dimension}-${ordinal}`)
-  dimension: "D1|D2|D3|D4|D5|D6|D7|D8",
+  dimension: "D1|D2|D3|D4|D5|D6|D7|D8|D9",
   severity: "blocker|recommended|opportunistic",   // 🔴 | 🟡 | 🟢
   finding: "string",                 // descrição
   evidence: "string",                // arquivo:linha ou output
@@ -118,12 +120,13 @@ const scanFindings = await parallel(
 );
 
 // Composição (NÃO fan-out): delega aos comandos existentes no fluxo principal
-const kbFindings = await runCommand("/meta:kb-freshness");        // ingere FreshnessSchema[]
-const specFindings = await runCommand("/meta:metaspec-validate"); // por artefato de alto risco
+const kbFindings = await runCommand("/meta:kb-freshness");         // D4 — ingere FreshnessSchema[]
+const specFindings = await runCommand("/meta:metaspec-validate");  // D5 — por artefato de alto risco
+const ctxFindings = await runCommand("/meta:context-freshness");   // D9 — FreshnessSchema[] dos docs/*-context/ (vazio no framework)
 
 // Atribuir id ESTÁVEL a cada achado — é a única chave confiável de correlação
 // entre achado e veredito no fan-in (o juiz reformula o texto; o id não muda).
-const allFindings = [...scanFindings.flat(), ...kbFindings, ...specFindings]
+const allFindings = [...scanFindings.flat(), ...kbFindings, ...specFindings, ...ctxFindings]
   .map((f, i) => ({ ...f, id: `${f.dimension}-${i}` }));
 ```
 
@@ -148,8 +151,10 @@ const VerdictSchema = {
 ```
 
 ### Passo 3.2 — Completeness critic (loop-until-done, budget-gated)
-Antes do fan-in, um crítico confirma que as 8 dimensões rodaram e nenhuma
-categoria de artefato foi pulada. O que faltar vira nova rodada.
+Antes do fan-in, um crítico confirma que as 9 dimensões rodaram e nenhuma
+categoria de artefato foi pulada (incl. D9 — ausência de achados de contexto só é
+válida se os `docs/*-context/` forem templates; em projeto-alvo populado, vazio
+silencioso = falha, não sucesso). O que faltar vira nova rodada.
 
 ### Passo 4 — Fan-in: consolidar e priorizar (0 tokens)
 No contexto principal, parta de `allFindings` (já com `id` estável):
@@ -176,7 +181,7 @@ Avise em pt-BR; itere as dimensões com `Agent` uma a uma com o mesmo
 # Onion Evolution Backlog — <data>
 
 ## 0. Sumário
-◆ Dimensões: 8  ◆ Padrão: fan-out-and-synthesize  ◆ Workers: N
+◆ Dimensões: 9  ◆ Padrão: fan-out-and-synthesize  ◆ Workers: N
 ◆ Budget: ~X tokens  ◆ Run ID: <id>  ◆ Agent View: <ref>
 
 ## 1. Backlog priorizado
@@ -206,7 +211,7 @@ regra da [Doutrina de Modernização](../../../docs/knowledge-base/concepts/onio
 ## ⚠️ Notas
 
 - **Read-only**: propõe, não muta `.claude/`. Só escreve o relatório em `docs/analysis/`.
-- **Compõe, não duplica**: D4/D5 reusam `/meta:kb-freshness` e `/meta:metaspec-validate` — nunca reimplementam, nunca aninham frota dentro de frota.
+- **Compõe, não duplica**: D4/D5/D9 reusam `/meta:kb-freshness`, `/meta:metaspec-validate` e `/meta:context-freshness` — nunca reimplementam, nunca aninham frota dentro de frota.
 - **Invariante**: pode *reportar* sobre os workflows faseados, **nunca** propor fundir suas fases — o juiz adversarial veta.
 - Orquestre **sempre no nível principal**; **não crie** um agente "evolve-worker".
 - Doutrina de julgamento: `docs/knowledge-base/concepts/onion-modernization-doctrine.md`.
@@ -215,7 +220,7 @@ regra da [Doutrina de Modernização](../../../docs/knowledge-base/concepts/onio
 
 - Doutrina (qual padrão aplicar): [onion-modernization-doctrine.md](../../../docs/knowledge-base/concepts/onion-modernization-doctrine.md)
 - Doutrina de frota: [agent-fleet-orchestration.md](../../../docs/knowledge-base/concepts/agent-fleet-orchestration.md)
-- Composição: `/meta:kb-freshness` (D4) · `/meta:metaspec-validate` (D5)
+- Composição: `/meta:kb-freshness` (D4) · `/meta:metaspec-validate` (D5) · `/meta:context-freshness` (D9)
 - Atuadores: `/meta:create-command|agent|skill|abstraction|knowledge-base`
 - Baseline manual que automatiza: [onion-vv-baseline-2026-06.md](../../../docs/analysis/onion-vv-baseline-2026-06.md)
 - Skill de fan-out: `onion-fleet` · Meta-spec: [commands.md §10](../../../docs/meta-specs/commands.md)
