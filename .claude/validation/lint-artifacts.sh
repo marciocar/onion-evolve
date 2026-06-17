@@ -487,6 +487,74 @@ check_context_freshness_stamp() {
 }
 
 # ===========================================================================
+# REGRA 16 — Contagem de inventário-TOTAL divergente da SSOT [SOFT]
+#   Checa SÓ frases-de-total CANÔNICAS contra inventory.sh — nunca 'N comandos' cru
+#   nem 'N especializados' (palavra comum em por-categoria/feature). Marcadores de
+#   total confiáveis: 'N comandos invocáveis', 'N comandos em M categorias',
+#   'N agentes ...em M categorias' (qualquer texto antes de 'em N categorias') e
+#   'N Knowledge Bases'. Assim NÃO flaga métricas de frota
+#   ('28 agentes' de um run), breakdowns ('4 comandos especializados de docs',
+#   '3 agentes especializados criados') nem snapshots. Complementa a Regra 9 (só CLAUDE.md).
+#   SOFT: heurística sobre linguagem natural — surfaca drift sem bloquear CI por FP.
+#   ISENTA: docs/analysis/ (datado), .claude/sessions/ (gitignored), docs/materials/
+#   (derivado — deferido), docs/onion/inventory.md (SSOT), e frontmatter
+#   status:snapshot / type:adr / type:evolution-backlog.
+# ===========================================================================
+check_inventory_total_drift() {
+  local env_out cmd agent cats kb n pair num ct
+  env_out="$(bash "${SCRIPT_DIR}/inventory.sh" --env 2>/dev/null || true)"
+  cmd="$(printf '%s\n' "${env_out}" | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
+  agent="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENTS_TOTAL=' | cut -d= -f2)"
+  cats="$(printf '%s\n' "${env_out}" | grep '^ONION_COMMAND_CATEGORIES=' | cut -d= -f2)"
+  kb="$(printf '%s\n' "${env_out}" | grep '^ONION_KBS_TOTAL=' | cut -d= -f2)"
+  [ -n "${cmd}" ] || return
+
+  while IFS= read -r -d '' f; do
+    case "${f}" in
+      */docs/analysis/*|*/.claude/sessions/*|*/docs/materials/*|*/docs/onion/inventory.md) continue ;;
+    esac
+    if grep -qiE '^(status:[[:space:]]*snapshot|type:[[:space:]]*(adr|evolution-backlog))' "${f}"; then continue; fi
+
+    # 'N comandos invocáveis' — 'invocáveis' é marcador de TOTAL (nunca por-categoria)
+    while IFS= read -r n; do
+      if [ -n "${n}" ] && [ "${n}" != "${cmd}" ]; then
+        violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT: '${n} comandos invocáveis' (esperado ${cmd}) — derive de inventory.md (/meta:inventory)"
+      fi
+    done < <(grep -oiE '[0-9]+ comandos invocáveis' "${f}" 2>/dev/null | grep -oE '^[0-9]+')
+
+    # 'N comandos em M categorias' — frase-de-total canônica
+    while IFS= read -r pair; do
+      [ -z "${pair}" ] && continue
+      num="$(printf '%s' "${pair}" | grep -oE '^[0-9]+')"
+      ct="$(printf '%s' "${pair}" | grep -oE '[0-9]+ categorias' | grep -oE '^[0-9]+')"
+      if [ -n "${num}" ] && [ "${num}" != "${cmd}" ]; then
+        violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT: '${pair}' (esperado ${cmd} comandos) — /meta:inventory"
+      fi
+      if [ -n "${ct}" ] && [ "${ct}" != "${cats}" ]; then
+        violation "SOFT" "${f}" "contagem de categorias divergente da SSOT: '${pair}' (esperado ${cats}) — /meta:inventory"
+      fi
+    done < <(grep -oiE '[0-9]+ comandos em [0-9]+ categorias' "${f}" 2>/dev/null)
+
+    # 'N agentes ... em M categorias' — qualquer texto entre 'agentes' e 'em N categorias'
+    # (de IA / especializados / IA distribuídos); o qualificador 'em N categorias' marca o total
+    while IFS= read -r pair; do
+      [ -z "${pair}" ] && continue
+      num="$(printf '%s' "${pair}" | grep -oE '^[0-9]+')"
+      if [ -n "${num}" ] && [ "${num}" != "${agent}" ]; then
+        violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '${pair}' (esperado ${agent}) — /meta:inventory"
+      fi
+    done < <(grep -oiE '[0-9]+ agentes[^.,|]*em [0-9]+ categorias' "${f}" 2>/dev/null)
+
+    # 'N Knowledge Bases' — frase-de-total (forma curta 'KBs' é ambígua em exemplos → não usada)
+    while IFS= read -r n; do
+      if [ -n "${n}" ] && [ "${n}" != "${kb}" ]; then
+        violation "SOFT" "${f}" "contagem-total de KBs divergente da SSOT: '${n} Knowledge Bases' (esperado ${kb}) — /meta:inventory"
+      fi
+    done < <(grep -oiE '[0-9]+ knowledge bases' "${f}" 2>/dev/null | grep -oE '^[0-9]+')
+  done < <(find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -507,6 +575,7 @@ check_claude_md_counts
 check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp
+check_inventory_total_drift
 
 # ===========================================================================
 # SUMÁRIO FINAL
