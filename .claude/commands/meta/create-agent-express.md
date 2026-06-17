@@ -41,7 +41,7 @@ Ferramentas disponíveis:
 - **Execução**: Bash, Task
 - **Web**: WebFetch, WebSearch
 - **Desenvolvimento**: ExitPlanMode, TodoWrite
-- **Ferramentas MCP**: Várias ferramentas com prefixo mcp__ para integrações específicas
+- **Ferramentas MCP**: ferramentas com prefixo `mcp__` para integrações **genéricas** (Playwright, etc.). ⚠️ Providers de task (ClickUp/Jira/Asana/Linear) e forge (GitHub) vão via adapter SDAAL (`taskManager.*`/`forge.*`), **NÃO** como `mcp__<provider>__*` direto — ver CLAUDE.md §Task Manager.
 
 Apresente essas ferramentas organizadas por categoria e peça ao usuário para selecionar quais são apropriadas para o propósito do agente. Por padrão, use acesso mínimo às ferramentas por segurança.
 

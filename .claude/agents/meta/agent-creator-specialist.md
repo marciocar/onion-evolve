@@ -180,7 +180,7 @@ Olá! Analisei o ambiente e encontrei:
   - Product: [listar principais]
   - Engineer: [listar principais]
   
-- **Ferramentas MCP:** [listar principais servidores]
+- **Ferramentas MCP:** [listar principais servidores] — *(providers de task/forge via adapter SDAAL, não `mcp__<provider>__*` direto)*
 
 ### 🔍 Análise do Seu Pedido:
 **Você quer criar:** [resumir pedido do usuário]
@@ -235,9 +235,17 @@ Você concorda ou prefere outra estrutura?
 Ferramentas MCP detectadas que podem ser úteis:
 - [listar ferramentas MCP relevantes baseadas no propósito]
 
+> ⚠️ **SDAAL / API-first (regra dura):** providers de **task** (ClickUp/Jira/Asana/Linear) e **forge**
+> (GitHub) **NÃO** entram como `mcp__<provider>__*` direto num agente novo — são alcançados pela
+> abstração (`taskManager.*` / `forge.*`), que resolve transporte (API default, MCP opcional).
+> `mcp__<provider>__*` direto só vive nos **adapters** e nos **especialistas** (`@jira-specialist`,
+> `@clickup-specialist`). MCP **genérico não-provider** (Playwright, code-understanding) é livre.
+> Ver `.claude/utils/task-manager/` e CLAUDE.md §Task Manager — e o bloco "via Adapter/MCP Opcional" abaixo.
+
 O agente precisa de acesso a:
 - **Ferramentas básicas** (Read, Write, Grep, Bash, etc.)
-- **Ferramentas MCP** (ClickUp, GitHub, Playwright, etc.)
+- **Ferramentas MCP genéricas** (Playwright, code-understanding, etc. — não-provider)
+- **Integrações de task/forge** → via adapter SDAAL (`taskManager.*`/`forge.*`), **nunca** `mcp__<provider>__*` direto
 - **Ferramentas especializadas** (especificar)
 
 #### 5️⃣ **Nível de Autonomia**
