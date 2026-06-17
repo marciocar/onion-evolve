@@ -377,6 +377,12 @@ ${where}"
 # REGRA 12 — Nomes de tool de agente válidos no Claude Code
 #   Cursor-style (read_file, run_terminal_cmd, …) [HARD] — sem ferramentas;
 #   MCP underscore único (mcp_<Server>_…) [HARD] — formato é mcp__server__tool
+#   MCP de PROVIDER de task/forge no tools: [HARD] — pega tanto a forma idiomática
+#     (mcp__clickup__, mcp__github__ — o que um criador escreveria à mão) quanto a
+#     forma gerenciada deste harness (mcp__claude_ai_Atlassian__, mcp__claude_ai_Asana__…).
+#     Viola SDAAL/API-first: providers vão via taskManager.*/forge.* (adapter), não
+#     declarados num agente novo. Só adapters e especialistas (clickup/jira-specialist)
+#     podem (integrations §9). Escopado ao frontmatter tools: → não pega exemplo RUIM em prosa.
 # ===========================================================================
 check_agent_tool_names() {
   local CURSOR='read_file|write|search_replace|run_terminal_cmd|codebase_search|grep|glob_file_search|list_dir|web_search|todo_write|read_lints|update_memory'
@@ -387,6 +393,11 @@ check_agent_tool_names() {
         violation "HARD" "${agent}" "tool name estilo-Cursor: '${tool}' — use nome nativo do Claude Code (Read/Write/Edit/Bash/Grep/Glob/WebSearch/WebFetch/TodoWrite)"
       elif echo "${tool}" | grep -qE '^mcp_[A-Za-z]' && ! echo "${tool}" | grep -qE '^mcp__'; then
         violation "HARD" "${agent}" "tool MCP em formato inválido: '${tool}' — Claude Code usa 'mcp__<server>__<tool>' (duplo underscore)"
+      elif echo "${tool}" | grep -qiE '^mcp__(claude_ai_)?(clickup|jira|atlassian|asana|linear|github|gitlab|bitbucket)__'; then
+        case "${agent}" in
+          */clickup-specialist.md|*/jira-specialist.md) : ;;   # especialistas de provider podem
+          *) violation "HARD" "${agent}" "tool MCP de provider direto no frontmatter: '${tool}' — providers de task/forge vão via adapter SDAAL (taskManager.*/forge.*), não mcp__<provider>__* (integrations §9; só adapters/especialistas)" ;;
+        esac
       fi
     done < <(awk '
       # Escopa ao 1º bloco de frontmatter (---...---); ignora exemplos no corpo.
