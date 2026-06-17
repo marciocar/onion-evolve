@@ -84,7 +84,7 @@ Delegar para o agente com contexto coletado.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📊 Estrutura:
-∟ 94 comandos em 11 categorias
+∟ 84 comandos em 9 categorias
 ∟ 49 agentes especializados
 ∟ Task Manager Abstraction (Jira/ClickUp/Asana/Linear)
 
@@ -148,7 +148,7 @@ Para: "criar task no ClickUp"
 
 - Sempre começa com contexto do workspace
 - Detecta sessões ativas automaticamente
-- Para ajuda específica de agente: @nome-do-agente
+- Para ajuda específica de agente: `<nome-do-agente>`
 
 ## 🔴 REGRA CRÍTICA: Criação de Tasks
 

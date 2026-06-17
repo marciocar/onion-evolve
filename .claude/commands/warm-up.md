@@ -68,7 +68,7 @@ Estabelecer contexto completo do projeto incluindo:
 - `docs/meta-specs/index.md` - Meta especificações
 
 ### Estrutura de Comandos
-- 77 comandos em 9 categorias
+- 84 comandos em 9 categorias
 - 49 agentes especializados em 9 categorias
 - Knowledge Bases estruturadas para IA
 
