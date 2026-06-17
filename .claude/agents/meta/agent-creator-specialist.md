@@ -237,7 +237,8 @@ Ferramentas MCP detectadas que podem ser úteis:
 
 > ⚠️ **SDAAL / API-first (regra dura):** providers de **task** (ClickUp/Jira/Asana/Linear) e **forge**
 > (GitHub) **NÃO** entram como `mcp__<provider>__*` direto num agente novo — são alcançados pela
-> abstração (`taskManager.*` / `forge.*`), que resolve transporte (API default, MCP opcional).
+> abstração (`taskManager.*` / `forge.*`), que resolve o transporte: **task-manager** = API default
+> (MCP opcional); **forge** = CLI/API — **nunca MCP** (`integrations.md` §forge / CLAUDE.md §Forge).
 > `mcp__<provider>__*` direto só vive nos **adapters** e nos **especialistas** (`@jira-specialist`,
 > `@clickup-specialist`). MCP **genérico não-provider** (Playwright, code-understanding) é livre.
 > Ver `.claude/utils/task-manager/` e CLAUDE.md §Task Manager — e o bloco "via Adapter/MCP Opcional" abaixo.
