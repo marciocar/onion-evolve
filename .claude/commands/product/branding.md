@@ -20,7 +20,7 @@ Comando especializado para trabalhar com Branding e Posicionamento de Marca usan
 
 ## Requisitos do Usuário
 <requirements>
-#Comando para usar o agente @branding-positioning-specialist para atuar na criação de Branding e Posicionamento de Marca, podendo também receber usar o @business-context como base para tomada de decisões
+#Comando para usar o agente @branding-positioning-specialist para atuar na criação de Branding e Posicionamento de Marca, podendo também usar o contexto de negócio (`docs/business-context/`) como base para tomada de decisões
 </requirements>
 
 ## Processo

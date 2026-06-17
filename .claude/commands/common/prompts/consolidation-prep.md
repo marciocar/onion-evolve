@@ -1,6 +1,6 @@
 ---
 name: consolidation-prep
-description: Steps de preparacao compartilhados entre consolidate-documents e consolidate-meetings
+description: Steps de preparação compartilhados entre consolidate-documents e consolidate-meetings
 type: fragment
 ---
 
