@@ -64,7 +64,8 @@ DEST="<INSTALL_DIR — ver Fase 2>"
 # (a) MANIFESTO filtrado: só pathspecs que EXISTEM em HEAD — git archive aborta (exit 128) se um
 #     pathspec não casa nada. Filtrar evita o erro críptico de tar.
 want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation
-      docs/meta-specs docs/knowledge-base docs/sdaal .env.example)
+      docs/meta-specs docs/knowledge-base docs/sdaal)
+#     NÃO incluir .env.example aqui — é específico do alvo (clobber). Tratado em (e), never-clobber.
 manifest=(); for p in "${want[@]}"; do
   git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p" | grep -q . && manifest+=("$p")
 done
@@ -79,6 +80,17 @@ diff -rq "$TMP" "$DEST" 2>/dev/null || true
 
 # (d) Após confirmação do maestro: aplicar (cp preserva o que NÃO está no manifesto).
 cp -R "$TMP"/. "$DEST"/ && rm -rf "$TMP"
+
+# (e) .env.example — NEVER-CLOBBER por-arquivo: quase sempre existe no alvo e é específico dele
+#     (vars do projeto). Se o alvo já tem, escrever o do Onion como .env.example.onion (merge fica
+#     a cargo do maestro); senão, copiar direto. Mesma doutrina do CLAUDE.md (Fase 5).
+if git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q .; then
+  if [ -f "$DEST/.env.example" ]; then
+    git -C "$SOURCE_ROOT" show HEAD:.env.example > "$DEST/.env.example.onion"
+  else
+    git -C "$SOURCE_ROOT" show HEAD:.env.example > "$DEST/.env.example"
+  fi
+fi
 ```
 
 > Hoje o apply é cópia-por-cima após revisão do diff (conflitos **surgem**, o maestro decide). Merge
