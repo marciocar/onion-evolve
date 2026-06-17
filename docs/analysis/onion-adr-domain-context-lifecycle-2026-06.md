@@ -30,6 +30,11 @@ e dá **paridade** aos três geradores para que o primeiro tick já nasça consi
 `/meta:evolve`) é **diferida ao Tijolo 2**, com contrato especificado em `## Gatilho de
 Implementação`.
 
+> **Atualização 2026-06-17 — Tijolo 2 ENTREGUE.** A camada *Manage* foi implementada:
+> comando [`/meta:context-freshness`](../../.claude/commands/meta/context-freshness.md) +
+> extensão de `inventory.sh` (conta `*-context/`) e `lint-artifacts.sh` (Regra 15 — carimbo
+> de frescor) + composição **D9** no [`/meta:evolve`](../../.claude/commands/meta/evolve.md).
+
 ---
 
 ## Contexto
@@ -143,4 +148,4 @@ reimplementa**, o molde de [`/meta:kb-freshness`](../../.claude/commands/meta/kb
 
 ---
 
-**Mantido por:** Sistema Onion · **Última atualização:** 2026-06-16
+**Mantido por:** Sistema Onion · **Última atualização:** 2026-06-17

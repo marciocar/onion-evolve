@@ -25,6 +25,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 CLAUDE_DIR="${REPO_ROOT}/.claude"
 KB_DIR="${REPO_ROOT}/docs/knowledge-base"
+DOCS_DIR="${REPO_ROOT}/docs"
 
 # ---------------------------------------------------------------------------
 # Contagem de comandos invocáveis por categoria (exclui common/ e READMEs)
@@ -60,6 +61,17 @@ count_kbs() {
   find "${KB_DIR}" -name "*.md" ! -iname "index.md" -print 2>/dev/null | wc -l | tr -d ' '
 }
 
+# Arquivos POPULADOS de um contexto de domínio (exclui README.md template e index.md).
+# No framework os contextos são templates (só README) → 0; em projeto-alvo conta o conteúdo.
+count_context_files() {
+  # $1 = nome do contexto (ex.: business-context)
+  # Guarda de dir ausente: em projeto-alvo um contexto pode não existir; sem isto,
+  # find sai 1 → pipefail propaga → a atribuição $(...) aborta o script (set -e).
+  local d="${DOCS_DIR}/$1"
+  [ -d "${d}" ] || { echo 0; return 0; }
+  find "${d}" -name "*.md" ! -iname "readme.md" ! -iname "index.md" -print 2>/dev/null | wc -l | tr -d ' '
+}
+
 # ---------------------------------------------------------------------------
 # Coleta de valores
 # ---------------------------------------------------------------------------
@@ -67,6 +79,9 @@ CMD_TOTAL="$(count_commands_total)"
 AGENT_TOTAL="$(count_agents_total)"
 SKILLS="$(count_skills)"
 KBS="$(count_kbs)"
+CTX_BUSINESS="$(count_context_files business-context)"
+CTX_TECHNICAL="$(count_context_files technical-context)"
+CTX_COMPLIANCE="$(count_context_files compliance-context)"
 
 # Categorias de comando (ordenadas por contagem desc na saída markdown)
 declare -A CMD_CATS=()
@@ -98,6 +113,9 @@ emit_env() {
   echo "ONION_AGENTS_TOTAL=${AGENT_TOTAL}"
   echo "ONION_SKILLS_TOTAL=${SKILLS}"
   echo "ONION_KBS_TOTAL=${KBS}"
+  echo "ONION_CONTEXT_BUSINESS=${CTX_BUSINESS}"
+  echo "ONION_CONTEXT_TECHNICAL=${CTX_TECHNICAL}"
+  echo "ONION_CONTEXT_COMPLIANCE=${CTX_COMPLIANCE}"
   echo "ONION_COMMAND_CATEGORIES=${CMD_CAT_COUNT}"
   echo "ONION_AGENT_CATEGORIES=${AGENT_CAT_COUNT}"
 }
@@ -108,6 +126,9 @@ emit_json() {
   printf '  "agents_total": %s,\n' "${AGENT_TOTAL}"
   printf '  "skills_total": %s,\n' "${SKILLS}"
   printf '  "kbs_total": %s,\n' "${KBS}"
+  printf '  "context_business": %s,\n' "${CTX_BUSINESS}"
+  printf '  "context_technical": %s,\n' "${CTX_TECHNICAL}"
+  printf '  "context_compliance": %s,\n' "${CTX_COMPLIANCE}"
   printf '  "command_categories": %s,\n' "${CMD_CAT_COUNT}"
   printf '  "agent_categories": %s\n' "${AGENT_CAT_COUNT}"
   printf '}\n'
@@ -151,6 +172,19 @@ EOF
     echo "| \`${cat}/\` | ${AGENT_CATS[$cat]} |"
   done
   echo "| **Total** | **${AGENT_TOTAL}** |"
+
+  cat <<EOF
+
+## Contextos de domínio (spec-as-code — populados no projeto-alvo)
+
+> Arquivos de conteúdo (exclui README/index). No framework são **templates** (0 = só README).
+
+| Contexto | Arquivos |
+|----------|---------:|
+| \`business-context/\` | ${CTX_BUSINESS} |
+| \`technical-context/\` | ${CTX_TECHNICAL} |
+| \`compliance-context/\` | ${CTX_COMPLIANCE} |
+EOF
 }
 
 case "${1:---markdown}" in
