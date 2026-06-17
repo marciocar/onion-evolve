@@ -96,7 +96,7 @@ qualquer projeto-alvo, com nomes de arquivo diferentes:
    limites de escopo).
 3. **Selecionar** as relevantes ao artefato avaliado.
 
-> No **onion-claude** (Modo Framework L0), a descoberta retorna as 5 specs:
+> No **onion-evolve** (Modo Framework L0), a descoberta retorna as 5 specs:
 > `agents.md`, `commands.md`, `architecture.md`, `code-standards.md`,
 > `integrations.md`. Use-as como régua — mas **chegue a elas por descoberta**, não
 > por caminho cravado, para que o mesmo agente funcione em projeto-alvo.

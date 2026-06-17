@@ -41,8 +41,8 @@ partir de `.claude/` (Markdown + YAML). Não há `package.json`, Node ou pnpm.
 
 ```bash
 # 1. Fork e clone
-git clone https://github.com/your-username/onion-claude.git
-cd onion-claude
+git clone https://github.com/your-username/onion-evolve.git
+cd onion-evolve
 
 # 2. Abra no Claude Code — comandos, agentes e skills carregam automaticamente.
 #    Para começar: /warm-up e depois /onion
@@ -53,7 +53,7 @@ cd onion-claude
 ## 🛠️ Estrutura do projeto
 
 ```
-onion-claude/
+onion-evolve/
 ├── .claude/                # Sistema Onion operacional
 │   ├── commands/           # Comandos por categoria (Markdown + frontmatter)
 │   ├── agents/             # Agentes especializados por domínio
