@@ -466,7 +466,9 @@ check_context_freshness_stamp() {
     base="${REPO_ROOT}/docs/${ctx}"
     [ -d "${base}" ] || continue
     while IFS= read -r -d '' f; do
-      if ! grep -qiE 'Última Atualização|^updated:|^date:' "${f}"; then
+      # Casa pelo radical ASCII 'Atualiza' (sem -i): robusto a locale C (case-fold de
+      # 'Ú' multibyte) e a NBSP/espaço duplo entre as palavras. Frontmatter via âncora.
+      if ! grep -qE 'Atualiza|^[Uu]pdated:|^[Dd]ate:' "${f}"; then
         violation "SOFT" "${f}" "contexto de domínio sem carimbo de frescor ('Última Atualização'/'updated:') — exigido pela fase Manage (/meta:context-freshness)"
       fi
     done < <(find "${base}" -name "*.md" ! -iname "readme.md" ! -iname "index.md" -print0 2>/dev/null)

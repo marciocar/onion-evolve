@@ -10,7 +10,7 @@ tags: [evolve, audit, fleet, self-evolution, modernization]
 version: "1.2.0"
 updated: "2026-06-17"
 allowed-tools: Read Write Grep Glob Bash(find *) Bash(wc *) Bash(git log*) Bash(cat .env*)
-argument-hint: "[dimensão específica (D1..D8) | vazio = auditoria completa]"
+argument-hint: "[dimensão específica (D1..D9) | vazio = auditoria completa]"
 related_commands:
   - /meta:fleet
   - /meta:kb-freshness
@@ -54,7 +54,7 @@ A orquestração roda **sempre no nível principal** (este comando + skill
 ## 📥 Input
 
 ```
-/meta:evolve            # auditoria completa (8 dimensões)
+/meta:evolve            # auditoria completa (9 dimensões)
 /meta:evolve D2         # só uma dimensão (ex.: redundância)
 ```
 
@@ -83,17 +83,17 @@ Confirme a ferramenta nativa **Workflow**. Se ausente → **fallback serial**
 (Passo 5) com aviso em pt-BR. Determinístico, não inferido.
 
 ### Passo 1 — Escopo
-- `$ARGUMENTS` preenchido com `D1..D8` → roda só aquela dimensão.
-- Vazio → roda as 8. Levante os alvos com `Glob`/`find`/`Grep`.
+- `$ARGUMENTS` preenchido com `D1..D9` → roda só aquela dimensão.
+- Vazio → roda as 9. Levante os alvos com `Glob`/`find`/`Grep`.
 
 ### Passo 2 — Delegar padrão à skill `onion-fleet`
-Acione **`onion-fleet`** com: tarefa = "auditar o Onion em 8 dimensões
+Acione **`onion-fleet`** com: tarefa = "auditar o Onion em 9 dimensões
 independentes"; independência = alta (cada dimensão é autônoma); padrão esperado
 = **fan-out-and-synthesize**. A skill confirma elegibilidade e tiering.
 
-### Passo 3 — Fan-out (workers de dimensão) + composição (D4/D5)
+### Passo 3 — Fan-out (workers de dimensão) + composição (D4/D5/D9)
 Autore o script `Workflow`. Cada worker de dimensão recebe a régua da sua linha e
-devolve `FindingSchema[]`. **D4 e D5 NÃO são workers** — são chamados no fluxo
+devolve `FindingSchema[]`. **D4, D5 e D9 NÃO são workers** — são chamados no fluxo
 principal (sequencialmente) e seus resultados mesclados, pois `kb-freshness` já
 roda sua própria frota interna (aninhar violaria `onion-fleet`).
 
@@ -151,8 +151,10 @@ const VerdictSchema = {
 ```
 
 ### Passo 3.2 — Completeness critic (loop-until-done, budget-gated)
-Antes do fan-in, um crítico confirma que as 8 dimensões rodaram e nenhuma
-categoria de artefato foi pulada. O que faltar vira nova rodada.
+Antes do fan-in, um crítico confirma que as 9 dimensões rodaram e nenhuma
+categoria de artefato foi pulada (incl. D9 — ausência de achados de contexto só é
+válida se os `docs/*-context/` forem templates; em projeto-alvo populado, vazio
+silencioso = falha, não sucesso). O que faltar vira nova rodada.
 
 ### Passo 4 — Fan-in: consolidar e priorizar (0 tokens)
 No contexto principal, parta de `allFindings` (já com `id` estável):
@@ -179,7 +181,7 @@ Avise em pt-BR; itere as dimensões com `Agent` uma a uma com o mesmo
 # Onion Evolution Backlog — <data>
 
 ## 0. Sumário
-◆ Dimensões: 8  ◆ Padrão: fan-out-and-synthesize  ◆ Workers: N
+◆ Dimensões: 9  ◆ Padrão: fan-out-and-synthesize  ◆ Workers: N
 ◆ Budget: ~X tokens  ◆ Run ID: <id>  ◆ Agent View: <ref>
 
 ## 1. Backlog priorizado

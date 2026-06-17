@@ -58,6 +58,9 @@ count_skills() {
 }
 
 count_kbs() {
+  # Mesma guarda de dir das funções de contexto: docs/knowledge-base/ pode não
+  # existir num projeto-alvo → sem isto, find sai 1 → pipefail → $(...) aborta (set -e).
+  [ -d "${KB_DIR}" ] || { echo 0; return 0; }
   find "${KB_DIR}" -name "*.md" ! -iname "index.md" -print 2>/dev/null | wc -l | tr -d ' '
 }
 
