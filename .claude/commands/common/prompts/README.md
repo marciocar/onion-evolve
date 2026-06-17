@@ -13,6 +13,7 @@ Este diretório contém prompts abrangentes projetados para guiar o Claude Code 
 | `output-formats.md` | Formatos de saída padronizados | Outputs consistentes |
 | `code-review-checklist.md` | Checklist de code review | Reviews de PR |
 | `git-workflow-patterns.md` | Padrões de workflow Git | GitFlow, commits |
+| `story-points-gate.md` | Gate de estimativa antes de iniciar dev | `engineer/start`, `work`, `hotfix` |
 
 ### 📄 Prompts de Geração
 
