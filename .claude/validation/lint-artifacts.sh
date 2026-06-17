@@ -206,6 +206,10 @@ check_kebab_case_filenames() {
       README.md|SKILL.md|ESPERANTO.md) continue ;;
     esac
 
+    # Sessões são artefatos de trabalho gitignored (nomes arbitrários do usuário: INDEX.md,
+    # STATE.md, dirs datados) — não são artefatos do framework, fora do kebab-case.
+    if [[ "${file}" == */sessions/* ]]; then continue; fi
+
     # Underscore em common/templates é aceito (legado de templates)
     if [[ "${file}" == */common/templates/* ]] && [[ "${base}" == *_* ]]; then
       continue

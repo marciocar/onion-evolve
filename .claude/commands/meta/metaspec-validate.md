@@ -5,7 +5,7 @@ description: |
   constituição do @metaspec-gate-keeper. Executa as leituras no fluxo principal
   (confiável) e produz relatório com evidência citada.
 model: sonnet
-allowed-tools: Read Grep Glob Bash
+allowed-tools: Read Grep Glob Bash(bash .claude/validation/*) Bash(ls *) Bash(grep *) Bash(wc *) Bash(diff *)
 category: meta
 tags: [metaspec, validation, conformance, architecture]
 version: "1.0.0"
