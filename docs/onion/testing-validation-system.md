@@ -1,6 +1,6 @@
 # 🧪 Sistema Integrado de Testes e Validação
 
-> **Versão**: 3.0.0 | **Última atualização**: 2025-12-02
+> **Versão**: 3.1.0 | **Última atualização**: 2026-06-17
 
 Documentação completa do conjunto integrado de comandos, agentes e knowledge bases para testes e validação no Sistema Onion.
 
@@ -8,7 +8,7 @@ Documentação completa do conjunto integrado de comandos, agentes e knowledge b
 
 ## 📊 Visão Geral do Sistema
 
-O Sistema de Testes e Validação é composto por **4 camadas integradas** que trabalham em conjunto:
+O Sistema de Testes e Validação é composto por **4 camadas integradas** (que testam o **projeto-alvo**) mais uma **5ª camada meta** (que testa as próprias **guardas determinísticas do framework**):
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -38,6 +38,15 @@ O Sistema de Testes e Validação é composto por **4 camadas integradas** que t
 │  ├─ /validate/qa-points/estimate - Estimar QA points     │
 │  ├─ /validate/collab/three-amigos - Sessões colaborativas│
 │  └─ /validate/collab/pair-testing - Teste em par          │
+└─────────────────────────────────────────────────────────────┘
+
+      ╞═══════════ META (testa o próprio framework) ═══════════╡
+
+┌─────────────────────────────────────────────────────────────┐
+│  🛡️ AUTO-TESTE DE GUARDAS DETERMINÍSTICAS                    │
+│  ├─ lint-artifacts.sh - guardas do framework (16 regras)   │
+│  ├─ fixtures/ + manifest.tsv - inputs ruins/bons conhecidos │
+│  └─ lint-selftest.sh - assere que cada guarda ainda reage  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -368,6 +377,33 @@ Escala:
 
 ---
 
+## 🛡️ Camada 5 (Meta): Auto-teste de Guardas Determinísticas
+
+As 4 camadas acima validam o **projeto-alvo**. A 5ª camada é **meta**: valida as próprias **guardas determinísticas** do framework — `.claude/validation/lint-artifacts.sh` (16 regras que bloqueiam o CI via `onion-validate.yml`) e validadores irmãos como `federation-contract-validate.sh`.
+
+**Problema que resolve**: uma guarda que silenciosamente para de funcionar (regex quebrada, allowlist larga demais) não é pega por nada — é a meta-falha "guarda parcial" aplicada às próprias guardas. A disciplina de *failure-mode test* (criar input ruim → confirmar que a guarda flagra) funcionava de forma **ad-hoc**; esta camada a torna **permanente e bloqueante no CI**.
+
+### Componentes
+
+| Componente | Papel |
+|---|---|
+| `.claude/validation/fixtures/**` | Artefatos mínimos, cada um isolando UMA regra (casos `bad`/`good`/`exempt`) |
+| `.claude/validation/fixtures/manifest.tsv` | Registro `kind · fixture · target · verdict · keyword` — uma linha por fixture |
+| `.claude/validation/lint-selftest.sh` | Runner: injeta cada fixture e assere o veredito real vs esperado |
+
+### Como funciona
+
+- **modo `lint`**: monta um sandbox (cópia de `.claude/` + `docs/` + `CLAUDE.md`, para `inventory.sh` ver os números reais), injeta a fixture com nome único, roda `lint-artifacts.sh` como **caixa-preta** e assere por path: `bad` → deve haver violação citando a fixture (com o keyword da regra certa); `good`/`exempt` → não pode haver.
+- **modo `contract`**: roda `federation-contract-validate.sh <fixture>` e assere o exit code (`pass`=0 / `fail`≠0).
+
+### Disciplina codificada
+
+Toda guarda determinística nova nasce com (a) fixture de failure-mode no manifest e (b) revisão independente de prompt neutro antes do PR. Normativo em [meta-specs/commands.md §11](../meta-specs/commands.md) e [meta-specs/agents.md §9](../meta-specs/agents.md). Roda no CI logo após o linter — ver [ci.md](./ci.md).
+
+**Fora de escopo (deliberado)**: não testa comportamento de LLM (não-determinístico, caro) — isso é coberto, não-deterministicamente, por `/meta:metaspec-validate` + `onion-review.yml`.
+
+---
+
 ## 🔄 Fluxos Integrados
 
 ### Fluxo 1: Desenvolvimento Completo com Testes
@@ -596,6 +632,6 @@ Comandos de teste geram:
 ---
 
 **Responsável**: Sistema Onion v3.0  
-**Última Atualização**: 2025-12-02  
+**Última Atualização**: 2026-06-17  
 **Mantido por**: Comando `/docs/build-index`
 

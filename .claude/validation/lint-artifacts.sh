@@ -48,6 +48,12 @@
 #  15. Frescor de contexto de domínio [SOFT] — arquivo POPULADO em docs/*-context/
 #      (exclui README/index) deve carregar carimbo 'Última Atualização'/'updated:';
 #      habilita a fase Manage (/meta:context-freshness). No framework = no-op (templates)
+#
+# Convenção: .claude/validation/fixtures/ guarda TEMPLATES de teste das próprias
+#   guardas (consumidos por lint-selftest.sh), não artefatos ativos. As 4 regras de
+#   varredura ampla (3, 4, 6, 16) isentam '*/validation/fixtures/*'; as demais varrem
+#   roots estreitos (agents/, commands/, templates/, meta-specs/, *-context/) que as
+#   fixtures não habitam. Por isso uma fixture "bad" não polui o lint real do repo.
 # =============================================================================
 
 set -euo pipefail
@@ -135,7 +141,7 @@ check_no_gpt4_model() {
       lines=$(grep -n "^model:.*gpt-4" "${file}" | head -3)
       violation "HARD" "${file}" "campo model: contém gpt-4 (linha(s): ${lines})"
     fi
-  done < <(find "${CLAUDE_DIR}" -name "*.md" -print0 2>/dev/null)
+  done < <(find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -149,7 +155,8 @@ check_no_mcp_onion_orchestrator() {
   local hits
   # O próprio script contém a string como padrão de busca — excluí-lo da varredura
   hits=$(grep -rl "mcp_onion-orchestrator" "${CLAUDE_DIR}" 2>/dev/null \
-    | grep -v "^${self}$" || true)
+    | grep -v "^${self}$" \
+    | grep -v "/validation/fixtures/" || true)
 
   if [ -n "${hits}" ]; then
     while IFS= read -r file; do
@@ -221,7 +228,7 @@ check_kebab_case_filenames() {
     if echo "${name_part}" | grep -qE '[A-Z]| |_'; then
       violation "SOFT" "${file}" "filename não segue kebab-case (maiúsculas, espaço ou underscore em '${base}')"
     fi
-  done < <(find "${CLAUDE_DIR}" -name "*.md" -print0 2>/dev/null)
+  done < <(find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -515,7 +522,7 @@ check_inventory_total_drift() {
 
   while IFS= read -r -d '' f; do
     case "${f}" in
-      */docs/analysis/*|*/.claude/sessions/*|*/docs/materials/*|*/docs/onion/inventory.md) continue ;;
+      */docs/analysis/*|*/.claude/sessions/*|*/docs/materials/*|*/docs/onion/inventory.md|*/validation/fixtures/*) continue ;;
     esac
     if grep -qiE '^(status:[[:space:]]*snapshot|type:[[:space:]]*(adr|evolution-backlog))' "${f}"; then continue; fi
 
