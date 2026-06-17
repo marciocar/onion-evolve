@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# =============================================================================
+# Onion — pre-commit hook
+# -----------------------------------------------------------------------------
+# Roda o MESMO linter determinístico do CI (.github/workflows/onion-validate.yml)
+# localmente, antes do commit. Falha (exit 1) se houver violação HARD — fail-fast
+# que evita descobrir o drift só no CI. Violações SOFT não bloqueiam.
+#
+# Cobre as guardas de SSOT (inventário vs filesystem, contagens em CLAUDE.md e
+# docs/onion/) — ver .claude/validation/lint-artifacts.sh.
+#
+# Ativação (opt-in, uma vez por clone):
+#     git config core.hooksPath .githooks
+#
+# Desativar temporariamente um commit: git commit --no-verify
+# =============================================================================
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+LINT="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+
+# Sem o linter no repo (ex.: projeto-alvo sem .claude/validation) → não bloqueia.
+[ -f "${LINT}" ] || exit 0
+
+echo "🧅 Onion pre-commit — rodando lint determinístico…"
+if ! bash "${LINT}"; then
+  echo ""
+  echo "❌ Commit bloqueado: violação(ões) HARD acima. Corrija ou use 'git commit --no-verify' para pular."
+  exit 1
+fi
