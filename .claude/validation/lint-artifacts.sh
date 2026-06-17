@@ -491,7 +491,8 @@ check_context_freshness_stamp() {
 #   Checa SÓ frases-de-total CANÔNICAS contra inventory.sh — nunca 'N comandos' cru
 #   nem 'N especializados' (palavra comum em por-categoria/feature). Marcadores de
 #   total confiáveis: 'N comandos invocáveis', 'N comandos em M categorias',
-#   'N agentes especializados em M categorias'. Assim NÃO flaga métricas de frota
+#   'N agentes ...em M categorias' (qualquer texto antes de 'em N categorias') e
+#   'N Knowledge Bases'. Assim NÃO flaga métricas de frota
 #   ('28 agentes' de um run), breakdowns ('4 comandos especializados de docs',
 #   '3 agentes especializados criados') nem snapshots. Complementa a Regra 9 (só CLAUDE.md).
 #   SOFT: heurística sobre linguagem natural — surfaca drift sem bloquear CI por FP.
@@ -500,11 +501,12 @@ check_context_freshness_stamp() {
 #   status:snapshot / type:adr / type:evolution-backlog.
 # ===========================================================================
 check_inventory_total_drift() {
-  local env_out cmd agent cats n pair num ct
+  local env_out cmd agent cats kb n pair num ct
   env_out="$(bash "${SCRIPT_DIR}/inventory.sh" --env 2>/dev/null || true)"
   cmd="$(printf '%s\n' "${env_out}" | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
   agent="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENTS_TOTAL=' | cut -d= -f2)"
   cats="$(printf '%s\n' "${env_out}" | grep '^ONION_COMMAND_CATEGORIES=' | cut -d= -f2)"
+  kb="$(printf '%s\n' "${env_out}" | grep '^ONION_KBS_TOTAL=' | cut -d= -f2)"
   [ -n "${cmd}" ] || return
 
   while IFS= read -r -d '' f; do
@@ -533,14 +535,22 @@ check_inventory_total_drift() {
       fi
     done < <(grep -oiE '[0-9]+ comandos em [0-9]+ categorias' "${f}" 2>/dev/null)
 
-    # 'N agentes especializados em M categorias' — frase-de-total canônica (exige o qualificador)
+    # 'N agentes ... em M categorias' — qualquer texto entre 'agentes' e 'em N categorias'
+    # (de IA / especializados / IA distribuídos); o qualificador 'em N categorias' marca o total
     while IFS= read -r pair; do
       [ -z "${pair}" ] && continue
       num="$(printf '%s' "${pair}" | grep -oE '^[0-9]+')"
       if [ -n "${num}" ] && [ "${num}" != "${agent}" ]; then
         violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '${pair}' (esperado ${agent}) — /meta:inventory"
       fi
-    done < <(grep -oiE '[0-9]+ agentes especializados em [0-9]+ categorias' "${f}" 2>/dev/null)
+    done < <(grep -oiE '[0-9]+ agentes[^.,|]*em [0-9]+ categorias' "${f}" 2>/dev/null)
+
+    # 'N Knowledge Bases' — frase-de-total (forma curta 'KBs' é ambígua em exemplos → não usada)
+    while IFS= read -r n; do
+      if [ -n "${n}" ] && [ "${n}" != "${kb}" ]; then
+        violation "SOFT" "${f}" "contagem-total de KBs divergente da SSOT: '${n} Knowledge Bases' (esperado ${kb}) — /meta:inventory"
+      fi
+    done < <(grep -oiE '[0-9]+ knowledge bases' "${f}" 2>/dev/null | grep -oE '^[0-9]+')
   done < <(find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
 }
 
