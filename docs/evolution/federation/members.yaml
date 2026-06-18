@@ -1,0 +1,29 @@
+# Registro de membros da co-evolução Onion (fluxo A — downstream/distribuição).
+# Quem adota o Onion e em que versão. Fonte canônica: o core (onion-evolve).
+# Adicionar um projeto = 1 entrada aqui + rodar /meta:adopt no projeto.
+# (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../../rfc/rfc-0001 §gatilho.)
+version: 1
+
+members:
+  - id: onion-evolve
+    name: onion-evolve
+    role: producer            # o core / framework — fonte das releases e do protocolo
+    remote: github.com/marciocar/onion-evolve
+    path: "."                 # este repo
+
+  - id: rhilo-metagamify
+    name: rhilo-metagamify (MetaGamify)
+    role: consumer            # projeto que adota o Onion (modo standalone, vendorizado)
+    remote: github.com/marciocar/metagamify
+    onion_version: a865c9f17092   # pin atual (espelha .claude/.onion-version do projeto)
+    adopted_at: 2026-06-17
+    mode: legacy              # greenfield | legacy | regulated
+
+# --- TEMPLATE: copiar p/ onboardar um novo projeto ---
+#  - id: <slug-do-projeto>
+#    name: <nome>
+#    role: consumer
+#    remote: github.com/<org>/<repo>
+#    onion_version: <commit-curto>   # = .claude/.onion-version do projeto após /meta:adopt
+#    adopted_at: <AAAA-MM-DD>
+#    mode: greenfield | legacy | regulated
