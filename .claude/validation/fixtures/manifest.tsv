@@ -1,6 +1,9 @@
 # Manifesto de fixtures do auto-teste de guardas (lint-selftest.sh)
 # Colunas TAB-separadas: kind	fixture	target	verdict	keyword
-#   kind    : lint | contract
+#   kind    : lint | contract | merge
+#             merge: exercita .claude/utils/adopt/merge-onion-hooks.sh com a
+#                    fixture como settings.json-ALVO; target/verdict/keyword = '-'
+#                    (asserção é semântica: presença + preservação + idempotência).
 #   fixture : caminho relativo sob .claude/validation/fixtures/
 #   target  : subdir do repo onde injetar (só kind=lint; use '-' p/ contract).
 #             Evite campos vazios no MEIO da linha: IFS=tab colapsa tabs
@@ -21,3 +24,5 @@ lint	r16-count-drift/good-cmd-count.md	docs	good
 lint	r16-count-drift/exempt-snapshot.md	docs	exempt
 contract	contracts/bad-no-fixtures.md	-	fail
 contract	contracts/good-contract.md	-	pass
+merge	adopt-settings-merge/target-empty.json	-	-
+merge	adopt-settings-merge/target-with-own.json	-	-

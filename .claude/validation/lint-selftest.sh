@@ -158,6 +158,55 @@ run_contract_fixture() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo merge — exercita .claude/utils/adopt/merge-onion-hooks.sh (gap do
+# /meta:adopt --update). A fonte é o settings.json REAL do sandbox (acompanha a
+# SSOT de hooks sozinho — sem expected.json acoplado). Para cada fixture-alvo,
+# assere por SEMÂNTICA (não por diff de texto):
+#   (1) presença   : todo command Onion da fonte aparece no resultado
+#   (2) preservação: todo command próprio do alvo continua presente (never-clobber)
+#   (3) idempotência: re-merjar o resultado não muda nada (no-op na 2ª passada)
+# ---------------------------------------------------------------------------
+run_merge_fixture() {
+  local fixture="$1"
+  local tgt="${FIX_DIR}/${fixture}"
+  local src="${SANDBOX}/.claude/settings.json"
+  local helper="${SANDBOX}/.claude/utils/adopt/merge-onion-hooks.sh"
+
+  if ! command -v jq >/dev/null 2>&1; then
+    record_pass "${fixture} (skip: jq ausente)"; return
+  fi
+  if [ ! -f "${tgt}" ]; then record_fail "${fixture}" "fixture inexistente: ${tgt}"; return; fi
+  if [ ! -f "${helper}" ]; then record_fail "${fixture}" "helper ausente: ${helper}"; return; fi
+
+  local out
+  if ! out="$(bash "${helper}" "${src}" "${tgt}" 2>/dev/null)"; then
+    record_fail "${fixture}" "merge-onion-hooks.sh falhou (exit não-zero)"; return
+  fi
+
+  # jq que lista commands de <ref> ausentes em <out>, por evento (vazio = ok)
+  local diff_jq='["SessionStart","PreCompact"][] as $ev
+    | ($ref.hooks[$ev] // [])[].hooks[]?.command as $c
+    | select(([ ($out.hooks[$ev] // [])[].hooks[]?.command ] | index($c)) == null)
+    | "\($ev): \($c)"'
+
+  local missing lost
+  missing="$(jq -nr --argjson ref "$(cat "${src}")" --argjson out "${out}" "${diff_jq}")"
+  if [ -n "${missing}" ]; then record_fail "${fixture}" "hook Onion ausente no resultado: ${missing}"; return; fi
+
+  lost="$(jq -nr --argjson ref "$(cat "${tgt}")" --argjson out "${out}" "${diff_jq}")"
+  if [ -n "${lost}" ]; then record_fail "${fixture}" "hook próprio do alvo PERDIDO (clobber): ${lost}"; return; fi
+
+  local tmp out2
+  tmp="$(mktemp)"; printf '%s' "${out}" > "${tmp}"
+  out2="$(bash "${helper}" "${src}" "${tmp}" 2>/dev/null)"; rm -f "${tmp}"
+  if ! diff <(printf '%s' "${out}" | jq -S .) <(printf '%s' "${out2}" | jq -S .) >/dev/null 2>&1; then
+    record_fail "${fixture}" "não idempotente: 2ª passada do merge difere da 1ª"; return
+  fi
+
+  record_pass "${fixture}"
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -171,6 +220,7 @@ while IFS=$'\t' read -r kind fixture target verdict keyword || [ -n "${kind:-}" 
   case "${kind}" in
     lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" ;;
     contract) run_contract_fixture "${fixture}" "${verdict}" ;;
+    merge)    run_merge_fixture "${fixture}" ;;
     *)        record_fail "${fixture:-?}" "kind desconhecido '${kind}'" ;;
   esac
 done < "${MANIFEST}"
