@@ -1,0 +1,2 @@
+# Mensagens de inbox já tratadas movem para cá (git mv) — "lido" git-visível, sem state file.
+# O hook SessionStart conta só o inbox de 1º nível, então mensagens aqui deixam de gerar o aviso 📬.

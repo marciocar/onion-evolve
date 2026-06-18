@@ -32,6 +32,12 @@
             "command": "bash .claude/hooks/worklog-capture-session.sh",
             "timeout": 5,
             "statusMessage": "Capturando session_id no worklog (Onion)"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/co-evolution-inbox-check.sh",
+            "timeout": 5,
+            "statusMessage": "Checando inbox de co-evolução (Onion)"
           }
         ]
       }

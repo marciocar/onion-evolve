@@ -36,6 +36,22 @@ O Onion (framework) evolui; **muitos projetos** o adotam. Sem método, duas dore
 *Duas sessões no mesmo repo não colidem.*
 - **git worktrees** (isolamento) + **um escritor por escopo** + **handoff commitado** (cada sessão registra o que fez antes de sair).
 
+## Notificação & gerenciamento do inbox ("you have mail")
+
+Você não precisa lembrar de checar — o **SessionStart hook** avisa no boot:
+
+- **Hook** (`.claude/hooks/co-evolution-inbox-check.sh`, registrado em `.claude/settings.json`): no início
+  da sessão conta as mensagens não-processadas em `inbox/` e injeta `📬 Onion co-evolução: N mensagem(ns)…`.
+  **Silencioso quando 0** (disciplina de *motd*). É o primitivo "you have mail on login" — o único que
+  dispara sozinho (memória e `/warm-up` não).
+- **Comando [`/meta:co-evolve`](../../.claude/commands/meta/co-evolve.md)**: lê e gerencia — detecta o papel
+  do repo (`.onion-version`), resume as mensagens, orienta conforme core/consumidor.
+- **Lido/não-lido (git-visível, sem state file):** ao tratar uma mensagem, `git mv` dela para
+  `inbox/_processed/`. O hook só conta o 1º nível de `inbox/`, então processadas somem do aviso.
+
+Esse trio (hook + comando + `_processed/`) vive em `.claude/`/`docs/evolution/` → **core e todo projeto
+herdam** o mesmo "you have mail".
+
 ## Seu ritual (maestro)
 
 1. **Início de sessão:** `git fetch` + ler o `inbox/` do repo (e o do core, se for sessão de projeto).
