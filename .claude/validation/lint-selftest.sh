@@ -57,6 +57,17 @@ cp -a "${REPO_ROOT}/.claude"   "${SANDBOX}/.claude"
 cp -a "${REPO_ROOT}/docs"      "${SANDBOX}/docs"
 cp -a "${REPO_ROOT}/CLAUDE.md" "${SANDBOX}/CLAUDE.md"
 
+# ---------------------------------------------------------------------------
+# SSOT em tempo de teste — derivada do inventory.sh do PRÓPRIO sandbox (verdade
+# real). Fixtures de contagem (r16) usam placeholders em vez de hardcodar o total,
+# pra não ficarem stale a cada comando novo/removido:
+#   __ONION_COMMANDS_TOTAL__ → contagem real      (caso GOOD: deve casar a SSOT)
+#   __ONION_COMMANDS_DRIFT__ → contagem + offset   (casos BAD/EXEMPT: diverge garantido)
+# A substituição acontece ao injetar a fixture no sandbox (run_lint_fixture).
+SSOT_CMD_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
+  | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
+SSOT_CMD_DRIFT="$(( ${SSOT_CMD_TOTAL:-0} + 7 ))"   # offset != 0 → sempre divergente
+
 record_pass() { PASS=$((PASS + 1)); echo "  ✓ ${1}"; }
 record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} — ${2}"; }
 
@@ -75,7 +86,11 @@ run_lint_fixture() {
   fi
 
   mkdir -p "${dst_dir}"
-  cp "${src}" "${dst}"
+  # Substitui placeholders de contagem pela SSOT derivada (ver bloco SSOT acima).
+  # Fixtures sem placeholder passam intactas (sed é no-op).
+  sed -e "s/__ONION_COMMANDS_TOTAL__/${SSOT_CMD_TOTAL}/g" \
+      -e "s/__ONION_COMMANDS_DRIFT__/${SSOT_CMD_DRIFT}/g" \
+      "${src}" > "${dst}"
 
   local out
   out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" 2>&1)" || true
