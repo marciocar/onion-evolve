@@ -28,3 +28,18 @@ if ! bash "${LINT}"; then
   echo "❌ Commit bloqueado: violação(ões) HARD acima. Corrija ou use 'git commit --no-verify' para pular."
   exit 1
 fi
+
+# Self-test das guardas — condicional. Só roda quando o COMMIT mexe no harness de
+# validação (.claude/validation/**, inclui fixtures/), pois é mais lento (~1min:
+# monta sandbox copiando a árvore). Assim a quebra de fixture/guarda é pega LOCAL,
+# não só no CI — sem penalizar todo commit. CI roda sempre (onion-validate.yml).
+SELFTEST="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
+if [ -f "${SELFTEST}" ] \
+   && git diff --cached --name-only --diff-filter=ACMR | grep -qE '^\.claude/validation/'; then
+  echo "🧪 Onion pre-commit — mudança em .claude/validation/ → rodando self-test das guardas…"
+  if ! bash "${SELFTEST}"; then
+    echo ""
+    echo "❌ Commit bloqueado: self-test das guardas falhou acima. Corrija ou use 'git commit --no-verify' para pular."
+    exit 1
+  fi
+fi
