@@ -6,10 +6,10 @@ description: |
   retomável. Greenfield-first. NÃO é CLI — roda dentro do Claude Code.
   Relacionado: /docs:reverse-consolidate, /meta:setup-integration, /docs:build-tech-docs.
 model: sonnet
-allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(ls *) Bash(rm *) Bash(mktemp *) Bash(cat *)
+allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(ls *) Bash(rm *) Bash(mktemp *) Bash(cat *) Bash(mkdir *) Bash(printf *)
 argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--in-place] [--update] [--dry-run]"
 category: meta
-version: "1.4.0"
+version: "1.5.0"
 updated: "2026-06-18"
 ---
 
@@ -100,6 +100,54 @@ fi
 
 ---
 
+## ⚙️ Procedimento de Configuração pós-cópia (idempotente)
+
+Usado pela **Fase 3** (install) e pelo **`--update`** — re-aplica os passos install-only que **não** vêm
+na cópia de arquivos (registro de hooks + starter de co-evolução). Idempotente: re-rodar não duplica.
+Snippet self-contained (shell novo a cada fase).
+
+```bash
+SOURCE_ROOT="$(git rev-parse --show-toplevel)"
+DEST="<INSTALL_DIR (Fase 3) | TARGET (--update)>"
+
+# (1) settings.json — MERGE never-clobber dos hooks Onion (registro do "you have mail" + worklog).
+#     Helper testável e idempotente (.claude/utils/adopt/merge-onion-hooks.sh; coberto por
+#     lint-selftest.sh kind=merge). Preserva hooks/permissions próprios do alvo.
+if [ -f "$DEST/.claude/settings.json" ]; then
+  merged="$(bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" \
+             "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json")" \
+    && printf '%s\n' "$merged" > "$DEST/.claude/settings.json"
+  # Sem jq, o helper devolve o alvo INTACTO e sai com código 3 → avisar o maestro p/ registrar à mão.
+else
+  cp "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json"
+fi
+
+# (2) starter docs/evolution/ — cria só o que estiver AUSENTE (idempotente; não clobba inbox em uso).
+mkdir -p "$DEST/docs/evolution/inbox/_processed"
+[ -f "$DEST/docs/evolution/inbox/_processed/.gitkeep" ] || : > "$DEST/docs/evolution/inbox/_processed/.gitkeep"
+if [ ! -f "$DEST/docs/evolution/README.md" ]; then
+  cat > "$DEST/docs/evolution/README.md" <<'PTR'
+# Co-evolução (consumidor)
+
+Este repo é **CONSUMIDOR** do Onion. O protocolo canônico (3 fluxos) vive no core
+(`onion-evolve/docs/evolution/`). Use `inbox/` para sinalizar o core (fluxo B) e rode `/meta:co-evolve`.
+PTR
+fi
+
+# (3) branch de integração — PLACEHOLDER (backlog #1): setar gitflow.branch.{develop,master} no alvo +
+#     persistir a escolha num lugar versionado (.onion-version). Ver inbox
+#     2026-06-18-adopt-gitflow-develop-branch-config.md. NÃO implementado nesta versão.
+
+# (4) re-stamp .onion-version — ver Fase 5 (install) ou o bloco --update (cada um carimba a identidade certa).
+```
+
+> O passo (1) **substitui** o antigo never-clobber grosso (que copiava só se ausente; senão deixava um
+> `settings.onion.json` sidecar p/ merge manual). Agora um adotante com `settings.json` **próprio** recebe
+> os hooks Onion **registrados** — sem perder os seus. Fecha o gap do `--update`
+> (`docs/evolution/inbox/2026-06-18-adopt-update-skips-phase3-steps.md`).
+
+---
+
 ## ⚡ Fluxo de Execução (faseado, retomável)
 
 > Sessão `<SOURCE_ROOT>/.claude/sessions/adopt-<slug>/STATE.md` — **cada fase atualiza o ponteiro
@@ -167,27 +215,12 @@ fi
   ```
   Skeleton mínimo: identidade do projeto + roteamento Task Manager + idioma (skill `language-standards`)
   + contextos L1+ + entrada `/onion`·`/warm-up`.
-- **`settings.json` — com never-clobber** (traz os hooks do Onion ao alvo — incl. o "you have mail" de
-  co-evolução — sem clobbar settings/permissions do alvo):
-  ```bash
-  if [ -f "$INSTALL_DIR/.claude/settings.json" ]; then
-    cp "$SOURCE_ROOT/.claude/settings.json" "$INSTALL_DIR/.claude/settings.onion.json"
-    # merge settings.onion.json → settings.json (hooks SessionStart/PreCompact + permissions) = a cargo do maestro
-  else
-    cp "$SOURCE_ROOT/.claude/settings.json" "$INSTALL_DIR/.claude/settings.json"
-  fi
-  ```
-  Os scripts dos hooks já vieram via `.claude/hooks/` (manifesto da Fase 2); o registro é este `settings.json`.
-- **Starter de co-evolução** (`docs/evolution/` — o alvo é **consumidor**; o protocolo canônico fica no
-  core, NÃO é copiado):
-  ```bash
-  mkdir -p "$INSTALL_DIR/docs/evolution/inbox/_processed"
-  : > "$INSTALL_DIR/docs/evolution/inbox/_processed/.gitkeep"
-  # Escrever docs/evolution/README.md (ponteiro): "este repo é CONSUMIDOR; protocolo canônico em
-  #   onion-evolve/docs/evolution/; use inbox/ p/ sinalizar o core (fluxo B); rode /meta:co-evolve".
-  ```
-  Assim o hook "you have mail" tem o que escanear (`inbox/`) e o `/meta:co-evolve` (vindo em
-  `.claude/commands/`) orienta o consumidor. Fecha o trio no alvo.
+- **Configuração pós-cópia** (`settings.json` merge + starter `docs/evolution/`): rodar o
+  [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
+  com `DEST="$INSTALL_DIR"`. Ele **registra os hooks Onion** no `settings.json` do alvo (merge never-clobber,
+  incl. o "you have mail") e cria o starter de co-evolução (`inbox/_processed/` + README-ponteiro). Os
+  *scripts* dos hooks já vieram via `.claude/hooks/` (manifesto da Fase 2); o **registro** é o passo (1) do
+  Procedimento. Fecha o trio no alvo: o hook tem o que escanear (`inbox/`) e o `/meta:co-evolve` orienta o consumidor.
 - Regenerar `docs/INDEX.md` do alvo (`/docs:build-index`). Checkpoint: `NEXT: Fase 4`.
 
 ### Fase 4 — Configurar integrações (`.env`) — **RODA NO ALVO**
@@ -272,6 +305,11 @@ git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
 ```
 
 - Aplicar via o **Procedimento de cópia segura** (`DEST="$TARGET"`) — diff revela customizações locais.
+- **Re-aplicar a configuração install-only** via o [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
+  (`DEST="$TARGET"`). **Crítico:** sem isto, um adotante com `settings.json` próprio recebe os *scripts* dos
+  hooks (no manifesto acima) mas **não** o registro → o "you have mail" não dispara. O Procedimento faz o
+  merge idempotente do `settings.json` + garante o starter `docs/evolution/`. (Fecha
+  `docs/evolution/inbox/2026-06-18-adopt-update-skips-phase3-steps.md`.)
 - **Re-carimbar** com a identidade NOVA da fonte (re-derivar — não há PASSO 0 aqui):
   ```bash
   SRC_ID="$(bash "$SOURCE_ROOT/.claude/validation/onion-version.sh")"   # novo commit/date
