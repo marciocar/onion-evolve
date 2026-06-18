@@ -9,8 +9,8 @@ model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(ls *) Bash(rm *) Bash(mktemp *) Bash(cat *)
 argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--in-place] [--update] [--dry-run]"
 category: meta
-version: "1.3.0"
-updated: "2026-06-16"
+version: "1.4.0"
+updated: "2026-06-18"
 ---
 
 # 🧅 /meta:adopt — Adoção de Repositório
@@ -63,8 +63,10 @@ DEST="<INSTALL_DIR — ver Fase 2>"
 
 # (a) MANIFESTO filtrado: só pathspecs que EXISTEM em HEAD — git archive aborta (exit 128) se um
 #     pathspec não casa nada. Filtrar evita o erro críptico de tar.
-want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation
+want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks
       docs/meta-specs docs/knowledge-base docs/sdaal)
+#     .claude/hooks: scripts dos SessionStart/PreCompact (incl. co-evolução "you have mail"). O REGISTRO
+#       dos hooks vive em .claude/settings.json → tratado na Fase 3 (never-clobber, não entra no cp cego).
 #     NÃO incluir .env.example aqui — é específico do alvo (clobber). Tratado em (e), never-clobber.
 manifest=(); for p in "${want[@]}"; do
   git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p" | grep -q . && manifest+=("$p")
@@ -165,6 +167,27 @@ fi
   ```
   Skeleton mínimo: identidade do projeto + roteamento Task Manager + idioma (skill `language-standards`)
   + contextos L1+ + entrada `/onion`·`/warm-up`.
+- **`settings.json` — com never-clobber** (traz os hooks do Onion ao alvo — incl. o "you have mail" de
+  co-evolução — sem clobbar settings/permissions do alvo):
+  ```bash
+  if [ -f "$INSTALL_DIR/.claude/settings.json" ]; then
+    cp "$SOURCE_ROOT/.claude/settings.json" "$INSTALL_DIR/.claude/settings.onion.json"
+    # merge settings.onion.json → settings.json (hooks SessionStart/PreCompact + permissions) = a cargo do maestro
+  else
+    cp "$SOURCE_ROOT/.claude/settings.json" "$INSTALL_DIR/.claude/settings.json"
+  fi
+  ```
+  Os scripts dos hooks já vieram via `.claude/hooks/` (manifesto da Fase 2); o registro é este `settings.json`.
+- **Starter de co-evolução** (`docs/evolution/` — o alvo é **consumidor**; o protocolo canônico fica no
+  core, NÃO é copiado):
+  ```bash
+  mkdir -p "$INSTALL_DIR/docs/evolution/inbox/_processed"
+  : > "$INSTALL_DIR/docs/evolution/inbox/_processed/.gitkeep"
+  # Escrever docs/evolution/README.md (ponteiro): "este repo é CONSUMIDOR; protocolo canônico em
+  #   onion-evolve/docs/evolution/; use inbox/ p/ sinalizar o core (fluxo B); rode /meta:co-evolve".
+  ```
+  Assim o hook "you have mail" tem o que escanear (`inbox/`) e o `/meta:co-evolve` (vindo em
+  `.claude/commands/`) orienta o consumidor. Fecha o trio no alvo.
 - Regenerar `docs/INDEX.md` do alvo (`/docs:build-index`). Checkpoint: `NEXT: Fase 4`.
 
 ### Fase 4 — Configurar integrações (`.env`) — **RODA NO ALVO**
@@ -242,7 +265,7 @@ NOW="$(git -C "$SOURCE_ROOT" rev-parse --short=12 HEAD)"
 [ "$ADOPTED_COMMIT" = "$NOW" ] && { echo "Já atualizado ($NOW)."; exit 0; }
 
 # DELTA do framework desde a adoção (manifesto filtrado, como no Procedimento):
-want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation
+want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks
       docs/meta-specs docs/knowledge-base docs/sdaal .env.example)
 manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p" | grep -q . && manifest+=("$p"); done
 git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
