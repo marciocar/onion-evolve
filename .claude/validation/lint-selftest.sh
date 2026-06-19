@@ -235,7 +235,12 @@ run_resolve_selftests() {
   # (c) sem campo, sem config, branch develop existe → develop
   d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
   printf 'role: adopted\n' > "${d}/.claude/.onion-version"
-  git -C "${d}" commit -q --allow-empty -m x; git -C "${d}" branch develop
+  # Identidade via env var (maior precedência) para o commit rodar em runner de CI sem git user.*
+  # configurado — env vence config/-c mesmo se GIT_COMMITTER_NAME estiver setado vazio.
+  GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+  GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test \
+    git -C "${d}" commit -q --allow-empty -m x
+  git -C "${d}" branch develop
   out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
   if [ "${out}" = "develop" ]; then record_pass "resolve: default develop-se-existe"
   else record_fail "resolve: default develop-se-existe" "esperava 'develop', veio '${out}'"; fi
@@ -249,7 +254,12 @@ run_resolve_selftests() {
 
   # (e) SEM arquivo .onion-version (repo pré-stamp), branch develop existe → develop (caminho [ -f ] falso)
   d="$(mktemp -d)"; git -C "${d}" init -q
-  git -C "${d}" commit -q --allow-empty -m x; git -C "${d}" branch develop
+  # Identidade via env var (maior precedência) para o commit rodar em runner de CI sem git user.*
+  # configurado — env vence config/-c mesmo se GIT_COMMITTER_NAME estiver setado vazio.
+  GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+  GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test \
+    git -C "${d}" commit -q --allow-empty -m x
+  git -C "${d}" branch develop
   out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
   if [ "${out}" = "develop" ]; then record_pass "resolve: stamp ausente + develop existe"
   else record_fail "resolve: stamp ausente + develop existe" "esperava 'develop', veio '${out}'"; fi
