@@ -18,6 +18,37 @@ O Onion (framework) evolui; **muitos projetos** o adotam. Sem método, duas dore
 - **Um escritor por repo:** cada repo tem uma sessão dona; **git worktrees** para paralelismo no mesmo repo.
 - **Eficiência > cerimônia:** o mínimo que destrava; maquinaria formal só quando se paga.
 
+## Linguagem ubíqua
+
+> Um termo, um significado — compartilhado entre o maestro e **todas** as sessões (DDD). **Onde o mercado
+> já tem o termo, usamos o do mercado** (menos esforço cognitivo p/ quem adota o Onion); só cunhamos nome
+> próprio onde não existe. Aprofundamento do mapeamento contra a indústria: [`../analysis/onion-vision-concept-map-2026-06.md`](../analysis/onion-vision-concept-map-2026-06.md) §1.
+
+| Termo (nosso) | Significado | Equivalente de mercado |
+|---|---|---|
+| **Core** | a fonte/fábrica do framework (este repo, `onion-evolve`) | `role: source` · **upstream** · **producer** |
+| **Instância adotada** (adotante) | repo que vendorizou o Onion (ex. metagamify, Arandek) | `role: adopted` · **downstream** · **consumer** |
+| **Onion de \<repo\>** | a cópia do framework dentro de um repo | **vendoring** (dependência copiada pra dentro) |
+| **Sessão do \<repo\>** | um CLI Claude Code ancorado em **1** repo | — (ver *um escritor por repo*) |
+| **Maestro** | o humano que orquestra e roteia | **human-in-the-loop (HITL)** / orquestrador |
+| **doc-bridge** | canal de markdown commitado entre instâncias | coordenação **async git-backed** (*drop-box* / GitHub Squad) |
+| **O que o Onion é** | (p/ explicar a terceiros) | **agent harness** (técnico) · **agentic SDLC framework** (funcional) · specs = **Spec-Driven Development (SDD)** |
+
+**Eixo de papel — mesmo conceito, 3 nomes conforme o contexto** (não são coisas diferentes):
+`source = upstream = producer` → **Core** · `adopted = downstream = consumer` → **instância adotada**.
+(O stamp `.onion-version` diz `source/adopted`; o `federation/members.yaml` diz `producer/consumer`; a
+distribuição fala `upstream/downstream`. **Um eixo só.**)
+
+**⚠️ "control plane":** o nosso (futuro) governa a **evolução do framework** entre repos (≈ *schema/package
+registry com governança*) — **não** é o "agent control plane" de **runtime** do mercado (OpenHands, Galileo…).
+Sempre qualificar para não colidir.
+
+**Regra anti-ambiguidade:** nunca dizer **"o Onion" / "a sessão" / "a instância"** cru — **sempre qualificar
+com o repo** ("o Onion do Arandek", "a sessão do metagamify").
+
+**Convenção do assistente:** em toda ação de **escrita**, o assistente prefixa o repo-alvo —
+`[Core]`, `[Arandek]`, `[metagamify]` — para o maestro nunca confundir qual ponta está sendo tocada.
+
 ## Os 3 fluxos
 
 ### A. Core → projetos (downstream / distribuição)
