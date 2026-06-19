@@ -2,11 +2,11 @@
 name: pr
 description: Criar Pull Request com integração GitFlow e sync automático.
 model: sonnet
-allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Grep Glob Bash(cat .env*)
+allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Grep Glob Bash(cat .env*) Bash(bash *)
 category: engineer
 tags: [pr, gitflow, workflow]
-version: "3.1.0"
-updated: "2026-06-13"
+version: "3.2.0"
+updated: "2026-06-19"
 related_agents:
   - gitflow-specialist
 ---
@@ -38,11 +38,18 @@ Siga estes passos para criar o PR:
 
 4. **Comentário na task** documentando o PR (via adapter Task Manager): URL do PR, branch, descrição das mudanças e status dos testes (passing | review | pending). A **formatação por provider** (ADF/Jira, Markdown/ClickUp-Linear, HTML/Asana, Unicode em comments ClickUp) é resolvida pelo adapter / especialista do provider — o comando não formata manualmente.
 
-5. **Abrir o PR via adapter forge:**
+5. **Resolver a base + abrir o PR via adapter forge:**
+   A base do PR é a **branch de integração** do repo — resolvida de forma determinística e portável
+   (SSOT versionado `.onion-version` → `git config gitflow.branch.develop` → default detectado), **não**
+   hardcoded. Isto faz um repo adotado com branch de integração própria (ex. `<projeto>-evolve`, carimbada
+   pelo `/meta:adopt --integration-branch`) ser respeitada em qualquer máquina:
+   ```bash
+   BASE="$(bash .claude/validation/resolve-integration-branch.sh)"   # ver helper p/ a cadeia
+   ```
    ```typescript
    const forge = getForge();                       // .claude/utils/forge/factory.md
    const pr = await forge.createPR({
-     head: 'feature/[descricao]', base: 'develop',  // ou main, conforme o fluxo
+     head: 'feature/[descricao]', base: BASE,       // branch de integração resolvida
      title: '[título]', body: '[resumo + link da task]'
    });
    ```

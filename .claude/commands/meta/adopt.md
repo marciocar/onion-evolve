@@ -7,10 +7,10 @@ description: |
   Relacionado: /docs:reverse-consolidate, /meta:setup-integration, /docs:build-tech-docs.
 model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(ls *) Bash(rm *) Bash(mktemp *) Bash(cat *) Bash(mkdir *) Bash(printf *)
-argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--in-place] [--update] [--dry-run]"
+argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--integration-branch <nome>] [--in-place] [--update] [--dry-run]"
 category: meta
-version: "1.5.0"
-updated: "2026-06-18"
+version: "1.6.0"
+updated: "2026-06-19"
 ---
 
 # 🧅 /meta:adopt — Adoção de Repositório
@@ -134,9 +134,16 @@ Este repo é **CONSUMIDOR** do Onion. O protocolo canônico (3 fluxos) vive no c
 PTR
 fi
 
-# (3) branch de integração — PLACEHOLDER (backlog #1): setar gitflow.branch.{develop,master} no alvo +
-#     persistir a escolha num lugar versionado (.onion-version). Ver inbox
-#     2026-06-18-adopt-gitflow-develop-branch-config.md. NÃO implementado nesta versão.
+# (3) branch de integração — setar git config local (CONVENIÊNCIA p/ `git flow` cru; o durável é o
+#     .onion-version, passo abaixo). No install, INTEGRATION_BRANCH vem do PASSO 0e (via STATE.md);
+#     no --update (sem PASSO 0), resolve do stamp já existente do alvo. O /engineer:pr lê esse mesmo
+#     helper para mirar a base do PR — não depende do git config (que é local da máquina).
+INTEGRATION_BRANCH="${INTEGRATION_BRANCH:-$(bash "$SOURCE_ROOT/.claude/validation/resolve-integration-branch.sh" "$DEST")}"
+git -C "$DEST" config gitflow.branch.develop "$INTEGRATION_BRANCH"
+# master = branch principal do alvo; ${VAR:-main} trata o caso "sem origin/HEAD" (pipeline de sed
+# de entrada vazia retorna 0 → um `|| echo main` direto NÃO dispararia; capturar e default é correto).
+MASTER_BRANCH="$(git -C "$DEST" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')"
+git -C "$DEST" config gitflow.branch.master "${MASTER_BRANCH:-main}"
 
 # (4) re-stamp .onion-version — ver Fase 5 (install) ou o bloco --update (cada um carimba a identidade certa).
 ```
@@ -173,9 +180,14 @@ SRC_COMMIT_DATE="$(awk '/^commit_date:/{print $2}' <<<"$SRC_ID")"
 # 0c. Garantir git no alvo — APENAS no modelo "instalar" (NUNCA no --in-place, que não toca o alvo):
 if [ -z "$IN_PLACE" ] && [ ! -d "$TARGET/.git" ]; then git -C "$TARGET" init -q; fi
 # 0d. Detectar MODO (ou --mode): greenfield (sem código) | legacy (tem) | regulated (marcadores/flag).
+# 0e. Branch de integração (--integration-branch <nome>): INTEGRATION_BRANCH = o nome dado; se OMITIDO,
+#     fica vazio — NÃO se carimba o campo (a resolução detecta a cada PR: develop-se-existe-senão a branch
+#     principal). Carimbar `develop` por default seria errado num greenfield sem branch develop (o campo
+#     presente vence a cadeia → base apontaria p/ branch inexistente). Só vira SSOT versionado (Fase 5)
+#     quando é escolha explícita; o git config local é setado no Procedimento pós-cópia (conveniência).
 ```
 
-- Persistir `TARGET`, `MODE`, `SRC_*` no `STATE.md`. `NEXT: Fase 1`.
+- Persistir `TARGET`, `MODE`, `INTEGRATION_BRANCH`, `SRC_*` no `STATE.md`. `NEXT: Fase 1`.
 
 ### Fase 1 — Engenharia reversa (se houver código)
 
@@ -214,7 +226,8 @@ fi
   # escrever o skeleton em "$OUT" (merge de CLAUDE.onion.md → CLAUDE.md fica a cargo do maestro)
   ```
   Skeleton mínimo: identidade do projeto + roteamento Task Manager + idioma (skill `language-standards`)
-  + contextos L1+ + entrada `/onion`·`/warm-up`.
+  + contextos L1+ + entrada `/onion`·`/warm-up` + **estratégia de branches** (produto vs integração:
+  `${INTEGRATION_BRANCH}` é o alvo dos PRs de evolução Onion; ver `.onion-version`).
 - **Configuração pós-cópia** (`settings.json` merge + starter `docs/evolution/`): rodar o
   [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
   com `DEST="$INSTALL_DIR"`. Ele **registra os hooks Onion** no `settings.json` do alvo (merge never-clobber,
@@ -242,6 +255,9 @@ adopted_from: $(git -C "$SOURCE_ROOT" remote get-url origin 2>/dev/null || echo 
 adopted_at: $(date +%F)
 mode: ${MODE}
 EOF
+# integration_branch: carimbar SÓ se foi escolha explícita (--integration-branch). Sem escolha → omitir;
+# o resolve-integration-branch.sh detecta a cada PR (develop-se-existe-senão a branch principal).
+[ -n "${INTEGRATION_BRANCH:-}" ] && printf 'integration_branch: %s\n' "${INTEGRATION_BRANCH}" >> "$INSTALL_DIR/.claude/.onion-version"
 ```
 
 - Se o alvo versiona `.claude/`, **committar** `.onion-version`. `NEXT: Fase 6`.
@@ -314,7 +330,10 @@ git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
   ```bash
   SRC_ID="$(bash "$SOURCE_ROOT/.claude/validation/onion-version.sh")"   # novo commit/date
   # Reusar o heredoc da Fase 5 mapeando commit→source_commit e commit_date→source_commit_date,
-  # PRESERVANDO adopted_from/mode do stamp antigo; atualizar source_commit/date + adopted_at=$(date +%F).
+  # PRESERVANDO adopted_from/mode/integration_branch do stamp antigo; atualizar source_commit/date
+  # + adopted_at=$(date +%F). (Se o stamp antigo NÃO tiver integration_branch — adoção pré-1.6.0 ou sem
+  # escolha explícita —, PRESERVAR a ausência: não congelar um valor; a resolução detecta a cada PR. O
+  # passo (3) do Procedimento ainda seta o git config local de conveniência a partir do valor resolvido.)
   ```
 - **Tie com a federação:** o `source_commit` do stamp **é** a versão de cada membro (member-version
   awareness — [multi-repo-federation.md](../../../docs/knowledge-base/concepts/multi-repo-federation.md)).

@@ -262,10 +262,20 @@ role: adopted
 adopted_from: <repo/URL da fonte>
 adopted_at: <YYYY-MM-DD>
 mode: greenfield | legacy | regulated
+integration_branch: <branch>   # OPCIONAL — presente só quando escolhido via --integration-branch
 ```
 
-Adicionar este **arquivo** (não diretório) não fere §7. Consumidores: `/meta:adopt` (escreve), a
-**federação** (versão de cada membro) e o CI. Decisão: [ADR de Adoção](../analysis/onion-adr-repo-adoption-2026-06.md).
+O campo **`integration_branch`** (opcional) é o **SSOT versionado** da branch de integração — a que os PRs
+de evolução Onion miram (ex. `<projeto>-evolve`, separada da branch de produto). É **carimbado só quando
+escolha explícita** (`/meta:adopt --integration-branch <nome>`); **ausente** é o caso normal. A base do PR
+é resolvida por `.claude/validation/resolve-integration-branch.sh` na cadeia: **(1)** este campo se presente
+→ **(2)** `git config gitflow.branch.develop` → **(3)** default **detectado** (`develop` se a branch existir,
+senão a branch principal `main`/`master`). Consumido pelo `/engineer:pr`. Vive no stamp **porque `git config`
+é local da máquina e não viaja no clone** — o versionado garante a mesma base de PR em qualquer máquina;
+quando ausente, a detecção (passo 3) adapta-se ao repo a cada PR.
+
+Adicionar este **arquivo** (não diretório) não fere §7. Consumidores: `/meta:adopt` (escreve), `/engineer:pr`
+(lê `integration_branch`), a **federação** (versão de cada membro) e o CI. Decisão: [ADR de Adoção](../analysis/onion-adr-repo-adoption-2026-06.md).
 
 ### 6.2 Sessões e estado
 
