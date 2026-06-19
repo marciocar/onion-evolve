@@ -35,13 +35,29 @@ origin: sessão de co-evolução (inbox triage + /meta:adopt --update fix #99)
 
 ### 🟡 Decisão de apetite (carrega dívida embutida)
 
-3. **#1 — `--integration-branch` no `/meta:adopt`** (`adopt-gitflow-develop-branch-config`, já versionado).
-   `git config gitflow.branch.develop` é local da máquina → exige persistir a escolha versionada
-   (`.onion-version`, campo `integration_branch`) + reconstruir a config local (candidato: warm-up do alvo).
-   **Pré-requisito não-óbvio:** o schema do `.onion-version` (`architecture.md §6.1`) **não tem lint
-   determinístico** — adicionar `integration_branch` ficaria desprotegido. Fechar o #1 bem implica primeiro
-   estender o lint para validar o schema do stamp (+ fixture). O placeholder do passo (3) do Procedimento
-   pós-cópia (`adopt.md`) já está marcado para receber isto.
+3. ✅ **#1 (MERGED, PR #104) — `--integration-branch` no `/meta:adopt`** (`adopt-gitflow-develop-branch-config`).
+   **Eixo corrigido pela diligência:** a premissa original ("setar `git config gitflow.branch.develop`")
+   não se sustentava — *nenhum* comando lia essa config para a base do PR (`pr.md` hardcodava `develop`).
+   O lever real é o `/engineer:pr` **resolver** a branch de integração via helper
+   `resolve-integration-branch.sh` (cadeia: campo `integration_branch` no `.onion-version` → `git config`
+   → default detectado `develop`-se-existe-senão principal). SSOT versionado no `.onion-version` dissolve a
+   fragilidade "git config é local da máquina". Campo carimbado só quando escolha explícita; helper
+   defensivo (tolera ausente/vazio/CRLF), coberto por `lint-selftest.sh` modo resolve (8 cenários).
+
+   - 🚫 **Lint determinístico do schema `.onion-version` — WON'T-DO (verificado), não "adiado".** O
+     pré-requisito que este item carregava ("estender o lint para validar o schema do stamp") foi um
+     **mis-diagnóstico por analogia de doutrina** ("SSOT → tem que ser lintado"), feito antes de examinar
+     os consumidores. Verificação empírica do failure mode de cada campo malformado: `integration_branch`
+     → helper degrada seguro; `source_commit` → `--update` re-copia (idempotente) ou `git diff` **falha
+     visível** (não silencioso); `role` → orientação humana read-only, corrigível; `mode` → **inerte**
+     (nenhum reader); proveniência → inerte. **Nenhum** caminho causa corrupção silenciosa/irreversível.
+     **Raiz da mudança:** lint é o guard certo para SSOT **editado à mão que drifta** (inventory, contagens);
+     errado para dado **gerado-por-máquina e consumido-na-leitura** como o `.onion-version` — aí o guard que
+     encaixa é (a) testar o gerador + (b) **leitura defensiva** nos consumidores (o que o #1 já estabeleceu).
+     **Gatilho de revisão:** reabrir *se* a federação passar a **parsear mais campos do stamp por script**
+     (vira consumidor determinístico → muda a classe). Resíduo cosmético opcional: `--update` com
+     `source_commit` lixo cospe `fatal: ambiguous argument` cru — fix seria 1 linha de guard no `--update`
+     (checar formato sha antes do `git diff`), **não** um schema-lint.
 
 ### 🔴 Decisão estratégica (pede pensamento, não execução)
 
