@@ -207,6 +207,75 @@ run_merge_fixture() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo resolve — exercita .claude/validation/resolve-integration-branch.sh
+# (cadeia .onion-version → git config → default detectado). Cenários
+# self-contained (repos git temporários); o conteúdo do stamp é trivial, então
+# não há fixture-file. Cobre os MODOS DE FALHA, não só o happy-path: campo
+# presente / fallback git config / develop-se-existe / default branch principal.
+# ---------------------------------------------------------------------------
+run_resolve_selftests() {
+  local helper="${SCRIPT_DIR}/resolve-integration-branch.sh"
+  if [ ! -f "${helper}" ]; then record_fail "resolve-integration-branch" "helper ausente: ${helper}"; return; fi
+  local d out
+
+  # (a) campo integration_branch presente → vence toda a cadeia
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
+  printf 'role: adopted\nintegration_branch: arandek-evolve\n' > "${d}/.claude/.onion-version"
+  out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
+  if [ "${out}" = "arandek-evolve" ]; then record_pass "resolve: campo integration_branch vence"
+  else record_fail "resolve: campo integration_branch vence" "esperava 'arandek-evolve', veio '${out}'"; fi
+
+  # (b) sem campo, git config gitflow.branch.develop setado → fallback git config
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
+  printf 'role: adopted\n' > "${d}/.claude/.onion-version"; git -C "${d}" config gitflow.branch.develop feature-x
+  out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
+  if [ "${out}" = "feature-x" ]; then record_pass "resolve: fallback git config"
+  else record_fail "resolve: fallback git config" "esperava 'feature-x', veio '${out}'"; fi
+
+  # (c) sem campo, sem config, branch develop existe → develop
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
+  printf 'role: adopted\n' > "${d}/.claude/.onion-version"
+  git -C "${d}" commit -q --allow-empty -m x; git -C "${d}" branch develop
+  out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
+  if [ "${out}" = "develop" ]; then record_pass "resolve: default develop-se-existe"
+  else record_fail "resolve: default develop-se-existe" "esperava 'develop', veio '${out}'"; fi
+
+  # (d) sem campo, sem config, sem develop → branch principal (default literal 'main')
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
+  printf 'role: source\n' > "${d}/.claude/.onion-version"
+  out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
+  if [ "${out}" = "main" ]; then record_pass "resolve: default branch principal"
+  else record_fail "resolve: default branch principal" "esperava 'main', veio '${out}'"; fi
+
+  # (e) SEM arquivo .onion-version (repo pré-stamp), branch develop existe → develop (caminho [ -f ] falso)
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" commit -q --allow-empty -m x; git -C "${d}" branch develop
+  out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
+  if [ "${out}" = "develop" ]; then record_pass "resolve: stamp ausente + develop existe"
+  else record_fail "resolve: stamp ausente + develop existe" "esperava 'develop', veio '${out}'"; fi
+
+  # (f) campo integration_branch VAZIO → cai para git config (não trava no campo vazio)
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
+  printf 'role: adopted\nintegration_branch:\n' > "${d}/.claude/.onion-version"; git -C "${d}" config gitflow.branch.develop cfgbranch
+  out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
+  if [ "${out}" = "cfgbranch" ]; then record_pass "resolve: campo vazio cai p/ git config"
+  else record_fail "resolve: campo vazio cai p/ git config" "esperava 'cfgbranch', veio '${out}'"; fi
+
+  # (g) sem campo, sem config, sem develop, origin/HEAD=master → master (cobre o ramo symbolic-ref)
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/master
+  out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
+  if [ "${out}" = "master" ]; then record_pass "resolve: origin/HEAD=master"
+  else record_fail "resolve: origin/HEAD=master" "esperava 'master', veio '${out}'"; fi
+
+  # (h) sem campo, sem config develop, sem branch develop, gitflow.branch.master custom → trunk
+  d="$(mktemp -d)"; git -C "${d}" init -q; git -C "${d}" config gitflow.branch.master trunk
+  out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
+  if [ "${out}" = "trunk" ]; then record_pass "resolve: gitflow.branch.master custom"
+  else record_fail "resolve: gitflow.branch.master custom" "esperava 'trunk', veio '${out}'"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -224,6 +293,9 @@ while IFS=$'\t' read -r kind fixture target verdict keyword || [ -n "${kind:-}" 
     *)        record_fail "${fixture:-?}" "kind desconhecido '${kind}'" ;;
   esac
 done < "${MANIFEST}"
+
+# Modo resolve — não vem do manifest (cenários self-contained, sem fixture-file).
+run_resolve_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário
