@@ -7,8 +7,8 @@ model: sonnet
 allowed-tools: Read Grep Bash(find *)
 category: engineer
 tags: [warmup, context, engineering, technical]
-version: "3.0.0"
-updated: "2025-12-02"
+version: "3.1.0"
+updated: "2026-06-18"
 ---
 
 # 🔥 Warm-up de Engenharia
@@ -124,6 +124,9 @@ Estabelecer contexto focado em:
 - ✅ Entender `.claude/sessions/<feature>/` (o **worklog**) para contexto de trabalho — estrutura na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
 - ✅ Para reportar status ou retomar, ler **só o `STATE.md`** (índice Tier-0, ponteiro `NEXT`), não a pasta inteira — protocolo em [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md)
 - ✅ Distinguir **worklog** (estado em arquivo) do **transcript** nativo (`claude --resume`)
+
+### Co-evolução do framework (se `docs/evolution/` existir)
+- ✅ Sinais core↔derivados (bug, pedido, field-signal) passam pelo `docs/evolution/inbox/`. O hook "you have mail" (📬) avisa a contagem no boot; rode `/meta:co-evolve` para ler/gerenciar. Protocolo (3 fluxos): [docs/evolution/README.md](../../../docs/evolution/README.md)
 
 ## 💡 Quando Usar Este Warm-up
 
