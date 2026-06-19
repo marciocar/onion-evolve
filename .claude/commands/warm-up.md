@@ -7,8 +7,8 @@ model: sonnet
 allowed-tools: Read Bash(ls *) Bash(find docs*)
 category: general
 tags: [warmup, context, preparation, overview]
-version: "3.0.0"
-updated: "2025-12-02"
+version: "3.1.0"
+updated: "2026-06-18"
 ---
 
 # 🔥 Warm-up Geral do Projeto
@@ -58,6 +58,11 @@ Estabelecer contexto completo do projeto incluindo:
 - ✅ Task Manager Abstraction (ClickUp, Asana, Linear)
 - ✅ Framework EXTRACT para reuniões
 
+### 5. Co-evolução (se `docs/evolution/` existir)
+- ✅ Reconhecer o papel do repo: `source` (core) · `adopted` (consumidor) — via `.claude/.onion-version` ou `.claude/validation/onion-version.sh`
+- ✅ Conferir `docs/evolution/inbox/` por mensagens não-processadas. O hook SessionStart "you have mail" já avisa a **contagem** no boot (📬); o warm-up apenas **orienta** — não re-conta.
+- ✅ Havendo mensagens, rodar `/meta:co-evolve` para ler/gerenciar. O protocolo canônico (3 fluxos) vive em `docs/evolution/README.md`.
+
 ## 🔍 Contexto a Manter
 
 ### Documentação Essencial
@@ -66,6 +71,7 @@ Estabelecer contexto completo do projeto incluindo:
 - `docs/onion/commands-guide.md` - Todos os comandos
 - `docs/onion/agents-reference.md` - Todos os agentes
 - `docs/meta-specs/index.md` - Meta especificações
+- `docs/evolution/README.md` - Modelo de co-evolução core↔derivados (se presente)
 
 ### Estrutura de Comandos
 - 85 comandos em 9 categorias
@@ -84,6 +90,7 @@ Estabelecer contexto completo do projeto incluindo:
 Após este warm-up geral, use warm-ups específicos:
 - `/product/warm-up` - Para trabalho de produto
 - `/engineer/warm-up` - Para trabalho de engenharia
+- `/meta:co-evolve` - Se o hook "you have mail" (📬) sinalizou mensagens no inbox de co-evolução
 
 ## ⚠️ Notas
 

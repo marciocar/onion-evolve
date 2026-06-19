@@ -26,12 +26,12 @@ origin: sessão de co-evolução (inbox triage + /meta:adopt --update fix #99)
 
 ### 🟢 Mecânico / rápido
 
-1. **PR #100 — arquivar a #2.** Move `adopt-update-skips-phase3-steps.md` → `_processed/`. Aberto; só falta
-   merge. Decisão do maestro (merge na default branch).
-2. **#3-c — warm-up aponta para `evolution/inbox`.** O sinal `co-evolution-not-distributed-by-adopt` está
-   **parcialmente resolvido**: 3-a (starter `docs/evolution/` no adopt) feito pelo #95; **3-c segue aberto**
-   — nenhum dos 3 warm-ups (`warm-up.md`, `product/`, `engineer/`) menciona o inbox. Trivial: reusar
-   `co-evolution-inbox-check.sh` (silencioso se vazio). Ao fechar, mover a mensagem #3 para `_processed/`.
+1. ✅ **#100 (MERGED) — #2 arquivada.** `adopt-update-skips-phase3-steps.md` → `_processed/`.
+2. ✅ **#3-c FEITO — warm-up aponta para `evolution/inbox`.** O sinal `co-evolution-not-distributed-by-adopt`
+   está **totalmente resolvido**: 3-a (starter `docs/evolution/` no adopt) pelo #95; 3-c — `warm-up.md` (seção
+   5) + `engineer/warm-up.md` apontam para o inbox + `/meta:co-evolve` (orientam, sem re-contar; o hook conta).
+   `product/warm-up.md` deixado de fora de propósito (co-evolução é sinal técnico, não fluxo de produto).
+   Mensagem #3 movida para `_processed/` neste mesmo PR.
 
 ### 🟡 Decisão de apetite (carrega dívida embutida)
 
