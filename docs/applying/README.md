@@ -49,14 +49,19 @@ Projetos podem combinar cenários (ex: greenfield em setor regulado segue greenf
 
 ---
 
-## Automação (planejada) — `/meta:adopt`
+## Automação — `/meta:adopt` (operacional)
 
-Hoje a aplicação é **manual** (copiar `.claude/` + seguir o guia). A decisão de **operacionalizar
-esta doutrina como um comando faseado in-platform** (`/meta:adopt <path|git-url>` — **não** CLI) está
-registrada no [ADR de Adoção de Repositório](../analysis/onion-adr-repo-adoption-2026-06.md): modelos
-de controle (instalar / operar in-place / worktree), stamp de versão e reuso de
-`/docs:reverse-consolidate` + `/meta:setup-integration`. Até o comando existir, siga os guias abaixo.
+Esta doutrina **já está operacionalizada** no comando faseado in-platform
+**[`/meta:adopt <path|git-url>`](../../.claude/commands/meta/adopt.md)** (v1.6.0 — **não** é CLI; roda
+dentro do Claude Code). Ele cobre: modelos de controle (instalar / operar in-place / worktree), detecção
+de modo (greenfield/legacy/regulated), stamp de versão `.onion-version`, `--integration-branch <nome>`,
+`--update` (re-cópia deliberada), e reusa `/docs:reverse-consolidate` + `/meta:setup-integration`. Decisão:
+[ADR de Adoção de Repositório](../analysis/onion-adr-repo-adoption-2026-06.md). Estes guias são a **doutrina
+por cenário** que o comando aplica.
+
+Para o **ciclo de vida completo** (adoção → update → revisão → sincronização) **por modo**, ver
+[**adoption-lifecycle.md**](./adoption-lifecycle.md).
 
 ---
 
-**Próximo passo**: abrir o guia correspondente ao seu cenário.
+**Próximo passo**: abrir o guia do seu cenário (acima) ou o [ciclo de vida](./adoption-lifecycle.md) para operações pós-adoção.
