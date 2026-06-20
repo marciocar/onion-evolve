@@ -32,9 +32,11 @@
 - Roda da **[Core]** (lê `role: source`), opera no alvo por path. Carimba `.onion-version` (proveniência).
 - **Por modo:** greenfield = scaffold dos 3 contextos; legacy = `/docs:reverse-consolidate` + install em **worktree** (isola a árvore do legado); regulated = + `docs/compliance-context/` populado.
 - **Direção (fora-pra-dentro vs dentro-pra-fora)** e **consentimento:** o alvo precisa **saber** da nova config — nada espalhado sem consciência. 🟠 *a-desenhar* (card 6).
-- **Dois modos de comando** (saídas distintas) — 🟠 *a-desenhar* (card 6):
-  - **Onion autônomo** → produz um **relatório** (o que foi feito · novidades · do que a instância é capaz agora).
-  - **Consumidor no comando** → **onboarding assistido** (o Claude+Onion local da instância guiando, consciente).
+- **Dois modos de comando** (saídas distintas):
+  - **Onion autônomo** → **auto-emite um relatório** (o que foi feito · novidades · do que a instância é
+    capaz agora · próximos passos) **no canal de fluxo A do alvo** (`docs/evolution/inbound/`, git-visível),
+    e o hook "you have mail" o sinaliza na sessão do alvo. 🟢 *implementado* (adopt v1.7.0).
+  - **Consumidor no comando** → **onboarding assistido** (o Claude+Onion local da instância guiando, consciente). 🟠 *a-desenhar*.
 - **Limpeza de IDE legada** (`.cursor/.windsurf/copilot`) = **opção** com etapas bem definidas (nunca cego). 🟠 *gap — não implementado*.
 
 ## 2. Update (puxar evolução do framework)
@@ -45,12 +47,16 @@
 - Computa o delta `pin-da-instância → HEAD do Core`, copia **diff-based/never-clobber** (não toca arquivos do alvo fora do manifesto), re-aplica o Procedimento pós-cópia (hooks/settings) e **re-carimba** o `.onion-version`.
 - **Relink:** hoje só implícito via `--update` (reusa `adopted_from`). Relink explícito (re-apontar proveniência) 🟠 *a-desenhar*.
 - **Fluxo A** (downstream): o Core anuncia o que muda no [`federation/CHANGELOG.md`](../evolution/federation/CHANGELOG.md); a instância puxa quando quiser.
+- **Relatório auto-emitido + notificação** 🟢: o `--update` escreve o relatório do delta no
+  `docs/evolution/inbound/` do alvo (canal de fluxo A) e o hook "you have mail" o sinaliza — sem o maestro
+  repassá-lo à mão. Fecha o gap "fluxo A meia-estrada" (`inbox/2026-06-19-flow-a-report-and-bidirectional-mail.md`).
 
 ## 3. Revisão
 
 - A **cópia segura** é `tmp → diff → aplicar`: o **diff mostra exatamente o que muda** antes de escrever 🟢. O maestro confirma.
 - A instância revisa na **sessão dela** (o Claude+Onion local pode assistir a leitura do diff).
 - **regulated:** + gate do `@metaspec-gate-keeper`/compliance antes de aceitar.
+- **Drift cosmético de prettier (esperado, benigno):** o vendor chega com o formato do **core**; se o adotante roda `prettier`/`lint-staged`, ele reformata os `.md` ao padrão local no commit → o diff incha com reflow sem mudança de conteúdo. **Não é bug do core** (ele não pode prever a config de cada adotante). Se incomodar, o adotante adiciona os paths do Onion (`.claude/**`, `docs/meta-specs/**`, `docs/knowledge-base/**`) ao `.prettierignore` dele. Sinal recorrente (`inbox/2026-06-17` + `inbox/2026-06-19-mgfy-adocao-update-a0fdf35.md`) → **wontfix consciente**.
 
 ## 4. Sincronização
 
@@ -72,7 +78,8 @@
 | Cópia diff-based/never-clobber + re-stamp | 🟢 |
 | Procedimento pós-cópia idempotente (hooks/settings) | 🟢 |
 | Resolução portável da branch de integração | 🟢 |
-| Relatório autônomo / onboarding assistido (dois modos de comando) | 🟠 a-desenhar (card 6) |
+| Relatório autônomo auto-emitido no alvo (`inbound/`) + notificação "you have mail" bidirecional | 🟢 (adopt v1.7.0) |
+| Onboarding assistido (consumidor no comando) | 🟠 a-desenhar (card 6) |
 | Direção-aware + consentimento explícito do alvo | 🟠 a-desenhar (card 6) |
 | Limpeza de IDE legada (opção, com etapas) | 🟠 gap |
 | Relink explícito | 🟠 a-desenhar |

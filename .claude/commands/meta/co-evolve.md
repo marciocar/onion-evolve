@@ -4,8 +4,8 @@ description: Orienta a sessão na co-evolução Onion core↔derivados — detec
 model: haiku
 category: meta
 tags: [co-evolution, inbox, bridge, federation, onboarding, sdaal]
-version: "1.0.0"
-updated: "2026-06-18"
+version: "1.1.0"
+updated: "2026-06-20"
 allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(bash .claude/validation/onion-version.sh)
 argument-hint: "(sem argumentos — lê o estado de co-evolução deste repo)"
 ---
@@ -31,11 +31,14 @@ O `role` pode vir de dois lugares (o core **não** tem `.onion-version` estátic
 Mapear: **`role: source` → CORE** (`onion-evolve`, dono do framework + protocolo) ·
 **`role: adopted` → CONSUMIDOR** (projeto que adotou o Onion, ex. vendorizado/standalone).
 
-## Passo 2 — Ler o inbox (mensagens pendentes)
+## Passo 2 — Ler os canais (mensagens pendentes)
 
-Listar `docs/evolution/inbox/*.md` de 1º nível (excluir `_processed/` e `README.md`). Para cada,
-resumir `title`/`date`/`type` do frontmatter. Se não houver pasta ou estiver vazia → "sem mensagens
-pendentes". (É o que o hook SessionStart conta para emitir o 📬.)
+Listar de 1º nível (excluir `_processed/` e `README.md`) **os dois canais** do doc-bridge:
+- **`docs/evolution/inbox/*.md`** — fluxo B (sinal/feedback). No core: chegando dos projetos; no consumidor: a relayar ao core.
+- **`docs/evolution/inbound/*.md`** — fluxo A (core→consumidor): relatório de adoção/update + anúncios. **Só existe no consumidor.**
+
+Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente → "sem pendências".
+(É o que o hook SessionStart conta para emitir o 📬 inbox / 📥 inbound.)
 
 ## Passo 3 — Orientar conforme o papel
 
@@ -43,7 +46,8 @@ pendentes". (É o que o hook SessionStart conta para emitir o 📬.)
 - **Pedir ajuda / reportar bug / dar feedback ao core (fluxo B):** depositar um markdown datado
   (`AAAA-MM-DD-<assunto>.md`) no `inbox/` do **core** (`onion-evolve/docs/evolution/inbox/`, se montado;
   senão entregar ao maestro copiar). Sem comunicação viva — é assíncrono via git.
-- **Receber releases do framework (fluxo A):** ler o `CHANGELOG` do core; atualizar com `/meta:adopt --update`.
+- **Receber releases do framework (fluxo A):** ler o `inbound/` (relatório de update auto-emitido pelo core,
+  com arquivos aplicados + novidades + próximos passos) e o `CHANGELOG` do core; atualizar com `/meta:adopt --update`.
 - O protocolo é **canônico no core** — este repo **referencia**, não redefine.
 
 **Se CORE (`onion-evolve`):**
@@ -60,10 +64,10 @@ pendentes". (É o que o hook SessionStart conta para emitir o 📬.)
 
 ## Passo 5 — Gerenciar (opcional, sob confirmação)
 
-Ao **tratar** uma mensagem do inbox, mover para `docs/evolution/inbox/_processed/`
-(`git mv docs/evolution/inbox/<arquivo> docs/evolution/inbox/_processed/`). Assim o "lido/não-lido" fica
-**git-visível** (sem state file) e o hook deixa de contá-la. **Só mover após o maestro confirmar** que a
-mensagem foi de fato endereçada.
+Ao **tratar** uma mensagem, mover para o `_processed/` **do canal** dela
+(`git mv docs/evolution/<inbox|inbound>/<arquivo> docs/evolution/<inbox|inbound>/_processed/`). Assim o
+"lido/não-lido" fica **git-visível** (sem state file) e o hook deixa de contá-la. **Só mover após o maestro
+confirmar** que a mensagem foi de fato endereçada.
 
 ## Referência canônica
 

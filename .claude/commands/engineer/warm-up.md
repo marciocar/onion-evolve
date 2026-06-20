@@ -126,7 +126,7 @@ Estabelecer contexto focado em:
 - ✅ Distinguir **worklog** (estado em arquivo) do **transcript** nativo (`claude --resume`)
 
 ### Co-evolução do framework (se `docs/evolution/` existir)
-- ✅ Sinais core↔derivados (bug, pedido, field-signal) passam pelo `docs/evolution/inbox/`. O hook "you have mail" (📬) avisa a contagem no boot; rode `/meta:co-evolve` para ler/gerenciar. Protocolo (3 fluxos): [docs/evolution/README.md](../../../docs/evolution/README.md)
+- ✅ Sinais core↔derivados passam por dois canais: `docs/evolution/inbox/` (fluxo B: bug/pedido/field-signal consumidor→core) e, em consumidores, `docs/evolution/inbound/` (fluxo A: relatório de update/anúncio core→consumidor). O hook "you have mail" (📬 inbox / 📥 inbound) avisa a contagem no boot; rode `/meta:co-evolve` para ler/gerenciar. Protocolo (3 fluxos): [docs/evolution/README.md](../../../docs/evolution/README.md)
 
 ## 💡 Quando Usar Este Warm-up
 
