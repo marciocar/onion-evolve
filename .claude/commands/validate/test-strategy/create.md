@@ -11,10 +11,10 @@ parameters:
     description: Nome da funcionalidade a ser testada
     required: true
   - name: risk-level
-    description: Nível de risco (baixo|médio|alto|crítico). Default: médio
+    description: 'Nível de risco (baixo|médio|alto|crítico). Default: médio'
     required: false
   - name: complexity
-    description: Complexidade (simples|médio|complexo|épico). Default: médio
+    description: 'Complexidade (simples|médio|complexo|épico). Default: médio'
     required: false
   - name: task-manager
     description: Provedor do task manager (clickup|asana|linear). Usa TASK_MANAGER_PROVIDER se não fornecido

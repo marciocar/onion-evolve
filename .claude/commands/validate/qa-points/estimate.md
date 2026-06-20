@@ -12,16 +12,16 @@ parameters:
     description: Descrição da tarefa de teste (entre aspas)
     required: true
   - name: complexity
-    description: Complexidade base (simple|medium|complex|epic). Default: auto-detect
+    description: 'Complexidade base (simple|medium|complex|epic). Default: auto-detect'
     required: false
   - name: risk
-    description: Nível de risco (low|medium|high|critical). Default: auto-detect
+    description: 'Nível de risco (low|medium|high|critical). Default: auto-detect'
     required: false
   - name: type
-    description: Tipo de teste (unit|integration|ui|api|e2e|performance|security|manual). Default: auto-detect
+    description: 'Tipo de teste (unit|integration|ui|api|e2e|performance|security|manual). Default: auto-detect'
     required: false
   - name: task-id
-    description: ID da task no task manager para atualizar (ex: PROJ-123, CU-456)
+    description: 'ID da task no task manager para atualizar (ex: PROJ-123, CU-456)'
     required: false
   - name: task-manager
     description: Provedor do task manager (jira|clickup|asana|auto-detect). Se não fornecido, será inferido do .env ou formato do task-id

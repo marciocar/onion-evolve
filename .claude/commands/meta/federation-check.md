@@ -1,6 +1,6 @@
 ---
 name: federation-check
-description: Lado consumer da Onion Federation (Fase 2). Lê o inbox (CHANGELOG) do ledger git, detecta contratos endereçados a este membro, valida cada um em casa (formato + classe do bump) e emite o veredito MemberExpertSchema {approved, blocked_contracts, required_migrations, reasoning}. Fail-safe: bump breaking ou ausência de output válido = veto (approved:false). Não muta o ledger — só lê e reporta ao maestro.
+description: 'Lado consumer da Onion Federation (Fase 2). Lê o inbox (CHANGELOG) do ledger git, detecta contratos endereçados a este membro, valida cada um em casa (formato + classe do bump) e emite o veredito MemberExpertSchema {approved, blocked_contracts, required_migrations, reasoning}. Fail-safe: bump breaking ou ausência de output válido = veto (approved:false). Não muta o ledger — só lê e reporta ao maestro.'
 model: sonnet
 category: meta
 tags: [federation, contract, check, consumer, inbox, member-expert, sdaal]

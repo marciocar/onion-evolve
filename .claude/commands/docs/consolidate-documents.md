@@ -15,7 +15,7 @@ parameters:
     description: Foco da consolidação (all|divergences|convergences|insights|gaps|structure)
     required: false
   - name: output_path
-    description: Caminho onde salvar o documento consolidado (opcional, padrão: docs/consolidated/)
+    description: 'Caminho onde salvar o documento consolidado (opcional, padrão: docs/consolidated/)'
     required: false
 
 category: docs

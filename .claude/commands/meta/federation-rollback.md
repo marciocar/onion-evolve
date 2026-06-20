@@ -1,6 +1,6 @@
 ---
 name: federation-rollback
-description: Rollback Protocol guiado da Onion Federation (Fase 3, design §5.5). Para um contrato que quebrou, pina a versão anterior no ledger + sela entrada ROLLBACK no CHANGELOG e GUIA o maestro pela ordem inversa de reverts por repo (consumers→producer) via forge. Human-gated: automatiza só o determinístico/reversível (pin no ledger); NÃO executa merges/reverts cross-repo (atomicidade multi-repo não existe). Falha parcial → gate humano.
+description: 'Rollback Protocol guiado da Onion Federation (Fase 3, design §5.5). Para um contrato que quebrou, pina a versão anterior no ledger + sela entrada ROLLBACK no CHANGELOG e GUIA o maestro pela ordem inversa de reverts por repo (consumers→producer) via forge. Human-gated: automatiza só o determinístico/reversível (pin no ledger); NÃO executa merges/reverts cross-repo (atomicidade multi-repo não existe). Falha parcial → gate humano.'
 model: sonnet
 category: meta
 tags: [federation, rollback, ledger, semver, recovery, sdaal]

@@ -8,10 +8,10 @@ allowed-tools: Read Write Bash(cat .env*)
 
 parameters:
   - name: story_id
-    description: ID da story no task manager (ex: STORY-123, TASK-456)
+    description: 'ID da story no task manager (ex: STORY-123, TASK-456)'
     required: true
   - name: task_manager
-    description: Task manager usado (clickup|jira|linear|asana). Default: TASK_MANAGER_PROVIDER do .env
+    description: 'Task manager usado (clickup|jira|linear|asana). Default: TASK_MANAGER_PROVIDER do .env'
     required: false
     default: auto
   - name: generate_agenda

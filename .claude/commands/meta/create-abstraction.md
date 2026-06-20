@@ -8,13 +8,13 @@ allowed-tools: Read Write Bash(ls *) Bash(mkdir *) Bash(grep *)
 
 parameters:
   - name: abstraction_name
-    description: Nome da abstração em kebab-case (ex: notification-manager)
+    description: 'Nome da abstração em kebab-case (ex: notification-manager)'
     required: true
   - name: interface_name
-    description: Nome da interface TypeScript (ex: INotificationManager)
+    description: 'Nome da interface TypeScript (ex: INotificationManager)'
     required: false
   - name: providers
-    description: Lista de provedores separados por vírgula (ex: slack,discord,email)
+    description: 'Lista de provedores separados por vírgula (ex: slack,discord,email)'
     required: false
   - name: description
     description: Descrição breve do propósito da abstração

@@ -11,7 +11,7 @@ parameters:
     description: Caminho para o projeto a ser analisado
     required: true
   - name: output_path
-    description: Onde salvar documentação (default: docs/reverse/)
+    description: 'Onde salvar documentação (default: docs/reverse/)'
     required: false
 
 category: docs

@@ -9,7 +9,7 @@ allowed-tools: Read Bash(find *) Bash(grep *) Bash(ls *) Bash(test -f *)
 
 parameters:
   - name: path
-    description: Caminho para validar (default: docs/)
+    description: 'Caminho para validar (default: docs/)'
     required: false
     default: docs/
   - name: fix

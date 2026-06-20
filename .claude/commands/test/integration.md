@@ -8,7 +8,7 @@ allowed-tools: Read Glob Write Bash(find *) Bash(cat *) Bash(npm *) Bash(pnpm *)
 
 parameters:
   - name: api-endpoint
-    description: Endpoint da API ou serviço para testar (ex: "/api/users", "UserService")
+    description: 'Endpoint da API ou serviço para testar (ex: "/api/users", "UserService")'
     required: true
   - name: --generate
     description: Gera arquivo de teste se não existir
@@ -26,10 +26,10 @@ parameters:
     description: Inclui fuzzing de API (testes com dados malformados)
     required: false
   - name: --framework
-    description: Framework específico (sobrescreve auto-detecção: supertest|pact|postman|wiremock|jest|vitest)
+    description: 'Framework específico (sobrescreve auto-detecção: supertest|pact|postman|wiremock|jest|vitest)'
     required: false
   - name: --mock-external
-    description: Mocka serviços externos (default: true para testes isolados)
+    description: 'Mocka serviços externos (default: true para testes isolados)'
     required: false
 
 category: test
