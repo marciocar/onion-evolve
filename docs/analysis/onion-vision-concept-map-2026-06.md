@@ -74,8 +74,11 @@ Eixo: **uma instância trabalha sozinha (sem federação) OU se beneficia da aju
 
 ## 3. Cards de relação
 
-### 1. Adoção standalone / in-place — 🟢 GRAVADO
+### 1. Adoção standalone / in-place + DISTRIBUIÇÃO — 🟢 GRAVADO · 🔵 evoluir p/ nativo
 Repo vira Onion soberano (durável) ou opera in-place (efêmero). Fonte: `onion-adr-repo-adoption-2026-06.md`.
+**Norte (jun/2026):** a **distribuição da camada `.claude/`** deve ir **nativa** (plugins/marketplace/SKILL.md +
+proveniência `gh skill`), superando o vendoring-cego — gated por apetite. Camadas `docs/` (spec-as-code) e
+co-evolução **ficam** (sem equivalente nativo). Veredito por camadas: [`onion-distribution-strategy-2026-06.md`](./onion-distribution-strategy-2026-06.md).
 
 ### 2. Federação vertical (core ↔ consumidor) — 🟢 GRAVADO · ⏸️ INATIVA
 Contratos versionados (spec-as-code + tests/fixtures) num ledger git; ciclo publish/check/status/rollback.
@@ -85,6 +88,9 @@ Liga no **gatilho de graduação** (contrato breaking OU >5 projetos). Fontes: `
 Camada hospedada futura: hospeda/sincroniza ledger, monitora drift, alerta breaking, compliance-at-scale.
 Fronteira comercial: local livre/BSL · hospedado SaaS. **≠ "agent control plane" de runtime** (ver §1).
 Design **não escrito** (proposto FASE 3 do reposicionamento). Fonte: `onion-repositioning-sdaal-session-2026-06-17.md` §6.
+**Afiado (jun/2026):** como o nativo **comoditiza a distribuição** (camada 1), o produto/control-plane é
+**precisamente as camadas 2+3** (spec-as-code + co-evolução/governança/compliance). Ir nativo na camada 1
+**afia** o moat. Ver [`onion-distribution-strategy-2026-06.md`](./onion-distribution-strategy-2026-06.md).
 
 ### 4. Comercialização — 🟡 DECIDIDO · ⚠️ material em drift
 BSL (open-core), monetização faseada (licença → control plane), ICP = orgs reguladas + multi-repo.
@@ -134,5 +140,10 @@ papéis**. Extensão do inbox de co-evolução. Gradua quando houver volume real
 - **Aberta:** nomear o **"control plane" do Onion** de forma distinta (evitar colisão com a categoria de runtime)?
 - **Aberta:** federação cross-consumer — vira RFC própria? quando?
 - **Aberta:** desenhar as etapas de "adoção consciente" (limpeza opcional + relatório/onboarding + relink explícito).
+- **2026-06-20** — Veredito de distribuição gravado ([`onion-distribution-strategy-2026-06.md`](./onion-distribution-strategy-2026-06.md)):
+  estratégia **por camadas** — camada 1 (`.claude/`) vai **nativa** (plugins/SKILL.md/`gh skill` proveniência);
+  camadas 2+3 (spec-as-code + co-evolução) **ficam** e viram o produto/control-plane. Ecossistema **validou**
+  a filosofia do Onion; gap real = proveniência rastreável (fecha #112/#113 via tree-SHA). Gated por apetite.
+- **Aberta:** apetite/sequência da migração da camada 1 p/ plugin nativo (norte gravado; execução não-iniciada).
 
 > Para retroagir um conceito: edite o card + registre aqui a data e o porquê. Liberdade total — é tudo novo.
