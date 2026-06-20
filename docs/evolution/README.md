@@ -13,7 +13,7 @@ O Onion (framework) evolui; **muitos projetos** o adotam. Sem método, duas dore
 
 ## Princípios (estado da arte 2026)
 
-- **Orquestração, não autonomia:** o humano (você) é o **maestro**; agentes rodam async, cada um no seu escopo. **Sem IA-fala-IA ao vivo** (A2A-runtime fica `hold` por critério de design).
+- **Orquestração, não autonomia:** o humano (você) é o **maestro**; agentes rodam async, cada um no seu escopo. O risco que se controla é **ler+interpretar+executar** automático sem gate — **não** "agentes se falarem". **Transportar** e **notificar** mensagens podem ser automáticos (determinísticos); **executar** o que chega é gate humano. A2A é ortogonal. Por isso o **A2A-runtime cross-repo fica `hold`** (auto-execução distribuída + atomicidade multi-repo inexistente), não por proibir conversa. Eixo completo: [`../analysis/onion-adr-comms-transport-vs-execution-2026-06.md`](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md).
 - **Coordenação = git-async:** mensagens são **markdown commitado** (padrão *drop-box* / GitHub Squad). "Async dentro do repo escala melhor que tempo-real."
 - **Um escritor por repo:** cada repo tem uma sessão dona; **git worktrees** para paralelismo no mesmo repo.
 - **Eficiência > cerimônia:** o mínimo que destrava; maquinaria formal só quando se paga.
@@ -61,6 +61,10 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
 - **Canal + notificação no consumidor:** a adoção/update **auto-emite o relatório** no `inbound/` do alvo
   (git-visível) e o hook "you have mail" o sinaliza — o maestro não precisa repassá-lo à mão. `inbound/` é o
   **próprio** canal de fluxo A (≠ `inbox/`, que é o outbox de fluxo B). Lido/não-lido via `git mv` p/ `inbound/_processed/`.
+- **Carteiro (transporte automático)** 🟠 *a-desenhar:* hoje o **relay entre repos é manual** (o maestro
+  cruza as pontas). O carteiro automatiza só **transporte + notificação** (atos 1-2), nunca a execução
+  (ato 3): **pull pelo destino** (respeita "um escritor por repo"), reusando ledger git + scripts
+  determinísticos. Design no [ADR do eixo](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md); liga no gatilho de graduação.
 
 ### B. Projetos → core (upstream / sinal + pedido de ajuda) ← o loop de co-evolução
 *Um projeto reporta bug, dá feedback, **pede ajuda/feature**, manda status.*
@@ -109,7 +113,7 @@ herdam** o mesmo "you have mail".
 |---|---|
 | Coordenação por arquivo commitado no repo | *drop-box* do GitHub Squad — async no repo escala melhor que tempo-real |
 | Humano maestro, agentes async por escopo | "Coerência por orquestração, não autonomia" (consenso 2026) |
-| A2A-runtime = `hold` | A2A v1.2 (Linux Foundation, prod) é p/ cross-org enterprise — pesado aqui |
+| A2A-runtime cross-repo = `hold` | risco = auto-execução distribuída (ato 3 sem gate) + atomicidade multi-repo inexistente; A2A v1.2 (LF) é peso cross-org enterprise. Não é "proibir conversa" — ver [ADR do eixo](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md) |
 | Registro + pin de versão | manifest-pinning (textbook); multi-repo custa 15–30% em coordenação |
 
 Fontes: [GitHub Squad](https://github.blog/ai-and-ml/github-copilot/how-squad-runs-coordinated-ai-agents-inside-your-repository/) · [Orchestration not autonomy](https://mikemason.ca/writing/ai-coding-agents-jan-2026/) · [LF Agent2Agent](https://www.linuxfoundation.org/press/linux-foundation-launches-the-agent2agent-protocol-project-to-enable-secure-intelligent-communication-between-ai-agents) · [Multi-repo coordination tax](https://medium.com/@kantmusk/the-20-coordination-tax-every-multi-repo-javascript-team-pays-in-2026-f58d1a6b85d3)
