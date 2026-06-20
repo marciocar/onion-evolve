@@ -15,7 +15,7 @@ parameters:
     description: Nível do responsável (junior/pleno/senior) para ajuste contextual
     required: false
   - name: methodology
-    description: Metodologia a usar (planning-poker/t-shirt/decomposition). Default: auto-detect
+    description: 'Metodologia a usar (planning-poker/t-shirt/decomposition). Default: auto-detect'
     required: false
   - name: create_task
     description: Se true, cria task no gerenciador configurado com a estimativa

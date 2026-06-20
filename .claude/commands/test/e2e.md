@@ -8,7 +8,7 @@ allowed-tools: Read Glob Write Bash(npx *)
 
 parameters:
   - name: feature-name
-    description: Nome da feature para testar (ex: "login", "checkout")
+    description: 'Nome da feature para testar (ex: "login", "checkout")'
     required: true
   - name: --generate
     description: Gera arquivo de teste se não existir
@@ -17,13 +17,13 @@ parameters:
     description: Executa os testes
     required: false
   - name: --headless
-    description: Executa sem interface gráfica (default: true)
+    description: 'Executa sem interface gráfica (default: true)'
     required: false
   - name: --record
     description: Grava vídeo/screenshots dos testes
     required: false
   - name: --framework
-    description: Framework específico (sobrescreve auto-detecção: cypress|playwright|selenium)
+    description: 'Framework específico (sobrescreve auto-detecção: cypress|playwright|selenium)'
     required: false
 
 category: test

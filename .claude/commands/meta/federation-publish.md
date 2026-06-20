@@ -1,6 +1,6 @@
 ---
 name: federation-publish
-description: Anuncia (publica) um bump de contrato de federação aos consumers, escrevendo a entrada de inbox no CHANGELOG do ledger git. Classifica o bump como breaking (major) ou compatível (minor/patch), aplica o checkpoint do maestro (confirmar escopo) e endereça os consumers do contrato. É o lado producer da comunicação assíncrona (Onion Federation Fase 2). Pré-requisito: contrato já registrado via /meta:federation-register.
+description: 'Anuncia (publica) um bump de contrato de federação aos consumers, escrevendo a entrada de inbox no CHANGELOG do ledger git. Classifica o bump como breaking (major) ou compatível (minor/patch), aplica o checkpoint do maestro (confirmar escopo) e endereça os consumers do contrato. É o lado producer da comunicação assíncrona (Onion Federation Fase 2). Pré-requisito: contrato já registrado via /meta:federation-register.'
 model: sonnet
 category: meta
 tags: [federation, contract, publish, ledger, changelog, semver, sdaal]

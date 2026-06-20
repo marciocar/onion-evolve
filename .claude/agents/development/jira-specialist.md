@@ -47,7 +47,7 @@ updated: "2026-05-15"
 # Configurações Necessárias
 required_env:
   - name: JIRA_HOST
-    description: Hostname do Jira (ex: empresa.atlassian.net ou jira.empresa.com)
+    description: 'Hostname do Jira (ex: empresa.atlassian.net ou jira.empresa.com)'
     required: true
   - name: JIRA_API_TOKEN
     description: API Token (Cloud) ou Personal Access Token (Server/DC). Cloud token em https://id.atlassian.com/manage-profile/security/api-tokens
@@ -62,7 +62,7 @@ required_env:
     description: "'3' (Cloud, default) | '2' (Server antigo)"
     required: false
   - name: JIRA_PROJECT_KEY
-    description: Project key padrão para novas issues (ex: PROJ)
+    description: 'Project key padrão para novas issues (ex: PROJ)'
     required: false
 ---
 

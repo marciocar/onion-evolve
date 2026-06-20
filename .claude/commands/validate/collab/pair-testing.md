@@ -8,7 +8,7 @@ allowed-tools: Read Glob Write
 
 parameters:
   - name: feature
-    description: Nome da feature/funcionalidade a ser testada (ex: "checkout", "login", "user-profile")
+    description: 'Nome da feature/funcionalidade a ser testada (ex: "checkout", "login", "user-profile")'
     required: true
   - name: perspective
     description: Perspectiva de teste (white-box|grey-box|black-box). Define o foco da sessão
@@ -17,14 +17,14 @@ parameters:
     description: Criar evento no calendário para a sessão
     required: false
   - name: task-manager
-    description: Task manager usado (clickup|jira|linear|asana). Default: TASK_MANAGER_PROVIDER do .env
+    description: 'Task manager usado (clickup|jira|linear|asana). Default: TASK_MANAGER_PROVIDER do .env'
     required: false
     default: auto
   - name: feature-id
-    description: ID da feature no task manager (ex: TASK-123, CU-456). Opcional para buscar contexto
+    description: 'ID da feature no task manager (ex: TASK-123, CU-456). Opcional para buscar contexto'
     required: false
   - name: participants
-    description: Participantes da sessão (ex: "dev1,qa1" ou "dev1,dev2"). Se não fornecido, será inferido da perspectiva
+    description: 'Participantes da sessão (ex: "dev1,qa1" ou "dev1,dev2"). Se não fornecido, será inferido da perspectiva'
     required: false
 
 category: validate

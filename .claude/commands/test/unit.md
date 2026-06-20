@@ -23,7 +23,7 @@ parameters:
     description: Modo watch para re-execução automática
     required: false
   - name: --framework
-    description: Framework específico (sobrescreve auto-detecção: jest|vitest|pytest|junit)
+    description: 'Framework específico (sobrescreve auto-detecção: jest|vitest|pytest|junit)'
     required: false
 
 category: test

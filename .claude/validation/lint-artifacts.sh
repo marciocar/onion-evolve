@@ -566,6 +566,36 @@ check_inventory_total_drift() {
 }
 
 # ===========================================================================
+# REGRA 17 — Frontmatter: valor escalar com ': ' não-aspado [HARD]
+#   Causa-raiz do "metadata dropada" no Claude Code (YAML: "mapping values are
+#   not allowed here"): um valor de frontmatter NÃO-aspado contendo ': '
+#   (dois-pontos-espaço) — ex.: `description: Foo (ex: bar)`. Quebrou 22 artefatos
+#   e passou batido pelo lint (grep não parseia YAML). Guarda determinística (awk,
+#   sem dependência → vale igual em pre-commit e CI). Validação YAML COMPLETA é do
+#   `claude plugin validate` (fluxo de plugin); esta regra cobre a classe que de fato bate.
+# ===========================================================================
+check_frontmatter_scalar_colon() {
+  while IFS= read -r -d '' f; do
+    head -1 "${f}" | grep -q '^---$' || continue   # só arquivos com bloco de frontmatter
+    awk '
+      NR==1 && $0=="---" { infm=1; next }
+      infm && $0=="---"  { exit }
+      infm {
+        if (match($0, /^[[:space:]]*[A-Za-z_][A-Za-z0-9_-]*:[[:space:]]+/)) {
+          val = substr($0, RLENGTH+1)
+          sub(/[[:space:]]#.*$/, "", val)                 # remove comentário inline
+          first = substr(val, 1, 1)
+          if (first=="\047"||first=="\042"||first=="|"||first==">"||first=="["||first=="{"||first=="&"||first=="*"||first=="#") next
+          if (index(val, ": ") > 0) print NR
+        }
+      }
+    ' "${f}" | while IFS= read -r badln; do
+      violation "HARD" "${f}" "frontmatter linha ${badln}: valor escalar com ': ' não-aspado (quebra o YAML → metadata dropada no Claude Code; aspe o valor)"
+    done
+  done < <(find "${CLAUDE_DIR}/agents" "${CLAUDE_DIR}/commands" -name '*.md' ! -path '*/validation/fixtures/*' -print0 2>/dev/null)
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -587,6 +617,7 @@ check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp
 check_inventory_total_drift
+check_frontmatter_scalar_colon
 
 # ===========================================================================
 # SUMÁRIO FINAL

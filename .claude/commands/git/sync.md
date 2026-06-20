@@ -8,7 +8,7 @@ allowed-tools: Bash(git *) Read Bash(cat .env*)
 
 parameters:
   - name: branch
-    description: Branch alvo para sincronização (default: develop)
+    description: 'Branch alvo para sincronização (default: develop)'
     required: false
     default: develop
 

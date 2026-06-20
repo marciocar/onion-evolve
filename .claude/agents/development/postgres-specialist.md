@@ -36,10 +36,10 @@ updated: "2025-11-24"
 # Configurações Opcionais
 optional_env:
   - name: POSTGRES_HOST
-    description: Host do PostgreSQL (default: localhost)
+    description: 'Host do PostgreSQL (default: localhost)'
     default: localhost
   - name: POSTGRES_PORT
-    description: Porta do PostgreSQL (default: 5432)
+    description: 'Porta do PostgreSQL (default: 5432)'
     default: "5432"
   - name: POSTGRES_DB
     description: Nome do banco de dados

@@ -9,7 +9,7 @@ allowed-tools: Read Bash(find *) Bash(ls *) Bash(wc *)
 
 parameters:
   - name: path
-    description: Caminho para analisar (default: docs/)
+    description: 'Caminho para analisar (default: docs/)'
     required: false
     default: docs/
 

@@ -8,7 +8,7 @@ allowed-tools: Read Write Bash(find *) Bash(grep *) Bash(mkdir *)
 
 parameters:
   - name: feature-id
-    description: ID da feature/epic no task manager (ex: PROJ-123, CU-456)
+    description: 'ID da feature/epic no task manager (ex: PROJ-123, CU-456)'
     required: true
   - name: task-manager
     description: Provedor do task manager (jira|clickup|asana). Se não fornecido, será inferido automaticamente do .env ou formato do feature-id
