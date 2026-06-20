@@ -9,8 +9,8 @@ model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(ls *) Bash(rm *) Bash(mktemp *) Bash(cat *) Bash(mkdir *) Bash(printf *)
 argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--integration-branch <nome>] [--in-place] [--update] [--dry-run]"
 category: meta
-version: "1.6.0"
-updated: "2026-06-19"
+version: "1.7.0"
+updated: "2026-06-20"
 ---
 
 # 🧅 /meta:adopt — Adoção de Repositório
@@ -68,6 +68,9 @@ want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/valid
 #     .claude/hooks: scripts dos SessionStart/PreCompact (incl. co-evolução "you have mail"). O REGISTRO
 #       dos hooks vive em .claude/settings.json → tratado na Fase 3 (never-clobber, não entra no cp cego).
 #     NÃO incluir .env.example aqui — é específico do alvo (clobber). Tratado em (e), never-clobber.
+#     NÃO incluir docs/evolution/ aqui — os canais inbox/inbound são infra LOCAL de cada repo; copiá-los
+#       clobaria o inbox/inbound EM USO do alvo. São provisionados idempotente (never-clobber) pelo passo
+#       (2) do «Procedimento de Configuração pós-cópia» — que roda tanto na adoção (Fase 3) quanto no --update.
 manifest=(); for p in "${want[@]}"; do
   git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p" | grep -q . && manifest+=("$p")
 done
@@ -122,15 +125,20 @@ else
   cp "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json"
 fi
 
-# (2) starter docs/evolution/ — cria só o que estiver AUSENTE (idempotente; não clobba inbox em uso).
-mkdir -p "$DEST/docs/evolution/inbox/_processed"
-[ -f "$DEST/docs/evolution/inbox/_processed/.gitkeep" ] || : > "$DEST/docs/evolution/inbox/_processed/.gitkeep"
+# (2) starter docs/evolution/ — cria só o que estiver AUSENTE (idempotente; não clobba canais em uso).
+#     DOIS canais simétricos: inbox/ (fluxo B: consumidor→core) + inbound/ (fluxo A: core→consumidor,
+#     relatório de adoção/update + anúncios). Ambos com _processed/ p/ lido/não-lido git-visível.
+for ch in inbox inbound; do
+  mkdir -p "$DEST/docs/evolution/$ch/_processed"
+  [ -f "$DEST/docs/evolution/$ch/_processed/.gitkeep" ] || : > "$DEST/docs/evolution/$ch/_processed/.gitkeep"
+done
 if [ ! -f "$DEST/docs/evolution/README.md" ]; then
   cat > "$DEST/docs/evolution/README.md" <<'PTR'
 # Co-evolução (consumidor)
 
 Este repo é **CONSUMIDOR** do Onion. O protocolo canônico (3 fluxos) vive no core
-(`onion-evolve/docs/evolution/`). Use `inbox/` para sinalizar o core (fluxo B) e rode `/meta:co-evolve`.
+(`onion-evolve/docs/evolution/`). Canais: `inbox/` para sinalizar o core (fluxo B) e `inbound/`
+para receber relatórios de update/anúncios do core (fluxo A). Rode `/meta:co-evolve` para ler/gerenciar.
 PTR
 fi
 
@@ -152,6 +160,62 @@ git -C "$DEST" config gitflow.branch.master "${MASTER_BRANCH:-main}"
 > `settings.onion.json` sidecar p/ merge manual). Agora um adotante com `settings.json` **próprio** recebe
 > os hooks Onion **registrados** — sem perder os seus. Fecha o gap do `--update`
 > (`docs/evolution/inbox/2026-06-18-adopt-update-skips-phase3-steps.md`).
+
+---
+
+## 📨 Procedimento de Relatório de Fluxo A (auto-emitido no alvo)
+
+Usado pela **Fase 6** (adoção) e pelo **`--update`**. O relatório do que foi feito **não** pode ficar só
+no chat da sessão-fonte — o maestro teria que repassá-lo à mão para a sessão do alvo. Em vez disso, a
+sessão-fonte **escreve o relatório por path no alvo**, num canal convencionado e git-visível
+(`docs/evolution/inbound/` — o canal de **fluxo A**, irmão do `inbox/` de fluxo B). Lá o hook "you have
+mail" o detecta e a sessão do alvo o "recebe e age". Fecha o gap reportado em
+`docs/evolution/inbox/2026-06-19-flow-a-report-and-bidirectional-mail.md`.
+
+> ⚠️ **NÃO** escrever no `inbox/` do alvo: lá é o *outbox dele pro core* (fluxo B); apareceria como se o
+> consumidor estivesse sinalizando o core. Fluxo A tem o **próprio** canal (`inbound/`).
+
+```bash
+SOURCE_ROOT="$(git rev-parse --show-toplevel)"
+DEST="<INSTALL_DIR (adoção) | TARGET (--update)>"
+OP="<adopt | update>"            # operação que gerou o relatório
+PIN="<source_commit aplicado>"   # commit curto da fonte (o pin NOVO)
+PREV="<pin anterior | vazio na 1ª adoção>"
+
+INBOUND="$DEST/docs/evolution/inbound"
+mkdir -p "$INBOUND/_processed"
+REPORT="$INBOUND/$(date +%F)-${OP}-${PIN}.md"
+# O orquestrador PREENCHE os campos reais (diff --stat já computado, novidades do CHANGELOG do core, etc.).
+cat > "$REPORT" <<EOF
+---
+title: 'Relatório de ${OP} Onion — pin ${PIN}'
+date: $(date +%F)
+from: core (sessão-fonte, source-driven)
+to: $(basename "$DEST") (consumidor)
+type: flow-a-report
+source_commit: ${PIN}
+previous_commit: ${PREV:-—}
+flow: A (core→consumidor / distribuição)
+---
+
+# Relatório de ${OP} — pin ${PIN}
+
+## Arquivos aplicados
+<colar o git diff --stat ${PREV:+${PREV}..}HEAD do manifesto>
+
+## Novidades / capacidades novas
+<resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>
+
+## Próximos passos (NO ALVO)
+1. Revisar o diff aplicado nesta sessão.
+2. Commitar a atualização (gitflow do próprio repo).
+3. Push / abrir PR na branch de integração.
+4. (Opcional) Devolver sinal de campo ao core via inbox/ (fluxo B).
+EOF
+```
+
+> **Lido/não-lido git-visível:** ao tratar o relatório, a sessão do alvo faz `git mv` dele para
+> `inbound/_processed/` (mesma doutrina do `inbox/`). O hook deixa de contá-lo.
 
 ---
 
@@ -265,6 +329,9 @@ EOF
 ### Fase 6 — Relatório + próximos passos
 
 - Resumo: superfície instalada, modo, `INSTALL_DIR`, stamp, branch `onion/adopt`.
+- **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório de Fluxo A](#-procedimento-de-relatório-de-fluxo-a-auto-emitido-no-alvo)
+  (`DEST="$INSTALL_DIR"`, `OP=adopt`, `PIN=$SRC_COMMIT`, `PREV` vazio na 1ª adoção). O relatório fica em
+  `docs/evolution/inbound/` do alvo (git-visível) → o hook "you have mail" o sinaliza na sessão do alvo.
 - **Próximos NO ALVO:** `/warm-up` → `/onion` → `/docs:build-tech-docs`.
 - **Rampa da federação:** oferecer registrar o alvo como membro (`members.yaml`).
 
@@ -335,6 +402,10 @@ git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
   # escolha explícita —, PRESERVAR a ausência: não congelar um valor; a resolução detecta a cada PR. O
   # passo (3) do Procedimento ainda seta o git config local de conveniência a partir do valor resolvido.)
   ```
+- **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório de Fluxo A](#-procedimento-de-relatório-de-fluxo-a-auto-emitido-no-alvo)
+  (`DEST="$TARGET"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`). Reusa o `diff --stat` já computado
+  acima. **Fecha o gap real:** sem isto, o relatório do update sai só no chat da fonte e o maestro tem que
+  repassá-lo à mão para a sessão do alvo (`docs/evolution/inbox/2026-06-19-flow-a-report-and-bidirectional-mail.md`).
 - **Tie com a federação:** o `source_commit` do stamp **é** a versão de cada membro (member-version
   awareness — [multi-repo-federation.md](../../../docs/knowledge-base/concepts/multi-repo-federation.md)).
 

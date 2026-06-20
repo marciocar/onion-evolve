@@ -32,6 +32,7 @@ O Onion (framework) evolui; **muitos projetos** o adotam. Sem método, duas dore
 | **Sessão do \<repo\>** | um CLI Claude Code ancorado em **1** repo | — (ver *um escritor por repo*) |
 | **Maestro** | o humano que orquestra e roteia | **human-in-the-loop (HITL)** / orquestrador |
 | **doc-bridge** | canal de markdown commitado entre instâncias | coordenação **async git-backed** (*drop-box* / GitHub Squad) |
+| **inbox/** · **inbound/** | os dois canais do doc-bridge no consumidor: `inbox/` = **fluxo B** (sinal consumidor→core) · `inbound/` = **fluxo A** (relatório de update/anúncio core→consumidor). Ambos versionados, com `_processed/` p/ lido/não-lido | *outbox* · *inbox* |
 | **O que o Onion é** | (p/ explicar a terceiros) | **agent harness** (técnico) · **agentic SDLC framework** (funcional) · specs = **Spec-Driven Development (SDD)** |
 
 **Eixo de papel — mesmo conceito, 3 nomes conforme o contexto** (não são coisas diferentes):
@@ -57,6 +58,9 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
 - **Pin de versão:** cada projeto carrega `.claude/.onion-version` (commit de origem).
 - **Anúncio:** o core registra mudanças relevantes em [`federation/CHANGELOG.md`](federation/CHANGELOG.md).
 - **Atualização no projeto:** `/meta:adopt --update` (deliberado, nunca link vivo).
+- **Canal + notificação no consumidor:** a adoção/update **auto-emite o relatório** no `inbound/` do alvo
+  (git-visível) e o hook "you have mail" o sinaliza — o maestro não precisa repassá-lo à mão. `inbound/` é o
+  **próprio** canal de fluxo A (≠ `inbox/`, que é o outbox de fluxo B). Lido/não-lido via `git mv` p/ `inbound/_processed/`.
 
 ### B. Projetos → core (upstream / sinal + pedido de ajuda) ← o loop de co-evolução
 *Um projeto reporta bug, dá feedback, **pede ajuda/feature**, manda status.*
@@ -72,20 +76,23 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
 Você não precisa lembrar de checar — o **SessionStart hook** avisa no boot:
 
 - **Hook** (`.claude/hooks/co-evolution-inbox-check.sh`, registrado em `.claude/settings.json`): no início
-  da sessão conta as mensagens não-processadas em `inbox/` e injeta `📬 Onion co-evolução: N mensagem(ns)…`.
-  **Silencioso quando 0** (disciplina de *motd*). É o primitivo "you have mail on login" — o único que
-  dispara sozinho (memória e `/warm-up` não).
+  da sessão conta as mensagens não-processadas e injeta o aviso. **Bidirecional** — cobre os dois canais,
+  cada um com sua label: `📬 … inbox (fluxo B: sinal/feedback)` + `📥 … inbound/ (fluxo A: relatório de
+  update/anúncio)`. **Silencioso quando 0** em ambos (disciplina de *motd*). É o primitivo "you have mail on
+  login" — o único que dispara sozinho (memória e `/warm-up` não). _(O nome do arquivo mantém `inbox-check`
+  por estabilidade do registro nos consumidores já adotados; o comportamento cobre os dois canais.)_
 - **Comando [`/meta:co-evolve`](../../.claude/commands/meta/co-evolve.md)**: lê e gerencia — detecta o papel
   do repo (`.onion-version`), resume as mensagens, orienta conforme core/consumidor.
 - **Lido/não-lido (git-visível, sem state file):** ao tratar uma mensagem, `git mv` dela para
-  `inbox/_processed/`. O hook só conta o 1º nível de `inbox/`, então processadas somem do aviso.
+  `_processed/` do canal (`inbox/_processed/` ou `inbound/_processed/`). O hook só conta o 1º nível de cada
+  canal, então processadas somem do aviso.
 
 Esse trio (hook + comando + `_processed/`) vive em `.claude/`/`docs/evolution/` → **core e todo projeto
 herdam** o mesmo "you have mail".
 
 ## Seu ritual (maestro)
 
-1. **Início de sessão:** `git fetch` + ler o `inbox/` do repo (e o do core, se for sessão de projeto).
+1. **Início de sessão:** `git fetch` + ler o `inbox/` do repo (e, se for sessão de projeto, o `inbound/` p/ relatórios do core + o `inbox/` do core).
 2. **Projeto precisa de algo do core** → deposita mensagem no `inbox/` do core (fluxo B).
 3. **Core mudou algo que afeta projetos** → registra no `CHANGELOG.md` (fluxo A); projetos puxam via `/meta:adopt --update`.
 4. **Você roteia** entre os repos e decide a ordem de merge. **Uma sessão por repo**; se uma sessão cobrir outro repo (a ponta estava adormecida), **logue quem fez** no handoff e commit isolado.
