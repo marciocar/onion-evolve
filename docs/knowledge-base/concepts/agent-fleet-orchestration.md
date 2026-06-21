@@ -6,9 +6,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.2.0 |
+| **Versão** | 1.3.0 |
 | **Data de Criação** | 2026-06-13 |
-| **Última Atualização** | 2026-06-15 |
+| **Última Atualização** | 2026-06-20 |
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Camada de Frota de Agentes |
 
@@ -113,6 +113,12 @@ Agent Teams entra como **terceiro modo opt-in**, nunca requisito duro — mesmo 
 - **Fallback gracioso:** flag off → degrade para Workflow (ou serial), avisando em pt-BR; **nunca** assumir a flag ligada.
 - **Portabilidade preservada:** o Onion é template instalável em **qualquer** projeto; não pode depender de feature experimental gated → o default permanece Workflow.
 - **Mesma invariante arquitetural:** orquestre no **nível principal** (skill/comando) — o "lead" do time é a própria sessão principal. **Nunca** dentro de um agente (§4.2; ver [Aplicação no Onion](#-aplicação-no-onion)).
+- **Escopo é DENTRO de um repo, nunca cross-repo.** Agent Teams coordena dentro de **uma sessão/worktree** — **não há suporte multi-repo nativo** (limitação oficial, jun/2026). Coordenação multi-repo na prática se faz por **git + file-lock** (o próprio caso do compilador C da Anthropic — *Building a C compiler with a team of parallel Claudes*), não por Agent Teams. Logo, **Agent Teams ≠ co-evolução entre repos** — esta vive na camada git-async (ledger + doc-bridge), com a linha vermelha do A2A-runtime cross-repo intacta. Ver [`onion-adr-comms-transport-vs-execution-2026-06.md`](../../analysis/onion-adr-comms-transport-vs-execution-2026-06.md).
+
+> **Postura da Anthropic (fonte oficial):** autonomia **com salvaguardas**, não launch-and-forget —
+> *stopping conditions*, sandbox + guardrails, e gates por **classificador de risco** (Claude Code
+> *auto mode*) que escala ao humano após N bloqueios. Para Agent Teams, recomenda **hooks**
+> (`TeammateIdle`/`TaskCompleted`) como quality gates. Alinha-se ao §7.5 abaixo.
 
 > Reavaliar quando Agent Teams sair de experimental: a ressalva de portabilidade cai e a fronteira pode ser revista.
 
@@ -411,6 +417,13 @@ const branches = (await parallel([
 ```
 
 ### 7.5 Autonomia e gates (control before autonomy)
+
+> **O eixo de risco é o ATO, não a conversa.** O que exige gate não é agentes se
+> coordenarem (mailbox, `SendMessage`) — é o ato de **ler+interpretar+executar** algo
+> irreversível. **Transportar** e **notificar** (mover resultado, avisar) são
+> determinísticos e automatizáveis; **executar** o passo crítico é gate humano. A2A é
+> ortogonal ao risco. Eixo completo (co-evolução e frota) em
+> [`onion-adr-comms-transport-vs-execution-2026-06.md`](../../analysis/onion-adr-comms-transport-vs-execution-2026-06.md).
 
 A frota **propõe**; o humano **confirma** o passo crítico. Exija **gate humano**
 quando:
