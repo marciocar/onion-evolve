@@ -105,11 +105,13 @@ só se/quando o gargalo real for outro (ver §4 TOPO).
   fixa. Uma tabela-heurística (1 / 2–4 / 5–10 / >10) poderia entrar como *guia* na KB. Risco: contagem
   fixa briga com o princípio "budget como teto". *Gatilho:* se sessões reais mostrarem over/under-scale
   recorrente → avaliar a heurística no `/meta:evolve`.
-- **TOPO — topologia hierárquica com sub-orquestradores** — hoje **conflita** com a invariante "nunca
-  aninhar orquestração". Mas o nesting de subagentes já existe (até 5 níveis, jun/2026), e a árvore é a
-  saída teórica **se** a frota plana estourar. *Gatilho:* quando uma tarefa real precisar de >16 workers
-  efetivos OU o contexto do orquestrador virar gargalo medido (não hipotético) → reabrir a regra de
-  topologia plana e avaliar agregadores hierárquicos com compactação por nó.
+- **TOPO — topologia hierárquica com sub-orquestradores** — **aprofundado em 2026-06-21** no
+  [ADR-rascunho de topologia](./onion-fleet-topology-adr-draft-2026-06-21.md): a "hierarquia" conflacia
+  *locus de orquestração* (invariante — fica no nível principal) com *forma de grafo* (árvore com nós
+  sumarizadores — **já permitida** no nível principal). O ADR reafirma a invariante e legitima a árvore
+  **sob gatilho**: só quando a síntese exige LLM sobre conjunto que estoura 1 agente (senão o fan-in JS
+  0-token vence). *Gatilho:* esse caso real de síntese-por-LLM ocorrer → aplicar o padrão "nó
+  sumarizador" do ADR (compactação por nó `b·m ≤ W`).
 - **MATH — formalização (α_ρ>1, s>β, mixing depth)** — lente quantitativa para o que o `onion-fleet`
   hoje decide por heurística. Valor potencial: **critérios de aceite testáveis** e calibração empírica
   de `N_max` por modelo/tamanho de resumo. *Gatilho:* se quisermos medir/justificar dimensionamento com
@@ -152,6 +154,9 @@ avaliar os 🟡 quando seus gatilhos dispararem. Antes de mover qualquer 🟡 pa
   ~80% validação do que o Onion já é (autor não conhecia a base); deltas reais (TOPO hierárquica, MATH
   do paper, A2A) parqueados no radar com gatilho. Paper não verificado — tratado como hipótese.
   Para retroagir: editar aqui com data + porquê. Liberdade total — é tudo novo.
+- **2026-06-21** — Eixo TOPO aprofundado no
+  [ADR-rascunho de topologia](./onion-fleet-topology-adr-draft-2026-06-21.md): desambígua *locus*
+  (invariante) × *forma de grafo* (árvore sob gatilho, no nível principal). Item TOPO de §4 atualizado.
 
 ## Fontes
 
