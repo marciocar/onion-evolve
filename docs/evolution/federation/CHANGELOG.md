@@ -8,6 +8,12 @@
 
 ---
 
+## 2026-06-21 · Decisão: **não adotar** roteamento dinâmico de tier em runtime (sinal HeyClicky) · COMPATÍVEL · alvo: nenhum (informativo, sem ação)
+
+- **Decisão de governança, não mudança de framework.** Avaliado o micro-delta do sinal de mercado HeyClicky (YC S26): escolher o tier do modelo **dinamicamente em runtime** (router de 1ª camada por tarefa) vs. o padrão atual do Onion — tier **fixado na autoria** (quem escreve o grafo define `model` por agente/fase na Workflow).
+- **Veredito: não adotar.** Complexidade > ganho no modelo spec-as-code; o tiering estático por autoria é determinístico, auditável e suficiente. As outras 3 leituras do sinal foram **validações confirmatórias** de padrões já canônicos (model-tiering, background agents + report-back, proxy=SDAAL) — nada a mudar.
+- **Ação p/ adotantes: nenhuma.** Entrada registrada só para deixar o trilho de decisão git-visível (o core avaliou um sinal externo e declinou conscientemente). Sinal triado em [`../inbox/_processed/2026-06-20-heyclicky-model-routing-signal.md`](../inbox/_processed/2026-06-20-heyclicky-model-routing-signal.md) (#120).
+
 ## 2026-06-20 · Fluxo A com canal próprio (`inbound/`) + "you have mail" bidirecional + relatório de update auto-emitido · COMPATÍVEL · alvo: adotantes
 
 - **Canal de fluxo A:** a adoção/update agora provisiona `docs/evolution/inbound/` (irmão do `inbox/`) — o canal **core→consumidor**, separado do `inbox/` (que é o outbox de fluxo B). Provisionado idempotente (never-clobber) pelo Procedimento de Configuração pós-cópia.
