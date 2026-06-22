@@ -351,6 +351,74 @@ run_resolve_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo prettierignore — exercita .claude/utils/adopt/merge-prettierignore.sh.
+# Self-contained (estilo run_resolve_selftests): cenários em mktemp -d, sem
+# fixture-file/manifest. Cobre os MODOS DE FALHA (não só o happy-path): criação
+# from-scratch, append parcial preservando o original, append SEM newline final
+# (bug de linha-grudada), idempotência byte-a-byte, e o caso do adotante real
+# (paths soltos sem cabeçalho → não polui com cabeçalho órfão).
+# ---------------------------------------------------------------------------
+run_prettierignore_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/merge-prettierignore.sh"
+  local tpl="${REPO_ROOT}/.claude/utils/adopt/prettierignore-onion.tpl"
+  if [ ! -f "${helper}" ]; then record_fail "prettierignore" "helper ausente: ${helper}"; return; fi
+  if [ ! -f "${tpl}" ]; then record_fail "prettierignore" "template ausente: ${tpl}"; return; fi
+  local d
+
+  # (a) absent → cria com paths + cabeçalho de auto-doc
+  d="$(mktemp -d)"; bash "${helper}" "${d}" >/dev/null 2>&1
+  if grep -qxF "docs/onion/inventory.md" "${d}/.prettierignore" 2>/dev/null \
+     && grep -qF "=== onion" "${d}/.prettierignore" 2>/dev/null; then
+    record_pass "prettierignore: absent cria com paths + cabeçalho"
+  else record_fail "prettierignore: absent cria" "faltou path ou cabeçalho na criação"; fi
+  rm -rf "${d}"
+
+  # (b) partial (com \n final) → appenda os faltantes SEM cabeçalho; original intacto
+  d="$(mktemp -d)"; printf '.claude/\n' > "${d}/.prettierignore"; bash "${helper}" "${d}" >/dev/null 2>&1
+  if grep -qxF "docs/meta-specs/" "${d}/.prettierignore" && grep -qxF ".claude/" "${d}/.prettierignore" \
+     && ! grep -qF "=== onion" "${d}/.prettierignore"; then
+    record_pass "prettierignore: partial appenda sem cabeçalho órfão"
+  else record_fail "prettierignore: partial" "appendou cabeçalho órfão ou perdeu linha original"; fi
+  rm -rf "${d}"
+
+  # (c) partial SEM newline final → 1ª linha appendada NÃO gruda na última existente
+  d="$(mktemp -d)"; printf '.claude/' > "${d}/.prettierignore"; bash "${helper}" "${d}" >/dev/null 2>&1
+  if grep -qxF ".claude/" "${d}/.prettierignore" && grep -qxF "docs/sdaal/" "${d}/.prettierignore"; then
+    record_pass "prettierignore: partial-no-eol não gruda linhas"
+  else record_fail "prettierignore: partial-no-eol" "linha grudou (newline final não garantido)"; fi
+  rm -rf "${d}"
+
+  # (d) complete (copiado do .tpl) → no-op byte-a-byte (idempotência genuína)
+  d="$(mktemp -d)"; cp "${tpl}" "${d}/.prettierignore"
+  local before after; before="$(cat "${d}/.prettierignore")"; bash "${helper}" "${d}" >/dev/null 2>&1
+  after="$(cat "${d}/.prettierignore")"
+  if [ "${before}" = "${after}" ]; then record_pass "prettierignore: complete é no-op (idempotente)"
+  else record_fail "prettierignore: complete" "mutou um alvo já completo"; fi
+  rm -rf "${d}"
+
+  # (e) complete-no-header → 5 paths soltos (espelha o rhilo real): no-op, NÃO injeta cabeçalho órfão
+  d="$(mktemp -d)"
+  printf '.claude/\ndocs/meta-specs/\ndocs/sdaal/\ndocs/knowledge-base/\ndocs/onion/inventory.md\n' > "${d}/.prettierignore"
+  before="$(cat "${d}/.prettierignore")"; bash "${helper}" "${d}" >/dev/null 2>&1
+  after="$(cat "${d}/.prettierignore")"
+  if [ "${before}" = "${after}" ]; then record_pass "prettierignore: complete-no-header não injeta cabeçalho"
+  else record_fail "prettierignore: complete-no-header" "injetou cabeçalho órfão num alvo já protegido"; fi
+  rm -rf "${d}"
+
+  # (f) CRLF → .claude/\r\n no alvo não vira duplicata (normalização CRLF na comparação)
+  d="$(mktemp -d)"; printf '.claude/\r\n' > "${d}/.prettierignore"; bash "${helper}" "${d}" >/dev/null 2>&1
+  if [ "$(grep -cF '.claude/' "${d}/.prettierignore")" = "1" ]; then
+    record_pass "prettierignore: CRLF não duplica"
+  else record_fail "prettierignore: CRLF" ".claude/ duplicado (CRLF não normalizado)"; fi
+  rm -rf "${d}"
+
+  # (g) $DEST inválido → exit 2 (erro de uso, não gracioso)
+  local rc=0; bash "${helper}" "/nao/existe/$$" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "prettierignore: dest inválido → exit 2"
+  else record_fail "prettierignore: dest inválido" "esperava exit 2, veio ${rc}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -372,6 +440,9 @@ done < "${MANIFEST}"
 
 # Modo resolve — não vem do manifest (cenários self-contained, sem fixture-file).
 run_resolve_selftests
+
+# Modo prettierignore — idem (cenários self-contained, sem fixture-file).
+run_prettierignore_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário

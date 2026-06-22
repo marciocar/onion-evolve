@@ -105,28 +105,23 @@ origin: sessão de co-evolução (inbox triage + /meta:adopt --update fix #99)
 > 2026-06-22, entrada "Delta 06f7232 + proteção de vendor"; rascunho em `federation/outbox/rhilo-metagamify/`).
 > Sinal movido para `inbox/_processed/`.
 
-### 🟡 Decisão de apetite — ABERTO
+### 🟡 Decisão de apetite — ENTREGUE
 
-7. ⏳ **ABERTO — `/meta:adopt` deve provisionar proteção de formatação (never-clobber `.prettierignore`).**
-   **Sinal de campo (3ª reincidência, agora com fail HARD de CI):** o `/meta:adopt` copia
-   `docs/knowledge-base/`, `docs/meta-specs/`, `docs/sdaal/` e **gera** o SSOT gerado-por-máquina
-   `docs/onion/inventory.md`, mas **não provisiona** a proteção de formatação correspondente. Num adotante
-   com formatador (prettier/dprint/biome) + pre-commit hook, o `lint-staged` reformata o SSOT → o
-   `check_inventory_sync` (comparação byte-a-byte) quebra → **violação HARD** em laço vicioso (rodar
-   `/meta:inventory` + commitar reintroduz a violação). O adotante já mitigou localmente adicionando os paths
-   ao `.prettierignore` — mas cada adotante redescobre o problema (3× no `rhilo-metagamify`; o sinal de
-   2026-06-17 já apontava o sintoma cosmético, sem perceber o fail HARD).
-   - **Decisão (aceita, anunciada):** o **Procedimento de Configuração pós-cópia** (compartilhado install ↔
-     `--update`) deve **provisionar/mesclar (never-clobber) um `.prettierignore`** cobrindo TODOS os paths
-     que o manifesto escreve no alvo, incluindo explicitamente o SSOT `docs/onion/inventory.md`. Mesmo
-     princípio dos hooks: o comando não pode assumir que o alvo "sabe" preservar o vendor — tem de
-     **provisionar a proteção explicitamente**.
-   - **Fronteira:** o core **não adota prettier** (não tem formatador) — só **provisiona a proteção** no fluxo
-     de adoção. O `.prettierignore` é artefato local do adotante; never-clobber não toca num já-existente.
-   - **Escopo provável:** estender o helper/template do Procedimento pós-cópia (onde o `merge-onion-hooks.sh`
-     já vive) + cobrir com `lint-selftest.sh` (cenário formatter+hook). Dívida transversal conhecida: o
-     `--update` ponta-a-ponta não tem harness determinístico (roda dentro do Claude Code).
-   - **Origem:** [`../evolution/inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md`](../evolution/inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md).
+7. ✅ **ENTREGUE — `/meta:adopt` provisiona proteção de formatação (never-clobber `.prettierignore`).**
+   Passo (5) no "Procedimento de Configuração pós-cópia" (Fase 3 + `--update`) via helper determinístico
+   `.claude/utils/adopt/merge-prettierignore.sh` + template curado `prettierignore-onion.tpl` (espelha o
+   fix empírico do rhilo-metagamify, develop:PR #62), coberto por `lint-selftest.sh` (7 cenários:
+   absent/partial/partial-no-eol/complete/complete-no-header/CRLF/dest-inválido). adopt.md → v1.8.0.
+   **Eixo corrigido pela revisão dupla (HARD-1):** o `.prettierignore` NÃO espelha o manifesto `want=` —
+   protege **artefatos Onion** de duas naturezas: vendor copiado (churn) + SSOT *gerado-pelo-consumidor*
+   `docs/onion/inventory.md` (fail HARD; o adopt NÃO o escreve — o consumidor o gera via `/meta:inventory`).
+   **Escopo factual:** cobre prettier (e tools que respeitam `.prettierignore`); dprint/biome usam config
+   próprio → helper **detecta e avisa**, cobertura ativa = follow-up. **Cabeçalho só na criação
+   from-scratch** (no append não polui o arquivo do adotante — coerência never-clobber).
+   - **Resíduo (follow-up):** cobertura ativa de dprint/biome; selftest de paridade automática
+     template↔`want=` (hoje: comentário cruzado nos dois blocos `want=`).
+   - **Origem:** [`../evolution/inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md`](../evolution/inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md)
+     — sinal de campo do `rhilo-metagamify` (3ª reincidência; o de 2026-06-17 já apontava o sintoma cosmético sem perceber o fail HARD).
 
 ## Dívida técnica transversal
 
