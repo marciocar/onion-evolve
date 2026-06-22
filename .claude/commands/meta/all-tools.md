@@ -31,14 +31,21 @@ snapshots em `.claude/docs/tools/` que **drifavam** da realidade; isso viola o p
 
 ## ⚡ Execução
 
-1. **Ferramentas nativas + MCP** — liste as ferramentas realmente disponíveis nesta sessão,
-   agrupadas por origem (nativas do Claude Code; servidores MCP conectados). Use os **nomes e
-   descrições reais** do contexto — **sem assinaturas TypeScript inventadas e sem nomes de
-   ferramenta de outras IDEs** (ex.: nada de `read_file`/`codebase_search` estilo-Cursor; os
-   formatos válidos são os nativos do Claude Code e `mcp__<server>__<tool>`).
-2. **Recursos do Onion** — apresente um resumo curto + os **links** para o canônico acima.
+1. **Ferramentas nativas do Claude Code** — agrupe em **núcleo** (carregadas de imediato,
+   com nome + descrição real) e **estendidas/deferidas** (surgem via `ToolSearch`). As
+   deferidas são conhecidas **só por nome** até o fetch — **liste-as por nome e NÃO invente
+   descrição** (busque via `ToolSearch` só se precisar do detalhe). Use sempre os nomes reais
+   do contexto — **sem assinaturas TypeScript inventadas e sem nomes de outras IDEs** (ex.:
+   nada de `read_file`/`codebase_search` estilo-Cursor; o formato válido é o nativo).
+2. **Ferramentas MCP** — agrupe por servidor e **marque o status de conexão**: *conectado*
+   (toolset completo disponível agora) vs *exige autenticação* (só expõe `authenticate`/
+   `complete_authentication` até conectar). Formato dos nomes: `mcp__<server>__<tool>`.
+   Listar um servidor sem o status engana o leitor (um `Jira`/`Slack` "disponível" mas não
+   autenticado não é acionável). Quando relevante, cite a coerência com o `.env` (ex.:
+   `TASK_MANAGER_PROVIDER` ativo via API-first, MCP opcional).
+3. **Recursos do Onion** — apresente um resumo curto + os **links** para o canônico acima.
    **Não** recopie listas nem contagens (elas derivam da SSOT).
-3. **Saída**: tudo na resposta da sessão. **Não escreva arquivos.**
+4. **Saída**: tudo na resposta da sessão. **Não escreva arquivos.**
 
 ## ⚠️ Notas
 
