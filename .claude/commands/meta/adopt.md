@@ -9,8 +9,8 @@ model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(ls *) Bash(rm *) Bash(mktemp *) Bash(cat *) Bash(mkdir *) Bash(printf *)
 argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--integration-branch <nome>] [--in-place] [--update] [--dry-run]"
 category: meta
-version: "1.7.0"
-updated: "2026-06-20"
+version: "1.8.0"
+updated: "2026-06-22"
 ---
 
 # 🧅 /meta:adopt — Adoção de Repositório
@@ -65,6 +65,8 @@ DEST="<INSTALL_DIR — ver Fase 2>"
 #     pathspec não casa nada. Filtrar evita o erro críptico de tar.
 want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks
       docs/meta-specs docs/knowledge-base docs/sdaal)
+#     ⚠️ Novo path docs/ vendorizado aqui → refletir em .claude/utils/adopt/prettierignore-onion.tpl
+#       (proteção de formatador, passo (5) do Procedimento pós-cópia). .claude/* já coberto por `.claude/`.
 #     .claude/hooks: scripts dos SessionStart/PreCompact (incl. co-evolução "you have mail"). O REGISTRO
 #       dos hooks vive em .claude/settings.json → tratado na Fase 3 (never-clobber, não entra no cp cego).
 #     NÃO incluir .env.example aqui — é específico do alvo (clobber). Tratado em (e), never-clobber.
@@ -106,7 +108,8 @@ fi
 ## ⚙️ Procedimento de Configuração pós-cópia (idempotente)
 
 Usado pela **Fase 3** (install) e pelo **`--update`** — re-aplica os passos install-only que **não** vêm
-na cópia de arquivos (registro de hooks + starter de co-evolução). Idempotente: re-rodar não duplica.
+na cópia de arquivos (registro de hooks + starter de co-evolução + proteção de formatador). Idempotente:
+re-rodar não duplica.
 Snippet self-contained (shell novo a cada fase).
 
 ```bash
@@ -154,6 +157,14 @@ MASTER_BRANCH="$(git -C "$DEST" symbolic-ref --quiet --short refs/remotes/origin
 git -C "$DEST" config gitflow.branch.master "${MASTER_BRANCH:-main}"
 
 # (4) re-stamp .onion-version — ver Fase 5 (install) ou o bloco --update (cada um carimba a identidade certa).
+
+# (5) .prettierignore — provisiona proteção contra o FORMATADOR do alvo (never-clobber, idempotente).
+#     Protege artefatos Onion: vendor copiado (.claude/, docs/{meta-specs,sdaal,knowledge-base}) E o SSOT
+#     GERADO docs/onion/inventory.md — o lint Onion o compara byte-a-byte (check_inventory_sync) e o
+#     formatador do adotante (prettier + lint-staged) o reformata → violação HARD em laço vicioso.
+#     Cobre prettier e ferramentas que respeitam .prettierignore; detecta dprint.json/biome.json e AVISA
+#     (não os cobre — cobertura ativa = follow-up). Helper testável (lint-selftest.sh: prettierignore).
+bash "$SOURCE_ROOT/.claude/utils/adopt/merge-prettierignore.sh" "$DEST"
 ```
 
 > O passo (1) **substitui** o antigo never-clobber grosso (que copiava só se ausente; senão deixava um
@@ -383,6 +394,7 @@ NOW="$(git -C "$SOURCE_ROOT" rev-parse --short=12 HEAD)"
 # DELTA do framework desde a adoção (manifesto filtrado, como no Procedimento):
 want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks
       docs/meta-specs docs/knowledge-base docs/sdaal .env.example)
+# ⚠️ Novo path docs/ vendorizado aqui → refletir em .claude/utils/adopt/prettierignore-onion.tpl (passo (5)).
 manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p" | grep -q . && manifest+=("$p"); done
 git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
 ```
