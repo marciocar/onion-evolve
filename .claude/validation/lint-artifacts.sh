@@ -542,11 +542,14 @@ check_context_freshness_stamp() {
 #   status:snapshot / type:adr / type:evolution-backlog.
 # ===========================================================================
 check_inventory_total_drift() {
-  local env_out cmd agent cats kb n pair num ct
+  local env_out cmd agent cats agent_cats kb n pair num ct
   env_out="$(bash "${SCRIPT_DIR}/inventory.sh" --env 2>/dev/null || true)"
   cmd="$(printf '%s\n' "${env_out}" | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
   agent="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENTS_TOTAL=' | cut -d= -f2)"
   cats="$(printf '%s\n' "${env_out}" | grep '^ONION_COMMAND_CATEGORIES=' | cut -d= -f2)"
+  # Categorias de AGENTE ≠ categorias de COMANDO (podem divergir: ex. 10 cmd-cats × 9 agent-cats).
+  # Usar a var própria evita validar/afirmar 'N agentes em <cmd_cats> categorias' (falso).
+  agent_cats="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENT_CATEGORIES=' | cut -d= -f2)"
   kb="$(printf '%s\n' "${env_out}" | grep '^ONION_KBS_TOTAL=' | cut -d= -f2)"
   [ -n "${cmd}" ] || return
 
@@ -582,8 +585,12 @@ check_inventory_total_drift() {
     while IFS= read -r pair; do
       [ -z "${pair}" ] && continue
       num="$(printf '%s' "${pair}" | grep -oE '^[0-9]+')"
+      ct="$(printf '%s' "${pair}" | grep -oE '[0-9]+ categorias' | grep -oE '^[0-9]+')"
       if [ -n "${num}" ] && [ "${num}" != "${agent}" ]; then
         violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '${pair}' (esperado ${agent}) — /meta:inventory"
+      fi
+      if [ -n "${ct}" ] && [ "${ct}" != "${agent_cats}" ]; then
+        violation "SOFT" "${f}" "contagem de categorias de agentes divergente da SSOT: '${pair}' (esperado ${agent_cats}) — /meta:inventory"
       fi
     done < <(grep -oiE '[0-9]+ agentes[^.,|]*em [0-9]+ categorias' "${f}" 2>/dev/null)
 
@@ -684,11 +691,12 @@ _apply_fix_file() {            # $1=arquivo  $2=programa sed -E
 }
 
 run_inventory_fixes() {
-  local env_out cmd agent cats kb skill prog
+  local env_out cmd agent cats agent_cats kb skill prog
   env_out="$(bash "${SCRIPT_DIR}/inventory.sh" --env 2>/dev/null || true)"
   cmd="$(printf '%s\n'   "${env_out}" | grep '^ONION_COMMANDS_TOTAL='     | cut -d= -f2)"
   agent="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENTS_TOTAL='       | cut -d= -f2)"
   cats="$(printf '%s\n'  "${env_out}" | grep '^ONION_COMMAND_CATEGORIES=' | cut -d= -f2)"
+  agent_cats="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENT_CATEGORIES=' | cut -d= -f2)"  # ≠ cats
   kb="$(printf '%s\n'    "${env_out}" | grep '^ONION_KBS_TOTAL='          | cut -d= -f2)"
   skill="$(printf '%s\n' "${env_out}" | grep '^ONION_SKILLS_TOTAL='       | cut -d= -f2)"
   [ -n "${cmd}" ] || return
@@ -701,7 +709,7 @@ run_inventory_fixes() {
   # contagens reescrevem ambas numa só substituição (o \N preserva o miolo/cauda).
   prog="s/[0-9]+( comandos invocáveis)/${cmd}\1/g"
   prog="${prog}; s/([0-9]+)( comandos[^.,|]*em )([0-9]+)( categorias)/${cmd}\2${cats}\4/g"
-  prog="${prog}; s/([0-9]+)( agentes[^.,|]*em )([0-9]+)( categorias)/${agent}\2${cats}\4/g"
+  prog="${prog}; s/([0-9]+)( agentes[^.,|]*em )([0-9]+)( categorias)/${agent}\2${agent_cats}\4/g"
   prog="${prog}; /^[[:space:]]*\|/! s/([0-9]+)( agentes[[:space:]]*[e,][[:space:]]*)([0-9]+)( comandos)/${agent}\2${cmd}\4/g"
   prog="${prog}; s/[0-9]+( [Kk]nowledge [Bb]ases)/${kb}\1/g"
 
