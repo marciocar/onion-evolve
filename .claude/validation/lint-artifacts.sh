@@ -74,6 +74,36 @@ SOFT_COUNT=0
 TOTAL_COUNT=0
 
 # ---------------------------------------------------------------------------
+# Modo --fix: além de detectar, REESCREVE as contagens divergentes para a SSOT.
+# Sem --fix o script é puramente diagnóstico (comportamento histórico).
+# ---------------------------------------------------------------------------
+FIX_MODE=0
+for _arg in "$@"; do
+  case "${_arg}" in
+    --fix) FIX_MODE=1 ;;
+  esac
+done
+FIXED_FILES=0
+declare -a FIX_LOG=()
+
+# ---------------------------------------------------------------------------
+# Escopo único do inventário — predicado COMPARTILHADO por detecção (REGRA 16)
+# e correção (--fix). Extraí-lo garante que o --fix NUNCA toque um arquivo que
+# a detecção isenta (materials/marketing, análises datadas, snapshots, a SSOT).
+# Retorna 0 (sucesso) = EXCLUIR; 1 = incluir na varredura de contagem.
+# ---------------------------------------------------------------------------
+inventory_scope_excluded() {
+  local f="$1"
+  case "${f}" in
+    */docs/analysis/*|*/.claude/sessions/*|*/docs/materials/*|*/docs/onion/inventory.md|*/validation/fixtures/*) return 0 ;;
+  esac
+  if grep -qiE '^(status:[[:space:]]*snapshot|type:[[:space:]]*(adr|evolution-backlog))' "${f}" 2>/dev/null; then
+    return 0
+  fi
+  return 1
+}
+
+# ---------------------------------------------------------------------------
 # Função auxiliar: emitir violação
 # ---------------------------------------------------------------------------
 violation() {
@@ -521,10 +551,7 @@ check_inventory_total_drift() {
   [ -n "${cmd}" ] || return
 
   while IFS= read -r -d '' f; do
-    case "${f}" in
-      */docs/analysis/*|*/.claude/sessions/*|*/docs/materials/*|*/docs/onion/inventory.md|*/validation/fixtures/*) continue ;;
-    esac
-    if grep -qiE '^(status:[[:space:]]*snapshot|type:[[:space:]]*(adr|evolution-backlog))' "${f}"; then continue; fi
+    inventory_scope_excluded "${f}" && continue
 
     # 'N comandos invocáveis' — 'invocáveis' é marcador de TOTAL (nunca por-categoria)
     while IFS= read -r n; do
@@ -533,7 +560,11 @@ check_inventory_total_drift() {
       fi
     done < <(grep -oiE '[0-9]+ comandos invocáveis' "${f}" 2>/dev/null | grep -oE '^[0-9]+')
 
-    # 'N comandos em M categorias' — frase-de-total canônica
+    # 'N comandos [...] em M categorias' — frase-de-total canônica.
+    # COBERTURA AMPLIADA: '[^.,|]*' permite qualificadores entre 'comandos' e 'em'
+    # (ex.: '86 comandos especializados organizados em 9 categorias'); '[^.,|]'
+    # barra vírgula/ponto/pipe → não atravessa frases nem casa linha de tabela.
+    # Subsume a forma estrita 'N comandos em M categorias'.
     while IFS= read -r pair; do
       [ -z "${pair}" ] && continue
       num="$(printf '%s' "${pair}" | grep -oE '^[0-9]+')"
@@ -544,7 +575,7 @@ check_inventory_total_drift() {
       if [ -n "${ct}" ] && [ "${ct}" != "${cats}" ]; then
         violation "SOFT" "${f}" "contagem de categorias divergente da SSOT: '${pair}' (esperado ${cats}) — /meta:inventory"
       fi
-    done < <(grep -oiE '[0-9]+ comandos em [0-9]+ categorias' "${f}" 2>/dev/null)
+    done < <(grep -oiE '[0-9]+ comandos[^.,|]*em [0-9]+ categorias' "${f}" 2>/dev/null)
 
     # 'N agentes ... em M categorias' — qualquer texto entre 'agentes' e 'em N categorias'
     # (de IA / especializados / IA distribuídos); o qualificador 'em N categorias' marca o total
@@ -555,6 +586,25 @@ check_inventory_total_drift() {
         violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '${pair}' (esperado ${agent}) — /meta:inventory"
       fi
     done < <(grep -oiE '[0-9]+ agentes[^.,|]*em [0-9]+ categorias' "${f}" 2>/dev/null)
+
+    # 'N agentes e/, M comandos' — frase-de-total COMBINADA (ex.: descrição do
+    # agente @onion 'conhecimento completo de 49 agentes e 84 comandos'). Valida
+    # ambos os números. GUARDA anti-tabela: linhas iniciadas por '|' são breakdown
+    # (ex.: '| 3 agentes, 3 comandos |'), não total → puladas (evita falso-positivo).
+    while IFS= read -r line; do
+      [ -z "${line}" ] && continue
+      case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
+      pair="$(printf '%s' "${line}" | grep -oiE '[0-9]+ agentes[[:space:]]*[e,][[:space:]]*[0-9]+ comandos' || true)"
+      [ -z "${pair}" ] && continue
+      num="$(printf '%s' "${pair}" | grep -oE '^[0-9]+')"
+      ct="$(printf '%s' "${pair}" | grep -oE '[0-9]+ comandos' | grep -oE '^[0-9]+')"
+      if [ -n "${num}" ] && [ "${num}" != "${agent}" ]; then
+        violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '${pair}' (esperado ${agent}) — /meta:inventory"
+      fi
+      if [ -n "${ct}" ] && [ "${ct}" != "${cmd}" ]; then
+        violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT: '${pair}' (esperado ${cmd}) — /meta:inventory"
+      fi
+    done < <(grep -iE '[0-9]+ agentes[[:space:]]*[e,][[:space:]]*[0-9]+ comandos' "${f}" 2>/dev/null)
 
     # 'N Knowledge Bases' — frase-de-total (forma curta 'KBs' é ambígua em exemplos → não usada)
     while IFS= read -r n; do
@@ -596,10 +646,80 @@ check_frontmatter_scalar_colon() {
 }
 
 # ===========================================================================
+# MODO --fix — propaga a SSOT para as frases-de-total divergentes
+#   SEGURANÇA: cada sed casa a FRASE CANÔNICA INTEIRA e o backreference reproduz
+#   as palavras-âncora (' comandos invocáveis', ' em N categorias', …). Nunca um
+#   'sed s/85/86/' cego — um número solto (ano, '9 categorias' correto) jamais é
+#   tocado. ESCOPO idêntico ao da detecção (inventory_scope_excluded). IDEMPOTENTE:
+#   se já está na SSOT, o sed reescreve para o mesmo valor → bytes idênticos.
+# ===========================================================================
+_apply_fix_file() {            # $1=arquivo  $2=programa sed -E
+  local file="$1" prog="$2"
+  local tmp; tmp="$(mktemp)"
+  sed -E "${prog}" "${file}" > "${tmp}" 2>/dev/null || { rm -f "${tmp}"; return; }
+  if ! diff -q "${file}" "${tmp}" >/dev/null 2>&1; then
+    while IFS= read -r dline; do
+      FIX_LOG+=("${file#${REPO_ROOT}/}: ${dline}")
+    done < <(diff "${file}" "${tmp}" | grep -E '^[<>]' || true)
+    cat "${tmp}" > "${file}"
+    FIXED_FILES=$(( FIXED_FILES + 1 ))
+  fi
+  rm -f "${tmp}"
+}
+
+run_inventory_fixes() {
+  local env_out cmd agent cats kb skill prog
+  env_out="$(bash "${SCRIPT_DIR}/inventory.sh" --env 2>/dev/null || true)"
+  cmd="$(printf '%s\n'   "${env_out}" | grep '^ONION_COMMANDS_TOTAL='     | cut -d= -f2)"
+  agent="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENTS_TOTAL='       | cut -d= -f2)"
+  cats="$(printf '%s\n'  "${env_out}" | grep '^ONION_COMMAND_CATEGORIES=' | cut -d= -f2)"
+  kb="$(printf '%s\n'    "${env_out}" | grep '^ONION_KBS_TOTAL='          | cut -d= -f2)"
+  skill="$(printf '%s\n' "${env_out}" | grep '^ONION_SKILLS_TOTAL='       | cut -d= -f2)"
+  [ -n "${cmd}" ] || return
+
+  # REGRA 8 — a SSOT é REGENERADA (nunca editada frase-a-frase); materializa a
+  # verdade que as frases derivam. inventory.md é isento das reescritas seguintes.
+  bash "${SCRIPT_DIR}/inventory.sh" --markdown > "${REPO_ROOT}/docs/onion/inventory.md" 2>/dev/null || true
+
+  # Mesmo conjunto de frases canônicas da detecção (REGRA 16). Frases com DUAS
+  # contagens reescrevem ambas numa só substituição (o \N preserva o miolo/cauda).
+  prog="s/[0-9]+( comandos invocáveis)/${cmd}\1/g"
+  prog="${prog}; s/([0-9]+)( comandos[^.,|]*em )([0-9]+)( categorias)/${cmd}\2${cats}\4/g"
+  prog="${prog}; s/([0-9]+)( agentes[^.,|]*em )([0-9]+)( categorias)/${agent}\2${cats}\4/g"
+  prog="${prog}; /^[[:space:]]*\|/! s/([0-9]+)( agentes[[:space:]]*[e,][[:space:]]*)([0-9]+)( comandos)/${agent}\2${cmd}\4/g"
+  prog="${prog}; s/[0-9]+( [Kk]nowledge [Bb]ases)/${kb}\1/g"
+
+  while IFS= read -r -d '' f; do
+    inventory_scope_excluded "${f}" && continue
+    _apply_fix_file "${f}" "${prog}"
+  done < <(find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
+
+  # CLAUDE.md vive na RAIZ do repo — FORA dos roots varridos (.claude/, docs/),
+  # então o loop acima NÃO o alcança (a detecção R9 cobre suas contagens, não a
+  # R16). Aplica o MESMO programa de frases canônicas + o fix de 'N skills' (forma
+  # curta, seguro só aqui: ocorrência única canônica que espelha a R9 HARD).
+  if [ -f "${REPO_ROOT}/CLAUDE.md" ]; then
+    _apply_fix_file "${REPO_ROOT}/CLAUDE.md" "${prog}; s/[0-9]+( skills)/${skill}\1/g"
+  fi
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
 echo ""
+
+if [ "${FIX_MODE}" -eq 1 ]; then
+  run_inventory_fixes
+  if [ "${FIXED_FILES}" -gt 0 ]; then
+    echo "=== --fix: ${FIXED_FILES} arquivo(s) realinhado(s) à SSOT ==="
+    for entry in "${FIX_LOG[@]}"; do echo "  ${entry}"; done
+    echo ""
+  else
+    echo "=== --fix: nenhuma frase-de-total divergente (já em sincronia) ==="
+    echo ""
+  fi
+fi
 
 check_agent_frontmatter
 check_agent_tool_names
