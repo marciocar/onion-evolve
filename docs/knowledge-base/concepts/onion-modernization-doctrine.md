@@ -143,6 +143,7 @@ A serem modernizados em iterações seguintes aplicando esta doutrina (cada um e
 
 ## 📚 Fontes e referências
 
+- Irmã: [Doutrina de Dogfooding do Onion](onion-dogfooding-doctrine.md) — modernização decide *o que* refatorar; dogfooding prova que funcionou (rodar de verdade → aprender → resolver)
 - [SDAAL — padrão de adapter](specification-driven-ai-abstraction-layer.md)
 - [Agent Fleet Orchestration — 6 padrões canônicos](agent-fleet-orchestration.md)
 - Meta-specs (constituição): [commands.md](../../meta-specs/commands.md) · [architecture.md](../../meta-specs/architecture.md) · [integrations.md](../../meta-specs/integrations.md)

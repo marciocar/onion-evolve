@@ -205,6 +205,12 @@ A formatação de descrições e comentários **muda conforme o provider ativo**
 
 ---
 
+## 🐕 Evolução do Core — Dogfood é o padrão master
+
+Toda mudança no core do Onion se valida **rodando o artefato de verdade** — não só plano/lint/spec. Aprenda com o que o uso revela e **resolva no mesmo loop** (fix → re-dogfood), testando modo-de-falha (não só happy-path) e tratando veredito de revisor/subagente como hipótese a verificar com evidência. O gate mecânico (`.claude/validation/`: lint + selftest + inventory) é o dogfood determinístico; para o resto, **invoque o artefato e observe**. Doutrina canônica (com evidência e o encaixe no loop de auto-evolução): [`docs/knowledge-base/concepts/onion-dogfooding-doctrine.md`](docs/knowledge-base/concepts/onion-dogfooding-doctrine.md).
+
+---
+
 ## 🚀 Deployment
 - Siga fluxos `/engineer/*` para desenvolvimento
 - Use feature branches para mudanças
