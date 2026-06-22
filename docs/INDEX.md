@@ -10,7 +10,7 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- 🤖 **86 comandos invocáveis** Claude Code em 9 categorias + root (+ 16 fragmentos compartilhados em `common/` e 3 READMEs)
+- 🤖 **87 comandos invocáveis** Claude Code em 9 categorias + root (+ 16 fragmentos compartilhados em `common/` e 3 READMEs)
 - 🎯 **49 agentes de IA especializados** em 9 categorias
 - 🧩 **5 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-fleet` — orquestração de frota)
 - 📚 **Knowledge Bases estruturadas** para consumo por IA
@@ -23,7 +23,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **118 arquivos markdown** em `docs/`
+- **120 arquivos markdown** em `docs/`
 - **15 arquivos** em `docs/onion/` (Sistema Onion)
 - **37 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
   - 19 arquivos em `concepts/` (Conceitos fundamentais)
@@ -37,7 +37,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **3 contextos spec-as-code** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`
 
 ### Sistema Onion (`.claude/`)
-- **86 comandos invocáveis** Claude Code distribuídos em:
+- **87 comandos invocáveis** Claude Code distribuídos em:
   - 24 em `meta/` (meta-comandos, criadores, validação, orquestração de frota, frescor de KB e de contexto, federação, adoção e co-evolução)
   - 20 em `product/` (gestão de produto e descoberta)
   - 11 em `engineer/` (engenharia e desenvolvimento)
@@ -59,8 +59,8 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **86 arquivos** de documentação markdown
-- **86 comandos invocáveis** em 9 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
+- **120 arquivos** de documentação markdown
+- **87 comandos invocáveis** em 9 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
 - **49 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
 

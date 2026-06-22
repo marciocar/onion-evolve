@@ -171,6 +171,28 @@ Checklist:
 
 ---
 
+## 📣 Após mergear mudança relevante a adotantes (anúncio flow A)
+
+O Onion tem **adotantes** que vendorizam o framework (registrados em
+[`docs/evolution/federation/members.yaml`](docs/evolution/federation/members.yaml)) e são **cegos** ao
+core — só veem o que é commitado no **próprio** `inbound/`. Por isso, mudança relevante a eles **não**
+pode depender de você lembrar de avisar: é **passo de ritual**, na granularidade de **merge** (o adotante
+vendoriza por commit, não por release).
+
+Ao mergear uma mudança que afeta adotantes (breaking, feature de core, decisão, fix que muda comportamento):
+
+1. **Registre o anúncio** no [`CHANGELOG.md`](docs/evolution/federation/CHANGELOG.md) (fluxo A), com o
+   campo `alvo:` (`<id>` · `adotantes`/`todos` · `nenhum` · `futuros adotantes`).
+2. **Gere o rascunho** com [`/meta:co-announce`](.claude/commands/meta/co-announce.md) — escreve um
+   `inbound/` pronto na staging `federation/outbox/<id>/`, endereçado via `members.yaml`.
+3. **Transporte** (maestro): copie o rascunho para o `inbound/` do adotante e commite **no repo dele**
+   (a sessão do core nunca pusha repo alheio). O hook "you have mail" o sinala (📥) na sessão do adotante.
+
+> Mudança sem impacto em adotantes (`alvo: nenhum`) → registre no CHANGELOG por auditoria; nada a transportar.
+> Para anúncio de **contrato formal** (bump semver validado), use `/meta:federation-publish` (ledger).
+
+---
+
 ## 🔗 Links úteis
 
 - [Identidade e visão geral (README)](README.md)
