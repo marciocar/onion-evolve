@@ -419,6 +419,71 @@ run_prettierignore_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo design-tokens — exercita .claude/validation/lint-design-tokens.sh.
+# Self-contained (mktemp), cobre MODOS DE FALHA: tokens válidos passam;
+# alias órfão / ciclo de referência / contraste WCAG abaixo do mínimo viram
+# HARD (exit 1); design-context ausente é gracioso (exit 0).
+# Pula se jq/awk ausentes (mesma graça do gate).
+# ---------------------------------------------------------------------------
+run_design_tokens_selftests() {
+  local gate="${REPO_ROOT}/.claude/validation/lint-design-tokens.sh"
+  if [ ! -f "${gate}" ]; then record_fail "design-tokens" "gate ausente: ${gate}"; return; fi
+  if ! command -v jq >/dev/null 2>&1 || ! command -v awk >/dev/null 2>&1; then
+    record_pass "design-tokens (skip: jq/awk ausente)"; return
+  fi
+  local d rc
+  local mkdc # cria docs/design-context com 1 arquivo de tokens + pares de contraste
+  mkdc() { local base="$1"; mkdir -p "${base}/docs/design-context/semantic" "${base}/docs/design-context/governance"; }
+
+  # (a) tokens válidos (alias resolve, contraste alto) → exit 0
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.text","bg":"color.paper","min":4.5,"note":"ok"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "design-tokens: válidos passam"
+  else record_fail "design-tokens: válidos" "esperava exit 0, veio ${rc}"; fi
+  rm -rf "${d}"
+
+  # (b) alias órfão → HARD (exit 1)
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"$type":"color","x":{"$value":"{color.nope}"}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ]; then record_pass "design-tokens: alias órfão → HARD"
+  else record_fail "design-tokens: órfão" "esperava exit 1, veio ${rc}"; fi
+  rm -rf "${d}"
+
+  # (c) ciclo de referência → HARD
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"$type":"color","a":{"$value":"{color.b}"},"b":{"$value":"{color.a}"}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ]; then record_pass "design-tokens: ciclo → HARD"
+  else record_fail "design-tokens: ciclo" "esperava exit 1, veio ${rc}"; fi
+  rm -rf "${d}"
+
+  # (d) contraste WCAG abaixo do mínimo → HARD
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"$type":"color","fg":{"$value":"#999999"},"bg":{"$value":"#FFFFFF"}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.fg","bg":"color.bg","min":4.5,"note":"cinza fraco"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ]; then record_pass "design-tokens: contraste baixo → HARD"
+  else record_fail "design-tokens: contraste" "esperava exit 1, veio ${rc}"; fi
+  rm -rf "${d}"
+
+  # (e) design-context ausente → gracioso (exit 0)
+  d="$(mktemp -d)"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "design-tokens: contexto ausente → gracioso"
+  else record_fail "design-tokens: ausente" "esperava exit 0, veio ${rc}"; fi
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -443,6 +508,9 @@ run_resolve_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
+
+# Modo design-tokens — idem (cenários self-contained, sem fixture-file).
+run_design_tokens_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário

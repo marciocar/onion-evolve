@@ -1,0 +1,27 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$description": "Semantic / papéis de cor — referenciam foundations por {alias}. Camada 1 da cascata. É aqui que componentes e geração devem consumir (nunca o primitivo cru). W3C DTCG.",
+  "color": {
+    "$type": "color",
+    "surface": {
+      "base":    { "$value": "{color.neutral.0}",   "$description": "Fundo da página" },
+      "subtle":  { "$value": "{color.neutral.50}",  "$description": "Fundo secundário/cards" },
+      "muted":   { "$value": "{color.neutral.100}" }
+    },
+    "on-surface": {
+      "strong":  { "$value": "{color.neutral.900}", "$description": "Texto principal" },
+      "muted":   { "$value": "{color.neutral.700}", "$description": "Texto secundário" }
+    },
+    "action": {
+      "primary":    { "$value": "{color.brand.orange}", "$description": "CTA primário — laranja Onion" },
+      "on-primary": { "$value": "{color.neutral.0}",     "$description": "Texto sobre action.primary" },
+      "accent":     { "$value": "{color.brand.purple}",  "$description": "Acento/destaque — roxo família" }
+    },
+    "feedback": {
+      "success": { "$value": "{color.green.500}" },
+      "info":    { "$value": "{color.blue.500}" },
+      "danger":  { "$value": "{color.red.500}" },
+      "warning": { "$value": "{color.amber.500}" }
+    }
+  }
+}
