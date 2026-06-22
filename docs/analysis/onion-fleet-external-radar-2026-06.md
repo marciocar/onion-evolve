@@ -121,10 +121,13 @@ só se/quando o gargalo real for outro (ver §4 TOPO).
   do panel via mixing depth). Recomendação: **adotar qualitativo já** (explica/justifica o que o Onion
   faz), **calibração quantitativa fica no radar**. *Gatilho:* se quisermos critérios de aceite
   **numéricos** p/ judge-panel ou calibrar `N_max` por modelo.
-- **PROTO-A2A (coordenação horizontal IA↔IA)** — choca de frente com o modelo de co-evolução do Onion:
-  **git-async + humano-maestro, sem IA-fala-IA**. Não cabe agora. *Gatilho:* se/quando a **federação
-  formal** graduar (ver RFC-0001 §gatilho) e exigir coordenação viva entre repos. MCP (vertical) **já é
-  adotado** como transporte opcional.
+- **PROTO-A2A (coordenação horizontal IA↔IA)** — **já ADJUDICADO** (aprofundado 2026-06-21, ver
+  [nota de reconciliação](./onion-a2a-federation-reconcile-2026-06.md)). SSOT =
+  [ADR A2A](./onion-federation-adr-a2a-format-interop-2026-06.md) (aceito 2026-06-15): **runtime A2A =
+  linha vermelha** (git-async + maestro, sem IA-fala-IA); **formato A2A** (Agent Card one-way) permitido
+  mas **diferido**. O Onion está **à frente** do sinal externo (que tratou A2A como monólito). *Gatilho
+  preciso (do ADR):* 1º consumer não-Onion OU interop real nomeada — **não disparou** (só consumidor
+  Onion hoje). MCP (vertical) **já é** transporte opcional.
 - **CTX-vocabulário (Write/Select/Compress/Isolate) + "context folding"** — o Onion já faz isolamento;
   adotar o vocabulário canônico pode enriquecer a KB de frota/contexto. *Gatilho:* refresh da KB.
 
@@ -166,6 +169,10 @@ avaliar os 🟡 quando seus gatilhos dispararem. Antes de mover qualquer 🟡 pa
   [nota de transição de fase](./onion-fleet-math-phase-transition-2026-06.md): paper **verificado**
   (arXiv:2601.17311); modela o judge-panel (binário+maioria), não o fan-out geral. Item MATH de §4
   atualizado (não-verificado → verificado+mapeado).
+- **2026-06-21** — Eixo A2A aprofundado na
+  [nota de reconciliação](./onion-a2a-federation-reconcile-2026-06.md): **já adjudicado** pelo ADR A2A
+  (SSOT); Onion à frente do sinal. **Radar percorrido nos 3 eixos** (TOPO/MATH/A2A) — todos tratados,
+  nenhum virou adoção cega. Radar segue vivo para quando algum gatilho disparar.
 
 ## Fontes
 
