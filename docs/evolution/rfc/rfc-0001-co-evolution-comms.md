@@ -60,5 +60,5 @@ a cópia no `rhilo-metagamify` passa a ser **referência/resposta**.
 
 ## 6. Em aberto
 
-- **RFC-0002:** veredito da doutrina catálogo-first contra o `.claude/` real (adiado por decisão do dono).
+- ~~**RFC-0002:** veredito da doutrina catálogo-first contra o `.claude/` real.~~ ✅ **Entregue (2026-06-22)** — ver [rfc-0002-meta-strategy-verdict.md](rfc-0002-meta-strategy-verdict.md).
 - Automatizar a cópia `inbox` derivado→core (hoje manual/maestro) — só quando a Federação plena ligar.
