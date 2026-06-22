@@ -35,10 +35,12 @@ proposta de "persona orquestradora" + matemática de dimensionamento de árvore)
    parte das "propostas" é **re-derivação independente** do que o Onion já especifica — o que vale
    como **validação externa**, não como trabalho novo. É o mesmo padrão do sinal HeyClicky
    ([_processed](../evolution/inbox/_processed/2026-06-20-heyclicky-model-routing-signal.md)).
-2. **A matemática não foi verificada.** O **Efeito Ringelmann** (Max Ringelmann, 1913) é real e bem
-   documentado. Já o paper citado — *"Phase Transition for Budgeted Multi-Agent Synergy"* (jan/2026) —
-   e seus números (β, γ(m), ρ, W; `N ≈ W/m`; `N = b^L`; `α_ρ > 1`; `s > β`) **não foram conferidos por
-   mim**. Entram aqui como **hipótese/lente conceitual**, não como teorema estabelecido.
+2. **A matemática (atualizado 2026-06-21: VERIFICADA).** O **Efeito Ringelmann** (Max Ringelmann, 1913)
+   é real e bem documentado. O paper citado — *"Phase Transition for Budgeted Multi-Agent Synergy"* —
+   **foi verificado**: arXiv:2601.17311 (Liu, Kong, Pei, jan/2026); fórmulas conferidas e aprofundadas
+   na [nota dedicada](./onion-fleet-math-phase-transition-2026-06.md). Ressalva que permanece: a teoria
+   é **escopada a tarefa binária + voto por maioria** (modela o judge-panel, não o fan-out geral), e
+   `β, γ, ρ` são parâmetros empíricos não medidos no Onion → lente qualitativa, não calculadora.
 3. **Métricas de mercado são direcionais.** "15× tokens", "29–39% de ganho de context engineering",
    "A2A em 150+ orgs", "ADK 1.0 GA", composição da AAIF — plausíveis e úteis como direção, mas
    **não verificados**; tratar como contexto, não como fato fechado.
@@ -112,10 +114,13 @@ só se/quando o gargalo real for outro (ver §4 TOPO).
   **sob gatilho**: só quando a síntese exige LLM sobre conjunto que estoura 1 agente (senão o fan-in JS
   0-token vence). *Gatilho:* esse caso real de síntese-por-LLM ocorrer → aplicar o padrão "nó
   sumarizador" do ADR (compactação por nó `b·m ≤ W`).
-- **MATH — formalização (α_ρ>1, s>β, mixing depth)** — lente quantitativa para o que o `onion-fleet`
-  hoje decide por heurística. Valor potencial: **critérios de aceite testáveis** e calibração empírica
-  de `N_max` por modelo/tamanho de resumo. *Gatilho:* se quisermos medir/justificar dimensionamento com
-  número (não só regra de bolso) **e** após verificar a existência/validade do paper.
+- **MATH — formalização (α_ρ>1, s>β, mixing depth)** — **paper VERIFICADO** em 2026-06-21
+  (arXiv:2601.17311) e aprofundado na [nota dedicada](./onion-fleet-math-phase-transition-2026-06.md):
+  a teoria modela **precisamente o judge-panel** (tarefa binária + voto), não o fan-out geral. Dela saem
+  3 lentes (diversidade do panel = requisito de correção via α_ρ · gate `s>β` orquestrar-ou-não · teto
+  do panel via mixing depth). Recomendação: **adotar qualitativo já** (explica/justifica o que o Onion
+  faz), **calibração quantitativa fica no radar**. *Gatilho:* se quisermos critérios de aceite
+  **numéricos** p/ judge-panel ou calibrar `N_max` por modelo.
 - **PROTO-A2A (coordenação horizontal IA↔IA)** — choca de frente com o modelo de co-evolução do Onion:
   **git-async + humano-maestro, sem IA-fala-IA**. Não cabe agora. *Gatilho:* se/quando a **federação
   formal** graduar (ver RFC-0001 §gatilho) e exigir coordenação viva entre repos. MCP (vertical) **já é
@@ -157,6 +162,10 @@ avaliar os 🟡 quando seus gatilhos dispararem. Antes de mover qualquer 🟡 pa
 - **2026-06-21** — Eixo TOPO aprofundado no
   [ADR-rascunho de topologia](./onion-fleet-topology-adr-draft-2026-06-21.md): desambígua *locus*
   (invariante) × *forma de grafo* (árvore sob gatilho, no nível principal). Item TOPO de §4 atualizado.
+- **2026-06-21** — Eixo MATH aprofundado na
+  [nota de transição de fase](./onion-fleet-math-phase-transition-2026-06.md): paper **verificado**
+  (arXiv:2601.17311); modela o judge-panel (binário+maioria), não o fan-out geral. Item MATH de §4
+  atualizado (não-verificado → verificado+mapeado).
 
 ## Fontes
 
