@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **34 arquivos** de knowledge base (exceto `index.md`)
-- **16** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/`
+- **36 arquivos** de knowledge base (exceto `index.md`)
+- **18** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/`
 
 ---
 
@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/          # 16 — Conceitos fundamentais
+├── concepts/          # 18 — Conceitos fundamentais
 ├── frameworks/        # 8  — Frameworks e metodologias
 ├── tools/             # 4  — Ferramentas e recursos
 ├── platforms/         # 2  — Plataformas e tecnologias
@@ -28,7 +28,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (16)
+## 🧠 Conceitos Fundamentais (18)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Fleet Orchestration](concepts/agent-fleet-orchestration.md) — orquestração de frota: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
@@ -37,9 +37,11 @@ docs/knowledge-base/
 - [Configuration Management](concepts/configuration-management.md) — gestão de configurações e secrets
 - [Consolidated to Tasks Patterns](concepts/consolidated-to-tasks-patterns.md) — transformação de conhecimento consolidado em tasks
 - [Context Window Optimization](concepts/context-window-optimization.md) — otimização de contexto, prompt caching e custo multi-agente
+- [Domain Context Lifecycle](concepts/domain-context-lifecycle.md) — contexto de domínio como SSOT viva (CRUD+), não snapshot; fundamenta a regra L0 e o ciclo *Manage*
 - [Identificar e Precificar Dor do Cliente](concepts/identificar-precificar-dor-cliente.md) — metodologias de produto
 - [Meeting Transcription to Knowledge Base](concepts/meeting-transcription-to-knowledge-base.md) — framework EXTRACT
 - [Multi-repo Federation](concepts/multi-repo-federation.md) — contratos spec-as-code + ledger git (topologia peer)
+- [Onion Dogfooding Doctrine](concepts/onion-dogfooding-doctrine.md) — padrão master de evolução: rodar de verdade → aprender → resolver (fix → re-dogfood)
 - [Onion Modernization Doctrine](concepts/onion-modernization-doctrine.md) — regra de inventário/SSOT e doutrina de modernização
 - [Spec-as-Code Strategy](concepts/spec-as-code-strategy.md) — hierarquia de especificações (L0-L3)
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA

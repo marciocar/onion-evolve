@@ -163,6 +163,15 @@ done
 3. Verificar limite de 500 linhas
 4. Validar `paths` glob se especificado
 
+### Antes de mesclar no core (dogfood — padrão master)
+1. **Rodar o artefato de verdade**, não só validar no papel: invocar o comando/skill, executar
+   o script num caso real. Lint verde ≠ pronto.
+2. **Testar o modo de falha** (input ausente, recurso já existe, retomada, colisão), não só o
+   happy-path.
+3. **Fechar o loop**: todo fix é **re-dogfoodado** (o fix pode regredir).
+4. Gate mecânico: `lint-artifacts.sh` + `lint-selftest.sh`; se mudou contagens, `/meta:inventory`.
+5. Doutrina: `docs/knowledge-base/concepts/onion-dogfooding-doctrine.md`.
+
 ## Fallback para falhas de validação
 
 ```

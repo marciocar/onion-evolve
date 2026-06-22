@@ -147,6 +147,13 @@ Tipos: `feat`, `fix`, `docs`, `refactor`, `chore`, `test`, `style`, `perf`.
 
 Antes de abrir o PR:
 
+- **Dogfood (padrão master)** — **rode o artefato alterado de verdade**, não só lint/spec:
+  invoque o comando/skill, execute o script num caso real, teste o **modo de falha** (não só
+  o happy-path) e resolva findings no **mesmo loop** (fix → re-dogfood). Doutrina:
+  [`onion-dogfooding-doctrine.md`](docs/knowledge-base/concepts/onion-dogfooding-doctrine.md).
+- Gate mecânico (o dogfood determinístico): `bash .claude/validation/lint-artifacts.sh` e,
+  ao mexer em guardas/validação, `bash .claude/validation/lint-selftest.sh`. Se mudou
+  contagens (comandos/agentes/skills/KBs), rode `/meta:inventory`.
 - `/validate/workflow` — completude de workflows.
 - Skills `onion-validation` e `onion-patterns` — conformidade de artefatos
   (YAML, categorias, limites de tamanho, naming).
@@ -155,6 +162,7 @@ Antes de abrir o PR:
 
 Checklist:
 
+- [ ] **Dogfoodado**: artefato alterado rodado de verdade; modo-de-falha exercitado; loop fechado.
 - [ ] Segue as meta-specs aplicáveis.
 - [ ] Frontmatter YAML correto.
 - [ ] Dentro dos limites de tamanho (ou refatorado com extração para KB).
