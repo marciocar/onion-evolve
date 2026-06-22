@@ -88,13 +88,17 @@ origin: sessão de co-evolução (inbox triage + /meta:adopt --update fix #99)
 
 ### 🔴 Gap de processo (reconfirmado em campo)
 
-6. **Anúncio flow A "nunca operado ponta-a-ponta" — confirmado pelo a0fdf35.** A **capacidade** existe
-   (`inbound/` + relatório auto-emitido + you-have-mail, #116/2026-06-20), mas o delta a0fdf35 chegou ao
-   adotante **sem anúncio** — puxado por `--update` cego. É gap de **processo**, não de capacidade: a
-   federação ainda não *exerce* o `/meta:federation-publish` ao shipar um delta relevante. **Este ciclo
-   de triagem (2 respostas empurradas ao `inbound/`) é a primeira operação prática do flow A** — move o
-   blip #1 de `assess` rumo a `trial`. Pendência: tornar o anúncio parte do ritual de release do core
-   (não só capacidade disponível). Relacionado ao RFC-0002 e ao item #4.
+6. ✅ **ENTREGUE — Anúncio flow A vira passo de ritual.** Era gap de **processo**, não de capacidade
+   (`inbound/` + relatório auto-emitido + you-have-mail já existiam, #116): a federação não *exercia* o
+   anúncio ao shipar — dependia de o humano lembrar. **Fix:** comando produtor [`/meta:co-announce`](../../.claude/commands/meta/co-announce.md)
+   (gera o `inbound/` pronto na staging `federation/outbox/<id>/` a partir de uma entrada do CHANGELOG,
+   resolvendo `alvo:` via `members.yaml`) + ritual documentado no `CONTRIBUTING.md` (passo pós-merge,
+   granularidade de **merge** — não release, pois o adotante vendoriza por commit). Human-in-the-loop
+   preservado (core gera/endereça; maestro transporta). **Eixo corrigido pela diligência:** o lar do
+   anúncio leve é o **doc-bridge** (`inbound/`), não o `/meta:federation-publish` (ledger de contratos,
+   federação formal) como a redação original sugeria. **Dogfood pegou** o parsing de `alvo:` com anotação
+   entre parênteses (`nenhum (informativo...)`) que o happy-path escondia. Move o blip #1 de `assess` → `trial`.
+   **Resíduo:** transporte segue manual por design (regra um-escritor-por-repo) — automação cross-repo não existe.
 
 ## Dívida técnica transversal
 

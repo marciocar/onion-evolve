@@ -52,7 +52,9 @@ Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente →
 
 **Se CORE (`onion-evolve`):**
 - **Ler o inbox** = sinal de campo dos projetos; triar (vira fix/feature/backlog).
-- **Anunciar** mudança relevante aos projetos no `docs/evolution/federation/CHANGELOG.md` (fluxo A).
+- **Anunciar** mudança relevante aos projetos no `docs/evolution/federation/CHANGELOG.md` (fluxo A) e
+  **gerar o anúncio pronto-para-transportar** com [`/meta:co-announce`](co-announce.md) (produtor do
+  doc-bridge: escreve na staging `federation/outbox/<id>/`; o maestro transporta ao `inbound/` do adotante).
 - **Registro** de quem adota: `docs/evolution/federation/members.yaml`.
 
 ## Passo 4 — Regras invariantes (sempre, qualquer papel)
