@@ -61,15 +61,14 @@ origin: sessão de co-evolução (inbox triage + /meta:adopt --update fix #99)
 
 ### 🔴 Decisão estratégica (pede pensamento, não execução)
 
-4. **RFC-0002 — veredito profundo da camada de meta-estratégia.** O `rhilo-metagamify` enviou (fluxo B,
-   doc-bridge) um **ack** ao handoff `onion-strategy-layer-handoff-2026-06-17.md` — mensagem
-   `2026-06-17-veredito-strategy-layer.md`, `status: ack (veredito profundo pendente — RFC-0002)`. O core
-   **deve** produzir o RFC-0002 em resposta; nunca foi escrito. É o único item que pede *design*, não
-   mecânica. Enquanto pendente, o sinal **permanece corretamente no inbox** (não processar sinal
-   não-endereçado).
-   - ⚠️ **Higiene:** há um move desse arquivo para `_processed/` **não-commitado no working tree local** (de
-     sessão anterior) — prematuro. Na `main` o sinal segue no inbox (correto). Resolução do maestro quando
-     for commitar o working tree: descartar esse move até o RFC-0002 existir.
+4. ✅ **ENTREGUE (2026-06-22) — RFC-0002, veredito profundo da camada de meta-estratégia.** O core escreveu
+   [`rfc-0002-meta-strategy-verdict.md`](../evolution/rfc/rfc-0002-meta-strategy-verdict.md) em resposta ao
+   ack `2026-06-17-veredito-strategy-layer.md`. **Veredito:** catálogo-first **aceito como doutrina**
+   (materialização diferida — estender `onion-patterns`; blip #9→trial); reposicionamento **ratificado** via
+   distribuição por camadas (ADR FASE-0 + BSL = follow-up; blip #10→adopt). Volta ao adotante por fluxo A
+   (CHANGELOG + `/meta:co-announce`) para mover os blips no radar dele.
+   - ✅ **Coerência resolvida:** o sinal está em `inbox/_processed/` — com o RFC-0002 existindo, o
+     arquivamento agora é **legítimo** (o veredito foi dado). O flag de "move prematuro" fica encerrado.
 
 ## Adendo 2026-06-22 — triagem de 2 sinais do `rhilo-metagamify` (fluxo B)
 
