@@ -71,6 +71,32 @@ origin: sessão de co-evolução (inbox triage + /meta:adopt --update fix #99)
      sessão anterior) — prematuro. Na `main` o sinal segue no inbox (correto). Resolução do maestro quando
      for commitar o working tree: descartar esse move até o RFC-0002 existir.
 
+## Adendo 2026-06-22 — triagem de 2 sinais do `rhilo-metagamify` (fluxo B)
+
+> Triados na sessão de co-evolução de 2026-06-22 (CHANGELOG 2026-06-22, duas entradas). Respostas
+> empurradas ao `inbound/` do adotante; sinais movidos para `inbox/_processed/` do core.
+
+### 🟡 Decisão de apetite
+
+5. **Diretriz canônica de "decision snapshot" (retenção + payload mínimo).** Sinal de campo: o adotante
+   inflou o banco gravando o **pool inteiro de candidatos** por decisão, sem retenção. **Veredito já dado:
+   DIVIDIR** — impl é local (autorizado), mas a **diretriz é lacuna real do framework**: a doutrina
+   spec-as-code / rastreabilidade atômica nunca especificou política de retenção nem teto de payload.
+   **Trabalho no core:** rascunhar um princípio canônico — *"snapshot de rastreabilidade declara política
+   de retenção + payload mínimo (selecionado + top-N rejeitados, não o universo); frio → arquiva/comprime"*
+   — como KB concept (candidato a `concepts/`) ou adendo de meta-spec. Quadrante MET. Sem dependência;
+   pode esperar o adotante devolver um formato de "snapshot mínimo" que generalize (insumo da diretriz).
+
+### 🔴 Gap de processo (reconfirmado em campo)
+
+6. **Anúncio flow A "nunca operado ponta-a-ponta" — confirmado pelo a0fdf35.** A **capacidade** existe
+   (`inbound/` + relatório auto-emitido + you-have-mail, #116/2026-06-20), mas o delta a0fdf35 chegou ao
+   adotante **sem anúncio** — puxado por `--update` cego. É gap de **processo**, não de capacidade: a
+   federação ainda não *exerce* o `/meta:federation-publish` ao shipar um delta relevante. **Este ciclo
+   de triagem (2 respostas empurradas ao `inbound/`) é a primeira operação prática do flow A** — move o
+   blip #1 de `assess` rumo a `trial`. Pendência: tornar o anúncio parte do ritual de release do core
+   (não só capacidade disponível). Relacionado ao RFC-0002 e ao item #4.
+
 ## Dívida técnica transversal
 
 - **`/meta:adopt --update` sem teste ponta-a-ponta automatizado.** O `kind=merge` cobre o *merge isolado*
