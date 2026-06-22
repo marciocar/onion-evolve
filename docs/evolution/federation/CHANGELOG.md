@@ -8,6 +8,18 @@
 
 ---
 
+## 2026-06-22 · Veredito: diretriz de retenção do *decision-snapshot* é candidata de framework (impl é local) · COMPATÍVEL · alvo: rhilo-metagamify (informativo p/ demais)
+
+- **Sinal de campo do `rhilo-metagamify`:** o padrão "decision snapshot" (rastreabilidade atômica, herdado da doutrina spec-as-code/SDAAL) inflou o banco do adotante (32MB→86MB/semana) — cada decisão grava o **pool inteiro de candidatos** (~79KB/linha), **sem retenção nem teto de payload**.
+- **Veredito (roteamento): DIVIDIR.** A *implementação* (poda por janela, payload mínimo = selecionado + top-N, TOAST/arquivamento) é **engenharia local** do adotante — DB/volume-específica; autorizado a rascunhar já. A *diretriz* é **lacuna doutrinária real** do framework: a doutrina de rastreabilidade nunca especificou retenção nem payload mínimo. Registrado candidato (quadrante MET) no backlog de co-evolução.
+- **Ação p/ adotantes: nenhuma obrigatória.** Quem usa rastreabilidade atômica deve declarar política de retenção localmente até a diretriz graduar (KB/meta-spec). Resposta empurrada ao `inbound/` do adotante. Sinal triado em [`../inbox/_processed/2026-06-19-consulta-retencao-decision-snapshot.md`](../inbox/_processed/2026-06-19-consulta-retencao-decision-snapshot.md).
+
+## 2026-06-22 · Confirmação de protocolo: o core trata o adotante como **cego** (anúncio explícito obrigatório) · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Sinal de campo (adoção a0fdf35, vendorizado):** aplicou limpo (16 arquivos, sem conflito/segredo), mas **o anúncio flow A não operou** — o delta chegou por `--update` deliberado e cego, sem o core deixar mensagem no `inbound/`.
+- **Resposta:** (1) a reescrita do `gitflow-patterns.md` foi **intencional** (refactor `1ca200c`, motor GitFlow consolidado na KB) — não efeito colateral; (2) **sim**, o protocolo já trata o adotante como cego — a capacidade existe (`inbound/` + relatório auto-emitido + you-have-mail bidirecional, anúncio de 2026-06-20). O a0fdf35 expôs **gap de processo, não de capacidade**: a capacidade não foi *exercida* naquele delta.
+- **Ação p/ adotantes: nenhuma.** Gap de processo (operar o anúncio flow A ponta-a-ponta) registrado no backlog. Resposta empurrada ao `inbound/` do adotante. Sinal em [`../inbox/_processed/2026-06-19-sinal-adocao-a0fdf35.md`](../inbox/_processed/2026-06-19-sinal-adocao-a0fdf35.md).
+
 ## 2026-06-21 · Decisão: **não adotar** roteamento dinâmico de tier em runtime (sinal HeyClicky) · COMPATÍVEL · alvo: nenhum (informativo, sem ação)
 
 - **Decisão de governança, não mudança de framework.** Avaliado o micro-delta do sinal de mercado HeyClicky (YC S26): escolher o tier do modelo **dinamicamente em runtime** (router de 1ª camada por tarefa) vs. o padrão atual do Onion — tier **fixado na autoria** (quem escreve o grafo define `model` por agente/fase na Workflow).
