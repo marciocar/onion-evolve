@@ -15,7 +15,7 @@ members:
     name: rhilo-metagamify (MetaGamify)
     role: consumer            # projeto que adota o Onion (modo standalone, vendorizado)
     remote: github.com/marciocar/metagamify
-    onion_version: a0fdf35fef03   # pin atual (espelha .claude/.onion-version do projeto, sync 2026-06-19)
+    onion_version: 06f7232fe861   # pin atual (espelha .claude/.onion-version do projeto, sync 2026-06-22 via sinal PR #62)
     adopted_at: 2026-06-17
     mode: legacy              # greenfield | legacy | regulated
 

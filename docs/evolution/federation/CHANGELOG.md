@@ -8,6 +8,17 @@
 
 ---
 
+## 2026-06-22 · Delta `06f7232` (anúncio retroativo) + proteção de vendor contra formatador no `/meta:adopt` · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Anúncio retroativo do delta `06f7232` (de `a0fdf35`).** Você adotou este delta via `/meta:adopt --update` (seu PR #62, merge `18479ce`) **antes** de o core deixar o anúncio flow A — o laço que você mesmo sinalizou (3ª reincidência). Eis a classificação do que entrou (superfície vendorizada, ~29 arquivos):
+  - **Comandos novos:** `/catch-up` (briefing de retomada por sinais duráveis) e `/meta:co-announce` (este produtor de flow A).
+  - **Lint reforçado (HARD):** regras **r16** (count-drift do inventário), **r17** (guarda do `:` em frontmatter YAML), **r18** (proíbe a árvore não-padrão `.claude/docs/`); novas fixtures + `lint-selftest`. O delta **remove** `.claude/docs/` e move os utils C4 para `.claude/utils/`.
+  - **Self-heal de inventário** (`lint --fix`) + `inventory.sh` ajustado.
+  - **KBs novas:** `decision-snapshot-retention` (resposta à sua consulta) e `onion-dogfooding-doctrine`.
+  - **Canal flow A (`inbound/`) + you-have-mail bidirecional** já presentes neste delta (#116).
+- **Resposta ao seu sinal de prettier (causa raiz do drift do SSOT — 3ª reincidência, agora com fail HARD de CI).** Achado **aceito**: o `/meta:adopt` copia `docs/knowledge-base/`, `docs/meta-specs/`, `docs/sdaal/` e **gera** o SSOT `docs/onion/inventory.md`, mas **não provisiona** a proteção de formatação correspondente — então um adotante com formatador + pre-commit hook reformata o SSOT e quebra o lint HARD (`check_inventory_sync`), em laço vicioso. **Decisão:** o Procedimento de Configuração pós-cópia (install + `--update`) passará a **provisionar/mesclar (never-clobber) um `.prettierignore`** cobrindo TODOS os paths que o manifesto escreve no alvo, incluindo explicitamente o SSOT `docs/onion/inventory.md`. Rastreado como item de backlog do `/meta:adopt`. O core **não adota prettier** — só provisiona a proteção (generaliza p/ prettier/dprint/biome).
+- **Ação p/ você:** nenhuma obrigatória. Seu fix local (`docs/knowledge-base/` + `docs/onion/inventory.md` no `.prettierignore`) está correto e continua válido; quando a proteção graduar no `/meta:adopt`, o `--update` a mesclará idempotente (never-clobber não toca no seu `.prettierignore`). Sinal triado em [`../inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md`](../inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md).
+
 ## 2026-06-22 · RFC-0002 — veredito da camada de meta-estratégia (catálogo-first + reposicionamento) · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Veredito profundo entregue.** Em resposta ao seu ack de 2026-06-17 (`veredito profundo pendente — RFC-0002`), o core escreveu [`rfc-0002-meta-strategy-verdict.md`](../rfc/rfc-0002-meta-strategy-verdict.md).
