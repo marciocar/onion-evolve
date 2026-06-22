@@ -78,14 +78,13 @@ origin: sessão de co-evolução (inbox triage + /meta:adopt --update fix #99)
 
 ### 🟡 Decisão de apetite
 
-5. **Diretriz canônica de "decision snapshot" (retenção + payload mínimo).** Sinal de campo: o adotante
-   inflou o banco gravando o **pool inteiro de candidatos** por decisão, sem retenção. **Veredito já dado:
-   DIVIDIR** — impl é local (autorizado), mas a **diretriz é lacuna real do framework**: a doutrina
-   spec-as-code / rastreabilidade atômica nunca especificou política de retenção nem teto de payload.
-   **Trabalho no core:** rascunhar um princípio canônico — *"snapshot de rastreabilidade declara política
-   de retenção + payload mínimo (selecionado + top-N rejeitados, não o universo); frio → arquiva/comprime"*
-   — como KB concept (candidato a `concepts/`) ou adendo de meta-spec. Quadrante MET. Sem dependência;
-   pode esperar o adotante devolver um formato de "snapshot mínimo" que generalize (insumo da diretriz).
+5. ✅ **ENTREGUE — Diretriz canônica de "decision snapshot" (retenção + payload mínimo).** Sinal de campo: o
+   adotante inflou o banco gravando o **pool inteiro de candidatos** por decisão, sem retenção. Veredito:
+   **DIVIDIR** — impl é local (autorizado), e a **diretriz é lacuna real do framework** (a doutrina
+   spec-as-code / rastreabilidade atômica nunca especificou retenção nem teto de payload). A diretriz
+   nasceu como KB concept: [`concepts/decision-snapshot-retention.md`](../knowledge-base/concepts/decision-snapshot-retention.md)
+   (3 regras: payload mínimo · retenção declarada · frio→arquiva; + fronteira diretriz×impl). Quadrante MET.
+   **Resíduo:** v2 quando o adotante devolver um formato de "snapshot mínimo" que generalize (insumo de campo).
 
 ### 🔴 Gap de processo (reconfirmado em campo)
 

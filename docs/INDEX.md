@@ -23,10 +23,10 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **115 arquivos markdown** em `docs/`
+- **118 arquivos markdown** em `docs/`
 - **15 arquivos** em `docs/onion/` (Sistema Onion)
-- **36 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
-  - 18 arquivos em `concepts/` (Conceitos fundamentais)
+- **37 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
+  - 19 arquivos em `concepts/` (Conceitos fundamentais)
   - 8 arquivos em `frameworks/` (Frameworks e metodologias)
   - 4 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
   - 2 em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
