@@ -8,7 +8,7 @@ Este guia documenta todos os comandos disponíveis no sistema `.claude/`, organi
 
 > **Contagens canônicas por categoria e total:** [docs/onion/inventory.md](inventory.md) — **SSOT gerada do filesystem** (`/meta:inventory`), validada no CI. Este guia descreve os comandos; os números vivem na SSOT para nunca drifarem.
 
-Categorias: `product/`, `meta/`, `docs/`, `engineer/`, `git/`, `validate/`, `test/`, `development/`, `quick/` + root (`onion`, `warm-up`).
+Categorias: `product/`, `meta/`, `docs/`, `engineer/`, `git/`, `validate/`, `test/`, `development/`, `quick/` + root (`onion`, `warm-up`, `catch-up`).
 
 ### Convenções de Nomenclatura
 
@@ -605,6 +605,11 @@ feature/user-auth ← nova branch
 **Propósito**: Aquecimento geral do sistema  
 **Input**: Contexto geral  
 **Integração ClickUp**: ✅ Valida conectividade
+
+### `/catch-up`
+**Propósito**: Briefing de retomada — reconstrói "onde paramos" de sinais duráveis (git recente, sessão ACTIVE, memória, inbox) após queda/saída de sessão. Irmão do `/warm-up` (que carrega contexto do projeto; o catch-up reconstrói sua última atividade)  
+**Input**: Nenhum  
+**Integração ClickUp**: ➖ Read-only / orientação
 
 ---
 
