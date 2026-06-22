@@ -2,7 +2,7 @@
 title: "ADR (RASCUNHO) — Topologia de frota: locus plano (invariante) × forma de grafo (escalável sob gatilho)"
 date: 2026-06-21
 type: adr-draft
-status: proposed
+status: accepted
 decision-scope: agent-fleet-orchestration / topology
 supersedes: none
 related:
@@ -19,17 +19,18 @@ related:
 |-------|-------|
 | **Decisão** | Separar dois eixos que costumam ser confundidos: o **locus da orquestração** (sempre no nível principal — invariante) e a **forma do grafo de agentes** (plano por padrão, **árvore com nós sumarizadores sob gatilho**). Topologia hierárquica é uma decisão de **forma de grafo composta no nível principal**, **não** a criação de um orquestrador aninhado. |
 | **Escopo** | `agent-fleet-orchestration` / topologia / skill `onion-fleet` + `/meta:fleet` |
-| **Status** | 🟡 **Proposto** em 2026-06-21. Parte doutrinária (a desambiguação) é a decisão; a documentação do padrão "nó sumarizador" na KB/skill fica **diferida** até aceite (ver Gatilho de Implementação). |
+| **Status** | 🟢 **Aceito** em 2026-06-22 (proposto em 2026-06-21). Parte doutrinária (a desambiguação) é a decisão **vigente**; a documentação do padrão "nó sumarizador" na KB/skill fica **diferida** até um caso real bater o gatilho (ver Gatilho de Implementação). Revisão prevista (acordada com o maestro no aceite). |
 | **Origem** | Item 🟡 TOPO do [radar de frota](./onion-fleet-external-radar-2026-06.md) — sinal externo (Ringelmann + paper de transição de fase) trazido pelo maestro. |
 
 ---
 
 ## Status
 
-🟡 **Proposto (doutrinário) — 2026-06-21.** O ADR **reafirma** a invariante de locus (`architecture.md
-§4.2`) e **acrescenta** uma distinção que hoje falta na doutrina. Nenhuma meta-spec atual governa
-"frota plana vs. hierárquica" — este é o gap que o ADR fecha. Implementação (texto novo na KB/skill)
-diferida até aceite.
+🟢 **Aceito (doutrinário) — 2026-06-22** (proposto em 2026-06-21). O ADR **reafirma** a invariante de
+locus (`architecture.md §4.2`) e **acrescenta** uma distinção que hoje falta na doutrina. Nenhuma
+meta-spec atual governa "frota plana vs. hierárquica" — este é o gap que o ADR fecha. Implementação
+(texto novo na KB/skill) diferida até um caso real bater o gatilho. **Revisão prevista** — acordada com
+o maestro no aceite (re-examinar a parte doutrinária e a condição de gatilho com mais distância).
 
 ---
 
@@ -39,9 +40,12 @@ diferida até aceite.
 A doutrina de frota ([`agent-fleet-orchestration.md`](../knowledge-base/concepts/agent-fleet-orchestration.md))
 e a skill `onion-fleet` cobrem com precisão *quando* orquestrar, contrato de subagente, tiering,
 fan-in e verificação adversarial. Mas **nenhuma meta-spec governa a topologia do grafo** (plano vs.
-árvore). O único registro de "hierarquia" na KB é para **descartá-la** — a armadilha "frota dentro de
-um agente" (`agent-fleet-orchestration.md:461`, `:478`). Isso gera uma confusão: lê-se "hierarquia é
-proibida", quando o que é proibido é coisa mais estreita.
+árvore). O texto vigente **silencia sobre a forma do grafo** e só fala de **locus** — a armadilha
+"frota dentro de um agente" (`agent-fleet-orchestration.md:461`, `:478`) restringe *onde* a
+orquestração mora, não *que forma* o grafo tem. A KB sequer usa as palavras "hierarquia"/"árvore"
+nesse sentido. O risco, portanto, é **por omissão**: na ausência de doutrina sobre forma, o leitor
+**infere** que "hierarquia é proibida", quando o proibido é coisa mais estreita (o locus). É essa
+inferência-por-silêncio que o ADR corrige — não uma frase contraditória no texto.
 
 ### A confusão (locus × forma)
 Um sinal externo (conversa com Claude que invoca o efeito **Ringelmann** + um paper de transição de
@@ -55,17 +59,20 @@ dois eixos distintos**:
    - Por quê: (a) **economia de tokens** — a coordenação roda em **JavaScript a 0 token**
      (`agent-fleet-orchestration.md:247-248`); mover para dentro de um agente volta a custar tokens e
      replica contexto × níveis (`onion-fleet/SKILL.md:131` — "mais caro e turvo"). (b) **regra
-     arquitetural** — `architecture.md:203` (§4.2): `agents/* → commands/*` = **Não** ("Agente não
+     arquitetural** — `architecture.md:204` (§4.2): `agents/* → commands/*` = **Não** ("Agente não
      invoca comando diretamente — sugere ao usuário") → **não existe** agente `fleet-orchestrator`.
 2. **Forma do grafo de agentes** — o *shape* do fan-out: plano (todos os workers no mesmo nível) vs.
    **árvore** (workers agrupados sob **nós sumarizadores** que condensam antes do fan-in final).
 
-O ponto central: **a invariante restringe o eixo 1, não o eixo 2.** Árvores são **permitidas e já
-expressas no nível principal** — os próprios exemplos da ferramenta nativa Workflow compõem
-`parallel(items.map(() => parallel([...lenses])))`, que é um grafo de **dois níveis** orquestrado
-inteiramente no script principal. O nesting de subagentes (até 5 níveis, desde v2.1.172,
-`agent-fleet-orchestration.md:250`) também existe. O que **nunca** pode acontecer é a *orquestração*
-migrar para dentro de um worker.
+O ponto central: **a invariante restringe o eixo 1, não o eixo 2.** A "forma de árvore" que este ADR
+legitima é **uma só**: **(a) `parallel`/`pipeline` aninhados compostos no nível principal** — os
+próprios exemplos da ferramenta nativa Workflow fazem `parallel(items.map(() => parallel([...lenses])))`,
+um grafo de **dois níveis** orquestrado inteiramente no script principal. **Não** confundir com **(b)
+nesting de subagentes** (`agents/* → agents/*`, até 5 níveis desde v2.1.172,
+`agent-fleet-orchestration.md:250`): isso é **delegação entre especialistas**, onde o agente delega mas
+**não orquestra frota** — a mesma fonte (`:250`) recomenda manter a orquestração no nível principal.
+O ADR constrói sobre **(a)**; **(b)** é fato adjacente, não evidência de "árvore permitida". O que
+**nunca** pode acontecer é a *orquestração* migrar para dentro de um worker.
 
 ### Contra-ponto honesto à matemática do paper
 A premissa "estrela satura em `N≈W/m`" assume que **o orquestrador-LLM lê as N mensagens** dos
@@ -88,9 +95,16 @@ sumarizadores intermediários ganham sentido.
 
 ## Decisão
 
+> **O que este ADR decide (e o que NÃO decide).** Aceitar este ADR **não introduz um padrão de uso
+> obrigatório** nem torna a árvore o default — mantém o **default plano** (CA1) e apenas torna a
+> árvore-no-principal um caminho **legítimo e nomeado** para um caso-limite estreito. A peça **vigente**
+> é a **desambiguação locus×forma**; a documentação do padrão "nó sumarizador" na KB/skill fica
+> diferida (Gatilho de Implementação). O contra-ponto W/m é justamente o que justifica manter o gatilho
+> estreito.
+
 1. **Locus é invariante — não muda.** A orquestração (fan-out, fan-in, decisão, roteamento) mora
    **sempre no nível principal** (skill/comando). Nenhum agente dispara frota; `fleet-orchestrator`
-   permanece proibido (`architecture.md:203` §4.2). Os dois pilares — economia de token (fan-in JS) e
+   permanece proibido (`architecture.md:204` §4.2). Os dois pilares — economia de token (fan-in JS) e
    auditabilidade — seguem de pé.
    > **Nota (lendo de fora):** a regra `agents/* → commands/* = Não` (§4.2) é um **proxy** de um
    > princípio mais amplo — *sem inversão de controle: a orquestração mora no topo*. Não é capricho de
@@ -112,9 +126,12 @@ sumarizadores intermediários ganham sentido.
    ranqueamento, merge, filtro), o **fan-in JS a 0 token vence** — é mais barato e mais auditável.
 
 4. **Compactação por nó é requisito.** Havendo nó sumarizador, cada nó devolve **resumo condensado**
-   (não bruto), respeitando `b·m ≤ W` por nó (b = fan-in local, m = tamanho do resumo, W = janela).
-   É a tradução da regra do paper para o único ponto em que ela morde no Onion: o **agente
-   sintetizador**, não o orquestrador.
+   (não bruto), de modo que o **input do agente sintetizador caiba na sua janela de contexto** — um
+   requisito de **primeiros princípios** (não herdado do paper). A heurística de design
+   `b·m ≤ W` (b = fan-in local, m = tamanho do resumo, W = janela) é só uma forma compacta de dizer
+   isso; é onde a aritmética de orçamento-de-janela morde no Onion — no **agente sintetizador**, não no
+   orquestrador. É **heurística**, não critério mensurável (W/m/b não têm valor fixado aqui); o que se
+   **verifica** é a parte observável: o sintetizador lê *k resumos*, não *N brutos* (ver CA2).
 
 ### Esboço ilustrativo (não é implementação)
 ```javascript
@@ -154,7 +171,8 @@ const finalSynthesis = await agent(synthesize(summaries), { model: "opus" });   
 ## Consequências
 
 ### Positivas
-- Remove a confusão "hierarquia = proibida"; deixa explícito o que é permitido e o que é armadilha.
+- Remove a inferência-por-omissão "hierarquia = proibida"; deixa explícito o que é permitido (forma de
+  árvore no nível principal) e o que é armadilha (locus dentro de um agente).
 - Prepara escala para o caso real (síntese por LLM sobre conjunto grande) sem inflar custo no caso comum.
 - Reafirma a invariante de locus com fundamento renovado (o contra-ponto W/m fortalece o "fan-in JS").
 
@@ -184,17 +202,24 @@ estoura 1 agente):
   o padrão **não** usa nó sumarizador — fan-in JS 0-token. *Verificável:* nenhum `agent()` de síntese
   intermediária no script.
 - **CA2 (árvore sob gatilho):** dada síntese por LLM sobre conjunto que estouraria 1 agente, o grafo
-  usa nós sumarizadores com `b·m ≤ W` por nó (resumo condensado), e a orquestração permanece no nível
-  principal. *Verificável:* `grep` não encontra agente que dispara frota; o agente final lê *k resumos*,
-  não *N brutos*.
-- **CA3 (invariante intacta):** em nenhum caso existe agente `fleet-orchestrator`. *Verificável:*
-  `/meta:metaspec-validate` contra `architecture.md §4.2` → ✅.
+  usa nós sumarizadores (resumo condensado, heurística `b·m ≤ W`) e a orquestração permanece no nível
+  principal. *Verificável (estrutural):* o agente final lê *k resumos*, não *N brutos* — inspeção da
+  estrutura do script (nº de inputs do `agent()` de síntese). A condensação em si é design, não
+  grep-able.
+- **CA3 (invariante intacta):** em nenhum caso existe agente `fleet-orchestrator`. **Dois níveis de
+  verificação, não confundir:** *(a) ausência estrutural — determinística:* `grep -rL` por um agente
+  real chamado `fleet-orchestrator` em `.claude/agents/**` retorna vazio (hoje a única ocorrência da
+  string é a **referência-proibição** em `metaspec-gate-keeper.md`, não um agente). É o gate canônico do
+  projeto (selftest/inventory). *(b) conformidade de design — julgamento:* "nenhum agente *dispara
+  frota*" é semântico (intenção em prosa), **não** grep-able; afere-se por **veredito LLM** via
+  `/meta:metaspec-validate` contra `architecture.md §4.2` (com evidência citada) — não como prova
+  mecânica automática.
 
 ---
 
 ## Referências
 
-- [`architecture.md`](../meta-specs/architecture.md) — §4.2 (`agents/* → commands/*` = Não, linha 203), §4.3 (acoplamento entre dimensões)
+- [`architecture.md`](../meta-specs/architecture.md) — §4.2 (`agents/* → commands/*` = Não, linha 204), §4.3 (acoplamento entre dimensões)
 - [`agents.md`](../meta-specs/agents.md) — §5-6 (delegação; sem agente fleet-orchestrator)
 - [`agent-fleet-orchestration.md`](../knowledge-base/concepts/agent-fleet-orchestration.md) — doutrina de frota vigente (caps :246, fan-in :247-248, nesting :250, armadilha :461/:478)
 - [`onion-fleet-external-radar-2026-06.md`](./onion-fleet-external-radar-2026-06.md) — origem (item 🟡 TOPO)
@@ -203,4 +228,13 @@ estoura 1 agente):
 
 ---
 
-**Mantido por:** Sistema Onion · **Última atualização:** 2026-06-21
+**Mantido por:** Sistema Onion · **Última atualização:** 2026-06-22 (aceite + correção de citação
+`architecture.md:204`; refino pós-revisão em frota — separação mecânico×julgamento nos CAs, `b·m≤W`
+rebaixada a heurística, "O gap" reframado como omissão, mecanismo (a)×(b) na forma de árvore)
+
+> **Histórico de revisão.** Revisão adversarial em frota (5 lentes + verificação adversarial,
+> 2026-06-22): 16 achados, **0 blocker/major** — decisão central validada. Refinos das camadas 1-2
+> aplicados. **Diferido à promoção:** ancorar "nó sumarizador" ao termo de mercado/`agente de síntese`
+> (regra de linguagem ubíqua); frase-âncora locus×forma na KB ao lado da armadilha; promoção de
+> metadados (title/`type`/filename `draft→adr`) + atualizar 4 referências cruzadas em
+> `onion-fleet-math-phase-transition-2026-06.md` e `onion-fleet-external-radar-2026-06.md`.
