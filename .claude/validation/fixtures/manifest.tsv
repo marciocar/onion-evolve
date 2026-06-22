@@ -33,3 +33,4 @@ lint	r16-count-drift/bad-agentes-comandos.md	docs	bad	divergente da SSOT
 lint	r16-count-drift/good-table-breakdown.md	docs	good
 fix	r16-count-drift/bad-cmd-count.md	docs	corrected
 fix	r16-count-drift/exempt-snapshot.md	docs	untouched
+lint	r18-claude-docs/bad-doc-under-claude-docs.md	.claude/docs	bad	proibido

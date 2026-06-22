@@ -75,13 +75,13 @@ CONTRIBUTING.md             # Guidelines para evolução
 ├── sessions/               # Estado persistente de workflows faseados
 │   └── <feature>/          # Por feature em desenvolvimento
 │
-├── utils/                  # Abstrações e utilitários (SDAAL)
+├── utils/                  # Abstrações e utilitários (SDAAL) + insumos operacionais de agentes
 │   ├── task-manager/       # Task Manager Abstraction (factory, interface, types, detector, adapters/)
 │   ├── forge/              # Forge Abstraction — PR/review/CI/Release no host remoto (GitHub; gh-first, REST fallback)
+│   ├── c4-*.md             # Templates/regras C4 consumidos pelos agentes c4-* (detection, templates, mermaid, documentation)
 │   └── date-time-standards.md  # Padrões de data/hora
 │
 ├── rules/                  # Regras complementares (opcional)
-├── docs/                   # Documentação interna do .claude/ (opcional)
 └── validation/             # Scripts de validação: inventory.sh, onion-version.sh, lint, federation-*
 ```
 
