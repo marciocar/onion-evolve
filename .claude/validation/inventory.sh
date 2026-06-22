@@ -37,7 +37,7 @@ count_commands_in() {
     -print 2>/dev/null | wc -l | tr -d ' '
 }
 
-# Total invocável (categorias + root onion/warm-up), exclui common/ e READMEs
+# Total invocável (categorias + root onion/warm-up/catch-up), exclui common/ e READMEs
 count_commands_total() {
   find "${CLAUDE_DIR}/commands" -name "*.md" \
     ! -path "*/common/*" \
@@ -94,7 +94,7 @@ while IFS= read -r dir; do
   [ "$cat" = "common" ] && continue
   CMD_CATS["$cat"]="$(count_commands_in "$dir")"
 done < <(find "${CLAUDE_DIR}/commands" -mindepth 1 -maxdepth 1 -type d 2>/dev/null)
-# Root-level (onion, warm-up)
+# Root-level (onion, warm-up, catch-up)
 CMD_ROOT="$(find "${CLAUDE_DIR}/commands" -maxdepth 1 -name "*.md" ! -iname "readme.md" -print 2>/dev/null | wc -l | tr -d ' ')"
 
 # Categorias de agente
@@ -162,7 +162,7 @@ EOF
   for cat in $(for c in "${!CMD_CATS[@]}"; do echo "${CMD_CATS[$c]} $c"; done | sort -rn | awk '{print $2}'); do
     echo "| \`${cat}/\` | ${CMD_CATS[$cat]} |"
   done
-  echo "| _root_ (\`onion\`, \`warm-up\`) | ${CMD_ROOT} |"
+  echo "| _root_ (\`onion\`, \`warm-up\`, \`catch-up\`) | ${CMD_ROOT} |"
   echo "| **Total** | **${CMD_TOTAL}** |"
   cat <<EOF
 

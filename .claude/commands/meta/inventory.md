@@ -6,7 +6,7 @@ category: meta
 tags: [inventory, ssot, counts, generator, self-evolution]
 version: "1.0.0"
 updated: "2026-06-14"
-allowed-tools: Read Edit Bash(bash .claude/validation/inventory.sh*) Bash(find *) Bash(diff *)
+allowed-tools: Read Edit Bash(bash .claude/validation/inventory.sh*) Bash(bash .claude/validation/lint-artifacts.sh*) Bash(find *) Bash(diff *)
 argument-hint: "(sem argumentos — sempre regenera tudo do filesystem)"
 ---
 
@@ -44,32 +44,41 @@ bash .claude/validation/inventory.sh --env
 # ONION_COMMANDS_TOTAL / ONION_AGENTS_TOTAL / ONION_SKILLS_TOTAL / ONION_KBS_TOTAL …
 ```
 
-### Passo 3 — Reconciliar derivados (apenas se divergirem)
+### Passo 3 — Propagar para os derivados (determinístico, sem reescrita à mão)
 
-Ler e, **somente onde houver número divergente**, alinhar à SSOT — sem reescrever prosa:
+```bash
+bash .claude/validation/lint-artifacts.sh --fix
+```
 
-- `CLAUDE.md` — bloco de inventário (linha "N comandos invocáveis…", agentes, skills).
-- `docs/onion/index.md` — Visão + Estatísticas.
-- `docs/knowledge-base/index.md` — total de KBs e contagem por subpasta.
+O lint **sabe**, por arquivo, qual é a contagem correta (computa do filesystem) e
+**reescreve apenas as frases-de-total divergentes** — frase canônica inteira, com as
+palavras-âncora preservadas (`N comandos invocáveis`, `N agentes e M comandos`,
+`N agentes/comandos em M categorias`, `N Knowledge Bases`). Herda o **mesmo escopo e
+exclusões** da detecção: nunca toca `docs/materials/` (marketing), `docs/analysis/`
+(datado), snapshots, nem a própria SSOT (que é **regenerada**, não editada frase a frase).
+Idempotente — rodar de novo é no-op. **Fecha o loop**: "gerar" agora é acoplado a
+"propagar", então um add/remove de recurso não pode mais terminar com violação.
 
-Onde possível, prefira **apontar para `docs/onion/inventory.md`** em vez de repetir o número.
+> **Não cobre por design** (reconciliação manual): breakdowns por categoria em prosa
+> (estrutura, não só número) e `docs/materials/`. Para esses, edite com contexto.
 
 ### Passo 4 — Validar
 
 ```bash
-bash .claude/validation/lint-artifacts.sh   # check_inventory_sync deve passar (0 HARD)
+bash .claude/validation/lint-artifacts.sh   # 0 HARD e 0 SOFT (drift de contagem zerado)
 ```
 
-Se o lint acusar drift, é porque o Passo 1 não foi rodado ou um recurso mudou
-depois — rode o Passo 1 de novo.
+Se ainda acusar drift, é um caso **fora do escopo do `--fix`** (breakdown por categoria,
+material derivado) — reconcilie à mão, ou um recurso mudou após o Passo 1 (rode de novo).
 
 ## 📤 Saída esperada
 
 ```
 ✅ docs/onion/inventory.md regenerado
    ◆ Comandos: <N>  ◆ Agentes: <N>  ◆ Skills: <N>  ◆ KBs: <N>
-✅ Derivados reconciliados: <lista de arquivos tocados> (ou "nenhum — já em sincronia")
-✅ lint check_inventory_sync: OK
+✅ --fix: <N> arquivo(s) realinhado(s) à SSOT (ou "nenhuma frase-de-total divergente")
+   <arquivo:linha — frase antiga → frase nova, por mudança>
+✅ lint: 0 HARD / 0 SOFT
 ```
 
 ## ⚠️ Notas

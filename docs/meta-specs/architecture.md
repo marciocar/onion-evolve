@@ -42,10 +42,10 @@ CONTRIBUTING.md             # Guidelines para evolução
 ├── agents/                 # Agentes especializados
 │   ├── compliance/         # 5 agentes — frameworks regulatórios
 │   ├── deployment/         # 1 agente — containerização
-│   ├── development/        # ~20 agentes — especialistas técnicos
-│   ├── git/                # 4 agentes — review pré-PR
+│   ├── development/        # 18 agentes — especialistas técnicos
+│   ├── git/                # 5 agentes — review pré-PR
 │   ├── meta/               # 5 agentes — orquestração e criação
-│   ├── product/            # 8 agentes — discovery e spec
+│   ├── product/            # 9 agentes — discovery e spec
 │   ├── research/           # 1 agente — pesquisa
 │   ├── review/             # 2 agentes — code review
 │   └── testing/            # 3 agentes — testes
@@ -62,7 +62,8 @@ CONTRIBUTING.md             # Guidelines para evolução
 │   ├── test/               # Estratégias de teste
 │   ├── validate/           # Validação (test-strategy/, qa-points/, collab/)
 │   ├── onion.md            # Ponto de entrada inteligente
-│   └── warm-up.md          # Preparação geral de contexto
+│   ├── warm-up.md          # Preparação geral de contexto
+│   └── catch-up.md         # Briefing de retomada (onde paramos)
 │
 ├── skills/                 # Skills (cérebro)
 │   ├── onion/              # Orquestrador master

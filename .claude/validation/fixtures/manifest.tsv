@@ -28,4 +28,9 @@ merge	adopt-settings-merge/target-empty.json	-	-
 merge	adopt-settings-merge/target-with-own.json	-	-
 lint	r17-frontmatter-colon/bad-unquoted-colon.md	.claude/agents/development	bad	não-aspado
 lint	r17-frontmatter-colon/good-quoted.md	.claude/agents/development	good	
+lint	r16-count-drift/bad-cmd-categorias.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/bad-agentes-comandos.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/good-table-breakdown.md	docs	good
+fix	r16-count-drift/bad-cmd-count.md	docs	corrected
+fix	r16-count-drift/exempt-snapshot.md	docs	untouched
 lint	r18-claude-docs/bad-doc-under-claude-docs.md	.claude/docs	bad	proibido

@@ -67,6 +67,10 @@ cp -a "${REPO_ROOT}/CLAUDE.md" "${SANDBOX}/CLAUDE.md"
 SSOT_CMD_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
   | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
 SSOT_CMD_DRIFT="$(( ${SSOT_CMD_TOTAL:-0} + 7 ))"   # offset != 0 → sempre divergente
+# __ONION_AGENTS_TOTAL__ → contagem real de agentes (usado por fixtures da frase
+# COMBINADA 'N agentes e M comandos', onde só o lado comandos deve divergir).
+SSOT_AGENT_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
+  | grep '^ONION_AGENTS_TOTAL=' | cut -d= -f2)"
 
 record_pass() { PASS=$((PASS + 1)); echo "  ✓ ${1}"; }
 record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} — ${2}"; }
@@ -90,6 +94,7 @@ run_lint_fixture() {
   # Fixtures sem placeholder passam intactas (sed é no-op).
   sed -e "s/__ONION_COMMANDS_TOTAL__/${SSOT_CMD_TOTAL}/g" \
       -e "s/__ONION_COMMANDS_DRIFT__/${SSOT_CMD_DRIFT}/g" \
+      -e "s/__ONION_AGENTS_TOTAL__/${SSOT_AGENT_TOTAL}/g" \
       "${src}" > "${dst}"
 
   local out
@@ -122,6 +127,66 @@ run_lint_fixture() {
       record_fail "${fixture}" "verdict desconhecido '${verdict}'"
       ;;
   esac
+}
+
+# ---------------------------------------------------------------------------
+# Modo fix — injeta a fixture, roda 'lint-artifacts.sh --fix' no sandbox e assere
+# o EFEITO da reescrita (não só a detecção):
+#   corrected : após --fix, a fixture não é mais citada na detecção (drift curado),
+#               o valor de drift sumiu, e uma 2ª passada de --fix é byte-idêntica
+#               (IDEMPOTÊNCIA).
+#   untouched : a fixture (path/frontmatter isento) permanece byte-idêntica após
+#               --fix (o motor de reescrita herda o escopo da detecção).
+# ---------------------------------------------------------------------------
+run_fix_fixture() {
+  local fixture="$1" target="$2" verdict="$3"
+  local src="${FIX_DIR}/${fixture}"
+  local dst_dir="${SANDBOX}/${target}"
+  local dst="${dst_dir}/${INJECT_NAME}"
+
+  if [ ! -f "${src}" ]; then
+    record_fail "${fixture}" "fixture inexistente: ${src}"
+    return
+  fi
+
+  mkdir -p "${dst_dir}"
+  sed -e "s/__ONION_COMMANDS_TOTAL__/${SSOT_CMD_TOTAL}/g" \
+      -e "s/__ONION_COMMANDS_DRIFT__/${SSOT_CMD_DRIFT}/g" \
+      -e "s/__ONION_AGENTS_TOTAL__/${SSOT_AGENT_TOTAL}/g" \
+      "${src}" > "${dst}"
+  local before; before="$(cat "${dst}")"
+
+  bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --fix >/dev/null 2>&1 || true
+
+  case "${verdict}" in
+    corrected)
+      local out cited
+      out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" 2>&1)" || true
+      cited="$(printf '%s\n' "${out}" | grep -F "${INJECT_BASE}" || true)"
+      if [ -n "${cited}" ]; then
+        record_fail "${fixture}" "--fix não curou o drift; ainda citada: ${cited}"; rm -f "${dst}"; return
+      fi
+      if grep -qF "${SSOT_CMD_DRIFT} comandos" "${dst}"; then
+        record_fail "${fixture}" "--fix deixou o valor de drift (${SSOT_CMD_DRIFT}) no arquivo"; rm -f "${dst}"; return
+      fi
+      local after1; after1="$(cat "${dst}")"
+      bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --fix >/dev/null 2>&1 || true
+      if [ "$(cat "${dst}")" != "${after1}" ]; then
+        record_fail "${fixture}" "--fix não idempotente (2ª passada mudou bytes)"; rm -f "${dst}"; return
+      fi
+      record_pass "${fixture} (fix:corrected+idempotente)"
+      ;;
+    untouched)
+      if [ "$(cat "${dst}")" != "${before}" ]; then
+        record_fail "${fixture}" "--fix tocou arquivo isento (deveria preservar histórico/snapshot)"; rm -f "${dst}"; return
+      fi
+      record_pass "${fixture} (fix:untouched)"
+      ;;
+    *)
+      record_fail "${fixture}" "verdict fix desconhecido '${verdict}'"
+      ;;
+  esac
+  rm -f "${dst}"
 }
 
 # ---------------------------------------------------------------------------
@@ -298,6 +363,7 @@ while IFS=$'\t' read -r kind fixture target verdict keyword || [ -n "${kind:-}" 
   [ "${kind}" = "kind" ] && continue           # header
   case "${kind}" in
     lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" ;;
+    fix)      run_fix_fixture "${fixture}" "${target}" "${verdict}" ;;
     contract) run_contract_fixture "${fixture}" "${verdict}" ;;
     merge)    run_merge_fixture "${fixture}" ;;
     *)        record_fail "${fixture:-?}" "kind desconhecido '${kind}'" ;;
