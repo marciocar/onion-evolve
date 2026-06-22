@@ -596,6 +596,22 @@ check_frontmatter_scalar_colon() {
 }
 
 # ===========================================================================
+# REGRA 18 — Sem documentação versionada sob .claude/docs/ [HARD]
+#   architecture.md §2: artefato invocável vive em .claude/; descrição/análise
+#   vive em docs/ (raiz). .claude/docs/ é um ponto cego (não varrido pelas demais
+#   regras), onde cruft stale/de-dialeto-errado se esconde. Esta guarda impede a
+#   reacumulação. Insumos OPERACIONAIS de agentes (templates/regras) vão para
+#   .claude/utils/ (ex.: c4-*.md), não .claude/docs/.
+# ===========================================================================
+check_no_claude_docs() {
+  local d="${CLAUDE_DIR}/docs"
+  [ -d "${d}" ] || return 0
+  while IFS= read -r -d '' f; do
+    violation "HARD" "${f}" "documentação sob .claude/docs/ — proibido (architecture.md §2: docs vivem em docs/; insumos de agente em .claude/utils/). Mova ou remova."
+  done < <(find "${d}" -name '*.md' -print0 2>/dev/null)
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -618,6 +634,7 @@ check_abstraction_methods_exist
 check_context_freshness_stamp
 check_inventory_total_drift
 check_frontmatter_scalar_colon
+check_no_claude_docs
 
 # ===========================================================================
 # SUMÁRIO FINAL

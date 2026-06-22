@@ -184,7 +184,7 @@ docs/
 
 #### Referências Técnicas
 - **[Exemplos Práticos](onion/practical-examples.md)** - Casos de uso reais com exemplos
-- **Referência de Ferramentas** - rode o comando `/meta:all-tools` para documentar todas as ferramentas disponíveis
+- **Referência de Ferramentas** - rode o comando `/meta:all-tools` para listar (sob demanda) as ferramentas disponíveis no contexto atual
 - **[Arquitetura de Comandos](onion/claude-code-commands-architecture.md)** - Estrutura interna dos comandos
 
 #### Documentação Avançada
