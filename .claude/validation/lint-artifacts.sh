@@ -48,6 +48,10 @@
 #  15. Frescor de contexto de domínio [SOFT] — arquivo POPULADO em docs/*-context/
 #      (exclui README/index) deve carregar carimbo 'Última Atualização'/'updated:';
 #      habilita a fase Manage (/meta:context-freshness). No framework = no-op (templates)
+#  16. Contagem de inventário-TOTAL divergente da SSOT [SOFT] — comandos/agentes/KBs +
+#      categorias; categorias de AGENTE via ONION_AGENT_CATEGORIES (≠ COMMAND_CATEGORIES)
+#  17. Frontmatter: valor escalar com ': ' não-aspado [HARD] — quebra YAML no Claude Code
+#  18. Documentação versionada sob .claude/docs/ [HARD] — árvore proibida (usar docs/)
 #
 # Convenção: .claude/validation/fixtures/ guarda TEMPLATES de teste das próprias
 #   guardas (consumidos por lint-selftest.sh), não artefatos ativos. As 4 regras de

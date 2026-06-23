@@ -113,6 +113,7 @@ Comandos devem residir em uma das categorias abaixo. Categorias com asterisco re
 | `validate/` | Validação de testes, QA, workflows colaborativos | 4+ |
 | `test/` | Estratégias de teste (unit, integration, e2e) | 3 |
 | `development/` | Comandos de desenvolvimento específicos | 1+ |
+| `design/` | Vertical de design — identidade visual como spec-as-code (**INCUBAÇÃO**: categoria provisória; `design-context/` é 4º peer candidato, não cravado — ver ADR design-peer-promotion) | 1+ |
 | `quick/` | Análises pontuais rápidas | 1+ |
 | (root) | `onion.md` e `warm-up.md` — pontos de entrada | 2 |
 

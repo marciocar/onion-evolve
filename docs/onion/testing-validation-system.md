@@ -44,7 +44,7 @@ O Sistema de Testes e Validação é composto por **4 camadas integradas** (que 
 
 ┌─────────────────────────────────────────────────────────────┐
 │  🛡️ AUTO-TESTE DE GUARDAS DETERMINÍSTICAS                    │
-│  ├─ lint-artifacts.sh - guardas do framework (16 regras)   │
+│  ├─ lint-artifacts.sh - guardas do framework (18 regras)   │
 │  ├─ fixtures/ + manifest.tsv - inputs ruins/bons conhecidos │
 │  └─ lint-selftest.sh - assere que cada guarda ainda reage  │
 └─────────────────────────────────────────────────────────────┘
@@ -379,7 +379,7 @@ Escala:
 
 ## 🛡️ Camada 5 (Meta): Auto-teste de Guardas Determinísticas
 
-As 4 camadas acima validam o **projeto-alvo**. A 5ª camada é **meta**: valida as próprias **guardas determinísticas** do framework — `.claude/validation/lint-artifacts.sh` (16 regras que bloqueiam o CI via `onion-validate.yml`) e validadores irmãos como `federation-contract-validate.sh`.
+As 4 camadas acima validam o **projeto-alvo**. A 5ª camada é **meta**: valida as próprias **guardas determinísticas** do framework — `.claude/validation/lint-artifacts.sh` (18 regras — as HARD bloqueiam o CI via `onion-validate.yml`, as SOFT alertam) e validadores irmãos como `federation-contract-validate.sh`.
 
 **Problema que resolve**: uma guarda que silenciosamente para de funcionar (regex quebrada, allowlist larga demais) não é pega por nada — é a meta-falha "guarda parcial" aplicada às próprias guardas. A disciplina de *failure-mode test* (criar input ruim → confirmar que a guarda flagra) funcionava de forma **ad-hoc**; esta camada a torna **permanente e bloqueante no CI**.
 
