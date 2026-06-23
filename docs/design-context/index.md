@@ -1,6 +1,6 @@
 # 🎨 Design Context — Índice
 
-> **Última Atualização:** 2026-06-22 · **Status:** provisório (incubação do 4º peer — ver [README](README.md))
+> **Última Atualização:** 2026-06-23 · **Status:** provisório (incubação do 4º peer — ver [README](README.md))
 
 Hub navegável da identidade visual do Onion (SSOT). Spec-as-code aplicado ao design: tokens são a fonte
 de verdade; CSS/componentes/material são saída gerada.
@@ -29,8 +29,13 @@ A identidade de um escopo = `merge(foundations, semantic, brand[X], product[Y], 
   referências resolvidas (sem órfãs/ciclos) + contraste WCAG dos pares semânticos. Logos/pixels ficam fora
   da SSOT, sob gate humano.
 
-## Próximos (roadmap — plano `transient-cooking-pebble`)
+## Roadmap (plano `transient-cooking-pebble`)
 
-- Fase 1: gate + sink Tailwind + dogfood (gerar tema do Onion). ◀ _em andamento_
-- Fase 2: comando `/design` faseado. · Fase 3: `@design-system-specialist` + Figma/Penpot.
-- Fase 4: camada generativa (`@brand-generator` + diverge/converge). · Fase 5: WCAG como guard de CI.
+**Entregue (em main):**
+- ✅ **Fase 1** (`gate+sink`): `lint-design-tokens.sh` + `design-sink/` Tailwind + dogfood (tema do Onion). _PR #143_
+- ✅ **Fase 2** (`comando+specialist`): comando `/design:identity` + `@design-system-specialist` (puxado da F3). _PR #145_
+
+**Próximos (adiados — só com evidência/gatilho, não por entusiasmo):**
+- ⏳ **Fase 3** (`fontes-externas`): Figma/Penpot como produtores de token. _Gate: adotante que use design tool vivo._
+- ⏳ **Fase 4** (`brand-generator`): camada generativa (`@brand-generator` + diverge/converge). _Gate: 2ª marca/produto real exercitando a cascata `brands/`+`products/`._
+- ⏳ **Fase 5** (`wcag-guard-ci`): contraste WCAG como guard de CI bloqueante (a lógica já existe no lint local — falta promover a CI). _A mais madura; sem dependência externa._
