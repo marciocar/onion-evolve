@@ -186,6 +186,11 @@ Framework de testes documentado em: [docs/knowledge-base/frameworks/framework-te
 - Tabelas com cabeçalho claro
 - Imagens com texto alternativo (`![texto alt](path)`)
 - Diagramas Mermaid em vez de imagens binárias quando possível
+- **Referências legíveis:** todo id opaco (`T1`, `#7`, `§8`, `$1`, `blip #9`, regra `r16`, PR `#144`)
+  leva um **rótulo mnemônico de 2-5 palavras na 1ª menção** — ex.: `T1 (peer-ou-provisório)`,
+  `#7 (.prettierignore no adopt)`. Ids nus economizam o autor e **gastam a cognição do leitor** (ele para
+  e rebusca). Com vários ids relacionados, dar um mini-glossário. Vale para docs, comentários, commits,
+  PRs e mensagens ao usuário.
 
 ---
 
