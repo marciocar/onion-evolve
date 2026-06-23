@@ -20,6 +20,14 @@ A coordenação roda em JavaScript e custa **0 tokens de modelo**. O teto é de
 
 ## Instruções (passo a passo)
 
+0. **Varredura proativa de elegibilidade (DETECÇÃO ≠ EXECUÇÃO).** Ao receber **qualquer** tarefa de
+   escopo amplo, **antes** de planejar execução serial, cheque os sinais de fan-out (N itens/arquivos/PRs/
+   fontes independentes, varredura ampla, auditoria, migração mecânica, review multi-dimensão, padrão
+   decompor→delegar→sintetizar/verificar). **Detectar e propor o fan-out é dever proativo** — não espere o
+   usuário dizer "frota". A regra **opt-in** (gotchas) é sobre *executar* (não paralelizar por default),
+   **não** sobre detectar: mesmo opt-in na execução, sinalize a oportunidade. Se positivo → proponha padrão
+   + escopo + custo (e respeite o gate do `Workflow`); se a tarefa é pequena/serial/dependente → siga serial
+   sem ruído. Em projeto Onion, prefira os mecanismos canônicos (esta skill → `Workflow`) ao `Agent` manual.
 1. **Detectar elegibilidade de fan-out.** Há *independência real* entre as
    subtarefas? Cada uma produz seu resultado sem ler a saída da outra? Se há
    dependência de ordem ou estado compartilhado mutável, **não** paralelize —
