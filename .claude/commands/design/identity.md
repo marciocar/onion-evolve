@@ -39,9 +39,10 @@ material são saída gerada e regenerável.
 ## Fronteiras
 
 - **NÃO** decide posicionamento/estratégia de marca → use `/product:branding` antes (alimenta o brief).
-- **NÃO** é gerador-de-IA-de-design (ainda): esta versão usa **fonte manual** (você/o especialista
-  edita tokens). A geração divergente (N identidades por IA) + convergência (tournament + gate) é a
-  fase generativa do roadmap — não está aqui.
+- **NÃO** é gerador-de-IA-de-design: usa **fonte manual** (você/o especialista edita tokens) ou
+  **ingestão** (`design-source/`). A geração divergente (N identidades por IA) + convergência
+  (gate + juiz) vive no comando irmão **[`/design:generate`](generate.md)** — cuja candidata
+  vencedora alimenta o **DEVELOP** (Fase 2) daqui.
 - **NÃO** crava o 4º peer: `docs/design-context/` é provisório (ver seu ADR de promoção).
 
 ## Workflow faseado (retomável)
