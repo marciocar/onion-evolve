@@ -1,0 +1,30 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$description": "Foundations / primitivos de cor — brand-agnostic, valores crus. Camada 0 da cascata. Identidade real do Onion (cores dos badges do README). W3C DTCG.",
+  "color": {
+    "$type": "color",
+    "brand": {
+      "orange": {
+        "$value": "#D97757",
+        "$description": "Laranja Onion — plataforma Claude Code (badge). Cor primária da marca."
+      },
+      "purple": {
+        "$value": "#8A2BE2",
+        "$description": "Roxo Onion — família Onion (badge). Cor de acento/identidade da família."
+      }
+    },
+    "neutral": {
+      "0":   { "$value": "#FFFFFF", "$description": "Branco — superfície base (light)" },
+      "50":  { "$value": "#F7F6F4" },
+      "100": { "$value": "#ECE9E4" },
+      "300": { "$value": "#C9C3BA" },
+      "500": { "$value": "#8A8378" },
+      "700": { "$value": "#4A453E" },
+      "900": { "$value": "#1A1714", "$description": "Quase-preto quente — texto base (light)" }
+    },
+    "green": { "500": { "$value": "#3FB950", "$description": "Verde — base de success (badge MIT)" } },
+    "blue":  { "500": { "$value": "#3B82F6", "$description": "Azul — base de info (badge metodologia)" } },
+    "red":   { "500": { "$value": "#E5484D", "$description": "Vermelho — base de danger" } },
+    "amber": { "500": { "$value": "#E0A020", "$description": "Âmbar — base de warning" } }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "$description": "SSOT das regras de contraste WCAG que o gate (.claude/validation/lint-design-tokens.sh) consome. Cada par declara token de primeiro plano (fg), de fundo (bg) e a razão mínima exigida. WCAG 2.x: 4.5 = texto normal (AA), 3.0 = texto grande/bold ou componentes de UI (AA).",
+  "pairs": [
+    { "fg": "color.on-surface.strong", "bg": "color.surface.base",   "min": 4.5, "note": "texto principal sobre fundo" },
+    { "fg": "color.on-surface.muted",  "bg": "color.surface.base",   "min": 4.5, "note": "texto secundário sobre fundo" },
+    { "fg": "color.on-surface.strong", "bg": "color.surface.subtle", "min": 4.5, "note": "texto principal sobre card" },
+    { "fg": "color.action.on-primary", "bg": "color.action.primary", "min": 3.0, "note": "texto em CTA (bold/large)" }
+  ]
+}
