@@ -44,7 +44,7 @@ Após instalar o Sistema Onion no projeto, você deve ver a seguinte estrutura:
 ```
 seu-projeto/
 ├── .claude/
-│   ├── commands/           # 87 comandos em 9 categorias
+│   ├── commands/           # 88 comandos em 10 categorias
 │   ├── agents/             # 49 agentes especializados
 │   ├── skills/             # 5 skills de orquestração
 │   ├── sessions/           # Sessões de desenvolvimento
@@ -462,7 +462,7 @@ Você completou seu primeiro ciclo completo de desenvolvimento com o Sistema Oni
 @task-specialist "decompor feature em subtasks"    # Decomposição agnóstica
 ```
 
-> **Referência completa**: [agents-reference.md](agents-reference.md) — 49 agentes em 9 categorias
+> **Referência completa**: [agents-reference.md](agents-reference.md) — 50 agentes em 9 categorias
 
 ---
 
