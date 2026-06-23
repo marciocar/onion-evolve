@@ -35,7 +35,8 @@ A identidade de um escopo = `merge(foundations, semantic, brand[X], product[Y], 
 - ✅ **Fase 1** (`gate+sink`): `lint-design-tokens.sh` + `design-sink/` Tailwind + dogfood (tema do Onion). _PR #143_
 - ✅ **Fase 2** (`comando+specialist`): comando `/design:identity` + `@design-system-specialist` (puxado da F3). _PR #145_
 
+- ✅ **Fase 5** (`wcag-guard-ci`): contraste WCAG como guard de CI bloqueante (`onion-validate.yml` roda `lint-design-tokens.sh` em `docs/design-context/**`). _PR #150_
+- ✅ **Fase 3** (`fontes-externas`): abstração SDAAL de ingestão `design-source/` (irmã do `design-sink/`) — adapter `file` funcional (paleta flat → DTCG, round-trip validado no gate); `figma`/`penpot` como **costura** (sem ferramenta viva p/ dogfoodar). _PR #151_
+
 **Próximos (adiados — só com evidência/gatilho, não por entusiasmo):**
-- ⏳ **Fase 3** (`fontes-externas`): Figma/Penpot como produtores de token. _Gate: adotante que use design tool vivo._
-- ⏳ **Fase 4** (`brand-generator`): camada generativa (`@brand-generator` + diverge/converge). _Gate: 2ª marca/produto real exercitando a cascata `brands/`+`products/`._
-- ⏳ **Fase 5** (`wcag-guard-ci`): contraste WCAG como guard de CI bloqueante (a lógica já existe no lint local — falta promover a CI). _A mais madura; sem dependência externa._
+- ⏳ **Fase 4** (`brand-generator`): camada generativa (`@brand-generator` + diverge/converge), via frota. _Dogfood: gera variações candidatas da própria identidade Onion; promoção da cascata multi-brand pende de 2ª marca real (ADR peer)._
