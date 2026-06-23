@@ -13,10 +13,10 @@ W3C/DTCG como SSOT em `docs/design-context/`; CSS/componentes/material como saí
 | Comando | Faz |
 |---------|-----|
 | [`/design:identity`](identity.md) | Ciclo brief → develop (tokens + gate WCAG + materializa) → material. Faseado, retomável. Delega a `@design-system-specialist`. |
+| [`/design:generate`](generate.md) | Camada generativa: diverge (N identidades por IA, em frota) → converge (gate WCAG + juiz) → vencedora alimenta o DEVELOP do identity. Delega a `@brand-generator`. |
 
 ## Próximos (roadmap — plano `transient-cooking-pebble`)
 
-- Fase generativa: `/design:identity` ganha diverge (N identidades por IA) + converge (tournament + gate).
 - `/design:evolve`: faceta de `/meta:evolve` — audita drift visual e produz backlog priorizado.
 
 ## Princípios

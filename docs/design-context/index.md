@@ -38,5 +38,9 @@ A identidade de um escopo = `merge(foundations, semantic, brand[X], product[Y], 
 - ✅ **Fase 5** (`wcag-guard-ci`): contraste WCAG como guard de CI bloqueante (`onion-validate.yml` roda `lint-design-tokens.sh` em `docs/design-context/**`). _PR #150_
 - ✅ **Fase 3** (`fontes-externas`): abstração SDAAL de ingestão `design-source/` (irmã do `design-sink/`) — adapter `file` funcional (paleta flat → DTCG, round-trip validado no gate); `figma`/`penpot` como **costura** (sem ferramenta viva p/ dogfoodar). _PR #151_
 
-**Próximos (adiados — só com evidência/gatilho, não por entusiasmo):**
-- ⏳ **Fase 4** (`brand-generator`): camada generativa (`@brand-generator` + diverge/converge), via frota. _Dogfood: gera variações candidatas da própria identidade Onion; promoção da cascata multi-brand pende de 2ª marca real (ADR peer)._
+- ✅ **Fase 4** (`brand-generator`): camada generativa via frota — comando `/design:generate` + agente `@brand-generator` (diverge N paletas em paralelo → converge pelo gate WCAG + juiz). A IA gera, o gate decide. _PR #152_
+
+**Roadmap completo.** Fases pendentes viram gatilho-de-evidência, não trabalho aberto:
+- ⏳ Adapters `figma`/`penpot` (costura da F3) entram com ferramenta viva para dogfoodar.
+- ⏳ Promoção a 4º peer pleno (ADR provisório) pende de ritmo-de-mudança distinto observável (adotante populando contextos / 2ª marca real exercitando a cascata).
+- 💡 Ideia: `/design:evolve` — faceta de `/meta:evolve` que audita drift visual.

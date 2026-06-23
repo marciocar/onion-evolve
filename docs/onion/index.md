@@ -9,8 +9,8 @@ Bem-vindo ao índice da documentação do **Sistema Onion**. Este documento orga
 ## 🎯 Visão Geral
 
 O **Sistema Onion** é um **framework template em `.claude/`** — instalável em qualquer projeto (novo, legado ou regulado), plataforma única Claude Code, sem produto npm e sem CLI standalone. Inclui:
-- 🤖 **88 comandos invocáveis** Claude Code em 10 categorias
-- 🎯 **50 agentes de IA especializados** em 9 categorias
+- 🤖 **89 comandos invocáveis** Claude Code em 10 categorias
+- 🎯 **51 agentes de IA especializados** em 9 categorias
 - 🧩 **5 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-fleet`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
@@ -23,7 +23,7 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 > **Contagens canônicas (SSOT):** [inventory.md](inventory.md) — gerado do filesystem por `/meta:inventory` e validado no CI. Os números abaixo derivam dele.
 
 - **16 documentos** em `docs/onion/`
-- **88 comandos invocáveis** Claude Code em `.claude/commands/`
+- **89 comandos invocáveis** Claude Code em `.claude/commands/`
 - **49 agentes** IA em `.claude/agents/`
 - **5 skills** em `.claude/skills/`
 
@@ -36,12 +36,12 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 **Comece aqui se você é novo no Sistema Onion:**
 
 1. **[Guia de Comandos](commands-guide.md)** - Documentação dos comandos disponíveis
-   - 88 comandos invocáveis em 10 categorias
+   - 89 comandos invocáveis em 10 categorias
    - Exemplos de uso e workflows
    - Integrações com Task Managers
 
 2. **[Referência de Agentes](agents-reference.md)** - Lista e descrição dos agentes especializados
-   - 50 agentes em 9 categorias
+   - 51 agentes em 9 categorias
    - Quando usar cada agente
    - Capacidades e especializações
 
