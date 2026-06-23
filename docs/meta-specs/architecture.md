@@ -52,6 +52,7 @@ CONTRIBUTING.md             # Guidelines para evolução
 │
 ├── commands/               # Comandos invocáveis
 │   ├── common/             # Templates e prompts compartilhados
+│   ├── design/             # Vertical de design (INCUBAÇÃO — categoria provisória; ver ADR design-peer-promotion)
 │   ├── development/        # Comandos de desenvolvimento
 │   ├── docs/               # Geração e validação de documentação
 │   ├── engineer/           # Workflow faseado de implementação
@@ -115,7 +116,8 @@ docs/
 │
 ├── business-context/       # Template vazio — populado no projeto-alvo
 ├── technical-context/      # Template vazio — populado no projeto-alvo
-└── compliance-context/     # Template vazio — populado no projeto-alvo (quando aplicável)
+├── compliance-context/     # Template vazio — populado no projeto-alvo (quando aplicável)
+└── design-context/         # INCUBAÇÃO — 4º peer candidato, provisório (ver decisions/onion-adr-design-peer-promotion)
 ```
 
 ---
