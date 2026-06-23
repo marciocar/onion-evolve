@@ -14,7 +14,9 @@
 # Gracioso: design-context ausente → exit 0 (adotante pode não ter). jq/awk
 #           ausente → aviso + exit 0 (mesma doutrina dos worklog-*.sh / merge-hooks).
 #
-# Consumido por: pre-commit, CI, /design (fase converge), /meta:context-freshness.
+# Consumido por: CI (.github/workflows/onion-validate.yml — bloqueia em HARD
+#                quando muda docs/design-context/** ou .claude/**), /design
+#                (fase converge), /meta:context-freshness.
 # Exercitado por: lint-selftest.sh (run_design_tokens_selftests).
 # =============================================================================
 set -uo pipefail
