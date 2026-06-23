@@ -55,6 +55,10 @@ A simetria source↔sink fecha um laço verificável: `paleta flat ──source�
 CSS vars`. O adapter `file` é exercitado por esse round-trip (paleta da identidade Onion → DTCG → passa no
 `lint-design-tokens.sh`), o mesmo critério mecânico que valida o sink.
 
+> **Cores em `#rrggbb` (6 dígitos).** Para o round-trip valer, o adapter `file` aceita só hex de 6 dígitos
+> — alinhado ao gate, que computa contraste WCAG de `#rrggbb`. `#rgb` e `#rrggbbaa` (alpha) são rejeitados
+> (falha-alto), assim como chaves `$`-reservadas e colisão de prefixo (`brand` + `brand.orange`).
+
 ## Determinismo
 
 A ingestão é **determinística (sem LLM)** — normalização de dados, não geração. (Geração de identidade

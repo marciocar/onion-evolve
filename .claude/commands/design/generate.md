@@ -6,7 +6,7 @@ description: |
   alimenta o DEVELOP do /design:identity. A IA gera; o gate decide. Orquestra a frota
   via onion-fleet/Workflow (generate-and-filter). Delega a @brand-generator (workers).
 model: opus
-allowed-tools: Read Write Edit Glob Grep Workflow Bash(bash .claude/validation/*) Bash(bash .claude/utils/design-source/*) Bash(mktemp*) Bash(rm -rf /tmp/*)
+allowed-tools: Read Write Edit Glob Grep Workflow Bash(bash .claude/validation/*) Bash(bash .claude/utils/design-source/*) Bash(mktemp -d -t onion-design-*) Bash(rm -rf /tmp/onion-design-*)
 category: design
 tags: [design, tokens, generative, fleet, wcag, branding]
 version: "0.1.0"
@@ -56,17 +56,34 @@ divergentes** (ex.: `conservadora`, `ousada`, `alto-contraste`, `monocromática-
 guia um worker, para cobrir o espaço sem convergir cedo. `N` default 4 (ajustável ao budget).
 
 ### 2. DIVERGE (fan-out, `Workflow`)
-N `@brand-generator` em **paralelo** (`parallel()`), cada um com seu ângulo, `schema` de candidata
-(foundations + semantic + contrast-pairs), tier **sonnet** (worker generativo). Independência real:
-nenhum lê a saída do outro.
+N `@brand-generator` em **paralelo** (`parallel()`), cada um com seu ângulo, tier **sonnet** (worker
+generativo). Independência real: nenhum lê a saída do outro.
+
+> **Contrato worker↔gate (importante).** A **estrutura de papéis é FIXA pela SSOT**, não pelo worker: o
+> `semantic/` (papéis → `{alias}`) e o `governance/contrast-pairs.json` (quais pares o gate verifica, por
+> **path de token**, ex. `color.on-surface.strong`/`color.surface.base`) vêm do projeto. Cada worker varia
+> **só as `foundations`** (a paleta crua), com os **nomes de foundation que o `semantic` espera**
+> (`brand.*`, `neutral.*`, `green/blue/red/amber.500`). Assim a comparação é justa (mesmos pares para todas)
+> e o gate não reprova por descasamento de nomenclatura. O `schema` da candidata é, portanto,
+> `{ angle, rationale, foundations }` — **não** carrega `contrast-pairs` (esses são da SSOT).
 
 ### 3. CONVERGE (filtro determinístico, 0 tokens)
-Para **cada** candidata: escrever os tokens num `design-context` temporário e rodar o **gate**:
+Para **cada** candidata, montar um `design-context` temporário e rodar o **gate**:
 ```bash
-bash .claude/validation/lint-design-tokens.sh "<tmp-da-candidata>"
+tmp="$(mktemp -d -t onion-design-XXXXXX)"
+mkdir -p "$tmp/docs/design-context"/{foundations,semantic,governance}
+# foundations da candidata: paleta flat → DTCG via o adapter file da F3 (reuso)
+printf '%s' "<foundations-flat-json>" \
+  | bash .claude/utils/design-source/file-to-tokens.sh - \
+  > "$tmp/docs/design-context/foundations/color.tokens.json"
+# semantic + governance: estrutura FIXA da SSOT (copiar a do projeto)
+cp docs/design-context/semantic/color.tokens.json      "$tmp/docs/design-context/semantic/"
+cp docs/design-context/governance/contrast-pairs.json  "$tmp/docs/design-context/governance/"
+bash .claude/validation/lint-design-tokens.sh "$tmp" && rm -rf "$tmp"
 ```
 Reprovadas (contraste < mín, alias órfão/ciclo, DTCG malformado) são **descartadas** — o corte é
-calculado, não opinião. Reportar quantas passaram/cairam (`SKIP — <motivo>`).
+calculado, não opinião. Reportar quantas passaram/caíram (`SKIP — <motivo>`). _(É exatamente este passo
+que justifica a permissão `design-source/*`: a F3 materializa as `foundations` da candidata em DTCG.)_
 
 ### 4. RANQUEAR (juiz) + fan-in
 Um **juiz** (agente independente, opus) ranqueia **só as aprovadas** por aderência ao brief

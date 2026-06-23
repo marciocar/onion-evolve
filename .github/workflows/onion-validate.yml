@@ -31,6 +31,9 @@ jobs:
       - name: Gate determinístico de design tokens (DTCG + refs + WCAG)
         run: |
           if ! command -v jq >/dev/null 2>&1; then sudo apt-get update -qq && sudo apt-get install -y -qq jq; fi
+          # Fail-loud no CI: o gate é gracioso (skip) sem jq — aceitável local, mas
+          # no CI um runner sem jq passaria em verde sem validar nada. Exige jq aqui.
+          command -v jq >/dev/null 2>&1 || { echo "ERRO: jq indisponível no runner — gate de design não pode rodar."; exit 1; }
           bash .claude/validation/lint-design-tokens.sh
 
       - name: Lembrete — checagens semânticas são locais
