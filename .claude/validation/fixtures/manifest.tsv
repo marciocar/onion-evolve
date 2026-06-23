@@ -36,3 +36,4 @@ fix	r16-count-drift/exempt-snapshot.md	docs	untouched
 lint	r18-claude-docs/bad-doc-under-claude-docs.md	.claude/docs	bad	proibido
 lint	r16-count-drift/bad-agent-categorias.md	docs	bad	categorias de agentes
 lint	r16-count-drift/good-agent-categorias.md	docs	good
+fix	r16-count-drift/bad-agent-categorias.md	docs	corrected
