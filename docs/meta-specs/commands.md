@@ -336,7 +336,7 @@ Complementa a Seção 3: enquanto workflows faseados coordenam trabalho **sequen
 
 ### 10.2 Regras normativas
 
-1. **Opt-in**: fan-out é explícito, nunca o comportamento default. Trabalho serial dependente permanece sequencial.
+1. **Opt-in na execução, proativo na detecção**: *executar* fan-out é explícito, nunca o comportamento default (trabalho serial dependente permanece sequencial). Mas **detectar e propor** a oportunidade de fan-out é **dever** — ao receber tarefa com sinais de elegibilidade (varredura ampla, auditoria, N itens independentes, migração mecânica, review multi-dimensão), o Claude sinaliza/propõe **antes** de planejar execução serial. Detecção ≠ execução.
 2. **Independência**: só paralelizar subtarefas sem dependência cruzada de dados.
 3. **Fan-in obrigatório**: todo fan-out termina em consolidação num resultado único (não N saídas soltas).
 4. **Mutação — partição-primeiro, worktree só p/ sobreposição, 1 branch**: ao mutar arquivos em paralelo, o orquestrador **particiona por arquivos disjuntos** (sem corrida → dispensa worktree); usa `isolation: 'worktree'` **apenas** quando há sobreposição real ou branches independentes a fundir. A saída é **uma branch de consolidação** que entra no fluxo faseado normal (`/git:flow` ou `/engineer:pr` via forge) — **nunca** N branches persistentes contornando o gate de PR. Conflito de partição ou operação irreversível → **gate humano**. Playbook completo: [agent-fleet-orchestration.md §7](../knowledge-base/concepts/agent-fleet-orchestration.md).
