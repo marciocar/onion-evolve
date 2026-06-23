@@ -8,12 +8,12 @@
 
 | Recurso | Quantidade |
 |---------|-----------:|
-| Comandos invocáveis | **87** |
-| Agentes | **49** |
+| Comandos invocáveis | **88** |
+| Agentes | **50** |
 | Skills | **5** |
 | Knowledge Bases | **37** |
 
-## Comandos por categoria (9 categorias + root)
+## Comandos por categoria (10 categorias + root)
 
 | Categoria | Comandos |
 |-----------|---------:|
@@ -26,14 +26,15 @@
 | `test/` | 3 |
 | `quick/` | 1 |
 | `development/` | 1 |
+| `design/` | 1 |
 | _root_ (`onion`, `warm-up`, `catch-up`) | 3 |
-| **Total** | **87** |
+| **Total** | **88** |
 
 ## Agentes por categoria (9 categorias)
 
 | Categoria | Agentes |
 |-----------|--------:|
-| `development/` | 18 |
+| `development/` | 19 |
 | `product/` | 9 |
 | `meta/` | 5 |
 | `git/` | 5 |
@@ -42,7 +43,7 @@
 | `review/` | 2 |
 | `research/` | 1 |
 | `deployment/` | 1 |
-| **Total** | **49** |
+| **Total** | **50** |
 
 ## Contextos de domínio (spec-as-code — populados no projeto-alvo)
 

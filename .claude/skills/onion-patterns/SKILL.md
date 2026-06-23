@@ -25,7 +25,7 @@ paths: [".claude/**", "docs/onion/**"]
 └── quick/           # Ações rápidas
 ```
 
-### `.claude/agents/` (49 agentes em 9 categorias)
+### `.claude/agents/` (50 agentes em 9 categorias)
 ```
 .claude/agents/
 ├── development/     # 20 — React, Node, Jira, ClickUp, infra
