@@ -34,7 +34,8 @@ design-context/
 ├── modes/<light|dark|hc>.tokens.json # override por modo
 ├── system/components.md          # padrões de UI (prosa AI-context)
 ├── decisions/                    # ADRs de design (subcamada decisional, §8.4)
-└── governance/accessibility-rules.md  # SSOT das regras WCAG que o gate consome
+└── governance/contrast-pairs.json # SSOT das regras WCAG de CONTRASTE que o gate consome
+                                # (foco/motion/touch-target ainda NÃO são checados pelo gate — follow-up)
 ```
 
 > No **framework** (este repo) o contexto traz a identidade do **próprio Onion** (dogfood). Num projeto

@@ -7,7 +7,7 @@ description: |
   Faseado e retomável. Fonte manual nesta versão; geração por IA (diverge/converge)
   chega numa fase futura. Delega a @design-system-specialist.
 model: sonnet
-allowed-tools: Read Write Edit Bash Glob Grep
+allowed-tools: Read Write Edit Glob Grep Bash(bash .claude/validation/*) Bash(bash .claude/utils/design-sink/*)
 category: design
 tags: [design, tokens, identity, wcag, branding]
 version: "0.1.0"
@@ -55,8 +55,9 @@ ou `<brand>`/`<product>` para multi-brand. Cada fase atualiza o ponteiro `NEXT`.
    visual **deriva** da estratégia de marca. Ausente → coletar o mínimo com o maestro (3-5 perguntas:
    personalidade da marca, público, tom, restrições, referências a evitar/buscar).
 2. Ler `docs/design-context/` existente (não partir do zero se já há identidade).
-3. Produzir/atualizar `docs/design-context/foundations/*.md` (brief em prosa: intenção declarada
+3. Produzir/atualizar `docs/design-context/brief.md` (brief em prosa: intenção declarada
    — "confiável, moderno, acessível" — que vira **restrições verificáveis**, não estilo livre).
+   _(Não usar `foundations/`: essa camada é só `*.tokens.json` — primitivos DTCG, não prosa.)_
 4. Checkpoint: `NEXT: Fase 2`.
 
 ### Fase 2 — DEVELOP (tokens → SSOT → materializa)
