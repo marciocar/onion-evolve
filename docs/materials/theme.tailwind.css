@@ -1,0 +1,109 @@
+/*
+ * GERADO — não editar à mão.
+ * SSOT: docs/design-context/foundations/color.tokens.json
+ *        docs/design-context/semantic/color.tokens.json (25 tokens W3C/DTCG)
+ * Sink: Tailwind v4 @theme (CSS-first, substituição de tailwind.config.js)
+ *
+ * Importar no entry-point CSS do projeto:
+ *   @import "theme.tailwind.css";
+ *
+ * Gate WCAG verificado: lint-design-tokens.sh — 0 violações HARD (2026-06-24).
+ * Contraste accent-foreground (branco/#FFFFFF sobre roxo/#8A2BE2): 5.96:1 → AA normal ✓
+ * Contraste primary-foreground (dark/#1A1714 sobre laranja/#D97757): 5.72:1 → AA normal ✓
+ */
+
+@theme {
+  /*
+   * Superfícies — papel: fundo da página e variantes
+   * token: color.surface.base → color.neutral.0
+   */
+  --color-background: #FFFFFF;
+
+  /*
+   * Texto principal sobre superfície
+   * token: color.on-surface.strong → color.neutral.900
+   */
+  --color-foreground: #1A1714;
+
+  /*
+   * Superfície secundária silenciada (inputs, divisores de seção)
+   * token: color.surface.muted → color.neutral.100
+   */
+  --color-muted: #ECE9E4;
+
+  /*
+   * Texto secundário / placeholder
+   * token: color.on-surface.muted → color.neutral.700
+   */
+  --color-muted-foreground: #4A453E;
+
+  /*
+   * CTA primário — laranja Onion
+   * token: color.action.primary → color.brand.orange
+   */
+  --color-primary: #D97757;
+
+  /*
+   * Texto/ícone sobre primary — escuro para AA normal (5.72:1)
+   * token: color.action.on-primary → color.neutral.900
+   * Decisão: branco sobre laranja daria apenas 3.12:1 (AA-UI mas falha AA normal).
+   */
+  --color-primary-foreground: #1A1714;
+
+  /*
+   * Acento/destaque — roxo família Onion
+   * token: color.action.accent → color.brand.purple
+   */
+  --color-accent: #8A2BE2;
+
+  /*
+   * Texto/ícone sobre accent — branco para AA normal (5.96:1)
+   * token: color.surface.base → color.neutral.0
+   * Decisão: on-surface.strong (#1A1714) sobre roxo dá apenas 3.00:1 (AA-UI, falha AA normal).
+   *          Branco é o único candidato semântico disponível que passa AA normal.
+   */
+  --color-accent-foreground: #FFFFFF;
+
+  /*
+   * Feedback — erro/perigo
+   * token: color.feedback.danger → color.red.500
+   */
+  --color-destructive: #E5484D;
+
+  /*
+   * Feedback — sucesso
+   * token: color.feedback.success → color.green.500
+   */
+  --color-success: #3FB950;
+
+  /*
+   * Feedback — alerta/aviso
+   * token: color.feedback.warning → color.amber.500
+   */
+  --color-warning: #E0A020;
+
+  /*
+   * Feedback — informação
+   * token: color.feedback.info → color.blue.500
+   */
+  --color-info: #3B82F6;
+
+  /*
+   * Borda padrão
+   * token: color.border.default → color.neutral.300
+   * (papel semântico criado neste ciclo — a materialização Tailwind expôs a lacuna)
+   */
+  --color-border: #C9C3BA;
+
+  /*
+   * Fundo de cards/painéis
+   * token: color.surface.subtle → color.neutral.50
+   */
+  --color-card: #F7F6F4;
+
+  /*
+   * Texto sobre cards/painéis
+   * token: color.on-surface.strong → color.neutral.900
+   */
+  --color-card-foreground: #1A1714;
+}

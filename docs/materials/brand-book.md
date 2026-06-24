@@ -42,6 +42,7 @@ clareza e consistência acima de ornamento. Ver [`brief.md`](../design-context/b
 | `surface.muted` | `{neutral.100}` | `#ECE9E4` |
 | `on-surface.strong` | `{neutral.900}` | `#1A1714` |
 | `on-surface.muted` | `{neutral.700}` | `#4A453E` |
+| `border.default` | `{neutral.300}` | `#C9C3BA` |
 | `action.primary` | `{brand.orange}` | `#D97757` |
 | `action.on-primary` | `{neutral.900}` | `#1A1714` |
 | `action.accent` | `{brand.purple}` | `#8A2BE2` |
