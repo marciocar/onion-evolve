@@ -85,7 +85,7 @@ clareza e consistência acima de ornamento. Ver [`brief.md`](../design-context/b
 ```css
 .btn-primary {
   background: var(--color-action-primary);   /* #D97757 */
-  color:      var(--color-action-on-primary); /* #FFFFFF — só em botão/label */
+  color:      var(--color-action-on-primary); /* #1A1714 — texto escuro, AA-normal pleno */
 }
 .link-accent { color: var(--color-action-accent); }  /* #8A2BE2 */
 body {
