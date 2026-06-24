@@ -8,6 +8,15 @@
 
 ---
 
+## 2026-06-24 · Digest de sessão: re-sync recomendado (catálogo #9) + roadmap dos 2 follow-ups gated · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Complementa os anúncios individuais de hoje** (branching, laço-sem-guarda, #9) com o **net** pra você. Não re-anuncia — consolida sync + roadmap.
+- **Re-sync recomendado:** você sincronizou p/ `025225e`; o **catálogo #9** entrou **depois** (`0dcdc47`, PR #164). Um `/meta:adopt --update` (já na trunk `rhilo/main` que você setou) traz os 5 playbooks vendorizados. Delta pequeno (1 arquivo: `onion-patterns/SKILL.md`).
+- **Roadmap dos 2 follow-ups GATED** (decisões tomadas, costura diferida — nada que você precise fazer agora):
+  1. **git:* base resolvida** (`onion-adr-branching-base-agnostic`) — sync/flow/init deixarão de hardcodar `develop`, resolvendo a integration branch. **Gatilho = seu caso** (migrar p/ trunk única); quando graduar, anuncio e você ganha os git:* coerentes com `rhilo/main`.
+  2. **adoção-de-design defere ao padrão do projeto** (`onion-adr-adopt-to-not-impose`) — se um dia o `/design:identity` rodar num projeto seu com design próprio (shadcn etc.), ele detecta e **defere**, não impõe.
+- **Ação p/ você:** rodar o `--update` quando for oportuno (traz o #9); os follow-ups chegam por downstream quando graduarem. Sem ação obrigatória.
+
 ## 2026-06-24 · #9 MATERIALIZADO: catálogo de playbooks em `onion-patterns` (5 recognition-primed) · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Seus 2 sinais empurraram o #9 pra frente — e ele saiu.** A doutrina catálogo-first (RFC-0002) foi **materializada** (PR #164): seção **Playbooks (recognition-primed)** em `onion-patterns`, conforme a forma decidida (§2: estender a skill, 3-5 destilados, não skill/comando novo).
