@@ -1,6 +1,6 @@
 # 🎨 Design Context — Índice
 
-> **Última Atualização:** 2026-06-23 · **Status:** provisório (incubação do 4º peer — ver [README](README.md))
+> **Última Atualização:** 2026-06-24 · **Status:** provisório (incubação do 4º peer — ver [README](README.md))
 
 Hub navegável da identidade visual do Onion (SSOT). Spec-as-code aplicado ao design: tokens são a fonte
 de verdade; CSS/componentes/material são saída gerada.

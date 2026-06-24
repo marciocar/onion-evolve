@@ -1,0 +1,28 @@
+/* Gerado de docs/design-context por design-sink/tokens-to-css-vars.sh — NÃO editar à mão. */
+:root {
+  --color-action-accent: #8A2BE2;
+  --color-action-on-primary: #FFFFFF;
+  --color-action-primary: #D97757;
+  --color-amber-500: #E0A020;
+  --color-blue-500: #3B82F6;
+  --color-brand-orange: #D97757;
+  --color-brand-purple: #8A2BE2;
+  --color-feedback-danger: #E5484D;
+  --color-feedback-info: #3B82F6;
+  --color-feedback-success: #3FB950;
+  --color-feedback-warning: #E0A020;
+  --color-green-500: #3FB950;
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-100: #ECE9E4;
+  --color-neutral-300: #C9C3BA;
+  --color-neutral-50: #F7F6F4;
+  --color-neutral-500: #8A8378;
+  --color-neutral-700: #4A453E;
+  --color-neutral-900: #1A1714;
+  --color-on-surface-muted: #4A453E;
+  --color-on-surface-strong: #1A1714;
+  --color-red-500: #E5484D;
+  --color-surface-base: #FFFFFF;
+  --color-surface-muted: #ECE9E4;
+  --color-surface-subtle: #F7F6F4;
+}
