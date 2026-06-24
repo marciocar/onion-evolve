@@ -45,8 +45,10 @@ core** hoje detecta — o inbound-detection do Onion é o elo fraco.
 
 ### O que o SDAAL já cobre vs o gap
 
-- **Coberto — eixo FORMATO.** `design-source` (`figma`/`penpot`/`file` → DTCG) e `design-sink`
-  (DTCG → `css-vars`/`tailwind`/`shadcn`) já são SDAAL anti-lock-in. A *materialização* já adapta ao stack.
+- **Coberto (como padrão) — eixo FORMATO.** `design-source` (entrada → DTCG) e `design-sink`
+  (DTCG → alvo) já são SDAAL anti-lock-in. Maturidade honesta: no source, só `file` está **implementado**
+  (`figma`/`penpot` são **costura** 🔜); no sink, `css-vars` está implementado. O padrão está estabelecido,
+  ainda que os adapters de rede sejam stubs. A *materialização* adapta ao stack quando há adapter.
 - **Gap — eixo PADRÃO/AUTORIDADE, na adoção.** Não há (a) um provider que represente *qual design system o
   projeto já roda*, nem (b) um passo que **detecte do filesystem** e **decida deferir/estender/introduzir**
   sem clobber. `/design:identity` só lê `docs/design-context/` (o lugar **do Onion**) — é cego a um design
@@ -110,8 +112,12 @@ princípio nomeado já orienta as sessões de adoção a **não impor**.
 - ✅ **Nomeia** um princípio que já governa task-manager/forge por baixo — fecha a lacuna na vertical de design.
 - ✅ Destila o melhor do `frontend-design`/`ux-flow` **para dentro do mecanismo governado** (em vez de adotar
   ferramenta externa cega ao SSOT — ver nota de método abaixo).
-- ⚠️ Implementação **diferida** — este ADR só nomeia + costura. O `defer` (SSOT alheia) exige cuidado: o
-  `sink` apontar pra fora do `design-context/` muda o contrato do gate WCAG (validar a SSOT alheia).
+- ⚠️ Implementação **diferida** — este ADR só nomeia + costura. O `defer` (SSOT alheia) tem um risco mais
+  profundo que apontamento de path: a SSOT do projeto (`tailwind.config`, `shared.css`, tokens Figma) **em
+  geral não é DTCG**, então o gate `lint-design-tokens.sh` — que valida DTCG no `design-context/` — pode
+  **não conseguir validar a SSOT alheia** (incompatibilidade de **formato**, não só de localização). O build
+  terá de escolher: (a) **ingerir** a SSOT alheia para DTCG via `design-source` (e aí o gate volta a valer),
+  ou (b) rodar a checagem WCAG por outro caminho sobre o formato nativo do projeto. Decisão de build, em aberto.
 - ⚠️ "Provisório" até o gatilho — vive em `docs/analysis/`, não na constituição.
 
 ## Alternativas consideradas
