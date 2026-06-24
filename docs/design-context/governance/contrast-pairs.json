@@ -6,6 +6,8 @@
     { "fg": "color.on-surface.strong", "bg": "color.surface.subtle", "min": 4.5, "note": "texto principal sobre card" },
     { "fg": "color.on-surface.strong", "bg": "color.surface.muted",  "min": 4.5, "note": "texto principal sobre fundo mudo" },
     { "fg": "color.action.accent",     "bg": "color.surface.base",   "min": 4.5, "note": "acento roxo sobre fundo" },
-    { "fg": "color.action.on-primary", "bg": "color.action.primary", "min": 4.5, "note": "texto em CTA — AA-normal pleno (qualquer tamanho)" }
+    { "fg": "color.action.on-primary", "bg": "color.action.primary", "min": 4.5, "note": "texto em CTA — AA-normal pleno (qualquer tamanho)" },
+    { "fg": "color.action.on-accent",  "bg": "color.action.accent",  "min": 4.5, "note": "texto sobre acento roxo (branco)" },
+    { "fg": "color.feedback.on-danger","bg": "color.feedback.danger", "min": 4.5, "note": "texto sobre danger (escuro) — margem justa, travado" }
   ]
 }

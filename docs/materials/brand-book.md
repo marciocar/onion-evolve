@@ -46,9 +46,11 @@ clareza e consistência acima de ornamento. Ver [`brief.md`](../design-context/b
 | `action.primary` | `{brand.orange}` | `#D97757` |
 | `action.on-primary` | `{neutral.900}` | `#1A1714` |
 | `action.accent` | `{brand.purple}` | `#8A2BE2` |
+| `action.on-accent` | `{neutral.0}` | `#FFFFFF` |
 | `feedback.success` | `{green.500}` | `#3FB950` |
 | `feedback.info` | `{blue.500}` | `#3B82F6` |
 | `feedback.danger` | `{red.500}` | `#E5484D` |
+| `feedback.on-danger` | `{neutral.900}` | `#1A1714` |
 | `feedback.warning` | `{amber.500}` | `#E0A020` |
 
 ## Contraste WCAG (calculado — `lint-design-tokens.sh`)
@@ -61,6 +63,8 @@ clareza e consistência acima de ornamento. Ver [`brief.md`](../design-context/b
 | Texto principal sobre `surface.muted` | **14.74:1** | ✅ | ✅ |
 | Acento (roxo) sobre fundo | **5.96:1** | ✅ | ✅ |
 | **Texto escuro sobre CTA laranja** | **5.72:1** | ✅ | ✅ |
+| Branco sobre acento roxo (`on-accent`) | **5.96:1** | ✅ | ✅ |
+| Escuro sobre danger (`on-danger`) | **4.56:1** | ✅ | ✅ |
 
 ## Do / Don't
 

@@ -18,12 +18,14 @@
     "action": {
       "primary":    { "$value": "{color.brand.orange}", "$description": "CTA primário — laranja Onion" },
       "on-primary": { "$value": "{color.neutral.900}",   "$description": "Texto sobre action.primary — escuro p/ AA-normal (5.72:1); branco no laranja dava só 3.12:1 (AA-UI)" },
-      "accent":     { "$value": "{color.brand.purple}",  "$description": "Acento/destaque — roxo família" }
+      "accent":     { "$value": "{color.brand.purple}",  "$description": "Acento/destaque — roxo família" },
+      "on-accent":  { "$value": "{color.neutral.0}",     "$description": "Texto sobre action.accent — branco p/ AA-normal (5.96:1); escuro no roxo dava só 3.00:1 (AA-UI)" }
     },
     "feedback": {
       "success": { "$value": "{color.green.500}" },
       "info":    { "$value": "{color.blue.500}" },
       "danger":  { "$value": "{color.red.500}" },
+      "on-danger": { "$value": "{color.neutral.900}", "$description": "Texto sobre feedback.danger — escuro (4.56:1, margem justa, travado no gate); branco no vermelho dava só 3.91:1" },
       "warning": { "$value": "{color.amber.500}" }
     }
   }
