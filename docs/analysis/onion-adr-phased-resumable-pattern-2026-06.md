@@ -1,16 +1,19 @@
 ---
 title: 'ADR — Padrão Faseado Retomável (PFR) como padrão transversal L0 (PROPOSTO / provisório)'
-status: proposto
 date: 2026-06-23
+type: adr
+status: proposto
+decision-scope: orchestration / execution-backbone
+supersedes: none
 deciders: maestro + sessão de evolução
 context_freshness: 2026-06-23
 related:
-  - docs/meta-specs/commands.md §3 (workflows faseados — invariante)
-  - docs/meta-specs/architecture.md §8 (critério de promoção a peer)
-  - docs/knowledge-base/concepts/worklog-protocol.md (SSOT mecânica)
-  - docs/knowledge-base/frameworks/gitflow-patterns.md (contrato de sessão)
-  - docs/analysis/onion-strategy-layer-adr-draft-2026-06-17.md (camada de seleção — a reconciliar)
-  - docs/design-context/decisions/onion-adr-design-peer-promotion.md (precedente: ADR provisório + gatilho)
+  - ../meta-specs/commands.md §3 (workflows faseados — invariante)
+  - ../meta-specs/architecture.md §8 (critério de promoção a peer)
+  - ../knowledge-base/concepts/worklog-protocol.md (SSOT mecânica)
+  - ../knowledge-base/frameworks/gitflow-patterns.md (contrato de sessão)
+  - onion-strategy-layer-adr-draft-2026-06-17.md (camada de seleção — a reconciliar)
+  - ../design-context/decisions/onion-adr-design-peer-promotion.md (precedente: ADR provisório + gatilho)
 ---
 
 # ADR — Padrão Faseado Retomável (PFR) como padrão transversal L0
