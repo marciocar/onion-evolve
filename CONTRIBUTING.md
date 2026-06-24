@@ -171,7 +171,7 @@ Checklist:
 
 ---
 
-## 📣 Após mergear mudança relevante a adotantes (anúncio flow A)
+## 📣 Após mergear mudança relevante a adotantes (anúncio downstream)
 
 O Onion tem **adotantes** que vendorizam o framework (registrados em
 [`docs/evolution/federation/members.yaml`](docs/evolution/federation/members.yaml)) e são **cegos** ao
@@ -181,7 +181,7 @@ vendoriza por commit, não por release).
 
 Ao mergear uma mudança que afeta adotantes (breaking, feature de core, decisão, fix que muda comportamento):
 
-1. **Registre o anúncio** no [`CHANGELOG.md`](docs/evolution/federation/CHANGELOG.md) (fluxo A), com o
+1. **Registre o anúncio** no [`CHANGELOG.md`](docs/evolution/federation/CHANGELOG.md) (downstream), com o
    campo `alvo:` (`<id>` · `adotantes`/`todos` · `nenhum` · `futuros adotantes`).
 2. **Gere o rascunho** com [`/meta:co-announce`](.claude/commands/meta/co-announce.md) — escreve um
    `inbound/` pronto na staging `federation/outbox/<id>/`, endereçado via `members.yaml`.

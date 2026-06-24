@@ -21,15 +21,21 @@ construir infra de federação pesada antes de se pagar.
 
 ## 2. Decisão — modelo de 3 fluxos (híbrido, git-async, maestro humano)
 
-1. **A · Core → projetos (downstream):** registro (`../federation/members.yaml`) + pin de versão
+> **Vocabulário canônico (2026-06-24):** os fluxos têm **nome próprio** — **downstream**, **upstream**,
+> **handoff** — no lugar dos rótulos opacos *flow/fluxo A/B/C* (retirados; regra "rotular referências
+> opacas", code-standards §7). Ver [ADR de vocabulário](../../analysis/onion-adr-coevolution-flow-naming-2026-06.md).
+> Entradas antigas (`CHANGELOG.md`, `*/_processed/`) **preservam** "flow A/B" — são append-only/auditoria
+> (invariante I7), não se reescrevem.
+
+1. **Downstream · Core → projetos** _(ex-flow A)_: registro (`../federation/members.yaml`) + pin de versão
    (`.claude/.onion-version`) + log de anúncio (`../federation/CHANGELOG.md`). Projeto adota via
    `/meta:adopt --update`. = manifest-pinning.
-2. **B · Projetos → core (upstream):** `../inbox/` — qualquer projeto deposita sinal/bug/pedido-de-ajuda/
-   status como markdown commitado. É o loop que evolui o framework a partir do uso real.
-3. **C · Dentro de um repo (sessões paralelas):** git worktrees + um escritor por escopo + handoff
-   commitado.
+2. **Upstream · Projetos → core** _(ex-flow B)_: `../inbox/` — qualquer projeto deposita sinal/bug/
+   pedido-de-ajuda/status como markdown commitado. É o loop que evolui o framework a partir do uso real.
+3. **Handoff · Dentro de um repo (sessões paralelas)** _(ex-flow C)_: git worktrees + um escritor por
+   escopo + handoff commitado. (Eixo distinto: é **concorrência intra-repo**, não direção cross-repo.)
 
-O **humano é o maestro** que roteia A e B entre repos. **System-of-record:** doc-bridge (markdown
+O **humano é o maestro** que roteia downstream e upstream entre repos. **System-of-record:** doc-bridge (markdown
 commitado) agora; **Federação Onion** (`/meta:federation-*`, já implementada) é a **graduação** — ligar
 quando houver contrato quebrável ou nº de projetos que torne o roteamento manual custoso (ver gatilho no
 README).

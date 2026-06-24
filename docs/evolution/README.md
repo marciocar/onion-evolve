@@ -32,7 +32,7 @@ O Onion (framework) evolui; **muitos projetos** o adotam. Sem método, duas dore
 | **Sessão do \<repo\>** | um CLI Claude Code ancorado em **1** repo | — (ver *um escritor por repo*) |
 | **Maestro** | o humano que orquestra e roteia | **human-in-the-loop (HITL)** / orquestrador |
 | **doc-bridge** | canal de markdown commitado entre instâncias | coordenação **async git-backed** (*drop-box* / GitHub Squad) |
-| **inbox/** · **inbound/** | os dois canais do doc-bridge no consumidor: `inbox/` = **fluxo B** (sinal consumidor→core) · `inbound/` = **fluxo A** (relatório de update/anúncio core→consumidor). Ambos versionados, com `_processed/` p/ lido/não-lido | *outbox* · *inbox* |
+| **inbox/** · **inbound/** | os dois canais do doc-bridge no consumidor: `inbox/` = **upstream** (sinal consumidor→core) · `inbound/` = **downstream** (relatório de update/anúncio core→consumidor). Ambos versionados, com `_processed/` p/ lido/não-lido | *outbox* · *inbox* |
 | **O que o Onion é** | (p/ explicar a terceiros) | **agent harness** (técnico) · **agentic SDLC framework** (funcional) · specs = **Spec-Driven Development (SDD)** |
 
 **Eixo de papel — mesmo conceito, 3 nomes conforme o contexto** (não são coisas diferentes):
@@ -52,7 +52,7 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
 
 ## Os 3 fluxos
 
-### A. Core → projetos (downstream / distribuição)
+### Downstream — Core → projetos (distribuição)
 *Quando o framework muda, os projetos descobrem e adotam com segurança.*
 - **Registro:** [`federation/members.yaml`](federation/members.yaml) — quem adota o Onion e em que versão.
 - **Pin de versão:** cada projeto carrega `.claude/.onion-version` (commit de origem).
@@ -60,18 +60,18 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
 - **Atualização no projeto:** `/meta:adopt --update` (deliberado, nunca link vivo).
 - **Canal + notificação no consumidor:** a adoção/update **auto-emite o relatório** no `inbound/` do alvo
   (git-visível) e o hook "you have mail" o sinaliza — o maestro não precisa repassá-lo à mão. `inbound/` é o
-  **próprio** canal de fluxo A (≠ `inbox/`, que é o outbox de fluxo B). Lido/não-lido via `git mv` p/ `inbound/_processed/`.
+  **próprio** canal de downstream (≠ `inbox/`, que é o outbox de upstream). Lido/não-lido via `git mv` p/ `inbound/_processed/`.
 - **Carteiro (transporte automático)** 🟠 *a-desenhar:* hoje o **relay entre repos é manual** (o maestro
   cruza as pontas). O carteiro automatiza só **transporte + notificação** (atos 1-2), nunca a execução
   (ato 3): **pull pelo destino** (respeita "um escritor por repo"), reusando ledger git + scripts
   determinísticos. Design no [ADR do eixo](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md); liga no gatilho de graduação.
 
-### B. Projetos → core (upstream / sinal + pedido de ajuda) ← o loop de co-evolução
+### Upstream — Projetos → core (sinal + pedido de ajuda) ← o loop de co-evolução
 *Um projeto reporta bug, dá feedback, **pede ajuda/feature**, manda status.*
 - **Canal:** [`inbox/`](inbox/) aqui no core. O projeto deposita um markdown datado (`AAAA-MM-DD-<assunto>.md`).
 - **Exemplo real:** o bug do `.env.example` (dogfooding no metagamify) virou o fix `#89`. O 1º veredito do metagamify está em [`inbox/`](inbox/).
 
-### C. Dentro de um repo (sessões paralelas)
+### Handoff — Dentro de um repo (sessões paralelas)
 *Duas sessões no mesmo repo não colidem.*
 - **git worktrees** (isolamento) + **um escritor por escopo** + **handoff commitado** (cada sessão registra o que fez antes de sair).
 
@@ -81,7 +81,7 @@ Você não precisa lembrar de checar — o **SessionStart hook** avisa no boot:
 
 - **Hook** (`.claude/hooks/co-evolution-inbox-check.sh`, registrado em `.claude/settings.json`): no início
   da sessão conta as mensagens não-processadas e injeta o aviso. **Bidirecional** — cobre os dois canais,
-  cada um com sua label: `📬 … inbox (fluxo B: sinal/feedback)` + `📥 … inbound/ (fluxo A: relatório de
+  cada um com sua label: `📬 … inbox (upstream: sinal/feedback)` + `📥 … inbound/ (downstream: relatório de
   update/anúncio)`. **Silencioso quando 0** em ambos (disciplina de *motd*). É o primitivo "you have mail on
   login" — o único que dispara sozinho (memória e `/warm-up` não). _(O nome do arquivo mantém `inbox-check`
   por estabilidade do registro nos consumidores já adotados; o comportamento cobre os dois canais.)_
@@ -97,8 +97,8 @@ herdam** o mesmo "you have mail".
 ## Seu ritual (maestro)
 
 1. **Início de sessão:** `git fetch` + ler o `inbox/` do repo (e, se for sessão de projeto, o `inbound/` p/ relatórios do core + o `inbox/` do core).
-2. **Projeto precisa de algo do core** → deposita mensagem no `inbox/` do core (fluxo B).
-3. **Core mudou algo que afeta projetos** → registra no `CHANGELOG.md` (fluxo A); projetos puxam via `/meta:adopt --update`.
+2. **Projeto precisa de algo do core** → deposita mensagem no `inbox/` do core (upstream).
+3. **Core mudou algo que afeta projetos** → registra no `CHANGELOG.md` (downstream); projetos puxam via `/meta:adopt --update`.
 4. **Você roteia** entre os repos e decide a ordem de merge. **Uma sessão por repo**; se uma sessão cobrir outro repo (a ponta estava adormecida), **logue quem fez** no handoff e commit isolado.
 
 ## Ownership — de quem é a RFC?

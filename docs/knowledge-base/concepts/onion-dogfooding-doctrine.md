@@ -75,7 +75,7 @@ Casos reais onde o dogfood pegou o que o happy-path escondia:
 | **Self-heal de inventário** (PR #126) | Dogfood do fluxo: adicionar **e remover** um recurso real e rodar `/meta:inventory` | Bug real: o `CLAUDE.md` vive **fora** dos scan-roots do lint (`.claude/`+`docs/`); o `--fix` global não o alcançava. O happy-path (CLAUDE.md já correto) escondia — só a mudança real de contagem expôs. |
 | **`/meta:all-tools`** (PR #128) | Rodar o comando reescrito e produzir o catálogo real da sessão | Lacunas: faltava marcar **status de conexão MCP** (conectado vs exige-auth) e tratar **tools deferidas por nome** (sem inventar descrição — o pecado do dialeto-Cursor em outra roupagem). |
 | **Limpeza `.claude/docs/`** (PR #127) | Verificação **adversarial** do veredito do explorer | O veredito "deletar os c4" teria **quebrado** os agentes c4 (que os referenciam); a verificação reverteu para "mover" (e o move **reparou** refs já penduradas). |
-| **`.env.example`** (fix #89) | Dogfooding do Onion **no adotante** (rhilo-metagamify, ao vivo) | Bug de campo que virou fix never-clobber no core, via [fluxo B do inbox](../../evolution/README.md). |
+| **`.env.example`** (fix #89) | Dogfooding do Onion **no adotante** (rhilo-metagamify, ao vivo) | Bug de campo que virou fix never-clobber no core, via [upstream do inbox](../../evolution/README.md). |
 
 A lição comum: **o erro só apareceu ao executar.** Nenhum foi pego por revisão-no-papel.
 
@@ -95,7 +95,7 @@ O dogfooding é o **fechamento empírico** do loop que a [Doutrina de Moderniza�
 DOGFOOD (esta doutrina)      → roda de verdade → aprende → resolve no mesmo loop
    ├─ gate mecânico: lint + selftest + inventory (determinístico)
    └─ gate de uso: invoca o artefato; testa modo-de-falha; verificação adversarial
-        ↺ fix → re-dogfood até passar; findings de campo (fluxo B) realimentam /meta:evolve
+        ↺ fix → re-dogfood até passar; findings de campo (upstream) realimentam /meta:evolve
 ```
 
 **Modernização decide o padrão; dogfooding prova que funcionou.** Um sem o outro é metade do loop:
@@ -109,6 +109,6 @@ modernização é tentativa-e-erro sem critério.
 - Irmã: [Doutrina de Modernização do Onion](onion-modernization-doctrine.md)
 - Gate mecânico: [`lint-artifacts.sh`](../../../.claude/validation/lint-artifacts.sh) · [`lint-selftest.sh`](../../../.claude/validation/lint-selftest.sh) · [`inventory.sh`](../../../.claude/validation/inventory.sh)
 - Governança: [@metaspec-gate-keeper](../../../.claude/agents/meta/metaspec-gate-keeper.md) (Regra Zero — evidência ou abstenção)
-- Co-evolução (fluxo B = dogfooding de campo): [docs/evolution/README.md](../../evolution/README.md)
+- Co-evolução (upstream = dogfooding de campo): [docs/evolution/README.md](../../evolution/README.md)
 - Reforço aplicado: `CONTRIBUTING.md` (fluxo de PR) · `.claude/skills/onion-validation/SKILL.md` (regra de gerador) · `CLAUDE.md` (recall por sessão no core)
 - Evidência (PRs): self-heal de inventário (#126), limpeza `.claude/docs/` (#127), `/meta:all-tools` (#128)

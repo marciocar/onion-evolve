@@ -10,7 +10,7 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- 🤖 **89 comandos invocáveis** Claude Code em 10 categorias + root (+ 16 fragmentos compartilhados em `common/` e 3 READMEs)
+- 🤖 **90 comandos invocáveis** Claude Code em 10 categorias + root (+ 16 fragmentos compartilhados em `common/` e 3 READMEs)
 - 🎯 **51 agentes de IA especializados** em 9 categorias
 - 🧩 **5 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-fleet` — orquestração de frota)
 - 📚 **Knowledge Bases estruturadas** para consumo por IA
@@ -37,7 +37,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **3 contextos spec-as-code** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`
 
 ### Sistema Onion (`.claude/`)
-- **89 comandos invocáveis** Claude Code distribuídos em:
+- **90 comandos invocáveis** Claude Code distribuídos em:
   - 24 em `meta/` (meta-comandos, criadores, validação, orquestração de frota, frescor de KB e de contexto, federação, adoção e co-evolução)
   - 20 em `product/` (gestão de produto e descoberta)
   - 11 em `engineer/` (engenharia e desenvolvimento)
@@ -60,7 +60,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 
 ### Total
 - **120 arquivos** de documentação markdown
-- **89 comandos invocáveis** em 10 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
+- **90 comandos invocáveis** em 10 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
 - **51 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
 
@@ -150,7 +150,8 @@ docs/
 │   ├── onion-adr-repo-adoption-2026-06.md  # ADR durável (adoção de repo / /meta:adopt)
 │   ├── onion-adr-domain-context-lifecycle-2026-06.md  # ADR durável (contexto de domínio = SSOT viva)
 │   ├── onion-adr-phased-resumable-pattern-2026-06.md  # ADR provisório (PFR = backbone faseado retomável L0)
-│   └── onion-adr-ledger-format-location-2026-06.md  # ADR provisório (ledger: markdown fica; repo-neutro gated; norte = Carteiro)
+│   ├── onion-adr-ledger-format-location-2026-06.md  # ADR provisório (ledger: markdown fica; repo-neutro gated; norte = Carteiro)
+│   └── onion-adr-coevolution-flow-naming-2026-06.md  # ADR (vocab: flow A/B/C → downstream/upstream/handoff)
 │
 ├── materials/                  # Materiais derivados externos (Fase 4 — 6 arquivos)
 │   ├── README.md               # Índice e guia de uso dos materiais
@@ -307,6 +308,7 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 - **[ADR — Contexto de domínio: SSOT viva — Junho/2026](analysis/onion-adr-domain-context-lifecycle-2026-06.md)** — decisão durável: contexto de domínio = SSOT viva com ciclo CRUD+ (não snapshot); 3 domínios peer + critério de promoção; pesos derivados; camada *Manage* executável = Tijolo 2.
 - **[ADR — Padrão Faseado Retomável (PFR) — Junho/2026](analysis/onion-adr-phased-resumable-pattern-2026-06.md)** — decisão provisória: nomeia o PFR como backbone determinístico L0 (sessão + `STATE.md` + fases); adia cravar em `commands.md §3` até gatilho de evidência (scaffolder usado ≥2x, ou strategy-ADR aceito).
 - **[ADR — Ledger de co-evolução: formato e localização — Junho/2026](analysis/onion-adr-ledger-format-location-2026-06.md)** — decisão provisória: o formato do ledger fica markdown+YAML (machine-readable já); o repo-neutro (Federação formal) fica gated por gatilho (I14); o norte que resolve o atrito de transporte é automatizar o "Carteiro" — alinhado ao padrão dominante 2026.
+- **[ADR — Vocabulário dos fluxos de co-evolução — Junho/2026](analysis/onion-adr-coevolution-flow-naming-2026-06.md)** — decisão aceita: renomeia os fluxos de rótulos opacos (flow A/B/C) para nomes próprios (**downstream / upstream / handoff**); cumpre a regra "rotular referências opacas" (code-standards §7); preserva história append-only.
 - **[Revisão da Federação — Junho/2026](analysis/onion-federation-review-2026-06.md)** — federação multi-repo do Onion vs. A2A e padrões de coordenação multi-agente (jun/2026): alinhamento mainstream + por que não A2A vivo + recomendações de nomenclatura/interop.
 
 ---

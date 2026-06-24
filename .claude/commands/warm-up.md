@@ -60,7 +60,7 @@ Estabelecer contexto completo do projeto incluindo:
 
 ### 5. Co-evolução (se `docs/evolution/` existir)
 - ✅ Reconhecer o papel do repo: `source` (core) · `adopted` (consumidor) — via `.claude/.onion-version` ou `.claude/validation/onion-version.sh`
-- ✅ Conferir os canais de co-evolução: `docs/evolution/inbox/` (fluxo B, sinal/feedback) e, em consumidores, `docs/evolution/inbound/` (fluxo A, relatório de update/anúncio do core). O hook SessionStart "you have mail" já avisa a **contagem** no boot (📬 inbox / 📥 inbound); o warm-up apenas **orienta** — não re-conta.
+- ✅ Conferir os canais de co-evolução: `docs/evolution/inbox/` (upstream, sinal/feedback) e, em consumidores, `docs/evolution/inbound/` (downstream, relatório de update/anúncio do core). O hook SessionStart "you have mail" já avisa a **contagem** no boot (📬 inbox / 📥 inbound); o warm-up apenas **orienta** — não re-conta.
 - ✅ Havendo mensagens, rodar `/meta:co-evolve` para ler/gerenciar. O protocolo canônico (3 fluxos) vive em `docs/evolution/README.md`.
 
 ## 🔍 Contexto a Manter
@@ -74,7 +74,7 @@ Estabelecer contexto completo do projeto incluindo:
 - `docs/evolution/README.md` - Modelo de co-evolução core↔derivados (se presente)
 
 ### Estrutura de Comandos
-- 89 comandos em 10 categorias
+- 90 comandos em 10 categorias
 - 51 agentes especializados em 9 categorias
 - Knowledge Bases estruturadas para IA
 

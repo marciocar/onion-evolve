@@ -70,10 +70,10 @@ há fronteira.
   faseado), `LICENSE` MIT→BSL e versionamento nomeado. Blip #10: `assess` → **`adopt`** (direção escolhida;
   execução faseada por apetite).
 
-## 4. Reconciliação com a sala de obra (fluxo A)
+## 4. Reconciliação com a sala de obra (downstream)
 
 Os blips #9/#10 vivem no `radar.md` do **`rhilo-metagamify`** (sala de obra), não no core. Este veredito
-volta ao adotante por **fluxo A** (CHANGELOG + `/meta:co-announce` → `inbound/`) para que **ele** mova os
+volta ao adotante por **downstream** (CHANGELOG + `/meta:co-announce` → `inbound/`) para que **ele** mova os
 blips (#9→trial, #10→adopt). O core não escreve o radar do derivado (um escritor por repo).
 
 ## 5. Em aberto / follow-ups (fora do escopo deste RFC)

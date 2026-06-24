@@ -4,7 +4,7 @@
 > Diretriz canônica para **rastreabilidade atômica sustentável**: todo registro de decisão (decision
 > snapshot) declara uma **política de retenção** e persiste o **payload mínimo** (a decisão, não o
 > universo de entrada). Sem isso, a rastreabilidade — virtude do [Spec-as-Code](spec-as-code-strategy.md)
-> — vira dívida de armazenamento ilimitada. Nasceu de um sinal de campo (fluxo B) de um adotante.
+> — vira dívida de armazenamento ilimitada. Nasceu de um sinal de campo (upstream) de um adotante.
 
 ---
 
@@ -17,7 +17,7 @@
 | **Última Atualização** | 2026-06-22 |
 | **Categoria** | Conceitos |
 | **Quadrante (radar)** | MET (Método/Processo) |
-| **Origem** | sinal de campo `rhilo-metagamify` (2026-06-19) — [co-evolução fluxo B](../../evolution/README.md) |
+| **Origem** | sinal de campo `rhilo-metagamify` (2026-06-19) — [co-evolução upstream](../../evolution/README.md) |
 | **Conceitos-irmãos** | [Spec-as-Code](spec-as-code-strategy.md) · [Ciclo de Vida do Contexto de Domínio](domain-context-lifecycle.md) |
 
 ---
@@ -64,7 +64,7 @@ nunca acúmulo perpétuo no caminho quente.
 
 ## 📐 Worked example (evidência — não asserção)
 
-Caso real que originou a diretriz ([sinal de campo, fluxo B](../../evolution/federation/CHANGELOG.md)):
+Caso real que originou a diretriz ([sinal de campo, upstream](../../evolution/federation/CHANGELOG.md)):
 
 | Sintoma | Diagnóstico | O que a diretriz teria evitado |
 |---|---|---|
@@ -96,4 +96,4 @@ Esta é a divisão que o veredito de roteamento estabeleceu (impl local + diretr
 - Pai: [Spec-as-Code Strategy](spec-as-code-strategy.md) — rastreabilidade é parte do spec-as-code (a decisão é spec; o código é saída)
 - Parente: [Ciclo de Vida do Contexto de Domínio](domain-context-lifecycle.md) — pensamento de ciclo de vida (CRUD+) aplicado a artefatos vivos; snapshots também têm ciclo de vida
 - Doutrina de evolução: [Modernização](onion-modernization-doctrine.md) (decide *o quê*) · [Dogfooding](onion-dogfooding-doctrine.md) (prova que funciona)
-- Co-evolução (origem do sinal): [docs/evolution/README.md](../../evolution/README.md) · [CHANGELOG fluxo A](../../evolution/federation/CHANGELOG.md) (entrada 2026-06-22) · backlog `onion-coevolution-backlog-2026-06-18.md` (item #5)
+- Co-evolução (origem do sinal): [docs/evolution/README.md](../../evolution/README.md) · [CHANGELOG downstream](../../evolution/federation/CHANGELOG.md) (entrada 2026-06-22) · backlog `onion-coevolution-backlog-2026-06-18.md` (item #5)

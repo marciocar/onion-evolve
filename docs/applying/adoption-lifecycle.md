@@ -34,7 +34,7 @@
 - **Direção (fora-pra-dentro vs dentro-pra-fora)** e **consentimento:** o alvo precisa **saber** da nova config — nada espalhado sem consciência. 🟠 *a-desenhar* (card 6).
 - **Dois modos de comando** (saídas distintas):
   - **Onion autônomo** → **auto-emite um relatório** (o que foi feito · novidades · do que a instância é
-    capaz agora · próximos passos) **no canal de fluxo A do alvo** (`docs/evolution/inbound/`, git-visível),
+    capaz agora · próximos passos) **no canal downstream do alvo** (`docs/evolution/inbound/`, git-visível),
     e o hook "you have mail" o sinaliza na sessão do alvo. 🟢 *implementado* (adopt v1.7.0).
   - **Consumidor no comando** → **onboarding assistido** (o Claude+Onion local da instância guiando, consciente). 🟠 *a-desenhar*.
 - **Limpeza de IDE legada** (`.cursor/.windsurf/copilot`) = **opção** com etapas bem definidas (nunca cego). 🟠 *gap — não implementado*.
@@ -46,10 +46,10 @@
 - **Deliberado, nunca link vivo** (instâncias são `standalone`/vendorizadas). Roda da **[Core]** (source); a instância (`role: adopted`) **não pode** ser a fonte.
 - Computa o delta `pin-da-instância → HEAD do Core`, copia **diff-based/never-clobber** (não toca arquivos do alvo fora do manifesto), re-aplica o Procedimento pós-cópia (hooks/settings) e **re-carimba** o `.onion-version`.
 - **Relink:** hoje só implícito via `--update` (reusa `adopted_from`). Relink explícito (re-apontar proveniência) 🟠 *a-desenhar*.
-- **Fluxo A** (downstream): o Core anuncia o que muda no [`federation/CHANGELOG.md`](../evolution/federation/CHANGELOG.md); a instância puxa quando quiser.
+- **Downstream**: o Core anuncia o que muda no [`federation/CHANGELOG.md`](../evolution/federation/CHANGELOG.md); a instância puxa quando quiser.
 - **Relatório auto-emitido + notificação** 🟢: o `--update` escreve o relatório do delta no
-  `docs/evolution/inbound/` do alvo (canal de fluxo A) e o hook "you have mail" o sinaliza — sem o maestro
-  repassá-lo à mão. Fecha o gap "fluxo A meia-estrada" (`inbox/2026-06-19-flow-a-report-and-bidirectional-mail.md`).
+  `docs/evolution/inbound/` do alvo (canal downstream) e o hook "you have mail" o sinaliza — sem o maestro
+  repassá-lo à mão. Fecha o gap "downstream meia-estrada" (`inbox/2026-06-19-flow-a-report-and-bidirectional-mail.md`).
 
 ## 3. Revisão
 
@@ -89,6 +89,6 @@
 
 - Guias por cenário: [`applying-greenfield.md`](./applying-greenfield.md) · [`applying-legacy.md`](./applying-legacy.md) · [`applying-regulated.md`](./applying-regulated.md)
 - Comando: [`.claude/commands/meta/adopt.md`](../../.claude/commands/meta/adopt.md)
-- Co-evolução (fluxos A/B/C) + linguagem ubíqua: [`docs/evolution/README.md`](../evolution/README.md)
+- Co-evolução (downstream/upstream/handoff) + linguagem ubíqua: [`docs/evolution/README.md`](../evolution/README.md)
 - ADR de adoção: [`onion-adr-repo-adoption-2026-06.md`](../analysis/onion-adr-repo-adoption-2026-06.md)
 - Requisitos de qualidade (card 6): [`onion-vision-concept-map-2026-06.md`](../analysis/onion-vision-concept-map-2026-06.md)

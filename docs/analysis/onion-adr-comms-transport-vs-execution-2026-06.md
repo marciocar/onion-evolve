@@ -37,7 +37,7 @@ muda apenas a **razão** registrada (e, com ela, o vocabulário da doutrina).
 ### Como o problema emergiu
 
 A feature 1 (canal `inbound/` + "you have mail" bidirecional + relatório auto-emitido) fechou a
-**entrega e a notificação** do fluxo A. Ao discutir o passo seguinte — **automatizar o relay** entre
+**entrega e a notificação** do downstream. Ao discutir o passo seguinte — **automatizar o relay** entre
 repos —, o maestro corrigiu uma imprecisão da doutrina:
 
 > O risco **não é** "A2A" (dois agentes se falarem). O risco é **leitura + execução automática** sem

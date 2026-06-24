@@ -1,4 +1,4 @@
-# Registro de membros da co-evolução Onion (fluxo A — downstream/distribuição).
+# Registro de membros da co-evolução Onion (downstream/distribuição).
 # Quem adota o Onion e em que versão. Fonte canônica: o core (onion-evolve).
 # Adicionar um projeto = 1 entrada aqui + rodar /meta:adopt no projeto.
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../../rfc/rfc-0001 §gatilho.)
