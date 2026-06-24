@@ -4,6 +4,6 @@
     { "fg": "color.on-surface.strong", "bg": "color.surface.base",   "min": 4.5, "note": "texto principal sobre fundo" },
     { "fg": "color.on-surface.muted",  "bg": "color.surface.base",   "min": 4.5, "note": "texto secundário sobre fundo" },
     { "fg": "color.on-surface.strong", "bg": "color.surface.subtle", "min": 4.5, "note": "texto principal sobre card" },
-    { "fg": "color.action.on-primary", "bg": "color.action.primary", "min": 3.0, "note": "texto em CTA (bold/large)" }
+    { "fg": "color.action.on-primary", "bg": "color.action.primary", "min": 4.5, "note": "texto em CTA — AA-normal pleno (qualquer tamanho)" }
   ]
 }

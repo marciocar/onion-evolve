@@ -14,7 +14,7 @@
     },
     "action": {
       "primary":    { "$value": "{color.brand.orange}", "$description": "CTA primário — laranja Onion" },
-      "on-primary": { "$value": "{color.neutral.0}",     "$description": "Texto sobre action.primary" },
+      "on-primary": { "$value": "{color.neutral.900}",   "$description": "Texto sobre action.primary — escuro p/ AA-normal (5.72:1); branco no laranja dava só 3.12:1 (AA-UI)" },
       "accent":     { "$value": "{color.brand.purple}",  "$description": "Acento/destaque — roxo família" }
     },
     "feedback": {
