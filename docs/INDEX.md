@@ -152,7 +152,8 @@ docs/
 │   ├── onion-adr-phased-resumable-pattern-2026-06.md  # ADR provisório (PFR = backbone faseado retomável L0)
 │   ├── onion-adr-ledger-format-location-2026-06.md  # ADR provisório (ledger: markdown fica; repo-neutro gated; norte = Carteiro)
 │   ├── onion-adr-coevolution-flow-naming-2026-06.md  # ADR (vocab: flow A/B/C → downstream/upstream/handoff)
-│   └── onion-adr-adopt-to-not-impose-2026-06.md  # ADR (adoção defere ao padrão do projeto; SDAAL design-system provider)
+│   ├── onion-adr-adopt-to-not-impose-2026-06.md  # ADR (adoção defere ao padrão do projeto; SDAAL design-system provider)
+│   └── onion-adr-branching-base-agnostic-2026-06.md  # ADR (branching: base resolvida/agnóstica, não GitFlow/develop hardcoded)
 │
 ├── materials/                  # Materiais derivados externos (Fase 4 — 6 arquivos)
 │   ├── README.md               # Índice e guia de uso dos materiais
@@ -312,6 +313,7 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 - **[ADR — Ledger de co-evolução: formato e localização — Junho/2026](analysis/onion-adr-ledger-format-location-2026-06.md)** — decisão provisória: o formato do ledger fica markdown+YAML (machine-readable já); o repo-neutro (Federação formal) fica gated por gatilho (I14); o norte que resolve o atrito de transporte é automatizar o "Carteiro" — alinhado ao padrão dominante 2026.
 - **[ADR — Vocabulário dos fluxos de co-evolução — Junho/2026](analysis/onion-adr-coevolution-flow-naming-2026-06.md)** — decisão aceita: renomeia os fluxos de rótulos opacos (flow A/B/C) para nomes próprios (**downstream / upstream / handoff**); cumpre a regra "rotular referências opacas" (code-standards §7); preserva história append-only.
 - **[ADR — "Onion adota, não impõe" — Junho/2026](analysis/onion-adr-adopt-to-not-impose-2026-06.md)** — decisão provisória: na adoção, verticais opinativas **detectam o padrão do projeto e deferem/estendem/introduzem** (never-clobber); abre o eixo SDAAL **design-system provider** (`onion-native`/`project-existing`/`none`) + validação de adoção. Diferido ao gatilho.
+- **[ADR — Branching: base resolvida (agnóstica) — Junho/2026](analysis/onion-adr-branching-base-agnostic-2026-06.md)** — decisão provisória: a base de integração é **dado resolvido** (via `resolve-integration-branch.sh`), não GitFlow/`develop` hardcoded; GitFlow = uma topologia, trunk-based = setar a integration branch. Instância do "adota não impõe" (#160); costura nos git:* diferida ao gatilho.
 - **[Revisão da Federação — Junho/2026](analysis/onion-federation-review-2026-06.md)** — federação multi-repo do Onion vs. A2A e padrões de coordenação multi-agente (jun/2026): alinhamento mainstream + por que não A2A vivo + recomendações de nomenclatura/interop.
 
 ---
