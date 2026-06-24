@@ -9,10 +9,17 @@ no `.env`; a SSOT permanece neutra. Nunca chamar a ferramenta-alvo direto no com
 | Provider | Saída | Status |
 |----------|-------|--------|
 | **`css-vars`** | `:root { --color-... }` (CSS custom properties) | ✅ implementado (`tokens-to-css-vars.sh`) — universal, zero dependência |
-| `tailwind` | `@theme { --color-...: ... }` (Tailwind v4) | 🔜 spec (Fase 1+) — deriva do css-vars |
+| `tailwind` | `@theme { --color-...: ... }` (Tailwind v4) | 🟡 **output de referência validado** em [`docs/materials/theme.tailwind.css`](../../../docs/materials/theme.tailwind.css) (materializado via `@design-system-specialist`, gate verde) · **adapter reutilizável 🔜** |
+| `shadcn` | `:root { --background/--primary/--ring/… }` (19 vars shadcn/ui, hex v4) | 🟡 **output de referência validado** em [`docs/materials/theme.shadcn.css`](../../../docs/materials/theme.shadcn.css) (gate verde, contrastes calculados) · **adapter reutilizável 🔜** |
 | `style-dictionary` | build multi-plataforma (CSS/TS/Swift/Kotlin) | 🔜 adapter (dependência node, opcional) |
 | `artifact-design` | preview/dogfood visual via skill nativa | 🔜 |
 | `none` | no-op (fallback gracioso) | ✅ |
+
+> **🟡 output validado vs adapter:** `tailwind` e `shadcn` já têm **arquivos-alvo corretos e validados pelo
+> gate** (servem hoje como tema pronto p/ `@import` e como *fixture* de validação). O que falta é o **script
+> adapter reutilizável** (`tokens-to-tailwind.sh` / `tokens-to-shadcn.sh`, irmãos do `tokens-to-css-vars.sh`)
+> para regenerar automaticamente quando a SSOT mudar — esse é o **próximo passo de transformação do core**
+> (distinto de produzir mais output one-off, que é execução). Recovery point para retomar a vertical.
 
 ## Resolução de cascata
 

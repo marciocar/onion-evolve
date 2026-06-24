@@ -20,6 +20,25 @@
 
 ---
 
+## 🎨 Identidade visual (design system materializado)
+
+Saída da vertical de design (`/design:identity`) — gerada da SSOT de tokens em `docs/design-context/`
+(gate WCAG verde, 28 tokens / 8 pares). **Pronto para outros usarem:**
+
+| Arquivo | Formato | Como usar |
+|---|---|---|
+| [`theme.css`](./theme.css) | CSS custom properties universais | `@import` em qualquer projeto; consumir `var(--color-action-primary)` etc. |
+| [`theme.tailwind.css`](./theme.tailwind.css) | Tailwind v4 `@theme` | `@import` num projeto Tailwind v4 (15 vars: `--color-background`, `--color-primary`…) |
+| [`theme.shadcn.css`](./theme.shadcn.css) | shadcn/ui (`:root`, hex v4) | `@import` antes do `@theme`; 19 vars shadcn (`--background`, `--primary`, `--ring`…) |
+| [`brand-book.md`](./brand-book.md) | guia | paleta, papéis semânticos, contrastes WCAG, do/don't |
+
+> **Regenerar:** edite a SSOT em `docs/design-context/`, rode `bash .claude/validation/lint-design-tokens.sh`
+> (gate obrigatório), depois o sink (`bash .claude/utils/design-sink/tokens-to-css-vars.sh`). **Não** edite os
+> `theme*.css` à mão — são saída gerada. Adapters Tailwind/shadcn reutilizáveis: ver
+> [`design-sink/README.md`](../../.claude/utils/design-sink/README.md) (roadmap).
+
+---
+
 ## Como usar estes materiais
 
 ### Para copywriters / designers (landing page)
