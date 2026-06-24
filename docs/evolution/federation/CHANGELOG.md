@@ -8,6 +8,23 @@
 
 ---
 
+## 2026-06-24 · #9 MATERIALIZADO: catálogo de playbooks em `onion-patterns` (5 recognition-primed) · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Seus 2 sinais empurraram o #9 pra frente — e ele saiu.** A doutrina catálogo-first (RFC-0002) foi **materializada** (PR #164): seção **Playbooks (recognition-primed)** em `onion-patterns`, conforme a forma decidida (§2: estender a skill, 3-5 destilados, não skill/comando novo).
+- **Os 5 playbooks:** descoberta→backlog · planejamento→entrega (é um PFR) · assumir-repo ("adota não impõe") · **agir-em-ambiente-compartilhado** (do seu sinal de 2026-06-23) · **laço-sem-guarda** (do seu pedido de 2026-06-24). Os 2 últimos **nasceram dos seus sinais** — seu uso de campo virou doutrina.
+- **Doutrina:** reconheça a situação → aplique o playbook (barato); sem match → delibere (caro) e o resíduo vira playbook novo. Seleção (catálogo) + execução (**PFR**).
+- **Ação p/ você:** no próximo `/meta:adopt --update` o catálogo chega vendorizado. Pode mover o **blip #9 → `done`** no seu radar (materialização entregue). O playbook "laço-sem-guarda" formaliza a doutrina; a **implementação** das guardas segue local (como no veredito).
+
+## 2026-06-24 · Veredito: "laço-sem-guarda" = playbook candidato (core) + guardas específicas (local) — reforça #9 · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Seu pedido-de-ajuda triado** ([inbox 2026-06-24](../inbox/_processed/2026-06-24-pedido-ajuda-escolha-dose-fila.md)): dose/fila + 4 laços de realimentação sem guarda. Sua intuição de **DIVIDIR** está certa.
+- **(Q1) Doutrina ou local? → DIVIDIR.** O padrão genérico *"reconheça um laço de realimentação sem guarda → aplique clamp/anti-windup/estado-mínimo/dead-letter"* **é candidato a playbook** em `onion-patterns` (recognition-primed) e **reforça o #9** (catálogo-first, de-deferido hoje no veredito RFC-0002). É teoria de controle genérica, não RHILO-específica → **core**. A *implementação* (qual guarda p/ BullMQ/WRR/outbox/dose) é **engenharia local sua**. Materialização do playbook = junto da materialização do #9 (caminho governado), não ad-hoc.
+- **(Q2) Ordem das guardas? → meta-heurística é doutrina; a ordem específica é sua.** A heurística *"guarde primeiro o laço de maior ganho/raio-de-dano; kill-switch antes de afinar"* é o nível-core. A ordem concreta (BullMQ→outbox→retenção→dose) é **decisão local com seu contexto de prod** — não ranqueio suas guardas daqui (não tenho o contexto de lá; "dev de outro repo não vive aqui").
+- **(Q3) Forma do playbook → sim, encaixa catálogo(seleção)+PFR(execução).** Se materializado: entrada recognition-primed em `onion-patterns` (reconhece o caso) → sequência de aplicação de guarda (um PFR se não-trivial). Confirma o framing seleção+execução (PFR #154).
+- **2º sinal de campo pró-#9.** Junto do veredito RFC-0002 de hoje, são duas evidências empurrando a materialização do catálogo p/ frente. Registrado como candidato a playbook ("unguarded-loop guard").
+- **Disposição dos anexos:** a pesquisa volumosa (técnicas de fila, freeze-triage — ~49KB) é **material seu (adotante)**, input de triagem, **não doc durável do core** — removida do core após triar (você a tem; o core retém o sinal + este veredito como registro). "Não vive aqui."
+- **Ação p/ você:** implementar as guardas localmente na ordem que seu contexto pedir (a meta-heurística orienta); o playbook genérico chega quando o #9 materializar (anúncio downstream). Abrir/!atualizar blip se fizer sentido no seu radar.
+
 ## 2026-06-24 · Veredito: branching = base resolvida (agnóstica), NÃO trunk-default — instância do "adota não impõe" · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Seu sinal recebido e triado** ([inbox 2026-06-24](../inbox/_processed/2026-06-24-sinal-branching-trunk-based-vs-develop.md)): o "metade em cada lado" (canal `docs/evolution/` + comandos vendorizados encalhados em `develop`, divergente da `rhilo/main` que deploya). Diligência adversarial sobre as 3 alegações: (1) git:* embute develop = **verdade** (sync/init/flow); (2) já há resolução de base = **verdade, mas só metade** (`resolve-integration-branch.sh` + `/engineer:pr` #104 existem; **não propagaram** aos git:*); (3) "/meta:co-evolve mandou commitar em develop" = **falso** (o co-evolve é agnóstico a branch; o canal vive onde o `docs/evolution/` foi commitado — quem o pôs em develop foi a adoção, não o comando).
