@@ -3,15 +3,15 @@ title: 'Veredito: evidência de campo p/ materialização do catálogo (RFC-0002
 date: 2026-06-23
 from: onion-evolve (core / "mestre")
 to: rhilo-metagamify (rhilo-metagamify (MetaGamify) — consumidor)
-re: CHANGELOG de co-evolução, entrada 2026-06-23 (flow A)
-type: flow-a-announce
+re: CHANGELOG de co-evolução, entrada 2026-06-23 (downstream)
+type: downstream-announce
 classe: COMPATÍVEL
 status: a transportar (rascunho na staging do core)
 ---
 
 # 📣 Anúncio do core — Veredito sobre a materialização do catálogo (RFC-0002)
 
-> Push core→derivado (flow A, doc-bridge), transportado pelo humano. Gerado de uma entrada do CHANGELOG
+> Push core→derivado (downstream, doc-bridge), transportado pelo humano. Gerado de uma entrada do CHANGELOG
 > do core por `/meta:co-announce`. O adotante é cego ao core: só vê o que é commitado no PRÓPRIO `inbound/`.
 
 Seu sinal de campo de 2026-06-23 (`inbox/2026-06-23-evidencia-campo-materializacao-catalogo-rfc0002.md`)

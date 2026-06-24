@@ -16,8 +16,8 @@ Mostra a posição **deste repo** no modelo de co-evolução do Onion, lê o `in
 **Read-only por padrão** — só move mensagens para `_processed/` quando você confirmar.
 
 > Modelo (resumo autossuficiente — o protocolo canônico completo vive em `onion-evolve/docs/evolution/`):
-> 3 fluxos — **A** core→projetos (releases/anúncios) · **B** projetos→core (sinal/bug/pedido-de-ajuda
-> via `inbox/`) · **C** dentro do repo (worktrees + um escritor por escopo + handoff). O humano é o **maestro**;
+> 3 fluxos — **downstream** core→projetos (releases/anúncios) · **upstream** projetos→core (sinal/bug/pedido-de-ajuda
+> via `inbox/`) · **handoff** dentro do repo (worktrees + um escritor por escopo). O humano é o **maestro**;
 > coordenação é **git-async** (sem IA-fala-IA).
 
 ## Passo 1 — Detectar o papel deste repo
@@ -34,8 +34,8 @@ Mapear: **`role: source` → CORE** (`onion-evolve`, dono do framework + protoco
 ## Passo 2 — Ler os canais (mensagens pendentes)
 
 Listar de 1º nível (excluir `_processed/` e `README.md`) **os dois canais** do doc-bridge:
-- **`docs/evolution/inbox/*.md`** — fluxo B (sinal/feedback). No core: chegando dos projetos; no consumidor: a relayar ao core.
-- **`docs/evolution/inbound/*.md`** — fluxo A (core→consumidor): relatório de adoção/update + anúncios. **Só existe no consumidor.**
+- **`docs/evolution/inbox/*.md`** — upstream (sinal/feedback). No core: chegando dos projetos; no consumidor: a relayar ao core.
+- **`docs/evolution/inbound/*.md`** — downstream (core→consumidor): relatório de adoção/update + anúncios. **Só existe no consumidor.**
 
 Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente → "sem pendências".
 (É o que o hook SessionStart conta para emitir o 📬 inbox / 📥 inbound.)
@@ -43,16 +43,16 @@ Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente →
 ## Passo 3 — Orientar conforme o papel
 
 **Se CONSUMIDOR (projeto):**
-- **Pedir ajuda / reportar bug / dar feedback ao core (fluxo B):** depositar um markdown datado
+- **Pedir ajuda / reportar bug / dar feedback ao core (upstream):** depositar um markdown datado
   (`AAAA-MM-DD-<assunto>.md`) no `inbox/` do **core** (`onion-evolve/docs/evolution/inbox/`, se montado;
   senão entregar ao maestro copiar). Sem comunicação viva — é assíncrono via git.
-- **Receber releases do framework (fluxo A):** ler o `inbound/` (relatório de update auto-emitido pelo core,
+- **Receber releases do framework (downstream):** ler o `inbound/` (relatório de update auto-emitido pelo core,
   com arquivos aplicados + novidades + próximos passos) e o `CHANGELOG` do core; atualizar com `/meta:adopt --update`.
 - O protocolo é **canônico no core** — este repo **referencia**, não redefine.
 
 **Se CORE (`onion-evolve`):**
 - **Ler o inbox** = sinal de campo dos projetos; triar (vira fix/feature/backlog).
-- **Anunciar** mudança relevante aos projetos no `docs/evolution/federation/CHANGELOG.md` (fluxo A) e
+- **Anunciar** mudança relevante aos projetos no `docs/evolution/federation/CHANGELOG.md` (downstream) e
   **gerar o anúncio pronto-para-transportar** com [`/meta:co-announce`](co-announce.md) (produtor do
   doc-bridge: escreve na staging `federation/outbox/<id>/`; o maestro transporta ao `inbound/` do adotante).
 - **Registro** de quem adota: `docs/evolution/federation/members.yaml`.

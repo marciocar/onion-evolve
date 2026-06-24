@@ -39,7 +39,7 @@ resolve a dor — o que resolve é **automatizar o transporte**.
 ### O que já existe (evidência)
 
 1. **O ledger hoje é doc-bridge leve.** Markdown commitado no próprio core (`docs/evolution/`): `inbox/`
-   (fluxo B), `inbound/` (fluxo A no adotante), `federation/{CHANGELOG.md, members.yaml, outbox/}`.
+   (upstream), `inbound/` (downstream no adotante), `federation/{CHANGELOG.md, members.yaml, outbox/}`.
    Transportado **à mão** pelo maestro (RFC-0001 §6 "Carteiro" = ainda a-desenhar).
 2. **Os artefatos já são machine-readable.** `CHANGELOG.md` é regex-parseável por
    `federation-inbox-scan.sh`; `members.yaml` é YAML puro (`yq`-parseável); `contracts/<id>.md` têm

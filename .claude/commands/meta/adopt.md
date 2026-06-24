@@ -129,7 +129,7 @@ else
 fi
 
 # (2) starter docs/evolution/ — cria só o que estiver AUSENTE (idempotente; não clobba canais em uso).
-#     DOIS canais simétricos: inbox/ (fluxo B: consumidor→core) + inbound/ (fluxo A: core→consumidor,
+#     DOIS canais simétricos: inbox/ (upstream: consumidor→core) + inbound/ (downstream: core→consumidor,
 #     relatório de adoção/update + anúncios). Ambos com _processed/ p/ lido/não-lido git-visível.
 for ch in inbox inbound; do
   mkdir -p "$DEST/docs/evolution/$ch/_processed"
@@ -140,8 +140,8 @@ if [ ! -f "$DEST/docs/evolution/README.md" ]; then
 # Co-evolução (consumidor)
 
 Este repo é **CONSUMIDOR** do Onion. O protocolo canônico (3 fluxos) vive no core
-(`onion-evolve/docs/evolution/`). Canais: `inbox/` para sinalizar o core (fluxo B) e `inbound/`
-para receber relatórios de update/anúncios do core (fluxo A). Rode `/meta:co-evolve` para ler/gerenciar.
+(`onion-evolve/docs/evolution/`). Canais: `inbox/` para sinalizar o core (upstream) e `inbound/`
+para receber relatórios de update/anúncios do core (downstream). Rode `/meta:co-evolve` para ler/gerenciar.
 PTR
 fi
 
@@ -174,17 +174,17 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/merge-prettierignore.sh" "$DEST"
 
 ---
 
-## 📨 Procedimento de Relatório de Fluxo A (auto-emitido no alvo)
+## 📨 Procedimento de Relatório Downstream (auto-emitido no alvo)
 
 Usado pela **Fase 6** (adoção) e pelo **`--update`**. O relatório do que foi feito **não** pode ficar só
 no chat da sessão-fonte — o maestro teria que repassá-lo à mão para a sessão do alvo. Em vez disso, a
 sessão-fonte **escreve o relatório por path no alvo**, num canal convencionado e git-visível
-(`docs/evolution/inbound/` — o canal de **fluxo A**, irmão do `inbox/` de fluxo B). Lá o hook "you have
+(`docs/evolution/inbound/` — o canal **downstream**, irmão do `inbox/` upstream). Lá o hook "you have
 mail" o detecta e a sessão do alvo o "recebe e age". Fecha o gap reportado em
 `docs/evolution/inbox/2026-06-19-flow-a-report-and-bidirectional-mail.md`.
 
-> ⚠️ **NÃO** escrever no `inbox/` do alvo: lá é o *outbox dele pro core* (fluxo B); apareceria como se o
-> consumidor estivesse sinalizando o core. Fluxo A tem o **próprio** canal (`inbound/`).
+> ⚠️ **NÃO** escrever no `inbox/` do alvo: lá é o *outbox dele pro core* (upstream); apareceria como se o
+> consumidor estivesse sinalizando o core. Downstream tem o **próprio** canal (`inbound/`).
 
 ```bash
 SOURCE_ROOT="$(git rev-parse --show-toplevel)"
@@ -206,7 +206,7 @@ to: $(basename "$DEST") (consumidor)
 type: flow-a-report
 source_commit: ${PIN}
 previous_commit: ${PREV:-—}
-flow: A (core→consumidor / distribuição)
+flow: downstream (core→consumidor / distribuição)
 ---
 
 # Relatório de ${OP} — pin ${PIN}
@@ -221,7 +221,7 @@ flow: A (core→consumidor / distribuição)
 1. Revisar o diff aplicado nesta sessão.
 2. Commitar a atualização (gitflow do próprio repo).
 3. Push / abrir PR na branch de integração.
-4. (Opcional) Devolver sinal de campo ao core via inbox/ (fluxo B).
+4. (Opcional) Devolver sinal de campo ao core via inbox/ (upstream).
 EOF
 ```
 
@@ -340,7 +340,7 @@ EOF
 ### Fase 6 — Relatório + próximos passos
 
 - Resumo: superfície instalada, modo, `INSTALL_DIR`, stamp, branch `onion/adopt`.
-- **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório de Fluxo A](#-procedimento-de-relatório-de-fluxo-a-auto-emitido-no-alvo)
+- **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$INSTALL_DIR"`, `OP=adopt`, `PIN=$SRC_COMMIT`, `PREV` vazio na 1ª adoção). O relatório fica em
   `docs/evolution/inbound/` do alvo (git-visível) → o hook "you have mail" o sinaliza na sessão do alvo.
 - **Próximos NO ALVO:** `/warm-up` → `/onion` → `/docs:build-tech-docs`.
@@ -414,7 +414,7 @@ git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
   # escolha explícita —, PRESERVAR a ausência: não congelar um valor; a resolução detecta a cada PR. O
   # passo (3) do Procedimento ainda seta o git config local de conveniência a partir do valor resolvido.)
   ```
-- **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório de Fluxo A](#-procedimento-de-relatório-de-fluxo-a-auto-emitido-no-alvo)
+- **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$TARGET"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`). Reusa o `diff --stat` já computado
   acima. **Fecha o gap real:** sem isto, o relatório do update sai só no chat da fonte e o maestro tem que
   repassá-lo à mão para a sessão do alvo (`docs/evolution/inbox/2026-06-19-flow-a-report-and-bidirectional-mail.md`).

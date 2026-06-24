@@ -1,6 +1,6 @@
-# 📤 Outbox — staging de anúncios flow A (core → adotante)
+# 📤 Outbox — staging de anúncios downstream (core → adotante)
 
-Staging **do core** para anúncios de fluxo A **aguardando transporte humano** ao `inbound/` de cada
+Staging **do core** para anúncios downstream **aguardando transporte humano** ao `inbound/` de cada
 adotante. Gerada por [`/meta:co-announce`](../../../../.claude/commands/meta/co-announce.md) a partir de
 uma entrada do [`CHANGELOG.md`](../CHANGELOG.md).
 

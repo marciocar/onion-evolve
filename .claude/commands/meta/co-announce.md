@@ -1,20 +1,20 @@
 ---
 name: co-announce
-description: Gera um anúncio flow A pronto-para-transportar a partir de uma entrada do CHANGELOG de co-evolução, endereçado ao(s) adotante(s) do campo `alvo:` (resolvidos via members.yaml), escrevendo na staging do core (federation/outbox/<id>/). É o lado producer do doc-bridge leve (≠ /meta:federation-publish, que é o ledger de contratos). Human-in-the-loop — o maestro revisa e transporta para o inbound/ do adotante (a sessão do core nunca pusha repo alheio).
+description: Gera um anúncio downstream pronto-para-transportar a partir de uma entrada do CHANGELOG de co-evolução, endereçado ao(s) adotante(s) do campo `alvo:` (resolvidos via members.yaml), escrevendo na staging do core (federation/outbox/<id>/). É o lado producer do doc-bridge leve (≠ /meta:federation-publish, que é o ledger de contratos). Human-in-the-loop — o maestro revisa e transporta para o inbound/ do adotante (a sessão do core nunca pusha repo alheio).
 model: sonnet
 category: meta
-tags: [co-evolution, flow-a, announce, inbound, outbox, bridge, federation]
+tags: [co-evolution, downstream, announce, inbound, outbox, bridge, federation]
 version: "1.0.0"
 updated: "2026-06-22"
 allowed-tools: Read Write Edit Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(bash .claude/validation/onion-version.sh) Bash(git -C * log*)
 argument-hint: "[<data-ou-slug-da-entrada>]  (sem arg = última entrada do CHANGELOG com alvo: ≠ nenhum)"
 ---
 
-# 📣 /meta:co-announce — Anunciar mudança aos adotantes (flow A, doc-bridge)
+# 📣 /meta:co-announce — Anunciar mudança aos adotantes (downstream, doc-bridge)
 
 Transforma uma entrada do `docs/evolution/federation/CHANGELOG.md` num **anúncio pronto-para-transportar**
 no `inbound/` do adotante. Fecha o gap do [backlog #6](../../../docs/analysis/onion-coevolution-backlog-2026-06-18.md):
-a capacidade de flow A existe, mas o anúncio **nunca era exercido** ao shipar — dependia de o humano lembrar.
+a capacidade de downstream existe, mas o anúncio **nunca era exercido** ao shipar — dependia de o humano lembrar.
 
 > **O que este comando NÃO é.** Não é o relatório auto-emitido de `/meta:adopt --update` (esse é
 > **adotante-puxa**, vem com o delta vendorizado). É o **core-empurra**: anuncia uma mudança/decisão
@@ -29,7 +29,7 @@ a capacidade de flow A existe, mas o anúncio **nunca era exercido** ao shipar �
 
 Detectar o papel (igual a `/meta:co-evolve`): rodar `bash .claude/validation/onion-version.sh` e ler `role:`.
 - `role: source` → **CORE** → segue.
-- `role: adopted` → **CONSUMIDOR** → **parar**: adotante não anuncia (ele sinaliza via `inbox/`, fluxo B).
+- `role: adopted` → **CONSUMIDOR** → **parar**: adotante não anuncia (ele sinaliza via `inbox/`, upstream).
   Orientar a usar `/meta:co-evolve`.
 
 ## Passo 2 — Selecionar a entrada do CHANGELOG
@@ -62,7 +62,7 @@ existir no `members.yaml` → **avisar** (registro ausente) e seguir só com os 
 
 Para cada destinatário, escrever `docs/evolution/federation/outbox/<id>/<data-da-entrada>-<slug>.md`
 (`mkdir -p` do dir + `_processed/`). Envelope **simétrico** ao `inbound/` que o adotante já entende
-(ver `/meta:adopt` § Procedimento de Relatório de Fluxo A):
+(ver `/meta:adopt` § Procedimento de Relatório Downstream):
 
 ```markdown
 ---
@@ -70,15 +70,15 @@ title: '<assunto da entrada>'
 date: <data da entrada>
 from: onion-evolve (core / "mestre")
 to: <id> (<name> — consumidor)
-re: CHANGELOG de co-evolução, entrada <data> (flow A)
-type: flow-a-announce
+re: CHANGELOG de co-evolução, entrada <data> (downstream)
+type: downstream-announce
 classe: <COMPATÍVEL | BREAKING>
 status: a transportar (rascunho na staging do core)
 ---
 
 # 📣 Anúncio do core — <assunto>
 
-> Push core→derivado (flow A, doc-bridge), transportado pelo humano. Gerado de uma entrada do CHANGELOG
+> Push core→derivado (downstream, doc-bridge), transportado pelo humano. Gerado de uma entrada do CHANGELOG
 > do core por `/meta:co-announce`. O adotante é cego ao core: só vê o que é commitado no PRÓPRIO `inbound/`.
 
 <corpo da entrada do CHANGELOG, colado verbatim — já é o conteúdo do anúncio>
@@ -99,7 +99,7 @@ status: a transportar (rascunho na staging do core)
 Apresentar o que foi gerado e **não** assumir o transporte. Saída:
 
 ```
-📣 anúncio gerado (flow A) — entrada <data> · <assunto> [<COMPATÍVEL|BREAKING>]
+📣 anúncio gerado (downstream) — entrada <data> · <assunto> [<COMPATÍVEL|BREAKING>]
    ◆ destinatários (de members.yaml): <id>, <id>
    ◆ rascunhos na staging:
        docs/evolution/federation/outbox/<id>/<arquivo>.md
@@ -124,7 +124,7 @@ ou, sem destinatário:
 ## 🔗 Referências
 
 - Consumidor/orientação: [`/meta:co-evolve`](co-evolve.md) (lê inbox/inbound, gerencia)
-- Envelope irmão: [`/meta:adopt`](adopt.md) § Procedimento de Relatório de Fluxo A
+- Envelope irmão: [`/meta:adopt`](adopt.md) § Procedimento de Relatório Downstream
 - Protocolo dos 3 fluxos: [docs/evolution/README.md](../../../docs/evolution/README.md)
 - Registro de adotantes: [members.yaml](../../../docs/evolution/federation/members.yaml) · Anúncios: [CHANGELOG.md](../../../docs/evolution/federation/CHANGELOG.md)
 - Ledger de contratos (federação formal): [`/meta:federation-publish`](federation-publish.md)
