@@ -58,9 +58,8 @@
 
   /*
    * Texto/ícone sobre accent — branco para AA normal (5.96:1)
-   * token: color.surface.base → color.neutral.0
+   * token: color.action.on-accent → color.neutral.0 (papel dedicado, criado neste ciclo)
    * Decisão: on-surface.strong (#1A1714) sobre roxo dá apenas 3.00:1 (AA-UI, falha AA normal).
-   *          Branco é o único candidato semântico disponível que passa AA normal.
    */
   --color-accent-foreground: #FFFFFF;
 

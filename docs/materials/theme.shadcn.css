@@ -1,0 +1,242 @@
+/*
+ * GERADO — NÃO editar à mão.
+ * SSOT: docs/design-context/foundations/color.tokens.json
+ *        docs/design-context/semantic/color.tokens.json (28 tokens W3C/DTCG)
+ * Sink: shadcn/ui — variáveis de tema consumidas pelos componentes shadcn
+ *
+ * Gate WCAG verificado: lint-design-tokens.sh — 0 violações HARD (2026-06-24).
+ *
+ * ─── FORMATO ESCOLHIDO: hex direto (shadcn/ui com Tailwind v4) ───────────────
+ *
+ * shadcn/ui tem duas convenções históricas:
+ *
+ *   v3 (Tailwind CSS v3, globals.css padrão shadcn até 2024):
+ *     Usa HSL space-separated sem "hsl()" — ex.: --background: 0 0% 100%
+ *     Isso permite que o Tailwind v3 envolva em hsl() via `hsl(var(--background))`.
+ *
+ *   v4 (Tailwind CSS v4, convenção vigente em 2025):
+ *     Usa hex ou oklch diretos no :root — ex.: --background: #ffffff
+ *     O Tailwind v4 consome custom properties CSS diretamente no bloco @theme;
+ *     não há necessidade de space-separated HSL como intermediário.
+ *
+ * DECISÃO: hex direto (convenção v4).
+ * Justificativa: nosso outro sink (theme.tailwind.css) é Tailwind v4 @theme.
+ * Usar hex é consistente com a SSOT (que armazena hex), elimina conversão HSL
+ * com perda de legibilidade e é o formato que o inicializador `shadcn@latest`
+ * gera quando o projeto já usa Tailwind v4.
+ *
+ * ADAPTAR PARA v3: substituir cada valor hex pelo HSL space-separated
+ * equivalente (ex.: #FFFFFF → 0 0% 100%) e envolver no CSS do Tailwind v3
+ * com `hsl(var(--token))`. A tabela de mapeamentos abaixo documenta os papéis
+ * semânticos para facilitar essa conversão se necessário.
+ *
+ * ─── CONTRASTE VERIFICADO (pares texto/fundo, WCAG AA-normal ≥4.5:1) ────────
+ *
+ * --foreground / --background         : 17.85:1  PASS
+ * --card-foreground / --card          : 16.53:1  PASS
+ * --popover-foreground / --popover    : 17.85:1  PASS
+ * --primary-foreground / --primary    :  5.72:1  PASS  (branco daria 3.12 — FAIL)
+ * --secondary-foreground / --secondary: 14.74:1  PASS
+ * --muted-foreground / --muted        :  7.84:1  PASS
+ * --accent-foreground / --accent      :  5.96:1  PASS  (escuro daria 3.00 — FAIL)
+ * --destructive-foreground/--destructive: 4.56:1 PASS  (branco daria 3.91 — FAIL)
+ *
+ * ─── IMPORTAÇÃO ──────────────────────────────────────────────────────────────
+ *
+ * Adicionar ao entry-point CSS do projeto (antes de @theme, se houver):
+ *   @import "theme.shadcn.css";
+ *
+ * E garantir que tailwind.config / CSS não sobrescreva estas variáveis com
+ * os defaults shadcn (--background: 0 0% 100%, etc).
+ */
+
+:root {
+  /*
+   * ── SUPERFÍCIES ────────────────────────────────────────────────────────────
+   */
+
+  /* Fundo da página
+   * papel semântico : color.surface.base
+   * token resolvido : color.neutral.0 → #FFFFFF
+   */
+  --background: #FFFFFF;
+
+  /* Texto principal sobre a página
+   * papel semântico : color.on-surface.strong
+   * token resolvido : color.neutral.900 → #1A1714
+   * contraste       : 17.85:1 sobre --background → AA-normal PASS
+   */
+  --foreground: #1A1714;
+
+  /*
+   * ── CARD ───────────────────────────────────────────────────────────────────
+   */
+
+  /* Superfície de cards e painéis elevados
+   * papel semântico : color.surface.subtle
+   * token resolvido : color.neutral.50 → #F7F6F4
+   * decisão         : subtle é um degrau acima do base; cards ficam visualmente
+   *                   separados sem sombra — convenção comum em design systems.
+   */
+  --card: #F7F6F4;
+
+  /* Texto sobre cards
+   * papel semântico : color.on-surface.strong
+   * token resolvido : color.neutral.900 → #1A1714
+   * contraste       : 16.53:1 sobre --card → AA-normal PASS
+   */
+  --card-foreground: #1A1714;
+
+  /*
+   * ── POPOVER ────────────────────────────────────────────────────────────────
+   */
+
+  /* Superfície de popovers, dropdowns, tooltips
+   * papel semântico : color.surface.base
+   * token resolvido : color.neutral.0 → #FFFFFF
+   * decisão         : popovers surgem "sobre" o conteúdo; usar base (#FFFFFF)
+   *                   em vez de subtle garante a maior nitidez sobre qualquer
+   *                   fundo da página e é o comportamento padrão shadcn.
+   */
+  --popover: #FFFFFF;
+
+  /* Texto sobre popovers
+   * papel semântico : color.on-surface.strong
+   * token resolvido : color.neutral.900 → #1A1714
+   * contraste       : 17.85:1 sobre --popover → AA-normal PASS
+   */
+  --popover-foreground: #1A1714;
+
+  /*
+   * ── PRIMARY ────────────────────────────────────────────────────────────────
+   */
+
+  /* CTA primário — laranja Onion
+   * papel semântico : color.action.primary
+   * token resolvido : color.brand.orange → #D97757
+   */
+  --primary: #D97757;
+
+  /* Texto/ícone sobre primary
+   * papel semântico : color.action.on-primary
+   * token resolvido : color.neutral.900 → #1A1714
+   * contraste       : 5.72:1 sobre --primary → AA-normal PASS
+   * decisão         : branco (#FFFFFF) sobre laranja daria 3.12:1 — falha
+   *                   AA-normal (passa só AA-UI). Escuro é obrigatório.
+   */
+  --primary-foreground: #1A1714;
+
+  /*
+   * ── SECONDARY ──────────────────────────────────────────────────────────────
+   */
+
+  /* Superfície de ações/botões secundários
+   * papel semântico : color.surface.muted
+   * token resolvido : color.neutral.100 → #ECE9E4
+   * decisão         : não há papel "secondary" na SSOT; mapeado para
+   *                   surface.muted — a superfície mais silenciada disponível,
+   *                   adequada para botões secundários (ghost/outlined) e
+   *                   elementos de menor hierarquia visual.
+   *                   LACUNA: color.action.secondary não existe na SSOT.
+   */
+  --secondary: #ECE9E4;
+
+  /* Texto sobre secondary
+   * papel semântico : color.on-surface.strong
+   * token resolvido : color.neutral.900 → #1A1714
+   * contraste       : 14.74:1 sobre --secondary → AA-normal PASS
+   */
+  --secondary-foreground: #1A1714;
+
+  /*
+   * ── MUTED ──────────────────────────────────────────────────────────────────
+   */
+
+  /* Superfície para conteúdo silenciado (badges, seções de contexto, tabs)
+   * papel semântico : color.surface.muted
+   * token resolvido : color.neutral.100 → #ECE9E4
+   * nota            : compartilha valor com --secondary por design — shadcn usa
+   *                   muted para contextos menos interativos (não-clicáveis);
+   *                   secondary para ações interativas. Papéis distintos,
+   *                   valor coincidente nesta paleta.
+   */
+  --muted: #ECE9E4;
+
+  /* Texto silenciado / placeholder / label auxiliar
+   * papel semântico : color.on-surface.muted
+   * token resolvido : color.neutral.700 → #4A453E
+   * contraste       : 7.84:1 sobre --muted → AA-normal PASS
+   */
+  --muted-foreground: #4A453E;
+
+  /*
+   * ── ACCENT ─────────────────────────────────────────────────────────────────
+   */
+
+  /* Acento — roxo família Onion (hover states, seleção, destaque)
+   * papel semântico : color.action.accent
+   * token resolvido : color.brand.purple → #8A2BE2
+   */
+  --accent: #8A2BE2;
+
+  /* Texto/ícone sobre accent
+   * papel semântico : color.action.on-accent (papel dedicado criado neste ciclo)
+   * token resolvido : color.neutral.0 → #FFFFFF
+   * contraste       : 5.96:1 sobre --accent → AA-normal PASS (travado no gate)
+   * decisão         : on-surface.strong (#1A1714) sobre roxo dá 3.00:1 —
+   *                   falha AA-normal. Branco é obrigatório.
+   */
+  --accent-foreground: #FFFFFF;
+
+  /*
+   * ── DESTRUCTIVE ────────────────────────────────────────────────────────────
+   */
+
+  /* Superfície/cor de ação destrutiva (delete, error, danger zone)
+   * papel semântico : color.feedback.danger
+   * token resolvido : color.red.500 → #E5484D
+   */
+  --destructive: #E5484D;
+
+  /* Texto sobre destructive
+   * papel semântico : color.feedback.on-danger (papel dedicado criado neste ciclo)
+   * token resolvido : color.neutral.900 → #1A1714
+   * contraste       : 4.56:1 sobre --destructive → AA-normal PASS (margem justa)
+   * decisão         : branco (#FFFFFF) sobre vermelho dá 3.91:1 — falha AA-normal.
+   *                   Escuro é necessário; margem justa TRAVADA no gate (se o
+   *                   vermelho mudar e cair <4.5, o gate barra HARD).
+   */
+  --destructive-foreground: #1A1714;
+
+  /*
+   * ── UTILIDADES ─────────────────────────────────────────────────────────────
+   */
+
+  /* Borda padrão (divisores, contornos neutros)
+   * papel semântico : color.border.default
+   * token resolvido : color.neutral.300 → #C9C3BA
+   * nota WCAG       : borda não-texto — sem requisito de contraste de texto;
+   *                   requisito de UI component (3:1 sobre adjacente) não se
+   *                   aplica quando é apenas separador decorativo.
+   */
+  --border: #C9C3BA;
+
+  /* Borda de campos de entrada (input, textarea, select)
+   * papel semântico : color.border.default
+   * token resolvido : color.neutral.300 → #C9C3BA
+   * decisão         : mesma borda semântica — inputs compartilham o padrão
+   *                   de borda do design. LACUNA: não há papel
+   *                   color.border.input separado na SSOT.
+   */
+  --input: #C9C3BA;
+
+  /* Anel de foco (outline de acessibilidade — foco visível, WCAG 2.4.11)
+   * papel semântico : color.action.accent
+   * token resolvido : color.brand.purple → #8A2BE2
+   * decisão         : accent roxo é o elemento de identidade mais distinto
+   *                   da paleta; garante foco visível inequívoco sobre
+   *                   superfícies claras (surface.base/subtle/muted) e
+   *                   sobre primary laranja.
+   */
+  --ring: #8A2BE2;
+}
