@@ -171,6 +171,42 @@ Para Jira (`TASK_MANAGER_PROVIDER=jira`), usar **ADF** (JSON estruturado) — n�
 /meta:create-knowledge-base  # nova KB em docs/knowledge-base/
 ```
 
+## Playbooks (recognition-primed — catálogo, blip #9)
+
+> **Doutrina (RFC-0002):** dado um objetivo, **reconheça** a situação contra este catálogo e **aplique** o
+> playbook (barato); só **delibere** (fan-out/juízes — caro) quando não há match, e o resíduo vira playbook
+> novo (o catálogo aprende). É **seleção** (qual aplicar) + **execução** (rodar) — a execução não-trivial
+> costuma ser um **PFR** (workflow faseado retomável: `reconheça o caso → rode o fluxo`).
+
+### descoberta → backlog
+Situação: ideias/reuniões brutas a virar backlog priorizado.
+```
+/product/collect → /product/spec → /product/feature   (bruto: /product/extract-meeting → /product/consolidate-meetings → /product/convert-to-tasks)
+```
+
+### planejamento → entrega  (é um PFR)
+Situação: feature definida a implementar com rastreabilidade.
+```
+/engineer/plan → /engineer/start <slug> → /engineer/work → /engineer/pre-pr → /engineer/pr
+```
+
+### assumir um repo  ("adota não impõe")
+Situação: instalar/operar o Onion num projeto novo ou legado — **detectar o padrão do projeto, não impor**.
+```
+/meta:adopt (detect → defer/extend/introduce, never-clobber) → /docs/reverse-consolidate → /docs/build-tech-docs
+```
+
+### agir em ambiente compartilhado / prod-durante-dev  (guarda — sinal de campo)
+Situação: incidente em prod enquanto se desenvolve; HML = prod-real + homolog; `.env`/flags ambíguos.
+Playbook (disciplina, não-comando): **declarar `{ambiente, branch, reversível?}` antes de agir** · **verificar
+antes de escrever em prod** (nunca agir sob suposição não-verificada) · **separar frentes** (incidente ≠ feature).
+
+### laço de realimentação sem guarda  (guarda — sinal de campo)
+Situação: laço de alto ganho sobre estado/sinal **sem amortecimento** (sem clamp, cap-de-profundidade,
+dead-letter, anti-windup).
+Playbook: reconheça → **clamp / anti-windup / estado-mínimo / dead-letter**; **guarde primeiro o laço de
+maior ganho/raio-de-dano** (kill-switch antes de afinar). Implementação concreta = engenharia local do adotante.
+
 ## Gotchas
 
 - **Feature slug com underscore quebra GitFlow**: branches Git e pastas de sessão usam o mesmo slug — kebab-case é obrigatório
@@ -185,3 +221,4 @@ Para Jira (`TASK_MANAGER_PROVIDER=jira`), usar **ADF** (JSON estruturado) — n�
 - Skill relacionada: `language-standards` (idioma e docs)
 - Skill relacionada: `onion-validation` (regras de validação)
 - Agente: `@metaspec-gate-keeper` (valida conformidade)
+- Playbooks/catálogo (#9): `docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md` (doutrina) · `docs/analysis/onion-adr-phased-resumable-pattern-2026-06.md` (PFR = execução)
