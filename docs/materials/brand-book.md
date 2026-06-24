@@ -43,7 +43,7 @@ clareza e consistência acima de ornamento. Ver [`brief.md`](../design-context/b
 | `on-surface.strong` | `{neutral.900}` | `#1A1714` |
 | `on-surface.muted` | `{neutral.700}` | `#4A453E` |
 | `action.primary` | `{brand.orange}` | `#D97757` |
-| `action.on-primary` | `{neutral.0}` | `#FFFFFF` |
+| `action.on-primary` | `{neutral.900}` | `#1A1714` |
 | `action.accent` | `{brand.purple}` | `#8A2BE2` |
 | `feedback.success` | `{green.500}` | `#3FB950` |
 | `feedback.info` | `{blue.500}` | `#3B82F6` |
@@ -59,19 +59,20 @@ clareza e consistência acima de ornamento. Ver [`brief.md`](../design-context/b
 | Texto principal sobre `surface.subtle` | **16.53:1** | ✅ | ✅ |
 | Texto principal sobre `surface.muted` | **14.74:1** | ✅ | ✅ |
 | Acento (roxo) sobre fundo | **5.96:1** | ✅ | ✅ |
-| **Branco sobre CTA laranja** | **3.12:1** | ❌ | ✅ |
+| **Texto escuro sobre CTA laranja** | **5.72:1** | ✅ | ✅ |
 
 ## Do / Don't
 
 ✅ **Do**
-- Use branco no CTA laranja **só como rótulo de botão** (UI/texto grande — 3.12:1 cobre AA-UI).
+- Use `action.on-primary` (**texto escuro `#1A1714`**) no CTA laranja — **5.72:1**, AA-normal pleno em
+  qualquer tamanho. O gate exige `min 4.5` para esse par.
 - Use `on-surface.strong` para corpo de texto (17.85:1 — folga enorme).
 - Use o roxo como acento/destaque (links, badges, realces) — 5.96:1 sobre fundo claro é seguro.
 - Consuma sempre os **papéis semânticos**, regenere o `theme.css` pelo sink.
 
 ❌ **Don't**
-- **Não** ponha texto-corpo branco pequeno sobre o laranja (3.12 < 4.5 — falha AA normal). Para parágrafo
-  sobre laranja, use `neutral.900`.
+- **Não** ponha branco sobre o laranja (3.12 < 4.5 — falha AA-normal; o gate barra). O `on-primary` é
+  escuro de propósito.
 - **Não** use o roxo como ação primária (ele é acento; o laranja é o CTA).
 - **Não** edite o `theme.css` à mão — é saída gerada.
 - **Não** introduza cor fora da escala sem passar pelo gate.
