@@ -149,7 +149,8 @@ docs/
 │   ├── onion-federation-adr-a2a-format-interop-2026-06.md  # ADR durável (federação A2A)
 │   ├── onion-adr-repo-adoption-2026-06.md  # ADR durável (adoção de repo / /meta:adopt)
 │   ├── onion-adr-domain-context-lifecycle-2026-06.md  # ADR durável (contexto de domínio = SSOT viva)
-│   └── onion-adr-phased-resumable-pattern-2026-06.md  # ADR provisório (PFR = backbone faseado retomável L0)
+│   ├── onion-adr-phased-resumable-pattern-2026-06.md  # ADR provisório (PFR = backbone faseado retomável L0)
+│   └── onion-adr-ledger-format-location-2026-06.md  # ADR provisório (ledger: markdown fica; repo-neutro gated; norte = Carteiro)
 │
 ├── materials/                  # Materiais derivados externos (Fase 4 — 6 arquivos)
 │   ├── README.md               # Índice e guia de uso dos materiais
@@ -305,6 +306,7 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 - **[ADR — Adoção de repositório — Junho/2026](analysis/onion-adr-repo-adoption-2026-06.md)** — decisão durável: adoção = comando in-platform `/meta:adopt` (não CLI); stamp de versão; rampa da federação.
 - **[ADR — Contexto de domínio: SSOT viva — Junho/2026](analysis/onion-adr-domain-context-lifecycle-2026-06.md)** — decisão durável: contexto de domínio = SSOT viva com ciclo CRUD+ (não snapshot); 3 domínios peer + critério de promoção; pesos derivados; camada *Manage* executável = Tijolo 2.
 - **[ADR — Padrão Faseado Retomável (PFR) — Junho/2026](analysis/onion-adr-phased-resumable-pattern-2026-06.md)** — decisão provisória: nomeia o PFR como backbone determinístico L0 (sessão + `STATE.md` + fases); adia cravar em `commands.md §3` até gatilho de evidência (scaffolder usado ≥2x, ou strategy-ADR aceito).
+- **[ADR — Ledger de co-evolução: formato e localização — Junho/2026](analysis/onion-adr-ledger-format-location-2026-06.md)** — decisão provisória: o formato do ledger fica markdown+YAML (machine-readable já); o repo-neutro (Federação formal) fica gated por gatilho (I14); o norte que resolve o atrito de transporte é automatizar o "Carteiro" — alinhado ao padrão dominante 2026.
 - **[Revisão da Federação — Junho/2026](analysis/onion-federation-review-2026-06.md)** — federação multi-repo do Onion vs. A2A e padrões de coordenação multi-agente (jun/2026): alinhamento mainstream + por que não A2A vivo + recomendações de nomenclatura/interop.
 
 ---

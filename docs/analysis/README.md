@@ -17,6 +17,7 @@ documentação ativa contém só o que é canônico ou usado em runtime; o resto
 | `onion-adr-repo-adoption-2026-06.md` | **ADR durável** — decisão doutrinária (adoção de repo = comando in-platform `/meta:adopt`, não CLI; stamp de versão; rampa da federação). ADRs são *superseded*, **nunca removidos**. |
 | `onion-federation-adr-a2a-format-interop-2026-06.md` | **ADR durável** — decisão doutrinária (linha vermelha A2A partida: runtime proibido, formato permitido como projeção one-way). ADRs são *superseded*, **nunca removidos**. |
 | `onion-adr-phased-resumable-pattern-2026-06.md` | **ADR durável (provisório)** — nomeia o PFR como padrão transversal L0 (backbone faseado retomável); fica até ser superseded pelo PR constitucional (cravar em `commands.md §3`). O rótulo "provisório" **não** o torna efêmero — ADRs são *superseded*, **nunca removidos**. |
+| `onion-adr-ledger-format-location-2026-06.md` | **ADR durável (provisório)** — veredito sobre formato e localização do ledger de co-evolução (markdown fica; repo-neutro gated; norte = automatizar transporte/Carteiro). Fica até ser superseded quando o gatilho de graduação disparar. "Provisório" **não** o torna efêmero — ADRs são *superseded*, **nunca removidos**. |
 
 ## O que é REMOVIDO (efêmero — git arquiva)
 
