@@ -178,6 +178,7 @@ docs/
 - **[Guia de Comandos](onion/commands-guide.md)** - Documentação completa de todos os comandos disponíveis
 - **[Referência de Agentes](onion/agents-reference.md)** - Lista e descrição de todos os agentes especializados
 - **[Fluxos de Engenharia](onion/engineering-flows.md)** - Workflows detalhados para desenvolvimento
+- **[Co-evolução — Cartão de Referência](onion/co-evolution-reference.md)** - Família de comandos `evolve`/`co-evolve`/`co-announce`/`co-deliver`/`federation-*` com quem-executa × direção do dado
 - **[Sistema de Testes e Validação](onion/testing-validation-system.md)** - Framework completo de testes e validação
 
 #### Integrações e Configuração
