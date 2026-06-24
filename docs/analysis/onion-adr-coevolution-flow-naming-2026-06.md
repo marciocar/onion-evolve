@@ -50,6 +50,11 @@ de legenda. `handoff` separa o eixo intra-repo do cross-repo.
 (append-only, I7) e `*/_processed/` (auditoria) **preservam** "flow A/B": reescrevê-los violaria o
 invariante append-only. Quem lê uma entrada antiga encontra a nota de equivalência na RFC-0001.
 
+> **Fronteira de escopo (staging vs história):** rascunhos de outbox **ativos** (`outbox/<id>/*.md`
+> **não**-`_processed/`) são **staging mutável** → usam o vocabulário corrente (downstream/upstream); só
+> entram em "história imutável" ao serem movidos para `_processed/`. Assim, um anúncio recém-gerado por
+> `/meta:co-announce` (campo `type: downstream-announce`) nunca nasce com vocabulário aposentado.
+
 ## Consequências
 
 - ✅ Vocabulário auto-explicativo; elimina o id opaco da operação diária (cumpre code-standards §7).

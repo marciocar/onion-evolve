@@ -61,7 +61,7 @@ member_field() {  # $1 = id desejado ; $2 = nome do campo
   awk -v want="$1" -v field="$2" '
     function clean(s) {  # remove valor: tira comentário inline YAML, aspas e espaços
       sub(/^[^:]*:[[:space:]]*/,"",s); sub(/[[:space:]]*#.*$/,"",s)
-      gsub(/[[:space:]]+$/,"",s); gsub(/"/,"",s); return s
+      gsub(/[[:space:]]+$/,"",s); gsub(/"/,"",s); gsub(/\047/,"",s); return s
     }
     /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ {
       v=clean($0); cur=(v==want); next
@@ -81,9 +81,12 @@ NAME="$(member_field "${MEMBER}" name)"
 # --- Resolve o path local do alvo: --target > members.yaml path: (se resolvível) ---
 if [ -z "${TARGET}" ]; then
   CFG_PATH="$(member_field "${MEMBER}" path)"
-  if [ -n "${CFG_PATH}" ] && [ "${CFG_PATH}" != "." ] && [ -d "${CFG_PATH}" ]; then
-    TARGET="${CFG_PATH}"
-  else
+  if [ -n "${CFG_PATH}" ] && [ "${CFG_PATH}" != "." ]; then
+    # path relativo do members.yaml resolve contra a RAIZ DO REPO, não o CWD da invocação
+    case "${CFG_PATH}" in /*) ;; *) CFG_PATH="${REPO_ROOT}/${CFG_PATH}" ;; esac
+    [ -d "${CFG_PATH}" ] && TARGET="${CFG_PATH}"
+  fi
+  if [ -z "${TARGET}" ]; then
     echo "ERRO: path local do adotante '${MEMBER}' não resolvido. Informe --target <path>" >&2
     echo "      (members.yaml não traz 'path:' utilizável para este consumer)." >&2
     exit 2

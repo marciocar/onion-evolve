@@ -36,7 +36,7 @@ worktree).
 
 Rodar `bash .claude/validation/onion-version.sh` e ler `role:`.
 - `role: source` → **CORE** → segue.
-- `role: adopted` → **CONSUMIDOR** → **parar**: adotante não entrega (ele sinaliza via `inbox/`, fluxo B).
+- `role: adopted` → **CONSUMIDOR** → **parar**: adotante não entrega (ele sinaliza via `inbox/`, upstream).
 
 ## Passo 2 — Resolver alvo e rascunho(s)
 

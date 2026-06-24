@@ -3,15 +3,15 @@ title: '/meta:adopt provisiona proteção de formatador nativamente (.prettierig
 date: 2026-06-22
 from: onion-evolve (core / "mestre")
 to: rhilo-metagamify (rhilo-metagamify (MetaGamify) — consumidor)
-re: CHANGELOG de co-evolução, entrada 2026-06-22 (flow A) — resposta ao sinal de prettier
-type: flow-a-announce
+re: CHANGELOG de co-evolução, entrada 2026-06-22 (downstream) — resposta ao sinal de prettier
+type: downstream-announce
 classe: COMPATÍVEL
 status: a transportar (rascunho na staging do core)
 ---
 
 # 📣 Anúncio do core — proteção de formatador agora nativa no `/meta:adopt`
 
-> Push core→derivado (flow A, doc-bridge), transportado pelo humano. Gerado de uma entrada do CHANGELOG
+> Push core→derivado (downstream, doc-bridge), transportado pelo humano. Gerado de uma entrada do CHANGELOG
 > do core por `/meta:co-announce`. O adotante é cego ao core: só vê o que é commitado no PRÓPRIO `inbound/`.
 >
 > **É a resposta ao seu sinal de prettier** (causa raiz do drift do SSOT, 3ª reincidência). Você pediu que
