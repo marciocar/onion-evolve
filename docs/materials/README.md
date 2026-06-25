@@ -42,7 +42,7 @@ Saída da vertical de design (`/design:identity`) — gerada da SSOT de tokens e
 ## Como usar estes materiais
 
 ### Para copywriters / designers (landing page)
-Leia `landing-page.md` — cada seção tem headline proposta, bullets de mensagens-chave e nota de elemento visual. O trabalho é transformar os bullets em copy de marketing acabado, mantendo rastreabilidade à KB-fonte. Antes de publicar, valide contagens (82/49/5/34) contra `/meta:inventory`.
+Leia `landing-page.md` — cada seção tem headline proposta, bullets de mensagens-chave e nota de elemento visual. O trabalho é transformar os bullets em copy de marketing acabado, mantendo rastreabilidade à KB-fonte. Antes de publicar, valide contagens (90/51/5/37) contra `/meta:inventory`.
 
 ### Para redatores técnicos (manual)
 Leia `manual-toc.md` — o TOC já mapeia quais capítulos têm conteúdo existente em `docs/onion/` (✅) vs quais precisam ser escritos do zero (🔲). Há apenas 2 capítulos 🔲 (Task Manager & Forge Adapters, e Orquestração de Frota) — os demais já têm fontes reaproveitáveis.
