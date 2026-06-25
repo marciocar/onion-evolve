@@ -1,7 +1,8 @@
 /*
  * GERADO — não editar à mão.
  * SSOT: docs/design-context/foundations/color.tokens.json
- *        docs/design-context/semantic/color.tokens.json (25 tokens W3C/DTCG)
+ *        docs/design-context/semantic/color.tokens.json
+ * SSOT total: 28 tokens W3C/DTCG (13 foundations + 15 semantic)
  * Sink: Tailwind v4 @theme (CSS-first, substituição de tailwind.config.js)
  *
  * Importar no entry-point CSS do projeto:

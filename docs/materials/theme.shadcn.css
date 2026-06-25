@@ -1,7 +1,8 @@
 /*
  * GERADO — NÃO editar à mão.
  * SSOT: docs/design-context/foundations/color.tokens.json
- *        docs/design-context/semantic/color.tokens.json (28 tokens W3C/DTCG)
+ *        docs/design-context/semantic/color.tokens.json
+ * SSOT total: 28 tokens W3C/DTCG (13 foundations + 15 semantic)
  * Sink: shadcn/ui — variáveis de tema consumidas pelos componentes shadcn
  *
  * Gate WCAG verificado: lint-design-tokens.sh — 0 violações HARD (2026-06-24).
@@ -234,9 +235,11 @@
    * papel semântico : color.action.accent
    * token resolvido : color.brand.purple → #8A2BE2
    * decisão         : accent roxo é o elemento de identidade mais distinto
-   *                   da paleta; garante foco visível inequívoco sobre
-   *                   superfícies claras (surface.base/subtle/muted) e
-   *                   sobre primary laranja.
+   *                   da paleta; foco visível forte sobre superfícies claras
+   *                   (4.92–5.96:1, acima do mín. 3:1 de WCAG 2.4.11).
+   * ressalva        : sobre o primary laranja o ring roxo dá só 1.91:1 — conte
+   *                   com o ring-offset (halo) padrão do shadcn p/ separar o anel
+   *                   do botão laranja focado.
    */
   --ring: #8A2BE2;
 }
