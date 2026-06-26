@@ -37,3 +37,10 @@ lint	r18-claude-docs/bad-doc-under-claude-docs.md	.claude/docs	bad	proibido
 lint	r16-count-drift/bad-agent-categorias.md	docs	bad	categorias de agentes
 lint	r16-count-drift/good-agent-categorias.md	docs	good
 fix	r16-count-drift/bad-agent-categorias.md	docs	corrected
+lint	r16-count-drift/bad-parentetic.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/good-parentetic.md	docs	good
+lint	r16-count-drift/bad-approx.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/good-approx-frota.md	docs	good
+lint	r16-count-drift/bad-composite.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/good-composite.md	docs	good
+fix	r16-count-drift/bad-composite.md	docs	corrected

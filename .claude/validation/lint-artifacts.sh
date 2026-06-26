@@ -537,7 +537,11 @@ check_context_freshness_stamp() {
 #   nem 'N especializados' (palavra comum em por-categoria/feature). Marcadores de
 #   total confiáveis: 'N comandos invocáveis', 'N comandos em M categorias',
 #   'N agentes ...em M categorias' (qualquer texto antes de 'em N categorias') e
-#   'N Knowledge Bases'. Assim NÃO flaga métricas de frota
+#   'N Knowledge Bases'. FORMATOS AMPLIADOS (2026-06): parentético '(N total)'
+#   ANCORADO no substantivo da linha (agentes/comandos); aproximado 'N+ comandos|agentes'
+#   com GUARDA ANTI-FROTA (pula ranges 'A-B+' e linhas paralel/frota/fan-out — 'N+ agentes'
+#   ali é carga de runtime, não inventário); composto 'N comandos, M agentes, P skills,
+#   K knowledge bases' (ordem inversa da combinada → não colidem). Assim NÃO flaga métricas de frota
 #   ('28 agentes' de um run), breakdowns ('4 comandos especializados de docs',
 #   '3 agentes especializados criados') nem snapshots. Complementa a Regra 9 (só CLAUDE.md).
 #   SOFT: heurística sobre linguagem natural — surfaca drift sem bloquear CI por FP.
@@ -546,7 +550,7 @@ check_context_freshness_stamp() {
 #   status:snapshot / type:adr / type:evolution-backlog.
 # ===========================================================================
 check_inventory_total_drift() {
-  local env_out cmd agent cats agent_cats kb n pair num ct
+  local env_out cmd agent cats agent_cats kb skill n pair num ct line cn an sn kn
   env_out="$(bash "${SCRIPT_DIR}/inventory.sh" --env 2>/dev/null || true)"
   cmd="$(printf '%s\n' "${env_out}" | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
   agent="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENTS_TOTAL=' | cut -d= -f2)"
@@ -555,6 +559,7 @@ check_inventory_total_drift() {
   # Usar a var própria evita validar/afirmar 'N agentes em <cmd_cats> categorias' (falso).
   agent_cats="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENT_CATEGORIES=' | cut -d= -f2)"
   kb="$(printf '%s\n' "${env_out}" | grep '^ONION_KBS_TOTAL=' | cut -d= -f2)"
+  skill="$(printf '%s\n' "${env_out}" | grep '^ONION_SKILLS_TOTAL=' | cut -d= -f2)"
   [ -n "${cmd}" ] || return
 
   while IFS= read -r -d '' f; do
@@ -623,6 +628,70 @@ check_inventory_total_drift() {
         violation "SOFT" "${f}" "contagem-total de KBs divergente da SSOT: '${n} Knowledge Bases' (esperado ${kb}) — /meta:inventory"
       fi
     done < <(grep -oiE '[0-9]+ knowledge bases' "${f}" 2>/dev/null | grep -oE '^[0-9]+')
+
+    # '(N total)' — forma PARENTÉTICA (ex.: header '### Agentes Disponíveis (49 total)').
+    # '(N total)' isolado é AMBÍGUO (cmd? agente?) → ANCORA no substantivo da MESMA linha.
+    # Guarda anti-tabela: linhas iniciadas por '|' são breakdown, não total.
+    while IFS= read -r line; do
+      [ -z "${line}" ] && continue
+      case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
+      n="$(printf '%s' "${line}" | grep -oiE '\([0-9]+ total' | grep -oE '[0-9]+' | head -1 || true)"
+      [ -z "${n}" ] && continue
+      if printf '%s' "${line}" | grep -qiE 'agentes'; then
+        if [ "${n}" != "${agent}" ]; then
+          violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '(${n} total)' (esperado ${agent}) — /meta:inventory"
+        fi
+      elif printf '%s' "${line}" | grep -qiE 'comandos'; then
+        if [ "${n}" != "${cmd}" ]; then
+          violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT: '(${n} total)' (esperado ${cmd}) — /meta:inventory"
+        fi
+      fi
+    done < <(grep -iE '\([0-9]+ total' "${f}" 2>/dev/null)
+
+    # 'N+ comandos|agentes' — forma APROXIMADA (ex.: 'ecossistema de 60+ comandos').
+    # GUARDA ANTI-FROTA: pula ranges 'A-B+' (o '[^0-9-]' barra o número precedido de '-')
+    # e linhas de métrica de EXECUÇÃO (paralel/frota/fan-out/...), que usam 'N+ agentes'
+    # para carga de runtime — NÃO inventário (FP real: agent-orchestration-landscape KB).
+    while IFS= read -r line; do
+      [ -z "${line}" ] && continue
+      case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
+      if printf '%s' "${line}" | grep -qiE 'paralel|frota|fan-out|simultân|supervision'; then continue; fi
+      n="$(printf '%s' "${line}" | grep -oiE '(^|[^0-9-])[0-9]+\+ comandos' | grep -oE '[0-9]+' | head -1 || true)"
+      if [ -n "${n}" ] && [ "${n}" != "${cmd}" ]; then
+        violation "SOFT" "${f}" "contagem aproximada de comandos divergente da SSOT: '${n}+ comandos' (esperado ${cmd}+) — /meta:inventory"
+      fi
+      n="$(printf '%s' "${line}" | grep -oiE '(^|[^0-9-])[0-9]+\+ agentes' | grep -oE '[0-9]+' | head -1 || true)"
+      if [ -n "${n}" ] && [ "${n}" != "${agent}" ]; then
+        violation "SOFT" "${f}" "contagem aproximada de agentes divergente da SSOT: '${n}+ agentes' (esperado ${agent}+) — /meta:inventory"
+      fi
+    done < <(grep -iE '[0-9]+\+ (comandos|agentes)' "${f}" 2>/dev/null)
+
+    # 'N comandos, M agentes, P skills, K knowledge bases' — forma COMPOSTA numa linha.
+    # Ordem comandos→agentes é INVERSA da combinada 'N agentes e M comandos' (acima) → não colidem.
+    # O feeder EXIGE a forma CANÔNICA COMPLETA (até 'knowledge bases'): uma enumeração
+    # parcial com reticências (ex.: '(79 comandos, 38 agentes, 4 skills…)' em prosa que
+    # DESCREVE o anti-padrão de hardcode) é ilustrativa, não um total — não deve flagar.
+    # Guarda anti-tabela. Valida cada campo contra sua SSOT.
+    while IFS= read -r line; do
+      [ -z "${line}" ] && continue
+      case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
+      cn="$(printf '%s' "${line}" | grep -oiE '[0-9]+ comandos' | grep -oE '^[0-9]+' | head -1 || true)"
+      an="$(printf '%s' "${line}" | grep -oiE '[0-9]+ agentes' | grep -oE '^[0-9]+' | head -1 || true)"
+      sn="$(printf '%s' "${line}" | grep -oiE '[0-9]+ skills' | grep -oE '^[0-9]+' | head -1 || true)"
+      kn="$(printf '%s' "${line}" | grep -oiE '[0-9]+ knowledge bases' | grep -oE '^[0-9]+' | head -1 || true)"
+      if [ -n "${cn}" ] && [ "${cn}" != "${cmd}" ]; then
+        violation "SOFT" "${f}" "contagem composta de comandos divergente da SSOT: '${cn} comandos' (esperado ${cmd}) — /meta:inventory"
+      fi
+      if [ -n "${an}" ] && [ "${an}" != "${agent}" ]; then
+        violation "SOFT" "${f}" "contagem composta de agentes divergente da SSOT: '${an} agentes' (esperado ${agent}) — /meta:inventory"
+      fi
+      if [ -n "${sn}" ] && [ "${sn}" != "${skill}" ]; then
+        violation "SOFT" "${f}" "contagem composta de skills divergente da SSOT: '${sn} skills' (esperado ${skill}) — /meta:inventory"
+      fi
+      if [ -n "${kn}" ] && [ "${kn}" != "${kb}" ]; then
+        violation "SOFT" "${f}" "contagem composta de KBs divergente da SSOT: '${kn} knowledge bases' (esperado ${kb}) — /meta:inventory"
+      fi
+    done < <(grep -iE '[0-9]+ comandos,[^|]*[0-9]+ agentes,[^|]*[0-9]+ [Kk]nowledge [Bb]ases' "${f}" 2>/dev/null)
   done < <(find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
 }
 
@@ -716,6 +785,17 @@ run_inventory_fixes() {
   prog="${prog}; s/([0-9]+)( agentes[^.,|]*em )([0-9]+)( categorias)/${agent}\2${agent_cats}\4/g"
   prog="${prog}; /^[[:space:]]*\|/! s/([0-9]+)( agentes[[:space:]]*[e,][[:space:]]*)([0-9]+)( comandos)/${agent}\2${cmd}\4/g"
   prog="${prog}; s/[0-9]+( [Kk]nowledge [Bb]ases)/${kb}\1/g"
+  # Formatos AMPLIADOS (espelham a detecção da Regra 16):
+  # (a) parentético '(N total)' — ancora no substantivo; '[^()]*' não atravessa o parêntese
+  prog="${prog}; s/([Aa]gentes[^()]*\()[0-9]+( total)/\1${agent}\2/g"
+  prog="${prog}; s/([Cc]omandos[^()]*\()[0-9]+( total)/\1${cmd}\2/g"
+  # (b) aproximado 'N+ comandos|agentes' — preserva o '+'; '[^0-9-]' impede tocar ranges 'A-B+'
+  #     (métrica de frota, ex.: '8-16+ agentes paralelos'). Risco residual: 'N+ agentes' SEM range
+  #     em linha de frota não tem guarda 'paralel' por-linha (sed é global) → coberto pela revisão do diff.
+  prog="${prog}; s/([^0-9-])[0-9]+(\+ comandos)/\1${cmd}\2/g"
+  prog="${prog}; s/([^0-9-])[0-9]+(\+ agentes)/\1${agent}\2/g"
+  # (c) composto 'N comandos, M agentes, P skills, K knowledge bases' — reescreve os 4 campos de uma vez
+  prog="${prog}; s/[0-9]+( comandos, )[0-9]+( agentes, )[0-9]+( skills, )[0-9]+( [Kk]nowledge [Bb]ases)/${cmd}\1${agent}\2${skill}\3${kb}\4/g"
 
   while IFS= read -r -d '' f; do
     inventory_scope_excluded "${f}" && continue
