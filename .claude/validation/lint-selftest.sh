@@ -76,6 +76,11 @@ SSOT_AGENT_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/d
 SSOT_AGENT_CATS="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
   | grep '^ONION_AGENT_CATEGORIES=' | cut -d= -f2)"
 SSOT_AGENT_CATS_DRIFT="$(( ${SSOT_AGENT_CATS:-0} + 3 ))"
+# __ONION_SKILLS_TOTAL__ / __ONION_KBS_TOTAL__ → reais (formato COMPOSTO: só comandos diverge; skills/KBs casam).
+SSOT_SKILL_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
+  | grep '^ONION_SKILLS_TOTAL=' | cut -d= -f2)"
+SSOT_KB_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
+  | grep '^ONION_KBS_TOTAL=' | cut -d= -f2)"
 
 record_pass() { PASS=$((PASS + 1)); echo "  ✓ ${1}"; }
 record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} — ${2}"; }
@@ -100,6 +105,8 @@ run_lint_fixture() {
   sed -e "s/__ONION_COMMANDS_TOTAL__/${SSOT_CMD_TOTAL}/g" \
       -e "s/__ONION_COMMANDS_DRIFT__/${SSOT_CMD_DRIFT}/g" \
       -e "s/__ONION_AGENTS_TOTAL__/${SSOT_AGENT_TOTAL}/g" \
+      -e "s/__ONION_SKILLS_TOTAL__/${SSOT_SKILL_TOTAL}/g" \
+      -e "s/__ONION_KBS_TOTAL__/${SSOT_KB_TOTAL}/g" \
       -e "s/__ONION_AGENT_CATEGORIES_DRIFT__/${SSOT_AGENT_CATS_DRIFT}/g" \
       -e "s/__ONION_AGENT_CATEGORIES__/${SSOT_AGENT_CATS}/g" \
       "${src}" > "${dst}"
@@ -160,6 +167,8 @@ run_fix_fixture() {
   sed -e "s/__ONION_COMMANDS_TOTAL__/${SSOT_CMD_TOTAL}/g" \
       -e "s/__ONION_COMMANDS_DRIFT__/${SSOT_CMD_DRIFT}/g" \
       -e "s/__ONION_AGENTS_TOTAL__/${SSOT_AGENT_TOTAL}/g" \
+      -e "s/__ONION_SKILLS_TOTAL__/${SSOT_SKILL_TOTAL}/g" \
+      -e "s/__ONION_KBS_TOTAL__/${SSOT_KB_TOTAL}/g" \
       -e "s/__ONION_AGENT_CATEGORIES_DRIFT__/${SSOT_AGENT_CATS_DRIFT}/g" \
       -e "s/__ONION_AGENT_CATEGORIES__/${SSOT_AGENT_CATS}/g" \
       "${src}" > "${dst}"

@@ -129,7 +129,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 **IMPORTANTE:** Você tem acesso direto a toda esta documentação. Leia dinamicamente conforme necessário.
 
-### 🤖 Agentes Disponíveis (49 total)
+### 🤖 Agentes Disponíveis (51 total)
 
 #### **🔧 Desenvolvimento (20 agentes)**
 - `@clickup-specialist` - ClickUp REST API e operações otimizadas
@@ -200,7 +200,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 - `@branch-test-planner` - Cobertura de testes para mudanças do branch
 - `@branch-metaspec-checker` - Validação de conformidade com metaspecs do branch
 
-### 📋 Comandos Disponíveis (82 total — listagem parcial dos principais)
+### 📋 Comandos Disponíveis (90 total — listagem parcial dos principais)
 
 > ⚠️ **Listagem desatualizada (refresh pendente — ver `/meta:evolve`):** alguns comandos abaixo
 > não existem mais ou nunca existiram (ex.: `/engineer/deploy`, `/git/rebase`, `/validate/architecture`).
