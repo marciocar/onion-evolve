@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **37 arquivos** de knowledge base (exceto `index.md`)
-- **19** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/`
+- **38 arquivos** de knowledge base (exceto `index.md`)
+- **20** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/`
 
 ---
 
@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/          # 19 — Conceitos fundamentais
+├── concepts/          # 20 — Conceitos fundamentais
 ├── frameworks/        # 8  — Frameworks e metodologias
 ├── tools/             # 4  — Ferramentas e recursos
 ├── platforms/         # 2  — Plataformas e tecnologias
@@ -28,7 +28,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (19)
+## 🧠 Conceitos Fundamentais (20)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Fleet Orchestration](concepts/agent-fleet-orchestration.md) — orquestração de frota: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
@@ -44,6 +44,7 @@ docs/knowledge-base/
 - [Multi-repo Federation](concepts/multi-repo-federation.md) — contratos spec-as-code + ledger git (topologia peer)
 - [Onion Dogfooding Doctrine](concepts/onion-dogfooding-doctrine.md) — padrão master de evolução: rodar de verdade → aprender → resolver (fix → re-dogfood)
 - [Onion Modernization Doctrine](concepts/onion-modernization-doctrine.md) — regra de inventário/SSOT e doutrina de modernização
+- [Onion Working Method](concepts/onion-working-method.md) — porta de entrada do método: Seleção (catálogo) + Execução (PFR + coordenação por modo) + Validação (dogfood + adversarial) + Disciplina; mapa de fontes meta-spec/KB/ADR/RFC
 - [Spec-as-Code Strategy](concepts/spec-as-code-strategy.md) — hierarquia de especificações (L0-L3)
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA
 - [Specification-Driven AI Abstraction Layer (SDAAL)](concepts/specification-driven-ai-abstraction-layer.md) — padrão-pai das camadas de abstração
