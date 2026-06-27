@@ -111,6 +111,23 @@ Vertical **Design** empacotada como plugin `onion-design`:
   do consumidor".
 - **Gate verde:** `lint-artifacts` 0 HARD; `lint-selftest` 79/79 (5 guardas novas `assemble-plugin`).
 
+### Generalização provada (2026-06-27, mesmo dia) — 2ª vertical
+
+O assembler design-específico foi **generalizado** para `assemble-plugin.sh` (dirigido por manifesto
+shell, dependency-free) + manifestos em `verticals/<plugin>.manifest.sh`. Prova de que o padrão vale
+para N verticais sem duplicar o script:
+- **`onion-design`** (manifesto retrofitado) — `tree_sha` **idêntico** ao da 1ª geração (generalização
+  não alterou a saída).
+- **`onion-compliance`** (manifesto novo) — **shape distinto**: 5 agentes (ISO 27001/22301, SOC2, PMBOK,
+  security-information-master) + `build-compliance-docs`, **sem** SDAAL utils nem gate. O genérico cria só
+  as pastas necessárias (compliance não tem `utils/`/`validation/`).
+- Marketplace agora lista **2 plugins** (nomes únicos, versões batem). Dogfood: instalação simulada de
+  compliance entrega agentes + command **sem vazar `compliance-context`** (camada 2). Selftest 81/81
+  (cobre design **e** compliance, incl. manifesto inválido → exit 2).
+
+→ Com 2 verticais provando o padrão, os follow-ups **path-portability** e **drift-guard** passam a valer
+o investimento (antes era cedo, com 1 só).
+
 ### Limitações honestas do protótipo (follow-ups)
 
 1. **Path-portability:** commands/agents do plugin ainda referenciam paths `.claude/utils/design-sink/` e
