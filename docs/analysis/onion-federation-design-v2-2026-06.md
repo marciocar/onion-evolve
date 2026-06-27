@@ -2,7 +2,7 @@
 
 > **Status:** efêmero / forward-looking (segue [analysis/README.md](README.md)) — **design e backlog** da capacidade Federation, agora na **topologia peer**. Pronto para a próxima `/meta:evolve` (ou execução manual faseada) consumir. Conclusões duradouras migram para a KB `multi-repo-federation.md` e a meta-spec do formato de contrato (criadas na execução).
 >
-> **Data:** 2026-06-14 · **Supersede:** [onion-federation-design-2026-06.md](onion-federation-design-2026-06.md) (v1, topologia hub) · **Racional do pivô:** [onion-federation-design-review-2026-06.md](onion-federation-design-review-2026-06.md) (review adversarial, 24/36 achados) + decisão do usuário (topologia peer + comunicação simplificada).
+> **Data:** 2026-06-14 · **Supersede:** onion-federation-design-2026-06.md (v1, topologia hub — removido no #53) · **Racional do pivô:** [onion-federation-design-review-2026-06.md](onion-federation-design-review-2026-06.md) (review adversarial, 24/36 achados) + decisão do usuário (topologia peer + comunicação simplificada).
 
 ---
 
@@ -10,7 +10,7 @@
 
 **Capacidade desejada:** coordenar mudanças entre múltiplos repositórios sem quebrar integrações — "ajustes em integrações que **não podem quebrar** o que está funcionando, com garantia de sucesso, **monitorável e testável**" — tendo o **humano como maestro**.
 
-**v1 (hub) — o que era:** um orquestrador **único** operando sobre N diretórios de outros repos (fan-out por subagente-especialista por membro). Doc: [v1](onion-federation-design-2026-06.md).
+**v1 (hub) — o que era:** um orquestrador **único** operando sobre N diretórios de outros repos (fan-out por subagente-especialista por membro). Doc: v1 (removido no #53).
 
 **Por que pivotamos (review adversarial de 42 agents):**
 - **SA-3 (load-bearing):** o hub repousa num **spike não-verificado** — uma sessão Claude Code operar sobre o dir de outro repo **como raiz de subagente**. Se falhar, as fases cross-repo colapsam.

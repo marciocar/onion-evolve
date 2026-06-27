@@ -39,7 +39,7 @@ As duas cores coexistem: o laranja ancora a plataforma (Claude Code); o roxo anc
 1. Toda cor em uso deve existir como primitivo em `foundations/` ou alias em `semantic/`
 2. Todo alias `{...}` deve resolver sem ciclo/órfão
 3. Contraste WCAG dos pares declarados ≥ `min` exigido por par (`governance/contrast-pairs.json`).
-   WCAG 2.1: 4.5 = texto normal · 3.0 = texto grande/bold ou UI. **Estado atual:** todos os 6 pares
+   WCAG 2.1: 4.5 = texto normal · 3.0 = texto grande/bold ou UI. **Estado atual:** todos os 8 pares
    declarados exigem **4.5** (AA-normal pleno — inclusive o CTA, ver decisão #171).
 
 ## Fonte upstream
