@@ -44,3 +44,10 @@ lint	r16-count-drift/good-approx-frota.md	docs	good
 lint	r16-count-drift/bad-composite.md	docs	bad	divergente da SSOT
 lint	r16-count-drift/good-composite.md	docs	good
 fix	r16-count-drift/bad-composite.md	docs	corrected
+lint	r16-count-drift/bad-bare-especializados.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/bad-bare-ia.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/good-bare-paren.md	docs	good
+lint	r16-count-drift/good-bare-historical.md	docs	good
+lint	r16-count-drift/good-bare-fleet.md	docs	good
+lint	r16-count-drift/good-bare-criados.md	docs	good
+fix	r16-count-drift/bad-bare-especializados.md	docs	corrected

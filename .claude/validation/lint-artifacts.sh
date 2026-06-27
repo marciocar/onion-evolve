@@ -733,6 +733,31 @@ check_inventory_total_drift() {
         violation "SOFT" "${f}" "contagem composta de KBs divergente da SSOT: '${kn} knowledge bases' (esperado ${kb}) — /meta:inventory"
       fi
     done < <(grep -iE '[0-9]+ comandos,[^|]*[0-9]+ agentes,[^|]*[0-9]+ [Kk]nowledge [Bb]ases' "${f}" 2>/dev/null)
+
+    # 'N agentes especializados' / 'N agentes IA' — forma BARE de total-atual (sem
+    # âncora 'em categorias'/total/composto, que as regras acima já cobrem). É campo
+    # minado de FALSO-POSITIVO → guarda densa em DUAS camadas:
+    #   (1) pula tabelas (|) e linhas de FROTA/EXECUÇÃO/CRIAÇÃO
+    #       (paralel|frota|fan-out|simultân|supervision|trabalhando|criad);
+    #   (2) SÓ considera linhas com MARCADOR de total-atual — 'especializados' OU ' IA'
+    #       (com ou sem '**' do markdown). É o marcador que separa "49 agentes
+    #       especializados/IA" [inventário-atual] de: "os 49 agentes usavam Cursor"
+    #       [histórico], "5 agentes — frameworks" [breakdown por categoria],
+    #       "(20 agentes)" [contagem por-categoria], "49 agentes / 4 skills" [changelog],
+    #       "8 agentes · 1.2M tokens" [métrica de run] — nenhum traz o marcador.
+    while IFS= read -r line; do
+      [ -z "${line}" ] && continue
+      case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
+      if printf '%s' "${line}" | grep -qiE 'paralel|frota|fan-out|simultân|supervision|trabalhando|criad'; then continue; fi
+      # '(N agentes)' parentético = contagem POR-CATEGORIA/breakdown (ex.: header
+      # 'AGENTES ESPECIALIZADOS (3 agentes)'), não total — pula mesmo com marcador.
+      if printf '%s' "${line}" | grep -qE '\([0-9]+ agentes\)'; then continue; fi
+      printf '%s' "${line}" | grep -qiE 'agentes especializados|agentes\*{0,2} (de )?IA' || continue
+      n="$(printf '%s' "${line}" | grep -oiE '[0-9]+ agentes' | grep -oE '^[0-9]+' | head -1 || true)"
+      if [ -n "${n}" ] && [ "${n}" != "${agent}" ]; then
+        violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '${n} agentes (especializados/IA)' (esperado ${agent}) — /meta:inventory"
+      fi
+    done < <(grep -iE '[0-9]+ agentes' "${f}" 2>/dev/null)
   done < <(_find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
 }
 
@@ -837,6 +862,13 @@ run_inventory_fixes() {
   prog="${prog}; s/([^0-9-])[0-9]+(\+ agentes)/\1${agent}\2/g"
   # (c) composto 'N comandos, M agentes, P skills, K knowledge bases' — reescreve os 4 campos de uma vez
   prog="${prog}; s/[0-9]+( comandos, )[0-9]+( agentes, )[0-9]+( skills, )[0-9]+( [Kk]nowledge [Bb]ases)/${cmd}\1${agent}\2${skill}\3${kb}\4/g"
+  # (d) BARE 'N agentes especializados/IA' — só formas SED-SEGURAS (sed é global, sem guarda
+  #     por-linha): fim-de-linha/pontuação (não toca 'especializados criados'), 'especializados
+  #     de IA', e '** IA' do markdown. As variantes amorfas (ex.: 'N agentes + matriz') ficam só
+  #     na DETECÇÃO (SOFT avisa) + correção à mão. Marcador especializados/IA = anti-histórico.
+  prog="${prog}; s/[0-9]+( agentes especializados)([.,;:)]|[[:space:]]*\$)/${agent}\1\2/g"
+  prog="${prog}; s/[0-9]+( agentes especializados de IA)/${agent}\1/g"
+  prog="${prog}; s/[0-9]+( agentes\*{0,2} IA)/${agent}\1/g"
 
   while IFS= read -r -d '' f; do
     inventory_scope_excluded "${f}" && continue

@@ -24,7 +24,7 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 
 - **16 documentos** em `docs/onion/`
 - **91 comandos invocáveis** Claude Code em `.claude/commands/`
-- **49 agentes** IA em `.claude/agents/`
+- **51 agentes** IA em `.claude/agents/`
 - **5 skills** em `.claude/skills/`
 
 ---

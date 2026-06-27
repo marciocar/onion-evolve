@@ -716,7 +716,7 @@ graph TD
 ## 🔗 Documentos Relacionados
 
 - [Fluxos de Engenharia Detalhados →](engineering-flows.md)
-- [Referência de Agentes](agents-reference.md) — catálogo dos 49 agentes especializados
+- [Referência de Agentes](agents-reference.md) — catálogo dos 51 agentes especializados
 - [Exemplos Práticos](practical-examples.md) — casos de uso reais
 - [Sistema de Testes e Validação](testing-validation-system.md) — framework completo de testes
 - [Configuração Inicial](getting-started.md) — setup do sistema
