@@ -100,10 +100,10 @@ Executado: VM/Runtime       Executado: Cognição do LLM
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                      ADAPTER LAYER                              │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐ │
-│  │  clickup   │  │   asana    │  │   linear   │  │    none    │ │
-│  │    .md     │  │    .md     │  │    .md     │  │  (fallback)│ │
-│  └────────────┘  └────────────┘  └────────────┘  └────────────┘ │
+│   ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐   │
+│   │  jira   │ │ clickup │ │  asana  │ │ linear  │ │  none   │   │
+│   │   .md   │ │   .md   │ │   .md   │ │   .md   │ │   .md   │   │
+│   └─────────┘ └─────────┘ └─────────┘ └─────────┘ └─────────┘   │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
@@ -111,7 +111,7 @@ Executado: VM/Runtime       Executado: Cognição do LLM
 │                    EXECUTION LAYER                              │
 │                  (MCP Tools / API Calls)                        │
 │                                                                 │
-│   mcp__clickup__*   mcp__asana__*   linear_api_*   local_store  │
+│  jira:REST   clickup:API   asana:API   linear:GQL   none:local  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 

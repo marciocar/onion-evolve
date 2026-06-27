@@ -361,13 +361,18 @@ curl -H "Authorization: $CLICKUP_API_TOKEN" \
 
 ### Agente Especializado (com MCP)
 
+> Exemplo com o **especialista dedicado de UM provider** (ClickUp). Só o especialista do provider
+> usa `mcp__<provider>__*` direto; o **consumidor** (comando/agente comum) nunca faz isso — vai pela
+> abstração `taskManager.*`, que resolve o provider ativo (`TASK_MANAGER_PROVIDER`: jira | clickup |
+> asana | linear). Ver [task-manager-abstraction.md](task-manager-abstraction.md).
+
 ```yaml
 ---
 name: clickup-specialist
 tools:
   - Read
   - write
-  - mcp__clickup__*  # MCP específico
+  - mcp__clickup__*  # MCP do provider — legítimo só aqui (especialista dedicado), não no consumidor
 ---
 
 ## 🔧 Configurações Necessárias
