@@ -52,6 +52,8 @@
 #      categorias; categorias de AGENTE via ONION_AGENT_CATEGORIES (≠ COMMAND_CATEGORIES)
 #  17. Frontmatter: valor escalar com ': ' não-aspado [HARD] — quebra YAML no Claude Code
 #  18. Documentação versionada sob .claude/docs/ [HARD] — árvore proibida (usar docs/)
+#  19. Plugins de vertical (plugins/*) em sincronia com as fontes [HARD] — gerados por
+#      assemble-plugin.sh; drift (edição à mão OU fonte alterada sem regenerar) bloqueia merge
 #
 # Convenção: .claude/validation/fixtures/ guarda TEMPLATES de teste das próprias
 #   guardas (consumidos por lint-selftest.sh), não artefatos ativos. As 4 regras de
@@ -345,6 +347,48 @@ check_inventory_sync() {
     violation "HARD" "${inv_file}" "inventário desatualizado vs filesystem — regenere com '/meta:inventory' (bash .claude/validation/inventory.sh --markdown > docs/onion/inventory.md)"
   fi
   rm -f "${tmp}"
+}
+
+# ===========================================================================
+# REGRA 19 — Plugins de vertical (plugins/*) sincronizados com as fontes [HARD]
+#           Cada plugins/<name> é GERADO por assemble-plugin.sh a partir de
+#           verticals/<name>.manifest.sh. Regenera p/ temp e compara: drift =
+#           alguém editou o plugin à mão OU mudou a fonte sem regenerar.
+#           IGNORA ref/commit_date do provenance.json (voláteis por commit);
+#           compara o resto + o tree_sha (sinal de conteúdo, worktree-based).
+# ===========================================================================
+check_plugins_sync() {
+  local asm="${SCRIPT_DIR}/../utils/marketplace/assemble-plugin.sh"
+  local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
+  [ -f "${asm}" ] || return            # sem assembler → nada a checar (repo sem a feature)
+  [ -d "${vdir}" ] || return
+  command -v jq >/dev/null 2>&1 || return   # sem jq → pula gracioso (mesma graça dos outros)
+
+  local manifest name committed tmp
+  for manifest in "${vdir}"/*.manifest.sh; do
+    [ -f "${manifest}" ] || continue
+    name="$(. "${manifest}" >/dev/null 2>&1; printf '%s' "${PLUGIN_NAME:-}")"
+    [ -n "${name}" ] || continue
+    committed="${REPO_ROOT}/plugins/${name}"
+    if [ ! -d "${committed}" ]; then
+      violation "HARD" "plugins/${name}" "plugin ausente — gere com 'bash .claude/utils/marketplace/assemble-plugin.sh ${manifest#${REPO_ROOT}/}'"
+      continue
+    fi
+    tmp="$(mktemp -d)"
+    bash "${asm}" "${manifest}" "${REPO_ROOT}" "${tmp}/${name}" >/dev/null 2>&1
+    # (a) tudo exceto provenance.json (ref/commit_date voláteis lá dentro)
+    if ! diff -r -x provenance.json "${committed}" "${tmp}/${name}" >/dev/null 2>&1; then
+      violation "HARD" "plugins/${name}" "plugin fora de sincronia com a fonte — regenere com 'bash .claude/utils/marketplace/assemble-plugin.sh ${manifest#${REPO_ROOT}/}'"
+    fi
+    # (b) tree_sha (sinal de conteúdo content-addressed)
+    local c_sha t_sha
+    c_sha="$(jq -r '.tree_sha' "${committed}/.claude-plugin/provenance.json" 2>/dev/null)"
+    t_sha="$(jq -r '.tree_sha' "${tmp}/${name}/.claude-plugin/provenance.json" 2>/dev/null)"
+    if [ "${c_sha}" != "${t_sha}" ]; then
+      violation "HARD" "plugins/${name}" "tree_sha divergente (fonte mudou sem regenerar) — rode assemble-plugin.sh"
+    fi
+    rm -rf "${tmp}"
+  done
 }
 
 # ===========================================================================
@@ -914,6 +958,7 @@ check_kebab_case_filenames
 check_no_fleet_orchestrator_agent
 check_inventory_sync
 check_claude_md_counts
+check_plugins_sync
 check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp

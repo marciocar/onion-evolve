@@ -110,15 +110,24 @@ while IFS= read -r f; do
 done < <(find "${DEST}" -type f ! -path "*/.claude-plugin/*" 2>/dev/null)
 
 # Proveniência content-addressed (padrão gh skill): repository + ref + tree_sha.
-# tree_sha = hash do ls-tree de TODAS as fontes listadas (determinístico; muda só com conteúdo).
+# tree_sha = hash do CONTEÚDO da WORKING-TREE das fontes (NÃO `ls-tree HEAD`) — assim é consistente
+# no pre-commit (onde HEAD≠staged) e independente de SRC/DEST absolutos. Lista "blobsha relpath"
+# ordenada → hash. Determinístico; muda só quando o conteúdo das fontes muda. (ref/commit_date vêm
+# do HEAD e são VOLÁTEIS — o drift-guard os ignora; só o tree_sha é o sinal de drift de conteúdo.)
 url="$(git -C "${SRC}" remote get-url origin 2>/dev/null || true)"
 repository="$(printf '%s' "${url}" | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#\.git$##')"
 [ -n "${repository}" ] || repository="local/${PLUGIN_NAME}"
 ref="$(git -C "${SRC}" rev-parse HEAD 2>/dev/null || echo unknown)"
 commit_date="$(git -C "${SRC}" show -s --format=%cI HEAD 2>/dev/null || echo unknown)"
-tree_sha="$(git -C "${SRC}" ls-tree -r HEAD -- \
-  "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" 2>/dev/null \
-  | git hash-object --stdin 2>/dev/null || echo unknown)"
+tree_sha="$(
+  {
+    for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}"; do
+      if [ -d "${SRC}/${p}" ]; then ( cd "${SRC}" && find "${p}" -type f ); else printf '%s\n' "${p}"; fi
+    done | LC_ALL=C sort | while IFS= read -r rel; do
+      printf '%s %s\n' "$(git -C "${SRC}" hash-object "${SRC}/${rel}" 2>/dev/null || echo nohash)" "${rel}"
+    done
+  } | git hash-object --stdin 2>/dev/null || echo unknown
+)"
 
 cat > "${DEST}/.claude-plugin/provenance.json" <<EOF
 {

@@ -146,12 +146,22 @@ artefato transformado):
   substituir confiável — a reescrita é a forma portável best-effort; em conteúdo de agent + scripts
   funciona. Verificação viva (`/plugin install`) confirma o elo de command-markdown.
 
-### Achado pré-existente (fora de escopo — follow-up separado)
+### Achado pré-existente — ✅ RESOLVIDO via frota (2026-06-27)
 
-Os agentes de compliance citam `compliance_iso27001_template.md`, `_iso22301_`, `_soc2_`, `_pmbok_` que
-**não existem no core** (refs penduradas já antes do plugin). Bundlamos/reescrevemos só o que existe
-(`compliance-context-template.md`); os pendurados ficam como bug de conteúdo a resolver à parte (criar os
-4 templates OU corrigir as refs dos agentes).
+Os agentes de compliance citavam `compliance_iso27001_template.md`, `_iso22301_`, `_soc2_`, `_pmbok_` que
+**não existiam no core** (refs penduradas). Resolvido por **frota** (`Workflow`, 4 workers-especialistas em
+paralelo — 1 por framework, outputs disjuntos): cada especialista autorou seu template (392–557 linhas,
+dialeto-puro/REGRA 13), gravado em `commands/common/templates/`. Agora: refs resolvem no core (arquivos
+existem) e, no plugin, viram `${CLAUDE_PLUGIN_ROOT}/templates/` (via os 4 adicionados ao `TEMPLATES` do
+manifesto + path-portability do #197). 0 ref core-layout residual no plugin compliance.
+
+### Drift-guard — ✅ FECHADO (REGRA 19)
+
+`check_plugins_sync` no `lint-artifacts.sh` [HARD]: cada `plugins/<name>` é regenerado da fonte e comparado
+(diff `-x provenance.json` + `tree_sha`); drift (edição à mão OU fonte mudada sem regenerar) bloqueia merge.
+`tree_sha` passou a ser **worktree-based** (não `ls-tree HEAD`) → consistente no pre-commit. Ignora
+`ref`/`commit_date` (voláteis). Dogfood adversarial: adulterar→HARD, voláteis→ignorados, restaurar→0 HARD.
+Selftest `run_plugins_sync_selftests` (em-sync + detecção + voláteis).
 
 ### Limitações honestas restantes (follow-ups)
 

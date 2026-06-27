@@ -93,7 +93,7 @@ Combined with ISO 22301: 8/8 requisitos Serasa (100%) ✅
 ## 📖 Template Reference
 
 **Sempre leia o template primeiro:**
-`.claude/commands/common/templates/compliance_soc2_template.md`
+`${CLAUDE_PLUGIN_ROOT}/templates/compliance_soc2_template.md`
 
 Este template contém:
 - 5 Trust Services Principles (Security, Availability, Processing Integrity, Confidentiality, Privacy)
@@ -731,7 +731,7 @@ aws s3 sync . $BUCKET/
 
 **1. Ler Template + ISO 27001 Overlap:**
 ```bash
-Read .claude/commands/common/templates/compliance_soc2_template.md
+Read ${CLAUDE_PLUGIN_ROOT}/templates/compliance_soc2_template.md
 Read docs/compliance-context/security/access-control.md
 Grep "What encryption is used?"
 ```
