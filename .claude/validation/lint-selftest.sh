@@ -580,6 +580,50 @@ run_assemble_plugin_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo plugins-sync — exercita o drift-guard (REGRA 19 check_plugins_sync) do
+# lint-artifacts: cada plugins/<name> committado DEVE bater com a regeneração da
+# fonte (diff -x provenance + tree_sha). Cobre: em-sync (catch de regen esquecida)
+# + detecção de adulteração + insensibilidade a ref/commit_date voláteis.
+# ---------------------------------------------------------------------------
+run_plugins_sync_selftests() {
+  local asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
+  local vdir="${REPO_ROOT}/.claude/utils/marketplace/verticals"
+  if [ ! -f "${asm}" ] || [ ! -d "${vdir}" ]; then record_fail "plugins-sync" "assembler/verticals ausentes"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_pass "plugins-sync: jq ausente → pulado (gracioso)"; return; fi
+  local manifest name committed d csha tsha
+
+  for manifest in "${vdir}"/*.manifest.sh; do
+    [ -f "${manifest}" ] || continue
+    name="$(. "${manifest}" >/dev/null 2>&1; printf '%s' "${PLUGIN_NAME:-}")"
+    [ -n "${name}" ] || continue
+    committed="${REPO_ROOT}/plugins/${name}"
+    d="$(mktemp -d)"
+    bash "${asm}" "${manifest}" "${REPO_ROOT}" "${d}/${name}" >/dev/null 2>&1
+    csha="$(jq -r '.tree_sha' "${committed}/.claude-plugin/provenance.json" 2>/dev/null)"
+    tsha="$(jq -r '.tree_sha' "${d}/${name}/.claude-plugin/provenance.json" 2>/dev/null)"
+    # (a) committed em-sync com a fonte (diff ignorando provenance + tree_sha igual)
+    if diff -r -x provenance.json "${committed}" "${d}/${name}" >/dev/null 2>&1 && [ "${csha}" = "${tsha}" ]; then
+      record_pass "plugins-sync: ${name} committed em-sync com a fonte"
+    else record_fail "plugins-sync: ${name} em-sync" "plugin committado diverge da regeneração — regenere"; fi
+    # (b) adulteração no plugin → diff detecta
+    printf '\n# tamper\n' >> "${d}/${name}/.claude-plugin/plugin.json"
+    if ! diff -r -x provenance.json "${committed}" "${d}/${name}" >/dev/null 2>&1; then
+      record_pass "plugins-sync: ${name} adulteração detectada"
+    else record_fail "plugins-sync: ${name} detecção" "diff não pegou a adulteração"; fi
+    rm -rf "${d}"
+  done
+
+  # (c) insensível a ref/commit_date voláteis: 2 provenances iguais salvo ref/date → diff -x ignora
+  local p1 p2; p1="$(mktemp -d)"; p2="$(mktemp -d)"
+  printf '{"tree_sha":"X","ref":"aaa","commit_date":"2020"}' > "${p1}/provenance.json"
+  printf '{"tree_sha":"X","ref":"bbb","commit_date":"2099"}' > "${p2}/provenance.json"
+  if diff -r -x provenance.json "${p1}" "${p2}" >/dev/null 2>&1; then
+    record_pass "plugins-sync: ref/commit_date voláteis ignorados (diff -x provenance)"
+  else record_fail "plugins-sync: voláteis" "diff -x provenance não isolou os campos voláteis"; fi
+  rm -rf "${p1}" "${p2}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo design-tokens — exercita .claude/validation/lint-design-tokens.sh.
 # Self-contained (mktemp), cobre MODOS DE FALHA: tokens válidos passam;
 # alias órfão / ciclo de referência / contraste WCAG abaixo do mínimo viram
@@ -772,6 +816,9 @@ run_githook_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).
 run_assemble_plugin_selftests
+
+# Modo plugins-sync — drift-guard (REGRA 19): committed bate com a regeneração da fonte.
+run_plugins_sync_selftests
 
 # Modo design-tokens — idem (cenários self-contained, sem fixture-file).
 run_design_tokens_selftests
