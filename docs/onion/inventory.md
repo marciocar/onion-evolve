@@ -17,8 +17,8 @@
 
 | Categoria | Comandos |
 |-----------|---------:|
-| `meta/` | 27 |
-| `product/` | 20 |
+| `meta/` | 26 |
+| `product/` | 21 |
 | `engineer/` | 11 |
 | `docs/` | 11 |
 | `validate/` | 6 |

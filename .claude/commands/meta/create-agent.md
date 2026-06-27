@@ -29,6 +29,8 @@ updated: "2025-11-24"
 related_commands:
   - /meta/create-command
   - /meta/create-agent-express
+  - /meta/create-skill
+  - /meta/create-knowledge-base
 
 related_agents:
   - agent-creator-specialist
