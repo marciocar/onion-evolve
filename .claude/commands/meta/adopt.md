@@ -165,6 +165,14 @@ git -C "$DEST" config gitflow.branch.master "${MASTER_BRANCH:-main}"
 #     Cobre prettier e ferramentas que respeitam .prettierignore; detecta dprint.json/biome.json e AVISA
 #     (não os cobre — cobertura ativa = follow-up). Helper testável (lint-selftest.sh: prettierignore).
 bash "$SOURCE_ROOT/.claude/utils/adopt/merge-prettierignore.sh" "$DEST"
+
+# (6) pre-commit NATIVO — provisiona o padrão de hook do Onion (git nativo via core.hooksPath,
+#     dependency-free e à prova de worktree; espelha o .githooks/pre-commit do core). Cura de RAIZ do
+#     atrito ENOENT da adoção legacy com husky (não só avisa --no-verify): o hook nativo degrada
+#     gracioso sem node_modules. Never-clobber (pre-commit próprio → sidecar .onion); husky detectado →
+#     avisa migração; core.hooksPath só seta se UNSET. Helper testável (lint-selftest.sh: githook).
+#     Doutrina: docs/analysis/onion-adr-native-githooks-standard-2026-06.md
+bash "$SOURCE_ROOT/.claude/utils/adopt/install-onion-githook.sh" "$DEST"
 ```
 
 > O passo (1) **substitui** o antigo never-clobber grosso (que copiava só se ausente; senão deixava um
@@ -219,7 +227,9 @@ flow: downstream (core→consumidor / distribuição)
 
 ## Próximos passos (NO ALVO)
 1. Revisar o diff aplicado nesta sessão.
-2. Commitar a atualização (gitflow do próprio repo).
+2. Commitar a atualização (gitflow do próprio repo). Em worktree legacy sem node_modules e com
+   pre-commit hook (husky/lint-staged), use \`git commit --no-verify\` (ENOENT = binário ausente,
+   não violação; artefatos Onion já protegidos por .prettierignore) ou rode \`pnpm install\` antes.
 3. Push / abrir PR na branch de integração.
 4. (Opcional) Devolver sinal de campo ao core via inbox/ (upstream).
 EOF
@@ -286,6 +296,15 @@ else
   INSTALL_DIR="$TARGET"
 fi
 # 2b. Rodar o «Procedimento de cópia segura» com DEST="$INSTALL_DIR" (filtra manifesto, tmp, diff, aplica).
+
+# 2c. AVISO de hook de commit (legacy): a worktree nova NÃO tem node_modules. Se o alvo usa HUSKY
+#     (que invoca binário de node_modules: husky+lint-staged → prettier/eslint), o 1º commit da adoção
+#     falha com ENOENT e o lint-staged REVERTE (commit não acontece). O hook NATIVO Onion (Fase 3,
+#     passo 6) é a cura de raiz — degrada gracioso sem node_modules —, MAS só vence se o adotante migrar
+#     (core.hooksPath é never-clobber: husky pré-existente continua ativo até a migração). Até lá:
+if [ -d "$INSTALL_DIR/.husky" ] || grep -q '"lint-staged"\|lint-staged' "$INSTALL_DIR/package.json" 2>/dev/null; then
+  [ -d "$INSTALL_DIR/node_modules" ] || echo "⚠️ Alvo usa husky/lint-staged e a worktree não tem node_modules: para o 1º commit use 'git commit --no-verify' (ENOENT é binário ausente, não violação; artefatos Onion já protegidos por .prettierignore) ou 'pnpm install' na worktree. CURA: migrar husky → hook nativo Onion (provisionado na Fase 3; ver ADR native-githooks-standard)."
+fi
 ```
 
 - Checkpoint: `NEXT: Fase 3`.

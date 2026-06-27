@@ -442,6 +442,61 @@ run_prettierignore_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo githook — exercita .claude/utils/adopt/install-onion-githook.sh (padrão de
+# hook nativo Onion; ADR native-githooks-standard). Self-contained (mktemp -d).
+# ---------------------------------------------------------------------------
+run_githook_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/install-onion-githook.sh"
+  local tpl="${REPO_ROOT}/.claude/utils/adopt/githook-pre-commit-onion.tpl"
+  if [ ! -f "${helper}" ]; then record_fail "githook" "helper ausente: ${helper}"; return; fi
+  if [ ! -f "${tpl}" ]; then record_fail "githook" "template ausente: ${tpl}"; return; fi
+  local d rc
+
+  # (a) repo sem .githooks → cria pre-commit executável + seta core.hooksPath=.githooks
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  bash "${helper}" "${d}" >/dev/null 2>&1
+  if [ -x "${d}/.githooks/pre-commit" ] && [ "$(git -C "${d}" config --local --get core.hooksPath)" = ".githooks" ]; then
+    record_pass "githook: absent cria pre-commit + seta hooksPath"
+  else record_fail "githook: absent" "não criou hook executável ou não setou hooksPath"; fi
+  rm -rf "${d}"
+
+  # (b) pre-commit próprio DIFERENTE → sidecar .onion, original intacto (never-clobber)
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.githooks"
+  printf '#!/bin/sh\necho meu-hook\n' > "${d}/.githooks/pre-commit"
+  bash "${helper}" "${d}" >/dev/null 2>&1
+  if [ -f "${d}/.githooks/pre-commit.onion" ] && grep -q 'meu-hook' "${d}/.githooks/pre-commit"; then
+    record_pass "githook: pre-commit próprio → sidecar .onion (never-clobber)"
+  else record_fail "githook: never-clobber" "clobrou o pre-commit do alvo ou não gerou sidecar"; fi
+  rm -rf "${d}"
+
+  # (c) core.hooksPath já setado (husky/custom) → NÃO sobrescreve + avisa
+  d="$(mktemp -d)"; git -C "${d}" init -q; git -C "${d}" config core.hooksPath .husky/_
+  local err; err="$(bash "${helper}" "${d}" 2>&1 >/dev/null)"
+  if [ "$(git -C "${d}" config --local --get core.hooksPath)" = ".husky/_" ] && printf '%s' "${err}" | grep -q 'NÃO sobrescrito'; then
+    record_pass "githook: hooksPath pré-setado não é sobrescrito"
+  else record_fail "githook: hooksPath never-clobber" "sobrescreveu o hooksPath do adotante"; fi
+  rm -rf "${d}"
+
+  # (d) idempotente: 2ª rodada com hook idêntico → no-op (sem sidecar espúrio)
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  bash "${helper}" "${d}" >/dev/null 2>&1; bash "${helper}" "${d}" >/dev/null 2>&1
+  if [ -x "${d}/.githooks/pre-commit" ] && [ ! -f "${d}/.githooks/pre-commit.onion" ]; then
+    record_pass "githook: 2ª rodada é no-op (idempotente)"
+  else record_fail "githook: idempotente" "gerou sidecar espúrio na 2ª rodada"; fi
+  rm -rf "${d}"
+
+  # (e) dest não-git → exit 2 (erro de uso)
+  d="$(mktemp -d)"; rc=0; bash "${helper}" "${d}" >/dev/null 2>&1 || rc=$?; rm -rf "${d}"
+  if [ "${rc}" -eq 2 ]; then record_pass "githook: dest não-git → exit 2"
+  else record_fail "githook: dest não-git" "esperava exit 2, veio ${rc}"; fi
+
+  # (f) dest inexistente → exit 2
+  rc=0; bash "${helper}" "/nao/existe/$$" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "githook: dest inválido → exit 2"
+  else record_fail "githook: dest inválido" "esperava exit 2, veio ${rc}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo design-tokens — exercita .claude/validation/lint-design-tokens.sh.
 # Self-contained (mktemp), cobre MODOS DE FALHA: tokens válidos passam;
 # alias órfão / ciclo de referência / contraste WCAG abaixo do mínimo viram
@@ -628,6 +683,9 @@ run_resolve_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
+
+# Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
+run_githook_selftests
 
 # Modo design-tokens — idem (cenários self-contained, sem fixture-file).
 run_design_tokens_selftests
