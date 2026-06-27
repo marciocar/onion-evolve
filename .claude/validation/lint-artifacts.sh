@@ -82,11 +82,23 @@ TOTAL_COUNT=0
 # Sem --fix o script é puramente diagnóstico (comportamento histórico).
 # ---------------------------------------------------------------------------
 FIX_MODE=0
+ONLY_PATH=""        # --only=<abspath>: escopa a varredura a UM arquivo (acelera o selftest: O(fixtures×1))
 for _arg in "$@"; do
   case "${_arg}" in
     --fix) FIX_MODE=1 ;;
+    --only=*) ONLY_PATH="${_arg#--only=}" ;;
   esac
 done
+# Normaliza --only para ABSOLUTO (a checagem de pertencimento compara com raízes
+# absolutas; caminho relativo casaria nada → falso-verde silencioso). Arquivo
+# inexistente → aborta (não deixar um escopo quebrado "passar" vazio).
+if [ -n "${ONLY_PATH}" ]; then
+  case "${ONLY_PATH}" in
+    /*) ;;
+    *) ONLY_PATH="$(cd "$(dirname "${ONLY_PATH}")" 2>/dev/null && pwd)/$(basename "${ONLY_PATH}")" ;;
+  esac
+  [ -f "${ONLY_PATH}" ] || { echo "ERRO: --only: arquivo inexistente: ${ONLY_PATH}" >&2; exit 2; }
+fi
 FIXED_FILES=0
 declare -a FIX_LOG=()
 
@@ -105,6 +117,35 @@ inventory_scope_excluded() {
     return 0
   fi
   return 1
+}
+
+# ---------------------------------------------------------------------------
+# _find — wrapper de find que honra --only=<arquivo>. Sem --only, é find normal.
+# Com --only, emite SÓ o arquivo-alvo, e apenas se ele estiver sob uma das raízes
+# da regra — preservando a semântica de escopo de cada regra (regra cujo alvo
+# está fora das suas raízes → não varre nada, idêntico ao find real que não
+# acharia o arquivo lá). Convenção: raízes vêm ANTES dos predicados (que começam
+# com '-' ou '!'). É o que dá ao selftest O(fixtures × 1) em vez de
+# O(fixtures × repo-inteiro) — mesma cobertura, segundos em vez de minutos.
+# ---------------------------------------------------------------------------
+_find() {
+  local roots=() preds=()
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -*|'!') preds=("$@"); break ;;
+      *) roots+=("$1"); shift ;;
+    esac
+  done
+  if [ -n "${ONLY_PATH}" ]; then
+    local r
+    for r in "${roots[@]}"; do
+      case "${ONLY_PATH}" in
+        "${r}"/*|"${r}") find "${ONLY_PATH}" "${preds[@]}"; return ;;
+      esac
+    done
+    return 0   # alvo fora das raízes desta regra → nada a varrer
+  fi
+  find "${roots[@]}" "${preds[@]}"
 }
 
 # ---------------------------------------------------------------------------
@@ -142,7 +183,7 @@ check_agent_frontmatter() {
     if [ -n "${missing}" ]; then
       violation "HARD" "${agent}" "frontmatter de agente incompleto — campos ausentes:${missing}"
     fi
-  done < <(find "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -155,7 +196,7 @@ check_command_description() {
       violation "HARD" "${cmd}" "frontmatter de comando sem description:"
     fi
   done < <(
-    find "${CLAUDE_DIR}/commands" -name "*.md" \
+    _find "${CLAUDE_DIR}/commands" -name "*.md" \
       ! -path "*/common/*"   \
       ! -name "README.md"    \
       -print0 2>/dev/null
@@ -175,7 +216,7 @@ check_no_gpt4_model() {
       lines=$(grep -n "^model:.*gpt-4" "${file}" | head -3)
       violation "HARD" "${file}" "campo model: contém gpt-4 (linha(s): ${lines})"
     fi
-  done < <(find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -212,7 +253,7 @@ check_line_limits() {
     if [ "${lines}" -gt 1500 ]; then
       violation "HARD" "${agent}" "agente com ${lines} linhas (limite: 1500)"
     fi
-  done < <(find "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
 
   # 5b. Comandos (exclui common/templates e common/prompts)
   while IFS= read -r -d '' cmd; do
@@ -222,7 +263,7 @@ check_line_limits() {
       violation "HARD" "${cmd}" "comando com ${lines} linhas (limite: 800)"
     fi
   done < <(
-    find "${CLAUDE_DIR}/commands" -name "*.md" \
+    _find "${CLAUDE_DIR}/commands" -name "*.md" \
       ! -path "*/common/templates/*" \
       ! -path "*/common/prompts/*"   \
       -print0 2>/dev/null
@@ -262,7 +303,7 @@ check_kebab_case_filenames() {
     if echo "${name_part}" | grep -qE '[A-Z]| |_'; then
       violation "SOFT" "${file}" "filename não segue kebab-case (maiúsculas, espaço ou underscore em '${base}')"
     fi
-  done < <(find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -274,7 +315,7 @@ check_no_fleet_orchestrator_agent() {
     if grep -q "^name:.*fleet-orchestrator" "${agent}"; then
       violation "HARD" "${agent}" "agente com name: 'fleet-orchestrator' viola §4.2 da arquitetura"
     fi
-  done < <(find "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -371,7 +412,7 @@ check_no_direct_provider_calls() {
 ${lines}"
     fi
   done < <(
-    find "${CLAUDE_DIR}/commands" "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null
+    _find "${CLAUDE_DIR}/commands" "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null
   )
 }
 
@@ -415,7 +456,7 @@ ${where}"
       fi
     done < <(grep -hoE '(taskManager|tm|forge)\.[a-zA-Z]+\(' "${file}" 2>/dev/null \
               | sed -E 's/.*\.([a-zA-Z]+)\(/\1/' | sort -u)
-  done < <(find "${CLAUDE_DIR}/commands" "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}/commands" "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -460,7 +501,7 @@ check_agent_tool_names() {
       inblk && /^[^[:space:]#]/ { inblk=0 }
       inblk && /^[[:space:]]*-/ { t=$0; sub(/^[[:space:]]*-[[:space:]]*/,"",t); sub(/[[:space:]#].*$/,"",t); if(t!="") print t }
     ' "${agent}")
-  done < <(find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -483,7 +524,7 @@ check_template_dialect() {
     while IFS= read -r m; do
       [ -n "${m}" ] && violation "HARD" "${tpl}" "MCP em formato Cursor no template: '${m}' — use 'mcp__<server>__<tool>' (duplo underscore)"
     done < <(grep -hoE 'mcp_[A-Za-z][A-Za-z_]*' "${tpl}" 2>/dev/null | grep -vE '^mcp__' | sort -u)
-  done < <(find "${tdir}" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
+  done < <(_find "${tdir}" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -504,7 +545,7 @@ check_metaspec_dialect() {
     while IFS= read -r m; do
       [ -n "${m}" ] && violation "HARD" "${spec}" "MCP em formato Cursor: '${m}' — use 'mcp__<server>__<tool>' (duplo underscore)"
     done < <(grep -hoE 'mcp_[A-Za-z][A-Za-z_]*' "${spec}" 2>/dev/null | grep -vE '^mcp__' | sort -u)
-  done < <(find "${mdir}" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${mdir}" -name "*.md" -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -527,7 +568,7 @@ check_context_freshness_stamp() {
       if ! grep -qE 'Atualiza|^[Uu]pdated:|^[Dd]ate:' "${f}"; then
         violation "SOFT" "${f}" "contexto de domínio sem carimbo de frescor ('Última Atualização'/'updated:') — exigido pela fase Manage (/meta:context-freshness)"
       fi
-    done < <(find "${base}" -name "*.md" ! -iname "readme.md" ! -iname "index.md" -print0 2>/dev/null)
+    done < <(_find "${base}" -name "*.md" ! -iname "readme.md" ! -iname "index.md" -print0 2>/dev/null)
   done
 }
 
@@ -692,7 +733,7 @@ check_inventory_total_drift() {
         violation "SOFT" "${f}" "contagem composta de KBs divergente da SSOT: '${kn} knowledge bases' (esperado ${kb}) — /meta:inventory"
       fi
     done < <(grep -iE '[0-9]+ comandos,[^|]*[0-9]+ agentes,[^|]*[0-9]+ [Kk]nowledge [Bb]ases' "${f}" 2>/dev/null)
-  done < <(find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -722,7 +763,7 @@ check_frontmatter_scalar_colon() {
     ' "${f}" | while IFS= read -r badln; do
       violation "HARD" "${f}" "frontmatter linha ${badln}: valor escalar com ': ' não-aspado (quebra o YAML → metadata dropada no Claude Code; aspe o valor)"
     done
-  done < <(find "${CLAUDE_DIR}/agents" "${CLAUDE_DIR}/commands" -name '*.md' ! -path '*/validation/fixtures/*' -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}/agents" "${CLAUDE_DIR}/commands" -name '*.md' ! -path '*/validation/fixtures/*' -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -738,7 +779,7 @@ check_no_claude_docs() {
   [ -d "${d}" ] || return 0
   while IFS= read -r -d '' f; do
     violation "HARD" "${f}" "documentação sob .claude/docs/ — proibido (architecture.md §2: docs vivem em docs/; insumos de agente em .claude/utils/). Mova ou remova."
-  done < <(find "${d}" -name '*.md' -print0 2>/dev/null)
+  done < <(_find "${d}" -name '*.md' -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -800,7 +841,7 @@ run_inventory_fixes() {
   while IFS= read -r -d '' f; do
     inventory_scope_excluded "${f}" && continue
     _apply_fix_file "${f}" "${prog}"
-  done < <(find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
 
   # CLAUDE.md vive na RAIZ do repo — FORA dos roots varridos (.claude/, docs/),
   # então o loop acima NÃO o alcança (a detecção R9 cobre suas contagens, não a

@@ -112,7 +112,7 @@ run_lint_fixture() {
       "${src}" > "${dst}"
 
   local out
-  out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" 2>&1)" || true
+  out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${dst}" 2>&1)" || true
 
   rm -f "${dst}"
 
@@ -174,12 +174,12 @@ run_fix_fixture() {
       "${src}" > "${dst}"
   local before; before="$(cat "${dst}")"
 
-  bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --fix >/dev/null 2>&1 || true
+  bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --fix --only="${dst}" >/dev/null 2>&1 || true
 
   case "${verdict}" in
     corrected)
       local out cited
-      out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" 2>&1)" || true
+      out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${dst}" 2>&1)" || true
       cited="$(printf '%s\n' "${out}" | grep -F "${INJECT_BASE}" || true)"
       if [ -n "${cited}" ]; then
         record_fail "${fixture}" "--fix não curou o drift; ainda citada: ${cited}"; rm -f "${dst}"; return
@@ -188,7 +188,7 @@ run_fix_fixture() {
         record_fail "${fixture}" "--fix deixou o valor de drift (${SSOT_CMD_DRIFT}) no arquivo"; rm -f "${dst}"; return
       fi
       local after1; after1="$(cat "${dst}")"
-      bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --fix >/dev/null 2>&1 || true
+      bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --fix --only="${dst}" >/dev/null 2>&1 || true
       if [ "$(cat "${dst}")" != "${after1}" ]; then
         record_fail "${fixture}" "--fix não idempotente (2ª passada mudou bytes)"; rm -f "${dst}"; return
       fi
