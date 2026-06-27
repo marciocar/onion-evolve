@@ -183,7 +183,7 @@ check_agent_frontmatter() {
     if [ -n "${missing}" ]; then
       violation "HARD" "${agent}" "frontmatter de agente incompleto — campos ausentes:${missing}"
     fi
-  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -253,7 +253,7 @@ check_line_limits() {
     if [ "${lines}" -gt 1500 ]; then
       violation "HARD" "${agent}" "agente com ${lines} linhas (limite: 1500)"
     fi
-  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 
   # 5b. Comandos (exclui common/templates e common/prompts)
   while IFS= read -r -d '' cmd; do
@@ -315,7 +315,7 @@ check_no_fleet_orchestrator_agent() {
     if grep -q "^name:.*fleet-orchestrator" "${agent}"; then
       violation "HARD" "${agent}" "agente com name: 'fleet-orchestrator' viola §4.2 da arquitetura"
     fi
-  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null)
+  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
 
 # ===========================================================================
