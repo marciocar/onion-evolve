@@ -1,0 +1,21 @@
+{
+  "name": "onion-evolve",
+  "owner": {
+    "name": "Onion - Marcio Carvalho",
+    "email": "marcio@grana.ai"
+  },
+  "metadata": {
+    "description": "Marketplace privado do Sistema Onion — verticais empacotadas como plugins (vertical-skill SDAAL). Camada 1 (capacidade) via plugin; camadas 2+3 (spec-as-code + co-evolucao) via /meta:adopt. Ver docs/analysis/onion-adr-exchange-unit-2026-06.md.",
+    "version": "0.1.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "onion-design",
+      "source": "./plugins/onion-design",
+      "description": "Vertical de design do Onion: identidade visual como spec-as-code (tokens W3C/DTCG), gate WCAG, materializacao via design-sink. Auto-adapta ao design-context do consumidor (SDAAL).",
+      "version": "0.1.0",
+      "author": { "name": "Onion - Marcio Carvalho" }
+    }
+  ]
+}

@@ -87,6 +87,11 @@ da camada `.claude/`**.
 
 - **2026-06-20** — Veredito gravado: híbrido por camadas (1 nativo · 2+3 moat). Gated por apetite.
   Para retroagir: editar aqui com data + porquê. É tudo novo — liberdade total.
+- **2026-06-27** — Apetite sinalizado pelo maestro → **camada 1 destravada e iniciada**. ADR
+  `onion-adr-exchange-unit-2026-06.md` (unidade de troca = vertical-skill SDAAL via marketplace +
+  proveniência; monetização gated) + protótipo da vertical **Design** como plugin `onion-design`
+  (`.claude-plugin/marketplace.json` + script de montagem determinístico + dogfood de instalação).
+  Separação de camadas provada em campo (plugin = camada 1; `design-context` fica do consumidor).
 
 ## Fontes-chave
 
