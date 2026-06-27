@@ -15,6 +15,7 @@ tools:
 color: yellow
 priority: alta
 expertise: ["customer-pain-analysis", "value-pricing", "customer-success", "business-strategy", "product-strategy"]
+related_agents: ["product-agent", "research-agent"]
 ---
 
 # Especialista em Analisar e Precificar a Dor de um Cliente

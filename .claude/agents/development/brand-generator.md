@@ -15,6 +15,8 @@ tools:
   - Glob
   - TodoWrite
 color: purple
+expertise: ["visual-identity", "color-palette", "design-tokens", "wcag-contrast", "divergent-generation"]
+related_agents: ["design-system-specialist", "branding-positioning-specialist"]
 ---
 
 # Brand Generator
