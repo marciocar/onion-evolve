@@ -127,14 +127,14 @@ Decisão final guiada por `@security-information-master` durante `/docs:build-co
 | [@iso-22301-specialist](../../.claude/agents/compliance/iso-22301-specialist.md) | BCMS ISO 22301:2019 | ISO 22301 |
 | [@soc2-specialist](../../.claude/agents/compliance/soc2-specialist.md) | Trust Services Criteria | SOC2 Type II |
 | [@pmbok-specialist](../../.claude/agents/compliance/pmbok-specialist.md) | PMBOK Guide 7th Edition | PMBOK |
-| [@corporate-compliance-specialist](../../.claude/agents/compliance/corporate-compliance-specialist.md) | Anticorrupção, PLD/KYC, ética | Corporate |
+| [@corporate-compliance-specialist](../../.claude/agents/review/corporate-compliance-specialist.md) | Anticorrupção, PLD/KYC, ética | Corporate |
 
 ---
 
 ## Referência
 
 - KB de padrão de spec-as-code: [docs/sdaal/sdaal.md](../sdaal/sdaal.md)
-- Guia de aplicação em projeto regulado: [docs/onion/applying-regulated.md](../onion/applying-regulated.md) (a criar conforme T3.3)
+- Guia de aplicação em projeto regulado: [docs/applying/applying-regulated.md](../applying/applying-regulated.md)
 
 ---
 

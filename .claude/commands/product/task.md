@@ -3,7 +3,7 @@ name: task
 description: |
   Criação de tasks com decomposição hierárquica inteligente.
   Use para criar tasks estruturadas com subtasks e action items.
-  Suporta: ClickUp, Asana, Linear (via TASK_MANAGER_PROVIDER).
+  Suporta: Jira, ClickUp, Asana, Linear (via TASK_MANAGER_PROVIDER).
 model: sonnet
 allowed-tools: Bash(cat .env*) Read Write Grep Glob
 parameters:
