@@ -67,7 +67,8 @@ tools: [lista separada por vírgulas das ferramentas selecionadas]
 IMPORTANTE: a extensão do arquivo deve ser .md, não .yaml
 
 ### 6. Implementação
-- Crie o arquivo em `.claude/agents/[name-agent].md`
+- **Escolha a categoria** existente mais adequada ao escopo do agente: `development` | `product` | `compliance` | `git` | `meta` | `testing` | `review` | `research` | `deployment` (veja `.claude/agents/<categoria>/`).
+- Crie o arquivo em `.claude/agents/[categoria]/[name-agent].md` — agentes vivem em **subpasta de categoria**, nunca no root de `agents/` (estrutura canônica; o `create-agent` completo também categoriza).
 - Torne o prompt do sistema abrangente mas focado
 
 ### 7. Confirmar Criação

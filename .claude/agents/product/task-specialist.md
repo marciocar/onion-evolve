@@ -31,7 +31,7 @@ related_agents:
 
 related_commands:
   - /product/task
-  - /meta/create-task-structure
+  - /product/create-task-structure
 
 version: "3.0.0"
 updated: "2025-11-24"

@@ -125,7 +125,7 @@ independente que a contesta, produzindo um **veredito estruturado** com campos
 ```
 fleet.md · metaspec-validate.md · create-agent.md · create-command.md
 create-skill.md · create-abstraction.md · create-knowledge-base.md
-create-task-structure.md · create-agent-express.md · setup-integration.md
+create-agent-express.md · setup-integration.md
 fleet-fallback.md (se existir) · all-tools.md · analyze-complex-problem.md
 ```
 

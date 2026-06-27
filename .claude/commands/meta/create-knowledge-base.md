@@ -25,6 +25,9 @@ updated: "2026-05-15"
 output_path: docs/knowledge-base/
 
 related_commands:
+  - /meta/create-command
+  - /meta/create-agent
+  - /meta/create-skill
   - /docs:build-business-docs
   - /docs:build-tech-docs
   - /docs:build-index
