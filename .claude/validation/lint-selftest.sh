@@ -497,50 +497,66 @@ run_githook_selftests() {
 }
 
 # ---------------------------------------------------------------------------
-# Modo assemble-plugin — exercita .claude/utils/marketplace/assemble-design-plugin.sh
-# (empacota a vertical Design como plugin; ADR exchange-unit). Roda contra o REPO
-# real com dest em mktemp (não toca o plugins/ commitado). Cobre: estrutura gerada,
-# determinismo/idempotência, manifest válido (8 campos), proveniência, modo de falha.
+# Modo assemble-plugin — exercita .claude/utils/marketplace/assemble-plugin.sh
+# (genérico, dirigido por manifesto; ADR exchange-unit). Roda contra o REPO real
+# com dest em mktemp (não toca o plugins/ commitado). Cobre AMBAS as verticais
+# (design = com utils/gate; compliance = agentes-pesado, sem utils/gate → prova de
+# generalização), estrutura, determinismo, manifest 8 campos, proveniência, falhas.
 # ---------------------------------------------------------------------------
 run_assemble_plugin_selftests() {
-  local helper="${REPO_ROOT}/.claude/utils/marketplace/assemble-design-plugin.sh"
+  local helper="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
+  local mdesign="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion-design.manifest.sh"
+  local mcompl="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion-compliance.manifest.sh"
   if [ ! -f "${helper}" ]; then record_fail "assemble-plugin" "helper ausente: ${helper}"; return; fi
   if ! command -v jq >/dev/null 2>&1; then record_pass "assemble-plugin: jq ausente → pulado (gracioso)"; return; fi
   local d rc
 
-  # (a) monta estrutura esperada (commands + agents + utils + manifest + proveniência)
+  # (a) DESIGN: estrutura com utils + gate (commands+agents+utils+validation+manifest+proveniência)
   d="$(mktemp -d)"
-  bash "${helper}" "${REPO_ROOT}" "${d}/onion-design" >/dev/null 2>&1
-  if [ -f "${d}/onion-design/.claude-plugin/plugin.json" ] \
-     && [ -f "${d}/onion-design/.claude-plugin/provenance.json" ] \
-     && ls "${d}/onion-design/commands/"*.md >/dev/null 2>&1 \
-     && ls "${d}/onion-design/agents/"*.md >/dev/null 2>&1 \
-     && [ -d "${d}/onion-design/utils/design-sink" ]; then
-    record_pass "assemble-plugin: estrutura (commands+agents+utils+manifest+proveniência)"
-  else record_fail "assemble-plugin: estrutura" "faltou componente no plugin montado"; fi
+  bash "${helper}" "${mdesign}" "${REPO_ROOT}" "${d}/design" >/dev/null 2>&1
+  if [ -f "${d}/design/.claude-plugin/plugin.json" ] && [ -f "${d}/design/.claude-plugin/provenance.json" ] \
+     && ls "${d}/design/commands/"*.md >/dev/null 2>&1 && ls "${d}/design/agents/"*.md >/dev/null 2>&1 \
+     && [ -d "${d}/design/utils/design-sink" ] && [ -f "${d}/design/validation/lint-design-tokens.sh" ]; then
+    record_pass "assemble-plugin: design (commands+agents+utils+validation+proveniência)"
+  else record_fail "assemble-plugin: design estrutura" "faltou componente no plugin design"; fi
 
-  # (b) plugin.json = EXATAMENTE os 8 campos permitidos (additionalProperties rejeitado)
-  local keys; keys="$(jq -r 'keys | sort | join(",")' "${d}/onion-design/.claude-plugin/plugin.json" 2>/dev/null)"
-  if [ "${keys}" = "author,description,homepage,keywords,license,name,repository,version" ]; then
-    record_pass "assemble-plugin: plugin.json 8 campos exatos"
-  else record_fail "assemble-plugin: plugin.json campos" "keys inesperadas: ${keys}"; fi
+  # (b) COMPLIANCE: shape diferente — agentes + 1 command, SEM utils/ nem validation/ (generalização)
+  bash "${helper}" "${mcompl}" "${REPO_ROOT}" "${d}/compliance" >/dev/null 2>&1
+  if ls "${d}/compliance/agents/"*.md >/dev/null 2>&1 && [ -f "${d}/compliance/commands/build-compliance-docs.md" ] \
+     && [ ! -d "${d}/compliance/utils" ] && [ ! -d "${d}/compliance/validation" ]; then
+    record_pass "assemble-plugin: compliance (agentes+command, sem utils/gate — generaliza)"
+  else record_fail "assemble-plugin: compliance estrutura" "shape inesperado no plugin compliance"; fi
 
-  # (c) proveniência content-addressed: tem repository + ref + tree_sha não-vazios
+  # (c) plugin.json = EXATAMENTE os 8 campos permitidos (ambos)
+  local kd kc
+  kd="$(jq -r 'keys|sort|join(",")' "${d}/design/.claude-plugin/plugin.json" 2>/dev/null)"
+  kc="$(jq -r 'keys|sort|join(",")' "${d}/compliance/.claude-plugin/plugin.json" 2>/dev/null)"
+  local want="author,description,homepage,keywords,license,name,repository,version"
+  if [ "${kd}" = "${want}" ] && [ "${kc}" = "${want}" ]; then
+    record_pass "assemble-plugin: plugin.json 8 campos exatos (design+compliance)"
+  else record_fail "assemble-plugin: plugin.json campos" "design=${kd} compliance=${kc}"; fi
+
+  # (d) proveniência content-addressed não-vazia (compliance, shape sem utils/gate)
   if jq -e '.repository and .ref and .tree_sha and (.tree_sha|length>0)' \
-       "${d}/onion-design/.claude-plugin/provenance.json" >/dev/null 2>&1; then
+       "${d}/compliance/.claude-plugin/provenance.json" >/dev/null 2>&1; then
     record_pass "assemble-plugin: proveniência repository+ref+tree_sha"
   else record_fail "assemble-plugin: proveniência" "campos de proveniência ausentes/vazios"; fi
 
-  # (d) determinismo: 2ª montagem (mesmo HEAD) → mesmo tree_sha
-  local t1 t2; t1="$(jq -r '.tree_sha' "${d}/onion-design/.claude-plugin/provenance.json" 2>/dev/null)"
-  bash "${helper}" "${REPO_ROOT}" "${d}/onion-design2" >/dev/null 2>&1
-  t2="$(jq -r '.tree_sha' "${d}/onion-design2/.claude-plugin/provenance.json" 2>/dev/null)"
+  # (e) determinismo: 2ª montagem (mesmo HEAD) → mesmo tree_sha
+  local t1 t2; t1="$(jq -r '.tree_sha' "${d}/design/.claude-plugin/provenance.json" 2>/dev/null)"
+  bash "${helper}" "${mdesign}" "${REPO_ROOT}" "${d}/design2" >/dev/null 2>&1
+  t2="$(jq -r '.tree_sha' "${d}/design2/.claude-plugin/provenance.json" 2>/dev/null)"
   if [ -n "${t1}" ] && [ "${t1}" = "${t2}" ]; then record_pass "assemble-plugin: tree_sha determinístico"
   else record_fail "assemble-plugin: determinismo" "tree_sha divergiu: ${t1} vs ${t2}"; fi
   rm -rf "${d}"
 
-  # (e) source não-git → exit 2 (erro de uso)
-  d="$(mktemp -d)"; rc=0; bash "${helper}" "${d}" "${d}/out" >/dev/null 2>&1 || rc=$?; rm -rf "${d}"
+  # (f) manifesto inválido → exit 2
+  rc=0; bash "${helper}" "/nao/existe/$$.sh" "${REPO_ROOT}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "assemble-plugin: manifesto inválido → exit 2"
+  else record_fail "assemble-plugin: manifesto inválido" "esperava exit 2, veio ${rc}"; fi
+
+  # (g) source não-git → exit 2
+  d="$(mktemp -d)"; rc=0; bash "${helper}" "${mdesign}" "${d}" "${d}/out" >/dev/null 2>&1 || rc=$?; rm -rf "${d}"
   if [ "${rc}" -eq 2 ]; then record_pass "assemble-plugin: source não-git → exit 2"
   else record_fail "assemble-plugin: source não-git" "esperava exit 2, veio ${rc}"; fi
 }
