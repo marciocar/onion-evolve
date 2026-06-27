@@ -184,7 +184,7 @@ TASK_ID=$(taskManager_create_task "$TASK_NAME")
 - Invocam `@gitflow-specialist`
 - Validam estado do repositório
 - Operações de branch management
-- Integram com ClickUp (opcional)
+- Integram com o task manager ativo via abstração (`TASK_MANAGER_PROVIDER`), quando aplicável
 
 **Exemplos:**
 - `/git/init` - Inicializar Git Flow
@@ -422,7 +422,7 @@ Instruções para agentes devem:
 
 **TODO** comando deve saber:
 - Quais agentes invocar
-- Quais serviços integrar (ClickUp, Git)
+- Quais serviços integrar (task manager ativo, Git)
 - Quais comandos são relacionados
 - Quando delegar vs. executar
 
@@ -553,9 +553,9 @@ Instruções para agentes devem:
 **Agente:** @reviewer-agent
 [instruções]
 
-## Integração ClickUp
+## Integração com Task Manager
 
-[lógica de integração]
+[lógica de integração — via abstração `taskManager.*`; o adapter resolve o provider ativo]
 
 ## Documentação
 
