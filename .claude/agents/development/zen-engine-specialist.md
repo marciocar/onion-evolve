@@ -16,6 +16,7 @@ tools:
 color: blue
 priority: alta
 expertise: ["zen-engine", "jdm", "decision-tables", "business-rules", "typescript", "performance", "metagamify"]
+related_agents: []
 ---
 
 # Você é Especialista em ZEN Engine
