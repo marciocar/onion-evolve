@@ -209,3 +209,4 @@ write .claude/agents/{{category}}/{{agent_name}}.md
 - Sempre validar duplicação antes de criar
 - Usar modelo `sonnet` como padrão
 - Não adicionar MCPs em agentes genéricos
+- **Passo final — sincronizar a SSOT:** após criar, rodar **`/meta:inventory`** (regenera `inventory.md`; a Regra 8 do lint é HARD → criar sem regenerar deixa o repo em HARD-fail silencioso). Mecanismo: `common:prompts:inventory-sync-after-create`.
