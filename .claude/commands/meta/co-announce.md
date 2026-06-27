@@ -27,10 +27,12 @@ a capacidade de downstream existe, mas o anúncio **nunca era exercido** ao ship
 
 ## Passo 1 — Guarda de papel (só CORE)
 
-Detectar o papel (igual a `/meta:co-evolve`): rodar `bash .claude/validation/onion-version.sh` e ler `role:`.
-- `role: source` → **CORE** → segue.
-- `role: adopted` → **CONSUMIDOR** → **parar**: adotante não anuncia (ele sinaliza via `inbox/`, upstream).
-  Orientar a usar `/meta:co-evolve`.
+Detectar o papel (igual a `/meta:co-evolve`): ler o **stamp `.claude/.onion-version`** (campo `role:`)
+primeiro; só se ausente, cair para `bash .claude/validation/onion-version.sh`. **Não** confie só no script —
+ele hardcoda `role: source` (identidade da FONTE) e, vendorizado num adotante, mentiria 'source'.
+- `role: source` (ou stamp ausente neste core) → **CORE** → segue.
+- `role: adopted` → **CONSUMIDOR** → **parar**: adotante não anuncia (ele sinaliza upstream via `inbox/` +
+  [`/meta:co-relay`](co-relay.md)). Orientar a usar `/meta:co-evolve`.
 
 ## Passo 2 — Selecionar a entrada do CHANGELOG
 
@@ -68,7 +70,7 @@ Para cada destinatário, escrever `docs/evolution/federation/outbox/<id>/<data-d
 ---
 title: '<assunto da entrada>'
 date: <data da entrada>
-from: onion-evolve (core / "mestre")
+from: onion-evolve (core / maestro principal)
 to: <id> (<name> — consumidor)
 re: CHANGELOG de co-evolução, entrada <data> (downstream)
 type: downstream-announce
