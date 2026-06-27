@@ -69,7 +69,7 @@ Você **gera documentação técnica de segurança** seguindo:
 ## 📖 Template Reference
 
 **Sempre leia o template primeiro:**
-`.claude/commands/common/templates/compliance_iso27001_template.md`
+`${CLAUDE_PLUGIN_ROOT}/templates/compliance_iso27001_template.md`
 
 Este template contém:
 - Estrutura completa de cada documento
@@ -566,7 +566,7 @@ Documentar processo de Incident Response conforme ISO 27001 Annex A 5.24-5.28.
 
 **1. Ler Template Primeiro:**
 ```bash
-Read .claude/commands/common/templates/compliance_iso27001_template.md
+Read ${CLAUDE_PLUGIN_ROOT}/templates/compliance_iso27001_template.md
 ```
 
 **2. Ler Contexto do Projeto:**

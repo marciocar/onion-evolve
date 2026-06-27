@@ -16,4 +16,10 @@ AGENTS=(
 )
 UTILS=()
 VALIDATION=()
-TEMPLATES=(".claude/commands/common/templates/compliance-context-template.md")
+TEMPLATES=(
+  ".claude/commands/common/templates/compliance-context-template.md"
+  ".claude/commands/common/templates/compliance_iso27001_template.md"
+  ".claude/commands/common/templates/compliance_iso22301_template.md"
+  ".claude/commands/common/templates/compliance_soc2_template.md"
+  ".claude/commands/common/templates/compliance_pmbok_template.md"
+)

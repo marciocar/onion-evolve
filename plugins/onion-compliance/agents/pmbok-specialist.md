@@ -73,7 +73,7 @@ Você **gera documentação de governança** seguindo:
 ## 📖 Template Reference
 
 **Sempre leia o template primeiro:**
-`.claude/commands/common/templates/compliance_pmbok_template.md`
+`${CLAUDE_PLUGIN_ROOT}/templates/compliance_pmbok_template.md`
 
 Este template contém:
 - 12 Princípios do PMBOK 7th Edition
@@ -593,7 +593,7 @@ Se API down > 30min:
 
 **1. Ler Template + NX Context:**
 ```bash
-Read .claude/commands/common/templates/compliance_pmbok_template.md
+Read ${CLAUDE_PLUGIN_ROOT}/templates/compliance_pmbok_template.md
 Read nx.json
 Read .github/CODEOWNERS
 Grep "What is the NX monorepo structure?"
