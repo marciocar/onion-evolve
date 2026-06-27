@@ -112,7 +112,7 @@ PARALELO (todos ao mesmo tempo, sem esperar o anterior):
 ### Passo 4: Gerar Documentação
 
 Gere os arquivos em `docs/compliance-context/` seguindo o template-base
-`.claude/commands/common/templates/compliance-context-template.md`. Crie apenas os arquivos dos
+`${CLAUDE_PLUGIN_ROOT}/templates/compliance-context-template.md`. Crie apenas os arquivos dos
 frameworks selecionados.
 
 > **Convenção de nomes (esta seção tem precedência sobre o template-base).** Use
@@ -164,7 +164,7 @@ docs/compliance-context/
 
 ## 🔗 Referências
 
-- **Template-base**: `.claude/commands/common/templates/compliance-context-template.md`
+- **Template-base**: `${CLAUDE_PLUGIN_ROOT}/templates/compliance-context-template.md`
 - **Pasta-alvo**: `docs/compliance-context/`
 - **Comandos complementares**: `/docs:build-tech-docs` · `/docs:build-business-docs`
 - **Ciclo de vida (SSOT viva)**: [domain-context-lifecycle.md](../../../docs/knowledge-base/concepts/domain-context-lifecycle.md)

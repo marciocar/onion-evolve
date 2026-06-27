@@ -23,7 +23,7 @@ set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-PROJECT="${1:-${REPO_ROOT}}"
+PROJECT="${1:-$(pwd)}"
 DC="${PROJECT}/docs/design-context"
 
 HARD=0

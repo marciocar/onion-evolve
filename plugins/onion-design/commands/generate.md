@@ -6,7 +6,7 @@ description: |
   alimenta o DEVELOP do /design:identity. A IA gera; o gate decide. Orquestra a frota
   via onion-fleet/Workflow (generate-and-filter). Delega a @brand-generator (workers).
 model: opus
-allowed-tools: Read Write Edit Glob Grep Workflow Bash(bash .claude/validation/*) Bash(bash .claude/utils/design-source/*) Bash(mktemp -d -t onion-design-*) Bash(rm -rf /tmp/onion-design-*)
+allowed-tools: Read Write Edit Glob Grep Workflow Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/design-source/*) Bash(mktemp -d -t onion-design-*) Bash(rm -rf /tmp/onion-design-*)
 category: design
 tags: [design, tokens, generative, fleet, wcag, branding]
 version: "0.1.0"
@@ -74,12 +74,12 @@ tmp="$(mktemp -d -t onion-design-XXXXXX)"
 mkdir -p "$tmp/docs/design-context"/{foundations,semantic,governance}
 # foundations da candidata: paleta flat → DTCG via o adapter file da F3 (reuso)
 printf '%s' "<foundations-flat-json>" \
-  | bash .claude/utils/design-source/file-to-tokens.sh - \
+  | bash ${CLAUDE_PLUGIN_ROOT}/utils/design-source/file-to-tokens.sh - \
   > "$tmp/docs/design-context/foundations/color.tokens.json"
 # semantic + governance: estrutura FIXA da SSOT (copiar a do projeto)
 cp docs/design-context/semantic/color.tokens.json      "$tmp/docs/design-context/semantic/"
 cp docs/design-context/governance/contrast-pairs.json  "$tmp/docs/design-context/governance/"
-bash .claude/validation/lint-design-tokens.sh "$tmp" && rm -rf "$tmp"
+bash ${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh "$tmp" && rm -rf "$tmp"
 ```
 Reprovadas (contraste < mín, alias órfão/ciclo, DTCG malformado) são **descartadas** — o corte é
 calculado, não opinião. Reportar quantas passaram/caíram (`SKIP — <motivo>`). _(É exatamente este passo
@@ -117,7 +117,7 @@ contraste deve ser **descartado** pelo gate, não vencer. Prova que "o gate deci
 ## Referências
 
 - Workers: `@brand-generator` · Materializa o vencedor: `@design-system-specialist`
-- Gate: `.claude/validation/lint-design-tokens.sh` · Ingestão: `.claude/utils/design-source/`
+- Gate: `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh` · Ingestão: `${CLAUDE_PLUGIN_ROOT}/utils/design-source/`
 - Frota: skill `onion-fleet` · `/meta:fleet` · KB `agent-fleet-orchestration`
 - Consome o vencedor: `/design:identity` (Fase 2 DEVELOP) · Brief: `/product:branding`
 - Peer provisório: `docs/design-context/decisions/onion-adr-design-peer-promotion.md`

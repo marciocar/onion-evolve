@@ -128,15 +128,36 @@ para N verticais sem duplicar o script:
 → Com 2 verticais provando o padrão, os follow-ups **path-portability** e **drift-guard** passam a valer
 o investimento (antes era cedo, com 1 só).
 
-### Limitações honestas do protótipo (follow-ups)
+### Path-portability ✅ FECHADO (follow-up resolvido)
 
-1. **Path-portability:** commands/agents do plugin ainda referenciam paths `.claude/utils/design-sink/` e
-   `.claude/validation/...` do layout-core. Reescrita p/ paths relativos ao plugin (`${CLAUDE_PLUGIN_ROOT}`)
-   é a migração real — fora do escopo deste protótipo (que prova empacotamento + instalação + proveniência).
-2. **Drift-guard:** o `plugins/onion-design/` gerado é commitado; falta um lint estilo `check_inventory_sync`
-   que rejeite divergência entre o gerado e a regeneração do script. Hoje protegido só pela guarda de
-   determinismo do selftest.
-3. **Instalação viva:** `/plugin marketplace add` + `/plugin install` é interativo do Claude Code (não
-   roda em bash) — passo de verificação do maestro.
-4. **Verticais command-based** (Design) não têm SKILL.md p/ proveniência de frontmatter; aqui ela vive no
+A reescrita de paths foi implementada **manifesto-dirigida no assembler** (SSOT-core intacta; plugin =
+artefato transformado):
+- **Mapa derivado do manifesto:** refs a componentes BUNDLADOS (`UTILS`/`VALIDATION`/`TEMPLATES`) →
+  `${CLAUDE_PLUGIN_ROOT}/...`. Cirúrgico: `docs/*-context/` (camada 2) e soft-deps
+  (`@metaspec-gate-keeper`, `onion-fleet`) **não** entram no mapa → ficam intactas.
+- **Novo componente `TEMPLATES`:** bundla `compliance-context-template.md` → `templates/` + ref reescrita.
+- **Scripts portáveis:** as cópias do plugin têm `PROJECT="${1:-$(pwd)}"` (default = cwd do consumidor);
+  os scripts-core seguem `${REPO_ROOT}` (intactos).
+- **Dogfood real:** num consumidor temp com `design-context` PRÓPRIO, o gate e o sink do PLUGIN rodaram
+  (sem arg → `PROJECT=pwd`), validaram e geraram 29 CSS vars **do consumidor**; plugin self-contained
+  (zero path absoluto do core). Design: 0 ref core-layout residual. Selftest **83/83** (guardas e2/e3 de
+  portabilidade). Gate verde.
+- ⚠️ **Caveat (issue upstream #9354):** `${CLAUDE_PLUGIN_ROOT}` em **markdown de comando** pode não
+  substituir confiável — a reescrita é a forma portável best-effort; em conteúdo de agent + scripts
+  funciona. Verificação viva (`/plugin install`) confirma o elo de command-markdown.
+
+### Achado pré-existente (fora de escopo — follow-up separado)
+
+Os agentes de compliance citam `compliance_iso27001_template.md`, `_iso22301_`, `_soc2_`, `_pmbok_` que
+**não existem no core** (refs penduradas já antes do plugin). Bundlamos/reescrevemos só o que existe
+(`compliance-context-template.md`); os pendurados ficam como bug de conteúdo a resolver à parte (criar os
+4 templates OU corrigir as refs dos agentes).
+
+### Limitações honestas restantes (follow-ups)
+
+1. **Drift-guard:** os `plugins/*` gerados são commitados; falta um lint estilo `check_inventory_sync` que
+   rejeite divergência entre o gerado e a regeneração. Hoje protegido pela guarda de determinismo do selftest.
+2. **Instalação viva:** `/plugin marketplace add` + `/plugin install` é interativo do Claude Code (não roda
+   em bash) — passo de verificação do maestro (também valida o caveat #9354).
+3. **Verticais command-based** (Design) não têm SKILL.md p/ proveniência de frontmatter; aqui ela vive no
    nível do plugin (`provenance.json`). Peças skill-shaped usam a convenção `gh skill` direto no frontmatter.

@@ -40,7 +40,7 @@ git -C "${SRC}" rev-parse --git-dir >/dev/null 2>&1 || { echo "ERRO: source não
 
 # Defaults antes do source (manifesto pode sobrescrever).
 PLUGIN_NAME=""; PLUGIN_VERSION="0.1.0"; PLUGIN_DESC=""; KEYWORDS=()
-COMMANDS=(); AGENTS=(); UTILS=(); VALIDATION=()
+COMMANDS=(); AGENTS=(); UTILS=(); VALIDATION=(); TEMPLATES=()
 # shellcheck disable=SC1090
 . "${MANIFEST}"
 [ -n "${PLUGIN_NAME}" ] || { echo "ERRO: manifesto sem PLUGIN_NAME: ${MANIFEST}" >&2; exit 2; }
@@ -52,6 +52,7 @@ for c in "${COMMANDS[@]}"; do [ -e "${SRC}/${c}" ] || { echo "ERRO: command font
 for a in "${AGENTS[@]}"; do [ -f "${SRC}/${a}" ] || { echo "ERRO: agente fonte ausente: ${a}" >&2; exit 2; }; done
 for u in "${UTILS[@]}"; do [ -d "${SRC}/${u}" ] || { echo "ERRO: util fonte ausente: ${u}" >&2; exit 2; }; done
 for v in "${VALIDATION[@]}"; do [ -f "${SRC}/${v}" ] || { echo "ERRO: validation fonte ausente: ${v}" >&2; exit 2; }; done
+for t in "${TEMPLATES[@]}"; do [ -f "${SRC}/${t}" ] || { echo "ERRO: template fonte ausente: ${t}" >&2; exit 2; }; done
 
 # Montagem limpa (idempotente).
 rm -rf "${DEST}" 2>/dev/null
@@ -77,6 +78,36 @@ if [ "${#VALIDATION[@]}" -gt 0 ]; then
     cp "${SRC}/${v}" "${DEST}/validation/" 2>/dev/null && chmod +x "${DEST}/validation/$(basename "${v}")" 2>/dev/null
   done
 fi
+# templates/ — arquivos (só cria a pasta se houver).
+if [ "${#TEMPLATES[@]}" -gt 0 ]; then
+  mkdir -p "${DEST}/templates" 2>/dev/null
+  for t in "${TEMPLATES[@]}"; do cp "${SRC}/${t}" "${DEST}/templates/" 2>/dev/null; done
+fi
+
+# ---------------------------------------------------------------------------
+# PATH-PORTABILITY — reescreve refs ao layout-CORE p/ ${CLAUDE_PLUGIN_ROOT} (manifesto-dirigido).
+# Cirúrgico: SÓ os paths dos componentes BUNDLADOS (utils/validation/templates). Refs a docs/* (camada 2
+# do consumidor) e a soft-deps (@metaspec-gate-keeper, skills) NÃO entram no mapa → ficam intactas.
+# A SSOT (.claude/) não é tocada; só as cópias do plugin. Determinístico.
+# ---------------------------------------------------------------------------
+PR='${CLAUDE_PLUGIN_ROOT}'
+declare -a RW_FROM RW_TO
+add_rw() { RW_FROM+=("$1"); RW_TO+=("$2"); }
+for u in "${UTILS[@]}"; do add_rw "${u}" "${PR}/utils/$(basename "${u}")"; done
+# validation: mapeia o DIRETÓRIO (cobre o glob `.claude/validation/*` e o arquivo específico).
+declare -A _vseen=()
+for v in "${VALIDATION[@]}"; do vd="$(dirname "${v}")"; [ -n "${_vseen[$vd]:-}" ] && continue; _vseen[$vd]=1; add_rw "${vd}" "${PR}/validation"; done
+for t in "${TEMPLATES[@]}"; do add_rw "${t}" "${PR}/templates/$(basename "${t}")"; done
+
+# Aplica os pares em TODOS os arquivos do plugin (escapa regex em FROM; `|` como delim).
+while IFS= read -r f; do
+  for i in "${!RW_FROM[@]}"; do
+    from_esc="$(printf '%s' "${RW_FROM[$i]}" | sed 's/[.[\*^$/]/\\&/g')"
+    sed -i "s|${from_esc}|${RW_TO[$i]}|g" "${f}" 2>/dev/null
+  done
+  # Scripts bundlados: PROJECT default core-ascend → cwd do consumidor (portável; core intacto).
+  case "${f}" in *.sh) sed -i 's|\${1:-\${REPO_ROOT}}|${1:-$(pwd)}|g' "${f}" 2>/dev/null ;; esac
+done < <(find "${DEST}" -type f ! -path "*/.claude-plugin/*" 2>/dev/null)
 
 # Proveniência content-addressed (padrão gh skill): repository + ref + tree_sha.
 # tree_sha = hash do ls-tree de TODAS as fontes listadas (determinístico; muda só com conteúdo).
@@ -86,7 +117,7 @@ repository="$(printf '%s' "${url}" | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#
 ref="$(git -C "${SRC}" rev-parse HEAD 2>/dev/null || echo unknown)"
 commit_date="$(git -C "${SRC}" show -s --format=%cI HEAD 2>/dev/null || echo unknown)"
 tree_sha="$(git -C "${SRC}" ls-tree -r HEAD -- \
-  "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" 2>/dev/null \
+  "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" 2>/dev/null \
   | git hash-object --stdin 2>/dev/null || echo unknown)"
 
 cat > "${DEST}/.claude-plugin/provenance.json" <<EOF
