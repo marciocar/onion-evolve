@@ -502,6 +502,103 @@ run_design_tokens_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo co-relay — exercita .claude/utils/co-evolution/co-relay.sh (carteiro
+# UPSTREAM, entrega-sem-commit). Self-contained (mktemp): adotante + core temp.
+# Cobre MODOS DE FALHA + a PROVA do invariante (untracked, sem commit) + a
+# REGRESSÃO crítica: a guarda lê o STAMP .onion-version, NÃO onion-version.sh
+# (que hardcoda 'source' e mentiria no adotante). Espelho do co-deliver.
+# ---------------------------------------------------------------------------
+run_corelay_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/co-evolution/co-relay.sh"
+  if [ ! -f "${helper}" ]; then record_fail "co-relay" "helper ausente: ${helper}"; return; fi
+  local d core rc
+  local SIG="docs/evolution/inbox/2026-01-01-sinal-teste.md"
+
+  # builder: cria adotante git em $1 com stamp role=$2 + 1 sinal no inbox
+  mk_adopter() {
+    git -C "$1" init -q
+    mkdir -p "$1/.claude" "$1/docs/evolution/inbox"
+    printf 'role: %s\n' "$2" > "$1/.claude/.onion-version"
+    printf '# sinal de teste\n' > "$1/${SIG}"
+  }
+
+  # (a) stamp role:source → exit 2 (rejeita CORE)
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  mk_adopter "${d}" source
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "co-relay: stamp source → exit 2 (rejeita core)"
+  else record_fail "co-relay: stamp source" "esperava exit 2, veio ${rc}"; fi
+  rm -rf "${d}" "${core}"
+
+  # (b) stamp role:adopted + alvo válido → relay ocorre (sinal aparece no inbox do core)
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  mk_adopter "${d}" adopted
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${core}/${SIG}" ]; then record_pass "co-relay: adopted + alvo → relaya"
+  else record_fail "co-relay: adopted relaya" "exit ${rc} ou sinal não chegou ao inbox do core"; fi
+  rm -rf "${d}" "${core}"
+
+  # (c) ANTI-REGRESSÃO: onion-version.sh presente (emite 'source') MAS stamp 'adopted' → DEVE seguir
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  mk_adopter "${d}" adopted
+  mkdir -p "${d}/.claude/validation"; cp "${REPO_ROOT}/.claude/validation/onion-version.sh" "${d}/.claude/validation/" 2>/dev/null || true
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${core}/${SIG}" ]; then record_pass "co-relay: lê o STAMP, não onion-version.sh (anti-regressão)"
+  else record_fail "co-relay: guarda via stamp" "exit ${rc} — guarda usou onion-version.sh ('source') em vez do stamp?"; fi
+  rm -rf "${d}" "${core}"
+
+  # (d) --target ausente → exit 2
+  d="$(mktemp -d)"; mk_adopter "${d}" adopted
+  rc=0; ( cd "${d}" && bash "${helper}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "co-relay: --target ausente → exit 2"
+  else record_fail "co-relay: --target ausente" "esperava exit 2, veio ${rc}"; fi
+  rm -rf "${d}"
+
+  # (e) --target inválido (não-git) → exit 2
+  d="$(mktemp -d)"; core="$(mktemp -d)"; mk_adopter "${d}" adopted   # core SEM git init
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "co-relay: --target não-git → exit 2"
+  else record_fail "co-relay: --target não-git" "esperava exit 2, veio ${rc}"; fi
+  rm -rf "${d}" "${core}"
+
+  # (f) --target sem docs/evolution/inbox → mkdir -p + AVISO, não falha hard (entrega ocorre)
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q   # core sem o canal
+  mk_adopter "${d}" adopted
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${core}/${SIG}" ]; then record_pass "co-relay: canal ausente → mkdir -p + entrega (simetria co-deliver)"
+  else record_fail "co-relay: canal ausente" "exit ${rc} — deveria criar inbox/ e entregar, não falhar"; fi
+  rm -rf "${d}" "${core}"
+
+  # (g) PROVA DO INVARIANTE: pós-relay, sinal é UNTRACKED no core e NÃO há commit novo
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  mk_adopter "${d}" adopted
+  ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || true
+  local st commits
+  st="$(git -C "${core}" status --porcelain -- "${SIG}" 2>/dev/null | head -1)"
+  commits="$(git -C "${core}" rev-list --all --count 2>/dev/null || echo 0)"
+  if [ "${st#'??'}" != "${st}" ] && [ "${commits}" = "0" ]; then record_pass "co-relay: entrega-sem-commit (untracked, 0 commits no core)"
+  else record_fail "co-relay: invariante I3" "esperava untracked (??) e 0 commits; status='${st}' commits=${commits}"; fi
+  rm -rf "${d}" "${core}"
+
+  # (h) never-clobber: sinal já presente no inbox do core → no-op exit 0
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  mk_adopter "${d}" adopted
+  printf '# já existe (versão do core)\n' > "${core}/${SIG}"
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'versão do core' "${core}/${SIG}"; then record_pass "co-relay: never-clobber (no-op idempotente)"
+  else record_fail "co-relay: never-clobber" "exit ${rc} — clobberou o arquivo já presente?"; fi
+  rm -rf "${d}" "${core}"
+
+  # (i) --dry-run não escreve nada
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  mk_adopter "${d}" adopted
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" --dry-run ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ ! -f "${core}/${SIG}" ]; then record_pass "co-relay: --dry-run não escreve"
+  else record_fail "co-relay: --dry-run" "exit ${rc} — dry-run escreveu no inbox do core?"; fi
+  rm -rf "${d}" "${core}"
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -529,6 +626,9 @@ run_prettierignore_selftests
 
 # Modo design-tokens — idem (cenários self-contained, sem fixture-file).
 run_design_tokens_selftests
+
+# Modo co-relay — idem (carteiro upstream; adotante+core em mktemp, sem fixture-file).
+run_corelay_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário

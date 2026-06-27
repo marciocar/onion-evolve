@@ -34,9 +34,12 @@ worktree).
 
 ## Passo 1 — Guarda de papel (só CORE)
 
-Rodar `bash .claude/validation/onion-version.sh` e ler `role:`.
-- `role: source` → **CORE** → segue.
-- `role: adopted` → **CONSUMIDOR** → **parar**: adotante não entrega (ele sinaliza via `inbox/`, upstream).
+Detectar o papel **como em `/meta:co-evolve`**: ler o **stamp `.claude/.onion-version`** (campo `role:`)
+primeiro; só se ausente, cair para `bash .claude/validation/onion-version.sh`. **Não** confie só no script —
+ele hardcoda `role: source` (é a identidade da FONTE) e, vendorizado num adotante, mentiria 'source'.
+- `role: source` (ou stamp ausente neste core) → **CORE** → segue.
+- `role: adopted` → **CONSUMIDOR** → **parar**: adotante não entrega downstream (ele sinaliza upstream via
+  `inbox/` + [`/meta:co-relay`](co-relay.md)).
 
 ## Passo 2 — Resolver alvo e rascunho(s)
 

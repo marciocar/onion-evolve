@@ -43,9 +43,12 @@ Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente →
 ## Passo 3 — Orientar conforme o papel
 
 **Se CONSUMIDOR (projeto):**
-- **Pedir ajuda / reportar bug / dar feedback ao core (upstream):** depositar um markdown datado
-  (`AAAA-MM-DD-<assunto>.md`) no `inbox/` do **core** (`onion-evolve/docs/evolution/inbox/`, se montado;
-  senão entregar ao maestro copiar). Sem comunicação viva — é assíncrono via git.
+- **Pedir ajuda / reportar bug / dar feedback ao core (upstream):** escrever um markdown datado
+  (`AAAA-MM-DD-<assunto>.md`) no **próprio** `inbox/` (`docs/evolution/inbox/` — é o que "a relayar ao core")
+  e **transportar com [`/meta:co-relay`](co-relay.md)** (`/meta:co-relay <sinal> --target <path-do-core>`):
+  Ato-1 determinístico, **entrega-sem-commit** (untracked no `inbox/` do core; a sessão do core commita +
+  tria). Se o core **não** vive na mesma máquina → entregar ao maestro transportar. Sem comunicação viva —
+  assíncrono via git.
 - **Receber releases do framework (downstream):** ler o `inbound/` (relatório de update auto-emitido pelo core,
   com arquivos aplicados + novidades + próximos passos) e o `CHANGELOG` do core; atualizar com `/meta:adopt --update`.
 - O protocolo é **canônico no core** — este repo **referencia**, não redefine.
