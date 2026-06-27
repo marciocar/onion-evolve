@@ -118,7 +118,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 1. **commands-guide.md** - comandos documentados
 2. **engineering-flows.md** - fluxos principais + diagramas
-3. **agents-reference.md** - 49 agentes + matriz de decisão
+3. **agents-reference.md** - 51 agentes + matriz de decisão
 4. **practical-examples.md** - exemplos completos end-to-end
 5. **getting-started.md** - Setup + troubleshooting
 6. **naming-conventions.md** - Padrões `<feature-slug>`
