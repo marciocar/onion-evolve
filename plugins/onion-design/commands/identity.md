@@ -7,7 +7,7 @@ description: |
   Faseado e retomável. Fonte manual nesta versão; geração por IA (diverge/converge)
   chega numa fase futura. Delega a @design-system-specialist.
 model: sonnet
-allowed-tools: Read Write Edit Glob Grep Bash(bash .claude/validation/*) Bash(bash .claude/utils/design-sink/*)
+allowed-tools: Read Write Edit Glob Grep Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/design-sink/*)
 category: design
 tags: [design, tokens, identity, wcag, branding]
 version: "0.1.0"
@@ -69,12 +69,12 @@ ou `<brand>`/`<product>` para multi-brand. Cada fase atualiza o ponteiro `NEXT`.
    - multi-brand/produto: `brands/<brand>/` e `products/<product>/` (overrides esparsos; herdam o core).
 2. **Gate obrigatório** (não materializar se falhar):
    ```bash
-   bash .claude/validation/lint-design-tokens.sh
+   bash ${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh
    ```
    DTCG bem-formado + referências resolvidas + contraste WCAG. Falhou → corrigir a SSOT (não contornar).
 3. Delegar a **`@design-system-specialist`** a materialização via `design-sink`:
    ```bash
-   bash .claude/utils/design-sink/tokens-to-css-vars.sh > <alvo>/theme.css   # css-vars (universal)
+   bash ${CLAUDE_PLUGIN_ROOT}/utils/design-sink/tokens-to-css-vars.sh > <alvo>/theme.css   # css-vars (universal)
    ```
    Para Tailwind v4 / shadcn, o especialista mapeia os papéis semânticos (`@theme`, `--background`/`--primary`/…).
 4. Carimbar frescor em `docs/design-context/index.md` (`Última Atualização`). Checkpoint: `NEXT: Fase 3`.
@@ -112,7 +112,7 @@ fora da escala, contraste insuficiente, alias órfão) — o gate deve barrar. F
 
 ## Referências
 
-- SSOT + gate: `docs/design-context/` · `.claude/validation/lint-design-tokens.sh`
-- Sink: `.claude/utils/design-sink/` · Especialista: `@design-system-specialist`
+- SSOT + gate: `docs/design-context/` · `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh`
+- Sink: `${CLAUDE_PLUGIN_ROOT}/utils/design-sink/` · Especialista: `@design-system-specialist`
 - Brief upstream: `/product:branding` (estratégia) · Material: `/product:presentation`
 - Decisão de peer: `docs/design-context/decisions/onion-adr-design-peer-promotion.md` (provisório)

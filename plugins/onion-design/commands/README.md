@@ -21,7 +21,7 @@ W3C/DTCG como SSOT em `docs/design-context/`; CSS/componentes/material como saí
 
 ## Princípios
 
-- **A IA gera; o gate determinístico decide** (`.claude/validation/lint-design-tokens.sh`).
+- **A IA gera; o gate determinístico decide** (`${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh`).
 - **Anti-lock-in**: SSOT são tokens abertos; ferramentas (artifact-design, Figma, Penpot, Style
   Dictionary, Tailwind) entram como adapters plugáveis (`design-source/`, `design-sink/`).
 - **Dogfood**: a identidade do próprio Onion é o caso de teste.

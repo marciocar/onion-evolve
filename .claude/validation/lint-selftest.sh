@@ -548,6 +548,24 @@ run_assemble_plugin_selftests() {
   t2="$(jq -r '.tree_sha' "${d}/design2/.claude-plugin/provenance.json" 2>/dev/null)"
   if [ -n "${t1}" ] && [ "${t1}" = "${t2}" ]; then record_pass "assemble-plugin: tree_sha determinístico"
   else record_fail "assemble-plugin: determinismo" "tree_sha divergiu: ${t1} vs ${t2}"; fi
+
+  # (e2) PATH-PORTABILITY (design): refs a componentes BUNDLADOS reescritas p/ plugin-root.
+  # Não resta `.claude/utils/` nem `.claude/validation/` (design não tem templates pendurados);
+  # ${CLAUDE_PLUGIN_ROOT} presente; camada 2 (docs/design-context) PRESERVADA; script default = pwd.
+  if ! grep -rq '\.claude/utils/\|\.claude/validation/' "${d}/design" 2>/dev/null \
+     && grep -rq 'CLAUDE_PLUGIN_ROOT' "${d}/design" 2>/dev/null \
+     && grep -rq 'docs/design-context' "${d}/design" 2>/dev/null \
+     && grep -q 'PROJECT="${1:-$(pwd)}"' "${d}/design/validation/lint-design-tokens.sh" 2>/dev/null; then
+    record_pass "assemble-plugin: design path-portable (sem core-layout; camada 2 preservada; script→pwd)"
+  else record_fail "assemble-plugin: design portabilidade" "resta core-layout, faltou plugin-root, ou camada 2 sumiu"; fi
+
+  # (e3) PATH-PORTABILITY (compliance): o template BUNDLADO foi reescrito p/ plugin-root.
+  # (refs a compliance_*_template.md inexistentes são bug PRÉ-EXISTENTE do core — fora de escopo, não checado.)
+  if ! grep -rq '\.claude/commands/common/templates/compliance-context-template' "${d}/compliance" 2>/dev/null \
+     && grep -rq 'CLAUDE_PLUGIN_ROOT}/templates/compliance-context-template' "${d}/compliance" 2>/dev/null \
+     && [ -f "${d}/compliance/templates/compliance-context-template.md" ]; then
+    record_pass "assemble-plugin: compliance template bundlado + ref reescrita"
+  else record_fail "assemble-plugin: compliance template" "template não bundlado ou ref não reescrita"; fi
   rm -rf "${d}"
 
   # (f) manifesto inválido → exit 2

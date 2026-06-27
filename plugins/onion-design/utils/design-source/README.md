@@ -44,9 +44,9 @@ O chamador redireciona o STDOUT para o arquivo da SSOT e **valida com o gate** a
 
 ```bash
 # bootstrap de foundations a partir de uma paleta de marca (flat) → SSOT
-bash .claude/utils/design-source/file-to-tokens.sh brand-palette.json \
+bash ${CLAUDE_PLUGIN_ROOT}/utils/design-source/file-to-tokens.sh brand-palette.json \
   > docs/design-context/foundations/color.tokens.json
-bash .claude/validation/lint-design-tokens.sh   # gate F5: DTCG + refs + WCAG
+bash ${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh   # gate F5: DTCG + refs + WCAG
 ```
 
 ## Round-trip (dogfood)

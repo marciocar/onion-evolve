@@ -37,7 +37,7 @@ worker — você varia a paleta dentro dessa estrutura (ver contrato em `/design
 ## Princípio reitor (anti "modelo julga a si mesmo")
 
 A IA **gera**; o **gate determinístico decide**. Você propõe cores e relações — mas **não** afirma
-que "passam no contraste": isso é **calculado** por `.claude/validation/lint-design-tokens.sh`
+que "passam no contraste": isso é **calculado** por `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh`
 (WCAG), fora de você. Projete *para* passar (use sua estimativa de luminância como heurística), mas a
 verdade é do gate. Candidata que não passa é descartada na convergência — sem apelo.
 
@@ -79,6 +79,6 @@ produza uma candidata forte e independente.
 
 ## Referências
 
-- Orquestrador: `/design:generate` · Gate: `.claude/validation/lint-design-tokens.sh`
+- Orquestrador: `/design:generate` · Gate: `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh`
 - SSOT/forma: `docs/design-context/` (foundations/semantic/governance)
 - Materializador: `@design-system-specialist` · Frota: skill `onion-fleet`

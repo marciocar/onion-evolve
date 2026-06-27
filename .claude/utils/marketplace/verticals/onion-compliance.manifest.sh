@@ -16,3 +16,4 @@ AGENTS=(
 )
 UTILS=()
 VALIDATION=()
+TEMPLATES=(".claude/commands/common/templates/compliance-context-template.md")
