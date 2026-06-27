@@ -219,7 +219,9 @@ flow: downstream (core→consumidor / distribuição)
 
 ## Próximos passos (NO ALVO)
 1. Revisar o diff aplicado nesta sessão.
-2. Commitar a atualização (gitflow do próprio repo).
+2. Commitar a atualização (gitflow do próprio repo). Em worktree legacy sem node_modules e com
+   pre-commit hook (husky/lint-staged), use \`git commit --no-verify\` (ENOENT = binário ausente,
+   não violação; artefatos Onion já protegidos por .prettierignore) ou rode \`pnpm install\` antes.
 3. Push / abrir PR na branch de integração.
 4. (Opcional) Devolver sinal de campo ao core via inbox/ (upstream).
 EOF
@@ -286,6 +288,13 @@ else
   INSTALL_DIR="$TARGET"
 fi
 # 2b. Rodar o «Procedimento de cópia segura» com DEST="$INSTALL_DIR" (filtra manifesto, tmp, diff, aplica).
+
+# 2c. AVISO de hook de commit (legacy): a worktree nova NÃO tem node_modules. Se o alvo tem
+#     pre-commit hook que invoca binário de node_modules (husky+lint-staged → prettier/eslint),
+#     o 1º commit da adoção falha com ENOENT e o lint-staged REVERTE (commit não acontece).
+if [ -d "$INSTALL_DIR/.husky" ] || grep -q '"lint-staged"\|lint-staged' "$INSTALL_DIR/package.json" 2>/dev/null; then
+  [ -d "$INSTALL_DIR/node_modules" ] || echo "⚠️ Alvo tem pre-commit hook (husky/lint-staged) e a worktree não tem node_modules: o commit da adoção precisa de 'git commit --no-verify' (ENOENT é binário ausente, não violação; artefatos Onion já protegidos por .prettierignore) OU rode 'pnpm install'/'npm ci' na worktree."
+fi
 ```
 
 - Checkpoint: `NEXT: Fase 3`.
