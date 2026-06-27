@@ -81,4 +81,8 @@ Após criar o agente, confirme que o arquivo foi criado com sucesso
 - Considere tratamento de erros e casos extremos
 - Torne os formatos de saída explícitos
 
+## ⚠️ Passo final — sincronizar a SSOT
+
+Após criar o agente, rodar **`/meta:inventory`** (regenera `inventory.md`; a Regra 8 do lint é HARD → criar sem regenerar deixa o repo em HARD-fail silencioso). Mecanismo: `common:prompts:inventory-sync-after-create`.
+
 Agora, analise os requisitos e comece a criar o agente seguindo este processo.

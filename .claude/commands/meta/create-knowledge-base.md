@@ -227,3 +227,4 @@ Salve em `docs/knowledge-base/<category>/<slug-do-topic>.md` seguindo o template
 - **Manter viva**: revisar quando o tema evolui (libs/frameworks mudam rápido)
 - **Categorização certa** importa: usuários encontram por categoria, não por busca
 - **Sem duplicação**: se já existe KB do tema, atualizar em vez de criar nova
+- **Passo final — sincronizar a SSOT:** após criar, rodar **`/meta:inventory`** (regenera `inventory.md`; a Regra 8 do lint é HARD → criar sem regenerar deixa o repo em HARD-fail silencioso). Mecanismo: `common:prompts:inventory-sync-after-create`.

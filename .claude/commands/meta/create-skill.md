@@ -299,3 +299,4 @@ Resuma as mudanças em 2-3 bullets e liste riscos.
 - Skill ativado permanece em contexto pelo resto da sessão — cada linha extra é custo recorrente
 - Skill gerado sem contexto de domínio real tem valor mínimo — sempre extrair de runbooks/schemas/PRs
 - Se o agente já lida bem com o task sem o skill → o skill não agrega valor
+- **Passo final — sincronizar a SSOT:** após criar, rodar **`/meta:inventory`** (regenera `inventory.md`; a Regra 8 do lint é HARD → criar sem regenerar deixa o repo em HARD-fail silencioso). Mecanismo: `common:prompts:inventory-sync-after-create`.
