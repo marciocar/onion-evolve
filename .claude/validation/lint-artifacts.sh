@@ -54,6 +54,8 @@
 #  18. Documentação versionada sob .claude/docs/ [HARD] — árvore proibida (usar docs/)
 #  19. Plugins de vertical (plugins/*) em sincronia com as fontes [HARD] — gerados por
 #      assemble-plugin.sh; drift (edição à mão OU fonte alterada sem regenerar) bloqueia merge
+#  20. Capability Contract: tier de conformance reivindicado é cumprido [HARD] — Bronze (campos
+#      mínimos), Silver (requires resolvem), Gold (Silver + loads). Declarar acima do cumprido bloqueia.
 #
 # Convenção: .claude/validation/fixtures/ guarda TEMPLATES de teste das próprias
 #   guardas (consumidos por lint-selftest.sh), não artefatos ativos. As 4 regras de
@@ -388,6 +390,65 @@ check_plugins_sync() {
       violation "HARD" "plugins/${name}" "tree_sha divergente (fonte mudou sem regenerar) — rode assemble-plugin.sh"
     fi
     rm -rf "${tmp}"
+  done
+}
+
+# ===========================================================================
+# REGRA 20 — Capability Contract: tier de conformance cumprido [HARD]
+#           Cada verticals/<name>.manifest.sh declara CONFORMANCE (bronze|silver|
+#           gold) + PROVIDES/REQUIRES/LOADS. Valida o tier reivindicado:
+#             bronze = provides + description + version presentes
+#             silver = bronze + cada REQUIRES (type:value) resolve no filesystem
+#             gold   = silver + LOADS presente
+#           Reivindicar acima do cumprido = HARD (auto-descrição honesta).
+# ===========================================================================
+check_capability_conformance() {
+  local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
+  [ -d "${vdir}" ] || return
+  local manifest report name claimed bronze silver gold unresolved met
+  for manifest in "${vdir}"/*.manifest.sh; do
+    [ -f "${manifest}" ] || continue
+    # Subshell: source o manifesto e computa os tiers cumpridos + requires não-resolvidos.
+    report="$(
+      REPO_ROOT="${REPO_ROOT}"
+      . "${manifest}" >/dev/null 2>&1
+      claimed="${CONFORMANCE:-bronze}"
+      b=1; { [ "${#PROVIDES[@]}" -gt 0 ] && [ -n "${PLUGIN_DESC:-}" ] && [ -n "${PLUGIN_VERSION:-}" ]; } || b=0
+      un=""
+      for r in "${REQUIRES[@]:-}"; do
+        [ -n "${r}" ] || continue
+        ty="${r%%:*}"; va="${r#*:}"; ok=0
+        case "${ty}" in
+          agent)      find "${REPO_ROOT}/.claude/agents" -name "${va}.md" 2>/dev/null | grep -q . && ok=1 ;;
+          command)    find "${REPO_ROOT}/.claude/commands" -name "${va}.md" 2>/dev/null | grep -q . && ok=1 ;;
+          skill)      [ -d "${REPO_ROOT}/.claude/skills/${va}" ] && ok=1 ;;
+          validation) [ -f "${REPO_ROOT}/.claude/validation/${va}" ] && ok=1 ;;
+          util)       [ -d "${REPO_ROOT}/.claude/utils/${va}" ] && ok=1 ;;
+          template)   [ -f "${REPO_ROOT}/.claude/commands/common/templates/${va}" ] && ok=1 ;;
+          env)        grep -q "^${va}=" "${REPO_ROOT}/.env.example" 2>/dev/null && ok=1 ;;
+          kb)         [ -e "${REPO_ROOT}/docs/knowledge-base/${va}" ] && ok=1 ;;
+          *)          ok=0 ;;
+        esac
+        [ "${ok}" = 1 ] || un="${un} ${r}"
+      done
+      s=1; { [ "${b}" = 1 ] && [ -z "${un}" ]; } || s=0
+      g=1; { [ "${s}" = 1 ] && [ "${#LOADS[@]}" -gt 0 ]; } || g=0
+      printf 'NAME=%s\nCLAIMED=%s\nB=%s\nS=%s\nG=%s\nUN=%s\n' "${PLUGIN_NAME:-?}" "${claimed}" "${b}" "${s}" "${g}" "${un# }"
+    )"
+    name="$(printf '%s' "${report}" | sed -n 's/^NAME=//p')"
+    claimed="$(printf '%s' "${report}" | sed -n 's/^CLAIMED=//p')"
+    bronze="$(printf '%s' "${report}" | sed -n 's/^B=//p')"
+    silver="$(printf '%s' "${report}" | sed -n 's/^S=//p')"
+    gold="$(printf '%s' "${report}" | sed -n 's/^G=//p')"
+    unresolved="$(printf '%s' "${report}" | sed -n 's/^UN=//p')"
+    # met = maior tier cumprido
+    met="none"; [ "${bronze}" = 1 ] && met="bronze"; [ "${silver}" = 1 ] && met="silver"; [ "${gold}" = 1 ] && met="gold"
+    # rank p/ comparar
+    rank() { case "$1" in bronze) echo 1;; silver) echo 2;; gold) echo 3;; *) echo 0;; esac; }
+    if [ "$(rank "${claimed}")" -gt "$(rank "${met}")" ]; then
+      local why=""; [ -n "${unresolved}" ] && why=" (requires não-resolvidos:${unresolved})"
+      violation "HARD" "verticals/${name}.manifest.sh" "capability: reivindica '${claimed}' mas só cumpre '${met}'${why} — ajuste CONFORMANCE ou as deps/loads"
+    fi
   done
 }
 
@@ -959,6 +1020,7 @@ check_no_fleet_orchestrator_agent
 check_inventory_sync
 check_claude_md_counts
 check_plugins_sync
+check_capability_conformance
 check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp

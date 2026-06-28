@@ -624,6 +624,56 @@ run_plugins_sync_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo capability — exercita o Capability Contract (REGRA 20 check_capability_conformance):
+# (a) contratos reais são HONESTOS (tier reivindicado == cumprido) — catch de over-claim;
+# (b) primitiva de resolução de REQUIRES (type:value) acerta presente e ausente.
+# ---------------------------------------------------------------------------
+run_capability_selftests() {
+  local vdir="${REPO_ROOT}/.claude/utils/marketplace/verticals"
+  [ -d "${vdir}" ] || { record_fail "capability" "verticals/ ausente"; return; }
+  local manifest
+
+  for manifest in "${vdir}"/*.manifest.sh; do
+    [ -f "${manifest}" ] || continue
+    local rep nm claimed met
+    rep="$(
+      REPO_ROOT="${REPO_ROOT}"; . "${manifest}" >/dev/null 2>&1
+      b=1; { [ "${#PROVIDES[@]}" -gt 0 ] && [ -n "${PLUGIN_DESC:-}" ] && [ -n "${PLUGIN_VERSION:-}" ]; } || b=0
+      un=""
+      for r in "${REQUIRES[@]:-}"; do
+        [ -n "${r}" ] || continue; ty="${r%%:*}"; va="${r#*:}"; ok=0
+        case "${ty}" in
+          agent) find "${REPO_ROOT}/.claude/agents" -name "${va}.md" 2>/dev/null|grep -q . && ok=1;;
+          command) find "${REPO_ROOT}/.claude/commands" -name "${va}.md" 2>/dev/null|grep -q . && ok=1;;
+          skill) [ -d "${REPO_ROOT}/.claude/skills/${va}" ] && ok=1;;
+          validation) [ -f "${REPO_ROOT}/.claude/validation/${va}" ] && ok=1;;
+          util) [ -d "${REPO_ROOT}/.claude/utils/${va}" ] && ok=1;;
+          template) [ -f "${REPO_ROOT}/.claude/commands/common/templates/${va}" ] && ok=1;;
+          env) grep -q "^${va}=" "${REPO_ROOT}/.env.example" 2>/dev/null && ok=1;;
+          kb) [ -e "${REPO_ROOT}/docs/knowledge-base/${va}" ] && ok=1;;
+        esac
+        [ "${ok}" = 1 ] || un="${un} ${r}"
+      done
+      s=1; { [ "${b}" = 1 ] && [ -z "${un}" ]; } || s=0
+      g=1; { [ "${s}" = 1 ] && [ "${#LOADS[@]}" -gt 0 ]; } || g=0
+      m=none; [ "${b}" = 1 ] && m=bronze; [ "${s}" = 1 ] && m=silver; [ "${g}" = 1 ] && m=gold
+      printf '%s|%s|%s' "${PLUGIN_NAME:-?}" "${CONFORMANCE:-bronze}" "${m}"
+    )"
+    nm="${rep%%|*}"; claimed="$(printf '%s' "${rep}" | cut -d'|' -f2)"; met="$(printf '%s' "${rep}" | cut -d'|' -f3)"
+    rk() { case "$1" in bronze) echo 1;; silver) echo 2;; gold) echo 3;; *) echo 0;; esac; }
+    if [ "$(rk "${claimed}")" -le "$(rk "${met}")" ]; then
+      record_pass "capability: ${nm} contrato honesto (reivindica ${claimed} ⩽ cumpre ${met})"
+    else record_fail "capability: ${nm} over-claim" "reivindica ${claimed} mas só cumpre ${met}"; fi
+  done
+
+  # (b) resolução: agente real resolve, bogus não
+  if find "${REPO_ROOT}/.claude/agents" -name "soc2-specialist.md" 2>/dev/null | grep -q . \
+     && ! find "${REPO_ROOT}/.claude/agents" -name "__nao_existe__.md" 2>/dev/null | grep -q .; then
+    record_pass "capability: resolução de REQUIRES acerta presente/ausente"
+  else record_fail "capability: resolução" "primitiva de resolução incorreta"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo design-tokens — exercita .claude/validation/lint-design-tokens.sh.
 # Self-contained (mktemp), cobre MODOS DE FALHA: tokens válidos passam;
 # alias órfão / ciclo de referência / contraste WCAG abaixo do mínimo viram
@@ -819,6 +869,9 @@ run_assemble_plugin_selftests
 
 # Modo plugins-sync — drift-guard (REGRA 19): committed bate com a regeneração da fonte.
 run_plugins_sync_selftests
+
+# Modo capability — Capability Contract (REGRA 20): contrato honesto + resolução de requires.
+run_capability_selftests
 
 # Modo design-tokens — idem (cenários self-contained, sem fixture-file).
 run_design_tokens_selftests

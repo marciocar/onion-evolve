@@ -23,3 +23,24 @@ TEMPLATES=(
   ".claude/commands/common/templates/compliance_soc2_template.md"
   ".claude/commands/common/templates/compliance_pmbok_template.md"
 )
+
+# Capability Contract (auto-descrição — ADR onion-adr-capability-contract-2026-06).
+CONFORMANCE="gold"
+PROVIDES=("iso-27001-isms" "iso-22301-bcms" "soc2-tsc" "pmbok-governance" "build-compliance-docs")
+REQUIRES=(
+  "agent:security-information-master"
+  "agent:iso-27001-specialist"
+  "agent:iso-22301-specialist"
+  "agent:soc2-specialist"
+  "agent:pmbok-specialist"
+  "command:build-compliance-docs"
+  "template:compliance-context-template.md"
+  "template:compliance_iso27001_template.md"
+  "template:compliance_iso22301_template.md"
+  "template:compliance_soc2_template.md"
+  "template:compliance_pmbok_template.md"
+)
+LOADS=(
+  "when:framework=iso27001 -> template:compliance_iso27001_template.md"
+  "when:framework=soc2 -> template:compliance_soc2_template.md"
+)
