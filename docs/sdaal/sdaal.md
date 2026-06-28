@@ -305,6 +305,8 @@ LLMs alucinam quando precisam **decidir** sem informação suficiente. SDAAL eli
 - Cada mapeamento de campo está em uma **tabela explícita** no adapter. Não há "o agente decide como mapear `priority`" — está escrito que `urgent → 1` no ClickUp e `urgent → Highest` no Jira.
 - O fallback `none.md` garante que **nunca há um caminho indefinido**. Se o provedor falha, o agente segue um spec determinístico de degradação.
 
+> **Variante `none` fail-safe (domínio sensível).** O Null Object padrão **degrada em silêncio** (opera offline, emite warnings). Mas **abstrações de domínio sensível podem ter `none` fail-safe** — que **recusa** em vez de degradar, exigindo override humano explícito. Precedente: o `none` do [de-identification](../../.claude/utils/de-identification/adapters/none.md) (ADR `onion-adr-slm-as-tool-de-identification-2026-06`) recusa redigir-e-passar PII sem `allowUnredacted` — compliance falha **seguro**. Registrado aqui para que a 3ª abstração sensível não pareça ad-hoc. Ver a [economia de motores](../knowledge-base/concepts/onion-engine-economy.md) para quando cada motor (Transformer / SLM-ferramenta / shell) é o certo.
+
 O efeito prático: **o LLM ganha um modelo mental estável do domínio**, o que tornaria o agente mais preciso, mais auditável e mais reutilizável entre sessões.
 
 ### 10.4 SDAAL como ativo arquitetural *compounding*
