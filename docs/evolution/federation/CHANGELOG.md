@@ -8,6 +8,17 @@
 
 ---
 
+## 2026-06-28 · Sinal RESOLVIDO: lint-selftest.sh robusto a adotante (não aborta mais sem plugins/) · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Seu sinal de campo foi endereçado** ([inbox 2026-06-28](../inbox/_processed/2026-06-28-lint-selftest-aborts-in-adopter-without-plugins.md), relayado via `/meta:co-relay`, PR #202). O `lint-selftest.sh` **abortava com exit 2** no seu repo (sem `plugins/`) — sob `set -e`, um modo **core-only** derrubava o script **antes** do `run_de_identification_selftests` (o de-id do #201) rodar. Você teve que validar o round-trip à mão; agora não precisa mais.
+- **Diagnóstico (seu, confirmado):** o harness é **artefato distribuído** com dois contextos — core (tem `plugins/`, `fixtures/`) e adotante (subconjunto). Um `set -e` global tornava o modo mais frágil o **teto de todos**. Não era regressão do #201 — fragilidade estrutural pré-existente que o de-id apenas tornou visível.
+- **Fix (PR #202, sua opção (2) + (1) combinadas):**
+  1. **Skip gracioso por precondição local** (mesmo idioma do `jq ausente → pulado`): modos core-only auto-reportam `pulado (adotante)` como **PASS** quando o artefato falta — loop de fixtures (sem `manifest`), `assemble-plugin`/`plugins-sync`/`graph` (sem `plugins/` vendorizados; o consumidor **não publica plugins**).
+  2. **Rede de segurança `|| true`** nos modos de maquinaria de marketplace: um abort imprevisto **jamais esconde** os modos self-contained seguintes.
+- **Strictness do core preservada:** onde `plugins/`/`fixtures/` existem (o core), o skip **nunca dispara** → drift real ainda vira FAIL + exit ≠0. O gate ficou **context-aware, não mais frouxo**.
+- **Validado nos dois contextos (dogfood adversarial):** core **100/0 exit 0**; adotante simulado (sem `plugins/` nem `fixtures/`) **47/0 exit 0**, com o **de-id passando** (round-trip, dedupe, determinismo).
+- **Ação p/ você:** no próximo `/meta:adopt --update`, o `lint-selftest.sh` corrigido chega vendorizado. A partir daí, o passo pós-update **"rode `lint-selftest.sh`"** conclui com **exit 0** e valida o de-id no harness (sem precisar rodar o `redact-deterministic.sh` à mão). Sem ação obrigatória agora.
+
 ## 2026-06-27 · S1 RESOLVIDO: padrão "toolbox" = régua P0-P3 + coesão dos create-* (ciclo ASSESS→TRIAL→ADOPT fechado) · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Seu sinal S1 (padrão "toolbox") saiu de "triado" para RESOLVIDO** ([inbox 2026-06-24](../inbox/_processed/2026-06-24-sinal-padrao-toolbox.md)). O pedido — um **meio de 1ª classe para classificar procedimentos recorrentes** (script/skill/comando) e gerir seu ciclo de vida — foi escopado, trialado e selado num ciclo completo (ASSESS #181 → TRIAL #183/#184/#185 → ADOPT #186).
