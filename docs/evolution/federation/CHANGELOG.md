@@ -8,6 +8,18 @@
 
 ---
 
+## 2026-06-28 · BREAKING: skill `onion-fleet`→`onion-orchestration` + `/meta:fleet`→`/meta:orchestrate` (migração de vocabulário) · BREAKING · alvo: rhilo-metagamify
+
+- **Migração de vocabulário no core:** os apelidos `frota` (PT) / `fleet` (EN) foram **aposentados** em favor do vocabulário canônico da indústria de orquestração multi-agente — `orquestração` (conceito) / `orchestrator-worker` (padrão) / `workers` (coletivo executor). Decisão fundamentada por pesquisa (3 ângulos + web jul-2026): o canônico é *orchestrator-worker / fan-out-fan-in*; "fleet" é jargão em transição e "frota" era o único termo técnico traduzido. Doc: [onion-orchestration-ontology-2026-06](../../analysis/onion-orchestration-ontology-2026-06.md).
+- **O que mudou (afeta você):**
+  - **Skill renomeada:** `onion-fleet` → **`onion-orchestration`** (mesma capacidade: reconhece fan-out e autora/dispara Workflow).
+  - **Comando renomeado:** `/meta:fleet` → **`/meta:orchestrate`**.
+  - **KB renomeada:** `agent-fleet-orchestration.md` → `agent-orchestration.md` (+ 4 ADRs `onion-fleet-*` → `onion-orchestration-*`).
+  - **Anti-pattern:** `fleet-orchestrator` → `worker-orchestrator` (a guarda §4.2 / Regra 7 do lint).
+  - **Vocabulário:** prosa migrada para `orquestração`/`workers` em todo o core (308 reescritas + de-mão).
+- **Por que BREAKING para você:** seu repo tem `onion-fleet` **vendorizado**. Ao rodar `/meta:adopt --update`, o delta troca a skill/comando renomeados. **Ação no alvo:** (1) rodar o `--update` quando oportuno; (2) se você tiver docs/sessões/refs próprias citando `/meta:fleet` ou `onion-fleet`, atualizar para `/meta:orchestrate` / `onion-orchestration` (muscle-memory); (3) o anti-pattern proibido passou a ser `worker-orchestrator` (refletido no lint vendorizado). Sem pressa — o `--update` é idempotente; coordene quando for atualizar o framework.
+- **Validação no core:** lint 0/0, selftest 100/0, revisão independente (pegou substituição semântica cega em L0, corrigida), grep-zero limpo. PR #205 MERGED.
+
 ## 2026-06-28 · Sinal RESOLVIDO: lint-selftest.sh robusto a adotante (não aborta mais sem plugins/) · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Seu sinal de campo foi endereçado** ([inbox 2026-06-28](../inbox/_processed/2026-06-28-lint-selftest-aborts-in-adopter-without-plugins.md), relayado via `/meta:co-relay`, PR #202). O `lint-selftest.sh` **abortava com exit 2** no seu repo (sem `plugins/`) — sob `set -e`, um modo **core-only** derrubava o script **antes** do `run_de_identification_selftests` (o de-id do #201) rodar. Você teve que validar o round-trip à mão; agora não precisa mais.
