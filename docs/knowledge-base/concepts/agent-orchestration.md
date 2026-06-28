@@ -477,6 +477,8 @@ Logo, a camada de orquestração mora em **skill + comando**, **nunca** num agen
 
 > **Nunca crie um agente `worker-orchestrator`.** Isso violaria §4.2 e esconderia a orquestração no lugar mais caro. A orquestração é responsabilidade do nível principal.
 
+> **Locus ≠ forma — hierarquia NÃO é proibida.** O que se proíbe é o **locus** (orquestração *dentro* de um agente). A **forma do grafo** é livre: plano (default) ou **árvore** (workers agrupados sob nós sumarizadores — *aggregator/sub-synthesizer*) é **legítima**, desde que **composta no nível principal** (`parallel`/`pipeline` aninhados), nunca por um agente que orquestra. Não infira "hierarquia = proibida" do silêncio: o proibido é a inversão de controle (worker dirigindo a orquestração), não a topologia. Quando usar árvore (síntese por LLM que estoura 1 agente) é caso-limite estreito — ver [ADR de topologia](../../analysis/onion-orchestration-topology-adr-2026-06-21.md). É a mesma lógica da [economia de motores](onion-engine-economy.md): o fan-in determinístico em JS vence por default; o motor LLM (nó sumarizador) entra só por necessidade.
+
 ### Cross-links
 
 - [`docs/meta-specs/commands.md`](../../meta-specs/commands.md) — constituição L0 dos comandos (categoria `meta/` abriga `/meta:orchestrate`; o grafo de orquestração não é um workflow faseado retomável, e sim coordenação efêmera intra-run).
