@@ -3,9 +3,9 @@ title: 'Revisão adversarial em orquestração — ADR de topologia de orquestra
 date: 2026-06-22
 type: orchestration-review-report
 status: executado (refinos camadas 1-2 aplicados ao ADR; camada 3 diferida à promoção)
-scope: revisão do ADR onion-orchestration-topology-adr-draft-2026-06-21
+scope: revisão do ADR onion-orchestration-topology-adr-2026-06-21
 run_id: wf_e7ae4944-674
-target: docs/analysis/onion-orchestration-topology-adr-draft-2026-06-21.md
+target: docs/analysis/onion-orchestration-topology-adr-2026-06-21.md
 note: "Proof-point da revisão (dogfood: revisar a doutrina de orquestração usando a própria orquestração). Output bruto: /tmp/.../tasks/wcutuh3rs.output (efêmero)."
 ---
 

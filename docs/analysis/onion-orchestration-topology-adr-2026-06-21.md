@@ -1,7 +1,7 @@
 ---
-title: "ADR (RASCUNHO) — Topologia de orquestração: locus plano (invariante) × forma de grafo (escalável sob gatilho)"
+title: "ADR — Topologia de orquestração: locus plano (invariante) × forma de grafo (escalável sob gatilho)"
 date: 2026-06-21
-type: adr-draft
+type: adr
 status: accepted
 decision-scope: agent-orchestration / topology
 supersedes: none
@@ -62,7 +62,9 @@ dois eixos distintos**:
      arquitetural** — `architecture.md:204` (§4.2): `agents/* → commands/*` = **Não** ("Agente não
      invoca comando diretamente — sugere ao usuário") → **não existe** agente `worker-orchestrator`.
 2. **Forma do grafo de agentes** — o *shape* do fan-out: plano (todos os workers no mesmo nível) vs.
-   **árvore** (workers agrupados sob **nós sumarizadores** que condensam antes do fan-in final).
+   **árvore** (workers agrupados sob **nós sumarizadores** que condensam antes do fan-in final). O
+   "nó sumarizador" é o **aggregator / sub-synthesizer** do vocabulário da indústria — um agregador
+   *intermediário*, distinto do *agente de síntese* (synthesizer) que faz o fan-in **final**.
 
 O ponto central: **a invariante restringe o eixo 1, não o eixo 2.** A "forma de árvore" que este ADR
 legitima é **uma só**: **(a) `parallel`/`pipeline` aninhados compostos no nível principal** — os
@@ -228,13 +230,19 @@ estoura 1 agente):
 
 ---
 
-**Mantido por:** Sistema Onion · **Última atualização:** 2026-06-22 (aceite + correção de citação
-`architecture.md:204`; refino pós-revisão em orquestração — separação mecânico×julgamento nos CAs, `b·m≤W`
-rebaixada a heurística, "O gap" reframado como omissão, mecanismo (a)×(b) na forma de árvore)
+**Mantido por:** Sistema Onion · **Última atualização:** 2026-06-28 (promoção F3a — `draft→adr`:
+metadados title/`type`/filename + 4 refs cruzadas; ancoragem de "nó sumarizador" ao termo de mercado
+**aggregator / sub-synthesizer** — intermediário, distinto do *agente de síntese* final)
 
 > **Histórico de revisão.** Revisão adversarial em orquestração (5 lentes + verificação adversarial,
-> 2026-06-22): 16 achados, **0 blocker/major** — decisão central validada. Refinos das camadas 1-2
-> aplicados. **Diferido à promoção:** ancorar "nó sumarizador" ao termo de mercado/`agente de síntese`
-> (regra de linguagem ubíqua); frase-âncora locus×forma na KB ao lado da armadilha; promoção de
-> metadados (title/`type`/filename `draft→adr`) + atualizar 4 referências cruzadas em
-> `onion-orchestration-math-phase-transition-2026-06.md` e `onion-orchestration-external-radar-2026-06.md`.
+> 2026-06-22): 16 achados, **0 blocker/major** — decisão central validada. Refinos das camadas 1-2 aplicados.
+>
+> **Promoção F3a (2026-06-28) — CONCLUÍDA:** metadados `draft→adr` (title sem "RASCUNHO", `type: adr`,
+> arquivo renomeado sem `-draft-`) + 4 refs cruzadas atualizadas + "nó sumarizador" ancorado ao termo de
+> mercado **aggregator / sub-synthesizer** (a ancoragem ao "agente de síntese" seria imprecisa — esse é o
+> *synthesizer final*, não o agregador intermediário).
+>
+> **Ainda diferido (F3b — decisão doutrinária do maestro):** (1) a **re-revisão da parte doutrinária "com
+> mais distância"** acordada no aceite (decisão central locus×forma + gatilho do nó sumarizador); (2)
+> frase-âncora locus×forma na KB `agent-orchestration.md` ao lado da armadilha (§461/§478). Sem gatilho de
+> urgência — o status `accepted` já vigora.
