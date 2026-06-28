@@ -380,7 +380,7 @@ playwright: ~20 ferramentas MCP para browser automation
 # Análise de Código
 code-understanding: ~10 ferramentas MCP para análise
 
-# Orquestração de frota: nativa via ferramenta Workflow do Claude Code (sem MCP) — ver /meta:fleet
+# Orquestração de subagentes: nativa via ferramenta Workflow do Claude Code (sem MCP) — ver /meta:orchestrate
 
 # Raciocínio Complexo
 sequential-thinking: 1 ferramenta MCP para CoT

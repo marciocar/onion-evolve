@@ -12,7 +12,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 
 - 🤖 **92 comandos invocáveis** Claude Code em 10 categorias + root (+ 16 fragmentos compartilhados em `common/` e 3 READMEs)
 - 🎯 **51 agentes de IA especializados** em 9 categorias
-- 🧩 **5 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-fleet` — orquestração de frota)
+- 🧩 **5 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes)
 - 📚 **Knowledge Bases estruturadas** para consumo por IA
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente com ativação automática
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
@@ -38,7 +38,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 
 ### Sistema Onion (`.claude/`)
 - **92 comandos invocáveis** Claude Code distribuídos em:
-  - 24 em `meta/` (meta-comandos, criadores, validação, orquestração de frota, frescor de KB e de contexto, federação, adoção e co-evolução)
+  - 24 em `meta/` (meta-comandos, criadores, validação, orquestração de subagentes, frescor de KB e de contexto, federação, adoção e co-evolução)
   - 20 em `product/` (gestão de produto e descoberta)
   - 11 em `engineer/` (engenharia e desenvolvimento)
   - 11 em `docs/` (geração e validação de documentação)
@@ -48,7 +48,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `development/`, 1 em `quick/`
   - 3 no root: `onion.md`, `warm-up.md`, `catch-up.md`
   - **não-invocáveis**: 16 fragmentos em `common/` (5 templates + 11 prompts) e 3 READMEs de categoria
-- **5 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-fleet`)
+- **5 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`)
 - **51 agentes** IA distribuídos em:
   - 18 em `development/` (frontend, backend, infra, integrações)
   - 9 em `product/` (gestão e narrativa)
@@ -92,7 +92,7 @@ docs/
 ├── knowledge-base/             # Knowledge Bases (36 arquivos, incl. index)
 │   ├── concepts/               # Conceitos fundamentais (17 arquivos)
 │   │   ├── abstraction-patterns-catalog.md
-│   │   ├── agent-fleet-orchestration.md
+│   │   ├── agent-orchestration.md
 │   │   ├── ai-agent-design-patterns.md
 │   │   ├── branding-posicionamento-marca.md
 │   │   ├── configuration-management.md
@@ -223,7 +223,7 @@ Knowledge Bases estruturadas para consumo por IA e referência técnica:
 - **Spec-Driven Development** - Metodologia emergente de desenvolvimento com IA
 - **Specification-Driven AI Abstraction Layer** - Camada de abstração orientada a especificações
 - **AI Agent Design Patterns** - Padrões de design para agentes IA
-- **Agent Fleet Orchestration** - Orquestração de frota: 6 padrões canônicos sobre primitivas nativas
+- **Agent Orchestration** - Orquestração de subagentes: 6 padrões canônicos sobre primitivas nativas
 - **Abstraction Patterns Catalog** - Catálogo de padrões de abstração
 - **Context Window Optimization** - Otimização de contexto para IA
 - **Configuration Management** - Gestão de configurações

@@ -3,13 +3,13 @@ name: context-freshness
 description: |
   Audita o frescor dos contextos de domínio (docs/business-context/,
   docs/technical-context/, docs/compliance-context/) tratando-os como SSOT viva,
-  não snapshot. Um worker por arquivo via onion-fleet retorna veredito
+  não snapshot. Um worker por arquivo via onion-orchestration retorna veredito
   CURRENT/STALE/HISTORICAL + trechos desatualizados + direção de refresh; o fan-in
   consolida, detecta contradição cross-domínio e marca candidatos a remoção.
   É a fase *Manage* executável do ciclo de vida (ADR onion-adr-domain-context-lifecycle).
 model: opus
 category: meta
-tags: [context, freshness, fleet, validation, lifecycle]
+tags: [context, freshness, orchestration, validation, lifecycle]
 version: "1.0.0"
 updated: "2026-06-17"
 allowed-tools: Read Grep Glob
@@ -103,8 +103,8 @@ Registre o conjunto como `CTX_FILES`. **Se vazio** (ex.: rodando no framework, o
 os contextos são templates), informe o usuário e **encerre sem erro** — não há
 contexto populado para auditar.
 
-### Passo 2 — Delegar padrão à skill `onion-fleet`
-Acione **`onion-fleet`**: tarefa = "auditar frescor de cada arquivo em CTX_FILES
+### Passo 2 — Delegar padrão à skill `onion-orchestration`
+Acione **`onion-orchestration`**: tarefa = "auditar frescor de cada arquivo em CTX_FILES
 contra a régua de contexto"; independência = alta (cada arquivo é autônomo); padrão
 = **fan-out-and-synthesize**. A skill confirma elegibilidade e tiering. Se reprovar,
 serial (Passo 5).
@@ -126,7 +126,7 @@ const FreshnessSchema = {
 
 **Model tiering** (igual `kb-freshness`): workers → **haiku**; fan-in → **sonnet**;
 verificação adversarial (se acionada) → **opus**. Teto **16 workers** concorrentes;
-batchs de 16 para frotas maiores. Nunca modelos de outro provider.
+batchs de 16 para orquestrações maiores. Nunca modelos de outro provider.
 
 ### Passo 4 — Fan-in: consolidar, contradição cross-domínio, remover
 No contexto principal (0 tokens de modelo):
@@ -197,13 +197,13 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 - **Nunca cria nem modifica** contextos — só audita e relata. Refresh = `/docs:build-*-docs`.
 - **No framework**, os 3 contextos são templates (só `README.md`) → `CTX_FILES` vazio
   → encerra sem erro. O valor real é em **projetos-alvo** que populam os contextos.
-- **Fleet opt-in**: alvo único → executa direto com `Agent` (sem overhead de Workflow).
+- **Orquestração opt-in**: alvo único → executa direto com `Agent` (sem overhead de Workflow).
 - Orquestre **sempre no nível principal** — nunca dentro de subagente; **não crie** um
   agente "context-freshness-worker".
 - **Contrato de composição (D9 do `/meta:evolve`)**: quando invocado por `/meta:evolve`,
   retorne o **array `FreshnessSchema[]` cru** (não só o relatório Unicode), para o
   `evolve` mesclar no backlog. `/meta:evolve` chama no **fluxo principal** e ingere o
-  array — nunca aninha esta frota dentro da dele (mesma regra do D4/`kb-freshness`).
+  array — nunca aninha esta orquestração dentro da dele (mesma regra do D4/`kb-freshness`).
 
 ---
 
@@ -213,4 +213,4 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 - ADR: [onion-adr-domain-context-lifecycle-2026-06.md](../../../docs/analysis/onion-adr-domain-context-lifecycle-2026-06.md) (§Gatilho — este comando é o Tijolo 2)
 - Molde reusado: [`/meta:kb-freshness`](kb-freshness.md)
 - Geradores (primeiro tick): `/docs:build-business-docs` · `/docs:build-tech-docs` · `/docs:build-compliance-docs`
-- Doutrina de frota: [agent-fleet-orchestration.md](../../../docs/knowledge-base/concepts/agent-fleet-orchestration.md) · Skill: `onion-fleet`
+- Doutrina de orquestração: [agent-orchestration.md](../../../docs/knowledge-base/concepts/agent-orchestration.md) · Skill: `onion-orchestration`

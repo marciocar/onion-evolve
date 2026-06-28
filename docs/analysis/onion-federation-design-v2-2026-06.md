@@ -85,7 +85,7 @@ O ledger é **sempre seu próprio repo git** ("federation spine"), montado em ca
 | **Manifesto** `members.yaml` | **no ledger** (não `.claude/federation/`) | dissolve review SA-1/#1; campos: `id` estável (sobrevive a rename), `name`, `path`, `remote`, `role` producer/consumer/lib (review #24) |
 | **Formato de contrato** | `contracts/<C>.md` no ledger | padrão SDAAL (interface/types/semver/producer↔consumers) **+ campos obrigatórios `tests:` e fixtures de payload** (review #4, #14) |
 | **Caixa de correio** | `CHANGELOG.md` append-only no ledger | convenção nova, mínima; cada entrada datada referencia o contrato + versão |
-| **Comandos publish/check** | `meta/` namespace (`/meta:federation-*`) | **não** nova categoria — dissolve SA-1/#2; precedente `/meta:fleet`, `/meta:evolve`, `/meta:inventory` |
+| **Comandos publish/check** | `meta/` namespace (`/meta:federation-*`) | **não** nova categoria — dissolve SA-1/#2; precedente `/meta:orchestrate`, `/meta:evolve`, `/meta:inventory` |
 | **Validação local (o "veto")** | Onion do repo dono | `MemberExpertSchema` `{approved, blocked_contracts[], required_migrations[], reasoning}`; ausência de output = veto (**fail-safe**, review #5) |
 | **PRs coordenados + rollback** | forge adapter, por repo | `.claude/utils/forge/`; ordem de merge + protocolo de rollback (review #12, #15) |
 | **Monitor / status** | `/meta:federation-status` | lê ledger + forge CI por membro; detecta **contract-drift** e commit fora do fluxo (review #16) |
@@ -168,12 +168,12 @@ Os **24 achados confirmados** da [review](onion-federation-design-review-2026-06
 | #6 (reverse-consolidate cai no hub, não no membro) | ✅ **N/A no peer** — não há adoção cross-dir; cada Onion já vive no seu repo |
 | #12 (PRs sem atomicidade) | ✅ Aceito explicitamente: humano-maestro + ordem de merge (§6); atomicidade multi-repo não existe no GitHub |
 | #13 (merge de `.claude/` legado) | ✅ **N/A no peer** — sem bootstrap-adopt cross-dir; cada repo adota Onion pelo fluxo normal |
-| #17 (`/meta:evolve` não é reusável como scan) | ✅ v2 não reusa evolve como scan; usa padrão fleet só onde couber |
+| #17 (`/meta:evolve` não é reusável como scan) | ✅ v2 não reusa evolve como scan; usa padrão orchestrator-worker só onde couber |
 | #8 (guardrail "≤400 linhas" já violado) | 🟡 Reconhecido (§2) — rever a régua p/ adapters ricos na execução |
 | #19 (schema de manifesto: débito F1→F2) | ✅ `members.yaml` com schema estável mínimo desde a Fase 1 |
 | #20 (membros não-Onion / stacks heterogêneos) | 🟡 **Endereçar na Fase 1** — classificar modos: full-member / observe-only / external |
 | #21 (conflito entre experts + HITL) | ✅ Maestro humano + checkpoints explícitos (§6) |
-| #22 (budget de token de frota) | 🟡 **Aberto** — menor no peer (sem frota cross-dir); modelar na Fase 3 se necessário |
+| #22 (budget de token de orquestração) | 🟡 **Aberto** — menor no peer (sem orquestração cross-dir); modelar na Fase 3 se necessário |
 | #23 (F3 conflaciona spike + produto) | ✅ Spike isolado na Fase 0; produto nas fases seguintes |
 | #24 (concorrência + naming collision) | ✅ `id` estável no manifesto + (futuro) lock no ledger |
 

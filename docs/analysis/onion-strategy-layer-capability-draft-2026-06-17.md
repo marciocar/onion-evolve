@@ -8,9 +8,9 @@ authored-in: onion-evolve (sala de design)
 for-instance: sala de obra (.claude/ implementação)
 depends-on: ./onion-strategy-layer-adr-draft-2026-06-17.md
 related:
-  - ../../.claude/skills/onion-fleet/
+  - ../../.claude/skills/onion-orchestration/
   - ../../.claude/skills/onion-patterns/
-  - ../../.claude/commands/meta/fleet.md
+  - ../../.claude/commands/meta/orchestrate.md
   - ../../.claude/commands/meta/analyze-complex-problem.md
 ---
 
@@ -52,7 +52,7 @@ Um catálogo de **playbooks nomeados**, cada um uma entrada estruturada:
 Exemplos de playbooks que já existem **implícitos** no Onion e mereceriam entrada explícita:
 - `descoberta-a-backlog` → `/product:collect → ... → /product:feature`
 - `planejamento-a-entrega` → `/engineer:plan → start → work → pre-pr → pr`
-- `auditoria-ampla` → `onion-fleet` fan-out-and-synthesize + juiz adversarial
+- `auditoria-ampla` → `onion-orchestration` fan-out-and-synthesize + juiz adversarial
 - `hotfix-emergencial` → `/engineer:hotfix`
 - `adoção-de-repo` → `/meta:adopt`
 
@@ -71,7 +71,7 @@ Não precisa de comando pesado. O reconhecimento pode ser:
 
 - O catálogo é **conhecimento consultável sob demanda** → é a definição de skill (carrega
   quando relevante, não polui contexto). Encaixa em `.claude/skills/`.
-- Reconhecimento é leve; deliberação reusa `onion-fleet`/`Workflow` (não reinventa).
+- Reconhecimento é leve; deliberação reusa `onion-orchestration`/`Workflow` (não reinventa).
 - Um **comando** (`/meta:strategize`) só se justifica se o usuário quiser *invocar
   explicitamente* "escolha a estratégia para isto" — provavelmente desnecessário no começo.
 
@@ -79,22 +79,22 @@ Não precisa de comando pesado. O reconhecimento pode ser:
 
 | Já existe | O que faz | O que o catálogo adiciona |
 |-----------|-----------|---------------------------|
-| `onion-fleet` (skill) | reconhece trabalho de fan-out → emite padrão de Workflow | catálogo por **caso de uso**, não só por forma de orquestração |
+| `onion-orchestration` (skill) | reconhece trabalho de fan-out → emite padrão de Workflow | catálogo por **caso de uso**, não só por forma de orquestração |
 | `onion-patterns` (skill) | convenções de estrutura/nomenclatura | playbooks de **execução** (fluxo+ferramentas), não estrutura |
 | padrões canônicos do Workflow | fan-out, judge panel, pipeline… | mapeia **situação → qual padrão**, em vez de listar padrões soltos |
 | `/meta:analyze-complex-problem` | análise de UM problema | reconhecimento de caso → playbook, não análise |
 
-> ⚠️ **Risco de sobreposição real**: `onion-fleet` + `onion-patterns` juntas já cobrem talvez
+> ⚠️ **Risco de sobreposição real**: `onion-orchestration` + `onion-patterns` juntas já cobrem talvez
 > 60% disto. A pergunta honesta para a sala de obra: o catálogo é uma **skill nova**, ou uma
 > **extensão de `onion-patterns`** (adicionar seção "playbooks de estratégia")? Decidir contra
-> "não inchar a frota sem ganho" (CLAUDE.md). Meu palpite: **estender `onion-patterns`** primeiro.
+> "não inchar o conjunto de especialistas sem ganho" (CLAUDE.md). Meu palpite: **estender `onion-patterns`** primeiro.
 
 ## Critério de aceitação (esboço)
 
 1. ≥5 playbooks destilados do que já é tácito, com `reconhece-quando` + `fluxo` + `grupo` + `reroute`.
 2. Reconhecimento funciona por skill (sem comando pesado obrigatório).
 3. Sem match → fallback explícito para deliberação (Doc 1); resíduo vira proposta de playbook.
-4. Não duplica `onion-fleet`/`onion-patterns` — estende ou se justifica.
+4. Não duplica `onion-orchestration`/`onion-patterns` — estende ou se justifica.
 
 ## Decisão pendente para a sala de obra
 

@@ -1,14 +1,14 @@
 ---
 name: generate
 description: |
-  Camada generativa da vertical de design: diverge (N identidades por IA, em frota
+  Camada generativa da vertical de design: diverge (N identidades por IA, em orquestração
   paralela) → converge (gate WCAG determinístico filtra + juiz ranqueia) → vencedora
-  alimenta o DEVELOP do /design:identity. A IA gera; o gate decide. Orquestra a frota
-  via onion-fleet/Workflow (generate-and-filter). Delega a @brand-generator (workers).
+  alimenta o DEVELOP do /design:identity. A IA gera; o gate decide. Orquestra os workers
+  via onion-orchestration/Workflow (generate-and-filter). Delega a @brand-generator (workers).
 model: opus
 allowed-tools: Read Write Edit Glob Grep Workflow Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/design-source/*) Bash(mktemp -d -t onion-design-*) Bash(rm -rf /tmp/onion-design-*)
 category: design
-tags: [design, tokens, generative, fleet, wcag, branding]
+tags: [design, tokens, generative, orchestration, wcag, branding]
 version: "0.1.0"
 updated: "2026-06-23"
 related_agents:
@@ -18,7 +18,7 @@ related_agents:
 related_commands:
   - /design:identity
   - /product:branding
-  - /meta:fleet
+  - /meta:orchestrate
 ---
 
 # /design:generate — Identidade generativa (diverge → converge)
@@ -32,7 +32,7 @@ passou no contraste calculado** e melhor atende o brief.
 
 > **Princípio reitor.** A IA **gera**, o **gate decide**. Contraste é **calculado**
 > (`lint-design-tokens.sh`), nunca "achado" pelo modelo — que é o pior juiz da própria saída
-> (doutrina de dogfooding). A frota cobre largura (N ângulos independentes); o gate corta o que
+> (doutrina de dogfooding). A orquestração cobre largura (N ângulos independentes); o gate corta o que
 > não serve.
 
 ## Fronteiras
@@ -43,11 +43,11 @@ passou no contraste calculado** e melhor atende o brief.
 - **NÃO** commita candidatas na SSOT automaticamente: vivem em staging (`/tmp` ou
   `docs/design-context/_candidates/`) até o **maestro** escolher e promover. Promover uma 2ª marca
   na cascata pende do gatilho do [ADR de peer](../../../docs/design-context/decisions/onion-adr-design-peer-promotion.md).
-- **É OPT-IN de frota**: dispara a ferramenta `Workflow` (custo de N workers). Avisar escopo/custo antes.
+- **É OPT-IN de orquestração**: dispara a ferramenta `Workflow` (custo de N workers). Avisar escopo/custo antes.
 
-## Fluxo (orquestração de frota — generate-and-filter)
+## Fluxo (orquestração de subagentes — generate-and-filter)
 
-Padrão canônico da skill [`onion-fleet`](../../skills/onion-fleet/SKILL.md) (KB `agent-fleet-orchestration`).
+Padrão canônico da skill [`onion-orchestration`](../../skills/onion-orchestration/SKILL.md) (KB `agent-orchestration`).
 A orquestração mora **aqui** (comando, nível principal) — nunca dentro de um worker.
 
 ### 1. BRIEF + ângulos
@@ -105,7 +105,7 @@ contraste deve ser **descartado** pelo gate, não vencer. Prova que "o gate deci
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-/design:generate — <scope> — frota generate-and-filter
+/design:generate — <scope> — orquestração generate-and-filter
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ◆ Ângulos     : <N> (conservadora, ousada, …)  · workers: <N> sonnet
 ◆ Geradas     : <N>  → Gate WCAG: <P> aprovadas / <R> descartadas (SKIP)
@@ -118,6 +118,6 @@ contraste deve ser **descartado** pelo gate, não vencer. Prova que "o gate deci
 
 - Workers: `@brand-generator` · Materializa o vencedor: `@design-system-specialist`
 - Gate: `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh` · Ingestão: `${CLAUDE_PLUGIN_ROOT}/utils/design-source/`
-- Frota: skill `onion-fleet` · `/meta:fleet` · KB `agent-fleet-orchestration`
+- Orquestração: skill `onion-orchestration` · `/meta:orchestrate` · KB `agent-orchestration`
 - Consome o vencedor: `/design:identity` (Fase 2 DEVELOP) · Brief: `/product:branding`
 - Peer provisório: `docs/design-context/decisions/onion-adr-design-peer-promotion.md`

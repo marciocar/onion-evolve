@@ -48,8 +48,8 @@ problema que vira incidente de produção e erode a confiança no processo.
 ### Abordagem — O que o Onion fez
 
 1. **Design adversarial antes de codar.** A primeira proposta (v1) era um hub
-   centralizado — um repo "mestre" que coordenaria os demais. O Onion disparou uma frota
-   de **42 agentes** para revisar o design; **24 de 36 achados críticos** apontaram para
+   centralizado — um repo "mestre" que coordenaria os demais. O Onion disparou uma orquestração
+   de **42 subagentes** para revisar o design; **24 de 36 achados críticos** apontaram para
    o mesmo risco: o hub vira ponto único de falha e de autoridade. O design pivotou para
    uma **topologia peer com ledger git** — sem mestre, cada repo é soberano.
 2. **Implementação em fases retomáveis**, não big-bang:
@@ -122,7 +122,7 @@ precisa, antes de tudo, **conseguir cuidar de si mesmo**. Auto-evolução não �
 
 ### Abordagem — O que o Onion fez
 
-1. **Disparo de frota em 8 dimensões.** `/meta:evolve` lançou **28 agentes** cobrindo
+1. **Disparo de orquestração em 8 dimensões.** `/meta:evolve` lançou **28 agentes** cobrindo
    D1–D8: peso/tamanho, redundância, duplicação, KBs stale, conformidade arquitetural,
    legado/modernização, links, e frontmatter. Cada dimensão tem auditores próprios.
 2. **Escala real, em minutos.** Em **~26 minutos**: **1.27M tokens** consumidos, **635
@@ -144,7 +144,7 @@ precisa, antes de tudo, **conseguir cuidar de si mesmo**. Auto-evolução não �
 
 | Métrica | Valor |
 |---------|-------|
-| Agentes na frota | 28 (8 auditores + ~19 juízes + critic) |
+| Agentes na orquestração | 28 (8 auditores + ~19 juízes + critic) |
 | Tokens / tool-uses / duração | 1.27M · 635 · ~26 min |
 | Achados brutos → sobreviventes | 41 → 30 (11 refutados pelo juiz adversarial) |
 | Distribuição de severidade | 2🔴 · 18🟡 · 10🟢 |
@@ -167,7 +167,7 @@ E, sobre a disciplina que torna isso seguro:
 
 ### Lição Aprendida / Aplicabilidade
 
-O padrão central é **auditoria como frota, com juízo adversarial e separação
+O padrão central é **auditoria como orquestração, com juízo adversarial e separação
 diagnóstico/execução**. Três decisões de design fazem a diferença entre um relatório útil
 e ruído:
 
@@ -180,7 +180,7 @@ e ruído:
 
 Para qualquer time, o takeaway se generaliza além do Onion: **codebases grandes precisam
 de um mecanismo de auto-diagnóstico periódico** que não dependa de alguém ter disciplina
-de ler tudo. A frota faz o scan; o juiz filtra o ruído; o humano aprova a cura. É
+de ler tudo. A orquestração faz o scan; o juiz filtra o ruído; o humano aprova a cura. É
 sustentável justamente porque não exige heroísmo manual.
 
 ---
@@ -203,7 +203,7 @@ deveria pegar o problema fazia parte dele.
 **A face do novo.** Quase simultaneamente, a Anthropic lançou uma feature experimental:
 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` — um substrato de peers persistentes que se
 coordenam em runtime. A pergunta estratégica: **o Onion deveria adotar isso como novo
-padrão de frota?** Reescrever toda a doutrina de orquestração em cima de uma feature
+padrão orchestrator-worker?** Reescrever toda a doutrina de orquestração em cima de uma feature
 gated e acoplada a versão?
 
 Por que importava: errar em qualquer das faces é caro. Deixar o legado apodrecer trava a
@@ -218,7 +218,7 @@ está em **fazer as duas coisas com método**.
    `agent-template.md`, do qual cada agente novo herdava os nomes errados. Corrigir as 49
    folhas sem corrigir a raiz garantiria recaída no próximo agente criado.
 2. **Corrigiu o propagador PRIMEIRO** (PR #44), antes de tocar nas folhas.
-3. **Fan-out paralelo** migrou os 49 agentes em 2 PRs (#42, #43) — frota, não trabalho
+3. **Fan-out paralelo** migrou os 49 agentes em 2 PRs (#42, #43) — orquestração, não trabalho
    serial.
 4. **Corrigiu o lint** (REGRA 12) para validar os nomes nativos corretos, fechando o loop
    entre régua e realidade.
@@ -288,12 +288,12 @@ consigo mesmo**.
 
 - **Federation v2** mostrou que coordenação distribuída vence centralização — e que design
   adversarial pega o erro antes do código.
-- **`/meta:evolve`** mostrou que auto-diagnóstico em frota, com juízo adversarial e
+- **`/meta:evolve`** mostrou que auto-diagnóstico em orquestração, com juízo adversarial e
   separação diagnóstico/execução, mantém um codebase grande saudável sem heroísmo manual.
 - **Cursor→Native + Agent Teams** mostrou disciplina diante da evolução da plataforma:
   consertar a raiz do legado e avaliar o novo com evidência empírica.
 
-O denominador comum em todos: **o humano é o maestro, a frota é a orquestra, e cada
+O denominador comum em todos: **o humano é o maestro, os subagentes são a orquestra, e cada
 decisão é rastreável a evidência citada.** Foi assim que uma única sessão de auto-evolução
 produziu 22 PRs mergeados — não por automação cega, mas por orquestração disciplinada.
 

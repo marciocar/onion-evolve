@@ -8,7 +8,7 @@ supersedes: none
 related:
   - ../evolution/README.md
   - ../knowledge-base/concepts/multi-repo-federation.md
-  - ../knowledge-base/concepts/agent-fleet-orchestration.md
+  - ../knowledge-base/concepts/agent-orchestration.md
   - onion-federation-adr-a2a-format-interop-2026-06.md
   - onion-federation-design-v2-2026-06.md
 ---
@@ -50,8 +50,8 @@ A doutrina rotula o eixo de risco como **"A2A-runtime = linha vermelha"** (`evol
 
 - **automação determinística é abraçada** — scripts em `.claude/validation/` (sem LLM) validam
   contratos, escaneiam inbox, detectam drift (`multi-repo-federation.md:117-125`);
-- **gate humano é exigido para decisões** — "control before autonomy" (`agent-fleet-orchestration.md
-  §7.5`), checkpoints de publish/rollback, "a frota propõe, o humano confirma".
+- **gate humano é exigido para decisões** — "control before autonomy" (`agent-orchestration.md
+  §7.5`), checkpoints de publish/rollback, "a orquestração propõe, o humano confirma".
 
 Ou seja: o Onion **nunca** controlou "agentes se falarem". Ele controla **quem executa e com qual
 gate**. Chamar isso de "A2A" confunde — e foi o que o ADR `a2a-format-interop` já começou a desfazer
@@ -126,9 +126,9 @@ motivos independentes**:
    suporta multi-repo nativo**. O próprio caso da Anthropic (compilador C com Claudes paralelos) usou
    **git + file-lock**, não Agent Teams.
 
-**Onde Agent Teams cabe:** **dentro de um repo**, como terceiro modo opt-in da frota, só quando a
+**Onde Agent Teams cabe:** **dentro de um repo**, como terceiro modo opt-in da orquestração, só quando a
 coordenação precisa de *negociação viva* não pré-desenhável como grafo — com o default permanecendo
-**Workflow** (determinístico, 0-token, auditável). Detalhe na KB `agent-fleet-orchestration.md`.
+**Workflow** (determinístico, 0-token, auditável). Detalhe na KB `agent-orchestration.md`.
 
 ---
 
@@ -151,7 +151,7 @@ O carteiro é **orquestração da terceira camada** — as outras duas seguem in
 
 ## Consequências
 
-- **Doutrina:** `evolution/README.md` e `agent-fleet-orchestration.md` passam a falar do eixo dos três
+- **Doutrina:** `evolution/README.md` e `agent-orchestration.md` passam a falar do eixo dos três
   atos; o rótulo "A2A" deixa de carregar o peso do risco (que é o ato 3).
 - **Implementação:** nada muda agora. O carteiro entra no backlog como design pronto.
 - **O que NÃO muda:** A2A-runtime cross-repo segue proibido; "um escritor por repo", gate humano para
@@ -169,5 +169,5 @@ o maestro bastam.
 - Federação (fases, ledger): [`onion-federation-design-v2-2026-06.md`](onion-federation-design-v2-2026-06.md)
 - Doutrina dos 3 fluxos: [`../evolution/README.md`](../evolution/README.md)
 - Determinístico-vs-LLM + fail-safe: [`../knowledge-base/concepts/multi-repo-federation.md`](../knowledge-base/concepts/multi-repo-federation.md)
-- Workflow vs Agent Teams + control-before-autonomy: [`../knowledge-base/concepts/agent-fleet-orchestration.md`](../knowledge-base/concepts/agent-fleet-orchestration.md)
+- Workflow vs Agent Teams + control-before-autonomy: [`../knowledge-base/concepts/agent-orchestration.md`](../knowledge-base/concepts/agent-orchestration.md)
 - Sinais de campo: `../evolution/inbox/_processed/2026-06-19-flow-a-report-and-bidirectional-mail.md` · `../evolution/inbox/_processed/2026-06-19-mgfy-adocao-update-a0fdf35.md`

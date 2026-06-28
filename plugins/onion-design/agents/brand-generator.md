@@ -4,7 +4,7 @@ description: |
   Gerador divergente de identidade visual: propõe N variações de paleta/identidade
   (cores, papéis semânticos) a partir de um brief, em W3C/DTCG. É o lado GENERATIVO
   da vertical de design — diverge; quem decide é o gate determinístico (WCAG), não ele.
-  Use dentro da frota de /design:generate (generate-and-filter). Cada invocação produz
+  Use dentro da orquestração de /design:generate (generate-and-filter). Cada invocação produz
   UMA candidata independente (ideal para fan-out paralelo).
   Relacionado: @design-system-specialist (materializa o vencedor), @branding-positioning-specialist (brief).
 model: sonnet
@@ -45,7 +45,7 @@ verdade é do gate. Candidata que não passa é descartada na convergência — 
 
 Recebe: personalidade da marca, público, tom, restrições (cores a evitar/buscar, acessibilidade-alvo
 AA/AAA), e um **ângulo divergente** (ex.: "conservadora", "ousada", "alto-contraste", "monocromática
-quente") — cada agente da frota recebe um ângulo distinto para cobrir o espaço de soluções, não
+quente") — cada worker da orquestração recebe um ângulo distinto para cobrir o espaço de soluções, não
 convergir cedo.
 
 ## Saída (uma candidata, estruturada)
@@ -68,11 +68,11 @@ candidatas e evita reprovação por descasamento de nomenclatura.
 - **NÃO** materializa (não gera CSS/Tailwind — isso é `@design-system-specialist`, depois da convergência).
 - **NÃO** decide a vencedora (a convergência — gate + juiz — é do orquestrador `/design:generate`).
 - **NÃO** commita na SSOT: candidatas vivem em staging até o maestro escolher e promover.
-- **NÃO** orquestra a frota (isto é um worker; a orquestração mora no comando — ver `onion-fleet`).
+- **NÃO** orquestra os workers (isto é um worker; a orquestração mora no comando — ver `onion-orchestration`).
 
-## Encaixe na frota (generate-and-filter)
+## Encaixe na orquestração (generate-and-filter)
 
-Padrão canônico (KB `agent-fleet-orchestration`): N `@brand-generator` em **paralelo** (cada um seu
+Padrão canônico (KB `agent-orchestration`): N `@brand-generator` em **paralelo** (cada um seu
 ângulo) → cada candidata pelo **gate WCAG** (filtro determinístico, 0 tokens) → **juiz** ranqueia as
 aprovadas por aderência ao brief → vencedora vai ao `@design-system-specialist`. Você é **um worker**;
 produza uma candidata forte e independente.
@@ -81,4 +81,4 @@ produza uma candidata forte e independente.
 
 - Orquestrador: `/design:generate` · Gate: `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh`
 - SSOT/forma: `docs/design-context/` (foundations/semantic/governance)
-- Materializador: `@design-system-specialist` · Frota: skill `onion-fleet`
+- Materializador: `@design-system-specialist` · Orquestração: skill `onion-orchestration`

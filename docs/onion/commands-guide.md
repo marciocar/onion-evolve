@@ -501,7 +501,7 @@ docs/business-context/
 ```
 
 ### `/meta:evolve`
-**Propósito**: Auto-auditoria do próprio Sistema Onion via frota (fan-out-and-synthesize) que produz um backlog priorizado de refatorações de modernização, com evidência citada (`arquivo:linha`)  
+**Propósito**: Auto-auditoria do próprio Sistema Onion via orquestração (fan-out-and-synthesize) que produz um backlog priorizado de refatorações de modernização, com evidência citada (`arquivo:linha`)  
 **Input**: Dimensão específica (`D1`..`D8`) ou vazio para auditoria completa (8 dimensões)  
 **Natureza**: Read-only — propõe, não muta `.claude/`; a única escrita é o relatório em `docs/analysis/onion-evolution-<data>.md`
 
@@ -511,14 +511,14 @@ docs/business-context/
 /meta:evolve D1         # só outliers de peso/tamanho
 ```
 
-### `/meta:fleet`
-**Propósito**: Orquestra uma frota de agentes em paralelo (fan-out/fan-in) sobre uma tarefa, via a ferramenta nativa Workflow  
+### `/meta:orchestrate`
+**Propósito**: Orquestra subagentes em paralelo (fan-out/fan-in) sobre uma tarefa, via a ferramenta nativa Workflow  
 **Input**: Descrição da tarefa elegível a paralelização (auditoria, migração, review ou pesquisa ampla)  
-**Padrões canônicos**: classify-and-act · fan-out-and-synthesize · adversarial verification · generate-and-filter · tournament · loop-until-done (skill `onion-fleet`)
+**Padrões canônicos**: classify-and-act · fan-out-and-synthesize · adversarial verification · generate-and-filter · tournament · loop-until-done (skill `onion-orchestration`)
 
 ```bash
 # Exemplo de uso
-/meta:fleet contar agentes por categoria em .claude/agents/ e retornar resumo consolidado
+/meta:orchestrate contar agentes por categoria em .claude/agents/ e retornar resumo consolidado
 ```
 
 > Outros meta-comandos disponíveis: `/meta:create-command`, `/meta:create-skill`, `/meta:create-knowledge-base`, `/meta:create-abstraction`, `/meta:kb-freshness`, `/meta:metaspec-validate`, `/meta:setup-integration`, `/meta:setup-code-review`.

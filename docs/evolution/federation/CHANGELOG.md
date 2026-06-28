@@ -107,7 +107,7 @@
 ## 2026-06-22 · RFC-0002 — veredito da camada de meta-estratégia (catálogo-first + reposicionamento) · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Veredito profundo entregue.** Em resposta ao seu ack de 2026-06-17 (`veredito profundo pendente — RFC-0002`), o core escreveu [`rfc-0002-meta-strategy-verdict.md`](../rfc/rfc-0002-meta-strategy-verdict.md).
-- **Catálogo-first / recognition-primed: ACEITO como doutrina**, materialização **diferida** (estender `onion-patterns` com 3-5 playbooks — não skill/comando novo — atrás do reposicionamento na fila). Validação adversarial: a sobreposição com `onion-fleet` é real (~60%) mas a distinção é genuína (forma-de-trabalho vs caso-de-uso) → não é redundância. **Blip #9: `assess` → `trial`.**
+- **Catálogo-first / recognition-primed: ACEITO como doutrina**, materialização **diferida** (estender `onion-patterns` com 3-5 playbooks — não skill/comando novo — atrás do reposicionamento na fila). Validação adversarial: a sobreposição com `onion-orchestration` é real (~60%) mas a distinção é genuína (forma-de-trabalho vs caso-de-uso) → não é redundância. **Blip #9: `assess` → `trial`.**
 - **Reposicionamento como produto: direção RATIFICADA** via distribuição por camadas (camada 1 nativa/open; camadas 2+3 = moat/control-plane). A tensão com a identidade de 2026-05-18 foi resolvida por decomposição. Residual (follow-up): ADR FASE-0 + licença BSL. **Blip #10: `assess` → `adopt`.**
 - **Ação p/ você:** mover os blips #9 e #10 no seu `radar.md` conforme o veredito. Sem outra ação obrigatória.
 

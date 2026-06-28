@@ -223,7 +223,7 @@ Pesquise $ARGUMENTS profundamente:
 
 Combina com `agent: Explore` (read-only, otimizado para exploração) ou `Plan`, ou subagents custom.
 
-> **Orquestração multi-agente (mai/2026):** `context: fork` roda **um** subagent isolado. Para coordenar **vários** agentes em paralelo/sequência (fan-out/fan-in, pipelines), o mecanismo canônico do Claude Code é a **ferramenta nativa `Workflow`** (research preview) — ver [Agent Fleet Orchestration](../concepts/agent-fleet-orchestration.md) e o comando `/meta:fleet`. Regra: `context: fork` para isolar uma skill; `Workflow` para frota.
+> **Orquestração multi-agente (mai/2026):** `context: fork` roda **um** subagent isolado. Para coordenar **vários** agentes em paralelo/sequência (fan-out/fan-in, pipelines), o mecanismo canônico do Claude Code é a **ferramenta nativa `Workflow`** (research preview) — ver [Agent Orchestration](../concepts/agent-orchestration.md) e o comando `/meta:orchestrate`. Regra: `context: fork` para isolar uma skill; `Workflow` para orquestração.
 
 ### 4. Controle de Invocação
 

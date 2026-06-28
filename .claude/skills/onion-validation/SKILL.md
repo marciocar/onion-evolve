@@ -35,12 +35,12 @@ allowed-tools: Bash(find .claude/*) Bash(wc -l*) Bash(grep*)
 - [ ] Seção "Processo" ou "Fluxo de Execução" presente
 - [ ] Sem duplicação de nome
 
-### Validação de Fleet (`docs/meta-specs/commands.md` §10)
-Para comandos/skills de orquestração de frota:
+### Validação de Orquestração (`docs/meta-specs/commands.md` §10)
+Para comandos/skills de orquestração de subagentes:
 - [ ] Orquestração reside em skill/comando, **nunca** em agente (architecture.md §4.2)
 - [ ] Fan-out é **opt-in**, nunca comportamento default (§10.2 regra 1)
 - [ ] Fan-out só com independência real; fan-in/consolidação obrigatório
-- [ ] Frota paraleliza **dentro** de uma fase; não funde workflows faseados canônicos (§10.2 invariante)
+- [ ] A orquestração paraleliza **dentro** de uma fase; não funde workflows faseados canônicos (§10.2 invariante)
 - [ ] Trata falha parcial de worker (`.filter(Boolean)`) e reporta descartes
 - [ ] `isolation:'worktree'` quando há mutação concorrente de arquivos
 - [ ] `budget`/model tiering declarados; verificação adversarial em alto risco

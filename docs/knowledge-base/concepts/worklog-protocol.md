@@ -16,7 +16,7 @@
 
 - [Prompt Caching — Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (jun/2026)
 - [Claude Code — Overview](https://docs.claude.com/en/docs/claude-code/overview) (jun/2026)
-- KBs irmãs (citadas, não duplicadas): [Context Window Optimization](context-window-optimization.md), [Spec-Driven Development](spec-driven-development.md), [Agent Fleet Orchestration](agent-fleet-orchestration.md)
+- KBs irmãs (citadas, não duplicadas): [Context Window Optimization](context-window-optimization.md), [Spec-Driven Development](spec-driven-development.md), [Agent Orchestration](agent-orchestration.md)
 
 ---
 
@@ -151,7 +151,7 @@ Amarre as escritas do worklog aos limites de `/compact` para não perder nada na
 
 ## 8. Enquadramento conceitual
 
-O worklog é uma instância de **Spec-Anchored Development** ([Spec-Driven Development](spec-driven-development.md) §níveis): a spec (objetivo + plano + decisões) é mantida e coevolui com o código — exatamente o loop de checkpoint. Em fases que fazem fan-out (orquestradas pela ferramenta nativa **Workflow**, mai/2026), os workers leem `STATE.md` + um bloco de fase como prefixo cacheável compartilhado com o orquestrador (ver [Agent Fleet Orchestration](agent-fleet-orchestration.md) §caching em frota).
+O worklog é uma instância de **Spec-Anchored Development** ([Spec-Driven Development](spec-driven-development.md) §níveis): a spec (objetivo + plano + decisões) é mantida e coevolui com o código — exatamente o loop de checkpoint. Em fases que fazem fan-out (orquestradas pela ferramenta nativa **Workflow**, mai/2026), os workers leem `STATE.md` + um bloco de fase como prefixo cacheável compartilhado com o orquestrador (ver [Agent Orchestration](agent-orchestration.md) §caching em orquestração).
 
 ---
 

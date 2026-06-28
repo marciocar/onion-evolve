@@ -58,7 +58,7 @@ age com confiança sobre uma realidade que já não existe.
 ### O ponto cego se repete no Onion
 
 A maquinaria de "Manage" **já existe** no Onion (`/meta:kb-freshness`, `/meta:evolve`,
-`inventory.sh` + `lint-artifacts.sh`, skill `onion-fleet`), mas **nenhuma peça toca**
+`inventory.sh` + `lint-artifacts.sh`, skill `onion-orchestration`), mas **nenhuma peça toca**
 `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`. Além disso, os
 três geradores **divergiram** entre si: `build-tech-docs` e `build-business-docs` ganharam
 resolução de evidência conflitante, modo não-interativo e marcadores de status; o
@@ -111,7 +111,7 @@ especialistas com apenas `Read Bash(grep *)`).
 ### Positivas
 - **Nomeia o ponto cego** (Manage) e lhe dá doutrina antes de runtime.
 - **Paridade** elimina a assimetria entre os 3 geradores; o primeiro tick nasce consistente.
-- **Reuso máximo**: o Tijolo 2 herda o molde de `kb-freshness` (verdito, threshold, fleet,
+- **Reuso máximo**: o Tijolo 2 herda o molde de `kb-freshness` (verdito, threshold, orquestração,
   schema) — superfície nova mínima.
 - Corrige um bug latente: `build-compliance-docs` prometia escrever/orquestrar sem as tools.
 
@@ -128,13 +128,13 @@ Construir quando o Tijolo 1 estiver em uso e a primeira drift de contexto aparec
 reimplementa**, o molde de [`/meta:kb-freshness`](../../.claude/commands/meta/kb-freshness.md):
 
 1. **Comando de audit de frescor de contexto** — verdito `CURRENT/STALE/HISTORICAL`, threshold
-   herdado (`≤18 meses`), fan-out via `onion-fleet` (worker haiku → fan-in sonnet), retorno
+   herdado (`≤18 meses`), fan-out via `onion-orchestration` (worker haiku → fan-in sonnet), retorno
    `FreshnessSchema[]`. Cobre `docs/*-context/` como o `kb-freshness` cobre `docs/knowledge-base/`.
 2. **Extensão de validação** — `.claude/validation/inventory.sh` passa a contar `*-context/`
    (hoje só conta `knowledge-base/`); `.claude/validation/lint-artifacts.sh` ganha barreira de
    drift/staleness (hoje Regra 8 = inventory sync, Regra 6 = kebab-case SOFT; nenhuma checa frescor).
 3. **Composição no `/meta:evolve`** — nova dimensão **no fluxo principal**, como D4/D5 hoje delegam
-   a `kb-freshness`/`metaspec-validate` sem aninhar frota dentro de frota.
+   a `kb-freshness`/`metaspec-validate` sem aninhar orquestração dentro de orquestração.
 
 ---
 

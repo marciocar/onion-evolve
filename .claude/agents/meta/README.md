@@ -13,8 +13,8 @@ Agentes que **constroem e governam o próprio Sistema Onion**: criam comandos, a
 | [`@metaspec-gate-keeper`](metaspec-gate-keeper.md) | Validação de conformidade arquitetural contra as metaspecs | Guardião do DNA: validar alinhamento com metaspecs e integridade de contexto antes do PR |
 
 ## 🔗 Relacionados
-- Comandos que delegam a esta frota: [`/meta:create-agent`](../../commands/meta/create-agent.md), [`/meta:create-agent-express`](../../commands/meta/create-agent-express.md), [`/meta:create-command`](../../commands/meta/create-command.md), [`/meta:create-skill`](../../commands/meta/create-skill.md), [`/engineer:pre-pr`](../../commands/engineer/pre-pr.md) (aciona `@metaspec-gate-keeper`)
+- Comandos que delegam a esta orquestração: [`/meta:create-agent`](../../commands/meta/create-agent.md), [`/meta:create-agent-express`](../../commands/meta/create-agent-express.md), [`/meta:create-command`](../../commands/meta/create-command.md), [`/meta:create-skill`](../../commands/meta/create-skill.md), [`/engineer:pre-pr`](../../commands/engineer/pre-pr.md) (aciona `@metaspec-gate-keeper`)
 - Índice da categoria de comandos: [`meta/` commands](../../commands/meta/README.md)
-- Skills do core: [`.claude/skills/`](../../skills/) (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-fleet`)
+- Skills do core: [`.claude/skills/`](../../skills/) (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`)
 - Metaspecs (constituição L0): [`docs/meta-specs/`](../../../docs/meta-specs/)
 - Inventário canônico: [`docs/onion/inventory.md`](../../../docs/onion/inventory.md)

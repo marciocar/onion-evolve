@@ -134,7 +134,7 @@ A reescrita de paths foi implementada **manifesto-dirigida no assembler** (SSOT-
 artefato transformado):
 - **Mapa derivado do manifesto:** refs a componentes BUNDLADOS (`UTILS`/`VALIDATION`/`TEMPLATES`) →
   `${CLAUDE_PLUGIN_ROOT}/...`. Cirúrgico: `docs/*-context/` (camada 2) e soft-deps
-  (`@metaspec-gate-keeper`, `onion-fleet`) **não** entram no mapa → ficam intactas.
+  (`@metaspec-gate-keeper`, `onion-orchestration`) **não** entram no mapa → ficam intactas.
 - **Novo componente `TEMPLATES`:** bundla `compliance-context-template.md` → `templates/` + ref reescrita.
 - **Scripts portáveis:** as cópias do plugin têm `PROJECT="${1:-$(pwd)}"` (default = cwd do consumidor);
   os scripts-core seguem `${REPO_ROOT}` (intactos).
@@ -146,10 +146,10 @@ artefato transformado):
   substituir confiável — a reescrita é a forma portável best-effort; em conteúdo de agent + scripts
   funciona. Verificação viva (`/plugin install`) confirma o elo de command-markdown.
 
-### Achado pré-existente — ✅ RESOLVIDO via frota (2026-06-27)
+### Achado pré-existente — ✅ RESOLVIDO via orquestração (2026-06-27)
 
 Os agentes de compliance citavam `compliance_iso27001_template.md`, `_iso22301_`, `_soc2_`, `_pmbok_` que
-**não existiam no core** (refs penduradas). Resolvido por **frota** (`Workflow`, 4 workers-especialistas em
+**não existiam no core** (refs penduradas). Resolvido por **orquestração** (`Workflow`, 4 workers-especialistas em
 paralelo — 1 por framework, outputs disjuntos): cada especialista autorou seu template (392–557 linhas,
 dialeto-puro/REGRA 13), gravado em `commands/common/templates/`. Agora: refs resolvem no core (arquivos
 existem) e, no plugin, viram `${CLAUDE_PLUGIN_ROOT}/templates/` (via os 4 adicionados ao `TEMPLATES` do

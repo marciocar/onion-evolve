@@ -1,7 +1,7 @@
-# Fallback Serial da Frota
+# Fallback Serial da Orquestração
 
-Fragmento canônico de degradação da camada de frota. Referenciado por
-`/meta:fleet`, skill `onion-fleet` e `/engineer:pre-pr` — **não duplique**
+Fragmento canônico de degradação da camada de orquestração. Referenciado por
+`/meta:orchestrate`, skill `onion-orchestration` e `/engineer:pre-pr` — **não duplique**
 esta lógica em cada consumidor; inclua apenas um backlink para este arquivo.
 
 ---
@@ -28,7 +28,7 @@ Ao detectar substrato indisponível, **antes de processar qualquer item**,
 informe o usuário em pt-BR:
 
 ```
-⚠️ **Substrato de frota indisponível**
+⚠️ **Substrato de orquestração indisponível**
 
 A ferramenta nativa Workflow não está acessível neste ambiente.
 O trabalho seguirá de forma **serial** (um item por vez) — o resultado
@@ -117,7 +117,7 @@ deve depender do substrato usado.
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔄 FROTA SERIAL (fallback)
+🔄 ORQUESTRAÇÃO SERIAL (fallback)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ▶ Tarefa: <descrição>
@@ -150,7 +150,7 @@ deve depender do substrato usado.
 
 ## 🔗 Consumidores deste fragmento
 
-- `/meta:fleet` — Passo 0 e seção "Fallback serial" (`commands/meta/fleet.md`)
-- `onion-fleet` — seção "Resiliência" (`.claude/skills/onion-fleet/SKILL.md`)
+- `/meta:orchestrate` — Passo 0 e seção "Fallback serial" (`commands/meta/orchestrate.md`)
+- `onion-orchestration` — seção "Resiliência" (`.claude/skills/onion-orchestration/SKILL.md`)
 - `/engineer:pre-pr` — nota "Fallback sequencial" na seção de fan-out
   (`commands/engineer/pre-pr.md`)

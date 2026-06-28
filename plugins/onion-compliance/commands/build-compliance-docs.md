@@ -92,9 +92,9 @@ propagar a contradição para a documentação gerada.
 
 ### Passo 3: Delegar para Especialistas (Fan-Out Paralelo)
 
-Os 4 especialistas são **independentes entre si** — sem dependência de ordem. Despachá-los em **paralelo** via frota (pattern `fan-out-and-synthesize`).
+Os 4 especialistas são **independentes entre si** — sem dependência de ordem. Despachá-los em **paralelo** via orquestração (pattern `fan-out-and-synthesize`).
 
-Use `/meta:fleet` ou a skill `onion-fleet` para despachar em paralelo:
+Use `/meta:orchestrate` ou a skill `onion-orchestration` para despachar em paralelo:
 
 ```
 PARALELO (todos ao mesmo tempo, sem esperar o anterior):

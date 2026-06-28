@@ -42,7 +42,7 @@ note: "2026-06-15 é RETIDO (não removido) — virou âncora de citação dos m
 | 3 | 🟡 | D6 | `agent-template.md:176-178` **propagador MCP-first** ("potencializado com MCPs"; comentário classifica por presença de MCP) — todo agente novo herda | API-first (propagador) | S | editar template (fonte) |
 | 4 | 🟡 | D6 | `agent-creator-specialist.md` campo inventado `mcp_servers:` em 4 templates (`:395,613,1076,1093`) — hardcoda nomes de MCP server; fora do schema canônico | API-first (propagador) | S | editar (gate-keeper) |
 | 5 | 🟡 | D5 | `agent-creator-specialist.md:1058` Template 2 `related_commands:["/compliance/generate"]` — comando+categoria fantasma (cluster do #1) | meta-spec / phantom | S | editar → comando real (`/docs:build-compliance-docs`) |
-| 6 | 🟡 | D6 | `command-creator-specialist.md:409` ensina só "Orquestração Sequencial"; sem Pattern 1 de **fan-out (Workflow)** para passos independentes | Workflow fan-out vs prosa | M | editar → add Pattern 1 citando `agent-fleet-orchestration.md` |
+| 6 | 🟡 | D6 | `command-creator-specialist.md:409` ensina só "Orquestração Sequencial"; sem Pattern 1 de **fan-out (Workflow)** para passos independentes | Workflow fan-out vs prosa | M | editar → add Pattern 1 citando `agent-orchestration.md` |
 | 7 | 🟡 | D4 | `spec-driven-development-tools-2025.md:17` flag "revalidar antes de citar" **não honrado** (conteúdo parado em 2025-12-16; só o campo Status mudou no commit ed4c6a6) | kb-freshness (date-gate desonesto) | M | `/meta:kb-freshness` |
 | 8 | 🟡 | D4 | `spec-driven-development.md:14` flag "revalidar periodicamente" não honrado desde 2025-12-02 | kb-freshness | M | `/meta:kb-freshness` |
 | 9 | 🟡 | D7 | `onion-federation-design-v2-2026-06.md:5,13` **links mortos p/ v1** (removido no #53). **CORRIGIDO vs worker:** `:5` é ponteiro `Supersede:` — **delink** ambos, **não** repointar p/ v2 (auto-referência). **(juiz refutou o fix do worker)** | reparar link (delink) | S | editar → delink `:5` e `:13` |
@@ -56,7 +56,7 @@ note: "2026-06-15 é RETIDO (não removido) — virou âncora de citação dos m
 | # | Dim | Achado | Esf. | Comando |
 |---|-----|--------|------|---------|
 | 14 | D6 | `agent-skills-specialist.md:103` resíduo **multi-IDE** (".agents/skills p/ Cursor/VS Code") — abandonado em 2026-05-18 (`architecture.md §5/§7`) | S | editar |
-| 15 | D4 | `context-window-optimization.md:40-53` versões fixas de modelo sem disclaimer evergreen → referenciar SSOT `agent-fleet-orchestration.md §lineup` ([[prefer-evergreen-model-references]]) | S | editar |
+| 15 | D4 | `context-window-optimization.md:40-53` versões fixas de modelo sem disclaimer evergreen → referenciar SSOT `agent-orchestration.md §lineup` ([[prefer-evergreen-model-references]]) | S | editar |
 | 16 | D4 | `identificar-precificar-dor-cliente.md` + `branding-posicionamento-marca.md` sem `date` em frontmatter (auditoria automática cega) | S | editar |
 | 17 | D2 | `agent-creator-specialist.md:838-1132` (~294 linhas inline: matriz/anti-patterns/templates) sem KB paralela — `command-creator` já tem a sua | M | `/meta:create-knowledge-base` |
 | 18 | D2 | `command-creator-specialist.md:926-956,1010-1018` duplica inline o que já está na sua KB | S | editar → referenciar KB |

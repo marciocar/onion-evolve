@@ -8,7 +8,7 @@
 |-------|-------|
 | **Versão** | 1.1.0 |
 | **Data de Criação** | 2025-11-24 |
-| **Última Atualização** | 2026-06-13 (refresh frota de agentes) |
+| **Última Atualização** | 2026-06-13 (refresh orquestração de subagentes) |
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Design de Agentes |
 
@@ -17,7 +17,7 @@
 **Substrato nativo (Claude Code, 2026):**
 
 - [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code) — ferramenta Workflow (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`), research preview (28/mai/2026)
-- [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — relatório sobre doutrina de orquestração de frota
+- [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — relatório sobre doutrina de orquestração
 - Padrões canônicos de orquestração da Anthropic (2026)
 - Práticas do Sistema Onion
 
@@ -33,7 +33,7 @@
 
 Este documento define patterns de design para agentes de IA, focando em arquitetura, especialização, delegação e orquestração para sistemas multi-agente eficientes.
 
-> **Atualização 2026-06-13**: a orquestração multi-agente deixou de ser conceitual e passou a assentar sobre primitivas **nativas do Claude Code** — a ferramenta **Workflow** (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`). A seção de orquestração foi reescrita para refletir esse substrato. Para o aprofundamento operacional de **frota** (até 16 subagentes concorrentes, 1.000 agregados por run, custo e tiers), consulte a KB irmã [`agent-fleet-orchestration.md`](agent-fleet-orchestration.md).
+> **Atualização 2026-06-13**: a orquestração multi-agente deixou de ser conceitual e passou a assentar sobre primitivas **nativas do Claude Code** — a ferramenta **Workflow** (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`). A seção de orquestração foi reescrita para refletir esse substrato. Para o aprofundamento operacional de **orquestração** (até 16 subagentes concorrentes, 1.000 agregados por run, custo e tiers), consulte a KB irmã [`agent-orchestration.md`](agent-orchestration.md).
 
 ### Definição de Agente
 
@@ -178,7 +178,7 @@ const report = await agent(
 );
 ```
 
-> **Onde mora a orquestração:** na arquitetura do Onion (architecture.md §4.2), `agents/*` **NÃO pode** invocar `commands/*` — um agente sugere, não orquestra. Quem orquestra frota é **skill + comando** (`skills/* → commands/*, agents/*`). Portanto, **nunca** crie um agente `fleet-orchestrator`; a coordenação de frota vive no **nível principal** (skill/comando), onde é mais barata e limpa.
+> **Onde mora a orquestração:** na arquitetura do Onion (architecture.md §4.2), `agents/*` **NÃO pode** invocar `commands/*` — um agente sugere, não orquestra. Quem orquestra os workers é **skill + comando** (`skills/* → commands/*, agents/*`). Portanto, **nunca** crie um agente `worker-orchestrator`; a coordenação dos workers vive no **nível principal** (skill/comando), onde é mais barata e limpa.
 
 ---
 
@@ -216,7 +216,7 @@ A ferramenta Workflow permite fixar o modelo por chamada de `agent(...)`, então
 
 Desde **10/jun/2026 (v2.1.172)**, subagentes podem aninhar **até 5 níveis** de profundidade — antes, o fan-out era de nível único.
 
-Mesmo com nesting disponível, a recomendação permanece: **orquestrar no nível principal** (skill/comando), não dentro de um subagente. Coordenar frota a partir do nível principal é mais barato (coordenação JS = 0 tokens) e mais limpo (respeita a regra `agents/* ↛ commands/*`). Reserve o nesting profundo para sub-decomposições legítimas, não para esconder a orquestração dentro de um agente.
+Mesmo com nesting disponível, a recomendação permanece: **orquestrar no nível principal** (skill/comando), não dentro de um subagente. Coordenar a orquestração a partir do nível principal é mais barato (coordenação JS = 0 tokens) e mais limpo (respeita a regra `agents/* ↛ commands/*`). Reserve o nesting profundo para sub-decomposições legítimas, não para esconder a orquestração dentro de um agente.
 
 ---
 
@@ -627,7 +627,7 @@ Faça o que achar melhor.
 ## 📚 Recursos Adicionais
 
 ### Internos (Sistema Onion)
-- [Agent Fleet Orchestration](agent-fleet-orchestration.md) - **KB irmã**: aprofundamento operacional de frota (Workflow nativo, tiers, custo, isolamento)
+- [Agent Orchestration](agent-orchestration.md) - **KB irmã**: aprofundamento operacional de orquestração (Workflow nativo, tiers, custo, isolamento)
 - [Specification-Driven AI Abstraction Layer](specification-driven-ai-abstraction-layer.md) - Padrão para abstrações documentais
 - [Task Manager Abstraction](task-manager-abstraction.md) - Implementação de referência do SDAAL
 - [Spec-as-Code Strategy](spec-as-code-strategy.md) - Metodologia de especificações

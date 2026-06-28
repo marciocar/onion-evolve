@@ -1,5 +1,5 @@
 ---
-title: "A2A/federação — reconciliação do sinal externo com a doutrina (já adjudicada) + fechamento do radar de frota"
+title: "A2A/federação — reconciliação do sinal externo com a doutrina (já adjudicada) + fechamento do radar de orquestração"
 date: 2026-06-21
 type: analysis
 status: proposed / living
@@ -10,7 +10,7 @@ next-review-trigger: "se o gatilho do ADR A2A disparar (1º consumer não-Onion 
 relates:
   - ./onion-federation-adr-a2a-format-interop-2026-06.md
   - ./onion-adr-comms-transport-vs-execution-2026-06.md
-  - ./onion-fleet-external-radar-2026-06.md
+  - ./onion-orchestration-external-radar-2026-06.md
   - ../evolution/rfc/rfc-0001-co-evolution-comms.md
   - ../knowledge-base/concepts/multi-repo-federation.md
 ---
@@ -19,7 +19,7 @@ relates:
 
 > **Natureza:** nota de **leitura-de-sinal**, não de doutrina. A decisão A2A já existe e é canônica —
 > esta nota **defere** a ela e apenas reconcilia o que a conversa externa trouxe. Aprofunda o item 🟡
-> A2A do [radar de frota](./onion-fleet-external-radar-2026-06.md) e o **fecha** (3º/último eixo).
+> A2A do [radar de orquestração](./onion-orchestration-external-radar-2026-06.md) e o **fecha** (3º/último eixo).
 
 ## 1. O eixo já está adjudicado (SSOT)
 
@@ -60,7 +60,7 @@ Hoje há **um** consumidor (`rhilo-metagamify`), que é **Onion** — logo o gat
 A projeção de formato é "🟢 oportunística no backlog", não dívida; **construí-la antes do gatilho seria
 especulação**. Nada a fazer neste eixo agora.
 
-## 5. Síntese — fechamento do radar de frota (3 eixos percorridos)
+## 5. Síntese — fechamento do radar de orquestração (3 eixos percorridos)
 
 | Eixo | Veredito após aprofundar | Artefato |
 |---|---|---|
@@ -84,4 +84,4 @@ quando algum gatilho disparar.
 
 - **SSOT da decisão:** [ADR — A2A como projeção de formato, não runtime](./onion-federation-adr-a2a-format-interop-2026-06.md) (aceito 2026-06-15).
 - **Complementos:** [RFC-0001](../evolution/rfc/rfc-0001-co-evolution-comms.md) (git-async > A2A-runtime), [ADR comms](./onion-adr-comms-transport-vs-execution-2026-06.md) (A2A ortogonal ao risco), [KB multi-repo-federation](../knowledge-base/concepts/multi-repo-federation.md) §7, design de federação v2 (Fase 5 abandonada).
-- **Sinal:** conversa externa (share `claude.ai/share/332f6246…`) — ver [radar](./onion-fleet-external-radar-2026-06.md) §2.
+- **Sinal:** conversa externa (share `claude.ai/share/332f6246…`) — ver [radar](./onion-orchestration-external-radar-2026-06.md) §2.

@@ -106,7 +106,7 @@ tem o framework Onion (a *fonte*); o alvo é o argumento `<path|git-url>`.
 - **A — CLI standalone (`onion adopt`) ❌.** *Pró:* familiar. *Contra:* **viola `architecture.md §5/§7`**
   (abandonado em 2026-05-18); recria a expectativa de produto/binário que o Onion não é. Rejeitada.
 - **B — Comando faseado in-platform ✅ ESCOLHIDA.** *Pró:* coerente com a plataforma única; reusa a
-  frota; retomável. *Contra:* exige sessão Claude Code com o framework à mão (não é "double-click").
+  orquestração; retomável. *Contra:* exige sessão Claude Code com o framework à mão (não é "double-click").
 - **C — Operar in-place (additional working dir) ✅ (complementar).** *Pró:* rampa leve, zero
   instalação, ótimo para análise one-off. *Contra:* não "Onion-iza" o repo (controle efêmero). Adotada
   como **modo**, não como substituto de B.

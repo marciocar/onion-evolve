@@ -26,7 +26,7 @@
 
 Este documento consolida as melhores práticas para criação e uso de comandos personalizados no Claude Code, focando em eficiência, manutenibilidade e integração com sistemas de IA.
 
-> **Refresh 2026-06-13 (v1.1.0)**: além das práticas de comandos individuais, esta KB agora cobre o substrato nativo de orquestração de frota — a ferramenta **Workflow** (Dynamic Workflows, research preview de 28/mai/2026), a ferramenta **Agent** (subagente único, com nesting até 5 níveis desde 10/jun/2026) e o papel das **Skills** como ponto de orquestração no nível principal. O lineup de modelos vigente é **Fable 5, Opus 4.8, Sonnet 4.6 e Haiku 4.5**.
+> **Refresh 2026-06-13 (v1.1.0)**: além das práticas de comandos individuais, esta KB agora cobre o substrato nativo de orquestração — a ferramenta **Workflow** (Dynamic Workflows, research preview de 28/mai/2026), a ferramenta **Agent** (subagente único, com nesting até 5 níveis desde 10/jun/2026) e o papel das **Skills** como ponto de orquestração no nível principal. O lineup de modelos vigente é **Fable 5, Opus 4.8, Sonnet 4.6 e Haiku 4.5**.
 
 ---
 
@@ -171,13 +171,13 @@ Fornecem contexto adicional e ferramentas para o modelo.
 
 ---
 
-## 🚢 Orquestração de Frota (Claude Code 2026)
+## 🚢 Orquestração (Claude Code 2026)
 
-A partir de meados de 2026, o Claude Code traz orquestração de frota **nativa**. Em vez de descrever delegação em prosa e disparar subagentes um a um de forma manual e sequencial, o desenvolvedor declara a topologia da frota em código e a engine executa o fan-out, a sincronização e a validação por você.
+A partir de meados de 2026, o Claude Code traz orquestração **nativa**. Em vez de descrever delegação em prosa e disparar subagentes um a um de forma manual e sequencial, o desenvolvedor declara a topologia da orquestração em código e a engine executa o fan-out, a sincronização e a validação por você.
 
 ### Ferramenta Workflow (Dynamic Workflows, 28/mai/2026)
 
-A ferramenta **Workflow** (research preview, lançada em 28/mai/2026) é o substrato nativo de orquestração de frota no Claude Code. A coordenação roda em **JavaScript** e custa **0 tokens de modelo** — só os subagentes consomem tokens. Isso torna topologias complexas baratas e determinísticas.
+A ferramenta **Workflow** (research preview, lançada em 28/mai/2026) é o substrato nativo de orquestração no Claude Code. A coordenação roda em **JavaScript** e custa **0 tokens de modelo** — só os subagentes consomem tokens. Isso torna topologias complexas baratas e determinísticas.
 
 Primitivas expostas:
 
@@ -229,23 +229,23 @@ Contraste prático:
 
 | Aspecto | Ferramenta **Agent** | Ferramenta **Workflow** |
 |---------|----------------------|--------------------------|
-| Cardinalidade | 1 subagente por chamada | Frota (até 16 concorrentes / 1.000 agregados) |
+| Cardinalidade | 1 subagente por chamada | Workers (até 16 concorrentes / 1.000 agregados) |
 | Concorrência | Sequencial (uma chamada por vez) | Fan-out paralelo nativo (`parallel`) |
 | Coordenação | Implícita no modelo (consome tokens) | JavaScript (0 tokens de modelo) |
 | Isolamento / budget / schema | Manual | Declarativo (`isolation`, `budget`, `schema`) |
 | Quando usar | Delegar uma tarefa pontual | Distribuir/sincronizar trabalho em escala |
 
-Regra de ouro: orquestração de frota é **mais barata e mais limpa no nível principal** (skill/comando), não dentro de um subagente. Use `Agent` quando precisa de uma delegação única; use `Workflow` quando precisa de paralelismo, barreiras ou pipelines.
+Regra de ouro: orquestração é **mais barata e mais limpa no nível principal** (skill/comando), não dentro de um subagente. Use `Agent` quando precisa de uma delegação única; use `Workflow` quando precisa de paralelismo, barreiras ou pipelines.
 
 ### Skills como ponto de orquestração
 
-No nível principal, **Skills** são o lugar canônico para orquestrar frotas. Uma skill pode invocar comandos e agentes e, portanto, hospedar a lógica de `Workflow`/`Agent`. No Sistema Onion (framework template em `.claude/` sobre Claude Code), a arquitetura (architecture.md §4.2) **proíbe** `agents/* → commands/*` — um agente **sugere**, mas não invoca um comando. Skills, por outro lado, **podem orquestrar** (`skills/* → commands/*, agents/*`).
+No nível principal, **Skills** são o lugar canônico para orquestrar workers. Uma skill pode invocar comandos e agentes e, portanto, hospedar a lógica de `Workflow`/`Agent`. No Sistema Onion (framework template em `.claude/` sobre Claude Code), a arquitetura (architecture.md §4.2) **proíbe** `agents/* → commands/*` — um agente **sugere**, mas não invoca um comando. Skills, por outro lado, **podem orquestrar** (`skills/* → commands/*, agents/*`).
 
-Consequência direta: a orquestração de frota mora em **SKILL + COMANDO**, nunca em um agente. **Não** crie um agente do tipo `fleet-orchestrator` — ele seria incapaz de invocar comandos e violaria a §4.2.
+Consequência direta: a orquestração mora em **SKILL + COMANDO**, nunca em um agente. **Não** crie um agente do tipo `worker-orchestrator` — ele seria incapaz de invocar comandos e violaria a §4.2.
 
 ### Observabilidade: Agent View (GA mai/2026)
 
-Com frotas rodando em paralelo, a visibilidade de cada sessão é essencial. O **Agent View** (GA desde mai/2026) oferece observabilidade de sessões paralelas — acompanhar o que cada subagente está fazendo, custo por sessão e estado da frota em tempo real. Superfícies relacionadas: **Managed Agents** (beta, abr/2026) e **Routines** (research preview, mai/2026).
+Com workers rodando em paralelo, a visibilidade de cada sessão é essencial. O **Agent View** (GA desde mai/2026) oferece observabilidade de sessões paralelas — acompanhar o que cada subagente está fazendo, custo por sessão e estado da orquestração em tempo real. Superfícies relacionadas: **Managed Agents** (beta, abr/2026) e **Routines** (research preview, mai/2026).
 
 ---
 
@@ -327,7 +327,7 @@ crie um componente similar para Card.
 4. Retornar output
 ```
 
-**Paralelismo nativo via Workflow** (recomendado a partir de 2026) — quando o trabalho se divide em itens independentes, declare a frota e deixe a engine fazer o fan-out e a barreira. A coordenação roda em JavaScript (0 tokens) e o `schema` valida cada saída:
+**Paralelismo nativo via Workflow** (recomendado a partir de 2026) — quando o trabalho se divide em itens independentes, declare a orquestração e deixe a engine fazer o fan-out e a barreira. A coordenação roda em JavaScript (0 tokens) e o `schema` valida cada saída:
 
 ```javascript
 // Em vez de N delegações sequenciais ao @agente-especialista,

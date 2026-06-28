@@ -10,7 +10,10 @@ actors:
     label: "Maestro (humano) — decide, aprova, dá apetite, faz o gate"
   - id: assistant
     class: Actor/Assistant
-    label: "Assistant (Claude) — executa, propõe, valida, orquestra a frota"
+    label: "Assistant (Claude) — executa/propõe/valida; evolui o framework (orquestração-de-evolução) e rege os workers (orquestração-de-workers)"
+  - id: subagent
+    class: Actor/Specialist-agent
+    label: "Subagente (worker) — executa uma subtarefa sob o lead, no canal de orquestração"
   - id: onion
     class: Actor/Framework
     label: "Onion — provê capacidades, serve o maestro, evolui via dogfood"
@@ -31,14 +34,17 @@ channels:
   - id: federation-ledger
     class: Channel
     label: "Federation ledger (CHANGELOG + contratos)"
-  - id: frota
+  - id: orchestration
     class: Channel
-    label: "Frota (SendMessage / Workflow) — orquestração de subagentes"
+    label: "Orquestração (Workflow / SendMessage) — canal da orquestração-de-workers (intra-repo, síncrona): lead → subagentes"
 
 # Triplas: subject | predicate | object | via (canal, opcional)
+# Dois domínios de orquestração (ver TBox §"Dois domínios de orquestração"):
+#   - orquestração-DE-EVOLUÇÃO  (cross-repo/assíncrona): maestro rege o assistant; assistant evolui o onion.
+#   - orquestração-DE-WORKERS   (intra-repo/síncrona):   assistant (lead) rege subagentes pelo canal de orquestração.
 edges:
   # papel
-  - { s: maestro,   p: orchestrates, o: assistant }
+  - { s: maestro,   p: orchestrates, o: assistant }   # orquestração-de-evolução (regência geral do trabalho)
   - { s: assistant, p: executes,     o: onion }
   - { s: assistant, p: evolves,      o: onion }
   - { s: onion,     p: serves,       o: maestro }
@@ -52,6 +58,6 @@ edges:
   - { s: assistant, p: proposes,  o: maestro,   via: conversa-plan-gate }
   - { s: assistant, p: reports,   o: maestro,   via: conversa-plan-gate }
   - { s: assistant, p: asks,      o: maestro,   via: conversa-plan-gate }
-  - { s: assistant, p: delegates, o: frota,     via: frota }
+  - { s: assistant, p: orchestrates-workers, o: subagent, via: orchestration }   # orquestração-de-workers (lead → workers; o canal é o por-onde, não o objeto)
   - { s: core,      p: announces, o: adopter,   via: doc-bridge }
   - { s: adopter,   p: signals,   o: core,      via: doc-bridge }

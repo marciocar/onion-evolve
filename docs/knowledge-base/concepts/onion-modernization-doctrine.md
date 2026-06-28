@@ -14,7 +14,7 @@
 | **Última Atualização** | 2026-06-13 |
 | **Categoria** | Conceitos |
 | **Comando relacionado** | `/meta:evolve` (sensor que aplica esta doutrina) |
-| **Padrão-pai** | [SDAAL](specification-driven-ai-abstraction-layer.md) · [Agent Fleet Orchestration](agent-fleet-orchestration.md) |
+| **Padrão-pai** | [SDAAL](specification-driven-ai-abstraction-layer.md) · [Agent Orchestration](agent-orchestration.md) |
 
 ---
 
@@ -43,8 +43,8 @@ Qualquer proposta de modernização é **rejeitada** se ferir:
 |---|---|---|
 | **Consolidar vs manter** N artefatos similares | **Consolidar** se: mesma intenção + sem estado faseado + sem nome canônico distinto por categoria. **MANTER** se são fases de `engineer/*`/`product/*` (valor de design, não duplicação — [commands.md §3](../../meta-specs/commands.md)) ou duplicação de nome legítima por categoria ([commands.md §4.1](../../meta-specs/commands.md)). | ✅ fases nunca fundidas |
 | **Verbos de um fluxo** (N arquivos/subpastas para start/publish/finish do mesmo fluxo) | **Dispatcher arg-driven** (`/git:flow <tipo> <ação>`) quando os verbos **não** têm estado faseado retomável e a lógica canônica vive numa KB citável. Colapsa N arquivos + subpastas em 1 ([commands.md §4.2](../../meta-specs/commands.md)). **NÃO** aplicar a `engineer/*`/`product/*` (faseados = invariante). | ✅ só verbos sem estado retomável |
-| **Extrair SDAAL adapter vs KB vs Skill** | **Adapter (SDAAL)** quando há N *provedores intercambiáveis* atrás de uma interface (Task Manager, Forge, Notificação) — código agnóstico, troca por `.env` sem tocar comandos. **KB** quando é *conhecimento de fundo* consumido por leitura (doutrina, padrões, fontes, templates de workflow). **Skill** quando é *orquestração reutilizável* no contexto principal (`onion-fleet`). | n/a |
-| **Workflow fan-out vs prosa sequencial** | **Fan-out** (`Workflow` nativo) se largura × independência alta E sem estado mutável compartilhado. **Sequencial / `pipeline`** se há dependência de ordem. **Default = serial** — fan-out é opt-in ([commands.md §10](../../meta-specs/commands.md), [agent-fleet-orchestration.md](agent-fleet-orchestration.md)). | ✅ frota paraleliza *dentro* da fase |
+| **Extrair SDAAL adapter vs KB vs Skill** | **Adapter (SDAAL)** quando há N *provedores intercambiáveis* atrás de uma interface (Task Manager, Forge, Notificação) — código agnóstico, troca por `.env` sem tocar comandos. **KB** quando é *conhecimento de fundo* consumido por leitura (doutrina, padrões, fontes, templates de workflow). **Skill** quando é *orquestração reutilizável* no contexto principal (`onion-orchestration`). | n/a |
+| **Workflow fan-out vs prosa sequencial** | **Fan-out** (`Workflow` nativo) se largura × independência alta E sem estado mutável compartilhado. **Sequencial / `pipeline`** se há dependência de ordem. **Default = serial** — fan-out é opt-in ([commands.md §10](../../meta-specs/commands.md), [agent-orchestration.md](agent-orchestration.md)). | ✅ orquestração paraleliza *dentro* da fase |
 | **Shed ceremony → KB** | Boilerplate, troubleshooting exaustivo, fundamentos teóricos e exemplos longos saem do comando/agente e vão para a KB; o comando mantém só o **grafo executável** que cita a KB ([commands.md §5/§6](../../meta-specs/commands.md)). | n/a |
 | **Reposicionar agente "detentor de conhecimento"** | Se um agente é re-delegado N vezes por comandos para fornecer *conhecimento* (não execução), extraia o conhecimento para uma **KB citável** e reposicione o agente como **mentor ad-hoc**. Comandos citam a KB; param de re-delegar. | ✅ remove acoplamento command→agent desnecessário |
 | **Inventário/contagem (comandos, agentes, skills, KBs)** | **Nunca hardcode** contagens duplicadas em prosa — elas entropizam a cada recurso criado. O inventário é **derivado do filesystem** (SSOT em `docs/onion/inventory.md`, gerado por `/meta:inventory`) e **validado no CI** (lint Regra 8 + 9). Docs **referenciam** a SSOT; não a repetem. Drift detectado → o atuador é `/meta:inventory`, não edição manual. | ✅ drift vira erro de CI, não dívida silenciosa |
@@ -82,7 +82,7 @@ frontmatter (description, allowed-tools escopado, model, version)
 ## Fluxo (etapas EXECUTÁVEIS, cada uma citando a fonte):
    - lógica de domínio → cita a KB (motor)
    - integração trocável → chama o adapter (SDAAL)
-   - orquestração paralela → aciona a skill (onion-fleet)
+   - orquestração paralela → aciona a skill (onion-orchestration)
 ## Referências (KB + adapters + mentor)
 ```
 
@@ -145,7 +145,7 @@ A serem modernizados em iterações seguintes aplicando esta doutrina (cada um e
 
 - Irmã: [Doutrina de Dogfooding do Onion](onion-dogfooding-doctrine.md) — modernização decide *o que* refatorar; dogfooding prova que funcionou (rodar de verdade → aprender → resolver)
 - [SDAAL — padrão de adapter](specification-driven-ai-abstraction-layer.md)
-- [Agent Fleet Orchestration — 6 padrões canônicos](agent-fleet-orchestration.md)
+- [Agent Orchestration — 6 padrões canônicos](agent-orchestration.md)
 - Meta-specs (constituição): [commands.md](../../meta-specs/commands.md) · [architecture.md](../../meta-specs/architecture.md) · [integrations.md](../../meta-specs/integrations.md)
 - [Baseline de V&V — jun/2026](../../analysis/onion-vv-baseline-2026-06.md) (auditoria manual que `/meta:evolve` automatiza)
 - Adapters de referência: [`utils/task-manager/`](../../../.claude/utils/task-manager/README.md) · [`utils/forge/`](../../../.claude/utils/forge/README.md)

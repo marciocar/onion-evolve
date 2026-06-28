@@ -31,7 +31,7 @@ docs/knowledge-base/
 ## 🧠 Conceitos Fundamentais (20)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
-- [Agent Fleet Orchestration](concepts/agent-fleet-orchestration.md) — orquestração de frota: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
+- [Agent Orchestration](concepts/agent-orchestration.md) — orquestração de subagentes: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
 - [AI Agent Design Patterns](concepts/ai-agent-design-patterns.md) — padrões de design para agentes IA
 - [Branding e Posicionamento](concepts/branding-posicionamento-marca.md) — estratégias de marca
 - [Configuration Management](concepts/configuration-management.md) — gestão de configurações e secrets

@@ -11,7 +11,7 @@ fontes:
   - docs/analysis/onion-agent-teams-evaluation-2026-06.md
   - docs/analysis/onion-federation-design-v2-2026-06.md
   - docs/onion/getting-started.md
-  - docs/knowledge-base/concepts/agent-fleet-orchestration.md
+  - docs/knowledge-base/concepts/agent-orchestration.md
   - docs/knowledge-base/concepts/task-manager-abstraction.md
   - docs/knowledge-base/concepts/multi-repo-federation.md
 ---
@@ -48,7 +48,7 @@ O Sistema Onion é um **framework template instalável em `.claude/`** que orque
 
 **Camada 2 — Agentes (.claude/agents/):** 49 especialistas de IA em 9 categorias (development, product, git, meta, compliance, testing, review, research, deployment). Agentes sabem *fazer* — são convocados pelos comandos ou diretamente pelo usuário. `@jira-specialist` faz JQL + ADF, `@metaspec-gate-keeper` valida arquitetura, `@react-developer` escreve componentes.
 
-**Camada 3 — Skills (.claude/skills/):** 5 programas de orquestração de alto nível. `onion-fleet` é o mais poderoso: autora scripts Workflow nativos do Claude Code para fan-out paralelo de agentes, com tiering de modelos (haiku para scan/classificação, sonnet para raciocínio, opus para julgamento adversarial).
+**Camada 3 — Skills (.claude/skills/):** 5 programas de orquestração de alto nível. `onion-orchestration` é o mais poderoso: autora scripts Workflow nativos do Claude Code para fan-out paralelo de agentes, com tiering de modelos (haiku para scan/classificação, sonnet para raciocínio, opus para julgamento adversarial).
 
 **Camada 4 — Abstrações (.claude/utils/):** SDAAL (Service Decoupled Abstraction Adapter Layer) em dois eixos — Task Manager (Jira/ClickUp/Asana/Linear) e Forge (GitHub/GitLab/Bitbucket). Os comandos nunca chamam APIs direto; delegam ao adapter que resolve transporte, formatação e fallback.
 
@@ -82,9 +82,9 @@ O ponto diferenciador: o ciclo é **tri-dimensional e simétrico** — Produto, 
 **Com Onion:** 5 agentes de compliance (iso-27001, iso-22301, soc2, pmbok, security-information-master) integrados ao mesmo ciclo. `/docs:build-compliance-docs` gera documentação de conformidade a partir do estado real do projeto.
 *(Fonte: onion-review-2026-05.md §Top 5 forças — "Cobertura de compliance integrada")*
 
-### Problema 5: Frotas de IA são caras e trabalhosas de montar
+### Problema 5: Orquestração de IA é cara e trabalhosa de montar
 **Sem Onion:** Orquestrar 30 agentes em paralelo exige escrever scripts Workflow complexos manualmente, definir schemas, tierar modelos, lidar com falhas.
-**Com Onion:** A skill `onion-fleet` autora scripts Workflow nativos com tiering automático (haiku/sonnet/opus), barrier + fan-in, verificação adversarial e fallback serial. Um comando `/meta:evolve` dispara 28 agentes em 8 dimensões sem o dev escrever um linha de orquestração.
+**Com Onion:** A skill `onion-orchestration` autora scripts Workflow nativos com tiering automático (haiku/sonnet/opus), barrier + fan-in, verificação adversarial e fallback serial. Um comando `/meta:evolve` dispara 28 agentes em 8 dimensões sem o dev escrever um linha de orquestração.
 *(Fonte: docs/analysis/onion-evolution-2026-06-15.md §0 Sumário — "28 agentes · 1.27M tokens · ~26 min")*
 
 ### Problema 6: Multi-repositório sem coordenação rompe integrações
@@ -94,13 +94,13 @@ O ponto diferenciador: o ciclo é **tri-dimensional e simétrico** — Produto, 
 
 ### Problema 7: O framework envelhece e o dev não percebe
 **Sem Onion:** Documentação e agentes ficam obsoletos silenciosamente. Ninguém audita.
-**Com Onion:** `/meta:evolve` — auto-auditoria periódica em 8 dimensões via frota. Produz backlog priorizado com evidência citada e comando atuador por item. O framework se auto-diagnostica.
+**Com Onion:** `/meta:evolve` — auto-auditoria periódica em 8 dimensões via orquestração. Produz backlog priorizado com evidência citada e comando atuador por item. O framework se auto-diagnostica.
 *(Fonte: docs/analysis/onion-evolution-2026-06-15.md §0 — "30 achados (2🔴·18🟡·10🟢)")*
 
 ### Problema 8: Não há padrão para quando usar paralelismo vs sequencial
 **Sem Onion:** O dev não sabe quando fan-out paralelo é melhor que sessões sequenciais, ou quando Agent Teams agrega sobre Workflow.
-**Com Onion:** KB `agent-fleet-orchestration` documenta os três substratos (sessões faseadas / Workflow / Agent Teams) com tabela de decisão, critérios e fallback gracioso. O padrão é codificado, não deixado à memória do dev.
-*(Fonte: docs/knowledge-base/concepts/agent-fleet-orchestration.md §"Dois Substratos de Orquestração")*
+**Com Onion:** KB `agent-orchestration` documenta os três substratos (sessões faseadas / Workflow / Agent Teams) com tabela de decisão, critérios e fallback gracioso. O padrão é codificado, não deixado à memória do dev.
+*(Fonte: docs/knowledge-base/concepts/agent-orchestration.md §"Dois Substratos de Orquestração")*
 
 ---
 
@@ -113,7 +113,7 @@ O ponto diferenciador: o ciclo é **tri-dimensional e simétrico** — Produto, 
 │                    Claude Code (plataforma)                 │
 ├─────────────────────────────────────────────────────────────┤
 │  SKILLS (.claude/skills/)        ← orquestração de alto nível │
-│    onion · onion-fleet · onion-patterns · language-standards  │
+│    onion · onion-orchestration · onion-patterns · language-standards  │
 ├──────────────────┬──────────────────────────────────────────┤
 │  COMMANDS        │  AGENTS (.claude/agents/)                │
 │  (.claude/       │  49 especialistas em 9 categorias:       │
@@ -189,10 +189,10 @@ O Onion usa SDAAL em duas camadas de integração:
 | SOC2 Type II | `@soc2-specialist` | Controles + coleta de evidências |
 | Validação arquitetural | `@metaspec-gate-keeper` | Conformidade L0/L1+ |
 
-### Orquestração & Frota
+### Orquestração & Workers
 | Capacidade | Mecanismo | Quando usar |
 |------------|-----------|-------------|
-| Fan-out paralelo | Workflow + `onion-fleet` | Auditoria, migração, review amplo |
+| Fan-out paralelo | Workflow + `onion-orchestration` | Auditoria, migração, review amplo |
 | Sessões retomáveis | `.claude/sessions/` + STATE.md | Feature de longa duração |
 | Agent Teams (opt-in) | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` | Negociação peer-a-peer viva |
 | Federation multi-repo | `/meta:federation-*` | Coordenação cross-repo sem quebrar contratos |
@@ -200,7 +200,7 @@ O Onion usa SDAAL em duas camadas de integração:
 ### Meta (Auto-Evolução)
 | Capacidade | Comando |
 |------------|---------|
-| Auto-auditoria | `/meta:evolve` — 8 dimensões, frota, backlog priorizado |
+| Auto-auditoria | `/meta:evolve` — 8 dimensões, orquestração, backlog priorizado |
 | Frescor de KBs | `/meta:kb-freshness` — veredito CURRENT/STALE/HISTORICAL |
 | Criar novo agente | `/meta:create-agent` — contextualizado no ecossistema |
 | Criar novo comando | `/meta:create-command` |
@@ -246,7 +246,7 @@ O Onion usa SDAAL em duas camadas de integração:
 
 ### Case Study 3: Agent Teams — "Decidindo Não Adotar (Com Evidência)"
 
-**Situação:** A Anthropic lança uma feature experimental: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. A pergunta: o Onion deve adotar como padrão? Mudar toda a doutrina de frota?
+**Situação:** A Anthropic lança uma feature experimental: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. A pergunta: o Onion deve adotar como padrão? Mudar toda a doutrina de orquestração?
 
 **O que o Onion fez:**
 1. Smoke-test empírico: TeamCreate → TaskCreate → SendMessage round-trip PASS.
@@ -254,7 +254,7 @@ O Onion usa SDAAL em duas camadas de integração:
 3. Avaliação estruturada: três primitivas mapeadas (sessões faseadas / Workflow / Agent Teams), cada uma com seu nicho, limitações e quando preferir.
 4. ADR documentado com critérios: experimental + gated + acoplado a versão = não virar padrão obrigatório.
 
-**Resultado:** Decisão opt-in/3º modo com detecção de capacidade + fallback gracioso. Os padrões existentes foram mantidos. A decisão foi documentada como ADR e sintetizada na KB de doutrina de frota.
+**Resultado:** Decisão opt-in/3º modo com detecção de capacidade + fallback gracioso. Os padrões existentes foram mantidos. A decisão foi documentada como ADR e sintetizada na KB de doutrina de orquestração.
 
 **Citação:** *"Workflow = orquestração que o orquestrador desenha (a forma é conhecida antes de começar). Agent Teams = coordenação que emerge (os agentes se acertam em runtime)."* — [onion-agent-teams-evaluation-2026-06.md §3]
 
@@ -358,7 +358,7 @@ R: Não. O Onion vive inteiramente em `.claude/` — uma pasta de configuração
 R: Sim, se for Jira, ClickUp, Asana ou Linear. Define `TASK_MANAGER_PROVIDER` no `.env` e o adapter correto assume automaticamente. Para outros providers, o modo `none` permite uso offline.
 
 **P: Precisa de Claude Code pago ou funciona no plano gratuito?**
-R: O Onion usa o Claude Code como plataforma. As frotas de agentes (como `/meta:evolve`) consomem tokens substancialmente — 1.27M tokens numa auditoria completa. Uso moderado funciona em planos menores; frotas pesadas favorecem planos ilimitados.
+R: O Onion usa o Claude Code como plataforma. As orquestrações de subagentes (como `/meta:evolve`) consomem tokens substancialmente — 1.27M tokens numa auditoria completa. Uso moderado funciona em planos menores; orquestrações pesadas favorecem planos ilimitados.
 
 **P: O Onion substitui o GitFlow?**
 R: Não — complementa. Os comandos `/engineer:*` e `/git:*` são orientados pelo motor GitFlow documentado em `gitflow-patterns.md`. O Onion adiciona sessões retomáveis, gates de qualidade automatizados e integração com task manager sobre o GitFlow existente.
@@ -375,7 +375,7 @@ R: Copiar a pasta `.claude/` para o projeto, configurar `.env` com o provider de
 **P: Posso usar só partes do Onion?**
 R: Sim. As três dimensões (produto, engenharia, compliance) são peer — pode começar só com `/engineer:*` e adicionar produto/compliance depois. Os adapters só são ativados se as variáveis do `.env` estiverem configuradas.
 
-**P: Agent Teams substitui o Workflow para frotas?**
+**P: Agent Teams substitui o Workflow para orquestração?**
 R: Não. São substratos complementares. Workflow = orquestração determinística de forma conhecida (melhor para auditoria, migração, review). Agent Teams = coordenação emergente peer-a-peer (melhor para negociação viva entre sub-streams). O Onion usa Workflow por padrão; Agent Teams é opt-in.
 
 **P: O Onion funciona com monorepo?**

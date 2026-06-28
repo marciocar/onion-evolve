@@ -3,7 +3,7 @@ status: snapshot
 type: evolution-backlog
 date: 2026-06-27
 topic: "Como trabalhamos — método de trabalho como artefato de 1ª classe"
-method: discovery (fan-out-and-synthesize, 5 lentes, frota onion-fleet/Workflow run wf_fe33d451-db3)
+method: discovery (fan-out-and-synthesize, 5 lentes, orquestração onion-orchestration/Workflow run wf_fe33d451-db3)
 scope: read-only research — propõe, não muta (exceto este relatório)
 ---
 
@@ -12,7 +12,7 @@ scope: read-only research — propõe, não muta (exceto este relatório)
 > **Discovery, não execução.** Destila o *método de trabalho* do Onion (loop de dogfood, revisão
 > adversarial, disciplina operacional, gestão de memória) e propõe **como o framework deve codificá-lo
 > como artefato de 1ª classe** — não só praticá-lo implicitamente. Pedido do maestro de 2026-06-25.
-> Frota de 5 lentes (read-only); síntese com **filtro crítico** (validação adversarial é insumo, não ordem).
+> Orquestração de 5 lentes (read-only); síntese com **filtro crítico** (validação adversarial é insumo, não ordem).
 
 ## Sumário executivo (veredito)
 
@@ -29,7 +29,7 @@ independentes, chegaram ao mesmo diagnóstico: a doutrina de trabalho do Onion v
 
 **O artefato de 1ª classe que falta é UM ponto de síntese navegável — uma KB integrada**
 (`onion-working-method.md`) que articula as camadas do método e **aponta** (não duplica) as fontes.
-**Não** são N meta-specs, comandos e guardas automáticas novas — várias propostas da frota nessa
+**Não** são N meta-specs, comandos e guardas automáticas novas — várias propostas da orquestração nessa
 direção são **over-engineering que contradiz a própria doutrina do Onion** (ver §Rejeitados).
 
 ## As 5 lentes (prática atual destilada)
@@ -37,7 +37,7 @@ direção são **over-engineering que contradiz a própria doutrina do Onion** (
 | Lente | O que o método JÁ é | Onde vive hoje | Gap central |
 |-------|---------------------|----------------|-------------|
 | **Loop de dogfood** | Rodar o artefato de verdade; testar modo-de-falha (não happy-path); fix→re-dogfood no mesmo loop; gate mecânico determinístico (`.claude/validation/`) vs gate de uso (invocar e observar) | dogfooding-doctrine.md (canônico) + CLAUDE.md §Dogfood + CONTRIBUTING.md (checklist) | Sem protocolo de **captura** dos findings de modo-de-falha; fronteira gate-mecânico/gate-de-uso é só textual |
-| **Revisão adversarial + fechar o loop** | Revisão independente com prompt neutro; veredito é **hipótese a verificar com evidência** (rejeitar falso-positivo); re-revisar o fix (regressão) | dogfooding-doctrine + working-discipline §Validação + metaspec-gate-keeper "REGRA ZERO" + fleet | Nunca nomeado como **unidade**; cada fan-out reinventa seu schema de veredito |
+| **Revisão adversarial + fechar o loop** | Revisão independente com prompt neutro; veredito é **hipótese a verificar com evidência** (rejeitar falso-positivo); re-revisar o fix (regressão) | dogfooding-doctrine + working-discipline §Validação + metaspec-gate-keeper "REGRA ZERO" + orquestração | Nunca nomeado como **unidade**; cada fan-out reinventa seu schema de veredito |
 | **Disciplina operacional** | Git (PR-merged antes de deletar branch; add seletivo em repo com inbox); localização multi-repo (anunciar); rotular refs opacas; fan-out (detectar=dever, executar=opt-in) | working-discipline (global) + 4 memórias de feedback + prosa inline em comandos | Espalhada; "REGRA DE OURO" em `pr.md` é re-invenção local; sem porta de entrada única |
 | **Gestão de memória** | Híbrido (feedback→silencioso+aviso; project→mostrar antes); recall automático; checagem leve de coerência; override do usuário | working-discipline §Memória + MEMORY.md (índice) + hooks de worklog | Diretiva sem mecanização; "silencioso/avisar" e "checagem de coerência" são tácitos |
 | **Síntese (integradora)** | Seleção (catálogo/playbooks) + Execução (PFR faseado retomável) + Validação (dogfood) + Disciplina | fragmentado nos 5 acima; nenhum os articula | **Sem KB/ponto único** que mostre o método como sistema |
@@ -81,7 +81,7 @@ constitucional. Meta-spec L0 são contratos que o `@metaspec-gate-keeper` valida
 
 ### ❌ REJEITADOS (over-engineering — contradizem a doutrina do próprio Onion)
 
-A frota propôs, eu refuto com evidência (a doutrina anti-inchaço é a régua):
+A orquestração propôs, eu refuto com evidência (a doutrina anti-inchaço é a régua):
 
 - **`operational-discipline-check.sh` (guarda automática que detecta `git add -A`, stale branch,
   orphaned monitor):** sedutor, mas é exatamente o **"guarda-hard que vira atrito ou bypass"** que o

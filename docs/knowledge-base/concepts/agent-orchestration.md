@@ -1,4 +1,4 @@
-# Agent Fleet Orchestration
+# Agent Orchestration
 
 ---
 
@@ -10,7 +10,7 @@
 | **Data de Criação** | 2026-06-13 |
 | **Última Atualização** | 2026-06-20 |
 | **Categoria** | Concepts |
-| **Aplicação** | Sistema Onion - Camada de Frota de Agentes |
+| **Aplicação** | Sistema Onion - Camada de Orquestração de Agentes |
 
 ### Fontes
 
@@ -18,7 +18,7 @@
 
 - [Introducing Dynamic Workflows in Claude Code](https://claude.com/blog/introducing-dynamic-workflows-in-claude-code) — ferramenta Workflow (`agent`/`parallel`/`pipeline`/`schema`/`isolation`/`budget`), research preview (28/mai/2026)
 - [Claude Code Release Notes — v2.1.172](https://docs.claude.com/en/docs/claude-code/release-notes) — nesting de subagentes até 5 níveis (10/jun/2026)
-- [Agent View — General Availability](https://docs.claude.com/en/docs/claude-code/agent-view) — observabilidade de frota (GA, mai/2026)
+- [Agent View — General Availability](https://docs.claude.com/en/docs/claude-code/agent-view) — observabilidade de orquestração (GA, mai/2026)
 - [Building Effective Agents — Anthropic](https://www.anthropic.com/engineering/building-effective-agents) — padrões canônicos de orquestração (2026)
 - [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — doutrina da "era da orquestração"
 - [Claude Code — Agent Teams](https://code.claude.com/docs/en/agent-teams) — substrato experimental de peers persistentes (`TeamCreate`/`SendMessage`/task list compartilhada), atrás de `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
@@ -32,11 +32,11 @@
 
 ## 🎯 Visão Geral
 
-Uma **frota de agentes** (agent fleet) é a **execução paralela coordenada de subagentes especializados** sob um único orquestrador. Em vez de um agente único processar uma tarefa de ponta a ponta de forma serial, a frota **decompõe** o trabalho, **despacha** N subagentes em paralelo (fan-out), aguarda (ou não) sua conclusão e **consolida** os resultados (fan-in).
+Uma **orquestração de subagentes** é a **execução paralela coordenada de subagentes especializados** sob um único orquestrador. Em vez de um agente único processar uma tarefa de ponta a ponta de forma serial, a orquestração **decompõe** o trabalho, **despacha** N subagentes em paralelo (fan-out), aguarda (ou não) sua conclusão e **consolida** os resultados (fan-in).
 
-A partir de jun/2026, no Claude Code, a frota deixou de ser "promptware" e passou a assentar sobre a ferramenta nativa **Workflow** (research preview, 28/mai/2026). A coordenação roda em **JavaScript** e custa **0 tokens de modelo** — apenas os subagentes consomem tokens. O orquestrador descreve o **grafo de execução** em código, não em prosa.
+A partir de jun/2026, no Claude Code, a orquestração deixou de ser "promptware" e passou a assentar sobre a ferramenta nativa **Workflow** (research preview, 28/mai/2026). A coordenação roda em **JavaScript** e custa **0 tokens de modelo** — apenas os subagentes consomem tokens. O orquestrador descreve o **grafo de execução** em código, não em prosa.
 
-As cinco propriedades que definem uma frota madura:
+As cinco propriedades que definem uma orquestração madura:
 
 | Propriedade | O que significa |
 |-------------|-----------------|
@@ -46,15 +46,15 @@ As cinco propriedades que definem uma frota madura:
 | **Budget** | Teto de tokens por agente e por run, contendo custo de execuções longas. |
 | **Observabilidade** | Cada subagente é inspecionável em tempo real via Agent View. |
 
-> A camada de frota é o nível operacional acima do design de agente individual. Para o design do agente em si (identidade, ferramentas, especialização), veja a KB irmã [`ai-agent-design-patterns.md`](ai-agent-design-patterns.md).
+> A camada de orquestração é o nível operacional acima do design de agente individual. Para o design do agente em si (identidade, ferramentas, especialização), veja a KB irmã [`ai-agent-design-patterns.md`](ai-agent-design-patterns.md).
 
 ---
 
-## ⚖️ Frota vs. Agente Único
+## ⚖️ Orquestração vs. Agente Único
 
-Frota **não é default**. Ela paga overhead de coordenação, multiplica custo de tokens e introduz pontos de falha paralelos. Use o teste abaixo antes de despachar uma frota.
+Orquestração **não é default**. Ela paga overhead de coordenação, multiplica custo de tokens e introduz pontos de falha paralelos. Use o teste abaixo antes de despachar uma orquestração.
 
-### Quando a frota vence
+### Quando a orquestração vence
 
 - **Subtarefas independentes** — o trabalho se decompõe em unidades que não dependem umas das outras (ex.: auditar 4 módulos distintos). O fan-out converte tempo serial em tempo paralelo.
 - **Varredura ampla** — cobrir muitas fontes/arquivos/hipóteses (ex.: pesquisar 12 fontes web, varrer um monorepo). Workers Haiku/Sonnet baratos cobrem a largura.
@@ -68,15 +68,15 @@ Frota **não é default**. Ela paga overhead de coordenação, multiplica custo 
 - **Fan-out sem independência real** — se os "workers" compartilham estado mutável ou um depende do output do outro, a paralelização produz corrida de dados ou retrabalho.
 - **Contexto profundamente compartilhado** — quando todos os subagentes precisariam do mesmo contexto grande, replicá-lo por worker desperdiça tokens; um agente único com bom context boundary pode ganhar.
 
-**Regra de bolso:** frota se justifica quando `largura × independência` é alta o suficiente para amortizar o custo de coordenação e síntese.
+**Regra de bolso:** a orquestração se justifica quando `largura × independência` é alta o suficiente para amortizar o custo de coordenação e síntese.
 
 ---
 
 ## 🔀 Dois Substratos de Orquestração: Workflow vs Agent Teams
 
-> **Status (jun/2026):** Agent Teams é **experimental**, atrás da flag `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (off por default). O substrato **default e portável** da frota Onion é a ferramenta **Workflow**. Esta seção fixa a fronteira; a decisão de framework está registrada em [`docs/analysis/onion-agent-teams-evaluation-2026-06.md`](../../analysis/onion-agent-teams-evaluation-2026-06.md).
+> **Status (jun/2026):** Agent Teams é **experimental**, atrás da flag `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (off por default). O substrato **default e portável** da orquestração Onion é a ferramenta **Workflow**. Esta seção fixa a fronteira; a decisão de framework está registrada em [`docs/analysis/onion-agent-teams-evaluation-2026-06.md`](../../analysis/onion-agent-teams-evaluation-2026-06.md).
 
-Decididos a usar uma frota (acima), restam **dois substratos** com modelos de coordenação opostos. Não competem — cobrem **shapes de trabalho diferentes**:
+Decididos a usar uma orquestração (acima), restam **dois substratos** com modelos de coordenação opostos. Não competem — cobrem **shapes de trabalho diferentes**:
 
 | | **Workflow** (default) | **Agent Teams** (opt-in, experimental) |
 |---|---|---|
@@ -103,13 +103,13 @@ A forma do trabalho é CONHECIDA antes de começar (decompõe-se num grafo)?
 
 **Regra de bolso:** Workflow é o **default**. Agent Teams só ganha quando a coordenação **não pode ser pré-desenhada** como grafo — quando os agentes precisam *conversar* para decidir o próximo passo. Se você consegue escrever o grafo, Workflow é mais barato, mais auditável e portável.
 
-> **Sessões faseadas ≠ frota.** Lembre que os workflows faseados retomáveis (`.claude/sessions/`, p.ex. `engineer/plan→pr-update`) são o **backbone** de trabalho single-thread com humano no loop — outra camada, que **nenhum** dos dois substratos de frota substitui. Frota (Workflow ou Agent Teams) paraleliza *dentro* de uma fase, não funde fases.
+> **Sessões faseadas ≠ orquestração.** Lembre que os workflows faseados retomáveis (`.claude/sessions/`, p.ex. `engineer/plan→pr-update`) são o **backbone** de trabalho single-thread com humano no loop — outra camada, que **nenhum** dos dois substratos de orquestração substitui. A orquestração (Workflow ou Agent Teams) paraleliza *dentro* de uma fase, não funde fases.
 
 ### Postura no Onion: capacidade opt-in com fallback gracioso
 
 Agent Teams entra como **terceiro modo opt-in**, nunca requisito duro — mesmo espírito **SDAAL** dos adapters de forge/task-manager:
 
-- **Detecção de capacidade:** `onion-fleet` verifica `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` antes de preferir Agent Teams.
+- **Detecção de capacidade:** `onion-orchestration` verifica `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` antes de preferir Agent Teams.
 - **Fallback gracioso:** flag off → degrade para Workflow (ou serial), avisando em pt-BR; **nunca** assumir a flag ligada.
 - **Portabilidade preservada:** o Onion é template instalável em **qualquer** projeto; não pode depender de feature experimental gated → o default permanece Workflow.
 - **Mesma invariante arquitetural:** orquestre no **nível principal** (skill/comando) — o "lead" do time é a própria sessão principal. **Nunca** dentro de um agente (§4.2; ver [Aplicação no Onion](#-aplicação-no-onion)).
@@ -230,7 +230,7 @@ while (!state.done && tokensUsed < budget) {
 
 ## 🛠️ Primitivas Nativas (Workflow / Agent)
 
-A ferramenta **Workflow** é o substrato de frota. A ferramenta **Agent** dispara 1 subagente especializado.
+A ferramenta **Workflow** é o substrato de orquestração. A ferramenta **Agent** dispara 1 subagente especializado.
 
 | Primitiva | Papel | Semântica |
 |-----------|-------|-----------|
@@ -253,7 +253,7 @@ A ferramenta **Workflow** é o substrato de frota. A ferramenta **Agent** dispar
 
 ## 🛡️ Verificação Adversarial / Judge-Panel
 
-O caso mais forte de verificação é o **judge-panel**: N céticos avaliam o mesmo artefato em `parallel`, e a decisão sai por **voto** (maioria, unanimidade, ou média ponderada). É a aplicação direta de *adversarial verification* em escala de frota.
+O caso mais forte de verificação é o **judge-panel**: N céticos avaliam o mesmo artefato em `parallel`, e a decisão sai por **voto** (maioria, unanimidade, ou média ponderada). É a aplicação direta de *adversarial verification* em escala de orquestração.
 
 ```javascript
 const verdicts = await parallel(
@@ -304,15 +304,15 @@ Tiers de **worker** recomendados (uso geral): **opus / sonnet / haiku**. Snapsho
 - **Prompt caching** — para runs longos e workers que compartilham um preâmbulo grande, o cache de prompt corta custo e latência repetidos.
 - **Budget-gated loops** — todo loop (`loop-until-done`) deve ter guarda de `budget` para não divergir.
 - **loop-until-dry** — itere até a fonte de trabalho "secar" (zero erros restantes), não por contagem fixa.
-- **Completeness critic** — antes de declarar pronto, um agente crítico verifica se a frota cobriu todo o escopo (evita fan-out que deixa lacunas silenciosas).
+- **Completeness critic** — antes de declarar pronto, um agente crítico verifica se a orquestração cobriu todo o escopo (evita fan-out que deixa lacunas silenciosas).
 
 ---
 
-## 🔒 Frota Mutante: Isolamento, Consolidação e Autonomia
+## 🔒 Orquestração Mutante: Isolamento, Consolidação e Autonomia
 
 Até aqui os padrões foram **read-only** (auditar, pesquisar, verificar). Quando a
-frota **muta** o repositório em paralelo, há corrida de escrita — e a forma de
-evitá-la **com eficiência** é a parte que distingue uma frota mutante operacional
+orquestração **muta** o repositório em paralelo, há corrida de escrita — e a forma de
+evitá-la **com eficiência** é a parte que distingue uma orquestração mutante operacional
 de um blueprint. Regra-mãe: **particione primeiro; isole por worktree só quando
 precisar; consolide numa única branch.**
 
@@ -356,7 +356,7 @@ const DiffSchema = {
 
 ### 7.3 Playbook de consolidação (o "merge" que faltava)
 
-O fan-in de uma frota mutante roda no orquestrador (JS, 0 tokens):
+O fan-in de uma orquestração mutante roda no orquestrador (JS, 0 tokens):
 
 1. **Coletar** — `results.filter(Boolean)` (worker morto → `null`; reporte os SKIP).
 2. **Detectar sobreposição** — em JS, cruze os `files[].path` de todos os workers.
@@ -367,7 +367,7 @@ O fan-in de uma frota mutante roda no orquestrador (JS, 0 tokens):
      - mutação que deveria ser disjunta mas colidiu → **gate humano** (a partição
        falhou; o humano decide).
 3. **Aplicar numa única branch de consolidação** — uma branch (ex.:
-   `fleet/<tarefa>-<data>`), não N branches soltas.
+   `orchestration/<tarefa>-<data>`), não N branches soltas.
 4. **Verificação adversarial** em alto risco — um crítico contesta o diff agregado
    (lint, testes, coerência) antes de aceitar.
 5. **Gate humano** para irreversível/conflito (ver 7.5).
@@ -403,7 +403,7 @@ if (collisions.length) {
 - **Worker morto** → o `agent()` retorna `null`; `.filter(Boolean)` antes do fan-in.
 - **Saída = uma branch consolidada**, nunca N branches persistentes. Essa branch
   entra no **fluxo normal**: `/git:flow feature finish` ou `/engineer:pr` (via
-  forge adapter, `.claude/utils/forge/`) → **gate de PR**. A frota paraleliza
+  forge adapter, `.claude/utils/forge/`) → **gate de PR**. A orquestração paraleliza
   *dentro* da fase de implementação; **não** funde fases nem cria branches que
   contornem o gate (invariante — `commands.md §10.3`).
 
@@ -422,10 +422,10 @@ const branches = (await parallel([
 > coordenarem (mailbox, `SendMessage`) — é o ato de **ler+interpretar+executar** algo
 > irreversível. **Transportar** e **notificar** (mover resultado, avisar) são
 > determinísticos e automatizáveis; **executar** o passo crítico é gate humano. A2A é
-> ortogonal ao risco. Eixo completo (co-evolução e frota) em
+> ortogonal ao risco. Eixo completo (co-evolução e orquestração) em
 > [`onion-adr-comms-transport-vs-execution-2026-06.md`](../../analysis/onion-adr-comms-transport-vs-execution-2026-06.md).
 
-A frota **propõe**; o humano **confirma** o passo crítico. Exija **gate humano**
+A orquestração **propõe**; o humano **confirma** o passo crítico. Exija **gate humano**
 quando:
 
 - a operação é **irreversível** (deploy, merge em produção, mudança regulada);
@@ -436,7 +436,7 @@ quando:
 Doutrina da era da orquestração:
 
 - **Control before autonomy** — gates e limites antes de delegar trabalho amplo.
-- **Gates humanos** — irreversível passa por aprovação, mesmo em frota autônoma.
+- **Gates humanos** — irreversível passa por aprovação, mesmo em orquestração autônoma.
 - **Delegation gap** — a lacuna entre a intenção do orquestrador e o que os
   workers executam cresce com a profundidade; verificação adversarial a fecha.
 
@@ -444,7 +444,7 @@ Doutrina da era da orquestração:
 
 ## 👁️ Observabilidade
 
-Cada subagente de uma frota é inspecionável via **Agent View** (GA, mai/2026): estado, prompt, tokens consumidos e output estruturado de cada worker em tempo real. Sem essa visibilidade, uma frota é uma caixa-preta — um worker travado ou divergente passa despercebido até o fan-in.
+Cada subagente de uma orquestração é inspecionável via **Agent View** (GA, mai/2026): estado, prompt, tokens consumidos e output estruturado de cada worker em tempo real. Sem essa visibilidade, uma orquestração é uma caixa-preta — um worker travado ou divergente passa despercebido até o fan-in.
 
 Superfícies relacionadas (jun/2026): **Managed Agents** (beta, abr/2026) e **Routines** (research preview, mai/2026).
 
@@ -454,32 +454,32 @@ Superfícies relacionadas (jun/2026): **Managed Agents** (beta, abr/2026) e **Ro
 
 | Armadilha | Sintoma | Mitigação |
 |-----------|---------|-----------|
-| **Custo de token** | Frota custa mais que o valor entregue. | Use tiers (Haiku/Sonnet workers), `budget`, prompt caching; reavalie se frota se justifica. |
+| **Custo de token** | Orquestração custa mais que o valor entregue. | Use tiers (Haiku/Sonnet workers), `budget`, prompt caching; reavalie se a orquestração se justifica. |
 | **Overhead de coordenação** | Decompor + sintetizar custa mais que resolver direto. | Para tarefas pequenas, prefira agente único. |
 | **Verificação insuficiente** | Output aceito sem contestação; alucinação passa. | Adicione crítico ou judge-panel em saídas de alto risco. |
 | **Fan-out sem independência real** | Workers competem por estado ou um depende do outro → corrida/retrabalho. | Garanta independência; use `pipeline` serial ou `isolation: 'worktree'`. |
-| **Frota dentro de um agente** | Orquestração escondida num subagente, mais cara e fora da regra arquitetural. | Orquestre no nível principal (skill/comando). |
+| **Orquestração dentro de um agente** | Orquestração escondida num subagente, mais cara e fora da regra arquitetural. | Orquestre no nível principal (skill/comando). |
 | **Lacunas silenciosas** | Fan-out deixa parte do escopo sem cobertura. | Use um completeness critic antes do fan-in final. |
 
 ---
 
 ## 🧅 Aplicação no Onion
 
-No Onion (port do Claude Code), a orquestração de frota tem **endereço fixo** ditado pela arquitetura:
+No Onion (port do Claude Code), a orquestração tem **endereço fixo** ditado pela arquitetura:
 
-- A regra de dependência de `architecture.md` §4.2 **proíbe** `agents/* → commands/*` — um agente **sugere**, não invoca comando nem orquestra frota.
+- A regra de dependência de `architecture.md` §4.2 **proíbe** `agents/* → commands/*` — um agente **sugere**, não invoca comando nem orquestra subagentes.
 - Skills **podem** orquestrar: `skills/* → commands/*, agents/*, docs/*`.
 
-Logo, a camada de frota mora em **skill + comando**, **nunca** num agente:
+Logo, a camada de orquestração mora em **skill + comando**, **nunca** num agente:
 
-- **Skill** `.claude/skills/onion-fleet/` — cérebro de orquestração: descreve o grafo (qual padrão canônico, quais primitivas, quais tiers).
-- **Comando** `/meta:fleet` — ponto de invocação no nível principal, onde a coordenação JS roda a 0 tokens.
+- **Skill** `.claude/skills/onion-orchestration/` — cérebro de orquestração: descreve o grafo (qual padrão canônico, quais primitivas, quais tiers).
+- **Comando** `/meta:orchestrate` — ponto de invocação no nível principal, onde a coordenação JS roda a 0 tokens.
 
-> **Nunca crie um agente `fleet-orchestrator`.** Isso violaria §4.2 e esconderia a orquestração no lugar mais caro. A frota é responsabilidade do nível principal.
+> **Nunca crie um agente `worker-orchestrator`.** Isso violaria §4.2 e esconderia a orquestração no lugar mais caro. A orquestração é responsabilidade do nível principal.
 
 ### Cross-links
 
-- [`docs/meta-specs/commands.md`](../../meta-specs/commands.md) — constituição L0 dos comandos (categoria `meta/` abriga `/meta:fleet`; o grafo de frota não é um workflow faseado retomável, e sim coordenação efêmera intra-run).
+- [`docs/meta-specs/commands.md`](../../meta-specs/commands.md) — constituição L0 dos comandos (categoria `meta/` abriga `/meta:orchestrate`; o grafo de orquestração não é um workflow faseado retomável, e sim coordenação efêmera intra-run).
 - [`ai-agent-design-patterns.md`](ai-agent-design-patterns.md) — KB irmã: design do agente individual e os mesmos padrões sob a ótica de design.
 
 ---

@@ -1,7 +1,7 @@
 # Onion Federation — Review Adversarial do Design (2026-06-14)
 
 > **Alvo:** `onion-federation-design-2026-06.md` (v1, PR #36 — **removido** do repo após execução; recuperável via git history). Supersedido por [onion-federation-design-v2-2026-06.md](onion-federation-design-v2-2026-06.md).
-> **Método:** frota de 6 lentes críticas independentes → refutação adversarial achado a achado → consolidação.
+> **Método:** orquestração de 6 lentes críticas independentes → refutação adversarial achado a achado → consolidação.
 > **Contrato:** read-only sobre o design; este relatório é a única escrita. **Não** executa nada — propõe ajustes ao design **antes** de construir.
 
 ---
@@ -14,7 +14,7 @@
 | **Confirmados** (sobreviveram à refutação) | **24** |
 | Refutados/descartados (fracos, duplicados, já cobertos) | 12 (33%) |
 | Blockers | 7 · Recommended 15 · Opportunistic 2 |
-| Frota | 42 agents · ~1.46M tokens · 24 min · Run `wf_dbfb2b91-cd3` |
+| Orquestração | 42 agents · ~1.46M tokens · 24 min · Run `wf_dbfb2b91-cd3` |
 
 **Confirmados por lente:** identity 6 · safety 5 · completeness 4 · feasibility 3 · reuse 3 · phasing 3.
 
@@ -42,7 +42,7 @@ O design **reconhece** isso, mas em §7 (lista de "spikes/incertezas"), ao lado 
 
 **Correção raiz — duas opções, o juiz adversarial recomenda a (B):**
 - **(A) Fase 0 de meta-spec:** PRs em `architecture.md §1.2/§1.3`, `commands.md §2`, `agents.md §2` adicionando `federation/` com justificativa; merge só após aval do gate-keeper; **só então** a Fase 1 roda.
-- **(B) Encaixar no canônico existente** (dissolve a maioria dos blockers sem nova categoria): manifesto em `docs/` ou `.claude/sessions/`; comandos em `meta/` (`/meta:federation-adopt`, precedente `/meta:fleet`, `/meta:evolve`); experts em `agents/meta/` com naming `federation-<member>-expert.md`; contratos em `docs/knowledge-base/concepts/` ou `docs/meta-specs/`; skill dobrada na `onion-fleet` existente como modo cross-repo.
+- **(B) Encaixar no canônico existente** (dissolve a maioria dos blockers sem nova categoria): manifesto em `docs/` ou `.claude/sessions/`; comandos em `meta/` (`/meta:federation-adopt`, precedente `/meta:orchestrate`, `/meta:evolve`); experts em `agents/meta/` com naming `federation-<member>-expert.md`; contratos em `docs/knowledge-base/concepts/` ou `docs/meta-specs/`; skill dobrada na `onion-orchestration` existente como modo cross-repo.
 
 > **Recomendação:** adotar (B) onde houver encaixe limpo e usar (A) só para o resíduo irredutível. Qualquer caminho exige veredito do gate-keeper **antes do primeiro arquivo**.
 
@@ -90,14 +90,14 @@ Toda a topologia de fan-out cross-repo (Fases 3–5) repousa numa capacidade **n
 |---|---|---|---|---|
 | 8 | identity | Reconciliar guardrail "SDAAL ≤400 linhas": o framework já o viola (jira 887, clickup 796, linear 785…); revisar a régua (400 p/ factory/interface/types; adapters ricos isentos) ou parar de citá-lo como proteção | design | S |
 | 9 | identity | Mapear contratos p/ local canônico (`knowledge-base/concepts/` ou `meta-specs/`) ou incluir PR de `architecture.md §1.3` | F4 | S |
-| 10 | identity | PR de `architecture.md §1.2` p/ skill nova **ou** dobrar em `onion-fleet` | F5 | S |
+| 10 | identity | PR de `architecture.md §1.2` p/ skill nova **ou** dobrar em `onion-orchestration` | F5 | S |
 | 11 | identity | Elevar spike cross-dir a Fase 0 go/no-go (ver SA-3) | F0 | S |
 | 12 | feasibility | Especificar enforcement da ordem de merge (gate humano), polling de status por membro, rollback | F5 | M |
 | 13 | feasibility | Protocolo de merge de `.claude/` em repo legado (4 passos: inventariar conflitos → diff+confirmação → CLAUDE.md append → settings.json key-merge) | F1 | M |
 | 14 | safety | Contrato **comportamental**: fixtures de payload por operação; juiz com mandato de revisar semântica | F4/F5 | M |
 | 15 | safety | Seção "Rollback Protocol" no orchestrate (trigger, ordem inversa, falha→gate humano, pin de contrato) | F5 | M |
 | 16 | safety | `status` com 3 dimensões: CI health, contract-code sync (drift), federation compliance (commit fora do fluxo) | F2/F5 | M |
-| 17 | reuse | Corrigir citação: `/federation:scan` **não** delega a `/meta:evolve` (topologia fixa D1-D8); reusa o **padrão** onion-fleet + estilo de relatório | F3 | S |
+| 17 | reuse | Corrigir citação: `/federation:scan` **não** delega a `/meta:evolve` (topologia fixa D1-D8); reusa o **padrão** onion-orchestration + estilo de relatório | F3 | S |
 | 18 | reuse | `docs/integration-contracts/` ao §7 spikes em pé de igualdade com `.claude/federation/`; aceite F4 inclui aval do gate-keeper | F4 | S |
 | 19 | phasing | Schema mínimo estável do manifesto (`name`/`path`/`remote`) já na F1, ou declarar migração no aceite da F2 | F1/F2 | S |
 | 20 | completeness | Classificar modos de membro: full-member / observe-only (não-Onion) / external (só contrato publicado) | F4 | M |
@@ -115,7 +115,7 @@ Toda a topologia de fan-out cross-repo (Fases 3–5) repousa numa capacidade **n
 
 ## 3. O que foi refutado (12) — e por quê
 
-A frota descartou 12 achados (33%) — confiança de que o backlog acima é sinal, não ruído. Padrões dos refutados: duplicatas da mesma violação de categoria entre lentes (consolidadas em SA-1); achados já cobertos por uma frase do próprio doc; e exageros sobre primitivas que de fato funcionam como o design assume (ex.: `additional working directories` existem e o doc os cita corretamente).
+A orquestração descartou 12 achados (33%) — confiança de que o backlog acima é sinal, não ruído. Padrões dos refutados: duplicatas da mesma violação de categoria entre lentes (consolidadas em SA-1); achados já cobertos por uma frase do próprio doc; e exageros sobre primitivas que de fato funcionam como o design assume (ex.: `additional working directories` existem e o doc os cita corretamente).
 
 ---
 
@@ -124,7 +124,7 @@ A frota descartou 12 achados (33%) — confiança de que o backlog acima é sina
 A lente `identity` **não** encontrou ressurreição da visão abandonada de 2026-05-18:
 - ✅ Sem CLI standalone, sem `.onion/`, sem `packages/`, sem multi-IDE.
 - ✅ Orquestração em skill/comando, experts em agentes — `agents→commands` não violado.
-- ✅ Reuso de SDAAL/forge/fleet/Workflow como substrato, não runtime novo.
+- ✅ Reuso de SDAAL/forge/orquestração/Workflow como substrato, não runtime novo.
 
 As violações de SA-1 são de **estrutura de diretório/categoria** (resolvíveis por encaixe canônico ou PR de meta-spec), **não** de filosofia.
 

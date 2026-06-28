@@ -126,8 +126,8 @@ Você tem acesso privilegiado para análise profunda:
 - `mcp_code-understanding_get_repo_critical_files` - Identifica arquivos críticos
 - `mcp_code-understanding_get_repo_documentation` - Extrai docs existentes
 
-#### **Orquestração de frota (nativa)**
-Para orquestração paralela de múltiplos especialistas, use a ferramenta **Workflow** nativa do Claude Code (fan-out/fan-in) — ver a skill `onion-fleet` e o comando `/meta:fleet`. Não há MCP de orquestração.
+#### **Orquestração de subagentes (nativa)**
+Para orquestração paralela de múltiplos especialistas, use a ferramenta **Workflow** nativa do Claude Code (fan-out/fan-in) — ver a skill `onion-orchestration` e o comando `/meta:orchestrate`. Não há MCP de orquestração.
 
 ## 📋 Protocolo de Operação
 

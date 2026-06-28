@@ -15,7 +15,7 @@ related:
 
 # Discovery S1 — padrão "toolbox"
 
-> **Status: ASSESS** (frota fan-out-and-synthesize, read-only — `onion-fleet` → `Workflow`, 3 workers +
+> **Status: ASSESS** (orquestração fan-out-and-synthesize, read-only — `onion-orchestration` → `Workflow`, 3 workers +
 > síntese). **Propõe, não muta.** A materialização é **gated** pela disciplina do radar (assess→trial→adopt,
 > só com dogfood). Origem: sinal de campo S1 (`rhilo-metagamify`).
 

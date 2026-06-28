@@ -14,7 +14,7 @@
 | **Última Atualização** | 2026-06-16 |
 | **Categoria** | Conceitos |
 | **Comando relacionado** | `/docs:build-business-docs` · `/docs:build-tech-docs` · `/docs:build-compliance-docs` (primeiro tick) · `/meta:kb-freshness` (molde da fase *Manage*) |
-| **Padrão-pai** | [Doutrina de Modernização do Onion](onion-modernization-doctrine.md) · [Agent Fleet Orchestration](agent-fleet-orchestration.md) |
+| **Padrão-pai** | [Doutrina de Modernização do Onion](onion-modernization-doctrine.md) · [Orquestração de Agentes](agent-orchestration.md) |
 
 ### Fontes
 
@@ -91,11 +91,11 @@ Esta KB define a **doutrina**. A execução da fase *Manage* (auditar frescor de
 
 - **Verdito** por arquivo: `CURRENT` / `STALE` / `HISTORICAL`.
 - **Threshold de frescor** herdado: cada arquivo carrega `Última Atualização`; ausente ou **> 18 meses** = candidato a STALE.
-- **Fan-out** via [`onion-fleet`](../../../.claude/skills/onion-fleet/SKILL.md) (pattern `fan-out-and-synthesize`): worker por arquivo/diretório (tier haiku) → fan-in (tier sonnet) → retorno no formato `FreshnessSchema[]`.
-- **Composição** no [`/meta:evolve`](../../../.claude/commands/meta/evolve.md) como dimensão **no fluxo principal** — como D4/D5 hoje delegam a `kb-freshness`/`metaspec-validate` sem aninhar frota dentro de frota.
+- **Fan-out** via [`onion-orchestration`](../../../.claude/skills/onion-orchestration/SKILL.md) (pattern `fan-out-and-synthesize`): worker por arquivo/diretório (tier haiku) → fan-in (tier sonnet) → retorno no formato `FreshnessSchema[]`.
+- **Composição** no [`/meta:evolve`](../../../.claude/commands/meta/evolve.md) como dimensão **no fluxo principal** — como D4/D5 hoje delegam a `kb-freshness`/`metaspec-validate` sem aninhar orquestração dentro de orquestração.
 
 > **Tijolo 2 entregue (2026-06-17):** a fase *Manage* é executada pelo comando
 > [`/meta:context-freshness`](../../../.claude/commands/meta/context-freshness.md) (veredito
-> CURRENT/STALE/HISTORICAL, fan-out via `onion-fleet`, contradição cross-domínio no fan-in),
+> CURRENT/STALE/HISTORICAL, fan-out via `onion-orchestration`, contradição cross-domínio no fan-in),
 > com a Regra 15 do lint exigindo o carimbo de frescor e a dimensão D9 do `/meta:evolve`
 > compondo a auditoria. Esta KB é a doutrina (Tijolo 1) que esse comando executa.

@@ -1,8 +1,8 @@
-# fleet-smoke-test — Smoke Test Reprodutível do /meta:fleet
+# orchestration-smoke-test — Smoke Test Reprodutível do /meta:orchestrate
 
 **Versão:** 1.0.0  
 **Data:** 2026-06-13  
-**Escopo:** `.claude/commands/meta/fleet.md` · `.claude/skills/onion-fleet/SKILL.md`  
+**Escopo:** `.claude/commands/meta/orchestrate.md` · `.claude/skills/onion-orchestration/SKILL.md`  
 **Execução:** **manual** — não existe runner automático; siga cada cenário na ordem descrita.  
 **Escrita destrutiva:** nenhuma — todos os cenários são read-only.
 
@@ -32,12 +32,12 @@ escolhendo o padrão `fan-out-and-synthesize`.
 ### Comando de invocação
 
 ```
-/meta:fleet contar agentes por categoria em .claude/agents/ e retornar um resumo consolidado
+/meta:orchestrate contar agentes por categoria em .claude/agents/ e retornar um resumo consolidado
 ```
 
 ### Comportamento esperado
 
-1. O comando invoca a skill `onion-fleet` que detecta elegibilidade de fan-out
+1. O comando invoca a skill `onion-orchestration` que detecta elegibilidade de fan-out
    (uma leitura por diretório de categoria, sem dependência entre elas).
 2. A skill seleciona o padrão **`fan-out-and-synthesize`**.
 3. Um worker por categoria lê os arquivos dentro dela (read-only: `Read` ou
@@ -45,8 +45,8 @@ escolhendo o padrão `fan-out-and-synthesize`.
    `development`, `git`, `meta`, `product`, `research`, `review`, `testing`.
 4. O fan-in consolida numa tabela única com `categoria → contagem`.
 5. A saída final apresenta **exatamente 1 resultado consolidado** — não 9 saídas
-   separadas — no formato de saída documentado em `fleet.md` (bloco
-   `━━━ FROTA EXECUTADA ━━━`).
+   separadas — no formato de saída documentado em `orchestrate.md` (bloco
+   `━━━ ORQUESTRAÇÃO EXECUTADA ━━━`).
 6. Relatório inclui: padrão escolhido, número de workers, tier de modelo e
    contagem total de agentes.
 
@@ -92,12 +92,12 @@ independente que a contesta, produzindo um **veredito estruturado** com campos
 ### Comando de invocação
 
 ```
-/meta:fleet verificar a afirmação: "todos os comandos em .claude/commands/meta/ têm campo `version` no frontmatter YAML"
+/meta:orchestrate verificar a afirmação: "todos os comandos em .claude/commands/meta/ têm campo `version` no frontmatter YAML"
 ```
 
 ### Comportamento esperado
 
-1. A skill `onion-fleet` detecta o padrão **`adversarial verification`**: uma
+1. A skill `onion-orchestration` detecta o padrão **`adversarial verification`**: uma
    afirmação a verificar com contestação independente.
 2. O gerador (worker A, tier haiku) lê os arquivos de `.claude/commands/meta/`
    e lista quais têm o campo `version` no frontmatter.
@@ -123,10 +123,10 @@ independente que a contesta, produzindo um **veredito estruturado** com campos
 ### Arquivos em escopo (`.claude/commands/meta/`)
 
 ```
-fleet.md · metaspec-validate.md · create-agent.md · create-command.md
+orchestrate.md · metaspec-validate.md · create-agent.md · create-command.md
 create-skill.md · create-abstraction.md · create-knowledge-base.md
 create-agent-express.md · setup-integration.md
-fleet-fallback.md (se existir) · all-tools.md · analyze-complex-problem.md
+orchestration-fallback.md (se existir) · all-tools.md · analyze-complex-problem.md
 ```
 
 > A afirmação pode ser verdadeira ou falsa — o que importa é o **comportamento**
@@ -159,7 +159,7 @@ Como não é possível desabilitar a ferramenta `Workflow` diretamente no Claude
 Code, simule a condição usando o argumento explícito de fallback:
 
 ```
-/meta:fleet [FORCE_FALLBACK] listar as 3 primeiras linhas de .claude/commands/meta/fleet.md e .claude/skills/onion-fleet/SKILL.md
+/meta:orchestrate [FORCE_FALLBACK] listar as 3 primeiras linhas de .claude/commands/meta/orchestrate.md e .claude/skills/onion-orchestration/SKILL.md
 ```
 
 > O prefixo `[FORCE_FALLBACK]` não é uma flag técnica real — serve como sinal
@@ -172,9 +172,9 @@ Code, simule a condição usando o argumento explícito de fallback:
 1. O Passo 0 detecta substrato indisponível (ou o avaliador informa ao modelo
    que `Workflow` não está disponível).
 2. O comando emite **aviso explícito em pt-BR** similar a:
-   > "O substrato de frota (Workflow) não está disponível neste ambiente.
+   > "O substrato de orquestração (Workflow) não está disponível neste ambiente.
    > O trabalho seguirá de forma serial via Agent — mais lento, sem paralelismo real."
-3. Os 2 itens (`fleet.md` e `SKILL.md`) são processados **sequencialmente**,
+3. Os 2 itens (`orchestrate.md` e `SKILL.md`) são processados **sequencialmente**,
    um de cada vez, com chamadas `Agent` individuais.
 4. **Nenhuma linguagem de concorrência** ("em paralelo", "simultaneamente",
    "ao mesmo tempo") aparece no relatório.
@@ -200,18 +200,18 @@ Code, simule a condição usando o argumento explícito de fallback:
 
 ---
 
-## Cenário 4 — frota mutante (partição-primeiro)
+## Cenário 4 — orquestração mutante (partição-primeiro)
 
 ### Objetivo
 
-Validar a **frota que ESCREVE** arquivos em paralelo: partição-primeiro (sem
+Validar a **orquestração que ESCREVE** arquivos em paralelo: partição-primeiro (sem
 worktree quando os alvos são disjuntos), detecção de colisão de paths no fan-in,
 consolidação numa **única branch** e gate humano em conflito.
 
 ### Comando de invocação
 
 ```
-/meta:fleet adicionar `version: "1.0.0"` ao frontmatter dos comandos sem o campo
+/meta:orchestrate adicionar `version: "1.0.0"` ao frontmatter dos comandos sem o campo
 ```
 
 ### Comportamento esperado
@@ -221,7 +221,7 @@ consolidação numa **única branch** e gate humano em conflito.
    **nenhum outro** toca → o relatório declara "partição-primeiro, sem worktree".
 3. Workers retornam `DiffSchema`; o fan-in **cruza os `files[].path` em JS** e
    confirma **partição limpa** (zero paths repetidos).
-4. **Consolidação numa única branch** (ex.: `fleet/add-version-field`) — não N
+4. **Consolidação numa única branch** (ex.: `orchestration/add-version-field`) — não N
    branches soltas; a branch entra no fluxo normal (`/git:flow feature finish` ou
    `/engineer:pr`).
 5. Worker morto → `null` → `.filter(Boolean)` + `SKIP — <motivo>` no relatório.
@@ -248,11 +248,11 @@ gate humano.
 ## Cenário 5 — classify-and-act
 
 ### Objetivo
-Validar que a frota executa UM passo de classificação centralizado antes de qualquer roteamento, e que cada item é entregue exclusivamente ao handler do seu bucket correto (`bug`, `feature` ou `docs`), com fan-in em um único relatório consolidado.
+Validar que a orquestração executa UM passo de classificação centralizado antes de qualquer roteamento, e que cada item é entregue exclusivamente ao handler do seu bucket correto (`bug`, `feature` ou `docs`), com fan-in em um único relatório consolidado.
 
 ### Comando de invocação
 ```
-/meta:fleet triar as issues abaixo em buckets bug | feature | docs e rotear cada uma ao handler especializado: ["Login falha com OAuth", "Adicionar exportação CSV", "Atualizar guia de instalação", "NullPointerException no checkout", "Documentar endpoint /health", "Permitir login por magic link"]
+/meta:orchestrate triar as issues abaixo em buckets bug | feature | docs e rotear cada uma ao handler especializado: ["Login falha com OAuth", "Adicionar exportação CSV", "Atualizar guia de instalação", "NullPointerException no checkout", "Documentar endpoint /health", "Permitir login por magic link"]
 ```
 
 ### Comportamento esperado
@@ -280,7 +280,7 @@ Validar que o padrão generate-and-filter gera N candidatos em paralelo e aplica
 
 ### Comando de invocação
 ```
-/meta:fleet gere 5 variações de esquema JSON para o recurso "Pedido" e filtre apenas as que passam na validação de schema (ajv); reporte aprovados, reprovados e run-id
+/meta:orchestrate gere 5 variações de esquema JSON para o recurso "Pedido" e filtre apenas as que passam na validação de schema (ajv); reporte aprovados, reprovados e run-id
 ```
 
 ### Comportamento esperado
@@ -308,7 +308,7 @@ Validar que o padrão tournament reduz o campo pela metade a cada rodada elimina
 
 ### Comando de invocação
 ```
-/meta:fleet comparar as 4 abordagens de cache (in-memory, Redis, CDN edge, banco de dados) em rodadas eliminatórias 2-a-2 e eleger a melhor para um contexto de alta leitura
+/meta:orchestrate comparar as 4 abordagens de cache (in-memory, Redis, CDN edge, banco de dados) em rodadas eliminatórias 2-a-2 e eleger a melhor para um contexto de alta leitura
 ```
 
 ### Comportamento esperado
@@ -325,7 +325,7 @@ Validar que o padrão tournament reduz o campo pela metade a cada rodada elimina
 | Primitivo correto | Rodadas usam `parallel()` com barreira (a Final depende dos vencedores) | Uso de `pipeline()` (sem barreira) entre rodadas dependentes |
 | Fan-in único | Exatamente 1 relatório consolidado com `run-id` | Múltiplos relatórios soltos ou `run-id` ausente |
 | Descarte de falhas | Worker falho → `null`, adversário avança, `SKIP — <motivo>` presente | Falha interrompe o torneio ou avança sem registrar motivo |
-| Orquestração no nível principal | Nenhum subagente coordena rodadas | Subagente age como "fleet-orchestrator" interno |
+| Orquestração no nível principal | Nenhum subagente coordena rodadas | Subagente age como "worker-orchestrator" interno |
 
 ---
 
@@ -336,7 +336,7 @@ Validar que `loop-until-done` corrige erros de lint em lotes sucessivos até zer
 
 ### Comando de invocação
 ```
-/meta:fleet corrigir o próximo lote de erros de lint repetidamente até zerar (loop-until-dry), com teto de 8 iterações e budget máximo de 200 000 tokens
+/meta:orchestrate corrigir o próximo lote de erros de lint repetidamente até zerar (loop-until-dry), com teto de 8 iterações e budget máximo de 200 000 tokens
 ```
 
 ### Comportamento esperado
@@ -359,7 +359,7 @@ Validar que `loop-until-done` corrige erros de lint em lotes sucessivos até zer
 
 ## Checklist de regressão — 6 padrões canônicos
 
-Execute após qualquer alteração em `fleet.md` ou `SKILL.md`. Marque cada item
+Execute após qualquer alteração em `orchestrate.md` ou `SKILL.md`. Marque cada item
 **somente após validação manual** ou após um cenário de smoke test que o cubra.
 
 ```
@@ -368,7 +368,7 @@ Padrão canônico              Coberto neste smoke test  Última validação
 [ ] fan-out-and-synthesize   Cenário 1                 ____________
 [ ] adversarial verification  Cenário 2                 ____________
 [ ] fallback serial          Cenário 3 (transversal)   ____________
-[ ] frota mutante (worktree) Cenário 4 (transversal)   ____________
+[ ] orquestração mutante (worktree) Cenário 4 (transversal)   ____________
 [ ] classify-and-act         Cenário 5                 ____________
 [ ] generate-and-filter      Cenário 6                 ____________
 [ ] tournament               Cenário 7                 ____________
@@ -376,9 +376,9 @@ Padrão canônico              Coberto neste smoke test  Última validação
 ```
 
 > **Cobertura completa (6/6 padrões canônicos).** Os 6 padrões canônicos têm
-> cenário (1, 2, 5, 6, 7, 8); `fallback serial` (3) e `frota mutante` (4) são
+> cenário (1, 2, 5, 6, 7, 8); `fallback serial` (3) e `orquestração mutante` (4) são
 > cenários transversais adicionais. Cenários 5-8 foram **autorados pela própria
-> frota** (`/meta:fleet`, fan-out-and-synthesize + verificação adversarial) —
+> orquestração** (`/meta:orchestrate`, fan-out-and-synthesize + verificação adversarial) —
 > dogfooding em 2026-06-14.
 
 ### Invariantes transversais (verificar em todos os cenários)
@@ -401,8 +401,8 @@ Padrão canônico              Coberto neste smoke test  Última validação
 
 ## Referências
 
-- Comando: `.claude/commands/meta/fleet.md`
-- Skill operacional: `.claude/skills/onion-fleet/SKILL.md`
-- KB de doutrina: `docs/knowledge-base/concepts/agent-fleet-orchestration.md`
-- Fallback canonical: `.claude/commands/common/prompts/fleet-fallback.md`
+- Comando: `.claude/commands/meta/orchestrate.md`
+- Skill operacional: `.claude/skills/onion-orchestration/SKILL.md`
+- KB de doutrina: `docs/knowledge-base/concepts/agent-orchestration.md`
+- Fallback canonical: `.claude/commands/common/prompts/orchestration-fallback.md`
 - Meta-spec arquitetura (§4.2): `docs/meta-specs/architecture.md`

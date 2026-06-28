@@ -16,7 +16,7 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
 
 - 92 comandos invocáveis por categoria (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `design`, `development`, `quick`) + `onion.md`, `warm-up.md` e `catch-up.md` no root; `common/` guarda fragmentos compartilhados (templates/prompts) e há READMEs de categoria. (`design/` é **categoria de comando**, não 4ª dimensão peer — esta permanece em 3: produto, engenharia, compliance; a promoção de `design-context` a peer é provisória e gated)
 - 51 agentes especializados de IA em 9 categorias (`compliance`, `deployment`, `development`, `git`, `meta`, `product`, `research`, `review`, `testing`)
-- 5 skills em `.claude/skills/` (`onion` — orquestrador; `onion-patterns`; `onion-validation`; `language-standards`; `onion-fleet` — orquestração de frota)
+- 5 skills em `.claude/skills/` (`onion` — orquestrador; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes)
 - **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear) via `.claude/utils/task-manager/`
 - Workflows automatizados de desenvolvimento (GitFlow + sessions persistentes em `.claude/sessions/`)
 
@@ -52,7 +52,7 @@ O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas — uma
   - `clickup` → `@clickup-specialist` (API-first; MCP opcional, listas, custom fields, comentários Unicode)
 - **Sem provider configurado** (`none`) → operar offline com `@task-specialist`; **não** tentar API calls
 
-> **Por que só jira/clickup têm especialista dedicado (decisão de design, não viés):** Jira e ClickUp têm APIs/regras ricas o bastante para justificar um especialista (ADF + JQL + transitions no Jira; formatação Unicode + custom fields + hierarquia/checklists no ClickUp). **Asana e Linear** são integralmente cobertos pelo `@task-specialist` genérico + seu adapter (API-first) — criar especialistas dedicados seria inchar a frota sem ganho. Em todos os casos, **o consumidor chama a abstração agnóstica** (`taskManager.*`); o adapter resolve transporte (REST API default, MCP opcional), formato e quando acionar o especialista. **Nunca** se chama o MCP/SDK de um provider direto no comando/agente.
+> **Por que só jira/clickup têm especialista dedicado (decisão de design, não viés):** Jira e ClickUp têm APIs/regras ricas o bastante para justificar um especialista (ADF + JQL + transitions no Jira; formatação Unicode + custom fields + hierarquia/checklists no ClickUp). **Asana e Linear** são integralmente cobertos pelo `@task-specialist` genérico + seu adapter (API-first) — criar especialistas dedicados seria inchar o conjunto de especialistas sem ganho. Em todos os casos, **o consumidor chama a abstração agnóstica** (`taskManager.*`); o adapter resolve transporte (REST API default, MCP opcional), formato e quando acionar o especialista. **Nunca** se chama o MCP/SDK de um provider direto no comando/agente.
 
 ### Fallback gracioso
 

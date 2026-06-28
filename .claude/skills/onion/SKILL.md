@@ -103,7 +103,7 @@ Branch atual:
 | Nova knowledge base | `/meta:create-knowledge-base` |
 | Configurar integração (task manager, APIs) | `/meta:setup-integration` |
 | Análise de problema complexo | `/meta:analyze-complex-problem` |
-| Orquestrar frota de agentes (fan-out paralelo) | `/meta:fleet` (skill `onion-fleet`) |
+| Orquestrar subagentes (fan-out paralelo) | `/meta:orchestrate` (skill `onion-orchestration`) |
 
 **Régua de decisão — em qual CAIXA vai um procedimento recorrente?** (a tabela acima dá o comando *se você já sabe a caixa*; isto decide a caixa — antes de criar)
 1. **P0 — Já existe?** `grep`/`find` no namespace. Se algo cobre, ou é extensão natural (flag, parâmetro, seção a um SKILL.md) → **EXTEND/FIX, não crie** (anti-proliferação de átomos).
@@ -115,19 +115,19 @@ Branch atual:
 
 ---
 
-### Orquestração de Frota (paralelo)
+### Orquestração (paralelo)
 | Intenção | Comando / Skill |
 |----------|-----------------|
-| Auditoria/migração/review amplos em paralelo | `/meta:fleet` |
-| Decompor → delegar → sintetizar/verificar | skill `onion-fleet` (autora `Workflow`) |
-| Doutrina e padrões canônicos | KB `agent-fleet-orchestration` |
+| Auditoria/migração/review amplos em paralelo | `/meta:orchestrate` |
+| Decompor → delegar → sintetizar/verificar | skill `onion-orchestration` (autora `Workflow`) |
+| Doutrina e padrões canônicos | KB `agent-orchestration` |
 
 ---
 
 ### Auto-Evolução do Framework
 | Intenção | Comando / KB |
 |----------|--------------|
-| "Auditar o Onion", "como melhoro o framework?", "está desatualizado/pesado?" | `/meta:evolve` (fleet, read-only → backlog priorizado) |
+| "Auditar o Onion", "como melhoro o framework?", "está desatualizado/pesado?" | `/meta:evolve` (orquestração, read-only → backlog priorizado) |
 | Qual padrão de refatoração aplicar (consolidar/adapter/KB/skill/fan-out) | KB `onion-modernization-doctrine` |
 | Frescor de KBs · conformidade meta-spec | `/meta:kb-freshness` · `/meta:metaspec-validate` (compostos pelo `/meta:evolve`) |
 

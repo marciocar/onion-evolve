@@ -45,7 +45,7 @@ Saída da vertical de design (`/design:identity`) — gerada da SSOT de tokens e
 Leia `landing-page.md` — cada seção tem headline proposta, bullets de mensagens-chave e nota de elemento visual. O trabalho é transformar os bullets em copy de marketing acabado, mantendo rastreabilidade à KB-fonte. Antes de publicar, valide contagens (90/51/5/37) contra `/meta:inventory`.
 
 ### Para redatores técnicos (manual)
-Leia `manual-toc.md` — o TOC já mapeia quais capítulos têm conteúdo existente em `docs/onion/` (✅) vs quais precisam ser escritos do zero (🔲). Há apenas 2 capítulos 🔲 (Task Manager & Forge Adapters, e Orquestração de Frota) — os demais já têm fontes reaproveitáveis.
+Leia `manual-toc.md` — o TOC já mapeia quais capítulos têm conteúdo existente em `docs/onion/` (✅) vs quais precisam ser escritos do zero (🔲). Há apenas 2 capítulos 🔲 (Task Manager & Forge Adapters, e Orquestração de Subagentes) — os demais já têm fontes reaproveitáveis.
 
 ### Para jornalistas / analistas (press kit + artigo crítico)
 Leia `press-kit.md` para o one-pager e FAQ de imprensa, depois `critical-article-outline.md` para os ângulos críticos e as perguntas difíceis que valem apuração. O artigo crítico foi intencionalmente balanceado: força e limitações com a mesma honestidade.
