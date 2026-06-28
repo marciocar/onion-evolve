@@ -4,8 +4,8 @@ description: 'Carteiro-LOCAL do doc-bridge (UPSTREAM) — espelho do /meta:co-de
 model: sonnet
 category: meta
 tags: [co-evolution, upstream, transport, carteiro, inbox, relay, bridge]
-version: "1.0.0"
-updated: "2026-06-27"
+version: "1.1.0"
+updated: "2026-06-28"
 allowed-tools: Read Bash(bash .claude/utils/co-evolution/co-relay.sh*) Bash(ls docs/evolution/*) Bash(cat .claude/.onion-version)
 argument-hint: "[<signal-file>] --target <path-local-do-core> [--from <dir>] [--dry-run]"
 ---
@@ -58,16 +58,26 @@ bash .claude/utils/co-evolution/co-relay.sh [<signal-file>] --target <path-do-co
 O helper: aplica a guarda de papel (stamp), valida o alvo (git + avisa se não tem `docs/evolution/` na
 árvore atual), e copia never-clobber (sinal já presente no `inbox/` = no-op idempotente).
 
-## Passo 4 — Marcar relayado + checkpoint do maestro
+## Passo 4 — Marcar relayado no PRÓPRIO repo (ato determinístico) + checkpoint do maestro
 
-Após o relay, o adotante pode mover o sinal local para `inbox/_processed/` (registro de "já enviado") **na
-sessão do adotante**. **Não** assuma o lado do core — quem commita + tria lá é a **sessão do core**. Saída
-sugerida:
+Após o relay, **mova o sinal local para `inbox/_processed/` e commite esse registro NO PRÓPRIO repo do
+adotante**. É o estado git-visível "já enviado ao core" (sem state file). Isto é **ato determinístico — NÃO
+uma escolha a devolver ao maestro**: untracked some num `git clean -fd`, então o registro **precisa ser
+commitado para durar**. Commite **junto da linha Onion/co-evolução, separado de outras frentes** em curso
+(ex.: não misturar com trabalho de produto na mesma branch). **Não pergunte "commito ou deixo solto?"** —
+oriente e execute; commitar é o caminho correto.
+
+> **Não confundir com I3.** Commitar o `_processed/` é no **próprio** repo do adotante (permitido — ele é o
+> escritor dele). O I3 proíbe commitar no repo **alheio** (o core) — e isso o carteiro já respeita
+> (entrega-sem-commit). O lado do core (commit + triagem do **sinal recebido**) é da **sessão do core**; não o assuma.
+
+Saída sugerida (ORIENTE o próximo passo — não pergunte se deve commitar):
 
 ```
 📨 Carteiro-local upstream — relayado ao core (<N> arquivo(s)) em <core>/docs/evolution/inbox/
-   ◆ entrega-sem-commit (I3 respeitado) — a sessão do core commita + tria
-   ▶ no core: abrir sessão → 📬 you-have-mail → /meta:co-evolve (triar o sinal)
+   ◆ entrega-sem-commit (I3 respeitado) — a sessão do core commita + tria o sinal
+   ▶ aqui (adotante): git mv inbox/<sinal> inbox/_processed/ + commit (junto da linha Onion, separado de outras frentes)
+   ▶ no core: abrir sessão → 📬 you-have-mail → /meta:co-evolve (triar)
 ```
 
 ## ⚠️ Notas
