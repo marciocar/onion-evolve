@@ -185,14 +185,20 @@ Toda abstração SDAAL segue exatamente esta árvore:
 | Arquivo | Papel | Tamanho típico |
 |---|---|---|
 | `README.md` | Onboarding em 1 página: o que é, como configurar, como usar | < 150 linhas |
-| `interface.md` | Contrato TypeScript canônico que todos os adapters implementam | < 300 linhas |
-| `types.md` | Tipos compartilhados (Input/Output), enums normalizados, `ProviderConfig` | < 250 linhas |
-| `factory.md` | `get<Manager>()`, `FactoryOptions`, decisão de qual adapter instanciar | < 200 linhas |
-| `detector.md` | `detectProvider()`, `checkProviderConfiguration()`, validações de env | < 200 linhas |
-| `adapters/<provider>.md` | Mapeamento campo-a-campo + chamadas MCP/API + normalização | < 400 linhas |
-| `adapters/none.md` | Null Object: warnings + IDs locais + degradação graciosa | < 200 linhas |
+| Classe | Arquivos | Alvo de tamanho |
+|---|---|---|
+| **Núcleo** (contrato/lógica enxuta) | `interface.md`, `types.md`, `factory.md`, `detector.md` | **≤ 500 linhas** |
+| **Adapter de provider** (mapeamento campo-a-campo de API real) | `adapters/<provider>.md` | **≤ 900 linhas** |
+| **Adapter leve / Null Object** | `adapters/none.md`, baseline (regex etc.) | ≤ 900 (pequenos por natureza) |
 
-**Regra dura**: nenhum arquivo passa de **400 linhas**. Acima disso, a IA perde precisão na leitura e o spec deixa de ser interpretável de forma confiável.
+**Critério por tipo (não um número universal):** o tamanho saudável depende do que o arquivo carrega.
+O **núcleo** é contrato e deve ser enxuto (≤500). Um **adapter de provider rico** (ex.: Jira com ADF + JQL +
+transitions + bulk) tem mapeamento campo-a-campo **irredutível** e legitimamente chega a ~900 — densidade não
+é inchaço. O que importa é **leitura focada**: o Transformer lê o bytecode para agir, então o arquivo precisa
+caber numa leitura precisa. **Crescimento orgânico é permitido, com critério** — limites baseados na realidade
+medida (núcleo real ≤465, adapter rico real ≤887) + folga, alinhados ao espírito da Regra 5 do lint (que já
+diferencia agente ≤1500 / comando ≤800). Acima do alvo da sua classe: considere fragmentar via *progressive
+disclosure* (§14.5), mas só se ganhar foco — não fragmentar por fragmentar.
 
 ---
 
@@ -571,27 +577,30 @@ private mapStatus(status: TaskStatus): string {
 
 ---
 
-### 14.5 Arquivos > 400 Linhas
+### 14.5 Arquivo acima do alvo da sua classe (fragmentar com critério)
 
-**❌ Errado** — um único `clickup.md` com 800 linhas misturando CRUD, busca, comentários, webhooks, normalização e helpers:
+O alvo depende da **classe** (§7): núcleo ≤500, adapter de provider ≤900. Um adapter de API rica perto de 900
+é **legítimo** (densidade irredutível). O anti-pattern é o arquivo que estoura o alvo **por mistura de
+responsabilidades** — não por densidade necessária.
 
-```
-adapters/clickup.md  (823 linhas)  ❌
-```
+**❌ Errado** — um adapter que cresce além do alvo por **misturar** CRUD, busca, comentários, webhooks,
+normalização e helpers num arquivo só, perdendo foco de leitura.
 
-**✅ Correto** — divida em sub-arquivos ou crie sub-abstrações coerentes:
+**✅ Correto** — quando o ganho é foco, divida via *progressive disclosure* (a IA carrega só o sub-arquivo do que precisa):
 
 ```
 adapters/
 └── clickup/
-    ├── index.md            # Entry point + composição (< 100 linhas)
+    ├── index.md            # Entry point + composição
     ├── crud.md             # createTask, getTask, updateTask, deleteTask
     ├── comments.md         # addComment, getComments
     ├── search.md           # searchTasks
     └── mappings.md         # Tabelas de status, priority, etc.
 ```
 
-**Por que importa**: acima de ~400 linhas, a IA perde precisão na leitura e o spec deixa de ser interpretável de forma confiável.
+**Por que importa**: o Markdown é o bytecode que o Transformer lê para agir — precisa caber numa leitura
+precisa. Mas fragmentar um adapter **coeso** só para baixar o número espalha contexto e piora. Critério, não
+número mágico: fragmente quando o arquivo perdeu foco, não quando densidade legítima o fez crescer.
 
 ---
 

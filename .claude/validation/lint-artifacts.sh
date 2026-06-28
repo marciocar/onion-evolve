@@ -247,9 +247,14 @@ check_no_mcp_onion_orchestrator() {
 }
 
 # ===========================================================================
-# REGRA 5 — Limites de linhas
+# REGRA 5 — Limites de linhas (por TIPO de artefato — tamanho saudável ≠ número universal)
 #           Agente  > 1500 linhas → HARD
 #           Comando > 800  linhas → HARD  (common/templates e common/prompts isentos)
+#           SDAAL núcleo (interface/types/factory/detector) > 500 → SOFT
+#           SDAAL adapter (utils/**/adapters/*.md)          > 900 → SOFT
+#           Critério por classe (doutrina docs/sdaal/sdaal.md §7): núcleo é contrato enxuto;
+#           adapter de provider rico tem mapeamento campo-a-campo irredutível. SOFT = crescimento
+#           orgânico permitido, mas o débito fica VISÍVEL/medido (não invisível).
 # ===========================================================================
 check_line_limits() {
   # 5a. Agentes
@@ -274,6 +279,28 @@ check_line_limits() {
       ! -path "*/common/prompts/*"   \
       -print0 2>/dev/null
   )
+
+  # 5c. SDAAL núcleo (interface/types/factory/detector) — alvo ≤ 500 [SOFT]
+  while IFS= read -r -d '' core; do
+    local lines
+    lines=$(wc -l < "${core}")
+    if [ "${lines}" -gt 500 ]; then
+      violation "SOFT" "${core}" "núcleo SDAAL com ${lines} linhas (alvo: 500 — ver docs/sdaal/sdaal.md §7)"
+    fi
+  done < <(
+    _find "${CLAUDE_DIR}/utils" \
+      \( -name "interface.md" -o -name "types.md" -o -name "factory.md" -o -name "detector.md" \) \
+      -print0 2>/dev/null
+  )
+
+  # 5d. SDAAL adapter de provider — alvo ≤ 900 [SOFT] (densidade campo-a-campo legítima)
+  while IFS= read -r -d '' adapter; do
+    local lines
+    lines=$(wc -l < "${adapter}")
+    if [ "${lines}" -gt 900 ]; then
+      violation "SOFT" "${adapter}" "adapter SDAAL com ${lines} linhas (alvo: 900 — fragmentar via progressive disclosure, sdaal.md §14.5)"
+    fi
+  done < <(_find "${CLAUDE_DIR}/utils" -path "*/adapters/*.md" -print0 2>/dev/null)
 }
 
 # ===========================================================================
