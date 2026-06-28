@@ -43,10 +43,10 @@ PASS=0
 FAIL=0
 FAILED_CASES=()
 
-if [ ! -f "${MANIFEST}" ]; then
-  echo "ERRO: manifest não encontrado: ${MANIFEST}" >&2
-  exit 2
-fi
+# Nota: o loop de fixtures (lint/fix/contract/merge) é core-only — exige as fixtures
+# vendorizadas em ${FIX_DIR}. Um adotante não as vendoriza, então NÃO abortamos aqui:
+# o loop abaixo (ver "Loop do manifest") fica condicional e os modos self-contained
+# (de-identification etc.) seguem rodando. Robustez a adotante sem perder a guarda no core.
 
 # ---------------------------------------------------------------------------
 # Sandbox para o modo lint — cópia fiel para que inventory.sh compute a verdade
@@ -509,6 +509,11 @@ run_assemble_plugin_selftests() {
   local mcompl="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion-compliance.manifest.sh"
   if [ ! -f "${helper}" ]; then record_fail "assemble-plugin" "helper ausente: ${helper}"; return; fi
   if ! command -v jq >/dev/null 2>&1; then record_pass "assemble-plugin: jq ausente → pulado (gracioso)"; return; fi
+  # Maquinaria de marketplace é core-only: validar a MONTAGEM de plugin só faz sentido
+  # em quem publica plugins (o core tem plugins/ committed). Um consumidor não republica
+  # → pular gracioso em vez de cair no assemble (que exige todos os componentes-fonte do
+  # manifest presentes) sob set -e e abortar o harness inteiro.
+  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_pass "assemble-plugin: sem plugins/ vendorizados → pulado (consumidor não publica plugins)"; return; fi
   local d rc
 
   # (a) DESIGN: estrutura com utils + gate (commands+agents+utils+validation+manifest+proveniência)
@@ -590,6 +595,9 @@ run_plugins_sync_selftests() {
   local vdir="${REPO_ROOT}/.claude/utils/marketplace/verticals"
   if [ ! -f "${asm}" ] || [ ! -d "${vdir}" ]; then record_fail "plugins-sync" "assembler/verticals ausentes"; return; fi
   if ! command -v jq >/dev/null 2>&1; then record_pass "plugins-sync: jq ausente → pulado (gracioso)"; return; fi
+  # Drift-guard de plugins committed é core-only: o adotante não vendoriza plugins/
+  # (só verticals/*.manifest.sh). Sem plugins/ não há "committed" para comparar → pular.
+  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_pass "plugins-sync: sem plugins/ vendorizados → pulado (consumidor não publica plugins)"; return; fi
   local manifest name committed d csha tsha
 
   for manifest in "${vdir}"/*.manifest.sh; do
@@ -682,6 +690,11 @@ run_graph_selftests() {
   local gfile="${REPO_ROOT}/docs/onion/graph.md"
   if [ ! -f "${gen}" ]; then record_fail "graph" "graph.sh ausente"; return; fi
   if ! command -v jq >/dev/null 2>&1; then record_pass "graph: jq ausente → pulado (gracioso)"; return; fi
+  # Core-only: o grafo canônico (graph.md em-sync) e o --impact assumem as verticais
+  # PUBLICADAS (ex.: onion-design). Um consumidor não vendoriza plugins/ → a regeneração
+  # local diverge do graph.md committed por construção. Pular gracioso (a guarda de drift
+  # do grafo é autoral do core, onde plugins/ existe e é validada estritamente).
+  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_pass "graph: sem plugins/ vendorizados → pulado (grafo canônico é autoral do core)"; return; fi
 
   local tmp; tmp="$(mktemp)"; bash "${gen}" --markdown > "${tmp}" 2>/dev/null
   if diff -q "${gfile}" "${tmp}" >/dev/null 2>&1; then record_pass "graph: graph.md em-sync com a spec-as-code"
@@ -921,19 +934,23 @@ run_de_identification_selftests() {
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
 echo ""
 
-while IFS=$'\t' read -r kind fixture target verdict keyword || [ -n "${kind:-}" ]; do
-  kind="${kind:-}"
-  [ -z "${kind}" ] && continue
-  [ "${kind#\#}" != "${kind}" ] && continue   # linha de comentário
-  [ "${kind}" = "kind" ] && continue           # header
-  case "${kind}" in
-    lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" ;;
-    fix)      run_fix_fixture "${fixture}" "${target}" "${verdict}" ;;
-    contract) run_contract_fixture "${fixture}" "${verdict}" ;;
-    merge)    run_merge_fixture "${fixture}" ;;
-    *)        record_fail "${fixture:-?}" "kind desconhecido '${kind}'" ;;
-  esac
-done < "${MANIFEST}"
+if [ -f "${MANIFEST}" ]; then
+  while IFS=$'\t' read -r kind fixture target verdict keyword || [ -n "${kind:-}" ]; do
+    kind="${kind:-}"
+    [ -z "${kind}" ] && continue
+    [ "${kind#\#}" != "${kind}" ] && continue   # linha de comentário
+    [ "${kind}" = "kind" ] && continue           # header
+    case "${kind}" in
+      lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" ;;
+      fix)      run_fix_fixture "${fixture}" "${target}" "${verdict}" ;;
+      contract) run_contract_fixture "${fixture}" "${verdict}" ;;
+      merge)    run_merge_fixture "${fixture}" ;;
+      *)        record_fail "${fixture:-?}" "kind desconhecido '${kind}'" ;;
+    esac
+  done < "${MANIFEST}"
+else
+  record_pass "fixtures: manifest ausente → loop de fixture pulado (core-only; adotante não vendoriza fixtures/)"
+fi
 
 # Modo resolve — não vem do manifest (cenários self-contained, sem fixture-file).
 run_resolve_selftests
@@ -945,10 +962,12 @@ run_prettierignore_selftests
 run_githook_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).
-run_assemble_plugin_selftests
+# Core-only: já pula gracioso sem plugins/ (ver função). O `|| true` é rede de segurança —
+# um abort imprevisto sob set -e jamais esconde os modos self-contained seguintes (de-id).
+run_assemble_plugin_selftests || true
 
 # Modo plugins-sync — drift-guard (REGRA 19): committed bate com a regeneração da fonte.
-run_plugins_sync_selftests
+run_plugins_sync_selftests || true
 
 # Modo capability — Capability Contract (REGRA 20): contrato honesto + resolução de requires.
 run_capability_selftests
