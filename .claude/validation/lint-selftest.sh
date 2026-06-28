@@ -867,6 +867,55 @@ run_corelay_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo de-identification — exercita o baseline determinístico (adapter `regex` da
+# abstração SDAAL de-identification). Self-contained (mktemp). Cobre MODOS DE FALHA:
+# PII conhecida é redigida; round-trip redact→restore reconstrói o original; texto
+# sem PII é no-op idempotente; saída determinística entre execuções; valor repetido
+# vira o MESMO placeholder. python3 ausente → pulado (gracioso, igual jq no graph).
+# ---------------------------------------------------------------------------
+run_de_identification_selftests() {
+  local s="${REPO_ROOT}/.claude/utils/de-identification/scripts/redact-deterministic.sh"
+  if [ ! -f "${s}" ]; then record_fail "de-id" "script ausente: ${s}"; return; fi
+  if ! command -v python3 >/dev/null 2>&1; then record_pass "de-id: python3 ausente → pulado (gracioso)"; return; fi
+
+  local map red restored
+  local sample='email a@b.com.br, CPF 123.456.789-09, CNPJ 12.345.678/0001-99, tel (11) 98765-4321, cartão 4111 1111 1111 1111, IP 10.0.0.1; de novo a@b.com.br'
+
+  # (a) PII conhecida é redigida — placeholders presentes, originais ausentes
+  map="$(mktemp)"; red="$(printf '%s' "${sample}" | bash "${s}" --redact --map "${map}")"
+  if printf '%s' "${red}" | grep -q '\[\[EMAIL_1\]\]' \
+     && printf '%s' "${red}" | grep -q '\[\[CPF_1\]\]' \
+     && printf '%s' "${red}" | grep -q '\[\[CARD_1\]\]' \
+     && ! printf '%s' "${red}" | grep -q '123\.456\.789-09'; then
+    record_pass "de-id: PII de formato fixo é redigida (email/CPF/CNPJ/tel/cartão/IP)"
+  else record_fail "de-id: redação" "PII não redigida ou original vazou no texto"; fi
+
+  # (b) round-trip redact→restore reconstrói o original
+  restored="$(printf '%s' "${red}" | bash "${s}" --restore --map "${map}")"
+  if [ "${restored}" = "${sample}" ]; then record_pass "de-id: round-trip redact→restore é fiel"
+  else record_fail "de-id: round-trip" "restore não reconstruiu o original"; fi
+  rm -f "${map}"
+
+  # (c) dedupe — valor repetido vira o MESMO placeholder (reidentificação consistente)
+  if [ "$(printf '%s' "${red}" | grep -oE 'EMAIL_[0-9]+' | sort -u | wc -l)" = "1" ]; then
+    record_pass "de-id: valor repetido → mesmo placeholder (dedupe estável)"
+  else record_fail "de-id: dedupe" "email repetido gerou placeholders distintos"; fi
+
+  # (d) texto sem PII → no-op idempotente
+  local clean='Reunião amanhã sobre o roadmap, sem dados pessoais.'
+  if [ "$(printf '%s' "${clean}" | bash "${s}" --redact --map "$(mktemp)")" = "${clean}" ]; then
+    record_pass "de-id: texto sem PII → no-op idempotente"
+  else record_fail "de-id: no-op" "redação alterou texto sem PII"; fi
+
+  # (e) determinismo — mesma entrada, duas execuções → saída idêntica
+  local a b
+  a="$(printf '%s' "${sample}" | bash "${s}" --redact --map "$(mktemp)")"
+  b="$(printf '%s' "${sample}" | bash "${s}" --redact --map "$(mktemp)")"
+  if [ "${a}" = "${b}" ]; then record_pass "de-id: redação determinística (2 execuções idênticas)"
+  else record_fail "de-id: determinismo" "saída variou entre execuções"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -912,6 +961,9 @@ run_design_tokens_selftests
 
 # Modo co-relay — idem (carteiro upstream; adotante+core em mktemp, sem fixture-file).
 run_corelay_selftests
+
+# Modo de-identification — baseline determinístico (adapter regex da abstração SDAAL): redação + round-trip + no-op + determinismo.
+run_de_identification_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário
