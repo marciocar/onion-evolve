@@ -135,9 +135,9 @@ Justificativa válida exige **pelo menos um** dos critérios:
 - Análise de produto sem framework específico → `@product-agent`
 - Pesquisa multi-fonte → `@research-agent`
 
-### Proibido: agente orquestrador de orquestração
+### Proibido: agente orquestrador de workers
 
-**Não crie um agente "worker-orchestrator".** A orquestração de orquestração (fan-out paralelo) reside em **skill/comando** (`onion-orchestration` + `/meta:orchestrate`), nunca em agente — por [architecture.md §4.2](./architecture.md), `agents/* → commands/*` é proibido e subagentes não disparam a orquestração. Ver [commands.md §10](./commands.md).
+**Não crie um agente "worker-orchestrator".** A orquestração de workers (fan-out paralelo) reside em **skill/comando** (`onion-orchestration` + `/meta:orchestrate`), nunca em agente — por [architecture.md §4.2](./architecture.md), `agents/* → commands/*` é proibido e subagentes não disparam a orquestração. Ver [commands.md §10](./commands.md).
 
 ### Regra para o YAML `description`
 

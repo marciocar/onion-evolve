@@ -58,7 +58,7 @@ related:
 ### Onde eu desconfio de mim mesmo
 - **Sobreposição com `onion-patterns`/`onion-orchestration`.** Elas já cobrem talvez 60%. Meu palpite:
   o catálogo deve **estender `onion-patterns`** (seção "playbooks"), não virar skill/comando
-  novo. A sala de obra precisa olhar o código real e decidir. CLAUDE.md: "não inchar a frota".
+  novo. A sala de obra precisa olhar o código real e decidir. CLAUDE.md: "não inchar o conjunto de especialistas".
 - **Não precisa de comando.** Resisti à tentação do `/meta:strategize`. Reconhecimento por
   skill (progressive disclosure) basta no começo; comando só se houver demanda de invocação
   explícita.

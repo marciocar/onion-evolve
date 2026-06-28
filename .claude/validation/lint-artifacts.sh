@@ -826,7 +826,7 @@ check_inventory_total_drift() {
     while IFS= read -r line; do
       [ -z "${line}" ] && continue
       case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
-      if printf '%s' "${line}" | grep -qiE 'paralel|orquestr|orchestrator|frota|fan-out|simultân|supervision'; then continue; fi
+      if printf '%s' "${line}" | grep -qiE 'paralel|orquestração de workers|orquestração paralela|orchestrator-worker|frota|fan-out|simultân|supervision'; then continue; fi
       n="$(printf '%s' "${line}" | grep -oiE '(^|[^0-9-])[0-9]+\+ comandos' | grep -oE '[0-9]+' | head -1 || true)"
       if [ -n "${n}" ] && [ "${n}" != "${cmd}" ]; then
         violation "SOFT" "${f}" "contagem aproximada de comandos divergente da SSOT: '${n}+ comandos' (esperado ${cmd}+) — /meta:inventory"
@@ -878,7 +878,7 @@ check_inventory_total_drift() {
     while IFS= read -r line; do
       [ -z "${line}" ] && continue
       case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
-      if printf '%s' "${line}" | grep -qiE 'paralel|orquestr|orchestrator|frota|fan-out|simultân|supervision|trabalhando|criad'; then continue; fi
+      if printf '%s' "${line}" | grep -qiE 'paralel|orquestração de workers|orquestração paralela|orchestrator-worker|frota|fan-out|simultân|supervision|trabalhando|criad'; then continue; fi
       # '(N agentes)' parentético = contagem POR-CATEGORIA/breakdown (ex.: header
       # 'AGENTES ESPECIALIZADOS (3 agentes)'), não total — pula mesmo com marcador.
       if printf '%s' "${line}" | grep -qE '\([0-9]+ agentes\)'; then continue; fi

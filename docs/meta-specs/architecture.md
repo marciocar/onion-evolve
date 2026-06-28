@@ -68,7 +68,7 @@ CONTRIBUTING.md             # Guidelines para evolução
 │
 ├── skills/                 # Skills (cérebro)
 │   ├── onion/              # Orquestrador master
-│   ├── onion-orchestration/        # Orquestração de orquestração (fan-out paralelo)
+│   ├── onion-orchestration/  # Orquestração de workers (fan-out paralelo)
 │   ├── onion-patterns/     # Padrões e nomenclatura
 │   ├── onion-validation/   # Regras de validação
 │   └── language-standards/ # Padrões de idioma

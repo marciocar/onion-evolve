@@ -87,7 +87,7 @@ Não precisa de comando pesado. O reconhecimento pode ser:
 > ⚠️ **Risco de sobreposição real**: `onion-orchestration` + `onion-patterns` juntas já cobrem talvez
 > 60% disto. A pergunta honesta para a sala de obra: o catálogo é uma **skill nova**, ou uma
 > **extensão de `onion-patterns`** (adicionar seção "playbooks de estratégia")? Decidir contra
-> "não inchar a frota sem ganho" (CLAUDE.md). Meu palpite: **estender `onion-patterns`** primeiro.
+> "não inchar o conjunto de especialistas sem ganho" (CLAUDE.md). Meu palpite: **estender `onion-patterns`** primeiro.
 
 ## Critério de aceitação (esboço)
 
