@@ -135,9 +135,9 @@ Justificativa válida exige **pelo menos um** dos critérios:
 - Análise de produto sem framework específico → `@product-agent`
 - Pesquisa multi-fonte → `@research-agent`
 
-### Proibido: agente orquestrador de frota
+### Proibido: agente orquestrador de orquestração
 
-**Não crie um agente "fleet-orchestrator".** A orquestração de frota (fan-out paralelo) reside em **skill/comando** (`onion-fleet` + `/meta:fleet`), nunca em agente — por [architecture.md §4.2](./architecture.md), `agents/* → commands/*` é proibido e subagentes não disparam a frota. Ver [commands.md §10](./commands.md).
+**Não crie um agente "worker-orchestrator".** A orquestração de orquestração (fan-out paralelo) reside em **skill/comando** (`onion-orchestration` + `/meta:orchestrate`), nunca em agente — por [architecture.md §4.2](./architecture.md), `agents/* → commands/*` é proibido e subagentes não disparam a orquestração. Ver [commands.md §10](./commands.md).
 
 ### Regra para o YAML `description`
 
@@ -238,7 +238,7 @@ Arquivo hipotético: `.claude/agents/misc/MyAgent.md`
 
 ## 9. Guardas determinísticas que tocam agentes testam a si mesmas
 
-Várias guardas de `lint-artifacts.sh` protegem agentes — frontmatter obrigatório (Regra 1), nomes de tool válidos / proibição de MCP de provider no frontmatter (Regra 12), limites de tamanho (Regra 5), proibição de agente fleet-orchestrator (Regra 7). Pela simetria com [commands.md §11](./commands.md), toda guarda **nova** (ou alteração) que valide agentes nasce com:
+Várias guardas de `lint-artifacts.sh` protegem agentes — frontmatter obrigatório (Regra 1), nomes de tool válidos / proibição de MCP de provider no frontmatter (Regra 12), limites de tamanho (Regra 5), proibição de agente worker-orchestrator (Regra 7). Pela simetria com [commands.md §11](./commands.md), toda guarda **nova** (ou alteração) que valide agentes nasce com:
 
 1. **Fixture de failure-mode** em `.claude/validation/fixtures/`, registrada no `manifest.tsv`, isolando a regra (caso `bad` obrigatório; `good`/`exempt` quando houver allowlist — ex.: a allowlist de especialistas de provider da Regra 12).
 2. **Revisão independente** de prompt neutro antes do PR.

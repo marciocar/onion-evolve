@@ -63,10 +63,10 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 | 2 | Cada integração de task manager é caso especial | Reescrever prompts/formatos por provider (Jira exige ADF, ClickUp Unicode, Asana HTML) | SDAAL Task Manager Abstraction — `TASK_MANAGER_PROVIDER` no `.env` roteia ao adapter certo, formatação tipada |
 | 3 | Trabalho interrompido = contexto perdido | Reexplicar contexto do zero a cada retomada de sessão | Workflows faseados retomáveis + `STATE.md` (ponteiro Tier-0 ~1KB) em `.claude/sessions/` |
 | 4 | Compliance é silo separado do dev | Documentação ISO/SOC2 criada depois, manualmente, desconectada da entrega | 5 agentes de compliance integrados ao mesmo ciclo; `/docs:build-compliance-docs` gera a partir do estado real |
-| 5 | Frotas de IA são caras e trabalhosas | Escrever scripts de orquestração manuais, schemas, tiering, tratamento de falha | Skill `onion-fleet` autora `Workflow` com tiering automático (haiku/sonnet/opus), barrier+fan-in, verificação adversarial |
+| 5 | Orquestrações de IA são caras e trabalhosas | Escrever scripts de orquestração manuais, schemas, tiering, tratamento de falha | Skill `onion-orchestration` autora `Workflow` com tiering automático (haiku/sonnet/opus), barrier+fan-in, verificação adversarial |
 | 6 | Multi-repo sem coordenação quebra integrações | Coordenação por Slack/docs manuais, sem garantia de validação prévia | Federation v2 — topologia peer + ledger git (`publish` → `check` → `status` → `rollback`) |
-| 7 | Framework envelhece silenciosamente | Documentação e agentes ficam obsoletos sem que ninguém audite | `/meta:evolve` — auto-auditoria em 8 dimensões via frota, backlog priorizado com evidência citada |
-| 8 | Sem padrão paralelo vs sequencial | O time não sabe quando usar fan-out, sessões ou Agent Teams | KB `agent-fleet-orchestration` — tabela de decisão dos 3 substratos + fallback gracioso |
+| 7 | Framework envelhece silenciosamente | Documentação e agentes ficam obsoletos sem que ninguém audite | `/meta:evolve` — auto-auditoria em 8 dimensões via orquestração, backlog priorizado com evidência citada |
+| 8 | Sem padrão paralelo vs sequencial | O time não sabe quando usar fan-out, sessões ou Agent Teams | KB `agent-orchestration` — tabela de decisão dos 3 substratos + fallback gracioso |
 
 *(Detalhamento "antes/depois" com prosa completa e fontes por item: material bruto §2)*
 
@@ -81,7 +81,7 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 │                 Claude Code (plataforma única)                │
 ├─────────────────────────────────────────────────────────────┤
 │  SKILLS (.claude/skills/) — 5 — orquestração de alto nível     │
-│    onion · onion-fleet · onion-patterns ·                      │
+│    onion · onion-orchestration · onion-patterns ·                      │
 │    onion-validation · language-standards                       │
 ├──────────────────┬──────────────────────────────────────────┤
 │  COMMANDS         │  AGENTS (.claude/agents/)                 │
@@ -104,7 +104,7 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 
 1. **Comandos** (`.claude/commands/`) — 82 arquivos Markdown invocáveis por categoria (`/product:*`, `/engineer:*`, `/git:*`, `/docs:*`, `/meta:*`, `/validate:*`, `/test:*`, `/development:*`, `/quick:*`). Cada um define `allowed-tools` (escopo de permissão), `model` (tier de custo) e a lógica de orquestração. Comandos definem **o que fazer e como** — não *quem sabe fazer*.
 2. **Agentes** (`.claude/agents/`) — 49 especialistas em 9 categorias (development, product, git, meta, compliance, testing, review, research, deployment). Sabem **fazer**: `@jira-specialist` opera JQL+ADF, `@metaspec-gate-keeper` valida arquitetura, `@react-developer` escreve componentes.
-3. **Skills** (`.claude/skills/`) — 5 programas de orquestração de alto nível. `onion-fleet` é o mais poderoso: autora scripts `Workflow` nativos do Claude Code para fan-out paralelo de agentes, com tiering de modelos por tier (haiku para scan/classificação, sonnet para raciocínio, opus para julgamento adversarial — sem fixar versão exata).
+3. **Skills** (`.claude/skills/`) — 5 programas de orquestração de alto nível. `onion-orchestration` é o mais poderoso: autora scripts `Workflow` nativos do Claude Code para fan-out paralelo de agentes, com tiering de modelos por tier (haiku para scan/classificação, sonnet para raciocínio, opus para julgamento adversarial — sem fixar versão exata).
 4. **Abstrações** (`.claude/utils/`) — padrão SDAAL em dois eixos: **Task Manager** (Jira/ClickUp/Asana/Linear, API-first com MCP opcional) e **Forge** (GitHub hoje, GitLab/Bitbucket com costura pronta). Comandos nunca chamam a API do provider direto — sempre via adapter, que resolve transporte, formatação e fallback.
 5. **Documentação constitucional** (`docs/`) — Meta-specs L0 (constituição), Knowledge Bases (34 documentos estruturados para consumo por IA), Business/Technical/Compliance Contexts (Spec as Code gerados por `/docs:build-*-docs`).
 
@@ -173,11 +173,11 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 | SOC2 Type II | `@soc2-specialist` | Controles + coleta de evidências |
 | Validação arquitetural | `@metaspec-gate-keeper` | Conformidade L0/L1+ |
 
-### Orquestração & Frota
+### Orquestração
 
 | Capacidade | Mecanismo | Quando usar |
 |------------|-----------|-------------|
-| Fan-out paralelo | `Workflow` (nativo) + skill `onion-fleet` | Auditoria, migração, review amplo |
+| Fan-out paralelo | `Workflow` (nativo) + skill `onion-orchestration` | Auditoria, migração, review amplo |
 | Sessões retomáveis | `.claude/sessions/` + `STATE.md` | Feature de longa duração |
 | Agent Teams (opt-in) | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` | Negociação peer-a-peer viva, experimental |
 | Federation multi-repo | `/meta:federation-*` | Coordenação cross-repo sem quebrar contratos |
@@ -186,7 +186,7 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 
 | Capacidade | Comando |
 |------------|---------|
-| Auto-auditoria | `/meta:evolve` — 8 dimensões, frota, backlog priorizado |
+| Auto-auditoria | `/meta:evolve` — 8 dimensões, orquestração, backlog priorizado |
 | Frescor de KBs | `/meta:kb-freshness` — veredito CURRENT/STALE/HISTORICAL |
 | Criar novo agente | `/meta:create-agent` — contextualizado no ecossistema |
 | Criar novo comando | `/meta:create-command` |
@@ -213,7 +213,7 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 
 ### Caso 3 — Agent Teams: "Decidindo Não Adotar (Com Evidência)"
 
-**Situação:** a Anthropic lançou `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (substrato experimental de peers persistentes) — adotar como novo padrão de frota?
+**Situação:** a Anthropic lançou `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (substrato experimental de peers persistentes) — adotar como novo padrão de orquestração?
 **O que o Onion fez:** smoke-test empírico (TeamCreate→TaskCreate→SendMessage round-trip), demo real com divisão de tarefas por `owner`, e avaliação estruturada das três primitivas (sessões faseadas / `Workflow` / Agent Teams).
 **Resultado:** ADR formal — Agent Teams entra como **3º modo opt-in** com detecção de capacidade e fallback gracioso; os padrões existentes (`Workflow`-first) permanecem.
 **Citação:** *"Workflow = orquestração que o orquestrador desenha. Agent Teams = coordenação que emerge."* — [onion-agent-teams-evaluation-2026-06.md](../../analysis/onion-agent-teams-evaluation-2026-06.md) §3
@@ -303,7 +303,7 @@ Não. O Onion vive inteiramente em `.claude/` — código, linguagem, framework 
 Sim, para Jira, ClickUp, Asana ou Linear — basta definir `TASK_MANAGER_PROVIDER` no `.env`. Sem provider, o modo `none` permite uso offline com decomposição local.
 
 **Precisa de plano Claude Code pago?**
-O Onion usa o Claude Code como plataforma. Frotas pesadas (ex.: `/meta:evolve` ≈ 1.27M tokens numa auditoria completa) favorecem planos com mais headroom; uso moderado funciona em planos menores.
+O Onion usa o Claude Code como plataforma. Orquestrações pesadas (ex.: `/meta:evolve` ≈ 1.27M tokens numa auditoria completa) favorecem planos com mais headroom; uso moderado funciona em planos menores.
 
 **O Onion substitui o GitFlow?**
 Não — complementa. `/engineer:*` e `/git:*` são orientados pelo motor GitFlow (`gitflow-patterns.md`); o Onion adiciona sessões retomáveis, gates de qualidade e integração com task manager por cima.
@@ -320,7 +320,7 @@ Copiar `.claude/` para o projeto, configurar `.env` (task manager + forge) e rod
 **Posso usar só partes do Onion?**
 Sim. As três dimensões (produto, engenharia, compliance) são peer — pode começar só com `/engineer:*`. Adapters só ativam se as variáveis do `.env` estiverem configuradas.
 
-**Agent Teams substitui o Workflow para frotas?**
+**Agent Teams substitui o Workflow para orquestração?**
 Não. São complementares: `Workflow` = orquestração determinística de forma conhecida (auditoria, migração, review); Agent Teams = coordenação emergente peer-a-peer (negociação viva). Onion usa `Workflow` por padrão; Agent Teams é opt-in.
 
 **O Onion funciona com monorepo?**
@@ -371,7 +371,7 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 - **Auto-auditoria**: [onion-evolution-2026-06-15.md](../../analysis/onion-evolution-2026-06-15.md)
 - **Agent Teams ADR**: [onion-agent-teams-evaluation-2026-06.md](../../analysis/onion-agent-teams-evaluation-2026-06.md)
 - **Federation v2**: [onion-federation-design-v2-2026-06.md](../../analysis/onion-federation-design-v2-2026-06.md) · [multi-repo-federation.md](../concepts/multi-repo-federation.md)
-- **Doutrina de frota**: [agent-fleet-orchestration.md](../concepts/agent-fleet-orchestration.md)
+- **Doutrina de orquestração**: [agent-orchestration.md](../concepts/agent-orchestration.md)
 - **Task Manager Abstraction**: [task-manager-abstraction.md](../concepts/task-manager-abstraction.md)
 - **Getting started**: `docs/onion/getting-started.md`
 

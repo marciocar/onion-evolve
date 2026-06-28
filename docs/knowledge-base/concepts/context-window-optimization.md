@@ -41,7 +41,7 @@
 
 Lineup atual do Claude no Claude Code — use estes modelos; não há modelos OpenAI/Gemini como opções de agente no Onion.
 
-| Modelo | Papel típico em frota | Context Window | ~Linhas de Código |
+| Modelo | Papel típico em orquestração | Context Window | ~Linhas de Código |
 |--------|-----------------------|----------------|-------------------|
 | Claude Fable 5 | Orquestração de raciocínio profundo | 1M tokens | ~400K linhas |
 | Claude Opus 4.8 | Orquestrador (planeja, sintetiza, decide) | 200K tokens (1M na variante `[1m]`) | ~80K–400K linhas |
@@ -50,7 +50,7 @@ Lineup atual do Claude no Claude Code — use estes modelos; não há modelos Op
 
 **Nota**: 1 token ≈ 4 caracteres em inglês, ~3 em código.
 
-**Tiering de modelos** (doutrina "orchestration era"): o orquestrador roda em Opus 4.8 (ou Fable 5 quando o raciocínio domina); os workers paralelos rodam em Sonnet 4.6 ou Haiku 4.5. Reservar o modelo caro só para o nível que decide reduz custo agregado sem perder qualidade no resultado final. Veja [Custo em Frota (Multi-Agente)](#-custo-em-frota-multi-agente).
+**Tiering de modelos** (doutrina "orchestration era"): o orquestrador roda em Opus 4.8 (ou Fable 5 quando o raciocínio domina); os workers paralelos rodam em Sonnet 4.6 ou Haiku 4.5. Reservar o modelo caro só para o nível que decide reduz custo agregado sem perder qualidade no resultado final. Veja [Custo em Orquestração (Multi-Agente)](#-custo-em-orquestração-multi-agente).
 
 ---
 
@@ -240,7 +240,7 @@ Para o mecanismo concreto de cache de prompt entre chamadas e entre subagentes, 
 
 **Regra de ouro:** ordene o contexto do **mais estável para o mais volátil**. O cache cobre apenas o prefixo comum; qualquer mudança no início invalida o que vem depois. System prompt e blocos compartilhados primeiro, conteúdo volátil (arquivo atual, tarefa, erros) por último.
 
-### Caching em frota (fan-out)
+### Caching em orquestração (fan-out)
 
 Em um fan-out, N subagentes recebem o **mesmo prefixo** (system prompt do worker + spec/plano + KB de referência) e diferem apenas na fatia volátil (o item que cada um processa). Esse prefixo idêntico é exatamente o caso de uso do prompt caching: paga-se o processamento do prefixo essencialmente uma vez e os N workers o reutilizam.
 
@@ -256,9 +256,9 @@ Em um fan-out, N subagentes recebem o **mesmo prefixo** (system prompt do worker
 └────────────────────────────────────────────────────────┘
 ```
 
-> **A coordenação custa 0 tokens de modelo.** Na ferramenta nativa **Workflow** (Dynamic Workflows, research preview de 28/mai/2026), a lógica de orquestração — `agent(...)`, `parallel([...])`, `pipeline(...)`, agregação e validação de `schema` — roda em **JavaScript**, não consome tokens do modelo. Apenas as chamadas de subagente (`agent`) gastam tokens. Combinado com prompt caching no prefixo compartilhado, o overhead de coordenar uma frota grande tende a zero: você paga pelos workers e pelo prefixo (uma vez), não por orquestrar.
+> **A coordenação custa 0 tokens de modelo.** Na ferramenta nativa **Workflow** (Dynamic Workflows, research preview de 28/mai/2026), a lógica de orquestração — `agent(...)`, `parallel([...])`, `pipeline(...)`, agregação e validação de `schema` — roda em **JavaScript**, não consome tokens do modelo. Apenas as chamadas de subagente (`agent`) gastam tokens. Combinado com prompt caching no prefixo compartilhado, o overhead de coordenar uma orquestração grande tende a zero: você paga pelos workers e pelo prefixo (uma vez), não por orquestrar.
 
-Detalhamento de custo e alocação de budget entre orquestrador e workers em [Custo em Frota (Multi-Agente)](#-custo-em-frota-multi-agente). Para os padrões de orquestração em si (fan-out, pipeline, isolamento por worktree), veja [agent-fleet-orchestration.md](agent-fleet-orchestration.md).
+Detalhamento de custo e alocação de budget entre orquestrador e workers em [Custo em Orquestração (Multi-Agente)](#-custo-em-orquestração-multi-agente). Para os padrões de orquestração em si (fan-out, pipeline, isolamento por worktree), veja [agent-orchestration.md](agent-orchestration.md).
 
 ---
 
@@ -450,11 +450,11 @@ budget:
 
 ---
 
-## 🚀 Custo em Frota (Multi-Agente)
+## 🚀 Custo em Orquestração (Multi-Agente)
 
 Quando o trabalho é distribuído entre vários subagentes, a otimização de contexto deixa de ser "um budget" e passa a ser **alocação de budget entre o orquestrador e N workers**. O objetivo é o mesmo — gastar menos tokens por resultado — mas as alavancas mudam.
 
-> No Sistema Onion a orquestração de frota mora em **skill + comando** (que podem invocar `commands/*` e `agents/*`), nunca dentro de um agente — `architecture.md` §4.2 proíbe `agents/* → commands/*`. Não existe e não se deve criar um agente "fleet-orchestrator".
+> No Sistema Onion a orquestração mora em **skill + comando** (que podem invocar `commands/*` e `agents/*`), nunca dentro de um agente — `architecture.md` §4.2 proíbe `agents/* → commands/*`. Não existe e não se deve criar um agente "worker-orchestrator".
 
 ### 1. Token budgeting por worker
 
@@ -469,7 +469,7 @@ Cada subagente disparado por `agent(...)` recebe seu próprio budget (parâmetro
 
 ### 2. Model tiering
 
-Não use o modelo do orquestrador em todo worker. O orquestrador (que planeja, sintetiza e decide) roda em **Opus 4.8** — ou **Fable 5** quando o raciocínio domina; os workers paralelos rodam em **Sonnet 4.6** (uso geral) ou **Haiku 4.5** (classificação, extração, filtro, tarefas mecânicas). Reservar o tier caro para o nível de decisão é o que torna a frota economicamente viável.
+Não use o modelo do orquestrador em todo worker. O orquestrador (que planeja, sintetiza e decide) roda em **Opus 4.8** — ou **Fable 5** quando o raciocínio domina; os workers paralelos rodam em **Sonnet 4.6** (uso geral) ou **Haiku 4.5** (classificação, extração, filtro, tarefas mecânicas). Reservar o tier caro para o nível de decisão é o que torna a orquestração economicamente viável.
 
 ```
 Opus 4.8 (orquestrador)  ── planeja, distribui, sintetiza
@@ -485,7 +485,7 @@ Opus 4.8 (orquestrador)  ── planeja, distribui, sintetiza
 O custo agregado de um run não é o budget de um agente, e sim a soma do orquestrador com os workers. Um modelo grosseiro de alocação:
 
 ```yaml
-fleet_budget:
+orchestration_budget:
   total_run: 200000          # teto agregado do run (tokens de modelo)
   orchestrator:
     model: opus-4.8
@@ -498,7 +498,7 @@ fleet_budget:
   # prefixo compartilhado (system + spec + KB) cacheado → cobrado ~1x
 ```
 
-Limites operacionais da ferramenta Workflow: até **16 subagentes concorrentes** e **1.000 agregados por run**; nesting de subagentes até **5 níveis** (v2.1.172, 10/jun/2026). Mesmo assim, prefira orquestrar a frota no **nível principal** (skill/comando): é mais barato e limpo do que aninhar fan-out dentro de um subagente.
+Limites operacionais da ferramenta Workflow: até **16 subagentes concorrentes** e **1.000 agregados por run**; nesting de subagentes até **5 níveis** (v2.1.172, 10/jun/2026). Mesmo assim, prefira orquestrar os workers no **nível principal** (skill/comando): é mais barato e limpo do que aninhar fan-out dentro de um subagente.
 
 ### 4. Quando paralelizar compensa
 
@@ -514,7 +514,7 @@ Paralelizar tem custo fixo (o budget do orquestrador para fan-out e síntese). C
 
 **Heurística:** paralelize quando o trabalho é divisível em itens independentes **e** o prefixo compartilhado (cacheável) é grande em relação à fatia volátil de cada worker — aí o caching + a coordenação em JS (0 tokens) fazem o custo marginal de cada worker tender só ao seu trabalho real.
 
-> Os padrões de orquestração citados (fan-out-and-synthesize, pipeline, classify-and-act, generate-and-filter, adversarial verification, tournament, loop-until-done) estão detalhados em [agent-fleet-orchestration.md](agent-fleet-orchestration.md).
+> Os padrões de orquestração citados (fan-out-and-synthesize, pipeline, classify-and-act, generate-and-filter, adversarial verification, tournament, loop-until-done) estão detalhados em [agent-orchestration.md](agent-orchestration.md).
 
 ---
 
@@ -602,7 +602,7 @@ Estamos trabalhando com React.
 
 ### Conceitos Relacionados
 
-- [agent-fleet-orchestration.md](agent-fleet-orchestration.md) — padrões de orquestração de frota (fan-out, pipeline, isolamento por worktree) e onde o custo multi-agente desta KB se aplica
+- [agent-orchestration.md](agent-orchestration.md) — padrões de orquestração (fan-out, pipeline, isolamento por worktree) e onde o custo multi-agente desta KB se aplica
 - [ai-agent-design-patterns.md](ai-agent-design-patterns.md) — padrões de design de agentes de IA
 
 ---

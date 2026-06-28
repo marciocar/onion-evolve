@@ -38,7 +38,7 @@ related:
    playbooks** (`caso → fluxo → grupo de ferramentas`) onde a decisão vira **reconhecimento**
    (match), não composição. Deliberação cara passa a ser **fallback**. É recognition-primed
    decision making — mais barato e mais alinhado a "eficiência E eficácia".
-4. Revisei Docs 1 e 2 para catálogo-first. O Onion tem peças de orquestração (Workflow/fleet/
+4. Revisei Docs 1 e 2 para catálogo-first. O Onion tem peças de orquestração (Workflow/onion-orchestration/
    `onion-patterns`) mas **não um catálogo de playbooks por caso de uso** — esse é o gap.
 5. 4 docs entregues (este é o 3).
 
@@ -56,7 +56,7 @@ related:
   catálogo legível — baixo risco, alto valor de auditoria (casa com o pitch do reposicionamento).
 
 ### Onde eu desconfio de mim mesmo
-- **Sobreposição com `onion-patterns`/`onion-fleet`.** Elas já cobrem talvez 60%. Meu palpite:
+- **Sobreposição com `onion-patterns`/`onion-orchestration`.** Elas já cobrem talvez 60%. Meu palpite:
   o catálogo deve **estender `onion-patterns`** (seção "playbooks"), não virar skill/comando
   novo. A sala de obra precisa olhar o código real e decidir. CLAUDE.md: "não inchar a frota".
 - **Não precisa de comando.** Resisti à tentação do `/meta:strategize`. Reconhecimento por

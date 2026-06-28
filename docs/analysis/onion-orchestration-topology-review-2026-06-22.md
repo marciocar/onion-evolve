@@ -1,21 +1,21 @@
 ---
-title: 'Revisão adversarial em frota — ADR de topologia de frota (locus × forma)'
+title: 'Revisão adversarial em orquestração — ADR de topologia de orquestração (locus × forma)'
 date: 2026-06-22
-type: fleet-review-report
+type: orchestration-review-report
 status: executado (refinos camadas 1-2 aplicados ao ADR; camada 3 diferida à promoção)
-scope: revisão do ADR onion-fleet-topology-adr-draft-2026-06-21
+scope: revisão do ADR onion-orchestration-topology-adr-draft-2026-06-21
 run_id: wf_e7ae4944-674
-target: docs/analysis/onion-fleet-topology-adr-draft-2026-06-21.md
-note: "Proof-point da revisão (dogfood: revisar a doutrina de frota usando a própria frota). Output bruto: /tmp/.../tasks/wcutuh3rs.output (efêmero)."
+target: docs/analysis/onion-orchestration-topology-adr-draft-2026-06-21.md
+note: "Proof-point da revisão (dogfood: revisar a doutrina de orquestração usando a própria orquestração). Output bruto: /tmp/.../tasks/wcutuh3rs.output (efêmero)."
 ---
 
-# Revisão adversarial em frota — ADR de topologia de frota
+# Revisão adversarial em orquestração — ADR de topologia de orquestração
 
 ## 0. Sumário do run
 
 | | |
 |---|---|
-| Padrão | fan-out-and-synthesize + verificação adversarial (dogfood: frota revisando a doutrina de frota) |
+| Padrão | fan-out-and-synthesize + verificação adversarial (dogfood: orquestração revisando a doutrina de orquestração) |
 | Lentes (review) | 5 — coerência-doutrinária · âncoras/citações · lógica-do-gatilho · nomenclatura · tensão-KB |
 | Workers | 21 agentes · ~838K tokens · 108 tool-uses · ~9,5 min |
 | Fan-in | determinístico em JS a 0 token (fiel ao próprio ADR: síntese no orquestrador, não em agente) |
@@ -41,11 +41,11 @@ seção Referências ficou stale. **Fix aplicado** (camada 1).
 
 ### Tema B — Critérios de aceite vendem "mecânico" onde é julgamento (3 · 1 confirmed/2 partial · minor) → ✅ REFINADO
 - **CA3** atribuía a `/meta:metaspec-validate` (julgamento LLM, `model: sonnet`) uma prova mecânica
-  "→ ✅". Verificado: `grep 'fleet-orchestrator' .claude/agents/` retorna só a *referência-proibição* em
+  "→ ✅". Verificado: `grep 'worker-orchestrator' .claude/agents/` retorna só a *referência-proibição* em
   `metaspec-gate-keeper.md`, nenhum agente real → a ausência estrutural é grep-able; a garantia
-  *comportamental* ("nunca dispara frota") **não** é. **Fix:** CA3 separado em (a) ausência estrutural
+  *comportamental* ("nunca dispara orquestração") **não** é. **Fix:** CA3 separado em (a) ausência estrutural
   determinística + (b) conformidade de design por veredito LLM.
-- **CA2** "grep não encontra agente que dispara frota" — grep pega a string literal, não a intenção
+- **CA2** "grep não encontra agente que dispara orquestração" — grep pega a string literal, não a intenção
   semântica (expressa em prosa no `.md`). **Fix:** CA2 reescrito para a parte estrutural observável.
 - **`b·m ≤ W`** decorativa (W/m/b sem valor nem método; o próprio ADR marca o paper como não-verificado).
   **Fix:** rebaixada a heurística de primeiros princípios ("input do sintetizador cabe na janela").
@@ -62,8 +62,8 @@ seção Referências ficou stale. **Fix aplicado** (camada 1).
 - **Doutrina "vigente" sem porta de entrada** — KB/SKILL não tocadas; o leitor da KB só vê a armadilha de
   *locus*. (Diferido: frase-âncora locus×forma na KB ao lado de `:461/:478`.)
 - **Metadados incoerentes** — `status: accepted` + título "RASCUNHO" + `type: adr-draft` + filename
-  `-draft-`. **4 referências cruzadas** em `onion-fleet-math-phase-transition-2026-06.md` e
-  `onion-fleet-external-radar-2026-06.md` apontam para o nome atual. (Diferido: promoção `draft→adr` + atualizar refs.)
+  `-draft-`. **4 referências cruzadas** em `onion-orchestration-math-phase-transition-2026-06.md` e
+  `onion-orchestration-external-radar-2026-06.md` apontam para o nome atual. (Diferido: promoção `draft→adr` + atualizar refs.)
 - **Espantalho leve** — a KB *silencia* sobre forma do grafo, não diz "hierarquia proibida". **Fix:**
   "O gap" reframado como inferência-por-omissão (camada 2). ✅
 
@@ -83,16 +83,16 @@ seção Referências ficou stale. **Fix aplicado** (camada 1).
 1. **[lógica-gatilho] CA3 confunde validação estrutural (grep-able) com garantia comportamental** —
    *partial/minor.* `metaspec-validate` é julgamento LLM, não checador determinístico; a ausência do
    agente é grep-able, a garantia comportamental não. Verificador: núcleo correto; calibrado a partial
-   porque o texto *literal* de CA3 reivindica só "não existe agente fleet-orchestrator" (alvo modesto).
+   porque o texto *literal* de CA3 reivindica só "não existe agente worker-orchestrator" (alvo modesto).
 
 2. **[lógica-gatilho] `b·m ≤ W` é decorativa** — *partial/minor.* Três variáveis sem valor nem método;
    paper auto-declarado não-verificado. Verificador: a desigualdade é decorativa, mas CA2 já não depende
    dela — verifica o observável ("lê k resumos, não N brutos"). Rebaixar a heurística.
 
 3. **[lógica-gatilho] CA2 afirma verificação por grep do que grep não detecta** — *confirmed/minor.*
-   "agente que dispara frota" é semântico (prosa), não padrão sintático. String literal `fleet-orchestrator`
+   "agente que dispara orquestração" é semântico (prosa), não padrão sintático. String literal `worker-orchestrator`
    é grep-able e hoje só aparece como referência-proibição (`metaspec-gate-keeper.md:187`,
-   `agent-fleet-orchestration.md:478`).
+   `agent-orchestration.md:478`).
 
 4. **[nomenclatura] "Nó sumarizador" é cunhagem, não termo de mercado** — *partial/minor.* Viola regra
    ubíqua; equivalentes: `agent-orchestration-landscape-2026.md:32,44,51` (orchestrator-worker/supervisor).

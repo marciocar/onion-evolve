@@ -1,18 +1,18 @@
 ---
 name: evolve
 description: |
-  Auto-auditoria do Sistema Onion via fleet (fan-out-and-synthesize) que produz
+  Auto-auditoria do Sistema Onion via orquestração (fan-out-and-synthesize) que produz
   um backlog priorizado, com evidência citada, de refatorações de modernização.
   Read-only: propõe, não muta (a única escrita é o relatório em docs/analysis/).
 model: opus
 category: meta
-tags: [evolve, audit, fleet, self-evolution, modernization]
+tags: [evolve, audit, orchestration, self-evolution, modernization]
 version: "1.2.0"
 updated: "2026-06-17"
 allowed-tools: Read Write Grep Glob Bash(find *) Bash(wc *) Bash(git log*) Bash(cat .env*)
 argument-hint: "[dimensão específica (D1..D9) | vazio = auditoria completa]"
 related_commands:
-  - /meta:fleet
+  - /meta:orchestrate
   - /meta:kb-freshness
   - /meta:context-freshness
   - /meta:metaspec-validate
@@ -30,7 +30,7 @@ Olhar para o **próprio Sistema Onion** com fan-out de auditores e produzir um
 **backlog priorizado de refatorações de modernização**, com evidência citada
 (`arquivo:linha`) e o **padrão de refatoração** recomendado por item. É a
 automação contínua da [Baseline de V&V manual](../../../docs/analysis/onion-vv-baseline-2026-06.md):
-em vez de auditar à mão, dispara uma frota e sintetiza.
+em vez de auditar à mão, dispara uma orquestração e sintetiza.
 
 **Read-only por contrato.** O comando **nunca muta `.claude/`**; a única escrita
 é o relatório em `docs/analysis/`. Ele **propõe**; a execução das correções é dos
@@ -39,10 +39,10 @@ consolidações de cluster) sob validação do `@metaspec-gate-keeper`.
 
 O **julgamento** de qual padrão aplicar a cada achado vem da
 [Doutrina de Modernização](../../../docs/knowledge-base/concepts/onion-modernization-doctrine.md);
-a **doutrina de frota** (padrões, tiering, tetos) vem de
-[agent-fleet-orchestration.md](../../../docs/knowledge-base/concepts/agent-fleet-orchestration.md).
+a **doutrina de orquestração** (padrões, tiering, tetos) vem de
+[agent-orchestration.md](../../../docs/knowledge-base/concepts/agent-orchestration.md).
 A orquestração roda **sempre no nível principal** (este comando + skill
-`onion-fleet`), nunca dentro de subagente ([commands.md §10.1](../../../docs/meta-specs/commands.md)).
+`onion-orchestration`), nunca dentro de subagente ([commands.md §10.1](../../../docs/meta-specs/commands.md)).
 
 ## 🟢 Quando usar
 
@@ -62,19 +62,19 @@ A orquestração roda **sempre no nível principal** (este comando + skill
 
 Top-level = **fan-out-and-synthesize** (1 worker por dimensão, barrier, fan-in em
 JS no contexto principal). **D4, D5 e D9 são composição** — delegam a comandos
-existentes, **não** reimplementam (e não aninham frota dentro de frota).
+existentes, **não** reimplementam (e não aninham orquestração dentro de orquestração).
 
 | # | Dimensão | O que escaneia (evidência) | Tier |
 |---|----------|----------------------------|------|
 | D1 | **Peso/tamanho** | `find .claude/{agents,commands} -name '*.md'` + `wc -l` vs limites (agentes 1200/1500; comandos 500/800). Classifica refactor vs isento (template/README). | haiku |
 | D2 | **Redundância/overlap** | Nomes + `description` próximos (clusters `branch-*`, testing-3, meta-creators). Agrupa por similaridade. | sonnet |
 | D3 | **Duplicação >50 linhas** | Blocos repetidos entre comandos → candidatos a `common/templates` ou `common/prompts` ([commands.md §6](../../../docs/meta-specs/commands.md)). | haiku |
-| D4 | **KBs stale** | **DELEGA a `/meta:kb-freshness`** — ingere o array `FreshnessSchema[]`. Não reimplementar. **Threshold canônico de data = item 6 da régua kb-freshness: ≤18 meses** (relativo a hoje); **NUNCA** usar ad-hoc tipo ">6 meses" (gera falso-positivo — calibração 2026-06-15). Se, por restrição de no-fleet-in-fleet, rodar como scan focado em vez de delegar, **herde o gate ≤18mo** explicitamente no prompt do worker. | (kb-freshness) |
+| D4 | **KBs stale** | **DELEGA a `/meta:kb-freshness`** — ingere o array `FreshnessSchema[]`. Não reimplementar. **Threshold canônico de data = item 6 da régua kb-freshness: ≤18 meses** (relativo a hoje); **NUNCA** usar ad-hoc tipo ">6 meses" (gera falso-positivo — calibração 2026-06-15). Se, por restrição de no-orchestration-in-orchestration, rodar como scan focado em vez de delegar, **herde o gate ≤18mo** explicitamente no prompt do worker. | (kb-freshness) |
 | D5 | **Conformidade meta-spec** | **DELEGA a `/meta:metaspec-validate`** por artefato de alto risco — ingere os vereditos estruturados. Não reimplementar a constituição. | (metaspec-validate) |
 | D6 | **Moderna vs legada + vazamento SDAAL** | Prosa/delegação sequencial que deveria ser `Workflow` fan-out; resíduo `.onion`/CLI/npm/multi-IDE ([architecture.md §7](../../../docs/meta-specs/architecture.md)). **Vazamento provider-specific / MCP-first:** chamada direta a provider (`mcp_<provider>_*`) ou "MCP como transporte default" em comandos/agentes fora de adapters/especialistas — viola API-first/agnosticismo (lint Regra 10; doutrina §consumo de integração). | sonnet |
 | D7 | **Cross-refs / links** | `find .claude -xtype l` (symlinks quebrados) + links relativos `[..](..)` que apontam para arquivos inexistentes. | haiku |
 | D8 | **Plataforma/frontmatter + inventário** | Cobertura de `allowed-tools`/`model:`, frontmatter completo, kebab-case ([commands.md §1](../../../docs/meta-specs/commands.md), [agents.md](../../../docs/meta-specs/agents.md)). **Inventário:** roda `bash .claude/validation/inventory.sh --markdown` e compara com `docs/onion/inventory.md` + contagens em `CLAUDE.md`; divergência = achado (atuador `/meta:inventory`, **não** edição manual — ver doutrina §regra de inventário). | haiku |
-| D9 | **Frescor de contexto de domínio** | **DELEGA a `/meta:context-freshness`** — ingere `FreshnessSchema[]` dos `docs/*-context/`. Herda o threshold ≤18mo (item 1 da régua de contexto). No framework = **no-op** (contextos são templates, só README); o valor é em projeto-alvo que populou os contextos. Não reimplementar; não aninhar frota. | (context-freshness) |
+| D9 | **Frescor de contexto de domínio** | **DELEGA a `/meta:context-freshness`** — ingere `FreshnessSchema[]` dos `docs/*-context/`. Herda o threshold ≤18mo (item 1 da régua de contexto). No framework = **no-op** (contextos são templates, só README); o valor é em projeto-alvo que populou os contextos. Não reimplementar; não aninhar orquestração. | (context-freshness) |
 
 ## ⚡ Etapas de Execução
 
@@ -86,8 +86,8 @@ Confirme a ferramenta nativa **Workflow**. Se ausente → **fallback serial**
 - `$ARGUMENTS` preenchido com `D1..D9` → roda só aquela dimensão.
 - Vazio → roda as 9. Levante os alvos com `Glob`/`find`/`Grep`.
 
-### Passo 2 — Delegar padrão à skill `onion-fleet`
-Acione **`onion-fleet`** com: tarefa = "auditar o Onion em 9 dimensões
+### Passo 2 — Delegar padrão à skill `onion-orchestration`
+Acione **`onion-orchestration`** com: tarefa = "auditar o Onion em 9 dimensões
 independentes"; independência = alta (cada dimensão é autônoma); padrão esperado
 = **fan-out-and-synthesize**. A skill confirma elegibilidade e tiering.
 
@@ -95,7 +95,7 @@ independentes"; independência = alta (cada dimensão é autônoma); padrão esp
 Autore o script `Workflow`. Cada worker de dimensão recebe a régua da sua linha e
 devolve `FindingSchema[]`. **D4, D5 e D9 NÃO são workers** — são chamados no fluxo
 principal (sequencialmente) e seus resultados mesclados, pois `kb-freshness` já
-roda sua própria frota interna (aninhar violaria `onion-fleet`).
+roda sua própria orquestração interna (aninhar violaria `onion-orchestration`).
 
 ```javascript
 const FindingSchema = {
@@ -211,7 +211,7 @@ regra da [Doutrina de Modernização](../../../docs/knowledge-base/concepts/onio
 ## ⚠️ Notas
 
 - **Read-only**: propõe, não muta `.claude/`. Só escreve o relatório em `docs/analysis/`.
-- **Compõe, não duplica**: D4/D5/D9 reusam `/meta:kb-freshness`, `/meta:metaspec-validate` e `/meta:context-freshness` — nunca reimplementam, nunca aninham frota dentro de frota.
+- **Compõe, não duplica**: D4/D5/D9 reusam `/meta:kb-freshness`, `/meta:metaspec-validate` e `/meta:context-freshness` — nunca reimplementam, nunca aninham orquestração dentro de orquestração.
 - **Invariante**: pode *reportar* sobre os workflows faseados, **nunca** propor fundir suas fases — o juiz adversarial veta.
 - Orquestre **sempre no nível principal**; **não crie** um agente "evolve-worker".
 - Doutrina de julgamento: `docs/knowledge-base/concepts/onion-modernization-doctrine.md`.
@@ -219,8 +219,8 @@ regra da [Doutrina de Modernização](../../../docs/knowledge-base/concepts/onio
 ## 🔗 Referências
 
 - Doutrina (qual padrão aplicar): [onion-modernization-doctrine.md](../../../docs/knowledge-base/concepts/onion-modernization-doctrine.md)
-- Doutrina de frota: [agent-fleet-orchestration.md](../../../docs/knowledge-base/concepts/agent-fleet-orchestration.md)
+- Doutrina de orquestração: [agent-orchestration.md](../../../docs/knowledge-base/concepts/agent-orchestration.md)
 - Composição: `/meta:kb-freshness` (D4) · `/meta:metaspec-validate` (D5) · `/meta:context-freshness` (D9)
 - Atuadores: `/meta:create-command|agent|skill|abstraction|knowledge-base`
 - Baseline manual que automatiza: [onion-vv-baseline-2026-06.md](../../../docs/analysis/onion-vv-baseline-2026-06.md)
-- Skill de fan-out: `onion-fleet` · Meta-spec: [commands.md §10](../../../docs/meta-specs/commands.md)
+- Skill de fan-out: `onion-orchestration` · Meta-spec: [commands.md §10](../../../docs/meta-specs/commands.md)

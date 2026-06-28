@@ -78,7 +78,7 @@ Comando meta que [ação] do sistema.
 **Padrões:**
 - Integram com o task manager ativo via abstração `TASK_MANAGER_PROVIDER` (o adapter resolve Jira/ClickUp/Asana/Linear; nunca chamam a API/MCP do provider direto)
 - Gerenciam sessions (.claude/sessions/)
-- Coordenam múltiplos agentes — quando as subtarefas são **independentes**, use a camada de frota (fan-out/fan-in) sobre a ferramenta nativa **Workflow**; ver `docs/knowledge-base/concepts/agent-fleet-orchestration.md` e o comando `/meta:fleet`
+- Coordenam múltiplos agentes — quando as subtarefas são **independentes**, use a camada de orquestração (fan-out/fan-in) sobre a ferramenta nativa **Workflow**; ver `docs/knowledge-base/concepts/agent-orchestration.md` e o comando `/meta:orchestrate`
 - Workflows complexos e iterativos
 
 **Exemplos:**

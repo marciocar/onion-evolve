@@ -325,28 +325,28 @@ Mudanças nesta spec exigem:
 
 ---
 
-## 10. Orquestração em fleet (fan-out paralelo)
+## 10. Orquestração (fan-out paralelo)
 
-Complementa a Seção 3: enquanto workflows faseados coordenam trabalho **sequencial e retomável**, a orquestração em **fleet** coordena trabalho **paralelo** (fan-out → fan-in) sobre o substrato nativo do Claude Code (ferramenta `Workflow`). Doutrina, padrões canônicos e mapeamento às primitivas: [docs/knowledge-base/concepts/agent-fleet-orchestration.md](../knowledge-base/concepts/agent-fleet-orchestration.md).
+Complementa a Seção 3: enquanto workflows faseados coordenam trabalho **sequencial e retomável**, a orquestração coordena trabalho **paralelo** (fan-out → fan-in) sobre o substrato nativo do Claude Code (ferramenta `Workflow`). Doutrina, padrões canônicos e mapeamento às primitivas: [docs/knowledge-base/concepts/agent-orchestration.md](../knowledge-base/concepts/agent-orchestration.md).
 
-### 10.1 Onde a orquestração de fleet pode residir
+### 10.1 Onde a orquestração pode residir
 
 - **Permitido**: em `skills/*` e `commands/*` — executam no contexto principal e podem orquestrar as ferramentas `Workflow`/`Agent`.
-- **Proibido**: criar um **agente** orquestrador de fleet. Por [architecture.md §4.2](./architecture.md), `agents/* → commands/*` é proibido e subagentes não devem disparar a frota — a orquestração mora no nível principal. A camada canônica é a skill `onion-fleet` + o comando `/meta:fleet`.
+- **Proibido**: criar um **agente** orquestrador. Por [architecture.md §4.2](./architecture.md), `agents/* → commands/*` é proibido e subagentes não devem disparar a orquestração — esta mora no nível principal. A camada canônica é a skill `onion-orchestration` + o comando `/meta:orchestrate`.
 
 ### 10.2 Regras normativas
 
 1. **Opt-in na execução, proativo na detecção**: *executar* fan-out é explícito, nunca o comportamento default (trabalho serial dependente permanece sequencial). Mas **detectar e propor** a oportunidade de fan-out é **dever** — ao receber tarefa com sinais de elegibilidade (varredura ampla, auditoria, N itens independentes, migração mecânica, review multi-dimensão), o Claude sinaliza/propõe **antes** de planejar execução serial. Detecção ≠ execução.
 2. **Independência**: só paralelizar subtarefas sem dependência cruzada de dados.
 3. **Fan-in obrigatório**: todo fan-out termina em consolidação num resultado único (não N saídas soltas).
-4. **Mutação — partição-primeiro, worktree só p/ sobreposição, 1 branch**: ao mutar arquivos em paralelo, o orquestrador **particiona por arquivos disjuntos** (sem corrida → dispensa worktree); usa `isolation: 'worktree'` **apenas** quando há sobreposição real ou branches independentes a fundir. A saída é **uma branch de consolidação** que entra no fluxo faseado normal (`/git:flow` ou `/engineer:pr` via forge) — **nunca** N branches persistentes contornando o gate de PR. Conflito de partição ou operação irreversível → **gate humano**. Playbook completo: [agent-fleet-orchestration.md §7](../knowledge-base/concepts/agent-fleet-orchestration.md).
+4. **Mutação — partição-primeiro, worktree só p/ sobreposição, 1 branch**: ao mutar arquivos em paralelo, o orquestrador **particiona por arquivos disjuntos** (sem corrida → dispensa worktree); usa `isolation: 'worktree'` **apenas** quando há sobreposição real ou branches independentes a fundir. A saída é **uma branch de consolidação** que entra no fluxo faseado normal (`/git:flow` ou `/engineer:pr` via forge) — **nunca** N branches persistentes contornando o gate de PR. Conflito de partição ou operação irreversível → **gate humano**. Playbook completo: [agent-orchestration.md §7](../knowledge-base/concepts/agent-orchestration.md).
 5. **Verificação**: achados de alto risco passam por verificação adversarial / judge-panel antes de serem aceitos.
 6. **Budget e tiers**: respeitar teto de tokens (`budget`) e model tiering (orquestrador em opus; workers em sonnet/haiku).
-7. **Invariante preservada**: a frota paraleliza *dentro* de uma fase; **não funde** os workflows faseados canônicos da Seção 3 (`engineer/*`, `product/*`).
+7. **Invariante preservada**: a orquestração paraleliza *dentro* de uma fase; **não funde** os workflows faseados canônicos da Seção 3 (`engineer/*`, `product/*`).
 
 ### 10.3 Padrões canônicos
 
-Os seis padrões canônicos (classify-and-act, fan-out-and-synthesize, adversarial verification, generate-and-filter, tournament, loop-until-done) e seu mapeamento às primitivas `agent()`/`parallel()`/`pipeline()` são normalizados na KB de fleet orchestration (link acima).
+Os seis padrões canônicos (classify-and-act, fan-out-and-synthesize, adversarial verification, generate-and-filter, tournament, loop-until-done) e seu mapeamento às primitivas `agent()`/`parallel()`/`pipeline()` são normalizados na KB de orquestração (link acima).
 
 ---
 

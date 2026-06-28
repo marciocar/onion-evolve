@@ -7,10 +7,10 @@ scope: framework-template-instalavel
 decisao: opt-in-terceiro-modo-com-fallback-gracioso  # NÃO padrão obrigatório
 relacionados:
   - onion-review-2026-05.md                                       # identidade canônica
-  - ../knowledge-base/concepts/agent-fleet-orchestration.md        # doutrina de frota
+  - ../knowledge-base/concepts/agent-orchestration.md        # doutrina de orquestração
   - ../knowledge-base/frameworks/agent-orchestration-landscape-2026.md
   - ../knowledge-base/concepts/onion-modernization-doctrine.md
-ciclo-de-vida: efêmero  # sintetizar a conclusão na doutrina de frota e remover (ver analysis/README.md)
+ciclo-de-vida: efêmero  # sintetizar a conclusão na doutrina de orquestração e remover (ver analysis/README.md)
 ---
 
 # Avaliação — Agent Teams no Sistema Onion (junho/2026)
@@ -26,7 +26,7 @@ adapters de forge e task-manager. Nunca um requisito duro.
 | | Decisão |
 |---|---|
 | Vira padrão obrigatório do Onion agora? | **Não** |
-| Exige rever os padrões existentes (sessões faseadas, Workflow/onion-fleet)? | **Não** |
+| Exige rever os padrões existentes (sessões faseadas, Workflow/onion-orchestration)? | **Não** |
 | É vantagem real para algum shape de trabalho? | **Sim — nicho** (negociação viva peer-a-peer) |
 | Postura recomendada | **Capacidade opt-in** + detecção + fallback gracioso |
 
@@ -42,8 +42,8 @@ com `owner`/`blockedBy`). A pergunta de framework: isso muda a identidade/padrõ
 
 A **identidade canônica** ([onion-review-2026-05.md](onion-review-2026-05.md)) fixa: framework
 **template em `.claude/`** instalável em qualquer projeto, **plataforma única Claude Code**, três
-dimensões peer (produto/engenharia/compliance), **workflows faseados retomáveis**, e frota via
-`onion-fleet`/`Workflow`.
+dimensões peer (produto/engenharia/compliance), **workflows faseados retomáveis**, e orquestração via
+`onion-orchestration`/`Workflow`.
 
 ---
 
@@ -55,7 +55,7 @@ concorrentes:
 | Primitiva | Modelo | Controle | Estado | Bom para |
 |-----------|--------|----------|--------|----------|
 | **Sessões faseadas retomáveis** (`.claude/sessions/`) | 1 thread, humano no loop | Determinístico, durável em arquivo (worklog) | Persistente | `product/collect→feature`, `engineer/plan→pr-update` — o **backbone** |
-| **Workflow / onion-fleet** | Fan-out de workers **stateless** | **Determinístico** (script: loop/cond/pipeline), retomável por journal | Efêmero | Auditoria, migração, review, pesquisa — **shape conhecido a priori** |
+| **Workflow / onion-orchestration** | Fan-out de workers **stateless** | **Determinístico** (script: loop/cond/pipeline), retomável por journal | Efêmero | Auditoria, migração, review, pesquisa — **shape conhecido a priori** |
 | **Agent Teams** (novo) | Peers **persistentes** + mailbox + task list compartilhada | **Emergente** (model-driven; agentes negociam) | Idle entre turnos; `owner`/`blockedBy` | Negociação viva entre sub-streams; hand-off dinâmico; humano redirecionando no meio |
 
 A distinção que importa: **Workflow = orquestração que o orquestrador desenha** (a forma é
@@ -86,7 +86,7 @@ runtime).
    Coordenação emergente é mais difícil de **reproduzir, verificar e auditar** — atrito direto com a
    doutrina *fail-loud-and-resume* (afirmar "essa fase terminou?" fica mais difícil no modelo
    idle/mailbox).
-3. **Risco de bloat.** Uma 3ª primitiva sem fronteira clara ("use X quando Y") incha a frota e gera
+3. **Risco de bloat.** Uma 3ª primitiva sem fronteira clara ("use X quando Y") incha a orquestração e gera
    paralisia de decisão — contra a doutrina de modernização (SSOT/inventário enxuto).
 
 ### 4.3 Por que NÃO força revisão dos padrões atuais
@@ -131,13 +131,13 @@ individual pelo mailbox — exatamente a capacidade de "humano no loop redirecio
 
 ## 6. Postura recomendada
 
-1. **Manter os padrões atuais intactos.** Nenhuma mudança em sessões faseadas ou Workflow/onion-fleet.
-2. **Adotar Agent Teams como capacidade opt-in:** `onion-fleet` **detecta** a flag e **prefere**
+1. **Manter os padrões atuais intactos.** Nenhuma mudança em sessões faseadas ou Workflow/onion-orchestration.
+2. **Adotar Agent Teams como capacidade opt-in:** `onion-orchestration` **detecta** a flag e **prefere**
    Agent Teams **apenas** para o shape "negociação viva entre peers"; **degrada graciosamente** para
    Workflow/serial quando a flag está off — idêntico ao padrão dos adapters forge/task-manager
    (avisar em pt-BR, nunca assumir).
 3. **Fronteira na doutrina.** Adicionar à KB
-   [`agent-fleet-orchestration`](../knowledge-base/concepts/agent-fleet-orchestration.md) uma seção
+   [`agent-orchestration`](../knowledge-base/concepts/agent-orchestration.md) uma seção
    "Workflow vs Agent Teams: quando usar qual" + nota de capacidade opt-in. Atualizar a
    [`agent-orchestration-landscape-2026`](../knowledge-base/frameworks/agent-orchestration-landscape-2026.md)
    se descrever o cenário.
@@ -148,9 +148,9 @@ individual pelo mailbox — exatamente a capacidade de "humano no loop redirecio
 
 ## 7. Próximos passos (não executados aqui)
 
-- [x] Sintetizar a fronteira "Workflow vs Agent Teams" na KB `agent-fleet-orchestration` (a conclusão
+- [x] Sintetizar a fronteira "Workflow vs Agent Teams" na KB `agent-orchestration` (a conclusão
       duradoura desta análise vive lá). — **feito 2026-06-15** (seção "🔀 Dois Substratos de Orquestração", KB v1.2.0).
-- [ ] Implementar detecção de capacidade + fallback gracioso em `onion-fleet` (espelhar o padrão
+- [ ] Implementar detecção de capacidade + fallback gracioso em `onion-orchestration` (espelhar o padrão
       SDAAL dos adapters).
 - [ ] Reavaliar quando a feature sair de experimental (remover a ressalva de portabilidade da §4.2).
 - [ ] **Ao concluir os itens acima:** condensar este doc na doutrina e **remover** o artefato

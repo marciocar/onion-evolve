@@ -4,12 +4,12 @@ description: >
   nativa Workflow que codifica o padrão canônico certo. Use quando houver N
   subtarefas independentes, varreduras amplas (auditorias, migrações, edições
   multi-arquivo), review paralelo, ou o padrão decompor→delegar→sintetizar/verificar.
-  Ative mesmo sem o usuário dizer "frota", "paralelo" ou "fleet". Orquestra sempre
+  Ative mesmo sem o usuário dizer "orquestração", "paralelo" ou "fan-out". Orquestra sempre
   no contexto principal (skill/comando), nunca dentro de um subagente.
 allowed-tools: Workflow Agent Read Grep Glob Bash(git worktree*)
 ---
 
-# Onion Fleet — Orquestração de Frota
+# Onion Orchestration — Orquestração de Workers
 
 Cérebro operacional para fan-out paralelo no Sistema Onion. Reconhece quando
 um trabalho se decompõe em subtarefas independentes e o codifica em um script
@@ -24,7 +24,7 @@ A coordenação roda em JavaScript e custa **0 tokens de modelo**. O teto é de
    escopo amplo, **antes** de planejar execução serial, cheque os sinais de fan-out (N itens/arquivos/PRs/
    fontes independentes, varredura ampla, auditoria, migração mecânica, review multi-dimensão, padrão
    decompor→delegar→sintetizar/verificar). **Detectar e propor o fan-out é dever proativo** — não espere o
-   usuário dizer "frota". A regra **opt-in** (gotchas) é sobre *executar* (não paralelizar por default),
+   usuário dizer "orquestração". A regra **opt-in** (gotchas) é sobre *executar* (não paralelizar por default),
    **não** sobre detectar: mesmo opt-in na execução, sinalize a oportunidade. Se positivo → proponha padrão
    + escopo + custo (e respeite o gate do `Workflow`); se a tarefa é pequena/serial/dependente → siga serial
    sem ruído. Em projeto Onion, prefira os mecanismos canônicos (esta skill → `Workflow`) ao `Agent` manual.
@@ -47,7 +47,7 @@ A coordenação roda em JavaScript e custa **0 tokens de modelo**. O teto é de
    tudo numa **branch de consolidação**; colisão → **gate humano** (ou judge-panel
    p/ abordagens concorrentes). A branch consolidada entra no fluxo normal
    (`/git:flow feature finish` / `/engineer:pr` via forge) — nunca N branches
-   soltas. (Playbook: KB de frota §7.)
+   soltas. (Playbook: KB de orquestração §7.)
 5. **Verificação adversarial / judge-panel quando alto risco.** Mudanças amplas,
    irreversíveis ou de compliance ganham uma etapa de verificação por um agente
    independente (ou painel de juízes) sobre a saída agregada.
@@ -116,7 +116,7 @@ if (collided.length) return gateHumano(collided, results);  // partição falhou
 - **Prompt caching**: instruções/contexto comuns aos workers entram no prefixo
   cacheável, cortando custo no fan-out.
 - Tiers de worker (uso geral): **opus, sonnet, haiku**. `fable` apenas onde
-  permitido — **disponibilidade restrita** (ver KB de frota → "Disponibilidade
+  permitido — **disponibilidade restrita** (ver KB de orquestração → "Disponibilidade
   de modelos", fonte única). Nunca ofereça modelo de outro provider como worker.
 
 ## Gotchas
@@ -129,16 +129,16 @@ if (collided.length) return gateHumano(collided, results);  // partição falhou
   **dispensa worktree** (worktree custa ~200-500ms + disco/agente). Use
   `isolation:'worktree'` **só** quando há sobreposição real ou branches
   independentes a fundir. Consolide numa **única branch** → fluxo normal
-  (`/git:flow` / `/engineer:pr`). Playbook completo: KB de frota §7.
-- **Fleet é OPT-IN, nunca default.** Fan-out é decisão explícita. Trabalho
+  (`/git:flow` / `/engineer:pr`). Playbook completo: KB de orquestração §7.
+- **Orquestração é OPT-IN, nunca default.** Fan-out é decisão explícita. Trabalho
   serial e os workflows faseados canônicos (`engineer/*`, `product/*`)
-  permanecem sequenciais — a frota paraleliza *dentro* de uma fase, não funde
+  permanecem sequenciais — a orquestração paraleliza *dentro* de uma fase, não funde
   fases.
 - **Nunca orqueste dentro de um subagente.** A orquestração mora no **nível
-  principal** (skill/comando). Subagentes não disparam a frota — fan-out aninhado
+  principal** (skill/comando). Subagentes não disparam a orquestração — fan-out aninhado
   dentro de worker é mais caro e turvo. Por
   [architecture.md §4.2](../../../docs/meta-specs/architecture.md), `agents/* →
-  commands/*` é proibido; logo **não existe** agente "fleet-orchestrator".
+  commands/*` é proibido; logo **não existe** agente "worker-orchestrator".
 - **Coordenação JS custa 0 tokens.** Filtros, agregação, ranqueamento e
   roteamento entre etapas rodam em JavaScript — não gaste chamadas de modelo no
   que é determinístico.
@@ -146,8 +146,8 @@ if (collided.length) return gateHumano(collided, results);  // partição falhou
 
 ## Resiliência (versão confiável)
 
-- **Passo 0 — health-check do substrato.** Antes de autorar o script, confirme que a ferramenta `Workflow` está disponível. Se não estiver, acione o **fallback serial** de forma determinística (padrão canônico: `common:prompts:fleet-fallback`) — não dependa de o modelo "perceber".
-- **Completeness critic.** Antes do fan-in final, um crítico verifica se a frota cobriu todo o escopo (modalidade não rodada, item não coberto) — evita lacunas silenciosas em varreduras amplas.
+- **Passo 0 — health-check do substrato.** Antes de autorar o script, confirme que a ferramenta `Workflow` está disponível. Se não estiver, acione o **fallback serial** de forma determinística (padrão canônico: `common:prompts:orchestration-fallback`) — não dependa de o modelo "perceber".
+- **Completeness critic.** Antes do fan-in final, um crítico verifica se a orquestração cobriu todo o escopo (modalidade não rodada, item não coberto) — evita lacunas silenciosas em varreduras amplas.
 - **Falha parcial de worker.** `parallel()` pode retornar `null` (worker morto, timeout, ou output que falhou no `schema`). **Sempre** `.filter(Boolean)` antes do fan-in e **reporte** quantos foram descartados (`SKIP — <motivo>`). Um worker morto nunca deve silenciar nem corromper o relatório.
 - **Timeout por worker.** `budget` limita tokens, não tempo. Para workers que tocam I/O externo, aplique um teto de tempo (campo nativo quando existir; senão `Promise.race` com timer) e trate o estouro como SKIP.
 - **Budget em todo fan-out.** Exija `budget` por worker também em `parallel()`/`pipeline()`, não só em `loop-until-done`.
@@ -158,8 +158,8 @@ if (collided.length) return gateHumano(collided, results);  // partição falhou
 
 ## Referências
 
-- KB de doutrina e mapeamento de padrões: `docs/knowledge-base/concepts/agent-fleet-orchestration.md`
-- Comando faceta: `/meta:fleet`
-- Meta-spec de comandos (§10 Orquestração em fleet): `docs/meta-specs/commands.md`
+- KB de doutrina e mapeamento de padrões: `docs/knowledge-base/concepts/agent-orchestration.md`
+- Comando faceta: `/meta:orchestrate`
+- Meta-spec de comandos (§10 Orquestração): `docs/meta-specs/commands.md`
 - Meta-spec de arquitetura (§4.2 dependências): `docs/meta-specs/architecture.md`
 - Skill relacionada: `onion-patterns` (estrutura e nomenclatura)

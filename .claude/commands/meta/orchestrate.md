@@ -1,12 +1,12 @@
 ---
-name: fleet
+name: orchestrate
 description: |
-  Orquestra uma frota de agentes em paralelo (fan-out/fan-in) sobre uma tarefa,
+  Orquestra subagentes em paralelo (fan-out/fan-in) sobre uma tarefa,
   via a ferramenta nativa Workflow. Use para auditorias, migrações, review e
   pesquisa amplas.
 model: opus
 category: meta
-tags: [fleet, orchestration, parallel, workflow]
+tags: [orchestrator-worker, orchestration, parallel, workflow]
 version: "1.1.0"
 updated: "2026-06-13"
 allowed-tools: Read Grep Glob
@@ -19,9 +19,9 @@ related_agents:
   - metaspec-gate-keeper
 ---
 
-# 🚀 Frota de Agentes (fan-out / fan-in)
+# 🚀 Orquestração de Subagentes (fan-out / fan-in)
 
-Ponto de entrada invocável para orquestrar uma **frota de subagentes em
+Ponto de entrada invocável para orquestrar **subagentes em
 paralelo** sobre uma única tarefa ampla, usando a ferramenta nativa **Workflow**
 do Claude Code. A coordenação roda em JavaScript e custa **0 tokens de modelo**.
 
@@ -33,10 +33,10 @@ resultados em um único veredito (fan-in) e, quando o risco justifica, submete a
 saída a uma **verificação adversarial** antes de relatar.
 
 A orquestração mora **sempre no nível principal** (este comando + a skill
-`onion-fleet`), nunca dentro de um subagente. Por
+`onion-orchestration`), nunca dentro de um subagente. Por
 [architecture.md §4.2](../../../docs/meta-specs/architecture.md) a dependência
 `agents/* → commands/*` é proibida — um agente sugere, não invoca comando. Logo
-**não existe** nem deve ser criado um agente "fleet-orchestrator".
+**não existe** nem deve ser criado um agente "worker-orchestrator".
 
 ## 🟢 Quando usar (e quando NÃO)
 
@@ -53,7 +53,7 @@ A orquestração mora **sempre no nível principal** (este comando + a skill
 - Há dependência de ordem ou estado compartilhado mutável entre as etapas.
 - Cada passo precisa ler a saída do anterior (pipeline humano, não fan-out).
 - São os workflows faseados canônicos `engineer/*` e `product/*` — eles
-  permanecem sequenciais; a frota paraleliza *dentro* de uma fase, não funde fases.
+  permanecem sequenciais; a orquestração paraleliza *dentro* de uma fase, não funde fases.
 
 > Fan-out é **opt-in**, nunca default. Paralelizar trabalho dependente corrompe o
 > resultado e desperdiça budget. Na dúvida sobre independência, mantenha serial.
@@ -70,15 +70,15 @@ Capture `$ARGUMENTS` como a descrição da tarefa a paralelizar. Se vier vazia,
 peça ao usuário o que paralelizar antes de prosseguir (não invente escopo).
 
 ```
-/meta:fleet <tarefa a paralelizar>
+/meta:orchestrate <tarefa a paralelizar>
 ```
 
 Levante o conjunto de itens (arquivos, módulos, PRs, fontes) com `Glob`/`Grep`
 quando o alvo for "para cada X" — esse é o material do fan-out.
 
-### Passo 2 — Delegar seleção de padrão e elegibilidade à skill `onion-fleet`
+### Passo 2 — Delegar seleção de padrão e elegibilidade à skill `onion-orchestration`
 
-Acione a skill **`onion-fleet`**, que é o cérebro operacional do fan-out. Ela:
+Acione a skill **`onion-orchestration`**, que é o cérebro operacional do fan-out. Ela:
 
 1. Confirma a **elegibilidade** (independência real entre subtarefas).
 2. Escolhe **1 dos 6 padrões canônicos** conforme a forma do trabalho:
@@ -106,14 +106,14 @@ Com o padrão escolhido, autore um script da ferramenta **Workflow**. Use:
 - **Mutação (workers escrevem):** **particione por arquivos disjuntos** (sem
   corrida → **dispensa worktree**); use `isolation:'worktree'` **só** quando há
   sobreposição real ou branches independentes a fundir. Consolide numa **única
-  branch** → fluxo normal. Playbook completo + `DiffSchema`: [agent-fleet-orchestration.md §7](../../../docs/knowledge-base/concepts/agent-fleet-orchestration.md).
+  branch** → fluxo normal. Playbook completo + `DiffSchema`: [agent-orchestration.md §7](../../../docs/knowledge-base/concepts/agent-orchestration.md).
 - `budget` (teto de tokens) — **obrigatório** em qualquer `loop-until-done`.
 
 Aplique **model tiering**: opus orquestra no nível principal; workers mecânicos
 (extração, classificação, varredura) vão para haiku; raciocínio médio para
 sonnet; reserve opus para orquestração e juízes adversariais críticos.
 Tiers de worker (uso geral): **opus, sonnet, haiku**; `fable` só onde permitido
-(disponibilidade restrita — ver `agent-fleet-orchestration.md` → "Disponibilidade
+(disponibilidade restrita — ver `agent-orchestration.md` → "Disponibilidade
 de modelos", fonte única). Nunca ofereça modelo de outro provider como worker. Tetos: até **16 subagentes concorrentes** e
 **1.000 agregados** por run.
 
@@ -165,7 +165,7 @@ if (collided.length) return gateHumano(collided, results);                  // p
 
 // partição limpa → 1 branch de consolidação → entra no fluxo faseado normal:
 //   /git:flow feature finish   ou   /engineer:pr  (via forge adapter)
-return { branch: "fleet/add-version-field", changed: paths.length };
+return { branch: "orchestration/add-version-field", changed: paths.length };
 
 // Variante worktree (só quando há sobreposição): trocar a chamada acima por
 //   agent(..., { isolation: "worktree", schema: DiffSchema })
@@ -194,7 +194,7 @@ Se a ferramenta nativa **Workflow** não estiver disponível neste ambiente,
 **degrade graciosamente** para **delegação sequencial a subagentes** com a
 ferramenta `Agent`:
 
-1. Avise o usuário em pt-BR que o substrato de frota não está disponível e que o
+1. Avise o usuário em pt-BR que o substrato de orquestração não está disponível e que o
    trabalho seguirá serial (mais lento, sem paralelismo real).
 2. Itere os itens chamando `Agent` um a um, mantendo o mesmo `schema` por item.
 3. Consolide as saídas no contexto principal exatamente como no Passo 4.
@@ -204,7 +204,7 @@ ferramenta `Agent`:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚀 FROTA EXECUTADA
+🚀 ORQUESTRAÇÃO EXECUTADA
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ▶ Tarefa: <descrição>
@@ -227,27 +227,27 @@ ferramenta `Agent`:
 
 ```bash
 # Auditoria de conformidade ampla (fan-out-and-synthesize + verificação adversarial)
-/meta:fleet auditar conformidade de todos os agentes contra as meta-specs
+/meta:orchestrate auditar conformidade de todos os agentes contra as meta-specs
 
 # Migração mecânica multi-arquivo (mutação partição-primeiro → 1 branch; ver script no Passo 3)
-/meta:fleet adicionar o campo `version` ao frontmatter de todos os comandos sem versão
+/meta:orchestrate adicionar o campo `version` ao frontmatter de todos os comandos sem versão
 
 # Pesquisa fan-out citada (fan-out-and-synthesize)
-/meta:fleet pesquisar e comparar 5 fontes sobre padrões de orquestração de agentes em 2026
+/meta:orchestrate pesquisar e comparar 5 fontes sobre padrões de orquestração de agentes em 2026
 ```
 
 ## 🔗 Referências
 
 - KB de doutrina e mapeamento de padrões:
-  `docs/knowledge-base/concepts/agent-fleet-orchestration.md`
-- Skill operacional do fan-out: `onion-fleet`
-- Meta-spec de comandos (orquestração em fleet): `docs/meta-specs/commands.md`
+  `docs/knowledge-base/concepts/agent-orchestration.md`
+- Skill operacional do fan-out: `onion-orchestration`
+- Meta-spec de comandos (orquestração): `docs/meta-specs/commands.md`
 - Meta-spec de arquitetura (§4.2 dependências): `docs/meta-specs/architecture.md`
 
 ## ⚠️ Notas
 
-- Fleet é **opt-in**, nunca default — fan-out é decisão explícita.
+- A orquestração é **opt-in**, nunca default — fan-out é decisão explícita.
 - Orquestre **sempre no nível principal** (comando/skill); nunca dentro de um
-  subagente, e **não crie** um agente "fleet-orchestrator".
+  subagente, e **não crie** um agente "worker-orchestrator".
 - Mutação concorrente de arquivos exige `isolation:'worktree'`.
 - `loop-until-done` sempre com `budget` — sem teto não há loop.

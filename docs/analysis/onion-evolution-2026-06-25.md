@@ -10,14 +10,14 @@
 | Achados brutos | 49 |
 | Julgados (adversarial opus) | 22 |
 | Mortos pelo juiz (refutados/vetados) | 10 |
-| Sobreviventes da frota | 39 |
+| Sobreviventes da orquestração | 39 |
 | **Refutados na curadoria do maestro** (validação adversarial = insumo) | **4** |
 | **Backlog real após curadoria** | **35** |
 
 > **Read-only por contrato:** esta auditoria não mutou `.claude/`. A única escrita é este relatório.
 > A execução das correções é dos atuadores (`/meta:*`, edição direta) sob validação do `@metaspec-gate-keeper`.
 
-**Veredito de alto nível: 0 blockers reais.** Os 4 "blockers" da frota não sobreviveram à curadoria
+**Veredito de alto nível: 0 blockers reais.** Os 4 "blockers" da orquestração não sobreviveram à curadoria
 (2 eram "no action needed" mal-rotulados; 1 refutado por evidência; 1 rebaixado a recommended). O framework
 está **saudável** — o backlog é manutenção de frescor e fechamento de buracos de lint, não dívida estrutural.
 
@@ -39,16 +39,16 @@ Severidade após minha validação direta. Rótulos mnemônicos de 2-5 palavras 
 | 8 | 🟢 | D9 | **`design-context/brief.md:42` diz "6 pares"** — `governance/contrast-pairs.json` tem 8 (e o gate valida 8); memória já registra 8 pares/28 tokens | refresh-context | S | edição direta |
 | 9 | 🟢 | D8 | **READMEs de categoria ausentes** — 7 categorias de comando + 9 de agente sem README de descoberta | fill-doc | M | `/meta:create-*` ou edição |
 | 10 | 🟢 | D8 | **Frontmatter opcional ausente** — `expertise`/`related_agents` em brand-generator, design-system-specialist, runflow-specialist, zen-engine-specialist, pain-price-specialist | fill-frontmatter | S | edição direta |
-| 11 | 🟢 | D2/D1 | **Clusters candidatos a consolidação** (test-* / meta-creators / branch-* / C4 / NX) — **NÃO acionar sem dogfood**; a maioria é peer distinto por design (a própria frota reconhece) | consolidar-vs-manter (§44) | L | avaliar caso a caso pós-evidência |
+| 11 | 🟢 | D2/D1 | **Clusters candidatos a consolidação** (test-* / meta-creators / branch-* / C4 / NX) — **NÃO acionar sem dogfood**; a maioria é peer distinto por design (a própria orquestração reconhece) | consolidar-vs-manter (§44) | L | avaliar caso a caso pós-evidência |
 
 ---
 
 ## 2. Refutados na curadoria do maestro (validação adversarial = insumo, não ordem)
 
-Estes vieram como sobreviventes da frota mas **rejeito com evidência** — fechando o loop adversarial
+Estes vieram como sobreviventes da orquestração mas **rejeito com evidência** — fechando o loop adversarial
 (o juiz opus só rodou nos 22 que tocavam `engineer/*`/`product/*` ou consolidação; os "blockers" passaram batido):
 
-| ID | Sev frota | Por que refuto |
+| ID | Sev orquestração | Por que refuto |
 |----|-----------|----------------|
 | **D1-7** | 🔴 blocker | "Sem lint CI p/ drift de inventário" — **FALSO**. `lint-artifacts.sh:286 check_inventory_sync()` emite **HARD** e `:317 check_claude_md_drift()` também; `onion-validate.yml:26` os roda no CI. Worker procurou `inventory` direto no workflow YAML e no `inventory.sh` (o check vive no lint). |
 | **D8-4** | 🔴 blocker | "Inventory perfeitamente alinhado, **no action needed**" — não é achado; é confirmação de saúde mal-rotulada como blocker. |
@@ -57,7 +57,7 @@ Estes vieram como sobreviventes da frota mas **rejeito com evidência** — fech
 
 E os **10 mortos pelo juiz opus** (todos refutados, **0 vetos de fusão de fase**): D1-0, D1-5, D2-1, D2-9,
 D3-0, D3-1, D3-2, D3-3, D6-1, D7-4 — em geral porque a evidência se contradizia ou a oportunidade **já estava
-satisfeita** (ex.: D1-5 alegava que `presentation-orchestrator` não cita `onion-fleet`, mas `:59` cita
+satisfeita** (ex.: D1-5 alegava que `presentation-orchestrator` não cita `onion-orchestration`, mas `:59` cita
 explicitamente; D2/D3 alegavam duplicação já extraída para `common/prompts/`).
 
 ---
@@ -87,7 +87,7 @@ não foram regenerados. Item #6.
   (`vetoed_phase_merge=false` em todos os 22 julgados; D2-1 chegou a propor tocar o fluxo de produto e foi
   **refutado** com a observação de que collect→refine→spec→task→estimate→feature é o faseado canônico legítimo).
 - ✅ **Read-only:** `.claude/` intacto; só este relatório foi escrito.
-- ✅ **Sem fleet-in-fleet:** D4/D5/D9 rodaram como scan focado (agente único, gate ≤18mo herdado), não sub-frotas.
+- ✅ **Sem orquestração-aninhada:** D4/D5/D9 rodaram como scan focado (agente único, gate ≤18mo herdado), não sub-orquestrações.
 
 ---
 
@@ -103,9 +103,9 @@ não foram regenerados. Item #6.
 **Deferidos / não-acionáveis:**
 - #9, #10 — cosmético/opportunistic.
 - #11 — consolidação de clusters **só com dogfood** (doutrina §44: manter se há nome canônico/escopo distinto;
-  a frota mesma classificou test-*/branch-*/C4/NX como peers por design).
+  a orquestração mesma classificou test-*/branch-*/C4/NX como peers por design).
 
 ---
 
 *Gerado por `/meta:evolve` (fan-out-and-synthesize, 9 dimensões). Curadoria adversarial do maestro aplicada
-sobre o output da frota — falsos-positivos refutados com evidência citada, conforme doutrina de dogfood.*
+sobre o output da orquestração — falsos-positivos refutados com evidência citada, conforme doutrina de dogfood.*

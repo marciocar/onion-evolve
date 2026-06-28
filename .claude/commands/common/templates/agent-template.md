@@ -84,9 +84,9 @@ updated: "2025-11-24"
 | `related_agents` | array | Agentes relacionados | `[]` |
 | `related_commands` | array | Comandos relacionados | `[]` |
 
-### Model tiering em fleet
+### Model tiering em orquestração
 
-Ao orquestrar frota (fan-out via ferramenta Workflow nativa), distribua tiers:
+Ao orquestrar workers (fan-out via ferramenta Workflow nativa), distribua tiers:
 o orquestrador roda em `opus`; workers de alto volume e baixa complexidade vão
 para `sonnet` ou `haiku`. Em caso de dúvida, **herde do parent** omitindo o campo
 `model`. Esse tiering reduz custo agregado em fan-out, onde dezenas de subagentes

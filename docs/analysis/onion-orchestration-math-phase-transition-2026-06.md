@@ -1,22 +1,22 @@
 ---
-title: "Matemática de dimensionamento de frota — o paper de transição de fase aplicado ao Onion (jun/2026)"
+title: "Matemática de dimensionamento de orquestração — o paper de transição de fase aplicado ao Onion (jun/2026)"
 date: 2026-06-21
 type: analysis
 status: proposed / living
-authority: mapeamento + leitura crítica; sem decisão executável (insumo p/ /meta:evolve e p/ a doutrina de frota)
+authority: mapeamento + leitura crítica; sem decisão executável (insumo p/ /meta:evolve e p/ a doutrina de orquestração)
 research: arXiv:2601.17311 (verificado via web, jun/2026) + arXiv:2604.02460 (suporte empírico)
 last-review: 2026-06-21
 next-review-trigger: "se quisermos critérios de aceite NUMÉRICOS p/ judge-panel · OU calibrar N_max de panel por modelo · OU nova evidência empírica sobre s>β"
 relates:
-  - ./onion-fleet-external-radar-2026-06.md
-  - ./onion-fleet-topology-adr-draft-2026-06-21.md
-  - ../knowledge-base/concepts/agent-fleet-orchestration.md
+  - ./onion-orchestration-external-radar-2026-06.md
+  - ./onion-orchestration-topology-adr-draft-2026-06-21.md
+  - ../knowledge-base/concepts/agent-orchestration.md
 ---
 
-# Matemática de dimensionamento de frota — o paper de transição de fase aplicado ao Onion
+# Matemática de dimensionamento de orquestração — o paper de transição de fase aplicado ao Onion
 
 > **Natureza:** nota de análise **viva**. Aprofunda o item 🟡 MATH do
-> [radar de frota](./onion-fleet-external-radar-2026-06.md). Lê o paper com fundamento, mapeia
+> [radar de orquestração](./onion-orchestration-external-radar-2026-06.md). Lê o paper com fundamento, mapeia
 > honestamente o que se aplica ao Onion e o que **não** se aplica, e recomenda **sem absoluto**.
 
 ## 1. Contexto — o paper foi VERIFICADO
@@ -58,10 +58,10 @@ extrai o que de fato serve ao Onion.
 
 | Resultado do paper | Aplica ao Onion? | Onde / como |
 |---|---|---|
-| `α_ρ>1` amplifica vs `α_ρ≤1` colapsa | **SIM — precisamente no judge-panel** | O judge-panel do Onion (N céticos, voto — `onion-fleet/SKILL.md:43-45`, `agent-fleet-orchestration.md:254-274`) **é** uma agregação por maioria binária. O paper o modela diretamente. |
+| `α_ρ>1` amplifica vs `α_ρ≤1` colapsa | **SIM — precisamente no judge-panel** | O judge-panel do Onion (N céticos, voto — `onion-orchestration/SKILL.md:43-45`, `agent-orchestration.md:254-274`) **é** uma agregação por maioria binária. O paper o modela diretamente. |
 | `s > β` (scale-out vs scale-up) | **SIM — lente do gate "orquestrar ou não"** | Quantifica o gate de acoplamento já existente (`SKILL.md:23-27`). O irmão arXiv:2604.02460 dá suporte empírico ao "quando `s ≤ β`, não orqueste — single-agent vence sob mesmo budget". |
 | mixing depth / saturação | **SIM — teto racional ao panel** | "Mais juízes além de um ponto é desperdício, a menos que `ρ↓` ou `γ↑`" → limita o N do judge-panel; casa com o cap de 16 e com "completeness critic" sem inflar custo. |
-| estrela satura em `W/m` | **PARCIAL** | **Não morde no orquestrador** (fan-in do Onion é JS a 0 token — ele não lê as N saídas). **Morde no nó sumarizador** quando a síntese é por LLM — é o `b·m ≤ W` do [ADR de topologia](./onion-fleet-topology-adr-draft-2026-06-21.md). |
+| estrela satura em `W/m` | **PARCIAL** | **Não morde no orquestrador** (fan-in do Onion é JS a 0 token — ele não lê as N saídas). **Morde no nó sumarizador** quando a síntese é por LLM — é o `b·m ≤ W` do [ADR de topologia](./onion-orchestration-topology-adr-draft-2026-06-21.md). |
 | recursão de maioria binária | **NÃO — ao fan-out geral** | O fan-in comum do Onion é **dedupe/rank/merge** (não voto binário) sobre **workers heterogêneos**. Fora do escopo do modelo; não force a matemática aqui. |
 
 ## 4. As 3 lentes acionáveis
@@ -73,7 +73,7 @@ extrai o que de fato serve ao Onion.
    (modelos/prompts/lentes diversos) é o que move o painel para o regime amplificador `α_ρ>1`.
 
 2. **`s > β` é a versão quantitativa do gate "orquestrar ou não".**
-   Frota só compensa o multiplicador de custo quando o expoente de organização supera o de scale-up.
+   A orquestração só compensa o multiplicador de custo quando o expoente de organização supera o de scale-up.
    Em tarefa acoplada (código, raciocínio sequencial) `s` é baixo → `s ≤ β` → **não orqueste**
    (single-agent com bom context-engineering vence). Confirma a postura opt-in do Onion + o irmão 2604.
 
@@ -85,7 +85,7 @@ extrai o que de fato serve ao Onion.
 
 - **Adotar QUALITATIVamente já (custo ~zero):** o paper **explica e justifica** duas coisas que o Onion
   já faz por heurística — a diversidade do judge-panel (`α_ρ`) e o gate orquestrar-ou-não (`s>β`).
-  **Candidato diferido (não agora):** uma linha na doutrina de frota tornando explícito que *"a
+  **Candidato diferido (não agora):** uma linha na doutrina de orquestração tornando explícito que *"a
   diversidade do panel (ρ baixo) é requisito de correção — painel homogêneo pode colapsar em consenso
   errado (α_ρ≤1)"*. Igual ao padrão do ADR de topologia: registrar a decisão, implementar quando aceito.
 - **Manter QUANTITATIVO no radar 🟡:** calibrar `β, γ(m), ρ` empiricamente exige instrumentação que o
@@ -114,5 +114,5 @@ extrai o que de fato serve ao Onion.
 - **Primária (verificada):** *Phase Transition for Budgeted Multi-Agent Synergy*, **arXiv:2601.17311**
   (Liu, Kong, Pei, jan/2026). Fórmulas de `arxiv.org/html/2601.17311v1`.
 - **Suporte empírico:** **arXiv:2604.02460** — single-agent vence multi-agent sob budget igual (multi-hop).
-- **Canônico interno:** `onion-fleet/SKILL.md` (judge-panel, gate, caps), `agent-fleet-orchestration.md`
-  (doutrina), [ADR de topologia](./onion-fleet-topology-adr-draft-2026-06-21.md), [radar](./onion-fleet-external-radar-2026-06.md).
+- **Canônico interno:** `onion-orchestration/SKILL.md` (judge-panel, gate, caps), `agent-orchestration.md`
+  (doutrina), [ADR de topologia](./onion-orchestration-topology-adr-draft-2026-06-21.md), [radar](./onion-orchestration-external-radar-2026-06.md).

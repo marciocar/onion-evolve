@@ -47,7 +47,7 @@ jobs:
 
             - Conformidade com agents.md, commands.md, architecture.md, code-standards.md,
               integrations.md — cite a regra como `meta-spec:linha` ao apontar violação.
-            - Regras de FLEET (commands.md §10): orquestração reside em skill/comando, NUNCA
+            - Regras de ORQUESTRAÇÃO (commands.md §10): orquestração reside em skill/comando, NUNCA
               em agente (architecture.md §4.2); invariante de workflows faseados preservada;
               resiliência exigida quando há fan-out (falha parcial, timeout, fan-in, fallback).
             - Código/idioma (code-standards.md): pt-BR em docs/conteúdo, inglês em código/commits;

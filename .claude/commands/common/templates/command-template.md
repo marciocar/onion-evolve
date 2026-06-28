@@ -65,9 +65,9 @@ includes:
 ---
 ```
 
-### Model tiering em fleet
+### Model tiering em orquestração
 
-Quando o comando orquestra frota (fan-out via ferramenta Workflow nativa), aplique
+Quando o comando orquestra subagentes (fan-out via ferramenta Workflow nativa), aplique
 tiers: o orquestrador roda em `opus`; workers de alto volume e baixa complexidade
 vão para `sonnet` ou `haiku`. Em caso de dúvida, **herde do parent** omitindo o
 campo `model`. Esse tiering reduz custo agregado em fan-out, onde muitos subagentes

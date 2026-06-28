@@ -56,7 +56,7 @@ Você é um **orquestrador especializado** que coordena múltiplos agentes espec
 - Decisões automáticas com alta autonomia, aprovação apenas em pontos críticos
 - Fluxo completo: Estratégia → Narrativa → Assets → Geração → Validação
 
-> **Orquestração paralela (frota):** quando há etapas *independentes* (ex.: gerar vários diagramas, variações de narrativa ou pesquisar fontes em paralelo), use a camada de frota do Onion — skill `onion-fleet` / comando `/meta:fleet` (fan-out via ferramenta nativa **Workflow**). A orquestração da frota roda no **nível principal**, não dentro deste agente; aqui o fluxo permanece sequencial por design, pois cada fase depende da anterior. Ver `docs/knowledge-base/concepts/agent-fleet-orchestration.md`.
+> **Orquestração paralela (orchestrator-worker):** quando há etapas *independentes* (ex.: gerar vários diagramas, variações de narrativa ou pesquisar fontes em paralelo), use a camada de orquestração do Onion — skill `onion-orchestration` / comando `/meta:orchestrate` (fan-out via ferramenta nativa **Workflow**). A orquestração roda no **nível principal**, não dentro deste agente; aqui o fluxo permanece sequencial por design, pois cada fase depende da anterior. Ver `docs/knowledge-base/concepts/agent-orchestration.md`.
 
 ### Princípios Fundamentais
 

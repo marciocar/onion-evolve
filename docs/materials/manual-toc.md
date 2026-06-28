@@ -50,7 +50,7 @@ As 5 camadas do framework: Comandos, Agentes, Skills, Abstrações (SDAAL), Docu
 
 ### 3.2 Skills de orquestração
 
-As 5 skills (`onion`, `onion-fleet`, `onion-patterns`, `onion-validation`, `language-standards`) — quando cada uma entra em ação e como se relacionam com comandos/agentes.
+As 5 skills (`onion`, `onion-orchestration`, `onion-patterns`, `onion-validation`, `language-standards`) — quando cada uma entra em ação e como se relacionam com comandos/agentes.
 
 - **Fonte:** [onion-framework-identity.md](../knowledge-base/meta/onion-framework-identity.md) §3 (camada 3); [index.md](../onion/index.md)
 - **Status:** 🔲 precisa ser escrito (existe menção dispersa, falta capítulo dedicado)
@@ -98,11 +98,11 @@ Padrão SDAAL: detecção de provider via `.env` (`TASK_MANAGER_PROVIDER`, `FORG
 
 ---
 
-## 7. Orquestração de Frota
+## 7. Orquestração de Subagentes
 
-Quando usar fan-out paralelo (`Workflow` + skill `onion-fleet`), sessões retomáveis para features longas, Agent Teams (opt-in/experimental) e Federation multi-repo.
+Quando usar fan-out paralelo (`Workflow` + skill `onion-orchestration`), sessões retomáveis para features longas, Agent Teams (opt-in/experimental) e Federation multi-repo.
 
-- **Fonte:** [onion-framework-identity.md](../knowledge-base/meta/onion-framework-identity.md) §4 (Orquestração & Frota), §5 (Caso 1 — Federation, Caso 3 — Agent Teams); KB [agent-fleet-orchestration.md](../knowledge-base/concepts/agent-fleet-orchestration.md); KB [multi-repo-federation.md](../knowledge-base/concepts/multi-repo-federation.md)
+- **Fonte:** [onion-framework-identity.md](../knowledge-base/meta/onion-framework-identity.md) §4 (Orquestração), §5 (Caso 1 — Federation, Caso 3 — Agent Teams); KB [agent-orchestration.md](../knowledge-base/concepts/agent-orchestration.md); KB [multi-repo-federation.md](../knowledge-base/concepts/multi-repo-federation.md)
 - **Status:** 🔲 precisa ser escrito (KBs técnicas existem, falta capítulo de manual com exemplos guiados)
 
 ---

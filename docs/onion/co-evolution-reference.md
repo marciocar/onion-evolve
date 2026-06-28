@@ -36,7 +36,7 @@ sinal              → /meta:co-evolve   → /meta:co-announce → /meta:co-deli
 
 | Comando | ▶ Roda | Direção | O que faz |
 |---------|--------|---------|-----------|
-| `/meta:evolve` | core | intra-core | Auto-auditoria via **frota** (fan-out → síntese) → backlog priorizado com evidência em `docs/analysis/`. **Read-only** (propõe, não muta). |
+| `/meta:evolve` | core | intra-core | Auto-auditoria via **orquestração** (fan-out → síntese) → backlog priorizado com evidência em `docs/analysis/`. **Read-only** (propõe, não muta). |
 
 ### Co-evolução — doc-bridge leve
 

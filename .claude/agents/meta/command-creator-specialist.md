@@ -407,7 +407,7 @@ Este comando delega para o agente especializado.
 3. [Retornar resultado em formato X]
 ```
 
-**Pattern 2: Orquestração Sequencial** (passos **dependentes**; para passos **independentes**, prefira fan-out via a ferramenta nativa Workflow — ver `/meta:fleet` / skill `onion-fleet`)
+**Pattern 2: Orquestração Sequencial** (passos **dependentes**; para passos **independentes**, prefira fan-out via a ferramenta nativa Workflow — ver `/meta:orchestrate` / skill `onion-orchestration`)
 ```markdown
 ## Execução
 

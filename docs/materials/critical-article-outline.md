@@ -87,16 +87,16 @@ defende que o Onion deve ser avaliado não pelo que promete fazer, mas pelos com
 - **Pergunta para o leitor**: você aceitaria construir seu fluxo de desenvolvimento inteiro sobre uma
   feature experimental de um único fornecedor? (Agent Teams ainda é `EXPERIMENTAL` e gated por env var.)
 
-### 4. Custo de tokens e a economia da frota
+### 4. Custo de tokens e a economia da orquestração
 
 - **Os números são públicos e altos**: uma auto-auditoria completa custou **1.27M tokens, 635 tool-uses,
-  ~26 minutos**. Frotas pesadas favorecem "planos com mais headroom" (FAQ). *(Identidade §6)*
+  ~26 minutos**. Orquestrações pesadas favorecem "planos com mais headroom" (FAQ). *(Identidade §6)*
 - **Implicação de custo real**: orquestração multi-agente não é grátis. Cada fan-out de dezenas de agentes
   tem um preço — e o artigo deve estimar o que isso representa rodando semanalmente num time.
 - **A pergunta de ROI**: o ganho de produtividade supera o custo de tokens + custo de manutenção do
   framework + custo de aprendizado? A resposta provavelmente depende do tamanho do time e da frequência
   de uso — e o Onion não publica esse cálculo.
-- **Contra-argumento**: uso moderado roda em planos menores (FAQ); nem todo comando é uma frota. O artigo
+- **Contra-argumento**: uso moderado roda em planos menores (FAQ); nem todo comando é uma orquestração. O artigo
   deve distinguir o uso cotidiano (barato) do uso pesado (caro), sem deixar o número de 1.27M intimidar
   injustamente nem ser varrido para baixo do tapete.
 
@@ -112,7 +112,7 @@ defende que o Onion deve ser avaliado não pelo que promete fazer, mas pelos com
 - **Quem precisa de garantias de estabilidade**: um framework que pivotou direções estruturais inteiras em
   uma única data (2026-05-18) e roda auto-evolução contínua é, por construção, um alvo móvel. Ótimo para
   early adopters, desconfortável para quem precisa de uma base congelada.
-- **Sensibilidade a custo de IA**: ver seção 4 — onde tokens são o gargalo orçamentário, a frota pesa.
+- **Sensibilidade a custo de IA**: ver seção 4 — onde tokens são o gargalo orçamentário, a orquestração pesa.
 
 ### 6. Perguntas sem resposta fácil
 
@@ -128,7 +128,7 @@ defende que o Onion deve ser avaliado não pelo que promete fazer, mas pelos com
   "comprovado".
 - **A linha entre orquestração e perda de controle**: o Onion declara "humano-maestro como invariante" e
   abandonou as fases v4.0 que beiravam autonomia. É um limite saudável — mas a fronteira entre
-  "frota orquestrada" e "agente autônomo difícil de supervisionar" é tênue e vai pressionar conforme as
+  "orquestração" e "agente autônomo difícil de supervisionar" é tênue e vai pressionar conforme as
   plataformas avançam.
 - **Sustentabilidade econômica**: se a orquestração pesada exige planos premium, o Onion é viável para
   o mid-market ou só para quem já tem orçamento de IA folgado?
@@ -147,7 +147,7 @@ defende que o Onion deve ser avaliado não pelo que promete fazer, mas pelos com
   sumir. Por que isso é aceitável para um framework que se quer "constitucional"?
 
 **Sobre custo:**
-- 1.27M tokens por auto-auditoria. Qual o custo mensal realista de um time rodando o Onion com frotas
+- 1.27M tokens por auto-auditoria. Qual o custo mensal realista de um time rodando o Onion com orquestrações
   regularmente? Vocês têm esse número para um cliente real, não para o próprio repositório?
 - Qual a fração dos 82 comandos que um time típico realmente usa em 90 dias? O resto é peso morto?
 

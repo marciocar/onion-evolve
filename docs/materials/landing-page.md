@@ -61,7 +61,7 @@
 **Bloco 1 — Produto & Discovery:** coletar requisitos, refinar spec, transcrever reuniões, converter em tasks no task manager ativo (Seção 4, "Produto & Discovery").
 **Bloco 2 — Engenharia & GitFlow:** planejar feature em fases retomáveis, abrir PR via forge adapter, hotfix fast-track (Seção 4, "Engenharia & GitFlow").
 **Bloco 3 — Qualidade & Compliance:** code review, testes unitários, ISO 27001, SOC2 Type II, validação arquitetural (Seção 4, "Qualidade & Compliance").
-**Bloco 4 — Orquestração & Frota:** fan-out paralelo de agentes, sessões retomáveis, federation multi-repo, Agent Teams opt-in (Seção 4, "Orquestração & Frota").
+**Bloco 4 — Orquestração & Subagentes:** fan-out paralelo de subagentes, sessões retomáveis, federation multi-repo, Agent Teams opt-in (Seção 4, "Orquestração & Subagentes").
 **Bloco 5 — Meta (Auto-Evolução):** `/meta:evolve` audita 8 dimensões, frescor de KBs, criar novo agente/comando, inventário automático (Seção 4, "Meta").
 
 **Visual:** grid de 5 cards com ícone, título e 3 bullets cada. Cada card linka para a seção correspondente do manual.

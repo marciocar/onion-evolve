@@ -10,10 +10,10 @@
 | **Data de Criação** | 2026-06-13 |
 | **Última Atualização** | 2026-06-15 |
 | **Categoria** | Frameworks |
-| **Método** | Pesquisa multi-fonte via `/meta:fleet` (fan-out-and-synthesize) + verificação adversarial (Opus) |
-| **Aplicação** | Posicionamento da camada de frota do Onion vs. estado da arte |
+| **Método** | Pesquisa multi-fonte via `/meta:orchestrate` (fan-out-and-synthesize) + verificação adversarial (Opus) |
+| **Aplicação** | Posicionamento da camada de orquestração do Onion vs. estado da arte |
 
-> **Nota de confiabilidade:** este documento separa **fatos estruturais** (verificados contra fonte primária, cross-source) de **números de impacto/adoção** (majoritariamente self-report de vendor — tratados como **não-verificados**). A marcação segue o veredito do verificador adversarial que acompanhou a pesquisa. Ver [agent-fleet-orchestration.md](../concepts/agent-fleet-orchestration.md) para a doutrina operacional.
+> **Nota de confiabilidade:** este documento separa **fatos estruturais** (verificados contra fonte primária, cross-source) de **números de impacto/adoção** (majoritariamente self-report de vendor — tratados como **não-verificados**). A marcação segue o veredito do verificador adversarial que acompanhou a pesquisa. Ver [agent-orchestration.md](../concepts/agent-orchestration.md) para a doutrina operacional.
 
 ### Fontes (verificadas)
 
@@ -29,7 +29,7 @@
 
 ## 🎯 Visão Geral
 
-Em 2026, "orquestração de agentes" deixou de ser pesquisa e virou **infraestrutura de produto**. Cinco correntes independentes convergem para um mesmo núcleo arquitetural — **orquestrador-worker hierárquico + isolamento + verificação** — diferindo no substrato (nativo, framework, enterprise) e no grau de autonomia. Este landscape compara as cinco e posiciona a camada de frota do Onion.
+Em 2026, "orquestração de agentes" deixou de ser pesquisa e virou **infraestrutura de produto**. Cinco correntes independentes convergem para um mesmo núcleo arquitetural — **orquestrador-worker hierárquico + isolamento + verificação** — diferindo no substrato (nativo, framework, enterprise) e no grau de autonomia. Este landscape compara as cinco e posiciona a camada de orquestração do Onion.
 
 ---
 
@@ -90,13 +90,13 @@ Marcados pelo verificador adversarial como self-report de vendor ou sem metodolo
 
 ## 🧅 Como o Onion se posiciona
 
-A camada de frota do Onion (ver [agent-fleet-orchestration.md](../concepts/agent-fleet-orchestration.md)) está **alinhada ao consenso verificado**:
+A camada de orquestração do Onion (ver [agent-orchestration.md](../concepts/agent-orchestration.md)) está **alinhada ao consenso verificado**:
 
 - Adota **orchestrator-worker** sobre o substrato **nativo** (`Workflow`/`Agent`) — corrente #1, sem reinventar motor.
 - Usa **isolamento por worktree**, **model tiering** e **verificação adversarial / judge-panel** — práticas consensuais.
 - Mantém a orquestração no **nível principal** (skill/comando), respeitando `architecture.md §4.2`.
 
-**Onde o Onion deve avançar para uma versão confiável** (gaps transversais que ninguém resolve): guardrails de **segurança adversarial** em fan-out, **verificação automatizada** (não manual) e **modelo de custo/break-even**. Estes pontos são objeto de auditoria contínua via `/meta:fleet`.
+**Onde o Onion deve avançar para uma versão confiável** (gaps transversais que ninguém resolve): guardrails de **segurança adversarial** em fan-out, **verificação automatizada** (não manual) e **modelo de custo/break-even**. Estes pontos são objeto de auditoria contínua via `/meta:orchestrate`.
 
 ### Por que o Onion não adota A2A vivo (federação)
 

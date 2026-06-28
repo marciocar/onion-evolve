@@ -39,7 +39,7 @@ pendentes?), checks técnicos (meta specs, code review, testes) e indicador `rea
 
 ### 🔧 Validações Técnicas (fan-out paralelo):
 
-Os quatro agentes abaixo são **independentes** — execute-os como uma **frota em paralelo** (fan-out) e depois **consolide** o feedback num relatório único (fan-in). Padrão na skill `onion-fleet` e na KB `agent-fleet-orchestration`.
+Os quatro agentes abaixo são **independentes** — execute-os como uma **orquestração em paralelo** (fan-out) e depois **consolide** o feedback num relatório único (fan-in). Padrão na skill `onion-orchestration` e na KB `agent-orchestration`.
 
 **Fan-out (paralelo)** — dispare simultaneamente, cada um com saída estruturada:
 - `branch-metaspec-checker` — alinhamento da branch com as meta-specs do projeto.
@@ -49,7 +49,7 @@ Os quatro agentes abaixo são **independentes** — execute-os como uma **frota 
 
 **Fan-in (consolidação)** — mescle os quatro retornos num **relatório único** de pré-PR, deduplicando achados e ordenando por severidade.
 
-> **Fallback sequencial:** se o substrato de fan-out paralelo não estiver disponível, invoque os quatro agentes em sequência (1→4) e consolide ao final — mesmo resultado, mais lento. Padrão canônico de degradação: `common/prompts/fleet-fallback.md`.
+> **Fallback sequencial:** se o substrato de fan-out paralelo não estiver disponível, invoque os quatro agentes em sequência (1→4) e consolide ao final — mesmo resultado, mais lento. Padrão canônico de degradação: `common/prompts/orchestration-fallback.md`.
 
 ### 📋 AUTO-UPDATE:
 5. **Validar critérios de aceitação** - Verificar todos os checkboxes

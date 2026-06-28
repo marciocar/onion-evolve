@@ -26,7 +26,7 @@
 #   6. Filenames em .claude/ devem ser kebab-case [SOFT]
 #      (exceções: README.md, SKILL.md, ESPERANTO.md e templates com underscore
 #       em common/templates)
-#   7. Nenhum agente pode ter name: contendo 'fleet-orchestrator' [HARD]
+#   7. Nenhum agente pode ter name: contendo 'worker-orchestrator' [HARD]
 #   8. Inventário canônico (docs/onion/inventory.md) em sincronia com o
 #      filesystem [HARD] — gerado por inventory.sh; drift bloqueia merge
 #   9. Contagens no CLAUDE.md em sincronia com a SSOT [HARD]
@@ -41,7 +41,7 @@
 #      MCP de underscore único (mcp_<Server>_…) [HARD] — formato é mcp__server__tool
 #  13. Templates canônicos (commands/common/templates/) dialeto-puro [HARD] —
 #      são copiados verbatim ao criar agentes/comandos; token Cursor ou MCP
-#      underscore-único aqui re-propaga o bug para toda nova frota
+#      underscore-único aqui re-propaga o bug para toda nova orquestração
 #  14. Meta-specs (docs/meta-specs/) sem dialeto Cursor em exemplos de tools:
 #      [HARD] — autoridade L0; token Cursor como item de lista YAML ou MCP
 #      underscore-único. A lista de PROIBIÇÃO em prosa/blockquote é isenta
@@ -313,13 +313,13 @@ check_kebab_case_filenames() {
 }
 
 # ===========================================================================
-# REGRA 7 — Nenhum agente pode ter name: contendo 'fleet-orchestrator' [HARD]
+# REGRA 7 — Nenhum agente pode ter name: contendo 'worker-orchestrator' [HARD]
 #           (violação arquitetural — §4.2 de architecture.md)
 # ===========================================================================
-check_no_fleet_orchestrator_agent() {
+check_no_worker_orchestrator_agent() {
   while IFS= read -r -d '' agent; do
-    if grep -q "^name:.*fleet-orchestrator" "${agent}"; then
-      violation "HARD" "${agent}" "agente com name: 'fleet-orchestrator' viola §4.2 da arquitetura"
+    if grep -q "^name:.*worker-orchestrator" "${agent}"; then
+      violation "HARD" "${agent}" "agente com name: 'worker-orchestrator' viola §4.2 da arquitetura"
     fi
   done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
@@ -638,7 +638,7 @@ check_agent_tool_names() {
 # REGRA 13 — Templates canônicos devem ser dialeto-puro
 #   Templates em commands/common/templates/ são copiados verbatim ao criar
 #   agentes/comandos; qualquer nome de tool estilo-Cursor [HARD] ou MCP
-#   underscore-único [HARD] aqui re-propaga o bug para toda nova frota.
+#   underscore-único [HARD] aqui re-propaga o bug para toda nova orquestração.
 #   Cobre tokens distintivos em QUALQUER lugar do template (não só frontmatter,
 #   pois o template demonstra YAML no corpo). 'write'/'grep' ficam de fora por
 #   ambiguidade com prosa/shell — no frontmatter real a REGRA 12 os pega.
@@ -710,7 +710,7 @@ check_context_freshness_stamp() {
 #   'N agentes ...em M categorias' (qualquer texto antes de 'em N categorias') e
 #   'N Knowledge Bases'. FORMATOS AMPLIADOS (2026-06): parentético '(N total)'
 #   ANCORADO no substantivo da linha (agentes/comandos); aproximado 'N+ comandos|agentes'
-#   com GUARDA ANTI-FROTA (pula ranges 'A-B+' e linhas paralel/frota/fan-out — 'N+ agentes'
+#   com GUARDA ANTI-ORQUESTRAÇÃO (pula ranges 'A-B+' e linhas paralel/frota/fan-out — 'N+ agentes'
 #   ali é carga de runtime, não inventário); composto 'N comandos, M agentes, P skills,
 #   K knowledge bases' (ordem inversa da combinada → não colidem). Assim NÃO flaga métricas de frota
 #   ('28 agentes' de um run), breakdowns ('4 comandos especializados de docs',
@@ -820,13 +820,13 @@ check_inventory_total_drift() {
     done < <(grep -iE '\([0-9]+ total' "${f}" 2>/dev/null)
 
     # 'N+ comandos|agentes' — forma APROXIMADA (ex.: 'ecossistema de 60+ comandos').
-    # GUARDA ANTI-FROTA: pula ranges 'A-B+' (o '[^0-9-]' barra o número precedido de '-')
+    # GUARDA ANTI-ORQUESTRAÇÃO: pula ranges 'A-B+' (o '[^0-9-]' barra o número precedido de '-')
     # e linhas de métrica de EXECUÇÃO (paralel/frota/fan-out/...), que usam 'N+ agentes'
     # para carga de runtime — NÃO inventário (FP real: agent-orchestration-landscape KB).
     while IFS= read -r line; do
       [ -z "${line}" ] && continue
       case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
-      if printf '%s' "${line}" | grep -qiE 'paralel|frota|fan-out|simultân|supervision'; then continue; fi
+      if printf '%s' "${line}" | grep -qiE 'paralel|orquestr|orchestrator|frota|fan-out|simultân|supervision'; then continue; fi
       n="$(printf '%s' "${line}" | grep -oiE '(^|[^0-9-])[0-9]+\+ comandos' | grep -oE '[0-9]+' | head -1 || true)"
       if [ -n "${n}" ] && [ "${n}" != "${cmd}" ]; then
         violation "SOFT" "${f}" "contagem aproximada de comandos divergente da SSOT: '${n}+ comandos' (esperado ${cmd}+) — /meta:inventory"
@@ -867,7 +867,7 @@ check_inventory_total_drift() {
     # 'N agentes especializados' / 'N agentes IA' — forma BARE de total-atual (sem
     # âncora 'em categorias'/total/composto, que as regras acima já cobrem). É campo
     # minado de FALSO-POSITIVO → guarda densa em DUAS camadas:
-    #   (1) pula tabelas (|) e linhas de FROTA/EXECUÇÃO/CRIAÇÃO
+    #   (1) pula tabelas (|) e linhas de ORQUESTRAÇÃO/EXECUÇÃO/CRIAÇÃO
     #       (paralel|frota|fan-out|simultân|supervision|trabalhando|criad);
     #   (2) SÓ considera linhas com MARCADOR de total-atual — 'especializados' OU ' IA'
     #       (com ou sem '**' do markdown). É o marcador que separa "49 agentes
@@ -878,7 +878,7 @@ check_inventory_total_drift() {
     while IFS= read -r line; do
       [ -z "${line}" ] && continue
       case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
-      if printf '%s' "${line}" | grep -qiE 'paralel|frota|fan-out|simultân|supervision|trabalhando|criad'; then continue; fi
+      if printf '%s' "${line}" | grep -qiE 'paralel|orquestr|orchestrator|frota|fan-out|simultân|supervision|trabalhando|criad'; then continue; fi
       # '(N agentes)' parentético = contagem POR-CATEGORIA/breakdown (ex.: header
       # 'AGENTES ESPECIALIZADOS (3 agentes)'), não total — pula mesmo com marcador.
       if printf '%s' "${line}" | grep -qE '\([0-9]+ agentes\)'; then continue; fi
@@ -986,8 +986,8 @@ run_inventory_fixes() {
   prog="${prog}; s/([Aa]gentes[^()]*\()[0-9]+( total)/\1${agent}\2/g"
   prog="${prog}; s/([Cc]omandos[^()]*\()[0-9]+( total)/\1${cmd}\2/g"
   # (b) aproximado 'N+ comandos|agentes' — preserva o '+'; '[^0-9-]' impede tocar ranges 'A-B+'
-  #     (métrica de frota, ex.: '8-16+ agentes paralelos'). Risco residual: 'N+ agentes' SEM range
-  #     em linha de frota não tem guarda 'paralel' por-linha (sed é global) → coberto pela revisão do diff.
+  #     (métrica de orquestração, ex.: '8-16+ agentes paralelos'). Risco residual: 'N+ agentes' SEM range
+  #     em linha de orquestração não tem guarda 'paralel' por-linha (sed é global) → coberto pela revisão do diff.
   prog="${prog}; s/([^0-9-])[0-9]+(\+ comandos)/\1${cmd}\2/g"
   prog="${prog}; s/([^0-9-])[0-9]+(\+ agentes)/\1${agent}\2/g"
   # (c) composto 'N comandos, M agentes, P skills, K knowledge bases' — reescreve os 4 campos de uma vez
@@ -1041,7 +1041,7 @@ check_no_gpt4_model
 check_no_mcp_onion_orchestrator
 check_line_limits
 check_kebab_case_filenames
-check_no_fleet_orchestrator_agent
+check_no_worker_orchestrator_agent
 check_inventory_sync
 check_claude_md_counts
 check_plugins_sync

@@ -26,7 +26,7 @@ related:
 | **Decisão proposta** | Criar um **catálogo de padrões de estratégia (playbooks)** — mapeamento `situação reconhecida → fluxo nomeado → grupo de ferramentas → sequência` — de forma que a seleção de caminho vire **reconhecimento** (match contra catálogo), não **composição do zero** (raciocinar tool por tool toda vez). A deliberação cara (fan-out, juízes) passa a ser **fallback** para o resíduo que nenhum padrão cobre. |
 | **Escopo** | Meta-estratégia de orquestração. Regra L0 que se senta acima de `commands.md`/`agents.md` e que prioriza **catálogo-first**: o agente primeiro reconhece o caso e aplica o playbook; só delibera quando não há match. |
 | **Status** | 🟡 **Proposto** em 2026-06-17 15:18 -03 (refinado às 15:18 após esclarecimento do usuário: catálogo-first, não deliberação-first). Aguarda reconciliação na sala de obra. |
-| **Origem** | Sessão de design 2026-06-17. Esclarecimento decisivo do usuário: *"em vez de ter que orquestrar e pensar no uso de ferramenta tool por tool, já ter fluxos/casos mapeados — padrões."* Isto é **recognition-primed decision making**: reconhecer a situação como típica e aplicar o padrão validado, em vez de reavaliar tudo. O Onion tem peças de orquestração (Workflow/fleet) mas **não um catálogo de playbooks por caso de uso**. |
+| **Origem** | Sessão de design 2026-06-17. Esclarecimento decisivo do usuário: *"em vez de ter que orquestrar e pensar no uso de ferramenta tool por tool, já ter fluxos/casos mapeados — padrões."* Isto é **recognition-primed decision making**: reconhecer a situação como típica e aplicar o padrão validado, em vez de reavaliar tudo. O Onion tem peças de orquestração (Workflow/onion-orchestration) mas **não um catálogo de playbooks por caso de uso**. |
 
 ---
 
@@ -45,10 +45,10 @@ nomear a fronteira:
 2. **Dirigido por código** (orquestração determinística — ferramenta `Workflow`). A *estrutura*
    (laços, fan-out, condicionais) é fixa no script; o modelo só preenche as folhas. Bom para
    formas conhecidas (auditoria, migração, review paralelo). Custo: rígido — exige saber a forma.
-   → É o que `/meta:evolve`, `/meta:fleet`, `onion-fleet` materializam.
+   → É o que `/meta:evolve`, `/meta:orchestrate`, `onion-orchestration` materializam.
 
 **O ponto cego**: não existe um **catálogo de playbooks por caso de uso** que o agente
-possa reconhecer e aplicar. O que existe (`onion-fleet`, padrões canônicos do Workflow) é
+possa reconhecer e aplicar. O que existe (`onion-orchestration`, padrões canônicos do Workflow) é
 catálogo de **forma de orquestração** (fan-out, judge panel, pipeline…), não de **`caso de
 uso → fluxo → grupo de ferramentas`**. Sem esse catálogo, o agente recompõe a estratégia
 do zero, tool por tool, a cada tarefa — implícito no julgamento de quem invoca. É o mesmo

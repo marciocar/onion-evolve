@@ -70,7 +70,7 @@ resolução de referências e conformidade de escala são **calculados** (gate d
 - **NÃO** decide posicionamento/estratégia de marca → `@branding-positioning-specialist`.
 - **NÃO** escreve a lógica/estado dos componentes React → `@react-developer` (o
   design-system-specialist fornece os tokens/tema que ele consome).
-- **NÃO** orquestra frota nem invoca comandos (é worker/especialista, invocado por `/design`).
+- **NÃO** orquestra subagentes nem invoca comandos (é worker/especialista, invocado por `/design`).
 - **NÃO** gera pixels/logos como verdade — assets multimodais ficam fora da SSOT, sob gate humano.
 
 ## Fluxo típico (dentro de `/design`)

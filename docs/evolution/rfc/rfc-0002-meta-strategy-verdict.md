@@ -35,11 +35,11 @@ match, e o resíduo vira novo playbook (o catálogo aprende). Precedente exato: 
 
 | Artefato | Reconhece o quê | Sobreposição com catálogo-first |
 |---|---|---|
-| skill `onion-fleet` / `/meta:fleet` | **forma de trabalho** (independência → fan-out, judge-panel, pipeline) | parcial (~60%) — mas dimensão **diferente** |
+| skill `onion-orchestration` / `/meta:orchestrate` | **forma de trabalho** (independência → fan-out, judge-panel, pipeline) | parcial (~60%) — mas dimensão **diferente** |
 | skill `onion-patterns` | convenções estruturais (naming, YAML, limites) | baixa — é doutrina de forma, não de caso |
 | `/meta:analyze-complex-problem` | **um** problema (template de análise) | baixa — analisa, não seleciona estratégia |
 
-**Conclusão:** a sobreposição é real mas a distinção é **genuína** — `onion-fleet` reconhece *forma de
+**Conclusão:** a sobreposição é real mas a distinção é **genuína** — `onion-orchestration` reconhece *forma de
 orquestração*; catálogo-first reconhece *caso de uso* (`refatorar-feature-legada`, `descoberta→backlog`…).
 **Não é redundância** → a doutrina se sustenta.
 

@@ -66,7 +66,7 @@ estado determinístico (`[DONE]`/`[ACTIVE]`/`[TODO]`).
 
 ### 2b. Coordenação por modo: harness + comunicação = f(escala)
 
-O **harness** (sessões, subagentes, a ferramenta nativa `Workflow`/frota) e a **camada de comunicação** (o
+O **harness** (sessões, subagentes, a ferramenta nativa `Workflow`/orquestração) e a **camada de comunicação** (o
 **Ledger** é uma camada de comunicação) instanciam o **mesmo modelo** em escalas diferentes. O Ledger é
 **isomórfico**: `{registry (quem/versões) · changelog (o-quê/porquê) · contracts (o-que-quebra)}`.
 
@@ -78,7 +78,7 @@ O **harness** (sessões, subagentes, a ferramenta nativa `Workflow`/frota) e a *
 
 - **Fontes canônicas:** [Multi-repo Federation](multi-repo-federation.md) ·
   [discovery harness+ledger](../../analysis/onion-research-harness-ledger-3-modes-2026-06.md) ·
-  orquestração de frota: [Agent Fleet Orchestration](agent-fleet-orchestration.md) + skill `onion-fleet`.
+  orquestração de subagentes: [Agent Orchestration](agent-orchestration.md) + skill `onion-orchestration`.
 - **Gated:** o modo **equipe** é o maior eixo de evolução futura — só com dogfood (1º caso N-devs/1-repo).
 
 ## 3. Validação — como sei que ficou certo

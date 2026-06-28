@@ -52,7 +52,7 @@ Agentes especialistas de execução técnica do Onion: backend, frontend, banco,
 | Agente | Especialidade | Quando usar |
 |--------|---------------|-------------|
 | [`@design-system-specialist`](design-system-specialist.md) | Design system técnico — tokens W3C/DTCG → CSS/Tailwind/shadcn, WCAG | Materializar tokens em tema/componentes, validar contraste |
-| [`@brand-generator`](brand-generator.md) | Gerador divergente de identidade visual (W3C/DTCG) | Frota de `/design:generate` — uma candidata por invocação |
+| [`@brand-generator`](brand-generator.md) | Gerador divergente de identidade visual (W3C/DTCG) | Orquestração de `/design:generate` — uma candidata por invocação |
 
 ## 🔗 Relacionados
 

@@ -62,7 +62,7 @@ Independente desta sessão: o `/meta:evolve` de 2026-06-17 tem **1 blocker 🔴*
 `agent-creator-specialist.md` guia listar ferramentas MCP sem steering SDAAL → novos agentes
 nascem violando API-first. Isso é dívida ativa que **interage** com qualquer nova capacidade
 (se `/meta:strategize` for criado por um agente mal-orientado, herda o vício). Fechar o
-blocker é pré-requisito higiênico para qualquer expansão de frota.
+blocker é pré-requisito higiênico para qualquer expansão de orquestração.
 
 ## 6. O que eu não consigo saber daqui
 - Se a sala de obra já começou algo nesta direção (instâncias isoladas — não vejo o trabalho dela).
@@ -76,4 +76,4 @@ blocker é pré-requisito higiênico para qualquer expansão de frota.
 > Os Docs 1-2 (revisados para catálogo-first) miram um gap real, **mas**: (a) a parte difícil
 > é a **precisão do reconhecimento** ("reconhece-quando"), não a lista de fluxos (item 4); (b) o
 > reposicionamento provavelmente vem antes, embora o catálogo caiba em paralelo se incremental
-> (item 3); (c) feche o blocker SDAAL antes de expandir frota (item 5).
+> (item 3); (c) feche o blocker SDAAL antes de expandir a orquestração (item 5).

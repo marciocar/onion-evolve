@@ -51,7 +51,7 @@ Achado mais forte da revisão: os **seis padrões canônicos** de coordenação 
 | Padrão de consenso (externo, jun/2026) | Equivalente no Onion |
 |---|---|
 | Spec-scoped tasks | Contrato como SSOT de escopo (`:41`) |
-| Worktree isolation | Camada de frota (`agent-fleet-orchestration`) + repos soberanos |
+| Worktree isolation | Camada de orquestração (`agent-orchestration`) + repos soberanos |
 | Coordinator / specialist / **verifier** | maestro + `check` (verifier) + `MemberExpertSchema` |
 | Tests + automated gates antes do merge | `contract-validate.sh` + `tests`/`fixtures` obrigatórios |
 | **Verification nodes at handoff boundaries** | `check` no consumer = exatamente isso |
@@ -90,7 +90,7 @@ O Onion fica **fora desse ecossistema por escolha**.
 
 3. **Explorar interop de formato** — Avaliar adotar Agent Cards / semântica A2A **apenas como formato de contrato/discovery**, mantendo transporte git-async. Candidato a ADR.
 
-4. **Gaps que o landscape diz que *ninguém* resolve** continuam abertos no Onion: segurança adversarial em fan-out, modelo de break-even de custo, reprodutibilidade regulada. A federação herda esses gaps da camada de frota — registrar no backlog `/meta:evolve`.
+4. **Gaps que o landscape diz que *ninguém* resolve** continuam abertos no Onion: segurança adversarial em fan-out, modelo de break-even de custo, reprodutibilidade regulada. A federação herda esses gaps da camada de orquestração — registrar no backlog `/meta:evolve`.
 
 5. **Frescor das KBs** — `multi-repo-federation.md` (2026-06-15) e `agent-orchestration-landscape-2026.md` (atualizado nesta leva para 2026-06-15, com os números A2A de abril/2026). Próxima atualização planejada do landscape: dez/2026.
 

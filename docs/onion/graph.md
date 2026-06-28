@@ -10,9 +10,9 @@
 - **adopter** --adopts--> onion
 - **adopter** --signals--> core _(via doc-bridge)_
 - **assistant** --asks--> maestro _(via conversa-plan-gate)_
-- **assistant** --delegates--> frota _(via frota)_
 - **assistant** --evolves--> onion
 - **assistant** --executes--> onion
+- **assistant** --orchestrates-workers--> subagent _(via orchestration)_
 - **assistant** --proposes--> maestro _(via conversa-plan-gate)_
 - **assistant** --reports--> maestro _(via conversa-plan-gate)_
 - **core** --announces--> adopter _(via doc-bridge)_
@@ -55,7 +55,7 @@
 - **onion** --has-member--> nx-migration-specialist
 - **onion** --has-member--> nx-monorepo-specialist
 - **onion** --has-member--> onion
-- **onion** --has-member--> onion-fleet
+- **onion** --has-member--> onion-orchestration
 - **onion** --has-member--> onion-patterns
 - **onion** --has-member--> onion-validation
 - **onion** --has-member--> pain-price-specialist
@@ -152,9 +152,9 @@ agent-skills-specialist	related	agent-creator-specialist
 agent-skills-specialist	related	claude-code-specialist	
 agent-skills-specialist	related	command-creator-specialist	
 assistant	asks	maestro	conversa-plan-gate
-assistant	delegates	frota	frota
 assistant	evolves	onion	
 assistant	executes	onion	
+assistant	orchestrates-workers	subagent	orchestration
 assistant	proposes	maestro	conversa-plan-gate
 assistant	reports	maestro	conversa-plan-gate
 branch-code-reviewer	related	/engineer/pre-pr	
@@ -294,7 +294,7 @@ onion	has-member	nodejs-specialist
 onion	has-member	nx-migration-specialist	
 onion	has-member	nx-monorepo-specialist	
 onion	has-member	onion	
-onion	has-member	onion-fleet	
+onion	has-member	onion-orchestration	
 onion	has-member	onion-patterns	
 onion	has-member	onion-validation	
 onion	has-member	pain-price-specialist	

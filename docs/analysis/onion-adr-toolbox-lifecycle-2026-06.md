@@ -28,7 +28,7 @@ related:
 
 Sinal de campo S1 (`rhilo-metagamify`): os 7 `/meta:create-*` eram **átomos isolados** — sem etapa que
 classificasse "que artefato eu devo criar?", sem coesão entre si, e sem fechar o ciclo de vida (a criação
-deixava o inventário em **HARD-fail silencioso** da Regra 8). O discovery S1 (frota fan-out-and-synthesize,
+deixava o inventário em **HARD-fail silencioso** da Regra 8). O discovery S1 (orquestração fan-out-and-synthesize,
 PR #181) destilou o veredito: **o toolbox não é infraestrutura nova — é uma régua de decisão + cross-linkagem
 dos átomos existentes, sobre o substrato que o core já tem** (`inventory.sh` SSOT + `lint-artifacts.sh` gate +
 `/meta:evolve`/`*-freshness`). O critério já tinha um 1º caso concreto provado: o S2 (`/meta:co-relay`).

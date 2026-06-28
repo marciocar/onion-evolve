@@ -18,16 +18,16 @@ Comandos que **constroem, auditam, integram e co-evoluem o próprio Sistema Onio
 | Comando | Finalidade |
 |---------|-----------|
 | [`/meta:inventory`](inventory.md) | Regenera o inventário canônico (comandos/agentes/skills/KBs) do filesystem — SSOT que o lint protege. |
-| [`/meta:evolve`](evolve.md) | Auto-auditoria do core via frota (fan-out-and-synthesize) → backlog priorizado de modernização. Read-only. |
-| [`/meta:kb-freshness`](kb-freshness.md) | Audita o frescor de cada KB contra o fluxo atual do Onion (via `onion-fleet`); veredito CURRENT/STALE/HISTORICAL. |
+| [`/meta:evolve`](evolve.md) | Auto-auditoria do core via orquestração (fan-out-and-synthesize) → backlog priorizado de modernização. Read-only. |
+| [`/meta:kb-freshness`](kb-freshness.md) | Audita o frescor de cada KB contra o fluxo atual do Onion (via `onion-orchestration`); veredito CURRENT/STALE/HISTORICAL. |
 | [`/meta:context-freshness`](context-freshness.md) | Audita o frescor dos contextos de domínio (business/technical/compliance) — fase *Manage* do ciclo de vida. |
 | [`/meta:metaspec-validate`](metaspec-validate.md) | Valida um artefato/decisão contra as metaspecs vigentes. Aplica a constituição do `@metaspec-gate-keeper`. |
 | [`/meta:analyze-complex-problem`](analyze-complex-problem.md) | Análise estruturada de problemas complexos (críticos, migrações, arquitetura, performance) com template oficial. |
 
-### Frota e descoberta
+### Orquestração e descoberta
 | Comando | Finalidade |
 |---------|-----------|
-| [`/meta:fleet`](fleet.md) | Orquestra uma frota de agentes em paralelo (fan-out/fan-in) via a ferramenta nativa Workflow. |
+| [`/meta:orchestrate`](orchestrate.md) | Orquestra workers em paralelo (fan-out/fan-in) via a ferramenta nativa Workflow. |
 | [`/meta:all-tools`](all-tools.md) | Apresenta sob demanda as ferramentas do contexto atual (nativas + MCP); defere ao inventário para artefatos Onion. |
 
 ### Adoção e integração
@@ -55,7 +55,7 @@ Comandos que **constroem, auditam, integram e co-evoluem o próprio Sistema Onio
 | [`/meta:federation-rollback`](federation-rollback.md) | Rollback Protocol guiado (Fase 3): pina versão anterior no ledger + guia reverts inversos consumers→producer. Human-gated. |
 
 ## 🔗 Referências
-- **Skills de orquestração**: [`onion`](../../skills/onion/SKILL.md) (orquestrador mestre), [`onion-fleet`](../../skills/onion-fleet/SKILL.md) (frota), [`onion-patterns`](../../skills/onion-patterns/SKILL.md), [`onion-validation`](../../skills/onion-validation/SKILL.md)
+- **Skills de orquestração**: [`onion`](../../skills/onion/SKILL.md) (orquestrador mestre), [`onion-orchestration`](../../skills/onion-orchestration/SKILL.md) (orquestração), [`onion-patterns`](../../skills/onion-patterns/SKILL.md), [`onion-validation`](../../skills/onion-validation/SKILL.md)
 - **Agentes que esta categoria aciona**: `@command-creator-specialist`, `@agent-creator-specialist`, `@agent-skills-specialist`, `@research-agent`, `@metaspec-gate-keeper`, `@code-reviewer`
 - **Gate determinístico**: [`.claude/validation/`](../../validation/) (lint + selftest + inventory) — o dogfood mecânico que o CI roda
 - **SSOT do inventário**: [`docs/onion/inventory.md`](../../../docs/onion/inventory.md) — gerada por `/meta:inventory`, nunca editada à mão

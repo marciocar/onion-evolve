@@ -4,18 +4,18 @@ description: |
   Audita cada KB em docs/knowledge-base/ contra o fluxo ATUAL do Sistema Onion
   (ferramenta Workflow nativa, padrões canônicos 2026, lineup de modelos Claude
   vigente referenciado por tier (opus/sonnet/haiku/fable) ou "mais recente"). Usa fan-out-and-synthesize
-  via onion-fleet: um worker por KB (ou por diretório), retornando veredito
+  via onion-orchestration: um worker por KB (ou por diretório), retornando veredito
   CURRENT/STALE/HISTORICAL + pontos desatualizados + direção de atualização.
   Consolida tudo num relatório priorizado de ações de refresh.
 model: opus
 category: meta
-tags: [kb, freshness, fleet, validation]
+tags: [kb, freshness, orchestration, validation]
 version: "1.0.0"
 updated: "2026-06-13"
 allowed-tools: Read Grep Glob
 argument-hint: "[caminho de KB específica | vazio = todas]"
 related_commands:
-  - /meta:fleet
+  - /meta:orchestrate
   - /meta:create-knowledge-base
 related_agents:
   - onion
@@ -36,7 +36,7 @@ atualização para cada KB.
 A premissa de frescor é simples: **uma KB que ensina o que não existe mais ou
 omite o que existe hoje é pior que nenhuma KB** — ela induz agentes e humanos ao
 erro. A obrigação de manter KBs vivas está documentada em
-`docs/knowledge-base/concepts/agent-fleet-orchestration.md` e no comando
+`docs/knowledge-base/concepts/agent-orchestration.md` e no comando
 `/meta:create-knowledge-base` (seção "Manter viva: revisar quando o tema
 evolui").
 
@@ -66,7 +66,7 @@ eles sozinhos — uma KB que só falha em item menor permanece **CURRENT**.
 | # | Item | Critério |
 |---|------|----------|
 | 1 | **Lineup de modelos (!)** | Usa o lineup Claude vigente referenciado por tier (opus/sonnet/haiku/fable) ou "mais recente" — não fixa versão exata como única referência. FALHA = famílias retiradas (Claude 3.x, claude-v1/v2) ou modelo de outro provider (GPT-*, Gemini, Llama) citado como modelo Claude. |
-| 2 | **Ferramenta Workflow (!)** | Se a KB trata de orquestração de agentes, frota ou paralelismo: deve referenciar a ferramenta nativa `Workflow` (research preview mai/2026). Ausência = STALE. |
+| 2 | **Ferramenta Workflow (!)** | Se a KB trata de orquestração de agentes, orquestração de subagentes ou paralelismo: deve referenciar a ferramenta nativa `Workflow` (research preview mai/2026). Ausência = STALE. |
 | 3 | **Itens formalmente abandonados (!)** | Não contém referências positivas a `.onion/`, CLI standalone, plano v4.0 FASES 5-9, multi-IDE — itens abandonados em 2026-05-18. |
 | 4 | **Plataforma única** | Afirma Claude Code como plataforma única (não "qualquer IDE"). |
 | 5 | **Task Manager Abstraction (!)** | Se menciona task manager: cita a camada plugável (Jira/ClickUp/Asana/Linear) via `TASK_MANAGER_PROVIDER`. Referência a provider único hardcoded = STALE. |
@@ -115,9 +115,9 @@ Argumento recebido: $ARGUMENTS
 Registre o conjunto final como `KB_FILES` — esse é o material do fan-out.
 Se `KB_FILES` estiver vazio, informe o usuário e encerre sem erro.
 
-### Passo 2 — Delegar elegibilidade e padrão à skill `onion-fleet`
+### Passo 2 — Delegar elegibilidade e padrão à skill `onion-orchestration`
 
-Acione a skill **`onion-fleet`** passando:
+Acione a skill **`onion-orchestration`** passando:
 
 - Tarefa: "Auditar frescor de cada KB listada em KB_FILES contra a régua
   canônica 2026."
@@ -152,7 +152,7 @@ const FreshnessSchema = {
 - Verificação adversarial (se acionada) → **opus**.
 - Nunca use modelos de outros providers como workers.
 
-Teto: até **16 workers concorrentes**. Para frotas maiores (>16 KBs),
+Teto: até **16 workers concorrentes**. Para orquestrações maiores (>16 KBs),
 processe em batchs de 16.
 
 ```javascript
@@ -189,7 +189,7 @@ de consolidar.
 
 Se a ferramenta Workflow não estiver disponível:
 
-1. Avise o usuário em pt-BR que o substrato de frota não está disponível e que
+1. Avise o usuário em pt-BR que o substrato de orquestração não está disponível e que
    a auditoria seguirá serial via ferramenta `Agent`.
 2. Itere `KB_FILES` chamando `Agent` um a um com o mesmo schema `FreshnessSchema`.
 3. Consolide exatamente como no Passo 4.
@@ -228,17 +228,17 @@ KB FRESHNESS REPORT — 2026-06-13
    Ação  : adicionar seção "Substrate nativo: ferramenta Workflow (mai/2026)"
 
 ─── CURRENT ───────────────────────────────────
-✅ concepts/agent-fleet-orchestration.md
+✅ concepts/agent-orchestration.md
 ✅ concepts/task-manager-abstraction.md
 ✅ ... (N KBs)
 
 ─── ALERTAS TRANSVERSAIS ──────────────────────
 ⚠  Item #1 (lineup de modelos) falhou em 4 KBs — revisão em lote recomendada.
-   Sugestão: /meta:fleet substituir referências a modelos obsoletos em lote
+   Sugestão: /meta:orchestrate substituir referências a modelos obsoletos em lote
 
 ─── PRÓXIMOS PASSOS ───────────────────────────
 1. Arquivar/reescrever KBs HISTORICAL (2 arquivos)
-2. Atualizar KBs STALE em lote via /meta:fleet
+2. Atualizar KBs STALE em lote via /meta:orchestrate
 3. Rodar /docs:build-index após os refreshes
 4. Re-executar /meta:kb-freshness para confirmar frescor
 
@@ -269,12 +269,12 @@ KB FRESHNESS REPORT — 2026-06-13
 
 - Este comando **nunca cria nem modifica KBs** — apenas audita e relata. Para
   aplicar os refreshes, use `/meta:create-knowledge-base` (atualizar KB
-  existente) ou `/meta:fleet` (atualização em lote de muitas KBs de uma vez).
-- A doutrina de frota (fan-out-and-synthesize, model tiering, teto de 16
+  existente) ou `/meta:orchestrate` (atualização em lote de muitas KBs de uma vez).
+- A doutrina de orquestração (fan-out-and-synthesize, model tiering, teto de 16
   workers, verificação adversarial) vem de
-  `docs/knowledge-base/concepts/agent-fleet-orchestration.md` — consulte-a se
+  `docs/knowledge-base/concepts/agent-orchestration.md` — consulte-a se
   precisar ajustar o Workflow gerado.
-- Fleet é **opt-in**: se `$ARGUMENTS` apontar para uma única KB, o comando
+- A orquestração é **opt-in**: se `$ARGUMENTS` apontar para uma única KB, o comando
   executa diretamente com `Agent` (sem overhead de Workflow).
 - Orquestre **sempre no nível principal** — nunca dentro de um subagente e
   **não crie** um agente "kb-freshness-worker".
@@ -282,15 +282,15 @@ KB FRESHNESS REPORT — 2026-06-13
   `/meta:evolve`, retorne o **array `FreshnessSchema[]` cru** (não apenas o
   relatório Unicode), para que o `evolve` mescle os vereditos direto no backlog
   sem reparsear. O schema (acima) é o contrato. `/meta:evolve` chama este comando
-  no **fluxo principal** e ingere o array — nunca aninha esta frota dentro da dele.
+  no **fluxo principal** e ingere o array — nunca aninha esta orquestração dentro da dele.
 
 ---
 
 ## Referências
 
-- KB de doutrina de frota: `docs/knowledge-base/concepts/agent-fleet-orchestration.md`
-- Skill operacional do fan-out: `onion-fleet`
+- KB de doutrina de orquestração: `docs/knowledge-base/concepts/agent-orchestration.md`
+- Skill operacional do fan-out: `onion-orchestration`
 - Comando de geração de KB: `/meta:create-knowledge-base`
 - Saúde documental ampla: `/docs:docs-health`
-- Atualização em lote: `/meta:fleet`
+- Atualização em lote: `/meta:orchestrate`
 - Índice mestre: `docs/knowledge-base/index.md` (atualizar via `/docs:build-index`)

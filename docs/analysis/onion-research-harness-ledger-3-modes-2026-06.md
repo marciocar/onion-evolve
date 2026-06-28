@@ -3,7 +3,7 @@ status: snapshot
 type: evolution-backlog
 date: 2026-06-27
 topic: "Harness + Ledger (camada de comunicação) nos 3 modos: solo · equipe · federação"
-method: discovery (fan-out-and-synthesize, 4 lentes, frota onion-fleet/Workflow run wf_e3aa9343-950)
+method: discovery (fan-out-and-synthesize, 4 lentes, orquestração onion-orchestration/Workflow run wf_e3aa9343-950)
 scope: read-only research — propõe, não muta (exceto este relatório)
 related: onion-research-how-we-work-2026-06.md, onion-distribution-instance-model (memória)
 ---
@@ -13,7 +13,7 @@ related: onion-research-how-we-work-2026-06.md, onion-distribution-instance-mode
 > **Discovery, não execução.** Investiga como o **harness** (sessões persistentes, subagentes, a
 > ferramenta Workflow) e a **camada de comunicação** (hoje o Ledger da Federação) se adaptam e se
 > **generalizam** aos três modos de operação: solo · equipe · federação. Parte do esclarecimento do
-> maestro: *"o Ledger não deixa de ser camada de comunicação"*. Pedido de 2026-06-25. Frota de 4 lentes
+> maestro: *"o Ledger não deixa de ser camada de comunicação"*. Pedido de 2026-06-25. Orquestração de 4 lentes
 > (read-only); síntese com filtro crítico (anti-inchaço: dogfood antes de produto).
 
 ## Sumário executivo (veredito)
@@ -50,7 +50,7 @@ A coluna **EQUIPE está quase toda vazia** — é o diagnóstico central.
 
 ### ✅ SOLO — maduro
 Harness completo: sessões `.claude/sessions/<slug>/` (STATE.md Tier-0, worklog-protocol, retomada fria sem
-transcript), Workflow/frota (fan-out determinístico, 0 tokens de coordenação). A "comunicação" colapsa em
+transcript), Workflow/orquestração (fan-out determinístico, 0 tokens de coordenação). A "comunicação" colapsa em
 **handoff consigo mesmo no tempo**: memória (recall automático) + STATE.md (sessão N→N+1). O doc-bridge
 (inbox/inbound) existe como scaffolding provisionado pelo `/meta:adopt`, mas **sem tráfego** (silencioso).
 Nada essencial falta.

@@ -183,9 +183,9 @@ contextos diferentes. Severidade e critérios vêm sempre daqui.
 - **Priorizar solicitações** de acordo com orientação de metaspec
 - **Identificar scope creep** antes que impacte o foco do projeto
 
-### 4. Critérios de Fleet (commands.md §10)
-- **Orquestração de frota vive em skill/comando, nunca em agente** (architecture.md §4.2 — `agents/* → commands/*` proibido; não aprovar agente "fleet-orchestrator")
-- **Invariante preservada**: a frota paraleliza dentro de uma fase; não funde workflows faseados canônicos (§3)
+### 4. Critérios de Orquestração (commands.md §10)
+- **Orquestração de subagentes vive em skill/comando, nunca em agente** (architecture.md §4.2 — `agents/* → commands/*` proibido; não aprovar agente "worker-orchestrator")
+- **Invariante preservada**: a orquestração paraleliza dentro de uma fase; não funde workflows faseados canônicos (§3)
 - **Resiliência exigida** quando o artefato dispara fan-out: falha parcial/timeout de worker tratados, fan-in obrigatório, fallback serial determinístico, `budget`/tiering declarados
 
 ## Framework de Análise
