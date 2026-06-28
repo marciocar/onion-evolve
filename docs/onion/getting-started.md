@@ -44,7 +44,7 @@ Após instalar o Sistema Onion no projeto, você deve ver a seguinte estrutura:
 ```
 seu-projeto/
 ├── .claude/
-│   ├── commands/           # 91 comandos em 10 categorias
+│   ├── commands/           # 92 comandos em 10 categorias
 │   ├── agents/             # 51 agentes especializados
 │   ├── skills/             # 5 skills de orquestração
 │   ├── sessions/           # Sessões de desenvolvimento
@@ -52,7 +52,7 @@ seu-projeto/
 ├── docs/
 │   ├── onion/              # Documentação do framework
 │   ├── meta-specs/         # Constituição do sistema (L0)
-│   └── knowledge-base/     # 38 Knowledge Bases estruturadas
+│   └── knowledge-base/     # 39 Knowledge Bases estruturadas
 ├── .env                    # Variáveis de ambiente (NÃO commitar)
 ├── .env.example            # Template de variáveis
 ├── .claudeignore           # Otimização do context window
