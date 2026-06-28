@@ -13,7 +13,7 @@ related:
   - ./onion-adr-comms-transport-vs-execution-2026-06.md
 ---
 
-# ADR (RASCUNHO) — Topologia de orquestração: locus plano × forma de grafo
+# ADR — Topologia de orquestração: locus plano × forma de grafo
 
 | Campo | Valor |
 |-------|-------|
@@ -242,7 +242,12 @@ metadados title/`type`/filename + 4 refs cruzadas; ancoragem de "nó sumarizador
 > mercado **aggregator / sub-synthesizer** (a ancoragem ao "agente de síntese" seria imprecisa — esse é o
 > *synthesizer final*, não o agregador intermediário).
 >
-> **Ainda diferido (F3b — decisão doutrinária do maestro):** (1) a **re-revisão da parte doutrinária "com
-> mais distância"** acordada no aceite (decisão central locus×forma + gatilho do nó sumarizador); (2)
-> frase-âncora locus×forma na KB `agent-orchestration.md` ao lado da armadilha (§461/§478). Sem gatilho de
-> urgência — o status `accepted` já vigora.
+> **Re-revisão F3b (2026-06-28) — CONCLUÍDA:** a parte doutrinária foi re-examinada "com mais distância"
+> (acordado no aceite). **Veredito: a decisão central se sustenta** — e ficou mais ancorada: o gatilho do nó
+> sumarizador é uma instância do critério "qual motor quando" da [economia de motores](../knowledge-base/concepts/onion-engine-economy.md)
+> (fan-in determinístico JS vence por default; motor LLM entra só por necessidade); o contra-ponto W/m é a
+> tese SDAAL aplicada. As "fraquezas" (gatilho por julgamento, `b·m≤W` heurística, CA2 não-grep-able) são
+> **limites honestamente assumidos** no texto, não dívida. Aplicado: (a) frase-âncora **locus×forma** na KB
+> `agent-orchestration.md` (parte VIGENTE — corrige a inferência-por-omissão "hierarquia=proibida"; o padrão
+> nó-sumarizador completo segue diferido ao gatilho real); (b) corrigido o H1 interno que restara "(RASCUNHO)"
+> do F3a. **F3 fechado.**
