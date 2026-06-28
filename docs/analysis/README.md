@@ -21,6 +21,7 @@ documentação ativa contém só o que é canônico ou usado em runtime; o resto
 | `onion-adr-coevolution-flow-naming-2026-06.md` | **ADR durável** — decisão de vocabulário: fluxos de co-evolução renomeados de flow A/B/C → downstream/upstream/handoff (cumpre code-standards §7). ADRs são *superseded*, **nunca removidos**. |
 | `onion-adr-adopt-to-not-impose-2026-06.md` | **ADR durável (provisório)** — princípio "Onion adota, não impõe": adoção detecta o padrão do projeto e defere/estende/introduz (never-clobber); eixo SDAAL design-system provider. Fica até o gatilho cravar a costura. ADRs são *superseded*, **nunca removidos**. |
 | `onion-adr-branching-base-agnostic-2026-06.md` | **ADR durável (provisório)** — branching: a base de integração é dado resolvido (agnóstica), não GitFlow/develop hardcoded; instância do "adota não impõe". Costura nos git:* diferida ao gatilho. ADRs são *superseded*, **nunca removidos**. |
+| `onion-adr-slm-as-tool-de-identification-2026-06.md` | **ADR durável** — fronteira runtime-vs-ferramenta: SLM entra como ferramenta atrás de adapter SDAAL (de-identificação de PII), nunca como orquestrador; estende a tese "LLM=runtime" com um "segundo runtime" estreito. Protótipo: abstração `de-identification` + baseline `regex` determinístico. ADRs são *superseded*, **nunca removidos**. |
 
 ## O que é REMOVIDO (efêmero — git arquiva)
 
