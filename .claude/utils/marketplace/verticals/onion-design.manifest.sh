@@ -13,3 +13,20 @@ AGENTS=(
 )
 UTILS=(".claude/utils/design-source" ".claude/utils/design-sink")
 VALIDATION=(".claude/validation/lint-design-tokens.sh")
+
+# Capability Contract (auto-descrição — ADR onion-adr-capability-contract-2026-06).
+# provides=o que entrega · requires=deps (type:value) · loads=contexto condicional · conformance=tier.
+CONFORMANCE="gold"
+PROVIDES=("design-tokens-w3c-dtcg" "wcag-contrast-gate" "materializacao-css-tailwind-shadcn")
+REQUIRES=(
+  "agent:design-system-specialist"
+  "agent:brand-generator"
+  "agent:branding-positioning-specialist"
+  "validation:lint-design-tokens.sh"
+  "util:design-source"
+  "util:design-sink"
+)
+LOADS=(
+  "when:brief -> kb-or-context:business-context"
+  "when:material -> reuse:presentation/canva"
+)

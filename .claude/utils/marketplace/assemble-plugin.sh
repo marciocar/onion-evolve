@@ -41,6 +41,7 @@ git -C "${SRC}" rev-parse --git-dir >/dev/null 2>&1 || { echo "ERRO: source não
 # Defaults antes do source (manifesto pode sobrescrever).
 PLUGIN_NAME=""; PLUGIN_VERSION="0.1.0"; PLUGIN_DESC=""; KEYWORDS=()
 COMMANDS=(); AGENTS=(); UTILS=(); VALIDATION=(); TEMPLATES=()
+CONFORMANCE="bronze"; PROVIDES=(); REQUIRES=(); LOADS=()   # Capability Contract (ADR capability-contract)
 # shellcheck disable=SC1090
 . "${MANIFEST}"
 [ -n "${PLUGIN_NAME}" ] || { echo "ERRO: manifesto sem PLUGIN_NAME: ${MANIFEST}" >&2; exit 2; }
@@ -156,5 +157,18 @@ cat > "${DEST}/.claude-plugin/plugin.json" <<EOF
 }
 EOF
 
-echo "Onion: plugin '${PLUGIN_NAME}' montado em ${DEST} (tree_sha=${tree_sha:0:12})." >&2
+# capability.json — Capability Contract materializado (auto-descrição content-stable; sem campos voláteis).
+json_arr() { local out="" x; for x in "$@"; do out="${out}\"${x}\","; done; printf '[%s]' "${out%,}"; }
+cat > "${DEST}/.claude-plugin/capability.json" <<EOF
+{
+  "name": "${PLUGIN_NAME}",
+  "version": "${PLUGIN_VERSION}",
+  "conformance": "${CONFORMANCE}",
+  "provides": $(json_arr "${PROVIDES[@]}"),
+  "requires": $(json_arr "${REQUIRES[@]}"),
+  "loads": $(json_arr "${LOADS[@]}")
+}
+EOF
+
+echo "Onion: plugin '${PLUGIN_NAME}' montado em ${DEST} (tree_sha=${tree_sha:0:12}; conformance=${CONFORMANCE})." >&2
 exit 0

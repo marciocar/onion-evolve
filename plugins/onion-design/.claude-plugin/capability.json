@@ -1,0 +1,8 @@
+{
+  "name": "onion-design",
+  "version": "0.1.0",
+  "conformance": "gold",
+  "provides": ["design-tokens-w3c-dtcg","wcag-contrast-gate","materializacao-css-tailwind-shadcn"],
+  "requires": ["agent:design-system-specialist","agent:brand-generator","agent:branding-positioning-specialist","validation:lint-design-tokens.sh","util:design-source","util:design-sink"],
+  "loads": ["when:brief -> kb-or-context:business-context","when:material -> reuse:presentation/canva"]
+}
