@@ -1,0 +1,57 @@
+# actors.yaml — Seed spec-as-code dos ATORES, CANAIS e arestas de PAPEL/COMUNICAÇÃO do Onion.
+# SSOT dos axiomas que NÃO vivem no frontmatter (são doutrinários: dogfood, co-evolução, working-method).
+# Consumido por .claude/validation/graph.sh para compor a lente sócio-técnica (docs/onion/graph.md).
+# TBox/vocabulário: docs/knowledge-base/concepts/onion-relation-vocabulary.md
+# NÃO é store — é seed gerador. Modela a ESTRUTURA da comunicação (não o conteúdo das mensagens).
+
+actors:
+  - id: maestro
+    class: Actor/Maestro
+    label: "Maestro (humano) — decide, aprova, dá apetite, faz o gate"
+  - id: assistant
+    class: Actor/Assistant
+    label: "Assistant (Claude) — executa, propõe, valida, orquestra a frota"
+  - id: onion
+    class: Actor/Framework
+    label: "Onion — provê capacidades, serve o maestro, evolui via dogfood"
+  - id: core
+    class: Actor/Core
+    label: "Core — o Onion como fonte (source) da co-evolução"
+  - id: adopter
+    class: Actor/Adopter
+    label: "Adopter — repo consumidor que adota o Onion"
+
+channels:
+  - id: conversa-plan-gate
+    class: Channel
+    label: "Conversa + plan-mode gate (maestro <-> assistant)"
+  - id: doc-bridge
+    class: Channel
+    label: "Doc-bridge co-evolução (inbox upstream / inbound downstream)"
+  - id: federation-ledger
+    class: Channel
+    label: "Federation ledger (CHANGELOG + contratos)"
+  - id: frota
+    class: Channel
+    label: "Frota (SendMessage / Workflow) — orquestração de subagentes"
+
+# Triplas: subject | predicate | object | via (canal, opcional)
+edges:
+  # papel
+  - { s: maestro,   p: orchestrates, o: assistant }
+  - { s: assistant, p: executes,     o: onion }
+  - { s: assistant, p: evolves,      o: onion }
+  - { s: onion,     p: serves,       o: maestro }
+  - { s: onion,     p: evolves-via,  o: dogfood }
+  - { s: core,      p: co-evolves,   o: adopter }
+  - { s: adopter,   p: adopts,       o: onion }
+  # comunicação (com canal via)
+  - { s: maestro,   p: requests,  o: assistant, via: conversa-plan-gate }
+  - { s: maestro,   p: gates,     o: assistant, via: conversa-plan-gate }
+  - { s: maestro,   p: approves,  o: assistant, via: conversa-plan-gate }
+  - { s: assistant, p: proposes,  o: maestro,   via: conversa-plan-gate }
+  - { s: assistant, p: reports,   o: maestro,   via: conversa-plan-gate }
+  - { s: assistant, p: asks,      o: maestro,   via: conversa-plan-gate }
+  - { s: assistant, p: delegates, o: frota,     via: frota }
+  - { s: core,      p: announces, o: adopter,   via: doc-bridge }
+  - { s: adopter,   p: signals,   o: core,      via: doc-bridge }

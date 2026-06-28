@@ -56,6 +56,8 @@
 #      assemble-plugin.sh; drift (edição à mão OU fonte alterada sem regenerar) bloqueia merge
 #  20. Capability Contract: tier de conformance reivindicado é cumprido [HARD] — Bronze (campos
 #      mínimos), Silver (requires resolvem), Gold (Silver + loads). Declarar acima do cumprido bloqueia.
+#  21. Grafo (docs/onion/graph.md) em sincronia com a spec-as-code [HARD] — gerado por graph.sh;
+#      drift (editar à mão OU mudar fonte sem regenerar) bloqueia merge.
 #
 # Convenção: .claude/validation/fixtures/ guarda TEMPLATES de teste das próprias
 #   guardas (consumidos por lint-selftest.sh), não artefatos ativos. As 4 regras de
@@ -450,6 +452,29 @@ check_capability_conformance() {
       violation "HARD" "verticals/${name}.manifest.sh" "capability: reivindica '${claimed}' mas só cumpre '${met}'${why} — ajuste CONFORMANCE ou as deps/loads"
     fi
   done
+}
+
+# ===========================================================================
+# REGRA 21 — Grafo (docs/onion/graph.md) sincronizado com a spec-as-code [HARD]
+#           graph.md é GERADO por graph.sh (actors.yaml + capability + frontmatter).
+#           Regenera p/ temp e compara: drift = editou à mão OU mudou a fonte sem
+#           regenerar. Espelha check_inventory_sync. Pula gracioso sem jq.
+# ===========================================================================
+check_graph_sync() {
+  local gen="${SCRIPT_DIR}/graph.sh"
+  local gfile="${REPO_ROOT}/docs/onion/graph.md"
+  [ -f "${gen}" ] || return
+  command -v jq >/dev/null 2>&1 || return   # graph.sh usa jq p/ capability → pula gracioso sem jq
+  if [ ! -f "${gfile}" ]; then
+    violation "HARD" "docs/onion/graph.md" "grafo ausente — rode 'bash .claude/validation/graph.sh --markdown > docs/onion/graph.md'"
+    return
+  fi
+  local tmp; tmp="$(mktemp)"
+  bash "${gen}" --markdown > "${tmp}" 2>/dev/null || true
+  if ! diff -q "${gfile}" "${tmp}" >/dev/null 2>&1; then
+    violation "HARD" "docs/onion/graph.md" "grafo desatualizado vs spec-as-code — regenere com '/meta:graph' (bash .claude/validation/graph.sh --markdown > docs/onion/graph.md)"
+  fi
+  rm -f "${tmp}"
 }
 
 # ===========================================================================
@@ -1021,6 +1046,7 @@ check_inventory_sync
 check_claude_md_counts
 check_plugins_sync
 check_capability_conformance
+check_graph_sync
 check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp

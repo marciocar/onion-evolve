@@ -674,6 +674,37 @@ run_capability_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo graph — lente sócio-técnica (REGRA 21 check_graph_sync): graph.md em sincronia
+# com a regeneração + determinismo + atores + a consulta de valor (impacto reverso).
+# ---------------------------------------------------------------------------
+run_graph_selftests() {
+  local gen="${REPO_ROOT}/.claude/validation/graph.sh"
+  local gfile="${REPO_ROOT}/docs/onion/graph.md"
+  if [ ! -f "${gen}" ]; then record_fail "graph" "graph.sh ausente"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_pass "graph: jq ausente → pulado (gracioso)"; return; fi
+
+  local tmp; tmp="$(mktemp)"; bash "${gen}" --markdown > "${tmp}" 2>/dev/null
+  if diff -q "${gfile}" "${tmp}" >/dev/null 2>&1; then record_pass "graph: graph.md em-sync com a spec-as-code"
+  else record_fail "graph: em-sync" "graph.md diverge da regeneração — regenere"; fi
+  rm -f "${tmp}"
+
+  # triplas computadas UMA vez, reusadas (perf — evita re-invocar graph.sh)
+  local T T2; T="$(bash "${gen}" --triples 2>/dev/null)"; T2="$(bash "${gen}" --triples 2>/dev/null)"
+  if [ "$(printf '%s' "${T}" | sha256sum)" = "$(printf '%s' "${T2}" | sha256sum)" ]; then
+    record_pass "graph: triplas determinísticas"
+  else record_fail "graph: determinismo" "triplas variam entre execuções"; fi
+
+  if printf '%s\n' "${T}" | grep -q "^maestro	gates	assistant" \
+     && printf '%s\n' "${T}" | grep -q "^onion	serves	maestro"; then
+    record_pass "graph: atores+comunicação presentes (maestro/assistant/onion)"
+  else record_fail "graph: atores" "arestas de ator/comunicação ausentes"; fi
+
+  if bash "${gen}" --impact design-system-specialist 2>/dev/null | grep -q "onion-design"; then
+    record_pass "graph: --impact retorna dependentes reais"
+  else record_fail "graph: --impact" "impacto reverso não achou dependente conhecido"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo design-tokens — exercita .claude/validation/lint-design-tokens.sh.
 # Self-contained (mktemp), cobre MODOS DE FALHA: tokens válidos passam;
 # alias órfão / ciclo de referência / contraste WCAG abaixo do mínimo viram
@@ -872,6 +903,9 @@ run_plugins_sync_selftests
 
 # Modo capability — Capability Contract (REGRA 20): contrato honesto + resolução de requires.
 run_capability_selftests
+
+# Modo graph — lente sócio-técnica (REGRA 21): graph.md em-sync + determinismo + atores + impacto.
+run_graph_selftests
 
 # Modo design-tokens — idem (cenários self-contained, sem fixture-file).
 run_design_tokens_selftests
