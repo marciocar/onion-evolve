@@ -9,7 +9,7 @@ last-review: 2026-06-21
 next-review-trigger: "se quisermos critérios de aceite NUMÉRICOS p/ judge-panel · OU calibrar N_max de panel por modelo · OU nova evidência empírica sobre s>β"
 relates:
   - ./onion-orchestration-external-radar-2026-06.md
-  - ./onion-orchestration-topology-adr-draft-2026-06-21.md
+  - ./onion-orchestration-topology-adr-2026-06-21.md
   - ../knowledge-base/concepts/agent-orchestration.md
 ---
 
@@ -61,7 +61,7 @@ extrai o que de fato serve ao Onion.
 | `α_ρ>1` amplifica vs `α_ρ≤1` colapsa | **SIM — precisamente no judge-panel** | O judge-panel do Onion (N céticos, voto — `onion-orchestration/SKILL.md:43-45`, `agent-orchestration.md:254-274`) **é** uma agregação por maioria binária. O paper o modela diretamente. |
 | `s > β` (scale-out vs scale-up) | **SIM — lente do gate "orquestrar ou não"** | Quantifica o gate de acoplamento já existente (`SKILL.md:23-27`). O irmão arXiv:2604.02460 dá suporte empírico ao "quando `s ≤ β`, não orqueste — single-agent vence sob mesmo budget". |
 | mixing depth / saturação | **SIM — teto racional ao panel** | "Mais juízes além de um ponto é desperdício, a menos que `ρ↓` ou `γ↑`" → limita o N do judge-panel; casa com o cap de 16 e com "completeness critic" sem inflar custo. |
-| estrela satura em `W/m` | **PARCIAL** | **Não morde no orquestrador** (fan-in do Onion é JS a 0 token — ele não lê as N saídas). **Morde no nó sumarizador** quando a síntese é por LLM — é o `b·m ≤ W` do [ADR de topologia](./onion-orchestration-topology-adr-draft-2026-06-21.md). |
+| estrela satura em `W/m` | **PARCIAL** | **Não morde no orquestrador** (fan-in do Onion é JS a 0 token — ele não lê as N saídas). **Morde no nó sumarizador** quando a síntese é por LLM — é o `b·m ≤ W` do [ADR de topologia](./onion-orchestration-topology-adr-2026-06-21.md). |
 | recursão de maioria binária | **NÃO — ao fan-out geral** | O fan-in comum do Onion é **dedupe/rank/merge** (não voto binário) sobre **workers heterogêneos**. Fora do escopo do modelo; não force a matemática aqui. |
 
 ## 4. As 3 lentes acionáveis
@@ -115,4 +115,4 @@ extrai o que de fato serve ao Onion.
   (Liu, Kong, Pei, jan/2026). Fórmulas de `arxiv.org/html/2601.17311v1`.
 - **Suporte empírico:** **arXiv:2604.02460** — single-agent vence multi-agent sob budget igual (multi-hop).
 - **Canônico interno:** `onion-orchestration/SKILL.md` (judge-panel, gate, caps), `agent-orchestration.md`
-  (doutrina), [ADR de topologia](./onion-orchestration-topology-adr-draft-2026-06-21.md), [radar](./onion-orchestration-external-radar-2026-06.md).
+  (doutrina), [ADR de topologia](./onion-orchestration-topology-adr-2026-06-21.md), [radar](./onion-orchestration-external-radar-2026-06.md).

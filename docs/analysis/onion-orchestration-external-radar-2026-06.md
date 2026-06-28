@@ -108,7 +108,7 @@ só se/quando o gargalo real for outro (ver §4 TOPO).
   fixa briga com o princípio "budget como teto". *Gatilho:* se sessões reais mostrarem over/under-scale
   recorrente → avaliar a heurística no `/meta:evolve`.
 - **TOPO — topologia hierárquica com sub-orquestradores** — **aprofundado em 2026-06-21** no
-  [ADR-rascunho de topologia](./onion-orchestration-topology-adr-draft-2026-06-21.md): a "hierarquia" conflacia
+  [ADR-rascunho de topologia](./onion-orchestration-topology-adr-2026-06-21.md): a "hierarquia" conflacia
   *locus de orquestração* (invariante — fica no nível principal) com *forma de grafo* (árvore com nós
   sumarizadores — **já permitida** no nível principal). O ADR reafirma a invariante e legitima a árvore
   **sob gatilho**: só quando a síntese exige LLM sobre conjunto que estoura 1 agente (senão o fan-in JS
@@ -163,7 +163,7 @@ avaliar os 🟡 quando seus gatilhos dispararem. Antes de mover qualquer 🟡 pa
   do paper, A2A) parqueados no radar com gatilho. Paper não verificado — tratado como hipótese.
   Para retroagir: editar aqui com data + porquê. Liberdade total — é tudo novo.
 - **2026-06-21** — Eixo TOPO aprofundado no
-  [ADR-rascunho de topologia](./onion-orchestration-topology-adr-draft-2026-06-21.md): desambígua *locus*
+  [ADR-rascunho de topologia](./onion-orchestration-topology-adr-2026-06-21.md): desambígua *locus*
   (invariante) × *forma de grafo* (árvore sob gatilho, no nível principal). Item TOPO de §4 atualizado.
 - **2026-06-21** — Eixo MATH aprofundado na
   [nota de transição de fase](./onion-orchestration-math-phase-transition-2026-06.md): paper **verificado**

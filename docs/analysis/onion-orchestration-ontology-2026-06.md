@@ -7,7 +7,7 @@ authority: insumo de direção (fundamenta a desambiguação no onion-relation-v
 research: 3 frentes — Explore interno (frota) + Explore interno (evolução×frota) + WebSearch jul/2026 (pós-corte ago/2025)
 related:
   - ../knowledge-base/concepts/onion-relation-vocabulary.md (TBox — recebe a desambiguação)
-  - onion-orchestration-topology-adr-draft-2026-06-21.md (ADR de topologia; dívida de metadados = F3 deferido)
+  - onion-orchestration-topology-adr-2026-06-21.md (ADR de topologia; dívida de metadados = F3 deferido)
   - ../knowledge-base/concepts/agent-orchestration.md (doutrina das 5 camadas de frota)
   - onion-research-self-describing-components-2026-06.md (ontologia leve / capability contract)
   - ../evolution/rfc/rfc-0002-meta-strategy-verdict.md (sobreposição evolução×frota reconhecida)
@@ -46,7 +46,7 @@ O inventário (A1) mostra uma ontologia de frota **estratificada e consistente**
 | 5. Seleção | recognition-primed / playbooks (`onion-patterns`) |
 
 A maior confusão histórica interna — *locus × forma* — **já foi resolvida** no ADR de topologia
-(`onion-orchestration-topology-adr-draft-2026-06-21.md`, aceito 2026-06-22). Restam **dívidas**, não confusões:
+(`onion-orchestration-topology-adr-2026-06-21.md`, aceito 2026-06-22). Restam **dívidas**, não confusões:
 metadados do ADR incoerentes (título "RASCUNHO" + `status: accepted`), homônimo "Workflow" (ferramenta) vs
 "workflow faseado retomável" (PFR), e a cunhagem "nó sumarizador" sem âncora ao termo de mercado. **Essas dívidas
 são o escopo F3, deferido.**
@@ -133,7 +133,7 @@ alinhamento de vocabulário**. Decisão do maestro: **migração plena ao canôn
   (corrige o antigo `delegates → frota`, cujo objeto era o próprio canal); matriz caso-de-uso × forma (`/meta:evolve`).
 - **Apelidos aposentados:** `frota`/`fleet` → `orquestração`/`orchestrator-worker`/`workers`; anti-pattern
   `fleet-orchestrator` → `worker-orchestrator`; skill → `onion-orchestration`; comando → `/meta:orchestrate`.
-- **Deferido (F3):** dívida do ADR de topologia (promover draft→adr, ancorar "nó sumarizador" → synthesizer) +
+- **Deferido (F3):** dívida do ADR de topologia (promover draft→adr, ancorar "nó sumarizador" → aggregator/sub-synthesizer) +
   homônimo Workflow(ferramenta) vs PFR.
 
 **Não fazer:** adotar triple-store/RDF/ontologia formal externa (contra a decisão #2 já tomada e contra a maré Gen III).
