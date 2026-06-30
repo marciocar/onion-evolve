@@ -1,6 +1,6 @@
 # 📚 Índice - Knowledge Bases
 
-> **Última atualização**: 2026-06-15 | **Gerado por**: `/docs:build-index`
+> **Última atualização**: 2026-06-30 | **Gerado por**: `/docs:build-index`
 
 Índice das **Knowledge Bases** do Sistema Onion — conhecimento estruturado para consumo por IA e referência técnica.
 
@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **38 arquivos** de knowledge base (exceto `index.md`)
-- **20** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/`
+- **46 arquivos** de knowledge base (exceto `index.md`)
+- **20** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/`
 
 ---
 
@@ -17,13 +17,17 @@
 
 ```
 docs/knowledge-base/
-├── concepts/          # 20 — Conceitos fundamentais
-├── frameworks/        # 8  — Frameworks e metodologias
-├── tools/             # 4  — Ferramentas e recursos
-├── platforms/         # 2  — Plataformas e tecnologias
-├── patterns/          # 1  — Padrões de implementação (SDAAL examples)
-├── architectures/     # 1  — C4 + ADR patterns
-└── meta/              # 2  — Padrões de criação de comandos + identidade/produto
+├── concepts/            # 20 — Conceitos fundamentais
+├── frameworks/          # 8  — Frameworks e metodologias
+├── tools/               # 4  — Ferramentas e recursos
+├── platforms/           # 2  — Plataformas e tecnologias
+├── patterns/            # 1  — Padrões de implementação (SDAAL examples)
+├── architectures/       # 1  — C4 + ADR patterns
+├── meta/                # 2  — Padrões de criação de comandos + identidade/produto
+└── agentic-patterns/    # 8  — Como IA + harness colaboram (KB viva do campo)
+    ├── harness/         #     Internals de harnesses específicos
+    ├── ai-strategies/   #     Padrões de guiar o transformer
+    └── field-observations/ # Observações brutas do campo
 ```
 
 ---
@@ -96,6 +100,24 @@ docs/knowledge-base/
 
 ---
 
+## 🤖 Agentic Patterns (8)
+
+> KB viva sobre como IA + harness colaboram na prática. Três trilhos: internals de harnesses,
+> estratégias de guiar o transformer, e observações brutas do campo. Escopo aberto — começa em
+> Claude Code mas evolui com qualquer harness que o maestro operar.
+
+**harness/**
+- [Claude Code — Internals](agentic-patterns/harness/claude-code-internals.md) — filesystem layout, task system, workflow journals, hooks, memória
+
+**ai-strategies/**
+- [Object-Led Discovery & Fitting](agentic-patterns/ai-strategies/object-led-discovery.md) — promover objeto existente a papel premium via ciclo dirigível
+- [Breadcrumb Patterns](agentic-patterns/ai-strategies/breadcrumb-patterns.md) — forçar absorção vs acomodação no transformer
+
+**field-observations/**
+- [2026-06-30 — Harness Paths](agentic-patterns/field-observations/2026-06-30-harness-paths.md) — observação que originou este KB (promovida)
+
+---
+
 ## ⚙️ Meta (2)
 
 - [Command Creation Patterns](meta/command-creation-patterns.md) — padrões por categoria para criação de comandos
@@ -117,4 +139,4 @@ docs/knowledge-base/
 
 ---
 
-**Mantido por**: Sistema Onion · **Última atualização**: 2026-06-15
+**Mantido por**: Sistema Onion · **Última atualização**: 2026-06-30
