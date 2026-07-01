@@ -207,6 +207,15 @@ dead-letter, anti-windup).
 Playbook: reconheça → **clamp / anti-windup / estado-mínimo / dead-letter**; **guarde primeiro o laço de
 maior ganho/raio-de-dano** (kill-switch antes de afinar). Implementação concreta = engenharia local do adotante.
 
+### promover objeto existente a papel premium  (object-led discovery & fitting — sinal de campo)
+Situação: maestro pede para elevar um objeto existente e solto (ex.: uma `<table>`) a um componente/papel
+reutilizável e rico ("premium") — diferente de `create-*` (que parte do zero).
+Playbook: **espelhar** (stub/worktree se a migração muta N arquivos; plano se for leitura) → **descobrir
+object-led** (Capability Contract do objeto: `provides/requires`/tier atual; inventariar pares no repo) →
+**vestir** (resolver o **perfil completo** do papel-alvo de saída — não por pedido sucessivo — reusando
+catálogo/SDAAL antes de introduzir dependência nova) → **materializar** (gate por etapa + verificação) →
+**realimentar** (o perfil descoberto vira entrada de catálogo para a próxima promoção do mesmo tipo de objeto).
+
 ## Gotchas
 
 - **Feature slug com underscore quebra GitFlow**: branches Git e pastas de sessão usam o mesmo slug — kebab-case é obrigatório
