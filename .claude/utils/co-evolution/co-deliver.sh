@@ -20,14 +20,17 @@
 #
 # Uso       : co-deliver.sh <member-id> [<outbox-file>] --target <path> [--dry-run]
 #               <member-id>    : id em docs/evolution/federation/members.yaml
-#                                (precisa ser role: consumer)
+#                                (precisa ser role: hub ou standalone — T1/T3,
+#                                adotam o core diretamente; RFC-0003 §2.1. role:
+#                                consumer é T2, via-hub — fora do escopo deste
+#                                carteiro-local core→direto)
 #               <outbox-file>  : basename OU path do rascunho. Omitido = entrega
 #                                TODOS os .md de 1º nível do outbox/<id>/.
 #               --target <p>   : path LOCAL do repo adotante (obrigatório se o
 #                                members.yaml não trouxer um path resolvível).
 #               --dry-run      : mostra o plano, não escreve nada.
 #
-# Gracioso  : uso inválido / member inexistente / não-consumer / outbox ou alvo
+# Gracioso  : uso inválido / member inexistente / role não-hub/standalone / outbox ou alvo
 #             ausente → exit 2 (erro de uso, pt-BR em STDERR). Arquivo já presente
 #             no inbound/ → no-op idempotente (exit 0). Sem `set -e` p/ controlar
 #             os exits graciosos. Determinístico, sem LLM.
@@ -76,7 +79,7 @@ member_field() {  # $1 = id desejado ; $2 = nome do campo
 ROLE="$(member_field "${MEMBER}" role)"
 NAME="$(member_field "${MEMBER}" name)"
 [ -n "${ROLE}" ] || { echo "ERRO: member-id '${MEMBER}' não existe em members.yaml." >&2; exit 2; }
-[ "${ROLE}" = "consumer" ] || { echo "ERRO: '${MEMBER}' tem role='${ROLE}' — só se entrega a consumer (downstream core→adotante)." >&2; exit 2; }
+[ "${ROLE}" = "hub" ] || [ "${ROLE}" = "standalone" ] || { echo "ERRO: '${MEMBER}' tem role='${ROLE}' — carteiro-local só entrega a hub/standalone (T1/T3, adotam o core direto; RFC-0003 §2.1). role=consumer é T2 (via-hub), fora deste escopo." >&2; exit 2; }
 
 # --- Resolve o path local do alvo: --target > members.yaml path: (se resolvível) ---
 if [ -z "${TARGET}" ]; then
@@ -88,7 +91,7 @@ if [ -z "${TARGET}" ]; then
   fi
   if [ -z "${TARGET}" ]; then
     echo "ERRO: path local do adotante '${MEMBER}' não resolvido. Informe --target <path>" >&2
-    echo "      (members.yaml não traz 'path:' utilizável para este consumer)." >&2
+    echo "      (members.yaml não traz 'path:' utilizável para este membro)." >&2
     exit 2
   fi
 fi
