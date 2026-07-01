@@ -38,10 +38,16 @@ echo "--- branches remotas ---"
 git -C "$REPO" branch -r 2>/dev/null | grep -E "develop|main" | head -5
 ```
 
-Com base na saída, determine o MODO:
+Com base na saída, determine o MODO. **Primeiro verifique se é o core:**
+
+```bash
+REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+bash "$REPO/.claude/validation/onion-version.sh" 2>/dev/null | grep "^role:"
+```
 
 | Condição | Modo |
 |---|---|
+| `onion-version.sh` retorna `role: source` | **SOURCE HEALTH CHECK** — este é o core Onion |
 | `.claude/` tem `agents/`, `commands/`, `skills/` | **RECOVERY** — framework presente, identidade perdida |
 | `.claude/` existe mas com estrutura diferente (sem agents/commands/skills Onion) | **RECOVERY PARCIAL** — só identity + co-evolução |
 | `.claude/` ausente ou vazio | **ADOPTION REQUEST** — repo virgem |
@@ -290,6 +296,64 @@ Reporte:
 >
 > Enquanto isso, você já pode trabalhar neste repo — o Claude Code tem o contexto
 > coletado nesta sessão mesmo sem o framework completo.
+
+---
+
+## ETAPA 3C — SOURCE HEALTH CHECK (core Onion detectado)
+
+Use este bloco se o modo for SOURCE HEALTH CHECK (`role: source`).
+
+> **Este é o core Onion (onion-evolve).** A recuperação de adotante não se aplica aqui.
+> O core não tem stamp commitado nem skeleton no CLAUDE.md — sua identidade vem do git.
+
+### 3C.1 O que NÃO fazer
+
+- Não regenerar `.onion-version` (é gerado ao vivo pelo `onion-version.sh`)
+- Não adicionar skeleton ao CLAUDE.md (é a constituição do framework, não um skeleton)
+- Não gerar `onion-adoption-request.md` (o core é a fonte, não um consumidor)
+
+### 3C.2 Validação determinística do core
+
+```bash
+REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+echo "=== Health-check do core Onion ==="
+
+echo "--- stamp ao vivo ---"
+bash "$REPO/.claude/validation/onion-version.sh" 2>/dev/null \
+  && echo "✅ onion-version.sh OK" || echo "❌ onion-version.sh falhou"
+
+echo ""
+echo "--- lint-selftest ---"
+bash "$REPO/.claude/validation/lint-selftest.sh" 2>&1 | tail -5
+
+echo ""
+echo "--- lint-artifacts (HARD) ---"
+bash "$REPO/.claude/validation/lint-artifacts.sh" 2>&1 | grep -E "HARD|OK ✓|FALHOU" | tail -3
+```
+
+### 3C.3 Se encontrar arquivos corrompidos
+
+Tudo é versionado no git do core. Restaure com `git restore`:
+
+```bash
+git restore CLAUDE.md                        # se CLAUDE.md estiver corrompido
+git restore .claude/                         # se .claude/ tiver arquivos corrompidos
+git restore docs/applying/rescue-prompt.md  # este próprio arquivo
+```
+
+### 3C.4 Se o problema for contexto de sessão (Claude Code abriu "cego")
+
+Se os arquivos estão íntegros mas a sessão não reconhece o framework:
+
+```
+/warm-up
+```
+
+O `/warm-up` carrega README, docs, meta-specs e inventário — é o caminho padrão para re-orientar
+uma sessão no core. Se o `/warm-up` não estiver disponível (sessão completamente sem contexto),
+rode: `cat CLAUDE.md` e `cat docs/onion/inventory.md` para reconstituir o contexto manualmente.
+
+Reportar: resultado do lint, se algum arquivo foi restaurado, se o contexto de sessão foi re-orientado.
 
 ---
 

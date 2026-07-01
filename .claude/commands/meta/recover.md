@@ -30,6 +30,83 @@ fonte. Cobre dois sintomas:
 
 ---
 
+## ⚡ Detecção de role — execute ANTES de qualquer outra etapa
+
+```bash
+REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+ROLE="$(bash "$REPO/.claude/validation/onion-version.sh" 2>/dev/null | awk '/^role:/{print $2}')"
+echo "Role detectado: ${ROLE:-desconhecido}"
+```
+
+**Se `role: source`** → este é o **core (onion-evolve)**. O fluxo de recuperação de adotante
+**não se aplica**. O core não tem stamp commitado nem skeleton no CLAUDE.md — sua identidade vem
+do git. Siga o [Health-check do core](#-health-check-do-core-role-source) abaixo e pare por aí.
+
+**Se `role: adopted`** ou stamp ausente → continue com o [Diagnóstico automático](#diagnóstico-automático).
+
+---
+
+## 🏗️ Health-check do core (role: source)
+
+Quando este comando é rodado no `onion-evolve` (ou qualquer repo com `role: source`):
+
+### O que NÃO fazer
+- Não regenerar stamp (é gerado ao vivo por `onion-version.sh` a partir do git)
+- Não prepend skeleton no CLAUDE.md (o CLAUDE.md do core é a constituição do framework, não um skeleton)
+- Não criar `docs/evolution/inbox` como se fosse um adotante (o core tem o canal, mas não é consumidor)
+
+### O que fazer: validação determinística
+
+```bash
+REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+echo "=== Health-check do core Onion ==="
+
+# 1. Stamp ao vivo
+bash "$REPO/.claude/validation/onion-version.sh" 2>/dev/null \
+  && echo "✅ onion-version.sh OK" || echo "❌ onion-version.sh falhou"
+
+# 2. Gate determinístico: selftest + lint
+echo ""
+echo "--- lint-selftest ---"
+bash "$REPO/.claude/validation/lint-selftest.sh" 2>&1 | tail -5
+
+echo ""
+echo "--- lint-artifacts (HARD only) ---"
+bash "$REPO/.claude/validation/lint-artifacts.sh" 2>&1 | grep -E "HARD|OK ✓|FALHOU" | tail -3
+
+# 3. Inventory sync
+echo ""
+echo "--- inventory sync ---"
+bash "$REPO/.claude/validation/inventory.sh" 2>/dev/null | head -5
+```
+
+### Se encontrar arquivos corrompidos ou ausentes
+
+Todos os arquivos do core estão versionados no git. Restaure com:
+
+```bash
+# Restaurar arquivo específico
+git restore CLAUDE.md
+git restore .claude/commands/meta/recover.md
+# etc.
+
+# Ou restaurar .claude/ inteiro (CUIDADO: descarta mudanças não commitadas)
+git restore .claude/
+```
+
+### Se o problema for só contexto de sessão
+
+Se os arquivos estão íntegros mas Claude Code abriu sem saber que é o Onion source:
+
+```
+/warm-up
+```
+
+O `/warm-up` carrega o contexto completo (README, docs, meta-specs, inventário). É o caminho
+padrão para re-orientar uma sessão no core.
+
+---
+
 ## Diagnóstico automático
 
 Execute este bloco antes de qualquer alteração:
