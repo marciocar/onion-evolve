@@ -53,8 +53,8 @@ Ler o campo `alvo:` do cabeçalho da entrada e resolver contra `docs/evolution/f
 
 - `nenhum` → **parar**: entrada informativa, sem destinatário. Nada a anunciar.
 - `futuros adotantes` → **parar**: aplica-se a adoções futuras (chega via `/meta:adopt`), não a um adotante atual.
-- `adotantes` / `todos` → **todos** os `role: consumer` do `members.yaml`.
-- `<id>` (ex.: `rhilo-metagamify`) → esse membro (`role: consumer`).
+- `adotantes` / `todos` → **todos** os `role: hub` ou `role: standalone` do `members.yaml` (T1/T3, adotam o core direto — RFC-0003 §2.1).
+- `<id>` (ex.: `rhilo-metagamify`) → esse membro (role `hub` ou `standalone`).
 
 Para cada `id` resolvido, ler do `members.yaml`: `name`, `remote` (e `path` se montado localmente).
 Ignorar as linhas de **template comentado** (`#  - id: <slug-do-projeto>`). Se o `id` do `alvo:` não

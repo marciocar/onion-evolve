@@ -1,18 +1,26 @@
 ---
 title: 'Trial — Capability "Object-Led Discovery & Fitting" (promover objeto a papel)'
 date: 2026-07-01
-veredito: trial
-origem: docs/evolution/inbox/2026-06-29-capability-adaptive-object-led-discovery.md
+veredito: resolvido — aceito como playbook do catálogo
+resolvido-em: 2026-07-01
+origem: docs/evolution/inbox/_processed/2026-06-29-capability-adaptive-object-led-discovery.md
 from: rhilo-metagamify (adotante standalone)
 gate: dogfood com DataTable premium (rhilo-app `feat/gamification-dose-viz`) antes de canonizar forma
-proxima-acao: maestro avalia questões (a)–(d) e autoriza rodada de dogfood guiado
+resultado: ../analysis/onion-adr-object-led-discovery-2026-07.md (PR #213 MERGED d24f03a) — anunciado via federation/CHANGELOG.md 2026-07-01 + outbox/rhilo-metagamify/_processed/
 ---
 
 # Trial — Capability "Object-Led Discovery & Fitting"
 
-> **Veredito de triagem (2026-07-01):** `trial` — sinal bem fundamentado, evidência empírica concreta,
-> peças do core já existem. A **forma final** (ADR próprio? extensão RFC-0002? skill fina?) precisa de um
-> dogfood guiado antes de canonizar. O DataTable premium é o caso piloto natural.
+> **RESOLVIDO (2026-07-01):** as questões (a)–(d) abaixo foram respondidas e o dogfood guiado foi feito
+> **retroativamente** sobre a evidência que o próprio sinal já trazia (sem precisar operar de novo no
+> rhilo-app) — ver [`onion-adr-object-led-discovery-2026-07.md`](../analysis/onion-adr-object-led-discovery-2026-07.md)
+> (PR [#213](https://github.com/marciocar/onion-evolve/pull/213), merged `d24f03a`). Este documento fica
+> como **registro da triagem original** (por que `trial`, não `accept`/`defer` direto); o veredito final e
+> a forma materializada vivem no ADR.
+>
+> **Veredito de triagem original (2026-07-01):** `trial` — sinal bem fundamentado, evidência empírica concreta,
+> peças do core já existem. A **forma final** (ADR próprio? extensão RFC-0002? skill fina?) precisava de um
+> dogfood guiado antes de canonizar. O DataTable premium foi o caso piloto usado.
 
 ## Por que trial (não accept nem defer)
 
@@ -57,23 +65,22 @@ espelhar → descobrir (object-led) → vestir (capability-fitting) → material
 - **Catálogo-first / Strategy-Playbooks** (RFC-0002) — reconhece situação → reroute; resíduo → novo playbook
 - **Economia de motores** — Transformer dirige o fluxo; SLM-como-ferramenta executa os passos; SDAAL é o contrato
 
-## Questões abertas para o maestro decidir (pré-dogfood)
+## Questões respondidas (era "pré-dogfood"; ver ADR para o texto completo da resposta)
 
-| # | Pergunta | Inclinação do sinal |
-|---|---|---|
-| **(a)** Forma: ADR + skill própria ou extensão RFC-0002 + Strategy-Playbooks + skill fina de orquestração? | Extensão (menor superfície, casa com catálogo-first) |
-| **(b)** "Espelho/stub": artefato físico (worktree descartável) ou conceitual (plano)? | Físico quando há risco de mutação (N arquivos); conceitual quando é só leitura |
-| **(c)** Gate assess→trial: caso piloto = DataTable premium do rhilo-app? | Sim — resultado à mão, bom baseline "dirigido vs improvisado" |
-| **(d)** Relação com `create-*`: "promover" (objeto existe) vs "criar" (do zero) — mesmo toolbox, gatilho diferente? | Mesmo toolbox; gatilho `--from <objeto>` vs `--new` |
+| # | Pergunta | Inclinação do sinal | Resposta final (ADR) |
+|---|---|---|---|
+| **(a)** Forma: ADR + skill própria ou extensão RFC-0002 + Strategy-Playbooks + skill fina de orquestração? | Extensão (menor superfície, casa com catálogo-first) | ✅ Confirmada — playbook em `onion-patterns/SKILL.md`, sem skill/comando novo |
+| **(b)** "Espelho/stub": artefato físico (worktree descartável) ou conceitual (plano)? | Físico quando há risco de mutação (N arquivos); conceitual quando é só leitura | ✅ Confirmada — mesma régua |
+| **(c)** Gate assess→trial: caso piloto = DataTable premium do rhilo-app? | Sim — resultado à mão, bom baseline "dirigido vs improvisado" | ✅ Confirmada — usado **retroativamente** (evidência já anexada ao sinal, sem operar de novo no rhilo-app) |
+| **(d)** Relação com `create-*`: "promover" (objeto existe) vs "criar" (do zero) — mesmo toolbox, gatilho diferente? | Mesmo toolbox; gatilho `--from <objeto>` vs `--new` | Parcial — mesma régua P0-P3, mas **não** entrou no toolbox `create-*`; vive como playbook próprio e paralelo |
 
-## Próximo passo concreto
+## Próximo passo concreto (histórico — já executado)
 
-1. **Maestro responde (a)–(d)** — define forma e gatilho antes de qualquer implementação
-2. **Dogfood guiado**: rodar o ciclo proposto manualmente sobre o DataTable premium (rhilo-app),
-   usando o resultado imperativo como baseline; medir o delta de reprodutibilidade e catalogação
-3. **Se dogfood confirma valor**: PR de implementação (extensão RFC-0002 + skill fina ou ADR próprio,
-   conforme decisão em (a))
-4. **Se dogfood revela problema**: registrar o aprendizado e reclassificar para defer/reject com evidência
+1. ~~Maestro responde (a)–(d)~~ — respondido no ADR
+2. ~~Dogfood guiado~~ — feito retroativamente sobre a evidência do próprio sinal (§6)
+3. ~~PR de implementação~~ — [#213](https://github.com/marciocar/onion-evolve/pull/213), merged `d24f03a`
+4. Loop fechado com anúncio downstream a `rhilo-metagamify` (`federation/CHANGELOG.md` 2026-07-01 +
+   entrega via `/meta:co-deliver` no `inbound/` de lá)
 
 ## Rejeições registradas (anti-inchaço)
 

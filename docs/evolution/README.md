@@ -65,6 +65,9 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
   cruza as pontas). O carteiro automatiza só **transporte + notificação** (atos 1-2), nunca a execução
   (ato 3): **pull pelo destino** (respeita "um escritor por repo"), reusando ledger git + scripts
   determinísticos. Design no [ADR do eixo](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md); liga no gatilho de graduação.
+  - **Carteiro-local** (`/meta:co-deliver`/`/meta:co-relay`) já automatiza o caso **1-máquina** (filesystem
+    compartilhado). Para um membro em **máquina diferente**, sem esses atalhos: ver
+    [`federation/onboarding-remote-member.md`](federation/onboarding-remote-member.md).
 
 ### Upstream — Projetos → core (sinal + pedido de ajuda) ← o loop de co-evolução
 *Um projeto reporta bug, dá feedback, **pede ajuda/feature**, manda status.*

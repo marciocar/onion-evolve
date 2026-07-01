@@ -44,7 +44,7 @@ ele hardcoda `role: source` (é a identidade da FONTE) e, vendorizado num adotan
 ## Passo 2 — Resolver alvo e rascunho(s)
 
 `$ARGUMENTS` = `<member-id> [<outbox-file>] --target <path> [--dry-run]`.
-- `<member-id>` deve existir em `members.yaml` com **role: consumer** (o helper valida; producer → erro).
+- `<member-id>` deve existir em `members.yaml` com **role: hub ou standalone** (T1/T3, adotam o core direto — RFC-0003 §2.1; o helper valida). role=consumer (T2, via-hub) fica fora deste carteiro-local.
 - `<outbox-file>` opcional: basename ou path de UM rascunho. Omitido = **todos** os `.md` de 1º nível de
   `outbox/<member-id>/` (cuidado: pode reentregar rascunhos antigos não-arquivados).
 - `--target <path>` é o **path local do repo adotante** — obrigatório quando o `members.yaml` não traz um
@@ -58,7 +58,7 @@ ele hardcoda `role: source` (é a identidade da FONTE) e, vendorizado num adotan
 bash .claude/utils/co-evolution/co-deliver.sh <member-id> [<outbox-file>] --target <path> [--dry-run]
 ```
 
-O helper: valida (member/consumer/outbox/alvo-git), avisa se o alvo não tem `docs/evolution/` na árvore
+O helper: valida (member/role/outbox/alvo-git), avisa se o alvo não tem `docs/evolution/` na árvore
 atual, e copia never-clobber (arquivo já presente no `inbound/` = no-op idempotente).
 
 ## Passo 4 — Marcar transportado + checkpoint do maestro

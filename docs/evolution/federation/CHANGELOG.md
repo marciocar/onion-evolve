@@ -8,6 +8,13 @@
 
 ---
 
+## 2026-07-01 · Veredito: "object-led discovery & fitting" vira playbook do catálogo (não skill/comando novo) · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Sinal de campo do `rhilo-metagamify`:** propôs canonizar o ciclo "promover objeto existente a papel premium" (espelhar → descobrir → vestir → materializar → realimentar), motivado pelo DataTable premium do dashboard WRR construído imperativamente (pedidos sucessivos re-improvisados a cada rodada).
+- **Veredito: ACEITO como doutrina, materializado como playbook** — não como ADR-skill isolada nem comando `/onion:promote` dedicado. Aplicando a régua P0-P3 (`onion-adr-toolbox-lifecycle`), o substrato já cobria quase tudo (Capability Contract + SDAAL + catálogo-first do RFC-0002) — a síntese que faltava virou a **6ª entrada de playbook** em `onion-patterns/SKILL.md` §Playbooks ("promover objeto existente a papel premium").
+- **Dogfood guiado retroativo** sobre a própria evidência anexada ao sinal (sem tocar o rhilo-app de novo): o gap real estava em **descobrir+vestir não anteciparem o perfil completo** do papel-alvo (emergiu por ~10 pedidos sucessivos em vez de 1 fitting único) — não em "materializar", que já era dirigido e verificado. Doc: [`onion-adr-object-led-discovery-2026-07.md`](../../analysis/onion-adr-object-led-discovery-2026-07.md) (PR #213).
+- **Ação p/ adotantes: nenhuma obrigatória.** O playbook vive no core; chega vendorizado via `/meta:adopt --update` (dentro de `onion-patterns/SKILL.md`). Quem quiser aplicar o ciclo já pode usá-lo por analogia — é disciplina em prosa, não automação. Sinal triado em [`../inbox/_processed/2026-06-29-capability-adaptive-object-led-discovery.md`](../inbox/_processed/2026-06-29-capability-adaptive-object-led-discovery.md).
+
 ## 2026-06-28 · BREAKING: skill `onion-fleet`→`onion-orchestration` + `/meta:fleet`→`/meta:orchestrate` (migração de vocabulário) · BREAKING · alvo: rhilo-metagamify
 
 - **Migração de vocabulário no core:** os apelidos `frota` (PT) / `fleet` (EN) foram **aposentados** em favor do vocabulário canônico da indústria de orquestração multi-agente — `orquestração` (conceito) / `orchestrator-worker` (padrão) / `workers` (coletivo executor). Decisão fundamentada por pesquisa (3 ângulos + web jul-2026): o canônico é *orchestrator-worker / fan-out-fan-in*; "fleet" é jargão em transição e "frota" era o único termo técnico traduzido. Doc: [onion-orchestration-ontology-2026-06](../../analysis/onion-orchestration-ontology-2026-06.md).
