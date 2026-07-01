@@ -30,3 +30,4 @@ Arquivos com `promoted` podem ser arquivados (mover para `_processed/`).
 | Data | Assunto | Status |
 |------|---------|--------|
 | 2026-06-30 | [Harness Paths — como o Claude Code armazena state](2026-06-30-harness-paths.md) | `promoted` |
+| 2026-07-01 | [Verificação superficial travestida de profunda — 2 casos reais](2026-07-01-shallow-verification-masquerading-as-deep.md) | `raw` |
