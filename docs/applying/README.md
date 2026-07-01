@@ -64,4 +64,21 @@ Para o **ciclo de vida completo** (adoção → update → revisão → sincroni
 
 ---
 
+---
+
+## Recuperação — quando o contato com o framework é perdido
+
+Um repo adotado pode perder o contexto Onion silenciosamente (CLAUDE.md revertido, `.onion-version`
+ausente, branch nova sem o stamp). Dois caminhos de recuperação:
+
+| Situação | Caminho |
+|---|---|
+| `.claude/` com agents/commands/skills presente, só identidade perdida | **[`/meta:recover`](../../.claude/commands/meta/recover.md)** — regenera stamp + skeleton sem tocar o código |
+| Sem `.claude/` algum, ou repo que nunca teve Onion | **[`rescue-prompt.md`](./rescue-prompt.md)** — prompt autônomo que funciona em qualquer sessão Claude Code; gera pedido de adoção formal se necessário |
+
+O `rescue-prompt.md` é o **crash kit** do Onion: pode ser colado em qualquer sessão Claude Code —
+mesmo sem o framework instalado — e guia o recovery ou a solicitação de adoção ao core.
+
+---
+
 **Próximo passo**: abrir o guia do seu cenário (acima) ou o [ciclo de vida](./adoption-lifecycle.md) para operações pós-adoção.
