@@ -14,6 +14,10 @@ O Sistema Onion é um **framework template** que se materializa em cada projeto-
 | Legado | [applying-legacy.md](./applying-legacy.md) | Projeto existente, requer engenharia reversa antes da aplicação |
 | Regulado | [applying-regulated.md](./applying-regulated.md) | Projeto sujeito a frameworks de compliance (ISO 27001, ISO 22301, SOC2, PMBOK) |
 
+Para quem não conhece o Onion e quer entender o todo antes de entrar no detalhe de cenário:
+**[Manual de Adoção Completo](./onion-adoption-manual.md)** — história, conceitos, ecossistema atual
+e how-to prático, escrito na voz do framework.
+
 Cada guia documenta:
 
 - Pré-requisitos
