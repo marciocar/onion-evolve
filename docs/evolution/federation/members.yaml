@@ -1,29 +1,65 @@
-# Registro de membros da co-evolução Onion (downstream/distribuição).
-# Quem adota o Onion e em que versão. Fonte canônica: o core (onion-evolve).
-# Adicionar um projeto = 1 entrada aqui + rodar /meta:adopt no projeto.
+# Registro de membros da co-evolução Onion.
+# Quem adota o Onion, em que tier, versão e configuração de confiança.
+# Fonte canônica: o core (onion-evolve). Adicionar projeto = 1 entrada aqui + /meta:adopt.
+# RFC-0003: hierarquia de tiers (source | hub | standalone | consumer) substitui producer/consumer.
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../../rfc/rfc-0001 §gatilho.)
-version: 1
+version: 2
+trust_policy_version: 1
 
 members:
   - id: onion-evolve
     name: onion-evolve
-    role: producer            # o core / framework — fonte das releases e do protocolo
+    role: source              # TIER 0 — core; autoridade emissora; lê tudo; escreve só em si
     remote: github.com/marciocar/onion-evolve
     path: "."                 # este repo
+    local_path: "/home/marciocar/onion-evolve"
+    personality_summary: "Framework template que se instala em .claude/; orquestra produto/engenharia/compliance; dogfood como padrão master"
+    specializations: [framework-template, sdaal, co-evolution, dogfooding, breadcrumbs]
+    personality_last_sync: 2026-07-01
+    exposes:
+      - public-kbs
+      - changelog
+      - commands-via-adopt
+      - personality-public
+    # TIER 0 — sem trust_topology; o core lê tudo por papel, não por concessão
 
   - id: rhilo-metagamify
     name: rhilo-metagamify (MetaGamify)
-    role: consumer            # projeto que adota o Onion (modo standalone, vendorizado)
+    role: hub                 # TIER 1 — central; pode ter sub-adotados
+    parent: onion-evolve
     remote: github.com/marciocar/metagamify
-    onion_version: 025225e286d8   # espelha .claude/.onion-version; sync 2026-06-24 via /meta:adopt --update (integration_branch: rhilo/main)
+    local_path: "/home/marciocar/rhilo-metagamify"
+    onion_version: 025225e286d8   # espelha .claude/.onion-version; sync 2026-06-24
     adopted_at: 2026-06-17
     mode: legacy              # greenfield | legacy | regulated
+    personality_summary: "Engine de metagamificação modular; especialista Nx + Asana; co-evolução ativa"
+    specializations: [gamification, nx-monorepo, asana-integration, metagamification]
+    personality_last_sync: 2026-07-01
+    trust:
+      can_receive_from: [onion-evolve]    # quem pode me mandar conselho/sinal
+      can_advise_to: [onion-evolve]       # quem posso aconselhar (via co-relay)
+      can_correct_to: []                  # quem posso propor correção ([] = nenhum por padrão)
+      diary_readable_by: [onion-evolve]   # quem pode ler meu diário PROTECTED
+      diary_classifications_shared: [public, collective]  # o que envio proativamente
+      exposes_downstream: []              # IDs de meus sub-adotados (T2) — vazio agora
 
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
-#    role: consumer
+#    role: hub | standalone   # hub se terá sub-adotados; standalone se adota core diretamente sem sub-adotados
+#    parent: onion-evolve
 #    remote: github.com/<org>/<repo>
+#    local_path: "<path-absoluto-no-filesystem-do-maestro>"
 #    onion_version: <commit-curto>   # = .claude/.onion-version do projeto após /meta:adopt
 #    adopted_at: <AAAA-MM-DD>
 #    mode: greenfield | legacy | regulated
+#    personality_summary: "<1 linha — quem esta instância se tornou>"
+#    specializations: []
+#    personality_last_sync: <AAAA-MM-DD>
+#    trust:
+#      can_receive_from: [onion-evolve]
+#      can_advise_to: [onion-evolve]
+#      can_correct_to: []
+#      diary_readable_by: [onion-evolve]
+#      diary_classifications_shared: [public, collective]
+#      exposes_downstream: []
