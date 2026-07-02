@@ -2,7 +2,7 @@
 # Quem adota o Onion, em que tier, versão e configuração de confiança.
 # Fonte canônica: o core (onion-evolve). Adicionar projeto = 1 entrada aqui + /meta:adopt.
 # RFC-0003: hierarquia de tiers (source | hub | standalone | consumer) substitui producer/consumer.
-# (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../../rfc/rfc-0001 §gatilho.)
+# (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../rfc/rfc-0001 §gatilho.)
 version: 2
 trust_policy_version: 1
 
@@ -13,15 +13,15 @@ members:
     remote: github.com/marciocar/onion-evolve
     path: "."                 # este repo
     local_path: "/home/marciocar/onion-evolve"
-    personality_summary: "Framework template que se instala em .claude/; orquestra produto/engenharia/compliance; dogfood como padrão master"
+    personality_summary: "Framework template que se instala em .claude/; orquestra produto/engenharia/compliance; dogfood como padrão master"  # seed manual pré-F2 — substituir no 1º /meta:personality-sync real
     specializations: [framework-template, sdaal, co-evolution, dogfooding, breadcrumbs]
-    personality_last_sync: 2026-07-01
+    personality_last_sync: 2026-07-01   # seed manual (o comando de sync ainda não existe — RFC-0003 F2)
     exposes:
       - public-kbs
       - changelog
       - commands-via-adopt
       - personality-public
-    # TIER 0 — sem trust_topology; o core lê tudo por papel, não por concessão
+    # TIER 0 — sem bloco trust:; o core lê tudo por papel, não por concessão
 
   - id: rhilo-metagamify
     name: rhilo-metagamify (MetaGamify)
@@ -29,12 +29,12 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
     local_path: "/home/marciocar/rhilo-metagamify"
-    onion_version: 025225e286d8   # espelha .claude/.onion-version; sync 2026-06-24
-    adopted_at: 2026-06-17
+    onion_version: a458a0fc6b71   # espelha .claude/.onion-version; sync 2026-07-01
+    adopted_at: 2026-06-17        # 1ª adoção (o stamp do adotante re-carimba no --update: lá consta 2026-06-30 — semântica a unificar, ver audit 2026-07-01 item #5)
     mode: legacy              # greenfield | legacy | regulated
-    personality_summary: "Engine de metagamificação modular; especialista Nx + Asana; co-evolução ativa"
+    personality_summary: "Engine de metagamificação modular; especialista Nx + Asana; co-evolução ativa"  # seed manual pré-F2 — substituir no 1º /meta:personality-sync real
     specializations: [gamification, nx-monorepo, asana-integration, metagamification]
-    personality_last_sync: 2026-07-01
+    personality_last_sync: 2026-07-01   # seed manual (o comando de sync ainda não existe — RFC-0003 F2)
     trust:
       can_receive_from: [onion-evolve]    # quem pode me mandar conselho/sinal
       can_advise_to: [onion-evolve]       # quem posso aconselhar (via co-relay)

@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# diary-index.sh — Regenera .claude/diary/INDEX.md a partir dos arquivos de entrada
+# diary-index.sh — Regenera .claude/diary/index.md a partir dos arquivos de entrada
 # Parte do gate mecânico do Onion (Economy of Motors: Shell = determinístico)
 # Uso: bash .claude/validation/diary-index.sh [<repo-root>]
 set -euo pipefail
 
 REPO="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 DIARY_DIR="$REPO/.claude/diary"
-INDEX="$DIARY_DIR/INDEX.md"
+INDEX="$DIARY_DIR/index.md"
 TODAY="$(date +%F)"
 
 # Criar diretório se não existir
 mkdir -p "$DIARY_DIR"
 
 # Verificar se há entradas
-ENTRIES=$(find "$DIARY_DIR" -maxdepth 1 -name "*.md" ! -name "INDEX.md" 2>/dev/null | sort -r)
+ENTRIES=$(find "$DIARY_DIR" -maxdepth 1 -name "*.md" ! -name "index.md" 2>/dev/null | sort -r)
 
 if [ -z "$ENTRIES" ]; then
   cat > "$INDEX" <<EOF
@@ -23,7 +23,7 @@ if [ -z "$ENTRIES" ]; then
 
 Gerado em: ${TODAY}
 EOF
-  echo "INDEX.md criado (vazio)."
+  echo "index.md criado (vazio)."
   exit 0
 fi
 
@@ -66,7 +66,7 @@ done <<< "$ENTRIES"
 # Instância
 INSTANCE_ID=$(awk '/^instance:/{print $2; exit}' "$REPO/.claude/.onion-version" 2>/dev/null || basename "$REPO")
 
-# Escrever INDEX.md
+# Escrever index.md
 cat > "$INDEX" <<EOF
 # Diário — ${INSTANCE_ID}
 
@@ -90,7 +90,7 @@ ${TABLE_ROWS}
 *Para regenerar este índice: \`bash .claude/validation/diary-index.sh\`.*
 EOF
 
-echo "INDEX.md regenerado: ${TOTAL} entradas (${STALE} stale, ${SHARABLE} compartilháveis)."
+echo "index.md regenerado: ${TOTAL} entradas (${STALE} stale, ${SHARABLE} compartilháveis)."
 if [ "$STALE" -gt 0 ]; then
   echo "⏰ ${STALE} entrada(s) com review_after vencido — revisar e atualizar ou marcar como obsoleto."
 fi

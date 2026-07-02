@@ -391,9 +391,9 @@ check_inventory_sync() {
 check_plugins_sync() {
   local asm="${SCRIPT_DIR}/../utils/marketplace/assemble-plugin.sh"
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
-  [ -f "${asm}" ] || return            # sem assembler → nada a checar (repo sem a feature)
-  [ -d "${vdir}" ] || return
-  command -v jq >/dev/null 2>&1 || return   # sem jq → pula gracioso (mesma graça dos outros)
+  [ -f "${asm}" ] || return 0            # sem assembler → nada a checar (repo sem a feature)
+  [ -d "${vdir}" ] || return 0
+  command -v jq >/dev/null 2>&1 || return 0   # sem jq → pula gracioso (mesma graça dos outros)
 
   local manifest name committed tmp
   for manifest in "${vdir}"/*.manifest.sh; do
@@ -433,7 +433,7 @@ check_plugins_sync() {
 # ===========================================================================
 check_capability_conformance() {
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
-  [ -d "${vdir}" ] || return
+  [ -d "${vdir}" ] || return 0
   local manifest report name claimed bronze silver gold unresolved met
   for manifest in "${vdir}"/*.manifest.sh; do
     [ -f "${manifest}" ] || continue
@@ -490,8 +490,8 @@ check_capability_conformance() {
 check_graph_sync() {
   local gen="${SCRIPT_DIR}/graph.sh"
   local gfile="${REPO_ROOT}/docs/onion/graph.md"
-  [ -f "${gen}" ] || return
-  command -v jq >/dev/null 2>&1 || return   # graph.sh usa jq p/ capability → pula gracioso sem jq
+  [ -f "${gen}" ] || return 0
+  command -v jq >/dev/null 2>&1 || return 0   # graph.sh usa jq p/ capability → pula gracioso sem jq
   if [ ! -f "${gfile}" ]; then
     violation "HARD" "docs/onion/graph.md" "grafo ausente — rode 'bash .claude/validation/graph.sh --markdown > docs/onion/graph.md'"
     return
@@ -513,8 +513,8 @@ check_graph_sync() {
 check_claude_md_counts() {
   local claude_md="${REPO_ROOT}/CLAUDE.md"
   local inv_script="${SCRIPT_DIR}/inventory.sh"
-  [ -f "${claude_md}" ] || return
-  [ -f "${inv_script}" ] || return
+  [ -f "${claude_md}" ] || return 0
+  [ -f "${inv_script}" ] || return 0
 
   # Totais canônicos do filesystem
   local env_out cmd_truth agent_truth skill_truth
@@ -583,14 +583,14 @@ ${lines}"
 check_abstraction_methods_exist() {
   local tm_iface="${CLAUDE_DIR}/utils/task-manager/interface.md"
   local forge_iface="${CLAUDE_DIR}/utils/forge/interface.md"
-  [ -f "${tm_iface}" ] || return
-  [ -f "${forge_iface}" ] || return
+  [ -f "${tm_iface}" ] || return 0
+  [ -f "${forge_iface}" ] || return 0
 
   # Conjunto canônico de métodos (assinaturas "  metodo(" nas interfaces)
   local methods
   methods=$(grep -hoE '^[[:space:]]+[a-zA-Z]+\(' "${tm_iface}" "${forge_iface}" 2>/dev/null \
     | tr -d ' (' | sort -u)
-  [ -n "${methods}" ] || return
+  [ -n "${methods}" ] || return 0
 
   while IFS= read -r -d '' file; do
     # Allowlist: adapters e especialistas podem usar pseudocódigo específico
@@ -758,7 +758,7 @@ check_inventory_total_drift() {
   agent_cats="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENT_CATEGORIES=' | cut -d= -f2)"
   kb="$(printf '%s\n' "${env_out}" | grep '^ONION_KBS_TOTAL=' | cut -d= -f2)"
   skill="$(printf '%s\n' "${env_out}" | grep '^ONION_SKILLS_TOTAL=' | cut -d= -f2)"
-  [ -n "${cmd}" ] || return
+  [ -n "${cmd}" ] || return 0
 
   while IFS= read -r -d '' f; do
     inventory_scope_excluded "${f}" && continue
@@ -995,7 +995,7 @@ run_inventory_fixes() {
   agent_cats="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENT_CATEGORIES=' | cut -d= -f2)"  # ≠ cats
   kb="$(printf '%s\n'    "${env_out}" | grep '^ONION_KBS_TOTAL='          | cut -d= -f2)"
   skill="$(printf '%s\n' "${env_out}" | grep '^ONION_SKILLS_TOTAL='       | cut -d= -f2)"
-  [ -n "${cmd}" ] || return
+  [ -n "${cmd}" ] || return 0
 
   # REGRA 8 — a SSOT é REGENERADA (nunca editada frase-a-frase); materializa a
   # verdade que as frases derivam. inventory.md é isento das reescritas seguintes.

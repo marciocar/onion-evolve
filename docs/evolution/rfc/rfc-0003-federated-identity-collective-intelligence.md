@@ -46,7 +46,7 @@ TIER 0 — CORE (role: source)
 
 TIER 1 — CENTRAL/HUB (role: hub)
   Adotante que tem seus próprios adotados; parent = core
-  Lê: public do core + public/peer de T1 autorizados em trust_topology
+  Lê: public do core + public/peer de T1 autorizados no bloco `trust:` do members.yaml
 
 TIER 2 — CONSUMER-DE-HUB (role: consumer, parent: <hub-id>)
   Adota um hub, não o core diretamente
@@ -81,7 +81,7 @@ antes de qualquer prosa. O formato do diário usa frontmatter como canal primár
 
 **Diretório:** `.claude/diary/` por instância (versionado — é autobiografia, não ephemeral)
 **Arquivo:** `<AAAA-MM-DD>-<slug>.md`
-**Índice:** `.claude/diary/INDEX.md` — gerado por `diary-index.sh`, ~1KB, Tier-0 pointer
+**Índice:** `.claude/diary/index.md` — gerado por `diary-index.sh`, ~1KB, Tier-0 pointer (kebab-case por code-standards)
 
 ```yaml
 ---
@@ -190,7 +190,7 @@ Se autorizado: cópia never-clobber no `inbox/` do peer (sem commit — I3 respe
 
 | Fase | O que | Gate para avançar |
 |---|---|---|
-| **Pré-F1** | Esta RFC + `trust_topology` em `members.yaml` | RFC aceita pelo maestro |
+| **Pré-F1** | Esta RFC + bloco `trust:` em `members.yaml` (nome real do campo implementado) | RFC aceita pelo maestro |
 | **F1** | `/meta:diary` + `diary-index.sh` + 10 entradas reais no core | Dogfood 1 semana |
 | **F2** | `/meta:personality-sync` + `personality.md` do core + members.yaml estendido | Dogfood + personality legível |
 | **F3** | Trust SDAAL + extensão co-relay `--to peer` | Primeiro relay peer real bem-sucedido |
@@ -203,5 +203,5 @@ Se autorizado: cópia never-clobber no `inbox/` do peer (sem commit — I3 respe
 
 - Formato exato da projeção A2A Agent Card — a spec A2A está em upgrade; validar antes de F2
 - Trigger para síntese coletiva: periódico (cron) ou on-demand (`/meta:synthesize-collective`)
-- Formato de log de tentativas de relay bloqueadas (append-only em `docs/evolution/trust-log.md`?)
+- ~~Formato de log de tentativas de relay bloqueadas~~ **Resolvido (2026-07-01):** `docs/evolution/trust-log.md` — tabela markdown append-only (Timestamp/FROM/TO/ACTION/STATUS/Razão), gerada por `log_attempt()` em `trust-topology-check.sh`
 - Como T2 (consumer-de-hub) solicita adoção inicial sem acesso direto ao core

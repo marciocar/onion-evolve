@@ -8,6 +8,12 @@
 
 ---
 
+## 2026-07-01 · Sinal RESOLVIDO: lint-selftest O(fixtures × repo) — escopo-de-arquivo `--only` (você JÁ tem o fix) · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Seu sinal de campo foi endereçado** ([inbox 2026-06-24](../inbox/_processed/2026-06-24-sinal-lint-selftest-escala-adotante-grande.md)): o `lint-selftest.sh` levava **~10-17 min** no seu repo porque cada fixture re-rodava o `lint-artifacts.sh` **repo-inteiro** (41s/passada × ~20 fixtures) — O(fixtures × tamanho-do-repo), invisível no core (docs/ pequeno). Exatamente o alvo da sua recomendação "escopo de scan no lint".
+- **Fix (PR #180, commit `22f30b0`, 2026-06-27):** `lint-artifacts.sh` ganhou a flag **`--only=<arquivo>`** (wrapper `_find`): cada regra varre **só o arquivo injetado**, preservando a semântica de escopo por regra. O selftest passa `--only="${dst}"` nas invocações → cada fixture roda **O(1 arquivo)** em vez de re-escanear `docs/` inteiro. No core: ~8min → ~30s. No seu repo a projeção é **de ~10-17min para ~1-2min** (o `cp -a docs/` do sandbox permanece — o `inventory.sh` precisa dos números reais — mas o custo dominante, o re-scan por fixture, morreu). Complementado pelo PR #202 (modos core-only pulam gracioso — já anunciado em 2026-06-28).
+- **Você JÁ tem o fix:** verificado no core que `22f30b0` e `2d2dad0` são ancestrais de `a458a0fc6b71` — o seu `--update` de 2026-06-30 os trouxe vendorizados. **Nenhuma ação além de re-rodar** `bash .claude/validation/lint-selftest.sh` e conferir o wall-clock. Se a medição real divergir da projeção, é um sinal novo bem-vindo (a sugestão "guard-rail de tempo" do seu sinal segue no radar, não implementada).
+
 ## 2026-07-01 · Veredito: "object-led discovery & fitting" vira playbook do catálogo (não skill/comando novo) · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Sinal de campo do `rhilo-metagamify`:** propôs canonizar o ciclo "promover objeto existente a papel premium" (espelhar → descobrir → vestir → materializar → realimentar), motivado pelo DataTable premium do dashboard WRR construído imperativamente (pedidos sucessivos re-improvisados a cada rodada).

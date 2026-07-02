@@ -929,6 +929,111 @@ run_de_identification_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo trust-topology — exercita .claude/validation/trust-topology-check.sh
+# (RFC-0003 §2.5). Self-contained (mktemp --repo → members.yaml e trust-log
+# ficam no sandbox; NUNCA toca o trust-log real). Cobre a regressão FED-2-0
+# (auditoria 2026-07-01): campos do bloco `trust:` a 6 espaços COM comentário
+# inline devem casar — o bug tornava a topologia granular sempre-falsa. E os
+# MODOS DE FALHA: lista vazia, trust unidirecional, standalone sem canal
+# lateral, membro inexistente.
+# ---------------------------------------------------------------------------
+run_trust_topology_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/trust-topology-check.sh"
+  if [ ! -f "${chk}" ]; then record_fail "trust-topology" "script ausente: ${chk}"; return; fi
+
+  local d="$(mktemp -d)"
+  mkdir -p "${d}/docs/evolution/federation"
+  # Schema FIEL ao members.yaml real: campos de trust a 6 espaços + comentário inline
+  cat > "${d}/docs/evolution/federation/members.yaml" <<'YAML'
+version: 2
+members:
+  - id: onion-evolve
+    role: source
+  - id: hub-a
+    role: hub
+    trust:
+      can_receive_from: [onion-evolve, hub-b]    # quem pode me mandar conselho
+      can_advise_to: [onion-evolve, hub-b]       # quem posso aconselhar
+      can_correct_to: [onion-evolve]             # quem posso propor correção
+      exposes_downstream: [t2-x]                 # meus sub-adotados
+  - id: hub-b
+    role: hub
+    trust:
+      can_receive_from: [onion-evolve, hub-a]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []                         # nenhum por padrão
+  - id: solo-c
+    role: standalone
+  - id: t2-x
+    role: consumer
+    parent: hub-a
+YAML
+
+  local rc
+  tt() { # tt <from> <to> <action> <exit-esperado> <label>
+    local want="$4" label="$5"; rc=0
+    bash "${chk}" --from "$1" --to "$2" --action "$3" --repo "${d}" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -eq "${want}" ]; then record_pass "trust: ${label}"
+    else record_fail "trust: ${label}" "esperava exit ${want}, veio ${rc}"; fi
+  }
+
+  # Regressão FED-2-0: campo populado (6 espaços + comentário inline) DEVE casar
+  tt hub-a onion-evolve correct 0 "can_correct_to populado autoriza (regressão FED-2-0)"
+  tt hub-a t2-x relay           0 "hub→T2 via exposes_downstream"
+  tt hub-a hub-b advise         0 "hub↔hub bidirecional autoriza"
+  # Modos de falha: a topologia granular deve continuar BLOQUEANDO
+  tt hub-b onion-evolve correct 1 "can_correct_to vazio bloqueia"
+  tt hub-b hub-a advise         1 "trust unidirecional bloqueia"
+  tt solo-c hub-a relay         1 "standalone sem canal lateral"
+  tt hub-a hub-b correct        1 "correct peer exige core como broker"
+  # Regras por role (não podem regredir)
+  tt onion-evolve hub-a relay   0 "source tem autoridade universal"
+  tt hub-b onion-evolve advise  0 "inbox do core aberto p/ advise"
+  tt ghost hub-a relay          2 "membro inexistente → exit 2"
+  # Invariante de auditabilidade: toda tentativa logada (no sandbox, não no real)
+  if [ -f "${d}/docs/evolution/trust-log.md" ] && [ "$(grep -c '^|' "${d}/docs/evolution/trust-log.md")" -ge 10 ]; then
+    record_pass "trust: toda tentativa logada (sandbox via --repo)"
+  else record_fail "trust: log auditável" "trust-log.md do sandbox ausente/incompleto"; fi
+
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo onion-version — exercita a detecção de papel de onion-version.sh
+# (regressão FED-3-1 da auditoria 2026-07-01: o script emitia 'role: source'
+# HARDCODED, tornando inofensivo o guard de identidade do /meta:adopt em
+# instância adotada — o script é vendorizado para todo alvo). Self-contained:
+# copia o script p/ repo temp e varia a presença/conteúdo do stamp.
+# ---------------------------------------------------------------------------
+run_onion_version_selftests() {
+  local ov="${REPO_ROOT}/.claude/validation/onion-version.sh"
+  if [ ! -f "${ov}" ]; then record_fail "onion-version" "script ausente: ${ov}"; return; fi
+  local d out
+
+  # (a) repo-fonte (sem stamp) → role: source
+  d="$(mktemp -d)"; mkdir -p "${d}/.claude/validation"; cp "${ov}" "${d}/.claude/validation/"
+  git -C "${d}" init -q
+  out="$(bash "${d}/.claude/validation/onion-version.sh" | grep '^role:' || true)"
+  if [ "${out}" = "role: source" ]; then record_pass "onion-version: sem stamp → source"
+  else record_fail "onion-version: sem stamp" "esperava 'role: source', veio '${out}'"; fi
+
+  # (b) stamp role: adopted → adopted (e o guard do /meta:adopt ABORTA — regressão FED-3-1)
+  printf 'framework: onion\nsource_commit: abc123\nrole: adopted\n' > "${d}/.claude/.onion-version"
+  out="$(bash "${d}/.claude/validation/onion-version.sh" | grep '^role:' || true)"
+  if [ "${out}" = "role: adopted" ] \
+     && ! bash "${d}/.claude/validation/onion-version.sh" | grep -q '^role: source'; then
+    record_pass "onion-version: stamp adopted → guard do adopt aborta (regressão FED-3-1)"
+  else record_fail "onion-version: stamp adopted" "esperava 'role: adopted', veio '${out}'"; fi
+
+  # (c) stamp presente SEM campo role → adopted por definição (nunca 'source' por omissão)
+  printf 'framework: onion\n' > "${d}/.claude/.onion-version"
+  out="$(bash "${d}/.claude/validation/onion-version.sh" | grep '^role:' || true)"
+  if [ "${out}" = "role: adopted" ]; then record_pass "onion-version: stamp sem role → adopted (fail-safe)"
+  else record_fail "onion-version: stamp sem role" "esperava 'role: adopted', veio '${out}'"; fi
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -983,6 +1088,12 @@ run_corelay_selftests
 
 # Modo de-identification — baseline determinístico (adapter regex da abstração SDAAL): redação + round-trip + no-op + determinismo.
 run_de_identification_selftests
+
+# Modo trust-topology — topologia de confiança RFC-0003 (regressão FED-2-0 + modos de falha; sandbox via --repo).
+run_trust_topology_selftests
+
+# Modo onion-version — detecção de papel source/adopted via stamp (regressão FED-3-1; repo temp).
+run_onion_version_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário

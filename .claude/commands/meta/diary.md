@@ -101,7 +101,7 @@ echo "Criado: $FILEPATH"
 
 Abrir o arquivo para o maestro completar Signal, Evidence e Next crumb.
 
-**Após preenchimento:** rodar `diary index` para atualizar o INDEX.md.
+**Após preenchimento:** rodar `diary index` para atualizar o index.md.
 
 ---
 
@@ -116,7 +116,7 @@ DIARY_DIR="$REPO/.claude/diary"
 # --type learning|decision|error|innovation|observation
 # --sharable (só entradas com share_with != [] ou classification em [peer,public,collective])
 
-find "$DIARY_DIR" -name "*.md" ! -name "INDEX.md" | sort -r | while read f; do
+find "$DIARY_DIR" -name "*.md" ! -name "index.md" | sort -r | while read f; do
   DATE=$(awk '/^date:/{print $2}' "$f")
   TYPE=$(awk '/^type:/{print $2}' "$f")
   CLASS=$(awk '/^classification:/{print $2}' "$f")
@@ -141,7 +141,7 @@ DIARY_DIR="$REPO/.claude/diary"
 OUTBOX="$REPO/docs/evolution/outbox/diary"
 mkdir -p "$OUTBOX"
 
-find "$DIARY_DIR" -name "*.md" ! -name "INDEX.md" | while read f; do
+find "$DIARY_DIR" -name "*.md" ! -name "index.md" | while read f; do
   SHARE=$(awk '/^share_with:/{print}' "$f" | grep -v '\[\]')
   CLASS=$(awk '/^classification:/{print $2}' "$f")
   
@@ -165,13 +165,13 @@ Se `--dry-run`: listar sem copiar.
 
 ---
 
-### `index` — Regenerar INDEX.md
+### `index` — Regenerar index.md
 
 ```bash
 bash "$(git rev-parse --show-toplevel)/.claude/validation/diary-index.sh"
 ```
 
-O INDEX.md é o Tier-0 pointer do diário (~1KB). O Transformer lê o índice, não o diário inteiro.
+O index.md é o Tier-0 pointer do diário (~1KB). O Transformer lê o índice, não o diário inteiro.
 Formato do índice: tabela com date, type, classification, slug, review_after — ordenada por data desc.
 
 ---
@@ -205,7 +205,7 @@ Formato do índice: tabela com date, type, classification, slug, review_after �
 
 ```
 .claude/diary/
-├── INDEX.md                      # Tier-0 pointer (~1KB) — gerado por diary-index.sh
+├── index.md                      # Tier-0 pointer (~1KB) — gerado por diary-index.sh
 ├── 2026-07-01-oauth-learning.md
 ├── 2026-07-02-sdaal-decision.md
 └── ...
