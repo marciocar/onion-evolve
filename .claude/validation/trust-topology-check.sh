@@ -71,6 +71,9 @@ get_role() {
 }
 
 # Verificar se ID está em uma lista YAML (campo: [a, b, c])
+# Indentação LIVRE (os campos de trust vivem a 6 espaços, aninhados sob `trust:`)
+# e comentário inline removido ANTES da comparação — sem isso o match é sempre-falso
+# (bug FED-2-0 da auditoria 2026-07-01: topologia granular inteira inoperante).
 id_in_list() {
   local ID="$1"
   local MEMBER_ID="$2"
@@ -78,8 +81,10 @@ id_in_list() {
   # Extrai o bloco do membro e verifica o campo
   awk -v id="$MEMBER_ID" -v field="$FIELD" -v search="$ID" '
     /^  - id:/ { found = ($NF == id); next }
-    found && $0 ~ "^    " field ":" {
+    found && $0 ~ ("^[ ]+" field ":") {
       line = $0
+      # Remove comentário inline PRIMEIRO (senão vira lixo colado ao último elemento)
+      sub(/#.*$/, "", line)
       # Remove espaços e colchetes; verifica se search está como elemento
       gsub(/[[:space:]]/, "", line)
       gsub(/^[^:]+:/, "", line)
@@ -90,7 +95,6 @@ id_in_list() {
       }
       exit
     }
-    found && /^  - id:/ && $NF != id { exit }
   ' "$MEMBERS"
 }
 

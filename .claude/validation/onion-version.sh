@@ -37,19 +37,31 @@ framework="$(git remote get-url origin 2>/dev/null | sed -E 's#.*/##; s#\.git$##
 commit="$(git rev-parse --short=12 HEAD 2>/dev/null || echo unknown)"
 commit_date="$(git log -1 --format=%cd --date=short 2>/dev/null || echo unknown)"
 
+# Papel: o repo-FONTE não carrega stamp committado; um repo ADOTADO carrega
+# .claude/.onion-version (escrito pelo /meta:adopt). A PRESENÇA do stamp é a
+# evidência de adoção — antes este script emitia 'role: source' hardcoded, o que
+# tornava o guard de identidade do /meta:adopt inofensivo em instância adotada
+# (o script é vendorizado; bug FED-3-1 da auditoria 2026-07-01).
+role="source"
+STAMP="${REPO_ROOT}/.claude/.onion-version"
+if [ -f "${STAMP}" ]; then
+  role="$(awk '/^role:/{print $2; exit}' "${STAMP}")"
+  [ -n "${role}" ] || role="adopted"   # stamp presente sem campo role → adotado por definição
+fi
+
 FORMAT="${1:---yaml}"
 
 case "${FORMAT}" in
   --json)
-    printf '{"framework":"%s","commit":"%s","commit_date":"%s","role":"source"}\n' \
-      "${framework}" "${commit}" "${commit_date}"
+    printf '{"framework":"%s","commit":"%s","commit_date":"%s","role":"%s"}\n' \
+      "${framework}" "${commit}" "${commit_date}" "${role}"
     ;;
   --yaml)
     cat <<YAML
 framework: ${framework}
 commit: ${commit}
 commit_date: ${commit_date}
-role: source
+role: ${role}
 YAML
     ;;
   *)
