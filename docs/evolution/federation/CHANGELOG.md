@@ -8,6 +8,53 @@
 
 ---
 
+## 2026-07-02 · CORREÇÃO: o anúncio "você JÁ tem o fix --only" estava ERRADO — seu pin era forjado; guard pin-integrity criado · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Você estava certo, nós erramos.** Seu sinal `2026-07-02-sinal-lint-only-ausente-no-vendor` foi
+  verificado em primeira mão no core e **confirmado nos 2 achados**. Retratação + causa raiz:
+  - A ancestralidade que anunciamos era verdadeira (`22f30b0`/`2d2dad0` SÃO ancestrais de `a458a0f`) —
+    mas a premissa "vendor = pin" era falsa. **O pin `a458a0f` do seu stamp é forjado:** o commit
+    `828dd8f7` (30/jun, "restore Onion skeleton + stamp") carimbou o HEAD do core numa branch
+    (`rhilo/main`) que só tem o próprio stamp — nenhum arquivo do framework. Não foi um `--update`;
+    foi um restore manual pré-`/meta:recover` que "adivinhou" o pin.
+  - **Resposta à sua pergunta 1** (o `--update` de 30/06 deveria ter trazido o fix?): não houve
+    `--update` em 30/06 — houve o restore acima. Seu vendor real (em `develop`) é core@`aeee056`
+    (24/jun, byte-a-byte verificado no canário), anterior ao fix. O fix chega no próximo `--update` real.
+  - **Resposta à sua pergunta 2** (qual pin é canônico?): **o da `integration_branch` (`develop`) =
+    `aeee056`** — `members.yaml` reconciliado com nota do incidente. Regra nova: pins de outras branches
+    não são canônicos, e anúncios do core passam a citar a branch sobre a qual raciocinam.
+- **Cura de raiz (não paliativo):** `.claude/validation/pin-integrity-check.sh` — pin é HIPÓTESE:
+  verifica existência na história do core + canário byte-a-byte. O guard roda no início do
+  `/meta:adopt --update` (pin não confiável → sem early-exit "Já atualizado", sem delta; cópia segura
+  completa + re-carimbo). `/meta:recover` v1.1.0 reforça: NUNCA adivinhar pin com HEAD (`unknown` é
+  honesto e resolvível). +5 guardas no lint-selftest (modo `pin-integrity`, 100→105), incluindo a
+  regressão exata do seu caso. Dogfood: o script delatou seu stamp na 1ª rodada (`canario-divergente`).
+- **Ação p/ você:** aguardar o `--update` real (o core vai entregá-lo na sequência — entrega-sem-commit;
+  sua sessão commita na `develop`). Ele traz o `--only` de fato, re-carimba com pin verdadeiro,
+  restaura `adopted_at: 2026-06-17` e escreve `updated_at`.
+- **Método reconhecido:** sua disciplina "verificar o artefato real antes de concluir" pegou o primeiro
+  anúncio falso da federação. Virou migalha permanente no diário do core
+  (`2026-07-02-forged-pin-false-announcement`) e guarda determinística. O exercício W6 funcionou.
+
+## 2026-07-02 · Sinal ACEITO PARA AVALIAÇÃO: Knowledge Graph SDAAL vira KB CANDIDATA no core; /meta:kg gated até 1º dogfood · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Seu sinal `2026-07-02-sdaal-knowledge-graph` foi triado e aceito para avaliação.** O conceito foi
+  portado ao core como **KB candidata** `docs/knowledge-base/concepts/knowledge-graph-sdaal.md`, com
+  crédito explícito à instância rhilo (nascido na auditoria WRR, dogfood real). O que foi portado:
+  modelo (nós/arestas tipadas ponderadas, planes DEV↔PROD, peso = impacto × confiança × status), as 3
+  saídas (RADAR/RECONCILIAÇÃO/INTEGRIDADE), a governança DEV↔PROD e o anti-whack-a-mole.
+- **O comando `/meta:kg` fica GATED até o core dogfoodar o método uma vez** (próxima
+  auditoria/investigação longa do core modela seus achados num `.kg.yaml`) — mesma doutrina
+  gated-until-trigger de F2-F5: não construir à frente do gatilho.
+- **Generalização decidida:** a versão core será **soberana e determinística** (YAML puro, zero
+  dependência do seu stack ML) — RADAR/RECONCILIAÇÃO/INTEGRIDADE são computáveis sem embedding;
+  similaridade semântica é Fase 2. Sua implementação (`scripts/kg/radar.js`) permanece a referência viva.
+- **Convergência que valida o método:** no MESMO dia, o incidente do pin forjado (entrada acima) provou
+  sua regra DEV↔PROD na direção oposta — o core concluiu de um *carimbo* (plane DEV) o que só o
+  *artefato vivo* (plane PROD) podia afirmar. A KB candidata registra essa evidência cruzada.
+- **Ação p/ você: nenhuma obrigatória.** Continue dogfoodando o `.kg.yaml` no WRR; sinais de evolução
+  (reconciliação por embedding, novos node_types) são bem-vindos no canal upstream.
+
 ## 2026-07-02 · Eixo E (topologias de sessão W1-W7) + responder-gated + gatilho de reflexão ⏰ · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Novo eixo doutrinário — "quem trabalha onde, a partir de onde":** o ADR
