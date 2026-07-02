@@ -87,17 +87,24 @@ interface <Name> { /* shape */ }
 
 ## 3. Manifesto (`members.yaml`)
 
-Schema mínimo estável (o `id` sobrevive a rename — review #24):
+Schema mínimo estável (o `id` sobrevive a rename — review #24). **v2 desde a RFC-0003** (2026-07-01):
+o `role` de membro usa a hierarquia de tiers (`source | hub | standalone | consumer`), que **substituiu**
+o binário `producer | consumer | lib`:
 
 ```yaml
-version: 1
+version: 2
 members:
   - id: m-7a1c            # estável; chave de correlação
     name: repo-a
     path: ./relative-or-config-path   # DADO de instância (não hardcode em comando — ajuste 2a)
     remote: git@...                    # opcional
-    role: producer                     # producer | consumer | lib
+    role: hub                          # source (T0 core) | hub (T1) | standalone (T3) | consumer (T2, exige parent:)
+    parent: <id-do-core-ou-hub>        # obrigatório para hub/standalone/consumer (RFC-0003 §2.1)
 ```
+
+> ⚠️ **Não confundir os namespaces:** o `role:` acima é o papel do **membro** na rede (tier RFC-0003).
+> Os campos `producer:`/`consumers:` do **contrato** (`contracts/<id>.md`, §2 acima) são um eixo
+> **ortogonal** — papel por contrato — e permanecem inalterados pela RFC-0003.
 
 > **Ajuste 2a:** `path` é **dado de configuração** lido do `members.yaml` — comandos e scripts do
 > framework **nunca** embutem caminho absoluto. Resolução é por argumento / manifesto / path relativo.
