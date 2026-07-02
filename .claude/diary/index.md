@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 6 entradas · **Stale:** 0 · **Compartilháveis:** 6
+**Total:** 7 entradas · **Stale:** 0 · **Compartilháveis:** 7
 
 Gerado em: 2026-07-02
 
@@ -15,6 +15,7 @@ Gerado em: 2026-07-02
 | 2026-07-02 | decision | public 📤 | work-models-eixo-e-decision | 2026-09-30 |
 | 2026-07-02 | learning | public 📤 | sovereign-lazy-triggers-research | 2026-09-30 |
 | 2026-07-02 | error | public 📤 | live-session-collision-farol | 2026-09-30 |
+| 2026-07-02 | learning | public 📤 | intelligent-breadcrumbs-research | 2026-10-02 |
 | 2026-07-02 | error | public 📤 | forged-pin-false-announcement | 2026-09-30 |
 | 2026-07-01 | decision | public 📤 | federation-usage-modes-decision | 2026-09-29 |
 | 2026-07-01 | learning | public 📤 | audit-dogfood-finds-code-bugs | 2026-09-29 |
