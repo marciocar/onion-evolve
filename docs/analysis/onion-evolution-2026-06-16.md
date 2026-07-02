@@ -2,14 +2,22 @@
 title: Onion Evolution Backlog — 2026-06-16
 date: 2026-06-16
 author: Sistema Onion (assistido por IA — /meta:evolve)
-status: backlog-ativo
+status: executado-e-superseded   # blockers #1-#6 executados (PRs #57/#69/#82, mesmo dia); backlog ativo atual = onion-evolution-2026-06-25.md
 scope: framework-template-instalavel
 run_id: wf_1088017b-b73
 supersedes_active_backlog: onion-evolution-2026-06-15.md
+superseded_by: onion-evolution-2026-06-25.md
 note: "2026-06-15 é RETIDO (não removido) — virou âncora de citação dos materiais/identidade (§0 métricas). Ver §7."
 ---
 
 # Onion Evolution Backlog — 2026-06-16
+
+> **Nota de curadoria (2026-07-01, auditoria de federação item #14):** este backlog foi **executado 26
+> minutos depois de gerado** e nunca anotado. Itens #1–#5 resolvidos no PR #69 (`c810ee6`, 2026-06-16
+> 07:27) + guard no PR #82; #6 era stale já na origem (fan-out presente desde o PR #57). O alerta
+> transversal 1 ("MCP-first NÃO executado") e os próximos passos 🔴 1–2 foram concluídos nos mesmos PRs.
+> **Permanecem abertos apenas #7 e #8** (revalidação dos KBs de spec-driven development — ver
+> `/meta:kb-freshness`). O backlog ativo é [onion-evolution-2026-06-25.md](onion-evolution-2026-06-25.md).
 
 ## 0. Sumário
 

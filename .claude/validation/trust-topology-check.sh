@@ -4,29 +4,36 @@
 # RFC-0003 §2.5 + invariante: toda tentativa logada (autorizada ou não).
 #
 # Uso:
-#   trust-topology-check.sh --from <id> --to <id> --action relay|advise|correct [--repo <path>]
+#   trust-topology-check.sh --from <id> --to <id> --action relay|advise|correct [--repo <path>] [--dry-run]
 #
 # Exit:
 #   0 = autorizado
 #   1 = bloqueado (mensagem explicativa em stderr + log)
 #   2 = erro de configuração (members.yaml ausente, campo faltando, etc.)
+#
+# --dry-run: imprime o veredito SEM gravar em trust-log.md — para dogfood/CI/
+#            exploração. Sem a flag, toda invocação é logada (invariante RFC-0003
+#            "toda tentativa auditável"); com ela, o log de produção não mistura
+#            ruído de teste com sinal real (achado #10 da auditoria 2026-07-01).
 set -euo pipefail
 
 # --- Argumentos ---
 FROM_ID=""
 TO_ID=""
 ACTION=""
+DRY_RUN=0
 REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --from)   FROM_ID="$2";  shift 2 ;;
-    --to)     TO_ID="$2";    shift 2 ;;
-    --action) ACTION="$2";   shift 2 ;;
-    --repo)   REPO="$2";     shift 2 ;;
+    --from)    FROM_ID="$2";  shift 2 ;;
+    --to)      TO_ID="$2";    shift 2 ;;
+    --action)  ACTION="$2";   shift 2 ;;
+    --repo)    REPO="$2";     shift 2 ;;
+    --dry-run) DRY_RUN=1;     shift ;;
     *)
       echo "ERROR: argumento desconhecido: $1" >&2
-      echo "Uso: $0 --from <id> --to <id> --action relay|advise|correct [--repo <path>]" >&2
+      echo "Uso: $0 --from <id> --to <id> --action relay|advise|correct [--repo <path>] [--dry-run]" >&2
       exit 2
       ;;
   esac
@@ -110,10 +117,15 @@ get_member_role() {
   echo "$ROLE"
 }
 
-# --- Log de tentativa (auditável — todo relay logado) ---
+# --- Log de tentativa (auditável — todo relay logado; --dry-run não grava) ---
 log_attempt() {
   local STATUS="$1"
   local REASON="$2"
+
+  if [ "$DRY_RUN" = "1" ]; then
+    echo "   (dry-run: veredito ${STATUS} NÃO gravado em trust-log.md)" >&2
+    return 0
+  fi
 
   mkdir -p "$(dirname "$TRUST_LOG")"
 

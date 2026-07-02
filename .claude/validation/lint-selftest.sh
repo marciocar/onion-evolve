@@ -995,6 +995,14 @@ YAML
     record_pass "trust: toda tentativa logada (sandbox via --repo)"
   else record_fail "trust: log auditável" "trust-log.md do sandbox ausente/incompleto"; fi
 
+  # --dry-run: mesmo veredito, NADA gravado (log não nasce num sandbox limpo)
+  local d2; d2="$(mktemp -d)"; cp -r "${d}/docs" "${d2}/docs"; rm -f "${d2}/docs/evolution/trust-log.md"
+  rc=0; bash "${chk}" --from hub-a --to onion-evolve --action correct --repo "${d2}" --dry-run >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ ! -f "${d2}/docs/evolution/trust-log.md" ]; then
+    record_pass "trust: --dry-run dá veredito sem gravar no log"
+  else record_fail "trust: --dry-run" "esperava exit 0 sem trust-log.md; exit=${rc}, log $( [ -f "${d2}/docs/evolution/trust-log.md" ] && echo criado || echo ausente )"; fi
+  rm -rf "${d2}"
+
   rm -rf "${d}"
 }
 

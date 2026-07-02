@@ -30,7 +30,7 @@ members:
     remote: github.com/marciocar/metagamify
     local_path: "/home/marciocar/rhilo-metagamify"
     onion_version: a458a0fc6b71   # espelha .claude/.onion-version; sync 2026-07-01
-    adopted_at: 2026-06-17        # 1ª adoção (o stamp do adotante re-carimba no --update: lá consta 2026-06-30 — semântica a unificar, ver audit 2026-07-01 item #5)
+    adopted_at: 2026-06-17        # 1ª adoção (semântica única desde o fix do audit #5: --update preserva adopted_at + escreve updated_at; o stamp do rhilo carrega 2026-06-30 por re-carimbo pré-fix — o próximo --update restaura daqui)
     mode: legacy              # greenfield | legacy | regulated
     personality_summary: "Engine de metagamificação modular; especialista Nx + Asana; co-evolução ativa"  # seed manual pré-F2 — substituir no 1º /meta:personality-sync real
     specializations: [gamification, nx-monorepo, asana-integration, metagamification]
@@ -46,8 +46,10 @@ members:
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
-#    role: hub | standalone   # hub se terá sub-adotados; standalone se adota core diretamente sem sub-adotados
-#    parent: onion-evolve
+#    role: hub | standalone | consumer   # hub = terá sub-adotados; standalone = adota core direto sem sub-adotados; consumer = T2, adota um HUB (não o core)
+#    parent: onion-evolve      # p/ hub/standalone; um T2 (role: consumer) usa parent: <id-do-hub> — MAS a doutrina de
+#                              # onboarding de T2 (quem dirige a adoção, o que o hub expõe) está ABERTA (RFC-0003 §5 +
+#                              # audit 2026-07-01 #11): NÃO onboardar um consumer antes de fechá-la
 #    remote: github.com/<org>/<repo>
 #    local_path: "<path-absoluto-no-filesystem-do-maestro>"
 #    onion_version: <commit-curto>   # = .claude/.onion-version do projeto após /meta:adopt

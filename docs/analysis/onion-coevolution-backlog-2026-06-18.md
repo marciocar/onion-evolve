@@ -1,8 +1,8 @@
 ---
-title: 'Backlog de co-evolução — pendências em aberto (jornada de 2026-06-18)'
+title: 'Backlog de co-evolução — jornada de 2026-06-18 (RESOLVIDO)'
 date: 2026-06-18
 type: evolution-backlog
-status: aberto
+status: resolvido   # todos os 7 itens ✅ entregues; curadoria 2026-07-01 (audit federação #14) — removível per analysis/README.md quando os links de entrada (co-announce.md, KBs) forem re-apontados
 origin: sessão de co-evolução (inbox triage + /meta:adopt --update fix #99)
 ---
 
@@ -64,7 +64,7 @@ origin: sessão de co-evolução (inbox triage + /meta:adopt --update fix #99)
 4. ✅ **ENTREGUE (2026-06-22) — RFC-0002, veredito profundo da camada de meta-estratégia.** O core escreveu
    [`rfc-0002-meta-strategy-verdict.md`](../evolution/rfc/rfc-0002-meta-strategy-verdict.md) em resposta ao
    ack `2026-06-17-veredito-strategy-layer.md`. **Veredito:** catálogo-first **aceito como doutrina**
-   (materialização diferida — estender `onion-patterns`; blip #9→trial); reposicionamento **ratificado** via
+   (materialização diferida — estender `onion-patterns`; blip #9→trial — **desde então MATERIALIZADO**: PR #164 / `0dcdc47`, 2026-06-24, 5 playbooks em `onion-patterns`); reposicionamento **ratificado** via
    distribuição por camadas (ADR FASE-0 + BSL = follow-up; blip #10→adopt). Volta ao adotante por fluxo A
    (CHANGELOG + `/meta:co-announce`) para mover os blips no radar dele.
    - ✅ **Coerência resolvida:** o sinal está em `inbox/_processed/` — com o RFC-0002 existindo, o

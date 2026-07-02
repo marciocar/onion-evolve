@@ -428,8 +428,12 @@ git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
   ```bash
   SRC_ID="$(bash "$SOURCE_ROOT/.claude/validation/onion-version.sh")"   # novo commit/date
   # Reusar o heredoc da Fase 5 mapeando commit→source_commit e commit_date→source_commit_date,
-  # PRESERVANDO adopted_from/mode/integration_branch do stamp antigo; atualizar source_commit/date
-  # + adopted_at=$(date +%F). (Se o stamp antigo NÃO tiver integration_branch — adoção pré-1.6.0 ou sem
+  # PRESERVANDO adopted_from/mode/integration_branch E adopted_at do stamp antigo; atualizar
+  # source_commit/date + updated_at=$(date +%F).
+  # ⚠️ adopted_at NUNCA é re-carimbado: registra a 1ª adoção (semântica única — audit 2026-07-01 #5);
+  # a data de cada update vive em updated_at. Se o stamp antigo tiver perdido o adopted_at original
+  # (re-carimbo pré-fix), restaurar do members.yaml do core (campo adopted_at do membro).
+  # (Se o stamp antigo NÃO tiver integration_branch — adoção pré-1.6.0 ou sem
   # escolha explícita —, PRESERVAR a ausência: não congelar um valor; a resolução detecta a cada PR. O
   # passo (3) do Procedimento ainda seta o git config local de conveniência a partir do valor resolvido.)
   ```
