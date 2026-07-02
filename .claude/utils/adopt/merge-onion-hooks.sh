@@ -10,7 +10,10 @@
 #             um adotante com settings.json próprio recebia os SCRIPTS dos hooks
 #             mas não o REGISTRO → o aviso 📬 não disparava.
 #
-# Mecânica  : Para cada evento (SessionStart, PreCompact), garante que cada
+# Mecânica  : Para cada evento COM HOOKS NA FONTE (derivado de $src.hooks|keys —
+#             não hardcoded; regressão 2026-07-02: a lista fixa [SessionStart,
+#             PreCompact] deixaria UserPromptSubmit/SessionEnd do farol de sessão
+#             fora da distribuição), garante que cada
 #             entrada de hook da FONTE esteja presente no ALVO. "Presente" =
 #             existe no alvo um hook com o MESMO .command (os commands Onion são
 #             canônicos e idênticos após a cópia do manifesto — bash .claude/
@@ -54,7 +57,7 @@ jq -n \
   --slurpfile s "${SRC}" \
   --slurpfile t "${TGT}" '
   ($s[0]) as $src | ($t[0]) as $tgt |
-  reduce ["SessionStart", "PreCompact"][] as $ev ($tgt;
+  reduce (($src.hooks // {}) | keys[]) as $ev ($tgt;
     # commands Onion já presentes no alvo, para este evento
     ([ (.hooks[$ev] // [])[].hooks[]?.command ]) as $present
     # entradas de hook da fonte (achatando os grupos) ainda ausentes no alvo

@@ -1042,6 +1042,78 @@ run_onion_version_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo session-beacon — exercita o FAROL DE SESSÃO (validation/session-beacon.sh
+# + hooks/session-beacon-hook.sh). Incidente 2026-07-02: sessão W1 fez checkout
+# num repo com sessão W2 viva — I3 inclui sessões, não só commits. O farol é
+# sinal (advisory), não trava. Self-contained: repo git em mktemp.
+# ---------------------------------------------------------------------------
+run_session_beacon_selftests() {
+  local sb="${REPO_ROOT}/.claude/validation/session-beacon.sh"
+  local hk="${REPO_ROOT}/.claude/hooks/session-beacon-hook.sh"
+  if [ ! -f "${sb}" ]; then record_fail "session-beacon" "script ausente: ${sb}"; return; fi
+  local d out rc
+
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  mkdir -p "${d}/.claude/validation" "${d}/.claude/hooks"
+  cp "${sb}" "${d}/.claude/validation/"; [ -f "${hk}" ] && cp "${hk}" "${d}/.claude/hooks/"
+
+  # (a) up cria farol com campos + exclude local (não commitável) idempotente
+  bash "${sb}" up "${d}" "sess-alpha" "core-hat"
+  bash "${sb}" up "${d}" "sess-alpha" "core-hat"
+  if [ -f "${d}/.claude/beacons/sess-alpha.beacon" ] \
+     && grep -q '^hat: core-hat' "${d}/.claude/beacons/sess-alpha.beacon" \
+     && [ "$(grep -cx '.claude/beacons/' "${d}/.git/info/exclude")" = "1" ]; then
+    record_pass "session-beacon: up cria farol + exclude local idempotente"
+  else record_fail "session-beacon: up" "farol/exclude errados em ${d}"; fi
+
+  # (b) check com farol VIVO alheio → exit 1 e lista 🕯️ (regressão colisão W1×W2)
+  rc=0; out="$(bash "${sb}" check "${d}")" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q '🕯️ VIVA: sess-alpha'; then
+    record_pass "session-beacon: check detecta sessão viva alheia → exit 1 (regressão W1×W2)"
+  else record_fail "session-beacon: check vivo" "esperava exit 1 + 🕯️; out='${out}' rc=${rc}"; fi
+
+  # (c) --ignore da própria sessão → exit 0 (sessão não se auto-bloqueia)
+  rc=0; bash "${sb}" check "${d}" --ignore "sess-alpha" >/dev/null || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "session-beacon: --ignore próprio farol → exit 0"
+  else record_fail "session-beacon: ignore" "esperava exit 0, veio ${rc}"; fi
+
+  # (d) farol STALE (refreshed_at antigo) → listado como stale, exit 0 (sinal, não trava)
+  sed -i 's/^refreshed_at:.*/refreshed_at: 1000000/' "${d}/.claude/beacons/sess-alpha.beacon"
+  rc=0; out="$(bash "${sb}" check "${d}")" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '(stale) sess-alpha'; then
+    record_pass "session-beacon: stale não bloqueia (sessão morta não trava o repo)"
+  else record_fail "session-beacon: stale" "esperava exit 0 + stale; out='${out}' rc=${rc}"; fi
+
+  # (e) sweep remove stale; down remove vivo → check limpo
+  bash "${sb}" sweep "${d}"
+  bash "${sb}" up "${d}" "sess-beta"
+  bash "${sb}" down "${d}" "sess-beta"
+  rc=0; out="$(bash "${sb}" check "${d}")" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ] && [ ! -f "${d}/.claude/beacons/sess-alpha.beacon" ]; then
+    record_pass "session-beacon: sweep+down limpam → check silencioso exit 0"
+  else record_fail "session-beacon: sweep/down" "esperava vazio+0; out='${out}' rc=${rc}"; fi
+
+  # (f) hook: SessionStart com session_id acende farol; com OUTRO vivo → aviso 🕯️; exit 0 sempre
+  if [ -f "${hk}" ]; then
+    bash "${sb}" up "${d}" "sess-other"
+    rc=0; out="$(cd "${d}" && printf '{"session_id":"sess-self"}' | bash .claude/hooks/session-beacon-hook.sh up)" || rc=$?
+    if [ "${rc}" -eq 0 ] && [ -f "${d}/.claude/beacons/sess-self.beacon" ] \
+       && printf '%s' "${out}" | grep -q 'OUTRA sessão viva'; then
+      record_pass "session-beacon: hook acende farol + avisa colisão no boot (exit 0)"
+    else record_fail "session-beacon: hook" "esperava farol+aviso+0; out='${out}' rc=${rc}"; fi
+
+    # (g) hook sem session_id (harness antigo) → no-op silencioso exit 0
+    rc=0; out="$(cd "${d}" && printf '{}' | bash .claude/hooks/session-beacon-hook.sh up)" || rc=$?
+    if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+      record_pass "session-beacon: hook sem session_id → no-op silencioso"
+    else record_fail "session-beacon: hook no-op" "esperava vazio+0; out='${out}' rc=${rc}"; fi
+  else
+    record_fail "session-beacon" "hook ausente: ${hk}"
+  fi
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo pin-integrity — exercita .claude/validation/pin-integrity-check.sh (o
 # guard do /meta:adopt --update contra pin forjado — incidente 2026-06-30/rhilo:
 # stamp apontava HEAD do core, vendor era 6 dias mais velho, anúncio downstream
@@ -1211,6 +1283,9 @@ run_onion_version_selftests
 
 # Modo pin-integrity — pin do stamp é hipótese: guard do /meta:adopt --update (incidente rhilo 06-30; sandbox git).
 run_pin_integrity_selftests
+
+# Modo session-beacon — farol de sessão: I3 inclui sessões vivas (colisão W1×W2 de 2026-07-02; sandbox git).
+run_session_beacon_selftests
 
 # Modo mail-hook — "you have mail" + gatilho de reflexão ⏰ (motd silencioso, 3 sinais, exit 0; sandbox).
 run_mail_hook_selftests

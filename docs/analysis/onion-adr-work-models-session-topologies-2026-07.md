@@ -89,3 +89,33 @@ necessário e subdesenvolvido. O Onion o institui com gate humano.
   (cron rejeitado como base) — a registrar na próxima revisão da RFC.
 - O Onion está **à frente da literatura** no recorte drop-box cross-repo (nenhuma fonte mediu) — o
   trust-log + CHANGELOG + diário nos posicionam para publicar o post-mortem que falta (oportunidade, não compromisso).
+
+## 7. Adendo 2026-07-02 (mesmo dia, campo) — colisão W1×W2 e o FAROL DE SESSÃO
+
+**Incidente:** horas depois deste ADR, a primeira operação W1 real (sessão do core operando o rhilo
+por path para o `--update` + processamento co-evolução) fez `git checkout` na working tree do alvo
+**enquanto uma sessão W2 estava viva lá** (auditoria WRR em `audit/oraculo-integration`). Nada se
+perdeu (a sessão do alvo protegeu o próprio trabalho), mas ficou provado: **I3 ("um escritor por
+repo") inclui SESSÕES VIVAS, não só commits** — checar `git status` limpo não basta; a branch corrente
+é contexto de quem está trabalhando, e checkout alheio é interferência mesmo sem perder bytes.
+
+**Decisão — farol de sessão (session beacon), sinal e não trava:**
+
+1. **Mecanismo** (`.claude/validation/session-beacon.sh` + hook `session-beacon-hook.sh`): cada sessão
+   **acende** um farol no boot (`SessionStart`), **refresca** a cada prompt (`UserPromptSubmit`) e
+   **apaga** no fim (`SessionEnd`). Beacons vivem em `.claude/beacons/` e são **git-invisíveis**
+   (`.git/info/exclude` local ao clone — runtime state, nunca commitado).
+2. **Detecção de colisão no boot:** se ao acender há OUTRO farol fresco no repo, o hook avisa
+   🕯️ com branch/hat/idade — a topologia W3 (duas sessões no mesmo repo) deixa de ser invisível.
+3. **Disciplina W1 (cross-repo):** antes de checkout/escrita na working tree de repo alheio, rodar
+   `session-beacon.sh check <repo>` — exit 1 (farol vivo) = **parar e coordenar com o maestro**.
+   Entrega em `inbound/` (untracked, sem checkout) segue segura e dispensa o check.
+4. **Sinal, não trava:** farol stale (> `ONION_BEACON_TTL_MIN`, default 480min) é listado mas não
+   bloqueia — sessão morta sem cleanup não pode travar o repo; `sweep` limpa. O gate é humano (I3 +
+   ato 3), o farol só dá o dado que faltava.
+5. **Dupla serventia:** o mesmo farol responde à demanda de visibilidade do maestro ("você parece ser
+   muitos") — `check` em cada repo = mapa de quem está onde, com chapéu e idade.
+
+Guardas: lint-selftest modo `session-beacon` (7 casos, incl. regressão da colisão). Diário:
+`2026-07-02-live-session-collision-farol.md`. Chega aos adotantes vendorizado no próximo `--update`
+(hook registrado via merge idempotente do settings.json).
