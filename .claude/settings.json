@@ -38,6 +38,36 @@
             "command": "bash .claude/hooks/co-evolution-inbox-check.sh",
             "timeout": 5,
             "statusMessage": "Checando inbox de co-evolução (Onion)"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-beacon-hook.sh up",
+            "timeout": 5,
+            "statusMessage": "Acendendo farol de sessão (Onion)"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-beacon-hook.sh refresh",
+            "timeout": 5,
+            "statusMessage": "Refrescando farol de sessão (Onion)"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-beacon-hook.sh down",
+            "timeout": 5,
+            "statusMessage": "Apagando farol de sessão (Onion)"
           }
         ]
       }
