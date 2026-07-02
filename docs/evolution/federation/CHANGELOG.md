@@ -8,6 +8,27 @@
 
 ---
 
+## 2026-07-02 · Eixo E (topologias de sessão W1-W7) + responder-gated + gatilho de reflexão ⏰ · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Novo eixo doutrinário — "quem trabalha onde, a partir de onde":** o ADR
+  [`onion-adr-work-models-session-topologies-2026-07`](../../analysis/onion-adr-work-models-session-topologies-2026-07.md)
+  institui o **Eixo E** (7 topologias: W1 source-por-path · W2 sessão-do-alvo · W3 duas-sessões-mesmo-repo ·
+  W4 par local · W5 remoto · **W6 responder-gated** · W7 agendada 🔴 rejeitada como base). Decisões
+  fundamentadas em **pesquisa verificada** (deep-research, 24 claims 3-votos): cron vendor = serviço vivo +
+  autonomia-default → incompatível com o fluxo soberano; o padrão validado é **trigger lazy por sessão**.
+- **O que muda no seu vendor (próximo `--update`):**
+  - **Hook "you have mail" ganha o sinal ⏰:** migalhas do diário com `review_after` vencido aparecem no
+    boot (gatilho invariável de reflexão). +4 guardas no lint-selftest (modo `mail-hook`).
+  - **`/meta:co-evolve` v1.2.0 — Passo 3.5 (responder-gated, W6):** com 📬/📥/⏰ pendente, a sessão
+    **propõe o rascunho** (triagem/processamento/re-teste) e **para** para sua confirmação — ato 3 nunca
+    auto-executa.
+  - **`/meta:diary` v1.1.0 — sub-comando `review`:** migalha vencida é **RE-TESTADA contra evidência
+    atual** (válida→novo prazo; inválida→`superseded: true`, nunca apagada; parcial→reescrita). Antídoto
+    do risco nº1 documentado (reflexão falsa persistida → erro auto-reforçante).
+- **KB atualizada:** `federation-usage-modes.md` agora tem os **cinco eixos** (A-E) + tabela W1-W7 (§1.0).
+- **Ação p/ você: nenhuma obrigatória.** Tudo chega vendorizado no próximo `/meta:adopt --update`. Se seu
+  diário local tiver migalhas, o ⏰ passa a vigiá-las automaticamente.
+
 ## 2026-07-02 · RFC-0003 ACEITA — identidade federada, tiers e trust agora são doutrina (você é T1 hub) · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **A RFC-0003 (identidade federada e inteligência coletiva) saiu de `draft` → `accepted`** (2026-07-02,

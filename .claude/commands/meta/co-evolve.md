@@ -4,8 +4,8 @@ description: Orienta a sessão na co-evolução Onion core↔derivados — detec
 model: haiku
 category: meta
 tags: [co-evolution, inbox, bridge, federation, onboarding, sdaal]
-version: "1.1.0"
-updated: "2026-06-20"
+version: "1.2.0"
+updated: "2026-07-02"
 allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(bash .claude/validation/onion-version.sh)
 argument-hint: "(sem argumentos — lê o estado de co-evolução deste repo)"
 ---
@@ -59,6 +59,23 @@ Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente →
   **gerar o anúncio pronto-para-transportar** com [`/meta:co-announce`](co-announce.md) (produtor do
   doc-bridge: escreve na staging `federation/outbox/<id>/`; o maestro transporta ao `inbound/` do adotante).
 - **Registro** de quem adota: `docs/evolution/federation/members.yaml`.
+
+## Passo 3.5 — Propor rascunho (responder-gated, topologia W6)
+
+Havendo mensagem pendente (📬/📥) ou migalha vencida (⏰), **proponha — nunca execute**
+([ADR work-models](../../../docs/analysis/onion-adr-work-models-session-topologies-2026-07.md) §2:
+atos 1-2 automáticos; o ato 3 vira *propor→confirmar*):
+
+- **CORE com 📬:** redigir o **rascunho de triagem** (veredito: fix/feature/backlog/informativo + resposta
+  sugerida) e, se couber anúncio, o **esboço de entrada de CHANGELOG** — apresentar e **parar**. Só após o
+  maestro confirmar: registrar/anunciar (`/meta:co-announce`) e mover a mensagem (Passo 5).
+- **CONSUMIDOR com 📥:** redigir o **rascunho de processamento** (o que o anúncio pede, o que muda aqui,
+  ação proposta) e, se gerar sinal de volta, o **esboço de mensagem upstream** no próprio `inbox/` —
+  apresentar e **parar**. Só após confirmação: commitar/relayar (`/meta:co-relay`) e mover.
+- **⏰ (qualquer papel):** propor a sessão de **re-teste** das migalhas vencidas via `/meta:diary review`
+  (nunca re-carimbar sem re-testar — risco de reflexão falsa persistida).
+
+O rascunho nasce **no repo desta sessão** (ou como entrega-sem-commit) — I3 intacto.
 
 ## Passo 4 — Regras invariantes (sempre, qualquer papel)
 

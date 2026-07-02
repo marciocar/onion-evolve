@@ -77,6 +77,10 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
 ### Handoff — Dentro de um repo (sessões paralelas)
 *Duas sessões no mesmo repo não colidem.*
 - **git worktrees** (isolamento) + **um escritor por escopo** + **handoff commitado** (cada sessão registra o que fez antes de sair).
+- O handoff é uma das **7 topologias de sessão** (Eixo E, valores W1-W7 — quem trabalha onde, a partir de onde): a
+  taxonomia completa (source-por-path, sessão-do-alvo, responder-gated, ⏰ reflexão etc.) vive no
+  [ADR work-models](../analysis/onion-adr-work-models-session-topologies-2026-07.md) + KB
+  [federation-usage-modes §1.0](../knowledge-base/concepts/federation-usage-modes.md).
 
 ## Notificação & gerenciamento do inbox ("you have mail")
 

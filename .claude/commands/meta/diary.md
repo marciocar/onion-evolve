@@ -2,16 +2,17 @@
 name: diary
 description: |
   Gerencia o diário de aprendizado da instância Onion — sistema de breadcrumbs para o Transformer.
-  Cria, lista e exporta entradas estruturadas (learning/decision/error/innovation/observation) que
-  orientam a absorção correta do contexto em sessões futuras e entre instâncias federadas.
+  Cria, lista, exporta e RE-TESTA entradas estruturadas (learning/decision/error/innovation/observation)
+  que orientam a absorção correta do contexto em sessões futuras e entre instâncias federadas — o
+  sub-comando review é o gatilho invariável de reflexão (⏰ migalha vencida → re-testar, nunca re-carimbar).
   O diário é autobiografia viva: não registra o passado, orienta o futuro. Relacionado: /meta:co-relay,
   /meta:personality-sync (Fase 2, gated), RFC-0003.
 model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *) Bash(find *) Bash(awk *) Bash(grep *) Bash(sort *)
-argument-hint: "create | list [--classification <c>] [--type <t>] [--sharable] | export-sharable [--dry-run] | index"
+argument-hint: "create | list [--classification <c>] [--type <t>] [--sharable] | export-sharable [--dry-run] | index | review"
 category: meta
-version: "1.0.0"
-updated: "2026-07-01"
+version: "1.1.0"
+updated: "2026-07-02"
 ---
 
 # 🧅 /meta:diary — Diário de Aprendizado Onion
@@ -173,6 +174,25 @@ bash "$(git rev-parse --show-toplevel)/.claude/validation/diary-index.sh"
 
 O index.md é o Tier-0 pointer do diário (~1KB). O Transformer lê o índice, não o diário inteiro.
 Formato do índice: tabela com date, type, classification, slug, review_after — ordenada por data desc.
+
+---
+
+### `review` — Re-testar migalhas vencidas (gatilho invariável de reflexão)
+
+Quando o hook sinalizar **⏰** (entradas com `review_after` vencido), rodar o protocolo de re-teste —
+**nunca re-carimbar sem re-testar** (risco nº1 documentado: reflexão falsa persistida vira erro
+auto-reforçante — [ADR work-models §4](../../../docs/analysis/onion-adr-work-models-session-topologies-2026-07.md)):
+
+1. **Listar vencidas:** entradas com `review_after < hoje` (o `index.md` já as marca ⏰).
+2. **Re-testar cada uma contra evidência ATUAL** (não contra a memória da época): o Signal ainda é
+   verdadeiro? A Evidence ainda se sustenta? Verificar no filesystem/git/execução — não presumir.
+3. **Veredito (sempre confirmado pelo maestro — gate na absorção):**
+   - **Válida** → atualizar só `review_after` (+90 dias) e registrar 1 linha de re-teste no corpo
+     (`## Re-testada em <data>: <evidência>`).
+   - **Inválida** → adicionar `superseded: true` ao frontmatter + nota do porquê (nunca apagar — o
+     diário é história; o índice deixa de recomendá-la).
+   - **Parcial** → reescrever Signal/Evidence com o estado atual + novo `review_after`.
+4. **Regenerar o índice** (`diary index`).
 
 ---
 

@@ -14,8 +14,9 @@ Ao ler a tabela, não confunda:
 
 Quem roda ≠ pra onde o dado vai. Ex.: `/meta:co-deliver` **roda no core** mas o dado é **downstream** (vai para o adotante).
 
-> Estes dois eixos descrevem **cada comando**. Os eixos maiores — tier de federação (T0-T3), modo de adoção
-> e qual maquinaria vale em cada combinação — estão reconciliados na KB
+> Estes dois eixos descrevem **cada comando**. Os eixos maiores — tier de federação (T0-T3), modo de adoção,
+> **topologia de sessão (Eixo E, valores W1-W7: quem trabalha onde, a partir de onde)** e qual maquinaria vale em cada
+> combinação — estão reconciliados na KB
 > [federation-usage-modes.md](../knowledge-base/concepts/federation-usage-modes.md) (matriz canônica + gatilhos de graduação).
 
 ## Os 3 fluxos
