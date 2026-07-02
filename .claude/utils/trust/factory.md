@@ -47,10 +47,18 @@ resolve_trust_adapter() {
 
 ## Integração com trust-topology-check.sh
 
-O script determinístico chama a factory antes de verificar qualquer ação:
+> ⚠️ **Estado real (nota de honestidade — audit 2026-07-01 #17):** o `trust-topology-check.sh` de hoje é
+> uma **implementação simplificada pré-adapter** — as regras por tier vivem **inline** no script
+> (if/case) e ele **não** chama `resolve_trust_adapter()`. Os adapters em `adapters/` são o **design-alvo**
+> desta seção, não o código vigente. A refatoração para o caminho factory→adapter fica **gated pela F3**
+> (gate: primeiro relay peer real — RFC-0003 §4); refatorar antes seria construir à frente do gatilho.
+> Enquanto isso, a paridade comportamental script-inline ↔ regras dos adapters é vigiada pelo
+> lint-selftest (modo `trust-topology`, 11 guardas).
+
+Design-alvo (quando F3 abrir):
 
 ```bash
-# Em trust-topology-check.sh:
+# Em trust-topology-check.sh (futuro, F3):
 ADAPTER="$(resolve_trust_adapter "$REPO")"
 # Depois aplica as regras do adapter para decidir authorized=true|false
 ```
