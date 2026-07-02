@@ -38,10 +38,8 @@ related:
 - **`in-place` (efêmero) ⇒ sem tier.** Não instala `.claude/`, não carrega `role:`, não entra no
   members.yaml — está **fora da federação por construção** (decisão registrada, não lacuna).
 - A e C são **ortogonais**: qualquer cenário (greenfield/legacy/regulated) pode ocupar qualquer tier T1/T3.
-  A única combinação com lacuna doutrinária conhecida é `regulated` × classificação de dados do diário
-  (defaults conservadores não definidos — lacuna identificada na
-  [auditoria 2026-07-01](../../analysis/onion-federation-audit-2026-07-01.md) item #18; candidata a adendo
-  na revisão da RFC-0003).
+  O cruzamento `regulated` × classificação de dados tem doutrina própria (RFC-0003 §2.2, decisão
+  2026-07-02): default **`protected`**, promoção a `public`/`collective` só com revisão humana explícita.
 
 ### 1.1 Os três namespaces de "role" (fonte de metade da confusão)
 
@@ -65,8 +63,8 @@ Legenda (herdada do adoption-lifecycle): 🟢 implementado/vivo · 🟠 parcial/
 | Tier | Modos de adoção (eixos A+B) | Doc-bridge leve (co-evolve/announce/deliver/relay) | Federação formal (register/publish/check/status/rollback) | Identidade RFC-0003 (diary/personality/trust) |
 |---|---|---|---|---|
 | **T0 source** (core, `onion-evolve`) | — (não se auto-adota; é quem roda `/meta:adopt`) | 🟢 emissor de todos os fluxos; `co-announce`/`co-deliver` só rodam aqui | 🔒 seria o *producer* dos contratos que emitir | 🟢 diary implementado (F1; gate de 10 entradas pendente) · 🟠 personality (F2 a-desenhar) · 🟠 trust construído, bug de parsing pendente |
-| **T1 hub** (ex.: rhilo-metagamify) | greenfield/legacy/regulated × install — **sempre dirigido pelo Core** (hub-driven adoption sem doutrina; pendência RFC-0003 §5) | 🟢 `co-evolve`/`co-relay` ativos (caso 1-máquina); `co-relay --to peer` 🔒 (F3) | 🔒 | 🟠 bloco `trust:` no members.yaml; diary/personality do hub não rodaram |
-| **T2 consumer-de-hub** | **indefinido** — nenhum doc define que modo de adoção um T2 usa nem quem dirige (pergunta aberta RFC-0003 §5) | 🔒 fora do desenho atual | 🔒 | 🔒 tier só existe na RFC; template do members.yaml ainda não o expressa |
+| **T1 hub** (ex.: rhilo-metagamify) | greenfield/legacy/regulated × install — **sempre dirigido pelo Core** (hub-driven adoption = gatilho futuro; RFC-0003 §2.1, decisão 2026-07-02) | 🟢 `co-evolve`/`co-relay` ativos (caso 1-máquina); `co-relay --to peer` 🔒 (F3) | 🔒 | 🟠 bloco `trust:` no members.yaml; diary/personality do hub não rodaram |
+| **T2 consumer-de-hub** | **core-driven** (RFC-0003 §5, decisão 2026-07-02): maestro roda `/meta:adopt` do core + registra `parent: <hub-id>`; o hub não roda adopt | 🔒 fora do desenho atual (`co-relay --to peer` é F3) | 🔒 | 🔒 tier definido na RFC + template do members.yaml; nenhum T2 real ainda |
 | **T3 standalone** | greenfield/legacy/regulated × install, via Core direto | 🟢 idêntico ao T1, com `exposes_downstream` sempre vazio por definição | 🔒 | 🟠 igual ao T1 |
 | **in-place (efêmero)** | qualquer cenário × `--in-place` | — fora da rede por construção | — | — |
 
@@ -79,9 +77,10 @@ Legenda (herdada do adoption-lifecycle): 🟢 implementado/vivo · 🟠 parcial/
   emite upstream (`inbox/` próprio → `co-relay` para o core). O "hub" só se diferencia do standalone quando
   tiver sub-adotados (T2) — mecanismo ainda sem doutrina. Enquanto isso, opera na prática como standalone
   com potencial de crescer.
-- **T2 — consumer-de-hub:** puramente conceitual. Existe na RFC como tier, mas nenhum artefato operacional
-  (adopt, template, co-relay) o suporta. **Não onboardar um T2 antes de fechar a doutrina** (como ele adota,
-  quem dirige, o que o hub lhe expõe via `exposes_downstream`).
+- **T2 — consumer-de-hub:** doutrina fechada (RFC-0003 §5, decisão 2026-07-02): onboarda **via core**
+  (source-driven) com `parent: <hub-id>` registrado; o hub não roda adopt e a relação hub→T2 é só de
+  leitura (`exposes_downstream`). *Hub-driven adoption* é gatilho futuro (1º T2 real + dor de roteamento).
+  Nenhum T2 real existe ainda.
 - **T3 — standalone:** adota o core direto, sem sub-adotados; lê só o `public` do core; não vê outros
   membros. É o tier default para um novo adotante sem ambição de rede própria.
 - **Membro remoto (outra máquina):** qualquer tier T1/T3 **sem** `local_path` — os atalhos Carteiro-local
@@ -99,10 +98,10 @@ Consolidação dos gatilhos hoje espalhados em ≥4 docs, com o **estado real** 
 |---|---|---|---|
 | Doc-bridge → **Federação formal** (contratos + publish/check/status/rollback) | contrato que pode quebrar consumers **OU** ≥3-5 adotantes | RFC-0001 §gatilho; [ADR ledger](../../analysis/onion-adr-ledger-format-location-2026-06.md) | 🔒 corretamente desligada (1 adotante, 0 contratos); núcleo mecânico saudável (scripts + fixtures ✓) |
 | **F1 diary** → F2 | 10 entradas reais + 1 semana de dogfood | RFC-0003 §4 | 🟠 comando existe; **0 entradas** — gate pendente |
-| F2 **personality-sync** → F3 | dogfood F1 + personality legível (critério não-mensurável — pendência) | RFC-0003 §4 | 🟠 comando não existe; campos semeados à mão no members.yaml (marcados como seed) |
+| F2 **personality-sync** → F3 | híbrido (decisão 2026-07-02): mecânico (personality.md gerado pelo sync, 5 seções preenchidas) + confirmação do maestro | RFC-0003 §4 | 🟠 comando não existe; campos semeados à mão no members.yaml (marcados como seed) |
 | F3 **trust + co-relay peer** → F4 | 1º relay peer real bem-sucedido | RFC-0003 §4 | 🟠 infra construída **antecipadamente** (antes do gate F1); parsing do bloco `trust:` com bug; `--to peer` não existe |
 | F4 **synthesize-collective** | 3+ instâncias com diários maduros (90+ dias) | RFC-0003 §4 | 🔒 não existe (correto) |
-| F5 **market-scan** | diário maduro + demanda real (critério não-mensurável — pendência) | RFC-0003 §4 | 🔒 não existe (correto) |
+| F5 **market-scan** | híbrido (decisão 2026-07-02): mecânico (≥1 entrada `market-signal` no diário OU pedido em `inbox/`) + confirmação do maestro | RFC-0003 §4 | 🔒 não existe (correto) |
 | Carteiro-local → **Carteiro distribuído** (transporte automático entre máquinas) | mesmo gatilho da graduação formal / membro remoto real | [ADR ledger §3.3](../../analysis/onion-adr-ledger-format-location-2026-06.md) | 🟢 local entregue (`co-deliver`/`co-relay`); distribuído 🔒 a-desenhar (correto) |
 | **Agent Card A2A** (projeção one-way do members.yaml) | 1º consumer não-Onion **OU** necessidade nomeada de interop | [ADR A2A](../../analysis/onion-federation-adr-a2a-format-interop-2026-06.md) | 🔒 não construído (correto — "não é dívida ativa") |
 

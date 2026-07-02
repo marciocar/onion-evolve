@@ -47,9 +47,9 @@ members:
 #  - id: <slug-do-projeto>
 #    name: <nome>
 #    role: hub | standalone | consumer   # hub = terá sub-adotados; standalone = adota core direto sem sub-adotados; consumer = T2, adota um HUB (não o core)
-#    parent: onion-evolve      # p/ hub/standalone; um T2 (role: consumer) usa parent: <id-do-hub> — MAS a doutrina de
-#                              # onboarding de T2 (quem dirige a adoção, o que o hub expõe) está ABERTA (RFC-0003 §5 +
-#                              # audit 2026-07-01 #11): NÃO onboardar um consumer antes de fechá-la
+#    parent: onion-evolve      # p/ hub/standalone; um T2 (role: consumer) usa parent: <id-do-hub>.
+#                              # T2 onboarda VIA CORE (source-driven; RFC-0003 §5, decisão 2026-07-02) —
+#                              # o hub NÃO roda adopt; hub-driven adoption é gatilho futuro (1º T2 real)
 #    remote: github.com/<org>/<repo>
 #    local_path: "<path-absoluto-no-filesystem-do-maestro>"
 #    onion_version: <commit-curto>   # = .claude/.onion-version do projeto após /meta:adopt
