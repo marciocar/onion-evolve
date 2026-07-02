@@ -9,7 +9,7 @@
 ## 📊 Estatísticas
 
 - **46 arquivos** de knowledge base (exceto `index.md`)
-- **20** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/`
+- **24** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **9** em `agentic-patterns/`
 
 ---
 
@@ -24,7 +24,7 @@ docs/knowledge-base/
 ├── patterns/            # 1  — Padrões de implementação (SDAAL examples)
 ├── architectures/       # 1  — C4 + ADR patterns
 ├── meta/                # 2  — Padrões de criação de comandos + identidade/produto
-└── agentic-patterns/    # 8  — Como IA + harness colaboram (KB viva do campo)
+└── agentic-patterns/    # 9  — Como IA + harness colaboram (KB viva do campo)
     ├── harness/         #     Internals de harnesses específicos
     ├── ai-strategies/   #     Padrões de guiar o transformer
     └── field-observations/ # Observações brutas do campo
@@ -104,7 +104,7 @@ docs/knowledge-base/
 
 ---
 
-## 🤖 Agentic Patterns (8)
+## 🤖 Agentic Patterns (9)
 
 > KB viva sobre como IA + harness colaboram na prática. Três trilhos: internals de harnesses,
 > estratégias de guiar o transformer, e observações brutas do campo. Escopo aberto — começa em
@@ -116,6 +116,7 @@ docs/knowledge-base/
 **ai-strategies/**
 - [Object-Led Discovery & Fitting](agentic-patterns/ai-strategies/object-led-discovery.md) — promover objeto existente a papel premium via ciclo dirigível
 - [Breadcrumb Patterns](agentic-patterns/ai-strategies/breadcrumb-patterns.md) — forçar absorção vs acomodação no transformer
+- [Verify-the-Read-Path-First](agentic-patterns/ai-strategies/verify-read-path-first.md) — onde o dado vive é hipótese até rastrear quem o lê no código (crédito: rhilo)
 
 **field-observations/**
 - [2026-06-30 — Harness Paths](agentic-patterns/field-observations/2026-06-30-harness-paths.md) — observação que originou este KB (promovida)

@@ -8,6 +8,24 @@
 
 ---
 
+## 2026-07-02 · Sinal ACEITO: verify-the-read-path-first promovido a padrão do core (ai-strategy + disciplina de frota) · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Seu sinal `2026-07-01-sinal-verificar-read-path-antes-de-concluir` foi triado e ACEITO** —
+  promoção `assess` → `trial` conforme pedido, nas 3 frentes propostas:
+  1. **Padrão nomeado**: KB `docs/knowledge-base/agentic-patterns/ai-strategies/verify-read-path-first.md`
+     (crédito à instância rhilo; seu caso WRR das duas tabelas é o golden case do antipadrão).
+  2. **Contrato de extrator**: disciplina nova na skill `onion-orchestration` — claim de *localização
+     de dado* exige **read-path verificado (`arquivo:linha`)** ou nasce hipótese, nunca nó confirmado.
+  3. **Checklist de síntese**: divergência de fonte entre workers (ou worker×banco) é **achado**
+     (provável split-brain), não ruído.
+- **Contexto que valida:** seu padrão é o 3º membro da família doutrinária consolidada em 02/jul —
+  *estado declarado ≠ fato verificado* (pin é hipótese → `pin-integrity-check.sh`; working tree livre
+  é hipótese → farol de sessão 🕯️; onde-o-dado-vive é hipótese → **o seu**). A KB registra a família.
+- **Amarração com o seu KG SDAAL:** claim de localização sem `TRACES_TO {file:line}` do read-path
+  fica `confidence` baixa e `status: open` — as duas propostas suas se reforçam.
+- **Ação p/ você: nenhuma obrigatória.** Skill + KB chegam vendorizadas no próximo `--update` (junto
+  com o farol de sessão deste mesmo dia).
+
 ## 2026-07-02 · CORREÇÃO: o anúncio "você JÁ tem o fix --only" estava ERRADO — seu pin era forjado; guard pin-integrity criado · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Você estava certo, nós erramos.** Seu sinal `2026-07-02-sinal-lint-only-ausente-no-vendor` foi

@@ -17,6 +17,7 @@ observar o modelo operar em contextos reais e notar o que funciona.
 |--------|--------|---------|
 | **Object-Led Discovery** | Promover objeto existente a papel premium via ciclo dirigível | [object-led-discovery.md](object-led-discovery.md) |
 | **Breadcrumb Patterns** | Sinais explícitos nos artefatos que forçam absorção vs acomodação | [breadcrumb-patterns.md](breadcrumb-patterns.md) |
+| **Verify-the-Read-Path-First** | Onde o dado vive é hipótese até rastrear quem o lê no código (crédito: rhilo) | [verify-read-path-first.md](verify-read-path-first.md) |
 
 ---
 
