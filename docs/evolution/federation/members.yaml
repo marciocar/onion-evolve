@@ -29,7 +29,14 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
     local_path: "/home/marciocar/rhilo-metagamify"
-    onion_version: a458a0fc6b71   # espelha .claude/.onion-version; sync 2026-07-01
+    onion_version: aeee056fb7aa   # estado VERIFICADO do vendor em develop (canário byte-a-byte; 2026-07-02).
+                                  # O stamp em rhilo/main diz a458a0fc6b71, mas é pin FORJADO — um restore
+                                  # manual de 06-30 carimbou o HEAD do core numa branch que só tem o
+                                  # próprio stamp (nenhum arquivo do framework); sinal 2026-07-02-sinal-
+                                  # lint-only-ausente-no-vendor; guard: pin-integrity-check.sh.
+                                  # Regra: este campo espelha o pin da INTEGRATION_BRANCH (develop) —
+                                  # pins de outras branches do adotante não são canônicos. Próximo
+                                  # --update re-carimba e reconcilia aqui.
     adopted_at: 2026-06-17        # 1ª adoção (semântica única desde o fix do audit #5: --update preserva adopted_at + escreve updated_at; o stamp do rhilo carrega 2026-06-30 por re-carimbo pré-fix — o próximo --update restaura daqui)
     mode: legacy              # greenfield | legacy | regulated
     personality_summary: "Engine de metagamificação modular; especialista Nx + Asana; co-evolução ativa"  # seed manual pré-F2 — substituir no 1º /meta:personality-sync real

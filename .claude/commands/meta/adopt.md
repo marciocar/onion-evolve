@@ -9,8 +9,8 @@ model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(ls *) Bash(rm *) Bash(mktemp *) Bash(cat *) Bash(mkdir *) Bash(printf *)
 argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--integration-branch <nome>] [--in-place] [--update] [--dry-run]"
 category: meta
-version: "1.8.0"
-updated: "2026-06-22"
+version: "1.9.0"
+updated: "2026-07-02"
 ---
 
 # 🧅 /meta:adopt — Adoção de Repositório
@@ -408,14 +408,28 @@ SOURCE_ROOT="$(git rev-parse --show-toplevel)"; TARGET="<path do alvo>"
 [ -f "$TARGET/.claude/.onion-version" ] || { echo "Repo não adotado: rode a adoção primeiro."; exit 1; }
 ADOPTED_COMMIT="$(awk '/^source_commit:/{print $2}' "$TARGET/.claude/.onion-version")"
 NOW="$(git -C "$SOURCE_ROOT" rev-parse --short=12 HEAD)"
-[ "$ADOPTED_COMMIT" = "$NOW" ] && { echo "Já atualizado ($NOW)."; exit 0; }
+
+# GUARD pin-integrity — o pin do stamp é HIPÓTESE, não fato (incidente 2026-06-30/rhilo: um restore
+# manual carimbou o HEAD do core sem copiar arquivos → anúncio "você já tem X" saiu falso; sinal
+# 2026-07-02-sinal-lint-only-ausente-no-vendor). Verifica: (1) pin existe na história do core;
+# (2) canário vendorizado bate com o conteúdo do pin. Pin não confiável → SEM early-exit
+# "Já atualizado", SEM delta; a cópia segura completa re-sincroniza e o re-carimbo corrige o pin.
+PIN_OK=""
+if PIN_MSG="$(bash "$SOURCE_ROOT/.claude/validation/pin-integrity-check.sh" "$SOURCE_ROOT" "$TARGET")"; then
+  PIN_OK=1
+else
+  echo "⚠️  ${PIN_MSG} — pin não confiável (forjado, update parcial ou customização local no canário);"
+  echo "    delta/early-exit desativados; seguindo com cópia segura completa + re-carimbo."
+fi
+[ -n "$PIN_OK" ] && [ "$ADOPTED_COMMIT" = "$NOW" ] && { echo "Já atualizado ($NOW)."; exit 0; }
 
 # DELTA do framework desde a adoção (manifesto filtrado, como no Procedimento):
 want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks
       docs/meta-specs docs/knowledge-base docs/sdaal .env.example)
 # ⚠️ Novo path docs/ vendorizado aqui → refletir em .claude/utils/adopt/prettierignore-onion.tpl (passo (5)).
 manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p" | grep -q . && manifest+=("$p"); done
-git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
+# Delta só com pin VERIFICADO (senão o range mente); a cópia segura abaixo não depende do delta.
+[ -n "$PIN_OK" ] && git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
 ```
 
 - Aplicar via o **Procedimento de cópia segura** (`DEST="$TARGET"`) — diff revela customizações locais.

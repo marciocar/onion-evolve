@@ -1042,6 +1042,67 @@ run_onion_version_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo pin-integrity — exercita .claude/validation/pin-integrity-check.sh (o
+# guard do /meta:adopt --update contra pin forjado — incidente 2026-06-30/rhilo:
+# stamp apontava HEAD do core, vendor era 6 dias mais velho, anúncio downstream
+# saiu falso). Self-contained: core fake com 2 commits do canário em mktemp.
+# ---------------------------------------------------------------------------
+run_pin_integrity_selftests() {
+  local pic="${REPO_ROOT}/.claude/validation/pin-integrity-check.sh"
+  if [ ! -f "${pic}" ]; then record_fail "pin-integrity" "script ausente: ${pic}"; return; fi
+  local src tgt pin1 out rc
+
+  src="$(mktemp -d)"; tgt="$(mktemp -d)"
+  git -C "${src}" init -q
+  mkdir -p "${src}/.claude/validation" "${tgt}/.claude/validation"
+  printf '#!/bin/sh\necho v1\n' > "${src}/.claude/validation/lint-artifacts.sh"
+  git -C "${src}" add -A
+  git -C "${src}" -c user.name=onion -c user.email=onion@selftest commit -qm v1
+  pin1="$(git -C "${src}" rev-parse --short=12 HEAD)"
+  printf '#!/bin/sh\necho v2\n' > "${src}/.claude/validation/lint-artifacts.sh"
+  git -C "${src}" add -A
+  git -C "${src}" -c user.name=onion -c user.email=onion@selftest commit -qm v2
+
+  # (a) pin real + canário batendo → pin-ok, exit 0
+  printf 'framework: onion\nsource_commit: %s\nrole: adopted\n' "${pin1}" > "${tgt}/.claude/.onion-version"
+  printf '#!/bin/sh\necho v1\n' > "${tgt}/.claude/validation/lint-artifacts.sh"
+  rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q "^pin-ok ${pin1}"; then
+    record_pass "pin-integrity: pin real + canário íntegro → pin-ok"
+  else record_fail "pin-integrity: pin-ok" "esperava exit 0 'pin-ok ${pin1}'; out='${out}' rc=${rc}"; fi
+
+  # (b) CASO RHILO — pin real mas canário divergente (vendor mais velho/novo que o stamp) → untrusted
+  printf '#!/bin/sh\necho v2\n' > "${tgt}/.claude/validation/lint-artifacts.sh"
+  rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'canario-divergente'; then
+    record_pass "pin-integrity: canário divergente → untrusted (regressão incidente rhilo 06-30)"
+  else record_fail "pin-integrity: canário" "esperava exit 1 canario-divergente; out='${out}' rc=${rc}"; fi
+
+  # (c) pin unknown (recover honesto) → untrusted, sem quebrar
+  printf 'framework: onion\nsource_commit: unknown\nrole: adopted\n' > "${tgt}/.claude/.onion-version"
+  rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'unknown'; then
+    record_pass "pin-integrity: pin unknown → untrusted (recover honesto resolvível)"
+  else record_fail "pin-integrity: unknown" "esperava exit 1 unknown; out='${out}' rc=${rc}"; fi
+
+  # (d) pin inexistente na história da fonte → untrusted
+  printf 'framework: onion\nsource_commit: deadbeefcafe\nrole: adopted\n' > "${tgt}/.claude/.onion-version"
+  rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'inexistente-na-historia'; then
+    record_pass "pin-integrity: pin fora da história → untrusted"
+  else record_fail "pin-integrity: história" "esperava exit 1 inexistente; out='${out}' rc=${rc}"; fi
+
+  # (e) stamp ausente → untrusted (nunca crash)
+  rm -f "${tgt}/.claude/.onion-version"
+  rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'stamp-ausente'; then
+    record_pass "pin-integrity: stamp ausente → untrusted"
+  else record_fail "pin-integrity: stamp" "esperava exit 1 stamp-ausente; out='${out}' rc=${rc}"; fi
+
+  rm -rf "${src}" "${tgt}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo mail-hook — exercita .claude/hooks/co-evolution-inbox-check.sh (o "you
 # have mail" + gatilho de reflexão ⏰ da RFC-0003 §2.3). Self-contained: cwd em
 # sandbox mktemp (o hook usa paths relativos). Cobre a disciplina de motd
@@ -1147,6 +1208,9 @@ run_trust_topology_selftests
 
 # Modo onion-version — detecção de papel source/adopted via stamp (regressão FED-3-1; repo temp).
 run_onion_version_selftests
+
+# Modo pin-integrity — pin do stamp é hipótese: guard do /meta:adopt --update (incidente rhilo 06-30; sandbox git).
+run_pin_integrity_selftests
 
 # Modo mail-hook — "you have mail" + gatilho de reflexão ⏰ (motd silencioso, 3 sinais, exit 0; sandbox).
 run_mail_hook_selftests

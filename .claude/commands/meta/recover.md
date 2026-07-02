@@ -10,8 +10,8 @@ model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *)
 argument-hint: "[--dry-run]"
 category: meta
-version: "1.0.0"
-updated: "2026-07-01"
+version: "1.1.0"
+updated: "2026-07-02"
 ---
 
 # 🧅 /meta:recover — Recuperação de Identidade Onion
@@ -212,6 +212,10 @@ OLD_MODE="$(awk '/^mode:/{print $2}' "$STAMP" 2>/dev/null)"
 OLD_INTBRANCH="$(awk '/^integration_branch:/{print $2}' "$STAMP" 2>/dev/null)"
 
 # Usar valor coletado ou preservar o antigo ou usar fallback
+# ⚠️ NUNCA "adivinhar" o pin com o HEAD atual do core (incidente 2026-06-30/rhilo: um restore manual
+#    carimbou o HEAD da fonte sem copiar os arquivos correspondentes → o anúncio downstream "você já
+#    tem o fix" saiu falso). `unknown` é honesto e resolvível: o /meta:adopt --update tem guard
+#    pin-integrity que detecta pin não confiável e re-sincroniza via cópia segura completa.
 SOURCE_COMMIT="${OLD_SOURCE_COMMIT:-unknown}"
 SOURCE_DATE="${OLD_SOURCE_DATE:-$TODAY}"
 ADOPTED_FROM="${OLD_ADOPTED_FROM:-$ADOPTED_FROM_COLLECTED}"  # de Coleta
