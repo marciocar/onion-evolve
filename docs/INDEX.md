@@ -144,7 +144,9 @@ docs/
 ├── analysis/                   # Análises ativas (baselines; itens efêmeros são removidos pós-execução — ver analysis/README.md)
 │   ├── onion-review-2026-05.md         # SSOT de identidade
 │   ├── onion-vv-baseline-2026-06.md    # baseline de V&V (usada por /meta:evolve)
-│   ├── onion-evolution-2026-06-16.md   # auditoria mais recente (backlog ativo)
+│   ├── onion-evolution-2026-06-25.md   # auditoria geral mais recente (backlog ativo: 35 itens)
+│   ├── onion-federation-audit-2026-07-01.md  # auditoria focada em federação (backlog próprio)
+│   ├── onion-evolution-2026-06-16.md   # executado + superseded (curadoria 2026-07-01)
 │   ├── onion-evolution-2026-06-15.md   # run citado por materiais/identidade (proof-point retido)
 │   ├── onion-federation-adr-a2a-format-interop-2026-06.md  # ADR durável (federação A2A)
 │   ├── onion-adr-repo-adoption-2026-06.md  # ADR durável (adoção de repo / /meta:adopt)
@@ -304,7 +306,9 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 
 - **[Revisão Analítica do Sistema Onion — Maio/2026](analysis/onion-review-2026-05.md)** — SSOT de identidade: documenta o abandono de `.onion/`, plano v4.0 e `packages/onion-cli/`; sintetiza as análises-fonte de 2025.
 - **[Baseline de Verificação e Validação — Junho/2026](analysis/onion-vv-baseline-2026-06.md)** — baseline de V&V (tamanhos + conformidade de plataforma); usada por `/meta:evolve`.
-- **[Onion Evolution — 2026-06-16](analysis/onion-evolution-2026-06-16.md)** — auditoria de evolução **mais recente** (backlog ativo: ~20 acionáveis; sistêmicos = MCP-first ainda aberto, categorias fantasma, ambiguidade de threshold de tamanho).
+- **[Onion Evolution — 2026-06-25](analysis/onion-evolution-2026-06-25.md)** — auditoria geral **mais recente** (backlog ativo: 35 itens pós-curadoria; 0 blockers reais).
+- **[Onion Federation Audit — 2026-07-01](analysis/onion-federation-audit-2026-07-01.md)** — auditoria **focada em federação** (18 itens; blockers e quick-fixes já executados na própria sessão).
+- **[Onion Evolution — 2026-06-16](analysis/onion-evolution-2026-06-16.md)** — **executado + superseded** (blockers resolvidos nos PRs #69/#82 no mesmo dia; nota de curadoria 2026-07-01; abertos só #7/#8 — KB freshness).
 - **[Onion Evolution — 2026-06-15](analysis/onion-evolution-2026-06-15.md)** — run **retido como proof-point** citado por materiais/identidade (métricas §0: 28 agentes · 1.27M tokens · ~26 min · 30 achados). Não é o backlog ativo.
 - **[ADR — A2A formato vs runtime — Junho/2026](analysis/onion-federation-adr-a2a-format-interop-2026-06.md)** — decisão durável: linha vermelha A2A partida (runtime proibido / formato permitido como projeção one-way).
 - **[ADR — Adoção de repositório — Junho/2026](analysis/onion-adr-repo-adoption-2026-06.md)** — decisão durável: adoção = comando in-platform `/meta:adopt` (não CLI); stamp de versão; rampa da federação.

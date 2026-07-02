@@ -263,7 +263,8 @@ source_commit: <ref-curta da fonte na adoção>
 source_commit_date: <YYYY-MM-DD>
 role: adopted
 adopted_from: <repo/URL da fonte>
-adopted_at: <YYYY-MM-DD>
+adopted_at: <YYYY-MM-DD>       # data da 1ª adoção — NUNCA re-carimbada pelo --update
+updated_at: <YYYY-MM-DD>       # OPCIONAL — data do último --update (presente após o 1º update)
 mode: greenfield | legacy | regulated
 integration_branch: <branch>   # OPCIONAL — presente só quando escolhido via --integration-branch
 ```
