@@ -22,7 +22,7 @@ related:
 > gatilhos de graduação com o estado real verificado (auditoria orquestrada de 2026-07-01,
 > run `wf_48c138b0-5f6`).
 
-## 1. Os quatro eixos (e por que não são o mesmo)
+## 1. Os cinco eixos (e por que não são o mesmo)
 
 | Eixo | Valores | Vive em | Descreve |
 |---|---|---|---|
@@ -30,6 +30,7 @@ related:
 | **B. Modelo de controle** | `install` (vendorizado, durável) · `in-place` (efêmero) | flag `--in-place` do adopt | **como** o Onion vive no alvo |
 | **C. Tier de federação** | `source` (T0) · `hub` (T1) · `consumer` (T2) · `standalone` (T3) | `role:` do members.yaml (RFC-0003 §2.1) | a **posição na rede** pós-adoção |
 | **D. Operação de co-evolução** | quem-executa × direção-do-dado | [cartão de referência](../../onion/co-evolution-reference.md) | **cada comando** individual |
+| **E. Topologia de sessão** | W1 source-por-path · W2 sessão-do-alvo · W3 duas-sessões-mesmo-repo · W4 par local · W5 remoto · W6 responder-gated · W7 agendada (🔴 rejeitada como base) | [ADR work-models](../../analysis/onion-adr-work-models-session-topologies-2026-07.md) | **quem trabalha onde, a partir de onde** |
 
 **Regra de reconciliação:**
 
@@ -40,6 +41,22 @@ related:
 - A e C são **ortogonais**: qualquer cenário (greenfield/legacy/regulated) pode ocupar qualquer tier T1/T3.
   O cruzamento `regulated` × classificação de dados tem doutrina própria (RFC-0003 §2.2, decisão
   2026-07-02): default **`protected`**, promoção a `public`/`collective` só com revisão humana explícita.
+
+### 1.0 Eixo E — as sete topologias de sessão (resumo; canônico no [ADR](../../analysis/onion-adr-work-models-session-topologies-2026-07.md))
+
+| W | Topologia | Uma linha |
+|---|-----------|-----------|
+| W1 | Source-driven por path | sessão do core opera o alvo por path (adopt por-path, `--in-place`, ponta adormecida com commit isolado + log) |
+| W2 | Sessão do alvo (canônico) | um escritor por repo (I3); o core **indica**, a instância executa |
+| W3 | Duas sessões, mesmo repo | handoff por worktree (escopo) OU sala-de-design/sala-de-obra (função) |
+| W4 | Par local (1 máquina) | carteiro-local automatiza transporte+notificação (`co-deliver`/`co-relay`) |
+| W5 | Membro remoto | git-async mediado pelo maestro (sem carteiro-local) |
+| W6 | **Responder-gated** | a sessão do destino **propõe rascunho** ao ver 📬/📥/⏰; maestro confirma (ato 3 = propor→confirmar) |
+| W7 | Sessão agendada | 🔴 rejeitada como base (serviço vivo + autonomia-default); equivalente soberano = trigger *lazy por sessão* (hooks) |
+
+As topologias **compõem** (W4 pode conter W3 em cada repo; W6 opera sobre W2/W4/W5). O **gatilho
+invariável de reflexão** (⏰ migalha vencida no boot + protocolo de re-teste no `/meta:diary`) é parte
+do eixo E — decidido com pesquisa fundamentada ([relatório](../../analysis/onion-work-models-research-2026-07.md)).
 
 ### 1.1 Os três namespaces de "role" (fonte de metade da confusão)
 

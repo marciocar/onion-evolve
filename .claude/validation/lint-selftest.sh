@@ -1042,6 +1042,51 @@ run_onion_version_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo mail-hook — exercita .claude/hooks/co-evolution-inbox-check.sh (o "you
+# have mail" + gatilho de reflexão ⏰ da RFC-0003 §2.3). Self-contained: cwd em
+# sandbox mktemp (o hook usa paths relativos). Cobre a disciplina de motd
+# (SILENCIOSO quando 0), os 3 sinais (📬 inbox / 📥 inbound / ⏰ diário vencido),
+# as exclusões (index/README/_processed) e o invariante exit 0 sempre.
+# ---------------------------------------------------------------------------
+run_mail_hook_selftests() {
+  local hook="${REPO_ROOT}/.claude/hooks/co-evolution-inbox-check.sh"
+  if [ ! -f "${hook}" ]; then record_fail "mail-hook" "hook ausente: ${hook}"; return; fi
+  local d out rc
+
+  # (a) tudo vazio → silencioso (nenhum output) e exit 0
+  d="$(mktemp -d)"; mkdir -p "${d}/docs/evolution/inbox" "${d}/.claude/diary"
+  rc=0; out="$(cd "${d}" && bash "${hook}")" || rc=$?
+  if [ -z "${out}" ] && [ "${rc}" -eq 0 ]; then record_pass "mail-hook: 0 mensagens → silencioso (motd)"
+  else record_fail "mail-hook: silêncio" "esperava vazio+exit 0; out='${out}' rc=${rc}"; fi
+
+  # (b) 1 inbox + 1 inbound → 📬 e 📥; README/_processed excluídos
+  mkdir -p "${d}/docs/evolution/inbox/_processed" "${d}/docs/evolution/inbound"
+  printf '# s\n' > "${d}/docs/evolution/inbox/2026-01-01-sinal.md"
+  printf '# r\n' > "${d}/docs/evolution/inbox/README.md"
+  printf '# p\n' > "${d}/docs/evolution/inbox/_processed/2025-12-01-velho.md"
+  printf '# a\n' > "${d}/docs/evolution/inbound/2026-01-02-anuncio.md"
+  out="$(cd "${d}" && bash "${hook}")"
+  if printf '%s' "${out}" | grep -q '📬.*1 mensagem' && printf '%s' "${out}" | grep -q '📥.*1 entrega'; then
+    record_pass "mail-hook: 📬+📥 contam só 1º nível (README/_processed fora)"
+  else record_fail "mail-hook: canais" "contagem errada: ${out}"; fi
+
+  # (c) diário: vencida conta, futura e index.md não → ⏰ com N=1
+  printf -- '---\nreview_after: 2020-01-01\n---\n' > "${d}/.claude/diary/2020-01-01-velha.md"
+  printf -- '---\nreview_after: 2099-01-01\n---\n' > "${d}/.claude/diary/2099-01-01-fresca.md"
+  printf '# idx\n' > "${d}/.claude/diary/index.md"
+  out="$(cd "${d}" && bash "${hook}")"
+  if printf '%s' "${out}" | grep -q '⏰.*1 migalha'; then
+    record_pass "mail-hook: ⏰ conta só review_after vencido (regressão RFC-0003 §2.3)"
+  else record_fail "mail-hook: reflexão" "⏰ errado: ${out}"; fi
+
+  # (d) exit 0 SEMPRE (mesmo com sinais presentes) — hook nunca falha a sessão
+  rc=0; (cd "${d}" && bash "${hook}" >/dev/null) || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "mail-hook: exit 0 sempre"
+  else record_fail "mail-hook: exit" "esperava 0, veio ${rc}"; fi
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -1102,6 +1147,9 @@ run_trust_topology_selftests
 
 # Modo onion-version — detecção de papel source/adopted via stamp (regressão FED-3-1; repo temp).
 run_onion_version_selftests
+
+# Modo mail-hook — "you have mail" + gatilho de reflexão ⏰ (motd silencioso, 3 sinais, exit 0; sandbox).
+run_mail_hook_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário
