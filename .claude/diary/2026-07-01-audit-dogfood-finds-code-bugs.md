@@ -9,6 +9,7 @@ breadcrumb_for: [meta:evolve, meta:orchestrate, onion-orchestration]
 share_with: [collective]
 next_recommended: "2026-07-01-federation-usage-modes-decision"
 review_after: 2026-09-29
+conflict_class: dynamic
 ---
 
 ## Signal

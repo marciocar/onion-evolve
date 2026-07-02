@@ -9,6 +9,8 @@ breadcrumb_for: [meta:adopt, meta:co-deliver, meta:co-relay, meta:co-evolve]
 share_with: [collective]
 next_recommended: "2026-07-02-forged-pin-false-announcement"
 review_after: 2026-09-30
+conflict_class: conditional
+valid_when: "sessoes cross-repo (W1) continuam operando por path na mesma maquina, sem lock de harness"
 ---
 
 ## Signal

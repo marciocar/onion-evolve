@@ -9,6 +9,8 @@ breadcrumb_for: [meta:diary, meta:co-evolve, meta:evolve]
 share_with: [collective]
 next_recommended: "2026-07-02-sovereign-lazy-triggers-research"
 review_after: 2026-10-02
+conflict_class: static
+valid_when: "os benchmarks STALE/MemConflict seguem sendo o estado da arte publicado (campo move em meses)"
 ---
 
 ## Signal

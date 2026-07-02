@@ -11,7 +11,7 @@ model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *) Bash(find *) Bash(awk *) Bash(grep *) Bash(sort *)
 argument-hint: "create | list [--classification <c>] [--type <t>] [--sharable] | export-sharable [--dry-run] | index | review"
 category: meta
-version: "1.1.0"
+version: "1.2.0"
 updated: "2026-07-02"
 ---
 
@@ -62,6 +62,18 @@ INSTANCE_ID="$(awk '/^instance:/{print $2}' "$REPO/.claude/.onion-version" 2>/de
 3. **Tags** — 1-5 tags descritivas (ex: `[oauth, session, co-evolution]`)
 4. **Affects** — quais dimensões esta entrada afeta: `engineering`, `product`, `compliance`, `design`, `meta`
 5. **Slug** — nome curto para o arquivo (ex: `oauth-session-learning`)
+6. **Classe de conflito** — COMO esta migalha pode ser invalidada? (vocabulário
+   [MemConflict](../../../docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md) — a
+   estrutura de decisão que dirige o re-teste; pesquisa 2026-07: o estado da arte reconhece só ~25%
+   das contradições porque a memória não carrega estrutura de invalidação):
+   - `dynamic` — o fato muda com o tempo/mundo (pin, versão, comportamento de script). Re-teste:
+     **rodar o artefato** de novo.
+   - `static` — o fato era uma conclusão que fonte melhor pode corrigir (veredito de auditoria,
+     interpretação). Re-teste: **confrontar a melhor fonte atual**.
+   - `conditional` — vale ENQUANTO uma condição vale. Re-teste: **checar só a condição** (o mais
+     barato). Exige `valid_when`.
+7. **valid_when** *(obrigatório se `conditional`; opcional nas demais)* — a condição de
+   aplicabilidade em 1 linha testável (ex: `"o rhilo segue sem node_modules na worktree"`).
 
 **Gerar arquivo:**
 
@@ -85,6 +97,8 @@ breadcrumb_for: []
 share_with: []
 next_recommended: ""
 review_after: ${REVIEW_DATE}
+conflict_class: <dynamic|static|conditional>
+valid_when: "<condição testável — obrigatória se conditional; REMOVER a linha se não se aplica>"
 ---
 
 ## Signal
@@ -184,8 +198,16 @@ Quando o hook sinalizar **⏰** (entradas com `review_after` vencido), rodar o p
 auto-reforçante — [ADR work-models §4](../../../docs/analysis/onion-adr-work-models-session-topologies-2026-07.md)):
 
 1. **Listar vencidas:** entradas com `review_after < hoje` (o `index.md` já as marca ⏰).
-2. **Re-testar cada uma contra evidência ATUAL** (não contra a memória da época): o Signal ainda é
-   verdadeiro? A Evidence ainda se sustenta? Verificar no filesystem/git/execução — não presumir.
+2. **Re-testar cada uma contra evidência ATUAL, dirigido pela `conflict_class`** (não contra a
+   memória da época — e não genericamente):
+   - `dynamic` → **RODE o artefato** de novo (o pin ainda é esse? o script ainda sai com esse
+     código? exit code é evidência, leitura é hipótese).
+   - `static` → **confronte a melhor fonte atual** (a conclusão sobrevive ao que existe de melhor
+     hoje? fonte nova supersede?).
+   - `conditional` → **cheque só o `valid_when`** (a condição ainda vale? → migalha vale; condição
+     caiu? → inválida ou reescrever). É o re-teste mais barato — use-o.
+   - *(sem `conflict_class` — entrada pré-1.2.0)* → protocolo genérico: verificar Signal e Evidence
+     no filesystem/git/execução; ao re-testar, **classificar** (adicionar o campo) para o próximo ciclo.
 3. **Veredito (sempre confirmado pelo maestro — gate na absorção):**
    - **Válida** → atualizar só `review_after` (+90 dias) e registrar 1 linha de re-teste no corpo
      (`## Re-testada em <data>: <evidência>`).
@@ -202,6 +224,11 @@ auto-reforçante — [ADR work-models §4](../../../docs/analysis/onion-adr-work
 2. **Evidence é bullet, não prosa** — o Transformer precisa de fatos, não narrativa.
 3. **Next crumb é obrigatório** — o diário não termina numa entrada; termina numa ação.
 4. **review_after sempre preenchido** — nada no diário é eterno. Padrão: 90 dias após `date`.
+   `conflict_class` diz COMO re-testar quando vencer (dynamic → rodar; static → confrontar fonte;
+   conditional → checar `valid_when`). `conditional` sem `valid_when` é inválida (guarda no
+   lint-selftest); os campos são **opcionais** para retrocompat — entrada sem eles cai no protocolo
+   genérico do review e é classificada no 1º re-teste. Experimento em curso (pesquisa breadcrumbs
+   2026-07, Q2): medir re-absorção com vs sem estrutura entre ciclos de review.
 5. **Classification antes de share_with** — a classificação é a política; share_with é exceção explícita.
 6. **Private é o default para erros com contexto de negócio** — não expor dados do adotante.
 7. **Innovations são public por padrão** — se descobrimos algo útil, a rede deve poder absorver.
