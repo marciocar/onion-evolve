@@ -19,6 +19,10 @@
 | Operação | greenfield | legacy | regulated | Quem dirige |
 |---|---|---|---|---|
 | **Adoção** | scaffold + install | + reverse-eng + worktree `onion/adopt` | + `compliance-context` (ISO/SOC2/PMBOK) | **[Core]** (source-driven), por path |
+
+> **T2 (consumer-de-hub) também é core-driven** (RFC-0003 §5, decisão 2026-07-02): o maestro roda
+> `/meta:adopt` do core e registra `parent: <hub-id>` no members.yaml — o hub **não** roda adopt.
+> *Hub-driven adoption* é gatilho futuro (1º T2 real + dor de roteamento via core).
 | **Update** | `--update` (delta diff-based) | idem | idem | **[Core]** dirige · instância revisa/commita |
 | **Revisão** | diff da cópia segura (tmp→diff→aplicar) | idem (+ atenção a customizações locais) | + gate de compliance | maestro + Claude local da instância |
 | **Sincronização** | gitflow do alvo + registro no Core | idem | idem | **sessão da instância** ([repo]) |

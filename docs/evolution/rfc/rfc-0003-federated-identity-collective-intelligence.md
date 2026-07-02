@@ -1,8 +1,9 @@
 ---
 title: 'RFC-0003 — Identidade federada e inteligência coletiva entre instâncias Onion'
-status: draft
+status: accepted
 canonical-in: onion-evolve (core) — fonte da série de RFCs de co-evolução
 drafted-in: onion-evolve (core, 2026-07-01)
+accepted-in: 2026-07-02 (revisão Lote B da auditoria de federação 2026-07-01 — 5 pendências arbitradas)
 extends: RFC-0001 (modelo dos 3 fluxos), RFC-0002 (doutrina catálogo-first)
 review_after: 2026-10-01
 ---
@@ -59,6 +60,18 @@ TIER 3 — STANDALONE (role: standalone)
 
 **Campo `role` em `members.yaml`:** substitui `producer` → `source`; `consumer` → `hub|standalone|consumer`.
 
+> **Fora de escopo — namespace de contrato (nota da revisão 2026-07-02, audit #13):** os campos
+> `producer:`/`consumers:` do formato de **CONTRATO** da Federação formal (`contracts/<id>.md` — KB
+> [multi-repo-federation](../../knowledge-base/concepts/multi-repo-federation.md)) são um eixo **ortogonal**
+> (papel *por contrato*) e permanecem **inalterados** por esta RFC. Só o `role:` de **membro** migra para
+> tiers. Os 3 namespaces de "role" (contrato / membro / stamp) estão reconciliados na KB
+> [federation-usage-modes §1.1](../../knowledge-base/concepts/federation-usage-modes.md).
+
+**Adoção de T2 (decisão da revisão 2026-07-02, audit #11):** T2 onboarda **via core** (source-driven) —
+o maestro roda `/meta:adopt` do core e registra `parent: <hub-id>` no `members.yaml`; o hub **não** roda
+adopt. *Hub-driven adoption* fica como **gatilho futuro** (1º T2 real + dor de roteamento via core); até
+lá, a relação hub→T2 é só de leitura (`exposes_downstream`).
+
 ### 2.2 Classificação de dados
 
 | Nível | Visível para | Exemplos |
@@ -69,6 +82,12 @@ TIER 3 — STANDALONE (role: standalone)
 | `downstream` | Instância + seus filhos (T2) | Docs que central publica para seus adotados |
 | `public` | Qualquer instância federada | Inovações gerais, KBs de boas práticas |
 | `collective` | Elegível para síntese co-autorada pelo core | Candidatos à KB coletiva |
+
+> **Membros `mode: regulated` (decisão da revisão 2026-07-02, audit #18):** o default de `classification`
+> é **`protected`** (não `public`). Promover uma entrada a `public`/`collective` exige **revisão humana
+> explícita** do maestro da instância, e o `/meta:diary export-sharable` pede confirmação extra nesses
+> membros. Racional: num membro regulado (ISO/SOC2/PMBOK), o custo de um vazamento por descuido supera o
+> atrito da revisão por entrada.
 
 ### 2.3 Diário — formato breadcrumb-first
 
@@ -192,10 +211,21 @@ Se autorizado: cópia never-clobber no `inbox/` do peer (sem commit — I3 respe
 |---|---|---|
 | **Pré-F1** | Esta RFC + bloco `trust:` em `members.yaml` (nome real do campo implementado) | RFC aceita pelo maestro |
 | **F1** | `/meta:diary` + `diary-index.sh` + 10 entradas reais no core | Dogfood 1 semana |
-| **F2** | `/meta:personality-sync` + `personality.md` do core + members.yaml estendido | Dogfood + personality legível |
+| **F2** | `/meta:personality-sync` + `personality.md` do core + members.yaml estendido | **Mecânico:** `personality.md` existe, gerado pelo sync (não manual), com as 5 seções do template preenchidas · **+ humano:** maestro confirma que o texto reflete a instância |
 | **F3** | Trust SDAAL + extensão co-relay `--to peer` | Primeiro relay peer real bem-sucedido |
 | **F4** | `/meta:synthesize-collective` + `docs/knowledge-base/collective/` | 3+ instâncias com diários maduros (90+ dias) |
-| **F5** | `/meta:market-scan` + `docs/knowledge-base/market-intelligence/` | Diário maduro + demanda real |
+| **F5** | `/meta:market-scan` + `docs/knowledge-base/market-intelligence/` | **Mecânico:** ≥1 entrada de diário com tag `market-signal` OU pedido registrado em `inbox/` · **+ humano:** maestro confirma a demanda |
+
+> **Gates híbridos (revisão 2026-07-02, audit #15):** F2 e F5 têm **precondição mecânica**
+> (script-checkável) **+ decisão final humana** — coerente com o invariante "maestro no ato 3". F1 e F4
+> já eram contagens objetivas.
+>
+> **Nota de execução — antecipação de F3 (audit #9):** o commit `f07fe90` (2026-07-01) entregou a infra
+> de F3 (Trust SDAAL + `trust-topology-check.sh`) junto com F1, **antes** do gate de F1 ser cruzado. A
+> antecipação fica registrada: a infra **existe mas não conta como fase concluída** — o roadmap segue
+> sequencial e o gate F1 (10 entradas + 1 semana; estado em 2026-07-02: 2/10) continua sendo o próximo
+> marco. Risco aceito: adapters de trust não exercitados por relay real até F3 abrir — bitrot vigiado
+> pelo modo `trust-topology` do lint-selftest (desde a auditoria 2026-07-01).
 
 ---
 
@@ -204,4 +234,7 @@ Se autorizado: cópia never-clobber no `inbox/` do peer (sem commit — I3 respe
 - Formato exato da projeção A2A Agent Card — a spec A2A está em upgrade; validar antes de F2
 - Trigger para síntese coletiva: periódico (cron) ou on-demand (`/meta:synthesize-collective`)
 - ~~Formato de log de tentativas de relay bloqueadas~~ **Resolvido (2026-07-01):** `docs/evolution/trust-log.md` — tabela markdown append-only (Timestamp/FROM/TO/ACTION/STATUS/Razão), gerada por `log_attempt()` em `trust-topology-check.sh`
-- Como T2 (consumer-de-hub) solicita adoção inicial sem acesso direto ao core
+- ~~Como T2 (consumer-de-hub) solicita adoção inicial sem acesso direto ao core~~ **Resolvido (2026-07-02,
+  audit #11):** T2 onboarda **via core** (source-driven) com `parent: <hub-id>` registrado no members.yaml;
+  hub-driven adoption é gatilho futuro (1º T2 real + dor de roteamento) — ver §2.1 e
+  [adoption-lifecycle.md](../../applying/adoption-lifecycle.md)
