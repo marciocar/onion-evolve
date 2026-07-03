@@ -4,14 +4,17 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 7 entradas · **Stale:** 0 · **Compartilháveis:** 7
+**Total:** 10 entradas · **Stale:** 0 · **Compartilháveis:** 10
 
-Gerado em: 2026-07-02
+Gerado em: 2026-07-03
 
 ---
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-03 | learning | public 📤 | workflow-resume-cache-recovery | 2026-10-01 | conditional |
+| 2026-07-03 | learning | public 📤 | sandbox-selftest-exposes-latent-bugs | 2026-10-01 | static |
+| 2026-07-03 | innovation | public 📤 | declared-vs-verified-family | 2026-10-01 | static |
 | 2026-07-02 | decision | public 📤 | work-models-eixo-e-decision | 2026-09-30 | conditional |
 | 2026-07-02 | learning | public 📤 | sovereign-lazy-triggers-research | 2026-09-30 | static |
 | 2026-07-02 | error | public 📤 | live-session-collision-farol | 2026-09-30 | conditional |
