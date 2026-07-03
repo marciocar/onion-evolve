@@ -689,7 +689,29 @@ run_graph_selftests() {
   local gen="${REPO_ROOT}/.claude/validation/graph.sh"
   local gfile="${REPO_ROOT}/docs/onion/graph.md"
   if [ ! -f "${gen}" ]; then record_fail "graph" "graph.sh ausente"; return; fi
-  if ! command -v jq >/dev/null 2>&1; then record_pass "graph: jq ausente → pulado (gracioso)"; return; fi
+
+  # Guardas SEM dependência de jq (rodam sempre — o bug do parser não depende dele):
+  # (a) unit: yaml_list restrito ao FRONTMATTER — corpo com exemplos de template
+  #     (related_agents: ["agente-1",...]) não pode virar tripla (incidente 2026-07-03:
+  #     7 nós fantasma + 5 arestas falsas p/ nós reais no grafo canônico).
+  local yfn; yfn="$(sed -n '/^yaml_list()/,/^}/p' "${gen}")"
+  if [ -n "${yfn}" ]; then
+    eval "${yfn}"
+    local fx; fx="$(mktemp)"
+    printf -- '---\nname: fx\nrelated_agents:\n  - real-a\n  - real-b\n---\n\n# corpo\n\nrelated_agents: ["agente-1", "agente-2"]\nrelated_commands: ["/comando-1"]\n' > "${fx}"
+    local got; got="$(yaml_list "${fx}" "related_agents" | tr '\n' ',')"
+    if [ "${got}" = "real-a,real-b," ]; then record_pass "graph: yaml_list lê só o frontmatter (corpo com template ignorado)"
+    else record_fail "graph: yaml_list frontmatter-only" "esperado 'real-a,real-b,' — obtido '${got}'"; fi
+    rm -f "${fx}"
+  else
+    record_fail "graph: yaml_list" "função yaml_list não encontrada em graph.sh"
+  fi
+  # (b) regressão nos dados reais: nenhum nó de template no grafo
+  if bash "${gen}" --triples 2>/dev/null | grep -qE 'agente-[0-9]|comando-[0-9]|autonomy:'; then
+    record_fail "graph: sem ruído de template" "triplas contêm placeholders (agente-N/comando-N/autonomy:)"
+  else record_pass "graph: triplas sem ruído de template (placeholders de exemplos)"; fi
+
+  if ! command -v jq >/dev/null 2>&1; then record_pass "graph: jq ausente → demais checks pulados (gracioso)"; return; fi
   # Core-only: o grafo canônico (graph.md em-sync) e o --impact assumem as verticais
   # PUBLICADAS (ex.: onion-design). Um consumidor não vendoriza plugins/ → a regeneração
   # local diverge do graph.md committed por construção. Pular gracioso (a guarda de drift
