@@ -29,14 +29,20 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
     local_path: "/home/marciocar/rhilo-metagamify"
-    onion_version: 083403c606b7   # VERIFICADO (pin-ok pós-update 2026-07-02): --update real entregue na
-                                  # develop (fix --only + 8 dias de core), re-carimbado + updated_at.
-                                  # Regra: este campo espelha o pin da BRANCH ONDE O VENDOR VIVE (develop
-                                  # no rhilo) — o campo integration_branch do stamp (rhilo/main) é config
-                                  # de PR do adotante, não referência de pin; pins de outras branches não
-                                  # são canônicos. Histórico: o pin anterior declarado (a458a0fc6b71) era
-                                  # FORJADO por restore manual de 06-30 (sinal 2026-07-02-sinal-lint-only-
-                                  # ausente-no-vendor; guard permanente: pin-integrity-check.sh).
+    onion_version: 8e22352da32f   # pin mais recente VERIFICADO entre as linhagens (pin-ok 2026-07-03).
+                                  # Membro MULTI-LINHAGEM: pins por linhagem no mapa lineages: abaixo
+                                  # (parecer onion-parecer-rhilo-lineages-2026-07, decisão D2). Regra: um
+                                  # pin só entra aqui VERIFICADO por pin-integrity-check.sh — nunca do
+                                  # stamp declarado (histórico: a458a0fc6b71 era FORJADO por restore
+                                  # manual de 06-30; sinal 2026-07-02-sinal-lint-only-ausente-no-vendor).
+    lineages:                     # estado declarado E verificado por linhagem (D2; linhagem = 4º membro da família "declarado ≠ verificado")
+      framework:                  # onde a co-evolução vive (inbox/inbound commitados, sinais, diário)
+        branch: develop
+        pin: 083403c606b7         # verificado 2026-07-02; commits 7813ee34 (update) + abbbf802 (processa inbound)
+      production:                 # o motor (rhilo/main e filhas audit/*) — stamp com lineage: production
+        branch: rhilo/main
+        pin: 8e22352da32f         # verificado 2026-07-03 (Movimento 1, framework-only; pin-ok pós-cópia;
+                                  # commit pendente na sessão do rhilo — entrega-sem-commit I3)
     adopted_at: 2026-06-17        # 1ª adoção (semântica única desde o fix do audit #5: --update preserva adopted_at + escreve updated_at; o stamp do rhilo carrega 2026-06-30 por re-carimbo pré-fix — o próximo --update restaura daqui)
     mode: legacy              # greenfield | legacy | regulated
     personality_summary: "Engine de metagamificação modular; especialista Nx + Asana; co-evolução ativa"  # seed manual pré-F2 — substituir no 1º /meta:personality-sync real
