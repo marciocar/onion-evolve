@@ -877,6 +877,30 @@ run_corelay_selftests() {
   if [ "${rc}" -eq 0 ] && [ ! -f "${core}/${SIG}" ]; then record_pass "co-relay: --dry-run não escreve"
   else record_fail "co-relay: --dry-run" "exit ${rc} — dry-run escreveu no inbox do core?"; fi
   rm -rf "${d}" "${core}"
+
+  # (j) DEDUP por conteúdo: sinal IDÊNTICO já triado em _processed/ (nome diferente) → no-op
+  #     (regressão do incidente 2026-07-03: carteiro re-entregou 3 sinais pós-triagem → 📬 fantasma)
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q
+  mkdir -p "${core}/docs/evolution/inbox/_processed"
+  mk_adopter "${d}" adopted
+  printf '# sinal de teste\n' > "${core}/docs/evolution/inbox/_processed/2025-12-31-outro-nome.md"
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ ! -f "${core}/${SIG}" ]; then
+    record_pass "co-relay: conteúdo idêntico já em _processed → no-op (regressão 📬 fantasma 2026-07-03)"
+  else record_fail "co-relay: dedup _processed" "exit ${rc} — re-entregou sinal já triado (existe=$([ -f "${core}/${SIG}" ] && echo sim || echo não))"; fi
+  rm -rf "${d}" "${core}"
+
+  # (k) sinal ATUALIZADO: mesmo nome em _processed mas conteúdo DIFERENTE → DEVE entregar
+  #     (a pergunta do maestro "elas não foram atualizadas?" virou guarda: update ≠ duplicata)
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q
+  mkdir -p "${core}/docs/evolution/inbox/_processed"
+  mk_adopter "${d}" adopted
+  printf '# versão antiga já triada\n' > "${core}/docs/evolution/inbox/_processed/2026-01-01-sinal-teste.md"
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${core}/${SIG}" ] && grep -q 'sinal de teste' "${core}/${SIG}"; then
+    record_pass "co-relay: mesmo nome, conteúdo novo → entrega (sinal atualizado ≠ duplicata)"
+  else record_fail "co-relay: sinal atualizado" "exit ${rc} — dedup bloqueou uma atualização legítima?"; fi
+  rm -rf "${d}" "${core}"
 }
 
 # ---------------------------------------------------------------------------

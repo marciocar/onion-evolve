@@ -43,7 +43,11 @@
 #
 # Gracioso  : uso inválido / não-adotante / alvo ausente ou não-git → exit 2 (erro
 #             de uso, pt-BR em STDERR). Sinal já presente no inbox/ do core → no-op
-#             idempotente (exit 0). Sem `set -e` p/ controlar os exits graciosos.
+#             idempotente (exit 0). DEDUP POR CONTEÚDO: byte-idêntico a arquivo no
+#             inbox/ OU no inbox/_processed/ do core → no-op "já entregue/processado"
+#             (cura a re-entrega pós-triagem, incidente 2026-07-03); mesmo nome com
+#             conteúdo DIFERENTE segue entregando (sinal atualizado, não duplicata).
+#             Sem `set -e` p/ controlar os exits graciosos.
 #             Determinístico, sem LLM. Espelha .claude/utils/co-evolution/co-deliver.sh.
 #
 # Consumido por /meta:co-relay. Par simétrico downstream: /meta:co-deliver.
@@ -129,6 +133,21 @@ for f in "${FILES[@]}"; do
   base="$(basename "$f")"
   if [ -e "${DEST_DIR}/${base}" ]; then
     echo "Onion: já relayado (no-op): ${base}" >&2
+    skipped=$((skipped + 1))
+    continue
+  fi
+  # Dedup por CONTEÚDO vs inbox/ E _processed/ do core — cura da corrida do assíncrono
+  # (incidente 2026-07-03: 3 sinais re-entregues pelo carteiro depois de o core já tê-los
+  # triado por outro caminho → 📬 fantasma a cada boot). Byte-idêntico = já entregue/
+  # processado → no-op. Mesmo NOME com conteúdo DIFERENTE segue entregando: é sinal
+  # ATUALIZADO (nova rodada), não duplicata.
+  dup=""
+  for existing in "${DEST_DIR}"/*.md "${DEST_DIR}/_processed"/*.md; do
+    [ -f "${existing}" ] || continue
+    if cmp -s "$f" "${existing}"; then dup="${existing}"; break; fi
+  done
+  if [ -n "${dup}" ]; then
+    echo "Onion: já entregue/processado no core (conteúdo idêntico a $(basename "${dup}")) — no-op: ${base}" >&2
     skipped=$((skipped + 1))
     continue
   fi

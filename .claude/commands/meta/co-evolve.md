@@ -4,7 +4,7 @@ description: Orienta a sessão na co-evolução Onion core↔derivados — detec
 model: haiku
 category: meta
 tags: [co-evolution, inbox, bridge, federation, onboarding, sdaal]
-version: "1.2.0"
+version: "1.3.0"
 updated: "2026-07-02"
 allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(bash .claude/validation/onion-version.sh)
 argument-hint: "(sem argumentos — lê o estado de co-evolução deste repo)"
@@ -90,6 +90,13 @@ Ao **tratar** uma mensagem, mover para o `_processed/` **do canal** dela
 (`git mv docs/evolution/<inbox|inbound>/<arquivo> docs/evolution/<inbox|inbound>/_processed/`). Assim o
 "lido/não-lido" fica **git-visível** (sem state file) e o hook deixa de contá-la. **Só mover após o maestro
 confirmar** que a mensagem foi de fato endereçada.
+
+**Caso residual — duplicata untracked (entrega de carteiro pós-triagem):** se uma mensagem de 1º nível é
+**untracked** (entrega-sem-commit do co-relay/co-deliver) e **byte-idêntica** a uma cópia já em
+`_processed/` (verificar com `diff`/`cmp`, nunca só pelo nome), é re-entrega da corrida do assíncono —
+propor **remover** o original untracked (o conteúdo já está preservado tracked). Conteúdo **diferente**
+com mesmo nome = sinal ATUALIZADO → triagem nova, não remoção. (O co-relay v≥ incidente 2026-07-03
+deduplica por conteúdo na entrega; esta linha cobre entregas de carteiros antigos.)
 
 ## Referência canônica
 
