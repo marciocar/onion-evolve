@@ -1042,6 +1042,60 @@ run_onion_version_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo diary-crumbs — exercita a estrutura de decisão das migalhas no
+# diary-index.sh (pesquisa breadcrumbs 2026-07, enabler conflict_class/valid_when;
+# vocabulário MemConflict). Campos opcionais (retrocompat), mas quando presentes
+# validados: classe fora do vocabulário ou conditional sem valid_when → exit 1.
+# Self-contained: diário fake em mktemp.
+# ---------------------------------------------------------------------------
+run_diary_crumbs_selftests() {
+  local di="${REPO_ROOT}/.claude/validation/diary-index.sh"
+  if [ ! -f "${di}" ]; then record_fail "diary-crumbs" "script ausente: ${di}"; return; fi
+  local d out rc
+
+  d="$(mktemp -d)"; mkdir -p "${d}/.claude/diary"
+
+  # (a) entrada SEM os campos (pré-1.2.0) → passa (retrocompat; campos são opcionais)
+  printf -- '---\ndate: 2026-01-01\ntype: learning\nclassification: public\nreview_after: 2099-01-01\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-01-legacy-entry.md"
+  rc=0; bash "${di}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "diary-crumbs: entrada sem conflict_class → passa (retrocompat)"
+  else record_fail "diary-crumbs: retrocompat" "esperava exit 0, veio ${rc}"; fi
+
+  # (b) as 3 classes válidas (conditional COM valid_when) → passa e índice expõe a classe
+  printf -- '---\ndate: 2026-01-02\ntype: error\nclassification: public\nreview_after: 2099-01-01\nconflict_class: dynamic\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-02-dyn-entry.md"
+  printf -- '---\ndate: 2026-01-03\ntype: decision\nclassification: public\nreview_after: 2099-01-01\nconflict_class: static\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-03-sta-entry.md"
+  printf -- '---\ndate: 2026-01-04\ntype: learning\nclassification: public\nreview_after: 2099-01-01\nconflict_class: conditional\nvalid_when: "a condicao X vale"\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-04-cond-entry.md"
+  rc=0; bash "${di}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q '| conditional |' "${d}/.claude/diary/index.md" \
+     && grep -q '| dynamic |' "${d}/.claude/diary/index.md"; then
+    record_pass "diary-crumbs: 3 classes válidas → passa; índice expõe a classe"
+  else record_fail "diary-crumbs: classes válidas" "esperava exit 0 + classes no índice; rc=${rc}"; fi
+
+  # (c) classe fora do vocabulário → FALHA alto (migalha desonesta não vira índice)
+  printf -- '---\ndate: 2026-01-05\ntype: learning\nclassification: public\nreview_after: 2099-01-01\nconflict_class: volatile\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-05-bad-class.md"
+  rc=0; out="$(bash "${di}" "${d}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q "conflict_class 'volatile' inválida"; then
+    record_pass "diary-crumbs: classe fora do vocabulário → exit 1 com erro nomeado"
+  else record_fail "diary-crumbs: classe inválida" "esperava exit 1 + erro; out='${out}' rc=${rc}"; fi
+  rm -f "${d}/.claude/diary/2026-01-05-bad-class.md"
+
+  # (d) conditional SEM valid_when → FALHA (promete re-teste dirigido que não pode cumprir)
+  printf -- '---\ndate: 2026-01-06\ntype: learning\nclassification: public\nreview_after: 2099-01-01\nconflict_class: conditional\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-06-cond-sem-when.md"
+  rc=0; out="$(bash "${di}" "${d}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q "exige valid_when"; then
+    record_pass "diary-crumbs: conditional sem valid_when → exit 1 (guarda do enabler)"
+  else record_fail "diary-crumbs: cond sem when" "esperava exit 1 + erro; out='${out}' rc=${rc}"; fi
+
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo session-beacon — exercita o FAROL DE SESSÃO (validation/session-beacon.sh
 # + hooks/session-beacon-hook.sh). Incidente 2026-07-02: sessão W1 fez checkout
 # num repo com sessão W2 viva — I3 inclui sessões, não só commits. O farol é
@@ -1289,6 +1343,9 @@ run_session_beacon_selftests
 
 # Modo mail-hook — "you have mail" + gatilho de reflexão ⏰ (motd silencioso, 3 sinais, exit 0; sandbox).
 run_mail_hook_selftests
+
+# Modo diary-crumbs — estrutura de decisão da migalha: conflict_class/valid_when (enabler breadcrumbs 2026-07; sandbox).
+run_diary_crumbs_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário

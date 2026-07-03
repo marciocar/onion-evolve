@@ -9,6 +9,8 @@ breadcrumb_for: [meta:co-evolve, meta:adopt, meta:diary]
 share_with: [collective]
 next_recommended: ""
 review_after: 2026-09-30
+conflict_class: conditional
+valid_when: "o fluxo segue human-gated e soberano (sem servico vivo de vendor no loop)"
 ---
 
 ## Signal

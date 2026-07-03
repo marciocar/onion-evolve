@@ -9,6 +9,7 @@ breadcrumb_for: [meta:co-evolve, meta:adopt, meta:federation-register]
 share_with: [collective]
 next_recommended: ""
 review_after: 2026-09-29
+conflict_class: static
 ---
 
 ## Signal

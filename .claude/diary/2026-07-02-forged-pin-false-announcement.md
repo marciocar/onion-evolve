@@ -9,6 +9,7 @@ breadcrumb_for: [meta:adopt, meta:recover, meta:co-announce, meta:co-evolve]
 share_with: [collective]
 next_recommended: "2026-07-02-work-models-eixo-e-decision"
 review_after: 2026-09-30
+conflict_class: dynamic
 ---
 
 ## Signal
