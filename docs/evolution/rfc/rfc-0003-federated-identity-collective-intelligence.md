@@ -226,6 +226,12 @@ Se autorizado: cópia never-clobber no `inbox/` do peer (sem commit — I3 respe
 > sequencial e o gate F1 (10 entradas + 1 semana; estado em 2026-07-02: 2/10) continua sendo o próximo
 > marco. Risco aceito: adapters de trust não exercitados por relay real até F3 abrir — bitrot vigiado
 > pelo modo `trust-topology` do lint-selftest (desde a auditoria 2026-07-01).
+>
+> **Estado F1 em 2026-07-03:** contagem **10/10 atingida** (todas reais — 4 nascidas de incidentes,
+> 2 de pesquisas verificadas, 4 de decisões/aprendizados; estruturadas com `conflict_class` desde a
+> v1.2.0 do `/meta:diary`). O 2º critério (**dogfood 1 semana**, início 2026-07-01) fecha em
+> **2026-07-08** — F1 só gradua aí, e a graduação **habilita** F2 (precondição mecânica satisfeita),
+> não a constrói: decisão de abrir F2 é do maestro (gated-until-trigger).
 
 ---
 
