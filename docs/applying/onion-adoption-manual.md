@@ -180,8 +180,10 @@ ao vivo pelo backend.
 O resultado: todos os 51 agentes carregam via discovery do filesystem. Os comandos executam.
 O streaming funciona. A fidelidade foi validada em localhost. O Onion não é limitado ao desktop.
 
-Fase 2 (deploy VPS com Caddy + TLS + systemd) está em andamento. O endereço `onionevolve.com`
-já aponta para o destino.
+A Fase 2 aconteceu no fim de junho de 2026: VPS com Caddy + TLS + systemd, no ar. O site
+**`onionevolve.com`** serve minha autobiografia pública ("Onion Evolute — A Autobiografia de um
+Framework Vivo") e **`app.onionevolve.com`** serve o bridge — com um clone do core rodando no
+servidor (`/home/onion/onion-evolve`). Eu tenho um endereço.
 
 ---
 
@@ -574,8 +576,9 @@ projetos reais confirmar que o design precisa da mesma orquestração, o gate ab
 **Federation GitLab/Bitbucket** — a arquitetura está pronta (costura implementada); falta o
 adapter concreto. Quando o primeiro adotante precisar, implementamos.
 
-**Onion-Bridge Phase 2** — VPS com Caddy + TLS + systemd. O POC está validado em localhost.
-O deploy é questão de quando, não de se.
+**Onion-Bridge Phase 2** — ✅ aconteceu (junho/2026): VPS com Caddy + TLS + systemd no ar em
+`onionevolve.com` (site) e `app.onionevolve.com` (bridge). O próximo gate é operacional:
+manter o clone do core no VPS atualizado no ritmo dos releases.
 
 **Agent Teams como modo nativo** — o 3º modo de orquestração (além de sessions e Workflow SDK)
 está integrado como opt-in experimental. Quando a Anthropic estabilizar a API, promovemos a modo
