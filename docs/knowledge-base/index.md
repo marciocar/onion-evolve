@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **46 arquivos** de knowledge base (exceto `index.md`)
-- **24** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **9** em `agentic-patterns/`
+- **47 arquivos** de knowledge base (exceto `index.md`)
+- **25** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **9** em `agentic-patterns/`
 
 ---
 
@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 20 — Conceitos fundamentais
+├── concepts/            # 25 — Conceitos fundamentais
 ├── frameworks/          # 8  — Frameworks e metodologias
 ├── tools/               # 4  — Ferramentas e recursos
 ├── platforms/           # 2  — Plataformas e tecnologias
@@ -32,7 +32,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (24)
+## 🧠 Conceitos Fundamentais (25)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Orchestration](concepts/agent-orchestration.md) — orquestração de subagentes: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
@@ -53,6 +53,7 @@ docs/knowledge-base/
 - [Onion Modernization Doctrine](concepts/onion-modernization-doctrine.md) — regra de inventário/SSOT e doutrina de modernização
 - [Onion Relation Vocabulary](concepts/onion-relation-vocabulary.md) — TBox da ontologia leve: classes e predicados controlados com que o Onion descreve a si mesmo
 - [Onion Working Method](concepts/onion-working-method.md) — porta de entrada do método: Seleção (catálogo) + Execução (PFR + coordenação por modo) + Validação (dogfood + adversarial) + Disciplina; mapa de fontes meta-spec/KB/ADR/RFC
+- [Secret Handling (Agent)](concepts/secret-handling-agent.md) — regra dura: agente nunca pede/aceita segredo em texto claro; receituário capability-split → terminal real → efêmero → fora-de-banda → container (crédito: rhilo, dogfood real)
 - [Spec-as-Code Strategy](concepts/spec-as-code-strategy.md) — hierarquia de especificações (L0-L3)
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA
 - [Specification-Driven AI Abstraction Layer (SDAAL)](concepts/specification-driven-ai-abstraction-layer.md) — padrão-pai das camadas de abstração

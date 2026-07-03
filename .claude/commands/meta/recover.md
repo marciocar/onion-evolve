@@ -10,8 +10,8 @@ model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *)
 argument-hint: "[--dry-run]"
 category: meta
-version: "1.1.0"
-updated: "2026-07-02"
+version: "1.2.0"
+updated: "2026-07-03"
 ---
 
 # 🧅 /meta:recover — Recuperação de Identidade Onion
@@ -262,12 +262,17 @@ Skeleton a prepend (adaptar com valores coletados):
 Antes de operar com tasks: **`@task-specialist`** (decomposição agnóstica).
 Adapter: `.claude/utils/task-manager/adapters/<provider>.md`.
 
-## 🌿 Estratégia de Branches
+## 🌿 Estratégia de Branches (tabela de linhagens)
 
-| Branch | Papel |
-|---|---|
-| `<integration_branch>` | integração / base dos PRs Onion |
-| `main` | produção |
+| Branch | Papel | É produção? | PRs de quê miram aqui |
+|---|---|---|---|
+| `<integration_branch>` | integração / base dos PRs Onion | não | framework, docs, co-evolução |
+| `main` | produção | **sim** (verificar deploy real) | release |
+
+> ⚠️ **Regra de linhagem** (sinal de campo rhilo 2026-07-03): se o repo tem MAIS de uma linhagem
+> longa (ex.: trilho de produto ≠ trilho de integração), declare TODAS aqui com papel + regra de
+> PR por trilho — e **nunca** infira produção do nome da branch: produção = commit deployado
+> (registry/ECS) + config viva, não a branch que a doc aponta.
 
 ## 📝 Idioma
 
