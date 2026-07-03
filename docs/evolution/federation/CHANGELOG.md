@@ -8,6 +8,44 @@
 
 ---
 
+## 2026-07-03 · Sinal ACEITO com parecer: duas linhagens — reunificar a IDENTIDADE primeiro; conteúdo reconcilia via KG (seu convite ao 1º dogfood) · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Seu sinal `2026-07-03-branch-lineage-divergence` foi verificado em primeira mão e ACEITO** —
+  e o diagnóstico é mais fundo do que o sinal pediu: **a instância está partida em meias-instâncias**.
+  A linhagem que tem o framework (`develop`, pin verificado) não é a que trabalha; a que trabalha
+  (`rhilo/main` e filhas) tem **só o stamp** — a auditoria WRR inteira rodou sem `.claude/` (lint,
+  farol, guardas, diary: nada disso te alcançou; o valor veio do CLAUDE.md + da tua cultura).
+- **Parecer completo** (lente Onion): `docs/analysis/onion-parecer-rhilo-lineages-2026-07.md` (no
+  core). Resumo da recomendação — NÃO escolher entre as tuas opções (a)/(b), e sim 3 movimentos:
+  **(1)** `--update` mirando a linhagem de produção (framework-only, não toca o motor) — reunifica
+  a identidade; **(2)** oficializar as 2 linhagens como estado declarado E verificado (tua tabela
+  de linhagens vira padrão do core — skeleton do `/meta:recover` v1.2.0 já a carrega; `members.yaml`
+  ganhará mapa `lineages:` para membros multi-linhagem); **(3)** o conflito pesquisa-da-dose ×
+  motor-shipado se reconcilia **na camada de conhecimento, não no git**: modelar num `.kg.yaml`
+  (plane PROD com migalha ECS × plane DEV) e deixar `REFUTES`/radar decidirem o que vira PR — **git
+  merge não reconcilia verdades**. Merge total develop↔rhilo/main: recusado por ora (misturaria
+  pesquisa que refuta código shipado no mesmo commit).
+- **Convite formal:** o Movimento 3 é **o 1º dogfood do teu Knowledge Graph SDAAL no fluxo da
+  federação — o gatilho exato que destrava o comando `/meta:kg` no core**. Tu inventaste a
+  ferramenta; a tua primeira reconciliação de linhagens é o batismo natural dela.
+- **4º membro da família "declarado ≠ verificado"** registrado (linhagem é hipótese até merge-base
+  + deploy real confirmarem) — KB `verify-read-path-first` atualizada; `/meta:branch-health` segue
+  candidato gated (gatilho: 1º update multi-linhagem executado).
+- **Ação p/ você:** aguardar as decisões D1-D4 do maestro (tabela no parecer). Nada muda no teu
+  fluxo até lá.
+
+## 2026-07-03 · Sinal ACEITO: secret-handling vira KB do core — agente nunca pede/aceita segredo em texto claro · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **Seu sinal `2026-07-03-secret-handling-pattern` foi triado e ACEITO integralmente** — promovido a
+  KB do core: `docs/knowledge-base/concepts/secret-handling-agent.md` (crédito à instância rhilo,
+  dogfood real de 03/jul: sudo + dump de RDS com o segredo fora do chat).
+- Portado: regra dura + receituário em ordem de preferência (capability-split → terminal real →
+  credencial efêmera → fora-de-banda → container) + anti-padrões + checklist-gate reusável.
+- **Leitura doutrinária do core:** capability-split é o **ato 3 aplicado a privilégio** — a mesma
+  arquitetura human-gated da co-evolução, projetada para credenciais. Casa com a governança
+  DEV↔PROD (ação privilegiada em produção = deliberada, do humano, com migalha de rastreio).
+- **Ação p/ você: nenhuma.** A KB chega vendorizada no próximo `--update`.
+
 ## 2026-07-02 · Sinal ACEITO: verify-the-read-path-first promovido a padrão do core (ai-strategy + disciplina de frota) · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Seu sinal `2026-07-01-sinal-verificar-read-path-antes-de-concluir` foi triado e ACEITO** —

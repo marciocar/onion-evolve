@@ -48,13 +48,15 @@ parar e rastrear no código de onde o runtime lê, antes de concluir a partir do
 
 ## Família doutrinária — "estado declarado ≠ fato verificado"
 
-Terceiro membro da família consolidada em 2026-07-02 (todos com guarda/migalha):
+Família consolidada em 2026-07-02/03 (todos com guarda/migalha; a migalha
+`declared-vs-verified-family` manda: ao achar um caso novo, atualizar esta tabela):
 
 | Membro | Declarado | Verificado | Registro |
 |---|---|---|---|
 | Pin é hipótese | stamp/members.yaml | artefato vendorizado (canário) | `pin-integrity-check.sh` + diário `forged-pin` |
 | Working tree livre é hipótese | `git status` limpo | sessões vivas (farol 🕯️) | `session-beacon.sh` + diário `live-session-collision` |
 | **Onde-o-dado-vive é hipótese** | tabela de nome óbvio / resumo de agente | **read-path no código** | este padrão + skill `onion-orchestration` |
+| Linhagem de branch é hipótese | doc "PRs miram develop" / nome da branch | commit **deployado** (registry/ECS) + merge-base real | sinal rhilo `2026-07-03-branch-lineage-divergence` (4º membro; comando `/meta:branch-health` é candidato gated — 2ª instância com multi-linhagem OU próxima confusão de base de PR) |
 
 Parentesco direto: [onion-dogfooding-doctrine](../../concepts/onion-dogfooding-doctrine.md)
 ("RODE o artefato; veredito de leitura é hipótese, exit code é evidência") e a governança
