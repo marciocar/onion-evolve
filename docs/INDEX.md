@@ -1,6 +1,6 @@
 # 📚 Índice Central de Documentação
 
-> **Última atualização**: 2026-06-16 | **Gerado por**: `/docs:build-index` | **Revisado**: auditoria manual
+> **Última atualização**: 2026-07-03 | **Gerado por**: `/docs:build-index` | **Contagens**: rescaneadas do filesystem
 
 Bem-vindo ao índice central de documentação do projeto. Este documento serve como hub de navegação para toda a documentação disponível.
 
@@ -10,47 +10,50 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- 🤖 **94 comandos invocáveis** Claude Code em 10 categorias + root (+ 16 fragmentos compartilhados em `common/` e 3 READMEs)
+- 🤖 **94 comandos invocáveis** Claude Code em 10 categorias + root (+ 24 fragmentos compartilhados em `common/` e 10 READMEs de categoria)
 - 🎯 **51 agentes de IA especializados** em 9 categorias
 - 🧩 **5 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes)
-- 📚 **Knowledge Bases estruturadas** para consumo por IA
+- 📚 **Knowledge Bases estruturadas** para consumo por IA (49 documentos de conteúdo + KB viva `agentic-patterns/`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente com ativação automática
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
-- 🏗️ **Spec as Code Multi-Context** — separação entre business, technical e meta-specs
+- 🏗️ **Spec as Code Multi-Context** — business, technical, compliance (peer) + design (provisório, gated)
 
 ---
 
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **120 arquivos markdown** em `docs/`
-- **15 arquivos** em `docs/onion/` (Sistema Onion)
-- **37 arquivos** em `docs/knowledge-base/` (Knowledge Bases)
-  - 19 arquivos em `concepts/` (Conceitos fundamentais)
-  - 8 arquivos em `frameworks/` (Frameworks e metodologias)
-  - 4 arquivos em `tools/` (Ferramentas, incl. Agent Skills)
+- **213 arquivos markdown** em `docs/`
+- **17 arquivos** em `docs/onion/` (Sistema Onion)
+- **54 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 49 documentos de conteúdo + `index.md` + 4 READMEs de (sub)categoria)
+  - 25 em `concepts/` (Conceitos fundamentais)
+  - 8 em `frameworks/` (Frameworks e metodologias)
+  - 4 em `tools/` (Ferramentas, incl. Agent Skills)
   - 2 em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
+  - 6 em `agentic-patterns/` (KB viva do campo: harness/ai-strategies/field-observations) + 4 READMEs
   - 1 `index.md`
 - **6 arquivos** em `docs/meta-specs/` (Meta Especificações: 5 meta-specs L0 + `index.md`)
-- **6 arquivos** em `docs/materials/` (materiais derivados externos — Fase 4): landing page, manual, case studies, artigo crítico, press kit, README
-- Arquivos adicionais em `docs/analysis/`, `docs/plans/`, `docs/applying/`, `docs/sdaal/`
-- **3 contextos spec-as-code** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/`
+- **7 arquivos** em `docs/materials/` (materiais derivados externos — Fase 4): landing page, manual, case studies, brand book, artigo crítico, press kit, README
+- **7 arquivos** em `docs/applying/` (guias de aplicação: greenfield, legacy, regulado, adoption-lifecycle, manual, rescue-prompt)
+- **7 arquivos** em `docs/design-context/` (vertical de design, **provisória** — ver nota abaixo)
+- **55 arquivos** em `docs/analysis/` (análises ativas — ver [analysis/README.md](analysis/README.md) para o critério de retenção; só baselines/ADRs duráveis são navegados individualmente aqui)
+- **3 contextos spec-as-code peer** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/` (1 `README.md` cada, ainda sem conteúdo gerado neste repo)
 
 ### Sistema Onion (`.claude/`)
 - **94 comandos invocáveis** Claude Code distribuídos em:
-  - 24 em `meta/` (meta-comandos, criadores, validação, orquestração de subagentes, frescor de KB e de contexto, federação, adoção e co-evolução)
-  - 20 em `product/` (gestão de produto e descoberta)
+  - 29 em `meta/` (meta-comandos, criadores, validação, orquestração de subagentes, frescor de KB e de contexto, federação, adoção e co-evolução)
+  - 21 em `product/` (gestão de produto e descoberta)
   - 11 em `engineer/` (engenharia e desenvolvimento)
   - 11 em `docs/` (geração e validação de documentação)
-  - 6 em `validate/` (validação e testes)
+  - 6 em `validate/` (validação e testes — inclui subpastas `collab/`, `qa-points/`, `test-strategy/`)
   - 6 em `git/` (GitFlow e versionamento)
   - 3 em `test/` (unit, integration, e2e)
-  - 1 em `development/`, 1 em `quick/`
+  - 2 em `design/`, 1 em `development/`, 1 em `quick/`
   - 3 no root: `onion.md`, `warm-up.md`, `catch-up.md`
-  - **não-invocáveis**: 16 fragmentos em `common/` (5 templates + 11 prompts) e 3 READMEs de categoria
+  - **não-invocáveis**: 24 fragmentos em `common/` (11 templates + 13 prompts, incl. READMEs) e 10 READMEs de categoria
 - **5 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`)
 - **51 agentes** IA distribuídos em:
-  - 18 em `development/` (frontend, backend, infra, integrações)
+  - 20 em `development/` (frontend, backend, infra, integrações)
   - 9 em `product/` (gestão e narrativa)
   - 5 em `compliance/` (ISO 27001, ISO 22301, SOC2, PMBOK, governance)
   - 5 em `meta/` (orquestração, criação, validação, skills)
@@ -59,8 +62,8 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **120 arquivos** de documentação markdown
-- **94 comandos invocáveis** em 10 categorias + root (+ 16 fragmentos `common/` + 3 READMEs)
+- **213 arquivos** de documentação markdown em `docs/`
+- **94 comandos invocáveis** em 10 categorias + root (+ 24 fragmentos `common/` + 10 READMEs de categoria)
 - **51 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
 
@@ -72,7 +75,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 docs/
 ├── INDEX.md                    # Este arquivo (hub central)
 │
-├── onion/                      # Sistema Onion (15 arquivos)
+├── onion/                      # Sistema Onion (17 arquivos)
 │   ├── index.md                # Índice da seção
 │   ├── inventory.md            # SSOT de contagens (gerado por /meta:inventory)
 │   ├── commands-guide.md       # Guia completo de comandos
@@ -83,93 +86,74 @@ docs/
 │   ├── naming-conventions.md   # Padrões de <feature-slug>
 │   ├── maintenance-checklist.md # Guia de manutenção
 │   ├── ci.md                   # CI / code-review automatizado
+│   ├── co-evolution-reference.md # Cartão de referência da família evolve/co-evolve
+│   ├── graph.md                # Grafo de relações do sistema
 │   ├── testing-validation-system.md  # Sistema de testes e validação
 │   ├── claude-code-commands-architecture.md  # Arquitetura de comandos
 │   ├── end-to-end-validation-tests.md  # Testes de validação E2E
 │   ├── ESPERANTO.md            # documento do framework
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
-├── knowledge-base/             # Knowledge Bases (36 arquivos, incl. index)
-│   ├── concepts/               # Conceitos fundamentais (17 arquivos)
-│   │   ├── abstraction-patterns-catalog.md
-│   │   ├── agent-orchestration.md
-│   │   ├── ai-agent-design-patterns.md
-│   │   ├── branding-posicionamento-marca.md
-│   │   ├── configuration-management.md
-│   │   ├── consolidated-to-tasks-patterns.md
-│   │   ├── context-window-optimization.md
-│   │   ├── domain-context-lifecycle.md        # contexto de domínio = SSOT viva (Tijolo 1)
-│   │   ├── identificar-precificar-dor-cliente.md
-│   │   ├── meeting-transcription-to-knowledge-base.md
-│   │   ├── multi-repo-federation.md          # federação (Fases 1-3)
-│   │   ├── onion-modernization-doctrine.md   # doutrina de /meta:evolve
-│   │   ├── spec-as-code-strategy.md
-│   │   ├── spec-driven-development.md
-│   │   ├── specification-driven-ai-abstraction-layer.md
-│   │   ├── task-manager-abstraction.md
-│   │   └── worklog-protocol.md                # contrato de sessão
+├── knowledge-base/             # Knowledge Bases (54 arquivos, incl. index)
+│   ├── concepts/               # Conceitos fundamentais (25 arquivos)
 │   ├── frameworks/             # Frameworks e metodologias (8 arquivos)
-│   │   ├── agent-orchestration-landscape-2026.md
-│   │   ├── framework-story-points.md
-│   │   ├── framework-testes.md
-│   │   ├── gitflow-patterns.md
-│   │   ├── qa-story-points.md
-│   │   ├── collaborative-testing-patterns.md
-│   │   ├── test-strategy-scoring.md
-│   │   └── spec-driven-development-tools-2025.md
 │   ├── platforms/              # Plataformas e tecnologias (2 arquivos)
-│   │   ├── git-ledger-as-working-dir.md  # ledger da federação (Fase 0)
-│   │   └── runflow.md
 │   ├── tools/                  # Ferramentas e recursos (4 arquivos)
-│   │   ├── agent-skills.md
-│   │   ├── claude-code-commands-best-practices-2026.md
-│   │   ├── docker-deployment.md
-│   │   └── whisper.md          # Knowledge base do Whisper
 │   ├── patterns/               # Padrões de implementação (1 arquivo)
-│   │   └── sdaal-examples.md
 │   ├── architectures/          # C4 + ADR (1 arquivo)
-│   │   └── c4-adr-patterns.md
-│   └── meta/                   # Criação de comandos + identidade/produto (2 arquivos)
-│       ├── command-creation-patterns.md
-│       └── onion-framework-identity.md
+│   ├── meta/                   # Criação de comandos + identidade/produto (2 arquivos)
+│   └── agentic-patterns/       # KB viva: IA + harness (6 docs + 4 READMEs)
+│       ├── harness/            #   Internals de harnesses específicos
+│       ├── ai-strategies/      #   Padrões de guiar o transformer
+│       └── field-observations/ #   Observações brutas do campo
 │
 ├── meta-specs/                 # Meta Especificações (6 arquivos — constituição L0)
 │   ├── index.md                # Índice de meta specs
-│   ├── agents.md               # Padrões obrigatórios para agentes
-│   ├── commands.md             # Padrões para comandos + workflows faseados (invariante)
-│   ├── architecture.md         # Estrutura de diretórios, framework instalável
-│   ├── code-standards.md       # Idioma, formatação, naming, estilo
-│   └── integrations.md         # Task Manager Abstraction, padrão de adapter, MCPs
+│   ├── agents.md                # Padrões obrigatórios para agentes
+│   ├── commands.md              # Padrões para comandos + workflows faseados (invariante)
+│   ├── architecture.md          # Estrutura de diretórios, framework instalável
+│   ├── code-standards.md        # Idioma, formatação, naming, estilo
+│   └── integrations.md          # Task Manager Abstraction, padrão de adapter, MCPs
 │
-├── analysis/                   # Análises ativas (baselines; itens efêmeros são removidos pós-execução — ver analysis/README.md)
-│   ├── onion-review-2026-05.md         # SSOT de identidade
-│   ├── onion-vv-baseline-2026-06.md    # baseline de V&V (usada por /meta:evolve)
-│   ├── onion-evolution-2026-06-25.md   # auditoria geral mais recente (backlog ativo: 35 itens)
-│   ├── onion-federation-audit-2026-07-01.md  # auditoria focada em federação (backlog próprio)
-│   ├── onion-evolution-2026-06-16.md   # executado + superseded (curadoria 2026-07-01)
-│   ├── onion-evolution-2026-06-15.md   # run citado por materiais/identidade (proof-point retido)
-│   ├── onion-federation-adr-a2a-format-interop-2026-06.md  # ADR durável (federação A2A)
-│   ├── onion-adr-repo-adoption-2026-06.md  # ADR durável (adoção de repo / /meta:adopt)
-│   ├── onion-adr-domain-context-lifecycle-2026-06.md  # ADR durável (contexto de domínio = SSOT viva)
-│   ├── onion-adr-phased-resumable-pattern-2026-06.md  # ADR provisório (PFR = backbone faseado retomável L0)
-│   ├── onion-adr-ledger-format-location-2026-06.md  # ADR provisório (ledger: markdown fica; repo-neutro gated; norte = Carteiro)
-│   ├── onion-adr-coevolution-flow-naming-2026-06.md  # ADR (vocab: flow A/B/C → downstream/upstream/handoff)
-│   ├── onion-adr-adopt-to-not-impose-2026-06.md  # ADR (adoção defere ao padrão do projeto; SDAAL design-system provider)
-│   └── onion-adr-branching-base-agnostic-2026-06.md  # ADR (branching: base resolvida/agnóstica, não GitFlow/develop hardcoded)
+├── design-context/              # Vertical de design (7 arquivos — PROVISÓRIO, gated)
+│   ├── README.md                # O que é + princípios (SSOT viva, tokens W3C/DTCG)
+│   ├── index.md                 # Hub navegável + frescor
+│   ├── brief.md                 # Brief de identidade visual
+│   ├── foundations/*.tokens.json
+│   ├── semantic/*.tokens.json
+│   ├── governance/contrast-pairs.json  # SSOT das regras WCAG de contraste
+│   └── decisions/                # ADRs de design
 │
-├── materials/                  # Materiais derivados externos (Fase 4 — 6 arquivos)
+├── analysis/                   # Análises ativas (55 arquivos; ver analysis/README.md — ciclo de vida e critério de retenção)
+│
+├── applying/                    # Guias de aplicação (7 arquivos)
+│   ├── README.md · adoption-lifecycle.md · applying-greenfield.md
+│   ├── applying-legacy.md · applying-regulated.md
+│   └── onion-adoption-manual.md · rescue-prompt.md
+│
+├── materials/                  # Materiais derivados externos (Fase 4 — 7 arquivos)
 │   ├── README.md               # Índice e guia de uso dos materiais
 │   ├── landing-page.md         # Esqueleto da landing page
 │   ├── manual-toc.md           # Sumário do manual técnico
 │   ├── case-studies.md         # 3 case studies desenvolvidos
+│   ├── brand-book.md           # Brand book derivado do design-context
 │   ├── critical-article-outline.md  # Outline de artigo crítico
 │   └── press-kit.md            # One-pager, FAQ imprensa, bio, citações
 │
-├── sdaal/                      # Specification-Driven AI Abstraction Layer
-│   └── [documentação SDAAL]
+├── evolution/                   # Co-evolução core↔derivados (doc-bridge)
+│   ├── README.md                # Modelo dos 3 fluxos (downstream/upstream/handoff)
+│   ├── trust-log.md             # Ledger de confiança da federação
+│   ├── trial-object-led-discovery-fitting.md
+│   ├── federation/              # members.yaml, CHANGELOG.md, outbox/ (staging de anúncios)
+│   ├── inbox/                   # Canal upstream (sinal/feedback de projetos) + _processed/
+│   └── rfc/                     # RFCs do protocolo de co-evolução
 │
-└── tools/                      # Ferramentas e recursos
-    └── [documentação de ferramentas]
+├── sdaal/                       # Specification-Driven AI Abstraction Layer
+│   └── sdaal.md
+│
+└── business-context/ · technical-context/ · compliance-context/
+    # 3 contextos spec-as-code PEER — templates no framework (só README.md),
+    # populados no projeto-alvo por /docs:build-*-docs
 ```
 
 ---
@@ -182,8 +166,9 @@ docs/
 - **[Guia de Comandos](onion/commands-guide.md)** - Documentação completa de todos os comandos disponíveis
 - **[Referência de Agentes](onion/agents-reference.md)** - Lista e descrição de todos os agentes especializados
 - **[Fluxos de Engenharia](onion/engineering-flows.md)** - Workflows detalhados para desenvolvimento
-- **[Co-evolução — Cartão de Referência](onion/co-evolution-reference.md)** - Família de comandos `evolve`/`co-evolve`/`co-announce`/`co-deliver`/`federation-*` com quem-executa × direção do dado
+- **[Co-evolução — Cartão de Referência](onion/co-evolution-reference.md)** - Família de comandos `evolve`/`co-evolve`/`co-announce`/`co-deliver`/`co-relay`/`federation-*` com quem-executa × direção do dado
 - **[Sistema de Testes e Validação](onion/testing-validation-system.md)** - Framework completo de testes e validação
+- **[Grafo do Sistema](onion/graph.md)** - Grafo de relações entre comandos, agentes e KBs
 
 #### Integrações e Configuração
 - **[Configuração Inicial](onion/getting-started.md)** - Setup completo do sistema
@@ -216,46 +201,16 @@ docs/
 
 ## 📚 Knowledge Bases
 
-Knowledge Bases estruturadas para consumo por IA e referência técnica:
+Knowledge Bases estruturadas para consumo por IA e referência técnica — índice completo e sempre fresco em **[knowledge-base/index.md](knowledge-base/index.md)**. Resumo por categoria:
 
-### Conceitos Fundamentais (17 arquivos)
-- **Domain Context Lifecycle** - Contexto de domínio como SSOT viva (ciclo CRUD+); pesos derivados, remover/validar como gate ✨ NOVO
-- **Task Manager Abstraction** - Abstração de gerenciadores de tarefas
-- **Spec-as-Code Strategy** - Estratégia de especificações como código
-- **Spec-Driven Development** - Metodologia emergente de desenvolvimento com IA
-- **Specification-Driven AI Abstraction Layer** - Camada de abstração orientada a especificações
-- **AI Agent Design Patterns** - Padrões de design para agentes IA
-- **Agent Orchestration** - Orquestração de subagentes: 6 padrões canônicos sobre primitivas nativas
-- **Abstraction Patterns Catalog** - Catálogo de padrões de abstração
-- **Context Window Optimization** - Otimização de contexto para IA
-- **Configuration Management** - Gestão de configurações
-- **Consolidated to Tasks Patterns** - Conversão de documentos consolidados em tasks
-- **Multi-Repo Federation** - Federação multi-repo (Fases 1-3)
-- **Onion Modernization Doctrine** - Doutrina de modernização (`/meta:evolve`)
-- **Worklog Protocol** - Contrato de sessão de trabalho
-- **Branding e Posicionamento** - Estratégias de marca
-- **Identificar e Precificar Dor do Cliente** - Metodologias de produto
-- **Meeting Transcription to Knowledge Base** - Processamento de reuniões
-
-### Frameworks e Metodologias (8 arquivos)
-- **Agent Orchestration Landscape 2026** - Comparativo de 5 correntes (Anthropic/coding-agents/OSS/enterprise/academia) com verificação adversarial
-- **Framework de Story Points** - Estimativas ágeis
-- **Framework de Testes** - White-box, Grey-box, Black-box
-- **GitFlow Patterns** - Motor GitFlow (branching, releases, versionamento)
-- **QA Story Points** - Estimativas de QA
-- **Collaborative Testing Patterns** - Three Amigos, pair testing
-- **Test Strategy Scoring** - Scoring de estratégia de teste
-- **Spec-Driven Development Tools 2025** - Ferramentas e análise
-
-### Plataformas e Tecnologias (2 arquivos)
-- **Git Ledger as Working Dir** - Ledger da federação (Fase 0)
-- **Runflow** - Documentação da plataforma
-
-### Ferramentas (4 arquivos)
-- **Agent Skills** - Formato aberto de skills para agentes IA
-- **Claude Code Commands Best Practices 2026** - Boas práticas de comandos Claude Code
-- **Docker Deployment** - Containerização e deploy
-- **Whisper** - Sistema de transcrição de áudio (OpenAI)
+- **[Conceitos Fundamentais](knowledge-base/index.md#-conceitos-fundamentais-25)** (25) — Domain Context Lifecycle, Task Manager Abstraction, Spec-as-Code/Driven Development, SDAAL, Agent Orchestration, Onion Dogfooding Doctrine, Onion Engine Economy, Onion Relation Vocabulary, Onion Working Method, Knowledge Graph SDAAL, Secret Handling (Agent), Federation Usage Modes, Decision Snapshot Retention, e mais
+- **[Frameworks e Metodologias](knowledge-base/index.md#-frameworks-e-metodologias-8)** (8) — GitFlow, Story Points, Framework de Testes, Collaborative Testing, Test Strategy Scoring
+- **[Plataformas](knowledge-base/index.md#-plataformas-2)** (2) — Git Ledger as Working Dir, Runflow
+- **[Ferramentas](knowledge-base/index.md#-ferramentas-4)** (4) — Agent Skills, Claude Code Commands Best Practices, Docker, Whisper
+- **[Patterns](knowledge-base/index.md#-patterns-1)** (1) — SDAAL Examples
+- **[Architectures](knowledge-base/index.md#-architectures-1)** (1) — C4 + ADR Patterns
+- **[Meta](knowledge-base/index.md#-meta-2)** (2) — Command Creation Patterns, Onion Framework Identity
+- **[Agentic Patterns](knowledge-base/index.md#-agentic-patterns-6)** (6, KB viva) — internals de harness, estratégias de guiar o transformer, observações brutas do campo
 
 **Localização:** `docs/knowledge-base/`
 
@@ -266,13 +221,24 @@ Knowledge Bases estruturadas para consumo por IA e referência técnica:
 Especificações de nível mais alto que servem como "constituição" do Sistema Onion. **As 5 meta-specs L0 foram criadas em 2026-05-18** como parte do saneamento e ativam a validação via `@metaspec-gate-keeper`:
 
 - **[Índice de Meta Specs](meta-specs/index.md)** - Visão geral das meta especificações
-- **[agents.md](meta-specs/agents.md)** ✨ NOVO - Padrões obrigatórios para agentes (YAML, categorias, naming, limites)
-- **[commands.md](meta-specs/commands.md)** ✨ NOVO - Padrões para comandos + **workflows faseados como invariante**
-- **[architecture.md](meta-specs/architecture.md)** ✨ NOVO - Estrutura de diretórios, framework instalável, dependências
-- **[code-standards.md](meta-specs/code-standards.md)** ✨ NOVO - Idioma, formatação, naming, estilo
-- **[integrations.md](meta-specs/integrations.md)** ✨ NOVO - Task Manager Abstraction como referência canônica, padrão de adapter, MCPs
+- **[agents.md](meta-specs/agents.md)** - Padrões obrigatórios para agentes (YAML, categorias, naming, limites)
+- **[commands.md](meta-specs/commands.md)** - Padrões para comandos + **workflows faseados como invariante**
+- **[architecture.md](meta-specs/architecture.md)** - Estrutura de diretórios, framework instalável, dependências
+- **[code-standards.md](meta-specs/code-standards.md)** - Idioma, formatação, naming, estilo
+- **[integrations.md](meta-specs/integrations.md)** - Task Manager Abstraction como referência canônica, padrão de adapter, MCPs
 
 **Localização:** `docs/meta-specs/`
+
+---
+
+## 🎨 Design Context (provisório)
+
+Vertical de design incubada como candidata a **4º contexto de domínio peer** (ao lado de business/technical/compliance) — promoção formal gated por evidência de ritmo distinto via `/meta:context-freshness` (ver [ADR](design-context/decisions/onion-adr-design-peer-promotion.md)).
+
+- **[README](design-context/README.md)** - O que é, princípios (SSOT tokens W3C/DTCG, cascata core→semantic→brand→product→mode)
+- **[Índice](design-context/index.md)** - Hub navegável + frescor
+
+**Localização:** `docs/design-context/`
 
 ---
 
@@ -280,10 +246,13 @@ Especificações de nível mais alto que servem como "constituição" do Sistema
 
 Guias de aplicação do Onion em projetos novos, legados ou regulados:
 
-- **[Guias de Aplicação — README](applying/README.md)** ✨ NOVO - Visão geral e árvore de decisão
-- **[Onion em Projeto Novo (Greenfield)](applying/applying-greenfield.md)** ✨ NOVO - Passo a passo desde `git init`
-- **[Onion em Projeto Legado](applying/applying-legacy.md)** ✨ NOVO - Engenharia reversa + migração gradual
-- **[Onion em Projeto Regulado](applying/applying-regulated.md)** ✨ NOVO - ISO 27001, ISO 22301, SOC2, PMBOK
+- **[Guias de Aplicação — README](applying/README.md)** - Visão geral e árvore de decisão
+- **[Ciclo de Vida da Adoção](applying/adoption-lifecycle.md)** - Fases da adoção, do primeiro contato ao steady-state
+- **[Onion em Projeto Novo (Greenfield)](applying/applying-greenfield.md)** - Passo a passo desde `git init`
+- **[Onion em Projeto Legado](applying/applying-legacy.md)** - Engenharia reversa + migração gradual
+- **[Onion em Projeto Regulado](applying/applying-regulated.md)** - ISO 27001, ISO 22301, SOC2, PMBOK
+- **[Manual de Adoção](applying/onion-adoption-manual.md)** - Referência operacional de `/meta:adopt`
+- **[Rescue Prompt](applying/rescue-prompt.md)** - Prompt de resgate para adoções travadas
 
 ---
 
@@ -295,34 +264,39 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 - **[Landing Page](materials/landing-page.md)** - Esqueleto de 7 seções (hero → CTA)
 - **[Manual — Sumário](materials/manual-toc.md)** - TOC de 11 capítulos (conteúdo existente ✅ / a escrever 🔲)
 - **[Estudos de Caso](materials/case-studies.md)** - 3 casos desenvolvidos (Federation v2, /meta:evolve, Cursor→Native)
+- **[Brand Book](materials/brand-book.md)** - Derivado do `design-context/` (tokens → identidade aplicada)
 - **[Artigo Crítico — Outline](materials/critical-article-outline.md)** - Análise honesta (trade-offs, perguntas duras)
 - **[Press Kit](materials/press-kit.md)** - One-pager, FAQ imprensa, bio, citações
 
 ---
 
+## 🔄 Co-evolução (Federação core↔derivados)
+
+Modelo de co-evolução entre este core (`onion-evolve`) e projetos que adotaram o framework:
+
+- **[README — 3 fluxos](evolution/README.md)** - downstream (core→projetos) · upstream (projetos→core) · handoff (dentro do repo)
+- **[Trust Log](evolution/trust-log.md)** - ledger de confiança da federação (pins, verificações)
+- **`federation/members.yaml`** - registro de adotantes, pins, lineages
+- **`federation/CHANGELOG.md`** - anúncios de mudanças relevantes aos adotantes
+- **`inbox/`** - canal upstream (sinal/feedback de projetos, `_processed/` = já triado)
+- **Comandos**: `/meta:co-evolve` (orientação), `/meta:co-announce` (produzir anúncio), `/meta:co-relay`/`/meta:co-deliver` (transporte local same-machine)
+
+**Localização:** `docs/evolution/`
+
+---
+
 ## 📊 Análises
 
-> **Ciclo de vida** (ver [analysis/README.md](analysis/README.md)): análises e planos são **efêmeros** — uma vez executados, são removidos (git é o arquivo). Permanecem apenas os **baselines ativos** abaixo. As retrospectivas P1/T2.6/T3.2, o plano de saneamento e a análise de vendor Unleash foram **executados/curados e removidos em 2026-06-14** (recuperáveis via git history).
+> **Ciclo de vida** (ver [analysis/README.md](analysis/README.md)): análises e planos são **efêmeros** — uma vez executados, são removidos (git é o arquivo). Este hub navega apenas os **baselines/ADRs duráveis**; a lista completa (55 arquivos nesta pasta) e o critério de retenção vivem em `analysis/README.md` — SSOT para não duplicar uma lista que fica obsoleta a cada sessão.
 
-- **[Revisão Analítica do Sistema Onion — Maio/2026](analysis/onion-review-2026-05.md)** — SSOT de identidade: documenta o abandono de `.onion/`, plano v4.0 e `packages/onion-cli/`; sintetiza as análises-fonte de 2025.
-- **[Baseline de Verificação e Validação — Junho/2026](analysis/onion-vv-baseline-2026-06.md)** — baseline de V&V (tamanhos + conformidade de plataforma); usada por `/meta:evolve`.
-- **[Onion Evolution — 2026-06-25](analysis/onion-evolution-2026-06-25.md)** — auditoria geral **mais recente** (backlog ativo: 35 itens pós-curadoria; 0 blockers reais).
-- **[Onion Federation Audit — 2026-07-01](analysis/onion-federation-audit-2026-07-01.md)** — auditoria **focada em federação** (18 itens; blockers e quick-fixes já executados na própria sessão).
-- **[ADR — Modelos de trabalho: topologias de sessão — Julho/2026](analysis/onion-adr-work-models-session-topologies-2026-07.md)** — decisão durável: **Eixo E** (W1-W7, quem trabalha onde); W6 responder-gated; W7 cron rejeitado como base; gatilho invariável de reflexão (⏰ + re-teste).
-- **[Pesquisa — coordenação assíncrona e autonomia agendada — Julho/2026](analysis/onion-work-models-research-2026-07.md)** — insumo do ADR acima (deep-research, 24 claims verificados): vendor-cron incompatível com soberania; padrões repo-nativos validados.
-- **[Pesquisa — Breadcrumbs Inteligentes no SDAAL — Julho/2026](analysis/onion-intelligent-breadcrumbs-research-2026-07.md)** — deep-research (19 claims confirmados / 6 refutados): estrutura de decisão + validade é a aposta com lastro; armazenamento executável sem prova sobrevivente; menor enabler = `conflict_class`/`valid_when` no diário (ADR gated).
-- **[Parecer — Duas linhagens no rhilo — Julho/2026](analysis/onion-parecer-rhilo-lineages-2026-07.md)** — a instância adotante está partida em meias-instâncias (framework numa linhagem, trabalho na outra); recomendação em 3 movimentos (reunificar identidade → oficializar linhagens → reconciliar conteúdo via KG); decisões D1-D4 pendentes do maestro.
-- **[Onion Evolution — 2026-06-16](analysis/onion-evolution-2026-06-16.md)** — **executado + superseded** (blockers resolvidos nos PRs #69/#82 no mesmo dia; nota de curadoria 2026-07-01; abertos só #7/#8 — KB freshness).
-- **[Onion Evolution — 2026-06-15](analysis/onion-evolution-2026-06-15.md)** — run **retido como proof-point** citado por materiais/identidade (métricas §0: 28 agentes · 1.27M tokens · ~26 min · 30 achados). Não é o backlog ativo.
-- **[ADR — A2A formato vs runtime — Junho/2026](analysis/onion-federation-adr-a2a-format-interop-2026-06.md)** — decisão durável: linha vermelha A2A partida (runtime proibido / formato permitido como projeção one-way).
-- **[ADR — Adoção de repositório — Junho/2026](analysis/onion-adr-repo-adoption-2026-06.md)** — decisão durável: adoção = comando in-platform `/meta:adopt` (não CLI); stamp de versão; rampa da federação.
-- **[ADR — Contexto de domínio: SSOT viva — Junho/2026](analysis/onion-adr-domain-context-lifecycle-2026-06.md)** — decisão durável: contexto de domínio = SSOT viva com ciclo CRUD+ (não snapshot); 3 domínios peer + critério de promoção; pesos derivados; camada *Manage* executável = Tijolo 2.
-- **[ADR — Padrão Faseado Retomável (PFR) — Junho/2026](analysis/onion-adr-phased-resumable-pattern-2026-06.md)** — decisão provisória: nomeia o PFR como backbone determinístico L0 (sessão + `STATE.md` + fases); adia cravar em `commands.md §3` até gatilho de evidência (scaffolder usado ≥2x, ou strategy-ADR aceito).
-- **[ADR — Ledger de co-evolução: formato e localização — Junho/2026](analysis/onion-adr-ledger-format-location-2026-06.md)** — decisão provisória: o formato do ledger fica markdown+YAML (machine-readable já); o repo-neutro (Federação formal) fica gated por gatilho (I14); o norte que resolve o atrito de transporte é automatizar o "Carteiro" — alinhado ao padrão dominante 2026.
-- **[ADR — Vocabulário dos fluxos de co-evolução — Junho/2026](analysis/onion-adr-coevolution-flow-naming-2026-06.md)** — decisão aceita: renomeia os fluxos de rótulos opacos (flow A/B/C) para nomes próprios (**downstream / upstream / handoff**); cumpre a regra "rotular referências opacas" (code-standards §7); preserva história append-only.
-- **[ADR — "Onion adota, não impõe" — Junho/2026](analysis/onion-adr-adopt-to-not-impose-2026-06.md)** — decisão provisória: na adoção, verticais opinativas **detectam o padrão do projeto e deferem/estendem/introduzem** (never-clobber); abre o eixo SDAAL **design-system provider** (`onion-native`/`project-existing`/`none`) + validação de adoção. Diferido ao gatilho.
-- **[ADR — Branching: base resolvida (agnóstica) — Junho/2026](analysis/onion-adr-branching-base-agnostic-2026-06.md)** — decisão provisória: a base de integração é **dado resolvido** (via `resolve-integration-branch.sh`), não GitFlow/`develop` hardcoded; GitFlow = uma topologia, trunk-based = setar a integration branch. Instância do "adota não impõe" (#160); costura nos git:* diferida ao gatilho.
-- **[Revisão da Federação — Junho/2026](analysis/onion-federation-review-2026-06.md)** — federação multi-repo do Onion vs. A2A e padrões de coordenação multi-agente (jun/2026): alinhamento mainstream + por que não A2A vivo + recomendações de nomenclatura/interop.
+**Baselines ativos (referenciados por comandos/constituição):**
+- **[Revisão Analítica do Sistema Onion — Maio/2026](analysis/onion-review-2026-05.md)** — SSOT de identidade, citada por `CLAUDE.md`.
+- **[Baseline de Verificação e Validação — Junho/2026](analysis/onion-vv-baseline-2026-06.md)** — usada por `/meta:evolve`.
+- **[Onion Evolution — mais recente](analysis/onion-evolution-2026-06-25.md)** — última auditoria geral (ponto de comparação da próxima rodada).
+- **[Onion Federation Audit — 2026-07-01](analysis/onion-federation-audit-2026-07-01.md)** — auditoria focada em federação.
+- **[Parecer — Duas linhagens no rhilo — Julho/2026](analysis/onion-parecer-rhilo-lineages-2026-07.md)** — D1/D2 executados; D3 (KG dogfood) e D4 (merge total) pendentes.
+
+**ADRs duráveis (nunca removidos, só *superseded*)** — lista completa e atualizada em [analysis/README.md](analysis/README.md#o-que-permanece-baselines-ativos): adoção de repo, A2A format-vs-runtime, domain-context-lifecycle, PFR, ledger format/location, vocabulário de fluxos de co-evolução, "adota não impõe", branching agnóstico, SLM-as-tool, object-led-discovery, e outros — **13 ADRs ativos** ao todo nesta rodada de scan.
 
 ---
 
@@ -356,7 +330,7 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 1. [Guia de Comandos](onion/commands-guide.md) - Seção "Comandos de Produto"
 2. [Exemplos Práticos](onion/practical-examples.md)
 3. [Knowledge Base - Story Points](knowledge-base/frameworks/framework-story-points.md)
-4. [Knowledge Base - Spec-Driven Development](knowledge-base/concepts/spec-driven-development.md) ✨ NOVO
+4. [Knowledge Base - Spec-Driven Development](knowledge-base/concepts/spec-driven-development.md)
 
 **Comandos essenciais:**
 - `/product/task` - Criar tasks estruturadas
@@ -407,7 +381,17 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 **Recursos:**
 - Agentes de arquitetura: `@c4-architecture-specialist`, `@mermaid-specialist`
 - Comandos de documentação: `/docs/build-tech-docs`, `/docs/reverse-consolidate`
-- Knowledge Bases: [SDAAL](knowledge-base/concepts/specification-driven-ai-abstraction-layer.md), [Spec-Driven Development](knowledge-base/concepts/spec-driven-development.md) ✨ NOVO
+- Knowledge Bases: [SDAAL](knowledge-base/concepts/specification-driven-ai-abstraction-layer.md), [Spec-Driven Development](knowledge-base/concepts/spec-driven-development.md)
+
+### 🎨 Para Design
+
+**Comece com:**
+1. [Design Context — README](design-context/README.md)
+2. `/design` (comandos de geração/validação de design system)
+
+**Recursos:**
+- Agente: `@design-system-specialist`
+- SSOT: `docs/design-context/` (tokens W3C/DTCG)
 
 ### 🔧 Para Administradores do Sistema
 
@@ -445,8 +429,9 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 | 📖 **Guias** | `docs/onion/` | Guias de uso e referência |
 | 📚 **Knowledge Bases** | `docs/knowledge-base/` | Conhecimento estruturado para IA |
 | 🏗️ **Meta Specs** | `docs/meta-specs/` | Especificações de alto nível |
+| 🎨 **Design Context** | `docs/design-context/` | SSOT de identidade visual (provisório) |
 | 📊 **Análises** | `docs/analysis/` | Análises e estudos |
-| 📋 **Planos** | `docs/plans/` | Planos de execução |
+| 🔄 **Evolução/Federação** | `docs/evolution/` | Doc-bridge core↔derivados |
 | 🔧 **SDAAL** | `docs/sdaal/` | Specification-Driven AI Abstraction Layer |
 | 🌐 **Materiais Externos** | `docs/materials/` | Landing page, manual, case studies, press kit (Fase 4) |
 
@@ -461,6 +446,7 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 | 📚 **Documentação** | `/docs/*` | [Guia de Comandos](onion/commands-guide.md#-comandos-de-documentação) |
 | 🌿 **Git** | `/git/*` | [Guia de Comandos](onion/commands-guide.md#-comandos-git) |
 | ⚙️ **Meta** | `/meta/*` | [Guia de Comandos](onion/commands-guide.md#-comandos-meta) |
+| 🎨 **Design** | `/design/*` | [Design Context](design-context/README.md) |
 | 🧅 **Onion** | `/onion/*` | [Sistema Onion](onion/) |
 | ⚡ **Quick** | `/quick/*` | [Guia de Comandos](onion/commands-guide.md) |
 
@@ -469,10 +455,10 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 | Categoria | Agentes | Documentação |
 |-----------|---------|--------------|
 | 🛡️ **Compliance** | `compliance/` (5) | [Referência de Agentes](onion/agents-reference.md#️-agentes-de-compliance) |
-| 🔴 **Meta** | `meta/` (4) | [Referência de Agentes](onion/agents-reference.md#-agentes-meta) |
+| 🔴 **Meta** | `meta/` (5) | [Referência de Agentes](onion/agents-reference.md#-agentes-meta) |
 | ⚙️ **Deployment** | `deployment/` (1) | [Referência de Agentes](onion/agents-reference.md) |
 | 🟣 **Pesquisa** | `research/` (1) | [Referência de Agentes](onion/agents-reference.md#-agentes-de-pesquisa) |
-| 🟢 **Review** | `review/` (1) | [Referência de Agentes](onion/agents-reference.md#-agentes-de-review) |
+| 🟢 **Review** | `review/` (2) | [Referência de Agentes](onion/agents-reference.md#-agentes-de-review) |
 
 ---
 
@@ -484,6 +470,7 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 - [Referência de Agentes](onion/agents-reference.md) - Todos os agentes
 - [Sistema de Testes e Validação](onion/testing-validation-system.md) - Framework completo
 - [Guias de Aplicação](applying/README.md) - Onion em projetos novos, legados ou regulados
+- [Co-evolução — README](evolution/README.md) - Modelo core↔derivados
 
 ### Knowledge Bases
 - [Task Manager Abstraction](knowledge-base/concepts/task-manager-abstraction.md)
@@ -491,7 +478,8 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 - [Framework de Testes](knowledge-base/frameworks/framework-testes.md)
 - [AI Agent Design Patterns](knowledge-base/concepts/ai-agent-design-patterns.md)
 - [Spec-as-Code Strategy](knowledge-base/concepts/spec-as-code-strategy.md)
-- [Spec-Driven Development](knowledge-base/concepts/spec-driven-development.md) ✨ NOVO
+- [Spec-Driven Development](knowledge-base/concepts/spec-driven-development.md)
+- [Onion Dogfooding Doctrine](knowledge-base/concepts/onion-dogfooding-doctrine.md)
 - [Whisper](knowledge-base/tools/whisper.md) - Transcrição de áudio
 
 ### Configuração
@@ -503,29 +491,12 @@ Esqueletos de materiais externos derivados da KB canônica de identidade ([onion
 
 ## 🆕 Novidades
 
-### ✨ Documentação Adicionada Recentemente
+### ✨ Documentação Adicionada Recentemente (ciclo 2026-06/07)
 
-- **[Spec-Driven Development](knowledge-base/concepts/spec-driven-development.md)** (2025-12-02)
-  - Knowledge base completa sobre metodologia emergente
-  - Análise de ferramentas (Kiro, Spec-Kit, Tessl)
-  - Níveis de implementação (Spec-First, Spec-Anchored, Spec-as-Source)
-  - Comparação com TDD, BDD, MDD
-  - Benefícios e desafios
-
-- **[Sistema de Testes e Validação](onion/testing-validation-system.md)** (2025-12-02)
-  - Framework completo de testes e validação
-  - 4 camadas integradas (Knowledge Base, Agentes, Comandos de Teste, Comandos de Validação)
-  - Guia completo para desenvolvedores, QA e times cross-funcionais
-
-- **Comandos de Produto Expandidos**
-  - `/product/extract-meeting` - Extração inteligente de insights de reuniões
-  - `/product/consolidate-meetings` - Consolidação de múltiplas reuniões
-  - `/product/convert-to-tasks` - Converter documentos consolidados em tasks
-  - `/product/whisper` - Facilitador para uso do Whisper
-  - `/docs/consolidate-documents` - Consolidar múltiplos documentos
-  - Agente `@meeting-consolidator` - Consolidação avançada de reuniões
-  - Agente `@whisper-specialist` - Especialista em transcrição de áudio
-  - Knowledge Base Whisper - Documentação completa do Whisper
+- **KB viva `agentic-patterns/`** — como IA + harness colaboram na prática (harness internals, ai-strategies, field-observations); nasceu de observação de campo e cresce com cada dogfood.
+- **`design-context/`** — vertical de design incubada como 4º contexto candidato a peer (provisório, gated por `/meta:context-freshness`).
+- **Federação com rhilo-metagamify** — primeiro adotante real: parecer de linhagens (D1/D2 executados), correção de pin forjado, KB `secret-handling-agent` e `knowledge-graph-sdaal` (crédito: dogfood do adotante).
+- **`onion-dogfooding-doctrine`**, **`onion-engine-economy`**, **`onion-relation-vocabulary`**, **`onion-working-method`** — KBs de doutrina consolidadas nesta janela.
 
 ---
 
@@ -557,10 +528,10 @@ Este índice é gerado automaticamente pelo comando `/docs/build-index`.
 **Para atualizar:**
 ```bash
 /docs/build-index              # Reconstruir índice principal
-/docs/build-index onion        # Reconstruir índice da seção onion
+/docs/build-index knowledge-base   # Reconstruir índice da seção knowledge-base
 ```
 
-**Última atualização:** 2026-06-16 (`/docs:build-index` — contagens reescaneadas do filesystem: concepts 16→17, docs 81→86, frameworks 12→8, tools 2→4, platforms 1→2; remoção de entradas-fantasma do nav de KBs)
+**Última atualização:** 2026-07-03 (`/docs:build-index` — contagens reescaneadas do filesystem: onion 15→17, knowledge-base 47→54 [+ agentic-patterns], materials 6→7 [brand-book], applying passou a ter contagem própria [7], analysis 24→55 listados [seção reduzida a baselines/ADRs, lista completa delegada a `analysis/README.md`], `design-context/` adicionado como nova seção provisória, commands `meta` 24→29 / `product` 20→21 / `validate` 1→6 [subpastas], `common/` fragments 16→24)
 **Mantido por:** Sistema Onion
 
 ---
