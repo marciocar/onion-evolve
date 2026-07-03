@@ -7,8 +7,8 @@ model: sonnet
 allowed-tools: Read Bash(ls *) Bash(find docs*)
 category: general
 tags: [warmup, context, preparation, overview]
-version: "3.1.0"
-updated: "2026-06-18"
+version: "3.2.0"
+updated: "2026-07-03"
 ---
 
 # 🔥 Warm-up Geral do Projeto
@@ -58,6 +58,11 @@ Estabelecer contexto completo do projeto incluindo:
 - ✅ Task Manager Abstraction (ClickUp, Asana, Linear)
 - ✅ Framework EXTRACT para reuniões
 
+### 4.5 Identidade e Ecossistema (quem o Onion É — não só o que tem)
+- ✅ Revisar `docs/knowledge-base/meta/onion-framework-identity.md` — **SSOT de identidade/posicionamento** (pitch, invenções nomeadas, materiais derivados)
+- ✅ Conhecer `docs/applying/onion-adoption-manual.md` — a **persona autobiográfica** (1ª pessoa) + ecossistema vivo: adotantes reais, **Onion-Bridge** (mobile via Agent SDK) e o site **`onionevolve.com`** (autobiografia pública; backend `app.onionevolve.com` com clone do core no VPS)
+- ✅ Sem esta etapa, a sessão sabe *operar* o framework mas não sabe *quem ele é* — perguntas de identidade/persona/site ficam sem resposta
+
 ### 5. Co-evolução (se `docs/evolution/` existir)
 - ✅ Reconhecer o papel do repo: `source` (core) · `adopted` (consumidor) — via `.claude/.onion-version` ou `.claude/validation/onion-version.sh`
 - ✅ Conferir os canais de co-evolução: `docs/evolution/inbox/` (upstream, sinal/feedback) e, em consumidores, `docs/evolution/inbound/` (downstream, relatório de update/anúncio do core). O hook SessionStart "you have mail" já avisa a **contagem** no boot (📬 inbox / 📥 inbound); o warm-up apenas **orienta** — não re-conta.
@@ -71,6 +76,8 @@ Estabelecer contexto completo do projeto incluindo:
 - `docs/onion/commands-guide.md` - Todos os comandos
 - `docs/onion/agents-reference.md` - Todos os agentes
 - `docs/meta-specs/index.md` - Meta especificações
+- `docs/knowledge-base/meta/onion-framework-identity.md` - SSOT de identidade/posicionamento
+- `docs/applying/onion-adoption-manual.md` - Persona autobiográfica + ecossistema (Onion-Bridge, onionevolve.com)
 - `docs/evolution/README.md` - Modelo de co-evolução core↔derivados (se presente)
 
 ### Estrutura de Comandos

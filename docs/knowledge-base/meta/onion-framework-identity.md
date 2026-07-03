@@ -20,9 +20,9 @@ date: 2026-06-15
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2026-06-15 |
-| **Última Atualização** | 2026-06-15 |
+| **Última Atualização** | 2026-07-03 |
 | **Categoria** | Meta |
 | **Propósito** | SSOT para materiais externos: landing page, manual, estudos de caso, artigos críticos, press kit |
 | **Fonte completa** | [onion-product-material-raw-2026-06.md](../../analysis/onion-product-material-raw-2026-06.md) — material bruto, toda afirmação citada `arquivo:seção` |
@@ -348,6 +348,25 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 
 ---
 
+## 10. Ecossistema Vivo (2026-07)
+
+> Fonte: [onion-adoption-manual.md](../../applying/onion-adoption-manual.md) (Partes I-II) +
+> verificação ao vivo em 2026-07-03 (endpoints respondendo).
+
+- **Persona autobiográfica**: o Onion conta a própria história em 1ª pessoa — é a 6ª invenção
+  nomeada, *Autobiographical Marketing* (os commits são a autobiografia; os docs gerados de si
+  são o portfólio). O texto canônico da persona é o **Manual de Adoção**
+  (`docs/applying/onion-adoption-manual.md`, prólogo "O Despertar").
+- **Onion-Bridge (mobile) — deployed**: ponte fina (repo privado `~/onion-bridge`, Node 22 + Hono
+  + PWA Android) que expõe o framework via `@anthropic-ai/claude-agent-sdk` com `cwd` no core.
+  **No ar**: site público **`onionevolve.com`** ("Onion Evolute — A Autobiografia de um Framework
+  Vivo") e backend **`app.onionevolve.com`** (VPS com Caddy/TLS + clone do core em
+  `/home/onion/onion-evolve`), deploy ~2026-06-29.
+- **Adotantes reais**: rhilo-metagamify (co-evolução ativa, lineages mapeadas em
+  `federation/members.yaml`) e rhilo-app (sessões persistentes, Jira/ADF, multi-contexto).
+
+---
+
 ## Mapa de Uso — Esta KB → Materiais Derivados
 
 | Seção | Alimenta |
@@ -361,6 +380,7 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 | 7. Posicionamento vs alternativas | Artigos críticos, comparativos |
 | 8. FAQ | Press kit, manual, onboarding |
 | 9. Citações-chave | Press kit, landing page |
+| 10. Ecossistema vivo | Landing page (prova social), press kit, site onionevolve.com |
 
 ---
 
@@ -377,5 +397,5 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 
 ---
 
-**Última atualização**: 2026-06-15
+**Última atualização**: 2026-07-03 (§10 Ecossistema Vivo — persona, Onion-Bridge deployed, onionevolve.com)
 **Mantido por**: Sistema Onion (síntese — gerada via `/meta:create-knowledge-base`, Fase 3 do plano de materiais externos)
