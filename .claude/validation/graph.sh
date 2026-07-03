@@ -31,9 +31,17 @@ MODE="${1:---markdown}"
 
 have_jq() { command -v jq >/dev/null 2>&1; }
 
-# --- extrator de lista YAML (inline [a,b] OU bloco "- a") do frontmatter ---
+# --- extrator de lista YAML (inline [a,b] OU bloco "- a") do FRONTMATTER ---
+# Escopo restrito ao bloco entre os dois primeiros '---': o corpo dos docs de
+# criadores (agent-creator etc.) contém EXEMPLOS de template com as mesmas keys
+# (related_agents: ["agente-1",...]) que, varridos, poluíam o grafo com nós
+# fantasma E arestas falsas para nós reais (incidente 2026-07-03, achado do
+# dogfood do artefato do grafo). Fora do frontmatter = exemplo, não spec.
 yaml_list() { # $1=file $2=key
   awk -v key="$2" '
+    NR==1 { if ($0 ~ /^---[[:space:]]*$/) { fm=1; next } else exit }
+    fm && /^---[[:space:]]*$/ { exit }
+    !fm { next }
     $0 ~ "^"key":" {
       l=$0; sub("^"key":[[:space:]]*","",l)
       if (l ~ /^\[/) { gsub(/[]["]/,"",l); n=split(l,a,","); for(i=1;i<=n;i++){gsub(/^[[:space:]]+|[[:space:]]+$/,"",a[i]); if(a[i]!="")print a[i]} ; next }

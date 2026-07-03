@@ -129,22 +129,10 @@
 # subject	predicate	object	via
 adopter	adopts	onion	
 adopter	signals	core	doc-bridge
-agent-creator-specialist	related	/comando-1	
-agent-creator-specialist	related	/comando-2autonomy: alta|media|baixa	
-agent-creator-specialist	related	/docs:build-compliance-docs	
-agent-creator-specialist	related	/meta/comandoautonomy: alta	
 agent-creator-specialist	related	/meta/create-agent	
 agent-creator-specialist	related	/meta/create-agent-express	
-agent-creator-specialist	related	/meta/setup-integrationautonomy: alta	
-agent-creator-specialist	related	/product/task	
-agent-creator-specialist	related	agente-1	
-agent-creator-specialist	related	agente-2	
-agent-creator-specialist	related	agente-3	
 agent-creator-specialist	related	command-creator-specialist	
 agent-creator-specialist	related	onion	
-agent-creator-specialist	related	product-agent	
-agent-creator-specialist	related	security-information-master	
-agent-creator-specialist	related	task-specialist	
 agent-skills-specialist	related	/meta/create-agent	
 agent-skills-specialist	related	/meta/create-command	
 agent-skills-specialist	related	/meta/create-skill	
