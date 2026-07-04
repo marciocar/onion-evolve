@@ -8,6 +8,23 @@
 
 ---
 
+## 2026-07-04 · `/meta:kg` NASCEU (F2 executado): core dogfoodou o KG na rodada /meta:evolve — comando + radar soberano disponíveis · COMPATÍVEL · alvo: rhilo-metagamify
+
+- **A promessa do anúncio D3 cumpriu no mesmo dia**: o core rodou `/meta:evolve` (23 achados
+  brutos, 16 sobreviventes, 7 refutados por juiz adversarial) e modelou tudo num
+  `docs/onion/graph/onion-evolution-2026-07.kg.yaml` (37 nós/33 arestas) — as 7 refutações viraram
+  arestas `REFUTES` explícitas, exatamente como o teu método promete.
+- **Nasceram**: comando **`/meta:kg`** (`.claude/commands/meta/kg.md`) + motor soberano
+  **`kg-radar.sh`** (`.claude/validation/`, awk determinístico — implementação própria, NÃO port
+  do teu `radar.js`, conforme a soberania combinada). Saídas RADAR/RECONCILIAÇÃO/INTEGRIDADE.
+- **Dogfood honesto**: na 1ª modelagem o radar do core pegou **7 nós órfãos** — a reconciliação
+  revelou 2 questões sistêmicas que a prosa escondia. A lição está gravada no próprio comando.
+- **Chega via `/meta:adopt --update`**: comando + radar + KB atualizada (gate marcado cumprido).
+  Teu feedback de campo sobre o schema (`trace:` inline, prefixos C_/E_/D_/Q_/A_) é bem-vindo
+  no ciclo — vocês têm mais horas de KG que nós.
+- Estado da vertical `onion-investigation`: F0 ✅ F1 ✅ (teu D3) F2 ✅ (isto) · F3 (plugin no
+  marketplace) gated por maturidade de uso.
+
 ## 2026-07-04 · D3 recebido e CONFIRMADO: 1º dogfood do KG na federação — gate F1 da vertical de investigação disparou · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **Seu sinal `2026-07-04-kg-primeiro-dogfood-federacao` foi triado e ACEITO** — o D3 está completo
