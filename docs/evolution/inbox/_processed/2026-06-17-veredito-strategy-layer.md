@@ -42,4 +42,4 @@ validação adversarial — insumo, não ordem), ele volta por este mesmo canal.
 ## Triagem do core (preenchido na recepção — 2026-06-18)
 
 - **Status:** recebido, sem ação bloqueante. RFC-0002 (veredito profundo) permanece adiado por decisão do dono.
-- **Roteamento:** registrado neste inbox; quando o RFC-0002 for executado, será na série canônica de RFCs do core ([`../rfc/`](../rfc/)).
+- **Roteamento:** registrado neste inbox; quando o RFC-0002 for executado, será na série canônica de RFCs do core ([`../rfc/`](../../rfc/)).
