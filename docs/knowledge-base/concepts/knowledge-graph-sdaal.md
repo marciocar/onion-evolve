@@ -11,6 +11,11 @@
 > auditoria/investigação longa do core deve modelar seus achados num `.kg.yaml` e só então o comando
 > gradua (mesma doutrina gated-until-trigger de F2-F5). Construir o comando antes do dogfood seria
 > construir à frente do gatilho.
+>
+> **Rampa de vertical**: este padrão é a espinha da vertical `onion-investigation` — desenho, rampa
+> F0-F3 e capability draft no ADR
+> [onion-adr-verticals-investigation-cartography-2026-07.md](../../analysis/onion-adr-verticals-investigation-cartography-2026-07.md)
+> (F1 = o 1º dogfood acima, em execução na sessão rhilo desde 2026-07-03).
 
 ## O problema que o padrão resolve
 
