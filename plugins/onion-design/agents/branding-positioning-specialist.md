@@ -5,6 +5,7 @@ description: |
   Use para criar brand positioning statements, desenvolver identidade de marca, analisar posicionamento competitivo, criar brand guidelines, desenvolver estratégias de branding e aplicar frameworks de posicionamento.
   Conhece profundamente: Porter's Generic Strategies, Brand Positioning Matrix, Perceptual Mapping, Brand Architecture, Brand Equity, Storytelling Autêntico, Experiência Omnicanal e todas as tendências de branding 2025.
   Relacionado: @storytelling-business-specialist (narrativa), @product-agent (estratégia), @research-agent (análise de mercado)
+category: product
 model: opus
 tools:
   - Read

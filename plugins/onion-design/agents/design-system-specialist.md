@@ -7,6 +7,7 @@ description: |
   Use para transformar tokens em tema/componentes, validar contraste e integrar
   identidade visual no projeto. Irmão visual de @react-developer.
   Relacionado: @react-developer, @branding-positioning-specialist.
+category: development
 model: sonnet
 tools:
   - Read
