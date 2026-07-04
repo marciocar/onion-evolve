@@ -7,10 +7,10 @@ description: |
 model: opus
 category: meta
 tags: [evolve, audit, orchestration, self-evolution, modernization]
-version: "1.2.0"
-updated: "2026-06-17"
+version: "1.3.0"
+updated: "2026-07-04"
 allowed-tools: Read Write Grep Glob Bash(find *) Bash(wc *) Bash(git log*) Bash(cat .env*)
-argument-hint: "[dimensão específica (D1..D9) | vazio = auditoria completa]"
+argument-hint: "[dimensão específica (D1..D10) | vazio = auditoria completa]"
 related_commands:
   - /meta:orchestrate
   - /meta:kb-freshness
@@ -54,14 +54,14 @@ A orquestração roda **sempre no nível principal** (este comando + skill
 ## 📥 Input
 
 ```
-/meta:evolve            # auditoria completa (9 dimensões)
+/meta:evolve            # auditoria completa (10 dimensões)
 /meta:evolve D2         # só uma dimensão (ex.: redundância)
 ```
 
 ## 🔬 Dimensões de auditoria (fan-out)
 
 Top-level = **fan-out-and-synthesize** (1 worker por dimensão, barrier, fan-in em
-JS no contexto principal). **D4, D5 e D9 são composição** — delegam a comandos
+JS no contexto principal). **D4, D5, D9 e D10 são composição** — delegam a comandos/rotina
 existentes, **não** reimplementam (e não aninham orquestração dentro de orquestração).
 
 | # | Dimensão | O que escaneia (evidência) | Tier |
@@ -75,6 +75,7 @@ existentes, **não** reimplementam (e não aninham orquestração dentro de orqu
 | D7 | **Cross-refs / links** | `find .claude -xtype l` (symlinks quebrados) + links relativos `[..](..)` que apontam para arquivos inexistentes. | haiku |
 | D8 | **Plataforma/frontmatter + inventário** | Cobertura de `allowed-tools`/`model:`, frontmatter completo, kebab-case ([commands.md §1](../../../docs/meta-specs/commands.md), [agents.md](../../../docs/meta-specs/agents.md)). **Inventário:** roda `bash .claude/validation/inventory.sh --markdown` e compara com `docs/onion/inventory.md` + contagens em `CLAUDE.md`; divergência = achado (atuador `/meta:inventory`, **não** edição manual — ver doutrina §regra de inventário). | haiku |
 | D9 | **Frescor de contexto de domínio** | **DELEGA a `/meta:context-freshness`** — ingere `FreshnessSchema[]` dos `docs/*-context/`. Herda o threshold ≤18mo (item 1 da régua de contexto). No framework = **no-op** (contextos são templates, só README); o valor é em projeto-alvo que populou os contextos. Não reimplementar; não aninhar orquestração. | (context-freshness) |
+| D10 | **Frescor da memória de sessão** | **CONTEXTO PRINCIPAL, não worker** (a memória `~/.claude/projects/<projeto>/memory/` é da sessão que roda o evolve; subagente não a enxerga). Para cada entrada do `MEMORY.md`: **1 teste barato de validade** conforme a classe de apodrecimento — fato-de-ambiente (`command -v`/`curl`/`ls`), estado-de-trabalho (`git log`/`ls` no artefato resolutor), preferência-do-maestro (**não expira sozinha** — só o maestro invalida). Corrigir/apagar na hora; nunca re-carimbar sem re-testar. Carimbar a varredura no índice (`última varredura: <data>, N rot em M`). **No-op gracioso** se a sessão não tem memória. Reporta ao relatório só contagens/vereditos (privacidade — nunca colar conteúdo de memória). Doutrina: [session-memory-lifecycle.md](../../../docs/knowledge-base/concepts/session-memory-lifecycle.md). | (principal) |
 
 ## ⚡ Etapas de Execução
 
@@ -83,24 +84,28 @@ Confirme a ferramenta nativa **Workflow**. Se ausente → **fallback serial**
 (Passo 5) com aviso em pt-BR. Determinístico, não inferido.
 
 ### Passo 1 — Escopo
-- `$ARGUMENTS` preenchido com `D1..D9` → roda só aquela dimensão.
-- Vazio → roda as 9. Levante os alvos com `Glob`/`find`/`Grep`.
+- `$ARGUMENTS` preenchido com `D1..D10` → roda só aquela dimensão.
+- Vazio → roda as 10. Levante os alvos com `Glob`/`find`/`Grep`.
 
 ### Passo 2 — Delegar padrão à skill `onion-orchestration`
-Acione **`onion-orchestration`** com: tarefa = "auditar o Onion em 9 dimensões
+Acione **`onion-orchestration`** com: tarefa = "auditar o Onion em 10 dimensões
 independentes"; independência = alta (cada dimensão é autônoma); padrão esperado
 = **fan-out-and-synthesize**. A skill confirma elegibilidade e tiering.
 
-### Passo 3 — Fan-out (workers de dimensão) + composição (D4/D5/D9)
+### Passo 3 — Fan-out (workers de dimensão) + composição (D4/D5/D9/D10)
 Autore o script `Workflow`. Cada worker de dimensão recebe a régua da sua linha e
-devolve `FindingSchema[]`. **D4, D5 e D9 NÃO são workers** — são chamados no fluxo
-principal (sequencialmente) e seus resultados mesclados, pois `kb-freshness` já
-roda sua própria orquestração interna (aninhar violaria `onion-orchestration`).
+devolve `FindingSchema[]`. **D4, D5, D9 e D10 NÃO são workers** — D4/D5/D9 são
+chamados no fluxo principal (sequencialmente) e seus resultados mesclados, pois
+`kb-freshness` já roda sua própria orquestração interna (aninhar violaria
+`onion-orchestration`); **D10 roda no contexto principal por necessidade** — a
+memória de sessão só é visível à sessão que executa o evolve (subagente não a
+enxerga), e seus achados entram como `FindingSchema[]` com contagens/vereditos,
+nunca conteúdo de memória.
 
 ```javascript
 const FindingSchema = {
   id: "string",                      // chave ESTÁVEL de correlação — atribuída no fan-in (`${dimension}-${ordinal}`)
-  dimension: "D1|D2|D3|D4|D5|D6|D7|D8|D9",
+  dimension: "D1|D2|D3|D4|D5|D6|D7|D8|D9|D10",
   severity: "blocker|recommended|opportunistic",   // 🔴 | 🟡 | 🟢
   finding: "string",                 // descrição
   evidence: "string",                // arquivo:linha ou output
@@ -123,10 +128,11 @@ const scanFindings = await parallel(
 const kbFindings = await runCommand("/meta:kb-freshness");         // D4 — ingere FreshnessSchema[]
 const specFindings = await runCommand("/meta:metaspec-validate");  // D5 — por artefato de alto risco
 const ctxFindings = await runCommand("/meta:context-freshness");   // D9 — FreshnessSchema[] dos docs/*-context/ (vazio no framework)
+const memFindings = sweepSessionMemory();                          // D10 — CONTEXTO PRINCIPAL: 1 teste/entrada do MEMORY.md; só contagens/vereditos (no-op sem memória)
 
 // Atribuir id ESTÁVEL a cada achado — é a única chave confiável de correlação
 // entre achado e veredito no fan-in (o juiz reformula o texto; o id não muda).
-const allFindings = [...scanFindings.flat(), ...kbFindings, ...specFindings, ...ctxFindings]
+const allFindings = [...scanFindings.flat(), ...kbFindings, ...specFindings, ...ctxFindings, ...memFindings]
   .map((f, i) => ({ ...f, id: `${f.dimension}-${i}` }));
 ```
 
@@ -151,7 +157,7 @@ const VerdictSchema = {
 ```
 
 ### Passo 3.2 — Completeness critic (loop-until-done, budget-gated)
-Antes do fan-in, um crítico confirma que as 9 dimensões rodaram e nenhuma
+Antes do fan-in, um crítico confirma que as 10 dimensões rodaram e nenhuma
 categoria de artefato foi pulada (incl. D9 — ausência de achados de contexto só é
 válida se os `docs/*-context/` forem templates; em projeto-alvo populado, vazio
 silencioso = falha, não sucesso). O que faltar vira nova rodada.
@@ -181,7 +187,7 @@ Avise em pt-BR; itere as dimensões com `Agent` uma a uma com o mesmo
 # Onion Evolution Backlog — <data>
 
 ## 0. Sumário
-◆ Dimensões: 9  ◆ Padrão: fan-out-and-synthesize  ◆ Workers: N
+◆ Dimensões: 10  ◆ Padrão: fan-out-and-synthesize  ◆ Workers: N
 ◆ Budget: ~X tokens  ◆ Run ID: <id>  ◆ Agent View: <ref>
 
 ## 1. Backlog priorizado
@@ -189,7 +195,7 @@ Avise em pt-BR; itere as dimensões com `Agent` uma a uma com o mesmo
 |---|-----|-----|------------------------|-------------------|---------------|---------|---------------------|
 | 1 | 🔴 | D6 | ... | shed-ceremony→KB | ... | M | /meta:create-knowledge-base |
 
-## 2. Achados por dimensão (D1–D8)
+## 2. Achados por dimensão (D1–D10)
 ## 3. Alertas transversais (causa sistêmica)
 ## 4. Invariantes respeitadas
    - Nenhuma proposta funde fases de engineer/* ou product/* (verificado pelo juiz adversarial).
@@ -210,7 +216,7 @@ regra da [Doutrina de Modernização](../../../docs/knowledge-base/concepts/onio
 
 ## ⚠️ Notas
 
-- **Read-only**: propõe, não muta `.claude/`. Só escreve o relatório em `docs/analysis/`.
+- **Read-only**: propõe, não muta `.claude/`. Só escreve o relatório em `docs/analysis/`. Exceção deliberada do D10: a **memória de sessão** (fora do repo) é corrigida/apagada na hora — é cache da sessão, não artefato do framework ([session-memory-lifecycle.md](../../../docs/knowledge-base/concepts/session-memory-lifecycle.md)).
 - **Compõe, não duplica**: D4/D5/D9 reusam `/meta:kb-freshness`, `/meta:metaspec-validate` e `/meta:context-freshness` — nunca reimplementam, nunca aninham orquestração dentro de orquestração.
 - **Invariante**: pode *reportar* sobre os workflows faseados, **nunca** propor fundir suas fases — o juiz adversarial veta.
 - Orquestre **sempre no nível principal**; **não crie** um agente "evolve-worker".

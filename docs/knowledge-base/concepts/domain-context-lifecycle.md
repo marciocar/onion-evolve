@@ -99,3 +99,8 @@ Esta KB define a **doutrina**. A execução da fase *Manage* (auditar frescor de
 > CURRENT/STALE/HISTORICAL, fan-out via `onion-orchestration`, contradição cross-domínio no fan-in),
 > com a Regra 15 do lint exigindo o carimbo de frescor e a dimensão D9 do `/meta:evolve`
 > compondo a auditoria. Esta KB é a doutrina (Tijolo 1) que esse comando executa.
+
+> **Irmã (2026-07-04):** a mesma tese ("stale engana ativamente") foi estendida ao 4º contexto
+> auditável — a **memória de sessão do harness** — em
+> [session-memory-lifecycle.md](session-memory-lifecycle.md) (3 classes de apodrecimento,
+> 3 gatilhos, dimensão **D10** do `/meta:evolve`).
