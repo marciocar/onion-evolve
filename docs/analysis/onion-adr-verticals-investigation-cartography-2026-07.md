@@ -7,7 +7,7 @@ decision-scope: meta / verticais / marketplace / sdaal
 supersedes: none
 extends: onion-adr-exchange-unit-2026-06.md, onion-adr-capability-contract-2026-06.md
 deciders: maestro + sessão de evolução
-context_freshness: 2026-07-03
+context_freshness: 2026-07-04
 related:
   - docs/knowledge-base/concepts/knowledge-graph-sdaal.md (doutrina da espinha da vertical A)
   - docs/analysis/onion-parecer-rhilo-lineages-2026-07.md (D3 = 1º dogfood do KG — gatilho F1 da vertical A)
@@ -67,11 +67,11 @@ planes DEV↔PROD; radar de atenção), e a pesquisa multi-fonte alimenta esse g
 
 **Rampa gated:**
 
-| Fase | O quê | Gatilho | Estado (2026-07-03) |
+| Fase | O quê | Gatilho | Estado (2026-07-04) |
 |---|---|---|---|
 | F0 | Este ADR + capability draft | decisão do maestro | ✅ feito |
-| F1 | 1º dogfood do KG na federação (D3: reconciliar pesquisa-da-dose × motor via `wrr-audit.kg.yaml`) | execução na sessão rhilo + **sinal upstream com o resultado** | 🔄 **em execução** (sessão rhilo, 2026-07-03) |
-| F2 | `/meta:kg` + store `kg-yaml` no core | F1 concluído + 1ª investigação real do core modelada em `.kg.yaml` | ⏳ gated |
+| F1 | 1º dogfood do KG na federação (D3: reconciliar pesquisa-da-dose × motor via `wrr-audit.kg.yaml`) | execução na sessão rhilo + **sinal upstream com o resultado** | ✅ **concluído** (sinal [`2026-07-04-kg-primeiro-dogfood-federacao`](../evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md): 56 nós, 81 arestas, radar sem contradições; inclui **fluxo reverso** — o grafo refutou o framing original PROD→DEV) |
+| F2 | `/meta:kg` + store `kg-yaml` no core | F1 concluído + 1ª investigação real do core modelada em `.kg.yaml` | 🔓 **aberto — aguardando veículo** (a próxima investigação/auditoria longa do core, candidata: rodada de `/meta:evolve`; o comando nasce JUNTO com esse dogfood, não em abstrato) |
 | F3 | manifesto `onion-investigation.manifest.sh` → plugin no marketplace | ≥2 artefatos maduros (mesmo critério que graduou design/compliance) | ⏳ gated |
 
 **Capability draft** (rascunho — vira `capability.json` só na F3):
@@ -157,3 +157,4 @@ gatilho foi o erro do plano v4.0. Este ADR é o anti-v4.0 — desenho registrado
 | Data | Mudança |
 |---|---|
 | 2026-07-03 | F0: desenho aceito pelo maestro; F1 da vertical A em execução (sessão rhilo) |
+| 2026-07-04 | F1 da vertical A ✅ (sinal upstream do rhilo, triado e confirmado); F2 🔓 aberto aguardando veículo. Decisão de triagem: NÃO vendorizar `scripts/kg/` do rhilo (soberania mantida) |
