@@ -7,6 +7,7 @@ description: |
   Use dentro da orquestração de /design:generate (generate-and-filter). Cada invocação produz
   UMA candidata independente (ideal para fan-out paralelo).
   Relacionado: @design-system-specialist (materializa o vencedor), @branding-positioning-specialist (brief).
+category: development
 model: sonnet
 tools:
   - Read

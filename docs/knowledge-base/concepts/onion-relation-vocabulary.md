@@ -1,3 +1,11 @@
+---
+title: "Vocabulário de relações do Onion (TBox)"
+category: concepts
+status: active
+date: 2026-06-28
+updated: 2026-07-04
+---
+
 # Vocabulário de relações do Onion (TBox da ontologia leve)
 
 > **O que é:** o conjunto **controlado** de classes e predicados com que o Onion descreve a si mesmo — o

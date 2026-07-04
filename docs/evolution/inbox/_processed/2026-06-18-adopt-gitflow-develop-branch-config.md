@@ -24,7 +24,7 @@ git config gitflow.branch.master  main             # produção
 ```
 
 O `/engineer/pr` resolve a base do PR pelo **motor GitFlow**, que lê `git config gitflow.branch.develop`
-([gitflow-patterns.md](../../knowledge-base/frameworks/gitflow-patterns.md)). Sem essa config, o fluxo
+([gitflow-patterns.md](../../../knowledge-base/frameworks/gitflow-patterns.md)). Sem essa config, o fluxo
 não sabe qual é a branch de integração do alvo — cai no default (`develop`/`main`) e pode mirar errado.
 
 ## Causa-raiz

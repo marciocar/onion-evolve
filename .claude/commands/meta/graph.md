@@ -1,6 +1,7 @@
 ---
 description: Consulta a lente sócio-técnica do Onion (grafo gerado da spec-as-code) — impacto reverso, caminho entre necessidade e capacidade, e órfãos. Dogfooda o grafo a serviço da orquestração.
 name: graph
+model: sonnet
 allowed-tools: Read Bash(bash .claude/validation/graph.sh*)
 argument-hint: "[--impact <nó> | --path <de> <até> | --orphans | --view]"
 category: meta

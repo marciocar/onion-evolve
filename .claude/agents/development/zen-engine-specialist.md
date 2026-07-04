@@ -5,6 +5,7 @@ description: |
   Use para: criar JDM para elementos de gamificação, validar regras complexas, otimizar Decision Tables, 
   implementar integração ZEN Engine no MetaGamify, resolver problemas de performance em avaliação de regras.
   Conhece profundamente: ZEN Engine / JDM (GoRules), ADR-004, integração técnica do MetaGamify.
+category: development
 model: sonnet
 tools:
   - Read

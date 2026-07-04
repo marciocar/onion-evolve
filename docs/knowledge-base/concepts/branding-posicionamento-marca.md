@@ -1,3 +1,11 @@
+---
+title: "Branding e Posicionamento de Marca"
+category: concepts
+status: reference
+date: 2026-05-15
+updated: 2026-07-04
+---
+
 # Branding e Posicionamento de Marca
 
 Base de conhecimento sobre branding e posicionamento de marca, incluindo conceitos fundamentais, estratégias modernas, tendências de 2025 e frameworks práticos para construção e gestão de marcas.
