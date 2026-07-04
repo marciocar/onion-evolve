@@ -7,17 +7,18 @@
 > generalizado**; a implementação de referência vive no rhilo (`scripts/kg/radar.js` +
 > `docs/rhilo/graph/wrr-audit.kg.yaml`).
 >
-> **Gate (comando `/meta:kg`): fechado até o core dogfoodar o método uma vez** — a próxima
-> auditoria/investigação longa do core deve modelar seus achados num `.kg.yaml` e só então o comando
-> gradua (mesma doutrina gated-until-trigger de F2-F5). Construir o comando antes do dogfood seria
-> construir à frente do gatilho.
+> **Gate (comando `/meta:kg`): ✅ CUMPRIDO em 2026-07-04** — o core dogfoodou o método na rodada
+> de `/meta:evolve` ([`onion-evolution-2026-07.kg.yaml`](../../onion/graph/onion-evolution-2026-07.kg.yaml),
+> 37 nós/33 arestas, 7 refutações como arestas REFUTES) e o comando **`/meta:kg`** nasceu dessa
+> vivência, junto com o motor soberano `.claude/validation/kg-radar.sh`. A doutrina
+> gated-until-trigger foi respeitada: o comando veio DEPOIS do dogfood, não antes.
 >
 > **Rampa de vertical**: este padrão é a espinha da vertical `onion-investigation` — desenho, rampa
 > F0-F3 e capability draft no ADR
 > [onion-adr-verticals-investigation-cartography-2026-07.md](../../analysis/onion-adr-verticals-investigation-cartography-2026-07.md).
-> **F1 disparou em 2026-07-04** (1º dogfood na federação, sessão rhilo — ver nota de doutrina abaixo);
-> o gate do comando permanece: `/meta:kg` nasce JUNTO com a 1ª investigação real do **core** modelada
-> em `.kg.yaml` (F2 aberto, aguardando veículo).
+> **F1 disparou em 2026-07-04** (1º dogfood na federação, sessão rhilo — ver nota de doutrina abaixo)
+> e **F2 executou no mesmo dia** (dogfood do core via `/meta:evolve` → `/meta:kg` + `kg-radar.sh`).
+> Resta F3 (plugin `onion-investigation`), gated por maturidade de uso.
 
 ## Nota de doutrina — git merge não reconcilia verdades (confirmada em campo)
 

@@ -106,7 +106,7 @@ arquitetura — não deixada ao acaso de cada sessão.
 
 **3. SDAAL** *(Software Defined Abstraction Adapter Layer)*
 Uma única interface para múltiplos providers. Você configura `TASK_MANAGER_PROVIDER=jira` no `.env`
-e todos os meus 93 comandos falam com o Jira automaticamente. Troca para ClickUp? Muda uma variável.
+e todos os meus 95 comandos falam com o Jira automaticamente. Troca para ClickUp? Muda uma variável.
 O adapter resolve ADF vs Markdown vs HTML. Você não muda o comando — muda o provider.
 
 **4. Capability Contract**
@@ -134,7 +134,7 @@ O que existe hoje, em julho de 2026:
 
 | Componente | Quantidade | Detalhe |
 |---|---|---|
-| **Comandos** | 93 | 10 categorias + 3 comandos root |
+| **Comandos** | 95 | 10 categorias + 3 comandos root |
 | **Agentes** | 51 | 9 categorias especializadas |
 | **Skills** | 5 | `onion`, `onion-orchestration`, `onion-patterns`, `onion-validation`, `language-standards` |
 | **Knowledge Bases** | 49 | 7 categorias (conceitos, frameworks, arquiteturas, ferramentas, plataformas, padrões agentic, meta) |
@@ -219,7 +219,7 @@ TASK_MANAGER_PROVIDER=jira    # ou clickup, asana, linear, none
 TASK_MANAGER_TRANSPORT=api    # padrão; mcp se tiver MCP ativo
 ```
 
-E todos os 93 comandos passam a falar com o Jira. O adapter resolve os detalhes: ADF para
+E todos os 95 comandos passam a falar com o Jira. O adapter resolve os detalhes: ADF para
 descrições no Jira Cloud, Markdown para ClickUp e Linear, HTML para Asana. Você não muda o comando
 — muda o provider. O mesmo `/product:task "Implementar OAuth"` cria a task no sistema certo,
 no formato certo, sem adaptação manual.
@@ -327,7 +327,7 @@ O maestro fará o merge quando fizer sentido — no ritmo do projeto, não no ri
 
 ### 5.1 O cardápio de comandos
 
-Você não precisa memorizar 93 comandos. Você precisa saber que eles existem e como encontrá-los.
+Você não precisa memorizar 95 comandos. Você precisa saber que eles existem e como encontrá-los.
 `/onion` é o dispatcher inteligente — descreve o que você quer fazer em linguagem natural, e o
 Onion recomenda o comando certo.
 
