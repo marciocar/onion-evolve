@@ -6,6 +6,10 @@ on:
       - '.claude/**'
       - 'docs/meta-specs/**'
       - 'docs/design-context/**'
+      # plugins/ são artefatos GERADOS guardados pela REGRA 19 (drift vs fonte).
+      # Sem este path, um PR que só toca plugins/ contorna o drift-guard
+      # (incidente 2026-07-04: fix de drift do #241 mergeou sem o lint rodar).
+      - 'plugins/**'
 
 permissions:
   contents: read
