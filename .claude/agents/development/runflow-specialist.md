@@ -3,6 +3,7 @@ name: runflow-specialist
 description: |
   Especialista em Runflow SDK e plataforma para desenvolvimento de agentes IA, workflows e integrações.
   Use para desenvolvimento de agentes IA, workflows e integracoes via Runflow SDK.
+category: development
 model: sonnet
 tools:
   - Read

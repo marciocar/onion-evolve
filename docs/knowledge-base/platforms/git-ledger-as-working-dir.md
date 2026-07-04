@@ -122,6 +122,6 @@ principal (§4.2:203, §10.1:332-333).
 ## 6. Conexão com a evolução
 
 Esta KB fecha a parte técnica da **Fase 0** (GATE) do
-[Onion Federation v2](../../analysis/onion-federation-design-v2-2026-06.md §7). Com SA-3 de-riscado
+[Onion Federation v2](../../analysis/onion-federation-design-v2-2026-06.md) §7. Com SA-3 de-riscado
 e o placement liberado (Sim-com-ajustes), o caminho para a **Fase 1** (formato de contrato +
 bootstrap do ledger real, testável num repo só) está aberto — respeitados os ajustes 2a e 6a acima.

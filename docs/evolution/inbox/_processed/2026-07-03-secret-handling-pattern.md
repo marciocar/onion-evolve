@@ -46,8 +46,8 @@ apagado depois. O agente deve **projetar o fluxo para não precisar ver o segred
 
 ## Proposta ao core
 
-- Formalizar como **spec SDAAL** em `docs/knowbase/concepts/secret-handling-agent.md` (markdown executável),
-  referenciada pelo [SDAAL](../../knowbase/concepts/specification-driven-ai-abstraction-layer.md) e pelas
+- Formalizar como **spec SDAAL** em `docs/knowledge-base/concepts/secret-handling-agent.md` (markdown executável),
+  referenciada pelo [SDAAL](../../knowledge-base/concepts/specification-driven-ai-abstraction-layer.md) e pelas
   regras de agente (`.claude/`). O agente passa a, por default: detectar necessidade de segredo → escolher
   o padrão (1–5) → **nunca** pedir texto claro.
 - Casar com a governança **DEV↔PROD** (sinal anterior, 2026-07-02): ação privilegiada em produção é

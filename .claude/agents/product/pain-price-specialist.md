@@ -4,6 +4,7 @@ description: |
   Especialista em analisar e precificar a dor de clientes usando frameworks validados e conhecimento estruturado.
   Use para: análise profunda de dores do cliente, identificação de oportunidades de valor, precificação baseada em outcomes.
   Integra conhecimento de: knowledge base de identificação/precificação, contexto de negócio do projeto, metodologias JTBD, Value Proposition Canvas, Customer Development.
+category: product
 model: opus
 tools:
   - Read

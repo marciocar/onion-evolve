@@ -34,7 +34,7 @@ datado, e as **correções ficam enterradas em prosa**. Consequências observada
 ### 1. Knowledge Graph SDAAL — a fonte da verdade como grafo ponderado
 Em vez de log, um `.kg.yaml`: **nós tipados** (`claim/decision/question/entity/evidence/artifact`) +
 **arestas tipadas com peso** (`SUPPORTS/REFUTES/SUPERSEDES/CAUSES/DEPENDS_ON/TRACES_TO`) + **plane**
-(`DEV`/`PROD`). No espírito [SDAAL](../../knowbase/concepts/specification-driven-ai-abstraction-layer.md)
+(`DEV`/`PROD`). No espírito [SDAAL](../../knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
 (markdown/YAML executável por IA). As auto-correções viram **arestas `REFUTES` explícitas** — a história
 não se apaga, se reconcilia. Uma ferramenta (`scripts/kg/radar.js`) computa **atenção = impacto × confiança
 × centralidade (PageRank)**, lista as verdades confrontadas e **checa integridade** (rejeita nó `done` não
@@ -63,14 +63,14 @@ tinha esquecido de ligar. O método se auto-corrigiu.
 
 ## Artefatos (para avaliar/portar ao core)
 
-- `docs/knowbase/concepts/knowledge-graph-sdaal.md` — a spec do método.
+- `docs/knowledge-base/concepts/knowledge-graph-sdaal.md` — a spec do método.
 - `scripts/kg/radar.js` — a ferramenta (atenção + reconciliação + integridade).
 - `docs/rhilo/graph/wrr-audit.kg.yaml` — a primeira instância (exemplo).
 
 ## Pedido
 
 Avaliar promover o **Knowledge Graph SDAAL** + a **governança DEV↔PROD** ao core do Onion (como
-`docs/knowbase/concepts/` + um comando `/meta:kg` análogo ao `/meta:co-evolve`). Se aprovado, generalizar
+`docs/knowledge-base/concepts/` + um comando `/meta:kg` análogo ao `/meta:co-evolve`). Se aprovado, generalizar
 o `scripts/kg/` para além do caso WRR e ligar a reconciliação por embedding (MiniLM já disponível).
 
 *Rode `/meta:co-evolve` para gerenciar este sinal.*

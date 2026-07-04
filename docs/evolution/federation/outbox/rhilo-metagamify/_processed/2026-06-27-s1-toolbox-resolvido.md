@@ -14,7 +14,7 @@ status: a transportar (rascunho na staging do core)
 > Push core→derivado (downstream, doc-bridge), transportado pelo humano. Gerado de uma entrada do CHANGELOG
 > do core por `/meta:co-announce`. O adotante é cego ao core: só vê o que é commitado no PRÓPRIO `inbound/`.
 
-- **Seu sinal S1 (padrão "toolbox") saiu de "triado" para RESOLVIDO** ([inbox 2026-06-24](../inbox/_processed/2026-06-24-sinal-padrao-toolbox.md)). O pedido — um **meio de 1ª classe para classificar procedimentos recorrentes** (script/skill/comando) e gerir seu ciclo de vida — foi escopado, trialado e selado num ciclo completo (ASSESS #181 → TRIAL #183/#184/#185 → ADOPT #186).
+- **Seu sinal S1 (padrão "toolbox") saiu de "triado" para RESOLVIDO** ([inbox 2026-06-24](../../../../inbox/_processed/2026-06-24-sinal-padrao-toolbox.md)). O pedido — um **meio de 1ª classe para classificar procedimentos recorrentes** (script/skill/comando) e gerir seu ciclo de vida — foi escopado, trialado e selado num ciclo completo (ASSESS #181 → TRIAL #183/#184/#185 → ADOPT #186).
 - **Veredito do scoping (ASSESS, PR #181):** o "toolbox" **NÃO é infra nova**. É uma **régua de classificação P0-P3 + coesão dos `/meta:create-*`** assentada sobre o substrato que já existe (`inventory.sh` + lint + `context-freshness`). Construir registry/dedup/embedding seria inchaço sem dogfood.
 - **O que entrou (vendorizado no próximo `--update`):**
   1. **Régua P0-P3 de classificação** no `onion/SKILL.md` (#184) — o classificador que você pediu: como decidir se um procedimento recorrente vira script (P0, determinístico/controle), comando (P1, juízo/quando), skill (P2, recall) ou ADR (P3, doutrina).

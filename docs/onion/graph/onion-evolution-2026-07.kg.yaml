@@ -35,7 +35,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: confirmed
+    status: done
     label: "5 links do CHANGELOG apontam ../inbox/ mas arquivos foram movidos a _processed/ (quebrados pela propria triagem)"
     trace: "docs/evolution/federation/CHANGELOG.md:235"
   - id: C_D7_12
@@ -43,7 +43,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: confirmed
+    status: done
     label: "Typo knowbase em 2 sinais processados quebra links ao knowledge-base"
     trace: "docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md:37"
   - id: C_D8_20
@@ -51,7 +51,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.7
-    status: open
+    status: done
     label: "/meta:graph sem campo model: obrigatorio no frontmatter"
     trace: ".claude/commands/meta/graph.md:1"
   - id: C_D5_10
@@ -59,7 +59,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.7
-    status: open
+    status: superseded
     label: "meta/adopt.md declara allowed-tools irrestrito (rm *, bash *, cat *) alem do uso real — maior raio de explosao do inventario"
     trace: ".claude/commands/meta/adopt.md:9"
   - id: C_D8_21
@@ -67,7 +67,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.7
-    status: open
+    status: done
     label: "6 agentes sem category: no frontmatter"
     trace: ".claude/agents/development/brand-generator.md:1"
   - id: C_D1_0
@@ -107,7 +107,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: confirmed
+    status: done
     label: "Path relativo errado em sinal processado quebra link ao KB GitFlow"
     trace: "docs/evolution/inbox/_processed/2026-06-18-adopt-gitflow-develop-branch-config.md:27"
   - id: C_D7_15
@@ -115,7 +115,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: confirmed
+    status: done
     label: "Path relativo errado em anuncio da outbox (../ deveria ser ../../../)"
     trace: "docs/evolution/federation/outbox/rhilo-metagamify/_processed/2026-06-27-s1-toolbox-resolvido.md:17"
   - id: C_D1_3
@@ -131,7 +131,7 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.7
-    status: open
+    status: done
     label: "2 KBs sem nenhum campo de data — inauditaveis sem git log"
     trace: "docs/knowledge-base/concepts/branding-posicionamento-marca.md:1"
   - id: C_D7_17
@@ -139,7 +139,7 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.9
-    status: confirmed
+    status: done
     label: "Ancora malformada §7 em link markdown do git-ledger KB"
     trace: "docs/knowledge-base/platforms/git-ledger-as-working-dir.md:125"
   - id: C_D8_22
@@ -317,6 +317,32 @@ nodes:
     label: "Nao portar radar.js do rhilo — soberania: cada instancia implementa seu motor deterministico"
     trace: "docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md:1"
 
+  # ── Rodada de atuação 2026-07-04 (quick-wins S) — o grafo dirigiu, o codigo mudou ──
+  - id: E_VERIFY_ADOPT
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "Verificacao em primeira mao: adopt.md USA bash em 5 pontos (123/152/167/175/258) — a parte 'Bash(bash *) nao usado' do claim original era falsa; rm/cat largos confirmados"
+    trace: ".claude/commands/meta/adopt.md:123"
+  - id: C_D5_10B
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: done
+    label: "Escopo corrigido: rm restrito ao literal do mktemp, cat restrito a heredoc; Bash(bash *) FICA (uso real comprovado)"
+    trace: ".claude/commands/meta/adopt.md:9"
+  - id: D_QUICKWINS
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: done
+    label: "Rodada quick-wins S executada dirigida pelo radar: 9 itens (3 blockers + 6) fechados; claims correspondentes marcados done"
+    trace: "docs/analysis/onion-evolution-2026-07-04.md:1"
+
 edges:
   # relatório supersede o baseline anterior
   - from: A_REPORT_0704
@@ -425,4 +451,20 @@ edges:
     edge_type: TRACES_TO
   - from: D_NO_VENDOR_RADAR
     to: D_KG_BIRTH
+    edge_type: TRACES_TO
+  # rodada de atuação: refutação parcial + supersede + rastreio
+  - from: E_VERIFY_ADOPT
+    to: C_D5_10
+    edge_type: REFUTES
+  - from: C_D5_10B
+    to: C_D5_10
+    edge_type: SUPERSEDES
+  - from: E_VERIFY_ADOPT
+    to: C_D5_10B
+    edge_type: SUPPORTS
+  - from: D_QUICKWINS
+    to: A_REPORT_0704
+    edge_type: TRACES_TO
+  - from: C_D5_10B
+    to: D_QUICKWINS
     edge_type: TRACES_TO
