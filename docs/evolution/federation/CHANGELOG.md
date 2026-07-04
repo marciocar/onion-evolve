@@ -8,6 +8,18 @@
 
 ---
 
+## 2026-07-04 · REGRA 22 no lint: links relativos de docs/evolution/ guardados (drift de git mv → _processed) · COMPATÍVEL · alvo: adotantes
+
+- Nova guarda HARD `check_evolution_links`: todo link relativo em `docs/evolution/**/*.md` deve
+  resolver (arquivo OU diretório). Causa-raiz que ela mata: o ritual de triagem (`git mv →
+  _processed/`) quebrava quem apontava para o arquivo movido — 4 achados confirmados na auditoria
+  2026-07-04, +3 que a própria regra achou na primeira execução.
+- Anti-falso-positivo por construção: **ignora conteúdo dentro de code fences** e **aceita link de
+  coleção (diretório)** — os 3 falso-positivos refutados pelo juiz adversarial viraram requisitos.
+- Determinística, sem jq (roda em qualquer ambiente). 3 fixtures novas no selftest (123 casos).
+- Ação p/ adotantes: nenhuma — chega via `/meta:adopt --update`; o lint de vocês passa a proteger o
+  próprio `docs/evolution/`. Se o CI flagrar link antigo quebrado, é achado real: corrigir o link.
+
 ## 2026-07-04 · `/meta:kg` NASCEU (F2 executado): core dogfoodou o KG na rodada /meta:evolve — comando + radar soberano disponíveis · COMPATÍVEL · alvo: rhilo-metagamify
 
 - **A promessa do anúncio D3 cumpriu no mesmo dia**: o core rodou `/meta:evolve` (23 achados

@@ -1042,6 +1042,49 @@ run_inventory_fixes() {
 }
 
 # ===========================================================================
+# REGRA 22 — Links relativos quebrados em docs/evolution/ [HARD]
+#   Origem: auditoria 2026-07-04 (alerta transversal nº 1) + Q_LINT_LINKS do KG —
+#   o ritual de triagem (git mv → _processed/) quebra quem aponta pro arquivo
+#   movido; 4 dos 16 achados confirmados eram exatamente isso.
+#   Lições dos 3 falso-positivos REFUTADOS pelo juiz (viram requisitos):
+#   - IGNORA conteúdo dentro de code fences ``` (E_J_FENCES — templates de
+#     geração citam paths do arquivo GERADO, não deste);
+#   - ACEITA link de diretório (D7-18 — link de coleção é legítimo; test -e).
+#   Âncora (#...) é removida antes do teste; http(s)/mailto/absoluto/só-âncora
+#   ficam fora do escopo. Determinístico, sem jq.
+# ===========================================================================
+check_evolution_links() {
+  local base="${REPO_ROOT}/docs/evolution"
+  [ -d "${base}" ] || return 0
+  local f dir lineno target clean
+  while IFS= read -r -d '' f; do
+    dir="$(dirname "${f}")"
+    while IFS=$'\t' read -r lineno target; do
+      [ -n "${target}" ] || continue
+      clean="${target%%#*}"
+      [ -n "${clean}" ] || continue
+      if [ ! -e "${dir}/${clean}" ]; then
+        violation "HARD" "${f}" "link relativo quebrado (linha ${lineno}): '${target}' não resolve — alvo movido para _processed/? atualize o link junto com o git mv"
+      fi
+    done < <(awk '
+      /^[[:space:]]*```/ { fence = !fence; next }
+      fence { next }
+      {
+        line = $0
+        while (match(line, /\]\(([^)]+)\)/)) {
+          tgt = substr(line, RSTART + 2, RLENGTH - 3)
+          line = substr(line, RSTART + RLENGTH)
+          if (tgt ~ /^(https?|mailto):/) continue
+          if (tgt ~ /^\//) continue
+          if (tgt ~ /^#/) continue
+          printf "%d\t%s\n", NR, tgt
+        }
+      }
+    ' "${f}")
+  done < <(_find "${base}" -name '*.md' -print0 2>/dev/null)
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -1080,6 +1123,7 @@ check_context_freshness_stamp
 check_inventory_total_drift
 check_frontmatter_scalar_colon
 check_no_claude_docs
+check_evolution_links
 
 # ===========================================================================
 # SUMÁRIO FINAL

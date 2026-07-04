@@ -34,7 +34,7 @@ datado, e as **correções ficam enterradas em prosa**. Consequências observada
 ### 1. Knowledge Graph SDAAL — a fonte da verdade como grafo ponderado
 Em vez de log, um `.kg.yaml`: **nós tipados** (`claim/decision/question/entity/evidence/artifact`) +
 **arestas tipadas com peso** (`SUPPORTS/REFUTES/SUPERSEDES/CAUSES/DEPENDS_ON/TRACES_TO`) + **plane**
-(`DEV`/`PROD`). No espírito [SDAAL](../../knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+(`DEV`/`PROD`). No espírito [SDAAL](../../../knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
 (markdown/YAML executável por IA). As auto-correções viram **arestas `REFUTES` explícitas** — a história
 não se apaga, se reconcilia. Uma ferramenta (`scripts/kg/radar.js`) computa **atenção = impacto × confiança
 × centralidade (PageRank)**, lista as verdades confrontadas e **checa integridade** (rejeita nó `done` não

@@ -51,3 +51,6 @@ lint	r16-count-drift/good-bare-historical.md	docs	good
 lint	r16-count-drift/good-bare-fleet.md	docs	good
 lint	r16-count-drift/good-bare-criados.md	docs	good
 fix	r16-count-drift/bad-bare-especializados.md	docs	corrected
+lint	r22-evolution-links/bad-broken-link.md	docs/evolution/inbox	bad	link relativo quebrado
+lint	r22-evolution-links/good-fence-ignored.md	docs/evolution/inbox	good
+lint	r22-evolution-links/good-valid-links.md	docs/evolution/inbox	good

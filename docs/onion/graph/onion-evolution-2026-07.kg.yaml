@@ -281,7 +281,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
+    status: done
     label: "Criar guarda deterministica de links em docs/evolution/ (que ignore code fences)? 4 claims confirmados pedem; 3 refutados ensinam o requisito anti-falso-positivo"
     trace: ".claude/validation/lint-artifacts.sh:1"
   - id: Q_LINT_FRONTMATTER
@@ -342,6 +342,15 @@ nodes:
     status: done
     label: "Rodada quick-wins S executada dirigida pelo radar: 9 itens (3 blockers + 6) fechados; claims correspondentes marcados done"
     trace: "docs/analysis/onion-evolution-2026-07-04.md:1"
+
+  - id: D_LINT_LINKS_GUARD
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: done
+    label: "REGRA 22 (check_evolution_links) nasce HARD com skip de fence e aceite de diretorio — os 3 falso-positivos refutados viraram requisitos; 1a execucao achou +3 links reais que a amostra do D7 perdeu"
+    trace: ".claude/validation/lint-artifacts.sh:1044"
 
 edges:
   # relatório supersede o baseline anterior
@@ -468,3 +477,10 @@ edges:
   - from: C_D5_10B
     to: D_QUICKWINS
     edge_type: TRACES_TO
+  # REGRA 22 responde a Q_LINT_LINKS (2026-07-04, mesma sessão)
+  - from: D_LINT_LINKS_GUARD
+    to: Q_LINT_LINKS
+    edge_type: TRACES_TO
+  - from: E_J_FENCES
+    to: D_LINT_LINKS_GUARD
+    edge_type: SUPPORTS
