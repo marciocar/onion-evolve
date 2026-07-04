@@ -14,8 +14,26 @@
 >
 > **Rampa de vertical**: este padrão é a espinha da vertical `onion-investigation` — desenho, rampa
 > F0-F3 e capability draft no ADR
-> [onion-adr-verticals-investigation-cartography-2026-07.md](../../analysis/onion-adr-verticals-investigation-cartography-2026-07.md)
-> (F1 = o 1º dogfood acima, em execução na sessão rhilo desde 2026-07-03).
+> [onion-adr-verticals-investigation-cartography-2026-07.md](../../analysis/onion-adr-verticals-investigation-cartography-2026-07.md).
+> **F1 disparou em 2026-07-04** (1º dogfood na federação, sessão rhilo — ver nota de doutrina abaixo);
+> o gate do comando permanece: `/meta:kg` nasce JUNTO com a 1ª investigação real do **core** modelada
+> em `.kg.yaml` (F2 aberto, aguardando veículo).
+
+## Nota de doutrina — git merge não reconcilia verdades (confirmada em campo)
+
+> **Doutrina:** conflito **epistêmico** entre linhagens (o que cada uma acredita ser verdade) se
+> resolve na **camada de conhecimento** (KG SDAAL: claims por plane, arestas REFUTES/SUPERSEDES,
+> radar) — e **só então** na camada de código (PR dirigido pelo veredito). `git merge` reconcilia
+> texto, não verdades.
+>
+> **Evidência de campo (1º dogfood na federação, 2026-07-04):** a instância rhilo reconciliou
+> `develop` (pesquisa da dose) × `rhilo/main` (motor deployado) num `wrr-audit.kg.yaml` — 56 nós,
+> 81 arestas, zero contradições estruturais. O radar produziu veredito **por-verdade** impossível
+> de derivar de merge textual: uma verdade cruza DEV→PROD (hard `cap=0`, defesa-em-profundidade),
+> uma segura na develop (dose-para-meta, aguarda validação on-policy) e — o achado mais valioso —
+> uma flui **ao contrário** (PROD→DEV): dados vivos refutaram a urgência do framing original da
+> pesquisa (métrica inflada ~82× por contagem-fantasma). Sinal completo:
+> [`2026-07-04-kg-primeiro-dogfood-federacao.md`](../../evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md).
 
 ## O problema que o padrão resolve
 
