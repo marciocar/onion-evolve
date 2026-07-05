@@ -1,9 +1,10 @@
 # Semente de pesquisa — Autorregulação da Aprendizagem (SRL) e o PLEA de Pedro Rosário × Onion
 
-> **Status: SEMENTE** — questões refinadas e prontas; a **deep-research roda quando o maestro
-> pedir** (mesmo padrão da pesquisa de breadcrumbs: harness multi-fonte, academia + campo,
-> verificação adversarial das alegações). Plantada em 2026-07-05 a pedido do maestro, a partir
-> da reflexão registrada no [parecer do whatsapp-sender](onion-parecer-whatsapp-sender-2026-07.md) §4-C.
+> **Status: ENTREGUE (2026-07-05)** — a deep-research rodou no mesmo dia do plantio; relatório
+> verificado em [onion-research-srl-plea-2026-07.md](onion-research-srl-plea-2026-07.md)
+> (11 achados, 1 refutado; **Q3 e Q5 ficaram ABERTAS** — rodadas dedicadas futuras). Plantada
+> em 2026-07-05 a partir da reflexão registrada no
+> [parecer do whatsapp-sender](onion-parecer-whatsapp-sender-2026-07.md) §4-C.
 >
 > **Princípio-guia do maestro (formulação canônica):** *"Onion dogfoodando com SDAAL — LLM como
 > VM; MD/KG/grafos/scripts como bytecode"* — sem sobrecarga do que não precisa; o poder do
