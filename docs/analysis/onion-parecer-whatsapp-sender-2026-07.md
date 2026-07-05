@@ -1,6 +1,11 @@
 # Parecer — `feature/whatsapp-sender`: destino do trabalho nascido no mobile
 
-> **Status: PROPOSTO** — o parecer apresenta; o maestro decide (topologia W6: propor→confirmar).
+> **Status: DECIDIDO E EXECUTADO (2026-07-05)** — maestro aprovou a opção A com reenquadramento
+> de princípio (ver §4-C e §6). Extração concluída: repo privado `marciocar/whatsapp-sender`
+> (história preservada via `git subtree split`, autoria do commit original intacta + nota de
+> proveniência), ferramenta reinstalada no VPS (`~onion/whatsapp-sender`; sessão QR não
+> sobreviveu ao checkout — re-scan no 1º uso), branch removida da origin após verificação
+> byte a byte da migração.
 > **Data:** 2026-07-05 · **Origem do artefato:** commit `17a90cb` (30/jun), criado **via
 > Onion-Bridge/PWA** na linhagem `vps-bridge` — a primeira feature da história do ecossistema
 > autorada de um celular. Resgatada à origin em 2026-07-05 (operação registrada no
@@ -51,7 +56,7 @@ aplicação. `whatsapp-sender/` é **aplicação Node na raiz** do repo do frame
 |---|---|
 | **(A) Repo próprio `marciocar/whatsapp-sender`** | ✅ **RECOMENDADA** — preserva a ferramenta funcionando (inclusive no VPS, onde a sessão QR já vive), zero contaminação da identidade do core, e o histórico nasce limpo (`git subtree split` ou cópia + commit inicial citando a origem `17a90cb`) |
 | (B) Mover para `.claude/utils/` ou `tools/` no core | ❌ viola a identidade (código de aplicação no template); adotantes não a usam; lib não-oficial sob a marca do framework |
-| (C) Eixo SDAAL `messenger` agora | ❌ construir à frente do gatilho (anti-v4.0). **Registrar como costura**: se surgir demanda real de notificação em 2+ contextos, o eixo nasce com provider oficial (Meta/Twilio) e este tool vira, no máximo, um adapter `whatsapp-web-unofficial` com aviso de risco |
+| (C) Eixo SDAAL `messenger` agora | ❌ construir à frente do gatilho (anti-v4.0). **Costura registrada com o princípio do maestro (2026-07-05)**: a *capacidade* de mensagear encaixa em muitas ações do Onion (notificação de co-evolução, gates humanos, prompts pedagógicos/autorregulatórios — ver [semente SRL/PLEA](onion-research-seed-srl-plea-2026-07.md) Q3), mas quando o gatilho disparar (demanda real em 2+ contextos) o eixo nasce **à moda Onion: dogfoodando com SDAAL — LLM como VM; MD/KG/grafos/scripts como bytecode**. Interface/adapters em markdown executável pela VM-Transformer, migalhas guiando em runtime, scripts só onde o determinismo paga, provider oficial primeiro (Meta Cloud/Twilio); a ferramenta extraída é possível *backend* de um adapter `whatsapp-web-unofficial` com aviso de risco — nunca código vendorizado no core |
 | (D) Descartar | ❌ funciona, tem uso e custou trabalho; o resgate já foi feito |
 
 **Pós-execução da opção A:** apagar `feature/whatsapp-sender` da origin do core (o conteúdo
@@ -72,6 +77,9 @@ VPS produziu código real de um celular (SDK com `bypassPermissions` + git local
 
 ## 6. Decisão do maestro
 
-- [ ] Aprovar opção A (repo próprio) — posso executar: criar repo, migrar com atribuição,
-      apagar a branch do core, atualizar registro
-- [ ] Outra rota (indicar)
+- [x] **Opção A aprovada e executada (2026-07-05)** — repo privado `marciocar/whatsapp-sender`
+      criado, história migrada com atribuição, branch do core apagada, registro atualizado.
+      Reenquadramento de princípio incorporado ao §4-C: capacidade reconhecida; implementação
+      futura spec-first (SDAAL, LLM-as-VM, bytecodes MD/KG/grafos/scripts).
+- [x] **Pesquisa futura plantada**: [onion-research-seed-srl-plea-2026-07.md](onion-research-seed-srl-plea-2026-07.md)
+      (Autorregulação da Aprendizagem + PLEA de Pedro Rosário × loop de auto-evolução do Onion).
