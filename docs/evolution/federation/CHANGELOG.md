@@ -8,6 +8,17 @@
 
 ---
 
+## 2026-07-04 · Fix de contrato: conversão SVG é do orquestrador, não do mermaid-specialist · COMPATÍVEL · alvo: adotantes
+
+- Fecha o gap `C_MERMAID_SVG_GAP` (descoberto pelo dogfood da shed-ceremony): o
+  `presentation-orchestrator` exigia "converter para SVG" do `@mermaid-specialist`, que declara
+  explicitamente NÃO renderizar (fronteira de design — especialista de sintaxe, dependency-free).
+- **Lado corrigido: o orquestrador** (v3.2.0) — FASE 3 agora delega só o CÓDIGO (`.mmd` validado)
+  e converte ele mesmo via `npx @mermaid-js/mermaid-cli`, com fallback gracioso (mermaid.live
+  manual ou prosseguir sem diagrama, avisando o maestro). KB `presentation-orchestration` v1.1.0
+  registra o histórico do contrato. Fronteira do mermaid-specialist preservada.
+- Ação p/ adotantes: nenhuma — chega via `/meta:adopt --update`.
+
 ## 2026-07-04 · Shed-ceremony: presentation-orchestrator e gamma-api-specialist enxutos; conhecimento em 2 KBs novas · COMPATÍVEL · alvo: adotantes
 
 - Padrão "reposicionar agente detentor de conhecimento" aplicado: **presentation-orchestrator

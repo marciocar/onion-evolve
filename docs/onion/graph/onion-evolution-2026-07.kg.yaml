@@ -374,9 +374,18 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: confirmed
+    status: done
     label: "Gap de contrato descoberto no dogfood da shed-ceremony: orquestrador exige converter-para-SVG do mermaid-specialist, mas o agente declara que NAO renderiza SVG (mmdc/Mermaid Live) — corrigir contrato em um dos lados"
     trace: ".claude/agents/development/mermaid-specialist.md:483"
+
+  - id: D_MERMAID_CONTRACT_FIX
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: done
+    label: "Lado escolhido: o ORQUESTRADOR e dono da conversao SVG (mmdc + fallback mermaid.live); fronteira do mermaid-specialist PRESERVADA (especialista de sintaxe, dependency-free por design)"
+    trace: ".claude/agents/product/presentation-orchestrator.md:103"
 
 edges:
   # relatório supersede o baseline anterior
@@ -527,3 +536,7 @@ edges:
   - from: C_D1_3
     to: D_SHED_CEREMONY
     edge_type: DEPENDS_ON
+  # correção do gap descoberto pelo dogfood da shed-ceremony
+  - from: D_MERMAID_CONTRACT_FIX
+    to: C_MERMAID_SVG_GAP
+    edge_type: TRACES_TO

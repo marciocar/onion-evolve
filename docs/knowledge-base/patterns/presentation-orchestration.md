@@ -1,6 +1,6 @@
 # Orquestração de Apresentações — contratos de delegação, templates e casos de uso
 
-> **Versão**: 1.0.0 | **Última atualização**: 2026-07-04 | **Categoria**: Patterns
+> **Versão**: 1.1.0 | **Última atualização**: 2026-07-04 | **Categoria**: Patterns
 > Conhecimento de orquestração **extraído do agente `@presentation-orchestrator`** na rodada
 > shed-ceremony de 2026-07-04. O agente mantém o grafo executável (7 fases) e cita esta KB para
 > contratos de delegação, templates de prompt/config, matriz de erros e casos de uso.
@@ -11,7 +11,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2026-07-04 |
 | **Última Atualização** | 2026-07-04 |
 | **Fonte** | Extração de `.claude/agents/product/presentation-orchestrator.md` v3.0.0 |
@@ -31,15 +31,24 @@ Você recebe:   estrutura narrativa completa · storyline (setup → conflito �
 Você valida:   coerência · adequação à audiência · quantidade de slides · qualidade
 ```
 
-### `@mermaid-specialist` 📊 [DIAGRAMAS]
+### `@mermaid-specialist` 📊 [CÓDIGO DE DIAGRAMAS]
 
 ```yaml
 Quando chamar: após narrativa definida, para fluxos/arquiteturas/processos
-Você fornece:  tipo de diagrama · conteúdo a visualizar · estilo · nome/caminho do arquivo ·
-               ⚠️ OBRIGATÓRIO: "converter para SVG" (Gamma NÃO aceita código Mermaid nem PNG)
-Você recebe:   código Mermaid validado · arquivo SVG · confirmação de compatibilidade
-Você valida:   SVG existe · qualidade visual · tamanho razoável
+Você fornece:  tipo de diagrama · conteúdo a visualizar · estilo · nome/caminho do .mmd
+Você recebe:   código Mermaid VALIDADO (o agente declara: ele NÃO renderiza/exporta SVG —
+               fronteira de design; ver mermaid-specialist.md §"O Que Você NÃO Faz")
+Você valida:   sintaxe validada · até ~50 nós · salvo em .tmp/assets/<nome>.mmd
+⚠️ CONVERSÃO A SVG É DO ORQUESTRADOR (passo determinístico próprio):
+   npx -y @mermaid-js/mermaid-cli -i <nome>.mmd -o <nome>.svg
+   Fallback se mmdc falhar (ex.: sem chromium): export manual via mermaid.live,
+   ou prosseguir sem diagrama (imagens AI do Gamma). Gamma só aceita SVG.
 ```
+
+> **Histórico deste contrato:** a versão 1.0.0 desta KB (herdada do agente v3.0.0) exigia
+> "converter para SVG" do mermaid-specialist — contradizendo a fronteira declarada do agente.
+> Gap descoberto pelo dogfood da shed-ceremony (claim `C_MERMAID_SVG_GAP` no KG) e corrigido
+> aqui: quem converte é o pipeline, não o especialista de sintaxe.
 
 ### `@gamma-api-specialist` 🚀 [GERAÇÃO]
 
@@ -84,14 +93,20 @@ Crie estrutura narrativa para apresentação: **Título** [x] · **Audiência** 
 Entregue: 1) storyline 2) estrutura de slides 3) mensagens-chave 4) onde inserir diagramas
 ```
 
-### FASE 3 — pedido ao mermaid
+### FASE 3 — pedido ao mermaid (código) + conversão do orquestrador
 
 ```markdown
 @mermaid-specialist
 Crie diagrama [tipo] mostrando [conteúdo]. **Contexto:** [objetivo]
 **Requisitos:** tipo [flowchart/sequence/...] · elementos [lista] · estilo [x]
-· **OBRIGATÓRIO: converter para SVG** · salvar em .tmp/assets/[nome].svg
-Entregue: 1) código Mermaid validado 2) arquivo SVG 3) confirmação de compatibilidade
+· salvar o CÓDIGO validado em .tmp/assets/[nome].mmd
+Entregue: 1) código Mermaid validado 2) confirmação de compatibilidade (GitHub/Live)
+```
+
+```bash
+# Conversão a SVG — passo do ORQUESTRADOR, após receber o .mmd:
+npx -y @mermaid-js/mermaid-cli -i .tmp/assets/[nome].mmd -o .tmp/assets/[nome].svg
+# falhou? → fallback: export manual via mermaid.live OU prosseguir sem diagrama (avisar maestro)
 ```
 
 ### FASE 4 — inputText consolidado (formato Gamma)
@@ -147,7 +162,9 @@ Timeout:            aguardar/verificar status · retentar após delay · avisar 
 ### Limitações do pipeline
 
 1. **Gamma**: máx 60-75 slides (por plano) · só SVG (não PNG/Mermaid cru) · tema deve existir · idioma ISO (`pt-BR`).
-2. **Mermaid**: conversão SVG demora em diagramas complexos · nem todo tipo é suportado pelo Gamma.
+2. **Mermaid**: o especialista entrega código, não render — conversão é do pipeline via `mmdc`
+   (exige chromium headless; pode falhar em ambientes mínimos → fallback mermaid.live) · conversão
+   demora em diagramas complexos · nem todo tipo é suportado pelo Gamma.
 3. **Narrativa**: pode exceder limite de chars do Gamma → condensar.
 
 ## 4. Casos de uso canônicos
