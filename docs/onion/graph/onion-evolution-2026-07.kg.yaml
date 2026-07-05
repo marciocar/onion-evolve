@@ -75,7 +75,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.7
-    status: open
+    status: done
     label: "presentation-orchestrator 1189 linhas — cerimonia (YAML de delegacao repetido, 7 fases prescritivas)"
     trace: ".claude/agents/product/presentation-orchestrator.md:71"
   - id: C_D1_1
@@ -83,7 +83,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.7
-    status: open
+    status: done
     label: "gamma-api-specialist 1166 linhas — conhecimento de API deveria ser KB citavel"
     trace: ".claude/agents/development/gamma-api-specialist.md:300"
   - id: C_D2_4
@@ -297,7 +297,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.8
-    status: open
+    status: done
     label: "Rodada shed-ceremony do cluster de agentes especialistas (presentation-orchestrator, gamma-api, postgres)? Extrair conhecimento p/ KBs citaveis"
     trace: "docs/knowledge-base/concepts/onion-modernization-doctrine.md:55"
   - id: D_KG_BIRTH
@@ -360,6 +360,23 @@ nodes:
     status: done
     label: "REGRA 23 (model: em comandos, category: em agentes) HARD; granularidade de allowed-tools DELIBERADAMENTE fora — julgamento, nao gate (licao E_VERIFY_ADOPT: escopo largo as vezes e uso real)"
     trace: ".claude/validation/lint-artifacts.sh:1088"
+
+  - id: D_SHED_CEREMONY
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: done
+    label: "Shed-ceremony executada: presentation-orchestrator 1189→165 e gamma-api 1166→132 linhas; conhecimento em 2 KBs citaveis (patterns/presentation-orchestration + platforms/gamma-app-api). postgres (C_D1_3) DEFERIDO — abaixo da margem, sem gatilho"
+    trace: "docs/knowledge-base/patterns/presentation-orchestration.md:1"
+  - id: C_MERMAID_SVG_GAP
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "Gap de contrato descoberto no dogfood da shed-ceremony: orquestrador exige converter-para-SVG do mermaid-specialist, mas o agente declara que NAO renderiza SVG (mmdc/Mermaid Live) — corrigir contrato em um dos lados"
+    trace: ".claude/agents/development/mermaid-specialist.md:483"
 
 edges:
   # relatório supersede o baseline anterior
@@ -500,3 +517,13 @@ edges:
   - from: E_VERIFY_ADOPT
     to: D_LINT_FRONTMATTER_GUARD
     edge_type: SUPPORTS
+  # shed-ceremony: decisão responde a questão; dogfood revela gap novo
+  - from: D_SHED_CEREMONY
+    to: Q_CEREMONY_ROUND
+    edge_type: TRACES_TO
+  - from: C_MERMAID_SVG_GAP
+    to: D_SHED_CEREMONY
+    edge_type: TRACES_TO
+  - from: C_D1_3
+    to: D_SHED_CEREMONY
+    edge_type: DEPENDS_ON

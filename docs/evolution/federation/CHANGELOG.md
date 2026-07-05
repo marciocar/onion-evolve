@@ -8,6 +8,20 @@
 
 ---
 
+## 2026-07-04 · Shed-ceremony: presentation-orchestrator e gamma-api-specialist enxutos; conhecimento em 2 KBs novas · COMPATÍVEL · alvo: adotantes
+
+- Padrão "reposicionar agente detentor de conhecimento" aplicado: **presentation-orchestrator
+  1189→165 linhas** e **gamma-api-specialist 1166→132** (-70% no par); o conhecimento vive agora em
+  KBs citáveis — `patterns/presentation-orchestration.md` (contratos de delegação, templates de
+  fase, matriz de erros, casos de uso) e `platforms/gamma-app-api.md` (spec da API validada,
+  rate-limits, padrões, exemplos).
+- **Dogfood adversarial dos agentes reduzidos**: o par novo respondeu com citação exata à KB
+  (403=créditos, preserve+inputTextBreaks, fila 45/50, fallback Oasis) — sem perda de capacidade.
+- **Achado do dogfood** (backlog, no KG): gap de contrato orquestrador×mermaid-specialist — o
+  orquestrador exige conversão a SVG que o mermaid declara não fazer (`mmdc`/Live). Correção em
+  ciclo próprio.
+- Ação p/ adotantes: nenhuma — chega via `/meta:adopt --update` (agentes + 2 KBs).
+
 ## 2026-07-04 · REGRA 23 no lint: model: em comandos e category: em agentes obrigatórios (HARD) · COMPATÍVEL · alvo: adotantes
 
 - Nova guarda `check_frontmatter_model_category`: comando invocável sem `model:` ou agente sem
