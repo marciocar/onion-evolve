@@ -3,6 +3,7 @@ name: branch-documentation-writer
 description: |
   Especialista em documentação que sincroniza docs com mudanças do branch atual.
   Use para manter documentação atualizada com alterações de código.
+  Diferença vs comandos /docs:* e @c4-documentation-specialist: este é DIFF-SCOPED (sincroniza docs afetadas pelas mudanças do branch, gate pré-PR); a documentação geral/estrutural do projeto é dos comandos docs e especialistas C4. Mesmo padrão de branch-code-reviewer vs code-reviewer.
 model: sonnet
 tools:
   - Read
