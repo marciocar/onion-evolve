@@ -24,8 +24,11 @@ members:
                               # o palpite e a verificação provou que ele estaria ERRADO — o clone estava
                               # numa FEATURE BRANCH local (feature/whatsapp-sender, commit 17a90cb via
                               # bridge/PWA), não na main. Meia-instância padrão-rhilo: linhagem produz.
-        # Resgate 2026-07-05: feature/whatsapp-sender PUSHED à origin (aguarda triagem);
-        # untracked do maestro preservados + backup em ~/vps-backup-2026-07-05 (workstation).
+        # Resgate 2026-07-05: feature/whatsapp-sender EXTRAÍDA para repo próprio
+        # (marciocar/whatsapp-sender, privado; parecer DECIDIDO) — branch removida da origin;
+        # a linhagem voltou a espelhar a main (rito de verificação continua valendo).
+        # Ferramenta reinstalada em ~onion/whatsapp-sender (fora do clone do core).
+        # Untracked do maestro preservados + backup em ~/vps-backup-2026-07-05 (workstation).
         # Auth git: deploy key SSH (~onion/.ssh/github_deploy; PAT antigo morto). Acesso da
         # workstation: ssh onion-vps (~/.ssh/hostinger_onion + config).
         # Papel: cwd do @anthropic-ai/claude-agent-sdk no onion-bridge (~onion/onion-bridge,
