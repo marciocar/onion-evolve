@@ -1085,6 +1085,33 @@ check_evolution_links() {
 }
 
 # ===========================================================================
+# REGRA 23 — Frontmatter: model: em comandos e category: em agentes [HARD]
+#   Origem: Q_LINT_FRONTMATTER do KG (achados D8-20/D8-21 da auditoria
+#   2026-07-04 — o gap deixou 7 artefatos divergirem em silêncio; a regra
+#   impede o 8º). Escopo DELIBERADAMENTE determinístico: granularidade de
+#   allowed-tools ficou DE FORA — é julgamento (o Bash(bash *) do adopt provou
+#   que escopo largo às vezes é uso real; regra heurística geraria FP).
+#   Mesmo molde/exclusões da R1 (agentes) e R2 (comandos: sem common/, sem README).
+# ===========================================================================
+check_frontmatter_model_category() {
+  while IFS= read -r -d '' cmd; do
+    if ! grep -q "^model:" "${cmd}"; then
+      violation "HARD" "${cmd}" "frontmatter de comando sem model: — todo comando invocável declara o tier (achado D8-20, auditoria 2026-07-04)"
+    fi
+  done < <(
+    _find "${CLAUDE_DIR}/commands" -name "*.md" \
+      ! -path "*/common/*"   \
+      ! -name "README.md"    \
+      -print0 2>/dev/null
+  )
+  while IFS= read -r -d '' agent; do
+    if ! grep -q "^category:" "${agent}"; then
+      violation "HARD" "${agent}" "frontmatter de agente sem category: — exigido pelo inventário/roteamento (achado D8-21, auditoria 2026-07-04)"
+    fi
+  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -1124,6 +1151,7 @@ check_inventory_total_drift
 check_frontmatter_scalar_colon
 check_no_claude_docs
 check_evolution_links
+check_frontmatter_model_category
 
 # ===========================================================================
 # SUMÁRIO FINAL

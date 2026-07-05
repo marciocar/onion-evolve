@@ -8,6 +8,17 @@
 
 ---
 
+## 2026-07-04 · REGRA 23 no lint: model: em comandos e category: em agentes obrigatórios (HARD) · COMPATÍVEL · alvo: adotantes
+
+- Nova guarda `check_frontmatter_model_category`: comando invocável sem `model:` ou agente sem
+  `category:` = violação HARD. Fecha o gap que deixou 7 artefatos do core divergirem em silêncio
+  (achados D8-20/D8-21 da auditoria 2026-07-04).
+- Escopo deliberadamente determinístico: granularidade de `allowed-tools` ficou FORA — é julgamento
+  (escopo largo às vezes é uso real), não gate mecânico.
+- 4 fixtures novas no selftest (127 casos). Mesmas exclusões das regras irmãs (common/, READMEs).
+- Ação p/ adotantes: nenhuma imediata — chega via `/meta:adopt --update`. Se o CI flagrar artefato
+  próprio sem os campos, é drift real: adicionar `model:`/`category:` (1 linha cada).
+
 ## 2026-07-04 · REGRA 22 no lint: links relativos de docs/evolution/ guardados (drift de git mv → _processed) · COMPATÍVEL · alvo: adotantes
 
 - Nova guarda HARD `check_evolution_links`: todo link relativo em `docs/evolution/**/*.md` deve
