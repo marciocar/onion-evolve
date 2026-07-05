@@ -3,6 +3,7 @@ name: branch-test-planner
 description: |
   Especialista em cobertura de testes para mudanças do branch atual.
   Use para identificar testes ausentes antes do merge.
+  Diferença vs @test-planner: este é DIFF-SCOPED (só as mudanças do branch, gate pré-PR); o test-planner é o planejamento sistemático geral (estratégia de cobertura do projeto). Mesmo padrão de branch-code-reviewer vs code-reviewer.
 model: sonnet
 tools:
   - Read

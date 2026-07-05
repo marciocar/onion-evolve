@@ -12,7 +12,7 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
 - **Workflows faseados retomáveis** com sessões persistentes — `product/collect→feature` (descoberta a backlog) e `engineer/plan→pr-update` (planejamento a entrega) são invariantes do framework, não devem ser consolidados
 - `.onion/` (estrutura agnóstica) e plano v4.0 FASES 5-9 (CLI standalone, multi-IDE, aprendizado contínuo) foram **formalmente abandonados em 2026-05-18**
 
-**Inventário atual** (contagens canônicas vivem em [docs/onion/inventory.md](docs/onion/inventory.md) — **SSOT gerada do filesystem** por `.claude/validation/inventory.sh` e validada no CI; nunca edite os números à mão, rode `/meta:inventory`):
+**Inventário atual** (contagens canônicas vivem em [docs/onion/inventory.md](docs/onion/inventory.md) — **SSOT gerada do filesystem** por `.claude/validation/inventory.sh` e validada no CI; nunca edite os números à mão, rode `/meta:inventory`. Convenção de contagem: a contagem de Knowledge Bases inclui os READMEs de (sub)categoria — ex.: 56 = 52 documentos de conteúdo + 4 READMEs; `index.md` fica fora):
 
 - 95 comandos invocáveis por categoria (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `design`, `development`, `quick`) + `onion.md`, `warm-up.md` e `catch-up.md` no root; `common/` guarda fragmentos compartilhados (templates/prompts) e há READMEs de categoria. (`design/` é **categoria de comando**, não 4ª dimensão peer — esta permanece em 3: produto, engenharia, compliance; a promoção de `design-context` a peer é provisória e gated)
 - 51 agentes especializados de IA em 9 categorias (`compliance`, `deployment`, `development`, `git`, `meta`, `product`, `research`, `review`, `testing`)
