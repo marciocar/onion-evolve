@@ -16,17 +16,22 @@ members:
     lineages:                 # o core também é multi-linhagem: o MESMO repo (role: source) vive em >1 checkout
       workstation:            # cópia de trabalho do maestro — a AUTORIDADE; onde a evolução acontece
         branch: main          # sem pin: a fonte não se carimba — sua versão É a HEAD
-      vps-bridge:             # clone de RUNTIME no VPS Hostinger (descoberto/verificado ao vivo 2026-07-03)
-        branch: main          # presumido (clone default do deploy ~2026-06-29 — onion-bridge/deploy/DEPLOY.md etapa C)
-        pin: unknown          # HONESTO: sem acesso SSH nesta sessão; NUNCA carimbar por palpite
-                              # (doutrina do pin forjado 2026-06-30 / /meta:recover v1.1.0). Verificar:
-                              # ssh → git -C /home/onion/onion-evolve rev-parse --short HEAD, ou expor
-                              # /version no bridge (follow-up). Provavelmente ATRÁS da main (deploy
-                              # ~06-29; a main andou #222-#234 desde então → drift de runtime real:
-                              # o bridge serve agentes/comandos da versão clonada, não da HEAD).
-        # Papel: cwd do @anthropic-ai/claude-agent-sdk no onion-bridge — serve app.onionevolve.com
-        # (health: {"ok":true,"onionCwd":"/home/onion/onion-evolve"}); site: onionevolve.com.
-        # Atualizar: ssh → cd /home/onion/onion-evolve && git pull (DEPLOY.md §Atualizar depois).
+      vps-bridge:             # clone no VPS Hostinger (srv1475924) — LINHAGEM QUE TRABALHA, não espelho
+        branch: main
+        pin: c09ae7fb99ed     # VERIFICADO 2026-07-05 via SSH (ssh onion-vps → rev-parse), pós-update
+                              # de 47 commits (9d24a1c→c09ae7f) + restart do onion-bridge (health ok).
+                              # Histórico do pin: unknown até 2026-07-05 (sem SSH); a doutrina segurou
+                              # o palpite e a verificação provou que ele estaria ERRADO — o clone estava
+                              # numa FEATURE BRANCH local (feature/whatsapp-sender, commit 17a90cb via
+                              # bridge/PWA), não na main. Meia-instância padrão-rhilo: linhagem produz.
+        # Resgate 2026-07-05: feature/whatsapp-sender PUSHED à origin (aguarda triagem);
+        # untracked do maestro preservados + backup em ~/vps-backup-2026-07-05 (workstation).
+        # Auth git: deploy key SSH (~onion/.ssh/github_deploy; PAT antigo morto). Acesso da
+        # workstation: ssh onion-vps (~/.ssh/hostinger_onion + config).
+        # Papel: cwd do @anthropic-ai/claude-agent-sdk no onion-bridge (~onion/onion-bridge,
+        # systemd onion-bridge) — serve app.onionevolve.com; SITE onionevolve.com = estáticos
+        # em /var/www/onion-landing (Caddy file_server) — gerido junto (decisão maestro 2026-07-05).
+        # Atualizar: ssh onion-vps → su - onion -c 'git -C ~/onion-evolve pull' → systemctl restart onion-bridge.
     personality_summary: "Framework template que se instala em .claude/; orquestra produto/engenharia/compliance; dogfood como padrão master"  # seed manual pré-F2 — substituir no 1º /meta:personality-sync real
     specializations: [framework-template, sdaal, co-evolution, dogfooding, breadcrumbs]
     personality_last_sync: 2026-07-01   # seed manual (o comando de sync ainda não existe — RFC-0003 F2)
