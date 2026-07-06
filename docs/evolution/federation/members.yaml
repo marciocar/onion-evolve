@@ -87,7 +87,8 @@ members:
     onion_version: c711baa17617   # VERIFICADO por pin-integrity-check.sh na adoção (pin-ok 2026-07-05)
     adopted_at: 2026-07-05
     mode: greenfield
-    personality_summary: "Produto educacional (guia do aluno + materiais); 1º adotante de campo da vertical onion-education — o trabalho aqui É o F1 (doutrina SRL/PLEA aplicada a material real; fricções voltam via inbox)"  # seed manual pré-F2
+    published_at: "https://onionevolve.com/pulse-mais/"   # materiais servidos pelo Caddy do VPS (webroot derivado: rsync de materials/ pós-commit; fonte = o repo)
+    personality_summary: "Produto educacional (guia do aluno + camada PLEA + cartão de prompts, PUBLICADOS); 1º adotante de campo da vertical onion-education — F1 executado 2026-07-05; fricções trianguladas na doutrina v1.1.0"  # seed manual pré-F2
     specializations: [education, srl-plea, learning-materials]
     personality_last_sync: 2026-07-05   # seed manual (comando de sync ainda não existe — RFC-0003 F2)
     trust:
