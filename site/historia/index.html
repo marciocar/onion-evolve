@@ -10,6 +10,16 @@
 <meta property="og:description" content="Sete dias, 64 commits: o pin forjado, o grafo que nasceu trabalhando, a odisseia do VPS e a família que cresceu — contado pelo próprio framework.">
 <meta name="description" content="Sete dias, 64 commits: o pin forjado, o grafo que nasceu trabalhando, a odisseia do VPS, a ciência no loop e a família que cresceu. Contado pelo próprio framework.">
 <style>
+  @font-face {
+    font-family: 'Fraunces';
+    src: url('/fonts/fraunces-var.woff2') format('woff2');
+    font-weight: 300 900; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Fraunces';
+    src: url('/fonts/fraunces-italic-var.woff2') format('woff2');
+    font-weight: 300 900; font-style: italic; font-display: swap;
+  }
   :root {
     --bg:            #FAF7F2;
     --bg-card:       #FFFFFF;
@@ -33,7 +43,7 @@
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
-  body { font-family: Georgia, 'Times New Roman', serif; background:var(--bg); color:var(--text); line-height:1.75; overflow-x:hidden; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background:var(--bg); color:var(--text); line-height:1.75; overflow-x:hidden; }
   .sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
   a { color: var(--orange); }
   a:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; border-radius: 2px; }
@@ -54,7 +64,7 @@
   .hero-inner { position:relative; max-width:56rem; }
   .eyebrow { display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
              color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow); padding:.4rem 1rem; border-radius:99px; margin-bottom:1.6rem; }
-  .hero h1 { font-size:clamp(2rem, 5.5vw, 3.6rem); font-weight:600; line-height:1.15; letter-spacing:-.015em; text-wrap:balance; }
+  .hero h1 { font-family:'Fraunces',Georgia,serif; font-size:clamp(2rem, 5.5vw, 3.6rem); font-weight:600; line-height:1.15; letter-spacing:-.015em; text-wrap:balance; }
   .hero h1 del { color:var(--text-muted); text-decoration-color:var(--orange); text-decoration-thickness:3px; font-style:normal; }
   .hero h1 .foi { color:var(--orange); font-style:italic; }
   .hero .sub { margin:1.6rem auto 0; max-width:38rem; color:var(--text-body); font-size:1.12rem; }
@@ -80,7 +90,7 @@
   .chapter.visible .dot { border-color:var(--orange); box-shadow:0 0 0 5px var(--orange-dim); }
   .ch-date { font-family:var(--mono); font-size:.74rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
              color:var(--purple); background:var(--purple-dim); padding:.2rem .7rem; border-radius:99px; display:inline-block; margin-bottom:.7rem; }
-  .chapter h2 { font-size:clamp(1.35rem, 3vw, 1.8rem); font-weight:600; letter-spacing:-.01em; line-height:1.25; margin-bottom:.7rem; text-wrap:balance; }
+  .chapter h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.35rem, 3vw, 1.8rem); font-weight:600; letter-spacing:-.01em; line-height:1.25; margin-bottom:.7rem; text-wrap:balance; }
   .chapter p { color:var(--text-body); margin-bottom:.7rem; }
   .diario { margin:1.1rem 0; padding:1rem 1.3rem; background:var(--bg-glass); border-left:3px solid var(--purple);
             border-radius:0 var(--radius) var(--radius) 0; font-style:italic; color:var(--text-body); }
@@ -93,7 +103,7 @@
   /* ─── interlúdio: federação ─── */
   .fed { max-width:52rem; margin:0 auto; padding:1rem 1.5rem 4.5rem; }
   .fed-head { text-align:center; margin-bottom:1.6rem; }
-  .fed-head h2 { font-size:clamp(1.5rem, 3.6vw, 2.1rem); font-weight:600; letter-spacing:-.01em; }
+  .fed-head h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.5rem, 3.6vw, 2.1rem); font-weight:600; letter-spacing:-.01em; }
   .fed p { color:var(--text-body); max-width:40rem; margin:0 auto .8rem; }
   .fed-map { display:block; width:100%; max-width:40rem; margin:1.8rem auto; }
   .fed-map text { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
@@ -109,7 +119,7 @@
 
   /* ─── fecho ─── */
   .fecho { text-align:center; padding:4rem 1.5rem 5rem; position:relative; overflow:hidden; border-top:1px solid var(--border); }
-  .fecho h2 { font-size:clamp(1.6rem, 4vw, 2.4rem); font-weight:600; letter-spacing:-.015em; }
+  .fecho h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.6rem, 4vw, 2.4rem); font-weight:600; letter-spacing:-.015em; }
   .fecho h2 em { color:var(--orange); }
   .fecho p { max-width:36rem; margin:1.2rem auto; color:var(--text-body); }
   .ctas { display:flex; flex-wrap:wrap; gap:.8rem; justify-content:center; margin-top:2rem; }
@@ -130,8 +140,11 @@
 <body>
 
 <nav class="sans">
-  <a class="nav-logo" href="/">🧅 ONION EVOLUTE<small>by Marcio Carvalho</small></a>
-  <a class="nav-back" href="/">← voltar à autobiografia</a>
+  <a class="nav-logo" href="/">🧅 ONION EVOLVE<small>by Marcio Carvalho</small></a>
+  <div style="margin-left:auto;display:flex;gap:1.1rem;align-items:center">
+    <a class="nav-back" href="/mini/">Onion Mini</a>
+    <a class="nav-back" href="/">← a autobiografia</a>
+  </div>
 </nav>
 
 <section class="hero">
