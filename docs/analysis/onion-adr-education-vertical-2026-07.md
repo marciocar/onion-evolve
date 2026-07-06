@@ -10,7 +10,7 @@ deciders: maestro + sessão de evolução
 context_freshness: 2026-07-05
 related:
   - docs/analysis/onion-research-srl-plea-2026-07.md (a evidência que funda a vertical)
-  - docs/knowledge-base/education/srl-plea-doctrine.md (Tijolo 1 — entregue neste F0)
+  - docs/knowledge-base/education/ (Tijolo 1 — duas camadas: theories/ + applications/)
   - docs/analysis/onion-research-seed-hegel-dialectics-2026-07.md (pesquisa-irmã, fundação filosófica)
   - docs/analysis/onion-parecer-whatsapp-sender-2026-07.md (§4-C — eixo messenger gated, amarrado à Q3)
 ---
@@ -34,7 +34,7 @@ metacognitiva": IA genérica melhora a tarefa sem gerar aprendizagem — RCT BJE
 
 | Fase | O quê | Gatilho | Estado (2026-07-05) |
 |---|---|---|---|
-| **F0** | Este ADR + camada de conhecimento: categoria `docs/knowledge-base/education/` com a doutrina SRL/PLEA classificada ([srl-plea-doctrine.md](../knowledge-base/education/srl-plea-doctrine.md)) | decisão do maestro | ✅ **aberto/entregue** |
+| **F0** | Este ADR + camada de conhecimento: categoria `docs/knowledge-base/education/` em **duas camadas** — [theories/](../knowledge-base/education/theories/) (a teoria como é, zero Onion) + [applications/](../knowledge-base/education/applications/) (nossas derivações, que citam e nunca reescrevem) | decisão do maestro | ✅ **aberto/entregue** |
 | F1 | **Dogfood de campo**: aplicar a doutrina num artefato educacional real — candidato nº 1: o guia do aluno pulse-mais reescrito pela lente PLEA (estrutura de fases embutida + avaliação forçada) | sessão do maestro no material | ⏳ gated |
 | F2 | Agentes/comandos que o F1 revelar necessários (candidatos hipotéticos: `@learning-designer`, `@srl-coach`) — **só se o uso pedir** | fricção real documentada no F1 | ⏳ gated |
 | F3 | Manifesto `onion-education.manifest.sh` → plugin no marketplace | ≥2 artefatos maduros (critério que graduou design/compliance) | ⏳ gated |
@@ -47,16 +47,19 @@ metacognitiva": IA genérica melhora a tarefa sem gerar aprendizagem — RCT BJE
    avaliação/reflexão do aprendiz (o análogo pedagógico do juiz adversarial) — Fan et al. 2025.
 3. **Rótulos honestos**: manter a separação fato-CONFIRMADO vs analogia-PLAUSÍVEL do relatório em
    todo material derivado (o "declarado ≠ verificado" aplicado à pedagogia).
-4. **Prompts móveis sem promessa**: a Q3 (mensageria autorregulatória) está ABERTA — nada de
+4. **Fonte ≠ derivação (fronteira física)**: teoria vive em `theories/` (fiel às fontes, zero
+   Onion); nossa leitura vive em `applications/` (cita a camada 1, nunca reescreve) — decisão do
+   maestro 2026-07-05, convergente com Zettelkasten/Diátaxis/grounding≠guidance.
+5. **Prompts móveis sem promessa**: a Q3 (mensageria autorregulatória) está ABERTA — nada de
    messenger pedagógico até a rodada dedicada + gatilho do eixo SDAAL (parecer whatsapp §4-C).
 
 ## Capability draft (vira `capability.json` só na F3)
 
 ```json
 {
-  "provides": ["srl-plea-doctrine", "educational-artifact-design-guidelines"],
-  "requires": ["kb:education/srl-plea-doctrine"],
-  "loads": ["when:educational-design -> kb:education/srl-plea-doctrine"],
+  "provides": ["srl-plea-theory-catalog", "educational-artifact-design-guidelines"],
+  "requires": ["kb:education/theories/plea-rosario", "kb:education/theories/srl-zimmerman", "kb:education/applications/educational-design-guidelines"],
+  "loads": ["when:educational-design -> kb:education/applications/educational-design-guidelines", "when:theory-reference -> kb:education/theories/"],
   "conformance": "bronze-alvo-inicial"
 }
 ```
@@ -72,3 +75,4 @@ dono×ritmo×decisão do `architecture.md §8` não está em jogo).
 | Data | Mudança |
 |---|---|
 | 2026-07-05 | F0 aberto: ADR + KB `education/srl-plea-doctrine` fundada sobre os 11 achados verificados |
+| 2026-07-05 | **Refatoração em duas camadas** (decisão do maestro): `theories/` (plea-rosario, srl-zimmerman; futuro hegel-system) ≠ `applications/` (pontes, diretrizes). Doutrina monolítica removida; diretriz vinculante nº 4 adicionada |
