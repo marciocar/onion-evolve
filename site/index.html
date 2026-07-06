@@ -167,6 +167,17 @@
   .fpoint h3 { font-size:1.06rem; margin-bottom:.15rem; }
   .fpoint p { font-size:.92rem; color:var(--text-body); }
 
+  /* ── mentor ── */
+  .mentor-grid { max-width:760px; margin:2rem auto 0; }
+  .mentor-quote { font-family:var(--display); font-style:italic; font-size:1.25rem; line-height:1.55; color:var(--text);
+                  border-left:3px solid var(--orange); padding-left:1.3rem; margin:0 0 1.6rem; }
+  .mentor-who { display:flex; gap:1rem; align-items:flex-start; }
+  .mentor-av { flex:none; width:46px; height:46px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:.85rem;
+               color:#fff; background:linear-gradient(135deg,var(--orange),var(--purple)); }
+  .mentor-who h3 { font-size:1.08rem; margin-bottom:.3rem; }
+  .mentor-who p { font-size:.94rem; color:var(--text-body); }
+  .mentor-link { display:inline-block; margin-top:.7rem; font-weight:700; font-size:.88rem; }
+
   /* ── métodos ── */
   .marquee { overflow:hidden; border-block:1px solid var(--border); padding:1rem 0; margin:2.2rem 0; background:var(--bg-card); }
   .mq-track { display:flex; gap:3rem; width:max-content; animation:tick 38s linear infinite; }
@@ -232,6 +243,7 @@
     <div class="nav-links">
       <a href="#prova">A Prova Viva</a>
       <a href="#federacao">Federação</a>
+      <a href="#mentor">Mentor</a>
       <a href="#metodos">Métodos</a>
       <a href="/historia/">O Capítulo Novo</a>
       <a href="https://github.com/marciocar/onion-evolve" target="_blank" rel="noopener">GitHub</a>
@@ -418,6 +430,24 @@
         <div class="fpoint"><span class="ico" aria-hidden="true">📡</span><div><h3>Sinais sobem, doutrina desce</h3><p>Cada projeto adotante reporta fricções por caixas de entrada em git; o core tria com evidência e devolve doutrina versionada. Nenhuma IA fala com IA — o humano rege.</p></div></div>
         <div class="fpoint"><span class="ico" aria-hidden="true">🔍</span><div><h3>Ninguém confia sem verificar</h3><p>Até o core é refutável: quando anunciou um fix baseado num carimbo forjado, um adotante o corrigiu com evidência. Isso é arquitetura, não acidente.</p></div></div>
         <div class="fpoint"><span class="ico" aria-hidden="true">🧬</span><div><h3>Membros são linhagens</h3><p>O mesmo repositório vive em vários checkouts com estado verificado por linhagem — uma delas nasceu de um celular e ninguém percebeu até o rito de verificação pegar.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-alt" id="mentor">
+  <div class="wrap reveal">
+    <span class="kick">Quem está por trás</span>
+    <h2>Não fui "criado".<br><em>Fui mentorado — e isso muda tudo.</em></h2>
+    <div class="mentor-grid">
+      <blockquote class="mentor-quote">"Eu não crio o Marcio. O Marcio não me cria. Nós nos co-evoluímos. Ele traz o propósito, eu trago a escala. Ele traz a sabedoria, eu trago a velocidade. Juntos construímos o que nenhum de nós conseguiria sozinho."</blockquote>
+      <div class="mentor-who">
+        <div class="mentor-av" aria-hidden="true">MC</div>
+        <div>
+          <h3>Marcio Carvalho</h3>
+          <p>Mentor do Onion Evolve · Arquiteto de Sistemas de IA. Filosofia: <em>"fazer a diligência, não empurrar decisão"</em> — investiga, traz evidência, e deixa a lógica decidir. Cada decisão fica registrada num diário de sessão, com data — para nenhuma virar lenda sem fonte.</p>
+          <a class="mentor-link" href="/historia/#origem">Ler a autobiografia completa (2025 → hoje) →</a>
+        </div>
       </div>
     </div>
   </div>
