@@ -8,7 +8,8 @@ diretrizes no [ADR](../../analysis/onion-adr-education-vertical-2026-07.md)).
 > **Não se mistura o core das teorias com as nossas derivações.** A separação é estrutural, não
 > por rótulo: rótulo apodrece, estrutura não. Convergência com Zettelkasten (*literature* ≠
 > *permanent notes*), Diátaxis (*reference* ≠ *how-to*) e grounding≠guidance — e com a família
-> Onion "declarado ≠ verificado": aqui, **fonte ≠ derivação**.
+> Onion "declarado ≠ verificado": aqui, **fonte ≠ derivação** — doutrina transversal documentada
+> em [concepts/source-vs-derivation.md](../concepts/source-vs-derivation.md).
 
 | Camada | Diretório | Regra |
 |---|---|---|
