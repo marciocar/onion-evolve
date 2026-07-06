@@ -2,7 +2,7 @@
 title: 'ADR — Grana.Ai: onde o Onion se consolidou como potência (não a origem)'
 date: 2026-07-06
 type: adr
-status: aceito — registro de linhagem; reconciliação técnica GATED (Fase 0 humana pendente)
+status: aceito — Fase 0 CONFIRMADA (2026-07-06); Fase 3 aguardando sinal de execução
 decision-scope: meta / federação / confidencialidade / identidade
 supersedes: none
 deciders: maestro
@@ -80,16 +80,30 @@ A Grana.Ai não é tratada como "berço" do Onion em nenhum material futuro — 
 Nada deste ADR vai para `/historia/#origem` ou qualquer superfície pública nesta rodada. Reversível
 no sentido publicar-depois; não no sentido despublicar-depois — por isso o default é conter.
 
-### D3 — Reconciliação técnica: GATED até alinhamento humano
+### D3 — Reconciliação técnica: GATED até alinhamento humano — ✅ CONFIRMADA 2026-07-06
 O branch `onion/adopt`/`onion/granaai-ssot` está **divergido** (342 à frente / 232 atrás do
-`develop` real) e **sem PR aberto** — trabalho de valor real em risco de apodrecer. Nenhuma ação
-de escrita em `GranaAi/granaai` acontece sem o maestro alinhar diretamente com Mauricio Matos
-primeiro (repositório de terceiro, produção regulada, humano real do outro lado — não é decisão
-unilateral desta sessão).
+`develop` real) e **sem PR aberto** — trabalho de valor real em risco de apodrecer. Fase 0
+concluída: o maestro confirmou levar o trabalho adiante ("vamos refinar juntos"), e **Mauricio
+Matos é o responsável por revisar/mergear no `develop`** real do time. A Fase 3 (cherry-pick,
+já preparada e verificada sem conflito) aguarda só o sinal de execução — não mais alinhamento.
+
+### D4 — Grana.Ai NÃO recebe `role: source` próprio
+Pergunta do maestro: "a Grana.Ai deve ter seu core ou source?" — **Não.** Doutrina
+[fonte≠derivação](../knowledge-base/concepts/source-vs-derivation.md) é explícita: existe **uma
+só fonte** (`onion-evolve`, T0); duas fontes cria a pergunta sem resposta de qual doutrina vale
+quando divergirem. O que a Grana.Ai tem, e que endereça a mesma necessidade sem violar a doutrina:
+- **`.claude/` vendorizado já É "o core deles" no dia a dia** — o time nunca olha pro
+  onion-evolve diretamente, só pro que está no próprio repo (verdade para todo `role: adopted`).
+- **`integration_branch: develop` explícito** — controle deliberado de QUANDO puxar updates
+  (nunca live-pull automático), o que um ambiente `mode: regulated` exige.
+- **Trust elevado, não role elevado**: `can_correct_to: [onion-evolve]` adicionado — o achado do
+  bug do lint (descoberta convergente, D-anterior) prova rigor técnico real; reconhecido como
+  confiança, não como uma segunda autoridade de fonte.
 
 ## Próximos passos
-1. **Fase 0** (fora desta sessão): maestro alinha com Mauricio — reconciliação desejada? quem
-   revisa/mergeia? ajuda técnica nossa é bem-vinda?
+1. ~~**Fase 0**~~ — ✅ CONFIRMADA 2026-07-06 (ver D3).
+2. **Fase 3**: aguardando o maestro dar o sinal de execução (não mais alinhamento humano) — plano
+   já pronto (cherry-pick dos 13 commits, zero conflito verificado).
 2. **Fase 3** (pós-alinhamento) — **preparada, não executada** (ver detalhamento abaixo).
 3. Considerar: uma vez reconciliado, criar canal de co-evolução real (inbox/outbox) para que
    sinais como o do lint não dependam de descoberta arqueológica — o próximo "sinal upstream" real
@@ -120,3 +134,4 @@ Nada disto foi executado — é plano pronto, não ação.
 | Data | Mudança |
 |---|---|
 | 2026-07-06 | ADR aceito; linhagem registrada em `members.yaml`; reconciliação técnica gated |
+| 2026-07-06 | **Fase 0 CONFIRMADA**: maestro decide levar `onion/adopt`+`onion/granaai-ssot` adiante; Mauricio Matos é o revisor/mergeador designado. **D4 nova**: Grana.Ai NÃO recebe `role: source` (doutrina fonte≠derivação) — recebe `integration_branch` explícito + trust elevado (`can_correct_to`) em vez disso. Fase 3 aguarda só o sinal de execução |
