@@ -100,6 +100,27 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  - id: granaai
+    name: granaai (Grana.Ai — CONFIDENCIAL, ver onion-adr-granaai-consolidation-2026-07.md)
+    role: standalone            # TIER 3 — adota o core direto; NÃO confundir com "origem" (ver ADR — é consolidação, não origem)
+    parent: onion-evolve
+    remote: github.com/GranaAi/granaai   # PRIVADO — não citar em superfície pública
+    local_path: null            # sem clone local nesta máquina; registro via investigação read-only (gh api)
+    onion_version: 4332ac8d1884   # source_commit no branch onion/adopt — DECLARADO pelo stamp deles, NÃO verificado byte-a-byte (sem clone local)
+    adopted_at: 2026-07-01
+    mode: regulated              # detectado corretamente pelo /meta:adopt deles — domínio fintech
+    reconciliation_status: pending_human_alignment   # branch onion/adopt diverged (342 ahead/232 behind develop deles), sem PR aberto — GATED até maestro alinhar com Mauricio Matos (ver ADR D3)
+    personality_summary: "Onde o Onion se consolidou como potência real (não a origem) — 3 dimensões peer provadas juntas em produção regulada (fintech). Convite de Marcio Carvalho (CTO Grana.Ai, criador do Onion) a Mauricio Matos, 2026-07-01: adoção completa + canonicalização SSOT (9 ADRs, 8 RFTs, grafo do ecossistema, 24/25 CURRENT). Achado notável: bug real de lint (graceful-skip sem jq) descoberto e corrigido lá E no core, mesmo dia, 7h41 de diferença, zero comunicação — descoberta convergente independente."
+    specializations: [regulated-fintech, canonicalization, ssot-governance]
+    personality_last_sync: 2026-07-06   # seed manual — investigação read-only, não sessão adotante
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []      # confidencial — sem compartilhamento até Fase 0 (alinhamento humano)
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: onion-mini
     name: onion-mini (Onion Mini — a versão mini e portátil, ex-onion-portable)
     role: standalone            # DESTILAÇÃO CURADA, não adoção (não vendoriza .claude/) — role
