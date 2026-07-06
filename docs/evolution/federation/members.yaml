@@ -78,6 +78,26 @@ members:
       diary_classifications_shared: [public, collective]  # o que envio proativamente
       exposes_downstream: []              # IDs de meus sub-adotados (T2) — vazio agora
 
+  - id: pulse-mais
+    name: pulse-mais (Pulse Mais — materiais educacionais)
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    parent: onion-evolve
+    remote: github.com/marciocar/pulse-mais
+    local_path: "/home/marciocar/pulse-mais"
+    onion_version: c711baa17617   # VERIFICADO por pin-integrity-check.sh na adoção (pin-ok 2026-07-05)
+    adopted_at: 2026-07-05
+    mode: greenfield
+    personality_summary: "Produto educacional (guia do aluno + materiais); 1º adotante de campo da vertical onion-education — o trabalho aqui É o F1 (doutrina SRL/PLEA aplicada a material real; fricções voltam via inbox)"  # seed manual pré-F2
+    specializations: [education, srl-plea, learning-materials]
+    personality_last_sync: 2026-07-05   # seed manual (comando de sync ainda não existe — RFC-0003 F2)
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
