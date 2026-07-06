@@ -99,6 +99,28 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  - id: onion-mini
+    name: onion-mini (Onion Mini — a versão mini e portátil, ex-onion-portable)
+    role: standalone            # DESTILAÇÃO CURADA, não adoção (não vendoriza .claude/) — role
+                                # 'distilled' formal é costura gated (2ª destilação; ADR mini-distillation D2)
+    parent: onion-evolve
+    remote: github.com/marciocar/onion-mini
+    local_path: "/home/marciocar/onion-mini"
+    onion_version: n/a          # sem stamp: destilação (reescrita curada da doutrina), não vendor do framework
+    adopted_at: 2026-07-05      # data da adoção definitiva/rebrand (repo existe desde jun/2026)
+    mode: distilled             # anotação livre; o trust engine só valida role
+    published_at: "https://github.com/marciocar/onion-mini"   # PÚBLICO — produto de ENTRADA da família
+    personality_summary: "A versão mini do Onion (master-prompt como bytecode, qualquer Transformer como VM): porta de entrada p/ iniciantes em dev/task management; ciclos com motor PLEA; SDAAL destilado; rampa de graduação p/ o core"
+    specializations: [distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles]
+    personality_last_sync: 2026-07-05   # seed manual
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>

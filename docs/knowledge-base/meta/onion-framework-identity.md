@@ -363,7 +363,12 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
   Vivo") e backend **`app.onionevolve.com`** (VPS com Caddy/TLS + clone do core em
   `/home/onion/onion-evolve`), deploy ~2026-06-29.
 - **Adotantes reais**: rhilo-metagamify (co-evolução ativa, lineages mapeadas em
-  `federation/members.yaml`) e rhilo-app (sessões persistentes, Jira/ADF, multi-contexto).
+  `federation/members.yaml`), rhilo-app (sessões persistentes, Jira/ADF, multi-contexto) e
+  pulse-mais (1º adotante da vertical educacional; materiais publicados).
+- **Família multi-plataforma**: hub `onion` ("prova de universalidade") + destilações por
+  plataforma (cursor/codex/copilot/zed/antigravity) e o **Onion Mini** (`marciocar/onion-mini`,
+  público) — a destilação máxima e produto de ENTRADA da família (destilação federada, ADR
+  mini-distillation 2026-07). O core segue Claude-Code-only; quem é multi-plataforma é a família.
 
 ---
 
