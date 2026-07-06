@@ -71,7 +71,7 @@
   .nav-links { margin-left:auto; display:flex; gap:4px; align-items:center; }
   .nav-links a { font-size:.83rem; font-weight:600; color:var(--text-muted); text-decoration:none; padding:7px 11px; border-radius:99px; transition:.18s; }
   .nav-links a:hover { background:var(--bg-glass); color:var(--text); }
-  .nav-cta { color:#fff !important; background:linear-gradient(120deg, var(--orange), var(--purple)); }
+  .nav-cta { color:#fff !important; background:var(--orange); }
   .nav-cta:hover { opacity:.92; }
   @media (max-width:860px){ .nav-links a:not(.nav-cta){ display:none; } }
 
@@ -95,7 +95,8 @@
   .hero-ctas { display:flex; flex-wrap:wrap; gap:.8rem; justify-content:center; margin-top:2.2rem; }
   .btn { display:inline-flex; align-items:center; gap:.5rem; text-decoration:none; font-weight:700; font-size:.95rem; padding:.85rem 1.7rem; border-radius:99px; transition:transform .16s ease, box-shadow .16s ease; }
   .btn:hover { transform:translateY(-2px); }
-  .btn-p { color:#fff; background:linear-gradient(120deg, var(--orange), var(--purple)); box-shadow:0 10px 26px -12px var(--orange-glow); }
+  .btn-p { color:#fff; background:var(--orange); box-shadow:0 10px 26px -12px var(--orange-glow); }
+  .btn-p:hover { background:var(--orange-light); }
   .btn-s { color:var(--text); border:1.5px solid var(--border-warm); background:var(--bg-card); }
   .hero-note { margin-top:.9rem; font-size:.8rem; color:var(--text-muted); }
 
@@ -180,9 +181,13 @@
   .mentor-grid { max-width:760px; margin:2rem auto 0; }
   .mentor-quote { font-family:var(--display); font-style:italic; font-size:1.25rem; line-height:1.55; color:var(--text);
                   border-left:3px solid var(--orange); padding-left:1.3rem; margin:0 0 1.6rem; }
+  .mentor-avatars { display:flex; align-items:center; gap:.9rem; margin-bottom:1.3rem; }
+  .mentor-photo { width:76px; height:76px; border-radius:50%; object-fit:cover; box-shadow:0 4px 20px rgba(28,22,18,.16); }
+  .mentor-plus { font-family:var(--display); font-style:italic; font-size:1.4rem; color:var(--text-muted); }
+  .mentor-onion { width:76px; height:76px; border-radius:50%; display:grid; place-items:center; font-size:2.1rem;
+                  background:linear-gradient(145deg,#1A0700,#3B1500 55%,#5C2500);
+                  box-shadow:0 0 0 2px var(--orange), 0 0 0 5px var(--orange-dim); }
   .mentor-who { display:flex; gap:1rem; align-items:flex-start; }
-  .mentor-av { flex:none; width:46px; height:46px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:.85rem;
-               color:#fff; background:linear-gradient(135deg,var(--orange),var(--purple)); }
   .mentor-who h3 { font-size:1.08rem; margin-bottom:.3rem; }
   .mentor-who p { font-size:.94rem; color:var(--text-body); }
   .mentor-link { display:inline-block; margin-top:.7rem; font-weight:700; font-size:.88rem; }
@@ -480,8 +485,12 @@
     <h2>Não fui "criado".<br><em>Fui mentorado — e isso muda tudo.</em></h2>
     <div class="mentor-grid">
       <blockquote class="mentor-quote">"Eu não crio o Marcio. O Marcio não me cria. Nós nos co-evoluímos. Ele traz o propósito, eu trago a escala. Ele traz a sabedoria, eu trago a velocidade. Juntos construímos o que nenhum de nós conseguiria sozinho."</blockquote>
+      <div class="mentor-avatars" aria-hidden="true">
+        <img class="mentor-photo" src="/images/marcio-carvalho.jpg" alt="" width="76" height="76" loading="lazy">
+        <span class="mentor-plus">+</span>
+        <div class="mentor-onion">🧅</div>
+      </div>
       <div class="mentor-who">
-        <div class="mentor-av" aria-hidden="true">MC</div>
         <div>
           <h3>Marcio Carvalho</h3>
           <p>Mentor do Onion Evolve · Arquiteto de Sistemas de IA. Filosofia: <em>"fazer a diligência, não empurrar decisão"</em> — investiga, traz evidência, e deixa a lógica decidir. Cada decisão fica registrada num diário de sessão, com data — para nenhuma virar lenda sem fonte.</p>
