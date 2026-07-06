@@ -10,6 +10,12 @@ on:
       # Sem este path, um PR que só toca plugins/ contorna o drift-guard
       # (incidente 2026-07-04: fix de drift do #241 mergeou sem o lint rodar).
       - 'plugins/**'
+      # docs/ + CLAUDE.md são guardados pelas regras de SSOT (R9/R15/R16/R22:
+      # contagens vivas, carimbo de frescor, links da co-evolução). Sem estes
+      # paths, um PR docs-only deriva contagens sem o CI ver (observado no #254:
+      # lint não rodou num PR que tocava CLAUDE.md + docs/onion — o local salvou).
+      - 'docs/**'
+      - 'CLAUDE.md'
 
 permissions:
   contents: read
