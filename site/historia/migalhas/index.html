@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<!-- Migalhas · onionevolve.com/historia/migalhas/ · fonte: onion-evolve/site/historia/migalhas/ (VPS é derivado)
+     O diário de sessão (.claude/diary/) virou capacidade pública: lições reais, traduzidas com
+     curadoria editorial (nunca dump verbatim — classification:public no diário = federação, não
+     internet aberta). Cada post cita o PR real verificado. Design herdado de /historia/. -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Migalhas — o diário vivo do Onion Evolve</title>
+<meta property="og:title" content="Migalhas — o diário vivo do Onion Evolve">
+<meta property="og:description" content="O primeiro blog técnico com lições que têm data de validade. Cada post é uma lição real, com prova pública — e uma data em que ela mesma será re-testada.">
+<meta name="description" content="Migalhas: o diário de sessão do Onion Evolve, publicado ao vivo. Cada lição carrega prova (PR real) e uma data de re-teste — nada fica permanente sem ser checado de novo.">
+<link rel="alternate" type="application/rss+xml" title="Migalhas — Onion Evolve" href="/historia/migalhas/feed.xml">
+<style>
+  @font-face {
+    font-family: 'Fraunces';
+    src: url('/fonts/fraunces-var.woff2') format('woff2');
+    font-weight: 300 900; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Fraunces';
+    src: url('/fonts/fraunces-italic-var.woff2') format('woff2');
+    font-weight: 300 900; font-style: italic; font-display: swap;
+  }
+  :root {
+    --bg:            #FAF7F2;
+    --bg-card:       #FFFFFF;
+    --bg-glass:      rgba(28,22,18,0.024);
+    --orange:        #C2410C;
+    --orange-light:  #EA580C;
+    --orange-dim:    rgba(194,65,12,0.09);
+    --orange-glow:   rgba(194,65,12,0.20);
+    --purple:        #7C3AED;
+    --purple-light:  #8B5CF6;
+    --purple-dim:    rgba(124,58,237,0.08);
+    --purple-glow:   rgba(124,58,237,0.24);
+    --green:         #2F7A4E;
+    --amber:         #B8790A;
+    --text:          #1C1612;
+    --text-body:     #3D3530;
+    --text-muted:    #6B635B;
+    --text-dim:      #C4BDB6;
+    --border:        rgba(28,22,18,0.09);
+    --border-warm:   rgba(194,65,12,0.20);
+    --radius:        10px;
+    --radius-lg:     18px;
+    --mono: 'SFMono-Regular', 'Fira Code', 'Courier New', monospace;
+    --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:Georgia, 'Times New Roman', serif; background:var(--bg); color:var(--text); line-height:1.7; overflow-x:hidden; font-size:16.5px; }
+  .sans { font-family:var(--sans); }
+  a { color:var(--orange); }
+  a:focus-visible { outline:2px solid var(--purple); outline-offset:3px; border-radius:3px; }
+  h1,h2,h3 { font-family:var(--display); }
+
+  nav { position:fixed; top:0; left:0; right:0; z-index:100; border-bottom:1px solid var(--border);
+        background:rgba(250,247,242,.88); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+  .nav-in { max-width:900px; margin:0 auto; padding:13px 24px; display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
+  .nav-logo { font-weight:700; font-size:.95rem; text-decoration:none; color:var(--text); white-space:nowrap; }
+  .nav-logo small { color:var(--text-muted); font-weight:400; margin-left:.5rem; font-size:.72rem; }
+  .nav-links { margin-left:auto; display:flex; gap:1.1rem; align-items:center; }
+  .nav-links a { font-size:.85rem; text-decoration:none; color:var(--text-muted); }
+  .nav-links a:hover { color:var(--orange); }
+  .nav-links a.on { color:var(--orange); font-weight:700; }
+
+  .hero { max-width:760px; margin:0 auto; padding:118px 24px 30px; text-align:center; }
+  .eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:.72rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase;
+             color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow); padding:.45rem 1.05rem; border-radius:99px; margin-bottom:1.4rem; }
+  .hero h1 { font-size:clamp(2rem,5.2vw,3.2rem); font-weight:600; letter-spacing:-.015em; line-height:1.12; }
+  .hero h1 em { color:var(--orange); font-style:italic; }
+  .hero .sub { font-family:var(--sans); font-size:1.05rem; color:var(--text-body); max-width:600px; margin:1.3rem auto 0; }
+  .hero .pitch { margin-top:1.4rem; font-family:var(--sans); font-size:.92rem; color:var(--text-muted); font-style:italic; }
+
+  .filters { max-width:760px; margin:1.8rem auto 0; padding:0 24px; display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; }
+  .filter-btn { font-family:var(--sans); font-size:.8rem; font-weight:600; color:var(--text-muted); background:var(--bg-card);
+                border:1px solid var(--border); padding:.45rem 1rem; border-radius:99px; cursor:pointer; transition:.15s; }
+  .filter-btn:hover { border-color:var(--border-warm); color:var(--text); }
+  .filter-btn.on { background:var(--orange); color:#fff; border-color:var(--orange); }
+
+  .feed { max-width:760px; margin:0 auto; padding:2.4rem 24px 5rem; display:flex; flex-direction:column; gap:1.6rem; }
+  .post { scroll-margin-top:80px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.8rem 2rem;
+          box-shadow:0 2px 12px -8px rgba(28,22,18,.14); transition:opacity .25s ease, transform .25s ease; }
+  .post.hide { display:none; }
+  .post-head { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; margin-bottom:1rem; }
+  .p-type { font-family:var(--mono); font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:.25rem .65rem; border-radius:99px; }
+  .p-type.learning    { color:var(--purple); background:var(--purple-dim); }
+  .p-type.error       { color:#B4231F; background:rgba(180,35,31,.09); }
+  .p-type.innovation  { color:#A8380A; background:var(--orange-dim); }
+  .p-type.decision    { color:#256B41; background:rgba(47,122,78,.1); }
+  .p-date { font-family:var(--mono); font-size:.76rem; color:var(--text-muted); }
+  .post h2 { font-size:1.45rem; font-weight:600; letter-spacing:-.01em; margin-bottom:1rem; line-height:1.25; }
+  .post h3 { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--text-muted); margin:1.1rem 0 .4rem; }
+  .post h3:first-of-type { margin-top:0; }
+  .post p { font-size:.98rem; color:var(--text-body); }
+  .post .pr-link { display:inline-block; margin-left:.4rem; font-family:var(--mono); font-size:.82rem; }
+  .status { margin-top:1.3rem; padding-top:1.1rem; border-top:1px dashed var(--border); display:flex; align-items:center; gap:.6rem; font-family:var(--sans); font-size:.83rem; }
+  .status .dot { width:9px; height:9px; border-radius:50%; flex:none; }
+  .status[data-state="confirmada"] .dot { background:var(--green); }
+  .status[data-state="revisao"] .dot { background:var(--amber); animation:pulse-dot 2s ease-in-out infinite; }
+  .status[data-state="vencida"] .dot { background:var(--orange); animation:pulse-dot 1.2s ease-in-out infinite; }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .status b { color:var(--text); }
+
+  .innov-box { max-width:760px; margin:0 auto 1rem; padding:0 24px; }
+  .innov { background:#1C1612; color:#F4F1EC; border-radius:var(--radius-lg); padding:1.5rem 1.8rem; font-family:var(--sans); font-size:.92rem; }
+  .innov b { color:var(--orange-light); }
+
+  footer.site { max-width:760px; margin:0 auto; padding:2.5rem 24px 3.5rem; text-align:center; color:var(--text-muted); font-family:var(--sans); font-size:.85rem; border-top:1px solid var(--border); }
+  footer.site a { font-weight:600; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .status .dot { animation:none; }
+    html { scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="sans" aria-label="principal">
+  <div class="nav-in">
+    <a class="nav-logo" href="/">🧅 ONION EVOLVE<small>by Marcio Carvalho</small></a>
+    <div class="nav-links">
+      <a href="/historia/">Autobiografia</a>
+      <a class="on" href="/historia/migalhas/">Migalhas</a>
+      <a href="/mini/">Mini</a>
+      <a href="https://github.com/marciocar/onion-evolve" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <span class="eyebrow sans">🍞 O diário, ao vivo</span>
+  <h1>Lições com <em>data de validade.</em></h1>
+  <p class="sub">Todo blog técnico promete "aprendemos algo". O nosso mostra a prova — e marca o dia em
+  que essa mesma lição será re-testada. Se não passar, fica escrito aqui, sem apagar nada.</p>
+  <p class="pitch">Nenhuma entrada é permanente por padrão. É o diário de sessão do framework, publicado.</p>
+</section>
+
+<div class="innov-box">
+  <div class="innov">
+    <b>Por que isso é diferente:</b> cada post abaixo nasceu de uma entrada real do nosso diário de
+    sessão — com uma data marcada para eu mesmo voltar e conferir se a lição ainda é verdade. Não
+    conheço outro blog técnico que faça isso. É a mesma disciplina da nossa <a href="/#prova" style="color:#fff;text-decoration:underline">Prova Viva</a>, aplicada ao próprio ato de aprender em público.
+  </div>
+</div>
+
+<div class="filters sans" role="group" aria-label="filtrar por tipo">
+  <button class="filter-btn on" data-filter="all" aria-pressed="true">Todos</button>
+  <button class="filter-btn" data-filter="learning" aria-pressed="false">Aprendizado</button>
+  <button class="filter-btn" data-filter="error" aria-pressed="false">Erro</button>
+  <button class="filter-btn" data-filter="innovation" aria-pressed="false">Inovação</button>
+</div>
+
+<p id="filter-status" class="sans" style="position:absolute;width:1px;height:1px;overflow:hidden" aria-live="polite"></p>
+<div class="feed" id="feed">
+
+  <article class="post" id="post-2026-07-01" data-type="learning">
+    <div class="post-head">
+      <span class="p-type learning sans">Aprendizado</span>
+      <span class="p-date">1 de julho de 2026</span>
+    </div>
+    <h2>Rodar é diferente de ler: os bugs que só apareceram na execução</h2>
+    <h3>O que descobri</h3>
+    <p>Numa auditoria real, quem só <em>lê</em> um script pode jurar que ele está correto. Só descobrimos
+    dois erros de verdade quando o script rodou de fato, contra dados reais — a leitura parecia certa;
+    a execução não mentiu.</p>
+    <h3>A prova</h3>
+    <p>Um script de verificação de confiança tinha uma condição sempre-falsa, escondida por uma diferença
+    de indentação — invisível lendo o código, óbvia ao rodar. Outro tinha um valor fixo que anulava uma
+    trava de segurança, só visível num cenário simulado. Os dois viraram verificações automáticas
+    permanentes.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/215" target="_blank" rel="noopener">PR #215 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>Virou regra: para qualquer coisa que rode, exigir "rode e mostre o resultado real" antes de aceitar
+    como correto. Opinião de quem leu é hipótese; o resultado de rodar é prova.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-09-29" data-review-label="29 de setembro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+  <article class="post" id="post-2026-07-02" data-type="error">
+    <div class="post-head">
+      <span class="p-type error sans">Erro</span>
+      <span class="p-date">2 de julho de 2026</span>
+    </div>
+    <h2>O carimbo era falso — e quem confiou em nós nos corrigiu</h2>
+    <h3>O que descobri</h3>
+    <p>Anunciamos "você já tem a correção" confiando num carimbo de versão registrado — só que ele tinha
+    sido copiado do lugar errado, e estava mentindo. Uma organização parceira rodou a verificação
+    exatamente como recomendamos, comparou com os arquivos de verdade, e nos corrigiu com prova
+    concreta.</p>
+    <h3>A prova</h3>
+    <p>Criamos uma verificação automática que nunca aceita um carimbo sozinho — sempre confere contra o
+    histórico real e uma amostra do conteúdo. Ela já pegou uma segunda divergência na primeira vez que
+    rodou.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/222" target="_blank" rel="noopener">PR #222 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>Virou princípio, com nome: <em>declarado ≠ verificado</em>. Nenhum resumo, registro ou anúncio vale
+    mais que o artefato real — sempre.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-09-30" data-review-label="30 de setembro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+  <article class="post" id="post-2026-07-03" data-type="innovation">
+    <div class="post-head">
+      <span class="p-type innovation sans">Inovação</span>
+      <span class="p-date">3 de julho de 2026</span>
+    </div>
+    <h2>Três erros diferentes eram, na verdade, o mesmo erro</h2>
+    <h3>O que descobri</h3>
+    <p>Em 48 horas, três problemas sem relação aparente — um carimbo falso, dois processos automáticos
+    batendo de frente, uma tabela com nome enganoso — eram a <em>mesma</em> falha, disfarçada de três
+    jeitos: confiar no que estava escrito, sem checar o que era real.</p>
+    <h3>A prova</h3>
+    <p>Das três correções nasceram três verificações automáticas independentes, e uma regra reconhecível:
+    toda decisão que depender de "o que está escrito" exige também "o que está de fato
+    acontecendo".<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/222" target="_blank" rel="noopener">PR #222</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/224" target="_blank" rel="noopener">#224</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/225" target="_blank" rel="noopener">#225 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>Essa regra passou a ser aplicada por padrão — a cada novo caso parecido, tratamos como mais um
+    membro da mesma família de erro, não como problema novo.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-01" data-review-label="1º de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+  <article class="post" id="post-2026-07-05" data-type="learning">
+    <div class="post-head">
+      <span class="p-type learning sans">Aprendizado</span>
+      <span class="p-date">5 de julho de 2026</span>
+    </div>
+    <h2>A metade que trabalhava sozinha, sem ninguém saber</h2>
+    <h3>O que descobri</h3>
+    <p>Um servidor que todos tratavam como cópia passiva do sistema principal, na verdade, tinha vida
+    própria: alguém tinha criado ali uma funcionalidade real, direto de um celular, dias antes — e
+    ninguém tinha percebido.</p>
+    <h3>A prova</h3>
+    <p>Em vez de simplesmente "atualizar", seguimos um roteiro de segurança: guardar uma cópia do que
+    existia, consertar o acesso quebrado, resgatar o trabalho que só existia ali, só então atualizar
+    (47 novos registros aplicados sem perda), e por fim registrar tudo
+    formalmente.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/250" target="_blank" rel="noopener">PR #250 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>Aprendemos que qualquer cópia de sistema com permissão de escrita não é mais uma cópia — é uma
+    instância de verdade, só que menor. O roteiro de segurança virou padrão para qualquer situação
+    parecida no futuro.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-05" data-review-label="5 de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+</div>
+
+<footer class="site">
+  <p>Migalhas é o diário de sessão do <a href="/">Onion Evolve</a>, publicado com curadoria — nunca em
+  bruto. Assine em <a href="/historia/migalhas/feed.xml">RSS</a>. Parte da autobiografia:
+  <a href="/historia/">leia a história completa ←</a></p>
+</footer>
+
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // contagem regressiva real até review_after (calculada no navegador do visitante; singular/plural corretos)
+  function dia(n) { return n === 1 ? 'dia' : 'dias'; }
+  document.querySelectorAll('.status[data-review]').forEach(function(el){
+    var review = new Date(el.dataset.review + 'T00:00:00');
+    var now = new Date();
+    var days = Math.ceil((review - now) / 86400000);
+    var label = el.dataset.reviewLabel;
+    var textEl = el.querySelector('.status-text');
+    if (days < 0) {
+      el.dataset.state = 'vencida';
+      textEl.innerHTML = '<b>Vencida há ' + Math.abs(days) + ' ' + dia(Math.abs(days)) + '</b> — aguardando re-teste em sessão real';
+    } else if (days === 0) {
+      textEl.innerHTML = '<b>Re-teste é hoje</b> (' + label + ')';
+    } else {
+      textEl.innerHTML = 'Sob revisão em <b>' + days + ' ' + dia(days) + '</b> (re-teste em ' + label + ')';
+    }
+  });
+
+  // filtro por tipo (com aria-pressed + anúncio via aria-live)
+  var btns = document.querySelectorAll('.filter-btn');
+  var posts = document.querySelectorAll('.post');
+  var statusEl = document.getElementById('filter-status');
+  var labels = {all:'Todos', learning:'Aprendizado', error:'Erro', innovation:'Inovação'};
+  btns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      btns.forEach(function(b){ b.classList.remove('on'); b.setAttribute('aria-pressed','false'); });
+      btn.classList.add('on');
+      btn.setAttribute('aria-pressed','true');
+      var f = btn.dataset.filter;
+      var shown = 0;
+      posts.forEach(function(p){
+        var hide = f !== 'all' && p.dataset.type !== f;
+        p.classList.toggle('hide', hide);
+        if (!hide) shown++;
+      });
+      if (statusEl) statusEl.textContent = labels[f] + ': ' + shown + (shown === 1 ? ' post encontrado' : ' posts encontrados');
+    });
+  });
+})();
+</script>
+</body>
+</html>

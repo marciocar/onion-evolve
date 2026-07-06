@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Migalhas — Onion Evolve</title>
+  <link>https://onionevolve.com/historia/migalhas/</link>
+  <atom:link href="https://onionevolve.com/historia/migalhas/feed.xml" rel="self" type="application/rss+xml"/>
+  <description>O diário de sessão do Onion Evolve, publicado ao vivo. Cada lição carrega prova pública e uma data de re-teste.</description>
+  <language>pt-BR</language>
+  <lastBuildDate>Sun, 05 Jul 2026 00:00:00 GMT</lastBuildDate>
+
+  <item>
+    <title>A metade que trabalhava sozinha, sem ninguém saber</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-05</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-05</guid>
+    <pubDate>Sun, 05 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Um servidor tratado como cópia passiva tinha vida própria: uma funcionalidade real criada de um celular, dias antes, sem que ninguém percebesse. O roteiro de segurança que seguimos para resgatar o trabalho sem perder nada — PR #250.</description>
+  </item>
+  <item>
+    <title>Três erros diferentes eram, na verdade, o mesmo erro</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-03</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-03</guid>
+    <pubDate>Fri, 03 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Em 48 horas, três problemas sem relação aparente eram a mesma falha disfarçada: confiar no que estava escrito sem checar o que era real. Nasceu o princípio declarado≠verificado — PR #222, #224, #225.</description>
+  </item>
+  <item>
+    <title>O carimbo era falso — e quem confiou em nós nos corrigiu</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-02</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-02</guid>
+    <pubDate>Thu, 02 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Anunciamos "você já tem a correção" confiando num carimbo forjado. Uma organização parceira nos corrigiu com prova concreta. Nasceu a verificação que nunca aceita um carimbo sozinho — PR #222.</description>
+  </item>
+  <item>
+    <title>Rodar é diferente de ler: os bugs que só apareceram na execução</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-01</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-01</guid>
+    <pubDate>Wed, 01 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Numa auditoria real, dois bugs só apareceram quando o script rodou de fato — a leitura parecia correta. Virou regra: exigir o resultado real, nunca só a opinião de quem leu — PR #215.</description>
+  </item>
+</channel>
+</rss>
