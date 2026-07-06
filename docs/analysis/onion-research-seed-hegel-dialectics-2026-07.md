@@ -1,6 +1,6 @@
 # Semente de pesquisa — Hegel (dialética, Aufhebung, Bildung) × epistemologia do Onion
 
-> **Status: SEMENTE** — plantada em 2026-07-05 a pedido do maestro ("depois quero mapear Hegel
+> **Status: SEMENTE (escopo ampliado 2026-07-05)** — plantada a pedido do maestro ("depois quero mapear Hegel
 > também"), registrada junto à síntese da pesquisa SRL/PLEA. A **deep-research roda quando o
 > maestro pedir** — mesmo harness (multi-fonte + verificação adversarial). Irmã de
 > [onion-research-seed-srl-plea-2026-07.md](onion-research-seed-srl-plea-2026-07.md); as duas
@@ -16,7 +16,26 @@ que o Onion já executa**. O exemplo mais nítido é a regra append-mostly do Kn
 antítese; o radar aponta onde a contradição pede síntese. A pesquisa verifica se a
 correspondência é rigorosa — e, honestamente, onde ela quebra.
 
-## Questões de pesquisa
+## Escopo ampliado pelo maestro (2026-07-05): catalogar o SISTEMA hegeliano
+
+Antes das questões de analogia, a pesquisa deve produzir um **catálogo verificado do sistema
+hegeliano** — entregável: KB de fundação (destino a decidir na entrega; candidata: categoria
+`education/` ou `concepts/`), classificada por veredito como a doutrina SRL/PLEA:
+
+- **Q0a — O Sistema**: a arquitetura da Enciclopédia (Lógica → Filosofia da Natureza → Filosofia
+  do Espírito) e o lugar da Fenomenologia como introdução/escada.
+- **Q0b — Espírito Absoluto**: arte → religião → filosofia como formas do espírito que se sabe a
+  si mesmo; o que "absoluto" significa (e o que NÃO significa — desfazer caricaturas).
+- **Q0c — Ciência da Lógica**: as três doutrinas (Ser → Essência → Conceito), a lógica como
+  automovimento do conceito, começo sem pressupostos, a relação lógica↔metafísica.
+- **Q0d — A Dialética Hegeliana**: os três momentos (abstrato/intelectivo → dialético/negativo-
+  racional → especulativo/positivo-racional), Aufhebung como operador, negação determinada — e a
+  correção histórica (tese-antítese-síntese é esquema de Chalybäus/Fichte, não o método de Hegel).
+- **Q0e — Principais reflexões e fundamentos**: Fenomenologia (consciência→autoconsciência→razão;
+  reconhecimento; senhor-e-servo), Bildung, "o verdadeiro é o todo", substância-como-sujeito,
+  história como progresso da consciência da liberdade, eticidade (família-sociedade civil-Estado).
+
+## Questões de pesquisa (analogia — após o catálogo)
 
 **Q1 — Aufhebung × `SUPERSEDES`/`REFUTES`.** A tríade negar-conservar-elevar mapeia com rigor no
 ciclo claim→refutação→novo-claim-com-preservação do KG? O que a literatura hegeliana (e a lógica
