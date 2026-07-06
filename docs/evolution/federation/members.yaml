@@ -89,7 +89,7 @@ members:
     adopted_at: 2026-07-05
     mode: greenfield
     published_at: "https://onionevolve.com/pulse-mais/"   # materiais servidos pelo Caddy do VPS (webroot derivado: rsync de materials/ pós-commit; fonte = o repo)
-    personality_summary: "Organização real (pulsemais.org.br) que o Onion ajuda a ensinar Desenvolvimento com IA a devs e não-devs, via consultoria de Marcio Carvalho — a origem real da vertical onion-education (não um experimento interno). Guia do aluno + camada PLEA + cartão de prompts publicados; F1 executado 2026-07-05; fricções trianguladas na doutrina v1.1.0"  # seed manual pré-F2
+    personality_summary: "Organização real (pulsemais.org.br) que o Onion ajuda a ensinar Desenvolvimento com IA a devs e não-devs, via consultoria de Marcio Carvalho — a origem real da vertical onion-education (não um experimento interno), hoje batizada Descasca (prática) / Método Onion (doutrina) — nomes 2026-07-06, sobre trabalho preexistente. Guia do aluno + camada PLEA + cartão de prompts publicados; F1 executado 2026-07-05; fricções trianguladas na doutrina v1.1.0"  # seed manual pré-F2
     specializations: [education, srl-plea, learning-materials]
     personality_last_sync: 2026-07-05   # seed manual (comando de sync ainda não existe — RFC-0003 F2)
     trust:
