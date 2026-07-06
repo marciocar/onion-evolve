@@ -134,7 +134,8 @@ members:
     adopted_at: 2026-07-05      # data da adoção definitiva/rebrand (repo existe desde jun/2026)
     mode: distilled             # anotação livre; o trust engine só valida role
     published_at: "https://onionevolve.com/mini/"   # vitrine no site da família (M2 ✅ 2026-07-05); código: github.com/marciocar/onion-mini
-    personality_summary: "A versão mini do Onion (master-prompt como bytecode, qualquer Transformer como VM): porta de entrada p/ iniciantes em dev/task management; ciclos com motor PLEA; SDAAL destilado; rampa de graduação p/ o core"
+    chatgpt_gpt: "https://chatgpt.com/g/g-6a4bf16ff65081919bfa7d98fe28b13f-onion-mini"   # Custom GPT criado 2026-07-06; setup documentado em onion-mini/GPT-SETUP.md; distribuição, não fonte (Instructions = ONION-MASTER-PROMPT.md colado à mão, não se atualiza sozinho)
+    personality_summary: "A versão mini do Onion (master-prompt como bytecode, qualquer Transformer como VM): porta de entrada p/ iniciantes em dev/task management; ciclos com motor Planejar→Executar→Avaliar (PLEA some do operacional, assina só nos créditos — Diretriz 9); SDAAL destilado; rampa de graduação p/ o core"
     specializations: [distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles]
     personality_last_sync: 2026-07-05   # seed manual
     trust:
