@@ -253,7 +253,7 @@
   </svg>
   <div class="hero-in">
     <span class="badge"><span class="pulse" aria-hidden="true"></span> Framework vivo · 267 PRs mergeados, cada um público · Claude Code</span>
-    <h1>O framework que <span class="hl" id="type">erra, aprende<br>e vira lei.</span><span class="caret" aria-hidden="true"></span><br>Em público.</h1>
+    <h1>O framework que<br><span class="hl" id="type">erra, aprende e vira lei.</span><span class="caret" aria-hidden="true"></span><br>Em público.</h1>
     <p class="sub">O <strong>Sistema Onion</strong> instala num repositório o ciclo completo de desenvolvimento
     com IA — produto, engenharia e compliance — com especificação antes do código, sessões que retomam de onde
     pararam e o seu task manager plugado. E ele <strong>evolui de verdade</strong>: cada erro vira doutrina
@@ -531,12 +531,12 @@
   var el = document.getElementById('type');
   if (el && !reduced) {
     var full = el.innerHTML;
-    var plain = 'erra, aprende\ne vira lei.';
+    var plain = 'erra, aprende e vira lei.';
     el.innerHTML = '';
     var i = 0;
     (function step(){
       if (i <= plain.length) {
-        el.innerHTML = plain.slice(0, i).replace('\n','<br>');
+        el.innerHTML = plain.slice(0, i);
         i++;
         setTimeout(step, i < 6 ? 90 : 55);
       } else { el.innerHTML = full; }
