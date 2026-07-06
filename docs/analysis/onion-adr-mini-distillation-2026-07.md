@@ -85,3 +85,4 @@ README: reposicionamento + rampa de graduação + créditos. Tetos de webchat re
 | Data | Mudança |
 |---|---|
 | 2026-07-05 | ADR aceito; rebrand onion-portable→onion-mini; v2.0 entregue e dogfoodada; membro registrado |
+| 2026-07-05 | Revisão do maestro → **AGENTS.md** (config universal, wrapper fino de 32 linhas sobre o master-prompt SSOT) + CLAUDE.md (`@AGENTS.md`, padrão do core) + master-prompt v2.1 (bootstrap oferece AGENTS.md como 1ª opção) + rebrand completado (presentation/sessions). Dogfood: leitor fresco entrou SÓ pelo AGENTS.md e chegou ao comportamento correto; modo degradado (só invariantes) aceitável. Mini `61a1bf2` |
