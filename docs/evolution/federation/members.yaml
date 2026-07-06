@@ -109,7 +109,7 @@ members:
     onion_version: n/a          # sem stamp: destilação (reescrita curada da doutrina), não vendor do framework
     adopted_at: 2026-07-05      # data da adoção definitiva/rebrand (repo existe desde jun/2026)
     mode: distilled             # anotação livre; o trust engine só valida role
-    published_at: "https://github.com/marciocar/onion-mini"   # PÚBLICO — produto de ENTRADA da família
+    published_at: "https://onionevolve.com/mini/"   # vitrine no site da família (M2 ✅ 2026-07-05); código: github.com/marciocar/onion-mini
     personality_summary: "A versão mini do Onion (master-prompt como bytecode, qualquer Transformer como VM): porta de entrada p/ iniciantes em dev/task management; ciclos com motor PLEA; SDAAL destilado; rampa de graduação p/ o core"
     specializations: [distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles]
     personality_last_sync: 2026-07-05   # seed manual
