@@ -328,6 +328,13 @@ fi
   incl. o "you have mail") e cria o starter de co-evolução (`inbox/_processed/` + README-ponteiro). Os
   *scripts* dos hooks já vieram via `.claude/hooks/` (manifesto da Fase 2); o **registro** é o passo (1) do
   Procedimento. Fecha o trio no alvo: o hook tem o que escanear (`inbox/`) e o `/meta:co-evolve` orienta o consumidor.
+- **Gerar o inventário DO ALVO** — o lint vendorizado (R8) exige `docs/onion/inventory.md` e o
+  hook nativo bloqueia o commit da adoção sem ele (gap descoberto no dogfood pulse-mais,
+  2026-07-05 — o 1º commit foi bloqueado pelo próprio hook recém-instalado):
+  ```bash
+  mkdir -p "$INSTALL_DIR/docs/onion"
+  (cd "$INSTALL_DIR" && bash .claude/validation/inventory.sh --markdown > docs/onion/inventory.md)
+  ```
 - Regenerar `docs/INDEX.md` do alvo (`/docs:build-index`). Checkpoint: `NEXT: Fase 4`.
 
 ### Fase 4 — Configurar integrações (`.env`) — **RODA NO ALVO**
