@@ -19,8 +19,8 @@ correspondência é rigorosa — e, honestamente, onde ela quebra.
 ## Escopo ampliado pelo maestro (2026-07-05): catalogar o SISTEMA hegeliano
 
 Antes das questões de analogia, a pesquisa deve produzir um **catálogo verificado do sistema
-hegeliano** — entregável: KB de fundação (destino a decidir na entrega; candidata: categoria
-`education/` ou `concepts/`), classificada por veredito como a doutrina SRL/PLEA:
+hegeliano** — entregável: **`docs/knowledge-base/education/theories/hegel-system.md`** (camada 1 — a teoria
+como é, zero Onion; as analogias Q1-Q5 irão para `applications/`), classificada por veredito:
 
 - **Q0a — O Sistema**: a arquitetura da Enciclopédia (Lógica → Filosofia da Natureza → Filosofia
   do Espírito) e o lugar da Fenomenologia como introdução/escada.
