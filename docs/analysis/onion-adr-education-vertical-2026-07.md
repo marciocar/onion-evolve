@@ -35,7 +35,7 @@ metacognitiva": IA genérica melhora a tarefa sem gerar aprendizagem — RCT BJE
 | Fase | O quê | Gatilho | Estado (2026-07-05) |
 |---|---|---|---|
 | **F0** | Este ADR + camada de conhecimento: categoria `docs/knowledge-base/education/` em **duas camadas** — [theories/](../knowledge-base/education/theories/) (a teoria como é, zero Onion) + [applications/](../knowledge-base/education/applications/) (nossas derivações, que citam e nunca reescrevem) | decisão do maestro | ✅ **aberto/entregue** |
-| F1 | **Dogfood de campo**: aplicar a doutrina num artefato educacional real — candidato nº 1: o guia do aluno pulse-mais reescrito pela lente PLEA (estrutura de fases embutida + avaliação forçada) | sessão do maestro no material | ⏳ gated |
+| F1 | **Dogfood de campo**: doutrina aplicada ao guia do aluno pulse-mais | executado por ordem do maestro (cobertura de ponta adormecida — pulse-mais sem sessão viva) | ✅ **executado 2026-07-05** — modo ADITIVO: camada companheira `ciclo-plea` + costura (fonte v2.0 preservada); 3 fricções → doutrina v1.1.0 (nuance por mídia, modos nativo/aditivo, escopo jornada-vs-referência) |
 | F2 | Agentes/comandos que o F1 revelar necessários (candidatos hipotéticos: `@learning-designer`, `@srl-coach`) — **só se o uso pedir** | fricção real documentada no F1 | ⏳ gated |
 | F3 | Manifesto `onion-education.manifest.sh` → plugin no marketplace | ≥2 artefatos maduros (critério que graduou design/compliance) | ⏳ gated |
 
@@ -76,3 +76,4 @@ dono×ritmo×decisão do `architecture.md §8` não está em jogo).
 |---|---|
 | 2026-07-05 | F0 aberto: ADR + KB `education/srl-plea-doctrine` fundada sobre os 11 achados verificados |
 | 2026-07-05 | **Refatoração em duas camadas** (decisão do maestro): `theories/` (plea-rosario, srl-zimmerman; futuro hegel-system) ≠ `applications/` (pontes, diretrizes). Doutrina monolítica removida; diretriz vinculante nº 4 adicionada |
+| 2026-07-05 | **F1 executado** no pulse-mais (1º adotante): camada PLEA do guia (modo aditivo) + regra do squad + Marina; fricções F-1/2/3 trianguladas no mesmo dia → guidelines v1.1.0. F2 segue gated: o F1 NÃO revelou necessidade de agente novo (a doutrina + sessão bastaram) |
