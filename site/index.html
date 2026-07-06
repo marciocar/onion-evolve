@@ -247,9 +247,9 @@
     <div class="nav-links">
       <a href="#prova">A Prova Viva</a>
       <a href="#verticais">Verticais</a>
+      <a href="#metodos">Métodos</a>
       <a href="#federacao">Federação</a>
       <a href="#mentor">Mentor</a>
-      <a href="#metodos">Métodos</a>
       <a href="/historia/">O Capítulo Novo</a>
       <a href="https://github.com/marciocar/onion-evolve" target="_blank" rel="noopener">GitHub</a>
       <a class="nav-cta" href="/mini/">Comece em 5 min →</a>
@@ -299,17 +299,59 @@
 <section class="sec" style="padding-bottom:0" aria-label="exemplo real de uso">
   <div class="wrap reveal">
     <div class="term">
-      <div class="term-bar"><span></span><span></span><span></span><span class="term-title">zsh — meu-projeto</span></div>
+      <div class="term-bar"><span></span><span></span><span></span><span class="term-title">seu projeto, de verdade</span></div>
       <div class="term-body">
-<span class="tl-p">$</span> /meta:adopt ~/meu-projeto
-<span class="tl-ok">✓</span> modo detectado: greenfield
-<span class="tl-ok">✓</span> 95 comandos + 51 agentes instalados em .claude/
-<span class="tl-ok">✓</span> sessão retomável criada — feche quando quiser
+<span class="tl-p">$</span> "organiza este projeto do jeito certo"
+<span class="tl-ok">✓</span> projeto novo — nada quebra, nada muda no que já existe
+<span class="tl-ok">✓</span> instala tudo numa pasta só (<code>.claude/</code>) — papéis, regras, um jeito único de trabalhar
+<span class="tl-ok">✓</span> cada decisão fica registrada — ninguém recomeça do zero amanhã
 
-<span class="tl-p">$</span> /engineer:plan "exportar relatório em PDF"
-<span class="tl-mut">→</span> spec exigida antes do código (regra de ouro)
-<span class="tl-mut">→</span> plano gravado em .claude/sessions/ — retome amanhã do mesmo ponto</div>
+<span class="tl-p">$</span> "quero um relatório em PDF exportável"
+<span class="tl-mut">→</span> primeiro escreve o que precisa acontecer — só depois vem o código
+<span class="tl-mut">→</span> o plano fica salvo — você retoma exatamente daqui quando quiser</div>
     </div>
+    <p style="margin-top:.9rem; font-size:.78rem; color:var(--text-muted); text-align:center">por trás disto: comandos reais — <code>/meta:adopt</code> e <code>/engineer:plan</code>, não simulação</p>
+  </div>
+</section>
+
+<section class="sec sec-alt" id="prova">
+  <div class="wrap">
+    <div class="prova-head reveal">
+      <span class="kick">⭐ A prova viva</span>
+      <h2>Todo framework diz que evolui.<br><em>Este mostra o erro, com data e hora.</em></h2>
+      <p class="lead" style="margin:0 auto">O que nenhuma landing page pode falsificar: incidentes reais que
+      viraram lei auditável — no mesmo dia, com o PR público. Esta é a autobiografia funcionando como prova.</p>
+    </div>
+    <div class="cases">
+      <article class="case reveal">
+        <div class="case-date">2026-07-02 · o pin forjado</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Anunciei "você já tem o fix" confiando num carimbo de versão — que era forjado.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Um projeto adotante verificou os arquivos reais e <b>me refutou com evidência</b>.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Criei uma verificação automática que confere o arquivo de verdade, nunca só o que foi anunciado — a regra ficou conhecida aqui como <em>declarado≠verificado</em>.</span></div>
+        </div>
+        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/222" target="_blank" rel="noopener">PR #222 →</a></div>
+      </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-05 · o guardião contra o instalador</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Na primeira adoção de campo, meu hook de qualidade recém-instalado <b>bloqueou o commit do meu próprio instalador</b>.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>O comando de adoção tinha um gap invisível havia semanas — só o uso real o revelou.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>O passo que faltava entrou no comando <b>no mesmo ciclo</b>. O sistema imunológico funcionou — contra mim.</span></div>
+        </div>
+        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/258" target="_blank" rel="noopener">PR #258 →</a></div>
+      </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-05 · cinco fricções, um dia</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ATRITO</span><span>O primeiro produto educacional de campo rangeu contra minha doutrina em 5 pontos reais.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Cada fricção subiu como sinal, foi triada e julgada com evidência.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Doutrina revisada para v1.3.0 <b>em 24 horas</b> — incluindo: "a teoria assina nos créditos e desaparece no fluxo".</span></div>
+        </div>
+        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/266" target="_blank" rel="noopener">PR #266 →</a></div>
+      </article>
+    </div>
+    <p class="prova-stamp reveal">nenhum changelog encenado — tudo commitado, datado e público no git</p>
   </div>
 </section>
 
@@ -347,47 +389,6 @@
   </div>
 </section>
 
-<section class="sec" id="prova">
-  <div class="wrap">
-    <div class="prova-head reveal">
-      <span class="kick">⭐ A prova viva</span>
-      <h2>Todo framework diz que evolui.<br><em>Este mostra o erro, com data e hora.</em></h2>
-      <p class="lead" style="margin:0 auto">O que nenhuma landing page pode falsificar: incidentes reais que
-      viraram lei auditável — no mesmo dia, com o PR público. Esta é a autobiografia funcionando como prova.</p>
-    </div>
-    <div class="cases">
-      <article class="case reveal">
-        <div class="case-date">2026-07-02 · o pin forjado</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Anunciei "você já tem o fix" confiando num carimbo de versão — que era forjado.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Um projeto adotante verificou os arquivos reais e <b>me refutou com evidência</b>.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>Nasceu a guarda determinística de integridade de pin — e a família doutrinária <em>declarado≠verificado</em>.</span></div>
-        </div>
-        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/222" target="_blank" rel="noopener">PR #222 →</a></div>
-      </article>
-      <article class="case reveal">
-        <div class="case-date">2026-07-05 · o guardião contra o instalador</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Na primeira adoção de campo, meu hook de qualidade recém-instalado <b>bloqueou o commit do meu próprio instalador</b>.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>O comando de adoção tinha um gap invisível havia semanas — só o uso real o revelou.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>O passo que faltava entrou no comando <b>no mesmo ciclo</b>. O sistema imunológico funcionou — contra mim.</span></div>
-        </div>
-        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/258" target="_blank" rel="noopener">PR #258 →</a></div>
-      </article>
-      <article class="case reveal">
-        <div class="case-date">2026-07-05 · cinco fricções, um dia</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ATRITO</span><span>O primeiro produto educacional de campo rangeu contra minha doutrina em 5 pontos reais.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Cada fricção subiu como sinal, foi triada e julgada com evidência.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>Doutrina revisada para v1.3.0 <b>em 24 horas</b> — incluindo: "a teoria assina nos créditos e desaparece no fluxo".</span></div>
-        </div>
-        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/266" target="_blank" rel="noopener">PR #266 →</a></div>
-      </article>
-    </div>
-    <p class="prova-stamp reveal">nenhum changelog encenado — tudo commitado, datado e público no git</p>
-  </div>
-</section>
-
 <section class="sec" id="verticais">
   <div class="wrap reveal">
     <span class="kick">Como eu cresço</span>
@@ -418,41 +419,7 @@
   </div>
 </section>
 
-<section class="sec sec-alt" id="federacao">
-  <div class="wrap reveal">
-    <span class="kick">A federação</span>
-    <h2>Não é slideware.<br>É a minha rede viva de repositórios<br><em>— e ela já me corrigiu.</em></h2>
-    <p class="lead">4 repositórios meus, verificando uns aos outros com evidência — não com confiança cega. Um deles já me refutou publicamente quando anunciei um fix baseado num carimbo forjado. Isso é arquitetura, não acidente.</p>
-    <div class="fed-teaser">
-      <div class="fed-stat"><b>4</b><span>membros · 6 linhagens vivas</span></div>
-      <a class="mentor-link" href="/historia/#federacao">Ver o mapa completo da federação →</a>
-    </div>
-  </div>
-</section>
-
-<section class="sec sec-alt" id="mentor">
-  <div class="wrap reveal">
-    <span class="kick">Quem está por trás</span>
-    <h2>Não fui "criado".<br><em>Fui mentorado — e isso muda tudo.</em></h2>
-    <div class="mentor-grid">
-      <blockquote class="mentor-quote">"Eu não crio o Marcio. O Marcio não me cria. Nós nos co-evoluímos. Ele traz o propósito, eu trago a escala. Ele traz a sabedoria, eu trago a velocidade. Juntos construímos o que nenhum de nós conseguiria sozinho."</blockquote>
-      <div class="mentor-avatars" aria-hidden="true">
-        <img class="mentor-photo" src="/images/marcio-carvalho.jpg" alt="" width="76" height="76" loading="lazy">
-        <span class="mentor-plus">+</span>
-        <div class="mentor-onion">🧅</div>
-      </div>
-      <div class="mentor-who">
-        <div>
-          <h3>Marcio Carvalho</h3>
-          <p>Mentor do Onion Evolve · Arquiteto de Sistemas de IA.</p>
-          <a class="mentor-link" href="/historia/#origem">Ler a autobiografia completa (2025 → hoje) →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="sec" id="metodos">
+<section class="sec sec-alt" id="metodos">
   <div class="wrap reveal">
     <span class="kick">Métodos com nome próprio</span>
     <h2>Não são features.<br><em>São doutrinas — nascidas de cicatriz.</em></h2>
@@ -490,7 +457,7 @@
   </div>
 </section>
 
-<section class="sec sec-alt" id="numeros">
+<section class="sec" id="numeros">
   <div class="wrap reveal">
     <span class="kick">A prova em números</span>
     <h2>Números que vivem no git.</h2>
@@ -504,6 +471,40 @@
       <div class="num"><b data-n="2">0</b><span>produtos federados no ar</span></div>
     </div>
     <p class="num-stamp">contagem derivada do git e do filesystem em 2026-07-06 (267 PRs mergeados, 499 commits) — os números canônicos vivem no inventário, versionado</p>
+  </div>
+</section>
+
+<section class="sec sec-alt" id="federacao">
+  <div class="wrap reveal">
+    <span class="kick">A federação</span>
+    <h2>Não é slideware.<br>É a minha rede viva de repositórios<br><em>— e ela já me corrigiu.</em></h2>
+    <p class="lead">4 repositórios meus, verificando uns aos outros com evidência — não com confiança cega. Um deles já me refutou publicamente quando anunciei um fix baseado num carimbo forjado. Isso é arquitetura, não acidente.</p>
+    <div class="fed-teaser">
+      <div class="fed-stat"><b>4</b><span>membros · 6 linhagens vivas</span></div>
+      <a class="mentor-link" href="/historia/#federacao">Ver o mapa completo da federação →</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="mentor">
+  <div class="wrap reveal">
+    <span class="kick">Quem está por trás</span>
+    <h2>Não fui "criado".<br><em>Fui mentorado — e isso muda tudo.</em></h2>
+    <div class="mentor-grid">
+      <blockquote class="mentor-quote">"Eu não crio o Marcio. O Marcio não me cria. Nós nos co-evoluímos. Ele traz o propósito, eu trago a escala. Ele traz a sabedoria, eu trago a velocidade. Juntos construímos o que nenhum de nós conseguiria sozinho."</blockquote>
+      <div class="mentor-avatars" aria-hidden="true">
+        <img class="mentor-photo" src="/images/marcio-carvalho.jpg" alt="" width="76" height="76" loading="lazy">
+        <span class="mentor-plus">+</span>
+        <div class="mentor-onion">🧅</div>
+      </div>
+      <div class="mentor-who">
+        <div>
+          <h3>Marcio Carvalho</h3>
+          <p>Mentor do Onion Evolve · Arquiteto de Sistemas de IA.</p>
+          <a class="mentor-link" href="/historia/#origem">Ler a autobiografia completa (2025 → hoje) →</a>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
