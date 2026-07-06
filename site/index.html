@@ -76,7 +76,7 @@
   @media (max-width:860px){ .nav-links a:not(.nav-cta){ display:none; } }
 
   /* ── hero ── */
-  .hero { min-height:100svh; display:grid; place-content:center; text-align:center; padding:110px 24px 40px; overflow:hidden; }
+  .hero { min-height:82svh; display:grid; place-content:center; text-align:center; padding:120px 24px 50px; overflow:hidden; }
   .rings { position:absolute; inset:0; display:grid; place-content:center; pointer-events:none; opacity:.5; }
   .rings circle { fill:none; stroke-width:1.2; transform-origin:center; }
   .r-spin { animation:ringspin 90s linear infinite; transform-origin:center; transform-box:fill-box; }
@@ -87,7 +87,7 @@
            color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow); padding:.48rem 1.05rem; border-radius:99px; margin-bottom:1.8rem; }
   .badge .pulse { width:8px; height:8px; border-radius:50%; background:var(--green); animation:bpulse 2s ease-in-out infinite; }
   @keyframes bpulse { 0%,100%{box-shadow:0 0 0 0 rgba(47,122,78,.5)} 50%{box-shadow:0 0 0 6px rgba(47,122,78,0)} }
-  .hero h1 { font-size:clamp(2.5rem, 6.6vw, 4.6rem); font-variation-settings:'opsz' 100; }
+  .hero h1 { font-size:clamp(1.9rem, 4.4vw, 3.15rem); font-variation-settings:'opsz' 32; }
   .hero h1 .hl { background:linear-gradient(115deg, var(--orange), var(--purple)); -webkit-background-clip:text; background-clip:text; color:transparent; font-style:italic; }
   .caret { display:inline-block; width:3px; height:.9em; background:var(--orange); vertical-align:-.1em; animation:blink 1s steps(1) infinite; }
   @keyframes blink { 50%{opacity:0} }
