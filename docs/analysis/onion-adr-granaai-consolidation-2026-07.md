@@ -90,12 +90,31 @@ unilateral desta sessão).
 ## Próximos passos
 1. **Fase 0** (fora desta sessão): maestro alinha com Mauricio — reconciliação desejada? quem
    revisa/mergeia? ajuda técnica nossa é bem-vinda?
-2. **Fase 3** (pós-alinhamento): avaliar rebase assistido vs. branch novo com cherry-pick dos 13
-   commits Onion-específicos sobre o `develop` atual deles (evita re-trazer os 232 commits já
-   divergidos).
+2. **Fase 3** (pós-alinhamento) — **preparada, não executada** (ver detalhamento abaixo).
 3. Considerar: uma vez reconciliado, criar canal de co-evolução real (inbox/outbox) para que
    sinais como o do lint não dependam de descoberta arqueológica — o próximo "sinal upstream" real
    deveria chegar em horas, não ser achado 5 dias depois numa investigação read-only.
+
+## Fase 3 preparada (read-only, pronta para o dia que a Fase 0 destravar)
+
+Verificado (`gh api compare onion/adopt...develop`): o `develop` real mudou **300 arquivos** desde
+que `onion/adopt` divergiu — **zero** deles em `.claude/`, `docs/adr/`, `docs/rft/`,
+`docs/technical-context/`, `docs/analysis/` ou `docs/INDEX.md`. Os **13 commits Onion-específicos
+são cherry-pickáveis limpos**, sem conflito esperado.
+
+**Estratégia recomendada** (a confirmar com Mauricio na Fase 0, não a decidir sozinho):
+1. Branch novo a partir do `develop` **atual** (não do ponto onde `onion/adopt` nasceu — evita
+   trazer os 232 commits já divergidos).
+2. Cherry-pick dos 13 commits, na ordem: `1286bf91` → `ded5e31a` → `6989f73e` → `6e0f7445` →
+   `629fd657` → `17b3cf7a` → `c26429c6` → `6618a750` → `f35ed0ea` → `069347c5` → `bd55eef3` →
+   `27655e54` → `d70f06c2`.
+3. **Re-verificar o ground-truth pós-cherry-pick**: a canonicalização mediu 45 apps/453 libs/34
+   integrações no ponto de divergência; como `develop` andou 300 arquivos, esses números podem
+   ter mudado — rodar a Fase 5 (canonicalização) de novo contra o código atual antes de declarar
+   "24/25 CURRENT" válido no novo estado.
+4. PR normal contra `develop` para revisão do time deles.
+
+Nada disto foi executado — é plano pronto, não ação.
 
 ## Histórico
 | Data | Mudança |
