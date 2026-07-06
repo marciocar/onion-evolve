@@ -151,6 +151,15 @@
   .case-pr { margin-top:auto; padding:.75rem 1.4rem; border-top:1px dashed var(--border); font-family:var(--mono); font-size:.74rem; }
   .prova-stamp { text-align:center; margin-top:2rem; font-family:var(--mono); font-size:.8rem; color:var(--text-muted); }
 
+  /* ── verticais ── */
+  .vert-founding { display:flex; flex-wrap:wrap; align-items:center; gap:.7rem; margin-top:1.6rem; }
+  .vert-founding span:not(.vert-tag) { font-weight:700; font-size:.94rem; background:var(--bg-card); border:1px solid var(--border); border-radius:99px; padding:.5rem 1.1rem; }
+  .vert-tag { font-family:var(--mono); font-size:.72rem; color:var(--text-muted); }
+  .belief-box { margin-top:1.8rem; background:var(--bg-deep); color:#F4F1EC; border-radius:var(--radius-lg); padding:1.5rem 2rem; display:flex; gap:1.2rem; align-items:center; flex-wrap:wrap; }
+  .belief-box .n { font-family:var(--display); font-size:1.3rem; font-style:italic; color:var(--orange-light); white-space:nowrap; }
+  .belief-box p { flex:1; min-width:240px; font-size:.96rem; color:#D8D2C8; }
+  .belief-box b { color:#fff; }
+
   /* ── federação ── */
   .fed-grid { display:grid; grid-template-columns:1.05fr .95fr; gap:2.6rem; align-items:center; margin-top:2rem; }
   @media (max-width:860px){ .fed-grid{ grid-template-columns:1fr; } }
@@ -242,6 +251,7 @@
     <a class="brand" href="/">🧅 ONION EVOLVE <small>by Marcio Carvalho</small></a>
     <div class="nav-links">
       <a href="#prova">A Prova Viva</a>
+      <a href="#verticais">Verticais</a>
       <a href="#federacao">Federação</a>
       <a href="#mentor">Mentor</a>
       <a href="#metodos">Métodos</a>
@@ -380,6 +390,35 @@
       </article>
     </div>
     <p class="prova-stamp reveal">nenhum changelog encenado — tudo commitado, datado e público no git</p>
+  </div>
+</section>
+
+<section class="sec" id="verticais">
+  <div class="wrap reveal">
+    <span class="kick">Como eu cresço</span>
+    <h2>Três dimensões nasceram comigo.<br><em>Duas verticais nasceram de evidência.</em></h2>
+    <p class="lead">Não crio verticais por roadmap — crio quando um dogfood real prova que preciso. Produto, Engenharia e Compliance são fundadoras; Investigação e Educação nasceram nesta mesma semana, do jeito que tudo aqui nasce.</p>
+    <div class="vert-founding">
+      <span>🎯 Produto</span><span>⚙️ Engenharia</span><span>🛡️ Compliance</span>
+      <span class="vert-tag">fundadoras · peer desde sempre</span>
+    </div>
+    <div class="dims" style="margin-top:1.4rem">
+      <div class="dim" style="border-top-color:var(--purple)">
+        <span class="ico" aria-hidden="true">🔍</span>
+        <h3>Investigação</h3>
+        <p>Nasceu do próprio dogfood: modelei minha auditoria como grafo de conhecimento (claims, evidências, decisões, arestas <code>SUPPORTS</code>/<code>REFUTES</code>/<code>SUPERSEDES</code>) e só então o comando <code>/meta:kg</code> existiu.</p>
+        <p style="margin-top:.6rem"><b>62 knowledge bases pararam de ser arquivos soltos.</b> Um segundo grafo — gerado direto da minha spec-as-code, sem escrever nada à mão — me deixa perguntar "o que depende disto?" e "que artefato ninguém mais referencia?" com um script determinístico. Eu não <em>leio</em> documentação: eu <em>navego</em> um grafo direcional.</p>
+      </div>
+      <div class="dim" style="border-top-color:var(--green)">
+        <span class="ico" aria-hidden="true">🎓</span>
+        <h3>Educação</h3>
+        <p>Nasceu de pesquisa real: 75 verificadores adversariais testando Autorregulação da Aprendizagem. Regra física: a teoria fica intocada numa camada; a minha leitura dela, noutra — nunca se misturam. Primeiro adotante de campo já publicado.</p>
+      </div>
+    </div>
+    <div class="belief-box">
+      <span class="n">Crença central</span>
+      <p>Minha constituição são <b>5 meta-specs que eu mesmo leio antes de agir</b> — arquitetura, agentes, comandos, padrões de código, integrações. Eu só edito uma delas com evidência; nunca por capricho, nunca por preferência de estilo.</p>
+    </div>
   </div>
 </section>
 
