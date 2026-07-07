@@ -376,6 +376,20 @@ fi
   incl. o "you have mail") e cria o starter de co-evolução (`inbox/_processed/` + README-ponteiro). Os
   *scripts* dos hooks já vieram via `.claude/hooks/` (manifesto da Fase 2); o **registro** é o passo (1) do
   Procedimento. Fecha o trio no alvo: o hook tem o que escanear (`inbox/`) e o `/meta:co-evolve` orienta o consumidor.
+- **Gerar os SSOTs que o lint nativo EXIGE** (senão o 1º commit do alvo falha — o pre-commit nativo
+  Onion roda `lint-artifacts.sh`, que trata `inventory.md`/`graph.md` ausentes como violação **HARD**).
+  Rodar as cópias vendorizadas (resolvem o root pelo próprio local → geram os SSOTs do ALVO):
+  ```bash
+  mkdir -p "$INSTALL_DIR/docs/onion"
+  bash "$INSTALL_DIR/.claude/validation/inventory.sh" --markdown > "$INSTALL_DIR/docs/onion/inventory.md"
+  # graph.md usa jq; a sessão-fonte tem. Sem jq, o lint PULA gracioso (guarda 'return 0') → não bloqueia
+  # o commit; gerar depois com /meta:graph. (Fecha a nota secundária do sinal 2026-07-01-lint-graceful-skip.)
+  if command -v jq >/dev/null 2>&1; then
+    bash "$INSTALL_DIR/.claude/validation/graph.sh" --markdown > "$INSTALL_DIR/docs/onion/graph.md"
+  else
+    echo "⚠️ jq ausente: graph.md não gerado agora (lint pula gracioso). Gerar depois com /meta:graph."
+  fi
+  ```
 - Regenerar `docs/INDEX.md` do alvo (`/docs:build-index`). Checkpoint: `NEXT: Fase 4`.
 
 ### Fase 4 — Configurar integrações (`.env`) — **RODA NO ALVO**
@@ -467,6 +481,15 @@ git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
 ```
 
 - Aplicar via o **Procedimento de cópia segura** (`DEST="$TARGET"`) — diff revela customizações locais.
+- **Regenerar os SSOTs do lint** (`inventory.md`/`graph.md`): um comando/agente novo no delta muda a
+  contagem canônica → o `inventory.md` committado do adotante fica stale → violação **HARD** no próximo
+  commit dele (pre-commit nativo). Regenerar as cópias vendorizadas (mesmo bloco da Fase 3):
+  ```bash
+  mkdir -p "$TARGET/docs/onion"
+  bash "$TARGET/.claude/validation/inventory.sh" --markdown > "$TARGET/docs/onion/inventory.md"
+  command -v jq >/dev/null 2>&1 && bash "$TARGET/.claude/validation/graph.sh" --markdown > "$TARGET/docs/onion/graph.md" \
+    || echo "⚠️ jq ausente: graph.md não regenerado (lint pula gracioso; /meta:graph depois)."
+  ```
 - **Re-aplicar a configuração install-only** via o [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
   (`DEST="$TARGET"`). **Crítico:** sem isto, um adotante com `settings.json` próprio recebe os *scripts* dos
   hooks (no manifesto acima) mas **não** o registro → o "you have mail" não dispara. O Procedimento faz o
