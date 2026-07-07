@@ -929,6 +929,50 @@ run_de_identification_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo nojq-graceful — regressão do bug "graceful-skip sem jq derruba o script".
+# Sob `set -euo pipefail`, uma guarda `<cond> || return` (SEM argumento) herda o
+# exit status da condição falsa e, chamada como statement solto, dispara o set -e
+# e ABORTA o script inteiro — o oposto do "pula gracioso" documentado. Bug real de
+# campo (docs/evolution/inbox/2026-07-01-lint-graceful-skip-sem-jq...): em máquina
+# sem jq o lint morria antes do sumário e bloqueava TODO commit (pre-commit nativo).
+# Duas asserções: (a) invariante estático — nenhum `|| return` nu no lint; (b)
+# funcional — o lint roda até o fim num PATH SEM jq.
+run_nojq_graceful_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_fail "nojq: lint-artifacts.sh ausente" "${lint}"; return 0; fi
+
+  # (a) invariante estático: guardas de skip DEVEM usar `return 0`, nunca `return` nu.
+  #     Pega a classe exata da regressão sem depender do ambiente (portável a adotante).
+  local bare
+  bare="$(grep -nE '\|\| return([[:space:]]*(#.*)?)$' "${lint}" || true)"
+  if [ -z "${bare}" ]; then record_pass "nojq: nenhuma guarda '|| return' nua (todas usam 'return 0')"
+  else record_fail "nojq: guarda '|| return' nua encontrada" "sob set -e aborta o script: ${bare//$'\n'/ | }"; fi
+
+  # (b) funcional: rodar o lint num PATH SEM jq e exigir que CHEGUE ao sumário (não
+  #     morra no meio). Espelha o $PATH real menos o jq num tmpdir de symlinks.
+  local nojq; nojq="$(mktemp -d)"
+  local d b bn
+  IFS=':' read -ra _dirs <<< "${PATH}"
+  for d in "${_dirs[@]}"; do
+    [ -d "${d}" ] || continue
+    for b in "${d}"/*; do
+      bn="$(basename "${b}")"
+      [ "${bn}" = "jq" ] && continue
+      [ -e "${nojq}/${bn}" ] || ln -sf "${b}" "${nojq}/${bn}" 2>/dev/null || true
+    done
+  done
+  local out rc
+  out="$(cd "${SANDBOX}" && PATH="${nojq}" bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" 2>&1)"; rc=$?
+  rm -rf "${nojq}"
+  # Sucesso = alcançou o sumário (independe de HARD/SOFT; o que importa é NÃO abortar no meio).
+  if printf '%s' "${out}" | grep -q '=== Sumário ==='; then
+    record_pass "nojq: lint roda até o sumário sem jq (skip gracioso, rc=${rc})"
+  else
+    record_fail "nojq: lint abortou sem jq antes do sumário" "rc=${rc} — bug graceful-skip regrediu"
+  fi
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -983,6 +1027,9 @@ run_corelay_selftests
 
 # Modo de-identification — baseline determinístico (adapter regex da abstração SDAAL): redação + round-trip + no-op + determinismo.
 run_de_identification_selftests
+
+# Modo nojq-graceful — regressão do bug "graceful-skip sem jq derruba o script" (field-signal 2026-07-01).
+run_nojq_graceful_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário
