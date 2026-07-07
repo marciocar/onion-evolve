@@ -1,6 +1,6 @@
 # 📚 Índice Central de Documentação
 
-> **Última atualização**: 2026-07-03 | **Gerado por**: `/docs:build-index` | **Contagens**: rescaneadas do filesystem
+> **Última atualização**: 2026-07-06 | **Gerado por**: `/docs:build-index` | **Contagens**: rescaneadas do filesystem
 
 Bem-vindo ao índice central de documentação do projeto. Este documento serve como hub de navegação para toda a documentação disponível.
 
@@ -13,7 +13,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - 🤖 **95 comandos invocáveis** Claude Code em 10 categorias + root (+ 24 fragmentos compartilhados em `common/` e 10 READMEs de categoria)
 - 🎯 **51 agentes de IA especializados** em 9 categorias
 - 🧩 **5 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes)
-- 📚 **Knowledge Bases estruturadas** para consumo por IA (49 documentos de conteúdo + KB viva `agentic-patterns/`)
+- 📚 **Knowledge Bases estruturadas** para consumo por IA (58 documentos de conteúdo + KB viva `agentic-patterns/` + vertical `education/`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente com ativação automática
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
 - 🏗️ **Spec as Code Multi-Context** — business, technical, compliance (peer) + design (provisório, gated)
@@ -23,25 +23,26 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **213 arquivos markdown** em `docs/`
+- **236 arquivos markdown** em `docs/`
 - **17 arquivos** em `docs/onion/` (Sistema Onion)
-- **63 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 57 documentos de conteúdo + `index.md` + 5 READMEs de (sub)categoria)
-  - 25 em `concepts/` (Conceitos fundamentais)
+- **64 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 58 documentos de conteúdo + `index.md` + 5 READMEs de (sub)categoria)
+  - 28 em `concepts/` (Conceitos fundamentais)
   - 8 em `frameworks/` (Frameworks e metodologias)
   - 4 em `tools/` (Ferramentas, incl. Agent Skills)
-  - 2 em `platforms/`, 1 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
+  - 3 em `platforms/`, 2 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
+  - 4 em `education/` (vertical educacional: theories/ + applications/, fonte≠derivação) + 1 README
   - 6 em `agentic-patterns/` (KB viva do campo: harness/ai-strategies/field-observations) + 4 READMEs
   - 1 `index.md`
 - **6 arquivos** em `docs/meta-specs/` (Meta Especificações: 5 meta-specs L0 + `index.md`)
 - **7 arquivos** em `docs/materials/` (materiais derivados externos — Fase 4): landing page, manual, case studies, brand book, artigo crítico, press kit, README
 - **7 arquivos** em `docs/applying/` (guias de aplicação: greenfield, legacy, regulado, adoption-lifecycle, manual, rescue-prompt)
 - **7 arquivos** em `docs/design-context/` (vertical de design, **provisória** — ver nota abaixo)
-- **55 arquivos** em `docs/analysis/` (análises ativas — ver [analysis/README.md](analysis/README.md) para o critério de retenção; só baselines/ADRs duráveis são navegados individualmente aqui)
+- **64 arquivos** em `docs/analysis/` (análises ativas — ver [analysis/README.md](analysis/README.md) para o critério de retenção; só baselines/ADRs duráveis são navegados individualmente aqui)
 - **3 contextos spec-as-code peer** (templates no framework, populados no projeto-alvo): `docs/business-context/`, `docs/technical-context/`, `docs/compliance-context/` (1 `README.md` cada, ainda sem conteúdo gerado neste repo)
 
 ### Sistema Onion (`.claude/`)
 - **95 comandos invocáveis** Claude Code distribuídos em:
-  - 29 em `meta/` (meta-comandos, criadores, validação, orquestração de subagentes, frescor de KB e de contexto, federação, adoção e co-evolução)
+  - 30 em `meta/` (meta-comandos, criadores, validação, orquestração de subagentes, frescor de KB e de contexto, federação, adoção e co-evolução)
   - 21 em `product/` (gestão de produto e descoberta)
   - 11 em `engineer/` (engenharia e desenvolvimento)
   - 11 em `docs/` (geração e validação de documentação)
@@ -62,7 +63,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **213 arquivos** de documentação markdown em `docs/`
+- **236 arquivos** de documentação markdown em `docs/`
 - **95 comandos invocáveis** em 10 categorias + root (+ 24 fragmentos `common/` + 10 READMEs de categoria)
 - **51 agentes** especializados em 9 categorias
 - **5 skills** (`.claude/skills/`)
@@ -94,14 +95,17 @@ docs/
 │   ├── ESPERANTO.md            # documento do framework
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
-├── knowledge-base/             # Knowledge Bases (63 arquivos, incl. index)
-│   ├── concepts/               # Conceitos fundamentais (25 arquivos)
+├── knowledge-base/             # Knowledge Bases (64 arquivos, incl. index)
+│   ├── concepts/               # Conceitos fundamentais (28 arquivos)
 │   ├── frameworks/             # Frameworks e metodologias (8 arquivos)
-│   ├── platforms/              # Plataformas e tecnologias (2 arquivos)
+│   ├── platforms/              # Plataformas e tecnologias (3 arquivos)
 │   ├── tools/                  # Ferramentas e recursos (4 arquivos)
-│   ├── patterns/               # Padrões de implementação (1 arquivo)
+│   ├── patterns/               # Padrões de implementação (2 arquivos)
 │   ├── architectures/          # C4 + ADR (1 arquivo)
 │   ├── meta/                   # Criação de comandos + identidade/produto (2 arquivos)
+│   ├── education/              # Vertical educacional — fonte≠derivação (4 arquivos + 1 README)
+│   │   ├── theories/           #   Fiel à fonte, zero Onion
+│   │   └── applications/       #   Nossas derivações — cita, nunca reescreve
 │   └── agentic-patterns/       # KB viva: IA + harness (6 docs + 4 READMEs)
 │       ├── harness/            #   Internals de harnesses específicos
 │       ├── ai-strategies/      #   Padrões de guiar o transformer
@@ -124,7 +128,7 @@ docs/
 │   ├── governance/contrast-pairs.json  # SSOT das regras WCAG de contraste
 │   └── decisions/                # ADRs de design
 │
-├── analysis/                   # Análises ativas (55 arquivos; ver analysis/README.md — ciclo de vida e critério de retenção)
+├── analysis/                   # Análises ativas (64 arquivos; ver analysis/README.md — ciclo de vida e critério de retenção)
 │
 ├── applying/                    # Guias de aplicação (7 arquivos)
 │   ├── README.md · adoption-lifecycle.md · applying-greenfield.md
@@ -203,13 +207,14 @@ docs/
 
 Knowledge Bases estruturadas para consumo por IA e referência técnica — índice completo e sempre fresco em **[knowledge-base/index.md](knowledge-base/index.md)**. Resumo por categoria:
 
-- **[Conceitos Fundamentais](knowledge-base/index.md#-conceitos-fundamentais-25)** (25) — Domain Context Lifecycle, Task Manager Abstraction, Spec-as-Code/Driven Development, SDAAL, Agent Orchestration, Onion Dogfooding Doctrine, Onion Engine Economy, Onion Relation Vocabulary, Onion Working Method, Knowledge Graph SDAAL, Secret Handling (Agent), Federation Usage Modes, Decision Snapshot Retention, e mais
+- **[Conceitos Fundamentais](knowledge-base/index.md#-conceitos-fundamentais-28)** (28) — Domain Context Lifecycle, Task Manager Abstraction, Spec-as-Code/Driven Development, SDAAL, Agent Orchestration, Onion Dogfooding Doctrine, Onion Engine Economy, Onion Relation Vocabulary, Onion Working Method, Knowledge Graph SDAAL, Secret Handling (Agent), Federation Usage Modes, Onion Federation and Adoption, Fonte≠Derivação, Session Memory Lifecycle, Decision Snapshot Retention, e mais
 - **[Frameworks e Metodologias](knowledge-base/index.md#-frameworks-e-metodologias-8)** (8) — GitFlow, Story Points, Framework de Testes, Collaborative Testing, Test Strategy Scoring
-- **[Plataformas](knowledge-base/index.md#-plataformas-2)** (2) — Git Ledger as Working Dir, Runflow
+- **[Plataformas](knowledge-base/index.md#-plataformas-3)** (3) — Gamma.App API, Git Ledger as Working Dir, Runflow
 - **[Ferramentas](knowledge-base/index.md#-ferramentas-4)** (4) — Agent Skills, Claude Code Commands Best Practices, Docker, Whisper
-- **[Patterns](knowledge-base/index.md#-patterns-1)** (1) — SDAAL Examples
+- **[Patterns](knowledge-base/index.md#-patterns-2)** (2) — Presentation Orchestration, SDAAL Examples
 - **[Architectures](knowledge-base/index.md#-architectures-1)** (1) — C4 + ADR Patterns
 - **[Meta](knowledge-base/index.md#-meta-2)** (2) — Command Creation Patterns, Onion Framework Identity
+- **[Education](knowledge-base/index.md#-education-4--1-readme)** (4 + 1 README) — vertical `onion-education`: PLEA/SRL (theories/, fiel à fonte) + diretrizes/pontes (applications/, nossa derivação)
 - **[Agentic Patterns](knowledge-base/index.md#-agentic-patterns-6)** (6, KB viva) — internals de harness, estratégias de guiar o transformer, observações brutas do campo
 
 **Localização:** `docs/knowledge-base/`
@@ -287,16 +292,16 @@ Modelo de co-evolução entre este core (`onion-evolve`) e projetos que adotaram
 
 ## 📊 Análises
 
-> **Ciclo de vida** (ver [analysis/README.md](analysis/README.md)): análises e planos são **efêmeros** — uma vez executados, são removidos (git é o arquivo). Este hub navega apenas os **baselines/ADRs duráveis**; a lista completa (55 arquivos nesta pasta) e o critério de retenção vivem em `analysis/README.md` — SSOT para não duplicar uma lista que fica obsoleta a cada sessão.
+> **Ciclo de vida** (ver [analysis/README.md](analysis/README.md)): análises e planos são **efêmeros** — uma vez executados, são removidos (git é o arquivo). Este hub navega apenas os **baselines/ADRs duráveis**; a lista completa (64 arquivos nesta pasta) e o critério de retenção vivem em `analysis/README.md` — SSOT para não duplicar uma lista que fica obsoleta a cada sessão.
 
 **Baselines ativos (referenciados por comandos/constituição):**
 - **[Revisão Analítica do Sistema Onion — Maio/2026](analysis/onion-review-2026-05.md)** — SSOT de identidade, citada por `CLAUDE.md`.
 - **[Baseline de Verificação e Validação — Junho/2026](analysis/onion-vv-baseline-2026-06.md)** — usada por `/meta:evolve`.
-- **[Onion Evolution — mais recente](analysis/onion-evolution-2026-06-25.md)** — última auditoria geral (ponto de comparação da próxima rodada).
+- **[Onion Evolution — mais recente](analysis/onion-evolution-2026-07-04.md)** — última auditoria geral (ponto de comparação da próxima rodada).
 - **[Onion Federation Audit — 2026-07-01](analysis/onion-federation-audit-2026-07-01.md)** — auditoria focada em federação.
 - **[Parecer — Duas linhagens no rhilo — Julho/2026](analysis/onion-parecer-rhilo-lineages-2026-07.md)** — D1/D2 executados; D3 (KG dogfood) e D4 (merge total) pendentes.
 
-**ADRs duráveis (nunca removidos, só *superseded*)** — lista completa e atualizada em [analysis/README.md](analysis/README.md#o-que-permanece-baselines-ativos): adoção de repo, A2A format-vs-runtime, domain-context-lifecycle, PFR, ledger format/location, vocabulário de fluxos de co-evolução, "adota não impõe", branching agnóstico, SLM-as-tool, object-led-discovery, e outros — **13 ADRs ativos** ao todo nesta rodada de scan.
+**ADRs duráveis (nunca removidos, só *superseded*)** — lista completa e atualizada em [analysis/README.md](analysis/README.md#o-que-permanece-baselines-ativos): adoção de repo, A2A format-vs-runtime, domain-context-lifecycle, PFR, ledger format/location, vocabulário de fluxos de co-evolução, "adota não impõe", branching agnóstico, SLM-as-tool, object-led-discovery, e outros — **12 ADRs listados como duráveis** em `analysis/README.md` nesta rodada de scan (23 arquivos com `onion-adr-*`/`*-adr-*` existem no total na pasta; nem todo ADR presente está necessariamente listado como ativo — `analysis/README.md` é a SSOT do veredito).
 
 ---
 
@@ -493,6 +498,8 @@ Modelo de co-evolução entre este core (`onion-evolve`) e projetos que adotaram
 
 ### ✨ Documentação Adicionada Recentemente (ciclo 2026-06/07)
 
+- **KB `education/`** — vertical `onion-education` (F0, 2026-07-05): duas camadas em fronteira física (`theories/` fiel à fonte, `applications/` nossa derivação) — instância batizadora da doutrina [fonte≠derivação](knowledge-base/concepts/source-vs-derivation.md).
+- **[Onion Federation and Adoption](knowledge-base/concepts/onion-federation-and-adoption.md)** — guia de síntese: `/meta:adopt` fase-a-fase, matriz de permissão dos 4 tiers de trust, os 5 perfis reais hoje registrados em `members.yaml`.
 - **KB viva `agentic-patterns/`** — como IA + harness colaboram na prática (harness internals, ai-strategies, field-observations); nasceu de observação de campo e cresce com cada dogfood.
 - **`design-context/`** — vertical de design incubada como 4º contexto candidato a peer (provisório, gated por `/meta:context-freshness`).
 - **Federação com rhilo-metagamify** — primeiro adotante real: parecer de linhagens (D1/D2 executados), correção de pin forjado, KB `secret-handling-agent` e `knowledge-graph-sdaal` (crédito: dogfood do adotante).
@@ -531,7 +538,7 @@ Este índice é gerado automaticamente pelo comando `/docs/build-index`.
 /docs/build-index knowledge-base   # Reconstruir índice da seção knowledge-base
 ```
 
-**Última atualização:** 2026-07-03 (`/docs:build-index` — contagens reescaneadas do filesystem: onion 15→17, knowledge-base 47→54 [+ agentic-patterns], materials 6→7 [brand-book], applying passou a ter contagem própria [7], analysis 24→55 listados [seção reduzida a baselines/ADRs, lista completa delegada a `analysis/README.md`], `design-context/` adicionado como nova seção provisória, commands `meta` 24→29 / `product` 20→21 / `validate` 1→6 [subpastas], `common/` fragments 16→24)
+**Última atualização:** 2026-07-06 (`/docs:build-index` — contagens reescaneadas do filesystem: docs/ 213→236, knowledge-base 63→64 arquivos [+3 concepts órfãos do scan anterior: session-memory-lifecycle, source-vs-derivation, onion-federation-and-adoption; +1 platforms `gamma-app-api`; +1 patterns `presentation-orchestration`; **nova categoria `education/`** com 4 docs + README, vertical `onion-education`], analysis 55→64 arquivos listados [baseline mais recente trocado para `onion-evolution-2026-07-04.md`; contagem de ADRs duráveis corrigida para 12, delegada a `analysis/README.md`], commands `meta` 29→30 [correção de contagem — a soma por categoria não batia com o total de 95 desde 2026-07-03])
 **Mantido por:** Sistema Onion
 
 ---
