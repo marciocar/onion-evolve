@@ -3,14 +3,15 @@ name: adopt
 description: |
   Adota um repositório/pasta no Sistema Onion: recebe um caminho local ou URL git
   e instala o framework (modelo durável) ou opera in-place (efêmero), faseado e
-  retomável. Greenfield-first. NÃO é CLI — roda dentro do Claude Code.
+  retomável. Greenfield-first. Detecta colisões de .gitignore `/docs/` e avisa no relatório.
+  NÃO é CLI — roda dentro do Claude Code.
   Relacionado: /docs:reverse-consolidate, /meta:setup-integration, /docs:build-tech-docs.
 model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(ls *) Bash(rm *) Bash(mktemp *) Bash(cat *) Bash(mkdir *) Bash(printf *)
 argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--integration-branch <nome>] [--in-place] [--update] [--dry-run]"
 category: meta
-version: "1.8.0"
-updated: "2026-06-22"
+version: "1.9.0"
+updated: "2026-07-07"
 ---
 
 # 🧅 /meta:adopt — Adoção de Repositório
@@ -200,6 +201,8 @@ DEST="<INSTALL_DIR (adoção) | TARGET (--update)>"
 OP="<adopt | update>"            # operação que gerou o relatório
 PIN="<source_commit aplicado>"   # commit curto da fonte (o pin NOVO)
 PREV="<pin anterior | vazio na 1ª adoção>"
+# [NOVO] Carregar aviso de colisão .gitignore (registrado na Fase 2, passo 2c) — pode estar vazio.
+GITIGNORE_DOCS_COLLISION="<carregar de STATE.md ou vazio>"
 
 INBOUND="$DEST/docs/evolution/inbound"
 mkdir -p "$INBOUND/_processed"
@@ -225,13 +228,40 @@ flow: downstream (core→consumidor / distribuição)
 ## Novidades / capacidades novas
 <resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>
 
+## Avisos de setup
+$([ -n "$GITIGNORE_DOCS_COLLISION" ] && cat <<WARN || echo "Nenhum aviso de setup.")
+### ⚠️ Colisão .gitignore detectada
+
+$GITIGNORE_DOCS_COLLISION
+
+**Por quê:** você tem uma regra no \`.gitignore\` que ignora \`docs/\` na raiz. Todos os docs futuros 
+instalados pelo Onion (evolução, relatórios, canonical) caem nessa armadilha — precisam de 
+\`git add -f\` para entrar, senão ficam untracked silenciosamente. O próprio canal de co-evolução 
+(\`docs/evolution/inbox/\`) é afetado.
+
+**Solução:** escolha **uma das**:
+1. **Remover a regra blanket** \`/docs/\` e usar exclusões pontuais no \`.gitignore\` 
+   (ex: \`/docs/temp\`, \`/docs/build\`) — deixa documentação versionável.
+2. **Respeitar a regra** e fazer \`git add -f\` explícito em todo doc Onion novo (não recomendado — 
+   propenso a esquecimento).
+3. **Escopar .gitignore** — por exemplo, se há \`/docs/local-build/\` que deve ignorar, usar isso 
+   em vez de \`/docs/\`.
+
+Recomendação: (1) — limpar o `.gitignore` remove a fricção de co-evolução. O maestro do core 
+sinaliza campo quando há pattern repetido — resolvem juntos.
+
+WARN
+)
+
 ## Próximos passos (NO ALVO)
 1. Revisar o diff aplicado nesta sessão.
-2. Commitar a atualização (gitflow do próprio repo). Em worktree legacy sem node_modules e com
+2. **Se houver aviso "Colisão .gitignore":** resolver conforme acima; depois commitar.
+3. Commitar a atualização (gitflow do próprio repo). Em worktree legacy sem node_modules e com
    pre-commit hook (husky/lint-staged), use \`git commit --no-verify\` (ENOENT = binário ausente,
    não violação; artefatos Onion já protegidos por .prettierignore) ou rode \`pnpm install\` antes.
-3. Push / abrir PR na branch de integração.
-4. (Opcional) Devolver sinal de campo ao core via inbox/ (upstream).
+4. Push / abrir PR na branch de integração.
+5. (Opcional) Devolver sinal de campo ao core via inbox/ (upstream) — ex: confirmar que a colisão 
+   foi resolvida, feedback sobre o passo (2), etc.
 EOF
 ```
 
@@ -297,7 +327,25 @@ else
 fi
 # 2b. Rodar o «Procedimento de cópia segura» com DEST="$INSTALL_DIR" (filtra manifesto, tmp, diff, aplica).
 
-# 2c. AVISO de hook de commit (legacy): a worktree nova NÃO tem node_modules. Se o alvo usa HUSKY
+# 2c. DETECÇÃO DE COLISÃO .gitignore `/docs/` (NOVO — field-signal da granaai).
+#     Se o alvo já tem uma regra que ignora a raiz `docs/`, todo doc futuro (incl. evolution/inbox,
+#     relatórios Onion, canonical docs) cai na armadilha silenciosa — `git add -f` obrigatório,
+#     esquecer → doc fica untracked. DETECTOR:
+GITIGNORE_DOCS_COLLISION=""
+if [ -f "$INSTALL_DIR/.gitignore" ]; then
+  # Procura por `/docs` (raiz-anchored, com ou sem /docs/* em seguida) que cubra docs/ genérico.
+  # git check-ignore diz a verdade (lê a precedência correta do .gitignore).
+  if git -C "$INSTALL_DIR" check-ignore -q docs/; then
+    CULPRIT=$(git -C "$INSTALL_DIR" check-ignore -v docs/ 2>/dev/null | head -1 | awk '{print $1}')
+    GITIGNORE_DOCS_COLLISION="Detectado: $CULPRIT ignora docs/ na raiz (blanket ignore)."
+  fi
+fi
+# Registrar no STATE.md para Fase 6 (relatório) reportar. Se o alvo tiver outras regras tipo
+# `/docs/*` que não disparam (precedência mais baixa), o check-ignore não as retorna — OK, é
+# informação precisa do que Git honra.
+[ -n "$GITIGNORE_DOCS_COLLISION" ] && echo "GITIGNORE_DOCS_COLLISION='$GITIGNORE_DOCS_COLLISION'" >> STATE.md
+
+# 2d. AVISO de hook de commit (legacy): a worktree nova NÃO tem node_modules. Se o alvo usa HUSKY
 #     (que invoca binário de node_modules: husky+lint-staged → prettier/eslint), o 1º commit da adoção
 #     falha com ENOENT e o lint-staged REVERTE (commit não acontece). O hook NATIVO Onion (Fase 3,
 #     passo 6) é a cura de raiz — degrada gracioso sem node_modules —, MAS só vence se o adotante migrar
