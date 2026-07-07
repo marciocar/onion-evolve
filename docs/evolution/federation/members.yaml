@@ -105,13 +105,13 @@ members:
     role: standalone            # TIER 3 — adota o core direto; NÃO confundir com "origem" (ver ADR — é consolidação, não origem)
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — não citar em superfície pública
-    local_path: null            # sem clone local nesta máquina; registro via investigação read-only (gh api)
-    onion_version: 4332ac8d1884   # source_commit no branch onion/adopt — DECLARADO pelo stamp deles, NÃO verificado byte-a-byte (sem clone local)
+    local_path: "/home/marciocar/granaai"   # clonado 2026-07-06/07 pra executar a reconciliação (cherry-pick + push + merge)
+    onion_version: 4332ac8d1884   # source_commit no branch onion/adopt — VERIFICADO byte-a-byte 2026-07-07 (.claude/.onion-version lido direto no clone local, pós-merge)
     adopted_at: 2026-07-01
     mode: regulated              # detectado corretamente pelo /meta:adopt deles — domínio fintech
     integration_branch: develop  # confirmado — ambiente regulado exige controle deliberado de QUANDO puxar updates (nunca live-pull automático)
-    reconciliation_status: pr_open_pending_review   # PR #1094 aberto contra develop (14 commits, cherry-pick limpo + regen inventário), Mauricio como reviewer, NÃO mergeado — decisão dele
-    reviewer: "Mauricio Matos <mauricio.matos@grana.ai> — responsável por revisar/mergear no develop"
+    reconciliation_status: merged_2026-07-07   # PR #1094 (14 commits + cherry-pick 1af2e8b2d restaurando o guia) e PR #1096 (fix .gitignore blanket /docs/) mergeados em develop; revisão do Mauricio ok + lint HARD limpo antes do merge
+    reviewer: "Mauricio Matos <mauricio.matos@grana.ai> — revisou e aprovou (comentário PR #1094, 2026-07-07); merge executado pelo core"
     personality_summary: "Onde o Onion se consolidou como potência real (não a origem) — 3 dimensões peer provadas juntas em produção regulada (fintech). Convite de Marcio Carvalho (CTO Grana.Ai, criador do Onion) a Mauricio Matos, 2026-07-01: adoção completa + canonicalização SSOT (9 ADRs, 8 RFTs, grafo do ecossistema, 24/25 CURRENT). Achado notável: bug real de lint (graceful-skip sem jq) descoberto e corrigido lá E no core, mesmo dia, 7h41 de diferença, zero comunicação — descoberta convergente independente. NÃO tem role:source próprio (doutrina fonte≠derivação: uma só fonte) — o .claude/ vendorizado já É 'o core deles' no dia a dia; trust elevado (não role elevado) reconhece o rigor comprovado."
     specializations: [regulated-fintech, canonicalization, ssot-governance]
     personality_last_sync: 2026-07-06   # seed manual — investigação read-only, não sessão adotante
