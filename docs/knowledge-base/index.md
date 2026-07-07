@@ -1,6 +1,6 @@
 # 📚 Índice - Knowledge Bases
 
-> **Última atualização**: 2026-07-03 | **Gerado por**: `/docs:build-index`
+> **Última atualização**: 2026-07-06 | **Gerado por**: `/docs:build-index`
 
 Índice das **Knowledge Bases** do Sistema Onion — conhecimento estruturado para consumo por IA e referência técnica.
 
@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **49 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **25** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria)
+- **58 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **28** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **3** em `platforms/` · **2** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
 
 ---
 
@@ -17,13 +17,14 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 25 — Conceitos fundamentais
+├── concepts/            # 28 — Conceitos fundamentais
 ├── frameworks/          # 8  — Frameworks e metodologias
 ├── tools/               # 4  — Ferramentas e recursos
-├── platforms/           # 2  — Plataformas e tecnologias
-├── patterns/            # 1  — Padrões de implementação (SDAAL examples)
+├── platforms/           # 3  — Plataformas e tecnologias
+├── patterns/            # 2  — Padrões de implementação (SDAAL + orquestração de apresentações)
 ├── architectures/       # 1  — C4 + ADR patterns
 ├── meta/                # 2  — Padrões de criação de comandos + identidade/produto
+├── education/           # 4  — Vertical educacional (fonte≠derivação: theories/ + applications/) + 1 README
 └── agentic-patterns/    # 6  — Como IA + harness colaboram (KB viva do campo) + 4 READMEs
     ├── harness/         #     Internals de harnesses específicos
     ├── ai-strategies/   #     Padrões de guiar o transformer
@@ -32,7 +33,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (25)
+## 🧠 Conceitos Fundamentais (28)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Orchestration](concepts/agent-orchestration.md) — orquestração de subagentes: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
@@ -50,10 +51,13 @@ docs/knowledge-base/
 - [Multi-repo Federation](concepts/multi-repo-federation.md) — contratos spec-as-code + ledger git (topologia peer)
 - [Onion Dogfooding Doctrine](concepts/onion-dogfooding-doctrine.md) — padrão master de evolução: rodar de verdade → aprender → resolver (fix → re-dogfood)
 - [Onion Engine Economy](concepts/onion-engine-economy.md) — qual motor para qual tarefa: os três motores de execução e o critério explícito de escolha
+- [Onion Federation and Adoption](concepts/onion-federation-and-adoption.md) — guia de síntese: processo completo de `/meta:adopt` fase-a-fase, matriz de permissão dos 4 tiers, 5 perfis reais registrados
 - [Onion Modernization Doctrine](concepts/onion-modernization-doctrine.md) — regra de inventário/SSOT e doutrina de modernização
 - [Onion Relation Vocabulary](concepts/onion-relation-vocabulary.md) — TBox da ontologia leve: classes e predicados controlados com que o Onion descreve a si mesmo
 - [Onion Working Method](concepts/onion-working-method.md) — porta de entrada do método: Seleção (catálogo) + Execução (PFR + coordenação por modo) + Validação (dogfood + adversarial) + Disciplina; mapa de fontes meta-spec/KB/ADR/RFC
 - [Secret Handling (Agent)](concepts/secret-handling-agent.md) — regra dura: agente nunca pede/aceita segredo em texto claro; receituário capability-split → terminal real → efêmero → fora-de-banda → container (crédito: rhilo, dogfood real)
+- [Session Memory Lifecycle](concepts/session-memory-lifecycle.md) — memória persistente do harness como 4º contexto auditável, irmã de domain-context-lifecycle
+- [Fonte ≠ Derivação](concepts/source-vs-derivation.md) — fronteira física entre conhecimento-fonte e nossa leitura dele; família do "declarado ≠ verificado"
 - [Spec-as-Code Strategy](concepts/spec-as-code-strategy.md) — hierarquia de especificações (L0-L3)
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA
 - [Specification-Driven AI Abstraction Layer (SDAAL)](concepts/specification-driven-ai-abstraction-layer.md) — padrão-pai das camadas de abstração
@@ -86,15 +90,17 @@ docs/knowledge-base/
 
 ---
 
-## 🌐 Plataformas (2)
+## 🌐 Plataformas (3)
 
+- [Gamma.App API](platforms/gamma-app-api.md) — Generations API: especificação, padrões de integração e exemplos (extraído do agente `@gamma-api-specialist`)
 - [Git Ledger as Working Dir](platforms/git-ledger-as-working-dir.md) — ledger git como additional working directory (prova da Fase 0 da federation)
 - [Runflow](platforms/runflow.md) — SDK e plataforma de agentes/workflows
 
 ---
 
-## 🧩 Patterns (1)
+## 🧩 Patterns (2)
 
+- [Presentation Orchestration](patterns/presentation-orchestration.md) — contratos de delegação, templates e casos de uso (extraído do agente `@presentation-orchestrator`)
 - [SDAAL Examples](patterns/sdaal-examples.md) — exemplos de implementação do padrão SDAAL
 
 ---
@@ -102,6 +108,23 @@ docs/knowledge-base/
 ## 🏛️ Architectures (1)
 
 - [C4 + ADR Patterns](architectures/c4-adr-patterns.md) — modelagem C4 e Architecture Decision Records
+
+---
+
+## 🎓 Education (4 + 1 README)
+
+> Vertical `onion-education` (F0 aberto 2026-07-05). Duas camadas em fronteira física — doutrina
+> [fonte≠derivação](concepts/source-vs-derivation.md): `theories/` é fiel à fonte (zero Onion),
+> `applications/` é a nossa derivação (cita, nunca reescreve). Ver [README](education/README.md)
+> para a regra completa.
+
+**theories/**
+- [PLEA — Pedro Rosário](education/theories/plea-rosario.md) — modelo de autorregulação, catálogo fiel verificado por painel adversarial
+- [SRL — Zimmerman, Bandura, Winne & Hadwin](education/theories/srl-zimmerman.md) — base teórica de Autorregulação da Aprendizagem + evidência empírica recente
+
+**applications/**
+- [Diretrizes de Desenho Educacional](education/applications/educational-design-guidelines.md) — regras vinculantes derivadas da evidência, para todo artefato da vertical
+- [Pontes Onion ↔ SRL/PLEA](education/applications/onion-srl-bridges.md) — analogias de engenharia (PLAUSÍVEL, nunca homologia confirmada)
 
 ---
 
@@ -146,4 +169,4 @@ docs/knowledge-base/
 
 ---
 
-**Mantido por**: Sistema Onion · **Última atualização**: 2026-07-03
+**Mantido por**: Sistema Onion · **Última atualização**: 2026-07-06
