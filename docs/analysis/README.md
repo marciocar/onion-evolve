@@ -6,6 +6,30 @@ Isto reforça a doutrina de modernização (regra de inventário/SSOT em
 [`../knowledge-base/concepts/onion-modernization-doctrine.md`](../knowledge-base/concepts/onion-modernization-doctrine.md)):
 documentação ativa contém só o que é canônico ou usado em runtime; o resto não acumula.
 
+## 🌱 Sementes de pesquisa abertas
+
+> Terceira categoria, distinta de "permanece"/"removido": uma semente é **plantada, não decidida**
+> — registra uma pergunta com grounding real, sem executar a pesquisa ainda. Fica até ser
+> **ENTREGUE** (relatório separado, linkado) ou incorporada a um baseline/ADR acima. Formato-
+> padrão: `onion-research-seed-<slug>-<AAAA-MM>.md` (Título → status → Por que → Questões →
+> Método previsto → Gatilho). Gap corrigido em 2026-07-06: antes desta tabela, o rastreamento de
+> sementes vivas existia só na memória de sessão do Claude, fora do repositório.
+
+| Semente | Status | Resumo |
+|---|---|---|
+| [Hegel (dialética, Aufhebung, Bildung)](onion-research-seed-hegel-dialectics-2026-07.md) | SEMENTE (2026-07-05) | Dialética hegeliana × epistemologia do Onion (KG append-mostly, Aufhebung); catálogo teórico + 5 questões de analogia. |
+| [SRL/PLEA (Pedro Rosário)](onion-research-seed-srl-plea-2026-07.md) | ENTREGUE (2026-07-05) | Autorregulação da aprendizagem × vertical educacional; 11 achados, Q3 e Q5 ficaram abertas. |
+| [Onion virar um modelo (SLM)](onion-research-seed-onion-as-model-2026-07.md) | SEMENTE (2026-07-06) | Destilação de doutrina já existe (onion-mini); destilação de pesos, não. Cruza com Q5 da semente SRL/PLEA. |
+| [Orquestrar SLMs federados](onion-research-seed-federated-slm-orchestration-2026-07.md) | SEMENTE (2026-07-06) | Colide com rejeição explícita ("SLM-como-agente", "model-routing multi-LLM"); onion-mini já é a resposta `bifurcada` — ver [parecer](onion-parecer-rejection-vs-spinoff-signal-2026-07.md). |
+| [smolagents e padrões emergentes](onion-research-seed-smolagents-and-emerging-patterns-2026-07.md) | SEMENTE (2026-07-06) | Mineração de estratégias de prior art (fontes primárias); pesquisa externa ainda não rodou. |
+| [Repos-padrão por tier](onion-research-seed-tiered-distribution-repos-2026-07.md) | SEMENTE (2026-07-06) | Extensão natural (não-rejeitada) do Trust SDAAL já existente; falta `role: distilled` formal + registro da família multi-plataforma. |
+| [VSCode/outra IDE, revisitado](onion-research-seed-ide-integration-revisit-2026-07.md) | SEMENTE (2026-07-06) | Colide de frente com o abandono formal de multi-IDE (2026-05-18) — pode ser resposta `bifurcada` (onion-mini) já cobrindo isso, ver [parecer](onion-parecer-rejection-vs-spinoff-signal-2026-07.md). |
+| [Lente do sabido ao a-saber + SDAAL](onion-research-seed-epistemic-lens-known-to-unknown-2026-07.md) | SEMENTE (2026-07-06) | Território novo; vizinhos parciais são `/meta:graph --path` e o veredito de frescor. |
+| [Organização das sementes (meta)](onion-research-seed-seed-organization-meta-2026-07.md) | ENTREGUE (2026-07-06) | Resolvida no próprio plantio — esta tabela é a entrega. |
+| [Cuidar de um modelo pronto](onion-research-seed-model-lifecycle-caretaking-2026-07.md) | SEMENTE (2026-07-06) | Território novo; único vizinho é `llm-provider` (roadmap SDAAL, não construído). |
+| [Onion como lente para modelos](onion-research-seed-onion-as-model-lens-2026-07.md) | SEMENTE (2026-07-06) | Território novo como conceito formal; "lente" no Onion hoje só significa perspectiva de leitura interna. |
+| [Canal-radar de fontes de pesquisa](onion-research-seed-research-radar-channel-2026-07.md) | SEMENTE (2026-07-06) | A forma já existe para sinal interno (`field-observations/`); falta versão para sinal externo — mecânica de cadência (`/loop`/cron) já pronta. |
+
 ## O que PERMANECE (baselines ativos)
 
 | Arquivo | Por que fica |
