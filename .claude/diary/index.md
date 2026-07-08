@@ -13,7 +13,7 @@ Gerado em: 2026-07-08
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
 | 2026-07-08 | observation | protected | docbridge-gitignore-check-candidate | 2026-10-06 | conditional |
-| 2026-07-05 | learning | public 📤 | vps-lineage-odyssey | 2026-10-05 | conditional |
+| 2026-07-05 | learning | public 📤 | vps-lineage-odyssey | 2026-10-06 | conditional |
 | 2026-07-03 | learning | public 📤 | workflow-resume-cache-recovery | 2026-10-01 | conditional |
 | 2026-07-03 | learning | public 📤 | sandbox-selftest-exposes-latent-bugs | 2026-10-01 | static |
 | 2026-07-03 | innovation | public 📤 | declared-vs-verified-family | 2026-10-01 | static |
