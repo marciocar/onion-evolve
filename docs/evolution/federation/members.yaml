@@ -12,9 +12,10 @@ members:
     role: source              # TIER 0 — core; autoridade emissora; lê tudo; escreve só em si
     remote: github.com/marciocar/onion-evolve
     path: "."                 # este repo
-    local_path: "/home/marciocar/onion-evolve"
+    local_path: "/home/marcio/onion-evolve"   # migrado 2026-07-08: notebook local → Hostinger KVM 8 (srv1812846), user marciocar→marcio
     lineages:                 # o core também é multi-linhagem: o MESMO repo (role: source) vive em >1 checkout
       workstation:            # cópia de trabalho do maestro — a AUTORIDADE; onde a evolução acontece
+        host: srv1812846      # Hostinger KVM 8 (8 vCPU/32 GB/387 GB) — lar permanente do core desde 2026-07-08
         branch: main          # sem pin: a fonte não se carimba — sua versão É a HEAD
       vps-bridge:             # clone no VPS Hostinger (srv1475924) — LINHAGEM QUE TRABALHA, não espelho
         branch: main
@@ -50,7 +51,7 @@ members:
     role: hub                 # TIER 1 — central; pode ter sub-adotados
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
-    local_path: "/home/marciocar/rhilo-metagamify"
+    local_path: "/home/marcio/rhilo-metagamify"
     onion_version: 8e22352da32f   # pin mais recente VERIFICADO entre as linhagens (pin-ok 2026-07-03).
                                   # Membro MULTI-LINHAGEM: pins por linhagem no mapa lineages: abaixo
                                   # (parecer onion-parecer-rhilo-lineages-2026-07, decisão D2). Regra: um
@@ -84,7 +85,7 @@ members:
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
     parent: onion-evolve
     remote: github.com/marciocar/pulse-mais
-    local_path: "/home/marciocar/pulse-mais"
+    local_path: "/home/marcio/pulse-mais"
     onion_version: c711baa17617   # VERIFICADO por pin-integrity-check.sh na adoção (pin-ok 2026-07-05)
     adopted_at: 2026-07-05
     mode: greenfield
@@ -105,7 +106,7 @@ members:
     role: standalone            # TIER 3 — adota o core direto; NÃO confundir com "origem" (ver ADR — é consolidação, não origem)
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — não citar em superfície pública
-    local_path: "/home/marciocar/granaai"   # clonado 2026-07-06/07 pra executar a reconciliação (cherry-pick + push + merge)
+    local_path: "/home/marcio/granaai"   # re-clonado 2026-07-08 no novo lar (KVM 8); acesso via token gh de marciocar (org GranaAi privada)
     onion_version: 4332ac8d1884   # source_commit no branch onion/adopt — VERIFICADO byte-a-byte 2026-07-07 (.claude/.onion-version lido direto no clone local, pós-merge)
     adopted_at: 2026-07-01
     mode: regulated              # detectado corretamente pelo /meta:adopt deles — domínio fintech
@@ -129,7 +130,7 @@ members:
                                 # 'distilled' formal é costura gated (2ª destilação; ADR mini-distillation D2)
     parent: onion-evolve
     remote: github.com/marciocar/onion-mini
-    local_path: "/home/marciocar/onion-mini"
+    local_path: "/home/marcio/onion-mini"
     onion_version: n/a          # sem stamp: destilação (reescrita curada da doutrina), não vendor do framework
     adopted_at: 2026-07-05      # data da adoção definitiva/rebrand (repo existe desde jun/2026)
     mode: distilled             # anotação livre; o trust engine só valida role
