@@ -1,0 +1,8 @@
+{
+  "name": "onion-product",
+  "version": "0.1.0",
+  "conformance": "silver",
+  "provides": ["descoberta-a-backlog","decomposicao-de-tasks","estimativa-story-points","extracao-de-reunioes","apresentacoes"],
+  "requires": ["agent:product-agent","agent:task-specialist","agent:story-points-framework-specialist","agent:pain-price-specialist","agent:extract-meeting-specialist"],
+  "loads": []
+}
