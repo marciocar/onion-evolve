@@ -573,6 +573,22 @@ run_assemble_plugin_selftests() {
   else record_fail "assemble-plugin: compliance template" "template não bundlado ou ref não reescrita"; fi
   rm -rf "${d}"
 
+  # (h) SKILLS (dir) + HOOKS (script) — fixture bundlando uma skill e um hook reais do repo.
+  local mfx dh; mfx="$(mktemp)"; dh="$(mktemp -d)"
+  cat > "${mfx}" <<'MFX'
+PLUGIN_NAME="fx-skillhook"
+PLUGIN_DESC="fixture skills+hooks"
+KEYWORDS=(fx)
+SKILLS=(".claude/skills/language-standards")
+HOOKS=(".claude/hooks/session-beacon-hook.sh")
+CONFORMANCE="bronze"; PROVIDES=("fx")
+MFX
+  bash "${helper}" "${mfx}" "${REPO_ROOT}" "${dh}/fx" >/dev/null 2>&1
+  if [ -f "${dh}/fx/skills/language-standards/SKILL.md" ] && [ -x "${dh}/fx/hooks/session-beacon-hook.sh" ]; then
+    record_pass "assemble-plugin: SKILLS (dir c/ SKILL.md) + HOOKS (script +x) bundlados"
+  else record_fail "assemble-plugin: skills/hooks" "skill dir ou hook script não bundlado"; fi
+  rm -f "${mfx}"; rm -rf "${dh}"
+
   # (f) manifesto inválido → exit 2
   rc=0; bash "${helper}" "/nao/existe/$$.sh" "${REPO_ROOT}" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 2 ]; then record_pass "assemble-plugin: manifesto inválido → exit 2"
