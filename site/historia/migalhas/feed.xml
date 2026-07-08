@@ -9,6 +9,13 @@
   <lastBuildDate>Sun, 05 Jul 2026 00:00:00 GMT</lastBuildDate>
 
   <item>
+    <title>Empacotamos a nós mesmos — e o padrão de 2026 já era o nosso</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-08</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-08</guid>
+    <pubDate>Tue, 08 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Para instalar o Onion em outro projeto a gente copiava arquivos — frágil. O padrão que a comunidade e a Anthropic adotaram em 2026 (um catálogo de peças instaláveis com versão e auto-update) já era quase o nosso. Empacotamos as capacidades por área, com mapa de quem-recebe-o-quê — PRs #292–#296.</description>
+  </item>
+  <item>
     <title>A metade que trabalhava sozinha, sem ninguém saber</title>
     <link>https://onionevolve.com/historia/migalhas/#post-2026-07-05</link>
     <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-05</guid>
