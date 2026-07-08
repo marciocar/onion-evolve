@@ -2,7 +2,7 @@
   "name": "onion-engineering",
   "version": "0.1.0",
   "conformance": "silver",
-  "provides": ["gitflow-faseado","pull-request-lifecycle","code-review-pre-pr","code-specialists-node-react-postgres-nx-docker"],
-  "requires": ["agent:gitflow-specialist","agent:branch-code-reviewer","agent:code-reviewer","agent:nodejs-specialist","agent:react-developer","agent:postgres-specialist","agent:docker-specialist"],
-  "loads": []
+  "provides": ["gitflow-faseado","pull-request-lifecycle","code-review-pre-pr","code-specialists-node-react-postgres-nx-docker","ssot-context-resolver"],
+  "requires": ["agent:gitflow-specialist","agent:branch-code-reviewer","agent:code-reviewer","agent:nodejs-specialist","agent:react-developer","agent:postgres-specialist","agent:docker-specialist","skill:onion-engineering-context"],
+  "loads": ["embed:kb/gitflow-patterns.md","embed:kb/worklog-protocol.md","when:work -> resolve:technical-context (skill onion-engineering-context)"]
 }

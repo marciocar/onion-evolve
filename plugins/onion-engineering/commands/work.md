@@ -19,7 +19,7 @@ Estamos atualmente trabalhando em uma funcionalidade que está especificada na s
 #$ARGUMENTS
 </folder>
 
-Para trabalhar nisso, você deve usar o **protocolo de leitura escalonado** (Tier 0→3) — **nunca** faça `cat` da pasta inteira (anti-pattern "Context Dump"; protocolo em [worklog-protocol.md §4](../../../docs/knowledge-base/concepts/worklog-protocol.md)):
+Para trabalhar nisso, você deve usar o **protocolo de leitura escalonado** (Tier 0→3) — **nunca** faça `cat` da pasta inteira (anti-pattern "Context Dump"; protocolo em [worklog-protocol.md §4](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)):
 
 1. **Tier 0 (sempre, ~1KB):** leia **só o `STATE.md`**. Seu `## NEXT` é o ponteiro **autoritativo** — diz fase atual e próximo passo. Não escaneie badges do `plan.md` para decidir.
 2. **Tier 1 (sob demanda):** leia **apenas o bloco da fase `[ACTIVE]`** do `plan.md` (a fase nomeada em `STATE.md.NEXT.phase`).
@@ -43,7 +43,7 @@ timestamp + status; offline → registrar em `plan.md`/`notes.md`, sem persistir
 3. **Documentar conclusão** com timestamp e métricas da fase
 
 ### **🗺️ SUBTASK MAPPING STRUCTURE (context.md):**
-Formato canônico na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) — lido (não redefinido) daqui:
+Formato canônico na [SSOT](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) — lido (não redefinido) daqui:
 ```markdown
 ## 📋 Phase-Subtask Mapping
 - **Phase 1**: "Nome da Fase" → Subtask ID: [subtask-id-1]
@@ -103,7 +103,7 @@ ${decisions.map(d => `   ∟ ${d}`).join('\n')}
 
 Quando você desenvolver o código para a fase atual, use os sub-agentes de desenvolvimento, code-review e teste quando apropriado para preservar o máximo possível do seu contexto.
 
-Toda vez que completar uma fase do plano (**checkpoint** — ver [worklog-protocol.md §7](../../../docs/knowledge-base/concepts/worklog-protocol.md)):
+Toda vez que completar uma fase do plano (**checkpoint** — ver [worklog-protocol.md §7](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)):
 - **AUTO-UPDATE**: Adicione comentário de progresso via abstração
 - **RASTREAMENTO**: Marque checkboxes na description correspondentes aos critérios completados
 - Pause e peça ao usuário para validar seu código.
@@ -115,8 +115,8 @@ Toda vez que completar uma fase do plano (**checkpoint** — ver [worklog-protoc
 
 ## 🔗 Referências
 
-- Contrato de worklog (SSOT): [gitflow-patterns.md §Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
-- Protocolo de leitura/resume/checkpoint: [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md)
+- Contrato de worklog (SSOT): [gitflow-patterns.md §Contrato de Sessão](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
+- Protocolo de leitura/resume/checkpoint: [worklog-protocol.md](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)
 - Higiene de contexto: [context-window-optimization.md](../../../docs/knowledge-base/concepts/context-window-optimization.md)
 - Abstração: `.claude/utils/task-manager/`
 - Detector: `.claude/utils/task-manager/detector.md`

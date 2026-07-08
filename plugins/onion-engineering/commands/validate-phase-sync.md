@@ -56,7 +56,7 @@ Executadas via adapter (REST API default; MCP opcional — ativado com `TASK_MAN
 - **Validação de Integridade**: Verifica se mapeamento está correto e completo
 
 ### Mapeamento Phase-Subtask
-Lê o mapeamento do arquivo `.claude/sessions/[slug]/context.md` (formato canônico na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)):
+Lê o mapeamento do arquivo `.claude/sessions/[slug]/context.md` (formato canônico na [SSOT](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)):
 ```markdown
 ## 📋 Phase-Subtask Mapping
 - **Phase 1**: "Template Consolidation" → Subtask ID: [id-1]
@@ -65,7 +65,7 @@ Lê o mapeamento do arquivo `.claude/sessions/[slug]/context.md` (formato canôn
 ```
 
 ### Correções Aplicadas
-Mapeie pelo token ASCII do `plan.md` (vocabulário em [worklog-protocol.md §6](../../../docs/knowledge-base/concepts/worklog-protocol.md)):
+Mapeie pelo token ASCII do `plan.md` (vocabulário em [worklog-protocol.md §6](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)):
 - Fases `[DONE]` → Subtask status "done"
 - Fases `[ACTIVE]` → Subtask status "in progress"
 - Fases `[TODO]` → Subtask status "to do"

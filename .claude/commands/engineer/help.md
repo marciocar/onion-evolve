@@ -59,7 +59,7 @@ Ajuda contextual da **dimensão de engenharia** do Onion: o ciclo faseado e reto
 
 ## 📚 Fontes canônicas
 
-- **Motor GitFlow** (git local, semver, contrato de sessão, proteção de branch): [`gitflow-patterns.md`](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md) — a fonte única; os comandos são orquestradores finos que a citam.
+- **Motor GitFlow** (git local, semver, contrato de sessão, proteção de branch): [`gitflow-patterns.md`](../../../docs/knowledge-base/frameworks/gitflow-patterns.md) — a fonte única; os comandos são orquestradores finos que a citam.
 - **Mentor ad-hoc / recovery**: `@gitflow-specialist`.
 - **Operações de host remoto** (PR/CI/Release): [`utils/forge/`](../../utils/forge/README.md).
 - **Tasks/sprints**: [`utils/task-manager/`](../../utils/task-manager/README.md).

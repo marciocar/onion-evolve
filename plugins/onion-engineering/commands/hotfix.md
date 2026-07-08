@@ -71,7 +71,7 @@ Roteamento, formatação (ADF/Markdown/Unicode/HTML) e mapeamento de status/prio
 
 ### Passo 3: Criar branch hotfix (git local)
 
-Segue [gitflow-patterns.md §Template 4](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-4-emergency-hotfix); o patch bump usa o [Algoritmo Unificado de Semver](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#algoritmo-unificado-de-auto-bump-semver) (hotfix = sempre `patch`):
+Segue [gitflow-patterns.md §Template 4](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-4-emergency-hotfix); o patch bump usa o [Algoritmo Unificado de Semver](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#algoritmo-unificado-de-auto-bump-semver) (hotfix = sempre `patch`):
 
 ```bash
 git checkout main && git pull origin main
@@ -82,7 +82,7 @@ git checkout -b "$BRANCH"
 
 ### Passo 4: Setup de sessão (worklog)
 
-Criar `.claude/sessions/<slug>/` conforme o [Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento): `STATE.md` (índice de resume, com `NEXT`→fase 1), `context.md` (task vinculada, branch, base + Phase-Subtask Mapping), `plan.md` ([DONE]/[ACTIVE]/[TODO]) e `notes.md`. Em hotfix o `architecture.md` é **opcional** (correção urgente pula arquitetura profunda).
+Criar `.claude/sessions/<slug>/` conforme o [Contrato de Sessão](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento): `STATE.md` (índice de resume, com `NEXT`→fase 1), `context.md` (task vinculada, branch, base + Phase-Subtask Mapping), `plan.md` ([DONE]/[ACTIVE]/[TODO]) e `notes.md`. Em hotfix o `architecture.md` é **opcional** (correção urgente pula arquitetura profunda).
 
 ### Passo 5: Iniciar desenvolvimento
 
@@ -98,9 +98,9 @@ Criar `.claude/sessions/<slug>/` conforme o [Contrato de Sessão](../../../docs/
 
 ## 🔗 Referências
 
-- Motor GitFlow (hotfix, semver): [gitflow-patterns.md §Template 4](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-4-emergency-hotfix)
+- Motor GitFlow (hotfix, semver): [gitflow-patterns.md §Template 4](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-4-emergency-hotfix)
 - Task Manager (criação provider-agnóstica): [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
-- Contrato de sessão: [gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
+- Contrato de sessão: [gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
 - Mentor: `@gitflow-specialist`
 
 ## ⚠️ Notas

@@ -400,7 +400,7 @@ Otimização de versionamento:
 
 O material de **referência detalhada** — templates passo-a-passo, scripts e cheat sheets — foi extraído para o knowledge base, mantendo este agente focado em orquestração e guidance. Consulte e cite a KB ao orientar:
 
-📖 **`docs/knowledge-base/frameworks/gitflow-patterns.md`**
+📖 **`${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md`**
 
 Conteúdo disponível na KB:
 

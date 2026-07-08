@@ -121,8 +121,8 @@ Estabelecer contexto focado em:
 6. **Sync**: `/git/sync` → Sincronizar após merge
 
 ### Estrutura de Sessões (worklogs)
-- ✅ Entender `.claude/sessions/<feature>/` (o **worklog**) para contexto de trabalho — estrutura na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
-- ✅ Para reportar status ou retomar, ler **só o `STATE.md`** (índice Tier-0, ponteiro `NEXT`), não a pasta inteira — protocolo em [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md)
+- ✅ Entender `.claude/sessions/<feature>/` (o **worklog**) para contexto de trabalho — estrutura na [SSOT](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
+- ✅ Para reportar status ou retomar, ler **só o `STATE.md`** (índice Tier-0, ponteiro `NEXT`), não a pasta inteira — protocolo em [worklog-protocol.md](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)
 - ✅ Distinguir **worklog** (estado em arquivo) do **transcript** nativo (`claude --resume`)
 
 ### Co-evolução do framework (se `docs/evolution/` existir)

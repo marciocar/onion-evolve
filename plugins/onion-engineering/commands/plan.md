@@ -19,22 +19,22 @@ Este é o comando para iniciar o planejamento de uma funcionalidade.
 
 ## Análise
 
-Leia os arquivos context.md e architecture.md na pasta .claude/sessions/<feature-slug> se ainda não tiver feito (carregue só as seções necessárias — ver protocolo de leitura em [worklog-protocol.md §4](../../../docs/knowledge-base/concepts/worklog-protocol.md)).
+Leia os arquivos context.md e architecture.md na pasta .claude/sessions/<feature-slug> se ainda não tiver feito (carregue só as seções necessárias — ver protocolo de leitura em [worklog-protocol.md §4](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)).
 
 Sua tarefa agora é criar um plano de implementação detalhado (plan.md) para esta funcionalidade. O objetivo desta documentação é criar uma abordagem de implementação faseada que nos permita construir a funcionalidade incrementalmente, testando cada fase conforme avançamos. E também deve tornar possível retomar o trabalho caso nossa sessão seja interrompida.
 
 O plan.md deve dividir a implementação em fases, cada fase com um pedaço do trabalho que pode ser realizado por um humano em ~2 horas. Cada fase é um **chunk auto-contido** (100–300 linhas): ler a fase N não deve exigir as fases anteriores em contexto.
 
-**Vocabulário de estado (obrigatório):** use os tokens ASCII `[DONE]` / `[ACTIVE]` / `[TODO]` no header de cada fase e tarefa (definidos na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) e [worklog-protocol.md §6](../../../docs/knowledge-base/concepts/worklog-protocol.md)). Emoji é decorativo; o token entre colchetes é o que máquinas leem. Invariante: **exatamente uma** fase `[ACTIVE]`, e ela deve ser igual a `STATE.md.NEXT.phase` — o `STATE.md.NEXT` é o ponteiro **autoritativo** de resume; os badges abaixo são detalhe humano subordinado.
+**Vocabulário de estado (obrigatório):** use os tokens ASCII `[DONE]` / `[ACTIVE]` / `[TODO]` no header de cada fase e tarefa (definidos na [SSOT](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) e [worklog-protocol.md §6](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)). Emoji é decorativo; o token entre colchetes é o que máquinas leem. Invariante: **exatamente uma** fase `[ACTIVE]`, e ela deve ser igual a `STATE.md.NEXT.phase` — o `STATE.md.NEXT` é o ponteiro **autoritativo** de resume; os badges abaixo são detalhe humano subordinado.
 
 O template para o plan.md é:
 
 <plan>
 # [NOME DA FUNCIONALIDADE]
 
-Se você está trabalhando nesta funcionalidade, atualize este plan.md E o `STATE.md.NEXT` conforme progride (ver checkpoint em [worklog-protocol.md §7](../../../docs/knowledge-base/concepts/worklog-protocol.md)).
+Se você está trabalhando nesta funcionalidade, atualize este plan.md E o `STATE.md.NEXT` conforme progride (ver checkpoint em [worklog-protocol.md §7](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)).
 
-> **Estado inicial:** num plano recém-criado, a Fase 1 nasce `[ACTIVE]` (igual a `STATE.md.NEXT.phase = 1`) e as demais `[TODO]`. Ao concluir uma fase, marque-a `[DONE]`, promova a próxima a `[ACTIVE]` e atualize o `STATE.md.NEXT` (transição em [worklog-protocol.md §6-7](../../../docs/knowledge-base/concepts/worklog-protocol.md)). Invariante: **exatamente uma** fase `[ACTIVE]`.
+> **Estado inicial:** num plano recém-criado, a Fase 1 nasce `[ACTIVE]` (igual a `STATE.md.NEXT.phase = 1`) e as demais `[TODO]`. Ao concluir uma fase, marque-a `[DONE]`, promova a próxima a `[ACTIVE]` e atualize o `STATE.md.NEXT` (transição em [worklog-protocol.md §6-7](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)). Invariante: **exatamente uma** fase `[ACTIVE]`.
 
 ## FASE 1 [ACTIVE]
 
