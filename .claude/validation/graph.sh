@@ -13,11 +13,12 @@
 #             dos plugins (requires/provides/loads) + frontmatter dos agentes
 #             (related_agents/related_commands) + has-member (onion → artefatos).
 #
-# Uso       : graph.sh [--markdown|--triples|--impact <nó>|--path <de> <até>|--orphans]
+# Uso       : graph.sh [--markdown|--triples|--impact <nó>|--path <de> <até>|--closure <nó>|--orphans]
 #               --markdown (default) : docs/onion/graph.md (duplo público)
 #               --triples            : TSV  subject<TAB>predicate<TAB>object<TAB>via
-#               --impact <nó>        : quem aponta para <nó> (dependência reversa)
+#               --impact <nó>        : quem aponta para <nó> (dependência reversa, 1-hop)
 #               --path <de> <até>    : caminho dirigido de <de> a <até> (BFS)
+#               --closure <nó>       : fecho transitivo direto — tudo alcançável de <nó> (auto-escopo de bundle)
 #               --orphans            : artefatos que ninguém referencia
 #
 # Determinístico, sem LLM. Mesma spec-as-code → mesma saída. Coberto por
@@ -130,6 +131,27 @@ case "${MODE}" in
         path=goal; node=goal; while(prev[node]!=""){node=prev[node]; path=node" -> "path}
         print "  "path
       }'
+    ;;
+
+  --closure)
+    seed="${2:-}"; [ -n "${seed}" ] || { echo "uso: graph.sh --closure <nó>" >&2; exit 2; }
+    # Fecho transitivo DIRETO (forward): tudo alcançável a partir de <seed> seguindo s -> o.
+    # Uso: auto-escopar o bundle de um vertical/papel — o que ele puxa (agentes, comandos,
+    # capabilities e docs DECLARADOS via kb:/context nos capability contracts). É a base do
+    # role-scoping DERIVADO do grafo (em vez de lista manual). Ponte de prefixo: um objeto
+    # 'agent:X'/'command:X' também alcança o nó basename 'X' (que carrega related_*), unindo
+    # a camada de capability à de atores sem tocar o graph.md.
+    echo "# Fecho transitivo direto de '${seed}' — tudo que ele alcança (auto-escopo de bundle):"
+    edges="$(triples_sorted | awk -F'\t' '{print $1"\t"$3}')"
+    printf '%s\n' "${edges}" | awk -F'\t' -v start="${seed}" '
+      { adj[$1]=adj[$1]" "$2 }
+      END{
+        head=1; tail=1; queue[tail++]=start; seen[start]=1
+        while(head<tail){ cur=queue[head++]
+          if (index(cur,":")>0){ bare=cur; sub(/^[a-z-]+:/,"",bare); if(bare!="" && !(bare in seen)){seen[bare]=1; queue[tail++]=bare} }
+          n=split(adj[cur],nb," "); for(i=1;i<=n;i++){ if(nb[i]!="" && !(nb[i] in seen)){seen[nb[i]]=1; queue[tail++]=nb[i]} } }
+        for(k in seen) if(k!=start) print k
+      }' | LC_ALL=C sort | sed 's/^/  /'
     ;;
 
   --markdown|*)

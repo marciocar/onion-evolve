@@ -776,6 +776,18 @@ run_graph_selftests() {
   if bash "${gen}" --impact design-system-specialist 2>/dev/null | grep -q "onion-design"; then
     record_pass "graph: --impact retorna dependentes reais"
   else record_fail "graph: --impact" "impacto reverso não achou dependente conhecido"; fi
+
+  # --closure: fecho transitivo direto (auto-escopo de bundle) alcança require direto E,
+  # via ponte de prefixo (agent:X → X), o nó basename que carrega related_*.
+  local clo; clo="$(bash "${gen}" --closure onion-engineering 2>/dev/null)"
+  if printf '%s\n' "${clo}" | grep -qE '^  agent:gitflow-specialist$' \
+     && printf '%s\n' "${clo}" | grep -qE '^  gitflow-specialist$'; then
+    record_pass "graph: --closure alcança require direto + ponte de prefixo (agent:X→X)"
+  else record_fail "graph: --closure" "fecho transitivo não achou require/basename conhecido"; fi
+  # --closure sem semente → uso + exit 2 (|| captura: sob set -e, exit 2 abortaria o harness)
+  local crc=0; bash "${gen}" --closure >/dev/null 2>&1 || crc=$?
+  if [ "${crc}" = 2 ]; then record_pass "graph: --closure sem semente → exit 2"
+  else record_fail "graph: --closure uso" "esperava exit 2 sem semente (obtido ${crc})"; fi
 }
 
 # ---------------------------------------------------------------------------
