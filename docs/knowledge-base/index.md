@@ -1,6 +1,6 @@
 # 📚 Índice - Knowledge Bases
 
-> **Última atualização**: 2026-06-30 | **Gerado por**: `/docs:build-index`
+> **Última atualização**: 2026-07-08 | **Gerado por**: `/docs:build-index` (contagens escaneadas do filesystem)
 
 Índice das **Knowledge Bases** do Sistema Onion — conhecimento estruturado para consumo por IA e referência técnica.
 
@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **46 arquivos** de knowledge base (exceto `index.md`)
-- **20** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **1** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/`
+- **49 arquivos** de knowledge base (exceto `index.md`)
+- **22** em `concepts/` · **9** em `agentic-patterns/` · **8** em `frameworks/` · **4** em `tools/` · **2** em `platforms/` · **2** em `meta/` · **1** em `patterns/` · **1** em `architectures/`
 
 ---
 
@@ -17,22 +17,22 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 20 — Conceitos fundamentais
+├── concepts/            # 22 — Conceitos fundamentais
+├── agentic-patterns/    # 9  — Como IA + harness colaboram (KB viva do campo)
+│   ├── harness/         #     Internals de harnesses específicos
+│   ├── ai-strategies/   #     Padrões de guiar o transformer
+│   └── field-observations/ # Observações brutas do campo
 ├── frameworks/          # 8  — Frameworks e metodologias
 ├── tools/               # 4  — Ferramentas e recursos
 ├── platforms/           # 2  — Plataformas e tecnologias
-├── patterns/            # 1  — Padrões de implementação (SDAAL examples)
-├── architectures/       # 1  — C4 + ADR patterns
 ├── meta/                # 2  — Padrões de criação de comandos + identidade/produto
-└── agentic-patterns/    # 8  — Como IA + harness colaboram (KB viva do campo)
-    ├── harness/         #     Internals de harnesses específicos
-    ├── ai-strategies/   #     Padrões de guiar o transformer
-    └── field-observations/ # Observações brutas do campo
+├── patterns/            # 1  — Padrões de implementação (SDAAL examples)
+└── architectures/       # 1  — C4 + ADR patterns
 ```
 
 ---
 
-## 🧠 Conceitos Fundamentais (20)
+## 🧠 Conceitos Fundamentais (22)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Orchestration](concepts/agent-orchestration.md) — orquestração de subagentes: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
@@ -47,7 +47,9 @@ docs/knowledge-base/
 - [Meeting Transcription to Knowledge Base](concepts/meeting-transcription-to-knowledge-base.md) — framework EXTRACT
 - [Multi-repo Federation](concepts/multi-repo-federation.md) — contratos spec-as-code + ledger git (topologia peer)
 - [Onion Dogfooding Doctrine](concepts/onion-dogfooding-doctrine.md) — padrão master de evolução: rodar de verdade → aprender → resolver (fix → re-dogfood)
+- [Onion Engine Economy](concepts/onion-engine-economy.md) — economia de motores: qual motor (modelo/effort/orquestração) para qual tarefa
 - [Onion Modernization Doctrine](concepts/onion-modernization-doctrine.md) — regra de inventário/SSOT e doutrina de modernização
+- [Onion Relation Vocabulary](concepts/onion-relation-vocabulary.md) — TBox da ontologia leve: vocabulário canônico de relações entre recursos
 - [Onion Working Method](concepts/onion-working-method.md) — porta de entrada do método: Seleção (catálogo) + Execução (PFR + coordenação por modo) + Validação (dogfood + adversarial) + Disciplina; mapa de fontes meta-spec/KB/ADR/RFC
 - [Spec-as-Code Strategy](concepts/spec-as-code-strategy.md) — hierarquia de especificações (L0-L3)
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA
@@ -100,7 +102,7 @@ docs/knowledge-base/
 
 ---
 
-## 🤖 Agentic Patterns (8)
+## 🤖 Agentic Patterns (9)
 
 > KB viva sobre como IA + harness colaboram na prática. Três trilhos: internals de harnesses,
 > estratégias de guiar o transformer, e observações brutas do campo. Escopo aberto — começa em
@@ -115,6 +117,7 @@ docs/knowledge-base/
 
 **field-observations/**
 - [2026-06-30 — Harness Paths](agentic-patterns/field-observations/2026-06-30-harness-paths.md) — observação que originou este KB (promovida)
+- [2026-07-01 — Verificação superficial travestida de profunda](agentic-patterns/field-observations/2026-07-01-shallow-verification-masquerading-as-deep.md) — modo de falha: revisor que declara verificação profunda sem exercer o artefato
 
 ---
 
@@ -139,4 +142,4 @@ docs/knowledge-base/
 
 ---
 
-**Mantido por**: Sistema Onion · **Última atualização**: 2026-06-30
+**Mantido por**: Sistema Onion · **Última atualização**: 2026-07-08
