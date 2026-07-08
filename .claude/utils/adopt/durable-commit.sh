@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# =============================================================================
+# durable-commit.sh — materializa a instalação Onion como OBJETO GIT (never-clobber).
+#
+# Usado pelo /meta:adopt: Fase 5 (adoção) e --update, APÓS aplicar + config + re-carimbar.
+# Fecha o incidente-fonte 2026-07-08 (inbox/_processed/2026-07-08-proposta-branch-onion-vendor.md):
+# o apply é `cp` na working tree; enquanto uncommitted, um DESCARTE de working-tree
+# (git restore / git checkout -- . / reset --hard / remoção de worktree) apaga tudo — inclusive
+# revertendo o .onion-version. (Verificado por dogfood: `git checkout` de branch SIMPLES carrega/
+# bloqueia tracked sujo; quem destrói é o descarte.) Este helper commita a superfície Onion numa
+# branch dedicada → a instalação vira objeto git durável, imune a qualquer descarte.
+#
+# Uso     : durable-commit.sh <DEST> <OP> <PIN> [BR]
+#   DEST  = repo alvo · OP = adopt|update · PIN = source_commit curto
+#   BR    = branch do commit (default: chore/onion-<OP>-<PIN>; a adoção passa onion/adopt,
+#           branch que a Fase 2 já cria; o --update dedica chore/onion-update-<pin>)
+#
+# Never-clobber: staja SÓ a superfície Onion — código de produto uncommitted do maestro fica de fora.
+# commit --no-verify (worktree legacy sem node_modules: husky/lint-staged daria ENOENT e REVERTERIA).
+# Gracioso: DEST não-git → aviso + exit 0. Nada a commitar → exit 0 (idempotente).
+# Determinístico, sem jq. Exercitado por lint-selftest.sh (run_durable_commit_selftests).
+# =============================================================================
+set -uo pipefail
+
+DEST="${1:?uso: durable-commit.sh <DEST> <OP> <PIN> [BR]}"
+OP="${2:?OP (adopt|update) obrigatório}"
+PIN="${3:?PIN (source_commit curto) obrigatório}"
+BR="${4:-chore/onion-${OP}-${PIN}}"
+
+git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1 \
+  || { echo "⚠️  ${DEST} não é repo git — commit durável pulado." >&2; exit 0; }
+
+# Branch do commit: entra se já existe, cria a partir do HEAD atual senão. A working tree segue INTACTA
+# (só ganha ponteiro de branch + o commit) — NÃO é vendor-branch "que se usa direto".
+git -C "${DEST}" rev-parse --verify "${BR}" >/dev/null 2>&1 \
+  && git -C "${DEST}" checkout "${BR}" >/dev/null 2>&1 \
+  || git -C "${DEST}" checkout -b "${BR}" >/dev/null 2>&1
+
+# Stage SÓ a superfície Onion (never-clobber do staging do maestro — produto fica de fora).
+ONION_PATHS=(.claude docs/meta-specs docs/knowledge-base docs/sdaal docs/evolution \
+             .prettierignore .githooks .env.example.onion)
+add=(); for p in "${ONION_PATHS[@]}"; do [ -e "${DEST}/${p}" ] && add+=("${p}"); done
+[ "${#add[@]}" -gt 0 ] && git -C "${DEST}" add -- "${add[@]}" 2>/dev/null
+
+# Guard nada-a-commitar (re-run idempotente).
+if git -C "${DEST}" diff --cached --quiet 2>/dev/null; then
+  echo "Onion: nada novo a commitar (instalação já durável em ${BR})."
+  exit 0
+fi
+
+git -C "${DEST}" commit --no-verify -m "chore(onion): ${OP} to pin ${PIN}" >/dev/null 2>&1 \
+  && { echo "Onion: instalação commitada em ${BR} (durável — imune a descarte de working-tree)."; exit 0; } \
+  || { echo "⚠️  commit durável falhou em ${DEST} (${BR})." >&2; exit 1; }

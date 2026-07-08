@@ -374,6 +374,79 @@ run_resolve_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo durable-commit — exercita .claude/utils/adopt/durable-commit.sh (fix do
+# incidente 2026-07-08: instalação uncommitted apagada por descarte de working-tree).
+# Self-contained (repos git em mktemp). Cobre o MODO DE FALHA (o incidente) e a cura:
+#   (a) controle      : SEM commit, um descarte (git checkout -- .) reverte o pin (o incidente)
+#   (b) durabilidade  : superfície Onion (L1+L2) vira objeto git na branch dedicada
+#   (c) never-clobber : produto uncommitted do maestro NÃO é varrido pro commit
+#   (d) sobrevivência : checkout ida-e-volta não perde mais o pin
+#   (e) idempotência  : re-run sem mudanças → exit 0, nada duplicado
+#   (f) gracioso      : DEST não-git → exit 0 com aviso
+# ---------------------------------------------------------------------------
+run_durable_commit_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh"
+  if [ ! -f "${helper}" ]; then record_fail "durable-commit" "helper ausente: ${helper}"; return; fi
+  local d
+  # Identidade via env (maior precedência) p/ commitar em CI sem git user.* configurado.
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+
+  # setup: adotado (tracked, pin OLD) numa feature branch, com --update aplicado uncommitted + produto
+  _dc_setup() {
+    d="$(mktemp -d)"; git -C "${d}" init -q
+    mkdir -p "${d}/.claude/commands"
+    printf 'source_commit: OLD111\nrole: adopted\n' > "${d}/.claude/.onion-version"
+    printf '# existing\n' > "${d}/.claude/commands/existing.md"
+    git -C "${d}" add -A; git -C "${d}" commit -qm base
+    git -C "${d}" checkout -q -b feature/x
+    printf 'source_commit: NEW999\nrole: adopted\n' > "${d}/.claude/.onion-version"
+    printf '# novo\n' > "${d}/.claude/commands/newcmd.md"
+    mkdir -p "${d}/docs/meta-specs"; printf '# spec\n' > "${d}/docs/meta-specs/spec.md"
+    mkdir -p "${d}/src"; printf 'produto\n' > "${d}/src/app.js"
+  }
+
+  # (a) controle — SEM commit: descarte reverte o pin (o incidente)
+  _dc_setup; git -C "${d}" checkout -- . 2>/dev/null
+  if [ "$(awk '/source_commit:/{print $2}' "${d}/.claude/.onion-version")" = "OLD111" ]; then
+    record_pass "durable-commit: incidente reproduzido (descarte reverte pin, sem commit)"
+  else record_fail "durable-commit: incidente" "descarte não reverteu o pin"; fi
+  rm -rf "${d}"
+
+  # (b) cura + (c) never-clobber + (d) sobrevivência + (e) idempotência
+  _dc_setup
+  bash "${helper}" "${d}" update NEW999 chore/onion-update-NEW999 >/dev/null 2>&1
+  if [ "$(git -C "${d}" rev-parse --abbrev-ref HEAD)" = "chore/onion-update-NEW999" ] \
+     && git -C "${d}" ls-files --error-unmatch .claude/commands/newcmd.md >/dev/null 2>&1 \
+     && git -C "${d}" ls-files --error-unmatch docs/meta-specs/spec.md >/dev/null 2>&1; then
+    record_pass "durable-commit: instalação (L1+L2) commitada na branch dedicada"
+  else record_fail "durable-commit: cura" "Onion não durável na branch dedicada"; fi
+
+  if git -C "${d}" ls-files --error-unmatch src/app.js >/dev/null 2>&1; then
+    record_fail "durable-commit: never-clobber" "produto src/app.js varrido pro commit (clobber)"
+  else record_pass "durable-commit: produto preservado fora do commit (never-clobber)"; fi
+
+  git -C "${d}" checkout -q - 2>/dev/null; git -C "${d}" checkout -q - 2>/dev/null
+  if [ "$(awk '/source_commit:/{print $2}' "${d}/.claude/.onion-version")" = "NEW999" ]; then
+    record_pass "durable-commit: pin sobrevive a checkout ida-e-volta (durável)"
+  else record_fail "durable-commit: sobrevivência" "pin perdido após checkout"; fi
+
+  if bash "${helper}" "${d}" update NEW999 chore/onion-update-NEW999 >/dev/null 2>&1; then
+    record_pass "durable-commit: re-run idempotente (nada a commitar → exit 0)"
+  else record_fail "durable-commit: idempotência" "re-run retornou não-zero"; fi
+  rm -rf "${d}"
+
+  # (f) gracioso — DEST não-git → exit 0
+  d="$(mktemp -d)"
+  if bash "${helper}" "${d}" adopt X >/dev/null 2>&1; then
+    record_pass "durable-commit: DEST não-git → exit 0 (gracioso)"
+  else record_fail "durable-commit: gracioso" "esperava exit 0 em não-git"; fi
+  rm -rf "${d}"
+
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+}
+
+# ---------------------------------------------------------------------------
 # Modo prettierignore — exercita .claude/utils/adopt/merge-prettierignore.sh.
 # Self-contained (estilo run_resolve_selftests): cenários em mktemp -d, sem
 # fixture-file/manifest. Cobre os MODOS DE FALHA (não só o happy-path): criação
@@ -1412,6 +1485,9 @@ fi
 
 # Modo resolve — não vem do manifest (cenários self-contained, sem fixture-file).
 run_resolve_selftests
+
+# Modo durable-commit — commit durável da instalação (fix do incidente uncommitted-descartável).
+run_durable_commit_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests

@@ -182,6 +182,40 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/install-onion-githook.sh" "$DEST"
 
 ---
 
+## 🔒 Procedimento de Commit Durável (never-clobber)
+
+Usado pela **Fase 5** (adoção) e pelo **`--update`**, **após** aplicar arquivos + config + re-carimbar o
+`.onion-version`. **Fecha o incidente-fonte 2026-07-08** (`inbox/_processed/2026-07-08-proposta-branch-onion-vendor.md`):
+o apply é `cp` na working tree; enquanto não for **objeto git**, um **descarte de working-tree**
+(`git checkout -- .`, `git restore .`, `reset --hard`, remoção de worktree) apaga tudo — inclusive
+revertendo o `.onion-version` (verificado por dogfood 2026-07-08: `git checkout` de branch **simples**
+carrega/bloqueia tracked sujo; quem destrói é o descarte). Este passo torna a instalação **durável**
+commitando numa **branch dedicada**
+(não deixa o "commite você" como próximo-passo manual, que foi exatamente o que se perdeu).
+
+Delega ao helper **testável e idempotente** `.claude/utils/adopt/durable-commit.sh` (coberto por
+`lint-selftest.sh` — `run_durable_commit_selftests`), no mesmo espírito do `merge-onion-hooks.sh`:
+
+```bash
+SOURCE_ROOT="$(git rev-parse --show-toplevel)"
+DEST="<INSTALL_DIR (adoção) | TARGET (--update)>"
+OP="<adopt | update>"; PIN="<source_commit aplicado (curto)>"
+# BR: a ADOÇÃO passa `onion/adopt` (branch que a Fase 2 já criou — sem branch redundante); o --update
+# dedica `chore/onion-update-<pin>` (framework não polui a branch de produto onde o maestro estava —
+# o cenário do incidente). Omitir → default `chore/onion-<OP>-<PIN>`.
+bash "$SOURCE_ROOT/.claude/utils/adopt/durable-commit.sh" "$DEST" "$OP" "$PIN" "<BR>"
+```
+
+O helper: entra/cria a branch (working tree intacta — NÃO é vendor-branch "que se usa direto"); staja
+**só a superfície Onion** (never-clobber do staging do maestro — produto fica de fora); `commit --no-verify`
+(worktree legacy sem node_modules); guarda nada-a-commitar (idempotente); `--in-place` nunca chega aqui.
+
+> **Never-clobber intacto:** o commit só **materializa** o que já foi aplicado+revisado (não faz merge, não
+> toca código de produto). O merge 3-way de vendor-branch (conflito-awareness) é a evolução seguinte
+> (RFC/`/meta:evolve` #2), não este passo.
+
+---
+
 ## 📨 Procedimento de Relatório Downstream (auto-emitido no alvo)
 
 Usado pela **Fase 6** (adoção) e pelo **`--update`**. O relatório do que foi feito **não** pode ficar só
@@ -200,6 +234,7 @@ DEST="<INSTALL_DIR (adoção) | TARGET (--update)>"
 OP="<adopt | update>"            # operação que gerou o relatório
 PIN="<source_commit aplicado>"   # commit curto da fonte (o pin NOVO)
 PREV="<pin anterior | vazio na 1ª adoção>"
+BR="<branch do commit durável: onion/adopt (adoção) | chore/onion-update-${PIN} (update)>"
 
 INBOUND="$DEST/docs/evolution/inbound"
 mkdir -p "$INBOUND/_processed"
@@ -226,12 +261,10 @@ flow: downstream (core→consumidor / distribuição)
 <resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>
 
 ## Próximos passos (NO ALVO)
-1. Revisar o diff aplicado nesta sessão.
-2. Commitar a atualização (gitflow do próprio repo). Em worktree legacy sem node_modules e com
-   pre-commit hook (husky/lint-staged), use \`git commit --no-verify\` (ENOENT = binário ausente,
-   não violação; artefatos Onion já protegidos por .prettierignore) ou rode \`pnpm install\` antes.
-3. Push / abrir PR na branch de integração.
-4. (Opcional) Devolver sinal de campo ao core via inbox/ (upstream).
+1. Revisar o commit da instalação (já feito automaticamente na branch \`${BR}\` pelo 🔒 Procedimento de
+   Commit Durável — a instalação já é objeto git, não se perde num descarte de working-tree).
+2. Push / abrir PR dessa branch para a branch de integração (gitflow do próprio repo).
+3. (Opcional) Devolver sinal de campo ao core via inbox/ (upstream).
 EOF
 ```
 
@@ -361,7 +394,9 @@ EOF
 [ -n "${INTEGRATION_BRANCH:-}" ] && printf 'integration_branch: %s\n' "${INTEGRATION_BRANCH}" >> "$INSTALL_DIR/.claude/.onion-version"
 ```
 
-- Se o alvo versiona `.claude/`, **committar** `.onion-version`. `NEXT: Fase 6`.
+- **Commit durável (obrigatório):** aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
+  (`DEST="$INSTALL_DIR"`, `OP=adopt`, `PIN=$SRC_COMMIT`, `BR=onion/adopt` — a branch que a Fase 2 já criou)
+  — materializa a instalação como objeto git para não ficar uncommitted/descartável. `NEXT: Fase 6`.
 
 ### Fase 6 — Relatório + próximos passos
 
@@ -458,6 +493,11 @@ manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p
   # escolha explícita —, PRESERVAR a ausência: não congelar um valor; a resolução detecta a cada PR. O
   # passo (3) do Procedimento ainda seta o git config local de conveniência a partir do valor resolvido.)
   ```
+- **Commit durável (obrigatório):** aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
+  (`DEST="$TARGET"`, `OP=update`, `PIN=$NOW`, `BR=chore/onion-update-$NOW`) **antes** do relatório — dedica
+  branch p/ o framework não poluir a branch de produto onde o maestro estava. Sem isto, os arquivos
+  aplicados ficam uncommitted e um descarte de working-tree (`git restore`/`reset --hard`/remoção de
+  worktree) os apaga (incidente-fonte 2026-07-08).
 - **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$TARGET"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`). Reusa o `diff --stat` já computado
   acima. **Fecha o gap real:** sem isto, o relatório do update sai só no chat da fonte e o maestro tem que
