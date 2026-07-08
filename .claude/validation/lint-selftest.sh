@@ -632,6 +632,45 @@ run_plugins_sync_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo role-bundle — exercita o mapa role→bundle (REGRA 22 check_role_bundle_sync) + o resolver:
+# (a) resolver acerta papeis conhecidos (source não-vazio, distilled vazio) e rejeita inválido;
+# (b) todo vertical em roles.yaml tem manifesto + está no marketplace.json (consistência).
+# ---------------------------------------------------------------------------
+run_role_bundle_selftests() {
+  local roles="${REPO_ROOT}/.claude/utils/marketplace/roles.yaml"
+  local resolver="${REPO_ROOT}/.claude/utils/marketplace/resolve-role-bundle.sh"
+  local vdir="${REPO_ROOT}/.claude/utils/marketplace/verticals"
+  local mkt="${REPO_ROOT}/.claude-plugin/marketplace.json"
+  if [ ! -f "${roles}" ] || [ ! -f "${resolver}" ]; then record_pass "role-bundle: roles.yaml/resolver ausentes → pulado (repo sem a feature)"; return; fi
+  if ! python3 -c "import yaml" >/dev/null 2>&1; then record_pass "role-bundle: pyyaml ausente → pulado (gracioso)"; return; fi
+
+  if [ -n "$(bash "${resolver}" source 2>/dev/null)" ]; then record_pass "role-bundle: resolver source → não-vazio"
+  else record_fail "role-bundle: resolver source" "esperava verticais para source"; fi
+  if [ -z "$(bash "${resolver}" distilled 2>/dev/null)" ]; then record_pass "role-bundle: resolver distilled → vazio"
+  else record_fail "role-bundle: resolver distilled" "distilled devia ser vazio"; fi
+  if bash "${resolver}" xpto >/dev/null 2>&1; then record_fail "role-bundle: resolver inválido" "papel inválido devia falhar (exit 2)"
+  else record_pass "role-bundle: resolver rejeita papel inválido"; fi
+
+  local refs v ok=1 bad=""
+  refs="$(python3 - "${roles}" <<'PY'
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1])) or {}
+s=set()
+for role,spec in (d.get("roles") or {}).items():
+    for k in ("base","optional"):
+        for x in ((spec or {}).get(k) or []): s.add(x)
+print("\n".join(sorted(s)))
+PY
+)"
+  for v in ${refs}; do
+    [ -n "${v}" ] || continue
+    { [ -f "${vdir}/${v}.manifest.sh" ] && grep -q "\"${v}\"" "${mkt}" 2>/dev/null; } || { ok=0; bad="${v}"; break; }
+  done
+  if [ "${ok}" = 1 ]; then record_pass "role-bundle: verticais referenciados existem + registrados"
+  else record_fail "role-bundle: consistência" "vertical '${bad}' sem manifesto ou fora do marketplace"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo capability — exercita o Capability Contract (REGRA 20 check_capability_conformance):
 # (a) contratos reais são HONESTOS (tier reivindicado == cumprido) — catch de over-claim;
 # (b) primitiva de resolução de REQUIRES (type:value) acerta presente e ausente.
@@ -1362,6 +1401,9 @@ run_plugins_sync_selftests || true
 
 # Modo capability — Capability Contract (REGRA 20): contrato honesto + resolução de requires.
 run_capability_selftests
+
+# Modo role-bundle — mapa role→bundle (REGRA 22): resolver + consistência dos verticais.
+run_role_bundle_selftests
 
 # Modo graph — lente sócio-técnica (REGRA 21): graph.md em-sync + determinismo + atores + impacto.
 run_graph_selftests
