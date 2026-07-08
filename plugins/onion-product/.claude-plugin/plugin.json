@@ -1,0 +1,10 @@
+{
+  "name": "onion-product",
+  "version": "0.1.0",
+  "description": "Vertical de produto do Onion: descoberta a backlog (collect→refine→spec→feature), decomposicao de tasks agnostica, estimativas (story points), extracao de reunioes e apresentacoes. Camada 1; o task-manager do consumidor via SDAAL.",
+  "author": { "name": "Onion - Marcio Carvalho" },
+  "homepage": "https://github.com/marciocar/onion-evolve",
+  "repository": "https://github.com/marciocar/onion-evolve",
+  "license": "MIT",
+  "keywords": ["product","backlog","task-management","story-points","discovery","onion"]
+}

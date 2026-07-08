@@ -96,3 +96,25 @@ Avaliar num próximo `/meta:evolve` ou revisão do `/meta:adopt`: migrar a entre
 copy-over-working-tree para **merge de uma branch vendor** (ou, no mínimo, **committar automaticamente**
 a instalação num branch dedicado ao fim do `--update`), fechando o gap "uncommitted = descartável". A
 Camada 1 já resolvida via plugin/marketplace — não reabrir. Relacionado à família "declarado ≠ verificado".
+
+## Síntese estratégica 2026 — federação = marketplace de organização (pesquisa 2026-07-08)
+
+Pesquisa web confirmou o padrão-comunidade/Anthropic vigente para **federação** e como ele mapeia no Onion
+(3 dimensões, das quais a 1 já está feita e as 2+3 são o roadmap):
+
+- **Dim 1 — durabilidade:** o `auto-update` nativo de plugin mata a fragilidade copy-over (é a origem
+  deste sinal). Já resolvido para a Camada 1.
+- **Dim 2 — escopo por papel = ACESSO POR GRUPO do marketplace de organização** (Team/Enterprise): o
+  admin auto-instala plugin X pro grupo (papel), disponibiliza pra outro, esconde do resto. É a resposta
+  NATIVA ao "quantidade de ferramentas/docs por papel" — não precisa hand-roll. Falta o mapa role→bundle
+  + um modo `--closure` no `/meta:graph` pra auto-escopar o bundle (incl. o fecho de docs L2).
+  **1ª prova de campo (2026-07-08):** verticais engineering-side empacotados — `onion-engineering`,
+  `onion-product`, `onion-testing`, `onion-docs` (silver) somam-se a `onion-design`/`onion-compliance`.
+- **Dim 3 — interop L3 ao vivo resiliente = A2A** (Agent2Agent): streaming quando conectado + webhook
+  push quando offline (recebe/retoma) + checkpoint durável + aceitação gated tipada. O trust model do
+  `members.yaml` (`can_receive_from`/`can_advise_to`/`can_correct_to`) **já É** a política de aceitação;
+  falta só o transporte ao vivo. É mudança de doutrina (o moat é git-async deliberado) — a aceitação
+  gated por tipo/camada é a ponte que preserva o controle. **Candidato a RFC** (evolução do rfc-0001).
+
+**Invariante reafirmada:** `/meta:adopt` fica — canal L2+3 + fallback L1 (regulados como granaai,
+air-gapped, sem-Enterprise). Coexistência por camada, não substituição (ADR exchange-unit, não-decisão).

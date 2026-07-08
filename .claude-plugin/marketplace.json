@@ -23,6 +23,34 @@
       "description": "Vertical de compliance do Onion: documentacao de conformidade como spec-as-code (ISO 27001/22301, SOC2, PMBOK) via agentes especialistas + build-compliance-docs. Auto-adapta ao compliance-context do consumidor (SDAAL).",
       "version": "0.1.0",
       "author": { "name": "Onion - Marcio Carvalho" }
+    },
+    {
+      "name": "onion-engineering",
+      "source": "./plugins/onion-engineering",
+      "description": "Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessoes persistentes) + especialistas de codigo (Node/React/Postgres/NX/Docker) e gates pre-PR. Camada 1; task-manager e forge do consumidor via SDAAL.",
+      "version": "0.1.0",
+      "author": { "name": "Onion - Marcio Carvalho" }
+    },
+    {
+      "name": "onion-product",
+      "source": "./plugins/onion-product",
+      "description": "Vertical de produto do Onion: descoberta a backlog (collect→refine→spec→feature), decomposicao de tasks agnostica, estimativas (story points), extracao de reunioes e apresentacoes. Camada 1; o task-manager do consumidor via SDAAL.",
+      "version": "0.1.0",
+      "author": { "name": "Onion - Marcio Carvalho" }
+    },
+    {
+      "name": "onion-testing",
+      "source": "./plugins/onion-testing",
+      "description": "Vertical de testes/QA do Onion: geracao e execucao de testes (unit/integration/e2e) com deteccao de framework + validacao de workflow. Perspectivas White/Grey/Black-box e QA story points. Camada 1.",
+      "version": "0.1.0",
+      "author": { "name": "Onion - Marcio Carvalho" }
+    },
+    {
+      "name": "onion-docs",
+      "source": "./plugins/onion-docs",
+      "description": "Vertical de documentacao do Onion: contexto de negocio/tecnico como spec-as-code, C4 (Context/Container/Component) + Mermaid, health/validacao de docs e engenharia reversa. Camada 1; business/technical-context = camada 2 do consumidor.",
+      "version": "0.1.0",
+      "author": { "name": "Onion - Marcio Carvalho" }
     }
   ]
 }
