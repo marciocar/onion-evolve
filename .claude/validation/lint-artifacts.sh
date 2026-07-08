@@ -482,6 +482,38 @@ check_capability_conformance() {
 }
 
 # ===========================================================================
+# REGRA 22 — Mapa role→bundle (roles.yaml) consistente com os verticais [HARD]
+#           Todo vertical nomeado em roles.yaml (base/optional de qualquer papel)
+#           deve ter manifesto em verticals/ E estar registrado no marketplace.json.
+#           Impede roles.yaml apontar p/ vertical inexistente. Pula gracioso sem python3/yaml.
+# ===========================================================================
+check_role_bundle_sync() {
+  local roles="${SCRIPT_DIR}/../utils/marketplace/roles.yaml"
+  local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
+  local mkt="${REPO_ROOT}/.claude-plugin/marketplace.json"
+  [ -f "${roles}" ] || return 0
+  command -v python3 >/dev/null 2>&1 || return 0
+  python3 -c "import yaml" >/dev/null 2>&1 || return 0
+  local refs v
+  refs="$(python3 - "${roles}" <<'PY'
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1])) or {}
+s = set()
+for role, spec in (d.get("roles") or {}).items():
+    for key in ("base", "optional"):
+        for x in ((spec or {}).get(key) or []):
+            s.add(x)
+print("\n".join(sorted(s)))
+PY
+)"
+  for v in ${refs}; do
+    [ -n "${v}" ] || continue
+    [ -f "${vdir}/${v}.manifest.sh" ] || violation "HARD" "utils/marketplace/roles.yaml" "papel referencia vertical '${v}' sem manifesto em verticals/${v}.manifest.sh"
+    grep -q "\"${v}\"" "${mkt}" 2>/dev/null || violation "HARD" "utils/marketplace/roles.yaml" "vertical '${v}' referenciado em roles.yaml não registrado no marketplace.json"
+  done
+}
+
+# ===========================================================================
 # REGRA 21 — Grafo (docs/onion/graph.md) sincronizado com a spec-as-code [HARD]
 #           graph.md é GERADO por graph.sh (actors.yaml + capability + frontmatter).
 #           Regenera p/ temp e compara: drift = editou à mão OU mudou a fonte sem
@@ -1143,6 +1175,7 @@ check_inventory_sync
 check_claude_md_counts
 check_plugins_sync
 check_capability_conformance
+check_role_bundle_sync
 check_graph_sync
 check_no_direct_provider_calls
 check_abstraction_methods_exist
