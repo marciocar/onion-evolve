@@ -4,14 +4,15 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 11 entradas · **Stale:** 0 · **Compartilháveis:** 11
+**Total:** 12 entradas · **Stale:** 0 · **Compartilháveis:** 11
 
-Gerado em: 2026-07-05
+Gerado em: 2026-07-08
 
 ---
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-08 | observation | protected | docbridge-gitignore-check-candidate | 2026-10-06 | conditional |
 | 2026-07-05 | learning | public 📤 | vps-lineage-odyssey | 2026-10-05 | conditional |
 | 2026-07-03 | learning | public 📤 | workflow-resume-cache-recovery | 2026-10-01 | conditional |
 | 2026-07-03 | learning | public 📤 | sandbox-selftest-exposes-latent-bugs | 2026-10-01 | static |
