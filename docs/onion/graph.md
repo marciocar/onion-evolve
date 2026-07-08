@@ -122,6 +122,41 @@
 - onion-design **requires** util:design-sink
 - onion-design **requires** util:design-source
 - onion-design **requires** validation:lint-design-tokens.sh
+- onion-docs **provides** business-technical-context
+- onion-docs **provides** c4-model-mermaid
+- onion-docs **provides** docs-health-validacao
+- onion-docs **provides** engenharia-reversa
+- onion-docs **requires** agent:c4-architecture-specialist
+- onion-docs **requires** agent:c4-documentation-specialist
+- onion-docs **requires** agent:docs-reverse-engineer
+- onion-docs **requires** agent:mermaid-specialist
+- onion-engineering **provides** code-review-pre-pr
+- onion-engineering **provides** code-specialists-node-react-postgres-nx-docker
+- onion-engineering **provides** gitflow-faseado
+- onion-engineering **provides** pull-request-lifecycle
+- onion-engineering **requires** agent:branch-code-reviewer
+- onion-engineering **requires** agent:code-reviewer
+- onion-engineering **requires** agent:docker-specialist
+- onion-engineering **requires** agent:gitflow-specialist
+- onion-engineering **requires** agent:nodejs-specialist
+- onion-engineering **requires** agent:postgres-specialist
+- onion-engineering **requires** agent:react-developer
+- onion-product **provides** apresentacoes
+- onion-product **provides** decomposicao-de-tasks
+- onion-product **provides** descoberta-a-backlog
+- onion-product **provides** estimativa-story-points
+- onion-product **provides** extracao-de-reunioes
+- onion-product **requires** agent:extract-meeting-specialist
+- onion-product **requires** agent:pain-price-specialist
+- onion-product **requires** agent:product-agent
+- onion-product **requires** agent:story-points-framework-specialist
+- onion-product **requires** agent:task-specialist
+- onion-testing **provides** estrategia-de-teste
+- onion-testing **provides** geracao-testes-unit-integration-e2e
+- onion-testing **provides** qa-story-points
+- onion-testing **requires** agent:test-agent
+- onion-testing **requires** agent:test-engineer
+- onion-testing **requires** agent:test-planner
 
 ## Triplas (cruas — para consumo determinístico)
 
@@ -346,6 +381,41 @@ onion-design	requires	agent:design-system-specialist
 onion-design	requires	util:design-sink	
 onion-design	requires	util:design-source	
 onion-design	requires	validation:lint-design-tokens.sh	
+onion-docs	provides	business-technical-context	
+onion-docs	provides	c4-model-mermaid	
+onion-docs	provides	docs-health-validacao	
+onion-docs	provides	engenharia-reversa	
+onion-docs	requires	agent:c4-architecture-specialist	
+onion-docs	requires	agent:c4-documentation-specialist	
+onion-docs	requires	agent:docs-reverse-engineer	
+onion-docs	requires	agent:mermaid-specialist	
+onion-engineering	provides	code-review-pre-pr	
+onion-engineering	provides	code-specialists-node-react-postgres-nx-docker	
+onion-engineering	provides	gitflow-faseado	
+onion-engineering	provides	pull-request-lifecycle	
+onion-engineering	requires	agent:branch-code-reviewer	
+onion-engineering	requires	agent:code-reviewer	
+onion-engineering	requires	agent:docker-specialist	
+onion-engineering	requires	agent:gitflow-specialist	
+onion-engineering	requires	agent:nodejs-specialist	
+onion-engineering	requires	agent:postgres-specialist	
+onion-engineering	requires	agent:react-developer	
+onion-product	provides	apresentacoes	
+onion-product	provides	decomposicao-de-tasks	
+onion-product	provides	descoberta-a-backlog	
+onion-product	provides	estimativa-story-points	
+onion-product	provides	extracao-de-reunioes	
+onion-product	requires	agent:extract-meeting-specialist	
+onion-product	requires	agent:pain-price-specialist	
+onion-product	requires	agent:product-agent	
+onion-product	requires	agent:story-points-framework-specialist	
+onion-product	requires	agent:task-specialist	
+onion-testing	provides	estrategia-de-teste	
+onion-testing	provides	geracao-testes-unit-integration-e2e	
+onion-testing	provides	qa-story-points	
+onion-testing	requires	agent:test-agent	
+onion-testing	requires	agent:test-engineer	
+onion-testing	requires	agent:test-planner	
 pain-price-specialist	related	product-agent	
 pain-price-specialist	related	research-agent	
 pmbok-specialist	related	/docs/build-compliance-docs	
