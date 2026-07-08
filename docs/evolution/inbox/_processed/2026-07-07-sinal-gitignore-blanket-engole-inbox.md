@@ -60,3 +60,20 @@ exclusões pontuais do projeto, mantém `apps/docs` intacto. Mergeado em `develo
 Avaliar, num próximo `/meta:evolve` ou revisão do `/meta:adopt`, se vale adicionar essa checagem
 de "canal do doc-bridge não pode estar gitignored" ao script de validação pós-adoção. Sem
 gatilho numérico definido — fica como candidato até um 2º adotante reportar o mesmo padrão.
+
+## Triagem 2026-07-08 (core)
+
+**Veredito: BACKLOG — candidato de evolução, GATED (não implementar agora).**
+
+- **Estado no adotante:** já corrigido (granaai PR #1096, mergeado em develop 2026-07-07). Não há
+  bug ativo no core — o sinal é insumo/candidato, não defeito.
+- **Teste do 2º adotante (feito na triagem):** durante o `/meta:adopt --update` de
+  `rhilo-metagamify` (2026-07-08), verificado com `git check-ignore -v` que o canal do doc-bridge
+  (`docs/evolution/inbox/README.md`, `_processed/.gitkeep` de inbox e inbound) **NÃO está
+  gitignored** e o repo **não tem regra blanket `/docs/`**. O padrão **não recorreu**.
+- **Consequência:** o gatilho declarado ("candidato até um 2º adotante reportar o mesmo padrão")
+  **não foi atendido** → a checagem não deve ser construída ainda.
+- **Critério de reabertura:** um 2º adotante reproduzir uma regra `docs/` larga demais que engula
+  `docs/evolution/`. Aí promover a checagem no `/meta:adopt` (pós-adoção) ou no lint vendorizado.
+- **Disposição:** movido para `_processed/`; registrado como observação de diário para reaparecer
+  num futuro `/meta:evolve`. Sem CHANGELOG/anúncio (nada muda para adotantes).
