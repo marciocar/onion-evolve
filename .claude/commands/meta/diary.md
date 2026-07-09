@@ -73,7 +73,7 @@ INSTANCE_ID="$(awk '/^instance:/{print $2}' "$REPO/.claude/.onion-version" 2>/de
    - `conditional` — vale ENQUANTO uma condição vale. Re-teste: **checar só a condição** (o mais
      barato). Exige `valid_when`.
 7. **valid_when** *(obrigatório se `conditional`; opcional nas demais)* — a condição de
-   aplicabilidade em 1 linha testável (ex: `"o rhilo segue sem node_modules na worktree"`).
+   aplicabilidade em 1 linha testável (ex: `"o adotante segue sem node_modules na worktree"`).
 
 **Gerar arquivo:**
 

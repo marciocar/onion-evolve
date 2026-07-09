@@ -197,7 +197,7 @@ write "${OUTPUT_FILE}"
 
 ```bash
 # Extrair reunião específica (nível executivo default)
-/product/extract-meeting source=rhilo-reuniao-28-nov.txt
+/product/extract-meeting source=reuniao-28-nov.txt
 
 # Nível completo com YAML
 /product/extract-meeting source=reuniao.txt level=complete
