@@ -1,0 +1,115 @@
+---
+title: "ADR/Spec — /meta:adopt --update via merge de vendor-branch (never-clobber estrutural)"
+date: 2026-07-09
+type: adr
+status: accepted (design) — implementação pendente (→ /engineer:plan)
+decision-scope: adoption / update durability / never-clobber
+supersedes: none
+related:
+  - onion-adr-repo-adoption-2026-06.md
+  - onion-evolution-2026-07-08.md
+  - ../evolution/inbox/_processed/2026-07-08-proposta-branch-onion-vendor.md
+  - ../../.claude/utils/adopt/durable-commit.sh
+  - ../evolution/rfc/rfc-0001-co-evolution-comms.md
+---
+
+# ADR/Spec — `/meta:adopt --update` via merge de vendor-branch
+
+| Campo | Valor |
+|-------|-------|
+| **Achado** | #2 do `/meta:evolve` dirigido (`onion-evolution-2026-07-08.md`) |
+| **Decisão** | `--update` migra de **copy-over** (`cp -R` + revisão de `diff`) para **merge de uma branch `onion/vendor`** persistente |
+| **Superfície** | **L1+L2 completo** (o manifest atual: `.claude/*` + `docs/{meta-specs,knowledge-base,sdaal}`) — preserva o fallback L1 do adopt |
+| **Constrói sobre** | #301 (`durable-commit.sh`) — reusado como o passo de commit no vendor-branch |
+| **Status** | design aceito; implementação via `/engineer:plan` |
+
+## 1. Contexto e problema
+
+O #301 tornou a instalação **durável** (commit automático numa branch dedicada), fechando o incidente
+"uncommitted apagado por descarte". Mas o **apply continua sendo copy-over** (`cp -R "$TMP"/. "$DEST"/`
+após revisão de `diff -rq`): a customização local do adotante aparece como **diff a revisar** — que o
+maestro pode clobar por engano — e **não** como conflito git de verdade. Falta o **never-clobber
+estrutural**: um 3-way merge onde a divergência é um conflito real, resolvido com as ferramentas de git.
+
+## 2. Decisão
+
+`--update` passa a **mergear** uma branch **`onion/vendor`** (persistente, só-framework) na branch de
+integração do adotante. O `onion/vendor` é a **fonte-de-merge**, atualizada a cada `--update` com o novo
+manifest do core; o `git merge` traz o framework novo para a working tree da integração (onde o Claude
+Code o lê) e **materializa a divergência como conflito git**.
+
+### Invariante preservada (caveat do sinal)
+`onion/vendor` **não é branch-que-se-usa-direto**: o Claude Code lê `.claude/` da working tree do branch
+**atual**; trocar pra `onion/vendor` perderia o código de produto. Ela é **só a fonte de merge**; após o
+merge, o framework vive na integração. Modelo = *vendor-branch-como-fonte-de-merge*.
+
+### Por que NÃO git subtree
+O framework está **espalhado** em `.claude/` + `docs/` (sem prefixo único que o subtree exige) e o subtree
+**acoplaria** o adotante ao remote/história do core. A branch `onion/vendor` é git puro, offline-ok,
+dependency-free — e **reusa** a maquinaria que já existe.
+
+## 3. Mecanismo (fluxo)
+
+### 3.1 Bootstrap do `onion/vendor` (na adoção, ou 1x em adotantes legados)
+- Criar `onion/vendor` (branch órfã **ou** ramificada da integração — ver §5 Q1).
+- Extrair o manifest do core (`git archive HEAD -- "${manifest[@]}" | tar -x`) para a working tree do
+  `onion/vendor` e **commitar** (reusa `durable-commit.sh` com `BR=onion/vendor`, `OP=vendor-seed`).
+- `onion/vendor` passa a conter **só o framework** (sem produto).
+
+### 3.2 `--update`
+1. Atualizar `onion/vendor`: checkout (por-path/worktree) → extrair o manifest NOVO do core sobre ela →
+   `durable-commit.sh "$TARGET" update "$NOW" onion/vendor` (o commit só materializa o delta do framework).
+2. Voltar à branch de integração: `git -C "$TARGET" checkout <integration_branch>`.
+3. **Merge**: `git -C "$TARGET" merge onion/vendor` (sem `--no-ff` obrigatório; mensagem estampa o pin).
+   - **Sem conflito** → framework novo aplicado limpo.
+   - **Conflito** (adotante customizou um arquivo do framework) → **conflito git real**; o maestro resolve
+     com as ferramentas de git (é o never-clobber estrutural — a customização NÃO some silenciosamente).
+4. Re-carimbar `.onion-version` (como hoje) + relatório downstream (como hoje).
+
+### 3.3 Reuso
+- `durable-commit.sh` — o passo de commit no `onion/vendor` (já testado, 6 selftests).
+- A extração de manifest (`git archive | tar`) — idêntica à de hoje.
+- `resolve-integration-branch.sh` — para saber em que branch mergear.
+
+## 4. Never-clobber: copy-over → 3-way merge
+
+| Aspecto | Hoje (copy-over + #301) | Com vendor-branch merge |
+|---------|--------------------------|--------------------------|
+| Divergência local | diff a revisar (clobável por engano) | **conflito git** (explícito, resolvível) |
+| Durabilidade | commit durável (#301) | commit durável **+** história de merge |
+| Ferramenta de resolução | olho humano no `diff -rq` | `git mergetool`/marcadores de conflito |
+| 3-way (base comum) | não (é cp) | **sim** (base = último `onion/vendor` mergeado) |
+
+## 5. Questões abertas (resolver no /engineer:plan)
+
+1. **`onion/vendor` órfã vs ramificada:** órfã (só framework, história limpa) exige
+   `merge --allow-unrelated-histories` no 1º merge; ramificada da integração compartilha história mas
+   arrasta o produto no 1º commit da branch (a limpar). **Provável:** órfã + allow-unrelated no seed.
+2. **Por-path vs worktree** para mexer no `onion/vendor` sem sair da integração: worktree
+   (`git worktree add`) evita o vai-e-volta de checkout e é à-prova-de-working-tree-suja. Ecoa a Fase 2a legacy.
+3. **Adotantes legados** (sem `onion/vendor`): o 1º `--update` pós-migração faz o **bootstrap** (§3.1) antes
+   do 1º merge. Precisa de guard idempotente.
+4. **Relação com `onion/adopt` (#301):** `onion/adopt` (commit durável da adoção) e `onion/vendor`
+   (fonte-de-merge do update) convergem? Provável: `onion/vendor` **substitui** o papel de fonte, e a
+   adoção passa a semeá-la; o commit durável do `--update` cai no merge da integração, não numa
+   `chore/onion-update-<pin>` avulsa. **Revisar a interação com o fluxo de #301.**
+5. **Interação com #299** (KB embarcado no plugin): conforme mais KB migra pro plugin, a superfície L2 do
+   `onion/vendor` **encolhe**. O manifest do vendor deve derivar do que NÃO está no plugin? (provável: não
+   agora — manter L1+L2 completo pelo fallback; otimizar depois).
+6. **`.gitattributes merge=union`** para arquivos append-only (CHANGELOG, `_processed/`)? Reduz conflito espúrio.
+
+## 6. Verificação (plano)
+
+- **Selftests** (estender `lint-selftest.sh`, padrão `run_durable_commit_selftests`): seed do vendor →
+  update-sem-conflito (merge limpo) → update-COM-conflito (customização local vira conflito, não é clobada)
+  → idempotência → adotante-legado-bootstrap.
+- **Dogfood de campo**: um `--update` real num adotante (rhilo/goalflow) com um arquivo de framework
+  **customizado** localmente — confirmar que o merge **conflita** (não clobba) e resolve.
+- Gate mecânico: `lint-artifacts` + `lint-selftest` verdes.
+
+## 7. Invariantes
+
+- **`/meta:adopt` fica** (canal L2+3 + **fallback L1** — por isso vendor carrega L1+L2 completo).
+- **Never-clobber** vira estrutural (mais forte, não mais fraco).
+- L1-via-plugin **coexiste** (não reaberto) — o vendor é o caminho adopt, o plugin é o caminho marketplace.
+- **Próximo passo:** `/engineer:plan` a partir desta spec (resolve as 6 questões da §5).
