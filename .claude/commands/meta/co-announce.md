@@ -55,6 +55,15 @@ Ler o campo `alvo:` do cabeçalho da entrada e resolver contra `docs/evolution/f
 - `futuros adotantes` → **parar**: aplica-se a adoções futuras (chega via `/meta:adopt`), não a um adotante atual.
 - `adotantes` / `todos` → **todos** os `role: hub` ou `role: standalone` do `members.yaml` (T1/T3, adotam o core direto — RFC-0003 §2.1).
 - `<id>` (ex.: `rhilo-metagamify`) → esse membro (role `hub` ou `standalone`).
+- **Seletor fino (F1.2 — mata o ruído):** `<key>:<value>[,<key>:<value>]` (AND) sobre atributos do
+  `members.yaml` — `key ∈ {mode|tier|specialization}`. Ex.: `alvo: mode:regulated` (só regulados),
+  `alvo: specialization:nx-monorepo`, `alvo: mode:regulated,tier:standalone`. Assim um anúncio só chega a
+  **quem tem contexto p/ agir** — um fix de `presentation-orchestrator` não vira ruído p/ um adotante fintech.
+
+> **Resolução determinística:** delegue a `bash .claude/utils/co-evolution/resolve-target.sh "<alvo>"`
+> (reusa `graph.sh --triples` que ingere o `members.yaml` — F1.1). Retorna os IDs que casam (um por linha;
+> vazio = ninguém). `nenhum`/`futuros` → vazio; `todos`/`adotantes` e `<id>` → retrocompat; `key:value` → seletor.
+> Chave desconhecida → exit 3; id inexistente → aviso. Não reimplemente o parsing à mão.
 
 Para cada `id` resolvido, ler do `members.yaml`: `name`, `remote` (e `path` se montado localmente).
 Ignorar as linhas de **template comentado** (`#  - id: <slug-do-projeto>`). Se o `id` do `alvo:` não

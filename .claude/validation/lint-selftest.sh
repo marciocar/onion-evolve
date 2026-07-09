@@ -590,6 +590,38 @@ run_compose_settings_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo resolve-target — exercita .claude/utils/co-evolution/resolve-target.sh (F1.2: targeting fino
+# por seletor no alvo:, reusando graph.sh --triples). Asserções ESTRUTURAIS (não fixam nomes de membro
+# → robusto a mudança de roster). Pula o que depende de membros sem python+yaml.
+# ---------------------------------------------------------------------------
+run_resolve_target_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/co-evolution/resolve-target.sh"
+  if [ ! -f "${helper}" ]; then record_fail "resolve-target" "helper ausente: ${helper}"; return; fi
+  if [ -z "$(bash "${helper}" nenhum 2>/dev/null)" ]; then record_pass "resolve-target: nenhum → vazio"
+  else record_fail "resolve-target: nenhum" "esperava vazio"; fi
+  local rc=0; bash "${helper}" 'foo:bar' >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "resolve-target: chave desconhecida → exit 3"
+  else record_fail "resolve-target: chave" "esperava exit 3, veio ${rc}"; fi
+  if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
+    record_pass "resolve-target: seletor sobre membros pulado (sem python+yaml — gracioso)"; return; fi
+  local todos hub
+  todos="$(bash "${helper}" todos 2>/dev/null | LC_ALL=C sort)"
+  hub="$(bash "${helper}" 'tier:hub' 2>/dev/null | grep -v '^$' | LC_ALL=C sort)"
+  if [ -n "${todos}" ] && [ -z "$(comm -23 <(printf '%s\n' "${hub}") <(printf '%s\n' "${todos}"))" ]; then
+    record_pass "resolve-target: todos não-vazio + tier:hub ⊆ todos"
+  else record_fail "resolve-target: subconjunto" "tier:hub não é subconjunto de todos"; fi
+  local a b
+  a="$(bash "${helper}" 'tier:standalone' 2>/dev/null | grep -v '^$' | LC_ALL=C sort)"
+  b="$(bash "${helper}" 'tier:standalone,mode:regulated' 2>/dev/null | grep -v '^$' | LC_ALL=C sort)"
+  if [ -z "$(comm -23 <(printf '%s\n' "${b}") <(printf '%s\n' "${a}"))" ]; then
+    record_pass "resolve-target: AND é interseção (a,b ⊆ a)"
+  else record_fail "resolve-target: AND" "interseção não é subconjunto de a"; fi
+  if [ "$(bash "${helper}" todos 2>/dev/null | sha256sum)" = "$(bash "${helper}" todos 2>/dev/null | sha256sum)" ]; then
+    record_pass "resolve-target: determinístico"
+  else record_fail "resolve-target: determinismo" "varia entre execuções"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo prettierignore — exercita .claude/utils/adopt/merge-prettierignore.sh.
 # Self-contained (estilo run_resolve_selftests): cenários em mktemp -d, sem
 # fixture-file/manifest. Cobre os MODOS DE FALHA (não só o happy-path): criação
@@ -1659,6 +1691,9 @@ run_vendor_branch_selftests
 
 # Modo compose-settings — settings.json N-camadas de escopo (RFC-0005 plano 2).
 run_compose_settings_selftests
+
+# Modo resolve-target — targeting fino por seletor no alvo: (F1.2 federação — mata o ruído).
+run_resolve_target_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
