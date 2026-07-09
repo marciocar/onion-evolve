@@ -703,6 +703,34 @@ run_detect_transport_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo resolve-scope-layers — exercita .claude/utils/scope/resolve-scope-layers.sh (RFC-0005: fecha o
+# loop do compose-settings — descobre a cadeia empresa→time→pessoa e compõe). Self-contained.
+# ---------------------------------------------------------------------------
+run_resolve_scope_layers_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/scope/resolve-scope-layers.sh"
+  if [ ! -f "${helper}" ]; then record_fail "resolve-scope-layers" "helper ausente: ${helper}"; return; fi
+  local t; t="$(mktemp -d)"; git -C "$t" init -q >/dev/null 2>&1
+  mkdir -p "$t/.claude" "$t/apps/dev/.claude"
+  printf '%s' '{"theme":"dark","permissions":{"allow":["Bash(git *)"]}}' > "$t/.claude/settings.json"
+  printf '%s' '{"model":"opus","permissions":{"allow":["Bash(nx *)"]}}' > "$t/apps/dev/.claude/settings.json"
+  local us; us="$(mktemp)"; printf '%s' '{"theme":"light"}' > "$us"
+  if [ "$(bash "${helper}" "$t/apps/dev" --user "$us" --list 2>/dev/null | grep -c .)" = "3" ]; then
+    record_pass "resolve-scope-layers: --list resolve 3 camadas (empresa+time+pessoa)"
+  else record_fail "resolve-scope-layers: list" "não resolveu 3 camadas"; fi
+  local rc=0; bash "${helper}" /dir/inexistente >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "resolve-scope-layers: dir inexistente → exit 2"
+  else record_fail "resolve-scope-layers: dir" "esperava 2, veio ${rc}"; fi
+  if command -v jq >/dev/null 2>&1; then
+    local eff; eff="$(bash "${helper}" "$t/apps/dev" --user "$us" 2>/dev/null)"
+    if [ "$(printf '%s' "${eff}" | jq -r .theme)" = "light" ] && [ "$(printf '%s' "${eff}" | jq -r .model)" = "opus" ] \
+       && [ "$(printf '%s' "${eff}" | jq -c '.permissions.allow')" = '["Bash(git *)","Bash(nx *)"]' ]; then
+      record_pass "resolve-scope-layers: compõe efetivo (last-wins pessoa + model time + união)"
+    else record_fail "resolve-scope-layers: compose" "efetivo incorreto"; fi
+  else record_pass "resolve-scope-layers: compose pulado (sem jq)"; fi
+  rm -rf "$t" "$us"
+}
+
+# ---------------------------------------------------------------------------
 # Modo prettierignore — exercita .claude/utils/adopt/merge-prettierignore.sh.
 # Self-contained (estilo run_resolve_selftests): cenários em mktemp -d, sem
 # fixture-file/manifest. Cobre os MODOS DE FALHA (não só o happy-path): criação
@@ -1772,6 +1800,9 @@ run_vendor_branch_selftests
 
 # Modo compose-settings — settings.json N-camadas de escopo (RFC-0005 plano 2).
 run_compose_settings_selftests
+
+# Modo resolve-scope-layers — fecha o loop do compose-settings (descobre a cadeia de escopo).
+run_resolve_scope_layers_selftests
 
 # Modo resolve-target — targeting fino por seletor no alvo: (F1.2 federação — mata o ruído).
 run_resolve_target_selftests
