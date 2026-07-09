@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 19 entradas · **Stale:** 0 · **Compartilháveis:** 16
+**Total:** 20 entradas · **Stale:** 0 · **Compartilháveis:** 17
 
 Gerado em: 2026-07-09
 
@@ -15,6 +15,7 @@ Gerado em: 2026-07-09
 | 2026-07-09 | innovation | public 📤 | security-gate-degrades-to-veto | 2026-10-07 | static |
 | 2026-07-09 | decision | public 📤 | scope-inheritance-rfc0005 | 2026-10-07 | static |
 | 2026-07-09 | learning | protected | granaai-readonly-field-dogfood | 2026-10-07 | conditional |
+| 2026-07-09 | innovation | public 📤 | first-live-a2a-handshake | 2026-10-07 | static |
 | 2026-07-09 | decision | public 📤 | federation-redesign-rfc0004-shipped | 2026-10-07 | static |
 | 2026-07-09 | innovation | public 📤 | adopt-vendor-branch-merge | 2026-10-07 | static |
 | 2026-07-08 | decision | protected | site-consolidation-kvm8 | 2026-10-06 | dynamic |
