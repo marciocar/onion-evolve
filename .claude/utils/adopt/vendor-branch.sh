@@ -44,13 +44,46 @@ _seed() {  # <TARGET> <INTEGRATION_BRANCH>
     || { echo "ERRO: falhou ao ramificar $VENDOR." >&2; return 2; }
 }
 
+# Acha o commit MAIS RECENTE da integração cujo framework é IDÊNTICO ao core@<pin> (blob-set via ls-tree,
+# content-addressed → cross-repo confiável). É o baseline LIMPO p/ ramificar o onion/vendor num legado:
+# ramificar do HEAD entraria com a customização já commitada NA BASE → o merge tomaria theirs = clobber
+# silencioso (spec §8 / experimento 2026-07-09). Vazio = não achou (framework/customização entrelaçados).
+_clean_baseline() {  # <SRC> <T> <PIN> <IB>
+  local SRC="$1" T="$2" PIN="$3" IB="$4" fw ref c cur
+  [ -n "$PIN" ] || return 0
+  git -C "$SRC" rev-parse --verify "${PIN}^{commit}" >/dev/null 2>&1 || return 0
+  fw="$(_manifest "$SRC")"; [ -n "$fw" ] || return 0
+  # shellcheck disable=SC2086
+  ref="$(git -C "$SRC" ls-tree -r "$PIN" -- $fw 2>/dev/null | awk '{print $3" "$4}' | LC_ALL=C sort)"
+  [ -n "$ref" ] || return 0
+  # shellcheck disable=SC2086
+  for c in $(git -C "$T" rev-list "$IB" -- $fw 2>/dev/null); do
+    # shellcheck disable=SC2086
+    cur="$(git -C "$T" ls-tree -r "$c" -- $fw 2>/dev/null | awk '{print $3" "$4}' | LC_ALL=C sort)"
+    [ "$cur" = "$ref" ] && { printf '%s\n' "$c"; return 0; }
+  done
+  return 0
+}
+
 _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   local T="$1" SRC="$2" PIN="$3" IB="$4"
   git -C "$T" rev-parse --git-dir >/dev/null 2>&1 || { echo "⚠️  $T não é repo git — update pulado." >&2; return 0; }
   git -C "$SRC" rev-parse --git-dir >/dev/null 2>&1 || { echo "ERRO: SOURCE_ROOT '$SRC' não é repo git." >&2; return 2; }
 
-  # Bootstrap de legado: sem vendor → ramifica agora (do estado atual da integração).
-  git -C "$T" rev-parse --verify "$VENDOR" >/dev/null 2>&1 || { _seed "$T" "$IB" || return $?; }
+  # Bootstrap de legado (sem vendor): ramifica do commit LIMPO (framework == core@pin-ADOTADO), não do HEAD
+  # (que pode ter customização commitada → clobber no 1º merge — spec §8). Fresh-adoption já tem vendor.
+  if ! git -C "$T" rev-parse --verify "$VENDOR" >/dev/null 2>&1; then
+    local ADOPTED base
+    ADOPTED="$(awk '/^source_commit:/{print $2}' "$T/.claude/.onion-version" 2>/dev/null)"
+    base="$(_clean_baseline "$SRC" "$T" "$ADOPTED" "$IB")"
+    if [ -n "$base" ]; then
+      git -C "$T" branch "$VENDOR" "$base" && echo "Onion: $VENDOR ramificada do baseline LIMPO ${base:0:12} (framework == pin ${ADOPTED}) — 3-way seguro."
+    else
+      echo "⚠️  Onion: sem commit de framework limpo == pin '${ADOPTED}' na história de '$IB' (legado entrelaçado)." >&2
+      echo "    O 1º merge pode NÃO conflitar (risco de clobrar customização). Ramifico do HEAD; revise o merge." >&2
+      _seed "$T" "$IB" || return $?
+    fi
+  fi
 
   # Working tree da integração precisa estar limpa p/ o merge (não força — never-clobber).
   git -C "$T" checkout -q "$IB" 2>/dev/null || { echo "ERRO: não consegui checar '$IB' em $T." >&2; return 2; }

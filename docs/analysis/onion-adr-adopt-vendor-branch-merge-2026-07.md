@@ -142,6 +142,11 @@ sem conflito espúrio.
 (guard idempotente, coberto por selftest) · Q4 `onion/adopt`=integração-da-adoção, `onion/vendor`=fonte-de-merge
 semeada dela; `chore/onion-update-<pin>` saiu do update · Q5 L1+L2 completo mantido · Q6 `.gitattributes merge=union`.
 
-**Pendente (não-bloqueante):** legado com customização já COMMITADA na integração antes de o vendor existir
-→ pode entrar na base e clobar no 1º merge (§5 Q1). Mitigação futura: semear vendor do `source_commit` pinado
-limpo. Documentado; o caminho fresh-adoption (o comum) não sofre.
+**Legado (§5 Q1) — RESOLVIDO (2026-07-09):** o bootstrap de `onion/vendor` num adotante legado (sem vendor,
+customização já commitada) NÃO ramifica mais do HEAD — acha o **commit-base LIMPO** (o mais recente cuja
+superfície de framework é blob-idêntica a `core@<pin-adotado>`, via `ls-tree -r` content-addressed
+cross-repo) e ramifica dele. Assim a base do 3-way é o framework limpo, e a customização commitada vira
+**conflito** (não clobber). Verificado por experimento + dogfood do helper (5/5) + selftest (caso "legado
+c/ customização commitada → baseline limpo → CONFLITO"). **Fallback honesto:** se o core não tem mais o
+pin (história reescrita) ou o framework nunca foi limpo (entrelaçado), o helper **avisa** e ramifica do
+HEAD, sinalizando o risco — nunca clobra em silêncio.

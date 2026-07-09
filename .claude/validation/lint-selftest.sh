@@ -527,7 +527,28 @@ run_vendor_branch_selftests() {
     record_pass "vendor-branch: legado sem vendor → bootstrap + merge"
   else record_fail "vendor-branch: legado" "exit=$rcl ou vendor não semeado"; fi
 
-  rm -rf "$core" "$t" "$c2" "$t2" "$c3" "$t3" 2>/dev/null
+  # (f) legado REALISTA (spec §8): .onion-version pinado + customização COMMITADA + sem vendor → o bootstrap
+  #     ramifica do BASELINE LIMPO (framework == core@pin), não do HEAD → CONFLITO, não clobra a customização
+  local c4 t4 ib4 pin4
+  c4="$(mktemp -d)/c4"; t4="$(mktemp -d)/a4"
+  # core v1 (repo incremental — NÃO re-inicializar; o pin v1 precisa sobreviver p/ o _clean_baseline achá-lo)
+  mkdir -p "$c4/.claude/commands"; git -C "$c4" init -q
+  printf 'cmd v1\n' > "$c4/.claude/commands/foo.md"; git -C "$c4" add -A; git -C "$c4" commit -qm "core v1"
+  pin4="$(git -C "$c4" rev-parse HEAD)"
+  mkdir -p "$t4"; git -C "$t4" init -q
+  git -C "$c4" archive HEAD -- .claude | tar -x -C "$t4"
+  printf 'source_commit: %s\nrole: adopted\n' "$pin4" > "$t4/.claude/.onion-version"
+  git -C "$t4" add -A; git -C "$t4" commit -qm "adopt v1 limpo"
+  ib4="$(git -C "$t4" rev-parse --abbrev-ref HEAD)"
+  printf 'cmd v1 CUSTOM\n' > "$t4/.claude/commands/foo.md"; git -C "$t4" add -A; git -C "$t4" commit -qm custom
+  printf 'cmd v2\n' > "$c4/.claude/commands/foo.md"; git -C "$c4" add -A; git -C "$c4" commit -qm "core v2"
+  local rcf=0; bash "${helper}" update "$t4" "$c4" v2 "$ib4" >/dev/null 2>&1 || rcf=$?
+  if [ "$rcf" -eq 10 ] && grep -q CUSTOM "$t4/.claude/commands/foo.md"; then
+    record_pass "vendor-branch: legado c/ customização commitada → baseline limpo → CONFLITO (não clobra)"
+  else record_fail "vendor-branch: legado baseline §8" "exit=$rcf ou customização clobada"; fi
+  git -C "$t4" merge --abort 2>/dev/null || true
+
+  rm -rf "$core" "$t" "$c2" "$t2" "$c3" "$t3" "$c4" "$t4" 2>/dev/null
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
 }
 
