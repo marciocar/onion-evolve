@@ -13,8 +13,9 @@
 #             dos plugins (requires/provides/loads) + frontmatter dos agentes
 #             (related_agents/related_commands) + has-member (onion → artefatos).
 #
-# Uso       : graph.sh [--markdown|--triples|--impact <nó>|--path <de> <até>|--closure <nó>|--orphans]
+# Uso       : graph.sh [--markdown|--triples|--impact <nó>|--path <de> <até>|--closure <nó>|--orphans|--map]
 #               --markdown (default) : docs/onion/graph.md (duplo público)
+#               --map                : mapa de adoções da federação (Mermaid) de members.yaml → docs/onion/federation-map.md
 #               --triples            : TSV  subject<TAB>predicate<TAB>object<TAB>via
 #               --impact <nó>        : quem aponta para <nó> (dependência reversa, 1-hop)
 #               --path <de> <até>    : caminho dirigido de <de> a <até> (BFS)
@@ -51,6 +52,69 @@ yaml_list() { # $1=file $2=key
     b && /^[[:space:]]+-[[:space:]]/ { it=$0; sub(/^[[:space:]]+-[[:space:]]*/,"",it); gsub(/"/,"",it); gsub(/^[[:space:]]+|[[:space:]]+$/,"",it); if(it!="")print it; next }
     b && /^[^[:space:]]/ { b=0 }
   ' "$1" 2>/dev/null
+}
+
+# python3+yaml disponível? (members.yaml é YAML aninhado — grep/sed não basta). Gracioso como have_jq.
+have_py() { command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1; }
+MEMBERS_YAML="${REPO_ROOT}/docs/evolution/federation/members.yaml"
+
+# members.yaml (SSOT de adoções) → triplas (mode=triples) OU mapa Mermaid (mode=map). Sem python3/yaml
+# ou sem o arquivo: no-op gracioso (como o capability sem jq). Determinístico.
+members_emit() {
+  local mode="$1"
+  [ -f "${MEMBERS_YAML}" ] || return 0
+  have_py || return 0
+  python3 - "${MEMBERS_YAML}" "${mode}" <<'PY'
+import sys, yaml
+path, mode = sys.argv[1], sys.argv[2]
+try:
+    d = yaml.safe_load(open(path)) or {}
+except Exception:
+    sys.exit(0)
+ms = d.get('members') or []
+def nid(x): return x.replace('-', '_').replace('.', '_')
+if mode == 'triples':
+    for m in ms:
+        mid = m.get('id')
+        if not mid: continue
+        if m.get('parent'): print(f"{mid}\tadopts\t{m['parent']}\t")
+        if m.get('role'): print(f"{mid}\ttier\t{m['role']}\t")
+        if m.get('mode'): print(f"{mid}\tmode\t{m['mode']}\t")
+        if m.get('onion_version'): print(f"{mid}\tpin\t{m['onion_version']}\t")
+        for s in (m.get('specializations') or []): print(f"{mid}\tspecialization\t{s}\t")
+        t = m.get('trust') or {}
+        for x in (t.get('can_correct_to') or []): print(f"{mid}\ttrust-corrects\t{x}\t")
+        for x in (t.get('can_advise_to') or []): print(f"{mid}\ttrust-advises\t{x}\t")
+        for lin in (m.get('lineages') or {}): print(f"{mid}\tlineage\t{lin}\t")
+elif mode == 'map':
+    print("# Mapa de Adoções — Federação Onion (GERADO; não editar à mão)\n")
+    print("> Gerado por `.claude/validation/graph.sh --map` de `docs/evolution/federation/members.yaml` (SSOT).")
+    print("> **Derivado**, não desenhado à mão — muda quando o `members.yaml` muda. Renderiza no GitHub sem build.\n")
+    print("```mermaid")
+    print("flowchart TD")
+    for m in ms:
+        mid = m.get('id')
+        if not mid: continue
+        role = m.get('role', 'member'); md = m.get('mode', '')
+        lbl = f"{mid}<br/>{role}" + (f" · {md}" if md else "")
+        print(f'  {nid(mid)}["{lbl}"]:::{role}')
+    for m in ms:
+        mid = m.get('id')
+        if not mid: continue
+        if m.get('parent'): print(f"  {nid(mid)} -->|adopts| {nid(m['parent'])}")
+        for x in ((m.get('trust') or {}).get('can_correct_to') or []):
+            print(f"  {nid(mid)} -.->|can-correct| {nid(x)}")
+    print("  classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;")
+    print("  classDef hub fill:#238636,color:#fff,stroke:#033a16;")
+    print("  classDef standalone fill:#8957e5,color:#fff,stroke:#3c1e70;")
+    print("```\n")
+    print("## Membros (derivado do SSOT)\n")
+    print("| id | tier | mode | specializations | pin |")
+    print("|----|------|------|-----------------|-----|")
+    for m in ms:
+        specs = ', '.join(m.get('specializations') or [])
+        print(f"| {m.get('id','')} | {m.get('role','')} | {m.get('mode','')} | {specs} | `{m.get('onion_version','—')}` |")
+PY
 }
 
 # --- emite todas as triplas: subject<TAB>predicate<TAB>object<TAB>via ---
@@ -90,6 +154,10 @@ emit_triples() {
   while IFS= read -r ag; do printf 'onion\thas-member\t%s\t\n' "$(basename "${ag}" .md)"; done \
     < <(find "${REPO_ROOT}/.claude/agents" -name "*.md" ! -iname "readme.md" 2>/dev/null | sort)
   for sk in "${REPO_ROOT}"/.claude/skills/*/; do [ -d "${sk}" ] && printf 'onion\thas-member\t%s\t\n' "$(basename "${sk}")"; done
+
+  # (5) membros da federação (adoções/tiers/mode/pin/specializations/trust/linhagens) — SSOT members.yaml.
+  #     Torna --impact/--closure/--map operáveis sobre a federação (ex.: --impact onion-evolve = quem adota).
+  members_emit triples
 }
 
 # Computa as triplas UMA vez por execução (cache) — evita re-emitir em cada seção do --markdown.
@@ -152,6 +220,13 @@ case "${MODE}" in
           n=split(adj[cur],nb," "); for(i=1;i<=n;i++){ if(nb[i]!="" && !(nb[i] in seen)){seen[nb[i]]=1; queue[tail++]=nb[i]} } }
         for(k in seen) if(k!=start) print k
       }' | LC_ALL=C sort | sed 's/^/  /'
+    ;;
+
+  --map)
+    # Mapa de adoções da federação, derivado do members.yaml → Mermaid (F1.1). Renderiza no GitHub sem build.
+    out="$(members_emit map)"
+    if [ -z "${out}" ]; then echo "graph.sh --map: members.yaml ausente ou sem python3+yaml (no-op gracioso)." >&2; exit 0; fi
+    printf '%s\n' "${out}"
     ;;
 
   --markdown|*)

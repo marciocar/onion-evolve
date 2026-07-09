@@ -519,11 +519,14 @@ PY
 #           Regenera p/ temp e compara: drift = editou à mão OU mudou a fonte sem
 #           regenerar. Espelha check_inventory_sync. Pula gracioso sem jq.
 # ===========================================================================
+have_py_yaml() { command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1; }
+
 check_graph_sync() {
   local gen="${SCRIPT_DIR}/graph.sh"
   local gfile="${REPO_ROOT}/docs/onion/graph.md"
   [ -f "${gen}" ] || return 0
-  command -v jq >/dev/null 2>&1 || return 0   # graph.sh usa jq p/ capability → pula gracioso sem jq
+  command -v jq >/dev/null 2>&1 || return 0     # graph.sh usa jq p/ capability → pula gracioso sem jq
+  have_py_yaml || return 0                        # graph.sh usa python+yaml p/ members.yaml → pula gracioso sem eles
   if [ ! -f "${gfile}" ]; then
     violation "HARD" "docs/onion/graph.md" "grafo ausente — rode 'bash .claude/validation/graph.sh --markdown > docs/onion/graph.md'"
     return
@@ -532,6 +535,26 @@ check_graph_sync() {
   bash "${gen}" --markdown > "${tmp}" 2>/dev/null || true
   if ! diff -q "${gfile}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/graph.md" "grafo desatualizado vs spec-as-code — regenere com '/meta:graph' (bash .claude/validation/graph.sh --markdown > docs/onion/graph.md)"
+  fi
+  rm -f "${tmp}"
+}
+
+# REGRA 23 — Mapa da federação (docs/onion/federation-map.md) sincronizado com members.yaml [HARD]
+#           GERADO por graph.sh --map (SSOT = members.yaml). Espelha check_graph_sync. Pula sem python+yaml.
+check_federation_map_sync() {
+  local gen="${SCRIPT_DIR}/graph.sh"
+  local mfile="${REPO_ROOT}/docs/onion/federation-map.md"
+  local members="${REPO_ROOT}/docs/evolution/federation/members.yaml"
+  [ -f "${gen}" ] && [ -f "${members}" ] || return 0
+  have_py_yaml || return 0
+  if [ ! -f "${mfile}" ]; then
+    violation "HARD" "docs/onion/federation-map.md" "mapa ausente — rode 'bash .claude/validation/graph.sh --map > docs/onion/federation-map.md'"
+    return
+  fi
+  local tmp; tmp="$(mktemp)"
+  bash "${gen}" --map > "${tmp}" 2>/dev/null || true
+  if ! diff -q "${mfile}" "${tmp}" >/dev/null 2>&1; then
+    violation "HARD" "docs/onion/federation-map.md" "mapa da federação desatualizado vs members.yaml — regenere: bash .claude/validation/graph.sh --map > docs/onion/federation-map.md"
   fi
   rm -f "${tmp}"
 }
@@ -1177,6 +1200,7 @@ check_plugins_sync
 check_capability_conformance
 check_role_bundle_sync
 check_graph_sync
+check_federation_map_sync
 check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp

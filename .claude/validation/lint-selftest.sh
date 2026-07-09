@@ -983,6 +983,28 @@ run_graph_selftests() {
   local crc=0; bash "${gen}" --closure >/dev/null 2>&1 || crc=$?
   if [ "${crc}" = 2 ]; then record_pass "graph: --closure sem semente → exit 2"
   else record_fail "graph: --closure uso" "esperava exit 2 sem semente (obtido ${crc})"; fi
+
+  # F1.1 — ingestão de members.yaml (fonte 5) + mapa Mermaid derivado. Pula gracioso sem python+yaml.
+  if command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
+     && [ -f "${REPO_ROOT}/docs/evolution/federation/members.yaml" ]; then
+    if printf '%s\n' "${T}" | grep -qE '	adopts	onion-evolve	' \
+       && printf '%s\n' "${T}" | grep -qE '	tier	(source|hub|standalone)	'; then
+      record_pass "graph: members.yaml ingerido (adopts/tier na federação)"
+    else record_fail "graph: members ingest" "triplas sem arestas de membro (adopts/tier)"; fi
+    local M; M="$(bash "${gen}" --map 2>/dev/null)"
+    if printf '%s\n' "${M}" | grep -q 'flowchart TD' \
+       && printf '%s\n' "${M}" | grep -q -- '-->|adopts|' \
+       && printf '%s\n' "${M}" | grep -q 'classDef source'; then
+      record_pass "graph: --map emite Mermaid derivado (flowchart + adopts + classDef)"
+    else record_fail "graph: --map" "mapa Mermaid inválido (falta flowchart/adopts/classDef)"; fi
+    # determinismo do --map (compara dois valores capturados — ambos sem newline final)
+    local M2; M2="$(bash "${gen}" --map 2>/dev/null)"
+    if [ "$(printf '%s' "${M}" | sha256sum)" = "$(printf '%s' "${M2}" | sha256sum)" ]; then
+      record_pass "graph: --map determinístico"
+    else record_fail "graph: --map determinismo" "mapa varia entre execuções"; fi
+  else
+    record_pass "graph: members/--map pulados (sem python+yaml — gracioso)"
+  fi
 }
 
 # ---------------------------------------------------------------------------
