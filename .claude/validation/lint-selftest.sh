@@ -404,6 +404,10 @@ run_durable_commit_selftests() {
     printf '# novo\n' > "${d}/.claude/commands/newcmd.md"
     mkdir -p "${d}/docs/meta-specs"; printf '# spec\n' > "${d}/docs/meta-specs/spec.md"
     mkdir -p "${d}/src"; printf 'produto\n' > "${d}/src/app.js"
+    # artefatos GERADOS na adoção (achado de campo gustavo-pulga 2026-07-09): devem ser durables também
+    printf '# CLAUDE\n' > "${d}/CLAUDE.md"
+    printf 'x merge=union\n' > "${d}/.gitattributes"
+    mkdir -p "${d}/docs/onion"; printf '# inventory\n' > "${d}/docs/onion/inventory.md"
   }
 
   # (a) controle — SEM commit: descarte reverte o pin (o incidente)
@@ -421,6 +425,13 @@ run_durable_commit_selftests() {
      && git -C "${d}" ls-files --error-unmatch docs/meta-specs/spec.md >/dev/null 2>&1; then
     record_pass "durable-commit: instalação (L1+L2) commitada na branch dedicada"
   else record_fail "durable-commit: cura" "Onion não durável na branch dedicada"; fi
+
+  # (b2) artefatos GERADOS na adoção também durables (regressão do achado gustavo-pulga)
+  if git -C "${d}" ls-files --error-unmatch CLAUDE.md >/dev/null 2>&1 \
+     && git -C "${d}" ls-files --error-unmatch .gitattributes >/dev/null 2>&1 \
+     && git -C "${d}" ls-files --error-unmatch docs/onion/inventory.md >/dev/null 2>&1; then
+    record_pass "durable-commit: artefatos de adoção (CLAUDE.md/.gitattributes/inventário) commitados"
+  else record_fail "durable-commit: artefatos de adoção" "CLAUDE.md/.gitattributes/docs/onion ficaram uncommitted"; fi
 
   if git -C "${d}" ls-files --error-unmatch src/app.js >/dev/null 2>&1; then
     record_fail "durable-commit: never-clobber" "produto src/app.js varrido pro commit (clobber)"
