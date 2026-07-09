@@ -47,8 +47,9 @@ faseado**: apontar o Onion para um repo/pasta e "assumir o controle" — **insta
 1. **Dry-run primeiro.** O [Procedimento de cópia segura](#-procedimento-de-cópia-segura-never-clobber)
    sempre **mostra o diff** antes de escrever. Só aplica após **confirmação explícita**.
 2. **Branch dedicada.** Instalar em `onion/adopt` — **nunca** na branch default sem consentimento.
-3. **Never-clobber — IMPLEMENTADO, não só prometido.** Extrair p/ tmp, **diff** vs o alvo, aplicar só
-   após revisão. Customizações locais aparecem no diff (o maestro decide) — ver o Procedimento.
+3. **Never-clobber — IMPLEMENTADO, não só prometido.** Na **adoção**, extrair p/ tmp + **diff** vs o alvo,
+   aplicar só após revisão. No **`--update`**, é **estrutural**: `git merge` de `onion/vendor` → customização
+   local vira **conflito git real** (resolvível), não diff clobável (Achado #2). Ver os Procedimentos.
 4. **Idempotente.** Re-adotar/atualizar = aplicar o delta + re-carimbar, não duplicar.
 
 ---
@@ -173,6 +174,13 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/merge-prettierignore.sh" "$DEST"
 #     avisa migração; core.hooksPath só seta se UNSET. Helper testável (lint-selftest.sh: githook).
 #     Doutrina: docs/analysis/onion-adr-native-githooks-standard-2026-06.md
 bash "$SOURCE_ROOT/.claude/utils/adopt/install-onion-githook.sh" "$DEST"
+
+# (7) .gitattributes merge=union — reduz conflito ESPÚRIO no merge de vendor-branch (Achado #2) em
+#     arquivos append-only do doc-bridge (CHANGELOG/_processed): duas pontas apendam → união, não conflito.
+#     Never-clobber por-linha (idempotente): só adiciona as regras Onion ausentes.
+for rule in 'docs/evolution/**/CHANGELOG.md merge=union' 'docs/evolution/**/_processed/** merge=union'; do
+  grep -qxF "$rule" "$DEST/.gitattributes" 2>/dev/null || printf '%s\n' "$rule" >> "$DEST/.gitattributes"
+done
 ```
 
 > O passo (1) **substitui** o antigo never-clobber grosso (que copiava só se ausente; senão deixava um
@@ -234,7 +242,7 @@ DEST="<INSTALL_DIR (adoção) | TARGET (--update)>"
 OP="<adopt | update>"            # operação que gerou o relatório
 PIN="<source_commit aplicado>"   # commit curto da fonte (o pin NOVO)
 PREV="<pin anterior | vazio na 1ª adoção>"
-BR="<branch do commit durável: onion/adopt (adoção) | chore/onion-update-${PIN} (update)>"
+BR="<branch do commit: onion/adopt (adoção) | \$INTEGRATION_BRANCH (update — o merge de onion/vendor cai nela)>"
 
 INBOUND="$DEST/docs/evolution/inbound"
 mkdir -p "$INBOUND/_processed"
@@ -396,7 +404,11 @@ EOF
 
 - **Commit durável (obrigatório):** aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
   (`DEST="$INSTALL_DIR"`, `OP=adopt`, `PIN=$SRC_COMMIT`, `BR=onion/adopt` — a branch que a Fase 2 já criou)
-  — materializa a instalação como objeto git para não ficar uncommitted/descartável. `NEXT: Fase 6`.
+  — materializa a instalação como objeto git para não ficar uncommitted/descartável.
+- **Semear a fonte-de-merge (`onion/vendor`):** com o framework LIMPO recém-commitado em `onion/adopt`,
+  ramificar `onion/vendor` dela — é a **base comum** que torna o `--update` um 3-way merge (never-clobber
+  estrutural, Achado #2). `bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-branch.sh" seed "$INSTALL_DIR" onion/adopt`.
+  Idempotente (pula se já existe). `NEXT: Fase 6`.
 
 ### Fase 6 — Relatório + próximos passos
 
@@ -474,7 +486,14 @@ manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p
 [ -n "$PIN_OK" ] && git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
 ```
 
-- Aplicar via o **Procedimento de cópia segura** (`DEST="$TARGET"`) — diff revela customizações locais.
+- **Aplicar o framework via MERGE de vendor-branch** (Achado #2 — substitui o copy-over):
+  `bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-branch.sh" update "$TARGET" "$SOURCE_ROOT" "$NOW" "$INTEGRATION_BRANCH"`
+  (`$INTEGRATION_BRANCH` = `resolve-integration-branch.sh "$TARGET"`). O helper aplica o framework novo no
+  `onion/vendor` (fonte-de-merge, base comum) e faz `git merge` na integração → a customização local vira
+  **conflito git real** (never-clobber estrutural), não diff clobável. **Exit 10 = CONFLITO** → o maestro
+  resolve (`git mergetool`/marcadores + `git commit`) **antes** de seguir; **exit 0** = framework atualizado
+  limpo. (Adotante legado sem `onion/vendor` → o helper o **semeia** antes de mergear.) `.env.example` segue
+  o never-clobber por-arquivo (grava `.env.example.onion` se o alvo já tem) — fora do merge, específico do alvo.
 - **Re-aplicar a configuração install-only** via o [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
   (`DEST="$TARGET"`). **Crítico:** sem isto, um adotante com `settings.json` próprio recebe os *scripts* dos
   hooks (no manifesto acima) mas **não** o registro → o "you have mail" não dispara. O Procedimento faz o
@@ -493,11 +512,12 @@ manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p
   # escolha explícita —, PRESERVAR a ausência: não congelar um valor; a resolução detecta a cada PR. O
   # passo (3) do Procedimento ainda seta o git config local de conveniência a partir do valor resolvido.)
   ```
-- **Commit durável (obrigatório):** aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
-  (`DEST="$TARGET"`, `OP=update`, `PIN=$NOW`, `BR=chore/onion-update-$NOW`) **antes** do relatório — dedica
-  branch p/ o framework não poluir a branch de produto onde o maestro estava. Sem isto, os arquivos
-  aplicados ficam uncommitted e um descarte de working-tree (`git restore`/`reset --hard`/remoção de
-  worktree) os apaga (incidente-fonte 2026-07-08).
+- **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima,
+  já commitado na integração); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o
+  `.onion-version` re-carimbado. Aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
+  (`DEST="$TARGET"`, `OP=update`, `PIN=$NOW`, `BR=$INTEGRATION_BRANCH`) — commita na **própria integração**
+  (não há mais `chore/onion-update-<pin>`: a fonte-de-merge durável é `onion/vendor`, o merge é o objeto git).
+  Em caso de conflito de merge (exit 10 acima), este passo roda **após** o maestro resolver e commitar o merge.
 - **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$TARGET"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`). Reusa o `diff --stat` já computado
   acima. **Fecha o gap real:** sem isto, o relatório do update sai só no chat da fonte e o maestro tem que
