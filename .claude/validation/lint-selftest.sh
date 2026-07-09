@@ -680,6 +680,29 @@ run_mail_receiver_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo detect-transport — exercita .claude/utils/federation-transport/detect-transport.sh (F2.1:
+# resolução SDAAL da via de transporte). Asserções robustas (não fixam roster).
+# ---------------------------------------------------------------------------
+run_detect_transport_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/federation-transport/detect-transport.sh"
+  if [ ! -f "${helper}" ]; then record_fail "detect-transport" "helper ausente: ${helper}"; return; fi
+  if [ "$(bash "${helper}" x 2>/dev/null)" = "git-async" ]; then record_pass "detect-transport: default → git-async (seguro)"
+  else record_fail "detect-transport: default" "não resolveu git-async"; fi
+  if [ "$(FEDERATION_TRANSPORT=local bash "${helper}" x 2>/dev/null)" = "local" ]; then record_pass "detect-transport: env=local → local"
+  else record_fail "detect-transport: local" "env=local não resolveu"; fi
+  if [ "$(FEDERATION_TRANSPORT=a2a-live bash "${helper}" x 2>/dev/null)" = "a2a-live" ] \
+     && FEDERATION_TRANSPORT=a2a-live bash "${helper}" x 2>&1 >/dev/null | grep -qi gated; then
+    record_pass "detect-transport: a2a-live explícito → a2a-live + avisa GATED (stub)"
+  else record_fail "detect-transport: a2a-live" "não é a2a-live ou não avisou gated"; fi
+  if [ "$(FEDERATION_TRANSPORT=auto bash "${helper}" __fantasma__ 2>/dev/null)" = "git-async" ]; then
+    record_pass "detect-transport: auto + sem clone → git-async (nunca sobe de via sozinho)"
+  else record_fail "detect-transport: auto fallback" "auto não caiu p/ git-async"; fi
+  local rc=0; FEDERATION_TRANSPORT=xpto bash "${helper}" x >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "detect-transport: FEDERATION_TRANSPORT inválido → exit 3"
+  else record_fail "detect-transport: inválido" "esperava exit 3, veio ${rc}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo prettierignore — exercita .claude/utils/adopt/merge-prettierignore.sh.
 # Self-contained (estilo run_resolve_selftests): cenários em mktemp -d, sem
 # fixture-file/manifest. Cobre os MODOS DE FALHA (não só o happy-path): criação
@@ -1758,6 +1781,9 @@ run_federation_console_selftests
 
 # Modo mail-receiver — acelerador "receiver que acorda" (F1.4 federação).
 run_mail_receiver_selftests
+
+# Modo detect-transport — resolução SDAAL da via de transporte (F2.1 federação).
+run_detect_transport_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
