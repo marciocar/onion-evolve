@@ -55,6 +55,7 @@
 - **onion** --has-member--> nx-migration-specialist
 - **onion** --has-member--> nx-monorepo-specialist
 - **onion** --has-member--> onion
+- **onion** --has-member--> onion-engineering-context
 - **onion** --has-member--> onion-orchestration
 - **onion** --has-member--> onion-patterns
 - **onion** --has-member--> onion-validation
@@ -130,10 +131,14 @@
 - onion-docs **requires** agent:c4-documentation-specialist
 - onion-docs **requires** agent:docs-reverse-engineer
 - onion-docs **requires** agent:mermaid-specialist
+- onion-engineering **loads** embed:kb/gitflow-patterns.md
+- onion-engineering **loads** embed:kb/worklog-protocol.md
+- onion-engineering **loads** when:work -> resolve:technical-context (skill onion-engineering-context)
 - onion-engineering **provides** code-review-pre-pr
 - onion-engineering **provides** code-specialists-node-react-postgres-nx-docker
 - onion-engineering **provides** gitflow-faseado
 - onion-engineering **provides** pull-request-lifecycle
+- onion-engineering **provides** ssot-context-resolver
 - onion-engineering **requires** agent:branch-code-reviewer
 - onion-engineering **requires** agent:code-reviewer
 - onion-engineering **requires** agent:docker-specialist
@@ -141,6 +146,7 @@
 - onion-engineering **requires** agent:nodejs-specialist
 - onion-engineering **requires** agent:postgres-specialist
 - onion-engineering **requires** agent:react-developer
+- onion-engineering **requires** skill:onion-engineering-context
 - onion-product **provides** apresentacoes
 - onion-product **provides** decomposicao-de-tasks
 - onion-product **provides** descoberta-a-backlog
@@ -317,6 +323,7 @@ onion	has-member	nodejs-specialist
 onion	has-member	nx-migration-specialist	
 onion	has-member	nx-monorepo-specialist	
 onion	has-member	onion	
+onion	has-member	onion-engineering-context	
 onion	has-member	onion-orchestration	
 onion	has-member	onion-patterns	
 onion	has-member	onion-validation	
@@ -389,10 +396,14 @@ onion-docs	requires	agent:c4-architecture-specialist
 onion-docs	requires	agent:c4-documentation-specialist	
 onion-docs	requires	agent:docs-reverse-engineer	
 onion-docs	requires	agent:mermaid-specialist	
+onion-engineering	loads	embed:kb/gitflow-patterns.md	
+onion-engineering	loads	embed:kb/worklog-protocol.md	
+onion-engineering	loads	when:work -> resolve:technical-context (skill onion-engineering-context)	
 onion-engineering	provides	code-review-pre-pr	
 onion-engineering	provides	code-specialists-node-react-postgres-nx-docker	
 onion-engineering	provides	gitflow-faseado	
 onion-engineering	provides	pull-request-lifecycle	
+onion-engineering	provides	ssot-context-resolver	
 onion-engineering	requires	agent:branch-code-reviewer	
 onion-engineering	requires	agent:code-reviewer	
 onion-engineering	requires	agent:docker-specialist	
@@ -400,6 +411,7 @@ onion-engineering	requires	agent:gitflow-specialist
 onion-engineering	requires	agent:nodejs-specialist	
 onion-engineering	requires	agent:postgres-specialist	
 onion-engineering	requires	agent:react-developer	
+onion-engineering	requires	skill:onion-engineering-context	
 onion-product	provides	apresentacoes	
 onion-product	provides	decomposicao-de-tasks	
 onion-product	provides	descoberta-a-backlog	

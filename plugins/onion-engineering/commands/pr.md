@@ -18,7 +18,7 @@ Você é um assistente especializado em **criação de Pull Requests**, fase 5 d
 ## 🤖 Integração via adapters (modernizada)
 
 - **Operações de host remoto** (abrir/atualizar PR, ler comentários de review, status de CI) passam **sempre** pelo adapter forge ([`.claude/utils/forge/`](../../utils/forge/interface.md)) — **nunca** `gh`/API direto (integrations.md §9). O adapter usa `gh` (default) ou REST (fallback) internamente.
-- **Git local** (criar branch, commit, push) é `git` direto, orientado pelo motor GitFlow ([gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md)).
+- **Git local** (criar branch, commit, push) é `git` direto, orientado pelo motor GitFlow ([gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md)).
 - **Sync de task** passa pelo adapter Task Manager ([`utils/task-manager/factory.md`](../../utils/task-manager/factory.md)) — roteamento e formatação por provider são do adapter.
 
 ---
@@ -63,7 +63,7 @@ Siga estes passos para criar o PR:
 
 9. **Aguardar confirmação de merge** do PR.
 
-10. **Sync automático pós-merge**: uma vez merged, execute `/git/sync` (fase seguinte do fluxo). O sync segue a [Matriz de Branches Protegidas e Estratégia de Sync](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync), faz cleanup, arquiva o worklog ACTIVE como registro ARCHIVED (estrutura na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)) e, se `TASK_MANAGER_PROVIDER` != `none`, atualiza a task para `done` via adapter.
+10. **Sync automático pós-merge**: uma vez merged, execute `/git/sync` (fase seguinte do fluxo). O sync segue a [Matriz de Branches Protegidas e Estratégia de Sync](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync), faz cleanup, arquiva o worklog ACTIVE como registro ARCHIVED (estrutura na [SSOT](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)) e, se `TASK_MANAGER_PROVIDER` != `none`, atualiza a task para `done` via adapter.
 
 REGRA DE OURO: faça commit APENAS dos arquivos que você alterou. Se houver outros, pergunte ao usuário antes. Não use `git add .` sem confirmação.
 
@@ -88,5 +88,5 @@ O PR está pronto para revisão final e merge manual.
 
 - Forge (PR, review, CI): [utils/forge/interface.md](../../utils/forge/interface.md)
 - Sync de task: [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
-- Motor GitFlow (branch, sync): [gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md)
+- Motor GitFlow (branch, sync): [gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md)
 - Mentor: `@gitflow-specialist`

@@ -1,53 +1,27 @@
-# 🌿 Git Commands - Sistema Onion
+# 🛠️ Comandos `engineer/` — planejamento à entrega
 
-Índice da categoria `git/` — comandos de versionamento e workflows GitFlow do Sistema Onion, com integração ao Task Manager ativo (`TASK_MANAGER_PROVIDER`) e a sessões em `.claude/sessions/`.
+Comandos da **dimensão de engenharia** do Onion: o ciclo faseado e retomável que vai de **planejamento** a **entrega de PR**, sobre o motor GitFlow e os adapters de forge e task-manager. Use quando for desenvolver uma feature, corrigir produção ou preparar/abrir um Pull Request.
 
-> **Motor GitFlow (git local)**: a referência canônica de workflow, troubleshooting, semver, contrato de sessão e proteção de branch é
-> [`docs/knowledge-base/frameworks/gitflow-patterns.md`](../../../docs/knowledge-base/frameworks/gitflow-patterns.md).
-> Os comandos abaixo são **orquestradores finos** que citam essa KB — não reimplementam a lógica. `@gitflow-specialist` é **mentor** para dúvidas ad-hoc.
->
-> **Operações de host remoto** (PR, review, CI, Release) vivem no adapter SDAAL [`.claude/utils/forge/`](../../utils/forge/README.md). Git local (branch/merge/tag/push) é `git` direto.
+O fluxo principal é uma cadeia retomável com sessões persistentes em `.claude/sessions/`: `plan` → `start` → `work` → `pre-pr` → `pr` → `pr-update`.
 
-## ⚡ Como usar
-
-Todos são [Claude Code Commands](https://docs.claude.com/en/docs/claude-code/slash-commands), digitados **no chat da Claude Code** (não no terminal):
-
-```
-/git/init
-/git:flow feature start "user-authentication"
-/git:flow release start "minor"
-```
-
-## 📋 Comandos
-
-O ciclo de vida GitFlow (feature/release/hotfix × start/publish/finish) vive num **dispatcher único** `/git:flow` — não há mais subpastas. Comandos atômicos distintos ficam separados.
+## Comandos
 
 | Comando | Finalidade |
 |---------|-----------|
-| `/git:flow <tipo> <ação> [nome\|versão]` | **Dispatcher do ciclo de vida GitFlow** — `feature`/`release`/`hotfix` × `start`/`publish`/`finish` |
-| `/git/init` | Inicializar repositório com GitFlow e convenções padrão |
-| `/git/sync [branch]` | Sincronização pós-merge (checkout + pull + cleanup de branch) |
-| `/git/fast-commit` | Adicionar todas as mudanças e fazer commit rápido |
-| `/git/help` | Ajuda contextual e quick reference dos workflows GitFlow |
-| `/git/code-review` | ↪️ **Alias** → `/meta:setup-code-review` (setup de code review no CI; não é GitFlow) |
+| [`/engineer:plan`](plan.md) | Planejamento de feature: analisa e cria plano estruturado (`plan.md` da sessão). |
+| [`/engineer:start`](start.md) | Inicia o desenvolvimento: cria a sessão e analisa as tasks do provider ativo (via `TASK_MANAGER_PROVIDER`). |
+| [`/engineer:work`](work.md) | Continua a feature ativa: lê a sessão, identifica a próxima fase e atualiza progresso via task-manager abstraction. |
+| [`/engineer:pre-pr`](pre-pr.md) | Validação completa antes do PR — verifica padrões e qualidade. |
+| [`/engineer:pr`](pr.md) | Cria o Pull Request com integração GitFlow e sync automático. Delega a `@gitflow-specialist`. |
+| [`/engineer:pr-update`](pr-update.md) | Atualiza um PR existente com mudanças adicionais. |
+| [`/engineer:hotfix`](hotfix.md) | Emergency workflow completo: task no Task Manager + branch hotfix + desenvolvimento. Delega a `@gitflow-specialist`. |
+| [`/engineer:validate-phase-sync`](validate-phase-sync.md) | Valida a sincronização entre as fases do `plan.md` e as subtasks do Task Manager. |
+| [`/engineer:bump`](bump.md) | Bump de versão seguindo semver (major, minor ou patch). |
+| [`/engineer:docs`](docs.md) | Invoca o agente de documentação para a branch atual. |
+| [`/engineer:warm-up`](warm-up.md) | Preparação de contexto técnico/de engenharia (arquitetura, padrões, estrutura, frameworks). |
 
-`/git:flow release start` aceita `"vX.Y.Z"` (versão exata) ou `patch` / `minor` / `major` (auto-bump semver). Matriz completa de combinações em [`flow.md`](flow.md).
-
-## 🔁 Fluxos principais (resumo)
-
-Os passos detalhados de cada fluxo estão no KB [`gitflow-patterns.md`](../../../docs/knowledge-base/frameworks/gitflow-patterns.md).
-
-- **Feature**: `/git:flow feature start` → desenvolvimento (`/engineer/start` → `/engineer/work`) → `/git:flow feature finish` → `/git/sync develop`
-- **Release**: `/git:flow release start "minor"` → testes/validação → `/git:flow release finish` → `/git/sync main`
-- **Hotfix (separado)**: `/git:flow hotfix start "bug"` → fix → `/git:flow hotfix finish`
-- **Hotfix (híbrido)**: `/engineer/hotfix "desc" --params` (cria task + sessão + branch) → fix → `/git:flow hotfix finish`
-
-## 🔗 Integração e referências
-
-- **Engineering**: `/engineer/start`, `/engineer/work`, `/engineer/pr`, `/engineer/hotfix`
-- **Product / Task Manager**: `/product/task`, `/product/task-check`
-- **Adapters (SDAAL)**: [`utils/forge/`](../../utils/forge/README.md) (PR/CI/Release) · [`utils/task-manager/`](../../utils/task-manager/README.md) (sync de tasks)
-- **Agentes**: `@gitflow-specialist` (mentor GitFlow), especialista do provider ativo (`@jira-specialist`, `@clickup-specialist`, …) para sync de tasks
-- **Referência GitFlow**: [`docs/knowledge-base/frameworks/gitflow-patterns.md`](../../../docs/knowledge-base/frameworks/gitflow-patterns.md) · skill `common:prompts:git-workflow-patterns`
-
-**Para começar**: `/git/help` ou `/git/init`.
+## 🔗 Referências
+- Agente delegado: [`@gitflow-specialist`](../../agents/git/gitflow-specialist.md) — motor GitFlow para `pr` e `hotfix`.
+- KB do motor: [`gitflow-patterns.md`](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md) — branch/merge/tag locais.
+- Adapters de integração: [`utils/forge/`](../../utils/forge/) (PR/CI/Release) e [`utils/task-manager/`](../../utils/task-manager/) (tasks/sprints).
+- Comandos irmãos: [`git/`](../git/README.md) (ciclo GitFlow), [`product/`](../product/README.md) (descoberta a backlog), [`test/`](../test/) e [`validate/`](../validate/) (qualidade pré-entrega).

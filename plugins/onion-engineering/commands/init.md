@@ -35,7 +35,7 @@ Configurar repositório Git com GitFlow seguindo as melhores práticas. Detectar
 
 ## 📚 Motor GitFlow
 
-O setup segue [gitflow-patterns.md §Template 1](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-1-setup-inicial-gitflow) — **fonte única** da detecção de branch principal, prefixos e validações. Para dúvidas ad-hoc ou recovery de estado inconsistente, consulte o mentor `@gitflow-specialist` (não é dependência de runtime do comando).
+O setup segue [gitflow-patterns.md §Template 1](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-1-setup-inicial-gitflow) — **fonte única** da detecção de branch principal, prefixos e validações. Para dúvidas ad-hoc ou recovery de estado inconsistente, consulte o mentor `@gitflow-specialist` (não é dependência de runtime do comando).
 
 ## 📋 Processo de Inicialização
 
@@ -96,7 +96,7 @@ Após inicialização, o sistema recomendará:
 
 ### Branch develop conflitante
 **Problema**: Já existe branch develop com conteúdo divergente
-**Solução**: ver [§Template 6 — Resolução de Conflitos](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-6-resolução-de-conflitos) ou consultar `@gitflow-specialist`
+**Solução**: ver [§Template 6 — Resolução de Conflitos](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-6-resolução-de-conflitos) ou consultar `@gitflow-specialist`
 
 ### Repositório remoto não configurado
 **Problema**: Não há origin configurado
@@ -104,4 +104,4 @@ Após inicialização, o sistema recomendará:
 
 ---
 
-*Lógica canônica em [gitflow-patterns.md §Template 1](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-1-setup-inicial-gitflow). Mentor para dúvidas: `@gitflow-specialist`.*
+*Lógica canônica em [gitflow-patterns.md §Template 1](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-1-setup-inicial-gitflow). Mentor para dúvidas: `@gitflow-specialist`.*

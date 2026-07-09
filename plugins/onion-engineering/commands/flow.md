@@ -23,7 +23,7 @@ related_agents:
 Ponto de entrada **único** para o ciclo de vida GitFlow. Substitui os antigos
 `git/{feature,release,hotfix}/{start,publish,finish}` (7 shims + 3 subpastas) por
 um dispatcher arg-driven. É um **orquestrador fino**: a lógica canônica mora no
-motor GitFlow ([gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md)),
+motor GitFlow ([gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md)),
 operações de host remoto no [forge adapter](../../utils/forge/interface.md) e sync
 de task no [task-manager adapter](../../utils/task-manager/factory.md).
 
@@ -47,7 +47,7 @@ Sem args válidos → mostre esta ajuda e pare (não adivinhe).
 1. **Git local** (branch/checkout/merge/tag/**push**) = `git` direto, orientado pela KB. **Não** passa por adapter.
 2. **Host remoto** (PR/review/CI/Release) = sempre via [forge adapter](../../utils/forge/interface.md) — nunca `gh`/API em prosa (integrations.md §9).
 3. **Task (opcional)** — se `TASK_MANAGER_PROVIDER` != `none`, via [task-manager adapter](../../utils/task-manager/factory.md); roteamento/formatação por provider são do adapter — **não reimplementar aqui**.
-4. **Working directory limpo** antes de qualquer merge; em conflito → [§Template 6](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-6-resolução-de-conflitos).
+4. **Working directory limpo** antes de qualquer merge; em conflito → [§Template 6](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-6-resolução-de-conflitos).
 
 ## ⚡ Matriz de Roteamento
 
@@ -55,12 +55,12 @@ Cada combinação `(type, action)` resolve para um Template do motor + ações d
 
 | Combinação | Motor (KB) | Git local | Forge | Task Manager |
 |---|---|---|---|---|
-| `feature start <nome>` | [§Template 2](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-2-feature-development) + [§Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) | cria `feature/<nome>` de `develop`, checkout; cria `.claude/sessions/<slug>/` | — | vincula task (opcional) |
+| `feature start <nome>` | [§Template 2](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-2-feature-development) + [§Contrato de Sessão](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento) | cria `feature/<nome>` de `develop`, checkout; cria `.claude/sessions/<slug>/` | — | vincula task (opcional) |
 | `feature publish` | §Template 2 | `git push -u origin feature/<nome>` | `requestReviewers` / PR draft (opcional) | `updateStatus → review` |
 | `feature finish` | §Template 2 / §6 | merge `feature → develop`, cleanup, arquiva sessão | — | `updateStatus → done` |
-| `release start <ver>` | [§Template 3](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-3-release-process) + [§Semver](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#algoritmo-unificado-de-auto-bump-semver) | resolve versão (explícita/auto-bump), cria `release/<ver>` de `develop` | — | cria task de release (opcional) |
+| `release start <ver>` | [§Template 3](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-3-release-process) + [§Semver](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#algoritmo-unificado-de-auto-bump-semver) | resolve versão (explícita/auto-bump), cria `release/<ver>` de `develop` | — | cria task de release (opcional) |
 | `release finish` | §Template 3 | merge `release → main`+`develop`, `git tag -a`, push `--tags` | `createRelease` (notas) + `getCIStatus(main)` | `updateStatus → done` |
-| `hotfix start <nome>` | [§Template 4](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#template-4-emergency-hotfix) | detecta primary branch, cria `hotfix/<nome>` da produção | — | cria task `urgent` (opcional) |
+| `hotfix start <nome>` | [§Template 4](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-4-emergency-hotfix) | detecta primary branch, cria `hotfix/<nome>` da produção | — | cria task `urgent` (opcional) |
 | `hotfix finish` | §Template 4 + §Semver | **dual-merge** `hotfix → main`+`develop`, tag patch, push `--tags` | `createRelease` + `getCIStatus(main)` | `updateStatus → done` |
 
 ## 📤 Saída
@@ -81,7 +81,7 @@ Reporte: combinação executada, branch resultante, ações de adapter realizada
 
 ## 📚 Referências
 
-- Motor GitFlow (Templates, semver, sessão, conflitos): [gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md)
+- Motor GitFlow (Templates, semver, sessão, conflitos): [gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md)
 - Forge (PR/CI/Release): [utils/forge/interface.md](../../utils/forge/interface.md)
 - Sync de task: [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
 - Setup: `/git:init` · Pós-merge: `/git:sync` · Mentor: `@gitflow-specialist`

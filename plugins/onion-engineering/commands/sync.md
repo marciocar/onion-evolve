@@ -39,7 +39,7 @@ Automatizar a sincronização após merge de PRs, respeitando a proteção de br
 
 ## ⚡ Fluxo de Execução
 
-Segue a [Matriz de Branches Protegidas e Estratégia de Sync](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync) — **fonte única** da proteção e da estratégia por contexto.
+Segue a [Matriz de Branches Protegidas e Estratégia de Sync](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync) — **fonte única** da proteção e da estratégia por contexto.
 
 1. **Detectar contexto** — `CURRENT=$(git branch --show-current)`, `TARGET=${branch:-develop}`.
 2. **Validar estado** — abortar se houver mudanças não commitadas; `git fetch origin --prune`.
@@ -63,6 +63,6 @@ Em branch protegida sem FF possível, reportar bloqueio e o workflow correto (`/
 
 ## 🔗 Referências
 
-- Proteção e estratégia: [gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync)
+- Proteção e estratégia: [gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync)
 - Sync de task: [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
 - Mentor (conflitos, troubleshooting): `@gitflow-specialist`

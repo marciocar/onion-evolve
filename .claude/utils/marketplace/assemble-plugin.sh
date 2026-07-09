@@ -22,6 +22,9 @@
 #   TEMPLATES=()  # arquivos → templates/  (vazio = sem templates, ok)
 #   SKILLS=()     # dirs (Agent Skill c/ SKILL.md) → skills/  (auto-descoberto pelo plugin)
 #   HOOKS=()      # arquivos (scripts) → hooks/  (registro via hooks.json fica a cargo do consumidor)
+#   DOCS=()       # arquivos → kb/  KB de FRAMEWORK (tipo A: gitflow-patterns, worklog-protocol…) que a
+#                 # vertical CITA. Torna o plugin auto-suficiente sem /meta:adopt. NÃO é o contexto do
+#                 # consumidor (tipo B: docs/*-context/) — esse fica L2, resolvido pela skill de contexto.
 #
 # Uso       : assemble-plugin.sh <manifest> [source-root] [dest-dir]
 #             source-root default = git toplevel; dest default = <root>/plugins/<PLUGIN_NAME>
@@ -43,7 +46,7 @@ git -C "${SRC}" rev-parse --git-dir >/dev/null 2>&1 || { echo "ERRO: source não
 
 # Defaults antes do source (manifesto pode sobrescrever).
 PLUGIN_NAME=""; PLUGIN_VERSION="0.1.0"; PLUGIN_DESC=""; KEYWORDS=()
-COMMANDS=(); AGENTS=(); UTILS=(); VALIDATION=(); TEMPLATES=(); SKILLS=(); HOOKS=()
+COMMANDS=(); AGENTS=(); UTILS=(); VALIDATION=(); TEMPLATES=(); SKILLS=(); HOOKS=(); DOCS=()
 CONFORMANCE="bronze"; PROVIDES=(); REQUIRES=(); LOADS=()   # Capability Contract (ADR capability-contract)
 # shellcheck disable=SC1090
 . "${MANIFEST}"
@@ -59,6 +62,7 @@ for v in "${VALIDATION[@]}"; do [ -f "${SRC}/${v}" ] || { echo "ERRO: validation
 for t in "${TEMPLATES[@]}"; do [ -f "${SRC}/${t}" ] || { echo "ERRO: template fonte ausente: ${t}" >&2; exit 2; }; done
 for s in "${SKILLS[@]}"; do [ -d "${SRC}/${s}" ] || { echo "ERRO: skill fonte ausente (dir): ${s}" >&2; exit 2; }; done
 for h in "${HOOKS[@]}"; do [ -f "${SRC}/${h}" ] || { echo "ERRO: hook fonte ausente (arquivo): ${h}" >&2; exit 2; }; done
+for d in "${DOCS[@]}"; do [ -f "${SRC}/${d}" ] || { echo "ERRO: doc-KB fonte ausente (arquivo): ${d}" >&2; exit 2; }; done
 
 # Montagem limpa (idempotente).
 rm -rf "${DEST}" 2>/dev/null
@@ -100,6 +104,11 @@ if [ "${#HOOKS[@]}" -gt 0 ]; then
   mkdir -p "${DEST}/hooks" 2>/dev/null
   for h in "${HOOKS[@]}"; do cp "${SRC}/${h}" "${DEST}/hooks/" 2>/dev/null && chmod +x "${DEST}/hooks/$(basename "${h}")" 2>/dev/null; done
 fi
+# kb/ — KB de framework embarcado (tipo A). Só cria a pasta se houver.
+if [ "${#DOCS[@]}" -gt 0 ]; then
+  mkdir -p "${DEST}/kb" 2>/dev/null
+  for d in "${DOCS[@]}"; do cp "${SRC}/${d}" "${DEST}/kb/" 2>/dev/null; done
+fi
 
 # ---------------------------------------------------------------------------
 # PATH-PORTABILITY — reescreve refs ao layout-CORE p/ ${CLAUDE_PLUGIN_ROOT} (manifesto-dirigido).
@@ -117,6 +126,9 @@ for v in "${VALIDATION[@]}"; do vd="$(dirname "${v}")"; [ -n "${_vseen[$vd]:-}" 
 for t in "${TEMPLATES[@]}"; do add_rw "${t}" "${PR}/templates/$(basename "${t}")"; done
 for s in "${SKILLS[@]}"; do add_rw "${s}" "${PR}/skills/$(basename "${s}")"; done
 for h in "${HOOKS[@]}"; do add_rw "${h}" "${PR}/hooks/$(basename "${h}")"; done
+# DOCS (KB tipo A embarcado): refs a esses docs específicos apontam p/ kb/ do plugin. Só os LISTADOS
+# entram no mapa — docs/*-context/ (tipo B, do consumidor) seguem intactos (resolvidos pela skill de contexto).
+for d in "${DOCS[@]}"; do add_rw "${d}" "${PR}/kb/$(basename "${d}")"; done
 
 # Aplica os pares em TODOS os arquivos do plugin (escapa regex em FROM; `|` como delim).
 while IFS= read -r f; do
@@ -124,6 +136,9 @@ while IFS= read -r f; do
     from_esc="$(printf '%s' "${RW_FROM[$i]}" | sed 's/[.[\*^$/]/\\&/g')"
     sed -i "s|${from_esc}|${RW_TO[$i]}|g" "${f}" 2>/dev/null
   done
+  # Colapsa prefixos relativos órfãos (`../../../${CLAUDE_PLUGIN_ROOT}` ← links markdown `[x](../../../docs/…)`)
+  # → ${CLAUDE_PLUGIN_ROOT} é raiz-do-plugin; qualquer `../` antes dele é resíduo do rewrite. Idempotente.
+  sed -i 's#\(\.\./\)\{1,\}\${CLAUDE_PLUGIN_ROOT}#${CLAUDE_PLUGIN_ROOT}#g' "${f}" 2>/dev/null
   # Scripts bundlados: PROJECT default core-ascend → cwd do consumidor (portável; core intacto).
   case "${f}" in *.sh) sed -i 's|\${1:-\${REPO_ROOT}}|${1:-$(pwd)}|g' "${f}" 2>/dev/null ;; esac
 done < <(find "${DEST}" -type f ! -path "*/.claude-plugin/*" 2>/dev/null)
@@ -140,7 +155,7 @@ ref="$(git -C "${SRC}" rev-parse HEAD 2>/dev/null || echo unknown)"
 commit_date="$(git -C "${SRC}" show -s --format=%cI HEAD 2>/dev/null || echo unknown)"
 tree_sha="$(
   {
-    for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}"; do
+    for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}"; do
       if [ -d "${SRC}/${p}" ]; then ( cd "${SRC}" && find "${p}" -type f ); else printf '%s\n' "${p}"; fi
     done | LC_ALL=C sort | while IFS= read -r rel; do
       printf '%s %s\n' "$(git -C "${SRC}" hash-object "${SRC}/${rel}" 2>/dev/null || echo nohash)" "${rel}"

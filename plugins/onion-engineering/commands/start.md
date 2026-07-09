@@ -30,7 +30,7 @@ usuário antes de prosseguir (ver exemplo em **Validação de ID Incompatível**
 - Certifique-se de que existe uma pasta `.claude/sessions/<feature-slug>` (o **worklog**)
 - Peça ao usuário o input para esta sessão (você receberá um ou mais tasks para trabalhar)
 
-> **Worklog vs. transcript**: o worklog (`.claude/sessions/<slug>/`) é o estado durável em arquivo; o transcript é a conversa nativa do Claude Code (`claude --resume`). A estrutura do worklog é definida pela **SSOT** — [gitflow-patterns.md §Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento); a mecânica de resume/leitura, por [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md). Não redefina a estrutura aqui.
+> **Worklog vs. transcript**: o worklog (`.claude/sessions/<slug>/`) é o estado durável em arquivo; o transcript é a conversa nativa do Claude Code (`claude --resume`). A estrutura do worklog é definida pela **SSOT** — [gitflow-patterns.md §Contrato de Sessão](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento); a mecânica de resume/leitura, por [worklog-protocol.md](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md). Não redefina a estrutura aqui.
 
 ## Análise
 
@@ -113,7 +113,7 @@ Uma vez que tenha um bom entendimento do que está sendo construído, salve-o no
 
 ## STATE.md — índice de resume (OBRIGATÓRIO)
 
-Após `context.md` e `architecture.md` aprovados, crie o `.claude/sessions/<feature-slug>/STATE.md` — o índice Tier-0 (~1KB) que torna o resume barato e determinístico. Esquema completo em [worklog-protocol.md §3](../../../docs/knowledge-base/concepts/worklog-protocol.md). Mínimo:
+Após `context.md` e `architecture.md` aprovados, crie o `.claude/sessions/<feature-slug>/STATE.md` — o índice Tier-0 (~1KB) que torna o resume barato e determinístico. Esquema completo em [worklog-protocol.md §3](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md). Mínimo:
 
 ```markdown
 # STATE — <feature-slug>
@@ -189,7 +189,7 @@ para obter a estrutura completa antes de criar o mapeamento fase→subtask abaix
 Quando subtasks existem, o sistema deve **automaticamente**:
 1. **Detectar subtasks** via `taskManager.getSubtasks(taskId)`
 2. **Correlacionar com fases** do plan.md (por ordem ou nome)
-3. **Salvar mapeamento** na seção `## 📋 Phase-Subtask Mapping` do `context.md` (header e formato canônicos na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)) para uso pelo `/engineer/work`
+3. **Salvar mapeamento** na seção `## 📋 Phase-Subtask Mapping` do `context.md` (header e formato canônicos na [SSOT](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)) para uso pelo `/engineer/work`
 4. **Validar correlação** e alertar se houver mismatch
 
 ## Pesquisa
