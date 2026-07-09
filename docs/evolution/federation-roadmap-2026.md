@@ -57,6 +57,15 @@ pura do SSOT) → libera valor imediato. **Fase 2 é gated na RFC-0004** (transp
   `/.well-known/agent-card.json`; sobre o `onion-bridge` (já roda). **Só SINAIS GATED** (nunca conversa
   autônoma). `pin-integrity-check` = verificação-antes-de-agir; gate humano = estados `input_required`/
   `auth_required`; `never-live-pull` p/ regulados. **Gate:** RFC-0004 + gate humano + dogfood. **Evidência:** `G1`, `S1·F4/F5/F9`.
+- **Fundação segura no core — ✅ (2026-07-09), dogfood-first:** o **gate de verificação-antes-de-agir** já
+  existe e é testado no core, SEM abrir canal: `a2a-verify.sh` (6 camadas fail-fast — trust policy compondo
+  `trust-topology-check.sh` · anti-replay `jti` · janela de timestamp · anti-SSRF · assinatura JWS RS256 ·
+  never-live-pull; **fail-safe = VETO, nunca skip**) + `a2a-ssrf-check.sh` + Agent Card gerado
+  (`a2a-agent-card.sh` → `docs/onion/agent-card.json`, filtrado ao core) + contrato do adapter completo +
+  **27 selftests** + drift-guard **REGRA 25**. De-risca o endpoint.
+- **Endpoint vivo — ⏳ GATED, pendente (VPS):** a rota Hono/SSE/webhook + servir o Agent Card + o **dogfood do
+  handshake com um adotante regulado** vivem no repo privado `~/onion-bridge` e exigem **gate humano explícito**.
+  O endpoint chama o `a2a-verify` do core na fronteira transport→ação.
 
 ### F2.3 — Veto reputação-condicionado (evolução futura)
 - **O quê:** ligar reputação-por-evidência (`trust-log` + `can_correct_to`) como condicionante do veto/urgência

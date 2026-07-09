@@ -1,0 +1,63 @@
+{
+  "capabilities": {
+    "pushNotifications": true,
+    "streaming": true
+  },
+  "defaultInputModes": [
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "description": "Onion framework core (source-of-truth). Recebe SINAIS de co-evolução GATED de membros da federação; nunca conversa autônoma agente-a-agente. Aceitação sempre sob gate humano.",
+  "name": "onion-evolve",
+  "protocolVersion": "0.3.0",
+  "security": [
+    {
+      "oauth2": [
+        "co-evolution.signal"
+      ]
+    },
+    {
+      "mtls": []
+    }
+  ],
+  "securitySchemes": {
+    "mtls": {
+      "type": "mutualTLS"
+    },
+    "oauth2": {
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://app.onionevolve.com/oauth/authorize",
+          "scopes": {
+            "co-evolution.signal": "enviar sinal de co-evolução gated"
+          },
+          "tokenUrl": "https://app.onionevolve.com/oauth/token"
+        }
+      },
+      "type": "oauth2"
+    }
+  },
+  "skills": [
+    {
+      "description": "Recebe um SINAL tipado (contrato/anúncio/veredito) para triagem sob gate humano. Signals-only: nunca executa conversa autônoma nem auto-aplica mudança.",
+      "id": "co-evolution-signal",
+      "inputModes": [
+        "application/json"
+      ],
+      "name": "Recepção de sinal de co-evolução (gated)",
+      "outputModes": [
+        "application/json"
+      ],
+      "tags": [
+        "gated",
+        "signals-only",
+        "co-evolution",
+        "human-in-the-loop"
+      ]
+    }
+  ],
+  "url": "https://app.onionevolve.com/a2a",
+  "version": "1.0.0"
+}

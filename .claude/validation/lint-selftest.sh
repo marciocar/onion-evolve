@@ -703,6 +703,213 @@ run_detect_transport_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo a2a-ssrf — anti-SSRF da URL de webhook A2A (camada 4 do gate a2a-verify,
+# F2.2 fundação). Deny-list estrutural (loopback/rfc1918/metadata/ipv6/scheme) +
+# allow-list dos hosts conhecidos do members.yaml. Fail-safe: fora da allowlist /
+# SSOT ausente = DENY (nunca skip). members.yaml sandbox via A2A_MEMBERS_FILE.
+# ---------------------------------------------------------------------------
+run_a2a_ssrf_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/federation-transport/a2a-ssrf-check.sh"
+  if [ ! -f "${helper}" ]; then record_fail "a2a-ssrf" "helper ausente: ${helper}"; return; fi
+  local mf out rc
+  mf="$(mktemp)"
+  cat > "${mf}" <<'YML'
+members:
+  - id: onion-evolve
+    remote: github.com/marciocar/onion-evolve
+  - id: acme
+    remote: gitlab.example.org/acme/app
+YML
+  _ssrf() { rc=0; out="$(A2A_MEMBERS_FILE="${mf}" bash "${helper}" "$1" 2>/dev/null)" || rc=$?; }
+
+  _ssrf "http://127.0.0.1:8787/h"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'loopback'; then record_pass "a2a-ssrf: 127.0.0.1 → deny loopback"
+  else record_fail "a2a-ssrf: loopback" "out='${out}' rc=${rc}"; fi
+
+  _ssrf "http://169.254.169.254/latest/meta-data/"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'link-local-metadata'; then record_pass "a2a-ssrf: 169.254.169.254 (metadata cloud) → deny"
+  else record_fail "a2a-ssrf: metadata" "out='${out}' rc=${rc}"; fi
+
+  _ssrf "https://10.1.2.3/h"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'rfc1918'; then record_pass "a2a-ssrf: 10.x → deny rfc1918"
+  else record_fail "a2a-ssrf: rfc1918-10" "out='${out}' rc=${rc}"; fi
+
+  _ssrf "https://192.168.1.1/h"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'rfc1918'; then record_pass "a2a-ssrf: 192.168.x → deny rfc1918"
+  else record_fail "a2a-ssrf: rfc1918-192" "out='${out}' rc=${rc}"; fi
+
+  _ssrf "ftp://gitlab.example.org/x"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'scheme'; then record_pass "a2a-ssrf: esquema não-http → deny"
+  else record_fail "a2a-ssrf: scheme" "out='${out}' rc=${rc}"; fi
+
+  _ssrf "https://gitlab.example.org/webhook"
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '^allow'; then record_pass "a2a-ssrf: host ∈ members.remote → allow"
+  else record_fail "a2a-ssrf: allow" "out='${out}' rc=${rc}"; fi
+
+  _ssrf "https://evil.example.net/hook"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'not-in-allowlist'; then record_pass "a2a-ssrf: host público fora da allowlist → deny"
+  else record_fail "a2a-ssrf: allowlist" "out='${out}' rc=${rc}"; fi
+
+  # fail-safe: SSOT ausente → deny (nunca allow por ausência)
+  rc=0; out="$(A2A_MEMBERS_FILE=/nao/existe/members.yaml bash "${helper}" "https://gitlab.example.org/x" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'members-absent'; then record_pass "a2a-ssrf: SSOT ausente → deny (fail-safe)"
+  else record_fail "a2a-ssrf: ssot-absent" "out='${out}' rc=${rc}"; fi
+
+  rm -f "${mf}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo a2a-verify — o gate "verificação-antes-de-agir" do a2a-live (F2.2 fundação).
+# Self-contained em mktemp (forja par RSA + JWS on-the-fly com openssl, como
+# run_pin_integrity forja commits). Cobre as 6 camadas + os invariantes hardcoded
+# (gated:true / committed:false SEMPRE) + o FAIL-SAFE (tooling ausente → VETO, nunca skip).
+# Precisa openssl+jq+python3+yaml p/ forjar fixtures — ausente → skip (não é o SUT).
+# ---------------------------------------------------------------------------
+run_a2a_verify_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/federation-transport/a2a-verify.sh"
+  if [ ! -f "${helper}" ]; then record_fail "a2a-verify" "helper ausente: ${helper}"; return; fi
+  if ! command -v openssl >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1 \
+     || ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import yaml' >/dev/null 2>&1; then
+    record_pass "a2a-verify: tooling p/ forjar fixtures ausente → skip (não-SUT)"; return
+  fi
+  local sb; sb="$(mktemp -d)"; mkdir -p "${sb}/docs/evolution/federation" "${sb}/jwks"
+  cat > "${sb}/docs/evolution/federation/members.yaml" <<'YML'
+members:
+  - id: onion-evolve
+    role: source
+    remote: github.com/marciocar/onion-evolve
+  - id: acme
+    role: standalone
+    remote: github.com/acme/app
+    trust: { can_receive_from: [onion-evolve] }
+  - id: fin
+    role: standalone
+    mode: regulated
+    remote: github.com/fin/app
+    trust: { can_receive_from: [onion-evolve] }
+YML
+  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "${sb}/priv.pem" 2>/dev/null
+  openssl pkey -in "${sb}/priv.pem" -pubout -out "${sb}/jwks/k1.pem" 2>/dev/null
+  local NOW out rc
+  NOW="$(date +%s)"
+  _b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
+  _jws() { local h p; h="$(printf '{"alg":"RS256","kid":"%s"}' "${6:-k1}" | _b64url)"
+    p="$(printf '{"iss":"%s","aud":"%s","iat":%s,"exp":%s,"jti":"%s"}' "$1" "$2" "$3" "$4" "$5" | _b64url)"
+    printf '%s.%s.%s' "$h" "$p" "$(printf '%s' "$h.$p" | openssl dgst -sha256 -sign "${sb}/priv.pem" | _b64url)"; }
+  _env() { printf '{"jws":"%s","signal":{"from":"%s","to":"%s","kind":"signal"}%s}' "$1" "$2" "$3" "$4"; }
+  _verify() { rc=0; out="$(A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver "$1" --repo "${sb}" --dry-run --envelope - <<<"$2" 2>/dev/null)" || rc=$?; }
+
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-h)" acme onion-evolve "")"
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"verified":true'; then record_pass "a2a-verify: envelope assinado válido → verified"
+  else record_fail "a2a-verify: happy" "out='${out}' rc=${rc}"; fi
+  if printf '%s' "${out}" | grep -q '"gated":true'; then record_pass "a2a-verify: gated:true sempre (verified pende gate humano)"
+  else record_fail "a2a-verify: gated-verified" "out='${out}'"; fi
+  if printf '%s' "${out}" | grep -q '"committed":false'; then record_pass "a2a-verify: committed:false sempre (I3)"
+  else record_fail "a2a-verify: committed" "out='${out}'"; fi
+
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-h)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q '"reason":"replay"'; then record_pass "a2a-verify: jti reusado → veto replay"
+  else record_fail "a2a-verify: replay" "out='${out}' rc=${rc}"; fi
+
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "$((NOW-7200))" "$((NOW-3600))" jti-e)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'expired'; then record_pass "a2a-verify: exp no passado → veto expired"
+  else record_fail "a2a-verify: expired" "out='${out}' rc=${rc}"; fi
+
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "$((NOW+99999))" "$((NOW+999999))" jti-f)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'future'; then record_pass "a2a-verify: iat muito à frente → veto future"
+  else record_fail "a2a-verify: future" "out='${out}' rc=${rc}"; fi
+
+  _verify onion-evolve "$(_env "$(_jws ghost onion-evolve "${NOW}" "$((NOW+3600))" jti-g)" ghost onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'trust-denied'; then record_pass "a2a-verify: from fora da policy → veto trust-denied"
+  else record_fail "a2a-verify: trust" "out='${out}' rc=${rc}"; fi
+  if printf '%s' "${out}" | grep -q '"gated":true'; then record_pass "a2a-verify: gated:true sempre (mesmo em veto)"
+  else record_fail "a2a-verify: gated-veto" "out='${out}'"; fi
+
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-s)" acme onion-evolve ',"pushNotificationConfig":{"url":"http://169.254.169.254/"}')"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q '"reason":"ssrf"'; then record_pass "a2a-verify: webhook p/ metadata → veto ssrf"
+  else record_fail "a2a-verify: ssrf" "out='${out}' rc=${rc}"; fi
+
+  local jbad; jbad="$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-b)"; jbad="${jbad%.*}.AAAABBBBCCCCDDDD"
+  _verify onion-evolve "$(_env "${jbad}" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'bad-signature'; then record_pass "a2a-verify: assinatura adulterada → veto bad-signature"
+  else record_fail "a2a-verify: bad-sig" "out='${out}' rc=${rc}"; fi
+
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-k kZ)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'unknown-kid'; then record_pass "a2a-verify: kid sem pubkey no JWKS → veto unknown-kid"
+  else record_fail "a2a-verify: kid" "out='${out}' rc=${rc}"; fi
+
+  _verify fin "$(_env "$(_jws onion-evolve fin "${NOW}" "$((NOW+3600))" jti-r)" onion-evolve fin "")"
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"apply_mode":"propose-only"'; then record_pass "a2a-verify: receptor regulado → apply_mode:propose-only (never-live-pull)"
+  else record_fail "a2a-verify: regulated" "out='${out}' rc=${rc}"; fi
+
+  # FAIL-SAFE: openssl fora do PATH → veto tooling-absent (degrade→VETO, nunca skip/allow)
+  local bin t p; bin="$(mktemp -d)"
+  for t in jq date mktemp python3 grep cat dirname git tr sed sort find awk head cut wc bash sha256sum; do
+    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && ln -s "$p" "${bin}/$t"
+  done
+  local se; se="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-safe)" acme onion-evolve "")"
+  rc=0; out="$(PATH="${bin}" A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${se}" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'tooling-absent'; then record_pass "a2a-verify: FAIL-SAFE — tooling ausente → veto (nunca skip/allow)"
+  else record_fail "a2a-verify: fail-safe" "out='${out}' rc=${rc}"; fi
+  rm -rf "${bin}" "${sb}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo agent-card — gerador do Agent Card A2A do core (F2.2 fundação). Projeção
+# read-only do members.yaml FILTRADA ao próprio core (confidencialidade). Cobre:
+# JSON válido, confidencialidade (adotante não vaza), signals-only, securitySchemes,
+# determinismo e o exit-3 gracioso (core ausente). Sandbox via A2A_MEMBERS_FILE.
+# ---------------------------------------------------------------------------
+run_agent_card_selftests() {
+  local gen="${REPO_ROOT}/.claude/validation/a2a-agent-card.sh"
+  if [ ! -f "${gen}" ]; then record_fail "agent-card" "gerador ausente: ${gen}"; return; fi
+  if ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import yaml' >/dev/null 2>&1; then
+    record_pass "agent-card: python+yaml ausente → skip (não-SUT)"; return
+  fi
+  local mf mf2 out rc a b n
+  mf="$(mktemp)"
+  cat > "${mf}" <<'YML'
+members:
+  - id: onion-evolve
+    role: source
+    remote: github.com/marciocar/onion-evolve
+  - id: acme-secret
+    role: standalone
+    remote: github.com/acme/secret
+YML
+  rc=0; out="$(A2A_MEMBERS_FILE="${mf}" bash "${gen}" 2>/dev/null)" || rc=$?
+
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | python3 -c 'import sys,json;json.load(sys.stdin)' 2>/dev/null; then
+    record_pass "agent-card: JSON válido"
+  else record_fail "agent-card: json" "rc=${rc} out='${out:0:80}'"; fi
+
+  if printf '%s' "${out}" | grep -q 'onion-evolve' && ! printf '%s' "${out}" | grep -q 'acme-secret'; then
+    record_pass "agent-card: CONFIDENCIALIDADE — só o core, adotante não vaza"
+  else record_fail "agent-card: confidencialidade" "vazou adotante OU sem core"; fi
+
+  n="$(printf '%s' "${out}" | python3 -c 'import sys,json;print(len(json.load(sys.stdin).get("skills",[])))' 2>/dev/null)"
+  if [ "${n}" = "1" ] && printf '%s' "${out}" | grep -q 'signals-only'; then
+    record_pass "agent-card: signals-only (1 skill gated, sem conversa autônoma)"
+  else record_fail "agent-card: signals-only" "n_skills='${n}'"; fi
+
+  if printf '%s' "${out}" | grep -q '"oauth2"' && printf '%s' "${out}" | grep -q '"mtls"'; then
+    record_pass "agent-card: securitySchemes oauth2 + mtls"
+  else record_fail "agent-card: schemes" "faltou oauth2/mtls"; fi
+
+  a="$(A2A_MEMBERS_FILE="${mf}" bash "${gen}" 2>/dev/null | sha256sum)"
+  b="$(A2A_MEMBERS_FILE="${mf}" bash "${gen}" 2>/dev/null | sha256sum)"
+  if [ "${a}" = "${b}" ]; then record_pass "agent-card: determinístico (2 rodadas sha-iguais)"
+  else record_fail "agent-card: determinismo" "diverge"; fi
+
+  mf2="$(mktemp)"; printf 'members:\n  - id: acme\n    role: standalone\n' > "${mf2}"
+  rc=0; A2A_MEMBERS_FILE="${mf2}" bash "${gen}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "agent-card: core ausente → exit 3 (gracioso, gerador)"
+  else record_fail "agent-card: exit3" "esperava exit 3, veio ${rc}"; fi
+
+  rm -f "${mf}" "${mf2}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo resolve-scope-layers — exercita .claude/utils/scope/resolve-scope-layers.sh (RFC-0005: fecha o
 # loop do compose-settings — descobre a cadeia empresa→time→pessoa e compõe). Self-contained.
 # ---------------------------------------------------------------------------
@@ -1815,6 +2022,15 @@ run_mail_receiver_selftests
 
 # Modo detect-transport — resolução SDAAL da via de transporte (F2.1 federação).
 run_detect_transport_selftests
+
+# Modo a2a-ssrf — anti-SSRF da URL de webhook A2A (camada 4 do gate a2a-verify, F2.2 fundação).
+run_a2a_ssrf_selftests
+
+# Modo a2a-verify — gate "verificação-antes-de-agir" do a2a-live (F2.2 fundação; 6 camadas + fail-safe).
+run_a2a_verify_selftests
+
+# Modo agent-card — gerador do Agent Card A2A do core, filtrado ao próprio core (F2.2 fundação; confidencialidade).
+run_agent_card_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests

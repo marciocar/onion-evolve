@@ -1,0 +1,3 @@
+# Chaves privadas JAMAIS aqui: ignora todo .pem por padrão (fail-safe anti-vazamento).
+# Pubkeys reais são adicionadas com `git add -f <kid>.pem` deliberadamente quando o endpoint vivo graduar.
+*.pem

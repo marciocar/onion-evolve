@@ -579,6 +579,27 @@ check_federation_console_sync() {
   rm -f "${tmp}"
 }
 
+# REGRA 25 — Agent Card A2A do core (docs/onion/agent-card.json) sincronizado com o SSOT [HARD]
+#           GERADO por a2a-agent-card.sh (members.yaml, FILTRADO ao core — F2.2 fundação a2a-live).
+#           Espelha check_federation_console_sync. Pula sem python+yaml.
+check_agent_card_sync() {
+  local gen="${SCRIPT_DIR}/a2a-agent-card.sh"
+  local cfile="${REPO_ROOT}/docs/onion/agent-card.json"
+  local members="${REPO_ROOT}/docs/evolution/federation/members.yaml"
+  [ -f "${gen}" ] && [ -f "${members}" ] || return 0
+  have_py_yaml || return 0
+  if [ ! -f "${cfile}" ]; then
+    violation "HARD" "docs/onion/agent-card.json" "agent card ausente — rode 'bash .claude/validation/a2a-agent-card.sh > docs/onion/agent-card.json'"
+    return
+  fi
+  local tmp; tmp="$(mktemp)"
+  bash "${gen}" > "${tmp}" 2>/dev/null || true
+  if ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
+    violation "HARD" "docs/onion/agent-card.json" "agent card desatualizado vs SSOT — regenere: bash .claude/validation/a2a-agent-card.sh > docs/onion/agent-card.json"
+  fi
+  rm -f "${tmp}"
+}
+
 # ===========================================================================
 # REGRA 9 — Contagens no CLAUDE.md em sincronia com a SSOT [HARD]
 #           Extrai "N comandos invocáveis", "N agentes", "N skills" do CLAUDE.md
@@ -1222,6 +1243,7 @@ check_role_bundle_sync
 check_graph_sync
 check_federation_map_sync
 check_federation_console_sync
+check_agent_card_sync
 check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp
