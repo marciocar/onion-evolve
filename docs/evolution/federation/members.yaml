@@ -39,6 +39,15 @@ members:
       - changelog
       - commands-via-adopt
       - personality-public
+    a2a:                        # endpoint a2a-live (RFC-0004 F2.2) — INFRA que hospeda o endpoint DO CORE,
+                                # NÃO uma identidade separada (single-source: o Agent Card servido é o do
+                                # onion-evolve). O bridge lê o core ao vivo e chama a2a-verify.sh na fronteira.
+      host: onion-bridge        # deploy /home/onion/onion-bridge na KVM 8 (Hono + claude-agent-sdk, systemd)
+      url: https://app.onionevolve.com/a2a
+      agent_card: docs/onion/agent-card.json          # gerado por a2a-agent-card.sh (filtrado ao core)
+      well_known: https://app.onionevolve.com/.well-known/agent-card.json
+      gate: a2a-verify.sh       # verificação-antes-de-agir (6 camadas, fail-safe); sinal verificado → gated
+      status: foundation        # gate de segurança ✅; endpoint vivo em construção (F2.2 fase-1)
     # TIER 0 — sem bloco trust:; o core lê tudo por papel, não por concessão
 
   - id: metagamify
