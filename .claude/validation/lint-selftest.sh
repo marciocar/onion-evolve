@@ -553,6 +553,43 @@ run_vendor_branch_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo compose-settings — exercita .claude/utils/scope/compose-settings.sh (RFC-0005 plano 2:
+# settings.json N-camadas de escopo framework→empresa→time→pessoa). Self-contained em mktemp.
+#   (a) merge type-aware: escalar last-wins · objeto recursa · array união (hooks/permissions)
+#   (b) determinismo · (c) proveniência · (d) gracioso (JSON inválido → exit 2; sem jq → skip)
+# ---------------------------------------------------------------------------
+run_compose_settings_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/scope/compose-settings.sh"
+  if [ ! -f "${helper}" ]; then record_fail "compose-settings" "helper ausente: ${helper}"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_pass "compose-settings: jq ausente → pulado (gracioso)"; return; fi
+  local d; d="$(mktemp -d)"
+  printf '%s' '{"theme":"dark","permissions":{"allow":["Bash(git *)"],"deny":[]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"fw"}]}]}}' > "$d/fw.json"
+  printf '%s' '{"permissions":{"deny":["x"]},"env":{"ORG":"granaai"}}' > "$d/org.json"
+  printf '%s' '{"model":"opus","permissions":{"allow":["Bash(nx *)"]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"team"}]}]}}' > "$d/team.json"
+  printf '%s' '{"theme":"light","env":{"EDITOR":"vim"}}' > "$d/person.json"
+  local C; C="$(bash "${helper}" "$d/fw.json" "$d/org.json" "$d/team.json" "$d/person.json" 2>/dev/null)"
+  if [ "$(printf '%s' "$C" | jq -r .theme)" = "light" ] \
+     && [ "$(printf '%s' "$C" | jq -r .model)" = "opus" ] \
+     && [ "$(printf '%s' "$C" | jq -c '.permissions.allow')" = '["Bash(git *)","Bash(nx *)"]' ] \
+     && [ "$(printf '%s' "$C" | jq -r '.env.ORG')" = "granaai" ] && [ "$(printf '%s' "$C" | jq -r '.env.EDITOR')" = "vim" ] \
+     && [ "$(printf '%s' "$C" | jq '.hooks.SessionStart|length')" = "2" ]; then
+    record_pass "compose-settings: N-camadas (escalar last-wins + objeto recursa + array união)"
+  else record_fail "compose-settings: merge" "composição incorreta (theme/model/allow/env/hooks)"; fi
+  local C2; C2="$(bash "${helper}" "$d/fw.json" "$d/org.json" "$d/team.json" "$d/person.json" 2>/dev/null)"
+  if [ "$(printf '%s' "$C" | sha256sum)" = "$(printf '%s' "$C2" | sha256sum)" ]; then
+    record_pass "compose-settings: determinístico"
+  else record_fail "compose-settings: determinismo" "composição varia entre execuções"; fi
+  if bash "${helper}" --provenance "$d/fw.json" "$d/person.json" 2>/dev/null | grep -q 'theme: fw.json, person.json'; then
+    record_pass "compose-settings: proveniência (theme ← fw + person)"
+  else record_fail "compose-settings: proveniência" "proveniência incorreta"; fi
+  printf '%s' '{bad' > "$d/bad.json"
+  local rc=0; bash "${helper}" "$d/fw.json" "$d/bad.json" >/dev/null 2>&1 || rc=$?
+  if [ "$rc" -eq 2 ]; then record_pass "compose-settings: JSON inválido → exit 2 (gracioso)"
+  else record_fail "compose-settings: inválido" "esperava exit 2, veio $rc"; fi
+  rm -rf "$d"
+}
+
+# ---------------------------------------------------------------------------
 # Modo prettierignore — exercita .claude/utils/adopt/merge-prettierignore.sh.
 # Self-contained (estilo run_resolve_selftests): cenários em mktemp -d, sem
 # fixture-file/manifest. Cobre os MODOS DE FALHA (não só o happy-path): criação
@@ -1619,6 +1656,9 @@ run_durable_commit_selftests
 
 # Modo vendor-branch — --update via merge de onion/vendor (Achado #2: never-clobber estrutural).
 run_vendor_branch_selftests
+
+# Modo compose-settings — settings.json N-camadas de escopo (RFC-0005 plano 2).
+run_compose_settings_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
