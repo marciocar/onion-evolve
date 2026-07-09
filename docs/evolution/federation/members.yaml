@@ -74,6 +74,9 @@ members:
     mode: legacy              # greenfield | legacy | regulated
     personality_summary: "Engine de metagamificação modular; especialista Nx + Asana; co-evolução ativa"  # seed manual pré-F2 — substituir no 1º /meta:personality-sync real
     specializations: [gamification, nx-monorepo, asana-integration, metagamification]
+    a2a:                        # participa do a2a-live (F2.2) como REMETENTE: assina sinais gated ao core.
+      sends_to: onion-evolve    # envia p/ o endpoint do core; não hospeda endpoint próprio
+      keys: [metagamify-1]      # kids cujas pubkeys o core PINOU (jwks/<kid>.pem). O a2a-verify exige kid ∈ keys[from]
     personality_last_sync: 2026-07-01   # seed manual (o comando de sync ainda não existe — RFC-0003 F2)
     trust:
       can_receive_from: [onion-evolve]    # quem pode me mandar conselho/sinal

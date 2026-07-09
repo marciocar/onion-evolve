@@ -123,6 +123,20 @@ KID="$(printf '%s' "${HDR_JSON}" | jq -r '.kid // empty' 2>/dev/null)"
 case "${KID}" in */*|..*|.) veto "bad-kid" "jws" ;; esac                # kid vira nome de arquivo → sanitiza
 PUB="${JWKS_DIR}/${KID}.pem"
 [ -f "${PUB}" ] || veto "unknown-kid:${KID}" "jws"
+# kid DEVE pertencer ao `from` (members.yaml a2a.keys) — fecha impersonação: sem isso, o dono de QUALQUER
+# kid pinado poderia assinar reivindicando from=outro. (Só assinatura+iss==from não basta com 2+ chaves.)
+command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 || veto "tooling-absent:python-yaml" "jws"
+OWNED="$(python3 - "${MEMBERS}" "${FROM}" <<'PY'
+import sys, yaml
+try: ms=(yaml.safe_load(open(sys.argv[1])) or {}).get('members') or []
+except Exception: sys.exit(0)
+for m in ms:
+    if m.get('id')==sys.argv[2]:
+        for k in ((m.get('a2a') or {}).get('keys') or []): print(k)
+        break
+PY
+)"
+printf '%s\n' "${OWNED}" | grep -qxF "${KID}" || veto "kid-not-owned-by-from:${KID}" "jws"
 
 TMP="$(mktemp -d)"; trap 'rm -rf "${TMP}"' EXIT
 b64url_decode "${SIG_B64}" > "${TMP}/sig.bin"

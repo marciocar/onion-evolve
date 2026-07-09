@@ -778,9 +778,11 @@ members:
   - id: onion-evolve
     role: source
     remote: github.com/marciocar/onion-evolve
+    a2a: { keys: [k1] }
   - id: acme
     role: standalone
     remote: github.com/acme/app
+    a2a: { keys: [k1] }
     trust: { can_receive_from: [onion-evolve] }
   - id: fin
     role: standalone
@@ -841,6 +843,11 @@ YML
   _verify fin "$(_env "$(_jws onion-evolve fin "${NOW}" "$((NOW+3600))" jti-r)" onion-evolve fin "")"
   if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"apply_mode":"propose-only"'; then record_pass "a2a-verify: receptor regulado → apply_mode:propose-only (never-live-pull)"
   else record_fail "a2a-verify: regulated" "out='${out}' rc=${rc}"; fi
+
+  # kid-binding: from=fin (sem k1 nas suas a2a.keys) assina com k1 → veto (anti-impersonação, hardening metagamify)
+  _verify onion-evolve "$(_env "$(_jws fin onion-evolve "${NOW}" "$((NOW+3600))" jti-imp)" fin onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'kid-not-owned-by-from'; then record_pass "a2a-verify: kid de outro dono (impersonação) → veto kid-not-owned-by-from"
+  else record_fail "a2a-verify: kid-binding" "out='${out}' rc=${rc}"; fi
 
   # FAIL-SAFE: openssl fora do PATH → veto tooling-absent (degrade→VETO, nunca skip/allow)
   local bin t p; bin="$(mktemp -d)"
