@@ -16,7 +16,21 @@ A *spec* (interface) define **o quê**; o *adapter* define **o como**; `FEDERATI
 |-----|-------|--------|---------|
 | **`git-async`** (default) | doc-bridge: `CHANGELOG` + `outbox/` + entrega-sem-commit; assíncrono, maestro transporta | ✅ em uso | [`adapters/git-async.md`](adapters/git-async.md) |
 | **`local`** | carteiro same-machine: `co-deliver.sh`/`co-relay.sh` entregam untracked no repo vizinho | ✅ em uso | [`adapters/local.md`](adapters/local.md) |
-| **`a2a-live`** | endpoint A2A (SSE + webhook) sobre o `onion-bridge` — só **sinais gated** | 🔒 **GATED (stub)** — RFC-0004 fase-2 | [`adapters/a2a-live.md`](adapters/a2a-live.md) |
+| **`a2a-live`** | endpoint A2A sobre o `onion-bridge` — só **sinais gated**, verificados pelo `a2a-verify` | ✅ **vivo (F2.2)** — 1º handshake real (metagamify) em 2026-07-09 | [`adapters/a2a-live.md`](adapters/a2a-live.md) |
+
+## Nomenclatura canônica — ATO vs VIA (fecha o sinal 2026-07-09)
+
+O eixo SDAAL (`git-async | local | a2a-live`) é a **via** (o "como"). Nomes anteriores descrevem o **ato** ou a
+**implementação** de uma via — não uma via concorrente. Mapeamento canônico:
+
+| Via (adapter) | Implementada por (ato/canal) |
+|---|---|
+| `local` | **carteiro-local** — `co-deliver.sh` (downstream) / `co-relay.sh` (upstream); entrega untracked same-machine |
+| `git-async` | canais do doc-bridge — `outbox/` → `inbound/` → `inbox/` (append-only; maestro transporta) |
+| `a2a-live` | endpoint no `onion-bridge` + `a2a-verify` (gate) + fila `data/a2a-pending` + `a2a-accept.sh` (fila→inbox) |
+
+**Regra:** "carteiro" nomeia o **ato de entregar** (e os scripts que o fazem), **nunca a via** — a via é sempre
+uma das três do eixo. Refino didático (o vocabulário já funcionava); **sem rename em massa**.
 
 ## Resolução
 
