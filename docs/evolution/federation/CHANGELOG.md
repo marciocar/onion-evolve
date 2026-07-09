@@ -56,7 +56,7 @@
 - Ação p/ adotantes: nenhuma — chega via `/meta:adopt --update`; o lint de vocês passa a proteger o
   próprio `docs/evolution/`. Se o CI flagrar link antigo quebrado, é achado real: corrigir o link.
 
-## 2026-07-04 · `/meta:kg` NASCEU (F2 executado): core dogfoodou o KG na rodada /meta:evolve — comando + radar soberano disponíveis · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-04 · `/meta:kg` NASCEU (F2 executado): core dogfoodou o KG na rodada /meta:evolve — comando + radar soberano disponíveis · COMPATÍVEL · alvo: metagamify
 
 - **A promessa do anúncio D3 cumpriu no mesmo dia**: o core rodou `/meta:evolve` (23 achados
   brutos, 16 sobreviventes, 7 refutados por juiz adversarial) e modelou tudo num
@@ -73,7 +73,7 @@
 - Estado da vertical `onion-investigation`: F0 ✅ F1 ✅ (teu D3) F2 ✅ (isto) · F3 (plugin no
   marketplace) gated por maturidade de uso.
 
-## 2026-07-04 · D3 recebido e CONFIRMADO: 1º dogfood do KG na federação — gate F1 da vertical de investigação disparou · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-04 · D3 recebido e CONFIRMADO: 1º dogfood do KG na federação — gate F1 da vertical de investigação disparou · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal `2026-07-04-kg-primeiro-dogfood-federacao` foi triado e ACEITO** — o D3 está completo
   dos dois lados. O resultado (56 nós, 81 arestas, radar sem contradições, veredito por-verdade com
@@ -95,7 +95,7 @@
 - Ação p/ adotante: **nenhuma imediata.** Quando o `/meta:kg` nascer no core (F2), anunciaremos —
   e teu feedback de campo sobre o schema será bem-vindo no ciclo.
 
-## 2026-07-03 · Sinal ACEITO com parecer: duas linhagens — reunificar a IDENTIDADE primeiro; conteúdo reconcilia via KG (seu convite ao 1º dogfood) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-03 · Sinal ACEITO com parecer: duas linhagens — reunificar a IDENTIDADE primeiro; conteúdo reconcilia via KG (seu convite ao 1º dogfood) · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal `2026-07-03-branch-lineage-divergence` foi verificado em primeira mão e ACEITO** —
   e o diagnóstico é mais fundo do que o sinal pediu: **a instância está partida em meias-instâncias**.
@@ -121,7 +121,7 @@
 - **Ação p/ você:** aguardar as decisões D1-D4 do maestro (tabela no parecer). Nada muda no teu
   fluxo até lá.
 
-## 2026-07-03 · Sinal ACEITO: secret-handling vira KB do core — agente nunca pede/aceita segredo em texto claro · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-03 · Sinal ACEITO: secret-handling vira KB do core — agente nunca pede/aceita segredo em texto claro · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal `2026-07-03-secret-handling-pattern` foi triado e ACEITO integralmente** — promovido a
   KB do core: `docs/knowledge-base/concepts/secret-handling-agent.md` (crédito à instância rhilo,
@@ -133,7 +133,7 @@
   DEV↔PROD (ação privilegiada em produção = deliberada, do humano, com migalha de rastreio).
 - **Ação p/ você: nenhuma.** A KB chega vendorizada no próximo `--update`.
 
-## 2026-07-02 · Sinal ACEITO: verify-the-read-path-first promovido a padrão do core (ai-strategy + disciplina de frota) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-02 · Sinal ACEITO: verify-the-read-path-first promovido a padrão do core (ai-strategy + disciplina de frota) · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal `2026-07-01-sinal-verificar-read-path-antes-de-concluir` foi triado e ACEITO** —
   promoção `assess` → `trial` conforme pedido, nas 3 frentes propostas:
@@ -151,7 +151,7 @@
 - **Ação p/ você: nenhuma obrigatória.** Skill + KB chegam vendorizadas no próximo `--update` (junto
   com o farol de sessão deste mesmo dia).
 
-## 2026-07-02 · CORREÇÃO: o anúncio "você JÁ tem o fix --only" estava ERRADO — seu pin era forjado; guard pin-integrity criado · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-02 · CORREÇÃO: o anúncio "você JÁ tem o fix --only" estava ERRADO — seu pin era forjado; guard pin-integrity criado · COMPATÍVEL · alvo: metagamify
 
 - **Você estava certo, nós erramos.** Seu sinal `2026-07-02-sinal-lint-only-ausente-no-vendor` foi
   verificado em primeira mão no core e **confirmado nos 2 achados**. Retratação + causa raiz:
@@ -179,7 +179,7 @@
   anúncio falso da federação. Virou migalha permanente no diário do core
   (`2026-07-02-forged-pin-false-announcement`) e guarda determinística. O exercício W6 funcionou.
 
-## 2026-07-02 · Sinal ACEITO PARA AVALIAÇÃO: Knowledge Graph SDAAL vira KB CANDIDATA no core; /meta:kg gated até 1º dogfood · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-02 · Sinal ACEITO PARA AVALIAÇÃO: Knowledge Graph SDAAL vira KB CANDIDATA no core; /meta:kg gated até 1º dogfood · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal `2026-07-02-sdaal-knowledge-graph` foi triado e aceito para avaliação.** O conceito foi
   portado ao core como **KB candidata** `docs/knowledge-base/concepts/knowledge-graph-sdaal.md`, com
@@ -198,7 +198,7 @@
 - **Ação p/ você: nenhuma obrigatória.** Continue dogfoodando o `.kg.yaml` no WRR; sinais de evolução
   (reconciliação por embedding, novos node_types) são bem-vindos no canal upstream.
 
-## 2026-07-02 · Eixo E (topologias de sessão W1-W7) + responder-gated + gatilho de reflexão ⏰ · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-02 · Eixo E (topologias de sessão W1-W7) + responder-gated + gatilho de reflexão ⏰ · COMPATÍVEL · alvo: metagamify
 
 - **Novo eixo doutrinário — "quem trabalha onde, a partir de onde":** o ADR
   [`onion-adr-work-models-session-topologies-2026-07`](../../analysis/onion-adr-work-models-session-topologies-2026-07.md)
@@ -219,7 +219,7 @@
 - **Ação p/ você: nenhuma obrigatória.** Tudo chega vendorizado no próximo `/meta:adopt --update`. Se seu
   diário local tiver migalhas, o ⏰ passa a vigiá-las automaticamente.
 
-## 2026-07-02 · RFC-0003 ACEITA — identidade federada, tiers e trust agora são doutrina (você é T1 hub) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-02 · RFC-0003 ACEITA — identidade federada, tiers e trust agora são doutrina (você é T1 hub) · COMPATÍVEL · alvo: metagamify
 
 - **A RFC-0003 (identidade federada e inteligência coletiva) saiu de `draft` → `accepted`** (2026-07-02,
   revisão completa: 5 pendências arbitradas — PRs #215/#216/#217, motivadas pela auditoria orquestrada de
@@ -246,20 +246,20 @@
   `onion-version.sh` role-aware) e os 15+3 casos novos do selftest. RFC canônica:
   `docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md` (no core).
 
-## 2026-07-01 · Sinal RESOLVIDO: lint-selftest O(fixtures × repo) — escopo-de-arquivo `--only` (você JÁ tem o fix) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-01 · Sinal RESOLVIDO: lint-selftest O(fixtures × repo) — escopo-de-arquivo `--only` (você JÁ tem o fix) · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal de campo foi endereçado** ([inbox 2026-06-24](../inbox/_processed/2026-06-24-sinal-lint-selftest-escala-adotante-grande.md)): o `lint-selftest.sh` levava **~10-17 min** no seu repo porque cada fixture re-rodava o `lint-artifacts.sh` **repo-inteiro** (41s/passada × ~20 fixtures) — O(fixtures × tamanho-do-repo), invisível no core (docs/ pequeno). Exatamente o alvo da sua recomendação "escopo de scan no lint".
 - **Fix (PR #180, commit `22f30b0`, 2026-06-27):** `lint-artifacts.sh` ganhou a flag **`--only=<arquivo>`** (wrapper `_find`): cada regra varre **só o arquivo injetado**, preservando a semântica de escopo por regra. O selftest passa `--only="${dst}"` nas invocações → cada fixture roda **O(1 arquivo)** em vez de re-escanear `docs/` inteiro. No core: ~8min → ~30s. No seu repo a projeção é **de ~10-17min para ~1-2min** (o `cp -a docs/` do sandbox permanece — o `inventory.sh` precisa dos números reais — mas o custo dominante, o re-scan por fixture, morreu). Complementado pelo PR #202 (modos core-only pulam gracioso — já anunciado em 2026-06-28).
 - **Você JÁ tem o fix:** verificado no core que `22f30b0` e `2d2dad0` são ancestrais de `a458a0fc6b71` — o seu `--update` de 2026-06-30 os trouxe vendorizados. **Nenhuma ação além de re-rodar** `bash .claude/validation/lint-selftest.sh` e conferir o wall-clock. Se a medição real divergir da projeção, é um sinal novo bem-vindo (a sugestão "guard-rail de tempo" do seu sinal segue no radar, não implementada).
 
-## 2026-07-01 · Veredito: "object-led discovery & fitting" vira playbook do catálogo (não skill/comando novo) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-07-01 · Veredito: "object-led discovery & fitting" vira playbook do catálogo (não skill/comando novo) · COMPATÍVEL · alvo: metagamify
 
 - **Sinal de campo do `rhilo-metagamify`:** propôs canonizar o ciclo "promover objeto existente a papel premium" (espelhar → descobrir → vestir → materializar → realimentar), motivado pelo DataTable premium do dashboard WRR construído imperativamente (pedidos sucessivos re-improvisados a cada rodada).
 - **Veredito: ACEITO como doutrina, materializado como playbook** — não como ADR-skill isolada nem comando `/onion:promote` dedicado. Aplicando a régua P0-P3 (`onion-adr-toolbox-lifecycle`), o substrato já cobria quase tudo (Capability Contract + SDAAL + catálogo-first do RFC-0002) — a síntese que faltava virou a **6ª entrada de playbook** em `onion-patterns/SKILL.md` §Playbooks ("promover objeto existente a papel premium").
 - **Dogfood guiado retroativo** sobre a própria evidência anexada ao sinal (sem tocar o rhilo-app de novo): o gap real estava em **descobrir+vestir não anteciparem o perfil completo** do papel-alvo (emergiu por ~10 pedidos sucessivos em vez de 1 fitting único) — não em "materializar", que já era dirigido e verificado. Doc: [`onion-adr-object-led-discovery-2026-07.md`](../../analysis/onion-adr-object-led-discovery-2026-07.md) (PR #213).
 - **Ação p/ adotantes: nenhuma obrigatória.** O playbook vive no core; chega vendorizado via `/meta:adopt --update` (dentro de `onion-patterns/SKILL.md`). Quem quiser aplicar o ciclo já pode usá-lo por analogia — é disciplina em prosa, não automação. Sinal triado em [`../inbox/_processed/2026-06-29-capability-adaptive-object-led-discovery.md`](../inbox/_processed/2026-06-29-capability-adaptive-object-led-discovery.md).
 
-## 2026-06-28 · BREAKING: skill `onion-fleet`→`onion-orchestration` + `/meta:fleet`→`/meta:orchestrate` (migração de vocabulário) · BREAKING · alvo: rhilo-metagamify
+## 2026-06-28 · BREAKING: skill `onion-fleet`→`onion-orchestration` + `/meta:fleet`→`/meta:orchestrate` (migração de vocabulário) · BREAKING · alvo: metagamify
 
 - **Migração de vocabulário no core:** os apelidos `frota` (PT) / `fleet` (EN) foram **aposentados** em favor do vocabulário canônico da indústria de orquestração multi-agente — `orquestração` (conceito) / `orchestrator-worker` (padrão) / `workers` (coletivo executor). Decisão fundamentada por pesquisa (3 ângulos + web jul-2026): o canônico é *orchestrator-worker / fan-out-fan-in*; "fleet" é jargão em transição e "frota" era o único termo técnico traduzido. Doc: [onion-orchestration-ontology-2026-06](../../analysis/onion-orchestration-ontology-2026-06.md).
 - **O que mudou (afeta você):**
@@ -271,7 +271,7 @@
 - **Por que BREAKING para você:** seu repo tem `onion-fleet` **vendorizado**. Ao rodar `/meta:adopt --update`, o delta troca a skill/comando renomeados. **Ação no alvo:** (1) rodar o `--update` quando oportuno; (2) se você tiver docs/sessões/refs próprias citando `/meta:fleet` ou `onion-fleet`, atualizar para `/meta:orchestrate` / `onion-orchestration` (muscle-memory); (3) o anti-pattern proibido passou a ser `worker-orchestrator` (refletido no lint vendorizado). Sem pressa — o `--update` é idempotente; coordene quando for atualizar o framework.
 - **Validação no core:** lint 0/0, selftest 100/0, revisão independente (pegou substituição semântica cega em L0, corrigida), grep-zero limpo. PR #205 MERGED.
 
-## 2026-06-28 · Sinal RESOLVIDO: lint-selftest.sh robusto a adotante (não aborta mais sem plugins/) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-28 · Sinal RESOLVIDO: lint-selftest.sh robusto a adotante (não aborta mais sem plugins/) · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal de campo foi endereçado** ([inbox 2026-06-28](../inbox/_processed/2026-06-28-lint-selftest-aborts-in-adopter-without-plugins.md), relayado via `/meta:co-relay`, PR #202). O `lint-selftest.sh` **abortava com exit 2** no seu repo (sem `plugins/`) — sob `set -e`, um modo **core-only** derrubava o script **antes** do `run_de_identification_selftests` (o de-id do #201) rodar. Você teve que validar o round-trip à mão; agora não precisa mais.
 - **Diagnóstico (seu, confirmado):** o harness é **artefato distribuído** com dois contextos — core (tem `plugins/`, `fixtures/`) e adotante (subconjunto). Um `set -e` global tornava o modo mais frágil o **teto de todos**. Não era regressão do #201 — fragilidade estrutural pré-existente que o de-id apenas tornou visível.
@@ -282,7 +282,7 @@
 - **Validado nos dois contextos (dogfood adversarial):** core **100/0 exit 0**; adotante simulado (sem `plugins/` nem `fixtures/`) **47/0 exit 0**, com o **de-id passando** (round-trip, dedupe, determinismo).
 - **Ação p/ você:** no próximo `/meta:adopt --update`, o `lint-selftest.sh` corrigido chega vendorizado. A partir daí, o passo pós-update **"rode `lint-selftest.sh`"** conclui com **exit 0** e valida o de-id no harness (sem precisar rodar o `redact-deterministic.sh` à mão). Sem ação obrigatória agora.
 
-## 2026-06-27 · S1 RESOLVIDO: padrão "toolbox" = régua P0-P3 + coesão dos create-* (ciclo ASSESS→TRIAL→ADOPT fechado) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-27 · S1 RESOLVIDO: padrão "toolbox" = régua P0-P3 + coesão dos create-* (ciclo ASSESS→TRIAL→ADOPT fechado) · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal S1 (padrão "toolbox") saiu de "triado" para RESOLVIDO** ([inbox 2026-06-24](../inbox/_processed/2026-06-24-sinal-padrao-toolbox.md)). O pedido — um **meio de 1ª classe para classificar procedimentos recorrentes** (script/skill/comando) e gerir seu ciclo de vida — foi escopado, trialado e selado num ciclo completo (ASSESS #181 → TRIAL #183/#184/#185 → ADOPT #186).
 - **Veredito do scoping (ASSESS, PR #181, [doc](../../analysis/onion-toolbox-s1-scoping-2026-06.md)):** o "toolbox" **NÃO é infra nova**. É uma **régua de classificação P0-P3 + coesão dos `/meta:create-*`** assentada sobre o substrato que já existe (`inventory.sh` + lint + `context-freshness`). Construir registry/dedup/embedding seria inchaço sem dogfood.
@@ -295,7 +295,7 @@
 - **Conexão com o seu S2:** o `/meta:co-relay` (resolvido ontem) foi o **1º caso concreto** deste padrão e destilou o critério (*procedimento recorrente → script + comando + ADR + gate humano*); a régua P0-P3 agora é o **classificador genérico** desse critério.
 - **Ação p/ você:** no próximo `/meta:adopt --update`, a régua + os `create-*` coesos chegam vendorizados. Pode **mover o blip "toolbox" no seu radar → done** (o que você levantou tem resposta canônica agora). Sem ação obrigatória.
 
-## 2026-06-27 · S2 resolvido: /meta:co-relay (transporte upstream entrega-sem-commit) + S1 toolbox triado · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-27 · S2 resolvido: /meta:co-relay (transporte upstream entrega-sem-commit) + S1 toolbox triado · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal S2 (mecânica do transporte manual) foi resolvido** ([inbox 2026-06-25](../inbox/_processed/2026-06-25-sinal-mecanica-transporte-regime-manual.md), PR #178). O incidente que você reportou — a IA commitou cross-repo na **branch errada** do core e escalou ao maestro decisões de **Ato-1 determinístico** — está **dissolvido por construção**.
 - **Como (reframe):** o core já tinha o padrão certo no `/meta:co-deliver` (downstream): **entrega-sem-commit** — larga o arquivo **untracked** no canal do alvo; quem commita é a sessão home do destino → **branch-agnóstico**. Faltava o **espelho upstream**. Criamos **`/meta:co-relay`** (adotante→core `inbox/`). **Sem commit cross-repo → não existe "branch errada" nem pergunta de push → nada a escalar.** O script worktree+commit que você propôs foi **rejeitado** (reintroduziria o incidente).
@@ -304,7 +304,7 @@
 - **Seu sinal S1 (padrão "toolbox") foi triado → backlog/pesquisa.** O S2 é o **1º caso concreto** dele e destilou o critério que você pediu: *procedimento recorrente → script determinístico (controle) + comando (juízo/quando) + ADR (doutrina) + gate humano (irreversível)*. Não será materializado como produto sem dogfood.
 - **Ação p/ você:** no próximo `/meta:adopt --update`, o `co-relay` chega vendorizado. A partir daí, p/ mandar um sinal ao core (mesma máquina): escreva no seu `docs/evolution/inbox/` e rode `/meta:co-relay <sinal> --target <path-do-core>` (Ato-1, entrega-sem-commit; a sessão do core commita + tria). Sem ação obrigatória agora.
 
-## 2026-06-24 · Digest de sessão: re-sync recomendado (catálogo #9) + roadmap dos 2 follow-ups gated · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-24 · Digest de sessão: re-sync recomendado (catálogo #9) + roadmap dos 2 follow-ups gated · COMPATÍVEL · alvo: metagamify
 
 - **Complementa os anúncios individuais de hoje** (branching, laço-sem-guarda, #9) com o **net** pra você. Não re-anuncia — consolida sync + roadmap.
 - **Re-sync recomendado:** você sincronizou p/ `025225e`; o **catálogo #9** entrou **depois** (`0dcdc47`, PR #164). Um `/meta:adopt --update` (já na trunk `rhilo/main` que você setou) traz os 5 playbooks vendorizados. Delta pequeno (1 arquivo: `onion-patterns/SKILL.md`).
@@ -313,14 +313,14 @@
   2. **adoção-de-design defere ao padrão do projeto** (`onion-adr-adopt-to-not-impose`) — se um dia o `/design:identity` rodar num projeto seu com design próprio (shadcn etc.), ele detecta e **defere**, não impõe.
 - **Ação p/ você:** rodar o `--update` quando for oportuno (traz o #9); os follow-ups chegam por downstream quando graduarem. Sem ação obrigatória.
 
-## 2026-06-24 · #9 MATERIALIZADO: catálogo de playbooks em `onion-patterns` (5 recognition-primed) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-24 · #9 MATERIALIZADO: catálogo de playbooks em `onion-patterns` (5 recognition-primed) · COMPATÍVEL · alvo: metagamify
 
 - **Seus 2 sinais empurraram o #9 pra frente — e ele saiu.** A doutrina catálogo-first (RFC-0002) foi **materializada** (PR #164): seção **Playbooks (recognition-primed)** em `onion-patterns`, conforme a forma decidida (§2: estender a skill, 3-5 destilados, não skill/comando novo).
 - **Os 5 playbooks:** descoberta→backlog · planejamento→entrega (é um PFR) · assumir-repo ("adota não impõe") · **agir-em-ambiente-compartilhado** (do seu sinal de 2026-06-23) · **laço-sem-guarda** (do seu pedido de 2026-06-24). Os 2 últimos **nasceram dos seus sinais** — seu uso de campo virou doutrina.
 - **Doutrina:** reconheça a situação → aplique o playbook (barato); sem match → delibere (caro) e o resíduo vira playbook novo. Seleção (catálogo) + execução (**PFR**).
 - **Ação p/ você:** no próximo `/meta:adopt --update` o catálogo chega vendorizado. Pode mover o **blip #9 → `done`** no seu radar (materialização entregue). O playbook "laço-sem-guarda" formaliza a doutrina; a **implementação** das guardas segue local (como no veredito).
 
-## 2026-06-24 · Veredito: "laço-sem-guarda" = playbook candidato (core) + guardas específicas (local) — reforça #9 · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-24 · Veredito: "laço-sem-guarda" = playbook candidato (core) + guardas específicas (local) — reforça #9 · COMPATÍVEL · alvo: metagamify
 
 - **Seu pedido-de-ajuda triado** ([inbox 2026-06-24](../inbox/_processed/2026-06-24-pedido-ajuda-escolha-dose-fila.md)): dose/fila + 4 laços de realimentação sem guarda. Sua intuição de **DIVIDIR** está certa.
 - **(Q1) Doutrina ou local? → DIVIDIR.** O padrão genérico *"reconheça um laço de realimentação sem guarda → aplique clamp/anti-windup/estado-mínimo/dead-letter"* **é candidato a playbook** em `onion-patterns` (recognition-primed) e **reforça o #9** (catálogo-first, de-deferido hoje no veredito RFC-0002). É teoria de controle genérica, não RHILO-específica → **core**. A *implementação* (qual guarda p/ BullMQ/WRR/outbox/dose) é **engenharia local sua**. Materialização do playbook = junto da materialização do #9 (caminho governado), não ad-hoc.
@@ -330,7 +330,7 @@
 - **Disposição dos anexos:** a pesquisa volumosa (técnicas de fila, freeze-triage — ~49KB) é **material seu (adotante)**, input de triagem, **não doc durável do core** — removida do core após triar (você a tem; o core retém o sinal + este veredito como registro). "Não vive aqui."
 - **Ação p/ você:** implementar as guardas localmente na ordem que seu contexto pedir (a meta-heurística orienta); o playbook genérico chega quando o #9 materializar (anúncio downstream). Abrir/!atualizar blip se fizer sentido no seu radar.
 
-## 2026-06-24 · Veredito: branching = base resolvida (agnóstica), NÃO trunk-default — instância do "adota não impõe" · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-24 · Veredito: branching = base resolvida (agnóstica), NÃO trunk-default — instância do "adota não impõe" · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal recebido e triado** ([inbox 2026-06-24](../inbox/_processed/2026-06-24-sinal-branching-trunk-based-vs-develop.md)): o "metade em cada lado" (canal `docs/evolution/` + comandos vendorizados encalhados em `develop`, divergente da `rhilo/main` que deploya). Diligência adversarial sobre as 3 alegações: (1) git:* embute develop = **verdade** (sync/init/flow); (2) já há resolução de base = **verdade, mas só metade** (`resolve-integration-branch.sh` + `/engineer:pr` #104 existem; **não propagaram** aos git:*); (3) "/meta:co-evolve mandou commitar em develop" = **falso** (o co-evolve é agnóstico a branch; o canal vive onde o `docs/evolution/` foi commitado — quem o pôs em develop foi a adoção, não o comando).
 - **(Q1) default de branching → agnóstico/parametrizável, NÃO trunk-default.** Trocar o default p/ trunk-based só **troca uma imposição por outra** — vetado pelo ADR [onion-adr-adopt-to-not-impose](../../analysis/onion-adr-adopt-to-not-impose-2026-06.md) (#160, mergeado hoje). A base de branch é **dado resolvido** (a semente já existe: `.onion-version` + `resolve-integration-branch.sh`). GitFlow = **uma** topologia; trunk-based = setar a integration branch = o trunk. **Este sinal é evidência de campo do #160, estendendo-o de design p/ branching.**
@@ -339,7 +339,7 @@
 - **Ação p/ você (local, já — não espere o framework):** você pode colapsar p/ a trunk que deploya (`rhilo/main`) como integration branch única: setar `integration_branch: rhilo/main` no `.claude/.onion-version` (o `/engineer:pr` **já respeita** isso) + mover `docs/evolution/` + radar p/ essa linha. Os git:* full-propagados chegam no follow-up.
 - **Follow-up (core):** [ADR onion-adr-branching-base-agnostic](../../analysis/onion-adr-branching-base-agnostic-2026-06.md) (provisório) nomeia a decisão; a **costura** (propagar `resolve-integration-branch` aos git:* sync/flow/init + guidance de canal-na-trunk) é diferida ao gatilho (mexe no motor GitFlow — exige selftest + revisão). Anunciado quando graduar.
 
-## 2026-06-23 · Veredito: evidência de campo p/ materialização do catálogo (RFC-0002) — de-deferir #9, forma confirmada · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-23 · Veredito: evidência de campo p/ materialização do catálogo (RFC-0002) — de-deferir #9, forma confirmada · COMPATÍVEL · alvo: metagamify
 
 - **Seu sinal de campo recebido e triado** ([inbox 2026-06-23](../inbox/_processed/2026-06-23-evidencia-campo-materializacao-catalogo-rfc0002.md)): evidência de que a **materialização diferida** do catálogo (RFC-0002) custa caro na operação real — com o auto-relato do operador (não conhecia o RFC-0002, reinventou a doutrina pior, errou o canal) como a prova mais nítida. **Não é proposta nova** (a doutrina já está aceita); é evidência de que o diferimento tem custo.
 - **(1) Core ou local? → DIVIDIR** (mesmo padrão do veredito decision-snapshot). O *catálogo/doutrina* (situação→playbook) é **core** — RFC-0002 §2 já decidiu a forma: estender `onion-patterns` com 3-5 playbooks. Os 3 casos que você nomeou (*firefight-em-prod-durante-dev*, *ação-em-ambiente-compartilhado*, *verificar-antes-de-agir-em-prod*) são **candidatos a playbook genérico** no core. Os playbooks *operacionais concretos* (guardas de ambiente dev/HML, split de frentes) são **engenharia local** sua — ambiente/DB-específicos, autorizado a destilar já.
@@ -349,14 +349,14 @@
 - **Auto-relato de canal — reconhecido:** largar o `.md` no `docs/evolution/` do adotante (em vez do `inbox/` do core) é o gap que o protocolo de co-evolução cobre; você já corrigiu (apagou o avulso + emitiu pelo `inbox/`). O protocolo funciona quando o maestro pergunta "mandou pela fila correta?" — vale internalizar no warm-up do adotante.
 - **Ação p/ você:** mover #9 na fila conforme de-deferição (decisão de apetite sua); nenhuma ação obrigatória de framework. Sinal a ser triado para `_processed/` no core.
 
-## 2026-06-22 · `/meta:adopt` provisiona proteção de formatador nativamente (`.prettierignore` never-clobber) — backlog #7 ENTREGUE · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-22 · `/meta:adopt` provisiona proteção de formatador nativamente (`.prettierignore` never-clobber) — backlog #7 ENTREGUE · COMPATÍVEL · alvo: metagamify
 
 - **Resposta ao seu sinal de prettier (PR #141, merge `727de4a`).** O `/meta:adopt` agora **provisiona** a proteção de formatador automaticamente: passo (5) do "Procedimento de Configuração pós-cópia" (Fase 3 + `--update`) mescla, never-clobber, os paths de artefatos Onion num `.prettierignore` do alvo — incluindo o SSOT `docs/onion/inventory.md`. O fix que você aplicou à mão (PR #62) deixa de ser redescoberta manual.
 - **Como funciona:** helper determinístico `merge-prettierignore.sh` + template curado `prettierignore-onion.tpl` (espelha o seu fix empírico). **Append-only** — não toca no seu `.prettierignore` existente; só adiciona paths faltantes. Idempotente. Coberto por 7 cenários de selftest (incl. CRLF e o caso do seu arquivo sem cabeçalho).
 - **Escopo honesto:** cobre **prettier** (e ferramentas que respeitam `.prettierignore`). **dprint/biome NÃO leem `.prettierignore`** — o helper os **detecta e avisa** (cobertura ativa = follow-up). Eixo corrigido por revisão dupla: o `.prettierignore` protege *artefatos Onion* (vendor + SSOT gerado-por-você), não "o que o manifesto copia".
 - **Ação p/ você:** opcional. No próximo `/meta:adopt --update`, o passo (5) roda e garante a proteção (idempotente — seu `.prettierignore` atual já está correto, então será no-op ou complementar). Pode **remover** sua nota local de "redescobrir o problema" — agora é responsabilidade do framework. Sinal triado em [`../inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md`](../inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md).
 
-## 2026-06-22 · Delta `06f7232` (anúncio retroativo) + proteção de vendor contra formatador no `/meta:adopt` · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-22 · Delta `06f7232` (anúncio retroativo) + proteção de vendor contra formatador no `/meta:adopt` · COMPATÍVEL · alvo: metagamify
 
 - **Anúncio retroativo do delta `06f7232` (de `a0fdf35`).** Você adotou este delta via `/meta:adopt --update` (seu PR #62, merge `18479ce`) **antes** de o core deixar o anúncio flow A — o laço que você mesmo sinalizou (3ª reincidência). Eis a classificação do que entrou (superfície vendorizada, ~29 arquivos):
   - **Comandos novos:** `/catch-up` (briefing de retomada por sinais duráveis) e `/meta:co-announce` (este produtor de flow A).
@@ -367,7 +367,7 @@
 - **Resposta ao seu sinal de prettier (causa raiz do drift do SSOT — 3ª reincidência, agora com fail HARD de CI).** Achado **aceito**: o `/meta:adopt` copia `docs/knowledge-base/`, `docs/meta-specs/`, `docs/sdaal/` e **gera** o SSOT `docs/onion/inventory.md`, mas **não provisiona** a proteção de formatação correspondente — então um adotante com formatador + pre-commit hook reformata o SSOT e quebra o lint HARD (`check_inventory_sync`), em laço vicioso. **Decisão:** o Procedimento de Configuração pós-cópia (install + `--update`) passará a **provisionar/mesclar (never-clobber) um `.prettierignore`** cobrindo TODOS os paths que o manifesto escreve no alvo, incluindo explicitamente o SSOT `docs/onion/inventory.md`. Rastreado como item de backlog do `/meta:adopt`. O core **não adota prettier** — só provisiona a proteção (generaliza p/ prettier/dprint/biome).
 - **Ação p/ você:** nenhuma obrigatória. Seu fix local (`docs/knowledge-base/` + `docs/onion/inventory.md` no `.prettierignore`) está correto e continua válido; quando a proteção graduar no `/meta:adopt`, o `--update` a mesclará idempotente (never-clobber não toca no seu `.prettierignore`). Sinal triado em [`../inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md`](../inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md).
 
-## 2026-06-22 · RFC-0002 — veredito da camada de meta-estratégia (catálogo-first + reposicionamento) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-22 · RFC-0002 — veredito da camada de meta-estratégia (catálogo-first + reposicionamento) · COMPATÍVEL · alvo: metagamify
 
 - **Veredito profundo entregue.** Em resposta ao seu ack de 2026-06-17 (`veredito profundo pendente — RFC-0002`), o core escreveu [`rfc-0002-meta-strategy-verdict.md`](../rfc/rfc-0002-meta-strategy-verdict.md).
 - **Catálogo-first / recognition-primed: ACEITO como doutrina**, materialização **diferida** (estender `onion-patterns` com 3-5 playbooks — não skill/comando novo — atrás do reposicionamento na fila). Validação adversarial: a sobreposição com `onion-orchestration` é real (~60%) mas a distinção é genuína (forma-de-trabalho vs caso-de-uso) → não é redundância. **Blip #9: `assess` → `trial`.**
@@ -381,13 +381,13 @@
 - **Ritual documentado:** `CONTRIBUTING.md` agora tem o passo pós-merge "anuncie mudança relevante a adotantes". Move o blip #1 (doc-bridge) de `assess` rumo a `trial`.
 - **Ação p/ adotantes: nenhuma.** Você passa a receber anúncios de mudança via `inbound/` (📥 you-have-mail) mesmo entre updates. Chega no próximo `/meta:adopt --update` (o comando é infra do core).
 
-## 2026-06-22 · Veredito: diretriz de retenção do *decision-snapshot* é candidata de framework (impl é local) · COMPATÍVEL · alvo: rhilo-metagamify (informativo p/ demais)
+## 2026-06-22 · Veredito: diretriz de retenção do *decision-snapshot* é candidata de framework (impl é local) · COMPATÍVEL · alvo: metagamify (informativo p/ demais)
 
 - **Sinal de campo do `rhilo-metagamify`:** o padrão "decision snapshot" (rastreabilidade atômica, herdado da doutrina spec-as-code/SDAAL) inflou o banco do adotante (32MB→86MB/semana) — cada decisão grava o **pool inteiro de candidatos** (~79KB/linha), **sem retenção nem teto de payload**.
 - **Veredito (roteamento): DIVIDIR.** A *implementação* (poda por janela, payload mínimo = selecionado + top-N, TOAST/arquivamento) é **engenharia local** do adotante — DB/volume-específica; autorizado a rascunhar já. A *diretriz* é **lacuna doutrinária real** do framework: a doutrina de rastreabilidade nunca especificou retenção nem payload mínimo. Registrado candidato (quadrante MET) no backlog de co-evolução.
 - **Ação p/ adotantes: nenhuma obrigatória.** Quem usa rastreabilidade atômica deve declarar política de retenção localmente até a diretriz graduar (KB/meta-spec). Resposta empurrada ao `inbound/` do adotante. Sinal triado em [`../inbox/_processed/2026-06-19-consulta-retencao-decision-snapshot.md`](../inbox/_processed/2026-06-19-consulta-retencao-decision-snapshot.md).
 
-## 2026-06-22 · Confirmação de protocolo: o core trata o adotante como **cego** (anúncio explícito obrigatório) · COMPATÍVEL · alvo: rhilo-metagamify
+## 2026-06-22 · Confirmação de protocolo: o core trata o adotante como **cego** (anúncio explícito obrigatório) · COMPATÍVEL · alvo: metagamify
 
 - **Sinal de campo (adoção a0fdf35, vendorizado):** aplicou limpo (16 arquivos, sem conflito/segredo), mas **o anúncio flow A não operou** — o delta chegou por `--update` deliberado e cego, sem o core deixar mensagem no `inbound/`.
 - **Resposta:** (1) a reescrita do `gitflow-patterns.md` foi **intencional** (refactor `1ca200c`, motor GitFlow consolidado na KB) — não efeito colateral; (2) **sim**, o protocolo já trata o adotante como cego — a capacidade existe (`inbound/` + relatório auto-emitido + you-have-mail bidirecional, anúncio de 2026-06-20). O a0fdf35 expôs **gap de processo, não de capacidade**: a capacidade não foi *exercida* naquele delta.

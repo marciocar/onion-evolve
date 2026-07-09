@@ -41,12 +41,12 @@ members:
       - personality-public
     # TIER 0 — sem bloco trust:; o core lê tudo por papel, não por concessão
 
-  - id: rhilo-metagamify
-    name: rhilo-metagamify (MetaGamify)
+  - id: metagamify
+    name: MetaGamify          # id/name públicos = SÓ "metagamify" (o nome da empresa NÃO entra em superfície — correção 2026-07-09)
     role: hub                 # TIER 1 — central; pode ter sub-adotados
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
-    local_path: "/home/marcio/rhilo-metagamify"
+    local_path: "/home/marcio/rhilo-metagamify"   # dir físico legado no disco (privado, não-exposto); doc-bridge depende dele — não renomear sem migrar o clone
     onion_version: 8e22352da32f   # pin mais recente VERIFICADO entre as linhagens (pin-ok 2026-07-03).
                                   # Membro MULTI-LINHAGEM: pins por linhagem no mapa lineages: abaixo
                                   # (parecer onion-parecer-rhilo-lineages-2026-07, decisão D2). Regra: um

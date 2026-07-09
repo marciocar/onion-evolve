@@ -6,11 +6,11 @@
 ```mermaid
 flowchart TD
   onion_evolve["onion-evolve<br/>source"]:::source
-  rhilo_metagamify["rhilo-metagamify<br/>hub · legacy"]:::hub
+  metagamify["metagamify<br/>hub · legacy"]:::hub
   pulse_mais["pulse-mais<br/>standalone · greenfield"]:::standalone
   granaai["granaai<br/>standalone · regulated"]:::standalone
   onion_mini["onion-mini<br/>standalone · distilled"]:::standalone
-  rhilo_metagamify -->|adopts| onion_evolve
+  metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
   granaai -.->|can-correct| onion_evolve
@@ -25,7 +25,7 @@ flowchart TD
 | id | tier | mode | specializations | pin |
 |----|------|------|-----------------|-----|
 | onion-evolve | source |  | framework-template, sdaal, co-evolution, dogfooding, breadcrumbs | `—` |
-| rhilo-metagamify | hub | legacy | gamification, nx-monorepo, asana-integration, metagamification | `8e22352da32f` |
+| metagamify | hub | legacy | gamification, nx-monorepo, asana-integration, metagamification | `8e22352da32f` |
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `4332ac8d1884` |
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
