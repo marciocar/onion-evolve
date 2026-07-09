@@ -2,7 +2,7 @@
 title: "ADR/Spec — /meta:adopt --update via merge de vendor-branch (never-clobber estrutural)"
 date: 2026-07-09
 type: adr
-status: accepted (design) — implementação pendente (→ /engineer:plan)
+status: accepted — implementado (2026-07-09, Fases 1-3); verificado por dogfood de campo (392 arquivos)
 decision-scope: adoption / update durability / never-clobber
 supersedes: none
 related:
@@ -120,4 +120,28 @@ dependency-free — e **reusa** a maquinaria que já existe.
 - **`/meta:adopt` fica** (canal L2+3 + **fallback L1** — por isso vendor carrega L1+L2 completo).
 - **Never-clobber** vira estrutural (mais forte, não mais fraco).
 - L1-via-plugin **coexiste** (não reaberto) — o vendor é o caminho adopt, o plugin é o caminho marketplace.
-- **Próximo passo:** `/engineer:plan` a partir desta spec (resolve as 6 questões da §5).
+
+## 8. Resolução e verificação (implementado 2026-07-09)
+
+**Implementação** (`.claude/utils/adopt/vendor-branch.sh` + fiação no `adopt.md` + selftests):
+- **Fase 1**: helper `seed`/`update` (worktree + reuso do `durable-commit.sh`) + `run_vendor_branch_selftests`
+  (5 casos; total 176). **Fase 2**: adoção semeia `onion/vendor`; `--update` mergeia (copy-over saiu);
+  `.gitattributes merge=union`; Contrato §3. **Fase 3**: dogfood de campo + este fechamento.
+
+**Correção de rota (Q1) — dogfood > design:** a hipótese "órfã" foi **refutada** por experimento — sem base
+comum, `merge --allow-unrelated-histories` dá conflito add/add em TODO arquivo. O correto é **ramificada**
+(base comum → 3-way real).
+
+**Verificação de campo (392 arquivos de framework REAIS):** com um arquivo customizado localmente + framework
+novo tocando o mesmo arquivo → **conflito ISOLADO em 1 arquivo** (o customizado); os ~391 restantes
+atualizaram limpo; customização preservada nos marcadores (não clobada); arquivo novo do framework veio
+limpo; produto preservado. **7/7 asserts.** Prova que o never-clobber estrutural funciona em escala real,
+sem conflito espúrio.
+
+**Resolução das 6 questões:** Q1 ramificada (acima) · Q2 worktree · Q3 bootstrap de legado no 1º `--update`
+(guard idempotente, coberto por selftest) · Q4 `onion/adopt`=integração-da-adoção, `onion/vendor`=fonte-de-merge
+semeada dela; `chore/onion-update-<pin>` saiu do update · Q5 L1+L2 completo mantido · Q6 `.gitattributes merge=union`.
+
+**Pendente (não-bloqueante):** legado com customização já COMMITADA na integração antes de o vendor existir
+→ pode entrar na base e clobar no 1º merge (§5 Q1). Mitigação futura: semear vendor do `source_commit` pinado
+limpo. Documentado; o caminho fresh-adoption (o comum) não sofre.
