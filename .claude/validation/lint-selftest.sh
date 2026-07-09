@@ -649,6 +649,37 @@ run_federation_console_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo mail-receiver — exercita .claude/utils/co-evolution/mail-receiver.sh (F1.4: acelerador
+# "receiver que acorda"). Self-contained em mktemp (repo sintético com canais inbox/inbound).
+# ---------------------------------------------------------------------------
+run_mail_receiver_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/co-evolution/mail-receiver.sh"
+  if [ ! -f "${helper}" ]; then record_fail "mail-receiver" "helper ausente: ${helper}"; return; fi
+  local t; t="$(mktemp -d)"; mkdir -p "$t/docs/evolution/inbox/_processed" "$t/docs/evolution/inbound"
+  local out rc
+  out="$(bash "${helper}" --repo "$t" 2>&1)"; rc=$?
+  if [ -z "${out}" ] && [ "${rc}" -eq 0 ]; then record_pass "mail-receiver: 0 mail → silencioso + exit 0"
+  else record_fail "mail-receiver: 0-mail" "esperava vazio+0 (got '${out}'/${rc})"; fi
+  printf 'x' > "$t/docs/evolution/inbox/a.md"
+  out="$(bash "${helper}" --repo "$t" 2>&1)"
+  if printf '%s' "${out}" | grep -q 'co-evolve' && [ -f "$t/.claude/sessions/.mail-receiver.state" ]; then
+    record_pass "mail-receiver: mail novo → acorda + salva assinatura"
+  else record_fail "mail-receiver: wake" "não acordou / sem estado"; fi
+  if [ -z "$(bash "${helper}" --repo "$t" 2>&1)" ]; then record_pass "mail-receiver: dedup (mesmo conjunto → silencioso)"
+  else record_fail "mail-receiver: dedup" "não deduplicou"; fi
+  printf 'y' > "$t/docs/evolution/inbound/b.md"
+  if printf '%s' "$(bash "${helper}" --repo "$t" 2>&1)" | grep -q '2 não-lido'; then
+    record_pass "mail-receiver: conjunto novo → acorda de novo"
+  else record_fail "mail-receiver: novo" "não reacordou no conjunto novo"; fi
+  rm -f "$t/.claude/sessions/.mail-receiver.state"
+  local o2; o2="$(bash "${helper}" --repo "$t" --dry-run 2>&1)"
+  if printf '%s' "${o2}" | grep -q 'co-evolve' && [ ! -f "$t/.claude/sessions/.mail-receiver.state" ]; then
+    record_pass "mail-receiver: --dry-run imprime sem tocar estado"
+  else record_fail "mail-receiver: dry-run" "tocou estado ou não imprimiu"; fi
+  rm -rf "$t"
+}
+
+# ---------------------------------------------------------------------------
 # Modo prettierignore — exercita .claude/utils/adopt/merge-prettierignore.sh.
 # Self-contained (estilo run_resolve_selftests): cenários em mktemp -d, sem
 # fixture-file/manifest. Cobre os MODOS DE FALHA (não só o happy-path): criação
@@ -1724,6 +1755,9 @@ run_resolve_target_selftests
 
 # Modo federation-console — console estático read-only do SSOT (F1.3 federação).
 run_federation_console_selftests
+
+# Modo mail-receiver — acelerador "receiver que acorda" (F1.4 federação).
+run_mail_receiver_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
