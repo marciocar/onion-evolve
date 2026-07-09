@@ -559,6 +559,26 @@ check_federation_map_sync() {
   rm -f "${tmp}"
 }
 
+# REGRA 24 — Console da federação (docs/onion/federation-console.html) sincronizado com o SSOT [HARD]
+#           GERADO por federation-console.sh (members.yaml + CHANGELOG). Espelha check_federation_map_sync.
+check_federation_console_sync() {
+  local gen="${SCRIPT_DIR}/federation-console.sh"
+  local cfile="${REPO_ROOT}/docs/onion/federation-console.html"
+  local members="${REPO_ROOT}/docs/evolution/federation/members.yaml"
+  [ -f "${gen}" ] && [ -f "${members}" ] || return 0
+  have_py_yaml || return 0
+  if [ ! -f "${cfile}" ]; then
+    violation "HARD" "docs/onion/federation-console.html" "console ausente — rode 'bash .claude/validation/federation-console.sh > docs/onion/federation-console.html'"
+    return
+  fi
+  local tmp; tmp="$(mktemp)"
+  bash "${gen}" > "${tmp}" 2>/dev/null || true
+  if ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
+    violation "HARD" "docs/onion/federation-console.html" "console desatualizado vs SSOT — regenere: bash .claude/validation/federation-console.sh > docs/onion/federation-console.html"
+  fi
+  rm -f "${tmp}"
+}
+
 # ===========================================================================
 # REGRA 9 — Contagens no CLAUDE.md em sincronia com a SSOT [HARD]
 #           Extrai "N comandos invocáveis", "N agentes", "N skills" do CLAUDE.md
@@ -1201,6 +1221,7 @@ check_capability_conformance
 check_role_bundle_sync
 check_graph_sync
 check_federation_map_sync
+check_federation_console_sync
 check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp

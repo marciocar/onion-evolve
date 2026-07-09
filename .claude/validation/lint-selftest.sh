@@ -622,6 +622,33 @@ run_resolve_target_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo federation-console — exercita .claude/validation/federation-console.sh (F1.3: console estático
+# read-only do SSOT). Asserções estruturais (não fixam roster). Pula/exit-3 sem python+yaml.
+# ---------------------------------------------------------------------------
+run_federation_console_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/federation-console.sh"
+  if [ ! -f "${helper}" ]; then record_fail "federation-console" "helper ausente: ${helper}"; return; fi
+  if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
+    local rc=0; bash "${helper}" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -eq 3 ]; then record_pass "federation-console: sem python+yaml → exit 3 (gracioso)"
+    else record_pass "federation-console: pulado (sem python+yaml)"; fi
+    return; fi
+  local H; H="$(bash "${helper}" 2>/dev/null)"
+  if printf '%s' "${H}" | grep -q '<!doctype html>' && printf '%s' "${H}" | grep -q '</html>' \
+     && ! printf '%s' "${H}" | grep -q '__DATA__' \
+     && printf '%s' "${H}" | grep -q '"timeline"' && printf '%s' "${H}" | grep -q '"members"'; then
+    record_pass "federation-console: HTML self-contained (members+timeline, sem placeholder)"
+  else record_fail "federation-console: html" "HTML inválido/incompleto"; fi
+  if printf '%s' "${H}" | grep -qiE 'src=.?https?://|<script src|href=.?https?://[^"]*\.(js|css)|fetch\('; then
+    record_fail "federation-console: self-contained" "tem dependência externa (CDN/fetch)"
+  else record_pass "federation-console: self-contained (sem CDN/fetch externo)"; fi
+  local H2; H2="$(bash "${helper}" 2>/dev/null)"
+  if [ "$(printf '%s' "${H}" | sha256sum)" = "$(printf '%s' "${H2}" | sha256sum)" ]; then
+    record_pass "federation-console: determinístico"
+  else record_fail "federation-console: determinismo" "varia entre execuções"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo prettierignore — exercita .claude/utils/adopt/merge-prettierignore.sh.
 # Self-contained (estilo run_resolve_selftests): cenários em mktemp -d, sem
 # fixture-file/manifest. Cobre os MODOS DE FALHA (não só o happy-path): criação
@@ -1694,6 +1721,9 @@ run_compose_settings_selftests
 
 # Modo resolve-target — targeting fino por seletor no alvo: (F1.2 federação — mata o ruído).
 run_resolve_target_selftests
+
+# Modo federation-console — console estático read-only do SSOT (F1.3 federação).
+run_federation_console_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
