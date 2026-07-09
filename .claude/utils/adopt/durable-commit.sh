@@ -37,8 +37,12 @@ git -C "${DEST}" rev-parse --verify "${BR}" >/dev/null 2>&1 \
   || git -C "${DEST}" checkout -b "${BR}" >/dev/null 2>&1
 
 # Stage SÓ a superfície Onion (never-clobber do staging do maestro — produto fica de fora).
+# Inclui os ARTEFATOS GERADOS na adoção (CLAUDE.md, inventário, .gitattributes, contextos de domínio) —
+# achado de campo 2026-07-09 (adoção greenfield gustavo-pulga): sem eles, ficavam uncommitted = a mesma
+# lacuna de durabilidade que #301 fecha p/ o framework. `git add` só staja o que mudou → seguro no --update.
 ONION_PATHS=(.claude docs/meta-specs docs/knowledge-base docs/sdaal docs/evolution \
-             .prettierignore .githooks .env.example.onion)
+             docs/onion docs/business-context docs/technical-context docs/compliance-context \
+             CLAUDE.md CLAUDE.onion.md .gitattributes .prettierignore .githooks .env.example.onion)
 add=(); for p in "${ONION_PATHS[@]}"; do [ -e "${DEST}/${p}" ] && add+=("${p}"); done
 [ "${#add[@]}" -gt 0 ] && git -C "${DEST}" add -- "${add[@]}" 2>/dev/null
 
