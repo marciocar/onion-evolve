@@ -917,6 +917,46 @@ YML
 }
 
 # ---------------------------------------------------------------------------
+# Modo a2a-accept — o ATO HUMANO que fecha o gate: registro verificado da fila →
+# doc de inbox (F2.2). Cobre: cria doc + marca transporte, idempotência, recusa
+# de não-verificado (fail-safe) e registro malformado. Self-contained em mktemp.
+# ---------------------------------------------------------------------------
+run_a2a_accept_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/federation-transport/a2a-accept.sh"
+  if [ ! -f "${helper}" ]; then record_fail "a2a-accept" "helper ausente: ${helper}"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_pass "a2a-accept: jq ausente → skip (não-SUT)"; return; fi
+  local d ib rec out rc doc
+  d="$(mktemp -d)"; ib="${d}/inbox"; mkdir -p "${ib}"
+  rec="${d}/verified.json"
+  cat > "${rec}" <<'JSON'
+{"taskId":"t1","receivedAt":"2026-07-09T21:42:01Z","from":"metagamify","signal":{"id":"2026-07-09-metagamify-a2a-hello","from":"metagamify","to":"onion-evolve","kind":"signal","body_path":"docs/x.md"},"verdict":{"verified":true,"regulated":false,"apply_mode":"gated"}}
+JSON
+  doc="${ib}/2026-07-09-metagamify-a2a-hello.md"
+  rc=0; out="$(bash "${helper}" "${rec}" --inbox "${ib}" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${doc}" ]; then record_pass "a2a-accept: verificado → doc de inbox criado"
+  else record_fail "a2a-accept: create" "rc=${rc} out='${out}'"; fi
+  if grep -q 'via a2a-live' "${doc}" 2>/dev/null && grep -q 'Conteúdo referenciado' "${doc}" 2>/dev/null; then record_pass "a2a-accept: doc marca transporte a2a-live + body_path"
+  else record_fail "a2a-accept: fields" "campos ausentes no doc"; fi
+
+  rc=0; out="$(bash "${helper}" "${rec}" --inbox "${ib}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'já aceito'; then record_pass "a2a-accept: idempotente (não sobrescreve)"
+  else record_fail "a2a-accept: idem" "rc=${rc} out='${out}'"; fi
+
+  local recu="${d}/unverified.json"
+  printf '%s' '{"from":"x","signal":{"id":"bad"},"verdict":{"verified":false,"reason":"veto"}}' > "${recu}"
+  rc=0; bash "${helper}" "${recu}" --inbox "${ib}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ] && [ "$(find "${ib}" -maxdepth 1 -name '*.md' | wc -l | tr -d ' ')" = "1" ]; then record_pass "a2a-accept: não-verificado → RECUSADO (fail-safe, nada criado)"
+  else record_fail "a2a-accept: refuse" "rc=${rc}"; fi
+
+  printf 'not json' > "${d}/bad.json"
+  rc=0; bash "${helper}" "${d}/bad.json" --inbox "${ib}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ]; then record_pass "a2a-accept: registro malformado → erro"
+  else record_fail "a2a-accept: malformed" "rc=${rc}"; fi
+
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo resolve-scope-layers — exercita .claude/utils/scope/resolve-scope-layers.sh (RFC-0005: fecha o
 # loop do compose-settings — descobre a cadeia empresa→time→pessoa e compõe). Self-contained.
 # ---------------------------------------------------------------------------
@@ -2038,6 +2078,9 @@ run_a2a_verify_selftests
 
 # Modo agent-card — gerador do Agent Card A2A do core, filtrado ao próprio core (F2.2 fundação; confidencialidade).
 run_agent_card_selftests
+
+# Modo a2a-accept — o ato humano fila→inbox que fecha o gate (F2.2; recusa não-verificado).
+run_a2a_accept_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
