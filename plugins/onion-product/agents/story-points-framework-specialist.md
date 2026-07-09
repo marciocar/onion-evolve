@@ -409,7 +409,7 @@ Recomendação: Verificar velocity médio e ajustar expectativas.
 - `/product/spec`: Documentar especificações técnicas
 
 ### Base de Conhecimento
-- `docs/knowledge-base/frameworks/framework-story-points.md`: Framework completo de story points
+- `${CLAUDE_PLUGIN_ROOT}/kb/framework-story-points.md`: Framework completo de story points
 
 ## 📚 Referências e Templates
 

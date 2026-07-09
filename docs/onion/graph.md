@@ -55,9 +55,11 @@
 - **onion** --has-member--> nx-migration-specialist
 - **onion** --has-member--> nx-monorepo-specialist
 - **onion** --has-member--> onion
+- **onion** --has-member--> onion-compliance-context
 - **onion** --has-member--> onion-engineering-context
 - **onion** --has-member--> onion-orchestration
 - **onion** --has-member--> onion-patterns
+- **onion** --has-member--> onion-product-context
 - **onion** --has-member--> onion-validation
 - **onion** --has-member--> pain-price-specialist
 - **onion** --has-member--> pmbok-specialist
@@ -94,6 +96,7 @@
 
 ## Capacidades por vertical (requires / provides / loads)
 
+- onion-compliance **loads** when:build -> resolve:compliance-context (skill onion-compliance-context)
 - onion-compliance **loads** when:framework=iso27001 -> template:compliance_iso27001_template.md
 - onion-compliance **loads** when:framework=soc2 -> template:compliance_soc2_template.md
 - onion-compliance **provides** build-compliance-docs
@@ -101,12 +104,14 @@
 - onion-compliance **provides** iso-27001-isms
 - onion-compliance **provides** pmbok-governance
 - onion-compliance **provides** soc2-tsc
+- onion-compliance **provides** ssot-context-resolver
 - onion-compliance **requires** agent:iso-22301-specialist
 - onion-compliance **requires** agent:iso-27001-specialist
 - onion-compliance **requires** agent:pmbok-specialist
 - onion-compliance **requires** agent:security-information-master
 - onion-compliance **requires** agent:soc2-specialist
 - onion-compliance **requires** command:build-compliance-docs
+- onion-compliance **requires** skill:onion-compliance-context
 - onion-compliance **requires** template:compliance-context-template.md
 - onion-compliance **requires** template:compliance_iso22301_template.md
 - onion-compliance **requires** template:compliance_iso27001_template.md
@@ -147,16 +152,21 @@
 - onion-engineering **requires** agent:postgres-specialist
 - onion-engineering **requires** agent:react-developer
 - onion-engineering **requires** skill:onion-engineering-context
+- onion-product **loads** embed:kb/framework-story-points.md
+- onion-product **loads** embed:kb/identificar-precificar-dor-cliente.md
+- onion-product **loads** when:spec -> resolve:business-context (skill onion-product-context)
 - onion-product **provides** apresentacoes
 - onion-product **provides** decomposicao-de-tasks
 - onion-product **provides** descoberta-a-backlog
 - onion-product **provides** estimativa-story-points
 - onion-product **provides** extracao-de-reunioes
+- onion-product **provides** ssot-context-resolver
 - onion-product **requires** agent:extract-meeting-specialist
 - onion-product **requires** agent:pain-price-specialist
 - onion-product **requires** agent:product-agent
 - onion-product **requires** agent:story-points-framework-specialist
 - onion-product **requires** agent:task-specialist
+- onion-product **requires** skill:onion-product-context
 - onion-testing **provides** estrategia-de-teste
 - onion-testing **provides** geracao-testes-unit-integration-e2e
 - onion-testing **provides** qa-story-points
@@ -323,9 +333,11 @@ onion	has-member	nodejs-specialist
 onion	has-member	nx-migration-specialist	
 onion	has-member	nx-monorepo-specialist	
 onion	has-member	onion	
+onion	has-member	onion-compliance-context	
 onion	has-member	onion-engineering-context	
 onion	has-member	onion-orchestration	
 onion	has-member	onion-patterns	
+onion	has-member	onion-product-context	
 onion	has-member	onion-validation	
 onion	has-member	pain-price-specialist	
 onion	has-member	pmbok-specialist	
@@ -359,6 +371,7 @@ onion	related	product-agent
 onion	related	task-specialist	
 onion	related	test-engineer	
 onion	serves	maestro	
+onion-compliance	loads	when:build -> resolve:compliance-context (skill onion-compliance-context)	
 onion-compliance	loads	when:framework=iso27001 -> template:compliance_iso27001_template.md	
 onion-compliance	loads	when:framework=soc2 -> template:compliance_soc2_template.md	
 onion-compliance	provides	build-compliance-docs	
@@ -366,12 +379,14 @@ onion-compliance	provides	iso-22301-bcms
 onion-compliance	provides	iso-27001-isms	
 onion-compliance	provides	pmbok-governance	
 onion-compliance	provides	soc2-tsc	
+onion-compliance	provides	ssot-context-resolver	
 onion-compliance	requires	agent:iso-22301-specialist	
 onion-compliance	requires	agent:iso-27001-specialist	
 onion-compliance	requires	agent:pmbok-specialist	
 onion-compliance	requires	agent:security-information-master	
 onion-compliance	requires	agent:soc2-specialist	
 onion-compliance	requires	command:build-compliance-docs	
+onion-compliance	requires	skill:onion-compliance-context	
 onion-compliance	requires	template:compliance-context-template.md	
 onion-compliance	requires	template:compliance_iso22301_template.md	
 onion-compliance	requires	template:compliance_iso27001_template.md	
@@ -412,16 +427,21 @@ onion-engineering	requires	agent:nodejs-specialist
 onion-engineering	requires	agent:postgres-specialist	
 onion-engineering	requires	agent:react-developer	
 onion-engineering	requires	skill:onion-engineering-context	
+onion-product	loads	embed:kb/framework-story-points.md	
+onion-product	loads	embed:kb/identificar-precificar-dor-cliente.md	
+onion-product	loads	when:spec -> resolve:business-context (skill onion-product-context)	
 onion-product	provides	apresentacoes	
 onion-product	provides	decomposicao-de-tasks	
 onion-product	provides	descoberta-a-backlog	
 onion-product	provides	estimativa-story-points	
 onion-product	provides	extracao-de-reunioes	
+onion-product	provides	ssot-context-resolver	
 onion-product	requires	agent:extract-meeting-specialist	
 onion-product	requires	agent:pain-price-specialist	
 onion-product	requires	agent:product-agent	
 onion-product	requires	agent:story-points-framework-specialist	
 onion-product	requires	agent:task-specialist	
+onion-product	requires	skill:onion-product-context	
 onion-testing	provides	estrategia-de-teste	
 onion-testing	provides	geracao-testes-unit-integration-e2e	
 onion-testing	provides	qa-story-points	

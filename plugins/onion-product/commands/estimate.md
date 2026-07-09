@@ -61,7 +61,7 @@ Fornecer estimativas precisas e acionáveis de story points para tarefas de dese
 
 ```bash
 # Carregar framework completo de story points
-Read docs/knowledge-base/frameworks/framework-story-points.md
+Read ${CLAUDE_PLUGIN_ROOT}/kb/framework-story-points.md
 
 # Verificar se há métricas históricas disponíveis
 # (velocity, accuracy rate, reference stories)
@@ -457,14 +457,14 @@ Incluir estimativa na especificação:
 ## 🔗 Referências
 
 - **Agente:** @story-points-framework-specialist
-- **Framework:** `docs/knowledge-base/frameworks/framework-story-points.md`
+- **Framework:** `${CLAUDE_PLUGIN_ROOT}/kb/framework-story-points.md`
 - **Comandos relacionados:** `/product/task`, `/product/feature`, `/product/spec`
 - **Agentes relacionados:** @product-agent, @task-specialist
 
 ## 📚 Base de Conhecimento
 
 O comando utiliza o framework completo de story points disponível em:
-- `docs/knowledge-base/frameworks/framework-story-points.md`
+- `${CLAUDE_PLUGIN_ROOT}/kb/framework-story-points.md`
 
 **Conteúdo incluído:**
 - Escala Fibonacci (1, 2, 3, 5, 8, 13, 20+)

@@ -2,7 +2,7 @@
   "name": "onion-product",
   "version": "0.1.0",
   "conformance": "silver",
-  "provides": ["descoberta-a-backlog","decomposicao-de-tasks","estimativa-story-points","extracao-de-reunioes","apresentacoes"],
-  "requires": ["agent:product-agent","agent:task-specialist","agent:story-points-framework-specialist","agent:pain-price-specialist","agent:extract-meeting-specialist"],
-  "loads": []
+  "provides": ["descoberta-a-backlog","decomposicao-de-tasks","estimativa-story-points","extracao-de-reunioes","apresentacoes","ssot-context-resolver"],
+  "requires": ["agent:product-agent","agent:task-specialist","agent:story-points-framework-specialist","agent:pain-price-specialist","agent:extract-meeting-specialist","skill:onion-product-context"],
+  "loads": ["embed:kb/framework-story-points.md","embed:kb/identificar-precificar-dor-cliente.md","when:spec -> resolve:business-context (skill onion-product-context)"]
 }

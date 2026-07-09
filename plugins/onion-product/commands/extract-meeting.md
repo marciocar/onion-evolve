@@ -38,7 +38,7 @@ related_agents:
   - task-specialist
 
 knowledge_bases:
-  - docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md
+  - ${CLAUDE_PLUGIN_ROOT}/kb/meeting-transcription-to-knowledge-base.md
 ---
 
 # 📋 Extrair Conhecimento de Reunião
@@ -215,7 +215,7 @@ write "${OUTPUT_FILE}"
 ## 🔗 Referências
 
 - **Agente**: `@extract-meeting-specialist`
-- **Knowledge Base**: `docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md`
+- **Knowledge Base**: `${CLAUDE_PLUGIN_ROOT}/kb/meeting-transcription-to-knowledge-base.md`
 - **Framework**: EXTRACT (7 dimensões)
 
 ## ⚠️ Notas

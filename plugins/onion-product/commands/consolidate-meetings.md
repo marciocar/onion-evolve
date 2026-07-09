@@ -190,7 +190,7 @@ O comando deve produzir:
 
 - **Agente**: @meeting-consolidator
 - **Comando Relacionado**: /product/extract-meeting (extração estruturada)
-- **Knowledge Base**: `docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md`
+- **Knowledge Base**: `${CLAUDE_PLUGIN_ROOT}/kb/meeting-transcription-to-knowledge-base.md`
 
 ## ⚠️ Notas Importantes
 
