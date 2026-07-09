@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# =============================================================================
+# vendor-branch.sh — /meta:adopt --update via MERGE de vendor-branch (never-clobber ESTRUTURAL).
+#
+# Achado #2 do /meta:evolve (docs/analysis/onion-adr-adopt-vendor-branch-merge-2026-07.md).
+# Migra o apply de copy-over (cp -R + diff a revisar, clobável) para um 3-way merge git: a customização
+# local do adotante vira CONFLITO git de verdade (resolvível), não some silenciosamente.
+#
+# Topologia (verificada por experimento 2026-07-09): onion/vendor é RAMIFICADA da integração (base comum),
+# NÃO órfã — órfã sem base comum dá conflito add/add em TODO arquivo. Ramificada → conflito só onde há
+# customização real; os demais atualizam limpo; produto (snapshot intocado no vendor) merge limpo.
+#
+# Uso:
+#   vendor-branch.sh seed   <TARGET> <INTEGRATION_BRANCH>
+#       Ramifica onion/vendor do HEAD da integração (framework LIMPO recém-instalado). Idempotente.
+#   vendor-branch.sh update <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
+#       Aplica o framework NOVO do core no onion/vendor (worktree) + durable-commit, depois mergeia na
+#       integração. Bootstrapa o vendor se ausente (legado). Exit: 0 merge limpo · 10 CONFLITO (humano
+#       resolve) · 2 erro de precondição.
+#
+# Reusa: durable-commit.sh (commit no vendor) · o manifest L1+L2 (mesma superfície do adopt).
+# Determinístico, sem jq. Exercitado por lint-selftest.sh (run_vendor_branch_selftests).
+# =============================================================================
+set -uo pipefail
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENDOR="onion/vendor"
+
+# Superfície L1+L2 (mesma do adopt.md; filtrada pelo que existe no core em HEAD).
+_manifest() {  # $1=SOURCE_ROOT → imprime pathspecs existentes, um por linha
+  local want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks \
+              docs/meta-specs docs/knowledge-base docs/sdaal) p
+  for p in "${want[@]}"; do git -C "$1" ls-tree HEAD -- "$p" | grep -q . && printf '%s\n' "$p"; done
+}
+
+_seed() {  # <TARGET> <INTEGRATION_BRANCH>
+  local T="$1" IB="$2"
+  git -C "$T" rev-parse --git-dir >/dev/null 2>&1 || { echo "⚠️  $T não é repo git — seed pulado." >&2; return 0; }
+  if git -C "$T" rev-parse --verify "$VENDOR" >/dev/null 2>&1; then
+    echo "Onion: $VENDOR já existe — seed pulado (idempotente)."; return 0
+  fi
+  git -C "$T" rev-parse --verify "$IB" >/dev/null 2>&1 || { echo "ERRO: integration branch '$IB' inexistente." >&2; return 2; }
+  git -C "$T" branch "$VENDOR" "$IB" \
+    && echo "Onion: $VENDOR ramificada de '$IB' (fonte-de-merge; base comum p/ o 3-way)." \
+    || { echo "ERRO: falhou ao ramificar $VENDOR." >&2; return 2; }
+}
+
+_update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
+  local T="$1" SRC="$2" PIN="$3" IB="$4"
+  git -C "$T" rev-parse --git-dir >/dev/null 2>&1 || { echo "⚠️  $T não é repo git — update pulado." >&2; return 0; }
+  git -C "$SRC" rev-parse --git-dir >/dev/null 2>&1 || { echo "ERRO: SOURCE_ROOT '$SRC' não é repo git." >&2; return 2; }
+
+  # Bootstrap de legado: sem vendor → ramifica agora (do estado atual da integração).
+  git -C "$T" rev-parse --verify "$VENDOR" >/dev/null 2>&1 || { _seed "$T" "$IB" || return $?; }
+
+  # Working tree da integração precisa estar limpa p/ o merge (não força — never-clobber).
+  git -C "$T" checkout -q "$IB" 2>/dev/null || { echo "ERRO: não consegui checar '$IB' em $T." >&2; return 2; }
+  if ! git -C "$T" diff --quiet 2>/dev/null || ! git -C "$T" diff --cached --quiet 2>/dev/null; then
+    echo "ERRO: working tree de $T ($IB) suja — commite/stash antes do --update (o merge exige árvore limpa)." >&2
+    return 2
+  fi
+
+  # Aplica o framework NOVO no onion/vendor, num worktree (não sai da integração).
+  local wt; wt="$(mktemp -d)/onion-vendor-wt"
+  git -C "$T" worktree add -q "$wt" "$VENDOR" 2>/dev/null || { echo "ERRO: worktree do $VENDOR falhou." >&2; return 2; }
+  local mf; mf="$(_manifest "$SRC")"
+  [ -n "$mf" ] || { echo "ERRO: manifest vazio (core sem framework?)." >&2; git -C "$T" worktree remove --force "$wt" 2>/dev/null; return 2; }
+  # shellcheck disable=SC2046
+  ( cd "$SRC" && git archive HEAD -- $(printf '%s ' $mf) ) | tar -x -C "$wt" 2>/dev/null
+  bash "$HERE/durable-commit.sh" "$wt" update "$PIN" "$VENDOR" >/dev/null 2>&1
+  git -C "$T" worktree remove --force "$wt" 2>/dev/null
+
+  # Merge do onion/vendor na integração (3-way; base comum). Conflito = never-clobber estrutural.
+  if git -C "$T" merge "$VENDOR" -m "chore(onion): update to pin ${PIN}" >/dev/null 2>&1; then
+    echo "Onion: framework atualizado via merge limpo de $VENDOR (pin ${PIN})."
+    return 0
+  fi
+  # Merge deixou conflito (ou nada a fazer). Distinga:
+  if git -C "$T" diff --name-only --diff-filter=U 2>/dev/null | grep -q .; then
+    echo "Onion: CONFLITO no merge de $VENDOR — customização local vs framework novo (never-clobber estrutural)." >&2
+    echo "  Resolva em $T: 'git mergetool' ou edite os marcadores; depois 'git commit'. Arquivos:" >&2
+    git -C "$T" diff --name-only --diff-filter=U 2>/dev/null | sed 's/^/    /' >&2
+    return 10
+  fi
+  # Sem conflito e merge não-zero → provavelmente nada a mergear (já atualizado).
+  git -C "$T" merge --abort 2>/dev/null || true
+  echo "Onion: nada a mergear (integração já em pin ${PIN})."
+  return 0
+}
+
+case "${1:-}" in
+  seed)   shift; [ "$#" -ge 2 ] || { echo "uso: vendor-branch.sh seed <TARGET> <INTEGRATION_BRANCH>" >&2; exit 2; }; _seed "$@" ;;
+  update) shift; [ "$#" -ge 4 ] || { echo "uso: vendor-branch.sh update <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>" >&2; exit 2; }; _update "$@" ;;
+  *) echo "uso: vendor-branch.sh {seed|update} ..." >&2; exit 2 ;;
+esac

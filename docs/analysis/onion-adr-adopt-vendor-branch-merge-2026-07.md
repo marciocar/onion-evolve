@@ -51,10 +51,11 @@ dependency-free — e **reusa** a maquinaria que já existe.
 ## 3. Mecanismo (fluxo)
 
 ### 3.1 Bootstrap do `onion/vendor` (na adoção, ou 1x em adotantes legados)
-- Criar `onion/vendor` (branch órfã **ou** ramificada da integração — ver §5 Q1).
-- Extrair o manifest do core (`git archive HEAD -- "${manifest[@]}" | tar -x`) para a working tree do
-  `onion/vendor` e **commitar** (reusa `durable-commit.sh` com `BR=onion/vendor`, `OP=vendor-seed`).
-- `onion/vendor` passa a conter **só o framework** (sem produto).
+- Criar `onion/vendor` **ramificada** da integração (`git branch onion/vendor <integration-HEAD>`) — §5 Q1
+  (órfã refutada por experimento: quebra a base comum do 3-way). O ponto de ramificação DEVE ser o estado
+  de **framework limpo** (verdadeiro logo após o install da adoção, antes de customizações).
+- `onion/vendor` compartilha história com a integração (base comum) e carrega o produto como snapshot
+  **intocado** (nunca editado nela → merge limpo). Só arquivos de framework mudam no vendor.
 
 ### 3.2 `--update`
 1. Atualizar `onion/vendor`: checkout (por-path/worktree) → extrair o manifest NOVO do core sobre ela →
@@ -82,9 +83,16 @@ dependency-free — e **reusa** a maquinaria que já existe.
 
 ## 5. Questões abertas (resolver no /engineer:plan)
 
-1. **`onion/vendor` órfã vs ramificada:** órfã (só framework, história limpa) exige
-   `merge --allow-unrelated-histories` no 1º merge; ramificada da integração compartilha história mas
-   arrasta o produto no 1º commit da branch (a limpar). **Provável:** órfã + allow-unrelated no seed.
+1. **`onion/vendor` órfã vs ramificada — RESOLVIDA por experimento (2026-07-09):** **ramificada** da
+   integração (`git branch onion/vendor <integration-HEAD>`). Órfã foi **refutada**: sem base comum, o
+   `merge --allow-unrelated-histories` dá **conflito add/add em TODO arquivo de framework** (mesmo os
+   não-customizados). Ramificada compartilha base comum → 3-way real: conflito **só** onde há customização
+   local; os demais atualizam limpo; produto preservado; customização preservada nos marcadores (não
+   clobada). O produto vive na branch (é ramo da integração) mas nunca é tocado nela → merge limpo.
+   **Subtileza p/ legados (§refinada Q3):** se a customização do adotante já está COMMITADA na integração
+   ANTES de o vendor existir, ela entra na base comum → o merge tomaria `theirs` (framework novo) =
+   clobber silencioso. Fresh-adoption não sofre (customização vem depois do ponto de ramificação). Legado
+   precisa de tratamento próprio (Fase 3).
 2. **Por-path vs worktree** para mexer no `onion/vendor` sem sair da integração: worktree
    (`git worktree add`) evita o vai-e-volta de checkout e é à-prova-de-working-tree-suja. Ecoa a Fase 2a legacy.
 3. **Adotantes legados** (sem `onion/vendor`): o 1º `--update` pós-migração faz o **bootstrap** (§3.1) antes

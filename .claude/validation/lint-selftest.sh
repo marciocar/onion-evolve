@@ -447,6 +447,80 @@ run_durable_commit_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo vendor-branch — exercita .claude/utils/adopt/vendor-branch.sh (Achado #2:
+# --update via merge de onion/vendor RAMIFICADA → never-clobber estrutural).
+# Self-contained (repos git em mktemp). Cobre o MODO DE FALHA e a cura:
+#   (a) seed        : onion/vendor ramificada, base comum com a integração
+#   (b) update limpo: framework novo sem customização → merge limpo, produto preservado
+#   (c) CONFLITO    : customização local → git merge conflita (exit 10), preservada (não clobada)  ← chave
+#   (d) idempotência: re-update mesmo pin → exit 0, tree limpa
+#   (e) legado      : alvo sem onion/vendor → update semeia antes de mergear
+# ---------------------------------------------------------------------------
+run_vendor_branch_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
+  if [ ! -f "${helper}" ]; then record_fail "vendor-branch" "helper ausente: ${helper}"; return; fi
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+  local core t ib
+
+  _vb_core() { local d="$1" v="$2"; rm -rf "$d"; mkdir -p "$d/.claude/commands" "$d/docs/meta-specs"; git -C "$d" init -q
+    printf 'cmd v%s\n' "$v" > "$d/.claude/commands/foo.md"; printf 'spec v%s\n' "$v" > "$d/docs/meta-specs/spec.md"
+    git -C "$d" add -A; git -C "$d" commit -qm "core v$v"; }
+  _vb_adopter() { local tt="$1" cc="$2"; rm -rf "$tt"; mkdir -p "$tt/src"; git -C "$tt" init -q
+    printf 'produto\n' > "$tt/src/app.js"; git -C "$cc" archive HEAD -- .claude docs | tar -x -C "$tt"
+    git -C "$tt" add -A; git -C "$tt" commit -qm "adopt v1 + produto"; }
+
+  core="$(mktemp -d)/c"; t="$(mktemp -d)/a"; _vb_core "$core" 1; _vb_adopter "$t" "$core"
+  ib="$(git -C "$t" rev-parse --abbrev-ref HEAD)"
+
+  # (a) seed
+  bash "${helper}" seed "$t" "$ib" >/dev/null 2>&1
+  if git -C "$t" rev-parse --verify onion/vendor >/dev/null 2>&1 \
+     && [ -n "$(git -C "$t" merge-base "$ib" onion/vendor 2>/dev/null)" ]; then
+    record_pass "vendor-branch: seed ramifica onion/vendor com base comum"
+  else record_fail "vendor-branch: seed" "sem onion/vendor ou sem base comum"; fi
+
+  # (b) update limpo
+  _vb_core "$core" 2
+  bash "${helper}" update "$t" "$core" v2 "$ib" >/dev/null 2>&1
+  if grep -q v2 "$t/docs/meta-specs/spec.md" && grep -q produto "$t/src/app.js"; then
+    record_pass "vendor-branch: update limpo aplica framework + preserva produto"
+  else record_fail "vendor-branch: update limpo" "v2 não aplicado ou produto perdido"; fi
+
+  # (c) CONFLITO — o teste-chave
+  printf 'cmd v2 CUSTOMIZADO\n' > "$t/.claude/commands/foo.md"; git -C "$t" add -A; git -C "$t" commit -qm custom
+  _vb_core "$core" 3
+  local rc=0; bash "${helper}" update "$t" "$core" v3 "$ib" >/dev/null 2>&1 || rc=$?
+  if [ "$rc" -eq 10 ] && grep -q CUSTOMIZADO "$t/.claude/commands/foo.md" \
+     && git -C "$t" diff --name-only --diff-filter=U 2>/dev/null | grep -q foo.md; then
+    record_pass "vendor-branch: customização local → CONFLITO (exit 10), não clobada"
+  else record_fail "vendor-branch: conflito" "exit=$rc ou customização clobada/sem conflito"; fi
+  git -C "$t" merge --abort 2>/dev/null || true
+
+  # (d) idempotência (repo limpo dedicado)
+  local c2 t2 ib2; c2="$(mktemp -d)/c2"; t2="$(mktemp -d)/a2"; _vb_core "$c2" 1
+  mkdir -p "$t2"; git -C "$t2" init -q; git -C "$c2" archive HEAD -- .claude docs | tar -x -C "$t2"
+  git -C "$t2" add -A; git -C "$t2" commit -qm adopt; ib2="$(git -C "$t2" rev-parse --abbrev-ref HEAD)"
+  bash "${helper}" seed "$t2" "$ib2" >/dev/null 2>&1; _vb_core "$c2" 2
+  bash "${helper}" update "$t2" "$c2" v2 "$ib2" >/dev/null 2>&1 || true
+  local rci=0; bash "${helper}" update "$t2" "$c2" v2 "$ib2" >/dev/null 2>&1 || rci=$?
+  if [ "$rci" -eq 0 ] && [ -z "$(git -C "$t2" status --short)" ]; then
+    record_pass "vendor-branch: re-update idempotente (exit 0, tree limpa)"
+  else record_fail "vendor-branch: idempotência" "exit=$rci ou tree suja"; fi
+
+  # (e) legado — sem onion/vendor, update semeia
+  local c3 t3 ib3; c3="$(mktemp -d)/c3"; t3="$(mktemp -d)/a3"; _vb_core "$c3" 1; _vb_adopter "$t3" "$c3"
+  ib3="$(git -C "$t3" rev-parse --abbrev-ref HEAD)"; _vb_core "$c3" 2
+  local rcl=0; bash "${helper}" update "$t3" "$c3" v2 "$ib3" >/dev/null 2>&1 || rcl=$?
+  if [ "$rcl" -eq 0 ] && git -C "$t3" rev-parse --verify onion/vendor >/dev/null 2>&1; then
+    record_pass "vendor-branch: legado sem vendor → bootstrap + merge"
+  else record_fail "vendor-branch: legado" "exit=$rcl ou vendor não semeado"; fi
+
+  rm -rf "$core" "$t" "$c2" "$t2" "$c3" "$t3" 2>/dev/null
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+}
+
+# ---------------------------------------------------------------------------
 # Modo prettierignore — exercita .claude/utils/adopt/merge-prettierignore.sh.
 # Self-contained (estilo run_resolve_selftests): cenários em mktemp -d, sem
 # fixture-file/manifest. Cobre os MODOS DE FALHA (não só o happy-path): criação
@@ -1488,6 +1562,9 @@ run_resolve_selftests
 
 # Modo durable-commit — commit durável da instalação (fix do incidente uncommitted-descartável).
 run_durable_commit_selftests
+
+# Modo vendor-branch — --update via merge de onion/vendor (Achado #2: never-clobber estrutural).
+run_vendor_branch_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
