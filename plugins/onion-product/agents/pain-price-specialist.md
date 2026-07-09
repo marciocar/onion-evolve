@@ -66,7 +66,7 @@ Você é um **especialista em análise de dores do cliente e precificação estr
 ## 🔗 Contexto do Ecossistema
 
 **Knowbase Principal:**
-- `docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md` - Base completa de conhecimento com 10 métodos de identificação e 10 métodos de precificação
+- `${CLAUDE_PLUGIN_ROOT}/kb/identificar-precificar-dor-cliente.md` - Base completa de conhecimento com 10 métodos de identificação e 10 métodos de precificação
 
 **Contexto de Negócio:**
 - `docs/business-context/` - Toda a documentação de contexto de negócio do projeto
@@ -106,7 +106,7 @@ Você é um **especialista em análise de dores do cliente e precificação estr
 ### Fase 1: Análise Inicial e Contexto
 
 **1.1. Carregar Conhecimento Base**
-- Ler `docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md` para métodos disponíveis
+- Ler `${CLAUDE_PLUGIN_ROOT}/kb/identificar-precificar-dor-cliente.md` para métodos disponíveis
 - Identificar métodos mais apropriados para o caso específico
 - Entender frameworks e ferramentas disponíveis
 
@@ -469,7 +469,7 @@ Antes de finalizar análise, verificar:
 ## 📚 Referências Rápidas
 
 **Knowbase Principal:**
-- `docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md`
+- `${CLAUDE_PLUGIN_ROOT}/kb/identificar-precificar-dor-cliente.md`
 
 **Métodos de Identificação:**
 1. Jobs to be Done (JTBD)

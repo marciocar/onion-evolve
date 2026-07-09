@@ -23,10 +23,14 @@ TEMPLATES=(
   ".claude/commands/common/templates/compliance_soc2_template.md"
   ".claude/commands/common/templates/compliance_pmbok_template.md"
 )
+# Skill de contexto: contrato SSOT mínimo + resolver de compliance-context (auto-suficiente em repos
+# não-adotados). tipo A (frameworks) = os TEMPLATES acima, já embarcados → sem DOCS. Ver
+# .claude/skills/onion-compliance-context/.
+SKILLS=(".claude/skills/onion-compliance-context")
 
 # Capability Contract (auto-descrição — ADR onion-adr-capability-contract-2026-06).
 CONFORMANCE="gold"
-PROVIDES=("iso-27001-isms" "iso-22301-bcms" "soc2-tsc" "pmbok-governance" "build-compliance-docs")
+PROVIDES=("iso-27001-isms" "iso-22301-bcms" "soc2-tsc" "pmbok-governance" "build-compliance-docs" "ssot-context-resolver")
 REQUIRES=(
   "agent:security-information-master"
   "agent:iso-27001-specialist"
@@ -34,6 +38,7 @@ REQUIRES=(
   "agent:soc2-specialist"
   "agent:pmbok-specialist"
   "command:build-compliance-docs"
+  "skill:onion-compliance-context"
   "template:compliance-context-template.md"
   "template:compliance_iso27001_template.md"
   "template:compliance_iso22301_template.md"
@@ -43,4 +48,5 @@ REQUIRES=(
 LOADS=(
   "when:framework=iso27001 -> template:compliance_iso27001_template.md"
   "when:framework=soc2 -> template:compliance_soc2_template.md"
+  "when:build -> resolve:compliance-context (skill onion-compliance-context)"
 )

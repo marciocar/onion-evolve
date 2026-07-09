@@ -22,15 +22,31 @@ AGENTS=(
 )
 UTILS=()
 VALIDATION=()
+# Skill de contexto: contrato SSOT mínimo + resolver de business-context (auto-suficiente em repos
+# não-adotados). Ver .claude/skills/onion-product-context/.
+SKILLS=(".claude/skills/onion-product-context")
+# KB de framework EMBARCADO (tipo A) — os mais citados: extração de reuniões (9×), story points (8×),
+# pain-price (6×). SSOT segue em docs/knowledge-base/; o plugin leva cópia gerada → funciona sem adopt.
+DOCS=(
+  "docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md"
+  "docs/knowledge-base/frameworks/framework-story-points.md"
+  "docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md"
+)
 
 # Capability Contract (auto-descrição — ADR onion-adr-capability-contract-2026-06).
 CONFORMANCE="silver"
-PROVIDES=("descoberta-a-backlog" "decomposicao-de-tasks" "estimativa-story-points" "extracao-de-reunioes" "apresentacoes")
+PROVIDES=("descoberta-a-backlog" "decomposicao-de-tasks" "estimativa-story-points" "extracao-de-reunioes" "apresentacoes" "ssot-context-resolver")
 REQUIRES=(
   "agent:product-agent"
   "agent:task-specialist"
   "agent:story-points-framework-specialist"
   "agent:pain-price-specialist"
   "agent:extract-meeting-specialist"
+  "skill:onion-product-context"
 )
-LOADS=()
+# tipo A embarcado (kb/); tipo B resolvido pela skill (business-context do consumidor).
+LOADS=(
+  "embed:kb/framework-story-points.md"
+  "embed:kb/identificar-precificar-dor-cliente.md"
+  "when:spec -> resolve:business-context (skill onion-product-context)"
+)

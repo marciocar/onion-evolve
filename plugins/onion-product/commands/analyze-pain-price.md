@@ -31,7 +31,7 @@ Wrapper otimizado para `@pain-price-specialist`. Em vez de invocar o agente dire
 - Garante a geração de relatório estruturado em `docs/reports/pain-price/`
 
 **Frameworks e métodos** (JTBD, Value Proposition Canvas, Customer Development, SPIN, 5 Porquês, Value-Based Pricing, WTP/Van Westendorp, Outcome-Based, matriz de priorização etc.) NÃO são duplicados aqui — estão na KB:
-`docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md`
+`${CLAUDE_PLUGIN_ROOT}/kb/identificar-precificar-dor-cliente.md`
 
 ---
 
@@ -123,7 +123,7 @@ Próximos passos: apresentar proposta outcome-based · validar WTP · contrato c
 
 ## 📚 Referências
 
-- **KB (frameworks/métodos):** `docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md`
+- **KB (frameworks/métodos):** `${CLAUDE_PLUGIN_ROOT}/kb/identificar-precificar-dor-cliente.md`
 - **Contexto de negócio:** `docs/business-context/` (`CUSTOMER_PERSONAS`, `CUSTOMER_JOURNEY`, `VOICE_OF_CUSTOMER`, `PRODUCT_STRATEGY`, `SALES_PROCESS`, `COMPETITIVE_LANDSCAPE`)
 - **Agente:** `@pain-price-specialist`
 - **Relacionados:** `@product-agent`, `/product/spec`, `/product/task`

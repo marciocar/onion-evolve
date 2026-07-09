@@ -69,10 +69,10 @@ Estabelecer contexto focado em:
 - `/docs/consolidate-documents` - Consolidar documentos de produto/negócio
 
 ### 4. Knowledge Bases de Produto
-- ✅ Revisar `docs/knowledge-base/frameworks/framework-story-points.md`
+- ✅ Revisar `${CLAUDE_PLUGIN_ROOT}/kb/framework-story-points.md`
 - ✅ Revisar `docs/knowledge-base/concepts/task-manager-abstraction.md`
-- ✅ Revisar `docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md`
-- ✅ Revisar `docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md`
+- ✅ Revisar `${CLAUDE_PLUGIN_ROOT}/kb/meeting-transcription-to-knowledge-base.md`
+- ✅ Revisar `${CLAUDE_PLUGIN_ROOT}/kb/identificar-precificar-dor-cliente.md`
 - ✅ Revisar `docs/knowledge-base/concepts/branding-posicionamento-marca.md`
 
 ### 5. Agentes de Produto
@@ -100,8 +100,8 @@ Estabelecer contexto focado em:
 ### Documentação Essencial
 - `docs/onion/commands-guide.md` - Comandos de produto
 - `docs/onion/practical-examples.md` - Exemplos práticos
-- `docs/knowledge-base/frameworks/framework-story-points.md` - Framework de estimativas
-- `docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md` - Processamento de reuniões
+- `${CLAUDE_PLUGIN_ROOT}/kb/framework-story-points.md` - Framework de estimativas
+- `${CLAUDE_PLUGIN_ROOT}/kb/meeting-transcription-to-knowledge-base.md` - Processamento de reuniões
 
 ### Workflows de Produto
 
