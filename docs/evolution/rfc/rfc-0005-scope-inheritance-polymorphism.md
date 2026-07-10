@@ -59,6 +59,29 @@ para o eixo horizontal (verticais opt-in), **não como transporte** (`H1·F5`, `
 Plano **cognitivo** resolve por concatenação/precedência nativa (grátis). Plano **config** exige o merge-N-camadas
 (o gap). Plano **conhecimento** usa `SUPERSEDES` (o escopo inferior supera o superior sem apagar).
 
+### 4.1 Adendo (2026-07-10) — "forma de adoção" é dimensão de 1ª classe (ground-truth Grana.Ai)
+
+> Origem: sinal de campo [`2026-07-10-rfc5-docs-only-adoption-ground-truth`](../inbox/_processed/2026-07-10-rfc5-docs-only-adoption-ground-truth.md)
+> — no dia seguinte ao aceite desta RFC, o time Grana.Ai materializou em `master` uma **adoção docs-only**
+> (PR #1127, Mauricio: *"`.claude/` (capability layer) and `CLAUDE.md` stay OUT of git"*), coexistindo com a
+> adoção **full** em `develop`. Escrito do `main` do core com o workstream de pesquisa dormente — a sessão de
+> `docs/scope-inheritance-research` deve **reconciliar** este adendo ao acordar.
+
+- **FORMA DE ADOÇÃO** — `full | docs-only | in-place` — é uma dimensão **ortogonal a escopo E a versão**,
+  que esta matriz não nomeava. Sem nome, ela **vaza para branch** (`master` docs-only vs `develop` full —
+  exatamente o uso de branch que o §3 rejeita). O ground-truth **confirma os 3 planos** (o time separou
+  conhecimento→versiona de capacidade→não-versiona) e **valida** a intuição: a escolha existe de fato;
+  falta o vocabulário para ela não se expressar por branch.
+- **4º modo de proveniência (GATED, a-desenhar): capability-update fora-do-git.** Adotante `docs-only`
+  não tem `.claude/` rastreado → não há árvore para o 3-way do `vendor-branch.sh`; o `--update` de
+  capability vira **entrega-fora-do-git** (parentesco: doc-bridge/entrega-sem-commit), maestro-gated —
+  coerente com regulado/never-live-pull (RFC-0004). **Estoura no 1º `--update` do time Grana.Ai** — desenhar
+  antes disso.
+- **Role/forma como proveniência no plano config — 1º passo ENTREGUE:** os gates agora polimorfam por
+  papel (guarda `role: adopted` nos checks de marketplace do lint, fix de 2026-07-10 + selftest
+  `run_adopted_role_selftests`). O caso geral (proveniência-por-chave com dimensão role/forma) segue com
+  a Fase 2.
+
 ## 5. Caso Grana.Ai (concreto)
 
 `granaai` (empresa, regulado) → time `desenvolvimento` → pessoa `mauricio`, num **nx monorepo**:
