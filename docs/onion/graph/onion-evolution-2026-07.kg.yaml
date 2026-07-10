@@ -334,6 +334,14 @@ nodes:
     status: done
     label: "Escopo corrigido: rm restrito ao literal do mktemp, cat restrito a heredoc; Bash(bash *) FICA (uso real comprovado)"
     trace: ".claude/commands/meta/adopt.md:9"
+  - id: E_LS_UNUSED
+    node_type: evidence
+    plane: DEV
+    impact: 1
+    confidence: 1.0
+    status: confirmed
+    label: "Residuo pos-fix (2026-07-10): Bash(ls *) declarado sem nenhum ls standalone no corpo (so git ls-tree, coberto por git *) — grant morto removido, v1.9.1"
+    trace: ".claude/commands/meta/adopt.md:9"
   - id: D_QUICKWINS
     node_type: decision
     plane: DEV
@@ -504,6 +512,9 @@ edges:
     to: C_D5_10
     edge_type: SUPERSEDES
   - from: E_VERIFY_ADOPT
+    to: C_D5_10B
+    edge_type: SUPPORTS
+  - from: E_LS_UNUSED
     to: C_D5_10B
     edge_type: SUPPORTS
   - from: D_QUICKWINS
