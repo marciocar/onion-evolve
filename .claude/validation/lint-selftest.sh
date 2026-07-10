@@ -864,7 +864,9 @@ YML
     p="$(printf '{"iss":"%s","aud":"%s","iat":%s,"exp":%s,"jti":"%s"}' "$1" "$2" "$3" "$4" "$5" | _b64url)"
     printf '%s.%s.%s' "$h" "$p" "$(printf '%s' "$h.$p" | openssl dgst -sha256 -sign "${sb}/priv.pem" | _b64url)"; }
   _env() { printf '{"jws":"%s","signal":{"from":"%s","to":"%s","kind":"signal"}%s}' "$1" "$2" "$3" "$4"; }
-  _verify() { rc=0; out="$(A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver "$1" --repo "${sb}" --dry-run --envelope - <<<"$2" 2>/dev/null)" || rc=$?; }
+  # A2A_CLOCK_TRUST=attested: o relógio do HOST de teste não é o SUT destes casos (a guarda
+  # clock-untrusted tem casos dedicados abaixo, com PATH stubado — determinístico em qualquer CI).
+  _verify() { rc=0; out="$(A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver "$1" --repo "${sb}" --dry-run --envelope - <<<"$2" 2>/dev/null)" || rc=$?; }
 
   _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-h)" acme onion-evolve "")"
   if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"verified":true'; then record_pass "a2a-verify: envelope assinado válido → verified"
@@ -923,7 +925,24 @@ YML
   rc=0; out="$(PATH="${bin}" A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${se}" 2>/dev/null)" || rc=$?
   if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'tooling-absent'; then record_pass "a2a-verify: FAIL-SAFE — tooling ausente → veto (nunca skip/allow)"
   else record_fail "a2a-verify: fail-safe" "out='${out}' rc=${rc}"; fi
-  rm -rf "${bin}" "${sb}"
+
+  # CLOCK-TRUST (carimbo de tempo só vale com fonte verificada): PATH stubado com TODAS as
+  # ferramentas + timedatectl fake dizendo NTPSynchronized=no e sem chronyc/ntpstat → veto.
+  local clkbin; clkbin="$(mktemp -d)"
+  for t in jq date mktemp python3 grep cat dirname git tr sed sort find awk head cut wc bash sha256sum openssl; do
+    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && ln -s "$p" "${clkbin}/$t"
+  done
+  printf '#!/usr/bin/env bash\necho no\n' > "${clkbin}/timedatectl"; chmod +x "${clkbin}/timedatectl"
+  local ce; ce="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-clk1)" acme onion-evolve "")"
+  rc=0; out="$(PATH="${clkbin}" A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${ce}" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'clock-untrusted'; then record_pass "a2a-verify: relógio sem prova de sync → veto clock-untrusted (fail-safe)"
+  else record_fail "a2a-verify: clock-untrusted" "out='${out}' rc=${rc}"; fi
+  # mesmo host dessincronizado + atestado explícito do operador → camada passa (verified)
+  ce="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-clk2)" acme onion-evolve "")"
+  rc=0; out="$(PATH="${clkbin}" A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${ce}" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"verified":true'; then record_pass "a2a-verify: A2A_CLOCK_TRUST=attested → atestado explícito destrava a camada"
+  else record_fail "a2a-verify: clock-attested" "out='${out}' rc=${rc}"; fi
+  rm -rf "${bin}" "${clkbin}" "${sb}"
 }
 
 # ---------------------------------------------------------------------------

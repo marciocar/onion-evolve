@@ -120,6 +120,12 @@ members:
     integration_branch: develop  # confirmado — ambiente regulado exige controle deliberado de QUANDO puxar updates (nunca live-pull automático)
     reconciliation_status: merged_2026-07-07   # PR #1094 (14 commits + cherry-pick 1af2e8b2d restaurando o guia) e PR #1096 (fix .gitignore blanket /docs/) mergeados em develop; revisão do Mauricio ok + lint HARD limpo antes do merge
     reviewer: "Mauricio Matos <mauricio.matos@grana.ai> — revisou e aprovou (comentário PR #1094, 2026-07-07); merge executado pelo core"
+    a2a:                        # participa do a2a-live (F2.2 #5) como REMETENTE regulado — PREPARADO, não ativado:
+      sends_to: onion-evolve    # envia p/ o endpoint do core; não hospeda endpoint próprio
+      keys: []                  # VAZIO até o gate humano pinar (kid sugerido: granaai-1). keys[] vazio = todo kid
+                                # veta (kid-not-owned — fail-safe). Fluxo: sessão granaai self-gera o par RS256
+                                # (priv NUNCA sai de lá) → core pina jwks/granaai-1.pem + registra o kid aqui.
+                                # Receptor mode:regulated ⇒ a2a-verify emite apply_mode:propose-only (never-live-pull).
     personality_summary: "Onde o Onion se consolidou como potência real (não a origem) — 3 dimensões peer provadas juntas em produção regulada (fintech). Convite de Marcio Carvalho (CTO Grana.Ai, criador do Onion) a Mauricio Matos, 2026-07-01: adoção completa + canonicalização SSOT (9 ADRs, 8 RFTs, grafo do ecossistema, 24/25 CURRENT). Achado notável: bug real de lint (graceful-skip sem jq) descoberto e corrigido lá E no core, mesmo dia, 7h41 de diferença, zero comunicação — descoberta convergente independente. NÃO tem role:source próprio (doutrina fonte≠derivação: uma só fonte) — o .claude/ vendorizado já É 'o core deles' no dia a dia; trust elevado (não role elevado) reconhece o rigor comprovado."
     specializations: [regulated-fintech, canonicalization, ssot-governance]
     personality_last_sync: 2026-07-06   # seed manual — investigação read-only, não sessão adotante

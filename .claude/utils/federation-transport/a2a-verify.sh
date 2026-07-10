@@ -16,7 +16,10 @@
 #   0. parse       — jq presente + envelope JSON válido? (senão veto tooling-absent:jq / malformed-envelope)
 #   1. trust       — COMPÕE trust-topology-check.sh (--from signal.from --to receiver --action relay): policy-as-data
 #   2. replay      — jti já visto? (state file por-receptor) → veto replay  (jti só é GRAVADO no fim, após tudo passar)
-#   3. timestamp   — exp<now → expired · iat>now+skew → future
+#   3. timestamp   — RELÓGIO CONFIÁVEL primeiro (janela de tempo só vale com fonte verificada: NTP sincronizado
+#                    via timedatectl|chronyc|ntpstat; sem prova → veto clock-untrusted; A2A_CLOCK_TRUST=attested
+#                    é o atestado explícito do operador p/ hosts sem essas ferramentas) · exp<now → expired ·
+#                    iat>now+skew → future
 #   4. ssrf        — a2a-ssrf-check.sh na URL do PushNotificationConfig (se houver)
 #   5. jws         — assinatura RS256 verificada com a pubkey do kid (JWKS fixture) + claims iss==from, aud==receiver
 #   6. never-live-pull — receptor mode:regulated → apply_mode:propose-only (aceita p/ o gate, nunca pull ao vivo)
@@ -104,6 +107,22 @@ STATE="${REPO}/.claude/sessions/.a2a-verify.${RECEIVER}.jti.state"
 if [ -f "${STATE}" ] && grep -qxF "${JTI}" "${STATE}" 2>/dev/null; then veto "replay" "replay"; fi
 
 # --- Camada 3: janela de timestamp -------------------------------------------
+# Pré-condição: o relógio local é confiável? Uma janela de tempo computada sobre relógio dessincronizado
+# aceita sinal expirado ou veta sinal válido — o carimbo só vale com fonte verificada (NTP). Fail-safe: VETO.
+clock_trusted() {
+  [ "${A2A_CLOCK_TRUST:-}" = "attested" ] && return 0   # atestado explícito do operador (host sem tooling NTP)
+  if command -v timedatectl >/dev/null 2>&1; then
+    [ "$(timedatectl show -p NTPSynchronized --value 2>/dev/null)" = "yes" ] && return 0
+  fi
+  if command -v chronyc >/dev/null 2>&1; then
+    chronyc tracking 2>/dev/null | grep -q '^Leap status.*Normal' && return 0
+  fi
+  if command -v ntpstat >/dev/null 2>&1; then
+    ntpstat >/dev/null 2>&1 && return 0
+  fi
+  return 1
+}
+clock_trusted || veto "clock-untrusted" "timestamp"
 NOW="$(date +%s)"
 [ -n "${EXP}" ] && [ "${EXP}" -lt "${NOW}" ] 2>/dev/null && veto "expired" "timestamp"
 [ -n "${IAT}" ] && [ "${IAT}" -gt "$(( NOW + SKEW ))" ] 2>/dev/null && veto "future" "timestamp"
