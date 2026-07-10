@@ -75,8 +75,10 @@ pura do SSOT) → libera valor imediato. **Fase 2 é gated na RFC-0004** (transp
   → `/a2a` público → verificado (7 camadas, incl. a guarda **clock-trust** estreada no mesmo dia, `e750023`)
   → fila gated → `a2a-accept` → inbox → triado. Nota honesta: `apply_mode:propose-only` é caminho de
   **receptor** regulado (coberto por selftest); o vivo exercitou kid-binding+clock com membro regulado real.
-  Diário: `2026-07-10-first-regulated-a2a-handshake`. Follow-ups: token a2a dedicado granaai (restart do
-  bridge = gesto humano) · PR da branch sender na sessão granaai.
+  Diário: `2026-07-10-first-regulated-a2a-handshake`. Follow-ups FECHADOS (mesmo dia): token a2a
+  DEDICADO da granaai provisionado (gesto humano do maestro: env+restart; re-dogfood verde com o token
+  novo — `verified:true`, aceito e triado) · sender da granaai em PR (`GranaAi/granaai#1135`, base
+  develop; a sessão da granaai acordou e roda `/meta:adopt --update` — coordenação viva).
 
 ### F2.3 — Veto reputação-condicionado (evolução futura)
 - **O quê:** ligar reputação-por-evidência (`trust-log` + `can_correct_to`) como condicionante do veto/urgência
