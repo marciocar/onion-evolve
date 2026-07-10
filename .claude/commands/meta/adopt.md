@@ -6,11 +6,11 @@ description: |
   retomável. Greenfield-first. NÃO é CLI — roda dentro do Claude Code.
   Relacionado: /docs:reverse-consolidate, /meta:setup-integration, /docs:build-tech-docs.
 model: sonnet
-allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(ls *) Bash(rm -rf "$TMP") Bash(mktemp *) Bash(cat > *) Bash(mkdir *) Bash(printf *)
+allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(rm -rf "$TMP") Bash(mktemp *) Bash(cat > *) Bash(mkdir *) Bash(printf *)
 argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--integration-branch <nome>] [--in-place] [--update] [--dry-run]"
 category: meta
-version: "1.9.0"
-updated: "2026-07-02"
+version: "1.9.1"
+updated: "2026-07-10"
 ---
 
 # 🧅 /meta:adopt — Adoção de Repositório
