@@ -23,8 +23,8 @@ tags:
   - meta
   - automation
 
-version: "3.0.0"
-updated: "2025-11-24"
+version: "3.0.1"
+updated: "2026-07-10"
 
 related_commands:
   - /meta/create-command
@@ -74,6 +74,8 @@ SENÃO → inferir da expertise:
 | docs, writing | `review` |
 | test, coverage | `testing` |
 | commands, agents | `meta` |
+| docker, deploy, container | `deployment` |
+| pesquisa, análise multi-fonte | `research` |
 
 ### Passo 3: Gerar Estrutura
 
@@ -88,10 +90,9 @@ description: |
 model: sonnet
 tools:
   - Read
-  - write
+  - Write
   - Edit
   - Grep
-  - grep
   - Glob
   - WebSearch
   - TodoWrite
@@ -151,7 +152,7 @@ if grep -r "^name: {{agent_name}}$" .claude/agents/ 2>/dev/null; then
 fi
 
 # 2. CATEGORIA - Verificar categoria válida
-VALID_CATEGORIES="development product compliance meta review testing research git"
+VALID_CATEGORIES="development product compliance meta review testing research git deployment"
 if [[ ! " $VALID_CATEGORIES " =~ " {{category}} " ]]; then
   echo "❌ ERRO: Categoria '{{category}}' inválida!"
   echo "Válidas: $VALID_CATEGORIES"
@@ -167,16 +168,15 @@ fi
 
 **Checklist de Validação:**
 - [ ] Nome único (não existe em `.claude/agents/`)
-- [ ] Categoria válida (development|product|compliance|meta|review|testing|research|git)
+- [ ] Categoria válida (development|product|compliance|meta|review|testing|research|git|deployment)
 - [ ] Expertise definida (3-5 áreas)
 - [ ] YAML header completo
-- [ ] < 300 linhas
+- [ ] ≤ 1.200 linhas (recomendado; hard limit 1.500 — meta-spec `agents.md`)
 
 ### Passo 5: Criar Arquivo
 
-```bash
-write .claude/agents/{{category}}/{{agent_name}}.md
-```
+Escrever o artefato com a tool **Write** em
+`.claude/agents/{{category}}/{{agent_name}}.md`.
 
 ## 📤 Output Esperado
 

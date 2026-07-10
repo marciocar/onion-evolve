@@ -99,8 +99,8 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: confirmed
-    label: "Pares /meta:create-* x especialistas: afinar delegacao nos pares command/skill (versao forte foi refutada em D1-2)"
+    status: done
+    label: "Pares /meta:create-* x especialistas: afinar delegacao nos pares command/skill (versao forte foi refutada em D1-2) — EXECUTADO 2026-07-10: skill nao precisava, command ganhou delegacao explicita (ver E_TUNE_PAIRS)"
     trace: ".claude/commands/meta/create-command.md:1"
   - id: C_D7_14
     node_type: claim
@@ -334,6 +334,14 @@ nodes:
     status: done
     label: "Escopo corrigido: rm restrito ao literal do mktemp, cat restrito a heredoc; Bash(bash *) FICA (uso real comprovado)"
     trace: ".claude/commands/meta/adopt.md:9"
+  - id: E_TUNE_PAIRS
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "Avaliacao dos pares restantes (2026-07-10): create-skill JA delega estruturado (Passo 4 — padrao de referencia, sem mudanca); create-command NAO delegava (especialista so em referencias) → delegacao explicita adicionada; staleness L0 corrigida em create-{command,agent} (limites 400/300 vs meta-spec 500-800/1200-1500, categorias sem design/deployment, tools driftadas no template inline)"
+    trace: ".claude/commands/meta/create-command.md:78"
   - id: E_LS_UNUSED
     node_type: evidence
     plane: DEV
@@ -516,6 +524,9 @@ edges:
     edge_type: SUPPORTS
   - from: E_LS_UNUSED
     to: C_D5_10B
+    edge_type: SUPPORTS
+  - from: E_TUNE_PAIRS
+    to: C_D2_5
     edge_type: SUPPORTS
   - from: D_QUICKWINS
     to: A_REPORT_0704

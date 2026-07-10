@@ -4,7 +4,7 @@ description: |
   Criação de novos comandos Claude Code com análise de contexto.
   Use para criar comandos que seguem padrões do Sistema Onion.
 model: sonnet
-allowed-tools: Read Write Bash(ls *) Bash(grep *) Bash(find *)
+allowed-tools: Read Write Bash(ls *) Bash(grep *)
 
 parameters:
   - name: command_name
@@ -23,8 +23,8 @@ tags:
   - meta
   - automation
 
-version: "3.0.0"
-updated: "2025-11-24"
+version: "3.1.0"
+updated: "2026-07-10"
 
 related_commands:
   - /meta/create-agent
@@ -75,66 +75,27 @@ SENÃO → inferir do propósito:
 | Comandos, agentes | `meta` |
 | Validações | `validate` |
 
-### Passo 3: Gerar Estrutura
+### Passo 3: Delegar Geração ao @command-creator-specialist
 
-Usar template de `common/templates/command-template.md`:
+A expertise de estruturação (workflow, integração ao ecossistema, relacionamentos) vive no
+especialista — este comando coleta o contexto e **delega**:
 
-```yaml
----
-name: {{command_name}}
-description: |
-  [Descrição em 2 linhas]
-  Use para [caso de uso principal].
-model: sonnet
-
-parameters:
-  - name: param1
-    description: [descrição]
-    required: [true/false]
-
-category: {{category}}
-tags:
-  - [tag1]
-  - [tag2]
-
-version: "3.0.0"
-updated: "[data atual]"
-
-related_commands:
-  - /category/comando
-
-related_agents:
-  - agente-relacionado
----
-
-# [Título do Comando]
-
-[Descrição breve]
-
-## 🎯 Objetivo
-
-[O que este comando faz]
-
-## ⚡ Fluxo de Execução
-
-### Passo 1: [Nome]
-[Instruções]
-
-### Passo 2: [Nome]
-[Instruções]
-
-## 📤 Output Esperado
-
-[Formato de saída]
-
-## 🔗 Referências
-
-- [Referências relevantes]
-
-## ⚠️ Notas
-
-- [Notas importantes]
 ```
+@command-creator-specialist
+
+Comando: {{command_name}}
+Categoria: {{category}}
+Propósito: {{description}}
+Template SSOT: common/templates/command-template.md
+Contexto descoberto (Passo 1): [comandos/agentes relacionados, duplicação verificada]
+```
+
+O especialista gera o artefato completo: frontmatter, fluxo, output esperado e
+relacionamentos (`related_commands`/`related_agents`) coerentes com o ecossistema.
+
+> **Camadas deliberadas:** este comando é a camada fina (coleta + validação + escrita);
+> a geração contextualizada é do especialista. Para o esqueleto cru sem análise, use
+> diretamente o template SSOT `common/templates/command-template.md`.
 
 ### Passo 4: Validações Obrigatórias
 
@@ -154,7 +115,7 @@ if [[ ! "{{command_name}}" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]]; then
 fi
 
 # 3. CATEGORIA - Verificar categoria válida
-VALID_CATEGORIES="engineer product git docs meta validate test development quick"
+VALID_CATEGORIES="engineer product git docs meta validate test development quick design"
 if [[ ! " $VALID_CATEGORIES " =~ " {{category}} " ]]; then
   echo "❌ ERRO: Categoria '{{category}}' inválida!"
   echo "Válidas: $VALID_CATEGORIES"
@@ -165,16 +126,15 @@ fi
 **Checklist de Validação:**
 - [ ] Nome único (não existe em `.claude/commands/`)
 - [ ] Nome em kebab-case válido
-- [ ] Categoria válida (engineer|product|git|docs|meta|validate|test|development|quick)
+- [ ] Categoria válida (engineer|product|git|docs|meta|validate|test|development|quick|design)
 - [ ] YAML header completo
-- [ ] < 400 linhas
+- [ ] ≤ 500 linhas (recomendado; hard limit 800 — meta-spec `commands.md`)
 - [ ] Seções obrigatórias (Objetivo, Fluxo, Output)
 
 ### Passo 5: Criar Arquivo
 
-```bash
-write .claude/commands/{{category}}/{{command_name}}.md
-```
+Escrever o artefato gerado pelo especialista com a tool **Write** em
+`.claude/commands/{{category}}/{{command_name}}.md`.
 
 ## 📤 Output Esperado
 
@@ -201,7 +161,7 @@ write .claude/commands/{{category}}/{{command_name}}.md
 
 ## ⚠️ Notas
 
-- Máximo 400 linhas por comando
+- Limites de tamanho da meta-spec `commands.md`: 500 linhas recomendado, 800 hard
 - Usar prompts modulares de `common/prompts/`
 - Sempre validar duplicação antes de criar
 - **Passo final — sincronizar a SSOT:** após criar, rodar **`/meta:inventory`** (regenera `inventory.md`; a Regra 8 do lint é HARD → criar sem regenerar deixa o repo em HARD-fail silencioso). Mecanismo: `common:prompts:inventory-sync-after-create`.
