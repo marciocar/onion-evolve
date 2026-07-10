@@ -72,11 +72,14 @@ Plano **cognitivo** resolve por concatenação/precedência nativa (grátis). Pl
   exatamente o uso de branch que o §3 rejeita). O ground-truth **confirma os 3 planos** (o time separou
   conhecimento→versiona de capacidade→não-versiona) e **valida** a intuição: a escolha existe de fato;
   falta o vocabulário para ela não se expressar por branch.
-- **4º modo de proveniência (GATED, a-desenhar): capability-update fora-do-git.** Adotante `docs-only`
-  não tem `.claude/` rastreado → não há árvore para o 3-way do `vendor-branch.sh`; o `--update` de
-  capability vira **entrega-fora-do-git** (parentesco: doc-bridge/entrega-sem-commit), maestro-gated —
-  coerente com regulado/never-live-pull (RFC-0004). **Estoura no 1º `--update` do time Grana.Ai** — desenhar
-  antes disso.
+- **4º modo de proveniência — DESENHADO (2026-07-10; implementação segue GATED): capability-update
+  fora-do-git.** Adotante `docs-only` não tem `.claude/` rastreado → não há árvore para o 3-way do
+  `vendor-branch.sh`; o `--update` de capability vira **entrega-fora-do-git** (parentesco:
+  doc-bridge/entrega-sem-commit), maestro-gated — coerente com regulado/never-live-pull (RFC-0004).
+  Design completo (detecção declarado≠verificado, 3-way por manifest de hashes, gate dry-run→apply,
+  proveniência via relatório tracked no `inbound/`): ver
+  [`onion-adr-capability-update-out-of-git-2026-07.md`](../../analysis/onion-adr-capability-update-out-of-git-2026-07.md).
+  A implementação abre no 1º `--update` docs-only real do time Grana.Ai.
 - **Role/forma como proveniência no plano config — 1º passo ENTREGUE:** os gates agora polimorfam por
   papel (guarda `role: adopted` nos checks de marketplace do lint, fix de 2026-07-10 + selftest
   `run_adopted_role_selftests`). **Caso geral ENTREGUE (2026-07-10):** proveniência-por-chave via
