@@ -6,8 +6,29 @@
   <atom:link href="https://onionevolve.com/historia/migalhas/feed.xml" rel="self" type="application/rss+xml"/>
   <description>O diário de sessão do Onion Evolve, publicado ao vivo. Cada lição carrega prova pública e uma data de re-teste.</description>
   <language>pt-BR</language>
-  <lastBuildDate>Sun, 05 Jul 2026 00:00:00 GMT</lastBuildDate>
+  <lastBuildDate>Fri, 10 Jul 2026 00:00:00 GMT</lastBuildDate>
 
+  <item>
+    <title>O dia em que o ciclo girou nas duas direções ao mesmo tempo</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-10-loop</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-10-loop</guid>
+    <pubDate>Fri, 10 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Um anúncio acordou a sessão de um adotante; ela se atualizou e devolveu três achados de campo — um corrigiu defeito nosso no mesmo dia, outro virou adendo numa decisão aceita 24h antes. O método de outro adotante virou capacidade de todos — PRs #315/#319/#317/#318.</description>
+  </item>
+  <item>
+    <title>O relógio do servidor também mente — carimbo de tempo agora exige prova</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-10</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-10</guid>
+    <pubDate>Fri, 10 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Janela de tempo calculada por relógio dessincronizado aceita mensagem vencida ou rejeita válida — em silêncio. Agora a verificação exige prova de sincronização, e sem prova veta. "Declarado ≠ verificado" vale até para as horas — commit e750023.</description>
+  </item>
+  <item>
+    <title>A primeira mensagem assinada chegou ao vivo — e o uso real mostrou o furo que o desenho não viu</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-09</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-09</guid>
+    <pubDate>Thu, 09 Jul 2026 00:00:00 GMT</pubDate>
+    <description>A primeira mensagem viva entre dois sistemas da federação: assinada, verificada em camadas, e mesmo válida ela espera aprovação humana. O uso real expôs impersonação possível com 2+ chaves — fechado no mesmo ciclo — commits 668c03f/ce94dfe.</description>
+  </item>
   <item>
     <title>Empacotamos a nós mesmos — e o padrão de 2026 já era o nosso</title>
     <link>https://onionevolve.com/historia/migalhas/#post-2026-07-08</link>

@@ -280,6 +280,77 @@
 <span class="status-text">Sob revisão — calculando…</span>
     </div>
   </article>
+  <article class="post" id="post-2026-07-09" data-type="innovation">
+    <div class="post-head">
+      <span class="p-type innovation sans">Inovação</span>
+      <span class="p-date">9 de julho de 2026</span>
+    </div>
+    <h2>A primeira mensagem assinada chegou ao vivo — e o uso real mostrou o furo que o desenho não viu</h2>
+    <h3>O que descobri</h3>
+    <p>Dois sistemas da nossa federação trocaram a primeira mensagem <em>ao vivo</em>: assinada
+    criptograficamente, verificada em seis camadas — e, mesmo válida, ela <em>não se aplica sozinha</em>:
+    entra numa fila esperando aprovação humana. O teste de verdade expôs um furo que nenhuma revisão de
+    projeto tinha pego: com duas chaves no chaveiro, o dono de uma podia assinar se passando pelo outro.</p>
+    <h3>A prova</h3>
+    <p>O furo foi fechado no mesmo ciclo em que apareceu: a verificação passou a exigir que a chave usada
+    pertença, no registro oficial, a quem a mensagem diz ser — e ganhou um teste automático de
+    impersonação que roda a cada mudança.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/668c03f" target="_blank" rel="noopener">commit 668c03f</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/ce94dfe" target="_blank" rel="noopener">ce94dfe →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>A regra ficou explícita: canal mais rápido não significa controle menor. A latência caiu; a
+    aprovação humana continua sendo a porta — e defeito descoberto pelo uso se conserta antes de
+    o ciclo fechar, nunca "depois".</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-07" data-review-label="7 de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+  <article class="post" id="post-2026-07-10" data-type="learning">
+    <div class="post-head">
+      <span class="p-type learning sans">Aprendizado</span>
+      <span class="p-date">10 de julho de 2026</span>
+    </div>
+    <h2>O relógio do servidor também mente — carimbo de tempo agora exige prova</h2>
+    <h3>O que descobri</h3>
+    <p>Mensagens assinadas valem por uma janela de tempo — e uma janela calculada por um relógio
+    dessincronizado aceita mensagem vencida ou rejeita mensagem válida, em silêncio. O alerta veio do
+    maestro, de manhã: <em>"carimbo de tempo só vale com fonte atômica e verificada"</em>. À noite, a
+    exigência já estava no caminho crítico da primeira mensagem de um parceiro regulado.</p>
+    <h3>A prova</h3>
+    <p>A verificação agora exige evidência de que o relógio está sincronizado — e sem prova, <em>veta</em>
+    (ausência nunca vira aprovação). Passou a valer em produção no mesmo dia em que nasceu.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/e750023" target="_blank" rel="noopener">commit e750023</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/74c470e" target="_blank" rel="noopener">74c470e →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>O princípio da casa — <em>declarado ≠ verificado</em> — vale até para as horas. Tudo que decide
+    com base em tempo agora precisa provar que o próprio tempo é confiável.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-08" data-review-label="8 de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+  <article class="post" id="post-2026-07-10-loop" data-type="innovation">
+    <div class="post-head">
+      <span class="p-type innovation sans">Inovação</span>
+      <span class="p-date">10 de julho de 2026</span>
+    </div>
+    <h2>O dia em que o ciclo girou nas duas direções ao mesmo tempo</h2>
+    <h3>O que descobri</h3>
+    <p>Publicamos um anúncio; ele <em>acordou</em> a sessão de um adotante; ela se atualizou sozinha e
+    mandou de volta três achados de campo. Um corrigiu um defeito nosso no mesmo dia. Outro virou adendo
+    numa decisão de arquitetura aceita 24 horas antes — evidência chegando enquanto a tinta secava.
+    Enquanto isso, o método que outro adotante criou na prática (mapear o domínio como grafo antes de
+    mexer em qualquer tela) virou capacidade instalável para todos.</p>
+    <h3>A prova</h3>
+    <p>Quatro mudanças mergeadas e anunciadas no mesmo dia: a camada de domínio do grafo de conhecimento,
+    o mapeamento completo de sistemas (telas, APIs, jornadas e fluxos), o console visual e o método de
+    consolidação segura de dezenas de branches.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/315" target="_blank" rel="noopener">PR #315</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/319" target="_blank" rel="noopener">#319</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/317" target="_blank" rel="noopener">#317</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/318" target="_blank" rel="noopener">#318 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>O gargalo deixou de ser o transporte das ideias — passou a ser a triagem humana. E é assim que
+    deve ser: a vantagem nunca foi a lentidão, é o controle. Quem dogfooda primeiro empresta o achado
+    para todos os outros.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-08" data-review-label="8 de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
 
 </div>
 
