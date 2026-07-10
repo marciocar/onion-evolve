@@ -391,6 +391,10 @@ check_inventory_sync() {
 check_plugins_sync() {
   local asm="${SCRIPT_DIR}/../utils/marketplace/assemble-plugin.sh"
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
+  # consumidor (role: adopted) NÃO distribui plugins — marketplace é superfície do source; a fonte é
+  # vendorizada mas a SAÍDA gerada (plugins/ + marketplace.json) não. Guarda POR PAPEL (não só por
+  # ferramenta) — sinal granaai 2026-07-10 (12 HARD falsos bloqueavam todo commit do adotante).
+  grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
   [ -f "${asm}" ] || return 0            # sem assembler → nada a checar (repo sem a feature)
   [ -d "${vdir}" ] || return 0
   command -v jq >/dev/null 2>&1 || return 0   # sem jq → pula gracioso (mesma graça dos outros)
@@ -491,6 +495,8 @@ check_role_bundle_sync() {
   local roles="${SCRIPT_DIR}/../utils/marketplace/roles.yaml"
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   local mkt="${REPO_ROOT}/.claude-plugin/marketplace.json"
+  # consumidor não carrega marketplace.json — mesma guarda por papel de check_plugins_sync (sinal granaai)
+  grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
   [ -f "${roles}" ] || return 0
   command -v python3 >/dev/null 2>&1 || return 0
   python3 -c "import yaml" >/dev/null 2>&1 || return 0

@@ -682,6 +682,31 @@ run_federation_console_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo adopted-role — os checks de marketplace (plugins_sync/role_bundle_sync) devem PULAR
+# em role: adopted (consumidor não distribui plugins). Sinal granaai 2026-07-10: rodando como
+# source, o selftest mascarava a regressão — este caso roda o lint num sandbox COM stamp adopted
+# e SEM plugins/ + marketplace.json, e assere zero violação de marketplace.
+# ---------------------------------------------------------------------------
+run_adopted_role_selftests() {
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_fail "adopted-role" "lint ausente: ${lint}"; return; fi
+  local asb; asb="$(mktemp -d)"
+  cp -a "${REPO_ROOT}/.claude" "${asb}/.claude"
+  cp -a "${REPO_ROOT}/docs" "${asb}/docs"
+  cp -a "${REPO_ROOT}/CLAUDE.md" "${asb}/CLAUDE.md"
+  rm -rf "${asb}/plugins" "${asb}/.claude-plugin"          # consumidor não carrega a SAÍDA gerada
+  printf 'framework: onion-evolve\nrole: adopted\n' > "${asb}/.claude/.onion-version"
+  local out
+  out="$(cd "${asb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if printf '%s' "${out}" | grep -qE 'plugin ausente|não registrado no marketplace'; then
+    record_fail "adopted-role: marketplace-skip" "consumidor sem plugins/ ainda viola marketplace (guarda por papel regrediu)"
+  else
+    record_pass "adopted-role: role adopted sem plugins/ → 0 violações de marketplace (guarda por papel)"
+  fi
+  rm -rf "${asb}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo kg-console — exercita .claude/validation/kg-console.sh (projeção HTML do KG,
 # irmão do federation-console). Usa a fixture kg-domain/good-domain.kg.yaml.
 # ---------------------------------------------------------------------------
@@ -2149,6 +2174,7 @@ run_resolve_target_selftests
 # Modo federation-console — console estático read-only do SSOT (F1.3 federação).
 run_federation_console_selftests
 run_kg_console_selftests
+run_adopted_role_selftests
 
 # Modo mail-receiver — acelerador "receiver que acorda" (F1.4 federação).
 run_mail_receiver_selftests
