@@ -63,9 +63,16 @@ pura do SSOT) → libera valor imediato. **Fase 2 é gated na RFC-0004** (transp
   never-live-pull; **fail-safe = VETO, nunca skip**) + `a2a-ssrf-check.sh` + Agent Card gerado
   (`a2a-agent-card.sh` → `docs/onion/agent-card.json`, filtrado ao core) + contrato do adapter completo +
   **27 selftests** + drift-guard **REGRA 25**. De-risca o endpoint.
-- **Endpoint vivo — ⏳ GATED, pendente (VPS):** a rota Hono/SSE/webhook + servir o Agent Card + o **dogfood do
-  handshake com um adotante regulado** vivem no repo privado `~/onion-bridge` e exigem **gate humano explícito**.
-  O endpoint chama o `a2a-verify` do core na fronteira transport→ação.
+- **Endpoint vivo — ✅ (2026-07-09, verificado 2026-07-10):** rota `/a2a` no ar atrás do Caddy (401 sem auth =
+  gate correto) + Agent Card servido em `app.onionevolve.com/.well-known/agent-card.json` (capabilities
+  streaming/pushNotifications declaradas). **1º handshake real validado ponta-a-ponta** (metagamify→core:
+  `verified:true` + `input_required`, nada auto-aplicado) — e o dogfood expôs+fechou o gap de kid-binding no
+  mesmo loop (diário `2026-07-09-first-live-a2a-handshake`). O endpoint chama o `a2a-verify` do core na
+  fronteira transport→ação; `a2a-accept.sh` fecha a outra ponta (fila→inbox sob ato humano).
+- **Dogfood com adotante REGULADO — ⏳ GATED, o único resto de F2.2:** handshake com a granaai (exercita
+  `never-live-pull` + política de regulado), deliberadamente adiado para gate humano explícito
+  (a estreia foi com o não-regulado). Pré-requisito: granaai self-gera par de chaves (priv nunca sai de lá),
+  core pina a pubkey (`jwks/<kid>.pem` + `a2a.keys[granaai]` no members.yaml) sob gate.
 
 ### F2.3 — Veto reputação-condicionado (evolução futura)
 - **O quê:** ligar reputação-por-evidência (`trust-log` + `can_correct_to`) como condicionante do veto/urgência
