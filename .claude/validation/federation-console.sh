@@ -29,7 +29,10 @@ for m in members:
     if not m.get('id'): continue
     t = m.get('trust') or {}
     M.append({
-        'id': m.get('id'), 'name': m.get('name',''), 'tier': m.get('role','member'),
+        # Superfície PÚBLICA: só o nome curto — o parêntese do name: no members.yaml é anotação
+        # interna do maestro (incl. marcador CONFIDENCIAL) e NUNCA entra na projeção (regra 2026-07-09;
+        # incidente 2026-07-10: console público vazou "Grana.Ai — CONFIDENCIAL" no name verbatim).
+        'id': m.get('id'), 'name': (m.get('name') or '').split(' (')[0], 'tier': m.get('role','member'),
         'mode': m.get('mode',''), 'parent': m.get('parent',''), 'pin': m.get('onion_version',''),
         'specializations': m.get('specializations') or [],
         'corrects': (t.get('can_correct_to') or []),
