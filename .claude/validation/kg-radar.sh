@@ -1,17 +1,27 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity]
-#      (sem flag = as três saídas)
+# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--triples]
+#      (sem flag = radar + reconcile + integrity + domain)
 #
 # Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
-#   RADAR         = atenção — peso do nó × centralidade (grau).
-#                   peso = impact(1-5) × confidence(0-1) × fator de status
-#                   fator: open=1.0 · confirmed=1.0 · refuted=0 · superseded=0.2 · done=0.1
-#   RECONCILIAÇÃO = arestas REFUTES/SUPERSEDES (as auto-correções explícitas do grafo)
-#   INTEGRIDADE   = ids duplicados · aresta para nó inexistente · nó órfão (grau 0) ·
-#                   contradição (REFUTES entrando em nó que segue confirmed/open) ·
-#                   enum inválido (node_type/edge_type/plane/status)
+#   RADAR           = atenção — peso do nó × centralidade (grau).
+#                     peso = impact(1-5) × confidence(0-1) × fator de status
+#                     fator: open=1.0 · confirmed=1.0 · refuted=0 · superseded=0.2 · done=0.1
+#   RECONCILIAÇÃO   = arestas REFUTES/SUPERSEDES (as auto-correções explícitas do grafo)
+#   INTEGRIDADE     = ids duplicados · aresta para nó inexistente · nó órfão (grau 0) ·
+#                     contradição (REFUTES entrando em nó que segue confirmed/open) ·
+#                     enum inválido (node_type/edge_type/plane/status/layer)
+#   RADAR-DE-DOMÍNIO= completude da camada `layer: domain` (⚠ atenção, NÃO reprova):
+#                     estado-absorvente · EVENT-sem-efeito · STATE-sem-dona ·
+#                     RULE-sem-trace · fonte-única (>1 READS saindo — ADR design-extends-kg)
+#   TRIPLES         = grafo como triplas `from EDGE to [on evento]` p/ consumo por LLM
+#
+# Camadas (campo opcional `layer`, default audit — retrocompatível):
+#   audit  = grafo epistêmico da investigação (claim/evidence/decision/question)
+#   domain = SSOT de domínio (entity/state/event/rule/invariant/policy), durável;
+#            o audit TRACES_TO o domain (distinção epistêmico×domínio — sinal
+#            2026-07-08-kg-dogfood-completo-promover, promoção schema+método).
 #
 # Soberania: motor próprio do core (decisão D_NO_VENDOR_RADAR) — NÃO é port do radar.js do rhilo.
 # Shell/awk puro por design (economia de motores: gate determinístico não aluga LLM).
@@ -20,7 +30,7 @@ set -euo pipefail
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity]" >&2; exit 2; }
+[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--triples]" >&2; exit 2; }
 
 awk -v mode="$MODE" '
 function statusFactor(s) {
@@ -52,6 +62,7 @@ section == "nodes" && nid != "" {
   line = $0; sub(/#.*$/, "", line)
   if (line ~ /node_type:/)  { v = line; sub(/.*node_type:/, "", v);  ntype[nid] = trim(v) }
   if (line ~ /plane:/)      { v = line; sub(/.*plane:/, "", v);      plane[nid] = trim(v) }
+  if (line ~ /layer:/)      { v = line; sub(/.*layer:/, "", v);      layer[nid] = trim(v) }
   if (line ~ /impact:/)     { v = line; sub(/.*impact:/, "", v);     impact[nid] = trim(v) + 0 }
   if (line ~ /confidence:/) { v = line; sub(/.*confidence:/, "", v); conf[nid] = trim(v) + 0 }
   if (line ~ /status:/)     { v = line; sub(/.*status:/, "", v);     nstatus[nid] = trim(v) }
@@ -66,17 +77,41 @@ section == "edges" && /^[[:space:]]+- from:/ {
 }
 section == "edges" && /to:/ && !/edge_type/ { v = $0; sub(/.*to:/, "", v); eto[ne] = trim(v); next }
 section == "edges" && /edge_type:/ { v = $0; sub(/.*edge_type:/, "", v); etype[ne] = trim(v); next }
+section == "edges" && /on:/ { v = $0; sub(/.*on:/, "", v); eon[ne] = trim(v); next }
 
 END {
-  VN = "entity claim decision question evidence artifact"
-  VE = "SUPPORTS REFUTES SUPERSEDES CAUSES DEPENDS_ON TRACES_TO"
+  VN = "entity claim decision question evidence artifact state event rule invariant policy"
+  VE = "SUPPORTS REFUTES SUPERSEDES CAUSES DEPENDS_ON TRACES_TO HAS_STATE TRANSITIONS EMITS CONSTRAINS READS WRITES"
   VP = "DEV PROD"
+  VL = "audit domain"
   problems = 0
 
-  # grau (centralidade MVP) + contradições
+  # layer default (retrocompat: grafo sem layer = 100% audit)
+  for (i = 1; i <= nn; i++) {
+    id = order[i]
+    if (layer[id] == "") layer[id] = "audit"
+    if (layer[id] == "domain") hasDomain = 1
+  }
+
+  # grau (centralidade MVP) + contradições + agregados de domínio
   for (i = 1; i <= ne; i++) {
     deg[efrom[i]]++; deg[eto[i]]++
-    if (etype[i] == "REFUTES") refutedBy[eto[i]]++
+    if (etype[i] == "REFUTES")     refutedBy[eto[i]]++
+    if (etype[i] == "TRANSITIONS") { transOut[efrom[i]]++; transIn[eto[i]]++ }
+    if (etype[i] == "HAS_STATE")   ownedState[eto[i]]++
+    if (etype[i] == "TRACES_TO")   traceOut[efrom[i]]++
+    if (etype[i] == "READS")       readsOut[efrom[i]]++
+    if (eon[i] != "")              { onUsed[eon[i]] = 1; deg[eon[i]]++ }  # on: conecta o evento (não é órfão)
+    outDeg[efrom[i]]++
+  }
+
+  if (mode == "--triples") {
+    for (i = 1; i <= ne; i++) {
+      t = efrom[i] " " etype[i] " " eto[i]
+      if (eon[i] != "") t = t " on " eon[i]
+      print t
+    }
+    exit 0
   }
 
   if (mode == "--all" || mode == "--radar") {
@@ -108,6 +143,42 @@ END {
     print ""
   }
 
+  if (mode == "--all" || mode == "--domain") {
+    print "══ RADAR-DE-DOMÍNIO — completude da camada domain (⚠ atenção, não reprova) ══"
+    if (!hasDomain) {
+      print "  (camada domain ausente — grafo puramente epistêmico/audit)"
+      print ""
+    } else {
+      warns = 0
+      for (i = 1; i <= nn; i++) {
+        id = order[i]
+        if (layer[id] != "domain") continue
+        # 1. estado-absorvente: recebe TRANSITIONS mas nenhuma sai (limbo? terminal legítimo? decidir)
+        if (ntype[id] == "state" && transIn[id] > 0 && transOut[id] == 0) {
+          print "  ⚠ estado-absorvente: " id " (recebe TRANSITIONS, nenhuma sai — limbo ou terminal legítimo?)"; warns++
+        }
+        # 2. EVENT-sem-efeito: evento que não dispara nada (sem aresta de saída e sem uso em on:)
+        if (ntype[id] == "event" && outDeg[id] == 0 && !(id in onUsed)) {
+          print "  ⚠ EVENT-sem-efeito: " id " (não origina aresta nem dispara TRANSITIONS via on:)"; warns++
+        }
+        # 3. STATE-sem-dona: estado que nenhuma entity possui via HAS_STATE
+        if (ntype[id] == "state" && ownedState[id] == 0) {
+          print "  ⚠ STATE-sem-dona: " id " (nenhuma entity o possui via HAS_STATE)"; warns++
+        }
+        # 4. RULE-sem-trace: regra/invariante/política não ancorada no código
+        if ((ntype[id] == "rule" || ntype[id] == "invariant" || ntype[id] == "policy") && traceOut[id] == 0) {
+          print "  ⚠ RULE-sem-trace: " id " (sem TRACES_TO — regra não ancorada em artefato)"; warns++
+        }
+        # 5. fonte-única: nó de domínio lendo de 2+ fontes (ADR design-extends-kg — atom-map)
+        if (readsOut[id] > 1) {
+          print "  ⚠ fonte-única violada: " id " (" readsOut[id] " arestas READS saindo — 1 átomo = 1 fonte)"; warns++
+        }
+      }
+      if (warns == 0) print "  ✅ camada domain completa (sem lacunas nas 5 checagens)"
+      print ""
+    }
+  }
+
   if (mode == "--all" || mode == "--integrity") {
     print "══ INTEGRIDADE ══"
     for (id in dup) { print "  ✗ id duplicado: " id; problems++ }
@@ -115,12 +186,14 @@ END {
       if (!(efrom[i] in nodeSeen)) { print "  ✗ aresta " i ": from aponta nó inexistente: " efrom[i]; problems++ }
       if (!(eto[i]   in nodeSeen)) { print "  ✗ aresta " i ": to aponta nó inexistente: " eto[i]; problems++ }
       if (index(VE, etype[i]) == 0 || etype[i] == "") { print "  ✗ aresta " i ": edge_type inválido: [" etype[i] "]"; problems++ }
+      if (eon[i] != "" && !(eon[i] in nodeSeen)) { print "  ✗ aresta " i ": on aponta evento inexistente: " eon[i]; problems++ }
     }
     for (i = 1; i <= nn; i++) {
       id = order[i]
       if (deg[id] == 0) { print "  ✗ nó órfão (grau 0): " id; problems++ }
       if (index(VN, ntype[id]) == 0 || ntype[id] == "") { print "  ✗ " id ": node_type inválido: [" ntype[id] "]"; problems++ }
       if (index(VP, plane[id]) == 0 || plane[id] == "") { print "  ✗ " id ": plane inválido: [" plane[id] "]"; problems++ }
+      if (index(VL, layer[id]) == 0) { print "  ✗ " id ": layer inválido: [" layer[id] "]"; problems++ }
       if (statusFactor(nstatus[id]) < 0) { print "  ✗ " id ": status inválido: [" nstatus[id] "]"; problems++ }
       if (impact[id] < 1 || impact[id] > 5) { print "  ✗ " id ": impact fora de 1-5: " impact[id]; problems++ }
       if (conf[id] < 0 || conf[id] > 1) { print "  ✗ " id ": confidence fora de 0-1: " conf[id]; problems++ }

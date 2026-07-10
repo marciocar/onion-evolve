@@ -1,0 +1,81 @@
+# Fixture: grafo de 2 camadas VÁLIDO — audit TRACES_TO domain, integridade limpa.
+# Espera: kg-radar.sh --integrity exit 0 (e radar-de-domínio sem lacunas).
+meta:
+  id: fixture-good-domain
+  date: 2026-07-10
+nodes:
+  # ---- camada domain (SSOT durável) ----
+  - id: EN_ORDER
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "pedido (entidade dona do ciclo)"
+  - id: ST_OPEN
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "pedido aberto"
+  - id: ST_CLOSED
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "pedido fechado"
+  - id: EV_PAYMENT
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "pagamento confirmado"
+  - id: RU_SINGLE_CLOSE
+    node_type: rule
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "pedido fecha no maximo uma vez"
+    trace: "apps/api/orders/close.ts:42"
+  # ---- camada audit (epistemica) ----
+  - id: C_CLOSE_IDEMPOTENT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "close() e idempotente no codigo lido"
+edges:
+  - from: EN_ORDER
+    to: ST_OPEN
+    edge_type: HAS_STATE
+  - from: EN_ORDER
+    to: ST_CLOSED
+    edge_type: HAS_STATE
+  - from: ST_OPEN
+    to: ST_CLOSED
+    edge_type: TRANSITIONS
+    on: EV_PAYMENT
+  - from: ST_CLOSED
+    to: ST_OPEN
+    edge_type: TRANSITIONS
+    on: EV_PAYMENT
+  - from: RU_SINGLE_CLOSE
+    to: ST_CLOSED
+    edge_type: CONSTRAINS
+  - from: RU_SINGLE_CLOSE
+    to: EN_ORDER
+    edge_type: TRACES_TO
+  - from: C_CLOSE_IDEMPOTENT
+    to: RU_SINGLE_CLOSE
+    edge_type: TRACES_TO

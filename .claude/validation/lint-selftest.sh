@@ -213,6 +213,39 @@ run_fix_fixture() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo kg — exit code de kg-radar.sh --integrity (motor do Knowledge Graph SDAAL)
+# ---------------------------------------------------------------------------
+run_kg_fixture() {
+  local fixture="$1" verdict="$2"
+  local src="${FIX_DIR}/${fixture}"
+
+  if [ ! -f "${src}" ]; then
+    record_fail "${fixture}" "fixture inexistente: ${src}"
+    return
+  fi
+
+  local rc=0
+  bash "${SCRIPT_DIR}/kg-radar.sh" "${src}" --integrity >/dev/null 2>&1 || rc=$?
+
+  case "${verdict}" in
+    pass)
+      if [ "${rc}" -eq 0 ]; then record_pass "${fixture}"
+      else record_fail "${fixture}" "esperava exit 0, veio ${rc}"; fi
+      ;;
+    fail)
+      # exige exatamente rc=1 (integridade quebrada); rc=2 é uso/arquivo-inexistente
+      # — aceitá-lo mascararia um path de fixture quebrado como sucesso.
+      if [ "${rc}" -eq 1 ]; then record_pass "${fixture}"
+      elif [ "${rc}" -eq 0 ]; then record_fail "${fixture}" "esperava exit 1, veio 0 (radar não pegou grafo inválido)"
+      else record_fail "${fixture}" "esperava exit 1, veio ${rc} (uso/arquivo inexistente? fixture path quebrado?)"; fi
+      ;;
+    *)
+      record_fail "${fixture}" "verdict desconhecido '${verdict}'"
+      ;;
+  esac
+}
+
+# ---------------------------------------------------------------------------
 # Modo contract — exit code de federation-contract-validate.sh
 # ---------------------------------------------------------------------------
 run_contract_fixture() {
@@ -2035,6 +2068,7 @@ if [ -f "${MANIFEST}" ]; then
       lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" ;;
       fix)      run_fix_fixture "${fixture}" "${target}" "${verdict}" ;;
       contract) run_contract_fixture "${fixture}" "${verdict}" ;;
+      kg)       run_kg_fixture "${fixture}" "${verdict}" ;;
       merge)    run_merge_fixture "${fixture}" ;;
       *)        record_fail "${fixture:-?}" "kind desconhecido '${kind}'" ;;
     esac

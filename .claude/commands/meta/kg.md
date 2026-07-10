@@ -2,14 +2,15 @@
 name: kg
 description: |
   Modela uma investigação/auditoria longa como Knowledge Graph SDAAL (.kg.yaml):
-  claims/evidência/decisões tipados, arestas SUPPORTS/REFUTES/SUPERSEDES, planes DEV/PROD.
-  Roda o radar determinístico (kg-radar.sh) para veredito de atenção, reconciliação e integridade.
+  claims/evidência/decisões tipados, arestas SUPPORTS/REFUTES/SUPERSEDES, planes DEV/PROD —
+  e, na camada `layer: domain`, o SSOT de domínio (entity/state/event/rule/policy) que o audit TRACES_TO.
+  Roda o radar determinístico (kg-radar.sh) para atenção, reconciliação, integridade e radar-de-domínio.
   Nascido do 1º dogfood do core (auditoria /meta:evolve 2026-07-04) — F2 da vertical onion-investigation.
 model: sonnet
 category: meta
-tags: [kg, knowledge-graph, investigation, sdaal, radar, reconciliation]
-version: "1.0.0"
-updated: "2026-07-04"
+tags: [kg, knowledge-graph, investigation, sdaal, radar, reconciliation, domain-layer]
+version: "1.1.0"
+updated: "2026-07-10"
 allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/kg-radar.sh*) Bash(ls docs/*)
 argument-hint: "[<arquivo.kg.yaml> | novo <slug>]  (vazio = localizar .kg.yaml existente e rodar radar)"
 related_commands:
@@ -66,7 +67,9 @@ meta:
   date: AAAA-MM-DD
 nodes:
   - id: C_MEU_CLAIM          # prefixos por convenção: C_ claim · E_ evidence · D_ decision · Q_ question · A_ artifact
-    node_type: claim         # entity | claim | decision | question | evidence | artifact
+    node_type: claim         # AUDIT: entity | claim | decision | question | evidence | artifact
+                             # DOMAIN: entity | state | event | rule | invariant | policy
+    layer: audit             # audit (default, epistêmico) | domain (SSOT durável) — omitir = audit
     plane: DEV               # DEV = fonte/branch · PROD = artefato vivo (deploy+config+dados)
     impact: 4                # 1-5
     confidence: 0.9          # 0-1
@@ -76,12 +79,19 @@ nodes:
 edges:
   - from: E_EVIDENCIA
     to: C_MEU_CLAIM
-    edge_type: SUPPORTS      # SUPPORTS | REFUTES | SUPERSEDES | CAUSES | DEPENDS_ON | TRACES_TO
+    edge_type: SUPPORTS      # AUDIT: SUPPORTS | REFUTES | SUPERSEDES | CAUSES | DEPENDS_ON | TRACES_TO
+                             # DOMAIN: HAS_STATE | TRANSITIONS | EMITS | CONSTRAINS | READS | WRITES
+    on: EV_GATILHO           # só TRANSITIONS: o evento que dispara (conta como conexão do evento)
 ```
 
 Peso do nó = `impact × confidence × fator de status` (open/confirmed = 1.0 · refuted = 0 ·
 superseded = 0.2 · done = 0.1). Atenção = peso × (1 + grau). **Formato estrito**: uma chave por
 linha, listas com `- id:`/`- from:` — o radar é awk, não parser YAML completo.
+
+**As duas camadas (distinção epistêmico×domínio):** `audit` = o que a investigação *acredita*
+(efêmero, append-mostly); `domain` = o que o sistema *é* (durável, SSOT: entidades, estados,
+eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção do metagamify (dogfood
+2026-07-08), promovida como schema+método. Mesmo arquivo, campo `layer` (separar só se a escala pedir).
 
 ## ⚡ Etapas
 
@@ -104,13 +114,19 @@ linha, listas com `- id:`/`- from:` — o radar é awk, não parser YAML complet
 
 ### Passo 3 — Rodar o radar (determinístico — o veredito é dele)
 ```bash
-bash .claude/validation/kg-radar.sh docs/onion/graph/<slug>.kg.yaml            # 3 saídas
+bash .claude/validation/kg-radar.sh docs/onion/graph/<slug>.kg.yaml            # 4 saídas
 bash .claude/validation/kg-radar.sh <arquivo> --integrity                      # só o gate (exit 1 se problema)
+bash .claude/validation/kg-radar.sh <arquivo> --domain                         # só completude da camada domain
+bash .claude/validation/kg-radar.sh <arquivo> --triples                        # triplas p/ consumo por LLM
 ```
 - **RADAR** = onde olhar primeiro (top atenção).
 - **RECONCILIAÇÃO** = as auto-correções registradas (REFUTES/SUPERSEDES).
+- **RADAR-DE-DOMÍNIO** = completude da camada `domain` (⚠ atenção, **não reprova**): estado-absorvente ·
+  EVENT-sem-efeito · STATE-sem-dona · RULE-sem-trace · fonte-única (>1 READS — átomo lendo de 2 fontes).
+  *Foi esta checagem que fez o SLOT-limbo emergir do modelo no dogfood do metagamify.*
 - **INTEGRIDADE** = órfãos, arestas para nós inexistentes, contradições (REFUTES entrando em nó
-  ainda `confirmed`), enums inválidos. **Exit 1 = reconciliar antes de commitar.**
+  ainda `confirmed`), enums inválidos (incl. `layer`, `on:` para evento inexistente).
+  **Exit 1 = reconciliar antes de commitar.**
 
 ### Passo 4 — Agir dirigido pelo veredito
 - Claims `confirmed` de alta atenção → PRs/atuadores (citar o nó no commit).
@@ -130,7 +146,13 @@ bash .claude/validation/kg-radar.sh <arquivo> --integrity                      #
 - **Append-mostly**: corrigir = adicionar nó/aresta ou mudar `status`; **nunca** deletar nós
   (auditoria da investigação é o próprio grafo).
 - O radar é **gate**: integridade com exit 1 bloqueia o commit do `.kg.yaml` (mesmo espírito dos
-  demais scripts de `.claude/validation/`).
+  demais scripts de `.claude/validation/`). O radar-de-domínio **não** é gate — lacuna de completude
+  é atenção (um estado-absorvente pode ser terminal legítimo; o juízo é seu).
+- **Átomos de UI** (design) são nós `layer: domain`: átomo `READS` sua fonte (1 só — fonte-única),
+  `TRACES_TO` o componente dono; o `SourceTag` do adotante é a aresta *renderizada*, não motor do core.
+  Doutrina: [ADR design-extends-kg](../../../docs/analysis/onion-adr-design-extends-kg-2026-07.md).
+- **Fase-2 semântica** (método, não código do core): embeddings + cosseno para flag de redundância
+  entre nós — cada instância implementa com seu stack (soberania); o core fica no determinístico.
 - 1º dogfood real (56 nós/81 arestas no rhilo; 37 nós/33 arestas no core): ver
   [onion-evolution-2026-07-04.md](../../../docs/analysis/onion-evolution-2026-07-04.md) e o sinal
   [2026-07-04-kg-primeiro-dogfood-federacao.md](../../../docs/evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md).

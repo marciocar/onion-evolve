@@ -1,0 +1,79 @@
+# Fixture: camada domain com LACUNAS de completude (as 5 checagens disparam ⚠)
+# mas SEM violação estrutural — prova que radar-de-domínio é atenção, não gate.
+# Espera: kg-radar.sh --integrity exit 0; --domain emite os 5 tipos de ⚠.
+meta:
+  id: fixture-warn-domain-gaps
+  date: 2026-07-10
+nodes:
+  - id: ST_LIMBO
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: open
+    label: "estado-absorvente e sem dona (recebe TRANSITIONS, nada sai, sem HAS_STATE)"
+  - id: ST_START
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "estado inicial (tambem sem dona)"
+  - id: EV_GHOST
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: "evento emitido que nao dispara nada (EVENT-sem-efeito)"
+  - id: RU_UNANCHORED
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "regra declarada sem TRACES_TO (RULE-sem-trace)"
+  - id: AT_DOUBLE_READ
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "atomo de UI lendo de 2 fontes (fonte-unica violada)"
+  - id: EN_SRC_A
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "endpoint A"
+  - id: EN_SRC_B
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "endpoint B"
+edges:
+  - from: ST_START
+    to: ST_LIMBO
+    edge_type: TRANSITIONS
+  - from: ST_START
+    to: EV_GHOST
+    edge_type: EMITS
+  - from: RU_UNANCHORED
+    to: ST_START
+    edge_type: CONSTRAINS
+  - from: AT_DOUBLE_READ
+    to: EN_SRC_A
+    edge_type: READS
+  - from: AT_DOUBLE_READ
+    to: EN_SRC_B
+    edge_type: READS
