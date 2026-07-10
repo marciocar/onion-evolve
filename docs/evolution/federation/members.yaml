@@ -122,7 +122,7 @@ members:
     reviewer: "Mauricio Matos <mauricio.matos@grana.ai> — revisou e aprovou (comentário PR #1094, 2026-07-07); merge executado pelo core"
     a2a:                        # participa do a2a-live (F2.2 #5) como REMETENTE regulado — PREPARADO, não ativado:
       sends_to: onion-evolve    # envia p/ o endpoint do core; não hospeda endpoint próprio
-      keys: []                  # VAZIO até o gate humano pinar (kid sugerido: granaai-1). keys[] vazio = todo kid
+      keys: [granaai-1]         # PINADO 2026-07-10 sob gate humano (handshake #5 autorizado). Antes: keys[] vazio = todo kid
                                 # veta (kid-not-owned — fail-safe). Fluxo: sessão granaai self-gera o par RS256
                                 # (priv NUNCA sai de lá) → core pina jwks/granaai-1.pem + registra o kid aqui.
                                 # Receptor mode:regulated ⇒ a2a-verify emite apply_mode:propose-only (never-live-pull).
