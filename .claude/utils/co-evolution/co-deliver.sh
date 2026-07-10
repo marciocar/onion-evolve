@@ -81,9 +81,12 @@ NAME="$(member_field "${MEMBER}" name)"
 [ -n "${ROLE}" ] || { echo "ERRO: member-id '${MEMBER}' não existe em members.yaml." >&2; exit 2; }
 [ "${ROLE}" = "hub" ] || [ "${ROLE}" = "standalone" ] || { echo "ERRO: '${MEMBER}' tem role='${ROLE}' — carteiro-local só entrega a hub/standalone (T1/T3, adotam o core direto; RFC-0003 §2.1). role=consumer é T2 (via-hub), fora deste escopo." >&2; exit 2; }
 
-# --- Resolve o path local do alvo: --target > members.yaml path: (se resolvível) ---
+# --- Resolve o path local do alvo: --target > members.yaml local_path: (path: fallback) ---
+# Sinal 2026-07-10-co-deliver-local-path-gap: o campo real do members.yaml é 'local_path:'; o
+# helper buscava só 'path:' e forçava --target mesmo com o registro válido.
 if [ -z "${TARGET}" ]; then
-  CFG_PATH="$(member_field "${MEMBER}" path)"
+  CFG_PATH="$(member_field "${MEMBER}" local_path)"
+  [ -n "${CFG_PATH}" ] || CFG_PATH="$(member_field "${MEMBER}" path)"
   if [ -n "${CFG_PATH}" ] && [ "${CFG_PATH}" != "." ]; then
     # path relativo do members.yaml resolve contra a RAIZ DO REPO, não o CWD da invocação
     case "${CFG_PATH}" in /*) ;; *) CFG_PATH="${REPO_ROOT}/${CFG_PATH}" ;; esac
@@ -91,7 +94,7 @@ if [ -z "${TARGET}" ]; then
   fi
   if [ -z "${TARGET}" ]; then
     echo "ERRO: path local do adotante '${MEMBER}' não resolvido. Informe --target <path>" >&2
-    echo "      (members.yaml não traz 'path:' utilizável para este membro)." >&2
+    echo "      (members.yaml não traz 'local_path:'/'path:' utilizável para este membro)." >&2
     exit 2
   fi
 fi

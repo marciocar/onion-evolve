@@ -1873,6 +1873,58 @@ run_corelay_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo co-deliver — exercita .claude/utils/co-evolution/co-deliver.sh (carteiro
+# DOWNSTREAM, espelho do co-relay). Foco: resolução do path do adotante pelo
+# members.yaml (campo local_path: com comentário inline — regressão do sinal
+# 2026-07-10-co-deliver-local-path-gap) + --target soberano + membro sem path
+# → exit 2. Self-contained (mktemp).
+# ---------------------------------------------------------------------------
+run_codeliver_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/co-evolution/co-deliver.sh"
+  if [ ! -f "${helper}" ]; then record_fail "co-deliver" "helper ausente: ${helper}"; return; fi
+  local core adopter other rc
+
+  # builder: core temp (repo git + members.yaml + outbox com 1 rascunho); $2 = local_path (vazio = sem path)
+  mk_deliver_core() {
+    git -C "$1" init -q
+    mkdir -p "$1/docs/evolution/federation/outbox/alvo"
+    printf '# anúncio de teste\n' > "$1/docs/evolution/federation/outbox/alvo/2026-01-01-anuncio.md"
+    {
+      printf 'members:\n'
+      printf '  - id: alvo\n    role: standalone\n    name: "Alvo Teste"\n'
+      if [ -n "$2" ]; then printf '    local_path: "%s"   # comentário inline (caso real do members.yaml)\n' "$2"; fi
+    } > "$1/docs/evolution/federation/members.yaml"
+  }
+
+  # (a) resolve local_path do members.yaml (com comentário inline) — SEM --target
+  core="$(mktemp -d)"; adopter="$(mktemp -d)"; git -C "${adopter}" init -q; mkdir -p "${adopter}/docs/evolution"
+  mk_deliver_core "${core}" "${adopter}"
+  rc=0; ( cd "${core}" && bash "${helper}" alvo ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${adopter}/docs/evolution/inbound/2026-01-01-anuncio.md" ]; then
+    record_pass "co-deliver: resolve local_path do members.yaml (regressão sinal 2026-07-10)"
+  else record_fail "co-deliver: local_path" "exit ${rc} — não resolveu local_path do members.yaml"; fi
+  rm -rf "${core}" "${adopter}"
+
+  # (b) membro SEM local_path/path e sem --target → exit 2 (mensagem acionável)
+  core="$(mktemp -d)"; mk_deliver_core "${core}" ""
+  rc=0; ( cd "${core}" && bash "${helper}" alvo ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "co-deliver: sem path resolvível → exit 2"
+  else record_fail "co-deliver: sem path" "esperava exit 2, veio ${rc}"; fi
+  rm -rf "${core}"
+
+  # (c) --target é soberano (vence o local_path do members.yaml)
+  core="$(mktemp -d)"; adopter="$(mktemp -d)"; other="$(mktemp -d)"
+  git -C "${adopter}" init -q; git -C "${other}" init -q; mkdir -p "${other}/docs/evolution"
+  mk_deliver_core "${core}" "${adopter}"
+  rc=0; ( cd "${core}" && bash "${helper}" alvo --target "${other}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${other}/docs/evolution/inbound/2026-01-01-anuncio.md" ] \
+     && [ ! -e "${adopter}/docs/evolution/inbound/2026-01-01-anuncio.md" ]; then
+    record_pass "co-deliver: --target soberano sobre members.yaml"
+  else record_fail "co-deliver: --target" "exit ${rc} — entrega não foi (só) ao --target"; fi
+  rm -rf "${core}" "${adopter}" "${other}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo de-identification — exercita o baseline determinístico (adapter `regex` da
 # abstração SDAAL de-identification). Self-contained (mktemp). Cobre MODOS DE FALHA:
 # PII conhecida é redigida; round-trip redact→restore reconstrói o original; texto
@@ -2364,6 +2416,9 @@ run_design_tokens_selftests
 
 # Modo co-relay — idem (carteiro upstream; adotante+core em mktemp, sem fixture-file).
 run_corelay_selftests
+
+# Modo co-deliver — carteiro downstream (resolução local_path do members.yaml; sinal 2026-07-10).
+run_codeliver_selftests
 
 # Modo de-identification — baseline determinístico (adapter regex da abstração SDAAL): redação + round-trip + no-op + determinismo.
 run_de_identification_selftests
