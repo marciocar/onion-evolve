@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 22 entradas · **Stale:** 0 · **Compartilháveis:** 19
+**Total:** 23 entradas · **Stale:** 0 · **Compartilháveis:** 19
 
 Gerado em: 2026-07-10
 
@@ -13,6 +13,7 @@ Gerado em: 2026-07-10
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
 | 2026-07-10 | reflection | public 📤 | the-day-the-loop-ran-both-ways | 2026-10-08 | static |
+| 2026-07-10 | error | protected | ssh-alt-port-2222 | 2026-10-08 | dynamic |
 | 2026-07-10 | innovation | public 📤 | first-regulated-a2a-handshake | 2026-10-08 | static |
 | 2026-07-09 | innovation | public 📤 | security-gate-degrades-to-veto | 2026-10-07 | static |
 | 2026-07-09 | decision | public 📤 | scope-inheritance-rfc0005 | 2026-10-07 | static |
