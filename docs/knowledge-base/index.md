@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **59 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **28** em `concepts/` · **9** em `frameworks/` · **4** em `tools/` · **3** em `platforms/` · **3** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
+- **61 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **28** em `concepts/` · **9** em `frameworks/` · **5** em `tools/` · **3** em `platforms/` · **3** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
 
 ---
 
@@ -21,7 +21,7 @@ docs/knowledge-base/
 ├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 5  — Ferramentas e recursos
 ├── platforms/           # 3  — Plataformas e tecnologias
-├── patterns/            # 2  — Padrões de implementação (SDAAL + orquestração de apresentações)
+├── patterns/            # 3  — Padrões de implementação (SDAAL, apresentações, policy-as-data)
 ├── architectures/       # 1  — C4 + ADR patterns
 ├── meta/                # 2  — Padrões de criação de comandos + identidade/produto
 ├── education/           # 4  — Vertical educacional (fonte≠derivação: theories/ + applications/) + 1 README
