@@ -612,8 +612,11 @@ run_compose_settings_selftests() {
   if [ "$(printf '%s' "$C" | sha256sum)" = "$(printf '%s' "$C2" | sha256sum)" ]; then
     record_pass "compose-settings: determinístico"
   else record_fail "compose-settings: determinismo" "composição varia entre execuções"; fi
-  if bash "${helper}" --provenance "$d/fw.json" "$d/person.json" 2>/dev/null | grep -q 'theme: fw.json, person.json'; then
-    record_pass "compose-settings: proveniência (theme ← fw + person)"
+  # --provenance é alias de --show-scope (formato novo: <scope>\t<path>=<valor> + sobreposição)
+  local TAB=$'\t'
+  if bash "${helper}" --provenance "$d/fw.json" "$d/person.json" 2>/dev/null \
+       | grep -qxF "person.json${TAB}theme=\"light\"${TAB}# sobrepõe: fw.json"; then
+    record_pass "compose-settings: proveniência (theme ← person sobrepõe fw)"
   else record_fail "compose-settings: proveniência" "proveniência incorreta"; fi
   printf '%s' '{bad' > "$d/bad.json"
   local rc=0; bash "${helper}" "$d/fw.json" "$d/bad.json" >/dev/null 2>&1 || rc=$?
@@ -1132,6 +1135,100 @@ run_resolve_scope_layers_selftests() {
     else record_fail "resolve-scope-layers: compose" "efetivo incorreto"; fi
   else record_pass "resolve-scope-layers: compose pulado (sem jq)"; fi
   rm -rf "$t" "$us"
+}
+
+# ---------------------------------------------------------------------------
+# Modo show-scope — exercita a proveniência-por-chave do compose-settings.sh (RFC-0005 Fase 2:
+# paridade `git config --show-scope`). Self-contained em mktemp. Cobre: sobreposição escalar ·
+# set-once · chave profunda · array com origem por-elemento · conflito de tipo (sub-chave não vaza) ·
+# invariante strip==compose (runtime, exit 4) · determinismo · labels + fallback basename · --json
+# (meta.role/form + status) · modos-de-falha (uso inválido → exit 2) · passthrough do resolve com stamp.
+# ---------------------------------------------------------------------------
+run_show_scope_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/scope/compose-settings.sh"
+  local resolver="${REPO_ROOT}/.claude/utils/scope/resolve-scope-layers.sh"
+  if [ ! -f "${helper}" ]; then record_fail "show-scope" "helper ausente: ${helper}"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_pass "show-scope: jq ausente → pulado (gracioso)"; return; fi
+  local TAB=$'\t'
+  local d; d="$(mktemp -d)"
+  printf '%s' '{"theme":"dark","permissions":{"allow":["Bash(git *)"],"deny":[]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"fw"}]}]}}' > "$d/fw.json"
+  printf '%s' '{"permissions":{"deny":["x"]},"env":{"ORG":"granaai"}}' > "$d/org.json"
+  printf '%s' '{"model":"opus","permissions":{"allow":["Bash(nx *)"]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"team"}]}]}}' > "$d/team.json"
+  printf '%s' '{"theme":"light","env":{"EDITOR":"vim"}}' > "$d/person.json"
+
+  # (a) texto com labels canônicos: vencedor, sobreposição, set-once, chave profunda, array por-elemento
+  local S rc=0
+  S="$(bash "${helper}" --show-scope --role adopted --form docs-only \
+        framework="$d/fw.json" empresa="$d/org.json" time="$d/team.json" pessoa="$d/person.json" 2>/dev/null)" || rc=$?
+  if [ "$rc" -eq 0 ] \
+     && printf '%s\n' "$S" | grep -qxF "# layers: framework empresa time pessoa · role: adopted · form: docs-only" \
+     && printf '%s\n' "$S" | grep -qxF "pessoa${TAB}theme=\"light\"${TAB}# sobrepõe: framework" \
+     && printf '%s\n' "$S" | grep -qxF "time${TAB}model=\"opus\"" \
+     && printf '%s\n' "$S" | grep -qxF "empresa${TAB}env.ORG=\"granaai\"" \
+     && printf '%s\n' "$S" | grep -qxF "framework${TAB}permissions.allow[0]=\"Bash(git *)\"" \
+     && printf '%s\n' "$S" | grep -qxF "time${TAB}permissions.allow[1]=\"Bash(nx *)\"${TAB}# merged"; then
+    record_pass "show-scope: texto (vencedor + sobrepõe + set-once + chave profunda + array merged)"
+  else record_fail "show-scope: texto" "saída não bate com o esperado (rc=$rc)"; fi
+
+  # (b) invariante strip==compose (checada em runtime a cada execução; exit 4 = violação) — rc=0 acima
+  # já a exercita no caso complexo; aqui o spot-check cruzado JSON×compose (declarado≠verificado):
+  local C J
+  C="$(bash "${helper}" "$d/fw.json" "$d/org.json" "$d/team.json" "$d/person.json" 2>/dev/null)"
+  J="$(bash "${helper}" --show-scope --json fw="$d/fw.json" org="$d/org.json" team="$d/team.json" person="$d/person.json" 2>/dev/null)"
+  if [ "$(printf '%s' "$C" | jq -r .theme)" = "$(printf '%s' "$J" | jq -r '.keys.theme.value')" ] \
+     && [ "$(printf '%s' "$C" | jq -c '.permissions.allow')" = "$(printf '%s' "$J" | jq -c '.keys["permissions.allow"].elements | map(.value)')" ]; then
+    record_pass "show-scope: invariante (valores do JSON == compose)"
+  else record_fail "show-scope: invariante" "valores do --json divergem do compose"; fi
+
+  # (c) --json bem-formado: status overridden/merged + overrides[] + meta.role/form
+  if [ "$(printf '%s' "$J" | jq -r '.keys.theme.status')" = "overridden" ] \
+     && [ "$(printf '%s' "$J" | jq -c '.keys.theme.overrides')" = '["fw"]' ] \
+     && [ "$(printf '%s' "$J" | jq -r '.keys["permissions.allow"].status')" = "merged" ] \
+     && [ "$(printf '%s' "$J" | jq '.keys["permissions.allow"].elements|length')" = "2" ] \
+     && [ "$(bash "${helper}" --show-scope --json --role source --form full "$d/fw.json" 2>/dev/null | jq -r '.meta.role + "/" + .meta.form')" = "source/full" ]; then
+    record_pass "show-scope: --json (status + overrides + meta.role/form)"
+  else record_fail "show-scope: json" "estrutura do --json incorreta"; fi
+
+  # (d) conflito de tipo: objeto sombreado por escalar → folha vence, sub-chave NÃO vaza
+  printf '%s' '{"x":{"a":1,"b":2}}' > "$d/t1.json"; printf '%s' '{"x":"flat"}' > "$d/t2.json"
+  local T; T="$(bash "${helper}" --show-scope base="$d/t1.json" top="$d/t2.json" 2>/dev/null)"
+  if printf '%s\n' "$T" | grep -qxF "top${TAB}x=\"flat\"${TAB}# sobrepõe: base" \
+     && ! printf '%s\n' "$T" | grep -qF "x.a"; then
+    record_pass "show-scope: conflito de tipo (folha vence; sub-chave não vaza)"
+  else record_fail "show-scope: conflito de tipo" "sub-chave vazou ou vencedor errado"; fi
+
+  # (e) determinismo (sha256 de 2 execuções)
+  local S2; S2="$(bash "${helper}" --show-scope --role adopted --form docs-only \
+        framework="$d/fw.json" empresa="$d/org.json" time="$d/team.json" pessoa="$d/person.json" 2>/dev/null)"
+  if [ "$(printf '%s' "$S" | sha256sum)" = "$(printf '%s' "$S2" | sha256sum)" ]; then
+    record_pass "show-scope: determinístico"
+  else record_fail "show-scope: determinismo" "saída varia entre execuções"; fi
+
+  # (f) modos-de-falha: --json sem --show-scope · --role inválido · JSON inválido (todos exit 2)
+  local r1=0 r2=0 r3=0
+  bash "${helper}" --json "$d/fw.json" >/dev/null 2>&1 || r1=$?
+  bash "${helper}" --show-scope --role banana "$d/fw.json" >/dev/null 2>&1 || r2=$?
+  printf '%s' '{bad' > "$d/bad.json"; bash "${helper}" --show-scope "$d/fw.json" "$d/bad.json" >/dev/null 2>&1 || r3=$?
+  if [ "$r1" -eq 2 ] && [ "$r2" -eq 2 ] && [ "$r3" -eq 2 ]; then
+    record_pass "show-scope: modos-de-falha (--json solto / --role inválido / JSON inválido → exit 2)"
+  else record_fail "show-scope: falha" "esperava exit 2/2/2, veio $r1/$r2/$r3"; fi
+
+  # (g) passthrough do resolve-scope-layers: labels canônicos + role/form lidos do stamp
+  if [ -f "${resolver}" ]; then
+    local t us R; t="$(mktemp -d)"; git -C "$t" init -q >/dev/null 2>&1
+    mkdir -p "$t/.claude" "$t/apps/dev/.claude"
+    printf '%s' '{"theme":"dark"}' > "$t/.claude/settings.json"
+    printf '%s' '{"model":"opus"}' > "$t/apps/dev/.claude/settings.json"
+    printf 'framework: onion-evolve\nsource_commit: abc\nsource_commit_date: 2026-07-01\nrole: adopted\nform: docs-only\n' > "$t/.claude/.onion-version"
+    us="$(mktemp)"; printf '%s' '{"theme":"light"}' > "$us"
+    R="$(bash "${resolver}" "$t/apps/dev" --user "$us" --show-scope 2>/dev/null)"
+    if printf '%s\n' "$R" | grep -qxF "# layers: empresa time pessoa · role: adopted · form: docs-only" \
+       && printf '%s\n' "$R" | grep -qxF "pessoa${TAB}theme=\"light\"${TAB}# sobrepõe: empresa"; then
+      record_pass "show-scope: resolve-scope-layers repassa (labels canônicos + role/form do stamp)"
+    else record_fail "show-scope: resolve" "passthrough sem labels/role/form esperados"; fi
+    rm -rf "$t" "$us"
+  else record_fail "show-scope" "resolver ausente: ${resolver}"; fi
+  rm -rf "$d"
 }
 
 # ---------------------------------------------------------------------------
@@ -2208,6 +2305,9 @@ run_compose_settings_selftests
 
 # Modo resolve-scope-layers — fecha o loop do compose-settings (descobre a cadeia de escopo).
 run_resolve_scope_layers_selftests
+
+# Modo show-scope — proveniência-por-chave do compositor (RFC-0005 Fase 2, `--show-scope`).
+run_show_scope_selftests
 
 # Modo resolve-target — targeting fino por seletor no alvo: (F1.2 federação — mata o ruído).
 run_resolve_target_selftests

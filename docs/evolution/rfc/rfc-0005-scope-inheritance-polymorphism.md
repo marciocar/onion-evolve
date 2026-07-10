@@ -79,8 +79,9 @@ Plano **cognitivo** resolve por concatenação/precedência nativa (grátis). Pl
   antes disso.
 - **Role/forma como proveniência no plano config — 1º passo ENTREGUE:** os gates agora polimorfam por
   papel (guarda `role: adopted` nos checks de marketplace do lint, fix de 2026-07-10 + selftest
-  `run_adopted_role_selftests`). O caso geral (proveniência-por-chave com dimensão role/forma) segue com
-  a Fase 2.
+  `run_adopted_role_selftests`). **Caso geral ENTREGUE (2026-07-10):** proveniência-por-chave via
+  `--show-scope` no `compose-settings.sh` (texto + `--json`), com a dimensão role/forma injetada do stamp
+  pelo `resolve-scope-layers.sh` — ver `scope-convention-2026.md` Plano 2 e selftest `run_show_scope_selftests`.
 
 ## 5. Caso Grana.Ai (concreto)
 
@@ -108,6 +109,11 @@ Plano **cognitivo** resolve por concatenação/precedência nativa (grátis). Pl
   (`~/.claude`). Zero código; é doutrina + convenção.
 - **Fase 2 — o gap real:** **resolver N-camadas + gerador de `settings.json` composto por diretório, com
   proveniência** (generaliza o `vendor-branch`/merge; type-aware strategic-merge). Dogfood-first, no Grana.Ai.
+  **✅ ENTREGUE (2026-07-10):** compositor (`compose-settings.sh`) + resolver da cadeia (`resolve-scope-layers.sh`)
+  + proveniência-por-chave `--show-scope` (paridade `git config --show-scope`, invariante runtime
+  strip==compose, formatos texto/JSON, dimensão role/forma) — gate: `run_compose_settings_selftests` +
+  `run_resolve_scope_layers_selftests` + `run_show_scope_selftests`. O dogfood de campo no Grana.Ai real
+  (empresa+time+pessoa no nx monorepo) segue como próximo passo de campo, não bloqueia a entrega.
 - **Fase 3 — conhecimento:** ligar `SUPERSEDES` de escopo no KG (regra-do-time supera regra-do-framework),
   gated atrás de dogfood.
 

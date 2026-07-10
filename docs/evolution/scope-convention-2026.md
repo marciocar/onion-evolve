@@ -38,8 +38,26 @@ bash .claude/utils/scope/compose-settings.sh \
 ```
 
 O `compose-settings` faz merge type-aware (objetos recursam · arrays unem: hooks/permissions · escalares
-last-wins) + `--provenance` (auditável — importante p/ regulado). **O nativo cobre user/project/local; o
-`compose-settings` cobre o TIME (subdiretório) + a base vendor explícita.** É exatamente o gap que ele preenche.
+last-wins) + **proveniência-por-chave** via `--show-scope` (paridade `git config --show-scope`; `--provenance`
+é alias). **O nativo cobre user/project/local; o `compose-settings` cobre o TIME (subdiretório) + a base
+vendor explícita.** É exatamente o gap que ele preenche.
+
+```bash
+# Quem setou cada chave? (auditável — importante p/ regulado)
+bash .claude/utils/scope/resolve-scope-layers.sh <time-dir> --show-scope
+# layers: empresa time pessoa · role: adopted · form: docs-only     ← role/forma lidos do .onion-version
+# pessoa	theme="light"	# sobrepõe: empresa                          ← sobreposto (vencedor + sombreadas)
+# time	model="opus"                                                 ← set (1 camada)
+# empresa	permissions.allow[0]="Bash(git *)"
+# time	permissions.allow[1]="Bash(nx *)"	# merged                    ← array união, origem por elemento
+
+# Formato JSON p/ auditoria (regulado): {meta:{layers,role,form}, keys:{<path>:{value,scope,status,overrides}}}
+bash .claude/utils/scope/resolve-scope-layers.sh <time-dir> --show-scope --json
+```
+
+Camadas aceitam rótulo explícito no compose (`empresa=path.json`); sem rótulo, o basename. A cada execução o
+script verifica a invariante `strip(provtree) == compose` (a proveniência nunca deriva do merge real —
+declarado≠verificado; divergência = exit 4).
 
 ## Plano 3 — Conhecimento: `SUPERSEDES` (gated, Fase 3)
 
@@ -54,6 +72,6 @@ KG (`/meta:kg`) — ortogonal ao merge de arquivo ("git merge não reconcilia ve
 - **Never-clobber**: o compose é merge determinístico + proveniência, não clobber.
 
 ## O que fica p/ design/dogfood
-- **Resolver da cadeia** (`resolve-scope-layers.sh`): dado repo+time+pessoa, descobrir os paths das camadas e
-  chamar o `compose-settings` — micro-slice opcional que automatiza a invocação acima.
+- ~~**Resolver da cadeia** (`resolve-scope-layers.sh`)~~ — ✅ entregue: descobre empresa→time→pessoa, compõe e
+  repassa `--show-scope` com rótulos canônicos + role/forma do stamp.
 - **Dogfood no Grana.Ai**: empresa(granaai)+time(desenvolvimento)+pessoa(mauricio) no nx monorepo (próximo passo #3).
