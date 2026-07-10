@@ -9,7 +9,7 @@
 ## 📊 Estatísticas
 
 - **58 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **28** em `concepts/` · **8** em `frameworks/` · **4** em `tools/` · **3** em `platforms/` · **2** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
+- **28** em `concepts/` · **9** em `frameworks/` · **4** em `tools/` · **3** em `platforms/` · **2** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
 
 ---
 
@@ -18,7 +18,7 @@
 ```
 docs/knowledge-base/
 ├── concepts/            # 28 — Conceitos fundamentais
-├── frameworks/          # 8  — Frameworks e metodologias
+├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 4  — Ferramentas e recursos
 ├── platforms/           # 3  — Plataformas e tecnologias
 ├── patterns/            # 2  — Padrões de implementação (SDAAL + orquestração de apresentações)
@@ -66,7 +66,7 @@ docs/knowledge-base/
 
 ---
 
-## 🏗️ Frameworks e Metodologias (8)
+## 🏗️ Frameworks e Metodologias (9)
 
 - [Agent Orchestration Landscape 2026](frameworks/agent-orchestration-landscape-2026.md) — comparativo de 5 correntes (verificação adversarial)
 - [Collaborative Testing Patterns](frameworks/collaborative-testing-patterns.md) — pair testing, three amigos
@@ -74,6 +74,7 @@ docs/knowledge-base/
 - [Framework de Testes](frameworks/framework-testes.md) — White/Grey/Black-box, QA Story Points
 - [GitFlow Patterns](frameworks/gitflow-patterns.md) — branching, releases, versionamento
 - [QA Story Points](frameworks/qa-story-points.md) — matrizes de pontuação de QA
+- [Safe Multi-Branch Consolidation](frameworks/safe-multibranch-consolidation.md) — 2 lanes, migração-antes-do-código, salvage, build-green (promovida do dogfood rhilo)
 - [Spec-Driven Development Tools 2025](frameworks/spec-driven-development-tools-2025.md) — análise comparativa de ferramentas
 - [Test Strategy Scoring](frameworks/test-strategy-scoring.md) — thresholds e detecção de gaps de teste
 
