@@ -139,6 +139,12 @@ rhilo-app em [2026-07-09](../../evolution/inbox/_processed/2026-07-09-artefato-c
 gate WCAG decide); o KG **rege** (fonte-única + rastreabilidade, depois de decidir). Eixos
 ortogonais — dois papéis, um substrato.
 
+**Motor de projeção ≠ motor de UI de adotante.** O core **não** distribui componentes de front
+(identidade + soberania: o `SourceTag` é sempre implementação local do adotante). O que o core tem é
+**projeção read-only dos próprios artefatos** — `kg-console.sh` renderiza o `.kg.yaml` em HTML
+self-contained (grafo interativo + veredito do `kg-radar.sh` embutido), mesmo padrão do
+`federation-console.sh` (zero backend, zero CDN, determinístico). Ver ≠ distribuir.
+
 ## Mapeamento completo — o playbook (`/meta:kg map <área>`)
 
 > **Situação (recognition-primed):** vai redesenhar/refatorar/assumir uma área e o conhecimento dela

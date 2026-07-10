@@ -682,6 +682,38 @@ run_federation_console_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo kg-console — exercita .claude/validation/kg-console.sh (projeção HTML do KG,
+# irmão do federation-console). Usa a fixture kg-domain/good-domain.kg.yaml.
+# ---------------------------------------------------------------------------
+run_kg_console_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/kg-console.sh"
+  local fixture="${FIX_DIR}/kg-domain/good-domain.kg.yaml"
+  if [ ! -f "${helper}" ]; then record_fail "kg-console" "helper ausente: ${helper}"; return; fi
+  if [ ! -f "${fixture}" ]; then record_fail "kg-console" "fixture ausente: ${fixture}"; return; fi
+  if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
+    local rc=0; bash "${helper}" "${fixture}" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -eq 3 ]; then record_pass "kg-console: sem python+yaml → exit 3 (gracioso)"
+    else record_pass "kg-console: pulado (sem python+yaml)"; fi
+    return; fi
+  local H; H="$(bash "${helper}" "${fixture}" 2>/dev/null)"
+  if printf '%s' "${H}" | grep -q '<!doctype html>' && printf '%s' "${H}" | grep -q '</html>' \
+     && ! printf '%s' "${H}" | grep -q '__DATA__' \
+     && printf '%s' "${H}" | grep -q '"nodes"' && printf '%s' "${H}" | grep -q 'RADAR'; then
+    record_pass "kg-console: HTML self-contained (nodes+veredito do radar, sem placeholder)"
+  else record_fail "kg-console: html" "HTML inválido/incompleto"; fi
+  if printf '%s' "${H}" | grep -qiE 'src=.?https?://|<script src|href=.?https?://[^"]*\.(js|css)|fetch\('; then
+    record_fail "kg-console: self-contained" "tem dependência externa (CDN/fetch)"
+  else record_pass "kg-console: self-contained (sem CDN/fetch externo)"; fi
+  local H2; H2="$(bash "${helper}" "${fixture}" 2>/dev/null)"
+  if [ "$(printf '%s' "${H}" | sha256sum)" = "$(printf '%s' "${H2}" | sha256sum)" ]; then
+    record_pass "kg-console: determinístico"
+  else record_fail "kg-console: determinismo" "varia entre execuções"; fi
+  local rc2=0; bash "${helper}" "/nonexistent/x.kg.yaml" >/dev/null 2>&1 || rc2=$?
+  if [ "${rc2}" -eq 2 ]; then record_pass "kg-console: arquivo inexistente → exit 2"
+  else record_fail "kg-console: uso" "esperava exit 2, veio ${rc2}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo mail-receiver — exercita .claude/utils/co-evolution/mail-receiver.sh (F1.4: acelerador
 # "receiver que acorda"). Self-contained em mktemp (repo sintético com canais inbox/inbound).
 # ---------------------------------------------------------------------------
@@ -2097,6 +2129,7 @@ run_resolve_target_selftests
 
 # Modo federation-console — console estático read-only do SSOT (F1.3 federação).
 run_federation_console_selftests
+run_kg_console_selftests
 
 # Modo mail-receiver — acelerador "receiver que acorda" (F1.4 federação).
 run_mail_receiver_selftests
