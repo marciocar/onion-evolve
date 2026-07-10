@@ -9,7 +9,7 @@
 ## 📊 Estatísticas
 
 - **58 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **28** em `concepts/` · **9** em `frameworks/` · **4** em `tools/` · **3** em `platforms/` · **2** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
+- **28** em `concepts/` · **9** em `frameworks/` · **4** em `tools/` · **3** em `platforms/` · **3** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
 
 ---
 
@@ -99,8 +99,9 @@ docs/knowledge-base/
 
 ---
 
-## 🧩 Patterns (2)
+## 🧩 Patterns (3)
 
+- [Literate Policy-as-Data](patterns/literate-policy-as-data.md) — config de três leitores: parser lê dados, humano lê história, IA lê ordens (batizadora: members.yaml)
 - [Presentation Orchestration](patterns/presentation-orchestration.md) — contratos de delegação, templates e casos de uso (extraído do agente `@presentation-orchestrator`)
 - [SDAAL Examples](patterns/sdaal-examples.md) — exemplos de implementação do padrão SDAAL
 
