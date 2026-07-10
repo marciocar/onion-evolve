@@ -450,6 +450,12 @@ já faz tmp→diff→aplicar (o diff mostra o que muda), e re-carimba `.onion-ve
 
 ## Atualizar um repo adotado (`--update`)
 
+> **⚠️ Forma docs-only:** se o alvo NÃO versiona `.claude/` (verificar: `git -C "$TARGET" ls-tree HEAD -- .claude`
+> vazio + `.claude/` em disco), o fluxo abaixo **não se aplica à superfície de capability** — ele assume
+> `.claude/` tracked (vendor-branch, pin-canário, commit durável). Seguir o 4º modo (3-way por manifest de
+> hashes, maestro-gated): [ADR capability-update-out-of-git](../../../docs/analysis/onion-adr-capability-update-out-of-git-2026-07.md)
+> — implementação gated até o 1º caso real; até lá, o update docs-only é operação manual guiada pelo ADR.
+
 Repo já adotado → trazer atualizações do framework. **Reusa o stamp** (self-contained):
 
 ```bash
