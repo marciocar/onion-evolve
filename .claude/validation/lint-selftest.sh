@@ -707,6 +707,47 @@ run_adopted_role_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo write-stamp — escrita determinística do .onion-version (sinal granaai multi-lineage:
+# a regra preserve-adopted_at era prosa e uma sessão a violou; agora é código testado).
+# ---------------------------------------------------------------------------
+run_write_stamp_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh"
+  if [ ! -f "${helper}" ]; then record_fail "write-stamp" "helper ausente: ${helper}"; return; fi
+  local wsb today; wsb="$(mktemp -d)"; mkdir -p "${wsb}/t/.claude"; today="$(date +%F)"
+  # 1. adoção fresca: adopted_at=hoje, SEM updated_at
+  bash "${helper}" "${wsb}/t" --framework onion-evolve --commit abc123 --commit-date 2026-07-10 \
+    --adopted-from git@x:y.git --mode regulated >/dev/null 2>&1
+  if grep -q "^adopted_at: ${today}$" "${wsb}/t/.claude/.onion-version" \
+     && ! grep -q '^updated_at:' "${wsb}/t/.claude/.onion-version"; then
+    record_pass "write-stamp: adoção fresca → adopted_at=hoje, sem updated_at"
+  else record_fail "write-stamp: fresh" "$(cat "${wsb}/t/.claude/.onion-version")"; fi
+  # 2. update: adopted_at PRESERVADO + updated_at=hoje + campos antigos vencem args
+  printf 'framework: onion-evolve\nsource_commit: abc123\nsource_commit_date: 2026-07-10\nrole: adopted\nadopted_from: git@x:y.git\nadopted_at: 2026-07-01\nmode: regulated\nintegration_branch: develop\n' \
+    > "${wsb}/t/.claude/.onion-version"
+  bash "${helper}" "${wsb}/t" --framework onion-evolve --commit def456 --commit-date 2026-07-15 \
+    --mode legacy >/dev/null 2>&1
+  if grep -q '^adopted_at: 2026-07-01$' "${wsb}/t/.claude/.onion-version" \
+     && grep -q "^updated_at: ${today}$" "${wsb}/t/.claude/.onion-version" \
+     && grep -q '^source_commit: def456$' "${wsb}/t/.claude/.onion-version" \
+     && grep -q '^mode: regulated$' "${wsb}/t/.claude/.onion-version" \
+     && grep -q '^integration_branch: develop$' "${wsb}/t/.claude/.onion-version"; then
+    record_pass "write-stamp: update → preserva adopted_at/mode/branch, escreve updated_at (a regra do audit #5 em código)"
+  else record_fail "write-stamp: preserve" "$(cat "${wsb}/t/.claude/.onion-version")"; fi
+  # 3. adopted_at perdido → restaura do members.yaml (nunca inventa)
+  if command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1; then
+    printf 'framework: onion-evolve\nsource_commit: def456\nsource_commit_date: 2026-07-15\nrole: adopted\nmode: regulated\n' \
+      > "${wsb}/t/.claude/.onion-version"
+    printf 'members:\n  - id: acme\n    adopted_at: 2026-06-15\n' > "${wsb}/members.yaml"
+    bash "${helper}" "${wsb}/t" --framework onion-evolve --commit fff999 --commit-date 2026-07-16 \
+      --members "${wsb}/members.yaml" --member-id acme >/dev/null 2>&1
+    if grep -q '^adopted_at: 2026-06-15$' "${wsb}/t/.claude/.onion-version"; then
+      record_pass "write-stamp: adopted_at perdido → restaurado do members.yaml"
+    else record_fail "write-stamp: restore" "$(cat "${wsb}/t/.claude/.onion-version")"; fi
+  else record_pass "write-stamp: restore pulado (sem python+yaml)"; fi
+  rm -rf "${wsb}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo kg-console — exercita .claude/validation/kg-console.sh (projeção HTML do KG,
 # irmão do federation-console). Usa a fixture kg-domain/good-domain.kg.yaml.
 # ---------------------------------------------------------------------------
@@ -2175,6 +2216,7 @@ run_resolve_target_selftests
 run_federation_console_selftests
 run_kg_console_selftests
 run_adopted_role_selftests
+run_write_stamp_selftests
 
 # Modo mail-receiver — acelerador "receiver que acorda" (F1.4 federação).
 run_mail_receiver_selftests

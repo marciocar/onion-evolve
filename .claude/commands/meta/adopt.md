@@ -388,18 +388,14 @@ Ver [🔁 Transição de Contexto](#-transição-de-contexto-fonte--alvo). No al
 ```bash
 # USAR os SRC_* do PASSO 0 (carregados via STATE.md — shell não persiste). NÃO re-rodar
 # onion-version.sh a partir do alvo (daria a identidade errada).
-cat > "$INSTALL_DIR/.claude/.onion-version" <<EOF
-framework: ${SRC_FRAMEWORK}
-source_commit: ${SRC_COMMIT}
-source_commit_date: ${SRC_COMMIT_DATE}
-role: adopted
-adopted_from: $(git -C "$SOURCE_ROOT" remote get-url origin 2>/dev/null || echo "$SOURCE_ROOT")
-adopted_at: $(date +%F)
-mode: ${MODE}
-EOF
-# integration_branch: carimbar SÓ se foi escolha explícita (--integration-branch). Sem escolha → omitir;
+# Escrita DETERMINÍSTICA via helper — NUNCA heredoc à mão: a semântica adopted_at/updated_at vive no
+# script, coberta por selftest (nasceu do sinal granaai 2026-07-10: re-carimbo por deslize de sessão).
+bash "$SOURCE_ROOT/.claude/utils/adopt/write-stamp.sh" "$INSTALL_DIR" \
+  --framework "${SRC_FRAMEWORK}" --commit "${SRC_COMMIT}" --commit-date "${SRC_COMMIT_DATE}" \
+  --adopted-from "$(git -C "$SOURCE_ROOT" remote get-url origin 2>/dev/null || echo "$SOURCE_ROOT")" \
+  --mode "${MODE}" ${INTEGRATION_BRANCH:+--integration-branch "${INTEGRATION_BRANCH}"}
+# integration_branch: só entra se foi escolha explícita (--integration-branch); sem escolha o helper omite —
 # o resolve-integration-branch.sh detecta a cada PR (develop-se-existe-senão a branch principal).
-[ -n "${INTEGRATION_BRANCH:-}" ] && printf 'integration_branch: %s\n' "${INTEGRATION_BRANCH}" >> "$INSTALL_DIR/.claude/.onion-version"
 ```
 
 - **Commit durável (obrigatório):** aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
@@ -499,18 +495,20 @@ manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p
   hooks (no manifesto acima) mas **não** o registro → o "you have mail" não dispara. O Procedimento faz o
   merge idempotente do `settings.json` + garante o starter `docs/evolution/`. (Fecha
   `docs/evolution/inbox/2026-06-18-adopt-update-skips-phase3-steps.md`.)
-- **Re-carimbar** com a identidade NOVA da fonte (re-derivar — não há PASSO 0 aqui):
+- **Re-carimbar** com a identidade NOVA da fonte (re-derivar — não há PASSO 0 aqui). **Sempre via
+  helper determinístico** — a semântica (preserve + updated_at) vive no script, não em quem o chama:
   ```bash
-  SRC_ID="$(bash "$SOURCE_ROOT/.claude/validation/onion-version.sh")"   # novo commit/date
-  # Reusar o heredoc da Fase 5 mapeando commit→source_commit e commit_date→source_commit_date,
-  # PRESERVANDO adopted_from/mode/integration_branch E adopted_at do stamp antigo; atualizar
-  # source_commit/date + updated_at=$(date +%F).
-  # ⚠️ adopted_at NUNCA é re-carimbado: registra a 1ª adoção (semântica única — audit 2026-07-01 #5);
-  # a data de cada update vive em updated_at. Se o stamp antigo tiver perdido o adopted_at original
-  # (re-carimbo pré-fix), restaurar do members.yaml do core (campo adopted_at do membro).
-  # (Se o stamp antigo NÃO tiver integration_branch — adoção pré-1.6.0 ou sem
-  # escolha explícita —, PRESERVAR a ausência: não congelar um valor; a resolução detecta a cada PR. O
-  # passo (3) do Procedimento ainda seta o git config local de conveniência a partir do valor resolvido.)
+  eval "$(bash "$SOURCE_ROOT/.claude/validation/onion-version.sh" | awk -F': ' \
+    '/^framework/{print "SRC_FRAMEWORK="$2} /^commit:/{print "SRC_COMMIT="$2} /^commit_date/{print "SRC_COMMIT_DATE="$2}')"
+  bash "$SOURCE_ROOT/.claude/utils/adopt/write-stamp.sh" "$TARGET" \
+    --framework "${SRC_FRAMEWORK}" --commit "${SRC_COMMIT}" --commit-date "${SRC_COMMIT_DATE}" \
+    --members "$SOURCE_ROOT/docs/evolution/federation/members.yaml" --member-id "<id-no-members-se-registrado>"
+  # O helper, no caminho de UPDATE (stamp existente): PRESERVA adopted_from/mode/integration_branch e
+  # adopted_at do stamp antigo (⚠️ adopted_at NUNCA re-carimba — semântica única, audit 2026-07-01 #5);
+  # atualiza source_commit/date; escreve updated_at=hoje. adopted_at perdido (re-carimbo pré-fix) →
+  # restaurado do members.yaml (--members/--member-id); irrecuperável → omitido com AVISO, nunca inventado.
+  # integration_branch ausente no antigo → ausência preservada (resolução detecta a cada PR; o passo (3)
+  # do Procedimento ainda seta o git config local a partir do valor resolvido).
   ```
 - **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima,
   já commitado na integração); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o

@@ -114,8 +114,25 @@ members:
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — não citar em superfície pública
     local_path: "/home/marcio/granaai"   # re-clonado 2026-07-08 no novo lar (KVM 8); acesso via token gh de marciocar (org GranaAi privada)
-    onion_version: 4332ac8d1884   # source_commit no branch onion/adopt — VERIFICADO byte-a-byte 2026-07-07 (.claude/.onion-version lido direto no clone local, pós-merge)
-    adopted_at: 2026-07-01
+    onion_version: 4332ac8d1884   # último pin VERIFICADO byte-a-byte (2026-07-07). Membro MULTI-LINHAGEM:
+                                  # pins por linhagem no mapa lineages: abaixo (regra: pin só entra aqui
+                                  # VERIFICADO por pin-integrity-check.sh — nunca do stamp declarado).
+    lineages:                     # ≥3 adoções distintas (sinal 2026-07-10-granaai-multi-lineage, testemunho
+                                  # do maestro; padrão metagamify/D2 — linhagem = "declarado ≠ verificado")
+      local-kvm8:                 # clone /home/marcio/granaai NESTE servidor — a linhagem das sessões daqui
+        branch: onion/adopt-update-74c470e   # update 2026-07-10 commitado local (3ed42d1c2); PR p/ develop pendente
+        pin: 4332ac8d1884         # DECLARADO no stamp: 74c470e35f17 — mas pin-integrity = pin-untrusted
+                                  # (canário divergente: drift consciente DRIFT-ONION do lint local, converge
+                                  # no próximo --update) → mantém o último verificado; re-verificar pós-update.
+                                  # ⚠️ o stamp local re-carimbou adopted_at p/ 2026-07-10 (deslize de sessão
+                                  # contra a regra preserve — fix de raiz: write-stamp.sh determinístico).
+      mauricio:                   # máquina do Mauricio Matos — a linhagem da adoção registrada (2026-07-01);
+                                  # reconciliação #1094/#1096 revisada por ele. Pin não-verificável deste host.
+        pin: nao-verificavel-deste-host
+      leonardo-offline:           # instância adotada OFFLINE pelo Leonardo Melo — âncora: branch
+                                  # feature/onion-integration (2025-11-06; ADR onion-adr-granaai-consolidation).
+        pin: desconhecido-ate-o-repo-aparecer
+    adopted_at: 2026-07-01        # 1ª adoção conhecida (linhagem mauricio) — semântica única (audit #5)
     mode: regulated              # detectado corretamente pelo /meta:adopt deles — domínio fintech
     integration_branch: develop  # confirmado — ambiente regulado exige controle deliberado de QUANDO puxar updates (nunca live-pull automático)
     reconciliation_status: merged_2026-07-07   # PR #1094 (14 commits + cherry-pick 1af2e8b2d restaurando o guia) e PR #1096 (fix .gitignore blanket /docs/) mergeados em develop; revisão do Mauricio ok + lint HARD limpo antes do merge
