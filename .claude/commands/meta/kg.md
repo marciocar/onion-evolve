@@ -121,6 +121,7 @@ bash .claude/validation/kg-radar.sh docs/onion/graph/<slug>.kg.yaml            #
 bash .claude/validation/kg-radar.sh <arquivo> --integrity                      # só o gate (exit 1 se problema)
 bash .claude/validation/kg-radar.sh <arquivo> --domain                         # só completude da camada domain
 bash .claude/validation/kg-radar.sh <arquivo> --triples                        # triplas p/ consumo por LLM
+bash .claude/validation/kg-console.sh <arquivo> > grafo.html                    # VER o grafo (projeção HTML self-contained)
 ```
 - **RADAR** = onde olhar primeiro (top atenção).
 - **RECONCILIAÇÃO** = as auto-correções registradas (REFUTES/SUPERSEDES).
