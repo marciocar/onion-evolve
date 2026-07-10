@@ -4,14 +4,15 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 20 entradas · **Stale:** 0 · **Compartilháveis:** 17
+**Total:** 21 entradas · **Stale:** 0 · **Compartilháveis:** 18
 
-Gerado em: 2026-07-09
+Gerado em: 2026-07-10
 
 ---
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-10 | innovation | public 📤 | first-regulated-a2a-handshake | 2026-10-08 | static |
 | 2026-07-09 | innovation | public 📤 | security-gate-degrades-to-veto | 2026-10-07 | static |
 | 2026-07-09 | decision | public 📤 | scope-inheritance-rfc0005 | 2026-10-07 | static |
 | 2026-07-09 | learning | protected | granaai-readonly-field-dogfood | 2026-10-07 | conditional |

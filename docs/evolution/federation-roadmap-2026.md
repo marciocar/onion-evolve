@@ -69,10 +69,14 @@ pura do SSOT) → libera valor imediato. **Fase 2 é gated na RFC-0004** (transp
   `verified:true` + `input_required`, nada auto-aplicado) — e o dogfood expôs+fechou o gap de kid-binding no
   mesmo loop (diário `2026-07-09-first-live-a2a-handshake`). O endpoint chama o `a2a-verify` do core na
   fronteira transport→ação; `a2a-accept.sh` fecha a outra ponta (fila→inbox sob ato humano).
-- **Dogfood com adotante REGULADO — ⏳ GATED, o único resto de F2.2:** handshake com a granaai (exercita
-  `never-live-pull` + política de regulado), deliberadamente adiado para gate humano explícito
-  (a estreia foi com o não-regulado). Pré-requisito: granaai self-gera par de chaves (priv nunca sai de lá),
-  core pina a pubkey (`jwks/<kid>.pem` + `a2a.keys[granaai]` no members.yaml) sob gate.
+- **Dogfood com adotante REGULADO — ✅ (2026-07-10) → F2.2 COMPLETO:** handshake granaai→core validado ao
+  vivo sob autorização explícita do maestro (cobertura da ponta adormecida, commit isolado `cd60d103c` na
+  branch `onion/a2a-sender-granaai`): keypair self-gerado lá, pubkey pinada aqui (`dc489b4`), sinal assinado
+  → `/a2a` público → verificado (7 camadas, incl. a guarda **clock-trust** estreada no mesmo dia, `e750023`)
+  → fila gated → `a2a-accept` → inbox → triado. Nota honesta: `apply_mode:propose-only` é caminho de
+  **receptor** regulado (coberto por selftest); o vivo exercitou kid-binding+clock com membro regulado real.
+  Diário: `2026-07-10-first-regulated-a2a-handshake`. Follow-ups: token a2a dedicado granaai (restart do
+  bridge = gesto humano) · PR da branch sender na sessão granaai.
 
 ### F2.3 — Veto reputação-condicionado (evolução futura)
 - **O quê:** ligar reputação-por-evidência (`trust-log` + `can_correct_to`) como condicionante do veto/urgência
