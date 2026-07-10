@@ -5,14 +5,15 @@ description: |
   claims/evidência/decisões tipados, arestas SUPPORTS/REFUTES/SUPERSEDES, planes DEV/PROD —
   e, na camada `layer: domain`, o SSOT de domínio (entity/state/event/rule/policy) que o audit TRACES_TO.
   Roda o radar determinístico (kg-radar.sh) para atenção, reconciliação, integridade e radar-de-domínio.
+  Modo `map <área>`: PFR de mapeamento completo (inventário → atom-map/fatias → .kg.yaml → radar).
   Nascido do 1º dogfood do core (auditoria /meta:evolve 2026-07-04) — F2 da vertical onion-investigation.
 model: sonnet
 category: meta
 tags: [kg, knowledge-graph, investigation, sdaal, radar, reconciliation, domain-layer]
-version: "1.1.0"
+version: "1.2.0"
 updated: "2026-07-10"
 allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/kg-radar.sh*) Bash(ls docs/*)
-argument-hint: "[<arquivo.kg.yaml> | novo <slug>]  (vazio = localizar .kg.yaml existente e rodar radar)"
+argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área>]  (vazio = localizar .kg.yaml existente e rodar radar)"
 related_commands:
   - /meta:evolve
   - /meta:graph
@@ -42,6 +43,8 @@ impressão do modelo.
   `REFUTES` explícita, não deleção (história reconcilia, não apaga).
 - Quando o conflito é **epistêmico** (o que cada lado acredita), não textual — `git merge` não
   resolve; o grafo resolve na camada de conhecimento e o PR sai **dirigido pelo veredito**.
+- **`map <área>`**: mapear uma área do sistema (UI ou backend) como SSOT de domínio **antes** de
+  redesenhar/refatorar — o contrato primeiro, o pixel/refactor depois (ver Modo map abaixo).
 
 **NÃO** usar para: lista simples de tarefas (use o task manager) · estrutura do próprio framework
 (use `/meta:graph`, que é outra lente — derivada da spec-as-code, sem store).
@@ -133,12 +136,68 @@ bash .claude/validation/kg-radar.sh <arquivo> --triples                        #
 - `question` de alta atenção → próximo trabalho a propor ao maestro.
 - Conflito DEV×PROD resolvido → **só então** a camada de código muda, na direção que o grafo deu.
 
+## 🗺️ Modo map — mapeamento completo de uma área (PFR)
+
+`map <área>` mapeia uma área do sistema como **SSOT de domínio** antes de qualquer redesign/refactor.
+Destilado dos 2 dogfoods do metagamify/rhilo-app (fatias de domínio WRR/SLA + atomização do
+command-center — exemplares em `docs/evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md`
+e `2026-07-08-kg-dogfood-completo-promover.md`). Workflow faseado retomável; cada fase fecha com commit.
+
+### F0 — Inventário exaustivo
+Enumerar **tudo** da área antes de decidir qualquer coisa. UI: telas/abas/componentes e cada **dado
+exibido** (~100 elementos no dogfood). Backend: entidades, estados, eventos, regras, integrações.
+*"Antes de qualquer pixel"* — o inventário é o insumo, não o contrato.
+
+### F1 — O contrato: atom-map (UI) / fatias de domínio (backend)
+**UI → produzir o `atom-map.md`** (doc-contrato que as fases de implementação obedecem):
+- Tabela por átomo: **`Átomo | Endpoint dono | Conceito (nó do KG) | Dono de EXIBIÇÃO (1) | Dono de ESCRITA (1)`**.
+- **Invariante de fonte-única**: 1 átomo = 1 fonte + 1 dono-de-exibição + 1 dono-de-escrita.
+  Réplicas viram link ("ver em X") ou `SourceTag` apontando ao dono — **nunca 2ª busca do mesmo
+  número por outro endpoint**.
+- **`SourceTag`** (rastreabilidade como componente, no stack do adotante): todo elemento que exibe
+  dado carrega `endpoint` (fonte) + `concept` (nó do KG) + `formula` (se há transform no front).
+- **Ledger de de-duplicação**: cada átomo que hoje aparece N× → decisão registrada de quem fica
+  dono e o que as outras exibições viram (corte, link, SourceTag). Átomos parecidos-mas-distintos
+  (ex.: configurado ≠ efetivo ≠ override) **separam com rótulo**, nunca se misturam sem rótulo.
+- **Pergunta atômica**: cada aba/tela responde **1 pergunta**; os átomos donos listados. Aba que
+  não tem pergunta própria funde ou morre.
+- **Decisões difíceis registradas** no próprio doc (rótulo honesto: REAL ≠ SIMULAÇÃO; métrica
+  sintética que não mede o que promete → funde/renomeia; PII contida e mascarada por padrão).
+
+**Backend/API/funcionalidade → fatias de domínio**: por fatia (ex.: ciclo do SLOT, máquina de SLA),
+entidades, estados, transições (com evento gatilho), regras/invariantes — **ancoradas no código**
+(arquivo:linha). Endpoint de API = `entity` fonte; funcionalidade = a fatia (cluster de
+regras+estados+eventos) que ela toca.
+
+**Jornadas/fluxos → máquina de estados** (por identidade, não analogia): passos da jornada = `state`
+do progresso do ator (ou do processo, se fluxo de sistema); avanço = `TRANSITIONS` com `on:` no
+evento (ação do usuário ou do sistema); cada passo `TRACES_TO` a tela/endpoint que toca. O radar
+paga na hora: **estado-absorvente = ponto de drop-off/limbo do funil** — o mesmo motor que achou o
+SLOT-limbo acha onde a jornada morre. Sem tipos novos até um dogfood pedir (gated-until-trigger).
+
+### F2 — Materializar no `.kg.yaml` (o join, per ADR design-extends-kg)
+Átomos e fatias viram nós `layer: domain` (`entity/state/event/rule/invariant/policy`); arestas
+`HAS_STATE/TRANSITIONS(on)/EMITS/CONSTRAINS/READS/WRITES`; átomo `READS` sua fonte única e
+`TRACES_TO` o dono; o atom-map doc e o grafo se referenciam mutuamente (doc = contrato humano;
+grafo = camada máquina).
+
+### F3 — Radar + invariante verificável
+`kg-radar.sh <arquivo> --domain` (estado-absorvente, EVENT-sem-efeito, STATE-sem-dona,
+RULE-sem-trace, fonte-única) + `--integrity` (gate). Lacuna vira **decisão explícita** no grafo
+(limbo real ou terminal legítimo?). **Invariante grep-verificável no repo do adotante**: cada
+endpoint-dono aparece como fonte de exibição em **1** componente (o "cara-crachá" do front).
+
+### F4 — Adaptador do adotante (fora do core)
+Implementar o `SourceTag` no stack local (React/Vue/CLI — soberania: o core dá o schema e o método,
+nunca o componente). Redesign/refactor só começa aqui — **dirigido pelo contrato**.
+
 ## 💡 Exemplos
 
 ```bash
 /meta:kg novo auditoria-seguranca          # cria docs/onion/graph/auditoria-seguranca.kg.yaml
 /meta:kg docs/onion/graph/onion-evolution-2026-07.kg.yaml   # modela/atualiza e roda radar
 /meta:kg                                    # localiza o mais recente e roda o radar
+/meta:kg map command-center                 # PFR F0-F4: inventário → atom-map → .kg.yaml → radar
 ```
 
 ## ⚠️ Notas
