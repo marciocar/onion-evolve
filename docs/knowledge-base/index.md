@@ -8,7 +8,7 @@
 
 ## 📊 Estatísticas
 
-- **58 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **59 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
 - **28** em `concepts/` · **9** em `frameworks/` · **4** em `tools/` · **3** em `platforms/` · **3** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
 
 ---
@@ -19,7 +19,7 @@
 docs/knowledge-base/
 ├── concepts/            # 28 — Conceitos fundamentais
 ├── frameworks/          # 9  — Frameworks e metodologias
-├── tools/               # 4  — Ferramentas e recursos
+├── tools/               # 5  — Ferramentas e recursos
 ├── platforms/           # 3  — Plataformas e tecnologias
 ├── patterns/            # 2  — Padrões de implementação (SDAAL + orquestração de apresentações)
 ├── architectures/       # 1  — C4 + ADR patterns
@@ -82,11 +82,12 @@ docs/knowledge-base/
 
 ---
 
-## 🛠️ Ferramentas (4)
+## 🛠️ Ferramentas (5)
 
 - [Agent Skills](tools/agent-skills.md) — formato aberto de skills para agentes
 - [Claude Code Commands Best Practices 2026](tools/claude-code-commands-best-practices-2026.md) — boas práticas, ferramenta Workflow, Skill, subagentes
 - [Docker Deployment](tools/docker-deployment.md) — containerização Node.js/Next.js/NX Monorepo: Dockerfiles, Compose, segurança, troubleshooting
+- [PostgreSQL 17](tools/postgresql.md) — triggers, functions, migrations (Prisma), indexing e troubleshooting; extraída do `@postgres-specialist` (shed-ceremony 2026-07-10)
 - [Whisper](tools/whisper.md) — transcrição de áudio (OpenAI)
 
 ---

@@ -123,8 +123,8 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.7
-    status: open
-    label: "postgres-specialist 1121 linhas — margem de alerta, observar"
+    status: done
+    label: "postgres-specialist 1121 linhas — margem de alerta, observar. EXECUTADO 2026-07-10 (gatilho: decisao do maestro) — shed-ceremony 1121→~160 linhas, conhecimento na KB tools/postgresql.md (ver E_PG_SHED)"
     trace: ".claude/agents/development/postgres-specialist.md:1"
   - id: C_D4_8
     node_type: claim
@@ -334,6 +334,14 @@ nodes:
     status: done
     label: "Escopo corrigido: rm restrito ao literal do mktemp, cat restrito a heredoc; Bash(bash *) FICA (uso real comprovado)"
     trace: ".claude/commands/meta/adopt.md:9"
+  - id: E_PG_SHED
+    node_type: evidence
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "Shed-ceremony do postgres-specialist (2026-07-10, gatilho = decisao do maestro que suspende o deferimento de D_SHED_CEREMONY): agente 1121→~160 linhas mantendo role/processo/guidelines; SQL de referencia, exemplos e troubleshooting extraidos verbatim para a KB tools/postgresql.md (mesmo padrao gamma/presentation)"
+    trace: "docs/knowledge-base/tools/postgresql.md:1"
   - id: E_TUNE_PAIRS
     node_type: evidence
     plane: DEV
@@ -527,6 +535,9 @@ edges:
     edge_type: SUPPORTS
   - from: E_TUNE_PAIRS
     to: C_D2_5
+    edge_type: SUPPORTS
+  - from: E_PG_SHED
+    to: C_D1_3
     edge_type: SUPPORTS
   - from: D_QUICKWINS
     to: A_REPORT_0704
