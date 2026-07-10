@@ -167,6 +167,8 @@ como repos peer. Cada sprint tem rastreabilidade do chat ao PR — sem lacuna de
 Não são repos separados — são checkouts paralelos do mesmo `.git`, em caminhos diferentes. Quando o
 maestro precisa trabalhar em duas branches simultaneamente sem criar conflito, usa worktrees. A
 worktree herda todo o framework do repo principal. É o mesmo Onion, em paralelo, sem colisão.
+(Esses dois são pré-convenção e ficam onde estão — *grandfather*; worktrees novos seguem o layout
+`~/worktrees/<repo>/<branch-slug>/` da [convenção de worktrees](../evolution/worktree-convention-2026.md).)
 
 ### 2.3 Onion-Bridge
 
@@ -453,10 +455,12 @@ Por que? Porque dois agentes escrevendo em paralelo no mesmo filesystem criam co
 ativa. O resultado é caos silencioso.
 
 A solução quando você precisa trabalhar em duas branches do mesmo repo simultaneamente: **git
-worktrees**. Crie um checkout paralelo em outro caminho:
+worktrees**. Crie um checkout paralelo no layout canônico `~/worktrees/<repo>/<branch-slug>/`
+(convenção: [`worktree-convention-2026.md`](../evolution/worktree-convention-2026.md) — codificada
+da prática de campo do metagamify):
 
 ```bash
-git worktree add ~/metagamify-rhilo-atual develop
+git -C ~/rhilo-metagamify worktree add ~/worktrees/rhilo-metagamify/develop develop
 ```
 
 Agora você tem dois diretórios, dois checkouts, duas sessões Claude Code — mas um único `.git`.

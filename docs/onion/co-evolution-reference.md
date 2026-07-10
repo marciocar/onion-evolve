@@ -25,7 +25,7 @@ Quem roda ≠ pra onde o dado vai. Ex.: `/meta:co-deliver` **roda no core** mas 
 |-------|---------|-------|----------|
 | **downstream** | core → adotante | `inbound/` (no adotante) | release / anúncio / decisão |
 | **upstream** | adotante → core | `inbox/` (no core) | sinal / feedback / bug / pedido-de-ajuda |
-| **handoff** | intra-repo | git worktrees | um escritor por escopo (concorrência, não direção cross-repo) |
+| **handoff** | intra-repo | git worktrees ([convenção de layout](../evolution/worktree-convention-2026.md)) | um escritor por escopo (concorrência, não direção cross-repo) |
 
 ## Ciclo de vida de um sinal de campo
 

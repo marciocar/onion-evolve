@@ -119,3 +119,16 @@ repo") inclui SESSÕES VIVAS, não só commits** — checar `git status` limpo n
 Guardas: lint-selftest modo `session-beacon` (7 casos, incl. regressão da colisão). Diário:
 `2026-07-02-live-session-collision-farol.md`. Chega aos adotantes vendorizado no próximo `--update`
 (hook registrado via merge idempotente do settings.json).
+
+---
+
+## Adendo (2026-07-10) — localização/nomenclatura de worktree DECIDIDA (convenção umbrella)
+
+O comportamento de W3 (um escritor por escopo, handoff commitado) sempre foi doutrina; a **localização**
+dos worktrees duráveis do maestro era ad-hoc (`~/<nome>-atual` no manual, sem regra). Codificado em
+[`worktree-convention-2026.md`](../evolution/worktree-convention-2026.md): layout umbrella
+**`~/worktrees/<repo>/<branch-slug>/`** (crédito: prática de campo do metagamify; padrão de mercado
+gwq para fluxos paralelos com agentes IA). Efêmeros tool-managed (vendor-branch/mktemp, adopt legacy,
+`Workflow isolation`, `.claude/worktrees/` do harness) ficam fora — continuam gerenciados por quem os
+cria. Caveat registrado na convenção: o farol de sessão é por working-tree — worktrees irmãs não se
+veem via beacon; o handoff entre elas confia na convenção + commit (slice futuro anotado).

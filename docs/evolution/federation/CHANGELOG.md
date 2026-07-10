@@ -8,6 +8,22 @@
 
 ---
 
+## 2026-07-10 · Convenção de worktrees codificada: `~/worktrees/<repo>/<branch-slug>` (crédito: metagamify) · COMPATÍVEL · alvo: todos
+
+- **A prática de campo do metagamify virou doutrina**: worktrees duráveis do maestro agora têm layout
+  canônico — umbrella **`~/worktrees/<repo>/<branch-slug>/`** (branch-slug em kebab, `/`→`-`).
+  Doc novo: `docs/evolution/worktree-convention-2026.md` (chega via `--update`). O comportamento
+  (topologia W3, um-escritor-por-escopo, handoff commitado) não muda — só a localização/nomenclatura,
+  que era ad-hoc, foi decidida. Fundamentação: padrão de mercado 2026 (gwq umbrella) p/ fluxos
+  paralelos com agentes IA e multi-repo — o caso da federação.
+- **Fora do escopo**: worktrees efêmeros tool-managed (vendor-branch, adopt, `Workflow isolation`,
+  `.claude/worktrees/` do harness) seguem gerenciados por quem os cria. Worktrees NÃO viram lineages
+  no members.yaml. **Grandfather**: os pré-convenção (`~/metagamify-rhilo-atual`, `~/rhilo-app-atual`)
+  ficam onde estão até recriação natural.
+- **Caveat registrado**: o farol de sessão é por working-tree — worktrees irmãs não se veem via
+  beacon; o handoff entre elas confia na convenção + commit (slice futuro anotado, abre com incidente real).
+- Ação p/ adotantes: nenhuma obrigatória. Worktree novo → criar no layout canônico.
+
 ## 2026-07-10 · Fix importante pós-update: lint de marketplace não bloqueia mais o consumidor + stamp determinístico · COMPATÍVEL · alvo: todos
 
 - **Se o seu lint ficou HARD-red após um `--update`** (12 violações "plugin ausente"/"não registrado

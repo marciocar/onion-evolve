@@ -48,7 +48,7 @@ related:
 |---|-----------|-----------|
 | W1 | Source-driven por path | sessão do core opera o alvo por path (adopt por-path, `--in-place`, ponta adormecida com commit isolado + log) |
 | W2 | Sessão do alvo (canônico) | um escritor por repo (I3); o core **indica**, a instância executa |
-| W3 | Duas sessões, mesmo repo | handoff por worktree (escopo) OU sala-de-design/sala-de-obra (função) |
+| W3 | Duas sessões, mesmo repo | handoff por worktree (escopo) OU sala-de-design/sala-de-obra (função); layout dos worktrees: [worktree-convention](../../evolution/worktree-convention-2026.md) |
 | W4 | Par local (1 máquina) | carteiro-local automatiza transporte+notificação (`co-deliver`/`co-relay`) |
 | W5 | Membro remoto | git-async mediado pelo maestro (sem carteiro-local) |
 | W6 | **Responder-gated** | a sessão do destino **propõe rascunho** ao ver 📬/📥/⏰; maestro confirma (ato 3 = propor→confirmar) |

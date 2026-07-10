@@ -67,7 +67,8 @@ KG (`/meta:kg`) — ortogonal ao merge de arquivo ("git merge não reconcilia ve
 
 ## Invariantes
 - **Versão × escopo separados**: escopo = camadas que compõem (esta convenção); versão = `vendor-branch` no tempo.
-  **Branch NÃO é escopo** (não compõe — RFC-0005 §3).
+  **Branch NÃO é escopo** (não compõe — RFC-0005 §3). Worktree/branch é o eixo versão/paralelismo — layout
+  canônico dos worktrees do maestro na [worktree-convention](worktree-convention-2026.md).
 - **Cavalgar o nativo** (non-friction): o plano cognitivo é grátis; só o `settings.json` do time exige o compose.
 - **Never-clobber**: o compose é merge determinístico + proveniência, não clobber.
 

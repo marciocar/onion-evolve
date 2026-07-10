@@ -73,7 +73,7 @@ O **harness** (sessões, subagentes, a ferramenta nativa `Workflow`/orquestraç�
 | Modo | Unidade que se comunica | Mecanismo | Estado |
 |------|-------------------------|-----------|--------|
 | **Solo** | eu-comigo-no-tempo | memória + sessões (recall automático) | ✅ maduro |
-| **Equipe** | devs-no-mesmo-repo | worktrees + handoff (1-escritor/escopo) | 🔴 gap (informal) — **gated** |
+| **Equipe** | devs-no-mesmo-repo | worktrees + handoff (1-escritor/escopo; layout: [worktree-convention](../../evolution/worktree-convention-2026.md)) | 🟡 layout codificado; orquestração N-devs segue **gated** |
 | **Federação** | repos-separados | Ledger git + doc-bridge (`/meta:co-*`, `/meta:federation-*`) | ✅ produção |
 
 - **Fontes canônicas:** [Multi-repo Federation](multi-repo-federation.md) ·
@@ -107,7 +107,8 @@ A disciplina operacional do executor é **regra global** (carrega em toda sessã
 
 - **Fonte canônica:** `~/.claude/rules/working-discipline.md` — git (confirmar PR merged antes de deletar
   branch; add seletivo em repo que recebe correspondência), localização multi-repo/worktree (anunciar onde
-  se opera), legibilidade (rotular referências opacas), fan-out (detectar é dever, executar é opt-in),
+  se opera; layout canônico: [worktree-convention](../../evolution/worktree-convention-2026.md)),
+  legibilidade (rotular referências opacas), fan-out (detectar é dever, executar é opt-in),
   gestão de memória (híbrido + recall automático + checagem leve de coerência).
 
 ## 5. O que NÃO fazer (anti-padrões — doutrina anti-inchaço)
