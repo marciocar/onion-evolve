@@ -8,6 +8,16 @@
 
 ---
 
+## 2026-07-10 · Assinatura da família nos PRs: 🧅 "Gerado por Claude Code usando Onion" · COMPATÍVEL · alvo: todos
+
+- **Novo padrão de superfície** (decisão do maestro, 2026-07-10): todo corpo de PR criado pelo fluxo
+  Onion termina com a assinatura da família —
+  `🧅 Gerado por [Claude Code](https://claude.com/claude-code) usando [Onion](https://onionevolve.com)`.
+  Substitui o default do harness ("🤖 Generated with Claude Code") e a regra anterior de não mencionar
+  IA no PR (a assinatura é a exceção única e deliberada — é a autoria da família).
+- **Onde vive**: `/engineer:pr` v3.3.0 (chega via `/meta:adopt --update`). Aplique também em PRs
+  abertos fora do comando (sessões ad-hoc): a assinatura é do fluxo, não só do comando.
+
 ## 2026-07-10 · Convenção de worktrees codificada: `~/worktrees/<repo>/<branch-slug>` (crédito: metagamify) · COMPATÍVEL · alvo: todos
 
 - **A prática de campo do metagamify virou doutrina**: worktrees duráveis do maestro agora têm layout
