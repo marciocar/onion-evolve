@@ -18,7 +18,7 @@ related:
 |-------|-------|
 | **Decisão** | A vertical de **design** e o **KG-SDAAL** são **eixos ortogonais**, não concorrentes: design **DIVERGE** (generativo — largar N versões, gate WCAG decide) e o KG **REGE** (rastreabilidade + fonte-única, depois de decidir). A rastreabilidade de átomos de front (`atom-map`/`SourceTag`) **estende o KG dogfoodado** — **não** constrói um 2º grafo/registro de "fonte da verdade". |
 | **Escopo** | Design + investigação (KG). Não toca produto/engenharia/compliance nem o transporte. |
-| **Status** | ✅ **Aceito (doutrinário)** — 2026-07-09. Doutrina; **zero código agora**. A materialização (átomos de design como nós do KG) fica **gated no artefato** `atom-map` do metagamify (declarado≠verificado). **Gate SATISFEITO em 2026-07-09** — o artefato real chegou via relay do rhilo-app ([inbox/_processed/2026-07-09-artefato-command-center-atom-map.md](../evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md)): ~35 átomos com fonte/dono-de-exibição/dono-de-escrita, ledger de de-dup e invariante grep-verificável. Materialização liberada para o backlog. |
+| **Status** | ✅ **Aceito (doutrinário)** — 2026-07-09. Doutrina; **zero código agora**. A materialização (átomos de design como nós do KG) fica **gated no artefato** `atom-map` do metagamify (declarado≠verificado). **Gate SATISFEITO em 2026-07-09** — o artefato real chegou via relay do rhilo-app ([inbox/_processed/2026-07-09-artefato-command-center-atom-map.md](../evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md)): ~35 átomos com fonte/dono-de-exibição/dono-de-escrita, ledger de de-dup e invariante grep-verificável. **Materialização EXECUTADA em 2026-07-10** (branch `feat/kg-domain-layer`): átomo = nó `layer: domain`, fonte-única = checagem do radar-de-domínio (`kg-radar.sh`), doutrina na KB [knowledge-graph-sdaal §design/atom-map](../knowledge-base/concepts/knowledge-graph-sdaal.md). |
 | **Origem** | Síntese do maestro ao triar o sinal 2 do metagamify (SDAAL→design): "cara-crachá interessante… a questão é manter eficiência e eficácia **sem sobrepor**". |
 
 ---
@@ -29,6 +29,9 @@ design no KG + checagem de integridade) liga quando o artefato `atom-map` real c
 **Update (mesmo dia, triagem noturna):** o artefato chegou — relay do **rhilo-app** (não do metagamify),
 arquivado em `../evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md`. O gate está
 satisfeito; a materialização é item de backlog aberto (não executado nesta triagem).
+**Update 2026-07-10:** materialização **executada** junto com a promoção da camada domain (sinal
+kg-dogfood-completo): schema do átomo (`entity` + `READS`/`WRITES`/`TRACES_TO`), checagem fonte-única no
+radar-de-domínio e doutrina na KB. `SourceTag` permanece adaptador do adotante — o core não ganhou motor de UI.
 
 ## Contexto
 Duas forças convergiram e **pareciam competir**:

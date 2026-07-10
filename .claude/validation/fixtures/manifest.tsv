@@ -1,6 +1,6 @@
 # Manifesto de fixtures do auto-teste de guardas (lint-selftest.sh)
 # Colunas TAB-separadas: kind	fixture	target	verdict	keyword
-#   kind    : lint | contract | merge
+#   kind    : lint | fix | contract | merge | kg
 #             merge: exercita .claude/utils/adopt/merge-onion-hooks.sh com a
 #                    fixture como settings.json-ALVO; target/verdict/keyword = '-'
 #                    (asserção é semântica: presença + preservação + idempotência).
@@ -8,7 +8,7 @@
 #   target  : subdir do repo onde injetar (só kind=lint; use '-' p/ contract).
 #             Evite campos vazios no MEIO da linha: IFS=tab colapsa tabs
 #             consecutivos. Campos vazios só no FIM (ex.: keyword) são seguros.
-#   verdict : lint -> bad|good|exempt ; contract -> pass|fail
+#   verdict : lint -> bad|good|exempt ; contract/kg -> pass|fail (kg = exit de kg-radar.sh --integrity)
 #   keyword : substring esperada na violação (só verdict=bad; vazio caso contrário)
 # Linhas iniciadas por '#' e linhas em branco são ignoradas.
 kind	fixture	target	verdict	keyword
@@ -58,3 +58,6 @@ lint	r23-frontmatter/bad-command-no-model.md	.claude/commands/meta	bad	sem model
 lint	r23-frontmatter/good-command-full.md	.claude/commands/meta	good
 lint	r23-frontmatter/bad-agent-no-category.md	.claude/agents/development	bad	sem category:
 lint	r23-frontmatter/good-agent-full.md	.claude/agents/development	good
+kg	kg-domain/good-domain.kg.yaml	-	pass
+kg	kg-domain/warn-domain-gaps.kg.yaml	-	pass
+kg	kg-domain/bad-integrity.kg.yaml	-	fail

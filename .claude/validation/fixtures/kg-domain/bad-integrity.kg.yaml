@@ -1,0 +1,20 @@
+# Fixture: grafo QUEBRADO — layer inválido, aresta para nó inexistente,
+# on: apontando evento inexistente.
+# Espera: kg-radar.sh --integrity exit 1.
+meta:
+  id: fixture-bad-integrity
+  date: 2026-07-10
+nodes:
+  - id: ST_ONLY
+    node_type: state
+    layer: cosmic
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "estado com layer invalido"
+edges:
+  - from: ST_ONLY
+    to: ST_MISSING
+    edge_type: TRANSITIONS
+    on: EV_MISSING
