@@ -15,7 +15,8 @@ O Onion (framework) evolui; **muitos projetos** o adotam. Sem método, duas dore
 
 - **Orquestração, não autonomia:** o humano (você) é o **maestro**; agentes rodam async, cada um no seu escopo. O risco que se controla é **ler+interpretar+executar** automático sem gate — **não** "agentes se falarem". **Transportar** e **notificar** mensagens podem ser automáticos (determinísticos); **executar** o que chega é gate humano. A2A é ortogonal. Por isso o **A2A-runtime cross-repo fica `hold`** (auto-execução distribuída + atomicidade multi-repo inexistente), não por proibir conversa. Eixo completo: [`../analysis/onion-adr-comms-transport-vs-execution-2026-06.md`](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md).
 - **Coordenação = git-async:** mensagens são **markdown commitado** (padrão *drop-box* / GitHub Squad). "Async dentro do repo escala melhor que tempo-real."
-- **Um escritor por repo:** cada repo tem uma sessão dona; **git worktrees** para paralelismo no mesmo repo.
+- **Um escritor por repo:** cada repo tem uma sessão dona; **git worktrees** para paralelismo no mesmo repo
+  (layout canônico: [`worktree-convention-2026.md`](worktree-convention-2026.md)).
 - **Eficiência > cerimônia:** o mínimo que destrava; maquinaria formal só quando se paga.
 
 ## Linguagem ubíqua
@@ -77,6 +78,8 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
 ### Handoff — Dentro de um repo (sessões paralelas)
 *Duas sessões no mesmo repo não colidem.*
 - **git worktrees** (isolamento) + **um escritor por escopo** + **handoff commitado** (cada sessão registra o que fez antes de sair).
+  Localização/nomenclatura dos worktrees duráveis: [`worktree-convention-2026.md`](worktree-convention-2026.md)
+  (`~/worktrees/<repo>/<branch-slug>` — crédito: prática de campo do metagamify).
 - O handoff é uma das **7 topologias de sessão** (Eixo E, valores W1-W7 — quem trabalha onde, a partir de onde): a
   taxonomia completa (source-por-path, sessão-do-alvo, responder-gated, ⏰ reflexão etc.) vive no
   [ADR work-models](../analysis/onion-adr-work-models-session-topologies-2026-07.md) + KB
