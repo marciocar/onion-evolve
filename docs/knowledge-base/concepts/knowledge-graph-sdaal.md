@@ -139,6 +139,34 @@ rhilo-app em [2026-07-09](../../evolution/inbox/_processed/2026-07-09-artefato-c
 gate WCAG decide); o KG **rege** (fonte-única + rastreabilidade, depois de decidir). Eixos
 ortogonais — dois papéis, um substrato.
 
+## Mapeamento completo — o playbook (`/meta:kg map <área>`)
+
+> **Situação (recognition-primed):** vai redesenhar/refatorar/assumir uma área e o conhecimento dela
+> vive espalhado (telas, endpoints, regras implícitas). **Playbook:** mapear a área como SSOT de
+> domínio ANTES de mexer — o contrato primeiro, o pixel/refactor depois. Nasceu de 2 dogfoods reais
+> do rhilo e se repete a cada adotante que assume uma área (metagamify → GranaAi → …).
+
+O PFR completo (F0 inventário → F1 contrato → F2 `.kg.yaml` → F3 radar → F4 adaptador) vive no
+comando [`/meta:kg`](../../../.claude/commands/meta/kg.md) §Modo map. O essencial doutrinário:
+
+- **F1 tem 3 variantes — todas por identidade, não analogia** (o mesmo motor, o mesmo radar):
+  1. **UI → atom-map** (contrato de átomos): 1 átomo = 1 fonte + 1 dono-de-exibição + 1
+     dono-de-escrita; `SourceTag` (endpoint+concept+formula) como rastreabilidade-componente;
+     ledger de de-duplicação; **pergunta atômica por aba**. Exemplar:
+     [artefato command-center](../../evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md).
+  2. **Backend/API/funcionalidade → fatias de domínio**: entidades/estados/eventos/regras ancoradas
+     no código; endpoint = `entity` fonte. Exemplar:
+     [kg-dogfood-completo](../../evolution/inbox/_processed/2026-07-08-kg-dogfood-completo-promover.md)
+     (4 fatias: ciclo do SLOT, integração PULL, máquina de SLA, dicionário ubíquo).
+  3. **Jornadas/fluxos → máquina de estados**: passos = `state` do progresso do ator/processo,
+     avanço = `TRANSITIONS(on evento)`, cada passo `TRACES_TO` tela/endpoint. O radar entrega valor
+     imediato: **estado-absorvente = drop-off/limbo do funil**. Tipos novos (`actor`, `step`) só
+     quando um dogfood provar a falta — gated-until-trigger, a doutrina deste próprio comando.
+- **O doc-contrato e o grafo se referenciam** (atom-map = join, per ADR): doc = contrato humano que
+  as fases de implementação obedecem; `.kg.yaml` = camada máquina que o radar verifica.
+- **Invariante grep-verificável no repo do adotante**: cada endpoint-dono aparece como fonte de
+  exibição em 1 componente ("cara-crachá" — `verify-read-path-first` aplicado ao front).
+
 ## Generalização para o core — EXECUTADA (2026-07-10) + Fase 2
 
 O gate abriu (2026-07-04) e a camada domain foi promovida (2026-07-10, sinal
