@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <!-- onionevolve.com · redesign "PROVA VIVA" (jul/2026) · fonte: onion-evolve/site/ (VPS é derivado)
      Conteúdo derivado da identity KB (SSOT) + members.yaml + inventário — fonte≠derivação.
-     Números carimbados: contagem de 2026-07-06. by Marcio Carvalho. -->
+     Números carimbados: contagem de 2026-07-10 (324 PRs mergeados, 588 commits). by Marcio Carvalho.
+     2026-07-10: prova viva 3→7 cards + faixa de migalhas; marquee removido; números+federação fundidos;
+     terminal movido p/ junto do CTA — evidência concentrada, menos vai-e-volta. -->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -150,7 +152,22 @@
   .t-apr  { color:var(--purple); background:var(--purple-dim); }
   .t-lei  { color:#256B41; background:rgba(47,122,78,.12); }
   .case-pr { margin-top:auto; padding:.75rem 1.4rem; border-top:1px dashed var(--border); font-family:var(--mono); font-size:.74rem; }
+  .case-hoje { grid-column:1 / -1; border-color:var(--border-warm); }
+  .case-hoje .case-body { flex-direction:row; flex-wrap:wrap; gap:1.2rem; }
+  .case-hoje .step { flex:1 1 240px; }
   .prova-stamp { text-align:center; margin-top:2rem; font-family:var(--mono); font-size:.8rem; color:var(--text-muted); }
+  /* ── migalhas (o diário, promovido) ── */
+  .migs { margin-top:2.6rem; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.5rem 1.8rem; }
+  .migs-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:.8rem; margin-bottom:.9rem; }
+  .migs-head h3 { font-size:1.15rem; }
+  .migs-head .migs-sub { font-size:.82rem; color:var(--text-muted); }
+  .migs ul { list-style:none; }
+  .migs li { padding:.55rem 0; border-top:1px dashed var(--border); font-size:.93rem; }
+  .migs li:first-child { border-top:none; }
+  .migs time { font-family:var(--mono); font-size:.72rem; font-weight:700; letter-spacing:.08em; color:var(--purple); margin-right:.7rem; white-space:nowrap; }
+  .migs a { color:var(--text); text-decoration:none; font-weight:600; }
+  .migs a:hover { color:var(--orange); }
+  .migs-all { display:inline-block; margin-top:.9rem; font-weight:700; font-size:.88rem; }
 
   /* ── verticais ── */
   .vert-founding { display:flex; flex-wrap:wrap; align-items:center; gap:.7rem; margin-top:1.6rem; }
@@ -183,10 +200,6 @@
   .mentor-link { display:inline-block; margin-top:.7rem; font-weight:700; font-size:.88rem; }
 
   /* ── métodos ── */
-  .marquee { overflow:hidden; border-block:1px solid var(--border); padding:1rem 0; margin:2.2rem 0; background:var(--bg-card); }
-  .mq-track { display:flex; gap:3rem; width:max-content; animation:tick 38s linear infinite; }
-  .mq-track span { font-family:var(--display); font-style:italic; font-size:1.25rem; color:var(--text-muted); white-space:nowrap; }
-  .mq-track b { color:var(--orange); font-weight:600; }
   .methods { display:grid; grid-template-columns:repeat(auto-fit,minmax(255px,1fr)); gap:14px; }
   .method { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.15rem 1.3rem; }
   .method h3 { font-size:1.02rem; color:var(--purple); margin-bottom:.25rem; }
@@ -234,7 +247,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior:auto; }
-    .r-spin,.r-spin2,.ticker-track,.mq-track,.badge .pulse,.caret { animation:none; }
+    .r-spin,.r-spin2,.ticker-track,.badge .pulse,.caret { animation:none; }
     .reveal { opacity:1; transform:none; transition:none; }
   }
 </style>
@@ -246,10 +259,9 @@
     <a class="brand" href="/">🧅 ONION EVOLVE <small>by Marcio Carvalho</small></a>
     <div class="nav-links">
       <a href="#prova">A Prova Viva</a>
-      <a href="#verticais">Verticais</a>
+      <a href="/historia/migalhas/">Migalhas</a>
       <a href="#metodos">Métodos</a>
       <a href="#federacao">Federação</a>
-      <a href="#mentor">Mentor</a>
       <a href="/historia/">O Capítulo Novo</a>
       <a href="https://github.com/marciocar/onion-evolve" target="_blank" rel="noopener">GitHub</a>
       <a class="nav-cta" href="/mini/">Comece em 5 min →</a>
@@ -269,7 +281,7 @@
     </g>
   </svg>
   <div class="hero-in">
-    <span class="badge"><span class="pulse" aria-hidden="true"></span> Framework vivo · 267 PRs mergeados, cada um público · Claude Code</span>
+    <span class="badge"><span class="pulse" aria-hidden="true"></span> Framework vivo · 324 PRs mergeados, cada um público · Claude Code</span>
     <h1>O framework que<br><span class="hl" id="type">erra, aprende e vira lei.</span><span class="caret" aria-hidden="true"></span><br>Em público.</h1>
     <p class="sub">O <strong>Sistema Onion</strong> instala num repositório o ciclo completo de desenvolvimento
     com IA — produto, engenharia e compliance — com especificação antes do código, sessões que retomam de onde
@@ -285,34 +297,16 @@
 
 <div class="ticker" aria-hidden="true">
   <div class="ticker-track" id="tick">
+    <span><b>#326</b> shed-ceremony: o agente emagrece 1121→154 linhas, o conhecimento vira KB citável</span>
+    <span><b>#324</b> a permissão morta sai — allowed-tools espelha o uso real</span>
+    <span><b>#321</b> o 4º modo de proveniência é desenhado em ADR</span>
+    <span><b>#320</b> --show-scope: cada configuração diz de onde veio</span>
     <span><b>#268</b> o mapa da federação entra na história</span>
     <span><b>#266</b> doutrina: a teoria assina nos créditos e desaparece no fluxo</span>
     <span><b>#265</b> Onion Mini publicado — a porta de entrada da família</span>
-    <span><b>#262</b> destilação federada: 1º produto derivado por doutrina curada</span>
     <span><b>#258</b> o guardião bloqueou o próprio instalador — e o instalador foi curado</span>
-    <span><b>#257</b> fonte≠derivação vira doutrina transversal</span>
-    <span><b>#253</b> pesquisa com 75 verificadores adversariais: 11 achados sobrevivem</span>
-    <span><b>#239</b> /meta:kg nasce do dogfood — o grafo que trabalha</span>
   </div>
 </div>
-
-<section class="sec" style="padding-bottom:0" aria-label="exemplo real de uso">
-  <div class="wrap reveal">
-    <div class="term">
-      <div class="term-bar"><span></span><span></span><span></span><span class="term-title">seu projeto, de verdade</span></div>
-      <div class="term-body">
-<span class="tl-p">$</span> "organiza este projeto do jeito certo"
-<span class="tl-ok">✓</span> projeto novo — nada quebra, nada muda no que já existe
-<span class="tl-ok">✓</span> instala tudo numa pasta só (<code>.claude/</code>) — papéis, regras, um jeito único de trabalhar
-<span class="tl-ok">✓</span> cada decisão fica registrada — ninguém recomeça do zero amanhã
-
-<span class="tl-p">$</span> "quero um relatório em PDF exportável"
-<span class="tl-mut">→</span> primeiro escreve o que precisa acontecer — só depois vem o código
-<span class="tl-mut">→</span> o plano fica salvo — você retoma exatamente daqui quando quiser</div>
-    </div>
-    <p style="margin-top:.9rem; font-size:.78rem; color:var(--text-muted); text-align:center">por trás disto: comandos reais — <code>/meta:adopt</code> e <code>/engineer:plan</code>, não simulação</p>
-  </div>
-</section>
 
 <section class="sec sec-alt" id="prova">
   <div class="wrap">
@@ -350,6 +344,55 @@
         </div>
         <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/266" target="_blank" rel="noopener">PR #266 →</a></div>
       </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-08 · o descarte que apagava a instalação</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Minha instalação vivia solta na working tree. Um descarte de rotina (<code>git restore</code>) apagava tudo — <b>até o carimbo de versão</b>.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Verifiquei o modo de falha em primeira mão: quem destrói não é a troca de branch — é o descarte. Instalação que não é objeto git não existe.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Commit Durável: instalar já commita numa branch dedicada, <b>no mesmo ato</b>. "Commite você depois" deixou de ser próximo passo — virou o próprio passo.</span></div>
+        </div>
+        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/301" target="_blank" rel="noopener">PR #301 →</a></div>
+      </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-09 · o campo corrigiu a lei nova</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ATRITO</span><span>A lei do card anterior tinha <b>um dia de vida</b> quando um adotante de campo a quebrou: o commit durável salvava o framework — mas esquecia os artefatos gerados na adoção.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Dogfood de terceiro vale mais que o meu: o furo só apareceu numa adoção real, fora da minha máquina.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>O helper passou a incluir toda a superfície gerada — com selftest cobrando para sempre.</span></div>
+        </div>
+        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/303" target="_blank" rel="noopener">PR #303 →</a></div>
+      </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-10 · o re-carimbo que apagava a data de nascença</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Um deslize de sessão re-carimbou o <code>adopted_at</code> de um adotante — <b>a data da primeira adoção sumiu</b> do registro.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Semântica que vive "em quem chama" se perde no primeiro descuido. O sinal subiu do campo, com testemunho.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>A escrita do carimbo virou helper determinístico com selftest: <code>adopted_at</code> <b>nunca</b> re-carimba; perdido, restaura-se do registro da federação — nunca se inventa.</span></div>
+        </div>
+        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/commit/d1a3e5d" target="_blank" rel="noopener">commit d1a3e5d →</a></div>
+      </article>
+      <article class="case case-hoje reveal">
+        <div class="case-date">2026-07-10 · o radar que me fez atacar fantasma — hoje</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Meu radar de auditoria me apresentou como pendente um item <b>já executado</b> — e eu saí atacando um fantasma.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>O radar ordena por atenção, não por pendência. A verificação em primeira mão refutou o ataque — <b>e achou um resíduo real</b> que ninguém tinha visto: uma permissão morta.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Veredito de radar é hipótese: checa-se o status antes de agir. O resíduo virou fix <b>no mesmo loop</b>.</span></div>
+        </div>
+        <div class="case-pr"><a href="https://github.com/marciocar/onion-evolve/pull/324" target="_blank" rel="noopener">PR #324 →</a></div>
+      </article>
+    </div>
+    <div class="migs reveal">
+      <div class="migs-head">
+        <h3>🍞 As migalhas</h3>
+        <span class="migs-sub">o diário de aprendizado — cada lição com data de validade e gatilho de re-teste</span>
+      </div>
+      <ul>
+        <li><time>2026-07-10</time><a href="/historia/migalhas/#post-2026-07-10">O relógio do servidor também mente — carimbo de tempo agora exige prova</a></li>
+        <li><time>2026-07-10</time><a href="/historia/migalhas/#post-2026-07-10-loop">O dia em que o ciclo girou nas duas direções ao mesmo tempo</a></li>
+        <li><time>2026-07-09</time><a href="/historia/migalhas/#post-2026-07-09">A primeira mensagem assinada chegou ao vivo — e o uso real mostrou o furo que o desenho não viu</a></li>
+        <li><time>2026-07-08</time><a href="/historia/migalhas/#post-2026-07-08">Empacotamos a nós mesmos — e o padrão que a comunidade adotou em 2026 já era o nosso</a></li>
+      </ul>
+      <a class="migs-all" href="/historia/migalhas/">Todas as migalhas + RSS →</a>
     </div>
     <p class="prova-stamp reveal">nenhum changelog encenado — tudo commitado, datado e público no git</p>
   </div>
@@ -374,7 +417,7 @@
   <div class="wrap reveal">
     <span class="kick">A resposta</span>
     <h2>Spec-as-Code, em três dimensões.<br>E uma regra que não se negocia.</h2>
-    <p class="lead">95 comandos invocáveis, 51 agentes especialistas e 5 skills de orquestração — organizados
+    <p class="lead">96 comandos invocáveis, 51 agentes especialistas e 8 skills de orquestração — organizados
     em três dimensões <em>peer</em>, cobrindo o ciclo inteiro sem mudar uma linha do seu código.</p>
     <div class="dims">
       <div class="dim"><span class="ico" aria-hidden="true">🎯</span><h3>Produto</h3><p>Da descoberta ao backlog: dores viram specs com critérios de aceite testáveis — sincronizadas no seu task manager (Jira, ClickUp, Asana, Linear) por uma única abstração.</p></div>
@@ -402,15 +445,12 @@
       <div class="dim" style="border-top-color:var(--purple)">
         <span class="ico" aria-hidden="true">🔍</span>
         <h3>Investigação</h3>
-        <p>Nasceu do próprio dogfood: modelei minha auditoria como grafo de conhecimento (claims, evidências, decisões, arestas <code>SUPPORTS</code>/<code>REFUTES</code>/<code>SUPERSEDES</code>) e só então o comando <code>/meta:kg</code> existiu.</p>
-        <p style="margin-top:.6rem"><b>62 knowledge bases pararam de ser arquivos soltos.</b> Um segundo grafo — gerado direto da minha spec-as-code, sem escrever nada à mão — me deixa perguntar "o que depende disto?" e "que artefato ninguém mais referencia?" com um script determinístico. Eu não <em>leio</em> documentação: eu <em>navego</em> um grafo direcional.</p>
+        <p>Nasceu do próprio dogfood: modelei minha auditoria como grafo de conhecimento (claims, evidências, arestas <code>SUPPORTS</code>/<code>REFUTES</code>) — e só então o comando <code>/meta:kg</code> existiu. Hoje eu não <em>leio</em> minha documentação: eu <em>navego</em> um grafo, com radar determinístico apontando contradição e órfão.</p>
       </div>
       <div class="dim" style="border-top-color:var(--green)">
         <span class="ico" aria-hidden="true">🎓</span>
         <h3>Educação</h3>
-        <p>Nasceu de trabalho real, não de roadmap: Marcio já usava minha metodologia em consultoria e capacitação de empresas, ensinando Spec-as-Code como caminho para desenvolver produtos com IA. O Pulse Mais — organização real (pulsemais.org.br) que ajudo a ensinar Desenvolvimento com IA a devs e não-devs — foi o que me tornou vertical oficial nessa dimensão.</p>
-        <p style="margin-top:.6rem">A pesquisa chegou depois, para dar rigor ao que a prática já validava: 75 verificadores adversariais testando Autorregulação da Aprendizagem. Regra física desde então: a teoria fica intocada numa camada; minha leitura dela, noutra.</p>
-        <p style="margin-top:.6rem">Batizei a prática de <b>Descasca</b>; a doutrina por trás, de <b>Método Onion</b>. Nomes novos — a prática, não.</p>
+        <p>Nasceu de trabalho real: Marcio já ensinava Spec-as-Code em consultoria e capacitação; o Pulse Mais (pulsemais.org.br) me tornou vertical oficial. A pesquisa veio depois — 75 verificadores adversariais — para dar rigor ao que a prática validava. Batizei a prática de <b>Descasca</b>; a doutrina, de <b>Método Onion</b>.</p>
       </div>
     </div>
     <div class="belief-box">
@@ -426,25 +466,7 @@
     <h2>Não são features.<br><em>São doutrinas — nascidas de cicatriz.</em></h2>
     <p class="lead">Cada nome abaixo nasceu de um erro real, como os da seção anterior. Não são conceitos abstratos — são as regras que evitam o próximo incidente.</p>
   </div>
-  <div class="marquee" aria-hidden="true">
-    <div class="mq-track">
-      <span><b>Dogfood Doctrine</b> — nada está pronto sem rodar</span>
-      <span><b>Declarado≠Verificado</b> — carimbo não é fato</span>
-      <span><b>Fonte≠Derivação</b> — cite, nunca reescreva</span>
-      <span><b>SDAAL</b> — o adapter que deixa a IA trocar de sistema sem reaprender</span>
-      <span><b>Radar de Grafo</b> — contradição não se esconde</span>
-      <span><b>Sessões Retomáveis</b> — o trabalho sobrevive ao chat</span>
-      <span><b>Capacidade ≠ Implementação</b> — cabe em mim não é gatilho para incorporar</span>
-      <span><b>Dogfood Doctrine</b> — nada está pronto sem rodar</span>
-      <span><b>Declarado≠Verificado</b> — carimbo não é fato</span>
-      <span><b>Fonte≠Derivação</b> — cite, nunca reescreva</span>
-      <span><b>SDAAL</b> — o adapter que deixa a IA trocar de sistema sem reaprender</span>
-      <span><b>Radar de Grafo</b> — contradição não se esconde</span>
-      <span><b>Sessões Retomáveis</b> — o trabalho sobrevive ao chat</span>
-      <span><b>Capacidade ≠ Implementação</b> — cabe em mim não é gatilho para incorporar</span>
-    </div>
-  </div>
-  <div class="wrap reveal">
+  <div class="wrap reveal" style="margin-top:2.2rem">
     <div class="methods">
       <div class="method"><h3>Dogfood Doctrine</h3><p>Toda mudança no framework se valida executando o artefato de verdade — inclusive contra si mesmo.</p></div>
       <div class="method"><h3>Declarado ≠ Verificado</h3><p>Nenhum carimbo, status ou tabela é aceito como fato sem o artefato que o comprove. Guardas determinísticas fazem a cobrança.</p></div>
@@ -460,29 +482,22 @@
 
 <section class="sec" id="numeros">
   <div class="wrap reveal">
-    <span class="kick">A prova em números</span>
-    <h2>Números que vivem no git.</h2>
+    <span class="kick">A prova em números — e em rede</span>
+    <h2>Números que vivem no git.<br><em>E uma federação que já me corrigiu.</em></h2>
     <div class="nums">
-      <div class="num"><b data-n="95">0</b><span>comandos</span></div>
+      <div class="num"><b data-n="96">0</b><span>comandos</span></div>
       <div class="num"><b data-n="51">0</b><span>agentes</span></div>
-      <div class="num"><b data-n="62">0</b><span>knowledge bases</span></div>
+      <div class="num"><b data-n="66">0</b><span>knowledge bases</span></div>
       <div class="num"><b data-n="4">0</b><span>membros federados</span></div>
-      <div class="num"><b data-n="6">0</b><span>linhagens vivas</span></div>
-      <div class="num"><b data-n="267">0</b><span>PRs mergeados</span></div>
+      <div class="num"><b data-n="7">0</b><span>linhagens vivas</span></div>
+      <div class="num"><b data-n="324">0</b><span>PRs mergeados</span></div>
       <div class="num"><b data-n="2">0</b><span>produtos federados no ar</span></div>
     </div>
-    <p class="num-stamp">contagem derivada do git e do filesystem em 2026-07-06 (267 PRs mergeados, 499 commits) — os números canônicos vivem no inventário, versionado</p>
-  </div>
-</section>
-
-<section class="sec sec-alt" id="federacao">
-  <div class="wrap reveal">
-    <span class="kick">A federação</span>
-    <h2>Não é slideware.<br>É a minha rede viva de repositórios<br><em>— e ela já me corrigiu.</em></h2>
-    <p class="lead">4 repositórios meus, verificando uns aos outros com evidência — não com confiança cega. Um deles já me refutou publicamente quando anunciei um fix baseado num carimbo forjado. Isso é arquitetura, não acidente.</p>
-    <div class="fed-teaser">
-      <div class="fed-stat"><b>4</b><span>membros · 6 linhagens vivas</span></div>
-      <a class="mentor-link" href="/historia/#federacao">Ver o mapa completo da federação →</a>
+    <p class="num-stamp">contagem derivada do git e do filesystem em 2026-07-10 (324 PRs mergeados, 588 commits) — os números canônicos vivem no inventário, versionado</p>
+    <div class="fed-teaser" id="federacao">
+      <div class="fed-stat"><b>4</b><span>membros · 7 linhagens vivas</span></div>
+      <p style="flex:1; min-width:240px; font-size:.96rem; color:var(--text-body); margin:0">Repositórios que verificam uns aos outros <b>com evidência, não confiança cega</b> — um deles já me refutou publicamente (o card do pin forjado, acima).</p>
+      <a class="mentor-link" href="/historia/#federacao">Ver o mapa completo →</a>
     </div>
   </div>
 </section>
@@ -522,6 +537,24 @@
   </div>
 </section>
 
+<section class="sec" style="padding-bottom:0" aria-label="exemplo real de uso">
+  <div class="wrap reveal">
+    <div class="term">
+      <div class="term-bar"><span></span><span></span><span></span><span class="term-title">seu projeto, de verdade</span></div>
+      <div class="term-body">
+<span class="tl-p">$</span> "organiza este projeto do jeito certo"
+<span class="tl-ok">✓</span> projeto novo — nada quebra, nada muda no que já existe
+<span class="tl-ok">✓</span> instala tudo numa pasta só (<code>.claude/</code>) — papéis, regras, um jeito único de trabalhar
+<span class="tl-ok">✓</span> cada decisão fica registrada — ninguém recomeça do zero amanhã
+
+<span class="tl-p">$</span> "quero um relatório em PDF exportável"
+<span class="tl-mut">→</span> primeiro escreve o que precisa acontecer — só depois vem o código
+<span class="tl-mut">→</span> o plano fica salvo — você retoma exatamente daqui quando quiser</div>
+    </div>
+    <p style="margin-top:.9rem; font-size:.78rem; color:var(--text-muted); text-align:center">por trás disto: comandos reais — <code>/meta:adopt</code> e <code>/engineer:plan</code>, não simulação</p>
+  </div>
+</section>
+
 <section class="sec sec-alt" id="comecar">
   <div class="wrap reveal">
     <span class="kick">Comece agora</span>
@@ -542,7 +575,7 @@
         <h3>🧅 Adoção plena</h3>
         <ol>
           <li>Clone o core e rode <b>/meta:adopt</b> no seu repositório</li>
-          <li>95 comandos, 51 agentes, compliance e federação — sem tocar seu código</li>
+          <li>96 comandos, 51 agentes, compliance e federação — sem tocar seu código</li>
           <li>Tudo que você fez no Mini migra sem retrabalho</li>
         </ol>
         <a class="btn btn-s" href="https://github.com/marciocar/onion-evolve" target="_blank" rel="noopener">Ver no GitHub →</a>
