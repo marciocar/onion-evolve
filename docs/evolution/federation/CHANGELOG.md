@@ -8,6 +8,72 @@
 
 ---
 
+## 2026-07-10 · Fix importante pós-update: lint de marketplace não bloqueia mais o consumidor + stamp determinístico · COMPATÍVEL · alvo: todos
+
+- **Se o seu lint ficou HARD-red após um `--update`** (12 violações "plugin ausente"/"não registrado
+  no marketplace" + commits bloqueados pelo pre-commit): corrigido. Os checks de marketplace agora
+  têm **guarda por papel** — `role: adopted` pula (consumidor não distribui plugins; marketplace é
+  superfície do `source`). Crédito: sinal de campo da **granaai**, fix idêntico ao drift local dela
+  (o `DRIFT-ONION` de vocês converge sozinho no próximo update). +selftest `adopted-role` fechando a
+  cegueira "selftest roda como source".
+- **`write-stamp.sh`**: a escrita do `.claude/.onion-version` virou helper determinístico — o
+  `--update` agora **preserva `adopted_at`** (1ª adoção, semântica única) e escreve `updated_at`
+  por código testado, não por prosa que sessão pode violar (aconteceu — sinal multi-lineage granaai).
+  `adopted_at` perdido é restaurado do `members.yaml`; irrecuperável → omitido com aviso, nunca inventado.
+- Ação p/ adotantes: `/meta:adopt --update` traz ambos. Quem aplicou fix local no lint: remover a
+  marca de drift após o update.
+
+## 2026-07-10 · KG-SDAAL ganha camada de DOMÍNIO + modo `map` + console visual · COMPATÍVEL · alvo: todos
+
+- **`layer: domain`** no `.kg.yaml` (retrocompatível — grafo sem `layer` segue 100% audit):
+  ontologia `entity/state/event/rule/invariant/policy` + arestas `HAS_STATE/TRANSITIONS(on)/EMITS/
+  CONSTRAINS/READS/WRITES`. O grafo epistêmico (audit) `TRACES_TO` o SSOT de domínio (durável).
+  **Radar-de-domínio** (`kg-radar.sh --domain`): 5 checagens de completude (estado-absorvente,
+  EVENT-sem-efeito, STATE-sem-dona, RULE-sem-trace, fonte-única) — ⚠ atenção, não gate. Modo
+  `--triples` p/ consumo por LLM. Crédito: 2º dogfood do **metagamify** (promoção schema+método;
+  o motor de cada instância é soberano).
+- **`/meta:kg map <área>`** (v1.2.0): PFR de mapeamento completo — inventário → contrato →
+  `.kg.yaml` → radar → adaptador. 3 variantes por identidade: **UI → atom-map** (1 átomo = 1 fonte
+  + 1 dono-de-exibição + 1 dono-de-escrita; `SourceTag`; ledger de de-dup; pergunta atômica por
+  aba — crédito: artefato do **rhilo-app**) · **backend/API/funcionalidade → fatias de domínio** ·
+  **jornadas/fluxos → máquina de estados** (estado-absorvente = drop-off do funil). Mapeie ANTES de
+  redesenhar/refatorar — o contrato primeiro.
+- **`kg-console.sh`**: `.kg.yaml` → HTML self-contained (grafo interativo + veredito do radar
+  embutido). Projeção read-only dos próprios artefatos — o core não distribui componentes de front
+  (`SourceTag` é sempre implementação local de cada adotante).
+- Ação p/ adotantes: nenhuma obrigatória — chega via `/meta:adopt --update`. Sugestão: rodar
+  `/meta:kg map` na próxima área que forem redesenhar.
+
+## 2026-07-10 · a2a-live: F2.2 COMPLETO — canal vivo aberto a remetentes (incl. regulados) + guarda clock-trust · COMPATÍVEL · alvo: todos
+
+- O transporte **a2a-live** saiu de fundação para operação: 1º handshake com membro **regulado**
+  (granaai) validado ponta-a-ponta no endpoint público (`app.onionevolve.com/a2a`) — sinal assinado
+  RS256, 7 camadas de verificação, fila gated, aceitação humana, triagem. **Nada auto-aplicado,
+  nunca** (o gate humano é o moat; a latência caiu, o controle não). Remetentes ativos: metagamify
+  e granaai, cada um com token dedicado e pubkey pinada sob gate.
+- **Guarda clock-trust** no `a2a-verify`: a janela anti-replay agora exige PROVA de relógio
+  sincronizado (`timedatectl`/`chronyc`/`ntpstat`; sem prova → veto `clock-untrusted`) — "o carimbo
+  de tempo só vale com fonte atômica e verificada" (diretriz do maestro, no gate no mesmo dia).
+- **Para entrar no a2a-live** (opt-in, gated): self-gerar par RS256 (`.onion-a2a/`, privada NUNCA
+  sai da sua máquina), pedir ao maestro o pin da pubkey + token dedicado, espelhar o
+  `send-signal.sh`. O git-async continua sendo o default — a2a-live é exceção gated p/ latência.
+- Ação p/ adotantes: nenhuma obrigatória. Interessados no canal vivo: sinal no inbox do core.
+
+## 2026-07-10 · 2 KBs novas + RFC-0005 §4.1 ("forma de adoção" nomeada) · COMPATÍVEL · alvo: todos
+
+- **KB `frameworks/safe-multibranch-consolidation`**: o método de consolidação segura multi-branch
+  (2 lanes código×conhecimento, migração-antes-do-código, salvage-antes-de-drop, build-green como
+  prova, schema de veredito por branch validado pelo gate-keeper). Crédito: dogfood completo do
+  **metagamify/rhilo-app** (~19 branches, verificado).
+- **KB `patterns/literate-policy-as-data`**: a "config de três leitores" (parser lê dados, humano
+  lê história, IA lê ordens) — o padrão do `members.yaml` batizado, com genealogia (Knuth→UNIX→
+  ADRs→policy-as-data) e as 6 regras da casa. Copiem à vontade — é feito para isso.
+- **RFC-0005 §4.1**: "**forma de adoção**" (`full | docs-only | in-place`) agora é dimensão de 1ª
+  classe, ortogonal a escopo E versão (ground-truth: adoção docs-only real na Grana.Ai). O
+  capability-update p/ adotante docs-only/regulado está registrado como 4º modo de proveniência
+  (GATED, a-desenhar) — se você pretende adotar docs-only, sinalize antes do 1º `--update`.
+- Ação p/ adotantes: nenhuma — chega via `/meta:adopt --update`.
+
 ## 2026-07-04 · Fix de contrato: conversão SVG é do orquestrador, não do mermaid-specialist · COMPATÍVEL · alvo: adotantes
 
 - Fecha o gap `C_MERMAID_SVG_GAP` (descoberto pelo dogfood da shed-ceremony): o
