@@ -982,6 +982,15 @@ Decida uma postura por projeto e registre-a no `.gitignore` com um comentário. 
 
 > **Fonte única** para proteção de branch e estratégia de sincronização pós-merge (antes inline em `git/sync.md`).
 
+> 🔭 **Design-alvo (gated) — papéis resolvidos, não regex.** Hoje a classificação de papel é derivada do
+> **nome literal** da branch (regex `^(main|master|develop)$`). O ADR
+> [branch-roles-sdaal](../../analysis/onion-adr-branch-roles-sdaal-2026-07.md) (`status: proposto`) propõe que
+> o papel de cada branch seja **resolvido** (`roleOf(branch)` do SDAAL `branch-roles`), não assumido pelo nome —
+> corrigindo 2 bugs latentes: (i) uma branch de **produção por-cliente** (ex. `rhilo/main`) **é** produção mas
+> não casa o regex → não é protegida; (ii) um adotante com `develop`=**staging** (ex. GranaAi) casa como
+> "Integração", semântica errada. Enquanto na Fase 0, a matriz abaixo continua vigente por nome; o rewire abre
+> por gatilho (proteção divergente que morde).
+
 ### Matriz de proteção
 
 | Branch | Push direto | Merge permitido | Observação |

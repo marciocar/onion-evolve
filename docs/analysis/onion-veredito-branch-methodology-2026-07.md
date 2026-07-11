@@ -6,6 +6,7 @@ status: rascunho-para-ratificacao
 date: 2026-07-11
 re: docs/evolution/inbox/2026-07-10-metodologia-branches-gitflow-main-produto-vs-rhilo.md
 para: metagamify (rhilo) — via /meta:co-evolve (outbox)
+mecanismo: onion-adr-branch-roles-sdaal-2026-07.md (o SDAAL que sustenta a resposta)
 autor: onion (síntese) — PENDENTE ratificação do maestro
 ---
 
@@ -98,6 +99,31 @@ fazendo as **duas** coisas hoje — e é isso que confunde. A doutrina: **separe
 3. **Reunificar o framework** nela — o **Movimento 1 do parecer, ainda pendente**: um `--update` mirando uma
    branch de integração cortada de `rhilo/main` (via `onion/vendor`, o mecanismo que acabou de shipar em
    #302), tornando o stamp **verdadeiro** e as sessões de produção deixando de rodar nuas de guarda-rails.
+
+## 3-bis. A resposta de fundo — metodologia de branch é um **SDAAL** (papéis resolvidos, não impostos)
+
+As três respostas acima têm um mesmo fundo, que o maestro nomeou: **isto é um SDAAL.** Em vez de o Onion
+prescrever um mapa fixo de branches, ele define **papéis abstratos** (integração, staging/homolog, produção,
+linhagem-de-cliente, lane-de-framework) e **cada projeto declara** qual das suas branches cumpre cada papel —
+exatamente como o task-manager abstrai jira/clickup e o `trust` abstrai source/hub/standalone/consumer. O
+mecanismo está desenhado em [ADR — Branch-roles como SDAAL](onion-adr-branch-roles-sdaal-2026-07.md).
+
+Isso responde as três perguntas num nível acima:
+- **Qual a branch de stage?** → a que o **projeto declara** no papel `staging`. GranaAi: `develop`. metagamify:
+  a que levava ao homolog. O framework **não dita** — resolve; e se nenhuma foi declarada, responde "não
+  declarada" (Null Object honesto), nunca chuta.
+- **A empresa readapta a estratégia dela?** → **NÃO.** É a essência do SDAAL: o consumidor não muda; o
+  adapter resolve. GranaAi mantém `develop=stage`; só **mapeia** `branch_roles: {staging: develop, ...}`.
+- **E se surgir coisa nova** (`preview`, nova linhagem de cliente)? → **novo papel/mapeamento**, aberto p/
+  extensão, fechado p/ modificação. Não quebra o modelo.
+
+> **Fronteira (RFC-0005, cravada no ADR):** os papéis vivem no eixo **versão/entrega**, não escopo. Cliente-
+> como-**customização** compõe (escopo, `resolve-scope-layers`); cliente-como-**deploy** ramifica (linhagem,
+> eixo versão). A mesma `rhilo/main` é legítima como branch de deploy, antipadrão como "branch do cliente".
+
+Este SDAAL generaliza o que o Onion **já faz** para uma branch só (`resolve-integration-branch.sh`,
+[ADR branching-base-agnostic](onion-adr-branching-base-agnostic-2026-06.md)) para N papéis. Está em
+**Fase 0 (design-only, gated)**: a doutrina responde o sinal agora; o resolver/rewire abrem por gatilho real.
 
 ## 4. Síntese — o mapa recomendado
 

@@ -428,6 +428,14 @@ O **Task Manager Abstraction** (`.claude/utils/task-manager/`) é a **implementa
 > Documentação completa: [`docs/knowledge-base/concepts/task-manager-abstraction.md`](task-manager-abstraction.md)
 > Código-fonte: [`.claude/utils/task-manager/`](../../../.claude/utils/task-manager/)
 
+> **O eixo abstraído varia; a anatomia não.** O `adapter` não precisa ser um *provider externo*. O SDAAL já
+> generaliza para **papéis**: `trust` (`.claude/utils/trust/`) tem adapters por **tier** (source/hub/standalone/
+> consumer). E o design-alvo **`branch-roles`** (ADR [branch-roles-sdaal](../../analysis/onion-adr-branch-roles-sdaal-2026-07.md),
+> `status: proposto/gated`) abstrai **papéis de branch/ambiente** — o adapter é a **topologia de branching**
+> (gitflow/trunk-based/multi-lineage/none), e cada projeto declara qual branch cumpre qual papel
+> (`integration`/`staging`/`production`/…). Provider externo, tier, topologia — o eixo muda; interface +
+> factory + detector + adapters + Null Object permanecem.
+
 ### Por que é canônica?
 
 | Princípio SDAAL | Como o Task Manager exemplifica |
