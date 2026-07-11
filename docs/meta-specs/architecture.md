@@ -278,6 +278,20 @@ senão a branch principal `main`/`master`). Consumido pelo `/engineer:pr`. Vive 
 é local da máquina e não viaja no clone** — o versionado garante a mesma base de PR em qualquer máquina;
 quando ausente, a detecção (passo 3) adapta-se ao repo a cada PR.
 
+> **PROPOSTO (design-alvo, gated — não shipped):** `integration_branch` é **um papel de branch**. O ADR
+> [branch-roles-sdaal](../analysis/onion-adr-branch-roles-sdaal-2026-07.md) generaliza a resolução de base de
+> **1 papel** para **N papéis** por faceta (fluxo/ambiente/linhagem), via um mapa `branch_roles:` no stamp:
+> ```yaml
+> branch_roles:            # PROPOSTO — schema-alvo; consumido só a partir da Fase 1 (gated)
+>   integration: <branch>  # faceta flow (alias do integration_branch shipped)
+>   production: main        # faceta environment
+>   staging: develop        # faceta environment (ex. GranaAi: develop=stage) — sem default; Null Object se ausente
+> ```
+> Quando implementado, `integration_branch` (campo **shipped** acima) permanece aceito como **alias** de
+> `branch_roles.integration` — retrocompat total; `resolve-integration-branch.sh` vira shim de
+> `resolve-branch-role.sh integration`. Enquanto na Fase 0, **só `integration_branch` é lido**; `branch_roles`
+> é schema documentado, ainda não consumido.
+
 Adicionar este **arquivo** (não diretório) não fere §7. Consumidores: `/meta:adopt` (escreve), `/engineer:pr`
 (lê `integration_branch`), a **federação** (versão de cada membro) e o CI. Decisão: [ADR de Adoção](../analysis/onion-adr-repo-adoption-2026-06.md).
 
