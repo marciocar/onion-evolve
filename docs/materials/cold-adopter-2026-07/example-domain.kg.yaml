@@ -1,0 +1,69 @@
+# Exemplo rodável — reconciliacao de UMA verdade contraditoria (dominio generico).
+# Rode: bash .claude/validation/kg-radar.sh docs/materials/cold-adopter-2026-07/example-domain.kg.yaml
+# Espera: RECONCILIACAO mostra a aresta REFUTES; INTEGRIDADE exit 0.
+# Historia: dois times reportam o churn diferente. O grafo confronta as verdades; o radar aponta.
+meta:
+  id: example-churn-contradiction
+  date: 2026-07-11
+nodes:
+  - id: C_CHURN_HIGH
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: refuted
+    label: "churn e 8% ao mes (do dashboard de produto)"
+  - id: C_CHURN_LOW
+    node_type: claim
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "churn e 3% ao mes (cancelamentos pagos no billing)"
+  - id: E_DASHBOARD
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "o dashboard conta expiracao de trial como churn"
+  - id: E_BILLING
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "export do billing mostra 3% de cancelamentos pagos/mes"
+  - id: Q_TRIAL_CHURN
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "trial que nao converte deve contar como churn?"
+  - id: D_DEFINE_CHURN
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: open
+    label: "churn = so cancelamento pago; excluir trial nao-convertido (metrica separada)"
+edges:
+  - from: E_DASHBOARD
+    to: C_CHURN_HIGH
+    edge_type: SUPPORTS
+  - from: E_BILLING
+    to: C_CHURN_LOW
+    edge_type: SUPPORTS
+  - from: E_BILLING
+    to: C_CHURN_HIGH
+    edge_type: REFUTES
+  - from: C_CHURN_LOW
+    to: C_CHURN_HIGH
+    edge_type: REFUTES
+  - from: D_DEFINE_CHURN
+    to: Q_TRIAL_CHURN
+    edge_type: TRACES_TO
+  - from: D_DEFINE_CHURN
+    to: C_CHURN_LOW
+    edge_type: DEPENDS_ON

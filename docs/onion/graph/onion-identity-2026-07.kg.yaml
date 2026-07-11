@@ -448,6 +448,106 @@ nodes:
     status: open
     label: "existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio)"
     trace: "F2 gap #1 (o desempate)"
+  # ==== camada pesquisa knowledge-centric (2026-07-11) + candidatos NS completos ====
+  - id: E_KC_RESEARCH
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "pesquisa knowledge-centric 2026-07 (26+ fontes datadas; hype vs implementado)"
+    trace: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
+  - id: C_AXIS_HOT
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "eixo knowledge-centric esta QUENTE — 'Company Brain' virou aposta YC RFS Summer 2026"
+    trace: "KC research"
+  - id: C_PEER_UNIQUE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.78
+    status: confirmed
+    label: "NINGUEM trata negocio+eng+compliance como 3 verticais IGUAIS; todo player ancora numa e trata o resto como contexto"
+    trace: "KC research (o eixo unico do Onion)"
+  - id: C_COMBO_UNOCCUPIED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.75
+    status: confirmed
+    label: "companhia existe por PROPRIEDADE, nao por COMBINACAO; o combo multi-vertical-reconciliado esta desocupado"
+    trace: "KC research veredito"
+  - id: C_RECONCILE_VALUE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.82
+    status: confirmed
+    label: "RAG/GraphRAG e recuperacao, nao reconciliacao (VersionRAG 64%/10%) — reconciliar VERDADE e o diferencial"
+    trace: "KC research (VersionRAG arXiv:2510.08109)"
+  - id: C_TOKI_TWIN
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: confirmed
+    label: "TOKI (jun/2026) = maquinaria GEMEA do radar (contradicao write-time, preserva perdedor), mas sobre MEMORIA DE AGENTE"
+    trace: "KC research (TOKI arXiv:2606.06240)"
+  - id: C_DEMAND_AXIS_NOT_ONION
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "a validacao de mercado e do EIXO (YC RFS), NAO do Onion; segue zero adotante frio — 'funciona != vende'"
+    trace: "KC research + C_ORBIT_CAVEAT"
+  - id: C_NAME_SLICES
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    label: "ha nome de mercado pra FATIAS (Company Brain/Active Ontology/DTO), nao pro COMBO — nomear o combo e ato estrategico aberto"
+    trace: "KC research"
+  - id: C_NS2_PORTABLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "NS2: metodo portatil/destilavel, familia multi-plataforma (onion-mini + Custom GPT reais; familia nao verificada)"
+    trace: "F2 Q5"
+  - id: C_NS4_CONTROLPLANE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.3
+    status: open
+    label: "NS4: control-plane hospedado + open-core BSL (1 prova regulada granaai; control-plane nao escrito; maior gap desejo-vs-poder)"
+    trace: "F2 Q5"
+  - id: D_COLD_ADOPTER_EXP
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "experimento cold-adopter: probe organico (onion-mini+one-pager) + concierge arms-length; 4-6 semanas, guarda anti-vaidade/anti-v4.0"
+    trace: "docs/analysis/onion-experiment-cold-adopter-2026-07.md"
 edges:
   - from: E_CLAUDE_MD
     to: C_IDENTITY_CANON
@@ -594,3 +694,61 @@ edges:
   - from: Q_COLD_ADOPTER
     to: C_ORBIT_CAVEAT
     edge_type: DEPENDS_ON
+  # ==== arestas pesquisa knowledge-centric + estrutura da decisao NS ====
+  - from: E_KC_RESEARCH
+    to: C_AXIS_HOT
+    edge_type: SUPPORTS
+  - from: E_KC_RESEARCH
+    to: C_PEER_UNIQUE
+    edge_type: SUPPORTS
+  - from: E_KC_RESEARCH
+    to: C_COMBO_UNOCCUPIED
+    edge_type: SUPPORTS
+  - from: E_KC_RESEARCH
+    to: C_RECONCILE_VALUE
+    edge_type: SUPPORTS
+  - from: E_KC_RESEARCH
+    to: C_TOKI_TWIN
+    edge_type: SUPPORTS
+  - from: E_KC_RESEARCH
+    to: C_DEMAND_AXIS_NOT_ONION
+    edge_type: SUPPORTS
+  - from: E_KC_RESEARCH
+    to: C_NAME_SLICES
+    edge_type: SUPPORTS
+  - from: C_AXIS_HOT
+    to: C_NS1_KG
+    edge_type: SUPPORTS
+  - from: C_PEER_UNIQUE
+    to: C_NS1_KG
+    edge_type: SUPPORTS
+  - from: C_COMBO_UNOCCUPIED
+    to: C_NS1_KG
+    edge_type: SUPPORTS
+  - from: C_RECONCILE_VALUE
+    to: C_NS1_KG
+    edge_type: SUPPORTS
+  - from: C_TOKI_TWIN
+    to: C_RECONCILE_VALUE
+    edge_type: SUPPORTS
+  - from: C_DEMAND_AXIS_NOT_ONION
+    to: C_ORBIT_CAVEAT
+    edge_type: SUPPORTS
+  - from: C_DEMAND_AXIS_NOT_ONION
+    to: Q_COLD_ADOPTER
+    edge_type: SUPPORTS
+  - from: C_NS1_KG
+    to: Q_COLD_ADOPTER
+    edge_type: DEPENDS_ON
+  - from: C_NAME_SLICES
+    to: C_CATEGORY_UNNAMED
+    edge_type: SUPERSEDES
+  - from: Q_NORTHSTAR
+    to: C_NS2_PORTABLE
+    edge_type: DEPENDS_ON
+  - from: Q_NORTHSTAR
+    to: C_NS4_CONTROLPLANE
+    edge_type: DEPENDS_ON
+  - from: D_COLD_ADOPTER_EXP
+    to: Q_COLD_ADOPTER
+    edge_type: TRACES_TO
