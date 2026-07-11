@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 24 entradas · **Stale:** 0 · **Compartilháveis:** 20
+**Total:** 25 entradas · **Stale:** 0 · **Compartilháveis:** 21
 
 Gerado em: 2026-07-11
 
@@ -12,6 +12,7 @@ Gerado em: 2026-07-11
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-11 | decision | public 📤 | knowledge-centric-reframe-and-north-star | 2026-10-09 | static |
 | 2026-07-11 | reflection | public 📤 | hegel-limit-kg-boundary | 2026-10-09 | static |
 | 2026-07-10 | reflection | public 📤 | the-day-the-loop-ran-both-ways | 2026-10-08 | static |
 | 2026-07-10 | error | protected | ssh-alt-port-2222 | 2026-10-08 | dynamic |
