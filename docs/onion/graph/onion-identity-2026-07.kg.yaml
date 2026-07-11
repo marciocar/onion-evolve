@@ -1,0 +1,304 @@
+# KG SDAAL — (re)construção do conhecimento das verticais do Onion Evolve.
+# Seed F1 (2026-07-11): ingere o diagnóstico de 10-11/07 (identidade + branch-methodology + correções git).
+# Plano: docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md
+# Camada audit (epistêmico). Domain nasce na F4, do que o radar reconciliar.
+meta:
+  id: onion-identity-2026-07
+  date: 2026-07-11
+nodes:
+  # ---- perguntas de pesquisa (F2) ----
+  - id: Q_IDENTITY
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "o que o Onion e de verdade hoje vs o pitch, e qual o fluxo real"
+  - id: Q_ICP
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.4
+    status: open
+    label: "qual dor atendemos e para quem (ICP concreto, nao generico)"
+  - id: Q_MARKET
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.4
+    status: open
+    label: "onde somos unicos vs commodity (mercado jul2026, lente edge-core Hagel)"
+  - id: Q_VALUE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.4
+    status: open
+    label: "o que gera valor de verdade e quais quick-wins reais"
+  - id: Q_FUTURE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.3
+    status: open
+    label: "o que desejamos ser vs o que podemos ser (north-star)"
+  - id: Q_METHOD
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "como heranca-polimorfismo (RFC-0004/0005) se aplica a construcao de conhecimento"
+  - id: Q_BRANCH_MAIN
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "onde a main-produto entra no mapa de linhagens do members.yaml"
+  - id: Q_CLIENT_SCOPE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "cliente de consultoria = escopo (compoe) ou linhagem (ramifica)"
+  - id: Q_DEVELOP_ROLE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "papel canonico da develop: integracao GitFlow ou lane de framework"
+  # ---- claims confirmados (o que ja sabemos) ----
+  - id: C_IDENTITY_CANON
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    label: "Onion e framework template em .claude, 3 dimensoes peer, plataforma unica Claude Code"
+    trace: "CLAUDE.md:identidade-canonica"
+  - id: C_RFC4_INTER_INSTANCE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "RFC-0004 trata de federacao inter-instancias, nao do arranjo de branches interno"
+    trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+  - id: C_RFC5_SCOPE_NOT_BRANCH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "RFC-0005 rejeita branch-como-escopo; branch permanece no eixo versao"
+    trace: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+  - id: C_PARECER_2LINEAGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "parecer 03/07 propos 2 linhagens framework-develop x production-rhilomain; main-produto fora do mapa"
+    trace: "docs/analysis/onion-parecer-rhilo-lineages-2026-07.md"
+  - id: C_SIGNAL_DISJOINT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.3
+    status: refuted
+    label: "sinal afirma 3 branches disjuntas desde 15/06 e main sem framework"
+    trace: "docs/evolution/inbox/2026-07-10-metodologia-branches-gitflow-main-produto-vs-rhilo.md"
+  - id: C_TOPO_SHARED_BASE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "develop e rhilo-main compartilham base 05f96a05 (01/07); nao disjuntas desde 15/06"
+    trace: "git merge-base origin/develop origin/rhilo/main"
+  - id: C_TOPO_MAIN_HAS_FW
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "main tem 239 arquivos .claude (adotou Onion 26/06); nao vazia, apenas parada"
+    trace: "git ls-tree origin/main .claude"
+  - id: C_VERTICALS_EMPTY
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "business-context e technical-context vazios (so README) - greenfield"
+    trace: "docs/business-context/ docs/technical-context/"
+  - id: C_KG_MATURE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "KG SDAAL (meta:kg + kg-radar.sh) ja dogfoodado em producao; e a tecnica de reconciliacao"
+    trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+  - id: C_HEGEL_CRITERION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "KG e a tecnica certa quando o conhecimento deixa de ser monotonico (contradicao/Schranke)"
+    trace: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md"
+  # ---- decisoes ----
+  - id: D_METHOD_KG
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: open
+    label: "construir conhecimento das verticais como KG SDAAL vivo (padrao candidato)"
+    trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md"
+  - id: D_PHASE_ORDER
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: "metodo+grafo primeiro; preenchimento das verticais depois (verticais vazias)"
+    trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:1"
+  - id: D_NO_DISTORT
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: "nao entortar doutrina: lane-de-conhecimento e GitFlow coexistem (eixos diferentes)"
+    trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:2.1"
+  # ---- evidencias ----
+  - id: E_GIT_MERGEBASE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "merge-base origin/develop origin/rhilo-main = 05f96a05 em 2026-07-01"
+    trace: "git merge-base"
+  - id: E_GIT_LSTREE_MAIN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "git ls-tree origin/main .claude conta 239 arquivos"
+    trace: "git ls-tree -r --name-only origin/main -- .claude"
+  - id: E_CLAUDE_MD
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "CLAUDE.md declara a identidade canonica (2026-05-18)"
+    trace: "CLAUDE.md"
+  - id: E_RFC5_TEXT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "RFC-0005: branch-para-escopo rejeitado; versao x escopo sao eixos separados"
+    trace: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+edges:
+  - from: E_CLAUDE_MD
+    to: C_IDENTITY_CANON
+    edge_type: SUPPORTS
+  - from: E_RFC5_TEXT
+    to: C_RFC5_SCOPE_NOT_BRANCH
+    edge_type: SUPPORTS
+  - from: E_GIT_MERGEBASE
+    to: C_TOPO_SHARED_BASE
+    edge_type: SUPPORTS
+  - from: E_GIT_LSTREE_MAIN
+    to: C_TOPO_MAIN_HAS_FW
+    edge_type: SUPPORTS
+  - from: E_GIT_MERGEBASE
+    to: C_SIGNAL_DISJOINT
+    edge_type: REFUTES
+  - from: C_TOPO_SHARED_BASE
+    to: C_SIGNAL_DISJOINT
+    edge_type: REFUTES
+  - from: C_TOPO_MAIN_HAS_FW
+    to: C_SIGNAL_DISJOINT
+    edge_type: REFUTES
+  - from: C_KG_MATURE
+    to: D_METHOD_KG
+    edge_type: SUPPORTS
+  - from: C_HEGEL_CRITERION
+    to: D_METHOD_KG
+    edge_type: SUPPORTS
+  - from: D_METHOD_KG
+    to: Q_METHOD
+    edge_type: TRACES_TO
+  - from: D_PHASE_ORDER
+    to: C_VERTICALS_EMPTY
+    edge_type: DEPENDS_ON
+  - from: D_PHASE_ORDER
+    to: Q_IDENTITY
+    edge_type: TRACES_TO
+  - from: D_NO_DISTORT
+    to: Q_DEVELOP_ROLE
+    edge_type: TRACES_TO
+  - from: Q_IDENTITY
+    to: C_IDENTITY_CANON
+    edge_type: DEPENDS_ON
+  - from: Q_ICP
+    to: Q_IDENTITY
+    edge_type: DEPENDS_ON
+  - from: Q_MARKET
+    to: C_IDENTITY_CANON
+    edge_type: DEPENDS_ON
+  - from: Q_VALUE
+    to: Q_ICP
+    edge_type: DEPENDS_ON
+  - from: Q_FUTURE
+    to: Q_MARKET
+    edge_type: DEPENDS_ON
+  - from: Q_METHOD
+    to: C_RFC4_INTER_INSTANCE
+    edge_type: DEPENDS_ON
+  - from: Q_BRANCH_MAIN
+    to: C_PARECER_2LINEAGE
+    edge_type: DEPENDS_ON
+  - from: Q_CLIENT_SCOPE
+    to: C_RFC5_SCOPE_NOT_BRANCH
+    edge_type: DEPENDS_ON
+  - from: Q_DEVELOP_ROLE
+    to: C_PARECER_2LINEAGE
+    edge_type: DEPENDS_ON
