@@ -235,6 +235,219 @@ nodes:
     status: confirmed
     label: "RFC-0005: branch-para-escopo rejeitado; versao x escopo sao eixos separados"
     trace: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+  # ==== camada F2 (pesquisa densa 2026-07-11, verificada adversarialmente) ====
+  # -- evidencias PROD --
+  - id: E_DOGFOOD_BUGS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "dogfood pegou bugs reais (#126 #89 #128; adopt-vendor 392arq/1conflito/7-7 asserts)"
+    trace: "F2 Q4"
+  - id: E_MARKET_SCAN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "scan de mercado: Spec Kit 93k, BMAD 49k, 15k+ plugins, awesome-claude-code 36.8k"
+    trace: "F2 Q3 (web)"
+  - id: E_ORBIT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    label: "5 adotantes = repos de Marcio ou consultoria/CTO; ZERO adotante frio/externo"
+    trace: "F2 Q2 (members.yaml + remotes)"
+  - id: E_SITE_LIVE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "onionevolve.com exibe 96/51/8 e reflete o loop (verificado live 200)"
+    trace: "F2 Q1 (curl)"
+  # -- claims de valor/mercado --
+  - id: C_DOGFOOD_VALUE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.88
+    status: confirmed
+    label: "VALOR PROVADO: dogfood pega bug real que revisao-no-papel nao pega"
+    trace: "F2 Q4"
+  - id: C_MARKET_COMMODITY
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.88
+    status: confirmed
+    label: "comandos/agentes/skills/plugins + spec-driven-dev sao COMMODITY, nao moat"
+    trace: "F2 Q3"
+  - id: C_ORBIT_CAVEAT
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "TODOS adotantes na orbita de Marcio; dor+ICP validados so intra-orbita (funciona != vende)"
+    trace: "F2 Q2"
+  - id: C_MARKET_PULL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.2
+    status: refuted
+    label: "ha pull de mercado independente (adotante frio fora da orbita)"
+    trace: "F2 Q2 gap"
+  - id: C_COEVOLVE_VALUE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "VALOR PROVADO: co-evolucao transporta sinal bidirecional sub-dia; 1o a2a REGULADO fechou F2.2"
+    trace: "F2 Q4"
+  # -- claims de identidade --
+  - id: C_FLOW_EVOLUTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "fluxo REAL do core = loop auto/co-evolucao, nao o pipeline product->pr do pitch"
+    trace: "F2 Q1"
+  - id: C_IDENTITY_DRIFT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.82
+    status: confirmed
+    label: "drift SUBESTIMA: KB de identidade em 82/49/5/34 vs SSOT/site em 96/51/8/66"
+    trace: "F2 Q1"
+  - id: C_PUBLIC_AHEAD
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "pitch PUBLICO ja correto e reflete o loop; a maior distancia esta no SSOT/KB INTERNO"
+    trace: "F2 Q1"
+  - id: C_PIPELINE_COMMODITY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: confirmed
+    label: "pipeline product->pr (33 cmds) e commodity aspiracional/adopter-facing, nao bandeira"
+    trace: "F2 Q1/Q3"
+  # -- claims de ICP/metodo --
+  - id: C_ICP_REGULATED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: confirmed
+    label: "ICP decidido (2026-06-17) = orgs reguladas + multi-repo; interno, NAO validado por mercado"
+    trace: "F2 Q2"
+  - id: C_ICP_TENSION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.55
+    status: open
+    label: "tensao nao reconciliada: ICP estreito (regulado+multi-repo) vs 4 personas amplas da KB"
+    trace: "F2 Q2"
+  - id: C_COMPLIANCE_RARE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.62
+    status: open
+    label: "compliance-no-loop = vertical RARA que casa com ICP regulado; prova de campo em granaai"
+    trace: "F2 Q3/Q5"
+  - id: C_KG_BIZ_UNPROVEN
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "KG-sobre-NEGOCIO/IDENTIDADE e DESENHO, nao uso vivo — o salto diferenciador continua nao-executado"
+    trace: "F2 Q4/Q6-C5"
+  - id: C_CATEGORY_UNNAMED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.68
+    status: confirmed
+    label: "a categoria do combo Onion nao tem nome de mercado (usa agent-harness/agentic-SDLC emprestados)"
+    trace: "F2 Q5"
+  - id: C_EDGE_HAGEL
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.87
+    status: confirmed
+    label: "EDGE HAGEL: rhilo/metagamify dogfoodou o KG SDAAL e PUXOU o core (/meta:kg + kg-radar nasceram da vivencia)"
+    trace: "F2 Q5 (56 nos/81 arestas, /meta:evolve 2026-07-04)"
+  # -- decisao de north-star + candidatos --
+  - id: Q_NORTHSTAR
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.4
+    status: open
+    label: "qual north-star: NS1-KG-conhecimento, NS2-portatil, NS3-educacao, NS4-controlplane"
+    trace: "F2 Q5 (F3 nivel Criar — nao decidida)"
+  - id: C_NS1_KG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.65
+    status: open
+    label: "NS1: framework que constroi conhecimento reconciliavel vivo (KG); edge mais forte, negocio nao provado"
+    trace: "F2 Q5"
+  - id: C_NS3_EDU
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "NS3: braco de educacao (Descasca/Metodo Onion); mais proximo de caixa, evidencia mais fraca"
+    trace: "F2 Q5"
+  - id: Q_COLD_ADOPTER
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.3
+    status: open
+    label: "existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio)"
+    trace: "F2 gap #1 (o desempate)"
 edges:
   - from: E_CLAUDE_MD
     to: C_IDENTITY_CANON
@@ -301,4 +514,83 @@ edges:
     edge_type: DEPENDS_ON
   - from: Q_DEVELOP_ROLE
     to: C_PARECER_2LINEAGE
+    edge_type: DEPENDS_ON
+  # ==== arestas F2 ====
+  - from: E_DOGFOOD_BUGS
+    to: C_DOGFOOD_VALUE
+    edge_type: SUPPORTS
+  - from: E_MARKET_SCAN
+    to: C_MARKET_COMMODITY
+    edge_type: SUPPORTS
+  - from: E_ORBIT
+    to: C_ORBIT_CAVEAT
+    edge_type: SUPPORTS
+  - from: E_SITE_LIVE
+    to: C_PUBLIC_AHEAD
+    edge_type: SUPPORTS
+  - from: C_DOGFOOD_VALUE
+    to: Q_VALUE
+    edge_type: TRACES_TO
+  - from: C_COEVOLVE_VALUE
+    to: Q_VALUE
+    edge_type: TRACES_TO
+  - from: C_MARKET_COMMODITY
+    to: Q_MARKET
+    edge_type: TRACES_TO
+  - from: C_ORBIT_CAVEAT
+    to: Q_ICP
+    edge_type: TRACES_TO
+  - from: C_ORBIT_CAVEAT
+    to: C_MARKET_PULL
+    edge_type: REFUTES
+  - from: C_MARKET_COMMODITY
+    to: C_PIPELINE_COMMODITY
+    edge_type: SUPPORTS
+  - from: C_PIPELINE_COMMODITY
+    to: Q_IDENTITY
+    edge_type: TRACES_TO
+  - from: C_FLOW_EVOLUTION
+    to: Q_IDENTITY
+    edge_type: TRACES_TO
+  - from: C_PUBLIC_AHEAD
+    to: C_IDENTITY_DRIFT
+    edge_type: SUPPORTS
+  - from: C_IDENTITY_DRIFT
+    to: Q_IDENTITY
+    edge_type: TRACES_TO
+  - from: C_EDGE_HAGEL
+    to: Q_FUTURE
+    edge_type: TRACES_TO
+  - from: C_EDGE_HAGEL
+    to: C_NS1_KG
+    edge_type: SUPPORTS
+  - from: C_NS1_KG
+    to: C_KG_BIZ_UNPROVEN
+    edge_type: DEPENDS_ON
+  - from: C_KG_BIZ_UNPROVEN
+    to: D_METHOD_KG
+    edge_type: TRACES_TO
+  - from: Q_NORTHSTAR
+    to: C_NS1_KG
+    edge_type: DEPENDS_ON
+  - from: Q_NORTHSTAR
+    to: C_NS3_EDU
+    edge_type: DEPENDS_ON
+  - from: C_ICP_REGULATED
+    to: Q_ICP
+    edge_type: TRACES_TO
+  - from: C_ICP_TENSION
+    to: Q_ICP
+    edge_type: TRACES_TO
+  - from: C_COMPLIANCE_RARE
+    to: C_ICP_REGULATED
+    edge_type: DEPENDS_ON
+  - from: C_COMPLIANCE_RARE
+    to: Q_MARKET
+    edge_type: TRACES_TO
+  - from: C_CATEGORY_UNNAMED
+    to: Q_FUTURE
+    edge_type: TRACES_TO
+  - from: Q_COLD_ADOPTER
+    to: C_ORBIT_CAVEAT
     edge_type: DEPENDS_ON

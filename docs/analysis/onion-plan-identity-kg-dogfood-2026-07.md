@@ -210,3 +210,56 @@ uma retornando `claims`+`evidence` estruturados, verificados adversarialmente, c
 ## 7. Próximo passo concreto
 Rodar **F1** (seed do grafo + primeiro radar) — barato, e já revela as lacunas que devem (ou não)
 justificar a pesquisa densa da F2. F2 só dispara com o "vai" do maestro.
+
+---
+
+## 8. F3 — Veredito de priorização (2026-07-11)
+
+> F2 rodou (13 agentes, verificação adversarial), ~57 claims ingeridos no grafo
+> [`onion-identity-2026-07.kg.yaml`](../onion/graph/onion-identity-2026-07.kg.yaml) (49 nós / 48 arestas,
+> integridade limpa). Radar dirigiu este veredito — a atenção sai do motor, não da impressão.
+
+### A base sólida (PROD, provado — o que sustenta tudo)
+- **O MECANISMO tem valor provado**: dogfood pega bug real que revisão-no-papel não pega (0.88); KG
+  reconcilia verdade que `git merge` não (0.82); co-evolução bidirecional sub-dia + 1º a2a **regulado**
+  (0.85); determinizar-a-prosa vira script+selftest (0.85).
+- **O edge Hagel é real** (0.87): rhilo/metagamify dogfoodou o KG e **puxou o core** — o único edge→core
+  com dogfood executado, não hipótese.
+- **A identidade real** = o **loop de auto/co-evolução**, não o pipeline `product→pr` do pitch.
+
+### A verdade dura (o caveat load-bearing — atenção máxima no radar: 21.2)
+- **ZERO adotante frio.** 100% dos adotantes estão na órbita de Marcio (repos dele ou consultoria/CTO).
+  **"Funciona ≠ vende"** — o mecanismo está provado; o **mercado não**.
+- Tudo que é "raro/moat" saiu **WEAKENED** — repousa em **ausência-de-contraexemplo**, não em prova de
+  unicidade nem de valor de mercado. Não-falsificável.
+- O **salto diferenciador** (KG-sobre-negócio) é **DESENHO, não uso vivo** — continua não-executado.
+
+### Priorizar
+1. **O loop dogfood-auditável + KG SDAAL como o produto/identidade REAL** — onde valor provado (0.88) e
+   edge Hagel (0.87) convergem. **Não** o pipeline de produto.
+2. **O 2º dogfood do KG: aplicar sobre IDENTIDADE/NEGÓCIO** — é *literalmente esta iniciativa* (F4). Sem
+   ela, o diferenciador-núcleo continua não-executado. É o próximo dogfood mais difícil **e** mais raro.
+3. **Compliance-no-loop** — a vertical rara que casa com o ICP decidido (regulado+multi-repo) e tem prova
+   de campo em granaai. O moat-candidato com menos ausência-de-evidência.
+
+### Quick-wins (fazer já — barato, alto retorno)
+- Corrigir o **drift de números** na KB de identidade (82/49/5 → 96/51/8, bater com SSOT+site).
+- Corrigir o **press-kit FAQ** ("não é produto comercial" contra a decisão BSL de 2026-06-17).
+- **Emitir os tokens a2a** dedicados já enfileirados (granaai + metagamify) — gate humano permanece.
+
+### Fechar / segundo-plano
+- **Não** investir no pipeline `product→pr` (33 cmds) como **diferencial** — é commodity + aspiracional.
+- **Control-plane hospedado + BSL** (NS4, conf 0.30): backlog até um edge disparar (construir à frente do
+  gatilho foi o erro v4.0).
+- **onion-as-model** (SLM destilado): semente não-executada; aguardar "vai".
+
+### Estudar — o desempate (decisão do maestro, nível Criar)
+- **`Q_COLD_ADOPTER`**: existe *qualquer* pull dos diferenciais raros **FORA da órbita de Marcio**? Um
+  único adotante frio falsifica/confirma a unicidade — é **o desempate de tudo**.
+- **North-star não escolhida** (`Q_NORTHSTAR` aberta): **NS1-KG** (edge real, negócio não provado) vs
+  **NS3-Educação/Descasca** (mais perto de caixa, evidência mais fraca). Precisa de **1 sinal externo**
+  pra desempatar. **Não decidido aqui — é seu.**
+
+### Lacunas que nem a pesquisa fechou
+Zero pull de mercado independente · unicidade não-falsificável · KG-sobre-negócio nunca executado ·
+categoria sem nome de mercado · federação ainda majoritariamente design · zero cliente pagante.
