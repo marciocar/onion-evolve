@@ -1,0 +1,596 @@
+# KG SDAAL — (re)construção do conhecimento das verticais do Onion Evolve.
+# Seed F1 (2026-07-11): ingere o diagnóstico de 10-11/07 (identidade + branch-methodology + correções git).
+# Plano: docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md
+# Camada audit (epistêmico). Domain nasce na F4, do que o radar reconciliar.
+meta:
+  id: onion-identity-2026-07
+  date: 2026-07-11
+nodes:
+  # ---- perguntas de pesquisa (F2) ----
+  - id: Q_IDENTITY
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "o que o Onion e de verdade hoje vs o pitch, e qual o fluxo real"
+  - id: Q_ICP
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.4
+    status: open
+    label: "qual dor atendemos e para quem (ICP concreto, nao generico)"
+  - id: Q_MARKET
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.4
+    status: open
+    label: "onde somos unicos vs commodity (mercado jul2026, lente edge-core Hagel)"
+  - id: Q_VALUE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.4
+    status: open
+    label: "o que gera valor de verdade e quais quick-wins reais"
+  - id: Q_FUTURE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.3
+    status: open
+    label: "o que desejamos ser vs o que podemos ser (north-star)"
+  - id: Q_METHOD
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "como heranca-polimorfismo (RFC-0004/0005) se aplica a construcao de conhecimento"
+  - id: Q_BRANCH_MAIN
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "onde a main-produto entra no mapa de linhagens do members.yaml"
+  - id: Q_CLIENT_SCOPE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "cliente de consultoria = escopo (compoe) ou linhagem (ramifica)"
+  - id: Q_DEVELOP_ROLE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "papel canonico da develop: integracao GitFlow ou lane de framework"
+  # ---- claims confirmados (o que ja sabemos) ----
+  - id: C_IDENTITY_CANON
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    label: "Onion e framework template em .claude, 3 dimensoes peer, plataforma unica Claude Code"
+    trace: "CLAUDE.md:identidade-canonica"
+  - id: C_RFC4_INTER_INSTANCE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "RFC-0004 trata de federacao inter-instancias, nao do arranjo de branches interno"
+    trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+  - id: C_RFC5_SCOPE_NOT_BRANCH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "RFC-0005 rejeita branch-como-escopo; branch permanece no eixo versao"
+    trace: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+  - id: C_PARECER_2LINEAGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "parecer 03/07 propos 2 linhagens framework-develop x production-rhilomain; main-produto fora do mapa"
+    trace: "docs/analysis/onion-parecer-rhilo-lineages-2026-07.md"
+  - id: C_SIGNAL_DISJOINT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.3
+    status: refuted
+    label: "sinal afirma 3 branches disjuntas desde 15/06 e main sem framework"
+    trace: "docs/evolution/inbox/2026-07-10-metodologia-branches-gitflow-main-produto-vs-rhilo.md"
+  - id: C_TOPO_SHARED_BASE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "develop e rhilo-main compartilham base 05f96a05 (01/07); nao disjuntas desde 15/06"
+    trace: "git merge-base origin/develop origin/rhilo/main"
+  - id: C_TOPO_MAIN_HAS_FW
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "main tem 239 arquivos .claude (adotou Onion 26/06); nao vazia, apenas parada"
+    trace: "git ls-tree origin/main .claude"
+  - id: C_VERTICALS_EMPTY
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "business-context e technical-context vazios (so README) - greenfield"
+    trace: "docs/business-context/ docs/technical-context/"
+  - id: C_KG_MATURE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "KG SDAAL (meta:kg + kg-radar.sh) ja dogfoodado em producao; e a tecnica de reconciliacao"
+    trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+  - id: C_HEGEL_CRITERION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "KG e a tecnica certa quando o conhecimento deixa de ser monotonico (contradicao/Schranke)"
+    trace: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md"
+  # ---- decisoes ----
+  - id: D_METHOD_KG
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: open
+    label: "construir conhecimento das verticais como KG SDAAL vivo (padrao candidato)"
+    trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md"
+  - id: D_PHASE_ORDER
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: "metodo+grafo primeiro; preenchimento das verticais depois (verticais vazias)"
+    trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:1"
+  - id: D_NO_DISTORT
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: "nao entortar doutrina: lane-de-conhecimento e GitFlow coexistem (eixos diferentes)"
+    trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:2.1"
+  # ---- evidencias ----
+  - id: E_GIT_MERGEBASE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "merge-base origin/develop origin/rhilo-main = 05f96a05 em 2026-07-01"
+    trace: "git merge-base"
+  - id: E_GIT_LSTREE_MAIN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "git ls-tree origin/main .claude conta 239 arquivos"
+    trace: "git ls-tree -r --name-only origin/main -- .claude"
+  - id: E_CLAUDE_MD
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "CLAUDE.md declara a identidade canonica (2026-05-18)"
+    trace: "CLAUDE.md"
+  - id: E_RFC5_TEXT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "RFC-0005: branch-para-escopo rejeitado; versao x escopo sao eixos separados"
+    trace: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+  # ==== camada F2 (pesquisa densa 2026-07-11, verificada adversarialmente) ====
+  # -- evidencias PROD --
+  - id: E_DOGFOOD_BUGS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "dogfood pegou bugs reais (#126 #89 #128; adopt-vendor 392arq/1conflito/7-7 asserts)"
+    trace: "F2 Q4"
+  - id: E_MARKET_SCAN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "scan de mercado: Spec Kit 93k, BMAD 49k, 15k+ plugins, awesome-claude-code 36.8k"
+    trace: "F2 Q3 (web)"
+  - id: E_ORBIT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    label: "5 adotantes = repos de Marcio ou consultoria/CTO; ZERO adotante frio/externo"
+    trace: "F2 Q2 (members.yaml + remotes)"
+  - id: E_SITE_LIVE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "onionevolve.com exibe 96/51/8 e reflete o loop (verificado live 200)"
+    trace: "F2 Q1 (curl)"
+  # -- claims de valor/mercado --
+  - id: C_DOGFOOD_VALUE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.88
+    status: confirmed
+    label: "VALOR PROVADO: dogfood pega bug real que revisao-no-papel nao pega"
+    trace: "F2 Q4"
+  - id: C_MARKET_COMMODITY
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.88
+    status: confirmed
+    label: "comandos/agentes/skills/plugins + spec-driven-dev sao COMMODITY, nao moat"
+    trace: "F2 Q3"
+  - id: C_ORBIT_CAVEAT
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "TODOS adotantes na orbita de Marcio; dor+ICP validados so intra-orbita (funciona != vende)"
+    trace: "F2 Q2"
+  - id: C_MARKET_PULL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.2
+    status: refuted
+    label: "ha pull de mercado independente (adotante frio fora da orbita)"
+    trace: "F2 Q2 gap"
+  - id: C_COEVOLVE_VALUE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "VALOR PROVADO: co-evolucao transporta sinal bidirecional sub-dia; 1o a2a REGULADO fechou F2.2"
+    trace: "F2 Q4"
+  # -- claims de identidade --
+  - id: C_FLOW_EVOLUTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "fluxo REAL do core = loop auto/co-evolucao, nao o pipeline product->pr do pitch"
+    trace: "F2 Q1"
+  - id: C_IDENTITY_DRIFT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.82
+    status: confirmed
+    label: "drift SUBESTIMA: KB de identidade em 82/49/5/34 vs SSOT/site em 96/51/8/66"
+    trace: "F2 Q1"
+  - id: C_PUBLIC_AHEAD
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "pitch PUBLICO ja correto e reflete o loop; a maior distancia esta no SSOT/KB INTERNO"
+    trace: "F2 Q1"
+  - id: C_PIPELINE_COMMODITY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: confirmed
+    label: "pipeline product->pr (33 cmds) e commodity aspiracional/adopter-facing, nao bandeira"
+    trace: "F2 Q1/Q3"
+  # -- claims de ICP/metodo --
+  - id: C_ICP_REGULATED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: confirmed
+    label: "ICP decidido (2026-06-17) = orgs reguladas + multi-repo; interno, NAO validado por mercado"
+    trace: "F2 Q2"
+  - id: C_ICP_TENSION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.55
+    status: open
+    label: "tensao nao reconciliada: ICP estreito (regulado+multi-repo) vs 4 personas amplas da KB"
+    trace: "F2 Q2"
+  - id: C_COMPLIANCE_RARE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.62
+    status: open
+    label: "compliance-no-loop = vertical RARA que casa com ICP regulado; prova de campo em granaai"
+    trace: "F2 Q3/Q5"
+  - id: C_KG_BIZ_UNPROVEN
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "KG-sobre-NEGOCIO/IDENTIDADE e DESENHO, nao uso vivo — o salto diferenciador continua nao-executado"
+    trace: "F2 Q4/Q6-C5"
+  - id: C_CATEGORY_UNNAMED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.68
+    status: confirmed
+    label: "a categoria do combo Onion nao tem nome de mercado (usa agent-harness/agentic-SDLC emprestados)"
+    trace: "F2 Q5"
+  - id: C_EDGE_HAGEL
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.87
+    status: confirmed
+    label: "EDGE HAGEL: rhilo/metagamify dogfoodou o KG SDAAL e PUXOU o core (/meta:kg + kg-radar nasceram da vivencia)"
+    trace: "F2 Q5 (56 nos/81 arestas, /meta:evolve 2026-07-04)"
+  # -- decisao de north-star + candidatos --
+  - id: Q_NORTHSTAR
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.4
+    status: open
+    label: "qual north-star: NS1-KG-conhecimento, NS2-portatil, NS3-educacao, NS4-controlplane"
+    trace: "F2 Q5 (F3 nivel Criar — nao decidida)"
+  - id: C_NS1_KG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.65
+    status: open
+    label: "NS1: framework que constroi conhecimento reconciliavel vivo (KG); edge mais forte, negocio nao provado"
+    trace: "F2 Q5"
+  - id: C_NS3_EDU
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "NS3: braco de educacao (Descasca/Metodo Onion); mais proximo de caixa, evidencia mais fraca"
+    trace: "F2 Q5"
+  - id: Q_COLD_ADOPTER
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.3
+    status: open
+    label: "existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio)"
+    trace: "F2 gap #1 (o desempate)"
+edges:
+  - from: E_CLAUDE_MD
+    to: C_IDENTITY_CANON
+    edge_type: SUPPORTS
+  - from: E_RFC5_TEXT
+    to: C_RFC5_SCOPE_NOT_BRANCH
+    edge_type: SUPPORTS
+  - from: E_GIT_MERGEBASE
+    to: C_TOPO_SHARED_BASE
+    edge_type: SUPPORTS
+  - from: E_GIT_LSTREE_MAIN
+    to: C_TOPO_MAIN_HAS_FW
+    edge_type: SUPPORTS
+  - from: E_GIT_MERGEBASE
+    to: C_SIGNAL_DISJOINT
+    edge_type: REFUTES
+  - from: C_TOPO_SHARED_BASE
+    to: C_SIGNAL_DISJOINT
+    edge_type: REFUTES
+  - from: C_TOPO_MAIN_HAS_FW
+    to: C_SIGNAL_DISJOINT
+    edge_type: REFUTES
+  - from: C_KG_MATURE
+    to: D_METHOD_KG
+    edge_type: SUPPORTS
+  - from: C_HEGEL_CRITERION
+    to: D_METHOD_KG
+    edge_type: SUPPORTS
+  - from: D_METHOD_KG
+    to: Q_METHOD
+    edge_type: TRACES_TO
+  - from: D_PHASE_ORDER
+    to: C_VERTICALS_EMPTY
+    edge_type: DEPENDS_ON
+  - from: D_PHASE_ORDER
+    to: Q_IDENTITY
+    edge_type: TRACES_TO
+  - from: D_NO_DISTORT
+    to: Q_DEVELOP_ROLE
+    edge_type: TRACES_TO
+  - from: Q_IDENTITY
+    to: C_IDENTITY_CANON
+    edge_type: DEPENDS_ON
+  - from: Q_ICP
+    to: Q_IDENTITY
+    edge_type: DEPENDS_ON
+  - from: Q_MARKET
+    to: C_IDENTITY_CANON
+    edge_type: DEPENDS_ON
+  - from: Q_VALUE
+    to: Q_ICP
+    edge_type: DEPENDS_ON
+  - from: Q_FUTURE
+    to: Q_MARKET
+    edge_type: DEPENDS_ON
+  - from: Q_METHOD
+    to: C_RFC4_INTER_INSTANCE
+    edge_type: DEPENDS_ON
+  - from: Q_BRANCH_MAIN
+    to: C_PARECER_2LINEAGE
+    edge_type: DEPENDS_ON
+  - from: Q_CLIENT_SCOPE
+    to: C_RFC5_SCOPE_NOT_BRANCH
+    edge_type: DEPENDS_ON
+  - from: Q_DEVELOP_ROLE
+    to: C_PARECER_2LINEAGE
+    edge_type: DEPENDS_ON
+  # ==== arestas F2 ====
+  - from: E_DOGFOOD_BUGS
+    to: C_DOGFOOD_VALUE
+    edge_type: SUPPORTS
+  - from: E_MARKET_SCAN
+    to: C_MARKET_COMMODITY
+    edge_type: SUPPORTS
+  - from: E_ORBIT
+    to: C_ORBIT_CAVEAT
+    edge_type: SUPPORTS
+  - from: E_SITE_LIVE
+    to: C_PUBLIC_AHEAD
+    edge_type: SUPPORTS
+  - from: C_DOGFOOD_VALUE
+    to: Q_VALUE
+    edge_type: TRACES_TO
+  - from: C_COEVOLVE_VALUE
+    to: Q_VALUE
+    edge_type: TRACES_TO
+  - from: C_MARKET_COMMODITY
+    to: Q_MARKET
+    edge_type: TRACES_TO
+  - from: C_ORBIT_CAVEAT
+    to: Q_ICP
+    edge_type: TRACES_TO
+  - from: C_ORBIT_CAVEAT
+    to: C_MARKET_PULL
+    edge_type: REFUTES
+  - from: C_MARKET_COMMODITY
+    to: C_PIPELINE_COMMODITY
+    edge_type: SUPPORTS
+  - from: C_PIPELINE_COMMODITY
+    to: Q_IDENTITY
+    edge_type: TRACES_TO
+  - from: C_FLOW_EVOLUTION
+    to: Q_IDENTITY
+    edge_type: TRACES_TO
+  - from: C_PUBLIC_AHEAD
+    to: C_IDENTITY_DRIFT
+    edge_type: SUPPORTS
+  - from: C_IDENTITY_DRIFT
+    to: Q_IDENTITY
+    edge_type: TRACES_TO
+  - from: C_EDGE_HAGEL
+    to: Q_FUTURE
+    edge_type: TRACES_TO
+  - from: C_EDGE_HAGEL
+    to: C_NS1_KG
+    edge_type: SUPPORTS
+  - from: C_NS1_KG
+    to: C_KG_BIZ_UNPROVEN
+    edge_type: DEPENDS_ON
+  - from: C_KG_BIZ_UNPROVEN
+    to: D_METHOD_KG
+    edge_type: TRACES_TO
+  - from: Q_NORTHSTAR
+    to: C_NS1_KG
+    edge_type: DEPENDS_ON
+  - from: Q_NORTHSTAR
+    to: C_NS3_EDU
+    edge_type: DEPENDS_ON
+  - from: C_ICP_REGULATED
+    to: Q_ICP
+    edge_type: TRACES_TO
+  - from: C_ICP_TENSION
+    to: Q_ICP
+    edge_type: TRACES_TO
+  - from: C_COMPLIANCE_RARE
+    to: C_ICP_REGULATED
+    edge_type: DEPENDS_ON
+  - from: C_COMPLIANCE_RARE
+    to: Q_MARKET
+    edge_type: TRACES_TO
+  - from: C_CATEGORY_UNNAMED
+    to: Q_FUTURE
+    edge_type: TRACES_TO
+  - from: Q_COLD_ADOPTER
+    to: C_ORBIT_CAVEAT
+    edge_type: DEPENDS_ON
