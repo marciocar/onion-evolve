@@ -2,20 +2,22 @@
 title: "Veredito — metodologia de branches (main-produto × rhilo/main-cliente × develop) — resposta ao sinal metagamify/rhilo"
 category: meta
 tags: [gitflow, lineages, escopo, versao, rfc-0004, rfc-0005, federacao, veredito, co-evolve]
-status: rascunho-para-ratificacao
+status: ratificado
+ratificado_em: 2026-07-11
+ratificado_por: maestro (Marcio)
 date: 2026-07-11
 re: docs/evolution/inbox/2026-07-10-metodologia-branches-gitflow-main-produto-vs-rhilo.md
 para: metagamify (rhilo) — via /meta:co-evolve (outbox)
 mecanismo: onion-adr-branch-roles-sdaal-2026-07.md (o SDAAL que sustenta a resposta)
-autor: onion (síntese) — PENDENTE ratificação do maestro
+autor: onion (síntese) — RATIFICADO pelo maestro 2026-07-11
 ---
 
 # Veredito — metodologia de branches (resposta ao sinal de 2026-07-10)
 
-> **Status: RASCUNHO PARA RATIFICAÇÃO.** Este é o veredito recomendado, ancorado em evidência
-> (RFC-0004, RFC-0005, parecer de 03/07, verificação git). **Não** vai ao consumidor antes do "vai" do
-> maestro — a pergunta era dirigida a ele. As recomendações honram a diretriz **"não entortar doutrina
-> para caber na tese; os eixos coexistem"**.
+> **Status: RATIFICADO pelo maestro (2026-07-11).** Veredito ancorado em evidência (RFC-0004, RFC-0005,
+> parecer de 03/07, verificação git); as recomendações honram a diretriz **"não entortar doutrina para caber
+> na tese; os eixos coexistem"**. Ratificado → **liberado para resposta ao consumidor** (metagamify/rhilo) via
+> `/meta:co-evolve` (outbox), e o **Movimento 1 está destravado**.
 
 ## 0. Correção factual antes de qualquer veredito (o enquadramento estava errado)
 
@@ -140,15 +142,20 @@ cliente RHILO   → NÃO é branch: é CAMADA DE ESCOPO composta sobre o produto
 - **Movimento 1 permanece o próximo passo** — vendorizar o framework na linhagem de produção, agora com o
   vetor confirmado (não vendorizar na linhagem errada de novo).
 
-## 5. O que NÃO foi decidido aqui (fica com o maestro)
+## 5. Decisões ratificadas pelo maestro (2026-07-11)
 
-- Adicionar a lineage `product`(main) ao `members.yaml` — **recomendado**, mas é edição do SSOT de federação.
-- Se e quando extrair as customizações-RHILO para camadas de escopo (esforço real; a RFC-0005 Fase 3
-  `SUPERSEDES`-de-escopo ainda é gated).
-- Liberar o **Movimento 1** (o sinal pediu para **segurá-lo** até o vetor confirmar — este veredito **é** a
-  confirmação do vetor: pode seguir).
+- ✅ **`develop` = GitFlow E lane-de-framework coexistem** (declarado ≠ drift); a lineage `framework`(develop)
+  do parecer fica ratificada.
+- ✅ **Adicionar a lineage `product`(main) ao `members.yaml`** — aprovado (edição do SSOT de federação a fazer).
+- ✅ **Cliente = escopo (compõe) × deploy = versão (ramifica)**; `rhilo/main` legítima como branch de deploy,
+  antipadrão como "branch do cliente" — mecanismo formalizado no branch-roles SDAAL.
+- ✅ **Movimento 1 DESTRAVADO** — o sinal pediu segurá-lo até o vetor confirmar; este veredito ratificado **é**
+  a confirmação. Pode seguir (vendorizar o framework na linhagem de produção).
+- ⏳ **Gated (não agora):** extrair as customizações-RHILO para camadas de escopo (RFC-0005 Fase 3
+  `SUPERSEDES`-de-escopo ainda gated) — abre por gatilho, não neste ato.
 
 ---
 
-**Próximo passo:** ratificação do maestro → resposta ao metagamify via `/meta:co-evolve` (outbox), citando
-este doc. Enquanto não ratificado, o Movimento 1 segue segurado conforme o consumidor pediu.
+**Próximo passo (ratificado):** responder o metagamify via `/meta:co-evolve` (outbox), citando este doc + o
+ADR branch-roles SDAAL. O Movimento 1 está **destravado** — a hold que o consumidor pediu foi levantada por
+esta ratificação.
