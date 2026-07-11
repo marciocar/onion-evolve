@@ -18,7 +18,13 @@
 funcionam com `tmux`. **Nunca opere o Onion remoto sem `tmux`**: sem ele, uma queda de conexão mata a sessão
 Claude e o trabalho em voo.
 
-## 2. mosh + tmux — recomendado para conexão que oscila
+> ✅ **Recomendação do Onion: a dobradinha `mosh` + `tmux` é a mais adequada para operar o core remoto** —
+> resiliência (roaming/sleep/**reconexão automática**) + persistência + scrollback via tmux. Mesmo numa conexão
+> "estável", notebook dorme e rede troca; a dobradinha absorve isso sem você re-digitar nada. **`ssh` + `tmux`
+> é a alternativa mais popular e conhecida, e também é válida** — mas é o plano B (mais simples, reconexão
+> manual), não o par recomendado. Escolha `ssh` por simplicidade/nativo-Windows; escolha `mosh` por padrão.
+
+## 2. mosh + tmux — a dobradinha RECOMENDADA (default)
 
 `mosh` (Mobile Shell) é o transporte resiliente: sobrevive a **roaming, sleep, latência alta** e **reconecta
 sozinho** (fecha o notebook, reabre, já está lá). Eco local instantâneo.
@@ -31,18 +37,22 @@ sozinho** (fecha o notebook, reabre, já está lá). Eco local instantâneo.
 - Com porta SSH alternativa: `mosh --ssh="ssh -p <porta>" <user>@<host>` (o `mosh` faz o SSH primeiro, depois
   troca para UDP).
 
-## 3. ssh + tmux — alternativa mais simples (conexão estável)
+## 3. ssh + tmux — a alternativa popular e simples (plano B)
 
-`ssh` é universal, TCP, sem camada extra, sem UDP. Se o SSH cai, o `tmux` na máquina remota **mantém tudo**;
-você re-conecta e `tmux attach`. Diferença vs `mosh`: **você reconecta na mão** (o `mosh` reconecta sozinho).
-Nativo no PowerShell (OpenSSH) e no WSL.
+`ssh` é o mais **conhecido/popularizado** e o mais simples: universal, TCP, sem camada extra, sem UDP, nativo
+no PowerShell (OpenSSH) e no WSL. **É uma escolha válida** — só não é o par recomendado (§2). Se o SSH cai, o
+`tmux` na máquina remota **mantém tudo**; você re-conecta e `tmux attach`. Diferença vs `mosh`: **você
+reconecta na mão** (o `mosh` reconecta sozinho). Prefira `ssh` se valoriza simplicidade/nativo; senão, `mosh`.
 
 ## 4. O decisor
 
+> **Default recomendado: `mosh` + `tmux`.** A tabela abaixo é o desempate fino — mas na dúvida, use a dobradinha.
+
 | Sua situação | Use |
 |---|---|
-| Conexão oscila · notebook dorme · troca de rede | **`mosh` + `tmux`** |
-| Conexão estável · quer menos peças · nativo Windows | **`ssh` + `tmux`** |
+| **Padrão / na dúvida** | ✅ **`mosh` + `tmux`** (recomendado) |
+| Conexão oscila · notebook dorme · troca de rede | **`mosh` + `tmux`** (onde mais brilha) |
+| Só quer simplicidade / nativo Windows / conexão sempre estável | **`ssh` + `tmux`** (alternativa popular) |
 | **Sempre** | **`tmux`** — `mosh` persiste a *conexão*; `tmux` persiste a *sessão* (e sobrevive a reboot da máquina, que o `mosh` não) |
 
 São **complementares, não substitutos**: `mosh` reconecta o transporte; `tmux` guarda a sessão.
