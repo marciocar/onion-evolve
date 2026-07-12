@@ -4,6 +4,11 @@ category: discussion
 status: fonte-de-discussao-isolada
 date: 2026-07-11
 branch: discuss/interface-state-of-art
+# ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
+phase: CONVERGE        # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
+next_action: "Instrumentar N≥3 sessões INTERATIVAS pra provar recorrência (N02) — só então o loop NS1 é observável; em paralelo, colher os 3 invariantes prontos (exibir-degrada-skip/gatear-degrada-veto · formativo-não-performático · gate-em-camadas-por-risco) → authorization-layers §7; emitir o .kg.yaml da estrela."
+scope_globs: ["docs/onion/graph/", "docs/knowledge-base/concepts/authorization-layers-intake-vs-execution.md"]
+objective_tags: ["NS1", "intake-execucao", "dogfood-auditavel"]
 ---
 
 # 🧵 A interface no estado da arte — como servir melhor o que estamos construindo
