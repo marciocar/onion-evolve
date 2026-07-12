@@ -86,3 +86,26 @@ Conteúdo **OFF** (`OTEL_LOG_USER_PROMPTS` não setado — intake=estrutura). Fi
 Leg-1 (N≥4, recorrência confirmada + refutada) prova **o loop observa** → move o diferenciador NS1 de design pra
 medido. Os **invariantes** só promovem depois da **leg-2** (intervenção + re-medida). Até lá, `R_*` seguem
 candidatos — e isso está **certo**.
+
+## 8. Adendo pré-dados — aperto do sinal 3 (loop) + piso do sinal 2 (2026-07-12)
+
+> **Legítimo como pré-registro, NÃO HARKing:** nenhum dado interativo confirmatório existe ainda. Um shakedown
+> **headless** do harness (validação de instrumento, explicitamente não-Leg-1) expôs dois falsos-positivos na
+> definição operacional dos sinais. Corrigi-los **antes** de rodar as sessões é refinar o pré-registro; corrigi-los
+> **depois** de ver dados reais seria exploratório. Registrado aqui para travar a versão vigente.
+
+**Falso-positivo 1 — sinal 3 (loop).** A v1 marcava "mesmo span-name ≥3× na sessão" → pegava `claude_code.llm_request`,
+que é **cadência normal multi-turno**, não "travei". **Aperto (v2):** loop deixa de ser span-name repetido e passa a
+ser **episódio repetido na sequência de FERRAMENTAS**:
+- **(a) ciclo multi-tool:** sub-sequência contígua de len≥2 com **≥2 tipos distintos** de tool, repetida ≥2× (ex.: edit↔test);
+- **(b) retry:** mesma tool ≥3× consecutivas **só se** a sessão teve `reject` (retry-após-negação).
+- **Batch produtivo de 1 tool** (ex.: `Write×3` sem reject) **NÃO** é loop. Validado: o batch parou de disparar.
+
+**Falso-positivo 2 — sinal 2 (`blocked_on_user`).** A v1 marcava "topo do quartil da sessão" e disparava sobre ~7ms
+(ruído headless). **Aperto:** piso de magnitude **`BLOCKED_FLOOR_MS = 1000`** — gate humano real dura segundos; <1s
+não conta. Reforça o achado A da NOTE-05 (o sinal só é significativo em sessão interativa).
+
+**Limite honesto que permanece:** mesmo o loop v2 **não decide sozinho** stuck-vs-produtivo — um ciclo edit↔test
+repetido pode ser progresso legítimo. Por isso o **refutador (§4) continua obrigatório** sobre todo candidato: o
+aperto reduz o ruído de entrada, não substitui o julgamento adversarial. (Local do heurístico: `leg1_analyze.py`,
+efêmero no scratchpad — reproduzível; não é código de produto.)
