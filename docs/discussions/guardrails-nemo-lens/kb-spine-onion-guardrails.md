@@ -63,6 +63,12 @@ O **modo estrutural é o mais seguro**: não depende de a condição de erro ser
 
 Destilada de **148 vetos categorizados reais** minerados dos gates (todos com read-path confirmado — evidência completa em [`taxonomy-onion-r.md`](./taxonomy-onion-r.md)). **A taxonomia emergiu dos vetos, não foi projetada.**
 
+> **ONION-R é uma LENTE/ÍNDICE sobre gates existentes — não um sistema paralelo.** **11 das 14 categorias
+> HERDAM por read-path** de mecanismos que já rodam (`a2a-verify`, `trust-topology-check`,
+> `metaspec-gate-keeper`, `.claude/validation/*`); só R15 traz design novo — e mesmo ele **estende** a linha
+> intake×execução da KB [`authorization-layers`](../../knowledge-base/concepts/authorization-layers-intake-vs-execution.md), não a reinventa. Reconciliação completa (checagem #1 do core):
+> [`reconciliation-authorization-layers.md`](./reconciliation-authorization-layers.md).
+
 | ONION-Rn | Categoria | Placement | Modo dominante | Análogo de mercado |
 |---|---|---|---|---|
 | **R1** | Integridade de SSOT / drift doc↔filesystem | meta | determinístico | sem equiv. (~LLM03) |

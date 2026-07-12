@@ -61,7 +61,7 @@ Uma linha de **constituição** nos agentes/skills que consomem os canais (`co-e
 Gated (o agente obedece a constituição) + estrutural (a cerca de R15.1 dá a fronteira sintática que a constituição referencia).
 
 ### R15.3 — Efeito gated  ·  modo: **estrutural (C1/C2) + gated (C3)**
-Qualquer efeito **externo/irreversível** (commit, push, PR, send, apply) *derivado de* conteúdo não-confiável cruza o **gate de execução** (intake×execução → maestro). Para C1/C2 **já é estrutural** (`a2a-accept` never-apply; `co-deliver` never-commit). R15 **nomeia** isso e **estende** a exigência a C3 (adotar/reverse-eng não deve auto-aplicar mudança guiada por conteúdo alheio sem gate). É a instância direta da camada de liberação (`authorization-layers-intake-vs-execution`): **ingresso é autônomo, efeito é gated.**
+Qualquer efeito **externo/irreversível** (commit, push, PR, send, apply) *derivado de* conteúdo não-confiável cruza o **gate de execução** (intake×execução → maestro). Para C1/C2 **já é estrutural** (`a2a-accept` never-apply; `co-deliver` never-commit). R15 **nomeia** isso e **estende** a exigência a C3 (adotar/reverse-eng não deve auto-aplicar mudança guiada por conteúdo alheio sem gate). **R15.3 HERDA — não reinventa:** é a linha da KB [`authorization-layers`](../../knowledge-base/concepts/authorization-layers-intake-vs-execution.md) (**ingresso autônomo, efeito gated**), e `onion-effect-gate.sh` (R15.3b) **materializa o "próximo passo" que a própria KB §7 declarou faltar** (*"a linha não é enforçada uniformemente por um só helper — um lint/helper transversal seria o próximo passo"*). Não há modelo concorrente: há o modelo da KB ganhando o helper que lhe faltava.
 
 ## 4. O que R15 NÃO é (guarda contra o scope-creep)
 
