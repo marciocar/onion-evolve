@@ -145,9 +145,9 @@ nodes:
     layer: audit
     plane: DEV
     impact: 4
-    confidence: 0.6
+    confidence: 0.45
     status: open
-    label: "colher os 3 invariantes prontos para o core (authorization-layers §7) — gated pelo maestro"
+    label: "colher os 3 invariantes para o core (authorization-layers §7) — GATED: candidatos contestados pelo refutador, aprovacao e nossa"
   - id: D_KGCONSOLE_INSPECTION
     node_type: decision
     layer: audit
@@ -163,7 +163,7 @@ nodes:
     layer: audit
     plane: DEV
     impact: 4
-    confidence: 0.7
+    confidence: 0.5
     status: open
     label: "exibir degrada skip; gatear degrada veto (gerador vs gate — a metade certa por elemento)"
   - id: R_FORMATIVO
@@ -171,7 +171,7 @@ nodes:
     layer: audit
     plane: DEV
     impact: 3
-    confidence: 0.7
+    confidence: 0.4
     status: open
     label: "formativo, nao performatico — nada de metrica rankeavel/comparavel no tempo"
   - id: R_GATE_CAMADAS
@@ -179,9 +179,35 @@ nodes:
     layer: audit
     plane: DEV
     impact: 4
-    confidence: 0.7
+    confidence: 0.55
     status: open
     label: "gate em camadas por risco = materializacao visual da linha: intake auto / reversivel soft / irreversivel hard"
+
+  # ---- refutacoes do refutador (contestaveis — hipoteses, nao veredito; cada uma com sua confianca) ----
+  - id: REF_1_DISPLAY_FEEDS_GATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.65
+    status: open
+    label: "refutador: display que ALIMENTA um gate (evidence-pack) degradando pra skip enfraquece o gate — falta recorte 'input-de-gate degrada veto'"
+  - id: REF_2_LOOP_NEEDS_TREND
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: open
+    label: "refutador: o loop NS1 (N01->N03) exige re-medir blocked_on_user no tempo; 'nada comparavel no tempo' proibe o proprio loop (auto-contradicao)"
+  - id: REF_3_EXTERNAL_IS_IRREVERSIBLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: open
+    label: "refutador: 'reversivel=soft' abre buraco — enviar pra externo ja expoe; core ja trata externo=publicar=irreversivel (co-deliver/a2a), precisa herdar"
 
   # ---- ancoras cross-study (entidades — o que o radar cruza entre estrelas) ----
   - id: ENT_AUTH_LAYERS
@@ -283,3 +309,14 @@ edges:
   - from: ENT_PESSOAL_STAR
     to: C_TELEMETRY_VIABLE
     edge_type: DEPENDS_ON
+
+  # >>> refutador dobrado de volta: REFUTES entrando em rule OPEN acende o flag de contradicao nao-reconciliada <<<
+  - from: REF_1_DISPLAY_FEEDS_GATE
+    to: R_EXIBIR_SKIP_GATEAR_VETO
+    edge_type: REFUTES
+  - from: REF_2_LOOP_NEEDS_TREND
+    to: R_FORMATIVO
+    edge_type: REFUTES
+  - from: REF_3_EXTERNAL_IS_IRREVERSIBLE
+    to: R_GATE_CAMADAS
+    edge_type: REFUTES
