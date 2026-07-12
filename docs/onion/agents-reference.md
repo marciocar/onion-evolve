@@ -6,7 +6,7 @@ Este guia documenta os agentes especializados disponíveis no sistema `.claude/`
 
 ## 📊 Resumo
 
-> **Contagens canônicas por categoria e total:** [docs/onion/inventory.md](inventory.md) — **SSOT gerada do filesystem** (`/meta:inventory`), validada no CI. Sistema Onion: **96 comandos** em 10 categorias, **51 agentes** em 9 categorias, **8 skills**, **71 knowledge bases**. Categorias de agentes: `development/`, `product/`, `compliance/`, `git/`, `meta/`, `testing/`, `review/`, `research/`, `deployment/`.
+> **Contagens canônicas por categoria e total:** [docs/onion/inventory.md](inventory.md) — **SSOT gerada do filesystem** (`/meta:inventory`), validada no CI. Sistema Onion: **96 comandos** em 10 categorias, **51 agentes** em 9 categorias, **8 skills**, **72 knowledge bases**. Categorias de agentes: `development/`, `product/`, `compliance/`, `git/`, `meta/`, `testing/`, `review/`, `research/`, `deployment/`.
 
 ## 📋 Índice de Agentes
 
@@ -52,7 +52,7 @@ Este guia documenta os agentes especializados disponíveis no sistema `.claude/`
 ```
 
 **Capacidades**:
-- Conhecimento completo: 96 comandos, 51 agentes, 8 skills, 71 knowledge bases
+- Conhecimento completo: 96 comandos, 51 agentes, 8 skills, 72 knowledge bases
 - Análise inteligente de contexto e recomendação de abordagem
 - Orquestração de workflows end-to-end
 - Delegação para agentes especializados
