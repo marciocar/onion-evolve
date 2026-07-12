@@ -5,9 +5,9 @@ status: fonte-de-discussao-isolada
 date: 2026-07-11
 branch: discuss/behavior-mapping-kg
 # ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
-phase: DEEP            # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
+phase: CONVERGE       # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
 index: README.md       # ← entrada da frente: as 5 notas + sínteses + protos
-next_action: "[Contexto mesclado em main: a premissa telemetria compartilhada (C_TELEMETRY_VIABLE) está formalizada na pesquisa da camada dialógica + no overlay constellation.kg.yaml; a estrela interface (o loop) foi promovida #344 — checar o schema de coleta CONTRA eles, não reinventar.] As 5 perguntas do SEED estão trabalhadas (ver README.md → Q1–Q5, cada uma com nota + pesquisa citada + proto kg-radar verde). Próximo passo é do maestro: promover algo a feat/*, aprofundar uma nota, FECHAR a decisão aberta da Q5 (sensor-capability × produto próprio), ou parkear."
+next_action: "[Contexto mesclado em main: a premissa telemetria compartilhada (C_TELEMETRY_VIABLE) está formalizada na pesquisa da camada dialógica + no overlay constellation.kg.yaml; a estrela interface (o loop) foi promovida #344 — checar o schema de coleta CONTRA eles, não reinventar.] As 5 perguntas do SEED estão trabalhadas (ver README.md → Q1–Q5, cada uma com nota + pesquisa citada + proto kg-radar verde). Q5 FECHADA (2026-07-12): sensor-como-capability; produto próprio deferido (gated: pull frio externo). Próximo passo é do maestro: promover algo a feat/*, aprofundar uma nota, ou parkear."
 scope_globs: ["docs/onion/graph/", "docs/knowledge-base/concepts/"]
 objective_tags: ["NS1", "intake-execucao", "kg-map"]
 ---
@@ -38,7 +38,7 @@ contexto**, mapear **fluxos, telas e sistemas**, e daí **criar novos processos 
 2. O que é **intake** (observar/guardar) × **execução** (agir sobre) — o estudo de camadas de liberação aplica direto.  → [02 — intake × execução](02-intake-execucao.md)
 3. Captura: passiva (telas/ações) vs declarada (o usuário anota)? Local-first vs nuvem?  → [03 — captura e localidade](03-captura-e-localidade.md)
 4. Do sinal bruto ao KG: o que vira `claim`/`event`/`entity`? Como o radar reconcilia "o que a pessoa faz × diz"?  → [04 — sinal ao KG](04-sinal-ao-kg.md)
-5. Fronteira produto: isto é **feature do Onion pessoal** ou um **produto próprio** (process-mining pessoal)?  → [05 — fronteira de produto](05-fronteira-produto.md) _(decisão aberta)_
+5. Fronteira produto: isto é **feature do Onion pessoal** ou um **produto próprio** (process-mining pessoal)?  → [05 — fronteira de produto](05-fronteira-produto.md) _(✅ DECIDIDO: capability; produto deferido)_
 
 ## Conexões com o que já existe
 - **KG SDAAL** (`/meta:kg` modo `map`, atom-map de telas/sistemas), `de-identification` SDAAL, `exposes:`/soberania.

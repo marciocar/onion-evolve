@@ -1,25 +1,28 @@
 ---
-title: "P5 — Fronteira de produto: o sensor é capability do Onion pessoal (decisão aberta)"
+title: "P5 — Fronteira de produto: o sensor é capability do Onion pessoal (DECIDIDO; produto deferido)"
 category: discussion-note
 status: fonte-de-discussao-isolada
+decisao: "FECHADA 2026-07-12 — sensor-como-capability; produto próprio deferido (gated: pull frio externo)"
 branch: discuss/behavior-mapping-kg
 responde: "SEED.md — pergunta 5 (feature do Onion pessoal vs produto próprio)"
 lente: "feature × produto (continuum de VC) + a identidade canônica do Onion"
 ancora_pesquisa: research/SYNTHESIS-P5.md
-metodo: "pesquisa orquestrada 1 frente (citada) + identidade canônica; recomendação, não decisão"
+metodo: "pesquisa orquestrada 1 frente (citada) + identidade canônica; decisão do maestro em 2026-07-12"
 constroi_sobre: [01-consentimento-dual, 02-intake-execucao, 03-captura-e-localidade, 04-sinal-ao-kg]
 ---
 
 # 🧵 P5 — Fronteira de produto
 
 > **Isolada.** Pensa, não entrega. Nada vai pro core sem o maestro pedir. Não misturar com os
-> outros temas. ⚠️ **Esta nota NÃO decide** — recomenda e deixa a escolha de rumo com o maestro.
+> outros temas. ✅ **DECIDIDA pelo maestro (2026-07-12):** sensor-como-**capability**; o produto
+> próprio fica **deferido** (revisável se surgir pull frio externo). A recomendação abaixo virou decisão.
 
 ## O veredito, em uma frase
 
 **O enquadramento "sensor" alinha com a identidade do Onion (capability que alimenta o Onion
 pessoal, não produto standalone); a hipótese "produto próprio" é real mas ocupada e conflita com a
-identidade canônica — por isso a recomendação é sensor-como-capability, e a decisão fica ABERTA.**
+identidade canônica — por isso a decisão (fechada em 2026-07-12) é sensor-como-**capability**, com o
+produto próprio **deferido** e revisável se surgir pull frio externo.**
 
 ## 1. Sensor é plataforma; produto é o que se faz com o log
 
@@ -47,17 +50,22 @@ canônica **e** entrada num mercado ocupado (RescueTime/Timely + enterprise). Um
 que alimenta o Onion pessoal é coerente com a tese knowledge-centric: atividade bruta → conhecimento
 reconciliado (P4), consumido pelo cérebro pessoal.
 
-## 3. A recomendação (não a decisão)
+## 3. A decisão (fechada pelo maestro, 2026-07-12)
 
-> **Sensor-como-capability do Onion pessoal.** O sensor (P1–P4: captura consentida, 3 gates, local-
-> first, bruto→KG) é uma **capability** que alimenta `onion-pessoal-marcio` — não um produto
-> próprio. A hipótese "produto próprio de process-mining consentido" **fica gated ao maestro**: é
-> escolha de rumo (poderia justificar-se se a inteligência sobre o log virasse o diferencial, e se o
-> maestro aceitar o desvio de identidade). A nota **não fecha** isto.
+> **DECIDIDO: sensor-como-capability do Onion pessoal.** O sensor (P1–P4: captura consentida, 3
+> gates, local-first, bruto→KG) é uma **capability** que alimenta `onion-pessoal-marcio` — não um
+> produto próprio. A hipótese "produto próprio de process-mining consentido" fica **DEFERIDA** (não
+> descartada): revisável **se e quando** surgir um **pull frio externo** que prove a dor num mercado
+> grande — o gatilho herda o desempate `Q_COLD_ADOPTER` do north-star (hoje: *zero adotante frio* →
+> a demanda é do eixo, não do Onion).
 
-Por que deixar aberto e não decidir: a fronteira feature×produto é **contínua, não binária**, e a
-escolha "virar produto" é estratégica (identidade, mercado, foco) — exatamente o tipo de decisão que
-o padrão discussion-worktrees reserva ao maestro (*"nada promove ao core sem o maestro pedir"*).
+Por que capability, e por que deferir (não matar) o produto:
+- **Capability** alinha com a identidade canônica (framework-template, sem CLI/produto standalone) e
+  com a tese knowledge-centric — o valor está na inteligência sobre o log, que é o cérebro pessoal.
+- **Deferir** (não descartar) é honesto: a fronteira feature×produto é **contínua, não binária**;
+  um pull frio externo futuro poderia reabrir a hipótese-produto sem contradizer esta decisão.
+- **Gatilho de revisão:** surgir demanda arms-length por um process-mining pessoal standalone
+  (o experimento `Q_COLD_ADOPTER`). Enquanto não surgir, capability é a escolha.
 
 ## Honestidade (o fecho)
 
@@ -65,42 +73,43 @@ o padrão discussion-worktrees reserva ao maestro (*"nada promove ao core sem o 
   fechadas — "ser a plataforma" e "ser o negócio" são coisas distintas.
 - **Privacidade é diferencial E ônus.** O que a P1–P3 tratam como virtude (local-first, consentido)
   a literatura de personal informatics trata como custo de curadoria/retenção. As duas leituras convivem.
-- **Recomendação ≠ veredito.** Eu recomendo o caminho-capability, mas a decisão de produto é do
-  maestro — o proto deixa `D_SENSOR_AS_CAPABILITY` com `status: open` de propósito.
+- **Decidido, não `done`.** O maestro fechou como capability (`D_SENSOR_AS_CAPABILITY` = `confirmed`),
+  mas não é `done`: rumo estratégico não se verifica em PROD. Fica **revisável** pelo gatilho de pull
+  frio — o proto mantém `C_PRODUCT` `open` (deferido), não refutado.
 - **Fonte do "sensor estratégico" é composta** — montei a distinção das arquiteturas (ActivityWatch)
   + o cânone feature/produto, não de um artigo único que a nomeie assim.
 
 ## Tabela de fecho
 
-| Caminho | A favor | Contra | Alinha com identidade? |
-|---------|---------|--------|------------------------|
-| **Sensor/capability** (recomendado) | coerente com framework-template; alimenta o cérebro pessoal | sozinho é "feature" | ✅ sim |
-| **Produto próprio** | mercado real; valor na inteligência sobre o log | mercado ocupado; desvia da identidade canônica | ❌ conflita |
-| **Decisão** | — | — | 🔓 **ABERTA — do maestro** |
+| Caminho | A favor | Contra | Veredito |
+|---------|---------|--------|----------|
+| **Sensor/capability** | coerente com framework-template; alimenta o cérebro pessoal | sozinho é "feature" | ✅ **ESCOLHIDO** |
+| **Produto próprio** | mercado real; valor na inteligência sobre o log | mercado ocupado; desvia da identidade canônica | ⏸️ **DEFERIDO** (gated: pull frio) |
+| **Decisão** | — | — | ✅ **FECHADA 2026-07-12 — capability** |
 
 ## Dogfood
 
 A fronteira vive como **grafo de decisão** (camada audit) em
 [`proto/product-boundary.kg.yaml`](proto/product-boundary.kg.yaml) — a decisão
-`D_SENSOR_AS_CAPABILITY` fica **`status: open`** (não decidida), com as hipóteses feature/produto e o
-conflito de identidade como claims que ela `DEPENDS_ON`.
+`D_SENSOR_AS_CAPABILITY` agora é **`status: confirmed`**; `C_FEATURE` confirmado; `C_PRODUCT` fica
+`open` (**deferido**, não refutado); e uma evidência `E_NORTHSTAR` sustenta deferir o produto.
 
 ```bash
 $ bash .claude/validation/kg-radar.sh docs/discussions/behavior-mapping-kg/proto/product-boundary.kg.yaml
-# ══ RADAR: a decisão OPEN e a pergunta no topo da atenção — "isto ainda é do maestro"
+# ══ RADAR: D_SENSOR_AS_CAPABILITY (confirmed) + C_FEATURE no topo; C_PRODUCT despencou (deferido)
 # ══ RADAR-DE-DOMÍNIO: (camada domain ausente — grafo puramente epistêmico/audit)
-# ══ INTEGRIDADE: ✅ sem contradições estruturais (8 nós, 9 arestas)  → exit 0
+# ══ INTEGRIDADE: ✅ sem contradições estruturais (9 nós, 10 arestas)  → exit 0
 ```
 
-O radar deixa a decisão aberta no topo — a P5 mapeou o terreno e recomendou, mas o grafo registra
-honestamente que a escolha **ainda não foi feita**.
+O radar agora coloca a **decisão fechada** no topo — a P5 mapeou o terreno, o maestro decidiu, e o
+grafo registra o fecho (capability) mantendo o produto como hipótese **deferida**, não morta.
 
 ---
 
 ## 🏁 A frente behavior-mapping-kg — as 5 perguntas do SEED
 
-Com a P5, as cinco perguntas de partida do SEED estão **abertas e trabalhadas** (não "fechadas" — é
-uma discussão):
+Com a P5 **fechada**, as cinco perguntas de partida do SEED estão trabalhadas — e a única decisão de
+rumo (Q5) foi tomada:
 
 | # | Nota | Veredito curto |
 |---|------|----------------|
@@ -108,7 +117,7 @@ uma discussão):
 | Q2 | [02 — intake × execução](02-intake-execucao.md) | três gates (observar/inferir/agir), não um |
 | Q3 | [03 — captura e localidade](03-captura-e-localidade.md) | passiva **E** declarada; bruto fica local |
 | Q4 | [04 — sinal ao KG](04-sinal-ao-kg.md) | event/entity/claim; reconciliar faz×diz por SUPPORTS/REFUTES/SUPERSEDES |
-| Q5 | [05 — fronteira de produto](05-fronteira-produto.md) | recomenda capability; **decisão de produto aberta** |
+| Q5 | [05 — fronteira de produto](05-fronteira-produto.md) | ✅ **DECIDIDO: capability**; produto próprio **deferido** (gated: pull frio) |
 
 **Nada promove ao core sem o maestro pedir.** A frente pensou até clarear; o próximo passo (promover
 algo a `feat/*`, aprofundar uma nota, ou descartar) é decisão do maestro.
