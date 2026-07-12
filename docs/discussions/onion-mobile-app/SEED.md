@@ -6,7 +6,7 @@ date: 2026-07-11
 branch: discuss/onion-mobile-app
 # ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
 phase: SEED            # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
-next_action: "Esperar a substância do cacho firmar (superfície segue substância): explorar a superfície (PWA/onion-bridge/onion-mini + voz como canal de intenção) depois que o cérebro (pessoal-marcio) tiver base confirmada."
+next_action: "Esperar a substância do cacho firmar (superfície segue substância): explorar a superfície (PWA/onion-bridge/onion-mini + voz como canal de intenção) depois que o cérebro (pessoal-marcio) tiver base confirmada. [Contexto mesclado: a pesquisa da camada dialógica (prévia/voz/superfície) e o estudo interface (#344) estão em main — aterram a superfície quando o cérebro firmar.]"
 scope_globs: ["docs/onion/"]
 objective_tags: ["NS2", "portatil", "familia"]
 ---
