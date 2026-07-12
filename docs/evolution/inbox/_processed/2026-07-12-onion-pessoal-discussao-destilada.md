@@ -71,7 +71,19 @@ status: candidatos (triagem gated — nada promovido)
 
 ---
 
-## Triagem do core (preencher na recepção)
+## Triagem do core (2026-07-12)
 
-- **Status:** _pendente_
-- **Roteamento:** _(qual candidato vira ADR / KB / nota / comando; qual fica no radar como `assess`)_
+- **Status:** processado. O candidato principal foi **promovido sob convite**; o restante **segurado
+  deliberadamente** pelo core (não é rejeição — é sequenciamento).
+- **Roteamento:**
+  - **Lente Aristóteles (régua+motor) → PROMOVIDA.** Virou a KB `transfer-heuristic-aristotle` (mesclada em
+    `main`) e foi **fiada no `/meta:adopt`** (decisão reuse-vs-fresh), com o carimbo *"earned by use, draw from
+    pessoal-marcio"* — usando esta discussão como **fonte + prova viva** (a régua pegando a própria falsa
+    distinção da estrela). Commits `0dcacbb` / `e0b2d6a` / `68c2e1f`; overlay `constellation.kg.yaml` registra
+    como **acordo + enriquecimento**, não contradição. Boletim downstream de retorno arquivado em
+    `inbound/_processed/2026-07-12-boletim-core.md`.
+  - **Restante → SEGURADO / `assess`** (self-red-team = dogfood-na-saída · workflow de discussão · Aufhebung =
+    append-mostly · gaps G1 domínio-não-software / G2 Verifiable Credentials / G3 inferência-sem-defesa). Decisão
+    do core: **segurar a promoção até o sensor (`behavior-mapping`) e o loop (`interface`, já promovido #344)
+    firmarem a base.** Alinha com a recomendação de triagem original (`assess`, nada bloqueante).
+- **Caveat mantido:** intra-órbita — a discussão N=1 prova o método, não o mercado; segue isolada.
