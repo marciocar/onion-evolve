@@ -4,6 +4,11 @@ category: discussion
 status: fonte-de-discussao-isolada
 date: 2026-07-11
 branch: discuss/onion-pessoal-marcio
+# ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
+phase: DEEP            # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
+next_action: "Segurar a promoção do cérebro pessoal até o sensor (behavior-mapping) + o loop (interface) confirmarem a base coletar→KG→reconciliar; converter a visão numa decisão gated em vez de aprofundar mais a visão."
+scope_globs: ["docs/onion/graph/", "docs/evolution/research/knowledge-centric-ssot-2026/"]
+objective_tags: ["NS1", "company-brain", "knowledge-centric"]
 ---
 
 # 🧵 Onion pessoal — um Company Brain para o Marcio Carvalho
