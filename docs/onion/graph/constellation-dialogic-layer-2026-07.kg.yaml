@@ -109,7 +109,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.3
-    status: open
+    status: done
     label: "quais campos exatos do boletim, e como projetar do .kg.yaml SEM expor o corpo (isolamento)?"
   - id: Q_AUTOREG_RHYTHM
     node_type: question
@@ -203,6 +203,48 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "resolvido: sem ritmo fixo; event-triggered (Aristoteles@intake, Hegel@contradicao, TTL-backstop@recolher), dogfood-gated; estende /meta:diary review + recolher + §2.6"
+
+  # ---- RESOLUCAO de Q_PREVIA_SCHEMA (projecao por-papel; o .kg.yaml e a face publica) ----
+  - id: C_PREVIA_IS_ROLE_PROJECTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "o boletim e projecao por-papel de .kg.yaml + SEED: claim/evidence confirmed=AFERIDO, decision=DECIDIDO/DECIDINDO, question open=DUVIDAS, REFUTES/SUPERSEDES=INCOMODOS, radar=o-que-fazer-agora"
+  - id: C_KG_IS_PUBLIC_FACE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "o .kg.yaml e a face epistemica PUBLICA da estrela (labels+scores, curado pelo autor); o corpo NOTE-prose e privado (Tier-1-3, sob convite) — Aristoteles: igual a metadado, diferente do corpo"
+  - id: C_PREVIA_IS_DETERMINISTIC
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "o boletim e projecao MECANICA de kg-radar.sh + SEED (molde federation-status-scan --json) — o core formata o que o motor computa, nao interpreta nem bisbilhota"
+  - id: D_PREVIA_SCHEMA_DEFINED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "resolvido: schema = Tier-0 (fase/next_action) + as 4 saidas do kg-radar reagrupadas por papel; fonte = .kg.yaml + SEED, NUNCA o corpo; read-only sob convite; Fase 1 = formatador fino"
+  - id: D_ISOLATION_EXTENSION_GATED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao nossa — candidato, nao promocao"
 
   # ---- ancoras (entidades) ----
   - id: ENT_DIARY_REVIEW
@@ -343,4 +385,27 @@ edges:
     edge_type: DEPENDS_ON
   - from: D_AUTOREG_EVENT_TRIGGERED
     to: Q_AUTOREG_RHYTHM
+    edge_type: SUPPORTS
+
+  # resolucao do schema: projecao por-papel + face publica; resíduo gated
+  - from: C_PREVIA_IS_ROLE_PROJECTION
+    to: D_PREVIA_SCHEMA_DEFINED
+    edge_type: SUPPORTS
+  - from: C_KG_IS_PUBLIC_FACE
+    to: D_PREVIA_SCHEMA_DEFINED
+    edge_type: SUPPORTS
+  - from: C_PREVIA_IS_DETERMINISTIC
+    to: D_PREVIA_SCHEMA_DEFINED
+    edge_type: SUPPORTS
+  - from: C_PREVIA_IS_ROLE_PROJECTION
+    to: C_PREVIA_CONTAINS_RADAR
+    edge_type: DEPENDS_ON
+  - from: C_PREVIA_IS_DETERMINISTIC
+    to: ENT_KG_SDAAL
+    edge_type: DEPENDS_ON
+  - from: C_KG_IS_PUBLIC_FACE
+    to: D_ISOLATION_EXTENSION_GATED
+    edge_type: SUPPORTS
+  - from: D_PREVIA_SCHEMA_DEFINED
+    to: Q_PREVIA_SCHEMA
     edge_type: SUPPORTS

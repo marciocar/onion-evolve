@@ -181,3 +181,30 @@ onde uma decisão de Aristóteles/Hegel já está sendo tomada:
 é **mensurável** — `blocked_on_user` subindo sinaliza que virou teatro. **Consequência:** os três gatilhos já
 acontecem → *piggyback* = zero cadência nova, nada a construir; estende `/meta:diary review` + o recolher do
 worklog + o critério §2.6.
+
+## 12. Resolução — o schema do boletim + a projeção sem expor o corpo (2026-07-12)
+
+A dúvida `Q_PREVIA_SCHEMA` foi trabalhada e **resolvida** (com um resíduo gated, honesto, abaixo). O boletim é uma
+**projeção por-papel** do `.kg.yaml` + SEED Tier-0:
+
+| Seção do boletim | Vem de |
+|---|---|
+| **fase · próximo passo** | SEED Tier-0 (`phase` · `next_action`) |
+| **aferido** | `claim`/`evidence` com `status: confirmed` (label + confidence) |
+| **decidido / decidindo** | `decision` — `confirmed` / `open` |
+| **dúvidas** | `question` `open`, ranqueadas por atenção = o "o que fazer agora" do RADAR |
+| **incômodos / problemas** | RECONCILIAÇÃO (`REFUTES`/`SUPERSEDES`) + contradições não-reconciliadas |
+| **saúde** | INTEGRIDADE (nº nós/arestas, pendências, exit) |
+
+**A projeção sem quebrar o isolamento:** a fonte é **o `.kg.yaml` + o SEED Tier-0, nunca o corpo (`NOTE-*.md`)**.
+Régua de Aristóteles: o `.kg.yaml` é *igual* a metadado (distilado estruturado, tipado, curado pelo autor, já
+construído pra compartilhar — é o insumo do radar) → transfere "metadado é intake seguro"; é *diferente* do corpo
+(prosa Tier-1→3) → privado, sob convite. Logo **o `.kg.yaml` é a face epistêmica pública da estrela** (como o SEED
+é seu Tier-0 público). Três travas: (1) **só labels + scores**, nunca a prosa; (2) **determinístico** (molde
+`federation-status-scan --json`) — o core formata o que o motor computa, não interpreta; (3) **read-only, sob
+convite** (intake). **Consequência:** zero motor novo — o boletim é `kg-radar.sh` + SEED reformatado; a Fase 1 é um
+formatador fino, gated.
+
+**Resíduo gated (honesto):** isso **estende** a linha só-metadados (hoje "frontmatter + Tier-0") para incluir o
+`.kg.yaml` como superfície pública. Essa extensão **precisa de ratificação** (candidato gated, não promoção) —
+registrada no grafo como `D_ISOLATION_EXTENSION_GATED` (`open`). É a próxima decisão nossa, se a Fase 1 abrir.
