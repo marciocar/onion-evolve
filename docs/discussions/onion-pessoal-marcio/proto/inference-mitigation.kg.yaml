@@ -1,0 +1,237 @@
+# Proto (sandbox) — a MITIGAÇÃO DE INFERÊNCIA como grafo de DOMÍNIO (P5).
+# PLAUSÍVEL/open — derivado de research/SYNTHESIS-P5.md. NÃO muta nada do core.
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/onion-pessoal-marcio/proto/inference-mitigation.kg.yaml
+# Espera: INTEGRIDADE exit 0; RADAR-DE-DOMÍNIO aponta ⚠ (estado-absorvente ST_EMISSAO — terminal legítimo).
+#
+# A tese da P5: para o DONO, a inferência interna é FEATURE (indefesa por construção); o perigo é o CRUZAMENTO da
+# fronteira. Defesa = 6 camadas NEGATIVAS na fronteira (começa no ACESSO: a saída não filtra o que nunca foi string).
+# status: confirmed = postura/peça Onion que transfere; status: open = camada nova a desenhar OU o gap irredutível.
+meta:
+  id: marcio-mitigacao-inferencia-p5
+  date: 2026-07-12
+nodes:
+  # ==== DOMAIN — o motor, a fronteira, e o fluxo de emissão ====
+  - id: EN_MOTOR
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "o motor/LLM local que lê o KG — infere o não-declarado (85-95%); para o dono, isso É a feature"
+  - id: EN_FRONTEIRA
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "a fronteira de transmissão — onde a defesa vive (o dano é o CRUZAMENTO, não a dedução)"
+  - id: ST_INFERENCIA_INTERNA
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "inferência INTERNA (o motor deduz para o dono) — legível, desejada, INDEFESA por construção"
+  - id: ST_EMISSAO
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "EMISSÃO (o destilado cruza a fronteira) — só predicado provado, gated; corta ~80%, não zera"
+  - id: EV_RELEASE_GATED
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "release gated por-destinatário/propósito, self-red-teamed (Deng: aprovação no ponto de transmissão)"
+
+  # ==== DOMAIN — as 6 camadas negativas de defesa ====
+  - id: PO_L1_ESCOPO
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.75
+    status: open
+    label: "L1 escopo de consulta: schema-mask + fatia-da-vertical por propósito (AskSafely) — dá ao motor só o mínimo"
+  - id: PO_L2_PROPOSITO
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "L2 propósito vinculado: monitor de traço data-category×purpose (C-Trace) — rejeita fora do propósito"
+  - id: PO_L3_FILTRO
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "L3 filtro de saída por COMPOSIÇÃO (QI-cluster) — a violação é composição de quase-identificadores, não string"
+  - id: PO_L4_JUIZ
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: confirmed
+    label: "L4 juiz-de-CI SEPARADO do motor (1-2-3 Check) — o gerador não pode ser o porteiro (conflito de objetivo)"
+  - id: PO_L5_REDTEAM
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: confirmed
+    label: "L5 self-red-team: rodar o PRÓPRIO motor como atacante antes do release (dogfood aplicado à privacidade)"
+  - id: PO_L6_BUDGET
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.55
+    status: open
+    label: "L6 ε-ledger monotônico (DP-Fusion/DP-ICL) — reconstrução por repetição no tempo; N=1 é o pior caso"
+
+  # ==== DOMAIN — invariantes (a verdade governante + o gap irredutível) ====
+  - id: IN_ACESSO_PRIMEIRO
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "a defesa começa no ACESSO — a saída não consegue filtrar uma conclusão que nunca foi string"
+  - id: IN_FEATURE_NA_FRONTEIRA
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "feature dentro, perigo na fronteira: para o dono inferir é o produto (Deng 3.75 vs 2.34); o dano é o cruzamento"
+  - id: IN_INFERENCIA_IRREDUTIVEL
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "IRREDUTÍVEL (sem defesa publicada): o motor legítimo inferindo p/ o dono não se impede — só não-emissão + fronteira de acesso"
+
+  # ==== AUDIT — a evidência ====
+  - id: AR_SYNTH_P5
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "SYNTHESIS-P5.md — ~40 fontes, cada dimensão verificada adversarialmente"
+    trace: "docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P5.md"
+  - id: C_STAAB
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "a inferência explora a CAPACIDADE de raciocínio (não memorização); anonimização+alinhamento ineficazes (Staab ICLR 2024)"
+  - id: C_DENG
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "conforto por destinatário: 3.75 dono vs 2.34 terceiros; o dano é o CRUZAMENTO (Deng et al. 2026)"
+
+edges:
+  # o fluxo: inferência interna → emissão só via release gated
+  - from: EN_MOTOR
+    to: ST_INFERENCIA_INTERNA
+    edge_type: HAS_STATE
+  - from: EN_FRONTEIRA
+    to: ST_EMISSAO
+    edge_type: HAS_STATE
+  - from: ST_INFERENCIA_INTERNA
+    to: ST_EMISSAO
+    edge_type: TRANSITIONS
+    on: EV_RELEASE_GATED
+
+  # as 6 camadas restringem o acesso (L1), o release (L2/L5) e a emissão (L3/L4/L6)
+  - from: PO_L1_ESCOPO
+    to: EN_MOTOR
+    edge_type: CONSTRAINS
+  - from: PO_L2_PROPOSITO
+    to: EV_RELEASE_GATED
+    edge_type: CONSTRAINS
+  - from: PO_L3_FILTRO
+    to: ST_EMISSAO
+    edge_type: CONSTRAINS
+  - from: PO_L4_JUIZ
+    to: ST_EMISSAO
+    edge_type: CONSTRAINS
+  - from: PO_L5_REDTEAM
+    to: EV_RELEASE_GATED
+    edge_type: CONSTRAINS
+  - from: PO_L6_BUDGET
+    to: ST_EMISSAO
+    edge_type: CONSTRAINS
+
+  # a doutrina governante
+  - from: IN_ACESSO_PRIMEIRO
+    to: EN_MOTOR
+    edge_type: CONSTRAINS
+  - from: IN_FEATURE_NA_FRONTEIRA
+    to: EV_RELEASE_GATED
+    edge_type: CONSTRAINS
+  - from: IN_INFERENCIA_IRREDUTIVEL
+    to: ST_INFERENCIA_INTERNA
+    edge_type: CONSTRAINS
+
+  # audit ancora as invariantes na evidência
+  - from: C_STAAB
+    to: IN_INFERENCIA_IRREDUTIVEL
+    edge_type: TRACES_TO
+  - from: C_DENG
+    to: IN_FEATURE_NA_FRONTEIRA
+    edge_type: TRACES_TO
+
+  # a doutrina ancora na síntese
+  - from: PO_L1_ESCOPO
+    to: AR_SYNTH_P5
+    edge_type: TRACES_TO
+  - from: PO_L2_PROPOSITO
+    to: AR_SYNTH_P5
+    edge_type: TRACES_TO
+  - from: PO_L3_FILTRO
+    to: AR_SYNTH_P5
+    edge_type: TRACES_TO
+  - from: PO_L4_JUIZ
+    to: AR_SYNTH_P5
+    edge_type: TRACES_TO
+  - from: PO_L5_REDTEAM
+    to: AR_SYNTH_P5
+    edge_type: TRACES_TO
+  - from: PO_L6_BUDGET
+    to: AR_SYNTH_P5
+    edge_type: TRACES_TO
+  - from: IN_ACESSO_PRIMEIRO
+    to: AR_SYNTH_P5
+    edge_type: TRACES_TO
+  - from: IN_FEATURE_NA_FRONTEIRA
+    to: AR_SYNTH_P5
+    edge_type: TRACES_TO
+  - from: IN_INFERENCIA_IRREDUTIVEL
+    to: AR_SYNTH_P5
+    edge_type: TRACES_TO

@@ -1,0 +1,37 @@
+# Proto (sandbox) — como o Onion pessoal do Marcio se REGISTRARIA no members.yaml do core.
+# ⚠️ HIPOTÉTICO / discussão isolada — NÃO é o members.yaml real; nada aqui está registrado na federação.
+# Deriva de research/SYNTHESIS-P3.md e do precedente `granaai` (regulated, trust zerado).
+# Tese: membro adotante PELO MÉTODO, soberano NO DADO — privacidade máxima SEM sair da federação.
+
+- id: marcio-pessoal
+  name: "Onion pessoal do Marcio (cérebro reconciliado N=1 — HIPOTÉTICO)"
+  role: standalone                 # T3 — adota o core direto; sem sub-adotados. NÃO é source (fonte≠derivação: uma só fonte)
+  parent: onion-evolve
+  remote: "(privado — repo do KG da vida; local-first no device/VPS que o Marcio controla)"
+  local_path: "(soberano — não publicado)"
+  onion_version: "(pin verificável por pin-integrity-check.sh — SEM exceção para o criador)"
+  adopted_at: "(hipotético)"
+  mode: regulated                  # nada sobe sem gate humano explícito; default de classificação = protected
+  personality_summary: "cérebro pessoal N=1 do criador — dogfood do método (NÃO prova de mercado: centro da órbita)"
+  specializations: []
+  personality_last_sync: "(n/a — gated)"
+
+  # o ALVO da adoção NÃO é a pessoa — é um repo git que hospeda o KG da vida (.kg.yaml versionado).
+  # o que viaja é o método KG SDAAL, não a máquina de adoção de repo de código (gap: domínio não-software).
+
+  trust:
+    can_receive_from: [onion-evolve]   # recebe updates/conselho do core (o valor de SER membro)
+    can_advise_to: [onion-evolve]      # pode devolver sinal de método (bug/feedback do dogfood)
+    can_correct_to: []                 # mínimo — sem privilégio de criador
+    diary_readable_by: []              # ZERADO — nem o core lê (estilo granaai)
+    diary_classifications_shared: []   # ZERADO — nada sobe proativamente
+    exposes_downstream: []
+
+  # o KG BRUTO é `private` (inviolável mesmo para o core; local-first, irrevogável).
+  # O QUE PODE SAIR (opt-in gated, destilado deliberadamente empobrecido — "na dúvida, não sai"):
+  exposes:
+    - method-signals                 # bugs/feedback do dogfood — como qualquer adotante
+    - distilled-breadcrumbs-gated    # migalhas public/collective SÓ após revisão humana (mode: regulated)
+    - verifiable-claims              # NOVO (P3): W3C Verifiable Credentials — provar um fato derivado SEM entregar o KG
+  # NUNCA sai: o KG bruto, transcrições/embeddings ricos, qualquer artefato do qual o bruto seja reconstruível
+  #            (gradient-inversion: destilado≠seguro) — protegido por de-identification `none` fail-safe.
