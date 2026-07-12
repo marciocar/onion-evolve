@@ -4,6 +4,11 @@ category: discussion
 status: fonte-de-discussao-isolada
 date: 2026-07-11
 branch: discuss/behavior-mapping-kg
+# ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
+phase: EXPLORE         # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
+next_action: "Desenhar o schema de coleta CHECANDO contra interface-state-of-art.kg.yaml (não reinventar a premissa de telemetria — N05 já mostrou: substrato ruidoso, filtro de prefixo é passo-0); carregar a ética junto (tema de alta sensibilidade, privacidade/vigilância)."
+scope_globs: ["docs/onion/graph/", "docs/knowledge-base/concepts/"]
+objective_tags: ["NS1", "intake-execucao", "kg-map"]
 ---
 
 # 🧵 Sensor de comportamento → contexto: coletar, mapear e catalogar com Dogfood KG SDAAL
