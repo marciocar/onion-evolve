@@ -160,3 +160,24 @@ distintos: a camada dialógica é **por-estrela** (n=1, dentro de um grafo); o r
 **Consequência de design (encolhe o escopo, baixa o risco anti-v4.0):** a camada **não é um 4º serviço
 monolítico** — é uma **disciplina de autoria** (o ritual) + uma **vista fina** (a prévia), ambas cavalgando o
 motor de radar que já existe. Isso *fortalece* "cada peça estende uma existente" e reduz o que haveria a construir.
+
+## 11. Resolução — o ritmo do auto-check (2026-07-12)
+
+A dúvida `Q_AUTOREG_RHYTHM` foi trabalhada e **resolvida dissolvendo a premissa**: "ritmo" assume um relógio, e
+relógio manufatura teatro (auto-check em cadência fixa checa quando nada mudou → rubber-stamping, o anti-padrão
+que a estrela interface marcou: "fadiga de aprovação é falha de segurança", "formativo, não performático").
+
+**Veredito: não há bom ritmo — o gatilho é o evento.** O auto-check é **event-triggered**, ancorado nos momentos
+onde uma decisão de Aristóteles/Hegel já está sendo tomada:
+
+| Gatilho | Dispara quando | Régua |
+|---|---|---|
+| **Aristóteles @ intake** | conhecimento externo entra (transferir um achado) | igual→transfere / diferente→desenha — na transferência, não no relógio |
+| **Hegel/Schranke @ contradição** | o novo contradiz/refuta/supera o velho (não-monotônico, §2.6) | o **incômodo é o gatilho** — quando uma aresta `REFUTES`/`SUPERSEDES` quer existir |
+| **Backstop @ recolher** | no handoff (atualizar Tier-0 antes de rotacionar) — já acontece | varredura TTL de baixa freq. p/ incômodos latentes |
+
+**Travas anti-teatro** (da interface + do diário): (1) **batch por unidade lógica**, nunca por-edit; (2)
+**dogfood-gated, não click-gated** — o backstop **re-testa, nunca re-carimba** (`/meta:diary review`); (3) a fadiga
+é **mensurável** — `blocked_on_user` subindo sinaliza que virou teatro. **Consequência:** os três gatilhos já
+acontecem → *piggyback* = zero cadência nova, nada a construir; estende `/meta:diary review` + o recolher do
+worklog + o critério §2.6.

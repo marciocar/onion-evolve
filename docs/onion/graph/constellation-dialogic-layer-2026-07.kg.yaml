@@ -117,7 +117,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.3
-    status: open
+    status: done
     label: "qual ritmo/gatilho do auto-check Aristoteles+Hegel sem virar overhead nem teatro?"
   - id: Q_DIALOGIC_VS_RADAR
     node_type: question
@@ -170,7 +170,49 @@ nodes:
     status: confirmed
     label: "resolvido: ortogonal ao radar-da-constelacao, mas REUSA o motor-base — sobreposicao e reuso (estende), nao competicao; encolhe o '4o servico' pra disciplina+vista"
 
+  # ---- RESOLUCAO de Q_AUTOREG_RHYTHM (dissolve a premissa: gatilho, nao ritmo) ----
+  - id: C_RHYTHM_IS_EVENT_NOT_CLOCK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "nao ha bom ritmo fixo — o auto-check e EVENT-triggered (Aristoteles@intake, Hegel@contradicao, backstop@recolher); relogio manufatura teatro"
+  - id: C_ANTITHEATER_DOGFOOD_GATED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "anti-teatro: batch por unidade logica + dogfood-gated (re-testar, nunca re-carimbar); blocked_on_user subindo sinaliza que virou teatro"
+  - id: C_PIGGYBACK_EXISTING_EVENTS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "os 3 gatilhos ja acontecem (intake/contradicao/recolher) — piggyback = zero cadencia nova, zero overhead, nada a construir"
+  - id: D_AUTOREG_EVENT_TRIGGERED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "resolvido: sem ritmo fixo; event-triggered (Aristoteles@intake, Hegel@contradicao, TTL-backstop@recolher), dogfood-gated; estende /meta:diary review + recolher + §2.6"
+
   # ---- ancoras (entidades) ----
+  - id: ENT_DIARY_REVIEW
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "/meta:diary review — 'migalha vencida -> re-testar, nunca re-carimbar' (o molde do backstop TTL, dogfood-gated)"
   - id: ENT_INTERFACE_STAR
     node_type: entity
     layer: audit
@@ -278,4 +320,27 @@ edges:
     edge_type: SUPPORTS
   - from: D_DIALOGIC_ORTHOGONAL
     to: Q_DIALOGIC_VS_RADAR
+    edge_type: SUPPORTS
+
+  # resolucao do ritmo: gatilho por evento, dogfood-gated
+  - from: C_RHYTHM_IS_EVENT_NOT_CLOCK
+    to: D_AUTOREG_EVENT_TRIGGERED
+    edge_type: SUPPORTS
+  - from: C_ANTITHEATER_DOGFOOD_GATED
+    to: D_AUTOREG_EVENT_TRIGGERED
+    edge_type: SUPPORTS
+  - from: C_PIGGYBACK_EXISTING_EVENTS
+    to: D_AUTOREG_EVENT_TRIGGERED
+    edge_type: SUPPORTS
+  - from: C_RHYTHM_IS_EVENT_NOT_CLOCK
+    to: C_RITUAL_IS_NEW
+    edge_type: DEPENDS_ON
+  - from: C_ANTITHEATER_DOGFOOD_GATED
+    to: ENT_DIARY_REVIEW
+    edge_type: DEPENDS_ON
+  - from: C_ANTITHEATER_DOGFOOD_GATED
+    to: ENT_KG_SDAAL
+    edge_type: DEPENDS_ON
+  - from: D_AUTOREG_EVENT_TRIGGERED
+    to: Q_AUTOREG_RHYTHM
     edge_type: SUPPORTS
