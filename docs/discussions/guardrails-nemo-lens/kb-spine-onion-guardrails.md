@@ -61,7 +61,7 @@ O **modo estrutural é o mais seguro**: não depende de a condição de erro ser
 
 ## 4. A taxonomia ONION-R (índice)
 
-Destilada de **148 vetos categorizados reais** minerados dos gates (todos com read-path confirmado — evidência completa em [`taxonomy-onion-r.md`](./taxonomy-onion-r.md)). **A taxonomia emergiu dos vetos, não foi projetada.**
+Destilada de **148 vetos categorizados reais** minerados dos gates (todos com read-path confirmado — evidência completa em [`taxonomy-onion-r.md`](./taxonomy-onion-r.md)). **A taxonomia emergiu dos vetos, não foi projetada.** *(Nem todos são guardrails de **segurança** — inclui gates de qualidade genéricos: R1 drift, R7 CLI, R12 WCAG; a coluna "análogo de mercado" separa os dois.)*
 
 > **ONION-R é uma LENTE/ÍNDICE sobre gates existentes — não um sistema paralelo.** **11 das 14 categorias
 > HERDAM por read-path** de mecanismos que já rodam (`a2a-verify`, `trust-topology-check`,

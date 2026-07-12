@@ -42,7 +42,7 @@ nos agentes consumidores; **cobertura de selftest** (guarda das guardas); reconc
 |---------|----------------|-------------|
 | Home dos helpers | `.claude/utils/guardrails/` (novo dir — lugar único à camada) | `.claude/utils/trust/` (SDAAL de confiança **já existe** — R15 é o mesmo campo semântico: `verified-crypto`/`verified-semantic`, a2a-verify/trust irmãos) **⚠️ avaliar antes** · `.claude/utils/federation-transport/` (só C1/C2, pior p/ C3) |
 | Constituição R15.2/R15.3b | **fragmento único** em `.claude/commands/common/prompts/untrusted-content-provenance.md` (padrão SSOT já usado, ex. `task-manager-provider-detection.md`) — referenciado, não copiado | colar o bloco em cada consumidor (**anti-DRY — rejeitado**) |
-| Taxonomia (148 vetos) | KB de referência companheira, linkada do conceito | apêndice do próprio conceito |
+| Taxonomia (148 vetos — nem todos de segurança; inclui gates de qualidade R1/R7/R12) | KB de referência companheira, linkada do conceito | apêndice do próprio conceito |
 | R15.3a nos helpers reais | **KB-only** (nomeia via read-path, sem tocar a2a-accept/co-deliver) | comentário nos .sh (churn desnecessário) |
 | Vínculo com a branch | **feature branch nova** off main via `/engineer:plan`; docs da discussão ficam como registro | reusar a branch de discussão (mistura design + entrega) |
 
@@ -58,7 +58,13 @@ Rodar `@metaspec-gate-keeper` sobre a proposta: valida invariantes 1–3 (transv
 - `kb-spine-onion-guardrails.md` → `docs/knowledge-base/concepts/onion-guardrails.md`.
 - `taxonomy-onion-r.md` → KB de referência linkada.
 - Marcar toda reivindicação "cobre LLM0X" como **provisória**.
-**Gate:** `lint-artifacts` (convenções de KB) + `/meta:inventory` (contagem de KB muda → SSOT) + `/docs:build-index`.
+- ⚠️ **Gate anti-drift da própria taxonomia (correção da checagem #2/A2 — a camada obedece seu próprio
+  ONION-R1):** ou **(a)** rebaixar as citações `arquivo:linha`/contagens da taxonomia para *read-path a
+  revalidar* (sem número perpétuo), **ou (b)** colocar a KB `onion-guardrails` no escopo de um re-grep
+  dirigido periódico (via `/meta:kb-freshness`, idealmente bloqueante como `check_inventory_sync`). **Sem
+  isto, a taxonomia é um 2º SSOT que viola a própria R1** — o refutador pegou este ponto, é trabalho real
+  aqui, não opcional.
+**Gate:** `lint-artifacts` (convenções de KB) + `/meta:inventory` (contagem de KB muda → SSOT) + `/docs:build-index` + o gate anti-drift acima.
 **Risco:** baixo. **Reverter:** remover os arquivos.
 
 ### Fase 2 — Helpers determinísticos (aditivo, sem wire-in, COM selftest)

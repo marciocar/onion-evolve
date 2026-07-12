@@ -297,7 +297,14 @@ evidencia: 148 vetos categorizados nas 14 categorias (soma das linhas da tabela-
 | R13 | Invariantes de orquestração | execução | 4 / 0 | OWASP LLM06 |
 | R14 | Fronteira SDAAL / agência de tool | exec/input | 3 / 0 | OWASP LLM06 |
 
-Totais: **148 vetos categorizados** (soma exata das 14 linhas), **todos confirmados** por read-path — destilados de ~165 sinais brutos minerados (dedup entre fontes; as 11 hipóteses foram fechadas na verificação inline de 2026-07-12). **† R5** inclui 2 vetos `conf.*` = **never-clobber por construção** (staging por whitelist em durable-commit.sh; merge por união em merge-onion-hooks.sh): guardas reais que **não emitem string** porque previnem o clobber estruturalmente — o `lint-selftest.sh` existe para guardar esse silêncio. É um 3º modo, ao lado de `determinístico` e `gated`: **estrutural/silencioso**.
+Totais: **148 vetos categorizados** (soma exata das 14 linhas), **todos confirmados** por read-path — destilados de ~165 sinais brutos minerados (dedup entre fontes; as 11 hipóteses foram fechadas na verificação inline de 2026-07-12). *(Nem todos são guardrails de **segurança** — inclui gates de qualidade genéricos: R1 drift de SSOT, R7 higiene de CLI, R12 WCAG. Ver a coluna "análogo de mercado".)*
+
+> ⚠️ **Auto-drift (concessão da checagem #2 do core — [`refutation-survival.md`](./refutation-survival.md) A2).**
+> As citações `arquivo:linha` e as contagens (`148`, `R1 22/0`…) são **snapshot de 2026-07-12** — NÃO há gate
+> que as revalide contra o código (um refactor movendo `:635`→`:650` deixaria isto stale sem alarme). É o
+> pecado que **ONION-R1 pune** — o catálogo anti-drift ainda não tem guardrail anti-drift **de si mesmo**. Até
+> a promoção amarrar esse gate (plano §Fase 1), **leia as citações como read-path a REVALIDAR**, não verdade
+> perpétua. *A camada de guardrails tem que passar nos próprios guardrails.* **† R5** inclui 2 vetos `conf.*` = **never-clobber por construção** (staging por whitelist em durable-commit.sh; merge por união em merge-onion-hooks.sh): guardas reais que **não emitem string** porque previnem o clobber estruturalmente — o `lint-selftest.sh` existe para guardar esse silêncio. É um 3º modo, ao lado de `determinístico` e `gated`: **estrutural/silencioso**.
 
 ---
 
