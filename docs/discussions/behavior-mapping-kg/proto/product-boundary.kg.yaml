@@ -1,0 +1,100 @@
+# Proto — a fronteira de produto como GRAFO DE DECISÃO (KG SDAAL, camada audit).
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/behavior-mapping-kg/proto/product-boundary.kg.yaml
+# Espera: RADAR rankeia a decisão OPEN no topo; INTEGRIDADE exit 0 (grafo puramente audit).
+#
+# Nota 05: NÃO decide pelo maestro. A decisão D_SENSOR_AS_CAPABILITY fica `status: open` —
+# recomenda o sensor-como-capability do Onion pessoal, com o produto-próprio gated ao maestro.
+# Grafo epistêmico (audit): claims/evidência/decisão/pergunta, sem camada domain.
+meta:
+  id: product-boundary-behavior-sensor
+  date: 2026-07-12
+
+nodes:
+  - id: Q_BOUNDARY
+    node_type: question
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "isto é feature do Onion pessoal ou um produto próprio de process-mining consentido?"
+  - id: C_FEATURE
+    node_type: claim
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "é o SENSOR/capability que alimenta o Onion pessoal (o log é plataforma; o valor é o que se faz com ele)"
+  - id: C_PRODUCT
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "é produto próprio de process-mining pessoal consentido (mercado real: RescueTime/Timely/enterprise)"
+  - id: C_IDENTITY_CONFLICT
+    node_type: claim
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "produto standalone conflita com a identidade canônica (Onion = framework template, sem CLI/produto)"
+  - id: E_IDENTITY
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "CLAUDE.md / onion-review-2026-05 — não é produto npm, não tem CLI standalone"
+  - id: E_MARKET
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "landscape — sensor (ActivityWatch) vs. aplicação; process mining enterprise é categoria bilionária"
+  - id: A_PESSOAL
+    node_type: artifact
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "discuss/onion-pessoal-marcio — o cérebro que o sensor alimentaria (a razão de ser feature)"
+  - id: D_SENSOR_AS_CAPABILITY
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.6
+    status: open
+    label: "RECOMENDA sensor-como-capability do Onion pessoal; produto-próprio gated ao maestro (DECISÃO ABERTA)"
+
+edges:
+  # evidências sustentam as hipóteses
+  - from: E_IDENTITY
+    to: C_FEATURE
+    edge_type: SUPPORTS
+  - from: E_IDENTITY
+    to: C_IDENTITY_CONFLICT
+    edge_type: SUPPORTS
+  - from: E_MARKET
+    to: C_PRODUCT
+    edge_type: SUPPORTS
+  # o caminho-feature ancora no cérebro pessoal e se apoia no argumento de identidade
+  - from: C_FEATURE
+    to: A_PESSOAL
+    edge_type: TRACES_TO
+  - from: C_FEATURE
+    to: C_IDENTITY_CONFLICT
+    edge_type: DEPENDS_ON
+  # a decisão pesa as três hipóteses e responde à pergunta — mas fica ABERTA
+  - from: D_SENSOR_AS_CAPABILITY
+    to: C_FEATURE
+    edge_type: DEPENDS_ON
+  - from: D_SENSOR_AS_CAPABILITY
+    to: C_PRODUCT
+    edge_type: DEPENDS_ON
+  - from: D_SENSOR_AS_CAPABILITY
+    to: C_IDENTITY_CONFLICT
+    edge_type: DEPENDS_ON
+  - from: D_SENSOR_AS_CAPABILITY
+    to: Q_BOUNDARY
+    edge_type: TRACES_TO
