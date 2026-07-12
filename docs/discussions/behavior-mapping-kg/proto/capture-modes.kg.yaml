@@ -1,0 +1,247 @@
+# Proto — localidade do dado e modos de captura (KG SDAAL).
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/behavior-mapping-kg/proto/capture-modes.kg.yaml
+# Espera: DOMÍNIO ✅ (ciclo de localidade sem estado absorvente) · INTEGRIDADE exit 0.
+#
+# Nota 03: duas fontes (passiva=observada / declarada=anotada) alimentam o bruto; e o bruto
+# VIVE LOCAL — só o de-identificado/predicado/derivado pode sair (local-first, não-retenção > cifra).
+meta:
+  id: capture-modes-behavior-sensor
+  date: 2026-07-12
+
+nodes:
+  # ── FONTES de captura (domain) ─────────────────────────────────────
+  - id: E_PASSIVE
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "captura passiva — telas/ações observadas (completa, mas cega ao significado)"
+  - id: E_DECLARED
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "captura declarada — o usuário anota (significativa, mas esparsa e enviesada)"
+  - id: E_RAW
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "o dado bruto — possui os estados de localidade; vive no dispositivo"
+
+  # ── ESTADOS de localidade (domain), possuídos por E_RAW ────────────
+  - id: S_LOCAL_BRUTO
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "local-bruto — no dispositivo do usuário, nunca exportado"
+  - id: S_DERIVED
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "derivado — predicado/agregado de-identificado (candidato a compartilhar)"
+  - id: S_SHARED
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "compartilhado — só o derivado saiu para a nuvem (nunca o bruto)"
+  - id: S_PURGED
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "purgado — bruto apagado (não-retenção > cifra); o ciclo pode reiniciar"
+
+  # ── EVENTOS (domain) ───────────────────────────────────────────────
+  - id: EV_CAPTURE
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "capture — passiva e/ou declarada geram o bruto local"
+  - id: EV_DERIVE
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "derive — extrair predicado/agregado de-identificado do bruto (local)"
+  - id: EV_EXPORT
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "export — só o derivado sai à nuvem (GATE: bruto nunca)"
+  - id: EV_PURGE
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "purge — apagar o bruto (não-retenção)"
+
+  # ── POLÍTICA / REGRA / INVARIANTE (domain) ─────────────────────────
+  - id: P_LOCAL_FIRST
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "local-first — bruto vive no dispositivo; só derivado/predicado pode sair"
+  - id: R_NON_RETENTION
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "não-retenção > cifra — minimizar e purgar o bruto vale mais que criptografá-lo"
+  - id: I_RAW_NEVER_LEAVES
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "o bruto NUNCA sai do dispositivo — só o derivado/de-identificado atravessa a fronteira"
+
+  # ── ARTEFATOS de ancoragem (domain) ────────────────────────────────
+  - id: A_RFC0003
+    node_type: artifact
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "rfc-0003 — classificação 6-níveis (private inviolável) e soberania de dados"
+  - id: A_DEIDENT
+    node_type: artifact
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: ".claude/utils/de-identification — redige antes de sair; fail-safe none"
+
+  # ── CAMADA AUDIT — local-first REFUTA cloud-first-com-cifra ────────
+  - id: C_LOCAL_FIRST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "bruto local, só predicado sai — soberania por arquitetura"
+  - id: C_CLOUD_FIRST_OK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.3
+    status: refuted
+    label: "mandar tudo à nuvem e proteger com cifra basta (REFUTADO)"
+  - id: E_NONRETENTION
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "de-identificação redige strings, não inferência; não-guardar o bruto é a defesa mais forte"
+
+edges:
+  # E_RAW possui os estados de localidade
+  - from: E_RAW
+    to: S_LOCAL_BRUTO
+    edge_type: HAS_STATE
+  - from: E_RAW
+    to: S_DERIVED
+    edge_type: HAS_STATE
+  - from: E_RAW
+    to: S_SHARED
+    edge_type: HAS_STATE
+  - from: E_RAW
+    to: S_PURGED
+    edge_type: HAS_STATE
+  # ciclo de localidade (fecha em purge → nova captura; sem estado absorvente)
+  - from: S_PURGED
+    to: S_LOCAL_BRUTO
+    edge_type: TRANSITIONS
+    on: EV_CAPTURE
+  - from: S_LOCAL_BRUTO
+    to: S_DERIVED
+    edge_type: TRANSITIONS
+    on: EV_DERIVE
+  - from: S_DERIVED
+    to: S_SHARED
+    edge_type: TRANSITIONS
+    on: EV_EXPORT
+  - from: S_LOCAL_BRUTO
+    to: S_PURGED
+    edge_type: TRANSITIONS
+    on: EV_PURGE
+  - from: S_SHARED
+    to: S_PURGED
+    edge_type: TRANSITIONS
+    on: EV_PURGE
+  # as duas fontes alimentam a captura
+  - from: E_PASSIVE
+    to: EV_CAPTURE
+    edge_type: EMITS
+  - from: E_DECLARED
+    to: EV_CAPTURE
+    edge_type: EMITS
+  # o gate de localidade e a não-retenção
+  - from: P_LOCAL_FIRST
+    to: EV_EXPORT
+    edge_type: CONSTRAINS
+  - from: I_RAW_NEVER_LEAVES
+    to: EV_EXPORT
+    edge_type: CONSTRAINS
+  - from: R_NON_RETENTION
+    to: EV_CAPTURE
+    edge_type: CONSTRAINS
+  # ancoragem
+  - from: P_LOCAL_FIRST
+    to: A_RFC0003
+    edge_type: TRACES_TO
+  - from: I_RAW_NEVER_LEAVES
+    to: A_RFC0003
+    edge_type: TRACES_TO
+  - from: R_NON_RETENTION
+    to: A_DEIDENT
+    edge_type: TRACES_TO
+  # reconciliação epistêmica
+  - from: C_LOCAL_FIRST
+    to: P_LOCAL_FIRST
+    edge_type: TRACES_TO
+  - from: E_NONRETENTION
+    to: C_LOCAL_FIRST
+    edge_type: SUPPORTS
+  - from: C_LOCAL_FIRST
+    to: C_CLOUD_FIRST_OK
+    edge_type: REFUTES
