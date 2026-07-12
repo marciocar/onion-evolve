@@ -32,6 +32,7 @@ Litmus: *"se a fonte mudar, edito em quantos lugares? → **um**"* (a camada 1).
 | [theories/self-in-time.md](theories/self-in-time.md) | P2 | Ainslie/Laibson (hiperbólico), Thaler-Shefrin, Parfit, Wrosch, McAdams, Ricoeur (ipse/idem) |
 | [theories/formal-reconciliation.md](theories/formal-reconciliation.md) | P2 | AGM/Hansson, entrincheiramento, TMS/ATMS, PROV, Dung/ASPIC+/bipolar, QBAF, paraconsistência |
 | [theories/discriminator-motor-bug.md](theories/discriminator-motor-bug.md) | P2 | info-sensibilidade, resíduo (Williams), hard/soft, Chang, Simon, Tetlock, Frankfurt, Higgins |
+| [theories/data-sovereignty.md](theories/data-sovereignty.md) | P3 | Solid/PDS (fracasso), local-first (Ink&Switch/CRDTs), FL+DP, W3C VC, gradient-inversion |
 
 **Camada 2 — derivação Onion (cita a camada 1):**
 
@@ -41,14 +42,18 @@ Litmus: *"se a fonte mudar, edito em quantos lugares? → **um**"* (a camada 1).
 | [applications/reconciliation-engine.md](applications/reconciliation-engine.md) | P2 | spec do motor (compromisso≠fato · discriminador 3-órgãos · anti-auto-engano) |
 | [marcio.kg.yaml](marcio.kg.yaml) | P1 (executável) | as verticais como grafo de **domínio** |
 | [reconciliation-engine.kg.yaml](reconciliation-engine.kg.yaml) | P2 (executável) | o **motor** como grafo de **domínio** |
+| [fronteira-decision.kg.yaml](fronteira-decision.kg.yaml) | P3 (executável) | a decisão da fronteira como grafo de **audit** (opções + REFUTES + decision) |
+| [membership-marcio-pessoal.yaml](membership-marcio-pessoal.yaml) | P3 | entrada **hipotética** de `members.yaml` (standalone+regulated, trust zerado) |
 
 ## Dogfood
 
 ```bash
 bash .claude/validation/kg-radar.sh docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml               # P1
 bash .claude/validation/kg-radar.sh docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml # P2
+bash .claude/validation/kg-radar.sh docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml    # P3
 ```
 
-Ambos: **INTEGRIDADE exit 0** · **RECONCILIAÇÃO** mostra o `REFUTES` (Aufhebung: superado-preservado) ·
-**RADAR-DE-DOMÍNIO** aponta ⚠ esperado (estado-absorvente terminal). O nó mais central de cada grafo é a
-sua tese-núcleo: P1 → a invariante de **incomensurabilidade**; P2 → o **compromisso como objeto de 1ª classe**.
+Todos: **INTEGRIDADE exit 0** · **RECONCILIAÇÃO** mostra os `REFUTES`. O nó mais central de cada grafo é a
+sua tese-núcleo: P1 → a invariante de **incomensurabilidade**; P2 → o **compromisso como objeto de 1ª classe**;
+P3 → **membro pelo método, soberano no dado** (com as 2 opções rejeitadas refutadas). P1/P2 são camada
+**domain** (⚠ estado-absorvente esperado); P3 é camada **audit** (uma decisão pura).

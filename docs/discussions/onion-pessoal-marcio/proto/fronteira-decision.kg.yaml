@@ -1,0 +1,148 @@
+# Proto (sandbox) — a DECISÃO da P3 como grafo de AUDIT (epistêmico).
+# PLAUSÍVEL/open — derivado de research/SYNTHESIS-P3.md. NÃO muta o members.yaml do core.
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml
+# Espera: INTEGRIDADE exit 0; RECONCILIAÇÃO mostra os REFUTES (as 2 opções rejeitadas); camada domain ausente (é decisão pura).
+#
+# A tese da P3: "adotante × à parte" é FALSA DICOTOMIA — privacidade e federação são eixos independentes.
+# A opção escolhida (membro pelo método, soberano no dado) tem 3 evidências (2 internas + 1 externa) que convergem.
+meta:
+  id: marcio-fronteira-core-p3
+  date: 2026-07-12
+nodes:
+  - id: Q_FRONTEIRA
+    node_type: question
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "o Onion pessoal é instância adotante na federação, ou algo à parte (privado)?"
+
+  # ---- a resposta escolhida + as duas rejeitadas ----
+  - id: C_MEMBRO_SOBERANO
+    node_type: claim
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "membro adotante PELO MÉTODO (standalone+regulated), soberano NO DADO (KG bruto private, só destilado sai)"
+  - id: C_APARTE_INPLACE
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.2
+    status: refuted
+    label: "ficar 'à parte' (--in-place, fora da federação) para ter privacidade"
+  - id: C_BYPASS_CRIADOR
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.15
+    status: refuted
+    label: "o criador-como-membro precisa de privilégio/bypass (role source ou trust irrestrito)"
+  - id: C_DOGFOOD_NAO_PULL
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "o Onion pessoal prova o MÉTODO (dogfood), não o MERCADO — é o centro da órbita (Q_COLD_ADOPTER intacto)"
+
+  # ---- evidências (2 internas + 1 externa) que convergem ----
+  - id: E_PRIVATE_INVIOLAVEL
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    label: "trust adapter: 'private inviolável mesmo para o core' — privacidade NÃO exige sair da federação"
+  - id: E_GRANAAI
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "precedente granaai: regulated + diary zerado + membro pleno (privacidade e federação são eixos independentes)"
+  - id: E_NO_BYPASS
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "'trust elevado, não role elevado' + pin FORJADO do próprio Marcio detectado — sem exceção para o dono"
+  - id: E_EXTERNAL_HYBRID
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "arte externa 2026: híbrido local-first + 'share distilled, never raw' (federar store fracassou) — converge com a doutrina Onion"
+  - id: E_ORBIT
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    label: "caveat intra-órbita: adotantes = repos do Marcio; ZERO adotante frio (C_ORBIT_CAVEAT)"
+
+  - id: AR_SYNTH_P3
+    node_type: artifact
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "SYNTHESIS-P3.md — doutrina interna + arte externa"
+    trace: "docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P3.md"
+
+  - id: D_FRONTEIRA
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: open
+    label: "registrar como standalone+regulated, trust zerado, KG bruto private; VC p/ destilado verificável; gap: adoção de domínio não-software"
+
+edges:
+  # a escolhida é sustentada pelas 3 evidências convergentes
+  - from: E_PRIVATE_INVIOLAVEL
+    to: C_MEMBRO_SOBERANO
+    edge_type: SUPPORTS
+  - from: E_GRANAAI
+    to: C_MEMBRO_SOBERANO
+    edge_type: SUPPORTS
+  - from: E_EXTERNAL_HYBRID
+    to: C_MEMBRO_SOBERANO
+    edge_type: SUPPORTS
+  # as rejeitadas são refutadas (falsa dicotomia / sem bypass)
+  - from: E_PRIVATE_INVIOLAVEL
+    to: C_APARTE_INPLACE
+    edge_type: REFUTES
+  - from: E_GRANAAI
+    to: C_APARTE_INPLACE
+    edge_type: REFUTES
+  - from: E_NO_BYPASS
+    to: C_BYPASS_CRIADOR
+    edge_type: REFUTES
+  # o caveat sustenta a honestidade (prova método, não mercado)
+  - from: E_ORBIT
+    to: C_DOGFOOD_NAO_PULL
+    edge_type: SUPPORTS
+  # a decisão depende da resposta escolhida e reconhece o caveat
+  - from: D_FRONTEIRA
+    to: C_MEMBRO_SOBERANO
+    edge_type: DEPENDS_ON
+  - from: D_FRONTEIRA
+    to: C_DOGFOOD_NAO_PULL
+    edge_type: DEPENDS_ON
+  - from: D_FRONTEIRA
+    to: Q_FRONTEIRA
+    edge_type: TRACES_TO
+  - from: D_FRONTEIRA
+    to: AR_SYNTH_P3
+    edge_type: TRACES_TO
+  # evidências ancoram na síntese
+  - from: E_NO_BYPASS
+    to: AR_SYNTH_P3
+    edge_type: TRACES_TO
+  - from: E_EXTERNAL_HYBRID
+    to: AR_SYNTH_P3
+    edge_type: TRACES_TO
