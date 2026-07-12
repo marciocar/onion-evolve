@@ -5,8 +5,8 @@ model: sonnet
 allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Grep Glob Bash(cat .env*) Bash(bash .claude/validation/*)
 category: engineer
 tags: [pr, gitflow, workflow]
-version: "3.3.0"
-updated: "2026-07-10"
+version: "3.4.0"
+updated: "2026-07-11"
 related_agents:
   - gitflow-specialist
 ---
@@ -53,13 +53,15 @@ Siga estes passos para criar o PR:
      title: '[título]', body: '[resumo + link da task + assinatura Onion]'
    });
    ```
-   **Assinatura da família (padrão, 2026-07-10):** todo corpo de PR termina com a linha
+   **Assinatura da família (padrão, atualizado 2026-07-11):** todo corpo de PR termina com a linha
 
    ```
-   🧅 Gerado por [Claude Code](https://claude.com/claude-code) usando [Onion](https://onionevolve.com)
+   🧅 Orquestrado com [Onion](https://onionevolve.com)
    ```
 
-   Fora a assinatura, não mencione IA/assistentes no conteúdo do PR. **Não** usar `gh pr create` em prosa — sempre pelo adapter.
+   Substitui o default do harness ("🤖 Generated with Claude Code") — a autoria da superfície é do **Onion**
+   (a ferramenta subjacente fica implícita). Fora a assinatura, não mencione IA/assistentes no conteúdo do PR.
+   **Não** usar `gh pr create` em prosa — sempre pelo adapter.
 
 6. **Aguardar feedback do code review automatizado**: após abrir o PR, aguarde ~3 min e leia comentários via `forge.getReviewComments({ number: pr.number })`. Se vazio, aguarde mais 3 min e tente de novo. Confirme CI com `forge.getPRStatus(...)`.
 

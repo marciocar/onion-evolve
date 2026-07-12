@@ -8,6 +8,14 @@
 
 ---
 
+## 2026-07-11 · Assinatura da família revisada: 🧅 "Orquestrado com Onion" · COMPATÍVEL · alvo: todos
+
+- **Nova superfície** (decisão do maestro, 2026-07-11): a assinatura da família nos PRs passa a ser
+  `🧅 Orquestrado com [Onion](https://onionevolve.com)` — dropa o "Gerado por [Claude Code] usando". A autoria
+  da superfície é do **Onion**; a ferramenta subjacente fica implícita.
+- **Substitui** a assinatura de 2026-07-10 (entrada abaixo — mantida por auditoria). Onde vive: `/engineer:pr`
+  v3.4.0 (chega via `/meta:adopt --update`). Aplique também em PRs manuais do fluxo Onion.
+
 ## 2026-07-10 · Assinatura da família nos PRs: 🧅 "Gerado por Claude Code usando Onion" · COMPATÍVEL · alvo: todos
 
 - **Novo padrão de superfície** (decisão do maestro, 2026-07-10): todo corpo de PR criado pelo fluxo
