@@ -34,6 +34,7 @@ Litmus: *"se a fonte mudar, edito em quantos lugares? → **um**"* (a camada 1).
 | [theories/discriminator-motor-bug.md](theories/discriminator-motor-bug.md) | P2 | info-sensibilidade, resíduo (Williams), hard/soft, Chang, Simon, Tetlock, Frankfurt, Higgins |
 | [theories/data-sovereignty.md](theories/data-sovereignty.md) | P3 | Solid/PDS (fracasso), local-first (Ink&Switch/CRDTs), FL+DP, W3C VC, gradient-inversion |
 | [theories/privacy-engineering.md](theories/privacy-engineering.md) | P4 | Privacy-by-Design, LINDDUN, Contextual Integrity, SD-JWT/BBS/ZKP, DP budget, Staab (inferência) |
+| [theories/inference-defense.md](theories/inference-defense.md) | P5 | scrubbing insuficiente, FgAA/INTACT/TRACE-RPS, AskSafely, CI-CoT, C-Trace, Deng (feature/fronteira) |
 
 **Camada 2 — derivação Onion (cita a camada 1):**
 
@@ -46,6 +47,7 @@ Litmus: *"se a fonte mudar, edito em quantos lugares? → **um**"* (a camada 1).
 | [fronteira-decision.kg.yaml](fronteira-decision.kg.yaml) | P3 (executável) | a decisão da fronteira como grafo de **audit** (opções + REFUTES + decision) |
 | [membership-marcio-pessoal.yaml](membership-marcio-pessoal.yaml) | P3 | entrada **hipotética** de `members.yaml` (standalone+regulated, trust zerado) |
 | [classification-por-vertical.kg.yaml](classification-por-vertical.kg.yaml) | P4 (executável) | a **política de privacidade** por vertical como grafo de **domínio** (private/protected + gap de inferência) |
+| [inference-mitigation.kg.yaml](inference-mitigation.kg.yaml) | P5 (executável) | a **mitigação de inferência** como grafo de **domínio** (6 camadas na fronteira + o gap irredutível) |
 
 ## Dogfood
 
