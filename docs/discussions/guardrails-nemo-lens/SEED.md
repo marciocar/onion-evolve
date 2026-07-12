@@ -4,6 +4,11 @@ category: discussion
 status: fonte-de-discussao-isolada
 date: 2026-07-11
 branch: discuss/guardrails-nemo-lens
+# ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
+phase: DEEP            # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
+next_action: "Commitar a WIP em curso (taxonomy-onion-r, promotion-plan, prototype/, research-market-lens); reconciliar a taxonomia de guardrails contra authorization-layers + a2a-verify/trust — trilha NS4 independente do cacho, é a mais pronta pra virar core."
+scope_globs: ["docs/knowledge-base/concepts/authorization-layers-intake-vs-execution.md", ".claude/validation/"]
+objective_tags: ["NS4", "control-plane", "governanca"]
 ---
 
 # 🧵 Guardrails Onion — tão prático quanto NVIDIA NeMo Guardrails, mas na lente Onion
