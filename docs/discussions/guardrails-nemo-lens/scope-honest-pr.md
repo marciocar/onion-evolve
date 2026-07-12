@@ -3,7 +3,7 @@ title: "Checagem #3 do core — escopo + status honestos do PR"
 category: discussion
 status: escopo-checagem-3-core
 date: 2026-07-12
-branch: discuss/guardrails-nemo-lens
+branch: docs/onion-guardrails
 responde: docs/evolution/inbound/_processed/2026-07-12-boletim-core-pre-pr.md (checagem #3)
 ---
 
@@ -20,8 +20,13 @@ KB `candidato`**, nada que mude comportamento. O código (R15) e o wire-in ficam
 
 | Artefato de origem | Vira, no core | Status |
 |--------------------|---------------|--------|
-| `kb-spine-onion-guardrails.md` | `docs/knowledge-base/concepts/onion-guardrails.md` | **`candidato`** |
-| `taxonomy-onion-r.md` | KB de referência linkada (com a nota de auto-drift) | **`candidato`** |
+| `kb-spine-onion-guardrails.md` | `docs/knowledge-base/concepts/onion-guardrails.md` | **`candidato`** ✅ criado |
+| `taxonomy-onion-r.md` (148 read-paths) | **FICA como evidência de discussão linkada — NÃO entra no core ainda** | (refinamento A2) |
+
+> **Refinamento dirigido pela checagem #2/A2:** um catálogo de `arquivo:linha` no core **sem gate anti-drift**
+> violaria ONION-R1. Então só o **concept KB** (que referencia gates **por nome** — resiliente a drift) é
+> promovido; a taxonomia detalhada fica linkada como evidência até a promoção amarrar o gate anti-drift. É
+> mais conservador que o rascunho original desta #3 — na direção certa (menos-no-core-primeiro).
 
 **Natureza:** docs puros, **zero mudança de comportamento**, zero código novo no runtime. É a moldura/lente +
 a taxonomia (índice sobre gates que já rodam). Segue a convenção `status: candidato` que a KB
@@ -54,9 +59,18 @@ a taxonomia (índice sobre gates que já rodam). Segue a convenção `status: ca
 > materialização ficam para passos gated posteriores, pós cross-review. As 3 checagens do core (reconciliação,
 > refutador, escopo) estão fechadas no registro de discussão.
 
-## Transição de branch (mecânica, pós-#3)
+## Transição de branch (mecânica, pós-#3) — ✅ FEITA
 
 `discuss/guardrails-nemo-lens` → **`docs/onion-guardrails`** (é doutrina/KB, não feature de código → prefixo
-`docs/*`, não `feat/*`). O corpus de discussão viaja junto como **registro de design** (rastreabilidade
-pesquisa→taxonomia→R15→checagens). Depois: `/engineer:pr` (forge adapter, corpo honesto = este escopo) e
-**chamar o core pro cross-review antes do merge** ("o merge sai no nosso").
+`docs/*`, não `feat/*`) — renomeada local + remoto, ref antigo removido. O corpus de discussão viaja junto como
+**registro de design** (rastreabilidade pesquisa→taxonomia→R15→checagens).
+
+## O fluxo daqui é o CANÔNICO do core (não improviso)
+
+O plano de promoção é o **o quê**; o **como** é o fluxo faseado do core `…→ pre-pr → pr`:
+- **`/engineer:pre-pr`** — fan-out dos 4 branch-agents (metaspec/code/docs/test) → relatório único; termina
+  **pedindo a permissão do maestro** antes do PR (o gate humano é do core, não meu).
+- **`/engineer:pr`** — abre o PR via **adapter forge** (nunca `gh` cru), base resolvida por
+  `resolve-integration-branch.sh`, assinatura Onion no corpo.
+- **+ camada de co-evolução (o "O NÓS"):** chamar o core-próprio pro **cross-review** antes do merge — isto
+  NÃO é do pre-pr/pr canônico; é o gate extra que o boletim pediu porque a mudança afeta o core.
