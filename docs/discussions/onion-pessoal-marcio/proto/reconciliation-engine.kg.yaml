@@ -1,0 +1,260 @@
+# Proto (sandbox) — o MOTOR DE RECONCILIAÇÃO do Onion pessoal como grafo de DOMÍNIO (P2).
+# PLAUSÍVEL/open — derivado de research/SYNTHESIS-P2.md. NÃO é SSOT do core.
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml
+# Espera: INTEGRIDADE exit 0; RECONCILIAÇÃO mostra o REFUTES do RAMO-BUG (fato×fato → superseded);
+#         RADAR-DE-DOMÍNIO aponta ⚠ (estado-absorvente ST_C_LIBERADO — terminal legítimo) — esperado.
+#
+# A tese da P2 codificada: COMPROMISSO ≠ FATO. Um fato contraditório invalida um fato (ramo-bug: REFUTES);
+# um compromisso NÃO é invalidado por um fato — é MANTIDO (defecção) ou LIBERADO (sunset ratificado).
+# O discriminador é híbrido de 3 órgãos (screen-hard IGUAL/maduro · marca-humana + resíduo DIFERENTE/novo).
+# status: confirmed = maquinaria madura que TRANSFERE (IGUAL); status: open = peça nova a desenhar (DIFERENTE).
+meta:
+  id: marcio-motor-reconciliacao-p2
+  date: 2026-07-12
+nodes:
+  # ==== DOMAIN — o compromisso como objeto de 1a classe (o ipse de Ricoeur) ====
+  - id: EN_COMPROMISSO
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "compromisso (objeto de 1a classe: validade temporal + bindingness + bright-line + sunset) — NÃO é fato"
+  - id: ST_C_DECLARADO
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "compromisso DECLARADO (o eu-passado que prometeu — DEV datado)"
+  - id: ST_C_MANTIDO
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "MANTIDO (defecção detectada — o mastro de Ulisses segura; default)"
+  - id: ST_C_LIBERADO
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "LIBERADO (revisão ratificada — sunset como saúde, não fracasso; a válvula de escape auditável)"
+  - id: EV_DEFECCAO
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "comportamento diverge do compromisso (a célula intenção-alta × ação-ausente)"
+  - id: EV_SUNSET_RATIFICADO
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "sunset RATIFICADO (gate humano — Parfit/Wrosch: a obrigação decaiu legitimamente)"
+  - id: EV_MARCO
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "marco temporal N=1 (fresh-start: aniversário, luto, mudança) — re-litiga o compromisso mantido"
+
+  # ==== DOMAIN — o discriminador de 3 órgãos + doutrina ====
+  - id: PO_SCREEN_HARD
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "órgão 1 (IGUAL): screen determinístico — hard/unsat-core aponta o bug ('não compila'); info + multifinal antes"
+  - id: PO_MARCA_HUMANA
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.6
+    status: open
+    label: "órgão 2 (DIFERENTE): marca humana versionada — sacro/protegido é AUTORADO (Tetlock/Chang); o motor não infere sozinho"
+  - id: PO_RESIDUO
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "órgão 3 (DIFERENTE): feedback pós-hoc — tensão 'resolvida' que re-emerge (resíduo de Williams) → promover a dialetheia protegida"
+  - id: PO_ENTRENCHMENT
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "ordem de entrincheiramento idiográfica (Gärdenfors) — quem vence; responder-gated, declarada+versionada"
+  - id: RU_BRIGHT_LINE
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "bright-line (Ainslie): exceção legítima (não estabelece precedente) vs defecção (repetida, desfaz o bundle)"
+  - id: IN_COMPROMISSO_NAO_FATO
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "invariante: um fato contraditório NÃO invalida um compromisso (só o mantém ou o libera) — não-construído em personal-KB"
+  - id: IN_ANTI_AUTOENGANO
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.55
+    status: open
+    label: "invariante load-bearing (menos fonteada): um desvio NÃO se auto-absolve — só bright-line OU marco ratificado, contra o DEV datado, nunca por introspecção do eu-presente"
+
+  # ==== AUDIT — RAMO-COMPROMISSO (motor): comportamento NÃO refuta o compromisso ====
+  - id: AR_SYNTHESIS_P2
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "SYNTHESIS-P2.md — pesquisa do motor (~60 fontes)"
+    trace: "docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P2.md"
+  - id: C_DECLARO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "declarei: 'X toda semana' (o compromisso DEV — permanece; NÃO é derrubado pelo comportamento)"
+  - id: C_COMPORTAMENTO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "log: não fiz X há 3 semanas (evidência de defecção — alimenta o discriminador, não invalida o compromisso)"
+
+  # ==== AUDIT — RAMO-BUG (contradição material): fato×fato → REFUTES → superseded ====
+  - id: C_FATO_14H
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.4
+    status: superseded
+    label: "fato: 'reunião 14h' — contradição-BUG, dissolve sob informação (superado, não deletado)"
+  - id: C_FATO_16H
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "fato: 'reunião 16h' (verificado) — o screen-hard resolve; sem síntese both/and possível"
+
+edges:
+  # --- máquina de estados do compromisso (mantido vs liberado; nunca invalidado por fato) ---
+  - from: EN_COMPROMISSO
+    to: ST_C_DECLARADO
+    edge_type: HAS_STATE
+  - from: EN_COMPROMISSO
+    to: ST_C_MANTIDO
+    edge_type: HAS_STATE
+  - from: EN_COMPROMISSO
+    to: ST_C_LIBERADO
+    edge_type: HAS_STATE
+  - from: ST_C_DECLARADO
+    to: ST_C_MANTIDO
+    edge_type: TRANSITIONS
+    on: EV_DEFECCAO
+  - from: ST_C_DECLARADO
+    to: ST_C_LIBERADO
+    edge_type: TRANSITIONS
+    on: EV_SUNSET_RATIFICADO
+  - from: ST_C_MANTIDO
+    to: ST_C_LIBERADO
+    edge_type: TRANSITIONS
+    on: EV_MARCO
+
+  # --- o RAMO-BUG reconciliado (Aufhebung: nega+conserva — superado, não deletado) ---
+  - from: C_FATO_16H
+    to: C_FATO_14H
+    edge_type: REFUTES
+
+  # --- a doutrina restringe a máquina (o motor) ---
+  - from: IN_COMPROMISSO_NAO_FATO
+    to: EN_COMPROMISSO
+    edge_type: CONSTRAINS
+  - from: IN_ANTI_AUTOENGANO
+    to: ST_C_LIBERADO
+    edge_type: CONSTRAINS
+  - from: RU_BRIGHT_LINE
+    to: EV_DEFECCAO
+    edge_type: CONSTRAINS
+  - from: PO_ENTRENCHMENT
+    to: ST_C_MANTIDO
+    edge_type: CONSTRAINS
+  - from: PO_ENTRENCHMENT
+    to: ST_C_LIBERADO
+    edge_type: CONSTRAINS
+  - from: PO_SCREEN_HARD
+    to: C_FATO_14H
+    edge_type: CONSTRAINS
+  - from: PO_MARCA_HUMANA
+    to: EN_COMPROMISSO
+    edge_type: CONSTRAINS
+  - from: PO_RESIDUO
+    to: EN_COMPROMISSO
+    edge_type: CONSTRAINS
+
+  # --- audit TRACES_TO domain (o confronto ancora nos estados/eventos) ---
+  - from: C_DECLARO
+    to: ST_C_DECLARADO
+    edge_type: TRACES_TO
+  - from: C_COMPORTAMENTO
+    to: EV_DEFECCAO
+    edge_type: TRACES_TO
+
+  # --- a doutrina ancora na pesquisa P2 ---
+  - from: RU_BRIGHT_LINE
+    to: AR_SYNTHESIS_P2
+    edge_type: TRACES_TO
+  - from: IN_ANTI_AUTOENGANO
+    to: AR_SYNTHESIS_P2
+    edge_type: TRACES_TO
+  - from: IN_COMPROMISSO_NAO_FATO
+    to: AR_SYNTHESIS_P2
+    edge_type: TRACES_TO
+  - from: PO_SCREEN_HARD
+    to: AR_SYNTHESIS_P2
+    edge_type: TRACES_TO
+  - from: PO_MARCA_HUMANA
+    to: AR_SYNTHESIS_P2
+    edge_type: TRACES_TO
+  - from: PO_RESIDUO
+    to: AR_SYNTHESIS_P2
+    edge_type: TRACES_TO
+  - from: PO_ENTRENCHMENT
+    to: AR_SYNTHESIS_P2
+    edge_type: TRACES_TO
