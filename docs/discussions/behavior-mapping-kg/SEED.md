@@ -7,7 +7,7 @@ branch: discuss/behavior-mapping-kg
 # ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
 phase: DEEP            # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
 index: README.md       # ← entrada da frente: as 5 notas + sínteses + protos
-next_action: "As 5 perguntas do SEED estão trabalhadas (ver README.md → Q1–Q5, cada uma com nota + pesquisa citada + proto kg-radar verde). Próximo passo é do maestro: promover algo a feat/*, aprofundar uma nota, FECHAR a decisão aberta da Q5 (sensor-capability × produto próprio), ou parkear."
+next_action: "[Contexto mesclado em main: a premissa telemetria compartilhada (C_TELEMETRY_VIABLE) está formalizada na pesquisa da camada dialógica + no overlay constellation.kg.yaml; a estrela interface (o loop) foi promovida #344 — checar o schema de coleta CONTRA eles, não reinventar.] As 5 perguntas do SEED estão trabalhadas (ver README.md → Q1–Q5, cada uma com nota + pesquisa citada + proto kg-radar verde). Próximo passo é do maestro: promover algo a feat/*, aprofundar uma nota, FECHAR a decisão aberta da Q5 (sensor-capability × produto próprio), ou parkear."
 scope_globs: ["docs/onion/graph/", "docs/knowledge-base/concepts/"]
 objective_tags: ["NS1", "intake-execucao", "kg-map"]
 ---
