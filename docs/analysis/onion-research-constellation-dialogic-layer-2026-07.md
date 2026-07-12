@@ -51,6 +51,9 @@ Um serviço bidirecional com **duas metades que são o mesmo objeto visto de doi
 decidido, `questions` = dúvidas, arestas `REFUTES`/nós `open` = incômodos/problemas. A prévia é uma *leitura* desse
 grafo; a auto-regulação é a *manutenção* dele. O grafo é o meio onde core e estrela se encontram — e é dogfood puro.
 
+> **Um 3º uso emergiu depois** (ver §14): o **boletim core→estrela** — o core *informa* a estrela do que virou
+> `main`, sem deranjar. Simétrico ao carteiro (estrela→core PUSH de conteúdo): este é core→estrela PUSH de contexto.
+
 ## 3. A epistemologia — qualitativo→quantitativo (o coração)
 
 Incômodos, dúvidas e vereditos são **ações não-determinísticas, qualitativas**. O
@@ -228,3 +231,39 @@ Three). A casa documenta a **disciplina**, não o slogan.
 **Veredito:** merece casa; forma recomendada = **uma KB focada da régua de transferência**, cross-link a SDAAL +
 `/meta:adopt` (o vivido) e a Hegel/Bloom (irmãs). Registrado no grafo: `D_ARISTOTLE_HOME_IS_KB` (`open`) — o **ato**
 de criar a KB no core é a decisão que **passa por nós** (não foi executado aqui).
+
+## 14. Padrão — o boletim core→estrela (informar sem deranjar)
+
+**Emergiu 1× nesta sessão** (ao mesclar trabalho que concernia estrelas vivas). Documentado como **padrão
+candidato** — Rule of Three não cumprida; vira doutrina firme por recorrência/uso, não por estética (mesmo bar
+da KB de Aristóteles: mérito por uso).
+
+**O problema.** Quando o core mescla algo que concerne uma estrela (o conteúdo dela promovido, sua contribuição
+*surfaced*, uma premissa compartilhada agora formalizada), uma sessão-estrela **viva** precisa saber — mas um
+context-dump no meio de uma tarefa a **deranja** (abandona o que fazia, tenta reconciliar tudo, confunde `main`×local).
+
+**A direção.** Simétrico ao **carteiro** (doc-bridge, estrela→core PUSH de *conteúdo*): o boletim é **core→estrela
+PUSH de *contexto***. Não é a prévia (core→estrela PULL, que *pede* o estado); é o core *avisando* o que mudou.
+
+**As 3 travas anti-deranjo:**
+1. **Contexto, não tarefa** — rotular "atualização de contexto, não é comando". A sessão pode ignorar sem perder nada.
+2. **Não é redirect** — dizer explícito "não muda o que você está fazendo agora" (como o worklog: o `## NEXT` é o
+   ponteiro; um update mid-flight é apenso, não desvio).
+3. **Ancorar no SEED (canal durável); o chat é o empurrão volátil** — o trabalho real é atualizar o Tier-0 do SEED
+   (recolher). A mensagem no chat só avisa "vale reler"; o conteúdo não depende de a sessão prestar atenção na hora certa.
+
+**Template** (cabeçalho comum + 1 linha por estrela):
+```
+📻 Boletim do core (contexto, não tarefa — não interrompe o que você está fazendo).
+Reli teu SEED: o Tier-0 está atualizado. Resumo do que virou main:
+— <o que mudou que concerne ESTA estrela, e o que NÃO muda no foco dela>
+```
+
+**A opção mais leve** (sessões delicadas): não colar nada — só `re-lê teu SEED` ou `/catch-up` (que lê o SEED
+atualizado sozinho).
+
+**Encaixe (cada peça estende uma existente):** SEED Tier-0/recolher (o canal durável) · worklog (`## NEXT` =
+ponteiro, não redirect) · camadas de liberação (é *intake de contexto* pra estrela — informa, não executa; a
+estrela decide se absorve, W6 propor→confirmar) · carteiro (o irmão simétrico, a outra direção do PUSH).
+
+**Status: candidato, design-only, gated.** Documentar-como-candidato ≠ promover. Vira firme quando recorrer.

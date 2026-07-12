@@ -313,6 +313,24 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "KG SDAAL / Dogfood — o motor qualitativo->quantitativo (confidence/impact/status/radar)"
+
+  # ---- 3o face: o boletim core->estrela (padrao candidato, emergiu 1x) ----
+  - id: C_BOLETIM_INFORM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "3o uso: o boletim core->estrela INFORMA a estrela do que virou main (simetrico ao carteiro star->core PUSH) — 3 travas: contexto-nao-tarefa, nao-redirect, ancora-no-SEED (chat=empurrao volatil)"
+  - id: D_BOLETIM_CANDIDATE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por estetica"
 edges:
   # a prova viva sustenta a tese e a epistemologia
   - from: E_INTERFACE_FOLD
@@ -466,3 +484,11 @@ edges:
   - from: D_ARISTOTLE_HOME_IS_KB
     to: D_ARISTOTLE_HOME_CANDIDATE
     edge_type: DEPENDS_ON
+
+  # o boletim e um face da camada decomposta; sustenta a decisao de document-lo como candidato
+  - from: C_BOLETIM_INFORM
+    to: C_DIALOGIC_DECOMPOSED
+    edge_type: DEPENDS_ON
+  - from: C_BOLETIM_INFORM
+    to: D_BOLETIM_CANDIDATE
+    edge_type: SUPPORTS
