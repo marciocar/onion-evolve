@@ -1,0 +1,374 @@
+# Proto — o pipeline bruto→ação do sensor como máquina de estados de domínio (KG SDAAL).
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/behavior-mapping-kg/proto/pipeline-gates.kg.yaml
+# Espera: DOMÍNIO ✅ (sem estado absorvente — o ciclo fecha e reinicia) · INTEGRIDADE exit 0.
+#
+# Nota 02-intake-execucao: o estudo de camadas dá UMA linha (guardar × agir). Um sensor de
+# comportamento tem TRÊS gates:
+#   gate 1 — OBSERVAR   (P_OBSERVE_GATE): captura exige dupla autorização (herda a nota 01).
+#   [zona de intake autônomo: guardar → mapear em KG — R_INTAKE_FREE]
+#   gate 2 — INFERIR    (P_INFER_GATE): derivar/perfilar é ato regulado (profiling); debita escopo/ε.
+#   [propor é propose-only — guardar proposta ≠ aplicar]
+#   gate 3 — AGIR       (R_VETO_ACT + I_REVERSIBILITY): só humano aplica efeito irreversível; VETO-não-SKIP.
+# Camada audit: "1 gate basta" é REFUTADO por "o sensor tem 3 gates" (a inversão da P1 + a inferência).
+
+meta:
+  id: pipeline-gates-behavior-sensor
+  date: 2026-07-12
+
+nodes:
+  # ── ATORES (domain) ────────────────────────────────────────────────
+  - id: E_SENSOR
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "o sensor/pipeline — faz o intake (observar autorizado, guardar, mapear, inferir, propor)"
+  - id: E_HUMAN
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "o humano — único que emite o ato irreversível (aprova/rejeita no gate 3)"
+  - id: E_SUBJECT
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "a pessoa (titular) — cujo comportamento é observado; autoriza na nota 01"
+
+  # ── ESTADOS do pipeline (domain), possuídos por E_SENSOR ───────────
+  - id: S_LATENTE
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "latente — baseline; nada observado (o ciclo fecha aqui e pode reiniciar)"
+  - id: S_BRUTO
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "bruto — sinal observado (só existe após o gate 1 = observar autorizado)"
+  - id: S_GUARDADO
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "guardado — bruto retido local-first, não-exportado (intake autônomo)"
+  - id: S_MAPEADO
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "mapeado — bruto virou KG (event/entity), escopado ao propósito (intake autônomo)"
+  - id: S_INFERIDO
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "inferido — atributo/agregação derivado (só após o gate 2; debita escopo/ε)"
+  - id: S_PROPOSTO
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "proposto — processo/automação sugerido (propose-only; não avança sozinho)"
+  - id: S_APLICADO
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "aplicado — efeito no mundo/pessoa (só após o gate 3 = aprovação humana)"
+
+  # ── EVENTOS (domain) — gatilhos das transições ─────────────────────
+  - id: EV_OBSERVE
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "observe — capturar (GATE 1: só em dupla autorização)"
+  - id: EV_STORE
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "store — guardar o bruto (intake autônomo)"
+  - id: EV_MAP
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "map — transformar bruto em KG (intake autônomo)"
+  - id: EV_INFER
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "infer — derivar/perfilar/agregar (GATE 2: ato regulado; escopo + ε)"
+  - id: EV_PROPOSE
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "propose — sugerir processo/automação (propose-only, sem efeito de saída)"
+  - id: EV_APPLY
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "apply — agir/automatizar no mundo (GATE 3: só humano; efeito irreversível)"
+  - id: EV_REJECT
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "reject — humano descarta a proposta (volta ao baseline)"
+  - id: EV_RESET
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "reset — ciclo de melhoria fecha; re-observar exige consentimento ainda válido"
+
+  # ── OS TRÊS GATES + a zona de intake (policy/rule/invariant) ───────
+  - id: P_OBSERVE_GATE
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "GATE 1 — observar exige dupla autorização deliberada (herda a nota 01)"
+  - id: R_INTAKE_FREE
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "entre observar e inferir, guardar/mapear é intake AUTÔNOMO (guardar ≠ aceitar ≠ aplicar)"
+  - id: P_INFER_GATE
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "GATE 2 — inferir/perfilar é ato regulado (profiling); debita escopo/ε, não é intake livre"
+  - id: R_VETO_ACT
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "GATE 3 — agir sem aprovação humana = VETO (regulado = propose-only), nunca skip"
+  - id: I_REVERSIBILITY
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "gatear pelo EFEITO DE SAÍDA/irreversibilidade, não pela leitura — ler/analisar não gateia"
+
+  # ── ARTEFATOS de ancoragem (domain) ────────────────────────────────
+  - id: A_CONSENT_NOTE
+    node_type: artifact
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "nota 01-consentimento-dual + proto/consent.kg.yaml (fonte do gate 1)"
+  - id: A_LAYERS_KB
+    node_type: artifact
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "KB authorization-layers-intake-vs-execution (a linha guardar × agir; VETO-não-SKIP)"
+  - id: A_ART22
+    node_type: artifact
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "GDPR Art. 22 (decisão automatizada) + Art. 4(4) profiling + AI Act Art. 14 (human oversight)"
+
+  # ── CAMADA AUDIT — a reconciliação: 1 gate é REFUTADO por 3 gates ──
+  - id: C_THREE_GATES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "um sensor de comportamento tem 3 gates (observar/inferir/agir), não 1"
+  - id: C_SINGLE_GATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.3
+    status: refuted
+    label: "basta a linha guardar × agir (1 gate) — REFUTADO para o sensor"
+  - id: E_INVERSION
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "P1: observar é o gate (pré-intake) + a inferência fura o consentimento → 3 gates"
+
+edges:
+  # E_SENSOR possui os estados do pipeline
+  - from: E_SENSOR
+    to: S_LATENTE
+    edge_type: HAS_STATE
+  - from: E_SENSOR
+    to: S_BRUTO
+    edge_type: HAS_STATE
+  - from: E_SENSOR
+    to: S_GUARDADO
+    edge_type: HAS_STATE
+  - from: E_SENSOR
+    to: S_MAPEADO
+    edge_type: HAS_STATE
+  - from: E_SENSOR
+    to: S_INFERIDO
+    edge_type: HAS_STATE
+  - from: E_SENSOR
+    to: S_PROPOSTO
+    edge_type: HAS_STATE
+  - from: E_SENSOR
+    to: S_APLICADO
+    edge_type: HAS_STATE
+  # o fluxo bruto→ação (cada transição disparada por um evento)
+  - from: S_LATENTE
+    to: S_BRUTO
+    edge_type: TRANSITIONS
+    on: EV_OBSERVE
+  - from: S_BRUTO
+    to: S_GUARDADO
+    edge_type: TRANSITIONS
+    on: EV_STORE
+  - from: S_GUARDADO
+    to: S_MAPEADO
+    edge_type: TRANSITIONS
+    on: EV_MAP
+  - from: S_MAPEADO
+    to: S_INFERIDO
+    edge_type: TRANSITIONS
+    on: EV_INFER
+  - from: S_INFERIDO
+    to: S_PROPOSTO
+    edge_type: TRANSITIONS
+    on: EV_PROPOSE
+  - from: S_PROPOSTO
+    to: S_APLICADO
+    edge_type: TRANSITIONS
+    on: EV_APPLY
+  - from: S_PROPOSTO
+    to: S_LATENTE
+    edge_type: TRANSITIONS
+    on: EV_REJECT
+  - from: S_APLICADO
+    to: S_LATENTE
+    edge_type: TRANSITIONS
+    on: EV_RESET
+  # agência: o sensor observa; SÓ o humano aplica/rejeita (gate 3)
+  - from: E_SENSOR
+    to: EV_OBSERVE
+    edge_type: EMITS
+  - from: E_HUMAN
+    to: EV_APPLY
+    edge_type: EMITS
+  - from: E_HUMAN
+    to: EV_REJECT
+    edge_type: EMITS
+  # observar lê o comportamento do titular
+  - from: EV_OBSERVE
+    to: E_SUBJECT
+    edge_type: READS
+  # os gates governam seus eventos
+  - from: P_OBSERVE_GATE
+    to: EV_OBSERVE
+    edge_type: CONSTRAINS
+  - from: R_INTAKE_FREE
+    to: EV_MAP
+    edge_type: CONSTRAINS
+  - from: P_INFER_GATE
+    to: EV_INFER
+    edge_type: CONSTRAINS
+  - from: R_VETO_ACT
+    to: EV_APPLY
+    edge_type: CONSTRAINS
+  - from: I_REVERSIBILITY
+    to: EV_APPLY
+    edge_type: CONSTRAINS
+  # ancoragem das regras/políticas (TRACES_TO artefato)
+  - from: P_OBSERVE_GATE
+    to: A_CONSENT_NOTE
+    edge_type: TRACES_TO
+  - from: R_INTAKE_FREE
+    to: A_LAYERS_KB
+    edge_type: TRACES_TO
+  - from: P_INFER_GATE
+    to: A_ART22
+    edge_type: TRACES_TO
+  - from: R_VETO_ACT
+    to: A_ART22
+    edge_type: TRACES_TO
+  - from: I_REVERSIBILITY
+    to: A_LAYERS_KB
+    edge_type: TRACES_TO
+  # reconciliação epistêmica: 3 gates REFUTA 1 gate; a inversão da P1 sustenta
+  - from: C_THREE_GATES
+    to: P_INFER_GATE
+    edge_type: TRACES_TO
+  - from: E_INVERSION
+    to: C_THREE_GATES
+    edge_type: SUPPORTS
+  - from: C_THREE_GATES
+    to: C_SINGLE_GATE
+    edge_type: REFUTES
