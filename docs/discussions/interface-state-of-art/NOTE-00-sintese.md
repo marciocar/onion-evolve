@@ -73,8 +73,10 @@ observando a si mesma pela mesma linha que ela enforça.
 
 - Tudo aqui é **design-only, isolado** — nenhuma linha foi pro core. Gates de N≥3, refutador, "exibir/gatear",
   reputação-condiciona-gate são **candidatos**, gated atrás de dogfood.
-- A prova barata proposta (N01, fio 3): ligar `CLAUDE_CODE_ENABLE_TELEMETRY=1` numa sessão real e ver se um
-  padrão-candidato emerge com lastro — responder à pergunta 2 do SEED *dogfoodando*, não teorizando.
+- A prova barata (N01, fio 3) foi **EXECUTADA** — ver [[NOTE-05]]: telemetria real capturada, estrutura grátis
+  / conteúdo gated confirmado por construção. Rendeu 2 ajustes de design (gate-signal é **interativo-only**;
+  filtro-de-prefixo `claude_code.*` é **passo-0**) e o limite honesto: prova barata mostra que o *instrumento*
+  funciona, **não** que um padrão existe (Rule of Three exige N≥3 sessões interativas — próximo passo real).
 - Ligações vivas: `discuss/behavior-mapping-kg` (a coleta ampla) e `discuss/onion-mobile-app` (voz = canal de
   intenção / terminal = canal de precisão).
 
