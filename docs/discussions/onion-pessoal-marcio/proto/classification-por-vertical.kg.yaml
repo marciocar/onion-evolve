@@ -1,0 +1,271 @@
+# Proto (sandbox) — a POLÍTICA DE PRIVACIDADE por vertical como grafo de DOMÍNIO (P4).
+# PLAUSÍVEL/open — derivado de research/SYNTHESIS-P4.md. NÃO muta nada do core.
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml
+# Espera: INTEGRIDADE exit 0; RADAR-DE-DOMÍNIO aponta ⚠ (estado-absorvente ST_DESTILADO — terminal legítimo).
+#
+# A tese da P4: sensibilidade NÃO é uniforme (classifica por vertical + pior-caso-de-inferência); o `ipse` é o mais
+# íntimo (nunca sai); a saída é predicado provado sob budget de ε; e o gap SEM cifra é a INFERÊNCIA (IN_INFERENCIA_GAP).
+# status: confirmed = maquinaria/postura que já transfere; status: open = peça nova/gap a desenhar.
+meta:
+  id: marcio-privacidade-p4
+  date: 2026-07-12
+nodes:
+  # ==== DOMAIN — as verticais (P1) + o ipse (P2), classificadas por sensibilidade ====
+  - id: EN_IPSE
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "ipse / fio-de-promessa (P2) — sensibilidade MÁXIMA: introspecção pura, o dado mais íntimo"
+  - id: EN_V_RELACOES
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "vertical Relações — MÁXIMA: expõe TERCEIROS não-consentidos (dado de outros)"
+  - id: EN_V_SAUDE
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "vertical Saúde — alta: categoria especial (GDPR art. 9)"
+  - id: EN_V_SENTIDO
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "vertical Sentido/valores/crença — alta: foro íntimo"
+  - id: EN_V_TRABALHO
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "vertical Trabalho — média: MAS pode inferir as private (herda sensibilidade)"
+  - id: EN_V_RECURSOS
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: confirmed
+    label: "vertical Recursos/finanças — média-alta"
+
+  # ==== DOMAIN — o KG e o fluxo de saída (bruto → destilado, gated) ====
+  - id: EN_KG_PESSOAL
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "o KG pessoal (o dado mais sensível que existe) — local-first, AES-256"
+  - id: ST_BRUTO
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "BRUTO — private, local, NUNCA copiado (não-retenção > cifra; contra subpoena/breach)"
+  - id: ST_DESTILADO
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "DESTILADO — só predicado provado pode sair (herda a sensibilidade do que permite INFERIR)"
+  - id: EV_DISCLOSURE_GATED
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "disclosure gated (VC + budget de ε + gate humano) — na dúvida, NÃO sai"
+
+  # ==== DOMAIN — as políticas (o stack de 6 camadas) ====
+  - id: PO_PRIVATE
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "classificação PRIVATE (nunca sai, nem destilado, sem gate triplo) — ipse/relações/saúde/sentido"
+  - id: PO_PROTECTED
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "classificação PROTECTED (default regulated; só destilado gated) — trabalho/recursos"
+  - id: PO_INFERENCIA
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.6
+    status: open
+    label: "classificar pelo PIOR CASO DE INFERÊNCIA (Contextual Integrity) — o inócuo herda o que permite inferir"
+  - id: PO_DISCLOSURE_VC
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "NOVO: disclosure = predicado provado (SD-JWT VC / BBS / ZKP), nunca payload"
+  - id: PO_BUDGET
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.55
+    status: open
+    label: "NOVO: budget ledger de ε monotônico — 'só destilado sai' repetido reconstrói; budget 0 = pare"
+
+  # ==== DOMAIN — invariantes (a postura fail-safe + o gap sem cifra) ====
+  - id: IN_NONE_FAILSAFE
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "de-identification `none` fail-safe: recusa redigir-e-passar (não degrada); override humano auditável"
+  - id: IN_NAO_RETENCAO
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "não-retenção > cifra: 'não se pode ser compelido a descriptografar o que nunca se guardou'"
+  - id: IN_INFERENCIA_GAP
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "GAP SEM CIFRA (o elo mais fraco): o LLM sobre o KG infere o não-declarado (85-95%) — nomeado, não resolvido"
+
+  # ==== AUDIT — a evidência do gap de inferência ====
+  - id: AR_SYNTH_P4
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "SYNTHESIS-P4.md — maquinaria interna + stack externo"
+    trace: "docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P4.md"
+  - id: C_INFERENCIA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "Staab et al. (ICLR 2024): LLM infere atributos pessoais não-declarados 85-95% — nenhuma cifra cobre"
+
+edges:
+  # o fluxo de saída
+  - from: EN_KG_PESSOAL
+    to: ST_BRUTO
+    edge_type: HAS_STATE
+  - from: EN_KG_PESSOAL
+    to: ST_DESTILADO
+    edge_type: HAS_STATE
+  - from: ST_BRUTO
+    to: ST_DESTILADO
+    edge_type: TRANSITIONS
+    on: EV_DISCLOSURE_GATED
+
+  # classificação por vertical (private vs protected)
+  - from: PO_PRIVATE
+    to: EN_IPSE
+    edge_type: CONSTRAINS
+  - from: PO_PRIVATE
+    to: EN_V_RELACOES
+    edge_type: CONSTRAINS
+  - from: PO_PRIVATE
+    to: EN_V_SAUDE
+    edge_type: CONSTRAINS
+  - from: PO_PRIVATE
+    to: EN_V_SENTIDO
+    edge_type: CONSTRAINS
+  - from: PO_PROTECTED
+    to: EN_V_TRABALHO
+    edge_type: CONSTRAINS
+  - from: PO_PROTECTED
+    to: EN_V_RECURSOS
+    edge_type: CONSTRAINS
+  # inferência: o protected herda a sensibilidade do que permite inferir
+  - from: PO_INFERENCIA
+    to: EN_V_TRABALHO
+    edge_type: CONSTRAINS
+  - from: PO_INFERENCIA
+    to: EN_V_RECURSOS
+    edge_type: CONSTRAINS
+
+  # o gate de saída
+  - from: PO_DISCLOSURE_VC
+    to: ST_DESTILADO
+    edge_type: CONSTRAINS
+  - from: PO_BUDGET
+    to: ST_DESTILADO
+    edge_type: CONSTRAINS
+  - from: IN_NONE_FAILSAFE
+    to: EV_DISCLOSURE_GATED
+    edge_type: CONSTRAINS
+  - from: IN_NAO_RETENCAO
+    to: ST_BRUTO
+    edge_type: CONSTRAINS
+  # o gap de inferência paira sobre o KG inteiro
+  - from: IN_INFERENCIA_GAP
+    to: EN_KG_PESSOAL
+    edge_type: CONSTRAINS
+
+  # audit ancora o gap na evidência
+  - from: C_INFERENCIA
+    to: IN_INFERENCIA_GAP
+    edge_type: TRACES_TO
+
+  # a doutrina ancora na síntese
+  - from: PO_PRIVATE
+    to: AR_SYNTH_P4
+    edge_type: TRACES_TO
+  - from: PO_PROTECTED
+    to: AR_SYNTH_P4
+    edge_type: TRACES_TO
+  - from: PO_INFERENCIA
+    to: AR_SYNTH_P4
+    edge_type: TRACES_TO
+  - from: PO_DISCLOSURE_VC
+    to: AR_SYNTH_P4
+    edge_type: TRACES_TO
+  - from: PO_BUDGET
+    to: AR_SYNTH_P4
+    edge_type: TRACES_TO
+  - from: IN_NONE_FAILSAFE
+    to: AR_SYNTH_P4
+    edge_type: TRACES_TO
+  - from: IN_NAO_RETENCAO
+    to: AR_SYNTH_P4
+    edge_type: TRACES_TO
+  - from: IN_INFERENCIA_GAP
+    to: AR_SYNTH_P4
+    edge_type: TRACES_TO

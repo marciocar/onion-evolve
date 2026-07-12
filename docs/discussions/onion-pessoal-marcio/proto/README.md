@@ -33,6 +33,7 @@ Litmus: *"se a fonte mudar, edito em quantos lugares? → **um**"* (a camada 1).
 | [theories/formal-reconciliation.md](theories/formal-reconciliation.md) | P2 | AGM/Hansson, entrincheiramento, TMS/ATMS, PROV, Dung/ASPIC+/bipolar, QBAF, paraconsistência |
 | [theories/discriminator-motor-bug.md](theories/discriminator-motor-bug.md) | P2 | info-sensibilidade, resíduo (Williams), hard/soft, Chang, Simon, Tetlock, Frankfurt, Higgins |
 | [theories/data-sovereignty.md](theories/data-sovereignty.md) | P3 | Solid/PDS (fracasso), local-first (Ink&Switch/CRDTs), FL+DP, W3C VC, gradient-inversion |
+| [theories/privacy-engineering.md](theories/privacy-engineering.md) | P4 | Privacy-by-Design, LINDDUN, Contextual Integrity, SD-JWT/BBS/ZKP, DP budget, Staab (inferência) |
 
 **Camada 2 — derivação Onion (cita a camada 1):**
 
@@ -44,6 +45,7 @@ Litmus: *"se a fonte mudar, edito em quantos lugares? → **um**"* (a camada 1).
 | [reconciliation-engine.kg.yaml](reconciliation-engine.kg.yaml) | P2 (executável) | o **motor** como grafo de **domínio** |
 | [fronteira-decision.kg.yaml](fronteira-decision.kg.yaml) | P3 (executável) | a decisão da fronteira como grafo de **audit** (opções + REFUTES + decision) |
 | [membership-marcio-pessoal.yaml](membership-marcio-pessoal.yaml) | P3 | entrada **hipotética** de `members.yaml` (standalone+regulated, trust zerado) |
+| [classification-por-vertical.kg.yaml](classification-por-vertical.kg.yaml) | P4 (executável) | a **política de privacidade** por vertical como grafo de **domínio** (private/protected + gap de inferência) |
 
 ## Dogfood
 
