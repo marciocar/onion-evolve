@@ -13,6 +13,10 @@ date: 2026-07-12
 > `/meta:adopt` (adotar × fresh). Nasceu explícita nos estudos de discussão (as "duas âncoras") e foi trabalhada
 > como candidato gated na pesquisa da camada dialógica (branch `docs/constellation-dialogic-layer-2026-07`, ainda
 > não mesclada). Promoção a doutrina firme = dogfood + nosso julgamento (é candidata, não lei).
+>
+> **Reconciliada com a estrela (2026-07-12, sob convite do maestro):** o tratamento mais rico da régua vive em
+> `discuss/onion-pessoal-marcio` (o par **régua/motor** + a régua pegando a própria falsa distinção da estrela).
+> Esta KB agora **puxa da estrela** — corrigindo o fluxo (não é mais um rascunho cego do core).
 
 ---
 
@@ -52,6 +56,10 @@ e **por quê** (com evidência), em vez de reusar por preguiça ou reinventar po
 A régua existe para tornar esses dois erros **visíveis e nomeáveis** — não é "reusar sempre" (isso é falsa
 analogia latente) nem "desenhar sempre" (falsa distinção latente).
 
+**Exemplos vividos** (da estrela `discuss/onion-pessoal-marcio`): *falsa analogia* = importar RBAC / MRR /
+independência-entre-fontes para um N=1 que precisa do oposto; *falsa distinção* = re-desenhar substrato
+markdown-in-git, supersessão bitemporal ou claim+evidence quando o padrão já existe maduro.
+
 ## 4. Já vivida no core (por isso é *nomear*, não importar)
 
 A régua não é nova aqui — ela já governa decisões de design do Onion, sem nome:
@@ -65,19 +73,25 @@ A régua não é nova aqui — ela já governa decisões de design do Onion, sem
 
 Nomear o que o uso já mostra é dogfood — não intelectualização.
 
-## 5. Conversa com as outras réguas (nota, não doutrina)
+**E já dogfoodada — a régua pegou a própria falsa distinção.** Na estrela `discuss/onion-pessoal-marcio`, aplicada
+ao próprio trabalho, a régua barrou uma falsa distinção *dela*: o que a pesquisa marcara como "novo" era
+**composição, não invenção** — *belief base* (Hansson) e argumentação bipolar `SUPPORTS`/`REFUTES` (Cayrol et al.,
+2005) já existiam maduros, e reinventá-los seria o erro. Esse é o "ganha o pão" que a KB precisava: **um uso real
+onde a régua mudou uma decisão**, não só um enunciado. (Fonte: a estrela; trazida ao core sob convite, 2026-07-12.)
 
-Esta régua **conversa** com dois outros critérios que o Onion usa ao decidir *como pensar*. A associação é
-**observação, não doutrina ratificada** — não há um "trio" canônico; Hegel e Bloom vivem hoje num plano (§2.x),
-não como réguas próprias. A tabela abaixo é um mapa mental, não uma tese:
+## 5. A régua e o motor (o par governante da estrela)
 
-| Critério | Eixo | Pergunta |
-|---|---|---|
-| **Aristóteles** (esta) | transferência | igual transfere, ou diferente exige design fresco? |
-| **Hegel** (limite/movimento, §2.6) | não-monotonicidade | o novo *soma* (prosa) ou *contradiz/supera* (→ KG)? |
-| **Bloom revisado** (§2.2) | esforço | qual o nível mais alto que a pergunta exige (Lembrar…Criar)? |
+Onde a régua foi mais trabalhada — a estrela `discuss/onion-pessoal-marcio` — ela é **metade de um par governante**,
+e essa é a forma mais afiada dela:
 
-Os três são pragmáticos — critérios de decisão, não teses filosóficas.
+- **Aristóteles = a RÉGUA** — decide *o que* transfere (igual) vs *o que* se desenha fresco (diferente).
+- **Hegel = o MOTOR** — decide *como* a tensão vira combustível: a contradição gera desenvolvimento, a *Aufhebung*
+  nega+conserva+eleva — **sem telos** (sem fim garantido). É a mesma dialética cujo facet-limite (Grenze/Schranke)
+  já mora no core (§2.6 do plano KG — "quando o conhecimento deixa de ser monotônico → KG").
+
+**Atribuição honesta:** o par régua/motor é a **lente governante da estrela**, não uma doutrina de core ratificada.
+Bloom revisado (§2.2, teto de esforço) é régua-irmã de *eixo distinto* (esforço, não transferência) — conversa, mas
+não forma o par.
 
 ## 6. Como aplicar (a disciplina)
 

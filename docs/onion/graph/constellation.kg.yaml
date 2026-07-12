@@ -1,0 +1,93 @@
+# KG SDAAL — OVERLAY da Constelacao (grafo-de-grafos): reconcilia premissas ENTRE estudos.
+# Este overlay comeca minimo, com a 1a reconciliacao real: a regua de Aristoteles atraves de
+#   (a) a estrela discuss/onion-pessoal-marcio (tratamento rico, dogfoodado),
+#   (b) a KB candidata do core (transfer-heuristic-aristotle.md, era cega a estrela),
+#   (c) a pesquisa da camada dialogica (D_ARISTOTLE_HOME_IS_KB).
+# Achado: reconciliacao aqui e ACORDO + enriquecimento (SUPPORTS), nao contradicao (sem REFUTES).
+# Camada audit. Design-only, gated (Fase 2 da Constelacao). Curado a mao (soberano), nao auto-detectado.
+meta:
+  id: constellation-overlay
+  date: 2026-07-12
+nodes:
+  # ---- ancoras: os estudos cujas premissas o overlay cruza ----
+  - id: ENT_STAR_PESSOAL
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "estrela discuss/onion-pessoal-marcio — onde a regua de Aristoteles foi mais trabalhada (par regua/motor)"
+  - id: ENT_KB_CORE
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "KB candidata do core: transfer-heuristic-aristotle.md (branch docs/transfer-heuristic-aristotle-kb, nao mesclada)"
+  - id: ENT_DIALOGIC_RESEARCH
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "pesquisa da camada dialogica — onde D_ARISTOTLE_HOME_IS_KB propos dar casa a regua"
+
+  # ---- as premissas cruzadas ----
+  - id: C_ARISTOTLE_STAR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "par regua/motor: Aristoteles decide O QUE transfere; Hegel (motor, Aufhebung, sem telos) decide COMO a tensao vira combustivel — tratamento rico da estrela"
+  - id: C_ARISTOTLE_KB
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "a KB core da regua de transferencia — era CEGA a estrela; reconciliada/enriquecida com ela em 2026-07-12 (candidata, nao mesclada)"
+  - id: E_STAR_CAUGHT_ITSELF
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "prova viva: a estrela aplicou a regua a si mesma e pegou a PROPRIA falsa distincao (belief base/Hansson; argumentacao bipolar Cayrol 2005 ja existiam) — o uso real que ganha o pao"
+  - id: C_RECONCILED_AGREE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "reconciliacao = ACORDO + enriquecimento, nao contradicao: estrela e KB concordam no nucleo; a estrela enriquece a KB (par regua/motor + a prova viva)"
+edges:
+  - from: C_ARISTOTLE_STAR
+    to: ENT_STAR_PESSOAL
+    edge_type: DEPENDS_ON
+  - from: C_ARISTOTLE_KB
+    to: ENT_KB_CORE
+    edge_type: DEPENDS_ON
+  - from: C_ARISTOTLE_KB
+    to: ENT_DIALOGIC_RESEARCH
+    edge_type: DEPENDS_ON
+  - from: E_STAR_CAUGHT_ITSELF
+    to: C_ARISTOTLE_STAR
+    edge_type: SUPPORTS
+  # >>> o join cross-study: a estrela SUSTENTA e enriquece a KB do core (acordo, nao contradicao) <<<
+  - from: C_ARISTOTLE_STAR
+    to: C_ARISTOTLE_KB
+    edge_type: SUPPORTS
+  - from: E_STAR_CAUGHT_ITSELF
+    to: C_RECONCILED_AGREE
+    edge_type: SUPPORTS
+  - from: C_RECONCILED_AGREE
+    to: C_ARISTOTLE_KB
+    edge_type: SUPPORTS
