@@ -208,3 +208,23 @@ formatador fino, gated.
 **Resíduo gated (honesto):** isso **estende** a linha só-metadados (hoje "frontmatter + Tier-0") para incluir o
 `.kg.yaml` como superfície pública. Essa extensão **precisa de ratificação** (candidato gated, não promoção) —
 registrada no grafo como `D_ISOLATION_EXTENSION_GATED` (`open`). É a próxima decisão nossa, se a Fase 1 abrir.
+
+## 13. Trabalho de `D_ARISTOTLE_HOME_CANDIDATE` — nomear o vivido (ato gated)
+
+A decisão foi **trabalhada** (análise + refutador); o **ato** de escrever no core fica gated pela autorização
+conjunta. Reenquadramento-chave: dar casa a Aristóteles **não é importar filosofia — é nomear uma régua que o
+core já vive sem nome.** O SDAAL já a vive (Asana/Linear reusam o genérico = *igual*; Jira/ClickUp ganham
+especialista = *diferente*); `/meta:adopt` (adotar-vs-fresh) também. É dogfood (nomear o que o uso mostra), não
+over-reach.
+
+**Aristóteles sobre si mesmo:** *igual* a Hegel/Bloom (trio de réguas de pesquisa; as irmãs têm casa em §2.6/§2.2,
+ela não → paridade) e *igual* à régua já vivida no SDAAL → transfere "é core, só falta nome".
+
+**Refutador (sobreviveu, afiado):** não é "só DRY" (DRY é duplicação de código; isto é transferência de
+conhecimento com dois modos de falha nomeados — falsa analogia / falsa distinção — mais a disciplina de veredito
+com evidência); não é filosofia-seminário (pragmática como Hegel/Bloom já são); N≥3 usos independentes (Rule of
+Three). A casa documenta a **disciplina**, não o slogan.
+
+**Veredito:** merece casa; forma recomendada = **uma KB focada da régua de transferência**, cross-link a SDAAL +
+`/meta:adopt` (o vivido) e a Hegel/Bloom (irmãs). Registrado no grafo: `D_ARISTOTLE_HOME_IS_KB` (`open`) — o **ato**
+de criar a KB no core é a decisão que **passa por nós** (não foi executado aqui).

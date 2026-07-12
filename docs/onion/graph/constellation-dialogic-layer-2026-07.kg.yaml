@@ -246,6 +246,40 @@ nodes:
     status: open
     label: "GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao nossa — candidato, nao promocao"
 
+  # ---- trabalho de D_ARISTOTLE_HOME_CANDIDATE (nomear o vivido; ATO gated) ----
+  - id: C_ARISTOTLE_ALREADY_LIVED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "a regua de Aristoteles JA e vivida no core sem nome (SDAAL: Asana/Linear reusam=igual, Jira/ClickUp especialista=diferente; /meta:adopt) — dar casa = NOMEAR o vivido, nao importar"
+  - id: C_ARISTOTLE_PARITY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "trio de reguas de pesquisa: Hegel (§2.6) e Bloom (§2.2) tem casa no core; Aristoteles so nas worktrees — merece paridade"
+  - id: C_ARISTOTLE_IS_DISCIPLINE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "o valor e a DISCIPLINA (declarar IGUAL->transfere / DIFERENTE->desenha com evidencia; bloqueia falsa-analogia e falsa-distincao) — refutador: nao e so DRY, e transferencia com 2 modos de falha"
+  - id: D_ARISTOTLE_HOME_IS_KB
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "recomendacao: casa = KB focada da regua de transferencia, cross-link SDAAL/adopt (o vivido) + Hegel/Bloom (irmas) — promocao focada; o ATO de escrever no core e gated pela nossa autorizacao"
+
   # ---- ancoras (entidades) ----
   - id: ENT_DIARY_REVIEW
     node_type: entity
@@ -409,3 +443,26 @@ edges:
   - from: D_PREVIA_SCHEMA_DEFINED
     to: Q_PREVIA_SCHEMA
     edge_type: SUPPORTS
+
+  # trabalho de Aristoteles: nomear o vivido; a forma (KB) depende do sim; ATO gated
+  - from: C_ARISTOTLE_PARITY
+    to: C_ARISTOTLE_NO_HOME
+    edge_type: DEPENDS_ON
+  - from: C_ARISTOTLE_ALREADY_LIVED
+    to: D_ARISTOTLE_HOME_CANDIDATE
+    edge_type: SUPPORTS
+  - from: C_ARISTOTLE_PARITY
+    to: D_ARISTOTLE_HOME_CANDIDATE
+    edge_type: SUPPORTS
+  - from: C_ARISTOTLE_IS_DISCIPLINE
+    to: D_ARISTOTLE_HOME_CANDIDATE
+    edge_type: SUPPORTS
+  - from: C_ARISTOTLE_ALREADY_LIVED
+    to: D_ARISTOTLE_HOME_IS_KB
+    edge_type: SUPPORTS
+  - from: C_ARISTOTLE_IS_DISCIPLINE
+    to: D_ARISTOTLE_HOME_IS_KB
+    edge_type: SUPPORTS
+  - from: D_ARISTOTLE_HOME_IS_KB
+    to: D_ARISTOTLE_HOME_CANDIDATE
+    edge_type: DEPENDS_ON
