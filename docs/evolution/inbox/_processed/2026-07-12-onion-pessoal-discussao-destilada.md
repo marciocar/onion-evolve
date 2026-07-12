@@ -20,7 +20,7 @@ status: candidatos (triagem gated — nada promovido)
 5 passadas (P1–P5) fecharam as 4 perguntas do SEED + a fronteira aberta. Método idêntico em toda passada:
 **pesquisa orquestrada citada → derivação `fonte≠derivação` → proto executável (`.kg.yaml` que passa no
 `kg-radar`)**. ~200 fontes; cada síntese passou por verificação adversarial (que derrubou citações fabricadas).
-Índice: [`docs/discussions/onion-pessoal-marcio/README.md`](../../discussions/onion-pessoal-marcio/README.md).
+Índice: [`docs/discussions/onion-pessoal-marcio/README.md`](../../../discussions/onion-pessoal-marcio/README.md).
 
 ## Candidatos-a-doutrina (o que pode transferir para o core)
 
@@ -31,13 +31,13 @@ status: candidatos (triagem gated — nada promovido)
      "X transfere para Y?".
    - **Hegel (o motor):** a *Aufhebung* (nega+conserva+eleva) **já é** a regra append-mostly do KG SDAAL
      (refutado permanece, superado-preservando). Nomear a correspondência dá vocabulário ao que o radar já faz.
-   - **Candidato:** KB de conceito ou nota em [`onion-relation-vocabulary`](../../knowledge-base/concepts/onion-relation-vocabulary.md) / método de análise.
+   - **Candidato:** KB de conceito ou nota em [`onion-relation-vocabulary`](../../../knowledge-base/concepts/onion-relation-vocabulary.md) / método de análise.
 
 2. **"Self-red-team = dogfood aplicado à saída."**
    - Rodar o **próprio motor do artefato como atacante** contra o que ele vai emitir, **antes** de emitir; se
      deduz o que deveria ficar oculto, não emite. É a doutrina de dogfood (rodar o artefato de verdade,
      tratar veredito como hipótese) virada **gate de pré-emissão**.
-   - **Candidato:** nota em [`onion-dogfooding-doctrine`](../../knowledge-base/concepts/onion-dogfooding-doctrine.md).
+   - **Candidato:** nota em [`onion-dogfooding-doctrine`](../../../knowledge-base/concepts/onion-dogfooding-doctrine.md).
 
 3. **"Convergência interna × externa" como sinal de validação.**
    - 3× (P3/P4/P5) a doutrina que o Onion já tem bateu, **sem se conhecer**, com o consenso externo de 2026
@@ -47,7 +47,7 @@ status: candidatos (triagem gated — nada promovido)
 
 4. **O workflow de discussão isolada, validado end-to-end.**
    - "research → derivation (`fonte≠derivação`) → executable proto (`kg-radar`)" rodou 5×, com o proto se
-     auto-provando (nó mais central = a tese-núcleo). Complementa o [`discussion-worktrees-pattern`](../../knowledge-base/concepts/discussion-worktrees-pattern.md)
+     auto-provando (nó mais central = a tese-núcleo). Complementa o [`discussion-worktrees-pattern`](../../../knowledge-base/concepts/discussion-worktrees-pattern.md)
      existente com o **método interno** de cada passada.
    - **Candidato:** estender a KB de discussion-worktrees com o playbook das passadas.
 
