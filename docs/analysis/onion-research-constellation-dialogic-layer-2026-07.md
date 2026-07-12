@@ -139,3 +139,24 @@ julgamento compartilhado. A camada dialógica é a **generalização** desse ges
 - **Não é vigilância da sessão.** A auto-regulação é a estrela observando a si mesma pela própria gramática — não o
   core bisbilhotando (a prévia é **sob convite**, intake).
 - **Não é medição automática.** O quantitativo atribuído é uma alça; só o dogfood o converte em medida.
+
+## 10. Resolução — a dúvida "sobrepõe o radar?" (2026-07-12, síntese)
+
+A dúvida `Q_DIALOGIC_VS_RADAR` foi trabalhada e **resolvida por síntese** (o incômodo virou alavanca; no grafo:
+`C_DIALOGIC_DECOMPOSED SUPERSEDES C_DIALOGIC_SERVICE`). Veredito:
+
+**Ortogonal ao radar-da-constelação, mas reusa o motor-base — sobreposição é *reuso*, não competição.** A palavra
+"radar" esconde dois: o **motor-base `kg-radar.sh`** (per-graph, roda em qualquer grafo) e o
+**radar-da-constelação** (`kg-constellation-radar.sh`, Fase 2, roda no overlay cross-study). Os eixos são
+distintos: a camada dialógica é **por-estrela** (n=1, dentro de um grafo); o radar-da-constelação é
+**entre-estrelas** (n≥2, cruzando grafos). Decompondo a camada:
+
+| Peça | Relação com o radar | Novo? |
+|---|---|---|
+| **Auto-regulação** (mecanismo) | **roda o motor-base `kg-radar.sh` no próprio grafo** (foi o que a dobra da interface fez) | não — motor existente aplicado a si mesmo |
+| **Prévia** (boletim) | **vista agrupada-por-papel**; a seção "dúvidas/o-que-fazer-agora" **contém** o radar-base per-graph (superset) | fina — é uma projeção |
+| **Ritual Aristóteles+Hegel** (autoria) | **upstream do radar** — produz os nós, não os ranqueia | **sim — o único conteúdo genuinamente novo** |
+
+**Consequência de design (encolhe o escopo, baixa o risco anti-v4.0):** a camada **não é um 4º serviço
+monolítico** — é uma **disciplina de autoria** (o ritual) + uma **vista fina** (a prévia), ambas cavalgando o
+motor de radar que já existe. Isso *fortalece* "cada peça estende uma existente" e reduz o que haveria a construir.

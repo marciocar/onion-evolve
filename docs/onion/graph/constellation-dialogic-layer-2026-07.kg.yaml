@@ -13,7 +13,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.7
-    status: open
+    status: superseded
     label: "o 4o servico dialogico (previa + auto-regulacao) fecha o vao bidirecional que mapa/radar/carteiro deixam"
   - id: C_SAME_OBJECT
     node_type: claim
@@ -125,8 +125,50 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.35
-    status: open
+    status: done
     label: "incomodo: a camada dialogica (por-estrela) se sobrepoe ao radar (cross-study) ou e ortogonal de verdade?"
+
+  # ---- RESOLUCAO de Q_DIALOGIC_VS_RADAR (sintese hegeliana: SUPERSEDES) ----
+  - id: C_AUTOREG_REUSES_ENGINE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "a auto-regulacao RODA o motor-base kg-radar.sh no proprio grafo (como a dobra da interface fez) — so o ritual de autoria e novo"
+  - id: C_PREVIA_CONTAINS_RADAR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    label: "a previa e uma vista agrupada-por-papel; sua secao 'duvidas/o-que-fazer-agora' CONTEM o radar-base per-graph (superset, nao competidor)"
+  - id: C_RITUAL_IS_NEW
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "o unico conteudo genuinamente novo e o ritual de autoria Aristoteles+Hegel — upstream do radar (produz nos, nao os ranqueia)"
+  - id: C_DIALOGIC_DECOMPOSED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.75
+    status: confirmed
+    label: "a camada dialogica nao e um 4o servico monolitico: e o ritual de autoria [novo] + a previa como vista [fina], reusando o motor-base; ortogonal ao radar-da-constelacao (por-estrela x cross-study)"
+  - id: D_DIALOGIC_ORTHOGONAL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "resolvido: ortogonal ao radar-da-constelacao, mas REUSA o motor-base — sobreposicao e reuso (estende), nao competicao; encolhe o '4o servico' pra disciplina+vista"
 
   # ---- ancoras (entidades) ----
   - id: ENT_INTERFACE_STAR
@@ -214,3 +256,26 @@ edges:
   - from: Q_DIALOGIC_VS_RADAR
     to: C_DIALOGIC_SERVICE
     edge_type: DEPENDS_ON
+
+  # resolucao (sintese hegeliana): SUPERSEDES + a decisao que responde a duvida
+  - from: C_RITUAL_IS_NEW
+    to: C_DIALOGIC_DECOMPOSED
+    edge_type: SUPPORTS
+  - from: C_AUTOREG_REUSES_ENGINE
+    to: C_DIALOGIC_DECOMPOSED
+    edge_type: SUPPORTS
+  - from: C_PREVIA_CONTAINS_RADAR
+    to: C_DIALOGIC_DECOMPOSED
+    edge_type: SUPPORTS
+  - from: C_AUTOREG_REUSES_ENGINE
+    to: ENT_KG_SDAAL
+    edge_type: DEPENDS_ON
+  - from: C_DIALOGIC_DECOMPOSED
+    to: C_DIALOGIC_SERVICE
+    edge_type: SUPERSEDES
+  - from: C_DIALOGIC_DECOMPOSED
+    to: D_DIALOGIC_ORTHOGONAL
+    edge_type: SUPPORTS
+  - from: D_DIALOGIC_ORTHOGONAL
+    to: Q_DIALOGIC_VS_RADAR
+    edge_type: SUPPORTS
