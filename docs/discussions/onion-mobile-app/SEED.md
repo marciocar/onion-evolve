@@ -4,6 +4,11 @@ category: discussion
 status: fonte-de-discussao-isolada
 date: 2026-07-11
 branch: discuss/onion-mobile-app
+# ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
+phase: SEED            # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
+next_action: "Esperar a substância do cacho firmar (superfície segue substância): explorar a superfície (PWA/onion-bridge/onion-mini + voz como canal de intenção) depois que o cérebro (pessoal-marcio) tiver base confirmada."
+scope_globs: ["docs/onion/"]
+objective_tags: ["NS2", "portatil", "familia"]
 ---
 
 # 🧵 App Onion no celular — um Onion de verdade, não o Claude Code
