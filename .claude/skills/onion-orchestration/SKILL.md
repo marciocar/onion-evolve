@@ -104,20 +104,27 @@ if (collided.length) return gateHumano(collided, results);  // partição falhou
 // sem colisão → consolida numa branch → /git:flow feature finish | /engineer:pr
 ```
 
-## Model tiering & budget
+## Model tiering — PADRÃO OBRIGATÓRIO (tier por complexidade, sempre)
 
-- **Opus orquestra** no nível principal (decisão, roteamento, síntese);
-  **Sonnet/Haiku são os workers** — tier por dificuldade da subtarefa.
-  Workers mecânicos (extração, classificação, varredura) → haiku;
-  raciocínio de média complexidade → sonnet; reservar opus para
-  orquestração e juízes adversariais críticos.
-- **Loops budget-gated**: `loop-until-done` sempre com teto via `budget`
-  (tokens) — sem teto não há loop.
-- **Prompt caching**: instruções/contexto comuns aos workers entram no prefixo
-  cacheável, cortando custo no fan-out.
-- Tiers de worker (uso geral): **opus, sonnet, haiku**. `fable` apenas onde
-  permitido — **disponibilidade restrita** (ver KB de orquestração → "Disponibilidade
-  de modelos", fonte única). Nunca ofereça modelo de outro provider como worker.
+> **Regra Onion — sobrepõe o default do Workflow ("omita o `model`; herda a sessão").** Toda orquestração
+> Onion **atribui explicitamente `model` + `effort` por stage, conforme a complexidade da subtarefa**. Deixar
+> tudo herdar o modelo da sessão é o antipadrão que o maestro sinalizou (2026-07-12): **desperdiça** modelo
+> forte no fan-out mecânico e **sub-serve** o verify/juiz difícil. **Tiering não é opcional — é o default.**
+
+| Complexidade do stage | `model` | `effort` | Exemplos |
+|---|---|---|---|
+| **Mecânico** — extração, classificação, varredura, transform, particionar, mapear | `haiku` | `low` | auditar 1 arquivo, extrair API, dividir partições |
+| **Raciocínio médio** — análise, research por dimensão, síntese parcial | `sonnet` | `medium` | pesquisar uma dimensão, resumir achados, propor fix |
+| **Difícil / alto risco** — verify adversarial, juiz/painel, síntese final, mudança irreversível/compliance | `opus` | `high` (ou `xhigh`) | refutar um achado, judge-panel, consolidação crítica |
+
+- **Opus orquestra** no nível principal (decisão, roteamento, síntese) — custo 0 tokens no JS. Os **workers**
+  são tierados pela tabela; só o stage que **realmente** exige raciocínio profundo paga opus.
+- **No relatório (passo 7)** declare o tier de cada fase (ex.: `scan: haiku/low · verify: opus/high`) — se
+  uma fase difícil rodou barata ou uma mecânica rodou cara, é bug de tiering a corrigir.
+- **Loops budget-gated**: `loop-until-done` sempre com teto via `budget` (tokens) — sem teto não há loop.
+- **Prompt caching**: instruções/contexto comuns aos workers entram no prefixo cacheável, cortando custo no fan-out.
+- Tiers disponíveis: **opus, sonnet, haiku**. `fable` apenas onde permitido — **disponibilidade restrita**
+  (ver KB de orquestração → "Disponibilidade de modelos", fonte única). Nunca ofereça modelo de outro provider.
 
 ## Gotchas
 
