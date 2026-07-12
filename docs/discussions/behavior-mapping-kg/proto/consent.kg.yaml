@@ -1,0 +1,288 @@
+# Proto — consentimento-como-policy para um sensor de comportamento (KG SDAAL).
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/behavior-mapping-kg/proto/consent.kg.yaml
+# Espera: DOMÍNIO ✅ (state-machine de consentimento sem estado absorvente) · INTEGRIDADE exit 0.
+#
+# Modelo (nota 01-consentimento-dual): a permissão de OBSERVAR é o gate.
+#   - camada domain = a máquina de consentimento (não-autorizado → autorizado → revogado)
+#     + as políticas/regras que a governam (dupla autorização, VETO, não-acidental, composição).
+#   - camada audit  = a reconciliação honesta: "consentir a captura basta?" é REFUTADO pela
+#     lacuna da inferência (Staab et al.), que TRACES_TO a política de domínio.
+#
+# Princípio: a pessoa E a organização querem+autorizam; nunca imposto (revogável, VETO-não-SKIP)
+# nem acidental (sem default/scope-creep). Consentir a captura ≠ estar protegido na inferência.
+meta:
+  id: consent-behavior-sensor
+  date: 2026-07-12
+
+nodes:
+  # ── ENTIDADES (domain) ─────────────────────────────────────────────
+  - id: E_PERSON
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "a pessoa — sujeito cujo comportamento é mapeado (titular do consentimento)"
+  - id: E_ORG
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "a organização — compositora do conhecimento transversal (não vigia)"
+  - id: E_PURPOSE
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "propósito-de-mapeamento — atividade/produto transversal que escopa a captura"
+
+  # ── ESTADOS (domain) — a máquina de consentimento, possuída por E_PERSON ─
+  - id: S_NAO_AUTORIZADO
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "não-autorizado — baseline; sem dupla autorização não há captura (default seguro)"
+  - id: S_AUTORIZADO
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "autorizado — dupla autorização deliberada ativa (pessoa E org), escopada ao propósito"
+  - id: S_REVOGADO
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "revogado — consentimento retirado; captura cessa; bruto a purgar (revogação sempre alcançável)"
+
+  # ── EVENTOS (domain) ───────────────────────────────────────────────
+  - id: EV_AUTHORIZE
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "authorize — a pessoa E a org autorizam deliberadamente (opt-in, dupla)"
+  - id: EV_REVOKE
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "revoke — a pessoa (ou a org) retira o consentimento a qualquer momento"
+  - id: EV_PURGE
+    node_type: event
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "purge — bruto purgado após revogação; volta ao baseline não-autorizado"
+  - id: EV_CAPTURE
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "capture — observação capturada; só válida em S_AUTORIZADO, escopada ao propósito"
+
+  # ── POLÍTICA / REGRAS / INVARIANTE (domain) ────────────────────────
+  - id: P_DUAL_AUTH
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "dupla autorização deliberada exigida antes de qualquer captura (opt-in, revogável)"
+  - id: R_VETO
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "captura fora de S_AUTORIZADO = VETO (fail-safe: ausência de consentimento ≠ permissão)"
+  - id: R_COMPOSE
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "compor entre pessoas exige o consentimento próprio de cada uma (agregação, não escrutínio)"
+  - id: I_NO_ACCIDENT
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "não-acidental — sem captura por default, vazamento ou scope-creep além do propósito"
+
+  # ── ARTEFATOS de ancoragem (domain) ────────────────────────────────
+  - id: A_CONSENT_LEDGER
+    node_type: artifact
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "registro de consentimento — quem autorizou o quê, quando, para qual propósito"
+  - id: A_AUTH_LAYERS
+    node_type: artifact
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "KB authorization-layers-intake-vs-execution.md (fonte do fail-safe VETO-não-SKIP)"
+  - id: A_CLASSIFICATION
+    node_type: artifact
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "rfc-0003 — classificação 6-níveis (private inviolável) e minimização de propósito"
+  - id: A_OBSERVATION
+    node_type: artifact
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "observação capturada — escrita no store escopado ao propósito (local-first, não-retida)"
+
+  # ── CAMADA AUDIT — a reconciliação honesta (consentir ≠ proteger da inferência) ─
+  - id: C_CAPTURE_CONSENTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "mapeamento consentido para melhoria/automação ≠ vigilância (finalidade + agregação + controle)"
+  - id: C_CONSENT_SUFFICIENT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.3
+    status: refuted
+    label: "consentir a captura basta para privacidade (REFUTADO pela inferência)"
+  - id: C_INFERENCE_GAP
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "mesmo consentido na captura, o motor sobre o KG infere o não-capturado (lacuna aberta)"
+  - id: E_STAAB
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "Staab et al., ICLR 2024 — LLMs inferem atributos pessoais não fornecidos"
+
+edges:
+  # máquina de estados — E_PERSON possui os estados
+  - from: E_PERSON
+    to: S_NAO_AUTORIZADO
+    edge_type: HAS_STATE
+  - from: E_PERSON
+    to: S_AUTORIZADO
+    edge_type: HAS_STATE
+  - from: E_PERSON
+    to: S_REVOGADO
+    edge_type: HAS_STATE
+  # transições (revogação sempre alcançável; revogado volta ao baseline via purge)
+  - from: S_NAO_AUTORIZADO
+    to: S_AUTORIZADO
+    edge_type: TRANSITIONS
+    on: EV_AUTHORIZE
+  - from: S_AUTORIZADO
+    to: S_REVOGADO
+    edge_type: TRANSITIONS
+    on: EV_REVOKE
+  - from: S_REVOGADO
+    to: S_NAO_AUTORIZADO
+    edge_type: TRANSITIONS
+    on: EV_PURGE
+  # dupla autorização: ambas as partes emitem o authorize (só o par dispara)
+  - from: E_PERSON
+    to: EV_AUTHORIZE
+    edge_type: EMITS
+  - from: E_ORG
+    to: EV_AUTHORIZE
+    edge_type: EMITS
+  - from: E_PERSON
+    to: EV_REVOKE
+    edge_type: EMITS
+  # captura só emana do estado autorizado; lê o propósito (escopo) e escreve a observação
+  - from: S_AUTORIZADO
+    to: EV_CAPTURE
+    edge_type: EMITS
+  - from: EV_CAPTURE
+    to: E_PURPOSE
+    edge_type: READS
+  - from: EV_CAPTURE
+    to: A_OBSERVATION
+    edge_type: WRITES
+  # políticas/regras/invariante governam a captura
+  - from: P_DUAL_AUTH
+    to: EV_CAPTURE
+    edge_type: CONSTRAINS
+  - from: R_VETO
+    to: EV_CAPTURE
+    edge_type: CONSTRAINS
+  - from: I_NO_ACCIDENT
+    to: EV_CAPTURE
+    edge_type: CONSTRAINS
+  - from: R_COMPOSE
+    to: E_ORG
+    edge_type: CONSTRAINS
+  # ancoragem das regras (TRACES_TO artefato — evita RULE-sem-trace)
+  - from: P_DUAL_AUTH
+    to: A_CONSENT_LEDGER
+    edge_type: TRACES_TO
+  - from: R_VETO
+    to: A_AUTH_LAYERS
+    edge_type: TRACES_TO
+  - from: R_COMPOSE
+    to: A_CLASSIFICATION
+    edge_type: TRACES_TO
+  - from: I_NO_ACCIDENT
+    to: A_CLASSIFICATION
+    edge_type: TRACES_TO
+  # reconciliação epistêmica (audit → domain) e a lacuna da inferência
+  - from: C_CAPTURE_CONSENTED
+    to: P_DUAL_AUTH
+    edge_type: TRACES_TO
+  - from: E_STAAB
+    to: C_INFERENCE_GAP
+    edge_type: SUPPORTS
+  - from: C_INFERENCE_GAP
+    to: C_CONSENT_SUFFICIENT
+    edge_type: REFUTES
+  - from: C_INFERENCE_GAP
+    to: P_DUAL_AUTH
+    edge_type: TRACES_TO
