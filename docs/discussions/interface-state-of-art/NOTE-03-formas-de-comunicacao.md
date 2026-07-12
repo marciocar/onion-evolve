@@ -7,6 +7,7 @@ branch: discuss/interface-state-of-art
 responde: SEED.md — pergunta 3
 metodo: pesquisa orquestrada citada (2 frentes) antes de posição
 relacionado: NOTE-01-telemetria-util-e-etica.md, NOTE-02-reconhecimento-de-padroes.md
+atualizada_por: NOTE-05 (dogfood real — achado A abaixo)
 ---
 
 # 🧵 Nota 03 — Voz, diagramas ao vivo, grafo projetado, gates visuais
@@ -87,6 +88,13 @@ A telemetria `blocked_on_user` (Nota 01, tempo esperando gate) é a **métrica q
 da Nota 03 está fatigando o maestro**. Batching + risco-em-camadas + evidence-pack **reduzem** esse tempo
 *sem remover* o gate. Ciclo: instrumenta (01) → reconhece padrão de atrito (02) → redesenha gate/superfície
 (03) → re-mede. É o loop dogfood-auditável (NS1) aplicado à própria interface.
+
+> **⟳ Correção do dogfood (NOTE-05, telemetria real):** o `blocked_on_user` **existe e é capturável**, mas
+> **só tem sinal em sessão INTERATIVA** — num `claude -p` headless ele flatlina (~9ms de overhead, sem humano
+> esperando). Consequência direta para esta nota: **a fadiga de gate só se mede com humano no loop**; o loop
+> 01→02→03 tem que ser instrumentado sobre sessões **interativas** (não headless), senão a métrica-âncora do
+> ciclo é cega justamente ao que ela deveria medir. O gate visual não é só desejável — sem sessão interativa
+> instrumentada, ele é **inobservável**.
 
 ## Fios abertos que voltam ao maestro
 

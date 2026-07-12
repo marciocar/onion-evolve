@@ -6,6 +6,7 @@ date: 2026-07-12
 branch: discuss/interface-state-of-art
 responde: SEED.md — pergunta 1
 metodo: pesquisa orquestrada citada (3 frentes) antes de posição
+atualizada_por: NOTE-05 (dogfood real — 2 achados abaixo)
 ---
 
 # 🧵 Nota 01 — Que telemetria seria útil e ética capturar da própria sessão
@@ -48,6 +49,17 @@ acionável: **não precisamos instrumentar do zero** — o Claude Code já emite
 - span `claude_code.tool.blocked_on_user` = **tempo esperando permissão humana** (custo do gate);
 - subagentes (Task) aninham sob o span do pai → **toda a cadeia de delegação vira um trace só**;
 - **estrutura vem de graça; conteúdo é opt-in gated** (`OTEL_LOG_USER_PROMPTS`, `OTEL_LOG_TOOL_CONTENT`…).
+
+> **⟳ Correção do dogfood (NOTE-05, telemetria real capturada):** dois pontos acima ganharam nuance ao rodar de verdade.
+> - **Achado B — "vem de graça" é grátis mas RUIDOSO.** O stream real vem **entrelaçado com a telemetria do próprio
+>   app da máquina** (`prisma:engine:*`, `rhilo.bullmq.queue.jobs`, `[Outbox] …`, `nodejs.eventloop.*`, `v8js.memory.*`,
+>   `mcp_server_connection`, `plugin_loaded`). Instrumentar a sessão ≠ sinal limpo — exige um **filtro de prefixo
+>   `claude_code.*` / `gen_ai.*` como passo-0** obrigatório. O substrato é grátis; a limpeza não.
+> - **Achado A — `blocked_on_user` só tem sinal em sessão INTERATIVA.** O span existe e é capturável, mas em `claude -p`
+>   headless ele **flatlina** (~9ms de overhead, sem humano esperando). O "custo do gate" só é mensurável **com humano no
+>   loop** — logo, dogfoodar gate exige instrumentar a sessão interativa, não headless. (Também atualiza a NOTE-03.)
+> - **Confirmado por construção:** a linha *intake=estrutura / conteúdo=gated* **segurou sem esforço** — nenhum prompt/código
+>   apareceu na captura (não liguei `OTEL_LOG_USER_PROMPTS`). Tokens/custo/`tool_decision`/spans, sim.
 
 ## A resposta em duas metades
 
