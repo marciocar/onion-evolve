@@ -68,6 +68,24 @@ Quatro invariantes — é o que separa "discussão" de "frente de trabalho":
 Cada worktree abre com um `docs/discussions/<slug>/SEED.md`: **enquadramento** (o que é o tema) · **por que
 importa pro Onion** · **perguntas de partida** · **conexões** com o que já existe (pra a sessão nova começar
 aterrada, não do zero). O seed é o análogo do `STATE.md` do worklog, mas para *explorar* em vez de *executar*.
+Template: [`docs/discussions/_template/SEED.md`](../../discussions/_template/SEED.md).
+
+### 4.1 Bloco Tier-0 do SEED (o que o mapa da constelação consome)
+
+O frontmatter do SEED carrega um **bloco Tier-0** — o "STATE.md-de-exploração" da estrela, e o **único** que o
+mapa macro lê (metadados, nunca o corpo):
+
+```yaml
+phase: SEED            # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
+next_action: "próximo passo imperativo (análogo ao ## NEXT do STATE.md)"
+scope_globs: ["docs/kg/"]     # globs que o estudo tende a tocar → detecta COLISÃO DE ESCOPO entre estrelas
+objective_tags: ["NS1"]        # objetivo/north-star → detecta CONVERGÊNCIA DE OBJETIVO entre estrelas
+```
+
+**Recolher = atualizar `phase` + `next_action` antes de rotacionar** (handoff-commitado, como o `## NEXT` do
+STATE.md). Os campos `scope_globs`/`objective_tags` alimentam a **anti-divergência** do modelo
+[Constelação de Estudos](constellation-of-studies.md) — o mapa cruza-os entre estrelas pra alertar colisão de
+escopo e convergência de objetivo **antes** de dois estudos divergirem sobre bases frágeis.
 
 ## 5. Ciclo de vida (pode nunca mergear — e tudo bem)
 
