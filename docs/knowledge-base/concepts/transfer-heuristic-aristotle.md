@@ -65,18 +65,19 @@ A régua não é nova aqui — ela já governa decisões de design do Onion, sem
 
 Nomear o que o uso já mostra é dogfood — não intelectualização.
 
-## 5. O trio de réguas de pesquisa
+## 5. Conversa com as outras réguas (nota, não doutrina)
 
-A régua de transferência é uma de **três réguas** que o Onion usa para decidir *como pensar* — cada uma com um
-eixo distinto:
+Esta régua **conversa** com dois outros critérios que o Onion usa ao decidir *como pensar*. A associação é
+**observação, não doutrina ratificada** — não há um "trio" canônico; Hegel e Bloom vivem hoje num plano (§2.x),
+não como réguas próprias. A tabela abaixo é um mapa mental, não uma tese:
 
-| Régua | Eixo | Pergunta |
+| Critério | Eixo | Pergunta |
 |---|---|---|
 | **Aristóteles** (esta) | transferência | igual transfere, ou diferente exige design fresco? |
 | **Hegel** (limite/movimento, §2.6) | não-monotonicidade | o novo *soma* (prosa) ou *contradiz/supera* (→ KG)? |
 | **Bloom revisado** (§2.2) | esforço | qual o nível mais alto que a pergunta exige (Lembrar…Criar)? |
 
-As três são pragmáticas — critérios de decisão, não teses filosóficas.
+Os três são pragmáticos — critérios de decisão, não teses filosóficas.
 
 ## 6. Como aplicar (a disciplina)
 
