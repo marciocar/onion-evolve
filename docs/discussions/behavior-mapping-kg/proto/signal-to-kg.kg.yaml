@@ -1,0 +1,167 @@
+# Proto — do sinal bruto ao KG + reconciliação observado × declarado (KG SDAAL).
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/behavior-mapping-kg/proto/signal-to-kg.kg.yaml
+# Espera: RECONCILIAÇÃO mostra REFUTES (say-do gap) e SUPERSEDES (mudança); INTEGRIDADE exit 0.
+#
+# Nota 04: a ação observada vira `event` (PROD, object-centric: um evento toca vários objetos);
+# app/doc/pessoa viram `entity`; a inferência vira `claim` (audit, herda o gate 2). O declarado
+# (DEV) e o observado (PROD) reconciliam por SUPPORTS/REFUTES/SUPERSEDES — o radar mostra o gap.
+meta:
+  id: signal-to-kg-behavior-sensor
+  date: 2026-07-12
+
+nodes:
+  # ── DOMÍNIO: o que o sinal bruto vira ──────────────────────────────
+  - id: E_ACTOR
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "a pessoa (ator) — object-centric: um evento se liga a ela e a outros objetos"
+  - id: E_APP
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "app/tela/sistema — objeto de contexto da ação (não achatar em 1 case id)"
+  - id: E_DOC
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "documento/artefato tocado — outro objeto ligado ao mesmo evento"
+  - id: EV_ACTION
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "ação observada (click/edit) — o átomo bruto vira event, case+activity+timestamp"
+  - id: R_ACTION_IS_EVENT
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "ação de baixo nível → event (após abstração p/ atividade significativa)"
+  - id: R_OBJECT_IS_ENTITY
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "app/doc/tela/pessoa → entity (object-centric OCEL/EKG, não single-case)"
+  - id: P_RECONCILE
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "declarado(DEV) × observado(PROD) reconciliam por SUPPORTS/REFUTES/SUPERSEDES"
+  - id: A_OCEL
+    node_type: artifact
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "padrões de event log — XES (IEEE 1849) / OCEL object-centric / Event Knowledge Graph"
+  - id: A_KG_KB
+    node_type: artifact
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "KB knowledge-graph-sdaal — planos DEV/PROD, reconciliação append-mostly"
+
+  # ── AUDIT: a reconciliação (o coração da Q4) ───────────────────────
+  - id: C_OBSERVED
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "observado: a pessoa revisa PRs à tarde (do sinal capturado)"
+  - id: C_DECLARED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.4
+    status: refuted
+    label: "declarado: 'reviso PRs toda manhã' (o que a pessoa DIZ) — REFUTADO pelo observado"
+  - id: C_OBSERVED_OLD
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.6
+    status: superseded
+    label: "observado antigo: revisava de manhã (comportamento mudou no tempo)"
+  - id: E_LOG
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "event log capturado — a evidência que sustenta o observado"
+
+edges:
+  # object-centric: um evento, vários objetos
+  - from: E_ACTOR
+    to: EV_ACTION
+    edge_type: EMITS
+  - from: EV_ACTION
+    to: E_DOC
+    edge_type: WRITES
+  - from: EV_ACTION
+    to: E_APP
+    edge_type: READS
+  # as regras de mapeamento (ancoradas nos padrões de event log)
+  - from: R_ACTION_IS_EVENT
+    to: EV_ACTION
+    edge_type: CONSTRAINS
+  - from: R_OBJECT_IS_ENTITY
+    to: E_APP
+    edge_type: CONSTRAINS
+  - from: R_ACTION_IS_EVENT
+    to: A_OCEL
+    edge_type: TRACES_TO
+  - from: R_OBJECT_IS_ENTITY
+    to: A_OCEL
+    edge_type: TRACES_TO
+  - from: P_RECONCILE
+    to: C_DECLARED
+    edge_type: CONSTRAINS
+  - from: P_RECONCILE
+    to: A_KG_KB
+    edge_type: TRACES_TO
+  # reconciliação epistêmica: observado sustenta-se, refuta o declarado, supera o antigo
+  - from: E_LOG
+    to: C_OBSERVED
+    edge_type: SUPPORTS
+  - from: C_OBSERVED
+    to: C_DECLARED
+    edge_type: REFUTES
+  - from: C_OBSERVED
+    to: C_OBSERVED_OLD
+    edge_type: SUPERSEDES
+  # ponte audit → domain (o observado ancora no evento de domínio)
+  - from: C_OBSERVED
+    to: EV_ACTION
+    edge_type: TRACES_TO
+  - from: C_DECLARED
+    to: P_RECONCILE
+    edge_type: TRACES_TO
