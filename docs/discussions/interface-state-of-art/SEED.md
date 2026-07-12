@@ -6,7 +6,7 @@ date: 2026-07-11
 branch: discuss/interface-state-of-art
 # ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
 phase: PROMOTE         # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
-next_action: "PROMOVIDA a main (#344: SEED + 6 notas). Os 3 invariantes viraram candidatos CONTESTADOS na pesquisa da camada dialógica (já em main) — refutador dobrado, radar acende a pendência. Resta o único portão real: instrumentar N≥3 sessões INTERATIVAS pra provar recorrência (N02). O .kg.yaml + a dobra do refutador vivem no worktree (não mesclados)."
+next_action: "PROMOVIDA a main (#344). Pré-registro do N≥3 escrito (NOTE-06) — conserta a conflação: LEG-1 (N≥4 sessões INTERATIVAS → provar que o LOOP observa recorrência = o diferenciador NS1) é SEPARADA de LEG-2 (validar os 3 invariantes contestados exige INTERVIR+re-medir, estudo maior, depois). Anti-HARKing: critério fixado antes de minerar; descoberta≠confirmação; filtro-de-prefixo passo-0; harness da NOTE-05 engatilhado. Próximo passo real: rodar as sessões interativas (do maestro; viés intra-órbita declarado). Mesmo N≥3 OK NÃO promove os invariantes — só o loop."
 scope_globs: ["docs/onion/graph/", "docs/knowledge-base/concepts/authorization-layers-intake-vs-execution.md"]
 objective_tags: ["NS1", "intake-execucao", "dogfood-auditavel"]
 ---

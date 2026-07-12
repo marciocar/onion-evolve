@@ -234,6 +234,24 @@ nodes:
     confidence: 0.6
     status: open
     label: "estrela discuss/onion-pessoal-marcio (o proposito: cerebro pessoal reconciliado)"
+
+  # ---- pré-registro N≥3 (NOTE-06): a distincao leg-1/leg-2 + a trava anti-HARKing ----
+  - id: C_LEG1_NOT_LEG2
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "N≥3 prova o LOOP observa recorrencia (leg-1); validar os invariantes exige INTERVIR+re-medir (leg-2, estudo maior) — nao confundir; leg-1 OK nao promove os R_*"
+  - id: E_PREREGISTRO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "pré-registro N≥3 declarado (NOTE-06): sinais fixados, descoberta!=confirmacao (N>=4), filtro-de-prefixo passo-0, vies intra-orbita declarado — anti-HARKing"
 edges:
   # a tese e seus apoios
   - from: E_AUTOMODE_GATE
@@ -320,3 +338,11 @@ edges:
   - from: REF_3_EXTERNAL_IS_IRREVERSIBLE
     to: R_GATE_CAMADAS
     edge_type: REFUTES
+
+  # pré-registro: a distincao leg-1/leg-2 CONSTRANGE a colheita dos invariantes
+  - from: E_PREREGISTRO
+    to: C_LEG1_NOT_LEG2
+    edge_type: SUPPORTS
+  - from: C_LEG1_NOT_LEG2
+    to: D_HARVEST_INVARIANTS
+    edge_type: CONSTRAINS
