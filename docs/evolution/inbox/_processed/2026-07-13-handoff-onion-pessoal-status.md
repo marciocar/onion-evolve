@@ -17,7 +17,7 @@ status: contexto + mapa de triagem — NÃO é sinal separado; mover para _proce
 ## O que já aconteceu (fechado)
 
 - **Discussão Onion pessoal (P1–P5)** — mergeada em `main` (PR #343). Índice:
-  [`docs/discussions/onion-pessoal-marcio/README.md`](../../discussions/onion-pessoal-marcio/README.md).
+  [`docs/discussions/onion-pessoal-marcio/README.md`](../../../discussions/onion-pessoal-marcio/README.md).
 - **A lente Aristóteles+Hegel virou doutrina** — KB `transfer-heuristic-aristotle`, fiada no `/meta:adopt`
   (o 1º sinal destilado já foi triado + arquivado).
 - **Sinal de intenção mergeado** (PR #350) — Marcio declara-se **1º adotante-de-pesquisa** do Onion pessoal

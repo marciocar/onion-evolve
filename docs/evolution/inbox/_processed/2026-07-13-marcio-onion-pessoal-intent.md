@@ -18,7 +18,7 @@ status: declaração de intenção — gated (não é adoção executada)
 
 Marcio declara intenção de erguer o **Onion pessoal** (o KG de vida reconciliado, N=1) como uma
 **instância-dogfood / braço de pesquisa** — e de figurar como seu **primeiro adotante**. A discussão
-[`docs/discussions/onion-pessoal-marcio/`](../../discussions/onion-pessoal-marcio/README.md) (5 passadas,
+[`docs/discussions/onion-pessoal-marcio/`](../../../discussions/onion-pessoal-marcio/README.md) (5 passadas,
 mergeada via #343) é o desenho; esta é a intenção de dar-lhe corpo.
 
 ## O rótulo honesto (os guardrails — o que ESTE sinal afirma e o que NÃO afirma)
@@ -41,7 +41,7 @@ mergeada via #343) é o desenho; esta é a intenção de dar-lhe corpo.
   o método KG SDAAL, não a máquina de adoção de repo de código (gap G1 nomeado: adoção de domínio não-software).
 - **Fronteira (P3):** membro **pelo método, soberano no dado** — `role: standalone`, `mode: regulated`, KG bruto
   `private` (inviolável, local-first), só destilado sai por opt-in gated. A entrada `marcio-pessoal` do
-  [proto hipotético](../../discussions/onion-pessoal-marcio/proto/membership-marcio-pessoal.yaml) deixaria de ser hipótese.
+  [proto hipotético](../../../discussions/onion-pessoal-marcio/proto/membership-marcio-pessoal.yaml) deixaria de ser hipótese.
 - **Privacidade (P4/P5):** `de-identification` `none` fail-safe; classificação por vertical (`ipse`/relações/saúde
   = `private`); e o reconhecimento honesto de que a **inferência interna é indefesa por construção** — a defesa é
   a fronteira de saída (as 6 camadas negativas da P5), não uma cifra.
@@ -61,7 +61,22 @@ Nível 2 acontecer (repo + `/meta:adopt --mode regulated`), este sinal é o ante
 
 ---
 
-## Triagem do core (preencher na recepção)
+## Triagem do core (2026-07-13 · sessão `chore/co-evolve-onion-pessoal-triage`)
 
-- **Status:** _pendente_
-- **Roteamento:** _(registrar intenção como `assess` / decisão de sequenciamento; confirmar guardrails)_
+Verificado contra a fonte antes de dispositado (doutrina dogfood).
+
+- **Status:** ✅ **triado — aceito.**
+- **Veredito:** enquadramento honesto **aceito** — método≠mercado (`Q_COLD_ADOPTER` permanece aberto,
+  reconhecido), `role: standalone` + `mode: regulated`, sem privilégio de criador, KG bruto `private`
+  local-first. Roteamento **`assess` / informativo, NÃO-bloqueante**.
+- **Guardrails confirmados** (herdam para um futuro Nível 2): standalone+regulated, trust mínimo, passa por
+  `pin-integrity-check.sh` como qualquer membro, `de-identification: none` fail-safe, saída só destilada+gated.
+- **Estado de fato (verificado):** `members.yaml` tem 5 entradas (core + 4 adotantes), **sem** `marcio-pessoal`
+  — coerente com "intenção, não execução". Proto `membership-marcio-pessoal.yaml` segue **hipótese**.
+- **Sequenciamento — Nível 2 HELD (decisão do maestro, 2026-07-13):** a dependência que travava (o sensor)
+  **amadureceu** — `behavior-sensor-three-gates` + `onion-guardrails` estão no `main` (confirmado). Mesmo assim,
+  o Nível 2 (erguer o repo + `/meta:adopt --mode regulated` + entrada real em `members.yaml`) **NÃO é enfileirado
+  agora**: preserva o hold do core sobre a visão (braço de pesquisa não fura a régua).
+  **Gatilho de reavaliação:** sensor firmou; a decisão de enfileirar fica para um passo explícito futuro do maestro.
+- **Antecedente:** este sinal arquivado é o antecedente; quando/se o Nível 2 acontecer, a entrada real herda os
+  guardrails acima.
