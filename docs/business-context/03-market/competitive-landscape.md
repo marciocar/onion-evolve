@@ -1,5 +1,7 @@
 # Panorama Competitivo
 
+**Última Atualização:** 2026-07-13
+
 > Da pesquisa orquestrada citada (2026-07-12). Categoria: **SDD (spec-driven development) sobre Claude Code**. Complementa [`../02-product/strategy.md`](../02-product/strategy.md) §Posicionamento.
 
 ---

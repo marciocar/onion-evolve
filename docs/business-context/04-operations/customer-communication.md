@@ -1,5 +1,7 @@
 # Guidelines de Comunicação por IA
 
+**Última Atualização:** 2026-07-13
+
 > ⚠️ **STUB parcial — partes brand-dependentes marcadas `[INFERIDO — D3]`.** As diretrizes operacionais abaixo já valem; o tom de marca definitivo depende de [`../decisions.md`](../decisions.md) `D3`.
 
 ---

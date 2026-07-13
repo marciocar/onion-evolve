@@ -1,5 +1,7 @@
 # Jornada do Cliente
 
+**Última Atualização:** 2026-07-13
+
 Ciclo do adotante do Onion — descoberta → adoção → federação → advocacy. Adaptado à natureza do produto (framework instalável, não SaaS). Marcado `[INFERIDO]` onde não há campo ainda.
 
 ---

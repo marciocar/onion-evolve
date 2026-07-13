@@ -1,5 +1,7 @@
 # Personas
 
+**Última Atualização:** 2026-07-13
+
 Personas em **camadas** — do usuário provado hoje (N=1) ao aspiracional (`[hipótese]`). Cada uma tem nota de interação com IA.
 
 ---

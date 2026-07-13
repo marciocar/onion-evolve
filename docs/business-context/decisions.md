@@ -1,5 +1,7 @@
 # 🗂️ Registro de Decisões Estratégicas
 
+**Última Atualização:** 2026-07-13
+
 > Mecanismo de rastreio das decisões de negócio em aberto. Cada card é uma pergunta que você resolve **escolhendo** uma opção ou **descrevendo** livremente. Versionado no git → cada sessão avança daqui, não recomeça. Spec-as-code aplicado às decisões de negócio (dogfood do próprio Onion).
 >
 > **Status:** `aberto` (a decidir) · `hipótese` (inclinação registrada, não fechada) · `ratificado` (decidido, com data).

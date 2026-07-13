@@ -1,5 +1,7 @@
 # Processo de Vendas
 
+**Última Atualização:** 2026-07-13
+
 > Deriva do modelo comercial em camadas de [`../02-product/strategy.md`](../02-product/strategy.md) (`D1`) e da sequência de receitas (`D4`). Nesta fase, é **desenho**, não operação viva — receita/preço concretos são `[hipótese — D5]`.
 
 ---

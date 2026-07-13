@@ -1,5 +1,7 @@
 # Framework de Mensagem e Marca
 
+**Última Atualização:** 2026-07-13
+
 > ⚠️ **STUB — depende de branding.** A brand voice **definitiva** e a linha Onion Pessoal exigem `@branding-positioning-specialist` + `@storytelling-business-specialist` quando o card [`../decisions.md`](../decisions.md) `D3` avançar. O conteúdo abaixo é **provisório** (`[INFERIDO]` do léxico existente), não decisão de marca fechada.
 
 ---

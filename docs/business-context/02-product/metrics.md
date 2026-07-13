@@ -1,5 +1,7 @@
 # Métricas de Produto
 
+**Última Atualização:** 2026-07-13
+
 > KPIs-norte desta fase (early / pré-PMF externo). A maioria é **aspiracional** — depende de instrumentação que ainda não existe. Marcado `[hipótese]` / `[a instrumentar]`.
 
 ---

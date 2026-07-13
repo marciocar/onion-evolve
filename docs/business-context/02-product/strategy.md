@@ -1,5 +1,7 @@
 # Estratégia de Produto
 
+**Última Atualização:** 2026-07-13
+
 > Núcleo do seed. Ancora visão, posicionamento (com pesquisa citada), o **modelo comercial em camadas** e os diferenciais/moat. Inclinações marcadas `[hipótese]`; decisões abertas em [`../decisions.md`](../decisions.md).
 
 ---

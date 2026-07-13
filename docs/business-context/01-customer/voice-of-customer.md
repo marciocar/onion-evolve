@@ -1,5 +1,7 @@
 # Voz do Cliente
 
+**Última Atualização:** 2026-07-13
+
 > ⚠️ **Gap conhecido:** o Onion não tem base de clientes externos ainda. Este arquivo é **N=1 (maestro) + 4 adotantes de campo + sinais da pesquisa**, não voz-de-mercado. Enriquecer quando houver campo. Majoritariamente `[INFERIDO]`.
 
 ---

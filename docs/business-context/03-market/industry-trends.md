@@ -1,5 +1,7 @@
 # Tendências de Indústria e Mercado
 
+**Última Atualização:** 2026-07-13
+
 > Da pesquisa orquestrada citada (2026-07-12). Contextualiza onde o Onion joga e por que a tese (contexto explícito no ciclo todo) está no timing certo.
 
 ---
