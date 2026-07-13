@@ -32,11 +32,16 @@ Este seed cumpre duplo papel (decisão do maestro):
 - [Métricas](02-product/metrics.md) — KPIs-norte e como instrumentar
 - Feature catalog — _2ª passada_
 
-## Camada 3 — Mercado — _2ª passada_
-- competitive-landscape · industry-trends (pesquisa citada já coletada, ver `strategy.md` §Posicionamento)
+## Camada 3 — Mercado ([`03-market/`](03-market/))
 
-## Camada 4 — Operacional — _2ª passada_
-- sales-process · messaging-framework · customer-communication (dependem de branding — ver `decisions.md` `D3`)
+- [Panorama competitivo](03-market/competitive-landscape.md) — diretos/indiretos/execução + win-loss + 🎯 whitespace de compliance (pesquisa citada)
+- [Tendências de indústria](03-market/industry-trends.md) — SDD mainstream · orquestração multi-agente · context engineering · regulatório
+
+## Camada 4 — Operacional ([`04-operations/`](04-operations/))
+
+- [Processo de vendas](04-operations/sales-process.md) — funil mini→serviço, qualificação, objeções, guardrails
+- [Framework de mensagem](04-operations/messaging-framework.md) — _stub, depende de branding (`decisions.md` `D3`)_
+- [Comunicação por IA](04-operations/customer-communication.md) — _stub parcial, brand-dependent (`D3`)_
 
 ---
 
