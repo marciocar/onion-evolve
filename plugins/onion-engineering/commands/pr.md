@@ -27,12 +27,16 @@ Siga estes passos para criar o PR:
 
 1. **Testes verdes**: execute a suíte de testes da branch atual e confirme que todos passam. Se algum falhar, corrija antes de prosseguir.
 
-2. **CRÍTICO — Feature branch primeiro (git local):**
+2. **CRÍTICO — Branch de trabalho primeiro (git local), prefixo resolvido pelo tipo de mudança:**
+   O GitFlow tem mais prefixos que `feature/*` — `docs/*`, `hotfix/*`, `release/*`. **Não force
+   `feature/`**: se a branch atual **já** tem um prefixo GitFlow válido (`feature/`, `hotfix/`,
+   `release/`, `docs/`, `fix/`, `chore/`), trabalhe nela; senão, crie uma cujo prefixo case com o
+   tipo de mudança (docs-only → `docs/…`; correção → `fix/…`; feature → `feature/…`).
    ```bash
-   git checkout -b feature/[descricao-sucinta]
-   git push -u origin feature/[descricao-sucinta]   # push é git local
+   git checkout -b <prefixo>/[descricao-sucinta]    # só se a branch atual não for GitFlow válida
+   git push -u origin <prefixo>/[descricao-sucinta]  # push é git local
    ```
-   Faça commit apenas dos arquivos alterados (ver Regra de Ouro) e push para a feature branch.
+   Faça commit apenas dos arquivos alterados (ver Regra de Ouro) e push para a branch de trabalho.
 
 3. **Task → in progress + under-review**: se `TASK_MANAGER_PROVIDER` != `none`, via o adapter Task Manager — `updateStatus(taskId, 'in_progress')` + tag `under-review`. Carregue `.env` e leia o provider; em `none`, pule (sem persistência remota). **Não reimplementar** roteamento aqui — é responsabilidade do adapter.
 
@@ -49,7 +53,7 @@ Siga estes passos para criar o PR:
    ```typescript
    const forge = getForge();                       // .claude/utils/forge/factory.md
    const pr = await forge.createPR({
-     head: 'feature/[descricao]', base: BASE,       // branch de integração resolvida
+     head: '<prefixo>/[descricao]', base: BASE,     // branch de trabalho atual (ver passo 2); base = branch de integração resolvida
      title: '[título]', body: '[resumo + link da task + assinatura Onion]'
    });
    ```

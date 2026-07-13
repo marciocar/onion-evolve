@@ -98,9 +98,19 @@ YAML válido entre `---` no início do arquivo. Campos comuns:
 title: <título humano>
 date: <YYYY-MM-DD>
 version: <semver>
-status: <active | historical | draft>
+status: <active | historical | draft | candidato>
 ---
 ```
+
+**Valores de `status`:**
+
+- `active` — vigente, é a referência atual.
+- `historical` — preservado como registro; superado por algo mais novo.
+- `draft` — em elaboração, ainda não é referência.
+- `candidato` — **entra pra ganhar core por uso, não por estar pronta**: KB nascida de
+  discussão/dogfood que se prova por uso repetido antes de ser promovida a `active`. Convenção
+  estabelecida por uso (7 KBs em 2026-07) e formalizada aqui a partir do sinal de campo do dogfood
+  do `pre-pr` da promoção de `onion-guardrails`.
 
 ---
 
