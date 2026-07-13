@@ -1017,7 +1017,15 @@ check_inventory_total_drift() {
         violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '${n} agentes (especializados/IA)' (esperado ${agent}) — /meta:inventory"
       fi
     done < <(grep -iE '[0-9]+ agentes' "${f}" 2>/dev/null)
-  done < <(_find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null)
+  # PRÉ-FILTRO (perf, 2026-07-13): só varre .md que CONTÊM uma frase-de-contagem candidata.
+  #   Antes: 750 arquivos × ~8 greps/arquivo (esta é ~50% do tempo total do lint); ~90% dos .md
+  #   não têm número+substantivo-de-inventário → puro overhead. O pattern abaixo é SUPERSET de
+  #   TODAS as 8 patterns internas (comandos|agentes|knowledge bases|categorias|skills; '\+?' cobre
+  #   a forma aproximada 'N+ comandos'; '(N total' cobre a parentética) → nenhum arquivo candidato
+  #   é excluído: comportamento IDÊNTICO (arquivo sem match não geraria violação alguma).
+  #   'xargs -r' evita rodar grep quando _find não emite nada (ex.: ONLY_PATH fora das raízes).
+  done < <(_find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null \
+    | xargs -0 -r grep -lZ -iE '[0-9]+\+?[[:space:]]+(comandos|agentes|knowledge[[:space:]]+bases|categorias|skills)|\([0-9]+[[:space:]]+total' 2>/dev/null)
 }
 
 # ===========================================================================
