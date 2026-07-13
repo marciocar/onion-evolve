@@ -1,0 +1,494 @@
+# KG SDAAL — dogfood da propria pesquisa "camada dialogica da Constelacao" (docs/analysis/onion-research-
+# constellation-dialogic-layer-2026-07.md). Aplica o metodo a si mesmo: claims=aferido, decisions=decidido,
+# questions=duvidas/incomodos, com confidence/impact/status. Demonstra qualitativo->quantitativo no meta-nivel.
+# Camada audit (epistemico). Design-only, gated — nada promovido.
+meta:
+  id: constellation-dialogic-layer-2026-07
+  date: 2026-07-12
+nodes:
+  # ---- aferido (claims) ----
+  - id: C_DIALOGIC_SERVICE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: superseded
+    label: "o 4o servico dialogico (previa + auto-regulacao) fecha o vao bidirecional que mapa/radar/carteiro deixam"
+  - id: C_SAME_OBJECT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "previa e auto-regulacao sao o MESMO objeto (o .kg.yaml da estrela) visto de dois lados"
+  - id: C_TWO_QUANTITATIVES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "ha dois quantitativos: confidence ATRIBUIDA (alca) x evidencia MEDIDA (dogfood)"
+  - id: C_QUAL_TO_QUANT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.75
+    status: confirmed
+    label: "o KG cristaliza julgamento nao-deterministico em dado rastreavel/contavel — explicito e enderecavel, nao objetivo"
+  - id: C_ARISTOTLE_NO_HOME
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "a regua de Aristoteles so existe nas worktrees; Hegel/Bloom ja tem casa canonica no core"
+
+  # ---- evidencia (verificada) ----
+  - id: E_INTERFACE_FOLD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "a dobra do refutador em interface-state-of-art.kg.yaml (nos+REFUTES, radar acende exit 1) e a prova viva da camada"
+  - id: E_EXPLORE_ARISTOTLE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    label: "exploracao: zero hits de 'aristo' no core; a regua so aparece nas worktrees (SYNTHESIS, NOTE-0x)"
+
+  # ---- decidido (decisions) ----
+  - id: D_STORE_GATED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "guardar como pesquisa de core design-only/gated, NAO mesclar — julgamento conjunto (nao promovido)"
+  - id: D_DOGFOOD_IS_ENGINE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "o dogfood e o motor que move um no da confidence atribuida para o numero medido"
+  - id: D_ARISTOTLE_HOME_CANDIDATE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "dar casa canonica a Aristoteles e candidato gated, nao promocao agora"
+
+  # ---- a trava (rule) ----
+  - id: R_NO_MEASURE_WITHOUT_DOGFOOD
+    node_type: rule
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: open
+    label: "nao tratar confidence ATRIBUIDA como medicao sem dogfood real (honrar os dois-quantitativos)"
+
+  # ---- duvidas / incomodos (questions — a fronteira honesta) ----
+  - id: Q_PREVIA_SCHEMA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.3
+    status: done
+    label: "quais campos exatos do boletim, e como projetar do .kg.yaml SEM expor o corpo (isolamento)?"
+  - id: Q_AUTOREG_RHYTHM
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.3
+    status: done
+    label: "qual ritmo/gatilho do auto-check Aristoteles+Hegel sem virar overhead nem teatro?"
+  - id: Q_DIALOGIC_VS_RADAR
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.35
+    status: done
+    label: "incomodo: a camada dialogica (por-estrela) se sobrepoe ao radar (cross-study) ou e ortogonal de verdade?"
+
+  # ---- RESOLUCAO de Q_DIALOGIC_VS_RADAR (sintese hegeliana: SUPERSEDES) ----
+  - id: C_AUTOREG_REUSES_ENGINE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "a auto-regulacao RODA o motor-base kg-radar.sh no proprio grafo (como a dobra da interface fez) — so o ritual de autoria e novo"
+  - id: C_PREVIA_CONTAINS_RADAR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    label: "a previa e uma vista agrupada-por-papel; sua secao 'duvidas/o-que-fazer-agora' CONTEM o radar-base per-graph (superset, nao competidor)"
+  - id: C_RITUAL_IS_NEW
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "o unico conteudo genuinamente novo e o ritual de autoria Aristoteles+Hegel — upstream do radar (produz nos, nao os ranqueia)"
+  - id: C_DIALOGIC_DECOMPOSED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.75
+    status: confirmed
+    label: "a camada dialogica nao e um 4o servico monolitico: e o ritual de autoria [novo] + a previa como vista [fina], reusando o motor-base; ortogonal ao radar-da-constelacao (por-estrela x cross-study)"
+  - id: D_DIALOGIC_ORTHOGONAL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "resolvido: ortogonal ao radar-da-constelacao, mas REUSA o motor-base — sobreposicao e reuso (estende), nao competicao; encolhe o '4o servico' pra disciplina+vista"
+
+  # ---- RESOLUCAO de Q_AUTOREG_RHYTHM (dissolve a premissa: gatilho, nao ritmo) ----
+  - id: C_RHYTHM_IS_EVENT_NOT_CLOCK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "nao ha bom ritmo fixo — o auto-check e EVENT-triggered (Aristoteles@intake, Hegel@contradicao, backstop@recolher); relogio manufatura teatro"
+  - id: C_ANTITHEATER_DOGFOOD_GATED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "anti-teatro: batch por unidade logica + dogfood-gated (re-testar, nunca re-carimbar); blocked_on_user subindo sinaliza que virou teatro"
+  - id: C_PIGGYBACK_EXISTING_EVENTS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "os 3 gatilhos ja acontecem (intake/contradicao/recolher) — piggyback = zero cadencia nova, zero overhead, nada a construir"
+  - id: D_AUTOREG_EVENT_TRIGGERED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "resolvido: sem ritmo fixo; event-triggered (Aristoteles@intake, Hegel@contradicao, TTL-backstop@recolher), dogfood-gated; estende /meta:diary review + recolher + §2.6"
+
+  # ---- RESOLUCAO de Q_PREVIA_SCHEMA (projecao por-papel; o .kg.yaml e a face publica) ----
+  - id: C_PREVIA_IS_ROLE_PROJECTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "o boletim e projecao por-papel de .kg.yaml + SEED: claim/evidence confirmed=AFERIDO, decision=DECIDIDO/DECIDINDO, question open=DUVIDAS, REFUTES/SUPERSEDES=INCOMODOS, radar=o-que-fazer-agora"
+  - id: C_KG_IS_PUBLIC_FACE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "o .kg.yaml e a face epistemica PUBLICA da estrela (labels+scores, curado pelo autor); o corpo NOTE-prose e privado (Tier-1-3, sob convite) — Aristoteles: igual a metadado, diferente do corpo"
+  - id: C_PREVIA_IS_DETERMINISTIC
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "o boletim e projecao MECANICA de kg-radar.sh + SEED (molde federation-status-scan --json) — o core formata o que o motor computa, nao interpreta nem bisbilhota"
+  - id: D_PREVIA_SCHEMA_DEFINED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "resolvido: schema = Tier-0 (fase/next_action) + as 4 saidas do kg-radar reagrupadas por papel; fonte = .kg.yaml + SEED, NUNCA o corpo; read-only sob convite; Fase 1 = formatador fino"
+  - id: D_ISOLATION_EXTENSION_GATED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao nossa — candidato, nao promocao"
+
+  # ---- trabalho de D_ARISTOTLE_HOME_CANDIDATE (nomear o vivido; ATO gated) ----
+  - id: C_ARISTOTLE_ALREADY_LIVED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "a regua de Aristoteles JA e vivida no core sem nome (SDAAL: Asana/Linear reusam=igual, Jira/ClickUp especialista=diferente; /meta:adopt) — dar casa = NOMEAR o vivido, nao importar"
+  - id: C_ARISTOTLE_PARITY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "trio de reguas de pesquisa: Hegel (§2.6) e Bloom (§2.2) tem casa no core; Aristoteles so nas worktrees — merece paridade"
+  - id: C_ARISTOTLE_IS_DISCIPLINE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "o valor e a DISCIPLINA (declarar IGUAL->transfere / DIFERENTE->desenha com evidencia; bloqueia falsa-analogia e falsa-distincao) — refutador: nao e so DRY, e transferencia com 2 modos de falha"
+  - id: D_ARISTOTLE_HOME_IS_KB
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "recomendacao: casa = KB focada da regua de transferencia, cross-link SDAAL/adopt (o vivido) + Hegel/Bloom (irmas) — promocao focada; o ATO de escrever no core e gated pela nossa autorizacao"
+
+  # ---- ancoras (entidades) ----
+  - id: ENT_DIARY_REVIEW
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "/meta:diary review — 'migalha vencida -> re-testar, nunca re-carimbar' (o molde do backstop TTL, dogfood-gated)"
+  - id: ENT_INTERFACE_STAR
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "estrela discuss/interface-state-of-art — onde a prova viva (a dobra) vive"
+  - id: ENT_CONSTELLATION_ADR
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "ADR da Constelacao (3 servicos: mapa/radar/carteiro) — o que este 4o estende"
+  - id: ENT_KG_SDAAL
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "KG SDAAL / Dogfood — o motor qualitativo->quantitativo (confidence/impact/status/radar)"
+
+  # ---- 3o face: o boletim core->estrela (padrao candidato, emergiu 1x) ----
+  - id: C_BOLETIM_INFORM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "3o uso: o boletim core->estrela INFORMA a estrela do que virou main (simetrico ao carteiro star->core PUSH) — 3 travas: contexto-nao-tarefa, nao-redirect, ancora-no-SEED (chat=empurrao volatil)"
+  - id: D_BOLETIM_CANDIDATE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por estetica"
+edges:
+  # a prova viva sustenta a tese e a epistemologia
+  - from: E_INTERFACE_FOLD
+    to: C_DIALOGIC_SERVICE
+    edge_type: SUPPORTS
+  - from: E_INTERFACE_FOLD
+    to: C_QUAL_TO_QUANT
+    edge_type: SUPPORTS
+  - from: E_INTERFACE_FOLD
+    to: ENT_INTERFACE_STAR
+    edge_type: DEPENDS_ON
+
+  # a tese
+  - from: C_SAME_OBJECT
+    to: C_DIALOGIC_SERVICE
+    edge_type: SUPPORTS
+  - from: C_QUAL_TO_QUANT
+    to: C_DIALOGIC_SERVICE
+    edge_type: SUPPORTS
+  - from: C_DIALOGIC_SERVICE
+    to: ENT_CONSTELLATION_ADR
+    edge_type: DEPENDS_ON
+  - from: C_DIALOGIC_SERVICE
+    to: D_STORE_GATED
+    edge_type: SUPPORTS
+
+  # a epistemologia (os dois quantitativos + dogfood como motor)
+  - from: C_TWO_QUANTITATIVES
+    to: C_QUAL_TO_QUANT
+    edge_type: SUPPORTS
+  - from: C_TWO_QUANTITATIVES
+    to: D_DOGFOOD_IS_ENGINE
+    edge_type: SUPPORTS
+  - from: C_TWO_QUANTITATIVES
+    to: R_NO_MEASURE_WITHOUT_DOGFOOD
+    edge_type: SUPPORTS
+  - from: C_QUAL_TO_QUANT
+    to: ENT_KG_SDAAL
+    edge_type: DEPENDS_ON
+  - from: R_NO_MEASURE_WITHOUT_DOGFOOD
+    to: ENT_KG_SDAAL
+    edge_type: TRACES_TO
+
+  # Aristoteles sem casa -> candidato gated
+  - from: E_EXPLORE_ARISTOTLE
+    to: C_ARISTOTLE_NO_HOME
+    edge_type: SUPPORTS
+  - from: C_ARISTOTLE_NO_HOME
+    to: D_ARISTOTLE_HOME_CANDIDATE
+    edge_type: SUPPORTS
+
+  # as duvidas/incomodos dependem da tese (resolve-las clareia a fronteira)
+  - from: Q_PREVIA_SCHEMA
+    to: C_SAME_OBJECT
+    edge_type: DEPENDS_ON
+  - from: Q_AUTOREG_RHYTHM
+    to: C_DIALOGIC_SERVICE
+    edge_type: DEPENDS_ON
+  - from: Q_DIALOGIC_VS_RADAR
+    to: C_DIALOGIC_SERVICE
+    edge_type: DEPENDS_ON
+
+  # resolucao (sintese hegeliana): SUPERSEDES + a decisao que responde a duvida
+  - from: C_RITUAL_IS_NEW
+    to: C_DIALOGIC_DECOMPOSED
+    edge_type: SUPPORTS
+  - from: C_AUTOREG_REUSES_ENGINE
+    to: C_DIALOGIC_DECOMPOSED
+    edge_type: SUPPORTS
+  - from: C_PREVIA_CONTAINS_RADAR
+    to: C_DIALOGIC_DECOMPOSED
+    edge_type: SUPPORTS
+  - from: C_AUTOREG_REUSES_ENGINE
+    to: ENT_KG_SDAAL
+    edge_type: DEPENDS_ON
+  - from: C_DIALOGIC_DECOMPOSED
+    to: C_DIALOGIC_SERVICE
+    edge_type: SUPERSEDES
+  - from: C_DIALOGIC_DECOMPOSED
+    to: D_DIALOGIC_ORTHOGONAL
+    edge_type: SUPPORTS
+  - from: D_DIALOGIC_ORTHOGONAL
+    to: Q_DIALOGIC_VS_RADAR
+    edge_type: SUPPORTS
+
+  # resolucao do ritmo: gatilho por evento, dogfood-gated
+  - from: C_RHYTHM_IS_EVENT_NOT_CLOCK
+    to: D_AUTOREG_EVENT_TRIGGERED
+    edge_type: SUPPORTS
+  - from: C_ANTITHEATER_DOGFOOD_GATED
+    to: D_AUTOREG_EVENT_TRIGGERED
+    edge_type: SUPPORTS
+  - from: C_PIGGYBACK_EXISTING_EVENTS
+    to: D_AUTOREG_EVENT_TRIGGERED
+    edge_type: SUPPORTS
+  - from: C_RHYTHM_IS_EVENT_NOT_CLOCK
+    to: C_RITUAL_IS_NEW
+    edge_type: DEPENDS_ON
+  - from: C_ANTITHEATER_DOGFOOD_GATED
+    to: ENT_DIARY_REVIEW
+    edge_type: DEPENDS_ON
+  - from: C_ANTITHEATER_DOGFOOD_GATED
+    to: ENT_KG_SDAAL
+    edge_type: DEPENDS_ON
+  - from: D_AUTOREG_EVENT_TRIGGERED
+    to: Q_AUTOREG_RHYTHM
+    edge_type: SUPPORTS
+
+  # resolucao do schema: projecao por-papel + face publica; resíduo gated
+  - from: C_PREVIA_IS_ROLE_PROJECTION
+    to: D_PREVIA_SCHEMA_DEFINED
+    edge_type: SUPPORTS
+  - from: C_KG_IS_PUBLIC_FACE
+    to: D_PREVIA_SCHEMA_DEFINED
+    edge_type: SUPPORTS
+  - from: C_PREVIA_IS_DETERMINISTIC
+    to: D_PREVIA_SCHEMA_DEFINED
+    edge_type: SUPPORTS
+  - from: C_PREVIA_IS_ROLE_PROJECTION
+    to: C_PREVIA_CONTAINS_RADAR
+    edge_type: DEPENDS_ON
+  - from: C_PREVIA_IS_DETERMINISTIC
+    to: ENT_KG_SDAAL
+    edge_type: DEPENDS_ON
+  - from: C_KG_IS_PUBLIC_FACE
+    to: D_ISOLATION_EXTENSION_GATED
+    edge_type: SUPPORTS
+  - from: D_PREVIA_SCHEMA_DEFINED
+    to: Q_PREVIA_SCHEMA
+    edge_type: SUPPORTS
+
+  # trabalho de Aristoteles: nomear o vivido; a forma (KB) depende do sim; ATO gated
+  - from: C_ARISTOTLE_PARITY
+    to: C_ARISTOTLE_NO_HOME
+    edge_type: DEPENDS_ON
+  - from: C_ARISTOTLE_ALREADY_LIVED
+    to: D_ARISTOTLE_HOME_CANDIDATE
+    edge_type: SUPPORTS
+  - from: C_ARISTOTLE_PARITY
+    to: D_ARISTOTLE_HOME_CANDIDATE
+    edge_type: SUPPORTS
+  - from: C_ARISTOTLE_IS_DISCIPLINE
+    to: D_ARISTOTLE_HOME_CANDIDATE
+    edge_type: SUPPORTS
+  - from: C_ARISTOTLE_ALREADY_LIVED
+    to: D_ARISTOTLE_HOME_IS_KB
+    edge_type: SUPPORTS
+  - from: C_ARISTOTLE_IS_DISCIPLINE
+    to: D_ARISTOTLE_HOME_IS_KB
+    edge_type: SUPPORTS
+  - from: D_ARISTOTLE_HOME_IS_KB
+    to: D_ARISTOTLE_HOME_CANDIDATE
+    edge_type: DEPENDS_ON
+
+  # o boletim e um face da camada decomposta; sustenta a decisao de document-lo como candidato
+  - from: C_BOLETIM_INFORM
+    to: C_DIALOGIC_DECOMPOSED
+    edge_type: DEPENDS_ON
+  - from: C_BOLETIM_INFORM
+    to: D_BOLETIM_CANDIDATE
+    edge_type: SUPPORTS

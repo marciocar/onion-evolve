@@ -23,6 +23,11 @@ faseado**: apontar o Onion para um repo/pasta e "assumir o controle" — **insta
 
 > **Decisão de design:** [ADR de Adoção](../../../docs/analysis/onion-adr-repo-adoption-2026-06.md).
 
+> **Régua de decisão** (ao decidir "reusar atuador existente" vs "desenhar fresh"): aplique a
+> [régua de transferência](../../../docs/knowledge-base/concepts/transfer-heuristic-aristotle.md) —
+> declare o veredito *igual → transfere* (reusa o que já existe) ou *diferente → desenha* (fresh), **com
+> evidência**. Desconfie do reflexo: reuso preguiçoso = falsa analogia; reinventar o maduro = falsa distinção.
+
 ## Identidade e fronteiras (do ADR — inegociável)
 
 - **NÃO é CLI standalone** (invariante `architecture.md §5/§7`). Roda **dentro** de uma sessão

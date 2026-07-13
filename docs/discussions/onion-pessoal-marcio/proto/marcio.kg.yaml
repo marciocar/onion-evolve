@@ -1,0 +1,251 @@
+# Proto (sandbox de discussão) — modelo candidato das verticais peer de uma pessoa como grafo de DOMÍNIO.
+# PLAUSÍVEL/open — hipótese derivada da pesquisa (research/SYNTHESIS.md), NÃO um SSOT do core.
+# Rode: bash .claude/validation/kg-radar.sh docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml
+# Espera: INTEGRIDADE exit 0; RECONCILIAÇÃO mostra o REFUTES (declarado×vivido de saúde);
+#         RADAR-DE-DOMÍNIO aponta lacunas — ESPERADO num esqueleto-hipótese (vira agenda da P2).
+#
+# Arquitetura codificada: verticais de conteúdo = entity (os peers); eixos transversais = policy que
+# CONSTRAINS todas (mostra que atravessam, não são abas); peer-test = rule; incomensurabilidade = invariant
+# (status open — a pré-condição peer é filosoficamente fundamentada, psicometricamente não-testada);
+# uma instância trabalhada de reconciliação DEV×PROD (declarado × vivido → REFUTES → superseded = Aufhebung).
+meta:
+  id: marcio-verticais-p1
+  date: 2026-07-12
+nodes:
+  # ==== camada DOMAIN — verticais de conteúdo (o núcleo convergente; os peers) ====
+  - id: EN_V_RELACOES
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "vertical Relações/vínculo (SDT-relacionamento, Nussbaum-afiliação, WHOQOL-social)"
+  - id: EN_V_TRABALHO
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "vertical Trabalho/realização (PERMA A+E, Locke&Latham, skills-graph)"
+  - id: EN_V_SENTIDO
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "vertical Sentido/propósito (PERMA-M, Nussbaum-razão-prática, ikigai)"
+  - id: EN_V_SAUDE
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "vertical Saúde/vitalidade (WHOQOL-físico, Nussbaum vida/saúde-corporal)"
+  # ---- verticais candidatas em questão aberta ----
+  - id: EN_V_RECURSOS
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "vertical? Recursos/finanças — só WHOQOL/Nussbaum isolam; peer ou subordinada a Trabalho? (ABERTA)"
+  - id: EN_V_ESPIRIT
+    node_type: entity
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "vertical? Espiritualidade/crença — dupla natureza (vertical p/ quem vive, eixo p/ quem interpreta) (ABERTA)"
+
+  # ==== camada DOMAIN — eixos TRANSVERSAIS (policy: atravessam as verticais, NÃO são verticais) ====
+  - id: PO_AUTONOMIA
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "eixo transversal: autonomia/competência/relação (SDT content-free) — o 'como', dentro de cada vertical"
+  - id: PO_CULTURA
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "eixo transversal: cultura/valores/crença moral (Schwartz, Hofstede, WEIRD) — matriz de ponderação"
+  - id: PO_CHA
+    node_type: policy
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "decomposição ortogonal: competência C/H/A (skill×contexto) — anatomia DENTRO de cada vertical"
+
+  # ==== camada DOMAIN — doutrina do peer-test ====
+  - id: IN_INCOMENSURAVEL
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "verticais são incomensuráveis, não somáveis num score global (Nussbaum/Berlin) — filosófico, psicometricamente não-testado"
+  - id: RU_PEER_TEST
+    node_type: rule
+    layer: domain
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "peer-test operacional: dois candidatos com r>0.7 são o mesmo eixo (colapso de Ryff) — funde ou mantém"
+    trace: "docs/discussions/onion-pessoal-marcio/research/SYNTHESIS.md#1"
+
+  # ==== instância trabalhada: reconciliação DEV×PROD numa vertical (Saúde) ====
+  - id: ST_SAUDE_DECLARADA
+    node_type: state
+    layer: domain
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "Saúde: prioridade DECLARADA (intenção/DEV)"
+  - id: ST_SAUDE_VIVIDA
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "Saúde: prioridade VIVIDA (comportamento/PROD)"
+  - id: EV_COMPORTAMENTO
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "sinal comportamental observado (o 'inclined abstainer' interno — pretende e não faz)"
+
+  # ==== camada AUDIT — o confronto que reconcilia (append-mostly / Aufhebung) ====
+  - id: AR_SYNTHESIS
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "SYNTHESIS.md — pesquisa P1 (~65 fontes verificadas)"
+    trace: "docs/discussions/onion-pessoal-marcio/research/SYNTHESIS.md"
+  - id: C_DECLARADO_SAUDE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: superseded
+    label: "declarado: 'saúde é prioridade alta' — superado-preservado (não deletado) pela evidência de PROD"
+  - id: C_VIVIDO_SAUDE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "vivido: comportamento trata saúde como baixa prioridade (evidência de PROD)"
+
+edges:
+  # --- a instância de reconciliação (a vertical Saúde tem seus estados; o comportamento revela o gap) ---
+  - from: EN_V_SAUDE
+    to: ST_SAUDE_DECLARADA
+    edge_type: HAS_STATE
+  - from: EN_V_SAUDE
+    to: ST_SAUDE_VIVIDA
+    edge_type: HAS_STATE
+  - from: ST_SAUDE_DECLARADA
+    to: ST_SAUDE_VIVIDA
+    edge_type: TRANSITIONS
+    on: EV_COMPORTAMENTO
+  # --- o confronto DEV×PROD reconciliado (Hegel: nega+conserva+eleva; NÃO deleta) ---
+  - from: C_VIVIDO_SAUDE
+    to: C_DECLARADO_SAUDE
+    edge_type: REFUTES
+  - from: C_DECLARADO_SAUDE
+    to: ST_SAUDE_DECLARADA
+    edge_type: TRACES_TO
+  - from: C_VIVIDO_SAUDE
+    to: ST_SAUDE_VIVIDA
+    edge_type: TRACES_TO
+
+  # --- a incomensurabilidade (invariant) restringe TODAS as verticais: são peers, não somáveis ---
+  - from: IN_INCOMENSURAVEL
+    to: EN_V_RELACOES
+    edge_type: CONSTRAINS
+  - from: IN_INCOMENSURAVEL
+    to: EN_V_TRABALHO
+    edge_type: CONSTRAINS
+  - from: IN_INCOMENSURAVEL
+    to: EN_V_SENTIDO
+    edge_type: CONSTRAINS
+  - from: IN_INCOMENSURAVEL
+    to: EN_V_SAUDE
+    edge_type: CONSTRAINS
+  - from: IN_INCOMENSURAVEL
+    to: EN_V_RECURSOS
+    edge_type: CONSTRAINS
+  - from: IN_INCOMENSURAVEL
+    to: EN_V_ESPIRIT
+    edge_type: CONSTRAINS
+
+  # --- os eixos transversais CONSTRAINS várias verticais (a prova de que ATRAVESSAM, não são abas) ---
+  - from: PO_AUTONOMIA
+    to: EN_V_TRABALHO
+    edge_type: CONSTRAINS
+  - from: PO_AUTONOMIA
+    to: EN_V_RELACOES
+    edge_type: CONSTRAINS
+  - from: PO_AUTONOMIA
+    to: EN_V_SAUDE
+    edge_type: CONSTRAINS
+  - from: PO_CULTURA
+    to: EN_V_RELACOES
+    edge_type: CONSTRAINS
+  - from: PO_CULTURA
+    to: EN_V_SENTIDO
+    edge_type: CONSTRAINS
+  - from: PO_CULTURA
+    to: EN_V_ESPIRIT
+    edge_type: CONSTRAINS
+  - from: PO_CHA
+    to: EN_V_TRABALHO
+    edge_type: CONSTRAINS
+  - from: PO_CHA
+    to: EN_V_SAUDE
+    edge_type: CONSTRAINS
+  - from: PO_CHA
+    to: EN_V_RECURSOS
+    edge_type: CONSTRAINS
+
+  # --- a doutrina ancora na pesquisa (audit TRACES_TO o artefato-fonte) ---
+  - from: RU_PEER_TEST
+    to: AR_SYNTHESIS
+    edge_type: TRACES_TO
+  - from: IN_INCOMENSURAVEL
+    to: AR_SYNTHESIS
+    edge_type: TRACES_TO
+  - from: PO_AUTONOMIA
+    to: AR_SYNTHESIS
+    edge_type: TRACES_TO
+  - from: PO_CULTURA
+    to: AR_SYNTHESIS
+    edge_type: TRACES_TO
+  - from: PO_CHA
+    to: AR_SYNTHESIS
+    edge_type: TRACES_TO
