@@ -1144,10 +1144,15 @@ run_inventory_fixes() {
 }
 
 # ===========================================================================
-# REGRA 22 — Links relativos quebrados em docs/evolution/ [HARD]
+# REGRA 22 — Links relativos quebrados em docs/evolution/ e docs/knowledge-base/ [HARD]
 #   Origem: auditoria 2026-07-04 (alerta transversal nº 1) + Q_LINT_LINKS do KG —
 #   o ritual de triagem (git mv → _processed/) quebra quem aponta pro arquivo
 #   movido; 4 dos 16 achados confirmados eram exatamente isso.
+#   Extensão 2026-07-13 (sinal de campo A2, dogfood pre-pr onion-guardrails): o
+#   escopo cobria só docs/evolution/, então link quebrado em KB só era pego por
+#   revisor semântico. Estendido a docs/knowledge-base/ — guardrail determinístico
+#   de integridade de link de KB (categoria ONION-R1). Dry-run pré-fiação: 74 KBs,
+#   0 quebrados, 0 falso-positivo → extensão segura.
 #   Lições dos 3 falso-positivos REFUTADOS pelo juiz (viram requisitos):
 #   - IGNORA conteúdo dentro de code fences ``` (E_J_FENCES — templates de
 #     geração citam paths do arquivo GERADO, não deste);
@@ -1155,8 +1160,10 @@ run_inventory_fixes() {
 #   Âncora (#...) é removida antes do teste; http(s)/mailto/absoluto/só-âncora
 #   ficam fora do escopo. Determinístico, sem jq.
 # ===========================================================================
-check_evolution_links() {
-  local base="${REPO_ROOT}/docs/evolution"
+# Scanner genérico — varre <base> e emite violação por link relativo que não
+# resolve, com <hint> de correção específico do escopo. Reusado pelos dois checks.
+_scan_relative_links() {
+  local base="$1" hint="$2"
   [ -d "${base}" ] || return 0
   local f dir lineno target clean
   while IFS= read -r -d '' f; do
@@ -1166,7 +1173,7 @@ check_evolution_links() {
       clean="${target%%#*}"
       [ -n "${clean}" ] || continue
       if [ ! -e "${dir}/${clean}" ]; then
-        violation "HARD" "${f}" "link relativo quebrado (linha ${lineno}): '${target}' não resolve — alvo movido para _processed/? atualize o link junto com o git mv"
+        violation "HARD" "${f}" "link relativo quebrado (linha ${lineno}): '${target}' não resolve — ${hint}"
       fi
     done < <(awk '
       /^[[:space:]]*```/ { fence = !fence; next }
@@ -1184,6 +1191,16 @@ check_evolution_links() {
       }
     ' "${f}")
   done < <(_find "${base}" -name '*.md' -print0 2>/dev/null)
+}
+
+check_evolution_links() {
+  _scan_relative_links "${REPO_ROOT}/docs/evolution" \
+    "alvo movido para _processed/? atualize o link junto com o git mv"
+}
+
+check_knowledge_base_links() {
+  _scan_relative_links "${REPO_ROOT}/docs/knowledge-base" \
+    "KB movida/renomeada? atualize o link (a integridade de SSOT é gate, não só revisão semântica)"
 }
 
 # ===========================================================================
@@ -1257,6 +1274,7 @@ check_inventory_total_drift
 check_frontmatter_scalar_colon
 check_no_claude_docs
 check_evolution_links
+check_knowledge_base_links
 check_frontmatter_model_category
 
 # ===========================================================================
