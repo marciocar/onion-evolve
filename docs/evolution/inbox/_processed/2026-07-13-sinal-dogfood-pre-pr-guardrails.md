@@ -41,3 +41,23 @@ mas **o comando presume feature-first** e ignora que GitFlow tem `docs/*`/`hotfi
 ---
 *Sinal gerado durante o dogfood de promoção de `onion-guardrails` (as 3 checagens do core estão fechadas no
 registro de discussão). Entregue no próprio `inbox/` do core para triagem via `/meta:co-evolve`.*
+
+---
+
+## 🗂️ Triagem do core — 2026-07-13 (sessão `fix/pre-pr-guardrails-hygiene`)
+
+Verificado contra a fonte antes de dispositado (doutrina dogfood: veredito de subagente = hipótese).
+
+- **A1 — `status: candidato` fora do enum §2.6 → fix ✅ ENTREGUE** (commit `e6fa998`). Verificação
+  reforçou o achado: **7 KBs** já usavam `candidato` (o sinal dizia 2). `code-standards.md §2.6` agora
+  lista `<active | historical | draft | candidato>` + prosa da semântica dos 4 valores.
+- **A3 — `/engineer:pr` presume `feature/*` → fix ✅ ENTREGUE** (commit `e6fa998`). Passo 2 e o exemplo
+  TS (`head:`) deixam de forçar `feature/`: resolvem o prefixo pelo tipo de mudança ou aceitam a branch
+  atual quando já é prefixo GitFlow válido. Plugin `onion-engineering` regenerado.
+- **A2 — link-check determinístico só cobre `docs/evolution/` → feature (gated) ⏳ DEFERIDO** para PR
+  dedicado. Generalizar `check_evolution_links` (REGRA 22, `lint-artifacts.sh`) — já parametrizada por
+  `base` — para varrer também `docs/knowledge-base/` (e talvez `docs/discussions/`). Casa com ONION-R1
+  (integridade de SSOT). **Gatilho:** próxima sessão que tocar `lint-artifacts.sh` ou a vertical guardrails.
+  Cuidado com falso-positivo (code fences já tratados; conferir padrões de link de KB).
+
+Gate mecânico no fechamento de A1+A3: lint 0/0, selftest 47 ✓.
