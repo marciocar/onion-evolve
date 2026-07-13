@@ -107,5 +107,5 @@ não conta. Reforça o achado A da NOTE-05 (o sinal só é significativo em sess
 
 **Limite honesto que permanece:** mesmo o loop v2 **não decide sozinho** stuck-vs-produtivo — um ciclo edit↔test
 repetido pode ser progresso legítimo. Por isso o **refutador (§4) continua obrigatório** sobre todo candidato: o
-aperto reduz o ruído de entrada, não substitui o julgamento adversarial. (Local do heurístico: `leg1_analyze.py`,
-efêmero no scratchpad — reproduzível; não é código de produto.)
+aperto reduz o ruído de entrada, não substitui o julgamento adversarial. (Local do heurístico: `leg1_analyze.py` em
+`harness/` — cópia durável versionada; não é código de produto. Ver `harness/README.md` pro fluxo.)

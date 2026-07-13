@@ -1,0 +1,5 @@
+# capturas de sessão (dados, não versionados) — mesmo sendo só estrutura, ficam locais
+capture/
+*.ndjson
+*.raw
+meta.log
