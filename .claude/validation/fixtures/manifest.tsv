@@ -54,6 +54,8 @@ fix	r16-count-drift/bad-bare-especializados.md	docs	corrected
 lint	r22-evolution-links/bad-broken-link.md	docs/evolution/inbox	bad	link relativo quebrado
 lint	r22-evolution-links/good-fence-ignored.md	docs/evolution/inbox	good
 lint	r22-evolution-links/good-valid-links.md	docs/evolution/inbox	good
+lint	r22-kb-links/bad-broken-link.md	docs/knowledge-base/concepts	bad	link relativo quebrado
+lint	r22-kb-links/good-valid-links.md	docs/knowledge-base/concepts	good
 lint	r23-frontmatter/bad-command-no-model.md	.claude/commands/meta	bad	sem model:
 lint	r23-frontmatter/good-command-full.md	.claude/commands/meta	good
 lint	r23-frontmatter/bad-agent-no-category.md	.claude/agents/development	bad	sem category:
