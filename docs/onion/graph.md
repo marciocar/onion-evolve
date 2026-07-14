@@ -290,6 +290,15 @@ maestro	approves	assistant	conversa-plan-gate
 maestro	gates	assistant	conversa-plan-gate
 maestro	orchestrates	assistant	
 maestro	requests	assistant	conversa-plan-gate
+marcio-pessoal	adopts	onion-evolve	
+marcio-pessoal	mode	regulated	
+marcio-pessoal	pin	n/a	
+marcio-pessoal	specialization	kg-sdaal-method	
+marcio-pessoal	specialization	life-kg	
+marcio-pessoal	specialization	n1-dogfood	
+marcio-pessoal	specialization	research-arm	
+marcio-pessoal	tier	standalone	
+marcio-pessoal	trust-advises	onion-evolve	
 meeting-consolidator	related	/docs/build-tech-docs	
 meeting-consolidator	related	/product/consolidate-meetings	
 meeting-consolidator	related	/product/extract-meeting	

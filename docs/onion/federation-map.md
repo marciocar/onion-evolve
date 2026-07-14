@@ -10,11 +10,13 @@ flowchart TD
   pulse_mais["pulse-mais<br/>standalone · greenfield"]:::standalone
   granaai["granaai<br/>standalone · regulated"]:::standalone
   onion_mini["onion-mini<br/>standalone · distilled"]:::standalone
+  marcio_pessoal["marcio-pessoal<br/>standalone · regulated"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
   granaai -.->|can-correct| onion_evolve
   onion_mini -->|adopts| onion_evolve
+  marcio_pessoal -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
   classDef hub fill:#238636,color:#fff,stroke:#033a16;
   classDef standalone fill:#8957e5,color:#fff,stroke:#3c1e70;
@@ -29,3 +31,4 @@ flowchart TD
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `4332ac8d1884` |
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
+| marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
