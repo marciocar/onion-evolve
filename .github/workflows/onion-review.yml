@@ -58,7 +58,7 @@ jobs:
             Poste comentários inline nos pontos problemáticos, citando a regra e a evidência.
             Seja conciso e factual; se o diff estiver conforme, aprove explicitamente.
           claude_args: |
-            --model claude-sonnet-4-6
+            --model claude-sonnet-5
             --max-turns 8
 
       - name: Aviso — revisor Onion pulado (sem ANTHROPIC_API_KEY)
