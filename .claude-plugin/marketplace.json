@@ -11,16 +11,23 @@
   },
   "plugins": [
     {
-      "name": "onion-design",
-      "source": "./plugins/onion-design",
-      "description": "Vertical de design do Onion: identidade visual como spec-as-code (tokens W3C/DTCG), gate WCAG, materializacao via design-sink. Auto-adapta ao design-context do consumidor (SDAAL).",
+      "name": "onion-compliance",
+      "source": "./plugins/onion-compliance",
+      "description": "Vertical de compliance do Onion: documentacao de conformidade como spec-as-code (ISO 27001/22301, SOC2, PMBOK) via agentes especialistas + build-compliance-docs. Auto-adapta ao compliance-context do consumidor (SDAAL).",
       "version": "0.1.0",
       "author": { "name": "Onion - Marcio Carvalho" }
     },
     {
-      "name": "onion-compliance",
-      "source": "./plugins/onion-compliance",
-      "description": "Vertical de compliance do Onion: documentacao de conformidade como spec-as-code (ISO 27001/22301, SOC2, PMBOK) via agentes especialistas + build-compliance-docs. Auto-adapta ao compliance-context do consumidor (SDAAL).",
+      "name": "onion-design",
+      "source": "./plugins/onion-design",
+      "description": "Vertical de design do Onion: identidade visual como spec-as-code (tokens W3C/DTCG), gate WCAG e materializacao via design-sink. Auto-adapta ao design-context do consumidor (SDAAL).",
+      "version": "0.1.0",
+      "author": { "name": "Onion - Marcio Carvalho" }
+    },
+    {
+      "name": "onion-docs",
+      "source": "./plugins/onion-docs",
+      "description": "Vertical de documentacao do Onion: contexto de negocio/tecnico como spec-as-code, C4 (Context/Container/Component) + Mermaid, health/validacao de docs e engenharia reversa. Camada 1; business/technical-context = camada 2 do consumidor.",
       "version": "0.1.0",
       "author": { "name": "Onion - Marcio Carvalho" }
     },
@@ -42,13 +49,6 @@
       "name": "onion-testing",
       "source": "./plugins/onion-testing",
       "description": "Vertical de testes/QA do Onion: geracao e execucao de testes (unit/integration/e2e) com deteccao de framework + validacao de workflow. Perspectivas White/Grey/Black-box e QA story points. Camada 1.",
-      "version": "0.1.0",
-      "author": { "name": "Onion - Marcio Carvalho" }
-    },
-    {
-      "name": "onion-docs",
-      "source": "./plugins/onion-docs",
-      "description": "Vertical de documentacao do Onion: contexto de negocio/tecnico como spec-as-code, C4 (Context/Container/Component) + Mermaid, health/validacao de docs e engenharia reversa. Camada 1; business/technical-context = camada 2 do consumidor.",
       "version": "0.1.0",
       "author": { "name": "Onion - Marcio Carvalho" }
     }
