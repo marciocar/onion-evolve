@@ -196,7 +196,7 @@ interface ChatOptions {
 ```bash
 # .env
 LLM_PROVIDER=anthropic  # anthropic | openai | google | ollama | azure
-LLM_MODEL=claude-sonnet-latest  # alias de tier evergreen; ex. jun/2026: claude-sonnet-4-6
+LLM_MODEL=claude-sonnet-latest  # alias de tier evergreen; ex. jul/2026: claude-sonnet-5
 
 # Anthropic
 ANTHROPIC_API_KEY=sk-ant-xxxxx
