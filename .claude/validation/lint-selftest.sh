@@ -1459,6 +1459,55 @@ MFX
 }
 
 # ---------------------------------------------------------------------------
+# Modo generate-marketplace — exercita .claude/utils/marketplace/generate-marketplace.sh
+# (gera .claude-plugin/marketplace.json derivando plugins[] de cada plugin.json;
+# top-level preservado). Cobre: derivação de campos + ordem determinística,
+# idempotência, preservação do top-level, e caso vazio (sem plugins).
+# ---------------------------------------------------------------------------
+run_marketplace_generate_selftests() {
+  local helper="${SCRIPT_DIR}/../utils/marketplace/generate-marketplace.sh"
+  if [ ! -f "${helper}" ]; then record_fail "generate-marketplace" "helper ausente: ${helper}"; return; fi
+  local d out o1 o2
+  d="$(mktemp -d)"
+  mkdir -p "${d}/plugins/zeta/.claude-plugin" "${d}/plugins/alpha/.claude-plugin"
+  printf '{\n  "name": "zeta",\n  "version": "1.2.3",\n  "description": "desc zeta",\n  "author": { "name": "Aut" }\n}\n' > "${d}/plugins/zeta/.claude-plugin/plugin.json"
+  printf '{\n  "name": "alpha",\n  "version": "0.1.0",\n  "description": "desc alpha",\n  "author": { "name": "Aut" }\n}\n' > "${d}/plugins/alpha/.claude-plugin/plugin.json"
+
+  # (a) deriva campos dos dois plugins (name/source/version)
+  out="$(bash "${helper}" "${d}" 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '"name": "zeta"' \
+     && printf '%s' "${out}" | grep -q '"source": "./plugins/alpha"' \
+     && printf '%s' "${out}" | grep -q '"version": "1.2.3"'; then
+    record_pass "generate-marketplace: deriva campos dos plugins"
+  else record_fail "generate-marketplace: deriva campos" "name/source/version ausentes na saída"; fi
+
+  # (b) ordem determinística alfabética (alpha antes de zeta)
+  if [ "$(printf '%s\n' "${out}" | grep -nF '"name": "alpha"' | head -1 | cut -d: -f1)" \
+       -lt "$(printf '%s\n' "${out}" | grep -nF '"name": "zeta"' | head -1 | cut -d: -f1)" ]; then
+    record_pass "generate-marketplace: ordem alfabética determinística"
+  else record_fail "generate-marketplace: ordem alfabética" "zeta antes de alpha"; fi
+
+  # (c) idempotência: 2 gerações idênticas
+  o1="$(bash "${helper}" "${d}" 2>/dev/null)"; o2="$(bash "${helper}" "${d}" 2>/dev/null)"
+  if [ "${o1}" = "${o2}" ]; then record_pass "generate-marketplace: idempotente"
+  else record_fail "generate-marketplace: idempotente" "2ª geração difere"; fi
+
+  # (d) top-level preservado de marketplace.json existente
+  mkdir -p "${d}/.claude-plugin"
+  printf '{\n  "name": "meu-repo",\n  "owner": { "name": "Dono" },\n  "metadata": { "description": "d", "version": "9.9", "pluginRoot": "./plugins" },\n  "plugins": []\n}\n' > "${d}/.claude-plugin/marketplace.json"
+  out="$(bash "${helper}" "${d}" 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '"name": "meu-repo"' && printf '%s' "${out}" | grep -q '"version": "9.9"'; then
+    record_pass "generate-marketplace: top-level preservado"
+  else record_fail "generate-marketplace: top-level preservado" "top-level não preservado"; fi
+  rm -rf "${d}"
+
+  # (e) sem plugins → JSON com plugins array (vazio) válido
+  d="$(mktemp -d)"; out="$(bash "${helper}" "${d}" 2>/dev/null)"; rm -rf "${d}"
+  if printf '%s' "${out}" | grep -q '"plugins": \['; then record_pass "generate-marketplace: sem plugins → array válido"
+  else record_fail "generate-marketplace: sem plugins" "não emitiu plugins array"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo plugins-sync — exercita o drift-guard (REGRA 19 check_plugins_sync) do
 # lint-artifacts: cada plugins/<name> committado DEVE bater com a regeneração da
 # fonte (diff -x provenance + tree_sha). Cobre: em-sync (catch de regen esquecida)
@@ -2398,6 +2447,7 @@ run_githook_selftests
 # Core-only: já pula gracioso sem plugins/ (ver função). O `|| true` é rede de segurança —
 # um abort imprevisto sob set -e jamais esconde os modos self-contained seguintes (de-id).
 run_assemble_plugin_selftests || true
+run_marketplace_generate_selftests || true
 
 # Modo plugins-sync — drift-guard (REGRA 19): committed bate com a regeneração da fonte.
 run_plugins_sync_selftests || true
