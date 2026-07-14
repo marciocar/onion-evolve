@@ -2,7 +2,7 @@
 title: "ADR — /meta:create-vertical: generalizar o padrão hub-onion para scaffoldar verticais de projeto"
 date: 2026-07-14
 type: adr
-status: proposed — design-first (aguardando ratificação do maestro; nada implementado)
+status: accepted — ratificado pelo maestro 2026-07-14 (4 decisões fechadas); F1 é o próximo passo, nada implementado ainda
 decision-scope: meta / scaffolding / vertical-hub pattern / adoption
 supersedes: none
 related:
@@ -98,12 +98,15 @@ vertical-hub gerado nunca embute contagens/listas; deriva da SSOT (é o modelo d
   ferramenta de 1ª classe (fecha o loop com a origem do sinal).
 - **F4 — face de design (B3), gated:** skill de marca + onboarding auto-guiado no bootstrap. Separado.
 
-## Questões abertas (para o maestro ratificar)
+## Decisões ratificadas (maestro, 2026-07-14)
 
-1. **Nome:** `/meta:create-vertical` (fiel ao sinal) vs algo que sinalize melhor "projeto com hub" (ex.
-   `/meta:scaffold-project`)? A Decisão 1 sustenta manter "vertical".
-2. **Sujeito default:** gera in-place num repo existente, ou um projeto novo do zero, ou os dois modos?
-3. **Empacotar-como-plugin:** sempre, opcional (flag), ou nunca (só estrutura)? Afeta as Regras 19/20.
-4. **B3 (design) junto ou depois:** F4 gated é o proposto — confirmar.
+1. **Nome:** **`/meta:create-vertical`** (fiel ao sinal; a Decisão 1 sustenta).
+2. **Sujeito:** **ambos os modos** — gera in-place num repo existente **e** um projeto novo do zero (flag/detecção).
+   Cobre o caso do gustavo (repo-cliente existente) e greenfield.
+3. **Empacotar-como-plugin:** **opcional via flag** — por padrão gera só a estrutura (hub+help+book+bootstrap);
+   com `--plugin`, materializa manifesto + `assemble-plugin.sh` + `marketplace.json` + `roles.yaml`. Não impõe o
+   Capability Contract (Regras 19/20) a quem só quer o hub.
+4. **Face de design (B3):** **depois** — **F4 gated**, separada do núcleo (F1-F3).
 
-**Nada será implementado antes da ratificação deste ADR.** Design-first, com padrão.
+**Próximo passo = F1** (helpers testáveis: `bootstrap-new-project.sh` + gerador de `marketplace.json` + extração do
+scaffold-de-um-vertical da Fase 3 do adopt; cobertos por `lint-selftest.sh`). Nada implementado ainda.
