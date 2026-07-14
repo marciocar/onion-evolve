@@ -17,6 +17,11 @@
 #   (3) default detectado: `develop` se a branch existir; senão a branch
 #       principal (gitflow.branch.master → origin/HEAD → `main`)
 #
+# Aviso anti-silêncio (STDERR): quando NÃO há sinal algum e cai no literal "main"
+# (nem stamp/config/develop/origin-HEAD), emite um aviso no STDERR — o STDOUT segue
+# só o nome da branch. Impede o "palpite silencioso" que resolveu 'main' num repo
+# cuja integração era master/onion-adopt (sinal gustavo-pulga 2026-07-14).
+#
 # Uso       : resolve-integration-branch.sh [REPO_DIR]   (default: .)
 #             Emite o nome da branch em STDOUT. Exit 0 sempre (sempre há default).
 #
@@ -47,5 +52,18 @@ fi
 master="$(git -C "${REPO_DIR}" config --get gitflow.branch.master 2>/dev/null || true)"
 if [ -z "${master:-}" ]; then
   master="$(git -C "${REPO_DIR}" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || true)"
+fi
+# (4) PALPITE CEGO: nenhum sinal (nem stamp/config/develop, nem origin/HEAD) → cai no literal "main".
+#     Avisa no STDERR (o STDOUT segue SÓ o nome — BASE=$(...) intacto) para que o palpite deixe de ser
+#     SILENCIOSO. Sinal de campo gustavo-pulga 2026-07-14: um repo cuja integração real era master/onion-adopt
+#     resolveu "main" sem avisar. Só aqui: quando origin/HEAD dá a branch principal de verdade, o palpite é
+#     confiável → sem ruído no caso comum (greenfield main).
+if [ -z "${master:-}" ]; then
+  {
+    printf '⚠️  resolve-integration-branch: SEM sinal de branch de integração — usando o palpite cego "main".\n'
+    printf '    (sem integration_branch no .onion-version, sem gitflow.branch.develop, sem branch develop, sem origin/HEAD).\n'
+    printf '    Se a branch de integração NÃO for "main", grave o campo no SSOT versionado:\n'
+    printf '      integration_branch: <sua-branch>   # em .claude/.onion-version   (ou passe --integration-branch no /meta:adopt)\n'
+  } >&2
 fi
 printf '%s\n' "${master:-main}"
