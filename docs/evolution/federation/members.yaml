@@ -187,7 +187,7 @@ members:
     role: standalone            # T3 — adota o core direto. Mas adota o MÉTODO (KG SDAAL), NÃO vendoriza .claude/
                                 # (gap G1 dimensionado no spike F1; --profile de domínio é F2). Fonte≠derivação: uma só fonte.
     parent: onion-evolve
-    remote: github.com/marciocar/onion-pessoal   # PRIVADO (repo do KG de vida; só o Marcio acessa). Ponteiro, não o dado.
+    remote: "(privado — repo do KG de vida; endereço não publicado, só o Marcio acessa)"
     local_path: "/home/marcio/onion-pessoal"
     onion_version: n/a          # sem stamp: adoção de MÉTODO (kg-radar + /meta:kg + SDAAL destilado), não vendor do framework
     adopted_at: 2026-07-14      # federado como pesquisa (intent triada; F0 vertical Trabalho provou o método N=1)
