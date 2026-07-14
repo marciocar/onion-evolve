@@ -179,6 +179,31 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  # BRAÇO DE PESQUISA (não adotante-produto) — dogfood do MÉTODO KG SDAAL num cérebro de vida N=1.
+  # Federado 2026-07-14 (F3-lite: ponteiro de membro; o KG bruto é PRIVADO, nunca sai). Caveat intra-órbita
+  # segue north-star: prova o MÉTODO, não o MERCADO (Q_COLD_ADOPTER aberto; Marcio = centro da órbita).
+  - id: marcio-pessoal
+    name: Onion pessoal do Marcio (cérebro reconciliado N=1 — BRAÇO DE PESQUISA, não prova de mercado)
+    role: standalone            # T3 — adota o core direto. Mas adota o MÉTODO (KG SDAAL), NÃO vendoriza .claude/
+                                # (gap G1 dimensionado no spike F1; --profile de domínio é F2). Fonte≠derivação: uma só fonte.
+    parent: onion-evolve
+    remote: github.com/marciocar/onion-pessoal   # PRIVADO (repo do KG de vida; só o Marcio acessa). Ponteiro, não o dado.
+    local_path: "/home/marcio/onion-pessoal"
+    onion_version: n/a          # sem stamp: adoção de MÉTODO (kg-radar + /meta:kg + SDAAL destilado), não vendor do framework
+    adopted_at: 2026-07-14      # federado como pesquisa (intent triada; F0 vertical Trabalho provou o método N=1)
+    mode: regulated             # nada sobe sem gate humano explícito; default de classificação = protected/private
+    personality_summary: "cérebro pessoal N=1 do criador — dogfood do MÉTODO (NÃO prova de mercado: centro da órbita, Q_COLD_ADOPTER aberto). KG bruto private/local-first; só destilado gated sai."
+    specializations: [life-kg, kg-sdaal-method, research-arm, n1-dogfood]
+    personality_last_sync: n/a  # gated — nada sobe proativamente (estilo granaai, mais estrito)
+    # Trust SOBERANO (proto membership-marcio-pessoal): nem o core lê o diário; sem privilégio de criador.
+    trust:
+      can_receive_from: [onion-evolve]   # recebe método/conselho do core (o valor de ser membro)
+      can_advise_to: [onion-evolve]      # devolve sinal de método (bug/feedback do dogfood)
+      can_correct_to: []                 # mínimo — Marcio-criador ≠ Marcio-membro (sem privilégio de criador)
+      diary_readable_by: []              # ZERADO — nem o core lê (soberania do dado)
+      diary_classifications_shared: []   # ZERADO — nada sobe proativamente
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
