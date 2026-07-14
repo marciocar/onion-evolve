@@ -77,6 +77,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "=== DIAG: execution output do agente (o erro real mascarado como is_error) ==="
+          find "${RUNNER_TEMP:-/home/runner/work/_temp}" /home/runner/work/_temp . \
+            -name 'claude-execution-output.json' 2>/dev/null | sort -u | while read -r f; do
+              echo "--- ${f} ---"; cat "${f}" 2>/dev/null; echo
+            done | head -400
+          echo "=== fim DIAG ==="
           echo "::warning::onion-review não pôde executar (crash do agente / is_error) — nenhum veredito produzido. Revise manualmente. O gate determinístico (onion-validate) segue valendo."
           gh pr comment "${{ github.event.pull_request.number }}" \
             --body "⚠️ **onion-review não pôde executar** (crash do agente, \`is_error\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: um crash do revisor não bloqueia o PR (fix de resiliência 2026-07-14)._" \
