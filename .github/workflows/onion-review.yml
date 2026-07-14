@@ -35,8 +35,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      # RESILIÊNCIA (2026-07-14): continue-on-error faz um CRASH do agente (is_error)
+      # NÃO reprovar o PR. Motivo (achado por dogfood): este job só fica VERMELHO quando
+      # o revisor não consegue rodar — nunca quando acha violações (essas viram comentários
+      # inline e o job sai verde). Logo, reprovar por is_error bloqueia o PR pelo crash do
+      # bot, carregando ZERO informação sobre o código. O gate de qualidade duro é o
+      # determinístico (onion-validate.yml); a revisão semântica é advisory-quando-roda.
       - name: Revisor Onion (gate-keeper + code review)
+        id: review
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
+        continue-on-error: true
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -60,6 +68,19 @@ jobs:
           claude_args: |
             --model claude-sonnet-5
             --max-turns 8
+
+      # Se o revisor CRASHOU (is_error → outcome=failure, mascarado pelo continue-on-error):
+      # avisa de forma VISÍVEL (annotation + comentário no PR) e passa verde. Um crash produz
+      # ZERO veredito → não bloqueia; mas o humano vê que o PR não foi revisado semanticamente.
+      - name: Aviso se o revisor crashou (soft-pass, não bloqueia)
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.review.outcome == 'failure' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::warning::onion-review não pôde executar (crash do agente / is_error) — nenhum veredito produzido. Revise manualmente. O gate determinístico (onion-validate) segue valendo."
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --body "⚠️ **onion-review não pôde executar** (crash do agente, \`is_error\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: um crash do revisor não bloqueia o PR (fix de resiliência 2026-07-14)._" \
+            || echo "::warning::não consegui postar o comentário de aviso (segue soft-pass)"
 
       - name: Aviso — revisor Onion pulado (sem ANTHROPIC_API_KEY)
         if: ${{ env.HAS_ANTHROPIC_KEY != 'true' }}
