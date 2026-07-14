@@ -69,17 +69,50 @@ jobs:
             --model claude-sonnet-5
             --max-turns 8
 
-      # Se o revisor CRASHOU (is_error → outcome=failure, mascarado pelo continue-on-error):
+      # RETRY (2026-07-14): o crash do revisor é TRANSITÓRIO (rate-limit/overload sob carga —
+      # diagnosticado: o mesmo diff que "sempre crashava" passa quando o CI está quieto, e
+      # revisa liso localmente). Logo, uma 2ª tentativa quase sempre vira revisão REAL, em vez
+      # de soft-passar sem revisar. Só roda se a 1ª crashou. Mesma config do step acima.
+      - name: Revisor Onion (retry — só se a 1ª tentativa crashou)
+        id: review2
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.review.outcome == 'failure' }}
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Você é o revisor nativo do Sistema Onion. Revise o diff deste Pull Request
+            aplicando a doutrina do @metaspec-gate-keeper contra a constituição em
+            docs/meta-specs/ (descubra as meta-specs dinamicamente; não assuma nomes fixos):
+
+            - Conformidade com agents.md, commands.md, architecture.md, code-standards.md,
+              integrations.md — cite a regra como `meta-spec:linha` ao apontar violação.
+            - Regras de ORQUESTRAÇÃO (commands.md §10): orquestração reside em skill/comando, NUNCA
+              em agente (architecture.md §4.2); invariante de workflows faseados preservada;
+              resiliência exigida quando há fan-out (falha parcial, timeout, fan-in, fallback).
+            - Código/idioma (code-standards.md): pt-BR em docs/conteúdo, inglês em código/commits;
+              use famílias Claude por tier (opus/sonnet/haiku/fable) — sinalize modelos RETIRADOS
+              (Claude 3.x) ou de outro provider (gpt/gemini/llama) citados como modelo de agente.
+            - Ausência de vaporware (ex.: `mcp_onion-orchestrator`).
+
+            Poste comentários inline nos pontos problemáticos, citando a regra e a evidência.
+            Seja conciso e factual; se o diff estiver conforme, aprove explicitamente.
+          claude_args: |
+            --model claude-sonnet-5
+            --max-turns 8
+
+      # Só soft-passa se AMBAS as tentativas crasharam (o crash persistiu além do transitório).
+      # Se a 2ª tentativa não rodou (a 1ª passou) ou passou, este step é pulado.
       # avisa de forma VISÍVEL (annotation + comentário no PR) e passa verde. Um crash produz
       # ZERO veredito → não bloqueia; mas o humano vê que o PR não foi revisado semanticamente.
-      - name: Aviso se o revisor crashou (soft-pass, não bloqueia)
-        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.review.outcome == 'failure' }}
+      - name: Aviso se o revisor crashou nas 2 tentativas (soft-pass, não bloqueia)
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.review.outcome == 'failure' && steps.review2.outcome == 'failure' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "::warning::onion-review não pôde executar (crash do agente / is_error) — nenhum veredito produzido. Revise manualmente. O gate determinístico (onion-validate) segue valendo."
+          echo "::warning::onion-review não pôde executar após 2 tentativas (crash do agente / is_error) — nenhum veredito produzido. Revise manualmente. O gate determinístico (onion-validate) segue valendo."
           gh pr comment "${{ github.event.pull_request.number }}" \
-            --body "⚠️ **onion-review não pôde executar** (crash do agente, \`is_error\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: um crash do revisor não bloqueia o PR (fix de resiliência 2026-07-14)._" \
+            --body "⚠️ **onion-review não pôde executar após 2 tentativas** (crash do agente, \`is_error\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: um crash persistente do revisor não bloqueia o PR (resiliência + retry 2026-07-14)._" \
             || echo "::warning::não consegui postar o comentário de aviso (segue soft-pass)"
 
       - name: Aviso — revisor Onion pulado (sem ANTHROPIC_API_KEY)
