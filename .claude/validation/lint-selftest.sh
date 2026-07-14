@@ -1508,6 +1508,45 @@ run_marketplace_generate_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo bootstrap-vertical — exercita .claude/utils/vertical/bootstrap-new-project.sh
+# (scaffolda hub-skill + help + context-resolver de templates, com substituição de
+# placeholder). Cobre: geração+substituição, never-clobber, dry-run, slug inválido.
+# ---------------------------------------------------------------------------
+run_bootstrap_vertical_selftests() {
+  local helper="${SCRIPT_DIR}/../utils/vertical/bootstrap-new-project.sh"
+  if [ ! -f "${helper}" ]; then record_fail "bootstrap-new-project" "helper ausente: ${helper}"; return; fi
+  local d rc out
+
+  # (a) gera os 3 artefatos com substituição, sem placeholder residual
+  d="$(mktemp -d)"
+  bash "${helper}" meuproj --title "Meu Proj" --dir "${d}" >/dev/null 2>&1
+  if [ -f "${d}/.claude/skills/meuproj/SKILL.md" ] && [ -f "${d}/.claude/commands/meuproj/help.md" ] \
+     && [ -f "${d}/.claude/skills/meuproj-context/SKILL.md" ] \
+     && grep -q "name: meuproj" "${d}/.claude/skills/meuproj/SKILL.md" \
+     && grep -q "Meu Proj" "${d}/.claude/skills/meuproj/SKILL.md" \
+     && ! grep -rq "{{PROJECT" "${d}/.claude"; then
+    record_pass "bootstrap-vertical: gera hub+help+context, substituição sem placeholder residual"
+  else record_fail "bootstrap-vertical: gera+substitui" "arquivos/substituição incorretos"; fi
+
+  # (b) never-clobber: 2ª rodada não sobrescreve
+  out="$(bash "${helper}" meuproj --dir "${d}" 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q "never-clobber"; then record_pass "bootstrap-vertical: never-clobber"
+  else record_fail "bootstrap-vertical: never-clobber" "não pulou artefato existente"; fi
+  rm -rf "${d}"
+
+  # (c) dry-run não escreve nada
+  d="$(mktemp -d)"; bash "${helper}" xproj --dir "${d}" --dry-run >/dev/null 2>&1
+  if [ "$(find "${d}/.claude" -type f 2>/dev/null | wc -l)" -eq 0 ]; then record_pass "bootstrap-vertical: dry-run não escreve"
+  else record_fail "bootstrap-vertical: dry-run" "escreveu arquivos em dry-run"; fi
+  rm -rf "${d}"
+
+  # (d) slug inválido (não-kebab) → exit 2
+  d="$(mktemp -d)"; rc=0; bash "${helper}" "Nao_Kebab" --dir "${d}" >/dev/null 2>&1 || rc=$?; rm -rf "${d}"
+  if [ "${rc}" -eq 2 ]; then record_pass "bootstrap-vertical: slug não-kebab → exit 2"
+  else record_fail "bootstrap-vertical: slug não-kebab" "esperava exit 2, veio ${rc}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo plugins-sync — exercita o drift-guard (REGRA 19 check_plugins_sync) do
 # lint-artifacts: cada plugins/<name> committado DEVE bater com a regeneração da
 # fonte (diff -x provenance + tree_sha). Cobre: em-sync (catch de regen esquecida)
@@ -2448,6 +2487,7 @@ run_githook_selftests
 # um abort imprevisto sob set -e jamais esconde os modos self-contained seguintes (de-id).
 run_assemble_plugin_selftests || true
 run_marketplace_generate_selftests || true
+run_bootstrap_vertical_selftests || true
 
 # Modo plugins-sync — drift-guard (REGRA 19): committed bate com a regeneração da fonte.
 run_plugins_sync_selftests || true
