@@ -4,14 +4,18 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 25 entradas · **Stale:** 0 · **Compartilháveis:** 21
+**Total:** 29 entradas · **Stale:** 0 · **Compartilháveis:** 22
 
-Gerado em: 2026-07-11
+Gerado em: 2026-07-15
 
 ---
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-15 | error | protected | projected-scaffold-step-nonexistent | 2026-10-13 | static |
+| 2026-07-15 | learning | protected | kg-sdaal-crosses-federation | 2026-10-13 | dynamic |
+| 2026-07-15 | learning | protected | kg-audit-layer-generalizes-to-content | 2026-10-13 | conditional |
+| 2026-07-15 | innovation | public 📤 | create-vertical-f2-fino-delega | 2026-10-13 | dynamic |
 | 2026-07-11 | decision | public 📤 | knowledge-centric-reframe-and-north-star | 2026-10-09 | static |
 | 2026-07-11 | reflection | public 📤 | hegel-limit-kg-boundary | 2026-10-09 | static |
 | 2026-07-10 | reflection | public 📤 | the-day-the-loop-ran-both-ways | 2026-10-08 | static |
