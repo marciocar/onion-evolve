@@ -10,7 +10,7 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- 🤖 **96 comandos invocáveis** Claude Code em 10 categorias + root (+ 24 fragmentos compartilhados em `common/` e 10 READMEs de categoria)
+- 🤖 **97 comandos invocáveis** Claude Code em 10 categorias + root (+ 24 fragmentos compartilhados em `common/` e 10 READMEs de categoria)
 - 🎯 **51 agentes de IA especializados** em 9 categorias
 - 🧩 **8 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes; `onion-{engineering,product,compliance}-context` — resolvers de SSOT por vertical)
 - 📚 **73 Knowledge Bases** estruturadas para consumo por IA (+ KB viva `agentic-patterns/` + vertical `education/`)
@@ -43,7 +43,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **Contextos spec-as-code peer**: `docs/business-context/` **populado como dogfood** (13 arquivos — seed real do Onion nas 4 camadas); `docs/technical-context/` e `docs/compliance-context/` seguem **templates** (1 `README.md` cada), populados no projeto-alvo por `/docs:build-*-docs`
 
 ### Sistema Onion (`.claude/`)
-- **96 comandos invocáveis** Claude Code distribuídos em:
+- **97 comandos invocáveis** Claude Code distribuídos em:
   - 30 em `meta/` (meta-comandos, criadores, validação, orquestração de subagentes, frescor de KB e de contexto, federação, adoção e co-evolução)
   - 21 em `product/` (gestão de produto e descoberta)
   - 12 em `engineer/` (engenharia e desenvolvimento)
@@ -66,7 +66,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 
 ### Total
 - **431 arquivos** de documentação markdown em `docs/`
-- **96 comandos invocáveis** em 10 categorias + root (+ 24 fragmentos `common/` + 10 READMEs de categoria)
+- **97 comandos invocáveis** em 10 categorias + root (+ 24 fragmentos `common/` + 10 READMEs de categoria)
 - **51 agentes** especializados em 9 categorias
 - **8 skills** (`.claude/skills/`) · **73 Knowledge Bases**
 

@@ -30,7 +30,7 @@ O termo "SDD" na sua forma atual, centrada em IA, coalesceu em 2025.
 | Ferramenta | Lançamento | O que é "spec" | One-shot ou vivo? |
 |---|---|---|---|
 | **AWS Kiro** | jul/2025 | 3 markdown: `requirements.md` (user stories + **EARS notation**), `design.md`, `tasks.md` | **spec-first**. Böckeler: specs são *descartadas* após a feature; nova spec por mudança. O mais "leve" dos três. |
-| **GitHub Spec Kit** | open-source **02/set/2025** | Fluxo `Constitution → Specify → Plan → Tasks`; cada fase gera markdown; `constitution.md` = princípios inegociáveis | **Aspira a spec-anchored, opera como spec-first**. Blog diz "living, executable artifacts", mas cria **branch por spec** → ciclo preso ao change-request. Funciona com 30+ agentes. |
+| **GitHub Spec Kit** | open-source **02/set/2025** | Fluxo `Constitution → Specify → Plan → Tasks`; cada fase gera markdown; `constitution.md` = princípios inegociáveis | **Aspira a spec-anchored, opera como spec-first**. Blog diz "living, executable artifacts", mas cria **branch por spec** → ciclo preso ao change-request. Funciona com 51+ agentes. |
 | **BMAD-METHOD** | comunidade, 2025 | Personas de time ágil (Analyst, PM, Architect, PO, SM, Dev, QA) em markdown+YAML; artefatos = PRDs, arquitetura, stories | **Simulação de time ágil primeiro**, spec-driven "aparafusado". Doc (não código) é a fonte. |
 | **Tessl** | Framework + Registry (Série A); private beta | Specs mapeiam p/ arquivos de código com tags `@generate`/`@test`; "vibe-specs"; + Registry de **10.000+ specs** de libs OSS (anti-alucinação de API) | **Único mirando explicitamente spec-anchored E spec-as-source**. Código = "GENERATED FROM SPEC – DO NOT EDIT". |
 
