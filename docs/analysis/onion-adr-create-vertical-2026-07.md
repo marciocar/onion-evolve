@@ -91,8 +91,14 @@ vertical-hub gerado nunca embute contagens/listas; deriva da SSOT (é o modelo d
 
 ## Faseamento (doutrina Onion: helper testável → fiação → campo)
 
-- **F1 — helpers testáveis:** `bootstrap-new-project.sh` + gerador de `marketplace.json` + extração do
-  "scaffold-de-um-vertical" da Fase 3 do adopt como sub-rotina compartilhada; cobertos por `lint-selftest.sh`.
+- **F1 — helpers testáveis:** `bootstrap-new-project.sh` (hub+help+book-resolver) + gerador de
+  `marketplace.json` + `scaffold-book-dir.sh` (dir do book/SSOT); cobertos por `lint-selftest.sh`.
+  **Correção de eixo (2026-07-14, na execução):** o ADR previa *extrair* o scaffold da Fase 3 do adopt como
+  sub-rotina compartilhada. A investigação mostrou a sobreposição **mais fina** que o assumido — o núcleo do
+  create-vertical (hub+help+book) é o `bootstrap`, e a Fase 3 do adopt é majoritariamente **prosa de
+  adoção-de-repo** (skeleton do `CLAUDE.md`), não de criar-vertical; o determinístico extraível era ~2 linhas.
+  Logo o **refactor do adopt fica DEFERIDO** (alto-risco/baixo-retorno num comando sensível): o create-vertical
+  usa o próprio `scaffold-book-dir.sh`, e o adopt pode adotá-lo quando for aberto de novo (risco menor, momento certo).
 - **F2 — fiação:** o comando `/meta:create-vertical` orquestrando os `create-*` + os helpers de F1 + sync/lint.
 - **F3 — campo (dogfood):** rodar num projeto real descartável; idealmente o gustavo re-dogfooda o Tornak com a
   ferramenta de 1ª classe (fecha o loop com a origem do sinal).

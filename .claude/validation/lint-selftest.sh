@@ -1547,6 +1547,38 @@ run_bootstrap_vertical_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo scaffold-book — exercita .claude/utils/vertical/scaffold-book-dir.sh
+# (scaffolda docs/<project>-context/README.md com o contrato mínimo do book).
+# Cobre: geração+substituição, never-clobber, dry-run, slug inválido.
+# ---------------------------------------------------------------------------
+run_scaffold_book_selftests() {
+  local helper="${SCRIPT_DIR}/../utils/vertical/scaffold-book-dir.sh"
+  if [ ! -f "${helper}" ]; then record_fail "scaffold-book-dir" "helper ausente: ${helper}"; return; fi
+  local d rc out
+  d="$(mktemp -d)"
+  bash "${helper}" livroteste --title "Livro Teste" --dir "${d}" >/dev/null 2>&1
+  if [ -f "${d}/docs/livroteste-context/README.md" ] \
+     && grep -q "Livro Teste — Book" "${d}/docs/livroteste-context/README.md" \
+     && ! grep -q "{{PROJECT" "${d}/docs/livroteste-context/README.md"; then
+    record_pass "scaffold-book: gera book-dir + substituição sem placeholder"
+  else record_fail "scaffold-book: gera+substitui" "arquivo/substituição incorretos"; fi
+
+  out="$(bash "${helper}" livroteste --dir "${d}" 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q "never-clobber"; then record_pass "scaffold-book: never-clobber"
+  else record_fail "scaffold-book: never-clobber" "não pulou existente"; fi
+  rm -rf "${d}"
+
+  d="$(mktemp -d)"; bash "${helper}" xp --dir "${d}" --dry-run >/dev/null 2>&1
+  if [ "$(find "${d}/docs" -type f 2>/dev/null | wc -l)" -eq 0 ]; then record_pass "scaffold-book: dry-run não escreve"
+  else record_fail "scaffold-book: dry-run" "escreveu em dry-run"; fi
+  rm -rf "${d}"
+
+  d="$(mktemp -d)"; rc=0; bash "${helper}" "Bad_Slug" --dir "${d}" >/dev/null 2>&1 || rc=$?; rm -rf "${d}"
+  if [ "${rc}" -eq 2 ]; then record_pass "scaffold-book: slug não-kebab → exit 2"
+  else record_fail "scaffold-book: slug não-kebab" "esperava exit 2, veio ${rc}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo plugins-sync — exercita o drift-guard (REGRA 19 check_plugins_sync) do
 # lint-artifacts: cada plugins/<name> committado DEVE bater com a regeneração da
 # fonte (diff -x provenance + tree_sha). Cobre: em-sync (catch de regen esquecida)
@@ -2488,6 +2520,7 @@ run_githook_selftests
 run_assemble_plugin_selftests || true
 run_marketplace_generate_selftests || true
 run_bootstrap_vertical_selftests || true
+run_scaffold_book_selftests || true
 
 # Modo plugins-sync — drift-guard (REGRA 19): committed bate com a regeneração da fonte.
 run_plugins_sync_selftests || true
