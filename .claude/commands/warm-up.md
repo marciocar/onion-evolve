@@ -81,7 +81,7 @@ Estabelecer contexto completo do projeto incluindo:
 - `docs/evolution/README.md` - Modelo de co-evolução core↔derivados (se presente)
 
 ### Estrutura de Comandos
-- 96 comandos em 10 categorias
+- 97 comandos em 10 categorias
 - 51 agentes especializados em 9 categorias
 - Knowledge Bases estruturadas para IA
 
