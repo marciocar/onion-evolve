@@ -48,6 +48,12 @@ desenvolvimento; *Aufhebung* nega+conserva+eleva; **sem telos**).
 - **Dogfood recursivo**: rodar o `kg-radar` sobre cada proto é o Onion se olhando no espelho — e a **L5 self-red-team**
   da P5 é a doutrina de dogfood do próprio Onion aplicada à privacidade.
 
+## Como usar (o baseline pé-no-chão)
+
+**Usar o Onion pessoal hoje = `cd ~/onion-pessoal && claude` e conversar** (o `.kg.yaml` é mantido pela
+conversa; `kg-radar` é a lente). O passo-a-passo durável está em **[USAGE.md](USAGE.md)** — o baseline
+conversacional (F0/Wizard-of-Oz), antes da interface rica (`interface-state-of-art`, gated).
+
 ## O que fica (engenharia, não descoberta)
 
 As 4 perguntas do SEED estão fechadas e a fronteira aberta da P4 (inferência) foi resolvida **até onde a honestidade
