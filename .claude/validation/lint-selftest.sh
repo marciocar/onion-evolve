@@ -246,6 +246,48 @@ run_kg_fixture() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo kg-freshness/schema — guardas de frescor + versão de schema do kg-radar.sh
+# (ADR onion-adr-kg-freshness-gate, propostas #2/#1 do dogfood rhilo). Frescor é AVISO
+# (⚠, não muda exit) → asserção por CONTEÚDO de stdout; schema é RECUSA (✗, exit 1).
+# ---------------------------------------------------------------------------
+run_kg_freshness_selftests() {
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  local fx="${FIX_DIR}/kg-freshness" sx="${FIX_DIR}/kg-schema"
+  local out rc
+
+  # (a) fresh-verified --all: frescor declarado + schema atual → exit 0, sem STALE, SCHEMA ✅
+  rc=0; out=$(bash "${radar}" "${fx}/fresh-verified.kg.yaml" --all 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && ! printf '%s' "${out}" | grep -q 'STALE' \
+     && printf '%s' "${out}" | grep -q 'schema_version 1 (bate'; then
+    record_pass "kg-freshness: fresh-verified → exit 0, sem STALE, schema ✅"
+  else record_fail "kg-freshness: fresh-verified" "rc=${rc} out=${out}"; fi
+
+  # (b) stale-missing --freshness: nó PROD sem verified_at → STALE-MISSING, exit 0 (aviso)
+  rc=0; out=$(bash "${radar}" "${fx}/stale-missing.kg.yaml" --freshness 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'STALE-MISSING: ST_A'; then
+    record_pass "kg-freshness: stale-missing → STALE-MISSING + exit 0 (aviso, não reprova)"
+  else record_fail "kg-freshness: stale-missing" "rc=${rc} out=${out}"; fi
+
+  # (c) stale-old --freshness: verified_at < baseline → STALE-OLD, exit 0 (determinístico, sem "agora")
+  rc=0; out=$(bash "${radar}" "${fx}/stale-old.kg.yaml" --freshness 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'STALE-OLD: ST_A'; then
+    record_pass "kg-freshness: stale-old → STALE-OLD + exit 0"
+  else record_fail "kg-freshness: stale-old" "rc=${rc} out=${out}"; fi
+
+  # (d) schema-divergent --schema: schema_version ≠ radar → RECUSA com exit 1 (não é aviso)
+  rc=0; out=$(bash "${radar}" "${sx}/schema-divergent.kg.yaml" --schema 2>&1) || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'schema_version divergente'; then
+    record_pass "kg-schema: divergente → ✗ + exit 1 (recusa, radar não sabe ler)"
+  else record_fail "kg-schema: divergente" "esperava exit 1 + ✗; rc=${rc} out=${out}"; fi
+
+  # (e) retrocompat: grafo legado sem schema_version → ⚠ ausente + exit 0 (não quebra grafo válido)
+  rc=0; out=$(bash "${radar}" "${FIX_DIR}/kg-domain/good-domain.kg.yaml" --schema 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'schema_version ausente'; then
+    record_pass "kg-schema: ausente → ⚠ + exit 0 (retrocompat, degradê)"
+  else record_fail "kg-schema: ausente/retrocompat" "esperava exit 0 + ⚠; rc=${rc} out=${out}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo contract — exit code de federation-contract-validate.sh
 # ---------------------------------------------------------------------------
 run_contract_fixture() {
@@ -2462,6 +2504,9 @@ if [ -f "${MANIFEST}" ]; then
 else
   record_pass "fixtures: manifest ausente → loop de fixture pulado (core-only; adotante não vendoriza fixtures/)"
 fi
+
+# Modo kg-freshness/schema — guardas de frescor + versão de schema (ADR kg-freshness-gate F1).
+run_kg_freshness_selftests
 
 # Modo resolve — não vem do manifest (cenários self-contained, sem fixture-file).
 run_resolve_selftests

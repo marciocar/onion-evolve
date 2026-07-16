@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--triples]
-#      (sem flag = radar + reconcile + integrity + domain)
+# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--freshness|--schema|--triples]
+#      (sem flag = radar + reconcile + integrity + domain + freshness + schema)
 #
 # Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
 #   RADAR           = atenção — peso do nó × centralidade (grau).
@@ -15,6 +15,13 @@
 #   RADAR-DE-DOMÍNIO= completude da camada `layer: domain` (⚠ atenção, NÃO reprova):
 #                     estado-absorvente · EVENT-sem-efeito · STATE-sem-dona ·
 #                     RULE-sem-trace · fonte-única (>1 READS saindo — ADR design-extends-kg)
+#   FRESCOR         = frescor da SSOT (⚠ atenção, NÃO reprova — nó stale mente, não corrompe):
+#                     STALE-MISSING (nó plane:PROD sem verified_at:) · STALE-OLD (verified_at
+#                     anterior à meta.baseline). Determinístico: compara duas datas do arquivo,
+#                     sem "agora" (ADR onion-adr-kg-freshness-gate, proposta #2 rhilo dogfood).
+#   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
+#                     meta.schema_version ≠ a versão que o radar entende → recusa; ausente → ⚠
+#                     retrocompat (ADR onion-adr-kg-freshness-gate, proposta #1).
 #   TRIPLES         = grafo como triplas `from EDGE to [on evento]` p/ consumo por LLM
 #
 # Camadas (campo opcional `layer`, default audit — retrocompatível):
@@ -25,14 +32,18 @@
 #
 # Soberania: motor próprio do core (decisão D_NO_VENDOR_RADAR) — NÃO é port do radar.js do rhilo.
 # Shell/awk puro por design (economia de motores: gate determinístico não aluga LLM).
-# Exit: 0 = ok · 1 = INTEGRIDADE encontrou problema · 2 = erro de uso/arquivo.
+# Exit: 0 = ok · 1 = INTEGRIDADE ou SCHEMA encontrou problema · 2 = erro de uso/arquivo.
 set -euo pipefail
+
+# Versão de schema que ESTE radar entende. Bump quando a gramática do .kg.yaml mudar de forma
+# incompatível — o gate de SCHEMA recusa arquivos que declaram outra versão (proposta #1).
+RADAR_SCHEMA="1"
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--triples]" >&2; exit 2; }
+[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--freshness|--schema|--triples]" >&2; exit 2; }
 
-awk -v mode="$MODE" '
+awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" '
 function statusFactor(s) {
   if (s == "open" || s == "confirmed") return 1.0
   if (s == "refuted") return 0.0
@@ -66,6 +77,7 @@ section == "nodes" && nid != "" {
   if (line ~ /impact:/)     { v = line; sub(/.*impact:/, "", v);     impact[nid] = trim(v) + 0 }
   if (line ~ /confidence:/) { v = line; sub(/.*confidence:/, "", v); conf[nid] = trim(v) + 0 }
   if (line ~ /status:/)     { v = line; sub(/.*status:/, "", v);     nstatus[nid] = trim(v) }
+  if (line ~ /verified_at:/) { v = line; sub(/.*verified_at:/, "", v); verifiedAt[nid] = trim(v) }
   if ($0 ~ /label:/)        { v = $0; sub(/^[[:space:]]*label:/, "", v); label[nid] = trim(v) }
   next
 }
@@ -78,6 +90,10 @@ section == "edges" && /^[[:space:]]+- from:/ {
 section == "edges" && /to:/ && !/edge_type/ { v = $0; sub(/.*to:/, "", v); eto[ne] = trim(v); next }
 section == "edges" && /edge_type:/ { v = $0; sub(/.*edge_type:/, "", v); etype[ne] = trim(v); next }
 section == "edges" && /on:/ { v = $0; sub(/.*on:/, "", v); eon[ne] = trim(v); next }
+
+# meta: campos de governança de frescor/schema (proposta #1/#2 — ADR kg-freshness-gate)
+section == "meta" && /schema_version:/ { v = $0; sub(/.*schema_version:/, "", v); metaSchema = trim(v); next }
+section == "meta" && /baseline:/        { v = $0; sub(/.*baseline:/, "", v);        metaBaseline = trim(v); next }
 
 END {
   VN = "entity claim decision question evidence artifact state event rule invariant policy"
@@ -177,6 +193,37 @@ END {
       if (warns == 0) print "  ✅ camada domain completa (sem lacunas nas 5 checagens)"
       print ""
     }
+  }
+
+  if (mode == "--all" || mode == "--schema") {
+    print "══ SCHEMA — versão da gramática do .kg.yaml (✗ reprova na divergência) ══"
+    if (metaSchema == "") {
+      print "  ⚠ schema_version ausente no meta: — declare schema_version: \"" radarSchema "\" (retrocompat: aceito por ora)"
+    } else if (metaSchema != radarSchema) {
+      print "  ✗ schema_version divergente: arquivo declara [" metaSchema "], radar entende [" radarSchema "] — rode kg migrate ou atualize o radar"
+      problems++
+    } else {
+      print "  ✅ schema_version " metaSchema " (bate com o radar)"
+    }
+    print ""
+  }
+
+  if (mode == "--all" || mode == "--freshness") {
+    print "══ FRESCOR — SSOT re-verificada contra o vivo (⚠ atenção, não reprova) ══"
+    fwarns = 0; nprod = 0
+    for (i = 1; i <= nn; i++) {
+      id = order[i]
+      if (plane[id] != "PROD") continue
+      nprod++
+      if (verifiedAt[id] == "") {
+        print "  ⚠ STALE-MISSING: " id " (nó plane:PROD sem verified_at: — foto sem carimbo, re-verifique contra o vivo)"; fwarns++
+      } else if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") {
+        print "  ⚠ STALE-OLD: " id " (verified_at " verifiedAt[id] " anterior à baseline " metaBaseline " — a verdade pode ter envelhecido)"; fwarns++
+      }
+    }
+    if (nprod == 0) print "  (nenhum nó plane:PROD — nada a verificar quanto a frescor)"
+    else if (fwarns == 0) print "  ✅ " nprod " nó(s) PROD com frescor declarado" (metaBaseline != "" ? " (baseline " metaBaseline ")" : "")
+    print ""
   }
 
   if (mode == "--all" || mode == "--integrity") {

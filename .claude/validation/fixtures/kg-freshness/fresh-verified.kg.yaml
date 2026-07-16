@@ -1,0 +1,29 @@
+# Fixture: grafo com frescor DECLARADO — todo nó PROD tem verified_at >= baseline, schema atual.
+# Espera: --all exit 0, sem STALE, SCHEMA ✅ (proposta #2/#1 do ADR kg-freshness-gate).
+meta:
+  id: fixture-fresh-verified
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: EN_A
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-15
+    label: "entidade A (dona do estado)"
+  - id: ST_A
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-15
+    label: "estado A"
+edges:
+  - from: EN_A
+    to: ST_A
+    edge_type: HAS_STATE
