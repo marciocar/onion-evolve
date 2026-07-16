@@ -8,7 +8,30 @@
 
 ---
 
-## 2026-07-11 · Assinatura da família revisada: 🧅 "Orquestrado com Onion" · COMPATÍVEL · alvo: todos
+## 2026-07-16 · KG-SSOT ganha guardas de FRESCOR + SCHEMA e a doutrina SSOT-as-runtime (crédito: seus sinais de campo) · COMPATÍVEL · alvo: metagamify, marcio-pessoal, gustavo-pulga
+
+- **De onde veio:** os **seus sinais de campo** desta rodada. metagamify (o "ouro" do dogfood WRR +
+  `ssot-como-runtime`), gustavo-pulga (omnibus: KG por fronteira de confiança, auto-correção em campo),
+  marcio-pessoal (F0 validou o KG SDAAL numa **vida** N=1). Três domínios — produção, consultoria, vida —
+  e o **mesmo motor** segurou. O core absorveu e shippou; este anúncio fecha o loop de volta.
+- **O que mudou no `kg-radar.sh`** (motor soberano do core; adicionativo, retrocompatível):
+  - **`--freshness`** (⚠ aviso, não reprova): `verified_at:` carimba *quando* um nó foi cruzado com o vivo.
+    **STALE-MISSING** (nó rastreado sem carimbo) · **STALE-OLD** (`verified_at` anterior à `meta.baseline`).
+    **Rastreado = `plane:PROD` OU nó com `verified_against:`** (opt-in) — cobre nós **DEV** que apontam para
+    branch/commit/deploy (também apodrecem), sem inundar claims epistêmicos. *Determinístico: compara duas
+    datas do próprio arquivo, sem "agora".*
+  - **`--schema`** (✗ recusa): `schema_version:` no `meta:`; divergência da versão que o radar entende =
+    recusa (o radar não sabe ler o arquivo); ausência = ⚠ retrocompat.
+- **Doutrina SSOT-as-runtime** (KB `knowledge-graph-sdaal.md`, nova seção): a SSOT é o **programa que se
+  executa**, não o documento que se arquiva — ciclo `read(KG)→verify(vivo)→act→write(KG)`; **KG-first +
+  drive-to-verify** como par canônico. Nomeado do relato do metagamify ("montei o SSOT e o ignorei 3×").
+- **Também:** `/meta:kg` v1.3.0 expõe os modos; `/meta:co-evolve` v1.4.0 dá `git fetch`/`pull` **antes** de
+  ler o inbox (lição do marcio-pessoal — sinal same-repo não "chega" com checkout stale). Design: ADR
+  `onion-adr-kg-freshness-gate-2026-07`.
+- **Ação p/ você:** depende do seu setup — **radar soberano próprio** (metagamify): espelhe as 3 checagens no
+  seu radar; **adota o método** (marcio-pessoal, gustavo): aplique a disciplina (`verified_at:` em nós PROD/
+  com artefato móvel, `schema_version: "1"` no `meta:`, ciclo read→verify→act→write). Quem vendoriza `.claude/`:
+  `/meta:adopt --update` traz o `kg-radar.sh` novo. Nada obrigatório — é aviso, não gate-duro.
 
 - **Nova superfície** (decisão do maestro, 2026-07-11): a assinatura da família nos PRs passa a ser
   `🧅 Orquestrado com [Onion](https://onionevolve.com)` — dropa o "Gerado por [Claude Code] usando". A autoria
