@@ -119,14 +119,20 @@ function, o consumidor (humano OU IA) re-deriva à mão e ignora a fonte que ele
 - **Frescor vale em TODAS as camadas** (não só PROD) — é o que a **F1.1** implementa (§A): qualquer claim
   com artefato móvel, DEV inclusive.
 
-**Evidência convergente (gustavo, omnibus Sinais 5/6/7).** No mesmo período, um **segundo** adotante
-independente empurrou a SSOT a cidadão de 1ª classe por outro eixo — **confidencialidade**: *"um KG SDAAL
-por fronteira de confiança"* (KG do engajamento confidencial × KG de colaboração shareable, decisão
-`D_KG_SEPARADO`), com o grafo **se autocorrigindo em campo** (findings de deep-research `REFUTED` teses e
-`SUPERSEDED` no ledger). Confirma, de um ângulo ortogonal (partição × frescor), que o método SDAAL —
-append-mostly, soberano, reconciliável — segura fora do laboratório. *(A partição de visibilidade é eixo
-próprio, triada à parte; aqui entra só como evidência de que a SSOT-de-1ª-classe é padrão emergente, não
-capricho de um adotante.)*
+**Evidência convergente — três adotantes, mesmo período, mesmo método.** A SSOT-de-1ª-classe é **padrão
+emergente**, não capricho de um adotante:
+- **rhilo** (produção, WRR): SSOT-as-runtime + frescor + DEV-também — a linha-mestra deste ADR.
+- **gustavo** (consultoria, omnibus Sinais 5/6/7): a SSOT vira 1ª classe por outro eixo — **confidencialidade**:
+  *"um KG SDAAL por fronteira de confiança"* (engajamento confidencial × colaboração shareable, `D_KG_SEPARADO`),
+  com o grafo **se autocorrigindo em campo** (deep-research `REFUTED` teses, `SUPERSEDED` no ledger). Ângulo
+  ortogonal (partição × frescor); triado à parte.
+- **onion-pessoal** (uma vida, N=1): F0 da vertical Trabalho reconciliou **declarado(DEV) × vivido(PROD)** numa
+  vida — 2 `SUPERSEDES` + 1 `REFUTES` deixado de propósito → **`exit 1` honesto** (não grafo bonito e vazio). O
+  método transfere ao domínio mais sensível (não-código/não-negócio) mantendo a régua: Aufhebung append-mostly,
+  confronto DEV×PROD, radar determinístico. Sinal [`onion-pessoal-usando-dogfood-kg-sdaal`](../evolution/inbox/_processed/2026-07-16-onion-pessoal-usando-dogfood-kg-sdaal.md).
+
+Três domínios radicalmente distintos (produção, consultoria, vida) e o **mesmo motor** — append-mostly,
+soberano, reconciliável — segurou em todos. É a validação de campo mais forte que a linha KG SDAAL tem.
 
 ## Consequências
 - **Fazer (quando destravar, faseado):** os campos na gramática do `.kg.yaml`; as 3 checagens no

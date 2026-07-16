@@ -4,9 +4,9 @@ description: Orienta a sessão na co-evolução Onion core↔derivados — detec
 model: haiku
 category: meta
 tags: [co-evolution, inbox, bridge, federation, onboarding, sdaal]
-version: "1.3.0"
-updated: "2026-07-02"
-allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(bash .claude/validation/onion-version.sh)
+version: "1.4.0"
+updated: "2026-07-16"
+allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(git fetch origin*) Bash(git pull --ff-only*) Bash(git merge --ff-only origin/main*) Bash(bash .claude/validation/onion-version.sh)
 argument-hint: "(sem argumentos — lê o estado de co-evolução deste repo)"
 ---
 
@@ -32,6 +32,13 @@ Mapear: **`role: source` → CORE** (`onion-evolve`, dono do framework + protoco
 **`role: adopted` → CONSUMIDOR** (projeto que adotou o Onion, ex. vendorizado/standalone).
 
 ## Passo 2 — Ler os canais (mensagens pendentes)
+
+> **Passo 2.0 — sincronizar ANTES de ler (obrigatório).** Um sinal do **mesmo repo** (entregue via PR
+> mergeado em `origin/main`, não via doc-bridge) só "chega" ao inbox quando o **checkout de `main`
+> sincroniza** — worktrees compartilham o `.git` mas têm working trees separados; um merge no forge **não**
+> atualiza um checkout que não deu `pull`. Rode **`git fetch origin && git pull --ff-only`** (ou `git merge --ff-only origin/main`) antes de listar o inbox. Lição de campo 2026-07-16: o sinal
+> `onion-pessoal-usando-dogfood-kg-sdaal` "não chegou" na 1ª leitura por checkout 3 commits atrás. Isto
+> **complementa** o invariante "git fetch antes de evoluir" (Passo 4) — aqui é antes de **ler**, não só de escrever.
 
 Listar de 1º nível (excluir `_processed/` e `README.md`) **os dois canais** do doc-bridge:
 - **`docs/evolution/inbox/*.md`** — upstream (sinal/feedback). No core: chegando dos projetos; no consumidor: a relayar ao core.

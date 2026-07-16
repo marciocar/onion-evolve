@@ -30,6 +30,12 @@ aprende e melhora o próprio fluxo.
 4. Onde a linha **intake × execução** (o estudo) governa o que a interface pode coletar sozinha vs sob gate?
 
 ## Conexões com o que já existe
+- **Baseline conversacional (o que já funciona, antes da interface rica):**
+  [`onion-pessoal-marcio/USAGE.md`](../onion-pessoal-marcio/USAGE.md) — o "como usar pé-no-chão" (`cd
+  ~/onion-pessoal && claude` → conversar → o `.kg.yaml` mantido pela conversa → `kg-radar` é a lente). Esta
+  discussão pesquisa a interface **rica** (telemetria/padrões) que vem **depois** desse baseline. *(Gap de
+  campo N=1: o próprio criador precisou perguntar "como uso isso?" — o baseline estava indocumentado; sinal
+  `onion-pessoal-usando-dogfood-kg-sdaal`.)*
 - Estudo **camadas de liberação** (coleta é intake — pode ser autônoma de fonte permitida; execução gated).
 - `kg-console.sh` (projeção HTML do grafo), o diário (padrões→doutrina), `federation-console`.
 - Liga forte com `discuss/behavior-mapping-kg` (a coleta ampla) e `discuss/onion-mobile-app` (superfície).

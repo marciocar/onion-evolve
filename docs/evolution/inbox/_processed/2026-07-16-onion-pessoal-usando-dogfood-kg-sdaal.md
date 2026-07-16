@@ -61,7 +61,13 @@ worktree (o untracked em curso lá sobreviveu intacto). **Lição:** sinal no me
 quando o checkout de `main` **sincroniza com `origin/main`** — vale um lembrete no ritual de `/meta:co-evolve`
 (fazer `git fetch`/`pull` antes de ler o inbox).
 
-## Triagem do core (preencher na recepção)
+## Triagem do core (preenchida na recepção — 2026-07-16)
 
-- **Status:** _pendente_
-- **Roteamento:** _(registrar F0-validado na linha KG SDAAL; decidir cross-link USAGE↔interface-state-of-art)_
+- **Status:** ✅ **triado e executado** (assess não-bloqueante; 3 itens, todos pequenos e in-repo).
+- **Roteamento:**
+  1. **F0 valida KG SDAAL N=1** → registrado como **evidência convergente** (3º adotante: produção/rhilo ·
+     consultoria/gustavo · vida/onion-pessoal) na ADR [`onion-adr-kg-freshness-gate-2026-07`](../../../analysis/onion-adr-kg-freshness-gate-2026-07.md) §SSOT-as-runtime.
+  2. **Cross-link USAGE↔interface-state-of-art** → feito: ponteiro em `interface-state-of-art/SEED.md`
+     (baseline conversacional **antes** da interface rica).
+  3. **Gap de processo** (o sinal "não chegou" por checkout stale) → **corrigido no framework**: `/meta:co-evolve`
+     Passo 2.0 agora manda `git fetch`/`pull` **antes** de ler o inbox (v1.4.0). Auto-demonstrado por este sinal.
