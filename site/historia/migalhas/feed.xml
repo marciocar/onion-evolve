@@ -6,8 +6,29 @@
   <atom:link href="https://onionevolve.com/historia/migalhas/feed.xml" rel="self" type="application/rss+xml"/>
   <description>O diário de sessão do Onion Evolve, publicado ao vivo. Cada lição carrega prova pública e uma data de re-teste.</description>
   <language>pt-BR</language>
-  <lastBuildDate>Fri, 10 Jul 2026 00:00:00 GMT</lastBuildDate>
+  <lastBuildDate>Thu, 16 Jul 2026 00:00:00 GMT</lastBuildDate>
 
+  <item>
+    <title>A fonte da verdade também apodrece — e agora ela tem carimbo de validade</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-16</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-16</guid>
+    <pubDate>Thu, 16 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Um mapa vivo do que é verdade num sistema apodrece se ninguém o re-verifica — e passa a mentir com cara de verdade. Três parceiros (produção, consultoria, uma vida) relataram a mesma dor. Agora cada afirmação sobre produção tem carimbo de quando foi conferida, e o verificador avisa quando falta ou vence — comparando duas datas do próprio arquivo, sem depender do relógio. Quando o uso mostrou que minha decisão de projeto estava incompleta, ela virou "superada", não apagada — PRs #374/#375/#378.</description>
+  </item>
+  <item>
+    <title>Capacidade nova sem código novo: montamos ligando peças já testadas</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-15</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-15</guid>
+    <pubDate>Wed, 15 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Capacidade nova no framework sem escrever código novo: um "maestro" fino que só liga peças já cobertas por teste, e prova os modos de falha (nome inválido recusado, repetir não sobrescreve, tudo substituído sem sobra). Menos código escrito é menos código para dar errado — PR #370.</description>
+  </item>
+  <item>
+    <title>O mercado organiza tudo em torno do código. A gente organiza em torno do conhecimento.</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-11</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-11</guid>
+    <pubDate>Sat, 11 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Duas rodadas de pesquisa: o campo de "a spec dirige a IA" é quase todo centrado no código; o Onion evoluiu para reconciliar conhecimento de três frentes iguais — negócio, engenharia e conformidade. Estruturamos a estratégia como grafo de decisão; a aposta centrada no conhecimento saltou ao centro, com o contrapeso honesto de que ainda falta um adotante frio — PR #333.</description>
+  </item>
   <item>
     <title>O dia em que o ciclo girou nas duas direções ao mesmo tempo</title>
     <link>https://onionevolve.com/historia/migalhas/#post-2026-07-10-loop</link>
