@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 32 entradas · **Stale:** 0 · **Compartilháveis:** 23
+**Total:** 33 entradas · **Stale:** 0 · **Compartilháveis:** 23
 
 Gerado em: 2026-07-16
 
@@ -12,6 +12,7 @@ Gerado em: 2026-07-16
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-16 | decision | protected | two-homes-origin-and-coexistence | 2026-10-14 | static |
 | 2026-07-16 | decision | protected | kg-sdaal-dogfood-gold-backlog | 2026-10-14 | conditional |
 | 2026-07-16 | decision | protected | gustavo-omnibus-backlog | 2026-10-14 | conditional |
 | 2026-07-16 | innovation | public 📤 | deterministic-freshness-via-in-file-baseline | 2026-10-14 | static |
