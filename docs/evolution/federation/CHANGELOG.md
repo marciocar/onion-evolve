@@ -8,7 +8,23 @@
 
 ---
 
-## 2026-07-16 · KG-SSOT ganha guardas de FRESCOR + SCHEMA e a doutrina SSOT-as-runtime (crédito: seus sinais de campo) · COMPATÍVEL · alvo: metagamify, marcio-pessoal, gustavo-pulga
+## 2026-07-16 · KG-first virou MECANISMO: catch-up/warm-up/work consultam o `.kg.yaml` primeiro · COMPATÍVEL · alvo: metagamify, marcio-pessoal, gustavo-pulga
+
+- **De onde veio:** o sinal `mandar-a-doutrina-kg-first` do **metagamify** (alta prioridade): *"KG-first não
+  pode ser conselho, tem que ser mecanismo"*. A prova foi dura — o **próprio autor da doutrina reincidiu ≥4×**
+  na mesma sessão (planejou um redesenho sem consultar o KG; só consultou quando o maestro perguntou "está
+  fazendo SSOT-first?"; aí o grafo corrigiu 4 coisas). Conselho-que-depende-de-lembrar **já falhou
+  empiricamente**. Só mecanismo conserta.
+- **O que mudou (forcing function core-only):** os comandos de loop ganharam um **Passo 0 / primeiro ato** —
+  se existir um `.kg.yaml` no repo, **consultá-lo ANTES** de reconstruir de git/memória (é o SSOT de "onde
+  estamos", acima do git): `catch-up` (v1.1.0), `warm-up` (v3.3.0), `engineer:work` (v3.1.0). Rodam o radar,
+  citam **ids de nó** e fazem **drive-to-verify** (cruzar claims `plane:PROD` de alto impacto contra o vivo).
+- **Por que só o core entrega isto:** memória/CLAUDE.md/hook o adotante improvisa em 1 projeto; **cabear no
+  runtime dos comandos** é uniforme pra todos e não depende de reinventar. É o par operacional da doutrina
+  SSOT-as-runtime já anunciada (`read(KG)→verify(vivo)→act→write(KG)`).
+- **Ação p/ você:** `/meta:adopt --update` traz os comandos novos. Se você tem um `.kg.yaml`, o loop passa a
+  consultá-lo por padrão — nada a fazer além de atualizar. Design: ADR `onion-adr-kg-freshness-gate-2026-07`
+  (proposta #5, DONE). Próximo tier (ainda não): hook-template KG-first + `kg state`.
 
 - **De onde veio:** os **seus sinais de campo** desta rodada. metagamify (o "ouro" do dogfood WRR +
   `ssot-como-runtime`), gustavo-pulga (omnibus: KG por fronteira de confiança, auto-correção em campo),
