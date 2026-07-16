@@ -24,9 +24,10 @@ Ordem por alavanca × custo (dogfood: barato→caro, helper→fiação→campo):
 
 - **#2 ⭐ Frescor PROD (a flagship, maior buraco):** campo `verified_at:` (+ `verified_against:`) por nó
   `plane: PROD` + gate no `kg-radar.sh` que grita **STALE** quando o nó é mais antigo que a baseline/dump.
-  Sem isso o apodrecimento da SSOT é *inevitável* — "uma bela SSOT que mente". **Merece ADR próprio.**
+  Sem isso o apodrecimento da SSOT é *inevitável* — "uma bela SSOT que mente". **ADR ABERTO** →
+  `[[onion-adr-kg-freshness-gate-2026-07]]` (desenho + plano faseado F1-F3; código pendente).
 - **#1 schema_version + gate:** `schema_version:` no `meta:`; radar recusa/migra na divergência. Teria
-  pego o fork `scripts/kg`↔`kg-radar.sh` no dia 1. **Costurar no mesmo ADR do #2** (ambos = "radar
+  pego o fork `scripts/kg`↔`kg-radar.sh` no dia 1. **Costurado no ADR do #2** (ambos = "radar
   recusa/avisa quando a SSOT driftou"). Verificado ausente hoje.
 - **#3 Robustez do parser (hardening):** guard de linter no `lint-selftest` reprovando `label:`/`trace:`
   com substring de keyword (`plane:`/`status:`/`impact:`) + regra "campos livres antes dos escalares"
