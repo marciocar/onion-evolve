@@ -93,6 +93,31 @@ arestas, 4 fatias de domínio, o SLOT-limbo **emergiu do modelo** como bug estru
 achado de auditoria). Pragmatismo herdado do dogfood: **mesmo arquivo, campo `layer`** — separar em
 `*.domain.kg.yaml`/`*.audit.kg.yaml` só se a escala pedir.
 
+### Footguns ao autorar o `.kg.yaml` (armadilhas de campo)
+
+Aprendido no dogfood intenso do adotante rhilo-metagamify (2026-07-15/16, reconciliação do SSOT
+WRR/Modo Equilíbrio): a autoria do `.kg.yaml` tem armadilhas silenciosas que **corrompem o grafo
+sem erro visível**. Evite:
+
+- **`on:` vira booleano `True` (YAML 1.1).** A chave `on:` de `TRANSITIONS ... on: EVENTO` é
+  interpretada como o booleano `true` pelo parser YAML 1.1 → **os gatilhos de transição somem** (no
+  campo: 9 gatilhos perdidos numa migração, um estado-absorvente **falso** apareceu). **Cite o evento
+  entre aspas** (`on: "EVENTO"`) ou trate a chave `True` ao ler; nunca deixe `on:` nu.
+- **Colisão de keyword-substring com o radar.** O `kg-radar.sh` é awk puro (por design determinístico:
+  não aluga LLM) e captura campos por substring de linha (`plane:`/`status:`/`impact:`), tomando a
+  **última** ocorrência. Um campo livre — `label:`, `trace:`, `reason:` — cujo **texto** contenha
+  `plane:`/`status:`/etc. **sobrescreve o campo real**. Regra: **emita os campos livres ANTES dos
+  escalares** no bloco do nó (para o escalar real vencer), e evite as substrings de keyword dentro de
+  texto livre. É footgun garantido — trate como convenção, não como acaso.
+- **Vírgulas finais em flow-maps.** Trailing commas em mapas inline quebram o parse silenciosamente na
+  migração — revise antes de rodar o radar.
+
+> **A lição-mestra do mesmo dogfood** (frescor): um nó `plane: PROD` é uma **foto**; sem carimbo de
+> *quando/contra o quê foi verificado*, ele envelhece e o leitor (humano **ou IA**) confia no stale —
+> "uma bela SSOT que mente". A disciplina de frescor (`verified_at:` + gate STALE no radar) é feature
+> em backlog derivada deste sinal; até existir, **re-execute as claims `PROD` contra o estado vivo**
+> (cruzar KG + código `arquivo:linha` + dump fresco) antes de confiar nelas.
+
 ## As quatro saídas (o que uma ferramenta `radar` computa)
 
 1. **RADAR** — perguntas/decisões abertas ranqueadas por **atenção = impacto × confiança ×
