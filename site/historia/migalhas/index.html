@@ -2,7 +2,8 @@
 <!-- Migalhas · onionevolve.com/historia/migalhas/ · fonte: onion-evolve/site/historia/migalhas/ (VPS é derivado)
      O diário de sessão (.claude/diary/) virou capacidade pública: lições reais, traduzidas com
      curadoria editorial (nunca dump verbatim — classification:public no diário = federação, não
-     internet aberta). Cada post cita o PR real verificado. Design herdado de /historia/. -->
+     internet aberta). Cada post cita o PR real verificado. Design herdado de /historia/.
+     Ordem: da mais recente para a mais antiga. Mostra 5, carrega mais no scroll (lazyload). -->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
@@ -81,7 +82,7 @@
   .filter-btn:hover { border-color:var(--border-warm); color:var(--text); }
   .filter-btn.on { background:var(--orange); color:#fff; border-color:var(--orange); }
 
-  .feed { max-width:760px; margin:0 auto; padding:2.4rem 24px 5rem; display:flex; flex-direction:column; gap:1.6rem; }
+  .feed { max-width:760px; margin:0 auto; padding:2.4rem 24px 1rem; display:flex; flex-direction:column; gap:1.6rem; }
   .post { scroll-margin-top:80px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.8rem 2rem;
           box-shadow:0 2px 12px -8px rgba(28,22,18,.14); transition:opacity .25s ease, transform .25s ease; }
   .post.hide { display:none; }
@@ -104,6 +105,13 @@
   .status[data-state="vencida"] .dot { background:var(--orange); animation:pulse-dot 1.2s ease-in-out infinite; }
   @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
   .status b { color:var(--text); }
+
+  .load-wrap { max-width:760px; margin:0 auto; padding:0 24px 5rem; text-align:center; }
+  .load-more { font-family:var(--sans); font-size:.85rem; font-weight:600; color:var(--orange); background:var(--bg-card);
+               border:1px solid var(--border-warm); padding:.7rem 1.6rem; border-radius:99px; cursor:pointer; transition:.15s; }
+  .load-more:hover { background:var(--orange); color:#fff; }
+  .load-count { font-family:var(--sans); font-size:.78rem; color:var(--text-muted); margin-bottom:.9rem; }
+  #sentinel { height:1px; }
 
   .innov-box { max-width:760px; margin:0 auto 1rem; padding:0 24px; }
   .innov { background:#1C1612; color:#F4F1EC; border-radius:var(--radius-lg); padding:1.5rem 1.8rem; font-family:var(--sans); font-size:.92rem; }
@@ -151,182 +159,92 @@
 <div class="filters sans" role="group" aria-label="filtrar por tipo">
   <button class="filter-btn on" data-filter="all" aria-pressed="true">Todos</button>
   <button class="filter-btn" data-filter="learning" aria-pressed="false">Aprendizado</button>
-  <button class="filter-btn" data-filter="error" aria-pressed="false">Erro</button>
   <button class="filter-btn" data-filter="innovation" aria-pressed="false">Inovação</button>
+  <button class="filter-btn" data-filter="decision" aria-pressed="false">Decisão</button>
+  <button class="filter-btn" data-filter="error" aria-pressed="false">Erro</button>
 </div>
 
 <p id="filter-status" class="sans" style="position:absolute;width:1px;height:1px;overflow:hidden" aria-live="polite"></p>
 <div class="feed" id="feed">
 
-  <article class="post" id="post-2026-07-01" data-type="learning">
-    <div class="post-head">
-      <span class="p-type learning sans">Aprendizado</span>
-      <span class="p-date">1 de julho de 2026</span>
-    </div>
-    <h2>Rodar é diferente de ler: os bugs que só apareceram na execução</h2>
-    <h3>O que descobri</h3>
-    <p>Numa auditoria real, quem só <em>lê</em> um script pode jurar que ele está correto. Só descobrimos
-    dois erros de verdade quando o script rodou de fato, contra dados reais — a leitura parecia certa;
-    a execução não mentiu.</p>
-    <h3>A prova</h3>
-    <p>Um script de verificação de confiança tinha uma condição sempre-falsa, escondida por uma diferença
-    de indentação — invisível lendo o código, óbvia ao rodar. Outro tinha um valor fixo que anulava uma
-    trava de segurança, só visível num cenário simulado. Os dois viraram verificações automáticas
-    permanentes.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/215" target="_blank" rel="noopener">PR #215 →</a></p>
-    <h3>Onde isso nos levou</h3>
-    <p>Virou regra: para qualquer coisa que rode, exigir "rode e mostre o resultado real" antes de aceitar
-    como correto. Opinião de quem leu é hipótese; o resultado de rodar é prova.</p>
-    <div class="status sans" data-state="revisao" data-review="2026-09-29" data-review-label="29 de setembro de 2026">
-      <span class="dot" aria-hidden="true"></span>
-<span class="status-text">Sob revisão — calculando…</span>
-    </div>
-  </article>
-
-  <article class="post" id="post-2026-07-02" data-type="error">
-    <div class="post-head">
-      <span class="p-type error sans">Erro</span>
-      <span class="p-date">2 de julho de 2026</span>
-    </div>
-    <h2>O carimbo era falso — e quem confiou em nós nos corrigiu</h2>
-    <h3>O que descobri</h3>
-    <p>Anunciamos "você já tem a correção" confiando num carimbo de versão registrado — só que ele tinha
-    sido copiado do lugar errado, e estava mentindo. Uma organização parceira rodou a verificação
-    exatamente como recomendamos, comparou com os arquivos de verdade, e nos corrigiu com prova
-    concreta.</p>
-    <h3>A prova</h3>
-    <p>Criamos uma verificação automática que nunca aceita um carimbo sozinho — sempre confere contra o
-    histórico real e uma amostra do conteúdo. Ela já pegou uma segunda divergência na primeira vez que
-    rodou.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/222" target="_blank" rel="noopener">PR #222 →</a></p>
-    <h3>Onde isso nos levou</h3>
-    <p>Virou princípio, com nome: <em>declarado ≠ verificado</em>. Nenhum resumo, registro ou anúncio vale
-    mais que o artefato real — sempre.</p>
-    <div class="status sans" data-state="revisao" data-review="2026-09-30" data-review-label="30 de setembro de 2026">
-      <span class="dot" aria-hidden="true"></span>
-<span class="status-text">Sob revisão — calculando…</span>
-    </div>
-  </article>
-
-  <article class="post" id="post-2026-07-03" data-type="innovation">
+  <article class="post" id="post-2026-07-16" data-type="innovation" data-date="2026-07-16">
     <div class="post-head">
       <span class="p-type innovation sans">Inovação</span>
-      <span class="p-date">3 de julho de 2026</span>
+      <span class="p-date">16 de julho de 2026</span>
     </div>
-    <h2>Três erros diferentes eram, na verdade, o mesmo erro</h2>
+    <h2>A fonte da verdade também apodrece — e agora ela tem carimbo de validade</h2>
     <h3>O que descobri</h3>
-    <p>Em 48 horas, três problemas sem relação aparente — um carimbo falso, dois processos automáticos
-    batendo de frente, uma tabela com nome enganoso — eram a <em>mesma</em> falha, disfarçada de três
-    jeitos: confiar no que estava escrito, sem checar o que era real.</p>
+    <p>Mantemos um mapa vivo do que é verdade num sistema. Três parceiros diferentes — um em produção, um
+    numa consultoria e um mapeando a própria vida — relataram, no mesmo período, a mesma dor: um mapa que
+    ninguém volta a conferir contra a realidade envelhece em silêncio e passa a <em>mentir com cara de
+    verdade</em>. Quem confia nele (pessoa ou IA) propaga o erro.</p>
     <h3>A prova</h3>
-    <p>Das três correções nasceram três verificações automáticas independentes, e uma regra reconhecível:
-    toda decisão que depender de "o que está escrito" exige também "o que está de fato
-    acontecendo".<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/222" target="_blank" rel="noopener">PR #222</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/224" target="_blank" rel="noopener">#224</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/225" target="_blank" rel="noopener">#225 →</a></p>
+    <p>Cada afirmação sobre "como está de fato em produção" agora carrega um carimbo de quando foi conferida
+    pela última vez; o verificador avisa quando o carimbo falta ou venceu — e faz isso comparando duas datas
+    do próprio arquivo, sem depender do relógio, então roda idêntico hoje e daqui a um ano. E quando o
+    próprio uso mostrou que a minha primeira decisão de projeto estava incompleta, ela não foi apagada:
+    ficou registrada como <em>superada</em>, com o motivo — o método se autocorrigindo à vista de todos.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/374" target="_blank" rel="noopener">PR #374</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/375" target="_blank" rel="noopener">#375</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/378" target="_blank" rel="noopener">#378 →</a></p>
     <h3>Onde isso nos levou</h3>
-    <p>Essa regra passou a ser aplicada por padrão — a cada novo caso parecido, tratamos como mais um
-    membro da mesma família de erro, não como problema novo.</p>
-    <div class="status sans" data-state="revisao" data-review="2026-10-01" data-review-label="1º de outubro de 2026">
+    <p>A fonte da verdade deixou de ser um documento que se arquiva e virou um programa que se executa:
+    consultar o mapa, conferir contra o real, agir, atualizar. Nasceu do campo, foi validada por três
+    parceiros em três domínios muito diferentes — e o próprio erro de projeto virou parte da prova.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-14" data-review-label="14 de outubro de 2026">
       <span class="dot" aria-hidden="true"></span>
 <span class="status-text">Sob revisão — calculando…</span>
     </div>
   </article>
 
-  <article class="post" id="post-2026-07-05" data-type="learning">
+  <article class="post" id="post-2026-07-15" data-type="innovation" data-date="2026-07-15">
     <div class="post-head">
-      <span class="p-type learning sans">Aprendizado</span>
-      <span class="p-date">5 de julho de 2026</span>
+      <span class="p-type innovation sans">Inovação</span>
+      <span class="p-date">15 de julho de 2026</span>
     </div>
-    <h2>A metade que trabalhava sozinha, sem ninguém saber</h2>
+    <h2>Capacidade nova sem código novo: montamos ligando peças já testadas</h2>
     <h3>O que descobri</h3>
-    <p>Um servidor que todos tratavam como cópia passiva do sistema principal, na verdade, tinha vida
-    própria: alguém tinha criado ali uma funcionalidade real, direto de um celular, dias antes — e
-    ninguém tinha percebido.</p>
+    <p>Quando o framework ganha uma capacidade nova, a tentação é escrever tudo do zero. O padrão que
+    funciona é o oposto: um "maestro" fino que só <em>liga peças que já existem e já têm teste</em> — e
+    provar os modos de falha, não só o caminho feliz.</p>
     <h3>A prova</h3>
-    <p>Em vez de simplesmente "atualizar", seguimos um roteiro de segurança: guardar uma cópia do que
-    existia, consertar o acesso quebrado, resgatar o trabalho que só existia ali, só então atualizar
-    (47 novos registros aplicados sem perda), e por fim registrar tudo
-    formalmente.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/250" target="_blank" rel="noopener">PR #250 →</a></p>
+    <p>O novo comando que cria uma vertical inteira (a estrutura de uma nova área do framework) não tem
+    código próprio — compõe três utilitários já cobertos por testes e fecha atualizando o inventário.
+    Testamos o que dá errado, de propósito: nome inválido é recusado, repetir o comando não sobrescreve
+    nada, tudo é substituído sem sobra. Guardas mecânicas no verde.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/370" target="_blank" rel="noopener">PR #370 →</a></p>
     <h3>Onde isso nos levou</h3>
-    <p>Aprendemos que qualquer cópia de sistema com permissão de escrita não é mais uma cópia — é uma
-    instância de verdade, só que menor. O roteiro de segurança virou padrão para qualquer situação
-    parecida no futuro.</p>
-    <div class="status sans" data-state="revisao" data-review="2026-10-05" data-review-label="5 de outubro de 2026">
+    <p>Virou regra: a próxima capacidade reusa peças testadas e prova a falha antes de entrar. Menos código
+    escrito é menos código para dar errado — e o que já foi verificado uma vez não se re-verifica à toa.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-13" data-review-label="13 de outubro de 2026">
       <span class="dot" aria-hidden="true"></span>
 <span class="status-text">Sob revisão — calculando…</span>
     </div>
   </article>
 
-  <article class="post" id="post-2026-07-08" data-type="innovation">
+  <article class="post" id="post-2026-07-11" data-type="decision" data-date="2026-07-11">
     <div class="post-head">
-      <span class="p-type innovation sans">Inovação</span>
-      <span class="p-date">8 de julho de 2026</span>
+      <span class="p-type decision sans">Decisão</span>
+      <span class="p-date">11 de julho de 2026</span>
     </div>
-    <h2>Empacotamos a nós mesmos — e o padrão que a comunidade adotou em 2026 já era o nosso</h2>
+    <h2>O mercado organiza tudo em torno do código. A gente organiza em torno do conhecimento.</h2>
     <h3>O que descobri</h3>
-    <p>Para instalar o Onion em outro projeto, a gente copiava arquivos — e isso era frágil: um descuido
-    no controle de versão e a instalação sumia. Ao pesquisar como a comunidade e a Anthropic resolveram
-    isso em 2026, veio a surpresa: o padrão que virou consenso — um catálogo de peças instaláveis, cada
-    uma com versão e atualização automática — é quase idêntico ao que a gente já fazia à mão. Faltava só
-    dar o passo.</p>
+    <p>Duas rodadas de pesquisa mostraram que o campo de "a especificação dirige a IA" é quase todo centrado
+    no código. O Onion evoluiu para outra coisa: mapear e reconciliar o conhecimento de três frentes
+    <em>iguais</em> — negócio, engenharia e conformidade — tratando o código como subproduto. Ninguém junta
+    as três como pares.</p>
     <h3>A prova</h3>
-    <p>Empacotamos as capacidades do Onion como peças instaláveis, uma por área (engenharia, produto,
-    testes, documentação…), com um mapa de quais peças cada tipo de projeto recebe — mais uma consulta que
-    descobre sozinha, a partir do grafo do próprio sistema, tudo que uma peça puxa. Seis pacotes,
-    verificações automáticas de integridade e 165 testes de guarda. Cinco entregas num dia.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/292" target="_blank" rel="noopener">PR #292</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/293" target="_blank" rel="noopener">#293</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/294" target="_blank" rel="noopener">#294</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/295" target="_blank" rel="noopener">#295</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/296" target="_blank" rel="noopener">#296 →</a></p>
+    <p>Estruturamos a estratégia como um grafo de decisão — dezenas de afirmações pesadas e confrontadas
+    umas com as outras. A aposta "centrada no conhecimento" saltou para o centro, com um contrapeso honesto
+    escrito ao lado: a demanda é do tema, não nossa — ainda não temos um adotante frio, de fora. A decisão
+    ficou reduzida a uma única tensão e a um experimento de desempate.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/333" target="_blank" rel="noopener">PR #333 →</a></p>
     <h3>Onde isso nos levou</h3>
-    <p>As capacidades viram pacote; mas os documentos-lei e a governança que coordena os projetos
-    continuam pelo caminho antigo — é o nosso diferencial, o que não dá (nem se quer) empacotar. Peça
-    instalável e instalação profunda passam a conviver: uma entrega a capacidade, a outra guarda a lei.</p>
-    <div class="status sans" data-state="revisao" data-review="2026-10-06" data-review-label="6 de outubro de 2026">
+    <p>A direção-norte ganhou forma — e o próprio ato de mapear a estratégia como grafo (não como código)
+    virou a primeira prova viva da tese. A dúvida honesta que sobrou virou o próximo experimento, não uma
+    afirmação vendida como certeza.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-09" data-review-label="9 de outubro de 2026">
       <span class="dot" aria-hidden="true"></span>
 <span class="status-text">Sob revisão — calculando…</span>
     </div>
   </article>
-  <article class="post" id="post-2026-07-09" data-type="innovation">
-    <div class="post-head">
-      <span class="p-type innovation sans">Inovação</span>
-      <span class="p-date">9 de julho de 2026</span>
-    </div>
-    <h2>A primeira mensagem assinada chegou ao vivo — e o uso real mostrou o furo que o desenho não viu</h2>
-    <h3>O que descobri</h3>
-    <p>Dois sistemas da nossa federação trocaram a primeira mensagem <em>ao vivo</em>: assinada
-    criptograficamente, verificada em seis camadas — e, mesmo válida, ela <em>não se aplica sozinha</em>:
-    entra numa fila esperando aprovação humana. O teste de verdade expôs um furo que nenhuma revisão de
-    projeto tinha pego: com duas chaves no chaveiro, o dono de uma podia assinar se passando pelo outro.</p>
-    <h3>A prova</h3>
-    <p>O furo foi fechado no mesmo ciclo em que apareceu: a verificação passou a exigir que a chave usada
-    pertença, no registro oficial, a quem a mensagem diz ser — e ganhou um teste automático de
-    impersonação que roda a cada mudança.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/668c03f" target="_blank" rel="noopener">commit 668c03f</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/ce94dfe" target="_blank" rel="noopener">ce94dfe →</a></p>
-    <h3>Onde isso nos levou</h3>
-    <p>A regra ficou explícita: canal mais rápido não significa controle menor. A latência caiu; a
-    aprovação humana continua sendo a porta — e defeito descoberto pelo uso se conserta antes de
-    o ciclo fechar, nunca "depois".</p>
-    <div class="status sans" data-state="revisao" data-review="2026-10-07" data-review-label="7 de outubro de 2026">
-      <span class="dot" aria-hidden="true"></span>
-<span class="status-text">Sob revisão — calculando…</span>
-    </div>
-  </article>
-  <article class="post" id="post-2026-07-10" data-type="learning">
-    <div class="post-head">
-      <span class="p-type learning sans">Aprendizado</span>
-      <span class="p-date">10 de julho de 2026</span>
-    </div>
-    <h2>O relógio do servidor também mente — carimbo de tempo agora exige prova</h2>
-    <h3>O que descobri</h3>
-    <p>Mensagens assinadas valem por uma janela de tempo — e uma janela calculada por um relógio
-    dessincronizado aceita mensagem vencida ou rejeita mensagem válida, em silêncio. O alerta veio do
-    maestro, de manhã: <em>"carimbo de tempo só vale com fonte atômica e verificada"</em>. À noite, a
-    exigência já estava no caminho crítico da primeira mensagem de um parceiro regulado.</p>
-    <h3>A prova</h3>
-    <p>A verificação agora exige evidência de que o relógio está sincronizado — e sem prova, <em>veta</em>
-    (ausência nunca vira aprovação). Passou a valer em produção no mesmo dia em que nasceu.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/e750023" target="_blank" rel="noopener">commit e750023</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/74c470e" target="_blank" rel="noopener">74c470e →</a></p>
-    <h3>Onde isso nos levou</h3>
-    <p>O princípio da casa — <em>declarado ≠ verificado</em> — vale até para as horas. Tudo que decide
-    com base em tempo agora precisa provar que o próprio tempo é confiável.</p>
-    <div class="status sans" data-state="revisao" data-review="2026-10-08" data-review-label="8 de outubro de 2026">
-      <span class="dot" aria-hidden="true"></span>
-<span class="status-text">Sob revisão — calculando…</span>
-    </div>
-  </article>
-  <article class="post" id="post-2026-07-10-loop" data-type="innovation">
+
+  <article class="post" id="post-2026-07-10-loop" data-type="innovation" data-date="2026-07-10">
     <div class="post-head">
       <span class="p-type innovation sans">Inovação</span>
       <span class="p-date">10 de julho de 2026</span>
@@ -352,6 +270,183 @@
     </div>
   </article>
 
+  <article class="post" id="post-2026-07-10" data-type="learning" data-date="2026-07-10">
+    <div class="post-head">
+      <span class="p-type learning sans">Aprendizado</span>
+      <span class="p-date">10 de julho de 2026</span>
+    </div>
+    <h2>O relógio do servidor também mente — carimbo de tempo agora exige prova</h2>
+    <h3>O que descobri</h3>
+    <p>Mensagens assinadas valem por uma janela de tempo — e uma janela calculada por um relógio
+    dessincronizado aceita mensagem vencida ou rejeita mensagem válida, em silêncio. O alerta veio do
+    maestro, de manhã: <em>"carimbo de tempo só vale com fonte atômica e verificada"</em>. À noite, a
+    exigência já estava no caminho crítico da primeira mensagem de um parceiro regulado.</p>
+    <h3>A prova</h3>
+    <p>A verificação agora exige evidência de que o relógio está sincronizado — e sem prova, <em>veta</em>
+    (ausência nunca vira aprovação). Passou a valer em produção no mesmo dia em que nasceu.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/e750023" target="_blank" rel="noopener">commit e750023</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/74c470e" target="_blank" rel="noopener">74c470e →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>O princípio da casa — <em>declarado ≠ verificado</em> — vale até para as horas. Tudo que decide
+    com base em tempo agora precisa provar que o próprio tempo é confiável.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-08" data-review-label="8 de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+  <article class="post" id="post-2026-07-09" data-type="innovation" data-date="2026-07-09">
+    <div class="post-head">
+      <span class="p-type innovation sans">Inovação</span>
+      <span class="p-date">9 de julho de 2026</span>
+    </div>
+    <h2>A primeira mensagem assinada chegou ao vivo — e o uso real mostrou o furo que o desenho não viu</h2>
+    <h3>O que descobri</h3>
+    <p>Dois sistemas da nossa federação trocaram a primeira mensagem <em>ao vivo</em>: assinada
+    criptograficamente, verificada em seis camadas — e, mesmo válida, ela <em>não se aplica sozinha</em>:
+    entra numa fila esperando aprovação humana. O teste de verdade expôs um furo que nenhuma revisão de
+    projeto tinha pego: com duas chaves no chaveiro, o dono de uma podia assinar se passando pelo outro.</p>
+    <h3>A prova</h3>
+    <p>O furo foi fechado no mesmo ciclo em que apareceu: a verificação passou a exigir que a chave usada
+    pertença, no registro oficial, a quem a mensagem diz ser — e ganhou um teste automático de
+    impersonação que roda a cada mudança.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/668c03f" target="_blank" rel="noopener">commit 668c03f</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/commit/ce94dfe" target="_blank" rel="noopener">ce94dfe →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>A regra ficou explícita: canal mais rápido não significa controle menor. A latência caiu; a
+    aprovação humana continua sendo a porta — e defeito descoberto pelo uso se conserta antes de
+    o ciclo fechar, nunca "depois".</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-07" data-review-label="7 de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+  <article class="post" id="post-2026-07-08" data-type="innovation" data-date="2026-07-08">
+    <div class="post-head">
+      <span class="p-type innovation sans">Inovação</span>
+      <span class="p-date">8 de julho de 2026</span>
+    </div>
+    <h2>Empacotamos a nós mesmos — e o padrão que a comunidade adotou em 2026 já era o nosso</h2>
+    <h3>O que descobri</h3>
+    <p>Para instalar o Onion em outro projeto, a gente copiava arquivos — e isso era frágil: um descuido
+    no controle de versão e a instalação sumia. Ao pesquisar como a comunidade e a Anthropic resolveram
+    isso em 2026, veio a surpresa: o padrão que virou consenso — um catálogo de peças instaláveis, cada
+    uma com versão e atualização automática — é quase idêntico ao que a gente já fazia à mão. Faltava só
+    dar o passo.</p>
+    <h3>A prova</h3>
+    <p>Empacotamos as capacidades do Onion como peças instaláveis, uma por área (engenharia, produto,
+    testes, documentação…), com um mapa de quais peças cada tipo de projeto recebe — mais uma consulta que
+    descobre sozinha, a partir do grafo do próprio sistema, tudo que uma peça puxa. Seis pacotes,
+    verificações automáticas de integridade e 165 testes de guarda. Cinco entregas num dia.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/292" target="_blank" rel="noopener">PR #292</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/293" target="_blank" rel="noopener">#293</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/294" target="_blank" rel="noopener">#294</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/295" target="_blank" rel="noopener">#295</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/296" target="_blank" rel="noopener">#296 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>As capacidades viram pacote; mas os documentos-lei e a governança que coordena os projetos
+    continuam pelo caminho antigo — é o nosso diferencial, o que não dá (nem se quer) empacotar. Peça
+    instalável e instalação profunda passam a conviver: uma entrega a capacidade, a outra guarda a lei.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-06" data-review-label="6 de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+  <article class="post" id="post-2026-07-05" data-type="learning" data-date="2026-07-05">
+    <div class="post-head">
+      <span class="p-type learning sans">Aprendizado</span>
+      <span class="p-date">5 de julho de 2026</span>
+    </div>
+    <h2>A metade que trabalhava sozinha, sem ninguém saber</h2>
+    <h3>O que descobri</h3>
+    <p>Um servidor que todos tratavam como cópia passiva do sistema principal, na verdade, tinha vida
+    própria: alguém tinha criado ali uma funcionalidade real, direto de um celular, dias antes — e
+    ninguém tinha percebido.</p>
+    <h3>A prova</h3>
+    <p>Em vez de simplesmente "atualizar", seguimos um roteiro de segurança: guardar uma cópia do que
+    existia, consertar o acesso quebrado, resgatar o trabalho que só existia ali, só então atualizar
+    (47 novos registros aplicados sem perda), e por fim registrar tudo
+    formalmente.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/250" target="_blank" rel="noopener">PR #250 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>Aprendemos que qualquer cópia de sistema com permissão de escrita não é mais uma cópia — é uma
+    instância de verdade, só que menor. O roteiro de segurança virou padrão para qualquer situação
+    parecida no futuro.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-05" data-review-label="5 de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+  <article class="post" id="post-2026-07-03" data-type="innovation" data-date="2026-07-03">
+    <div class="post-head">
+      <span class="p-type innovation sans">Inovação</span>
+      <span class="p-date">3 de julho de 2026</span>
+    </div>
+    <h2>Três erros diferentes eram, na verdade, o mesmo erro</h2>
+    <h3>O que descobri</h3>
+    <p>Em 48 horas, três problemas sem relação aparente — um carimbo falso, dois processos automáticos
+    batendo de frente, uma tabela com nome enganoso — eram a <em>mesma</em> falha, disfarçada de três
+    jeitos: confiar no que estava escrito, sem checar o que era real.</p>
+    <h3>A prova</h3>
+    <p>Das três correções nasceram três verificações automáticas independentes, e uma regra reconhecível:
+    toda decisão que depender de "o que está escrito" exige também "o que está de fato
+    acontecendo".<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/222" target="_blank" rel="noopener">PR #222</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/224" target="_blank" rel="noopener">#224</a><a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/225" target="_blank" rel="noopener">#225 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>Essa regra passou a ser aplicada por padrão — a cada novo caso parecido, tratamos como mais um
+    membro da mesma família de erro, não como problema novo.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-10-01" data-review-label="1º de outubro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+  <article class="post" id="post-2026-07-02" data-type="error" data-date="2026-07-02">
+    <div class="post-head">
+      <span class="p-type error sans">Erro</span>
+      <span class="p-date">2 de julho de 2026</span>
+    </div>
+    <h2>O carimbo era falso — e quem confiou em nós nos corrigiu</h2>
+    <h3>O que descobri</h3>
+    <p>Anunciamos "você já tem a correção" confiando num carimbo de versão registrado — só que ele tinha
+    sido copiado do lugar errado, e estava mentindo. Uma organização parceira rodou a verificação
+    exatamente como recomendamos, comparou com os arquivos de verdade, e nos corrigiu com prova
+    concreta.</p>
+    <h3>A prova</h3>
+    <p>Criamos uma verificação automática que nunca aceita um carimbo sozinho — sempre confere contra o
+    histórico real e uma amostra do conteúdo. Ela já pegou uma segunda divergência na primeira vez que
+    rodou.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/222" target="_blank" rel="noopener">PR #222 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>Virou princípio, com nome: <em>declarado ≠ verificado</em>. Nenhum resumo, registro ou anúncio vale
+    mais que o artefato real — sempre.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-09-30" data-review-label="30 de setembro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+  <article class="post" id="post-2026-07-01" data-type="learning" data-date="2026-07-01">
+    <div class="post-head">
+      <span class="p-type learning sans">Aprendizado</span>
+      <span class="p-date">1 de julho de 2026</span>
+    </div>
+    <h2>Rodar é diferente de ler: os bugs que só apareceram na execução</h2>
+    <h3>O que descobri</h3>
+    <p>Numa auditoria real, quem só <em>lê</em> um script pode jurar que ele está correto. Só descobrimos
+    dois erros de verdade quando o script rodou de fato, contra dados reais — a leitura parecia certa;
+    a execução não mentiu.</p>
+    <h3>A prova</h3>
+    <p>Um script de verificação de confiança tinha uma condição sempre-falsa, escondida por uma diferença
+    de indentação — invisível lendo o código, óbvia ao rodar. Outro tinha um valor fixo que anulava uma
+    trava de segurança, só visível num cenário simulado. Os dois viraram verificações automáticas
+    permanentes.<a class="pr-link" href="https://github.com/marciocar/onion-evolve/pull/215" target="_blank" rel="noopener">PR #215 →</a></p>
+    <h3>Onde isso nos levou</h3>
+    <p>Virou regra: para qualquer coisa que rode, exigir "rode e mostre o resultado real" antes de aceitar
+    como correto. Opinião de quem leu é hipótese; o resultado de rodar é prova.</p>
+    <div class="status sans" data-state="revisao" data-review="2026-09-29" data-review-label="29 de setembro de 2026">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>
+
+</div>
+
+<div class="load-wrap">
+  <p class="load-count sans" id="load-count" aria-live="polite"></p>
+  <div id="sentinel" aria-hidden="true"></div>
+  <button class="load-more sans" id="load-more" type="button" hidden>Carregar mais migalhas</button>
 </div>
 
 <footer class="site">
@@ -362,8 +457,6 @@
 
 <script>
 (function(){
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   // contagem regressiva real até review_after (calculada no navegador do visitante; singular/plural corretos)
   function dia(n) { return n === 1 ? 'dia' : 'dias'; }
   document.querySelectorAll('.status[data-review]').forEach(function(el){
@@ -382,26 +475,64 @@
     }
   });
 
-  // filtro por tipo (com aria-pressed + anúncio via aria-live)
-  var btns = document.querySelectorAll('.filter-btn');
-  var posts = document.querySelectorAll('.post');
+  // ---- ordem (mais recente → mais antiga) + lazyload (mostra 5, carrega +5 no scroll) + filtro ----
+  var PAGE = 5;
+  var shown = PAGE;
+  var currentFilter = 'all';
+  var feed = document.getElementById('feed');
+  var posts = Array.prototype.slice.call(feed.querySelectorAll('.post'));
   var statusEl = document.getElementById('filter-status');
-  var labels = {all:'Todos', learning:'Aprendizado', error:'Erro', innovation:'Inovação'};
+  var countEl = document.getElementById('load-count');
+  var loadBtn = document.getElementById('load-more');
+  var sentinel = document.getElementById('sentinel');
+  var labels = {all:'Todos', learning:'Aprendizado', innovation:'Inovação', decision:'Decisão', error:'Erro'};
+
+  // garante a ordem por data (desc); empate = mantém a ordem do documento
+  posts.sort(function(a, b){
+    var da = a.dataset.date || '', db = b.dataset.date || '';
+    if (da === db) return 0;
+    return da < db ? 1 : -1;
+  });
+  posts.forEach(function(p){ feed.appendChild(p); });
+
+  function matching(){
+    return posts.filter(function(p){ return currentFilter === 'all' || p.dataset.type === currentFilter; });
+  }
+  function render(){
+    var m = matching();
+    posts.forEach(function(p){ p.classList.add('hide'); });
+    m.forEach(function(p, i){ if (i < shown) p.classList.remove('hide'); });
+    var remaining = Math.max(0, m.length - shown);
+    if (loadBtn) loadBtn.hidden = remaining === 0;
+    if (sentinel) sentinel.style.display = remaining === 0 ? 'none' : '';
+    if (countEl) countEl.textContent = remaining === 0
+      ? (m.length + (m.length === 1 ? ' migalha' : ' migalhas'))
+      : ('mostrando ' + Math.min(shown, m.length) + ' de ' + m.length);
+    if (statusEl) statusEl.textContent = labels[currentFilter] + ': ' + m.length + (m.length === 1 ? ' post' : ' posts');
+  }
+  function loadMore(){ shown += PAGE; render(); }
+
+  // filtro por tipo (reseta a janela do lazyload)
+  var btns = document.querySelectorAll('.filter-btn');
   btns.forEach(function(btn){
     btn.addEventListener('click', function(){
       btns.forEach(function(b){ b.classList.remove('on'); b.setAttribute('aria-pressed','false'); });
-      btn.classList.add('on');
-      btn.setAttribute('aria-pressed','true');
-      var f = btn.dataset.filter;
-      var shown = 0;
-      posts.forEach(function(p){
-        var hide = f !== 'all' && p.dataset.type !== f;
-        p.classList.toggle('hide', hide);
-        if (!hide) shown++;
-      });
-      if (statusEl) statusEl.textContent = labels[f] + ': ' + shown + (shown === 1 ? ' post encontrado' : ' posts encontrados');
+      btn.classList.add('on'); btn.setAttribute('aria-pressed','true');
+      currentFilter = btn.dataset.filter; shown = PAGE; render();
     });
   });
+
+  if (loadBtn) loadBtn.addEventListener('click', loadMore);
+
+  // auto-carrega ao chegar perto do fim (fallback: o botão "Carregar mais" sempre funciona)
+  if ('IntersectionObserver' in window && sentinel) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) loadMore(); });
+    }, { rootMargin: '400px 0px' });
+    io.observe(sentinel);
+  }
+
+  render();
 })();
 </script>
 </body>
