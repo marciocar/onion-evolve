@@ -185,7 +185,7 @@
     pela última vez; o verificador avisa quando o carimbo falta ou venceu — e faz isso comparando duas datas
     do próprio arquivo, sem depender do relógio, então roda idêntico hoje e daqui a um ano. E quando o
     próprio uso mostrou que a minha primeira decisão de projeto estava incompleta, ela não foi apagada:
-    ficou registrada como <em>superada</em>, com o motivo — o método se autocorrigindo à vista de todos.<span class="pr-ref">PR #374</span><span class="pr-ref">#375</span><span class="pr-ref">#378 →</span></p>
+    ficou registrada como <em>superada</em>, com o motivo — o método se autocorrigindo à vista de todos.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-16">PR #374</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-16">#375</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-16">#378 →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>A fonte da verdade deixou de ser um documento que se arquiva e virou um programa que se executa:
     consultar o mapa, conferir contra o real, agir, atualizar. Nasceu do campo, foi validada por três
@@ -210,7 +210,7 @@
     <p>O novo comando que cria uma vertical inteira (a estrutura de uma nova área do framework) não tem
     código próprio — compõe três utilitários já cobertos por testes e fecha atualizando o inventário.
     Testamos o que dá errado, de propósito: nome inválido é recusado, repetir o comando não sobrescreve
-    nada, tudo é substituído sem sobra. Guardas mecânicas no verde.<span class="pr-ref">PR #370 →</span></p>
+    nada, tudo é substituído sem sobra. Guardas mecânicas no verde.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-15">PR #370 →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>Virou regra: a próxima capacidade reusa peças testadas e prova a falha antes de entrar. Menos código
     escrito é menos código para dar errado — e o que já foi verificado uma vez não se re-verifica à toa.</p>
@@ -235,7 +235,7 @@
     <p>Estruturamos a estratégia como um grafo de decisão — dezenas de afirmações pesadas e confrontadas
     umas com as outras. A aposta "centrada no conhecimento" saltou para o centro, com um contrapeso honesto
     escrito ao lado: a demanda é do tema, não nossa — ainda não temos um adotante frio, de fora. A decisão
-    ficou reduzida a uma única tensão e a um experimento de desempate.<span class="pr-ref">PR #333 →</span></p>
+    ficou reduzida a uma única tensão e a um experimento de desempate.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-11">PR #333 →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>A direção-norte ganhou forma — e o próprio ato de mapear a estratégia como grafo (não como código)
     virou a primeira prova viva da tese. A dúvida honesta que sobrou virou o próximo experimento, não uma
@@ -261,7 +261,7 @@
     <h3>A prova</h3>
     <p>Quatro mudanças mergeadas e anunciadas no mesmo dia: a camada de domínio do grafo de conhecimento,
     o mapeamento completo de sistemas (telas, APIs, jornadas e fluxos), o console visual e o método de
-    consolidação segura de dezenas de branches.<span class="pr-ref">PR #315</span><span class="pr-ref">#319</span><span class="pr-ref">#317</span><span class="pr-ref">#318 →</span></p>
+    consolidação segura de dezenas de branches.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-10-loop">PR #315</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-10-loop">#319</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-10-loop">#317</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-10-loop">#318 →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>O gargalo deixou de ser o transporte das ideias — passou a ser a triagem humana. E é assim que
     deve ser: a vantagem nunca foi a lentidão, é o controle. Quem dogfooda primeiro empresta o achado
@@ -285,7 +285,7 @@
     exigência já estava no caminho crítico da primeira mensagem de um parceiro regulado.</p>
     <h3>A prova</h3>
     <p>A verificação agora exige evidência de que o relógio está sincronizado — e sem prova, <em>veta</em>
-    (ausência nunca vira aprovação). Passou a valer em produção no mesmo dia em que nasceu.<span class="pr-ref">commit e750023</span><span class="pr-ref">74c470e →</span></p>
+    (ausência nunca vira aprovação). Passou a valer em produção no mesmo dia em que nasceu.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-10">commit e750023</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-10">74c470e →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>O princípio da casa — <em>declarado ≠ verificado</em> — vale até para as horas. Tudo que decide
     com base em tempo agora precisa provar que o próprio tempo é confiável.</p>
@@ -309,7 +309,7 @@
     <h3>A prova</h3>
     <p>O furo foi fechado no mesmo ciclo em que apareceu: a verificação passou a exigir que a chave usada
     pertença, no registro oficial, a quem a mensagem diz ser — e ganhou um teste automático de
-    impersonação que roda a cada mudança.<span class="pr-ref">commit 668c03f</span><span class="pr-ref">ce94dfe →</span></p>
+    impersonação que roda a cada mudança.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-09">commit 668c03f</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-09">ce94dfe →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>A regra ficou explícita: canal mais rápido não significa controle menor. A latência caiu; a
     aprovação humana continua sendo a porta — e defeito descoberto pelo uso se conserta antes de
@@ -336,7 +336,7 @@
     <p>Empacotamos as capacidades do Onion como peças instaláveis, uma por área (engenharia, produto,
     testes, documentação…), com um mapa de quais peças cada tipo de projeto recebe — mais uma consulta que
     descobre sozinha, a partir do grafo do próprio sistema, tudo que uma peça puxa. Seis pacotes,
-    verificações automáticas de integridade e 165 testes de guarda. Cinco entregas num dia.<span class="pr-ref">PR #292</span><span class="pr-ref">#293</span><span class="pr-ref">#294</span><span class="pr-ref">#295</span><span class="pr-ref">#296 →</span></p>
+    verificações automáticas de integridade e 165 testes de guarda. Cinco entregas num dia.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-08">PR #292</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-08">#293</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-08">#294</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-08">#295</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-08">#296 →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>As capacidades viram pacote; mas os documentos-lei e a governança que coordena os projetos
     continuam pelo caminho antigo — é o nosso diferencial, o que não dá (nem se quer) empacotar. Peça
@@ -361,7 +361,7 @@
     <p>Em vez de simplesmente "atualizar", seguimos um roteiro de segurança: guardar uma cópia do que
     existia, consertar o acesso quebrado, resgatar o trabalho que só existia ali, só então atualizar
     (47 novos registros aplicados sem perda), e por fim registrar tudo
-    formalmente.<span class="pr-ref">PR #250 →</span></p>
+    formalmente.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-05">PR #250 →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>Aprendemos que qualquer cópia de sistema com permissão de escrita não é mais uma cópia — é uma
     instância de verdade, só que menor. O roteiro de segurança virou padrão para qualquer situação
@@ -385,7 +385,7 @@
     <h3>A prova</h3>
     <p>Das três correções nasceram três verificações automáticas independentes, e uma regra reconhecível:
     toda decisão que depender de "o que está escrito" exige também "o que está de fato
-    acontecendo".<span class="pr-ref">PR #222</span><span class="pr-ref">#224</span><span class="pr-ref">#225 →</span></p>
+    acontecendo".<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-03">PR #222</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-03">#224</a><a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-03">#225 →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>Essa regra passou a ser aplicada por padrão — a cada novo caso parecido, tratamos como mais um
     membro da mesma família de erro, não como problema novo.</p>
@@ -409,7 +409,7 @@
     <h3>A prova</h3>
     <p>Criamos uma verificação automática que nunca aceita um carimbo sozinho — sempre confere contra o
     histórico real e uma amostra do conteúdo. Ela já pegou uma segunda divergência na primeira vez que
-    rodou.<span class="pr-ref">PR #222 →</span></p>
+    rodou.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-02">PR #222 →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>Virou princípio, com nome: <em>declarado ≠ verificado</em>. Nenhum resumo, registro ou anúncio vale
     mais que o artefato real — sempre.</p>
@@ -433,7 +433,7 @@
     <p>Um script de verificação de confiança tinha uma condição sempre-falsa, escondida por uma diferença
     de indentação — invisível lendo o código, óbvia ao rodar. Outro tinha um valor fixo que anulava uma
     trava de segurança, só visível num cenário simulado. Os dois viraram verificações automáticas
-    permanentes.<span class="pr-ref">PR #215 →</span></p>
+    permanentes.<a class="pr-link" href="/historia/migalhas/provas/#prova-2026-07-01">PR #215 →</a></p>
     <h3>Onde isso nos levou</h3>
     <p>Virou regra: para qualquer coisa que rode, exigir "rode e mostre o resultado real" antes de aceitar
     como correto. Opinião de quem leu é hipótese; o resultado de rodar é prova.</p>
