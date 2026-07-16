@@ -4,11 +4,11 @@ description: |
   Continuar trabalho em feature ativa. Lê sessão e identifica próxima fase.
   Atualiza progresso via Task Manager abstraction.
 model: sonnet
-allowed-tools: Bash(git *) Bash(cat .env*) Read Write Edit Grep Glob
+allowed-tools: Bash(git *) Bash(cat .env*) Bash(ls *) Bash(bash .claude/validation/kg-radar.sh*) Read Write Edit Grep Glob
 category: engineer
-tags: [development, workflow, session]
-version: "3.0.0"
-updated: "2025-11-24"
+tags: [development, workflow, session, kg-first]
+version: "3.1.0"
+updated: "2026-07-16"
 ---
 
 # Engineer Work
@@ -21,6 +21,7 @@ Estamos atualmente trabalhando em uma funcionalidade que está especificada na s
 
 Para trabalhar nisso, você deve usar o **protocolo de leitura escalonado** (Tier 0→3) — **nunca** faça `cat` da pasta inteira (anti-pattern "Context Dump"; protocolo em [worklog-protocol.md §4](../../../docs/knowledge-base/concepts/worklog-protocol.md)):
 
+0. **KG-first (o primeiro ato, antes do Tier 0):** se existir um `.kg.yaml` no repo (`docs/onion/graph/*.kg.yaml` ou `docs/*/graph/`), **consulte-o ANTES** do `STATE.md`/git — é o SSOT de estado/domínio, **acima** do git. Rode `bash .claude/validation/kg-radar.sh <arquivo>`, cite **ids de nó**, e faça **drive-to-verify** (cruzar claims `plane: PROD` de alto impacto contra o vivo) **antes** de agir; nó stale mente (`--freshness`). **Mecanismo, não conselho** — consultar por padrão é a forcing function contra a reincidência (sinal metagamify 2026-07-16). Sem `.kg.yaml` → siga ao Tier 0. Doutrina: [knowledge-graph-sdaal.md](../../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md) §SSOT-as-runtime.
 1. **Tier 0 (sempre, ~1KB):** leia **só o `STATE.md`**. Seu `## NEXT` é o ponteiro **autoritativo** — diz fase atual e próximo passo. Não escaneie badges do `plan.md` para decidir.
 2. **Tier 1 (sob demanda):** leia **apenas o bloco da fase `[ACTIVE]`** do `plan.md` (a fase nomeada em `STATE.md.NEXT.phase`).
 3. **Tier 2 (raro):** abra `architecture.md`/`context.md` **só** se o `## Map` do `STATE.md` indicar que esta fase precisa — e só a seção apontada.

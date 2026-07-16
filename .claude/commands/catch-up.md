@@ -4,11 +4,11 @@ description: |
   Briefing de retomada — reconstrói "onde paramos" de sinais duráveis
   (git recente, sessão ACTIVE, memória, inbox) após queda/saída de sessão.
 model: sonnet
-allowed-tools: Read Grep Glob Bash(git *) Bash(ls *) Bash(find .claude/sessions*) Bash(find docs/evolution*)
+allowed-tools: Read Grep Glob Bash(git *) Bash(ls *) Bash(find .claude/sessions*) Bash(find docs/evolution*) Bash(bash .claude/validation/kg-radar.sh*)
 category: general
-tags: [resume, briefing, session, recovery, cold-resume]
-version: "1.0.0"
-updated: "2026-06-21"
+tags: [resume, briefing, session, recovery, cold-resume, kg-first]
+version: "1.1.0"
+updated: "2026-07-16"
 ---
 
 # 🔁 Catch-up — Briefing de Retomada
@@ -34,6 +34,21 @@ que ficou pela metade.
 
 Leia na ordem; pare cedo se já tiver o suficiente para o briefing. **Nunca**
 faça `cat` de pastas inteiras (anti-pattern Context Dump).
+
+### 0. KG-first — o `.kg.yaml` é o SSOT de "onde estamos" (acima do git)
+**Antes** de reconstruir de git/memória, **se existir um `.kg.yaml` no repo, abra-o PRIMEIRO** — ele é a
+fonte da verdade de estado, acima do git. É o **primeiro ato**, não um passo opcional no fim.
+- Localizar: `ls docs/onion/graph/*.kg.yaml docs/*/graph/*.kg.yaml *.kg.yaml 2>/dev/null`.
+- Rodar o veredito: `bash .claude/validation/kg-radar.sh <arquivo>` (atenção · reconciliação · integridade ·
+  frescor). Cite os **ids de nó** de maior atenção no briefing, em vez de re-derivar da prosa.
+- **Drive-to-verify:** claim `plane: PROD` de alto impacto → cruze contra o vivo (código `arquivo:linha`/dump)
+  **antes** de confiar; um nó stale mente (o `--freshness` avisa STALE).
+- Sem `.kg.yaml` no repo → siga para o passo 1 (git).
+
+> **Por que primeiro — mecanismo, não conselho.** Reconstruir de git/memória com o KG "de lado" **já falhou
+> em campo repetidamente** (sinal metagamify 2026-07-16: o próprio autor da doutrina reincidiu ≥4×). O loop
+> consultar o KG **por padrão** é a forcing function; "lembrar de consultar" não é. Doutrina:
+> [knowledge-graph-sdaal.md](../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md) §SSOT-as-runtime.
 
 ### 1. Git — a espinha dorsal ("o que eu estava fazendo")
 - `git status -sb` → branch atual + estado da árvore (limpo? N alterações?)
@@ -64,13 +79,14 @@ Sintetize em **um bloco curto** (não despeje os comandos crus):
 ```
 🔁 Catch-up — <repo> @ <branch>
 
+🗺️  KG (SSOT de estado): <top-atenção do radar + ids de nó | sem .kg.yaml no repo>
 📍 Última atividade: <tema inferido dos commits/diff>
 🌳 Árvore: <limpa | N arquivos alterados, M não-commitados>
 🗂️  Sessão formal ACTIVE: <slug + próximo passo do STATE.md | nenhuma>
 🧠 Memória relevante: <1–2 pontos em curso, se houver>
 📬 Pendências: <inbox/inbound, PRs abertos, diff não-commitado>
 
-▶️  Próximo passo provável: <inferência acionável>
+▶️  Próximo passo provável: <inferência acionável, dirigida pelo KG quando houver>
 ```
 
 Termine oferecendo a retomada: se há worklog → `/engineer:work <slug>`; se há diff

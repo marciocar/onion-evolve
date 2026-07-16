@@ -185,9 +185,13 @@ soberano, reconciliável — segurou em todos. É a validação de campo mais fo
   mas **não** responde "o que está feito / pendente / o próximo". O adotante teve de escrever um `kg-state.py`.
   Feature nova: um `--state` (ou `kg-state.sh`) irmão do radar, projetando alavancas vivas×inertes,
   implementado×a-aplicar, questões abertas, top-atenção. **Merece desenho próprio** (ADR/fase).
-- **Cabear KG-first nos loops (proposta #5).** `catch-up`/`warm-up`/`work` reconstroem de git/memória e **não
-  abrem o KG** — foi o buraco que fez o adotante errar. Quando existir um `.kg.yaml`, esses comandos devem
-  **consultá-lo primeiro** (é o SSOT de "onde estamos", acima do git). Fiação nova, backlog.
+- **Cabear KG-first nos loops (proposta #5).** ✅ **FEITA (2026-07-16).** `catch-up` (v1.1.0), `warm-up`
+  (v3.3.0) e `engineer:work` (v3.1.0) agora têm um **Passo 0 / primeiro ato**: se existir um `.kg.yaml` no
+  repo, **consultá-lo ANTES** de reconstruir de git/memória (rodar o radar, citar ids de nó, drive-to-verify
+  em claims PROD). É a **forcing function core-only** — escalada pelo sinal `mandar-a-doutrina-kg-first` do
+  metagamify (2026-07-16): *"KG-first não pode ser conselho, tem que ser mecanismo"* (prova: o próprio autor
+  reincidiu ≥4×). Loop consultar o KG **por padrão** ≠ "lembrar de consultar". Resta o **hook-template**
+  (proposta #3, trava independe de rodar comando) e o **`kg state`** (#4/#5) como próximo tier.
 
 ## Gatilho de materialização (gated)
 F1/F1.1/F2 feitas. O `kg state` e o cabeamento KG-first são **trabalho derivado** (desenho próprio) — o
