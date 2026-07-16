@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!-- Convite (probe do experimento adotante-frio, Instrumento A) · onionevolve.com/convite/
+     fonte: onion-evolve/site/convite/ · traduz docs/materials/cold-adopter-2026-07/one-pager-kg-reconciliation.md
+     Leitor-alvo: estranho arms-length, sem conhecimento prévio de Onion. Honesto e técnico, não hype.
+     O sinal que este convite mede: alguém FORA da órbita tenta no domínio dele e volta com artefato. -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reconcilie o conhecimento da sua org como um grafo (não como prosa)</title>
+<meta property="og:title" content="Reconcilie o conhecimento da sua org como um grafo">
+<meta property="og:description" content="Seu conhecimento organizacional está derivando — e o git merge não conserta isso. Modele verdade como grafo tipado: contradições viram arestas, não deleções. Um radar determinístico dá o veredito.">
+<meta name="description" content="Método aberto (schema + método, não SaaS) para reconciliar conhecimento organizacional como grafo tipado: REFUTES/SUPERSEDES em vez de git merge. Tente no seu domínio hoje.">
+<style>
+  @font-face { font-family:'Fraunces'; src:url('/fonts/fraunces-var.woff2') format('woff2'); font-weight:300 900; font-style:normal; font-display:swap; }
+  @font-face { font-family:'Fraunces'; src:url('/fonts/fraunces-italic-var.woff2') format('woff2'); font-weight:300 900; font-style:italic; font-display:swap; }
+  :root {
+    --bg:#FAF7F2; --bg-card:#FFFFFF; --orange:#C2410C; --orange-light:#EA580C; --orange-dim:rgba(194,65,12,0.09); --orange-glow:rgba(194,65,12,0.20);
+    --purple:#7C3AED; --purple-dim:rgba(124,58,237,0.08); --purple-glow:rgba(124,58,237,0.24); --green:#2F7A4E;
+    --text:#1C1612; --text-body:#3D3530; --text-muted:#6B635B; --border:rgba(28,22,18,0.09); --border-warm:rgba(194,65,12,0.20);
+    --radius:10px; --radius-lg:18px; --mono:'SFMono-Regular','Fira Code','Courier New',monospace; --display:'Fraunces',Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:Georgia,'Times New Roman',serif; background:var(--bg); color:var(--text); line-height:1.72; overflow-x:hidden; font-size:16.5px; }
+  .sans { font-family:var(--sans); }
+  a { color:var(--orange); }
+  a:focus-visible { outline:2px solid var(--purple); outline-offset:3px; border-radius:3px; }
+  h1,h2,h3 { font-family:var(--display); }
+  nav { position:fixed; top:0; left:0; right:0; z-index:100; border-bottom:1px solid var(--border);
+        background:rgba(250,247,242,.88); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+  .nav-in { max-width:900px; margin:0 auto; padding:13px 24px; display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
+  .nav-logo { font-weight:700; font-size:.95rem; text-decoration:none; color:var(--text); white-space:nowrap; }
+  .nav-logo small { color:var(--text-muted); font-weight:400; margin-left:.5rem; font-size:.72rem; }
+  .nav-links { margin-left:auto; display:flex; gap:1.1rem; align-items:center; }
+  .nav-links a { font-size:.85rem; text-decoration:none; color:var(--text-muted); }
+  .nav-links a:hover { color:var(--orange); }
+  .wrap { max-width:720px; margin:0 auto; padding:0 24px; }
+  .hero { padding:116px 24px 8px; text-align:center; }
+  .eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:.72rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase;
+             color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow); padding:.45rem 1.05rem; border-radius:99px; margin-bottom:1.4rem; }
+  .hero h1 { font-size:clamp(1.9rem,4.8vw,2.9rem); font-weight:600; letter-spacing:-.015em; line-height:1.16; max-width:720px; margin:0 auto; }
+  .hero h1 em { color:var(--orange); font-style:italic; }
+  .hero .sub { font-family:var(--sans); font-size:1.02rem; color:var(--text-muted); font-style:italic; max-width:600px; margin:1.2rem auto 0; }
+  section.blk { padding:2.1rem 0 .4rem; }
+  h2.sec { font-size:1.4rem; font-weight:600; letter-spacing:-.01em; margin-bottom:.8rem; }
+  p { font-size:1rem; color:var(--text-body); margin:.7rem 0; }
+  ol, ul { margin:.7rem 0 .7rem 1.2rem; }
+  li { font-size:1rem; color:var(--text-body); margin:.4rem 0; }
+  .lede { font-size:1.06rem; }
+  code { font-family:var(--mono); font-size:.86em; background:var(--orange-dim); padding:.1rem .35rem; border-radius:5px; }
+  pre { background:#1C1612; color:#F4F1EC; border-radius:var(--radius); padding:1.1rem 1.3rem; overflow-x:auto; margin:1rem 0; font-family:var(--mono); font-size:.8rem; line-height:1.65; }
+  pre .c { color:#C4BDB6; }
+  pre .k { color:var(--orange-light); }
+  .callout { background:var(--bg-card); border:1px solid var(--border); border-left:3px solid var(--orange); border-radius:var(--radius); padding:1rem 1.3rem; margin:1.1rem 0; font-family:var(--sans); font-size:.94rem; }
+  .cta-wrap { text-align:center; padding:2.4rem 24px 1rem; }
+  .cta { display:inline-block; font-family:var(--sans); font-size:.95rem; font-weight:600; color:#fff; background:var(--orange); border:1px solid var(--orange);
+         padding:.8rem 1.8rem; border-radius:99px; text-decoration:none; transition:.15s; }
+  .cta:hover { background:var(--orange-light); }
+  .cta-sub { font-family:var(--sans); font-size:.82rem; color:var(--text-muted); margin-top:.7rem; }
+  footer.site { max-width:720px; margin:2rem auto 0; padding:2.2rem 24px 3.5rem; text-align:center; color:var(--text-muted); font-family:var(--sans); font-size:.85rem; border-top:1px solid var(--border); }
+  footer.site a { font-weight:600; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+
+<nav class="sans" aria-label="principal">
+  <div class="nav-in">
+    <a class="nav-logo" href="/">🧅 ONION EVOLVE<small>by Marcio Carvalho</small></a>
+    <div class="nav-links">
+      <a href="/historia/">Autobiografia</a>
+      <a href="/historia/migalhas/">Migalhas</a>
+      <a href="/historia/migalhas/provas/">Provas</a>
+      <a href="/mini/">Mini</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <span class="eyebrow sans">🧩 Método aberto · convite</span>
+  <h1>Seu conhecimento organizacional está derivando — e o <em>git merge</em> não conserta isso.</h1>
+  <p class="sub">Um método honesto e técnico (não é SaaS, não pede seus dados). Leia em 3 minutos e teste no seu domínio hoje.</p>
+</header>
+
+<div class="wrap">
+
+  <section class="blk">
+    <h2 class="sec">O problema (que você provavelmente já sentiu)</h2>
+    <p class="lede">Times que trabalham com IA acumulam conhecimento em <strong>prosa</strong> — docs, ADRs, wikis,
+    transcrições, prompts. Três coisas quebram:</p>
+    <ol>
+      <li><strong>Verdade × verdade não se confronta.</strong> Duas fontes acreditam em coisas contraditórias e o documento não sabe.</li>
+      <li><strong>Drift silencioso.</strong> Uma verdade envelhece; a nova é escrita noutro lugar; ninguém reconcilia.</li>
+      <li><strong><code>git merge</code> não reconcilia verdades.</strong> Ele junta <em>texto</em>, não <em>o que é verdade</em>. Editar
+      a linha de um doc de 30&nbsp;KB <strong>apaga a história</strong> — a contradição some sem registro.</li>
+    </ol>
+    <p>RAG/GraphRAG não resolvem: eles <strong>recuperam</strong>, não <strong>reconciliam</strong> (pesquisa recente:
+    ~10% de acerto em mudança implícita de versão). Recuperar conhecimento ≠ decidir o que é verdade.</p>
+  </section>
+
+  <section class="blk">
+    <h2 class="sec">A ideia (30 segundos)</h2>
+    <p>Modele o conhecimento como um <strong>grafo tipado</strong>, não prosa:</p>
+    <ul>
+      <li><strong>Nós</strong> tipados: <code>claim</code> (afirmação), <code>evidence</code> (evidência), <code>decision</code>, <code>question</code>.</li>
+      <li><strong>Arestas</strong> tipadas: <code>SUPPORTS</code>, <code>REFUTES</code> (contradição explícita — não deleção),
+      <code>SUPERSEDES</code> (verdade nova supera a velha, sem apagá-la).</li>
+      <li>Um <strong>radar determinístico</strong> (não um LLM) lê o grafo e produz o veredito: onde olhar, quais
+      contradições reconciliar, o que está órfão. A atenção sai do <strong>motor</strong>, não da impressão do modelo.</li>
+    </ul>
+    <div class="callout">Quando uma verdade cai, ela <strong>não é deletada</strong> — vira <code>status: refuted</code>
+    com a aresta que a derrubou. <strong>História reconcilia, não apaga.</strong></div>
+  </section>
+
+  <section class="blk">
+    <h2 class="sec">Como se parece (um pedaço real de <code>.kg.yaml</code>)</h2>
+<pre><span class="c">nodes:</span>
+  - id: C_METRICA_INFLADA
+    node_type: claim
+    label: "a metrica de engajamento X mede o que promete"
+    status: refuted        <span class="c"># &lt;- caiu sob evidencia; NAO foi apagada</span>
+  - id: E_DADOS_VIVOS
+    node_type: evidence
+    label: "producao mostra a metrica inflada por contagem-fantasma"
+<span class="c">edges:</span>
+  - from: E_DADOS_VIVOS
+    to: C_METRICA_INFLADA
+    edge_type: <span class="k">REFUTES</span>     <span class="c"># &lt;- a contradicao vira aresta, nao sumico</span></pre>
+    <p>O radar vê essa aresta e te diz: <em>"há uma verdade refutada por dado vivo — reconcilie antes de decidir."</em></p>
+  </section>
+
+  <section class="blk">
+    <h2 class="sec">Tente você mesmo (no seu domínio, hoje)</h2>
+    <ol>
+      <li>Pegue <strong>uma</strong> área onde você tem verdades que se contradizem (uma decisão de produto disputada,
+      uma regra de negócio ambígua, um número que dois times reportam diferente).</li>
+      <li>Escreva 5–10 <code>claim</code>/<code>evidence</code> num <code>.kg.yaml</code> (o schema acima é tudo que você precisa).</li>
+      <li>Ligue as contradições com <code>REFUTES</code>/<code>SUPERSEDES</code>.</li>
+      <li>Rode o radar determinístico e veja o veredito.</li>
+    </ol>
+    <p>O método viaja como <strong>schema + método</strong> (não é um SaaS, não pede seus dados). Ponto de partida
+    público em <strong>onion-mini</strong>. Nasceu dogfoodado em auditorias de <strong>produção</strong> reais, não no papel.</p>
+  </section>
+
+  <div class="cta-wrap">
+    <a class="cta" href="https://github.com/marciocar/onion-mini" target="_blank" rel="noopener">Começar pelo onion-mini →</a>
+    <p class="cta-sub">Público, sem cadastro. Veja também as <a href="/historia/migalhas/provas/">provas</a> e a
+    <a href="/historia/">história</a> do método.</p>
+  </div>
+
+  <section class="blk">
+    <h2 class="sec">Se você tentar — mostre</h2>
+    <p>Rodou no <strong>seu</strong> domínio? <strong>Poste o seu <code>.kg.yaml</code></strong> (anonimizado) ou conte o que o
+    radar pegou que a prosa escondia. É o tipo de coisa que a gente quer ver funcionar fora da nossa própria casa.</p>
+  </section>
+
+</div>
+
+<footer class="site">
+  <p>Convite do <a href="/">Onion Evolve</a> — o método de reconciliação de conhecimento, aberto.
+  <a href="/historia/">a história ←</a></p>
+</footer>
+
+</body>
+</html>
