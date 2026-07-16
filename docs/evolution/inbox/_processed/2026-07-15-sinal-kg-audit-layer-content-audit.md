@@ -19,10 +19,10 @@ maturity: evidência de campo espontânea (adotante), verificada pelo radar sobe
 
 ## O que apareceu no campo
 
-A KB canônica [`knowledge-graph-sdaal.md`](../../knowledge-base/concepts/knowledge-graph-sdaal.md)
+A KB canônica [`knowledge-graph-sdaal.md`](../../../knowledge-base/concepts/knowledge-graph-sdaal.md)
 apresenta a camada `audit` (grafo epistêmico: `claim/evidence/decision/question`) como método
 para **investigações/auditorias de código e sistema** (nasceu da auditoria WRR de produção,
-sinal [`2026-07-02-sinal-sdaal-knowledge-graph`](_processed/2026-07-02-sinal-sdaal-knowledge-graph.md)).
+sinal [`2026-07-02-sinal-sdaal-knowledge-graph`](2026-07-02-sinal-sdaal-knowledge-graph.md)).
 
 No campo, o gustavo usou **exatamente a mesma gramática** para **auditar dois decks de
 treinamento** (documentação/conteúdo, não código) — e ela segurou **sem nenhuma adaptação**.
@@ -53,7 +53,7 @@ treinamento** (documentação/conteúdo, não código) — e ela segurou **sem n
 
 ## Pedido
 
-Avaliar **documentar na KB [`knowledge-graph-sdaal.md`](../../knowledge-base/concepts/knowledge-graph-sdaal.md)
+Avaliar **documentar na KB [`knowledge-graph-sdaal.md`](../../../knowledge-base/concepts/knowledge-graph-sdaal.md)
 que a camada `audit` se aplica a auditoria de CONTEÚDO/documentação** (não só código/sistema), citando o
 Lote 10 do Tornak como instância de campo. Se aprovado, considerar um exemplo mínimo content-audit ao lado
 do `example-domain.kg.yaml`.

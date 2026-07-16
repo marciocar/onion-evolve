@@ -73,6 +73,16 @@ O grafo é **append-mostly**: auto-correções viram arestas `REFUTES` explícit
 apaga, se **reconcilia** (mesmo parentesco do protocolo de re-teste do diário: `superseded: true`,
 nunca deletar — `/meta:diary review`).
 
+> **Escopo da camada `audit` — não é sobre código, é sobre investigação.** A gramática epistêmica
+> (`claim`/`evidence`/`decision`/`question` + `SUPPORTS`/`REFUTES`/`SUPERSEDES`) serve **qualquer
+> investigação com achados que se contradizem e se corrigem** — código e sistema (a origem: auditoria
+> WRR de produção), mas também **conteúdo/documentação**: decks, currículo, contratos, specs.
+> **Instância de campo** (gustavo-pulga/Tornak, `tornak.kg.yaml` Lote 10, verificada pelo `kg-radar.sh`
+> soberano do core — 107 nós/172 arestas limpo): a mesma gramática auditou 2 decks de treinamento sem
+> nenhuma adaptação, e o próprio mecanismo de auto-correção operou fora de código — `C_TARDE_NUM_15`
+> (confidence 0.4) ficou `REFUTED` por `C_TARDE_NUM_21` (confidence 1.0, backed por correção humana):
+> o erro permaneceu no grafo, refutado e rastreável, em vez de sobrescrito.
+
 ### Distinção epistêmico×domínio (por que duas camadas)
 
 O grafo de **auditoria** é efêmero e append-mostly (a investigação de hoje); o grafo de **domínio**

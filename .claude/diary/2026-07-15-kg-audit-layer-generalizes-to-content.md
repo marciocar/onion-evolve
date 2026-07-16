@@ -33,3 +33,10 @@ Avaliar registrar sinal no `inbox/` do core: **"camada `audit` do KG SDAAL gener
 auditar conteúdo/documentação"** — material de KB. Re-teste barato = grep a KB pelo uso
 content-audit (ver `valid_when`); quando documentado, aposentar esta migalha. Ver
 `[[2026-07-15-kg-sdaal-crosses-federation]]` (o dogfood cross-fed que trouxe este grafo à luz).
+
+## Retest 2026-07-16 — RESOLVIDA (migalha aposentada)
+`valid_when` **satisfeito**: `knowledge-graph-sdaal.md` agora tem a nota de escopo
+"a camada `audit` não é sobre código, é sobre investigação" documentando o uso content-audit
+e citando o Lote 10 do Tornak. Sinal upstream `2026-07-15-sinal-kg-audit-layer-content-audit`
+triado e movido para `_processed/`. A condição não vale mais → esta migalha não orienta mais
+ação futura (fica como registro histórico, não deletada — `superseded ≠ apagado`).
