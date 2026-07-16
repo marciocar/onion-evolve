@@ -9,6 +9,13 @@
   <lastBuildDate>Thu, 16 Jul 2026 00:00:00 GMT</lastBuildDate>
 
   <item>
+    <title>O framework sobreviveu à morte da própria máquina — e o que resgatamos previa o presente</title>
+    <link>https://onionevolve.com/historia/migalhas/#post-2026-07-16-rescue</link>
+    <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-16-rescue</guid>
+    <pubDate>Thu, 16 Jul 2026 00:00:00 GMT</pubDate>
+    <description>O notebook onde o framework era evoluído queimou com trabalho não salvo — origem da mudança para o servidor. Ao resgatar a máquina (capturar antes de sincronizar), o item de ouro foi uma pesquisa nunca publicada cujo gatilho de revisão previa a coexistência de duas máquinas num repo — a situação exata do dia do resgate. Conhecimento durável não morre com o hardware se está no repositório. PR #394.</description>
+  </item>
+  <item>
     <title>A fonte da verdade também apodrece — e agora ela tem carimbo de validade</title>
     <link>https://onionevolve.com/historia/migalhas/#post-2026-07-16</link>
     <guid>https://onionevolve.com/historia/migalhas/#post-2026-07-16</guid>
