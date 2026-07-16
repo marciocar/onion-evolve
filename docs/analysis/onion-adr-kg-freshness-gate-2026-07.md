@@ -19,16 +19,18 @@ related:
 |-------|-------|
 | **Decisão** | Um KG-SSOT **apodrece silenciosamente** quando suas claims `plane: PROD` não são **re-verificadas** contra o estado vivo, e **drifta** do próprio validador quando o schema evolui sem versão. O core adota **duas guardas irmãs**, ambas da família "o radar recusa/avisa quando a SSOT driftou": **(A) frescor** — campo `verified_at:` (+ opcional `verified_against:`) obrigatório em nós `plane: PROD`, com o `kg-radar.sh` emitindo **STALE** quando ausente ou vencido; **(B) versão de schema** — campo `schema_version:` no bloco `meta:`, com o radar **recusando/sinalizando** divergência da versão que ele entende. |
 | **Escopo** | Investigação (KG-SDAAL): o `.kg.yaml`, o `kg-radar.sh` e a KB `knowledge-graph-sdaal.md`. **Não** toca produto/engenharia/compliance, transporte, nem o motor de UI de adotante. |
-| **Status** | ✅ **Aceito (doutrinário) + plano faseado** — 2026-07-16. A **postura** decide-se agora; o **código** segue a doutrina de dogfood (helper testável → fiação → campo). **Zero código nesta triagem.** Gatilho e fases abaixo. |
+| **Status** | ✅ **Aceito + F1 IMPLEMENTADA** — 2026-07-16. A postura foi decidida e a **Fase 1 (helper + selftests) já entrou**: `kg-radar.sh` ganhou os modos `--freshness` e `--schema` (as 3 checagens: STALE-MISSING, STALE-OLD, schema-drift) + 5 selftests que reagem. Q1/Q2 resolvidas na prática (baseline in-file, sem "agora"). Restam F2 (fiação `/meta:kg` + KB) e F3 (campo). |
 | **Origem** | Propostas **#2 (⭐ a maior alavanca)** e **#1** do sinal de campo [`2026-07-16-kg-sdaal-dogfood-ouro`](../evolution/inbox/_processed/2026-07-16-kg-sdaal-dogfood-ouro.md) (adotante rhilo-metagamify) — o uso mais intenso do KG SDAAL até hoje (165 nós/288 arestas: reconciliou o SSOT do WRR/Modo Equilíbrio, decidiu arquitetura pelo grafo, gerou código, validou A/B ao vivo). Costuradas num ADR só porque são o **mesmo problema**: a SSOT diverge do real (no tempo) ou do validador (no formato). |
 
 ---
 
 ## Status
-✅ **Aceito (doutrinário)** — 2026-07-16. Decide a **postura**: frescor e versão-de-schema viram guardas do
-radar, não convenções torcidas para dar certo. A implementação liga em fases (abaixo), reusando o gate
-determinístico existente (`kg-radar.sh` + `lint-selftest.sh`). **Nenhuma mudança de código nesta triagem** —
-o quick win #5 (footguns YAML) já entrou no PR #373; este ADR é o desenho das guardas de maior alavanca.
+✅ **Aceito + F1 implementada** — 2026-07-16. Decide a **postura**: frescor e versão-de-schema viram guardas
+do radar, não convenções torcidas para dar certo. **F1 (helper + selftests) executada** reusando o gate
+determinístico existente (`kg-radar.sh` + `lint-selftest.sh`): 5 selftests que reagem (fresh/stale-missing/
+stale-old/schema-divergente/retrocompat), dogfoodados contra as fixtures **e** contra um grafo real do core
+(`onion-identity-2026-07.kg.yaml` → exit 0, só avisos — degradê confirmado). Restam **F2** (fiação `/meta:kg`
++ promoção da doutrina na KB) e **F3** (campo: rodar contra o grafo real do rhilo). Q1/Q2 resolvidas abaixo.
 
 ## Contexto
 O sinal do rhilo-metagamify nomeou a **lição-mestra** com evidência de campo:
@@ -102,21 +104,23 @@ um dogfood, duas guardas irmãs no mesmo `kg-radar.sh`. Separá-las duplicaria c
   com `onion-adr-design-extends-kg` (mesma família de guardas de integridade do radar).
 
 ## Questões abertas (resolver no dogfood faseado)
-- **Q1 — o horizonte do STALE-OLD.** TTL fixo (N dias, à la `review_after`)? Baseline por-arquivo (`meta:
-  baseline: <data>` → nós PROD anteriores = stale)? Arg `--since` no radar? **Hipótese:** começar por
-  STALE-MISSING (zero-knob, determinístico) + baseline opcional no `meta:`; TTL fixo só se o campo pedir.
-- **Q2 — determinismo vs "agora".** STALE-OLD precisa de uma noção de "hoje" → introduz dependência de tempo
-  no gate (não-reproduzível). Precedente: mail-hook/diary-index já comparam `review_after` vs agora. Confinar
-  a dependência de tempo à checagem STALE-OLD; STALE-MISSING e schema-drift permanecem 100% determinísticos.
+- **Q1 — o horizonte do STALE-OLD.** ✅ **RESOLVIDA na F1:** baseline por-arquivo (`meta: baseline: <data>`
+  → nós PROD com `verified_at` anterior = STALE-OLD). Zero-knob por padrão (STALE-MISSING não precisa de
+  baseline); TTL fixo dispensado. Simples, reusável, sem estado externo.
+- **Q2 — determinismo vs "agora".** ✅ **RESOLVIDA na F1:** ao comparar `verified_at` (nó) contra `baseline`
+  (meta) — **duas datas do próprio arquivo** — o gate **não usa "agora"** e permanece **100% determinístico/
+  reproduzível**. As 3 checagens (STALE-MISSING, STALE-OLD, schema-drift) rodam sem `date`. Melhor que o
+  precedente mail-hook (que compara vs agora) — aqui a referência é in-file.
 - **Q3 — retrocompat.** Grafos legados sem `verified_at`/`schema_version` não podem quebrar de uma vez.
   Degradê: ausência → aviso (não erro) numa 1ª versão; endurecer depois de os grafos de campo migrarem.
 - **Q4 — `verified_against` estruturado?** String livre (barato, footgun de keyword-substring — ver #3) ou
   sub-campos? **Hipótese:** string por ora, atenta à colisão de substring documentada nos footguns (PR #373).
 
 ## Plano faseado (dogfood: barato → caro)
-- **F1 — helper + selftests (testável isolado):** campos na gramática + 3 checagens no `kg-radar.sh` +
-  selftests em `lint-selftest.sh` que **reagem** (fixtures fresh/stale/versioned/divergent). Resolver Q1/Q2
-  na prática aqui. Gate: `lint-artifacts` 0/0, `lint-selftest` verde.
+- **F1 — helper + selftests (testável isolado):** ✅ **FEITA (2026-07-16).** `kg-radar.sh` ganhou
+  `--freshness` e `--schema` (+ ambos no `--all`), o parse de `verified_at:`/`schema_version:`/`baseline:`,
+  e a constante `RADAR_SCHEMA`. 5 fixtures em `fixtures/kg-freshness/` + `fixtures/kg-schema/` e 5 selftests
+  que reagem. Gate: `lint-artifacts` 0/0, `lint-selftest` **282/0**. Q1/Q2 resolvidas na prática.
 - **F2 — fiação + KB:** `/meta:kg` expõe o veredito de frescor; doutrina de frescor promovida na
   `knowledge-graph-sdaal.md` (de ponteiro a seção). `schema_version` semeado nos grafos-exemplo do core.
 - **F3 — campo:** rodar o radar com as guardas contra um grafo real de adotante (o próprio rhilo, que tem os

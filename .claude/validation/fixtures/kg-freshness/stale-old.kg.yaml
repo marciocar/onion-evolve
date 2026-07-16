@@ -1,0 +1,30 @@
+# Fixture: nó PROD com verified_at ANTERIOR à baseline — a verdade envelheceu.
+# Espera: --freshness emite STALE-OLD para ST_A, exit 0 (aviso). Determinístico: compara
+# duas datas do próprio arquivo (verified_at < baseline), sem depender de "agora".
+meta:
+  id: fixture-stale-old
+  schema_version: "1"
+  baseline: 2026-07-10
+nodes:
+  - id: EN_A
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-15
+    label: "entidade A (fresca)"
+  - id: ST_A
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-01
+    label: "estado A (verificado antes da baseline)"
+edges:
+  - from: EN_A
+    to: ST_A
+    edge_type: HAS_STATE

@@ -1,0 +1,29 @@
+# Fixture: schema_version divergente do que o radar entende — SSOT driftou do validador.
+# Espera: --schema REPROVA (✗ divergente) com exit 1 (proposta #1 — fork scripts/kg no dia 1).
+meta:
+  id: fixture-schema-divergent
+  schema_version: "99"
+  baseline: 2026-07-01
+nodes:
+  - id: EN_A
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-15
+    label: "entidade A"
+  - id: ST_A
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-15
+    label: "estado A"
+edges:
+  - from: EN_A
+    to: ST_A
+    edge_type: HAS_STATE

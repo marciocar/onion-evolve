@@ -1,0 +1,28 @@
+# Fixture: nó PROD SEM verified_at: — o modo-de-falha exato do campo (rhilo dogfood).
+# Espera: --freshness emite STALE-MISSING para ST_A, exit 0 (aviso, não reprova).
+meta:
+  id: fixture-stale-missing
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: EN_A
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-15
+    label: "entidade A (carimbada)"
+  - id: ST_A
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "estado A (foto sem carimbo de frescor)"
+edges:
+  - from: EN_A
+    to: ST_A
+    edge_type: HAS_STATE
