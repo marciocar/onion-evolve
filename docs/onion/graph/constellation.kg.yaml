@@ -7,6 +7,7 @@
 # Camada audit. Design-only, gated (Fase 2 da Constelacao). Curado a mao (soberano), nao auto-detectado.
 meta:
   id: constellation-overlay
+  schema_version: "1"
   date: 2026-07-12
 nodes:
   # ---- ancoras: os estudos cujas premissas o overlay cruza ----

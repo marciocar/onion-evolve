@@ -114,11 +114,10 @@ sem erro visível**. Evite:
 
 > **A lição-mestra do mesmo dogfood** (frescor): um nó `plane: PROD` é uma **foto**; sem carimbo de
 > *quando/contra o quê foi verificado*, ele envelhece e o leitor (humano **ou IA**) confia no stale —
-> "uma bela SSOT que mente". A disciplina de frescor (`verified_at:` + gate STALE no radar) é feature
-> em backlog derivada deste sinal; até existir, **re-execute as claims `PROD` contra o estado vivo**
-> (cruzar KG + código `arquivo:linha` + dump fresco) antes de confiar nelas.
+> "uma bela SSOT que mente". Essa disciplina agora é **guarda do radar** (`verified_at:` + gate STALE,
+> `schema_version:` + gate de drift) — ver §[Frescor e versão de schema](#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou).
 
-## As quatro saídas (o que uma ferramenta `radar` computa)
+## As saídas do radar (o que a ferramenta `radar` computa)
 
 1. **RADAR** — perguntas/decisões abertas ranqueadas por **atenção = impacto × confiança ×
    centralidade** (PageRank ponderado). Responde *o que fazer agora*.
@@ -133,8 +132,13 @@ sem erro visível**. Evite:
    - **STATE-sem-dona**: `state` que nenhuma `entity` possui via `HAS_STATE`;
    - **RULE-sem-trace**: `rule|invariant|policy` sem `TRACES_TO` (regra não ancorada em artefato);
    - **fonte-única**: nó de domínio com >1 `READS` saindo (1 átomo = 1 fonte — ver §design abaixo).
+5. **FRESCOR** (`--freshness`, ⚠ atenção, **não reprova**) — a SSOT foi re-verificada contra o vivo?
+   **STALE-MISSING** (nó `plane:PROD` sem `verified_at:`) · **STALE-OLD** (`verified_at` anterior à
+   `meta.baseline`). Ver §[Frescor e versão de schema](#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou).
+6. **SCHEMA** (`--schema`, ✗ **reprova**) — `meta.schema_version` bate com a versão que o radar entende?
+   Divergência = recusa (o radar não sabe ler o arquivo); ausência = ⚠ retrocompat.
 
-   Saída extra `--triples` (`from EDGE to [on evento]`) para consumo por LLM.
+Saída extra `--triples` (`from EDGE to [on evento]`) para consumo por LLM.
 
 ## Governança DEV↔PROD (a regra dura)
 
@@ -145,6 +149,39 @@ Evidência de campo no próprio core (mesmo dia, direção oposta): o incidente 
 (anúncio "você já tem o fix" raciocinou sobre o *carimbo* em vez do *artefato vendorizado*; guard
 permanente: `.claude/validation/pin-integrity-check.sh`). A regra generaliza: **carimbo/doc/branch é
 plane DEV; só o artefato vivo é plane PROD.**
+
+## Frescor e versão de schema — o radar recusa/avisa quando a SSOT driftou
+
+Um KG-SSOT que não é **re-executado** contra o estado vivo **apodrece silenciosamente** — vira "uma
+bela SSOT que mente", e um consumidor confiante (IA inclusive) *propaga* a mentira. Lição-mestra do
+dogfood mais intenso do padrão até hoje (adotante rhilo-metagamify, 2026-07-15/16: `doseMaxByLevel`
+no grafo `2/4/8/8/8` × real vivo `2/4/12/15/20`; bloqueador "aberto" já corrigido; feature "aguardando
+push" já deployada). O valor do KG **não** é ser escrito uma vez — é ser **re-verificável**. Duas
+guardas (ADR [`kg-freshness-gate`](../../analysis/onion-adr-kg-freshness-gate-2026-07.md)), a mesma
+máquina com duas referências — *o radar recusa/avisa quando a SSOT driftou*:
+
+**A. Frescor (drift no tempo — `--freshness`, ⚠ aviso).** Um nó `plane: PROD` é uma **foto**; sem
+carimbo de *quando* foi verificado, envelhece.
+- **`verified_at:`** (data ISO) em nós `plane: PROD` — *quando* a claim foi cruzada com o vivo. Opcional
+  **`verified_against:`** (ex. `dump:...` | `code@commit`) nomeia *contra o quê*. Nós `plane: DEV` não
+  exigem (o `TRACES_TO` já ancora *onde*; PROD precisa do *quando*).
+- **STALE-MISSING**: nó PROD sem `verified_at:` → ⚠ (o modo-de-falha exato do campo — a SSOT do rhilo
+  não tinha *nenhuma* disciplina de frescor). **STALE-OLD**: `verified_at` anterior a **`meta.baseline:`**
+  (uma data no `meta:`) → ⚠, a verdade pode ter envelhecido.
+- **Aviso, não erro** — um nó stale **mente**, não corrompe; o veredito certo é "re-verifique", não
+  "recuse o arquivo". Determinístico: compara **duas datas do próprio arquivo** (`verified_at` × `baseline`),
+  **sem "agora"** — reproduzível.
+
+**B. Versão de schema (drift no formato — `--schema`, ✗ recusa).** Uma SSOT que nenhuma ferramenta
+valida não é fonte da verdade (no campo: a SSOT viva estava no schema de uma ferramenta morta e dava
+287 violações no radar canônico — driftaram e ninguém percebeu).
+- **`schema_version:`** no bloco `meta:`. O radar carrega a versão que entende (`RADAR_SCHEMA`).
+- Divergência → **recusa** (exit 1): schema errado = os outros vereditos ficam não-confiáveis; falha
+  barulhenta é o seguro. Ausência → ⚠ retrocompat (degradê: não quebra grafo legado válido de uma vez).
+
+> **Até o frescor estar carimbado, cruze fontes.** Um nó PROD sem `verified_at` é *declarado*, nunca
+> *verificado* (doutrina `declarado ≠ verificado`). Re-execute a claim PROD contra o vivo — **KG +
+> código `arquivo:linha` + dump fresco** — antes de confiar. O `verified_at` é o carimbo desse cruzamento.
 
 ## Anti-whack-a-mole (disciplina complementar)
 

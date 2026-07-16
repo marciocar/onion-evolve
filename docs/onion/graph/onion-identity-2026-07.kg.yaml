@@ -4,6 +4,7 @@
 # Camada audit (epistêmico). Domain nasce na F4, do que o radar reconciliar.
 meta:
   id: onion-identity-2026-07
+  schema_version: "1"
   date: 2026-07-11
 nodes:
   # ---- perguntas de pesquisa (F2) ----

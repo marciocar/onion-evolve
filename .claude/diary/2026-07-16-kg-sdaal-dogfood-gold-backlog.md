@@ -23,9 +23,9 @@ Sinal upstream com **7 propostas ao core**, todas verificadas contra o código r
 Ordem por alavanca × custo (dogfood: barato→caro, helper→fiação→campo):
 
 - **#2 ⭐ Frescor PROD (a flagship, maior buraco):** campo `verified_at:` por nó `plane: PROD` + gate
-  **STALE** no `kg-radar.sh`. **F1 IMPLEMENTADA (2026-07-16)** → `[[onion-adr-kg-freshness-gate-2026-07]]`:
-  modos `--freshness`/`--schema`, STALE-MISSING + STALE-OLD (baseline in-file, determinístico), 5 selftests
-  (282/0). Restam **F2** (fiação `/meta:kg` + KB) e **F3** (campo contra o grafo real do rhilo).
+  **STALE** no `kg-radar.sh`. **F1+F2 IMPLEMENTADAS (2026-07-16)** → `[[onion-adr-kg-freshness-gate-2026-07]]`:
+  F1 = modos `--freshness`/`--schema` + 5 selftests (282/0); F2 = fiação `/meta:kg` (v1.3.0) + doutrina
+  promovida a seção na KB + `schema_version` semeado nos 5 grafos reais. Resta **F3** (campo contra o rhilo).
 - **#1 schema_version + gate:** `schema_version:` no `meta:`; radar **recusa** na divergência. **F1 FEITA
   junto do #2** (mesma família): `RADAR_SCHEMA="1"`, gate de drift (recusa) + degradê de retrocompat (ausente
   = ⚠, não quebra grafo legado). Teria pego o fork `scripts/kg`↔`kg-radar.sh` no dia 1.

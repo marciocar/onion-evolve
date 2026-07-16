@@ -19,7 +19,7 @@ related:
 |-------|-------|
 | **Decisão** | Um KG-SSOT **apodrece silenciosamente** quando suas claims `plane: PROD` não são **re-verificadas** contra o estado vivo, e **drifta** do próprio validador quando o schema evolui sem versão. O core adota **duas guardas irmãs**, ambas da família "o radar recusa/avisa quando a SSOT driftou": **(A) frescor** — campo `verified_at:` (+ opcional `verified_against:`) obrigatório em nós `plane: PROD`, com o `kg-radar.sh` emitindo **STALE** quando ausente ou vencido; **(B) versão de schema** — campo `schema_version:` no bloco `meta:`, com o radar **recusando/sinalizando** divergência da versão que ele entende. |
 | **Escopo** | Investigação (KG-SDAAL): o `.kg.yaml`, o `kg-radar.sh` e a KB `knowledge-graph-sdaal.md`. **Não** toca produto/engenharia/compliance, transporte, nem o motor de UI de adotante. |
-| **Status** | ✅ **Aceito + F1 IMPLEMENTADA** — 2026-07-16. A postura foi decidida e a **Fase 1 (helper + selftests) já entrou**: `kg-radar.sh` ganhou os modos `--freshness` e `--schema` (as 3 checagens: STALE-MISSING, STALE-OLD, schema-drift) + 5 selftests que reagem. Q1/Q2 resolvidas na prática (baseline in-file, sem "agora"). Restam F2 (fiação `/meta:kg` + KB) e F3 (campo). |
+| **Status** | ✅ **Aceito + F1/F2 IMPLEMENTADAS** — 2026-07-16. **F1** (helper + selftests): `kg-radar.sh` ganhou `--freshness`/`--schema` (STALE-MISSING, STALE-OLD, schema-drift) + 5 selftests que reagem; Q1/Q2 resolvidas (baseline in-file, sem "agora"). **F2** (fiação + KB): `/meta:kg` expõe os modos (v1.3.0), doutrina promovida a seção na `knowledge-graph-sdaal.md`, `schema_version` semeado nos 5 grafos reais do core. Resta **F3** (campo: contra o grafo real do rhilo). |
 | **Origem** | Propostas **#2 (⭐ a maior alavanca)** e **#1** do sinal de campo [`2026-07-16-kg-sdaal-dogfood-ouro`](../evolution/inbox/_processed/2026-07-16-kg-sdaal-dogfood-ouro.md) (adotante rhilo-metagamify) — o uso mais intenso do KG SDAAL até hoje (165 nós/288 arestas: reconciliou o SSOT do WRR/Modo Equilíbrio, decidiu arquitetura pelo grafo, gerou código, validou A/B ao vivo). Costuradas num ADR só porque são o **mesmo problema**: a SSOT diverge do real (no tempo) ou do validador (no formato). |
 
 ---
@@ -121,8 +121,11 @@ um dogfood, duas guardas irmãs no mesmo `kg-radar.sh`. Separá-las duplicaria c
   `--freshness` e `--schema` (+ ambos no `--all`), o parse de `verified_at:`/`schema_version:`/`baseline:`,
   e a constante `RADAR_SCHEMA`. 5 fixtures em `fixtures/kg-freshness/` + `fixtures/kg-schema/` e 5 selftests
   que reagem. Gate: `lint-artifacts` 0/0, `lint-selftest` **282/0**. Q1/Q2 resolvidas na prática.
-- **F2 — fiação + KB:** `/meta:kg` expõe o veredito de frescor; doutrina de frescor promovida na
-  `knowledge-graph-sdaal.md` (de ponteiro a seção). `schema_version` semeado nos grafos-exemplo do core.
+- **F2 — fiação + KB:** ✅ **FEITA (2026-07-16).** `/meta:kg` expõe `--freshness`/`--schema` (schema
+  exemplo com `verified_at:`/`schema_version:`/`baseline:`, comandos do radar, vereditos FRESCOR/SCHEMA,
+  nota do gate; v1.3.0). Doutrina promovida na `knowledge-graph-sdaal.md` de ponteiro a **seção**
+  ("Frescor e versão de schema") + saídas do radar (4→6). `schema_version: "1"` semeado nos 5 grafos
+  reais do core (as fixtures `kg-domain/*` ficam sem, de propósito — o selftest de retrocompat depende).
 - **F3 — campo:** rodar o radar com as guardas contra um grafo real de adotante (o próprio rhilo, que tem os
   nós PROD stale documentados) → confirmar que **STALE dispara** onde a dor apareceu. Registrar no diário;
   fechar o loop com o sinal.

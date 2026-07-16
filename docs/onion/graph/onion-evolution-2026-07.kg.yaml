@@ -7,6 +7,7 @@
 #           trace: migalha inline (arquivo:linha) — a aresta TRACES_TO fica p/ rastreio entre NÓS.
 meta:
   id: onion-evolution-2026-07
+  schema_version: "1"
   date: 2026-07-04
   source_run: wf_01b63531-114
 

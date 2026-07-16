@@ -10,8 +10,8 @@ description: |
 model: sonnet
 category: meta
 tags: [kg, knowledge-graph, investigation, sdaal, radar, reconciliation, domain-layer]
-version: "1.2.0"
-updated: "2026-07-10"
+version: "1.3.0"
+updated: "2026-07-16"
 allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/kg-radar.sh*) Bash(ls docs/*)
 argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área>]  (vazio = localizar .kg.yaml existente e rodar radar)"
 related_commands:
@@ -67,6 +67,8 @@ nunca o código do radar.
 ```yaml
 meta:
   id: <slug>
+  schema_version: "1"        # versão da gramática — o radar RECUSA (--schema) se divergir da que entende
+  baseline: AAAA-MM-DD       # opcional: nó PROD com verified_at anterior a esta data = STALE-OLD (--freshness)
   date: AAAA-MM-DD
 nodes:
   - id: C_MEU_CLAIM          # prefixos por convenção: C_ claim · E_ evidence · D_ decision · Q_ question · A_ artifact
@@ -77,6 +79,7 @@ nodes:
     impact: 4                # 1-5
     confidence: 0.9          # 0-1
     status: open             # open | confirmed | refuted | superseded | done
+    verified_at: AAAA-MM-DD  # SÓ plane:PROD — quando a claim foi cruzada com o vivo (ausente = ⚠ STALE-MISSING)
     label: "afirmacao verificavel em uma frase"
     trace: "arquivo:linha"   # migalha inline (o radar ignora; humanos e LLMs seguem)
 edges:
@@ -117,8 +120,10 @@ eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção do meta
 
 ### Passo 3 — Rodar o radar (determinístico — o veredito é dele)
 ```bash
-bash .claude/validation/kg-radar.sh docs/onion/graph/<slug>.kg.yaml            # 4 saídas
-bash .claude/validation/kg-radar.sh <arquivo> --integrity                      # só o gate (exit 1 se problema)
+bash .claude/validation/kg-radar.sh docs/onion/graph/<slug>.kg.yaml            # todas as saídas (radar+reconcile+integrity+domain+freshness+schema)
+bash .claude/validation/kg-radar.sh <arquivo> --integrity                      # só o gate estrutural (exit 1 se problema)
+bash .claude/validation/kg-radar.sh <arquivo> --schema                         # só o gate de schema (exit 1 se schema_version divergir)
+bash .claude/validation/kg-radar.sh <arquivo> --freshness                      # só o frescor da SSOT (⚠ STALE-MISSING/STALE-OLD, não reprova)
 bash .claude/validation/kg-radar.sh <arquivo> --domain                         # só completude da camada domain
 bash .claude/validation/kg-radar.sh <arquivo> --triples                        # triplas p/ consumo por LLM
 bash .claude/validation/kg-console.sh <arquivo> > grafo.html                    # VER o grafo (projeção HTML self-contained)
@@ -131,6 +136,12 @@ bash .claude/validation/kg-console.sh <arquivo> > grafo.html                    
 - **INTEGRIDADE** = órfãos, arestas para nós inexistentes, contradições (REFUTES entrando em nó
   ainda `confirmed`), enums inválidos (incl. `layer`, `on:` para evento inexistente).
   **Exit 1 = reconciliar antes de commitar.**
+- **FRESCOR** (⚠ **não reprova**) = a SSOT foi re-verificada contra o vivo? **STALE-MISSING** (nó
+  `plane:PROD` sem `verified_at:`) · **STALE-OLD** (`verified_at` anterior à `meta.baseline`). Um nó
+  stale **mente**, não corrompe — o veredito é "re-verifique". *Nasceu da lição-mestra do dogfood rhilo.*
+- **SCHEMA** (✗ **reprova**, exit 1) = `meta.schema_version` bate com o que o radar entende? Divergência
+  = recusa (o radar não sabe ler o arquivo); ausência = ⚠ retrocompat. *Teria pego o fork de ferramenta
+  no dia 1.*
 
 ### Passo 4 — Agir dirigido pelo veredito
 - Claims `confirmed` de alta atenção → PRs/atuadores (citar o nó no commit).
@@ -205,9 +216,11 @@ nunca o componente). Redesign/refactor só começa aqui — **dirigido pelo cont
 
 - **Append-mostly**: corrigir = adicionar nó/aresta ou mudar `status`; **nunca** deletar nós
   (auditoria da investigação é o próprio grafo).
-- O radar é **gate**: integridade com exit 1 bloqueia o commit do `.kg.yaml` (mesmo espírito dos
-  demais scripts de `.claude/validation/`). O radar-de-domínio **não** é gate — lacuna de completude
-  é atenção (um estado-absorvente pode ser terminal legítimo; o juízo é seu).
+- O radar é **gate**: integridade **ou schema** com exit 1 bloqueia o commit do `.kg.yaml` (mesmo
+  espírito dos demais scripts de `.claude/validation/`). O radar-de-domínio e o **frescor** **não** são
+  gate — são atenção (um estado-absorvente pode ser terminal legítimo; um nó stale mente mas não
+  corrompe — o juízo é seu). Carimbe `verified_at:` nos nós `plane:PROD` quando cruzar a claim com o
+  vivo — é o que aposenta o ⚠ STALE-MISSING e deixa o próximo leitor (humano ou IA) confiar sem re-checar.
 - **Átomos de UI** (design) são nós `layer: domain`: átomo `READS` sua fonte (1 só — fonte-única),
   `TRACES_TO` o componente dono; o `SourceTag` do adotante é a aresta *renderizada*, não motor do core.
   Doutrina: [ADR design-extends-kg](../../../docs/analysis/onion-adr-design-extends-kg-2026-07.md).
