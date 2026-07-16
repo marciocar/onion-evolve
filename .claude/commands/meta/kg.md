@@ -79,7 +79,8 @@ nodes:
     impact: 4                # 1-5
     confidence: 0.9          # 0-1
     status: open             # open | confirmed | refuted | superseded | done
-    verified_at: AAAA-MM-DD  # SÓ plane:PROD — quando a claim foi cruzada com o vivo (ausente = ⚠ STALE-MISSING)
+    verified_against: branch # opt-in: nomeia o artefato MÓVEL rastreado (branch|commit|deploy|config|dump:) — torna o nó rastreado por frescor mesmo em DEV
+    verified_at: AAAA-MM-DD  # quando a claim foi cruzada com o vivo (nó PROD ou com verified_against; ausente = ⚠ STALE-MISSING)
     label: "afirmacao verificavel em uma frase"
     trace: "arquivo:linha"   # migalha inline (o radar ignora; humanos e LLMs seguem)
 edges:
@@ -136,9 +137,10 @@ bash .claude/validation/kg-console.sh <arquivo> > grafo.html                    
 - **INTEGRIDADE** = órfãos, arestas para nós inexistentes, contradições (REFUTES entrando em nó
   ainda `confirmed`), enums inválidos (incl. `layer`, `on:` para evento inexistente).
   **Exit 1 = reconciliar antes de commitar.**
-- **FRESCOR** (⚠ **não reprova**) = a SSOT foi re-verificada contra o vivo? **STALE-MISSING** (nó
-  `plane:PROD` sem `verified_at:`) · **STALE-OLD** (`verified_at` anterior à `meta.baseline`). Um nó
-  stale **mente**, não corrompe — o veredito é "re-verifique". *Nasceu da lição-mestra do dogfood rhilo.*
+- **FRESCOR** (⚠ **não reprova**) = a SSOT foi re-verificada contra o vivo? **STALE-MISSING** (nó rastreado —
+  `plane:PROD` **ou** com `verified_against:` — sem `verified_at:`) · **STALE-OLD** (`verified_at` anterior à
+  `meta.baseline`). Cobre nós DEV que rastreiam artefato móvel (branch/commit), não só PROD. Um nó stale
+  **mente**, não corrompe — o veredito é "re-verifique". *Nasceu da lição-mestra do dogfood rhilo.*
 - **SCHEMA** (✗ **reprova**, exit 1) = `meta.schema_version` bate com o que o radar entende? Divergência
   = recusa (o radar não sabe ler o arquivo); ausência = ⚠ retrocompat. *Teria pego o fork de ferramenta
   no dia 1.*

@@ -285,6 +285,15 @@ run_kg_freshness_selftests() {
   if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'schema_version ausente'; then
     record_pass "kg-schema: ausente → ⚠ + exit 0 (retrocompat, degradê)"
   else record_fail "kg-schema: ausente/retrocompat" "esperava exit 0 + ⚠; rc=${rc} out=${out}"; fi
+
+  # (f) F1.1 — frescor estende a DEV que rastreia artefato móvel (verified_against), sem inundar
+  # claim epistêmico DEV puro. Sinal rhilo ssot-como-runtime §2 (C_CONSOLIDATION_MAP stale).
+  rc=0; out=$(bash "${radar}" "${fx}/dev-tracked-stale.kg.yaml" --freshness 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q 'STALE-MISSING: C_STRAT' \
+     && ! printf '%s' "${out}" | grep -q 'C_READ'; then
+    record_pass "kg-freshness: DEV+verified_against → STALE-MISSING; DEV puro NÃO flagado (não inunda)"
+  else record_fail "kg-freshness: dev-tracked" "esperava STALE C_STRAT sem C_READ; rc=${rc} out=${out}"; fi
 }
 
 # ---------------------------------------------------------------------------
