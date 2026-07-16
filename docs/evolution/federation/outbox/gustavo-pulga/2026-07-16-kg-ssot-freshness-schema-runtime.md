@@ -6,7 +6,7 @@ to: gustavo-pulga (workspace BetaHauss — COLABORADOR-VISITANTE, não registrad
 re: CHANGELOG de co-evolução, entrada 2026-07-16 (downstream)
 type: downstream-announce
 classe: COMPATÍVEL
-status: a transportar (rascunho na staging do core) — transporte via maestro (destino não-registrado)
+status: a transportar (rascunho na staging do core) — entrega via BRANCH (não inbound de repo separado)
 ---
 
 # 📣 Anúncio do core — KG-SSOT: frescor + schema + SSOT-as-runtime
@@ -30,16 +30,18 @@ entraram no **backlog priorizado** do core como candidatos a ADR próprio.
   core (mesma família "o radar recusa quando a SSOT driftou").
 
 ## ⚠️ Nota de fronteira (o seu próprio Sinal 8)
-Você **não está registrado no `members.yaml`** do core — é **colaborador-visitante**. Isso é exatamente o
-gap que o seu **Sinal 8** aponta (perfil colaborador-visitante + boundary de autorização de relay
-maestro-only ainda não formalizados). Por isso este anúncio **não tem destino automático**: o **maestro**
-transporta. Formalizar seu perfil está no backlog do core (crumb `2026-07-16-gustavo-omnibus-backlog`, #8).
+Você **não está registrado no `members.yaml`** do core — é **colaborador-visitante** (sem acesso ao core; a
+fronteira é reforçada pelo próprio SO). Isso é exatamente o gap do seu **Sinal 8** (perfil colaborador-visitante
++ autorização de relay maestro-only ainda não formalizados). O seu **canal de entrega é uma branch** que você
+acessa — não o `inbound/` de um repo separado. Formalizar seu perfil está no backlog do core (crumb
+`2026-07-16-gustavo-omnibus-backlog`, #8); até lá, a entrega por branch é o mecanismo de fato.
 
 ## Ação esperada
-- Ler (quando o maestro transportar ao seu canal).
+- Ler quando o maestro entregar este anúncio na **branch** do seu canal (você dá pull nela).
 - Aplicar a disciplina/gate como método no seu stack.
 
 ---
-> **Transporte (maestro):** destino **não-registrado** (colaborador-visitante). Copie para o canal de
-> recados/inbound que você usa com o Gustavo (BetaHauss) e commite lá — a sessão do core não pusha repo
-> alheio. Considere registrar/decidir o perfil dele (Sinal 8) antes do próximo ciclo.
+> **Transporte (maestro):** o Gustavo **recebe pela branch** (colaborador-visitante, sem acesso ao core).
+> Entregar committando este arquivo na **branch** que ele acessa (o canal BetaHauss/Tornak) e push — o
+> Gustavo dá pull. A sessão do core **não** pusha esse repo/branch alheio: o transporte é do maestro.
+> Considere formalizar o perfil dele (Sinal 8) para dar ao canal um nome de 1ª classe.
