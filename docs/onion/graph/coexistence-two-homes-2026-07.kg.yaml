@@ -1,0 +1,157 @@
+# Coexistência de 2 casas (Avell workstation + VPS primária) sobre 1 repo — decisão modelada ssot-first.
+# Nasceu do ssot-first ao vivo (2026-07-16): a arquitetura é uma investigação com opções rivais +
+# um veredito a reconciliar → KG bate a prosa (lente Hegel). O arquivo é in-repo → coexiste nas 2 máquinas.
+meta:
+  id: coexistence-two-homes-2026-07
+  schema_version: "1"
+  baseline: 2026-07-16
+  date: 2026-07-16
+nodes:
+  - id: E_GROUNDING
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-16
+    label: "recon 2026-07-16: 33 migalhas + 10 KGs + 1 sessao IN-REPO; 20 memorias FORA; VPS=srv1812846; Avell nao-alcancavel da VPS"
+  - id: C_GIT_COEXISTS
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-16
+    label: "tudo in-repo (codigo/diario/KG/sessions/docs) coexiste via git automaticamente — o repo JA e o cerebro compartilhado"
+  - id: C_MEMORY_LOCAL
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-16
+    label: "memoria (~/.claude/.../memory, 20 arqs) e FORA do repo → nao coexiste por git (unica lacuna real)"
+  - id: D_ORIGIN_SOT
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "origin (GitHub) = fonte unica; Avell e VPS sao clones; git e o elo (o link entre as duas casas)"
+  - id: D_VPS_PRIMARY
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "papeis assimetricos (escolha do maestro): VPS primaria always-on + Avell workstation movel"
+  - id: Q_MEMORY_COEXIST
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.4
+    status: confirmed
+    label: "como a memoria machine-local deve coexistir entre Avell e VPS?"
+  - id: C_OPT_DIARY_BRAIN
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "opcao A: diario in-repo e o cerebro; memoria fica local (rascunho por-maquina)"
+  - id: C_OPT_SYNC
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.35
+    status: refuted
+    label: "opcao B: sincronizar o dir cru de memoria (repo privado / rsync Avell<->VPS) — simetria total"
+  - id: C_OPT_HYBRID
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "opcao C (hibrida): memoria local + promover o DURAVEL pro diario/KG no boot — reconcilia sem sync cru"
+  - id: C_HEGEL_THRESHOLD
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "lente Hegel: KG vale quando o conhecimento deixa de ser monotonico; 20 memorias estaveis ABAIXO do limiar (memoria-KG = over-engineering); o DESIGN da coexistencia ACIMA (este KG vale a pena)"
+    trace: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md"
+  - id: D_MEMORY_VERDICT
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "VEREDITO: hibrido (opcao C) — diario e o cerebro compartilhado; memoria fica local; o duravel promove pro diario. Sync cru so se a memoria virar contradicao-rica (nao virou)"
+  - id: A_RESCUE
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "RESGATE: capturar o trabalho nao-commitado do Avell (branch rescue, ANTES de sync — o Avell e a capsula pre-VPS). Alta prioridade, risco de perda"
+  - id: C_FETCH_FIRST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "disciplina p/ 2 instancias vivas: git fetch/pull antes de evoluir (ja cabeado no co-evolve v1.4.0) + um-escritor-por-branch"
+edges:
+  - from: E_GROUNDING
+    to: C_GIT_COEXISTS
+    edge_type: SUPPORTS
+  - from: E_GROUNDING
+    to: C_MEMORY_LOCAL
+    edge_type: SUPPORTS
+  - from: C_GIT_COEXISTS
+    to: D_ORIGIN_SOT
+    edge_type: SUPPORTS
+  - from: D_VPS_PRIMARY
+    to: D_ORIGIN_SOT
+    edge_type: DEPENDS_ON
+  - from: Q_MEMORY_COEXIST
+    to: C_MEMORY_LOCAL
+    edge_type: DEPENDS_ON
+  - from: C_OPT_DIARY_BRAIN
+    to: D_MEMORY_VERDICT
+    edge_type: SUPPORTS
+  - from: C_OPT_HYBRID
+    to: D_MEMORY_VERDICT
+    edge_type: SUPPORTS
+  - from: C_HEGEL_THRESHOLD
+    to: D_MEMORY_VERDICT
+    edge_type: SUPPORTS
+  - from: C_HEGEL_THRESHOLD
+    to: C_OPT_SYNC
+    edge_type: REFUTES
+  - from: D_MEMORY_VERDICT
+    to: Q_MEMORY_COEXIST
+    edge_type: DEPENDS_ON
+  - from: D_MEMORY_VERDICT
+    to: C_HEGEL_THRESHOLD
+    edge_type: TRACES_TO
+  - from: A_RESCUE
+    to: D_ORIGIN_SOT
+    edge_type: DEPENDS_ON
+  - from: C_FETCH_FIRST
+    to: D_VPS_PRIMARY
+    edge_type: SUPPORTS
