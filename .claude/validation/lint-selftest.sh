@@ -757,6 +757,18 @@ run_adopted_role_selftests() {
   else
     record_pass "adopted-role: role adopted sem plugins/ → 0 violações de marketplace (guarda por papel)"
   fi
+  # link-check role-guard (sinal granaai 2026-07-16): adotante NÃO vendoriza docs core-only → links
+  # vendorizados que os referenciam devem ser PULADOS; MAS link KB-interno quebrado ainda VIOLA (precisão).
+  rm -rf "${asb}/docs/analysis" "${asb}/docs/discussions" "${asb}/docs/applying" "${asb}/docs/evolution/federation"
+  printf '# t\n[core-only](../analysis/foo.md)\n[kb-interno-faltando](concepts/nao-existe-xyz.md)\n' \
+    > "${asb}/docs/knowledge-base/test-link-guard.md"
+  local out2; out2="$(cd "${asb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if printf '%s' "${out2}" | grep -q 'concepts/nao-existe-xyz.md' \
+     && ! printf '%s' "${out2}" | grep -q 'analysis/foo.md'; then
+    record_pass "adopted-role: link-guard pula core-only (analysis) e ainda pega KB-interno quebrado (preciso)"
+  else
+    record_fail "adopted-role: link-guard" "core-only não-pulado OU KB-interno não-pego: $(printf '%s' "${out2}" | grep -i 'link relativo' | head -3)"
+  fi
   rm -rf "${asb}"
 }
 

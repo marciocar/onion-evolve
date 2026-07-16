@@ -1173,7 +1173,13 @@ run_inventory_fixes() {
 _scan_relative_links() {
   local base="$1" hint="$2"
   [ -d "${base}" ] || return 0
-  local f dir lineno target clean
+  # Role-guard (sinal granaai 2026-07-16): o adotante NÃO vendoriza os docs core-only
+  # (analysis/evolution/discussions/applying/materials/plans/onion) — um doc vendorizado (KB/comando)
+  # que os referencia resolve no CORE, mas o alvo é ausente-por-desenho no adotante. Pular SÓ o
+  # alvo-ausente que cai nesses prefixos; a checagem de link KB-interno (arquivo que DEVERIA existir)
+  # continua ativa. No core (role: source) o guard é no-op (os docs existem).
+  local adopted=""; grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && adopted=1
+  local f dir lineno target clean rel
   while IFS= read -r -d '' f; do
     dir="$(dirname "${f}")"
     while IFS=$'\t' read -r lineno target; do
@@ -1181,6 +1187,12 @@ _scan_relative_links() {
       clean="${target%%#*}"
       [ -n "${clean}" ] || continue
       if [ ! -e "${dir}/${clean}" ]; then
+        if [ -n "${adopted}" ]; then
+          rel="$(realpath -m --relative-to="${REPO_ROOT}" "${dir}/${clean}" 2>/dev/null)"
+          case "${rel}" in
+            docs/analysis/*|docs/evolution/*|docs/discussions/*|docs/applying/*|docs/materials/*|docs/plans/*|docs/onion/*) continue ;;
+          esac
+        fi
         violation "HARD" "${f}" "link relativo quebrado (linha ${lineno}): '${target}' não resolve — ${hint}"
       fi
     done < <(awk '
