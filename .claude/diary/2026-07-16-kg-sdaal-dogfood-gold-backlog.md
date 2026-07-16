@@ -22,10 +22,13 @@ Sinal upstream com **7 propostas ao core**, todas verificadas contra o código r
 ## Decision — triagem (o que fica pendente)
 Ordem por alavanca × custo (dogfood: barato→caro, helper→fiação→campo):
 
-- **#2 ⭐ Frescor PROD (a flagship, maior buraco):** campo `verified_at:` por nó `plane: PROD` + gate
-  **STALE** no `kg-radar.sh`. **F1+F2 IMPLEMENTADAS (2026-07-16)** → `[[onion-adr-kg-freshness-gate-2026-07]]`:
-  F1 = modos `--freshness`/`--schema` + 5 selftests (282/0); F2 = fiação `/meta:kg` (v1.3.0) + doutrina
-  promovida a seção na KB + `schema_version` semeado nos 5 grafos reais. Resta **F3** (campo contra o rhilo).
+- **#2 ⭐ Frescor (a flagship, maior buraco):** `verified_at:` + gate **STALE** no `kg-radar.sh`.
+  **F1+F1.1+F2 IMPLEMENTADAS (2026-07-16)** → `[[onion-adr-kg-freshness-gate-2026-07]]`: F1 = modos
+  `--freshness`/`--schema` + selftests; **F1.1** = frescor estende a DEV via `verified_against:` (opt-in),
+  **supersedendo o "só PROD"** após o sinal-companheiro `ssot-como-runtime` `REFUTAR` em campo (nó DEV
+  `C_CONSOLIDATION_MAP` stale); F2 = fiação `/meta:kg` (v1.3.0) + doutrina a seção na KB + semeadura.
+  283/0. **F3 SUBSUMIDA** (o campo operou a SSOT e o relato substituiu "rodar o radar lá"). Puro dogfood
+  SDAAL sobre o core: decisão-própria virou claim → `REFUTES` de campo → `SUPERSEDES`, história reconciliada.
 - **#1 schema_version + gate:** `schema_version:` no `meta:`; radar **recusa** na divergência. **F1 FEITA
   junto do #2** (mesma família): `RADAR_SCHEMA="1"`, gate de drift (recusa) + degradê de retrocompat (ausente
   = ⚠, não quebra grafo legado). Teria pego o fork `scripts/kg`↔`kg-radar.sh` no dia 1.
@@ -42,6 +45,22 @@ Ordem por alavanca × custo (dogfood: barato→caro, helper→fiação→campo):
 
 Seção 7 do sinal (não testado: `kg-console.sh` a fundo, modo `map` F4, domínio cross-repo, fase-2
 semântica por embeddings, escala do radar >1k nós) → informativo/backlog, não acionável.
+
+## Trabalho derivado do 2º sinal rhilo (`ssot-como-runtime`, triado 2026-07-16)
+Além da F1.1 (feita), o sinal-operação deixou 2 features de desenho próprio:
+- **`kg state`** — projeção de estado-de-trabalho (feito/pendente/próximo), irmão do radar. O adotante
+  escreveu um `kg-state.py`. Backlog: um `--state`/`kg-state.sh`. **Desenho próprio.**
+- **Cabear KG-first nos loops** (`catch-up`/`warm-up`/`work` consultam o `.kg.yaml` PRIMEIRO, acima do
+  git) — o buraco que fez o adotante re-derivar à mão 3×. **Fiação, backlog.**
+Doutrina **SSOT-as-runtime** (read→verify→act→write; LLM=VM, .kg.yaml=bytecode) absorvida no ADR.
+
+## Pendente — triagem própria (não desta sessão)
+- **Omnibus do gustavo** (`2026-07-16-treino-vertical-colaboracao-produtos`, ainda no inbox): 8 sinais
+  (spec→N-artefatos, absorção de skill 3º, retro-as-code, colaborador-visitante+autorização, KB
+  colaboração; **KG-SSOT: Sinais 5/6/7** = KG por fronteira de confiança + SSOT com partição de
+  visibilidade + gate client-safe determinístico). Entrou aqui só como **evidência convergente** da
+  virada SSOT-de-1ª-classe; a triagem completa é passo à parte. Lição da sessão: **ler o conteúdo
+  inteiro antes de triar** ([[read-full-content-before-triage]]) — quase descartei por leitura parcial.
 
 ## Done nesta sessão
 - **#5 [DONE]:** seção "Footguns ao autorar o `.kg.yaml`" na KB `knowledge-graph-sdaal.md` — `on:`→bool
