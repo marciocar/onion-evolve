@@ -50,6 +50,17 @@ uso** precisa da nota pé-no-chão (feita: `USAGE.md`) **linkada** no `interface
 
 ---
 
+## Nota de entrega (2026-07-16) — por que "não chegou" à 1ª leitura
+
+Este sinal foi mergeado em `origin/main` (PR #379), mas **não apareceu** na primeira leitura do core porque
+o **checkout local** `/home/marcio/onion-evolve` (branch `main`) estava **3 commits atrás** de `origin/main`.
+Worktrees compartilham o `.git` mas têm **working trees separados** — um merge no GitHub **não** atualiza um
+checkout que não deu `pull`. **Não foi falha de doc-bridge** (é o mesmo repo, não cross-repo — doc-bridge é
+para repos diferentes). **Entregue** via `git pull --ff-only` no checkout do core, a partir da sessão do
+worktree (o untracked em curso lá sobreviveu intacto). **Lição:** sinal no mesmo repo só "chega" ao core
+quando o checkout de `main` **sincroniza com `origin/main`** — vale um lembrete no ritual de `/meta:co-evolve`
+(fazer `git fetch`/`pull` antes de ler o inbox).
+
 ## Triagem do core (preencher na recepção)
 
 - **Status:** _pendente_
