@@ -4,11 +4,11 @@ description: |
   Preparação geral do projeto - contexto completo do Sistema Onion.
   Revisa README, estrutura de documentação e meta especificações.
 model: sonnet
-allowed-tools: Read Bash(ls *) Bash(find docs*)
+allowed-tools: Read Bash(ls *) Bash(find docs*) Bash(bash .claude/validation/kg-radar.sh*)
 category: general
-tags: [warmup, context, preparation, overview]
-version: "3.2.0"
-updated: "2026-07-03"
+tags: [warmup, context, preparation, overview, kg-first]
+version: "3.3.0"
+updated: "2026-07-16"
 ---
 
 # 🔥 Warm-up Geral do Projeto
@@ -24,6 +24,16 @@ Estabelecer contexto completo do projeto incluindo:
 - Mapeamento de recursos disponíveis
 
 ## 📋 Checklist de Preparação
+
+### 0. KG-first — o `.kg.yaml` é o SSOT vivo do estado/domínio (antes da prosa)
+- ✅ **Se existir um `.kg.yaml` no repo, consulte-o PRIMEIRO** (`ls docs/onion/graph/*.kg.yaml
+  docs/*/graph/*.kg.yaml *.kg.yaml 2>/dev/null`) — ele é a fonte da verdade de estado/domínio, **acima**
+  da prosa dos docs. Rode `bash .claude/validation/kg-radar.sh <arquivo>` e absorva o veredito (atenção,
+  reconciliação, integridade, frescor) citando **ids de nó**.
+- ✅ **Drive-to-verify:** claims `plane: PROD` de alto impacto → cruzar contra o vivo antes de assumir; nó
+  stale mente (`--freshness`). Sem `.kg.yaml` → siga para o item 1.
+- ⚙️ **Mecanismo, não conselho** (sinal metagamify 2026-07-16): consultar o KG **por padrão** é a forcing
+  function contra a reincidência de "reconstruir da prosa". Doutrina: [knowledge-graph-sdaal.md](../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md) §SSOT-as-runtime.
 
 ### 1. README Principal
 - ✅ Revisar `README.md` na raiz do projeto
