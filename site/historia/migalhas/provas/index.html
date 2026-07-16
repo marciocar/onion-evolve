@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<!-- Provas · onionevolve.com/historia/migalhas/provas/ · fonte: onion-evolve/site/historia/migalhas/provas/
+     O repositório onion-evolve é PRIVADO — os links de PR não abrem para o público. Esta página é a
+     prova público-segura: por migalha, o que mudou (reusado da própria migalha, já curado) + metadados
+     OBJETIVOS de cada PR/commit (status merged, data, arquivos e linhas). Nenhum corpo de PR é exposto
+     (as descrições cruas nomeiam adotantes confidenciais). Números não vazam nomes. -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Provas — as migalhas por trás dos números</title>
+<meta property="og:title" content="Provas — Migalhas do Onion Evolve">
+<meta name="description" content="A prova público-segura de cada migalha: o que mudou e os metadados objetivos de cada PR (merged, data, arquivos, linhas). O repositório é privado; aqui a prova é aberta sem abrir o código.">
+<meta name="robots" content="index,follow">
+<style>
+  @font-face { font-family:'Fraunces'; src:url('/fonts/fraunces-var.woff2') format('woff2'); font-weight:300 900; font-style:normal; font-display:swap; }
+  @font-face { font-family:'Fraunces'; src:url('/fonts/fraunces-italic-var.woff2') format('woff2'); font-weight:300 900; font-style:italic; font-display:swap; }
+  :root {
+    --bg:#FAF7F2; --bg-card:#FFFFFF; --orange:#C2410C; --orange-dim:rgba(194,65,12,0.09); --orange-glow:rgba(194,65,12,0.20);
+    --purple:#7C3AED; --purple-dim:rgba(124,58,237,0.08); --purple-glow:rgba(124,58,237,0.24); --green:#2F7A4E;
+    --text:#1C1612; --text-body:#3D3530; --text-muted:#6B635B; --border:rgba(28,22,18,0.09); --border-warm:rgba(194,65,12,0.20);
+    --radius-lg:18px; --mono:'SFMono-Regular','Fira Code','Courier New',monospace; --display:'Fraunces',Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:Georgia,'Times New Roman',serif; background:var(--bg); color:var(--text); line-height:1.7; overflow-x:hidden; font-size:16.5px; }
+  .sans { font-family:var(--sans); }
+  a { color:var(--orange); }
+  a:focus-visible { outline:2px solid var(--purple); outline-offset:3px; border-radius:3px; }
+  h1,h2 { font-family:var(--display); }
+  nav { position:fixed; top:0; left:0; right:0; z-index:100; border-bottom:1px solid var(--border);
+        background:rgba(250,247,242,.88); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+  .nav-in { max-width:900px; margin:0 auto; padding:13px 24px; display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; }
+  .nav-logo { font-weight:700; font-size:.95rem; text-decoration:none; color:var(--text); white-space:nowrap; }
+  .nav-logo small { color:var(--text-muted); font-weight:400; margin-left:.5rem; font-size:.72rem; }
+  .nav-links { margin-left:auto; display:flex; gap:1.1rem; align-items:center; }
+  .nav-links a { font-size:.85rem; text-decoration:none; color:var(--text-muted); }
+  .nav-links a:hover { color:var(--orange); }
+  .nav-links a.on { color:var(--orange); font-weight:700; }
+  .hero { max-width:760px; margin:0 auto; padding:118px 24px 24px; text-align:center; }
+  .eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:.72rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase;
+             color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow); padding:.45rem 1.05rem; border-radius:99px; margin-bottom:1.4rem; }
+  .hero h1 { font-size:clamp(1.8rem,4.6vw,2.8rem); font-weight:600; letter-spacing:-.015em; line-height:1.14; }
+  .hero h1 em { color:var(--orange); font-style:italic; }
+  .hero .sub { font-family:var(--sans); font-size:1.02rem; color:var(--text-body); max-width:620px; margin:1.2rem auto 0; }
+  .note { max-width:760px; margin:1.2rem auto 0; padding:0 24px; }
+  .note-in { background:#1C1612; color:#F4F1EC; border-radius:var(--radius-lg); padding:1.3rem 1.6rem; font-family:var(--sans); font-size:.88rem; }
+  .note-in b { color:var(--orange-light,#EA580C); }
+  .feed { max-width:760px; margin:0 auto; padding:2.2rem 24px 4rem; display:flex; flex-direction:column; gap:1.4rem; }
+  .pcard { scroll-margin-top:80px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.5rem 1.8rem;
+           box-shadow:0 2px 12px -8px rgba(28,22,18,.14); }
+  .pc-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:.7rem; margin-bottom:.6rem; }
+  .pc-date { font-family:var(--mono); font-size:.74rem; color:var(--text-muted); }
+  .pcard h2 { font-size:1.16rem; font-weight:600; letter-spacing:-.01em; line-height:1.3; }
+  .pc-desc { font-size:.94rem; color:var(--text-body); margin:.3rem 0 1rem; }
+  .pc-prs { list-style:none; display:flex; flex-direction:column; gap:.4rem; }
+  .pc-prs li { display:flex; flex-wrap:wrap; align-items:center; gap:.55rem; font-family:var(--sans); font-size:.82rem; padding:.5rem .7rem;
+               background:var(--orange-dim); border:1px solid var(--border); border-radius:8px; }
+  .pr-n { font-family:var(--mono); font-weight:700; color:var(--text); }
+  .pr-merged { display:inline-flex; align-items:center; gap:.3rem; color:var(--green); font-weight:600; }
+  .pr-merged::before { content:"●"; font-size:.7em; }
+  .pr-meta { color:var(--text-muted); font-family:var(--mono); font-size:.76rem; }
+  footer.site { max-width:760px; margin:0 auto; padding:2.4rem 24px 3.5rem; text-align:center; color:var(--text-muted); font-family:var(--sans); font-size:.85rem; border-top:1px solid var(--border); }
+  footer.site a { font-weight:600; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+
+<nav class="sans" aria-label="principal">
+  <div class="nav-in">
+    <a class="nav-logo" href="/">🧅 ONION EVOLVE<small>by Marcio Carvalho</small></a>
+    <div class="nav-links">
+      <a href="/historia/">Autobiografia</a>
+      <a href="/historia/migalhas/">Migalhas</a>
+      <a class="on" href="/historia/migalhas/provas/">Provas</a>
+      <a href="/mini/">Mini</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <span class="eyebrow sans">🔎 A prova, aberta</span>
+  <h1>As migalhas <em>por trás dos números.</em></h1>
+  <p class="sub">Cada lição das <a href="/historia/migalhas/">Migalhas</a> nasceu de mudanças reais, mergeadas
+  e testadas. O repositório é privado — então aqui está a prova sem abrir o código: o que mudou, e para cada
+  PR o que dá para conferir de fora (mergeado, quando, quantos arquivos e linhas).</p>
+</section>
+
+<div class="note">
+  <div class="note-in">
+    <b>Por que não linkamos direto o PR:</b> o repositório é privado (contém contexto de parceiros que não
+    pode ser público). Em vez de um link que ninguém abre, publicamos o que é <b>seguro e verificável</b>:
+    o status <em>mergeado</em>, a data e o tamanho de cada mudança. O conteúdo sensível fica no repositório;
+    a existência e o tamanho da prova ficam aqui.
+  </div>
+</div>
+
+<div class="feed">
+
+  <article class="pcard" id="prova-2026-07-16">
+    <div class="pc-head"><span class="pc-date sans">16 de julho de 2026 · Inovação</span></div>
+    <h2>A fonte da verdade também apodrece — e agora ela tem carimbo de validade</h2>
+    <p class="pc-desc">Cada afirmação sobre "como está em produção" ganhou carimbo de quando foi conferida;
+    o verificador avisa quando o carimbo falta ou venceu — comparando duas datas do próprio arquivo, sem
+    relógio. A decisão de projeto que o uso mostrou incompleta virou "superada", não apagada.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">PR #374</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">16 jul · 2 arquivos · +133 −2</span></li>
+      <li><span class="pr-n">PR #375</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">16 jul · 8 arquivos · +238 −26</span></li>
+      <li><span class="pr-n">PR #378</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">16 jul · 8 arquivos · +261 −49</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-15">
+    <div class="pc-head"><span class="pc-date sans">15 de julho de 2026 · Inovação</span></div>
+    <h2>Capacidade nova sem código novo: montamos ligando peças já testadas</h2>
+    <p class="pc-desc">O comando que cria uma vertical inteira não tem código próprio — compõe três
+    utilitários já cobertos por testes e fecha atualizando o inventário. Testamos os modos de falha, não só
+    o caminho feliz.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">PR #370</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">15 jul · 14 arquivos · +236 −25</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-11">
+    <div class="pc-head"><span class="pc-date sans">11 de julho de 2026 · Decisão</span></div>
+    <h2>O mercado organiza tudo em torno do código. A gente organiza em torno do conhecimento.</h2>
+    <p class="pc-desc">A estratégia foi estruturada como um grafo de decisão; a aposta centrada no
+    conhecimento saltou para o centro, com o contrapeso honesto de que ainda falta um adotante frio, de fora
+    da rede pessoal.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">PR #333</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">11 jul · 10 arquivos · +1067 −1</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-10-loop">
+    <div class="pc-head"><span class="pc-date sans">10 de julho de 2026 · Inovação</span></div>
+    <h2>O dia em que o ciclo girou nas duas direções ao mesmo tempo</h2>
+    <p class="pc-desc">Quatro mudanças mergeadas e anunciadas no mesmo dia: a camada de domínio do grafo de
+    conhecimento, o mapeamento completo de sistemas, o console visual e o método de consolidação segura de
+    dezenas de branches.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">PR #315</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">10 jul · 9 arquivos · +410 −38</span></li>
+      <li><span class="pr-n">PR #319</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">10 jul · 3 arquivos · +136 −2</span></li>
+      <li><span class="pr-n">PR #317</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">10 jul · 4 arquivos · +175 −0</span></li>
+      <li><span class="pr-n">PR #318</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">10 jul · 5 arquivos · +121 −7</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-10">
+    <div class="pc-head"><span class="pc-date sans">10 de julho de 2026 · Aprendizado</span></div>
+    <h2>O relógio do servidor também mente — carimbo de tempo agora exige prova</h2>
+    <p class="pc-desc">A verificação passou a exigir evidência de que o relógio está sincronizado — e sem
+    prova, veta (ausência nunca vira aprovação). Passou a valer em produção no mesmo dia.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">commit e750023</span> <span class="pr-merged sans">na main</span> <span class="pr-meta">3 arquivos · +47 −3</span></li>
+      <li><span class="pr-n">commit 74c470e</span> <span class="pr-merged sans">na main</span> <span class="pr-meta">4 arquivos · +79 −6</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-09">
+    <div class="pc-head"><span class="pc-date sans">9 de julho de 2026 · Inovação</span></div>
+    <h2>A primeira mensagem assinada chegou ao vivo — e o uso real mostrou o furo que o desenho não viu</h2>
+    <p class="pc-desc">O furo foi fechado no mesmo ciclo: a verificação passou a exigir que a chave usada
+    pertença, no registro oficial, a quem a mensagem diz ser — e ganhou um teste automático de impersonação
+    que roda a cada mudança.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">commit 668c03f</span> <span class="pr-merged sans">na main</span> <span class="pr-meta">4 arquivos · +33</span></li>
+      <li><span class="pr-n">commit ce94dfe</span> <span class="pr-merged sans">na main</span> <span class="pr-meta">3 arquivos · +155</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-08">
+    <div class="pc-head"><span class="pc-date sans">8 de julho de 2026 · Inovação</span></div>
+    <h2>Empacotamos a nós mesmos — e o padrão que a comunidade adotou em 2026 já era o nosso</h2>
+    <p class="pc-desc">Capacidades empacotadas como peças instaláveis, uma por área, com um mapa de quais
+    peças cada projeto recebe e uma consulta que descobre sozinha, pelo grafo, tudo que uma peça puxa. Seis
+    pacotes e 165 testes de guarda. Cinco entregas num dia.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">PR #292</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">8 jul · 110 arquivos · +26258 −0</span></li>
+      <li><span class="pr-n">PR #293</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">8 jul · 4 arquivos · +151 −0</span></li>
+      <li><span class="pr-n">PR #294</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">8 jul · 2 arquivos · +36 −2</span></li>
+      <li><span class="pr-n">PR #295</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">8 jul · 2 arquivos · +36 −2</span></li>
+      <li><span class="pr-n">PR #296</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">8 jul · 1 arquivo · +102 −0</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-05">
+    <div class="pc-head"><span class="pc-date sans">5 de julho de 2026 · Aprendizado</span></div>
+    <h2>A metade que trabalhava sozinha, sem ninguém saber</h2>
+    <p class="pc-desc">Em vez de "só atualizar", seguimos um roteiro de segurança: guardar uma cópia,
+    consertar o acesso quebrado, resgatar o trabalho que só existia ali, atualizar sem perda (47 registros)
+    e registrar tudo formalmente.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">PR #250</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">5 jul · 1 arquivo · +16 −11</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-03">
+    <div class="pc-head"><span class="pc-date sans">3 de julho de 2026 · Inovação</span></div>
+    <h2>Três erros diferentes eram, na verdade, o mesmo erro</h2>
+    <p class="pc-desc">Das três correções nasceram três verificações automáticas independentes e uma regra
+    reconhecível: toda decisão que depende de "o que está escrito" exige também "o que está de fato
+    acontecendo".</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">PR #222</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">2 jul · 17 arquivos · +510 −13</span></li>
+      <li><span class="pr-n">PR #224</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">2 jul · 9 arquivos · +388 −3</span></li>
+      <li><span class="pr-n">PR #225</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">2 jul · 10 arquivos · +124 −7</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-02">
+    <div class="pc-head"><span class="pc-date sans">2 de julho de 2026 · Erro</span></div>
+    <h2>O carimbo era falso — e quem confiou em nós nos corrigiu</h2>
+    <p class="pc-desc">Criamos uma verificação que nunca aceita um carimbo sozinho — sempre confere contra o
+    histórico real e uma amostra do conteúdo. Ela já pegou uma segunda divergência na primeira vez que rodou.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">PR #222</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">2 jul · 17 arquivos · +510 −13</span></li>
+    </ul>
+  </article>
+
+  <article class="pcard" id="prova-2026-07-01">
+    <div class="pc-head"><span class="pc-date sans">1 de julho de 2026 · Aprendizado</span></div>
+    <h2>Rodar é diferente de ler: os bugs que só apareceram na execução</h2>
+    <p class="pc-desc">Uma condição sempre-falsa escondida por indentação e um valor fixo que anulava uma
+    trava de segurança — invisíveis lendo, óbvios ao rodar. Os dois viraram verificações automáticas
+    permanentes.</p>
+    <ul class="pc-prs">
+      <li><span class="pr-n">PR #215</span> <span class="pr-merged sans">mergeado</span> <span class="pr-meta">2 jul · 22 arquivos · +646 −54</span></li>
+    </ul>
+  </article>
+
+</div>
+
+<footer class="site">
+  <p>Provas das <a href="/historia/migalhas/">Migalhas</a> do <a href="/">Onion Evolve</a>. Metadados
+  objetivos (mergeado, data, tamanho) — o conteúdo sensível fica no repositório privado.
+  <a href="/historia/">leia a história completa ←</a></p>
+</footer>
+
+</body>
+</html>
