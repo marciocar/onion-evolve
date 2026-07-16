@@ -4,6 +4,7 @@
 # Historia: dois times reportam o churn diferente. O grafo confronta as verdades; o radar aponta.
 meta:
   id: example-churn-contradiction
+  schema_version: "1"
   date: 2026-07-11
 nodes:
   - id: C_CHURN_HIGH

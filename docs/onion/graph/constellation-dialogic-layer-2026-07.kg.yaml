@@ -4,6 +4,7 @@
 # Camada audit (epistemico). Design-only, gated — nada promovido.
 meta:
   id: constellation-dialogic-layer-2026-07
+  schema_version: "1"
   date: 2026-07-12
 nodes:
   # ---- aferido (claims) ----
