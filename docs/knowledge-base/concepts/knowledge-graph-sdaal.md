@@ -160,14 +160,16 @@ push" já deployada). O valor do KG **não** é ser escrito uma vez — é ser *
 guardas (ADR [`kg-freshness-gate`](../../analysis/onion-adr-kg-freshness-gate-2026-07.md)), a mesma
 máquina com duas referências — *o radar recusa/avisa quando a SSOT driftou*:
 
-**A. Frescor (drift no tempo — `--freshness`, ⚠ aviso).** Um nó `plane: PROD` é uma **foto**; sem
-carimbo de *quando* foi verificado, envelhece.
-- **`verified_at:`** (data ISO) em nós `plane: PROD` — *quando* a claim foi cruzada com o vivo. Opcional
-  **`verified_against:`** (ex. `dump:...` | `code@commit`) nomeia *contra o quê*. Nós `plane: DEV` não
-  exigem (o `TRACES_TO` já ancora *onde*; PROD precisa do *quando*).
-- **STALE-MISSING**: nó PROD sem `verified_at:` → ⚠ (o modo-de-falha exato do campo — a SSOT do rhilo
-  não tinha *nenhuma* disciplina de frescor). **STALE-OLD**: `verified_at` anterior a **`meta.baseline:`**
-  (uma data no `meta:`) → ⚠, a verdade pode ter envelhecido.
+**A. Frescor (drift no tempo — `--freshness`, ⚠ aviso).** Um nó que rastreia um artefato **móvel** é uma
+**foto**; sem carimbo de *quando* foi verificado, envelhece.
+- **`verified_at:`** (data ISO) — *quando* a claim foi cruzada com o vivo. **Um nó é rastreado por frescor se
+  `plane: PROD`** (alvo implícito: o artefato vivo) **OU se declara `verified_against:`** (opt-in — nomeia o
+  artefato móvel: `branch` | `commit` | `deploy` | `config` | `dump:...`). Isso estende o frescor a **nós DEV**
+  que apontam para branch/commit (também apodrecem — F1.1, pós-campo), **sem inundar** claims epistêmicos
+  comuns (um `question`/`claim` DEV sem `verified_against` não é cobrado).
+- **STALE-MISSING**: nó rastreado sem `verified_at:` → ⚠ (o modo-de-falha exato do campo — a SSOT do rhilo
+  não tinha *nenhuma* disciplina de frescor, nem em PROD nem no nó DEV de estratégia `C_CONSOLIDATION_MAP`).
+  **STALE-OLD**: `verified_at` anterior a **`meta.baseline:`** (uma data no `meta:`) → ⚠, a verdade envelheceu.
 - **Aviso, não erro** — um nó stale **mente**, não corrompe; o veredito certo é "re-verifique", não
   "recuse o arquivo". Determinístico: compara **duas datas do próprio arquivo** (`verified_at` × `baseline`),
   **sem "agora"** — reproduzível.

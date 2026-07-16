@@ -77,7 +77,8 @@ section == "nodes" && nid != "" {
   if (line ~ /impact:/)     { v = line; sub(/.*impact:/, "", v);     impact[nid] = trim(v) + 0 }
   if (line ~ /confidence:/) { v = line; sub(/.*confidence:/, "", v); conf[nid] = trim(v) + 0 }
   if (line ~ /status:/)     { v = line; sub(/.*status:/, "", v);     nstatus[nid] = trim(v) }
-  if (line ~ /verified_at:/) { v = line; sub(/.*verified_at:/, "", v); verifiedAt[nid] = trim(v) }
+  if (line ~ /verified_against:/) { v = line; sub(/.*verified_against:/, "", v); verifiedAgainst[nid] = trim(v) }
+  else if (line ~ /verified_at:/) { v = line; sub(/.*verified_at:/, "", v); verifiedAt[nid] = trim(v) }
   if ($0 ~ /label:/)        { v = $0; sub(/^[[:space:]]*label:/, "", v); label[nid] = trim(v) }
   next
 }
@@ -210,19 +211,23 @@ END {
 
   if (mode == "--all" || mode == "--freshness") {
     print "══ FRESCOR — SSOT re-verificada contra o vivo (⚠ atenção, não reprova) ══"
-    fwarns = 0; nprod = 0
+    # Rastreado por frescor = plane:PROD (alvo implícito: o artefato vivo) OU qualquer nó que
+    # declare verified_against: (opt-in — nomeia o artefato MÓVEL que rastreia: branch/commit/
+    # deploy/config). Um nó DEV que aponta p/ branch/commit também apodrece (sinal rhilo
+    # ssot-como-runtime, §2: C_CONSOLIDATION_MAP stale). Não inunda claims epistêmicos comuns.
+    fwarns = 0; ntracked = 0
     for (i = 1; i <= nn; i++) {
       id = order[i]
-      if (plane[id] != "PROD") continue
-      nprod++
+      if (plane[id] != "PROD" && verifiedAgainst[id] == "") continue
+      ntracked++
       if (verifiedAt[id] == "") {
-        print "  ⚠ STALE-MISSING: " id " (nó plane:PROD sem verified_at: — foto sem carimbo, re-verifique contra o vivo)"; fwarns++
+        print "  ⚠ STALE-MISSING: " id " (frescor rastreado — plane:PROD ou verified_against: — sem verified_at:; re-verifique contra o vivo)"; fwarns++
       } else if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") {
         print "  ⚠ STALE-OLD: " id " (verified_at " verifiedAt[id] " anterior à baseline " metaBaseline " — a verdade pode ter envelhecido)"; fwarns++
       }
     }
-    if (nprod == 0) print "  (nenhum nó plane:PROD — nada a verificar quanto a frescor)"
-    else if (fwarns == 0) print "  ✅ " nprod " nó(s) PROD com frescor declarado" (metaBaseline != "" ? " (baseline " metaBaseline ")" : "")
+    if (ntracked == 0) print "  (nenhum nó com frescor rastreado — nada a verificar)"
+    else if (fwarns == 0) print "  ✅ " ntracked " nó(s) com frescor declarado" (metaBaseline != "" ? " (baseline " metaBaseline ")" : "")
     print ""
   }
 

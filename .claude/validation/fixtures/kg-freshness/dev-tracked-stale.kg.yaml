@@ -1,0 +1,42 @@
+# Fixture: nó DEV que rastreia artefato MÓVEL (verified_against: branches) SEM verified_at.
+# Modela o C_CONSOLIDATION_MAP do sinal rhilo (§2): estratégia DEV apontando p/ branches que
+# apodreceram. Espera: --freshness emite STALE-MISSING para C_STRAT (DEV opt-in via
+# verified_against), exit 0. O nó DEV epistêmico C_READ (sem verified_against) NÃO é flagado.
+meta:
+  id: fixture-dev-tracked-stale
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: EN_A
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-15
+    label: "entidade viva (PROD carimbada)"
+  - id: C_STRAT
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_against: "branches consolidate/*"
+    label: "estrategia de consolidacao (rastreia branches moveis)"
+  - id: C_READ
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "claim epistemico comum (nao rastreia artefato movel — nao exige frescor)"
+edges:
+  - from: C_STRAT
+    to: EN_A
+    edge_type: TRACES_TO
+  - from: C_READ
+    to: EN_A
+    edge_type: TRACES_TO
