@@ -208,7 +208,26 @@ nodes:
     impact: 4
     confidence: 0.85
     status: open
-    label: "Contrato cliente↔backend (session state, streaming de tool-call, fila offline) Expo/RN ↔ Node Agent SDK — não pesquisado"
+    label: "Contrato cliente↔backend (session state, streaming de tool-call, fila offline) Expo/RN ↔ Node Agent SDK — PARCIALMENTE avançado (spike 07-17): A2A NÃO é o canal; contrato de chat real ainda no fonte da VPS"
+
+  # ==== spike near-term (2026-07-17): verificação ao vivo do onion-bridge ====
+  - id: E_A2A_LIVE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-17"
+    label: "sonda ao vivo (2026-07-17): app.onionevolve.com/.well-known/agent-card.json = card do core, streaming:true, oauth2(PKCE)+mTLS, MAS skill ÚNICA co-evolution-signal (signals-only, gated). O PWA responde ('Onion Bridge') mas o JS/rotas de chat não são inspecionáveis remotamente"
+  - id: C_CHAT_SURFACE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "O canal de conversa do app é uma SUPERFÍCIE NOVA, distinta do endpoint A2A (que é signals-only por design). Fork-chave: o bridge do PESSOAL aponta cwd p/ o life-KG (~/onion-pessoal), não p/ o core. Contrato de chat = a reconciliar contra o fonte do bridge na VPS"
 
 edges:
   # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
@@ -294,3 +313,11 @@ edges:
   - from: D_STACK
     to: Q_PROTOCOL
     edge_type: DEPENDS_ON
+
+  # --- spike near-term: a sonda ao vivo sustenta que o chat é superfície nova ---
+  - from: E_A2A_LIVE
+    to: C_CHAT_SURFACE
+    edge_type: SUPPORTS
+  - from: C_CHAT_SURFACE
+    to: D_STACK
+    edge_type: SUPPORTS
