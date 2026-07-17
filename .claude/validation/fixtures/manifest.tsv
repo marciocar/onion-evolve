@@ -63,3 +63,5 @@ lint	r23-frontmatter/good-agent-full.md	.claude/agents/development	good
 kg	kg-domain/good-domain.kg.yaml	-	pass
 kg	kg-domain/warn-domain-gaps.kg.yaml	-	pass
 kg	kg-domain/bad-integrity.kg.yaml	-	fail
+lint	branch-distinction/bad-no-clause.md	.claude/agents/development	bad	cláusula de distinção
+lint	branch-distinction/good-with-clause.md	.claude/agents/development	good	

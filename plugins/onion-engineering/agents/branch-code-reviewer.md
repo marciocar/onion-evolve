@@ -3,6 +3,7 @@ name: branch-code-reviewer
 description: |
   Especialista em revisão de código pré-PR focado em mudanças do branch atual.
   Use para análise de qualidade, bugs e best practices antes do merge.
+  Diferença vs @code-reviewer: este é DIFF-SCOPED (só as mudanças do branch, gate pré-PR); o code-reviewer é o review geral de código (qualquer escopo). É o par-modelo que os outros branch-* citam.
 model: opus
 tools:
   - Read
