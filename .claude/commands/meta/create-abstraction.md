@@ -55,9 +55,30 @@ Criar estrutura completa de abstração agnóstica de provedor, permitindo troca
 
 Este comando **orquestra** a criação. O conhecimento de fundo já existe nas KBs — leia-as antes de gerar:
 
-- **Padrão SDAAL** (fundamentos, arquitetura, design patterns, anti-patterns, quando usar): [`specification-driven-ai-abstraction-layer.md`](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- **Critério de elegibilidade** (o Passo 0 abaixo — *quando* algo vira SDAAL): [`onion-abstraction-doctrine.md`](../../../docs/knowledge-base/concepts/onion-abstraction-doctrine.md)
+- **Padrão SDAAL** (fundamentos, arquitetura, design patterns, anti-patterns): [`specification-driven-ai-abstraction-layer.md`](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
 - **Implementação de referência real**: [`task-manager-abstraction.md`](../../../docs/knowledge-base/concepts/task-manager-abstraction.md) e `.claude/utils/task-manager/`
 - **Templates completos de geração** (README, interface, types, detector, factory, adapters, none, .env): [`sdaal-examples.md`](../../../docs/knowledge-base/patterns/sdaal-examples.md)
+
+## 🚦 Passo 0 (OBRIGATÓRIO) — Teste do Eixo: isto merece ser SDAAL?
+
+**Não gere nada antes de responder.** O comando assumia que quem invoca já decidiu — e o resultado foi
+abstração-por-declaração no core (auditoria 2026-07-17). Doutrina:
+[`onion-abstraction-doctrine.md`](../../../docs/knowledge-base/concepts/onion-abstraction-doctrine.md).
+
+Pergunte ao maestro e **exija as três**:
+
+| # | Pergunta | Se **não** → **PARE** |
+|---|---|---|
+| **a** | Existem **≥2 implementações reais** (não prometidas) do mesmo contrato? | → **script** em `.claude/utils/` (whitepaper §13: provider único = overhead que não compensa) |
+| **b** | Quem escolhe é o **ambiente/`.env`**, não o autor da chamada? | → **script** (a escolha é uma chamada, não configuração) |
+| **c** | O consumidor **precisa ser cego** ao provider ativo? | → **script chamado direto** (cegueira sem necessidade é cerimônia) |
+
+**Teste do gatilho:** 1 provider real + N prometidos = **script**. O 2º provider **real** é a graduação
+(`gated-until-trigger`). "Ficaria simétrico com o task-manager" **não é gatilho**.
+
+Se qualquer resposta for "não": **registre o desenho como gated** (com o gatilho nomeado) e encerre —
+não gere a estrutura.
 
 ## 📐 Estrutura Gerada
 
