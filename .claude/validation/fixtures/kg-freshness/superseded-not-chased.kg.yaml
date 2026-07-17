@@ -1,0 +1,63 @@
+# Fixture: nó PROD superseded/refuted SEM verified_at: — NÃO deve ser cobrado por frescor.
+# Um nó já reconciliado é HISTÓRIA (append-mostly o mantém p/ auditoria), não SSOT viva:
+# ninguém raciocina a partir dele, logo cobrar re-verificação é ruído que treina o leitor a
+# ignorar o aviso. Achado do dogfood de 2026-07-17 (re-verificação dos 24 nós de identidade:
+# 4 nós recém-supersededos seguiam sendo cobrados).
+# Espera: --freshness emite STALE-MISSING SÓ para C_VIVO; NUNCA para C_VELHO nem C_MORTO. exit 0.
+meta:
+  id: fixture-superseded-not-chased
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: C_VELHO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: superseded
+    label: "verdade antiga, ja substituida por C_NOVO (sem carimbo — de proposito)"
+  - id: C_MORTO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: refuted
+    label: "claim refutada pela evidencia (sem carimbo — de proposito)"
+  - id: C_NOVO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-15
+    label: "a verdade vigente, carimbada"
+  - id: C_VIVO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "claim VIVA sem carimbo — esta SIM deve ser cobrada (prova que a guarda nao morreu)"
+  - id: E_PROVA
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-15
+    label: "evidencia que refuta C_MORTO"
+edges:
+  - from: C_NOVO
+    to: C_VELHO
+    edge_type: SUPERSEDES
+  - from: E_PROVA
+    to: C_MORTO
+    edge_type: REFUTES
+  - from: C_NOVO
+    to: C_VIVO
+    edge_type: SUPPORTS

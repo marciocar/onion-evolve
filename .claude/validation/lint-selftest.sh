@@ -274,6 +274,16 @@ run_kg_freshness_selftests() {
     record_pass "kg-freshness: stale-old → STALE-OLD + exit 0"
   else record_fail "kg-freshness: stale-old" "rc=${rc} out=${out}"; fi
 
+  # (c2) superseded/refuted NÃO são cobrados por frescor — mas o nó VIVO sem carimbo continua sendo.
+  # Os dois lados no mesmo caso: senão "consertar" seria matar a guarda e chamar de fix.
+  rc=0; out=$(bash "${radar}" "${fx}/superseded-not-chased.kg.yaml" --freshness 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && ! printf '%s' "${out}" | grep -q 'STALE-MISSING: C_VELHO' \
+     && ! printf '%s' "${out}" | grep -q 'STALE-MISSING: C_MORTO' \
+     && printf '%s' "${out}" | grep -q 'STALE-MISSING: C_VIVO'; then
+    record_pass "kg-freshness: superseded/refuted não cobrados; nó vivo sem carimbo ainda cobrado"
+  else record_fail "kg-freshness: superseded-not-chased" "rc=${rc} out=${out}"; fi
+
   # (d) schema-divergent --schema: schema_version ≠ radar → RECUSA com exit 1 (não é aviso)
   rc=0; out=$(bash "${radar}" "${sx}/schema-divergent.kg.yaml" --schema 2>&1) || rc=$?
   if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'schema_version divergente'; then
