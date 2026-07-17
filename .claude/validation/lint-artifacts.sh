@@ -1280,7 +1280,7 @@ check_knowledge_base_links() {
 check_research_kg() {
   local base="${REPO_ROOT}/docs/evolution/research"
   [ -d "${base}" ] || return 0
-  local legacy=" federation-2026 scope-inheritance-2026 knowledge-centric-ssot-2026 spec-as-code-evolution-2026 "
+  local legacy=" federation-2026 knowledge-centric-ssot-2026 spec-as-code-evolution-2026 "
   local dir tema
   for dir in "${base}"/*/; do
     [ -f "${dir}SYNTHESIS.md" ] || continue
