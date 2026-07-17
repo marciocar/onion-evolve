@@ -46,9 +46,12 @@ uma só — construir a peça que **um uso pediu**, não o sistema que a simetri
   **research-first**, não desenho de priori.
 - **L2 — O KG das PEÇAS não existe.** Nenhum `.kg.yaml` modela o framework como peças componíveis (o ADR
   #402 acabou de nomear que nem o SDAAL-abstração está em KG). É o 1º tijolo, e ele já tem gatilho.
-- **L3 — A esteira de promoção não tem SSOT.** A régua `assess→trial→adopt` é citada como vinda de um
-  **`radar.md` que não existe** no repo. "As diferentes camadas de teste/promoção" que o maestro citou
-  (PoC/spike/stub/MVP/trial/adopt) precisam de casa. É dor real, **já** — provável gatilho mais próximo.
+- **L3 — As camadas de teste/promoção estavam dispersas.** ✅ **RESOLVIDO (2026-07-17)** —
+  [onion-promotion-ladder](../knowledge-base/concepts/onion-promotion-ladder.md) consolidou a esteira.
+  *Correção de premissa (declarado≠verificado):* o `radar.md` **não** era citação-fantasma do core — é o
+  radar de apetite do **adotante** (metagamify); a régua `assess→trial→adopt` **já vivia** no
+  toolbox-lifecycle §Dec.4. O que faltava eram as **camadas de experimentação** (PoC/spike/stub/simulação/
+  quarentena/candidato/MVP), agora nomeadas numa esteira. Foi o gatilho mais próximo — e disparou.
 - **L4 — PLEA como MECANISMO, não lente.** A **Q5 do seed SRL-PLEA ficou ABERTA**: *"como as fases PLEA se
   materializam em cada classe de bytecode (MD/KG/grafo/script)"*. É o "PLEA fractal auto-regulado" da visão,
   ainda não aterrissado num ciclo executável.
@@ -60,9 +63,10 @@ uma só — construir a peça que **um uso pediu**, não o sistema que a simetri
   O que é comprovado vs emergente vs hype. Conecta com a pesquisa WhatsApp (Tool RAG, RouteLLM).
 - **QB — PLEA como mecanismo de auto-regulação de FERRAMENTAS** (não de aprendiz humano) — fecha a Q5 do seed
   SRL-PLEA: materializar planejar/executar/avaliar sobre a família de bytecodes, com auto-regulação da adaptação.
-- **QC — A esteira de teste/promoção das peças:** destilar `assess→trial→adopt` numa SSOT (matando a
-  citação-fantasma `radar.md`), com as camadas nomeadas (PoC/spike/stub/MVP/simulação/trial/adopt) e o
-  gate de cada uma. Cruza com a doutrina dogfood e gated-until-trigger.
+- **QC — A esteira aplicada às PEÇAS:** ✅ a esteira geral já foi consolidada
+  ([onion-promotion-ladder](../knowledge-base/concepts/onion-promotion-ladder.md), 2026-07-17). O que resta
+  como pesquisa é **aplicá-la ao KG das peças** — cada peça (SDAAL, comando, skill) carregando sua camada/grau
+  de certeza no grafo, para o radar dizer "esta peça é spike, aquela é canon". Cruza com dogfood e gated-until-trigger.
 
 ## Gatilhos nomeados (cada peça gradua quando…)
 
