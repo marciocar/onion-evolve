@@ -1,0 +1,296 @@
+# KG-SSOT da pesquisa de stack do App Onion Pessoal (audit layer — o que a pesquisa CRÊ).
+# Fonte: deep-research wwujc53hz (6 ângulos, 23 fontes, 15 confirmados / 10 refutados, verificação adversarial).
+# Destilado em prosa: stack-research-2026-07.md (irmão). Rode:
+#   bash /home/marcio/onion-evolve/.claude/validation/kg-radar.sh <este-arquivo>
+meta:
+  id: stack-research-2026-07
+  date: "2026-07-17"
+  baseline: "2026-07-17"
+  schema_version: "1"
+
+nodes:
+  # ==== a pergunta e o veredito ====
+  - id: Q_STACK
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: done
+    label: "Qual stack pro app Onion Pessoal (instalável, câmera/mic, SLM on-device futuro, cliente do Agent SDK, ship rápido)? RESPONDIDA pela pesquisa"
+  - id: D_STACK
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "VEREDITO: React Native + Expo (app) + react-native-executorch / callstack-ai (SLM on-device). Único stack que bate os 4 requisitos duros com fontes primárias. Provisório: gated nas perguntas em aberto (spike)"
+
+  # ==== claims de capacidade (confirmados por fonte primária) + evidência ====
+  - id: C_RN_NATIVE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "RN+Expo dá acesso first-class a câmera/mic/notificações/filesystem num codebase Android+iOS (expo-camera, expo-media-library, expo-notifications)"
+  - id: E_EXPO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-17"
+    label: "docs.expo.dev (primária): takePictureAsync/recordAsync+RECORD_AUDIO; battle-tested 2026. Voto adversarial 3-0"
+  - id: C_RN_SLM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "RN tem caminho de SLM on-device PROVADO: react-native-executorch (Meta ExecuTorch) roda Llama/Phi/Qwen/SmolLM 100% offline, hooks useLLM, Expo-compat, já em produção (app Private Mind). Piso iOS17+/Android13+, New Arch"
+  - id: E_EXECUTORCH
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-17"
+    label: "docs.swmansion.com + github (primária): inference local offline; v0.8.0 (2026-04-03) add câmera real-time via VisionCamera worklets. Voto 3-0"
+  - id: C_PIPELINE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "executorch cobre o pipeline de companheiro: Whisper STT + Kokoro TTS + OCR on-device + photo→VLM (= captura de voz e dogfood de mídias/arquivos)"
+  - id: C_CALLSTACK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "2º runtime RN redundante: callstack/ai (react-native-ai) integra llama.cpp/llama.rn (GGUF), MLC-LLM, Apple Foundation Models, compat Vercel AI SDK"
+  - id: E_CALLSTACK
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-17"
+    label: "github.com/callstackincubator/ai (primária). Voto 3-0 no core; caveat: Apple Foundation Models text-gen precisa iOS 26+ (não 13+)"
+  - id: C_AGENTSDK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "@anthropic-ai/claude-agent-sdk é BACKEND-only (roda o loop no processo Node, precisa API key + fs) → o app é CLIENTE, exatamente como o onion-bridge já faz"
+  - id: E_ANTHROPIC
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-17"
+    label: "code.claude.com + npm (primária, fetch 2026-07-17): query()/ClaudeSDKClient, roda no backend. Voto 3-0"
+  - id: C_EXPO_SHIP
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: confirmed
+    label: "Expo EAS compila iOS na nuvem sem Mac; caminho de ship mais rápido pra solo-dev. Confiança média (fonte blog + docs primárias)"
+
+  # ==== alternativas (explicam por que RN venceu) ====
+  - id: C_CAPACITOR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "Capacitor = runner-up: plugins oficiais câmera/fs/notif/background, web→store rápido — MAS sem história madura de SLM on-device (o requisito decisivo). Microfone fora do set oficial"
+  - id: C_FLUTTER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "Flutter lidera stars (~168k vs RN ~121k) mas caminho de SLM on-device NÃO documentado na evidência — popularidade não vira capacidade local-first"
+
+  # ==== claims REFUTADOS (mortos na verificação adversarial) ====
+  - id: C_MARKETSHARE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: refuted
+    label: "REFUTADO: números de market-share (RN 42% / Flutter 46% / 'most-used' / Capacitor 'ship 3-4 semanas') — todos de blogs SEO que se ecoam; nenhum sobreviveu"
+  - id: C_FLUTTER_NANO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: refuted
+    label: "REFUTADO (0-3): 'roadmap Flutter 2026 inclui Gemini Nano on-device' — não sustentado; o caminho local-SLM do Flutter segue não-provado"
+  - id: E_ADVERSARIAL
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-17"
+    label: "verificação adversarial (3 votos/claim): 10 de 25 claims MORTOS, todos de adoção/market-share/roadmap. Fontes de popularidade = blogs baixa qualidade → tratar como faixa, não número"
+
+  # ==== encaixe arquitetural com o Onion ====
+  - id: C_SLM_IS_DEID
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "O SLM on-device É o adapter SDAAL de-identification/local-slm (a 'segunda runtime' da tese SDAAL): de-id de PII local antes de subir pro cérebro (P4) + modo offline. Não é enxerto"
+  - id: C_BRIDGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "O cérebro (onion-bridge: Node + Hono + Agent SDK, cwd=clone do core) JÁ existe → troca-se só o frontend PWA por app Expo/RN cliente"
+
+  # ==== perguntas em aberto (viram spike / Fase 1b) ====
+  - id: Q_DEID
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "CRÍTICA: um SLM 0.6-3B é preciso o bastante pra de-id de PII sobre o .kg.yaml antes de ir pro backend? Qual o fallback se não? (gate do local-slm)"
+  - id: Q_PERF
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: "Perf real de RN-executorch vs callstack/ai com SLM ~1-3B em Android mid-range (tokens/s, cold-start, teto de RAM, bateria/térmico)"
+  - id: Q_ABSENT
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    label: "A evidência blog-pesada perdeu história local-SLM melhor em Tauri v2 Mobile / KMP / Gemini Nano / Core ML / ONNX? (nenhum produziu claim verificado)"
+  - id: Q_PROTOCOL
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "Contrato cliente↔backend (session state, streaming de tool-call, fila offline) Expo/RN ↔ Node Agent SDK — não pesquisado"
+
+edges:
+  # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
+  - from: D_STACK
+    to: Q_STACK
+    edge_type: DEPENDS_ON
+  - from: C_RN_NATIVE
+    to: D_STACK
+    edge_type: SUPPORTS
+  - from: C_RN_SLM
+    to: D_STACK
+    edge_type: SUPPORTS
+  - from: C_PIPELINE
+    to: D_STACK
+    edge_type: SUPPORTS
+  - from: C_CALLSTACK
+    to: D_STACK
+    edge_type: SUPPORTS
+  - from: C_AGENTSDK
+    to: D_STACK
+    edge_type: SUPPORTS
+  - from: C_EXPO_SHIP
+    to: D_STACK
+    edge_type: SUPPORTS
+  # alternativas explicam a escolha (mostram o gap) → sustentam o veredito
+  - from: C_CAPACITOR
+    to: D_STACK
+    edge_type: SUPPORTS
+  - from: C_FLUTTER
+    to: D_STACK
+    edge_type: SUPPORTS
+
+  # --- evidência primária sustenta os claims ---
+  - from: E_EXPO
+    to: C_RN_NATIVE
+    edge_type: SUPPORTS
+  - from: E_EXECUTORCH
+    to: C_RN_SLM
+    edge_type: SUPPORTS
+  - from: E_EXECUTORCH
+    to: C_PIPELINE
+    edge_type: SUPPORTS
+  - from: E_CALLSTACK
+    to: C_CALLSTACK
+    edge_type: SUPPORTS
+  - from: E_ANTHROPIC
+    to: C_AGENTSDK
+    edge_type: SUPPORTS
+
+  # --- a verificação adversarial REFUTA os claims de market-share e o roadmap Nano ---
+  - from: E_ADVERSARIAL
+    to: C_MARKETSHARE
+    edge_type: REFUTES
+  - from: E_ADVERSARIAL
+    to: C_FLUTTER_NANO
+    edge_type: REFUTES
+  # o Nano refutado sustenta que o Flutter não tem caminho local-SLM provado
+  - from: C_FLUTTER_NANO
+    to: C_FLUTTER
+    edge_type: SUPPORTS
+
+  # --- encaixe arquitetural ---
+  - from: C_RN_SLM
+    to: C_SLM_IS_DEID
+    edge_type: SUPPORTS
+  - from: C_SLM_IS_DEID
+    to: D_STACK
+    edge_type: SUPPORTS
+  - from: C_BRIDGE
+    to: D_STACK
+    edge_type: SUPPORTS
+
+  # --- o veredito é PROVISÓRIO: depende das perguntas em aberto (spike) ---
+  - from: D_STACK
+    to: Q_DEID
+    edge_type: DEPENDS_ON
+  - from: D_STACK
+    to: Q_PERF
+    edge_type: DEPENDS_ON
+  - from: D_STACK
+    to: Q_ABSENT
+    edge_type: DEPENDS_ON
+  - from: D_STACK
+    to: Q_PROTOCOL
+    edge_type: DEPENDS_ON
