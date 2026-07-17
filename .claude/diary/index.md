@@ -1,10 +1,10 @@
-# Diário — onion-evolve
+# Diário — docs-salvage-transformer-kb
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 41 entradas · **Stale:** 0 · **Compartilháveis:** 29
+**Total:** 42 entradas · **Stale:** 0 · **Compartilháveis:** 30
 
 Gerado em: 2026-07-17
 
@@ -13,6 +13,7 @@ Gerado em: 2026-07-17
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
 | 2026-07-17 | reflection | public 📤 | worst-truth-is-uncertain | 2026-10-15 | static |
+| 2026-07-17 | learning | public 📤 | salvage-transformer-kb-confront-not-restore | 2026-10-15 | static |
 | 2026-07-17 | decision | public 📤 | research-first-and-equality-lens | 2026-10-15 | static |
 | 2026-07-17 | error | public 📤 | read-full-before-triage | 2026-10-15 | static |
 | 2026-07-17 | learning | public 📤 | pr-400-two-homes-under-real-concurrency | 2026-10-15 | static |
