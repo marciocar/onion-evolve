@@ -62,6 +62,11 @@ BEGIN { section = ""; nid = ""; ne = 0 }
 /^edges:/ { section = "edges"; nid = ""; next }
 /^meta:/  { section = "meta"; next }
 
+# Legibilidade da gramática (guarda anti-fail-open — sinal de campo granaai 2026-07-17): conta as
+# linhas COM conteúdo dentro de nodes:. Se a seção tem conteúdo e mesmo assim o parser não extrai
+# NENHUM nó, a forma do arquivo não é a gramática deste radar. Sem `next` — só conta e segue.
+section == "nodes" && NF > 0 { nodeSectionLines++ }
+
 section == "nodes" && /^[[:space:]]+- id:/ {
   nid = trim($0); sub(/^- id:/, "", nid); nid = trim(nid)
   if (nid in nodeSeen) dup[nid] = 1
@@ -102,6 +107,37 @@ END {
   VP = "DEV PROD"
   VL = "audit domain"
   problems = 0
+
+  # ── GUARDA DE LEGIBILIDADE (o radar tem que saber que NÃO SABE) ────────────────────────────
+  # Zero nós extraídos = o radar não leu o arquivo. Sem esta guarda, todo veredito abaixo é
+  # VACUOSAMENTE verdadeiro ("não há contradição em conjunto vazio") e o gate fica verde guardando
+  # NADA — o falso-verde que o sinal de campo granaai (2026-07-17) pegou num CI regulado, onde
+  # "o gate de rastreabilidade estava verde" é frase que aparece em auditoria. Nenhum KG legítimo
+  # tem zero nós. Mesma classe do bug do jq (2026-07-01): guarda que falha na direção do silêncio —
+  # lá fail-closed (barulhento, pego no mesmo dia), aqui fail-open (silencioso, durou commits).
+  # Reprova ANTES de opinar: o selo (meta.schema_version) atesta a intenção do gerador, não a forma
+  # do artefato, por isso ele não salva — a forma só se verifica parseando.
+  if (nn == 0) {
+    print "══ LEGIBILIDADE — o radar conseguiu ler o arquivo? (✗ reprova) ══"
+    if (nodeSectionLines > 0) {
+      print "  ✗ gramática não reconhecida: a seção nodes: tem " nodeSectionLines " linha(s) de conteúdo,"
+      print "    mas o radar extraiu 0 nós. Este radar entende nós como LISTA indentada:"
+      print "        nodes:"
+      print "          - id: <ID>"
+      print "            node_type: <tipo>          # (não `type:`)"
+      print "    e arestas como \"- from:\" INDENTADO + \"edge_type:\". Regenere na gramática canônica"
+      print "    (ver /meta:kg) ou corrija o gerador."
+    } else {
+      print "  ✗ nenhum nó encontrado: seção nodes: ausente ou vazia — isto não é um .kg.yaml legível."
+    }
+    if (metaSchema != "") {
+      print "  NOTA: o arquivo declara schema_version \"" metaSchema "\", mas o SELO atesta a INTENÇÃO do"
+      print "        gerador, não a FORMA do artefato — por isso ele não pegou isto."
+    }
+    print "  Abortando sem opinar: um veredito de integridade aqui seria vacuoso (falso-verde)."
+    print ""
+    exit 1
+  }
 
   # layer default (retrocompat: grafo sem layer = 100% audit)
   for (i = 1; i <= nn; i++) {
