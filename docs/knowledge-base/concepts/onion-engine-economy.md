@@ -10,7 +10,7 @@
 
 ## 📋 Metadata
 
-- **Relacionadas:** [SDAAL whitepaper](../../sdaal/sdaal.md) · [Doutrina de Dogfooding](onion-dogfooding-doctrine.md) · [Vocabulário de relações](onion-relation-vocabulary.md) · régua P0-P3 em [`onion/SKILL.md`](../../../.claude/skills/onion/SKILL.md) · [ADR SLM-como-ferramenta](../../analysis/onion-adr-slm-as-tool-de-identification-2026-06.md) · [ADR toolbox lifecycle](../../analysis/onion-adr-toolbox-lifecycle-2026-06.md)
+- **Relacionadas:** [Transformer — o reasoner](transformer-architecture.md) · [SDAAL whitepaper](../../sdaal/sdaal.md) · [Doutrina de Dogfooding](onion-dogfooding-doctrine.md) · [Vocabulário de relações](onion-relation-vocabulary.md) · régua P0-P3 em [`onion/SKILL.md`](../../../.claude/skills/onion/SKILL.md) · [ADR SLM-como-ferramenta](../../analysis/onion-adr-slm-as-tool-de-identification-2026-06.md) · [ADR toolbox lifecycle](../../analysis/onion-adr-toolbox-lifecycle-2026-06.md)
 - **Tese-mãe (SDAAL):** o Transformer é o reasoner, o Markdown é o bytecode — sem store externo.
 
 ---
