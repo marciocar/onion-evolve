@@ -245,7 +245,7 @@ conselho**. Dois episódios distintos, do mesmo adotante (rhilo-metagamify), na 
 | Episódio | Sinal | O que aconteceu |
 |---|---|---|
 | **origem da doutrina** | [`ssot-como-runtime-para-adr`](../../evolution/inbox/_processed/2026-07-16-ssot-como-runtime-para-adr.md) | montou o KG canônico e **o ignorou 3× na mesma sessão** — reconstruiu de git/memória enquanto o grafo já tinha a resposta (`E_ABANDON_APPLY_PROOF`, `C_CONSOLIDATION_MAP`) |
-| **escalada a mecanismo** | [`mandar-a-doutrina-kg-first`](../../evolution/inbox/2026-07-16-metagamify-mandar-a-doutrina-kg-first.md) | **depois** de escrever a doutrina, reincidiu **≥4×**: planejou um redesenho do WRR sem consultar o grafo. Ao consultar, o KG **corrigiu 4 erros** que ele cometeria — janela `7d`→**`14d` medido** (`C_WINDOW_SWEEP`); morte-da-chamada só-TTL→**sinal + derivação** (`C_ABANDON_PUSHED`/`Q_URANO_SIGNAL`); conflito com `I_NO_AGE_RELEASE`; e **metade do redesenho já existia como nó** (`R_DOSEPARAMETA`, `R_ADR018`) |
+| **escalada a mecanismo** | [`mandar-a-doutrina-kg-first`](../../evolution/inbox/_processed/2026-07-16-metagamify-mandar-a-doutrina-kg-first.md) | **depois** de escrever a doutrina, reincidiu **≥4×**: planejou um redesenho do WRR sem consultar o grafo. Ao consultar, o KG **corrigiu 4 erros** que ele cometeria — janela `7d`→**`14d` medido** (`C_WINDOW_SWEEP`); morte-da-chamada só-TTL→**sinal + derivação** (`C_ABANDON_PUSHED`/`Q_URANO_SIGNAL`); conflito com `I_NO_AGE_RELEASE`; e **metade do redesenho já existia como nó** (`R_DOSEPARAMETA`, `R_ADR018`) |
 
 > **A reincidência É o dado.** Não é falha de disciplina do consumidor — é falha de *design* do loop.
 > Um estado que depende de um evento que nunca chega é exatamente o bug do SLOT-limbo que o mesmo
