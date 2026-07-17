@@ -1,0 +1,28 @@
+# Fixture de REGRESSÃO — gramática que o radar NÃO entende (sinal de campo granaai 2026-07-17).
+# Reproduz a forma real que derrubou o gate num CI regulado: nós como MAPA (não lista), `type:`
+# em vez de `node_type:`/`edge_type:`, e `- from:` na coluna 0 (o radar exige indentação).
+# O arquivo CARIMBA schema_version "1" — o selo atesta a intenção do gerador, não a forma.
+# Esperado: ✗ LEGIBILIDADE "gramática não reconhecida" + exit 1 (NUNCA o ✅ vacuoso de 0 nós).
+meta:
+  schema_version: "1"
+  layer: domain
+stats:
+  nodes: 3
+  edges: 2
+nodes:
+  domain:antecipacao-recebiveis:
+    type: domain
+    label: Antecipação de Recebíveis
+  capability:registro-recebiveis:
+    type: capability
+    label: Registro de Recebíveis
+  domain:cessao:
+    type: domain
+    label: Cessão
+edges:
+- from: capability:registro-recebiveis
+  type: REALIZES
+  to: domain:antecipacao-recebiveis
+- from: domain:cessao
+  type: TRACES_TO
+  to: domain:antecipacao-recebiveis
