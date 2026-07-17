@@ -612,6 +612,52 @@ check_agent_card_sync() {
 #           e compara com os totais computados por inventory.sh. Impede que a
 #           constituição volte a drifar (foi onde o drift 79≠76 vivia).
 # ===========================================================================
+# ===========================================================================
+# REGRA — Contagens do SITE público sincronizadas com a SSOT [HARD]
+#           O site hardcoda números que a inventory.sh GERA. Sem gate, o pitch
+#           público drifta silencioso a cada comando criado — e mente para quem
+#           não pode conferir. Achado 2026-07-17 (re-verificação do grafo de
+#           identidade): o site exibia 95/96 comandos e 66 KBs; a SSOT dizia
+#           97 e 74 — e as três ocorrências divergiam ENTRE SI.
+#           Espelha check_claude_md_counts, com duas diferenças deliberadas:
+#           (a) checa TODAS as ocorrências (o bug foi valores divergentes entre
+#               si no mesmo arquivo — head -1 teria passado);
+#           (b) escopo = site/index.html (o PITCH). site/historia/ fica FORA por
+#               desenho: a timeline é histórica ("comando nº 95" era verdade
+#               quando o /meta:kg nasceu) — gatear história seria forjá-la.
+#           Ausente site/ (todo adotante) → no-op gracioso.
+# ===========================================================================
+check_site_inventory_sync() {
+  local site="${REPO_ROOT}/site/index.html"
+  local inv_script="${SCRIPT_DIR}/inventory.sh"
+  [ -f "${site}" ] || return 0          # sem site → nada a checar (adotante)
+  [ -f "${inv_script}" ] || return 0
+
+  local env_out
+  env_out="$(bash "${inv_script}" --env 2>/dev/null || true)"
+  local truth noun claim
+  # noun exibido no site → variável canônica da SSOT
+  for pair in "comandos:ONION_COMMANDS_TOTAL" "agentes:ONION_AGENTS_TOTAL" \
+              "skills:ONION_SKILLS_TOTAL" "knowledge bases:ONION_KBS_TOTAL"; do
+    noun="${pair%%:*}"
+    truth="$(echo "${env_out}" | grep "^${pair##*:}=" | cut -d= -f2)"
+    [ -n "${truth}" ] || continue
+    # (a) prose: "<N> <noun>"  — todas as ocorrências
+    while read -r claim; do
+      [ -n "${claim}" ] || continue
+      [ "${claim}" = "${truth}" ] || violation "HARD" "${site}" \
+        "site afirma ${claim} ${noun}, filesystem tem ${truth} — alinhe à SSOT (/meta:inventory)"
+    done < <(grep -oE "[0-9]+ ${noun}" "${site}" 2>/dev/null | grep -oE '^[0-9]+')
+    # (b) contador animado: data-n="<N>">0</b><span><noun></span>
+    while read -r claim; do
+      [ -n "${claim}" ] || continue
+      [ "${claim}" = "${truth}" ] || violation "HARD" "${site}" \
+        "contador data-n do site afirma ${claim} ${noun}, filesystem tem ${truth} — alinhe à SSOT (/meta:inventory)"
+    done < <(grep -oE "data-n=\"[0-9]+\">0</b><span>${noun}</span>" "${site}" 2>/dev/null \
+             | grep -oE '[0-9]+' | head -1)
+  done
+}
+
 check_claude_md_counts() {
   local claude_md="${REPO_ROOT}/CLAUDE.md"
   local inv_script="${SCRIPT_DIR}/inventory.sh"
@@ -1305,6 +1351,7 @@ check_kebab_case_filenames
 check_no_worker_orchestrator_agent
 check_inventory_sync
 check_claude_md_counts
+check_site_inventory_sync
 check_plugins_sync
 check_capability_conformance
 check_role_bundle_sync
