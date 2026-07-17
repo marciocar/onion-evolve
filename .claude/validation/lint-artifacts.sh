@@ -151,7 +151,10 @@ _find() {
     done
     return 0   # alvo fora das raízes desta regra → nada a varrer
   fi
-  find "${roots[@]}" "${preds[@]}"
+  # Poda .claude/worktrees/ (git worktrees locais, gitignored) — não são artefatos
+  # do framework; varrê-los gera falso-positivo local (o CI nunca os vê). Prune ANTES
+  # dos preds: '-o' curto-circuita p/ o alvo podado; o lado direito preserva -print0.
+  find "${roots[@]}" -path '*/.claude/worktrees/*' -prune -o "${preds[@]}"
 }
 
 # ---------------------------------------------------------------------------
@@ -237,7 +240,8 @@ check_no_mcp_onion_orchestrator() {
   # O próprio script contém a string como padrão de busca — excluí-lo da varredura
   hits=$(grep -rl "mcp_onion-orchestrator" "${CLAUDE_DIR}" 2>/dev/null \
     | grep -v "^${self}$" \
-    | grep -v "/validation/fixtures/" || true)
+    | grep -v "/validation/fixtures/" \
+    | grep -v "/.claude/worktrees/" || true)
 
   if [ -n "${hits}" ]; then
     while IFS= read -r file; do
