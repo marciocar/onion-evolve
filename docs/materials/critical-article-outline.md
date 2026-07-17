@@ -43,7 +43,7 @@ defende que o Onion deve ser avaliado não pelo que promete fazer, mas pelos com
 
 ### 1. O que o Onion acerta (e não é pouco)
 
-- **Disciplina arquitetural rara**: o padrão SDAAL (Service Decoupled Abstraction Adapter Layer) para
+- **Disciplina arquitetural rara**: o padrão SDAAL (Specification-Driven AI Abstraction Layer) para
   Task Manager e Forge é uma abstração real, não fachada — o mesmo comando roda em Jira, ClickUp, Asana
   ou Linear trocando uma variável de `.env`, com formatação tipada por provider. Isso é engenharia, não
   prompt engineering. *(Identidade §3; FAQ "Funciona com qualquer gerenciador?")*

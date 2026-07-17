@@ -1,6 +1,6 @@
 # Método de Trabalho do Onion
 
-> **Versão**: 1.0.0 | **Última atualização**: 2026-06-27 | **Categoria**: Conceitos
+> **Versão**: 1.1.0 | **Última atualização**: 2026-07-17 | **Categoria**: Conceitos
 > A **porta de entrada** do método de trabalho do Onion — como o framework **decide e executa** um
 > trabalho, e como **sabe que ficou certo**. É um **mapa**, não uma nova fonte: destila e **aponta** para
 > as fontes canônicas (que permanecem SSOT). Nasceu da pesquisa de evolução de 2026-06-27
@@ -38,6 +38,20 @@ uma fonte, a fonte vence (e esta KB é corrigida).
 ```
 
 ---
+
+## 0. KG-first — ler o SSOT antes de selecionar (o primeiro ato)
+
+**Se o repo tem um `.kg.yaml`, ele é consultado ANTES de qualquer seleção** — é o SSOT de estado/verdade,
+**acima** do git e da memória (que reconstroem por *inferência*; o grafo *declara*). Rodar o radar, citar
+**ids de nó**, e **drive-to-verify** (cruzar claim `plane: PROD` contra o vivo) antes de agir.
+
+Não é preferência de estilo: sem forcing function o default é prosa — reincidência medida em campo
+(≥4×, inclusive com quem escreveu a doutrina) e no próprio core.
+
+- **Fonte canônica:** [Knowledge Graph SDAAL §SSOT-as-runtime](knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho)
+  (ciclo `read→verify→act→write`; gênero **SSOT-first** × espécie **KG-first**) + ADR
+  [kg-freshness-gate](../../analysis/onion-adr-kg-freshness-gate-2026-07.md).
+- **Onde está cabeado:** `catch-up`, `warm-up`, `engineer:work` — Passo 0.
 
 ## 1. Seleção — qual fluxo aplicar
 
@@ -89,7 +103,19 @@ Toda mudança de core se valida **rodando o artefato de verdade**: testar **modo
 happy-path), **fix → re-dogfood** no mesmo loop. Dois gates: **mecânico** (determinístico — lint + selftest
 + inventory em `.claude/validation/`) e **de uso** (invocar e observar — julgamento humano).
 
+O loop fecha no **KG** nas duas pontas: `read(KG)` antes de auditar (§0), `write(KG)` depois de dogfoodar
+— senão o achado morre na prosa.
+
 - **Fonte canônica:** [Dogfooding Doctrine](onion-dogfooding-doctrine.md).
+
+### 3c. O "re-" — toda verdade tem TTL
+
+**Re-dogfood**, **re-teste de migalha** (`review_after`/⏰) e **re-verificação de frescor**
+(`verified_at`/STALE) são **o mesmo invariante**: *declarado ≠ verificado; re-testar, nunca re-carimbar*.
+
+- **Fonte canônica:** [Dogfooding Doctrine §♻️](onion-dogfooding-doctrine.md) (o enunciado + as 3
+  instâncias) · mecânica: [`/meta:diary review`](../../../.claude/commands/meta/diary.md) ·
+  [KG §Frescor](knowledge-graph-sdaal.md#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou).
 
 ### 3b. Revisão adversarial e fechar o loop
 
@@ -143,6 +169,8 @@ hierarquia L0-L3). Esta KB **cita**; cada uma permanece SSOT do seu tipo:
 | **RFC** | proposta/deliberação | forward-looking, vira decisão | `docs/evolution/rfc/rfc-000{1,2}-*.md` |
 | **Regra global** | disciplina do executor | carrega toda sessão, multi-projeto | `~/.claude/rules/working-discipline.md` |
 | **Memória** | estado/feedback entre sessões | por-dev, privada, recall automático | `~/.claude/projects/<repo>/memory/` |
+| **KG** (`.kg.yaml`) | **o que é verdade agora** (estado/domínio) | grafo tipado, **append-mostly**, verdades reconciliadas (`REFUTES`/`SUPERSEDES`), com frescor (`verified_at`) | `docs/onion/graph/*.kg.yaml` · motor `kg-radar.sh` · [KG SDAAL](knowledge-graph-sdaal.md) |
+| **Diário** (migalha) | o que o Transformer **deve absorver** | frontmatter estruturado, TTL (`review_after`), re-teste dirigido (`conflict_class`) | `.claude/diary/` · [`/meta:diary`](../../../.claude/commands/meta/diary.md) · RFC-0003 §2.3 |
 
 **Caminho de graduação:** uma decisão nasce **ADR** (provisório) → pode **cravar em meta-spec** (lei) num PR
 constitucional (ex.: o PFR está nesse caminho). Esta KB descreve o estado vigente e aponta para o artefato

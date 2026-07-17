@@ -126,7 +126,7 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 
 `product/collect→task` e `engineer/plan→pr-update` são **workflows faseados retomáveis** — invariantes do framework. Nunca são fundidos numa fase única.
 
-### Padrão SDAAL (Service Decoupled Abstraction Adapter Layer)
+### Padrão SDAAL (Specification-Driven AI Abstraction Layer)
 
 - **Task Manager**: `TASK_MANAGER_PROVIDER` no `.env` define o adapter ativo. O consumidor chama `taskManager.create()`; o adapter resolve para `POST /rest/api/3/issue` (Jira) ou a chamada equivalente (ClickUp/Asana/Linear).
 - **Forge**: `FORGE_PROVIDER` define o host remoto. `/engineer:pr` chama `forge.createPR()`; o adapter usa `gh pr create` (default) ou REST (fallback).

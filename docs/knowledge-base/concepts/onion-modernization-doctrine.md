@@ -53,6 +53,40 @@ Qualquer proposta de modernização é **rejeitada** se ferir:
 
 ---
 
+## 🚦 `gated-until-trigger` — o artefato vem depois do uso que o prove
+
+**A regra:** um artefato **não nasce por simetria, plano ou elegância** — nasce quando um **uso real**
+prova que ele falta. Enquanto o gatilho não dispara, o desenho fica **registrado e gated** (ADR, migalha,
+§Radar), nunca construído.
+
+> **Gatilho ≠ vontade.** "Seria bom ter", "o padrão pede", "ficaria simétrico" **não** são gatilhos.
+> Gatilho é **evidência de uso**: alguém tentou fazer o trabalho e faltou.
+
+**De onde veio (a lição cara):** o abandono formal de `.onion/` e das FASES 5-9 do plano v4.0 em
+2026-05-18 (CLI standalone, multi-IDE, aprendizado contínuo) — **catedral construída à frente do
+gatilho**, que nunca chegou. A doutrina é o que restou disso: *não construir catedral*.
+É por isso que o invariante #3 (§acima) existe, e é o mesmo princípio que fez `/meta:kg` nascer **depois**
+do 1º dogfood, não antes.
+
+**Como aplicar** — três perguntas, nesta ordem:
+
+| Pergunta | Se **não** | Se **sim** |
+|---|---|---|
+| **Um uso real falhou por falta disto?** | gated — registre o desenho e pare | siga |
+| **Aconteceu ≥1× de verdade** (não hipótese)? | gated — anote o gatilho que faria disparar | siga |
+| **A menor forma que resolve** já existe (extend/script/KB)? | construa a menor forma | **só então** o artefato novo |
+
+**O par com o dogfood:** o gatilho quase sempre **é** um dogfood — o uso que revelou a falta
+([Dogfooding Doctrine](onion-dogfooding-doctrine.md): *"findings do uso são trabalho de agora"*). Por isso
+esta doutrina e a de dogfood são as duas metades: o dogfood **produz** o gatilho; esta decide se ele basta.
+
+**Ao gatear, registre o gatilho** — gated sem gatilho nomeado é só "não fizemos", e volta como proposta
+recorrente daqui a um mês. Formato: *"gated até `<evento observável>`"*. Exemplos vivos: `/meta:kg` (gated
+até o 1º dogfood no core — **disparou** 2026-07-04) · `conflict_class` no KG (gated até um dogfood provar
+a falta — **não disparou**) · hook-template KG-first (idem).
+
+---
+
 ## 🔬 Litmus test: cerimônia vs valor genuíno
 
 Um bloco de texto num comando/agente é **cerimônia** (mover para KB ou remover) se:

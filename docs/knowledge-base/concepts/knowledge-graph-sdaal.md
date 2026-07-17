@@ -219,6 +219,24 @@ técnico — ver a ressalva do maestro em
 **KG-first + drive-to-verify são o par canônico** (ADR §SSOT como runtime): nenhum sozinho basta — o KG
 stale engana; o git sozinho esquece o que a SSOT já sabia.
 
+### Os nomes: gênero × espécie (para parar de multiplicar sinônimos)
+
+O campo usa vários rótulos para **dois** conceitos em **dois** níveis. A régua:
+
+| | **Gênero** — vale p/ qualquer SSOT | **Espécie** — o SSOT é um `.kg.yaml` |
+|---|---|---|
+| **só a perna `read`** | **SSOT-first** | **KG-first** |
+| **o ciclo inteiro** | **SSOT-as-runtime** | *(usar o gênero)* |
+
+- **`SSOT-first ⊂ SSOT-as-runtime`** — "first" é a **1ª perna**; "as-runtime" é `read→verify→act→write`.
+  Dizer "SSOT-first" quando se quer o ciclo inteiro é o erro comum.
+- **`KG-first` é o que está cabeado nos loops** (o SSOT do core é um `.kg.yaml`); **SSOT-first** é o que
+  se leva ao adotante cujo SSOT é outro artefato.
+- ⚠️ **"KG-runtime" — não usar.** Sinônimo redundante de SSOT-as-runtime; nasceu do salad, não de uma
+  distinção real.
+- **"Dogfood KG SDAAL" / "Dogfood KG-SSOT SDAAL" não são conceitos** — são *rodadas de dogfood* deste
+  padrão (ver [dogfooding-doctrine §🚦 item 3](onion-dogfooding-doctrine.md), os dois sentidos de re-dogfood).
+
 ### Por que mecanismo, e não "lembre-se de consultar"
 
 Porque **conselho-que-depende-de-lembrar já falhou empiricamente — inclusive com quem escreveu o
