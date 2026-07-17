@@ -105,8 +105,18 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
+    status: done
     label: "RESGATE: capturar o trabalho nao-commitado do Avell (branch rescue, ANTES de sync — o Avell e a capsula pre-VPS). Alta prioridade, risco de perda"
+  - id: E_RESCUE_DONE_0717
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "RESGATE CONCLUIDO: branch rescue/avell-uncommitted-2026-07 pushada e reaplicada; o ouro (pesquisa team-mode/federacao de conhecimento, 325 linhas) esta no main via PR #394 — risco de perda extinto"
+    trace: "PR #394; docs/analysis/onion-research-team-mode-knowledge-federation-2026-07.md"
+    verified_at: 2026-07-17
   - id: C_FETCH_FIRST
     node_type: claim
     layer: audit
@@ -152,6 +162,9 @@ edges:
   - from: A_RESCUE
     to: D_ORIGIN_SOT
     edge_type: DEPENDS_ON
+  - from: E_RESCUE_DONE_0717
+    to: A_RESCUE
+    edge_type: SUPPORTS
   - from: C_FETCH_FIRST
     to: D_VPS_PRIMARY
     edge_type: SUPPORTS

@@ -746,6 +746,56 @@ run_federation_console_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# check_site_inventory_sync — o pitch PÚBLICO não pode driftar da SSOT. Achado 2026-07-17
+# (re-verificação do grafo de identidade): o site exibia 95/96 comandos e 66 KBs contra 97/74
+# reais — e as ocorrências divergiam ENTRE SI (por isso o gate checa TODAS, não a primeira).
+# Os dois lados no mesmo caso: drift → PEGA; alinhado → PASSA. E a timeline de site/historia/
+# ("comando nº 95" era verdade quando o /meta:kg nasceu) NUNCA é gateada — forjar história seria
+# o oposto da doutrina. Números derivados da SSOT do sandbox (hardcodar 97 apodreceria o teste).
+# ---------------------------------------------------------------------------
+run_site_inventory_selftests() {
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_fail "site-inventory" "lint ausente: ${lint}"; return; fi
+  local sb; sb="$(mktemp -d)"
+  cp -a "${REPO_ROOT}/.claude" "${sb}/.claude"
+  cp -a "${REPO_ROOT}/docs" "${sb}/docs"
+  cp -a "${REPO_ROOT}/CLAUDE.md" "${sb}/CLAUDE.md"
+  # stamp adopted só p/ silenciar o ruído de marketplace (plugins/ não é copiado); o check de site
+  # NÃO tem guarda por papel — ele roda igual aqui, que é o que este caso exercita.
+  printf 'framework: onion-evolve\nrole: adopted\n' > "${sb}/.claude/.onion-version"
+  local env_out cmds kbs
+  env_out="$(bash "${sb}/.claude/validation/inventory.sh" --env 2>/dev/null || true)"
+  cmds="$(echo "${env_out}" | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
+  kbs="$(echo "${env_out}"  | grep '^ONION_KBS_TOTAL='      | cut -d= -f2)"
+  if [ -z "${cmds}" ] || [ -z "${kbs}" ]; then
+    record_fail "site-inventory" "inventory.sh --env não devolveu totais"; rm -rf "${sb}"; return
+  fi
+  mkdir -p "${sb}/site/historia"
+
+  # (a) DRIFT no pitch (prosa E contador) → HARD nos dois
+  printf '<p>%s comandos invocáveis</p>\n<b data-n="%s">0</b><span>knowledge bases</span>\n' \
+    "$((cmds - 1))" "$((kbs - 1))" > "${sb}/site/index.html"
+  local out; out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q "site afirma $((cmds - 1)) comandos" \
+     && printf '%s' "${out}" | grep -q "afirma $((kbs - 1)) knowledge bases"; then
+    record_pass "site-inventory: drift no pitch (prosa + contador data-n) → HARD"
+  else record_fail "site-inventory: drift" "gate não pegou o drift: ${out}"; fi
+
+  # (b) pitch ALINHADO + timeline histórica → PASSA (história não é gateada)
+  printf '<p>%s comandos invocáveis</p>\n<b data-n="%s">0</b><span>knowledge bases</span>\n' \
+    "${cmds}" "${kbs}" > "${sb}/site/index.html"
+  printf '<span>/meta:kg nasce (comando nº 95)</span>\n<p>96 comandos</p>\n' \
+    > "${sb}/site/historia/index.html"
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if printf '%s' "${out}" | grep -qE 'site afirma|contador data-n'; then
+    record_fail "site-inventory: alinhado" "falso-positivo OU gateou a timeline histórica: ${out}"
+  else
+    record_pass "site-inventory: pitch alinhado passa; timeline histórica não é gateada"
+  fi
+  rm -rf "${sb}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo adopted-role — os checks de marketplace (plugins_sync/role_bundle_sync) devem PULAR
 # em role: adopted (consumidor não distribui plugins). Sinal granaai 2026-07-10: rodando como
 # source, o selftest mascarava a regressão — este caso roda o lint num sandbox COM stamp adopted
@@ -2582,6 +2632,7 @@ run_resolve_target_selftests
 # Modo federation-console — console estático read-only do SSOT (F1.3 federação).
 run_federation_console_selftests
 run_kg_console_selftests
+run_site_inventory_selftests
 run_adopted_role_selftests
 run_write_stamp_selftests
 
