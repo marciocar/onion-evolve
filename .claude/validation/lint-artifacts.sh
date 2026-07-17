@@ -356,6 +356,25 @@ check_no_worker_orchestrator_agent() {
 }
 
 # ===========================================================================
+# REGRA — Agentes branch-* documentam a distinção vs o par geral [SOFT]
+#   Um agente DIFF-SCOPED (branch-code-reviewer, branch-metaspec-checker, ...)
+#   tem um par de escopo geral (@code-reviewer, @metaspec-gate-keeper, ...). A
+#   'description' É o contrato de roteamento que um dispatcher lê — sem cláusula
+#   de distinção ('Diferença vs' / 'DIFF-SCOPED'), o roteamento por description
+#   não sabe escolher (par com overlap real invisível). Guard nascido do achado
+#   D2 do evolve 2026-07-17 (description-como-contrato-de-roteamento).
+# ===========================================================================
+check_branch_agent_distinction() {
+  while IFS= read -r -d '' agent; do
+    if grep -qE "^name:[[:space:]]*branch-" "${agent}"; then
+      if ! grep -qiE 'Diferença vs|DIFF-SCOPED' "${agent}"; then
+        violation "SOFT" "${agent}" "agente branch-* sem cláusula de distinção ('Diferença vs'/'DIFF-SCOPED') — contrato de roteamento por description incompleto (achado D2, evolve 2026-07-17)"
+      fi
+    fi
+  done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
+}
+
+# ===========================================================================
 # REGRA 8 — Inventário canônico sincronizado com o filesystem [HARD]
 #           docs/onion/inventory.md é gerado por inventory.sh (SSOT).
 #           Regenera para um temp e compara: se divergir, alguém alterou
@@ -1353,6 +1372,7 @@ check_no_mcp_onion_orchestrator
 check_line_limits
 check_kebab_case_filenames
 check_no_worker_orchestrator_agent
+check_branch_agent_distinction
 check_inventory_sync
 check_claude_md_counts
 check_site_inventory_sync
