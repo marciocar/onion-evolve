@@ -76,7 +76,10 @@ nunca deletar — `/meta:diary review`).
 > **Escopo da camada `audit` — não é sobre código, é sobre investigação.** A gramática epistêmica
 > (`claim`/`evidence`/`decision`/`question` + `SUPPORTS`/`REFUTES`/`SUPERSEDES`) serve **qualquer
 > investigação com achados que se contradizem e se corrigem** — código e sistema (a origem: auditoria
-> WRR de produção), mas também **conteúdo/documentação**: decks, currículo, contratos, specs.
+> WRR de produção), mas também **conteúdo/documentação**: decks, currículo, contratos, specs, e
+> **pesquisa** (streams de deep-research cujos achados se refutam/superam — o veredito por-fonte, a
+> materialidade e as ressalvas `declarado≠verificado` são `status`/`confidence`/`impact`/`REFUTES`). Pesquisa
+> **nasce em KG, não morre em prosa** (doutrina 2026-07-17): 1ª instância `research/whatsapp-api-2026-07/`.
 > **Instância de campo** (gustavo-pulga/Tornak, `tornak.kg.yaml` Lote 10, verificada pelo `kg-radar.sh`
 > soberano do core — 107 nós/172 arestas limpo): a mesma gramática auditou 2 decks de treinamento sem
 > nenhuma adaptação, e o próprio mecanismo de auto-correção operou fora de código — `C_TARDE_NUM_15`

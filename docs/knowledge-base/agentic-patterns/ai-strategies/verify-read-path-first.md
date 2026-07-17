@@ -58,6 +58,15 @@ Família consolidada em 2026-07-02/03 (todos com guarda/migalha; a migalha
 | **Onde-o-dado-vive é hipótese** | tabela de nome óbvio / resumo de agente | **read-path no código** | este padrão + skill `onion-orchestration` |
 | Linhagem de branch é hipótese | doc "PRs miram develop" / nome da branch | commit **deployado** (registry/ECS) + merge-base real | sinal rhilo `2026-07-03-branch-lineage-divergence` (4º membro; comando `/meta:branch-health` é candidato gated — 2ª instância com multi-linhagem OU próxima confusão de base de PR) |
 
+| **Gramática do artefato é hipótese** | o selo `meta.schema_version` (auto-declarado) | o parse extraiu nós — o radar **leu**? | `kg-radar.sh` guarda de legibilidade + fixture `bad-grammar` (PR #398, 2026-07-17 — o falso-verde do granaai) |
+| **Síntese declarada ≠ achado verificável** | veredito em **prosa** (`H1·F6`, contável por grep — errável) | id de nó consultável no KG via `kg-radar` | pipeline pesquisa→KG + 1ª pesquisa nascida em KG (`docs/evolution/research/whatsapp-api-2026-07/`) |
+| **Doutrina declarada ≠ praticada** | `effort` obrigatório na skill de orquestração | scripts Workflow que de fato **passam** `effort` | guarda a nomear — achado 2026-07-17 (~0 scripts passam hoje) |
+
+> **Raiz da família** (maestro, 2026-07-17): *"a pior verdade é aquela que não temos certeza"* — a falsidade que
+> se **sabe** falsa é inofensiva (ninguém age nela); a verdade que não se sabe incerta atravessa o gate e vira
+> decisão. Por isso **certeza é CAMPO, não TOM**: todo gate/relatório distingue "conferi e está ok" de "não
+> consegui conferir" — foi o fix do `kg-radar` ("o radar tem que saber que NÃO SABE").
+
 Parentesco direto: [onion-dogfooding-doctrine](../../concepts/onion-dogfooding-doctrine.md)
 ("RODE o artefato; veredito de leitura é hipótese, exit code é evidência") e a governança
 DEV↔PROD do [knowledge-graph-sdaal](../../concepts/knowledge-graph-sdaal.md) (plane PROD =

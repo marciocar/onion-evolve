@@ -1224,6 +1224,31 @@ check_knowledge_base_links() {
 }
 
 # ===========================================================================
+# REGRA 26 — Pesquisa nasce em KG, não morre em prosa [HARD]
+#   Toda pasta docs/evolution/research/<tema>/ com SYNTHESIS.md exige um <tema>.kg.yaml
+#   irmão (doutrina 2026-07-17, born-in-KG — o antídoto do "17/7/2": a contagem de
+#   achados vira consultável pelo radar, não re-derivável da prosa). Legadas pré-doutrina
+#   sem KG = DEBITO DE MIGRACAO nomeado na allowlist (nao anistia silenciosa — sai da lista
+#   quando migrar). Origem: 1a pesquisa nascida em KG (research/whatsapp-api-2026-07).
+# ===========================================================================
+check_research_kg() {
+  local base="${REPO_ROOT}/docs/evolution/research"
+  [ -d "${base}" ] || return 0
+  local legacy=" federation-2026 scope-inheritance-2026 knowledge-centric-ssot-2026 spec-as-code-evolution-2026 "
+  local dir tema
+  for dir in "${base}"/*/; do
+    [ -f "${dir}SYNTHESIS.md" ] || continue
+    tema="$(basename "${dir}")"
+    if ! ls "${dir}"*.kg.yaml >/dev/null 2>&1; then
+      case "${legacy}" in
+        *" ${tema} "*) : ;;
+        *) violation "HARD" "${dir}" "pesquisa sem .kg.yaml — toda pesquisa NOVA nasce em KG (nao morre em prosa; doutrina 2026-07-17). Modele e valide: bash .claude/validation/kg-radar.sh ${dir}<tema>.kg.yaml" ;;
+      esac
+    fi
+  done
+}
+
+# ===========================================================================
 # REGRA 23 — Frontmatter: model: em comandos e category: em agentes [HARD]
 #   Origem: Q_LINT_FRONTMATTER do KG (achados D8-20/D8-21 da auditoria
 #   2026-07-04 — o gap deixou 7 artefatos divergirem em silêncio; a regra
@@ -1295,6 +1320,7 @@ check_frontmatter_scalar_colon
 check_no_claude_docs
 check_evolution_links
 check_knowledge_base_links
+check_research_kg
 check_frontmatter_model_category
 
 # ===========================================================================
