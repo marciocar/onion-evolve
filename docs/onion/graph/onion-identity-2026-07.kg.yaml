@@ -6,6 +6,7 @@ meta:
   id: onion-identity-2026-07
   schema_version: "1"
   date: 2026-07-11
+  baseline: 2026-07-17
 nodes:
   # ---- perguntas de pesquisa (F2) ----
   - id: Q_IDENTITY
@@ -90,6 +91,7 @@ nodes:
     status: confirmed
     label: "Onion e framework template em .claude, 3 dimensoes peer, plataforma unica Claude Code"
     trace: "CLAUDE.md:identidade-canonica"
+    verified_at: 2026-07-17
   - id: C_RFC4_INTER_INSTANCE
     node_type: claim
     layer: audit
@@ -135,6 +137,7 @@ nodes:
     status: confirmed
     label: "develop e rhilo-main compartilham base 05f96a05 (01/07); nao disjuntas desde 15/06"
     trace: "git merge-base origin/develop origin/rhilo/main"
+    verified_at: 2026-07-17
   - id: C_TOPO_MAIN_HAS_FW
     node_type: claim
     layer: audit
@@ -144,13 +147,14 @@ nodes:
     status: confirmed
     label: "main tem 239 arquivos .claude (adotou Onion 26/06); nao vazia, apenas parada"
     trace: "git ls-tree origin/main .claude"
+    verified_at: 2026-07-17
   - id: C_VERTICALS_EMPTY
     node_type: claim
     layer: audit
     plane: PROD
     impact: 4
     confidence: 0.9
-    status: confirmed
+    status: superseded
     label: "business-context e technical-context vazios (so README) - greenfield"
     trace: "docs/business-context/ docs/technical-context/"
   - id: C_KG_MATURE
@@ -162,6 +166,7 @@ nodes:
     status: confirmed
     label: "KG SDAAL (meta:kg + kg-radar.sh) ja dogfoodado em producao; e a tecnica de reconciliacao"
     trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+    verified_at: 2026-07-17
   - id: C_HEGEL_CRITERION
     node_type: claim
     layer: audit
@@ -209,13 +214,14 @@ nodes:
     status: confirmed
     label: "merge-base origin/develop origin/rhilo-main = 05f96a05 em 2026-07-01"
     trace: "git merge-base"
+    verified_at: 2026-07-17
   - id: E_GIT_LSTREE_MAIN
     node_type: evidence
     layer: audit
     plane: PROD
     impact: 3
     confidence: 1.0
-    status: confirmed
+    status: superseded
     label: "git ls-tree origin/main .claude conta 239 arquivos"
     trace: "git ls-tree -r --name-only origin/main -- .claude"
   - id: E_CLAUDE_MD
@@ -227,6 +233,7 @@ nodes:
     status: confirmed
     label: "CLAUDE.md declara a identidade canonica (2026-05-18)"
     trace: "CLAUDE.md"
+    verified_at: 2026-07-17
   - id: E_RFC5_TEXT
     node_type: evidence
     layer: audit
@@ -247,6 +254,7 @@ nodes:
     status: confirmed
     label: "dogfood pegou bugs reais (#126 #89 #128; adopt-vendor 392arq/1conflito/7-7 asserts)"
     trace: "F2 Q4"
+    verified_at: 2026-07-17
   - id: E_MARKET_SCAN
     node_type: evidence
     layer: audit
@@ -271,7 +279,7 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 1.0
-    status: confirmed
+    status: superseded
     label: "onionevolve.com exibe 96/51/8 e reflete o loop (verificado live 200)"
     trace: "F2 Q1 (curl)"
   # -- claims de valor/mercado --
@@ -284,6 +292,7 @@ nodes:
     status: confirmed
     label: "VALOR PROVADO: dogfood pega bug real que revisao-no-papel nao pega"
     trace: "F2 Q4"
+    verified_at: 2026-07-17
   - id: C_MARKET_COMMODITY
     node_type: claim
     layer: audit
@@ -320,6 +329,7 @@ nodes:
     status: confirmed
     label: "VALOR PROVADO: co-evolucao transporta sinal bidirecional sub-dia; 1o a2a REGULADO fechou F2.2"
     trace: "F2 Q4"
+    verified_at: 2026-07-17
   # -- claims de identidade --
   - id: C_FLOW_EVOLUTION
     node_type: claim
@@ -345,7 +355,7 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.85
-    status: confirmed
+    status: superseded
     label: "pitch PUBLICO ja correto e reflete o loop; a maior distancia esta no SSOT/KB INTERNO"
     trace: "F2 Q1"
   - id: C_PIPELINE_COMMODITY
@@ -412,6 +422,7 @@ nodes:
     status: confirmed
     label: "EDGE HAGEL: rhilo/metagamify dogfoodou o KG SDAAL e PUXOU o core (/meta:kg + kg-radar nasceram da vivencia)"
     trace: "F2 Q5 (56 nos/81 arestas, /meta:evolve 2026-07-04)"
+    verified_at: 2026-07-17
   # -- decisao de north-star + candidatos --
   - id: Q_NORTHSTAR
     node_type: question
@@ -459,6 +470,7 @@ nodes:
     status: confirmed
     label: "pesquisa knowledge-centric 2026-07 (26+ fontes datadas; hype vs implementado)"
     trace: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
+    verified_at: 2026-07-17
   - id: C_AXIS_HOT
     node_type: claim
     layer: audit
@@ -477,6 +489,7 @@ nodes:
     status: confirmed
     label: "NINGUEM trata negocio+eng+compliance como 3 verticais IGUAIS; todo player ancora numa e trata o resto como contexto"
     trace: "KC research (o eixo unico do Onion)"
+    verified_at: 2026-07-17
   - id: C_COMBO_UNOCCUPIED
     node_type: claim
     layer: audit
@@ -522,6 +535,7 @@ nodes:
     status: confirmed
     label: "ha nome de mercado pra FATIAS (Company Brain/Active Ontology/DTO), nao pro COMBO — nomear o combo e ato estrategico aberto"
     trace: "KC research"
+    verified_at: 2026-07-17
   - id: C_NS2_PORTABLE
     node_type: claim
     layer: audit
@@ -549,6 +563,57 @@ nodes:
     status: open
     label: "experimento cold-adopter: probe organico (onion-mini+one-pager) + concierge arms-length; 4-6 semanas, guarda anti-vaidade/anti-v4.0"
     trace: "docs/analysis/onion-experiment-cold-adopter-2026-07.md"
+  # ---- re-verificacao 2026-07-17 (fan-out de 24 nos contra o vivo; append-mostly) ----
+  - id: E_SITE_STALE_0717
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "curl onionevolve.com exibe 96 comandos; SSOT inventory.md diz 97 desde 2026-07-15 — o site publico esta stale"
+    trace: "curl https://onionevolve.com x docs/onion/inventory.md"
+    verified_at: 2026-07-17
+  - id: C_INTERNAL_AHEAD_0717
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "INVERTEU: o SSOT interno esta correto (97) e o pitch PUBLICO ficou atras (96) — a maior distancia agora e do lado publico"
+    trace: "docs/onion/inventory.md x site live"
+    verified_at: 2026-07-17
+  - id: E_LSTREE_MAIN_0717
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "git ls-tree origin/main .claude conta 399 arquivos (era 239 em 11/07) — main segue adotando, nao parada"
+    trace: "git ls-tree -r --name-only origin/main -- .claude"
+    verified_at: 2026-07-17
+  - id: C_VERTICALS_PARTIAL_0717
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "business-context deixou de ser vazio (11 arquivos desde 13/07); technical-context segue so README — greenfield parcial, nao total"
+    trace: "docs/business-context/ x docs/technical-context/"
+    verified_at: 2026-07-17
+  - id: Q_COLD_ADOPTER_0717
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "org externa e o mesmo que adotante frio? pulse-mais e ORGANIZACAO REAL E EXTERNA (members.yaml:93, correcao do maestro) mas o repo e de Marcio — decide o caveat de orbita e o pitch"
+    trace: "docs/evolution/federation/members.yaml:93"
+
 edges:
   - from: E_CLAUDE_MD
     to: C_IDENTITY_CANON
@@ -753,3 +818,28 @@ edges:
   - from: D_COLD_ADOPTER_EXP
     to: Q_COLD_ADOPTER
     edge_type: TRACES_TO
+  # ---- re-verificacao 2026-07-17 ----
+  - from: E_SITE_STALE_0717
+    to: E_SITE_LIVE
+    edge_type: SUPERSEDES
+  - from: C_INTERNAL_AHEAD_0717
+    to: C_PUBLIC_AHEAD
+    edge_type: SUPERSEDES
+  - from: E_LSTREE_MAIN_0717
+    to: E_GIT_LSTREE_MAIN
+    edge_type: SUPERSEDES
+  - from: E_LSTREE_MAIN_0717
+    to: C_TOPO_MAIN_HAS_FW
+    edge_type: SUPPORTS
+  - from: C_VERTICALS_PARTIAL_0717
+    to: C_VERTICALS_EMPTY
+    edge_type: SUPERSEDES
+  - from: E_SITE_STALE_0717
+    to: C_INTERNAL_AHEAD_0717
+    edge_type: SUPPORTS
+  - from: Q_COLD_ADOPTER_0717
+    to: C_ORBIT_CAVEAT
+    edge_type: DEPENDS_ON
+  - from: Q_COLD_ADOPTER_0717
+    to: E_ORBIT
+    edge_type: DEPENDS_ON

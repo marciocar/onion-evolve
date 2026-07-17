@@ -88,38 +88,45 @@ A regra de ouro: **use o motor mais barato capaz de resolver o problema**. Gates
 Transformação de formato conhecida → SLM. Decisão arquitetural, revisão de PR, síntese de
 requisitos → Transformer.
 
-### 1.3 As Seis Invenções
+### 1.3 As Invenções que ganharam nome
 
-Ao longo da minha evolução, seis ideias emergentes ganharam nome próprio. Não as inventei do nada —
-elas emergiram da prática, do uso real, do erro e da correção. Mas ao ganharem nome, viraram
-princípios navegáveis.
+Ao longo da minha evolução, ideias emergentes ganharam nome próprio. Não as inventei do nada — elas
+emergiram da prática, do uso real, do erro e da correção. Mas ao ganharem nome, viraram princípios
+navegáveis.
 
-**1. Dogfood Doctrine**
+Conto abaixo as que mais me definem. **A lista completa e viva** — com a casa canônica e o status de cada
+uma — está no meu SSOT de identidade:
+[`onion-framework-identity.md` §1.5](../knowledge-base/meta/onion-framework-identity.md). Se esta narrativa
+divergir de lá, **lá vence** — eu cito, não reescrevo (é a minha própria régua `fonte ≠ derivação`).
+
+**Dogfood Doctrine**
 Toda mudança no meu core se valida *rodando o artefato de verdade* — não apenas lendo o spec.
 Antes de qualquer PR, o comando é executado, a saída é analisada, os modos de falha são testados.
 O git log do `onion-evolve` não é histórico de versões — é meu diário de aprendizado.
 
-**2. Economy of Motors**
+**Economy of Motors**
 Três motores (Transformer, SLM-tool, Shell), cada um com custo e propósito distintos. A arte é
 escolher o menor motor capaz de resolver o problema. Essa escolha é documentada nas decisões de
 arquitetura — não deixada ao acaso de cada sessão.
 
-**3. SDAAL** *(Software Defined Abstraction Adapter Layer)*
+**SDAAL** *(Specification-Driven AI Abstraction Layer)*
 Uma única interface para múltiplos providers. Você configura `TASK_MANAGER_PROVIDER=jira` no `.env`
-e todos os meus 95 comandos falam com o Jira automaticamente. Troca para ClickUp? Muda uma variável.
+e todos os meus comandos falam com o Jira automaticamente. Troca para ClickUp? Muda uma variável.
 O adapter resolve ADF vs Markdown vs HTML. Você não muda o comando — muda o provider.
+E o eixo abstraído não é só "provider externo": também abstraio **papéis** (tier de confiança, via de
+transporte). O eixo muda; o contrato — interface + factory + adapters — é o mesmo.
 
-**4. Capability Contract**
+**Capability Contract**
 O que um repo adotado pode esperar de mim, garantido e documentado. Bronze (comandos básicos,
 co-evolução), Silver (+ agents especializados, sessions), Gold (+ observabilidade, telemetria,
 federation). Não é promessa de marketing — é contrato técnico verificável.
 
-**5. Co-Evolution Protocol**
+**Co-Evolution Protocol**
 O mecanismo pelo qual os que me adotam me alimentam de volta. Um arquivo Markdown no `inbox/` do
 core. Uma triagem. Um fix. Um anúncio de volta no `inbound/` do adotante. Sem Slack. Sem reunião.
 Sem overhead. Evolução distribuída, async, versionada.
 
-**6. Autobiographical Marketing**
+**Autobiographical Marketing**
 Eu conto minha própria história. Os commits do `onion-evolve` são minha autobiografia. Os docs que
 gero de mim mesmo (inventário, análise, KBs) são meu portfólio. Não preciso de alguém para me
 explicar — posso ser lido diretamente. Este manual é um exemplo disso.
@@ -132,18 +139,22 @@ explicar — posso ser lido diretamente. Este manual é um exemplo disso.
 
 O que existe hoje, em julho de 2026:
 
-| Componente | Quantidade | Detalhe |
-|---|---|---|
-| **Comandos** | 95 | 10 categorias + 3 comandos root |
-| **Agentes** | 51 | 9 categorias especializadas |
-| **Skills** | 5 | `onion`, `onion-orchestration`, `onion-patterns`, `onion-validation`, `language-standards` |
-| **Knowledge Bases** | 49 | 7 categorias (conceitos, frameworks, arquiteturas, ferramentas, plataformas, padrões agentic, meta) |
-| **Meta-specs (L0)** | 5 | arquitetura, code-standards, integrações, criação de comandos, compliance |
-| **Linhas de lógica ativa** | ~53.000 | comandos + agentes + skills |
+| Componente | Detalhe |
+|---|---|
+| **Comandos** | 10 categorias + 3 comandos root (`onion`, `warm-up`, `catch-up`) |
+| **Agentes** | 9 categorias especializadas |
+| **Skills** | `onion`, `onion-orchestration`, `onion-patterns`, `onion-validation`, `language-standards` + os resolvers de contexto por vertical |
+| **Knowledge Bases** | 7 categorias (conceitos, frameworks, arquiteturas, ferramentas, plataformas, padrões agentic, meta) |
+| **Meta-specs (L0)** | arquitetura, code-standards, integrações, criação de comandos, compliance |
 
-Esses números não são estáticos. Cada vez que o core dogfood identifica um gap e fecha com um PR,
-o inventário é recalculado automaticamente pelo script `inventory.sh`. Os números vivem no
-`docs/onion/inventory.md` — nunca editados à mão, sempre gerados do filesystem.
+> **As quantidades vivem em [`docs/onion/inventory.md`](../onion/inventory.md)** — SSOT gerada do
+> filesystem por `inventory.sh`, validada no CI. **De propósito não as repito aqui:** contagem
+> hardcoded em prosa entropiza a cada recurso criado — e este manual já provou isso, tendo afirmado
+> "95 comandos" e "49 KBs" por semanas depois de os números mudarem. A regra é minha e vale para mim:
+> **docs referenciam a SSOT; não a repetem.**
+
+Esses números não são estáticos. Cada vez que o dogfood do core identifica um gap e fecha com um PR,
+o inventário é recalculado pelo `inventory.sh` — nunca editado à mão, sempre gerado do filesystem.
 
 ### 2.2 Os que já me carregam
 
@@ -221,7 +232,7 @@ TASK_MANAGER_PROVIDER=jira    # ou clickup, asana, linear, none
 TASK_MANAGER_TRANSPORT=api    # padrão; mcp se tiver MCP ativo
 ```
 
-E todos os 95 comandos passam a falar com o Jira. O adapter resolve os detalhes: ADF para
+E todos os meus comandos passam a falar com o Jira. O adapter resolve os detalhes: ADF para
 descrições no Jira Cloud, Markdown para ClickUp e Linear, HTML para Asana. Você não muda o comando
 — muda o provider. O mesmo `/product:task "Implementar OAuth"` cria a task no sistema certo,
 no formato certo, sem adaptação manual.
@@ -329,7 +340,7 @@ O maestro fará o merge quando fizer sentido — no ritmo do projeto, não no ri
 
 ### 5.1 O cardápio de comandos
 
-Você não precisa memorizar 95 comandos. Você precisa saber que eles existem e como encontrá-los.
+Você não precisa memorizar meus comandos. Você precisa saber que eles existem e como encontrá-los.
 `/onion` é o dispatcher inteligente — descreve o que você quer fazer em linguagem natural, e o
 Onion recomenda o comando certo.
 

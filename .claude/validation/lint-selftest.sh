@@ -274,6 +274,16 @@ run_kg_freshness_selftests() {
     record_pass "kg-freshness: stale-old → STALE-OLD + exit 0"
   else record_fail "kg-freshness: stale-old" "rc=${rc} out=${out}"; fi
 
+  # (c2) superseded/refuted NÃO são cobrados por frescor — mas o nó VIVO sem carimbo continua sendo.
+  # Os dois lados no mesmo caso: senão "consertar" seria matar a guarda e chamar de fix.
+  rc=0; out=$(bash "${radar}" "${fx}/superseded-not-chased.kg.yaml" --freshness 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && ! printf '%s' "${out}" | grep -q 'STALE-MISSING: C_VELHO' \
+     && ! printf '%s' "${out}" | grep -q 'STALE-MISSING: C_MORTO' \
+     && printf '%s' "${out}" | grep -q 'STALE-MISSING: C_VIVO'; then
+    record_pass "kg-freshness: superseded/refuted não cobrados; nó vivo sem carimbo ainda cobrado"
+  else record_fail "kg-freshness: superseded-not-chased" "rc=${rc} out=${out}"; fi
+
   # (d) schema-divergent --schema: schema_version ≠ radar → RECUSA com exit 1 (não é aviso)
   rc=0; out=$(bash "${radar}" "${sx}/schema-divergent.kg.yaml" --schema 2>&1) || rc=$?
   if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'schema_version divergente'; then
@@ -2319,6 +2329,25 @@ run_diary_crumbs_selftests() {
   if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q "exige valid_when"; then
     record_pass "diary-crumbs: conditional sem valid_when → exit 1 (guarda do enabler)"
   else record_fail "diary-crumbs: cond sem when" "esperava exit 1 + erro; out='${out}' rc=${rc}"; fi
+  rm -f "${d}/.claude/diary/2026-01-06-cond-sem-when.md"
+
+  # (e) `type` fora do enum → FALHA alto. O drift real que motivou a guarda: 2 migalhas com
+  # `type: reflection` passaram batido porque o script validava conflict_class e NÃO type.
+  printf -- '---\ndate: 2026-01-07\ntype: musing\nclassification: public\nreview_after: 2099-01-01\nconflict_class: static\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-07-bad-type.md"
+  rc=0; out="$(bash "${di}" "${d}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q "type 'musing' inválido"; then
+    record_pass "diary-crumbs: type fora do enum → exit 1 com erro nomeado"
+  else record_fail "diary-crumbs: type inválido" "esperava exit 1 + erro; out='${out}' rc=${rc}"; fi
+  rm -f "${d}/.claude/diary/2026-01-07-bad-type.md"
+
+  # (f) `reflection` (promovido ao enum em 2026-07-17) → passa. Prova que a guarda não é
+  # retroativa contra as 2 migalhas reais que o campo já escreveu.
+  printf -- '---\ndate: 2026-01-08\ntype: reflection\nclassification: public\nreview_after: 2099-01-01\nconflict_class: static\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-08-reflection-entry.md"
+  rc=0; bash "${di}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "diary-crumbs: type reflection → passa (promovido ao enum)"
+  else record_fail "diary-crumbs: reflection" "esperava exit 0, veio ${rc}"; fi
 
   rm -rf "${d}"
 }

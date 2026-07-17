@@ -219,6 +219,11 @@ END {
     for (i = 1; i <= nn; i++) {
       id = order[i]
       if (plane[id] != "PROD" && verifiedAgainst[id] == "") continue
+      # Nó já reconciliado (superseded/refuted) é HISTÓRIA, não SSOT viva: append-mostly o mantém
+      # para auditoria, mas ninguém raciocina a partir dele — cobrar re-verificação é ruído que
+      # treina o leitor a ignorar o aviso. Achado de dogfood (2026-07-17, re-verificação dos 24
+      # nós de identidade): 4 nós recém-supersededos seguiam sendo cobrados.
+      if (nstatus[id] == "superseded" || nstatus[id] == "refuted") continue
       ntracked++
       if (verifiedAt[id] == "") {
         print "  ⚠ STALE-MISSING: " id " (frescor rastreado — plane:PROD ou verified_against: — sem verified_at:; re-verifique contra o vivo)"; fwarns++

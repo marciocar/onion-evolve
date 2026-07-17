@@ -50,7 +50,7 @@ O Sistema Onion é um **framework template instalável em `.claude/`** que orque
 
 **Camada 3 — Skills (.claude/skills/):** 5 programas de orquestração de alto nível. `onion-orchestration` é o mais poderoso: autora scripts Workflow nativos do Claude Code para fan-out paralelo de agentes, com tiering de modelos (haiku para scan/classificação, sonnet para raciocínio, opus para julgamento adversarial).
 
-**Camada 4 — Abstrações (.claude/utils/):** SDAAL (Service Decoupled Abstraction Adapter Layer) em dois eixos — Task Manager (Jira/ClickUp/Asana/Linear) e Forge (GitHub/GitLab/Bitbucket). Os comandos nunca chamam APIs direto; delegam ao adapter que resolve transporte, formatação e fallback.
+**Camada 4 — Abstrações (.claude/utils/):** SDAAL (Specification-Driven AI Abstraction Layer) em dois eixos — Task Manager (Jira/ClickUp/Asana/Linear) e Forge (GitHub/GitLab/Bitbucket). Os comandos nunca chamam APIs direto; delegam ao adapter que resolve transporte, formatação e fallback.
 
 **Camada 5 — Documentação constitucional (docs/):** Meta-specs L0 (constituição), Knowledge Bases (34 documentos estruturados para consumo por IA), Business/Technical/Compliance Contexts (Spec as Code gerados por comandos `/docs:build-*`).
 
@@ -147,7 +147,7 @@ O ponto diferenciador: o ciclo é **tri-dimensional e simétrico** — Produto, 
 /git:sync (cleanup + archive session)
 ```
 
-### Padrão SDAAL (Service Decoupled Abstraction Adapter Layer)
+### Padrão SDAAL (Specification-Driven AI Abstraction Layer)
 O Onion usa SDAAL em duas camadas de integração:
 - **Task Manager:** `TASK_MANAGER_PROVIDER` define qual adapter ativo. Comandos chamam `taskManager.create()` — o adapter resolve para `POST /rest/api/3/issue` (Jira) ou `ClickUp list task` (ClickUp).
 - **Forge:** `FORGE_PROVIDER` define o host remoto. `/engineer:pr` chama `forge.createPR()` — o adapter usa `gh pr create` (GitHub cli) ou REST (fallback).

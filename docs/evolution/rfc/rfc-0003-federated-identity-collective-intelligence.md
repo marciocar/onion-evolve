@@ -102,11 +102,20 @@ antes de qualquer prosa. O formato do diário usa frontmatter como canal primár
 **Arquivo:** `<AAAA-MM-DD>-<slug>.md`
 **Índice:** `.claude/diary/index.md` — gerado por `diary-index.sh`, ~1KB, Tier-0 pointer (kebab-case por code-standards)
 
+> **Emenda (2026-07-17) — o schema evoluiu; a SSOT viva é o comando.** O bloco abaixo registra o schema
+> **como aceito em 2026-07-02** (não se reescreve RFC aceita). Desde então ele ganhou, via dogfood:
+> **(a)** `conflict_class` (`dynamic|static|conditional`) + `valid_when` — a *estrutura de invalidação* que
+> dirige o re-teste (`/meta:diary` v1.2.0, vocabulário MemConflict); **(b)** o tipo **`reflection`**
+> (2026-07-17) — síntese retrospectiva sobre o método, que o campo já escrevia antes de existir no
+> vocabulário. **SSOT viva do schema: [`/meta:diary`](../../../.claude/commands/meta/diary.md)**, com guarda
+> determinística em `diary-index.sh` (tipo ou classe fora do enum = migalha desonesta → exit 1). Se este
+> bloco divergir do comando, **o comando vence**.
+
 ```yaml
 ---
 date: 2026-07-01
 instance: onion-evolve
-type: learning             # learning | decision | error | innovation | observation
+type: learning             # learning | decision | error | innovation | observation  (+ reflection — emenda 2026-07-17)
 classification: public     # private | protected | peer | downstream | public | collective
 tags: []
 affects: []                # engineering | product | compliance | design | meta

@@ -51,6 +51,18 @@ while IFS= read -r f; do
   # Campos OPCIONAIS (retrocompat: entrada sem eles cai no protocolo genérico do review), mas
   # quando presentes são validados — classe fora do vocabulário ou `conditional` sem `valid_when`
   # é migalha DESONESTA (promete um re-teste dirigido que não pode cumprir) → erro, exit 1.
+  # `type` fora do vocabulário é desonesto pelo mesmo critério: o índice promete ao Transformer um
+  # tipo que o /meta:diary não sabe processar. Enum: RFC-0003 §2.3 + /meta:diary (`reflection`
+  # promovido em 2026-07-17 — o campo o inventou antes do vocabulário ter casa p/ síntese
+  # retrospectiva). Diferente de conflict_class, `type` NÃO é opcional (sempre existiu no schema).
+  case "$TYPE" in
+    learning|decision|error|innovation|observation|reflection) : ;;
+    *)
+      echo "ERRO: $(basename "$f"): type '$TYPE' inválido (learning|decision|error|innovation|observation|reflection)" >&2
+      INVALID=$((INVALID + 1))
+      ;;
+  esac
+
   CCLASS=$(awk '/^conflict_class:/{print $2; exit}' "$f" 2>/dev/null || echo "")
   VWHEN=$(awk '/^valid_when:/{sub(/^valid_when:[ ]*/, ""); print; exit}' "$f" 2>/dev/null || echo "")
   if [ -n "$CCLASS" ]; then

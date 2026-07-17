@@ -1,8 +1,14 @@
 # 🎨→💻 design-sink — consumidores da SSOT de design (DTCG → formato-alvo)
 
-Abstração **SDAAL** (irmã de `design-source/`) que traduz a SSOT de tokens (`docs/design-context/`,
-W3C/DTCG) para o formato que cada alvo consome. **Anti-lock-in:** trocar o alvo = trocar `DESIGN_SINK_PROVIDER`
-no `.env`; a SSOT permanece neutra. Nunca chamar a ferramenta-alvo direto no comando — sempre via o sink.
+**Script determinístico** (irmão de `design-source/`) que traduz a SSOT de tokens (`docs/design-context/`,
+W3C/DTCG) para o formato que cada alvo consome. **Anti-lock-in:** a SSOT é W3C/DTCG — neutra por formato;
+quem quiser outro alvo escreve outro conversor lendo a mesma SSOT.
+
+> **Por que script e não SDAAL** ([abstraction-doctrine](../../../docs/knowledge-base/concepts/onion-abstraction-doctrine.md)):
+> há **1 conversor real** (`css-vars`) e os demais são costura. Teste do Eixo (a) reprova — abstração de
+> provider único é overhead sem ganho (whitepaper §13); e é transformação **determinística sem LLM**, que
+> a régua P0-P3 manda para script (P1). **Gatilho de graduação a SDAAL:** o **2º conversor real** nascer.
+> Até lá, o comando chama o script direto — o que é legítimo, não vazamento.
 
 ## Providers
 

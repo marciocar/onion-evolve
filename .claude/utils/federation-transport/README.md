@@ -38,6 +38,20 @@ uma das três do eixo. Refino didático (o vocabulário já funcionava); **sem r
 `FEDERATION_TRANSPORT` explícito → `auto` (local se same-machine, senão git-async) → **default `git-async`**
 (sempre disponível, menor superfície de ataque — RFC-0004 §3). **`a2a-live` nunca é auto-selecionado** (gated).
 
+## Dispensas declaradas (formato **SDAAL-papel**)
+
+O eixo do adapter aqui é a **via** de transporte (papel interno), não um provider externo —
+formato-papel na [abstraction-doctrine](../../../docs/knowledge-base/concepts/onion-abstraction-doctrine.md).
+Duas dispensas da anatomia canônica, **deliberadas e registradas** (a doutrina exige que sejam
+declaradas, não silenciosas — precedente: divergência `cli`-default do forge, `integrations.md` §1.0):
+
+- **sem `adapters/none.md`** — `git-async` **já é** o Null Object deste eixo: sempre disponível, é o
+  system-of-record e o fallback (§Resolução acima). "Sem transporte" não é um estado possível — se o
+  repo existe, git existe. Um `none.md` seria um segundo nome para `git-async`.
+- **sem `detector.md`** — a detecção é **determinística** (same-machine? env explícito?) e mora em
+  [`detect-transport.sh`](detect-transport.sh). Pela régua P0-P3, determinístico → **script**; um
+  `detector.md` seria spec de algo que o shell já decide sem juízo.
+
 ## Invariantes (RFC-0001/0004)
 
 - git-async continua o **system-of-record e o fallback** — os outros aceleram, não substituem.

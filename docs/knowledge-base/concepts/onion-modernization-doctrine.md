@@ -15,6 +15,7 @@
 | **Categoria** | Conceitos |
 | **Comando relacionado** | `/meta:evolve` (sensor que aplica esta doutrina) |
 | **Padrão-pai** | [SDAAL](specification-driven-ai-abstraction-layer.md) · [Agent Orchestration](agent-orchestration.md) |
+| **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — quando a decisão de refatorar depende de **estado/verdade** (o que já foi decidido? o que o campo refutou?), o KG é o SSOT a consultar **antes** de propor: `read(KG)` precede a auditoria ([§SSOT-as-runtime](knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho)) |
 
 ---
 
@@ -49,6 +50,40 @@ Qualquer proposta de modernização é **rejeitada** se ferir:
 | **Reposicionar agente "detentor de conhecimento"** | Se um agente é re-delegado N vezes por comandos para fornecer *conhecimento* (não execução), extraia o conhecimento para uma **KB citável** e reposicione o agente como **mentor ad-hoc**. Comandos citam a KB; param de re-delegar. | ✅ remove acoplamento command→agent desnecessário |
 | **Inventário/contagem (comandos, agentes, skills, KBs)** | **Nunca hardcode** contagens duplicadas em prosa — elas entropizam a cada recurso criado. O inventário é **derivado do filesystem** (SSOT em `docs/onion/inventory.md`, gerado por `/meta:inventory`) e **validado no CI** (lint Regra 8 + 9). Docs **referenciam** a SSOT; não a repetem. Drift detectado → o atuador é `/meta:inventory`, não edição manual. | ✅ drift vira erro de CI, não dívida silenciosa |
 | **Consumo de integração (Task Manager / Forge)** | O consumidor (comando/agente) é **agnóstico e API-first**: chama `getTaskManager()`/`getForge()` e métodos da interface (`taskManager.addComment(...)`). **Proibido** no consumidor: chamar MCP/SDK do provider direto (`mcp_<provider>_*`), apresentar **MCP como transporte default** (Task Manager é REST API-first; MCP opcional), inferir/branchear por provider na prosa, ou usar var de roteamento específica (`$CLICKUP_TASK_ID`). Transporte, formato (ADF/Unicode/Markdown) e quando acionar o especialista são responsabilidade do **adapter**. Provider-specific só vive em `adapters/` e nos especialistas. Validado no CI (lint Regra 10). Violação = quebra de SDAAL ([integrations.md §9](../../meta-specs/integrations.md)). | ✅ vazamento provider-specific vira erro de CI |
+
+---
+
+## 🚦 `gated-until-trigger` — o artefato vem depois do uso que o prove
+
+**A regra:** um artefato **não nasce por simetria, plano ou elegância** — nasce quando um **uso real**
+prova que ele falta. Enquanto o gatilho não dispara, o desenho fica **registrado e gated** (ADR, migalha,
+§Radar), nunca construído.
+
+> **Gatilho ≠ vontade.** "Seria bom ter", "o padrão pede", "ficaria simétrico" **não** são gatilhos.
+> Gatilho é **evidência de uso**: alguém tentou fazer o trabalho e faltou.
+
+**De onde veio (a lição cara):** o abandono formal de `.onion/` e das FASES 5-9 do plano v4.0 em
+2026-05-18 (CLI standalone, multi-IDE, aprendizado contínuo) — **catedral construída à frente do
+gatilho**, que nunca chegou. A doutrina é o que restou disso: *não construir catedral*.
+É por isso que o invariante #3 (§acima) existe, e é o mesmo princípio que fez `/meta:kg` nascer **depois**
+do 1º dogfood, não antes.
+
+**Como aplicar** — três perguntas, nesta ordem:
+
+| Pergunta | Se **não** | Se **sim** |
+|---|---|---|
+| **Um uso real falhou por falta disto?** | gated — registre o desenho e pare | siga |
+| **Aconteceu ≥1× de verdade** (não hipótese)? | gated — anote o gatilho que faria disparar | siga |
+| **A menor forma que resolve** já existe (extend/script/KB)? | construa a menor forma | **só então** o artefato novo |
+
+**O par com o dogfood:** o gatilho quase sempre **é** um dogfood — o uso que revelou a falta
+([Dogfooding Doctrine](onion-dogfooding-doctrine.md): *"findings do uso são trabalho de agora"*). Por isso
+esta doutrina e a de dogfood são as duas metades: o dogfood **produz** o gatilho; esta decide se ele basta.
+
+**Ao gatear, registre o gatilho** — gated sem gatilho nomeado é só "não fizemos", e volta como proposta
+recorrente daqui a um mês. Formato: *"gated até `<evento observável>`"*. Exemplos vivos: `/meta:kg` (gated
+até o 1º dogfood no core — **disparou** 2026-07-04) · `conflict_class` no KG (gated até um dogfood provar
+a falta — **não disparou**) · hook-template KG-first (idem).
 
 ---
 

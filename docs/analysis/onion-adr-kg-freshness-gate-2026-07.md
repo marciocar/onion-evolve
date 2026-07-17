@@ -20,7 +20,7 @@ related:
 |-------|-------|
 | **Decisão** | Um KG-SSOT **apodrece silenciosamente** quando suas claims `plane: PROD` não são **re-verificadas** contra o estado vivo, e **drifta** do próprio validador quando o schema evolui sem versão. O core adota **duas guardas irmãs**, ambas da família "o radar recusa/avisa quando a SSOT driftou": **(A) frescor** — campo `verified_at:` (+ opcional `verified_against:`) obrigatório em nós `plane: PROD`, com o `kg-radar.sh` emitindo **STALE** quando ausente ou vencido; **(B) versão de schema** — campo `schema_version:` no bloco `meta:`, com o radar **recusando/sinalizando** divergência da versão que ele entende. |
 | **Escopo** | Investigação (KG-SDAAL): o `.kg.yaml`, o `kg-radar.sh` e a KB `knowledge-graph-sdaal.md`. **Não** toca produto/engenharia/compliance, transporte, nem o motor de UI de adotante. |
-| **Status** | ✅ **Aceito + F1/F1.1/F2 IMPLEMENTADAS** — 2026-07-16. **F1** (`--freshness`/`--schema` + selftests, Q1/Q2 resolvidas). **F1.1** (revisão pós-campo): frescor **estende a nós DEV** que rastreiam artefato móvel (via `verified_against:`) — **supersede** a decisão original "só PROD" (ver §A). **F2** (fiação `/meta:kg` v1.3.0 + doutrina a seção na KB + `schema_version` semeado). Resta absorver a doutrina **SSOT-as-runtime** (§SSOT como runtime) e as features derivadas (`kg state`, KG-first nos loops — backlog). |
+| **Status** | ✅ **Aceito + F1/F1.1/F2 IMPLEMENTADAS** — 2026-07-16. **F1** (`--freshness`/`--schema` + selftests, Q1/Q2 resolvidas). **F1.1** (revisão pós-campo): frescor **estende a nós DEV** que rastreiam artefato móvel (via `verified_against:`) — **supersede** a decisão original "só PROD" (ver §A). **F2** (fiação `/meta:kg` v1.3.0 + doutrina a seção na KB + `schema_version` semeado). A doutrina **SSOT-as-runtime** foi **promovida à KB** (§SSOT como runtime → `knowledge-graph-sdaal.md`) e o **KG-first está cabeado nos 3 loops** (proposta #5 ✅). Resta o **`kg state`** e o **hook-template** (backlog derivado). |
 | **Origem** | Propostas **#2 (⭐)** e **#1** do sinal [`2026-07-16-kg-sdaal-dogfood-ouro`](../evolution/inbox/_processed/2026-07-16-kg-sdaal-dogfood-ouro.md) (rhilo, "o ouro" — a técnica), **revisadas e ampliadas** pelo sinal-companheiro [`2026-07-16-ssot-como-runtime-para-adr`](../evolution/inbox/_processed/2026-07-16-ssot-como-runtime-para-adr.md) (rhilo, "a operação") + evidência convergente do omnibus do gustavo (`2026-07-16-treino-vertical-colaboracao-produtos`, Sinais 5/6/7 — KG por fronteira de confiança, grafo se autocorrigindo em campo). Dois adotantes, mesmo período, empurrando **SSOT como cidadão de 1ª classe**. |
 
 ---
@@ -31,7 +31,10 @@ guardas do radar. **F1** (helper + selftests) + **F1.1** (frescor estende a DEV 
 supersedendo o "só PROD") + **F2** (fiação `/meta:kg` + doutrina a seção na KB + semeadura), tudo dogfoodado
 (fixtures + grafo real do core + a extensão DEV que prova a não-inundação). `lint-selftest` **283/0**. **F3
 subsumida** (o campo operou a SSOT e o relato substituiu o "rodar o radar lá"). A doutrina **SSOT-as-runtime**
-está absorvida (§abaixo); o trabalho derivado (`kg state`, KG-first nos loops) fica no backlog. Q1/Q2 resolvidas.
+está absorvida (§abaixo) e **promovida à KB** — a seção `knowledge-graph-sdaal.md §SSOT-as-runtime` existe e é
+a SSOT da doutrina (fechada em 2026-07-17; até então o §abaixo era a única casa, e o CHANGELOG de 16/07 a
+anunciou antes de o artefato existir — ver §Consequências). **KG-first nos loops ✅ FEITA** (proposta #5).
+No backlog derivado: `kg state` + hook-template. Q1/Q2 resolvidas.
 
 ## Contexto
 O sinal do rhilo-metagamify nomeou a **lição-mestra** com evidência de campo:
@@ -102,6 +105,12 @@ tempo** (nó PROD vs estado vivo → frescor) e drift **no formato** (arquivo vs
 um dogfood, duas guardas irmãs no mesmo `kg-radar.sh`. Separá-las duplicaria contexto sem ganho.
 
 ## SSOT como runtime, não artefato (a doutrina de operação)
+
+> **Promovida à KB** (mesmo movimento que o frescor fez na F2, §Plano faseado): a **doutrina durável** vive
+> em [`knowledge-graph-sdaal.md` §SSOT-as-runtime](../knowledge-base/concepts/knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho)
+> — é lá que o consumidor lê **como aplicar**. Esta seção permanece como a **decisão datada**: o *porquê*,
+> a evidência de campo e o enquadramento do frescor. Não duplicar: mudou a doutrina → edite a KB.
+
 O sinal-companheiro do rhilo (`ssot-como-runtime-para-adr`) trouxe a descoberta que **enquadra** o frescor:
 não basta **construir** a SSOT — tem que **operar a partir dela**. O próprio autor montou o KG canônico e,
 minutos depois, **o ignorou 3× na mesma sessão** — reconstruiu de git/memória (o jeito velho) enquanto o
@@ -135,10 +144,17 @@ Três domínios radicalmente distintos (produção, consultoria, vida) e o **mes
 soberano, reconciliável — segurou em todos. É a validação de campo mais forte que a linha KG SDAAL tem.
 
 ## Consequências
-- **Fazer (quando destravar, faseado):** os campos na gramática do `.kg.yaml`; as 3 checagens no
+- **Feito (F1/F1.1/F2):** os campos na gramática do `.kg.yaml`; as 3 checagens no
   `kg-radar.sh` (STALE-MISSING, STALE-OLD, schema-drift); selftests em `lint-selftest.sh` (cada guarda com
   caso que **reage** — passa quando fresco/versionado, avisa/recusa quando stale/divergente); doutrina de
-  frescor promovida na KB `knowledge-graph-sdaal.md` (hoje só há o ponteiro deixado pelo PR #373).
+  frescor promovida na KB `knowledge-graph-sdaal.md` de ponteiro a **seção** ("Frescor e versão de schema").
+- **Near-miss registrado (2026-07-17) — a própria regra DEV↔PROD violada pelo core.** O CHANGELOG de
+  2026-07-16 (e 3 anúncios downstream em staging) declararam a **doutrina SSOT-as-runtime como seção da KB**
+  quando a seção **não existia em nenhum commit** (`git log --all -S` vazio). Mesma classe do **pin forjado**:
+  o anúncio raciocinou sobre a *intenção* (plane DEV) em vez do *artefato* (plane PROD) — a doutrina de
+  `declarado ≠ verificado` foi **declarada e não verificada**. Pego pelo dogfood do `/warm-up` (os 3 loops
+  citavam um §inexistente) **antes do transporte**; fechado escrevendo o artefato. Lição que generaliza:
+  **anúncio é plane DEV; só o artefato no repo é plane PROD** — o `co-announce` deveria verificar o alvo.
 - **Não fazer:** parser YAML novo (fora de escopo — é a proposta #3, hardening separado); `kg migrate`
   (proposta #4, backlog — o gate de schema **aponta** para ela mas não a implementa); tornar frescor um
   erro-duro (é aviso — não corromper o fluxo de quem ainda não carimbou).

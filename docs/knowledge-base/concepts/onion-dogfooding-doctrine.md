@@ -12,12 +12,13 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2026-06-22 |
-| **Última Atualização** | 2026-06-22 |
+| **Última Atualização** | 2026-07-17 |
 | **Categoria** | Conceitos |
 | **Comando relacionado** | `/meta:evolve` (sensor) · gate mecânico em `.claude/validation/` |
 | **Padrão-irmão** | [Doutrina de Modernização](onion-modernization-doctrine.md) |
+| **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — o KG é o SSOT que o loop lê antes e escreve depois (§♻️ e §Onde se encaixa) · [`/meta:diary`](../../../.claude/commands/meta/diary.md) — o re-teste de migalha é o "re-" em outra roupa |
 
 ---
 
@@ -44,6 +45,11 @@ nova entrada do dogfood, não o fim.
    retomada, colisão — não só o caminho que se sabe que funciona.
 3. **Fechar o loop: fix → re-dogfood.** Todo fix é re-exercitado (o fix pode introduzir
    regressão). O loop só fecha quando o re-dogfood passa.
+   > **Dois sentidos de "re-dogfood" — ambos legítimos, não confundir:** (a) **re-dogfood do fix**
+   > (este item) — re-exercitar o artefato depois de consertar, dentro do mesmo loop; (b) **rodada de
+   > dogfood de um padrão** — o campo exercita o mesmo padrão de novo, semanas depois, e o que ele
+   > revela **supersede** o que a rodada anterior concluiu (*"2º dogfood do metagamify"*, *"re-dogfood
+   > geral do KG SDAAL"*). (a) fecha um loop; (b) **abre** um — é a instância de campo do "re-" (§♻️).
 4. **Validação adversarial é insumo, não ordem.** Veredito de revisor/subagente é hipótese a
    **verificar com evidência** — rejeitável com prova (ver [@metaspec-gate-keeper](../../../.claude/agents/meta/metaspec-gate-keeper.md), Regra Zero: "evidência ou abstenção").
 5. **Findings do uso são trabalho de agora**, não follow-up vago. Aprender e resolver no mesmo loop.
@@ -86,6 +92,8 @@ A lição comum: **o erro só apareceu ao executar.** Nenhum foi pego por revis�
 O dogfooding é o **fechamento empírico** do loop que a [Doutrina de Modernização](onion-modernization-doctrine.md) abre:
 
 ```
+KG-first (se houver .kg.yaml)→ read(KG): o grafo é o SSOT de estado, ACIMA do git/memória
+        ↓ drive-to-verify: claim PROD de alto impacto → cruzar contra o vivo antes de agir
 /meta:evolve (sensor)        → audita, propõe backlog (read-only)
         ↓ cada item cita uma regra de DECISÃO (modernization-doctrine)
 /meta:create-* (atuadores)   → geram/enxugam o artefato
@@ -95,12 +103,53 @@ O dogfooding é o **fechamento empírico** do loop que a [Doutrina de Moderniza�
 DOGFOOD (esta doutrina)      → roda de verdade → aprende → resolve no mesmo loop
    ├─ gate mecânico: lint + selftest + inventory (determinístico)
    └─ gate de uso: invoca o artefato; testa modo-de-falha; verificação adversarial
+        ↓ write(KG): o que o dogfood descobriu volta como nó/aresta (REFUTES/SUPERSEDES)
         ↺ fix → re-dogfood até passar; findings de campo (upstream) realimentam /meta:evolve
 ```
+
+**O KG fecha o loop nas duas pontas** ([knowledge-graph-sdaal §SSOT-as-runtime](knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho)):
+`read(KG)` **antes** de auditar (senão o sensor re-deriva o que a SSOT já sabia — falha medida em campo,
+≥4× com o próprio autor da doutrina) e `write(KG)` **depois** de dogfoodar (senão o achado morre na prosa).
+Sem as duas pernas, o ciclo é leitura, não runtime. O par é **KG-first + drive-to-verify** — nenhum
+sozinho basta: o KG stale engana; o git sozinho esquece o que a SSOT já sabia.
 
 **Modernização decide o padrão; dogfooding prova que funcionou.** Um sem o outro é metade do loop:
 modernizar sem dogfoodar entrega forma-bonita-não-validada; dogfoodar sem doutrina de
 modernização é tentativa-e-erro sem critério.
+
+---
+
+## ♻️ O "re-" — toda verdade tem TTL (o invariante que une três mecanismos)
+
+**Re-dogfood, re-teste de migalha e re-verificação de frescor são o mesmo invariante em três roupas:**
+
+> **Toda verdade tem prazo. Declarado ≠ verificado. Re-testar, nunca re-carimbar.**
+
+Nenhum dos três é opcional, e nenhum é novo — o que faltava era dizer que são **um só**:
+
+| Instância | Onde vive (SSOT) | TTL | Sinal de vencimento | Reconciliação |
+|---|---|---|---|---|
+| **re-dogfood** do fix | esta doutrina (§🚦 item 3) | — | o fix existe | re-exercitar até passar |
+| **re-teste** de migalha | [`/meta:diary review`](../../../.claude/commands/meta/diary.md) | `review_after` (90d) | ⏰ no boot (hook) | `superseded: true` (nunca apagar) |
+| **re-verificação** do KG | [knowledge-graph-sdaal §Frescor](knowledge-graph-sdaal.md#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou) | `verified_at` × `meta.baseline` | ⚠ STALE (radar `--freshness`) | `REFUTES`/`SUPERSEDES` (append-mostly) |
+
+O parentesco é **declarado, não analogia**: o gate de frescor do KG é filho do `review_after` do diário
+([ADR kg-freshness-gate](../../analysis/onion-adr-kg-freshness-gate-2026-07.md) — *"paralelo direto do
+`review_after` do diário; o padrão de TTL já é testado no core"*). E a ponta oposta também se encontra:
+o re-teste `dynamic` do diário — *"RODE o artefato de novo; **exit code é evidência, leitura é
+hipótese**"* — **é esta doutrina**, em outra roupa.
+
+### Duas assimetrias que este enunciado expõe (trabalho, não retórica)
+
+1. **Só o diário sabe *como* re-testar.** Ele carrega a **estrutura de invalidação** (`conflict_class`:
+   `dynamic` → rode o artefato · `static` → confronte a melhor fonte atual · `conditional` → cheque só o
+   `valid_when`). O KG só sabe dizer *"STALE, re-verifique"*, sem dirigir o **como**; o re-dogfood não tem
+   nem TTL nem sinal. **O diário está à frente.** Levar `conflict_class` ao KG é candidato **gated** — o
+   gatilho é um dogfood que prove a falta, não a simetria bonita (`gated-until-trigger`).
+2. **Escrever migalha é fácil; ler é o gargalo.** O recall passivo é quase perfeito e **despenca para
+   40-60% no uso ativo em decisão** ([work-models-research](../../analysis/onion-work-models-research-2026-07.md)).
+   É por isso que o "re-" precisa de **sinal automático** (⏰/STALE) e não de disciplina: sem forcing
+   function, o default é prosa — provado em campo e no próprio core.
 
 ---
 

@@ -55,6 +55,38 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 
 ---
 
+## 1.5 Invenções nomeadas — o catálogo canônico
+
+**Esta é a SSOT da lista** (o contrato que o [`/warm-up`](../../../.claude/commands/warm-up.md) declara).
+Materiais derivados — o [manual de adoção](../../applying/onion-adoption-manual.md) §1.3, press kit,
+artigos — **citam esta tabela**; não a reescrevem ([fonte ≠ derivação](../concepts/source-vs-derivation.md)).
+
+**Critério de entrada:** emergiu da prática (não foi projetado), **ganhou nome próprio**, e tem casa
+canônica citável. Nome sem casa é órfão — entra na tabela só quando a casa existir.
+
+| Invenção | O que é | Casa canônica | Status |
+|---|---|---|---|
+| **Dogfood Doctrine** | toda mudança de core se valida **rodando o artefato**; fix → re-dogfood | [`onion-dogfooding-doctrine.md`](../concepts/onion-dogfooding-doctrine.md) | ✅ ativa |
+| **Modernization Doctrine** | qual padrão de refatoração aplicar sem ferir invariantes | [`onion-modernization-doctrine.md`](../concepts/onion-modernization-doctrine.md) | ✅ ativa |
+| **Abstraction Doctrine** | **quando** algo vira SDAAL (Teste do Eixo + Teste do Gatilho) | [`onion-abstraction-doctrine.md`](../concepts/onion-abstraction-doctrine.md) | ✅ ativa (2026-07-17) |
+| **Economy of Motors** | 3 motores (Transformer · SLM-ferramenta · Shell); use o mais barato capaz | [`onion-engine-economy.md`](../concepts/onion-engine-economy.md) | ✅ ativa |
+| **SDAAL** *(Specification-Driven AI Abstraction Layer)* | uma interface, N providers; o spec é o artefato e o LLM o runtime | [KB](../concepts/specification-driven-ai-abstraction-layer.md) · [whitepaper](../../sdaal/sdaal.md) | ✅ ativa |
+| **KG SDAAL** | investigação/domínio como grafo tipado; verdades **reconciliadas** (`REFUTES`/`SUPERSEDES`), radar determinístico | [`knowledge-graph-sdaal.md`](../concepts/knowledge-graph-sdaal.md) | 🟡 candidata (dogfoodada) |
+| **SSOT-as-runtime** | a SSOT é o **programa que se executa**: `read→verify→act→write`; KG-first + drive-to-verify | [KG SDAAL §SSOT-as-runtime](../concepts/knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho) | ✅ ativa (cabeada nos 3 loops) |
+| **`gated-until-trigger`** | o artefato nasce do **uso que o prove**, nunca de simetria/plano | [modernization §🚦](../concepts/onion-modernization-doctrine.md) | ✅ ativa |
+| **`declarado ≠ verificado`** | carimbo/doc/branch é DEV; só o artefato vivo é PROD | [verify-read-path-first](../agentic-patterns/ai-strategies/verify-read-path-first.md) (tabela da família) | ✅ ativa |
+| **`fonte ≠ derivação`** | fonte e nossa leitura em artefatos **fisicamente** separados; a derivação **cita** | [`source-vs-derivation.md`](../concepts/source-vs-derivation.md) | ✅ ativa |
+| **PFR** *(Padrão Faseado Retomável)* | sessão durável + `STATE.md` + retomada fria; fases nunca fundidas | [ADR](../../analysis/onion-adr-phased-resumable-pattern-2026-06.md) + [método §2a](../concepts/onion-working-method.md) | 🟡 ADR provisório (a cravar em `commands.md §3`) |
+| **Capability Contract** | o que um repo adotado pode esperar: Bronze/Silver/Gold — contrato **verificável** | [ADR](../../analysis/onion-adr-capability-contract-2026-06.md) + `plugins/*/capability.json` | 🟡 só ADR |
+| **Co-Evolution Protocol** *(doc-bridge)* | sinal bidirecional core↔adotante por arquivo commitado; sem runtime acoplado | [`docs/evolution/README.md`](../../evolution/README.md) + `/meta:co-*` | ✅ ativa |
+| **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | [`breadcrumb-patterns.md`](../agentic-patterns/ai-strategies/breadcrumb-patterns.md) + `/meta:diary` | 🟡 draft (absorção não medida) |
+| **Object-led discovery** | o maestro dirige com o objeto; o Transformer executa com as peças certas | [KB](../agentic-patterns/ai-strategies/object-led-discovery.md) + [ADR](../../analysis/onion-adr-object-led-discovery-2026-07.md) | ✅ ativa |
+| **Autobiographical Marketing** | o framework conta a própria história; os commits **são** a autobiografia | [manual de adoção](../../applying/onion-adoption-manual.md) (persona 1ª pessoa) | 🟡 só prosa de manual |
+
+> **Manutenção:** ao nomear algo novo, **primeiro dê a casa**, depois adicione a linha. Nome anunciado
+> antes de existir é `declarado ≠ verificado` aplicado a nós mesmos — foi o que aconteceu com `KG-first` e
+> `drive-to-verify`, anunciados a 3 adotantes antes de terem casa no core (2026-07-16).
+
 ## 2. O Problema que Resolve
 
 | # | Problema | Sem Onion | Com Onion |
@@ -126,7 +158,7 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 
 `product/collect→task` e `engineer/plan→pr-update` são **workflows faseados retomáveis** — invariantes do framework. Nunca são fundidos numa fase única.
 
-### Padrão SDAAL (Service Decoupled Abstraction Adapter Layer)
+### Padrão SDAAL (Specification-Driven AI Abstraction Layer)
 
 - **Task Manager**: `TASK_MANAGER_PROVIDER` no `.env` define o adapter ativo. O consumidor chama `taskManager.create()`; o adapter resolve para `POST /rest/api/3/issue` (Jira) ou a chamada equivalente (ClickUp/Asana/Linear).
 - **Forge**: `FORGE_PROVIDER` define o host remoto. `/engineer:pr` chama `forge.createPR()`; o adapter usa `gh pr create` (default) ou REST (fallback).
@@ -353,9 +385,9 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 > Fonte: [onion-adoption-manual.md](../../applying/onion-adoption-manual.md) (Partes I-II) +
 > verificação ao vivo em 2026-07-03 (endpoints respondendo).
 
-- **Persona autobiográfica**: o Onion conta a própria história em 1ª pessoa — é a 6ª invenção
-  nomeada, *Autobiographical Marketing* (os commits são a autobiografia; os docs gerados de si
-  são o portfólio). O texto canônico da persona é o **Manual de Adoção**
+- **Persona autobiográfica**: o Onion conta a própria história em 1ª pessoa — é a invenção
+  *Autobiographical Marketing* ([§1.5](#15-invenções-nomeadas--o-catálogo-canônico); os commits são a
+  autobiografia; os docs gerados de si são o portfólio). O texto canônico da persona é o **Manual de Adoção**
   (`docs/applying/onion-adoption-manual.md`, prólogo "O Despertar").
 - **Onion-Bridge (mobile) — deployed**: ponte fina (repo privado `~/onion-bridge`, Node 22 + Hono
   + PWA Android) que expõe o framework via `@anthropic-ai/claude-agent-sdk` com `cwd` no core.

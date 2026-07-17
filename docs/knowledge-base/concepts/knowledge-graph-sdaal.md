@@ -185,6 +185,107 @@ valida não é fonte da verdade (no campo: a SSOT viva estava no schema de uma f
 > *verificado* (doutrina `declarado ≠ verificado`). Re-execute a claim PROD contra o vivo — **KG +
 > código `arquivo:linha` + dump fresco** — antes de confiar. O `verified_at` é o carimbo desse cruzamento.
 
+## SSOT-as-runtime — o KG é o primeiro ato (mecanismo, não conselho)
+
+> **Origem da decisão:** ADR [`onion-adr-kg-freshness-gate-2026-07`](../../analysis/onion-adr-kg-freshness-gate-2026-07.md)
+> §*SSOT como runtime, não artefato* — que é a **SSOT do desenho** (frescor/schema, evidência, ciclo,
+> gatilhos). Esta seção é a **doutrina durável** que o ADR moldou; ela **cita**, não reescreve. Para *por
+> que* se decidiu, e para a evidência completa dos três adotantes, leia o ADR.
+
+Um KG só é **fonte da verdade** se for **carregado e verificado antes de raciocinar**. Um grafo que o
+consumidor consulta *quando lembra* não é SSOT — é documentação. A diferença não é de grau, é de
+natureza: o `.kg.yaml` entra no ciclo **antes** da conversa, do git e da memória, porque essas três
+reconstroem o estado **por inferência** e o grafo o **declara**.
+
+**A formulação do maestro** (ADR §SSOT como runtime): *o `.kg.yaml` é o **bytecode**; o LLM é a **VM**
+que deve **executá-lo***. A SSOT é o programa que se **executa**, não o documento que se arquiva — o
+valor só aparece quando o KG é o **substrato de execução**. (A metáfora é **didática**, não argumento
+técnico — ver a ressalva do maestro em
+[`onion-repositioning-sdaal-session-2026-06-17`](../../analysis/onion-repositioning-sdaal-session-2026-06-17.md):
+*"o engenheiro sênior vai perguntar 'cadê os testes?'"*.)
+
+**O ciclo obrigatório — `read(KG) → verify(vivo) → act → write(KG)`:**
+
+1. **read(KG)** — localizar (`ls docs/onion/graph/*.kg.yaml docs/*/graph/*.kg.yaml *.kg.yaml`) e rodar
+   `bash .claude/validation/kg-radar.sh <arquivo>` **como primeiro ato**. Citar **ids de nó**, nunca
+   re-derivar da prosa: o id é a migalha que torna o raciocínio auditável.
+2. **verify(vivo)** — *drive-to-verify*: claim `plane: PROD` de alto impacto se cruza contra o artefato
+   vivo **antes** de virar premissa (§[Governança DEV↔PROD](#governança-devprod-a-regra-dura)). Nó
+   stale **mente** — o `--freshness` avisa, o `verified_at:` é o carimbo do cruzamento.
+3. **act** — só então planejar/agir, com o grafo como piso.
+4. **write(KG)** — o que a ação descobriu volta como nó/aresta (`REFUTES`/`SUPERSEDES` quando corrige),
+   append-mostly. Sem esta perna, o ciclo é leitura, não runtime: o grafo apodrece na próxima volta.
+
+**KG-first + drive-to-verify são o par canônico** (ADR §SSOT como runtime): nenhum sozinho basta — o KG
+stale engana; o git sozinho esquece o que a SSOT já sabia.
+
+### Os nomes: gênero × espécie (para parar de multiplicar sinônimos)
+
+O campo usa vários rótulos para **dois** conceitos em **dois** níveis. A régua:
+
+| | **Gênero** — vale p/ qualquer SSOT | **Espécie** — o SSOT é um `.kg.yaml` |
+|---|---|---|
+| **só a perna `read`** | **SSOT-first** | **KG-first** |
+| **o ciclo inteiro** | **SSOT-as-runtime** | *(usar o gênero)* |
+
+- **`SSOT-first ⊂ SSOT-as-runtime`** — "first" é a **1ª perna**; "as-runtime" é `read→verify→act→write`.
+  Dizer "SSOT-first" quando se quer o ciclo inteiro é o erro comum.
+- **`KG-first` é o que está cabeado nos loops** (o SSOT do core é um `.kg.yaml`); **SSOT-first** é o que
+  se leva ao adotante cujo SSOT é outro artefato.
+- ⚠️ **"KG-runtime" — não usar.** Sinônimo redundante de SSOT-as-runtime; nasceu do salad, não de uma
+  distinção real.
+- **"Dogfood KG SDAAL" / "Dogfood KG-SSOT SDAAL" não são conceitos** — são *rodadas de dogfood* deste
+  padrão (ver [dogfooding-doctrine §🚦 item 3](onion-dogfooding-doctrine.md), os dois sentidos de re-dogfood).
+
+### Por que mecanismo, e não "lembre-se de consultar"
+
+Porque **conselho-que-depende-de-lembrar já falhou empiricamente — inclusive com quem escreveu o
+conselho**. Dois episódios distintos, do mesmo adotante (rhilo-metagamify), na mesma quinzena:
+
+| Episódio | Sinal | O que aconteceu |
+|---|---|---|
+| **origem da doutrina** | [`ssot-como-runtime-para-adr`](../../evolution/inbox/_processed/2026-07-16-ssot-como-runtime-para-adr.md) | montou o KG canônico e **o ignorou 3× na mesma sessão** — reconstruiu de git/memória enquanto o grafo já tinha a resposta (`E_ABANDON_APPLY_PROOF`, `C_CONSOLIDATION_MAP`) |
+| **escalada a mecanismo** | [`mandar-a-doutrina-kg-first`](../../evolution/inbox/2026-07-16-metagamify-mandar-a-doutrina-kg-first.md) | **depois** de escrever a doutrina, reincidiu **≥4×**: planejou um redesenho do WRR sem consultar o grafo. Ao consultar, o KG **corrigiu 4 erros** que ele cometeria — janela `7d`→**`14d` medido** (`C_WINDOW_SWEEP`); morte-da-chamada só-TTL→**sinal + derivação** (`C_ABANDON_PUSHED`/`Q_URANO_SIGNAL`); conflito com `I_NO_AGE_RELEASE`; e **metade do redesenho já existia como nó** (`R_DOSEPARAMETA`, `R_ADR018`) |
+
+> **A reincidência É o dado.** Não é falha de disciplina do consumidor — é falha de *design* do loop.
+> Um estado que depende de um evento que nunca chega é exatamente o bug do SLOT-limbo que o mesmo
+> grafo diagnosticou. Documentar o KG-first e deixar o consumidor lembrar **reproduz o bug**.
+
+Não é anedota de um adotante: a pesquisa de migalhas do core já **mediu** o gargalo — recall passivo
+quase perfeito **despenca para 40-60% no uso ativo em decisão**
+([work-models-research](../../analysis/onion-work-models-research-2026-07.md)). *Escrever a migalha é
+fácil; a absorção na decisão seguinte é o gargalo.* A forcing function ataca exatamente esse ponto.
+
+**Hierarquia de forcing-function** (do mais fraco ao que só o core entrega):
+
+| Nível | Trava | Quem instala | Alcance |
+|---|---|---|---|
+| memória `feedback` | recall automático | o adotante | 1 projeto — lembra, não obriga |
+| regra no `CLAUDE.md` | contexto de toda sessão | o adotante | 1 projeto |
+| **hook** (`SessionStart`/`UserPromptSubmit`) | injeta/roda a consulta a cada prompt | adotante **ou core (template)** | forte, mas cada um reinventa |
+| **comandos cabeados** | trava no runtime do framework | **só o CORE** | **todos os adotantes, uniforme** |
+
+Os três primeiros o adotante improvisa. **O quarto é o único que escala** — e é por isso que a doutrina
+mora aqui, mas **vive** nos loops.
+
+### Onde a trava está cabeada (o runtime real)
+
+O passo KG-first é o **primeiro ato** dos três loops de retomada/execução do core — não um passo
+opcional no fim (ADR, proposta #5 ✅):
+
+- [`warm-up`](../../../.claude/commands/warm-up.md) — item 0, antes do README e da prosa dos docs;
+- [`catch-up`](../../../.claude/commands/catch-up.md) — passo 0, **acima do git** na reconstrução de
+  "onde paramos";
+- [`engineer/work`](../../../.claude/commands/engineer/work.md) — passo 0, antes do `STATE.md`/git.
+
+Nos três, o `allowed-tools` libera `Bash(bash .claude/validation/kg-radar.sh*)` — a trava sem a
+permissão seria conselho outra vez.
+
+**Gated (o sinal pediu, o dogfood ainda não disparou):** hook-template de KG-first distribuível,
+projeção `kg state` como irmã de 1ª classe do radar, e distribuição downstream via `inbound/`. Valem a
+doutrina **gated-until-trigger** deste próprio padrão: o mecanismo vem depois do uso que o prove, não
+antes.
+
 ## Anti-whack-a-mole (disciplina complementar)
 
 - **SSOT-por-conceito**: uma variável = um significado; nomear distinto quando fluxos divergem.
