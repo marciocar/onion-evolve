@@ -15,6 +15,7 @@
 | **Categoria** | Conceitos |
 | **Comando relacionado** | `/meta:evolve` (sensor que aplica esta doutrina) |
 | **Padrão-pai** | [SDAAL](specification-driven-ai-abstraction-layer.md) · [Agent Orchestration](agent-orchestration.md) |
+| **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — quando a decisão de refatorar depende de **estado/verdade** (o que já foi decidido? o que o campo refutou?), o KG é o SSOT a consultar **antes** de propor: `read(KG)` precede a auditoria ([§SSOT-as-runtime](knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho)) |
 
 ---
 

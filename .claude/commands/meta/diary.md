@@ -50,6 +50,10 @@ INSTANCE_ID="$(awk '/^instance:/{print $2}' "$REPO/.claude/.onion-version" 2>/de
    - `error` — erro cometido e como foi resolvido (+ como evitar)
    - `innovation` — algo novo criado aqui que pode beneficiar a rede
    - `observation` — observação de mercado, comunidade ou padrão externo
+   - `reflection` — síntese retrospectiva sobre o próprio método (nenhum dos acima serve: não veio do uso
+     nem é decisão, e não é externo). **Promovido em 2026-07-17** — o campo já o escrevia antes de existir
+     no vocabulário (`hegel-limit-kg-boundary`, `the-day-the-loop-ran-both-ways`) e o `diary-index.sh` não
+     validava `type`. Enum agora é **guarda** (tipo fora da lista = migalha desonesta → exit 1).
 
 2. **Classification** — quem deve poder ler isto?
    - `private` — só esta instância (default para `error` com contexto de negócio)
