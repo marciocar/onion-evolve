@@ -22,7 +22,7 @@ Os 3 bugs são **um só modo de falha**: o mecanismo de adoção **confia em est
 o real** — a própria família **declarado≠verificado** aplicada a si mesma. Um `exit 0` "limpo" é o caso
 **arriscado**, não o seguro, quando o alvo está stale-stampado (o stamp mente sobre o framework real).
 
-## Os 3 bugs (cluster)
+## Os bugs do cluster (B1-B3 de 2026-07-17; B4 apensado 2026-07-18)
 
 ### B1 — `pin-integrity-check.sh`: canário-só = falsa confiança 🔴 HIGH
 Reportou `pin-ok fb08cc6b` enquanto **12+ arquivos de framework** e o **nível inteiro** divergiam
@@ -44,6 +44,15 @@ Lê `.onion-version` da working-tree/branch checada (`feat=fb08cc6b`) mas mergei
 (`develop=4332ac8d`, 16 dias mais velho) → delta computado sobre pin errado.
 - **Fix proposto:** resolver a integração PRIMEIRO e ler o stamp DELA
   (`git show <IB>:.claude/.onion-version`).
+- **Alvo:** `.claude/commands/meta/adopt.md` (--update)
+
+### B4 — `--update` deixa `docs/onion/inventory.md` stale 🟡 MEDIUM
+Adicionado 2026-07-18 (sinal `kg-fail-open-primo` do granaai): o `--update` **não regenera o inventário**,
+então o 1º commit pós-update bate no **lint HARD** (Regra 8 / drift de contagem). A **Fase 3** da adoção
+regenera (`/meta:inventory`), mas o `--update` não — mesma família *declarado≠verificado* (o estado gerado
+não é reconciliado com o real após o merge).
+- **Fix proposto:** o `--update` regenera `inventory.md` (rodar `/meta:inventory`) ou **avisa** a staleness
+  ao final (never-silent). Encaixa no "Procedimento de Configuração pós-cópia (idempotente)".
 - **Alvo:** `.claude/commands/meta/adopt.md` (--update)
 
 ## Antídoto imediato (já provado em campo → candidato a guard nativo)
