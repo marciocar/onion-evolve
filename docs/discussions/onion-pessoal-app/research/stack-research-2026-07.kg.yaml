@@ -224,6 +224,41 @@ nodes:
     status: open
     label: "RISCO ABERTO (o mais frágil): sync git do life-KG soberano NO DEVICE. isomorphic-git é BYOFS sem suporte RN/Hermes documentado; lightning-fs é browser-only (IndexedDB, ausente no Hermes). Exige fs-shim custom sobre expo-file-system, NÃO verificado. Alternativas (nodejs-mobile, libgit2) não cobertas. Precisa spike próprio"
 
+  # ==== plano-B do SLM + standards a não perder (deep-research wzxz11dvf, 2026-07-18) ====
+  - id: E_STANDARDS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-07-18"
+    label: "standards 2026 (fontes primárias; caveat: orçamento de busca esgotou → dominância = auto-descrição do vendor, indicativo): Vercel AI SDK = interface-padrão de LLM em TS (25.6k stars, viva); MCP = standard dominante de tools/contexto (Claude Agent SDK JÁ usa nativo); 3 famílias de formato on-device (GGUF/.pte/MLC, sem vencedor); roteamento híbrido = padrão shipped (Apple Intelligence + RouteLLM). Refutado: callstack/ai NÃO é drop-in; Ollama/LMStudio NÃO são providers oficiais"
+  - id: D_PLANB
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "PLANO-B (se o SLM for antecipado): camada-interface Vercel AI SDK (local↔nuvem = troca de provider) + roteamento híbrido app-level (local p/ de-id/offline, nuvem p/ pesado) + runtime on-device via ADAPTER (nenhum é OpenAI-compatible drop-in; callstack/ai é referência) + tools via MCP no cérebro Claude"
+  - id: C_ALIGN
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "Alinhamento do stack aos standards: JÁ alinhado em MCP (Agent SDK nativo) + formato on-device válido (.pte). RISCO de divergência: (a) ausência da camada Vercel AI SDK (a decisão mais importante que falta) + (b) custo do adapter do executorch (não OpenAI-compatible)"
+  - id: Q_SYNC_STD
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "LACUNA (zero claim sobreviveu): qual o padrão dominante de sync local-first p/ dado que sincroniza device↔servidor — CRDTs (Yjs/Automerge) vs git vs movimento Ink & Switch? Liga com Q_GITSYNC. PRÓXIMA pesquisa antes de decidir a camada de sync do life-KG"
+
   # ==== perguntas em aberto (viram spike / Fase 1b) ====
   - id: Q_DEID
     node_type: question
@@ -443,6 +478,23 @@ edges:
   - from: C_CHAT_VERIFIED
     to: D_ADR
     edge_type: SUPPORTS
+
+  # --- standards/plano-B: alinhamento aos padrões dominantes + a lacuna de sync ---
+  - from: E_STANDARDS
+    to: D_PLANB
+    edge_type: SUPPORTS
+  - from: E_STANDARDS
+    to: C_ALIGN
+    edge_type: SUPPORTS
+  - from: D_PLANB
+    to: D_ADR
+    edge_type: SUPPORTS
+  - from: C_ALIGN
+    to: D_ADR
+    edge_type: SUPPORTS
+  - from: D_ADR
+    to: Q_SYNC_STD
+    edge_type: DEPENDS_ON
 
   # --- compatibilidade verificada: stack coeso, não defasado; git-sync = risco aberto ---
   - from: E_COMPAT
