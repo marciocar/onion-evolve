@@ -222,7 +222,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: open
-    label: "RISCO ABERTO (o mais frágil): sync git do life-KG soberano NO DEVICE. isomorphic-git é BYOFS sem suporte RN/Hermes documentado; lightning-fs é browser-only (IndexedDB, ausente no Hermes). Exige fs-shim custom sobre expo-file-system, NÃO verificado. Alternativas (nodejs-mobile, libgit2) não cobertas. Precisa spike próprio"
+    label: "RE-ESCOPADO (2026-07-18): o MODELO está resolvido (git fica SoT, D_SYNC). Fica o SPIKE DE EXECUÇÃO: caminho = isomorphic-git dentro de nodejs-mobile (Node real no device; ~213 stars, Node 18 near-EOL, dev build). Residual a provar: (a) rota mais leve (fs-shim expo-file-system, bugs iOS #1994/#1997) vs nodejs-mobile; (b) perf num KG crescente; (c) design de merge N=1 multi-device; (d) Yjs em RN"
 
   # ==== plano-B do SLM + standards a não perder (deep-research wzxz11dvf, 2026-07-18) ====
   - id: E_STANDARDS
@@ -256,8 +256,27 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
-    label: "LACUNA (zero claim sobreviveu): qual o padrão dominante de sync local-first p/ dado que sincroniza device↔servidor — CRDTs (Yjs/Automerge) vs git vs movimento Ink & Switch? Liga com Q_GITSYNC. PRÓXIMA pesquisa antes de decidir a camada de sync do life-KG"
+    status: done
+    label: "RESPONDIDA (2026-07-18, deep-research wlgpeo1sj): git FICA o SoT; o problema é executar git no device, não o modelo. Ver D_SYNC + E_SYNC"
+
+  # ==== decisão de sync (deep-research wlgpeo1sj, 2026-07-18) ====
+  - id: E_SYNC
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-18"
+    label: "sync verificado (104 agentes, fontes primárias): local-first-DBs (PowerSync/ElectricSQL/Zero/Jazz) são RN-capazes MAS todos exigem DB-servidor como SoT → substituem git, quebram 'origin=fonte única'. Automerge NÃO roda em produção RN (Rust→WASM, Hermes sem WASM; PR#1099 dormente). Ink&Switch VALIDA git-como-SoT (device=primário, servidor=secundário). Caminho git-no-device = isomorphic-git dentro de nodejs-mobile (Node real no device). ⚠ Yjs não coberto (pure-JS, provável viável)"
+  - id: D_SYNC
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "DECISÃO de sync: git FICA o SoT (alinha à doutrina 'origin=fonte única'; KG append-mostly ~ commits/merges). CRDT no máximo COMPLEMENTA (buffer offline), nunca substitui; local-first-DB DESQUALIFICADO (server-DB vira SoT). Caminho de execução = isomorphic-git dentro de nodejs-mobile (dev build, não Expo Go). O problema vira EXECUÇÃO, não modelo"
 
   # ==== perguntas em aberto (viram spike / Fase 1b) ====
   - id: Q_DEID
@@ -494,6 +513,17 @@ edges:
     edge_type: SUPPORTS
   - from: D_ADR
     to: Q_SYNC_STD
+    edge_type: DEPENDS_ON
+
+  # --- decisão de sync: git fica SoT; execução via git-no-device é o que resta ---
+  - from: E_SYNC
+    to: D_SYNC
+    edge_type: SUPPORTS
+  - from: D_SYNC
+    to: D_ADR
+    edge_type: SUPPORTS
+  - from: D_SYNC
+    to: Q_GITSYNC
     edge_type: DEPENDS_ON
 
   # --- compatibilidade verificada: stack coeso, não defasado; git-sync = risco aberto ---
