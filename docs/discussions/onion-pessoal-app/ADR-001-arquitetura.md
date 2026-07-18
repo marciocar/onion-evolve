@@ -77,6 +77,16 @@ helper→fiação→campo. **Near-term privacy-safe (review):** conversa **texto
 Os gates **L1 (escopo-de-consulta por vertical)** e **L6 (ε-ledger)** precisam **existir antes de embarcar**, não "futuro".
 Ordem: substância (✅) → spike (contrato/de-id) → superfície → **produto** (Fase 1b, gated na ordem pessoal→produto).
 
+### D8 — Continuidade de federação: /chat ⊥ /a2a+doc-bridge `[gap achado pelo maestro, 2026-07-18]`
+O app usa **/chat** (loop humano↔cérebro). Isso **NÃO substitui nem perde a federação** — meu foco em /chat era
+app-cêntrico e omitiu essa dimensão. Verificado no fonte: **/chat e /a2a COEXISTEM** no mesmo bridge (rotas
+separadas). A instância pessoal **PERMANECE membro federado**: hoje via **doc-bridge** (inbox/inbound +
+co-relay/co-deliver), NÃO via A2A-live (gated/foundation; `marcio-pessoal` nem tem bloco `a2a:` no `members.yaml` —
+trust zerado, research-arm). **Perder a federação seria WRONG Onion:** ela É o canal de co-evolução que traz os
+updates do core (o gap G1 que você perguntou no começo). Dois loops ORTOGONAIS, ambos ficam:
+- **Loop humano** = `/chat` (o maestro conversando com o life-KG).
+- **Loop máquina/co-evolução** = A2A + doc-bridge (sinais gated core↔membro; a herança de updates).
+
 ## Privacidade (P4/P5) — invariante operacional (não mais aspiracional)
 Life-KG cru só no nó confiável, **nunca** VPS; saída só **destilada+gated**; **de-id on-device antes de qualquer upload**;
 **sem `bypassPermissions`** no bridge do life-KG (allow-list: radar read-only; escrita ao `.kg.yaml` **human-gated**);

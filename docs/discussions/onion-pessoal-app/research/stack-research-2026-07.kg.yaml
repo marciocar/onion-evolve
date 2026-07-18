@@ -176,6 +176,16 @@ nodes:
     status: confirmed
     label: "O cérebro (onion-bridge: Node + Hono + Agent SDK, cwd=clone do core) JÁ existe → troca-se só o frontend PWA por app Expo/RN cliente"
 
+  # ==== continuidade de federação (gap achado pelo maestro, 2026-07-18) ====
+  - id: C_FEDERATION_STAYS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "A instância pessoal NÃO perde A2A/federação: /chat (loop humano) e /a2a (loop máquina/co-evolução) COEXISTEM no bridge (verificado). marcio-pessoal federa via doc-bridge (inbox/inbound), não A2A-live (gated). Perder a federação = WRONG Onion: é o canal que traz updates do core (G1). Meu ADR era app-cêntrico e omitia isso"
+
   # ==== freshness: versões verificadas ao vivo (npm registry, 2026-07-18) ====
   - id: E_VERSIONS
     node_type: evidence
@@ -382,6 +392,16 @@ edges:
   - from: D_ADR
     to: Q_DEID
     edge_type: DEPENDS_ON
+
+  # --- continuidade de federação sustenta a decisão de arquitetura ---
+  - from: C_FEDERATION_STAYS
+    to: D_ADR
+    edge_type: SUPPORTS
+
+  # --- freshness: as versões vivas confirmam o stack ---
+  - from: E_VERSIONS
+    to: D_STACK
+    edge_type: SUPPORTS
 
   # --- fonte do bridge lido (2026-07-18): fecha a Q_PROTOCOL, corrige o "chat = superfície nova" ---
   - from: E_BRIDGE_SOURCE
