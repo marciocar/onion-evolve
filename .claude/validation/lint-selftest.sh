@@ -756,6 +756,28 @@ run_reconcile_inputs_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo federation-radar — exercita .claude/validation/federation-radar.sh (saúde-de-verificação da
+# federação; ADR onion-adr-federation-kg-audit-overlay). Asserções estruturais (advisory, exit 0).
+# ---------------------------------------------------------------------------
+run_federation_radar_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/federation-radar.sh"
+  if [ ! -f "${helper}" ]; then record_fail "federation-radar" "helper ausente: ${helper}"; return; fi
+  local out rc=0
+  out="$(bash "${helper}" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "federation-radar: advisory (exit 0)"
+  else record_fail "federation-radar: exit" "esperava 0 (advisory), veio ${rc}"; fi
+  if printf '%s\n' "${out}" | grep -q 'FEDERATION RADAR'; then record_pass "federation-radar: emite cabeçalho"
+  else record_fail "federation-radar: cabeçalho" "sem 'FEDERATION RADAR'"; fi
+  # os 3 checks numerados presentes
+  if printf '%s\n' "${out}" | grep -q '①' && printf '%s\n' "${out}" | grep -q '②' && printf '%s\n' "${out}" | grep -q '③'; then
+    record_pass "federation-radar: 3 checks presentes (pin/staging/hub)"
+  else record_fail "federation-radar: checks" "faltam checks numerados"; fi
+  if [ "$(bash "${helper}" 2>/dev/null | sha256sum)" = "$(bash "${helper}" 2>/dev/null | sha256sum)" ]; then
+    record_pass "federation-radar: determinístico"
+  else record_fail "federation-radar: determinismo" "varia entre execuções"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo federation-console — exercita .claude/validation/federation-console.sh (F1.3: console estático
 # read-only do SSOT). Asserções estruturais (não fixam roster). Pula/exit-3 sem python+yaml.
 # ---------------------------------------------------------------------------
@@ -2668,6 +2690,9 @@ run_resolve_target_selftests
 
 # Modo reconcile-inputs — insumos determinísticos do /meta:co-announce --reconcile (conciliação de backlog).
 run_reconcile_inputs_selftests
+
+# Modo federation-radar — radar de saúde-de-verificação da federação (ADR federation-kg-audit-overlay).
+run_federation_radar_selftests
 
 # Modo federation-console — console estático read-only do SSOT (F1.3 federação).
 run_federation_console_selftests
