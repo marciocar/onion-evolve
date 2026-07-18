@@ -1,0 +1,145 @@
+# Doutrina dos INSTRUMENTOS DE PERCEPCAO do core (como o Onion ve/verifica/frescor). Validacao + adversario (fable, 7 furos).
+# SUPERSEDES: a doutrina corrigida supera minhas hipoteses cruas (farol=instrumento; instrumentos-leem-breadcrumbs).
+meta:
+  id: perception-instruments-2026-07
+  schema_version: "1"
+  baseline: 2026-07-18
+  date: 2026-07-18
+nodes:
+  - id: E_FABLE_REVIEW
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "revisor adversarial fable achou 7 furos (3 ALTA): farol eh breadcrumb nao instrumento; a2a-verify eh gate-ator nao sensor; instrumentos-leem-breadcrumbs eh falso (inventory le filesystem, a2a le relogio NTP)"
+  - id: C_HYP_FAROL_INSTRUMENT
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: superseded
+    verified_at: 2026-07-18
+    label: "HIPOTESE CRUA superada: o farol eh um instrumento. Na verdade o arquivo .beacon eh BREADCRUMB (o up DEIXA a marca); so o subcomando check eh SENSOR"
+  - id: C_HYP_READS_CRUMBS
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: superseded
+    verified_at: 2026-07-18
+    label: "HIPOTESE CRUA superada: instrumentos leem breadcrumbs. Refutada: inventory le filesystem, graph le spec, a2a le relogio NTP. O certo sao 3 FONTES (marca/estrutura/vivo)"
+  - id: C_4_ROLES
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "4 PAPEIS: SENSOR (percebe e reporta) · GATE (percebe e decide/escreve, ex a2a-verify) · PROJECAO (view derivada, ex console) · BREADCRUMB (a marca deixada, nao eh instrumento)"
+  - id: C_3_GENERA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "3 GENEROS de sensor por OBJETO: PRESENCA-VIVA (farol-check, telescopio) · ESTADO-DURAVEL (radar, grafo, inventario, canary) · MENSAGEM-NA-FRONTEIRA (you-have-mail, inbox-scan)"
+  - id: C_3_SOURCES
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "3 FONTES que um sensor le (a amarra correta): marca (breadcrumb: beacon, verified_at, stamp) · estrutura (spec-as-code: filesystem, members) · vivo (runtime: relogio NTP, git, tela)"
+  - id: C_UNIT_CHECK
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "unidade de classificacao = o CHECK, nao o script (um script empacota varios checks — inbox-check faz inbox E migalha-vencida; kg-radar tem 7 modos)"
+  - id: C_VEREDITO_AXIS
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "eixo transversal (nao genero): veredito advisory vs gate. kg-radar REPROVA (exit 1); federation-radar eh advisory (exit 0 sempre) — contratos opostos sob o mesmo nome radar, declarar por check"
+  - id: C_CANARY
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "CANARY (pergunta B): pin-integrity-check usa um canario (arquivo vendorizado que muda no core; divergencia byte-a-byte delata pin forjado/stale) — tripwire de declarado-nao-verificado. Sensor de estado, fonte=marca"
+  - id: C_FRESHNESS_LAZY
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "PRAZOS/CHECAGENS (pergunta C): o instrumento eh o eixo VALIDADE/FRESCOR — review_after + conflict_class + o gatilho lazy-por-sessao (co-evolution-inbox-check emite quando vencido). NAO cron (W7 rejeitado)"
+  - id: D_INSTRUMENTS_DOCTRINE
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: done
+    verified_at: 2026-07-18
+    label: "DOUTRINA (KB onion-perception-instruments): instrumentos = pernas read+verify; breadcrumbs = perna write. 3 generos por objeto + 4 papeis + 3 fontes + veredito/frescor transversais + unidade=check"
+    trace: "docs/knowledge-base/concepts/onion-perception-instruments.md"
+edges:
+  - from: E_FABLE_REVIEW
+    to: C_4_ROLES
+    edge_type: SUPPORTS
+  - from: E_FABLE_REVIEW
+    to: C_3_SOURCES
+    edge_type: SUPPORTS
+  - from: E_FABLE_REVIEW
+    to: C_UNIT_CHECK
+    edge_type: SUPPORTS
+  - from: C_4_ROLES
+    to: D_INSTRUMENTS_DOCTRINE
+    edge_type: SUPPORTS
+  - from: C_3_GENERA
+    to: D_INSTRUMENTS_DOCTRINE
+    edge_type: SUPPORTS
+  - from: C_3_SOURCES
+    to: D_INSTRUMENTS_DOCTRINE
+    edge_type: SUPPORTS
+  - from: C_UNIT_CHECK
+    to: D_INSTRUMENTS_DOCTRINE
+    edge_type: SUPPORTS
+  - from: C_VEREDITO_AXIS
+    to: D_INSTRUMENTS_DOCTRINE
+    edge_type: SUPPORTS
+  - from: C_CANARY
+    to: C_3_GENERA
+    edge_type: SUPPORTS
+  - from: C_FRESHNESS_LAZY
+    to: C_VEREDITO_AXIS
+    edge_type: SUPPORTS
+  - from: D_INSTRUMENTS_DOCTRINE
+    to: C_HYP_FAROL_INSTRUMENT
+    edge_type: SUPERSEDES
+  - from: D_INSTRUMENTS_DOCTRINE
+    to: C_HYP_READS_CRUMBS
+    edge_type: SUPERSEDES
