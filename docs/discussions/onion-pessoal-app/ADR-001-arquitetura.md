@@ -40,10 +40,18 @@ no nó pessoal**; o `onion_version: n/a` do `members.yaml` precisa ser **reconci
 for clonado) — senão o update-path G1 (`capability-update-out-of-git`, **docs-only maestro-gated, never-live-pull**) fica
 incoerente (não há `.claude/` a reconciliar). "Parte no core" segue rejeitada (`fonte≠derivação`; life-KG nunca no repo público).
 
-### D2 — Stack: React Native + Expo (+ executorch/callstack p/ SLM) `[VERIFICADO]`
-Único stack que bate os 4 requisitos com fontes primárias (deep-research). Caveat técnico do review: executorch exige
-**EAS dev build (não Expo Go)** + New Arch + piso iOS17/Android13/**≥4GB RAM**; SLM 1-3B é **viável mas apertado** em
-mid-range (gate `Q_PERF`). Números de market-share **refutados** — decisão por capacidade, não popularidade.
+### D2 — Stack: React Native + Expo (+ executorch/callstack p/ SLM) `[VERIFICADO + compat 2026-07-18]`
+Único stack que bate os 4 requisitos com fontes primárias (2 deep-research). **Compat verificada (25/25 claims):** SDK 57
+= RN 0.86/React 19.2 (lançado 30/06 — **é a ÚLTIMA, NÃO defasado**); executorch 0.9.x é **New-Arch-ONLY + dev-build**
+(não Expo Go) → **casa** com o SDK 57 (New Arch default), sem conflito. iOS17/Android13/**RAM≥4GB** realistas.
+- **Estratégia de DESACOPLAMENTO (D7):** único residual = executorch 0.9.2 (17/06) é 13 dias ANTERIOR a RN 0.86 (30/06),
+  pareamento binário não-verificado (nightly 0.10.0 já existe). ⇒ **shell no SDK 57 JÁ** (chat+câmera+mic+SSE, todos
+  confirmados no 57); a **camada SLM** usa 0.10.0/espera a stable. Assim NÃO se começa defasado nem se fica refém do dep travado.
+- **Libs a adicionar (verificado):** store+cripto = **expo-sqlite + SQLCipher** (op-sqlite se precisar JSI); SSE = **expo/fetch**
+  (`getReader`, POST+Bearer; dogfoodar o bug de stream-JSON que existia no SDK 52); voz = **executorch `useSpeechToText`**
+  (Whisper on-device) + **expo-audio** (expo-av deprecado); token = expo-secure-store.
+- **⚠ RISCO ABERTO `Q_GITSYNC`:** o sync git do life-KG soberano NO DEVICE é o ponto frágil (isomorphic-git BYOFS sem RN
+  verificado; lightning-fs browser-only). Toca a INVARIANTE 0 (como o life-KG vive/sincroniza no nó confiável). Precisa spike próprio.
 
 ### D3 — Cérebro: onion-bridge RECONFIGURADO por env (config, não fork) `[CORRIGIDO-r2]`
 **Reenquadrado (review-doutrina):** reapontar não é "fork" — é **reconfiguração via env, config pura; ZERO fork de código

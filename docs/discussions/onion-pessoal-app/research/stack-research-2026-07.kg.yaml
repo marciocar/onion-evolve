@@ -197,6 +197,33 @@ nodes:
     verified_at: "2026-07-18"
     label: "versões VIVAS (registry.npmjs.org, 2026-07-18): expo 57.0.7 (SDK 57 — a pesquisa citava 52, drift de 5 majors; expo/fetch muito mais maduro), react-native-executorch 0.9.2 (citava 0.8.0; v1.0 ainda não saiu), @anthropic-ai/claude-agent-sdk 0.3.214 (ainda 0.3.x → a API query() conferida é a atual), hono 4.12.30. Drift NÃO invalida — reforça o stack"
 
+  # ==== compatibilidade do stack (deep-research wte2k70qw, 2026-07-18, 25/25 confirmados) ====
+  - id: E_COMPAT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-18"
+    label: "compat verificada (25/25, fontes primárias): SDK 57 = RN 0.86/React 19.2 (lançado 30/06, é a ÚLTIMA — NÃO defasado). executorch 0.9.x = New-Arch-ONLY + dev-build-custom (não Expo Go) → CASA com o SDK 57 (New Arch default), sem conflito. iOS17/Android13/RAM≥4GB realistas. Gaps 1+6 = expo-sqlite/op-sqlite + SQLCipher; gap 2 = expo/fetch (getReader, POST+Bearer); gap 5 = executorch useSpeechToText (Whisper) + expo-audio (expo-av deprecado)"
+  - id: C_NOT_DEFASADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "O stack NÃO começa defasado. Único residual: executorch 0.9.2 (17/06) é 13 dias ANTERIOR a RN 0.86 (30/06) → o pareamento binário 0.9.2×RN0.86 não foi verificado no runtime (nightly 0.10.0 já existe). Superação = desacoplar: shell no SDK 57 JÁ (chat+câmera+mic+SSE confirmados); camada SLM usa 0.10.0/espera stable"
+  - id: Q_GITSYNC
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "RISCO ABERTO (o mais frágil): sync git do life-KG soberano NO DEVICE. isomorphic-git é BYOFS sem suporte RN/Hermes documentado; lightning-fs é browser-only (IndexedDB, ausente no Hermes). Exige fs-shim custom sobre expo-file-system, NÃO verificado. Alternativas (nodejs-mobile, libgit2) não cobertas. Precisa spike próprio"
+
   # ==== perguntas em aberto (viram spike / Fase 1b) ====
   - id: Q_DEID
     node_type: question
@@ -416,3 +443,17 @@ edges:
   - from: C_CHAT_VERIFIED
     to: D_ADR
     edge_type: SUPPORTS
+
+  # --- compatibilidade verificada: stack coeso, não defasado; git-sync = risco aberto ---
+  - from: E_COMPAT
+    to: D_STACK
+    edge_type: SUPPORTS
+  - from: E_COMPAT
+    to: C_NOT_DEFASADO
+    edge_type: SUPPORTS
+  - from: C_NOT_DEFASADO
+    to: D_ADR
+    edge_type: SUPPORTS
+  - from: D_ADR
+    to: Q_GITSYNC
+    edge_type: DEPENDS_ON
