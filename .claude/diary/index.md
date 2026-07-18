@@ -1,10 +1,10 @@
-# Diário — runtime-diary
+# Diário — breadcrumb-doctrine
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 47 entradas · **Stale:** 0 · **Compartilháveis:** 35
+**Total:** 48 entradas · **Stale:** 0 · **Compartilháveis:** 36
 
 Gerado em: 2026-07-18
 
@@ -16,6 +16,7 @@ Gerado em: 2026-07-18
 | 2026-07-18 | innovation | collective 📤 | self-reinforcing-radar-loop | 2026-10-15 | static |
 | 2026-07-18 | learning | public 📤 | method-adopter-has-no-doc-bridge | 2026-10-15 | static |
 | 2026-07-18 | decision | collective 📤 | doctrine-ingestor-core-absorbs-field | 2026-10-15 | static |
+| 2026-07-18 | decision | collective 📤 | breadcrumb-doctrine-three-genera | 2026-10-15 | static |
 | 2026-07-18 | decision | collective 📤 | autonomous-thread-runtime-graduated-ladder | 2026-10-15 | static |
 | 2026-07-17 | reflection | public 📤 | worst-truth-is-uncertain | 2026-10-15 | static |
 | 2026-07-17 | learning | public 📤 | salvage-transformer-kb-confront-not-restore | 2026-10-15 | static |
