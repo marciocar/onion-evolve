@@ -24,6 +24,15 @@
 - **Ação p/ adotantes:** nenhuma — a doutrina chega vendorizada no próximo `/meta:adopt --update` (KB
   atualizado). Crédito: dogfood de campo do **granaai** (2026-07-17).
 
+## 2026-07-18 · `write(KG)` virou passo de fechamento da orquestração — pesquisa persiste no KG-SSOT, não no efêmero · COMPATÍVEL · alvo: todos
+
+- **Bookend simétrico do read(KG).** Toda orquestração que **produz conhecimento** (pesquisa, auditoria,
+  investigação, design) fecha com **`write(KG)`**: persiste a síntese no repo (`docs/**/research/*.md`) **e**
+  materializa o `.kg.yaml` via `/meta:kg` + `kg-radar` (exit 0) — nunca deixa no `/tmp` efêmero do harness.
+  Vive na skill `onion-orchestration` (passo 7) + `/meta:orchestrate` (Passo 4.5). **Mecanismo, não conselho.**
+- **Ação p/ adotantes:** chega via `/meta:adopt --update`. A skill `deep-research` do harness não persiste —
+  a orquestração Onion é dona desse leg agora. Origem: **sinal de campo do onion-pessoal** (2026-07-18).
+
 ## 2026-07-18 · Convenção de worktrees — adendo: worktree do harness que vira DURÁVEL vai p/ `~/worktrees/` · COMPATÍVEL · alvo: todos
 
 - **Refina a convenção de worktrees (2026-07-10).** O harness do Claude Code (`--worktree`/`EnterWorktree`)
