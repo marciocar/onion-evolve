@@ -1,17 +1,20 @@
-# Diário — docs-salvage-transformer-kb
+# Diário — onion-evolve
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 42 entradas · **Stale:** 0 · **Compartilháveis:** 30
+**Total:** 45 entradas · **Stale:** 0 · **Compartilháveis:** 33
 
-Gerado em: 2026-07-17
+Gerado em: 2026-07-18
 
 ---
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-18 | innovation | collective 📤 | write-kg-closing-step-bookend | 2026-10-15 | static |
+| 2026-07-18 | learning | public 📤 | method-adopter-has-no-doc-bridge | 2026-10-15 | static |
+| 2026-07-18 | decision | collective 📤 | doctrine-ingestor-core-absorbs-field | 2026-10-15 | static |
 | 2026-07-17 | reflection | public 📤 | worst-truth-is-uncertain | 2026-10-15 | static |
 | 2026-07-17 | learning | public 📤 | salvage-transformer-kb-confront-not-restore | 2026-10-15 | static |
 | 2026-07-17 | decision | public 📤 | research-first-and-equality-lens | 2026-10-15 | static |

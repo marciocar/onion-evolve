@@ -41,6 +41,32 @@
 > pesquisa (métrica inflada ~82× por contagem-fantasma). Sinal completo:
 > [`2026-07-04-kg-primeiro-dogfood-federacao.md`](../../evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md).
 
+## Nota de doutrina — integridade técnica ≠ completude de rastreabilidade (absorvida do campo)
+
+> **Doutrina (S1):** um `.kg.yaml` pode selar **100% verde na integridade** (0 ciclos, 0 órfãos,
+> evidence 100%) e mesmo assim ter os breadcrumbs SDAAL **órfãos** — `TRACES_TO` 0/N (nenhuma
+> `decision` ligada aos nós que ela justifica). **Integridade estrutural** (o grafo não se contradiz)
+> **não é rastreabilidade** (cada nó aponta para a evidência/decisão verificável que o sustenta). É a
+> família *declarado≠verificado* estendida à rastreabilidade: "o grafo é consistente" ≠ "o grafo é
+> auditável". A **auto-extração** de `TRACES_TO`/`CONTROLLED_BY` (parsing de ADR/compliance) é
+> **soberania do adotante** (o motor de cada instância), não do core — o core carrega a **doutrina** +,
+> quando materializado, um radar de completude como **aviso** (não HARD).
+>
+> **Doutrina (S3a) — soberania do validador:** um validador **local** de `.kg.yaml` deve **DELEGAR** ao
+> `kg-radar.sh` soberano, **não reimplementar** a gramática. Um parser duplicado em gramática divergente
+> é **a superfície onde o falso-verde volta** — o fix do radar soberano não o alcança. O validador local
+> mantém só o **valor local** (ex.: checar que os paths de `evidence:`/`trace:` existem em disco); a
+> forma/gramática é do radar. (Irmã da guarda anti-fail-open `kg-radar.sh:120-139`.)
+>
+> **Evidência de campo (granaai, dogfood 2026-07-17):** um `.kg.yaml` de 107 nós/154 arestas selou verde
+> com `TRACES_TO` 0/10 (integridade perfeita, rastreabilidade órfã); e o fix de fail-open do radar
+> soberano não alcançou o validador local `kg-validate-v2.py` (gramática MAPA divergente) — o falso-verde
+> voltou pela porta do parser duplicado.
+>
+> **Absorvida via o ingestor de doutrina** (trust-gated: granaai tem `can_correct_to: [onion-evolve]`):
+> [onion-adr-doctrine-ingestor-2026-07](../../analysis/onion-adr-doctrine-ingestor-2026-07.md) · grafo da
+> absorção: `docs/onion/graph/granaai-doctrine-absorption-2026-07.kg.yaml` (radar exit 0).
+
 ## O problema que o padrão resolve
 
 Investigações longas degradam para **log cronológico**: cada achado é datado e as auto-correções

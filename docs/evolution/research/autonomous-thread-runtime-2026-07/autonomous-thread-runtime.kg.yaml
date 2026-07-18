@@ -1,0 +1,140 @@
+# Pesquisa 2026 + refutacao adversarial (fable) do contrato de autonomia do runtime de fios. write(KG).
+# SUPERSEDES = o contrato pos-refutacao supera o cru; a escada graduada supera o W6-por-item.
+meta:
+  id: autonomous-thread-runtime-2026-07
+  schema_version: "1"
+  baseline: 2026-07-18
+  date: 2026-07-18
+nodes:
+  - id: E_SRC_GRADUATED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "web 2026: autonomia e escada graduada Audit-Assist-Automate; Automate e estado GANHO (earned trust: permissoes estreitas + caminho verificado)"
+    trace: "https://www.mindstudio.ai/blog/progressive-autonomy-ai-agents-safe-deployment"
+  - id: E_SRC_DETERMINISTIC
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "web 2026: merge decidido por politica DETERMINISTICA, nunca probabilistica; IA sugere/acelera, politica decide/forca; agentic workflows read-only por padrao"
+    trace: "https://medium.com/@mvtavares/ai-can-speed-up-code-review-but-merge-decisions-still-need-deterministic-guardrails"
+  - id: E_SRC_HITL
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "web 2026: humano mantem autoridade sobre a minoria arriscada/irreversivel; IA cuida da maioria rotineira; oversight por nivel de risco no mesmo workflow"
+    trace: "https://ideaforgestudios.com/2026/07/17/human-in-the-loop-ai-agents-autonomy-playbook/"
+  - id: C_GRADUATED_LADDER
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "autonomia graduada ganha por dogfood casa com os 3 atos + toolbox-lifecycle + declarado-nao-verificado do Onion"
+  - id: C_DETERMINISTIC_MERGE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "merge por politica deterministica (nunca juizo de IA) casa com o gate mecanico do Onion (lint/selftest/radar) e hooks-sao-codigo"
+  - id: E_FABLE_REVIEW
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "revisor adversarial fable achou 10 furos; 4 ALTA foram contradicoes internas (vendor=outward, auto-merge vs main, LLM na politica, enabler git-nativo ignorado)"
+  - id: C_CONTRACT_RAW
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: superseded
+    verified_at: 2026-07-18
+    label: "CONTRATO CRU superado: own-repo docs-mostly = auto-merge seguro; politica com checks de LLM afirmativos; moat so guardava a working-tree alheia"
+  - id: C_CONTRACT_FIXED
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "CONTRATO CORRIGIDO: AUTOMATE gated (enabler git-nativo + path-allowlist vendor + politica 100 por cento mecanica, LLM veto-only); worktree propria + beacon-check; 3 guardas de parada"
+  - id: D_RUNTIME_CONTRACT
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: open
+    label: "DECISAO (proposed-GATED): escada graduada Nivel0/AUDIT/AUTOMATE-gated/MOAT; 1a passada so no AUDIT (main humano); sela so apos dogfood da Fase 2"
+    trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
+  - id: C_W6_PERITEM
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: superseded
+    verified_at: 2026-07-18
+    label: "W6-por-item superado: propor cada ato-3 e parar; a escada graduada em LOTE supera sem violar o gate do ato-3"
+  - id: C_GATED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: "GATE: o contrato so sela (proposed->accepted) apos o dogfood da Fase 2 (1a passada AUDIT produz 1 lote aceito pelo maestro)"
+edges:
+  - from: E_SRC_GRADUATED
+    to: C_GRADUATED_LADDER
+    edge_type: SUPPORTS
+  - from: E_SRC_HITL
+    to: C_GRADUATED_LADDER
+    edge_type: SUPPORTS
+  - from: E_SRC_DETERMINISTIC
+    to: C_DETERMINISTIC_MERGE
+    edge_type: SUPPORTS
+  - from: E_FABLE_REVIEW
+    to: C_CONTRACT_FIXED
+    edge_type: SUPPORTS
+  - from: C_CONTRACT_FIXED
+    to: C_CONTRACT_RAW
+    edge_type: SUPERSEDES
+  - from: C_GRADUATED_LADDER
+    to: D_RUNTIME_CONTRACT
+    edge_type: SUPPORTS
+  - from: C_DETERMINISTIC_MERGE
+    to: D_RUNTIME_CONTRACT
+    edge_type: SUPPORTS
+  - from: C_CONTRACT_FIXED
+    to: D_RUNTIME_CONTRACT
+    edge_type: SUPPORTS
+  - from: D_RUNTIME_CONTRACT
+    to: C_W6_PERITEM
+    edge_type: SUPERSEDES
+  - from: C_GATED
+    to: D_RUNTIME_CONTRACT
+    edge_type: DEPENDS_ON

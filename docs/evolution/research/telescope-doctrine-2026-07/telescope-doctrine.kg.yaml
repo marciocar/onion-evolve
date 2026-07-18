@@ -1,0 +1,175 @@
+# Avaliacao multi-lente do NOME+DOUTRINA da observacao de sessoes (telescopio). write(KG) da orquestracao wf_35e1e7a2.
+# As arestas SUPERSEDES sao a TESE: doutrina evolui por superacao (Aufhebung) auditavel no KG-SSOT, nao por git-merge que apaga.
+meta:
+  id: telescope-doctrine-2026-07
+  schema_version: "1"
+  baseline: 2026-07-18
+  date: 2026-07-18
+nodes:
+  - id: E_LENS_TRANSFORMER
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "lente Transformer: nome e mecanismo quando os entailments da palavra implicam o invariante sem reler a doutrina; telescopio entrega observar-nao-comunicar de graca"
+  - id: E_LENS_MARKET
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "lente Mercado: read-only mora na convencao+allowed-tools, nao numa flag (tmux documenta attach -r como convenience not security -> preferir capture-pane)"
+  - id: E_LENS_RISK
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "lente Risco (adversarial): telescopio como instrumento permanente convida ao daemon-vigia; a unidade do ato precisa ser evento pontual, nao instalacao"
+  - id: C_NAME_TELESCOPE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "NOME: telescopio (conceito) par por oposicao com o farol (farol emite metadado consentido; telescopio recebe conteudo pleno unilateral) — capacidade nova, nao sinonimo"
+  - id: C_ACT_VISLUMBRE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "unidade do ATO: vislumbre — da-se um vislumbre pelo telescopio, nunca telescopio ligado; carrega efemeridade (prova nada, efemero) que telescopio carrega mal"
+  - id: C_PEEK_RAW
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: superseded
+    verified_at: 2026-07-18
+    label: "IDEIA CRUA superada: espiar a tela das outras sessoes (peek) sem doutrina — sem invariante, convida a vigilancia/IA-vigia-IA"
+  - id: D_NAME_DECISION
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: done
+    verified_at: 2026-07-18
+    label: "DECISAO: telescopio (genero/conceito) + vislumbre (especie/ato) + slug /meta:telescope — nome CONFIRMADO pelo verify, confianca media-alta"
+    trace: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+  - id: C_INV9_RAW
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: superseded
+    verified_at: 2026-07-18
+    label: "INVARIANTE 9 CRU superado: pertencer-a-federacao IMPLICA consentir-em-ser-telescopado (so members.yaml) — upgrade silencioso de consentimento, fere soberania"
+  - id: E_FURO_A
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "FURO A (verify adversarial): consentimento — a observada precisa de opt-in explicito (campo telescope-allowed que o MEMBRO seta), espelhando que o farol e dela levantar"
+  - id: E_FURO_B
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "FURO B (verify adversarial): telescopar sessao viva E live-pull; restringir a leitura LOCAL same-machine pelo maestro humano (capture-pane localhost), largar remoto/tokens"
+  - id: C_FURO_C
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "FURO C (reuso): #1/#5 herdam a regra da NOTE-04 — guardar nao eh aceitar nao eh aplicar; o vislumbre (intake) degrada SKIP, so a acao derivada degrada VETO"
+  - id: C_INV9_FIXED
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "INVARIANTE 9 CORRIGIDO: opt-in da observada (telescope-allowed) + LOCAL-ONLY (capture-pane localhost pelo maestro humano; remoto = excecao gated a2a-live nomeada)"
+  - id: D_VALIDATION_PATTERN
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.8
+    status: done
+    verified_at: 2026-07-18
+    label: "PADRAO VIVO: a validacao de doutrina (fan-out de lentes -> sintese -> verify adversarial -> write(KG) com SUPERSEDES) e o motor de qualidade da superacao; nomeado playbook em onion-patterns"
+    trace: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
+  - id: C_GATED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: "GATE: a doutrina do telescopio nao sela ate 1 dogfood de recall (sessao reidentifica invariantes so ouvindo o nome) + furos A/B fechados + C herdado"
+edges:
+  - from: E_LENS_TRANSFORMER
+    to: C_NAME_TELESCOPE
+    edge_type: SUPPORTS
+  - from: E_LENS_MARKET
+    to: C_NAME_TELESCOPE
+    edge_type: SUPPORTS
+  - from: E_LENS_RISK
+    to: C_ACT_VISLUMBRE
+    edge_type: SUPPORTS
+  - from: C_NAME_TELESCOPE
+    to: D_NAME_DECISION
+    edge_type: SUPPORTS
+  - from: C_ACT_VISLUMBRE
+    to: D_NAME_DECISION
+    edge_type: SUPPORTS
+  - from: D_NAME_DECISION
+    to: C_PEEK_RAW
+    edge_type: SUPERSEDES
+  - from: E_FURO_A
+    to: C_INV9_FIXED
+    edge_type: SUPPORTS
+  - from: E_FURO_B
+    to: C_INV9_FIXED
+    edge_type: SUPPORTS
+  - from: C_FURO_C
+    to: C_INV9_FIXED
+    edge_type: SUPPORTS
+  - from: C_INV9_FIXED
+    to: C_INV9_RAW
+    edge_type: SUPERSEDES
+  - from: E_LENS_RISK
+    to: E_FURO_A
+    edge_type: SUPPORTS
+  - from: D_VALIDATION_PATTERN
+    to: D_NAME_DECISION
+    edge_type: SUPPORTS
+  - from: C_GATED
+    to: D_NAME_DECISION
+    edge_type: DEPENDS_ON

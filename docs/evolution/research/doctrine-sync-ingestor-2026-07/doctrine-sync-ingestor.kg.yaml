@@ -1,0 +1,128 @@
+# Exploracao orquestrada 2026-07-18: sync de doutrina adotante->core (o INGESTOR que falta) + federacao-como-KG.
+# write(KG) da orquestracao de 3 streams — dogfood do passo 7 de onion-orchestration. Sintese: docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md
+meta:
+  id: doctrine-sync-ingestor-2026-07
+  schema_version: "1"
+  baseline: 2026-07-18
+  date: 2026-07-18
+nodes:
+  - id: C_INGESTOR_GAP
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "cadeia doutrina adotante->core partida no meio: metade produtora+transporte construida; metade ingestora no core desenhada mas GATED"
+  - id: E_DOCTRINE_TERRAIN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "diary/export-sharable/co-relay/a2a-live construidos; personality-sync F2, synthesize-collective F4, SUPERSEDES RFC-0005 F3 todos gated; agregador-que-ingere-com-politica nomeado sem comando"
+    trace: "docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md"
+  - id: C_FIELD_SEAM
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "granaai e onion-pessoal pressionam a MESMA doutrina: fechar read(KG)->verify->act->write(KG) — auto-persist, forma-nao-carimbo, arquivo:linha, domain+frescor"
+  - id: E_PENDING_SIGNAL
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "deep-research (skill do harness) despeja em /tmp efemero e nao persiste no KG-SSOT — write(KG) depende de lembrar (semente + desbloqueio do onion-pessoal)"
+    trace: "docs/evolution/inbox/2026-07-18-deep-research-no-auto-kg-persist.md"
+  - id: E_GRANAAI_DOCTRINE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "granaai entregou 4 sinais de doutrina ao core: integridade-nao-eh-rastreabilidade (TRACES_TO), fail-open do radar, validador-local-delega-radar, formalizar /meta:kg map"
+    trace: "/home/marcio/granaai/docs/evolution/inbox/_processed/"
+  - id: E_PESSOAL_LIFEKG
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "onion-pessoal adota o METODO (nao vendoriza .claude): a raiz E o KG (marcio-*-f0.kg.yaml) com planes DEV/PROD, SUPERSEDES/Aufhebung e exit 1 honesto (contradicao viva)"
+    trace: "docs/evolution/federation/members.yaml:185"
+  - id: D_FASE1_WRITEKG
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: done
+    verified_at: 2026-07-18
+    label: "Fase 1: write(KG) vira passo de fechamento da orquestracao (passo 7 da skill + Passo 4.5 do comando) — bookend simetrico do read(KG), mecanismo nao conselho"
+    trace: ".claude/skills/onion-orchestration/SKILL.md"
+  - id: C_FED_AS_KG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "a foto da federacao como .kg.yaml de camada domain e substrato plausivel do ingestor, MAS as relacoes de federacao nao tem edge-type domain nativo -> dogfood-first, nao inventar no abstrato"
+  - id: D_INGESTOR_KGBACKED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "Fase 2: o ingestor = absorcao KG-backed da doutrina ja entregue do granaai (SUPPORTS/SUPERSEDES, trust-gated, human-gated) — o elo que falta, sem o F4-cron gated"
+  - id: D_FEDKG_SPIKE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "Fase 3: 1a federation.kg.yaml de producao (domain) de members.yaml+CHANGELOG+outbox (extrator = molde do reconcile-inputs.sh); radar = core nao surpreendido"
+edges:
+  - from: E_DOCTRINE_TERRAIN
+    to: C_INGESTOR_GAP
+    edge_type: SUPPORTS
+  - from: E_PENDING_SIGNAL
+    to: C_FIELD_SEAM
+    edge_type: SUPPORTS
+  - from: E_GRANAAI_DOCTRINE
+    to: C_FIELD_SEAM
+    edge_type: SUPPORTS
+  - from: E_PESSOAL_LIFEKG
+    to: C_FIELD_SEAM
+    edge_type: SUPPORTS
+  - from: C_FIELD_SEAM
+    to: D_FASE1_WRITEKG
+    edge_type: SUPPORTS
+  - from: C_INGESTOR_GAP
+    to: D_INGESTOR_KGBACKED
+    edge_type: SUPPORTS
+  - from: D_INGESTOR_KGBACKED
+    to: D_FASE1_WRITEKG
+    edge_type: DEPENDS_ON
+  - from: D_INGESTOR_KGBACKED
+    to: C_FED_AS_KG
+    edge_type: DEPENDS_ON
+  - from: D_FEDKG_SPIKE
+    to: C_FED_AS_KG
+    edge_type: DEPENDS_ON

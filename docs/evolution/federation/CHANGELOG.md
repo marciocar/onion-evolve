@@ -8,6 +8,31 @@
 
 ---
 
+## 2026-07-18 · O core absorve doutrina de campo do granaai: integridade≠rastreabilidade + soberania do validador (1º ingestor) · COMPATÍVEL · alvo: todos
+
+- **Nasceu o ingestor de doutrina** (o elo que faltava na cadeia adotante→core): o core passa a
+  **absorver doutrina de campo** por absorção **curada, trust-gated** (só de quem tem `can_correct_to`),
+  **KG-backed** (grafo audit, `kg-radar` exit 0) e **human-gated** — o precursor curado da síntese
+  coletiva (RFC-0003 F4, gated). ADR: `onion-adr-doctrine-ingestor-2026-07`.
+- **1º dogfood — granaai (2 doutrinas absorvidas no KB `knowledge-graph-sdaal.md`):**
+  - **integridade técnica ≠ completude de rastreabilidade** — um `.kg.yaml` sela verde na integridade e
+    mesmo assim tem `TRACES_TO` órfão; a família *declarado≠verificado* estendida à rastreabilidade.
+  - **soberania do validador** — um validador local **delega** ao `kg-radar` soberano, não reimplementa
+    a gramática (parser duplicado divergente = a superfície onde o falso-verde volta).
+- **S3b** (`--update` regenera `inventory.md`) e **S4** (`/meta:kg map <projeto>`) → backlog de engenharia;
+  **S2** (fail-open) já estava absorvido. Grafo da absorção: `granaai-doctrine-absorption-2026-07.kg.yaml`.
+- **Ação p/ adotantes:** nenhuma — a doutrina chega vendorizada no próximo `/meta:adopt --update` (KB
+  atualizado). Crédito: dogfood de campo do **granaai** (2026-07-17).
+
+## 2026-07-18 · `write(KG)` virou passo de fechamento da orquestração — pesquisa persiste no KG-SSOT, não no efêmero · COMPATÍVEL · alvo: todos
+
+- **Bookend simétrico do read(KG).** Toda orquestração que **produz conhecimento** (pesquisa, auditoria,
+  investigação, design) fecha com **`write(KG)`**: persiste a síntese no repo (`docs/**/research/*.md`) **e**
+  materializa o `.kg.yaml` via `/meta:kg` + `kg-radar` (exit 0) — nunca deixa no `/tmp` efêmero do harness.
+  Vive na skill `onion-orchestration` (passo 7) + `/meta:orchestrate` (Passo 4.5). **Mecanismo, não conselho.**
+- **Ação p/ adotantes:** chega via `/meta:adopt --update`. A skill `deep-research` do harness não persiste —
+  a orquestração Onion é dona desse leg agora. Origem: **sinal de campo do onion-pessoal** (2026-07-18).
+
 ## 2026-07-18 · Convenção de worktrees — adendo: worktree do harness que vira DURÁVEL vai p/ `~/worktrees/` · COMPATÍVEL · alvo: todos
 
 - **Refina a convenção de worktrees (2026-07-10).** O harness do Claude Code (`--worktree`/`EnterWorktree`)
