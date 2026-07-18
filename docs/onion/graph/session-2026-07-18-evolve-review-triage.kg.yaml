@@ -1,0 +1,237 @@
+# Sessao 2026-07-17/18 modelada como investigacao: evolve audit → forense onion-review → triagem KG-SDAAL.
+# O valor epistemico: 4 hipoteses caidas sob verificacao (REFUTES/SUPERSEDES) + eixo DEV(declarado)→PROD(verificado).
+# Espinha: a familia declarado≠verificado reaparece em adopt-update, KB de identidade, onion-review is_error, KG false-green.
+meta:
+  id: session-2026-07-18-evolve-review-triage
+  schema_version: "1"
+  baseline: 2026-07-18
+  date: 2026-07-18
+nodes:
+  - id: C_DECLARED_VERIFIED
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "familia-raiz: mecanismos confiam em estado DECLARADO sem verificar o VIVO — reaparece em adopt-update, KB de identidade, onion-review is_error e KG false-green"
+  - id: E_ADOPT_SIGNAL
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-17
+    label: "adopt --update clobra adotante stale-stampado (3 bugs: pin-canario, fallback HEAD, stamp branch errada) — triado #410"
+    trace: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
+  - id: C_IDENTITY_DRIFT
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "KB de identidade citava contagens driftadas da SSOT gerada (5 skills vs 8, 82/87 vs 97, 8 vs 10 dims) — resync #412 preservando narrativas historicas"
+    trace: "docs/knowledge-base/meta/onion-framework-identity.md"
+  - id: C_SOFTPASS_GAP
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "soft-pass do onion-review foi desenhado p/ crash transiente mas MASCAROU falha 100% persistente por 4 dias (silence != success) — gap: escalar falha persistente"
+  - id: C_EVOLVE_BACKLOG
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-07-18
+    label: "evolve audit 10-D (13 agentes): 6 achados sobreviveram, 2 refutados pelo juiz opus — executados em #411/#412/#413"
+    trace: "docs/analysis/onion-evolution-2026-07-17.md"
+  - id: C_D1_WEIGHT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.3
+    status: refuted
+    label: "ALEGAVA: peso de adopt.md (545 l.) tem padroes extraiveis p/ KB"
+  - id: E_D1_JUDGE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "juiz verificou: o core executavel ja vive em .claude/utils/adopt/*.sh; inline restante e orquestracao de fase, nao conceito extraivel"
+  - id: C_ITEM6
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.3
+    status: refuted
+    label: "ALEGAVA: roteamento de adapters duplicado em 5 arquivos e extraivel p/ common/prompts"
+  - id: E_ITEM6_VERIFY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "drive-to-verify: os 5 pontos sao o MESMO conceito enquadrado por audiencia/profundidade (index vs normativo vs troubleshooting); extrair achataria — Modernization Doctrine veta over-engineering"
+  - id: C_MODEL_CAUSE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.2
+    status: refuted
+    label: "ALEGAVA (crenca da memoria): o modelo claude-sonnet-5 causou o crash 100% do onion-review"
+  - id: E_TIMELINE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "crash 100% desde 2026-07-14 (runs 07-13 verdes); naquele dia mudaram DOIS: o bump de modelo E a @v1 saltando p/ v1.0.172/173/174"
+  - id: E_EXPERIMENT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "experimento controlado #414: pinar action em v1.0.171 MANTENDO sonnet-5 → onion-review RECUPEROU (review success, retry skipped) e refez review real em #415/#416"
+    trace: "PR #414; .github/workflows/onion-review.yml"
+  - id: C_ACTION_CAUSE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "a regressao da claude-code-action (v1.0.172+, 07-14) era a causa do crash — o modelo sonnet-5 sempre esteve correto"
+  - id: C_TRANSITORY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.2
+    status: superseded
+    label: "ALEGAVA (memoria 07-14): is_error do onion-review era TRANSITORIO (rate-limit/overload sob rajada de CI)"
+    trace: "memory/onion-review-ci-semantics.md"
+  - id: D_PIN
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: done
+    verified_at: 2026-07-18
+    label: "DECISAO: pinar claude-code-action em v1.0.171 (e90deca4) mantendo sonnet-5; des-pinar quando versao nova corrigir o hang"
+  - id: C_GENERATOR_LOCAL
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "drive-to-verify: o 'generator' dos sinais granaai (kg-ssot-sdaal, kg-validate-v2.py) e LOCAL do adotante, nao o core /meta:kg; a gramatica do core JA suporta TRACES_TO/CONTROLLED_BY"
+    trace: ".claude/commands/meta/kg.md"
+  - id: E_FAILOPEN_FIELD
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-17
+    label: "granaai validou em campo: --update fez a guarda de legibilidade reprovar o .kg.yaml MAPA (exit 1) enquanto o LIST valido passa — fail-open fix funciona"
+  - id: D_LOCAL_VALIDATOR_DOCTRINE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    label: "DOUTRINA (o 'primo' do fail-open): validador LOCAL de .kg.yaml deve DELEGAR ao kg-radar.sh, nunca reimplementar a gramatica — parser duplicado e onde o falso-verde volta. Ack #415/#416"
+  - id: D_DRIVE_VERIFY
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "METODO: veredito de revisor/juiz/sinal e HIPOTESE — verificar com evidencia de 1a mao antes de agir. Produziu as 4 refutacoes desta sessao (D1, item6, modelo, generator-local)"
+    trace: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
+edges:
+  - from: E_ADOPT_SIGNAL
+    to: C_DECLARED_VERIFIED
+    edge_type: SUPPORTS
+  - from: C_IDENTITY_DRIFT
+    to: C_DECLARED_VERIFIED
+    edge_type: SUPPORTS
+  - from: C_SOFTPASS_GAP
+    to: C_DECLARED_VERIFIED
+    edge_type: SUPPORTS
+  - from: C_D1_WEIGHT
+    to: C_EVOLVE_BACKLOG
+    edge_type: DEPENDS_ON
+  - from: C_ITEM6
+    to: C_EVOLVE_BACKLOG
+    edge_type: DEPENDS_ON
+  - from: E_D1_JUDGE
+    to: C_D1_WEIGHT
+    edge_type: REFUTES
+  - from: E_ITEM6_VERIFY
+    to: C_ITEM6
+    edge_type: REFUTES
+  - from: E_ITEM6_VERIFY
+    to: D_DRIVE_VERIFY
+    edge_type: DEPENDS_ON
+  - from: E_EXPERIMENT
+    to: C_MODEL_CAUSE
+    edge_type: REFUTES
+  - from: E_EXPERIMENT
+    to: C_ACTION_CAUSE
+    edge_type: SUPPORTS
+  - from: E_EXPERIMENT
+    to: D_DRIVE_VERIFY
+    edge_type: DEPENDS_ON
+  - from: E_TIMELINE
+    to: C_ACTION_CAUSE
+    edge_type: SUPPORTS
+  - from: C_ACTION_CAUSE
+    to: C_TRANSITORY
+    edge_type: SUPERSEDES
+  - from: D_PIN
+    to: C_ACTION_CAUSE
+    edge_type: TRACES_TO
+  - from: D_PIN
+    to: E_EXPERIMENT
+    edge_type: DEPENDS_ON
+  - from: C_GENERATOR_LOCAL
+    to: D_LOCAL_VALIDATOR_DOCTRINE
+    edge_type: SUPPORTS
+  - from: C_GENERATOR_LOCAL
+    to: D_DRIVE_VERIFY
+    edge_type: DEPENDS_ON
+  - from: E_FAILOPEN_FIELD
+    to: D_LOCAL_VALIDATOR_DOCTRINE
+    edge_type: SUPPORTS
+  - from: D_LOCAL_VALIDATOR_DOCTRINE
+    to: E_FAILOPEN_FIELD
+    edge_type: TRACES_TO
