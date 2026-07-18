@@ -97,3 +97,36 @@ Fontes: [gwq — git worktree manager](https://github.com/d-kuro/gwq) ·
 [Claude Code — parallel sessions with worktrees](https://code.claude.com/docs/en/worktrees) ·
 [Ultimate guide to git worktrees (AI agents)](https://medium.com/@pererikbergman/the-ultimate-guide-to-git-worktrees-from-daily-dev-to-ai-agents-2b39e63a359d) ·
 [ghq × gwq × fzf](https://shunk031.me/post/ghq-gwq-fzf-worktree/)
+
+## Adendo (2026-07-18) — worktree do harness que vira DURÁVEL: a **durabilidade** decide o local
+
+Lacuna revelada em campo: o harness do Claude Code (`--worktree`/`EnterWorktree`) cria em
+`.claude/worktrees/<name>` **por padrão** — correto para **efêmero** (auto-cleanup ao sair limpo, linha 21).
+Mas quando uma sessão iniciada assim vira **durável** (fica `locked` com pid, sobrevive a várias sessões, é
+um tópico `discuss/*` de dias), ela passa a ser um **worktree-durável-do-maestro no lugar de efêmero** — e a
+convenção não dizia o que fazer.
+
+**Caso concreto (o que expôs a lacuna):** `discuss/onion-pessoal-app` nasceu pelo harness em
+`.claude/worktrees/discuss+onion-pessoal-app` (note o `+` do harness, **não** o `-` da convenção — `/`→`-`
+daria `discuss-onion-pessoal-app`), enquanto as 3 irmãs `discuss/*` (`behavior-mapping-kg`,
+`interface-state-of-art`, `onion-mobile-app`) seguem `~/worktrees/onion-evolve/`. **Custo real:** foi este
+worktree in-repo que gerou 50 falsos-positivos no `lint-artifacts.sh` (fix #411, exclusão de `*/worktrees/*`).
+
+**Regra — a durabilidade decide o local, não a ferramenta-criadora:**
+
+- **Efêmero** (auto-cleanup, run único de orquestração, `vendor-branch.sh`, adoção): `.claude/worktrees/` —
+  **fica**. O lint já o ignora (`.git/info/exclude` + exclusão selada no #411). É a acomodação permanente.
+- **Durável** (locked, multi-sessão, tópico nomeado): pertence a `~/worktrees/<repo>/<branch-slug>/` —
+  **mesmo que tenha nascido pelo harness**. Ao perceber que uma sessão do harness virou durável, **recrie**
+  no path da convenção — **com a sessão fechada** (nunca com ela viva/locked; I3 — a sessão dona rotaciona,
+  não uma sessão irmã):
+  ```bash
+  git -C ~/<repo> worktree remove .claude/worktrees/<name>
+  git -C ~/<repo> worktree add ~/worktrees/<repo>/<branch-slug> <branch>
+  ```
+- **Nomenclatura:** o path da convenção usa `-` (`/`→`-`); o `+` só aparece em worktree do harness — é um
+  sinal barato de "nasceu efêmero, confira se virou durável".
+
+**Guard futuro (gated-until-trigger):** se a deriva reincidir, um check determinístico que flagra worktree
+`locked` em `.claude/worktrees/` (via `git worktree list --porcelain`) → avisar "relocar p/ `~/worktrees/`".
+**Não** implementado até um 2º caso — a doutrina + o `+`-como-sinal bastam por ora.
