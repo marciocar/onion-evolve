@@ -29,19 +29,19 @@
           },
           {
             "type": "command",
-            "command": "bash .claude/hooks/worklog-capture-session.sh",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/worklog-capture-session.sh\"",
             "timeout": 5,
             "statusMessage": "Capturando session_id no worklog (Onion)"
           },
           {
             "type": "command",
-            "command": "bash .claude/hooks/co-evolution-inbox-check.sh",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/co-evolution-inbox-check.sh\"",
             "timeout": 5,
             "statusMessage": "Checando inbox de co-evolução (Onion)"
           },
           {
             "type": "command",
-            "command": "bash .claude/hooks/session-beacon-hook.sh up",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-beacon-hook.sh\" up",
             "timeout": 5,
             "statusMessage": "Acendendo farol de sessão (Onion)"
           }
@@ -53,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/session-beacon-hook.sh refresh",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-beacon-hook.sh\" refresh",
             "timeout": 5,
             "statusMessage": "Refrescando farol de sessão (Onion)"
           }
@@ -65,7 +65,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/session-beacon-hook.sh down",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-beacon-hook.sh\" down",
             "timeout": 5,
             "statusMessage": "Apagando farol de sessão (Onion)"
           }
@@ -77,7 +77,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/worklog-precompact-breadcrumb.sh",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/worklog-precompact-breadcrumb.sh\"",
             "timeout": 5,
             "statusMessage": "Breadcrumb de compaction no worklog (Onion)"
           }
