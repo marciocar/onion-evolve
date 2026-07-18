@@ -719,6 +719,43 @@ run_resolve_target_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo reconcile-inputs — exercita .claude/utils/co-evolution/reconcile-inputs.sh (insumos
+# determinísticos do /meta:co-announce --reconcile). Asserções estruturais (não fixam roster).
+# O conteúdo de [ENTRIES] depende de resolve-target → pula gracioso sem python+yaml.
+# ---------------------------------------------------------------------------
+run_reconcile_inputs_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/co-evolution/reconcile-inputs.sh"
+  if [ ! -f "${helper}" ]; then record_fail "reconcile-inputs" "helper ausente: ${helper}"; return; fi
+  # --outbox é barato (sem python); --entries chama resolve-target → captura UMA vez e reusa.
+  local outbox entries
+  outbox="$(bash "${helper}" --outbox 2>/dev/null)"
+  if [ "$(printf '%s\n' "${outbox}" | head -1)" = "[OUTBOX]" ]; then
+    record_pass "reconcile-inputs: --outbox emite cabeçalho [OUTBOX]"
+  else record_fail "reconcile-inputs: --outbox" "cabeçalho [OUTBOX] ausente"; fi
+  local bad_state
+  bad_state="$(printf '%s\n' "${outbox}" | tail -n +2 | awk -F'\t' 'NF>=2 && $2!="staging" && $2!="processed"' | head -1)"
+  if [ -z "${bad_state}" ]; then record_pass "reconcile-inputs: outbox estado ∈ {staging,processed}"
+  else record_fail "reconcile-inputs: outbox estado" "estado inesperado: ${bad_state}"; fi
+  if [ "$(bash "${helper}" --outbox 2>/dev/null | sha256sum)" = "$(printf '%s\n' "${outbox}" | sha256sum)" ]; then
+    record_pass "reconcile-inputs: determinístico (outbox)"
+  else record_fail "reconcile-inputs: determinismo" "varia entre execuções"; fi
+  # conteúdo de [ENTRIES] depende de resolve-target (python+yaml) → pula gracioso
+  if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
+    record_pass "reconcile-inputs: conteúdo de entries pulado (sem python+yaml — gracioso)"; return; fi
+  entries="$(bash "${helper}" --entries 2>/dev/null)"   # 1× (memoizado no helper)
+  if [ "$(printf '%s\n' "${entries}" | head -1)" = "[ENTRIES]" ]; then
+    record_pass "reconcile-inputs: --entries emite cabeçalho [ENTRIES]"
+  else record_fail "reconcile-inputs: --entries" "cabeçalho [ENTRIES] ausente"; fi
+  local bad_entry
+  bad_entry="$(printf '%s\n' "${entries}" | tail -n +2 | awk -F'\t' 'NF<4 || $2==""' | head -1)"
+  if [ -z "${bad_entry}" ]; then record_pass "reconcile-inputs: toda entry tem ≥4 campos + destinatários"
+  else record_fail "reconcile-inputs: entry malformada" "linha: ${bad_entry}"; fi
+  if printf '%s\n' "${entries}" | grep -q '2026-07-10	.*a2a-live'; then
+    record_pass "reconcile-inputs: entrada a2a-live 07-10 presente com destinatários"
+  else record_fail "reconcile-inputs: a2a-live" "entrada 07-10 a2a-live ausente da conciliação"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo federation-console — exercita .claude/validation/federation-console.sh (F1.3: console estático
 # read-only do SSOT). Asserções estruturais (não fixam roster). Pula/exit-3 sem python+yaml.
 # ---------------------------------------------------------------------------
@@ -2628,6 +2665,9 @@ run_show_scope_selftests
 
 # Modo resolve-target — targeting fino por seletor no alvo: (F1.2 federação — mata o ruído).
 run_resolve_target_selftests
+
+# Modo reconcile-inputs — insumos determinísticos do /meta:co-announce --reconcile (conciliação de backlog).
+run_reconcile_inputs_selftests
 
 # Modo federation-console — console estático read-only do SSOT (F1.3 federação).
 run_federation_console_selftests
