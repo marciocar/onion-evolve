@@ -1,0 +1,122 @@
+# A FOTO DA FEDERACAO como KG (Fase 3, dogfood-first). Overlay AUDIT de SAUDE-DE-VERIFICACAO:
+# a estrutura (adopts/tier/trust) ja e grafo no graph.sh --triples; o VALOR "core nao surpreendido"
+# esta no eixo declarado!=verificado (pin, anuncio, personalidade) — que E a camada audit.
+# O radar rankeia o que precisa de atencao. Ontologia: ver finding em SYNTHESIS abaixo do PR.
+meta:
+  id: federation-health-2026-07
+  schema_version: "1"
+  baseline: 2026-07-18
+  date: 2026-07-18
+nodes:
+  - id: EN_CORE
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "onion-evolve (source/T0) — a fonte nao se carimba; sua versao E a HEAD do main"
+    trace: "docs/evolution/federation/members.yaml:10"
+  - id: C_GRANAAI_PIN_UNTRUSTED
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: open
+    verified_against: pin
+    label: "granaai linhagem local-kvm8: pin DECLARADO 74c470e mas pin-integrity=untrusted (canario divergente DRIFT-ONION) — re-verificar pos-update; mantem o ultimo verificado 4332ac8d"
+    trace: "docs/evolution/federation/members.yaml:126"
+  - id: C_ANNOUNCE_BACKLOG
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: open
+    label: "anuncios 07-18 (ingestor + write-kg) estao em STAGING p/ metagamify/pulse-mais/onion-mini — gerados, nao transportados (declarado != entregue)"
+    trace: "docs/evolution/federation/outbox/metagamify/2026-07-18-ingestor-doutrina-granaai.md"
+  - id: C_METAGAMIFY_PROD_UNCOMMITTED
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: open
+    verified_against: commit
+    label: "metagamify linhagem production: pin 8e22352 verificado 2026-07-03 mas o commit ficou pendente na sessao do rhilo (entrega-sem-commit I3) — verificado no artefato, nao no ledger"
+    verified_at: 2026-07-03
+    trace: "docs/evolution/federation/members.yaml:73"
+  - id: C_GRANAAI_LINEAGES_UNKNOWN
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: open
+    label: "granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETERMINADO por design"
+    trace: "docs/evolution/federation/members.yaml:131"
+  - id: C_PERSONALITY_SEEDS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: open
+    label: "todo personality_summary do members.yaml e SEED MANUAL pre-F2 (personality-sync nao existe) — declarado a mao, nunca emergido do uso (declarado != verificado)"
+    trace: "docs/evolution/federation/members.yaml:36"
+  - id: C_FED_STRUCTURE_IS_TRIPLES
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-18
+    label: "a ESTRUTURA da federacao (adopts/tier/trust/pin/lineage) ja e grafo: graph.sh --triples emite do members.yaml. A camada audit adiciona o eixo de VERIFICACAO, nao re-modela a estrutura"
+    trace: ".claude/validation/graph.sh:76"
+  - id: D_FED_KG_AS_AUDIT_OVERLAY
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.8
+    status: open
+    label: "FINDING: a foto-da-federacao-KG e um overlay AUDIT de saude-de-verificacao + um radar de federacao (checks proprios) — NAO um domain-layer forcado (adopts/trust nao cabem nos 6 edge-types domain; nao inventar tipo antes da prova)"
+  - id: C_FED_RADAR_ABSENT
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: "FALTA um radar de federacao: pin declarado!=verificado, anuncio staging-nao-transportado, hub sem sub-adotado, linhagem sem pin verificado — hoje espalhados em pin-integrity-check.sh/reconcile, fora do motor KG"
+edges:
+  - from: C_GRANAAI_PIN_UNTRUSTED
+    to: EN_CORE
+    edge_type: DEPENDS_ON
+  - from: C_ANNOUNCE_BACKLOG
+    to: EN_CORE
+    edge_type: DEPENDS_ON
+  - from: C_FED_STRUCTURE_IS_TRIPLES
+    to: D_FED_KG_AS_AUDIT_OVERLAY
+    edge_type: SUPPORTS
+  - from: C_FED_RADAR_ABSENT
+    to: D_FED_KG_AS_AUDIT_OVERLAY
+    edge_type: SUPPORTS
+  - from: C_GRANAAI_PIN_UNTRUSTED
+    to: C_FED_RADAR_ABSENT
+    edge_type: SUPPORTS
+  - from: C_ANNOUNCE_BACKLOG
+    to: C_FED_RADAR_ABSENT
+    edge_type: SUPPORTS
+  - from: C_PERSONALITY_SEEDS
+    to: C_FED_RADAR_ABSENT
+    edge_type: SUPPORTS
+  - from: C_METAGAMIFY_PROD_UNCOMMITTED
+    to: C_FED_RADAR_ABSENT
+    edge_type: SUPPORTS
+  - from: C_GRANAAI_LINEAGES_UNKNOWN
+    to: C_FED_RADAR_ABSENT
+    edge_type: SUPPORTS
