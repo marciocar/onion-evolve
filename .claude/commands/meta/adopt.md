@@ -186,6 +186,15 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/install-onion-githook.sh" "$DEST"
 for rule in 'docs/evolution/**/CHANGELOG.md merge=union' 'docs/evolution/**/_processed/** merge=union'; do
   grep -qxF "$rule" "$DEST/.gitattributes" 2>/dev/null || printf '%s\n' "$rule" >> "$DEST/.gitattributes"
 done
+
+# (8) SSOT inventory.md — REGENERA do filesystem do alvo pós-cópia (o inventory.sh vendorizado é a
+#     autoridade; ROOT = repo do alvo). Sem isto, o --update deixava docs/onion/inventory.md STALE quando
+#     o framework mudou contagens (novo comando/agente/KB) → check_inventory_sync HARD bloqueava o 1º
+#     commit do adotante (B4 / adopt-update-hardening; declarado≠verificado na adoção — a SSOT gerada não
+#     pode driftar em silêncio). Determinístico, sem LLM. Idempotente (regenera do filesystem).
+if [ -f "$DEST/.claude/validation/inventory.sh" ]; then
+  bash "$DEST/.claude/validation/inventory.sh" --markdown > "$DEST/docs/onion/inventory.md" 2>/dev/null || true
+fi
 ```
 
 > O passo (1) **substitui** o antigo never-clobber grosso (que copiava só se ausente; senão deixava um
