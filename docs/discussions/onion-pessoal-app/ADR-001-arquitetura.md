@@ -3,76 +3,95 @@ title: "ADR-001 — Arquitetura do App Onion Pessoal"
 category: discussion-adr
 status: proposed
 date: 2026-07-18
+revision: 2
 branch: discuss/onion-pessoal-app
 supersedes: []
 gated: true
 ---
 
-# ADR-001 — Arquitetura do App Onion Pessoal
+# ADR-001 — Arquitetura do App Onion Pessoal (rev. 2)
 
-> **Discussão isolada — proposed, gated.** Consolida o que foi VERIFICADO na sessão de 2026-07-17/18.
-> Nada vai pro core/produção sem o maestro pedir. Decisões marcadas `[VERIFICADO]` têm evidência;
-> `[PROPOSTO]` são spec-alvo a reconciliar.
+> **Discussão isolada — proposed, gated.** rev.2 incorpora review adversarial orquestrado (privacidade/P4-P5,
+> conformidade-doutrina, solidez técnica) que encontrou drifts CRÍTICOS na rev.1. Nada vai pro core/produção sem
+> o maestro pedir. `[VERIFICADO]` = evidência; `[PROPOSTO]` = spec-alvo a reconciliar; `[CORRIGIDO-r2]` = furo do review consertado.
 
 ## Contexto
 
-Um app **companheiro conversacional** sobre o **life-KG** do Marcio (3 verticais F0 runtime-grade em
-`~/onion-pessoal/`), na doutrina **KG-SSOT-first + runtime SDAAL**, ingerindo conteúdos/mídias/arquivos, com
-câmera/mic e caminho pra SLM on-device. Ordem-mãe do maestro: **camadas pessoal→produto** (N=1 primeiro).
-Evidência viva: `research/stack-research-2026-07.{md,kg.yaml}` (deep-research, radar exit 0).
+App **companheiro conversacional** sobre o **life-KG** do Marcio (3 verticais F0 runtime-grade em `~/onion-pessoal/`),
+na doutrina **KG-SSOT-first + runtime SDAAL**. Ordem-mãe: **camadas pessoal→produto**. Evidência:
+`research/stack-research-2026-07.{md,kg.yaml}` (radar exit 0).
+
+## INVARIANTE 0 — Locus de deploy `[CORRIGIDO-r2, era o furo-mãe]`
+
+O review de privacidade achou o buraco estrutural: **a rev.1 nunca fixava ONDE o cérebro roda**, e toda a alegação
+de soberania dependia disso. **Decisão:** o cérebro que opera verticais `private` (saúde/casamento) roda **num nó
+pessoal confiável do Marcio** (device ou máquina com full-disk-encryption), **nunca na VPS compartilhada** (Hostinger =
+terceiro). O life-KG cru **nunca persiste no disco da VPS**. O `onion-bridge` público atual (VPS, `cwd`=core) serve o
+**framework**, não a vida — o bridge pessoal é um **deploy separado no nó confiável**. Se algum dia rodar em nuvem, a
+P4 ("local-first, nunca copiado") **cai** e tem de ser re-derivada sob esse threat model — não silenciosamente.
 
 ## Decisões
 
-### D1 — Filho, não parte `[VERIFICADO]`
-O app/instância é um **adopter que federa** (`role: standalone`, `mode: regulated`, adota o MÉTODO, dado
-soberano) — já registrado como `marcio-pessoal` em `members.yaml`. "Parte dentro do core" é rejeitada por
-`fonte≠derivação` (o life-KG privado nunca entra no repo público). **Consequência aberta:** herança de updates
-do core p/ um adopter method-only = **gap G1** (modo docs-only, ADR `onion-adr-capability-update-out-of-git`) —
-a peça a desenhar se quiser "atualização natural".
+### D1 — Adopter standalone/regulated com core clonado no nó pessoal `[CORRIGIDO-r2]`
+Instância = **adopter que federa** (`role: standalone`, `mode: regulated`, dado soberano), já em `members.yaml`.
+**Correção do review-doutrina:** NÃO é "method-only" — a P3 recomendou a **Posição A** (standalone que tem `.claude/`
+em disco), e o cérebro **precisa** do `.claude/` do core (tools: `kg-radar`, agents). Então: **core clonado (docs-only)
+no nó pessoal**; o `onion_version: n/a` do `members.yaml` precisa ser **reconciliado** (vira um pin real quando o core
+for clonado) — senão o update-path G1 (`capability-update-out-of-git`, **docs-only maestro-gated, never-live-pull**) fica
+incoerente (não há `.claude/` a reconciliar). "Parte no core" segue rejeitada (`fonte≠derivação`; life-KG nunca no repo público).
 
 ### D2 — Stack: React Native + Expo (+ executorch/callstack p/ SLM) `[VERIFICADO]`
-Único stack que bate os 4 requisitos duros com fontes **primárias** (deep-research, 15 confirmados/10 refutados):
-câmera/mic/notif/fs (expo-*), SLM on-device provado (react-native-executorch — Whisper/TTS/OCR/VLM offline,
-2º runtime callstack-ai), cliente de backend Node Agent SDK, ship rápido (EAS). Runner-up **Capacitor** (sem SLM
-maduro). Números de market-share **refutados** — decisão apoiada em **capacidade**, não popularidade.
+Único stack que bate os 4 requisitos com fontes primárias (deep-research). Caveat técnico do review: executorch exige
+**EAS dev build (não Expo Go)** + New Arch + piso iOS17/Android13/**≥4GB RAM**; SLM 1-3B é **viável mas apertado** em
+mid-range (gate `Q_PERF`). Números de market-share **refutados** — decisão por capacidade, não popularidade.
 
-### D3 — Cérebro: onion-bridge RECONFIGURADO pro life-KG `[PROPOSTO, fork-chave]`
-O app é **cliente** de uma instância do **onion-bridge** (Node + Hono + `@anthropic-ai/claude-agent-sdk`).
-**Fork de uma linha:** o bridge do pessoal roda com **`cwd`/`ONION_CWD` → `~/onion-pessoal`** (o life-KG), não
-`/home/onion/onion-evolve` (o core). ⇒ **não é app do zero: é o bridge existente reconfigurado** pra ler o grafo
-de vida. Encurta o near-term drasticamente.
+### D3 — Cérebro: onion-bridge RECONFIGURADO por env (config, não fork) `[CORRIGIDO-r2]`
+**Reenquadrado (review-doutrina):** reapontar não é "fork" — é **reconfiguração via env, config pura; ZERO fork de código
+do bridge**. Invariante: o código do bridge fica **reconciliável** (recebe updates do core); qualquer mudança de código =
+derivação não-reconciliável, **proibida**.
+**Correção técnica do cwd (o pilar quebrado):** o Agent SDK roda com **`cwd` = o clone do CORE** (aí `.claude/kg-radar.sh`
+e agents resolvem), e o **life-KG entra como caminho SEPARADO** (`LIFE_KG=~/onion-pessoal`, absoluto) que o agente lê/escreve.
+Não dá pra `cwd`=dados **e** tools do core juntos — resolvido separando os dois paths.
 
-### D4 — Canal de chat = superfície NOVA `[VERIFICADO que falta + PROPOSTO o contrato]`
-Sonda ao vivo (2026-07-17) confirmou: `app.onionevolve.com` expõe **só** o A2A (`co-evolution-signal`,
-signals-only, gated — **não** conversa). O canal conversacional **não existe** na superfície verificada. Spec-alvo
-(spec-as-code, ver `proto/chat-endpoint.md`):
-```
-POST /chat  { sessionId, message }  → SSE: assistant_delta | tool_use | tool_result | done
-auth: bearer do maestro  (separado do oauth2/mTLS do A2A, que é só federação)
-```
+### D4 — Canal de chat = superfície NOVA, auth ≥ A2A `[CORRIGIDO-r2]`
+Sonda ao vivo confirmou: `app.onionevolve.com` expõe **só** A2A (`co-evolution-signal`, signals-only). O chat não existe na
+superfície verificada. **Correção de segurança (review-privacidade):** o `/chat` toca o dado MAIS sensível → auth **≥** A2A:
+**mTLS client-cert device-bound + tokens curtos PKCE**, **não** bearer estático. `sessionId` **vinculado à identidade
+autenticada**. `/health` autenticado, sem vazar path absoluto. Contrato em `proto/chat-endpoint.md`.
 
-### D5 — SLM on-device = adapter SDAAL `de-identification/local-slm` `[VERIFICADO o encaixe]`
-O "SLM futuro" NÃO é enxerto: é a "segunda runtime" da tese SDAAL. RN-executorch roda o SLM local pra **de-id de
-PII antes de subir** pro cérebro (P4) + modo offline. Camada **futura**, gated na `Q_DEID` (um 0.6-3B faz de-id
-preciso o bastante?).
+### D5 — SLM on-device = de-id `[VERIFICADO o encaixe; CORRIGIDO-r2 o transporte]`
+De-id `private` = adapter SDAAL **`de-identification/local-slm`** (existe). **Nuance do review:** o adapter atual roda por
+**HTTP (Ollama/vLLM)**; o **executorch embarcado** é um **transporte NOVO** — registrar como extensão-de-transporte do
+adapter, não suposição silenciosa. **Sequenciamento CORRIGIDO:** de-id não é "camada futura solta" — é **pré-condição** de
+qualquer upload de mídia/inferência-cloud sobre `private` (ver INVARIANTE 0 + D7).
 
-### D6 — Runtime KG-SSOT-first `[VERIFICADO]`
-O `.kg.yaml` do life-KG é o **store de registro**; `kg-radar.sh` é o **motor de reconciliação** determinístico;
-o app **superfície do veredito** do radar (RADAR/RECONCILIAÇÃO/INTEGRIDADE), distinguindo falha estrutural
-(exit 1) de aviso. Loop `read→verify→act→write`. Captura e espelho = o mesmo ato (conversa-first).
+### D6 — Runtime KG-SSOT-first COM o radar como gate `[CORRIGIDO-r2]`
+**Furo do review-doutrina (DRIFT-1):** a ref. da rev.1 só lia e hardcodava `reconciled:true` — "SSOT que mente". Corrigido:
+o loop **(a)** roda `kg-radar.sh` e **ramifica no exit code** (exit 1 = falha estrutural → BLOQUEIA o write + superfície o
+erro), **(b)** só então emite `kg_write`, **(c)** carimba **`verified_at`** no PROD capturado, **(d)** correções entram
+**append-mostly** como arestas `REFUTES`/`SUPERSEDES` — nunca overwrite. É `read→verify→act→write` de verdade.
 
-### D7 — Build em camadas (helper→fiação→campo) + faseado `[doutrina]`
-F0 substância (✅ grafos runtime-grade) → spike (contrato/de-id) → superfície (bridge-reconfig + cliente RN) →
-**produto** (Fase 1b: mercado/dor/preço/viral) — a última, gated na ordem pessoal→produto.
+### D7 — Build em camadas + sequenciamento privacy-safe `[CORRIGIDO-r2]`
+helper→fiação→campo. **Near-term privacy-safe (review):** conversa **texto** no nó confiável, **sem upload de mídia crua**;
+`attachments` = **gated-on-de-id** (processar câmera/mic/arquivo 100% on-device via executorch antes de qualquer subida).
+Os gates **L1 (escopo-de-consulta por vertical)** e **L6 (ε-ledger)** precisam **existir antes de embarcar**, não "futuro".
+Ordem: substância (✅) → spike (contrato/de-id) → superfície → **produto** (Fase 1b, gated na ordem pessoal→produto).
 
-## Privacidade (P4/P5) — invariante
-Life-KG cru **nunca** sai do repo soberano; só saída **destilada + gated**; de-id **on-device** antes de qualquer
-upload; a inferência interna é indefesa por construção (P5) → governa-se fronteira-de-saída, não o motor.
+## Privacidade (P4/P5) — invariante operacional (não mais aspiracional)
+Life-KG cru só no nó confiável, **nunca** VPS; saída só **destilada+gated**; **de-id on-device antes de qualquer upload**;
+**sem `bypassPermissions`** no bridge do life-KG (allow-list: radar read-only; escrita ao `.kg.yaml` **human-gated**);
+retrieval **escopado à vertical** da conversa (L1); a inferência interna é indefesa (P5) → governa-se fronteira-de-saída +
+declara-se **VPS e a API Anthropic** como atores do threat model (o prompt carrega o KG → 3º no loop).
 
-## Consequências / o que fica aberto (gated)
-- **Q_PROTOCOL residual:** o contrato de chat proposto precisa ser reconciliado contra o fonte do bridge (VPS,
-  inalcançável autônomo daqui) OU implementado se o bridge só tem A2A.
-- **Q_DEID / Q_PERF:** spike do SLM on-device (camada futura).
-- **G1:** desenhar o update-path docs-only p/ o adopter method-only.
-- **Fase 1b:** pesquisa de produto — depois que o N=1 rodar.
-- **Rodar o app RN + deploy do bridge-reconfig:** precisam de ambiente de dev/device e acesso à VPS.
+## Consequências / aberto (gated)
+- **Q_PROTOCOL residual:** contrato de chat proposto a reconciliar contra o fonte do bridge (VPS, inalcançável autônomo).
+- **Q_DEID / Q_PERF:** spike do SLM on-device (agora pré-condição, não luxo futuro).
+- **G1 + `members.yaml`:** reconciliar `onion_version: n/a` × core-clonado; desenhar o update-path docs-only maestro-gated.
+- **Mídia/conteúdo:** declarar eixo SDAAL (`content-source`/`media-store`) gated, não hardcodar no endpoint.
+- **Rodar RN + deploy do bridge no nó confiável:** precisam de device/ambiente + o nó do Marcio.
+
+## Anexo — o review que endureceu este ADR
+Review adversarial orquestrado (3 lentes paralelas, 2026-07-18) achou: privacidade (locus de deploy não-declarado quebrava
+P4; bearer < A2A; upload pré-de-id; inferência em terceiro), técnica (API `ClaudeSDKClient`→`query()`; cwd-vs-tools; SSE em
+RN precisa `expo/fetch`), doutrina (method-only×core-clonado; "fork"→config; radar não-gate; `verified_at` ausente). Dogfood:
+a revisão-no-papel-em-paralelo pegou o que uma passada linear não pegaria.

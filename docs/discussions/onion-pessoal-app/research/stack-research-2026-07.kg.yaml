@@ -229,6 +229,25 @@ nodes:
     status: confirmed
     label: "O canal de conversa do app é uma SUPERFÍCIE NOVA, distinta do endpoint A2A (que é signals-only por design). Fork-chave: o bridge do PESSOAL aponta cwd p/ o life-KG (~/onion-pessoal), não p/ o core. Contrato de chat = a reconciliar contra o fonte do bridge na VPS"
 
+  # ==== ADR + review orquestrado (2026-07-18) ====
+  - id: E_REVIEW
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-18"
+    label: "review adversarial orquestrado (3 lentes paralelas) achou drifts CRÍTICOS na ADR rev.1: locus de deploy não-declarado quebrava P4; API ClaudeSDKClient→query() (não existe no SDK TS); cwd-vs-tools quebrado; method-only×core-clonado incoerente; radar não rodava como gate. Todos consertados na rev.2"
+  - id: D_ADR
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "ADR-001 rev.2 (proposed/gated): arquitetura consolidada — locus=nó pessoal confiável (NÃO VPS); core-clonado + LIFE_KG como path separado; auth≥A2A (mTLS+PKCE); radar como GATE (exit 1 bloqueia write); de-id PRÉ-upload; sem bypassPermissions"
+
 edges:
   # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
   - from: D_STACK
@@ -321,3 +340,17 @@ edges:
   - from: C_CHAT_SURFACE
     to: D_STACK
     edge_type: SUPPORTS
+
+  # --- ADR consolida a pesquisa + é endurecido pelo review orquestrado ---
+  - from: D_STACK
+    to: D_ADR
+    edge_type: SUPPORTS
+  - from: C_CHAT_SURFACE
+    to: D_ADR
+    edge_type: SUPPORTS
+  - from: E_REVIEW
+    to: D_ADR
+    edge_type: SUPPORTS
+  - from: D_ADR
+    to: Q_DEID
+    edge_type: DEPENDS_ON
