@@ -4,10 +4,10 @@ description: Gera um anúncio downstream pronto-para-transportar a partir de uma
 model: sonnet
 category: meta
 tags: [co-evolution, downstream, announce, inbound, outbox, bridge, federation]
-version: "1.0.0"
-updated: "2026-06-22"
-allowed-tools: Read Write Edit Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(bash .claude/validation/onion-version.sh) Bash(git -C * log*)
-argument-hint: "[<data-ou-slug-da-entrada>]  (sem arg = última entrada do CHANGELOG com alvo: ≠ nenhum)"
+version: "1.1.0"
+updated: "2026-07-18"
+allowed-tools: Read Write Edit Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(bash .claude/validation/onion-version.sh) Bash(bash .claude/utils/co-evolution/reconcile-inputs.sh*) Bash(bash .claude/utils/co-evolution/resolve-target.sh*) Bash(git -C * log*)
+argument-hint: "[--reconcile | <data-ou-slug-da-entrada>]  (sem arg = última entrada com alvo: ≠ nenhum · --reconcile = concilia todo o backlog)"
 ---
 
 # 📣 /meta:co-announce — Anunciar mudança aos adotantes (downstream, doc-bridge)
@@ -24,6 +24,53 @@ a capacidade de downstream existe, mas o anúncio **nunca era exercido** ao ship
 > **Invariante (um escritor por repo).** A sessão do core **nunca** escreve/pusha no repo do adotante.
 > Este comando só escreve na **staging do core** (`federation/outbox/<id>/`). O **maestro** é o transporte:
 > revisa e copia para o `inbound/` do adotante. O hook "you have mail" do adotante o capta na sessão dele.
+
+## Modo `--reconcile` — conciliar TODO o backlog (não só o topo)
+
+> **O gap que fecha.** O fluxo padrão (abaixo) pesca **uma** entrada — a do argumento, ou a mais recente.
+> Uma entrada `alvo: todos` cujo anúncio **nunca foi** (ou foi só **parcialmente**) transportado fica
+> **aberta e invisível** — a conciliação dependia de memória humana. `--reconcile` cruza o CHANGELOG
+> inteiro contra a outbox e revela o **open-set**. (Nascido do dogfood 2026-07-18: a conciliação de
+> backlog foi feita à mão; este modo a torna repetível — irmão do que `--only`/`co-relay` fizeram.)
+
+Se `$ARGUMENTS` começa com `--reconcile`, siga **esta** seção (não os Passos 1-5 padrão):
+
+1. **Guarda de papel** — idêntica ao Passo 1 (só CORE; adotante → parar).
+2. **`git fetch`** (o main pode ter avançado — entradas novas surgem de outras sessões).
+3. **Levantar os insumos determinísticos** (não reimplemente à mão):
+   `bash .claude/utils/co-evolution/reconcile-inputs.sh` — emite duas seções TSV:
+   - `[ENTRIES]`: `<date>\t<recipients-csv>\t<alvo>\t<subject>` — toda entrada com `alvo:` acionável
+     (nenhum/futuros já omitidos), com os destinatários **já resolvidos** (via `resolve-target.sh`).
+   - `[OUTBOX]`: `<id>\t<staging|processed>\t<filename>` — o inventário de anúncios já produzidos.
+4. **Cruzar (juízo — é a parte que o script NÃO decide):** para cada `entry × recipient`, decidir a
+   cobertura casando um arquivo da outbox à entrada. Heurística de match: **mesma data** + o slug do
+   arquivo compartilha um **token distintivo** do assunto (ex.: `a2a-live`, `marketplace`, `kg`,
+   `rfc5`, `worktree`, `assinatura`). Estados:
+   - **`processed`** casando → **coberto e transportado** (fechado).
+   - **`staging`** casando → **gerado, mas NÃO transportado** (semi-aberto — falta o transporte).
+   - **nada** casando → **ABERTO** (nunca anunciado a esse destinatário).
+5. **Aplicar as guardas** (senão a conciliação vira ruído):
+   - **Superseded:** entrada que uma posterior declara substituir (`substitui`/`supersedes`) → **descartar**
+     (anunciar a substituída seria contraditório).
+   - **Pós-adoção (`declarado≠verificado`):** destinatário cuja adoção/último `--update` é **posterior**
+     à entrada já tem a mudança vendorizada → marcar `⊘ pós-adoção`, **não** aberto. Verificar pelo
+     `inbound/_processed` do adotante (se montado) ou pelo pin; **sem verificação em 1ª mão, dizer isso**
+     (não afirmar cobertura que não confirmou).
+   - **Ambíguo:** match incerto (data bate, token não) → **listar como candidato**, nunca decidir em
+     silêncio (a heurística de data+token é grosseira por construção — o juízo é seu, não do script).
+6. **Responder-gated (W6): propor, não executar.** Apresentar a **tabela de conciliação** (entrada ×
+   destinatário × estado) destacando os **ABERTOS** e os **semi-abertos (staging)**, e **parar**. Só após
+   o maestro confirmar: para cada gap ABERTO, gerar o rascunho reusando o **Passo 4** (mesmo envelope);
+   os semi-abertos (staging) não precisam de novo rascunho — precisam de **transporte** (orientar o maestro).
+
+Saída do `--reconcile` (exemplo):
+```
+🔎 conciliação de backlog — N entradas com alvo: acionável × M adotantes
+   ABERTO (nunca anunciado):   <date> · <assunto> → <id>, <id>
+   STAGING (falta transporte): <date> · <assunto> → <id>
+   ⊘ pós-adoção / superseded:  <date> · <assunto> (motivo)
+   ▶ propor gerar rascunho p/ os ABERTOS? (Passo 4) — os STAGING é só transportar.
+```
 
 ## Passo 1 — Guarda de papel (só CORE)
 
