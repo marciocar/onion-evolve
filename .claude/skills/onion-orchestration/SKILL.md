@@ -6,7 +6,7 @@ description: >
   multi-arquivo), review paralelo, ou o padrão decompor→delegar→sintetizar/verificar.
   Ative mesmo sem o usuário dizer "orquestração", "paralelo" ou "fan-out". Orquestra sempre
   no contexto principal (skill/comando), nunca dentro de um subagente.
-allowed-tools: Workflow Agent Read Grep Glob Bash(git worktree*)
+allowed-tools: Workflow Agent Read Write Grep Glob Bash(git worktree*) Bash(bash .claude/validation/kg-radar.sh*)
 ---
 
 # Onion Orchestration — Orquestração de Workers
@@ -54,8 +54,20 @@ A coordenação roda em JavaScript e custa **0 tokens de modelo**. O teto é de
 6. **Fan-in / consolidação.** Todo fan-out termina em **um único resultado**
    consolidado — nunca N saídas soltas. Agregue, deduplique e ranqueie no
    contexto principal (custo 0 tokens).
-7. **Relatório ao usuário** em pt-BR: padrão escolhido, nº de workers, tier de
-   modelo, budget gasto e o resultado consolidado.
+7. **`write(KG)` — o último ato (quando a orquestração PRODUZ conhecimento).** Se o fan-out gerou
+   **síntese/achados/decisões** (pesquisa, auditoria, investigação, design) — e **não** só uma mutação
+   de código que já termina em branch/PR — o resultado consolidado é uma **obrigação de `write(KG)`,
+   não opção**: **persista** a síntese no repo (`docs/**/research/*.md` ou local durável) — **nunca**
+   a deixe só no `/tmp/.../tasks/*.output` **efêmero** do harness — **e materialize/atualize** o
+   `.kg.yaml` via `/meta:kg` + `bash .claude/validation/kg-radar.sh` (exit 0). Fecha o ciclo
+   `read(KG)→verify→act→write(KG)` ([knowledge-graph-sdaal.md](../../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md)
+   §SSOT-as-runtime) — é o **bookend simétrico** do read(KG) (passo 0 de `warm-up`/`catch-up`/`engineer:work`).
+   **Mecanismo, não conselho:** skills do harness como `deep-research` despejam em `/tmp` efêmero — a
+   orquestração Onion é **dona** do leg `write(KG)`; "advice-que-depende-de-lembrar" falhou empiricamente
+   (3 pesquisas perderam o write até o próprio maestro — sinal de campo 2026-07-18).
+8. **Relatório ao usuário** em pt-BR: padrão escolhido, nº de workers, tier de
+   modelo, budget gasto, o resultado consolidado **e onde o `write(KG)` persistiu** (path do `.md`
+   + `.kg.yaml` + veredito do radar).
 
 ## Padrões → primitivas
 
@@ -163,6 +175,7 @@ if (collided.length) return gateHumano(collided, results);  // partição falhou
 - **Correlação por chave estável, nunca por path.** Ao casar resultado-de-worker com configuração (qual julgar, qual estágio), use **label/índice** estável — não string-match de caminho, que quebra na fronteira absoluto-vs-relativo.
 - **Claim de localização de dado exige read-path verificado.** Em auditoria data-driven, worker que afirma *onde um dado vive* (tabela/arquivo/cache/env) cita o **read-path no código** (`arquivo:linha` de quem efetivamente lê na operação auditada) — senão o item nasce **hipótese**, nunca nó confirmado. No fan-in, **divergência de fonte** entre workers (ou worker×banco) é **achado** (provável split-brain), não ruído. (Caso real: tabela de nome óbvio quase produziu veredito falso — o motor lia outra; padrão [verify-read-path-first](../../../docs/knowledge-base/agentic-patterns/ai-strategies/verify-read-path-first.md), sinal de campo do rhilo.)
 - **Retomar a fase quebrada, não racionalizar.** Quando uma fase falha/no-opa, **corrija o script e retome** via `resumeFromRunId` (workers concluídos vêm do cache; só a fase corrigida roda) — não substitua a verificação perdida por um check **a jusante** (CI/lint) e a declare "equivalente". Um check determinístico cobre a dimensão *sintática*; verificadores semânticos cobrem *funcionalidade/qualidade* — **não são intercambiáveis**. Nomeie a dimensão não-verificada; quando possível, converta-a num **guard determinístico permanente**.
+- **Síntese que não persistiu = síntese perdida (não a deixe efêmera).** Orquestração que produz conhecimento fecha em `write(KG)` (passo 7): o output do harness vive no `/tmp` e **drifta** — o SSOT nunca o viu. Antes do relatório, **persista no repo + materialize `.kg.yaml` (radar exit 0)** e **nomeie o path**. "Esqueci de salvar" é exatamente o modo-de-falha que o KG-first foi criado pra matar (sinal de campo 2026-07-18: `deep-research` do harness não persiste no KG-SSOT).
 
 ## Referências
 

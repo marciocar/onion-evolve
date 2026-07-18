@@ -7,9 +7,9 @@ description: |
 model: opus
 category: meta
 tags: [orchestrator-worker, orchestration, parallel, workflow]
-version: "1.1.0"
-updated: "2026-06-13"
-allowed-tools: Read Grep Glob
+version: "1.2.0"
+updated: "2026-07-18"
+allowed-tools: Read Write Grep Glob Bash(bash .claude/validation/kg-radar.sh*)
 argument-hint: "<tarefa a paralelizar>"
 related_commands:
   - /meta:create-agent
@@ -183,10 +183,31 @@ Todo fan-out converge em **um único resultado** — nunca N saídas soltas. Agr
 deduplique e ranqueie no contexto principal, em JavaScript (custo 0 tokens). Use
 o veredito adversarial para descartar falsos positivos e marcar lacunas.
 
+### Passo 4.5 — `write(KG)`: persistir o conhecimento (o último ato, não opção)
+
+Se a orquestração **produziu conhecimento** (pesquisa, auditoria, investigação, design) — e não só
+uma mutação de código que já termina em branch/PR — o resultado consolidado é uma **obrigação de
+`write(KG)`**, não uma opção:
+
+1. **Persista a síntese no repo** — `docs/**/research/*.md` (ou local durável apropriado). **Nunca**
+   deixe o resultado só no `/tmp/.../tasks/*.output` **efêmero** do harness: ele **drifta** e o SSOT
+   nunca o vê.
+2. **Materialize/atualize o `.kg.yaml`** dos achados/decisões via `/meta:kg` e valide com
+   `bash .claude/validation/kg-radar.sh <arquivo>` (**exit 0**).
+
+Fecha o ciclo `read(KG)→verify→act→write(KG)`
+([knowledge-graph-sdaal.md](../../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md)
+§SSOT-as-runtime) — é o **bookend simétrico** do read(KG) já cabeado como passo 0 em
+`warm-up`/`catch-up`/`engineer:work`. **Mecanismo, não conselho:** a skill `deep-research` é do
+**harness**, despeja em `/tmp` e não persiste — a orquestração **Onion** é dona deste leg. O modo-de-falha
+"advice-que-depende-de-lembrar" falhou empiricamente (3 pesquisas perderam o write até o próprio maestro —
+sinal de campo 2026-07-18). Delega a `onion-orchestration` (passo 7).
+
 ### Passo 5 — Relatório
 
 Apresente ao usuário, em pt-BR: padrão escolhido, nº de workers, tier de modelo
-por etapa, budget gasto e o **resultado consolidado**.
+por etapa, budget gasto, o **resultado consolidado** e — quando a orquestração produziu conhecimento
+— **onde o `write(KG)` persistiu** (path do `.md` + `.kg.yaml` + veredito do `kg-radar`).
 
 ## 🛟 Fallback — substrato Workflow indisponível
 
@@ -220,6 +241,7 @@ ferramenta `Agent`:
   ❌ [violação bloqueante, se houver]
 
 ∟ Verificação adversarial: [falsos positivos removidos / lacunas apontadas]
+∟ write(KG): docs/**/research/<síntese>.md · <área>.kg.yaml (radar exit 0)  ← se produziu conhecimento
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
