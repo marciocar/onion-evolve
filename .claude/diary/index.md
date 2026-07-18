@@ -1,10 +1,10 @@
-# Diário — runtime-boundary
+# Diário — close-crumb
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 50 entradas · **Stale:** 0 · **Compartilháveis:** 38
+**Total:** 51 entradas · **Stale:** 0 · **Compartilháveis:** 39
 
 Gerado em: 2026-07-18
 
@@ -17,6 +17,7 @@ Gerado em: 2026-07-18
 | 2026-07-18 | observation | collective 📤 | runtime-drained-safe-backlog | 2026-09-15 | static |
 | 2026-07-18 | decision | collective 📤 | perception-instruments-doctrine | 2026-10-15 | static |
 | 2026-07-18 | learning | public 📤 | method-adopter-has-no-doc-bridge | 2026-10-15 | static |
+| 2026-07-18 | reflection | collective 📤 | marathon-close-resume-trail | 2026-08-15 | static |
 | 2026-07-18 | decision | collective 📤 | doctrine-ingestor-core-absorbs-field | 2026-10-15 | static |
 | 2026-07-18 | decision | collective 📤 | breadcrumb-doctrine-three-genera | 2026-10-15 | static |
 | 2026-07-18 | decision | collective 📤 | autonomous-thread-runtime-graduated-ladder | 2026-10-15 | static |
