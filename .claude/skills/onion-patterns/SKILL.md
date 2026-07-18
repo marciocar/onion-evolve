@@ -216,6 +216,20 @@ object-led** (Capability Contract do objeto: `provides/requires`/tier atual; inv
 catálogo/SDAAL antes de introduzir dependência nova) → **materializar** (gate por etapa + verificação) →
 **realimentar** (o perfil descoberto vira entrada de catálogo para a próxima promoção do mesmo tipo de objeto).
 
+### validação de doutrina  (superação de alto risco — sinal de campo)
+Situação: uma decisão de **doutrina** de alto risco está na mesa (nomear um conceito, um invariante novo, uma
+ideia que **supera** uma anterior) — onde a qualidade da superação importa e o custo de errar é doutrinário.
+Não decida por prior/estética/votação.
+Playbook: **fan-out de lentes independentes** (ex.: absorção-pelo-Transformer, coerência-doutrinária,
+mercado/prior-art, risco-adversarial) → **síntese** que arbitra por razão (não placar) → **verificação
+adversarial** que tenta REFUTAR e faz a ideia *merecer* selar (é ela que acha os furos reais) → **`write(KG)`**
+com arestas **`SUPERSEDES`**: a ideia nova supera a antiga **sem apagá-la** (Aufhebung), e a genealogia fica
+**auditável** no KG-SSOT (*"git merge não reconcilia verdades"*). Gate: **não sela** até o adversário passar +
+1 dogfood de uso. É o motor de **qualidade da superação de doutrina** — decisões "já existem" como evolução de
+ideias; isto as faz evoluir com rigor. **Tiere** (`efficiency-over-economy`): é caro (fan-out orquestrado) — só
+para superações de alto risco, nunca toda escolha. 1º dogfood: a doutrina do `telescópio`
+(`docs/analysis/onion-adr-telescope-session-observation-2026-07.md`).
+
 ## Gotchas
 
 - **Feature slug com underscore quebra GitFlow**: branches Git e pastas de sessão usam o mesmo slug — kebab-case é obrigatório
