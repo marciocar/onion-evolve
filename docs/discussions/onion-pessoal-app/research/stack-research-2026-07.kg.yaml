@@ -176,6 +176,17 @@ nodes:
     status: confirmed
     label: "O cérebro (onion-bridge: Node + Hono + Agent SDK, cwd=clone do core) JÁ existe → troca-se só o frontend PWA por app Expo/RN cliente"
 
+  # ==== freshness: versões verificadas ao vivo (npm registry, 2026-07-18) ====
+  - id: E_VERSIONS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-07-18"
+    label: "versões VIVAS (registry.npmjs.org, 2026-07-18): expo 57.0.7 (SDK 57 — a pesquisa citava 52, drift de 5 majors; expo/fetch muito mais maduro), react-native-executorch 0.9.2 (citava 0.8.0; v1.0 ainda não saiu), @anthropic-ai/claude-agent-sdk 0.3.214 (ainda 0.3.x → a API query() conferida é a atual), hono 4.12.30. Drift NÃO invalida — reforça o stack"
+
   # ==== perguntas em aberto (viram spike / Fase 1b) ====
   - id: Q_DEID
     node_type: question
@@ -207,8 +218,8 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: open
-    label: "Contrato cliente↔backend (session state, streaming de tool-call, fila offline) Expo/RN ↔ Node Agent SDK — PARCIALMENTE avançado (spike 07-17): A2A NÃO é o canal; contrato de chat real ainda no fonte da VPS"
+    status: done
+    label: "RESPONDIDA (2026-07-18, fonte do bridge lido): contrato real mapeado — POST /chat bearer+SSE, query() API, workspace-por-token com symlink do core. Ver E_BRIDGE_SOURCE + proto/chat-endpoint.md. Restam só os HARDENINGs (não o contrato)"
 
   # ==== spike near-term (2026-07-17): verificação ao vivo do onion-bridge ====
   - id: E_A2A_LIVE
@@ -226,8 +237,25 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.85
+    status: superseded
+    label: "SUPERADO por C_CHAT_VERIFIED: eu disse que o chat era 'superfície NOVA que não existe' — ERRADO. O POST /chat EXISTE no bridge (só não é anunciado no agent-card). 'Distinto do A2A' seguia certo; 'inexistente' não"
+  - id: E_BRIDGE_SOURCE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
     status: confirmed
-    label: "O canal de conversa do app é uma SUPERFÍCIE NOVA, distinta do endpoint A2A (que é signals-only por design). Fork-chave: o bridge do PESSOAL aponta cwd p/ o life-KG (~/onion-pessoal), não p/ o core. Contrato de chat = a reconciliar contra o fonte do bridge na VPS"
+    verified_at: "2026-07-18"
+    label: "FONTE do bridge lido na VPS (/home/onion/onion-bridge, sudo read-only, 2026-07-18): POST /chat existe — bearer(admin/courtesy/byok), SSE forwarding SDKMessage cru, query() API confirmada (proto rev.2 acertou), workspace por-token com SYMLINK do .claude do core (resolve cwd-vs-tools!), bypassPermissions+allowDangerouslySkipPermissions LIGADO, uploads crus em /tmp na VPS, /health vaza onionCwd. deps ^0.3.195/hono^4.12.27"
+  - id: C_CHAT_VERIFIED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "Contrato de chat MAPEADO e verificado (fecha Q_PROTOCOL). O modelo de workspace-por-token com symlink do .claude do core JÁ implementa 'tools do core + dados separados' → o app pessoal = workspace cujos dados são o life-KG. Deltas p/ life-KG = os HARDENINGs do review (locus VPS→nó confiável, tirar bypassPermissions, de-id pré-upload, /health)"
 
   # ==== ADR + review orquestrado (2026-07-18) ====
   - id: E_REVIEW
@@ -354,3 +382,17 @@ edges:
   - from: D_ADR
     to: Q_DEID
     edge_type: DEPENDS_ON
+
+  # --- fonte do bridge lido (2026-07-18): fecha a Q_PROTOCOL, corrige o "chat = superfície nova" ---
+  - from: E_BRIDGE_SOURCE
+    to: C_CHAT_VERIFIED
+    edge_type: SUPPORTS
+  - from: C_CHAT_VERIFIED
+    to: C_CHAT_SURFACE
+    edge_type: SUPERSEDES
+  - from: E_BRIDGE_SOURCE
+    to: Q_PROTOCOL
+    edge_type: SUPPORTS
+  - from: C_CHAT_VERIFIED
+    to: D_ADR
+    edge_type: SUPPORTS

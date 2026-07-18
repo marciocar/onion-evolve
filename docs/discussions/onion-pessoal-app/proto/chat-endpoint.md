@@ -1,89 +1,64 @@
-# proto — Endpoint de chat do bridge pessoal (spec-as-code, PROPOSTO, rev.2)
+# Contrato do endpoint de chat do onion-bridge — VERIFICADO (2026-07-18)
 
-> Spec-alvo da `Q_PROTOCOL` (ADR-001 D4/D6). rev.2 conserta os furos do review adversarial. PROPOSTO — a reconciliar
-> contra o fonte do bridge na VPS. Roda no **nó pessoal confiável**, não na VPS (ADR INVARIANTE 0).
-> VERIFICADO: bridge = Hono; A2A é signals-only (não-chat). Fork-de-config (D3): `cwd`=clone do CORE (tools resolvem);
-> `LIFE_KG` = caminho SEPARADO do grafo de vida.
+> Fecha a `Q_PROTOCOL`. Lido do FONTE REAL na VPS (`/home/onion/onion-bridge/src/{server,chat,config,workspace}.ts`,
+> via sudo read-only). `[VERIFICADO]` = está no código hoje; `[HARDENING]` = o que o review recomenda mudar p/ o life-KG.
+> Deps reais: `@anthropic-ai/claude-agent-sdk ^0.3.195`, `hono ^4.12.27`, node ≥22, pnpm. Bridge = POC v0.1.0.
 
-## Contrato
+## Contrato real `[VERIFICADO]`
 
 ```
-POST /chat
-  # auth >= A2A (D4): mTLS client-cert device-bound + token curto PKCE — NÃO bearer estático
-  Content-Type: application/json
-  body: { "sessionId": "string (vinculado à identidade do cert)", "message": "string" }
-  # attachments: GATED-ON-DE-ID (D5/D7) — NÃO near-term; mídia processada 100% on-device antes de qualquer subida
+POST /chat        auth: Authorization: Bearer <token>   (+ X-Anthropic-Key se token BYOK)
+  # JSON:
+  { "prompt": "req", "sessionId?": "resume", "image?": "data:image/png;base64,... | base64",
+    "imageMimeType?": "image/png", "context?"|"systemPromptAppend?": "append ao system prompt" }
+  # OU multipart/form-data: campos prompt + file (File: image/*|pdf|text/*, ≤10MB) + sessionId? + context?
 
-  → 200, text/event-stream (SSE):
-     event: assistant_delta   data: { "text": "..." }
-     event: tool_use          data: { "name": "Bash", "input": {"command":"kg-radar..."} }
-     event: radar_gate        data: { "exit": 0, "integrity": "ok" }     # exit 1 → BLOQUEIA write, superfície erro
-     event: kg_write          data: { "file": "...", "nodes": ["P_..."], "verified_at": "2026-07-18", "edges": ["REFUTES ..."] }
-     event: done              data: { "reconciled": <do radar, NÃO hardcoded>, "radarExit": 0, "attention": [...] }
+  → 200 text/event-stream (SSE):
+     event: session         data: { "sessionId": "..." }        # 1x, p/ resume no cliente
+     event: <SDKMessage.type>  data: <SDKMessage cru em JSON>    # type = system|assistant|user|result
+     event: done            data: {}
+     event: error           data: { "message": "..." }
+  # rate-limit 20/min por token; workspace isolado por token (ver abaixo)
 
-GET /health  # autenticado; NÃO vaza path absoluto
-  → 200 { "ok": true }
+GET  /health   → { ok:true, onionCwd:"..." }   # ⚠ SEM auth + vaza o path do cwd (achado do review, real)
+GET  /commands (auth) · POST /a2a (token a2a dedicado) · /admin (AUTH_TOKEN)
 ```
 
-## Referência (Hono + Agent SDK — API `query()` CORRETA, radar como gate)
-
+## Como o SDK é chamado `[VERIFICADO]` (o proto rev.2 acertou a API)
 ```ts
-// server.ts — bridge pessoal (reconfig do onion-bridge por ENV; ZERO fork de código — D3)
-import { Hono } from 'hono'
-import { streamSSE } from 'hono/streaming'
-import { query } from '@anthropic-ai/claude-agent-sdk'  // função top-level (NÃO existe ClaudeSDKClient no SDK TS)
-
-const CORE_CWD = process.env.ONION_CWD                    // clone do CORE → resolve .claude/kg-radar.sh + agents
-const LIFE_KG  = process.env.LIFE_KG                      // caminho SEPARADO do grafo de vida (nó confiável)
-const app = new Hono()
-
-app.use('/chat', mtlsAndPkce())                          // D4: auth device-bound, não bearer estático
-
-app.post('/chat', (c) => streamSSE(c, async (sse) => {
-  const { sessionId, message } = await c.req.json()
-  const q = query({
-    prompt: message,
-    options: {
-      cwd: CORE_CWD,                                      // ← tools do core resolvem
-      resume: sessionId,                                  // sessão vinculada ao cert
-      settingSources: ['project'],                        // carrega .claude/ do core explicitamente
-      // SEM bypassPermissions (P4). Allow-list: radar read-only; kg-radar aponta LIFE_KG por caminho absoluto.
-      allowedTools: [`Bash(bash ${CORE_CWD}/.claude/validation/kg-radar.sh ${LIFE_KG}/*)`],
-      // escrita ao .kg.yaml = human-gated (canDenyTool / hook), nunca auto-aplicada
-    },
-  })
-  for await (const msg of q) {                            // itera SDKMessage; .type = assistant|user|result|system
-    if (msg.type === 'assistant') {
-      for (const block of msg.message.content) {          // text/tool_use são content blocks aninhados
-        if (block.type === 'text')     await sse.writeSSE({ event: 'assistant_delta', data: JSON.stringify({ text: block.text }) })
-        if (block.type === 'tool_use') await sse.writeSSE({ event: 'tool_use', data: JSON.stringify(block) })
-      }
-    }
-    // tool_result chega como msg.type 'user'/'result'; ramificar no exit do kg-radar → radar_gate/kg_write
-  }
-  // 'done' reflete o veredito REAL do radar (D6) — nunca hardcoded
-}))
-
-app.get('/health', mtlsAndPkce(), (c) => c.json({ ok: true }))
-export default app
+import { query } from "@anthropic-ai/claude-agent-sdk";   // função top-level — NÃO ClaudeSDKClient ✅
+const conversation = query({
+  prompt,                                    // string OU AsyncIterable<SDKUserMessage> (imagem inline)
+  options: {
+    cwd,                                      // workspace isolado por token (NÃO o core direto — ver abaixo)
+    settingSources: ["project"],             // carrega .claude/ do cwd ✅
+    permissionMode: "bypassPermissions",     // ⚠ [HARDENING] ligado + allowDangerouslySkipPermissions:true
+    resume: sessionId,                       // retomada de sessão
+    additionalDirectories: [uploadsDir],     // expõe uploads ao tool Read
+    systemPrompt: { type:"preset", preset:"claude_code", append: context },
+    env: { ...process.env, ANTHROPIC_API_KEY: byokKey },  // BYOK
+  },
+});
+for await (const message of conversation) stream.writeSSE({ event: message.type, data: JSON.stringify(message) });
 ```
 
-## Cliente RN (Expo) — SSE de verdade (fetch nativo do RN NÃO faz streaming)
+## A descoberta que resolve o cwd-vs-tools `[VERIFICADO]`
+`workspace.ts`: cada token → `workspaces/<sha256(token)[:16]>/` como `cwd`, com **symlinks read-only** pro Onion
+canônico: `.claude` → `${ONION_CWD}/.claude`, `CLAUDE.md`, `docs`. **É exatamente o padrão "tools do core + dados
+separados"** — o bridge já o implementa. Uploads isolados por token (`workspaces/<slug>/uploads`).
+⇒ **Para o app pessoal:** o workspace do token vira o life-KG (os `.kg.yaml`) COM `.claude` symlinkado do core. Não
+precisa "cwd=core + LIFE_KG env" (rev.2) — reusa o modelo de workspace que já existe. `ONION_CWD` real hoje = `/home/marciocar/onion-evolve` (o core).
 
-```ts
-import { fetch } from 'expo/fetch'   // res.body.getReader() suportado (Expo SDK 52+); ou react-native-sse
-async function send(sessionId: string, message: string, onEvent: (e:{event:string,data:any})=>void) {
-  const res = await fetch(`${BRIDGE_URL}/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },   // + client-cert mTLS (device-bound)
-    body: JSON.stringify({ sessionId, message }),
-  })
-  const reader = res.body!.getReader()                 // streaming real; bare fetch bufferizaria a resposta inteira
-  // decodifica text/event-stream → onEvent({event,data}); mostra assistant_delta e o veredito do radar no done
-}
+## Deltas p/ o life-KG `[HARDENING — o review, agora contra o real]`
+1. **Locus:** workspaces + uploads vivem na **VPS** (`/home/onion/...`, `/tmp/onion-bridge-uploads`). Pro life-KG
+   `private` isso viola INVARIANTE 0 (dado soberano no disco de terceiro) → mover pro **nó pessoal confiável**.
+2. **`bypassPermissions` + `allowDangerouslySkipPermissions`:** ligado. O próprio `.env.example` anota "hardening
+   futuro: allowlist via hook PreToolUse/canUseTool" → **fazer isso** pro life-KG (radar read-only; escrita `.kg.yaml` gated).
+3. **Auth:** bearer + TLS + rate-limit (não mTLS — a spec A2A do card era aspiracional; a2aGuard também é bearer).
+   Pro dado mais sensível → considerar token device-bound + expiração.
+4. **Uploads crus na VPS antes de de-id:** mídia (foto do cônjuge = 3º) vai a `/tmp` no servidor → processar
+   on-device (executorch) antes de subir (D5/D7).
+5. **`/health` sem auth vaza `onionCwd`** → autenticar + omitir path.
+6. **kg-radar NÃO é gate no endpoint** — o handler só faz `query()`+stream; rodar o radar é comportamento do agente
+   (via prompt/tools), não enforçado. Pro KG-SSOT-first (D6), o gate teria de ser adicionado (hook/wrapper).
 ```
-
-## A reconciliar (fecha a Q_PROTOCOL VERIFICADA — precisa do fonte do bridge)
-1. O bridge da VPS já tem rota de chat/SSE? path/auth/formato real?
-2. Confirmar a forma exata de `query()`/`SDKMessage` contra a versão instalada do SDK.
-3. `content-source`/`media-store` como eixo SDAAL (gated) — NÃO hardcodar ingestão de mídia aqui (DRIFT-5).
