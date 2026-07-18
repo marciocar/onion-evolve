@@ -8,6 +8,23 @@
 
 ---
 
+## 2026-07-18 · Convenção de worktrees — adendo: worktree do harness que vira DURÁVEL vai p/ `~/worktrees/` · COMPATÍVEL · alvo: todos
+
+- **Refina a convenção de worktrees (2026-07-10).** O harness do Claude Code (`--worktree`/`EnterWorktree`)
+  cria em `.claude/worktrees/<name>` **por padrão** — certo para **efêmero** (auto-cleanup ao sair limpo).
+  Mas quando a sessão vira **durável** (fica `locked`, sobrevive a várias sessões, é um tópico `discuss/*` de
+  dias), ela pertence a `~/worktrees/<repo>/<branch-slug>/`. Regra nova: **a durabilidade decide o local, não
+  a ferramenta que criou.**
+- **Ação:** efêmero fica em `.claude/worktrees/` (o lint já o ignora); **durável nascido pelo harness →
+  recriar** no path da convenção **quando a sessão fechar** (`git worktree remove .claude/worktrees/<name>` +
+  `git worktree add ~/worktrees/<repo>/<branch-slug> <branch>`) — nunca com a sessão viva/locked (um-escritor-por-repo).
+- **Sinal barato:** o `+` no nome de um worktree (`discuss+foo`) é carimbo do harness (a convenção usa `-`
+  em `/`→`-`) — se aparecer, confira se aquele worktree já virou durável.
+- **Sem breaking** — vale p/ worktree novo; os existentes seguem *grandfather* até removidos/recriados.
+  Doutrina: `docs/evolution/worktree-convention-2026.md` (adendo 2026-07-18).
+- **Crédito: observação de campo do maestro** (worktrees em locais diferentes entre projetos) → o
+  drive-to-verify achou a causa (default do harness), não um desleixo.
+
 ## 2026-07-18 · ACK: fail-open validado em campo (granaai) + doutrina "validador local delega ao radar" · COMPATÍVEL · alvo: granaai
 
 - **Obrigado — o fix do fail-open funciona em campo.** Você rodou `/meta:adopt --update` (`fb08cc6b → 61a3148`)
