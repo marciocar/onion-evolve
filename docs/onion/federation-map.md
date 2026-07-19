@@ -11,6 +11,7 @@ flowchart TD
   granaai["granaai<br/>standalone · regulated"]:::standalone
   gustavo_pulga["gustavo-pulga<br/>standalone · greenfield"]:::standalone
   onion_mini["onion-mini<br/>standalone · distilled"]:::standalone
+  onion_standalone["onion-standalone<br/>standalone · greenfield"]:::standalone
   marcio_pessoal["marcio-pessoal<br/>standalone · regulated"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
@@ -18,6 +19,7 @@ flowchart TD
   granaai -.->|can-correct| onion_evolve
   gustavo_pulga -->|adopts| onion_evolve
   onion_mini -->|adopts| onion_evolve
+  onion_standalone -->|adopts| onion_evolve
   marcio_pessoal -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
   classDef hub fill:#238636,color:#fff,stroke:#033a16;
@@ -34,4 +36,5 @@ flowchart TD
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `4332ac8d1884` |
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
+| onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `514dda85833a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |

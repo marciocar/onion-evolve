@@ -499,6 +499,15 @@ onion-product	requires	agent:product-agent
 onion-product	requires	agent:story-points-framework-specialist	
 onion-product	requires	agent:task-specialist	
 onion-product	requires	skill:onion-product-context	
+onion-standalone	adopts	onion-evolve	
+onion-standalone	mode	greenfield	
+onion-standalone	pin	514dda85833a	
+onion-standalone	specialization	claude-code	
+onion-standalone	specialization	framework-door	
+onion-standalone	specialization	public-distribution	
+onion-standalone	specialization	role-scoped-adopt	
+onion-standalone	tier	standalone	
+onion-standalone	trust-advises	onion-evolve	
 onion-testing	provides	estrategia-de-teste	
 onion-testing	provides	geracao-testes-unit-integration-e2e	
 onion-testing	provides	qa-story-points	
