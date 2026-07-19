@@ -278,6 +278,33 @@ nodes:
     status: confirmed
     label: "DECISÃO de sync: git FICA o SoT (alinha à doutrina 'origin=fonte única'; KG append-mostly ~ commits/merges). CRDT no máximo COMPLEMENTA (buffer offline), nunca substitui; local-first-DB DESQUALIFICADO (server-DB vira SoT). Caminho de execução = isomorphic-git dentro de nodejs-mobile (dev build, não Expo Go). O problema vira EXECUÇÃO, não modelo"
 
+  # ==== ADR-002: Vercel AI SDK (proposto, 2026-07-19) ====
+  - id: E_VERCEL_LAYERS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "verificado ao vivo: @ai-sdk/anthropic é MODEL-provider (generateText/streamText/tools) SEPARADO do claude-agent-sdk (agent-loop) — camadas distintas, Vercel AI SDK NÃO substitui o cérebro-agente. callstack/ai (on-device Vercel, 1.4k stars, AI SDK v6) roda llama.rn(GGUF)/MLC/Apple — NÃO executorch/.pte → colide com D2"
+  - id: D_VERCEL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.75
+    status: open
+    label: "ADR-002 (PROPOSTO — aguarda ratificação do maestro, NÃO auto-selado): Opção A — manter claude-agent-sdk no cérebro-nuvem; ADOTAR Vercel AI SDK como PADRÃO-DE-INTERFACE de modelo (fecha C_ALIGN, direcional); NÃO forçar o provider on-device agora. Near-term (shell SSE) não depende disso"
+  - id: Q_EXECUTORCH_VERCEL
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "TENSÃO D2↔Vercel (só fecha no spike on-device): callstack/ai (via Vercel) não cobre executorch(.pte) → executorch(features/produção) vs llama.rn(GGUF, Vercel-nativo). Vale um adapter executorch↔Vercel custom (não existe)? Decidir no dado real do Q_DEID, não no papel"
+
   # ==== perguntas em aberto (viram spike / Fase 1b) ====
   - id: Q_DEID
     node_type: question
@@ -524,6 +551,20 @@ edges:
     edge_type: SUPPORTS
   - from: D_SYNC
     to: Q_GITSYNC
+    edge_type: DEPENDS_ON
+
+  # --- ADR-002 Vercel AI SDK (proposto): a tensão executorch↔Vercel defere ao spike on-device ---
+  - from: E_VERCEL_LAYERS
+    to: D_VERCEL
+    edge_type: SUPPORTS
+  - from: D_VERCEL
+    to: D_ADR
+    edge_type: SUPPORTS
+  - from: D_VERCEL
+    to: Q_EXECUTORCH_VERCEL
+    edge_type: DEPENDS_ON
+  - from: Q_EXECUTORCH_VERCEL
+    to: Q_DEID
     edge_type: DEPENDS_ON
 
   # --- compatibilidade verificada: stack coeso, não defasado; git-sync = risco aberto ---
