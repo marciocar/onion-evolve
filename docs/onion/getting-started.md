@@ -52,7 +52,7 @@ seu-projeto/
 ├── docs/
 │   ├── onion/              # Documentação do framework
 │   ├── meta-specs/         # Constituição do sistema (L0)
-│   └── knowledge-base/     # 79 Knowledge Bases estruturadas
+│   └── knowledge-base/     # 80 Knowledge Bases estruturadas
 ├── .env                    # Variáveis de ambiente (NÃO commitar)
 ├── .env.example            # Template de variáveis
 ├── .claudeignore           # Otimização do context window

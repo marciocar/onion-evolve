@@ -69,14 +69,15 @@ seguro porque não depende de a condição de erro ser detectada — ela não po
 ## 4. A taxonomia ONION-R (índice)
 
 A taxonomia **emergiu dos vetos reais** que os gates já emitem (não foi projetada). O catálogo completo — 14
-categorias `ONION-R1..R14` + R15 (proposta), **148 vetos com read-path (`arquivo:linha`) e a string real
-emitida** — vive no registro de design:
-[`taxonomy-onion-r.md`](../../discussions/guardrails-nemo-lens/taxonomy-onion-r.md).
+categorias `ONION-R1..R14` + R15 (proposta), **148 vetos com a string real emitida e read-path** — vive na KB
+companheira [`onion-r-taxonomy`](onion-r-taxonomy.md).
 
-> **Por que a taxonomia com read-paths NÃO está nesta KB (ainda).** Um catálogo de `arquivo:linha` no core
-> **sem um gate anti-drift** violaria ONION-R1 (integridade de SSOT) — a própria categoria que ela define.
-> Até a promoção amarrar esse gate (re-grep dirigido via `/meta:kb-freshness`), a taxonomia detalhada fica
-> como **evidência de discussão linkada**, e esta KB referencia os gates **por nome** (resiliente a drift).
+> **Como o catálogo entrou no core sem violar o próprio ONION-R1.** Um catálogo de `arquivo:linha` **perpétuo**
+> violaria ONION-R1 (integridade de SSOT) — a própria categoria que ela define. A promoção (2026-07-19)
+> resolveu isso **rebaixando os números de linha**: a KB `onion-r-taxonomy` ancora cada veto pelo **arquivo**
+> (read-path estável a refactor) + pela **string de veto emitida** (identificador greppável), e declara-se
+> **snapshot a revalidar via `/meta:kb-freshness`** (re-grep dirigido). Os line-anchors datados ficam no
+> registro de design [`taxonomy-onion-r.md`](../../discussions/guardrails-nemo-lens/taxonomy-onion-r.md).
 
 Índice compacto (placement · modo · análogo de mercado — *nem todos são guardrails de segurança*):
 
@@ -103,6 +104,43 @@ emitida** — vive no registro de design:
 [`reconciliation-authorization-layers.md`](../../discussions/guardrails-nemo-lens/reconciliation-authorization-layers.md)). Só **R15** traz design novo — e mesmo ele **estende** a linha da KB
 [`authorization-layers`](authorization-layers-intake-vs-execution.md) §7 (o "próximo passo" que ela declarou
 faltar), não a reinventa.
+
+### 4.1 R15.3a — os effect-gates estruturais que o core JÁ enforça (nomeados, custo zero)
+
+R15.3 diz: *efeito irreversível derivado de conteúdo não-confiável cruza o gate de execução.* Para os canais
+de federação (C1) e doc-bridge (C2) **isso já é verdade hoje, por construção** — o efeito não é *checado*, é
+*impossível* sem gate (modo **estrutural**). **R15.3a é puro vocabulário**: nomear guardas existentes como
+membros de ONION-R15; nenhuma linha de código muda. (O canal **C3** — `adopt`/`reverse-consolidate` — **não**
+tem gate estrutural; fica para **R15.3b**, gated — ver [R15 §6](../../discussions/guardrails-nemo-lens/r15-untrusted-content-provenance.md).)
+
+| Canal | Guarda estrutural existente | Invariante (string real, greppável) | Read-path (arquivo) |
+|-------|-----------------------------|-------------------------------------|---------------------|
+| **C1 — federação a2a** | `a2a-accept` transporta o registro verificado da fila para o inbox, mas **nunca aplica** | *"NUNCA aplica nada; só transporta fila→inbox"* | `.claude/utils/federation-transport/a2a-accept.sh` |
+| **C2 — doc-bridge inbound** | `co-deliver`/`co-relay` escrevem **UNTRACKED** no `inbound/`, nunca commitam no repo alheio (invariante I3) | *"ENTREGA-SEM-COMMIT … NUNCA commita no repo alheio"* | `.claude/utils/co-evolution/co-deliver.sh` |
+
+> **Anti-drift (mesma regra da [taxonomia](onion-r-taxonomy.md)):** read-path a nível de **arquivo** + a
+> **string-invariante greppável**, sem número de linha perpétuo. Revalidável por `/meta:kb-freshness`.
+
+**Ganho:** com esses dois rótulos `ONION-R15.3a`, o Onion afirma cobertura parcial de **OWASP LLM01** com
+read-path confirmado — sem escrever código. É o exemplo canônico de que a camada é *consolidação
+transversal*: metade do valor é **reconhecer e nomear** o que o dogfood já construiu.
+
+### 4.2 R15.1 — proveniência marcada: o que é estrutural-por-construção vs o que é read-time (R15.2)
+
+O design de R15.1 assumia "os helpers de transporte ganham a linha de wrap". Ao promover ao core, o **código
+real** refinou onde a cerca estrutural genuinamente se aplica (achado de campo 2026-07-19):
+
+| Canal | Realidade do transporte | Enforcement R15.1 |
+|-------|-------------------------|-------------------|
+| **C1 — `a2a-accept`** | **NÃO inlineia o corpo não-confiável** — só o **referencia** (*"o a2a-live transporta o SINAL, não o corpo"*, `.claude/utils/federation-transport/a2a-accept.sh`). Os campos interpolados (`from`/`kind`/`id`) vêm de envelope **cripto-verificado** (`a2a-verify`: RS256 + kid-binding). | **estrutural por construção** ✅ — o corpo adversário nunca entra no contexto do core (mais forte que cercar). Nomeado, zero código. |
+| **C2 — `co-relay`** | **copia o arquivo verbatim** com dedup-por-conteúdo (`cmp -s`) + idempotência (invariante I3 entrega-sem-commit). Cercar-na-cópia quebraria o dedup, a idempotência e a fidelidade do artefato durável. | **read-time (R15.2)** — a proteção do corpo do doc-bridge vive na **constituição** que o core aplica ao **ler** (`/meta:co-evolve`), não no transporte. O helper `onion-untrusted-wrap.sh` é a ferramenta de cerca disponível nesse read. |
+| **C3 — `adopt`/`reverse-consolidate`** | lê repo alheio via `Read` nativo — sem hook único. | **read-time (R15.2 + R15.3b)** — cerca não se aplica (já era o design). |
+
+> **Lição (dogfood do core):** "estrutural > gated" **não** significa "cerca em todo transporte". Significa
+> preferir a defesa que torna o ataque **impossível por construção** — e às vezes o código já a tem (C1
+> não-inlineia; melhor que cercar), enquanto forçar a cerca onde o transporte é verbatim (C2) só quebraria
+> invariantes tateados. A cerca (`onion-untrusted-wrap.sh`) é a ferramenta **do read** (R15.2), não uma
+> emenda cega em todo `cp`.
 
 ## 5. Cobertura e fronteiras (provisório)
 

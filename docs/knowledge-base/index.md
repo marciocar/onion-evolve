@@ -1,6 +1,6 @@
 # 📚 Índice - Knowledge Bases
 
-> **Última atualização**: 2026-07-12 | **Gerado por**: `/docs:build-index`
+> **Última atualização**: 2026-07-19 | **Gerado por**: `/docs:build-index`
 
 Índice das **Knowledge Bases** do Sistema Onion — conhecimento estruturado para consumo por IA e referência técnica.
 
@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **65 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **32** em `concepts/` · **9** em `frameworks/` · **5** em `tools/` · **3** em `platforms/` · **3** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
+- **75 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **42** em `concepts/` · **9** em `frameworks/` · **5** em `tools/` · **3** em `platforms/` · **3** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **6** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria)
 
 ---
 
@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 33 — Conceitos fundamentais
+├── concepts/            # 42 — Conceitos fundamentais
 ├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 5  — Ferramentas e recursos
 ├── platforms/           # 3  — Plataformas e tecnologias
@@ -33,15 +33,17 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (33)
+## 🧠 Conceitos Fundamentais (42)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Orchestration](concepts/agent-orchestration.md) — orquestração de subagentes: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
 - [AI Agent Design Patterns](concepts/ai-agent-design-patterns.md) — padrões de design para agentes IA
 - [Camadas de Liberação (intake × execução)](concepts/authorization-layers-intake-vs-execution.md) — a linha entre intake (autônomo) e execução (gated); consolida a2a-verify/I3 — pai de onion-guardrails
+- [Behavior Sensor — Three Gates](concepts/behavior-sensor-three-gates.md) — **CANDIDATO** — os três gates de um sensor de comportamento: mapear consentido × vigiar (determinístico + gated + estrutural)
 - [Branding e Posicionamento](concepts/branding-posicionamento-marca.md) — estratégias de marca
 - [Configuration Management](concepts/configuration-management.md) — gestão de configurações e secrets
 - [Consolidated to Tasks Patterns](concepts/consolidated-to-tasks-patterns.md) — transformação de conhecimento consolidado em tasks
+- [Constellation of Studies](concepts/constellation-of-studies.md) — **CANDIDATO** — a constelação de estudos `discuss/*`: mapa macro das N estrelas (fase · next_action · convergência de tags), read-only
 - [Context Window Optimization](concepts/context-window-optimization.md) — otimização de contexto, prompt caching e custo multi-agente
 - [Decision Snapshot Retention](concepts/decision-snapshot-retention.md) — rastreabilidade atômica sustentável: payload mínimo (decisão, não universo) + política de retenção
 - [Discussion Worktrees](concepts/discussion-worktrees-pattern.md) — frentes de discussão isoladas (pensa, não entrega); estende parallel-worktrees
@@ -57,9 +59,13 @@ docs/knowledge-base/
 - [Onion Federation and Adoption](concepts/onion-federation-and-adoption.md) — guia de síntese: processo completo de `/meta:adopt` fase-a-fase, matriz de permissão dos 4 tiers, 5 perfis reais registrados
 - [Onion Guardrails](concepts/onion-guardrails.md) — **CANDIDATO** — a camada de guardrails nomeada: lente ONION-R sobre gates existentes (herda por read-path); motor determinístico + gated + estrutural, nunca classificador
 - [Onion Modernization Doctrine](concepts/onion-modernization-doctrine.md) — regra de inventário/SSOT e doutrina de modernização
+- [Onion Perception Instruments](concepts/onion-perception-instruments.md) — como o core VÊ, VERIFICA e se mantém FRESCO; irmã da doutrina de breadcrumbs
+- [Onion Promotion Ladder](concepts/onion-promotion-ladder.md) — a esteira de promoção das ideias aos artefatos: camadas de teste e maturação (discussão → core)
+- [Onion R Taxonomy](concepts/onion-r-taxonomy.md) — **CANDIDATO** — catálogo de referência dos guardrails do core: 14 categorias `ONION-R1..R14` (+R15 proposta), 148 vetos destilados dos gates reais, ancorados por string emitida + read-path (linha rebaixada, snapshot a revalidar via `/meta:kb-freshness`). Companheira de [Onion Guardrails](concepts/onion-guardrails.md)
 - [Onion Relation Vocabulary](concepts/onion-relation-vocabulary.md) — TBox da ontologia leve: classes e predicados controlados com que o Onion descreve a si mesmo
 - [Onion Working Method](concepts/onion-working-method.md) — porta de entrada do método: Seleção (catálogo) + Execução (PFR + coordenação por modo) + Validação (dogfood + adversarial) + Disciplina; mapa de fontes meta-spec/KB/ADR/RFC
 - [Parallel Work Worktrees](concepts/parallel-work-worktrees-pattern.md) — trabalho paralelo em worktrees independentes
+- [Public Door vs Private Core](concepts/public-door-vs-private-core.md) — porta pública ≠ core privado: a fronteira entre onde a família se adota e onde ela evolui
 - [Secret Handling (Agent)](concepts/secret-handling-agent.md) — regra dura: agente nunca pede/aceita segredo em texto claro; receituário capability-split → terminal real → efêmero → fora-de-banda → container (crédito: adotante de campo, dogfood real)
 - [Session Memory Lifecycle](concepts/session-memory-lifecycle.md) — memória persistente do harness como 4º contexto auditável, irmã de domain-context-lifecycle
 - [Fonte ≠ Derivação](concepts/source-vs-derivation.md) — fronteira física entre conhecimento-fonte e nossa leitura dele; família do "declarado ≠ verificado"
@@ -67,6 +73,8 @@ docs/knowledge-base/
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA
 - [Specification-Driven AI Abstraction Layer (SDAAL)](concepts/specification-driven-ai-abstraction-layer.md) — padrão-pai das camadas de abstração
 - [Task Manager Abstraction](concepts/task-manager-abstraction.md) — instância canônica do SDAAL (API-first; MCP opcional)
+- [Transfer Heuristic (Aristóteles)](concepts/transfer-heuristic-aristotle.md) — **CANDIDATO** — régua de transferência *igual → transfere / diferente → desenha* (lente de Aristóteles); invocada por `/meta:adopt`
+- [Transformer Architecture](concepts/transformer-architecture.md) — Transformer: a arquitetura por trás do reasoner do Onion
 - [Verify-External-for-Current](concepts/verify-external-for-current.md) — forcing function: claim sobre atual/emergente/popular (versão·device·player·framework·tendência) ⇒ verify externo (web) obrigatório; WebFetch é budget separado do WebSearch; sem verificar → declarar "não verificado". O `verify(vivo)` do SSOT-as-runtime aplicado ao mundo externo
 - [Worklog Protocol](concepts/worklog-protocol.md) — sessões retomáveis com eficácia de IA (STATE.md, leitura Tier 0→3, checkpoint)
 

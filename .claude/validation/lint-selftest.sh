@@ -2899,6 +2899,34 @@ run_mail_hook_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo guardrails — exercita os 2 helpers determinísticos da camada Onion Guardrails
+# (R15, ONION-R15): a cerca de proveniência (onion-untrusted-wrap.sh, em utils/guardrails/)
+# e o gate de efeito (onion-effect-gate.sh, aqui em validation/guardrails/). É a "guarda das
+# guardas" da camada: se um helper regredir (fence-breakout, gate que deixa passar execução
+# derivada de untrusted, verbo desconhecido não-gated, loop de flag-sem-valor), o selftest
+# reprova. Torna EXECUTÁVEL o invariante-3 (motor determinístico, zero probabilístico) —
+# os harnesses test-r15.sh (9 casos, R15.1) e test-r15-3b.sh (9 casos, R15.3b) são o dogfood
+# adversarial embarcado. Self-contained (os testes acham os helpers por path relativo).
+# ---------------------------------------------------------------------------
+run_guardrails_selftests() {
+  local gdir="${SCRIPT_DIR}/guardrails"
+  local wrap="${REPO_ROOT}/.claude/utils/guardrails/onion-untrusted-wrap.sh"
+  local gate="${gdir}/onion-effect-gate.sh"
+  if [ ! -f "${wrap}" ]; then record_fail "guardrails: wrap" "helper ausente: ${wrap}"; fi
+  if [ ! -f "${gate}" ]; then record_fail "guardrails: effect-gate" "helper ausente: ${gate}"; fi
+  local t out rc
+  for t in "test-r15" "test-r15-3b"; do
+    if [ ! -f "${gdir}/${t}.sh" ]; then record_fail "guardrails: ${t}" "harness ausente: ${gdir}/${t}.sh"; continue; fi
+    rc=0; out="$(bash "${gdir}/${t}.sh" 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ]; then
+      record_pass "guardrails: ${t}.sh dogfood adversarial ($(printf '%s' "${out}" | sed -n 's/.*== resultado: \([0-9]* passaram.*\) ==/\1/p' | tail -1))"
+    else
+      record_fail "guardrails: ${t}.sh" "dogfood reprovou (exit ${rc}) — $(printf '%s' "${out}" | grep '❌' | head -1)"
+    fi
+  done
+}
+
+# ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
 echo "=== Onion Lint Selftest — auto-teste das guardas ==="
@@ -2934,6 +2962,9 @@ run_resolve_selftests
 
 # Modo durable-commit — commit durável da instalação (fix do incidente uncommitted-descartável).
 run_durable_commit_selftests
+
+# Modo guardrails — helpers R15 (cerca de proveniência + gate de efeito); a guarda das guardas.
+run_guardrails_selftests
 
 # Modo vendor-branch — --update via merge de onion/vendor (Achado #2: never-clobber estrutural).
 run_vendor_branch_selftests
