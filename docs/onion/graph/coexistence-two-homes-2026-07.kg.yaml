@@ -36,6 +36,7 @@ nodes:
     label: "memoria (~/.claude/.../memory, 20 arqs) e FORA do repo → nao coexiste por git (unica lacuna real)"
   - id: D_ORIGIN_SOT
     node_type: decision
+    trace: .claude/diary/2026-07-16-two-homes-origin-and-coexistence.md
     layer: audit
     plane: DEV
     impact: 5
@@ -44,6 +45,7 @@ nodes:
     label: "origin (GitHub) = fonte unica; Avell e VPS sao clones; git e o elo (o link entre as duas casas)"
   - id: D_VPS_PRIMARY
     node_type: decision
+    trace: .claude/diary/2026-07-16-two-homes-origin-and-coexistence.md
     layer: audit
     plane: DEV
     impact: 4

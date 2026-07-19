@@ -78,6 +78,7 @@ nodes:
     trace: ".claude/validation/graph.sh:76"
   - id: D_FED_KG_AS_AUDIT_OVERLAY
     node_type: decision
+    trace: docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md
     layer: audit
     plane: PROD
     impact: 5
