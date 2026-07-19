@@ -224,6 +224,24 @@ nodes:
     status: open
     label: "RE-ESCOPADO (2026-07-18): o MODELO está resolvido (git fica SoT, D_SYNC). Fica o SPIKE DE EXECUÇÃO: caminho = isomorphic-git dentro de nodejs-mobile (Node real no device; ~213 stars, Node 18 near-EOL, dev build). Residual a provar: (a) rota mais leve (fs-shim expo-file-system, bugs iOS #1994/#1997) vs nodejs-mobile; (b) perf num KG crescente; (c) design de merge N=1 multi-device; (d) Yjs em RN"
 
+  # ==== git-on-device: caminho LEVE materializado no app, aguardando prova de device (2026-07-19) ====
+  - id: A_GITPROBE
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: done
+    label: "Prova git-on-device no app (onion-pessoal-app, commit daf5a3e): fsShim.ts adapta o BYOFS do isomorphic-git sobre expo-file-system/legacy; gitProbe.ts roda init/add/commit/log/status/read-back num .kg.yaml na MEMÓRIA do device, sem rede e sem nodejs-mobile. Botão + log granular na tela (Expo Go). Typecheck limpo. NÃO testado em device (aguarda G54/Poco)"
+  - id: C_GITSYNC_LIGHT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "HIPÓTESE a provar no device: o caminho LEVE do git-on-device — isomorphic-git (JS puro) + fs-shim sobre expo-file-system — roda no EXPO GO, sem dev build e sem nodejs-mobile. Se confirmado, resolve o residual (a) do Q_GITSYNC e torna o caminho pesado (nodejs-mobile+dev build, D_SYNC) desnecessário. confidence 0.5 = plausível-não-verificado; o teste no G54 confirma ou refuta"
+
   # ==== plano-B do SLM + standards a não perder (deep-research wzxz11dvf, 2026-07-18) ====
   - id: E_STANDARDS
     node_type: evidence
@@ -634,4 +652,18 @@ edges:
     edge_type: SUPPORTS
   - from: D_ADR
     to: Q_GITSYNC
+    edge_type: DEPENDS_ON
+
+  # --- caminho leve git-on-device: o artefato testa a hipótese; ambos aterram no Q_GITSYNC; prova depende do device ---
+  - from: A_GITPROBE
+    to: Q_GITSYNC
+    edge_type: TRACES_TO
+  - from: C_GITSYNC_LIGHT
+    to: Q_GITSYNC
+    edge_type: TRACES_TO
+  - from: A_GITPROBE
+    to: C_GITSYNC_LIGHT
+    edge_type: SUPPORTS
+  - from: C_GITSYNC_LIGHT
+    to: C_DEVICE_INTERIM
     edge_type: DEPENDS_ON

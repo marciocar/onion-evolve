@@ -6,7 +6,7 @@ date: 2026-07-17
 branch: discuss/onion-pessoal-app
 # ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
 phase: DEEP           # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
-next_action: "DES-PARQUEADO: device interino chegou (Moto G54, MediaTek — ver C_DEVICE_INTERIM). App scaffold em /home/marcio/onion-pessoal-app (Expo SDK 57 + RN 0.86, shell SSE↔bridge + câmera). PRÓXIMO: (1) testar shell no G54 via Expo Go+túnel (fecha Q_PROTOCOL no device real); (2) EAS Build (maestro faz `eas login`) p/ os spikes nativos Q_GITSYNC (git-on-device). Pesquisa de provider (SLM/Q_DEID) segue gated no WebSearch → sessão nova. Poco X8 Pro Max chega segunda (alvo final)."
+next_action: "DES-PARQUEADO: device interino (Moto G54, MediaTek — C_DEVICE_INTERIM). App em /home/marcio/onion-pessoal-app (Expo SDK 57 + RN 0.86). PRÓXIMO — tudo no G54 via Expo Go+túnel, SEM dev build: (1) shell SSE↔bridge → fecha Q_PROTOCOL no device real; (2) botão 'Rodar prova git' → testa o CAMINHO LEVE do Q_GITSYNC (isomorphic-git + expo-file-system, A_GITPROBE/C_GITSYNC_LIGHT) — se passar, resolve git-on-device SEM nodejs-mobile/EAS; (3) câmera. EAS Build só se o caminho leve FALHAR, ou p/ SLM (Q_DEID/Q_PERF). Pesquisa de provider (SLM) gated no WebSearch → sessão nova. Poco X8 Pro Max chega segunda (alvo final)."
 scope_globs: ["docs/discussions/onion-pessoal-app/"]
 objective_tags: ["onion-pessoal", "superficie", "onion-bridge", "life-companion"]
 ---
