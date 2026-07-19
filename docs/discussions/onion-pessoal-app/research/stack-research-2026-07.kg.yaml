@@ -542,6 +542,26 @@ nodes:
     status: open
     label: "GAP exposto pela prior-art: ciframos o CONTEÚDO (.enc), mas o remote AINDA vê metadados — nome de arquivo (fixo 'life.kg.yaml.enc', ok), mensagens de commit, grafo/timestamps, FREQUÊNCIA de commits (vaza padrão comportamental do life-KG). git-remote-gcrypt fecha (cifra a história inteira); nós não. +2 gaps: interop age-wire (envelope bespoke → o nó confiável precisa do MESMO JS, não o age CLI) e diff opaco (cifra o arquivo inteiro ~git-crypt, não valores ~SOPS). Direção: curto=neutralizar timing/mensagens de commit; médio=avaliar git-remote-gcrypt whole-repo (RN-compat = incógnita, mesma classe de any-sync/MindooDB); interop=convergir p/ age-wire pós-spike."
 
+  # ==== triagem do core ao sinal (2026-07-19) — orientação de doutrina de KG ====
+  - id: E_CORE_GUIDANCE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "Core respondeu ao sinal (life-kg-radar-port-schema-metadata). Veredito: PROSSIGA F1 — nada bloqueia o loop. P1 (porta JS conformance-gated) ABENÇOADO como doutrina (já é KB knowledge-graph-sdaal 'Multi-runtime'; refina D_LOCAL_VALIDATOR_DOCTRINE: delegar quando o runtime permite, porta gated quando PROÍBE — Hermes; o conformance JS↔sh É o gate anti-drift). P2 perfil leve SANCIONADO com 1 hard-fix: renomear type→node_type (kg-radar.sh L135 normativa). P3 Q_METADATA_LEAK é doutrina do core mas DOCUMENTAR, não construir — a mitigação (gcrypt whole-repo/age-wire) pertence à F2 (SSOT de mitigação de inferência/P5); o .enc de conteúdo já é a camada em-repouso correta. DRIVE-TO-VERIFY (minha checagem do .sh vivo): o 'opcional' do core está quase certo — o .sh AINDA reprova impact+status ausentes (só confidence+layer são de fato opcionais) → o store auto-preenche plane/impact/status (captura leve: user dá id/node_type/label). Bônus: core rodou spike G1 e concluiu que /meta:adopt-para-KG NÃO se constrói (o app JS próprio já cobre); somos o cliente KG-de-vida canônico. Valor real = F2."
+  - id: D_LIFEKG_CANONICAL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "DECISÃO (aplicada, commit 257b399): life-KG adota o SHAPE CANÔNICO ({meta.schema_version, nodes com node_type/plane/impact/status, edges}); o kgStore auto-preenche os obrigatórios e o saveKG GATEIA com kg-radar (D6: KG inválido não escreve). Perfil leve = subconjunto estrito com nomes canônicos, opcionais omitidos. Conformance JS↔sh 8/8 (incl. o fix de confidence-ausente que o drive-to-verify pegou)."
+
 edges:
   # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
   - from: D_STACK
@@ -829,3 +849,14 @@ edges:
   - from: Q_METADATA_LEAK
     to: E_SYNC_G54
     edge_type: CONSTRAINS
+
+  # --- triagem do core: valida prosseguir F1, define a decisão canônica, e manda o gap p/ F2 ---
+  - from: E_CORE_GUIDANCE
+    to: D_DEFINITIVE
+    edge_type: SUPPORTS
+  - from: D_LIFEKG_CANONICAL
+    to: E_CORE_GUIDANCE
+    edge_type: DEPENDS_ON
+  - from: E_CORE_GUIDANCE
+    to: Q_METADATA_LEAK
+    edge_type: SUPPORTS
