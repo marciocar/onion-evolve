@@ -63,6 +63,14 @@
 > soberano não alcançou o validador local `kg-validate-v2.py` (gramática MAPA divergente) — o falso-verde
 > voltou pela porta do parser duplicado.
 >
+> **Remediação de referência (granaai, confirmada 2026-07-18):** a destilação de S1+S3a no KB foi
+> verificada FIEL em campo — e a doutrina não só foi absorvida, foi **ACIONADA**: guiado por ela o
+> granaai reescreveu `kg-validate-v2.py` para **delegar** ao radar soberano (S3a) e regenerou o KG em
+> gramática LIST canônica, elevando os breadcrumbs de decisão de **10%→63%** (`TRACES_TO` nó→ADR, "A+");
+> a rastreabilidade *comportamental* (`layer: domain`, máquina de estados ancorada) fica como **template
+> gated-por-refactor**, não preventiva. Ou seja: **S1 dirigiu a remediação** — o loop adotante→core→adotante
+> fechou fiel, e há um exemplo de campo de referência.
+>
 > **Absorvida via o ingestor de doutrina** (trust-gated: granaai tem `can_correct_to: [onion-evolve]`):
 > [onion-adr-doctrine-ingestor-2026-07](../../analysis/onion-adr-doctrine-ingestor-2026-07.md) · grafo da
 > absorção: `docs/onion/graph/granaai-doctrine-absorption-2026-07.kg.yaml` (radar exit 0).
