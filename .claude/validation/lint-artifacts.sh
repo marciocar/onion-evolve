@@ -1388,6 +1388,49 @@ check_frontmatter_model_category() {
 }
 
 # ===========================================================================
+# REGRA 27 — Dependência de script de comando empacotado [HARD]
+#   Todo script .claude/validation/*.sh que um comando EMPACOTADO (num manifesto de
+#   vertical/work-tools) declara em `allowed-tools:` deve estar no VALIDATION[] do MESMO
+#   manifesto — OU ser um script de HARNESS sempre-presente num repo adotado (allowlist).
+#   Senão o plugin/bundle herda um DEAD-REF (o comando invoca um script ausente). Nasceu do
+#   sinal de campo kg-radar 2026-07-19: engineer:work.md cabeava kg-radar.sh com VALIDATION=()
+#   vazio → todo standalone montado herdava referência morta. Roda no source (o adotante não monta).
+# ===========================================================================
+check_bundled_command_script_deps() {
+  grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
+  local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
+  [ -d "${vdir}" ] || return 0
+  # Harness sempre-presente num repo adotado (não precisa estar no VALIDATION[] do bundle).
+  local harness=" onion-version.sh inventory.sh resolve-integration-branch.sh pin-integrity-check.sh lint-artifacts.sh lint-selftest.sh session-beacon.sh "
+  local man
+  for man in "${vdir}"/*.manifest.sh; do
+    [ -f "${man}" ] || continue
+    local dump pname="" valset=" ${harness}"; local -a cmds=()
+    dump="$( COMMANDS=(); VALIDATION=(); PLUGIN_NAME=""; . "${man}" 2>/dev/null
+             printf 'N\t%s\n' "${PLUGIN_NAME}"
+             for c in "${COMMANDS[@]}"; do printf 'C\t%s\n' "${c}"; done
+             for v in "${VALIDATION[@]}"; do printf 'V\t%s\n' "$(basename "${v}")"; done )"
+    local k val
+    while IFS=$'\t' read -r k val; do
+      case "${k}" in N) pname="${val}";; C) cmds+=("${val}");; V) valset+="${val} ";; esac
+    done <<< "${dump}"
+    local c files f s
+    for c in "${cmds[@]}"; do
+      if [ -d "${REPO_ROOT}/${c}" ]; then files="$(find "${REPO_ROOT}/${c}" -maxdepth 1 -name '*.md' 2>/dev/null)"; else files="${REPO_ROOT}/${c}"; fi
+      for f in ${files}; do
+        [ -f "${f}" ] || continue
+        for s in $(grep -m1 '^allowed-tools:' "${f}" 2>/dev/null | grep -oE '\.claude/validation/[a-z0-9-]+\.sh' | sed 's#.*/##' | sort -u); do
+          case "${valset}" in
+            *" ${s} "*) : ;;
+            *) violation "HARD" "utils/marketplace/verticals/$(basename "${man}")" "comando '$(basename "${f}")' declara .claude/validation/${s} em allowed-tools, mas o manifesto '${pname}' não o inclui em VALIDATION[] (nem é harness) — dead-ref no bundle" ;;
+          esac
+        done
+      done
+    done
+  done
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -1422,6 +1465,7 @@ check_site_inventory_sync
 check_plugins_sync
 check_capability_conformance
 check_role_bundle_sync
+check_bundled_command_script_deps
 check_graph_sync
 check_federation_map_sync
 check_federation_console_sync
