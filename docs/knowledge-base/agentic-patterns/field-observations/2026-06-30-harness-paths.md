@@ -9,17 +9,17 @@ promoted_to: harness/claude-code-internals.md
 
 ## O que originou esta observação
 
-Durante uma sessão do rhilo-metagamify (teste E2E de dispersão WRR), o maestro
+Durante uma sessão do um adotante (teste E2E de dispersão WRR), o maestro
 viu dois paths internos do harness que nunca tinha visto explicitamente:
 
 **Path 1** — task output (efêmero):
 ```
-/tmp/claude-1000/-home-marciocar-rhilo-metagamify/d5d16703-.../tasks/byjz0kaab.output
+/tmp/claude-1000/-home-<user>-<project>/d5d16703-.../tasks/byjz0kaab.output
 ```
 
 **Path 2** — workflow journal (persistente):
 ```
-~/.claude/projects/-home-marciocar-rhilo-metagamify/d5d16703-.../subagents/workflows/wf_f9902145-332/agent-a29e919445b736448.jsonl
+~/.claude/projects/-home-<user>-<project>/d5d16703-.../subagents/workflows/wf_f9902145-332/agent-a29e919445b736448.jsonl
 ```
 
 A pergunta "qual o formato desses arquivos? de onde vem esse padrão?" abriu a

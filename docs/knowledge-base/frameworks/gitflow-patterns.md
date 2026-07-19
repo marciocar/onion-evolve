@@ -965,7 +965,7 @@ Sob `.claude/sessions/` existem dois namespaces que **não** seguem este contrat
 O versionamento de `.claude/sessions/` é uma **escolha consciente por projeto**, não um default forçado. Duas posturas sancionadas:
 
 - **Gitignored (estado individual/efêmero)** — default para trabalho solo/curto; o worklog é rascunho. É a postura que o `.gitignore` do Onion ships.
-- **Committed (artefato de conhecimento do time)** — válido quando o time trata worklogs como histórico durável de design/decisão (é o que o projeto-alvo `rhilo-app` faz). Ao commitar, prefira versionar `archived/` e gitignorar os dirs ACTIVE — ou commitar ambos deliberadamente.
+- **Committed (artefato de conhecimento do time)** — válido quando o time trata worklogs como histórico durável de design/decisão (é o que o projeto-alvo `o app de um adotante` faz). Ao commitar, prefira versionar `archived/` e gitignorar os dirs ACTIVE — ou commitar ambos deliberadamente.
 
 Decida uma postura por projeto e registre-a no `.gitignore` com um comentário. Ver `meta-specs/architecture.md` §6.2.
 
@@ -986,8 +986,8 @@ Decida uma postura por projeto e registre-a no `.gitignore` com um comentário. 
 > **nome literal** da branch (regex `^(main|master|develop)$`). O ADR
 > [branch-roles-sdaal](../../analysis/onion-adr-branch-roles-sdaal-2026-07.md) (`status: proposto`) propõe que
 > o papel de cada branch seja **resolvido** (`roleOf(branch)` do SDAAL `branch-roles`), não assumido pelo nome —
-> corrigindo 2 bugs latentes: (i) uma branch de **produção por-cliente** (ex. `rhilo/main`) **é** produção mas
-> não casa o regex → não é protegida; (ii) um adotante com `develop`=**staging** (ex. GranaAi) casa como
+> corrigindo 2 bugs latentes: (i) uma branch de **produção por-cliente** (ex. `<adopter>/main`) **é** produção mas
+> não casa o regex → não é protegida; (ii) um adotante com `develop`=**staging** (ex. um adotante regulado) casa como
 > "Integração", semântica errada. Enquanto na Fase 0, a matriz abaixo continua vigente por nome; o rewire abre
 > por gatilho (proteção divergente que morde).
 

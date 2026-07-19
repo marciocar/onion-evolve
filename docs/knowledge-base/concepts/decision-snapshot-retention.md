@@ -17,7 +17,7 @@
 | **Última Atualização** | 2026-06-22 |
 | **Categoria** | Conceitos |
 | **Quadrante (radar)** | MET (Método/Processo) |
-| **Origem** | sinal de campo `rhilo-metagamify` (2026-06-19) — [co-evolução upstream](../../evolution/README.md) |
+| **Origem** | sinal de campo (2026-06-19) — [co-evolução upstream](../../evolution/README.md) |
 | **Conceitos-irmãos** | [Spec-as-Code](spec-as-code-strategy.md) · [Ciclo de Vida do Contexto de Domínio](domain-context-lifecycle.md) |
 
 ---

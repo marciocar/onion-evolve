@@ -16,7 +16,7 @@ tools:
   - TodoWrite
 color: blue
 priority: alta
-expertise: ["zen-engine", "jdm", "decision-tables", "business-rules", "typescript", "performance", "metagamify"]
+expertise: ["zen-engine", "jdm", "decision-tables", "business-rules", "typescript", "performance", "gamification"]
 related_agents: []
 ---
 

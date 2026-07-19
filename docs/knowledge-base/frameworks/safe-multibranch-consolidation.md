@@ -3,8 +3,8 @@
 > **Versão**: 1.0.0 | **Última atualização**: 2026-07-10 | **Categoria**: Frameworks
 > Método para convergir N feature-branches acumuladas (em 1+ repos) para branches consolidadas e
 > PRs sob comando, com dois mandatos duros: **nada fica pelo caminho** e **nada quebra produção**.
-> Promovido via co-evolução: nasceu e foi executado de ponta a ponta na instância rhilo
-> (metagamify + rhilo-app, ~19 branches, 2026-07-09); o core pediu o destilável
+> Promovido via co-evolução: nasceu e foi executado de ponta a ponta na uma instância adotante
+> (um adotante + o app de um adotante, ~19 branches, 2026-07-09); o core pediu o destilável
 > ("declarado ≠ verificado"), recebeu o artefato com a verificação completa e destilou esta KB.
 
 ---
@@ -17,7 +17,7 @@
 | **Data de Criação** | 2026-07-10 |
 | **Última Atualização** | 2026-07-10 |
 | **Categoria** | Frameworks |
-| **Origem** | Sinal upstream metagamify ([método](../../evolution/inbox/_processed/2026-07-09-metodo-consolidacao-segura-multibranch.md)) + [artefato verificado](../../evolution/inbox/_processed/2026-07-09-artefato-mapa-consolidacao.md) (mapa-SSOT com vereditos 6-branch, build-green, salvage) |
+| **Origem** | Sinal upstream um adotante ([método](../../evolution/inbox/_processed/2026-07-09-metodo-consolidacao-segura-multibranch.md)) + [artefato verificado](../../evolution/inbox/_processed/2026-07-09-artefato-mapa-consolidacao.md) (mapa-SSOT com vereditos 6-branch, build-green, salvage) |
 | **Relacionado** | [gitflow-patterns](gitflow-patterns.md) (motor git local) · [knowledge-graph-sdaal](../concepts/knowledge-graph-sdaal.md) (C_DEVPROD_GAP; o mapa vira nó do KG) |
 
 ---

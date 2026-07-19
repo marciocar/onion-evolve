@@ -2,10 +2,10 @@
 
 > **Status: CANDIDATA** — padrão recebido via co-evolução (sinal upstream
 > `docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md`), nascido e dogfoodado
-> na instância **rhilo-metagamify** durante uma auditoria real de produção (WRR/Modo Equilíbrio,
-> 01-02/jul/2026). Autoria do método: instância rhilo (T1 hub). Esta KB porta o **conceito
-> generalizado**; a implementação de referência vive no rhilo (`scripts/kg/radar.js` +
-> `docs/rhilo/graph/wrr-audit.kg.yaml`).
+> na uma instância adotante durante uma auditoria real de produção (WRR/Modo Equilíbrio,
+> 01-02/jul/2026). Autoria do método: uma instância adotante (T1 hub). Esta KB porta o **conceito
+> generalizado**; a implementação de referência vive em um adotante (`scripts/kg/radar.js` +
+> `docs/<adopter>/graph/audit.kg.yaml`).
 >
 > **Gate (comando `/meta:kg`): ✅ CUMPRIDO em 2026-07-04** — o core dogfoodou o método na rodada
 > de `/meta:evolve` ([`onion-evolution-2026-07.kg.yaml`](../../onion/graph/onion-evolution-2026-07.kg.yaml),
@@ -16,11 +16,11 @@
 > **Rampa de vertical**: este padrão é a espinha da vertical `onion-investigation` — desenho, rampa
 > F0-F3 e capability draft no ADR
 > [onion-adr-verticals-investigation-cartography-2026-07.md](../../analysis/onion-adr-verticals-investigation-cartography-2026-07.md).
-> **F1 disparou em 2026-07-04** (1º dogfood na federação, sessão rhilo — ver nota de doutrina abaixo)
+> **F1 disparou em 2026-07-04** (1º dogfood na federação, sessão de um adotante — ver nota de doutrina abaixo)
 > e **F2 executou no mesmo dia** (dogfood do core via `/meta:evolve` → `/meta:kg` + `kg-radar.sh`).
 > Resta F3 (plugin `onion-investigation`), gated por maturidade de uso.
 >
-> **Camada de DOMÍNIO promovida em 2026-07-10** — 2º dogfood do metagamify (sinal
+> **Camada de DOMÍNIO promovida em 2026-07-10** — 2º dogfood de campo (sinal
 > [2026-07-08-kg-dogfood-completo-promover](../../evolution/inbox/_processed/2026-07-08-kg-dogfood-completo-promover.md):
 > o grafo de auditoria evoluiu para SSOT de domínio) elevou o padrão a **duas camadas**
 > (`layer: audit|domain`), com radar-de-domínio e a materialização design/atom-map — ver seções abaixo.
@@ -32,8 +32,8 @@
 > radar) — e **só então** na camada de código (PR dirigido pelo veredito). `git merge` reconcilia
 > texto, não verdades.
 >
-> **Evidência de campo (1º dogfood na federação, 2026-07-04):** a instância rhilo reconciliou
-> `develop` (pesquisa da dose) × `rhilo/main` (motor deployado) num `wrr-audit.kg.yaml` — 56 nós,
+> **Evidência de campo (1º dogfood na federação, 2026-07-04):** a uma instância adotante reconciliou
+> `develop` (pesquisa da dose) × `<adopter>/main` (motor deployado) num `wrr-audit.kg.yaml` — 56 nós,
 > 81 arestas, zero contradições estruturais. O radar produziu veredito **por-verdade** impossível
 > de derivar de merge textual: uma verdade cruza DEV→PROD (hard `cap=0`, defesa-em-profundidade),
 > uma segura na develop (dose-para-meta, aguarda validação on-policy) e — o achado mais valioso —
@@ -58,22 +58,22 @@
 > mantém só o **valor local** (ex.: checar que os paths de `evidence:`/`trace:` existem em disco); a
 > forma/gramática é do radar. (Irmã da guarda anti-fail-open `kg-radar.sh:120-139`.)
 >
-> **Evidência de campo (granaai, dogfood 2026-07-17):** um `.kg.yaml` de 107 nós/154 arestas selou verde
+> **Evidência de campo (um adotante regulado, dogfood 2026-07-17):** um `.kg.yaml` de 107 nós/154 arestas selou verde
 > com `TRACES_TO` 0/10 (integridade perfeita, rastreabilidade órfã); e o fix de fail-open do radar
 > soberano não alcançou o validador local `kg-validate-v2.py` (gramática MAPA divergente) — o falso-verde
 > voltou pela porta do parser duplicado.
 >
-> **Remediação de referência (granaai, confirmada 2026-07-18):** a destilação de S1+S3a no KB foi
+> **Remediação de referência (um adotante regulado, confirmada 2026-07-18):** a destilação de S1+S3a no KB foi
 > verificada FIEL em campo — e a doutrina não só foi absorvida, foi **ACIONADA**: guiado por ela o
-> granaai reescreveu `kg-validate-v2.py` para **delegar** ao radar soberano (S3a) e regenerou o KG em
+> um adotante regulado reescreveu `kg-validate-v2.py` para **delegar** ao radar soberano (S3a) e regenerou o KG em
 > gramática LIST canônica, elevando os breadcrumbs de decisão de **10%→63%** (`TRACES_TO` nó→ADR, "A+");
 > a rastreabilidade *comportamental* (`layer: domain`, máquina de estados ancorada) fica como **template
 > gated-por-refactor**, não preventiva. Ou seja: **S1 dirigiu a remediação** — o loop adotante→core→adotante
 > fechou fiel, e há um exemplo de campo de referência.
 >
-> **Absorvida via o ingestor de doutrina** (trust-gated: granaai tem `can_correct_to: [onion-evolve]`):
+> **Absorvida via o ingestor de doutrina** (trust-gated: um adotante regulado tem `can_correct_to: [onion-evolve]`):
 > [onion-adr-doctrine-ingestor-2026-07](../../analysis/onion-adr-doctrine-ingestor-2026-07.md) · grafo da
-> absorção: `docs/onion/graph/granaai-doctrine-absorption-2026-07.kg.yaml` (radar exit 0).
+> absorção: `docs/onion/graph/<adopter>-doctrine-absorption-2026-07.kg.yaml` (radar exit 0).
 
 ## O problema que o padrão resolve
 
@@ -114,7 +114,7 @@ nunca deletar — `/meta:diary review`).
 > **pesquisa** (streams de deep-research cujos achados se refutam/superam — o veredito por-fonte, a
 > materialidade e as ressalvas `declarado≠verificado` são `status`/`confidence`/`impact`/`REFUTES`). Pesquisa
 > **nasce em KG, não morre em prosa** (doutrina 2026-07-17): 1ª instância `research/whatsapp-api-2026-07/`.
-> **Instância de campo** (gustavo-pulga/Tornak, `tornak.kg.yaml` Lote 10, verificada pelo `kg-radar.sh`
+> **Instância de campo** (um adotante, `<adopter>.kg.yaml` Lote 10, verificada pelo `kg-radar.sh`
 > soberano do core — 107 nós/172 arestas limpo): a mesma gramática auditou 2 decks de treinamento sem
 > nenhuma adaptação, e o próprio mecanismo de auto-correção operou fora de código — `C_TARDE_NUM_15`
 > (confidence 0.4) ficou `REFUTED` por `C_TARDE_NUM_21` (confidence 1.0, backed por correção humana):
@@ -125,14 +125,14 @@ nunca deletar — `/meta:diary review`).
 O grafo de **auditoria** é efêmero e append-mostly (a investigação de hoje); o grafo de **domínio**
 é durável (a ontologia do sistema: entidades, estados, eventos, regras). O audit **`TRACES_TO`** o
 domain — a investigação ancora suas verdades no modelo, e o modelo sobrevive à investigação. Foi
-essa separação que **evitou o inchaço** no 2º dogfood do metagamify (2026-07-08: 111 nós/170
+essa separação que **evitou o inchaço** no 2º dogfood de campo (2026-07-08: 111 nós/170
 arestas, 4 fatias de domínio, o SLOT-limbo **emergiu do modelo** como bug estrutural — não como
 achado de auditoria). Pragmatismo herdado do dogfood: **mesmo arquivo, campo `layer`** — separar em
 `*.domain.kg.yaml`/`*.audit.kg.yaml` só se a escala pedir.
 
 ### Footguns ao autorar o `.kg.yaml` (armadilhas de campo)
 
-Aprendido no dogfood intenso do adotante rhilo-metagamify (2026-07-15/16, reconciliação do SSOT
+Aprendido no dogfood intenso de um adotante (2026-07-15/16, reconciliação do SSOT
 WRR/Modo Equilíbrio): a autoria do `.kg.yaml` tem armadilhas silenciosas que **corrompem o grafo
 sem erro visível**. Evite:
 
@@ -163,7 +163,7 @@ sem erro visível**. Evite:
    `done` fora do plane PROD; órfãos; migalhas pendentes; ciclos `DEPENDS_ON`.
 4. **RADAR-DE-DOMÍNIO** — completude da camada `domain` (⚠ atenção, **não reprova** — um
    estado-absorvente pode ser terminal legítimo; o juízo é humano). As 5 checagens (promovidas do
-   dogfood metagamify 2026-07-08 + ADR design):
+   dogfood de campo 2026-07-08 + ADR design):
    - **estado-absorvente**: `state` que recebe `TRANSITIONS` e não emite nenhuma (limbo?);
    - **EVENT-sem-efeito**: `event` que não origina aresta nem dispara `TRANSITIONS` via `on:`;
    - **STATE-sem-dona**: `state` que nenhuma `entity` possui via `HAS_STATE`;
@@ -191,7 +191,7 @@ plane DEV; só o artefato vivo é plane PROD.**
 
 Um KG-SSOT que não é **re-executado** contra o estado vivo **apodrece silenciosamente** — vira "uma
 bela SSOT que mente", e um consumidor confiante (IA inclusive) *propaga* a mentira. Lição-mestra do
-dogfood mais intenso do padrão até hoje (adotante rhilo-metagamify, 2026-07-15/16: `doseMaxByLevel`
+dogfood mais intenso do padrão até hoje (um adotante, 2026-07-15/16: `doseMaxByLevel`
 no grafo `2/4/8/8/8` × real vivo `2/4/12/15/20`; bloqueador "aberto" já corrigido; feature "aguardando
 push" já deployada). O valor do KG **não** é ser escrito uma vez — é ser **re-verificável**. Duas
 guardas (ADR [`kg-freshness-gate`](../../analysis/onion-adr-kg-freshness-gate-2026-07.md)), a mesma
@@ -204,7 +204,7 @@ máquina com duas referências — *o radar recusa/avisa quando a SSOT driftou*:
   artefato móvel: `branch` | `commit` | `deploy` | `config` | `dump:...`). Isso estende o frescor a **nós DEV**
   que apontam para branch/commit (também apodrecem — F1.1, pós-campo), **sem inundar** claims epistêmicos
   comuns (um `question`/`claim` DEV sem `verified_against` não é cobrado).
-- **STALE-MISSING**: nó rastreado sem `verified_at:` → ⚠ (o modo-de-falha exato do campo — a SSOT do rhilo
+- **STALE-MISSING**: nó rastreado sem `verified_at:` → ⚠ (o modo-de-falha exato do campo — a SSOT de um adotante
   não tinha *nenhuma* disciplina de frescor, nem em PROD nem no nó DEV de estratégia `C_CONSOLIDATION_MAP`).
   **STALE-OLD**: `verified_at` anterior a **`meta.baseline:`** (uma data no `meta:`) → ⚠, a verdade envelheceu.
 - **Aviso, não erro** — um nó stale **mente**, não corrompe; o veredito certo é "re-verifique", não
@@ -277,12 +277,12 @@ O campo usa vários rótulos para **dois** conceitos em **dois** níveis. A rég
 ### Por que mecanismo, e não "lembre-se de consultar"
 
 Porque **conselho-que-depende-de-lembrar já falhou empiricamente — inclusive com quem escreveu o
-conselho**. Dois episódios distintos, do mesmo adotante (rhilo-metagamify), na mesma quinzena:
+conselho**. Dois episódios distintos, do mesmo adotante (um adotante), na mesma quinzena:
 
 | Episódio | Sinal | O que aconteceu |
 |---|---|---|
 | **origem da doutrina** | [`ssot-como-runtime-para-adr`](../../evolution/inbox/_processed/2026-07-16-ssot-como-runtime-para-adr.md) | montou o KG canônico e **o ignorou 3× na mesma sessão** — reconstruiu de git/memória enquanto o grafo já tinha a resposta (`E_ABANDON_APPLY_PROOF`, `C_CONSOLIDATION_MAP`) |
-| **escalada a mecanismo** | [`mandar-a-doutrina-kg-first`](../../evolution/inbox/_processed/2026-07-16-metagamify-mandar-a-doutrina-kg-first.md) | **depois** de escrever a doutrina, reincidiu **≥4×**: planejou um redesenho do WRR sem consultar o grafo. Ao consultar, o KG **corrigiu 4 erros** que ele cometeria — janela `7d`→**`14d` medido** (`C_WINDOW_SWEEP`); morte-da-chamada só-TTL→**sinal + derivação** (`C_ABANDON_PUSHED`/`Q_URANO_SIGNAL`); conflito com `I_NO_AGE_RELEASE`; e **metade do redesenho já existia como nó** (`R_DOSEPARAMETA`, `R_ADR018`) |
+| **escalada a mecanismo** | `mandar-a-doutrina-kg-first` | **depois** de escrever a doutrina, reincidiu **≥4×**: planejou um redesenho do WRR sem consultar o grafo. Ao consultar, o KG **corrigiu 4 erros** que ele cometeria — janela `7d`→**`14d` medido** (`C_WINDOW_SWEEP`); morte-da-chamada só-TTL→**sinal + derivação** (`C_ABANDON_PUSHED`/`Q_URANO_SIGNAL`); conflito com `I_NO_AGE_RELEASE`; e **metade do redesenho já existia como nó** (`R_DOSEPARAMETA`, `R_ADR018`) |
 
 > **A reincidência É o dado.** Não é falha de disciplina do consumidor — é falha de *design* do loop.
 > Um estado que depende de um evento que nunca chega é exatamente o bug do SLOT-limbo que o mesmo
@@ -335,7 +335,7 @@ antes.
 
 A rastreabilidade de **átomos de UI** não ganha grafo próprio — **estende esta camada domain**
 ([ADR](../../analysis/onion-adr-design-extends-kg-2026-07.md), gate satisfeito pelo artefato real do
-rhilo-app em [2026-07-09](../../evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md)):
+o app de um adotante em [2026-07-09](../../evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md)):
 
 - **átomo de informação** = nó `entity` com `layer: domain` (1 átomo = 1 fonte + 1 dono-de-exibição
   + 1 dono-de-escrita);
@@ -362,7 +362,7 @@ self-contained (grafo interativo + veredito do `kg-radar.sh` embutido), mesmo pa
 > **Situação (recognition-primed):** vai redesenhar/refatorar/assumir uma área e o conhecimento dela
 > vive espalhado (telas, endpoints, regras implícitas). **Playbook:** mapear a área como SSOT de
 > domínio ANTES de mexer — o contrato primeiro, o pixel/refactor depois. Nasceu de 2 dogfoods reais
-> do rhilo e se repete a cada adotante que assume uma área (metagamify → GranaAi → …).
+> de um adotante e se repete a cada adotante que assume uma área.
 
 O PFR completo (F0 inventário → F1 contrato → F2 `.kg.yaml` → F3 radar → F4 adaptador) vive no
 comando [`/meta:kg`](../../../.claude/commands/meta/kg.md) §Modo map. O essencial doutrinário:
@@ -390,12 +390,12 @@ comando [`/meta:kg`](../../../.claude/commands/meta/kg.md) §Modo map. O essenci
 O gate abriu (2026-07-04) e a camada domain foi promovida (2026-07-10, sinal
 [kg-dogfood-completo](../../evolution/inbox/_processed/2026-07-08-kg-dogfood-completo-promover.md)):
 o motor soberano `.claude/validation/kg-radar.sh` computa as 4 saídas + `--triples` do YAML puro,
-zero serviço externo, com fixtures no selftest de guardas. A implementação do rhilo reusa o stack ML
+zero serviço externo, com fixtures no selftest de guardas. A implementação de referência do adotante reusa o stack ML
 dele (embeddings MiniLM, pgvector, grafo `ElementLink`) — **não portar dependências**: o que viaja
 na federação é **schema + método**, nunca o código do motor.
 
 **Fase 2 semântica (método promovido, implementação soberana):** embeddings + cosseno para flagar
-redundância entre nós (o cluster do limbo no dogfood do metagamify foi detectado assim). Cada
+redundância entre nós (o cluster do limbo no dogfood de campo foi detectado assim). Cada
 instância implementa com seu stack; o core permanece determinístico até a escala pedir.
 
 ## Relações
@@ -405,5 +405,5 @@ instância implementa com seu stack; o core permanece determinístico até a esc
 - **Parentesco**: protocolo de re-teste do diário (`/meta:diary review`); doutrina de dogfood
   ([onion-dogfooding-doctrine](onion-dogfooding-doctrine.md)) — "invoque o artefato e observe" é a
   regra PROD-plane em outra roupa.
-- **Origem e crédito**: instância rhilo-metagamify, auditoria WRR (evidência: radar priorizou cura de
+- **Origem e crédito**: uma instância adotante, auditoria WRR (evidência: radar priorizou cura de
   raiz sobre paliativos; reconciliou 6 auto-correções como `REFUTES`; integridade pegou 3 órfãos).

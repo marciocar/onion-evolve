@@ -45,7 +45,7 @@ O harness usa **dois escopos de armazenamento** com lifecycles diferentes:
 O workdir é codificado como chave de namespace:
 
 ```
-/home/marciocar/rhilo-metagamify  →  -home-marciocar-rhilo-metagamify
+/home/<user>/<project>  →  -home-<user>-<project>
 ```
 
 **Regra:** toda `/` vira `-`; prefixo `-` no início. Garante unicidade sem criar

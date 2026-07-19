@@ -48,7 +48,7 @@ docs/knowledge-base/
 - [Domain Context Lifecycle](concepts/domain-context-lifecycle.md) — contexto de domínio como SSOT viva (CRUD+), não snapshot; fundamenta a regra L0 e o ciclo *Manage*
 - [Federação × Tipos de Uso](concepts/federation-usage-modes.md) — matriz canônica de reconciliação: 5 eixos A-E (tiers × adoção × topologias de sessão W1-W7), 3 namespaces de papel, gatilhos de graduação
 - [Identificar e Precificar Dor do Cliente](concepts/identificar-precificar-dor-cliente.md) — metodologias de produto
-- [Knowledge Graph SDAAL](concepts/knowledge-graph-sdaal.md) — **CANDIDATA** (nascida no rhilo, dogfood real): investigação como grafo ponderado (`REFUTES`/`SUPERSEDES`, planes DEV↔PROD, radar de atenção) + camada `domain` (SSOT durável), frescor/schema como guardas, e **§SSOT-as-runtime** (`read→verify→act→write`; KG-first + drive-to-verify). Gate cumprido em 2026-07-04 — `/meta:kg` existe
+- [Knowledge Graph SDAAL](concepts/knowledge-graph-sdaal.md) — **CANDIDATA** (nascida em campo, dogfood real): investigação como grafo ponderado (`REFUTES`/`SUPERSEDES`, planes DEV↔PROD, radar de atenção) + camada `domain` (SSOT durável), frescor/schema como guardas, e **§SSOT-as-runtime** (`read→verify→act→write`; KG-first + drive-to-verify). Gate cumprido em 2026-07-04 — `/meta:kg` existe
 - [Meeting Transcription to Knowledge Base](concepts/meeting-transcription-to-knowledge-base.md) — framework EXTRACT
 - [Multi-repo Federation](concepts/multi-repo-federation.md) — contratos spec-as-code + ledger git (topologia peer)
 - [Onion Abstraction Doctrine](concepts/onion-abstraction-doctrine.md) — quando algo vira SDAAL (e quando não vira): Teste do Eixo (≥2 impls reais · escolha do `.env` · consumidor cego) + Teste do Gatilho; 3ª irmã das doutrinas de decisão
@@ -60,7 +60,7 @@ docs/knowledge-base/
 - [Onion Relation Vocabulary](concepts/onion-relation-vocabulary.md) — TBox da ontologia leve: classes e predicados controlados com que o Onion descreve a si mesmo
 - [Onion Working Method](concepts/onion-working-method.md) — porta de entrada do método: Seleção (catálogo) + Execução (PFR + coordenação por modo) + Validação (dogfood + adversarial) + Disciplina; mapa de fontes meta-spec/KB/ADR/RFC
 - [Parallel Work Worktrees](concepts/parallel-work-worktrees-pattern.md) — trabalho paralelo em worktrees independentes
-- [Secret Handling (Agent)](concepts/secret-handling-agent.md) — regra dura: agente nunca pede/aceita segredo em texto claro; receituário capability-split → terminal real → efêmero → fora-de-banda → container (crédito: rhilo, dogfood real)
+- [Secret Handling (Agent)](concepts/secret-handling-agent.md) — regra dura: agente nunca pede/aceita segredo em texto claro; receituário capability-split → terminal real → efêmero → fora-de-banda → container (crédito: adotante de campo, dogfood real)
 - [Session Memory Lifecycle](concepts/session-memory-lifecycle.md) — memória persistente do harness como 4º contexto auditável, irmã de domain-context-lifecycle
 - [Fonte ≠ Derivação](concepts/source-vs-derivation.md) — fronteira física entre conhecimento-fonte e nossa leitura dele; família do "declarado ≠ verificado"
 - [Spec-as-Code Strategy](concepts/spec-as-code-strategy.md) — hierarquia de especificações (L0-L3)
@@ -79,7 +79,7 @@ docs/knowledge-base/
 - [Framework de Testes](frameworks/framework-testes.md) — White/Grey/Black-box, QA Story Points
 - [GitFlow Patterns](frameworks/gitflow-patterns.md) — branching, releases, versionamento
 - [QA Story Points](frameworks/qa-story-points.md) — matrizes de pontuação de QA
-- [Safe Multi-Branch Consolidation](frameworks/safe-multibranch-consolidation.md) — 2 lanes, migração-antes-do-código, salvage, build-green (promovida do dogfood rhilo)
+- [Safe Multi-Branch Consolidation](frameworks/safe-multibranch-consolidation.md) — 2 lanes, migração-antes-do-código, salvage, build-green (promovida do dogfood de campo)
 - [Spec-Driven Development Tools 2025](frameworks/spec-driven-development-tools-2025.md) — análise comparativa de ferramentas
 - [Test Strategy Scoring](frameworks/test-strategy-scoring.md) — thresholds e detecção de gaps de teste
 
@@ -148,7 +148,7 @@ docs/knowledge-base/
 **ai-strategies/**
 - [Object-Led Discovery & Fitting](agentic-patterns/ai-strategies/object-led-discovery.md) — promover objeto existente a papel premium via ciclo dirigível
 - [Breadcrumb Patterns](agentic-patterns/ai-strategies/breadcrumb-patterns.md) — forçar absorção vs acomodação no transformer
-- [Verify-the-Read-Path-First](agentic-patterns/ai-strategies/verify-read-path-first.md) — onde o dado vive é hipótese até rastrear quem o lê no código (crédito: rhilo)
+- [Verify-the-Read-Path-First](agentic-patterns/ai-strategies/verify-read-path-first.md) — onde o dado vive é hipótese até rastrear quem o lê no código (crédito: adotante de campo)
 
 **field-observations/**
 - [2026-06-30 — Harness Paths](agentic-patterns/field-observations/2026-06-30-harness-paths.md) — observação que originou este KB (promovida)

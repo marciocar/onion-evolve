@@ -1,6 +1,6 @@
 # Manuseio de Segredos pelo Agente — nunca em texto claro no chat
 
-> **Origem (crédito):** instância **rhilo-metagamify** (T1 hub), aplicado ao vivo em 2026-07-03
+> **Origem (crédito):** uma instância adotante (T1 hub), aplicado ao vivo em 2026-07-03
 > (instalação com sudo + dump de RDS de produção) — sinal upstream
 > `docs/evolution/inbox/_processed/2026-07-03-secret-handling-pattern.md`. Triado e promovido pelo
 > core em 2026-07-03. Spec no espírito SDAAL: markdown executável — o agente lê e segue.

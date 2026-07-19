@@ -46,7 +46,7 @@ fonte da verdade de estado, acima do git. É o **primeiro ato**, não um passo o
 - Sem `.kg.yaml` no repo → siga para o passo 1 (git).
 
 > **Por que primeiro — mecanismo, não conselho.** Reconstruir de git/memória com o KG "de lado" **já falhou
-> em campo repetidamente** (sinal metagamify 2026-07-16: o próprio autor da doutrina reincidiu ≥4×). O loop
+> em campo repetidamente** (sinal de campo 2026-07-16: o próprio autor da doutrina reincidiu ≥4×). O loop
 > consultar o KG **por padrão** é a forcing function; "lembrar de consultar" não é. Doutrina:
 > [knowledge-graph-sdaal.md](../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md) §SSOT-as-runtime.
 

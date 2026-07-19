@@ -401,9 +401,9 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
   **No ar**: site público **`onionevolve.com`** ("Onion Evolute — A Autobiografia de um Framework
   Vivo") e backend **`app.onionevolve.com`** (VPS com Caddy/TLS + clone do core em
   `/home/onion/onion-evolve`), deploy ~2026-06-29.
-- **Adotantes reais**: rhilo-metagamify (co-evolução ativa, lineages mapeadas em
-  `federation/members.yaml`), rhilo-app (sessões persistentes, Jira/ADF, multi-contexto) e
-  pulse-mais (1º adotante da vertical educacional; materiais publicados).
+- **Adotantes reais**: vários adotantes em campo — co-evolução ativa (lineages mapeadas em
+  `federation/members.yaml`), sessões persistentes (Jira/ADF, multi-contexto) e um adotante da
+  vertical educacional (materiais publicados).
 - **Família multi-plataforma**: hub `onion` ("prova de universalidade") + destilações por
   plataforma (cursor/codex/copilot/zed/antigravity) e o **Onion Mini** (`marciocar/onion-mini`,
   público) — a destilação máxima e produto de ENTRADA da família (destilação federada, ADR

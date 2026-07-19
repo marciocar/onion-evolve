@@ -3,7 +3,7 @@ title: "Federação e adoção do Onion — guia de síntese"
 date: 2026-07-06
 type: concept
 status: active
-confidentiality: "INTERNO — a seção 6.4 (Grana.Ai) segue a classificação de ../../analysis/onion-adr-granaai-consolidation-2026-07.md"
+note: "Os perfis da §6 são ilustrativos (anonimizados para circulação pública)."
 related:
   - multi-repo-federation.md
   - federation-usage-modes.md
@@ -14,7 +14,6 @@ related:
   - ../../../.claude/utils/trust/adapters/hub.md
   - ../../../.claude/utils/trust/adapters/standalone.md
   - ../../../.claude/utils/trust/adapters/consumer.md
-  - ../../analysis/onion-adr-granaai-consolidation-2026-07.md
 ---
 
 # Federação e adoção do Onion — guia de síntese
@@ -112,7 +111,7 @@ Fonte: [`/meta:adopt`](../../../.claude/commands/meta/adopt.md) (única via de e
 | **PASSO 0** | Captura a identidade da fonte (`onion-version.sh`) **antes de qualquer cd/cópia**; resolve o alvo (path ou clone); detecta o modo (greenfield/legacy/regulated). |
 | **Fase 1 — Engenharia reversa** | Pulada em greenfield. Em legacy/regulated, roda `/docs:reverse-consolidate` para alimentar o `technical-context` do alvo. |
 | **Fase 2 — Instalar** | Cria a branch/worktree `onion/adopt`; aplica o Procedimento de cópia segura (manifesto filtrado → `git archive` → tmp → diff → `cp`). |
-| **Fase 3 — Scaffold** | Cria `docs/{business,technical,compliance}-context/` vazios (governança **do alvo**, L1+); gera `CLAUDE.md` (never-clobber → `CLAUDE.onion.md` se já existir); registra hooks no `settings.json` (merge); cria o starter `docs/evolution/{inbox,inbound}/`; **gera `docs/onion/inventory.md` do alvo** — gap real descoberto no dogfood do pulse-mais (2026-07-05): o próprio hook recém-instalado bloqueava o 1º commit sem isso. |
+| **Fase 3 — Scaffold** | Cria `docs/{business,technical,compliance}-context/` vazios (governança **do alvo**, L1+); gera `CLAUDE.md` (never-clobber → `CLAUDE.onion.md` se já existir); registra hooks no `settings.json` (merge); cria o starter `docs/evolution/{inbox,inbound}/`; **gera `docs/onion/inventory.md` do alvo** — gap real descoberto no dogfood de um adotante (greenfield): o próprio hook recém-instalado bloqueava o 1º commit sem isso. |
 | **Fase 4 — Integrações (`.env`)** | Roda **dentro do alvo** (não da fonte) — `/meta:setup-integration`. |
 | **Fase 5 — Carimbar** | Escreve `.claude/.onion-version` no alvo com a identidade **da fonte capturada no PASSO 0** (nunca re-derivada do alvo). |
 | **Fase 6 — Relatório** | Auto-emite um relatório em `docs/evolution/inbound/` do alvo (nunca no `inbox/` dele — canais têm direção); oferece registrar o alvo em `members.yaml`. |
@@ -153,30 +152,26 @@ doutrina (master-prompt como bytecode) sem vendorizar `.claude/`. Existe precisa
 onde "adotar" termina e "destilar/citar" começa — um standalone de verdade sempre tem um
 `onion_version` verificável; este não tem porque não é o mesmo contrato.
 
-### 6.2 `pulse-mais` — adoção greenfield padrão
-`role: standalone`, `mode: greenfield`, `onion_version: c711baa17617` (**verificado** por
-`pin-integrity-check.sh` na própria adoção, 2026-07-05). Organização externa real
-(pulsemais.org.br) — o Onion **ajuda**, não é produto do Onion. Ciclo completo rodado até F1
-(vertical educacional).
+### 6.2 Adotante greenfield padrão
+`role: standalone`, `mode: greenfield`, `onion_version` **verificado** por `pin-integrity-check.sh`
+na própria adoção. Organização externa real — o Onion **ajuda**, não é produto do Onion. Ciclo
+completo rodado até F1 (vertical educacional).
 
-### 6.3 `rhilo-metagamify` — o único hub (T1) hoje
-`role: hub`, **multi-linhagem** (`framework` em `develop`, `production` em `rhilo/main` — cada
+### 6.3 Adotante hub (T1)
+`role: hub`, **multi-linhagem** (`framework` em `develop`, `production` em `<adopter>/main` — cada
 linhagem com seu próprio pin verificado). Na prática opera como standalone com potencial de crescer:
 tem a *capacidade* de ter sub-adotados (T2), mas nenhum existe ainda — `exposes_downstream: []`.
 
-### 6.4 `granaai` — regulated, trust elevado sem role elevado _(uso interno — ver confidencialidade)_
-`role: standalone`, `mode: regulated` (fintech real). Trust elevado incomum:
+### 6.4 Adotante regulado — trust elevado sem role elevado
+`role: standalone`, `mode: regulated` (ambiente regulado real). Trust elevado incomum:
 `can_correct_to: [onion-evolve]` — concedido não por hierarquia, mas por rigor comprovado: a mesma
 falha de lint (`|| return` sem argumento, abortando sob `set -e`) foi achada e corrigida
-independentemente lá **e** no core, no mesmo dia, 7h41 de diferença, zero comunicação entre as
-partes — descoberta convergente verificada via `git blame`. Ilustra a doutrina
-[fonte≠derivação](source-vs-derivation.md) na prática: a pergunta "a
-Grana.Ai deve ter seu próprio `source`?" foi respondida **não** — existe uma só fonte; o que o
-ambiente regulado precisa (controle deliberado de quando puxar updates) já é resolvido pelo campo
-`integration_branch: develop` explícito, sem duplicar autoridade. Detalhe completo, incl. os 2
-conflitos reais resolvidos no cherry-pick de reconciliação:
-[onion-adr-granaai-consolidation-2026-07.md](../../analysis/onion-adr-granaai-consolidation-2026-07.md)
-(interno).
+independentemente lá **e** no core, no mesmo dia, com poucas horas de diferença, zero comunicação
+entre as partes — descoberta convergente verificada via `git blame`. Ilustra a doutrina
+[fonte≠derivação](source-vs-derivation.md) na prática: a pergunta "um adotante regulado deve ter seu
+próprio `source`?" foi respondida **não** — existe uma só fonte; o que o ambiente regulado precisa
+(controle deliberado de quando puxar updates) já é resolvido pelo campo `integration_branch: develop`
+explícito, sem duplicar autoridade.
 
 ### 6.5 `onion-evolve` — o próprio core, também multi-linhagem
 `role: source`, T0. Sem bloco `trust:` (lê tudo por papel, não por concessão). Também vive em mais
@@ -200,7 +195,7 @@ entre o repo A e o repo B pode mudar sem quebrar o B".
   coordenados pelo maestro (producer primeiro, consumers depois) → se quebrar,
   `/meta:federation-rollback` guia a reversão na ordem inversa.
 - **Por que ainda não graduou:** o gatilho é "contrato que pode quebrar consumers **OU** 3-5+
-  adotantes" — hoje há 1 adotante real de peso (pulse-mais/granaai/rhilo ainda não trocam contratos
+  adotantes" — hoje há 1 adotante real de peso (os adotantes ainda não trocam contratos
   entre si) e 0 contratos registrados. O MVP mecânico existe e foi validado num ledger scratch;
   falta o ledger de produção com remote+concorrência real. Graduar antes disso seria especulação —
   o doc-bridge leve (§2-§6) já resolve o que existe hoje.
@@ -210,5 +205,4 @@ entre o repo A e o repo B pode mudar sem quebrar o B".
 - [federation-usage-modes.md](federation-usage-modes.md) — a matriz canônica dos 5 eixos (cenário/controle/tier/operação/topologia) + gatilhos de graduação
 - [source-vs-derivation.md](source-vs-derivation.md) — a doutrina que rege como este próprio documento deve se comportar
 - [`/meta:adopt`](../../../.claude/commands/meta/adopt.md) — o comando fonte de toda a §4
-- [`members.yaml`](../../evolution/federation/members.yaml) — os 5 perfis reais da §6
-- [onion-adr-granaai-consolidation-2026-07.md](../../analysis/onion-adr-granaai-consolidation-2026-07.md) — detalhe completo do caso §6.4 (interno)
+- [`members.yaml`](../../evolution/federation/members.yaml) — os perfis reais da §6 (uso interno)

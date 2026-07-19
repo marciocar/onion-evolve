@@ -61,7 +61,7 @@ Verificado ao vivo via `gh` em 2026-07-19:
 3. **Vitrine viva ou datada, nunca silenciosamente stale.** Se a face pública não sincroniza com a
    fonte, ela **declara** seu recorte ("snapshot de AAAA-MM-DD"); senão mente por omissão.
 4. **Adotante ancorado na fonte viva ≠ adotante preso.** Quem tem acesso e vendoriza `.claude/` do
-   core vivo (granaai, pulse-mais, metagamify) está **correto por design** — não confundir "vendoriza
+   core vivo (adotantes ancorados na fonte viva) está **correto por design** — não confundir "vendoriza
    do core" com "preso a um fork de incubação". O problema é **só** do cold-adopter externo
    (thread `Q_COLD_ADOPTER`, aberto em `members.yaml`).
 
