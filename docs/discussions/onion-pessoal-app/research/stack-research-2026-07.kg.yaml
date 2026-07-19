@@ -494,6 +494,35 @@ nodes:
     status: confirmed
     label: "ADR-001 rev.2 (proposed/gated): arquitetura consolidada — locus=nó pessoal confiável (NÃO VPS); core-clonado + LIFE_KG como path separado; auth≥A2A (mTLS+PKCE); radar como GATE (exit 1 bloqueia write); de-id PRÉ-upload; sem bypassPermissions"
 
+  # ==== F0 CONSTRUÍDO e PROVADO no G54 (2026-07-19) — fundação de dados do companheiro ====
+  - id: E_CIPHER_G54
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "Cifra-em-repouso PROVADA no G54 (Expo Go SDK 57, sem dev build): envelope XChaCha20-Poly1305 + scrypt (via @noble/ciphers DIRETO — age-encryption JS usa Web Streams inviáveis no Hermes) × isomorphic-git. Round-trip lossless, envelope oculta o plaintext (server-cannot-read), senha errada rejeitada (Poly1305). Executa o 'cifra=SOPS+age/filter-light' de D_SYNC — mesma primitiva que o age usa por baixo, sem o wrapper de streams. Corroborado independente em Node (fluxo principal). App: cipherProbe.ts (master)."
+  - id: E_KGSTORE_G54
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "life-KG runtime-grade PROVADO no G54: KG (schema_version + verified_at) → YAML (pacote yaml 2.9) → envelope cifrado (agora grava os params scrypt N/r/p = forward-compat vs cipherProbe) → commit isomorphic-git; chave 256-bit no expo-secure-store; só o .enc toca disco. Round-trip byte-a-byte, verified_at preservado, append + persistência versionada, zero plaintext. PROVOU YAML SOB HERMES (o desconhecido que a compat-research marcou p/ js-yaml). App: kgStore.ts + secureKey.ts + kgRuntimeProbe.ts (master, commit 1a6e5cd)."
+  - id: E_SYNC_G54
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "Sync on-device PROVADO no G54: push/clone do life-KG CIFRADO via isomorphic-git + http/web (fetch do Expo Go) ao repo GitHub PRIVADO dedicado marciocar/onion-pessoal-kg. Só ciphertext sobe → remote zero-knowledge por construção; clone decifra === original; verified_at sobrevive ao sync. Executa 'VPS/nuvem = remote zero-knowledge cifrado' de D_SYNC com um remote git PADRÃO. Validado antes contra o GitHub real em Node (dogfood). Bug pego: isomorphic-git 1.38 separa ref (local) de remoteRef; clone de branch não-default em repo vazio dá 'Could not find HEAD' → probe usa main. App: kgSync.ts + kgSyncProbe.ts (master, 208c7d1)."
+
 edges:
   # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
   - from: D_STACK
@@ -758,4 +787,15 @@ edges:
     edge_type: SUPPORTS
   - from: E_MARKET_2026
     to: D_DEFINITIVE
+    edge_type: SUPPORTS
+
+  # --- F0 provado no G54 (2026-07-19): o dogfood de dados sustenta as decisões de cifra/sync/store ---
+  - from: E_CIPHER_G54
+    to: D_SYNC
+    edge_type: SUPPORTS
+  - from: E_KGSTORE_G54
+    to: C_GITSYNC_LIGHT
+    edge_type: SUPPORTS
+  - from: E_SYNC_G54
+    to: D_SYNC
     edge_type: SUPPORTS
