@@ -9,12 +9,14 @@ flowchart TD
   metagamify["metagamify<br/>hub · legacy"]:::hub
   pulse_mais["pulse-mais<br/>standalone · greenfield"]:::standalone
   granaai["granaai<br/>standalone · regulated"]:::standalone
+  gustavo_pulga["gustavo-pulga<br/>standalone · greenfield"]:::standalone
   onion_mini["onion-mini<br/>standalone · distilled"]:::standalone
   marcio_pessoal["marcio-pessoal<br/>standalone · regulated"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
   granaai -.->|can-correct| onion_evolve
+  gustavo_pulga -->|adopts| onion_evolve
   onion_mini -->|adopts| onion_evolve
   marcio_pessoal -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
@@ -30,5 +32,6 @@ flowchart TD
 | metagamify | hub | legacy | gamification, nx-monorepo, asana-integration, metagamification | `8e22352da32f` |
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `4332ac8d1884` |
+| gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |

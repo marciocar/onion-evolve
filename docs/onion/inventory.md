@@ -11,7 +11,7 @@
 | Comandos invocáveis | **97** |
 | Agentes | **51** |
 | Skills | **8** |
-| Knowledge Bases | **77** |
+| Knowledge Bases | **78** |
 
 ## Comandos por categoria (10 categorias + root)
 
