@@ -278,9 +278,10 @@ nodes:
     layer: audit
     plane: DEV
     impact: 5
-    confidence: 0.85
-    status: open
-    label: "ADR-003 (proposto, aguarda ratificação): desenho definitivo v1 do Onion Pessoal. INVARIANTE 0 = OPÇÃO C (híbrido soberano): life-KG mora no device (git-sync) + cérebro LLM na nuvem via BYOK + de-id LOCAL (regra v1 → SLM depois) como portão; NENHUM KG cru sai do device. Runtime app-orquestrado (Vercel AI SDK direto no caminho privado; VPS/bridge NUNCA toca KG cru, fica no público/federação). STT externo v1 (áudio vaza, aceito). Core loop conversa-first (captura=espelho); build F0(dados)→F1(motor de-id+loop)→F2(superfície)→F3(SLM/Poco); protocolo N=1 Marcio uso diário"
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "ADR-003 RATIFICADO (2026-07-19, após revisão adversarial — 3 furos endurecidos): desenho definitivo v1 do Onion Pessoal. INVARIANTE 0 = OPÇÃO C (híbrido soberano): life-KG mora no device (git-sync) + cérebro LLM na nuvem via BYOK + de-id LOCAL (regra v1 → SLM depois) como portão; NENHUM KG cru sai do device. Runtime app-orquestrado (Vercel AI SDK direto no caminho privado; VPS/bridge NUNCA toca KG cru, fica no público/federação). STT externo v1 (áudio vaza, aceito). Core loop conversa-first; build F0(dados)→F1(motor de-id+loop)→F2(superfície)→F3(SLM/Poco); N=1 Marcio. FUROS DA REVISÃO: (1) de-id de regra frágil → Saúde/Relações gated/over-redação, começa por Trabalho; (2) origem soberana do KG migra p/ FORA da VPS (cifra em repouso se remote de nuvem); (3) C-direct risco de inflar F1 + kg-radar JS divergir → teste de conformidade JS↔sh + fallback bridge no nó confiável"
 
   # ==== plano-B do SLM + standards a não perder (deep-research wzxz11dvf, 2026-07-18) ====
   - id: E_STANDARDS

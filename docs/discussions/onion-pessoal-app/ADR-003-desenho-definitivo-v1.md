@@ -1,6 +1,6 @@
 ---
 title: "ADR-003 — Onion Pessoal: desenho definitivo v1 (do smoke-test ao companheiro N=1)"
-status: proposto — aguarda ratificação do maestro
+status: aceito — ratificado pelo maestro 2026-07-19 (após revisão adversarial; 3 furos incorporados)
 date: 2026-07-19
 supersedes: none
 depends_on: [ADR-001-arquitetura, ADR-002-vercel-ai-sdk]
@@ -51,6 +51,21 @@ na VPS** (cwd=core). O companheiro definitivo fala com o **life-KG do Marcio** �
 | **De-id** (portão que protege o KG antes de sair) | **LOCAL por regra** (adapter `de-identification`, redação regex/dicionário, round-trip `restore(redact(t))===t`) | SLM on-device (melhor qualidade contextual) quando `Q_DEID`/`Q_PERF` fecharem (Poco) | **SEMPRE local** — de-id na nuvem vazaria o que devia proteger. `none` = fail-safe (bloqueia envio). |
 | **STT** (transcrição de voz) | **externo/nuvem** (Whisper/Deepgram/Groq via adapter `speech-to-text`) — o áudio sai do device | STT on-device (executorch `useSpeechToText`, dev build) quando o SLM chegar | Vaza o áudio (aceito pelo maestro 2026-07-19, análogo ao cérebro-nuvem). Trocável sem tocar no resto. |
 
+**Sequenciamento por sensibilidade (revisão 2026-07-19, Furo 1):** de-id por regra é **FRÁGIL** (perde
+identificadores indiretos, nomes fora do dicionário). Portanto o **v1 NÃO expõe as verticais mais sensíveis
+(Saúde, Relações) ao cérebro-nuvem via de-id-de-regra**: começa por **Trabalho** (menor dano se vazar); as
+sensíveis operam em **over-redação** (redige agressivo, aceita perda de contexto) ou ficam **gated no de-id por
+SLM on-device (F3)**. `none`=fail-safe bloqueia o envio se o de-id não rodar. — o portão frágil não guarda o
+cofre mais caro até endurecer.
+
+### 2.2. Onde o life-KG persiste e sincroniza (revisão 2026-07-19, Furo 2)
+O life-KG cru vive no **device** (primário) e num **nó confiável do Marcio** (secundário/backup — notebook/
+mini-server). O **remote git de origem NÃO é a VPS** (disco de terceiro). Se um remote de nuvem for usado p/
+durabilidade (ex.: GitHub privado), o KG cru vai **cifrado em repouso** (git-crypt/age) — *repo privado ≠
+soberano; só cifrado conta*. **Hoje `~/onion-pessoal/` mora na VPS (estado pré-definitivo)** → **F0 inclui migrar
+a origem soberana p/ FORA da VPS** (device + nó confiável; a VPS deixa de ser guardiã do KG cru). Ink&Switch
+valida device=primário, servidor=secundário.
+
 **Consequência topológica:** a VPS/bridge **não é** o cérebro privado. O `onion-bridge` genérico segue para o
 **caminho público/federação** (dev/PM, A2A — ADR-001 D8); o **companheiro privado nunca lhe manda life-KG cru**.
 
@@ -87,6 +102,11 @@ O loop `read → verify → act → write` roda **no device**, com o LLM como ú
   **nó confiável do Marcio** (notebook/mini-server) rodando Agent SDK sobre o life-KG. **Lean: C-direct** (app
   orquestra, zero servidor a manter) para o v1; promover a "bridge no nó confiável" só se o loop ficar complexo
   demais. Em nenhum caso a VPS toca o KG cru.
+  - **Risco (revisão 2026-07-19, Furo 3):** C-direct **reimplementa** o agent-loop (tool-calling, sessão,
+    reconciliação) → pode inflar F1; e o **kg-radar JS arrisca DIVERGIR** do canônico (`.sh`). Mitigação: portar
+    só o **subset de integridade/schema** (não a reconciliação inteira) + **teste de conformidade JS↔sh** (mesmo
+    `.kg.yaml`, mesmo veredito); **fallback pronto** = bridge no nó confiável (reusa Agent SDK + o radar canônico
+    sem porta). **Gatilho de troca:** se o loop app-side exceder o esforço do fallback já em F1, promove o bridge.
 
 ---
 
@@ -110,8 +130,9 @@ Reúso vivo do core (ADR-001): o app **compõe** `kg-radar`, a prévia dialógic
 
 Substância antes de superfície. Cada fase **dogfooda o artefato de verdade** (não só plano/lint).
 
-- **F0 — Fundação de dados (barato, pré-requisito).** life-KG runtime-grade no device: schema + `verified_at`,
-  sync git device↔`~/onion-pessoal/` (isomorphic-git). *Gate: kg-radar on-device exit 0.*
+- **F0 — Fundação de dados (barato, pré-requisito).** life-KG runtime-grade: schema + `verified_at`; **migrar a
+  origem soberana p/ FORA da VPS** (device primário + nó confiável; cifrado se em remote de nuvem — §2.2); sync
+  git via isomorphic-git. *Gate: kg-radar on-device exit 0 + nenhum KG cru em disco de 3º.*
 - **F1 — Motor privado (o coração do C).** Adapter `de-identification` LOCAL (regra) + `speech-to-text` (externo) +
   loop `read→de-id→Vercel-AI-SDK(BYOK)→restore→write` + kg-radar JS. *Gate: um dump de voz vira nós no life-KG,
   de-id'd, sem KG cru saindo (provar no proxy de rede).*
@@ -141,6 +162,15 @@ Substância antes de superfície. Cada fase **dogfooda o artefato de verdade** (
 - **Sub-decisão do build (F1):** C-direct (lean) vs bridge-no-nó-confiável — decide com o código na mão.
 - **Herança do core (G1):** o app adota o *método* (não vendoriza `.claude/`); update-path docs-only segue
   como peça a desenhar (ADR-001 D1).
+
+## 7.1. Revisão adversarial (2026-07-19) — 3 furos incorporados antes de ratificar
+1. **De-id de regra é frágil pro cofre mais caro** → §2.1 sequencia por sensibilidade (Trabalho primeiro;
+   Saúde/Relações em over-redação ou gated no SLM de-id).
+2. **A origem soberana do KG não podia ser a VPS** (contradizia a própria INVARIANTE 0) → §2.2 + F0: origem
+   migra p/ device + nó confiável; cifra em repouso se em remote de nuvem.
+3. **C-direct pode inflar F1 + kg-radar JS pode divergir** → §3 nomeia o risco, o teste de conformidade JS↔sh
+   e o fallback (bridge no nó confiável) com gatilho de troca.
+Nenhum furo derruba a INVARIANTE 0 = C; os três a **endurecem**. Ratificado.
 
 ## 8. Rastreabilidade
 ADR-001 (arquitetura, INVARIANTE 0) · ADR-002 (Vercel AI SDK) · KG: `C_GITSYNC_LIGHT`, `E_GITPROBE_G54`,
