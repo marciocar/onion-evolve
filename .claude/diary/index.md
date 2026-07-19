@@ -1,17 +1,18 @@
-# Diário — close-crumb
+# Diário — onion-evolve
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 51 entradas · **Stale:** 0 · **Compartilháveis:** 39
+**Total:** 52 entradas · **Stale:** 0 · **Compartilháveis:** 40
 
-Gerado em: 2026-07-18
+Gerado em: 2026-07-19
 
 ---
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-19 | innovation | collective 📤 | farol-organizer-key-by-worktree | 2026-10-15 | static |
 | 2026-07-18 | innovation | collective 📤 | write-kg-closing-step-bookend | 2026-10-15 | static |
 | 2026-07-18 | innovation | collective 📤 | self-reinforcing-radar-loop | 2026-10-15 | static |
 | 2026-07-18 | observation | collective 📤 | runtime-drained-safe-backlog | 2026-09-15 | static |
