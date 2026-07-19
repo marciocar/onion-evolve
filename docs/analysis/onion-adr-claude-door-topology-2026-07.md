@@ -119,9 +119,9 @@ Registrado como `role: standalone`, pin `c9eb2c40bc3b` **verificado** por `pin-i
 |---|---|---|
 | P0 | Investigação + doutrina `porta ≠ core` + este ADR | ✅ 2026-07-19 |
 | P1 | D4 — registrar gustavo-pulga em `members.yaml` | ✅ 2026-07-19 |
-| P2 | D2 — maestro ratifica A (e o gatilho de B) | ⏳ aguarda ratificação |
+| P2 | D2 — maestro ratificou → **B via adopt** (ver [family-repo-topology ADR](onion-adr-family-repo-topology-2026-07.md)) | ✅ 2026-07-19 |
 | P3 | D3 — datar hub + 5 portas ("snapshot 06-04") | ⏳ gated (repos públicos, fora desta árvore) |
-| P4 | D2-B — porta pública destilada | ⏳ gated até 1º cold-adopter externo (`Q_COLD_ADOPTER`) |
+| P4 | Porta pública `onion-standalone` (B via adopt) — nascer via `/meta:adopt` role-scoped | ⏳ gated (family-topology F2; `Q_COLD_ADOPTER` segue aberto) |
 
 ## Referências
 
