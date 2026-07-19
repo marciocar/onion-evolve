@@ -26,18 +26,35 @@
 
 - (•) **hub = adoção de EMPRESA (federação como camada de time); standalone = dev solo com a ferramenta COMPLETA, mas SEM federação; consumer = adota um hub (bundle a definir); um standalone pode evoluir p/ hub (chega o multi) OU virar consumer** ← ratificado
 
-**Status:** `ratificado` (2026-07-19) · **Base:** pesquisa orquestrada [`onion-tier-matrix-2026-07`](../evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md) — convergência motor+doutrina+mercado (Anthropic separa na MESMA junta: capability individual plena vs marketplace/governança gated a Team/Enterprise; land-and-expand). **Fronteira de venda = a federação** (o "texto"/framework grátis no standalone; a rede é o upsell/moat no hub). **Codificado:** eixo `work_tools` em `roles.yaml` (PR #443). **Propagado:** `strategy.md`/`journey.md`/`personas.md`/`sales-process.md`. **Trava:** vender federação como upsell limpo **depende de D2** (garantia local-first+destilado).
+**Status:** `ratificado` (2026-07-19) · **Base:** pesquisa orquestrada [`onion-tier-matrix-2026-07`](../evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md) — convergência motor+doutrina+mercado (Anthropic separa na MESMA junta: capability individual plena vs marketplace/governança gated a Team/Enterprise; land-and-expand). **Fronteira de venda = a federação** (o "texto"/framework grátis no standalone; a rede é o upsell/moat no hub). **Codificado:** eixo `work_tools` em `roles.yaml` (PR #443). **Propagado:** `strategy.md`/`journey.md`/`personas.md`/`sales-process.md`. **Destravado (2026-07-19):** D2 ratificou a **direção** (c local-first+destilado) → vender federação como upsell limpo está desbloqueado em **arquitetura**; a **ativação** do flywheel de dado segue `gated` (ver D2).
 
-## D2 — Moeda-dado / federação de contexto
+## D2 — Moeda-dado / federação de contexto `[ratificado 2026-07-19 — DIREÇÃO; ATIVAÇÃO gated]`
 
 **Pergunta:** o modelo usa "compromisso de dado" (adotantes contribuem contexto → flywheel de federação)?
 
-- ( ) Sim, sem restrição forte agora
-- (•) **É hipótese — registrar e decidir depois** ← escolhido
-- ( ) Sim, mas local-first + destilado
-- ( ) Não por ora — só moeda-financeira
+> **O card fundia duas decisões** — DIREÇÃO (arquitetura) e ATIVAÇÃO (ligar o flywheel). Ratificadas em separado.
 
-**Status:** `aberto` · **Nota:** colide com a fronteira **P5 (mitigação de inferência)** do `discuss/onion-pessoal-marcio` — se dados entram no modelo, privacidade/inferência vira restrição de produto. Resolver P5 destrava/bloqueia esta.
+**DIREÇÃO (arquitetura) — RATIFICADA:**
+- ( ) Sim, sem restrição forte agora — ❌ **ELIMINADA** (regride a postura fail-safe já ratificada + colide com EU AI Act/EDPB no exato pilar que o Onion vende, compliance-peer)
+- ( ) É hipótese — adiar — ⤴ superada (só empurrava o bloqueio de D7)
+- (•) **Sim, mas LOCAL-FIRST + DESTILADO** ← **ratificado (direção)**
+- ( ) Não por ora — só moeda-financeira — 🛟 retido como **REDE** (fallback pré-comprometido se o custo do mecanismo inviabilizar; **nunca (a)**)
+
+**ATIVAÇÃO — `gated`.** Ratificar a direção **≠** ligar o flywheel. **Gatilho:** o SSOT único das 6 camadas
+(classificação-por-inferência + gate-por-propósito + ε-ledger) **construído + dogfoodado**; o threat model
+**N-tenant** verificado com lente própria (⚠️ P5 foi provada em **N=1 pessoal** — a extrapolação p/ N-tenant é
+**a verificar**, não citar P5 como bloqueio direto); abertas de ε / purpose-binding / taxonomia L3 resolvidas.
+
+**Mecânica (c):** o contexto de negócio **bruto fica soberano/local** (git como SoT); só **predicado destilado/
+agregado sobe**; classificação por **PIOR CASO DE INFERÊNCIA** (P4 — herda o que permite deduzir, não o que
+afirma); gates de saída **L1-L6** (05-mitigacao-inferencia). Estruturalmente = a doutrina **RFC-0004** (single-source
+p/ identidade/contratos; federa-se só a derivação/comunicação) aplicada a um domínio novo.
+
+**Guardrails:** **nunca** anunciar (c) como garantia operacional antes do mecanismo existir + dogfoodado
+(declarado≠verificado — venderia garantia não-construída = **queima o moat**); registrar o **resíduo** (~7-8%,
+nunca zero — LLM reconstrói atributos mesmo do destilado); **nunca relicenciar** depois de abrir.
+
+**Status:** `ratificado` (direção) · `gated` (ativação) · **Base:** pesquisa [`onion-d2-data-currency-2026-07`](../evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md). **Destrava:** D7 (federação como upsell limpo).
 
 ## D3 — Onion Pessoal / leigo final + mentoria
 
