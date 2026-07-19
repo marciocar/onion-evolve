@@ -97,7 +97,7 @@ linha, listas com `- id:`/`- from:` — o radar é awk, não parser YAML complet
 
 **As duas camadas (distinção epistêmico×domínio):** `audit` = o que a investigação *acredita*
 (efêmero, append-mostly); `domain` = o que o sistema *é* (durável, SSOT: entidades, estados,
-eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção do metagamify (dogfood
+eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção de um adotante (dogfood
 2026-07-08), promovida como schema+método. Mesmo arquivo, campo `layer` (separar só se a escala pedir).
 
 ## ⚡ Etapas
@@ -133,14 +133,14 @@ bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-console.sh <arquivo> > grafo.html      
 - **RECONCILIAÇÃO** = as auto-correções registradas (REFUTES/SUPERSEDES).
 - **RADAR-DE-DOMÍNIO** = completude da camada `domain` (⚠ atenção, **não reprova**): estado-absorvente ·
   EVENT-sem-efeito · STATE-sem-dona · RULE-sem-trace · fonte-única (>1 READS — átomo lendo de 2 fontes).
-  *Foi esta checagem que fez o SLOT-limbo emergir do modelo no dogfood do metagamify.*
+  *Foi esta checagem que fez o SLOT-limbo emergir do modelo no dogfood de campo.*
 - **INTEGRIDADE** = órfãos, arestas para nós inexistentes, contradições (REFUTES entrando em nó
   ainda `confirmed`), enums inválidos (incl. `layer`, `on:` para evento inexistente).
   **Exit 1 = reconciliar antes de commitar.**
 - **FRESCOR** (⚠ **não reprova**) = a SSOT foi re-verificada contra o vivo? **STALE-MISSING** (nó rastreado —
   `plane:PROD` **ou** com `verified_against:` — sem `verified_at:`) · **STALE-OLD** (`verified_at` anterior à
   `meta.baseline`). Cobre nós DEV que rastreiam artefato móvel (branch/commit), não só PROD. Um nó stale
-  **mente**, não corrompe — o veredito é "re-verifique". *Nasceu da lição-mestra do dogfood rhilo.*
+  **mente**, não corrompe — o veredito é "re-verifique". *Nasceu da lição-mestra do dogfood de campo.*
 - **SCHEMA** (✗ **reprova**, exit 1) = `meta.schema_version` bate com o que o radar entende? Divergência
   = recusa (o radar não sabe ler o arquivo); ausência = ⚠ retrocompat. *Teria pego o fork de ferramenta
   no dia 1.*
@@ -153,7 +153,7 @@ bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-console.sh <arquivo> > grafo.html      
 ## 🗺️ Modo map — mapeamento completo de uma área (PFR)
 
 `map <área>` mapeia uma área do sistema como **SSOT de domínio** antes de qualquer redesign/refactor.
-Destilado dos 2 dogfoods do metagamify/rhilo-app (fatias de domínio WRR/SLA + atomização do
+Destilado dos 2 dogfoods de campo (fatias de domínio de produção + atomização do
 command-center — exemplares em `docs/evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md`
 e `2026-07-08-kg-dogfood-completo-promover.md`). Workflow faseado retomável; cada fase fecha com commit.
 
@@ -228,7 +228,7 @@ nunca o componente). Redesign/refactor só começa aqui — **dirigido pelo cont
   Doutrina: [ADR design-extends-kg](../../../docs/analysis/onion-adr-design-extends-kg-2026-07.md).
 - **Fase-2 semântica** (método, não código do core): embeddings + cosseno para flag de redundância
   entre nós — cada instância implementa com seu stack (soberania); o core fica no determinístico.
-- 1º dogfood real (56 nós/81 arestas no rhilo; 37 nós/33 arestas no core): ver
+- 1º dogfood real (56 nós/81 arestas em um adotante; 37 nós/33 arestas no core): ver
   [onion-evolution-2026-07-04.md](../../../docs/analysis/onion-evolution-2026-07-04.md) e o sinal
   [2026-07-04-kg-primeiro-dogfood-federacao.md](../../../docs/evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md).
 

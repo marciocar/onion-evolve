@@ -212,7 +212,7 @@ OLD_MODE="$(awk '/^mode:/{print $2}' "$STAMP" 2>/dev/null)"
 OLD_INTBRANCH="$(awk '/^integration_branch:/{print $2}' "$STAMP" 2>/dev/null)"
 
 # Usar valor coletado ou preservar o antigo ou usar fallback
-# ⚠️ NUNCA "adivinhar" o pin com o HEAD atual do core (incidente 2026-06-30/rhilo: um restore manual
+# ⚠️ NUNCA "adivinhar" o pin com o HEAD atual do core (incidente 2026-06-30/um adotante: um restore manual
 #    carimbou o HEAD da fonte sem copiar os arquivos correspondentes → o anúncio downstream "você já
 #    tem o fix" saiu falso). `unknown` é honesto e resolvível: o /meta:adopt --update tem guard
 #    pin-integrity que detecta pin não confiável e re-sincroniza via cópia segura completa.
@@ -269,7 +269,7 @@ Adapter: `.claude/utils/task-manager/adapters/<provider>.md`.
 | `<integration_branch>` | integração / base dos PRs Onion | não | framework, docs, co-evolução |
 | `main` | produção | **sim** (verificar deploy real) | release |
 
-> ⚠️ **Regra de linhagem** (sinal de campo rhilo 2026-07-03): se o repo tem MAIS de uma linhagem
+> ⚠️ **Regra de linhagem** (sinal de campo um adotante 2026-07-03): se o repo tem MAIS de uma linhagem
 > longa (ex.: trilho de produto ≠ trilho de integração), declare TODAS aqui com papel + regra de
 > PR por trilho — e **nunca** infira produção do nome da branch: produção = commit deployado
 > (registry/ECS) + config viva, não a branch que a doc aponta.

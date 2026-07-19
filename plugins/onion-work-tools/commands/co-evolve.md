@@ -37,7 +37,7 @@ Mapear: **`role: source` → CORE** (`onion-evolve`, dono do framework + protoco
 > mergeado em `origin/main`, não via doc-bridge) só "chega" ao inbox quando o **checkout de `main`
 > sincroniza** — worktrees compartilham o `.git` mas têm working trees separados; um merge no forge **não**
 > atualiza um checkout que não deu `pull`. Rode **`git fetch origin && git pull --ff-only`** (ou `git merge --ff-only origin/main`) antes de listar o inbox. Lição de campo 2026-07-16: o sinal
-> `onion-pessoal-usando-dogfood-kg-sdaal` "não chegou" na 1ª leitura por checkout 3 commits atrás. Isto
+> `método pessoal-usando-dogfood-kg-sdaal` "não chegou" na 1ª leitura por checkout 3 commits atrás. Isto
 > **complementa** o invariante "git fetch antes de evoluir" (Passo 4) — aqui é antes de **ler**, não só de escrever.
 
 Listar de 1º nível (excluir `_processed/` e `README.md`) **os dois canais** do doc-bridge:
