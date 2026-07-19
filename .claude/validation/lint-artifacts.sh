@@ -1247,6 +1247,13 @@ _scan_relative_links() {
   # que os referencia resolve no CORE, mas o alvo é ausente-por-desenho no adotante. Pular SÓ o
   # alvo-ausente que cai nesses prefixos; a checagem de link KB-interno (arquivo que DEVERIA existir)
   # continua ativa. No core (role: source) o guard é no-op (os docs existem).
+  #
+  # Extensão porta-de-framework (ADR onion-adr-family-repo-topology-2026-07 D4 + roles.yaml): um door
+  # role-scoped (bundle 'standalone') SELA a meta-factory (commands/meta + agents/meta) e os verticais
+  # não-base (design/development/quick commands; compliance/research agents; lint-selftest e demais
+  # validações meta). KBs de doutrina embarcados citam esses arquivos por link — ausentes-por-desenho no
+  # door, exatamente como os docs core-only. Só ATIVA quando o alvo está ausente ([ ! -e ] abaixo): num
+  # adotante-cheio o alvo existe (nunca entra); no core (role: source) o guard nem roda. Backward-safe.
   local adopted=""; grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && adopted=1
   local f dir lineno target clean rel
   while IFS= read -r -d '' f; do
@@ -1260,6 +1267,10 @@ _scan_relative_links() {
           rel="$(realpath -m --relative-to="${REPO_ROOT}" "${dir}/${clean}" 2>/dev/null)"
           case "${rel}" in
             docs/analysis/*|docs/evolution/*|docs/discussions/*|docs/applying/*|docs/materials/*|docs/plans/*|docs/onion/*) continue ;;
+            # meta-factory + verticais não-base selados num door role-scoped (ausente-por-desenho)
+            .claude/commands/meta/*|.claude/commands/design/*|.claude/commands/development/*|.claude/commands/quick/*) continue ;;
+            .claude/agents/meta/*|.claude/agents/compliance/*|.claude/agents/research/*) continue ;;
+            .claude/validation/lint-selftest.sh|.claude/validation/federation-*|.claude/validation/kg-*|.claude/validation/graph.sh|.claude/validation/constellation-map.sh|.claude/validation/diary-index.sh|.claude/validation/a2a-*|.claude/validation/trust-topology-check.sh|.claude/validation/lint-design-tokens.sh) continue ;;
           esac
         fi
         violation "HARD" "${f}" "link relativo quebrado (linha ${lineno}): '${target}' não resolve — ${hint}"
