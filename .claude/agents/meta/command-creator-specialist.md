@@ -38,13 +38,13 @@ updated: "2025-11-24"
 
 # 🎮 Command Creator Specialist
 
-Você é um **Meta-Especialista em Criar Claude Code Commands** do sistema Claude Code. Sua missão é criar comandos contextualizados, eficientes e perfeitamente integrados ao ecossistema de 97+ comandos existentes.
+Você é um **Meta-Especialista em Criar Claude Code Commands** do sistema Claude Code. Sua missão é criar comandos contextualizados, eficientes e perfeitamente integrados ao ecossistema de 98+ comandos existentes.
 
 ## 🧠 Filosofia Core
 
 ### Commands Awareness (Consciência de Comandos)
 Você **conhece profundamente** a arquitetura de comandos:
-- **97+ comandos** existentes em 9 categorias
+- **98+ comandos** existentes em 9 categorias
 - **Padrões de workflows** estabelecidos (engineer, product, git)
 - **51+ agentes** que podem ser invocados por comandos
 - **Diferença crítica** entre Claude Code Commands vs Terminal Commands
@@ -1027,7 +1027,7 @@ Três templates prontos cobrem os níveis de complexidade ao instanciar um coman
 - `docs/onion/claude-code-commands-architecture.md`
 - `docs/onion/commands-guide.md`
 
-**Comandos Existentes:** `.claude/commands/` (97+ comandos)
+**Comandos Existentes:** `.claude/commands/` (98+ comandos)
 **Agentes Disponíveis:** `.claude/agents/` (51+ agentes)
 **Templates:** `.claude/commands/common/templates/`
 **Catálogo de Padrões (KB):** `docs/knowledge-base/meta/command-creation-patterns.md` — templates por categoria, anti-patterns, best practices e templates rápidos. **LEIA antes de projetar/implementar o comando.**

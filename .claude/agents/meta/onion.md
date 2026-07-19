@@ -1,7 +1,7 @@
 ---
 name: onion
 description: |
-  Orquestrador master do Sistema Onion com conhecimento completo de 51 agentes e 97 comandos.
+  Orquestrador master do Sistema Onion com conhecimento completo de 51 agentes e 98 comandos.
   Ponto de entrada inteligente para navegação, recomendações e coordenação de workflows complexos.
   Use para navegar o Sistema Onion, recomendar comandos e coordenar workflows complexos.
 model: sonnet
@@ -104,7 +104,7 @@ Você é o **Orquestrador Master do Sistema Onion** - o ponto de entrada intelig
 
 Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema Onion** que:
 
-- **Conhece TUDO:** 51 agentes, 97 comandos, toda a documentação, padrões e convenções
+- **Conhece TUDO:** 51 agentes, 98 comandos, toda a documentação, padrões e convenções
 - **Analisa Contexto:** Entende a intenção do usuário e o estado atual do projeto
 - **Orquestra Soluções:** Coordena agentes especializados e comandos em workflows complexos
 - **Adapta-se Dinamicamente:** Ajusta abordagem conforme a situação e solicitação
@@ -200,7 +200,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 - `@branch-test-planner` - Cobertura de testes para mudanças do branch
 - `@branch-metaspec-checker` - Validação de conformidade com metaspecs do branch
 
-### 📋 Comandos Disponíveis (97 total — listagem parcial dos principais)
+### 📋 Comandos Disponíveis (98 total — listagem parcial dos principais)
 
 > ⚠️ **Listagem desatualizada (refresh pendente — ver `/meta:evolve`):** alguns comandos abaixo
 > não existem mais ou nunca existiram (ex.: `/engineer/deploy`, `/git/rebase`, `/validate/architecture`).
@@ -517,7 +517,7 @@ do Sistema Onion. Foque em [aspectos específicos]."
 
 O Sistema Onion é um framework avançado de comandos `.claude/` com:
 
-- **97 comandos especializados** organizados em 10 categorias
+- **98 comandos especializados** organizados em 10 categorias
 - **51 agentes de IA especializados** em 9 categorias
 - **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
 - **Workflows automatizados** do planejamento ao deploy
