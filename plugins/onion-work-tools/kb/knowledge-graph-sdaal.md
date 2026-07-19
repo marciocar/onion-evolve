@@ -323,6 +323,39 @@ projeção `kg state` como irmã de 1ª classe do radar, e distribuição downst
 doutrina **gated-until-trigger** deste próprio padrão: o mecanismo vem depois do uso que o prove, não
 antes.
 
+## Multi-runtime — o motor tem UMA autoridade e portas conformance-gated (absorvida do campo: onion-pessoal-app)
+
+O validador local de `.kg.yaml` deve **DELEGAR** ao `kg-radar.sh`, nunca reimplementar a gramática —
+parser duplicado é onde o **falso-verde** volta (doutrina do local-validator, sessão 2026-07-18). Mas o
+campo achou a exceção que a regra não cobria: **um runtime onde o `.sh` não roda.** O app companheiro
+(`onion-pessoal-app`) precisa do gate de escrita **no device** — Hermes/React Native, sem bash. Delegar é
+impossível ali. A regra generalizada:
+
+> **O `kg-radar.sh` é a AUTORIDADE ÚNICA — o SSOT do motor.** Delegue quando o runtime permitir; quando ele
+> **proíbe** delegação (on-device/Hermes/…), uma porta em outro runtime é legítima **SÓ como adapter
+> conformance-gated** — e um **teste de conformidade porta↔`.sh` sobre os MESMOS fixtures É o gate
+> anti-drift** que a doutrina do local-validator exige. O que torna a reimplementação segura não é a porta;
+> é o conformance.
+
+**O corte certo do que portar** (validado em campo): porte o **subset que REPROVA** — INTEGRIDADE (ids
+duplicados, aresta para nó inexistente, órfão, enum inválido) + SCHEMA (versão). As camadas **analíticas
+soft** — reconciliação (REFUTES/SUPERSEDES), atenção (peso × centralidade), frescor, radar-de-domínio —
+**ficam no `.sh`** do nó confiável, porque não são gate: são leitura, não reprova. Um gate de escrita
+on-device só precisa do que reprova.
+
+**Invariante que o conformance protege:** a porta **não pode bifurcar a gramática**. Os **nomes de campo
+permanecem canônicos** — `node_type`, não `type` (o `.sh` é normativo: linha *"node_type: <tipo> (não
+`type:`)"*). Um perfil **leve** de KG (captura/pessoal) é sancionado como **subconjunto ESTRITO com nomes
+canônicos** — obrigatório `{schema_version, id, node_type, edges válidas}`; opcional `{impact, confidence,
+status, layer}` (alimentam a análise soft, degradam gracioso no radar completo). Leveza = **omitir
+opcionais**, nunca **renomear obrigatórios**; o conformance sobre os fixtures pega a bifurcação.
+
+**Origem de campo (2026-07-19):** `kgRadar.ts` (porta JS do subset-que-reprova) com conformance JS↔sh
+**6/6** — 1 KG válido + 5 defeitos (aresta pendurada, enum, id duplicado, schema divergente, edge_type).
+O sinal upstream perguntou se isto vira doutrina; vira: **kg-radar como SDAAL de múltiplos runtimes com
+contrato de conformidade.** É o mesmo princípio SDAAL do resto do Onion — uma abstração/autoridade, N
+implementações que provam conformidade ao contrato — aplicado ao motor de KG.
+
 ## Anti-whack-a-mole (disciplina complementar)
 
 - **SSOT-por-conceito**: uma variável = um significado; nomear distinto quando fluxos divergem.
