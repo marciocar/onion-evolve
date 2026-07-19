@@ -76,14 +76,17 @@ CONTRIBUTING.md             # Guidelines para evolução
 ├── sessions/               # Estado persistente de workflows faseados
 │   └── <feature>/          # Por feature em desenvolvimento
 │
-├── utils/                  # Abstrações e utilitários (SDAAL) + insumos operacionais de agentes
+├── utils/                  # Abstrações e utilitários (SDAAL) + insumos operacionais de agentes (lista representativa, não exaustiva)
 │   ├── task-manager/       # Task Manager Abstraction (factory, interface, types, detector, adapters/)
 │   ├── forge/              # Forge Abstraction — PR/review/CI/Release no host remoto (GitHub; gh-first, REST fallback)
+│   ├── trust/              # Trust SDAAL — topologia de confiança ENTRE instâncias (tier via members.yaml)
+│   ├── guardrails/         # Onion Guardrails — cerca de proveniência R15.1 do CORPO não-confiável (onion-untrusted-wrap.sh); ver KB onion-guardrails
 │   ├── c4-*.md             # Templates/regras C4 consumidos pelos agentes c4-* (detection, templates, mermaid, documentation)
-│   └── date-time-standards.md  # Padrões de data/hora
+│   ├── date-time-standards.md  # Padrões de data/hora
+│   └── …                   # demais insumos operacionais (adopt/, co-evolution/, scope/, vertical/, de-identification/, design-sink/, marketplace/, federation-transport/)
 │
 ├── rules/                  # Regras complementares (opcional)
-└── validation/             # Scripts de validação: inventory.sh, onion-version.sh, lint, federation-*
+└── validation/             # Scripts de validação: inventory.sh, onion-version.sh, lint, federation-*, guardrails/ (effect-gate R15.3b)
 ```
 
 ### 1.3 Estrutura de `docs/`

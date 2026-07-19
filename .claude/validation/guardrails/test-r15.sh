@@ -5,7 +5,7 @@
 
 set -uo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
-WRAP="${DIR}/onion-untrusted-wrap.sh"
+WRAP="${DIR}/../../utils/guardrails/onion-untrusted-wrap.sh"
 export ONION_WRAP_NONCE="testnonce"   # pin p/ asserção determinística
 PASS=0; FAIL=0
 

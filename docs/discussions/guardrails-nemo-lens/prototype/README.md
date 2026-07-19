@@ -6,9 +6,15 @@ date: 2026-07-12
 branch: discuss/guardrails-nemo-lens
 ---
 
-> ⚠️ **QUARENTENA.** Este é um spike isolado da discussão `guardrails-nemo-lens`, não o core.
-> Nada aqui está instalado em `.claude/`. Promoção ao core é passo **gated** (decisão do maestro).
-> Os helpers reais do core **não foram tocados** — R15.3a apenas *nomeia* guardas existentes.
+> ✅ **GRADUADO AO CORE (2026-07-19, F2 de `feature/onion-guardrails`).** Os 4 artefatos rodáveis deste
+> spike saíram da quarentena e viraram core (split por natureza): `onion-untrusted-wrap.sh` →
+> `.claude/utils/guardrails/`; `onion-effect-gate.sh`, `test-r15.sh`, `test-r15-3b.sh` →
+> `.claude/validation/guardrails/`, com runner `run_guardrails_selftests` no `lint-selftest.sh` (a guarda
+> das guardas). Este dir permanece como **registro de design** (os `.md` de constituição R15.2/R15.3b e os
+> resultados de dogfood ficam aqui). As tabelas abaixo descrevem os artefatos no estado de spike.
+>
+> ⚠️ **Histórico (era quarentena).** Spike isolado da discussão `guardrails-nemo-lens`; a promoção ao core
+> era passo **gated** (decisão do maestro) — cumprida em 2026-07-19.
 
 # Protótipo R15 — proveniência / quarentena de conteúdo não-confiável
 
