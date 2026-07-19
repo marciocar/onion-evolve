@@ -1,6 +1,6 @@
 # Processo de Vendas
 
-**Última Atualização:** 2026-07-13
+**Última Atualização:** 2026-07-19
 
 > Deriva do modelo comercial em camadas de [`../02-product/strategy.md`](../02-product/strategy.md) (`D1`) e da sequência de receitas (`D4`). Nesta fase, é **desenho**, não operação viva — receita/preço concretos são `[hipótese — D5]`.
 
@@ -11,7 +11,7 @@
 Não é B2C-SaaS de assinatura por assento. É **land-and-expand de alto ticket + camada de serviço**:
 
 ```
-mini (aha no repo do prospect) → compromisso (dado OU financeiro) → serviço/certificação
+mini (aha no repo) → standalone (framework completo grátis — fixa o hábito/MOAT) → [chega o MULTI] → hub (federação) OU compromisso financeiro → serviço/certificação
 ```
 
 O funil abre facilitado (mini prova valor rápido) e a progressão vira compromisso. A **moeda-dado** (federação de contexto) alimenta o que justifica a **moeda-financeira** (curadoria SOTA) — ver `strategy.md` §Modelo comercial.
@@ -21,7 +21,7 @@ O funil abre facilitado (mini prova valor rápido) e a progressão vira compromi
 - **Sinal primário:** sente delegation gap / drift / retrabalho com IA no dev.
 - **P4 — regulado/enterprise:** cunha de **maior valor** (governança/auditoria; disposto a pagar por reduzir risco). Ciclo longo.
 - **P3 — empresa c/ sistemas internos:** **volume org** mais provável (consistência/escala).
-- **P5 — dev solo:** ticket menor, entrada pelo mini.
+- **P5 — dev solo:** entrada pelo mini (teaser) + **standalone** (framework completo, **grátis**, sem federação). **Não** é meta de receita em volume (moat/advocacy — D5: solo não sustenta volume); converte a **hub** quando chega o MULTI (2ª pessoa/repo) — aí o alvo de receita real (P3/P4 empresa). `[reframe 2026-07-19]`
 - Ver personas em [`../01-customer/personas.md`](../01-customer/personas.md).
 
 ## Sequência de receitas `[inclinação — D4]`

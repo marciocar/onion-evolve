@@ -1,6 +1,6 @@
 # 🗂️ Registro de Decisões Estratégicas
 
-**Última Atualização:** 2026-07-13
+**Última Atualização:** 2026-07-19
 
 > Mecanismo de rastreio das decisões de negócio em aberto. Cada card é uma pergunta que você resolve **escolhendo** uma opção ou **descrevendo** livremente. Versionado no git → cada sessão avança daqui, não recomeça. Spec-as-code aplicado às decisões de negócio (dogfood do próprio Onion).
 >
@@ -19,6 +19,14 @@
 - ( ) Não-comercial, foco em sustentação
 
 **Status:** `hipótese` · **Lean:** camadas (BMAD/Wardley + selo SAFe/EOS). **Trava:** decidir o modelo **antes** de abrir publicamente (guardrail anti-relicenciamento). **Refina:** falta escolher gatilho de "abrir".
+
+## D7 — Semântica de tiers (hub / standalone / consumer) `[ratificado 2026-07-19]`
+
+**Pergunta:** o que separa os tiers de adoção, e o que cada um recebe/paga?
+
+- (•) **hub = adoção de EMPRESA (federação como camada de time); standalone = dev solo com a ferramenta COMPLETA, mas SEM federação; consumer = adota um hub (bundle a definir); um standalone pode evoluir p/ hub (chega o multi) OU virar consumer** ← ratificado
+
+**Status:** `ratificado` (2026-07-19) · **Base:** pesquisa orquestrada [`onion-tier-matrix-2026-07`](../evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md) — convergência motor+doutrina+mercado (Anthropic separa na MESMA junta: capability individual plena vs marketplace/governança gated a Team/Enterprise; land-and-expand). **Fronteira de venda = a federação** (o "texto"/framework grátis no standalone; a rede é o upsell/moat no hub). **Codificado:** eixo `work_tools` em `roles.yaml` (PR #443). **Propagado:** `strategy.md`/`journey.md`/`personas.md`/`sales-process.md`. **Trava:** vender federação como upsell limpo **depende de D2** (garantia local-first+destilado).
 
 ## D2 — Moeda-dado / federação de contexto
 

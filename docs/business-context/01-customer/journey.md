@@ -1,6 +1,6 @@
 # Jornada do Cliente
 
-**Última Atualização:** 2026-07-13
+**Última Atualização:** 2026-07-19
 
 Ciclo do adotante do Onion — descoberta → adoção → federação → advocacy. Adaptado à natureza do produto (framework instalável, não SaaS). Marcado `[INFERIDO]` onde não há campo ainda.
 
@@ -9,7 +9,7 @@ Ciclo do adotante do Onion — descoberta → adoção → federação → advoc
 ## Descoberta (awareness)
 
 - **Gatilho:** dor de contexto perdido / drift / retrabalho com IA no dev; ou desconforto com "vibe coding" (["vibe coding is dead", 2026](https://byteiota.com/spec-driven-development-kills-vibe-coding-march-2026/)). `[INFERIDO]`
-- **Fontes:** hoje boca-a-boca / rede do maestro (treinamentos, consultoria). Sem canal público ativo (`onion-evolve` é privado).
+- **Fontes:** boca-a-boca / rede do maestro (treinamentos, consultoria) + **a porta pública `onion-standalone`** (aberta 2026-07-19 — a instância adotável do framework para Claude Code; o core `onion-evolve` segue privado). O hub `marciocar/onion` aponta o dev solo p/ ela.
 - **Perguntas do prospect:** "isso é mais um repo de comandos?" "o que muda vs Claude Code puro / Spec Kit / Agent OS?"
 
 ## Avaliação
@@ -24,10 +24,22 @@ Ciclo do adotante do Onion — descoberta → adoção → federação → advoc
 - **1º marco de sucesso:** primeiro ciclo faseado retomável concluído (plan→pr) OU os 3 contextos vivos no repo.
 - **Ponto de confusão comum:** entender as 3 dimensões peer; qual comando/agente usar (mitigado por `/onion`). `[INFERIDO]`
 
-## Crescimento / Federação
+## Standalone (o degrau grátis — dev solo) `[reframe 2026-07-19]`
 
-- **Expansão:** de 1 repo dogfood → múltiplos repos co-evoluindo via federação (contratos + doc-bridge).
-- **Uso avançado:** `/meta:evolve` (auto-auditoria), federação multi-repo, escrever doutrinas próprias.
+- **O que é:** adotar a porta pública → o framework **completo** rodando no repo do dev solo (as 3 dimensões
+  + ferramentas de trabalho + KG soberano), **sem federação**. É o "texto" dado de graça — o hábito que fixa
+  (MOAT/advocacy), não uma cobrança.
+- **1º marco:** primeiro ciclo faseado retomável concluído (plan→pr) OU os 3 contextos vivos + o 1º `.kg.yaml` próprio.
+- **Objetivo de negócio:** **não** é conversão em volume (D5: solo não sustenta volume) — é dogfood de campo,
+  advocacy e o funil que alimenta os leads de ORG (P3/P4) que passam por aqui como demo.
+
+## Crescimento / Federação (o upsell — empresa/hub) `[reframe 2026-07-19]`
+
+- **Gatilho de expansão (land-and-expand):** a **chegada do MULTI** — 2º repo local adotado OU 2ª pessoa
+  commitando/precisando sincronizar. Não é "usar mais"; é o uso virar **organizacional**.
+- **Expansão:** standalone → **hub** (federação: sync multi-repo, bundles por squad, sub-adoção) — a rede que
+  nenhum concorrente copia. **Ou** standalone → consumer (re-parenteia a um hub).
+- **Uso avançado:** `/meta:evolve` (auto-auditoria — core), federação multi-repo, escrever doutrinas próprias.
 - **Sinal de cliente saudável:** repo ativo, contexto fresco (`/meta:context-freshness`), participa do fluxo core↔adotante.
 
 ## Advocacy / Churn

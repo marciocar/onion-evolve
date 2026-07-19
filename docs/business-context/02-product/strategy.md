@@ -1,6 +1,6 @@
 # Estratégia de Produto
 
-**Última Atualização:** 2026-07-13
+**Última Atualização:** 2026-07-19
 
 > Núcleo do seed. Ancora visão, posicionamento (com pesquisa citada), o **modelo comercial em camadas** e os diferenciais/moat. Inclinações marcadas `[hipótese]`; decisões abertas em [`../decisions.md`](../decisions.md).
 
@@ -43,12 +43,15 @@ Convergência: a intuição do maestro (mini-funil + parte paga + camada de serv
 
 | Camada | O que | Captura | Risco |
 |---|---|---|---|
-| **onion-mini** (porta) | amostra enxuta, muito valor rápido | funil, credibilidade, o "aha" no repo do usuário | baixo |
-| **Onion completo** | framework rico (3 dim, federação) | source-available, **sem promessa prévia de gratuidade pública** | ⚠️ |
+| **onion-mini** (porta/teaser) | demo instrumentada no repo do prospect (3 contextos + efeito medido) | funil, credibilidade, o "aha" que **não dá pra desver** | baixo |
+| **standalone** (dev solo, **grátis**) | framework **completo** — 3 dimensões + ferramentas de trabalho (KG soberano, diary, orquestração…), **SEM federação** | **MOAT / advocacy / dogfood de campo** — o "texto" replicável dado de graça; **não é funil de receita** (solo não sustenta volume) | ⚠️ (decidir o modelo **antes** de abrir) |
+| **hub** (empresa, **upsell**) | **+ federação** (a rede: sync multi-repo, bundles por squad, sub-adoção) | o **moat inimitável** (nenhum concorrente tem federação/3-peer) + assinatura de curadoria | médio |
 | **Fechada/paga** | facilitadores, templates prontos, curadoria SOTA | template premium + assinatura de atualização | médio |
 | **Serviço** | treino, consultoria, **certificação "operador Onion"**, implantação | onde você **já ganha** — formalizar | baixo |
 
-**Motor (land-and-expand, dupla-moeda):** o mini prova valor → progressão vira **compromisso de dado OU financeiro**. A moeda-dado (federação de contexto) **alimenta** o que justifica a moeda-financeira (curadoria SOTA). A **instrumentação** do mini é o produto escondido: mede valor (o "aha"), gera a moeda-dado, e destrava **preço por outcome** amanhã ([tendência 2025-26](https://www.bcg.com/publications/2025/rethinking-b2b-software-pricing-in-the-era-of-ai), exige telemetria que hoje não existe).
+> **Reframe de tiers `[decidido 2026-07-19]`** (pesquisa `docs/evolution/research/onion-tier-matrix-2026-07`): **hub = adoção de EMPRESA** (federação como camada de time); **standalone = dev solo com a ferramenta COMPLETA, mas SEM federação**. A fronteira **é a federação**: dá-se de graça o framework (o "texto"), retém-se a **rede** (o moat). Espelha a Anthropic (Agent Skills plenas no plano pago individual; marketplace/auto-install gated a Team/Enterprise) e o land-and-expand (Datadog): o gatilho de expansão é a **chegada do multi** (2º repo/2ª pessoa), não o uso individual crescer. Um standalone pode **evoluir p/ hub** (chega o multi) ou **virar consumer** (re-parenteia a um hub).
+
+**Motor (land-and-expand, dupla-moeda):** o mini prova valor → o standalone-grátis firma o hábito (MOAT) → a **chegada do multi** (2ª pessoa/repo) dispara o upsell p/ **hub (federação)** OU financeiro. A moeda-dado (federação de contexto) **alimenta** o que justifica a moeda-financeira (curadoria SOTA) — **mas depende de resolver D2** (garantia local-first+destilado; colide com a fronteira de mitigação de inferência). A **instrumentação** do mini/standalone é o produto escondido: mede valor (o "aha"), gera a moeda-dado, e destrava **preço por outcome** amanhã ([tendência 2025-26](https://www.bcg.com/publications/2025/rethinking-b2b-software-pricing-in-the-era-of-ai), exige telemetria que hoje não existe).
 
 ### Sequência de receitas `[inclinação — D4]`
 **1º** formalizar treino/consultoria (receita mais próxima, menor risco) → **2º** certificação "operador Onion" → **3º** compliance-pack (regulados, ticket alto) → **4º** assinatura de curadoria SOTA (recorrente).
