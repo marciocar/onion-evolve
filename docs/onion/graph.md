@@ -275,6 +275,13 @@ granaai	specialization	ssot-governance
 granaai	tier	standalone	
 granaai	trust-advises	onion-evolve	
 granaai	trust-corrects	onion-evolve	
+gustavo-pulga	adopts	onion-evolve	
+gustavo-pulga	mode	greenfield	
+gustavo-pulga	pin	c9eb2c40bc3b	
+gustavo-pulga	specialization	field-dogfood	
+gustavo-pulga	specialization	greenfield-adoption	
+gustavo-pulga	tier	standalone	
+gustavo-pulga	trust-advises	onion-evolve	
 iso-22301-specialist	related	/docs/build-compliance-docs	
 iso-22301-specialist	related	iso-27001-specialist	
 iso-22301-specialist	related	security-information-master	

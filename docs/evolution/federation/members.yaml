@@ -156,6 +156,30 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: gustavo-pulga
+    name: gustavo-pulga (projeto-betahauss-tornak — Tornak/BetaHauss; PRIVADO)
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    parent: onion-evolve
+    remote: github.com/marciocar/projeto-betahauss-tornak   # PRIVADO
+    local_path: "/home/marcio/gustavo-pulga"   # dir físico difere do nome do repo (não renomear sem migrar o clone)
+    onion_version: c9eb2c40bc3b   # VERIFICADO por pin-integrity-check.sh (pin-ok, 2026-07-19) —
+                                  # regularização de registro: o stamp existia (adopted_from: onion-evolve)
+                                  # mas o membro faltava em members.yaml (drift de registro; ADR claude-door-topology D4).
+    adopted_at: 2026-07-09
+    updated_at: 2026-07-14        # do stamp .claude/.onion-version
+    mode: greenfield
+    integration_branch: onion/adopt
+    personality_summary: "Adotante de campo (dogfood real): a sessão dele achou + corrigiu o bug #303 do core — descoberta convergente que validou o adopt durável. Ancorado corretamente na fonte viva (onion-evolve), não 'preso' a fork de incubação."  # seed manual pré-F2
+    specializations: [field-dogfood, greenfield-adoption]
+    personality_last_sync: 2026-07-09   # seed manual (comando de sync ainda não existe — RFC-0003 F2)
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
   - id: onion-mini
     name: onion-mini (Onion Mini — a versão mini e portátil, ex-onion-portable)
     role: standalone            # DESTILAÇÃO CURADA, não adoção (não vendoriza .claude/) — role
