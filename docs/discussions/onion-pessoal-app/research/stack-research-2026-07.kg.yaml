@@ -316,6 +316,16 @@ nodes:
     verified_at: "2026-07-19"
     label: "device-alvo = POCO X8 Pro Max (comprado 2026-07-19). VERIFICADO (URL do anúncio + DuckDuckGo): SoC MediaTek Dimensity 9500s (3nm, Cortex-X925); 12GB RAM (+12 virtual); 512GB; HyperOS 3.0/Android 16; 6.83'' AMOLED; 8500mAh; anunciado mar/2026. ⇒ FLAGSHIP: clara os pisos com folga (≥4GB→12GB; Android13→16) → SLM 1-3B fácil, 4B quant. viável; Q_PERF de-riscado. NPU = APU MediaTek (modelo exato a-confirmar) → input p/ a pesquisa de provider (qual runtime acelera em MediaTek: AI Edge/MediaPipe fortes; executorch/MLC variam)"
 
+  - id: E_DEVICE_RUNTIME
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "runtime × Dimensity 9500s (WebFetch, fatia device-crítica): NPU-MediaTek NÃO tem via limpa em runtime RN — ExecuTorch TEM backend MediaTek (XNNPACK/Vulkan/Qualcomm/MediaTek/Exynos) mas LLM-on-NPU sem workflow provado (RN wrapper→XNNPACK CPU); MLC=GPU OpenCL no Immortalis-G925 (sem NPU); Google MediaPipe LLM=só CPU/GPU + MAINTENANCE-ONLY → migra p/ LiteRT-LM (EMERGENTE, cobrir na pesquisa). MAS flagship (Cortex-X925/12GB) roda SLM 1-3B fácil em CPU/GPU sem NPU → Q_DEID viável. NPU-nativo=NeuroPilot (vendor-lock, não-RN). executorch NÃO descartado"
+
   # ==== perguntas em aberto (viram spike / Fase 1b) ====
   - id: Q_DEID
     node_type: question
@@ -588,6 +598,14 @@ edges:
   - from: Q_GITSYNC
     to: C_DEVICE
     edge_type: DEPENDS_ON
+
+  # --- fatia device-crítica (runtime × Dimensity 9500s) informa o device e a decisão de provider ---
+  - from: E_DEVICE_RUNTIME
+    to: C_DEVICE
+    edge_type: SUPPORTS
+  - from: E_DEVICE_RUNTIME
+    to: Q_EXECUTORCH_VERCEL
+    edge_type: SUPPORTS
 
   # --- compatibilidade verificada: stack coeso, não defasado; git-sync = risco aberto ---
   - from: E_COMPAT
