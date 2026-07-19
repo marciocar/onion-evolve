@@ -15,7 +15,7 @@ date: 2026-07-12
 > não mesclada). Promoção a doutrina firme = dogfood + nosso julgamento (é candidata, não lei).
 >
 > **Reconciliada com a estrela (2026-07-12, sob convite do maestro):** o tratamento mais rico da régua vive em
-> `discuss/onion-pessoal-marcio` (o par **régua/motor** + a régua pegando a própria falsa distinção da estrela).
+> `método pessoal (N=1)` (o par **régua/motor** + a régua pegando a própria falsa distinção da estrela).
 > Esta KB agora **puxa da estrela** — corrigindo o fluxo (não é mais um rascunho cego do core).
 
 ---
@@ -56,7 +56,7 @@ e **por quê** (com evidência), em vez de reusar por preguiça ou reinventar po
 A régua existe para tornar esses dois erros **visíveis e nomeáveis** — não é "reusar sempre" (isso é falsa
 analogia latente) nem "desenhar sempre" (falsa distinção latente).
 
-**Exemplos vividos** (da estrela `discuss/onion-pessoal-marcio`): *falsa analogia* = importar RBAC / MRR /
+**Exemplos vividos** (da estrela `método pessoal (N=1)`): *falsa analogia* = importar RBAC / MRR /
 independência-entre-fontes para um N=1 que precisa do oposto; *falsa distinção* = re-desenhar substrato
 markdown-in-git, supersessão bitemporal ou claim+evidence quando o padrão já existe maduro.
 
@@ -73,7 +73,7 @@ A régua não é nova aqui — ela já governa decisões de design do Onion, sem
 
 Nomear o que o uso já mostra é dogfood — não intelectualização.
 
-**E já dogfoodada — a régua pegou a própria falsa distinção.** Na estrela `discuss/onion-pessoal-marcio`, aplicada
+**E já dogfoodada — a régua pegou a própria falsa distinção.** Na estrela `método pessoal (N=1)`, aplicada
 ao próprio trabalho, a régua barrou uma falsa distinção *dela*: o que a pesquisa marcara como "novo" era
 **composição, não invenção** — *belief base* (Hansson) e argumentação bipolar `SUPPORTS`/`REFUTES` (Cayrol et al.,
 2005) já existiam maduros, e reinventá-los seria o erro. Esse é o "ganha o pão" que a KB precisava: **um uso real
@@ -81,7 +81,7 @@ onde a régua mudou uma decisão**, não só um enunciado. (Fonte: a estrela; tr
 
 ## 5. A régua e o motor (o par governante da estrela)
 
-Onde a régua foi mais trabalhada — a estrela `discuss/onion-pessoal-marcio` — ela é **metade de um par governante**,
+Onde a régua foi mais trabalhada — a estrela `método pessoal (N=1)` — ela é **metade de um par governante**,
 e essa é a forma mais afiada dela:
 
 - **Aristóteles = a RÉGUA** — decide *o que* transfere (igual) vs *o que* se desenha fresco (diferente).

@@ -30,7 +30,7 @@
 | 5 | **Fonte ≠ derivação (fronteira física)** — teoria vive em `theories/` (zero Onion); nossa leitura vive em `applications/` (cita, não reescreve) | decisão do maestro 2026-07-05; convergência Zettelkasten (literature≠permanent notes) · Diátaxis (reference≠how-to) · grounding≠guidance | vinculante |
 | 6 | **Prompts móveis: não prometer** — nenhum artefato depende de mensageria autorregulatória até a rodada Q3 + gatilho do eixo SDAAL | Q3 sem claims sobreviventes ([srl-zimmerman §5](../theories/srl-zimmerman.md)) | vinculante |
 | 8 | **Fidelidade ao design system do alvo** — material derivado HERDA o style/script do documento-referência e usa só componentes existentes (paleta não basta; inventar estrutura paralela = impor e quebrar consistência p/ o aprendiz) | correção do maestro no F1 (fricção F-4, 2026-07-05): a 1ª versão do ciclo-plea copiou tokens mas não o layout — refeita herdando o design system do guia (que carrega os tokens DTCG do Onion + light/dark) | vinculante |
-| 9 | **A teoria assina nos créditos; no fluxo, desaparece no comportamento** — em produtos NÃO-educacionais derivados da doutrina (ex: Onion Mini), o nome/jargão da teoria ("PLEA", "Planificar") vive em UM lugar (créditos/README); as superfícies operacionais carregam só o comportamento em língua clara ("Planejar → Executar → Avaliar", "checkpoint de fechamento"). Em produtos EDUCACIONAIS (pulse-mais, theories/), nomear o modelo segue obrigatório (diretriz 4) | correção do maestro no Mini (fricção F-5, 2026-07-05): acrônimo em ~10 superfícies operacionais = carga cognitiva + distrator de credibilidade p/ dev iniciante; fonte≠derivação aplicado à ATRIBUIÇÃO (assina 1×) | vinculante |
+| 9 | **A teoria assina nos créditos; no fluxo, desaparece no comportamento** — em produtos NÃO-educacionais derivados da doutrina (ex: Onion Mini), o nome/jargão da teoria ("PLEA", "Planificar") vive em UM lugar (créditos/README); as superfícies operacionais carregam só o comportamento em língua clara ("Planejar → Executar → Avaliar", "checkpoint de fechamento"). Em produtos EDUCACIONAIS (um adotante, theories/), nomear o modelo segue obrigatório (diretriz 4) | correção do maestro no Mini (fricção F-5, 2026-07-05): acrônimo em ~10 superfícies operacionais = carga cognitiva + distrator de credibilidade p/ dev iniciante; fonte≠derivação aplicado à ATRIBUIÇÃO (assina 1×) | vinculante |
 | 7 | **Narrativa como veículo é bem-vinda** — materiais podem usar herói-modelo/storytelling, citando o mecanismo (modelação observacional) | narrativas de Rosário ([plea-rosario §4](../theories/plea-rosario.md)) | recomendada |
 
 ## Escopo e modos (revisões do F1 — fricções F-2 e F-3)
@@ -44,10 +44,10 @@
   prompts) ficam fora das fases — carregam só a diretriz 4 (rótulos) e, opcionalmente, ponteiros
   aos checkpoints da jornada.
 
-## Aplicação no F1 (dogfood pulse-mais) — ✅ EXECUTADO 2026-07-05
+## Aplicação no F1 (dogfood um adotante) — ✅ EXECUTADO 2026-07-05
 
 O 1º artefato real saiu: camada PLEA do guia do aluno (modo aditivo —
-`pulse-mais:materials/ciclo-plea-pulse-mais-2026.html` + costura no guia): checkpoints por fase
+`<adopter>:materials/ciclo-plea-2026.html` + costura no guia): checkpoints por fase
 com planificação escrita antes do 1º prompt, monitorização ("um ajuste por sessão"), ritual de
 fechamento que termina em **redesenho**, regra de ouro do squad (gate ritual) e
 personagem-modelo (Marina, à la Testas). As diretrizes 1, 3 e 7 aplicaram limpo; as fricções

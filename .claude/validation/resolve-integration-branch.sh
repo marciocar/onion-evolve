@@ -20,7 +20,7 @@
 # Aviso anti-silêncio (STDERR): quando NÃO há sinal algum e cai no literal "main"
 # (nem stamp/config/develop/origin-HEAD), emite um aviso no STDERR — o STDOUT segue
 # só o nome da branch. Impede o "palpite silencioso" que resolveu 'main' num repo
-# cuja integração era master/onion-adopt (sinal gustavo-pulga 2026-07-14).
+# cuja integração era master/onion-adopt (sinal de campo 2026-07-14).
 #
 # Uso       : resolve-integration-branch.sh [REPO_DIR]   (default: .)
 #             Emite o nome da branch em STDOUT. Exit 0 sempre (sempre há default).
@@ -55,7 +55,7 @@ if [ -z "${master:-}" ]; then
 fi
 # (4) PALPITE CEGO: nenhum sinal (nem stamp/config/develop, nem origin/HEAD) → cai no literal "main".
 #     Avisa no STDERR (o STDOUT segue SÓ o nome — BASE=$(...) intacto) para que o palpite deixe de ser
-#     SILENCIOSO. Sinal de campo gustavo-pulga 2026-07-14: um repo cuja integração real era master/onion-adopt
+#     SILENCIOSO. Sinal de campo 2026-07-14: um repo cuja integração real era master/onion-adopt
 #     resolveu "main" sem avisar. Só aqui: quando origin/HEAD dá a branch principal de verdade, o palpite é
 #     confiável → sem ruído no caso comum (greenfield main).
 if [ -z "${master:-}" ]; then

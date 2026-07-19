@@ -48,7 +48,7 @@ nova entrada do dogfood, não o fim.
    > **Dois sentidos de "re-dogfood" — ambos legítimos, não confundir:** (a) **re-dogfood do fix**
    > (este item) — re-exercitar o artefato depois de consertar, dentro do mesmo loop; (b) **rodada de
    > dogfood de um padrão** — o campo exercita o mesmo padrão de novo, semanas depois, e o que ele
-   > revela **supersede** o que a rodada anterior concluiu (*"2º dogfood do metagamify"*, *"re-dogfood
+   > revela **supersede** o que a rodada anterior concluiu (*"2º dogfood de campo"*, *"re-dogfood
    > geral do KG SDAAL"*). (a) fecha um loop; (b) **abre** um — é a instância de campo do "re-" (§♻️).
 4. **Validação adversarial é insumo, não ordem.** Veredito de revisor/subagente é hipótese a
    **verificar com evidência** — rejeitável com prova (ver [@metaspec-gate-keeper](../../../.claude/agents/meta/metaspec-gate-keeper.md), Regra Zero: "evidência ou abstenção").
@@ -81,7 +81,7 @@ Casos reais onde o dogfood pegou o que o happy-path escondia:
 | **Self-heal de inventário** (PR #126) | Dogfood do fluxo: adicionar **e remover** um recurso real e rodar `/meta:inventory` | Bug real: o `CLAUDE.md` vive **fora** dos scan-roots do lint (`.claude/`+`docs/`); o `--fix` global não o alcançava. O happy-path (CLAUDE.md já correto) escondia — só a mudança real de contagem expôs. |
 | **`/meta:all-tools`** (PR #128) | Rodar o comando reescrito e produzir o catálogo real da sessão | Lacunas: faltava marcar **status de conexão MCP** (conectado vs exige-auth) e tratar **tools deferidas por nome** (sem inventar descrição — o pecado do dialeto-Cursor em outra roupagem). |
 | **Limpeza `.claude/docs/`** (PR #127) | Verificação **adversarial** do veredito do explorer | O veredito "deletar os c4" teria **quebrado** os agentes c4 (que os referenciam); a verificação reverteu para "mover" (e o move **reparou** refs já penduradas). |
-| **`.env.example`** (fix #89) | Dogfooding do Onion **no adotante** (rhilo-metagamify, ao vivo) | Bug de campo que virou fix never-clobber no core, via [upstream do inbox](../../evolution/README.md). |
+| **`.env.example`** (fix #89) | Dogfooding do Onion **no adotante** (um adotante, ao vivo) | Bug de campo que virou fix never-clobber no core, via [upstream do inbox](../../evolution/README.md). |
 
 A lição comum: **o erro só apareceu ao executar.** Nenhum foi pego por revisão-no-papel.
 

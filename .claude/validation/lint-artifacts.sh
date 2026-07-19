@@ -416,7 +416,7 @@ check_plugins_sync() {
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   # consumidor (role: adopted) NÃO distribui plugins — marketplace é superfície do source; a fonte é
   # vendorizada mas a SAÍDA gerada (plugins/ + marketplace.json) não. Guarda POR PAPEL (não só por
-  # ferramenta) — sinal granaai 2026-07-10 (12 HARD falsos bloqueavam todo commit do adotante).
+  # ferramenta) — sinal de campo 2026-07-10 (12 HARD falsos bloqueavam todo commit do adotante).
   grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
   [ -f "${asm}" ] || return 0            # sem assembler → nada a checar (repo sem a feature)
   [ -d "${vdir}" ] || return 0
@@ -518,7 +518,7 @@ check_role_bundle_sync() {
   local roles="${SCRIPT_DIR}/../utils/marketplace/roles.yaml"
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   local mkt="${REPO_ROOT}/.claude-plugin/marketplace.json"
-  # consumidor não carrega marketplace.json — mesma guarda por papel de check_plugins_sync (sinal granaai)
+  # consumidor não carrega marketplace.json — mesma guarda por papel de check_plugins_sync (sinal de campo)
   grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
   [ -f "${roles}" ] || return 0
   command -v python3 >/dev/null 2>&1 || return 0
@@ -1242,11 +1242,18 @@ run_inventory_fixes() {
 _scan_relative_links() {
   local base="$1" hint="$2"
   [ -d "${base}" ] || return 0
-  # Role-guard (sinal granaai 2026-07-16): o adotante NÃO vendoriza os docs core-only
+  # Role-guard (sinal de campo 2026-07-16): o adotante NÃO vendoriza os docs core-only
   # (analysis/evolution/discussions/applying/materials/plans/onion) — um doc vendorizado (KB/comando)
   # que os referencia resolve no CORE, mas o alvo é ausente-por-desenho no adotante. Pular SÓ o
   # alvo-ausente que cai nesses prefixos; a checagem de link KB-interno (arquivo que DEVERIA existir)
   # continua ativa. No core (role: source) o guard é no-op (os docs existem).
+  #
+  # Extensão porta-de-framework (ADR onion-adr-family-repo-topology-2026-07 D4 + roles.yaml): um door
+  # role-scoped (bundle 'standalone') SELA a meta-factory (commands/meta + agents/meta) e os verticais
+  # não-base (design/development/quick commands; compliance/research agents; lint-selftest e demais
+  # validações meta). KBs de doutrina embarcados citam esses arquivos por link — ausentes-por-desenho no
+  # door, exatamente como os docs core-only. Só ATIVA quando o alvo está ausente ([ ! -e ] abaixo): num
+  # adotante-cheio o alvo existe (nunca entra); no core (role: source) o guard nem roda. Backward-safe.
   local adopted=""; grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && adopted=1
   local f dir lineno target clean rel
   while IFS= read -r -d '' f; do
@@ -1260,6 +1267,10 @@ _scan_relative_links() {
           rel="$(realpath -m --relative-to="${REPO_ROOT}" "${dir}/${clean}" 2>/dev/null)"
           case "${rel}" in
             docs/analysis/*|docs/evolution/*|docs/discussions/*|docs/applying/*|docs/materials/*|docs/plans/*|docs/onion/*) continue ;;
+            # meta-factory + verticais não-base selados num door role-scoped (ausente-por-desenho)
+            .claude/commands/meta/*|.claude/commands/design/*|.claude/commands/development/*|.claude/commands/quick/*) continue ;;
+            .claude/agents/meta/*|.claude/agents/compliance/*|.claude/agents/research/*) continue ;;
+            .claude/validation/lint-selftest.sh|.claude/validation/federation-*|.claude/validation/kg-*|.claude/validation/graph.sh|.claude/validation/constellation-map.sh|.claude/validation/diary-index.sh|.claude/validation/a2a-*|.claude/validation/trust-topology-check.sh|.claude/validation/lint-design-tokens.sh) continue ;;
           esac
         fi
         violation "HARD" "${f}" "link relativo quebrado (linha ${lineno}): '${target}' não resolve — ${hint}"

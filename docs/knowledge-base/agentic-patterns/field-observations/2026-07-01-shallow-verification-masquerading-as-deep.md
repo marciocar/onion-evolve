@@ -9,7 +9,7 @@ status: raw
 ## O que originou esta observação
 
 Numa sessão trabalhando cross-repo (onion-evolve orquestrando investigação no
-rhilo-metagamify), o maestro pediu pra eu registrar os próprios erros — não só os fatos
+um adotante), o maestro pediu pra eu registrar os próprios erros — não só os fatos
 certos — porque notou uma falha maior por trás: "descobrimos rajadas e outras coisas que
 não sabemos o motivo e você não está empenhado em descobrir", e "não atualizamos o
 mapeamento e validação da fila e dos sistemas internos e externos". A pergunta dele: existe
@@ -38,8 +38,8 @@ feliz" (`working-discipline.md` §Validação) — não é uma regra nova, é um
 
 ## Caso 2 — erro de uma sessão anterior (mais caro, achado ao ler o histórico)
 
-Investigando a PR #75 (fix de gate WRR), li o relatório final da auditoria do burst de
-30/06 (`docs/reports/wrr/auditoria-burst-versao-final-2026-06-30.md` no rhilo-metagamify).
+Investigando a PR #75 (fix de gate do motor), li o relatório final da auditoria do burst de
+30/06 (`docs/reports/wrr/auditoria-burst-versao-final-2026-06-30.md` no um adotante).
 Uma sessão da MANHÃ tinha concluído "wrrLevel=null causou o burst" a partir de uma query
 SQL ad-hoc que achou esse campo null em 3 firmas. Isso motivou um backfill em 186
 participantes + guiou o fix da PR. Uma re-auditoria de FECHAMENTO (13 agentes, ~991k

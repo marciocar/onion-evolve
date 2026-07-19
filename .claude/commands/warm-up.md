@@ -32,7 +32,7 @@ Estabelecer contexto completo do projeto incluindo:
   reconciliação, integridade, frescor) citando **ids de nó**.
 - ✅ **Drive-to-verify:** claims `plane: PROD` de alto impacto → cruzar contra o vivo antes de assumir; nó
   stale mente (`--freshness`). Sem `.kg.yaml` → siga para o item 1.
-- ⚙️ **Mecanismo, não conselho** (sinal metagamify 2026-07-16): consultar o KG **por padrão** é a forcing
+- ⚙️ **Mecanismo, não conselho** (sinal de campo 2026-07-16): consultar o KG **por padrão** é a forcing
   function contra a reincidência de "reconstruir da prosa". Doutrina: [knowledge-graph-sdaal.md](../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md) §SSOT-as-runtime.
 
 ### 1. README Principal

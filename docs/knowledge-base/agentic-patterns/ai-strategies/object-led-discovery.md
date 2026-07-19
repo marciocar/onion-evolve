@@ -8,7 +8,7 @@
 | **Criado** | 2026-06-30 |
 | **Status** | `assess` — veredito do maestro pendente |
 | **Tags** | `transformer`, `discovery`, `capability`, `sdaal`, `object-led`, `fitting` |
-| **Origem** | Sinal de campo rhilo-metagamify (2026-06-29) + dogfood DataTable premium |
+| **Origem** | Sinal de campo um adotante (2026-06-29) + dogfood um componente de tabela premium |
 
 ---
 
@@ -96,14 +96,14 @@ em sequência, com gates e rastreabilidade.
 |---------|-----------|
 | **Forma:** ADR + skill própria, ou extensão do RFC-0002 + Capability Contract? | Extensão (menor superfície); skill fina de orquestração |
 | **Espelho:** artefato físico (worktree) ou conceitual (plano)? | Físico quando há risco de mutação (N arquivos); conceitual quando é leitura |
-| **1º caso canônico:** qual o dogfood? | DataTable premium do rhilo-app — resultado já à mão, bom baseline |
+| **1º caso canônico:** qual o dogfood? | um componente de tabela premium do app de um adotante — resultado já à mão, bom baseline |
 | **Relação com `create-*`:** mesmo toolbox? | Sim — "promover" (objeto existe) vs "criar" (do zero); gatilho diferente |
 
 ---
 
 ## 📊 Evidência de Campo
 
-O DataTable premium foi construído **imperativamente** — e essa prova é o gap mais limpo.
+O um componente de tabela premium foi construído **imperativamente** — e essa prova é o gap mais limpo.
 
 | | Processo Imperativo (o que aconteceu) | Processo Object-Led (o que deveria ser) |
 |-|---------------------------------------|-----------------------------------------|
@@ -112,7 +112,7 @@ O DataTable premium foi construído **imperativamente** — e essa prova é o ga
 | **Novos requisitos** | Re-improvisa a cada pedido | Gate no Materializar → acumula de forma rastreada |
 | **Reprodutibilidade** | Depende da atenção da sessão | Ciclo documentado + playbook no catálogo |
 
-**Artefatos existentes** (rhilo-app, branch `feat/gamification-dose-viz`):
+**Artefatos existentes** (o app de um adotante, branch `feat/feature-viz`):
 `apps/frontend/src/components/data-table/*` — 13 capacidades acumuladas por pedidos
 sucessivos: sort/filtro/busca/agrupar/expandir/colunas/export/salvar-visão/seleção+bulk/
 tela-cheia/densidade/resize/pin.

@@ -1,7 +1,7 @@
 # Verify-the-Read-Path-First — onde o dado vive é hipótese até rastrear quem o lê
 
-> **Origem (crédito):** instância **rhilo-metagamify** (T1 hub), auditoria real de produção
-> (WRR/Modo Equilíbrio, 01/jul/2026) — sinal upstream
+> **Origem (crédito):** uma instância adotante (T1 hub), auditoria real de produção
+> (auditoria de produção, 01/jul/2026) — sinal upstream
 > `docs/evolution/inbox/_processed/2026-07-01-sinal-verificar-read-path-antes-de-concluir.md`.
 > Triado e promovido pelo core em 2026-07-02 (radar: `assess` → `trial`).
 
@@ -56,9 +56,9 @@ Família consolidada em 2026-07-02/03 (todos com guarda/migalha; a migalha
 | Pin é hipótese | stamp/members.yaml | artefato vendorizado (canário) | `pin-integrity-check.sh` + diário `forged-pin` |
 | Working tree livre é hipótese | `git status` limpo | sessões vivas (farol 🕯️) | `session-beacon.sh` + diário `live-session-collision` |
 | **Onde-o-dado-vive é hipótese** | tabela de nome óbvio / resumo de agente | **read-path no código** | este padrão + skill `onion-orchestration` |
-| Linhagem de branch é hipótese | doc "PRs miram develop" / nome da branch | commit **deployado** (registry/ECS) + merge-base real | sinal rhilo `2026-07-03-branch-lineage-divergence` (4º membro; comando `/meta:branch-health` é candidato gated — 2ª instância com multi-linhagem OU próxima confusão de base de PR) |
+| Linhagem de branch é hipótese | doc "PRs miram develop" / nome da branch | commit **deployado** (registry/ECS) + merge-base real | sinal de campo `2026-07-03-branch-lineage-divergence` (4º membro; comando `/meta:branch-health` é candidato gated — 2ª instância com multi-linhagem OU próxima confusão de base de PR) |
 
-| **Gramática do artefato é hipótese** | o selo `meta.schema_version` (auto-declarado) | o parse extraiu nós — o radar **leu**? | `kg-radar.sh` guarda de legibilidade + fixture `bad-grammar` (PR #398, 2026-07-17 — o falso-verde do granaai) |
+| **Gramática do artefato é hipótese** | o selo `meta.schema_version` (auto-declarado) | o parse extraiu nós — o radar **leu**? | `kg-radar.sh` guarda de legibilidade + fixture `bad-grammar` (PR #398, 2026-07-17 — o falso-verde de um adotante regulado) |
 | **Síntese declarada ≠ achado verificável** | veredito em **prosa** (`H1·F6`, contável por grep — errável) | id de nó consultável no KG via `kg-radar` | pipeline pesquisa→KG + 1ª pesquisa nascida em KG (`docs/evolution/research/whatsapp-api-2026-07/`) |
 | **Doutrina declarada ≠ praticada** | `effort` obrigatório na skill de orquestração | scripts Workflow que de fato **passam** `effort` | guarda a nomear — achado 2026-07-17 (~0 scripts passam hoje) |
 

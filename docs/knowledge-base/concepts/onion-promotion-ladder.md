@@ -19,7 +19,7 @@ um `spike` descartável e um `MVP` entregável eram tratados como o mesmo objeto
 a régua `worst-truth-is-uncertain` condena: **certeza de fase é CAMPO, não TOM**.
 
 > **Correção factual (2026-07-17):** referências a *"a régua de promoção do `radar.md`"* apontam para um
-> **artefato do adotante** (o radar de apetite/backlog do metagamify — *"mova os blips no SEU radar.md"*), **não**
+> **artefato do adotante** (o radar de backlog de um adotante — *"mova os blips no SEU radar.md"*), **não**
 > para uma SSOT ausente do core. A régua `assess→trial→adopt` **vive** em
 > [toolbox-lifecycle](../../analysis/onion-adr-toolbox-lifecycle-2026-06.md) §Decisão 4; este KB a **completa**
 > com as camadas de experimentação que faltavam.

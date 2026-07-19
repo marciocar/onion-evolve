@@ -2,7 +2,7 @@
 # pin-integrity-check.sh — verifica se o pin (source_commit) do stamp de um adotante é CONFIÁVEL.
 #
 # O pin é HIPÓTESE, não fato: um restore manual pode carimbar um commit sem que os arquivos
-# vendorizados correspondam a ele (incidente 2026-06-30/rhilo — stamp apontava o HEAD do core,
+# vendorizados correspondam a ele (incidente de campo 2026-06-30 — stamp apontava o HEAD do core,
 # vendor era de 6 dias antes; o anúncio downstream "você já tem o fix" saiu falso; sinal
 # docs/evolution/inbox/_processed/2026-07-02-sinal-lint-only-ausente-no-vendor.md).
 #

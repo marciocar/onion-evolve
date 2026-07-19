@@ -38,13 +38,13 @@ fluxo sem ganho de segurança) ou **negligência** (deixar um sinal virar ação
 
 ## 2. As camadas (mapeadas ao vivo — dogfood a2a 2026-07-11)
 
-Um handshake a2a real (metagamify → core) expôs a escada inteira:
+Um handshake a2a real (um adotante → core) expôs a escada inteira:
 
 | # | Camada | Pergunta | Falha → | Evidência (dogfood 11/07) |
 |---|---|---|---|---|
 | **0** | **Transporte/acesso** | tem token/credencial pra *chegar* no endpoint? | 401, nem entra | POST vivo → `401: requer token a2a dedicado` |
 | **1** | parse | envelope é bem-formado? | veto malformed | — |
-| **2** | **trust** | o remetente é **contato permitido**? (`members.yaml` policy-as-data) | veto trust-denied | trust `metagamify→core` OK |
+| **2** | **trust** | o remetente é **contato permitido**? (`members.yaml` policy-as-data) | veto trust-denied | trust `um adotante→core` OK |
 | **3** | replay | `jti` já visto? | veto replay | — |
 | **4** | timestamp | relógio confiável + dentro da janela? | veto clock-untrusted/expired | `expired` vetado em teste |
 | **5** | SSRF | URL de webhook é segura? | veto ssrf | loopback/metadata negados |
