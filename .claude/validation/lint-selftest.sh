@@ -2570,7 +2570,226 @@ run_session_beacon_selftests() {
   else
     record_fail "session-beacon" "hook ausente: ${hk}"
   fi
+
+  # (h) refresh preserva o hat declarado — regressão do bug: 'up' sem hat NÃO apaga a
+  # intenção de escrita. Cobre o modo-de-falha (hat sobrescrito) E o happy-path (declarar
+  # de novo vence). Bug de campo: o hook 'refresh' chama 'up' sem hat a cada UserPromptSubmit.
+  bash "${sb}" up "${d}" "sess-hat" "item2-hat"           # declara a intenção
+  bash "${sb}" up "${d}" "sess-hat"                        # refresh SEM hat (simula o hook)
+  if grep -q '^hat: item2-hat' "${d}/.claude/beacons/sess-hat.beacon"; then
+    record_pass "session-beacon: refresh sem hat preserva a intenção declarada (não vira —)"
+  else record_fail "session-beacon: hat preservado" "refresh apagou o hat: $(grep '^hat:' "${d}/.claude/beacons/sess-hat.beacon")"; fi
+  # modo-de-falha inverso: um hat explícito novo TEM que vencer (preservação não congela)
+  bash "${sb}" up "${d}" "sess-hat" "outro-hat"
+  bash "${sb}" up "${d}" "sess-hat"                        # e o novo também sobrevive ao refresh
+  if grep -q '^hat: outro-hat' "${d}/.claude/beacons/sess-hat.beacon"; then
+    record_pass "session-beacon: hat explícito novo sobrescreve + sobrevive ao refresh"
+  else record_fail "session-beacon: hat override" "novo hat não venceu: $(grep '^hat:' "${d}/.claude/beacons/sess-hat.beacon")"; fi
+  bash "${sb}" down "${d}" "sess-hat"
+
+  # (i) key-by-worktree: 'up' grava a linha `worktree:` = toplevel realpath; refresh preserva.
+  # É o que a COLUNA PRESENÇA do mapa da constelação lê p/ atribuir o beacon à estrela certa.
+  bash "${sb}" up "${d}" "sess-wt" "wt-hat"
+  wt_expected="$(realpath "${d}" 2>/dev/null || echo "${d}")"
+  if grep -q "^worktree: ${wt_expected}$" "${d}/.claude/beacons/sess-wt.beacon"; then
+    record_pass "session-beacon: up grava worktree: = toplevel (key-by-worktree p/ presença)"
+  else record_fail "session-beacon: worktree field" "esperava 'worktree: ${wt_expected}'; veio '$(grep '^worktree:' "${d}/.claude/beacons/sess-wt.beacon")'"; fi
+  bash "${sb}" up "${d}" "sess-wt"                          # refresh sem args
+  if grep -q "^worktree: ${wt_expected}$" "${d}/.claude/beacons/sess-wt.beacon"; then
+    record_pass "session-beacon: worktree sobrevive ao refresh"
+  else record_fail "session-beacon: worktree refresh" "refresh perdeu worktree"; fi
+  bash "${sb}" down "${d}" "sess-wt"
+
+  # (ii) exclude no COMMON-dir: em worktree LIGADA, o beacon tem que ficar git-invisível.
+  # Modo-de-falha (o bug latente): escrever o exclude no git-dir por-worktree deixaria o
+  # beacon como '??' no status. Prova: após 'up' na worktree ligada, git status é limpo.
+  local main lw
+  main="$(mktemp -d)"; git -C "${main}" init -q
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+  git -C "${main}" commit -q --allow-empty -m base
+  mkdir -p "${main}/.claude/validation"; cp "${sb}" "${main}/.claude/validation/"
+  lw="$(mktemp -d)/linked"; git -C "${main}" worktree add -q "${lw}" -b wt-branch 2>/dev/null
+  if [ -d "${lw}" ]; then
+    bash "${main}/.claude/validation/session-beacon.sh" up "${lw}" "sess-linked" "lw-hat" 2>/dev/null
+    # -uall é OBRIGATÓRIO: sem ele, git COLAPSA untracked p/ '?? .claude/' e o grep nunca
+    # veria o beacon (teste vacuário). Com -uall, o beacon aparece SE não estiver excluído.
+    # Prova do modo-de-falha: git 2.43 NÃO lê o info/exclude por-worktree — só o do common-dir
+    # esconde. Sem o fix (--git-common-dir), este grep acharia o beacon → falha.
+    local leaked; leaked="$(git -C "${lw}" status --porcelain -uall 2>/dev/null | grep -c 'beacons/sess-linked.beacon' || true)"
+    if [ -f "${lw}/.claude/beacons/sess-linked.beacon" ] && [ "${leaked}" = "0" ]; then
+      record_pass "session-beacon: beacon em worktree ligada fica git-invisível (exclude no common-dir)"
+    else record_fail "session-beacon: exclude common-dir" "beacon vazou no git status -uall (grep=${leaked}) — exclude no dir errado?"; fi
+    git -C "${main}" worktree remove --force "${lw}" 2>/dev/null || true
+  else
+    record_fail "session-beacon: exclude common-dir" "git worktree add falhou (setup)"
+  fi
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+  rm -rf "${main}"
+
   rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo constellation-map — exercita .claude/validation/constellation-map.sh (o 🗺️ MAPA da
+# Constelação de Estudos, Fase 1). READ-ONLY, SÓ-METADADOS. Self-contained (dir de
+# discussões + repo git em mktemp). Cobre o modo-de-falha (corpo-nunca-lido, presença) e o
+# happy-path (colisão/convergência/painel/json). Molde: os run_*_selftests self-contained.
+# ---------------------------------------------------------------------------
+run_constellation_map_selftests() {
+  local map="${REPO_ROOT}/.claude/validation/constellation-map.sh"
+  if [ ! -f "${map}" ]; then record_fail "constellation-map" "script ausente: ${map}"; return; fi
+  local dd out rc
+
+  # ── Parte 1 (a–f): dir de discussões NÃO-git; presença toda dark (não é o foco aqui) ──
+  dd="$(mktemp -d)"
+  mkdir -p "${dd}/_template" "${dd}/alpha" "${dd}/beta" "${dd}/gamma" "${dd}/decoy"
+  printf 'title: "T"\nphase: SEED\n' > "${dd}/_template/SEED.md"   # _template deve ser IGNORADO
+  cat > "${dd}/alpha/SEED.md" <<'EOF'
+---
+title: "Alpha"
+branch: discuss/alpha
+phase: EXPLORE        # SEED | EXPLORE | DEEP
+next_action: "passo alpha bem longo para exercitar o truncamento do painel além de sessenta e quatro chars"
+scope_globs: ["docs/onion/graph/", "docs/x/"]
+objective_tags: ["NS1", "z"]
+---
+# corpo alpha (não deve ser lido)
+EOF
+  cat > "${dd}/beta/SEED.md" <<'EOF'
+---
+title: "Beta"
+branch: discuss/beta
+phase: DEEP
+next_action: "passo beta"
+scope_globs: ["docs/onion/graph/"]
+objective_tags: ["NS1"]
+---
+EOF
+  cat > "${dd}/gamma/SEED.md" <<'EOF'
+---
+title: "Gamma"
+branch: discuss/gamma
+phase: PARK
+next_action: "passo gamma"
+scope_globs: ["docs/unique/"]
+objective_tags: ["solo"]
+---
+EOF
+  # decoy: objective_tags AUSENTE do frontmatter DE PROPÓSITO. Um parser que leia o corpo
+  # pegaria o SECRETTAG do corpo (o boundary parser não — sai no 2º '---'). É o que torna o
+  # caso (f) DISCRIMINANTE do limite estrutural (não só do first-match-exit dos extratores).
+  cat > "${dd}/decoy/SEED.md" <<'EOF'
+---
+title: "Decoy"
+branch: discuss/decoy
+phase: SEED
+next_action: "passo decoy"
+scope_globs: ["docs/real/"]
+---
+# CORPO — o mapa NUNCA pode ler daqui pra baixo (objective_tags só existe AQUI):
+objective_tags: ["SECRETTAG"]
+scope_globs: ["SECRET"]
+EOF
+
+  rc=0; out="$(bash "${map}" --dir "${dd}" 2>&1)" || rc=$?
+
+  # (a) lista N=4 (o _template é ignorado) + phase + estrela
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '4 estrela' \
+     && printf '%s' "${out}" | grep -q 'alpha' && printf '%s' "${out}" | grep -q 'EXPLORE'; then
+    record_pass "constellation-map: lista N estrelas (ignora _template) + phase"
+  else record_fail "constellation-map: painel" "rc=${rc} out=${out}"; fi
+
+  # (b) COLISÃO de escopo: docs/onion/graph/ em alpha+beta
+  if printf '%s' "${out}" | grep -E 'docs/onion/graph/ →' | grep -q 'alpha' \
+     && printf '%s' "${out}" | grep -E 'docs/onion/graph/ →' | grep -q 'beta'; then
+    record_pass "constellation-map: colisão de scope_globs detectada (graph em 2)"
+  else record_fail "constellation-map: colisão" "não achou a colisão graph; out=${out}"; fi
+
+  # (c) CONVERGÊNCIA de objetivo: NS1 em alpha+beta
+  if printf '%s' "${out}" | grep -E 'NS1 →' | grep -q 'alpha' \
+     && printf '%s' "${out}" | grep -E 'NS1 →' | grep -q 'beta'; then
+    record_pass "constellation-map: convergência de objective_tags detectada (NS1 em 2)"
+  else record_fail "constellation-map: convergência" "não achou a convergência NS1; out=${out}"; fi
+
+  # (d) sem falso-positivo: glob/tag únicos (gamma) NÃO aparecem em colisão/convergência
+  if ! printf '%s' "${out}" | grep -q 'docs/unique/' && ! printf '%s' "${out}" | grep -qE 'solo →'; then
+    record_pass "constellation-map: sem falso-positivo (glob/tag únicos de gamma fora das seções)"
+  else record_fail "constellation-map: falso-positivo" "gamma vazou p/ colisão/convergência; out=${out}"; fi
+
+  # (e) --json bem-formado: count == 4 (via jq, se houver)
+  if command -v jq >/dev/null 2>&1; then
+    rc=0; local jc; jc="$(bash "${map}" --dir "${dd}" --json 2>/dev/null | jq -r '.count' 2>/dev/null)" || rc=$?
+    if [ "${rc}" -eq 0 ] && [ "${jc}" = "4" ]; then
+      record_pass "constellation-map: --json bem-formado (jq: count=4)"
+    else record_fail "constellation-map: json" "jq count=${jc} rc=${rc}"; fi
+  else
+    record_pass "constellation-map: --json (skip: jq ausente)"
+  fi
+
+  # (f) MODO-DE-FALHA só-metadados: o decoy no CORPO ('SECRET') NUNCA pode aparecer na saída.
+  # Prova que o mapa lê SÓ o frontmatter (fronteira estrutural), nunca o corpo da discussão.
+  local outj; outj="$(bash "${map}" --dir "${dd}" --json 2>&1; bash "${map}" --dir "${dd}" 2>&1)"
+  # SECRETTAG (campo ausente do frontmatter) é o discriminante do LIMITE; SECRET reforça.
+  if ! printf '%s' "${outj}" | grep -qE 'SECRET'; then
+    record_pass "constellation-map: corpo NUNCA lido (decoy SECRETTAG/SECRET ausentes do painel e do json)"
+  else record_fail "constellation-map: só-metadados" "VAZOU o corpo (SECRET* apareceu) — leu além do frontmatter!"; fi
+  rm -rf "${dd}"
+
+  # ── Parte 2 (g): PRESENÇA via git worktree add + beacon fresco/ausente ──
+  local repo wt sb
+  sb="${REPO_ROOT}/.claude/validation/session-beacon.sh"
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+  repo="$(mktemp -d)/r"; mkdir -p "${repo}/docs/discussions/star-p" "${repo}/docs/discussions/star-q"
+  git -C "${repo}" init -q
+  cat > "${repo}/docs/discussions/star-p/SEED.md" <<'EOF'
+---
+title: "P"
+branch: discuss/star-p
+phase: DEEP
+next_action: "passo p"
+scope_globs: ["docs/p/"]
+objective_tags: ["p"]
+---
+EOF
+  cat > "${repo}/docs/discussions/star-q/SEED.md" <<'EOF'
+---
+title: "Q"
+branch: discuss/star-q
+phase: SEED
+next_action: "passo q"
+scope_globs: ["docs/q/"]
+objective_tags: ["q"]
+---
+EOF
+  git -C "${repo}" add -A; git -C "${repo}" commit -qm seed
+  wt="$(mktemp -d)/wt-p"; git -C "${repo}" worktree add -q "${wt}" -b discuss/star-p 2>/dev/null
+  # beacon FRESCO na worktree da star-p (star-q não tem worktree → dark)
+  if [ -d "${wt}" ]; then
+    bash "${sb}" up "${wt}" "sess-p" "hat-p" 2>/dev/null
+    out="$(bash "${map}" --dir "${repo}/docs/discussions" 2>&1)" || true
+    # star-p com beacon fresco → 🕯️; star-q sem worktree → · (dark). Checa via json (robusto a colunas).
+    local pp qq
+    if command -v jq >/dev/null 2>&1; then
+      pp="$(bash "${map}" --dir "${repo}/docs/discussions" --json 2>/dev/null | jq -r '.stars[]|select(.slug=="star-p").presence')"
+      qq="$(bash "${map}" --dir "${repo}/docs/discussions" --json 2>/dev/null | jq -r '.stars[]|select(.slug=="star-q").presence')"
+      if [ "${pp}" = "live" ] && [ "${qq}" = "dark" ]; then
+        record_pass "constellation-map: presença — star-p 🕯️ (beacon fresco na worktree), star-q · (sem worktree)"
+      else record_fail "constellation-map: presença" "esperava p=live q=dark; veio p=${pp} q=${qq}"; fi
+    else
+      # sem jq: valida pelo painel (a linha da star-p deve ter o 🕯️)
+      if printf '%s' "${out}" | grep 'star-p' | grep -q '🕯️'; then
+        record_pass "constellation-map: presença — star-p viva no painel (sem jq)"
+      else record_fail "constellation-map: presença" "star-p não marcada viva; out=${out}"; fi
+    fi
+    bash "${sb}" down "${wt}" "sess-p" 2>/dev/null || true
+    git -C "${repo}" worktree remove --force "${wt}" 2>/dev/null || true
+  else
+    record_fail "constellation-map: presença" "git worktree add falhou (setup)"
+  fi
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+  rm -rf "${repo}"
 }
 
 # ---------------------------------------------------------------------------
@@ -2811,6 +3030,9 @@ run_pin_integrity_selftests
 
 # Modo session-beacon — farol de sessão: I3 inclui sessões vivas (colisão W1×W2 de 2026-07-02; sandbox git).
 run_session_beacon_selftests
+
+# Modo constellation-map — 🗺️ o MAPA da Constelação de Estudos (Fase 1): só-metadados, presença por worktree (sandbox git).
+run_constellation_map_selftests
 
 # Modo mail-hook — "you have mail" + gatilho de reflexão ⏰ (motd silencioso, 3 sinais, exit 0; sandbox).
 run_mail_hook_selftests
