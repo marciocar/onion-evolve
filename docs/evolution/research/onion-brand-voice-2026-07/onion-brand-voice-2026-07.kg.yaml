@@ -1,0 +1,110 @@
+# KG da orquestração de brand voice (wf_09aabf00-bfe): branding + storytelling → síntese. Born-in-KG.
+meta:
+  id: onion-brand-voice-2026-07
+  schema_version: "1"
+  baseline: 2026-07-19
+  date: 2026-07-19
+nodes:
+  - id: E_HOOK_IS_DATA
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "o gancho anti-hype = especificidade do dado verificavel (0-20% delegacao; 40%/55%, Anthropic 2026), nao superlativo"
+  - id: E_README_GOLD
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "README de onion-standalone ja e padrao-ouro de arquitetura de marca (Onion H1; plataforma badge cinza + <sub>)"
+  - id: C_TENSION_RESOLVED
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "tensao anti-hype-mas-fisga RESOLVIDA: a precisao do numero citado e a fisga; mantem tom denso do core sem hype"
+  - id: C_BRAND_ARCH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "Casa de Marca: Onion herói/mãe; plataforma = metadado de compatibilidade (nunca H1); universalidade citada como FATO"
+  - id: C_COMMERCIAL_BOUNDARY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "voz sela a fronteira comercial: gratis=o texto (standalone completo); moat=a rede (federacao=hub). Nunca prometer federacao no standalone; nunca pricing na porta (D1)"
+  - id: D_MESSAGING_DEFINITIVE
+    node_type: decision
+    trace: docs/business-context/04-operations/messaging-framework.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "messaging-framework.md DEFINITIVO p/ mini/standalone/hub (deixa de ser stub); linha leiga P6 segue bloqueada (D3)"
+  - id: D_DOOR_TWEAKS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    label: "README da porta: injetar gancho-dado + continuidade (aha vivido) + frame competitivo; H1/tagline = direcao criativa do maestro"
+  - id: Q_LEIGO_P6
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "linha leiga/Onion Pessoal (P6): bloqueada por D3 — tom nao-tecnico, sem lexico Onion, storytelling de zero (direcao do maestro)"
+  - id: Q_HERO_TAGLINE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.5
+    status: open
+    label: "tagline hero definitiva: #1 'O que voce decidiu ontem, a IA ainda sabe hoje' — escolha final e chamada criativa do maestro (top-3 intercambiaveis)"
+edges:
+  - from: E_HOOK_IS_DATA
+    to: C_TENSION_RESOLVED
+    edge_type: SUPPORTS
+  - from: E_README_GOLD
+    to: C_BRAND_ARCH
+    edge_type: SUPPORTS
+  - from: C_TENSION_RESOLVED
+    to: D_MESSAGING_DEFINITIVE
+    edge_type: SUPPORTS
+  - from: C_BRAND_ARCH
+    to: D_MESSAGING_DEFINITIVE
+    edge_type: SUPPORTS
+  - from: C_COMMERCIAL_BOUNDARY
+    to: D_MESSAGING_DEFINITIVE
+    edge_type: SUPPORTS
+  - from: C_TENSION_RESOLVED
+    to: D_DOOR_TWEAKS
+    edge_type: SUPPORTS
+  - from: Q_HERO_TAGLINE
+    to: D_DOOR_TWEAKS
+    edge_type: DEPENDS_ON
+  - from: Q_LEIGO_P6
+    to: D_MESSAGING_DEFINITIVE
+    edge_type: DEPENDS_ON
