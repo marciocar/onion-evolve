@@ -1,0 +1,72 @@
+# Fixture: guarda de PROVENIÊNCIA (--provenance) — decisão VIVA sem chão é avisada; o resto NÃO.
+# Prova os dois lados no mesmo caso (senão "consertar" seria matar a guarda e chamar de fix):
+#   - D_TRACED  (decisão viva, aresta TRACES_TO → artefato)  → NÃO avisada (ancorada por aresta)
+#   - D_INLINE  (decisão viva, campo trace: arquivo:linha)   → NÃO avisada (ancorada inline)
+#   - D_ORPHAN  (decisão viva, NENHUMA das duas)             → AVISADA (a que a guarda existe p/ pegar)
+#   - D_DEAD    (decisão superseded, sem chão)               → NÃO avisada (história, não SSOT viva)
+#   - C_CLAIM   (claim sem chão)                             → NÃO avisada (só decisão é cobrada)
+# Espera: --provenance emite ⚠ decisão-sem-proveniência SÓ para D_ORPHAN. exit 0 (aviso, não reprova).
+meta:
+  id: fixture-provenance-mixed
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: D_TRACED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "decisao ancorada por aresta TRACES_TO ao artefato"
+  - id: D_INLINE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    trace: kg-radar.sh:200
+    label: "decisao ancorada pela migalha trace: arquivo:linha inline"
+  - id: D_ORPHAN
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "decisao VIVA sem chao — esta SIM deve ser avisada (prova que a guarda nao morreu)"
+  - id: D_DEAD
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: superseded
+    label: "decisao ja substituida, sem chao — NAO cobrar (historia, nao SSOT viva)"
+  - id: C_CLAIM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "claim sem chao — NAO cobrada (proveniencia mira decisao, nao claim)"
+  - id: A_SRC
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "o artefato-origem que D_TRACED referencia"
+edges:
+  - from: D_TRACED
+    to: A_SRC
+    edge_type: TRACES_TO
+  - from: D_ORPHAN
+    to: D_DEAD
+    edge_type: SUPERSEDES
+  - from: D_INLINE
+    to: C_CLAIM
+    edge_type: SUPPORTS

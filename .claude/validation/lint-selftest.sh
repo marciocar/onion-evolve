@@ -307,6 +307,46 @@ run_kg_freshness_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo kg-provenance — guarda de PROVENIÊNCIA do kg-radar.sh (ITEM2): decisão VIVA sem
+# NENHUMA proveniência (nem aresta TRACES_TO nem campo trace: inline) = ⚠ AVISO aditivo,
+# não-HARD (não muda o exit). Como o FRESCOR, asserção por CONTEÚDO de stdout + exit 0.
+# ---------------------------------------------------------------------------
+run_kg_provenance_selftests() {
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  local px="${FIX_DIR}/kg-provenance"
+  local out rc
+
+  # (a) mixed --provenance: SÓ a decisão VIVA sem chão (D_ORPHAN) é avisada. As ancoradas
+  # (aresta/inline), a reconciliada (superseded) e a claim NÃO — os dois lados no mesmo caso
+  # (senão "consertar" seria matar a guarda). exit 0 (aviso, não reprova).
+  rc=0; out=$(bash "${radar}" "${px}/provenance-mixed.kg.yaml" --provenance 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q 'decisão-sem-proveniência: D_ORPHAN' \
+     && ! printf '%s' "${out}" | grep -q 'D_TRACED' \
+     && ! printf '%s' "${out}" | grep -q 'D_INLINE' \
+     && ! printf '%s' "${out}" | grep -q 'D_DEAD' \
+     && ! printf '%s' "${out}" | grep -q 'C_CLAIM'; then
+    record_pass "kg-provenance: decisão viva sem chão avisada; ancorada/superseded/claim NÃO (aviso, exit 0)"
+  else record_fail "kg-provenance: mixed" "rc=${rc} out=${out}"; fi
+
+  # (b) mixed --integrity: a fixture é um KG estruturalmente válido → exit 0 (senão o veredito
+  # de (a) seria sobre um grafo quebrado — a guarda tem que rodar sobre um KG legível).
+  rc=0; out=$(bash "${radar}" "${px}/provenance-mixed.kg.yaml" --integrity 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'sem contradições estruturais'; then
+    record_pass "kg-provenance: fixture mixed é KG válido (integridade verde)"
+  else record_fail "kg-provenance: mixed integrity" "esperava exit 0 + integridade verde; rc=${rc} out=${out}"; fi
+
+  # (c) clean --provenance: toda decisão viva ancorada → NENHUM ⚠, imprime ✅ + exit 0 (não
+  # falso-positivar o que tem chão — o par "good" que prova que a guarda fica quieta).
+  rc=0; out=$(bash "${radar}" "${px}/provenance-clean.kg.yaml" --provenance 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && ! printf '%s' "${out}" | grep -q 'decisão-sem-proveniência' \
+     && printf '%s' "${out}" | grep -q '✅ 2 decisão'; then
+    record_pass "kg-provenance: toda decisão viva ancorada → ✅, sem falso-positivo"
+  else record_fail "kg-provenance: clean" "esperava ✅ sem ⚠; rc=${rc} out=${out}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo contract — exit code de federation-contract-validate.sh
 # ---------------------------------------------------------------------------
 run_contract_fixture() {
@@ -2666,6 +2706,9 @@ fi
 
 # Modo kg-freshness/schema — guardas de frescor + versão de schema (ADR kg-freshness-gate F1).
 run_kg_freshness_selftests
+
+# Modo kg-provenance — guarda de proveniência de decisão (ITEM2).
+run_kg_provenance_selftests
 
 # Modo resolve — não vem do manifest (cenários self-contained, sem fixture-file).
 run_resolve_selftests
