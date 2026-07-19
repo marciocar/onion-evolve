@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 52 entradas · **Stale:** 0 · **Compartilháveis:** 40
+**Total:** 53 entradas · **Stale:** 0 · **Compartilháveis:** 41
 
 Gerado em: 2026-07-19
 
@@ -12,6 +12,7 @@ Gerado em: 2026-07-19
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-19 | observation | collective 📤 | guard-surfaces-orchestration-clears | 2026-10-15 | static |
 | 2026-07-19 | innovation | collective 📤 | farol-organizer-key-by-worktree | 2026-10-15 | static |
 | 2026-07-18 | innovation | collective 📤 | write-kg-closing-step-bookend | 2026-10-15 | static |
 | 2026-07-18 | innovation | collective 📤 | self-reinforcing-radar-loop | 2026-10-15 | static |
