@@ -1,0 +1,42 @@
+# Fixture: PROVENIÊNCIA sem lacuna — toda decisão viva está ancorada (não falso-positivar o ancorado).
+# Par "good" da provenance-mixed: prova que a guarda fica QUIETA quando tudo tem chão.
+#   - D_A (decisão viva, aresta TRACES_TO)   → ancorada
+#   - D_B (decisão viva, trace: inline)      → ancorada
+# Espera: --provenance NÃO emite nenhum ⚠, imprime "✅ 2 decisão(ões) viva(s) com proveniência ancorada". exit 0.
+meta:
+  id: fixture-provenance-clean
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: D_A
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "decisao ancorada por aresta TRACES_TO"
+  - id: D_B
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    trace: kg-radar.sh:222
+    label: "decisao ancorada pela migalha trace: inline"
+  - id: A_SRC
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "o artefato-origem que D_A referencia"
+edges:
+  - from: D_A
+    to: A_SRC
+    edge_type: TRACES_TO
+  - from: D_B
+    to: D_A
+    edge_type: SUPPORTS

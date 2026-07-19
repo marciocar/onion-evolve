@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--freshness|--schema|--triples]
-#      (sem flag = radar + reconcile + integrity + domain + freshness + schema)
+# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--schema|--triples]
+#      (sem flag = radar + reconcile + integrity + domain + provenance + freshness + schema)
 #
 # Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
 #   RADAR           = atenção — peso do nó × centralidade (grau).
@@ -15,6 +15,10 @@
 #   RADAR-DE-DOMÍNIO= completude da camada `layer: domain` (⚠ atenção, NÃO reprova):
 #                     estado-absorvente · EVENT-sem-efeito · STATE-sem-dona ·
 #                     RULE-sem-trace · fonte-única (>1 READS saindo — ADR design-extends-kg)
+#   PROVENIÊNCIA    = decisão ancorada em origem (⚠ atenção, NÃO reprova — completude da camada
+#                     audit): decisão VIVA sem NENHUMA proveniência (nem aresta TRACES_TO nem
+#                     campo `trace:` inline `arquivo:linha`). Reconciliada (superseded/refuted)
+#                     é história — não cobrada (mesmo racional do FRESCOR).
 #   FRESCOR         = frescor da SSOT (⚠ atenção, NÃO reprova — nó stale mente, não corrompe):
 #                     STALE-MISSING (nó plane:PROD sem verified_at:) · STALE-OLD (verified_at
 #                     anterior à meta.baseline). Determinístico: compara duas datas do arquivo,
@@ -41,7 +45,7 @@ RADAR_SCHEMA="1"
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--freshness|--schema|--triples]" >&2; exit 2; }
+[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--schema|--triples]" >&2; exit 2; }
 
 awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" '
 function statusFactor(s) {
@@ -84,6 +88,10 @@ section == "nodes" && nid != "" {
   if (line ~ /status:/)     { v = line; sub(/.*status:/, "", v);     nstatus[nid] = trim(v) }
   if (line ~ /verified_against:/) { v = line; sub(/.*verified_against:/, "", v); verifiedAgainst[nid] = trim(v) }
   else if (line ~ /verified_at:/) { v = line; sub(/.*verified_at:/, "", v); verifiedAt[nid] = trim(v) }
+  # Proveniência inline: a MIGALHA `arquivo:linha` (suporte de campo granaai 2026-07-17). Âncora
+  # em ^…trace: — um match solto casaria com label que cita "trace:"/"TRACES_TO" (este repo fala
+  # de rastreabilidade sobre si mesmo), false-positivando a origem.
+  if (line ~ /^[[:space:]]*trace:/) { v = line; sub(/^[[:space:]]*trace:/, "", v); traceInline[nid] = trim(v) }
   if ($0 ~ /label:/)        { v = $0; sub(/^[[:space:]]*label:/, "", v); label[nid] = trim(v) }
   next
 }
@@ -230,6 +238,31 @@ END {
       if (warns == 0) print "  ✅ camada domain completa (sem lacunas nas 5 checagens)"
       print ""
     }
+  }
+
+  if (mode == "--all" || mode == "--provenance") {
+    print "══ PROVENIÊNCIA — decisão ancorada em origem (⚠ atenção, não reprova) ══"
+    # Completude da camada AUDIT: uma decisão deveria apontar PARA a sua origem — a aresta
+    # TRACES_TO (ADR/artefato) ou a migalha `trace: arquivo:linha` inline. Sem NENHUMA das
+    # duas, a decisão é uma afirmação sem chão: quem lê não consegue voltar ao "porquê". É
+    # AVISO (não toca `problems`, não muda o exit) — o oposto do falso-verde: barulho honesto
+    # sobre uma lacuna, não uma reprovação.
+    pwarns = 0; ndec = 0
+    for (i = 1; i <= nn; i++) {
+      id = order[i]
+      if (ntype[id] != "decision") continue
+      # Decisão reconciliada (superseded/refuted) é HISTÓRIA, não SSOT viva — cobrar a origem
+      # dela é ruído que treina o leitor a ignorar o aviso (mesmo racional do FRESCOR, dogfood
+      # 2026-07-17). A guarda mira a decisão VIVA sem chão.
+      if (nstatus[id] == "superseded" || nstatus[id] == "refuted") continue
+      ndec++
+      if (traceOut[id] == 0 && traceInline[id] == "") {
+        print "  ⚠ decisão-sem-proveniência: " id " (sem aresta TRACES_TO nem campo trace: inline — origem não ancorada)"; pwarns++
+      }
+    }
+    if (ndec == 0) print "  (nenhuma decisão viva no grafo — nada a verificar)"
+    else if (pwarns == 0) print "  ✅ " ndec " decisão(ões) viva(s) com proveniência ancorada"
+    print ""
   }
 
   if (mode == "--all" || mode == "--schema") {
