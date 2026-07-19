@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 32 — Conceitos fundamentais
+├── concepts/            # 33 — Conceitos fundamentais
 ├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 5  — Ferramentas e recursos
 ├── platforms/           # 3  — Plataformas e tecnologias
@@ -33,7 +33,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (32)
+## 🧠 Conceitos Fundamentais (33)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Orchestration](concepts/agent-orchestration.md) — orquestração de subagentes: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
@@ -67,6 +67,7 @@ docs/knowledge-base/
 - [Spec-Driven Development](concepts/spec-driven-development.md) — metodologia emergente de desenvolvimento com IA
 - [Specification-Driven AI Abstraction Layer (SDAAL)](concepts/specification-driven-ai-abstraction-layer.md) — padrão-pai das camadas de abstração
 - [Task Manager Abstraction](concepts/task-manager-abstraction.md) — instância canônica do SDAAL (API-first; MCP opcional)
+- [Verify-External-for-Current](concepts/verify-external-for-current.md) — forcing function: claim sobre atual/emergente/popular (versão·device·player·framework·tendência) ⇒ verify externo (web) obrigatório; WebFetch é budget separado do WebSearch; sem verificar → declarar "não verificado". O `verify(vivo)` do SSOT-as-runtime aplicado ao mundo externo
 - [Worklog Protocol](concepts/worklog-protocol.md) — sessões retomáveis com eficácia de IA (STATE.md, leitura Tier 0→3, checkpoint)
 
 ---
