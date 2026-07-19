@@ -8,6 +8,7 @@ tools:
   - Read
   - Grep
   - WebSearch
+  - WebFetch
   - Glob
   - TodoWrite
 
@@ -106,6 +107,14 @@ Antes de mergulhar, estabeleça:
 - **Verificação de atualidade**: Garanta que informação é atual e relevante
 - **Resolução de conflito**: Quando fontes discordam, investigue por quê
 - **Identificação de lacunas**: Que perguntas permanecem sem resposta?
+
+> **🔴 Regra dura — atual/emergente/popular exige verificação externa (mecanismo, não conselho).**
+> Quando o claim toca algo **atual/emergente/popular** — **versão · device · projeto/player · framework ·
+> tendência** — você **DEVE buscar externo** (`WebSearch`/`WebFetch`) **antes de afirmar**; nunca responder
+> do conhecimento de cutoff/priors. `WebFetch` é **budget separado** do `WebSearch` — quando o `WebSearch`
+> esgota, use `WebFetch` sobre URLs conhecidas (npm, changelog, doc oficial). Se **ambos** indisponíveis
+> (orçamento esgotado, bloqueio de bot), **declarar "não verificado"** e parar — nunca apresentar prior como
+> fato. Doutrina: [`verify-external-for-current`](../../../docs/knowledge-base/concepts/verify-external-for-current.md).
 
 ## Framework de Saída de Pesquisa
 

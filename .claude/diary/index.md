@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 57 entradas · **Stale:** 0 · **Compartilháveis:** 45
+**Total:** 58 entradas · **Stale:** 0 · **Compartilháveis:** 46
 
 Gerado em: 2026-07-19
 
@@ -12,6 +12,7 @@ Gerado em: 2026-07-19
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-19 | learning | collective 📤 | verify-external-wired-into-research-flow | 2026-10-19 | static |
 | 2026-07-19 | decision | collective 📤 | verify-external-for-current-doctrine | 2026-10-19 | static |
 | 2026-07-19 | observation | collective 📤 | runtime-telescope-doctrine-matches-lived-practice | 2026-10-15 | static |
 | 2026-07-19 | decision | collective 📤 | onion-is-the-hero-platform-is-base | 2026-10-19 | static |
