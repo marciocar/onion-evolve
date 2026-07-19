@@ -26,13 +26,24 @@ TTL_MIN="${ONION_BEACON_TTL_MIN:-480}"
 BEACON_DIR="$REPO/.claude/beacons"
 
 ensure_exclude() {
-  # ignore local ao clone (não commitável) — não clobba .gitignore de ninguém
+  # ignore local ao clone (não commitável) — não clobba .gitignore de ninguém.
+  # Usa o COMMON-dir (não o git-dir por-worktree): em worktree ligada o git lê o exclude do
+  # common-dir, então escrever no per-worktree deixaria os beacons visíveis (?? no status).
   local git_dir
-  git_dir="$(git -C "$REPO" rev-parse --git-dir 2>/dev/null)" || return 0
+  git_dir="$(git -C "$REPO" rev-parse --git-common-dir 2>/dev/null)" \
+    || git_dir="$(git -C "$REPO" rev-parse --git-dir 2>/dev/null)" || return 0
   case "$git_dir" in /*) ;; *) git_dir="$REPO/$git_dir" ;; esac
   local excl="$git_dir/info/exclude"
   mkdir -p "$(dirname "$excl")"
   grep -qx '.claude/beacons/' "$excl" 2>/dev/null || echo '.claude/beacons/' >> "$excl"
+}
+
+# árvore de trabalho canônica deste beacon (key-by-worktree): o toplevel realpath.
+# Fallback gracioso p/ dir não-git. A coluna PRESENÇA do mapa da constelação lê isto.
+worktree_of() {
+  local wt
+  wt="$(git -C "$REPO" rev-parse --show-toplevel 2>/dev/null)" || wt="$REPO"
+  realpath "$wt" 2>/dev/null || echo "$wt"
 }
 
 now_epoch() { date +%s; }
@@ -45,9 +56,18 @@ case "$CMD" in
     B="$BEACON_DIR/$SID.beacon"
     STARTED="$(awk -F': ' '/^started_at:/{print $2; exit}' "$B" 2>/dev/null || true)"
     [ -n "$STARTED" ] || STARTED="$(now_epoch)"
+    # Preservar a intenção declarada (hat) através de refreshes sem-arg: o hook 'refresh'
+    # (UserPromptSubmit) chama 'up' SEM hat — não o conhece. Sem isto, cada prompt apagaria
+    # o hat declarado de volta para '—'. Espelha a preservação de started_at acima. Um hat
+    # explícito (arg não-vazio) sempre vence — declarar de novo re-escreve a intenção.
+    if [ -z "$HAT" ]; then
+      HAT="$(awk -F': ' '/^hat:/{print $2; exit}' "$B" 2>/dev/null || true)"
+      [ "$HAT" = "—" ] && HAT=""
+    fi
     {
       echo "session_id: $SID"
       echo "branch: $(git -C "$REPO" branch --show-current 2>/dev/null || echo unknown)"
+      echo "worktree: $(worktree_of)"
       echo "hat: ${HAT:-—}"
       echo "host: $(hostname 2>/dev/null || echo unknown)"
       echo "started_at: $STARTED"
