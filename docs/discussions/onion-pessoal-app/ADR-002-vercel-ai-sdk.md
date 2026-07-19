@@ -1,7 +1,7 @@
 ---
 title: "ADR-002 — Adoção (ou não) da Vercel AI SDK como camada-interface de modelo"
 category: discussion-adr
-status: proposed — aguarda ratificação do maestro (NÃO auto-selado)
+status: accepted — ratificado pelo maestro 2026-07-19 (Opção A)
 date: 2026-07-19
 branch: discuss/onion-pessoal-app
 decision-scope: arquitetura do app pessoal / camada-interface de LLM (C_ALIGN)
@@ -13,8 +13,9 @@ related:
 
 # ADR-002 — Vercel AI SDK como camada-interface de modelo?
 
-> **PROPOSTO — não selado.** Conduzo até aqui; **o maestro ratifica** (decisão de arquitetura do app dele).
-> Não marco "aceito" sozinho.
+> **ACEITO — ratificado pelo maestro 2026-07-19 (Opção A).** Conduzido até o ADR verde; o maestro selou.
+> Cérebro-nuvem segue `claude-agent-sdk`; Vercel AI SDK = contrato de interface de modelo; provider on-device
+> (executorch × llama.rn) = sub-decisão do spike `Q_DEID`/`Q_PERF`, no dado real.
 
 ## Contexto
 `C_ALIGN` (pesquisa de standards) apontou a **ausência da camada Vercel AI SDK** como o maior risco de divergência
@@ -64,4 +65,4 @@ e **sem** reabrir o D2 no papel — a resolução executorch×GGUF fica onde o d
 - Reabre uma **tensão D2↔Vercel** que só fecha no spike on-device (`Q_DEID`): se o de-id/SLM valer mais via
   llama.rn(GGUF, Vercel-nativo) ou via executorch(.pte, features) — dado real decide.
 - Sub-pergunta nova: existe/vale um **adapter executorch↔Vercel AI SDK** (custom)? (não existe hoje).
-- Status **proposto** — o maestro ratifica (→ `accepted`) ou ajusta a opção.
+- Status **ACEITO** (Opção A, ratificado 2026-07-19). A tensão executorch×GGUF segue aberta, deliberadamente, até o spike on-device.

@@ -293,9 +293,9 @@ nodes:
     layer: audit
     plane: DEV
     impact: 5
-    confidence: 0.75
-    status: open
-    label: "ADR-002 (PROPOSTO — aguarda ratificação do maestro, NÃO auto-selado): Opção A — manter claude-agent-sdk no cérebro-nuvem; ADOTAR Vercel AI SDK como PADRÃO-DE-INTERFACE de modelo (fecha C_ALIGN, direcional); NÃO forçar o provider on-device agora. Near-term (shell SSE) não depende disso"
+    confidence: 0.85
+    status: confirmed
+    label: "ADR-002 ACEITO (ratificado maestro 2026-07-19, Opção A): manter claude-agent-sdk no cérebro-nuvem; ADOTAR Vercel AI SDK como PADRÃO-DE-INTERFACE de modelo (fecha C_ALIGN); provider on-device (executorch × llama.rn) = sub-decisão do spike Q_DEID/Q_PERF, no dado real. Near-term (shell SSE) não depende disso"
   - id: Q_EXECUTORCH_VERCEL
     node_type: question
     layer: audit
