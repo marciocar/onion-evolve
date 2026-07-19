@@ -125,6 +125,23 @@ tem gate estrutural; fica para **R15.3b**, gated — ver [R15 §6](../../discuss
 read-path confirmado — sem escrever código. É o exemplo canônico de que a camada é *consolidação
 transversal*: metade do valor é **reconhecer e nomear** o que o dogfood já construiu.
 
+### 4.2 R15.1 — proveniência marcada: o que é estrutural-por-construção vs o que é read-time (R15.2)
+
+O design de R15.1 assumia "os helpers de transporte ganham a linha de wrap". Ao promover ao core, o **código
+real** refinou onde a cerca estrutural genuinamente se aplica (achado de campo 2026-07-19):
+
+| Canal | Realidade do transporte | Enforcement R15.1 |
+|-------|-------------------------|-------------------|
+| **C1 — `a2a-accept`** | **NÃO inlineia o corpo não-confiável** — só o **referencia** (*"o a2a-live transporta o SINAL, não o corpo"*, `.claude/utils/federation-transport/a2a-accept.sh`). Os campos interpolados (`from`/`kind`/`id`) vêm de envelope **cripto-verificado** (`a2a-verify`: RS256 + kid-binding). | **estrutural por construção** ✅ — o corpo adversário nunca entra no contexto do core (mais forte que cercar). Nomeado, zero código. |
+| **C2 — `co-relay`** | **copia o arquivo verbatim** com dedup-por-conteúdo (`cmp -s`) + idempotência (invariante I3 entrega-sem-commit). Cercar-na-cópia quebraria o dedup, a idempotência e a fidelidade do artefato durável. | **read-time (R15.2)** — a proteção do corpo do doc-bridge vive na **constituição** que o core aplica ao **ler** (`/meta:co-evolve`), não no transporte. O helper `onion-untrusted-wrap.sh` é a ferramenta de cerca disponível nesse read. |
+| **C3 — `adopt`/`reverse-consolidate`** | lê repo alheio via `Read` nativo — sem hook único. | **read-time (R15.2 + R15.3b)** — cerca não se aplica (já era o design). |
+
+> **Lição (dogfood do core):** "estrutural > gated" **não** significa "cerca em todo transporte". Significa
+> preferir a defesa que torna o ataque **impossível por construção** — e às vezes o código já a tem (C1
+> não-inlineia; melhor que cercar), enquanto forçar a cerca onde o transporte é verbatim (C2) só quebraria
+> invariantes tateados. A cerca (`onion-untrusted-wrap.sh`) é a ferramenta **do read** (R15.2), não uma
+> emenda cega em todo `cp`.
+
 ## 5. Cobertura e fronteiras (provisório)
 
 Mapeando contra OWASP LLM Top 10 — **cobertura com lastro real** (não hype):
