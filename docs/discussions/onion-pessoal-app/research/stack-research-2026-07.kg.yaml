@@ -582,6 +582,26 @@ nodes:
     verified_at: "2026-07-19"
     label: "A INVARIANTE-MÃE se sustenta ponta-a-ponta num device real: o dado mais sensível que existe (saúde/relações) é capturado, estruturado e espelhado por IA de NUVEM sem que a IA veja um byte de PII crua, com o KG soberano CIFRADO no aparelho e o write GATEADO pelo kg-radar. O loop coletar→KG→reconciliar deixou de ser Wizard-of-Oz: virou conversa. É a prova viva do ADR-003 INVARIANTE 0 = C (life-KG no device + cérebro nuvem BYOK + de-id LOCAL)."
 
+  # ==== AMENDA à INVARIANTE 0: mídia crua enquanto não há equivalente local (2026-07-19) ====
+  - id: D_MEDIA_EXCEPTION
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "AMENDA da INVARIANTE 0 (maestro, 2026-07-19): 'enquanto não temos equivalentes locais, vamos mandar imagens, áudios, arquivos e tudo mais; depois vamos alterando pelos nossos'. TEXTO: de-id LOCAL continua integral (toda mensagem). MÍDIA (imagem/áudio/arquivo): vai CRUA ao cérebro — exceção CONSCIENTE e TEMPORÁRIA, porque o de-id não tokeniza rosto/voz/documento e sem isso não há captura multimodal. Registrada em CÓDIGO (`mediaPolicy.ts`: ALLOW_RAW_MEDIA + MEDIA_NOTICE) com o porquê e a CONDIÇÃO DE SAÍDA (desligar quando houver SLM de-id de imagem, STT on-device e extração local de arquivo — F3). A UI exibe a política (header + rótulo da foto). RAZÃO DE ESTAR ESCRITO: o modo de falha que o projeto combate é declarado≠verificado — se o ADR diz uma coisa e o código faz outra, em semanas vira bug silencioso de privacidade. Provado: STT round-trip TTS→Whisper fiel (com nome) e imagem inline aceita pelo cérebro real (HTTP 200). App master: b6fae25 + 84b352f."
+  - id: E_STT_PROVEN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "STT externo PROVADO ponta-a-ponta (2026-07-19): adapter SDAAL `stt.ts` (provider-agnóstico, openai-whisper como 1º provider, fail-safe sem chave). Round-trip real: TTS gerou fala → o MESMO endpoint/modelo do adapter transcreveu de volta fiel, inclusive o nome ('Olá, briguei com a Marta hoje e me senti péssimo'). Botão 🎙️ grava (expo-audio, já provado no G54) → transcreve → o texto cai no campo para REVISÃO antes do envio (deliberado: o áudio já saiu, mas o texto ainda passa pelo de-id LOCAL). Falta só confirmar o formato de upload do RN no device. Fecha a última peça do F1."
+
 edges:
   # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
   - from: D_STACK
@@ -890,4 +910,12 @@ edges:
     edge_type: SUPPORTS
   - from: E_CHAT_MEMORY_G54
     to: D_LIFEKG_CANONICAL
+    edge_type: SUPPORTS
+
+  # --- a amenda de mídia MODIFICA o desenho definitivo; o STT provado a sustenta ---
+  - from: D_MEDIA_EXCEPTION
+    to: D_DEFINITIVE
+    edge_type: CONSTRAINS
+  - from: E_STT_PROVEN
+    to: D_MEDIA_EXCEPTION
     edge_type: SUPPORTS
