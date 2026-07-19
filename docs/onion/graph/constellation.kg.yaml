@@ -50,9 +50,9 @@ nodes:
     layer: audit
     plane: DEV
     impact: 4
-    confidence: 0.65
-    status: open
-    label: "a KB core da regua de transferencia — era CEGA a estrela; reconciliada/enriquecida com ela em 2026-07-12 (candidata, nao mesclada)"
+    confidence: 0.9
+    status: confirmed
+    label: "a KB core da regua de transferencia (transfer-heuristic-aristotle.md) — era CEGA a estrela; reconciliada/enriquecida com ela em 2026-07-12 e MESCLADA em main (invocada por /meta:adopt); drive-to-verify 2026-07-19 confirmou o arquivo vivo"
   - id: E_STAR_CAUGHT_ITSELF
     node_type: evidence
     layer: audit
