@@ -1,6 +1,6 @@
 # Personas
 
-**Última Atualização:** 2026-07-13
+**Última Atualização:** 2026-07-19
 
 Personas em **camadas** — do usuário provado hoje (N=1) ao aspiracional (`[hipótese]`). Cada uma tem nota de interação com IA.
 
@@ -38,10 +38,15 @@ Personas em **camadas** — do usuário provado hoje (N=1) ao aspiracional (`[hi
 
 ## P5 — Dev solo / maestro N=1 externo — `[hipótese]`
 
-- **Papel:** desenvolvedor individual (linha `onion-claude`, usada até a onion-magen).
+- **Papel:** desenvolvedor individual (a linha do dev solo, na plataforma Claude Code).
+- **Tier / entrada `[reframe 2026-07-19]`:** o **standalone** — ferramenta COMPLETA, **grátis**, sem federação.
+  Entra pela porta pública **`onion-standalone`** (aberta 2026-07-19; antes só adoção assistida via core privado).
 - **Objetivo:** produtividade pessoal com estrutura.
 - **Dor:** Claude Code puro não dá continuidade nem papéis; vibe coding gera drift.
 - **Nota IA:** onboarding facilitado; o "aha" tem que ser rápido e no repo dele.
+- **Conversão:** P5 **não** é meta de receita em volume (é MOAT/advocacy). Vira **hub** (empresa) quando chega o
+  MULTI (2ª pessoa/repo) — aí sim o alvo de receita (P3/P4). O tom da porta pública precisa falar com ele
+  (dev solo descobrindo sozinho), não o tom denso "do core" — ver `messaging-framework.md` (brand voice, stub).
 
 ## P6 — Leigo final / Onion Pessoal — `[hipótese — maior incerteza]` (`D3`)
 

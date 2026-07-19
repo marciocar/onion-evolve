@@ -1,6 +1,6 @@
 # Framework de Mensagem e Marca
 
-**Última Atualização:** 2026-07-13
+**Última Atualização:** 2026-07-19
 
 > ⚠️ **STUB — depende de branding.** A brand voice **definitiva** e a linha Onion Pessoal exigem `@branding-positioning-specialist` + `@storytelling-business-specialist` quando o card [`../decisions.md`](../decisions.md) `D3` avançar. O conteúdo abaixo é **provisório** (`[INFERIDO]` do léxico existente), não decisão de marca fechada.
 
@@ -17,6 +17,14 @@ Do léxico em [`../01-customer/voice-of-customer.md`](../01-customer/voice-of-cu
 - **pt-BR** para comunicação; inglês para código/commits.
 
 > Isto é o tom **do core hoje**, não a marca de um produto vendável. Ao abrir para público/leigo, revisar tudo (`D3`).
+
+> ⚠️ **URGÊNCIA `[2026-07-19]`** — a porta pública **`onion-standalone`** já está **aberta** (o P5 dev solo
+> descobre o Onion sozinho, sem onboarding humano). O tom denso "do core" **não** foi testado p/ esse público.
+> Princípios de marca já cravados pelo maestro (diário `2026-07-19-onion-is-the-hero-platform-is-base`, mergeado):
+> **(1) Onion é a autoridade; a plataforma (Claude Code) é a "base atual" — destaque menor, nunca co-título;
+> (2) todo README/superfície pública VENDE o conceito (problema→promessa→tese), não lista recursos.** A brand
+> voice definitiva (via `@branding-positioning-specialist` + `@storytelling-business-specialist`) é o **próximo
+> gate** — agora com um público real esperando, não hipotético.
 
 ## Value proposition núcleo
 
