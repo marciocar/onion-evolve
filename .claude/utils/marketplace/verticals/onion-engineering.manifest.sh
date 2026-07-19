@@ -28,7 +28,12 @@ AGENTS=(
   ".claude/agents/deployment/docker-specialist.md"
 )
 UTILS=()
-VALIDATION=()
+# Motor de KG soberano — engineer:work.md cabeia `bash .claude/validation/kg-radar.sh` no passo-0
+# (KG-first, "mecanismo não conselho"). Sem ele no bundle, o comando empacotado herda um dead-ref
+# (pesquisa wf_ab57a814-c16 / docs/evolution/research/onion-tier-matrix-2026-07). Viaja o SCRIPT
+# (determinístico, awk/python/jq), nunca o DADO — o door gera seus próprios .kg.yaml soberanos
+# (public-door-vs-private-core.md §5). O assembler copia+reescreve o path (assemble-plugin.sh VALIDATION[]).
+VALIDATION=(".claude/validation/kg-radar.sh")
 # Skill de contexto: contrato SSOT mínimo + resolver de technical-context (torna a vertical
 # auto-suficiente em repos não-adotados). Ver .claude/skills/onion-engineering-context/.
 SKILLS=(".claude/skills/onion-engineering-context")
