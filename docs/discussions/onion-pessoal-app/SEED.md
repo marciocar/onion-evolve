@@ -5,8 +5,8 @@ status: fonte-de-discussao-isolada
 date: 2026-07-17
 branch: discuss/onion-pessoal-app
 # ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
-phase: DEEP           # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
-next_action: "Executar o spike Q_GITSYNC (isomorphic-git no device: rota leve vs pesada, perf, merge N=1) — item mais alto do ranking; em paralelo decidir a adoção do Vercel AI SDK (C_ALIGN)."
+phase: PARK           # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
+next_action: "PARKED — o que resta é TODO device-blocked nesta VPS headless. Retomar os spikes on-device QUANDO HOUVER DEVICE (Expo dev-client num aparelho — Poco X8 Pro Max): Q_GITSYNC (isomorphic-git/nodejs-mobile), Q_DEID/Q_PERF (SLM + de-id no Dimensity 9500s), e a pesquisa completa de provider (radar de ponto-cego, precisa WebSearch). ADR-001/002 aceitos; não fecha — retoma com device."
 scope_globs: ["docs/discussions/onion-pessoal-app/"]
 objective_tags: ["onion-pessoal", "superficie", "onion-bridge", "life-companion"]
 ---
