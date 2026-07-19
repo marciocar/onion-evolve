@@ -250,7 +250,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: "2026-07-19"
-    label: "Dogfood no device real (Moto G54, Expo Go SDK 57, 2026-07-19): (1) câmera ✅ (expo-camera); (2) prova git-on-device ✅ TODA (init/add/commit/log/status/read-back via isomorphic-git+fsShim sobre expo-file-system); (3) SSE ao bridge: transporte+auth(courtesy)+Agent-SDK OK — a cadeia chegou à API Anthropic, bloqueada SÓ por crédito (billing da conta que banca courtesy), NÃO por protocolo/device. Q_PROTOCOL provada end-to-end no device modulo saldo"
+    label: "Dogfood no device real (Moto G54, Expo Go SDK 57, 2026-07-19): (1) câmera ✅ (expo-camera); (2) git-on-device ✅ TODA (init/add/commit/log/status/read-back via isomorphic-git+fsShim sobre expo-file-system) — BÔNUS: o estado git PERSISTE entre sessões do device (documentDirectory; um re-run leu 2 commits do repo anterior = git real com estado durável), exatamente o que o sync soberano precisa; (3) SSE ✅ STREAMOU no device via BYOK (bearer=byok token + X-Anthropic-Key=chave do usuário; a chave do usuário paga → bypassa crédito do servidor). Q_PROTOCOL FECHADA 100% end-to-end no device. App suporta 2 modos de auth (cortesia/login + BYOK)"
 
   # ==== plano-B do SLM + standards a não perder (deep-research wzxz11dvf, 2026-07-18) ====
   - id: E_STANDARDS
