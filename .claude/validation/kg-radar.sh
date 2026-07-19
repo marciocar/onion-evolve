@@ -22,7 +22,7 @@
 #   FRESCOR         = frescor da SSOT (⚠ atenção, NÃO reprova — nó stale mente, não corrompe):
 #                     STALE-MISSING (nó plane:PROD sem verified_at:) · STALE-OLD (verified_at
 #                     anterior à meta.baseline). Determinístico: compara duas datas do arquivo,
-#                     sem "agora" (ADR onion-adr-kg-freshness-gate, proposta #2 rhilo dogfood).
+#                     sem "agora" (ADR onion-adr-kg-freshness-gate, proposta #2 (dogfood de campo)).
 #   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
 #                     meta.schema_version ≠ a versão que o radar entende → recusa; ausente → ⚠
 #                     retrocompat (ADR onion-adr-kg-freshness-gate, proposta #1).
@@ -34,7 +34,7 @@
 #            o audit TRACES_TO o domain (distinção epistêmico×domínio — sinal
 #            2026-07-08-kg-dogfood-completo-promover, promoção schema+método).
 #
-# Soberania: motor próprio do core (decisão D_NO_VENDOR_RADAR) — NÃO é port do radar.js do rhilo.
+# Soberania: motor próprio do core (decisão D_NO_VENDOR_RADAR) — NÃO é port do radar.js de um adotante.
 # Shell/awk puro por design (economia de motores: gate determinístico não aluga LLM).
 # Exit: 0 = ok · 1 = INTEGRIDADE ou SCHEMA encontrou problema · 2 = erro de uso/arquivo.
 set -euo pipefail
@@ -66,7 +66,7 @@ BEGIN { section = ""; nid = ""; ne = 0 }
 /^edges:/ { section = "edges"; nid = ""; next }
 /^meta:/  { section = "meta"; next }
 
-# Legibilidade da gramática (guarda anti-fail-open — sinal de campo granaai 2026-07-17): conta as
+# Legibilidade da gramática (guarda anti-fail-open — sinal de campo 2026-07-17): conta as
 # linhas COM conteúdo dentro de nodes:. Se a seção tem conteúdo e mesmo assim o parser não extrai
 # NENHUM nó, a forma do arquivo não é a gramática deste radar. Sem `next` — só conta e segue.
 section == "nodes" && NF > 0 { nodeSectionLines++ }
@@ -88,7 +88,7 @@ section == "nodes" && nid != "" {
   if (line ~ /status:/)     { v = line; sub(/.*status:/, "", v);     nstatus[nid] = trim(v) }
   if (line ~ /verified_against:/) { v = line; sub(/.*verified_against:/, "", v); verifiedAgainst[nid] = trim(v) }
   else if (line ~ /verified_at:/) { v = line; sub(/.*verified_at:/, "", v); verifiedAt[nid] = trim(v) }
-  # Proveniência inline: a MIGALHA `arquivo:linha` (suporte de campo granaai 2026-07-17). Âncora
+  # Proveniência inline: a MIGALHA `arquivo:linha` (suporte de campo 2026-07-17). Âncora
   # em ^…trace: — um match solto casaria com label que cita "trace:"/"TRACES_TO" (este repo fala
   # de rastreabilidade sobre si mesmo), false-positivando a origem.
   if (line ~ /^[[:space:]]*trace:/) { v = line; sub(/^[[:space:]]*trace:/, "", v); traceInline[nid] = trim(v) }
@@ -119,7 +119,7 @@ END {
   # ── GUARDA DE LEGIBILIDADE (o radar tem que saber que NÃO SABE) ────────────────────────────
   # Zero nós extraídos = o radar não leu o arquivo. Sem esta guarda, todo veredito abaixo é
   # VACUOSAMENTE verdadeiro ("não há contradição em conjunto vazio") e o gate fica verde guardando
-  # NADA — o falso-verde que o sinal de campo granaai (2026-07-17) pegou num CI regulado, onde
+  # NADA — o falso-verde que o sinal de campo (2026-07-17) pegou num CI regulado, onde
   # "o gate de rastreabilidade estava verde" é frase que aparece em auditoria. Nenhum KG legítimo
   # tem zero nós. Mesma classe do bug do jq (2026-07-01): guarda que falha na direção do silêncio —
   # lá fail-closed (barulhento, pego no mesmo dia), aqui fail-open (silencioso, durou commits).
@@ -282,7 +282,7 @@ END {
     print "══ FRESCOR — SSOT re-verificada contra o vivo (⚠ atenção, não reprova) ══"
     # Rastreado por frescor = plane:PROD (alvo implícito: o artefato vivo) OU qualquer nó que
     # declare verified_against: (opt-in — nomeia o artefato MÓVEL que rastreia: branch/commit/
-    # deploy/config). Um nó DEV que aponta p/ branch/commit também apodrece (sinal rhilo
+    # deploy/config). Um nó DEV que aponta p/ branch/commit também apodrece (sinal de campo
     # ssot-como-runtime, §2: C_CONSOLIDATION_MAP stale). Não inunda claims epistêmicos comuns.
     fwarns = 0; ntracked = 0
     for (i = 1; i <= nn; i++) {

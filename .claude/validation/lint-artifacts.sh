@@ -540,6 +540,38 @@ PY
     [ -f "${vdir}/${v}.manifest.sh" ] || violation "HARD" "utils/marketplace/roles.yaml" "papel referencia vertical '${v}' sem manifesto em verticals/${v}.manifest.sh"
     grep -q "\"${v}\"" "${mkt}" 2>/dev/null || violation "HARD" "utils/marketplace/roles.yaml" "vertical '${v}' referenciado em roles.yaml não registrado no marketplace.json"
   done
+
+  # --- WORK_TOOLS (eixo cross-cutting, 2026-07-19) — drift-guard próprio ---
+  #   (1) todo `work_tools:` de papel referencia um set válido (ou none/tbd);
+  #   (2) todo tool nomeado em work_tool_sets resolve a um comando real .claude/commands/meta/<tool>.md;
+  #   (3) o conjunto `full` está coberto pelo manifesto onion-work-tools (roles.yaml <-> manifesto).
+  local wt_out kind a b
+  wt_out="$(python3 - "${roles}" <<'PY'
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1])) or {}
+sets = d.get("work_tool_sets") or {}
+valid = set(sets.keys()) | {"none", "tbd"}
+for role, spec in (d.get("roles") or {}).items():
+    wt = (spec or {}).get("work_tools")
+    if wt is not None and wt not in valid:
+        print("BADSET\t%s\t%s" % (role, wt))
+for name, lst in sets.items():
+    for t in (lst or []):
+        print("TOOL\t%s\t" % t)
+PY
+)"
+  while IFS=$'\t' read -r kind a b; do
+    case "${kind}" in
+      BADSET) violation "HARD" "utils/marketplace/roles.yaml" "papel '${a}' referencia work_tools set '${b}' inexistente em work_tool_sets" ;;
+      TOOL) [ -f "${REPO_ROOT}/.claude/commands/meta/${a}.md" ] || violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' sem comando em .claude/commands/meta/${a}.md" ;;
+    esac
+  done <<< "${wt_out}"
+  local wtman="${vdir}/onion-work-tools.manifest.sh" ft
+  if [ -f "${wtman}" ]; then
+    for ft in $(python3 -c "import yaml; d=yaml.safe_load(open('${roles}')) or {}; print(' '.join((d.get('work_tool_sets') or {}).get('full') or []))" 2>/dev/null); do
+      grep -q "commands/meta/${ft}.md" "${wtman}" || violation "HARD" "utils/marketplace/verticals/onion-work-tools.manifest.sh" "work_tool 'full:${ft}' (roles.yaml) ausente do manifesto onion-work-tools"
+    done
+  fi
 }
 
 # ===========================================================================

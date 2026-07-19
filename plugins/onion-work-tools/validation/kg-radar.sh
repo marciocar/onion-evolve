@@ -4,7 +4,7 @@
 # Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--schema|--triples]
 #      (sem flag = radar + reconcile + integrity + domain + provenance + freshness + schema)
 #
-# Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
+# Doutrina: ${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md
 #   RADAR           = atenção — peso do nó × centralidade (grau).
 #                     peso = impact(1-5) × confidence(0-1) × fator de status
 #                     fator: open=1.0 · confirmed=1.0 · refuted=0 · superseded=0.2 · done=0.1

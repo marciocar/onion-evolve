@@ -12,7 +12,7 @@ category: meta
 tags: [kg, knowledge-graph, investigation, sdaal, radar, reconciliation, domain-layer]
 version: "1.3.0"
 updated: "2026-07-16"
-allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/kg-radar.sh*) Bash(ls docs/*)
+allowed-tools: Read Write Edit Grep Glob Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*) Bash(ls docs/*)
 argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área>]  (vazio = localizar .kg.yaml existente e rodar radar)"
 related_commands:
   - /meta:evolve
@@ -31,7 +31,7 @@ comando modela a investigação como **grafo tipado num `.kg.yaml`** e usa o **r
 para produzir o veredito — a atenção, as reconciliações e a integridade saem do motor, não da
 impressão do modelo.
 
-> Doutrina: [knowledge-graph-sdaal.md](../../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md)
+> Doutrina: [knowledge-graph-sdaal.md](${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md)
 > (inclui a nota *"git merge não reconcilia verdades"*, confirmada em campo).
 > Rampa da vertical: [ADR verticals](../../../docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md).
 
@@ -121,13 +121,13 @@ eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção de um a
 
 ### Passo 3 — Rodar o radar (determinístico — o veredito é dele)
 ```bash
-bash .claude/validation/kg-radar.sh docs/onion/graph/<slug>.kg.yaml            # todas as saídas (radar+reconcile+integrity+domain+freshness+schema)
-bash .claude/validation/kg-radar.sh <arquivo> --integrity                      # só o gate estrutural (exit 1 se problema)
-bash .claude/validation/kg-radar.sh <arquivo> --schema                         # só o gate de schema (exit 1 se schema_version divergir)
-bash .claude/validation/kg-radar.sh <arquivo> --freshness                      # só o frescor da SSOT (⚠ STALE-MISSING/STALE-OLD, não reprova)
-bash .claude/validation/kg-radar.sh <arquivo> --domain                         # só completude da camada domain
-bash .claude/validation/kg-radar.sh <arquivo> --triples                        # triplas p/ consumo por LLM
-bash .claude/validation/kg-console.sh <arquivo> > grafo.html                    # VER o grafo (projeção HTML self-contained)
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh docs/onion/graph/<slug>.kg.yaml            # todas as saídas (radar+reconcile+integrity+domain+freshness+schema)
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --integrity                      # só o gate estrutural (exit 1 se problema)
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --schema                         # só o gate de schema (exit 1 se schema_version divergir)
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --freshness                      # só o frescor da SSOT (⚠ STALE-MISSING/STALE-OLD, não reprova)
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --domain                         # só completude da camada domain
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --triples                        # triplas p/ consumo por LLM
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-console.sh <arquivo> > grafo.html                    # VER o grafo (projeção HTML self-contained)
 ```
 - **RADAR** = onde olhar primeiro (top atenção).
 - **RECONCILIAÇÃO** = as auto-correções registradas (REFUTES/SUPERSEDES).
@@ -219,7 +219,7 @@ nunca o componente). Redesign/refactor só começa aqui — **dirigido pelo cont
 - **Append-mostly**: corrigir = adicionar nó/aresta ou mudar `status`; **nunca** deletar nós
   (auditoria da investigação é o próprio grafo).
 - O radar é **gate**: integridade **ou schema** com exit 1 bloqueia o commit do `.kg.yaml` (mesmo
-  espírito dos demais scripts de `.claude/validation/`). O radar-de-domínio e o **frescor** **não** são
+  espírito dos demais scripts de `${CLAUDE_PLUGIN_ROOT}/validation/`). O radar-de-domínio e o **frescor** **não** são
   gate — são atenção (um estado-absorvente pode ser terminal legítimo; um nó stale mente mas não
   corrompe — o juízo é seu). Carimbe `verified_at:` nos nós `plane:PROD` quando cruzar a claim com o
   vivo — é o que aposenta o ⚠ STALE-MISSING e deixa o próximo leitor (humano ou IA) confiar sem re-checar.
@@ -234,7 +234,7 @@ nunca o componente). Redesign/refactor só começa aqui — **dirigido pelo cont
 
 ## 🔗 Referências
 
-- Doutrina: [knowledge-graph-sdaal.md](../../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md)
-- Motor: `.claude/validation/kg-radar.sh` (soberano; awk determinístico)
+- Doutrina: [knowledge-graph-sdaal.md](${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md)
+- Motor: `${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh` (soberano; awk determinístico)
 - Vertical: [onion-adr-verticals-investigation-cartography-2026-07.md](../../../docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md)
 - Lente irmã (estrutura do framework): `/meta:graph`

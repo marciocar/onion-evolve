@@ -6,7 +6,7 @@ category: meta
 tags: [co-evolution, inbox, bridge, federation, onboarding, sdaal]
 version: "1.4.0"
 updated: "2026-07-16"
-allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(git fetch origin*) Bash(git pull --ff-only*) Bash(git merge --ff-only origin/main*) Bash(bash .claude/validation/onion-version.sh)
+allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(git fetch origin*) Bash(git pull --ff-only*) Bash(git merge --ff-only origin/main*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh)
 argument-hint: "(sem argumentos — lê o estado de co-evolução deste repo)"
 ---
 
@@ -24,7 +24,7 @@ Mostra a posição **deste repo** no modelo de co-evolução do Onion, lê o `in
 
 O `role` pode vir de dois lugares (o core **não** tem `.onion-version` estático — ele o computa):
 1. Se **`.claude/.onion-version`** existe → ler o campo `role:` (consumidor adotado: `role: adopted`).
-2. Senão, se **`.claude/validation/onion-version.sh`** existe → rodar `bash .claude/validation/onion-version.sh`
+2. Senão, se **`${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh`** existe → rodar `bash ${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh`
    e ler `role:` (a fonte/core retorna `role: source`).
 3. Se nenhum dos dois → repo ainda não é Onion (ou pré-adoção) — avisar e parar.
 

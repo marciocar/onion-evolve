@@ -1,0 +1,8 @@
+{
+  "name": "onion-work-tools",
+  "version": "0.1.0",
+  "conformance": "silver",
+  "provides": ["knowledge-graph-sdaal","learning-diary","orchestration","metaspec-validation","freshness-audits","constellation-map","co-evolution-upstream"],
+  "requires": ["agent:metaspec-gate-keeper","skill:onion-orchestration"],
+  "loads": ["embed:kb/knowledge-graph-sdaal.md","when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)","when:diary -> run:validation/diary-index.sh"]
+}

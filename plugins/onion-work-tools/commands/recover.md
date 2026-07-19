@@ -34,7 +34,7 @@ fonte. Cobre dois sintomas:
 
 ```bash
 REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-ROLE="$(bash "$REPO/.claude/validation/onion-version.sh" 2>/dev/null | awk '/^role:/{print $2}')"
+ROLE="$(bash "$REPO/${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh" 2>/dev/null | awk '/^role:/{print $2}')"
 echo "Role detectado: ${ROLE:-desconhecido}"
 ```
 
@@ -62,22 +62,22 @@ REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 echo "=== Health-check do core Onion ==="
 
 # 1. Stamp ao vivo
-bash "$REPO/.claude/validation/onion-version.sh" 2>/dev/null \
+bash "$REPO/${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh" 2>/dev/null \
   && echo "✅ onion-version.sh OK" || echo "❌ onion-version.sh falhou"
 
 # 2. Gate determinístico: selftest + lint
 echo ""
 echo "--- lint-selftest ---"
-bash "$REPO/.claude/validation/lint-selftest.sh" 2>&1 | tail -5
+bash "$REPO/${CLAUDE_PLUGIN_ROOT}/validation/lint-selftest.sh" 2>&1 | tail -5
 
 echo ""
 echo "--- lint-artifacts (HARD only) ---"
-bash "$REPO/.claude/validation/lint-artifacts.sh" 2>&1 | grep -E "HARD|OK ✓|FALHOU" | tail -3
+bash "$REPO/${CLAUDE_PLUGIN_ROOT}/validation/lint-artifacts.sh" 2>&1 | grep -E "HARD|OK ✓|FALHOU" | tail -3
 
 # 3. Inventory sync
 echo ""
 echo "--- inventory sync ---"
-bash "$REPO/.claude/validation/inventory.sh" 2>/dev/null | head -5
+bash "$REPO/${CLAUDE_PLUGIN_ROOT}/validation/inventory.sh" 2>/dev/null | head -5
 ```
 
 ### Se encontrar arquivos corrompidos ou ausentes
@@ -326,7 +326,7 @@ REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 echo "--- Validação de recuperação ---"
 
 # 1. Stamp legível com role: adopted
-bash "$REPO/.claude/validation/onion-version.sh" 2>/dev/null | grep -q "^role: adopted" \
+bash "$REPO/${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh" 2>/dev/null | grep -q "^role: adopted" \
   && echo "✅ stamp: role adopted" || echo "❌ stamp: inválido ou ausente"
 
 # 2. CLAUDE.md tem marker
