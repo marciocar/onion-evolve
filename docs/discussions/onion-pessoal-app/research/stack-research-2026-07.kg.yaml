@@ -622,6 +622,25 @@ nodes:
     verified_at: "2026-07-19"
     label: "DECISÃO de voz ASSIMÉTRICA (2026-07-19), e o porquê importa: ENTRADA (tua voz → STT) sai crua — exceção aceita; RACIOCÍNIO (cérebro) recebe só texto de-identificado; SAÍDA (resposta falada) NÃO sai — TTS on-device. O furo que isso fecha: a resposta exibida está DES-REDIGIDA (tem os nomes reais restaurados localmente), então um TTS de nuvem vazaria pelo outro lado exatamente o que a compartimentalização protege. Preserva a propriedade real do desenho: o transcritor OUVE mas não sabe quem você é; o cérebro SABE quem você é mas só vê tokens — nenhum tem o quadro completo. SPEECH-TO-SPEECH ficou GATED por isso (pesquisa jul/2026: GPT-Realtime-2 e Gemini 3.1 Flash Live existem, mas S2S entrega voz crua + life-KG ao MESMO modelo, sem texto intermediário p/ de-identificar — o portão some; + suporte RN instável, sem SDK JS oficial, polyfill de Web Audio, Android quebrando). Saída da exceção com STT on-device: whisper.rn / whisper-kit-expo (watch-items concretos, não hipótese)."
 
+  # ==== dois fios abertos achados em 2026-07-19 (medidos, não supostos) ====
+  - id: E_PERSONAL_KG_RADAR
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "Rodei o kg-radar CANÔNICO (.sh) nos 4 verticais do life-KG soberano (~/onion-pessoal/): 3 passam (exit 0), 1 REPROVA (exit 1) por contradição não-reconciliada — decisão que recebe REFUTES mas segue status=confirmed. O CONTEÚDO é privado do maestro e NÃO é registrado aqui (só ele reconcilia: refuted ou superseded). DUAS implicações p/ o app: (1) o write-gate do app BLOQUEARIA o sync desse vertical enquanto não reconciliar — o gate funcionando como projetado, mas é bom saber antes de sincronizar o KG real; (2) INVERSÃO reveladora: os 4 KGs pessoais têm a camada `domain` COMPLETA (5 checagens sem lacuna), enquanto o KG desta estrela tem ZERO nós domain. O KG de vida do maestro é o MODELO do que nos falta, não o contrário."
+  - id: Q_FRONTEND_MAP
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "ABERTO: o frontend do app NUNCA foi mapeado como SSOT de domínio. Medição (2026-07-19): 66 nós, TODOS layer:audit, ZERO domain — o radar diz 'camada domain ausente, grafo puramente epistêmico'; TRACES_TO = 2/66, com 3 decisões sinalizadas SEM proveniência (D_STACK, D_DEFINITIVE, D_PLANB) = o modo de falha que a KB nomeia ('integridade perfeita, rastreabilidade órfã'). E o app não tem docs/design-context/. A doutrina do core (/meta:kg modo `map <área>`) manda mapear ANTES de qualquer redesign — 'antes de qualquer pixel, o inventário é o insumo, não o contrato' — e eu já fiz um refactor grande de UI (separar chat/diagnóstico) SEM esse mapa. Direção: (1) atom-map do frontend → .kg.yaml layer:domain; (2) TRACES_TO nós→artefatos reais; (3) docs/design-context/ quando desenhar a superfície. É a ENTRADA correta do F2, não um desvio."
+
 edges:
   # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
   - from: D_STACK
@@ -949,4 +968,12 @@ edges:
     edge_type: SUPPORTS
   - from: D_VOICE_ASYMMETRY
     to: D_MEDIA_EXCEPTION
+    edge_type: CONSTRAINS
+
+  # --- os dois fios abertos: o radar no KG real evidencia a lacuna que a pergunta do frontend endereça ---
+  - from: E_PERSONAL_KG_RADAR
+    to: Q_FRONTEND_MAP
+    edge_type: SUPPORTS
+  - from: Q_FRONTEND_MAP
+    to: D_DEFINITIVE
     edge_type: CONSTRAINS
