@@ -1,0 +1,406 @@
+# KG SDAAL — grafo da estrela discuss/kg-visualization-dashboards.
+# Pesquisa (nasce em KG, nao morre em prosa): landscape 2026 de viz/dashboards/gestao do .kg.yaml.
+# Metodo: fan-out orquestrado (7 dimensoes, sonnet/medium) + verify adversarial por-claim (opus/high),
+#         44 agentes, 37 verdicts contra FONTE PRIMARIA. Sintese em NOTE-00..06.
+# Camada 100% audit (epistemica) — este estudo pesquisa, nao modela dominio.
+meta:
+  id: kg-visualization-dashboards-2026-07
+  schema_version: "1"
+  date: 2026-07-19
+  baseline: 2026-07-19
+nodes:
+  # ---- perguntas de pesquisa ----
+  - id: Q_FORMFACTOR
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "qual superficie de viz/gestao por cima do .kg.yaml, por fator de forma (desktop-full vs mobile/chat)"
+  - id: Q_DESKTOP
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "qual motor de graph-viz desktop-full de maior fidelidade ao modelo tipado"
+  - id: Q_MOBILE_CHAT
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "como consumir/gerir o KG em celular e dentro de chat (a restricao mais dura)"
+  - id: Q_TRANSFORM
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "qual pipeline transforma .kg.yaml em formatos de viz sem perder tipagem"
+  - id: Q_DASHBOARD
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "qual framework de dashboard de metricas do grafo (atencao/frescor/integridade)"
+
+  # ---- claims (achados que sobreviveram ao verify) ----
+  - id: C_CYTOSCAPE_DESKTOP
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "Cytoscape.js e a maior fidelidade desktop — seletores CSS-like mapeiam node_type/edge_type, rotulo de aresta cobre o gatilho de TRANSITIONS, MIT self-host"
+  - id: C_SIGMA_SCALE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "Sigma.js (WebGL sobre graphology) e a via de escala p/ milhares de nos sem perder atributos tipados"
+  - id: C_MOBILE_CEILING
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "node-link so e eficaz p/ grafo esparso ate ~20 nos; em celular o teto cai p/ ~15 — acima disso vira emaranhado"
+  - id: C_CYTOSCAPE_TOUCH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "Cytoscape.js e o unico com toque nativo verificado (pinch/pan/tap documentados); Sigma/Reagraph nao documentam mobile"
+  - id: C_DEGRADE_TEXT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "o padrao chat-native e DEGRADAR node-link p/ texto/lista/tabela — preserva tipos, peso e plane como campos, perde so a topologia visual"
+  - id: C_DOI_FILTER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "Degree-of-Interest (van Ham e Perer) e o filtro portavel p/ tela pequena — peso do no vezes 1/distancia como score, computavel do schema atual"
+  - id: C_TRIPLES_NATIVE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "a saida triples do kg-radar ja e o formato nativo ideal p/ LLM — triplas lineares batem prosa fluida em Q&A fact-intensive"
+  - id: C_MERMAID_FRAGILE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "Mermaid e fragil em mobile — SVG estatico sem zoom, texto ilegivel acima de ~30 nos, teto de arestas, e perde peso numerico e o toggle de plane"
+  - id: C_NO_TOOL_MOBILE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.75
+    status: confirmed
+    label: "nenhuma ferramenta de prateleira 2026 tem fator de forma mobile/chat-native p/ KG — kg-radar (texto) e kg-console (SVG self-contained) ja ocupam um nicho real vago"
+  - id: C_NETWORKX_HUB
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "a rota mais fiel e barata e YAML para NetworkX como hub, exportando GraphML e Cytoscape.js JSON simultaneos — passthrough de atributos sem perda"
+  - id: C_MULTIVARIATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "o .kg.yaml e por definicao uma rede multivariada; o survey Nobre/Lex 2019 e a grade de decisao (4 eixos) mais aplicavel, nao uma tecnica isolada"
+  - id: C_EDGE_BUNDLING
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: open
+    label: "a melhoria desktop mais barata do kg-console e trocar circular puro por edge bundling hierarquico (Holten) usando layer/plane como hierarquia de base"
+  - id: C_GRAPHRAG_SUMMARY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    label: "GraphRAG e PropertyGraphIndex sao camada de RESUMO por cima (verbalizam, nunca desenham) — diluem tipagem fina salvo prompt customizado"
+  - id: C_MERMAID_PRIMARY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.2
+    status: refuted
+    label: "hipotese descartada — Mermaid pode ser o visualizador PRIMARIO do KG em mobile/chat"
+  - id: C_ADOPT_EXTERNAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.2
+    status: refuted
+    label: "hipotese descartada — adotar um dashboard framework externo (Grafana/Neo4j Bloom) resolve a viz do KG de prateleira"
+
+  # ---- evidencia (fontes primarias verificadas no verify adversarial) ----
+  - id: E_CYTOSCAPE_DOCS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "js.cytoscape.org + blog webgl-preview: MIT confirmado, v3.34, gestos de toque nativos, renderer WebGL opt-in v3.31 (WebGPU ainda nao roda em mobile)"
+  - id: E_MERMAID_LIMITS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "mermaid issues 5042/1134/2162: SVG estatico sem interacao, ~200 nos travam mobile; maxEdges default 500 (o 280 era constante antiga, corrigida)"
+  - id: E_GHONIEM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "Ghoniem/Fekete/Castagliola 2005: acima de ~20 vertices a matriz bate node-link na maioria das tarefas, exceto path-finding"
+  - id: E_DOI_PAPER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "van Ham e Perer TVCG 2009: Degree-of-Interest de Furnas estendida de arvores p/ grafos (o range 0-1 do claim foi ressalva PARTIAL, nao esta na fonte)"
+  - id: E_GRAPHRAG_PAPER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "arXiv 2404.16130: GraphRAG deriva grafo de entidades, clusteriza em comunidades (Leiden) e resume por LLM; a saida ao usuario e TEXTO, nao grafo"
+  - id: E_TRIPLES_PAPER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "arXiv 2402.11541: triplas lineares soltas superam prosa fluida p/ LLM responder perguntas fact-intensive — o formato que o kg-radar ja emite"
+
+  # ---- artefatos (as superficies de texto que ja existem — o ponto de partida a superar) ----
+  - id: A_KG_RADAR
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "kg-radar.sh — radar deterministico awk (RADAR/reconcile/integridade/dominio/frescor/schema/triples), motor soberano do core"
+  - id: A_KG_CONSOLE
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "kg-console.sh — projecao read-only do .kg.yaml em 1 SVG node-link circular self-contained (zero backend/CDN), veredito do radar embutido"
+
+  # ---- decisoes (as recomendacoes GATED por fator de forma) ----
+  - id: D_DESKTOP_CYTOSCAPE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    trace: docs/discussions/kg-visualization-dashboards/NOTE-01-desktop-full.md
+    label: "GATED — p/ desktop-full, Cytoscape.js como motor canonico do dashboard interativo, com Sigma.js como via de escape p/ escala; yFiles/Ogma fora por licenca fechada"
+  - id: D_CHAT_TEXT_FIRST
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    trace: docs/discussions/kg-visualization-dashboards/NOTE-03-chat-native.md
+    label: "GATED — p/ mobile/chat, texto-primeiro em camadas: boletim deterministico do radar, node-focus por DOI, Mermaid so sob pedido explicito e so fatia pequena via Artifact"
+  - id: D_TRANSFORM_NETWORKX
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: open
+    trace: docs/discussions/kg-visualization-dashboards/NOTE-05-pipelines.md
+    label: "GATED — pipeline de transformacao com NetworkX como hub, exportando GraphML (offline denso) e Cytoscape.js JSON (web interativo) do mesmo dict tipado"
+  - id: D_EVOLVE_NOT_ADOPT
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.75
+    status: open
+    trace: docs/discussions/kg-visualization-dashboards/NOTE-00-sintese.md
+    label: "GATED — a rota certa e EVOLUIR as superficies proprias (radar texto + console SVG) por cima da SSOT, nao adotar um dashboard framework externo que exige ETL e nao tem mobile"
+
+edges:
+  # perguntas derivam da pergunta-mae
+  - from: Q_DESKTOP
+    edge_type: DEPENDS_ON
+    to: Q_FORMFACTOR
+  - from: Q_MOBILE_CHAT
+    edge_type: DEPENDS_ON
+    to: Q_FORMFACTOR
+  - from: Q_TRANSFORM
+    edge_type: DEPENDS_ON
+    to: Q_FORMFACTOR
+  - from: Q_DASHBOARD
+    edge_type: DEPENDS_ON
+    to: Q_FORMFACTOR
+
+  # desktop-full
+  - from: E_CYTOSCAPE_DOCS
+    edge_type: SUPPORTS
+    to: C_CYTOSCAPE_DESKTOP
+  - from: E_CYTOSCAPE_DOCS
+    edge_type: SUPPORTS
+    to: C_CYTOSCAPE_TOUCH
+  - from: C_CYTOSCAPE_DESKTOP
+    edge_type: SUPPORTS
+    to: D_DESKTOP_CYTOSCAPE
+  - from: C_SIGMA_SCALE
+    edge_type: SUPPORTS
+    to: D_DESKTOP_CYTOSCAPE
+  - from: C_MULTIVARIATE
+    edge_type: SUPPORTS
+    to: Q_DESKTOP
+  - from: D_DESKTOP_CYTOSCAPE
+    edge_type: DEPENDS_ON
+    to: Q_DESKTOP
+
+  # mobile / chat-native (o fator de forma principal)
+  - from: C_MOBILE_CEILING
+    edge_type: SUPPORTS
+    to: D_CHAT_TEXT_FIRST
+  - from: C_CYTOSCAPE_TOUCH
+    edge_type: SUPPORTS
+    to: D_CHAT_TEXT_FIRST
+  - from: C_DEGRADE_TEXT
+    edge_type: SUPPORTS
+    to: D_CHAT_TEXT_FIRST
+  - from: C_DOI_FILTER
+    edge_type: SUPPORTS
+    to: D_CHAT_TEXT_FIRST
+  - from: C_TRIPLES_NATIVE
+    edge_type: SUPPORTS
+    to: D_CHAT_TEXT_FIRST
+  - from: C_MERMAID_FRAGILE
+    edge_type: SUPPORTS
+    to: D_CHAT_TEXT_FIRST
+  - from: C_GRAPHRAG_SUMMARY
+    edge_type: SUPPORTS
+    to: D_CHAT_TEXT_FIRST
+  - from: D_CHAT_TEXT_FIRST
+    edge_type: DEPENDS_ON
+    to: Q_MOBILE_CHAT
+  - from: E_DOI_PAPER
+    edge_type: SUPPORTS
+    to: C_DOI_FILTER
+  - from: E_GHONIEM
+    edge_type: SUPPORTS
+    to: C_DEGRADE_TEXT
+  - from: E_GHONIEM
+    edge_type: SUPPORTS
+    to: C_MOBILE_CEILING
+  - from: E_TRIPLES_PAPER
+    edge_type: SUPPORTS
+    to: C_TRIPLES_NATIVE
+  - from: E_MERMAID_LIMITS
+    edge_type: SUPPORTS
+    to: C_MERMAID_FRAGILE
+  - from: E_GRAPHRAG_PAPER
+    edge_type: SUPPORTS
+    to: C_GRAPHRAG_SUMMARY
+  - from: A_KG_RADAR
+    edge_type: SUPPORTS
+    to: C_DEGRADE_TEXT
+  - from: C_TRIPLES_NATIVE
+    edge_type: TRACES_TO
+    to: A_KG_RADAR
+
+  # nao-adotar-externo / evoluir o proprio (dashboard + niche)
+  - from: C_NO_TOOL_MOBILE
+    edge_type: SUPPORTS
+    to: Q_MOBILE_CHAT
+  - from: C_NO_TOOL_MOBILE
+    edge_type: SUPPORTS
+    to: D_EVOLVE_NOT_ADOPT
+  - from: C_NO_TOOL_MOBILE
+    edge_type: TRACES_TO
+    to: A_KG_CONSOLE
+  - from: C_EDGE_BUNDLING
+    edge_type: SUPPORTS
+    to: D_EVOLVE_NOT_ADOPT
+  - from: D_EVOLVE_NOT_ADOPT
+    edge_type: DEPENDS_ON
+    to: Q_DASHBOARD
+
+  # transformacao
+  - from: C_NETWORKX_HUB
+    edge_type: SUPPORTS
+    to: D_TRANSFORM_NETWORKX
+  - from: D_TRANSFORM_NETWORKX
+    edge_type: DEPENDS_ON
+    to: Q_TRANSFORM
+
+  # reconciliacao — as auto-correcoes adversariais (append-mostly)
+  - from: C_MERMAID_FRAGILE
+    edge_type: REFUTES
+    to: C_MERMAID_PRIMARY
+  - from: D_CHAT_TEXT_FIRST
+    edge_type: SUPERSEDES
+    to: C_MERMAID_PRIMARY
+  - from: C_NO_TOOL_MOBILE
+    edge_type: REFUTES
+    to: C_ADOPT_EXTERNAL
+  - from: D_EVOLVE_NOT_ADOPT
+    edge_type: SUPERSEDES
+    to: C_ADOPT_EXTERNAL
