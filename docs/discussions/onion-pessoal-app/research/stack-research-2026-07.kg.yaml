@@ -305,6 +305,16 @@ nodes:
     status: open
     label: "TENSÃO D2↔Vercel (só fecha no spike on-device): callstack/ai (via Vercel) não cobre executorch(.pte) → executorch(features/produção) vs llama.rn(GGUF, Vercel-nativo). Vale um adapter executorch↔Vercel custom (não existe)? Decidir no dado real do Q_DEID, não no papel"
 
+  # ==== device-alvo (âncora dos spikes, 2026-07-19) ====
+  - id: C_DEVICE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "device-alvo do projeto = POCO X8 Pro Max (comprado pelo maestro 2026-07-19). ⚠ specs A-VERIFICAR (RAM/chipset/NPU/Android — decidem qual modelo 0.5-3B + runtime cabe; ex.: piso ≥4GB executorch). NÃO verificado: cutoff jan/2026 + orçamento de busca da sessão esgotado (200/200). É o alvo concreto de Q_DEID/Q_PERF/Q_GITSYNC — some o 'mid-range abstrato'"
+
   # ==== perguntas em aberto (viram spike / Fase 1b) ====
   - id: Q_DEID
     node_type: question
@@ -565,6 +575,17 @@ edges:
     edge_type: DEPENDS_ON
   - from: Q_EXECUTORCH_VERCEL
     to: Q_DEID
+    edge_type: DEPENDS_ON
+
+  # --- os spikes on-device aterram no device-alvo concreto (Poco X8 Pro Max) ---
+  - from: Q_DEID
+    to: C_DEVICE
+    edge_type: DEPENDS_ON
+  - from: Q_PERF
+    to: C_DEVICE
+    edge_type: DEPENDS_ON
+  - from: Q_GITSYNC
+    to: C_DEVICE
     edge_type: DEPENDS_ON
 
   # --- compatibilidade verificada: stack coeso, não defasado; git-sync = risco aberto ---
