@@ -70,7 +70,7 @@ Caso real que originou a diretriz ([sinal de campo, upstream](../../evolution/fe
 |---|---|---|
 | Banco do adotante 32MB → **86MB em ~1 semana**; 80% em 3 tabelas | `WRRSelectionDecision`: **38MB / 2.781 linhas**, ~**79KB/linha** (máx 186KB) — cada decisão grava **o pool inteiro de candidatos (~300+)** + exclusões por estágio, **sem poda** | Regra 1 (payload mínimo: selecionado + top-N, não o pool) reduz ~79KB → poucos KB; Regra 2+3 (retenção + frio) limita o acúmulo no caminho quente |
 
-A lição: a tabela não era um log — era a **rastreabilidade da spec do WRR**. O problema não foi *registrar
+A lição: a tabela não era um log — era a **rastreabilidade da spec do motor**. O problema não foi *registrar
 a decisão*; foi **registrar o universo** e **nunca podar**. A rastreabilidade certa é mais barata **e**
 mais legível (o auditor lê o que importa, não 300 candidatos).
 

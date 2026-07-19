@@ -9,7 +9,7 @@ promoted_to: harness/claude-code-internals.md
 
 ## O que originou esta observação
 
-Durante uma sessão do um adotante (teste E2E de dispersão WRR), o maestro
+Durante uma sessão de um adotante (teste E2E de dispersão do motor), o maestro
 viu dois paths internos do harness que nunca tinha visto explicitamente:
 
 **Path 1** — task output (efêmero):

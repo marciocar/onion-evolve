@@ -3,7 +3,7 @@
 > **Versão**: 1.0.0 | **Última atualização**: 2026-07-10 | **Categoria**: Frameworks
 > Método para convergir N feature-branches acumuladas (em 1+ repos) para branches consolidadas e
 > PRs sob comando, com dois mandatos duros: **nada fica pelo caminho** e **nada quebra produção**.
-> Promovido via co-evolução: nasceu e foi executado de ponta a ponta na uma instância adotante
+> Promovido via co-evolução: nasceu e foi executado de ponta a ponta numa instância adotante
 > (um adotante + o app de um adotante, ~19 branches, 2026-07-09); o core pediu o destilável
 > ("declarado ≠ verificado"), recebeu o artefato com a verificação completa e destilou esta KB.
 

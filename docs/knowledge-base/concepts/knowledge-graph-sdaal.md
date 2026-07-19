@@ -2,8 +2,8 @@
 
 > **Status: CANDIDATA** — padrão recebido via co-evolução (sinal upstream
 > `docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md`), nascido e dogfoodado
-> na uma instância adotante durante uma auditoria real de produção (WRR/Modo Equilíbrio,
-> 01-02/jul/2026). Autoria do método: uma instância adotante (T1 hub). Esta KB porta o **conceito
+> numa instância adotante durante uma auditoria real de produção (01-02/jul/2026).
+> Autoria do método: uma instância adotante (T1 hub). Esta KB porta o **conceito
 > generalizado**; a implementação de referência vive em um adotante (`scripts/kg/radar.js` +
 > `docs/<adopter>/graph/audit.kg.yaml`).
 >
@@ -32,11 +32,11 @@
 > radar) — e **só então** na camada de código (PR dirigido pelo veredito). `git merge` reconcilia
 > texto, não verdades.
 >
-> **Evidência de campo (1º dogfood na federação, 2026-07-04):** a uma instância adotante reconciliou
-> `develop` (pesquisa da dose) × `<adopter>/main` (motor deployado) num `wrr-audit.kg.yaml` — 56 nós,
+> **Evidência de campo (1º dogfood na federação, 2026-07-04):** uma instância adotante reconciliou
+> `develop` (pesquisa de produto) × `<adopter>/main` (motor deployado) num `prod-audit.kg.yaml` — 56 nós,
 > 81 arestas, zero contradições estruturais. O radar produziu veredito **por-verdade** impossível
 > de derivar de merge textual: uma verdade cruza DEV→PROD (hard `cap=0`, defesa-em-profundidade),
-> uma segura na develop (dose-para-meta, aguarda validação on-policy) e — o achado mais valioso —
+> uma segura na develop (pesquisa-para-meta, aguarda validação on-policy) e — o achado mais valioso —
 > uma flui **ao contrário** (PROD→DEV): dados vivos refutaram a urgência do framing original da
 > pesquisa (métrica inflada ~82× por contagem-fantasma). Sinal completo:
 > [`2026-07-04-kg-primeiro-dogfood-federacao.md`](../../evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md).
@@ -110,7 +110,7 @@ nunca deletar — `/meta:diary review`).
 > **Escopo da camada `audit` — não é sobre código, é sobre investigação.** A gramática epistêmica
 > (`claim`/`evidence`/`decision`/`question` + `SUPPORTS`/`REFUTES`/`SUPERSEDES`) serve **qualquer
 > investigação com achados que se contradizem e se corrigem** — código e sistema (a origem: auditoria
-> WRR de produção), mas também **conteúdo/documentação**: decks, currículo, contratos, specs, e
+> motor de produção), mas também **conteúdo/documentação**: decks, currículo, contratos, specs, e
 > **pesquisa** (streams de deep-research cujos achados se refutam/superam — o veredito por-fonte, a
 > materialidade e as ressalvas `declarado≠verificado` são `status`/`confidence`/`impact`/`REFUTES`). Pesquisa
 > **nasce em KG, não morre em prosa** (doutrina 2026-07-17): 1ª instância `research/whatsapp-api-2026-07/`.
@@ -133,7 +133,7 @@ achado de auditoria). Pragmatismo herdado do dogfood: **mesmo arquivo, campo `la
 ### Footguns ao autorar o `.kg.yaml` (armadilhas de campo)
 
 Aprendido no dogfood intenso de um adotante (2026-07-15/16, reconciliação do SSOT
-WRR/Modo Equilíbrio): a autoria do `.kg.yaml` tem armadilhas silenciosas que **corrompem o grafo
+auditoria de produção): a autoria do `.kg.yaml` tem armadilhas silenciosas que **corrompem o grafo
 sem erro visível**. Evite:
 
 - **`on:` vira booleano `True` (YAML 1.1).** A chave `on:` de `TRANSITIONS ... on: EVENTO` é
@@ -191,7 +191,7 @@ plane DEV; só o artefato vivo é plane PROD.**
 
 Um KG-SSOT que não é **re-executado** contra o estado vivo **apodrece silenciosamente** — vira "uma
 bela SSOT que mente", e um consumidor confiante (IA inclusive) *propaga* a mentira. Lição-mestra do
-dogfood mais intenso do padrão até hoje (um adotante, 2026-07-15/16: `doseMaxByLevel`
+dogfood mais intenso do padrão até hoje (um adotante, 2026-07-15/16: `maxByLevel`
 no grafo `2/4/8/8/8` × real vivo `2/4/12/15/20`; bloqueador "aberto" já corrigido; feature "aguardando
 push" já deployada). O valor do KG **não** é ser escrito uma vez — é ser **re-verificável**. Duas
 guardas (ADR [`kg-freshness-gate`](../../analysis/onion-adr-kg-freshness-gate-2026-07.md)), a mesma
@@ -282,7 +282,7 @@ conselho**. Dois episódios distintos, do mesmo adotante (um adotante), na mesma
 | Episódio | Sinal | O que aconteceu |
 |---|---|---|
 | **origem da doutrina** | [`ssot-como-runtime-para-adr`](../../evolution/inbox/_processed/2026-07-16-ssot-como-runtime-para-adr.md) | montou o KG canônico e **o ignorou 3× na mesma sessão** — reconstruiu de git/memória enquanto o grafo já tinha a resposta (`E_ABANDON_APPLY_PROOF`, `C_CONSOLIDATION_MAP`) |
-| **escalada a mecanismo** | `mandar-a-doutrina-kg-first` | **depois** de escrever a doutrina, reincidiu **≥4×**: planejou um redesenho do WRR sem consultar o grafo. Ao consultar, o KG **corrigiu 4 erros** que ele cometeria — janela `7d`→**`14d` medido** (`C_WINDOW_SWEEP`); morte-da-chamada só-TTL→**sinal + derivação** (`C_ABANDON_PUSHED`/`Q_URANO_SIGNAL`); conflito com `I_NO_AGE_RELEASE`; e **metade do redesenho já existia como nó** (`R_DOSEPARAMETA`, `R_ADR018`) |
+| **escalada a mecanismo** | `mandar-a-doutrina-kg-first` | **depois** de escrever a doutrina, reincidiu **≥4×**: planejou um redesenho do motor sem consultar o grafo. Ao consultar, o KG **corrigiu 4 erros** que ele cometeria — janela `7d`→**`14d` medido** (`C_WINDOW_SWEEP`); morte-da-chamada só-TTL→**sinal + derivação** (`C_ABANDON_PUSHED`/`Q_RELEASE_SIGNAL`); conflito com `I_NO_AGE_RELEASE`; e **metade do redesenho já existia como nó** (`R_PARAMETA`, `R_ADR018`) |
 
 > **A reincidência É o dado.** Não é falha de disciplina do consumidor — é falha de *design* do loop.
 > Um estado que depende de um evento que nunca chega é exatamente o bug do SLOT-limbo que o mesmo
@@ -405,5 +405,5 @@ instância implementa com seu stack; o core permanece determinístico até a esc
 - **Parentesco**: protocolo de re-teste do diário (`/meta:diary review`); doutrina de dogfood
   ([onion-dogfooding-doctrine](onion-dogfooding-doctrine.md)) — "invoque o artefato e observe" é a
   regra PROD-plane em outra roupa.
-- **Origem e crédito**: uma instância adotante, auditoria WRR (evidência: radar priorizou cura de
+- **Origem e crédito**: uma instância adotante, auditoria de produção (evidência: radar priorizou cura de
   raiz sobre paliativos; reconciliou 6 auto-correções como `REFUTES`; integridade pegou 3 órfãos).

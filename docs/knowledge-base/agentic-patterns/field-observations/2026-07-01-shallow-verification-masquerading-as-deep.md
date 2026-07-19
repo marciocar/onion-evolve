@@ -38,7 +38,7 @@ feliz" (`working-discipline.md` §Validação) — não é uma regra nova, é um
 
 ## Caso 2 — erro de uma sessão anterior (mais caro, achado ao ler o histórico)
 
-Investigando a PR #75 (fix de gate WRR), li o relatório final da auditoria do burst de
+Investigando a PR #75 (fix de gate do motor), li o relatório final da auditoria do burst de
 30/06 (`docs/reports/wrr/auditoria-burst-versao-final-2026-06-30.md` no um adotante).
 Uma sessão da MANHÃ tinha concluído "wrrLevel=null causou o burst" a partir de uma query
 SQL ad-hoc que achou esse campo null em 3 firmas. Isso motivou um backfill em 186
