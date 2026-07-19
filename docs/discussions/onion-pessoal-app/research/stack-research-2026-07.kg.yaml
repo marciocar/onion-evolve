@@ -311,9 +311,10 @@ nodes:
     layer: audit
     plane: PROD
     impact: 4
-    confidence: 0.6
-    status: open
-    label: "device-alvo do projeto = POCO X8 Pro Max (comprado pelo maestro 2026-07-19). ⚠ specs A-VERIFICAR (RAM/chipset/NPU/Android — decidem qual modelo 0.5-3B + runtime cabe; ex.: piso ≥4GB executorch). NÃO verificado: cutoff jan/2026 + orçamento de busca da sessão esgotado (200/200). É o alvo concreto de Q_DEID/Q_PERF/Q_GITSYNC — some o 'mid-range abstrato'"
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "device-alvo = POCO X8 Pro Max (comprado 2026-07-19). VERIFICADO (URL do anúncio + DuckDuckGo): SoC MediaTek Dimensity 9500s (3nm, Cortex-X925); 12GB RAM (+12 virtual); 512GB; HyperOS 3.0/Android 16; 6.83'' AMOLED; 8500mAh; anunciado mar/2026. ⇒ FLAGSHIP: clara os pisos com folga (≥4GB→12GB; Android13→16) → SLM 1-3B fácil, 4B quant. viável; Q_PERF de-riscado. NPU = APU MediaTek (modelo exato a-confirmar) → input p/ a pesquisa de provider (qual runtime acelera em MediaTek: AI Edge/MediaPipe fortes; executorch/MLC variam)"
 
   # ==== perguntas em aberto (viram spike / Fase 1b) ====
   - id: Q_DEID
