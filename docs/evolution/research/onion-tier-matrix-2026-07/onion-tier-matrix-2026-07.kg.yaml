@@ -1,0 +1,190 @@
+# KG da pesquisa orquestrada (wf_ab57a814-c16): matriz role→(verticais+work_tools) da família Onion.
+# 4 frentes (motor vivo · KG-SSOT · business/funil · externo-Anthropic 2026) → síntese. Born-in-KG.
+meta:
+  id: onion-tier-matrix-2026-07
+  schema_version: "1"
+  baseline: 2026-07-19
+  date: 2026-07-19
+nodes:
+  # --- evidência ---
+  - id: E_BASE_IDENTICAL
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "roles.yaml:20-25 — standalone.base == hub.base e optional byte-a-byte idênticos; só trust/downstream separa"
+  - id: E_DEADREF
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "work.md:24 cabeia kg-radar.sh no passo-0, mas onion-engineering.manifest.sh tem VALIDATION=() → dead-ref em todo standalone montado"
+  - id: E_ANTHROPIC_JOINT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "Anthropic: Agent Skills plenas em plano pago individual; marketplace+auto-install-por-grupo gated a Team/Enterprise (support.claude.com 13837433)"
+  - id: E_LAND_EXPAND
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "land-and-expand (Datadog): gatilho de expansão = chegada do MULTI (2º repo/2ª pessoa), não uso individual crescer"
+  # --- claims ---
+  - id: C_REFRAME_SUSTAINED
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "reframe (hub=empresa-com-federação / standalone=solo-completo-sem-federação) SUSTENTADO: motor+doutrina+mercado convergem"
+  - id: C_MATRIX_GAP
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "matriz estruturalmente incompleta: roles.yaml só modela verticais (base/optional), sem eixo p/ os 16 work_tools; nenhum manifesto referencia commands/meta"
+  - id: C_KG_SCRIPT_TRAVELS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "doutrina: viaja o SCRIPT (kg-radar.sh), nunca o DADO (.kg.yaml do core); cláusula 'motor não viaja' é escopada à Federação de orgs, não ao door-mesma-família"
+  - id: C_STD_MOAT_NOT_REVENUE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "standalone = MOAT/advocacy/dogfood-de-campo, NÃO funil de receita (D5: solo não sustenta volume; receita mira P3/P4-empresa via hub+serviço)"
+  # --- decisões ---
+  - id: D_ADOPT_REFRAME
+    node_type: decision
+    trace: docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    label: "ADOTAR o reframe; codificar a fronteira std=hub-em-trabalho, hub=+federação, meta-fábrica core-only"
+  - id: D_KGRADAR_FIX_NONGATED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: "FIX não-gated: add kg-radar.sh ao VALIDATION[] de onion-engineering.manifest.sh (fecha dead-ref + entrega motor de KG soberano)"
+  - id: D_WORKTOOLS_AXIS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: open
+    label: "DESIGN gated: eixo work_tools: cross-cutting em roles.yaml (hub==standalone), WITHHOLD downstream+meta-fábrica; + drift-guards no lint"
+  - id: D_FUNNEL_CUT
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: "funil: mini=demo medida (teaser) · standalone=framework completo grátis (o 'texto') · hub=federação+serviço (upsell, o moat)"
+  # --- questões ---
+  - id: Q_D2_DATA_CURRENCY
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "D2 moeda-dado ABERTA: garantir local-first+destilado antes de vender federação como upsell limpo (colide com fronteira de mitigação de inferência)"
+  - id: Q_STD_CONSUMER_NO_ANALOG
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.5
+    status: open
+    label: "std→consumer é extrapolação do maestro sem análogo de mercado — modelo de papéis suporta, mas hipótese não corroborada externamente"
+  - id: Q_COUNT_16_VS_17
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 1
+    confidence: 1.0
+    status: open
+    label: "são 16 work-tools (não ~17 do brief) — reconciliar contagem com o maestro"
+edges:
+  - from: E_BASE_IDENTICAL
+    to: C_REFRAME_SUSTAINED
+    edge_type: SUPPORTS
+  - from: E_ANTHROPIC_JOINT
+    to: C_REFRAME_SUSTAINED
+    edge_type: SUPPORTS
+  - from: E_LAND_EXPAND
+    to: C_REFRAME_SUSTAINED
+    edge_type: SUPPORTS
+  - from: E_BASE_IDENTICAL
+    to: C_MATRIX_GAP
+    edge_type: SUPPORTS
+  - from: E_DEADREF
+    to: C_MATRIX_GAP
+    edge_type: SUPPORTS
+  - from: C_REFRAME_SUSTAINED
+    to: D_ADOPT_REFRAME
+    edge_type: SUPPORTS
+  - from: E_DEADREF
+    to: D_KGRADAR_FIX_NONGATED
+    edge_type: CAUSES
+  - from: C_KG_SCRIPT_TRAVELS
+    to: D_KGRADAR_FIX_NONGATED
+    edge_type: SUPPORTS
+  - from: C_MATRIX_GAP
+    to: D_WORKTOOLS_AXIS
+    edge_type: CAUSES
+  - from: D_ADOPT_REFRAME
+    to: D_WORKTOOLS_AXIS
+    edge_type: SUPPORTS
+  - from: C_STD_MOAT_NOT_REVENUE
+    to: D_FUNNEL_CUT
+    edge_type: SUPPORTS
+  - from: Q_D2_DATA_CURRENCY
+    to: D_FUNNEL_CUT
+    edge_type: DEPENDS_ON
+  - from: D_WORKTOOLS_AXIS
+    to: D_KGRADAR_FIX_NONGATED
+    edge_type: DEPENDS_ON
+  - from: Q_STD_CONSUMER_NO_ANALOG
+    to: D_ADOPT_REFRAME
+    edge_type: DEPENDS_ON
+  - from: Q_COUNT_16_VS_17
+    to: C_MATRIX_GAP
+    edge_type: DEPENDS_ON
+  - from: C_STD_MOAT_NOT_REVENUE
+    to: C_REFRAME_SUSTAINED
+    edge_type: SUPPORTS
