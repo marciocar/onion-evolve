@@ -326,6 +326,16 @@ nodes:
     verified_at: "2026-07-19"
     label: "runtime × Dimensity 9500s (WebFetch, fatia device-crítica): NPU-MediaTek NÃO tem via limpa em runtime RN — ExecuTorch TEM backend MediaTek (XNNPACK/Vulkan/Qualcomm/MediaTek/Exynos) mas LLM-on-NPU sem workflow provado (RN wrapper→XNNPACK CPU); MLC=GPU OpenCL no Immortalis-G925 (sem NPU); Google MediaPipe LLM=só CPU/GPU + MAINTENANCE-ONLY → migra p/ LiteRT-LM (EMERGENTE, cobrir na pesquisa). MAS flagship (Cortex-X925/12GB) roda SLM 1-3B fácil em CPU/GPU sem NPU → Q_DEID viável. NPU-nativo=NeuroPilot (vendor-lock, não-RN). executorch NÃO descartado"
 
+  - id: C_DEVICE_INTERIM
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "device INTERINO até o Poco chegar (segunda) = Motorola Moto G54 (verificado 2026-07-19): MediaTek Dimensity 7020 (6nm), 8/12GB RAM, Android 13, 6.5'' LCD 120Hz, 5000mAh. TAMBÉM MediaTek → continuidade com o Poco (Dimensity 9500s); runtime/NPU research transfere. Mid-range: clara o piso executorch (≥4GB/Android13) mas é WORST-CASE p/ SLM = bom FLOOR-test (roda aqui → voa no Poco). ⚠ DIVISÃO: maestro roda device-side (laptop+G54 via USB); a sessão na VPS headless NÃO dirige o aparelho"
+
   # ==== perguntas em aberto (viram spike / Fase 1b) ====
   - id: Q_DEID
     node_type: question
@@ -598,6 +608,11 @@ edges:
   - from: Q_GITSYNC
     to: C_DEVICE
     edge_type: DEPENDS_ON
+
+  # --- device interino (G54) = mesma família MediaTek; habilita o teste device-side antes do Poco ---
+  - from: C_DEVICE_INTERIM
+    to: C_DEVICE
+    edge_type: SUPPORTS
 
   # --- fatia device-crítica (runtime × Dimensity 9500s) informa o device e a decisão de provider ---
   - from: E_DEVICE_RUNTIME
