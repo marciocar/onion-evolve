@@ -222,7 +222,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: open
-    label: "RE-ESCOPADO (2026-07-18): o MODELO está resolvido (git fica SoT, D_SYNC). Fica o SPIKE DE EXECUÇÃO: caminho = isomorphic-git dentro de nodejs-mobile (Node real no device; ~213 stars, Node 18 near-EOL, dev build). Residual a provar: (a) rota mais leve (fs-shim expo-file-system, bugs iOS #1994/#1997) vs nodejs-mobile; (b) perf num KG crescente; (c) design de merge N=1 multi-device; (d) Yjs em RN"
+    label: "RE-ESCOPADO (2026-07-18): o MODELO está resolvido (git fica SoT, D_SYNC). Fica o SPIKE DE EXECUÇÃO: caminho = isomorphic-git dentro de nodejs-mobile (Node real no device; ~213 stars, Node 18 near-EOL, dev build). Residual a provar: (a) rota mais leve (fs-shim expo-file-system, bugs iOS #1994/#1997) vs nodejs-mobile; (b) perf num KG crescente; (c) design de merge N=1 multi-device; (d) Yjs em RN. → (a) RESOLVIDO no G54 (2026-07-19, ver E_GITPROBE_G54/C_GITSYNC_LIGHT): caminho leve roda no Expo Go sem nodejs-mobile; b/c/d seguem abertos"
 
   # ==== git-on-device: caminho LEVE materializado no app, aguardando prova de device (2026-07-19) ====
   - id: A_GITPROBE
@@ -236,11 +236,21 @@ nodes:
   - id: C_GITSYNC_LIGHT
     node_type: claim
     layer: audit
-    plane: DEV
+    plane: PROD
     impact: 5
-    confidence: 0.5
-    status: open
-    label: "HIPÓTESE a provar no device: o caminho LEVE do git-on-device — isomorphic-git (JS puro) + fs-shim sobre expo-file-system — roda no EXPO GO, sem dev build e sem nodejs-mobile. Se confirmado, resolve o residual (a) do Q_GITSYNC e torna o caminho pesado (nodejs-mobile+dev build, D_SYNC) desnecessário. confidence 0.5 = plausível-não-verificado; o teste no G54 confirma ou refuta"
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "CONFIRMADO no G54 (Moto G54, Expo Go SDK 57, 2026-07-19): o caminho LEVE do git-on-device — isomorphic-git (JS puro) + fs-shim sobre expo-file-system — RODA no Expo Go, sem dev build e sem nodejs-mobile. A prova (init/add/commit/log/status/read-back) passou TODA no device. Resolve o residual (a) do Q_GITSYNC; o caminho pesado (nodejs-mobile+dev build, D_SYNC) fica DESNECESSÁRIO p/ git-on-device básico. Residuais b/c/d (perf/merge N=1/Yjs) seguem abertos"
+  - id: E_GITPROBE_G54
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "Dogfood no device real (Moto G54, Expo Go SDK 57, 2026-07-19): (1) câmera ✅ (expo-camera); (2) prova git-on-device ✅ TODA (init/add/commit/log/status/read-back via isomorphic-git+fsShim sobre expo-file-system); (3) SSE ao bridge: transporte+auth(courtesy)+Agent-SDK OK — a cadeia chegou à API Anthropic, bloqueada SÓ por crédito (billing da conta que banca courtesy), NÃO por protocolo/device. Q_PROTOCOL provada end-to-end no device modulo saldo"
 
   # ==== plano-B do SLM + standards a não perder (deep-research wzxz11dvf, 2026-07-18) ====
   - id: E_STANDARDS
@@ -667,3 +677,14 @@ edges:
   - from: C_GITSYNC_LIGHT
     to: C_DEVICE_INTERIM
     edge_type: DEPENDS_ON
+
+  # --- dogfood no device real (G54): evidência que confirma o caminho leve + o chat/SSE ---
+  - from: E_GITPROBE_G54
+    to: C_GITSYNC_LIGHT
+    edge_type: SUPPORTS
+  - from: E_GITPROBE_G54
+    to: C_CHAT_VERIFIED
+    edge_type: SUPPORTS
+  - from: E_GITPROBE_G54
+    to: C_DEVICE_INTERIM
+    edge_type: SUPPORTS
