@@ -120,6 +120,25 @@ Evidence) tem mobile/chat e todos exigem ETL que mata o append-mostly em texto p
 **métricas** desktop-full for pedido, Observable Framework ou Evidence.dev (git-first, spec-as-code) são
 o melhor encaixe filosófico — mas construídos por cima do YAML como SSOT, nunca substituindo-o.
 
+## Handoff para a constelação (como esta conclusão atravessa o isolamento)
+
+> **Nada propaga sozinho.** Estrelas são isoladas por assunto: o core **não** avisa, e o mapa da
+> constelação é *pull*, read-only, só-metadados. O elo cross-estrela é o maestro + **promoção-para-main**
+> (foi assim que `interface-state-of-art` #344 alimentou as outras).
+
+**Recomendação de handoff — candidato a `feat/*`:** promover a **projeção-chat do `kg-radar`**
+(`D_CHAT_TEXT_FIRST`) — *boletim-textual determinístico + node-focus por DOI* como superfície de consumo do
+KG em chat/mobile. É a perna `act` que este estudo (perna `research`) deixou pronta.
+
+- **Destino que consome:** `discuss/onion-mobile-app` (a superfície chat+mobile) — hoje em `DEEP` e
+  **"PROVADO NO G54" (2026-07-19)**, com app real rodando. O texto-primeiro é **substância pronta** para
+  ela: é exatamente a resposta que aquela estrela aguardava ("esperar a substância firmar").
+- **Como ela fica sabendo:** ao promover a projeção-chat a `feat/* → main`, `onion-mobile-app` (rebaseada
+  em main) **consome do main**. Sem promoção, o link permanece intenção registrada aqui — invisível para
+  ela até o maestro convidá-la explicitamente (abrir a worktree dela + `/catch-up` + convite).
+- **Fronteira:** esta estrela **não** escreve no SEED de outra (quebraria o isolamento). O handoff é
+  decisão do maestro, na sessão core.
+
 ## A fronteira honesta (o que NÃO se resolveu)
 
 - **Tudo é design-only, isolado.** Nenhuma linha foi pro core. As 4 decisões são candidatas GATED atrás
