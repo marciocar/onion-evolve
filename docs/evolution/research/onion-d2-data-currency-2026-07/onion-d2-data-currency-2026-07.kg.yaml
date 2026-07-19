@@ -1,0 +1,134 @@
+# KG da pesquisa D2 (wf_b533468d-41c): moeda-dado / flywheel — colisão P5 + doutrina federação + externo 2026. Born-in-KG.
+meta:
+  id: onion-d2-data-currency-2026-07
+  schema_version: "1"
+  baseline: 2026-07-19
+  date: 2026-07-19
+nodes:
+  - id: E_P5_FRONTEIRA_SAIDA
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "P5: inferencia do motor local sobre o KG do dono e feature (indefesa); a defesa desloca-se p/ a FRONTEIRA DE SAIDA (L1-L6) — nao emitir bruto"
+  - id: E_RFC4_SINGLE_SOURCE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "RFC-0004: single-source p/ identidade/contratos; federa-se so a comunicacao/derivacao — a fonte fica soberana, so o destilado circula"
+  - id: E_FAILSAFE_RATIFIED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "doutrina JA ratificada: de-id 'none'=fail-safe, 'private' inviolavel mesmo p/ o core, declarado!=verificado (VETO sem prova)"
+  - id: E_EU_AI_ACT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "EU AI Act + EDPB 2026 fecham a via livre de scraping/pooling: base legal GDPR + minimizacao antes de pooling (URLs)"
+  - id: E_SSOT_PROTOTIPO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "o SSOT unico das 6 camadas (classificacao-por-inferencia + gate-por-proposito + eps-ledger) e SO prototipo .kg.yaml hoje — nao operacional (P5 item 6)"
+  - id: C_A_ELIMINADA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "opcao (a) sem-restricao ELIMINADA: regride doutrina fail-safe vigente + contradiz o pilar compliance-peer (EU AI Act) que o Onion vende"
+  - id: C_CARD_FUNDE_DUAS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-19
+    label: "o card D2 FUNDE duas decisoes: DIRECAO (arquitetura c) vs ATIVACAO (ligar o flywheel) — separaveis e compativeis"
+  - id: C_P5_ESCOPO_N1
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "P5 foi provada em N=1 pessoal; D2 e multi-adotante (N-tenant) — o threat model N-tenant precisa lente propria; citar P5 como bloqueio direto e extrapolacao"
+  - id: D_RATIFY_DIRECAO_C
+    node_type: decision
+    trace: docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: open
+    label: "RECOMENDADO: ratificar a DIRECAO (c) local-first+destilado agora (mata (a), destrava D7 a custo zero); ATIVACAO gated ao mecanismo existir+dogfoodado"
+  - id: D_FALLBACK_D
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: "(d) so-financeira = REDE pre-comprometida se o custo do mecanismo inviabilizar (self-red-team 15-20x, eps-ledger N=1) — nunca (a)"
+  - id: Q_ATIVACAO_GATILHO
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "decisao pura do maestro: comprometer roadmap p/ construir o SSOT das 6 camadas ANTES de perseguir a moeda-dado, ou deixar amadurecer (b interino)"
+edges:
+  - from: E_P5_FRONTEIRA_SAIDA
+    to: D_RATIFY_DIRECAO_C
+    edge_type: SUPPORTS
+  - from: E_RFC4_SINGLE_SOURCE
+    to: D_RATIFY_DIRECAO_C
+    edge_type: SUPPORTS
+  - from: E_FAILSAFE_RATIFIED
+    to: C_A_ELIMINADA
+    edge_type: SUPPORTS
+  - from: E_EU_AI_ACT
+    to: C_A_ELIMINADA
+    edge_type: SUPPORTS
+  - from: C_A_ELIMINADA
+    to: D_RATIFY_DIRECAO_C
+    edge_type: SUPPORTS
+  - from: C_CARD_FUNDE_DUAS
+    to: D_RATIFY_DIRECAO_C
+    edge_type: SUPPORTS
+  - from: E_SSOT_PROTOTIPO
+    to: Q_ATIVACAO_GATILHO
+    edge_type: CAUSES
+  - from: Q_ATIVACAO_GATILHO
+    to: D_RATIFY_DIRECAO_C
+    edge_type: DEPENDS_ON
+  - from: C_P5_ESCOPO_N1
+    to: D_RATIFY_DIRECAO_C
+    edge_type: DEPENDS_ON
+  - from: E_SSOT_PROTOTIPO
+    to: D_FALLBACK_D
+    edge_type: SUPPORTS
