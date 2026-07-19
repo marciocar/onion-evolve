@@ -523,6 +523,25 @@ nodes:
     verified_at: "2026-07-19"
     label: "Sync on-device PROVADO no G54: push/clone do life-KG CIFRADO via isomorphic-git + http/web (fetch do Expo Go) ao repo GitHub PRIVADO dedicado marciocar/onion-pessoal-kg. Só ciphertext sobe → remote zero-knowledge por construção; clone decifra === original; verified_at sobrevive ao sync. Executa 'VPS/nuvem = remote zero-knowledge cifrado' de D_SYNC com um remote git PADRÃO. Validado antes contra o GitHub real em Node (dogfood). Bug pego: isomorphic-git 1.38 separa ref (local) de remoteRef; clone de branch não-default em repo vazio dá 'Could not find HEAD' → probe usa main. App: kgSync.ts + kgSyncProbe.ts (master, 208c7d1)."
 
+  # ==== prior-art do sync (pesquisa em comunidades, 2026-07-19) — verificar-contra-o-vivo ====
+  - id: E_SYNC_PRIOR_ART
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "Pesquisa em comunidades (2026-07-19): o padrão do kgSyncProbe JÁ é estabelecido/popular — NÃO é invenção, é variante restrita-a-mobile. Referências: (1) git-remote-gcrypt (remote helper gcrypt:: cifra o repo INTEIRO → o host guarda blobs opacos = 'git zero-knowledge' nomeado, mais forte que o nosso); (2) SOPS+age commitado via git hooks (o que o ADR nomeou; chave privada NUNCA no git, recipient público sim; SOPS cifra VALORES → diff legível, git-crypt cifra tudo → opaco); (3) local-first PKM cifrado é MAINSTREAM 2026 (Anytype zero-knowledge P2P, SiYuan E2E+LAN, Obsidian Sync E2E) — valida soberania-por-cifra. O nosso = content-level SOPS+age-no-git, hand-rolled porque Hermes não roda binários Go (SOPS/age) nem age-encryption JS (Web Streams) → @noble direto. Fontes: github/spwhitton/git-remote-gcrypt, git-annex, getsops#1891, tvi.al, openalternative."
+  - id: Q_METADATA_LEAK
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "GAP exposto pela prior-art: ciframos o CONTEÚDO (.enc), mas o remote AINDA vê metadados — nome de arquivo (fixo 'life.kg.yaml.enc', ok), mensagens de commit, grafo/timestamps, FREQUÊNCIA de commits (vaza padrão comportamental do life-KG). git-remote-gcrypt fecha (cifra a história inteira); nós não. +2 gaps: interop age-wire (envelope bespoke → o nó confiável precisa do MESMO JS, não o age CLI) e diff opaco (cifra o arquivo inteiro ~git-crypt, não valores ~SOPS). Direção: curto=neutralizar timing/mensagens de commit; médio=avaliar git-remote-gcrypt whole-repo (RN-compat = incógnita, mesma classe de any-sync/MindooDB); interop=convergir p/ age-wire pós-spike."
+
 edges:
   # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
   - from: D_STACK
@@ -799,3 +818,14 @@ edges:
   - from: E_SYNC_G54
     to: D_SYNC
     edge_type: SUPPORTS
+
+  # --- prior-art valida a direção de sync e levanta o gap de metadados que qualifica nossa impl ---
+  - from: E_SYNC_PRIOR_ART
+    to: D_SYNC
+    edge_type: SUPPORTS
+  - from: Q_METADATA_LEAK
+    to: E_SYNC_PRIOR_ART
+    edge_type: DEPENDS_ON
+  - from: Q_METADATA_LEAK
+    to: E_SYNC_G54
+    edge_type: CONSTRAINS
