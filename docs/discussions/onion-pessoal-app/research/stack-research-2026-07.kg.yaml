@@ -272,6 +272,16 @@ nodes:
     verified_at: "2026-07-19"
     label: "Dogfood multimodal no G54 (Expo Go SDK 57, 2026-07-19): foto ✅ (takePictureAsync base64→bridge inline), mic ✅ (expo-audio grava+toca de volta), vídeo ✅ (expo-camera recordAsync + expo-video VideoView playback). APIs verificadas no node_modules instalado (SDK 57 — não do cutoff). Sem dev build"
 
+  # ==== desenho definitivo v1 (ADR-003, 2026-07-19) ====
+  - id: D_DEFINITIVE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: open
+    label: "ADR-003 (proposto, aguarda ratificação): desenho definitivo v1 do Onion Pessoal. INVARIANTE 0 = OPÇÃO C (híbrido soberano): life-KG mora no device (git-sync) + cérebro LLM na nuvem via BYOK + de-id LOCAL (regra v1 → SLM depois) como portão; NENHUM KG cru sai do device. Runtime app-orquestrado (Vercel AI SDK direto no caminho privado; VPS/bridge NUNCA toca KG cru, fica no público/federação). STT externo v1 (áudio vaza, aceito). Core loop conversa-first (captura=espelho); build F0(dados)→F1(motor de-id+loop)→F2(superfície)→F3(SLM/Poco); protocolo N=1 Marcio uso diário"
+
   # ==== plano-B do SLM + standards a não perder (deep-research wzxz11dvf, 2026-07-18) ====
   - id: E_STANDARDS
     node_type: evidence
@@ -715,4 +725,18 @@ edges:
     edge_type: SUPPORTS
   - from: C_MEDIA_CAPTURE
     to: C_DEVICE_INTERIM
+    edge_type: DEPENDS_ON
+
+  # --- o desenho definitivo (ADR-003) se apoia no que foi provado + nas decisões de stack/sync/modelo ---
+  - from: D_DEFINITIVE
+    to: C_GITSYNC_LIGHT
+    edge_type: DEPENDS_ON
+  - from: D_DEFINITIVE
+    to: C_MEDIA_CAPTURE
+    edge_type: DEPENDS_ON
+  - from: D_DEFINITIVE
+    to: D_VERCEL
+    edge_type: DEPENDS_ON
+  - from: D_DEFINITIVE
+    to: D_SYNC
     edge_type: DEPENDS_ON
