@@ -2,7 +2,7 @@
 name: pr
 description: Criar Pull Request com integração GitFlow e sync automático.
 model: sonnet
-allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Grep Glob Bash(cat .env*) Bash(bash .claude/validation/*)
+allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Grep Glob Bash(cat .env*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/*)
 category: engineer
 tags: [pr, gitflow, workflow]
 version: "3.4.0"
@@ -48,7 +48,7 @@ Siga estes passos para criar o PR:
    hardcoded. Isto faz um repo adotado com branch de integração própria (ex. `<projeto>-evolve`, carimbada
    pelo `/meta:adopt --integration-branch`) ser respeitada em qualquer máquina:
    ```bash
-   BASE="$(bash .claude/validation/resolve-integration-branch.sh)"   # ver helper p/ a cadeia
+   BASE="$(bash ${CLAUDE_PLUGIN_ROOT}/validation/resolve-integration-branch.sh)"   # ver helper p/ a cadeia
    ```
    ```typescript
    const forge = getForge();                       // .claude/utils/forge/factory.md

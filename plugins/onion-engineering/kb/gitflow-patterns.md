@@ -96,7 +96,7 @@
 
 `git config gitflow.branch.develop` é **local da máquina** — não viaja no clone. Para que a base dos PRs
 de evolução seja a mesma em qualquer máquina, o Onion resolve a **branch de integração** por uma cadeia
-determinística, exposta pelo helper `.claude/validation/resolve-integration-branch.sh` e consumida pelo
+determinística, exposta pelo helper `${CLAUDE_PLUGIN_ROOT}/validation/resolve-integration-branch.sh` e consumida pelo
 `/engineer:pr` (a base do PR **não** é hardcoded):
 
 1. **`.claude/.onion-version` campo `integration_branch`** — SSOT **versionado** (viaja no clone). Carimbado
