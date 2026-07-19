@@ -1,10 +1,10 @@
-# Diário — farol-organizer
+# Diário — onion-evolve
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 54 entradas · **Stale:** 0 · **Compartilháveis:** 42
+**Total:** 55 entradas · **Stale:** 0 · **Compartilháveis:** 43
 
 Gerado em: 2026-07-19
 
@@ -12,6 +12,7 @@ Gerado em: 2026-07-19
 
 | Data | Tipo | Classificação | Slug | Revisar em | Classe |
 |---|---|---|---|---|---|
+| 2026-07-19 | observation | collective 📤 | runtime-telescope-doctrine-matches-lived-practice | 2026-10-15 | static |
 | 2026-07-19 | observation | collective 📤 | guard-surfaces-orchestration-clears | 2026-10-15 | static |
 | 2026-07-19 | innovation | collective 📤 | farol-organizer-key-by-worktree | 2026-10-15 | static |
 | 2026-07-19 | innovation | collective 📤 | constellation-map-landed | 2026-10-19 | static |
