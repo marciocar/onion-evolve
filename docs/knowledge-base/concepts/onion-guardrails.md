@@ -105,6 +105,26 @@ companheira [`onion-r-taxonomy`](onion-r-taxonomy.md).
 [`authorization-layers`](authorization-layers-intake-vs-execution.md) §7 (o "próximo passo" que ela declarou
 faltar), não a reinventa.
 
+### 4.1 R15.3a — os effect-gates estruturais que o core JÁ enforça (nomeados, custo zero)
+
+R15.3 diz: *efeito irreversível derivado de conteúdo não-confiável cruza o gate de execução.* Para os canais
+de federação (C1) e doc-bridge (C2) **isso já é verdade hoje, por construção** — o efeito não é *checado*, é
+*impossível* sem gate (modo **estrutural**). **R15.3a é puro vocabulário**: nomear guardas existentes como
+membros de ONION-R15; nenhuma linha de código muda. (O canal **C3** — `adopt`/`reverse-consolidate` — **não**
+tem gate estrutural; fica para **R15.3b**, gated — ver [R15 §6](../../discussions/guardrails-nemo-lens/r15-untrusted-content-provenance.md).)
+
+| Canal | Guarda estrutural existente | Invariante (string real, greppável) | Read-path (arquivo) |
+|-------|-----------------------------|-------------------------------------|---------------------|
+| **C1 — federação a2a** | `a2a-accept` transporta o registro verificado da fila para o inbox, mas **nunca aplica** | *"NUNCA aplica nada; só transporta fila→inbox"* | `.claude/utils/federation-transport/a2a-accept.sh` |
+| **C2 — doc-bridge inbound** | `co-deliver`/`co-relay` escrevem **UNTRACKED** no `inbound/`, nunca commitam no repo alheio (invariante I3) | *"ENTREGA-SEM-COMMIT … NUNCA commita no repo alheio"* | `.claude/utils/co-evolution/co-deliver.sh` |
+
+> **Anti-drift (mesma regra da [taxonomia](onion-r-taxonomy.md)):** read-path a nível de **arquivo** + a
+> **string-invariante greppável**, sem número de linha perpétuo. Revalidável por `/meta:kb-freshness`.
+
+**Ganho:** com esses dois rótulos `ONION-R15.3a`, o Onion afirma cobertura parcial de **OWASP LLM01** com
+read-path confirmado — sem escrever código. É o exemplo canônico de que a camada é *consolidação
+transversal*: metade do valor é **reconhecer e nomear** o que o dogfood já construiu.
+
 ## 5. Cobertura e fronteiras (provisório)
 
 Mapeando contra OWASP LLM Top 10 — **cobertura com lastro real** (não hype):
