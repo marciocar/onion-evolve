@@ -283,6 +283,16 @@ nodes:
     verified_at: "2026-07-19"
     label: "ADR-003 RATIFICADO (2026-07-19, após revisão adversarial — 3 furos endurecidos): desenho definitivo v1 do Onion Pessoal. INVARIANTE 0 = OPÇÃO C (híbrido soberano): life-KG mora no device (git-sync) + cérebro LLM na nuvem via BYOK + de-id LOCAL (regra v1 → SLM depois) como portão; NENHUM KG cru sai do device. Runtime app-orquestrado (Vercel AI SDK direto no caminho privado; VPS/bridge NUNCA toca KG cru, fica no público/federação). STT externo v1 (áudio vaza, aceito). Core loop conversa-first; build F0(dados)→F1(motor de-id+loop)→F2(superfície)→F3(SLM/Poco); N=1 Marcio. FUROS DA REVISÃO: (1) de-id de regra frágil → Saúde/Relações gated/over-redação, começa por Trabalho; (2) origem soberana do KG migra p/ FORA da VPS (cifra em repouso se remote de nuvem); (3) C-direct risco de inflar F1 + kg-radar JS divergir → teste de conformidade JS↔sh + fallback bridge no nó confiável"
 
+  - id: E_MARKET_2026
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.7
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "Busca fresca (2026-07-19, via fallback SDAAL WebFetch/DuckDuckGo — WebSearch no teto 200/200): (1) CIFRA-EM-GIT: SOPS+age = recomendação de mercado 2026 (envelope-encryption, diffável, filter-light), acima de git-crypt; (2) SYNC LOCAL-FIRST: mercado convergiu em CRDT + sync-engines E2EE (any-sync, MindooDB 'servers can store and sync but cannot read') — git-based sync não em destaque; os zero-knowledge-servers VALIDAM 'soberania por cifra'. Fontes: systemshardening/lupica/pistack (SOPS+age); Verity 'Local-First 2026', EMNE, anyproto/any-sync, klehmann/MindooDB. Caveat: RN-compat de any-sync/MindooDB NÃO verificado (gated, sessão nova)"
+
   # ==== plano-B do SLM + standards a não perder (deep-research wzxz11dvf, 2026-07-18) ====
   - id: E_STANDARDS
     node_type: evidence
@@ -335,7 +345,7 @@ nodes:
     impact: 5
     confidence: 0.8
     status: confirmed
-    label: "DECISÃO de sync: git FICA o SoT (alinha à doutrina 'origin=fonte única'; KG append-mostly ~ commits/merges). CRDT no máximo COMPLEMENTA (buffer offline), nunca substitui; local-first-DB DESQUALIFICADO (server-DB vira SoT). Caminho de execução = isomorphic-git dentro de nodejs-mobile (dev build, não Expo Go). O problema vira EXECUÇÃO, não modelo"
+    label: "DECISÃO de sync: git FICA o SoT (alinha à doutrina 'origin=fonte única'; KG append-mostly ~ commits/merges). CRDT no máximo COMPLEMENTA (buffer offline), nunca substitui; local-first-DB DESQUALIFICADO (server-DB vira SoT). Caminho de execução = isomorphic-git dentro de nodejs-mobile (dev build, não Expo Go). O problema vira EXECUÇÃO, não modelo. — RECONCILIAÇÃO (2026-07-19, ver E_MARKET_2026): (1) 'nodejs-mobile/dev-build' SUPERADO — caminho leve no Expo Go provado (C_GITSYNC_LIGHT); (2) o mercado 2026 foi p/ CRDT+sync-engines E2EE, mas a desqualificação de local-first-DB era por 'server=SoT plaintext' e NÃO cobre os ZERO-KNOWLEDGE (any-sync/MindooDB, 'server cannot read'), que VALIDAM o princípio soberania-por-cifra; git-as-SoT mantido (KG-SSOT git-native), zero-knowledge-engines = watch-items (RN-compat não verificado); (3) cifra escolhida = SOPS+age (filter-light, encaixa no isomorphic-git)"
 
   # ==== ADR-002: Vercel AI SDK (proposto, 2026-07-19) ====
   - id: E_VERCEL_LAYERS
@@ -741,3 +751,11 @@ edges:
   - from: D_DEFINITIVE
     to: D_SYNC
     edge_type: DEPENDS_ON
+
+  # --- busca fresca de mercado (2026-07-19) refina a decisão de sync e informa a cifra do desenho ---
+  - from: E_MARKET_2026
+    to: D_SYNC
+    edge_type: SUPPORTS
+  - from: E_MARKET_2026
+    to: D_DEFINITIVE
+    edge_type: SUPPORTS

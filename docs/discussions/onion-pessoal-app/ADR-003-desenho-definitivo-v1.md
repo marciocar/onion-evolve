@@ -61,10 +61,22 @@ cofre mais caro até endurecer.
 ### 2.2. Onde o life-KG persiste e sincroniza (revisão 2026-07-19, Furo 2)
 O life-KG cru vive no **device** (primário) e num **nó confiável do Marcio** (secundário/backup — notebook/
 mini-server). O **remote git de origem NÃO é a VPS** (disco de terceiro). Se um remote de nuvem for usado p/
-durabilidade (ex.: GitHub privado), o KG cru vai **cifrado em repouso** (git-crypt/age) — *repo privado ≠
-soberano; só cifrado conta*. **Hoje `~/onion-pessoal/` mora na VPS (estado pré-definitivo)** → **F0 inclui migrar
+durabilidade (ex.: GitHub privado), o KG cru vai **cifrado em repouso** — cifra = **SOPS+age** (recomendação de
+mercado jul/2026, verificada via fallback SDAAL de busca; envelope-encryption **filter-light** → encaixa no
+isomorphic-git melhor que git-crypt, que depende de filtros clean/smudge). *Repo privado ≠ soberano; só cifrado
+conta*. **Hoje `~/onion-pessoal/` mora na VPS (estado pré-definitivo)** → **F0 inclui migrar
 a origem soberana p/ FORA da VPS** (device + nó confiável; a VPS deixa de ser guardiã do KG cru). Ink&Switch
 valida device=primário, servidor=secundário.
+
+**Reconciliação com a `D_SYNC` (2026-07-19, busca fresca via fallback SDAAL):** o mercado local-first 2026
+convergiu em **CRDT + sync-engines E2EE** (`any-sync`, `MindooDB` — "*servers can store and sync, but cannot
+read*"). Isso **VALIDA** o princípio *soberania por cifra / server-can't-read* — não o refuta. A `D_SYNC`
+desqualificou local-first-DBs por "server vira SoT plaintext" (PowerSync/ElectricSQL); essa desqualificação
+**NÃO se aplica aos zero-knowledge** (MindooDB/any-sync). **Mantemos git-as-SoT** (o KG-SSOT é git-native — reúso
+do substrato do core + `kg-radar`; vantagem estrutural que nenhum engine dá), MAS `any-sync`/`MindooDB` entram
+como **watch-items a avaliar** na pesquisa de sync (sessão nova; **RN-compat é make-or-break, ainda não
+verificado**) — inclusive como possível **transporte cifrado sob o KG**. Divergência do mercado (CRDT) é
+consciente e justificada, não ignorância.
 
 **Consequência topológica:** a VPS/bridge **não é** o cérebro privado. O `onion-bridge` genérico segue para o
 **caminho público/federação** (dev/PM, A2A — ADR-001 D8); o **companheiro privado nunca lhe manda life-KG cru**.
@@ -132,7 +144,9 @@ Substância antes de superfície. Cada fase **dogfooda o artefato de verdade** (
 
 - **F0 — Fundação de dados (barato, pré-requisito).** life-KG runtime-grade: schema + `verified_at`; **migrar a
   origem soberana p/ FORA da VPS** (device primário + nó confiável; cifrado se em remote de nuvem — §2.2); sync
-  git via isomorphic-git. *Gate: kg-radar on-device exit 0 + nenhum KG cru em disco de 3º.*
+  git via isomorphic-git. **Spike obrigatório: `isomorphic-git × SOPS+age`** — provar cifra-em-repouso no
+  git-on-device (age é filter-light; validar clone/push/pull cifrado no device real, como fizemos com o resto).
+  *Gate: kg-radar on-device exit 0 + nenhum KG cru (plaintext) em disco de 3º + round-trip de cifra provado.*
 - **F1 — Motor privado (o coração do C).** Adapter `de-identification` LOCAL (regra) + `speech-to-text` (externo) +
   loop `read→de-id→Vercel-AI-SDK(BYOK)→restore→write` + kg-radar JS. *Gate: um dump de voz vira nós no life-KG,
   de-id'd, sem KG cru saindo (provar no proxy de rede).*
