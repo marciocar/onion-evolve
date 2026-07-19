@@ -69,14 +69,15 @@ seguro porque não depende de a condição de erro ser detectada — ela não po
 ## 4. A taxonomia ONION-R (índice)
 
 A taxonomia **emergiu dos vetos reais** que os gates já emitem (não foi projetada). O catálogo completo — 14
-categorias `ONION-R1..R14` + R15 (proposta), **148 vetos com read-path (`arquivo:linha`) e a string real
-emitida** — vive no registro de design:
-[`taxonomy-onion-r.md`](../../discussions/guardrails-nemo-lens/taxonomy-onion-r.md).
+categorias `ONION-R1..R14` + R15 (proposta), **148 vetos com a string real emitida e read-path** — vive na KB
+companheira [`onion-r-taxonomy`](onion-r-taxonomy.md).
 
-> **Por que a taxonomia com read-paths NÃO está nesta KB (ainda).** Um catálogo de `arquivo:linha` no core
-> **sem um gate anti-drift** violaria ONION-R1 (integridade de SSOT) — a própria categoria que ela define.
-> Até a promoção amarrar esse gate (re-grep dirigido via `/meta:kb-freshness`), a taxonomia detalhada fica
-> como **evidência de discussão linkada**, e esta KB referencia os gates **por nome** (resiliente a drift).
+> **Como o catálogo entrou no core sem violar o próprio ONION-R1.** Um catálogo de `arquivo:linha` **perpétuo**
+> violaria ONION-R1 (integridade de SSOT) — a própria categoria que ela define. A promoção (2026-07-19)
+> resolveu isso **rebaixando os números de linha**: a KB `onion-r-taxonomy` ancora cada veto pelo **arquivo**
+> (read-path estável a refactor) + pela **string de veto emitida** (identificador greppável), e declara-se
+> **snapshot a revalidar via `/meta:kb-freshness`** (re-grep dirigido). Os line-anchors datados ficam no
+> registro de design [`taxonomy-onion-r.md`](../../discussions/guardrails-nemo-lens/taxonomy-onion-r.md).
 
 Índice compacto (placement · modo · análogo de mercado — *nem todos são guardrails de segurança*):
 

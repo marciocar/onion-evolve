@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 33 — Conceitos fundamentais
+├── concepts/            # 34 — Conceitos fundamentais
 ├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 5  — Ferramentas e recursos
 ├── platforms/           # 3  — Plataformas e tecnologias
@@ -33,7 +33,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (33)
+## 🧠 Conceitos Fundamentais (34)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Agent Orchestration](concepts/agent-orchestration.md) — orquestração de subagentes: 6 padrões canônicos sobre as primitivas nativas (Workflow/Agent)
@@ -57,6 +57,7 @@ docs/knowledge-base/
 - [Onion Federation and Adoption](concepts/onion-federation-and-adoption.md) — guia de síntese: processo completo de `/meta:adopt` fase-a-fase, matriz de permissão dos 4 tiers, 5 perfis reais registrados
 - [Onion Guardrails](concepts/onion-guardrails.md) — **CANDIDATO** — a camada de guardrails nomeada: lente ONION-R sobre gates existentes (herda por read-path); motor determinístico + gated + estrutural, nunca classificador
 - [Onion Modernization Doctrine](concepts/onion-modernization-doctrine.md) — regra de inventário/SSOT e doutrina de modernização
+- [Onion R Taxonomy](concepts/onion-r-taxonomy.md) — **CANDIDATO** — catálogo de referência dos guardrails do core: 14 categorias `ONION-R1..R14` (+R15 proposta), 148 vetos destilados dos gates reais, ancorados por string emitida + read-path (linha rebaixada, snapshot a revalidar via `/meta:kb-freshness`). Companheira de [Onion Guardrails](concepts/onion-guardrails.md)
 - [Onion Relation Vocabulary](concepts/onion-relation-vocabulary.md) — TBox da ontologia leve: classes e predicados controlados com que o Onion descreve a si mesmo
 - [Onion Working Method](concepts/onion-working-method.md) — porta de entrada do método: Seleção (catálogo) + Execução (PFR + coordenação por modo) + Validação (dogfood + adversarial) + Disciplina; mapa de fontes meta-spec/KB/ADR/RFC
 - [Parallel Work Worktrees](concepts/parallel-work-worktrees-pattern.md) — trabalho paralelo em worktrees independentes
