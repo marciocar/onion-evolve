@@ -1,33 +1,78 @@
-# Mapa role → bundle de verticais (plugins) — O-QUE-SE-INSTALA por papel.
+# Mapa role → bundle — O-QUE-SE-INSTALA por papel: verticais de domínio (base/optional) +
+# ferramentas de TRABALHO cross-cutting (work_tools).
 #
 # NÃO confundir com .claude/utils/trust/ (QUEM-FALA-COM-QUEM: relay/advise/correct). Aqui é o ESCOPO
-# DE CAPACIDADE: qual conjunto de plugins cada papel recebe. Federação 2026 (marketplace de org):
-#   (a) acesso-por-grupo (Team/Enterprise) — role → group → auto-install destes plugins;
-#   (b) fallback /meta:adopt — quais verticais vendorizar por papel quando não há marketplace de org.
+# DE CAPACIDADE: qual conjunto de plugins/tools cada papel recebe. Federação 2026 (marketplace de org):
+#   (a) acesso-por-grupo (Team/Enterprise) — role → group → auto-install;
+#   (b) fallback /meta:adopt — quais verticais/tools vendorizar por papel quando não há marketplace de org.
 #
-# SSOT dos verticais = .claude/utils/marketplace/verticals/*.manifest.sh + .claude-plugin/marketplace.json.
-# Drift-guard: lint check_role_bundle_sync (todo vertical nomeado aqui deve ter manifesto E estar no marketplace).
-# Resolver: .claude/utils/marketplace/resolve-role-bundle.sh <role> [--with-optional].
+# TRÊS grupos de capacidade (ortogonais):
+#   - VERTICAIS de domínio (base/optional): produto/engenharia/testes/docs/design/compliance.
+#   - WORK_TOOLS (cross-cutting): ferramentas de trabalho de commands/meta que NÃO são meta-fábrica
+#     (kg/diary/orchestrate/metaspec-validate/...). std == hub == source aqui (pesquisa 2026-07-19,
+#     docs/evolution/research/onion-tier-matrix-2026-07). Cada tool arrasta seu motor/agente.
+#   - META-FÁBRICA (create-*/adopt/federation-*/evolve/graph/inventory) + DOWNSTREAM (co-deliver/announce):
+#     core-only / gated — nunca no bundle base de um adotante (D4 + trust).
+#
+# SSOT: verticais = verticals/*.manifest.sh; work_tools = verticals/onion-work-tools.manifest.sh; ambos em marketplace.json.
+# Drift-guard: lint check_role_bundle_sync (todo vertical/tool nomeado resolve a artefato real).
+# Resolver: resolve-role-bundle.sh <role> [--with-optional] [--tools].
 version: 1
 
+# Conjuntos de work_tools nomeados (referenciados por papel abaixo). NÃO são verticais de domínio,
+# NÃO são meta-fábrica. O manifesto onion-work-tools.manifest.sh materializa comandos + motores + agente.
+work_tool_sets:
+  # FULL — source/hub/standalone: a ferramenta de trabalho COMPLETA (o reframe: std=solo-completo).
+  full:
+    - kg                     # motor: validation/kg-radar.sh + kg-console.sh
+    - diary                  # motor: validation/diary-index.sh
+    - orchestrate
+    - analyze-complex-problem
+    - metaspec-validate      # agente: agents/meta/metaspec-gate-keeper.md
+    - recover
+    - all-tools
+    - kb-freshness
+    - context-freshness
+    - constellation          # motor: validation/constellation-map.sh
+    - setup-integration
+    - setup-code-review
+    - co-evolve              # co-evolução upstream: ler o inbox do core
+    - co-relay               # co-evolução upstream: sinalizar o core
+  # DOWNSTREAM — carteiro core→adotante. Só quem TEM sub-adotados (source; hub quando a seam
+  # org-marketplace abrir). std/consumer têm exposes_downstream vazio por definição → não recebem.
+  downstream:
+    - co-deliver
+    - co-announce
+  # MINIMAL (consumer T2) — A DEFINIR quando nascer um consumer real (subconjunto de full).
+
 roles:
-  source:        # TIER 0 — o core (onion-evolve). Instala TUDO: é o autor + a autoridade emissora.
+  source:        # TIER 0 — o core (onion-evolve). Instala TUDO: autor + autoridade emissora.
     base: [onion-engineering, onion-product, onion-testing, onion-docs, onion-design, onion-compliance]
     optional: []
-    note: "Alem dos verticais, a meta-factory (create-*/adopt/federation-*/evolve/graph/inventory) e core-only e NAO e vertical (ainda) — nunca sai do core."
+    work_tools: full
+    downstream: true
+    note: "Alem dos verticais e dos work_tools, a meta-factory (create-*/adopt/federation-*/evolve/graph/inventory) e core-only e NAO e vertical/tool — nunca sai do core."
 
-  hub:           # TIER 1 — trabalho completo; pode expor sub-adotados (concern de trust, nao de install).
+  hub:           # TIER 1 — adocao de EMPRESA; trabalho completo + pode expor sub-adotados (trust).
     base: [onion-engineering, onion-product, onion-testing, onion-docs]
     optional: [onion-design, onion-compliance]
+    work_tools: full
+    downstream: gated   # co-deliver/announce só quando a seam org-marketplace/hub-autonomo abrir; hoje a autoria de downstream e do core
 
-  standalone:    # TIER 3 — trabalho; dominio (design/compliance) opt-in por projeto (ex.: granaai = +compliance).
+  standalone:    # TIER 3 — dev solo com ferramenta COMPLETA, SEM federacao. Pode evoluir p/ hub ou consumer.
     base: [onion-engineering, onion-product, onion-testing, onion-docs]
     optional: [onion-design, onion-compliance]
+    work_tools: full
+    downstream: false   # exposes_downstream sempre vazio — sem sub-adotados
 
   consumer:      # TIER 2 — minimo (adota um hub, nao o core).
     base: [onion-engineering, onion-docs]
     optional: [onion-product, onion-testing]
+    work_tools: tbd     # A DEFINIR quando nascer um consumer real (subconjunto de full)
+    downstream: false
 
   distilled:     # NAO vendoriza nem instala — destilacao curada (onion-mini, prompt-as-bytecode).
     base: []
     optional: []
+    work_tools: none
+    downstream: false

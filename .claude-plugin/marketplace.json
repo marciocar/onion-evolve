@@ -1,11 +1,10 @@
 {
   "name": "onion-evolve",
   "owner": {
-    "name": "Onion - Marcio Carvalho",
-    "email": "marcio@grana.ai"
+    "name": "Onion"
   },
   "metadata": {
-    "description": "Marketplace privado do Sistema Onion — verticais empacotadas como plugins (vertical-skill SDAAL). Camada 1 (capacidade) via plugin; camadas 2+3 (spec-as-code + co-evolucao) via /meta:adopt. Ver docs/analysis/onion-adr-exchange-unit-2026-06.md.",
+    "description": "Marketplace de plugins Onion (verticais como spec-as-code).",
     "version": "0.1.0",
     "pluginRoot": "./plugins"
   },
@@ -20,7 +19,7 @@
     {
       "name": "onion-design",
       "source": "./plugins/onion-design",
-      "description": "Vertical de design do Onion: identidade visual como spec-as-code (tokens W3C/DTCG), gate WCAG e materializacao via design-sink. Auto-adapta ao design-context do consumidor (SDAAL).",
+      "description": "Vertical de design do Onion: identidade visual como spec-as-code (tokens W3C/DTCG), gate WCAG e materializacao via design-sink. Auto-adapta ao design-context do consumidor.",
       "version": "0.1.0",
       "author": { "name": "Onion - Marcio Carvalho" }
     },
@@ -49,6 +48,13 @@
       "name": "onion-testing",
       "source": "./plugins/onion-testing",
       "description": "Vertical de testes/QA do Onion: geracao e execucao de testes (unit/integration/e2e) com deteccao de framework + validacao de workflow. Perspectivas White/Grey/Black-box e QA story points. Camada 1.",
+      "version": "0.1.0",
+      "author": { "name": "Onion - Marcio Carvalho" }
+    },
+    {
+      "name": "onion-work-tools",
+      "source": "./plugins/onion-work-tools",
+      "description": "Ferramentas de trabalho cross-cutting do Onion (nao meta-fabrica): knowledge-graph (kg + radar soberano), diario de aprendizado, orquestracao, validacao de metaspec, freshness de KB/contexto, constelacao de estudos, recover, setup de integracoes, e co-evolucao upstream (co-evolve/co-relay). Distribuido a source/hub/standalone.",
       "version": "0.1.0",
       "author": { "name": "Onion - Marcio Carvalho" }
     }

@@ -173,6 +173,18 @@
 - onion-testing **requires** agent:test-agent
 - onion-testing **requires** agent:test-engineer
 - onion-testing **requires** agent:test-planner
+- onion-work-tools **loads** embed:kb/knowledge-graph-sdaal.md
+- onion-work-tools **loads** when:diary -> run:validation/diary-index.sh
+- onion-work-tools **loads** when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)
+- onion-work-tools **provides** co-evolution-upstream
+- onion-work-tools **provides** constellation-map
+- onion-work-tools **provides** freshness-audits
+- onion-work-tools **provides** knowledge-graph-sdaal
+- onion-work-tools **provides** learning-diary
+- onion-work-tools **provides** metaspec-validation
+- onion-work-tools **provides** orchestration
+- onion-work-tools **requires** agent:metaspec-gate-keeper
+- onion-work-tools **requires** skill:onion-orchestration
 
 ## Triplas (cruas — para consumo determinístico)
 
@@ -514,6 +526,18 @@ onion-testing	provides	qa-story-points
 onion-testing	requires	agent:test-agent	
 onion-testing	requires	agent:test-engineer	
 onion-testing	requires	agent:test-planner	
+onion-work-tools	loads	embed:kb/knowledge-graph-sdaal.md	
+onion-work-tools	loads	when:diary -> run:validation/diary-index.sh	
+onion-work-tools	loads	when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)	
+onion-work-tools	provides	co-evolution-upstream	
+onion-work-tools	provides	constellation-map	
+onion-work-tools	provides	freshness-audits	
+onion-work-tools	provides	knowledge-graph-sdaal	
+onion-work-tools	provides	learning-diary	
+onion-work-tools	provides	metaspec-validation	
+onion-work-tools	provides	orchestration	
+onion-work-tools	requires	agent:metaspec-gate-keeper	
+onion-work-tools	requires	skill:onion-orchestration	
 pain-price-specialist	related	product-agent	
 pain-price-specialist	related	research-agent	
 pmbok-specialist	related	/docs/build-compliance-docs	

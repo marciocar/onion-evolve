@@ -1,0 +1,59 @@
+# Manifesto do bundle CROSS-CUTTING de ferramentas de trabalho → plugin onion-work-tools.
+# NÃO é vertical de domínio NEM meta-fábrica: são os comandos de commands/meta que são ferramentas de
+# TRABALHO (kg/diary/orchestrate/metaspec-validate/...), distribuídos a source/hub/standalone (o reframe
+# 2026-07-19: std=solo-completo). SSOT do CONJUNTO por papel = roles.yaml (work_tool_sets.full). Este
+# manifesto é a materialização (comandos + motores + agente que os comandos arrastam).
+PLUGIN_NAME="onion-work-tools"
+PLUGIN_VERSION="0.1.0"
+PLUGIN_DESC="Ferramentas de trabalho cross-cutting do Onion (nao meta-fabrica): knowledge-graph (kg + radar soberano), diario de aprendizado, orquestracao, validacao de metaspec, freshness de KB/contexto, constelacao de estudos, recover, setup de integracoes, e co-evolucao upstream (co-evolve/co-relay). Distribuido a source/hub/standalone."
+KEYWORDS=(work-tools knowledge-graph diary orchestration metaspec co-evolution onion)
+
+# Os 14 comandos do conjunto `full` (roles.yaml work_tool_sets.full). Downstream (co-deliver/co-announce)
+# e meta-fabrica NAO entram aqui — sao core-only/gated.
+COMMANDS=(
+  ".claude/commands/meta/kg.md"
+  ".claude/commands/meta/diary.md"
+  ".claude/commands/meta/orchestrate.md"
+  ".claude/commands/meta/analyze-complex-problem.md"
+  ".claude/commands/meta/metaspec-validate.md"
+  ".claude/commands/meta/recover.md"
+  ".claude/commands/meta/all-tools.md"
+  ".claude/commands/meta/kb-freshness.md"
+  ".claude/commands/meta/context-freshness.md"
+  ".claude/commands/meta/constellation.md"
+  ".claude/commands/meta/setup-integration.md"
+  ".claude/commands/meta/setup-code-review.md"
+  ".claude/commands/meta/co-evolve.md"
+  ".claude/commands/meta/co-relay.md"
+)
+# Agente que metaspec-validate delega.
+AGENTS=(
+  ".claude/agents/meta/metaspec-gate-keeper.md"
+)
+UTILS=()
+# Motores determinísticos que os comandos cabeiam (kg→radar+console; diary→index; constellation→map).
+VALIDATION=(
+  ".claude/validation/kg-radar.sh"
+  ".claude/validation/kg-console.sh"
+  ".claude/validation/diary-index.sh"
+  ".claude/validation/constellation-map.sh"
+)
+# Skill de orquestração (orchestrate depende dela).
+SKILLS=(".claude/skills/onion-orchestration")
+# KB tipo A embarcado — a doutrina que kg/diary mais citam (auto-suficiência sem /meta:adopt).
+DOCS=(
+  "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+)
+
+# Capability Contract.
+CONFORMANCE="silver"
+PROVIDES=("knowledge-graph-sdaal" "learning-diary" "orchestration" "metaspec-validation" "freshness-audits" "constellation-map" "co-evolution-upstream")
+REQUIRES=(
+  "agent:metaspec-gate-keeper"
+  "skill:onion-orchestration"
+)
+LOADS=(
+  "embed:kb/knowledge-graph-sdaal.md"
+  "when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)"
+  "when:diary -> run:validation/diary-index.sh"
+)
