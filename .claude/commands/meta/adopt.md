@@ -162,10 +162,43 @@ fi
 #     helper para mirar a base do PR — não depende do git config (que é local da máquina).
 INTEGRATION_BRANCH="${INTEGRATION_BRANCH:-$(bash "$SOURCE_ROOT/.claude/validation/resolve-integration-branch.sh" "$DEST")}"
 git -C "$DEST" config gitflow.branch.develop "$INTEGRATION_BRANCH"
-# master = branch principal do alvo; ${VAR:-main} trata o caso "sem origin/HEAD" (pipeline de sed
-# de entrada vazia retorna 0 → um `|| echo main` direto NÃO dispararia; capturar e default é correto).
-MASTER_BRANCH="$(git -C "$DEST" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')"
-git -C "$DEST" config gitflow.branch.master "${MASTER_BRANCH:-main}"
+# master = branch de PRODUÇÃO do alvo. Delega ao helper irmão do resolve-integration-branch.sh —
+# .claude/validation/resolve-production-branch.sh — mesmo padrão testável dos passos vizinhos
+# (coberto por lint-selftest.sh). NUNCA derivar de origin/HEAD sozinho: em repos GitFlow o default
+# branch do remote costuma SER a integração (develop) — sinal de campo real, granaai, 2026-07-19:
+# origin/HEAD apontava para origin/develop, e a adoção antiga gravava gitflow.branch.master=develop
+# (idêntico a gitflow.branch.develop) porque a resolução confiava cegamente no default do remote em
+# vez de localizar uma master/main REAL. O bug NÃO era falta de produção — a granaai TEM
+# origin/master viva (produção real, ativa) — o problema era o origin/HEAD apontando para a branch
+# errada. O helper acha a produção real por show-ref (nunca chuta) e só aceita origin/HEAD como
+# candidato quando ele DIFERE da integração (cobre trunk-based por design sem reproduzir o bug).
+MASTER_BRANCH="$(bash "$SOURCE_ROOT/.claude/validation/resolve-production-branch.sh" "$DEST" --integration "$INTEGRATION_BRANCH")"
+# O helper já avisa no STDERR quando não identifica candidato, ou em caso de ambiguidade — não duplicar aqui.
+if [ -n "$MASTER_BRANCH" ]; then
+  # CONVERGÊNCIA: helper achou produção real → grava (idempotente; SOBRESCREVE config antigo/envenenado
+  # em vez de só "deixar de escrever" — re-rodar precisa CORRIGIR o estado, não apenas parar de piorar).
+  git -C "$DEST" config gitflow.branch.master "$MASTER_BRANCH"
+else
+  CURRENT_MASTER_CONFIG="$(git -C "$DEST" config --get gitflow.branch.master || true)"
+  # ASSINATURA DO VENENO (não "qualquer valor"): o bug gravava em gitflow.branch.master aquilo que o
+  # origin/HEAD apontava. Logo o config é provadamente envenenado quando bate com a INTEGRAÇÃO **ou**
+  # com o próprio default do remote — e o helper (autoridade) acabou de dizer que produção não é isso.
+  # NÃO desfazer fora dessas duas assinaturas: um valor que o maestro setou à mão (produção chamada
+  # `release`/`production`, que o helper não detecta) é legítimo e seria destruído por um unset amplo.
+  DEFAULT_REMOTE_HEAD="$(git -C "$DEST" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || true)"
+  if [ -n "$CURRENT_MASTER_CONFIG" ] && { [ "$CURRENT_MASTER_CONFIG" = "$INTEGRATION_BRANCH" ] \
+       || { [ -n "$DEFAULT_REMOTE_HEAD" ] && [ "$CURRENT_MASTER_CONFIG" = "$DEFAULT_REMOTE_HEAD" ]; }; }; then
+    # Config JÁ GRAVADO está envenenado (resquício de adoção antiga afetada pelo bug do origin/HEAD).
+    # O resolve-integration-branch.sh LÊ esse mesmo config; deixá-lo parado propagaria o erro a cada
+    # resolução seguinte — por isso desfaz em vez de só ignorar.
+    git -C "$DEST" config --unset gitflow.branch.master
+    echo "⚠️  Onion adopt: config de produção anterior ('$CURRENT_MASTER_CONFIG') era igual à integração" \
+         "(resquício de adoção antiga envenenada) — removido (git config --unset gitflow.branch.master)." \
+         "Se o alvo tiver produção sob outro nome, configure manualmente:" \
+         "  git -C '$DEST' config gitflow.branch.master <nome-da-branch-de-producao>" >&2
+  fi
+  # Config ausente, ou já correto e distinto da integração: nada a fazer (idempotente).
+fi
 
 # (4) re-stamp .onion-version — ver Fase 5 (install) ou o bloco --update (cada um carimba a identidade certa).
 

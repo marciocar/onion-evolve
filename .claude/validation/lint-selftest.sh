@@ -508,6 +508,129 @@ run_resolve_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo resolve-production — exercita .claude/validation/resolve-production-branch.sh
+# (irmão do resolve-integration acima). Cenários self-contained (repos git
+# temporários), um por DEFEITO encontrado pela verificação adversarial (sinal
+# granaai 2026-07-19). --integration é passado explícito em cada caso: isola o
+# contrato do resolve-production-branch.sh (candidatos + regras 1-5) da
+# resolução de integração em si (já coberta por run_resolve_selftests acima).
+#   (1) greenfield trunk-based : só main, sem develop            → "main" SEM alarme        (D1)
+#   (2) GitFlow clássico       : master viva + develop, origin/HEAD→develop → "master"       (D2/D4, caso granaai)
+#   (3) pós-rename             : master (antiga) + main (recente) → main + AVISO ambiguidade (D3)
+#   (4) default customizado    : sem master/main, origin/HEAD→"trunk"≠integração → "trunk"    (D4)
+#   (5) não identificável      : sem master/main, origin/HEAD==integração → VAZIO + aviso     (D5)
+#   (6) sem remote/commits     : não quebra, degrada gracioso (exit 0)                        (D6)
+# ---------------------------------------------------------------------------
+run_resolve_production_selftests() {
+  local helper="${SCRIPT_DIR}/resolve-production-branch.sh"
+  if [ ! -f "${helper}" ]; then record_fail "resolve-production-branch" "helper ausente: ${helper}"; return; fi
+  local d sha old_sha new_sha
+  local RP_OUT RP_ERR RP_RC
+
+  # Identidade via env (maior precedência) p/ commitar em CI sem git user.* configurado.
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+
+  # Executa o helper capturando stdout/stderr/exit code separadamente sem
+  # deixar `set -e` abortar o selftest inteiro num rc≠0 inesperado.
+  _rp_run() {
+    local rd="$1"; shift
+    local errfile; errfile="$(mktemp)"
+    RP_OUT="$(bash "${helper}" "${rd}" "$@" 2>"${errfile}")" && RP_RC=0 || RP_RC=$?
+    RP_ERR="$(cat "${errfile}")"; rm -f "${errfile}"
+  }
+
+  # (1) greenfield trunk-based: só main, sem develop → "main" SEM alarme (D1)
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/main
+  git -C "${d}" commit -q --allow-empty -m base
+  _rp_run "${d}" --integration main
+  rm -rf "${d}"
+  if [ "${RP_OUT}" = "main" ] && [ -z "${RP_ERR}" ]; then
+    record_pass "resolve-production: greenfield trunk-based → main sem alarme"
+  else
+    record_fail "resolve-production: greenfield trunk-based" "esperava out='main' sem stderr, veio out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+
+  # (2) GitFlow clássico: master (viva) + develop, origin/HEAD→develop → "master", NUNCA "develop" (caso granaai)
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/zzz-local
+  git -C "${d}" commit -q --allow-empty -m base
+  sha="$(git -C "${d}" rev-parse HEAD)"
+  git -C "${d}" update-ref refs/remotes/origin/master "${sha}"
+  git -C "${d}" update-ref refs/remotes/origin/develop "${sha}"
+  git -C "${d}" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/develop
+  _rp_run "${d}" --integration develop
+  rm -rf "${d}"
+  if [ "${RP_OUT}" = "master" ]; then
+    record_pass "resolve-production: GitFlow clássico (origin/HEAD→develop) → master"
+  else
+    record_fail "resolve-production: GitFlow clássico" "esperava 'master', veio out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+
+  # (3) pós-rename: master (antiga/parada) + main (recente) → escolhe a MAIS RECENTE + avisa ambiguidade
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/zzz-local
+  GIT_AUTHOR_DATE="2020-01-01T00:00:00" GIT_COMMITTER_DATE="2020-01-01T00:00:00" \
+    git -C "${d}" commit -q --allow-empty -m old
+  old_sha="$(git -C "${d}" rev-parse HEAD)"
+  GIT_AUTHOR_DATE="2024-06-01T00:00:00" GIT_COMMITTER_DATE="2024-06-01T00:00:00" \
+    git -C "${d}" commit -q --allow-empty -m new
+  new_sha="$(git -C "${d}" rev-parse HEAD)"
+  git -C "${d}" update-ref refs/remotes/origin/master "${old_sha}"
+  git -C "${d}" update-ref refs/remotes/origin/main "${new_sha}"
+  _rp_run "${d}" --integration develop
+  rm -rf "${d}"
+  if [ "${RP_OUT}" = "main" ] && printf '%s' "${RP_ERR}" | grep -qi "AMBIGUIDADE"; then
+    record_pass "resolve-production: pós-rename → main (mais recente) + avisa ambiguidade"
+  else
+    record_fail "resolve-production: pós-rename" "esperava out='main' + aviso AMBIGUIDADE, veio out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+
+  # (4) default customizado: sem master/main; origin/HEAD→"trunk" difere da integração → "trunk" (candidato legítimo)
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/zzz-local
+  git -C "${d}" commit -q --allow-empty -m base
+  sha="$(git -C "${d}" rev-parse HEAD)"
+  git -C "${d}" update-ref refs/remotes/origin/trunk "${sha}"
+  git -C "${d}" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/trunk
+  _rp_run "${d}" --integration develop
+  rm -rf "${d}"
+  if [ "${RP_OUT}" = "trunk" ]; then
+    record_pass "resolve-production: default customizado (origin/HEAD→trunk≠integração) → trunk"
+  else
+    record_fail "resolve-production: default customizado" "esperava 'trunk', veio out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+
+  # (5) não identificável: sem master/main; origin/HEAD == integração → VAZIO no stdout + aviso no stderr (NUNCA "main")
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/zzz-local
+  git -C "${d}" commit -q --allow-empty -m base
+  sha="$(git -C "${d}" rev-parse HEAD)"
+  git -C "${d}" update-ref refs/remotes/origin/develop "${sha}"
+  git -C "${d}" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/develop
+  _rp_run "${d}" --integration develop
+  rm -rf "${d}"
+  if [ -z "${RP_OUT}" ] && printf '%s' "${RP_ERR}" | grep -qi "não identificada"; then
+    record_pass "resolve-production: não identificável → vazio + aviso (nunca chuta main)"
+  else
+    record_fail "resolve-production: não identificável" "esperava out='' + aviso 'não identificada', veio out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+
+  # (6) repo sem remote e sem commits → não quebra, degrada gracioso (exit 0)
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  _rp_run "${d}"
+  rm -rf "${d}"
+  if [ "${RP_RC}" -eq 0 ]; then
+    record_pass "resolve-production: repo sem remote/commits degrada gracioso (exit 0)"
+  else
+    record_fail "resolve-production: repo sem remote/commits" "esperava exit 0, veio ${RP_RC} (out='${RP_OUT}' err='${RP_ERR}')"
+  fi
+
+  unset -f _rp_run
+}
+
+# ---------------------------------------------------------------------------
 # Modo durable-commit — exercita .claude/utils/adopt/durable-commit.sh (fix do
 # incidente 2026-07-08: instalação uncommitted apagada por descarte de working-tree).
 # Self-contained (repos git em mktemp). Cobre o MODO DE FALHA (o incidente) e a cura:
@@ -2959,6 +3082,9 @@ run_kg_provenance_selftests
 
 # Modo resolve — não vem do manifest (cenários self-contained, sem fixture-file).
 run_resolve_selftests
+
+# Modo resolve-production — irmão do resolve-integration (branch de PRODUÇÃO).
+run_resolve_production_selftests
 
 # Modo durable-commit — commit durável da instalação (fix do incidente uncommitted-descartável).
 run_durable_commit_selftests

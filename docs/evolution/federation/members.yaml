@@ -116,18 +116,25 @@ members:
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — não citar em superfície pública
     local_path: "/home/marcio/granaai"   # re-clonado 2026-07-08 no novo lar (KVM 8); acesso via token gh de marciocar (org GranaAi privada)
-    onion_version: 4332ac8d1884   # último pin VERIFICADO byte-a-byte (2026-07-07). Membro MULTI-LINHAGEM:
-                                  # pins por linhagem no mapa lineages: abaixo (regra: pin só entra aqui
-                                  # VERIFICADO por pin-integrity-check.sh — nunca do stamp declarado).
+    onion_version: 91d5dbb05a6d   # update de 2026-07-19 aplicado pela PRÓPRIA sessão do adotante
+                                  # (b8208cc1a3da -> 91d5dbb05a6d); merge limpo, único conflito foi
+                                  # docs/onion/inventory.md, resolvido regenerando do filesystem (correto:
+                                  # é SSOT gerado). Lint 0 violações. Pin anterior (b8208cc1a3da) tinha
+                                  # sido verificado pin-ok antes deste update.
+                                  # Membro MULTI-LINHAGEM: pins por linhagem no mapa lineages: abaixo
+                                  # (regra: pin só entra aqui VERIFICADO por pin-integrity-check.sh —
+                                  # nunca do stamp declarado).
     lineages:                     # ≥3 adoções distintas (sinal 2026-07-10-granaai-multi-lineage, testemunho
                                   # do maestro; padrão metagamify/D2 — linhagem = "declarado ≠ verificado")
-      local-kvm8:                 # clone /home/marcio/granaai NESTE servidor — a linhagem das sessões daqui
-        branch: onion/adopt-update-74c470e   # update 2026-07-10 commitado local (3ed42d1c2); PR p/ develop pendente
-        pin: 4332ac8d1884         # DECLARADO no stamp: 74c470e35f17 — mas pin-integrity = pin-untrusted
-                                  # (canário divergente: drift consciente DRIFT-ONION do lint local, converge
-                                  # no próximo --update) → mantém o último verificado; re-verificar pós-update.
-                                  # ⚠️ o stamp local re-carimbou adopted_at p/ 2026-07-10 (deslize de sessão
-                                  # contra a regra preserve — fix de raiz: write-stamp.sh determinístico).
+                                  # NOTA (2026-07-19, correção de "declarado ≠ verificado"): a anotação antiga
+                                  # aqui sobre "drift consciente DRIFT-ONION do lint local" NÃO se confirmou.
+                                  # Verificado por grep no repo inteiro da granaai: o marcador DRIFT-ONION NÃO
+                                  # EXISTE lá (únicas ocorrências são dois docs de inbound criados hoje,
+                                  # 2026-07-19, sem relação com o lint). A suspeita era diagnóstico do CORE
+                                  # sobre a linhagem local-kvm8 (2026-07-10), não algo reportado pelo adotante.
+                                  # A linhagem local-kvm8 (branch onion/adopt-update-74c470e, pin 4332ac8d1884)
+                                  # ficou OBSOLETA — superada pelo update de 2026-07-19 acima (via a linhagem
+                                  # da própria sessão do adotante) e foi removida deste mapa.
       mauricio:                   # máquina do Mauricio Matos — a linhagem da adoção registrada (2026-07-01);
                                   # reconciliação #1094/#1096 revisada por ele. Pin não-verificável deste host.
         pin: nao-verificavel-deste-host

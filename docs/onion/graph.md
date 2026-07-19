@@ -277,10 +277,9 @@ gitflow-specialist	related	/git/init
 gitflow-specialist	related	code-reviewer	
 granaai	adopts	onion-evolve	
 granaai	lineage	leonardo-offline	
-granaai	lineage	local-kvm8	
 granaai	lineage	mauricio	
 granaai	mode	regulated	
-granaai	pin	4332ac8d1884	
+granaai	pin	91d5dbb05a6d	
 granaai	specialization	canonicalization	
 granaai	specialization	regulated-fintech	
 granaai	specialization	ssot-governance	

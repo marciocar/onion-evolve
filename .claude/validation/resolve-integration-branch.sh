@@ -50,6 +50,15 @@ if git -C "${REPO_DIR}" show-ref --verify --quiet refs/heads/develop; then
   printf 'develop\n'; exit 0
 fi
 master="$(git -C "${REPO_DIR}" config --get gitflow.branch.master 2>/dev/null || true)"
+# NOTA (2026-07-19): tentou-se aqui uma "guarda anti-veneno" que descartava gitflow.branch.master
+# quando ele viesse literalmente "develop" (estado degenerado gravado pelo bug do adopt.md, curado
+# agora na origem por resolve-production-branch.sh). Foi REVERTIDA por verificação adversarial:
+# (a) regride um caso real — clone fresco onde develop só existe em refs/remotes/origin/develop e
+#     gitflow.branch.master=develop era o ÚNICO sinal correto da integração; a guarda o descartava
+#     e a cadeia caía no palpite cego "main" (base errada de PR no /engineer:pr);
+# (b) o ganho é quase inalcançável — o adopt.md sempre grava gitflow.branch.develop, então o passo
+#     (2) retorna antes de chegar aqui. Cura-se o veneno na ORIGEM (helper de produção + --unset no
+#     passo (3) do adopt), não neste consumidor.
 if [ -z "${master:-}" ]; then
   master="$(git -C "${REPO_DIR}" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || true)"
 fi

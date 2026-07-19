@@ -8,6 +8,47 @@
 
 ---
 
+## 2026-07-19 · FIX: `gitflow.branch.master` derivado do default branch (atinge adotantes GitFlow) + correção da anotação falsa de drift no `members.yaml` · COMPATÍVEL · alvo: todos
+
+- **Crédito: sinal de campo da granaai (2026-07-19).** A sessão deles rodou `/meta:adopt --update`
+  (`b8208cc1a3da → 91d5dbb05a6d`, merge limpo, único conflito em `docs/onion/inventory.md` resolvido
+  **regenerando do filesystem** — correto, é SSOT gerada) e pegou dois problemas: (1) o heads-up do core
+  previa um drift `DRIFT-ONION` do lint local que **não existe** no repo deles; (2) `gitflow.branch.master`
+  ficou **igual** a `gitflow.branch.develop` (ambos `develop`).
+- **ACHADO 1 — anotação falsa no `members.yaml`.** O ledger do core anotava a granaai com um "drift
+  consciente `DRIFT-ONION`". Verificado por grep no repo inteiro da granaai: o marcador **não existe** lá
+  (as únicas ocorrências são dois docs de inbound criados hoje). A anotação era de 2026-07-10 e falava da
+  linhagem **velha** (branch `onion/adopt-update-74c470e`, pin `4332ac8d1884`) — instância de
+  **declarado≠verificado**: o core propagou anotação stale do próprio ledger como previsão, sem cruzar
+  com o repo vivo do adotante. Corrigido no `members.yaml`.
+- **ACHADO 2 — bug real em `.claude/commands/meta/adopt.md`.** No "Procedimento de Configuração pós-cópia
+  (idempotente)", passo (3), a branch de **produção** era derivada do **default branch** do repo
+  (`git symbolic-ref --quiet --short refs/remotes/origin/HEAD`) com fallback cego para `"main"` ao setar
+  `gitflow.branch.master`. Em repos GitFlow o default branch é comumente `develop` (branch de
+  **integração**, não de produção) — isso grava produção == integração. Confirmado na granaai:
+  `origin/HEAD → origin/develop`, e tanto `gitflow.branch.master` quanto `gitflow.branch.develop`
+  ficaram `develop`. **Correção**: a granaai *tem* `origin/master` vivo (commit de 2026-07-19), e ele
+  é a produção real deles — o bug não é a ausência de `master`, é o `origin/HEAD` apontar para
+  `develop` em vez de `master`. Existem também várias branches de backup (`origin/backup-master`,
+  `origin/master-backup`, `master-backup-04082024`, `backup/master-2024-07-25` etc.), que não são
+  produção.
+- **O que muda:** a resolução da produção virou **helper testável** —
+  `.claude/validation/resolve-production-branch.sh`, irmão do `resolve-integration-branch.sh`, coberto por
+  `lint-selftest.sh` (6 cenários). Ele localiza uma `master`/`main` **real** por `show-ref` e **nunca
+  inventa** (sem produção identificável, devolve vazio e avisa). O `origin/HEAD` **não foi banido**: segue
+  como candidato **condicional**, aceito quando **difere** da integração (cobre trunk-based cujo default é
+  `trunk`/`production`/`stable`) e descartado só quando aponta para a própria integração — que é a forma
+  exata do bug. Entre `master` e `main` vivas, vence a de **commit mais recente** (anti-branch-morta em repo
+  pós-rename), com aviso de ambiguidade. Candidato único igual à integração é **trunk-based por design** e é
+  aceito sem alarme (greenfield só com `main` não regride).
+- **Convergência (não só "parar de piorar"):** o passo (3) agora **corrige o estado** ao ser re-rodado —
+  achou produção real, **sobrescreve**; não achou e o config vigente tem a assinatura do veneno (igual à
+  integração ou ao default do remote), **`git config --unset gitflow.branch.master`**. Um valor que você
+  setou à mão fora dessas assinaturas é preservado.
+- **Ação p/ adotantes:** rodar `/meta:adopt --update` — ele mesmo desfaz o config envenenado. Se a sua
+  produção tiver nome que o helper não detecta (ex.: `release`), sete à mão:
+  `git config gitflow.branch.master <sua-branch>`.
+
 ## 2026-07-18 · O core absorve doutrina de campo do granaai: integridade≠rastreabilidade + soberania do validador (1º ingestor) · COMPATÍVEL · alvo: todos
 
 - **Nasceu o ingestor de doutrina** (o elo que faltava na cadeia adotante→core): o core passa a
