@@ -203,6 +203,31 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  # PORTA DE FRAMEWORK (não projeto-adotante, não destilação) — a porta pública Claude que desfaz o
+  # colapso porta≡core (ADR onion-adr-family-repo-topology-2026-07 F2; doutrina public-door-vs-private-core).
+  # Nasceu 2026-07-19 via /meta:adopt role-scoped (composição: resolve-role-bundle standalone → verticais →
+  # vendor .claude/), SEM meta-factory nem memória privada. Doutrina que circula anonimizada na raiz (PR #438).
+  # Nasce PRIVADA; o flip público e o re-apontar do redirect onion-claude são gate do maestro (MOAT-lock-4).
+  - id: onion-standalone
+    name: onion-standalone (porta pública Claude — instância adotada role-scoped, bundle standalone)
+    role: standalone            # TIER 3 — mas é PORTA DE FRAMEWORK (distribui o bundle standalone), não projeto-adotante
+    parent: onion-evolve
+    remote: github.com/marciocar/onion-standalone   # PRIVADO até o flip (gate do maestro); ≡ onion-claude (redirect re-aponta no flip)
+    local_path: "/home/marcio/onion-standalone"
+    onion_version: 514dda85833a   # VERIFICADO por pin-integrity-check.sh (pin-ok 2026-07-19) — vendoriza .claude/ role-scoped (dif. do onion-mini, destilação sem stamp)
+    adopted_at: 2026-07-19
+    mode: greenfield            # pasta vazia → adopt role-scoped; SÓ o bundle standalone (eng/product/testing/docs), meta-factory selada
+    personality_summary: "A porta pública Claude do Onion: instância adotada role-scoped (bundle standalone: eng/product/testing/docs), SEM meta-factory nem memória privada de evolução. Derivação que cita o core (pin verificado). Desfaz o colapso porta≡core; nasce privada, flip público gated."
+    specializations: [framework-door, role-scoped-adopt, public-distribution, claude-code]
+    personality_last_sync: 2026-07-19   # seed manual
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
   # BRAÇO DE PESQUISA (não adotante-produto) — dogfood do MÉTODO KG SDAAL num cérebro de vida N=1.
   # Federado 2026-07-14 (F3-lite: ponteiro de membro; o KG bruto é PRIVADO, nunca sai). Caveat intra-órbita
   # segue north-star: prova o MÉTODO, não o MERCADO (Q_COLD_ADOPTER aberto; Marcio = centro da órbita).
