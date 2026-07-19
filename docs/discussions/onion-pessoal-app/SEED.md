@@ -5,8 +5,8 @@ status: fonte-de-discussao-isolada
 date: 2026-07-17
 branch: discuss/onion-pessoal-app
 # ── bloco Tier-0 (o mapa da constelação lê SÓ isto — metadados, nunca o corpo) ──
-phase: SEED           # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
-next_action: "Fixar a founding-question (superfície nova, motor adotado, dado soberano) e escolher o CORE LOOP do app (captura / espelho / coach) antes de qualquer pixel. Aterrar no life-KG real do Marcio (3 verticais em ~/onion-pessoal) como N=1 concreto — o app produtiza a sessão de 2026-07-17 feita à mão."
+phase: DEEP           # SEED | EXPLORE | DEEP | CONVERGE | PROMOTE | PARK
+next_action: "Executar o spike Q_GITSYNC (isomorphic-git no device: rota leve vs pesada, perf, merge N=1) — item mais alto do ranking; em paralelo decidir a adoção do Vercel AI SDK (C_ALIGN)."
 scope_globs: ["docs/discussions/onion-pessoal-app/"]
 objective_tags: ["onion-pessoal", "superficie", "onion-bridge", "life-companion"]
 ---
