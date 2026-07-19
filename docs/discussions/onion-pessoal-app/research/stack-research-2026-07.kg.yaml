@@ -602,6 +602,26 @@ nodes:
     verified_at: "2026-07-19"
     label: "STT externo PROVADO ponta-a-ponta (2026-07-19): adapter SDAAL `stt.ts` (provider-agnóstico, openai-whisper como 1º provider, fail-safe sem chave). Round-trip real: TTS gerou fala → o MESMO endpoint/modelo do adapter transcreveu de volta fiel, inclusive o nome ('Olá, briguei com a Marta hoje e me senti péssimo'). Botão 🎙️ grava (expo-audio, já provado no G54) → transcreve → o texto cai no campo para REVISÃO antes do envio (deliberado: o áudio já saiu, mas o texto ainda passa pelo de-id LOCAL). Falta só confirmar o formato de upload do RN no device. Fecha a última peça do F1."
 
+  # ==== F1 FECHADO (2026-07-19) — o motor privado completo, provado no G54 ====
+  - id: E_F1_CLOSED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "F1 FECHADO no device real (Moto G54, Expo Go SDK 57, sem dev build), num único dia: kg-radar JS (gate de escrita D6, conformidade JS↔sh 8/8) · de-id LOCAL (regra v1) · CORE LOOP com cérebro real (Anthropic direto BYOK) · gestão de prompts KG-SSOT-first + runtime · REFORÇO eval-driven (fixtures+asserções, ≡ /meta:diary review; captura drift) · CHAT COM MEMÓRIA (life-KG persistente; reconheceu pessoa entre turnos) · IMAGEM ao cérebro (viu a foto E amarrou ao contexto do KG) · VOZ nos dois sentidos: STT externo (uploadAsync RN-nativo — o caminho que a comunidade recomenda; fetch+FormData quebra no SDK 57, bug expo#33134) e TTS ON-DEVICE (expo-speech). Todas as peças verdes no aparelho."
+  - id: D_VOICE_ASYMMETRY
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-19"
+    label: "DECISÃO de voz ASSIMÉTRICA (2026-07-19), e o porquê importa: ENTRADA (tua voz → STT) sai crua — exceção aceita; RACIOCÍNIO (cérebro) recebe só texto de-identificado; SAÍDA (resposta falada) NÃO sai — TTS on-device. O furo que isso fecha: a resposta exibida está DES-REDIGIDA (tem os nomes reais restaurados localmente), então um TTS de nuvem vazaria pelo outro lado exatamente o que a compartimentalização protege. Preserva a propriedade real do desenho: o transcritor OUVE mas não sabe quem você é; o cérebro SABE quem você é mas só vê tokens — nenhum tem o quadro completo. SPEECH-TO-SPEECH ficou GATED por isso (pesquisa jul/2026: GPT-Realtime-2 e Gemini 3.1 Flash Live existem, mas S2S entrega voz crua + life-KG ao MESMO modelo, sem texto intermediário p/ de-identificar — o portão some; + suporte RN instável, sem SDK JS oficial, polyfill de Web Audio, Android quebrando). Saída da exceção com STT on-device: whisper.rn / whisper-kit-expo (watch-items concretos, não hipótese)."
+
 edges:
   # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
   - from: D_STACK
@@ -919,3 +939,14 @@ edges:
   - from: E_STT_PROVEN
     to: D_MEDIA_EXCEPTION
     edge_type: SUPPORTS
+
+  # --- F1 fechado sustenta o companheiro vivo; a assimetria de voz preserva a compartimentalização ---
+  - from: E_F1_CLOSED
+    to: C_COMPANION_ALIVE
+    edge_type: SUPPORTS
+  - from: D_VOICE_ASYMMETRY
+    to: E_F1_CLOSED
+    edge_type: SUPPORTS
+  - from: D_VOICE_ASYMMETRY
+    to: D_MEDIA_EXCEPTION
+    edge_type: CONSTRAINS
