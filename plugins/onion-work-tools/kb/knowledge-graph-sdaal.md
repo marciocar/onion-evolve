@@ -107,6 +107,16 @@ O grafo é **append-mostly**: auto-correções viram arestas `REFUTES` explícit
 apaga, se **reconcilia** (mesmo parentesco do protocolo de re-teste do diário: `superseded: true`,
 nunca deletar — `/meta:diary review`).
 
+> **Normativo: `id` em INGLÊS, `label` em pt-BR.** Segue a skill `language-standards`/
+> [`code-standards`](../../meta-specs/code-standards.md) — `id` é identificador (código: inglês),
+> `label` é prosa lida por humano (pt-BR). **Custo real medido em campo** (sinal onion-pessoal-app,
+> 2026-07-19): quando os `id` derivaram para português, o **contrato entre artefatos quebrou** — o
+> `atom-map.md` nomeava `E_REPLY`/`E_PHOTO` e o `.kg.yaml` correspondente nomeava
+> `E_RESPOSTA`/`E_FOTO`, dois artefatos do **mesmo contrato** discordando do nome do **mesmo átomo**
+> (exatamente o que o par doc-grafo existe para evitar — ver §Design/atom-map abaixo). Seja honesto
+> sobre o limite: detectar idioma em `id` é **frágil** — isto é **convenção de autoria**, não gate
+> mecânico do radar.
+
 > **Escopo da camada `audit` — não é sobre código, é sobre investigação.** A gramática epistêmica
 > (`claim`/`evidence`/`decision`/`question` + `SUPPORTS`/`REFUTES`/`SUPERSEDES`) serve **qualquer
 > investigação com achados que se contradizem e se corrigem** — código e sistema (a origem: auditoria
@@ -140,12 +150,15 @@ sem erro visível**. Evite:
   interpretada como o booleano `true` pelo parser YAML 1.1 → **os gatilhos de transição somem** (no
   campo: 9 gatilhos perdidos numa migração, um estado-absorvente **falso** apareceu). **Cite o evento
   entre aspas** (`on: "EVENTO"`) ou trate a chave `True` ao ler; nunca deixe `on:` nu.
-- **Colisão de keyword-substring com o radar.** O `kg-radar.sh` é awk puro (por design determinístico:
-  não aluga LLM) e captura campos por substring de linha (`plane:`/`status:`/`impact:`), tomando a
-  **última** ocorrência. Um campo livre — `label:`, `trace:`, `reason:` — cujo **texto** contenha
-  `plane:`/`status:`/etc. **sobrescreve o campo real**. Regra: **emita os campos livres ANTES dos
-  escalares** no bloco do nó (para o escalar real vencer), e evite as substrings de keyword dentro de
-  texto livre. É footgun garantido — trate como convenção, não como acaso.
+- **Colisão de keyword-substring com o radar — CORRIGIDA em 2026-07-19 (não é mais footgun).** O
+  `kg-radar.sh` é awk puro (por design determinístico: não aluga LLM) e **até 2026-07-19** capturava
+  campos por substring de linha, tomando a **última** ocorrência: um campo livre (`label:`, `trace:`,
+  `reason:`) cujo texto contivesse `plane:`/`status:`/etc. **sobrescrevia o campo real**. O workaround
+  de então — *"emita os campos livres antes dos escalares"* — **está obsoleto**: os campos passaram a
+  casar em **posição de campo** (`^[[:space:]]*<campo>:`), em `nodes`, `edges` e `meta`. **Escreva
+  labels livremente; a ordem dos campos não importa mais.** ⚠️ A armadilha permanece **inerente a
+  qualquer porta line-based** noutro runtime — por isso virou item obrigatório do contrato de
+  conformidade (ver §Multi-runtime).
 - **Vírgulas finais em flow-maps.** Trailing commas em mapas inline quebram o parse silenciosamente na
   migração — revise antes de rodar o radar.
 
@@ -355,6 +368,22 @@ opcionais**, nunca **renomear obrigatórios**; o conformance sobre os fixtures p
 O sinal upstream perguntou se isto vira doutrina; vira: **kg-radar como SDAAL de múltiplos runtimes com
 contrato de conformidade.** É o mesmo princípio SDAAL do resto do Onion — uma abstração/autoridade, N
 implementações que provam conformidade ao contrato — aplicado ao motor de KG.
+
+> **O contrato de conformidade DEVE incluir o caso CAMPO-CITADO-EM-TEXTO-LIVRE** (crédito: sinal de
+> campo onion-pessoal-app, 2026-07-19 — descoberto errando: a estrela pushou um grafo quebrado).
+> **Histórico e estado atual:** o `kg-radar.sh` é line-based e, até 2026-07-19, casava campos por
+> **substring de linha**; um `label` cujo texto citasse um token (ex.: `label: "66 nós, TODOS
+> layer:audit, ZERO domain"`) virava configuração e produzia falso-`B_TRAP`, reprovando um grafo
+> correto. **Isso está CORRIGIDO no soberano**: todos os campos passaram a casar em **posição de
+> campo** (`^[[:space:]]*<campo>:`, match *e* `sub` ancorados), estendendo a defesa que já existia
+> só para `trace:` — em **todas as seções**: `nodes`, `edges` (`to`/`edge_type`/`on`) e `meta`.
+> **Por que segue no contrato:** a armadilha é **inerente a parser line-based**, então **toda porta
+> em outro runtime nasce com ela** — a porta JS inclusive. O fixture de conformidade porta-vs-`.sh`
+> precisa cobrir o caso explicitamente, senão a porta sela verde **reproduzindo o bug que o gate
+> existe para impedir** (falso-verde pela porta, não pelo `.sh`). Dois vetores reais medidos, ambos
+> obrigatórios no fixture: (1) `label` citando `layer:`/`status:`/…; (2) em aresta, `to:
+> D_migrate_to:v2` recortado na última ocorrência (→ nó inexistente) e `on:` lido de dentro de
+> `reason:` (`reas·on:`).
 
 ## Anti-whack-a-mole (disciplina complementar)
 

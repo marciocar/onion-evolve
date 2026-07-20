@@ -11,8 +11,8 @@ model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *) Bash(find *) Bash(awk *) Bash(grep *) Bash(sort *)
 argument-hint: "create | list [--classification <c>] [--type <t>] [--sharable] | export-sharable [--dry-run] | index | review"
 category: meta
-version: "1.2.0"
-updated: "2026-07-02"
+version: "1.3.0"
+updated: "2026-07-19"
 ---
 
 # 🧅 /meta:diary — Diário de Aprendizado Onion
@@ -103,6 +103,7 @@ next_recommended: ""
 review_after: ${REVIEW_DATE}
 conflict_class: <dynamic|static|conditional>
 valid_when: "<condição testável — obrigatória se conditional; REMOVER a linha se não se aplica>"
+significance: "<frase orgulhosa e honesta, ≤1 linha — por que esta migalha vale e qual seu papel no continuum dogfoodado; OPCIONAL, REMOVER a linha se ainda não estiver clara>"
 ---
 
 ## Signal
@@ -118,7 +119,27 @@ EOF
 echo "Criado: $FILEPATH"
 ```
 
-Abrir o arquivo para o maestro completar Signal, Evidence e Next crumb.
+Abrir o arquivo para o maestro completar, guiado por **4 perguntas** (Signal/Evidence/Next crumb já
+eram; `significance` é a 4ª, nova em 1.3.0):
+
+1. **Signal** — o que o Transformer DEVE absorver desta entrada (≤3 linhas)?
+2. **Evidence** — o que aconteceu de concreto (bullets, não prosa)?
+3. **Next crumb** — o que fazer/investigar depois de absorver esta entrada?
+4. **Significance** *(campo `significance:` no frontmatter — opcional)* — "em uma frase orgulhosa e
+   honesta, por que esta migalha vale e qual seu papel no continuum da evolução dogfoodada?"
+
+**Guarda orgulho ≠ hype** (a `significance` não é decoração):
+- **Precisa de lastro em Evidence/Signal** — uma `significance` sem lastro no que a entrada de fato
+  mostra é migalha **desonesta** (mesma classe de `type`/`conflict_class` fora do vocabulário — ver
+  Regras do diário). Orgulho é ganho pela evidência, não declarado por conta própria.
+- **Cai junto quando a migalha é superseded** — no `review`, se o veredito for "inválida"
+  (`superseded: true`), a `significance` cai com o resto: não se vende com orgulho uma migalha morta.
+  É re-testada junto (mesma disciplina do `⏰`/`conflict_class`).
+- **Uma frase, não um parágrafo** — a força é a destilação. Se o encaixe-no-todo não cabe numa linha
+  orgulhosa e honesta, ele ainda não está claro — e isso, por si, já é um sinal (não force a frase).
+- **Opcional e retrocompatível** — entradas antigas (pré-1.3.0) não têm o campo e continuam válidas;
+  o `diary-index.sh` degrada gracioso (mostra "—") quando ausente. Não é obrigatório preencher em
+  entradas onde o papel-no-continuum ainda não se provou.
 
 **Após preenchimento:** rodar `diary index` para atualizar o index.md.
 
@@ -191,7 +212,9 @@ bash "$(git rev-parse --show-toplevel)/${CLAUDE_PLUGIN_ROOT}/validation/diary-in
 ```
 
 O index.md é o Tier-0 pointer do diário (~1KB). O Transformer lê o índice, não o diário inteiro.
-Formato do índice: tabela com date, type, classification, slug, review_after — ordenada por data desc.
+Formato do índice: tabela com date, type, classification, slug, **significance** (quando presente —
+degrada para "—" quando ausente), review_after, conflict_class — ordenada por data desc. A coluna
+`significance` é o que faz o índice dizer **por que ler** cada entrada, não só o quê/quando.
 
 ---
 
@@ -236,6 +259,13 @@ auto-reforçante — [ADR work-models §4](../../../docs/analysis/onion-adr-work
 5. **Classification antes de share_with** — a classificação é a política; share_with é exceção explícita.
 6. **Private é o default para erros com contexto de negócio** — não expor dados do adotante.
 7. **Innovations são public por padrão** — se descobrimos algo útil, a rede deve poder absorver.
+8. **Significance é opcional, mas se presente exige lastro** — uma frase (≤1 linha, frontmatter) que
+   destila por que a migalha vale e qual seu papel no continuum dogfoodado. Orgulho é ganho por
+   Evidence/Signal, não declarado por conta própria — `significance` sem lastro é migalha desonesta
+   (mesma classe de `type`/`conflict_class` fora do vocabulário). Cai junto quando a entrada é
+   `superseded` no `review` (não se vende com orgulho uma migalha morta). Campo **opcional e
+   retrocompatível** — entradas pré-1.3.0 sem ele continuam válidas; o `diary-index.sh` degrada
+   gracioso ("—") quando ausente.
 
 ---
 

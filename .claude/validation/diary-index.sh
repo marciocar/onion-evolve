@@ -32,6 +32,7 @@ TOTAL=$(echo "$ENTRIES" | wc -l | tr -d ' ')
 STALE=0
 SHARABLE=0
 INVALID=0
+SIGNIFICANT=0
 
 # Gerar linhas da tabela
 TABLE_ROWS=""
@@ -93,9 +94,26 @@ while IFS= read -r f; do
     SHARABLE=$((SHARABLE + 1))
   fi
 
+  # significance — síntese ORGULHOSA do porquê a migalha vale (princípio de publicação 2026-07-19,
+  # sinal docs/evolution/inbox/2026-07-19-breadcrumb-significance-publication-principle.md).
+  # Campo OPCIONAL e retrocompatível: entrada sem ele (toda migalha pré-1.3.0) degrada gracioso —
+  # mostra "—" no índice, nunca quebra o script. `sub` (não $2) porque é frase livre com espaços,
+  # mesmo padrão já usado para valid_when. Aspas ao redor são só delimitador de autoria — removidas
+  # na exibição; `|` é escapado para não vazar e quebrar a tabela markdown (mesma classe de risco
+  # que a captura frouxa por linha documentada no kg-radar.sh: valor de campo pode conter tokens
+  # que colidem com a sintaxe do formato-alvo).
+  SIG=$(awk '/^significance:/{sub(/^significance:[ ]*/, ""); print; exit}' "$f" 2>/dev/null || echo "")
+  SIG="${SIG%\"}"
+  SIG="${SIG#\"}"
+  SIG="${SIG//|/\/}"
+
   REVIEW_DISPLAY="${REVIEW:-—}"
   CCLASS_DISPLAY="${CCLASS:-—}"
-  TABLE_ROWS="${TABLE_ROWS}| ${DATE} | ${TYPE} | ${CLASS}${STALE_MARKER}${SHARE_MARKER} | ${SLUG} | ${REVIEW_DISPLAY} | ${CCLASS_DISPLAY} |
+  SIG_DISPLAY="${SIG:-—}"
+  if [ -n "$SIG" ]; then
+    SIGNIFICANT=$((SIGNIFICANT + 1))
+  fi
+  TABLE_ROWS="${TABLE_ROWS}| ${DATE} | ${TYPE} | ${CLASS}${STALE_MARKER}${SHARE_MARKER} | ${SLUG} | ${SIG_DISPLAY} | ${REVIEW_DISPLAY} | ${CCLASS_DISPLAY} |
 "
 done <<< "$ENTRIES"
 
@@ -116,14 +134,14 @@ cat > "$INDEX" <<EOF
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm \`review_after\` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** ${TOTAL} entradas · **Stale:** ${STALE} · **Compartilháveis:** ${SHARABLE}
+**Total:** ${TOTAL} entradas · **Stale:** ${STALE} · **Compartilháveis:** ${SHARABLE} · **Com significância:** ${SIGNIFICANT}
 
 Gerado em: ${TODAY}
 
 ---
 
-| Data | Tipo | Classificação | Slug | Revisar em | Classe |
-|---|---|---|---|---|---|
+| Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
+|---|---|---|---|---|---|---|
 ${TABLE_ROWS}
 ---
 

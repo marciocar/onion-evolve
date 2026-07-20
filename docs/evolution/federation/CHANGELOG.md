@@ -8,6 +8,45 @@
 
 ---
 
+## 2026-07-19 · `kg-radar.sh` passa a ANCORAR todos os campos do nó (fim da colisão label↔schema) + linha normativa de idioma de ids + `significance:` no diário (fase 1) · COMPATÍVEL · alvo: todos
+
+- **Crédito: dois sinais de campo da estrela `onion-pessoal-app` (2026-07-19)** — e o primeiro veio do jeito
+  mais caro e mais honesto que existe: a sessão deles **pushou um grafo quebrado** (`kg-radar` `exit 1`) porque
+  um `label:` que **descrevia a própria gramática** —
+  `label: "... 66 nós, TODOS layer:audit, ZERO domain ..."` — foi lido como configuração real pelo parser
+  line-based. Erraram em campo primeiro, devolveram o achado depois. Sem esse push quebrado, o bug não teria
+  evidência reproduzível.
+- **ACHADO — bug confirmado no core.** O `kg-radar.sh` casa os campos do nó de forma **frouxa**
+  (`line ~ /node_type:/`, `/plane:/`, `/layer:/`, `/impact:/`, `/confidence:/`, `/status:/`): qualquer valor de
+  `label:` que **cite** um desses tokens vira campo interpretado. A defesa **já existia para 1 de 7 campos** —
+  `trace:` é ancorado (`^[[:space:]]*trace:`), com comentário explícito no próprio script alertando do risco. A
+  estrela achou a armadilha aberta nos outros 6.
+- **O que muda:** o mesmo padrão provado de `trace:` foi **estendido a todos os campos do nó** — casamento
+  ancorado em posição de campo (início de linha, não substring), não mais match solto. Um `label:` pode citar
+  `layer:`/`status:`/`impact:` à vontade sem virar configuração. A estrela propôs duas opções (guarda de
+  detecção barata vs. ancorar todos os campos) e recomendou a segunda — **essa foi a escolha do core**: remove a
+  classe inteira do bug em vez de só avisar dela.
+- **Linha normativa nova — idioma dos ids no KG.** `knowledge-graph-sdaal.md` ganha a regra explícita:
+  **ids em inglês, labels em pt-BR**. A estrela achou o vazio ao misturar idioma dentro do próprio id
+  (`EV_GATE_REPROVA`) e ao divergir de nome entre `atom-map.md` e `.kg.yaml` (`E_REPLY` vs. `E_RESPOSTA`) — a
+  regra já valia por `language-standards`, mas não estava escrita onde quem escreve grafo efetivamente olha.
+- **`significance:` — novo campo de frontmatter do `/meta:diary` (fase 1).** Toda migalha passa a carregar uma
+  frase curta e honesta do **por que ela vale** — não só fatos + id de PR. Fase 1 (fechada agora): o campo em
+  si, a pergunta guiada no `create` (junto de Signal/Evidence/Next crumb) e a superfície no índice Tier-0
+  (`diary-index.sh`). Fases 2–3 (ancorar em `breadcrumb-patterns.md` como faceta do gênero ① Absorção + registro
+  em RFC-0003 como contrato federado) ficam em backlog — território de doutrina cross-instância, não fechado
+  num único ciclo.
+- **Ação p/ adotantes — depende da SUA rota de consumo (não é "nenhuma" para todos):**
+  - **Rota `/meta:adopt --update`** (vendoriza `.claude/validation` + `docs/knowledge-base`): nada a fazer —
+    o `kg-radar.sh` ancorado e a KB atualizada chegam no próximo update.
+  - **Rota PLUGINS/marketplace** (`onion-work-tools`, `onion-engineering` — o bundle traz sua própria cópia
+    de `validation/kg-radar.sh`): os plugins foram **re-montados neste mesmo commit**; puxe a versão nova do
+    bundle. Enquanto um bundle antigo estiver instalado, **o radar dele ainda tem o bug** — o fix na fonte
+    não alcança cópia vendorizada parada.
+  - **Quem tem porta em outro runtime** (`kgRadar.ts` ou equivalente): porte o mesmo fix **e** o mesmo teste
+    à mão. O bug é do **contrato de gramática**, não de uma implementação — toda porta line-based nasce com
+    ele. O caso entrou no contrato de conformidade (ver KB §Multi-runtime).
+
 ## 2026-07-19 · FIX: `gitflow.branch.master` derivado do default branch (atinge adotantes GitFlow) + correção da anotação falsa de drift no `members.yaml` · COMPATÍVEL · alvo: todos
 
 - **Crédito: sinal de campo da granaai (2026-07-19).** A sessão deles rodou `/meta:adopt --update`

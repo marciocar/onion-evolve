@@ -347,6 +347,137 @@ run_kg_provenance_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo kg-label-collision — CONTEÚDO não é CONFIGURAÇÃO. O parser do kg-radar.sh é line-based;
+# antes da âncora `^[[:space:]]*<campo>:`, um label que CITASSE um token de campo era lido como
+# valor daquele campo e REPROVAVA um grafo correto. Sinal de campo da estrela onion-pessoal-app
+# (2026-07-19): `label: "66 nos, TODOS layer:audit, ZERO domain"` → "✗ layer inválido".
+# Fixtures temporários (self-contained, não vêm do manifest) + cleanup via trap.
+# Os DOIS lados no mesmo caso: (a) label citando token NÃO confunde, (c) enum inválido em POSIÇÃO
+# DE CAMPO continua reprovando — senão "consertar" seria matar a guarda e chamar de fix.
+# ---------------------------------------------------------------------------
+run_kg_label_collision_selftests() {
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  local tmp out rc
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "${tmp}"' RETURN
+
+  cat > "${tmp}/label-collision.kg.yaml" <<'KGEOF'
+# Fixture temporário: labels que CITAM tokens de campo. Grafo estruturalmente VÁLIDO.
+meta:
+  id: fixture-label-collision
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: C_TRAP
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "66 nos, TODOS layer:audit, ZERO domain"
+  - id: A_SRC
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "node_type:evidence plane:PROD status:open impact:5 confidence:0.1 sao citacoes"
+edges:
+  - from: C_TRAP
+    to: A_SRC
+    edge_type: SUPPORTS
+KGEOF
+
+  cat > "${tmp}/enum-real.kg.yaml" <<'KGEOF'
+# Par "bad": o MESMO token, agora em posição de campo → tem que continuar reprovando.
+meta:
+  id: fixture-enum-real
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: C_BAD
+    node_type: claim
+    layer: nao-existe
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "layer invalido de verdade"
+  - id: A_SRC
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "artefato ok"
+edges:
+  - from: C_BAD
+    to: A_SRC
+    edge_type: SUPPORTS
+KGEOF
+
+  # (a) integridade: label citando "layer:"/"node_type:"/"plane:"/"status:" NÃO vira configuração
+  rc=0; out=$(bash "${radar}" "${tmp}/label-collision.kg.yaml" --integrity 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q 'sem contradições estruturais' \
+     && ! printf '%s' "${out}" | grep -q 'inválido'; then
+    record_pass "kg-label-collision: label citando token de campo → integridade verde (conteúdo ≠ configuração)"
+  else record_fail "kg-label-collision: label não confunde" "esperava exit 0 sem 'inválido'; rc=${rc} out=${out}"; fi
+
+  # (b) o valor REAL continua sendo lido (não basta ignorar o label — o campo tem que valer):
+  # peso de C_TRAP = impact 3 × confidence 0.9 × status confirmed (1.0) × grau 2 = 5.4, plano DEV.
+  rc=0; out=$(bash "${radar}" "${tmp}/label-collision.kg.yaml" --radar 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q '5.4  C_TRAP' \
+     && printf '%s' "${out}" | grep -q 'claim(DEV/confirmed)'; then
+    record_pass "kg-label-collision: campos reais ainda lidos (peso 5.4, claim(DEV/confirmed))"
+  else record_fail "kg-label-collision: campos reais" "esperava 5.4 C_TRAP claim(DEV/confirmed); rc=${rc} out=${out}"; fi
+
+  # (c) guarda viva: enum inválido em POSIÇÃO DE CAMPO continua reprovando com exit 1
+  rc=0; out=$(bash "${radar}" "${tmp}/enum-real.kg.yaml" --integrity 2>&1) || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'C_BAD: layer inválido'; then
+    record_pass "kg-label-collision: enum inválido em posição de campo AINDA reprova (guarda viva)"
+  else record_fail "kg-label-collision: guarda viva" "esperava exit 1 + 'C_BAD: layer inválido'; rc=${rc} out=${out}"; fi
+
+  # (d) ARESTAS/META — a mesma classe fora da seção `nodes` (2ª metade do fix, 2026-07-19).
+  # Dois vetores reais que o match solto abria: `to: D_migrate_to:v2` era recortado na ÚLTIMA
+  # ocorrência (virava "v2" → nó inexistente) e `on:` era lido de dentro de `reason:` (reas·on:).
+  cat > "${tmp}/edge-collision.kg.yaml" <<'KGEOF'
+meta:
+  schema_version: 1
+nodes:
+  - id: A_SRC
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "origem"
+  - id: D_migrate_to:v2
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "id contendo dois-pontos"
+edges:
+  - from: A_SRC
+    to: D_migrate_to:v2
+    edge_type: SUPPORTS
+    reason: "campo livre cujo texto contém on: como substring"
+KGEOF
+  rc=0; out=$(bash "${radar}" "${tmp}/edge-collision.kg.yaml" --integrity 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q 'sem contradições estruturais' \
+     && ! printf '%s' "${out}" | grep -q 'inexistente'; then
+    record_pass "kg-label-collision: aresta com id contendo ':' e campo livre citando 'on:' → integridade verde"
+  else record_fail "kg-label-collision: arestas/meta ancoradas" "esperava exit 0 sem 'inexistente'; rc=${rc} out=${out}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo contract — exit code de federation-contract-validate.sh
 # ---------------------------------------------------------------------------
 run_contract_fixture() {
@@ -2621,6 +2752,19 @@ run_diary_crumbs_selftests() {
   if [ "${rc}" -eq 0 ]; then record_pass "diary-crumbs: type reflection → passa (promovido ao enum)"
   else record_fail "diary-crumbs: reflection" "esperava exit 0, veio ${rc}"; fi
 
+  # (g) `significance` (1.3.0) — o caminho NÃO-VAZIO. A coluna nasceu 100% travessão (nenhuma
+  # entrada real a usava), então sem este caso um refactor do bloco de extração quebraria em
+  # silêncio. Exercita também os dois perigos do campo: `|` (quebraria a tabela markdown → vira
+  # `/`) e aspas de borda (removidas). O caminho VAZIO já é coberto pelas entradas (a)-(f).
+  printf -- '---\ndate: 2026-01-09\ntype: learning\nclassification: public\nreview_after: 2099-01-01\nconflict_class: static\nsignificance: "Prova o caminho | com pipe e aspas — vale ler"\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-09-sig-entry.md"
+  rc=0; bash "${di}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && grep -q 'Prova o caminho / com pipe e aspas' "${d}/.claude/diary/index.md" \
+     && ! grep -q 'significance: "' "${d}/.claude/diary/index.md"; then
+    record_pass "diary-crumbs: significance não-vazia → surfaça no índice (pipe escapado, aspas removidas)"
+  else record_fail "diary-crumbs: significance não-vazia" "esperava a frase no índice com '|' virando '/'; rc=${rc}"; fi
+
   rm -rf "${d}"
 }
 
@@ -3079,6 +3223,10 @@ run_kg_freshness_selftests
 
 # Modo kg-provenance — guarda de proveniência de decisão (ITEM2).
 run_kg_provenance_selftests
+
+# Modo kg-label-collision — conteúdo de label não pode ser lido como configuração
+# (sinal de campo onion-pessoal-app, 2026-07-19).
+run_kg_label_collision_selftests
 
 # Modo resolve — não vem do manifest (cenários self-contained, sem fixture-file).
 run_resolve_selftests

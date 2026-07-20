@@ -80,19 +80,34 @@ section == "nodes" && /^[[:space:]]+- id:/ {
 }
 section == "nodes" && nid != "" {
   line = $0; sub(/#.*$/, "", line)
-  if (line ~ /node_type:/)  { v = line; sub(/.*node_type:/, "", v);  ntype[nid] = trim(v) }
-  if (line ~ /plane:/)      { v = line; sub(/.*plane:/, "", v);      plane[nid] = trim(v) }
-  if (line ~ /layer:/)      { v = line; sub(/.*layer:/, "", v);      layer[nid] = trim(v) }
-  if (line ~ /impact:/)     { v = line; sub(/.*impact:/, "", v);     impact[nid] = trim(v) + 0 }
-  if (line ~ /confidence:/) { v = line; sub(/.*confidence:/, "", v); conf[nid] = trim(v) + 0 }
-  if (line ~ /status:/)     { v = line; sub(/.*status:/, "", v);     nstatus[nid] = trim(v) }
-  if (line ~ /verified_against:/) { v = line; sub(/.*verified_against:/, "", v); verifiedAgainst[nid] = trim(v) }
-  else if (line ~ /verified_at:/) { v = line; sub(/.*verified_at:/, "", v); verifiedAt[nid] = trim(v) }
+  # ── CAMPO SÓ EM POSIÇÃO DE CAMPO (âncora ^[[:space:]]*<campo>:) ──────────────────────────────
+  # O parser é line-based: um match SOLTO (`line ~ /layer:/` + `sub(/.*layer:/…)`) lê CONTEÚDO como
+  # CONFIGURAÇÃO — basta um label citar o token. Real, não hipotético:
+  #     label: "66 nos, TODOS layer:audit, ZERO domain"
+  # virava `✗ layer inválido: [audit, ZERO domain]` e REPROVAVA um grafo correto. A defesa já
+  # existia — mas só para `trace:` (comentário abaixo) — e ficou fechada em 1 de 7 campos. Agora
+  # a ancoragem cobre a classe inteira EM TODAS AS SEÇÕES: `nodes` (node_type/plane/layer/impact/
+  # confidence/status/verified_*/label), `edges` (to/edge_type/on) e `meta` (schema_version/baseline).
+  # Crédito: sinal de campo da estrela onion-pessoal-app (2026-07-19), que pushou um grafo quebrado
+  # exatamente por isto — um repo que FALA de layers/status escreve esses tokens em prosa o tempo todo.
+  # Âncora também no `sub`: casar ancorado e extrair solto (`.*campo:`) recortaria pela ÚLTIMA
+  # ocorrência da linha, devolvendo o rabo do label quando o valor cita o próprio token.
+  if (line ~ /^[[:space:]]*node_type:/)  { v = line; sub(/^[[:space:]]*node_type:/, "", v);  ntype[nid] = trim(v) }
+  if (line ~ /^[[:space:]]*plane:/)      { v = line; sub(/^[[:space:]]*plane:/, "", v);      plane[nid] = trim(v) }
+  if (line ~ /^[[:space:]]*layer:/)      { v = line; sub(/^[[:space:]]*layer:/, "", v);      layer[nid] = trim(v) }
+  if (line ~ /^[[:space:]]*impact:/)     { v = line; sub(/^[[:space:]]*impact:/, "", v);     impact[nid] = trim(v) + 0 }
+  if (line ~ /^[[:space:]]*confidence:/) { v = line; sub(/^[[:space:]]*confidence:/, "", v); conf[nid] = trim(v) + 0 }
+  if (line ~ /^[[:space:]]*status:/)     { v = line; sub(/^[[:space:]]*status:/, "", v);     nstatus[nid] = trim(v) }
+  if (line ~ /^[[:space:]]*verified_against:/) { v = line; sub(/^[[:space:]]*verified_against:/, "", v); verifiedAgainst[nid] = trim(v) }
+  else if (line ~ /^[[:space:]]*verified_at:/) { v = line; sub(/^[[:space:]]*verified_at:/, "", v); verifiedAt[nid] = trim(v) }
   # Proveniência inline: a MIGALHA `arquivo:linha` (suporte de campo 2026-07-17). Âncora
   # em ^…trace: — um match solto casaria com label que cita "trace:"/"TRACES_TO" (este repo fala
-  # de rastreabilidade sobre si mesmo), false-positivando a origem.
+  # de rastreabilidade sobre si mesmo), false-positivando a origem. Foi o PROTÓTIPO da defesa acima.
   if (line ~ /^[[:space:]]*trace:/) { v = line; sub(/^[[:space:]]*trace:/, "", v); traceInline[nid] = trim(v) }
-  if ($0 ~ /label:/)        { v = $0; sub(/^[[:space:]]*label:/, "", v); label[nid] = trim(v) }
+  # label: lê de $0 (não de `line`) de propósito — o texto do label pode conter `#` legítimo, e a
+  # poda de comentário o truncaria. Match agora ancorado como os demais (antes casava solto e só o
+  # sub era ancorado: numa linha de OUTRO campo que citasse "label:", o valor virava a linha inteira).
+  if ($0 ~ /^[[:space:]]*label:/) { v = $0; sub(/^[[:space:]]*label:/, "", v); label[nid] = trim(v) }
   next
 }
 
@@ -101,13 +116,22 @@ section == "edges" && /^[[:space:]]+- from:/ {
   v = trim($0); sub(/^- from:/, "", v); efrom[ne] = trim(v)
   next
 }
-section == "edges" && /to:/ && !/edge_type/ { v = $0; sub(/.*to:/, "", v); eto[ne] = trim(v); next }
-section == "edges" && /edge_type:/ { v = $0; sub(/.*edge_type:/, "", v); etype[ne] = trim(v); next }
-section == "edges" && /on:/ { v = $0; sub(/.*on:/, "", v); eon[ne] = trim(v); next }
+# ARESTAS/META — mesma ancoragem dos nós (2ª metade do fix; a 1ª cobriu só a seção `nodes`).
+# Dois vetores reais que o match solto abria aqui:
+#   (a) `to: D_migrate_to:v2` — `sub(/.*to:/)` recorta na ÚLTIMA ocorrência e devolve "v2":
+#       nó inexistente → falso "aresta para nó inexistente" reprovando um grafo correto;
+#   (b) `/on:/` casava QUALQUER linha contendo "on:" como substring — inclusive `reason:`
+#       (reas·on:), que é campo válido da migalha TRACES_TO. Bastava uma aresta com `reason:`
+#       para o atributo `on:` (evento gatilho de TRANSITIONS) ser lido do campo errado.
+# Ancorar em posição de campo mata os dois. (O antigo `!/edge_type/` virou redundante: uma linha
+# `edge_type:` não casa `^[[:space:]]*to:`.)
+section == "edges" && /^[[:space:]]*to:/ { v = $0; sub(/^[[:space:]]*to:/, "", v); eto[ne] = trim(v); next }
+section == "edges" && /^[[:space:]]*edge_type:/ { v = $0; sub(/^[[:space:]]*edge_type:/, "", v); etype[ne] = trim(v); next }
+section == "edges" && /^[[:space:]]*on:/ { v = $0; sub(/^[[:space:]]*on:/, "", v); eon[ne] = trim(v); next }
 
 # meta: campos de governança de frescor/schema (proposta #1/#2 — ADR kg-freshness-gate)
-section == "meta" && /schema_version:/ { v = $0; sub(/.*schema_version:/, "", v); metaSchema = trim(v); next }
-section == "meta" && /baseline:/        { v = $0; sub(/.*baseline:/, "", v);        metaBaseline = trim(v); next }
+section == "meta" && /^[[:space:]]*schema_version:/ { v = $0; sub(/^[[:space:]]*schema_version:/, "", v); metaSchema = trim(v); next }
+section == "meta" && /^[[:space:]]*baseline:/       { v = $0; sub(/^[[:space:]]*baseline:/, "", v);       metaBaseline = trim(v); next }
 
 END {
   VN = "entity claim decision question evidence artifact state event rule invariant policy"
