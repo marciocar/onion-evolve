@@ -85,6 +85,16 @@ descrevem um processo superado). Aplique esta **ordem de precedência** (mais fo
 Registre o conflito explicitamente e sinalize a fonte desatualizada como follow-up, em vez de
 propagar a contradição para a documentação gerada.
 
+> **⚠️ Evidência de FORNECEDOR carrega interesse — a precedência acima ordena por *frescor*, não por
+> *neutralidade*.** Relatório de pentest, laudo, parecer e certificação são autênticos e íntegros e ainda
+> assim **calibrados** por quem os emite. Ao montar pacote de auditoria a partir deles, leia a
+> **estrutura** antes de propagar a métrica: achados replicados por superfície (mesma classe por
+> host/endpoint/formulário) inflam a contagem; severidade fora da faixa usual da classe é ênfase;
+> **incentivo impresso no próprio texto** (reteste pago, etapa seguinte precificada) é evidência, não
+> suspeita. O que o fornecedor **concede contra o próprio interesse** é a parte de maior confiança do
+> documento. **Interesse qualifica a leitura, não a anula** — achado distinto e de lógica de negócio não
+> se relativiza. Doutrina: [evidence-source-interest.md](../../../docs/knowledge-base/concepts/evidence-source-interest.md).
+
 > **Modo não-interativo (infer-from-evidence).** Sem usuário disponível ou evidência completa,
 > não bloqueie: infira a partir do repo e dos artefatos existentes, **marque cada inferência**
 > com `[INFERIDO]` e liste as suposições numa seção "Pendências de validação" no `index.md`.

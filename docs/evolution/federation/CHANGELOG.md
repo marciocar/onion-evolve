@@ -8,6 +8,34 @@
 
 ---
 
+## 2026-07-20 · 3º eixo da evidência: **interesse da fonte** (verificado ≠ neutro) · COMPATÍVEL · alvo: todos
+
+- **Crédito: sinal de campo da granaai (2026-07-20)**, durante auditoria de compliance para due diligence.
+  E o mais valioso do sinal é *como* o achado apareceu: **não foi gate, foi ceticismo humano** — o maestro
+  leu a métrica reportada e perguntou pelo incentivo de quem a produziu. Nenhum mecanismo da casa faz essa
+  pergunta; por isso virou doutrina, e por isso a doutrina declara que **este eixo não é mecanizável**.
+- **A lacuna, nomeada com precisão:** o core já perguntava duas coisas sobre conteúdo de fora — *"pode me
+  COMANDAR?"* (R15, injeção/efeito) e *"bate com o ARTEFATO VIVO?"* (`declarado≠verificado`). Faltava a
+  terceira: **"quem produziu isto GANHA o quê com o que diz?"**. Um documento passa nos dois primeiros —
+  autêntico, íntegro, números conferidos — e ainda entrega leitura torta, porque ninguém leu o incentivo.
+- **Nova KB:** [`evidence-source-interest.md`](../../knowledge-base/concepts/evidence-source-interest.md).
+  Princípio: **declaração contra o próprio interesse é a evidência de maior confiança**; e o contrapeso
+  obrigatório — **descartar evidência porque a fonte tem interesse é o erro oposto, tão ruim quanto**.
+  Interesse **qualifica** a leitura, não a anula (sem isso a doutrina degenera em cinismo). Mais o método
+  de leitura da **estrutura**: replicação por superfície, severidade fora da faixa usual, incentivo
+  impresso no próprio texto, e o que a fonte concede contra si.
+- **Wire-in nas superfícies de ingestão:** `/meta:kg` (Passo 2 — evidência de terceiro carrega o interesse
+  no `label`/`trace`) e `/docs:build-compliance-docs` (evidência de fornecedor: a precedência existente
+  ordena por *frescor*, não por *neutralidade*). ⚠️ **Honestidade de escopo:** `deep-research` é skill do
+  **harness**, não artefato do core — a doutrina é referência para quem a usa, **não houve wire-in lá**.
+- **Schema GATED:** a proposta de campo distinguindo *"afirma e lucra"* de *"concede contra si"* (com
+  confiança maior por construção) foi **aceita como desenho e barrada na implementação** — é mudança de
+  gramática do `.kg.yaml`, alcança o `kg-radar.sh`, as portas em outro runtime e o contrato de
+  conformidade multi-runtime. Gatilho: **2º caso real** onde a anotação em prosa se prove insuficiente.
+- **Ação p/ adotantes:** nenhuma — chega vendorizada via `/meta:adopt --update` (KB + os dois comandos).
+  Quem ingere laudo/parecer/relatório de fornecedor: leia a §"Como ler a ESTRUTURA" antes de propagar a
+  métrica que o documento estampa.
+
 ## 2026-07-20 · `significance:` FECHADO — ancorado em `breadcrumb-patterns.md` (faceta avaliativa de ①) + contrato federado na RFC-0003 · COMPATÍVEL · alvo: todos
 
 - **Fecha as fases 2–3** que a entrada de 2026-07-19 deixou em backlog. O campo deixa de ser mecanismo

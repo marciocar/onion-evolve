@@ -112,6 +112,13 @@ eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção de um a
   artefato vivo = PROD) e `trace` para a fonte.
 - Cada **verificação** vira `evidence` + aresta `SUPPORTS` ou `REFUTES`. Refutou? O claim **fica**
   com `status: refuted` — a aresta é a auto-correção explícita.
+- **Evidência de TERCEIRO carrega o interesse da fonte.** Confirmar que o documento existe e diz X não
+  é ler **como X foi construído** — anote no `label`/`trace` do nó *quem produziu e o que ganha com o
+  que diz*, e leia a **estrutura** (achados replicados por superfície, severidade fora da faixa usual,
+  incentivo impresso no próprio texto). O que a fonte concede **contra o próprio interesse** é a parte
+  de **maior** confiança; o que ela afirma **a favor** do próprio interesse pede desconto — mas
+  interesse **qualifica, não anula** (achado distinto e de lógica de negócio não se relativiza).
+  Doutrina: [evidence-source-interest.md](../../../docs/knowledge-base/concepts/evidence-source-interest.md).
 - Correção que substitui verdade anterior = novo nó + `SUPERSEDES` (nunca editar o antigo além do status).
 - Perguntas em aberto viram `question`; decisões tomadas viram `decision` com `TRACES_TO` ao que as gerou.
 - **Todo nó precisa de pelo menos 1 aresta** — nó que não se liga a nada não pertence ao grafo
