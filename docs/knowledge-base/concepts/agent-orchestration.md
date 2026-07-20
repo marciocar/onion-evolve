@@ -6,9 +6,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.3.0 |
+| **Versão** | 1.4.0 |
 | **Data de Criação** | 2026-06-13 |
-| **Última Atualização** | 2026-06-20 |
+| **Última Atualização** | 2026-07-20 |
 | **Categoria** | Concepts |
 | **Aplicação** | Sistema Onion - Camada de Orquestração de Agentes |
 
@@ -22,6 +22,10 @@
 - [Building Effective Agents — Anthropic](https://www.anthropic.com/engineering/building-effective-agents) — padrões canônicos de orquestração (2026)
 - [The State of Agentic Coding 2026 — Context Studios](https://contextstudios.ai/) — doutrina da "era da orquestração"
 - [Claude Code — Agent Teams](https://code.claude.com/docs/en/agent-teams) — substrato experimental de peers persistentes (`TeamCreate`/`SendMessage`/task list compartilhada), atrás de `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+- [Create custom subagents](https://code.claude.com/docs/en/sub-agents) — teto de 200 subagentes por sessão (`CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`), requer v2.1.212+ (verificado 2026-07-20)
+- [Tools reference — Claude Code](https://code.claude.com/docs/en/tools-reference) — teto de 200 `WebSearch` por sessão (`CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION`), somado entre conversa principal e subagentes (verificado 2026-07-20)
+- [Introducing Claude Fable 5 and Claude Mythos 5](https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5) e [anúncio Anthropic](https://www.anthropic.com/news/claude-fable-5-mythos-5) — tier Mythos-class acima de Opus, GA 09/jun/2026 (Fable 5) vs gated (Mythos 5) (verificado 2026-07-20)
+- [Introducing Claude Sonnet 5](https://www.anthropic.com/news/claude-sonnet-5) — GA 30/jun/2026, novo default agentic (verificado 2026-07-20)
 
 **Relacionados no Onion:**
 
@@ -243,7 +247,20 @@ A ferramenta **Workflow** é o substrato de orquestração. A ferramenta **Agent
 
 **Barreira vs. sem barreira:** `parallel` é a escolha quando há um passo de fan-in que precisa de **todos** os resultados (síntese). `pipeline` é a escolha quando cada item pode percorrer os estágios no seu próprio ritmo, sem esperar os demais (maior throughput).
 
-**Limites operacionais (jun/2026):** até **16 subagentes concorrentes** e **1.000 agregados por run**.
+**Limites operacionais (jun/2026):** até **16 subagentes concorrentes** e **1.000 agregados por run** — teto do **Workflow** (o run).
+
+> ⚠️ **Teto POR SESSÃO do Claude Code (verificado na doc primária, 2026-07-20) — é OUTRO teto, e NÃO é o fan-out do Workflow.** O harness limita **200 subagentes por sessão** (`CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`, requer Claude Code ≥ v2.1.212; qualquer inteiro positivo, sem teto máximo, **não desligável**).
+>
+> **O que CONTA:** todo subagente disparado com a ferramenta `Agent` — aninhados, background, e **inclusive os que um agente de workflow dispara com `Agent`**; e o `/subtask` (fork in-session) gasta o mesmo orçamento.
+> **O que NÃO conta — o ponto que inverte a intuição:** *"Agents a workflow script spawns with `agent()` don't count; workflows have their own per-run limit."* Ou seja, **o fan-out de `agent()` de uma orquestração NÃO consome o orçamento da sessão** — o teto de run (16 concorrentes / 1.000 agregados) é que rege ali. `/fork` também não conta (vira sessão separada, com orçamento próprio).
+>
+> ⚠️ **Correção de um erro de leitura desta casa (2026-07-20):** a 1ª versão desta nota afirmava que "a sessão morde ANTES do run" e que o fan-out da orquestração contava contra os 200. **É falso**, e justamente no caso que esta KB cobre — foi inferido de "200 < 1.000" sem verificar a fonte, e propagado. Registrado como instância de `declarado≠verificado`, não apagado.
+>
+> **Modo de falha (também invertido na 1ª versão): é ERRO EXPLÍCITO, não silêncio.** *"When Claude reaches the limit, the Agent tool fails with `Subagent spawn limit reached`"* — e o erro instrui a concluir com as próprias ferramentas. O comportamento **silencioso** é o do teto de **WebSearch** (`CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION`, default 200, somado entre conversa principal e subagentes) — foi esse que já mordeu a casa (ver [verify-external-for-current](verify-external-for-current.md) e [search-is-sdaal-fallback-when-capped]). **Não generalize um teto pelo sintoma do outro:** diagnosticar com o instrumento errado é o oposto do que a doutrina de percepção prega.
+>
+> **`/clear` reseta a contagem — com ressalva:** *"If work that can still spawn subagents survives the clear, such as a running workflow, the count carries over instead."*
+>
+> Fontes: [sub-agents §Session subagent limit](https://code.claude.com/docs/en/sub-agents) · [tools-reference §Session search limit](https://code.claude.com/docs/en/tools-reference).
 
 **Coordenação = 0 tokens:** a lógica de fan-out/fan-in/filtro/loop roda em JavaScript no orquestrador. Não há custo de modelo na coordenação — só os subagentes pagam tokens. Isso muda o eixo econômico: vale a pena empurrar o máximo de lógica determinística para o JS.
 
@@ -290,14 +307,24 @@ A ferramenta Workflow permite fixar o `model` por chamada de `agent(...)`, entã
 
 > **Atualize o lineup SÓ aqui.** Os demais artefatos referenciam modelos por **tier** (evergreen), nunca por versão exata, e apontam para esta seção. Quando um modelo é adicionado, deprecado ou **bloqueado** (regional/política), basta atualizar esta nota — o resto continua válido.
 
-| Tier | Uso típico | Disponibilidade (jun/2026) |
-|---|---|---|
-| `opus` | orquestrador, juízes adversariais | geral |
-| `sonnet` | raciocínio de média complexidade | geral |
-| `haiku` | workers mecânicos, alto volume | geral |
-| `fable` | — | **restrita** — bloqueio do governo dos EUA (jun/2026); verificar antes de usar |
+> **Mudança estrutural (verificado 2026-07-20): existe um tier ACIMA de opus.** Desde jun/2026 há uma classe **Mythos-class** — mais capaz que qualquer Opus — publicada de duas formas: **Claude Fable 5** (`claude-fable-5`), **GA no mercado** desde 09/jun/2026, e **Claude Mythos 5** (`claude-mythos-5`), mesma capacidade sem os classificadores de segurança, **gated** (só via Project Glasswing). Isso substitui a nota antiga de "fable bloqueado pelo governo dos EUA" — mas com a linha do tempo **verificada na fonte primária (2026-07-20)**, não com um "foi revertido" vago: Fable 5 e Mythos 5 foram **suspensos em 12/jun** (controles de exportação dos EUA; sem verificação de nacionalidade em tempo real, a suspensão valeu para todos), os controles caíram em **30/jun** e o acesso foi **restaurado em 01/jul**. **Mythos 5 segue restrito** a um conjunto de organizações dos EUA (Glasswing).
+>
+> ⚠️ **Custo — é isto que mais pesa no tiering, mais que a disponibilidade:** em planos pagos o Fable 5 veio incluso até **07/jul**; a partir daí, **só via créditos de uso comprados** (Enterprise padrão não tem cota inclusa salvo créditos habilitados). Logo a régua tem **três** degraus, não dois: **GA de mercado ≠ liberado na sua conta ≠ sem custo marginal**. Confirme antes de tierar a faixa difícil para cá; **na dúvida, `opus`**. Fonte: [Redeploying Fable 5](https://www.anthropic.com/news/redeploying-fable-5).
 
-Tiers de **worker** recomendados (uso geral): **opus / sonnet / haiku**. Snapshot de versões à época (jun/2026, apenas referência histórica, não normativa): Opus 4.8 / Sonnet 4.6 / Haiku 4.5 / Fable 5. Não existe "gpt-4" nem qualquer modelo de outro provider como opção de modelo de agente no Claude Code.
+| Tier | Uso típico | Disponibilidade (verificado 2026-07-20) |
+|---|---|---|
+| `opus` | orquestrador, juízes adversariais padrão | geral |
+| `sonnet` | raciocínio de média complexidade | geral — **Claude Sonnet 5** (GA 30/jun/2026) é hoje o worker sonnet: o mais agentic da linha Sonnet, qualidade próxima de Opus a custo menor, e novo default dos planos Free/Pro |
+| `haiku` | workers mecânicos, alto volume | geral |
+| **Mythos-class** (acima de opus) | reservado à faixa **difícil/alto risco** (verify adversarial, juiz/painel, síntese crítica) — **só se a conta tiver acesso confirmado** | `claude-fable-5` é **GA de mercado** (fato verificável); `claude-mythos-5` é **gated** (Project Glasswing). **GA de mercado ≠ liberado nesta conta/plano** — isso não é verificável daqui |
+
+Tiers de **worker** recomendados (uso geral): **opus / sonnet / haiku** — sempre disponíveis, sempre o piso seguro. Para a faixa **difícil/alto risco**: **se a conta tiver acesso confirmado ao tier Mythos-class**, o frontier atual dessa faixa é `claude-fable-5`; **sem confirmação de acesso, use `opus`** — não assuma o tier superior só porque ele é GA no mercado. Snapshot de versões à época (jul/2026, referência histórica, não normativa): Opus 4.8 / Sonnet 5 / Haiku 4.5 / Fable 5 (Mythos-class GA) / Mythos 5 (Mythos-class gated). Não existe "gpt-4" nem qualquer modelo de outro provider como opção de modelo de agente no Claude Code.
+
+**Fontes (verificado por busca externa em 2026-07-20):**
+- [Introducing Claude Fable 5 and Claude Mythos 5](https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5) — especificações, disponibilidade (GA vs gated), 1M contexto/128K output, $10/$50 por MTok
+- [Claude Fable 5 and Claude Mythos 5 — Anthropic](https://www.anthropic.com/news/claude-fable-5-mythos-5) — anúncio, "most capable widely released model"
+- [Redeploying Fable 5 — Anthropic](https://www.anthropic.com/news/redeploying-fable-5) — restauração de acesso após bloqueio anterior (nota histórica acima)
+- [Introducing Claude Sonnet 5 — Anthropic](https://www.anthropic.com/news/claude-sonnet-5) — GA 30/jun/2026, "most agentic Sonnet model yet", default Free/Pro
 
 ### Outras alavancas de eficiência
 

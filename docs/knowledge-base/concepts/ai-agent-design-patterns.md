@@ -210,7 +210,7 @@ Padrão de custo-eficiência: usar **modelos diferentes por papel** no grafo de 
 
 A ferramenta Workflow permite fixar o modelo por chamada de `agent(...)`, então o lead opus pode despachar dezenas de workers sonnet/haiku sob `budget`, mantendo qualidade de coordenação sem pagar opus em cada folha.
 
-> Tiers disponíveis no Claude Code: **fable**, **opus**, **sonnet**, **haiku** (à época jun/2026: Fable 5 / Opus 4.8 / Sonnet 4.6 / Haiku 4.5). Não existe "gpt-4" nem qualquer modelo OpenAI como opção de modelo de agente no Claude Code.
+> Tiers no Claude Code, do topo para a base: **fable** (Mythos-class, **acima** de opus — não é par dele), **opus**, **sonnet**, **haiku**. Versões driftam; cite por **tier**, nunca por versão — fonte única do lineup: [`agent-orchestration.md` §Disponibilidade de modelos](agent-orchestration.md). Não existe "gpt-4" nem qualquer modelo OpenAI como opção de modelo de agente no Claude Code.
 
 ### Nesting de subagentes (5 níveis)
 

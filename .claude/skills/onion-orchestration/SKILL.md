@@ -16,7 +16,14 @@ um trabalho se decompõe em subtarefas independentes e o codifica em um script
 da ferramenta nativa **Workflow**, escolhendo o padrão canônico adequado.
 
 A coordenação roda em JavaScript e custa **0 tokens de modelo**. O teto é de
-16 subagentes concorrentes e 1.000 agregados por run.
+16 subagentes concorrentes e 1.000 agregados por run (teto do **Workflow** — o run).
+
+⚠️ **Teto de SESSÃO do Claude Code MORDE ANTES do teto de run acima.** `CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`
+(default 200) soma subagentes de **toda a sessão** (conversa principal + fan-out), não por run isolado — e o
+mesmo vale para `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` (default 200), o teto que já mordeu a casa. Suba o
+env var ou rode `/clear` para resetar a contagem — nunca desista da orquestração por teto esgotado. Detalhe e
+fontes: [agent-orchestration.md](../../../docs/knowledge-base/concepts/agent-orchestration.md) → "Primitivas
+Nativas" (fonte única).
 
 ## Instruções (passo a passo)
 
@@ -127,7 +134,7 @@ if (collided.length) return gateHumano(collided, results);  // partição falhou
 |---|---|---|---|
 | **Mecânico** — extração, classificação, varredura, transform, particionar, mapear | `haiku` | `low` | auditar 1 arquivo, extrair API, dividir partições |
 | **Raciocínio médio** — análise, research por dimensão, síntese parcial | `sonnet` | `medium` | pesquisar uma dimensão, resumir achados, propor fix |
-| **Difícil / alto risco** — verify adversarial, juiz/painel, síntese final, mudança irreversível/compliance | `opus` | `high` (ou `xhigh`) | refutar um achado, judge-panel, consolidação crítica |
+| **Difícil / alto risco** — verify adversarial, juiz/painel, síntese final, mudança irreversível/compliance | `opus` (ou o tier **Mythos-class**, hoje o Mythos-class, **só se souber que a conta tem acesso** — ver KB) | `high` (ou `xhigh`) | refutar um achado, judge-panel, consolidação crítica |
 
 - **Opus orquestra** no nível principal (decisão, roteamento, síntese) — custo 0 tokens no JS. Os **workers**
   são tierados pela tabela; só o stage que **realmente** exige raciocínio profundo paga opus.
@@ -135,8 +142,11 @@ if (collided.length) return gateHumano(collided, results);  // partição falhou
   uma fase difícil rodou barata ou uma mecânica rodou cara, é bug de tiering a corrigir.
 - **Loops budget-gated**: `loop-until-done` sempre com teto via `budget` (tokens) — sem teto não há loop.
 - **Prompt caching**: instruções/contexto comuns aos workers entram no prefixo cacheável, cortando custo no fan-out.
-- Tiers disponíveis: **opus, sonnet, haiku**. `fable` apenas onde permitido — **disponibilidade restrita**
-  (ver KB de orquestração → "Disponibilidade de modelos", fonte única). Nunca ofereça modelo de outro provider.
+- Tiers disponíveis: **opus, sonnet, haiku** — sempre, e é o piso seguro. Acima de `opus` existe hoje um tier
+  **Mythos-class** (ver KB) — use-o na
+  faixa difícil/alto-risco **só se souber que a conta tem acesso confirmado**: GA de mercado **não** é
+  sinônimo de liberado no plano/conta daqui. Na dúvida, fique em `opus`. Detalhe, versões e fontes: ver KB de
+  orquestração → "Disponibilidade de modelos" (fonte única). Nunca ofereça modelo de outro provider.
 
 ## Gotchas
 

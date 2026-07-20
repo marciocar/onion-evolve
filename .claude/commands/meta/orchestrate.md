@@ -112,10 +112,13 @@ Com o padrão escolhido, autore um script da ferramenta **Workflow**. Use:
 Aplique **model tiering**: opus orquestra no nível principal; workers mecânicos
 (extração, classificação, varredura) vão para haiku; raciocínio médio para
 sonnet; reserve opus para orquestração e juízes adversariais críticos.
-Tiers de worker (uso geral): **opus, sonnet, haiku**; `fable` só onde permitido
-(disponibilidade restrita — ver `agent-orchestration.md` → "Disponibilidade
-de modelos", fonte única). Nunca ofereça modelo de outro provider como worker. Tetos: até **16 subagentes concorrentes** e
-**1.000 agregados** por run.
+Tiers de worker (uso geral): **opus, sonnet, haiku** — sempre o piso seguro; acima de `opus` existe hoje um
+tier **Mythos-class** (ver KB), usável na faixa difícil/alto-risco
+**só se a conta tiver acesso confirmado** (ver `agent-orchestration.md` → "Disponibilidade de modelos", fonte
+única). Nunca ofereça modelo de outro provider como worker. Tetos: até **16 subagentes concorrentes** e
+**1.000 agregados** por run (Workflow) — **mas o teto de SESSÃO do Claude Code morde antes**
+(`CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION`, default 200, soma conversa + fan-out; mesmo padrão em
+`CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION`) — ver KB para como subir o teto.
 
 ```javascript
 // fan-out-and-synthesize: auditar N arquivos em paralelo (com barreira)

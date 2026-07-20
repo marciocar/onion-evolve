@@ -38,6 +38,7 @@ adversário *externo*):
 | DP (inference-time) | adversário de **extração** | **NÃO** — inferência de atributo é *imputação* por correlação; **N=1 é o pior caso** (sem multidão onde esconder) |
 | Machine unlearning | — | **NÃO** — imaturo/contornável; o fato vive no **store re-consultável** (*GraphSteal*, 2026) |
 | Anonimização (FgAA, INTACT, TRACE-RPS) | defender um **release** publicado | **NÃO** — ofuscar o grafo que se **quer** reconciliar é autocontraditório |
+| MI-regularização em treino (MINE-Reg, 2026) | composição **espacial**: profundidade de pipeline de agentes, por-pedido | **NÃO** — treino-time e sem ledger de runtime; mede outra composição (não a **temporal**, de turnos sobre KG persistente). Detalhe em §O irredutível |
 
 **Scrubbing de PII é comprovadamente inútil aqui:** removido todo PII literal, um Llama-3.3-70B recupera
 idade/gênero/país com F1 0,84–0,90, operando sobre estilo e tópico que o filtro nunca toca (*Inferential Privacy
@@ -227,6 +228,45 @@ fronteira, não zerada. Resíduo **~7–8% — estimativa NÃO-REPRODUZÍVEL** (
 6. **Superfície de metadados do sync** (frequência de commit vaza padrão comportamental) — é esta fronteira na
    camada de transporte; prior-art: git-remote-gcrypt whole-repo, age-wire para interop.
 
+**Prior-art verificado (2026-07-20) para o item 3 (ε-ledger/L6) e o item de composição (L3) — não abre o
+gate.** Leitura do PDF (extração própria, `pdftotext`) de Asif & Mohammadi Amiri, *Information-Theoretic
+Privacy Control for Sequential Multi-Agent LLM Systems* (arXiv:2603.05520) — candidato natural por atacar
+"sequential composition" com bound formal. Mecanismo: **MINE-Reg** (o texto usa `MINE-Reg` e `MI-reg`),
+regularização por **informação mútua** (estimada via MINE/Donsker-Varadhan) entre a saída de cada agente e
+uma variável sensível `Sᵢ`, aplicada **em treino** (LoRA sobre Qwen/LLaMA). Resultado central, **Teorema
+4.1**: bound com amplificação **exponencial** sob composição ingênua (contribuição maior dos agentes
+**iniciais** — "*early-agent dominance*").
+
+⚠️ **O `N` deste paper NÃO é o `N` do core — eixos diferentes.** O `N` do core é **população de indivíduos**
+(por que DP/k-anonymity falham: sem multidão onde esconder). O `N` do paper é **profundidade de um PIPELINE**
+de agentes especializados servindo um único pedido (N∈{2..5}), **por-pedido**, sem modelar multi-usuário.
+Confundi-los seria o erro de uma leitura rasa.
+
+**Veredito: NÃO fecha L3 nem L6 para o cenário do core** — mas por motivos que são do *desenho*, não de
+fraqueza declarada pelos autores. Régua Aristóteles (diferente → não transfere): **(a)** é **treino-time**,
+não runtime — exige rotular `Sᵢ` **a priori** e re-treinar cada agente; o motor do core é generalista e
+aberto. **(b)** o bound é **diagnóstico** — corrobora a premissa de L3 (garantia por-turno não fecha
+composição) em vez de resolvê-la. **(c)** **zero ledger/orçamento em runtime**: não há rastreamento de perda
+acumulada entre interações, logo **nada transfere para L6** — nem nome, nem mecanismo. **(d)** a composição
+medida é **espacial** (profundidade de pipeline num pedido), não **temporal** (turnos repetidos sobre um KG
+persistente), que é a de L3/L6.
+
+> 🚧 **Correção de citação (2026-07-20) — registrada, não apagada.** A 1ª versão deste bloco atribuía aos
+> autores três "limites" que o PDF **refuta ou não contém**: dizia que o bound "pode ser *purely vacuous*"
+> quando o paper afirma o oposto — *"the bound captures a practically relevant failure mode **rather than a
+> purely vacuous worst case**"*; citava entre aspas que a estrutura de Markov "*may not hold in practice*" —
+> frase **inexistente** no paper (0 ocorrências); e dizia que "MINE é *intractable*" quando o intratável é o
+> cálculo **direto** da MI (*"Direct computation of the MI (Oᵢ;Sᵢ) is intractable"*) — MINE é justamente a
+> **solução** para isso. Numa KB cuja tese é `declarado≠verificado`, **aspa fabricada destrói a autoridade do
+> documento inteiro**; fica o registro do erro junto da correção. **Também sub-declarava o threat model:** o
+> §3.2 cobre *"both external observers ... and internal agents attempting to infer upstream sensitive
+> information from shared representations"* — o segundo caso é **mais próximo** do cenário do core do que a
+> 1ª redação admitia, e o veredito de "não fecha" se sustenta pelos motivos (a)-(d), não por dispensar o
+> paper.
+
+Prior-art citado; L3/L6 seguem **GATED por
+dogfood** (gatilho inalterado — ver §L3-L6 acima).
+
 ## Referências
 
 - Staab, R. et al. (2024). *Beyond Memorization: Violating Privacy via Inference with LLMs.* ICLR 2024. https://arxiv.org/pdf/2310.07298
@@ -243,3 +283,4 @@ fronteira, não zerada. Resíduo **~7–8% — estimativa NÃO-REPRODUZÍVEL** (
 - *1-2-3 Check* (2025). https://arxiv.org/abs/2508.07667
 - Deng et al. (2026). *When Are LLM Inferences Acceptable?* https://arxiv.org/abs/2605.10013
 - *GraphSteal* (2026). https://arxiv.org/abs/2605.28645
+- Asif, S. & Mohammadi Amiri, M. (2026). *Information-Theoretic Privacy Control for Sequential Multi-Agent LLM Systems.* https://arxiv.org/abs/2603.05520

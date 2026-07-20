@@ -48,6 +48,8 @@ Lineup atual do Claude no Claude Code — use estes modelos; não há modelos Op
 | Claude Sonnet 4.6 | Worker de uso geral (implementação, análise) | 200K tokens | ~80K linhas |
 | Claude Haiku 4.5 | Worker barato/rápido (classificação, extração, filtro) | 200K tokens | ~80K linhas |
 
+> ⚠️ **Versões acima são SNAPSHOT (jun/2026), não lineup vigente** — o lineup drifta (em jul/2026 já há Sonnet 5, e **fable** é tier *acima* de opus, não par). Os **limites de contexto por tier** seguem úteis; para *qual modelo usar*, cite por **tier** e consulte a fonte única do lineup: [`agent-orchestration.md` §Disponibilidade de modelos](agent-orchestration.md).
+
 **Nota**: 1 token ≈ 4 caracteres em inglês, ~3 em código.
 
 **Tiering de modelos** (doutrina "orchestration era"): o orquestrador roda em Opus 4.8 (ou Fable 5 quando o raciocínio domina); os workers paralelos rodam em Sonnet 4.6 ou Haiku 4.5. Reservar o modelo caro só para o nível que decide reduz custo agregado sem perder qualidade no resultado final. Veja [Custo em Orquestração (Multi-Agente)](#-custo-em-orquestração-multi-agente).
