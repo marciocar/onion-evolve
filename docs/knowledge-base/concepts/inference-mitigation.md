@@ -53,8 +53,8 @@ uma conclusão que nunca foi string*.
 
 | Camada | Mecanismo (fonte) | O que reduz | O que **NÃO** fecha |
 |---|---|---|---|
-| **L1 — Escopo de consulta** | schema-masking + fatia-por-propósito (AskSafely); permission-aware retrieval | dá ao motor **só o que o propósito exige** | inferência sobre o liberado; **topologia sensível** (a aresta já vaza) |
-| **L2 — Propósito vinculado** | monitor de traço tipado data-category×purpose (C-Trace) | rejeita ação/saída **fora do propósito** | inferência **dentro** do propósito |
+| **L1 — Escopo de consulta** | schema-masking + fatia-por-propósito (AskSafely); permission-aware retrieval | dá ao motor **só o que o propósito exige**; retém a topologia **rotulada** como sensível | inferência sobre o liberado; topologia **NÃO-rotulada** e a sensibilidade que emerge da **co-ocorrência** de arestas inócuas |
+| **L2 — Propósito vinculado** | monitor de traço tipado sobre a **tupla de Integridade Contextual** (categoria-de-dado × propósito × **destinatário**; C-Trace) | rejeita ação/saída **fora do propósito ou para destinatário não autorizado** | inferência **dentro** do propósito |
 | **L3 — Filtro por composição** | 2ª camada QI-cluster + CI-CoT | vazamento **por-composição** e literal | conclusão nova nunca-string; **colapsa sob confusão de estilo** (AUROC 0,95→0,72) |
 | **L4 — Juiz-de-CI separado** | gerador ≠ porteiro (1-2-3 Check) | o que o gerador (otimizado p/ ajudar) deixa passar | probabilístico (−18/−19pt, não zero) |
 | **L5 — Self-red-team** | rodar o **próprio motor como atacante** contra o destilado antes de emitir (FgAA) | vazamento detectável **pré-emissão** | atacante mais forte que o self-red-team; custo 15–20× |
@@ -74,7 +74,7 @@ fresh o que é **diferente** — nunca reuso preguiçoso nem reinvenção do mad
 | **`verify-before-act`** | L2/L5 | IGUAL — monitor de propósito + self-red-team ("veredito como hipótese a verificar") já são a postura |
 | **`exposes:` + níveis de trust** (RFC-0003) | L1 | IGUAL — aplicados no adapter de recuperação = permission-aware retrieval |
 | **fail-safe `none` / abstain** | L3/L4 | IGUAL — "abster para revisão humana" *é* o `none` fail-safe (recusar, não degradar) |
-| **guardrails R15** (efeito-gate + proveniência) | fronteira | IGUAL o gesto — R15 cerca o efeito irreversível; a inferência é o mesmo gate virado para a **saída de conclusão** |
+| **guardrails R15** (efeito-gate + proveniência) | fronteira | **MISTO** — IGUAL a forma (predicado tipado, veredito `gate`, fail-safe recusa, deny-by-default do desconhecido) · DIFERENTE o regime (o effect-gate é stateless sobre lista fechada; L2 é stateful sobre eixos abertos). Detalhe em §Contrato →Reúso |
 
 **A descoberta bonita:** o **self-red-team** (L5) — rodar o próprio motor de inferência como atacante contra o
 destilado antes de emitir — **é a doutrina de dogfood do Onion aplicada à privacidade**: "veredito de revisor como
@@ -94,10 +94,128 @@ Distinção de escopo (decidida em campo, 2026-07-19):
 - **Promoção dirigida por dogfood:** cada camada vira doutrina refinada **a partir do uso real** do adotante (o
   de-id v1 → 6 camadas), não à frente dele — a mesma disciplina da promoção dos guardrails R15.
 
+## Contrato de conformidade — L1 e L2 (o que o adotante tem de PROVAR)
+
+O core não implementa o gate (§Fronteira). Mas "o adotante constrói" não pode virar "cada um garante o que
+quiser": sem contrato, `declarado≠verificado` volta pela porta de sempre — alguém afirma "temos gate de
+propósito" e ninguém consegue contestar. Este é o contrato.
+
+> ### 🔒 REGRA DE ADMISSÃO (aplica-se a TODA garantia, inclusive às futuras)
+>
+> **Todo mecanismo introduzido para fechar um furo entra provando-se — com fixture própria E com a
+> integridade dos seus PRESSUPOSTOS provada pelo mesmo rigor.** Pressuposto é tudo aquilo de que o
+> mecanismo depende para valer — e a lista é **fechada e exaustiva**, porque é o fechamento dela que faz o
+> regresso terminar:
+>
+> **(0) A SUPERFÍCIE DE ESCRITA DO MOTOR — o item que define o critério de todos os outros.** Enumere, por
+> **deny-by-default**, onde o motor pode escrever; tudo abaixo tem de ficar **fora** dela, provado pelo mesmo
+> check estrutural. Num sistema agêntico que **escreve código**, o motor desligar a verificação não é hipótese
+> remota — é o modo normal de operação. Por isso a lista inclui **o código do gate e o dos próprios checks**.
+>
+> **(1) a POLÍTICA** — a matriz de pares permitidos **e a rotulagem** (o que é sensível, o que é
+> topologia-sensível, a categoria de cada nó, o escopo de cada `P`) · **(2) a chave** com que verifica ·
+> **(3) a lista de revogação** que consulta · **(4) o relógio** que lê · **(5) a lista** de leitores
+> privilegiados, com **vocabulário e flags pinadas** · **(6) o canal de saída** por onde responde ·
+> **(7) o campo** de onde lê a origem.
+>
+> ⚠️ **Por que a POLÍTICA foi a última a ser vista (lição de método):** ela sustenta G1.1-G1.4, G2.1 e G2.7 —
+> e **escapou sete passadas adversariais porque toda fixture a usa como DADO**. A matriz é o pano de fundo de
+> cada teste, e **o que é pano de fundo não é observado**. Sem forjar nada, o motor que acrescenta
+> `(saude × coaching × recrutador) = permitido` e remove um rótulo `topologia-sensível` deixa **todas** as
+> fixtures verdes *por construção*: o gate funciona perfeito, executando a política errada.
+> **Pressuposto não enumerado é rodada adversarial futura.**
+>
+> **Por que esta regra existe (custo real, medido):** este contrato levou **cinco passadas adversariais**, e
+> em cada uma o furo estava um nível mais fundo — sempre pela **mesma** falha de forma: *o mecanismo criado
+> para fechar o buraco anterior entrava ele próprio sem prova*. O eixo `destinatário` entrou sem exigir
+> proveniência (e voltou a passar pelo rótulo). A concessão durável entrou sem exigir assinatura verificada
+> (e o `P` injetado voltou carimbado). A verificação de assinatura entrou sem proteger a **âncora** (e
+> forjar virou trocar a chave). **Um contrato que não carrega esta regra precisa de um adversário externo
+> para sempre.** Ao acrescentar uma garantia nova: pergunte *"de que ela depende para valer?"* e prove
+> **isso** também — antes de considerá-la fechada.
+
+> **⚠️ Diferença estrutural vs o contrato do `kg-radar` — leia antes de usar.** No multi-runtime do KG existe
+> um **`.sh` soberano** ao qual as portas se conformam: o teste é *"a porta concorda com a autoridade?"*.
+> Aqui **não existe implementação de referência no core, por desenho** — pela invariante da §Fronteira acima
+> (o gate roda sobre o KG privado, que nunca entra no core). Logo **o contrato É a autoridade** — e por isso
+> precisa ter forma **executável** (dado X + propósito P → saída esperada Y), nunca prosa. Um contrato em
+> prosa aqui seria exatamente a garantia não-verificável que a doutrina proíbe.
+
+> **⚠️ ESCOPO DA GARANTIA — por-TURNO, não composta.** Todas as fixtures abaixo são **por-consulta**. Uma
+> implementação conforme **não** impede *purpose-shopping*: N turnos com N propósitos estreitos, cada um
+> passando em tudo, cuja **união** no contexto do motor reconstrói o grafo. Fechar a composição é L3, e a
+> repetição no tempo é L6 — **ambas GATED**. Quem for conforme em L1+L2 pode dizer *"governo cada consulta"*;
+> **não** pode dizer *"o motor nunca viu o conjunto"*. G1.6 abaixo é o mínimo enquanto L3/L6 não existem.
+
+### L1 — Escopo de consulta (o gate de ACESSO)
+
+Regra-mãe: *a saída não consegue filtrar uma conclusão que nunca foi string.* L1 é onde mais se ganha.
+
+| # | O que DEVE garantir | Como se PROVA (fixture determinística) |
+|---|---|---|
+| **G1.0** | **MEDIAÇÃO COMPLETA — o gate é a única superfície que pode ALIMENTAR O MOTOR.** Sem isto, tudo abaixo prova **um caminho**, não o sistema. O critério **não** é "tocar o store" — é **poder virar contexto do motor**: indexador de embeddings, job de sync, tool de debug e o pipeline de de-id que carrega o grafo em memória **são violação**. **Leitor privilegiado** é admitido em duas formas, e só nelas: *(a)* **validador de canal LIMITADO** — emite veredito de **vocabulário fechado**, **enumerado NA LISTA e fixado pela fixture** (nunca declarado pela implementação: um código livre tipo `DETAIL: <texto>` devolveria o dump por dentro do "vocabulário"): só **códigos + contagens**, ids **opacos ou já in-scope**, **NUNCA valores de nó** e **nenhum campo de payload livre**; *(b)* leitor sobre **projeção já mediada**. ⚠️ **É o MODO que qualifica, não a ferramenta:** o `kg-radar.sh` em modo veredito (`--integrity`/`--schema`) cabe em (a); o **mesmo binário** em `--triples` **emite conteúdo do grafo e NÃO cabe** — "validador" não pode virar a palavra que autoriza o dump. Ambas vivem em **lista enumerada e auditável** — e a entrada **pina a INVOCAÇÃO** (binário **+ flags permitidas**), não a ferramenta: modo é argumento de runtime, e listar `kg-radar.sh` sem pinar as flags deixa um call site chamar `--triples` em produção enquanto a fixture testa `--integrity`. Fora da lista = violação | `T1.0` — verificação **ESTRUTURAL**, não espião in-process (leitor em **outro processo** — o indexador do próprio exemplo — é invisível a fixture in-process): **(a)** grafo de imports/permissão prova que **só o resolver e os leitores ENUMERADOS** tocam o driver do store, e o store é cifrado **em repouso** (os validadores privilegiados rodam **dentro da fronteira confiável** — §Fronteira); **(b)** asserção sobre a **SAÍDA** de cada leitor privilegiado, não só sobre presença na lista: saída fora do vocabulário fixado, ou contendo valor de nó, → **falha**; **(c)** **nenhum call site** invoca um leitor privilegiado fora das flags pinadas (grep-ável, determinístico). Determinístico e rodável em CI, no espírito do lint da casa |
+| **G1.1** | **Need-to-know por propósito**: dado o propósito `P`, o motor recebe **só** a fatia que `P` exige — nunca "o grafo todo" | `T1.1` — KG com nós dentro/fora do escopo de `P` → a fatia é **exatamente** o conjunto in-scope (assert de **igualdade**, não de contenção: **extra é falha**) |
+| **G1.2** | **Valores mascarados por default**: estrutura pode ser visível; **valores de instância não**, salvo se `P` os exigir | `T1.2` — nó sensível sob `P` que não requer valores → **mascarado**; sob `P` que requer → em claro |
+| **G1.3** | **Topologia é dado**: se a mera **existência** da relação é sensível, mascarar valor **não basta** — a aresta não entra na fatia | `T1.3` — aresta rotulada topologia-sensível **ausente** da fatia (não presente-com-valor-oculto) |
+| **G1.4** | **Fail-closed no propósito — desconhecido OU não-atestado.** `P` inexistente na matriz → fatia **vazia**. **E também:** `P` que EXISTE na matriz mas **não vem atestado** por canal confiável (ver G2.5) → fatia **vazia**. Atestação é condição dos **DOIS** gates: exigi-la só na emissão fecha a saída e deixa o **acesso** aberto — e o acesso é onde a regra-mãe vive | `T1.4a` — `P` inexistente → fatia vazia + recusa nomeada. `T1.4b` — `P` **mapeado porém não-atestado** (ex.: propósito largo `auditoria-completa` proposto por nó ingerido de terceiro) → fatia **vazia**; **falha** se a fatia larga for entregue "porque o `P` estava na matriz" |
+| **G1.5** | **Derivado herda o escopo da origem**: sumário, agregado, contagem, rótulo calculado ou **embedding** de nó fora-de-escopo/mascarado **carrega o escopo do dado de origem** | `T1.5` — fatia com `salario: ***` **e** um derivado `faixa_de_renda: alto` (ou o embedding do nó mascarado) → **falha**. Sem isto a conclusão vira string na ENTRADA e a regra-mãe morre dentro do próprio L1 |
+| **G1.6** | **Escopo de sessão inspecionável**: a implementação **expõe** o acumulado de fatias do contexto vivo e **avisa** ao cruzar um teto (paliativo enquanto L3/L6 são GATED) | `T1.6` — **duas** asserções, senão é satisfazível de graça: **(a)** após N turnos com propósitos distintos, o acumulado exposto é **igual** à união das fatias (assert de igualdade, no espírito de T1.1 — não basta "existe um endpoint"); **(b)** com o teto **fixado pela fixture** (nunca declarado pela implementação — `teto = ∞` passaria), o aviso **dispara**. Não é defesa — é **tornar a composição visível** em vez de silenciosa |
+| **G1.7** | **A POLÍTICA e o próprio GATE ficam fora da superfície de escrita do motor.** Matriz de pares, rotulagem (sensível / topologia-sensível / categoria / escopo de cada `P`), lista de privilegiados, vocabulário, flags pinadas — **e o código do resolver e o dos checks**. Sem isto o gate é correto e a regra é de quem a editou por último | `T1.7` — política alterável **pelo caminho do motor** → **falha**; rótulo removível pelo motor → **falha**; e **o código do gate e dos próprios checks** alteráveis pelo caminho do motor → **falha** (senão o motor desliga a verificação em vez de burlá-la, e as fixtures passam a testar outro gate) |
+
+> **Limite honesto de L1 — declarar junto (simétrico ao de L2):** G1.3 fecha **apenas o que foi rotulado**.
+> Topologia sensível **não-rotulada**, e a sensibilidade que **emerge da co-ocorrência** de arestas
+> individualmente inócuas, **continuam na fatia**. Passar em `T1.3` autoriza dizer *"as relações que
+> classifiquei como sensíveis não saem"* — **nunca** *"a topologia está fechada"*. A completude da rotulagem
+> é responsabilidade do adotante e **não é verificável por este contrato**.
+
+### L2 — Propósito vinculado (o gate de AÇÃO/SAÍDA)
+
+| # | O que DEVE garantir | Como se PROVA |
+|---|---|---|
+| **G2.1** | **Tripla, não par**: toda ação/saída carrega `(categoria-de-dado × propósito × **destinatário/canal**)` — e o **destinatário é RESOLVIDO PELO GATE a partir do sink efetivo** (URL, canal, handle), **nunca aceito da chamada**. Um destinatário auto-declarado é `declarado≠verificado` no exato eixo onde a KB mede o dano (3,75 dono × **2,34 terceiros**). *(O 4º eixo da Integridade Contextual — **princípio de transmissão**: consentimento, reciprocidade, retenção — fica **GATED junto de L3-L6**: sem fixture que o prove, seria obrigação decorativa, e a literatura de CI largamente o confunde com propósito. Contrato só exige o que sabe testar.)* | `T2.1a` — tupla com categoria×propósito **permitido** mas destinatário **declaradamente externo** não autorizado → rejeitada (o caso "coaching → recrutador"). `T2.1b` — tupla declarando `destinatário: dono` **e sink efetivo externo** (`http_post` p/ host de terceiro) → **rejeitada**. Sem `T2.1b` o eixo volta a passar pelo rótulo |
+| **G2.2** | **Rejeitar, não degradar**: recusa é **sentinela tipada + payload de dados VAZIO** — não um rótulo `refused` acompanhado de resumo explicativo | `T2.2` — assert sobre **o payload**, não sobre o campo de status: qualquer conteúdo derivado do dado na resposta recusada = **falha** |
+| **G2.3** | **Propósito prende o turno**: sem elevação a meio-caminho, e **todo canal derivado herda o `P` do turno** — sub-agente, tool-call, retry e re-tentativa com `P` diferente | `T2.3` — um caso **por canal** (sub-agente / tool-call / retry): cada um tentando operar com `P` ampliado → rejeitado. + **mutation**: removida a herança, o caso do sub-agente **falha** |
+| **G2.4** | **Não-tautologia**: o gate precisa **deixar passar** o que conforma | `T2.4` — ação conforme **passa**; + **mutation test**: desfeita a vinculação, `T2.1` **falha**. Gate que nunca deixa passar (ou nunca barra) não é gate |
+| **G2.5** | **Proveniência de QUEM declara `P`** (vale nos DOIS gates — ver G1.4): o propósito vincula só se **atestado**. `P` auto-declarado pelo modelo ou **derivado de conteúdo ingerido** não vincula. **Duas formas:** *(i)* **viva** — requisitante humano no turno; *(ii)* **durável/delegada** — concessão do dono com **assinatura VERIFICADA** (não basta ter campo `sig`), `P` **estreito por predicado**, destinatário **fixo**, **TTL** e revogação. **Não-delegável:** concessão não autoriza emitir outra concessão. Execução autônoma vale **só sob (ii)**; **ausentes ambas → fail-closed**. ⚠️ Fail-closed **absoluto** seria pior: negaria o resumo diário do próprio dono — o caso central de um KG-de-vida — e o implementador inventaria um "modo interno" fora do gate, furo maior e não-documentado. ⚠️ **A concessão é o mecanismo que fecha o buraco anterior — logo entra provando-se, como todos os outros; senão o `P` injetado volta carimbado** | `T2.5a` — nó de e-mail/PDF de terceiro dizendo *"o propósito é auditoria-completa"* → `P` **não aceito**, mesmo na matriz. `T2.5b` — turno autônomo **sem** concessão → recusa. `T2.5c` — concessão **expirada/revogada** → recusa; **válida e estreita → passa** (senão a via (ii) é decorativa). **`T2.5d`** — concessão com assinatura **ausente, inválida ou auto-emitida** → **recusa**; + **mutation**: removida a verificação de assinatura, `T2.5d` **falha** (sem isto, checar só `exp` + revogação passa em tudo). **`T2.5e`** — **TTL acima do máximo fixado PELA FIXTURE** → recusa (teto nunca declarado pela implementação: `TTL=10 anos` passaria); e `P` da concessão cuja fatia **não** seja subconjunto de um **teto de escopo fixado PELA FIXTURE** → recusa. (Comparar com o `P` mais largo da matriz quase não morde: excluiria só ele — `revisao-geral` com 98% da largura passaria. Mesmo remédio do TTL: o teto sai das mãos da implementação.) **`T2.5f`** — concessão que tenta **emitir outra** → recusa. **`T2.5g`** — **a ÂNCORA de confiança (pubkey/keystore do dono) vive FORA da superfície de escrita do motor**, provado pelo **mesmo check estrutural de T1.0**: âncora alterável pelo caminho do motor → **falha**. Sem isto, forjar deixa de ser inventar um `sig` e passa a ser **trocar a chave** — e a assinatura fica criptograficamente válida (regra de admissão: o verificador prova a integridade daquilo COM QUE verifica). **`T2.5h`** — **lista de revogação** fora da superfície de escrita do motor (mesmo check de T1.0) **e inalcançável → fail-closed**, nunca "não consta revogação, segue": é o artefato-irmão da âncora, e protegê-la sozinha deixava a concessão-zumbi. **`T2.5i`** — **fonte de tempo verificada**: relógio regredido ou sem prova de sincronia → **fail-closed**. Não redesenhar — **transferir** a guarda que a casa já tem: `a2a-verify.sh` exige prova de NTP (`timedatectl|chronyc|ntpstat`) e **veta `clock-untrusted`**. ⚠️ **Transfira a guarda, NÃO o escape dela:** lá o bypass `A2A_CLOCK_TRUST=attested` é um **operador humano** num host sem tooling; aqui seria uma **variável de ambiente que o próprio motor exporta** (ele tem shell). No contexto do KG o atestado de relógio é **atestação do dono** — a mesma âncora de G2.5(ii) — e a chave do escape vive **fora da superfície de escrita do motor**. Fixture negativa: escape setado **pelo caminho do motor** → recusa. (Régua Aristóteles: a forma era igual, a exceção **não** era.) Sem isto o TTL é decorativo (quem controla o relógio nunca expira). **`T2.5j`** — a via **(i) VIVA** também se prova: atestação **resolvida do CANAL** (existe mensagem real do requisitante neste turno), **nunca aceita da chamada** — campo `attested_by` setado em turno sem mensagem correspondente, ou por sub-agente montando turno sintético, → **recusa**. É o mesmo defeito que `T2.1b` consertou no eixo do destinatário, e a via viva é a MAIS usada |
+| **G2.6** | **Pré-requisito: o nó carrega a própria origem.** G2.5 é inimplementável se o KG não souber de onde cada nó veio — todo nó carrega **origem + nível de confiança**. Não é mecanismo novo: é o `exposes:` + níveis de trust (RFC-0003) que L1 já reusa, aplicado ao nó. ⚠️ **Convive com o `write(KG)` da KB irmã, sem contradizê-lo:** o motor **escreve conteúdo** legitimamente (é a 4ª perna do ciclo `read→verify→act→write`), mas o campo `origin`/nível de confiança é preenchido pelo **caminho de INGESTÃO**, nunca pelo motor — senão bastaria carimbar um nó ingerido como confiável e `T2.5a` cai. É o item (0) da regra de admissão aplicado ao item (7) | `T2.6` — nó **sem** campo de origem → tratado como **não-confiável** (jamais confiável por omissão). A fixture roda contra **o caminho de produção** (o mesmo resolver, não um duplo de teste) — senão prova a existência do campo no teste e não no artefato; é a doutrina de dogfood da casa: invoque o artefato de verdade |
+| **G2.7** | **Deny-by-default na categoria**: dado **sem categoria** (import, campo livre, derivado novo) é tratado como **restrito**, nunca como "não-restrito" | `T2.7` — nó de categoria nula/desconhecida → `gate`, nunca liberado. É o análogo do `gate unknown-verb` do effect-gate no eixo de L2 |
+
+> **Limite honesto de L2 — obrigatório declarar junto:** L2 **não fecha inferência DENTRO do propósito**.
+> Dados de carreira liberados legitimamente para "coaching" ainda permitem deduzir saúde. Quem implementar
+> L1+L2 conformes pode dizer *"governo fronteira de acesso e de emissão, por turno"* — **não** pode dizer
+> *"o motor não infere sobre mim"*. **Este contrato não quantifica redução, e não endossa as estimativas
+> de §O irredutível** (marcadas lá como não-reproduzíveis) — número sem fonte é o `declarado≠verificado`
+> que este contrato existe para matar, inclusive quando o número é da casa.
+
+### Reúso — o que transfere do effect-gate R15, e o que NÃO transfere
+
+Régua Aristóteles aplicada nos **dois sentidos** (ela pune tanto reuso preguiçoso quanto reinvenção do
+maduro). Veredito **MISTO** — verificado lendo e executando `.claude/validation/guardrails/onion-effect-gate.sh`:
+
+| | Veredito |
+|---|---|
+| **IGUAL → transfere** | a **forma**: predicado **tipado** sobre a ação · veredito `gate` = pare · **fail-safe recusa** · e sobretudo o **deny-by-default do desconhecido** (`--action frobnicate` → `gate unknown-verb`), que vira G1.4/G2.7 |
+| **DIFERENTE → desenha fresh** | o effect-gate é **puro e sem estado**, sobre uma lista **fechada e enumerável** de verbos × um **booleano**, **independente de domínio**. L2 é **stateful** (G2.3 prende o turno), sobre eixos **abertos e domínio-dependentes** (a taxonomia é mantida pelo adotante — §decisões abertas #1/#2). **Não** porte o classificador stateless de listas fixas esperando que sirva |
+| **O eixo que NÃO pode ser descartado** | o effect-gate carrega **proveniência** (`--untrusted-derived`). Trocar "verbo × proveniência" por "categoria × propósito" **perdendo** a proveniência abre o buraco que G2.5 fecha. A tupla certa **soma**, não substitui |
+
+L1 reusa `exposes:` + níveis de trust (RFC-0003) como *permission-aware retrieval* — o nome técnico do que o
+Onion já faz.
+
+### L3-L6 — explicitamente GATED (não especificar agora)
+
+O contrato **para aqui de propósito**. L3 (filtro por composição), L4 (juiz-de-CI), L5 (self-red-team) e L6
+(ε-ledger) **não** ganham contrato antes do dogfood do **de-id v1** do adotante — especificá-las agora é
+cerimônia à frente da substância, e a taxonomia de QI de L3 é *domínio-dependente* (a mesma razão pela qual
+o core não a mantém).
+
+**Gatilho de destravamento — OBSERVÁVEL pelo core** (gatilho que só o adotante enxerga apodrece por inércia):
+a chegada, em `docs/evolution/inbox/`, de um **sinal de co-evolução originado do de-id v1 em uso real** — o
+que ele acertou e o que deixou passar **é** o insumo do contrato de L3. Verificável com `ls`, não com fé.
+
 ## O irredutível e as decisões abertas (engenharia, não achado)
 
 **Irredutível:** a inferência do motor legítimo sobre o próprio grafo, para o dono, **não se impede**. Gerenciada na
-fronteira, não zerada. Resíduo ~7–8%; garantia **por-resposta, não composta** (N=1 é o pior caso). Declarar um KG
+fronteira, não zerada. Resíduo **~7–8% — estimativa NÃO-REPRODUZÍVEL** (herdada da síntese de origem; não rastreável a nenhuma das referências abaixo — **não cite como medida**, trate como ordem de grandeza); garantia **por-resposta, não composta** (N=1 é o pior caso). Declarar um KG
 "privado" **exige nomear esse resíduo**.
 
 **Abertas (a desenhar no adotante):**
