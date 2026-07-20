@@ -1,10 +1,10 @@
-# Diário — onion-evolve
+# Diário — .
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 61 entradas · **Stale:** 0 · **Compartilháveis:** 49 · **Com significância:** 1
+**Total:** 62 entradas · **Stale:** 0 · **Compartilháveis:** 50 · **Com significância:** 2
 
 Gerado em: 2026-07-20
 
@@ -12,6 +12,7 @@ Gerado em: 2026-07-20
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-07-20 | learning | collective 📤 | admission-rule-blindspot | Achamos, com lastro em oito passadas reais (não teorizado), a forma do próprio ponto cego adversarial — e a regra que ele gerou hoje só vale dentro de um documento; esta migalha é o que a torna reusável no próximo. | 2026-10-18 | static |
 | 2026-07-19 | learning | collective 📤 | verify-external-wired-into-research-flow | — | 2026-10-19 | static |
 | 2026-07-19 | decision | collective 📤 | verify-external-for-current-doctrine | — | 2026-10-19 | static |
 | 2026-07-19 | observation | collective 📤 | runtime-telescope-doctrine-matches-lived-practice | — | 2026-10-15 | static |

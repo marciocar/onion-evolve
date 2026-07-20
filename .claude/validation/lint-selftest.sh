@@ -2683,6 +2683,110 @@ run_onion_version_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo outbox-channel — exercita a REGRA 28 do lint (check_outbox_channel_exists):
+# anúncio em staging (docs/evolution/federation/outbox/<membro>/*.md) para um
+# membro cujo local_path NÃO TEM docs/evolution/inbound/ deve virar SOFT (nunca
+# HARD) — achado 2026-07-19 (6 anúncios p/ marcio-pessoal ficaram dias em
+# staging sem ninguém notar). Self-contained: sandbox próprio (cp -a de
+# .claude+docs+CLAUDE.md, p/ o lint completo rodar igual ao real) com 3 membros
+# SINTÉTICOS apendados ao members.yaml (id único → âncora de asserção) cobrindo
+# os 3 modos: com canal, sem canal, sem anúncio. Uma só execução do lint completo
+# (outras violações do sandbox — ex.: drift de federation-map/console/agent-card
+# pelos membros extras — são ruído esperado; asseremos só pela âncora do id
+# sintético, não pela contagem total). Pula gracioso sem python3+yaml.
+# ---------------------------------------------------------------------------
+run_outbox_channel_selftests() {
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_fail "outbox-channel" "lint ausente: ${lint}"; return; fi
+  if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
+    record_pass "outbox-channel: pulado (sem python3+yaml — gracioso)"; return
+  fi
+
+  local sb; sb="$(mktemp -d)"
+  cp -a "${REPO_ROOT}/.claude"   "${sb}/.claude"
+  cp -a "${REPO_ROOT}/docs"      "${sb}/docs"
+  cp -a "${REPO_ROOT}/CLAUDE.md" "${sb}/CLAUDE.md"
+  rm -rf "${sb}/plugins" "${sb}/.claude-plugin"
+  printf 'framework: onion-evolve\nrole: adopted\n' > "${sb}/.claude/.onion-version"
+
+  local com_canal sem_canal vazio naonvend ob
+  com_canal="$(mktemp -d)"; mkdir -p "${com_canal}/docs/evolution/inbound"
+  sem_canal="$(mktemp -d)"
+  vazio="$(mktemp -d)"
+  naonvend="$(mktemp -d)"
+  ob="${sb}/docs/evolution/federation/outbox"
+
+  # (1) vendorizado COM canal + anúncio           -> silêncio
+  mkdir -p "${ob}/selftest-com-canal";  printf '# t\n' > "${ob}/selftest-com-canal/2026-01-01-t.md"
+  # (2) vendorizado SEM canal + anúncio           -> SOFT [classe 3, local]
+  mkdir -p "${ob}/selftest-sem-canal";  printf '# t\n' > "${ob}/selftest-sem-canal/2026-01-01-t.md"
+  # (3) SEM anúncio em staging                    -> silêncio (nenhum dir criado)
+  # (4) membro onion_version n/a + anúncio        -> SOFT [classe 2, roda no CI]
+  mkdir -p "${ob}/selftest-nao-vendoriza"; printf '# t\n' > "${ob}/selftest-nao-vendoriza/2026-01-01-t.md"
+  # (5) dir órfão (não é id de membro) + anúncio  -> SOFT [classe 1, roda no CI]
+  mkdir -p "${ob}/selftest-orfao-xyz";  printf '# t\n' > "${ob}/selftest-orfao-xyz/2026-01-01-t.md"
+  # (6) SÓ _processed/ (já entregue)              -> silêncio (1º nível apenas)
+  mkdir -p "${ob}/selftest-so-processed/_processed"
+  printf '# t\n' > "${ob}/selftest-so-processed/_processed/2026-01-01-t.md"
+
+  {
+    printf '  - id: selftest-com-canal\n    role: standalone\n    onion_version: abc123\n    local_path: "%s"\n' "${com_canal}"
+    printf '  - id: selftest-sem-canal\n    role: standalone\n    onion_version: abc123\n    local_path: "%s"\n' "${sem_canal}"
+    printf '  - id: selftest-vazio\n    role: standalone\n    onion_version: abc123\n    local_path: "%s"\n' "${vazio}"
+    printf '  - id: selftest-nao-vendoriza\n    role: standalone\n    onion_version: n/a\n    local_path: "%s"\n' "${naonvend}"
+    printf '  - id: selftest-so-processed\n    role: standalone\n    onion_version: n/a\n    local_path: "%s"\n' "${naonvend}"
+  } >> "${sb}/docs/evolution/federation/members.yaml"
+
+  local out hard_com soft_com
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  hard_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+  soft_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+
+  printf '%s' "${out}" | grep -qF "selftest-com-canal" \
+    && record_fail "outbox-channel: com canal" "falso-positivo — acusou membro que TEM inbound/" \
+    || record_pass "outbox-channel: vendorizado COM canal → sem violação"
+
+  printf '%s' "${out}" | grep -qF "o clone local existe" \
+    && record_pass "outbox-channel: vendorizado SEM canal → SOFT (classe local)" \
+    || record_fail "outbox-channel: sem canal" "não emitiu a violação de clone-sem-inbound"
+
+  printf '%s' "${out}" | grep -qF "selftest-vazio" \
+    && record_fail "outbox-channel: sem anúncio" "acusou membro sem nenhum anúncio em staging" \
+    || record_pass "outbox-channel: SEM anúncio em staging → sem violação"
+
+  printf '%s' "${out}" | grep -qF "selftest-nao-vendoriza', que adota o MÉTODO" \
+    && record_pass "outbox-channel: membro onion_version n/a → SOFT (classe decidível no CI)" \
+    || record_fail "outbox-channel: n/a" "não acusou membro que não vendoriza (a classe que roda no CI)"
+
+  printf '%s' "${out}" | grep -qF "selftest-orfao-xyz', que NÃO é id de membro" \
+    && record_pass "outbox-channel: dir órfão → SOFT (classe decidível no CI)" \
+    || record_fail "outbox-channel: órfão" "não acusou dir de staging que não resolve a membro"
+
+  printf '%s' "${out}" | grep -qF "selftest-so-processed" \
+    && record_fail "outbox-channel: só _processed" "varreu _processed/ (já entregue) — deve ser 1º nível apenas" \
+    || record_pass "outbox-channel: só _processed/ → sem violação (1º nível apenas)"
+
+  # (7) PROVA DE SEVERIDADE — a propriedade CENTRAL da regra ("SOFT, nunca HARD") tem de ser
+  # testada, não declarada em comentário. Sem este caso, trocar violation SOFT->HARD passava verde
+  # (mutation test da verificação adversarial 2026-07-20). Compara o delta COM e SEM as fixtures:
+  # elas podem acrescentar SOFT, jamais HARD — senão os 6 anúncios pré-existentes bloqueariam o CI.
+  rm -rf "${ob}/selftest-com-canal" "${ob}/selftest-sem-canal" "${ob}/selftest-nao-vendoriza" \
+         "${ob}/selftest-orfao-xyz" "${ob}/selftest-so-processed"
+  local out2 hard_sem soft_sem
+  out2="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  hard_sem="$(printf '%s' "${out2}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+  soft_sem="$(printf '%s' "${out2}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+
+  if [ "${hard_com}" = "${hard_sem}" ] && [ "${soft_com}" -gt "${soft_sem}" ]; then
+    record_pass "outbox-channel: SEVERIDADE provada — fixtures somam SOFT (${soft_sem}→${soft_com}) e ZERO HARD (${hard_sem})"
+  else
+    record_fail "outbox-channel: severidade" "esperava HARD inalterado e SOFT maior; HARD ${hard_sem}->${hard_com}, SOFT ${soft_sem}->${soft_com}"
+  fi
+
+  rm -rf "${sb}" "${com_canal}" "${sem_canal}" "${vazio}" "${naonvend}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo diary-crumbs — exercita a estrutura de decisão das migalhas no
 # diary-index.sh (pesquisa breadcrumbs 2026-07, enabler conflict_class/valid_when;
 # vocabulário MemConflict). Campos opcionais (retrocompat), mas quando presentes
@@ -3344,6 +3448,9 @@ run_mail_hook_selftests
 
 # Modo diary-crumbs — estrutura de decisão da migalha: conflict_class/valid_when (enabler breadcrumbs 2026-07; sandbox).
 run_diary_crumbs_selftests
+
+# Modo outbox-channel — REGRA 28 do lint: anúncio em staging p/ membro SEM canal de recepção (achado 2026-07-19; sandbox).
+run_outbox_channel_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário

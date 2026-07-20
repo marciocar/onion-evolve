@@ -662,6 +662,83 @@ check_agent_card_sync() {
 }
 
 # ===========================================================================
+# REGRA 28 — Anúncio em staging para membro SEM canal de recepção [SOFT]
+#   Cada anúncio de 1º nível em docs/evolution/federation/outbox/<membro>/*.md
+#   resolve o <membro> em members.yaml; se o membro tem local_path mas esse path
+#   NÃO tem docs/evolution/inbound/, o anúncio é ESTRUTURALMENTE não-entregável
+#   por essa rota (ex.: marcio-pessoal — adota o MÉTODO, não vendoriza .claude/,
+#   por desenho — onion_version: n/a). Achado 2026-07-19: 6 anúncios ficaram dias
+#   em staging sem ninguém notar, porque nada cruzava "este membro tem canal?"
+#   antes de o /meta:co-announce produzir.
+#   SOFT DELIBERADO (nunca HARD): a decisão — dar canal ao membro, ou o
+#   co-announce pular membros sem canal — é do maestro, não do lint.
+#   Degrade gracioso: sem python3/yaml, membro não resolvido/sem local_path, ou
+#   local_path inexistente no filesystem → pula sem falhar.
+# ===========================================================================
+check_outbox_channel_exists() {
+  local outbox="${REPO_ROOT}/docs/evolution/federation/outbox"
+  local members="${REPO_ROOT}/docs/evolution/federation/members.yaml"
+  [ -d "${outbox}" ] && [ -f "${members}" ] || return 0
+  have_py_yaml || return 0
+
+  # TRÊS classes de "anúncio que não tem para onde ir". As DUAS primeiras são decidíveis
+  # SÓ COM O REPO — por isso rodam no CI. (A 1ª versão desta regra só olhava o filesystem
+  # do adotante e era NO-OP no CI: nenhum local_path existe no runner, logo zero membros
+  # avaliados — a regra dependia do mesmo ato humano cuja ausência causou o furo original.)
+  local member_dir member_id f meta resolved ver local_path pend
+  for member_dir in "${outbox}"/*/; do
+    [ -d "${member_dir}" ] || continue
+    member_id="$(basename "${member_dir}")"
+
+    meta="$(python3 - "${members}" "${member_id}" <<'PY' 2>/dev/null
+import sys, yaml
+path, mid = sys.argv[1], sys.argv[2]
+d = yaml.safe_load(open(path)) or {}
+for m in (d.get("members") or []):
+    if m.get("id") == mid:
+        print("1|%s|%s" % (m.get("onion_version") or "", m.get("local_path") or ""))
+        break
+else:
+    print("0||")
+PY
+)"
+    resolved="${meta%%|*}"; meta="${meta#*|}"
+    ver="${meta%%|*}"; local_path="${meta#*|}"
+
+    # Há anúncio de 1º nível aguardando transporte? (_processed/ já foi entregue — não varrer)
+    pend=0
+    for f in "${member_dir}"*.md; do [ -f "${f}" ] && pend=1 && break; done
+    [ "${pend}" -eq 1 ] || continue
+
+    # (1) [CI] dir de staging que não resolve a NENHUM id de members.yaml -> órfão.
+    if [ "${resolved}" != "1" ]; then
+      for f in "${member_dir}"*.md; do
+        [ -f "${f}" ] || continue
+        violation "SOFT" "${f}" "anúncio em staging no diretório '${member_id}', que NÃO é id de membro em members.yaml (órfão: typo, id renomeado ou membro removido) — é ainda menos entregável que um membro sem canal"
+      done
+      continue
+    fi
+
+    # (2) [CI] membro que NÃO vendoriza (onion_version: n/a) não tem doc-bridge por desenho.
+    if [ "${ver}" = "n/a" ]; then
+      for f in "${member_dir}"*.md; do
+        [ -f "${f}" ] || continue
+        violation "SOFT" "${f}" "anúncio em staging para '${member_id}', que adota o MÉTODO e NÃO vendoriza (onion_version: n/a) — logo não tem canal inbound/ por desenho; decisão do maestro: dar canal ao membro, ou o /meta:co-announce pular membros sem canal"
+      done
+      continue
+    fi
+
+    # (3) [LOCAL, bônus] membro vendorizado cujo clone existe aqui mas está sem o canal.
+    [ -n "${local_path}" ] && [ -d "${local_path}" ] || continue
+    [ -d "${local_path}/docs/evolution/inbound" ] && continue
+    for f in "${member_dir}"*.md; do
+      [ -f "${f}" ] || continue
+      violation "SOFT" "${f}" "anúncio em staging para '${member_id}': o clone local existe (${local_path}) mas NÃO tem docs/evolution/inbound/ — canal ausente"
+    done
+  done
+}
+
+# ===========================================================================
 # REGRA 9 — Contagens no CLAUDE.md em sincronia com a SSOT [HARD]
 #           Extrai "N comandos invocáveis", "N agentes", "N skills" do CLAUDE.md
 #           e compara com os totais computados por inventory.sh. Impede que a
@@ -1470,6 +1547,7 @@ check_graph_sync
 check_federation_map_sync
 check_federation_console_sync
 check_agent_card_sync
+check_outbox_channel_exists
 check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp
