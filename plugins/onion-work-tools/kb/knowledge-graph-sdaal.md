@@ -269,6 +269,44 @@ técnico — ver a ressalva do maestro em
 **KG-first + drive-to-verify são o par canônico** (ADR §SSOT como runtime): nenhum sozinho basta — o KG
 stale engana; o git sozinho esquece o que a SSOT já sabia.
 
+### Relatório é PROJEÇÃO do grafo, não fonte paralela (a metade que faltava — achado de campo, granaai, 2026-07-20)
+
+O ciclo `read→verify→act→write` acima estava **fechado na leitura e aberto na escrita**. Toda a doutrina
+desta seção — hierarquia de forcing-function, comandos cabeados, `allowed-tools` liberando o radar —
+existe para garantir que ninguém *raciocine* sem antes consultar o grafo. Mas nada, até este achado,
+impedia que um comando **produzisse conhecimento estruturado e o deixasse fora do grafo**. O laço estava
+fechado em "não deixe o KG mentir" e aberto em "não deixe conhecimento viver fora do KG".
+
+**A evidência auto-incriminadora** (sinal de campo da granaai,
+[`2026-07-20-gate-proveniencia-invertido.md`](../../evolution/inbox/_processed/2026-07-20-gate-proveniencia-invertido.md)):
+uma rodada de auditoria orquestrada — **70 agentes, 0 erros, 50 achados confirmados + 10 refutados**,
+tudo em JSON estruturado — e **nada disso foi ingerido no `.kg.yaml`**. A raiz não estava na execução
+(que rodou limpa); estava no **plano**: ele reservava uma fase para "construir o grafo" e a fase seguinte
+para "avaliar", com a saída da avaliação declarada em markdown solto. O grafo virou **predecessor** da
+avaliação em vez de ser o **destino** dela — exatamente o inverso da direção que o `write(KG)` do ciclo
+acima exige.
+
+**Autocrítica, sem esconder:** o core já tinha o diagnóstico e o próprio slogan certos. A seção
+[Por que mecanismo, e não "lembre-se de consultar"](#por-que-mecanismo-e-não-lembre-se-de-consultar),
+neste mesmo documento, já dizia — antes deste achado — que "síntese que não persistiu é síntese
+perdida" e que "advice-que-depende-de-lembrar falhou empiricamente". O core diagnosticou corretamente e
+escreveu a frase certa: **"mecanismo, não conselho"** — e mesmo assim deixou a perna da escrita como
+**conselho**, sem uma trava equivalente à do `read`. A granaai construiu o mecanismo que faltava; o core
+só tinha o texto.
+
+**O princípio, para valer daqui em diante:** se um comando produz achados estruturados, o destino é o
+`.kg.yaml`; o markdown é **vista** (projeção), nunca fonte paralela. Enquanto o relatório for redigido
+**em paralelo** ao grafo — e não **a partir dele** ou **direto nele** — ele pode divergir do que o grafo
+declara, recriando, dentro do próprio instrumento anti-divergência, a divergência que ele existe para
+combater.
+
+O mecanismo que fecha este furo (gate de proveniência que trata artefato novo sem nó como violação HARD,
+com passivo existente tolerado em baseline decrescente) é tratado à parte, para não duplicar a
+especificação aqui — ele vive em
+[`${CLAUDE_PLUGIN_ROOT}/validation/kg-provenance-coverage.sh`](${CLAUDE_PLUGIN_ROOT}/validation/kg-provenance-coverage.sh)
+(REGRA 29 do lint), e a **doutrina da catraca** que o torna adotável está em
+[`onion-guardrails.md`](onion-guardrails.md).
+
 ### Os nomes: gênero × espécie (para parar de multiplicar sinônimos)
 
 O campo usa vários rótulos para **dois** conceitos em **dois** níveis. A régua:

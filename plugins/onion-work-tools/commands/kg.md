@@ -216,6 +216,13 @@ nunca o componente). Redesign/refactor só começa aqui — **dirigido pelo cont
 
 ## ⚠️ Notas
 
+- **Grafo primeiro, relatório depois** (contrato para os consumidores): `/meta:evolve`,
+  `/meta:kb-freshness` e `/meta:context-freshness` — e qualquer comando que produza achados
+  estruturados — materializam aqui **antes** de renderizar seu relatório final; o markdown é
+  **projeção** do `.kg.yaml`, nunca fonte paralela. Senão o grafo vira predecessor da avaliação em
+  vez de destino dela (sinal de campo granaai, 2026-07-20: uma avaliação de 70 agentes com 60
+  achados estruturados em JSON não deixou nó nenhum no SSOT — o plano declarara "saída:
+  relatório.md").
 - **Append-mostly**: corrigir = adicionar nó/aresta ou mudar `status`; **nunca** deletar nós
   (auditoria da investigação é o próprio grafo).
 - O radar é **gate**: integridade **ou schema** com exit 1 bloqueia o commit do `.kg.yaml` (mesmo
