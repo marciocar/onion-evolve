@@ -58,6 +58,11 @@
 #      mínimos), Silver (requires resolvem), Gold (Silver + loads). Declarar acima do cumprido bloqueia.
 #  21. Grafo (docs/onion/graph.md) em sincronia com a spec-as-code [HARD] — gerado por graph.sh;
 #      drift (editar à mão OU mudar fonte sem regenerar) bloqueia merge.
+#  29. Proveniência INVERTIDA com catraca [HARD+SOFT] — documento de análise sob
+#      docs/analysis/ e docs/evolution/research/ deve ser citado em trace:/evidence:
+#      por algum .kg.yaml. Passivo no baseline versionado = SOFT; documento NOVO fora
+#      do baseline = HARD; baseline que CRESCE = HARD. Delega a kg-provenance-coverage.sh
+#      (escopo e exclusões justificados lá). Sinal granaai 2026-07-20.
 #
 # Convenção: .claude/validation/fixtures/ guarda TEMPLATES de teste das próprias
 #   guardas (consumidos por lint-selftest.sh), não artefatos ativos. As 4 regras de
@@ -1438,6 +1443,47 @@ check_research_kg() {
 }
 
 # ===========================================================================
+# REGRA 29 — Gate de PROVENIÊNCIA INVERTIDO, com catraca [HARD + SOFT]
+#   Espelho da REGRA 26 e do kg-radar. O radar pergunta "esta DECISÃO tem
+#   origem?"; a R26 pergunta "esta PASTA de pesquisa tem .kg.yaml?". Falta a
+#   terceira: "este DOCUMENTO existe no grafo?" — coberto = algum nó de algum
+#   .kg.yaml o cita em trace:/evidence:.
+#   Origem de campo: sinal granaai 2026-07-20 (docs/evolution/inbox/
+#   2026-07-20-gate-proveniencia-invertido.md) — a doutrina KG-SSOT tinha forcing
+#   function só na LEITURA; nada impedia conhecimento de NASCER fora do grafo.
+#   CATRACA (o que torna adotável): passivo no baseline versionado = SOFT;
+#   documento NOVO fora do baseline e sem nó = HARD; baseline que CRESCE = HARD.
+#   Toda a lógica (escopo, exclusões, catraca) vive em kg-provenance-coverage.sh,
+#   com o PORQUÊ de cada exclusão no cabeçalho de lá.
+#   Agregação: a classe PASSIVO sai como UMA linha SOFT com a contagem (dezenas de
+#   linhas idênticas afogariam as classes acionáveis); as demais, individualmente.
+# ===========================================================================
+check_kg_provenance_coverage() {
+  local helper="${SCRIPT_DIR}/kg-provenance-coverage.sh"
+  [ -f "${helper}" ] || return 0
+  # Honra --only com a MESMA semântica do _find: alvo fora das raízes desta regra
+  # → nada a varrer (é o que dá ao selftest O(fixtures × 1)).
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/docs/analysis/*|"${REPO_ROOT}"/docs/evolution/research/*|*/kg-coverage-baseline.txt) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out passivo=0 sev tag path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    if [ "${tag}" = "PASSIVO" ]; then passivo=$(( passivo + 1 )); continue; fi
+    violation "${sev}" "${REPO_ROOT}/${path}" "[proveniência-invertida/${tag}] ${msg}"
+  done <<< "${out}"
+  if [ "${passivo}" -gt 0 ]; then
+    violation "SOFT" "${REPO_ROOT}/.claude/validation/kg-coverage-baseline.txt" \
+      "[proveniência-invertida/PASSIVO] ${passivo} documento(s) de análise ainda sem nó no grafo, tolerados pelo baseline — a métrica de saúde é este número DIMINUINDO (detalhe: bash .claude/validation/kg-provenance-coverage.sh)"
+  fi
+}
+
+# ===========================================================================
 # REGRA 23 — Frontmatter: model: em comandos e category: em agentes [HARD]
 #   Origem: Q_LINT_FRONTMATTER do KG (achados D8-20/D8-21 da auditoria
 #   2026-07-04 — o gap deixou 7 artefatos divergirem em silêncio; a regra
@@ -1557,6 +1603,7 @@ check_no_claude_docs
 check_evolution_links
 check_knowledge_base_links
 check_research_kg
+check_kg_provenance_coverage
 check_frontmatter_model_category
 
 # ===========================================================================

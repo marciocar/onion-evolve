@@ -2683,6 +2683,269 @@ run_onion_version_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo kg-provenance — GATE DE PROVENIÊNCIA INVERTIDO com catraca (REGRA 29).
+#
+# Origem: sinal granaai 2026-07-20 — a doutrina KG-SSOT tinha forcing function só
+# na LEITURA; nada impedia conhecimento de NASCER fora do grafo.
+#
+# Este bloco NÃO testa só o happy-path da regra: testa os PRESSUPOSTOS de que ela
+# depende para valer (regra de admissão da casa, docs/knowledge-base/concepts/
+# inference-mitigation.md). São quatro, e cada um tem caso próprio:
+#   (P1) SEVERIDADE — provada por DELTA no lint REAL, não declarada em comentário.
+#   (P2) DECIDIDO SÓ COM O REPO — nenhum insumo externo; roda em repo isolado.
+#   (P3) BASELINE — só encolhe (crescer = HARD) e sua AUSÊNCIA degrada gracioso
+#        (uma HARD acionável) em vez de LIBERAR TUDO.
+#   (P4) MUTATION TEST — desfazendo a condição central, um caso FALHA.
+# Sandboxes self-contained (mktemp), sem fixture-file.
+# ---------------------------------------------------------------------------
+
+# Monta um repo mínimo com o escopo do gate. Ecoa o diretório criado.
+_prov_make_repo() {
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/.claude/validation" "${d}/docs/analysis" "${d}/docs/evolution/research/tema-x"
+  cp "${REPO_ROOT}/.claude/validation/kg-provenance-coverage.sh" "${d}/.claude/validation/"
+  [ -f "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" ] \
+    && cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${d}/.claude/validation/"
+
+  printf '# coberto\n'  > "${d}/docs/analysis/coberto.md"
+  printf '# passivo\n'  > "${d}/docs/analysis/passivo.md"
+  printf '# novo\n'     > "${d}/docs/analysis/novo.md"
+  printf '# adr\n'      > "${d}/docs/analysis/onion-adr-excluido.md"
+  printf '# readme\n'   > "${d}/docs/analysis/README.md"
+  printf '%s\n' '---' 'type: adr' '---' '# adr por frontmatter' > "${d}/docs/analysis/decisao-sem-prefixo.md"
+  printf '# sintese\n'  > "${d}/docs/evolution/research/tema-x/SYNTHESIS.md"
+
+  # Grafo: `trace:` com sufixo :NNN (normalização) + `evidence:` em LISTA.
+  cat > "${d}/docs/evolution/research/tema-x/tema-x.kg.yaml" <<'KGEOF'
+meta:
+  id: tema-x
+nodes:
+  - id: E1
+    node_type: evidence
+    trace: "docs/analysis/coberto.md:42"
+  - id: C1
+    node_type: claim
+    evidence:
+      - "./docs/evolution/research/tema-x/SYNTHESIS.md"
+KGEOF
+
+  printf '# baseline\ndocs/analysis/passivo.md\n' > "${d}/.claude/validation/kg-coverage-baseline.txt"
+  printf '%s\n' "${d}"
+}
+
+# _prov_run <repo> [args...] — preenche os globais _PROV_OUT (TSV) e _PROV_RC.
+# NÃO ecoa o resultado: o chamador precisa do rc, e `x="$(_prov_run …)"` rodaria
+# num SUBSHELL, onde a atribuição de _PROV_RC morre (armadilha real deste teste).
+_prov_run() {
+  local repo="$1"; shift
+  local tf; tf="$(mktemp)"
+  set +e
+  bash "${repo}/.claude/validation/kg-provenance-coverage.sh" "${repo}" --format tsv "$@" >"${tf}" 2>/dev/null
+  _PROV_RC=$?
+  set -e
+  _PROV_OUT="$(cat "${tf}")"
+  rm -f "${tf}"
+}
+
+_prov_has() { printf '%s\n' "$1" | grep -qE "^$2	$3	$4	"; }
+
+run_kg_provenance_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/kg-provenance-coverage.sh"
+  if [ ! -f "${h}" ]; then record_fail "kg-provenance" "helper ausente: ${h}"; return; fi
+
+  # =========================================================================
+  # BLOCO A — semântica do gate (repo isolado, SEM git → prova P2 de tabela)
+  # =========================================================================
+  local d out; d="$(_prov_make_repo)"
+  _prov_run "${d}"; out="${_PROV_OUT}"
+
+  _prov_has "${out}" "HARD" "NEW" "docs/analysis/novo\.md" \
+    && record_pass "kg-provenance: documento NOVO sem nó → HARD" \
+    || record_fail "kg-provenance: novo" "não emitiu HARD/NEW para docs/analysis/novo.md"
+
+  _prov_has "${out}" "SOFT" "PASSIVO" "docs/analysis/passivo\.md" \
+    && record_pass "kg-provenance: documento do baseline → SOFT (tolerado, não reprova)" \
+    || record_fail "kg-provenance: passivo" "não tolerou o documento do baseline como SOFT"
+
+  printf '%s\n' "${out}" | grep -q "docs/analysis/coberto\.md" \
+    && record_fail "kg-provenance: coberto" "falso-positivo — acusou documento CITADO em trace: (com sufixo :42)" \
+    || record_pass "kg-provenance: coberto por trace: (sufixo :NNN normalizado) → silêncio"
+
+  printf '%s\n' "${out}" | grep -q "research/tema-x/SYNTHESIS\.md" \
+    && record_fail "kg-provenance: evidence lista" "não reconheceu cobertura via evidence: em LISTA (com ./ à frente)" \
+    || record_pass "kg-provenance: coberto por evidence: em lista → silêncio"
+
+  printf '%s\n' "${out}" | grep -q "onion-adr-excluido\.md" \
+    && record_fail "kg-provenance: exclusão ADR" "ADR entrou no escopo (deve ser NORMA, não achado)" \
+    || record_pass "kg-provenance: ADR por nome → fora do escopo"
+
+  printf '%s\n' "${out}" | grep -q "decisao-sem-prefixo\.md" \
+    && record_fail "kg-provenance: exclusão ADR-frontmatter" "ADR declarado por 'type: adr' entrou no escopo" \
+    || record_pass "kg-provenance: ADR por frontmatter (type: adr) → fora do escopo"
+
+  printf '%s\n' "${out}" | grep -q "docs/analysis/README\.md" \
+    && record_fail "kg-provenance: exclusão README" "README (navegação, não achado) entrou no escopo" \
+    || record_pass "kg-provenance: README → fora do escopo"
+
+  # Exit code é o contrato do consumidor: HARD presente ⇒ rc 1.
+  [ "${_PROV_RC}" -eq 1 ] \
+    && record_pass "kg-provenance: exit code 1 com HARD presente" \
+    || record_fail "kg-provenance: exit code" "esperava rc=1 com HARD presente, veio rc=${_PROV_RC}"
+
+  # (P2) DECIDIDO SÓ COM O REPO: o sandbox não é git, não tem .env, não vê a home
+  # nem o repo real — e ainda assim o veredito HARD acima foi produzido. Prova que
+  # a regra NÃO é no-op no CI (um clone limpo decide sozinho). Contraprova: ao
+  # modelar o documento no grafo DENTRO do repo, o HARD some — nenhum outro insumo.
+  cat >> "${d}/docs/evolution/research/tema-x/tema-x.kg.yaml" <<'KGEOF'
+  - id: E2
+    node_type: evidence
+    trace: "docs/analysis/novo.md"
+KGEOF
+  _prov_run "${d}"; out="${_PROV_OUT}"
+  if printf '%s\n' "${out}" | grep -q "	NEW	"; then
+    record_fail "kg-provenance: repo-only" "modelar o doc no .kg.yaml do PRÓPRIO repo não removeu o HARD"
+  else
+    record_pass "kg-provenance: (P2) decisão tomada só com o repo — modelar no grafo do repo zera o HARD; rc=${_PROV_RC}"
+  fi
+
+  # =========================================================================
+  # BLOCO B — (P3) o BASELINE é pressuposto: só encolhe, e sua ausência não libera
+  # =========================================================================
+  local b; b="$(_prov_make_repo)"
+  local prev_menor="${b}/prev-menor.txt" prev_maior="${b}/prev-maior.txt"
+  printf '# prev\n'                              > "${prev_menor}"   # baseline ANTES: vazio
+  printf '# prev\ndocs/analysis/passivo.md\ndocs/analysis/extra.md\n' > "${prev_maior}"
+
+  # B1 — baseline CRESCEU (antes vazio, agora com 1 entrada) ⇒ HARD de catraca.
+  _prov_run "${b}" --previous-baseline "${prev_menor}"; out="${_PROV_OUT}"
+  _prov_has "${out}" "HARD" "CATRACA" ".*kg-coverage-baseline\.txt" \
+    && record_pass "kg-provenance: (P3) baseline que CRESCE → HARD (catraca)" \
+    || record_fail "kg-provenance: catraca-cresce" "acrescentar path ao baseline não foi sinalizado como HARD"
+
+  # B2 — baseline ENCOLHEU (antes 2 entradas, agora 1) ⇒ nenhuma HARD de catraca.
+  _prov_run "${b}" --previous-baseline "${prev_maior}"; out="${_PROV_OUT}"
+  printf '%s\n' "${out}" | grep -q "	CATRACA	" \
+    && record_fail "kg-provenance: catraca-encolhe" "baseline que ENCOLHEU foi tratado como regressão" \
+    || record_pass "kg-provenance: (P3) baseline que ENCOLHE → sem HARD de catraca"
+
+  # B3 — entrada de baseline que já não é necessária ⇒ SOFT cobrando o encolhimento
+  #      (sem isto o baseline vira lixo permanente e a métrica de saúde morre).
+  printf '# baseline\ndocs/analysis/passivo.md\ndocs/analysis/coberto.md\ndocs/analysis/sumiu.md\n' \
+    > "${b}/.claude/validation/kg-coverage-baseline.txt"
+  _prov_run "${b}" --previous-baseline "${b}/.claude/validation/kg-coverage-baseline.txt"; out="${_PROV_OUT}"
+  printf '%s\n' "${out}" | grep -q "	BASELINE-OBSOLETA	" \
+    && record_pass "kg-provenance: (P3) entrada obsoleta (doc já coberto) → SOFT 'remova do baseline'" \
+    || record_fail "kg-provenance: baseline-obsoleta" "não cobrou a remoção de entrada já coberta pelo grafo"
+  printf '%s\n' "${out}" | grep -q "	BASELINE-ORFA	" \
+    && record_pass "kg-provenance: (P3) entrada órfã (doc inexistente) → SOFT 'remova do baseline'" \
+    || record_fail "kg-provenance: baseline-orfa" "não cobrou a remoção de entrada que não existe mais"
+
+  # B3b — baseline VAZIO (só cabeçalho): regressão real achada no dogfood deste
+  #       gate — `grep` sem match sai 1 e, sob `set -euo pipefail`, ABORTAVA o
+  #       script inteiro sem emitir nada (rc=1 com STDOUT vazio: o consumidor
+  #       leria "sem violações"). Modo-de-falha, não happy-path.
+  printf '# baseline (vazio de propósito)\n' > "${b}/.claude/validation/kg-coverage-baseline.txt"
+  _prov_run "${b}"; out="${_PROV_OUT}"
+  if [ -n "${out}" ] && printf '%s\n' "${out}" | grep -q "	NEW	docs/analysis/passivo.md	"; then
+    record_pass "kg-provenance: (P3) baseline VAZIO → gate segue avaliando (não aborta em silêncio)"
+  else
+    record_fail "kg-provenance: baseline-vazio" "baseline sem entradas produziu saída vazia/sem HARD — o gate abortou em silêncio"
+  fi
+
+  # B4 — AUSÊNCIA do baseline: degrade gracioso que NÃO libera tudo. Exatamente
+  #      UMA HARD (a própria ausência, acionável) e o passivo rebaixado a SOFT.
+  #      O oposto seria bypass do gate por `rm baseline`.
+  rm -f "${b}/.claude/validation/kg-coverage-baseline.txt"
+  _prov_run "${b}"; out="${_PROV_OUT}"
+  local n_hard n_nobase
+  n_hard="$(printf '%s\n' "${out}" | grep -c '^HARD' || true)"
+  n_nobase="$(printf '%s\n' "${out}" | grep -c '	NO-BASELINE	' || true)"
+  if [ "${n_hard}" = "1" ] && [ "${n_nobase}" = "1" ] && [ "${_PROV_RC}" -eq 1 ]; then
+    record_pass "kg-provenance: (P3) baseline AUSENTE → 1 HARD acionável (não libera tudo, nem reprova em massa)"
+  else
+    record_fail "kg-provenance: baseline-ausente" "esperava exatamente 1 HARD (NO-BASELINE) e rc=1; veio HARD=${n_hard} NO-BASELINE=${n_nobase} rc=${_PROV_RC}"
+  fi
+  printf '%s\n' "${out}" | grep -q "	NO-BASELINE-UNCOVERED	docs/analysis/novo.md	" \
+    && record_pass "kg-provenance: (P3) sem baseline, o passivo continua VISÍVEL (SOFT) — silenciar seria liberar tudo" \
+    || record_fail "kg-provenance: baseline-ausente-visibilidade" "sem baseline o gate ficou cego aos documentos sem nó"
+
+  # =========================================================================
+  # BLOCO C — (P4) MUTATION TEST: desfaz a condição CENTRAL e mostra caso falhando
+  # =========================================================================
+  local m; m="$(_prov_make_repo)"
+  local mut="${m}/.claude/validation/kg-provenance-coverage.sh"
+  # A condição central é "não-coberto MENOS baseline = novos ⇒ HARD". Desfazê-la
+  # (lista de novos sempre vazia) é a mutação que um refactor descuidado faria.
+  sed -i.bak 's|comm -23 "${TMP}/uncovered" "${TMP}/baseline" > "${TMP}/novos"|: > "${TMP}/novos"|' "${mut}"
+  if ! grep -q ': > "${TMP}/novos"' "${mut}"; then
+    record_fail "kg-provenance: (P4) mutation" "a mutação não foi aplicada — o teste não prova nada (âncora do sed mudou?)"
+  else
+    local mout mrc
+    set +e
+    mout="$(bash "${mut}" "${m}" --format tsv 2>/dev/null)"; mrc=$?
+    set -e
+    if printf '%s\n' "${mout}" | grep -q "	NEW	docs/analysis/novo.md	"; then
+      record_fail "kg-provenance: (P4) mutation" "com a condição central DESFEITA o caso ainda passou verde — o teste não é load-bearing"
+    else
+      record_pass "kg-provenance: (P4) MUTATION TEST — condição central desfeita ⇒ o caso 'novo → HARD' FALHA (rc ${_PROV_RC}→${mrc}); o teste é load-bearing"
+    fi
+  fi
+
+  # =========================================================================
+  # BLOCO D — (P1) SEVERIDADE PROVADA POR DELTA no lint REAL (não declarada)
+  #   Ontem uma guarda declarou "SOFT nunca HARD" em comentário e o mutation test
+  #   passou verde. Aqui a severidade é medida: injeta-se documento no sandbox do
+  #   repo real e compara-se o SUMÁRIO com e sem ele.
+  # =========================================================================
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_fail "kg-provenance: delta" "lint ausente"; else
+    local sb; sb="$(mktemp -d)"
+    # cp SEM .claude/worktrees/ (checkout inteiro, ~12M) — o sandbox não precisa deles e o
+  # custo entrava no orçamento de CI (o job tem timeout-minutes: 10 e roda lint+tokens junto).
+  mkdir -p "${sb}/.claude"
+  (cd "${REPO_ROOT}/.claude" && tar -cf - --exclude=worktrees .) | (cd "${sb}/.claude" && tar -xf -)
+    cp -a "${REPO_ROOT}/docs"      "${sb}/docs"
+    cp -a "${REPO_ROOT}/CLAUDE.md" "${sb}/CLAUDE.md"
+    rm -rf "${sb}/plugins" "${sb}/.claude-plugin"
+    local probe_novo="docs/analysis/selftest-prov-novo.md"
+    local probe_pass="docs/analysis/selftest-prov-passivo.md"
+    local sbl="${sb}/.claude/validation/kg-coverage-baseline.txt"
+
+    local o0 h0 s0 o1 h1 s1 o2 h2 s2
+    o0="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sbl}" 2>&1 || true)"
+    h0="$(printf '%s' "${o0}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+    s0="$(printf '%s' "${o0}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+
+    # (1) documento NOVO sem nó e fora do baseline ⇒ soma exatamente 1 HARD.
+    printf '# sonda nova\n' > "${sb}/${probe_novo}"
+    o1="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe_novo}" 2>&1 || true)"
+    h1="$(printf '%s' "${o1}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+    if [ "${h1}" = "$((h0 + 1))" ] && printf '%s' "${o1}" | grep -qF "${probe_novo}"; then
+      record_pass "kg-provenance: (P1) SEVERIDADE por DELTA — documento novo sem nó soma HARD (${h0}→${h1})"
+    else
+      record_fail "kg-provenance: (P1) delta HARD" "esperava HARD ${h0}→$((h0 + 1)) citando ${probe_novo}; veio ${h1}"
+    fi
+
+    # (2) MESMO documento, agora listado no baseline ⇒ HARD volta ao valor-base
+    #     (é tolerado) e o passivo só engorda a contagem SOFT.
+    rm -f "${sb}/${probe_novo}"
+    printf '# sonda passivo\n' > "${sb}/${probe_pass}"
+    printf '%s\n' "${probe_pass}" >> "${sbl}"
+    o2="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe_pass}" 2>&1 || true)"
+    h2="$(printf '%s' "${o2}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+    s2="$(printf '%s' "${o2}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+    if [ "${h2}" = "${h0}" ]; then
+      record_pass "kg-provenance: (P1) SEVERIDADE por DELTA — documento do baseline NÃO soma HARD (${h0}→${h2}, SOFT ${s0}→${s2})"
+    else
+      record_fail "kg-provenance: (P1) delta baseline" "documento do baseline mexeu no HARD: ${h0}→${h2} (deveria ficar igual)"
+    fi
+    rm -rf "${sb}"
+  fi
+
+  rm -rf "${d}" "${b}" "${m}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo outbox-channel — exercita a REGRA 28 do lint (check_outbox_channel_exists):
 # anúncio em staging (docs/evolution/federation/outbox/<membro>/*.md) para um
 # membro cujo local_path NÃO TEM docs/evolution/inbound/ deve virar SOFT (nunca
@@ -2703,7 +2966,10 @@ run_outbox_channel_selftests() {
   fi
 
   local sb; sb="$(mktemp -d)"
-  cp -a "${REPO_ROOT}/.claude"   "${sb}/.claude"
+  # cp SEM .claude/worktrees/ (checkout inteiro, ~12M) — o sandbox não precisa deles e o
+  # custo entrava no orçamento de CI (o job tem timeout-minutes: 10 e roda lint+tokens junto).
+  mkdir -p "${sb}/.claude"
+  (cd "${REPO_ROOT}/.claude" && tar -cf - --exclude=worktrees .) | (cd "${sb}/.claude" && tar -xf -)
   cp -a "${REPO_ROOT}/docs"      "${sb}/docs"
   cp -a "${REPO_ROOT}/CLAUDE.md" "${sb}/CLAUDE.md"
   rm -rf "${sb}/plugins" "${sb}/.claude-plugin"
@@ -3451,6 +3717,9 @@ run_diary_crumbs_selftests
 
 # Modo outbox-channel — REGRA 28 do lint: anúncio em staging p/ membro SEM canal de recepção (achado 2026-07-19; sandbox).
 run_outbox_channel_selftests
+
+# Modo kg-provenance — REGRA 29: gate de proveniência INVERTIDO com catraca (sinal granaai 2026-07-20).
+run_kg_provenance_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário

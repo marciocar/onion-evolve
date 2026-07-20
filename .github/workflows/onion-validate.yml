@@ -23,7 +23,11 @@ permissions:
 jobs:
   lint-onion-artifacts:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Orçamento medido em 2026-07-20 (KVM 8): lint-selftest 6m59s (374 guardas) + lint-artifacts 21s
+    # + gate de design tokens ≈ 7,5min. Com teto de 10 o job rodava a ~75% do orçamento — margem que
+    # some no primeiro runner lento e vira CI vermelho por TEMPO, não por defeito. A suíte cresce a
+    # cada guarda nova (é o objetivo); o teto acompanha, com a medição registrada para o próximo ajuste.
+    timeout-minutes: 15
 
     steps:
       - name: Checkout Repository

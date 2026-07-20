@@ -16,3 +16,10 @@ faça uma análise usando o template `.claude/commands/common/templates/analysis
 </requirements>
 
 coloque o resultado em docs/analysis/*.md
+
+> ⚠️ **Grafo primeiro, markdown como VISTA** (sinal de campo granaai, 2026-07-20). `docs/analysis/`
+> está no escopo **HARD** do gate de proveniência invertido (`kg-provenance-coverage.sh`): documento novo
+> aqui **precisa ser citado** por algum nó (`trace:`/`evidence:`) de um `.kg.yaml`. Ordem correta: modele
+> os achados no grafo **antes** de renderizar o relatório — o markdown é projeção, não fonte paralela.
+> O erro que originou esta regra entrou no **planejamento** ("saída: relatório.md"), não na execução.
+

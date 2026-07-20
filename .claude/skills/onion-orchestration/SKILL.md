@@ -64,7 +64,12 @@ Nativas" (fonte única).
 7. **`write(KG)` — o último ato (quando a orquestração PRODUZ conhecimento).** Se o fan-out gerou
    **síntese/achados/decisões** (pesquisa, auditoria, investigação, design) — e **não** só uma mutação
    de código que já termina em branch/PR — o resultado consolidado é uma **obrigação de `write(KG)`,
-   não opção**: **persista** a síntese no repo (`docs/**/research/*.md` ou local durável) — **nunca**
+   não opção**. **Ordem: grafo primeiro, relatório depois** — o `.kg.yaml` é o **destino** dos
+   achados estruturados; qualquer markdown de saída é **projeção** dele, nunca fonte paralela
+   redigida à parte (reforça o sinal de campo granaai, 2026-07-20: um plano que declarou "saída:
+   relatório.md" como destino de uma avaliação de 70 agentes/60 achados deixou o grafo vazio — o
+   grafo virou predecessor da avaliação em vez de destino dela). **Persista** a síntese
+   no repo (`docs/**/research/*.md` ou local durável) — **nunca**
    a deixe só no `/tmp/.../tasks/*.output` **efêmero** do harness — **e materialize/atualize** o
    `.kg.yaml` via `/meta:kg` + `bash .claude/validation/kg-radar.sh` (exit 0). Fecha o ciclo
    `read(KG)→verify→act→write(KG)` ([knowledge-graph-sdaal.md](../../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md)

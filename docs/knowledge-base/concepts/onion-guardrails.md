@@ -1,7 +1,7 @@
 ---
 title: "Onion Guardrails — a camada de guardrails nomeada (lente sobre gates existentes)"
 category: concepts
-tags: [seguranca, guardrails, gate, a2a, trust, intake, execucao, prompt-injection, taxonomia, fail-safe]
+tags: [seguranca, guardrails, gate, a2a, trust, intake, execucao, prompt-injection, taxonomia, fail-safe, catraca, baseline]
 status: candidato
 date: 2026-07-12
 ---
@@ -161,10 +161,48 @@ Lente Aristóteles (`igual→transfere / diferente→desenha`):
 - **Desenha próprio:** o **motor** (determinístico/gated/estrutural, não Colang nem guard-model) e os
   conceitos nativos (trust topology, never-clobber, entrega-sem-commit).
 
-## 7. Status e próximos passos
+## 7. A catraca — doutrina de introdução de gate em base viva
+
+**Origem:** sinal de campo da granaai (2026-07-20, [inbox](../../evolution/inbox/_processed/2026-07-20-gate-proveniencia-invertido.md))
+sobre o gate de proveniência invertido do KG-SSOT. O mecanismo específico é deles; a forma de **introduzir
+qualquer gate novo** contra um passivo existente é geral o bastante para virar doutrina desta casa.
+
+**Tese.** Um gate novo que nasce reprovando o passivo é desligado no primeiro dia — reprovar dezenas de
+artefatos pré-existentes de uma vez é ruído, não sinal, e o próximo maestro sob pressão desativa a regra em
+vez de resolver o passivo. A forma adotável tem três peças:
+
+1. **Baseline do passivo, tolerado.** Tudo que já existe antes do gate nascer entra numa lista/allowlist
+   explícita e é aceito sem bloquear.
+2. **Violação HARD para o artefato **NOVO** — e, por serem pressupostos da própria catraca, também para **baseline que CRESCE** e para **baseline ausente** (sem ele não há catraca, e sair verde seria bypass).** Depois que o gate nasce, nada novo pode entrar fora da regra —
+   aí sim a falha é dura.
+3. **O baseline só encolhe.** Ele nunca cresce; a única direção permitida é sair da lista (o item foi
+   corrigido/migrado). Se algo tentasse *entrar* no baseline depois do dia de nascimento, o gate perdeu a
+   função.
+
+**A inversão da métrica.** A saúde do gate não é "está tudo verde" — é **o baseline diminuindo**. Um gate
+100% verde com um baseline enorme e estático não está trabalhando: está anestesiado, só constatando que o
+passivo continua lá. Meça o gate pelo tamanho do baseline ao longo do tempo, não pela taxa de PASS.
+
+**Caso vivo desta casa (evidência de por que importa).** Em 2026-07-19, a REGRA 28 do lint
+(`check_outbox_channel_exists`, `.claude/validation/lint-artifacts.sh`) nasceu para pegar anúncio de
+federação em staging sem canal de entrega — e, ao rodar pela primeira vez contra a base real, encontrou 6
+anúncios de passivo pré-existente. A regra foi desenhada **SOFT deliberado, nunca HARD**, com a razão de
+design escrita no próprio código: *a decisão — dar canal ao membro, ou o `/meta:co-announce` pular membros
+sem canal — é do maestro, não do lint*. Sem essa catraca, o gate teria nascido HARD, bloqueado o CI, e a
+única saída teria sido desligar a regra inteira — por uma condição que só o maestro podia **decidir**, não
+o CI **corrigir**. A REGRA 28 catraqueia por classe fixa (SOFT sempre) em vez de baseline-por-lista; a forma
+completa (baseline explícito + HARD-para-novo) é o alvo desta doutrina para gates onde o veredito por item
+*é* decidível objetivamente — como o de proveniência invertido da granaai.
+
+**Quando um novo gate entra em base viva:** declare o baseline (lista explícita ou classe que a torna
+implícita), gate HARD só o que é novo depois do dia de nascimento do gate, e reporte saúde pelo tamanho do
+baseline caindo — nunca pela taxa de PASS.
+
+## 8. Status e próximos passos
 
 - ✅ Doutrina, taxonomia (evidência) e design R15 fechados; 3 checagens do core passadas (reconciliação,
   refutador, escopo).
+- ✅ **Doutrina da catraca** (§7) — promovida a partir do sinal de campo da granaai (2026-07-20).
 - 🔜 **Gate anti-drift da taxonomia** (ONION-R1 sobre si mesma) — pré-requisito para promover o catálogo
   detalhado ao core.
 - 🔜 **R15 (wire-in)** — cerca de proveniência + gate de efeito; hoje protótipo em quarentena, não wired.

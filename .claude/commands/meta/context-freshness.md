@@ -139,6 +139,16 @@ No contexto principal (0 tokens de modelo):
    (stale engana ativamente → remoção É frescor).
 4. **Verificação adversarial** (opus) acionada quando: >30% STALE/HISTORICAL, ou
    contradição cross-domínio detectada. O juiz tenta refutar antes de consolidar.
+5. **Grafo primeiro**: contradição cross-domínio e candidatos `HISTORICAL` são achados estruturados
+   — materialize via `/meta:kg` (nó `claim`, `layer: audit`, `trace` ao arquivo) **antes** de
+   fechar a saída abaixo. O relatório é **vista** do grafo, não destino do achado (senão o grafo
+   fica predecessor da avaliação em vez de destino dela — sinal de campo granaai, 2026-07-20).
+> ⚠️ **Alcance honesto:** este comando **não escreve arquivo** (a saída é bloco de console), logo
+> **nenhum gate o alcança** — a ordem grafo-primeiro aqui é doutrina de execução, não mecanismo. Quem cai
+> no escopo HARD do `kg-provenance-coverage.sh` é quem materializa em `docs/analysis/` ou
+> `docs/evolution/research/`. Dito em voz alta para o slogan "mecanismo, não conselho" não ficar maior
+> do que o que foi de fato mecanizado.
+
 
 ### Passo 5 — Fallback serial (Workflow indisponível)
 Avise em pt-BR; itere `CTX_FILES` com `Agent`, mesmo `FreshnessSchema`; consolide

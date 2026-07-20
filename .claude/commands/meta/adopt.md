@@ -233,6 +233,17 @@ done
 if [ -f "$DEST/.claude/validation/inventory.sh" ]; then
   bash "$DEST/.claude/validation/inventory.sh" --markdown > "$DEST/docs/onion/inventory.md" 2>/dev/null || true
 fi
+
+# (9) BASELINE de cobertura de KG — REGENERA do filesystem do alvo (mesmo padrão do passo 8, mesma razão).
+#     O manifesto copia `.claude/validation/` INTEIRO, então o baseline DO CORE viaja junto. Sem regenerar,
+#     o adotante herda o passivo do core (paths que não existem lá → ruído órfão) e, pior, vê **todo
+#     documento de análise PRÓPRIO pré-existente como HARD-novo** — o gate nasceria reprovando o repo do
+#     adotante no dia 1 e seria desligado, que é exatamente o modo-de-falha que a catraca existe para
+#     evitar. A catraca só é adotável se o baseline for do ALVO, não do core. Determinístico, idempotente.
+if [ -f "$DEST/.claude/validation/kg-provenance-coverage.sh" ]; then
+  bash "$DEST/.claude/validation/kg-provenance-coverage.sh" --emit-baseline \
+    > "$DEST/.claude/validation/kg-coverage-baseline.txt" 2>/dev/null || true
+fi
 ```
 
 > O passo (1) **substitui** o antigo never-clobber grosso (que copiava só se ausente; senão deixava um
