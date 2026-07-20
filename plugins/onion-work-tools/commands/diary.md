@@ -162,7 +162,14 @@ find "$DIARY_DIR" -name "*.md" ! -name "index.md" | sort -r | while read f; do
   CLASS=$(awk '/^classification:/{print $2}' "$f")
   SLUG=$(basename "$f" .md | cut -d- -f4-)
   REVIEW=$(awk '/^review_after:/{print $2}' "$f")
+  # significance é FRASE (espaços) → extrair com sub(), nunca $2; aspas de borda removidas.
+  SIG=$(awk '/^significance:/{sub(/^significance:[[:space:]]*/,""); gsub(/^"|"$/,""); print; exit}' "$f")
   printf "%-12s  %-12s  %-12s  %-30s  review: %s\n" "$DATE" "$TYPE" "$CLASS" "$SLUG" "$REVIEW"
+  # NUNCA id nu: quando a migalha diz por que vale, isso aparece junto — é o canal avaliativo
+  # de ① Absorção (breadcrumb-patterns §Faceta de ①), não decoração. Ausente → linha some.
+  # `if` e não `[ ... ] && printf`: como É O ÚLTIMO comando do corpo do loop, a forma curta
+  # devolveria exit 1 na última entrada SEM significance (falha espúria sob set -e / no `||`).
+  if [ -n "$SIG" ]; then printf "              ↳ %s\n" "$SIG"; fi
 done
 ```
 

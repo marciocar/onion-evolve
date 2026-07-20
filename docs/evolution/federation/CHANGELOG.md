@@ -8,6 +8,30 @@
 
 ---
 
+## 2026-07-20 · `significance:` FECHADO — ancorado em `breadcrumb-patterns.md` (faceta avaliativa de ①) + contrato federado na RFC-0003 · COMPATÍVEL · alvo: todos
+
+- **Fecha as fases 2–3** que a entrada de 2026-07-19 deixou em backlog. O campo deixa de ser mecanismo
+  solto e passa a ter **lugar na taxonomia** e **status de contrato**.
+- **Fase 2 — `breadcrumb-patterns.md` v2.1.0:** `significance:` entra como **canal do gênero ① Absorção**,
+  nomeando uma faceta que a KB ainda não tinha: **denotativa × avaliativa**. Os instrumentos ① existentes
+  impedem o leitor de errar o **significado** (`data-slot`, enums); `significance` impede que ele erre o
+  **valor** — leia certo e ainda assim acomode como "mais um PR na lista". A classificação foi testada
+  contra o eixo da própria KB (**direção do sinal**): é presente/espacial, não aponta pra trás (② `trace:`)
+  nem pra frente (③ `next_recommended`). **Tensão registrada, não escondida:** se o campo um dia aparecer
+  preso a instrumentos de ② e ③, a classificação deve ser **re-testada** — mesma disciplina que já moveu
+  `status:` de canal para modificador.
+- **Fase 3 — RFC-0003 (emenda 2026-07-19):** `significance` entra no **contrato de migalha federada**.
+  Migalha é trocável entre instâncias (`co-relay`, `export-sharable`, `diary_readable_by`); se cada uma
+  inventar seu campo de orgulho, a rede perde o que torna migalhas intercambiáveis — **o core define campo,
+  formato e guarda; cada estrela preenche com o orgulho do próprio trabalho**. A emenda também crava que a
+  `significance` **herda a `classification` (§2.2)**: viaja dentro da migalha, sujeita ao mesmo gate —
+  **não é canal de disclosure novo**.
+- **Fiação que faltava:** `/meta:diary list` passa a mostrar a `significance` junto da linha da migalha
+  ("nunca id nu" — era pedido explícito do sinal e tinha ficado só no índice). Ausente → linha some.
+- **Ação p/ adotantes:** nenhuma. Campo **opcional/retrocompatível** — migalhas antigas seguem válidas.
+  Quem quiser adotar: a pergunta guiada já está no `create`. **Guarda:** orgulho **precisa de lastro** em
+  Signal/Evidence e **morre junto** quando o `review` supersede a migalha.
+
 ## 2026-07-19 · `kg-radar.sh` passa a ANCORAR todos os campos do nó (fim da colisão label↔schema) + linha normativa de idioma de ids + `significance:` no diário (fase 1) · COMPATÍVEL · alvo: todos
 
 - **Crédito: dois sinais de campo da estrela `onion-pessoal-app` (2026-07-19)** — e o primeiro veio do jeito

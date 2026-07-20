@@ -111,6 +111,30 @@ antes de qualquer prosa. O formato do diário usa frontmatter como canal primár
 > determinística em `diary-index.sh` (tipo ou classe fora do enum = migalha desonesta → exit 1). Se este
 > bloco divergir do comando, **o comando vence**.
 
+> **Emenda (2026-07-19) — `significance:` entra no CONTRATO de migalha federada.** Campo **opcional**
+> (retrocompatível) no frontmatter: **uma frase orgulhosa e honesta** dizendo por que a migalha vale e
+> qual seu **papel no continuum dogfoodado**. Se `Signal` força a absorção do **WHAT**, `significance`
+> força a do **WHY-que-orgulha** — tirando o encaixe-no-todo da prosa (onde afunda) e pondo-o no canal de
+> maior absorção. Ancorado em [`breadcrumb-patterns.md`](../../knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md)
+> §Faceta de ① como **absorção AVALIATIVA** (o leitor lê certo e ainda assim acomoda como "mais um PR").
+>
+> **Por que é contrato desta RFC, e não escolha de instância:** migalha é **trocável** entre instâncias
+> (`/meta:co-relay`, `export-sharable`, `diary_readable_by`). Se cada instância inventar seu próprio
+> "campo de orgulho", a rede perde exatamente a propriedade que torna migalhas intercambiáveis. **O core
+> define campo, formato e guarda; cada estrela o preenche com o orgulho do próprio trabalho.**
+>
+> **Herda a classificação (§2.2) — não é canal de vazamento.** A `significance` viaja **dentro** da
+> migalha e está sujeita ao mesmo gate: migalha `private`/`protected` não exporta sua `significance`. Ela
+> **não** cria superfície de disclosure nova — escrever nela algo que a `classification` não permitiria no
+> corpo é violação da mesma regra, não exceção a ela.
+>
+> **Guarda orgulho ≠ hype:** precisa de **lastro** em Signal/Evidence (sem lastro = migalha desonesta) e
+> **morre junto** — quando o `review` supersede a migalha, a `significance` cai com ela. Mecanização
+> honesta: `diary-index.sh` valida **forma/presença** e surfaça no índice Tier-0 (selftest cobre o caminho
+> não-vazio); **o lastro do orgulho não é mecanizável** — fica no gate humano da absorção, como o veredito
+> de review. Origem: proposta de campo da estrela `onion-pessoal-app` (sinal upstream 2026-07-19), triada
+> via `/meta:co-evolve`. **SSOT viva segue sendo [`/meta:diary`](../../../.claude/commands/meta/diary.md).**
+
 ```yaml
 ---
 date: 2026-07-01
