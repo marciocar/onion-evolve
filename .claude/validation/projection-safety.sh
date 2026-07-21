@@ -76,6 +76,26 @@ done
 
 [ ${#SURFACES[@]} -eq 0 ] && SURFACES=("${REPO_DIR}/site")
 
+# ── P0-bis: ESTE REPO TEM FEDERAÇÃO? ─────────────────────────────────────────
+# Só o CORE mantém registro de membros. Um adotante não tem — e para ele a
+# ausência é NORMAL, não protuguesa quebrada. A 1ª versão não fazia essa
+# distinção e reprovava HARD em todo adotante que atualizasse, travando o
+# pre-commit dele (achado em campo no update de 2026-07-21, ao aplicar o
+# framework num adotante real). É a MESMA classe do baseline de cobertura, que
+# também teria viajado e explodido o gate do adotante — a lição não alcançou
+# esta guarda porque ela foi escrita depois, noutro arquivo.
+# Regra: sem diretório de federação ⇒ nada a proteger ⇒ silêncio (exit 0).
+#        COM diretório e SEM members.yaml ⇒ registro quebrado ⇒ HARD (P0).
+FED_DIR="$(dirname "${MEMBERS}")"
+if [ ! -d "${FED_DIR}" ]; then
+  [ "${FORMAT}" = "tsv" ] && exit 0
+  [ "${EMIT_ONLY}" = "1" ] && exit 0
+  echo "=== Segurança de projeção ==="
+  echo "  Este repositório não mantém registro de federação (${FED_DIR#${REPO_DIR}/} ausente)."
+  echo "  Nada a proteger — a guarda vale no core, que é quem carrega nomes de membros."
+  exit 0
+fi
+
 # ── P0: a fonte precisa existir e ser legível — senão FALHA ALTO ──────────────
 if [ ! -r "${MEMBERS}" ]; then
   if [ "${FORMAT}" = "tsv" ]; then

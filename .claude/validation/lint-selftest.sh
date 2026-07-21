@@ -525,6 +525,17 @@ MEOF
     record_pass "projection-safety: (P0) fonte ausente → HARD, não verde silencioso"
   else record_fail "projection-safety: (P0)" "sem members.yaml a guarda passou verde — proteção fantasma"; fi
 
+  # (P0-bis) ADOTANTE — repo SEM diretório de federação: ausência é NORMAL, não
+  # registro quebrado. Silêncio (rc=0). Sem esta distinção a guarda reprovava
+  # HARD em TODO adotante que atualizasse e travava o pre-commit dele — achado
+  # em campo no update de 2026-07-21, mesma classe do baseline de cobertura que
+  # também teria viajado e explodido o gate do adotante.
+  mkdir -p "${tmp}/adotante"
+  printf '<p>limpo</p>' > "${tmp}/surface/index.html"
+  if bash "${helper}" --members "${tmp}/adotante/docs/evolution/federation/members.yaml" "${tmp}/surface" >/dev/null 2>&1; then
+    record_pass "projection-safety: (P0-bis) repo SEM federação → silêncio, não HARD (não trava o adotante)"
+  else record_fail "projection-safety: (P0-bis)" "adotante sem registro de federação foi reprovado — trava o pre-commit dele"; fi
+
   # (P5) members SEM marcador algum ⇒ lista vazia ⇒ REPROVA (anti NO-OP)
   cat > "${tmp}/members-nomarker.yaml" <<'MEOF'
 members:

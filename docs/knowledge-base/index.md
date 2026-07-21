@@ -174,9 +174,15 @@ docs/knowledge-base/
 
 ## 🔗 Links Rápidos
 
-- [Índice Central](../INDEX.md) — hub de navegação do projeto
-- [Sistema Onion](../onion/index.md) — documentação operacional
+<!-- ⚠️ Este índice é VENDORIZADO (viaja para todo repo adotado via /meta:adopt).
+     Só pode linkar o que viaja JUNTO — hoje: docs/meta-specs, docs/knowledge-base,
+     docs/sdaal. `../INDEX.md` (hub do core) e `../onion/index.md` NÃO estão no
+     manifesto de vendor: no core resolviam, no adotante ficavam pendurados, e o
+     lint do core nunca via porque lá o alvo existe. Achado em campo no update de
+     2026-07-21, ao rodar o lint DENTRO do repo do adotante — classe
+     "funciona no core, quebra no adotante". -->
 - [Meta Especificações](../meta-specs/index.md) — constituição L0
+- [SDAAL](../sdaal/) — a camada de abstração dirigida por especificação
 
 ### Comandos relacionados
 
