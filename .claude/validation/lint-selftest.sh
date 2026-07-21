@@ -464,6 +464,66 @@ run_kg_scope_selftests() {
 # P2 contradizia P4 e só o teste de injeção expôs — por isso (MUT) ataca essa condição.
 # Fixtures temporários self-contained (não vêm do manifest) + cleanup via trap.
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Modo federation-projection — REGRA 33. Mailbox-aware: nome do PRÓPRIO membro no
+# PRÓPRIO mailbox é permitido; cross-tenant e compartilhado reprovam; members.yaml
+# (fonte) e _processed/ (entregue) ficam fora do gate. Os DOIS lados no mesmo
+# conjunto — o falso-positivo que mataria a guarda (nome próprio) é tão testado
+# quanto o vazamento que ela existe para pegar.
+# ---------------------------------------------------------------------------
+run_federation_projection_selftests() {
+  local helper="${SCRIPT_DIR}/projection-safety.sh"
+  local tmp
+  [ -f "${helper}" ] || return 0
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "${tmp}"' RETURN
+  mkdir -p "${tmp}/fed/outbox/acme/_processed" "${tmp}/fed/outbox/openly/_processed"
+  cat > "${tmp}/fed/members.yaml" <<'MEOF'
+members:
+  - id: acme
+    name: acme (AcmeCorp — CONFIDENCIAL, ver adr.md)
+  - id: openly
+    name: openly (Projeto Aberto — sem marcador)
+MEOF
+  local m="--members ${tmp}/fed/members.yaml"
+  _fed() { bash "${helper}" --federation --format tsv ${m} "${tmp}/fed" 2>/dev/null | grep -c HARD; }
+
+  # (a) PRÓPRIO — AcmeCorp no mailbox de acme → NÃO reprova (não vaza; guarda não grita lobo)
+  printf 'nota interna da AcmeCorp\n' > "${tmp}/fed/outbox/acme/msg.md"
+  if [ "$(_fed)" -eq 0 ]; then
+    record_pass "federation-projection: (a) nome do próprio membro no próprio mailbox → permitido"
+  else record_fail "federation-projection: (a)" "falso-positivo no próprio mailbox — guarda viraria descartável"; fi
+
+  # (b) CRUZADO — AcmeCorp no mailbox de openly → HARD (openly aprende o nome confidencial de acme)
+  printf 'sobre a AcmeCorp\n' > "${tmp}/fed/outbox/openly/msg.md"
+  if [ "$(_fed)" -ge 1 ]; then
+    record_pass "federation-projection: (b) nome cruzando para mailbox alheio → HARD"
+  else record_fail "federation-projection: (b)" "vazamento cross-tenant não pego"; fi
+  rm -f "${tmp}/fed/outbox/openly/msg.md"
+
+  # (c) COMPARTILHADO — AcmeCorp no CHANGELOG (lido por todos) → HARD
+  printf 'ledger cita AcmeCorp\n' > "${tmp}/fed/CHANGELOG.md"
+  if [ "$(_fed)" -ge 1 ]; then
+    record_pass "federation-projection: (c) nome em artefato compartilhado → HARD"
+  else record_fail "federation-projection: (c)" "vazamento no ledger compartilhado não pego"; fi
+
+  # (d) _processed — nome cruzado num arquivo ENTREGUE → fora do gate (a casa não reescreve o passado)
+  rm -f "${tmp}/fed/CHANGELOG.md"
+  printf 'entregue: sobre a AcmeCorp\n' > "${tmp}/fed/outbox/openly/_processed/old.md"
+  if [ "$(_fed)" -eq 0 ]; then
+    record_pass "federation-projection: (d) _processed (entregue) fica fora do gate — histórico não se reescreve"
+  else record_fail "federation-projection: (d)" "gate mordeu histórico entregue"; fi
+
+  # (MUT) desfeita a exceção do PRÓPRIO mailbox, (a) passa a reprovar — prova que a
+  # distinção mailbox-aware é load-bearing (sem ela a guarda cai no chapado que mata).
+  rm -f "${tmp}/fed/outbox/openly/_processed/old.md"
+  sed 's/\[ "${mid}" = "${owner}" \] && continue/false \&\& continue/' "${helper}" > "${tmp}/mut.sh"
+  local n; n="$(bash "${tmp}/mut.sh" --federation --format tsv ${m} "${tmp}/fed" 2>/dev/null | grep -c HARD)"
+  if [ "${n}" -ge 1 ]; then
+    record_pass "federation-projection: (MUT) sem a exceção mailbox-aware o nome próprio reprova — a distinção é load-bearing"
+  else record_fail "federation-projection: (MUT)" "desfeita a exceção, nada mudou — o teste não prova a distinção"; fi
+}
+
 run_projection_safety_selftests() {
   local helper="${SCRIPT_DIR}/projection-safety.sh"
   local tmp
@@ -4097,6 +4157,7 @@ run_kg_scope_selftests
 
 # Modo projection-safety — REGRA 30: nome comercial de membro privado não sai do repo privado.
 run_projection_safety_selftests
+run_federation_projection_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário

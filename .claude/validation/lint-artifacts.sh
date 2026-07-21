@@ -1630,6 +1630,35 @@ check_projection_safety() {
 }
 
 # ===========================================================================
+# REGRA 33 — Segurança de projeção no HISTÓRICO DE FEDERAÇÃO (mailbox-aware) [HARD]
+#   Irmã da REGRA 30, threat model DIFERENTE. A 30 guarda superfície PÚBLICA
+#   (chapada: nenhum nome comercial). Esta guarda a coordenação CROSS-TENANT:
+#   nome comercial de um membro no mailbox de OUTRO, ou em artefato compartilhado
+#   (CHANGELOG/README lido por todos). Nome do próprio membro no próprio mailbox
+#   é PERMITIDO — auditar chapado geraria 20 falso-positivos e a guarda morreria.
+#   Exclui members.yaml (fonte) e _processed/ (entregue; a casa não reescreve o
+#   passado — se re-projetado publicamente, a REGRA 30 pega no ponto de projeção).
+#   Origem: a própria REGRA 30, ao varrer o outbox, achou "Grana.Ai" numa mensagem
+#   entregue a metagamify (cross-tenant real) — 2026-07-21.
+# ===========================================================================
+check_federation_projection() {
+  local helper="${SCRIPT_DIR}/projection-safety.sh"
+  local fed="${REPO_ROOT}/docs/evolution/federation"
+  [ -f "${helper}" ] || return 0
+  [ -d "${fed}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${fed}"/*|*/members.yaml) : ;; *) return 0 ;; esac
+  fi
+  local out sev tag path msg
+  out="$(bash "${helper}" --federation --format tsv "${fed}" 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    violation "${sev}" "${REPO_ROOT}/${path}" "[federação/${tag}] ${msg}"
+  done <<< "${out}"
+}
+
+# ===========================================================================
 # REGRA 23 — Frontmatter: model: em comandos e category: em agentes [HARD]
 #   Origem: Q_LINT_FRONTMATTER do KG (achados D8-20/D8-21 da auditoria
 #   2026-07-04 — o gap deixou 7 artefatos divergirem em silêncio; a regra
@@ -1753,6 +1782,7 @@ check_kg_provenance_coverage
 check_kg_view_sync
 check_site_graph_sync
 check_projection_safety
+check_federation_projection
 check_frontmatter_model_category
 
 # ===========================================================================

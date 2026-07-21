@@ -364,7 +364,7 @@
   lê história, IA lê ordens) — o padrão do `members.yaml` batizado, com genealogia (Knuth→UNIX→
   ADRs→policy-as-data) e as 6 regras da casa. Copiem à vontade — é feito para isso.
 - **RFC-0005 §4.1**: "**forma de adoção**" (`full | docs-only | in-place`) agora é dimensão de 1ª
-  classe, ortogonal a escopo E versão (ground-truth: adoção docs-only real na Grana.Ai). O
+  classe, ortogonal a escopo E versão (ground-truth: adoção docs-only real na granaai). O
   capability-update p/ adotante docs-only/regulado está registrado como 4º modo de proveniência
   (GATED, a-desenhar) — se você pretende adotar docs-only, sinalize antes do 1º `--update`.
 - Ação p/ adotantes: nenhuma — chega via `/meta:adopt --update`.

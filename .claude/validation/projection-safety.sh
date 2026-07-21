@@ -61,12 +61,14 @@ REPO_DIR="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 MEMBERS="${REPO_DIR}/docs/evolution/federation/members.yaml"
 MARKERS='CONFIDENCIAL|PRIVADO'          # P1 — vocabulário fechado
 EMIT_ONLY=0
+FEDERATION=0
 FORMAT=human
 SURFACES=()
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --emit-terms) EMIT_ONLY=1; shift ;;
+    --federation) FEDERATION=1; shift ;;
     --members)    MEMBERS="$2"; shift 2 ;;
     --format)     FORMAT="$2"; shift 2 ;;
     -h|--help)    sed -n '1,50p' "$0"; exit 0 ;;
@@ -158,6 +160,98 @@ TERMS="$(printf '%s\n%s\n' "${TERMS_CI}" "${TERMS_CS}" | grep -v '^[[:space:]]*$
 
 if [ "${EMIT_ONLY}" = "1" ]; then
   printf '%s\n' "${TERMS}"
+  exit 0
+fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# --federation: auditoria MAILBOX-AWARE do histórico de coordenação.
+#
+# O REGRA-30 padrão (superfícies públicas) é CHAPADO: nenhum nome comercial, ponto.
+# O histórico de federação NÃO pode ser auditado assim — 20 dos 22 aparecimentos são
+# o nome do PRÓPRIO membro no PRÓPRIO mailbox (outbox/granaai/ falando "Grana.Ai"),
+# que não vaza para ninguém: granaai já sabe que é granaai. Guarda que grita lobo 20×
+# é desligada no 1º dia — o modo de falha que esta casa mais paga.
+#
+# Modelo de AMEAÇA (o que de fato vaza):
+#   · CRUZADO   — nome comercial de UM membro no mailbox de OUTRO (adotante B aprende
+#                 o nome confidencial do adotante A). É o vazamento real.
+#   · COMPARTILHADO — nome comercial em artefato lido por TODOS (CHANGELOG, README).
+#   · PRÓPRIO   — nome do membro no seu próprio mailbox: PERMITIDO (não vaza).
+#
+# FRONTEIRA (o que NÃO se gateia, e por quê):
+#   · members.yaml  — é a FONTE dos termos; auto-flag seria absurdo.
+#   · _processed/   — histórico ENTREGUE. A prevenção acontece no ATIVO, antes da
+#                     entrega; reescrever registro entregue para esconder vazamento
+#                     é o anti-padrão "reescreve o passado" que a casa rejeita
+#                     ("história reconcilia, não apaga"). Se um _processed for um dia
+#                     re-projetado numa superfície pública, é a REGRA 30 que pega, no
+#                     ponto de projeção — não aqui, no armazenamento.
+# Origem: achado de campo 2026-07-21 — a própria REGRA 30, ao escanear o outbox,
+# pegou "Grana.Ai" numa mensagem entregue a metagamify (cross-tenant real).
+# ─────────────────────────────────────────────────────────────────────────────
+if [ "${FEDERATION}" = "1" ]; then
+  # Mapa member_id → nome(s) comercial(is). Mesma lógica de marcador/token do
+  # derive_terms, mas preservando de QUEM é cada nome (o que o mailbox-aware exige).
+  MEMBER_TERMS="$(awk -v markers="${MARKERS}" '
+    /^[[:space:]]*-[[:space:]]*id:[[:space:]]/ {
+      v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]*#.*$/,"",v)
+      gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); cur=v; next
+    }
+    /^[[:space:]]*name:[[:space:]]/ {
+      line=$0; sub(/[[:space:]]*#.*$/,"",line)
+      if (match(line,/\(.*\)/)==0) next
+      ann=substr(line,RSTART+1,RLENGTH-2)
+      if (ann !~ markers) next
+      sub(/[[:space:]]*ver[[:space:]]+[^,;]*/,"",ann)
+      gsub(markers,"",ann); gsub(/[—–\/;,]/,"\n",ann)
+      nn=split(ann,parts,"\n")
+      for (j=1;j<=nn;j++){ t=parts[j]; gsub(/^[[:space:]]+|[[:space:]]+$/,"",t)
+        if (t=="") continue; if (length(t)<4) continue
+        if (t !~ /[A-Z]|\./ && t !~ /-/) continue
+        print cur "\t" t }
+    }' "${MEMBERS}" | sort -u)"
+
+  FED_ROOT="${SURFACES[0]:-${FED_DIR}}"
+  viol=0; scanned=0
+  while IFS= read -r f; do
+    [ -n "${f}" ] || continue
+    rel="${f#${REPO_DIR}/}"
+    case "${rel}" in
+      */members.yaml)   continue ;;   # fonte
+      */_processed/*)   continue ;;   # entregue — fora do gate (ver FRONTEIRA)
+    esac
+    # De quem é este mailbox? outbox/<member>/... → owner=<member>; senão compartilhado.
+    owner=""
+    case "${rel}" in
+      */outbox/*) owner="${rel##*/outbox/}"; owner="${owner%%/*}" ;;
+    esac
+    scanned=$((scanned+1))
+    while IFS="$(printf '\t')" read -r mid term; do
+      [ -n "${term}" ] || continue
+      [ "${mid}" = "${owner}" ] && continue      # PRÓPRIO: permitido
+      if grep -qiF -- "${term}" "${f}" 2>/dev/null; then
+        kind="CRUZADO"; [ -z "${owner}" ] && kind="COMPARTILHADO"
+        if [ "${FORMAT}" = "tsv" ]; then
+          printf 'HARD\t%s\t%s\tnome comercial de "%s" em artefato de federação alheio/compartilhado — use o id público\n' "${kind}" "${rel}" "${mid}"
+        else
+          printf '  ✗ HARD [%s] %s: nome de "%s" presente — use o id público\n' "${kind}" "${rel}" "${mid}"
+        fi
+        viol=$((viol+1))
+      fi
+    done <<EOF
+${MEMBER_TERMS}
+EOF
+  done <<EOF
+$(find "${FED_ROOT}" -type f \( -name '*.md' -o -name '*.yaml' \) 2>/dev/null | sort)
+EOF
+
+  if [ "${FORMAT}" = "tsv" ]; then exit 0; fi
+  echo "=== Segurança de projeção — histórico de federação (mailbox-aware) ==="
+  echo "  Auditados : ${scanned} artefatos ativos (exclui members.yaml e _processed/)"
+  if [ "${viol}" -gt 0 ]; then
+    echo ""; echo "✗ REPROVA — ${viol} vazamento(s) cross-tenant/compartilhado."; exit 1
+  fi
+  echo "  ✓ nenhum nome comercial cruza mailbox nem entra em artefato compartilhado."
   exit 0
 fi
 
