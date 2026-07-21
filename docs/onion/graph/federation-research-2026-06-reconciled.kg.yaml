@@ -1,0 +1,1716 @@
+# Pesquisa de FEDERAÇÃO (jun/2026) modelada no KG + reconciliada contra a realidade de jul/2026.
+# Dogfood do gate de proveniência invertido: 10 documentos cujo conhecimento vivia FORA do grafo.
+# Camada audit. Nós de junho = plane DEV (o que a pesquisa acreditava); reconciliação = plane PROD.
+meta:
+  id: federation-research-2026-06-reconciled
+  schema_version: "1"
+  baseline: 2026-07-21
+  date: 2026-07-21
+nodes:
+  - id: G1_INTERRUPT_STATES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "A2A tem estados de interrupção nativos (input-required/auth-required) que pausam a task de forma retomável — ponto de acoplamento natural do gate humano assíncrono"
+  - id: G1_AUTH_REQUIRED_OOB
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "auth-required delega ao cliente, fora do protocolo A2A, a obtenção de credenciais/consentimento — autorização mora out-of-band, onde o maestro humano já está"
+  - id: G1_TRANSPORT_ONLY_AUTH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "Auth A2A é agent-card-driven e transport-only (sem identidade no payload); securitySchemes OpenAPI declaram OAuth2/OIDC/mTLS/apiKey"
+  - id: G1_OAUTH21_PKCE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "OAuth 2.1 (ainda draft IETF) torna PKCE obrigatório e exige exact-match de redirect URI — base de consentimento para o handshake gated"
+  - id: G1_RECEIVER_JWS_ANTIREPLAY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "O receptor DEVE verificar autenticidade antes de agir: JWS/JWT assinado (iss/aud/iat/exp/jti, JWKS por kid) + anti-replay por timestamp e jti single-use"
+  - id: G1_ANTI_SSRF
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "Anti-SSRF é normativo: servidor A2A não deve confiar cegamente em URL de cliente — allowlist + ownership challenge + egress firewall bloqueando privado/metadata"
+  - id: G1_RECEIVER_DEFENSE_DEPTH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "Defesa-em-profundidade do receptor (Agent Card assinado, TLS contra CA, parser patchado); A2A NÃO tem controle nativo contra prompt-injection cross-agent"
+  - id: G1_DURABLE_PAUSE_SIGNAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "O padrão mecânico do gate humano em protocolo async é durable-execution pause/resume por Signal (Temporal) — o Onion já realiza a metade durável via git-async (inbox commitado)"
+  - id: G1_AIP_PREPRINT_LOW_AUTHORITY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "AIP (Agent Identity Protocol, arXiv 2603.24775v1) existe e afirma delegação verificável cross-MCP/A2A, mas é preprint de autor único — confirmado-mas-baixa-autoridade, não doutrina"
+  - id: G1_GATED_HANDSHAKE_DESIGN
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "Veredito de desenho: o handshake a2a-live gated mapeia input-required/auth-required ao gate do maestro e roda o pin-integrity-check na fronteira transport→task do receptor — não inventa gate novo"
+  - id: G1_SIGNALS_ONLY_NOT_AUTONOMOUS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "O a2a-live deve transportar só sinais gated (contrato/anúncio), nunca conversas autônomas IA-fala-IA nem live-pull — decisão que permanece do maestro"
+  - id: G1_TRUST_BLOCK_DELEGATION_Q
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
+    label: "Deve o bloco trust:/members.yaml evoluir para delegação com escopo/consentimento propagável (linha AIP) quando/se o mercado consolidar o padrão?"
+  - id: G2_MCP_REGISTRY_OFICIAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f1"
+    label: "MCP Registry oficial existe desde set/2025 (Anthropic+GitHub+Microsoft+Block+PulseMCP), em preview — refuta a leitura forte de 'não existe padrão de descoberta'"
+  - id: G2_GOVERNANCA_NAMESPACE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f2"
+    label: "Governança do MCP Registry = namespace reverse-DNS + verificação OIDC/DNS + moderação reativa por denúncia"
+  - id: G2_CONFIANCA_NAO_RESOLVIDA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f3"
+    label: "Ecossistema declara 'descoberta resolvida, confiança não' — curadoria governada em escala continua não-resolvida (64,7M entradas p/ 1.691 pacotes reais, typosquatting persiste)"
+  - id: G2_DOCKER_MCP_CATALOG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f4"
+    label: "Docker MCP Catalog prova governança séria = assinatura + SBOM + provenance + commit-pinning, convergindo com a doutrina de pin do Onion"
+  - id: G2_BACKSTAGE_CITATION_FIX
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f5"
+    label: "Correção de citação: IBM/mcp-context-forge#2809 NÃO é a proposta Backstage travada (é EPIC do ContextForge); a proposta parada real é community-plugins#4034 + RFC#32062 — tese sobrevive, fonte fica mais honesta"
+  - id: G2_A2A_REGISTRY_ABERTO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f6"
+    label: "A2A padroniza o descritor (Agent Card em /.well-known/) mas declara explicitamente que não prescreve API padrão para registries curados — curadoria fica 'por sua conta'"
+  - id: G2_PROVENANCE_COMMIT_PADRAO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f7"
+    label: "Supply-chain de package registry (npm/Sigstore/SLSA) convergiu em provenance criptográfica ligada ao commit + OIDC Trusted Publishing como padrão de mercado"
+  - id: G2_CLAUDE_PLUGINS_ANALOGO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f8"
+    label: "Claude Code plugins (GA out/2025) já operam o par diretório vetado + marketplace com safety screening automático — análogo nativo da governança de registry"
+  - id: G2_DECISAO_MANTER_GATED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#resolução-do-gap"
+    label: "Insumo de decisão (não-doutrina): manter A2A/registry GATED e curar à mão é a postura que a própria evidência recomenda para a escala do Onion (5 membros) — members.yaml já é o sub-registry curado, pin já é a provenance-por-commit"
+  - id: G2_ACAO_ALINHAR_ESQUEMA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#resolução-do-gap"
+    label: "Ação barata proposta: ao ingerir members.yaml no graph.sh, alinhar esquema aos formatos emergentes (namespace reverse-DNS, Agent Card em well-known, tier trust verified|community visível, pin documentado como provenance-de-commit) sem comprometer o gate"
+  - id: G2_QUESTAO_GATILHO_SIGSTORE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f7"
+    label: "Se um adotante passar a rodar CI que publica artefatos consumidos por terceiros, quando vira barato/idiomático adotar provenance Sigstore/SLSA (hoje desnecessário na escala atual)?"
+  - id: G3_REPUTATION_GATES_TRUST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "RepuNet: reputação dual-level (agente+rede) via interação direta + gossip condiciona conectar/cortar par; participação sobe 19%→85%, sucesso de investimento 17%→98% (20 agentes GPT-4o-mini, simulação de teoria de jogos)"
+  - id: G3_TRUST_THRESHOLD_REMOVAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "Attention-based Trust Management: threshold de aceitação (score>τ) + remoção automática por taxa-de-violação (>80% em janela de 20) derruba ataque AiTM de 94,6%→23,5%, com <2% de perda de utilidade — análogo mais direto do veto Onion (trust-log + blocked_contracts)"
+  - id: G3_REPUTATION_DECENTRALIZED_GOSSIP
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "Reputação em MAS é peer-to-peer via gossip ponderado pela credibilidade do fofoqueiro, sem árbitro central — pode viajar pelo mesmo mesh git-async (CHANGELOG/inbox) do Onion, sem exigir serviço stateful novo"
+  - id: G3_REPUTATION_MATURITY_SIM_ONLY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "Reputação-condicionante do veto sai de 'teoria imatura' para 'evidência-simulação sólida, produção não-provada' (papers 2025-2026, benchmarks/simulação, não governança multi-org em produção) — deve ficar gated atrás de dogfood, não virar doutrina automática"
+  - id: G3_CRDT_REMOVES_SPOF_BUT_CAP_PRICED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "CRDT de fato remove o coordenador central como SPOF (fonte primária confirma S2·F11) — mas o preço é consistência eventual (não forte) + overhead de transmissão/metadados de tombstones"
+  - id: G3_SPLIT_BY_CAP_NOT_SCALE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "O corte central-vs-mesh é enraizado no teorema CAP (natureza do dado), não na escala do cluster: identidade/contratos exigem consistência forte (single-source); comunicação é estado colaborativo assíncrono (replicação otimista/mesh)"
+  - id: G3_GIT_ASYNC_IS_OPTIMISTIC_REPLICATION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "A comunicação git-async do Onion (doc-bridge co-*, CHANGELOG, inbox/inbound, um-escritor-por-repo) já É o modelo canônico de replicação otimista copy-modify-merge (Saito & Shapiro, MSR TR-2003-60) — não é analogia solta, é teoria de sistemas provada"
+  - id: G3_CRDT_VALUE_IDLE_SINGLE_WRITER
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "O valor-núcleo do CRDT (resolver escritas concorrentes de múltiplos escritores) fica ocioso num ledger de identidade/contratos de escritor único em N≈5 — CRDT é over-engineering não por ser cedo em escala, mas porque sua condição de uso não existe (implicação derivada, não citação literal)"
+  - id: G3_HUB_SPOKE_OPTIMAL_SMALL_SCALE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "Em escala pequena, control-plane central único (hub-and-spoke) é o ótimo operacional; o SPOF residual mitiga-se com HA + git append-only, não trocando por mesh — ressalva: o próprio Argo CD Agent descentraliza para reduzir esse SPOF, então 'remédio é só HA' é levemente forte"
+  - id: G3_DECISION_SINGLE_SOURCE_IDENTITY_MESH_COMMS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "Decisão proposta (insumo ao maestro, não doutrina ainda): single-source para identidade/contratos (consistência forte, escritor único) + mesh-de-comunicação git-async para colaboração (replicação otimista) — corte por natureza do dado, agora com fonte primária dos dois lados"
+  - id: G3_DECISION_REPUTATION_GATED_DOGFOOD
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "Decisão proposta: instrumentar o trust-log para acumular histórico primeiro, medir, e só então deixar reputação-por-evidência mexer no threshold do veto — não ligar reputação no veto sem dogfood prévio"
+  - id: G3_QUESTION_REPUTATION_VETO_THRESHOLD
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
+    label: "Como e quando o histórico de reputação verificado (trust-log acumulado) deve ajustar o threshold de aceitação/veto de um sinal ou par — pergunta em aberto até haver dogfood suficiente para medir"
+  - id: G4_AAIF_A2A_SEPARATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "AAIF não governa o A2A — são dois projetos separados da Linux Foundation (refuta o claim forte de F8, primário duplo: press release AAIF 09-dez-2025 lista só MCP/goose/AGENTS.md; press release A2A 09-abr-2026 chama A2A de 'another Linux Foundation project')"
+  - id: G4_AAIF_A2A_COMPLEMENTARY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "MCP (via AAIF) e A2A são ambos projetos LF, oficialmente descritos como complementares (MCP=vertical/tools, A2A=horizontal/peer) — claim atenuado que substitui a alegação falsa de co-governança/spec conjunta"
+  - id: G4_ARXIV_AIP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "arXiv:2603.24775 (AIP — Agent Identity Protocol, Sunil Prakash, mar/2026) existe e propõe Invocation-Bound Capability Tokens para delegação verificável cross-MCP/A2A; proposta acadêmica independente, não endossada por Anthropic/Google"
+  - id: G4_ARXIV_OVERLAYING_GOV
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "arXiv:2606.03518 (Overlaying Governance, Ibrahim & Li, jun/2026) existe — framework composicional de delegação/escopo com resource scope attenuation e accountability contratual"
+  - id: G4_ARXIV_ANUMATI
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "arXiv:2604.16524 (Anumati, Kadaboina, abr/2026) existe — modelo formal de proof-of-adherence/consent estendendo A2A e MCP, com spec TLA+ e implementação de referência"
+  - id: G4_DELEGATION_GATE_DECISION
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "Manter veredito de doutrina: delegação verificável cross-MCP/A2A é pesquisa ativa (3 papers acadêmicos verificados), não standard, não endossada por fornecedor — gate humano do maestro + trust SDAAL permanecem obrigatórios, adotar seria prematuro"
+  - id: G4_MCP_TOOLPOISONING_STAT_REFUTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "'30%+ de 1.800 servidores MCP com tool-poisoning' é conflação/superestimativa — número real do survey primário (arXiv:2506.13538, 1.899 servidores): 7,2% vuln geral, 5,5% tool-poisoning específico"
+  - id: G4_MCP_NO_AUTH_UNIVERSAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "Risco sistêmico real do MCP não é a % com vuln explorável, é a ausência quase universal de autenticação por padrão (~2.000 servidores escaneados pelo paper AIP: todos careciam de auth) — reforça never-clobber e ingestão gated mais que o número inflado"
+  - id: G4_BACKSTAGE_COST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "Custo self-host Backstage: ~$450k/ano (3 engenheiros), 6-12 meses até produção, TCO 1º ano > $800k — fonte é CEO de concorrente gerenciado (Roadie), viés direcional declarado"
+  - id: G4_BACKSTAGE_DECISION
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "Build-vs-buy do S3 (Backstage/Port = over-engineering caro para federação de ~5 membros) sobrevive mesmo descontando o viés de fornecedor — citar sempre com disclaimer de fonte-fornecedor"
+  - id: G4_MONOREPO_STAT_REFUTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 1
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "'63% das empresas com 50+ devs usam monorepo' é fabricado/não-sustentado — a fonte citada (nx.dev) não contém o número; busca ampla não achou survey confiável, só estudos de caso (Google, Meta, Microsoft, Uber)"
+  - id: G4_Q_MONOREPO_SIZE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.3
+    trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
+    label: "Qual o tamanho típico de um monorepo enterprise Nx? Sem número único confiável — único data point disponível é o teste Renovate citado em S2·F9 (198 deps / 14 workspaces), não uma média representativa"
+  - id: S1_A2A_MATURITY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "A2A amadureceu de experimento (Google, abr/2025) a standard de produção v1.0 (abr/2026) sob governança neutra LF, com 150+ orgs e adoção em Azure/AWS/GCP"
+  - id: S1_SSE_WEBHOOK_PAIR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "A2A converge em SSE (streaming quando conectado) + PushNotificationConfig/webhook (quando offline) + retomada via SubscribeToTask — o par de resiliência que falta ao Onion (metade viva)"
+  - id: S1_AGENT_CARD_REGISTRY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "AgentCard (/.well-known/agent-card.json) descreve skills/transporte/security schemes; members.yaml já é um agent-card registry offline equivalente"
+  - id: S1_AUTH_RECEIVER_SIDE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "A2A não cria identidade nova (reusa OAuth2.1/OIDC/mTLS via card); autorização/consent é sempre responsabilidade do agente remoto (receptor) — modelo canônico da aceitação gated que o Onion já pratica via trust: em members.yaml"
+  - id: S1_POLICY_AS_DATA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "Policy-as-data (OPA/Rego) aplica autorização na camada de tool-calling — a política decide, não o agente; members.yaml (trust/specializations/mode) já é policy-as-data, falta ser avaliado como política no targeting"
+  - id: S1_AGENT_SDK_HEADLESS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "Claude Agent SDK (subagents + Workflow tool + allowedTools/permissionMode deny-by-default) já roda no onion-bridge da VPS — é o motor pronto para um core falar ao vivo com outro core via A2A"
+  - id: S1_DURABLE_EXECUTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "Durable execution (AWS Lambda Durable Functions dez/2025, Azure Durable Task abr/2026, Temporal) cruzou para early majority: persistir fronteiras de execução e retomar sem repetir efeitos externos/mensagens de saída/aprovações"
+  - id: S1_MCP_A2A_LAYERS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "MCP (vertical: agente↔tools/dados) e A2A (horizontal: agente↔agente cross-vendor) são complementares por desenho — posiciona a federação Onion na camada A2A, não MCP"
+  - id: S1_AAIF_GOVERNS_BOTH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.35
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "Hipótese de que AAIF governa MCP e A2A com spec conjunta de interop declarada — verificação adversarial rebaixou a 'hypothesis': o press release primário da AAIF não menciona A2A entre os projetos-âncora nem declara spec conjunta"
+  - id: S1_IDENTITY_DELEGATION_RESEARCH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.3
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "Identidade/delegação verificável cross-MCP/A2A (AIP, frameworks de consent) é área de pesquisa ativa em arXiv 2026, não standard — IDs citados não verificados individualmente, tratar como direção futura do bloco trust:, não base de decisão"
+  - id: S1_EVIDENCE_ADVERSARIAL_VERIFICATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "Verificação adversarial (2026-07-09) checou as 15 fontes via WebFetch/WebSearch contra primários (LF press releases, spec oficial a2a-protocol.org, docs Anthropic/AWS): 13 confirmed, 2 hypothesis (F8, F15), nenhuma refutada por completo"
+  - id: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "Propõe federation-transport SDAAL com adapters git-async (default) | local (carteiro-local) | a2a-live (gated, SSE+webhook sobre claude-agent-sdk), seguindo o molde de task-manager/factory.md e forge/factory.md, com fallback gracioso e aceitação gated no lado receptor"
+  - id: S1_Q_GRAPH_INGEST_MEMBERS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "graph.sh ainda não ingere members.yaml — é a peça-ponte necessária para D2 (resolver destinatários por closure gated) e D4 (mapa de adoções derivado); precisa dessa costura antes de virar resolver de policy/registry"
+  - id: S1_Q_WEBHOOK_SECURITY
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
+    label: "Segurança do webhook A2A (SSRF na validação de URL, replay sem verificação de timestamp/JWT, card tampering) — o trust SDAAL precisa cobrir isso antes de ligar a2a-live; não decidido neste stream"
+  - id: S2_CATALOG_DERIVES_RELATIONS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "Backstage: catálogo spec-as-code é a camada de dados; relações (ownedBy/dependsOn/parentOf, tipadas e reversíveis) são DERIVADAS das entidades, não desenhadas à mão — espelho direto de members.yaml+graph.sh"
+  - id: S2_ATTRIBUTE_TARGETING
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "ArgoCD ApplicationSet generators (List/Cluster/Git-directory/Matrix): alvo é um seletor sobre atributos (labels/pastas), não enumeração manual por id — padrão-remédio direto para o ruído do campo alvo: no doc-bridge"
+  - id: S2_PULL_PLUS_WEBHOOK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "Flux notification controller: reconcile pull-based por intervalo continua a raiz; webhook receiver só acelera (dispara reconciliação imediata) sem virar push — valida o doc-bridge git-async como base correta"
+  - id: S2_HUBSPOKE_CONTROL_PLANE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "Argo CD Agent (hub-and-spoke, control plane central + agente leve remoto) e a doutrina control-plane=SSOT de config (per-tenant isola mas custa, não resolve o data plane) nomeiam a arquitetura para federação-de-federações core↔core (caso o membro regulado)"
+  - id: S2_SSOT_VS_MESH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "SSOT-central (members.yaml) vs mesh descentralizado (CRDT) para federação: trade-off arquitetural verdadeiro, mas a especificidade CRDT NÃO tem fonte primária (arXiv citado é sobre liqo/multi-cluster, não CRDT-sync) — rebaixado a hipótese pela verificação adversarial"
+  - id: S2_A2A_AGENT_CARD_DISCOVERY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "A2A Agent Card (JSON em URI well-known, discovery por registry search-by-skill, JSON-RPC/HTTP+SSE) é o análogo externo do personality_summary+specializations de members.yaml — mecanismo confirmado, mas achado tem drift factual (path correto é agent-card.json, não agent.json) e continua hipótese gated: hoje sem IA-fala-IA"
+  - id: S2_VENDOR_SUBTREE_SUBMODULE_HYBRID
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "Submodule (pin por consumidor) vs subtree (vendoring com patch local) vs registry versionado: /meta:adopt já é o híbrido subtree-like (never-clobber) + submodule-like (onion_version pin por membro) — confirma que o Onion escolheu o padrão certo para 5 membros, registry só valeria em escala muito maior"
+  - id: S2_ADVERSARIAL_FABRICATED_STATS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "Verificação adversarial (refetch de cada fonte) encontrou 3 números/atribuições fabricados ou não-fonteados que precisam ser removidos antes de virar doutrina: ArgoCD '30→5min / 3-4 engenheiros' (F4), Renovate '198 deps/14 workspaces/18 PRs' (F8), Nx '63% empresas 50+ devs usam monorepo' (F9) — nenhum achado central foi refutado, só specifics órfãos"
+  - id: S2_DECISION_GRAPH_INGEST_MEMBERS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "Costura proposta: graph.sh deve INGERIR members.yaml como fonte de nós (membros) e arestas (parent→adopts/adoptedBy, specializations→tags, trust.*→confiança), reusando o BFS existente (--impact/--path/--closure) para responder 'quem adota o quê' e emitir o mapa de adoções derivado (mata o desenho à mão)"
+  - id: S2_DECISION_SELECTOR_ALVO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "Costura proposta: /meta:co-announce passa a resolver alvo: como QUERY/seletor sobre campos que members.yaml já tem (specialization, mode, tier) em vez de per-id ou broadcast — zero campo novo no SSOT, só muda o resolver do alvo"
+  - id: S2_DECISION_FEDERATION_TRANSPORT_SDAAL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.65
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "Costura proposta: costurar federation-transport {git-async (default) | local (carteiro co-deliver/co-relay) | a2a-live (gated)} via SDAAL, no mesmo padrão factory do task-manager (api|mcp+fallback) — Federação formal (veto/rollback/ledger) é o control plane, o transport é o data plane; o membro regulado seria o primeiro consumidor a2a-live"
+  - id: S2_QUESTION_A2A_GATE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 2
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
+    label: "Quando (e se) o Onion habilita IA-fala-IA por doutrina, destravando o transporte a2a-live/Agent Card como implementação em vez de hipótese gated?"
+  - id: S3_BACKSTAGE_OVERKILL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "Self-hostar Backstage/Port é caro (US$450k+/ano, TCO 1º ano >US$800k, ~9 meses) e desalinhado para federação de 5 membros com maestro único — build-vs-buy pende para 'nenhum dos dois'"
+  - id: S3_MEMBERS_YAML_IS_GRAPH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "members.yaml já É o data-model de 'grafo dinâmico de entidades+relations' que portais como Port cobrariam para modelar (tier/role/specializations/mode/trust = schema+relations)"
+  - id: S3_CHANGELOG_EVENT_LOG
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "O CHANGELOG (campo alvo:) sobre git é, literalmente, um event store append-only de escritor único; o console deve ser uma projeção/read-model CQRS leve, nunca fonte"
+  - id: S3_MERMAID_FIRST_TOOLING
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "Escolha de lib de grafo é decidida pela forma do problema: Mermaid para diagrama estático/docs (regenerado de YAML), Cytoscape.js só se o grafo virar objeto de análise interativa, D3 é excesso"
+  - id: S3_STATIC_SITE_NO_BACKEND
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "Site estático (Alpine.js sobre feed.json/members.json + Caddy file_server, sem backend/DB) é o padrão maduro suficiente para console+mapa da federação"
+  - id: S3_ALPINE_WEAK_EVIDENCE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.4
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "F11 (Alpine.js 'sozinho é a melhor escolha', ~15KB, htmx exigiria backend) é o achado mais fraco do stream: a fonte primária não sustenta os específicos e chega a contradizer levemente o enquadramento do htmx — rebaixado a hypothesis pela verificação adversarial"
+  - id: S3_ARCH_MIN_DECISION
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "Arquitetura mínima proposta: members.yaml + CHANGELOG → graph.sh (com ingest novo) + script de projeção → map.mmd/feed.json/members.json → site estático Alpine.js → Caddy file_server em console.onionevolve.com, regenerado por hook/CI"
+  - id: S3_Q_TARGETING_FIX
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "O console expõe (via specializations/mode/trust) que o targeting alvo: hoje ignora esses sinais, mas ver não resolve o roteamento — o fix de P0-2 fica para outro stream. Qual?"
+  - id: S3_Q_P0_1_UNRESOLVED
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "P0-1 (core↔core vivo, o membro regulado isolada) não é resolvida por este stream de observabilidade — hipótese é que federation-transport (2º transporte a2a-live) é onde isso mora; o console só torna visível o que já trafega"
+  - id: S3_EV_BACKSTAGE_TCO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "roadie.io: 'at least three dedicated engineers', '$450,000 per year', 1º ano TCO 'exceeds $800,000', time-to-production '6-12 months', 'Backstage is not a developer portal, it's a framework for building one' (verbatim, verificado adversarialmente)"
+  - id: S3_EV_GRAPH_INGEST_GAP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
+    label: "Fato interno declarado no briefing: graph.sh ainda NÃO ingere members.yaml hoje — é o pré-requisito técnico de baixo esforço/alto retorno para o mapa derivado (F8) e para a arquitetura mínima proposta"
+  - id: S4_MULTI_AGENT_TOKEN_COST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f1"
+    label: "Multi-agente Anthropic supera agente único em 90,2% em pesquisa breadth-first mas consome ~15x mais tokens; Anthropic é explícita que domínios com contexto compartilhado ou muitas dependências não são bom fit para multi-agente"
+  - id: S4_MULTI_AGENT_CONTEXT_FAILURE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f2"
+    label: "Cognition (\"Don't Build Multi-Agents\"): fragilidade de subagentes paralelos vem de assumptions conflitantes e contexto faltante no sistema, não do número de agentes"
+  - id: S4_REPUTATION_GOSSIP
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f3"
+    label: "RepuNet (arxiv 2505.05029): sem rastreio de reputação, agentes MAS-LLM colapsam em defecção; reputação+gossip sustenta cooperação mais alta"
+  - id: S4_A2A_INTEROP
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f5"
+    label: "A2A (Linux Foundation, jun/2025): protocolo com Agent Cards JSON para descoberta de capacidade, HTTP+SSE+JSON-RPC 2.0 e OAuth2 para auth mútua sem compartilhar credenciais"
+  - id: S4_MCP_SUPPLY_CHAIN_RISK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f6"
+    label: "Tool-poisoning e supply-chain em MCP são risco real (backdoor postmark-mcp, CVE-2025-54136, OWASP MCP03:2025); estatística \"30%+ de 1.800 servidores\" veio superestimada na verificação (estudos comparáveis ~7%)"
+  - id: S4_COPILOT_ORG_INSTRUCTIONS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.25
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f7"
+    label: "Claim de que Copilot org-level GA (abr/2026) suporta config versionada em repo .github com audit+rollback+hierarquia enterprise→org conflou dois features distintos e citou fonte errada (feature real é de repo, não org-level; hierarquia real é personal>repo>org)"
+  - id: S4_CANONICAL_SOURCE_COMPILE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f8"
+    label: "Cursor/Windsurf: só regras commitadas no repo contam, regras globais por-dev \"drift silently\"; prática é manter fonte canônica e compilar para o formato nativo de cada ferramenta (fonte de baixa autoridade, tratado como hipótese)"
+  - id: S4_CONTROL_PLANE_MARKET
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f10"
+    label: "Mercado converge para control-planes gerenciados com observabilidade (MS Agent Framework 1.0 GA abr/2026, CrewAI AMP); detalhe \"hierarchical memory isolation\" da CrewAI não foi verificado em fonte primária"
+  - id: S4_DEC_TRANSPORT_SDAAL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#encaixe-nas-fundacoes"
+    label: "Proposta: criar federation-transport SDAAL com git-async como default (menor superfície de ataque) e a2a-live como opção opt-in transportando sinais gated (não conversa autônoma IA-fala-IA), endereçando P0-1 sem abrir o anti-padrão que Anthropic/Cognition sinalizam"
+  - id: S4_DEC_VPS_STATIC_FIRST
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#viabilidade-vps"
+    label: "Recomendação de viabilidade: atacar P0-4 (mapa derivado) e P0-3 (console) primeiro, como estáticos gerados na VPS reusando Caddy + graph.sh + federation-status, deixando P0-1 (a2a-live) para fase gated posterior"
+  - id: S4_Q_TARGETING_RESOLUTION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#p0-achado-menor-passo-de-reuso"
+    label: "Como resolver o campo alvo: do CHANGELOG por specialization/mode/tier do members.yaml (fatorando o conhecimento coletivo), em vez de per-id/broadcast, para corrigir o ruído P0-2 do targeting"
+  - id: S4_EV_ADVERSARIAL_VERIFICATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#verificacao-adversarial"
+    label: "Verificação adversarial (2026-07-09) contra fontes primárias via WebFetch/WebSearch: 9 de 12 achados materiais confirmados (F1,F3,F4,F5,F9,F11,F12 sólidos; F2/F6/F10 confirmados com ressalva), 2 rebaixados a hypothesis (F7, F8), nenhum refutado por completo"
+  - id: GAPS_A2A_INTERRUPT_NATIVE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "input-required/auth-required são estados nativos de interrupção retomável no A2A, onde o gate humano do maestro se acopla"
+  - id: GAPS_AUTH_REQUIRED_OOB
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "auth-required delega, por construção da spec, a obtenção de consentimento/credenciais 'fora do protocolo A2A' ao cliente"
+  - id: GAPS_PIN_INTEGRITY_A2A
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "A verificação de autenticidade exigida pela spec antes de agir (JWS/JWT, anti-replay por jti, anti-SSRF normativo) É o pin-integrity-check do lado A2A"
+  - id: GAPS_A2A_NO_PROMPT_INJECTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "A A2A não tem controle nativo contra prompt-injection cross-agent — argumento mais forte para o a2a-live transportar só sinais gated"
+  - id: GAPS_DECISION_A2A_LIVE_SIGNALS_ONLY
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "Decisão: o a2a-live (fase-2 gated) deve transportar só sinais gated, nunca conversas autônomas ou live-pull automático"
+  - id: GAPS_REGISTRY_DISCOVERY_SOLVED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "Descoberta de capacidade já está padronizada desde set/2025 (MCP Registry oficial, Docker MCP Catalog, Agent Card A2A, plugins Anthropic) — refuta 'não existe padrão pronto'"
+  - id: GAPS_REGISTRY_TRUST_UNSOLVED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "Curadoria/confiança governada em escala continua não-resolvida no mercado (64,7M entradas para 1.691 pacotes reais; typosquatting persistente)"
+  - id: GAPS_DECISION_KEEP_GATED_CURATION
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "Decisão: manter A2A/registry GATED e curar à mão via members.yaml + pin + validation — a própria evidência de mercado recomenda essa posição para ~5 membros"
+  - id: GAPS_REPUTATION_SIMULATION_EVIDENCE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "Reputação como gate de exclusão (RepuNet, Attention-Trust Management) é mecanismo real e forte, mas os números (85%, 23,5%) são de simulação/benchmark, não de produção"
+  - id: GAPS_QUESTION_REPUTATION_VETO_THRESHOLD
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "Quando instrumentar e medir o trust-log o suficiente para deixar a reputação mexer no threshold do veto (em vez de doutrina automática já nesta rodada)?"
+  - id: GAPS_CRDT_SPOF_CONFIRMED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "CRDT de fato remove o coordenador central como SPOF, mas precificado pelo CAP (consistência eventual, não forte) — S2·F11 passa de hipótese a confirmado"
+  - id: GAPS_DECISION_SINGLE_SOURCE_MESH
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "Veredito multi-core reforçado: single-source para identidade/contratos (recurso-exclusivo) + mesh git-async para comunicação (estado-colaborativo) + a2a-live gated"
+  - id: GAPS_MCP_TOOLPOISON_STATS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
+    label: "Estatística MCP tool-poisoning corrigida: 7,2% vuln geral / 5,5% tool-poisoning específico de 1.899 servidores (não '30%+ de 1.800'), mas ~2.000 servidores scanneados TODOS sem autenticação por padrão"
+  - id: SYNTHESIS.md_REUSE_NOT_INVENTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "O mercado já resolveu as peças que faltam ao Onion (Backstage, ArgoCD ApplicationSet, Flux, Argo CD Agent, A2A) — a jogada é reuso, não invenção"
+  - id: SYNTHESIS.md_GOVERNANCE_AHEAD_OBS_BEHIND
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "Onion está À FRENTE em governança (git-async gated, entrega-sem-commit, SSOT executável) e ATRÁS em observabilidade (falta onde VER e derivar o mapa)"
+  - id: SYNTHESIS.md_VPS_SUFFICES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "A VPS KVM 8 já basta: console e mapa são render estático do SSOT (members.yaml + CHANGELOG + graph.sh) via Caddy, sem backend/DB novo"
+  - id: SYNTHESIS.md_SINGLE_SOURCE_MESH
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "Recomendação: manter SSOT single-source para identidade/contratos e federar só a comunicação via mesh git-async (+a2a-live gated); NÃO promover o membro regulado a role:source"
+  - id: SYNTHESIS.md_GRAPH_SH_INGESTS_MEMBERS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "graph.sh precisa INGERIR members.yaml — pré-requisito técnico único de baixo esforço/alto retorno que habilita targeting, console e mapa"
+  - id: SYNTHESIS.md_FIRST_SLICE_ORDER
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "Ordem do 1º slice: (1) graph.sh ingere members.yaml, (2) targeting por seletor no alvo:, (3) console read-only, (4) receiver que acorda — sem exigir decisão de doutrina"
+  - id: SYNTHESIS.md_TARGETING_SCHEMA_OPEN
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "Esquema concreto do resolver de targeting (alvo: como query): sintaxe, precedência entre seletores, closure gated no graph.sh — ainda não pesquisado"
+  - id: SYNTHESIS.md_A2A_LIVE_HANDSHAKE_OPEN
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "Especificação do handshake a2a-live gated para o caso o membro regulado (regulado, integration_branch: develop, nunca live-pull) ainda não pesquisada"
+  - id: SYNTHESIS.md_A2A_RESILIENCE_PAIR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "Par de resiliência A2A (SSE conectado + webhook offline + lifecycle 8 estados + resubscribe) bate literalmente com a spec oficial; maturidade real v1.0, 150+ orgs, ACP fundido"
+  - id: SYNTHESIS.md_BACKSTAGE_COST_REJECTED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "Self-host Backstage para 5 membros seria over-engineering caro (3+ engenheiros, ~US$450k/ano, 6-12 meses) — descartado como caminho para o console"
+  - id: SYNTHESIS.md_TOOL_POISONING_STAT_DOWNGRADED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.3
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "Estatística \"30%+ de 1.800 servidores MCP com tool-poisoning\" foi rebaixada na verificação adversarial — estudos comparáveis dão ~7%; a ameaça em si (thrust) permanece confirmed"
+  - id: SYNTHESIS.md_CRDT_HYPOTHESIS_UNSOURCED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.3
+    trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
+    label: "\"Mesh-CRDT remove SPOF\" (S2·F11) é hypothesis: a especificidade CRDT não tem fonte primária (o arXiv citado é sobre liqo/multi-cluster K8s, não CRDT)"
+  - id: REC_TRANSPORT_SDAAL_BUILT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: ".claude/utils/federation-transport/README.md; .claude/utils/federation-transport/factory.md; .claude/utils/federation-transport/adapters/{git-async,local,a2a-live}.md; .claude/utils/federation-transport/detect-transport.sh"
+    label: "CONFIRMOU-SE: a abstração federation-transport SDAAL existe com os 3 adapters propostos em junho (git-async default | local | a2a-live gated), factory + interface + types + detect-transport.sh determinístico, com dispensas de anatomia declaradas"
+  - id: REC_SELECTOR_TARGETING_BUILT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: ".claude/utils/co-evolution/resolve-target.sh"
+    label: "CONFIRMOU-SE: o targeting por seletor (policy-as-data sobre mode/tier/specialization, com retrocompat todos|adotantes|<id>) foi implementado como resolve-target.sh (F1.2), reusando as triplas de membro do graph.sh — zero campo novo no SSOT, exatamente o desenho de junho"
+  - id: REC_GRAPH_INGESTS_MEMBERS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: ".claude/validation/graph.sh (linhas 18, 57-92, 158, 226-228); docs/onion/federation-map.md"
+    label: "CONFIRMOU-SE e FECHOU: graph.sh passou a ingerir members.yaml (triplas de membro: tier/adopts/mode/pin/specializations/trust/linhagens) e a emitir --map; o mapa de adoções é gerado, não desenhado à mão (docs/onion/federation-map.md, 2026-07-19)"
+  - id: REC_CONSOLE_SELF_CONTAINED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: ".claude/validation/federation-console.sh (cabeçalho + projeção python); docs/onion/federation-console.html (gerado 2026-07-20)"
+    label: "CONFIRMOU-SE em parte / REFUTOU em parte: o console existe como projeção CQRS estática sobre members.yaml + CHANGELOG (sem backend, sem DB, sem Backstage) — mas NÃO é o stack proposto em junho: é HTML self-contained com DADOS INLINE (CSP-safe, abre em file://), sem Alpine.js e sem feed.json/members.json a buscar"
+  - id: REC_CONSOLE_CONFIDENTIAL_LEAK
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: ".claude/validation/federation-console.sh (comentário da projeção de membros, regra 2026-07-09 + incidente 2026-07-10)"
+    label: "REFUTA 'projeção read-only é inócua': o console público vazou verbatim o campo name: de um membro, incluindo o marcador de confidencialidade que ele carrega (incidente 2026-07-10, já corrigido). A projeção precisou virar superfície com regra de sanitização (só o nome curto, parêntese é anotação interna) — read-model não é neutro quando o event-store carrega anotação do maestro"
+  - id: REC_A2A_RECEIVER_GATE_BUILT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: ".claude/utils/federation-transport/a2a-verify.sh; .claude/utils/federation-transport/a2a-ssrf-check.sh; .claude/utils/federation-transport/jwks/{metagamify-1,granaai-1}.pem; .claude/utils/federation-transport/adapters/a2a-live.md"
+    label: "CONFIRMOU-SE: a verificação-antes-de-agir do receptor existe e é executável — a2a-verify.sh (6 camadas, fail-safe, apply_mode propose-only p/ receptor regulado), a2a-ssrf-check.sh, JWKS com pubkeys PINADAS por kid (metagamify-1, granaai-1), a2a-accept.sh fila→inbox"
+  - id: REC_A2A_ENDPOINT_STATUS_FOUNDATION
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/evolution/federation/members.yaml (bloco a2a: do onion-evolve, status: foundation); .claude/utils/federation-transport/README.md (tabela de adapters); .claude/utils/federation-transport/adapters/a2a-live.md (linha 41)"
+    label: "REFUTA a 'metade viva entregue': o SSOT declara a2a.status: foundation ('endpoint vivo em construção, F2.2 fase-1') enquanto o README do transporte diz '✅ vivo (F2.2)' — contradição declarado≠verificado DENTRO do repo; e o adapter é explícito que o socket SSE/webhook é do bridge, FORA do gate. O par SSE+webhook segue não-provado no core"
+  - id: REC_SIGNALS_ONLY_RATIFIED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md §4-§6; .claude/utils/federation-transport/factory.md (a2a-live nunca auto)"
+    label: "CONFIRMOU-SE e virou doutrina: RFC-0004 ratifica 'só sinais gated, nunca IA-fala-IA autônoma', git-async de invariante absoluto para default-com-exceção-gated, a2a-live NUNCA auto-selecionado, fail-safe (ausência de gate válido = veto). A pergunta de junho sobre 'quando habilitar IA-fala-IA' foi respondida: gated sim, autônoma nunca"
+  - id: REC_MEMBERS_YAML_CURATED_REGISTRY
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/evolution/federation/members.yaml; .claude/validation/pin-integrity-check.sh; .claude/validation/a2a-agent-card.sh; .claude/validation/lint-artifacts.sh (REGRA 25, linha 648)"
+    label: "CONFIRMOU-SE: manter o registry GATED e curado à mão sustentou 9 membros — members.yaml é o sub-registry com pin verificado (pin-integrity-check.sh, nunca stamp declarado; histórico do pin FORJADO do metagamify), Agent Card em /.well-known/ gerado e guardado por lint HARD (REGRA 25)"
+  - id: REC_NO_REVERSE_DNS_NAMESPACE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-07-21
+    trace: "docs/evolution/federation/members.yaml (ids dos 9 membros); docs/onion/agent-card.json"
+    label: "REFUTA metade da 'ação barata' de junho: o esquema NÃO foi alinhado aos formatos emergentes — ids seguem slugs planos (onion-evolve, granaai, gustavo-pulga), sem namespace reverse-DNS e sem tier trust verified|community. Só o Agent Card em well-known e o pin-como-provenance-de-commit foram adotados"
+  - id: REC_STAGING_ROT_AND_MISSING_MAILBOX
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: "git 83a7830; git 419a390; .claude/validation/lint-artifacts.sh (REGRA 28, linhas 670-741); /home/marcio/onion-pessoal/docs/evolution/inbound/"
+    label: "REFUTA o enquadramento de junho (o gargalo era protocolo/liveness): o que travou de fato foi mundano — 11 anúncios apodreceram em staging até 13 dias (4 arquivados em 83a7830; 6 de marcio-pessoal + 1 órfão de onion-hub em 419a390) porque um membro method-only (onion_version: n/a) NÃO TINHA CAIXA POSTAL. Fix: caixa postal ≠ framework (inbound/ sem vendorizar) + lint REGRA 28 (SOFT, 3 classes) para o repo sozinho decidir 'este membro tem canal?'"
+  - id: REC_PIN_DRIFT_REAL_HEALTH_METRIC
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: "git rev-list --count c9eb2c40bc3b..HEAD = 292; git rev-list --count b8208cc1a3da..91d5dbb05a6d = 42; docs/evolution/federation/members.yaml (granaai onion_version, gustavo-pulga onion_version); /home/marcio/gustavo-pulga/.claude/.onion-version"
+    label: "REFUTA 'o híbrido subtree+pin é o padrão certo, resolvido': a métrica que doeu em julho foi drift de pin silencioso — gustavo-pulga está 292 commits atrás do core (pin c9eb2c40bc3b, verificado por rev-list) e granaai chegou a 42 atrás antes de a própria sessão do adotante atualizar em 2026-07-19 (b8208cc1a3da→91d5dbb05a6d, 13 atrás hoje). Nenhum dos 9 docs de junho modela envelhecimento de pin"
+  - id: REC_CONTRACT_DRIFT_GATE_EXISTS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: ".claude/validation/federation-status-scan.sh (linhas 3-19, 62-94); .claude/validation/federation-radar.sh"
+    label: "CONFIRMOU-SE: o corte 'identidade/contratos exigem escritor único e verificação forte' virou script — federation-status-scan.sh classifica contract-drift determinístico (in-sync|drift|unpublished) e federation-radar.sh dá o veredito advisory de saúde-de-verificação (4 checks declarado≠verificado, incl. anúncio-em-staging-não-transportado)"
+  - id: REC_GIT_ASYNC_STILL_DEFAULT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: ".claude/utils/federation-transport/factory.md (§divergência de default + fallback gracioso); .claude/utils/federation-transport/README.md (§Invariantes)"
+    label: "CONFIRMOU-SE: o mesh de comunicação git-async permaneceu o system-of-record e o fallback universal (default unset → git-async; qualquer indisponibilidade degrada p/ git-async; I3 entrega-sem-commit preservado em toda via) — o corte por natureza do dado sobreviveu ao contato com a realidade"
+  - id: REC_TRUST_LOG_NOT_ACCUMULATING
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/evolution/trust-log.md (9 linhas, mtime 2026-07-03); .claude/validation/trust-topology-check.sh (log_attempt/--dry-run)"
+    label: "REFUTA a metade operacional da decisão de junho ('instrumentar o trust-log para acumular histórico primeiro, depois medir'): o trust-log.md existe mas tem 9 linhas e não é escrito desde 2026-07-03 — em 17 dias de federação viva não acumulou amostra nenhuma. Reputação-condicionando-veto não está gated por dogfood, está gated por AUSÊNCIA DE DADO"
+  - id: REC_FABRICATED_CITATIONS_INSTITUTIONALIZED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "git 77b701d; docs/knowledge-base/concepts/agent-orchestration.md"
+    label: "CONFIRMOU-SE o padrão que a verificação adversarial de junho encontrou: números fabricados/órfãos continuam aparecendo e agora são corrigidos como rotina — commit 77b701d ('sync model tiering and session caps with verified sources; fix fabricated citations') tocou 5 KBs e a skill de orquestração"
+  - id: REC_Q_A2A_LIVE_TRAFFIC_UNVERIFIED
+    node_type: question
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.3
+    verified_at: 2026-07-21
+    trace: "docs/evolution/federation/members.yaml (granaai a2a: PREPARADO, não ativado); docs/evolution/federation/CHANGELOG.md (última entrada a2a: 2026-07-10 linha 342)"
+    label: "NÃO VERIFIQUEI: se houve tráfego a2a-live REAL além do 1º handshake de 2026-07-09 (metagamify). Não achei no repo fila data/a2a-pending, log de aceitação nem entrada de CHANGELOG posterior atestando sinal recebido pelo canal vivo; granaai está PREPARADO-não-ativado. O canal pode estar vivo-por-declaração e ocioso-de-fato — fica aberto"
+edges:
+  - from: G1_INTERRUPT_STATES
+    to: G1_GATED_HANDSHAKE_DESIGN
+    edge_type: SUPPORTS
+  - from: G1_AUTH_REQUIRED_OOB
+    to: G1_GATED_HANDSHAKE_DESIGN
+    edge_type: SUPPORTS
+  - from: G1_TRANSPORT_ONLY_AUTH
+    to: G1_GATED_HANDSHAKE_DESIGN
+    edge_type: SUPPORTS
+  - from: G1_TRANSPORT_ONLY_AUTH
+    to: G1_OAUTH21_PKCE
+    edge_type: DEPENDS_ON
+  - from: G1_RECEIVER_JWS_ANTIREPLAY
+    to: G1_GATED_HANDSHAKE_DESIGN
+    edge_type: SUPPORTS
+  - from: G1_ANTI_SSRF
+    to: G1_GATED_HANDSHAKE_DESIGN
+    edge_type: SUPPORTS
+  - from: G1_RECEIVER_DEFENSE_DEPTH
+    to: G1_GATED_HANDSHAKE_DESIGN
+    edge_type: SUPPORTS
+  - from: G1_DURABLE_PAUSE_SIGNAL
+    to: G1_GATED_HANDSHAKE_DESIGN
+    edge_type: SUPPORTS
+  - from: G1_RECEIVER_DEFENSE_DEPTH
+    to: G1_SIGNALS_ONLY_NOT_AUTONOMOUS
+    edge_type: CAUSES
+  - from: G1_GATED_HANDSHAKE_DESIGN
+    to: G1_SIGNALS_ONLY_NOT_AUTONOMOUS
+    edge_type: DEPENDS_ON
+  - from: G1_AIP_PREPRINT_LOW_AUTHORITY
+    to: G1_TRUST_BLOCK_DELEGATION_Q
+    edge_type: SUPPORTS
+  - from: G2_GOVERNANCA_NAMESPACE
+    to: G2_MCP_REGISTRY_OFICIAL
+    edge_type: DEPENDS_ON
+  - from: G2_CONFIANCA_NAO_RESOLVIDA
+    to: G2_DECISAO_MANTER_GATED
+    edge_type: SUPPORTS
+  - from: G2_A2A_REGISTRY_ABERTO
+    to: G2_DECISAO_MANTER_GATED
+    edge_type: SUPPORTS
+  - from: G2_BACKSTAGE_CITATION_FIX
+    to: G2_DECISAO_MANTER_GATED
+    edge_type: SUPPORTS
+  - from: G2_DOCKER_MCP_CATALOG
+    to: G2_DECISAO_MANTER_GATED
+    edge_type: SUPPORTS
+  - from: G2_MCP_REGISTRY_OFICIAL
+    to: G2_ACAO_ALINHAR_ESQUEMA
+    edge_type: SUPPORTS
+  - from: G2_PROVENANCE_COMMIT_PADRAO
+    to: G2_ACAO_ALINHAR_ESQUEMA
+    edge_type: SUPPORTS
+  - from: G2_CLAUDE_PLUGINS_ANALOGO
+    to: G2_ACAO_ALINHAR_ESQUEMA
+    edge_type: SUPPORTS
+  - from: G2_DOCKER_MCP_CATALOG
+    to: G2_PROVENANCE_COMMIT_PADRAO
+    edge_type: SUPPORTS
+  - from: G2_PROVENANCE_COMMIT_PADRAO
+    to: G2_QUESTAO_GATILHO_SIGSTORE
+    edge_type: CAUSES
+  - from: G3_REPUTATION_GATES_TRUST
+    to: G3_DECISION_REPUTATION_GATED_DOGFOOD
+    edge_type: SUPPORTS
+  - from: G3_TRUST_THRESHOLD_REMOVAL
+    to: G3_DECISION_REPUTATION_GATED_DOGFOOD
+    edge_type: SUPPORTS
+  - from: G3_REPUTATION_DECENTRALIZED_GOSSIP
+    to: G3_DECISION_REPUTATION_GATED_DOGFOOD
+    edge_type: SUPPORTS
+  - from: G3_REPUTATION_MATURITY_SIM_ONLY
+    to: G3_DECISION_REPUTATION_GATED_DOGFOOD
+    edge_type: SUPPORTS
+  - from: G3_DECISION_REPUTATION_GATED_DOGFOOD
+    to: G3_QUESTION_REPUTATION_VETO_THRESHOLD
+    edge_type: CAUSES
+  - from: G3_REPUTATION_DECENTRALIZED_GOSSIP
+    to: G3_SPLIT_BY_CAP_NOT_SCALE
+    edge_type: SUPPORTS
+  - from: G3_CRDT_REMOVES_SPOF_BUT_CAP_PRICED
+    to: G3_SPLIT_BY_CAP_NOT_SCALE
+    edge_type: CAUSES
+  - from: G3_SPLIT_BY_CAP_NOT_SCALE
+    to: G3_DECISION_SINGLE_SOURCE_IDENTITY_MESH_COMMS
+    edge_type: SUPPORTS
+  - from: G3_GIT_ASYNC_IS_OPTIMISTIC_REPLICATION
+    to: G3_DECISION_SINGLE_SOURCE_IDENTITY_MESH_COMMS
+    edge_type: SUPPORTS
+  - from: G3_CRDT_VALUE_IDLE_SINGLE_WRITER
+    to: G3_DECISION_SINGLE_SOURCE_IDENTITY_MESH_COMMS
+    edge_type: SUPPORTS
+  - from: G3_HUB_SPOKE_OPTIMAL_SMALL_SCALE
+    to: G3_DECISION_SINGLE_SOURCE_IDENTITY_MESH_COMMS
+    edge_type: SUPPORTS
+  - from: G3_CRDT_REMOVES_SPOF_BUT_CAP_PRICED
+    to: G3_CRDT_VALUE_IDLE_SINGLE_WRITER
+    edge_type: DEPENDS_ON
+  - from: G4_AAIF_A2A_COMPLEMENTARY
+    to: G4_AAIF_A2A_SEPARATE
+    edge_type: DEPENDS_ON
+  - from: G4_ARXIV_AIP
+    to: G4_DELEGATION_GATE_DECISION
+    edge_type: SUPPORTS
+  - from: G4_ARXIV_OVERLAYING_GOV
+    to: G4_DELEGATION_GATE_DECISION
+    edge_type: SUPPORTS
+  - from: G4_ARXIV_ANUMATI
+    to: G4_DELEGATION_GATE_DECISION
+    edge_type: SUPPORTS
+  - from: G4_ARXIV_AIP
+    to: G4_MCP_NO_AUTH_UNIVERSAL
+    edge_type: SUPPORTS
+  - from: G4_MCP_NO_AUTH_UNIVERSAL
+    to: G4_MCP_TOOLPOISONING_STAT_REFUTED
+    edge_type: SUPERSEDES
+  - from: G4_BACKSTAGE_COST
+    to: G4_BACKSTAGE_DECISION
+    edge_type: SUPPORTS
+  - from: G4_MONOREPO_STAT_REFUTED
+    to: G4_Q_MONOREPO_SIZE
+    edge_type: CAUSES
+  - from: S1_SSE_WEBHOOK_PAIR
+    to: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    edge_type: SUPPORTS
+  - from: S1_POLICY_AS_DATA
+    to: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    edge_type: SUPPORTS
+  - from: S1_AGENT_CARD_REGISTRY
+    to: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    edge_type: SUPPORTS
+  - from: S1_AUTH_RECEIVER_SIDE
+    to: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    edge_type: SUPPORTS
+  - from: S1_AGENT_SDK_HEADLESS
+    to: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    edge_type: SUPPORTS
+  - from: S1_DURABLE_EXECUTION
+    to: S1_SSE_WEBHOOK_PAIR
+    edge_type: SUPPORTS
+  - from: S1_MCP_A2A_LAYERS
+    to: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    edge_type: SUPPORTS
+  - from: S1_EVIDENCE_ADVERSARIAL_VERIFICATION
+    to: S1_A2A_MATURITY
+    edge_type: SUPPORTS
+  - from: S1_EVIDENCE_ADVERSARIAL_VERIFICATION
+    to: S1_AAIF_GOVERNS_BOTH
+    edge_type: REFUTES
+  - from: S1_A2A_MATURITY
+    to: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    edge_type: SUPPORTS
+  - from: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    to: S1_Q_GRAPH_INGEST_MEMBERS
+    edge_type: DEPENDS_ON
+  - from: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    to: S1_Q_WEBHOOK_SECURITY
+    edge_type: DEPENDS_ON
+  - from: S1_IDENTITY_DELEGATION_RESEARCH
+    to: S1_Q_WEBHOOK_SECURITY
+    edge_type: SUPPORTS
+  - from: S2_CATALOG_DERIVES_RELATIONS
+    to: S2_DECISION_GRAPH_INGEST_MEMBERS
+    edge_type: SUPPORTS
+  - from: S2_ATTRIBUTE_TARGETING
+    to: S2_DECISION_SELECTOR_ALVO
+    edge_type: SUPPORTS
+  - from: S2_PULL_PLUS_WEBHOOK
+    to: S2_DECISION_FEDERATION_TRANSPORT_SDAAL
+    edge_type: SUPPORTS
+  - from: S2_HUBSPOKE_CONTROL_PLANE
+    to: S2_DECISION_FEDERATION_TRANSPORT_SDAAL
+    edge_type: SUPPORTS
+  - from: S2_A2A_AGENT_CARD_DISCOVERY
+    to: S2_DECISION_FEDERATION_TRANSPORT_SDAAL
+    edge_type: SUPPORTS
+  - from: S2_A2A_AGENT_CARD_DISCOVERY
+    to: S2_QUESTION_A2A_GATE
+    edge_type: DEPENDS_ON
+  - from: S2_SSOT_VS_MESH
+    to: S2_HUBSPOKE_CONTROL_PLANE
+    edge_type: DEPENDS_ON
+  - from: S2_ADVERSARIAL_FABRICATED_STATS
+    to: S2_DECISION_FEDERATION_TRANSPORT_SDAAL
+    edge_type: DEPENDS_ON
+  - from: S3_EV_BACKSTAGE_TCO
+    to: S3_BACKSTAGE_OVERKILL
+    edge_type: SUPPORTS
+  - from: S3_BACKSTAGE_OVERKILL
+    to: S3_ARCH_MIN_DECISION
+    edge_type: SUPPORTS
+  - from: S3_MEMBERS_YAML_IS_GRAPH
+    to: S3_ARCH_MIN_DECISION
+    edge_type: SUPPORTS
+  - from: S3_CHANGELOG_EVENT_LOG
+    to: S3_ARCH_MIN_DECISION
+    edge_type: SUPPORTS
+  - from: S3_MERMAID_FIRST_TOOLING
+    to: S3_ARCH_MIN_DECISION
+    edge_type: SUPPORTS
+  - from: S3_STATIC_SITE_NO_BACKEND
+    to: S3_ARCH_MIN_DECISION
+    edge_type: SUPPORTS
+  - from: S3_ALPINE_WEAK_EVIDENCE
+    to: S3_STATIC_SITE_NO_BACKEND
+    edge_type: REFUTES
+  - from: S3_ARCH_MIN_DECISION
+    to: S3_EV_GRAPH_INGEST_GAP
+    edge_type: DEPENDS_ON
+  - from: S3_Q_TARGETING_FIX
+    to: S3_MEMBERS_YAML_IS_GRAPH
+    edge_type: DEPENDS_ON
+  - from: S3_Q_P0_1_UNRESOLVED
+    to: S3_CHANGELOG_EVENT_LOG
+    edge_type: DEPENDS_ON
+  - from: S4_EV_ADVERSARIAL_VERIFICATION
+    to: S4_MULTI_AGENT_TOKEN_COST
+    edge_type: SUPPORTS
+  - from: S4_EV_ADVERSARIAL_VERIFICATION
+    to: S4_MULTI_AGENT_CONTEXT_FAILURE
+    edge_type: SUPPORTS
+  - from: S4_EV_ADVERSARIAL_VERIFICATION
+    to: S4_A2A_INTEROP
+    edge_type: SUPPORTS
+  - from: S4_EV_ADVERSARIAL_VERIFICATION
+    to: S4_REPUTATION_GOSSIP
+    edge_type: SUPPORTS
+  - from: S4_EV_ADVERSARIAL_VERIFICATION
+    to: S4_MCP_SUPPLY_CHAIN_RISK
+    edge_type: SUPPORTS
+  - from: S4_EV_ADVERSARIAL_VERIFICATION
+    to: S4_COPILOT_ORG_INSTRUCTIONS
+    edge_type: REFUTES
+  - from: S4_MULTI_AGENT_TOKEN_COST
+    to: S4_DEC_TRANSPORT_SDAAL
+    edge_type: SUPPORTS
+  - from: S4_MULTI_AGENT_CONTEXT_FAILURE
+    to: S4_Q_TARGETING_RESOLUTION
+    edge_type: CAUSES
+  - from: S4_DEC_TRANSPORT_SDAAL
+    to: S4_MCP_SUPPLY_CHAIN_RISK
+    edge_type: DEPENDS_ON
+  - from: S4_A2A_INTEROP
+    to: S4_DEC_TRANSPORT_SDAAL
+    edge_type: SUPPORTS
+  - from: S4_CANONICAL_SOURCE_COMPILE
+    to: S4_DEC_VPS_STATIC_FIRST
+    edge_type: SUPPORTS
+  - from: S4_CONTROL_PLANE_MARKET
+    to: S4_DEC_VPS_STATIC_FIRST
+    edge_type: SUPPORTS
+  - from: GAPS_A2A_INTERRUPT_NATIVE
+    to: GAPS_DECISION_A2A_LIVE_SIGNALS_ONLY
+    edge_type: SUPPORTS
+  - from: GAPS_AUTH_REQUIRED_OOB
+    to: GAPS_A2A_INTERRUPT_NATIVE
+    edge_type: DEPENDS_ON
+  - from: GAPS_AUTH_REQUIRED_OOB
+    to: GAPS_DECISION_A2A_LIVE_SIGNALS_ONLY
+    edge_type: SUPPORTS
+  - from: GAPS_PIN_INTEGRITY_A2A
+    to: GAPS_DECISION_A2A_LIVE_SIGNALS_ONLY
+    edge_type: SUPPORTS
+  - from: GAPS_A2A_NO_PROMPT_INJECTION
+    to: GAPS_DECISION_A2A_LIVE_SIGNALS_ONLY
+    edge_type: SUPPORTS
+  - from: GAPS_REGISTRY_DISCOVERY_SOLVED
+    to: GAPS_DECISION_KEEP_GATED_CURATION
+    edge_type: SUPPORTS
+  - from: GAPS_REGISTRY_TRUST_UNSOLVED
+    to: GAPS_DECISION_KEEP_GATED_CURATION
+    edge_type: SUPPORTS
+  - from: GAPS_MCP_TOOLPOISON_STATS
+    to: GAPS_DECISION_KEEP_GATED_CURATION
+    edge_type: SUPPORTS
+  - from: GAPS_REPUTATION_SIMULATION_EVIDENCE
+    to: GAPS_QUESTION_REPUTATION_VETO_THRESHOLD
+    edge_type: CAUSES
+  - from: GAPS_CRDT_SPOF_CONFIRMED
+    to: GAPS_DECISION_SINGLE_SOURCE_MESH
+    edge_type: SUPPORTS
+  - from: SYNTHESIS.md_A2A_RESILIENCE_PAIR
+    to: SYNTHESIS.md_REUSE_NOT_INVENTION
+    edge_type: SUPPORTS
+  - from: SYNTHESIS.md_BACKSTAGE_COST_REJECTED
+    to: SYNTHESIS.md_VPS_SUFFICES
+    edge_type: SUPPORTS
+  - from: SYNTHESIS.md_CRDT_HYPOTHESIS_UNSOURCED
+    to: SYNTHESIS.md_SINGLE_SOURCE_MESH
+    edge_type: SUPPORTS
+  - from: SYNTHESIS.md_TOOL_POISONING_STAT_DOWNGRADED
+    to: SYNTHESIS.md_A2A_LIVE_HANDSHAKE_OPEN
+    edge_type: SUPPORTS
+  - from: SYNTHESIS.md_A2A_LIVE_HANDSHAKE_OPEN
+    to: SYNTHESIS.md_SINGLE_SOURCE_MESH
+    edge_type: DEPENDS_ON
+  - from: SYNTHESIS.md_FIRST_SLICE_ORDER
+    to: SYNTHESIS.md_GRAPH_SH_INGESTS_MEMBERS
+    edge_type: DEPENDS_ON
+  - from: SYNTHESIS.md_TARGETING_SCHEMA_OPEN
+    to: SYNTHESIS.md_GRAPH_SH_INGESTS_MEMBERS
+    edge_type: DEPENDS_ON
+  - from: SYNTHESIS.md_GOVERNANCE_AHEAD_OBS_BEHIND
+    to: SYNTHESIS.md_VPS_SUFFICES
+    edge_type: SUPPORTS
+  - from: REC_TRANSPORT_SDAAL_BUILT
+    to: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
+    edge_type: SUPPORTS
+  - from: REC_TRANSPORT_SDAAL_BUILT
+    to: S2_DECISION_FEDERATION_TRANSPORT_SDAAL
+    edge_type: SUPPORTS
+  - from: REC_SELECTOR_TARGETING_BUILT
+    to: S2_DECISION_SELECTOR_ALVO
+    edge_type: SUPPORTS
+  - from: REC_SELECTOR_TARGETING_BUILT
+    to: S2_ATTRIBUTE_TARGETING
+    edge_type: SUPPORTS
+  - from: REC_SELECTOR_TARGETING_BUILT
+    to: S1_POLICY_AS_DATA
+    edge_type: SUPPORTS
+  - from: REC_SELECTOR_TARGETING_BUILT
+    to: S3_Q_TARGETING_FIX
+    edge_type: SUPERSEDES
+  - from: REC_GRAPH_INGESTS_MEMBERS
+    to: S2_DECISION_GRAPH_INGEST_MEMBERS
+    edge_type: SUPPORTS
+  - from: REC_GRAPH_INGESTS_MEMBERS
+    to: S1_Q_GRAPH_INGEST_MEMBERS
+    edge_type: SUPERSEDES
+  - from: REC_GRAPH_INGESTS_MEMBERS
+    to: S3_EV_GRAPH_INGEST_GAP
+    edge_type: SUPERSEDES
+  - from: REC_GRAPH_INGESTS_MEMBERS
+    to: S2_CATALOG_DERIVES_RELATIONS
+    edge_type: SUPPORTS
+  - from: REC_CONSOLE_SELF_CONTAINED
+    to: S3_BACKSTAGE_OVERKILL
+    edge_type: SUPPORTS
+  - from: REC_CONSOLE_SELF_CONTAINED
+    to: S3_STATIC_SITE_NO_BACKEND
+    edge_type: SUPPORTS
+  - from: REC_CONSOLE_SELF_CONTAINED
+    to: S3_MEMBERS_YAML_IS_GRAPH
+    edge_type: SUPPORTS
+  - from: REC_CONSOLE_SELF_CONTAINED
+    to: S3_ALPINE_WEAK_EVIDENCE
+    edge_type: REFUTES
+  - from: REC_CONSOLE_SELF_CONTAINED
+    to: S3_ARCH_MIN_DECISION
+    edge_type: SUPERSEDES
+  - from: REC_CONSOLE_CONFIDENTIAL_LEAK
+    to: S3_CHANGELOG_EVENT_LOG
+    edge_type: REFUTES
+  - from: REC_A2A_RECEIVER_GATE_BUILT
+    to: G1_RECEIVER_JWS_ANTIREPLAY
+    edge_type: SUPPORTS
+  - from: REC_A2A_RECEIVER_GATE_BUILT
+    to: G1_ANTI_SSRF
+    edge_type: SUPPORTS
+  - from: REC_A2A_RECEIVER_GATE_BUILT
+    to: G1_GATED_HANDSHAKE_DESIGN
+    edge_type: SUPPORTS
+  - from: REC_A2A_RECEIVER_GATE_BUILT
+    to: S1_AUTH_RECEIVER_SIDE
+    edge_type: SUPPORTS
+  - from: REC_A2A_RECEIVER_GATE_BUILT
+    to: G1_AUTH_REQUIRED_OOB
+    edge_type: SUPPORTS
+  - from: REC_A2A_RECEIVER_GATE_BUILT
+    to: S1_Q_WEBHOOK_SECURITY
+    edge_type: SUPERSEDES
+  - from: REC_A2A_ENDPOINT_STATUS_FOUNDATION
+    to: S1_SSE_WEBHOOK_PAIR
+    edge_type: REFUTES
+  - from: REC_A2A_ENDPOINT_STATUS_FOUNDATION
+    to: REC_A2A_RECEIVER_GATE_BUILT
+    edge_type: DEPENDS_ON
+  - from: REC_SIGNALS_ONLY_RATIFIED
+    to: G1_SIGNALS_ONLY_NOT_AUTONOMOUS
+    edge_type: SUPPORTS
+  - from: REC_SIGNALS_ONLY_RATIFIED
+    to: S2_QUESTION_A2A_GATE
+    edge_type: SUPERSEDES
+  - from: REC_SIGNALS_ONLY_RATIFIED
+    to: G1_RECEIVER_DEFENSE_DEPTH
+    edge_type: SUPPORTS
+  - from: REC_MEMBERS_YAML_CURATED_REGISTRY
+    to: G2_DECISAO_MANTER_GATED
+    edge_type: SUPPORTS
+  - from: REC_MEMBERS_YAML_CURATED_REGISTRY
+    to: G2_DOCKER_MCP_CATALOG
+    edge_type: SUPPORTS
+  - from: REC_MEMBERS_YAML_CURATED_REGISTRY
+    to: S1_AGENT_CARD_REGISTRY
+    edge_type: SUPPORTS
+  - from: REC_NO_REVERSE_DNS_NAMESPACE
+    to: G2_ACAO_ALINHAR_ESQUEMA
+    edge_type: REFUTES
+  - from: REC_STAGING_ROT_AND_MISSING_MAILBOX
+    to: S1_SSE_WEBHOOK_PAIR
+    edge_type: REFUTES
+  - from: REC_STAGING_ROT_AND_MISSING_MAILBOX
+    to: S2_A2A_AGENT_CARD_DISCOVERY
+    edge_type: REFUTES
+  - from: REC_STAGING_ROT_AND_MISSING_MAILBOX
+    to: S3_Q_P0_1_UNRESOLVED
+    edge_type: SUPERSEDES
+  - from: REC_PIN_DRIFT_REAL_HEALTH_METRIC
+    to: S2_VENDOR_SUBTREE_SUBMODULE_HYBRID
+    edge_type: REFUTES
+  - from: REC_PIN_DRIFT_REAL_HEALTH_METRIC
+    to: G2_PROVENANCE_COMMIT_PADRAO
+    edge_type: SUPPORTS
+  - from: REC_CONTRACT_DRIFT_GATE_EXISTS
+    to: G3_DECISION_SINGLE_SOURCE_IDENTITY_MESH_COMMS
+    edge_type: SUPPORTS
+  - from: REC_CONTRACT_DRIFT_GATE_EXISTS
+    to: G3_SPLIT_BY_CAP_NOT_SCALE
+    edge_type: SUPPORTS
+  - from: REC_GIT_ASYNC_STILL_DEFAULT
+    to: G3_GIT_ASYNC_IS_OPTIMISTIC_REPLICATION
+    edge_type: SUPPORTS
+  - from: REC_GIT_ASYNC_STILL_DEFAULT
+    to: G3_DECISION_SINGLE_SOURCE_IDENTITY_MESH_COMMS
+    edge_type: SUPPORTS
+  - from: REC_GIT_ASYNC_STILL_DEFAULT
+    to: S2_PULL_PLUS_WEBHOOK
+    edge_type: SUPPORTS
+  - from: REC_GIT_ASYNC_STILL_DEFAULT
+    to: G3_CRDT_VALUE_IDLE_SINGLE_WRITER
+    edge_type: SUPPORTS
+  - from: REC_TRUST_LOG_NOT_ACCUMULATING
+    to: G3_DECISION_REPUTATION_GATED_DOGFOOD
+    edge_type: REFUTES
+  - from: REC_TRUST_LOG_NOT_ACCUMULATING
+    to: G3_QUESTION_REPUTATION_VETO_THRESHOLD
+    edge_type: CAUSES
+  - from: REC_FABRICATED_CITATIONS_INSTITUTIONALIZED
+    to: S2_ADVERSARIAL_FABRICATED_STATS
+    edge_type: SUPPORTS
+  - from: REC_FABRICATED_CITATIONS_INSTITUTIONALIZED
+    to: G4_MONOREPO_STAT_REFUTED
+    edge_type: SUPPORTS
+  - from: REC_Q_A2A_LIVE_TRAFFIC_UNVERIFIED
+    to: REC_A2A_ENDPOINT_STATUS_FOUNDATION
+    edge_type: DEPENDS_ON

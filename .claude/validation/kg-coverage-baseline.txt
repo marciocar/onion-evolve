@@ -60,16 +60,6 @@ docs/analysis/onion-work-models-research-2026-07.md
 docs/analysis/panorama-ia-generativa-2026-06.md
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md
 docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md
-docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md
-docs/evolution/research/federation-2026/G2-governed-capability-registry.md
-docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md
-docs/evolution/research/federation-2026/G4-re-verify-downgraded.md
-docs/evolution/research/federation-2026/GAPS-ADDENDUM.md
-docs/evolution/research/federation-2026/S1-a2a-live-interop.md
-docs/evolution/research/federation-2026/S2-sync-federation-models.md
-docs/evolution/research/federation-2026/S3-observability-console-map.md
-docs/evolution/research/federation-2026/S4-competitors-academia-governance.md
-docs/evolution/research/federation-2026/SYNTHESIS.md
 docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md
 docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md
 docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md
