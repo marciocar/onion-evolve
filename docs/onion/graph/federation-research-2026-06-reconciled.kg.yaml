@@ -1266,6 +1266,639 @@ nodes:
     verified_at: 2026-07-21
     trace: "docs/evolution/federation/members.yaml (granaai a2a: PREPARADO, não ativado); docs/evolution/federation/CHANGELOG.md (última entrada a2a: 2026-07-10 linha 342)"
     label: "NÃO VERIFIQUEI: se houve tráfego a2a-live REAL além do 1º handshake de 2026-07-09 (metagamify). Não achei no repo fila data/a2a-pending, log de aceitação nem entrada de CHANGELOG posterior atestando sinal recebido pelo canal vivo; granaai está PREPARADO-não-ativado. O canal pode estar vivo-por-declaração e ocioso-de-fato — fica aberto"
+  - id: B2_1_a2a_adr_ssot
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#1-o-eixo-já-está-adjudicado-ssot"
+    label: "ADR A2A = projeção de formato, não runtime (SSOT, aceito 2026-06-15)"
+  - id: B2_1_external_signal
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.7
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#2-reconciliação-o-que-a-conversa-externa-acertou--e-o-que-perdeu"
+    label: "Conversa externa (share 332f6246) trata A2A como camada horizontal monolítica a adotar"
+  - id: B2_1_claim_no_delta
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#2-reconciliação-o-que-a-conversa-externa-acertou--e-o-que-perdeu"
+    label: "Sinal externo não traz delta: Onion já decidiu com mais granularidade (runtime × formato) do que a conversa propõe"
+  - id: B2_1_claim_runtime_forbidden
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#1-o-eixo-já-está-adjudicado-ssot"
+    label: "Runtime A2A (IA-fala-IA em tempo real) é linha vermelha inegociável, Fase 5 abandonada"
+  - id: B2_1_claim_format_deferred
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#1-o-eixo-já-está-adjudicado-ssot"
+    label: "Formato A2A (Agent Card como projeção one-way do members.yaml) é permitido em princípio mas diferido até 1º consumer não-Onion ou interop real"
+  - id: B2_1_claim_orthogonal_risk
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#3-desambiguação-crítica-corrige-leitura-comum"
+    label: "A2A é ortogonal ao risco: o risco real é o 'ato 3' (ler+interpretar+executar automático sem gate) + falta de atomicidade multi-repo no git, não a troca de mensagens em si"
+  - id: B2_1_evidence_single_consumer
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.9
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#4-estado-atual-e-gatilho-não-é-dívida-ativa"
+    label: "Hoje há um único consumidor (rhilo-metagamify), que é Onion — gatilho do ADR não disparou"
+  - id: B2_1_decision_no_action
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.85
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#4-estado-atual-e-gatilho-não-é-dívida-ativa"
+    label: "Nada a fazer no eixo A2A agora — construir a projeção de formato antes do gatilho seria especulação"
+  - id: B2_1_claim_pattern_across_axes
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#5-síntese--fechamento-do-radar-de-orquestração-3-eixos-percorridos"
+    label: "Padrão que atravessa TOPO/MATH/A2A: sinal externo valida o que o Onion já faz, ou o Onion já está à frente — nenhum eixo virou adoção cega"
+  - id: B2_1_decision_radar_closed
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#5-síntese--fechamento-do-radar-de-orquestração-3-eixos-percorridos"
+    label: "Radar de orquestração fechado nos 3 eixos (TOPO, MATH, A2A) — segue vivo para gatilhos futuros"
+  - id: B2_2_claim_core_mechanic_healthy
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#0-sumário"
+    label: "Núcleo mecânico da Federação formal está saudável (scripts rodam, fixtures passam, cross-refs resolvem); problemas reais são bug de código + guard vazio + drift de registro/vocabulário"
+  - id: B2_2_evidence_dogfood_scripts
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#0-sumário"
+    label: "Dogfood real dos workers: diary-index.sh (exit 0, INDEX vazio correto), trust-topology-check.sh (modo-de-falha revelou blocker #1), federation-contract-validate.sh (fixtures good→0/bad→1 ✓), scans com falha graciosa sem ledger (exit 2 ✓)"
+  - id: B2_2_claim_trust_topology_bug
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 1"
+    label: "id_in_list() em trust-topology-check.sh nunca casava os campos do bloco trust: (regex esperava 4 espaços, real 6, e não removia comentário inline) — campos granulares de confiança ficaram mortos"
+  - id: B2_2_decision_fix_trust_regex
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 1"
+    label: "Aplicado na mesma sessão: regex de indentação livre + strip de comentário antes de comparar; 11 cenários dogfoodados + novo modo trust-topology no lint-selftest (11 guardas permanentes)"
+  - id: B2_2_claim_adopt_guard_empty
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 2"
+    label: "Guard de identidade do /meta:adopt era estruturalmente vazio: onion-version.sh imprimia role: source hardcoded (vendorizado a todo adotante) — rodar adopt de instância adotada passaria no guard"
+  - id: B2_2_decision_fix_onion_version_role
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 2"
+    label: "Aplicado na mesma sessão: onion-version.sh passa a derivar o papel da presença do stamp .claude/.onion-version (sem campo → adopted fail-safe); novo modo onion-version no lint-selftest (3 guardas)"
+  - id: B2_2_claim_kb_schema_v1_stale
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 3"
+    label: "KB multi-repo-federation.md §3 documentava members.yaml em schema v1 obsoleto (version: 1, role producer/consumer/lib), fonte copiada por /meta:federation-register ao bootstrapar ledger — corrigido para v2/tiers"
+  - id: B2_2_claim_pin_drift
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 4"
+    label: "Pin drift: members.yaml registrava onion_version de sync 06-24, stamp real do adotante era 06-30 — registro 6 dias atrás da realidade (corrigido)"
+  - id: B2_2_question_adopted_at_semantics
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 5"
+    label: "adopted_at diverge entre members.yaml (2026-06-17) e stamp do adotante (2026-06-30); provável causa: --update re-carimba e perde histórico — decisão do maestro pendente (preservar original+updated_at, ou alinhar semânticas)"
+  - id: B2_2_claim_three_role_namespaces
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#3-alertas-transversais item 1"
+    label: "Três namespaces de 'role' nunca reconciliados nomeadamente: role de contrato (producer/consumers), role de membro (tiers RFC-0003), role de stamp (source/adopted) — causa comum de metade do backlog (itens #3, #6, #12, #13)"
+  - id: B2_2_claim_manual_sync_fails_silently
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#3-alertas-transversais item 2"
+    label: "Sync manual do registro falha silenciosamente (itens #4, #5, #7, #8, #14): members.yaml/RFC/backlogs ficam atrás ou à frente da realidade; candidato a guard determinístico comparando members.yaml vs stamps reais"
+  - id: B2_2_claim_machinery_ahead_of_gate
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#3-alertas-transversais item 3"
+    label: "Maquinaria à frente do gate: commit f07fe90 entregou F1 (diary) + campo de F2 + Trust SDAAL inteiro de F3 antes do gate de F1 (0/10 entradas de diário) — não viola gating externo, mas dilui sequenciamento interno da RFC-0003"
+  - id: B2_2_decision_kb_federation_usage_modes
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-audit-2026-07-01.md#6-insumos-para-a-síntese"
+    label: "Matriz de reconciliação (tier × modo de adoção × maquinaria × status) absorvida e expandida na KB federation-usage-modes.md, nomeando os 3 namespaces de role como fix estrutural"
+  - id: B2_4_review_v1_source
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L15-L18 (§1) + onion-federation-design-review-2026-06.md"
+    label: "Review adversarial de 42 agents ao design v1 (hub) achou 24/36 achados confirmados, incluindo SA-3 e SA-1"
+  - id: B2_4_sa3_spike_risk
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L16 (§1)"
+    label: "SA-3: hub v1 repousava num spike não-verificado — sessão Claude Code operar dir de outro repo como raiz de subagente; se falhar, fases cross-repo colapsam"
+  - id: B2_4_sa1_metaspec_violation
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L17 (§1)"
+    label: "SA-1: hub v1 criava estruturas que violam meta-specs L0 (.claude/federation/, novas categorias de comando/agente)"
+  - id: B2_4_pivot_hub_to_peer
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L5,L19 (§1)"
+    label: "Pivô decidido: abandonar topologia hub (orquestrador único sobre N dirs) por topologia peer — cada repo com Onion soberano, comunicação assíncrona via ledger git compartilhado, humano como maestro"
+  - id: B2_4_identity_guardrail
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L36-L46 (§2)"
+    label: "Guardrail de identidade: v2 fica Claude Code-nativo — sem runtime/CLI standalone, .onion/, packages/, multi-IDE; orquestração só em skill/comando; linha vermelha = instâncias vivas conversando em tempo real (A2A/MCP runtime distribuído)"
+  - id: B2_4_ledger_git_spine
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L57-L76 (§3)"
+    label: "Ledger git dedicado (\"federation spine\") é a SSOT de coordenação — members.yaml, contracts/<C>.md, CHANGELOG.md — montado em cada membro como additional working directory nativo, remote opcional (local-only ou GitHub/GitLab)"
+  - id: B2_4_safety_layers_relocated
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L96-L104 (§5)"
+    label: "As 5 camadas da máquina de segurança (\"não pode quebrar\") continuam, mas a validação migra para quem é dono do código — mais forte que no hub"
+  - id: B2_4_contract_tests_required
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L101-L102,L163,L165 (§5, §8)"
+    label: "Formato de contrato exige campo tests: (paths) + ≥1 fixture de payload por operação — contrato sem teste correspondente é violação blocker (contrato comportamental, não só sintático)"
+  - id: B2_4_member_expert_schema
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L89,L103,L164 (§4, §5, §8)"
+    label: "Validação local do consumer emite MemberExpertSchema {approved, blocked_contracts[], required_migrations[], reasoning}; ausência de output válido = veto (fail-safe)"
+  - id: B2_4_maestro_workflow
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L108-L124 (§6)"
+    label: "Workflow do maestro humano-in-the-loop explícito: change→publish (checkpoint escopo)→check em cada consumer→PRs coordenados (checkpoint review)→ordem de merge producer-primeiro→rollback coordenado se quebrar"
+  - id: B2_4_phase5_a2a_out_of_scope
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L150-L151 (§7, Fase 5)"
+    label: "Fase 5 (instâncias vivas A2A, premium/futuro) fica formalmente FORA DE ESCOPO do MVP — só costura/flag, exige nova aprovação de identidade"
+  - id: B2_4_phased_backlog
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md#L128-L151 (§7)"
+    label: "Backlog faseado de execução (Fase 0 spikes/gate-keeper → Fase 1 formato de contrato+bootstrap ledger MVP → Fase 2 publish/check → Fase 3 mudança cross-repo conduzida → Fase 4 MCP read-only opcional → Fase 5 A2A fora de escopo), cada fase = PR atômico, ainda não executado na data do doc"
+  - id: B2_5_claim_two_federations
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-review-2026-06.md:14-27"
+    label: "Existem duas 'federações' distintas: A2A (agentes vivos, protocolo runtime) e 'multi-repo federation' do Onion (repositórios soberanos coordenados via git assíncrono, humano-maestro)"
+  - id: B2_5_decision_no_a2a
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-review-2026-06.md:25"
+    label: "Onion abandonou formalmente A2A vivo/runtime distribuído em 2026-05-18 — linha vermelha 'nunca IA-fala-IA em tempo real'"
+  - id: B2_5_artifact_federation_commands
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-review-2026-06.md:29-38"
+    label: "Fases 1-3 entregues: 5 comandos /meta:federation-* (register/publish/check/status/rollback) + 3 scripts determinísticos sem LLM"
+  - id: B2_5_evidence_six_patterns
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-federation-review-2026-06.md:47-60"
+    label: "Os 6 padrões de consenso externo (jun/2026) de coordenação multi-repo batem quase 1:1 com o que o Onion implementou (spec-scoped tasks, worktree isolation, verifier, gates, sequential merge)"
+  - id: B2_5_claim_verdict_defensible
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-review-2026-06.md:77-83"
+    label: "A decisão de abandonar A2A vivo é defensável e bem fundamentada para o escopo declarado do Onion, com uma ressalva sobre interop de formato"
+  - id: B2_5_question_format_interop
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-federation-review-2026-06.md:83,91"
+    label: "O Onion deveria adotar o formato/semântica de descoberta A2A (Agent Cards) só como serialização de contrato, sem violar a linha vermelha de runtime vivo? Candidato a ADR"
+  - id: B2_5_evidence_a2a_adoption
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-review-2026-06.md:64,113"
+    label: "A2A é governado pela Linux Foundation com 150+ organizações (abril/2026) — Atlassian, Salesforce, SAP, ServiceNow, MongoDB, PayPal — números tratados como indicativos, mas o fato estrutural é cross-source"
+  - id: B2_5_claim_naming_gap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.75
+    trace: "docs/analysis/onion-federation-review-2026-06.md:27,87"
+    label: "Chamar a feature de 'federação de agentes' é nomenclatura enganosa em jun/2026 — um leitor técnico espera A2A e conclui erradamente que o Onion está atrasado; custa caro na comunicação externa"
+  - id: B2_5_decision_rename_recommendation
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-federation-review-2026-06.md:87"
+    label: "Recomendação: renomear nos materiais de divulgação de 'federação de agentes' para 'federação de repositórios contract-safe' / 'multi-repo contract federation'"
+  - id: B2_5_claim_unresolved_gaps
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    trace: "docs/analysis/onion-federation-review-2026-06.md:74,93"
+    label: "Gaps que o landscape diz que ninguém resolve (segurança adversarial em fan-out, break-even de custo, reprodutibilidade regulada) continuam abertos no Onion, herdados da camada de orquestração"
+  - id: B2_5_decision_argue_divergence
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-federation-review-2026-06.md:89"
+    label: "Recomendação: argumentar explicitamente a divergência A2A (subseção 'Por que não A2A e o que reavaliaríamos') em vez de apenas declará-la abandonada na KB"
+  - id: REC2_ADOPTED_AT_RESOLVED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/evolution/federation/members.yaml (linha 75, comentário do metagamify; gustavo-pulga updated_at: 2026-07-14); .claude/validation/lint-selftest.sh (modo write-stamp, linhas 1189-1206)"
+    label: "RESOLVEU a questão aberta #5 do audit de 01-jul: a semântica de adopted_at foi unificada — --update PRESERVA adopted_at e escreve updated_at separado; há guarda de selftest (write-stamp: fresh sem updated_at / update preserva) e um membro já carrega o par (gustavo-pulga 2026-07-09 + 2026-07-14). O stamp do rhilo ainda carrega o re-carimbo pré-fix, a ser restaurado no próximo --update"
+  - id: REC2_TRUST_TOPOLOGY_FIX_HELD
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: ".claude/validation/trust-topology-check.sh (id_in_list, linhas 88-105)"
+    label: "CONFIRMOU-SE que o fix do bug de regex sobreviveu 20 dias: id_in_list casa indentação livre (^[ ]+field:) e faz sub(/#.*$/) ANTES de comparar — exatamente as duas correções descritas no audit; os campos granulares de trust: voltaram a ser legíveis"
+  - id: REC2_ONION_VERSION_ROLE_DERIVED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: ".claude/validation/onion-version.sh (linhas 42-49, 56-64)"
+    label: "CONFIRMOU-SE: o guard de identidade deixou de ser vazio — onion-version.sh deriva role da presença do stamp .claude/.onion-version, e stamp presente sem campo role cai em 'adopted' (fail-safe). O hardcode role: source foi removido com comentário explicando a regressão original"
+  - id: REC2_KB_SCHEMA_V2_HELD
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/knowledge-base/concepts/multi-repo-federation.md (linha 95: version: 2)"
+    label: "CONFIRMOU-SE: a KB multi-repo-federation.md carrega members.yaml em schema v2 — a fonte que o /meta:federation-register copia ao bootstrapar ledger não propaga mais o schema v1 obsoleto"
+  - id: REC2_ROLE_NAMESPACES_NAMED_NOT_COLLAPSED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/knowledge-base/concepts/federation-usage-modes.md §1.1 (tabela dos três namespaces, linhas 61-70); docs/evolution/federation/members.yaml (role: source|hub|standalone + tier nos 9 membros)"
+    label: "CONFIRMOU-SE em parte / REFUTA 'fix estrutural': os 3 namespaces de role foram NOMEADOS numa tabela da KB (contrato / membro / stamp) — mas não colapsados: members.yaml segue carregando role: (source|hub|standalone|consumer) E tier lado a lado nos 9 membros. Nomear reduziu a confusão, não removeu a duplicidade de eixo"
+  - id: REC2_NO_CONTRACT_EVER_REGISTERED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: "docs/evolution/federation/ (só members.yaml, CHANGELOG.md, outbox/, onboarding-remote-member.md — SEM contracts/); .claude/validation/fixtures/contracts (únicos contratos existentes são fixtures de teste); grep -i 'rollback|federation-check' em docs/evolution/federation/CHANGELOG.md = 0 ocorrências"
+    label: "REFUTA a leitura de que a Federação formal está 'entregue e viva': em >5 semanas nenhum contrato real foi registrado — o ledger não tem sequer o diretório contracts/, os únicos contratos no repo são fixtures de validação, e não há registro de nenhum federation-check/rollback exercido. Os 5 comandos e os 3 scripts existem e passam nos fixtures; a capacidade nunca encontrou um caso real"
+  - id: REC2_LEDGER_TRAFFIC_IS_DOCBRIDGE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/evolution/federation/CHANGELOG.md (53 entradas, formato '## <data> · <assunto> · COMPATÍVEL|BREAKING · alvo: <seletor>'); docs/evolution/federation/outbox/{granaai,gustavo-pulga,marcio-pessoal,metagamify,onion-hub,onion-mini,pulse-mais,rhilo-metagamify}/"
+    label: "NUANÇA que junho não previu: a espinha git do design v2 materializou-se, mas o tráfego que ela carrega é ANÚNCIO de co-evolução (doc-bridge, campo alvo:), não bump de contrato. O CHANGELOG virou mailbox do doc-bridge com 53 entradas e 8 outboxes por membro — o inbox de contratos previsto na Fase 2 ficou vazio. A federação que pegou foi a de documentos, não a de contratos"
+  - id: REC2_A2A_FORMAT_BUILT_WITHOUT_TRIGGER
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/onion/agent-card.json (protocolVersion 0.3.0, mtime 2026-07-09); .claude/validation/a2a-agent-card.sh; .claude/utils/federation-transport/ (a2a-verify.sh, a2a-ssrf-check.sh, jwks/, adapters/a2a-live.md); docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+    label: "REFUTA 'nada a fazer no eixo A2A agora': a projeção de formato FOI construída ~3 semanas depois do ADR (agent-card.json em /.well-known/, gerador + guarda de lint, JWKS pinado, verificador de 6 camadas) SEM que o gatilho declarado (1º consumidor não-Onion / interop real) tivesse disparado — o gatilho que disparou de fato foi interno (RFC-0004, transporte a2a-live gated entre membros Onion). O ADR estava certo no eixo runtime×formato e errado no gatilho"
+  - id: REC2_TRUST_MACHINERY_IDLE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/evolution/trust-log.md (9 linhas, 3 tentativas, todas de 2026-07-01 13:36)"
+    label: "REFUTA a implicação de que consertar o id_in_list destravou a topologia de confiança: o trust-log registra 3 tentativas, todas do próprio dia do dogfood (01-jul), e nada desde então. O bug foi corrigido e guardado por 11 cenários de selftest, mas a maquinaria de trust não é invocada em produção há 20 dias — código verde, uso zero"
+  - id: REC2_DIARY_GATE_MET
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: ".claude/diary/ (63 arquivos .md); .claude/validation/diary-index.sh"
+    label: "SUPERA o alerta 'maquinaria à frente do gate': o gate de F1 (10 entradas de diário) era 0/10 em 01-jul e hoje há 63 entradas. O desalinhamento de sequenciamento se dissolveu pelo uso — a crítica era de ritmo, não de desenho"
+  - id: REC2_NAMING_NEVER_LEAKED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-07-21
+    trace: "grep -i 'federa' em docs/materials/*.md → 'Federation multi-repo', 'Federation v2 — Coordenação Multi-Repo'; zero ocorrências de 'federação de agentes' fora dos próprios docs/analysis de junho"
+    label: "CONFIRMOU o risco como não-materializado: os materiais de divulgação nunca usaram 'federação de agentes' — falam 'Federation multi-repo' / 'coordenação multi-repo sem quebrar nada'. A recomendação de rename foi satisfeita em substância sem ato de rename; o termo enganoso ficou confinado aos próprios documentos de análise que o criticaram"
+  - id: REC2_HUB_VS_PEER_REFERENTS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-federation-design-v2-2026-06.md §1; docs/evolution/federation/members.yaml (SSOT única, escritor único, role: hub para metagamify); .claude/utils/federation-transport/README.md (§Invariantes)"
+    label: "RECONCILIAÇÃO: o 'abandono do hub' de junho e o 'hub-and-spoke é ótimo em escala pequena' do grafo irmão não se contradizem — têm referentes distintos. O que foi abandonado foi o hub de RUNTIME (uma sessão Claude orquestrando dirs alheios, SA-3); o que sobreviveu e é central é o hub de IDENTIDADE (members.yaml single-source, escritor único), e o repo até reintroduziu role: hub como topologia de adoção. Julho confirma os dois lados"
+  - id: REC2_Q_FORMAL_FEDERATION_DEAD_OR_DORMANT
+    node_type: question
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 0.4
+    verified_at: 2026-07-21
+    trace: "docs/evolution/federation/ (sem contracts/); .claude/commands/meta/federation-{register,publish,check,status,rollback}.md"
+    label: "NÃO VERIFIQUEI: se a Federação formal de contratos está DORMENTE (esperando o 1º caso real de API compartilhada entre membros) ou MORTA (superada pelo doc-bridge, que resolveu a necessidade concreta com menos cerimônia). Não achei no repo nenhum sinal de intenção de registrar contrato, nem decisão de aposentadoria — os 5 comandos seguem no inventário sem uso"
+  - id: B2_3_review_verdict
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "Veredito do review: design é direcionalmente sólido e fiel à identidade canônica, mas tem dois buracos estruturais que o tornam não-executável como está"
+  - id: B2_3_sa1_metaspec_violation
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "SA-1: o design cria cinco estruturas novas que colidem com proibições L0 das meta-specs, tratadas como nota e não como Fase 0 bloqueante"
+  - id: B2_3_sa2_safety_machine_gap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "SA-2: a máquina de segurança (contract-tests como gate, veto do expert, gate de compatibilidade, rollback coordenado, monitor) é declarada em cinco camadas mas nenhuma é operacionalizada no design"
+  - id: B2_3_sa3_crossdir_spike_late
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "SA-3: a topologia de fan-out cross-repo repousa numa capacidade não verificada de subagente ler/escrever em diretório de outro membro, e o spike só é alocado depois da fase que já depende dela"
+  - id: B2_3_decision_encaixe_canonico
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "Recomendação do juiz adversarial: encaixar manifesto/experts/contratos/skill na estrutura canônica existente em vez de abrir PR de meta-spec para categoria nova, reservando a Fase 0 ao resíduo irredutível"
+  - id: B2_3_contract_schema_requirement
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "Correção proposta para SA-2: o formato de contrato precisa de campos verificáveis — tests com paths e lint, fixtures de payload por operação, e schema estruturado de veto com ausência de output tratada como veto fail-safe"
+  - id: B2_3_identity_invariants_respected
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "A lente identity não encontrou ressurreição da visão abandonada de 2026-05-18; as violações de SA-1 são de estrutura de diretório/categoria, não de filosofia"
+  - id: B2_3_orchestration_method
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.9
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "Método de produção do review: seis lentes críticas independentes geraram 36 achados crus, refutados achado a achado e consolidados via orquestração de 42 agentes"
+  - id: B2_3_refuted_findings
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.8
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "12 dos 36 achados crus (33%) foram descartados na refutação adversarial por duplicata entre lentes, cobertura no próprio doc, ou exagero sobre primitivas que de fato funcionam"
+  - id: B2_3_next_steps_gate_keeper
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-federation-design-review-2026-06.md"
+    label: "Próximo passo definido: aplicar SA-1/SA-2/SA-3 ao doc de design e validar a Fase 0 com o gate-keeper de meta-spec antes de criar qualquer arquivo"
 edges:
   - from: G1_INTERRUPT_STATES
     to: G1_GATED_HANDSHAKE_DESIGN
@@ -1713,4 +2346,301 @@ edges:
     edge_type: SUPPORTS
   - from: REC_Q_A2A_LIVE_TRAFFIC_UNVERIFIED
     to: REC_A2A_ENDPOINT_STATUS_FOUNDATION
+    edge_type: DEPENDS_ON
+  - from: B2_1_claim_runtime_forbidden
+    to: B2_1_a2a_adr_ssot
+    edge_type: TRACES_TO
+  - from: B2_1_claim_format_deferred
+    to: B2_1_a2a_adr_ssot
+    edge_type: TRACES_TO
+  - from: B2_1_claim_no_delta
+    to: B2_1_external_signal
+    edge_type: REFUTES
+  - from: B2_1_claim_orthogonal_risk
+    to: B2_1_claim_runtime_forbidden
+    edge_type: SUPPORTS
+  - from: B2_1_evidence_single_consumer
+    to: B2_1_claim_format_deferred
+    edge_type: SUPPORTS
+  - from: B2_1_evidence_single_consumer
+    to: B2_1_decision_no_action
+    edge_type: CAUSES
+  - from: B2_1_claim_format_deferred
+    to: B2_1_decision_no_action
+    edge_type: SUPPORTS
+  - from: B2_1_claim_no_delta
+    to: B2_1_claim_pattern_across_axes
+    edge_type: SUPPORTS
+  - from: B2_1_claim_pattern_across_axes
+    to: B2_1_decision_radar_closed
+    edge_type: SUPPORTS
+  - from: B2_1_a2a_adr_ssot
+    to: B2_1_decision_radar_closed
+    edge_type: SUPPORTS
+  - from: B2_2_evidence_dogfood_scripts
+    to: B2_2_claim_core_mechanic_healthy
+    edge_type: SUPPORTS
+  - from: B2_2_evidence_dogfood_scripts
+    to: B2_2_claim_trust_topology_bug
+    edge_type: SUPPORTS
+  - from: B2_2_claim_trust_topology_bug
+    to: B2_2_claim_core_mechanic_healthy
+    edge_type: REFUTES
+  - from: B2_2_decision_fix_trust_regex
+    to: B2_2_claim_trust_topology_bug
+    edge_type: DEPENDS_ON
+  - from: B2_2_claim_adopt_guard_empty
+    to: B2_2_claim_core_mechanic_healthy
+    edge_type: REFUTES
+  - from: B2_2_decision_fix_onion_version_role
+    to: B2_2_claim_adopt_guard_empty
+    edge_type: DEPENDS_ON
+  - from: B2_2_claim_kb_schema_v1_stale
+    to: B2_2_claim_three_role_namespaces
+    edge_type: SUPPORTS
+  - from: B2_2_claim_pin_drift
+    to: B2_2_claim_manual_sync_fails_silently
+    edge_type: SUPPORTS
+  - from: B2_2_question_adopted_at_semantics
+    to: B2_2_claim_manual_sync_fails_silently
+    edge_type: SUPPORTS
+  - from: B2_2_claim_manual_sync_fails_silently
+    to: B2_2_claim_core_mechanic_healthy
+    edge_type: REFUTES
+  - from: B2_2_claim_machinery_ahead_of_gate
+    to: B2_2_claim_core_mechanic_healthy
+    edge_type: REFUTES
+  - from: B2_2_decision_kb_federation_usage_modes
+    to: B2_2_claim_three_role_namespaces
+    edge_type: DEPENDS_ON
+  - from: B2_4_review_v1_source
+    to: B2_4_sa3_spike_risk
+    edge_type: SUPPORTS
+  - from: B2_4_review_v1_source
+    to: B2_4_sa1_metaspec_violation
+    edge_type: SUPPORTS
+  - from: B2_4_sa3_spike_risk
+    to: B2_4_pivot_hub_to_peer
+    edge_type: CAUSES
+  - from: B2_4_sa1_metaspec_violation
+    to: B2_4_pivot_hub_to_peer
+    edge_type: CAUSES
+  - from: B2_4_pivot_hub_to_peer
+    to: B2_4_ledger_git_spine
+    edge_type: SUPPORTS
+  - from: B2_4_pivot_hub_to_peer
+    to: B2_4_identity_guardrail
+    edge_type: SUPPORTS
+  - from: B2_4_ledger_git_spine
+    to: B2_4_safety_layers_relocated
+    edge_type: SUPPORTS
+  - from: B2_4_contract_tests_required
+    to: B2_4_safety_layers_relocated
+    edge_type: SUPPORTS
+  - from: B2_4_member_expert_schema
+    to: B2_4_safety_layers_relocated
+    edge_type: SUPPORTS
+  - from: B2_4_safety_layers_relocated
+    to: B2_4_maestro_workflow
+    edge_type: DEPENDS_ON
+  - from: B2_4_identity_guardrail
+    to: B2_4_phase5_a2a_out_of_scope
+    edge_type: CAUSES
+  - from: B2_4_phased_backlog
+    to: B2_4_ledger_git_spine
+    edge_type: DEPENDS_ON
+  - from: B2_4_phased_backlog
+    to: B2_4_pivot_hub_to_peer
+    edge_type: TRACES_TO
+  - from: B2_5_claim_two_federations
+    to: B2_5_decision_no_a2a
+    edge_type: SUPPORTS
+  - from: B2_5_artifact_federation_commands
+    to: B2_5_evidence_six_patterns
+    edge_type: SUPPORTS
+  - from: B2_5_evidence_six_patterns
+    to: B2_5_claim_verdict_defensible
+    edge_type: SUPPORTS
+  - from: B2_5_decision_no_a2a
+    to: B2_5_claim_verdict_defensible
+    edge_type: SUPPORTS
+  - from: B2_5_claim_unresolved_gaps
+    to: B2_5_claim_verdict_defensible
+    edge_type: SUPPORTS
+  - from: B2_5_decision_no_a2a
+    to: B2_5_question_format_interop
+    edge_type: DEPENDS_ON
+  - from: B2_5_evidence_a2a_adoption
+    to: B2_5_claim_naming_gap
+    edge_type: SUPPORTS
+  - from: B2_5_evidence_a2a_adoption
+    to: B2_5_question_format_interop
+    edge_type: SUPPORTS
+  - from: B2_5_claim_naming_gap
+    to: B2_5_decision_rename_recommendation
+    edge_type: CAUSES
+  - from: B2_5_claim_naming_gap
+    to: B2_5_decision_argue_divergence
+    edge_type: CAUSES
+  - from: B2_5_claim_two_federations
+    to: B2_5_claim_naming_gap
+    edge_type: SUPPORTS
+  - from: B2_1_claim_runtime_forbidden
+    to: G1_SIGNALS_ONLY_NOT_AUTONOMOUS
+    edge_type: SUPPORTS
+  - from: B2_1_claim_orthogonal_risk
+    to: GAPS_A2A_NO_PROMPT_INJECTION
+    edge_type: SUPPORTS
+  - from: B2_1_claim_format_deferred
+    to: S2_A2A_AGENT_CARD_DISCOVERY
+    edge_type: SUPPORTS
+  - from: B2_1_a2a_adr_ssot
+    to: B2_5_question_format_interop
+    edge_type: SUPERSEDES
+  - from: B2_5_decision_no_a2a
+    to: GAPS_DECISION_KEEP_GATED_CURATION
+    edge_type: SUPPORTS
+  - from: B2_5_evidence_a2a_adoption
+    to: S1_A2A_MATURITY
+    edge_type: SUPPORTS
+  - from: B2_5_claim_unresolved_gaps
+    to: G3_REPUTATION_MATURITY_SIM_ONLY
+    edge_type: SUPPORTS
+  - from: B2_4_ledger_git_spine
+    to: G3_DECISION_SINGLE_SOURCE_IDENTITY_MESH_COMMS
+    edge_type: SUPPORTS
+  - from: B2_4_identity_guardrail
+    to: GAPS_DECISION_A2A_LIVE_SIGNALS_ONLY
+    edge_type: SUPPORTS
+  - from: B2_4_pivot_hub_to_peer
+    to: REC_GIT_ASYNC_STILL_DEFAULT
+    edge_type: SUPPORTS
+  - from: B2_2_claim_manual_sync_fails_silently
+    to: REC_PIN_DRIFT_REAL_HEALTH_METRIC
+    edge_type: SUPPORTS
+  - from: B2_2_decision_kb_federation_usage_modes
+    to: REC_MEMBERS_YAML_CURATED_REGISTRY
+    edge_type: SUPPORTS
+  - from: REC_SIGNALS_ONLY_RATIFIED
+    to: B2_4_phase5_a2a_out_of_scope
+    edge_type: SUPERSEDES
+  - from: REC_A2A_RECEIVER_GATE_BUILT
+    to: B2_1_decision_no_action
+    edge_type: SUPERSEDES
+  - from: REC_TRANSPORT_SDAAL_BUILT
+    to: B2_5_decision_argue_divergence
+    edge_type: SUPERSEDES
+  - from: REC2_ADOPTED_AT_RESOLVED
+    to: B2_2_question_adopted_at_semantics
+    edge_type: SUPERSEDES
+  - from: REC2_TRUST_TOPOLOGY_FIX_HELD
+    to: B2_2_decision_fix_trust_regex
+    edge_type: SUPPORTS
+  - from: REC2_ONION_VERSION_ROLE_DERIVED
+    to: B2_2_decision_fix_onion_version_role
+    edge_type: SUPPORTS
+  - from: REC2_KB_SCHEMA_V2_HELD
+    to: B2_2_claim_kb_schema_v1_stale
+    edge_type: SUPPORTS
+  - from: REC2_ROLE_NAMESPACES_NAMED_NOT_COLLAPSED
+    to: B2_2_decision_kb_federation_usage_modes
+    edge_type: SUPPORTS
+  - from: REC2_ROLE_NAMESPACES_NAMED_NOT_COLLAPSED
+    to: B2_2_claim_three_role_namespaces
+    edge_type: SUPPORTS
+  - from: REC2_NO_CONTRACT_EVER_REGISTERED
+    to: B2_5_artifact_federation_commands
+    edge_type: REFUTES
+  - from: REC2_NO_CONTRACT_EVER_REGISTERED
+    to: B2_4_contract_tests_required
+    edge_type: REFUTES
+  - from: REC2_NO_CONTRACT_EVER_REGISTERED
+    to: B2_4_member_expert_schema
+    edge_type: REFUTES
+  - from: REC2_NO_CONTRACT_EVER_REGISTERED
+    to: B2_2_claim_core_mechanic_healthy
+    edge_type: REFUTES
+  - from: REC2_NO_CONTRACT_EVER_REGISTERED
+    to: REC2_Q_FORMAL_FEDERATION_DEAD_OR_DORMANT
+    edge_type: CAUSES
+  - from: REC2_LEDGER_TRAFFIC_IS_DOCBRIDGE
+    to: B2_4_ledger_git_spine
+    edge_type: SUPPORTS
+  - from: REC2_LEDGER_TRAFFIC_IS_DOCBRIDGE
+    to: B2_4_maestro_workflow
+    edge_type: REFUTES
+  - from: REC2_LEDGER_TRAFFIC_IS_DOCBRIDGE
+    to: REC_STAGING_ROT_AND_MISSING_MAILBOX
+    edge_type: SUPPORTS
+  - from: REC2_A2A_FORMAT_BUILT_WITHOUT_TRIGGER
+    to: B2_1_decision_no_action
+    edge_type: REFUTES
+  - from: REC2_A2A_FORMAT_BUILT_WITHOUT_TRIGGER
+    to: B2_1_evidence_single_consumer
+    edge_type: REFUTES
+  - from: REC2_A2A_FORMAT_BUILT_WITHOUT_TRIGGER
+    to: B2_1_claim_format_deferred
+    edge_type: SUPERSEDES
+  - from: REC2_A2A_FORMAT_BUILT_WITHOUT_TRIGGER
+    to: B2_1_claim_runtime_forbidden
+    edge_type: SUPPORTS
+  - from: REC2_TRUST_MACHINERY_IDLE
+    to: REC_TRUST_LOG_NOT_ACCUMULATING
+    edge_type: SUPPORTS
+  - from: REC2_TRUST_MACHINERY_IDLE
+    to: B2_2_decision_fix_trust_regex
+    edge_type: REFUTES
+  - from: REC2_TRUST_MACHINERY_IDLE
+    to: B2_5_claim_unresolved_gaps
+    edge_type: SUPPORTS
+  - from: REC2_DIARY_GATE_MET
+    to: B2_2_claim_machinery_ahead_of_gate
+    edge_type: SUPERSEDES
+  - from: REC2_NAMING_NEVER_LEAKED
+    to: B2_5_decision_rename_recommendation
+    edge_type: SUPERSEDES
+  - from: REC2_NAMING_NEVER_LEAKED
+    to: B2_5_claim_naming_gap
+    edge_type: REFUTES
+  - from: REC2_HUB_VS_PEER_REFERENTS
+    to: B2_4_pivot_hub_to_peer
+    edge_type: SUPPORTS
+  - from: REC2_HUB_VS_PEER_REFERENTS
+    to: G3_HUB_SPOKE_OPTIMAL_SMALL_SCALE
+    edge_type: SUPPORTS
+  - from: REC2_HUB_VS_PEER_REFERENTS
+    to: S2_HUBSPOKE_CONTROL_PLANE
+    edge_type: SUPPORTS
+  - from: B2_1_claim_pattern_across_axes
+    to: SYNTHESIS.md_REUSE_NOT_INVENTION
+    edge_type: SUPPORTS
+  - from: B2_2_claim_manual_sync_fails_silently
+    to: REC_CONTRACT_DRIFT_GATE_EXISTS
+    edge_type: CAUSES
+  - from: B2_3_sa1_metaspec_violation
+    to: B2_3_review_verdict
+    edge_type: SUPPORTS
+  - from: B2_3_sa2_safety_machine_gap
+    to: B2_3_review_verdict
+    edge_type: SUPPORTS
+  - from: B2_3_decision_encaixe_canonico
+    to: B2_3_sa1_metaspec_violation
+    edge_type: DEPENDS_ON
+  - from: B2_3_contract_schema_requirement
+    to: B2_3_sa2_safety_machine_gap
+    edge_type: DEPENDS_ON
+  - from: B2_3_identity_invariants_respected
+    to: B2_3_decision_encaixe_canonico
+    edge_type: SUPPORTS
+  - from: B2_3_sa3_crossdir_spike_late
+    to: B2_3_next_steps_gate_keeper
+    edge_type: SUPPORTS
+  - from: B2_3_orchestration_method
+    to: B2_3_refuted_findings
+    edge_type: SUPPORTS
+  - from: B2_3_refuted_findings
+    to: B2_3_review_verdict
+    edge_type: SUPPORTS
+  - from: B2_3_decision_encaixe_canonico
+    to: B2_3_next_steps_gate_keeper
     edge_type: DEPENDS_ON

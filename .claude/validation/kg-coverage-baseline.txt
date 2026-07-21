@@ -1,7 +1,6 @@
 # Baseline de cobertura de proveniência invertida — PASSIVO TOLERADO.
 # Gerado por: bash .claude/validation/kg-provenance-coverage.sh --emit-baseline
 # Esta lista SÓ PODE ENCOLHER. Acrescentar path aqui é regressão (HARD).
-docs/analysis/onion-a2a-federation-reconcile-2026-06.md
 docs/analysis/onion-agent-teams-evaluation-2026-06.md
 docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md
 docs/analysis/onion-coevolution-backlog-2026-06-18.md
@@ -13,10 +12,6 @@ docs/analysis/onion-evolution-2026-06-16.md
 docs/analysis/onion-evolution-2026-06-17.md
 docs/analysis/onion-evolution-2026-07-08.md
 docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md
-docs/analysis/onion-federation-audit-2026-07-01.md
-docs/analysis/onion-federation-design-review-2026-06.md
-docs/analysis/onion-federation-design-v2-2026-06.md
-docs/analysis/onion-federation-review-2026-06.md
 docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md
 docs/analysis/onion-orchestration-external-radar-2026-06.md
 docs/analysis/onion-orchestration-math-phase-transition-2026-06.md
