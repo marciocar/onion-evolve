@@ -312,6 +312,85 @@ run_kg_freshness_selftests() {
 # não-HARD (não muda o exit). Como o FRESCOR, asserção por CONTEÚDO de stdout + exit 0.
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
+# Modo kg-view — REGRA 31. A lente é DERIVADA e reimplementa o parse do radar.
+# A dívida dos DOIS PARSERS só é admissível porque --assert-parity a vigia; se a
+# paridade não reprovar de verdade, a lente pode divergir do motor em silêncio e
+# mostrar um grafo que não existe. (V3) é o teste que sustenta a dívida.
+# ---------------------------------------------------------------------------
+run_kg_view_selftests() {
+  local view="${SCRIPT_DIR}/kg-view.sh"
+  local tmp out rc
+  [ -f "${view}" ] || return 0
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "${tmp}"' RETURN
+
+  cat > "${tmp}/v.kg.yaml" <<'KGEOF'
+meta:
+  id: fixture-view
+  schema_version: "1"
+nodes:
+  - id: C_UM
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "primeira afirmacao"
+  - id: E_UM
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    label: "evidencia que sustenta"
+edges:
+  - from: E_UM
+    to: C_UM
+    edge_type: SUPPORTS
+KGEOF
+
+  # (V1) --json é JSON legível por parser real e as contagens batem com a fonte.
+  out="$(bash "${view}" "${tmp}/v.kg.yaml" --json 2>/dev/null)"
+  if printf '%s' "${out}" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["node_count"]==2 and d["edge_count"]==1' 2>/dev/null; then
+    record_pass "kg-view: (V1) --json é JSON válido com contagens corretas (2 nós, 1 aresta)"
+  else record_fail "kg-view: (V1)" "JSON inválido ou contagens erradas: ${out}"; fi
+
+  # (V2) DETERMINISMO — caminho relativo e absoluto produzem saída IDÊNTICA.
+  # Sem isto a lente "driftaria" só por causa de quem a invocou e a REGRA 31
+  # reprovaria para sempre (defeito real, achado pelo guard na 1a execução).
+  ( cd "${tmp}" && bash "${view}" "v.kg.yaml" --markdown > "${tmp}/rel.md" 2>/dev/null )
+  bash "${view}" "${tmp}/v.kg.yaml" --markdown > "${tmp}/abs.md" 2>/dev/null
+  if diff -q "${tmp}/rel.md" "${tmp}/abs.md" >/dev/null 2>&1; then
+    record_pass "kg-view: (V2) saída idêntica por caminho relativo e absoluto (determinismo)"
+  else record_fail "kg-view: (V2)" "a lente muda conforme o caminho de invocação — drift eterno"; fi
+
+  # (V3) paridade VERDE no grafo são.
+  if bash "${view}" "${tmp}/v.kg.yaml" --assert-parity >/dev/null 2>&1; then
+    record_pass "kg-view: (V3) paridade com o kg-radar em grafo são"
+  else record_fail "kg-view: (V3)" "paridade falhou num grafo válido"; fi
+
+  # (V4) MUTATION TEST — quebra a âncora de nó da LENTE (não do radar) e prova
+  # que --assert-parity REPROVA. É o que torna admissível ter dois parsers: se
+  # este teste não pegasse, a divergência apareceria só num gráfico errado.
+  # O mutante precisa do kg-radar.sh AO LADO — senão o que a guarda mede é a
+  # ausência do motor, não a divergência de parse (foi o que aconteceu na 1a
+  # versão, e revelou o fail-open que o kg-view.sh agora fecha).
+  cp "${SCRIPT_DIR}/kg-radar.sh" "${tmp}/kg-radar.sh"
+  sed 's|section == "nodes" && /\^\[\[:space:\]\]+- id:/|section == "nodes" \&\& /^ZZNOMATCHZZ/|' \
+      "${view}" > "${tmp}/mutated.sh"
+  if ! bash "${tmp}/mutated.sh" "${tmp}/v.kg.yaml" --assert-parity >/dev/null 2>&1; then
+    record_pass "kg-view: (V4) MUTATION — parser divergente ⇒ --assert-parity REPROVA (a dívida é vigiada)"
+  else record_fail "kg-view: (V4)" "parser mutado passou na paridade — a guarda não vigia nada"; fi
+
+  # (V5) FAIL-LOUD — sem o kg-radar.sh ao lado, a paridade NÃO pode ser afirmada.
+  # Antes desta guarda o script saía 0 ("não verificável") e virava aprovação de nada.
+  rm -f "${tmp}/kg-radar.sh"
+  if ! bash "${tmp}/mutated.sh" "${tmp}/v.kg.yaml" --assert-parity >/dev/null 2>&1; then
+    record_pass "kg-view: (V5) motor ausente ⇒ paridade REPROVA (não vira verde por ausência)"
+  else record_fail "kg-view: (V5)" "sem kg-radar.sh a paridade passou — fail-open"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo kg-scope — `--scope` do gate de proveniência (insumo do /meta:kg backfill).
 #
 # A proteção que estes casos guardam é ESTRUTURAL, não conselho: avaliar um escopo
@@ -3940,6 +4019,9 @@ run_outbox_channel_selftests
 
 # Modo kg-coverage — REGRA 29: gate de proveniência INVERTIDO com catraca (sinal granaai 2026-07-20).
 run_kg_coverage_selftests
+
+# Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
+run_kg_view_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
 run_kg_scope_selftests

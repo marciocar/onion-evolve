@@ -1484,6 +1484,45 @@ check_kg_provenance_coverage() {
 }
 
 # ===========================================================================
+# REGRA 31 — Lente do grafo: DERIVADA e em paridade com o motor [HARD]
+#   Duas obrigações, porque são dois modos de falha distintos:
+#   (a) DRIFT DE CONTEÚDO — a lente é gerada de um .kg.yaml; se o grafo mudou e
+#       a lente não, ela vira relatório desatualizado com cara de atual (mesma
+#       classe das REGRAS 8/21/24 sobre SSOT gerada).
+#   (b) DRIFT DE PARSER — kg-view.sh reimplementa o parse do kg-radar.sh. Se os
+#       dois saírem de sincronia, a lente mostra um grafo que o motor não vê:
+#       mentira com autoridade de projeção. `--assert-parity` é o que torna
+#       essa dívida admissível; sem ela, o desvio só apareceria num gráfico
+#       errado meses depois.
+# ===========================================================================
+check_kg_view_sync() {
+  local gen="${SCRIPT_DIR}/kg-view.sh"
+  [ -f "${gen}" ] || return 0
+  local kg lens tmp out
+  while IFS= read -r kg; do
+    [ -n "${kg}" ] || continue
+    lens="${kg%.kg.yaml}-radar.md"
+    [ -f "${lens}" ] || continue           # lente é opt-in: só cobra o que existe
+    if [ -n "${ONLY_PATH}" ]; then
+      case "${ONLY_PATH}" in "${kg}"|"${lens}") : ;; *) continue ;; esac
+    fi
+    # (b) paridade de parser primeiro — se os parsers divergem, comparar o
+    # conteúdo da lente é comparar contra a projeção errada.
+    if ! out="$(bash "${gen}" "${kg}" --assert-parity 2>&1)"; then
+      violation "HARD" "${lens}" "[lente/PARIDADE] kg-view.sh e kg-radar.sh discordam sobre o tamanho do grafo — a lente está mentindo (${out})"
+      continue
+    fi
+    # (a) drift de conteúdo
+    tmp="$(mktemp)"
+    bash "${gen}" "${kg}" --markdown > "${tmp}" 2>/dev/null || true
+    if ! diff -q "${lens}" "${tmp}" >/dev/null 2>&1; then
+      violation "HARD" "${lens}" "[lente/DRIFT] lente desatualizada vs o grafo — regenere: bash .claude/validation/kg-view.sh ${kg#${REPO_ROOT}/} --markdown > ${lens#${REPO_ROOT}/}"
+    fi
+    rm -f "${tmp}"
+  done < <(find "${REPO_ROOT}/docs" -name '*.kg.yaml' -type f 2>/dev/null | sort)
+}
+
+# ===========================================================================
 # REGRA 30 — Segurança de PROJEÇÃO: nome comercial de membro privado não sai
 #   do repo privado [HARD]
 #   Origem: incidente 2026-07-10 — o console PÚBLICO da federação vazou
@@ -1646,6 +1685,7 @@ check_evolution_links
 check_knowledge_base_links
 check_research_kg
 check_kg_provenance_coverage
+check_kg_view_sync
 check_projection_safety
 check_frontmatter_model_category
 
