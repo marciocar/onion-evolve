@@ -1,17 +1,20 @@
-# Diário — .
+# Diário — onion-evolve
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 62 entradas · **Stale:** 0 · **Compartilháveis:** 50 · **Com significância:** 2
+**Total:** 65 entradas · **Stale:** 0 · **Compartilháveis:** 53 · **Com significância:** 5
 
-Gerado em: 2026-07-20
+Gerado em: 2026-07-21
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-07-21 | learning | collective 📤 | mechanism-beats-prose | Modelar 92 documentos de 14 meses no grafo revelou a lei que governa a durabilidade de decisões neste core — e ela não é sobre qualidade de argumento, é sobre onde a decisão foi parar. | 2026-10-19 | static |
+| 2026-07-21 | innovation | collective 📤 | inverted-provenance-ratchet | Invertemos a pergunta da proveniência — de 'as citações apontam para fontes reais?' para 'toda fonte é alcançável a partir do grafo?' — e a catraca pagou 92 documentos até o piso zero sem uma regressão. | 2026-10-19 | conditional |
+| 2026-07-21 | observation | collective 📤 | capability-never-met-reality | O passivo pago revelou a maior distância entre declarado e verificado do core — não num fato, mas numa CAPACIDADE inteira que passa em todos os testes e nunca tocou a realidade. | 2026-10-19 | dynamic |
 | 2026-07-20 | learning | collective 📤 | admission-rule-blindspot | Achamos, com lastro em oito passadas reais (não teorizado), a forma do próprio ponto cego adversarial — e a regra que ele gerou hoje só vale dentro de um documento; esta migalha é o que a torna reusável no próximo. | 2026-10-18 | static |
 | 2026-07-19 | learning | collective 📤 | verify-external-wired-into-research-flow | — | 2026-10-19 | static |
 | 2026-07-19 | decision | collective 📤 | verify-external-for-current-doctrine | — | 2026-10-19 | static |
