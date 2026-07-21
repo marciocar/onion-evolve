@@ -176,6 +176,7 @@
 - onion-work-tools **loads** embed:kb/knowledge-graph-sdaal.md
 - onion-work-tools **loads** when:diary -> run:validation/diary-index.sh
 - onion-work-tools **loads** when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)
+- onion-work-tools **loads** when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)
 - onion-work-tools **provides** co-evolution-upstream
 - onion-work-tools **provides** constellation-map
 - onion-work-tools **provides** freshness-audits
@@ -528,6 +529,7 @@ onion-testing	requires	agent:test-planner
 onion-work-tools	loads	embed:kb/knowledge-graph-sdaal.md	
 onion-work-tools	loads	when:diary -> run:validation/diary-index.sh	
 onion-work-tools	loads	when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)	
+onion-work-tools	loads	when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)	
 onion-work-tools	provides	co-evolution-upstream	
 onion-work-tools	provides	constellation-map	
 onion-work-tools	provides	freshness-audits	

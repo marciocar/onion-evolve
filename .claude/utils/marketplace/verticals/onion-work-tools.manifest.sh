@@ -37,6 +37,12 @@ VALIDATION=(
   ".claude/validation/kg-console.sh"
   ".claude/validation/diary-index.sh"
   ".claude/validation/constellation-map.sh"
+  # Gate de proveniência invertido (modo `kg backfill`). O resolve-integration-branch
+  # vai JUNTO de propósito: sem o irmão, o coverage cai para a catraca FRACA (compara
+  # contra HEAD, onde um baseline que cresceu e já foi commitado passa despercebido).
+  # Degradar em silêncio para catraca fraca num adotante seria o no-op de sempre.
+  ".claude/validation/kg-provenance-coverage.sh"
+  ".claude/validation/resolve-integration-branch.sh"
 )
 # Skill de orquestração (orchestrate depende dela).
 SKILLS=(".claude/skills/onion-orchestration")
@@ -55,5 +61,6 @@ REQUIRES=(
 LOADS=(
   "embed:kb/knowledge-graph-sdaal.md"
   "when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)"
+  "when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)"
   "when:diary -> run:validation/diary-index.sh"
 )

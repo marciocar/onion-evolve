@@ -10,10 +10,10 @@ description: |
 model: sonnet
 category: meta
 tags: [kg, knowledge-graph, investigation, sdaal, radar, reconciliation, domain-layer]
-version: "1.3.0"
-updated: "2026-07-16"
-allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/kg-radar.sh*) Bash(ls docs/*)
-argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área>]  (vazio = localizar .kg.yaml existente e rodar radar)"
+version: "1.4.0"
+updated: "2026-07-21"
+allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/kg-radar.sh*) Bash(bash .claude/validation/kg-provenance-coverage.sh*) Bash(ls docs/*)
+argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área> | backfill [<escopo>]]  (vazio = localizar .kg.yaml existente e rodar radar)"
 related_commands:
   - /meta:evolve
   - /meta:graph
@@ -211,6 +211,78 @@ endpoint-dono aparece como fonte de exibição em **1** componente (o "cara-crac
 ### F4 — Adaptador do adotante (fora do core)
 Implementar o `SourceTag` no stack local (React/Vue/CLI — soberania: o core dá o schema e o método,
 nunca o componente). Redesign/refactor só começa aqui — **dirigido pelo contrato**.
+
+## 🧾 Modo backfill — pagar passivo de proveniência invertida
+
+`backfill [<escopo>]` responde a pergunta de **fora do grafo para dentro**: *"que documentos deste
+corpus ainda não existem no grafo?"* — e paga o passivo em levas, até a catraca chegar ao piso.
+
+Destilado do dogfood de 2026-07-20/21 no próprio core: **92 documentos, baseline 75 → 0**, grafo de
+677 para 881 nós em 6 levas. Workflow faseado retomável; cada leva fecha com commit.
+
+> **O achado que justifica o modo**: ~2/3 do passivo **já tinha morrido em código** e ninguém marcou
+> — pesquisa entregue, contagem virada SSOT gerada, herança de escopo já em `compose-settings.sh`.
+> O core carregava dívida quitada nos livros. Lei destilada: *backlog em prosa datada renasce todo
+> dia e só morre quando vira guarda de lint ou SSOT gerada.*
+
+### F0 — Medir (não estimar)
+
+```bash
+bash .claude/validation/kg-provenance-coverage.sh                       # escopo canônico (com catraca)
+bash .claude/validation/kg-provenance-coverage.sh --scope <dir>         # outro corpus (EXPLORATÓRIO)
+```
+
+`--scope` sem `--baseline` **não arma catraca** — mede e devolve a pauta. É estrutural: escopo alheio
+contra o baseline canônico produziria órfãs em massa e HARDs falsos, e gate que cospe falso é gate
+desligado. Para armar catraca num escopo novo, `--baseline <arquivo>` de propósito.
+
+### F1 — Levas: um worker por documento
+
+Leva de **~16 documentos**, **um subagente `sonnet`/`medium` por documento** (paralelo). Contrato do
+worker, cada cláusula paga por erro real da rodada de origem:
+
+- **`doc` recebe o PATH, nunca o texto** — worker que devolve o conteúdo estoura o contexto do merge.
+- **ids em inglês com prefixo de leva** (`B3_7_…`), **labels em pt-BR**, **`trace:` obrigatório**.
+- **Nada de placeholder.** Um worker emitiu `id: a`, `label: x`, `trace: y` e **passou** no merge
+  porque satisfazia o *schema* — quem pegou foi a consequência (um documento sem cobertura), não a
+  regra. Rejeite `id`/`label` com ≤3 caracteres.
+- **Nome comercial de cliente não entra — nem em label, NEM EM ID.** O vazamento real da rodada foi
+  por ID, não por prosa (é o que a REGRA 30 guarda hoje).
+- **Modele por gênero** (review → achados+veredito; mapa conceitual → entidades e relações;
+  pesquisa → veredito e decisões, não a recontagem de hipóteses; material bruto → 3-5 nós bastam).
+  **Não infle documento pobre em achados**: forçar 10 nós num doc que tem 3 é ruído com aparência
+  de rigor.
+- **O worker NÃO julga se ainda vale** — isso é da F2, que tem acesso ao estado atual.
+
+### F2 — Sintetizador: as três perguntas que pagaram em todas as levas
+
+Um subagente `opus`/`high` por leva, com acesso ao repo e ao grafo existente:
+
+1. **Já virou realidade?** Procurar em `.claude/` (commands, skills, validation, utils, agents),
+   `docs/knowledge-base/`, `docs/evolution/rfc/`, `docs/meta-specs/`. Existe → nó `evidence`
+   `plane: PROD` com **trace REAL** + `SUPERSEDES` para a question/decision.
+   ⚠️ **ABRIR o arquivo.** Sem prova, fica `open`. Afirmar por nome plausível é o erro que custou
+   caro na rodada de origem (ver [[read-full-content-before-triage]]).
+2. **Duplicata?** — do que já está no grafo, ou de outro documento da mesma leva.
+3. **Cruza com o grafo existente?** — arestas para os nós que já existem, senão a leva vira ilha.
+
+### F3 — Merge, radar, catraca
+
+- Merge rejeitando placeholder, filtrando aresta pendurada e **reconciliando status**
+  (`REFUTES`/`SUPERSEDES` exigem que o alvo saia de `open`).
+- `kg-radar.sh <arquivo> --integrity --schema` — **espere exigências**; em toda leva houve. Na
+  última: dois nós órfãos e uma contradição de status, mais uma aresta que eu modelara como
+  `REFUTES` quando a relação honesta era `DEPENDS_ON`. **O radar é o revisor.**
+- Regenerar o baseline (`--emit-baseline > <baseline>`) e **medir antes de escrever o commit**:
+  contar pelo **radar**, nunca pelo andaime de merge (o script descartável da rodada reportou
+  "+209 nós" por aritmética de linhas quando a verdade eram 204).
+
+### ⚠️ O limite deste modo
+
+O gate mede **cobertura, não verdade**: exige que cada documento tenha *um nó*. Nó raso e genérico
+**passa**. Enquanto quem alimenta for orquestração com verificação adversarial, o flanco fica
+fechado; virando rotina apressada, o gate fica verde sobre grafo oco — e aí mente com autoridade de
+mecanismo. Ver [[inverted-provenance-ratchet]] no diário.
 
 ## 💡 Exemplos
 

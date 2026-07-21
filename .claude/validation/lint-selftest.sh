@@ -312,6 +312,64 @@ run_kg_freshness_selftests() {
 # não-HARD (não muda o exit). Como o FRESCOR, asserção por CONTEÚDO de stdout + exit 0.
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
+# Modo kg-scope — `--scope` do gate de proveniência (insumo do /meta:kg backfill).
+#
+# A proteção que estes casos guardam é ESTRUTURAL, não conselho: avaliar um escopo
+# ALHEIO contra o baseline CANÔNICO faria toda entrada do baseline virar ÓRFÃ (o
+# documento não está no novo escopo) e todo documento do novo escopo virar
+# HARD-novo. Num adotante com passivo populado seriam dezenas de violações falsas
+# no primeiro uso — e gate que cospe falso é gate desligado, que é o modo de falha
+# que a catraca inteira existe para evitar. Por isso `--scope` sem `--baseline`
+# entra em modo EXPLORATÓRIO.
+# ---------------------------------------------------------------------------
+run_kg_scope_selftests() {
+  local repo out rc
+  repo="$(_prov_make_repo)"
+  trap 'rm -rf "${repo}"' RETURN
+  mkdir -p "${repo}/docs/outro-corpus"
+  printf '# fora do escopo canonico\n' > "${repo}/docs/outro-corpus/alheio.md"
+
+  # (S1) --scope troca a raiz: o corpus alheio é medido, o canônico não entra.
+  out="$(bash "${repo}/.claude/validation/kg-provenance-coverage.sh" "${repo}" --scope docs/outro-corpus 2>&1)"; rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q 'EXPLORATÓRIA' \
+     && printf '%s' "${out}" | grep -q 'docs/outro-corpus/alheio.md' \
+     && ! printf '%s' "${out}" | grep -q 'docs/analysis/novo.md'; then
+    record_pass "kg-scope: (S1) --scope mede a raiz alheia e NÃO arrasta o escopo canônico"
+  else record_fail "kg-scope: (S1)" "rc=${rc} out=${out}"; fi
+
+  # (S2) exploratório NÃO cobra catraca, mesmo com baseline canônico presente:
+  #      nenhuma entrada do baseline pode virar ÓRFÃ/OBSOLETA por causa do escopo.
+  _prov_run "${repo}" --scope docs/outro-corpus
+  if [ "${_PROV_RC}" -eq 0 ] \
+     && ! printf '%s' "${_PROV_OUT}" | grep -q 'BASELINE-ORFA' \
+     && ! printf '%s' "${_PROV_OUT}" | grep -q 'BASELINE-OBSOLETA' \
+     && ! printf '%s' "${_PROV_OUT}" | grep -q 'HARD'; then
+    record_pass "kg-scope: (S2) exploratório não produz órfã/obsoleta/HARD contra o baseline canônico"
+  else record_fail "kg-scope: (S2)" "escopo alheio contaminou a catraca canônica: rc=${_PROV_RC} out=${_PROV_OUT}"; fi
+
+  # (S3) com --baseline EXPLÍCITO a catraca é armada no escopo novo: doc sem nó
+  #      e fora daquele baseline volta a ser HARD (o modo exploratório não é uma
+  #      porta dos fundos permanente).
+  printf '# baseline do outro corpus\n' > "${repo}/.claude/validation/outro-baseline.txt"
+  _prov_run "${repo}" --scope docs/outro-corpus --baseline .claude/validation/outro-baseline.txt
+  if printf '%s' "${_PROV_OUT}" | grep -q 'docs/outro-corpus/alheio.md' \
+     && printf '%s' "${_PROV_OUT}" | grep -qE '^HARD'; then
+    record_pass "kg-scope: (S3) --scope + --baseline explícito ARMA a catraca no escopo novo"
+  else record_fail "kg-scope: (S3)" "esperava HARD para doc novo sob baseline explícito: out=${_PROV_OUT}"; fi
+
+  # (S4) MUTATION TEST — desfaz a condição que liga o modo exploratório. Sem ela,
+  #      o escopo alheio cai no caminho da catraca canônica e o dano aparece
+  #      (órfãs em massa e/ou HARD). Se NADA mudar, (S2) não estava provando nada.
+  sed 's/^  EXPLORATORY=1$/  EXPLORATORY=0/' \
+      "${repo}/.claude/validation/kg-provenance-coverage.sh" > "${repo}/.claude/validation/mutated.sh"
+  out="$(bash "${repo}/.claude/validation/mutated.sh" "${repo}" --scope docs/outro-corpus --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | grep -qE 'BASELINE-ORFA|BASELINE-OBSOLETA|^HARD'; then
+    record_pass "kg-scope: (S4) MUTATION — sem o modo exploratório o escopo alheio CONTAMINA a catraca; a proteção é load-bearing"
+  else record_fail "kg-scope: (S4)" "com a proteção desfeita nada mudou — (S2) não prova nada: out=${out}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo projection-safety — REGRA 30. Nome comercial de membro privado não sai do
 # repo privado. Origem: incidente 2026-07-10 (o console público vazou nome + marcador
 # verbatim); a correção viveu como convenção LOCAL em federation-console.sh até
@@ -3882,6 +3940,9 @@ run_outbox_channel_selftests
 
 # Modo kg-coverage — REGRA 29: gate de proveniência INVERTIDO com catraca (sinal granaai 2026-07-20).
 run_kg_coverage_selftests
+
+# Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
+run_kg_scope_selftests
 
 # Modo projection-safety — REGRA 30: nome comercial de membro privado não sai do repo privado.
 run_projection_safety_selftests

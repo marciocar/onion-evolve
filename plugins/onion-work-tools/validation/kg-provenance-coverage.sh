@@ -69,7 +69,7 @@
 #       console). Exigir nó de artefato gerado é ruído puro: a fonte é a
 #       spec-as-code, e o drift-guard dela já é outro (REGRAS 8/21/23/24).
 #     · README.md / index.md / INDEX.md dentro do escopo — navegação, não achado.
-#     · .claude/validation/fixtures/** — templates de teste, não artefatos ativos
+#     · ${CLAUDE_PLUGIN_ROOT}/validation/fixtures/** — templates de teste, não artefatos ativos
 #       (mesma isenção que as regras de varredura ampla do lint aplicam).
 #
 #   Distinção da REGRA 26 (check_research_kg) — NÃO é duplicata: aquela exige que
@@ -117,7 +117,7 @@
 #     --emit-baseline                imprime no STDOUT o baseline sugerido (bootstrap)
 #     --summary                      acrescenta a linha de contagens
 #
-#   Baseline default, na ordem: <repo>/.claude/validation/kg-coverage-baseline.txt
+#   Baseline default, na ordem: <repo>/${CLAUDE_PLUGIN_ROOT}/validation/kg-coverage-baseline.txt
 #                        e só então .../fixtures/kg-coverage-baseline.txt
 #   (o primeiro é o canônico — fixtures/ guarda TEMPLATES de teste, não artefato
 #    ativo, por convenção documentada no cabeçalho do lint-artifacts.sh)
@@ -128,8 +128,8 @@
 # Determinístico, sem LLM. Consumido pela REGRA 29 do lint-artifacts.sh e coberto
 # pelo lint-selftest.sh (19 casos, incluindo a prova dos próprios PRESSUPOSTOS:
 # severidade por delta, decisão-só-com-o-repo, catraca que só encolhe, mutation
-# test). Acompanha .claude/validation/ nos repos adotados; num repo SEM baseline
-# a primeira execução é `--emit-baseline > .claude/validation/kg-coverage-baseline.txt`.
+# test). Acompanha ${CLAUDE_PLUGIN_ROOT}/validation/ nos repos adotados; num repo SEM baseline
+# a primeira execução é `--emit-baseline > ${CLAUDE_PLUGIN_ROOT}/validation/kg-coverage-baseline.txt`.
 # =============================================================================
 set -euo pipefail
 
@@ -193,13 +193,13 @@ if [ -n "${BASELINE}" ]; then
   case "${BASELINE}" in /*) ;; *) BASELINE="${REPO_DIR}/${BASELINE}" ;; esac
   BASELINE_REL="${BASELINE#${REPO_DIR}/}"
 else
-  for _cand in ".claude/validation/kg-coverage-baseline.txt" \
-               ".claude/validation/fixtures/kg-coverage-baseline.txt"; do
+  for _cand in "${CLAUDE_PLUGIN_ROOT}/validation/kg-coverage-baseline.txt" \
+               "${CLAUDE_PLUGIN_ROOT}/validation/fixtures/kg-coverage-baseline.txt"; do
     if [ -f "${REPO_DIR}/${_cand}" ]; then BASELINE="${REPO_DIR}/${_cand}"; BASELINE_REL="${_cand}"; break; fi
   done
   if [ -z "${BASELINE}" ]; then
-    BASELINE="${REPO_DIR}/.claude/validation/kg-coverage-baseline.txt"
-    BASELINE_REL=".claude/validation/kg-coverage-baseline.txt"
+    BASELINE="${REPO_DIR}/${CLAUDE_PLUGIN_ROOT}/validation/kg-coverage-baseline.txt"
+    BASELINE_REL="${CLAUDE_PLUGIN_ROOT}/validation/kg-coverage-baseline.txt"
   fi
 fi
 
@@ -307,7 +307,7 @@ comm -12 "${TMP}/scope" "${TMP}/covered" > "${TMP}/covered_in_scope"
 # Não existe modo que ESCREVA o baseline: escrita automática desarmaria a catraca.
 if [ "${EMIT_BASELINE}" -eq 1 ]; then
   printf '# Baseline de cobertura de proveniência invertida — PASSIVO TOLERADO.\n'
-  printf '# Gerado por: bash .claude/validation/kg-provenance-coverage.sh --emit-baseline\n'
+  printf '# Gerado por: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-provenance-coverage.sh --emit-baseline\n'
   printf '# Esta lista SÓ PODE ENCOLHER. Acrescentar path aqui é regressão (HARD).\n'
   cat "${TMP}/uncovered"
   exit 0
@@ -373,7 +373,7 @@ if [ "${BASELINE_PRESENT}" -eq 0 ]; then
   # violação HARD (uma só, acionável), e o passivo sai como SOFT informativo.
   # O oposto — tratar tudo como novo — reprovaria o repo inteiro e mataria o gate;
   # e silenciar tudo transformaria "apagar o baseline" em bypass do gate.
-  say "HARD" "NO-BASELINE" "${BASELINE_REL}" "baseline de cobertura AUSENTE — a catraca está desarmada e nenhum documento novo pode ser distinguido do passivo. Gere: bash .claude/validation/kg-provenance-coverage.sh --emit-baseline > ${BASELINE_REL}"
+  say "HARD" "NO-BASELINE" "${BASELINE_REL}" "baseline de cobertura AUSENTE — a catraca está desarmada e nenhum documento novo pode ser distinguido do passivo. Gere: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-provenance-coverage.sh --emit-baseline > ${BASELINE_REL}"
   while IFS= read -r p; do
     [ -n "${p}" ] || continue
     say "SOFT" "NO-BASELINE-UNCOVERED" "${p}" "sem nó no grafo (severidade rebaixada: sem baseline não há como saber se é passivo ou novo)"
@@ -383,7 +383,7 @@ else
   comm -23 "${TMP}/uncovered" "${TMP}/baseline" > "${TMP}/novos"
   while IFS= read -r p; do
     [ -n "${p}" ] || continue
-    say "HARD" "NEW" "${p}" "documento de análise NOVO sem nó no grafo — nenhum .kg.yaml o cita em trace:/evidence:. Achado estruturado nasce no grafo; o markdown é vista. Modele com /meta:kg e valide: bash .claude/validation/kg-radar.sh <grafo>.kg.yaml"
+    say "HARD" "NEW" "${p}" "documento de análise NOVO sem nó no grafo — nenhum .kg.yaml o cita em trace:/evidence:. Achado estruturado nasce no grafo; o markdown é vista. Modele com /meta:kg e valide: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <grafo>.kg.yaml"
   done < "${TMP}/novos"
 
   # (3b) Passivo tolerado => SOFT. É o que torna o gate adotável no 1º dia.
