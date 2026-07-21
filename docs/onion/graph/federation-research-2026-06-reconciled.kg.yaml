@@ -1899,6 +1899,1032 @@ nodes:
     confidence: 0.8
     trace: "docs/analysis/onion-federation-design-review-2026-06.md"
     label: "Próximo passo definido: aplicar SA-1/SA-2/SA-3 ao doc de design e validar a Fase 0 com o gate-keeper de meta-spec antes de criar qualquer arquivo"
+  - id: S1_epistemic_lens_question
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-epistemic-lens-known-to-unknown-2026-07.md"
+    label: "Existe (ou deveria existir) uma lente do sabido ao a-saber no Onion, e qual o papel do SDAAL nela?"
+  - id: S1_no_named_framework
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-epistemic-lens-known-to-unknown-2026-07.md"
+    label: "Hoje não existe framework nomeado 'gap epistêmico' no Onion, embora dois vizinhos resolvam fatias parecidas"
+  - id: S1_graph_path_limit
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-epistemic-lens-known-to-unknown-2026-07.md"
+    label: "/meta:graph --path caminha só entre nós que já existem no grafo, não entre sabido e desconhecido"
+  - id: S1_freshness_limit
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-epistemic-lens-known-to-unknown-2026-07.md"
+    label: "/meta:context-freshness trata fidelidade (o documentado ainda é verdade?), não cobertura (o que falta documentar?)"
+  - id: S1_composition_decision
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-epistemic-lens-known-to-unknown-2026-07.md"
+    label: "Testar composição de ferramentas existentes (graph --path + freshness + catálogo do working-method) antes de propor infraestrutura nova"
+  - id: S1_who_decides_question
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    trace: "docs/analysis/onion-research-seed-epistemic-lens-known-to-unknown-2026-07.md"
+    label: "Quem decide 'o que se quer saber' — gate humano (padrão da doutrina) ou uma IA que descobre sozinha o gap?"
+  - id: S1_real_gap_dependency
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    trace: "docs/analysis/onion-research-seed-epistemic-lens-known-to-unknown-2026-07.md"
+    label: "Qual o primeiro gap real (não hipotético) do próprio Onion para dogfoodar a lente?"
+  - id: S1_trigger_composition_attempt
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-epistemic-lens-known-to-unknown-2026-07.md"
+    label: "Gatilho: maestro pede tentativa real da lente num caso real → executar a partir da tentativa de composição (Q4), não de design abstrato"
+  - id: S2_claim_rejection_precedent
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
+    label: "Orquestrar SLMs federados já foi rejeitado duas vezes por nome (engine-economy §5 + ADR slm-as-tool): 'SLM é ferramenta via adapter, nunca orquestrador'"
+  - id: S2_claim_onion_mini_response
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    trace: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
+    label: "A resposta real a 'não depender de um único fornecedor' foi criar o onion-mini como produto-irmão portátil (rodando como Custom GPT), não tornar o core multi-LLM"
+  - id: S2_question_federation_vs_orchestration
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
+    label: "Q2 — 'federação de SLMs' é sobre trocar quem orquestra, ou é variação da federação de instâncias soberanas (repos-humanos) já existente no Onion, aplicada a modelos?"
+  - id: S2_question_new_evidence_gate
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
+    label: "Q1 — o que contaria como evidência nova (caso real, não hipotético) para reabrir a rejeição marcada 'não reabrir sem evidência nova'?"
+  - id: S2_evidence_arxiv_slm_agentic
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
+    label: "Literatura absorvida (arXiv 2506.02153, 'Small Language Models are the Future of Agentic AI') trata SLM-como-ferramenta-eficiente, não federação-de-orquestradores"
+  - id: S2_claim_bifurcado_category
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
+    label: "Retrofit 2026-07-06 nomeou a categoria 'bifurcado' — o lugar (core) está errado, não o mérito da capacidade; onion-mini já é essa resposta, com rótulo"
+  - id: S2_decision_deep_research_trigger
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
+    label: "Gatilho: maestro pede 'roda a pesquisa de SLMs federados' → deep-research adversarial; achado sobrevivente vai a revisão humana explícita antes de propor reabertura"
+  - id: S3_gatilho_maestro_pede
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 1
+    trace: "docs/analysis/onion-research-seed-hegel-dialectics-2026-07.md"
+    label: "Gatilho: maestro pede \"roda a pesquisa Hegel\" para disparar a semente"
+  - id: S3_decision_catalog_hegel_system
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-hegel-dialectics-2026-07.md"
+    label: "Produzir catálogo verificado do sistema hegeliano (Q0a-e) em hegel-system.md antes de qualquer analogia Onion"
+  - id: S3_claim_append_mostly_aufhebung
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-hegel-dialectics-2026-07.md"
+    label: "Regra append-mostly do KG SDAAL (claim refutado permanece, correção supera-preservando) é estruturalmente Aufhebung (negar+conservar+elevar)"
+  - id: S3_q_aufhebung_supersedes
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-hegel-dialectics-2026-07.md"
+    label: "Q1: Aufhebung mapeia com rigor no ciclo claim→refutação→novo-claim do KG? há distinção formal entre contradição-bug e contradição-motor?"
+  - id: S3_q_bildung_self_evolution
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-hegel-dialectics-2026-07.md"
+    label: "Q2: Bildung (autoformação pela negação como motor) é lente válida para o loop dogfood→erro→doutrina do Onion?"
+  - id: S3_q_master_servant_topology
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.25
+    trace: "docs/analysis/onion-research-seed-hegel-dialectics-2026-07.md"
+    label: "Q3: dialética senhor-servo (reconhecimento) informa a topologia responder-gated maestro-IA e a co-constituição core↔adotantes? (alto risco de analogia frouxa)"
+  - id: S3_q_bridge_srl_plea
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-hegel-dialectics-2026-07.md"
+    label: "Q4: a avaliação PLEA (redesenho de estratégia, não mera detecção de discrepância) tem estrutura dialética, com Vygotsky como ponte histórica real Hegel↔SRL?"
+  - id: S3_q_where_breaks
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-hegel-dialectics-2026-07.md"
+    label: "Q5 (crivo anti-decoração): onde a analogia quebra — tese-antítese-síntese é Fichte/Chalybäus não o método de Hegel; teleologia hegeliana vs evolução sem télos do framework; risco de retrofitting filosófico"
+  - id: S4_claim_abandono_2026_05_18
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-ide-integration-revisit-2026-07.md"
+    label: "Multi-IDE foi abandonado formalmente em 2026-05-18, citado como definitivo em 4+ docs canônicos (review, identity, architecture, press-kit)"
+  - id: S4_q_multi_ide_revisit
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-ide-integration-revisit-2026-07.md"
+    label: "Q2: 'ir para dentro do VSCode' é a mesma pergunta que multi-IDE nativo no core, ou é o que o onion-mini já resolve via AGENTS.md?"
+  - id: S4_claim_onion_mini_bridge
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-ide-integration-revisit-2026-07.md"
+    label: "onion-mini já roda em qualquer lugar que leia AGENTS.md (incl. VSCode com extensões agênticas) sem o core precisar mudar nada"
+  - id: S4_claim_bifurcado_retrofit
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-ide-integration-revisit-2026-07.md"
+    label: "Retrofit 2026-07-06 (parecer rejection-vs-spinoff): onion-mini/família multi-plataforma já é a resposta bifurcada, fora do core"
+  - id: S4_q_efficiency_criterion
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-ide-integration-revisit-2026-07.md"
+    label: "Q3: qual proposta concreta de eficiência (não replicar tudo, aproveitar AGENTS.md/onion-mini como ponte) faltaria como evidência nova para reabrir?"
+  - id: S4_decision_clarify_first
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-ide-integration-revisit-2026-07.md"
+    label: "Método previsto: esclarecer Q2 com o maestro ANTES de qualquer pesquisa técnica de viabilidade"
+  - id: S5_question_generative_composition
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
+    label: "Dado um problema, como compor soluções com as peças existentes? (composição generativa sobre o grafo)"
+  - id: S5_question_plea_mechanism
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
+    label: "Como PLEA se materializa como mecanismo de auto-regulação de ferramentas (não de aprendiz humano)?"
+  - id: S5_claim_graph_descriptive
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    trace: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
+    label: "/meta:graph hoje é DESCRITIVO (o que existe, impacto reverso, órfãos), não GENERATIVO"
+  - id: S5_claim_pieces_kg_missing
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
+    label: "Não existe .kg.yaml que modele o framework como peças componíveis; ADR SDAAL-aninhado é o 1º tijolo"
+  - id: S5_claim_anti_cathedral_alert
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
+    label: "A visão completa (projeta+aprende+autocorrige+evolui) é a assinatura exata da catedral abandonada nas FASES 5-9 do v4.0"
+  - id: S5_decision_dogfood_kg_sdaal
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
+    label: "Dogfoodar /meta:kg sobre um subconjunto real (os SDAALs) para provar que o grafo revela o que a prosa escondia"
+  - id: S5_entity_srl_plea_seed
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
+    label: "Seed irmão SRL-PLEA (Q5 aberta sobre bytecodes PLEA, herdada por este seed)"
+  - id: S6_question_model_lifecycle
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
+    label: "Uma vez com um modelo pronto, como cuidar dele — monitorar, atualizar, saber quando degrada?"
+  - id: S6_claim_no_doctrine
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
+    label: "Onion não tem hoje doutrina de ciclo de vida de modelo (drift, retraining, versionamento de pesos, avaliação contínua) análoga à que existe para contexto de domínio ou documentação"
+  - id: S6_claim_provider_diff
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
+    label: "llm-provider (roadmap SDAAL) resolve 'qual modelo usar', não 'como saber se o modelo já escolhido ainda está bom' — são problemas diferentes"
+  - id: S6_entity_llm_provider_roadmap
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
+    label: "abstração llm-provider planejada (não construída) no roadmap do SDAAL, já marcada como 'caso a repensar' por bootstrapping estranho"
+  - id: S6_entity_local_slm_adapter
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
+    label: "adapter local-slm de-identification — gated, aguardando 1º adotante regulado com runtime; único ponto onde 'cuidar de modelo' seria responsabilidade real do Onion"
+  - id: S6_decision_borrow_lifecycle_form
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
+    label: "proposta: emprestar a FORMA do ciclo de vida de contexto (CRUD+, veredito de frescor RECENTE/DEGRADADO/OBSOLETO) para modelo — sem copiar o conteúdo, a validar se transfere"
+  - id: S6_question_mlops_fit
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
+    label: "quanto de MLOps (drift, re-treino agendado, canary) é genuinamente aplicável ao Onion vs overhead desproporcional, e isso só faz sentido se o Onion tiver modelo próprio?"
+  - id: S6_artifact_engine_economy_kb
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
+    label: "onion-engine-economy.md — destino previsto do achado (nota de doutrina), já trata SLM como ferramenta"
+  - id: S7_q_onion_as_model
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md"
+    label: "O Onion pode virar um modelo em si (SLM treinado/destilado ou conceito mais moderno equivalente), em vez de só ser interpretado por modelos de terceiros?"
+  - id: S7_claim_llm_as_vm
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md"
+    label: "Tese-mãe do Onion: LLM-as-VM, markdown-as-bytecode — o master-prompt é o programa, qualquer Transformer de terceiro é a máquina que o interpreta"
+  - id: S7_claim_onion_mini_proof
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md"
+    label: "onion-mini prova a tese LLM-as-VM em produção (Claude e Custom GPT), mas é destilação de doutrina em markdown, nunca destilação de pesos — nenhum artefato encontrado com fine-tuning, LoRA ou checkpoint a partir do corpus do Onion"
+  - id: S7_claim_metaphor_fragile
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md"
+    label: "Ressalva que a pesquisa precisa enfrentar: a própria metáfora bytecode/VM já foi qualificada pelo maestro como frágil se levada a sério tecnicamente — \"cadê os testes?\""
+  - id: S7_claim_analogy_breaks
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md"
+    label: "Anti-tese deliberada (Q4): um modelo treinado não tem a auditabilidade/versionamento em PR que markdown tem — \"virar modelo\" pode trocar fonte≠derivação e declarado≠verificado por caixa-preta"
+  - id: S7_decision_scope_research
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md"
+    label: "Decidir, antes de pesquisar, se a investigação testa a metáfora bytecode/VM tecnicamente (enfrentando a ressalva de fragilidade) ou a usa como ponto de partida de um produto diferente (Q1: distinguir os 3 sentidos de \"virar modelo\")"
+  - id: S7_decision_trigger_research
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md"
+    label: "Gatilho: quando o maestro pedir (\"roda a pesquisa de Onion-como-modelo\"), executar o deep-research harness (fan-out multi-fonte + verificação adversarial) a partir desta semente"
+  - id: S8_QuestionLensMeaning
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
+    label: "O que \"lente\" significa nesta semente: abstração de acesso (a) ou camada de tradução/interpretação (b)?"
+  - id: S8_ClaimLensCurrentUsage
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    trace: "docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
+    label: "\"Lente\" já é vocabulário vivo no Onion (meta:graph, judge-panel, leitura de PLEA/SRL), mas sempre como perspectiva de leitura sobre o próprio sistema, nunca como camada sobre modelos externos"
+  - id: S8_ClaimReadingA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
+    label: "Leitura (a): Onion como abstração de acesso — interface única por trás da qual qualquer modelo é chamado (llm-provider levado a sério)"
+  - id: S8_ClaimReadingB
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
+    label: "Leitura (b): Onion como camada de tradução/interpretação — reformata/verifica/contextualiza output bruto de qualquer modelo segundo a doutrina, à moda do SDAAL aplicado a IA em vez de APIs de negócio"
+  - id: S8_ClaimOnionMiniPrimitiveLens
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
+    label: "O onion-mini já é, na prática, a doutrina (master-prompt) interpretada por qualquer Transformer intercambiável (Claude, GPT via Custom GPT) — forma primitiva de lente ainda sem nome formal"
+  - id: S8_QuestionCollisionRouting
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
+    label: "A leitura (a) colide com a rejeição já registrada de model-routing multi-LLM (onion-engine-economy.md §5) e com a semente federated-slm-orchestration, ou a leitura (b) escapa por ser categoria genuinamente diferente?"
+  - id: S8_DecisionClarifySessionFirst
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
+    label: "Método proposto: sessão dedicada de clareza conceitual interna (testar leituras contra onion-relation-vocabulary.md e contra a rejeição de Q3) ANTES de abrir pesquisa externa sobre LangChain/LiteLLM"
+  - id: S9_q_radar_mechanism
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md"
+    label: "Como desenhar o canal-radar de vigilância contínua sobre sinais externos de pesquisa (fora do próprio Onion)?"
+  - id: S9_claim_internal_pattern
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md"
+    label: "field-observations/ já documenta o padrão campo→assess (maestro)→entrada formal para sinal INTERNO (dogfood), reaproveitável para sinal externo"
+  - id: S9_evidence_heyclicky
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md"
+    label: "Sinal externo HeyClicky (roteamento de modelo) chegou via docs/evolution/inbox/, foi avaliado e recebeu veredito preliminar — prova o fluxo sinal→avaliação→veredito uma vez, não recorrente"
+  - id: S9_claim_cadence_tooling
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md"
+    label: "A mecânica de cadência recorrente já existe pronta (skills /loop e schedule/CronCreate); falta decidir o quê, onde e quem cura, não como repetir"
+  - id: S9_q1_folder_reuse
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md"
+    label: "Q1 — reaproveitar field-observations/ com campo domain: novo, ou criar pasta-irmã para não misturar dogfood interno com ecossistema externo (tensão fonte≠derivação)?"
+  - id: S9_q2_sources
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md"
+    label: "Q2 — quais fontes primárias (repos, papers, release notes, arXiv, changelogs) compõem o radar, e com que frequência cada uma é checada?"
+  - id: S9_q3_cadence_choice
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md"
+    label: "Q3 — cadência via /loop (sessão ativa) ou schedule/CronCreate (agente autônomo em cron), sem virar 'IA decide sozinha o que é relevante'?"
+  - id: S9_decision_trigger
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md"
+    label: "Gatilho: quando o maestro pedir 'vamos montar o canal-radar', executar a partir desta semente começando pelas decisões estruturais Q1-Q4, não pela captura"
+  - id: S10_question_organize
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
+    label: "Como organizar 9 sementes especulativas soltas, nenhuma decidida, sem forçar convergência prematura entre elas?"
+  - id: S10_claim_template_proven
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
+    label: "O template de 'semente de pesquisa' (título → status → por que → questões → método → gatilho) já existia e já funcionava"
+  - id: S10_evidence_two_instances
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
+    label: "2 instâncias reais confirmam o template: onion-research-seed-hegel-dialectics-2026-07.md e onion-research-seed-srl-plea-2026-07.md"
+  - id: S10_claim_gap_was_index
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
+    label: "O que faltava não era o template, era qualquer índice de 'quais sementes estão vivas agora' — o rastreamento morava só na memória de sessão, invisível a sessões futuras"
+  - id: S10_decision_index_table
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
+    label: "Criar tabela 'Sementes de pesquisa abertas' em docs/analysis/README.md como índice real, sem mudar o template"
+  - id: S10_decision_memory_pointer
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.85
+    trace: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
+    label: "Manter só uma memória consolidada (não uma por semente) que aponta pra tabela real — memória como ponteiro/cache, não fonte de verdade"
+  - id: S10_decision_cite_prior_decision
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.85
+    trace: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
+    label: "Sementes que colidem com decisão anterior devem citar a decisão e perguntar 'o que é diferente agora' — não fingir território virgem"
+  - id: S11_q_vale_extrair
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
+    label: "O que no smolagents (e vizinhos) é genuinamente novo vs. reinvenção com nome diferente do que o Onion já tem (agent-orchestration.md, 6 padrões Anthropic)?"
+  - id: S11_claim_no_prior_doctrine
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
+    label: "Onion não tem doutrina dedicada a minerar prior art de projetos externos específicos — só um processo ad-hoc já usado uma vez"
+  - id: S11_evidence_heyclicky
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    trace: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
+    label: "Precedente HeyClicky (sinal de roteamento de modelo) avaliado e rejeitado com veredito 'complexidade > ganho no modelo spec-as-code'"
+  - id: S11_claim_slm_grounding
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
+    label: "panorama-ia-generativa-2026-06 já absorveu grounding de mercado sobre SLMs (custo 10-30x menor, arXiv 2506.02153) mas não é específico sobre smolagents ou frameworks leves de orquestração"
+  - id: S11_q_fontes_primarias
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
+    label: "Onde a informação sobre padrões emergentes 'aparece primeiro' (repos/papers/RFCs) em vez de blogposts de segunda mão?"
+  - id: S11_q_criterio_extracao
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
+    label: "Qual critério explícito e reutilizável define quando um padrão externo vale a pena importar pro Onion?"
+  - id: S11_decision_deep_research
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
+    label: "Rodar deep-research harness fan-out multi-fonte (repo primário smolagents + 2-3 frameworks leves vizinhos + cruzamento com agent-orchestration.md/onion-engine-economy.md) só quando o maestro disparar"
+  - id: S11_decision_gatilho
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
+    label: "Gatilho declarado: maestro pede explicitamente ('roda a pesquisa do smolagents') para executar a partir desta semente"
+  - id: S12_q_plea_lens
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.6
+    trace: "docs/analysis/onion-research-seed-srl-plea-2026-07.md"
+    label: "PLEA mapeia formalmente o loop radar-KG → atuadores-dogfood → juiz/re-teste do Onion? (Q1)"
+  - id: S12_claim_plea_analogy
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-srl-plea-2026-07.md"
+    label: "As 3 fases PLEA já têm análogo operante no Onion: Planificação=radar/backlog/plans, Execução=atuadores/dogfood, Avaliação=juiz adversarial/re-teste/D10/gates"
+  - id: S12_claim_metacog_artifacts
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-srl-plea-2026-07.md"
+    label: "Artefatos metacognitivos já existem no Onion: diário=automonitorização, conflict_class/valid_when/review_after=autoavaliação calibrada, confidence dos claims=autoeficácia epistêmica"
+  - id: S12_q_messenger_channel
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    trace: "docs/analysis/onion-research-seed-srl-plea-2026-07.md"
+    label: "O messenger (whatsapp-sender) serve como canal de prompts autorregulatórios (lembretes de planificação, check-ins de execução, reflexões de avaliação)? (Q3, aberta)"
+  - id: S12_claim_sdaal_gate
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-srl-plea-2026-07.md"
+    label: "Implementação do canal messenger-autorregulatório exige eixo SDAAL spec-first (parecer §4-C) e é gated"
+  - id: S12_q_llm_vm_arch
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.3
+    trace: "docs/analysis/onion-research-seed-srl-plea-2026-07.md"
+    label: "A tese LLM-as-VM (MD=spec executável, KG=estado de conhecimento, grafos=mapa navegável, scripts=determinismo) é original frente a arquiteturas cognitivas como ACT-R/SOAR/agentes com memória externa? (Q5, aberta)"
+  - id: S12_decision_trigger
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-srl-plea-2026-07.md"
+    label: "Gatilho: maestro pede \"roda a pesquisa SRL/PLEA\" → dispara deep-research harness com verificação adversarial tecendo Q1-Q5"
+  - id: S12_artifact_report
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-research-seed-srl-plea-2026-07.md"
+    label: "Relatório de deep-research entregue (11 achados, 1 refutado) em onion-research-srl-plea-2026-07.md"
+  - id: S13_question_repo_tier_meaning
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-tiered-distribution-repos-2026-07.md"
+    label: "Q1: 'repos-padrão por tier' significa gerar repos novos (scaffolding automático) ou classificar/registrar formalmente os que já existem (família multi-plataforma)?"
+  - id: S13_claim_trust_matrix_exists
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-research-seed-tiered-distribution-repos-2026-07.md"
+    label: "A matriz de trust por tier (hub/consumer/standalone) já existe, é determinística e validada por trust-topology-check.sh --dry-run — controle de acesso 'sem dar acesso ao core' já é infra em produção"
+  - id: S13_claim_family_unregistered
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-research-seed-tiered-distribution-repos-2026-07.md"
+    label: "A família multi-plataforma (onion-cursor, onion-codex, onion-copilot, onion-zed, onion-antigravity) já existe de fato mas não está registrada em members.yaml — distribuição por tier já acontece informalmente, sem rastreamento"
+  - id: S13_question_distilled_role_worth_it
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-tiered-distribution-repos-2026-07.md"
+    label: "Q2: vale a pena formalizar role: distilled agora, ou o gatilho do ADR do Mini ('2ª destilação real') exige que a família seja trabalho ativo verificado, não só citada de passagem?"
+  - id: S13_question_core_access_sufficient
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-tiered-distribution-repos-2026-07.md"
+    label: "Q3: o pedido do maestro ('sem dar acesso ao core') já está satisfeito pela matriz de 4 tiers, ou ele quer graus intermediários de acesso que ela não modela hoje?"
+  - id: S13_question_mini_hierarchy_position
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-tiered-distribution-repos-2026-07.md"
+    label: "Q4: onde entra o Onion Mini nessa hierarquia — é standalone-por-destilação (5º padrão implícito, precisa nome no vocabulário controlado) ou apenas um standalone comum (T3)?"
+  - id: S13_decision_register_family
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    trace: "docs/analysis/onion-research-seed-tiered-distribution-repos-2026-07.md"
+    label: "Proposta: se Q1 resolver para leitura (b), registrar a família multi-plataforma real em members.yaml com a anotação de destilação já usada pelo onion-mini — trabalho quase administrativo, sem tooling nova"
+  - id: SY_evid_seed_index_table
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.98
+    verified_at: 2026-07-21
+    trace: "docs/analysis/README.md:9-31"
+    label: "A tabela 'Sementes de pesquisa abertas' EXISTE em docs/analysis/README.md (linhas 9-31), com 12 sementes indexadas, status por semente e a própria S10 marcada ENTREGUE"
+  - id: SY_evid_education_vertical_kb
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: "docs/knowledge-base/education/theories/plea-rosario.md · docs/knowledge-base/education/theories/srl-zimmerman.md · docs/knowledge-base/education/applications/onion-srl-bridges.md:24-30 · docs/analysis/onion-adr-education-vertical-2026-07.md"
+    label: "A pesquisa SRL/PLEA já virou KB no core: theories/plea-rosario.md + theories/srl-zimmerman.md (camada 1, fiel à fonte) e applications/onion-srl-bridges.md §1 com o mapa PLEA↔loop (Planificação=radar/backlog, Execução=atuadores/dogfood, Avaliação=juiz/re-teste/D10), rotulado PLAUSÍVEL — mais o ADR da vertical educacional"
+  - id: SY_evid_hegel_catalog_layer1
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/discussions/onion-pessoal-marcio/proto/theories/hegel-dialectics.md:1-50"
+    label: "Catálogo hegeliano camada-1 JÁ ESCRITO (97 linhas, fiel à fonte): momentos EL §§79-82, Aufhebung/negação determinada, Priest×Brandom, e a correção anti-decoração da Q5 já resolvida (tese-antítese-síntese é Fichte/Chalybäus, não Hegel; método real é imanente)"
+  - id: SY_evid_hegel_diary_grenze
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md:17-40"
+    label: "Migalha de diário 2026-07-11 já entrega um achado hegeliano OPERACIONAL e verificado por fonte: Grenze×Schranke define quando usar .kg.yaml (conhecimento deixa de ser monotônico), e 'KG sustenta a inquietude / prosa é a superação que nega+preserva+eleva' confirma a leitura append-mostly↔Aufhebung"
+  - id: SY_claim_hegel_system_kb_missing
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.95
+    trace: "docs/knowledge-base/education/theories/ (ls: plea-rosario.md, srl-zimmerman.md)"
+    label: "O destino canônico do catálogo (docs/knowledge-base/education/theories/hegel-system.md) NÃO existe — a pasta só tem plea-rosario.md e srl-zimmerman.md; o catálogo vive num sandbox de discussão que declara explicitamente 'não substitui' o seed"
+  - id: SY_evid_kg_dogfood_identity
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.92
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:1-35 · docs/onion/graph/onion-identity-2026-07.kg.yaml:1-25,167-187,423"
+    label: "O dogfood de /meta:kg sobre um subconjunto real do próprio framework ACONTECEU: plano de 2026-07-11 + grafo construído com nós de vertical/SDAAL (inclui 'KG SDAAL já dogfoodado em produção' e a EDGE-Hagel rhilo→core), baseline 2026-07-17"
+  - id: SY_claim_pieces_kg_still_missing
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/onion/graph/ (10 .kg.yaml inspecionados) · .claude/commands/meta/graph.md"
+    label: "O KG das PEÇAS componíveis segue inexistente: os 10 grafos de docs/onion/graph/ são audit/domain de investigações (identidade, federação, constelação, evolução), nenhum modela comandos/skills/abstrações como blocos de composição — a metade generativa da S5 não virou realidade"
+  - id: SY_evid_provenance_coverage_gate
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: ".claude/validation/kg-provenance-coverage.sh:1-40 · .claude/validation/lint-artifacts.sh:1456-1482 · .claude/validation/kg-coverage-baseline.txt"
+    label: "O eixo COBERTURA (≠ fidelidade) ganhou mecanismo determinístico: kg-provenance-coverage.sh pergunta 'este relatório existe no grafo?', com catraca de baseline versionado, plugado no lint-artifacts.sh (passivo SOFT, doc novo sem nó HARD)"
+  - id: SY_evid_parecer_bifurcado
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-parecer-rejection-vs-spinoff-signal-2026-07.md:12,39,44,48,142-145"
+    label: "O parecer rejection-vs-spinoff já DECIDIU (D1) a categoria 'bifurcado' e já EXECUTOU (D3) o retrofit das duas sementes: para SLM-federado e multi-IDE a resposta é 'o lugar (core) está errado, não o mérito' — onion-mini já é a resposta fora do core"
+  - id: SY_evid_family_topology_adr
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.93
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-adr-family-repo-topology-2026-07.md:1-60"
+    label: "A Q1 da S13 ('gerar repos novos ou classificar os existentes?') foi respondida por ADR ACEITO em 2026-07-19: taxonomia D1 de 4 tipos de repo com mecanismo de nascimento e de sync por tipo, e D2 resolvendo a porta pública via /meta:adopt role-scoped"
+  - id: SY_claim_family_unregistered_still
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/evolution/federation/members.yaml:190-203"
+    label: "A família multi-plataforma continua NÃO registrada: grep em members.yaml não acha cursor/codex/copilot/zed/antigravity — só onion-mini, e com 'role: distilled formal é costura gated' anotado no próprio arquivo"
+  - id: SY_evid_local_slm_adapter_doc
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: ".claude/utils/de-identification/adapters/local-slm.md · docs/sdaal/sdaal.md:320"
+    label: "O adapter local-slm de de-identification existe como spec no core (.claude/utils/de-identification/adapters/local-slm.md) — a âncora da S6 é real, mas é doc de adapter gated; llm-provider segue '📝 Roadmap' na tabela do sdaal.md"
+  - id: SY_claim_radar_channel_absent
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.88
+    trace: "docs/knowledge-base/agentic-patterns/field-observations/ · docs/evolution/inbox/ · docs/analysis/onion-orchestration-external-radar-2026-06.md"
+    label: "O canal-radar externo NÃO existe: field-observations/ tem só 2 observações internas de dogfood + README, sem campo domain:, o inbox de evolução está zerado (só _processed) e o único radar externo é um doc pontual de 2026-06 — a S9 segue genuinamente aberta"
+  - id: SY_claim_srl_pair_not_duplicate
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.95
+    trace: "docs/analysis/onion-research-seed-srl-plea-2026-07.md · docs/analysis/onion-research-srl-plea-2026-07.md"
+    label: "Os dois arquivos 'srl-plea' da pasta NÃO são duplicata: onion-research-seed-srl-plea-2026-07.md é a semente e onion-research-srl-plea-2026-07.md é o relatório entregue (11 achados) que ela mesma cita — a nomenclatura quase-idêntica é que confunde, não o conteúdo"
+  - id: SY_claim_bifurcado_cluster
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/README.md:22-31 · docs/analysis/onion-parecer-rejection-vs-spinoff-signal-2026-07.md:39"
+    label: "Dívida de organização exposta pelo grafo: quatro sementes (SLM-federado, multi-IDE, Onion-como-lente leitura-(a) e repos-por-tier) reperguntam a MESMA questão já respondida — 'onde mora a capacidade que o core rejeitou' → bifurcado/onion-mini; a pasta as mostra como 4 fios independentes"
+  - id: SY_claim_onion_as_model_pair_complementary
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md · docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
+    label: "onion-as-model e onion-as-model-lens NÃO são duplicata: a primeira pergunta se o Onion vira o modelo (pesos/destilação), a segunda se o Onion é camada SOBRE modelos de terceiros — mas compartilham a mesma âncora (onion-mini/LLM-as-VM) e deveriam ser pesquisadas na mesma rodada"
+  - id: SY_claim_sources_question_duplicated
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md:37 · docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
+    label: "Duplicata literal de questão: 'quais fontes primárias e com que frequência' aparece em S9 (Q2 do canal-radar) e em S11 (fontes primárias do smolagents) — é uma pergunta só, e ela pertence ao desenho do canal, não à mineração de um framework específico"
 edges:
   - from: G1_INTERRUPT_STATES
     to: G1_GATED_HANDSHAKE_DESIGN
@@ -2644,3 +3670,372 @@ edges:
   - from: B2_3_decision_encaixe_canonico
     to: B2_3_next_steps_gate_keeper
     edge_type: DEPENDS_ON
+  - from: S1_no_named_framework
+    to: S1_epistemic_lens_question
+    edge_type: SUPPORTS
+  - from: S1_graph_path_limit
+    to: S1_no_named_framework
+    edge_type: SUPPORTS
+  - from: S1_freshness_limit
+    to: S1_no_named_framework
+    edge_type: SUPPORTS
+  - from: S1_composition_decision
+    to: S1_graph_path_limit
+    edge_type: DEPENDS_ON
+  - from: S1_composition_decision
+    to: S1_freshness_limit
+    edge_type: DEPENDS_ON
+  - from: S1_composition_decision
+    to: S1_real_gap_dependency
+    edge_type: DEPENDS_ON
+  - from: S1_who_decides_question
+    to: S1_epistemic_lens_question
+    edge_type: DEPENDS_ON
+  - from: S1_trigger_composition_attempt
+    to: S1_composition_decision
+    edge_type: DEPENDS_ON
+  - from: S2_decision_deep_research_trigger
+    to: S2_question_new_evidence_gate
+    edge_type: DEPENDS_ON
+  - from: S2_question_new_evidence_gate
+    to: S2_claim_rejection_precedent
+    edge_type: DEPENDS_ON
+  - from: S2_question_federation_vs_orchestration
+    to: S2_claim_rejection_precedent
+    edge_type: DEPENDS_ON
+  - from: S2_evidence_arxiv_slm_agentic
+    to: S2_claim_rejection_precedent
+    edge_type: SUPPORTS
+  - from: S2_claim_bifurcado_category
+    to: S2_claim_onion_mini_response
+    edge_type: SUPPORTS
+  - from: S2_claim_onion_mini_response
+    to: S2_question_federation_vs_orchestration
+    edge_type: SUPPORTS
+  - from: S3_gatilho_maestro_pede
+    to: S3_decision_catalog_hegel_system
+    edge_type: CAUSES
+  - from: S3_q_aufhebung_supersedes
+    to: S3_decision_catalog_hegel_system
+    edge_type: DEPENDS_ON
+  - from: S3_q_bildung_self_evolution
+    to: S3_decision_catalog_hegel_system
+    edge_type: DEPENDS_ON
+  - from: S3_q_master_servant_topology
+    to: S3_decision_catalog_hegel_system
+    edge_type: DEPENDS_ON
+  - from: S3_q_bridge_srl_plea
+    to: S3_decision_catalog_hegel_system
+    edge_type: DEPENDS_ON
+  - from: S3_claim_append_mostly_aufhebung
+    to: S3_q_aufhebung_supersedes
+    edge_type: SUPPORTS
+  - from: S3_q_where_breaks
+    to: S3_claim_append_mostly_aufhebung
+    edge_type: REFUTES
+  - from: S4_claim_abandono_2026_05_18
+    to: S4_q_multi_ide_revisit
+    edge_type: CAUSES
+  - from: S4_claim_onion_mini_bridge
+    to: S4_claim_bifurcado_retrofit
+    edge_type: SUPPORTS
+  - from: S4_claim_bifurcado_retrofit
+    to: S4_q_multi_ide_revisit
+    edge_type: SUPERSEDES
+  - from: S4_decision_clarify_first
+    to: S4_q_multi_ide_revisit
+    edge_type: DEPENDS_ON
+  - from: S4_q_efficiency_criterion
+    to: S4_decision_clarify_first
+    edge_type: DEPENDS_ON
+  - from: S5_claim_graph_descriptive
+    to: S5_question_generative_composition
+    edge_type: SUPPORTS
+  - from: S5_claim_pieces_kg_missing
+    to: S5_decision_dogfood_kg_sdaal
+    edge_type: CAUSES
+  - from: S5_claim_anti_cathedral_alert
+    to: S5_decision_dogfood_kg_sdaal
+    edge_type: SUPPORTS
+  - from: S5_question_generative_composition
+    to: S5_decision_dogfood_kg_sdaal
+    edge_type: DEPENDS_ON
+  - from: S5_question_plea_mechanism
+    to: S5_entity_srl_plea_seed
+    edge_type: DEPENDS_ON
+  - from: S6_claim_no_doctrine
+    to: S6_question_model_lifecycle
+    edge_type: SUPPORTS
+  - from: S6_claim_provider_diff
+    to: S6_question_model_lifecycle
+    edge_type: SUPPORTS
+  - from: S6_entity_llm_provider_roadmap
+    to: S6_claim_provider_diff
+    edge_type: TRACES_TO
+  - from: S6_question_model_lifecycle
+    to: S6_entity_local_slm_adapter
+    edge_type: DEPENDS_ON
+  - from: S6_decision_borrow_lifecycle_form
+    to: S6_entity_local_slm_adapter
+    edge_type: DEPENDS_ON
+  - from: S6_question_mlops_fit
+    to: S6_question_model_lifecycle
+    edge_type: SUPPORTS
+  - from: S6_decision_borrow_lifecycle_form
+    to: S6_artifact_engine_economy_kb
+    edge_type: TRACES_TO
+  - from: S7_claim_llm_as_vm
+    to: S7_q_onion_as_model
+    edge_type: SUPPORTS
+  - from: S7_claim_onion_mini_proof
+    to: S7_claim_llm_as_vm
+    edge_type: SUPPORTS
+  - from: S7_claim_metaphor_fragile
+    to: S7_claim_llm_as_vm
+    edge_type: REFUTES
+  - from: S7_claim_analogy_breaks
+    to: S7_q_onion_as_model
+    edge_type: REFUTES
+  - from: S7_decision_scope_research
+    to: S7_claim_metaphor_fragile
+    edge_type: DEPENDS_ON
+  - from: S7_decision_trigger_research
+    to: S7_decision_scope_research
+    edge_type: DEPENDS_ON
+  - from: S8_ClaimLensCurrentUsage
+    to: S8_QuestionLensMeaning
+    edge_type: SUPPORTS
+  - from: S8_ClaimOnionMiniPrimitiveLens
+    to: S8_QuestionLensMeaning
+    edge_type: SUPPORTS
+  - from: S8_ClaimReadingA
+    to: S8_QuestionLensMeaning
+    edge_type: SUPPORTS
+  - from: S8_ClaimReadingB
+    to: S8_QuestionLensMeaning
+    edge_type: SUPPORTS
+  - from: S8_QuestionCollisionRouting
+    to: S8_ClaimReadingA
+    edge_type: DEPENDS_ON
+  - from: S8_DecisionClarifySessionFirst
+    to: S8_QuestionLensMeaning
+    edge_type: DEPENDS_ON
+  - from: S8_QuestionCollisionRouting
+    to: S8_QuestionLensMeaning
+    edge_type: DEPENDS_ON
+  - from: S9_claim_internal_pattern
+    to: S9_q_radar_mechanism
+    edge_type: SUPPORTS
+  - from: S9_evidence_heyclicky
+    to: S9_q_radar_mechanism
+    edge_type: SUPPORTS
+  - from: S9_claim_cadence_tooling
+    to: S9_q_radar_mechanism
+    edge_type: SUPPORTS
+  - from: S9_q1_folder_reuse
+    to: S9_claim_internal_pattern
+    edge_type: DEPENDS_ON
+  - from: S9_q3_cadence_choice
+    to: S9_claim_cadence_tooling
+    edge_type: DEPENDS_ON
+  - from: S9_q_radar_mechanism
+    to: S9_q1_folder_reuse
+    edge_type: DEPENDS_ON
+  - from: S9_q_radar_mechanism
+    to: S9_q2_sources
+    edge_type: DEPENDS_ON
+  - from: S9_q_radar_mechanism
+    to: S9_q3_cadence_choice
+    edge_type: DEPENDS_ON
+  - from: S9_decision_trigger
+    to: S9_q_radar_mechanism
+    edge_type: DEPENDS_ON
+  - from: S10_evidence_two_instances
+    to: S10_claim_template_proven
+    edge_type: SUPPORTS
+  - from: S10_claim_template_proven
+    to: S10_decision_index_table
+    edge_type: SUPPORTS
+  - from: S10_claim_gap_was_index
+    to: S10_decision_index_table
+    edge_type: CAUSES
+  - from: S10_decision_index_table
+    to: S10_question_organize
+    edge_type: SUPPORTS
+  - from: S10_decision_memory_pointer
+    to: S10_question_organize
+    edge_type: SUPPORTS
+  - from: S10_decision_cite_prior_decision
+    to: S10_question_organize
+    edge_type: SUPPORTS
+  - from: S10_decision_memory_pointer
+    to: S10_decision_index_table
+    edge_type: DEPENDS_ON
+  - from: S11_evidence_heyclicky
+    to: S11_claim_no_prior_doctrine
+    edge_type: SUPPORTS
+  - from: S11_claim_no_prior_doctrine
+    to: S11_q_vale_extrair
+    edge_type: SUPPORTS
+  - from: S11_claim_slm_grounding
+    to: S11_q_vale_extrair
+    edge_type: SUPPORTS
+  - from: S11_decision_deep_research
+    to: S11_q_fontes_primarias
+    edge_type: DEPENDS_ON
+  - from: S11_decision_deep_research
+    to: S11_q_criterio_extracao
+    edge_type: DEPENDS_ON
+  - from: S11_decision_deep_research
+    to: S11_q_vale_extrair
+    edge_type: DEPENDS_ON
+  - from: S11_decision_gatilho
+    to: S11_decision_deep_research
+    edge_type: DEPENDS_ON
+  - from: S12_claim_plea_analogy
+    to: S12_q_plea_lens
+    edge_type: SUPPORTS
+  - from: S12_claim_metacog_artifacts
+    to: S12_q_plea_lens
+    edge_type: SUPPORTS
+  - from: S12_artifact_report
+    to: S12_q_plea_lens
+    edge_type: TRACES_TO
+  - from: S12_q_messenger_channel
+    to: S12_claim_sdaal_gate
+    edge_type: DEPENDS_ON
+  - from: S12_decision_trigger
+    to: S12_artifact_report
+    edge_type: CAUSES
+  - from: S12_artifact_report
+    to: S12_q_messenger_channel
+    edge_type: TRACES_TO
+  - from: S12_artifact_report
+    to: S12_q_llm_vm_arch
+    edge_type: TRACES_TO
+  - from: S13_claim_trust_matrix_exists
+    to: S13_question_core_access_sufficient
+    edge_type: SUPPORTS
+  - from: S13_claim_family_unregistered
+    to: S13_decision_register_family
+    edge_type: SUPPORTS
+  - from: S13_decision_register_family
+    to: S13_question_repo_tier_meaning
+    edge_type: DEPENDS_ON
+  - from: S13_question_distilled_role_worth_it
+    to: S13_question_repo_tier_meaning
+    edge_type: DEPENDS_ON
+  - from: S13_question_mini_hierarchy_position
+    to: S13_question_repo_tier_meaning
+    edge_type: DEPENDS_ON
+  - from: S13_question_distilled_role_worth_it
+    to: S13_claim_family_unregistered
+    edge_type: TRACES_TO
+  - from: SY_evid_seed_index_table
+    to: S10_question_organize
+    edge_type: SUPPORTS
+  - from: SY_evid_seed_index_table
+    to: S10_decision_index_table
+    edge_type: SUPPORTS
+  - from: SY_evid_education_vertical_kb
+    to: S12_q_plea_lens
+    edge_type: SUPPORTS
+  - from: SY_evid_education_vertical_kb
+    to: S12_claim_plea_analogy
+    edge_type: SUPPORTS
+  - from: SY_evid_hegel_catalog_layer1
+    to: S3_q_where_breaks
+    edge_type: SUPPORTS
+  - from: SY_evid_hegel_diary_grenze
+    to: S3_claim_append_mostly_aufhebung
+    edge_type: SUPPORTS
+  - from: SY_evid_hegel_catalog_layer1
+    to: S3_decision_catalog_hegel_system
+    edge_type: SUPPORTS
+  - from: SY_claim_hegel_system_kb_missing
+    to: S3_decision_catalog_hegel_system
+    edge_type: SUPPORTS
+  - from: SY_claim_hegel_system_kb_missing
+    to: SY_evid_hegel_catalog_layer1
+    edge_type: SUPPORTS
+  - from: SY_evid_kg_dogfood_identity
+    to: S5_decision_dogfood_kg_sdaal
+    edge_type: SUPPORTS
+  - from: SY_claim_pieces_kg_still_missing
+    to: S5_claim_pieces_kg_missing
+    edge_type: SUPPORTS
+  - from: SY_claim_pieces_kg_still_missing
+    to: S5_question_generative_composition
+    edge_type: SUPPORTS
+  - from: SY_evid_provenance_coverage_gate
+    to: S1_freshness_limit
+    edge_type: SUPPORTS
+  - from: SY_evid_provenance_coverage_gate
+    to: S1_epistemic_lens_question
+    edge_type: SUPPORTS
+  - from: SY_evid_parecer_bifurcado
+    to: S4_q_multi_ide_revisit
+    edge_type: SUPPORTS
+  - from: SY_evid_parecer_bifurcado
+    to: S2_claim_bifurcado_category
+    edge_type: SUPPORTS
+  - from: SY_evid_parecer_bifurcado
+    to: S8_QuestionCollisionRouting
+    edge_type: SUPPORTS
+  - from: SY_evid_family_topology_adr
+    to: S13_question_repo_tier_meaning
+    edge_type: SUPPORTS
+  - from: SY_claim_family_unregistered_still
+    to: S13_decision_register_family
+    edge_type: SUPPORTS
+  - from: SY_claim_family_unregistered_still
+    to: S13_question_distilled_role_worth_it
+    edge_type: SUPPORTS
+  - from: SY_evid_local_slm_adapter_doc
+    to: S6_entity_local_slm_adapter
+    edge_type: SUPPORTS
+  - from: SY_evid_local_slm_adapter_doc
+    to: S6_entity_llm_provider_roadmap
+    edge_type: SUPPORTS
+  - from: SY_claim_radar_channel_absent
+    to: S9_q_radar_mechanism
+    edge_type: SUPPORTS
+  - from: SY_claim_radar_channel_absent
+    to: S9_claim_internal_pattern
+    edge_type: SUPPORTS
+  - from: SY_claim_sources_question_duplicated
+    to: S11_q_fontes_primarias
+    edge_type: SUPPORTS
+  - from: S11_decision_deep_research
+    to: S9_q3_cadence_choice
+    edge_type: SUPPORTS
+  - from: SY_claim_srl_pair_not_duplicate
+    to: S12_artifact_report
+    edge_type: SUPPORTS
+  - from: SY_claim_onion_as_model_pair_complementary
+    to: S7_q_onion_as_model
+    edge_type: SUPPORTS
+  - from: SY_claim_onion_as_model_pair_complementary
+    to: S8_QuestionLensMeaning
+    edge_type: SUPPORTS
+  - from: S8_QuestionLensMeaning
+    to: S2_question_new_evidence_gate
+    edge_type: SUPPORTS
+  - from: S6_question_model_lifecycle
+    to: S7_q_onion_as_model
+    edge_type: SUPPORTS
+  - from: S1_epistemic_lens_question
+    to: S5_decision_dogfood_kg_sdaal
+    edge_type: SUPPORTS
+  - from: S3_decision_catalog_hegel_system
+    to: SY_evid_education_vertical_kb
+    edge_type: SUPPORTS
+  - from: S4_q_efficiency_criterion
+    to: S13_decision_register_family
+    edge_type: SUPPORTS
+  - from: S5_question_plea_mechanism
+    to: S12_q_llm_vm_arch
+    edge_type: SUPPORTS
+  - from: SY_claim_bifurcado_cluster
+    to: S2_question_federation_vs_orchestration
+    edge_type: SUPPORTS
