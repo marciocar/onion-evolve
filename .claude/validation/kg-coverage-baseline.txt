@@ -1,11 +1,7 @@
 # Baseline de cobertura de proveniência invertida — PASSIVO TOLERADO.
 # Gerado por: bash .claude/validation/kg-provenance-coverage.sh --emit-baseline
 # Esta lista SÓ PODE ENCOLHER. Acrescentar path aqui é regressão (HARD).
-docs/analysis/onion-agent-teams-evaluation-2026-06.md
 docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md
-docs/analysis/onion-coevolution-backlog-2026-06-18.md
-docs/analysis/onion-decision-north-star-2026-07.md
-docs/analysis/onion-distribution-strategy-2026-06.md
 docs/analysis/onion-door-birth-findings-2026-07.md
 docs/analysis/onion-evolution-2026-06-15.md
 docs/analysis/onion-evolution-2026-06-16.md
@@ -13,9 +9,6 @@ docs/analysis/onion-evolution-2026-06-17.md
 docs/analysis/onion-evolution-2026-07-08.md
 docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md
 docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md
-docs/analysis/onion-orchestration-math-phase-transition-2026-06.md
-docs/analysis/onion-orchestration-ontology-2026-06.md
-docs/analysis/onion-orchestration-topology-review-2026-06-22.md
 docs/analysis/onion-parecer-whatsapp-sender-2026-07.md
 docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md
 docs/analysis/onion-plugin-marketplace-runbook-2026-07.md
@@ -40,8 +33,4 @@ docs/analysis/panorama-ia-generativa-2026-06.md
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md
 docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md
 docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md
-docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md
-docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md
-docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md
-docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md
 docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md

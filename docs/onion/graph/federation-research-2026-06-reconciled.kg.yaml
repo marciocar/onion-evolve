@@ -2925,6 +2925,1474 @@ nodes:
     confidence: 0.9
     trace: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md:37 · docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
     label: "Duplicata literal de questão: 'quais fontes primárias e com que frequência' aparece em S9 (Q2 do canal-radar) e em S11 (fontes primárias do smolagents) — é uma pergunta só, e ela pertence ao desenho do canal, não à mineração de um framework específico"
+  - id: B4_1_claim_branches_antipadrao
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Usar branches para representar ambientes/escopos é antipadrão explícito no GitOps: não compõem (fica-se em uma por vez) e a promoção não é merge simples"
+  - id: B4_1_claim_cascata_nativa_claude_code
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Claude Code já entrega cascata nativa de camadas: settings (managed→project→user) e CLAUDE.md hierárquico (upward-concat + lazy subtree + @imports)"
+  - id: B4_1_claim_subrepo_scoping_resolvido
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "O gap de scoping sub-repo (time/pessoa dentro de um monorepo) já existe no vetor via CLAUDE.md por subdiretório com lazy load"
+  - id: B4_1_claim_overlay_merge_type_aware
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Kustomize base/overlay com strategic merge type-aware (mapas mergeiam, listas por chave) é o alvo de qualidade para override parcial sem clobber"
+  - id: B4_1_claim_components_vs_overlay
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Herança vertical (empresa→time→pessoa, overlay) e composição horizontal (verticais opcionais, components/roles.yaml) são eixos distintos que não devem colidir"
+  - id: B4_1_claim_tsconfig_array_footgun
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Lição negativa do tsconfig extends: arrays sofrem replace silencioso sem proveniência — exatamente o modo-de-falha a evitar em .claude"
+  - id: B4_1_claim_policy_precisa_reconciliacao
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Camadas com política/compliance (OPA roots, KG SUPERSEDES) não podem resolver conflito por última-camada-vence silenciosa; exigem reconciliação explícita e versionada"
+  - id: B4_1_decision_mecanismo_hibrido
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Veredito do stream: mecanismo híbrido — cascata-nativa como transporte primário, overlays/strategic-merge como modelo de qualidade, merge-n-camadas (vendor-branch) só para versão, branches para escopo rejeitado"
+  - id: B4_1_decision_resolver_proveniencia
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.8
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Requisito transversal: Onion precisa de um resolver de proveniência próprio (estilo git config --show-scope) que aponte qual camada contribuiu cada valor"
+  - id: B4_1_evidence_verificacao_12_12
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Verificação adversarial: 12/12 achados confirmed contra fonte primária, com 3 ressalvas de atribuição de fonte (não de veracidade)"
+  - id: B4_1_artifact_tabela_regulated_member
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.75
+    trace: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+    label: "Tabela de encaixe o membro regulado: mapeamento framework/empresa/time/pessoa para managed-settings, CLAUDE.md raiz/package e settings de usuário, sem branches"
+  - id: B4_2_verdict_hybrid_mechanism
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "Veredito de mecanismo: híbrido — cascata-nativa (cognitivo) + merge-N-camadas do Onion (settings) + plugins/grupos (distribuição); branches reprovadas"
+  - id: B4_2_cognitive_layer_cascades_natively
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "CLAUDE.md/rules/skills concatenam nativamente raiz→cwd e managed→user→project→local (não sobrescrevem, compõem)"
+  - id: B4_2_settings_json_no_tree_inheritance
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "settings.json NÃO herda pela árvore de diretórios — carrega só do dir inicial, self-contained (assimetria/gap real)"
+  - id: B4_2_branches_rejected_as_vehicle
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "Branches reprovadas como veículo de herança de escopo — nenhum mecanismo nativo modela herança por branch git"
+  - id: B4_2_team_in_repo_native_via_claudemd
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "Time-dentro-do-repo já existe nativamente via CLAUDE.md/skills por diretório de pacote — corrige o achado central da pesquisa"
+  - id: B4_2_plugin_group_distribution
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "Marketplace de org + acesso por grupo (Enterprise) dão distribuição versionada com proveniência de bundles por papel"
+  - id: B4_2_cli_managed_plugins_no_autoinstall
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "Plugins de managed settings não auto-instalam no CLI (issue fechada not planned) — atrito real para adotante regulado"
+  - id: B4_2_server_managed_no_per_group
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "Server-managed settings aplicam uniforme à org inteira — per-group ainda não suportado (refuta claim de blog terceiro)"
+  - id: B4_2_import_transclusion_mechanism
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "@import dá composição explícita e declarativa de herança entre camadas, com profundidade máxima de 4 hops"
+  - id: B4_2_regulated_member_mapping_applied
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.75
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "Mapeamento concreto framework→empresa→time→pessoa aplicado ao nx monorepo regulado da o membro regulado"
+  - id: B4_2_person_layer_gap_question
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "Como versionar/compartilhar o 4º nível (pessoa-dentro-do-time-dentro-do-repo), onde o nativo é fraco?"
+  - id: B4_2_adversarial_verification_13of13
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+    label: "Verificação adversarial: 13/13 achados confirmados contra fonte primária, com 1 ajuste de enumeração (H2-03)"
+  - id: B4_3_cascade_mercado
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Mercado não versiona escopo por branch; padrão vencedor universal é cascata por diretório/escopo com mais-específico-vence (mise, git includeIf, Claude Code settings, nx targetDefaults)"
+  - id: B4_3_branch_rejected
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Branches rejeitados como mecanismo de herança de escopo: servem à distribuição/versão do framework, não à composição N-camadas simultâneas em runtime"
+  - id: B4_3_team_gap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Nível intermediário de time dentro de um repo é gap confirmado tanto no líder de mercado (nx só duplica, sem extends) quanto no Claude Code (.claude/ tem 4 slots fixos e user é global da máquina)"
+  - id: B4_3_hybrid_mechanism
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Veredito de mecanismo: híbrido com espinha em cascata-nativa por diretório/escopo + merge-n-camadas (vendor-branch generalizado) para reconciliar base↔override + overlay só para o aditivo"
+  - id: B4_3_governance_orthogonal
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Governança de override é camada de política ORTOGONAL à herança: resolvida por CODEOWNERS-por-path gerado + branch protection + required-reviewer rulesets + bypass-list auditável"
+  - id: B4_3_claude_settings_cascade
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Cascata nativa oficial do Claude Code: managed → cli → local → project → user, com managed como piso regulado inviolável"
+  - id: B4_3_mise_walkup
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "mise/asdf caminham a árvore de diretórios mesclando mise.toml/.tool-versions hierarquicamente, mais-fundo-vence — mecanismo-referência de cascata N-camadas em produção"
+  - id: B4_3_regulated_member_topology
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 0.8
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Topologia proposta para o o membro regulado: framework (vendor-branch) → empresa (managed-settings piso inviolável) → time (diretório + nx tags + CODEOWNERS gerado) → pessoa (user settings + polimorfismo estilo chezmoi), sem branch de escopo"
+  - id: B4_3_provenance_free
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.8
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Proveniência por chave/artefato (qual camada contribuiu o quê) sai de graça se a cascata for nomeada, ordenada e versionada, como o extends[] do Renovate"
+  - id: B4_3_resolver_gap
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.7
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Peça ainda a construir: resolver que caminhe do subdir da pessoa até a raiz do repo mesclando camadas de .claude/contexto — nenhum vendor oferece isso hoje"
+  - id: B4_3_adversarial_pass
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+    label: "Verificação adversarial de 2026-07-09 contra as 13 fontes: 13/13 findings confirmed, nenhuma fabricação; ajustes recomendados de URL/citação em H3-06 e H3-11"
+  - id: B4_4_cascata_nativa
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Claude Code já concatena CLAUDE.md em 4 camadas (managed→user→project→local), amplo→específico, sem sobrescrever (F1)"
+  - id: B4_4_subagentes_precedencia
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Subagentes resolvem colisão por precedência de escopo e herdam ferramentas por padrão (allowlist/disallowedTools) (F6)"
+  - id: B4_4_plugin_marketplace
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Plugin marketplace da Anthropic: override de grupo herda preferência org-wide — entrega framework→empresa→time em produção (F9)"
+  - id: B4_4_kustomize_overlay
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Overlay/merge-N-camadas (Kustomize base→overlay, strategic-merge) é o padrão de mercado para override estrutural sem branch (F8)"
+  - id: B4_4_supersedes_bitemporal
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "SUPERSEDES bitemporal (Zep/Graphiti): fato novo invalida sem apagar, com valid-time + provenance-time — eixo ortogonal ao merge de arquivo (F5)"
+  - id: B4_4_polimorfismo_sdaal
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Model Spec (chain of command Root→System→Developer→User→Guideline): defaults sobrepostos explicitamente vs guidelines sobrepostas implicitamente pelo contexto — núcleo do polimorfismo SDAAL (F3)"
+  - id: B4_4_constituicao_reason_based
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Constituição do Claude (jan/2026) virou reason-based: herda-se o porquê, escopo inferior re-resolve o como (F4)"
+  - id: B4_4_branches_rejeitados
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Branches rejeitadas como mecanismo de composição — servem só como transporte/proveniência (vendor-branch, ledger), não como plano de herança"
+  - id: B4_4_veredito_hibrido
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.8
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Veredito do stream: mecanismo híbrido — cascata-nativa (config cognitiva) + overlay/merge-N-camadas (override estrutural) + SUPERSEDES bitemporal (conhecimento); insumo ao maestro, não decide doutrina"
+  - id: B4_4_grana_encaixe
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.75
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Aplicação concreta ao o membro regulado: empresa=managed policy inviolável, time=CLAUDE.md do subdir nx, pessoa=user+local, conhecimento vivo=SUPERSEDES"
+  - id: B4_4_verificacao_adversarial
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Passe adversarial: 10/11 achados materiais confirmed, 1 hypothesis, 0 refuted; 3 confirmed com ressalva declarado≠verificado (F2 cifra, F8 citação, F10 estatística) já reconciliadas no KG do stream"
+  - id: B4_4_gap_engenharia
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 4
+    confidence: 0.7
+    trace: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+    label: "Gap de engenharia remanescente: gerar e resolver a cascata N-camadas (hoje 2, bilateral) e casar os 4 pilares do Onion sobre ela — não inventar mecanismo novo"
+  - id: B4_5_question_heranca_escopo
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "Qual mecanismo herda escopo framework→empresa→time→pessoa no Onion?"
+  - id: B4_5_claim_branch_rejeitada
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.95
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "Branch-exemplo do maestro (adopt→o membro regulado→time→pessoa) NÃO serve como mecanismo de composição de escopo — antipadrão GitOps documentado, sem proveniência por-chave"
+  - id: B4_5_decision_hibrido_tres_planos
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "Veredito de mecanismo: HÍBRIDO de 3 planos — cascata-nativa (cognitivo) + merge-N-camadas (config) + SUPERSEDES bitemporal (conhecimento), convergente nos 4 streams; insumo ao maestro, não doutrina fechada"
+  - id: B4_5_claim_cognitivo_cascata_nativa
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "A camada cognitiva (CLAUDE.md/rules/skills/agentes) já compõe nativamente por concatenação amplo→específico — sub-repo scoping existe de fábrica, não precisa ser construído"
+  - id: B4_5_claim_settings_gap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 4
+    confidence: 0.95
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "settings.json NÃO herda pela árvore — carrega self-contained só do diretório inicial; este é o único gap real de engenharia (H2·F7)"
+  - id: B4_5_evidence_regulated_member_caso
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "Caso o membro regulado (fintech regulada, monorepo nx) resolvido sem branch de escopo: managed=empresa (piso inviolável), CLAUDE.md por pacote=time, user/local=pessoa"
+  - id: B4_5_decision_slice1_resolver
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "Slice 1 recomendado: generalizar resolve-integration-branch.sh + vendor-branch.sh em resolver N-camadas com proveniência por-chave, materializando settings.json composto por diretório"
+  - id: B4_5_claim_supersedes_ortogonal
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "SUPERSEDES bitemporal do KG (valid-time + provenance-time) é eixo ORTOGONAL ao merge de arquivo — verdade nova invalida sem apagar, não é 3-way-merge"
+  - id: B4_5_claim_refutacao_grounding
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "Achado central do grounding original ('sub-repo scoping não existe em nenhum eixo') PARCIALMENTE REFUTADO — existe nativamente na camada cognitiva; gap real restrito a settings.json e ao 4º nível pessoa"
+  - id: B4_5_claim_arrays_merge_corrigido
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "'Arrays sempre mergeiam' é supergeneralização corrigida — doc oficial diz que a maioria dos settings substitui; só permissions e arrays explicitamente marcados mesclam"
+  - id: B4_5_question_quarto_nivel_pessoa
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    trace: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
+    label: "O 4º nível (pessoa-dentro-do-time versionável/compartilhável) é o único nativamente fraco — convenção members/<pessoa> é hipótese de design, não verificada em dogfood"
+  - id: B4_6_paper_verified
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "Paper arXiv:2601.17311 (transição de fase, agregação por maioria) verificado no HTML original em jun/2026"
+  - id: B4_6_empirical_support
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "Paper irmão arXiv:2604.02460 dá suporte empírico: single-agent supera multi-agent sob budget de token igual em raciocínio multi-hop"
+  - id: B4_6_judge_panel_maps
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "O judge-panel do Onion (N céticos, voto) é precisamente o modelo de agregação binária por maioria do paper"
+  - id: B4_6_diversity_correctness
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "Diversidade do judge-panel (ρ baixo) é requisito de correção, não estética — painel homogêneo (ρ→1) pode colapsar em consenso errado"
+  - id: B4_6_orchestrate_gate
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "s>β é a versão quantitativa do gate 'orquestrar ou não' — tarefa acoplada (s baixo) confirma postura opt-in do Onion"
+  - id: B4_6_mixing_depth_cap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "Mixing depth/saturação (piso v*) dá teto racional ao tamanho do painel — diversidade importa mais que número"
+  - id: B4_6_star_fanin_partial
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "Saturação de fan-in em estrela (b·m≤W) morde só no nó sumarizador por LLM, não no orquestrador (fan-in é JS sem custo de token)"
+  - id: B4_6_scope_limit
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "O modelo cobre só tarefa binária + voto por maioria — não se aplica ao fan-out geral do Onion (dedupe/rank/merge sobre workers heterogêneos)"
+  - id: B4_6_adopt_qualitative
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "Adotar qualitativamente já (custo ~zero): explicitar diversidade do panel e o gate orquestrar-ou-não na doutrina — candidato diferido, ainda não implementado"
+  - id: B4_6_park_quantitative
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "Manter quantitativo parqueado no radar 🟡 — calibrar β/γ/ρ empiricamente exige instrumentação que o Onion não tem e provavelmente não vale a complexidade agora"
+  - id: B4_6_calibration_trigger
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
+    label: "Gatilho para revisitar: se surgirem critérios de aceite numéricos para o judge-panel ou necessidade de calibrar N_max de panel por modelo"
+  - id: B4_7_claim_fleet_not_industry_primitive
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
+    label: "\"Frota/fleet\" é jargão em transição, não é primitivo de nenhum framework de orquestração da indústria (o canônico é orchestrator-worker/fan-out-fan-in)"
+  - id: B4_7_claim_gen3_no_grand_ontology
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
+    label: "Gen III (era LLM) abandonou ontologias formais (RDF/OWL) em favor de semântica implícita + protocolos lightweight (MCP/A2A/ANP)"
+  - id: B4_7_evidence_arxiv_web_of_agents
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
+    label: "Paper arXiv 2507.10644 mapeia 3 gerações (FIPA/Semantic Web/LLM) e situa Gen III como semântica implícita"
+  - id: B4_7_claim_boundary_evolution_fleet_fog
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
+    label: "A confusão real não está dentro da frota (coerente em 5 camadas) nem em termos da moda — está na fronteira embaçada entre ontologia de evolução (cross-repo) e ontologia de frota (intra-repo), com 4 superfícies de contato"
+  - id: B4_7_decision_retire_fleet_terms
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
+    label: "Aposentar os apelidos \"frota\"(PT)/\"fleet\"(EN) em favor do vocabulário canônico orquestração/orchestrator-worker/workers (executado 2026-06-28)"
+  - id: B4_7_decision_disambiguate_boundary_tbox_abox
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
+    label: "Desambiguar a fronteira no TBox (onion-relation-vocabulary.md) e ABox (actors.yaml): predicado orchestrates-workers corrige o antigo delegates→frota (cujo objeto era o próprio canal)"
+  - id: B4_7_decision_reject_external_ontology_store
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
+    label: "Não adotar triple-store/RDF/ontologia formal externa — confirmaria remar contra a maré Gen III e contradiria a decisão já tomada de \"não há store externo\""
+  - id: B4_7_question_topology_adr_debt_f3
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
+    label: "Dívida deferida (F3): metadados incoerentes do ADR de topologia (título RASCUNHO + status accepted) e cunhagem \"nó sumarizador\" sem âncora ao termo de mercado (aggregator/sub-synthesizer)"
+  - id: B4_7_artifact_canonical_vocab_table
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
+    label: "Tabela de correspondência vocabulário Onion ↔ termo canônico da indústria (§5), base da migração de rótulos"
+  - id: B4_8_adr_topologia
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "ADR de topologia de orquestração (locus×forma) sob revisão — metadados internamente inconsistentes (accepted + título RASCUNHO + type adr-draft + filename -draft-)"
+  - id: B4_8_veredito_validado
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "Decisão central do ADR VALIDADA pela revisão adversarial: distinção locus×forma é sólida"
+  - id: B4_8_zero_blocker
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "Run de 21 agentes (~838K tokens, fan-in determinístico a 0 token): 16 achados brutos, 0 refutados pelo verificador, 0 blocker/0 major (7 minor, 9 nit)"
+  - id: B4_8_wm_fortalece
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "Contraponto W/m (heurística de largura de janela) FORTALECE a decisão em vez de miná-la — fecha gap doutrinário mantendo o default plano"
+  - id: B4_8_ca_confunde_estrutural_comportamental
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "Critério de aceite CA3 confundia validação estrutural grep-ável (ausência do agente) com garantia comportamental (julgamento LLM via metaspec-validate)"
+  - id: B4_8_nomenclatura_sumarizador
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 2
+    confidence: 0.7
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "\"Nó sumarizador\" é cunhagem própria, não termo de mercado — tensiona a regra de linguagem ubíqua; equivalente interno mais fiel é \"agente de síntese\""
+  - id: B4_8_metadados_incoerentes
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "Metadados do ADR coexistem contraditórios (status accepted vs título/tipo/filename draft) com 4 referências cruzadas em outros documentos apontando ao nome atual"
+  - id: B4_8_kb_doutrina_ausente
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "Doutrina \"vigente\" do eixo forma-do-grafo não existe no texto que o leitor da KB/SKILL realmente consome — só a armadilha de locus está registrada"
+  - id: B4_8_decisao_fixes_camada12
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "Aplicar ao ADR os fixes de camadas 1-2: citação stale, CA2/CA3 separados em estrutural vs comportamental, b·m≤W reancorada, mecanismo (a) árvore legítima vs (b) nesting de subagentes separado, frase anti-objeção"
+  - id: B4_8_decisao_diferir_promocao
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.75
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "Diferir à promoção (camada 3): ancorar nomenclatura ao equivalente de mercado, frase-âncora na KB, promoção draft→adr com atualização das 4 referências cruzadas"
+  - id: B4_8_question_aprovador_excecao
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
+    label: "Quem aprova a exceção ao default de orquestração plana não está escrito — gatilho de implementação incompleto nesse ponto (risco prático avaliado como baixo)"
+  - id: B4_9_agent_teams_flag
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Flag experimental CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS ligada e testada"
+  - id: B4_9_three_primitives
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Três primitivas de orquestração: sessões faseadas, Workflow, Agent Teams"
+  - id: B4_9_claim_negotiation_gap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Agent Teams cobre negociação viva peer-a-peer que Workflow não cobre"
+  - id: B4_9_claim_blocker_portability
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Flag experimental+versão específica quebra invariante de portabilidade do Onion"
+  - id: B4_9_claim_blocker_auditability
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Coordenação emergente atrita com auditabilidade da dimensão compliance"
+  - id: B4_9_evidence_smoketest
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Smoke-test de conectividade 6/6 etapas PASS (mailbox bidirecional lead-teammate)"
+  - id: B4_9_evidence_tasklist_demo
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Demo de task list compartilhada com cross-check triplo batendo (49 agentes, 78 comandos)"
+  - id: B4_9_decision_optin
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Agent Teams vira terceiro modo opt-in com detecção e fallback gracioso, não padrão obrigatório"
+  - id: B4_9_decision_no_dedicated_command
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Não criar comando/skill dedicado a Agent Teams antes da fronteira de doutrina existir"
+  - id: B4_9_artifact_kb_boundary
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Seção 'Dois Substratos de Orquestração' sintetizada na KB agent-orchestration (v1.2.0)"
+  - id: B4_9_question_capability_detection
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Implementar detecção de capacidade + fallback gracioso em onion-orchestration"
+  - id: B4_9_question_reavaliar_experimental
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
+    label: "Reavaliar quando Agent Teams sair de experimental (remover ressalva de portabilidade)"
+  - id: B4_10_maestro_question
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "Onion deve seguir o modo mais moderno de evolução do ecossistema Claude Code ou uma estratégia mais adequada à própria arquitetura?"
+  - id: B4_10_ecosystem_native_plugins
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "Claude Code virou ecossistema nativo de plugins/marketplace (versionado por SHA, server-managed settings, update deliberado)"
+  - id: B4_10_skillmd_open_standard
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "SKILL.md é padrão aberto cross-vendor e `gh skill` traz proveniência (repo + tree SHA) que detecta divergência de conteúdo"
+  - id: B4_10_layer_taxonomy
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "Enquadramento em 3 camadas do Onion: (1) `.claude/` execução, (2) `docs/` spec-as-code, (3) co-evolução/federação — só a camada 1 é coberta pelo nativo"
+  - id: B4_10_verdict_hybrid
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.8
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "Veredito: estratégia híbrida por camada — camada 1 vira nativo (plugin/marketplace), camadas 2+3 ficam e viram o diferencial (moat)"
+  - id: B4_10_philosophy_validated
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "O ecossistema validou a filosofia do Onion (SKILL.md, update deliberado, human-in-the-loop, CLAUDE.md, sem CLI standalone) — Onion estava à frente, não atrás"
+  - id: B4_10_provenance_gap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "Gap genuíno identificado: falta proveniência rastreável (relay manual sem content-hash), manifesto declarativo por componente e descoberta indexada"
+  - id: B4_10_commercial_sharpening
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "Implicação comercial: se camada 1 é commodity nativa/grátis, o Onion monetiza exatamente as camadas 2+3 (governança/coordenação) — open-core clássico"
+  - id: B4_10_migration_path
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "Caminho de migração da camada 1 é incremental, opcional e gated pelo apetite do maestro — não é ordem de execução imediata"
+  - id: B4_10_appetite_signaled
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "2026-06-27: apetite sinalizado pelo maestro — camada 1 destravada e iniciada em campo"
+  - id: B4_10_exchange_unit_adr
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "ADR onion-adr-exchange-unit-2026-06: unidade de troca = vertical-skill SDAAL via marketplace + proveniência (monetização gated)"
+  - id: B4_10_design_plugin_prototype
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
+    label: "Protótipo da vertical Design como plugin `onion-design` (marketplace.json + script de montagem determinístico), dogfood de instalação provou a separação de camadas"
+  - id: B4_11_claim_ns1_kg_candidate
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 0.65
+    trace: "docs/analysis/onion-decision-north-star-2026-07.md"
+    label: "NS1: framework constrói conhecimento reconciliável vivo (KG multi-vertical) — candidato de maior atenção (29.2) e única convergência de evidência + diferenciador único (3 verticais peer)"
+  - id: B4_11_claim_demand_axis_not_onion
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    trace: "docs/analysis/onion-decision-north-star-2026-07.md"
+    label: "Contrapeso: a demanda de mercado provada é do EIXO (Company Brain, aposta YC 2026), não do Onion — zero adotante frio confirmado"
+  - id: B4_11_claim_reconcile_value
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.82
+    trace: "docs/analysis/onion-decision-north-star-2026-07.md"
+    label: "Reconciliar verdade é valor diferente de recuperar (RAG desmascarado) — sustenta a convicção em NS1"
+  - id: B4_11_claim_ns3_hedge_caixa
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-decision-north-star-2026-07.md"
+    label: "NS3 (braço de educação, Descasca/Método Onion) é o hedge de receita mais perto de caixa, mas com evidência fraca e desviando do eixo raro"
+  - id: B4_11_claim_ns2_ns4_backlog
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.45
+    trace: "docs/analysis/onion-decision-north-star-2026-07.md"
+    label: "NS2 (método portátil multi-plataforma) e NS4 (control-plane hospedado) ficam como backlog — sub-provado e conf 0.30/risco de repetir o erro v4.0, respectivamente"
+  - id: B4_11_question_cold_adopter
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    trace: "docs/analysis/onion-decision-north-star-2026-07.md"
+    label: "Q_COLD_ADOPTER: existe qualquer pull dos diferenciais raros do Onion fora da órbita de Marcio? — o desempate de maior alavancagem da estratégia"
+  - id: B4_11_decision_ns1_recommendation
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    trace: "docs/analysis/onion-decision-north-star-2026-07.md"
+    label: "Recomendação honesta (não decisão final): NS1 como norte, NS3 como hedge de caixa de curto prazo, com Q_COLD_ADOPTER como gate de peso entre os dois"
+  - id: B4_11_evidence_graph_identity_reconciled
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-decision-north-star-2026-07.md"
+    label: "Grafo de identidade reconciliado (59 nós, 66 arestas, integridade limpa) + 2 pesquisas de mercado — base empírica que alimenta toda a decisão"
+  - id: B4_11_decision_maestro_final_weight
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    trace: "docs/analysis/onion-decision-north-star-2026-07.md"
+    label: "Decisão de peso final entre NS1/NS3 permanece do maestro — o doc estrutura, não decide (nível Criar não é derivável só do radar)"
+  - id: B4_12_backlog_resolved
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "Backlog de co-evolução de 2026-06-18 fecha totalmente resolvido: os 7 itens priorizados foram entregues"
+  - id: B4_12_decision_integration_branch
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "Branch de integração do PR passa a ser resolvida por helper determinístico (cadeia .onion-version → git config → default), não por git config isolado como a premissa original supunha"
+  - id: B4_12_decision_wontdo_schema_lint
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "Lint determinístico de schema do .onion-version é WON'T-DO verificado: nenhum campo malformado causa corrupção silenciosa, então leitura defensiva nos consumidores basta"
+  - id: B4_12_question_reopen_lint
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "Gatilho de revisão: reabrir o lint de schema se a federação passar a parsear mais campos do stamp por script"
+  - id: B4_12_decision_rfc0002_catalogo
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "RFC-0002 ratifica catálogo-first como doutrina de meta-estratégia, materializada em 5 playbooks de onion-patterns"
+  - id: B4_12_decision_snapshot_retention
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "Diretriz canônica de retenção e payload mínimo para decision snapshot vira KB concept, separando diretriz de implementação local do adotante"
+  - id: B4_12_decision_co_announce
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "Comando /meta:co-announce fecha gap de processo do anúncio downstream, gerando staging a partir do CHANGELOG e resolvendo alvo via members.yaml"
+  - id: B4_12_evidence_dogfood_alvo_parsing
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "Dogfood do co-announce pegou caso real de parsing do campo alvo com anotação entre parênteses que o caminho feliz escondia"
+  - id: B4_12_decision_prettierignore
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: superseded
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "/meta:adopt passa a provisionar proteção never-clobber de .prettierignore para artefatos Onion, cobrindo vendor e SSOT gerada pelo consumidor"
+  - id: B4_12_claim_no_e2e_test
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
+    label: "Dívida técnica transversal permanece: /meta:adopt --update não tem teste ponta-a-ponta automatizado porque o fluxo roda dentro do Claude Code, não como CLI"
+  - id: SY4_prod_rfc0005_ratificada
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:1-60 (status: accepted 2026-07-09; §2 tabela dos 3 planos; §3 rejeição de branch-para-escopo; §4 matriz escopo×mecanismo; §4.1 adendo forma-de-adoção 2026-07-10)"
+    label: "O veredito híbrido de 3 planos (cascata-nativa cognitiva + merge-N-camadas de settings + SUPERSEDES bitemporal) VIROU DOUTRINA RATIFICADA: RFC-0005 accepted, citando H1-H4 achado a achado e rejeitando branch-para-escopo explicitamente"
+  - id: SY4_prod_compose_settings_ncamadas
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/utils/scope/compose-settings.sh · .claude/utils/scope/resolve-scope-layers.sh:1-60 (cadeia empresa→time→pessoa, merge type-aware) · git log: d20918a (#309) 6db26f4 (#314) 2dab19b (#320)"
+    label: "O 'único gap real de engenharia' (settings.json não herda pela árvore) está FECHADO em código: compose-settings.sh compõe N camadas com merge type-aware e resolve-scope-layers.sh descobre a cadeia empresa→time→pessoa automaticamente"
+  - id: SY4_prod_show_scope_provenancia
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/utils/scope/resolve-scope-layers.sh:11-18,60-61 (--show-scope/--provenance, --json, role/form do .onion-version) · docs/evolution/scope-convention-2026.md:44-58 (invariante strip(provtree)==compose, exit 4)"
+    label: "O 'requisito transversal' resolver de proveniência estilo git config --show-scope EXISTE e é auditável: proveniência por-chave com vencedor/sombreadas, origem por elemento de array, saída JSON para regulado e invariante declarado≠verificado que falha com exit 4"
+  - id: SY4_prod_scope_convention
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/evolution/scope-convention-2026.md:1-80 (tabela 3 planos × 4 escopos; 'Plano 1 — cavalgar o nativo, zero código'; Plano 3 SUPERSEDES marcado gated)"
+    label: "A convenção de escopo virou documento operacional: time = <time-dir>/.claude/ (nativo, zero código), pessoa = ~/.claude/, plano conhecimento (SUPERSEDES) declarado GATED atrás de dogfood — a divisão de trabalho que os 4 streams propuseram"
+  - id: SY4_prod_capability_update_adr
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-adr-capability-update-out-of-git-2026-07.md · docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md §4.1"
+    label: "A dimensão 'forma de adoção' (full|docs-only|in-place) — não prevista pelos 4 streams e vinda de ground-truth o membro regulado — ganhou nome e ADR próprio; a implementação do 4º modo de proveniência segue gated"
+  - id: SY4_prod_topology_adr_coerente
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-topology-adr-2026-06-21.md:1-25 (title sem RASCUNHO, type: adr, status: accepted, filename sem -draft-)"
+    label: "A dívida de metadados do ADR de topologia (accepted + título RASCUNHO + type adr-draft + filename -draft-) foi RESOLVIDA: frontmatter internamente coerente e promoção draft→adr concluída"
+  - id: SY4_prod_ca_estrutural_vs_comportamental
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-orchestration-topology-adr-2026-06-21.md:133-136 (b·m≤W reancorada como forma compacta, parte observável = k resumos), 203-211 (CA1 default plano · CA2 árvore sob gatilho · CA3 invariante grep-able)"
+    label: "Os fixes de camada 1-2 do review adversarial foram aplicados ao ADR: CA1/CA2/CA3 separados (estrutural grep-able vs comportamental), b·m≤W reancorada como heurística e não lei"
+  - id: SY4_prod_nomenclatura_ancorada
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/knowledge-base/concepts/onion-relation-vocabulary.md:96 (nó sumarizador ↔ aggregator/sub-synthesizer) · docs/knowledge-base/concepts/agent-orchestration.md:507 (frase-âncora locus≠forma na KB que o leitor consome)"
+    label: "Os dois diferimentos de camada 3 do review viraram realidade: a cunhagem 'nó sumarizador' está ancorada ao termo de mercado numa tabela do TBox, e a doutrina do eixo forma-do-grafo tem frase-âncora dentro da KB (não só no ADR)"
+  - id: SY4_prod_orchestrates_workers
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/knowledge-base/concepts/onion-relation-vocabulary.md:54,69,96 (predicado orchestrates-workers; coluna evolução vs orquestração; tabela Onion↔indústria)"
+    label: "A decisão da ontologia foi executada: 'frota/fleet' aposentado, predicado orchestrates-workers no TBox e a fronteira evolução(cross-repo)×orquestração(intra-repo) desambiguada em tabela canônica"
+  - id: SY4_prod_kb_dois_substratos
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/knowledge-base/concepts/agent-orchestration.md:79-127 (§Dois Substratos: Workflow default vs Agent Teams opt-in; escopo intra-repo; reavaliar ao sair de experimental)"
+    label: "A avaliação de Agent Teams virou doutrina viva na KB: fronteira Workflow(default)×Agent Teams(opt-in experimental), regra de bolso 'se dá para escrever o grafo, Workflow vence' e a linha vermelha Agent Teams ≠ co-evolução cross-repo"
+  - id: SY4_open_agent_teams_capability_detection
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: ".claude/skills/onion-orchestration/SKILL.md:183 (Passo 0 health-check só do Workflow; nenhuma ocorrência de 'Teams' ou CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS no SKILL.md)"
+    label: "SEGUE ABERTO: a detecção de capacidade de Agent Teams prometida pela KB não existe na skill — o Passo 0 do onion-orchestration só faz health-check do Workflow; a KB declara um mecanismo que o executável não implementa (declarado≠verificado)"
+  - id: SY4_prod_plugins_marketplace_camada1
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude-plugin/marketplace.json:1-20 · plugins/{onion-compliance,onion-design,onion-docs,onion-engineering,onion-product,onion-testing,onion-work-tools}/.claude-plugin · .claude/utils/marketplace/{assemble-plugin.sh,generate-marketplace.sh,resolve-role-bundle.sh,roles.yaml}"
+    label: "O veredito híbrido de distribuição saiu do papel: camada 1 é NATIVA hoje — 7 plugins montados, marketplace.json gerado por script determinístico (SSOT = plugin.json de cada plugin) e bundle por papel via roles.yaml"
+  - id: SY4_prod_co_announce_docbridge
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/commands/meta/co-announce.md:1-13,140 (staging em federation/outbox/<id>, adotante cego ao core) · comandos irmãos co-deliver/co-relay"
+    label: "O gap de processo do anúncio downstream está fechado e ampliado: /meta:co-announce (producer) ganhou par de carteiros locais co-deliver (downstream) e co-relay (upstream), com invariante entrega-sem-commit"
+  - id: SY4_prod_resolve_integration_branch
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/validation/resolve-integration-branch.sh:1-14 (cadeia .onion-version → git config → default; cita o sinal de campo 2026-06-18-adopt-gitflow-develop-branch-config)"
+    label: "A branch de integração é resolvida por helper determinístico e portável (SSOT durável no .onion-version, git config só como conveniência local) — exatamente como o backlog decidiu contra a premissa original"
+  - id: SY4_prod_snapshot_retention_kb
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/knowledge-base/concepts/decision-snapshot-retention.md:1-12 (v1.0.0, 2026-06-22; política de retenção + payload mínimo; nasceu de sinal de campo upstream)"
+    label: "A diretriz de retenção/payload mínimo de decision snapshot virou KB concept versionada, separando diretriz canônica de implementação local do adotante"
+  - id: SY4_prod_prettierignore_adopt
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/commands/meta/adopt.md:79,205-210 (never-clobber idempotente, detecta dprint/biome e avisa) · .claude/utils/adopt/durable-commit.sh:45"
+    label: "A proteção never-clobber de .prettierignore está provisionada no /meta:adopt com helper testável no lint-selftest — e já evoluiu para detectar formatadores não cobertos (dprint/biome) como follow-up declarado"
+  - id: SY4_prod_rfc0002_catalogo_playbooks
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/skills/onion-patterns/SKILL.md:174-178,247 (§Playbooks recognition-primed, doutrina RFC-0002, resíduo vira playbook novo) · docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md"
+    label: "Catálogo-first não é só RFC: virou seção de playbooks recognition-primed dentro da skill onion-patterns, com a regra reconhecer→aplicar→deliberar-só-sem-match e realimentação do catálogo"
+  - id: SY4_open_pessoa_versionavel
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/scope-convention-2026.md (pessoa = ~/.claude/settings.json + settings.local.json; nenhuma convenção members/<pessoa> versionada no repo) · .claude/utils/scope/resolve-scope-layers.sh:51 (camada pessoa = HOME, fora do git)"
+    label: "SEGUE ABERTO — o 4º nível: a camada pessoa resolve por ~/.claude (fora do git), então pessoa-dentro-do-time VERSIONÁVEL/COMPARTILHÁVEL continua sem mecanismo; a hipótese members/<pessoa> não foi materializada nem dogfoodada"
+  - id: SY4_open_dogfood_regulated_member_escopo
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/scope-convention-2026.md (§'O que fica p/ design/dogfood': 'Dogfood no o membro regulado: empresa+time+pessoa no nx monorepo (próximo passo #3)' ainda sem risco de tachado)"
+    label: "SEGUE ABERTO: o encaixe o membro regulado que os 4 streams desenharam em tabela ainda é PROPOSTA — o resolver existe, o dogfood de campo (empresa+time+pessoa no monorepo nx) está listado como próximo passo, não como feito"
+  - id: SY4_open_aprovador_excecao_arvore
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-orchestration-topology-adr-2026-06-21.md:185 ('default é plano; árvore é exceção justificada' — nenhum aprovador nomeado no texto)"
+    label: "SEGUE ABERTO (risco baixo): quem aprova a exceção ao default de orquestração plana continua não escrito; o ADR só diz que a exceção precisa ser 'justificada'"
+  - id: SY4_open_math_quantitativo_parqueado
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/knowledge-base/concepts/agent-orchestration.md:289 (só a frase qualitativa 'diversidade de céticos reduz viés correlacionado') · .claude/skills/onion-orchestration/SKILL.md:36 (gate orquestrar-ou-não em prosa, sem s/β)"
+    label: "A adoção QUALITATIVA da matemática de transição de fase entrou (diversidade do painel + gate orquestrar-ou-não em prosa), mas ρ/β/γ e teto de painel por mixing depth seguem PARQUEADOS — nenhuma instrumentação numérica no core"
+  - id: SY4_prod_cold_adopter_instrumentado
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-experiment-cold-adopter-2026-07.md:1-25 (status: desenhado-para-execucao; resolve Q_COLD_ADOPTER; decide_entre NS1-KG/NS3-Educacao) · docs/materials/cold-adopter-2026-07/{concierge-customer-dev-kit,channel-posts,one-pager-kg-reconciliation}.md"
+    label: "Q_COLD_ADOPTER virou EXPERIMENTO desenhado com instrumentos prontos (kit concierge, posts de canal, one-pager de reconciliação) — mas o status é 'desenhado-para-execucao': a pergunta de desempate NS1×NS3 continua sem resposta empírica"
+  - id: SY4_prod_ns3_vertical_educacao
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-adr-education-vertical-2026-07.md:1-20 (status: provisório — F0 aberto, camada de conhecimento fundada, construção gated; funda-se na pesquisa SRL/PLEA)"
+    label: "O hedge NS3 (braço de educação) saiu do papel como ADR de vertical educacional com F0 aberto — camada de conhecimento fundada, construção gated: o hedge avançou sem que a decisão de peso NS1×NS3 tenha sido tomada"
+  - id: SY4_dup_math_e_topology_compartilham_bm
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md (b·m≤W, saturação de fan-in) · docs/analysis/onion-orchestration-topology-review-2026-06-22.md (achado 'b·m≤W reancorada') · docs/analysis/onion-orchestration-topology-adr-2026-06-21.md:133-136"
+    label: "DUPLICATA PARCIAL declarada: math-phase-transition e topology-review compartilham o MESMO objeto (b·m≤W e o nó sumarizador) — o paper é a fonte, o ADR é a aplicação e o review é o controle de qualidade da aplicação; o ADR absorveu a heurística, tornando o insumo do math redundante como recomendação"
+  - id: SY4_dup_ontology_f3_e_review_metadados
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-orchestration-ontology-2026-06.md (dívida F3: metadados do ADR + cunhagem sem âncora) · docs/analysis/onion-orchestration-topology-review-2026-06-22.md (achados de metadados incoerentes + nomenclatura)"
+    label: "DUPLICATA EXATA: a 'dívida deferida F3' do doc de ontologia é literalmente o mesmo par de achados do review de topologia (metadados incoerentes + cunhagem 'nó sumarizador' sem âncora de mercado) — dois docs, um item; ambos fechados pelo mesmo fix"
+  - id: SY4_claim_ontology_nao_duplica
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/knowledge-base/concepts/onion-relation-vocabulary.md:54,69 (fronteira evolução×orquestração) vs docs/analysis/onion-orchestration-topology-adr-2026-06-21.md (locus×forma)"
+    label: "O núcleo do doc de ontologia NÃO duplica os outros dois: fronteira evolução(cross-repo)×orquestração(intra-repo) e recusa de ontologia formal externa são eixo próprio — a sobreposição do cluster é só na dívida F3"
+  - id: SY4_claim_duas_proveniencias_distintas
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: ".claude/utils/scope/resolve-scope-layers.sh (proveniência por-chave de settings) vs .claude/validation/kg-provenance-coverage.sh + .claude/validation/kg-coverage-baseline.txt (cobertura de relatórios no grafo)"
+    label: "Duas 'proveniências' coexistem no core e NÃO devem ser confundidas: proveniência-por-chave de configuração (RFC-0005) e cobertura-de-proveniência do KG (qual relatório existe no grafo) — mesmo princípio declarado≠verificado, objetos distintos"
 edges:
   - from: G1_INTERRUPT_STATES
     to: G1_GATED_HANDSHAKE_DESIGN
@@ -4038,4 +5506,679 @@ edges:
     edge_type: SUPPORTS
   - from: SY_claim_bifurcado_cluster
     to: S2_question_federation_vs_orchestration
+    edge_type: SUPPORTS
+  - from: B4_1_claim_branches_antipadrao
+    to: B4_1_decision_mecanismo_hibrido
+    edge_type: SUPPORTS
+  - from: B4_1_claim_cascata_nativa_claude_code
+    to: B4_1_decision_mecanismo_hibrido
+    edge_type: SUPPORTS
+  - from: B4_1_claim_subrepo_scoping_resolvido
+    to: B4_1_claim_cascata_nativa_claude_code
+    edge_type: SUPPORTS
+  - from: B4_1_claim_overlay_merge_type_aware
+    to: B4_1_decision_mecanismo_hibrido
+    edge_type: SUPPORTS
+  - from: B4_1_claim_components_vs_overlay
+    to: B4_1_decision_mecanismo_hibrido
+    edge_type: SUPPORTS
+  - from: B4_1_claim_tsconfig_array_footgun
+    to: B4_1_decision_resolver_proveniencia
+    edge_type: SUPPORTS
+  - from: B4_1_claim_policy_precisa_reconciliacao
+    to: B4_1_decision_mecanismo_hibrido
+    edge_type: SUPPORTS
+  - from: B4_1_decision_resolver_proveniencia
+    to: B4_1_decision_mecanismo_hibrido
+    edge_type: DEPENDS_ON
+  - from: B4_1_evidence_verificacao_12_12
+    to: B4_1_decision_mecanismo_hibrido
+    edge_type: SUPPORTS
+  - from: B4_1_artifact_tabela_regulated_member
+    to: B4_1_decision_mecanismo_hibrido
+    edge_type: TRACES_TO
+  - from: B4_2_cognitive_layer_cascades_natively
+    to: B4_2_verdict_hybrid_mechanism
+    edge_type: SUPPORTS
+  - from: B4_2_settings_json_no_tree_inheritance
+    to: B4_2_verdict_hybrid_mechanism
+    edge_type: SUPPORTS
+  - from: B4_2_plugin_group_distribution
+    to: B4_2_verdict_hybrid_mechanism
+    edge_type: SUPPORTS
+  - from: B4_2_branches_rejected_as_vehicle
+    to: B4_2_verdict_hybrid_mechanism
+    edge_type: SUPPORTS
+  - from: B4_2_team_in_repo_native_via_claudemd
+    to: B4_2_cognitive_layer_cascades_natively
+    edge_type: SUPPORTS
+  - from: B4_2_import_transclusion_mechanism
+    to: B4_2_cognitive_layer_cascades_natively
+    edge_type: SUPPORTS
+  - from: B4_2_cli_managed_plugins_no_autoinstall
+    to: B4_2_plugin_group_distribution
+    edge_type: REFUTES
+  - from: B4_2_server_managed_no_per_group
+    to: B4_2_settings_json_no_tree_inheritance
+    edge_type: SUPPORTS
+  - from: B4_2_regulated_member_mapping_applied
+    to: B4_2_verdict_hybrid_mechanism
+    edge_type: DEPENDS_ON
+  - from: B4_2_regulated_member_mapping_applied
+    to: B4_2_person_layer_gap_question
+    edge_type: CAUSES
+  - from: B4_2_adversarial_verification_13of13
+    to: B4_2_verdict_hybrid_mechanism
+    edge_type: SUPPORTS
+  - from: B4_2_adversarial_verification_13of13
+    to: B4_2_cli_managed_plugins_no_autoinstall
+    edge_type: SUPPORTS
+  - from: B4_3_mise_walkup
+    to: B4_3_cascade_mercado
+    edge_type: SUPPORTS
+  - from: B4_3_claude_settings_cascade
+    to: B4_3_team_gap
+    edge_type: SUPPORTS
+  - from: B4_3_adversarial_pass
+    to: B4_3_cascade_mercado
+    edge_type: SUPPORTS
+  - from: B4_3_cascade_mercado
+    to: B4_3_branch_rejected
+    edge_type: SUPPORTS
+  - from: B4_3_cascade_mercado
+    to: B4_3_hybrid_mechanism
+    edge_type: CAUSES
+  - from: B4_3_team_gap
+    to: B4_3_resolver_gap
+    edge_type: CAUSES
+  - from: B4_3_hybrid_mechanism
+    to: B4_3_governance_orthogonal
+    edge_type: DEPENDS_ON
+  - from: B4_3_hybrid_mechanism
+    to: B4_3_regulated_member_topology
+    edge_type: SUPPORTS
+  - from: B4_3_governance_orthogonal
+    to: B4_3_regulated_member_topology
+    edge_type: SUPPORTS
+  - from: B4_3_provenance_free
+    to: B4_3_regulated_member_topology
+    edge_type: SUPPORTS
+  - from: B4_3_resolver_gap
+    to: B4_3_regulated_member_topology
+    edge_type: DEPENDS_ON
+  - from: B4_4_cascata_nativa
+    to: B4_4_veredito_hibrido
+    edge_type: SUPPORTS
+  - from: B4_4_subagentes_precedencia
+    to: B4_4_veredito_hibrido
+    edge_type: SUPPORTS
+  - from: B4_4_plugin_marketplace
+    to: B4_4_veredito_hibrido
+    edge_type: SUPPORTS
+  - from: B4_4_kustomize_overlay
+    to: B4_4_veredito_hibrido
+    edge_type: SUPPORTS
+  - from: B4_4_supersedes_bitemporal
+    to: B4_4_veredito_hibrido
+    edge_type: SUPPORTS
+  - from: B4_4_branches_rejeitados
+    to: B4_4_veredito_hibrido
+    edge_type: SUPPORTS
+  - from: B4_4_constituicao_reason_based
+    to: B4_4_polimorfismo_sdaal
+    edge_type: SUPPORTS
+  - from: B4_4_polimorfismo_sdaal
+    to: B4_4_veredito_hibrido
+    edge_type: SUPPORTS
+  - from: B4_4_veredito_hibrido
+    to: B4_4_grana_encaixe
+    edge_type: CAUSES
+  - from: B4_4_verificacao_adversarial
+    to: B4_4_veredito_hibrido
+    edge_type: SUPPORTS
+  - from: B4_4_veredito_hibrido
+    to: B4_4_gap_engenharia
+    edge_type: CAUSES
+  - from: B4_4_gap_engenharia
+    to: B4_4_grana_encaixe
+    edge_type: DEPENDS_ON
+  - from: B4_5_decision_hibrido_tres_planos
+    to: B4_5_question_heranca_escopo
+    edge_type: SUPPORTS
+  - from: B4_5_claim_branch_rejeitada
+    to: B4_5_decision_hibrido_tres_planos
+    edge_type: SUPPORTS
+  - from: B4_5_claim_cognitivo_cascata_nativa
+    to: B4_5_decision_hibrido_tres_planos
+    edge_type: SUPPORTS
+  - from: B4_5_claim_supersedes_ortogonal
+    to: B4_5_decision_hibrido_tres_planos
+    edge_type: SUPPORTS
+  - from: B4_5_claim_settings_gap
+    to: B4_5_decision_hibrido_tres_planos
+    edge_type: SUPPORTS
+  - from: B4_5_claim_settings_gap
+    to: B4_5_decision_slice1_resolver
+    edge_type: CAUSES
+  - from: B4_5_decision_hibrido_tres_planos
+    to: B4_5_evidence_regulated_member_caso
+    edge_type: TRACES_TO
+  - from: B4_5_decision_hibrido_tres_planos
+    to: B4_5_decision_slice1_resolver
+    edge_type: CAUSES
+  - from: B4_5_claim_refutacao_grounding
+    to: B4_5_claim_settings_gap
+    edge_type: SUPERSEDES
+  - from: B4_5_claim_arrays_merge_corrigido
+    to: B4_5_decision_slice1_resolver
+    edge_type: DEPENDS_ON
+  - from: B4_5_question_quarto_nivel_pessoa
+    to: B4_5_decision_hibrido_tres_planos
+    edge_type: DEPENDS_ON
+  - from: B4_6_paper_verified
+    to: B4_6_judge_panel_maps
+    edge_type: SUPPORTS
+  - from: B4_6_paper_verified
+    to: B4_6_orchestrate_gate
+    edge_type: SUPPORTS
+  - from: B4_6_empirical_support
+    to: B4_6_orchestrate_gate
+    edge_type: SUPPORTS
+  - from: B4_6_judge_panel_maps
+    to: B4_6_diversity_correctness
+    edge_type: SUPPORTS
+  - from: B4_6_judge_panel_maps
+    to: B4_6_mixing_depth_cap
+    edge_type: SUPPORTS
+  - from: B4_6_diversity_correctness
+    to: B4_6_adopt_qualitative
+    edge_type: SUPPORTS
+  - from: B4_6_orchestrate_gate
+    to: B4_6_adopt_qualitative
+    edge_type: SUPPORTS
+  - from: B4_6_mixing_depth_cap
+    to: B4_6_park_quantitative
+    edge_type: SUPPORTS
+  - from: B4_6_scope_limit
+    to: B4_6_park_quantitative
+    edge_type: SUPPORTS
+  - from: B4_6_scope_limit
+    to: B4_6_star_fanin_partial
+    edge_type: SUPPORTS
+  - from: B4_6_park_quantitative
+    to: B4_6_calibration_trigger
+    edge_type: DEPENDS_ON
+  - from: B4_7_evidence_arxiv_web_of_agents
+    to: B4_7_claim_gen3_no_grand_ontology
+    edge_type: SUPPORTS
+  - from: B4_7_claim_gen3_no_grand_ontology
+    to: B4_7_decision_reject_external_ontology_store
+    edge_type: SUPPORTS
+  - from: B4_7_claim_fleet_not_industry_primitive
+    to: B4_7_decision_retire_fleet_terms
+    edge_type: SUPPORTS
+  - from: B4_7_artifact_canonical_vocab_table
+    to: B4_7_decision_retire_fleet_terms
+    edge_type: SUPPORTS
+  - from: B4_7_claim_boundary_evolution_fleet_fog
+    to: B4_7_decision_disambiguate_boundary_tbox_abox
+    edge_type: CAUSES
+  - from: B4_7_decision_retire_fleet_terms
+    to: B4_7_decision_disambiguate_boundary_tbox_abox
+    edge_type: DEPENDS_ON
+  - from: B4_7_question_topology_adr_debt_f3
+    to: B4_7_decision_disambiguate_boundary_tbox_abox
+    edge_type: DEPENDS_ON
+  - from: B4_8_zero_blocker
+    to: B4_8_veredito_validado
+    edge_type: SUPPORTS
+  - from: B4_8_wm_fortalece
+    to: B4_8_veredito_validado
+    edge_type: SUPPORTS
+  - from: B4_8_veredito_validado
+    to: B4_8_adr_topologia
+    edge_type: TRACES_TO
+  - from: B4_8_ca_confunde_estrutural_comportamental
+    to: B4_8_adr_topologia
+    edge_type: TRACES_TO
+  - from: B4_8_ca_confunde_estrutural_comportamental
+    to: B4_8_decisao_fixes_camada12
+    edge_type: CAUSES
+  - from: B4_8_decisao_fixes_camada12
+    to: B4_8_veredito_validado
+    edge_type: SUPPORTS
+  - from: B4_8_metadados_incoerentes
+    to: B4_8_decisao_diferir_promocao
+    edge_type: CAUSES
+  - from: B4_8_nomenclatura_sumarizador
+    to: B4_8_decisao_diferir_promocao
+    edge_type: CAUSES
+  - from: B4_8_kb_doutrina_ausente
+    to: B4_8_decisao_diferir_promocao
+    edge_type: CAUSES
+  - from: B4_8_decisao_diferir_promocao
+    to: B4_8_adr_topologia
+    edge_type: TRACES_TO
+  - from: B4_8_question_aprovador_excecao
+    to: B4_8_adr_topologia
+    edge_type: TRACES_TO
+  - from: B4_9_agent_teams_flag
+    to: B4_9_three_primitives
+    edge_type: CAUSES
+  - from: B4_9_evidence_smoketest
+    to: B4_9_agent_teams_flag
+    edge_type: DEPENDS_ON
+  - from: B4_9_evidence_smoketest
+    to: B4_9_claim_negotiation_gap
+    edge_type: SUPPORTS
+  - from: B4_9_evidence_tasklist_demo
+    to: B4_9_claim_blocker_auditability
+    edge_type: SUPPORTS
+  - from: B4_9_claim_negotiation_gap
+    to: B4_9_decision_optin
+    edge_type: SUPPORTS
+  - from: B4_9_claim_blocker_portability
+    to: B4_9_decision_optin
+    edge_type: SUPPORTS
+  - from: B4_9_claim_blocker_auditability
+    to: B4_9_decision_optin
+    edge_type: SUPPORTS
+  - from: B4_9_decision_optin
+    to: B4_9_artifact_kb_boundary
+    edge_type: CAUSES
+  - from: B4_9_decision_optin
+    to: B4_9_decision_no_dedicated_command
+    edge_type: CAUSES
+  - from: B4_9_decision_optin
+    to: B4_9_question_capability_detection
+    edge_type: DEPENDS_ON
+  - from: B4_9_question_reavaliar_experimental
+    to: B4_9_claim_blocker_portability
+    edge_type: TRACES_TO
+  - from: B4_10_verdict_hybrid
+    to: B4_10_maestro_question
+    edge_type: TRACES_TO
+  - from: B4_10_ecosystem_native_plugins
+    to: B4_10_layer_taxonomy
+    edge_type: SUPPORTS
+  - from: B4_10_skillmd_open_standard
+    to: B4_10_layer_taxonomy
+    edge_type: SUPPORTS
+  - from: B4_10_layer_taxonomy
+    to: B4_10_verdict_hybrid
+    edge_type: SUPPORTS
+  - from: B4_10_philosophy_validated
+    to: B4_10_verdict_hybrid
+    edge_type: SUPPORTS
+  - from: B4_10_provenance_gap
+    to: B4_10_verdict_hybrid
+    edge_type: SUPPORTS
+  - from: B4_10_verdict_hybrid
+    to: B4_10_commercial_sharpening
+    edge_type: CAUSES
+  - from: B4_10_verdict_hybrid
+    to: B4_10_migration_path
+    edge_type: CAUSES
+  - from: B4_10_appetite_signaled
+    to: B4_10_migration_path
+    edge_type: SUPPORTS
+  - from: B4_10_appetite_signaled
+    to: B4_10_exchange_unit_adr
+    edge_type: CAUSES
+  - from: B4_10_design_plugin_prototype
+    to: B4_10_exchange_unit_adr
+    edge_type: TRACES_TO
+  - from: B4_10_exchange_unit_adr
+    to: B4_10_verdict_hybrid
+    edge_type: SUPPORTS
+  - from: B4_11_evidence_graph_identity_reconciled
+    to: B4_11_claim_ns1_kg_candidate
+    edge_type: SUPPORTS
+  - from: B4_11_claim_reconcile_value
+    to: B4_11_claim_ns1_kg_candidate
+    edge_type: SUPPORTS
+  - from: B4_11_claim_demand_axis_not_onion
+    to: B4_11_claim_ns1_kg_candidate
+    edge_type: REFUTES
+  - from: B4_11_claim_demand_axis_not_onion
+    to: B4_11_question_cold_adopter
+    edge_type: CAUSES
+  - from: B4_11_claim_ns1_kg_candidate
+    to: B4_11_question_cold_adopter
+    edge_type: DEPENDS_ON
+  - from: B4_11_claim_ns3_hedge_caixa
+    to: B4_11_decision_ns1_recommendation
+    edge_type: SUPPORTS
+  - from: B4_11_claim_ns2_ns4_backlog
+    to: B4_11_decision_ns1_recommendation
+    edge_type: SUPPORTS
+  - from: B4_11_decision_ns1_recommendation
+    to: B4_11_question_cold_adopter
+    edge_type: DEPENDS_ON
+  - from: B4_11_decision_maestro_final_weight
+    to: B4_11_decision_ns1_recommendation
+    edge_type: DEPENDS_ON
+  - from: B4_12_decision_integration_branch
+    to: B4_12_backlog_resolved
+    edge_type: SUPPORTS
+  - from: B4_12_decision_wontdo_schema_lint
+    to: B4_12_decision_integration_branch
+    edge_type: DEPENDS_ON
+  - from: B4_12_question_reopen_lint
+    to: B4_12_decision_wontdo_schema_lint
+    edge_type: TRACES_TO
+  - from: B4_12_decision_rfc0002_catalogo
+    to: B4_12_backlog_resolved
+    edge_type: SUPPORTS
+  - from: B4_12_decision_snapshot_retention
+    to: B4_12_backlog_resolved
+    edge_type: SUPPORTS
+  - from: B4_12_decision_co_announce
+    to: B4_12_backlog_resolved
+    edge_type: SUPPORTS
+  - from: B4_12_evidence_dogfood_alvo_parsing
+    to: B4_12_decision_co_announce
+    edge_type: SUPPORTS
+  - from: B4_12_decision_prettierignore
+    to: B4_12_backlog_resolved
+    edge_type: SUPPORTS
+  - from: B4_12_claim_no_e2e_test
+    to: B4_12_backlog_resolved
+    edge_type: REFUTES
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_5_question_heranca_escopo
+    edge_type: SUPERSEDES
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_5_decision_hibrido_tres_planos
+    edge_type: SUPERSEDES
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_1_decision_mecanismo_hibrido
+    edge_type: SUPERSEDES
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_2_verdict_hybrid_mechanism
+    edge_type: SUPERSEDES
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_3_hybrid_mechanism
+    edge_type: SUPERSEDES
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_4_veredito_hibrido
+    edge_type: SUPERSEDES
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_5_claim_branch_rejeitada
+    edge_type: SUPPORTS
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_3_branch_rejected
+    edge_type: SUPPORTS
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_2_branches_rejected_as_vehicle
+    edge_type: SUPPORTS
+  - from: SY4_prod_rfc0005_ratificada
+    to: B4_4_branches_rejeitados
+    edge_type: SUPPORTS
+  - from: SY4_prod_compose_settings_ncamadas
+    to: B4_5_decision_slice1_resolver
+    edge_type: SUPERSEDES
+  - from: SY4_prod_compose_settings_ncamadas
+    to: B4_5_claim_settings_gap
+    edge_type: SUPERSEDES
+  - from: SY4_prod_compose_settings_ncamadas
+    to: B4_2_settings_json_no_tree_inheritance
+    edge_type: SUPERSEDES
+  - from: SY4_prod_compose_settings_ncamadas
+    to: B4_3_resolver_gap
+    edge_type: SUPERSEDES
+  - from: SY4_prod_compose_settings_ncamadas
+    to: B4_4_gap_engenharia
+    edge_type: SUPERSEDES
+  - from: SY4_prod_compose_settings_ncamadas
+    to: B4_1_claim_overlay_merge_type_aware
+    edge_type: SUPPORTS
+  - from: SY4_prod_show_scope_provenancia
+    to: B4_1_decision_resolver_proveniencia
+    edge_type: SUPERSEDES
+  - from: SY4_prod_show_scope_provenancia
+    to: B4_3_provenance_free
+    edge_type: SUPERSEDES
+  - from: SY4_prod_show_scope_provenancia
+    to: B4_1_claim_tsconfig_array_footgun
+    edge_type: SUPPORTS
+  - from: SY4_prod_show_scope_provenancia
+    to: SY4_claim_duas_proveniencias_distintas
+    edge_type: SUPPORTS
+  - from: SY4_claim_duas_proveniencias_distintas
+    to: SY_evid_provenance_coverage_gate
+    edge_type: SUPPORTS
+  - from: SY4_prod_scope_convention
+    to: B4_1_claim_subrepo_scoping_resolvido
+    edge_type: SUPERSEDES
+  - from: SY4_prod_scope_convention
+    to: B4_2_team_in_repo_native_via_claudemd
+    edge_type: SUPERSEDES
+  - from: SY4_prod_scope_convention
+    to: B4_3_team_gap
+    edge_type: SUPERSEDES
+  - from: SY4_prod_scope_convention
+    to: B4_5_claim_cognitivo_cascata_nativa
+    edge_type: SUPERSEDES
+  - from: SY4_prod_scope_convention
+    to: B4_5_claim_refutacao_grounding
+    edge_type: SUPPORTS
+  - from: SY4_prod_scope_convention
+    to: B4_5_claim_supersedes_ortogonal
+    edge_type: SUPPORTS
+  - from: SY4_prod_scope_convention
+    to: SY4_open_pessoa_versionavel
+    edge_type: SUPPORTS
+  - from: SY4_open_pessoa_versionavel
+    to: B4_5_question_quarto_nivel_pessoa
+    edge_type: SUPPORTS
+  - from: SY4_open_pessoa_versionavel
+    to: B4_2_person_layer_gap_question
+    edge_type: SUPPORTS
+  - from: SY4_open_dogfood_regulated_member_escopo
+    to: B4_1_artifact_tabela_regulated_member
+    edge_type: REFUTES
+  - from: SY4_open_dogfood_regulated_member_escopo
+    to: B4_2_regulated_member_mapping_applied
+    edge_type: REFUTES
+  - from: SY4_open_dogfood_regulated_member_escopo
+    to: B4_3_regulated_member_topology
+    edge_type: REFUTES
+  - from: SY4_open_dogfood_regulated_member_escopo
+    to: B4_4_grana_encaixe
+    edge_type: REFUTES
+  - from: SY4_open_dogfood_regulated_member_escopo
+    to: B4_5_evidence_regulated_member_caso
+    edge_type: REFUTES
+  - from: SY4_prod_capability_update_adr
+    to: SY4_prod_rfc0005_ratificada
+    edge_type: SUPPORTS
+  - from: SY4_prod_topology_adr_coerente
+    to: B4_8_metadados_incoerentes
+    edge_type: SUPERSEDES
+  - from: SY4_prod_topology_adr_coerente
+    to: B4_8_adr_topologia
+    edge_type: SUPERSEDES
+  - from: SY4_prod_topology_adr_coerente
+    to: B4_7_question_topology_adr_debt_f3
+    edge_type: SUPERSEDES
+  - from: SY4_prod_nomenclatura_ancorada
+    to: B4_8_nomenclatura_sumarizador
+    edge_type: SUPERSEDES
+  - from: SY4_prod_nomenclatura_ancorada
+    to: B4_8_kb_doutrina_ausente
+    edge_type: SUPERSEDES
+  - from: SY4_prod_nomenclatura_ancorada
+    to: B4_8_decisao_diferir_promocao
+    edge_type: SUPERSEDES
+  - from: SY4_prod_ca_estrutural_vs_comportamental
+    to: B4_8_decisao_fixes_camada12
+    edge_type: SUPERSEDES
+  - from: SY4_prod_ca_estrutural_vs_comportamental
+    to: B4_8_ca_confunde_estrutural_comportamental
+    edge_type: SUPERSEDES
+  - from: SY4_prod_ca_estrutural_vs_comportamental
+    to: B4_8_wm_fortalece
+    edge_type: SUPPORTS
+  - from: SY4_prod_ca_estrutural_vs_comportamental
+    to: B4_6_star_fanin_partial
+    edge_type: SUPPORTS
+  - from: SY4_prod_orchestrates_workers
+    to: B4_7_decision_retire_fleet_terms
+    edge_type: SUPERSEDES
+  - from: SY4_prod_orchestrates_workers
+    to: B4_7_decision_disambiguate_boundary_tbox_abox
+    edge_type: SUPERSEDES
+  - from: SY4_prod_orchestrates_workers
+    to: B4_7_claim_boundary_evolution_fleet_fog
+    edge_type: SUPPORTS
+  - from: SY4_prod_orchestrates_workers
+    to: B4_7_artifact_canonical_vocab_table
+    edge_type: SUPERSEDES
+  - from: SY4_prod_orchestrates_workers
+    to: S2_question_federation_vs_orchestration
+    edge_type: SUPPORTS
+  - from: B4_7_decision_reject_external_ontology_store
+    to: S5_decision_dogfood_kg_sdaal
+    edge_type: SUPPORTS
+  - from: B4_7_decision_reject_external_ontology_store
+    to: SY_evid_kg_dogfood_identity
+    edge_type: SUPPORTS
+  - from: B4_7_claim_gen3_no_grand_ontology
+    to: S1_composition_decision
+    edge_type: SUPPORTS
+  - from: SY4_prod_kb_dois_substratos
+    to: B4_9_artifact_kb_boundary
+    edge_type: SUPERSEDES
+  - from: SY4_prod_kb_dois_substratos
+    to: B4_9_decision_optin
+    edge_type: SUPERSEDES
+  - from: SY4_prod_kb_dois_substratos
+    to: B4_9_decision_no_dedicated_command
+    edge_type: SUPPORTS
+  - from: SY4_open_agent_teams_capability_detection
+    to: B4_9_question_capability_detection
+    edge_type: SUPPORTS
+  - from: SY4_open_agent_teams_capability_detection
+    to: B4_9_claim_blocker_portability
+    edge_type: SUPPORTS
+  - from: SY4_open_agent_teams_capability_detection
+    to: SY4_prod_kb_dois_substratos
+    edge_type: REFUTES
+  - from: SY4_prod_plugins_marketplace_camada1
+    to: B4_10_verdict_hybrid
+    edge_type: SUPERSEDES
+  - from: SY4_prod_plugins_marketplace_camada1
+    to: B4_10_migration_path
+    edge_type: SUPERSEDES
+  - from: SY4_prod_plugins_marketplace_camada1
+    to: B4_10_design_plugin_prototype
+    edge_type: SUPERSEDES
+  - from: SY4_prod_plugins_marketplace_camada1
+    to: B4_10_appetite_signaled
+    edge_type: SUPPORTS
+  - from: SY4_prod_plugins_marketplace_camada1
+    to: B4_10_provenance_gap
+    edge_type: SUPPORTS
+  - from: SY4_prod_plugins_marketplace_camada1
+    to: B4_2_plugin_group_distribution
+    edge_type: SUPPORTS
+  - from: SY4_prod_plugins_marketplace_camada1
+    to: B4_10_exchange_unit_adr
+    edge_type: SUPPORTS
+  - from: SY4_prod_co_announce_docbridge
+    to: B4_12_decision_co_announce
+    edge_type: SUPERSEDES
+  - from: SY4_prod_co_announce_docbridge
+    to: B4_12_evidence_dogfood_alvo_parsing
+    edge_type: SUPPORTS
+  - from: SY4_prod_co_announce_docbridge
+    to: REC2_LEDGER_TRAFFIC_IS_DOCBRIDGE
+    edge_type: SUPPORTS
+  - from: SY4_prod_resolve_integration_branch
+    to: B4_12_decision_integration_branch
+    edge_type: SUPERSEDES
+  - from: SY4_prod_resolve_integration_branch
+    to: B4_12_decision_wontdo_schema_lint
+    edge_type: SUPPORTS
+  - from: SY4_prod_snapshot_retention_kb
+    to: B4_12_decision_snapshot_retention
+    edge_type: SUPERSEDES
+  - from: SY4_prod_prettierignore_adopt
+    to: B4_12_decision_prettierignore
+    edge_type: SUPERSEDES
+  - from: SY4_prod_rfc0002_catalogo_playbooks
+    to: B4_12_decision_rfc0002_catalogo
+    edge_type: SUPERSEDES
+  - from: SY4_prod_rfc0002_catalogo_playbooks
+    to: B4_12_backlog_resolved
+    edge_type: SUPPORTS
+  - from: SY4_prod_cold_adopter_instrumentado
+    to: B4_11_question_cold_adopter
+    edge_type: SUPPORTS
+  - from: SY4_prod_cold_adopter_instrumentado
+    to: B4_11_decision_ns1_recommendation
+    edge_type: SUPPORTS
+  - from: SY4_prod_cold_adopter_instrumentado
+    to: B4_11_claim_demand_axis_not_onion
+    edge_type: SUPPORTS
+  - from: SY4_prod_cold_adopter_instrumentado
+    to: S13_claim_family_unregistered
+    edge_type: SUPPORTS
+  - from: SY4_prod_ns3_vertical_educacao
+    to: B4_11_claim_ns3_hedge_caixa
+    edge_type: SUPPORTS
+  - from: SY4_prod_ns3_vertical_educacao
+    to: B4_11_decision_maestro_final_weight
+    edge_type: SUPPORTS
+  - from: SY4_dup_math_e_topology_compartilham_bm
+    to: B4_6_mixing_depth_cap
+    edge_type: SUPERSEDES
+  - from: SY4_dup_math_e_topology_compartilham_bm
+    to: B4_6_star_fanin_partial
+    edge_type: SUPERSEDES
+  - from: SY4_dup_math_e_topology_compartilham_bm
+    to: B4_8_wm_fortalece
+    edge_type: SUPPORTS
+  - from: SY4_dup_ontology_f3_e_review_metadados
+    to: B4_7_question_topology_adr_debt_f3
+    edge_type: SUPERSEDES
+  - from: SY4_dup_ontology_f3_e_review_metadados
+    to: B4_8_metadados_incoerentes
+    edge_type: SUPPORTS
+  - from: SY4_dup_ontology_f3_e_review_metadados
+    to: B4_8_nomenclatura_sumarizador
+    edge_type: SUPPORTS
+  - from: SY4_claim_ontology_nao_duplica
+    to: SY4_dup_ontology_f3_e_review_metadados
+    edge_type: SUPPORTS
+  - from: SY4_claim_ontology_nao_duplica
+    to: B4_7_claim_fleet_not_industry_primitive
+    edge_type: SUPPORTS
+  - from: SY4_open_math_quantitativo_parqueado
+    to: B4_6_park_quantitative
+    edge_type: SUPPORTS
+  - from: SY4_open_math_quantitativo_parqueado
+    to: B4_6_adopt_qualitative
+    edge_type: SUPPORTS
+  - from: SY4_open_math_quantitativo_parqueado
+    to: B4_6_calibration_trigger
+    edge_type: SUPPORTS
+  - from: SY4_open_math_quantitativo_parqueado
+    to: B4_6_diversity_correctness
+    edge_type: SUPPORTS
+  - from: SY4_open_aprovador_excecao_arvore
+    to: B4_8_question_aprovador_excecao
+    edge_type: SUPPORTS
+  - from: B4_8_zero_blocker
+    to: B2_3_orchestration_method
+    edge_type: SUPPORTS
+  - from: B4_9_evidence_tasklist_demo
+    to: B4_8_zero_blocker
+    edge_type: SUPPORTS
+  - from: B4_10_skillmd_open_standard
+    to: S4_claim_abandono_2026_05_18
+    edge_type: SUPPORTS
+  - from: B4_10_philosophy_validated
+    to: S4_claim_abandono_2026_05_18
     edge_type: SUPPORTS
