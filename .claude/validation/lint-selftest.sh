@@ -1101,6 +1101,63 @@ run_durable_commit_selftests() {
 #   (d) idempotência: re-update mesmo pin → exit 0, tree limpa
 #   (e) legado      : alvo sem onion/vendor → update semeia antes de mergear
 # ---------------------------------------------------------------------------
+run_vendor_pin_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
+  [ -f "${helper}" ] || return 0
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+  # Fixture PRÓPRIA: as chamadas abaixo sujam o estado do alvo (bootstrap do
+  # vendor), então não podem compartilhar a fixture do run_vendor_branch_selftests
+
+# Modo vendor-pin — o pin entra provando ser commit (achado de campo 2026-07-21).
+run_vendor_pin_selftests
+  # — foi o que quebrou a suíte na 1ª tentativa.
+  local core t ib
+  core="$(mktemp -d)/c"; t="$(mktemp -d)/a"
+  rm -rf "$core"; mkdir -p "$core/.claude/commands"; git -C "$core" init -q
+  printf 'cmd\n' > "$core/.claude/commands/foo.md"
+  git -C "$core" add -A; git -C "$core" commit -qm "core"
+  rm -rf "$t"; mkdir -p "$t/src"; git -C "$t" init -q
+  printf 'produto\n' > "$t/src/app.js"; git -C "$t" archive --format=tar HEAD 2>/dev/null | true
+  git -C "$core" archive HEAD -- .claude | tar -x -C "$t"
+  git -C "$t" add -A; git -C "$t" commit -qm "adopt"
+  ib="$(git -C "$t" rev-parse --abbrev-ref HEAD)"
+  local _rc
+
+  # (PIN) O PIN ENTRA PROVANDO QUE É COMMIT. O script gravava no histórico do
+  # adotante QUALQUER string recebida. Achado de campo 2026-07-21: 2 dos 3
+  # adotantes locais tinham lixo carimbado ("vnextpin"; "2026-07-12", uma data).
+  # O dano é diferido — aparece semanas depois, quando o 3-way merge usa a base
+  # errada e vira ANCESTRALIDADE lida como conflito (17 arquivos, todos
+  # byte-idênticos ao core, no update real do gustavo-pulga).
+  # Os dois lados: lixo REPROVA (rc=2) e commit real PASSA da validação.
+  local _rc
+  _rc=0; bash "${helper}" update "$t" "$core" "vnextpin" "$ib" >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -eq 2 ]; then
+    record_pass "vendor-branch: (PIN) placeholder recusado — não vira registro no histórico do adotante"
+  else record_fail "vendor-branch: (PIN placeholder)" "esperava rc=2, veio ${_rc} — lixo seria carimbado"; fi
+
+  _rc=0; bash "${helper}" update "$t" "$core" "2026-07-12" "$ib" >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -eq 2 ]; then
+    record_pass "vendor-branch: (PIN) data no lugar do commit recusada (caso real de campo)"
+  else record_fail "vendor-branch: (PIN data)" "esperava rc=2, veio ${_rc}"; fi
+
+  _rc=0; bash "${helper}" update "$t" "$core" "" "$ib" >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -eq 2 ]; then
+    record_pass "vendor-branch: (PIN) pin vazio recusado"
+  else record_fail "vendor-branch: (PIN vazio)" "esperava rc=2, veio ${_rc}"; fi
+
+  # MUTAÇÃO: desfeita a validação, o lixo passa — prova que o teste é load-bearing.
+  sed 's|if ! git -C "$SRC" cat-file -e "${PIN}^{commit}" 2>/dev/null; then|if false; then|' \
+      "${helper}" > "${t}.mut.sh"
+  _rc=0; bash "${t}.mut.sh" update "$t" "$core" "vnextpin" "$ib" >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -ne 2 ]; then
+    record_pass "vendor-branch: (PIN/MUT) sem a validação o lixo passa — a guarda é load-bearing"
+  else record_fail "vendor-branch: (PIN/MUT)" "com a validação desfeita ainda recusou — o teste não prova nada"; fi
+  rm -f "${t}.mut.sh"
+
+}
+
 run_vendor_branch_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
   if [ ! -f "${helper}" ]; then record_fail "vendor-branch" "helper ausente: ${helper}"; return; fi
@@ -1127,7 +1184,7 @@ run_vendor_branch_selftests() {
 
   # (b) update limpo
   _vb_core "$core" 2
-  bash "${helper}" update "$t" "$core" v2 "$ib" >/dev/null 2>&1
+  bash "${helper}" update "$t" "$core" "$(git -C "$core" rev-parse --short=12 HEAD)" "$ib" >/dev/null 2>&1
   if grep -q v2 "$t/docs/meta-specs/spec.md" && grep -q produto "$t/src/app.js"; then
     record_pass "vendor-branch: update limpo aplica framework + preserva produto"
   else record_fail "vendor-branch: update limpo" "v2 não aplicado ou produto perdido"; fi
@@ -1135,7 +1192,7 @@ run_vendor_branch_selftests() {
   # (c) CONFLITO — o teste-chave
   printf 'cmd v2 CUSTOMIZADO\n' > "$t/.claude/commands/foo.md"; git -C "$t" add -A; git -C "$t" commit -qm custom
   _vb_core "$core" 3
-  local rc=0; bash "${helper}" update "$t" "$core" v3 "$ib" >/dev/null 2>&1 || rc=$?
+  local rc=0; bash "${helper}" update "$t" "$core" "$(git -C "$core" rev-parse --short=12 HEAD)" "$ib" >/dev/null 2>&1 || rc=$?
   if [ "$rc" -eq 10 ] && grep -q CUSTOMIZADO "$t/.claude/commands/foo.md" \
      && git -C "$t" diff --name-only --diff-filter=U 2>/dev/null | grep -q foo.md; then
     record_pass "vendor-branch: customização local → CONFLITO (exit 10), não clobada"
@@ -1147,8 +1204,9 @@ run_vendor_branch_selftests() {
   mkdir -p "$t2"; git -C "$t2" init -q; git -C "$c2" archive HEAD -- .claude docs | tar -x -C "$t2"
   git -C "$t2" add -A; git -C "$t2" commit -qm adopt; ib2="$(git -C "$t2" rev-parse --abbrev-ref HEAD)"
   bash "${helper}" seed "$t2" "$ib2" >/dev/null 2>&1; _vb_core "$c2" 2
-  bash "${helper}" update "$t2" "$c2" v2 "$ib2" >/dev/null 2>&1 || true
-  local rci=0; bash "${helper}" update "$t2" "$c2" v2 "$ib2" >/dev/null 2>&1 || rci=$?
+  local _p2="$(git -C "$c2" rev-parse --short=12 HEAD)"
+  bash "${helper}" update "$t2" "$c2" "$_p2" "$ib2" >/dev/null 2>&1 || true
+  local rci=0; bash "${helper}" update "$t2" "$c2" "$_p2" "$ib2" >/dev/null 2>&1 || rci=$?
   if [ "$rci" -eq 0 ] && [ -z "$(git -C "$t2" status --short)" ]; then
     record_pass "vendor-branch: re-update idempotente (exit 0, tree limpa)"
   else record_fail "vendor-branch: idempotência" "exit=$rci ou tree suja"; fi
@@ -1156,7 +1214,7 @@ run_vendor_branch_selftests() {
   # (e) legado — sem onion/vendor, update semeia
   local c3 t3 ib3; c3="$(mktemp -d)/c3"; t3="$(mktemp -d)/a3"; _vb_core "$c3" 1; _vb_adopter "$t3" "$c3"
   ib3="$(git -C "$t3" rev-parse --abbrev-ref HEAD)"; _vb_core "$c3" 2
-  local rcl=0; bash "${helper}" update "$t3" "$c3" v2 "$ib3" >/dev/null 2>&1 || rcl=$?
+  local rcl=0; bash "${helper}" update "$t3" "$c3" "$(git -C "$c3" rev-parse --short=12 HEAD)" "$ib3" >/dev/null 2>&1 || rcl=$?
   if [ "$rcl" -eq 0 ] && git -C "$t3" rev-parse --verify onion/vendor >/dev/null 2>&1; then
     record_pass "vendor-branch: legado sem vendor → bootstrap + merge"
   else record_fail "vendor-branch: legado" "exit=$rcl ou vendor não semeado"; fi
@@ -1176,7 +1234,7 @@ run_vendor_branch_selftests() {
   ib4="$(git -C "$t4" rev-parse --abbrev-ref HEAD)"
   printf 'cmd v1 CUSTOM\n' > "$t4/.claude/commands/foo.md"; git -C "$t4" add -A; git -C "$t4" commit -qm custom
   printf 'cmd v2\n' > "$c4/.claude/commands/foo.md"; git -C "$c4" add -A; git -C "$c4" commit -qm "core v2"
-  local rcf=0; bash "${helper}" update "$t4" "$c4" v2 "$ib4" >/dev/null 2>&1 || rcf=$?
+  local rcf=0; bash "${helper}" update "$t4" "$c4" "$(git -C "$c4" rev-parse --short=12 HEAD)" "$ib4" >/dev/null 2>&1 || rcf=$?
   if [ "$rcf" -eq 10 ] && grep -q CUSTOM "$t4/.claude/commands/foo.md"; then
     record_pass "vendor-branch: legado c/ customização commitada → baseline limpo → CONFLITO (não clobra)"
   else record_fail "vendor-branch: legado baseline §8" "exit=$rcf ou customização clobada"; fi

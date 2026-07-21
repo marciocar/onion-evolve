@@ -1,4 +1,29 @@
 #!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────────────────────
+# NOTA DE FRONTEIRA (2026-07-21): este script valida o pin do STAMP
+# (.claude/.onion-version) — se o commit existe e se o canário bate.
+# Ele NÃO valida os pins gravados no histórico da branch onion/vendor.
+# Esse era o buraco: medindo os 3 adotantes locais, DOIS tinham pin inválido
+# carimbado no vendor ("vnextpin"; "2026-07-12" — uma data). O stamp estava
+# `pin-ok` nos dois casos; o registro do vendor é que mentia, e o dano só
+# aparecia semanas depois, quando o 3-way merge usava a base errada.
+# A entrada agora é guardada em vendor-branch.sh (o pin entra provando ser
+# commit). Para AUDITAR o passivo já gravado: `--audit-vendor <target> <source>`.
+# ─────────────────────────────────────────────────────────────────────────────
+if [ "${1:-}" = "--audit-vendor" ]; then
+  _T="${2:?uso: pin-integrity-check.sh --audit-vendor <target> <source>}"
+  _S="${3:?uso: pin-integrity-check.sh --audit-vendor <target> <source>}"
+  _bad=0; _ok=0
+  while read -r _p; do
+    [ -n "${_p}" ] || continue
+    if git -C "${_S}" cat-file -e "${_p}^{commit}" 2>/dev/null; then _ok=$((_ok+1))
+    else printf '  ✗ pin inválido no onion/vendor: %s\n' "${_p}"; _bad=$((_bad+1)); fi
+  done < <(git -C "${_T}" log --format=%s onion/vendor 2>/dev/null \
+           | sed -n 's/^chore(onion): \(update\|adopt\) to pin \(.*\)$/\2/p' | sort -u)
+  printf '  %s pin(s) válido(s), %s inválido(s) em %s\n' "${_ok}" "${_bad}" "${_T}"
+  [ "${_bad}" -eq 0 ] && exit 0 || exit 1
+fi
+
 # pin-integrity-check.sh — verifica se o pin (source_commit) do stamp de um adotante é CONFIÁVEL.
 #
 # O pin é HIPÓTESE, não fato: um restore manual pode carimbar um commit sem que os arquivos

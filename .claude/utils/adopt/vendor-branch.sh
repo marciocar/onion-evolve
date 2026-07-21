@@ -70,6 +70,31 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   git -C "$T" rev-parse --git-dir >/dev/null 2>&1 || { echo "⚠️  $T não é repo git — update pulado." >&2; return 0; }
   git -C "$SRC" rev-parse --git-dir >/dev/null 2>&1 || { echo "ERRO: SOURCE_ROOT '$SRC' não é repo git." >&2; return 2; }
 
+  # ── O PIN ENTRA PROVANDO QUE É COMMIT ──────────────────────────────────────
+  # Este script gravava no histórico do adotante QUALQUER string recebida como
+  # pin ("update to pin ${PIN}"). Achado de campo 2026-07-21, medindo os 3
+  # adotantes locais: DOIS tinham lixo carimbado —
+  #     · gustavo-pulga : "vnextpin"     (placeholder digitado)
+  #     · rhilo-metagamify: "2026-07-12" (uma DATA no lugar do commit)
+  # O dano não aparece no dia: aparece semanas depois, quando o 3-way merge usa
+  # o commit errado como base e transforma ANCESTRALIDADE em conflito. Foi
+  # exatamente o que aconteceu no update do gustavo-pulga (17 arquivos em
+  # conflito, todos byte-idênticos ao core — conflito contábil, não de conteúdo).
+  # É o mecanismo concreto do "drift silencioso de pin" que o grafo já registrava
+  # em abstrato (REC_PIN_DRIFT_REAL_HEALTH_METRIC).
+  # Regra: o pin tem de EXISTIR como commit na história da FONTE. Sem isso não
+  # há como reconstruir a base, e escrever o registro seria registrar mentira.
+  if [ -z "${PIN}" ]; then
+    echo "ERRO: pin vazio — o registro do vendor não pode ser gravado sem pin." >&2; return 2
+  fi
+  if ! git -C "$SRC" cat-file -e "${PIN}^{commit}" 2>/dev/null; then
+    echo "ERRO: pin '${PIN}' não é um commit da fonte ($SRC)." >&2
+    echo "      O vendor grava esse valor no histórico do adotante; um pin inválido" >&2
+    echo "      quebra a base do 3-way merge e vira conflito falso semanas depois." >&2
+    echo "      Passe o commit real: git -C \"$SRC\" rev-parse --short=12 HEAD" >&2
+    return 2
+  fi
+
   # Bootstrap de legado (sem vendor): ramifica do commit LIMPO (framework == core@pin-ADOTADO), não do HEAD
   # (que pode ter customização commitada → clobber no 1º merge — spec §8). Fresh-adoption já tem vendor.
   if ! git -C "$T" rev-parse --verify "$VENDOR" >/dev/null 2>&1; then
