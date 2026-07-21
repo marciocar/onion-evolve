@@ -4393,6 +4393,1838 @@ nodes:
     confidence: 0.7
     trace: ".claude/utils/scope/resolve-scope-layers.sh (proveniência por-chave de settings) vs .claude/validation/kg-provenance-coverage.sh + .claude/validation/kg-coverage-baseline.txt (cobertura de relatórios no grafo)"
     label: "Duas 'proveniências' coexistem no core e NÃO devem ser confundidas: proveniência-por-chave de configuração (RFC-0005) e cobertura-de-proveniência do KG (qual relatório existe no grafo) — mesmo princípio declarado≠verificado, objetos distintos"
+  - id: B5_1_mcp_first_leak
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "Vazamento MCP-first viola API-first/SDAAL em 4-5 achados (D6+D5), incluindo o agent-template.md propagador"
+  - id: B5_1_mcp_sweep_decision
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "Decisão: varredura única MCP-first→API-first em comandos+agentes+templates, começando pelo template (fonte/propagador)"
+  - id: B5_1_inventory_drift
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "docs/INDEX.md com contagens stale (77 comandos, git=12, meta=13) vs SSOT real (82; git=6; meta=21)"
+  - id: B5_1_inventory_command_decision
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "Decisão: rodar /meta:inventory para reconciliar docs/INDEX.md com a SSOT do filesystem"
+  - id: B5_1_kb_date_gate_not_honored
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "6+ Knowledge Bases com gate de revalidação por data nunca honrado (pior caso: 17+ meses stale)"
+  - id: B5_1_kb_freshness_command_decision
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "Decisão: rodar /meta:kb-freshness em varredura exaustiva das KBs stale"
+  - id: B5_1_phantom_categories
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "3 agentes referenciam categorias fantasma de comando (commands/compliance, admin, architect) inexistentes"
+  - id: B5_1_broken_links_security_master
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "security-information-master.md contém 21 links relativos quebrados para docs de compliance"
+  - id: B5_1_fix_phantom_links_decision
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "Decisão: corrigir categorias fantasma e links quebrados, começando pelos 21 do security-information-master"
+  - id: B5_1_zero_phase_merge_vetoes
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "Invariante respeitada: 0 vetos de fusão de fase — nenhuma proposta funde workflows faseados engineer/plan→pr-update ou product/collect→feature"
+  - id: B5_1_refuted_findings
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "11 achados refutados pelo juiz adversarial com mérito (4 fusões D2 exageradas, 2 D3 superdeclaradas, 3 D4 mal-medidos, 1 D5, 1 D8)"
+  - id: B5_1_a2a_export_gated
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    trace: "docs/analysis/onion-evolution-2026-06-15.md"
+    label: "Item gated: projeção export-only Agent Card (formato A2A, sem runtime) do members.yaml, condicionada ao 1º consumer não-Onion na federação"
+  - id: B5_2_run_evolve_2026_06_16
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.95
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Auditoria /meta:evolve 2026-06-16 (fan-out 21 agentes, 8 dimensões D1-D8, 35 achados brutos)"
+  - id: B5_2_mcp_first_leakage
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Vazamento MCP-first vs API-first é causa sistêmica confirmada (não executado desde run anterior), propagado por agent-template.md e agent-creator-specialist.md a todo artefato novo"
+  - id: B5_2_phantom_categories
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Categorias de comando fantasma compliance/ e admin/ em command-creator-specialist.md e agent-creator-specialist.md, violam commands.md §8"
+  - id: B5_2_threshold_ambiguity
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Threshold heurístico '~400 linhas' (onion-patterns/onion-validation/command-template) diverge da constituição commands.md §5 (500 OK / 800 hard), causou 2 falsos-positivos e divergência entre juízes"
+  - id: B5_2_federation_v1_dead_links
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Links mortos para federação v1 (removida no PR #53) em onion-federation-design-v2 e paths errados em compliance-context/README e sdaal-examples"
+  - id: B5_2_zero_phase_merge_vetoes
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Invariante preservada: 0 vetos de fusão de fase — nenhuma proposta tocou engineer/plan→pr-update nem product/collect→feature"
+  - id: B5_2_adversarial_judge_refutation
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Camada adversarial de juízes refutou 8 de 13 achados brutos: threshold falso, aritmética impossível, fix errado (repoint vs delink), premissa falsa, leitura invertida de meta-spec"
+  - id: B5_2_decision_delink_not_repoint
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Juiz refutou o fix do worker (repointar link v1→v2, auto-referência) e decidiu delink como correção correta"
+  - id: B5_2_decision_retain_2026_06_15
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Decisão de manter onion-evolution-2026-06-15.md como âncora de citação de materiais/press-kit/case-studies em vez de remover no supersede"
+  - id: B5_2_executed_same_day
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Backlog executado 26 minutos após gerado: itens #1-#5 resolvidos no PR #69 e guard no PR #82, mesmo dia 2026-06-16"
+  - id: B5_2_a2a_projection_carryforward
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-evolution-2026-06-16.md"
+    label: "Projeção export-only Agent Card (A2A) carregada adiante — gatilho (1º consumer não-Onion) ainda não disparou"
+  - id: B5_3_run_evolve_0617
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.95
+    trace: "docs/analysis/onion-evolution-2026-06-17.md"
+    label: "Run de auditoria /meta:evolve 2026-06-17 (9 dimensões, fan-out-and-synthesize + juiz adversarial, wf_21e05d2d-3df)"
+  - id: B5_3_alert_a_count_drift
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-17.md"
+    label: "Drift de contagem hardcoded (82/77/94 comandos, 30/33 KBs) pervasivo em arquivos gerados, derivados e hand-maintained"
+  - id: B5_3_alert_b_mcp_leak
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-17.md"
+    label: "Vazamento MCP-first: agent-creator-specialist e create-agent-express guiam declarar mcp__* sem steering ao adapter SDAAL"
+  - id: B5_3_lint_rule9_gap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-06-17.md"
+    label: "Regra 9 do lint valida só CLAUDE.md, não cobre docs/onion/ nem arquivos gerados — guarda insuficiente"
+  - id: B5_3_decision_root_fix_order
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-17.md"
+    label: "Corrigir drift na raiz em ordem: regenerar gerados, derivar hand-maintained da SSOT, estender guarda do lint, preservar histórico — sed pontual é armadilha"
+  - id: B5_3_decision_fix_both_creators
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-17.md"
+    label: "Corrigir os dois caminhos de criação de agente (guarda na origem/propagador), não os agentes-folha que já violam API-first"
+  - id: B5_3_decision_preserve_historical
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-06-17.md"
+    label: "Preservar snapshots históricos datados (onion-review-2026-05, material-raw) sem correção de contagem — narrativa histórica não se corrige"
+  - id: B5_3_judge_cull_evidence
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-17.md"
+    label: "Juiz adversarial refutou/vetou 21 de 42 achados brutos (cull de finders recall-biased); nenhum veto de fusão de fase necessário"
+  - id: B5_3_backlog_prioritized
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-06-17.md"
+    label: "Backlog priorizado de 21 achados sobreviventes (1 blocker · 12 recommended · 8 opportunistic), read-only"
+  - id: B5_4_incident_source
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Incidente de campo rhilo-metagamify (KVM 8) que originou a investigação"
+  - id: B5_4_finding1_copy_manual_commit
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Achado 1 (crítico): apply é cópia-por-cima (cp -R) e o commit é passo manual pós-cópia — descarte de working tree nesse intervalo apaga tudo, inclusive o .onion-version"
+  - id: B5_4_finding2_merge_future
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Achado 2: apply deveria ser merge de vendor-branch com conflict-awareness; hoje customização local vira diff clobável, não conflito git real"
+  - id: B5_4_finding3_version_revert
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Achado 3: .onion-version reverte silenciosamente no checkout porque a identidade é linha na working tree, não objeto commitado"
+  - id: B5_4_finding4_report_offer_commit
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Achado 4: relatório de --update podia oferecer o comando de commit pronto em vez de prosa manual"
+  - id: B5_4_systemic_cause
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Causa sistêmica única: a entrega L2+3 não é objeto git até um ato humano pós-cópia (L1/plugin já é durável)"
+  - id: B5_4_dogfood_checkout_safe
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Dogfood 2026-07-08 verificou: git checkout de branch simples não descarta tracked sujo — o gatilho real é o descarte, não a troca de branch"
+  - id: B5_4_decision_autocommit
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Recomendação #1 (agora): apply/--update auto-commita em branch dedicado (chore/onion-resync) com git commit --no-verify, absorvendo Achados 3 e 4"
+  - id: B5_4_decision_vendor_branch
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Recomendação #2 (depois): --update evolui para merge/rebase de vendor-branch onion/framework como fonte-de-merge, não branch-que-se-usa"
+  - id: B5_4_invariant_adopt_stays
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Invariante respeitada: /meta:adopt permanece como canal L2+3 + fallback L1; nenhuma fusão de fases de workflow faseado"
+  - id: B5_4_ssot_context_pilot
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    trace: "docs/analysis/onion-evolution-2026-07-08.md"
+    label: "Piloto SSOT-context + KB embarcado (feat/plugin-ssot-context) reduz a superfície da L2 no adopt, mas não fecha o gap de meta-specs por path + variantes L3"
+  - id: B5_5_meta_strategize_capability
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
+    label: "/meta:strategize — capacidade de meta-estratégia proposta (Docs 1-2) em avaliação"
+  - id: B5_5_avaliacao_probabilistica_claim
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
+    label: "Fan-out + juízes reduz mas não elimina erro confiante — juízes são o mesmo tipo de modelo do gerador e podem compartilhar viés; doutrina deve declarar isso em voz alta, senão vende garantia que não tem"
+  - id: B5_5_custo_comparavel_evolve_claim
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
+    label: "Custo real de /meta:strategize com N candidatos + painel de juízes + verificação adversarial é comparável a /meta:evolve (~1.5M tokens / ~29min) — estimativa por analogia, não medida"
+  - id: B5_5_falta_benchmark_question
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
+    label: "Faltam benchmarks medidos de custo real para aplicar a regra de 'altitude por risco' com segurança"
+  - id: B5_5_prioridade_marcio_question
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    trace: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
+    label: "Prioridade real entre catálogo de meta-estratégia e reposicionamento como produto (BSL/control plane/ICP regulado) — decisão que só o Marcio toma, sessão só sinaliza o conflito"
+  - id: B5_5_catalogo_first_decision
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
+    label: "Ambiguidade do pedido resolvida às 15:18: é catálogo de playbooks reconhecíveis (doutrina/capacidade do framework), não ajuste de comportamento pessoal de sessão — Docs 1-2 revisados para catálogo-first"
+  - id: B5_5_precisao_match_question
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    trace: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
+    label: "Sub-blind-spot remanescente: o catálogo só funciona se os gatilhos de 'reconhece-quando' forem precisos — match errado aplica o fluxo errado com confiança (mesmo modo de falha do contexto stale do ADR de ciclo de vida); a parte difícil é a precisão do reconhecimento, não a lista de fluxos"
+  - id: B5_5_blocker_sdaal_aberto_claim
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
+    label: "Blocker 🔴 vivo do /meta:evolve 2026-06-17: agent-creator-specialist.md guia listar ferramentas MCP sem steering SDAAL, novos agentes nascem violando API-first — dívida ativa que interage com qualquer nova capacidade de orquestração"
+  - id: B5_5_desconhecidos_sessao_claim
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
+    label: "Limites de visibilidade da sessão: não sabe se a sala de obra já começou algo nessa direção, nem se analyze-complex-problem/fleet já cobrem o Doc 2 (descrito de memória, sem releitura linha a linha)"
+  - id: B5_6_catalog_estrategia
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.6
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Catálogo `strategy-playbooks`: situação → fluxo nomeado → ferramentas → sequência"
+  - id: B5_6_principio_reconhecer_compor
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Doutrina (Doc 1): reconhecer antes de compor — deliberar é fallback, não produto"
+  - id: B5_6_reconhecedor_leve
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Reconhecedor leve via progressive disclosure de skill (sem comando pesado)"
+  - id: B5_6_pergunta_skill_ou_extensao
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Skill nova ou estender `onion-patterns` com seção de playbooks?"
+  - id: B5_6_pergunta_comando_explicito
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Precisa de `/meta:strategize` ou skill automática já basta?"
+  - id: B5_6_risco_sobreposicao
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Risco: `onion-orchestration` + `onion-patterns` já cobrem ~60% do catálogo proposto"
+  - id: B5_6_playbooks_exemplo
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "5 playbooks implícitos já existentes a destilar (descoberta-a-backlog, planejamento-a-entrega, auditoria-ampla, hotfix, adoção-de-repo)"
+  - id: B5_6_loop_aprendizado_playbook
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Sem match no catálogo → deliberação → resíduo vira proposta de novo playbook (catálogo aprende)"
+  - id: B5_6_criterio_aceitacao
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Critério de aceitação: ≥5 playbooks, reconhecimento sem comando obrigatório, fallback explícito, não duplicar skills existentes"
+  - id: B5_6_skill_onion_orchestration
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Skill existente `onion-orchestration`: reconhece fan-out → emite padrão de Workflow"
+  - id: B5_6_skill_onion_patterns
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Skill existente `onion-patterns`: convenções de estrutura/nomenclatura"
+  - id: B5_6_gate_dependencia_doc1
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    trace: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
+    label: "Não implementar catálogo antes de a doutrina do Doc 1 ser reconciliada"
+  - id: B5_7_user_clarification
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "Esclarecimento decisivo do usuário: não é deliberar do zero por tarefa — é ter fluxos/casos já mapeados (playbooks)"
+  - id: B5_7_catalog_first_reframe
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "Reframe catálogo-first (caso→fluxo→grupo de ferramentas) substitui deliberação-first: decisão vira reconhecimento (recognition-primed), não composição"
+  - id: B5_7_gap_diagnosis
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "Diagnóstico: Onion tem peças de orquestração (Workflow, onion-orchestration, onion-patterns) mas não um catálogo de playbooks por caso de uso"
+  - id: B5_7_sdaal_precedent
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "Precedente análogo: SDAAL tinha integração ad-hoc funcionando mas faltava a doutrina/tabela explícita — mesmo shape do gap do catálogo"
+  - id: B5_7_overlap_doubt
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "Autosuspeita: o catálogo pode sobrepor ~60% com onion-patterns/onion-orchestration — carece de verificação contra o código real"
+  - id: B5_7_no_new_command
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "Decisão: resistir a criar comando novo (ex. /meta:strategize) — reconhecimento via skill com progressive disclosure basta por ora"
+  - id: B5_7_timing_question
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "O catálogo é importante mas provavelmente não urgente frente à sessão de reposicionamento como produto (BSL, control plane) — pode crescer em paralelo se destilado incrementalmente"
+  - id: B5_7_recommendation
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "Recomendação da sala de design: aceitar a doutrina catálogo-first como ADR e materializar estendendo onion-patterns com 3-5 playbooks destilados, sem skill/comando novo"
+  - id: B5_7_adr_format_question
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "Formato final do ADR não decidido: meta-spec nova vs seção dentro de architecture.md existente"
+  - id: B5_7_action_requested
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
+    label: "Ação pedida à sala de obra: reconciliar o material com o estado real de .claude/, rejeitar com evidência o que estiver errado, e decidir se a doutrina vira ADR aceito"
+  - id: B5_8_status_draft_gated
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.95
+    trace: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
+    label: "Patch é rascunho NÃO aplicado — gated pelo smoke-test no goalflow antes de aplicar"
+  - id: B5_8_finding_validation_is_meta
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
+    label: "onion-validation valida .claude/** (comandos/agentes/skills) — é skill de autoria de framework (meta), não de QA de produto"
+  - id: B5_8_decision_5_skills_reclass
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
+    label: "Das 5 skills candidatas, só onion-orchestration entra agora; as outras 4 (onion-validation, onion-patterns, onion, language-standards) provam a necessidade de um base plugin futuro"
+  - id: B5_8_patch1_runflow_dev
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.9
+    trace: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
+    label: "Patch #1: mover comando runflow-dev.md para o manifest do onion-engineering (agente irmão já empacotado)"
+  - id: B5_8_patch2_orchestration_design
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
+    label: "Patch #2: adicionar skill onion-orchestration ao manifest do onion-design (dependência funcional confirmada de design:generate)"
+  - id: B5_8_postpatch_driftguards
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
+    label: "Pós-aplicação é obrigatório re-montar os 2 plugins e rodar lint-artifacts + lint-selftest (R19/R20/R22) e /meta:inventory"
+  - id: B5_8_open_onion_core_base
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    trace: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
+    label: "#3 onion-core: base plugin pendente para root commands (onion/warm-up/catch-up) + as 4 skills transversais — resolveria o gap do /catch-up"
+  - id: B5_8_open_onion_meta_doctrine
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    trace: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
+    label: "#4 onion-meta: empacotar os 30 comandos meta/ como plugin tensiona a doutrina de que meta é L2/L3 adopt-only — exige RFC"
+  - id: B5_9_marketplace_publish
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+    label: "Publicar o marketplace via `/plugin marketplace add marciocar/onion-evolve` (repo do core como fonte, GitHub syncing)"
+  - id: B5_9_install_any_plan
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+    label: "Instalar um vertical individual (`/plugin install onion-engineering@onion-evolve`) funciona em qualquer plano"
+  - id: B5_9_plugin_root_caveat
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+    label: "Caveat: `${CLAUDE_PLUGIN_ROOT}` pode não resolver em markdown de comando (bug upstream claude-code #9354) — exige teste ao vivo"
+  - id: B5_9_role_scoping_gated
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+    label: "Acesso-por-grupo (role-scoping nativo) só existe em plano Team/Enterprise; o resto do fluxo é plano-agnóstico"
+  - id: B5_9_roles_yaml_resolver
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+    label: "`resolve-role-bundle.sh` resolve o bundle de verticais por papel a partir de `roles.yaml` — nunca de memória"
+  - id: B5_9_meta_factory_never_plugin
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+    label: "Doutrina: a meta-factory (`/meta:create-*`, `/meta:adopt`, `/meta:federation-*`, `/meta:evolve`, `/meta:graph`, `/meta:inventory`) nunca é vertical/plugin — nenhum grupo a recebe"
+  - id: B5_9_fallback_vendoring
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+    label: "Fallback sem marketplace: `/meta:adopt` entrega sempre Camadas 2+3 e, como fallback, Camada 1 vendorizada por papel via o mesmo resolver"
+  - id: B5_9_regulated_prefers_vendoring
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+    label: "Adotantes regulados (ex.: granaai) preferem vendoring pinado/auditável de propósito, não auto-update de plugin"
+  - id: B5_9_verification_checklist
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+    label: "Checklist de verificação ponta-a-ponta (marketplace list, install roda, grupo standalone auto-instala, adopt regulado entrega L2+L3+L1)"
+  - id: B5_10_ambiente_goalflow
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.9
+    trace: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
+    label: "goalflow-suite com os 6 plugins Onion habilitados mas não adotado (sem .onion-version)"
+  - id: B5_10_hipotese_fronteira_l1_l2
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    trace: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
+    label: "Doutrina do moat: plugin entrega Camada 1 (capacidade autocontida); /meta:adopt entrega Camada 2 (docs + governança)"
+  - id: B5_10_camada_a_resolucao
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    trace: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
+    label: "Os 6 namespaces de plugin resolvem em /help e /plugin list?"
+  - id: B5_10_camada_b_execucao
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.3
+    trace: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
+    label: "Comandos autocontidos (B1-B5: help, build-index, unit test, fast-commit) funcionam só com o plugin, sem adopt?"
+  - id: B5_10_camada_c_fronteira
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.3
+    trace: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
+    label: "Comandos que dependem de doc L2 ausente (C1-C3: identity, build-tech-docs, task) degradam com aviso em vez de crashar?"
+  - id: B5_10_catch_up_gap_confirmado
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
+    label: "/catch-up é comando-root, nunca empacotado em plugin — gap C4 confirmado por design, só acessível via adopt/onion-core"
+  - id: B5_10_regra_crash_vira_sinal
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    trace: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
+    label: "Se um comando da Camada C crashar (stack trace/erro cru) em vez de avisar, isso é bug de robustez a anotar como sinal de co-evolução"
+  - id: B5_10_decisao_veredito_final
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.2
+    trace: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
+    label: "Decisão pendente: goalflow-suite fica plugin-only (L1) ou roda /meta:adopt para framework completo L2+3"
+  - id: B5_11_onion_standalone_nascida
+    node_type: entity
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
+    label: "Porta pública onion-standalone nasceu privada/local via /meta:adopt role-scoped (bundle standalone, sem meta-factory), registrada em members.yaml, pin 514dda8 verificado"
+  - id: B5_11_adopt_role_scoped_composicao
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
+    label: "\"adopt role-scoped\" é uma composição (união dos manifestos das 4 verticais + harness mínimo), não existe flag --role nativo"
+  - id: B5_11_door_vendored_nao_marketplace
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
+    label: "Door é .claude/ vendored, não marketplace de plugins — guard por-papel de check_plugins_sync e o --update vendor-branch 3-way confirmam"
+  - id: B5_11_doutrina_circulation_safe
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
+    label: "Doutrina que circula precisa ser circulation-safe na raiz: nomes de cliente removidos das KBs na fonte (PR #438), não deixados para scrub no vendoring"
+  - id: B5_11_g1_link_guard_fix
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
+    label: "G1 resolvido (cf4f5dc): link-guard de _scan_relative_links estendido para pular alvos ausentes sob meta-factory selada em door role-scoped"
+  - id: B5_11_g2_tier_kb_nao_circulante
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
+    label: "G2 aberto: KB com confidentiality INTERNO (case-studies de adotantes reais) shipou para o door — vendoring não distingue doutrina public-safe de análise interna"
+  - id: B5_11_g3_convencao_provenencia
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
+    label: "G3 aberto: scrub-na-fonte é one-time; falta guard de lint que varra docs/knowledge-base/ contra ids de members.yaml privados para prevenir re-rot em KBs novas"
+  - id: B5_11_f5_semente_project_door
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.65
+    trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
+    label: "F5 semente: manifesto role-scoped efetivo + ruleset de scrub são o input concreto para automação project-door.sh, gated até ≥2 doors provarem o padrão"
+  - id: B5_11_flip_publico_gated
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.75
+    trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
+    label: "Flip público do onion-standalone + reapontar redirect onion-claude seguem gated ao maestro (MOAT-lock-4)"
+  - id: B5_12_gap_g1
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
+    label: "Gap G1: adopt presume software, não domínio não-código"
+  - id: B5_12_modo_falha
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
+    label: "Modo de falha é inadequação silenciosa, não crash"
+  - id: B5_12_payload_evidencia
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
+    label: "Vendoring copia ~3,7MB da suíte contra ~3 arquivos de método útil"
+  - id: B5_12_wiring_evidencia
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
+    label: "Wiring pós-cópia fia githook/prettier/GitFlow sem sentido num KG pessoal"
+  - id: B5_12_governanca_transfere
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
+    label: "Camada de governança (mode regulated, pin, soberania) é agnóstica e transfere como está"
+  - id: B5_12_decisao_profile
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    trace: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
+    label: "Direção F2: introduzir --profile kg|domain com vendoring mínimo do método"
+  - id: B5_12_decisao_zero_wiring
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
+    label: "Direção F2: zero wiring de código, gate KG-apropriado via kg-radar"
+  - id: B5_12_fronteira_spike
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
+    label: "Spike só dimensiona; construção do --profile fica para F2"
+  - id: B5_12_validacao_dryrun
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    trace: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
+    label: "Validação extra não-bloqueante: rodar adopt --dry-run real num KG throwaway"
+  - id: B5_13_correcao_factual_base_compartilhada
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+    label: "Verificação git refuta o framing do sinal: develop e rhilo/main compartilham base 05f96a05 (01/07), não são 3 linhas disjuntas desde 15/06; main tem 239 arquivos .claude/ (não está sem framework)"
+  - id: B5_13_rhilo_main_dupla_carga
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+    label: "rhilo/main hoje carrega duas coisas ao mesmo tempo: é legítima como branch de deploy/release (eixo versão) e antipadrão como 'branch do cliente' (customização-como-divergência-git)"
+  - id: B5_13_veredito_develop_coexiste
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+    label: "Q1 ratificado: develop = GitFlow (integração) E lane-de-framework coexistem quando declarado; declarado ≠ drift, lineage framework(develop) do parecer fica ratificada"
+  - id: B5_13_veredito_politica_merge_invertida
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+    label: "Q2 ratificado: separação main-produto × rhilo/main-cliente é saudável, mas a política 'merge de volta de rhilo/main para main' está invertida — produto-base deve fluir PARA o deploy do cliente, não o contrário"
+  - id: B5_13_lineage_product_main_nova
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+    label: "Aprovada nova 3ª lineage product(main) no members.yaml, distinta de framework(develop) e production(rhilo/main) — resolve o buraco de a main-produto não ter lugar declarado"
+  - id: B5_13_veredito_cliente_escopo_vs_versao
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+    label: "Q3 ratificado: nenhuma RFC (0004/0005) fecha o trio main/develop/rhilo-main — é slice novo; princípio que desempata: cliente-como-customização compõe (escopo), cliente-como-deploy ramifica (versão), sem confundir os dois eixos"
+  - id: B5_13_branch_roles_sdaal
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+    label: "Branch-roles como SDAAL: metodologia de branch generalizada — papéis abstratos (integração, staging, produção, linhagem-cliente, lane-framework) que cada projeto declara e resolve, em vez de mapa fixo imposto; Fase 0 design-only, gated"
+  - id: B5_13_movimento1_destravado
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+    label: "Movimento 1 destravado pelo veredito ratificado: vendorizar o framework na linhagem de produção rhilo/main (via onion/vendor, #302), tornando o stamp verdadeiro e encerrando sessões de produção rodando nuas de guarda-rails"
+  - id: B5_13_gate_extracao_escopo_rhilo
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+    label: "Gated (não agora): extrair as customizações-RHILO de rhilo/main para camadas de escopo composto (RFC-0005 Fase 3 SUPERSEDES-de-escopo) — abre por gatilho real, não neste ato"
+  - id: B5_14_evidence_progressive_autonomy
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "Autonomia é espectro Audit→Assist→Automate; Automate é estado GANHO por comportamento verificado (earned trust)"
+  - id: B5_14_evidence_deterministic_merge
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "Decisão de merge deve ser política determinística, nunca probabilística; IA sugere/acelera, não decide"
+  - id: B5_14_evidence_hitl_risk_split
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "Humano retém autoridade sobre o irreversível/arriscado; IA cuida da maioria rotineira, no mesmo workflow"
+  - id: B5_14_claim_transfer_onion
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "Audit/Assist/Automate transfere para os 3 atos do Onion + toolbox-lifecycle (ASSESS→TRIAL→ADOPT) + declarado≠verificado"
+  - id: B5_14_claim_onion_stricter
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "Onion desenha mais estrito que a web: moat inviolável (repo-alheio/W7 nunca) + path-allowlist vendor (AUDIT+ sempre) por causa da federação"
+  - id: B5_14_decision_draft_contract
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.4
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "Contrato-rascunho de autonomia AUTOMATE (1ª versão, antes da verificação adversarial)"
+  - id: B5_14_evidence_adversarial_review
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "Revisor fable achou 10 furos (4 ALTA contradições internas: docs vendorizados ditos não-outward, auto-merge contradiz main único, política com 2 vereditos LLM, enabler git-nativo ignorado)"
+  - id: B5_14_decision_automate_gated
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "Resolução pós-refutação: AUTOMATE nasce GATED (3 pré-condições duras: enabler git-nativo + path-allowlist mecânica + política 100% mecânica com LLM veto-only); 1ª passada só AUDIT no main humano; worktree própria + beacon-check + 3 guardas de parada"
+  - id: B5_14_artifact_adr_thread_runtime
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "ADR onion-adr-autonomous-thread-runtime-2026-07, nasce proposed-GATED (sela só após dogfood da Fase 2)"
+  - id: B5_14_question_automate_class_size
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    trace: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
+    label: "A classe AUTOMATE real deste repo é pequena (non-vendor) — a confirmar em campo"
+  - id: B5_15_ingestor_gap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+    label: "Cadeia doutrina adotante→core está partida no meio: core não ingere doutrina estruturalmente (buraco central)"
+  - id: B5_15_producer_transport_chain
+    node_type: entity
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-21
+    trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+    label: "Metade produtora+transporte da cadeia (diary export, co-relay, trust-topology-check) construída e dogfoodada"
+  - id: B5_15_kg_engine
+    node_type: entity
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+    label: "Motor kg-radar.sh + gramática de 2 camadas (audit/domain) pronto, mas sem .kg.yaml layer:domain de produção"
+  - id: B5_15_federation_edge_gap
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+    label: "Relações sociais de federação (adopts/trust-corrects/lineage) não têm equivalente nos 6 edge-types domain do KG"
+  - id: B5_15_dogfood_first
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+    label: "Federação-como-KG é dogfood-first: não inventar edge-type novo até dogfood provar a falta"
+  - id: B5_15_regulated_member_signals
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-21
+    trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+    label: "granaai já entregou 4 sinais de doutrina ao core (integridade≠rastreabilidade, fail-open do radar, validador-local, /meta:kg map) sem absorção estrutural"
+  - id: B5_15_onion_pessoal_method
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-07-21
+    trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+    label: "onion-pessoal adota o método (não vendoriza .claude/): raiz é o KG com planes DEV×PROD e SUPERSEDES/Aufhebung"
+  - id: B5_15_four_phase_plan
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+    label: "Plano de 4 fases: desbloquear → fechar write(KG) → construir o INGESTOR → 1ª federation.kg.yaml de produção"
+  - id: B5_15_federation_ontology_open
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+    label: "Ontologia de relações de federação no KG é gap aberto — só a Fase 3 (dogfood) decide, não o abstrato"
+  - id: B5_16_metodo_fanout_sintese
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 1
+    trace: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+    label: "Método: fan-out (branding-positioning + storytelling, sonnet) → síntese (opus)"
+  - id: B5_16_decisao_gancho_dado_verificavel
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    trace: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+    label: "Gancho não é superlativo — é a especificidade do dado verificável, não hype"
+  - id: B5_16_claim_evidencia_anthropic_2026
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    trace: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+    label: "Dado citado: devs delegam só 0-20% com confiança; 40% menos erro / 55% mais rápido (Anthropic 2026)"
+  - id: B5_16_decisao_casa_de_marca
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    trace: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+    label: "Arquitetura Casa de Marca: Onion herói/marca-mãe, plataforma é metadado de compatibilidade (badge, nunca H1)"
+  - id: B5_16_claim_prova_universalidade
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    trace: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+    label: "Prova de universalidade (\"portado a 6 ferramentas\") sustenta autoridade como fato, não slogan"
+  - id: B5_16_decisao_fronteira_comercial_voz
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    trace: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+    label: "Fronteira comercial na voz: grátis é o texto (standalone completo); moat é a rede (federação = hub); nunca prometer federação no standalone nem vocabulário de pricing na porta"
+  - id: B5_16_decisao_frame_competitivo
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    trace: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+    label: "Frame competitivo: nomear Agent OS como rival estrutural + citar fonte; nunca atacar por adjetivo"
+  - id: B5_16_artifact_messaging_framework
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 1
+    trace: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+    label: "messaging-framework.md deixa de ser stub — deliverable definitivo para mini/standalone/hub"
+  - id: B5_16_question_linha_leiga_p6_bloqueada
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+    label: "Linha leiga P6 segue bloqueada (D3) — H1/tagline final fica a critério de direção criativa do maestro"
+  - id: B5_17_taxonomia_bockeler
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "Böckeler separa 3 ambições: spec-first (descartável) / spec-anchored (vivo) / spec-as-source (fonte única, código gerado)"
+  - id: B5_17_gap_discurso_pratica
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "Quase toda ferramenta diz mirar spec-as-source e opera de fato em spec-first one-shot"
+  - id: B5_17_tessl_unico_as_source
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "Tessl é o único produto mirando explicitamente spec-anchored e spec-as-source (beta)"
+  - id: B5_17_agentspec_modelspec_runtime
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "AgentSpec e Model Spec (OpenAI) são os casos reais de spec interpretada em runtime hoje — governança/comportamento, não lógica de negócio"
+  - id: B5_17_grove_spec_unidade_fundamental
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.6
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "Sean Grove (OpenAI): especificação versionada é a unidade fundamental de programação, código é saída compilada"
+  - id: B5_17_critica_codigo_continua_fonte
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "Böckeler e Encarnacao refutam spec-as-all: código executável continua a fonte; spec precisa o bastante para rodar já é código"
+  - id: B5_17_spec_drift_nao_resolvido
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "Spec drift é a crítica central ainda sem solução disciplinar — SDD trocou 'ninguém atualiza' por 'ninguém reconcilia'"
+  - id: B5_17_pergunta_quem_reconcilia
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "Quem reconcilia mudanças concorrentes de spec entre agente e desenvolvedor humano?"
+  - id: B5_17_spec_growth_engine_grafo
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "Spec Growth Engine: Intent Graph vs Evidence Graph com gate de merge bloqueante — reconciliação spec↔código automatizada"
+  - id: B5_17_veredito_trajetoria_campo
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+    label: "Veredito: spec-as-code é presente, spec-as-run é fronteira em nichos, spec-as-all é aposta ideológica gated por reconciliação via grafo"
+  - id: SY5_mcp_first_leak_closed
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/agents/meta/agent-creator-specialist.md:183,239,242,249 · .claude/commands/common/templates/agent-template.md:144,178,181,312"
+    label: "PROVA: o vazamento MCP-first foi fechado na FONTE — agent-creator-specialist.md steera explicitamente para adapter SDAAL ('providers de task/forge via adapter SDAAL, não mcp__<provider>__* direto', l.183/239/242/249) e o agent-template.md documenta integração API-first (l.144/178/181/301/312). O achado que 3 diários repetiram morreu."
+  - id: SY5_count_drift_ssot_closed
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/onion/inventory.md:1 · .claude/validation/inventory.sh · .claude/validation/lint-artifacts.sh:1018,1293"
+    label: "PROVA: o drift de contagem virou SSOT gerada + guarda mecânica — docs/onion/inventory.md tem header 'GENERATED BY .claude/validation/inventory.sh — NÃO EDITE À MÃO' e o lint tem REGRA 16 (inventário-total divergente) + REGRA 8 (SSOT regenerada, nunca editada frase-a-frase) cobrindo derivados, não só CLAUDE.md."
+  - id: SY5_index_residual_drift
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/INDEX.md:47 vs docs/onion/inventory.md (meta/=32)"
+    label: "Resíduo VIVO (pequeno): docs/INDEX.md:47 diz '30 em meta/' e a SSOT gerada diz 32 — o mecanismo existe mas este derivado hand-maintained está fora de sincronia; é exatamente a classe que a REGRA 8 deveria pegar."
+  - id: SY5_kb_freshness_gate_closed
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/commands/meta/kb-freshness.md · plugins/onion-work-tools/commands/{kb-freshness,context-freshness}.md · .claude/validation/lint-artifacts.sh:994 · docs/analysis/onion-adr-kg-freshness-gate-2026-07.md"
+    label: "PROVA: o gate de frescor de KB deixou de ser data no frontmatter e virou executável — /meta:kb-freshness e /meta:context-freshness existem (inclusive empacotados em onion-work-tools), lint REGRA 15 carimba frescor de contexto e há ADR kg-freshness-gate."
+  - id: SY5_evolve_diaries_redecide
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-evolution-2026-06-{15,16,17}.md"
+    label: "DUPLICATA REAL: os diários 06-15, 06-16 e 06-17 re-decidem os MESMOS 3 achados (varredura MCP-first, drift de contagem, categorias fantasma) em 3 dias consecutivos — o próprio 06-16 registra 'não executado desde o run anterior'. Não é fan-out redundante: é backlog-em-prosa não executando."
+  - id: SY5_prose_backlog_antipattern
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "contraste .claude/validation/lint-artifacts.sh (fechou) × docs/analysis/onion-evolution-2026-06-*.md (repetiu)"
+    label: "Lição destilada da tripla: backlog que mora em prosa datada re-nasce todo dia; só morre quando vira guarda mecânica no lint ou SSOT gerada — foi o que aconteceu com contagem (REGRA 16/8) e não aconteceu com os achados que ficaram só no relatório."
+  - id: SY5_phase_merge_invariant_held
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "plugins/onion-engineering/commands/ (plan,start,work,pre-pr,pr,pr-update) · plugins/onion-product/commands/ (collect,refine,spec,feature)"
+    label: "Invariante confirmada nos 3 runs e ainda no repo: zero fusões de fase — engineer/{plan,start,work,pre-pr,pr,pr-update} e product/{collect,refine,spec,feature} continuam comandos separados hoje."
+  - id: SY5_strategy_trio_is_one_package
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md:5 (re: handoff + 4 docs irmãos)"
+    label: "Os 3 docs strategy-layer de 06-17 (blindspots + capability-draft + handoff) NÃO são repetição: são um pacote de uma sessão só (handoff=Doc 3, capability=Doc 2, blindspots=Doc 4/4) — e o próprio RFC-0002 os cita como '+4 docs irmãos' de um único handoff."
+  - id: SY5_rfc0002_judged_trio
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md §2,§3"
+    label: "PROVA: o pacote inteiro já foi JULGADO — RFC-0002 (status accepted, 2026-06-22) aceita catálogo-first como doutrina, ratifica 'sem comando novo' (estender onion-patterns), mede a sobreposição de ~60% contra o .claude/ real e a declara distinção genuína (forma de orquestração × caso de uso), e ratifica o reposicionamento por decomposição em camadas."
+  - id: SY5_playbooks_materialization_open
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: ".claude/skills/onion-patterns/SKILL.md:177 (única ocorrência de 'playbook')"
+    label: "MAS a materialização segue aberta: onion-patterns/SKILL.md tem UMA linha da doutrina recognition-primed (l.177) e nenhuma seção de 3-5 playbooks destilados — o critério de aceitação do Doc 2 (≥5 playbooks) não está atendido."
+  - id: SY5_adopt_durability_closed
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/utils/adopt/durable-commit.sh:15,19,55"
+    label: "PROVA: os Achados 1/3/4 de 07-08 morreram em código — .claude/utils/adopt/durable-commit.sh commita a entrega em branch dedicada com 'git commit --no-verify' (l.15,55), tornando a entrega L2+3 objeto git sem depender de ato humano posterior."
+  - id: SY5_vendor_branch_closed
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/utils/adopt/vendor-branch.sh · .claude/commands/meta/adopt.md:56,221,467-469,554 · docs/analysis/onion-adr-adopt-vendor-branch-merge-2026-07.md"
+    label: "PROVA: o Achado 2 (merge de vendor-branch em vez de copy-over) também virou realidade — vendor-branch.sh + adopt.md descrevendo --update como 'git merge de onion/vendor' 3-way com .gitattributes merge=union, e ADR próprio."
+  - id: SY5_marketplace_live
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude-plugin/marketplace.json · plugins/ (7 dirs)"
+    label: "PROVA: o runbook de marketplace saiu do papel — .claude-plugin/marketplace.json existe com pluginRoot ./plugins e 7 plugins publicáveis (compliance, design, docs, engineering, product, testing, work-tools)."
+  - id: SY5_meta_factory_doctrine_held
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "plugins/onion-work-tools/commands/ (14 arquivos, sem create-*/adopt/federation/evolve/graph/inventory)"
+    label: "PROVA da doutrina 'meta-factory nunca é plugin': o onion-work-tools empacota só meta cross-cutting (kg, diary, orchestrate, metaspec-validate, kb/context-freshness, co-evolve, co-relay, recover, setup-*) e NENHUM /meta:create-*, adopt, federation-*, evolve, graph ou inventory."
+  - id: SY5_onion_meta_question_dissolved
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "plugins/onion-work-tools/.claude-plugin/plugin.json (description: 'nao meta-fabrica')"
+    label: "A pergunta #4 ('empacotar os 30 comandos meta/ tensiona a doutrina, exige RFC') foi dissolvida por DECOMPOSIÇÃO, não por RFC: separou-se meta-ferramenta-de-trabalho (empacotável) de meta-fábrica (nunca empacotável)."
+  - id: SY5_orchestration_skill_shipped_elsewhere
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "plugins/onion-work-tools/skills/onion-orchestration/ · plugins/onion-design/ (sem skills/) · plugins/onion-design/commands/generate.md:50"
+    label: "Patch #2 aconteceu, mas em outro alvo: a skill onion-orchestration foi empacotada em onion-work-tools, não no manifest do onion-design — o onion-design não tem dir skills/ e alcança a orquestração só por referência textual."
+  - id: SY5_runflow_patch_open
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: ".claude/commands/development/runflow-dev.md · grep 'runflow' em plugins/*/.claude-plugin/*.json e .claude-plugin/marketplace.json = 0 hits"
+    label: "Patch #1 NÃO aplicado: runflow-dev.md continua só em .claude/commands/development/ e não aparece em nenhum manifest de plugin nem no marketplace.json."
+  - id: SY5_catch_up_gap_persists
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "find plugins -name 'catch-up*' = vazio · plugins/{onion-product,onion-engineering}/commands/warm-up.md"
+    label: "Gap C4 confirmado por inspeção e ainda vivo: nenhum plugin embarca catch-up (só warm-up, em product e engineering) — /catch-up segue exclusivo do caminho adopt."
+  - id: SY5_smoke_test_never_run
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "grep -rl goalflow .claude/diary/ docs/analysis/ → só os 3 docs de projeto, nenhum de resultado"
+    label: "O smoke test do goalflow não deixou rastro de execução no repo (nenhum resultado, diário ou análise citando o veredito) — as 3 camadas A/B/C seguem perguntas abertas, e o patch de cobertura segue corretamente gated atrás delas."
+  - id: SY5_g3_scrub_guard_absent
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "grep 'circulation-safe|public-safe|confidentiality' .claude/validation/*.sh = 0 hits · REGRAs do lint vão até 29 sem tal regra"
+    label: "PROVA NEGATIVA (G3 aberto): não existe guarda de lint varrendo docs/knowledge-base/ contra ids/nomes privados — grep por 'circulation-safe|public-safe|confidentiality' em .claude/validation/*.sh retorna zero. O scrub-na-fonte segue one-time."
+  - id: SY5_g2_doctrine_only
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/knowledge-base/concepts/public-door-vs-private-core.md:63,88 (sem campo confidentiality)"
+    label: "G2 (KB interna vazando para o door) ganhou DOUTRINA mas não mecanismo: a KB public-door-vs-private-core.md codifica destilação curada × vendoring e 'adotante ancorado ≠ preso', sem tier de confidencialidade legível por máquina."
+  - id: SY5_profile_never_built
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "grep 'profile' .claude/commands/meta/adopt.md = 0 hits · .claude/diary/2026-07-18-method-adopter-has-no-doc-bridge.md"
+    label: "PROVA NEGATIVA: o --profile kg|domain do spike F1 não existe — zero ocorrências de 'profile' em .claude/commands/meta/adopt.md e o único hit em .claude/ é um diário. O gap G1 (adopt presume software) segue integralmente aberto."
+  - id: SY5_branch_roles_second_resolver
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/validation/resolve-production-branch.sh:1-25 · .claude/validation/resolve-integration-branch.sh"
+    label: "PROVA parcial do branch-roles SDAAL: nasceu o SEGUNDO resolver de papel — resolve-production-branch.sh, irmão do resolve-integration-branch.sh, criado por sinal de campo da granaai (07-19: origin/HEAD apontando para develop envenenava gitflow.branch.master)."
+  - id: SY5_branch_roles_adr_still_proposed
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/analysis/onion-adr-branch-roles-sdaal-2026-07.md (status: proposto)"
+    label: "Mas o ADR branch-roles-sdaal continua 'proposto (design-only, gated)' — o mecanismo generalizado (branch_roles: no .onion-version, adapters, rewire da matriz de proteção) não foi escrito; o que existe são dois resolvers hard-coded por papel."
+  - id: SY5_product_lineage_not_materialized
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "docs/evolution/federation/members.yaml:67-77 (lineages: framework, production — sem product)"
+    label: "PROVA NEGATIVA: a 3ª lineage product(main) aprovada no veredito NÃO foi materializada — members.yaml do metagamify declara só framework(develop) e production(rhilo/main). A main-produto continua sem lugar declarado."
+  - id: SY5_movimento1_vendored_pending_commit
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/evolution/federation/members.yaml:73-75"
+    label: "Movimento 1 (vendorizar o framework na linhagem de produção) está feito-mas-não-selado: members.yaml carrega pin production 8e22352da32f verificado em 07-03 com nota explícita 'commit pendente na sessão do rhilo — entrega-sem-commit I3'."
+  - id: SY5_autonomy_adr_gated_beacon_real
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md (status proposed-GATED) · .claude/validation/session-beacon.sh:1-12 · docs/onion/graph/autonomous-thread-runtime-2026-07.kg.yaml"
+    label: "O runtime de autonomia virou ADR proposed-GATED com KG próprio, e uma das guardas duras já é código: session-beacon.sh implementa o beacon-check ('um escritor por repo inclui SESSÕES'), nascido do incidente de colisão W1×W2."
+  - id: SY5_ingestor_doctrine_accepted_code_absent
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-adr-doctrine-ingestor-2026-07.md (status accepted) · grep -rl ingestor .claude/ → só .claude/diary/*"
+    label: "O ingestor de doutrina virou ADR ACEITO (trust-gate via members.yaml can_correct_to, KG-backed, human-gated, 1º dogfood granaai), mas o executável do ingestor não existe — nenhum script/comando 'ingestor' em .claude/, só ADR e migalhas de diário."
+  - id: SY5_federation_kg_ontology_answered
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md"
+    label: "A pergunta da ontologia de relações de federação no KG deixou de ser abstrata: existe ADR federation-kg-audit-overlay — a decisão 'só o dogfood decide' foi honrada, não contornada."
+  - id: SY5_brand_voice_shipped
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/business-context/04-operations/messaging-framework.md:1-40"
+    label: "PROVA: o brand voice virou deliverable definitivo — messaging-framework.md (114 linhas, 2026-07-19) carrega Casa de Marca, léxico de subordinação da plataforma, prova de universalidade (6 ferramentas) e positioning statement; deixou de ser stub."
+  - id: SY5_p6_still_blocked
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "docs/business-context/04-operations/messaging-framework.md:6-8"
+    label: "A única pergunta do brand voice que sobrevive é a mesma que nasceu: a linha leiga P6 segue BLOQUEADA por D3, declarada no topo do próprio deliverable — bloqueio honesto, não esquecimento."
+  - id: SY5_spec_as_run_not_absorbed
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "grep -rl 'spec-as-run|spec-as-all|Spec Growth Engine' docs/ → só docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md · docs/knowledge-base/concepts/spec-as-code-strategy.md:9-11"
+    label: "PROVA NEGATIVA: a pesquisa spec-as-code→spec-as-run→spec-as-all NÃO foi absorvida — 'spec-as-run'/'spec-as-all'/'Spec Growth Engine' só aparecem no próprio SYNTHESIS; a KB spec-as-code-strategy.md continua v1.0.0 de 2025-11-24 e a spec-driven-development.md cita Tessl na moldura antiga de ferramentas 2025."
+  - id: SY5_spec_research_has_no_kg
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: "ls docs/evolution/research/spec-as-code-evolution-2026/ (só SYNTHESIS.md) vs irmãs com .kg.yaml · .claude/validation/lint-artifacts.sh:1421"
+    label: "Agravante mecânico: spec-as-code-evolution-2026/ é a ÚNICA das 3 pesquisas desta leva sem .kg.yaml ao lado do SYNTHESIS — as irmãs (brand-voice, doctrine-sync-ingestor) têm. Isso é exatamente o que a REGRA 26 do lint ('pesquisa nasce em KG, não morre em prosa') existe para pegar."
+  - id: SY5_a2a_gate_still_unfired
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: ".claude/validation/a2a-agent-card.sh · .claude/validation/lint-artifacts.sh:649 · docs/evolution/federation/members.yaml:83-86 · docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+    label: "A projeção export-only Agent Card carregada de 06-15 para 06-16 tem hoje CÓDIGO (a2a-agent-card.sh + REGRA de sync no lint + campo a2a: em members.yaml) — o gate 'só quando houver consumer não-Onion' foi respeitado e depois superado pelo a2a-live da RFC-0004."
+  - id: SY5_verdict_leva5
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-21
+    trace: "síntese desta leva"
+    label: "Veredito da leva 5: 17 docs, ~2/3 do passivo já morreu em código sem ninguém marcar; o que sobra concentra-se em 3 fios reais (adopt --profile, guarda de scrub/confidencialidade, absorção do spec-as-run) + 2 pendências de materialização barata (playbooks em onion-patterns, runflow-dev no manifest)."
 edges:
   - from: G1_INTERRUPT_STATES
     to: G1_GATED_HANDSHAKE_DESIGN
@@ -6181,4 +8013,778 @@ edges:
     edge_type: SUPPORTS
   - from: B4_10_philosophy_validated
     to: S4_claim_abandono_2026_05_18
+    edge_type: SUPPORTS
+  - from: B5_1_mcp_first_leak
+    to: B5_1_mcp_sweep_decision
+    edge_type: SUPPORTS
+  - from: B5_1_inventory_drift
+    to: B5_1_inventory_command_decision
+    edge_type: SUPPORTS
+  - from: B5_1_kb_date_gate_not_honored
+    to: B5_1_kb_freshness_command_decision
+    edge_type: SUPPORTS
+  - from: B5_1_phantom_categories
+    to: B5_1_fix_phantom_links_decision
+    edge_type: SUPPORTS
+  - from: B5_1_broken_links_security_master
+    to: B5_1_fix_phantom_links_decision
+    edge_type: SUPPORTS
+  - from: B5_1_refuted_findings
+    to: B5_1_zero_phase_merge_vetoes
+    edge_type: SUPPORTS
+  - from: B5_2_run_evolve_2026_06_16
+    to: B5_2_mcp_first_leakage
+    edge_type: CAUSES
+  - from: B5_2_run_evolve_2026_06_16
+    to: B5_2_phantom_categories
+    edge_type: CAUSES
+  - from: B5_2_run_evolve_2026_06_16
+    to: B5_2_threshold_ambiguity
+    edge_type: CAUSES
+  - from: B5_2_run_evolve_2026_06_16
+    to: B5_2_federation_v1_dead_links
+    edge_type: CAUSES
+  - from: B5_2_adversarial_judge_refutation
+    to: B5_2_zero_phase_merge_vetoes
+    edge_type: SUPPORTS
+  - from: B5_2_adversarial_judge_refutation
+    to: B5_2_decision_delink_not_repoint
+    edge_type: SUPPORTS
+  - from: B5_2_decision_delink_not_repoint
+    to: B5_2_federation_v1_dead_links
+    edge_type: DEPENDS_ON
+  - from: B5_2_executed_same_day
+    to: B5_2_mcp_first_leakage
+    edge_type: SUPPORTS
+  - from: B5_2_executed_same_day
+    to: B5_2_phantom_categories
+    edge_type: SUPPORTS
+  - from: B5_2_decision_retain_2026_06_15
+    to: B5_2_run_evolve_2026_06_16
+    edge_type: DEPENDS_ON
+  - from: B5_2_a2a_projection_carryforward
+    to: B5_2_run_evolve_2026_06_16
+    edge_type: DEPENDS_ON
+  - from: B5_3_run_evolve_0617
+    to: B5_3_alert_a_count_drift
+    edge_type: CAUSES
+  - from: B5_3_run_evolve_0617
+    to: B5_3_alert_b_mcp_leak
+    edge_type: CAUSES
+  - from: B5_3_run_evolve_0617
+    to: B5_3_backlog_prioritized
+    edge_type: CAUSES
+  - from: B5_3_lint_rule9_gap
+    to: B5_3_alert_a_count_drift
+    edge_type: SUPPORTS
+  - from: B5_3_alert_a_count_drift
+    to: B5_3_decision_root_fix_order
+    edge_type: CAUSES
+  - from: B5_3_alert_b_mcp_leak
+    to: B5_3_decision_fix_both_creators
+    edge_type: CAUSES
+  - from: B5_3_decision_preserve_historical
+    to: B5_3_decision_root_fix_order
+    edge_type: SUPPORTS
+  - from: B5_3_judge_cull_evidence
+    to: B5_3_backlog_prioritized
+    edge_type: SUPPORTS
+  - from: B5_3_backlog_prioritized
+    to: B5_3_judge_cull_evidence
+    edge_type: DEPENDS_ON
+  - from: B5_4_incident_source
+    to: B5_4_finding1_copy_manual_commit
+    edge_type: SUPPORTS
+  - from: B5_4_finding1_copy_manual_commit
+    to: B5_4_finding3_version_revert
+    edge_type: CAUSES
+  - from: B5_4_finding1_copy_manual_commit
+    to: B5_4_systemic_cause
+    edge_type: SUPPORTS
+  - from: B5_4_finding2_merge_future
+    to: B5_4_systemic_cause
+    edge_type: SUPPORTS
+  - from: B5_4_finding3_version_revert
+    to: B5_4_systemic_cause
+    edge_type: SUPPORTS
+  - from: B5_4_finding4_report_offer_commit
+    to: B5_4_systemic_cause
+    edge_type: SUPPORTS
+  - from: B5_4_dogfood_checkout_safe
+    to: B5_4_finding1_copy_manual_commit
+    edge_type: SUPPORTS
+  - from: B5_4_systemic_cause
+    to: B5_4_decision_autocommit
+    edge_type: CAUSES
+  - from: B5_4_decision_autocommit
+    to: B5_4_invariant_adopt_stays
+    edge_type: DEPENDS_ON
+  - from: B5_4_decision_vendor_branch
+    to: B5_4_decision_autocommit
+    edge_type: DEPENDS_ON
+  - from: B5_4_decision_vendor_branch
+    to: B5_4_finding2_merge_future
+    edge_type: TRACES_TO
+  - from: B5_4_ssot_context_pilot
+    to: B5_4_systemic_cause
+    edge_type: REFUTES
+  - from: B5_5_custo_comparavel_evolve_claim
+    to: B5_5_falta_benchmark_question
+    edge_type: CAUSES
+  - from: B5_5_custo_comparavel_evolve_claim
+    to: B5_5_prioridade_marcio_question
+    edge_type: SUPPORTS
+  - from: B5_5_catalogo_first_decision
+    to: B5_5_meta_strategize_capability
+    edge_type: SUPPORTS
+  - from: B5_5_catalogo_first_decision
+    to: B5_5_precisao_match_question
+    edge_type: CAUSES
+  - from: B5_5_meta_strategize_capability
+    to: B5_5_blocker_sdaal_aberto_claim
+    edge_type: DEPENDS_ON
+  - from: B5_5_avaliacao_probabilistica_claim
+    to: B5_5_meta_strategize_capability
+    edge_type: SUPPORTS
+  - from: B5_5_desconhecidos_sessao_claim
+    to: B5_5_prioridade_marcio_question
+    edge_type: SUPPORTS
+  - from: B5_6_principio_reconhecer_compor
+    to: B5_6_catalog_estrategia
+    edge_type: SUPPORTS
+  - from: B5_6_catalog_estrategia
+    to: B5_6_reconhecedor_leve
+    edge_type: DEPENDS_ON
+  - from: B5_6_skill_onion_patterns
+    to: B5_6_pergunta_skill_ou_extensao
+    edge_type: SUPPORTS
+  - from: B5_6_risco_sobreposicao
+    to: B5_6_pergunta_skill_ou_extensao
+    edge_type: CAUSES
+  - from: B5_6_risco_sobreposicao
+    to: B5_6_catalog_estrategia
+    edge_type: REFUTES
+  - from: B5_6_skill_onion_orchestration
+    to: B5_6_reconhecedor_leve
+    edge_type: SUPPORTS
+  - from: B5_6_playbooks_exemplo
+    to: B5_6_catalog_estrategia
+    edge_type: SUPPORTS
+  - from: B5_6_loop_aprendizado_playbook
+    to: B5_6_reconhecedor_leve
+    edge_type: SUPPORTS
+  - from: B5_6_criterio_aceitacao
+    to: B5_6_catalog_estrategia
+    edge_type: TRACES_TO
+  - from: B5_6_gate_dependencia_doc1
+    to: B5_6_principio_reconhecer_compor
+    edge_type: DEPENDS_ON
+  - from: B5_6_gate_dependencia_doc1
+    to: B5_6_catalog_estrategia
+    edge_type: CAUSES
+  - from: B5_6_pergunta_comando_explicito
+    to: B5_6_catalog_estrategia
+    edge_type: DEPENDS_ON
+  - from: B5_7_user_clarification
+    to: B5_7_catalog_first_reframe
+    edge_type: CAUSES
+  - from: B5_7_gap_diagnosis
+    to: B5_7_catalog_first_reframe
+    edge_type: SUPPORTS
+  - from: B5_7_sdaal_precedent
+    to: B5_7_gap_diagnosis
+    edge_type: SUPPORTS
+  - from: B5_7_catalog_first_reframe
+    to: B5_7_recommendation
+    edge_type: SUPPORTS
+  - from: B5_7_overlap_doubt
+    to: B5_7_recommendation
+    edge_type: SUPPORTS
+  - from: B5_7_no_new_command
+    to: B5_7_recommendation
+    edge_type: SUPPORTS
+  - from: B5_7_timing_question
+    to: B5_7_recommendation
+    edge_type: SUPPORTS
+  - from: B5_7_recommendation
+    to: B5_7_action_requested
+    edge_type: DEPENDS_ON
+  - from: B5_7_overlap_doubt
+    to: B5_7_action_requested
+    edge_type: DEPENDS_ON
+  - from: B5_7_adr_format_question
+    to: B5_7_action_requested
+    edge_type: DEPENDS_ON
+  - from: B5_8_finding_validation_is_meta
+    to: B5_8_decision_5_skills_reclass
+    edge_type: SUPPORTS
+  - from: B5_8_decision_5_skills_reclass
+    to: B5_8_patch2_orchestration_design
+    edge_type: CAUSES
+  - from: B5_8_decision_5_skills_reclass
+    to: B5_8_open_onion_core_base
+    edge_type: CAUSES
+  - from: B5_8_status_draft_gated
+    to: B5_8_patch1_runflow_dev
+    edge_type: DEPENDS_ON
+  - from: B5_8_status_draft_gated
+    to: B5_8_patch2_orchestration_design
+    edge_type: DEPENDS_ON
+  - from: B5_8_postpatch_driftguards
+    to: B5_8_patch1_runflow_dev
+    edge_type: DEPENDS_ON
+  - from: B5_8_postpatch_driftguards
+    to: B5_8_patch2_orchestration_design
+    edge_type: DEPENDS_ON
+  - from: B5_8_open_onion_meta_doctrine
+    to: B5_8_open_onion_core_base
+    edge_type: SUPPORTS
+  - from: B5_9_install_any_plan
+    to: B5_9_marketplace_publish
+    edge_type: DEPENDS_ON
+  - from: B5_9_plugin_root_caveat
+    to: B5_9_install_any_plan
+    edge_type: REFUTES
+  - from: B5_9_role_scoping_gated
+    to: B5_9_roles_yaml_resolver
+    edge_type: DEPENDS_ON
+  - from: B5_9_roles_yaml_resolver
+    to: B5_9_meta_factory_never_plugin
+    edge_type: SUPPORTS
+  - from: B5_9_fallback_vendoring
+    to: B5_9_roles_yaml_resolver
+    edge_type: DEPENDS_ON
+  - from: B5_9_regulated_prefers_vendoring
+    to: B5_9_fallback_vendoring
+    edge_type: SUPPORTS
+  - from: B5_9_verification_checklist
+    to: B5_9_marketplace_publish
+    edge_type: TRACES_TO
+  - from: B5_9_verification_checklist
+    to: B5_9_role_scoping_gated
+    edge_type: TRACES_TO
+  - from: B5_9_verification_checklist
+    to: B5_9_fallback_vendoring
+    edge_type: TRACES_TO
+  - from: B5_10_camada_a_resolucao
+    to: B5_10_ambiente_goalflow
+    edge_type: DEPENDS_ON
+  - from: B5_10_camada_b_execucao
+    to: B5_10_ambiente_goalflow
+    edge_type: DEPENDS_ON
+  - from: B5_10_camada_b_execucao
+    to: B5_10_hipotese_fronteira_l1_l2
+    edge_type: SUPPORTS
+  - from: B5_10_camada_c_fronteira
+    to: B5_10_hipotese_fronteira_l1_l2
+    edge_type: SUPPORTS
+  - from: B5_10_catch_up_gap_confirmado
+    to: B5_10_camada_c_fronteira
+    edge_type: SUPPORTS
+  - from: B5_10_regra_crash_vira_sinal
+    to: B5_10_camada_c_fronteira
+    edge_type: DEPENDS_ON
+  - from: B5_10_decisao_veredito_final
+    to: B5_10_camada_b_execucao
+    edge_type: DEPENDS_ON
+  - from: B5_10_decisao_veredito_final
+    to: B5_10_camada_c_fronteira
+    edge_type: DEPENDS_ON
+  - from: B5_11_adopt_role_scoped_composicao
+    to: B5_11_onion_standalone_nascida
+    edge_type: SUPPORTS
+  - from: B5_11_door_vendored_nao_marketplace
+    to: B5_11_onion_standalone_nascida
+    edge_type: SUPPORTS
+  - from: B5_11_onion_standalone_nascida
+    to: B5_11_g1_link_guard_fix
+    edge_type: DEPENDS_ON
+  - from: B5_11_doutrina_circulation_safe
+    to: B5_11_g2_tier_kb_nao_circulante
+    edge_type: CAUSES
+  - from: B5_11_doutrina_circulation_safe
+    to: B5_11_g3_convencao_provenencia
+    edge_type: CAUSES
+  - from: B5_11_g2_tier_kb_nao_circulante
+    to: B5_11_f5_semente_project_door
+    edge_type: SUPPORTS
+  - from: B5_11_g3_convencao_provenencia
+    to: B5_11_f5_semente_project_door
+    edge_type: SUPPORTS
+  - from: B5_11_f5_semente_project_door
+    to: B5_11_onion_standalone_nascida
+    edge_type: DEPENDS_ON
+  - from: B5_11_flip_publico_gated
+    to: B5_11_onion_standalone_nascida
+    edge_type: DEPENDS_ON
+  - from: B5_12_payload_evidencia
+    to: B5_12_modo_falha
+    edge_type: SUPPORTS
+  - from: B5_12_wiring_evidencia
+    to: B5_12_modo_falha
+    edge_type: SUPPORTS
+  - from: B5_12_modo_falha
+    to: B5_12_gap_g1
+    edge_type: SUPPORTS
+  - from: B5_12_gap_g1
+    to: B5_12_decisao_profile
+    edge_type: CAUSES
+  - from: B5_12_gap_g1
+    to: B5_12_decisao_zero_wiring
+    edge_type: CAUSES
+  - from: B5_12_governanca_transfere
+    to: B5_12_decisao_profile
+    edge_type: SUPPORTS
+  - from: B5_12_decisao_profile
+    to: B5_12_fronteira_spike
+    edge_type: DEPENDS_ON
+  - from: B5_12_decisao_zero_wiring
+    to: B5_12_fronteira_spike
+    edge_type: DEPENDS_ON
+  - from: B5_12_validacao_dryrun
+    to: B5_12_fronteira_spike
+    edge_type: DEPENDS_ON
+  - from: B5_13_correcao_factual_base_compartilhada
+    to: B5_13_veredito_politica_merge_invertida
+    edge_type: SUPPORTS
+  - from: B5_13_correcao_factual_base_compartilhada
+    to: B5_13_movimento1_destravado
+    edge_type: CAUSES
+  - from: B5_13_veredito_politica_merge_invertida
+    to: B5_13_lineage_product_main_nova
+    edge_type: SUPPORTS
+  - from: B5_13_veredito_cliente_escopo_vs_versao
+    to: B5_13_rhilo_main_dupla_carga
+    edge_type: CAUSES
+  - from: B5_13_rhilo_main_dupla_carga
+    to: B5_13_gate_extracao_escopo_rhilo
+    edge_type: DEPENDS_ON
+  - from: B5_13_veredito_develop_coexiste
+    to: B5_13_branch_roles_sdaal
+    edge_type: SUPPORTS
+  - from: B5_13_veredito_politica_merge_invertida
+    to: B5_13_branch_roles_sdaal
+    edge_type: SUPPORTS
+  - from: B5_13_veredito_cliente_escopo_vs_versao
+    to: B5_13_branch_roles_sdaal
+    edge_type: SUPPORTS
+  - from: B5_13_movimento1_destravado
+    to: B5_13_rhilo_main_dupla_carga
+    edge_type: DEPENDS_ON
+  - from: B5_14_evidence_progressive_autonomy
+    to: B5_14_claim_transfer_onion
+    edge_type: SUPPORTS
+  - from: B5_14_evidence_deterministic_merge
+    to: B5_14_claim_transfer_onion
+    edge_type: SUPPORTS
+  - from: B5_14_evidence_hitl_risk_split
+    to: B5_14_claim_transfer_onion
+    edge_type: SUPPORTS
+  - from: B5_14_claim_transfer_onion
+    to: B5_14_claim_onion_stricter
+    edge_type: SUPPORTS
+  - from: B5_14_claim_onion_stricter
+    to: B5_14_decision_draft_contract
+    edge_type: SUPPORTS
+  - from: B5_14_evidence_adversarial_review
+    to: B5_14_decision_draft_contract
+    edge_type: REFUTES
+  - from: B5_14_decision_automate_gated
+    to: B5_14_decision_draft_contract
+    edge_type: SUPERSEDES
+  - from: B5_14_decision_automate_gated
+    to: B5_14_artifact_adr_thread_runtime
+    edge_type: TRACES_TO
+  - from: B5_14_question_automate_class_size
+    to: B5_14_decision_automate_gated
+    edge_type: DEPENDS_ON
+  - from: B5_15_producer_transport_chain
+    to: B5_15_ingestor_gap
+    edge_type: SUPPORTS
+  - from: B5_15_regulated_member_signals
+    to: B5_15_ingestor_gap
+    edge_type: SUPPORTS
+  - from: B5_15_federation_edge_gap
+    to: B5_15_dogfood_first
+    edge_type: CAUSES
+  - from: B5_15_kg_engine
+    to: B5_15_federation_edge_gap
+    edge_type: DEPENDS_ON
+  - from: B5_15_onion_pessoal_method
+    to: B5_15_dogfood_first
+    edge_type: SUPPORTS
+  - from: B5_15_ingestor_gap
+    to: B5_15_four_phase_plan
+    edge_type: CAUSES
+  - from: B5_15_dogfood_first
+    to: B5_15_four_phase_plan
+    edge_type: DEPENDS_ON
+  - from: B5_15_four_phase_plan
+    to: B5_15_federation_ontology_open
+    edge_type: DEPENDS_ON
+  - from: B5_16_metodo_fanout_sintese
+    to: B5_16_decisao_gancho_dado_verificavel
+    edge_type: CAUSES
+  - from: B5_16_claim_evidencia_anthropic_2026
+    to: B5_16_decisao_gancho_dado_verificavel
+    edge_type: SUPPORTS
+  - from: B5_16_claim_prova_universalidade
+    to: B5_16_decisao_casa_de_marca
+    edge_type: SUPPORTS
+  - from: B5_16_decisao_gancho_dado_verificavel
+    to: B5_16_artifact_messaging_framework
+    edge_type: TRACES_TO
+  - from: B5_16_decisao_casa_de_marca
+    to: B5_16_artifact_messaging_framework
+    edge_type: TRACES_TO
+  - from: B5_16_decisao_fronteira_comercial_voz
+    to: B5_16_artifact_messaging_framework
+    edge_type: TRACES_TO
+  - from: B5_16_decisao_frame_competitivo
+    to: B5_16_artifact_messaging_framework
+    edge_type: TRACES_TO
+  - from: B5_16_question_linha_leiga_p6_bloqueada
+    to: B5_16_artifact_messaging_framework
+    edge_type: DEPENDS_ON
+  - from: B5_17_taxonomia_bockeler
+    to: B5_17_gap_discurso_pratica
+    edge_type: SUPPORTS
+  - from: B5_17_tessl_unico_as_source
+    to: B5_17_gap_discurso_pratica
+    edge_type: SUPPORTS
+  - from: B5_17_critica_codigo_continua_fonte
+    to: B5_17_grove_spec_unidade_fundamental
+    edge_type: REFUTES
+  - from: B5_17_spec_drift_nao_resolvido
+    to: B5_17_pergunta_quem_reconcilia
+    edge_type: CAUSES
+  - from: B5_17_spec_growth_engine_grafo
+    to: B5_17_pergunta_quem_reconcilia
+    edge_type: SUPPORTS
+  - from: B5_17_agentspec_modelspec_runtime
+    to: B5_17_veredito_trajetoria_campo
+    edge_type: SUPPORTS
+  - from: B5_17_gap_discurso_pratica
+    to: B5_17_veredito_trajetoria_campo
+    edge_type: SUPPORTS
+  - from: B5_17_critica_codigo_continua_fonte
+    to: B5_17_veredito_trajetoria_campo
+    edge_type: DEPENDS_ON
+  - from: B5_17_veredito_trajetoria_campo
+    to: B5_17_spec_growth_engine_grafo
+    edge_type: DEPENDS_ON
+  - from: SY5_mcp_first_leak_closed
+    to: B5_1_mcp_sweep_decision
+    edge_type: SUPPORTS
+  - from: SY5_mcp_first_leak_closed
+    to: B5_2_mcp_first_leakage
+    edge_type: SUPPORTS
+  - from: SY5_mcp_first_leak_closed
+    to: B5_3_alert_b_mcp_leak
+    edge_type: SUPPORTS
+  - from: SY5_mcp_first_leak_closed
+    to: B5_3_decision_fix_both_creators
+    edge_type: SUPPORTS
+  - from: SY5_mcp_first_leak_closed
+    to: B5_5_blocker_sdaal_aberto_claim
+    edge_type: SUPPORTS
+  - from: SY5_count_drift_ssot_closed
+    to: B5_1_inventory_command_decision
+    edge_type: SUPPORTS
+  - from: SY5_count_drift_ssot_closed
+    to: B5_1_inventory_drift
+    edge_type: SUPPORTS
+  - from: SY5_count_drift_ssot_closed
+    to: B5_3_alert_a_count_drift
+    edge_type: SUPPORTS
+  - from: SY5_count_drift_ssot_closed
+    to: B5_3_lint_rule9_gap
+    edge_type: SUPPORTS
+  - from: SY5_count_drift_ssot_closed
+    to: B5_3_decision_root_fix_order
+    edge_type: SUPPORTS
+  - from: SY5_index_residual_drift
+    to: SY5_count_drift_ssot_closed
+    edge_type: SUPPORTS
+  - from: SY5_kb_freshness_gate_closed
+    to: B5_1_kb_freshness_command_decision
+    edge_type: SUPPORTS
+  - from: SY5_kb_freshness_gate_closed
+    to: B5_1_kb_date_gate_not_honored
+    edge_type: SUPPORTS
+  - from: SY5_evolve_diaries_redecide
+    to: B5_1_mcp_sweep_decision
+    edge_type: SUPPORTS
+  - from: SY5_evolve_diaries_redecide
+    to: B5_2_mcp_first_leakage
+    edge_type: SUPPORTS
+  - from: SY5_evolve_diaries_redecide
+    to: B5_3_alert_b_mcp_leak
+    edge_type: SUPPORTS
+  - from: SY5_prose_backlog_antipattern
+    to: SY5_evolve_diaries_redecide
+    edge_type: SUPPORTS
+  - from: SY5_prose_backlog_antipattern
+    to: B5_2_executed_same_day
+    edge_type: SUPPORTS
+  - from: SY5_phase_merge_invariant_held
+    to: B5_1_zero_phase_merge_vetoes
+    edge_type: SUPPORTS
+  - from: SY5_phase_merge_invariant_held
+    to: B5_2_zero_phase_merge_vetoes
+    edge_type: SUPPORTS
+  - from: SY5_phase_merge_invariant_held
+    to: B5_4_invariant_adopt_stays
+    edge_type: SUPPORTS
+  - from: SY5_strategy_trio_is_one_package
+    to: B5_5_meta_strategize_capability
+    edge_type: SUPPORTS
+  - from: SY5_strategy_trio_is_one_package
+    to: B5_6_catalog_estrategia
+    edge_type: SUPPORTS
+  - from: SY5_strategy_trio_is_one_package
+    to: B5_7_catalog_first_reframe
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_7_action_requested
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_7_recommendation
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_7_adr_format_question
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_6_pergunta_skill_ou_extensao
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_6_pergunta_comando_explicito
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_7_no_new_command
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_6_risco_sobreposicao
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_7_overlap_doubt
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_5_prioridade_marcio_question
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_7_timing_question
+    edge_type: SUPPORTS
+  - from: SY5_rfc0002_judged_trio
+    to: B5_6_gate_dependencia_doc1
+    edge_type: SUPPORTS
+  - from: SY5_playbooks_materialization_open
+    to: B5_6_criterio_aceitacao
+    edge_type: SUPPORTS
+  - from: SY5_playbooks_materialization_open
+    to: B5_6_playbooks_exemplo
+    edge_type: SUPPORTS
+  - from: SY5_playbooks_materialization_open
+    to: B5_5_precisao_match_question
+    edge_type: SUPPORTS
+  - from: SY5_adopt_durability_closed
+    to: B5_4_decision_autocommit
+    edge_type: SUPPORTS
+  - from: SY5_adopt_durability_closed
+    to: B5_4_finding1_copy_manual_commit
+    edge_type: SUPPORTS
+  - from: SY5_adopt_durability_closed
+    to: B5_4_finding3_version_revert
+    edge_type: SUPPORTS
+  - from: SY5_adopt_durability_closed
+    to: B5_4_finding4_report_offer_commit
+    edge_type: SUPPORTS
+  - from: SY5_adopt_durability_closed
+    to: B5_4_systemic_cause
+    edge_type: SUPPORTS
+  - from: SY5_vendor_branch_closed
+    to: B5_4_finding2_merge_future
+    edge_type: SUPPORTS
+  - from: SY5_vendor_branch_closed
+    to: B5_4_decision_vendor_branch
+    edge_type: SUPPORTS
+  - from: SY5_vendor_branch_closed
+    to: B5_11_door_vendored_nao_marketplace
+    edge_type: SUPPORTS
+  - from: SY5_marketplace_live
+    to: B5_9_marketplace_publish
+    edge_type: SUPPORTS
+  - from: SY5_marketplace_live
+    to: B5_9_install_any_plan
+    edge_type: SUPPORTS
+  - from: SY5_meta_factory_doctrine_held
+    to: B5_9_meta_factory_never_plugin
+    edge_type: SUPPORTS
+  - from: SY5_onion_meta_question_dissolved
+    to: B5_8_open_onion_meta_doctrine
+    edge_type: SUPPORTS
+  - from: SY5_orchestration_skill_shipped_elsewhere
+    to: B5_8_patch2_orchestration_design
+    edge_type: SUPPORTS
+  - from: SY5_orchestration_skill_shipped_elsewhere
+    to: B5_8_decision_5_skills_reclass
+    edge_type: SUPPORTS
+  - from: SY5_orchestration_skill_shipped_elsewhere
+    to: B5_8_open_onion_core_base
+    edge_type: SUPPORTS
+  - from: SY5_runflow_patch_open
+    to: B5_8_patch1_runflow_dev
+    edge_type: SUPPORTS
+  - from: SY5_runflow_patch_open
+    to: B5_8_status_draft_gated
+    edge_type: SUPPORTS
+  - from: SY5_catch_up_gap_persists
+    to: B5_10_catch_up_gap_confirmado
+    edge_type: SUPPORTS
+  - from: SY5_catch_up_gap_persists
+    to: B5_8_open_onion_core_base
+    edge_type: SUPPORTS
+  - from: SY5_smoke_test_never_run
+    to: B5_10_camada_a_resolucao
+    edge_type: SUPPORTS
+  - from: SY5_smoke_test_never_run
+    to: B5_10_camada_b_execucao
+    edge_type: SUPPORTS
+  - from: SY5_smoke_test_never_run
+    to: B5_10_camada_c_fronteira
+    edge_type: SUPPORTS
+  - from: SY5_smoke_test_never_run
+    to: B5_10_decisao_veredito_final
+    edge_type: SUPPORTS
+  - from: SY5_smoke_test_never_run
+    to: B5_8_status_draft_gated
+    edge_type: SUPPORTS
+  - from: SY5_g3_scrub_guard_absent
+    to: B5_11_g3_convencao_provenencia
+    edge_type: SUPPORTS
+  - from: SY5_g2_doctrine_only
+    to: B5_11_g2_tier_kb_nao_circulante
+    edge_type: SUPPORTS
+  - from: SY5_g2_doctrine_only
+    to: B5_11_doutrina_circulation_safe
+    edge_type: SUPPORTS
+  - from: SY5_g2_doctrine_only
+    to: B5_11_flip_publico_gated
+    edge_type: SUPPORTS
+  - from: SY5_profile_never_built
+    to: B5_12_decisao_profile
+    edge_type: SUPPORTS
+  - from: SY5_profile_never_built
+    to: B5_12_gap_g1
+    edge_type: SUPPORTS
+  - from: SY5_profile_never_built
+    to: B5_12_decisao_zero_wiring
+    edge_type: SUPPORTS
+  - from: SY5_profile_never_built
+    to: B5_12_validacao_dryrun
+    edge_type: SUPPORTS
+  - from: SY5_profile_never_built
+    to: B5_12_fronteira_spike
+    edge_type: SUPPORTS
+  - from: SY5_branch_roles_second_resolver
+    to: B5_13_branch_roles_sdaal
+    edge_type: SUPPORTS
+  - from: SY5_branch_roles_adr_still_proposed
+    to: SY5_branch_roles_second_resolver
+    edge_type: SUPPORTS
+  - from: SY5_product_lineage_not_materialized
+    to: B5_13_lineage_product_main_nova
+    edge_type: SUPPORTS
+  - from: SY5_movimento1_vendored_pending_commit
+    to: B5_13_movimento1_destravado
+    edge_type: SUPPORTS
+  - from: SY5_movimento1_vendored_pending_commit
+    to: B5_13_veredito_develop_coexiste
+    edge_type: SUPPORTS
+  - from: SY5_product_lineage_not_materialized
+    to: B5_13_veredito_cliente_escopo_vs_versao
+    edge_type: SUPPORTS
+  - from: SY5_autonomy_adr_gated_beacon_real
+    to: B5_14_artifact_adr_thread_runtime
+    edge_type: SUPPORTS
+  - from: SY5_autonomy_adr_gated_beacon_real
+    to: B5_14_decision_automate_gated
+    edge_type: SUPPORTS
+  - from: SY5_autonomy_adr_gated_beacon_real
+    to: B5_14_decision_draft_contract
+    edge_type: SUPPORTS
+  - from: SY5_autonomy_adr_gated_beacon_real
+    to: B5_14_question_automate_class_size
+    edge_type: SUPPORTS
+  - from: SY5_ingestor_doctrine_accepted_code_absent
+    to: B5_15_ingestor_gap
+    edge_type: SUPPORTS
+  - from: SY5_ingestor_doctrine_accepted_code_absent
+    to: B5_15_four_phase_plan
+    edge_type: SUPPORTS
+  - from: SY5_ingestor_doctrine_accepted_code_absent
+    to: B5_15_regulated_member_signals
+    edge_type: SUPPORTS
+  - from: SY5_federation_kg_ontology_answered
+    to: B5_15_federation_ontology_open
+    edge_type: SUPPORTS
+  - from: SY5_federation_kg_ontology_answered
+    to: B5_15_dogfood_first
+    edge_type: SUPPORTS
+  - from: SY5_federation_kg_ontology_answered
+    to: B5_15_federation_edge_gap
+    edge_type: SUPPORTS
+  - from: SY5_brand_voice_shipped
+    to: B5_16_artifact_messaging_framework
+    edge_type: SUPPORTS
+  - from: SY5_brand_voice_shipped
+    to: B5_16_decisao_casa_de_marca
+    edge_type: SUPPORTS
+  - from: SY5_brand_voice_shipped
+    to: B5_16_claim_prova_universalidade
+    edge_type: SUPPORTS
+  - from: SY5_brand_voice_shipped
+    to: B5_16_decisao_fronteira_comercial_voz
+    edge_type: SUPPORTS
+  - from: SY5_p6_still_blocked
+    to: B5_16_question_linha_leiga_p6_bloqueada
+    edge_type: SUPPORTS
+  - from: SY5_spec_as_run_not_absorbed
+    to: B5_17_veredito_trajetoria_campo
+    edge_type: SUPPORTS
+  - from: SY5_spec_as_run_not_absorbed
+    to: B5_17_spec_growth_engine_grafo
+    edge_type: SUPPORTS
+  - from: SY5_spec_as_run_not_absorbed
+    to: B5_17_pergunta_quem_reconcilia
+    edge_type: SUPPORTS
+  - from: SY5_spec_as_run_not_absorbed
+    to: B5_17_spec_drift_nao_resolvido
+    edge_type: SUPPORTS
+  - from: SY5_spec_research_has_no_kg
+    to: SY5_spec_as_run_not_absorbed
+    edge_type: SUPPORTS
+  - from: SY5_a2a_gate_still_unfired
+    to: B5_1_a2a_export_gated
+    edge_type: SUPPORTS
+  - from: SY5_a2a_gate_still_unfired
+    to: B5_2_a2a_projection_carryforward
+    edge_type: SUPPORTS
+  - from: SY5_verdict_leva5
+    to: SY5_prose_backlog_antipattern
+    edge_type: SUPPORTS
+  - from: SY5_verdict_leva5
+    to: SY5_profile_never_built
+    edge_type: SUPPORTS
+  - from: SY5_verdict_leva5
+    to: SY5_g3_scrub_guard_absent
+    edge_type: SUPPORTS
+  - from: SY5_verdict_leva5
+    to: SY5_spec_as_run_not_absorbed
+    edge_type: SUPPORTS
+  - from: SY5_verdict_leva5
+    to: SY5_playbooks_materialization_open
+    edge_type: SUPPORTS
+  - from: SY5_verdict_leva5
+    to: SY5_runflow_patch_open
     edge_type: SUPPORTS

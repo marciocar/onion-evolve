@@ -2,17 +2,8 @@
 # Gerado por: bash .claude/validation/kg-provenance-coverage.sh --emit-baseline
 # Esta lista SÓ PODE ENCOLHER. Acrescentar path aqui é regressão (HARD).
 docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md
-docs/analysis/onion-door-birth-findings-2026-07.md
-docs/analysis/onion-evolution-2026-06-15.md
-docs/analysis/onion-evolution-2026-06-16.md
-docs/analysis/onion-evolution-2026-06-17.md
-docs/analysis/onion-evolution-2026-07-08.md
-docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md
 docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md
 docs/analysis/onion-parecer-whatsapp-sender-2026-07.md
-docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md
-docs/analysis/onion-plugin-marketplace-runbook-2026-07.md
-docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md
 docs/analysis/onion-product-material-raw-2026-06.md
 docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md
 docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md
@@ -21,16 +12,8 @@ docs/analysis/onion-research-self-describing-components-2026-06.md
 docs/analysis/onion-review-2026-05.md
 docs/analysis/onion-sdaal-fidelity-audit-2026-06.md
 docs/analysis/onion-sessions-review-2026-06.md
-docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md
-docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md
-docs/analysis/onion-strategy-layer-handoff-2026-06-17.md
 docs/analysis/onion-toolbox-s1-scoping-2026-06.md
-docs/analysis/onion-veredito-branch-methodology-2026-07.md
 docs/analysis/onion-vision-concept-map-2026-06.md
 docs/analysis/onion-vv-baseline-2026-06.md
 docs/analysis/onion-work-models-research-2026-07.md
 docs/analysis/panorama-ia-generativa-2026-06.md
-docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md
-docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md
-docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md
-docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md
