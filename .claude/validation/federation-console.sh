@@ -30,8 +30,13 @@ for m in members:
     t = m.get('trust') or {}
     M.append({
         # Superfície PÚBLICA: só o nome curto — o parêntese do name: no members.yaml é anotação
-        # interna do maestro (incl. marcador CONFIDENCIAL) e NUNCA entra na projeção (regra 2026-07-09;
-        # incidente 2026-07-10: console público vazou "Grana.Ai — CONFIDENCIAL" no name verbatim).
+        # interna do maestro (incl. marcador de confidencialidade) e NUNCA entra na projeção
+        # (regra 2026-07-09; incidente 2026-07-10: o console público vazou nome comercial +
+        # marcador verbatim).
+        # Este split é o SANITIZADOR. O VERIFICADOR que o cobre é
+        # .claude/validation/projection-safety.sh (REGRA 30 do lint), que audita a SAÍDA deste
+        # script — se o split falhar ou alguém projetar por outro caminho, o lint reprova.
+        # Promovido de convenção local a guarda compartilhada em 2026-07-21.
         'id': m.get('id'), 'name': (m.get('name') or '').split(' (')[0], 'tier': m.get('role','member'),
         'mode': m.get('mode',''), 'parent': m.get('parent',''), 'pin': m.get('onion_version',''),
         'specializations': m.get('specializations') or [],

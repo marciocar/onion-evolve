@@ -1484,6 +1484,48 @@ check_kg_provenance_coverage() {
 }
 
 # ===========================================================================
+# REGRA 30 — Segurança de PROJEÇÃO: nome comercial de membro privado não sai
+#   do repo privado [HARD]
+#   Origem: incidente 2026-07-10 — o console PÚBLICO da federação vazou
+#   "<nome> — CONFIDENCIAL" verbatim, porque o `name:` do members.yaml carrega
+#   anotação INTERNA do maestro entre parênteses. A correção nasceu como
+#   convenção LOCAL dentro de federation-console.sh (um split + comentário) e,
+#   por viver só ali, não alcançava a PRÓXIMA superfície que projetasse para
+#   fora — exatamente a forma de falha registrada em
+#   .claude/diary/2026-07-20-admission-rule-blindspot.md (cláusula local não
+#   alcança o próximo mecanismo). Esta regra é a promoção daquela convenção a
+#   guarda compartilhada, com os pressupostos enumerados no próprio helper.
+#   Termos são DERIVADOS de members.yaml (nunca hardcoded — nome de cliente no
+#   script seria o próprio vazamento).
+# ===========================================================================
+check_projection_safety() {
+  local helper="${SCRIPT_DIR}/projection-safety.sh"
+  [ -f "${helper}" ] || return 0
+  # Honra --only com a MESMA semântica do _find (mantém o selftest O(fixtures × 1)).
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/site/*|"${REPO_ROOT}"/docs/onion/graph/*|*/federation-console.html|*/members.yaml) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  # ATENÇÃO (P3 — superfícies são enumeradas, não inferidas): federation-console.html
+  # entrou nesta lista porque a 1ª versão da regra NÃO o auditava — e ele é servido
+  # em console.onionevolve.com e foi JUSTAMENTE a superfície que vazou em 2026-07-10.
+  # Toda superfície pública nova precisa ser acrescentada aqui à mão; o que não está
+  # nesta linha é invisível para a guarda.
+  local out sev tag path msg
+  out="$(bash "${helper}" --format tsv \
+          "${REPO_ROOT}/site" \
+          "${REPO_ROOT}/docs/onion/graph" \
+          "${REPO_ROOT}/docs/onion/federation-console.html" 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    violation "${sev}" "${REPO_ROOT}/${path}" "[projeção/${tag}] ${msg}"
+  done <<< "${out}"
+}
+
+# ===========================================================================
 # REGRA 23 — Frontmatter: model: em comandos e category: em agentes [HARD]
 #   Origem: Q_LINT_FRONTMATTER do KG (achados D8-20/D8-21 da auditoria
 #   2026-07-04 — o gap deixou 7 artefatos divergirem em silêncio; a regra
@@ -1604,6 +1646,7 @@ check_evolution_links
 check_knowledge_base_links
 check_research_kg
 check_kg_provenance_coverage
+check_projection_safety
 check_frontmatter_model_category
 
 # ===========================================================================

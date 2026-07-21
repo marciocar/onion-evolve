@@ -311,6 +311,104 @@ run_kg_freshness_selftests() {
 # NENHUMA proveniência (nem aresta TRACES_TO nem campo trace: inline) = ⚠ AVISO aditivo,
 # não-HARD (não muda o exit). Como o FRESCOR, asserção por CONTEÚDO de stdout + exit 0.
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Modo projection-safety — REGRA 30. Nome comercial de membro privado não sai do
+# repo privado. Origem: incidente 2026-07-10 (o console público vazou nome + marcador
+# verbatim); a correção viveu como convenção LOCAL em federation-console.sh até
+# 2026-07-21, quando virou guarda compartilhada.
+#
+# Os DOIS lados no mesmo conjunto: o que DEVE reprovar (a,b,c) e o que NÃO pode
+# reprovar (d,e,f) — senão "consertar" seria matar a guarda por descrédito. Guarda
+# que grita lobo em menção legítima é guarda desligada, e guarda desligada é NO-OP.
+#
+# (b) é o caso que a 1ª versão do helper NÃO pegava: o casamento era sensível a caixa
+# e o vazamento real passa MINÚSCULO dentro de identificador (lição de campo da leva 3
+# da modelagem: nome de cliente vazou para o `id:` de um nó, não só para o label).
+# P2 contradizia P4 e só o teste de injeção expôs — por isso (MUT) ataca essa condição.
+# Fixtures temporários self-contained (não vêm do manifest) + cleanup via trap.
+# ---------------------------------------------------------------------------
+run_projection_safety_selftests() {
+  local helper="${SCRIPT_DIR}/projection-safety.sh"
+  local tmp
+  [ -f "${helper}" ] || return 0
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "${tmp}"' RETURN
+  mkdir -p "${tmp}/surface"
+
+  # members.yaml de fixture: um membro PRIVADO (com marcador) e um PÚBLICO (sem).
+  # Nomes INVENTADOS — a fixture não carrega nome de cliente real.
+  cat > "${tmp}/members.yaml" <<'MEOF'
+members:
+  - id: acme-adopter
+    name: acme-adopter (AcmeCorp — CONFIDENCIAL, ver algum-adr.md)
+    role: standalone
+  - id: openly-public
+    name: openly-public (Projeto Aberto — materiais educacionais)
+    role: consumer
+MEOF
+
+  _ps() {  # $1 = conteúdo da superfície → rc do helper
+    printf '%s' "$1" > "${tmp}/surface/index.html"
+    bash "${helper}" --members "${tmp}/members.yaml" "${tmp}/surface" >/dev/null 2>&1
+  }
+
+  # (a) nome comercial em PROSA → reprova
+  if ! _ps '<p>parceiro AcmeCorp lancou</p>'; then
+    record_pass "projection-safety: (a) nome comercial em prosa → HARD"
+  else record_fail "projection-safety: (a)" "esperava rc=1 para nome comercial em prosa"; fi
+
+  # (b) nome MINÚSCULO dentro de IDENTIFICADOR → reprova (P4; o defeito original)
+  if ! _ps '<article id="post-acmecorp-x">ok</article>'; then
+    record_pass "projection-safety: (b) nome minúsculo dentro de identificador → HARD (P2×P4)"
+  else record_fail "projection-safety: (b)" "vazamento minúsculo em identificador ESCAPOU — é o defeito da 1ª versão"; fi
+
+  # (c) marcador em CAIXA ALTA → reprova
+  if ! _ps '<p>registro CONFIDENCIAL do maestro</p>'; then
+    record_pass "projection-safety: (c) marcador de confidencialidade → HARD"
+  else record_fail "projection-safety: (c)" "esperava rc=1 para marcador em caixa alta"; fi
+
+  # (d) palavra comum "confidencial" MINÚSCULA → NÃO reprova (P2: marcador é literal)
+  if _ps '<p>tratamos o material como confidencial</p>'; then
+    record_pass "projection-safety: (d) palavra comum minúscula NÃO é marcador (sem falso-positivo)"
+  else record_fail "projection-safety: (d)" "falso-positivo: 'confidencial' em prosa é palavra do português"; fi
+
+  # (e) id PÚBLICO do membro → NÃO reprova (a defesa é excluir ids, não a caixa)
+  if _ps '<p>o adotante acme-adopter atualizou</p>'; then
+    record_pass "projection-safety: (e) id público do membro NÃO reprova (sem falso-positivo)"
+  else record_fail "projection-safety: (e)" "falso-positivo no id público — a guarda viraria descartável"; fi
+
+  # (f) membro NÃO-marcado → NÃO reprova (só o marcador torna sensível — P1)
+  if _ps '<p>veja o Projeto Aberto</p>'; then
+    record_pass "projection-safety: (f) membro sem marcador NÃO é sensível (P1)"
+  else record_fail "projection-safety: (f)" "falso-positivo: membro público sem marcador virou sensível"; fi
+
+  # (P0) fonte ausente REPROVA — nunca verde silencioso
+  printf '<p>limpo</p>' > "${tmp}/surface/index.html"
+  if ! bash "${helper}" --members "${tmp}/nao-existe.yaml" "${tmp}/surface" >/dev/null 2>&1; then
+    record_pass "projection-safety: (P0) fonte ausente → HARD, não verde silencioso"
+  else record_fail "projection-safety: (P0)" "sem members.yaml a guarda passou verde — proteção fantasma"; fi
+
+  # (P5) members SEM marcador algum ⇒ lista vazia ⇒ REPROVA (anti NO-OP)
+  cat > "${tmp}/members-nomarker.yaml" <<'MEOF'
+members:
+  - id: only-public
+    name: only-public (Coisa Publica)
+MEOF
+  if ! bash "${helper}" --members "${tmp}/members-nomarker.yaml" "${tmp}/surface" >/dev/null 2>&1; then
+    record_pass "projection-safety: (P5) derivação vazia → HARD (NO-OP não é aprovação)"
+  else record_fail "projection-safety: (P5)" "lista vazia passou verde — a guarda seria NO-OP para sempre"; fi
+
+  # (MUT) MUTATION TEST — desfaz a condição central (casamento de NOME insensível a
+  # caixa) e prova que o caso (b) FALHA. Se (b) continuasse pegando com a mutação, o
+  # teste não seria load-bearing e a proteção de identificador seria ilusória.
+  sed 's/grep -qiF -- "${term}"/grep -qF -- "${term}"/g; s/grep -ciF -- "${term}"/grep -cF -- "${term}"/g' \
+      "${helper}" > "${tmp}/mutated.sh"
+  printf '<article id="post-acmecorp-x">ok</article>' > "${tmp}/surface/index.html"
+  if bash "${tmp}/mutated.sh" --members "${tmp}/members.yaml" "${tmp}/surface" >/dev/null 2>&1; then
+    record_pass "projection-safety: (MUT) condição desfeita ⇒ (b) escapa — o teste é load-bearing"
+  else record_fail "projection-safety: (MUT)" "com a condição desfeita o caso (b) ainda reprovou — o teste não prova nada"; fi
+}
+
 run_kg_provenance_selftests() {
   local radar="${SCRIPT_DIR}/kg-radar.sh"
   local px="${FIX_DIR}/kg-provenance"
@@ -2749,9 +2847,14 @@ _prov_run() {
 
 _prov_has() { printf '%s\n' "$1" | grep -qE "^$2	$3	$4	"; }
 
-run_kg_provenance_selftests() {
+# NOME: run_kg_COVERAGE_selftests, não run_kg_provenance_selftests. Colisão real
+# (2026-07-20→21): esta função nasceu com o mesmo nome da guarda do modo --provenance
+# do kg-radar (definida bem acima) e, em bash, a definição posterior SOBRESCREVE a
+# anterior — os 3 casos daquela guarda deixaram de rodar e estes rodaram DUAS vezes,
+# inflando a contagem de "passaram". Suíte verde não prova cobertura viva.
+run_kg_coverage_selftests() {
   local h="${REPO_ROOT}/.claude/validation/kg-provenance-coverage.sh"
-  if [ ! -f "${h}" ]; then record_fail "kg-provenance" "helper ausente: ${h}"; return; fi
+  if [ ! -f "${h}" ]; then record_fail "kg-coverage" "helper ausente: ${h}"; return; fi
 
   # =========================================================================
   # BLOCO A — semântica do gate (repo isolado, SEM git → prova P2 de tabela)
@@ -3777,8 +3880,11 @@ run_diary_crumbs_selftests
 # Modo outbox-channel — REGRA 28 do lint: anúncio em staging p/ membro SEM canal de recepção (achado 2026-07-19; sandbox).
 run_outbox_channel_selftests
 
-# Modo kg-provenance — REGRA 29: gate de proveniência INVERTIDO com catraca (sinal granaai 2026-07-20).
-run_kg_provenance_selftests
+# Modo kg-coverage — REGRA 29: gate de proveniência INVERTIDO com catraca (sinal granaai 2026-07-20).
+run_kg_coverage_selftests
+
+# Modo projection-safety — REGRA 30: nome comercial de membro privado não sai do repo privado.
+run_projection_safety_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário
