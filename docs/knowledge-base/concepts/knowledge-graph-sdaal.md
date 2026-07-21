@@ -307,6 +307,14 @@ especificação aqui — ele vive em
 (REGRA 29 do lint), e a **doutrina da catraca** que o torna adotável está em
 [`onion-guardrails.md`](onion-guardrails.md).
 
+> ⚠️ **"Coberto" ≠ "verificado" — a cobertura é por CITAÇÃO, não por conteúdo.** O gate responde
+> *"existe nó que cite este documento?"*, e um nó que o cite **sem sustentá-lo** satisfaz o gate. Isso é
+> **deliberado**: cobertura tem de ser decidível por script (determinismo), e julgar se a citação sustenta
+> a afirmação é semântico. O lado semântico já tem dono — é o **radar** (`STALE-TRACE`, decisão-sem-proveniência)
+> e a **verificação adversarial**. Dito em voz alta porque "coberto" lido como "conferido" seria a mesma
+> falsa-garantia que a doutrina `declarado≠verificado` existe para matar.
+
+
 ### Os nomes: gênero × espécie (para parar de multiplicar sinônimos)
 
 O campo usa vários rótulos para **dois** conceitos em **dois** níveis. A régua:

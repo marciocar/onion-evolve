@@ -2942,6 +2942,65 @@ KGEOF
     rm -rf "${sb}"
   fi
 
+  # =========================================================================
+  # BLOCO E — o caminho GIT da catraca (defeito da verificação adversarial
+  #   2026-07-20: os casos A-D exercitavam SÓ `--previous-baseline`; a
+  #   resolução por REF — que é a que roda em produção — não tinha um único
+  #   teste. Um caminho de produção sem prova é exatamente o furo que a regra
+  #   de admissão da casa existe para impedir.
+  # =========================================================================
+  local g; g="$(mktemp -d)"
+  mkdir -p "${g}/.claude/validation" "${g}/docs/analysis" "${g}/docs/onion/graph"
+  cp "${REPO_ROOT}/.claude/validation/kg-provenance-coverage.sh" "${g}/.claude/validation/"
+  [ -f "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" ] \
+    && cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${g}/.claude/validation/"
+  printf '# doc legado\n' > "${g}/docs/analysis/legado.md"
+  printf 'nodes:\n  - id: N1\n    node_type: claim\n' > "${g}/docs/onion/graph/x.kg.yaml"
+  printf '%s\n' 'docs/analysis/legado.md' > "${g}/.claude/validation/kg-coverage-baseline.txt"
+  git -C "${g}" init -q 2>/dev/null
+  git -C "${g}" add -A >/dev/null 2>&1
+  git -C "${g}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+
+  local og oe rc
+  # (E1) baseline versionado só no HEAD, INALTERADO → catraca resolve pelo git,
+  #      mas HEAD é ref LOCAL: tem de AVISAR (fraca), não sair verde em silêncio.
+  rc=0; og="$(cd "${g}" && bash .claude/validation/kg-provenance-coverage.sh 2>&1)" || rc=$?
+  if printf '%s' "${og}" | grep -q 'CATRACA-FRACA' \
+     && ! printf '%s' "${og}" | grep -q 'CATRACA-INDISPONIVEL'; then
+    record_pass "kg-provenance: (E1) caminho git — baseline no HEAD resolve a catraca e AVISA ref fraca"
+  else
+    record_fail "kg-provenance: (E1) ref fraca" "esperava CATRACA-FRACA sem CATRACA-INDISPONIVEL; veio: ${og}"
+  fi
+
+  # (E2) CRUX — baseline CRESCEU em relação ao ref git ⇒ HARD.
+  #      É o caso que provava que o caminho por ref realmente compara (e não
+  #      compara o baseline consigo mesmo, que era o no-op silencioso do defeito 3).
+  printf '%s\n' 'docs/analysis/inventado.md' >> "${g}/.claude/validation/kg-coverage-baseline.txt"
+  rc=0; og="$(cd "${g}" && bash .claude/validation/kg-provenance-coverage.sh 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${og}" | grep -qi 'catraca'; then
+    record_pass "kg-provenance: (E2) caminho git — baseline que CRESCE vs o ref ⇒ HARD (rc=1)"
+  else
+    record_fail "kg-provenance: (E2) crescimento via git" "esperava rc=1 + violação de catraca; rc=${rc} out=${og}"
+  fi
+  git -C "${g}" checkout -q -- .claude/validation/kg-coverage-baseline.txt 2>/dev/null
+
+  # (E3) ref FORTE: com origin/<branch> presente, a catraca resolve por ela e
+  #      NÃO avisa fraqueza (o aviso é só para HEAD/branch local).
+  # Clone REALISTA: além do ref remoto, `origin/HEAD` — sem ele o resolve-integration-branch
+  # cai no palpite cego ("main"), o chain procura origin/main (ausente) e degrada para HEAD.
+  # (Foi assim que este caso falhou na 1ª escrita: a fixture criava origin/<branch-atual>, mas o
+  # chain consulta origin/<branch-de-INTEGRAÇÃO>, que o resolver dizia ser outra.)
+  _gb="$(git -C "${g}" branch --show-current)"
+  git -C "${g}" update-ref "refs/remotes/origin/${_gb}" HEAD 2>/dev/null
+  git -C "${g}" symbolic-ref "refs/remotes/origin/HEAD" "refs/remotes/origin/${_gb}" 2>/dev/null
+  rc=0; og="$(cd "${g}" && bash .claude/validation/kg-provenance-coverage.sh 2>&1)" || rc=$?
+  if ! printf '%s' "${og}" | grep -q 'CATRACA-FRACA'; then
+    record_pass "kg-provenance: (E3) caminho git — origin/<branch> é ref FORTE (sem aviso de fraqueza)"
+  else
+    record_fail "kg-provenance: (E3) ref forte" "origin/<branch> presente e ainda avisou fraqueza: ${og}"
+  fi
+  rm -rf "${g}"
+
   rm -rf "${d}" "${b}" "${m}"
 }
 

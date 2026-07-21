@@ -2,6 +2,11 @@
 # =============================================================================
 # kg-provenance-coverage.sh — GATE DE PROVENIÊNCIA INVERTIDO (com catraca)
 #
+# LIMITE   : cobertura é por CITAÇÃO, não por CONTEÚDO. Um nó que cite o documento sem sustentá-lo
+#            satisfaz este gate — deliberado, porque cobertura precisa ser decidível por script.
+#            O julgamento semântico é do kg-radar (STALE-TRACE, decisão-sem-proveniência) e da
+#            verificação adversarial. Não leia "coberto" como "conferido".
+#
 # Propósito : Responder o ESPELHO da pergunta que o kg-radar.sh já faz.
 #             O radar pergunta, de dentro do grafo para fora:
 #                 "esta DECISÃO está ancorada numa origem?"  (decisão-sem-proveniência)
