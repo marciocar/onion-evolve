@@ -1484,6 +1484,71 @@ check_kg_provenance_coverage() {
 }
 
 # ===========================================================================
+# REGRA 32 — Página pública do grafo: números conferidos contra o mapa [HARD]
+#   A página /historia/grafo/ publica contagens do .kg.yaml em prosa e em
+#   BARRAS. Número no site é promessa: se o grafo cresce e a página não, ela
+#   mente para o público — e a barra mente pior que o número, porque o leitor
+#   a lê sem conferir. Mesmo molde da REGRA 21 (site × inventário).
+#   Guarda o QUANTITATIVO. O que ela NÃO guarda, e por isso está declarado no
+#   comentário da própria página: a decisão EDITORIAL de não publicar rótulo de
+#   nó. A REGRA 30 tampouco cobre isso (só barra nome comercial de parceiro) —
+#   conteúdo estratégico é contenção humana, não mecânica. Registrado para que
+#   ninguém confunda "o lint passou" com "é seguro publicar".
+# ===========================================================================
+check_site_graph_sync() {
+  local page="${REPO_ROOT}/site/historia/grafo/index.html"
+  local view="${SCRIPT_DIR}/kg-view.sh"
+  local kg="${REPO_ROOT}/docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
+  [ -f "${page}" ] || return 0
+  [ -f "${view}" ] && [ -f "${kg}" ] || return 0
+  command -v python3 >/dev/null 2>&1 || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${page}"|"${kg}") : ;; *) return 0 ;; esac
+  fi
+  local cov out
+  cov="$(bash "${SCRIPT_DIR}/kg-provenance-coverage.sh" "${REPO_ROOT}" 2>/dev/null \
+        | awk -F: '/Cobertos pelo grafo/ {gsub(/ /,"",$2); print $2}')"
+  out="$(bash "${view}" "${kg}" --json 2>/dev/null | python3 -c '
+import json,sys,re
+d=json.load(sys.stdin)
+page=open(sys.argv[1],encoding="utf-8").read()
+cov=sys.argv[2]
+truth={"nodes":d["node_count"],"edges":d["edge_count"],"orphans":d["orphans"]}
+for k,v in d["by_status"].items(): truth["s:"+k]=v
+for k,v in d["by_type"].items():   truth["t:"+k]=v
+if cov: truth["coverage"]=int(cov)
+bad=[]
+seen=set()
+for m in re.finditer(r"data-kg=\"([^\"]+)\"[^>]*>([0-9]+)<", page):
+    key,claim=m.group(1),int(m.group(2)); seen.add(key)
+    if key not in truth: bad.append(f"marcador data-kg=\"{key}\" nao existe no grafo")
+    elif truth[key]!=claim: bad.append(f"pagina afirma {claim} para \"{key}\", o grafo tem {truth[key]}")
+for k in truth:
+    if k not in seen and k.startswith(("s:","t:")):
+        bad.append(f"o grafo tem \"{k}\" ({truth[k]}) e a pagina nao mostra — composicao incompleta")
+# barras: a largura precisa bater com a proporcao real (tolerancia 0.15pp)
+tot_s=sum(d["by_status"].values()); tot_t=sum(d["by_type"].values())
+TT={"confirmada":("s:confirmed",tot_s),"em aberto":("s:open",tot_s),"superada":("s:superseded",tot_s),
+    "refutada":("s:refuted",tot_s),"encerrada":("s:done",tot_s),
+    "afirmação":("t:claim",tot_t),"decisão":("t:decision",tot_t),"evidência":("t:evidence",tot_t),
+    "pergunta":("t:question",tot_t),"entidade":("t:entity",tot_t),"artefato":("t:artifact",tot_t)}
+for m in re.finditer(r"width:([0-9.]+)%[^\"]*\"\s+title=\"([^\"]+)\"", page):
+    w,title=float(m.group(1)),m.group(2)
+    if title in TT:
+        key,tot=TT[title]
+        exp=truth.get(key,0)/tot*100
+        if abs(exp-w)>0.15:
+            bad.append(f"barra \"{title}\" tem {w}%, o real e {exp:.2f}%")
+print("\n".join(bad))
+' "${page}" "${cov}")"
+  [ -n "${out}" ] || return 0
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    violation "HARD" "site/historia/grafo/index.html" "[grafo-público] ${line} — regenere os números (bash .claude/validation/kg-view.sh ${kg#${REPO_ROOT}/} --json)"
+  done <<< "${out}"
+}
+
+# ===========================================================================
 # REGRA 31 — Lente do grafo: DERIVADA e em paridade com o motor [HARD]
 #   Duas obrigações, porque são dois modos de falha distintos:
 #   (a) DRIFT DE CONTEÚDO — a lente é gerada de um .kg.yaml; se o grafo mudou e
@@ -1686,6 +1751,7 @@ check_knowledge_base_links
 check_research_kg
 check_kg_provenance_coverage
 check_kg_view_sync
+check_site_graph_sync
 check_projection_safety
 check_frontmatter_model_category
 
