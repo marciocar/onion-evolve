@@ -1,0 +1,210 @@
+# KG SDAAL — a doutrina Elenxo/Bulbo NASCE no grafo, como ela mesma prega ("conhecimento nasce no
+# grafo, o markdown e vista"). Fonte: o rascunho gated docs/analysis/onion-doctrine-elenxo-bulbo-draft-
+# 2026-07.md. Modela o que ja esta assentado: as decisoes de nomeacao, as auto-incriminacoes REAIS
+# (Pintrich->Zimmerman, Hegel->Chalybaus, o gate de 50 achados), as ancoras cientificas e a fronteira
+# aberta. Camada audit (epistemico). Design-only, GATED — a pagina nao esta publicada nem vendorizada.
+meta:
+  id: onion-doctrine-elenxo-bulbo-2026-07
+  schema_version: "1"
+  date: 2026-07-22
+nodes:
+  # ---- decidido (as nomeacoes assentadas) ----
+  - id: D_ELENXO_IS_METHOD
+    node_type: decision
+    trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "Elenxo (do grego elenchos, refutacao socratica) nomeia o METODO: a fonte-unica que se refuta em publico para se superar"
+  - id: D_BULBO_IS_ARCH
+    node_type: decision
+    trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "Bulbo nomeia a ARQUITETURA: organismo de 4 camadas (substrato/fonte/aprendizagem/adaptacao) + a porosidade transversal que corta todas"
+  - id: D_COINAGES_DECLARED
+    node_type: decision
+    trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "as 6 cunhagens (Elenxo, Bulbo, SDAAL, KG-SSOT-first, porosidade epistemica, Dogfood-de-fronteira) declaradas como NOSSAS — nem escondidas, nem passadas por literatura"
+  - id: D_PAGE_GATED
+    node_type: decision
+    trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "a pagina e rascunho GATED — aguarda a area de publicacao de doutrinas; nao publicar nem vendorizar ainda"
+
+  # ---- aferido (as teses) ----
+  - id: C_FORM_PROVES_PHILOSOPHY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "a forma prova a filosofia: as correcoes de citacao feitas NO corpo sao a demonstracao viva — esconder um erro numa pagina sobre porosidade a refutaria"
+  - id: C_POROSITY_STRUCTURAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "porosidade epistemica e exigencia ESTRUTURAL (o corte no bulbo revela a camada de baixo), nao gentileza — SSOT fechada e dogma com formatacao bonita"
+  - id: C_VIRAL_BY_SUBSTANCE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "viral pela concepcao, nao pelo midiatismo: escrutinio (refutavel + datado + publico) e a unica atencao que se propaga sem hype"
+  - id: C_SSOT_NO_AUTHOR
+    node_type: claim
+    trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "SSOT nao tem autor-fundador (verificado 2026-07-22); ancora so na normalizacao de Codd (1970) — nao inventar pai para a bibliografia"
+
+  # ---- evidencia (as auto-incriminacoes REAIS — a prova de que o ciclo e real) ----
+  - id: E_ZIMMERMAN_FIX
+    node_type: evidence
+    trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "erro real corrigido: o ciclo de autorregulacao (previsao/execucao/autorreflexao) e de Zimmerman (2002), nao de Pintrich — a atribuicao errada foi cometida e corrigida"
+  - id: E_CHALYBAUS_FIX
+    node_type: evidence
+    trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "erro real corrigido: a triade tese/antitese/sintese e de Chalybaus (1837), nao de Hegel; o termo hegeliano certo e Aufhebung (cancela+preserva+eleva)"
+  - id: E_GATE_50_FINDINGS
+    node_type: evidence
+    trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "incidente 2026-07-20: gate auditou 50 achados (70 agentes, 10 refutados) e nao guardou NENHUM no grafo — porosidade falhou p/ dentro; virou a REGRA 29 invertida"
+
+  # ---- a trava (rule) ----
+  - id: R_COINAGE_DISCIPLINE
+    node_type: rule
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "ciencia cita a fonte real; o que e nosso declara autoria nossa — os dois NUNCA se confundem (nem plagio, nem credito emprestado)"
+
+  # ---- duvidas / incomodos (a fronteira honesta) ----
+  - id: Q_PUBLICATION_AREA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.4
+    status: open
+    label: "a area de publicacao de doutrinas ainda nao existe — onde e como a pagina gradua de gated a publica (grupo fechado primeiro)?"
+  - id: Q_BULBO_DIAGRAM
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.4
+    status: open
+    label: "um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco?"
+
+  # ---- entidades (as ancoras cientificas — emprestimo, citado) ----
+  - id: ENT_TRANSFORMER
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "Substrato: o Transformer (Vaswani et al. 2017, arXiv:1706.03762) — ciencia dada, nao nossa; o Onion orquestra em cima, nao reinventa"
+  - id: ENT_CQRS_CODD
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "Fonte->projecao: CQRS (Young 2010) sobre CQS (Meyer 1988); a raiz de SSOT e a normalizacao de Codd (1970) — cada fato num unico lugar"
+  - id: ENT_POPPER
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "Falseabilidade (Popper, A Logica da Descoberta Cientifica, 1934) — PARENTE, nao identidade, da porosidade epistemica"
+
+edges:
+  # as auto-incriminacoes reais sustentam a tese central (a forma prova a filosofia)
+  - from: E_ZIMMERMAN_FIX
+    to: C_FORM_PROVES_PHILOSOPHY
+    edge_type: SUPPORTS
+  - from: E_CHALYBAUS_FIX
+    to: C_FORM_PROVES_PHILOSOPHY
+    edge_type: SUPPORTS
+  # o gate que falhou p/ dentro prova que a porosidade e estrutural (e falha quando nao e)
+  - from: E_GATE_50_FINDINGS
+    to: C_POROSITY_STRUCTURAL
+    edge_type: SUPPORTS
+  # a disciplina de cunhagem e a regra que a decisao de declarar honra
+  - from: D_COINAGES_DECLARED
+    to: R_COINAGE_DISCIPLINE
+    edge_type: DEPENDS_ON
+  # SSOT-sem-autor ancora em Codd
+  - from: C_SSOT_NO_AUTHOR
+    to: ENT_CQRS_CODD
+    edge_type: DEPENDS_ON
+  # a porosidade e parente da falseabilidade de Popper
+  - from: C_POROSITY_STRUCTURAL
+    to: ENT_POPPER
+    edge_type: DEPENDS_ON
+  # o metodo (Elenxo) e o que torna a viralidade-por-substancia possivel
+  - from: D_ELENXO_IS_METHOD
+    to: C_VIRAL_BY_SUBSTANCE
+    edge_type: SUPPORTS
+  # a arquitetura (Bulbo) tem o Transformer como camada-substrato dada
+  - from: D_BULBO_IS_ARCH
+    to: ENT_TRANSFORMER
+    edge_type: DEPENDS_ON
+  # o metodo e a arquitetura sao a mesma ideia por dois angulos
+  - from: D_ELENXO_IS_METHOD
+    to: D_BULBO_IS_ARCH
+    edge_type: DEPENDS_ON
+  # a pagina so gradua de gated quando a area de publicacao existir
+  - from: D_PAGE_GATED
+    to: Q_PUBLICATION_AREA
+    edge_type: DEPENDS_ON
+  # o diagrama candidato visualizaria a arquitetura Bulbo
+  - from: Q_BULBO_DIAGRAM
+    to: D_BULBO_IS_ARCH
+    edge_type: DEPENDS_ON
