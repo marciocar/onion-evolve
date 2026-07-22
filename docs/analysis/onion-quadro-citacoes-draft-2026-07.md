@@ -44,12 +44,14 @@
 > — Marcio, 2026-07 (paráfrase da régua que ele aplica). Ao decidir reusar um atuador vs desenhar
 > fresco: onde o novo é análogo ao existente, transfere; onde difere, desenha do zero.
 
----
+## Do conjunto — formulações nossas (surgidas da conversa)
 
-### Candidatas a verificar (não incluídas até confirmar autoria verbatim)
+> Nem toda frase que fica é de um autor só. Estas nasceram **do trabalho em par** (Marcio + Onion),
+> no meio do serviço, e a gente as guarda como **nossas** — não atribuídas a uma boca só. Levemente
+> lapidadas para caber tanto no entendimento humano quanto no da IA que nos lê.
 
-- *"O core é o pior oráculo do que viaja"* — emergiu do trabalho de dogfood-de-fronteira; formulação
-  **conjunta**, não citação isolada do maestro. Fica na doutrina de dogfooding, não aqui, até o maestro
-  reivindicar (ou reformular) como frase dele.
-- *"A verdade de um adotante é um clone fresco"* — idem: lição de campo de 2026-07-22, doutrina, não
-  citação pessoal ainda.
+> **"O core é o pior oráculo do que viaja: um guard verde na fonte não prova nada — só o adotante revela o que de fato chegou nele."**
+> — Marcio + Onion, 2026-07-22 (formulação conjunta). Por que verificar **dentro** do adotante, nunca só na fonte: escopo, ausência de arquivos core-only e stamps não-vendorizados fazem a fonte mentir sobre o que ela distribui.
+
+> **"A verdade de um adotante é um clone fresco, não o working dir de quem o gerou — o que não foi commitado mente."**
+> — Marcio + Onion, 2026-07-22 (formulação conjunta). Arquivos *untracked*/gitignored no disco de quem gera mascaram o que o clone realmente recebe. Só um `git clone` limpo diz a verdade. (Nasceu do bug do `.onion-version` que o maestro pegou clonando fresco.)
