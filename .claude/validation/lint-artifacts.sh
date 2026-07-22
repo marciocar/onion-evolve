@@ -1743,14 +1743,26 @@ check_vendored_surface_clean() {
   fi
   [ ${#targets[@]} -gt 0 ] || return 0
   local terms term f
+  # (1) nomes COMERCIAIS marcados (derivados, menos os marcadores que são vocabulário das guardas)
   terms="$(bash "${helper}" --emit-terms 2>/dev/null | grep -vE '^(CONFIDENCIAL|PRIVADO)$' || true)"
+  # (2) IDS de ADOTANTE — o id também identifica o cliente (um id pode ser nome de pessoa, ou mapear direto na marca).
+  #     Derivados do members.yaml, EXCLUINDO os nomes do PRÓPRIO framework (onion-*) e do maestro (marcio*).
+  #     Decisão do maestro 2026-07-22: a superfície portável não nomeia parceiros; o crédito nominal fica no
+  #     diário privado (que não vendoriza).
+  local members="${REPO_ROOT}/docs/evolution/federation/members.yaml"
+  local ids=""
+  # Exclui: nomes do próprio framework (onion-*), do maestro (marcio*), e da convenção de
+  # FIXTURE (selftest-*) — senão a guarda deriva os membros-de-teste do members.yaml de um
+  # sandbox e se acusa nas próprias fixtures (achado ao rodar: quebrou os testes do outbox-channel).
+  [ -r "${members}" ] && ids="$(awk '/^[[:space:]]*-[[:space:]]*id:[[:space:]]/{v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]*#.*$/,"",v); gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); if (v !~ /^onion-/ && v !~ /^marcio/ && v !~ /^selftest-/ && length(v)>=4) print v}' "${members}" 2>/dev/null || true)"
+  terms="$(printf '%s\n%s\n' "${terms}" "${ids}" | grep -v '^[[:space:]]*$' | sort -u)"
   [ -n "${terms}" ] || return 0
   while IFS= read -r term; do
     [ -n "${term}" ] || continue
     while IFS= read -r f; do
       [ -n "${f}" ] || continue
       case "${f}" in */fixtures/*) continue ;; esac
-      violation "HARD" "${f#${REPO_ROOT}/}" "[vendor-scrub] nome comercial '${term}' na superfície vendorizada — viaja p/ todo adotante (cross-tenant por adoção); generalize (um adotante não conhece o cliente de outro)"
+      violation "HARD" "${f#${REPO_ROOT}/}" "[vendor-scrub] identificador de adotante '${term}' na superfície vendorizada — viaja p/ todo adotante (cross-tenant por adoção); generalize (o crédito nominal fica no diário privado)"
     done < <(grep -rilF -- "${term}" "${targets[@]}" 2>/dev/null | sort -u)
   done <<< "${terms}"
 }
