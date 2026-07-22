@@ -1759,13 +1759,20 @@ check_vendored_surface_clean() {
   # FIXTURE (selftest-*) — senão a guarda deriva os membros-de-teste do members.yaml de um
   # sandbox e se acusa nas próprias fixtures (achado ao rodar: quebrou os testes do outbox-channel).
   [ -r "${members}" ] && ids="$(awk '/^[[:space:]]*-[[:space:]]*id:[[:space:]]/{v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]*#.*$/,"",v); gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); if (v !~ /^onion-/ && v !~ /^marcio/ && v !~ /^selftest-/ && length(v)>=4) print v}' "${members}" 2>/dev/null || true)"
-  terms="$(printf '%s\n%s\n' "${terms}" "${ids}" | grep -v '^[[:space:]]*$' | sort -u)"
+  # '|| true': num adotante LIMPO (sem members.yaml nem nome comercial) terms+ids são vazios;
+  # grep -v não casa nada → exit 1 → sob 'set -euo pipefail' abortaria o LINT INTEIRO. O core
+  # nunca vê isso (sempre tem termos), mas todo adotante greenfield veria — achado ao rodar o
+  # lint DENTRO da cópia do Pedro (a lição de campo: o core é o pior oráculo do que viaja).
+  terms="$(printf '%s\n%s\n' "${terms}" "${ids}" | grep -v '^[[:space:]]*$' | sort -u || true)"
   [ -n "${terms}" ] || return 0
   while IFS= read -r term; do
     [ -n "${term}" ] || continue
     while IFS= read -r f; do
       [ -n "${f}" ] || continue
-      case "${f}" in */fixtures/*) continue ;; esac
+      # Fixtures NÃO são exceção: um nome real de cliente num fixture VENDORIZA p/ todo adotante
+      # igual a qualquer outro arquivo (achado 2026-07-22: um id de adotante num comentário de
+      # crédito de fixture escapava a guarda e viajava). Os termos derivam de nomes REAIS — nenhum
+      # fixture legítimo precisa deles (os de teste usam nomes inventados: acme-adopter, selftest-*).
       violation "HARD" "${f#${REPO_ROOT}/}" "[vendor-scrub] identificador de adotante '${term}' na superfície vendorizada — viaja p/ todo adotante (cross-tenant por adoção); generalize (o crédito nominal fica no diário privado)"
     done < <(grep -rilF -- "${term}" "${targets[@]}" 2>/dev/null | sort -u)
   done <<< "${terms}"

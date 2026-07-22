@@ -3674,6 +3674,16 @@ run_outbox_channel_selftests() {
     record_fail "outbox-channel: severidade" "esperava HARD inalterado e SOFT maior; HARD ${hard_sem}->${hard_com}, SOFT ${soft_sem}->${soft_com}"
   fi
 
+  # GREENFIELD (terms vazio): um adotante SEM members.yaml não pode ABORTAR o lint na derivação de
+  # termos da REGRA 36 — 'grep -v' sem match sai 1 e sob 'set -euo pipefail' derrubaria tudo. O core
+  # nunca vê (sempre tem termos); todo adotante greenfield veria. Regressão de 2026-07-22, achada
+  # rodando o lint DENTRO da cópia limpa do Pedro (o core é o pior oráculo do que viaja).
+  rm -f "${sb}/docs/evolution/federation/members.yaml"
+  local out3; out3="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if printf '%s' "${out3}" | grep -q 'Viola..es HARD'; then
+    record_pass "outbox-channel: (GREENFIELD) sem members.yaml → lint COMPLETA (REGRA 36 não aborta com terms vazio)"
+  else record_fail "outbox-channel: greenfield" "lint abortou num adotante sem members.yaml (terms vazio + set -e na REGRA 36)"; fi
+
   rm -rf "${sb}" "${com_canal}" "${sem_canal}" "${vazio}" "${naonvend}"
 }
 

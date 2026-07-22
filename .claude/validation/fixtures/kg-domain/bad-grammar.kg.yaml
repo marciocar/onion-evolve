@@ -1,4 +1,4 @@
-# Fixture de REGRESSÃO — gramática que o radar NÃO entende (sinal de campo granaai 2026-07-17).
+# Fixture de REGRESSÃO — gramática que o radar NÃO entende (sinal de campo de um adotante regulado 2026-07-17).
 # Reproduz a forma real que derrubou o gate num CI regulado: nós como MAPA (não lista), `type:`
 # em vez de `node_type:`/`edge_type:`, e `- from:` na coluna 0 (o radar exige indentação).
 # O arquivo CARIMBA schema_version "1" — o selo atesta a intenção do gerador, não a forma.
