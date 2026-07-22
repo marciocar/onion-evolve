@@ -514,7 +514,7 @@ check_capability_conformance() {
 }
 
 # ===========================================================================
-# REGRA 22 — Mapa role→bundle (roles.yaml) consistente com os verticais [HARD]
+# REGRA 37 — Mapa role→bundle (roles.yaml) consistente com os verticais [HARD]
 #           Todo vertical nomeado em roles.yaml (base/optional de qualquer papel)
 #           deve ter manifesto em verticals/ E estar registrado no marketplace.json.
 #           Impede roles.yaml apontar p/ vertical inexistente. Pula gracioso sem python3/yaml.
@@ -605,7 +605,7 @@ check_graph_sync() {
   rm -f "${tmp}"
 }
 
-# REGRA 23 — Mapa da federação (docs/onion/federation-map.md) sincronizado com members.yaml [HARD]
+# REGRA 38 — Mapa da federação (docs/onion/federation-map.md) sincronizado com members.yaml [HARD]
 #           GERADO por graph.sh --map (SSOT = members.yaml). Espelha check_graph_sync. Pula sem python+yaml.
 check_federation_map_sync() {
   local gen="${SCRIPT_DIR}/graph.sh"

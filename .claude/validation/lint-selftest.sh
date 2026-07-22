@@ -2610,7 +2610,7 @@ run_plugins_sync_selftests() {
 }
 
 # ---------------------------------------------------------------------------
-# Modo role-bundle — exercita o mapa role→bundle (REGRA 22 check_role_bundle_sync) + o resolver:
+# Modo role-bundle — exercita o mapa role→bundle (REGRA 37 check_role_bundle_sync) + o resolver:
 # (a) resolver acerta papeis conhecidos (source não-vazio, distilled vazio) e rejeita inválido;
 # (b) todo vertical em roles.yaml tem manifesto + está no marketplace.json (consistência).
 # ---------------------------------------------------------------------------
@@ -4248,7 +4248,7 @@ run_plugins_sync_selftests || true
 # Modo capability — Capability Contract (REGRA 20): contrato honesto + resolução de requires.
 run_capability_selftests
 
-# Modo role-bundle — mapa role→bundle (REGRA 22): resolver + consistência dos verticais.
+# Modo role-bundle — mapa role→bundle (REGRA 37): resolver + consistência dos verticais.
 run_role_bundle_selftests
 
 # Modo graph — lente sócio-técnica (REGRA 21): graph.md em-sync + determinismo + atores + impacto.

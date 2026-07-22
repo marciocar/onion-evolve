@@ -32,8 +32,8 @@ gastar na F2.
   (roles.yaml), que já materializa `kg.md`+`kg-radar.sh`+`kg-console.sh`. O que falta é um *role* método-only.
 - **Testado (drive-to-verify, não de prior):** injetei `role: personal` (base `[]` = ZERO vertical de
   software) + `work_tool_sets.kg_minimal: [kg, diary, constellation]` num `roles.yaml` de scratch e rodei o
-  resolver REAL → emitiu kg/diary/constellation; os três resolvem a comandos reais → **drift-guard REGRA 22
-  passa**. O precedente `distilled` (base `[]`, não-vendoriza) prova que a maquinaria tolera a forma.
+  resolver REAL → emitiu kg/diary/constellation; os três resolvem a comandos reais → **drift-guard REGRA 37
+  passa** (à época REGRA 22, renumerada na reconciliação de colisões 2026-07-22). O precedente `distilled` (base `[]`, não-vendoriza) prova que a maquinaria tolera a forma.
 - **O fork que fica é do maestro:** vendorizar-durável (role `personal` + `kg_minimal`) vs referenciar-local
   (mode/marker `vendor:false`, alinhado ao `onion_version: n/a` que o onion-pessoal já escolheu). Os 3 🔴 do
   spike colapsam nessa única decisão.
