@@ -1687,6 +1687,35 @@ check_migalhas_sync() {
 }
 
 # ===========================================================================
+# REGRA 35 — Site público não linka deep-link do repo PRIVADO (404 garantido) [HARD]
+#   O repo onion-evolve é PRIVADO. Um link github.com/…/onion-evolve/(pull|commit|
+#   blob|tree)/… em site/ dá 404 para todo visitante — a "prova viva" que não prova.
+#   Origem: incidente recorrente — 5 commits de correção de link-404 (jul) + 7 links
+#   vivos na home achados pelo MAESTRO usando o site (2026-07-22, declarado≠verificado
+#   público). A prova público-segura é a página /historia/migalhas/provas/ (metadado
+#   objetivo), nunca o PR cru. Turna a pega manual em trava permanente.
+#   Nota: a HOME do próprio repo (github.com/marciocar/onion-evolve SEM /pull|commit|…)
+#   é permitida — só os DEEP-LINKS que 404 são barrados.
+# ===========================================================================
+check_site_no_private_deeplinks() {
+  local site="${REPO_ROOT}/site"
+  [ -d "${site}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${site}"/*) : ;; *) return 0 ;; esac
+  fi
+  local f hits
+  while IFS= read -r f; do
+    [ -n "${f}" ] || continue
+    hits="$(grep -oE 'github\.com/[^"/ ]+/onion-evolve/(pull|commit|blob|tree)/[^"() ]+' "${f}" 2>/dev/null | sort -u || true)"
+    [ -n "${hits}" ] || continue
+    while IFS= read -r h; do
+      [ -n "${h}" ] || continue
+      violation "HARD" "${f#${REPO_ROOT}/}" "[site/404-privado] deep-link p/ repo PRIVADO dá 404 no público: ${h} — aponte para /historia/migalhas/provas/ (prova público-segura)"
+    done <<< "${hits}"
+  done < <(find "${site}" -type f \( -name '*.html' -o -name '*.xml' -o -name '*.md' \) 2>/dev/null | sort)
+}
+
+# ===========================================================================
 # REGRA 23 — Frontmatter: model: em comandos e category: em agentes [HARD]
 #   Origem: Q_LINT_FRONTMATTER do KG (achados D8-20/D8-21 da auditoria
 #   2026-07-04 — o gap deixou 7 artefatos divergirem em silêncio; a regra
@@ -1812,6 +1841,7 @@ check_site_graph_sync
 check_projection_safety
 check_federation_projection
 check_migalhas_sync
+check_site_no_private_deeplinks
 check_frontmatter_model_category
 
 # ===========================================================================

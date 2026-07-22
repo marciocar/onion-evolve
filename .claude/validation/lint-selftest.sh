@@ -323,6 +323,36 @@ run_kg_freshness_selftests() {
 # roda o gerador, verifica que a projeção saiu, que --check acusa drift após edição
 # manual, e (mutation) que quebrar a substituição-por-marcador faz o --check FALHAR.
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Modo site-deeplink — REGRA 35. Deep-link do repo PRIVADO em site/ dá 404 no
+# público. Os dois lados: link 404 → HARD; home do repo (sem /pull|commit) e
+# link interno de Provas → limpo. Cobre o trap do set -e (grep sem match não
+# pode abortar o lint) rodando a guarda real via --only.
+# ---------------------------------------------------------------------------
+run_site_deeplink_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  local site="${REPO_ROOT}/site"
+  [ -d "${site}" ] || { record_pass "site-deeplink: sem site/ — nada a testar (adotante)"; return; }
+  # A guarda escopa para REPO_ROOT/site — a fixture VIVE lá dentro (arquivo temporário
+  # com nome improvável), removida no RETURN. É o único jeito de exercitar a guarda REAL.
+  local tf="${site}/__selftest-deeplink__.html"
+  trap 'rm -f "'"${tf}"'"' RETURN
+  local out rc=0
+  # (a) deep-link p/ repo PRIVADO → HARD
+  printf '<a href="https://github.com/marciocar/onion-evolve/pull/222">PR #222</a>\n' > "${tf}"
+  out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q '404-privado'; then
+    record_pass "site-deeplink: (a) deep-link p/ repo privado em site/ → HARD"
+  else record_fail "site-deeplink: (a)" "link 404 não foi pego: rc=${rc} out=${out}"; fi
+  # (b) home do repo (sem /pull) + link interno → limpo (e grep-sem-match NÃO aborta o lint)
+  printf '<a href="https://github.com/marciocar/onion-evolve">repo</a> <a href="/historia/migalhas/provas/">prova</a>\n' > "${tf}"
+  rc=0; out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
+  if ! printf '%s' "${out}" | grep -q '404-privado'; then
+    record_pass "site-deeplink: (b) home do repo + link interno → limpo (grep-sem-match não aborta)"
+  else record_fail "site-deeplink: (b)" "falso-positivo em link permitido"; fi
+  rm -f "${tf}"
+}
+
 run_migalhas_generate_selftests() {
   local gen="${SCRIPT_DIR}/migalhas-generate.sh"
   local tmp
@@ -4232,6 +4262,7 @@ run_outbox_channel_selftests
 run_kg_coverage_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
+run_site_deeplink_selftests
 run_migalhas_generate_selftests
 run_kg_view_selftests
 
