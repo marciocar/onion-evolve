@@ -242,9 +242,13 @@ check_no_mcp_onion_orchestrator() {
   self="$(realpath "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
 
   local hits
-  # O próprio script contém a string como padrão de busca — excluí-lo da varredura
+  # O próprio script contém a string como padrão de busca — excluí-lo da varredura.
+  # lint-rules.md (o registro GERADO) cita o TÍTULO desta regra, que contém a string:
+  # é documentação derivada legítima, não uma referência ao componente. Mesma classe de
+  # ironia da REGRA 36 (guarda que se pega na própria documentação) — exclusão dirigida.
   hits=$(grep -rl "mcp_onion-orchestrator" "${CLAUDE_DIR}" 2>/dev/null \
     | grep -v "^${self}$" \
+    | grep -v "/validation/lint-rules.md$" \
     | grep -v "/validation/fixtures/" \
     | grep -v "/.claude/worktrees/" || true)
 
@@ -1588,7 +1592,7 @@ check_kg_view_sync() {
 }
 
 # ===========================================================================
-# REGRA 30 — Segurança de PROJEÇÃO: nome comercial de membro privado não sai
+# REGRA 30 — Segurança de PROJEÇÃO: nome comercial de membro privado não sai [HARD]
 #   do repo privado [HARD]
 #   Origem: incidente 2026-07-10 — o console PÚBLICO da federação vazou
 #   "<nome> — CONFIDENCIAL" verbatim, porque o `name:` do members.yaml carrega
@@ -1838,6 +1842,37 @@ check_bundled_command_script_deps() {
 }
 
 # ===========================================================================
+# REGRA 39 — Registro de REGRAS derivado e em paridade com as guardas [HARD]
+#           GERADO por rules-registry.sh (parseia os docstrings '# REGRA N — …' e o corpo de cada
+#           guarda p/ severidade). É o "documento de conhecimento da rede": vendorizado em
+#           .claude/validation/lint-rules.md, viaja no /meta:adopt. O gerador FALHA se houver
+#           número duplicado ou regra sem categoria — a catraca contra colisão e contra regra órfã.
+# ===========================================================================
+check_rules_registry_sync() {
+  local gen="${SCRIPT_DIR}/rules-registry.sh"
+  local doc="${SCRIPT_DIR}/lint-rules.md"
+  [ -f "${gen}" ] || return 0
+  command -v python3 >/dev/null 2>&1 || return 0
+  # Honra --only: só roda se o alvo for o gerador, o doc, ou o próprio lint (a fonte dos docstrings).
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${gen}"|"${doc}"|"${SCRIPT_DIR}/lint-artifacts.sh") : ;; *) return 0 ;; esac
+  fi
+  local tmp; tmp="$(mktemp)"
+  if ! bash "${gen}" > "${tmp}" 2>/dev/null; then
+    violation "HARD" ".claude/validation/lint-rules.md" "gerador do registro FALHOU (número de REGRA duplicado ou regra sem categoria) — rode: bash .claude/validation/rules-registry.sh"
+    rm -f "${tmp}"; return
+  fi
+  if [ ! -f "${doc}" ]; then
+    violation "HARD" ".claude/validation/lint-rules.md" "registro ausente — rode: bash .claude/validation/rules-registry.sh > .claude/validation/lint-rules.md"
+    rm -f "${tmp}"; return
+  fi
+  if ! diff -q "${doc}" "${tmp}" >/dev/null 2>&1; then
+    violation "HARD" ".claude/validation/lint-rules.md" "registro desatualizado vs docstrings — regenere: bash .claude/validation/rules-registry.sh > .claude/validation/lint-rules.md"
+  fi
+  rm -f "${tmp}"
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -1896,6 +1931,7 @@ check_migalhas_sync
 check_site_no_private_deeplinks
 check_vendored_surface_clean
 check_frontmatter_model_category
+check_rules_registry_sync
 
 # ===========================================================================
 # SUMÁRIO FINAL
