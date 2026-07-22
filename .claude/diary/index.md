@@ -4,14 +4,18 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 65 entradas · **Stale:** 0 · **Compartilháveis:** 53 · **Com significância:** 5
+**Total:** 69 entradas · **Stale:** 0 · **Compartilháveis:** 57 · **Com significância:** 9
 
-Gerado em: 2026-07-21
+Gerado em: 2026-07-22
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-07-22 | reflection | collective 📤 | verify-before-rewriting-foreign-history | A disciplina de verificar-antes-de-agir, no seu teste de maior aposta do dia: impediu reescrever 640 commits do repo de outra pessoa para consertar um problema que não existia. | 2026-10-20 | static |
+| 2026-07-22 | innovation | collective 📤 | pin-enters-proving-itself | O 'drift silencioso de pin' que o grafo do core registrava só em abstrato ganhou nome (vnextpin), mecanismo de entrada (o pin prova ser commit) e ferramenta de auditoria — porque a capacidade foi exercida contra adotantes reais, não desenhada. | 2026-10-20 | dynamic |
+| 2026-07-22 | learning | collective 📤 | guard-matches-threat-model | Uma guarda não é definida pelo que ela pega, mas pelo threat model que ela encarna — estender a lógica sem estender o modelo transforma proteção em ruído que se auto-desliga. | 2026-10-20 | static |
+| 2026-07-22 | learning | collective 📤 | core-green-adopter-red | Rodar o lint no core não é rodar o lint — o core é estruturalmente o único repo onde as dependências da guarda existem, então é onde ela mente com mais confiança sobre estar verde. | 2026-10-20 | static |
 | 2026-07-21 | learning | collective 📤 | mechanism-beats-prose | Modelar 92 documentos de 14 meses no grafo revelou a lei que governa a durabilidade de decisões neste core — e ela não é sobre qualidade de argumento, é sobre onde a decisão foi parar. | 2026-10-19 | static |
 | 2026-07-21 | innovation | collective 📤 | inverted-provenance-ratchet | Invertemos a pergunta da proveniência — de 'as citações apontam para fontes reais?' para 'toda fonte é alcançável a partir do grafo?' — e a catraca pagou 92 documentos até o piso zero sem uma regressão. | 2026-10-19 | conditional |
 | 2026-07-21 | observation | collective 📤 | capability-never-met-reality | O passivo pago revelou a maior distância entre declarado e verificado do core — não num fato, mas numa CAPACIDADE inteira que passa em todos os testes e nunca tocou a realidade. | 2026-10-19 | dynamic |
