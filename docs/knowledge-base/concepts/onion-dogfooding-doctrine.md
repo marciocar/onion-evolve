@@ -72,6 +72,32 @@ dogfood. Se a mudança altera **contagens** (comandos/agentes/skills/KBs), `/met
 
 ---
 
+## 🛰️ Dogfood de fronteira — o adotante como oráculo
+
+Há uma terceira camada, e ela corrige um ponto cego das duas primeiras: **o core é o pior lugar
+para testar o que viaja.** Uma guarda pode estar **verde no core e HARD em todo adotante** — porque
+o core é o único repositório onde as dependências da própria guarda existem (`members.yaml`,
+`docs/INDEX.md`, um baseline versionado). Rodar o gate no core, nesse caso, é rodá-lo no único
+ambiente onde ele não pode falhar: uma falsa prova de saúde.
+
+**Regra dura:** guarda ou artefato que **viaja** (mora em `.claude/validation/` e entra no manifesto
+de vendor) prova-se **rodando UMA VEZ dentro de um clone de adotante**, não só no core.
+
+- **Onde:** o clone de um adotante real (`~/<adotante>`), onde os arquivos que só o core tem **não
+  existem**.
+- **Quando:** o gatilho natural é `/meta:adopt --update` — toda vez que o framework viaja é a janela
+  para rodar o gate no destino. É barato (o clone já existe) e é exatamente quando os bugs de
+  "funciona no core, quebra fora" se revelam.
+- **Checklist mínimo ao escrever a guarda:** ela depende de algum arquivo que **só o core tem**? Se
+  sim, precisa de um caminho de degradação gracioso para o adotante — **e esse caminho precisa de
+  fixture própria** (senão a degradação é conselho, não mecanismo).
+
+Isto é o corolário empírico da [regra de admissão](inference-mitigation.md): o ponto cego "cláusula
+local não alcança o próximo mecanismo" recorre **entre arquivos, dentro de um único dia** — não é
+teoria. Crumbs: `core-green-adopter-red`, `guard-matches-threat-model`, `verify-before-rewriting-foreign-history`.
+
+---
+
 ## 📐 Worked examples (evidência — não asserção)
 
 Casos reais onde o dogfood pegou o que o happy-path escondia:
@@ -82,8 +108,11 @@ Casos reais onde o dogfood pegou o que o happy-path escondia:
 | **`/meta:all-tools`** (PR #128) | Rodar o comando reescrito e produzir o catálogo real da sessão | Lacunas: faltava marcar **status de conexão MCP** (conectado vs exige-auth) e tratar **tools deferidas por nome** (sem inventar descrição — o pecado do dialeto-Cursor em outra roupagem). |
 | **Limpeza `.claude/docs/`** (PR #127) | Verificação **adversarial** do veredito do explorer | O veredito "deletar os c4" teria **quebrado** os agentes c4 (que os referenciam); a verificação reverteu para "mover" (e o move **reparou** refs já penduradas). |
 | **`.env.example`** (fix #89) | Dogfooding do Onion **no adotante** (um adotante, ao vivo) | Bug de campo que virou fix never-clobber no core, via [upstream do inbox](../../evolution/README.md). |
+| **Update de campo** (2026-07-21, gustavo-pulga) | **Dogfood de fronteira**: rodar `/meta:adopt --update` num adotante real e rodar o lint DENTRO do clone dele | **Dois** bugs verdes no core: a Segurança de Projeção (REGRA 30) exigia `members.yaml`, que só o core tem → HARD em todo adotante; um índice de KB vendorizado linkava alvos fora do manifesto → link pendurado no adotante. O lint do core **nunca veria** — lá os alvos existem. |
+| **Validação de pin** (2026-07-21, vendor-branch) | Auditar os 3 adotantes reais com `--audit-vendor` | 2 de 3 tinham **pin inválido carimbado** (`vnextpin`; uma data). O drift silencioso que o grafo só refutava em abstrato ganhou mecanismo. E: 5 fixtures usavam **pins fictícios** — praticavam o hábito que deixou o lixo real passar. |
 
-A lição comum: **o erro só apareceu ao executar.** Nenhum foi pego por revisão-no-papel.
+A lição comum: **o erro só apareceu ao executar** — e, para o que viaja, só ao executar **fora do
+core**. Nenhum foi pego por revisão-no-papel.
 
 ---
 
