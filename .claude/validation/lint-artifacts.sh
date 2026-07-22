@@ -1659,6 +1659,34 @@ check_federation_projection() {
 }
 
 # ===========================================================================
+# REGRA 34 — Migalhas: superfícies DERIVADAS da fonte, sem drift [HARD]
+#   ADR onion-adr-blog-publication-generator-2026-07 (D2). As 3 superfícies
+#   (index.html/provas/feed.xml) são PROJEÇÃO de site/historia/migalhas/posts/*.md
+#   pelo migalhas-generate.sh. Editar a região gerada à mão (entre os marcadores
+#   ONION:GEN) = fonte paralela = o drift que 12 de 41 posts já sofreram (feed≠provas,
+#   medido na migração 2026-07-22). Regenerou? verde. Editou à mão? HARD. É o litmus
+#   de source-vs-derivation.md ("edito em UM") virado ESTRUTURAL. Skip gracioso sem
+#   python3 (exit 3 do gerador). Chrome (fora dos marcadores) é livre.
+# ===========================================================================
+check_migalhas_sync() {
+  local gen="${SCRIPT_DIR}/migalhas-generate.sh"
+  local mig="${REPO_ROOT}/site/historia/migalhas"
+  [ -f "${gen}" ] || return 0
+  [ -d "${mig}/posts" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${mig}"/*|"${gen}") : ;; *) return 0 ;; esac
+  fi
+  local rc=0
+  bash "${gen}" --check >/dev/null 2>&1 || rc=$?
+  case "${rc}" in
+    0) : ;;                                  # em sincronia
+    3) : ;;                                  # python3 ausente — skip gracioso
+    *) violation "HARD" "site/historia/migalhas/" \
+         "[migalhas/DRIFT] superfícies divergem da fonte posts/*.md — regenere: bash .claude/validation/migalhas-generate.sh (NÃO edite a região entre os marcadores ONION:GEN à mão)" ;;
+  esac
+}
+
+# ===========================================================================
 # REGRA 23 — Frontmatter: model: em comandos e category: em agentes [HARD]
 #   Origem: Q_LINT_FRONTMATTER do KG (achados D8-20/D8-21 da auditoria
 #   2026-07-04 — o gap deixou 7 artefatos divergirem em silêncio; a regra
@@ -1783,6 +1811,7 @@ check_kg_view_sync
 check_site_graph_sync
 check_projection_safety
 check_federation_projection
+check_migalhas_sync
 check_frontmatter_model_category
 
 # ===========================================================================

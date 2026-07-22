@@ -317,6 +317,88 @@ run_kg_freshness_selftests() {
 # paridade não reprovar de verdade, a lente pode divergir do motor em silêncio e
 # mostrar um grafo que não existe. (V3) é o teste que sustenta a dívida.
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Modo migalhas-generate — REGRA 34. O gerador projeta posts/*.md nas 3 superfícies
+# entre os marcadores ONION:GEN. Fixture self-contained (chrome mínimo + 1 post),
+# roda o gerador, verifica que a projeção saiu, que --check acusa drift após edição
+# manual, e (mutation) que quebrar a substituição-por-marcador faz o --check FALHAR.
+# ---------------------------------------------------------------------------
+run_migalhas_generate_selftests() {
+  local gen="${SCRIPT_DIR}/migalhas-generate.sh"
+  local tmp
+  [ -f "${gen}" ] || return 0
+  command -v python3 >/dev/null 2>&1 || { record_pass "migalhas-generate: python3 ausente (skip gracioso, coerente com REGRA 34)"; return; }
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "${tmp}"' RETURN
+  local M="${tmp}/site/historia/migalhas"
+  mkdir -p "${M}/posts" "${M}/provas"
+
+  # superfícies mínimas com os marcadores (chrome irrelevante para o teste)
+  printf '<html><body>\n<div class="feed" id="feed">\n<!-- ONION:GEN posts START -->\nVELHO\n<!-- ONION:GEN posts END -->\n</div>\n</body></html>\n' > "${M}/index.html"
+  printf '<html><body>\n<div class="feed">\n<!-- ONION:GEN provas START -->\nVELHO\n<!-- ONION:GEN provas END -->\n</div>\n</body></html>\n' > "${M}/provas/index.html"
+  printf '<rss><channel>\n<lastBuildDate>x</lastBuildDate>\n<!-- ONION:GEN items START -->\nVELHO\n<!-- ONION:GEN items END -->\n</channel></rss>\n' > "${M}/feed.xml"
+  cat > "${M}/posts/2026-07-01-caso.md" <<'PEOF'
+---
+slug: 2026-07-01-caso
+type: learning
+date: 2026-07-01
+review_after: 2026-10-01
+title: "Um título de teste"
+rss: "Um resumo de teste."
+prs:
+  - {label: "PR #7", status: "mergeado", meta: "1 jul · 1 arquivo · +1 −0"}
+---
+## O que descobri
+Parágrafo *um*.
+
+## A prova
+Parágrafo dois.
+
+## Onde isso nos levou
+Parágrafo três.
+PEOF
+
+  # o gerador precisa do git-root p/ resolver ROOT; força via cwd + fallback do script
+  MIGALHAS_ROOT="${tmp}" bash "${gen}" >/dev/null 2>&1
+  # (a) projetou nas 3 superfícies?
+  if grep -q 'id="post-2026-07-01-caso"' "${M}/index.html" \
+     && grep -q 'id="prova-2026-07-01-caso"' "${M}/provas/index.html" \
+     && grep -q '#post-2026-07-01-caso' "${M}/feed.xml"; then
+    record_pass "migalhas-generate: (a) projeta o post nas 3 superfícies entre os marcadores"
+  else record_fail "migalhas-generate: (a)" "post não projetado nas 3 superfícies"; fi
+
+  # (b) PR label verbatim + pr-link derivado do slug
+  if grep -q 'PR #7' "${M}/provas/index.html" \
+     && grep -q 'href="/historia/migalhas/provas/#prova-2026-07-01-caso"' "${M}/index.html"; then
+    record_pass "migalhas-generate: (b) label do PR verbatim + pr-link derivado do slug"
+  else record_fail "migalhas-generate: (b)" "label/pr-link errados"; fi
+
+  # (c) --check: em sincronia após gerar → exit 0
+  local rc=0; MIGALHAS_ROOT="${tmp}" bash "${gen}" --check >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "migalhas-generate: (c) --check exit 0 quando em sincronia"
+  else record_fail "migalhas-generate: (c)" "--check acusou drift num estado recém-gerado (rc=${rc})"; fi
+
+  # (d) --check: edição manual na região gerada → exit 1 (o drift-guard)
+  sed -i 's/Um título de teste/EDITADO A MAO/' "${M}/index.html"
+  rc=0; MIGALHAS_ROOT="${tmp}" bash "${gen}" --check >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    record_pass "migalhas-generate: (d) --check exit 1 após edição manual (drift detectado)"
+  else record_fail "migalhas-generate: (d)" "edição manual não foi detectada como drift"; fi
+
+  # (MUT) quebrar a substituição-por-marcador (splice não escreve) → --check nunca acusa drift
+  MIGALHAS_ROOT="${tmp}" bash "${gen}" >/dev/null 2>&1 || true   # re-sincroniza
+  sed 's/if MODE!="--check": open(path,"w",encoding="utf-8").write(new)/pass  # MUTADO/' "${gen}" > "${tmp}/mut.sh"
+  sed -i 's/Um título de teste/EDITADO DE NOVO/' "${M}/index.html"
+  MIGALHAS_ROOT="${tmp}" bash "${tmp}/mut.sh" --check >/dev/null 2>&1 || true
+  # com o write mutado, o --check ainda deve DETECTAR (só o write foi neutralizado, não o compare).
+  # o que a mutação quebra é a ESCRITA: provamos que sem escrever, gerar não conserta o drift.
+  MIGALHAS_ROOT="${tmp}" bash "${tmp}/mut.sh" >/dev/null 2>&1 || true   # "gera" com write mutado
+  if grep -q 'EDITADO DE NOVO' "${M}/index.html"; then
+    record_pass "migalhas-generate: (MUT) sem a escrita, gerar NÃO conserta o drift — a escrita é load-bearing"
+  else record_fail "migalhas-generate: (MUT)" "o drift sumiu sem a escrita — o teste não prova nada"; fi
+}
+
 run_kg_view_selftests() {
   local view="${SCRIPT_DIR}/kg-view.sh"
   local tmp out rc
@@ -4150,6 +4232,7 @@ run_outbox_channel_selftests
 run_kg_coverage_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
+run_migalhas_generate_selftests
 run_kg_view_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
