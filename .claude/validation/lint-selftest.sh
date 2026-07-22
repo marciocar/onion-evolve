@@ -247,7 +247,7 @@ run_kg_fixture() {
 
 # ---------------------------------------------------------------------------
 # Modo kg-freshness/schema — guardas de frescor + versão de schema do kg-radar.sh
-# (ADR onion-adr-kg-freshness-gate, propostas #2/#1 do dogfood rhilo). Frescor é AVISO
+# (ADR onion-adr-kg-freshness-gate, propostas #2/#1 de um dogfood de campo). Frescor é AVISO
 # (⚠, não muda exit) → asserção por CONTEÚDO de stdout; schema é RECUSA (✗, exit 1).
 # ---------------------------------------------------------------------------
 run_kg_freshness_selftests() {
@@ -297,7 +297,7 @@ run_kg_freshness_selftests() {
   else record_fail "kg-schema: ausente/retrocompat" "esperava exit 0 + ⚠; rc=${rc} out=${out}"; fi
 
   # (f) F1.1 — frescor estende a DEV que rastreia artefato móvel (verified_against), sem inundar
-  # claim epistêmico DEV puro. Sinal rhilo ssot-como-runtime §2 (C_CONSOLIDATION_MAP stale).
+  # claim epistêmico DEV puro. Sinal de um adotante: ssot-como-runtime §2 (C_CONSOLIDATION_MAP stale).
   rc=0; out=$(bash "${radar}" "${fx}/dev-tracked-stale.kg.yaml" --freshness 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
      && printf '%s' "${out}" | grep -q 'STALE-MISSING: C_STRAT' \
@@ -329,6 +329,38 @@ run_kg_freshness_selftests() {
 # link interno de Provas → limpo. Cobre o trap do set -e (grep sem match não
 # pode abortar o lint) rodando a guarda real via --only.
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Modo vendor-scrub — REGRA 36. Nome comercial de cliente na superfície
+# VENDORIZADA (o que /meta:adopt copia) viaja p/ todo adotante — cross-tenant por
+# adoção. Fixture: arquivo temporário numa raiz vendorizada com um termo REAL
+# derivado do members.yaml → HARD; sem ele → limpo. Termo do members.yaml, não
+# hardcoded (nome no teste seria o próprio vazamento que a regra combate).
+# ---------------------------------------------------------------------------
+run_vendor_scrub_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  local helper="${SCRIPT_DIR}/projection-safety.sh"
+  [ -f "${helper}" ] || return 0
+  local term
+  term="$(bash "${helper}" --emit-terms 2>/dev/null | grep -vE '^(CONFIDENCIAL|PRIVADO)$' | head -1 || true)"
+  [ -n "${term}" ] || { record_pass "vendor-scrub: sem termo derivável — nada a testar"; return; }
+  local tf="${REPO_ROOT}/.claude/validation/__scrubtest__.md"
+  trap 'rm -f "'"${tf}"'"' RETURN
+  local out rc=0
+  # (a) nome comercial real numa raiz vendorizada → HARD
+  printf 'exemplo citando %s como cliente\n' "${term}" > "${tf}"
+  out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'vendor-scrub'; then
+    record_pass "vendor-scrub: (a) nome comercial na superfície vendorizada → HARD"
+  else record_fail "vendor-scrub: (a)" "nome de cliente vendorizado não pego: rc=${rc}"; fi
+  # (b) sem nome comercial → limpo (e grep-sem-match não aborta)
+  printf 'texto generico sem nome de cliente\n' > "${tf}"
+  rc=0; out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
+  if ! printf '%s' "${out}" | grep -q 'vendor-scrub'; then
+    record_pass "vendor-scrub: (b) superfície limpa → sem HARD"
+  else record_fail "vendor-scrub: (b)" "falso-positivo em texto limpo"; fi
+  rm -f "${tf}"
+}
+
 run_site_deeplink_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   local site="${REPO_ROOT}/site"
@@ -2229,7 +2261,7 @@ run_prettierignore_selftests() {
   else record_fail "prettierignore: complete" "mutou um alvo já completo"; fi
   rm -rf "${d}"
 
-  # (e) complete-no-header → 5 paths soltos (espelha o rhilo real): no-op, NÃO injeta cabeçalho órfão
+  # (e) complete-no-header → 5 paths soltos (espelha um caso real de campo): no-op, NÃO injeta cabeçalho órfão
   d="$(mktemp -d)"
   printf '.claude/\ndocs/meta-specs/\ndocs/sdaal/\ndocs/knowledge-base/\ndocs/onion/inventory.md\n' > "${d}/.prettierignore"
   before="$(cat "${d}/.prettierignore")"; bash "${helper}" "${d}" >/dev/null 2>&1
@@ -3971,7 +4003,7 @@ EOF
 
 # ---------------------------------------------------------------------------
 # Modo pin-integrity — exercita .claude/validation/pin-integrity-check.sh (o
-# guard do /meta:adopt --update contra pin forjado — incidente 2026-06-30/rhilo:
+# guard do /meta:adopt --update contra pin forjado — incidente 2026-06-30 (um adotante):
 # stamp apontava HEAD do core, vendor era 6 dias mais velho, anúncio downstream
 # saiu falso). Self-contained: core fake com 2 commits do canário em mktemp.
 # ---------------------------------------------------------------------------
@@ -4003,7 +4035,7 @@ run_pin_integrity_selftests() {
   printf '#!/bin/sh\necho v2\n' > "${tgt}/.claude/validation/lint-artifacts.sh"
   rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
   if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'canario-divergente'; then
-    record_pass "pin-integrity: canário divergente → untrusted (regressão incidente rhilo 06-30)"
+    record_pass "pin-integrity: canário divergente → untrusted (regressão do incidente de campo 06-30)"
   else record_fail "pin-integrity: canário" "esperava exit 1 canario-divergente; out='${out}' rc=${rc}"; fi
 
   # (c) pin unknown (recover honesto) → untrusted, sem quebrar
@@ -4240,7 +4272,7 @@ run_trust_topology_selftests
 # Modo onion-version — detecção de papel source/adopted via stamp (regressão FED-3-1; repo temp).
 run_onion_version_selftests
 
-# Modo pin-integrity — pin do stamp é hipótese: guard do /meta:adopt --update (incidente rhilo 06-30; sandbox git).
+# Modo pin-integrity — pin do stamp é hipótese: guard do /meta:adopt --update (incidente de campo 06-30; sandbox git).
 run_pin_integrity_selftests
 
 # Modo session-beacon — farol de sessão: I3 inclui sessões vivas (colisão W1×W2 de 2026-07-02; sandbox git).
@@ -4262,6 +4294,7 @@ run_outbox_channel_selftests
 run_kg_coverage_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
+run_vendor_scrub_selftests
 run_site_deeplink_selftests
 run_migalhas_generate_selftests
 run_kg_view_selftests

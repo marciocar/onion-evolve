@@ -528,7 +528,7 @@ SOURCE_ROOT="$(git rev-parse --show-toplevel)"; TARGET="<path do alvo>"
 ADOPTED_COMMIT="$(awk '/^source_commit:/{print $2}' "$TARGET/.claude/.onion-version")"
 NOW="$(git -C "$SOURCE_ROOT" rev-parse --short=12 HEAD)"
 
-# GUARD pin-integrity — o pin do stamp é HIPÓTESE, não fato (incidente 2026-06-30/rhilo: um restore
+# GUARD pin-integrity — o pin do stamp é HIPÓTESE, não fato (incidente 2026-06-30 num adotante: um restore
 # manual carimbou o HEAD do core sem copiar arquivos → anúncio "você já tem X" saiu falso; sinal
 # 2026-07-02-sinal-lint-only-ausente-no-vendor). Verifica: (1) pin existe na história do core;
 # (2) canário vendorizado bate com o conteúdo do pin. Pin não confiável → SEM early-exit

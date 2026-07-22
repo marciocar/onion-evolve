@@ -25,7 +25,7 @@
 #       invisível a esta guarda — por isso ela IMPRIME os marcadores que procurou,
 #       para que a omissão seja visível em vez de silenciosa.
 #  P2 — CAIXA: NOME e MARCADOR seguem regras DIFERENTES.
-#       · NOME comercial ("Grana.Ai", "Tornak") é sensível em QUALQUER caixa —
+#       · NOME comercial ("AcmeCorp", "Acme-Brand") é sensível em QUALQUER caixa —
 #         nenhuma variante dele é pública.
 #       · MARCADOR ("CONFIDENCIAL") é literal e só conta em caixa alta: em
 #         minúsculo "confidencial" é palavra comum do português, e casar sem caixa
@@ -34,7 +34,7 @@
 #       O que protege contra falso-positivo no id público não é a caixa, é a
 #       EXCLUSÃO EXPLÍCITA dos ids (abaixo) — a caixa nunca foi a defesa certa.
 #       ⚠️ ESTE PRESSUPOSTO NASCEU ERRADO: a 1ª versão casava tudo com caixa, e o
-#       teste de injeção provou que "post-tornak-x" (vazamento minúsculo dentro de
+#       teste de injeção provou que "post-acmecorp-x" (vazamento minúsculo dentro de
 #       um identificador) ESCAPAVA — P2 contradizia P4. O erro fica registrado, não
 #       apagado: guarda que só protege prosa não protege identificador.
 #  P3 — SUPERFÍCIES SÃO ENUMERADAS, não inferidas. Só o que está na lista é
@@ -168,7 +168,7 @@ fi
 #
 # O REGRA-30 padrão (superfícies públicas) é CHAPADO: nenhum nome comercial, ponto.
 # O histórico de federação NÃO pode ser auditado assim — 20 dos 22 aparecimentos são
-# o nome do PRÓPRIO membro no PRÓPRIO mailbox (outbox/granaai/ falando "Grana.Ai"),
+# o nome do PRÓPRIO membro no PRÓPRIO mailbox (outbox/<adotante>/ com o próprio nome-empresa),
 # que não vaza para ninguém: granaai já sabe que é granaai. Guarda que grita lobo 20×
 # é desligada no 1º dia — o modo de falha que esta casa mais paga.
 #
@@ -187,7 +187,7 @@ fi
 #                     re-projetado numa superfície pública, é a REGRA 30 que pega, no
 #                     ponto de projeção — não aqui, no armazenamento.
 # Origem: achado de campo 2026-07-21 — a própria REGRA 30, ao escanear o outbox,
-# pegou "Grana.Ai" numa mensagem entregue a metagamify (cross-tenant real).
+# pegou o nome comercial de um adotante numa mensagem entregue a OUTRO adotante (cross-tenant real).
 # ─────────────────────────────────────────────────────────────────────────────
 if [ "${FEDERATION}" = "1" ]; then
   # Mapa member_id → nome(s) comercial(is). Mesma lógica de marcador/token do

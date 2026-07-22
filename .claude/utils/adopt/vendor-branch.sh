@@ -75,7 +75,7 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   # pin ("update to pin ${PIN}"). Achado de campo 2026-07-21, medindo os 3
   # adotantes locais: DOIS tinham lixo carimbado —
   #     · gustavo-pulga : "vnextpin"     (placeholder digitado)
-  #     · rhilo-metagamify: "2026-07-12" (uma DATA no lugar do commit)
+  #     · outro adotante: "2026-07-12" (uma DATA no lugar do commit)
   # O dano não aparece no dia: aparece semanas depois, quando o 3-way merge usa
   # o commit errado como base e transforma ANCESTRALIDADE em conflito. Foi
   # exatamente o que aconteceu no update do gustavo-pulga (17 arquivos em

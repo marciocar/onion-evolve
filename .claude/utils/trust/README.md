@@ -12,7 +12,7 @@ anatomia do contrato é a mesma; o que muda é o eixo.
 | Adapter | Tier | Papel |
 |---|---|---|
 | `source.md` | **T0** | o core — origem do framework |
-| `hub.md` | **T1** | hub de linhagem (ex.: rhilo) |
+| `hub.md` | **T1** | hub de linhagem (ex.: um adotante multi-linhagem) |
 | `consumer.md` | **T2** | adotante downstream |
 | `standalone.md` | **T3** | instância isolada — **sem federação** |
 

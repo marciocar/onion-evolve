@@ -1638,7 +1638,7 @@ check_projection_safety() {
 #   é PERMITIDO — auditar chapado geraria 20 falso-positivos e a guarda morreria.
 #   Exclui members.yaml (fonte) e _processed/ (entregue; a casa não reescreve o
 #   passado — se re-projetado publicamente, a REGRA 30 pega no ponto de projeção).
-#   Origem: a própria REGRA 30, ao varrer o outbox, achou "Grana.Ai" numa mensagem
+#   Origem: a própria REGRA 30, ao varrer o outbox, achou o nome comercial de um adotante numa mensagem
 #   entregue a metagamify (cross-tenant real) — 2026-07-21.
 # ===========================================================================
 check_federation_projection() {
@@ -1713,6 +1713,46 @@ check_site_no_private_deeplinks() {
       violation "HARD" "${f#${REPO_ROOT}/}" "[site/404-privado] deep-link p/ repo PRIVADO dá 404 no público: ${h} — aponte para /historia/migalhas/provas/ (prova público-segura)"
     done <<< "${hits}"
   done < <(find "${site}" -type f \( -name '*.html' -o -name '*.xml' -o -name '*.md' \) 2>/dev/null | sort)
+}
+
+# ===========================================================================
+# REGRA 36 — Superfície VENDORIZADA sem nome comercial de cliente [HARD]
+#   O que /meta:adopt copia (.claude/{agents,commands,skills,utils,validation,
+#   hooks} + docs/{meta-specs,knowledge-base,sdaal}) VIAJA para todo adotante.
+#   Um nome comercial de um cliente ali chega na máquina de OUTRO cliente que
+#   não o conhece — cross-tenant por adoção. Origem: onboarding do Pedro (Aura,
+#   2026-07-22) exigiu uma "cópia limpa"; o scrub permanente + esta guarda
+#   fecham o gate de uma vez, em vez de um scrub que alguém tem que lembrar.
+#   Termos DERIVADOS do members.yaml (nunca hardcoded — nome no script é o
+#   próprio vazamento), MENOS os marcadores (CONFIDENCIAL/PRIVADO são vocabulário
+#   das guardas, legitimamente vendorizado). Fixtures isentas.
+# ===========================================================================
+check_vendored_surface_clean() {
+  local helper="${SCRIPT_DIR}/projection-safety.sh"
+  [ -f "${helper}" ] || return 0
+  local roots=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks \
+               docs/meta-specs docs/knowledge-base docs/sdaal)
+  local targets=() r
+  if [ -n "${ONLY_PATH}" ]; then
+    local under=0
+    for r in "${roots[@]}"; do case "${ONLY_PATH}" in "${REPO_ROOT}/${r}"/*) under=1 ;; esac; done
+    [ "${under}" = "1" ] || return 0
+    targets=("${ONLY_PATH}")
+  else
+    for r in "${roots[@]}"; do [ -e "${REPO_ROOT}/${r}" ] && targets+=("${REPO_ROOT}/${r}"); done
+  fi
+  [ ${#targets[@]} -gt 0 ] || return 0
+  local terms term f
+  terms="$(bash "${helper}" --emit-terms 2>/dev/null | grep -vE '^(CONFIDENCIAL|PRIVADO)$' || true)"
+  [ -n "${terms}" ] || return 0
+  while IFS= read -r term; do
+    [ -n "${term}" ] || continue
+    while IFS= read -r f; do
+      [ -n "${f}" ] || continue
+      case "${f}" in */fixtures/*) continue ;; esac
+      violation "HARD" "${f#${REPO_ROOT}/}" "[vendor-scrub] nome comercial '${term}' na superfície vendorizada — viaja p/ todo adotante (cross-tenant por adoção); generalize (um adotante não conhece o cliente de outro)"
+    done < <(grep -rilF -- "${term}" "${targets[@]}" 2>/dev/null | sort -u)
+  done <<< "${terms}"
 }
 
 # ===========================================================================
@@ -1842,6 +1882,7 @@ check_projection_safety
 check_federation_projection
 check_migalhas_sync
 check_site_no_private_deeplinks
+check_vendored_surface_clean
 check_frontmatter_model_category
 
 # ===========================================================================

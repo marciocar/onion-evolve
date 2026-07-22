@@ -38,7 +38,7 @@ Agentes especialistas de execução técnica do Onion: backend, frontend, banco,
 | [`@gamma-api-specialist`](gamma-api-specialist.md) | Gamma.App API — apresentações e conteúdo com IA | Integrações técnicas e automações com Gamma |
 | [`@runflow-specialist`](runflow-specialist.md) | Runflow SDK — agentes IA, workflows, RAG, integrações | Desenvolvimento via Runflow SDK |
 | [`@whisper-specialist`](whisper-specialist.md) | Whisper (OpenAI) — transcrição de áudio multi-plataforma | Transcrever áudio e processar fala em projetos locais |
-| [`@zen-engine-specialist`](zen-engine-specialist.md) | ZEN Engine / JDM (GoRules) — regras de negócio | Criar/validar JDM, Decision Tables, integração MetaGamify |
+| [`@zen-engine-specialist`](zen-engine-specialist.md) | ZEN Engine / JDM (GoRules) — regras de negócio | Criar/validar JDM, Decision Tables, integração projeto de gamificação |
 
 ### Plataforma e segurança
 

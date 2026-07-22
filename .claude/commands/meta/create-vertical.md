@@ -61,7 +61,7 @@ sujeito**, e deixar o repo em estado válido (SSOT sincronizada, lint verde).
 
 > **Duas acepções de "vertical", uma só máquina** (ADR `onion-adr-create-vertical-2026-07`,
 > Decisão 1): o padrão vale tanto para uma **dimensão do framework** (engineering) quanto
-> para um **projeto-cliente** (tornak). As verticais do Onion são as instâncias-dogfood.
+> para um **projeto-cliente** (um cliente real). As verticais do Onion são as instâncias-dogfood.
 
 ## 🧩 Modos (Decisão 2 — ambos)
 

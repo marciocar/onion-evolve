@@ -8,7 +8,7 @@
 #             gerado por máquina (inventory.sh) e o lint Onion o compara
 #             byte-a-byte (check_inventory_sync) — prettier reformata → violação
 #             HARD em laço vicioso. Resolve o backlog #7 / sinal de campo do
-#             rhilo-metagamify (inbox/_processed/2026-06-22-sinal-prettier-vendor-quebra-ssot.md).
+#             um adotante multi-linhagem (sinal de vendor-prettier quebrando SSOT, jun/2026).
 #
 # Mecânica  : Lê a lista curada de paths de prettierignore-onion.tpl (irmão).
 #             - Alvo SEM .prettierignore → cria com o template inteiro (paths +
