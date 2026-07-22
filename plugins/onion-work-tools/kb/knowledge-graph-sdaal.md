@@ -269,7 +269,7 @@ técnico — ver a ressalva do maestro em
 **KG-first + drive-to-verify são o par canônico** (ADR §SSOT como runtime): nenhum sozinho basta — o KG
 stale engana; o git sozinho esquece o que a SSOT já sabia.
 
-### Relatório é PROJEÇÃO do grafo, não fonte paralela (a metade que faltava — achado de campo, granaai, 2026-07-20)
+### Relatório é PROJEÇÃO do grafo, não fonte paralela (a metade que faltava — achado de campo, um adotante regulado, 2026-07-20)
 
 O ciclo `read→verify→act→write` acima estava **fechado na leitura e aberto na escrita**. Toda a doutrina
 desta seção — hierarquia de forcing-function, comandos cabeados, `allowed-tools` liberando o radar —
@@ -277,7 +277,7 @@ existe para garantir que ninguém *raciocine* sem antes consultar o grafo. Mas n
 impedia que um comando **produzisse conhecimento estruturado e o deixasse fora do grafo**. O laço estava
 fechado em "não deixe o KG mentir" e aberto em "não deixe conhecimento viver fora do KG".
 
-**A evidência auto-incriminadora** (sinal de campo da granaai,
+**A evidência auto-incriminadora** (sinal de campo de um adotante regulado,
 [`2026-07-20-gate-proveniencia-invertido.md`](../../evolution/inbox/_processed/2026-07-20-gate-proveniencia-invertido.md)):
 uma rodada de auditoria orquestrada — **70 agentes, 0 erros, 50 achados confirmados + 10 refutados**,
 tudo em JSON estruturado — e **nada disso foi ingerido no `.kg.yaml`**. A raiz não estava na execução
@@ -291,7 +291,7 @@ acima exige.
 neste mesmo documento, já dizia — antes deste achado — que "síntese que não persistiu é síntese
 perdida" e que "advice-que-depende-de-lembrar falhou empiricamente". O core diagnosticou corretamente e
 escreveu a frase certa: **"mecanismo, não conselho"** — e mesmo assim deixou a perna da escrita como
-**conselho**, sem uma trava equivalente à do `read`. A granaai construiu o mecanismo que faltava; o core
+**conselho**, sem uma trava equivalente à do `read`. Um adotante regulado construiu o mecanismo que faltava; o core
 só tinha o texto.
 
 **O princípio, para valer daqui em diante:** se um comando produz achados estruturados, o destino é o

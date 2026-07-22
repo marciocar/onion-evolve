@@ -7,14 +7,14 @@
 #             responde "qual branch é a PRODUÇÃO?" — a base de hotfix, o alvo do
 #             release, o valor de `git config gitflow.branch.master`.
 #
-# Origem de campo (sinal granaai, 2026-07-19):
+# Origem de campo (sinal de um adotante regulado, 2026-07-19):
 #             o /meta:adopt derivava produção do DEFAULT do repo (origin/HEAD).
-#             No repo granaai, `origin/HEAD -> origin/develop` (o default do
+#             No repo de um adotante regulado, `origin/HEAD -> origin/develop` (o default do
 #             GitHub aponta para a branch de trabalho), então a adoção gravava
 #             `gitflow.branch.master=develop` — produção == integração. O veneno
 #             é durável: o consumidor resolve-integration-branch.sh LÊ esse
-#             config, então o erro se propaga a cada resolução seguinte. A
-#             granaai TEM `origin/master` viva (adbebb35d, 2026-07-19) — a
+#             config, então o erro se propaga a cada resolução seguinte. O
+#             adotante regulado TEM `origin/master` viva (adbebb35d, 2026-07-19) — a
 #             produção existia e estava a um `show-ref` de distância; o que
 #             faltava era não confiar cegamente no origin/HEAD.
 #
@@ -23,7 +23,7 @@
 #       nomes convencionais `master` e `main`, preferindo `refs/remotes/origin/`
 #       a `refs/heads/` — o remoto é a verdade compartilhada; o local pode ser
 #       um resquício da máquina. Verificar o ref (em vez de assumir o nome) é o
-#       que teria achado a produção da granaai.
+#       que teria achado a produção de um adotante regulado.
 #   (2) origin/HEAD é candidato LEGÍTIMO **somente quando DIFERE** da branch de
 #       integração. origin/HEAD não é lixo — é o único sinal que cobre
 #       trunk-based com default fora da convenção (`trunk`, `production`,
@@ -42,7 +42,7 @@
 #       origin/HEAD e o candidato distinto vence naturalmente.
 #   (5) NUNCA chutar "main". Sem candidato identificável, o STDOUT sai VAZIO e o
 #       STDERR explica como setar à mão. Um palpite aqui vira config durável
-#       errada (exatamente o dano do sinal granaai) — melhor não gravar nada do
+#       errada (exatamente o dano do sinal de um adotante regulado) — melhor não gravar nada do
 #       que gravar mentira.
 #
 # Uso       : resolve-production-branch.sh <REPO_DIR> [--integration <branch>]

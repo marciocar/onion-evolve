@@ -62,7 +62,7 @@
 #      docs/analysis/ e docs/evolution/research/ deve ser citado em trace:/evidence:
 #      por algum .kg.yaml. Passivo no baseline versionado = SOFT; documento NOVO fora
 #      do baseline = HARD; baseline que CRESCE = HARD. Delega a kg-provenance-coverage.sh
-#      (escopo e exclusões justificados lá). Sinal granaai 2026-07-20.
+#      (escopo e exclusões justificados lá). Sinal de um adotante regulado, 2026-07-20.
 #
 # Convenção: .claude/validation/fixtures/ guarda TEMPLATES de teste das próprias
 #   guardas (consumidos por lint-selftest.sh), não artefatos ativos. As 4 regras de
@@ -1448,7 +1448,7 @@ check_research_kg() {
 #   origem?"; a R26 pergunta "esta PASTA de pesquisa tem .kg.yaml?". Falta a
 #   terceira: "este DOCUMENTO existe no grafo?" — coberto = algum nó de algum
 #   .kg.yaml o cita em trace:/evidence:.
-#   Origem de campo: sinal granaai 2026-07-20 (docs/evolution/inbox/
+#   Origem de campo: sinal de um adotante regulado 2026-07-20 (docs/evolution/inbox/
 #   2026-07-20-gate-proveniencia-invertido.md) — a doutrina KG-SSOT tinha forcing
 #   function só na LEITURA; nada impedia conhecimento de NASCER fora do grafo.
 #   CATRACA (o que torna adotável): passivo no baseline versionado = SOFT;
@@ -1639,7 +1639,7 @@ check_projection_safety() {
 #   Exclui members.yaml (fonte) e _processed/ (entregue; a casa não reescreve o
 #   passado — se re-projetado publicamente, a REGRA 30 pega no ponto de projeção).
 #   Origem: a própria REGRA 30, ao varrer o outbox, achou o nome comercial de um adotante numa mensagem
-#   entregue a metagamify (cross-tenant real) — 2026-07-21.
+#   entregue a um adotante multi-linhagem (cross-tenant real) — 2026-07-21.
 # ===========================================================================
 check_federation_projection() {
   local helper="${SCRIPT_DIR}/projection-safety.sh"

@@ -95,13 +95,13 @@ ele hardcoda `role: source` (identidade da FONTE) e, vendorizado num adotante, m
 Ler o campo `alvo:` do cabeçalho da entrada e resolver contra `docs/evolution/federation/members.yaml`.
 
 > ⚠️ **Normalizar primeiro:** o `alvo:` real costuma ter uma **anotação entre parênteses** (ex.:
-> `alvo: metagamify (informativo p/ demais)`, `alvo: nenhum (informativo, sem ação)`). Parsear o(s)
+> `alvo: um adotante multi-linhagem (informativo p/ demais)`, `alvo: nenhum (informativo, sem ação)`). Parsear o(s)
 > **token(s) antes do primeiro `(`** e descartar a anotação. Não casar a string inteira.
 
 - `nenhum` → **parar**: entrada informativa, sem destinatário. Nada a anunciar.
 - `futuros adotantes` → **parar**: aplica-se a adoções futuras (chega via `/meta:adopt`), não a um adotante atual.
 - `adotantes` / `todos` → **todos** os `role: hub` ou `role: standalone` do `members.yaml` (T1/T3, adotam o core direto — RFC-0003 §2.1).
-- `<id>` (ex.: `metagamify`) → esse membro (role `hub` ou `standalone`).
+- `<id>` (ex.: `um adotante multi-linhagem`) → esse membro (role `hub` ou `standalone`).
 - **Seletor fino (F1.2 — mata o ruído):** `<key>:<value>[,<key>:<value>]` (AND) sobre atributos do
   `members.yaml` — `key ∈ {mode|tier|specialization}`. Ex.: `alvo: mode:regulated` (só regulados),
   `alvo: specialization:nx-monorepo`, `alvo: mode:regulated,tier:standalone`. Assim um anúncio só chega a

@@ -299,7 +299,7 @@ mecanismo. Ver [[inverted-provenance-ratchet]] no diário.
   `/meta:kb-freshness` e `/meta:context-freshness` — e qualquer comando que produza achados
   estruturados — materializam aqui **antes** de renderizar seu relatório final; o markdown é
   **projeção** do `.kg.yaml`, nunca fonte paralela. Senão o grafo vira predecessor da avaliação em
-  vez de destino dela (sinal de campo granaai, 2026-07-20: uma avaliação de 70 agentes com 60
+  vez de destino dela (sinal de campo de um adotante regulado, 2026-07-20: uma avaliação de 70 agentes com 60
   achados estruturados em JSON não deixou nó nenhum no SSOT — o plano declarara "saída:
   relatório.md").
 - **Append-mostly**: corrigir = adicionar nó/aresta ou mudar `status`; **nunca** deletar nós

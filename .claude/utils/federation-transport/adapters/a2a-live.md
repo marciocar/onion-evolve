@@ -16,7 +16,7 @@
 - **Verificação-antes-de-agir** (a spec A2A já exige do receptor): `pin-integrity-check.sh` + trust SDAAL +
   anti-replay (`jti`)/anti-SSRF/assinatura (JWS) **antes** de qualquer sinal virar ação. Ingestão remota =
   supply-chain não-confiável até verificada (`S4·F6`).
-- **`never-live-pull`** p/ regulados (ex.: granaai): recebe sinal, mas só aplica pelo mesmo gate (proposta →
+- **`never-live-pull`** p/ regulados (ex.: um adotante regulado): recebe sinal, mas só aplica pelo mesmo gate (proposta →
   confirmação do maestro). Nunca puxa framework ao vivo.
 
 ## deliver(signal)

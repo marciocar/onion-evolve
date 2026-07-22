@@ -1023,10 +1023,10 @@ run_resolve_selftests() {
 
   # (a) campo integration_branch presente → vence toda a cadeia
   d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
-  printf 'role: adopted\nintegration_branch: arandek-evolve\n' > "${d}/.claude/.onion-version"
+  printf 'role: adopted\nintegration_branch: acme-evolve\n' > "${d}/.claude/.onion-version"
   out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
-  if [ "${out}" = "arandek-evolve" ]; then record_pass "resolve: campo integration_branch vence"
-  else record_fail "resolve: campo integration_branch vence" "esperava 'arandek-evolve', veio '${out}'"; fi
+  if [ "${out}" = "acme-evolve" ]; then record_pass "resolve: campo integration_branch vence"
+  else record_fail "resolve: campo integration_branch vence" "esperava 'acme-evolve', veio '${out}'"; fi
 
   # (b) sem campo, git config gitflow.branch.develop setado → fallback git config
   d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
@@ -1092,11 +1092,11 @@ run_resolve_selftests() {
 # Modo resolve-production — exercita .claude/validation/resolve-production-branch.sh
 # (irmão do resolve-integration acima). Cenários self-contained (repos git
 # temporários), um por DEFEITO encontrado pela verificação adversarial (sinal
-# granaai 2026-07-19). --integration é passado explícito em cada caso: isola o
+# um adotante regulado 2026-07-19). --integration é passado explícito em cada caso: isola o
 # contrato do resolve-production-branch.sh (candidatos + regras 1-5) da
 # resolução de integração em si (já coberta por run_resolve_selftests acima).
 #   (1) greenfield trunk-based : só main, sem develop            → "main" SEM alarme        (D1)
-#   (2) GitFlow clássico       : master viva + develop, origin/HEAD→develop → "master"       (D2/D4, caso granaai)
+#   (2) GitFlow clássico       : master viva + develop, origin/HEAD→develop → "master"       (D2/D4, caso de um adotante regulado)
 #   (3) pós-rename             : master (antiga) + main (recente) → main + AVISO ambiguidade (D3)
 #   (4) default customizado    : sem master/main, origin/HEAD→"trunk"≠integração → "trunk"    (D4)
 #   (5) não identificável      : sem master/main, origin/HEAD==integração → VAZIO + aviso     (D5)
@@ -1133,7 +1133,7 @@ run_resolve_production_selftests() {
     record_fail "resolve-production: greenfield trunk-based" "esperava out='main' sem stderr, veio out='${RP_OUT}' err='${RP_ERR}'"
   fi
 
-  # (2) GitFlow clássico: master (viva) + develop, origin/HEAD→develop → "master", NUNCA "develop" (caso granaai)
+  # (2) GitFlow clássico: master (viva) + develop, origin/HEAD→develop → "master", NUNCA "develop" (caso de um adotante regulado)
   d="$(mktemp -d)"; git -C "${d}" init -q
   git -C "${d}" symbolic-ref HEAD refs/heads/zzz-local
   git -C "${d}" commit -q --allow-empty -m base
@@ -1242,7 +1242,7 @@ run_durable_commit_selftests() {
     printf '# novo\n' > "${d}/.claude/commands/newcmd.md"
     mkdir -p "${d}/docs/meta-specs"; printf '# spec\n' > "${d}/docs/meta-specs/spec.md"
     mkdir -p "${d}/src"; printf 'produto\n' > "${d}/src/app.js"
-    # artefatos GERADOS na adoção (achado de campo gustavo-pulga 2026-07-09): devem ser durables também
+    # artefatos GERADOS na adoção (achado de campo de um adotante de campo 2026-07-09): devem ser durables também
     printf '# CLAUDE\n' > "${d}/CLAUDE.md"
     printf 'x merge=union\n' > "${d}/.gitattributes"
     mkdir -p "${d}/docs/onion"; printf '# inventory\n' > "${d}/docs/onion/inventory.md"
@@ -1264,7 +1264,7 @@ run_durable_commit_selftests() {
     record_pass "durable-commit: instalação (L1+L2) commitada na branch dedicada"
   else record_fail "durable-commit: cura" "Onion não durável na branch dedicada"; fi
 
-  # (b2) artefatos GERADOS na adoção também durables (regressão do achado gustavo-pulga)
+  # (b2) artefatos GERADOS na adoção também durables (regressão do achado de um adotante de campo)
   if git -C "${d}" ls-files --error-unmatch CLAUDE.md >/dev/null 2>&1 \
      && git -C "${d}" ls-files --error-unmatch .gitattributes >/dev/null 2>&1 \
      && git -C "${d}" ls-files --error-unmatch docs/onion/inventory.md >/dev/null 2>&1; then
@@ -1333,7 +1333,7 @@ run_vendor_pin_selftests
   # adotantes locais tinham lixo carimbado ("vnextpin"; "2026-07-12", uma data).
   # O dano é diferido — aparece semanas depois, quando o 3-way merge usa a base
   # errada e vira ANCESTRALIDADE lida como conflito (17 arquivos, todos
-  # byte-idênticos ao core, no update real do gustavo-pulga).
+  # byte-idênticos ao core, no update real de um adotante de campo).
   # Os dois lados: lixo REPROVA (rc=2) e commit real PASSA da validação.
   local _rc
   _rc=0; bash "${helper}" update "$t" "$core" "vnextpin" "$ib" >/dev/null 2>&1 || _rc=$?
@@ -1460,14 +1460,14 @@ run_compose_settings_selftests() {
   if ! command -v jq >/dev/null 2>&1; then record_pass "compose-settings: jq ausente → pulado (gracioso)"; return; fi
   local d; d="$(mktemp -d)"
   printf '%s' '{"theme":"dark","permissions":{"allow":["Bash(git *)"],"deny":[]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"fw"}]}]}}' > "$d/fw.json"
-  printf '%s' '{"permissions":{"deny":["x"]},"env":{"ORG":"granaai"}}' > "$d/org.json"
+  printf '%s' '{"permissions":{"deny":["x"]},"env":{"ORG":"acme"}}' > "$d/org.json"
   printf '%s' '{"model":"opus","permissions":{"allow":["Bash(nx *)"]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"team"}]}]}}' > "$d/team.json"
   printf '%s' '{"theme":"light","env":{"EDITOR":"vim"}}' > "$d/person.json"
   local C; C="$(bash "${helper}" "$d/fw.json" "$d/org.json" "$d/team.json" "$d/person.json" 2>/dev/null)"
   if [ "$(printf '%s' "$C" | jq -r .theme)" = "light" ] \
      && [ "$(printf '%s' "$C" | jq -r .model)" = "opus" ] \
      && [ "$(printf '%s' "$C" | jq -c '.permissions.allow')" = '["Bash(git *)","Bash(nx *)"]' ] \
-     && [ "$(printf '%s' "$C" | jq -r '.env.ORG')" = "granaai" ] && [ "$(printf '%s' "$C" | jq -r '.env.EDITOR')" = "vim" ] \
+     && [ "$(printf '%s' "$C" | jq -r '.env.ORG')" = "acme" ] && [ "$(printf '%s' "$C" | jq -r '.env.EDITOR')" = "vim" ] \
      && [ "$(printf '%s' "$C" | jq '.hooks.SessionStart|length')" = "2" ]; then
     record_pass "compose-settings: N-camadas (escalar last-wins + objeto recursa + array união)"
   else record_fail "compose-settings: merge" "composição incorreta (theme/model/allow/env/hooks)"; fi
@@ -1658,7 +1658,7 @@ run_site_inventory_selftests() {
 
 # ---------------------------------------------------------------------------
 # Modo adopted-role — os checks de marketplace (plugins_sync/role_bundle_sync) devem PULAR
-# em role: adopted (consumidor não distribui plugins). Sinal granaai 2026-07-10: rodando como
+# em role: adopted (consumidor não distribui plugins). Sinal de um adotante regulado 2026-07-10: rodando como
 # source, o selftest mascarava a regressão — este caso roda o lint num sandbox COM stamp adopted
 # e SEM plugins/ + marketplace.json, e assere zero violação de marketplace.
 # ---------------------------------------------------------------------------
@@ -1678,7 +1678,7 @@ run_adopted_role_selftests() {
   else
     record_pass "adopted-role: role adopted sem plugins/ → 0 violações de marketplace (guarda por papel)"
   fi
-  # link-check role-guard (sinal granaai 2026-07-16): adotante NÃO vendoriza docs core-only → links
+  # link-check role-guard (sinal de um adotante regulado 2026-07-16): adotante NÃO vendoriza docs core-only → links
   # vendorizados que os referenciam devem ser PULADOS; MAS link KB-interno quebrado ainda VIOLA (precisão).
   rm -rf "${asb}/docs/analysis" "${asb}/docs/discussions" "${asb}/docs/applying" "${asb}/docs/evolution/federation"
   printf '# t\n[core-only](../analysis/foo.md)\n[kb-interno-faltando](concepts/nao-existe-xyz.md)\n' \
@@ -1694,7 +1694,7 @@ run_adopted_role_selftests() {
 }
 
 # ---------------------------------------------------------------------------
-# Modo write-stamp — escrita determinística do .onion-version (sinal granaai multi-lineage:
+# Modo write-stamp — escrita determinística do .onion-version (sinal de um adotante regulado multi-lineage:
 # a regra preserve-adopted_at era prosa e uma sessão a violou; agora é código testado).
 # ---------------------------------------------------------------------------
 run_write_stamp_selftests() {
@@ -1964,7 +1964,7 @@ YML
   if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"apply_mode":"propose-only"'; then record_pass "a2a-verify: receptor regulado → apply_mode:propose-only (never-live-pull)"
   else record_fail "a2a-verify: regulated" "out='${out}' rc=${rc}"; fi
 
-  # kid-binding: from=fin (sem k1 nas suas a2a.keys) assina com k1 → veto (anti-impersonação, hardening metagamify)
+  # kid-binding: from=fin (sem k1 nas suas a2a.keys) assina com k1 → veto (anti-impersonação, hardening de um adotante multi-linhagem)
   _verify onion-evolve "$(_env "$(_jws fin onion-evolve "${NOW}" "$((NOW+3600))" jti-imp)" fin onion-evolve "")"
   if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'kid-not-owned-by-from'; then record_pass "a2a-verify: kid de outro dono (impersonação) → veto kid-not-owned-by-from"
   else record_fail "a2a-verify: kid-binding" "out='${out}' rc=${rc}"; fi
@@ -2066,9 +2066,9 @@ run_a2a_accept_selftests() {
   d="$(mktemp -d)"; ib="${d}/inbox"; mkdir -p "${ib}"
   rec="${d}/verified.json"
   cat > "${rec}" <<'JSON'
-{"taskId":"t1","receivedAt":"2026-07-09T21:42:01Z","from":"metagamify","signal":{"id":"2026-07-09-metagamify-a2a-hello","from":"metagamify","to":"onion-evolve","kind":"signal","body_path":"docs/x.md"},"verdict":{"verified":true,"regulated":false,"apply_mode":"gated"}}
+{"taskId":"t1","receivedAt":"2026-07-09T21:42:01Z","from":"acme","signal":{"id":"2026-07-09-acme-a2a-hello","from":"acme","to":"onion-evolve","kind":"signal","body_path":"docs/x.md"},"verdict":{"verified":true,"regulated":false,"apply_mode":"gated"}}
 JSON
-  doc="${ib}/2026-07-09-metagamify-a2a-hello.md"
+  doc="${ib}/2026-07-09-acme-a2a-hello.md"
   rc=0; out="$(bash "${helper}" "${rec}" --inbox "${ib}" 2>/dev/null)" || rc=$?
   if [ "${rc}" -eq 0 ] && [ -f "${doc}" ]; then record_pass "a2a-accept: verificado → doc de inbox criado"
   else record_fail "a2a-accept: create" "rc=${rc} out='${out}'"; fi
@@ -2136,7 +2136,7 @@ run_show_scope_selftests() {
   local TAB=$'\t'
   local d; d="$(mktemp -d)"
   printf '%s' '{"theme":"dark","permissions":{"allow":["Bash(git *)"],"deny":[]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"fw"}]}]}}' > "$d/fw.json"
-  printf '%s' '{"permissions":{"deny":["x"]},"env":{"ORG":"granaai"}}' > "$d/org.json"
+  printf '%s' '{"permissions":{"deny":["x"]},"env":{"ORG":"acme"}}' > "$d/org.json"
   printf '%s' '{"model":"opus","permissions":{"allow":["Bash(nx *)"]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"team"}]}]}}' > "$d/team.json"
   printf '%s' '{"theme":"light","env":{"EDITOR":"vim"}}' > "$d/person.json"
 
@@ -2148,7 +2148,7 @@ run_show_scope_selftests() {
      && printf '%s\n' "$S" | grep -qxF "# layers: framework empresa time pessoa · role: adopted · form: docs-only" \
      && printf '%s\n' "$S" | grep -qxF "pessoa${TAB}theme=\"light\"${TAB}# sobrepõe: framework" \
      && printf '%s\n' "$S" | grep -qxF "time${TAB}model=\"opus\"" \
-     && printf '%s\n' "$S" | grep -qxF "empresa${TAB}env.ORG=\"granaai\"" \
+     && printf '%s\n' "$S" | grep -qxF "empresa${TAB}env.ORG=\"acme\"" \
      && printf '%s\n' "$S" | grep -qxF "framework${TAB}permissions.allow[0]=\"Bash(git *)\"" \
      && printf '%s\n' "$S" | grep -qxF "time${TAB}permissions.allow[1]=\"Bash(nx *)\"${TAB}# merged"; then
     record_pass "show-scope: texto (vencedor + sobrepõe + set-once + chave profunda + array merged)"
@@ -3193,7 +3193,7 @@ run_onion_version_selftests() {
 # ---------------------------------------------------------------------------
 # Modo kg-provenance — GATE DE PROVENIÊNCIA INVERTIDO com catraca (REGRA 29).
 #
-# Origem: sinal granaai 2026-07-20 — a doutrina KG-SSOT tinha forcing function só
+# Origem: sinal de um adotante regulado 2026-07-20 — a doutrina KG-SSOT tinha forcing function só
 # na LEITURA; nada impedia conhecimento de NASCER fora do grafo.
 #
 # Este bloco NÃO testa só o happy-path da regra: testa os PRESSUPOSTOS de que ela
@@ -4031,7 +4031,7 @@ run_pin_integrity_selftests() {
     record_pass "pin-integrity: pin real + canário íntegro → pin-ok"
   else record_fail "pin-integrity: pin-ok" "esperava exit 0 'pin-ok ${pin1}'; out='${out}' rc=${rc}"; fi
 
-  # (b) CASO RHILO — pin real mas canário divergente (vendor mais velho/novo que o stamp) → untrusted
+  # (b) CASO DE CAMPO — pin real mas canário divergente (vendor mais velho/novo que o stamp) → untrusted
   printf '#!/bin/sh\necho v2\n' > "${tgt}/.claude/validation/lint-artifacts.sh"
   rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
   if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'canario-divergente'; then
@@ -4290,7 +4290,7 @@ run_diary_crumbs_selftests
 # Modo outbox-channel — REGRA 28 do lint: anúncio em staging p/ membro SEM canal de recepção (achado 2026-07-19; sandbox).
 run_outbox_channel_selftests
 
-# Modo kg-coverage — REGRA 29: gate de proveniência INVERTIDO com catraca (sinal granaai 2026-07-20).
+# Modo kg-coverage — REGRA 29: gate de proveniência INVERTIDO com catraca (sinal de um adotante regulado 2026-07-20).
 run_kg_coverage_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.

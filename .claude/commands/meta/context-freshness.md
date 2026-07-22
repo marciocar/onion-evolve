@@ -142,7 +142,7 @@ No contexto principal (0 tokens de modelo):
 5. **Grafo primeiro**: contradição cross-domínio e candidatos `HISTORICAL` são achados estruturados
    — materialize via `/meta:kg` (nó `claim`, `layer: audit`, `trace` ao arquivo) **antes** de
    fechar a saída abaixo. O relatório é **vista** do grafo, não destino do achado (senão o grafo
-   fica predecessor da avaliação em vez de destino dela — sinal de campo granaai, 2026-07-20).
+   fica predecessor da avaliação em vez de destino dela — sinal de campo de um adotante regulado, 2026-07-20).
 > ⚠️ **Alcance honesto:** este comando **não escreve arquivo** (a saída é bloco de console), logo
 > **nenhum gate o alcança** — a ordem grafo-primeiro aqui é doutrina de execução, não mecanismo. Quem cai
 > no escopo HARD do `kg-provenance-coverage.sh` é quem materializa em `docs/analysis/` ou

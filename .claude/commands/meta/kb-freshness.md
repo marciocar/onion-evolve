@@ -179,7 +179,7 @@ No contexto principal (custo 0 tokens de modelo), consolide `findings`:
 5. **Grafo primeiro**: achados `HISTORICAL` e alertas transversais são achados estruturados —
    materialize via `/meta:kg` (nó `claim`, `layer: audit`, `trace` à KB) **antes** de fechar o
    relatório abaixo. O relatório é **vista** do grafo, não destino do achado (senão o grafo fica
-   predecessor da avaliação em vez de destino dela — sinal de campo granaai, 2026-07-20).
+   predecessor da avaliação em vez de destino dela — sinal de campo de um adotante regulado, 2026-07-20).
 > ⚠️ **Alcance honesto:** este comando **não escreve arquivo** (a saída é bloco de console), logo
 > **nenhum gate o alcança** — a ordem grafo-primeiro aqui é doutrina de execução, não mecanismo. Quem cai
 > no escopo HARD do `kg-provenance-coverage.sh` é quem materializa em `docs/analysis/` ou

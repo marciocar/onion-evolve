@@ -74,11 +74,11 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   # Este script gravava no histórico do adotante QUALQUER string recebida como
   # pin ("update to pin ${PIN}"). Achado de campo 2026-07-21, medindo os 3
   # adotantes locais: DOIS tinham lixo carimbado —
-  #     · gustavo-pulga : "vnextpin"     (placeholder digitado)
+  #     · um adotante de campo : "vnextpin"     (placeholder digitado)
   #     · outro adotante: "2026-07-12" (uma DATA no lugar do commit)
   # O dano não aparece no dia: aparece semanas depois, quando o 3-way merge usa
   # o commit errado como base e transforma ANCESTRALIDADE em conflito. Foi
-  # exatamente o que aconteceu no update do gustavo-pulga (17 arquivos em
+  # exatamente o que aconteceu no update de um adotante de campo (17 arquivos em
   # conflito, todos byte-idênticos ao core — conflito contábil, não de conteúdo).
   # É o mecanismo concreto do "drift silencioso de pin" que o grafo já registrava
   # em abstrato (REC_PIN_DRIFT_REAL_HEALTH_METRIC).

@@ -2,7 +2,7 @@
 # =============================================================================
 # write-stamp.sh — escrita DETERMINÍSTICA do .claude/.onion-version (adoção E update).
 #
-# Origem: sinal 2026-07-10-granaai-multi-lineage — a regra "adopted_at NUNCA re-carimba;
+# Origem: sinal de um adotante regulado (2026-07-10, multi-linhagem) — a regra "adopted_at NUNCA re-carimba;
 # a data de update vive em updated_at" existia como PROSA no adopt.md (l.506-510) e uma sessão
 # a violou no --update (re-rodou o heredoc da Fase 5 verbatim). Prosa não segura deslize de LLM;
 # este helper determiniza ("conserta o propagador").

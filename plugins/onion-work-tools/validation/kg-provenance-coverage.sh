@@ -15,7 +15,7 @@
 #             Um documento de análise está COBERTO quando algum nó de algum
 #             .kg.yaml do repo o cita em `trace:` ou `evidence:`.
 #
-# Origem de campo (sinal granaai, 2026-07-20 — docs/evolution/inbox/
+# Origem de campo (sinal de um adotante regulado, 2026-07-20 — docs/evolution/inbox/
 #             2026-07-20-gate-proveniencia-invertido.md):
 #             a doutrina KG-SSOT tinha forcing function só na LEITURA (/catch-up
 #             passo 0, kg-radar reprovando grafo inconsistente, STALE-TRACE).
@@ -75,7 +75,7 @@
 #   Distinção da REGRA 26 (check_research_kg) — NÃO é duplicata: aquela exige que
 #   o DIRETÓRIO de pesquisa contenha algum .kg.yaml; esta exige que o DOCUMENTO
 #   seja CITADO por algum nó. Uma pesquisa pode ter .kg.yaml e ainda assim ter um
-#   relatório órfão ao lado dele — exatamente o formato do incidente granaai.
+#   relatório órfão ao lado dele — exatamente o formato do incidente de um adotante regulado.
 #
 # ---------------------------------------------------------------------------
 # DECIDIDO SÓ COM O REPO (não é no-op no CI)

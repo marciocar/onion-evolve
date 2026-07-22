@@ -178,7 +178,7 @@ No contexto principal, parta de `allFindings` (já com `id` estável):
    (`claim`, `layer: audit`, `trace` para a evidência) no `.kg.yaml` de auditoria; `kg-radar.sh`
    deve fechar exit 0 antes de seguir. O grafo é o **destino** dos achados estruturados, não o
    relatório — senão ele vira predecessor da avaliação em vez de destino dela (lição do sinal de
-   campo granaai, 2026-07-20: 70 agentes/60 achados foram parar só em markdown).
+   campo de um adotante regulado, 2026-07-20: 70 agentes/60 achados foram parar só em markdown).
 5. Escreva o relatório — **projeção do grafo**, não fonte paralela — em
    `docs/analysis/onion-evolution-<YYYY-MM-DD>.md` (única escrita em **markdown**; **nunca** em
    `.claude/`).

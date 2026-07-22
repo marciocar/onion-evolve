@@ -50,7 +50,7 @@ related_agents:
 
 Generaliza o **DNA do `onion`** (hub-skill + help contextual + resolver de SSOT/book +
 bootstrap) para scaffoldar uma **vertical** de 1ª classe — o padrão que todo adotante
-hoje reinventa à mão (sinal de campo gustavo-pulga A1). Orquestrador **fino-delega**
+hoje reinventa à mão (sinal de um adotante de campo A1). Orquestrador **fino-delega**
 (mesmo espírito de `create-command`/`create-skill`): **compõe** os helpers testáveis da
 F1 e os `create-*`, não reimplementa.
 

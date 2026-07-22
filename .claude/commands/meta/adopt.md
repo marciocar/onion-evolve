@@ -165,10 +165,10 @@ git -C "$DEST" config gitflow.branch.develop "$INTEGRATION_BRANCH"
 # master = branch de PRODUÇÃO do alvo. Delega ao helper irmão do resolve-integration-branch.sh —
 # .claude/validation/resolve-production-branch.sh — mesmo padrão testável dos passos vizinhos
 # (coberto por lint-selftest.sh). NUNCA derivar de origin/HEAD sozinho: em repos GitFlow o default
-# branch do remote costuma SER a integração (develop) — sinal de campo real, granaai, 2026-07-19:
+# branch do remote costuma SER a integração (develop) — sinal de campo real, de um adotante regulado, 2026-07-19:
 # origin/HEAD apontava para origin/develop, e a adoção antiga gravava gitflow.branch.master=develop
 # (idêntico a gitflow.branch.develop) porque a resolução confiava cegamente no default do remote em
-# vez de localizar uma master/main REAL. O bug NÃO era falta de produção — a granaai TEM
+# vez de localizar uma master/main REAL. O bug NÃO era falta de produção — um adotante regulado TEM
 # origin/master viva (produção real, ativa) — o problema era o origin/HEAD apontando para a branch
 # errada. O helper acha a produção real por show-ref (nunca chuta) e só aceita origin/HEAD como
 # candidato quando ele DIFERE da integração (cobre trunk-based por design sem reproduzir o bug).
@@ -433,7 +433,7 @@ fi
   *scripts* dos hooks já vieram via `.claude/hooks/` (manifesto da Fase 2); o **registro** é o passo (1) do
   Procedimento. Fecha o trio no alvo: o hook tem o que escanear (`inbox/`) e o `/meta:co-evolve` orienta o consumidor.
 - **Gerar o inventário DO ALVO** — o lint vendorizado (R8) exige `docs/onion/inventory.md` e o
-  hook nativo bloqueia o commit da adoção sem ele (gap descoberto no dogfood pulse-mais,
+  hook nativo bloqueia o commit da adoção sem ele (gap descoberto no dogfood de um adotante,
   2026-07-05 — o 1º commit foi bloqueado pelo próprio hook recém-instalado):
   ```bash
   mkdir -p "$INSTALL_DIR/docs/onion"
@@ -452,7 +452,7 @@ Ver [🔁 Transição de Contexto](#-transição-de-contexto-fonte--alvo). No al
 # USAR os SRC_* do PASSO 0 (carregados via STATE.md — shell não persiste). NÃO re-rodar
 # onion-version.sh a partir do alvo (daria a identidade errada).
 # Escrita DETERMINÍSTICA via helper — NUNCA heredoc à mão: a semântica adopted_at/updated_at vive no
-# script, coberta por selftest (nasceu do sinal granaai 2026-07-10: re-carimbo por deslize de sessão).
+# script, coberta por selftest (nasceu do sinal de um adotante regulado 2026-07-10: re-carimbo por deslize de sessão).
 bash "$SOURCE_ROOT/.claude/utils/adopt/write-stamp.sh" "$INSTALL_DIR" \
   --framework "${SRC_FRAMEWORK}" --commit "${SRC_COMMIT}" --commit-date "${SRC_COMMIT_DATE}" \
   --adopted-from "$(git -C "$SOURCE_ROOT" remote get-url origin 2>/dev/null || echo "$SOURCE_ROOT")" \

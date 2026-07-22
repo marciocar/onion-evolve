@@ -66,7 +66,7 @@ Nativas" (fonte única).
    de código que já termina em branch/PR — o resultado consolidado é uma **obrigação de `write(KG)`,
    não opção**. **Ordem: grafo primeiro, relatório depois** — o `.kg.yaml` é o **destino** dos
    achados estruturados; qualquer markdown de saída é **projeção** dele, nunca fonte paralela
-   redigida à parte (reforça o sinal de campo granaai, 2026-07-20: um plano que declarou "saída:
+   redigida à parte (reforça o sinal de campo de um adotante regulado, 2026-07-20: um plano que declarou "saída:
    relatório.md" como destino de uma avaliação de 70 agentes/60 achados deixou o grafo vazio — o
    grafo virou predecessor da avaliação em vez de destino dela). **Persista** a síntese
    no repo (`docs/**/research/*.md` ou local durável) — **nunca**

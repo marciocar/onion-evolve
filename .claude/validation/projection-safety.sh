@@ -169,7 +169,7 @@ fi
 # O REGRA-30 padrão (superfícies públicas) é CHAPADO: nenhum nome comercial, ponto.
 # O histórico de federação NÃO pode ser auditado assim — 20 dos 22 aparecimentos são
 # o nome do PRÓPRIO membro no PRÓPRIO mailbox (outbox/<adotante>/ com o próprio nome-empresa),
-# que não vaza para ninguém: granaai já sabe que é granaai. Guarda que grita lobo 20×
+# que não vaza para ninguém: um adotante regulado já sabe que é ele mesmo. Guarda que grita lobo 20×
 # é desligada no 1º dia — o modo de falha que esta casa mais paga.
 #
 # Modelo de AMEAÇA (o que de fato vaza):

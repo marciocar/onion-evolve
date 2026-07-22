@@ -15,8 +15,8 @@ bad()  { printf '  ❌ %s\n' "$1"; FAIL=$((FAIL+1)); }
 echo "== R15.1 onion-untrusted-wrap.sh — dogfood =="
 
 # T1 — happy-path: conteúdo cercado, verified-semantic SEMPRE false
-out="$(printf 'olá do peer' | bash "$WRAP" --origin granaai --channel a2a-federation --verified-crypto true)"
-echo "$out" | grep -q '<<<UNTRUSTED origin="granaai" channel="a2a-federation" verified-crypto="true" verified-semantic="false" nonce="testnonce">>>' \
+out="$(printf 'olá do peer' | bash "$WRAP" --origin adotante-regulado --channel a2a-federation --verified-crypto true)"
+echo "$out" | grep -q '<<<UNTRUSTED origin="adotante-regulado" channel="a2a-federation" verified-crypto="true" verified-semantic="false" nonce="testnonce">>>' \
   && echo "$out" | grep -q '<<<END UNTRUSTED nonce="testnonce">>>' \
   && echo "$out" | grep -q 'olá do peer' \
   && ok "T1 cerca básica + verified-semantic=false" || { bad "T1 cerca básica"; echo "$out"; }

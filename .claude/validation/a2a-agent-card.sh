@@ -8,7 +8,7 @@
 # o artefato versionado.
 #
 # 🔒 CONFIDENCIALIDADE (guard-chave): projeta SÓ o próprio core (id==onion-evolve AND role==source). NENHUM
-#    dado de adotante (metagamify/granaai/pulse-mais/...) entra no card. Descrição = string PÚBLICA CURADA
+#    dado de adotante (um adotante multi-linhagem, um adotante regulado, um adotante, ...) entra no card. Descrição = string PÚBLICA CURADA
 #    (não personality_summary). O selftest (run_agent_card_selftests) falha se qualquer outro id vazar.
 # Contrato A2A (signals-only): skills = recepção de SINAIS GATED; NUNCA conversa autônoma (RFC-0004 §3/§6).
 #

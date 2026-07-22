@@ -6,7 +6,7 @@
 #
 # Propósito : Coração do NOVO da F1 do /meta:create-vertical (ADR
 #             onion-adr-create-vertical-2026-07). Hoje cada adotante replica esse
-#             padrão à mão (sinal gustavo-pulga A1). Este helper o torna 1ª classe.
+#             padrão à mão (sinal de um adotante de campo A1). Este helper o torna 1ª classe.
 #             Par de generate-marketplace.sh (o outro helper F1).
 #
 # Gera (a partir de templates/*.tpl, substituindo {{PROJECT}}/{{PROJECT_TITLE}}):

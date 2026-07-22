@@ -163,7 +163,7 @@ Lente Aristóteles (`igual→transfere / diferente→desenha`):
 
 ## 7. A catraca — doutrina de introdução de gate em base viva
 
-**Origem:** sinal de campo da granaai (2026-07-20, [inbox](../../evolution/inbox/_processed/2026-07-20-gate-proveniencia-invertido.md))
+**Origem:** sinal de campo de um adotante regulado (2026-07-20, [inbox](../../evolution/inbox/_processed/2026-07-20-gate-proveniencia-invertido.md))
 sobre o gate de proveniência invertido do KG-SSOT. O mecanismo específico é deles; a forma de **introduzir
 qualquer gate novo** contra um passivo existente é geral o bastante para virar doutrina desta casa.
 
@@ -192,7 +192,7 @@ sem canal — é do maestro, não do lint*. Sem essa catraca, o gate teria nasci
 única saída teria sido desligar a regra inteira — por uma condição que só o maestro podia **decidir**, não
 o CI **corrigir**. A REGRA 28 catraqueia por classe fixa (SOFT sempre) em vez de baseline-por-lista; a forma
 completa (baseline explícito + HARD-para-novo) é o alvo desta doutrina para gates onde o veredito por item
-*é* decidível objetivamente — como o de proveniência invertido da granaai.
+*é* decidível objetivamente — como o de proveniência invertido de um adotante regulado.
 
 **Quando um novo gate entra em base viva:** declare o baseline (lista explícita ou classe que a torna
 implícita), gate HARD só o que é novo depois do dia de nascimento do gate, e reporte saúde pelo tamanho do
@@ -202,7 +202,7 @@ baseline caindo — nunca pela taxa de PASS.
 
 - ✅ Doutrina, taxonomia (evidência) e design R15 fechados; 3 checagens do core passadas (reconciliação,
   refutador, escopo).
-- ✅ **Doutrina da catraca** (§7) — promovida a partir do sinal de campo da granaai (2026-07-20).
+- ✅ **Doutrina da catraca** (§7) — promovida a partir do sinal de campo de um adotante regulado (2026-07-20).
 - 🔜 **Gate anti-drift da taxonomia** (ONION-R1 sobre si mesma) — pré-requisito para promover o catálogo
   detalhado ao core.
 - 🔜 **R15 (wire-in)** — cerca de proveniência + gate de efeito; hoje protótipo em quarentena, não wired.

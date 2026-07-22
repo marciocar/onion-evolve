@@ -3,7 +3,7 @@
 # generate-marketplace.sh — Gera/atualiza .claude-plugin/marketplace.json a partir
 # dos plugins montados (SSOT: cada plugins/<name>/.claude-plugin/plugin.json).
 #
-# Propósito : Fechar o gap do sinal de campo gustavo-pulga 2026-07-13 (A3): ao montar
+# Propósito : Fechar o gap do sinal de campo de um adotante de campo 2026-07-13 (A3): ao montar
 #             plugins numa adoção, o repo falha o próprio lint por AUSÊNCIA de
 #             marketplace.json e NÃO havia gerador — o adotante escrevia à mão.
 #             Par do assemble-plugin.sh: aquele monta UM plugin; este agrega o
