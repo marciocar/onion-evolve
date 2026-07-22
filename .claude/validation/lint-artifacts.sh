@@ -1039,6 +1039,11 @@ check_context_freshness_stamp() {
 check_inventory_total_drift() {
   local env_out cmd agent cats agent_cats kb skill n pair num ct line cn an sn kn
   env_out="$(bash "${SCRIPT_DIR}/inventory.sh" --env 2>/dev/null || true)"
+  # Sem env (inventário ausente/vazio num adotante mínimo ou recém-adotado, antes de gerar o
+  # inventário) → nada a comparar; a ausência é da REGRA 8, não desta. Sem este guard, os 'grep'
+  # abaixo não casam → exit 1 → sob 'set -euo pipefail' abortavam o LINT INTEIRO (mesma classe da
+  # REGRA 36; achado 2026-07-22 ao testar a REGRA 40 num sandbox de adotante). [[fix-must-become-mechanism]]
+  [ -n "${env_out}" ] || return 0
   cmd="$(printf '%s\n' "${env_out}" | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
   agent="$(printf '%s\n' "${env_out}" | grep '^ONION_AGENTS_TOTAL=' | cut -d= -f2)"
   cats="$(printf '%s\n' "${env_out}" | grep '^ONION_COMMAND_CATEGORIES=' | cut -d= -f2)"
@@ -1880,6 +1885,29 @@ check_rules_registry_sync() {
 }
 
 # ===========================================================================
+# REGRA 40 — Adotante: .onion-version DEVE estar trackeado no git [HARD]
+#           Achado de campo 2026-07-22: o stamp é GITIGNORED na fonte (lá a identidade é lida ao vivo,
+#           backstop local). Numa cópia gerada à mão (git add -A respeita o ignore) o stamp NÃO era
+#           commitado → o clone perdia o marcador `role: adopted` → o role-guard de _scan_relative_links
+#           e os guards de plugins tratavam o clone como role: source → links/plugins core-only viravam
+#           156 falso-HARD. O adopt CANÔNICO force-adda; esta guarda garante que qualquer adotante
+#           (à mão ou não) commite o stamp. Só dispara p/ role: adopted, em repo git. Fecha o buraco
+#           no mecanismo (não one-off): [[fix-must-become-mechanism]].
+# ===========================================================================
+check_onion_version_tracked() {
+  local stamp="${REPO_ROOT}/.claude/.onion-version"
+  [ -f "${stamp}" ] || return 0
+  grep -q '^role:[[:space:]]*adopted' "${stamp}" 2>/dev/null || return 0   # só adotante
+  git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1 || return 0     # precisa ser repo git
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${stamp}") : ;; *) return 0 ;; esac
+  fi
+  if ! git -C "${REPO_ROOT}" ls-files --error-unmatch .claude/.onion-version >/dev/null 2>&1; then
+    violation "HARD" ".claude/.onion-version" "adotante (role: adopted) com .onion-version NÃO trackeado — commite-o ('git add -f .claude/.onion-version'): senão o clone perde o marcador de papel e TODOS os guards de adotante desligam (links/plugins core-only viram falso-HARD em massa no clone). Achado 2026-07-22."
+  fi
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -1939,6 +1967,7 @@ check_site_no_private_deeplinks
 check_vendored_surface_clean
 check_frontmatter_model_category
 check_rules_registry_sync
+check_onion_version_tracked
 
 # ===========================================================================
 # SUMÁRIO FINAL

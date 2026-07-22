@@ -16,7 +16,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**39 regras** no total — **35 HARD**, **6 SOFT**.
+**40 regras** no total — **36 HARD**, **6 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -46,7 +46,7 @@ Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 
 ## Fronteiras & contratos de arquitetura
 
-Proibições estruturais, documentação no lugar certo e o contrato de conformance.
+Proibições estruturais, documentação no lugar certo e os contratos de conformance e de adoção.
 
 | Nº | Regra | Severidade |
 |---:|-------|:----------:|
@@ -54,6 +54,7 @@ Proibições estruturais, documentação no lugar certo e o contrato de conforma
 | 7 | Nenhum agente pode ter name: contendo 'worker-orchestrator' | HARD |
 | 18 | Sem documentação versionada sob .claude/docs/ | HARD |
 | 20 | Capability Contract: tier de conformance cumprido | HARD |
+| 40 | Adotante: .onion-version DEVE estar trackeado no git | HARD |
 
 ## SDAAL — abstração de provider
 

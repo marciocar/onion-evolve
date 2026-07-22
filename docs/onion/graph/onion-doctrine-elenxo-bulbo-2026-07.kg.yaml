@@ -45,6 +45,15 @@ nodes:
     confidence: 0.9
     status: open
     label: "a pagina e rascunho GATED — aguarda a area de publicacao de doutrinas; nao publicar nem vendorizar ainda"
+  - id: D_QUADRO_CITACOES
+    node_type: decision
+    trace: docs/analysis/onion-quadro-citacoes-draft-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    label: "quadro de citacoes do maestro NASCEU (gated): as formulacoes recorrentes dele, atribuidas+datadas (verbatim vs parafrase marcado) — distinto das cunhagens (termos); mesma area de doutrinas futura"
 
   # ---- aferido (as teses) ----
   - id: C_FORM_PROVES_PHILOSOPHY
@@ -207,4 +216,8 @@ edges:
   # o diagrama candidato visualizaria a arquitetura Bulbo
   - from: Q_BULBO_DIAGRAM
     to: D_BULBO_IS_ARCH
+    edge_type: DEPENDS_ON
+  # o quadro de citacoes e irmao da disciplina de declarar cunhagens (atribuir a contribuicao do maestro)
+  - from: D_QUADRO_CITACOES
+    to: D_COINAGES_DECLARED
     edge_type: DEPENDS_ON

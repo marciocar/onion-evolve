@@ -514,6 +514,43 @@ run_rules_registry_selftests() {
   else record_fail "rules-registry: (f)" "REGRA 39 acusou o estado real (deveria estar em paridade)"; fi
 }
 
+# Modo onion-version-tracked — REGRA 40. Um adotante (role: adopted) TEM que trackear o .onion-version;
+# senão o clone perde o marcador e todos os guards de adotante desligam (achado de campo 2026-07-22, o
+# maestro pegou clonando fresco). Sandbox git mínimo — completa porque a REGRA 16 já não aborta com env
+# vazio (fix irmão da mesma sessão).
+run_onion_version_tracked_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  [ -f "${lint}" ] || return 0
+  command -v git >/dev/null 2>&1 || { record_pass "onion-version-tracked: git ausente (skip gracioso)"; return; }
+  local sb; sb="$(mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"; trap 'rm -rf "'"${sb}"'"' RETURN
+  mkdir -p "${sb}/.claude/validation"
+  cp "${lint}" "${sb}/.claude/validation/"
+  printf 'framework: onion-evolve\nrole: adopted\n' > "${sb}/.claude/.onion-version"
+  git -C "${sb}" init -q
+  git -C "${sb}" add .claude/validation >/dev/null 2>&1
+  git -C "${sb}" -c user.name=t -c user.email=t@t commit -q -m x >/dev/null 2>&1
+  local out
+  # (a) role: adopted + stamp UNTRACKED → HARD
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+    record_pass "onion-version-tracked: (a) adotante com stamp UNTRACKED → HARD"
+  else record_fail "onion-version-tracked: (a)" "stamp untracked não pego — o clone perderia o role"; fi
+  # (b) força-add → TRACKED → sem violação
+  git -C "${sb}" add -f .claude/.onion-version >/dev/null 2>&1
+  git -C "${sb}" -c user.name=t -c user.email=t@t commit -q -m s >/dev/null 2>&1
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if ! printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+    record_pass "onion-version-tracked: (b) stamp TRACKED → sem violação"
+  else record_fail "onion-version-tracked: (b)" "falso-positivo com stamp trackeado"; fi
+  # (c) role: source + UNTRACKED → guarda PULA (é o gate de papel, não o de tracked)
+  git -C "${sb}" rm --cached .claude/.onion-version >/dev/null 2>&1
+  printf 'framework: onion-evolve\nrole: source\n' > "${sb}/.claude/.onion-version"
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if ! printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+    record_pass "onion-version-tracked: (c) role: source + untracked → guarda pula (gate de papel)"
+  else record_fail "onion-version-tracked: (c)" "disparou em role: source (não-adotante)"; fi
+}
+
 run_kg_view_selftests() {
   local view="${SCRIPT_DIR}/kg-view.sh"
   local tmp out rc
@@ -4361,6 +4398,7 @@ run_vendor_scrub_selftests
 run_site_deeplink_selftests
 run_migalhas_generate_selftests
 run_rules_registry_selftests
+run_onion_version_tracked_selftests
 run_kg_view_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
