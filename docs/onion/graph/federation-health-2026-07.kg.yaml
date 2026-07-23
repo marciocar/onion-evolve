@@ -24,10 +24,22 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: open
+    status: superseded
     verified_against: pin
+    verified_at: 2026-07-23
     label: "granaai linhagem local-kvm8: pin DECLARADO 74c470e mas pin-integrity=untrusted (canario divergente DRIFT-ONION) — re-verificar pos-update; mantem o ultimo verificado 4332ac8d"
     trace: "docs/evolution/federation/members.yaml:126"
+  - id: E_GRANAAI_PIN_REVERIFIED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_against: pin
+    verified_at: 2026-07-23
+    label: "re-verificado 2026-07-23: granaai atualizou 91d5dbb->6cc162f (adopt --update); pin-integrity-check pin-ok 6cc162f + vendor-audit 5/5 limpo. O 74c470e era STALE (a linhagem andou alem), nao drift real. members.yaml onion_version atualizado ao pin verificado."
+    trace: "docs/evolution/federation/members.yaml:119"
   - id: C_ANNOUNCE_BACKLOG
     node_type: claim
     layer: audit
@@ -121,3 +133,7 @@ edges:
   - from: C_GRANAAI_LINEAGES_UNKNOWN
     to: C_FED_RADAR_ABSENT
     edge_type: SUPPORTS
+  # reconciliação 2026-07-23: a re-verificação supera o pin untrusted (stale, não drift)
+  - from: E_GRANAAI_PIN_REVERIFIED
+    to: C_GRANAAI_PIN_UNTRUSTED
+    edge_type: SUPERSEDES
