@@ -556,8 +556,8 @@ run_onion_version_tracked_selftests() {
   if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
     record_pass "onion-version-tracked: (d) role: hub + untracked → HARD (hub trackeia o stamp)"
   else record_fail "onion-version-tracked: (d)" "não pegou hub untracked (o clone do hub perderia o papel)"; fi
-  # (e) FONTE-DESACOPLADA (role: source + decoupled_from) + UNTRACKED → HARD (também carrega stamp derivado)
-  git -C "${sb}" rm --cached .claude/.onion-version >/dev/null 2>&1
+  # (e) FONTE-DESACOPLADA (role: source + decoupled_from) + UNTRACKED → HARD (também carrega stamp derivado).
+  # O stamp já está untracked (a case c fez rm --cached e a d só reescreveu o conteúdo) — só sobrescrevo.
   printf 'framework: x\nrole: source\ndecoupled_from: https://github.com/marciocar/onion-evolve.git\n' > "${sb}/.claude/.onion-version"
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
   if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
