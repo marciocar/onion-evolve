@@ -556,6 +556,13 @@ run_onion_version_tracked_selftests() {
   if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
     record_pass "onion-version-tracked: (d) role: hub + untracked → HARD (hub trackeia o stamp)"
   else record_fail "onion-version-tracked: (d)" "não pegou hub untracked (o clone do hub perderia o papel)"; fi
+  # (e) FONTE-DESACOPLADA (role: source + decoupled_from) + UNTRACKED → HARD (também carrega stamp derivado)
+  git -C "${sb}" rm --cached .claude/.onion-version >/dev/null 2>&1
+  printf 'framework: x\nrole: source\ndecoupled_from: https://github.com/marciocar/onion-evolve.git\n' > "${sb}/.claude/.onion-version"
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+    record_pass "onion-version-tracked: (e) fonte-desacoplada + untracked → HARD (o stamp derivado precisa viajar)"
+  else record_fail "onion-version-tracked: (e)" "não pegou decoupled untracked"; fi
 }
 
 # Modo hub-role-guard — costura HUB (2026-07-23): um hub É adotante para os role-guards que pulam os
@@ -583,6 +590,11 @@ run_hub_role_guard_selftests() {
   n="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 | grep -c 'não resolve' || true)"
   if [ "${n}" -ge 1 ]; then record_pass "hub-role-guard: (b) role: source → link core-only flagado (guard não pula no source)"
   else record_fail "hub-role-guard: (b)" "source não flagou o link ausente (o role-guard pula sempre?)"; fi
+  # (c) FONTE-DESACOPLADA (role: source + decoupled_from) → PULA (veio da superfície vendorizada, sem docs core-only)
+  printf 'framework: h\nrole: source\ndecoupled_from: https://github.com/marciocar/onion-evolve.git\n' > "${sb}/.claude/.onion-version"
+  n="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 | grep -c 'não resolve' || true)"
+  if [ "${n}" = 0 ]; then record_pass "hub-role-guard: (c) fonte-desacoplada (decoupled_from) → link core-only pulado (é source derivada)"
+  else record_fail "hub-role-guard: (c)" "decoupled_from flagou ${n} link(s) — o clone da fonte-desacoplada viraria falso-HARD"; fi
 }
 
 # Modo family-topology — REGRA 41 (2026-07-23): a SSOT-topologia no KG resolve a procedimentos REAIS. É a
@@ -628,6 +640,34 @@ K
   if printf '%s' "${out}" | grep -q 'topologia/PAPEL-ORFAO'; then
     record_pass "family-topology: (c) papel ativo fora de roles.yaml → HARD"
   else record_fail "family-topology: (c)" "não pegou papel órfão vs roles.yaml"; fi
+}
+
+# Modo decouple-source — transição 'desacoplar' (2026-07-23): um adotado/hub vira fonte soberana própria
+# (role: source + decoupled_from). Testa: dry-run NÃO toca; --confirm re-carimba; source recusa.
+run_decouple_source_selftests() {
+  local dec="${SCRIPT_DIR}/../utils/adopt/decouple-source.sh"
+  [ -f "${dec}" ] || return 0
+  command -v git >/dev/null 2>&1 || { record_pass "decouple-source: git ausente (skip gracioso)"; return; }
+  local sb; sb="$(mktemp -d)"; trap 'rm -rf "'"${sb}"'"' RETURN
+  mkdir -p "${sb}/.claude"
+  git -C "${sb}" init -q
+  printf 'framework: cliente-x\nsource_commit: abc123\nrole: hub\nadopted_from: https://github.com/marciocar/onion-evolve.git\n' > "${sb}/.claude/.onion-version"
+  # (a) DRY-RUN (sem --confirm) → não altera o stamp
+  bash "${dec}" "${sb}" >/dev/null 2>&1 || true
+  if grep -q '^role: hub$' "${sb}/.claude/.onion-version"; then
+    record_pass "decouple-source: (a) dry-run NÃO toca no stamp (role: hub intacto)"
+  else record_fail "decouple-source: (a)" "dry-run alterou o stamp"; fi
+  # (b) --confirm → role: source + decoupled_from (preserva a origem), commitado
+  bash "${dec}" "${sb}" --confirm >/dev/null 2>&1 || true
+  if grep -q '^role: source$' "${sb}/.claude/.onion-version" \
+     && grep -q '^decoupled_from: https://github.com/marciocar/onion-evolve.git$' "${sb}/.claude/.onion-version" \
+     && ! grep -q '^adopted_from:' "${sb}/.claude/.onion-version"; then
+    record_pass "decouple-source: (b) --confirm → role: source + decoupled_from (linhagem cortada, origem preservada)"
+  else record_fail "decouple-source: (b)" "$(cat "${sb}/.claude/.onion-version")"; fi
+  # (c) já é source → recusa (exit 1)
+  if ! bash "${dec}" "${sb}" --confirm >/dev/null 2>&1; then
+    record_pass "decouple-source: (c) já é fonte → recusa (não re-desacopla)"
+  else record_fail "decouple-source: (c)" "aceitou desacoplar uma fonte"; fi
 }
 
 run_kg_view_selftests() {
@@ -4499,6 +4539,7 @@ run_rules_registry_selftests
 run_onion_version_tracked_selftests
 run_hub_role_guard_selftests
 run_family_topology_selftests
+run_decouple_source_selftests
 run_kg_view_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.

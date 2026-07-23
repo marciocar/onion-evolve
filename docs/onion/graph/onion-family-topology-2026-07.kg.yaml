@@ -56,9 +56,9 @@ nodes:
     layer: audit
     plane: DEV
     impact: 4
-    confidence: 0.5
-    status: open
-    label: "fonte-desacoplada (GATED) — cliente que OWNA o proprio framework: corta o adopted_from, vira seu proprio T0, evolui sozinho. 'A fonte e soberana de quem a usa' no limite. Mecanismo nao existe ainda"
+    confidence: 0.7
+    status: confirmed
+    label: "fonte-desacoplada — cliente que OWNA o proprio framework: role: source + decoupled_from, vira seu proprio T0, autora sozinho, corta o --update do core. 'A fonte e soberana de quem a usa' no limite. Mecanismo: decouple-source.sh"
 
   # ---- TRANSIÇÕES (decision) — os movimentos; trace: = o procedimento REAL (o scaffold) ----
   - id: TX_create
@@ -99,31 +99,31 @@ nodes:
     label: "ATUALIZAR um repo adotado (/meta:adopt --update) — traz o delta do framework via merge de vendor-branch + re-config + re-stamp; idempotente"
   - id: TX_invite
     node_type: decision
-    trace: docs/knowledge-base/concepts/onion-guided-lifecycle.md
+    trace: .claude/utils/adopt/invite-collaborator.sh
     layer: audit
     plane: DEV
     impact: 3
-    confidence: 0.5
-    status: open
-    label: "CONVIDAR colaborador (GATED — hoje manual via gh api) — dono adiciona o cliente como colaborador write; ainda nao mecanizado numa transicao"
+    confidence: 0.8
+    status: confirmed
+    label: "CONVIDAR colaborador (invite-collaborator.sh) — dono adiciona o cliente ao repo (permissao write); dry-run-first, o convidado precisa aceitar"
   - id: TX_transfer
     node_type: decision
-    trace: docs/knowledge-base/concepts/onion-guided-lifecycle.md
+    trace: .claude/utils/adopt/transfer-ownership.sh
     layer: audit
     plane: DEV
     impact: 3
-    confidence: 0.5
-    status: open
-    label: "TRANSFERIR posse do repo (GATED — gh transfer, manual) — o dono passa a posse ao cliente; ex-dono vira colaborador (posse e singular)"
+    confidence: 0.8
+    status: confirmed
+    label: "TRANSFERIR posse (transfer-ownership.sh) — passa o repo ao cliente; posse singular (ex-dono vira colaborador via convite), URL redireciona, destino aceita"
   - id: TX_decouple
     node_type: decision
-    trace: docs/knowledge-base/concepts/onion-guided-lifecycle.md
+    trace: .claude/utils/adopt/decouple-source.sh
     layer: audit
     plane: DEV
     impact: 4
-    confidence: 0.4
-    status: open
-    label: "DESACOPLAR (GATED — mecanismo nao existe) — um adotado corta o cordao e vira fonte-soberana propria (own T0, linhagem propria, autora o proprio framework)"
+    confidence: 0.75
+    status: confirmed
+    label: "DESACOPLAR (decouple-source.sh) — um adotado/hub vira fonte-soberana propria (role: source + decoupled_from, own T0, autora o proprio framework, corta o --update do core)"
 
 edges:
   # source e a origem: cria, adota, atualiza; o distilled deriva dele

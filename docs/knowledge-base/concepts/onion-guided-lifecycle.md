@@ -65,6 +65,9 @@ O Onion não é GUI — roda **dentro** do Claude Code. O wizard é **conversaci
 
 Papéis: **source** (T0, a autora) · **hub** (T1, empresa que controla os próprios projetos) · **standalone**
 (T3, solo completo) · **consumer** (T2, projeto de um hub) · **distilled** (onion-mini) · **fonte-desacoplada**
-(gated — cliente que owna o próprio framework). Transições ativas: **criar · adotar · promover-hub · atualizar**
-(todas traceiam `/meta:adopt`). Transições gated: **convidar · transferir · desacoplar**. A fonte completa
-(com o procedimento de cada uma) vive no KG-topologia; as skills de condução derivam dela.
+(cliente que owna o próprio framework: `role: source` + `decoupled_from`, corta o `--update` do core).
+Transições **ativas** (todas com procedimento real): **criar · adotar · promover-hub · atualizar**
+(traceiam `/meta:adopt`) · **convidar** (`invite-collaborator.sh`) · **transferir** (`transfer-ownership.sh`) ·
+**desacoplar** (`decouple-source.sh`). A fonte completa vive no KG-topologia; as skills derivam dela — quando
+uma transição muda de gated a ativa, o wizard/onboarding refletem **sozinhos** (foi assim: a REGRA 41 só
+exigiu que os novos `trace` resolvessem, e as skills passaram a oferecê-las sem edição).
