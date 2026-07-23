@@ -1,3 +1,8 @@
+---
+verified_at: 2026-07-23
+source: "https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching"
+---
+
 # Context Window Optimization
 
 ---

@@ -3746,6 +3746,241 @@ KGEOF
 }
 
 # ---------------------------------------------------------------------------
+# Modo doctrine-freshness — GATE DE FRESCOR DOUTRINÁRIO com catraca (REGRA 42).
+#
+# Irmão TEMPORAL da REGRA 29: a 29 fecha conhecimento nascendo FORA do grafo
+# (espacial); esta fecha a afirmação doutrinária que EXPIROU EM SILÊNCIO (temporal).
+# Origem: world-sync 2026-07-20/23 — o cutoff é jan/2026; KB dizendo "lineup vigente
+# é X" vira mentira em julho sem uma linha do repo mudar.
+#
+# Prova os QUATRO pressupostos que a regra de admissão da casa exige (não declara):
+#   (P1) LISTA world-facing — o único eixo HARD (Nível A); Nível B é SOFT-only.
+#   (P2) DECIDIDO SÓ COM O REPO — sandbox sem git, sem rede, sem home → veredito.
+#        Reforçado por prova ESTRUTURAL: o helper não contém chamada de rede.
+#   (P3) BASELINE — só encolhe (crescer = HARD), ausência degrada FAIL-CLOSED.
+#   (P4) TTL lível por env (a FIXTURE fixa, nunca a implementação — lição T2.5e) +
+#        RELÓGIO (idade só vale com NTP provado; não-confiável degrada a SOFT).
+#   + MUTATION TEST de severidade: flip HARD→SOFT quebra o caso 'missing → HARD'.
+# Sandboxes self-contained (mktemp) com --list-file (independe das 4 KBs reais).
+# ---------------------------------------------------------------------------
+
+# Monta um repo mínimo com uma lista world-facing SINTÉTICA (--list-file). Ecoa o dir.
+_df_make_repo() {
+  local d today; d="$(mktemp -d)"; today="$(date +%F)"
+  mkdir -p "${d}/.claude/validation" "${d}/docs/knowledge-base/concepts"
+  cp "${REPO_ROOT}/.claude/validation/doctrine-freshness.sh" "${d}/.claude/validation/"
+  [ -f "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" ] \
+    && cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${d}/.claude/validation/"
+  local kc="${d}/docs/knowledge-base/concepts"
+  printf '%s\n' '---' "verified_at: ${today}" 'source: "https://ex.test/a"' '---' '# fresh'     > "${kc}/fresh.md"
+  printf '# missing\n'                                                                          > "${kc}/missing.md"
+  printf '# passivo\n'                                                                          > "${kc}/passivo.md"
+  printf '%s\n' '---' 'verified_at: ontem'      'source: "https://ex.test/b"' '---' '# malformed' > "${kc}/malformed.md"
+  printf '%s\n' '---' 'verified_at: 2999-01-01' 'source: "https://ex.test/c"' '---' '# future'  > "${kc}/future.md"
+  printf '%s\n' '---' 'verified_at: 2020-01-01' 'source: "https://ex.test/d"' '---' '# stale'   > "${kc}/stale.md"
+  printf '%s\n' '---' "verified_at: ${today}"                                 '---' '# nosource' > "${kc}/nosource.md"
+  printf '%s\n' '# lexical' 'O lineup vigente e X; latest.'                                     > "${kc}/lexical.md"
+  { for f in fresh missing passivo malformed future stale nosource; do
+      printf 'docs/knowledge-base/concepts/%s.md\n' "$f"; done; } > "${d}/.claude/validation/df-list.txt"
+  printf '# baseline\ndocs/knowledge-base/concepts/passivo.md\n' > "${d}/.claude/validation/doctrine-freshness-baseline.txt"
+  printf '%s\n' "${d}"
+}
+
+# _df_run <repo> [args...] — preenche _DF_OUT (TSV) e _DF_RC. Clock ATESTADO e TTL 90
+# por padrão (determinismo, independe do relógio do runner); _DF_CLOCK/_DF_TTL sobrepõem.
+# NÃO ecoa: rodar em subshell mataria _DF_RC (a armadilha que o kg-coverage documenta).
+_df_run() {
+  local repo="$1"; shift
+  local tf; tf="$(mktemp)"
+  set +e
+  DOCTRINE_CLOCK_TRUST="${_DF_CLOCK:-attested}" DOCTRINE_FRESHNESS_TTL_DAYS="${_DF_TTL:-90}" \
+    bash "${repo}/.claude/validation/doctrine-freshness.sh" "${repo}" \
+      --list-file "${repo}/.claude/validation/df-list.txt" --format tsv "$@" >"${tf}" 2>/dev/null
+  _DF_RC=$?
+  set -e
+  _DF_OUT="$(cat "${tf}")"; rm -f "${tf}"
+}
+
+_df_has() { printf '%s\n' "$1" | grep -qE "^$2"$'\t'"$3"$'\t'"$4"$'\t'; }
+
+run_doctrine_freshness_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/doctrine-freshness.sh"
+  if [ ! -f "${h}" ]; then record_fail "doctrine-freshness" "helper ausente: ${h}"; return; fi
+
+  # =========================================================================
+  # BLOCO A — semântica do gate (repo isolado, SEM git, SEM rede → prova P2)
+  # =========================================================================
+  local d out; d="$(_df_make_repo)"
+  _df_run "${d}"; out="${_DF_OUT}"
+
+  printf '%s\n' "${out}" | grep -q 'concepts/fresh\.md' \
+    && record_fail "doctrine: fresh" "doc carimbado e dentro do TTL foi flagado (falso-positivo)" \
+    || record_pass "doctrine: (NÍVEL A) doc fresco (verified_at hoje + source) → silêncio"
+
+  _df_has "${out}" HARD MISSING 'docs/knowledge-base/concepts/missing\.md' \
+    && record_pass "doctrine: (NÍVEL A) world-facing SEM verified_at e fora do baseline → HARD" \
+    || record_fail "doctrine: missing" "world-facing sem verified_at não virou HARD/MISSING"
+
+  _df_has "${out}" SOFT PASSIVO 'docs/knowledge-base/concepts/passivo\.md' \
+    && record_pass "doctrine: (P3) world-facing sem verified_at MAS no baseline → SOFT (tolerado)" \
+    || record_fail "doctrine: passivo" "doc do baseline não foi tolerado como SOFT"
+
+  _df_has "${out}" HARD MALFORMED 'docs/knowledge-base/concepts/malformed\.md' \
+    && record_pass "doctrine: (NÍVEL A) verified_at malformado → HARD estrutural" \
+    || record_fail "doctrine: malformed" "verified_at não-data não virou HARD/MALFORMED"
+
+  _df_has "${out}" HARD FUTURE 'docs/knowledge-base/concepts/future\.md' \
+    && record_pass "doctrine: (NÍVEL A) verified_at no FUTURO → HARD estrutural" \
+    || record_fail "doctrine: future" "verified_at no futuro não virou HARD/FUTURE"
+
+  _df_has "${out}" SOFT STALE 'docs/knowledge-base/concepts/stale\.md' \
+    && record_pass "doctrine: (NÍVEL A) verified_at > TTL → SOFT STALE (re-verifique, não reprova)" \
+    || record_fail "doctrine: stale" "verified_at vencido não virou SOFT/STALE"
+
+  _df_has "${out}" SOFT NO-SOURCE 'docs/knowledge-base/concepts/nosource\.md' \
+    && record_pass "doctrine: (NÍVEL A) carimbo SEM source → SOFT NO-SOURCE (carimbo sem fonte é frágil)" \
+    || record_fail "doctrine: nosource" "verified_at sem source não virou SOFT/NO-SOURCE"
+
+  _df_has "${out}" SOFT LEXICAL 'docs/knowledge-base/concepts/lexical\.md' \
+    && record_pass "doctrine: (NÍVEL B) doc fora da lista com token gatilho, sem carimbo → SOFT LEXICAL" \
+    || record_fail "doctrine: lexical" "rede lexical não pegou 'lineup vigente/latest' sem verified_at"
+
+  [ "${_DF_RC}" -eq 1 ] \
+    && record_pass "doctrine: (P2) DECIDIDO SÓ COM O REPO — sandbox sem git/rede/home produziu veredito HARD (rc=1); não é no-op no CI" \
+    || record_fail "doctrine: exit-code" "esperava rc=1 com HARD presente, veio rc=${_DF_RC}"
+
+  # =========================================================================
+  # BLOCO B — (P3) BASELINE: catraca só encolhe; vazio não aborta; ausência fail-closed
+  # =========================================================================
+  local b prev_menor prev_maior; b="$(_df_make_repo)"
+  prev_menor="${b}/prev-menor.txt"; prev_maior="${b}/prev-maior.txt"
+  printf '# prev\n'                                                                > "${prev_menor}"   # ANTES: vazio
+  printf '# prev\ndocs/knowledge-base/concepts/passivo.md\ndocs/knowledge-base/concepts/extra.md\n' > "${prev_maior}"
+
+  _df_run "${b}" --previous-baseline "${prev_menor}"; out="${_DF_OUT}"
+  _df_has "${out}" HARD CATRACA '.*doctrine-freshness-baseline\.txt' \
+    && record_pass "doctrine: (P3) baseline que CRESCE (vs prev vazio) → HARD (catraca)" \
+    || record_fail "doctrine: catraca-cresce" "acrescentar path ao baseline não foi HARD"
+
+  _df_run "${b}" --previous-baseline "${prev_maior}"; out="${_DF_OUT}"
+  printf '%s\n' "${out}" | grep -qE $'\tCATRACA\t' \
+    && record_fail "doctrine: catraca-encolhe" "baseline que ENCOLHEU foi tratado como regressão" \
+    || record_pass "doctrine: (P3) baseline que ENCOLHE → sem HARD de catraca"
+
+  # entrada obsoleta (doc agora carimbado) + órfã (doc fora da lista) → SOFT
+  printf '# baseline\ndocs/knowledge-base/concepts/passivo.md\ndocs/knowledge-base/concepts/fresh.md\ndocs/knowledge-base/concepts/ghost.md\n' \
+    > "${b}/.claude/validation/doctrine-freshness-baseline.txt"
+  _df_run "${b}" --previous-baseline "${b}/.claude/validation/doctrine-freshness-baseline.txt"; out="${_DF_OUT}"
+  printf '%s\n' "${out}" | grep -qE $'\tBASELINE-OBSOLETA\t' \
+    && record_pass "doctrine: (P3) entrada obsoleta (doc já carimbado) → SOFT 'remova do baseline'" \
+    || record_fail "doctrine: baseline-obsoleta" "não cobrou a remoção de entrada já carimbada"
+  printf '%s\n' "${out}" | grep -qE $'\tBASELINE-ORFA\t' \
+    && record_pass "doctrine: (P3) entrada órfã (fora da lista) → SOFT 'remova do baseline'" \
+    || record_fail "doctrine: baseline-orfa" "não cobrou a remoção de entrada fora da lista"
+
+  # baseline VAZIO (só cabeçalho): grep sem match sob set -euo pipefail NÃO pode abortar
+  printf '# baseline (vazio de propósito)\n' > "${b}/.claude/validation/doctrine-freshness-baseline.txt"
+  _df_run "${b}"; out="${_DF_OUT}"
+  if [ -n "${out}" ] && _df_has "${out}" HARD MISSING 'docs/knowledge-base/concepts/missing\.md'; then
+    record_pass "doctrine: (P3) baseline VAZIO → gate segue avaliando (não aborta em silêncio)"
+  else
+    record_fail "doctrine: baseline-vazio" "baseline sem entradas produziu saída vazia/sem HARD (abortou em silêncio?)"
+  fi
+
+  # AUSÊNCIA do baseline: degrade FAIL-CLOSED — exatamente 1 NO-BASELINE, passivo VISÍVEL como SOFT
+  rm -f "${b}/.claude/validation/doctrine-freshness-baseline.txt"
+  _df_run "${b}"; out="${_DF_OUT}"
+  local n_nobase; n_nobase="$(printf '%s\n' "${out}" | grep -cE $'\tNO-BASELINE\t' || true)"
+  if [ "${n_nobase}" = "1" ] && [ "${_DF_RC}" -eq 1 ]; then
+    record_pass "doctrine: (P3) baseline AUSENTE → 1 HARD NO-BASELINE acionável (não libera tudo)"
+  else
+    record_fail "doctrine: baseline-ausente" "esperava exatamente 1 NO-BASELINE e rc=1; veio NO-BASELINE=${n_nobase} rc=${_DF_RC}"
+  fi
+  _df_has "${out}" SOFT NO-BASELINE-UNCOVERED 'docs/knowledge-base/concepts/missing\.md' \
+    && record_pass "doctrine: (P3) sem baseline, o passivo continua VISÍVEL (SOFT) — silenciar seria liberar tudo" \
+    || record_fail "doctrine: baseline-ausente-visibilidade" "sem baseline o gate ficou cego aos docs sem carimbo"
+
+  # =========================================================================
+  # BLOCO C — (MUTATION TEST de severidade): flip HARD→SOFT quebra 'missing → HARD'
+  # =========================================================================
+  local m mut; m="$(_df_make_repo)"; mut="${m}/.claude/validation/doctrine-freshness.sh"
+  sed -i.bak 's|say "HARD" "MISSING"|say "SOFT" "MISSING"|' "${mut}"
+  if ! grep -q 'say "SOFT" "MISSING"' "${mut}"; then
+    record_fail "doctrine: (MUTATION)" "a mutação não foi aplicada — âncora do sed mudou; teste não prova nada"
+  else
+    local mout mrc
+    set +e
+    mout="$(DOCTRINE_CLOCK_TRUST=attested bash "${mut}" "${m}" --list-file "${m}/.claude/validation/df-list.txt" --format tsv 2>/dev/null)"; mrc=$?
+    set -e
+    if _df_has "${mout}" HARD MISSING 'docs/knowledge-base/concepts/missing\.md'; then
+      record_fail "doctrine: (MUTATION)" "com HARD→SOFT desfeito o caso 'missing → HARD' ainda passou — não é load-bearing"
+    else
+      record_pass "doctrine: (MUTATION TEST) severidade é load-bearing — flip HARD→SOFT quebra 'missing → HARD' (rc ${_DF_RC}→${mrc})"
+    fi
+  fi
+
+  # =========================================================================
+  # BLOCO D — (P4-TTL): TTL é LÍVEL por env (a fixture fixa, não a implementação)
+  # =========================================================================
+  local dt; dt="$(_df_make_repo)"
+  _DF_TTL=90 _df_run "${dt}"; out="${_DF_OUT}"
+  _df_has "${out}" SOFT STALE 'docs/knowledge-base/concepts/stale\.md' \
+    && record_pass "doctrine: (P4-TTL) TTL default 90 → doc de 2020 é STALE; doc de hoje NÃO" \
+    || record_fail "doctrine: ttl-default" "com TTL 90 o doc de 2020 não ficou STALE"
+  _DF_TTL=100000 _df_run "${dt}"; out="${_DF_OUT}"
+  printf '%s\n' "${out}" | grep -q $'\tSTALE\tdocs/knowledge-base/concepts/stale\.md' \
+    && record_fail "doctrine: ttl-env" "TTL alargado por env NÃO rejuvenesceu o doc (a fixture não fixa o TTL)" \
+    || record_pass "doctrine: (P4-TTL) TTL alargado por env (100000d) → o MESMO doc deixa de ser STALE (fixture fixa o TTL)"
+
+  # =========================================================================
+  # BLOCO E — (P4-RELÓGIO): relógio não-confiável degrada a idade a SOFT (não HARD espúrio)
+  # =========================================================================
+  local dc; dc="$(_df_make_repo)"
+  _DF_CLOCK=untrusted _df_run "${dc}"; out="${_DF_OUT}"
+  _df_has "${out}" SOFT STALE-CLOCK-UNTRUSTED 'docs/knowledge-base/concepts/stale\.md' \
+    && record_pass "doctrine: (P4-RELÓGIO) relógio não-confiável → STALE degrada a SOFT (não reprova por relógio)" \
+    || record_fail "doctrine: clock-stale" "com relógio não-confiável a idade não degradou a SOFT STALE-CLOCK-UNTRUSTED"
+  printf '%s\n' "${out}" | grep -qE $'\tHARD\tFUTURE\t' \
+    && record_fail "doctrine: clock-future" "relógio não-confiável ainda emitiu HARD FUTURE (a comparação com 'agora' não degradou)" \
+    || record_pass "doctrine: (P4-RELÓGIO) relógio não-confiável → FUTURE também degrada (não HARD espúrio)"
+  _df_has "${out}" HARD MALFORMED 'docs/knowledge-base/concepts/malformed\.md' \
+    && record_pass "doctrine: (P4-RELÓGIO) formato (independe do relógio) SEGUE HARD mesmo com relógio degradado" \
+    || record_fail "doctrine: clock-malformed" "malformado deixou de ser HARD com relógio degradado (degrade tarde demais)"
+
+  # =========================================================================
+  # BLOCO F — (P2 reforço) prova ESTRUTURAL: o helper NÃO faz rede (CI-safe by construction)
+  # =========================================================================
+  if grep -vE '^[[:space:]]*#' "${h}" | grep -qE 'curl|wget|/dev/tcp|nc |WebFetch|ntpstat.*http'; then
+    record_fail "doctrine: (P2) no-network" "o helper contém chamada de rede fora de comentário — não é CI-safe"
+  else
+    record_pass "doctrine: (P2) CI-SAFE por construção — nenhuma chamada de rede no corpo do helper (só o repo decide)"
+  fi
+
+  # =========================================================================
+  # BLOCO G — caminho GIT da catraca (a que roda em produção; não só --previous-baseline)
+  # =========================================================================
+  local g; g="$(_df_make_repo)"
+  git -C "${g}" init -q 2>/dev/null
+  git -C "${g}" add -A >/dev/null 2>&1
+  git -C "${g}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  local og rc
+  # (G1) baseline versionado só no HEAD, INALTERADO → resolve pela ref, mas HEAD é
+  #      ref LOCAL: AVISA fraca (não sai verde em silêncio).
+  rc=0; og="$(cd "${g}" && DOCTRINE_CLOCK_TRUST=attested bash .claude/validation/doctrine-freshness.sh --list-file .claude/validation/df-list.txt 2>&1)" || rc=$?
+  printf '%s' "${og}" | grep -q 'CATRACA-FRACA' && ! printf '%s' "${og}" | grep -q 'CATRACA-INDISPONIVEL' \
+    && record_pass "doctrine: (G1) caminho git — baseline no HEAD resolve a catraca e AVISA ref fraca" \
+    || record_fail "doctrine: (G1) ref fraca" "esperava CATRACA-FRACA sem CATRACA-INDISPONIVEL; veio: ${og}"
+  # (G2) baseline CRESCEU vs o ref git ⇒ HARD (prova que compara de verdade, não consigo mesmo)
+  printf 'docs/knowledge-base/concepts/inventado.md\n' >> "${g}/.claude/validation/doctrine-freshness-baseline.txt"
+  rc=0; og="$(cd "${g}" && DOCTRINE_CLOCK_TRUST=attested bash .claude/validation/doctrine-freshness.sh --list-file .claude/validation/df-list.txt 2>&1)" || rc=$?
+  [ "${rc}" -eq 1 ] && printf '%s' "${og}" | grep -qi 'catraca' \
+    && record_pass "doctrine: (G2) caminho git — baseline que CRESCE vs o ref ⇒ HARD (rc=1)" \
+    || record_fail "doctrine: (G2) crescimento via git" "esperava rc=1 + violação de catraca; rc=${rc}"
+
+  rm -rf "${d}" "${b}" "${m}" "${dt}" "${dc}" "${g}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo outbox-channel — exercita a REGRA 28 do lint (check_outbox_channel_exists):
 # anúncio em staging (docs/evolution/federation/outbox/<membro>/*.md) para um
 # membro cujo local_path NÃO TEM docs/evolution/inbound/ deve virar SOFT (nunca
@@ -4530,6 +4765,9 @@ run_outbox_channel_selftests
 
 # Modo kg-coverage — REGRA 29: gate de proveniência INVERTIDO com catraca (sinal de um adotante regulado 2026-07-20).
 run_kg_coverage_selftests
+
+# Modo doctrine-freshness — REGRA 42: gate de FRESCOR DOUTRINÁRIO com catraca (irmão temporal da 29; world-sync 2026-07-20/23).
+run_doctrine_freshness_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests

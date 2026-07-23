@@ -1,0 +1,3 @@
+# Baseline de frescor doutrinário — PASSIVO TOLERADO (world-facing hoje sem verified_at).
+# Gerado por: bash .claude/validation/doctrine-freshness.sh --emit-baseline
+# Esta lista SÓ PODE ENCOLHER. Acrescentar path aqui é regressão (HARD).

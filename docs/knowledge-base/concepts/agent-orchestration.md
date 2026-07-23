@@ -1,3 +1,8 @@
+---
+verified_at: 2026-07-23
+source: "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5"
+---
+
 # Agent Orchestration
 
 ---

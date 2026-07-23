@@ -1,7 +1,7 @@
 ---
 title: "Onion Guardrails — a camada de guardrails nomeada (lente sobre gates existentes)"
 category: concepts
-tags: [seguranca, guardrails, gate, a2a, trust, intake, execucao, prompt-injection, taxonomia, fail-safe, catraca, baseline]
+tags: [seguranca, guardrails, gate, a2a, trust, intake, execucao, prompt-injection, taxonomia, fail-safe, catraca, baseline, frescor, temporal, verified-at]
 status: candidato
 date: 2026-07-12
 ---
@@ -198,11 +198,109 @@ completa (baseline explícito + HARD-para-novo) é o alvo desta doutrina para ga
 implícita), gate HARD só o que é novo depois do dia de nascimento do gate, e reporte saúde pelo tamanho do
 baseline caindo — nunca pela taxa de PASS.
 
-## 8. Status e próximos passos
+## 8. REGRA 42 — declarado≠verificado contra o TEMPO (irmão temporal da REGRA 29)
+
+> **Wired como REGRA 42** do lint (`.claude/validation/lint-artifacts.sh` · helper `doctrine-freshness.sh`).
+> O número **30 já é outra regra** ("Segurança de PROJEÇÃO: nome comercial de membro privado não sai") — por
+> isso o frescor doutrinário é a 42, não a 30; repetir número de duas regras seria o próprio drift que a casa gateia.
+
+**Origem:** pergunta do maestro 2026-07-23 (frescor doutrinário) + a doutrina `verify-external-for-current`
+("algo atual/emergente/popular deve ser buscado externo, nunca respondido do cutoff") — provada no próprio
+dia por dogfood: um world-sync achou um tier de modelo inteiro acima do que a doutrina
+registrava, tetos inferidos errados e **aspas fabricadas** numa KB — tudo em doutrina que "parecia fina", sem
+uma linha do repo mudar.
+
+**O nome.** A REGRA 29 (`kg-provenance-coverage`, gate de proveniência invertido — origem: sinal de campo de
+um adotante regulado, 2026-07-20) pergunta *"este conhecimento existe no grafo?"* — **espacial**: fecha
+conhecimento nascendo fora do KG. **REGRA 42** é o irmão **temporal**: fecha afirmação world-facing que **expirou
+em silêncio**. As duas são a mesma classe — **declarado≠verificado** — testada contra eixos diferentes:
+
+| Gate | Pergunta | Eixo |
+|---|---|---|
+| **REGRA 29** | "este conhecimento existe no grafo?" | espacial (existe / não existe) |
+| **REGRA 42** | "esta afirmação world-facing tem verificação ainda fresca, ou expirou em silêncio?" | temporal (era verdade / ainda é verdade) |
+
+**A armadilha a não cair.** REGRA 42 **não** consulta a web em CI ("esta afirmação ainda é verdade?") — isso é
+**NO-OP** (runner sem rede) e indecidível por construção. O gate verifica só que toda afirmação
+sensível-ao-tempo **carrega** `verified_at` + `source` e que essa data **não expirou** — ele força
+**re-verificação periódica**; quem re-verifica é a sessão via `/meta:kb-freshness`, **nunca** o gate. É isso
+que o mantém CI-safe e determinístico (mesma lição do STALE-OLD do `kg-radar.sh`: compara **datas**, nunca
+consulta o mundo).
+
+### 8.1 A convenção — frontmatter, granularidade por-doc
+
+```yaml
+---
+verified_at: 2026-07-23     # AAAA-MM-DD — quando a afirmação foi cruzada contra a fonte primária
+source: https://...          # URL da fonte primária consultada
+---
+```
+
+- Granularidade **por-documento** (não por-afirmação): um doc world-facing carrega **um** `verified_at` que
+  cobre todas as afirmações sensíveis-ao-tempo nele. Mais grosso que o KG (nó a nó), deliberado — prosa não
+  tem endereço interno estável para pin fino.
+- A **lista de docs world-facing** que o Nível A cobre é um **pressuposto enumerado no helper**, não uma
+  heurística — ver REGRA DE ADMISSÃO (§8.4).
+
+### 8.2 Dois níveis — só um é mecânico
+
+| Nível | Escopo | Sem `verified_at` | `verified_at` STALE (>TTL) | Malformado / no futuro |
+|---|---|---|---|---|
+| **A — lista enumerada** | docs world-facing explicitamente listados no helper | **HARD** (via catraca) | **SOFT** "re-verifique" (atenção, não reprova — mesmo tom do radar) | **HARD** (erro estrutural) |
+| **B — rede lexical** | qualquer doc **fora** da lista, com tokens-gatilho (*lineup vigente*, *versão atual*, *latest*, *modelo mais recente*, *generally available*, *atualmente*…) | **SOFT-only** | **SOFT-only** | **SOFT-only** |
+
+- **Nível A é o único que reprova build.** É honesto porque a lista é fechada e auditável — o gate consegue
+  provar exatamente o que cobriu.
+- **Nível B é convenção-com-rede, não gate** — a mesma honestidade que um adotante regulado aplicou ao idioma de ids: um
+  grep por vocabulário-gatilho pega candidato, não confirma cobertura, e por isso **nunca** é HARD. Existe
+  para dar sinal cedo num doc que ainda não entrou na lista A (nem todo "atualmente" é, de fato, world-facing).
+
+### 8.3 Reuse — nenhum mecanismo novo, três primos já existentes
+
+- **A catraca (§7 desta KB).** REGRA 42-Nível A **é** a catraca aplicada a um eixo novo: baseline (docs sem
+  `verified_at` hoje) tolerado; doc **NOVO** sem a tag → HARD; baseline só encolhe. Não é analogia — é a
+  mesma forma de três peças, com o assunto trocado de "proveniência" para "frescor".
+- **O STALE-OLD do `kg-radar.sh`.** REGRA 42 generaliza esse padrão — de **nó de grafo** (`verified_at` ×
+  `baseline`, duas datas do próprio arquivo, sem tocar relógio) para **afirmação em prosa de KB**. Mesmo
+  mecanismo de comparação de datas; muda só o que é comparado.
+- **A guarda `clock-untrusted` do `a2a-verify.sh`.** É o **pressuposto** do gate inteiro: "recente" só vale
+  com relógio provado (via `timedatectl`/`chronyc`/`ntpstat`). REGRA 42 herda a mesma desconfiança — comparar
+  `verified_at` contra "hoje" sem relógio atestado é comparar contra um número que pode estar errado.
+
+### 8.4 REGRA DE ADMISSÃO — os pressupostos do próprio gate, enumerados
+
+Um gate que declara cobertura sem provar do que depende é o ponto cego que esta casa já nomeou
+(`.claude/diary/2026-07-20-admission-rule-blindspot.md`): *"pressuposto não enumerado é rodada adversarial
+futura."* REGRA 42 enumera os seus quatro, para nascer sem esse furo:
+
+1. **A lista world-facing.** Fixa e auditável no helper — nunca inferida por heurística. Crescê-la é decisão
+   humana (mesmo espírito do baseline: só o maestro decide o que entra em Nível A).
+2. **O TTL (90 dias default).** É config, e config **é fixada pela fixture nos testes, nunca pela
+   implementação** — a mesma lição já paga em T2.5e: um teste que lê o TTL real do sistema em vez de um
+   valor injetado pela fixture é um teste que, mais cedo ou mais tarde, vira flake ou bomba-relógio.
+3. **O relógio.** "Hoje" só vale com relógio provado — herdado do `a2a-verify` (§8.3). Sem essa prova,
+   dizer que um `verified_at` "está velho" é uma afirmação sem lastro.
+4. **O baseline.** Sem baseline explícito e versionado não há catraca — o gate sairia verde por *ausência*
+   de regra, não por conformidade (mesmo aviso já registrado na REGRA 29: baseline ausente é HARD, nunca um
+   passe livre).
+
+### 8.5 O encaixe — de "coisa que se lembra" a forcing function
+
+A doutrina `verify-external-for-current` já dizia *que* algo atual precisa de verificação externa — REGRA 42 é o
+que torna isso **mecânico**: transforma "reatualizar-se do mundo" de intenção-que-se-esquece em **forcing
+function** que o CI aplica sem depender de alguém lembrar. O gate **não** faz a re-verificação em si — só
+força a cadência. Quem de fato re-verifica contra o vivo é a sessão, via `/meta:kb-freshness`; REGRA 42 é o alarme
+que diz **quando**, `kb-freshness` é quem **responde**.
+
+## 9. Status e próximos passos
 
 - ✅ Doutrina, taxonomia (evidência) e design R15 fechados; 3 checagens do core passadas (reconciliação,
   refutador, escopo).
 - ✅ **Doutrina da catraca** (§7) — promovida a partir do sinal de campo de um adotante regulado (2026-07-20).
+- ✅ **Doutrina REGRA 42 — frescor doutrinário** (§8) — irmã temporal da catraca/REGRA 29; escrita a partir da pergunta
+  do maestro 2026-07-23 e do dogfood de world-sync do mesmo dia (tier de modelo, tetos e aspas fabricadas,
+  todos achados no mesmo ciclo). Wire-in mecânico (helper determinístico + catraca real + REGRA de lint) é
+  trabalho futuro — hoje é só doutrina, deliberadamente.
 - 🔜 **Gate anti-drift da taxonomia** (ONION-R1 sobre si mesma) — pré-requisito para promover o catálogo
   detalhado ao core.
 - 🔜 **R15 (wire-in)** — cerca de proveniência + gate de efeito; hoje protótipo em quarentena, não wired.

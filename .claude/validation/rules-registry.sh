@@ -98,8 +98,9 @@ CATEGORIES = [
      "Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins, topologia.",
      [8, 9, 16, 19, 21, 27, 37, 39, 41]),
     ("KG & proveniência",
-     "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca.",
-     [26, 29, 31, 32]),
+     "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca; "
+     "e frescor doutrinário — afirmação sensível-ao-tempo carimbada e dentro do TTL.",
+     [26, 29, 31, 32, 42]),
     ("Federação",
      "Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.",
      [24, 25, 28, 38]),

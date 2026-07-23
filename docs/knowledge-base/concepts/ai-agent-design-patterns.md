@@ -1,3 +1,8 @@
+---
+verified_at: 2026-07-23
+source: "https://claude.com/blog/introducing-dynamic-workflows-in-claude-code"
+---
+
 # AI Agent Design Patterns
 
 ---

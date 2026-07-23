@@ -1493,6 +1493,60 @@ check_kg_provenance_coverage() {
 }
 
 # ===========================================================================
+# REGRA 42 — Gate de FRESCOR DOUTRINÁRIO, com catraca [HARD + SOFT]
+#   Irmão TEMPORAL da REGRA 29. A 29 fecha conhecimento nascendo FORA do grafo
+#   (eixo ESPACIAL); esta fecha a afirmação doutrinária que EXPIROU EM SILÊNCIO
+#   (eixo TEMPORAL). Ambas são declarado≠verificado — uma contra o grafo, outra
+#   contra o TEMPO. Generaliza o STALE-OLD do kg-radar (verified_at vencido) de
+#   NÓ de grafo para AFIRMAÇÃO de doutrina em prosa de KB.
+#   Origem de campo (world-sync 2026-07-20/23): o cutoff do modelo é jan/2026; uma
+#   KB dizendo "o lineup vigente é X" vira MENTIRA em julho sem uma linha do repo
+#   mudar — e o world-sync achou tier acima do Opus, tetos errados e aspas
+#   fabricadas em doutrina "que parecia fina". O gate NÃO checa a web (seria no-op
+#   no CI); verifica que todo doc world-facing carrega verified_at (+ source) e que
+#   a data não expirou — força re-verificação; quem re-verifica é a sessão.
+#   Nível A (lista world-facing enumerada, o único eixo HARD): sem verified_at e
+#   FORA do baseline = HARD; no baseline = SOFT (passivo); malformado/futuro = HARD
+#   estrutural; > TTL = SOFT (re-verifique); relógio não-confiável degrada a idade
+#   a SOFT. Nível B (rede lexical em docs/knowledge-base, SOFT-only): token gatilho
+#   sem verified_at = SOFT. Toda a lógica (lista, TTL, relógio, catraca) vive em
+#   doctrine-freshness.sh, com o PORQUÊ de cada pressuposto no cabeçalho de lá.
+#   Agregação: PASSIVO e LEXICAL saem como UMA linha SOFT com a contagem (dezenas de
+#   linhas idênticas afogariam as classes acionáveis); as demais, individualmente.
+# ===========================================================================
+check_doctrine_freshness() {
+  local helper="${SCRIPT_DIR}/doctrine-freshness.sh"
+  [ -f "${helper}" ] || return 0
+  # Honra --only: as raízes desta regra são a lista world-facing (docs/knowledge-base),
+  # o baseline e o próprio helper. Alvo fora disso → nada a varrer (O(fixtures×1)).
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/docs/knowledge-base/*|*/doctrine-freshness-baseline.txt|"${helper}") : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out passivo=0 lexical=0 sev tag path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    case "${tag}" in
+      PASSIVO) passivo=$(( passivo + 1 )); continue ;;
+      LEXICAL) lexical=$(( lexical + 1 )); continue ;;
+    esac
+    violation "${sev}" "${REPO_ROOT}/${path}" "[frescor-doutrinário/${tag}] ${msg}"
+  done <<< "${out}"
+  if [ "${passivo}" -gt 0 ]; then
+    violation "SOFT" "${REPO_ROOT}/.claude/validation/doctrine-freshness-baseline.txt" \
+      "[frescor-doutrinário/PASSIVO] ${passivo} doc(s) world-facing ainda sem verified_at, tolerados pelo baseline — a métrica de saúde é este número DIMINUINDO (detalhe: bash .claude/validation/doctrine-freshness.sh)"
+  fi
+  if [ "${lexical}" -gt 0 ]; then
+    violation "SOFT" "${REPO_ROOT}/docs/knowledge-base" \
+      "[frescor-doutrinário/LEXICAL] ${lexical} doc(s) em docs/knowledge-base usam linguagem sensível-ao-tempo sem verified_at — rede frágil, revise se algum afirma lineup/versão/GA e precisa de carimbo (detalhe: bash .claude/validation/doctrine-freshness.sh)"
+  fi
+}
+
+# ===========================================================================
 # REGRA 32 — Página pública do grafo: números conferidos contra o mapa [HARD]
 #   A página /historia/grafo/ publica contagens do .kg.yaml em prosa e em
 #   BARRAS. Número no site é promessa: se o grafo cresce e a página não, ela
@@ -2018,6 +2072,7 @@ check_evolution_links
 check_knowledge_base_links
 check_research_kg
 check_kg_provenance_coverage
+check_doctrine_freshness
 check_kg_view_sync
 check_site_graph_sync
 check_projection_safety

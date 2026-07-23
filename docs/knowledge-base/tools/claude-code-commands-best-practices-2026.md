@@ -1,3 +1,8 @@
+---
+verified_at: 2026-07-23
+source: "https://docs.claude.com/en/release-notes/claude-code"
+---
+
 # Claude Code Commands Best Practices (atualizado em 2026-06-15)
 
 ---
