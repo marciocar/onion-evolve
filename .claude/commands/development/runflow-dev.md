@@ -7,13 +7,15 @@ model: sonnet
 allowed-tools: Read
 category: development
 tags: [runflow, sdk, workflows]
-version: "1.0.0"
-updated: "2026-05-18"
+version: "1.1.0"
+updated: "2026-07-23"
 ---
 
 # Desenvolvimento Runflow
 
 Comando especializado para desenvolvimento completo com Runflow SDK usando o agente especialista `@runflow-specialist`. Facilita criação de projetos, agentes, workflows, RAG e integrações, sempre orientando próximos passos e fechamento de tarefas.
+
+> **SSOT verificada**: `@runflow-ai/sdk` **1.6.2** — base de conhecimento `docs/knowledge-base/platforms/runflow.md` (verified_at 2026-07-23, fonte `docs.runflow.ai` + registry npm). API atual: `new Agent({...})` + `agent.process(...)`, `main.ts` como entrypoint, workflows via `flow(...).step(...).build().execute(...)` (a antiga `createWorkflow` está **deprecada**). Requisito de runtime: **Node.js >= 22**.
 
 ## Requisitos do Usuário
 <requirements>
@@ -137,7 +139,7 @@ O agente possui conhecimento completo da base de conhecimento em `docs/knowledge
 **O que o agente fará**:
 1. Definir schema de entrada e saída com Zod
 2. Criar agentes necessários para cada passo
-3. Configurar conectores (HubSpot, Twilio, etc.)
+3. Configurar connectors (dinâmicos, definidos no backend Runflow) via `createConnectorTool`/`connector`
 4. Implementar workflow com passos sequenciais/paralelos
 5. Adicionar passos condicionais se necessário
 6. Criar exemplo de execução
@@ -145,7 +147,7 @@ O agente possui conhecimento completo da base de conhecimento em `docs/knowledge
 
 **Exemplo de uso**:
 ```
-@runflow-specialist Criar workflow "lead-qualification" que: 1) qualifica lead com agente, 2) se nota >= 7 cria contato no HubSpot, 3) cria deal, 4) notifica equipe no Slack. Se nota < 7, apenas registra
+@runflow-specialist Criar workflow "lead-qualification" (via flow().step().build()) que: 1) qualifica lead com agente, 2) se nota >= 7 cria contato no HubSpot via connector, 3) cria deal, 4) notifica a equipe. Se nota < 7, apenas registra
 ```
 
 #### 2.6. Orientar Próximos Passos
@@ -224,7 +226,7 @@ O agente possui conhecimento completo da base de conhecimento em `docs/knowledge
 - ✅ Descreva funcionalidades desejadas
 - ✅ Especifique tools necessárias
 - ✅ Mencione se precisa RAG, memory, workflows
-- ✅ Indique integrações (HubSpot, Twilio, etc.)
+- ✅ Indique integrações (connectors dinâmicos definidos no backend Runflow; ex. citado na doc: HubSpot)
 
 **Desenvolvimento**:
 - ✅ Teste incrementalmente após cada criação
@@ -236,8 +238,9 @@ O agente possui conhecimento completo da base de conhecimento em `docs/knowledge
 
 **Configuração**:
 - ⚠️ Verifique `.runflow/rf.json` ou variáveis de ambiente antes de executar
-- ⚠️ Confirme versão do SDK (1.0.56) no `package.json`
-- ⚠️ Use `observability: 'minimal'` para evitar erros no trace collector
+- ⚠️ Confirme a versão do SDK no `package.json` (SSOT: `@runflow-ai/sdk` 1.6.2)
+- ⚠️ `observability` aceita `'full' | 'standard' | 'minimal'` — escolha o preset pelo volume de trace desejado
+- ⚠️ Node.js `>= 22` é obrigatório
 
 **RAG**:
 - ⚠️ Base de conhecimento deve existir na plataforma Runflow antes de configurar
@@ -262,9 +265,9 @@ O agente possui conhecimento completo da base de conhecimento em `docs/knowledge
 - ❌ Não ignore validação: sempre teste após criar código
 
 **Código**:
-- ❌ Não acesse Prisma diretamente (use Runflow SDK)
-- ❌ Não use `observability: 'full'` (use 'minimal')
-- ❌ Não ignore tratamento de erros em tools
+- ❌ Não use `createWorkflow(...)` em código novo — está deprecada; use `flow(...).step(...).build().execute(...)`
+- ❌ Não preencha assinatura de API de memória — se a KB não cobre, marque "verificar com a IFTL"
+- ❌ Não ignore tratamento de erros em tools nem a validação de `input.message` no `main()`
 
 **Integração**:
 - ❌ Não configure conectores sem credenciais válidas
@@ -408,8 +411,8 @@ O agente possui conhecimento completo da base de conhecimento em `docs/knowledge
 ### Problema: Agente não encontra base de conhecimento
 **Solução**: Verifique se base existe na plataforma Runflow antes de configurar RAG
 
-### Problema: Erro no trace collector
-**Solução**: Use `observability: 'minimal'` em todos os agentes
+### Problema: Volume de traces alto demais
+**Solução**: Ajuste `observability` para o preset `'minimal'` (ou use config granular). Os presets válidos são `'full' | 'standard' | 'minimal'`.
 
 ### Problema: Agente não segue padrões do projeto
 **Solução**: Mencione explicitamente "seguir padrões de main.ts" na solicitação
