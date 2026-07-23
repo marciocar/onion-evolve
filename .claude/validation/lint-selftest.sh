@@ -585,6 +585,51 @@ run_hub_role_guard_selftests() {
   else record_fail "hub-role-guard: (b)" "source não flagou o link ausente (o role-guard pula sempre?)"; fi
 }
 
+# Modo family-topology — REGRA 41 (2026-07-23): a SSOT-topologia no KG resolve a procedimentos REAIS. É a
+# fonte que as faces de CONDUÇÃO (wizard/onboarding/scaffold) projetam — se mentir, os fluxos de ajuda
+# dessincronizam. Testa: transição ativa com trace morto → HARD; papel ativo fora de roles.yaml → HARD;
+# gated (status: open) com trace morto → IGNORADO (não é procedimento ainda).
+run_family_topology_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  [ -f "${lint}" ] || return 0
+  if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
+    record_pass "family-topology: sem python+yaml (skip gracioso, coerente com REGRA 41)"; return; fi
+  local sb; sb="$(mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"; trap 'rm -rf "'"${sb}"'"' RETURN
+  mkdir -p "${sb}/.claude/validation" "${sb}/.claude/utils/marketplace" "${sb}/docs/onion/graph"
+  cp "${lint}" "${SCRIPT_DIR}/projection-safety.sh" "${sb}/.claude/validation/"
+  printf 'version: 1\nroles:\n  source:\n    base: []\n  hub:\n    base: []\n' > "${sb}/.claude/utils/marketplace/roles.yaml"
+  local KG="${sb}/docs/onion/graph/onion-family-topology-2026-07.kg.yaml"
+  _gen_topo() { cat > "${KG}" <<'K'
+meta: {id: t, schema_version: "1", date: 2026-07-23}
+nodes:
+  - {id: ROLE_hub, node_type: entity, status: confirmed, label: hub}
+  - {id: TX_adopt, node_type: decision, trace: .claude/validation/lint-artifacts.sh, status: confirmed, label: adopt}
+  - {id: TX_decouple, node_type: decision, trace: docs/NAO-EXISTE.md, status: open, label: gated}
+edges:
+  - {from: TX_adopt, to: ROLE_hub, edge_type: DEPENDS_ON}
+K
+  }
+  local out
+  # (a) SSOT válido + gated com trace morto IGNORADO → sem violação de topologia
+  _gen_topo
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${KG}" 2>&1 || true)"
+  if ! printf '%s' "${out}" | grep -q 'topologia/'; then
+    record_pass "family-topology: (a) transição ativa resolve + papel em roles.yaml + gated ignorado → limpo"
+  else record_fail "family-topology: (a)" "acusou um SSOT válido (ou não ignorou o gated)"; fi
+  # (b) transição ATIVA com trace morto → HARD (o SSOT mentiria p/ o wizard)
+  _gen_topo; sed -i 's#lint-artifacts.sh, status: confirmed#NAO-EXISTE.sh, status: confirmed#' "${KG}"
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${KG}" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'topologia/TRACE-MORTO'; then
+    record_pass "family-topology: (b) transição ativa com trace morto → HARD (anti-dessincronização)"
+  else record_fail "family-topology: (b)" "não pegou trace morto numa transição ativa"; fi
+  # (c) papel ATIVO fora de roles.yaml → HARD
+  _gen_topo; sed -i 's/id: ROLE_hub/id: ROLE_banana/' "${KG}"
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${KG}" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'topologia/PAPEL-ORFAO'; then
+    record_pass "family-topology: (c) papel ativo fora de roles.yaml → HARD"
+  else record_fail "family-topology: (c)" "não pegou papel órfão vs roles.yaml"; fi
+}
+
 run_kg_view_selftests() {
   local view="${SCRIPT_DIR}/kg-view.sh"
   local tmp out rc
@@ -4453,6 +4498,7 @@ run_migalhas_generate_selftests
 run_rules_registry_selftests
 run_onion_version_tracked_selftests
 run_hub_role_guard_selftests
+run_family_topology_selftests
 run_kg_view_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.

@@ -1,0 +1,167 @@
+# KG SDAAL — TOPOLOGIA DA FAMÍLIA Onion: a SSOT dos PAPÉIS e das TRANSIÇÕES entre eles.
+# É a fonte ÚNICA que as faces de CONDUÇÃO projetam (fonte≠derivação): o wizard (ajuda a FAZER) lê as
+# transições p/ conduzir; o onboarding (ajuda a CONHECER) lê os papéis p/ ensinar; o scaffold (GERA) são
+# os procedimentos que cada transição TRACEIA. Guardada pela REGRA 41 (toda transição confirmed resolve a
+# um procedimento REAL; os papéis batem com roles.yaml) — o SSOT não pode mentir nem dessincronizar.
+# Convenção: nós ROLE_<papel> = entity (os tiers); TX_<transição> = decision (os movimentos, com trace:).
+# Doutrina: docs/knowledge-base/concepts/onion-guided-lifecycle.md. Camada audit (meta/epistêmico).
+meta:
+  id: onion-family-topology-2026-07
+  schema_version: "1"
+  date: 2026-07-23
+nodes:
+  # ---- PAPÉIS (entity) — os tiers da família ----
+  - id: ROLE_source
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    label: "source (T0) — a AUTORA do framework (onion-evolve); tem a meta-fábrica (create-*/evolve/graph/inventory); NÃO carrega stamp (lida ao vivo)"
+  - id: ROLE_hub
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "hub (T1) — EMPRESA: adota e controla os PRÓPRIOS projetos (Camada 2); role: hub no stamp; USA o framework, nao o autora"
+  - id: ROLE_standalone
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "standalone (T3) — dev SOLO: framework completo, SEM sub-adotados nem federacao; adota o source direto"
+  - id: ROLE_consumer
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "consumer (T2) — PROJETO adotado por um hub (parent=hub); folha da cadeia, role: adopted, NAO re-adota (FED-3-1)"
+  - id: ROLE_distilled
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.85
+    status: confirmed
+    label: "distilled — onion-mini: destilacao curada (teaser); NAO vendoriza nem instala"
+  - id: ROLE_decoupled_source
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "fonte-desacoplada (GATED) — cliente que OWNA o proprio framework: corta o adopted_from, vira seu proprio T0, evolui sozinho. 'A fonte e soberana de quem a usa' no limite. Mecanismo nao existe ainda"
+
+  # ---- TRANSIÇÕES (decision) — os movimentos; trace: = o procedimento REAL (o scaffold) ----
+  - id: TX_create
+    node_type: decision
+    trace: .claude/commands/meta/adopt.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "CRIAR um repo framework-bearing p/ cliente (greenfield) — source instala o framework num alvo vazio → standalone/hub em potencial"
+  - id: TX_adopt
+    node_type: decision
+    trace: .claude/commands/meta/adopt.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "ADOTAR um projeto no Onion — source OU hub instala a superficie vendorizada num alvo → consumer (cp+config+stamp, never-clobber, faseado)"
+  - id: TX_promote_hub
+    node_type: decision
+    trace: .claude/commands/meta/adopt.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "PROMOVER a hub (/meta:adopt --promote-hub) — re-carimba adopted→hub, deliberado; abre a Camada 2 (a empresa passa a adotar os proprios projetos). FED-3-1 preservado"
+  - id: TX_update
+    node_type: decision
+    trace: .claude/commands/meta/adopt.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "ATUALIZAR um repo adotado (/meta:adopt --update) — traz o delta do framework via merge de vendor-branch + re-config + re-stamp; idempotente"
+  - id: TX_invite
+    node_type: decision
+    trace: docs/knowledge-base/concepts/onion-guided-lifecycle.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "CONVIDAR colaborador (GATED — hoje manual via gh api) — dono adiciona o cliente como colaborador write; ainda nao mecanizado numa transicao"
+  - id: TX_transfer
+    node_type: decision
+    trace: docs/knowledge-base/concepts/onion-guided-lifecycle.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "TRANSFERIR posse do repo (GATED — gh transfer, manual) — o dono passa a posse ao cliente; ex-dono vira colaborador (posse e singular)"
+  - id: TX_decouple
+    node_type: decision
+    trace: docs/knowledge-base/concepts/onion-guided-lifecycle.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.4
+    status: open
+    label: "DESACOPLAR (GATED — mecanismo nao existe) — um adotado corta o cordao e vira fonte-soberana propria (own T0, linhagem propria, autora o proprio framework)"
+
+edges:
+  # source e a origem: cria, adota, atualiza; o distilled deriva dele
+  - from: TX_create
+    to: ROLE_source
+    edge_type: DEPENDS_ON
+  - from: ROLE_standalone
+    to: TX_create
+    edge_type: DEPENDS_ON
+  - from: TX_adopt
+    to: ROLE_source
+    edge_type: DEPENDS_ON
+  - from: ROLE_consumer
+    to: TX_adopt
+    edge_type: DEPENDS_ON
+  - from: TX_update
+    to: ROLE_consumer
+    edge_type: DEPENDS_ON
+  - from: ROLE_distilled
+    to: ROLE_source
+    edge_type: DEPENDS_ON
+  # promocao: standalone/adopted → hub
+  - from: TX_promote_hub
+    to: ROLE_standalone
+    edge_type: DEPENDS_ON
+  - from: ROLE_hub
+    to: TX_promote_hub
+    edge_type: DEPENDS_ON
+  # o hub e o ator das transicoes de rede (convite/transferencia/desacople)
+  - from: TX_invite
+    to: ROLE_hub
+    edge_type: DEPENDS_ON
+  - from: TX_transfer
+    to: ROLE_hub
+    edge_type: DEPENDS_ON
+  - from: TX_decouple
+    to: ROLE_hub
+    edge_type: DEPENDS_ON
+  - from: ROLE_decoupled_source
+    to: TX_decouple
+    edge_type: DEPENDS_ON

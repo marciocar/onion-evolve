@@ -16,7 +16,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**40 regras** no total — **36 HARD**, **6 SOFT**.
+**41 regras** no total — **37 HARD**, **6 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -67,7 +67,7 @@ O consumidor fala com a abstração, nunca com o provider direto.
 
 ## SSOT anti-drift
 
-Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins.
+Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins, topologia.
 
 | Nº | Regra | Severidade |
 |---:|-------|:----------:|
@@ -79,6 +79,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 27 | Dependência de script de comando empacotado | HARD |
 | 37 | Mapa role→bundle (roles.yaml) consistente com os verticais | HARD |
 | 39 | Registro de REGRAS derivado e em paridade com as guardas | HARD |
+| 41 | Topologia da família: SSOT no KG resolve a procedimentos REAIS | HARD |
 
 ## KG & proveniência
 

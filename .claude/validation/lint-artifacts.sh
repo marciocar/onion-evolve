@@ -1908,6 +1908,62 @@ check_onion_version_tracked() {
 }
 
 # ===========================================================================
+# REGRA 41 — Topologia da família: SSOT no KG resolve a procedimentos REAIS [HARD]
+#           A topologia (docs/onion/graph/onion-family-topology-2026-07.kg.yaml) é a fonte que as faces de
+#           CONDUÇÃO projetam (wizard/onboarding/scaffold — onion-guided-lifecycle.md). Se o SSOT mentir,
+#           os fluxos de ajuda dessincronizam do que os comandos fazem — o medo do maestro. Esta guarda o
+#           impede: (a) toda TRANSIÇÃO ativa (TX_*, status: confirmed) traceia um procedimento que EXISTE;
+#           (b) todo PAPEL ativo (ROLE_*, status: confirmed) existe em roles.yaml. Gated (status: open) é
+#           pulado. Molde de check_role_bundle_sync. Pula gracioso sem python+yaml. [[fix-must-become-mechanism]]
+# ===========================================================================
+check_family_topology_sync() {
+  local kg="${REPO_ROOT}/docs/onion/graph/onion-family-topology-2026-07.kg.yaml"
+  local roles="${REPO_ROOT}/.claude/utils/marketplace/roles.yaml"
+  [ -f "${kg}" ] || return 0
+  have_py_yaml || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${kg}"|"${roles}") : ;; *) return 0 ;; esac
+  fi
+  local out
+  out="$(python3 - "${kg}" "${roles}" "${REPO_ROOT}" <<'PY'
+import sys, yaml, os, re
+kg, roles_path, root = sys.argv[1], sys.argv[2], sys.argv[3]
+try:
+    d = yaml.safe_load(open(kg, encoding='utf-8')) or {}
+except Exception as e:
+    print("ERRO\tKG ilegível: %s" % e); sys.exit(0)
+# papéis reais de roles.yaml (chaves sob 'roles:')
+real_roles = set()
+try:
+    r = yaml.safe_load(open(roles_path, encoding='utf-8')) or {}
+    real_roles = set((r.get('roles') or {}).keys())
+except Exception:
+    pass
+for n in (d.get('nodes') or []):
+    nid = n.get('id', ''); status = n.get('status', '')
+    if status != 'confirmed':
+        continue  # gated (open) é pulado — transição/papel futuro, sem procedimento ainda
+    if nid.startswith('TX_'):
+        tr = n.get('trace', '')
+        if not tr:
+            print("SEM-TRACE\t%s: transição ativa sem trace: (aponte ao procedimento que a implementa)" % nid)
+        elif not os.path.exists(os.path.join(root, tr)):
+            print("TRACE-MORTO\t%s: trace '%s' não resolve — procedimento ausente (o SSOT mentiria p/ o wizard)" % (nid, tr))
+    elif nid.startswith('ROLE_'):
+        role = nid[len('ROLE_'):]
+        if real_roles and role not in real_roles:
+            print("PAPEL-ORFAO\t%s: papel '%s' não existe em roles.yaml (SSOT da topologia divergente do bundle)" % (nid, role))
+PY
+)" || true
+  if [ -n "${out}" ]; then
+    while IFS=$'\t' read -r tag msg; do
+      [ -n "${msg}" ] || continue
+      violation "HARD" "docs/onion/graph/onion-family-topology-2026-07.kg.yaml" "[topologia/${tag}] ${msg}"
+    done <<< "${out}"
+  fi
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -1968,6 +2024,7 @@ check_vendored_surface_clean
 check_frontmatter_model_category
 check_rules_registry_sync
 check_onion_version_tracked
+check_family_topology_sync
 
 # ===========================================================================
 # SUMÁRIO FINAL
