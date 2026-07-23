@@ -314,6 +314,50 @@ especificação aqui — ele vive em
 > e a **verificação adversarial**. Dito em voz alta porque "coberto" lido como "conferido" seria a mesma
 > falsa-garantia que a doutrina `declarado≠verificado` existe para matar.
 
+### Investigação NASCE no grafo — o irmão INTERNO da proveniência (marcador `kg:`)
+
+A REGRA 29 acima olha da **borda do grafo para fora**: *"este relatório existe no grafo?"* (algum nó o
+cita). Falta a pergunta virada para **dentro** da própria migalha/doc: *"o grafo que esta investigação
+declara ter nascido dela é **real e são**?"*. É o mesmo eixo espacial da 29 — proveniência — mas medido
+por **marcador autodeclarado** em vez de por **citação**. Por isso: **irmão INTERNO** da 29.
+
+**Origem de campo** (memória do maestro 2026-07-23, *"radar sub-usado"*): o passo `write(KG)` (passo 7)
+da skill `onion-orchestration` era **ADVICE** — e advice-que-depende-de-lembrar **falhou de novo**, o
+mesmo modo de falha que esta seção inteira documenta. Uma sessão correu **8 passadas do contrato de
+inferência (Elenxo)** e a saída **evaporou em prosa**; só virou grafo **depois, à mão**
+([`inference-contract-audit-2026-07.kg.yaml`](../../onion/graph/inference-contract-audit-2026-07.kg.yaml)),
+quando o radar então reconstruiu a escada inteira + a tese-núcleo por peso. O **radar é runtime**, não
+lint ocasional — e estava **sub-usado**. A correção é **em camadas, honesta**: (1) uma **FASE `write(KG)`
+canônica** no template da classe FINDINGS da orquestração (default-path, caminho de menor resistência —
+materializa o `.kg.yaml` + roda o radar **antes** de retornar); (2) este **gate de integridade do
+marcador**; (3) a **pergunta guiada** no `/meta:diary create` (*"nasceu no grafo? path do `.kg.yaml`,
+ou prosa-só + porquê"*); (4) o **limite honesto** declarado abaixo.
+
+**O marcador `kg:`** é um campo de frontmatter — em migalha epistêmica (`type` decision/error/learning/
+reflection) ou doc de achado — que aponta para o `.kg.yaml` onde a investigação nasceu. Quem **declara**
+`kg:` tem de apontar para um grafo que **existe**, **é** `.kg.yaml`, e **passa no `kg-radar --integrity`
+E `--schema`** (exit 0). Pendurado, não-grafo, ou radar-reprova ⇒ **HARD**. O gate vive em
+[`.claude/validation/kg-born-marker.sh`](../../../.claude/validation/kg-born-marker.sh) (REGRA 43 do lint),
+e o **marcador `kg:` é o pressuposto — o gate o prova** (com mutation test da severidade), na regra de
+admissão da casa ([`inference-mitigation.md`](inference-mitigation.md)).
+
+> ⚠️ **Por que NÃO tem catraca/baseline — e por que isso é o CORRETO, não frouxidão.** A REGRA 29 precisa
+> de catraca porque cobra **ausência** (doc sem nó = violação): sem baseline reprovaria dezenas de legados
+> no 1º dia e seria desligada — o erro da catraca. Aqui é o **oposto**: a **ausência** do marcador `kg:`
+> **não é violação**. As ~72 migalhas existentes não declaram `kg:` — e o gate **nasce silencioso**, sem
+> retro-reprovar ninguém. Só o `kg:` **declarado-mas-inválido** reprova. `missing != violation` ⇒ não há
+> passivo a tolerar ⇒ não há baseline. Pôr catraca aqui **repetiria** o erro que a 29 existe para não
+> repetir. (Ver a doutrina da catraca em [`onion-guardrails.md`](onion-guardrails.md) — referenciada, não
+> reescrita: a 29 é por citação **com** catraca; a 43 é por marcador **sem** catraca, e a diferença é
+> exatamente `missing != violation`.)
+
+> 🎯 **O LIMITE HONESTO — mesmo rigor do Nível B da REGRA 42.** Investigação **não-declarada** é
+> **estruturalmente indetectável**: a investigação pode não deixar rastro nenhum no repo. Este gate **não
+> força o nascimento** — garante a **integridade do que se declara**. O nascimento de fato fica por conta
+> de **disciplina + default-path** (a FASE `write(KG)` canônica da orquestração, camada 1), **não** deste
+> HARD. Não fingir que o gate força o nascimento seria a mesma desonestidade que dizer "coberto = conferido":
+> ele só prova que o `.kg.yaml` **declarado** é real e são.
+
 
 ### Os nomes: gênero × espécie (para parar de multiplicar sinônimos)
 

@@ -16,7 +16,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**42 regras** no total — **38 HARD**, **7 SOFT**.
+**43 regras** no total — **39 HARD**, **7 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -83,7 +83,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 
 ## KG & proveniência
 
-Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca; e frescor doutrinário — afirmação sensível-ao-tempo carimbada e dentro do TTL.
+Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (por citação e por marcador autodeclarado); e frescor doutrinário — afirmação sensível-ao-tempo carimbada e dentro do TTL.
 
 | Nº | Regra | Severidade |
 |---:|-------|:----------:|
@@ -92,6 +92,7 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca; e 
 | 31 | Lente do grafo: DERIVADA e em paridade com o motor | HARD |
 | 32 | Página pública do grafo: números conferidos contra o mapa | HARD |
 | 42 | Gate de FRESCOR DOUTRINÁRIO, com catraca | HARD + SOFT |
+| 43 | Integridade do marcador kg: (proveniência virada p/ DENTRO) | HARD |
 
 ## Federação
 

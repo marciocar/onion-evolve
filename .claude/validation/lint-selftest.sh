@@ -3981,6 +3981,178 @@ run_doctrine_freshness_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo kg-born-marker — GATE DE INTEGRIDADE DO MARCADOR kg: (REGRA 43).
+#
+# Irmão INTERNO da REGRA 29: a 29 pergunta "este relatório existe no grafo?" (doc→nó);
+# esta pergunta "o grafo que a migalha DECLARA é real e são?" (marcador→.kg.yaml). Origem:
+# memória do maestro 2026-07-23 (radar sub-usado; write(KG) da onion-orchestration era advice).
+#
+# Cinco casos da tarefa + a distinção que é a RAZÃO DE EXISTIR deste gate (missing != violation,
+# o oposto da catraca da 29) + MUTATION TEST provando que a severidade HARD é LOAD-BEARING (não
+# declarada num comentário). Sandboxes self-contained (mktemp), sem fixture-file.
+# ---------------------------------------------------------------------------
+
+# Monta um repo mínimo com o escopo do gate + os grafos-alvo. Ecoa o diretório.
+_born_make_repo() {
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/.claude/validation" "${d}/.claude/diary" "${d}/docs/analysis"
+  cp "${REPO_ROOT}/.claude/validation/kg-born-marker.sh" "${d}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh"       "${d}/.claude/validation/"
+
+  # Grafo VÁLIDO (passa --integrity E --schema): 2 nós + 1 aresta (sem órfão).
+  cat > "${d}/docs/analysis/probe.kg.yaml" <<'KGEOF'
+meta:
+  id: probe
+  schema_version: "1"
+nodes:
+  - id: C1
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+  - id: E1
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+edges:
+  - from: E1
+    to: C1
+    edge_type: SUPPORTS
+KGEOF
+  # Grafo que o radar REPROVA (nó órfão, sem plane/impact) — .kg.yaml legítimo, mas inconsistente.
+  printf 'nodes:\n  - id: N1\n    node_type: claim\n' > "${d}/docs/analysis/bad.kg.yaml"
+  # Um .md que NÃO é grafo.
+  printf '# só prosa\n' > "${d}/docs/analysis/prose.md"
+
+  # (i) kg: → grafo VÁLIDO
+  printf '%s\n' '---' 'type: decision'   'kg: docs/analysis/probe.kg.yaml'     '---' '# ok'  > "${d}/.claude/diary/i-valid.md"
+  # (ii) kg: PENDURADO (path inexistente)
+  printf '%s\n' '---' 'type: error'      'kg: docs/analysis/nao-existe.kg.yaml' '---' '# x'  > "${d}/.claude/diary/ii-dangling.md"
+  # (iii) kg: aponta .md que NÃO é grafo
+  printf '%s\n' '---' 'type: learning'   'kg: docs/analysis/prose.md'           '---' '# x'  > "${d}/.claude/diary/iii-notkg.md"
+  # (iv) kg: aponta .kg.yaml que o radar REPROVA
+  printf '%s\n' '---' 'type: reflection' 'kg: docs/analysis/bad.kg.yaml'        '---' '# x'  > "${d}/.claude/diary/iv-radarfail.md"
+  # (v) migalha SEM kg: (não retro-reprova)
+  printf '%s\n' '---' 'type: learning'   '---' '# sem marcador'                        > "${d}/.claude/diary/v-nomarker.md"
+  printf '%s\n' "${d}"
+}
+
+# _born_run <repo> — preenche _BORN_OUT (TSV) e _BORN_RC. NÃO ecoa (o subshell de
+# x="$(...)" mataria a atribuição de _BORN_RC — a mesma armadilha do _prov_run).
+_born_run() {
+  local repo="$1"; local tf; tf="$(mktemp)"
+  set +e
+  bash "${repo}/.claude/validation/kg-born-marker.sh" "${repo}" --format tsv >"${tf}" 2>/dev/null
+  _BORN_RC=$?
+  set -e
+  _BORN_OUT="$(cat "${tf}")"; rm -f "${tf}"
+}
+
+run_kg_born_marker_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/kg-born-marker.sh"
+  if [ ! -f "${h}" ]; then record_fail "kg-born-marker" "helper ausente: ${h}"; return; fi
+
+  local d out; d="$(_born_make_repo)"
+  _born_run "${d}"; out="${_BORN_OUT}"
+
+  # (i) kg: → grafo VÁLIDO → passa (nenhuma linha para i-valid.md).
+  printf '%s\n' "${out}" | grep -q 'i-valid\.md' \
+    && record_fail "kg-born-marker: (i) válido" "falso-positivo — grafo VÁLIDO (radar exit 0) foi reprovado" \
+    || record_pass "kg-born-marker: (i) kg: → .kg.yaml VÁLIDO (radar --integrity E --schema exit 0) → silêncio"
+
+  # (ii) kg: PENDURADO → HARD/MISSING-PATH.
+  printf '%s\n' "${out}" | grep -qE '^HARD	MISSING-PATH	.claude/diary/ii-dangling\.md	' \
+    && record_pass "kg-born-marker: (ii) kg: pendurado (path inexistente) → HARD" \
+    || record_fail "kg-born-marker: (ii) pendurado" "não emitiu HARD/MISSING-PATH para ii-dangling.md"
+
+  # (iii) kg: → .md que não é grafo → HARD/NOT-KG.
+  printf '%s\n' "${out}" | grep -qE '^HARD	NOT-KG	.claude/diary/iii-notkg\.md	' \
+    && record_pass "kg-born-marker: (iii) kg: aponta .md não-grafo → HARD" \
+    || record_fail "kg-born-marker: (iii) não-grafo" "não emitiu HARD/NOT-KG para iii-notkg.md"
+
+  # (iv) kg: → .kg.yaml que o radar REPROVA → HARD/RADAR-FAIL.
+  printf '%s\n' "${out}" | grep -qE '^HARD	RADAR-FAIL	.claude/diary/iv-radarfail\.md	' \
+    && record_pass "kg-born-marker: (iv) kg: aponta .kg.yaml que o radar REPROVA → HARD" \
+    || record_fail "kg-born-marker: (iv) radar-reprova" "não emitiu HARD/RADAR-FAIL para iv-radarfail.md"
+
+  # (v) migalha SEM kg: → passa. É a RAZÃO DE EXISTIR do gate (missing != violation —
+  #     o oposto da catraca da 29; retro-reprovar as ~72 migalhas seria o erro da catraca).
+  printf '%s\n' "${out}" | grep -q 'v-nomarker\.md' \
+    && record_fail "kg-born-marker: (v) sem kg:" "retro-reprovou uma migalha SEM kg: — o erro da catraca que este gate NÃO comete" \
+    || record_pass "kg-born-marker: (v) migalha SEM kg: → passa (missing != violation; não retro-reprova)"
+
+  # Exit code é o contrato do consumidor: HARD presente ⇒ rc 1.
+  [ "${_BORN_RC}" -eq 1 ] \
+    && record_pass "kg-born-marker: exit code 1 com HARD presente" \
+    || record_fail "kg-born-marker: exit code" "esperava rc=1 com HARD presente, veio rc=${_BORN_RC}"
+
+  # =========================================================================
+  # MUTATION TEST — a severidade HARD do caso (ii) é LOAD-BEARING, não declarada.
+  #   Ontem uma guarda desta casa declarou "SOFT nunca HARD" em COMENTÁRIO e o
+  #   mutation test passou verde. Aqui: flip HARD→SOFT no ramo MISSING-PATH de uma
+  #   CÓPIA do helper e prove que a asserção (ii) — que exige HARD — QUEBRA.
+  # =========================================================================
+  local m; m="$(_born_make_repo)"
+  local mut="${m}/.claude/validation/kg-born-marker.sh"
+  sed -i.bak 's|say "HARD" "MISSING-PATH"|say "SOFT" "MISSING-PATH"|' "${mut}"
+  if ! grep -q 'say "SOFT" "MISSING-PATH"' "${mut}"; then
+    record_fail "kg-born-marker: (MUT) mutation" "a mutação não foi aplicada — o teste não prova nada (âncora do sed mudou?)"
+  else
+    local mout mrc
+    set +e
+    mout="$(bash "${mut}" "${m}" --format tsv 2>/dev/null)"; mrc=$?
+    set -e
+    if printf '%s\n' "${mout}" | grep -qE '^HARD	MISSING-PATH	.claude/diary/ii-dangling\.md	'; then
+      record_fail "kg-born-marker: (MUT) mutation" "com a severidade rebaixada a SOFT o caso (ii) ainda saiu HARD — o teste não é load-bearing"
+    else
+      record_pass "kg-born-marker: (MUT) MUTATION TEST — severidade HARD→SOFT em (ii) QUEBRA a asserção de HARD (rc ${_BORN_RC}→${mrc}); a severidade é load-bearing, não declarada"
+    fi
+  fi
+
+  # =========================================================================
+  # SEVERIDADE POR DELTA no lint REAL — o caso (ii) soma exatamente 1 HARD ao
+  #   sumário do lint completo (a severidade é MEDIDA, não lida de um comentário).
+  # =========================================================================
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_fail "kg-born-marker: delta" "lint ausente"; else
+    local sb; sb="$(mktemp -d)"
+    mkdir -p "${sb}/.claude"
+    (cd "${REPO_ROOT}/.claude" && tar -cf - --exclude=worktrees .) | (cd "${sb}/.claude" && tar -xf -)
+    cp -a "${REPO_ROOT}/docs"      "${sb}/docs"
+    cp -a "${REPO_ROOT}/CLAUDE.md" "${sb}/CLAUDE.md"
+    rm -rf "${sb}/plugins" "${sb}/.claude-plugin"
+    # Ambos os --only apontam para arquivos SOB .claude/diary (o lint recusa --only
+    # inexistente, então o baseline usa uma migalha REAL já limpa, não o path da sonda
+    # ainda-não-criada): o MESMO conjunto de regras dispara nas duas, e o delta isola a
+    # violação desta regra. Mesmo padrão do BLOCO D da REGRA 29 (baseline num arquivo
+    # existente, sonda em outro; ambos dentro das raízes da regra).
+    local probe=".claude/diary/selftest-born-dangling.md"
+    local base_crumb o0 h0 o1 h1
+    base_crumb="$(cd "${sb}" && find .claude/diary -maxdepth 1 -type f -name '*.md' 2>/dev/null | sort | head -1)"
+    if [ -z "${base_crumb}" ]; then
+      record_fail "kg-born-marker: delta setup" "sandbox sem migalha real p/ baseline do delta"
+    else
+      o0="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${base_crumb}" 2>&1 || true)"
+      h0="$(printf '%s' "${o0}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+      printf '%s\n' '---' 'type: decision' 'kg: docs/analysis/nao-existe-selftest.kg.yaml' '---' '# sonda' > "${sb}/${probe}"
+      o1="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe}" 2>&1 || true)"
+      h1="$(printf '%s' "${o1}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+      if [ "${h1}" = "$((h0 + 1))" ] && printf '%s' "${o1}" | grep -qF "${probe}"; then
+        record_pass "kg-born-marker: SEVERIDADE por DELTA — migalha com kg: pendurado soma HARD no lint real (${h0}→${h1})"
+      else
+        record_fail "kg-born-marker: delta HARD" "esperava HARD ${h0}→$((h0 + 1)) citando ${probe}; veio ${h1}"
+      fi
+    fi
+    rm -rf "${sb}"
+  fi
+
+  rm -rf "${d}" "${m}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo outbox-channel — exercita a REGRA 28 do lint (check_outbox_channel_exists):
 # anúncio em staging (docs/evolution/federation/outbox/<membro>/*.md) para um
 # membro cujo local_path NÃO TEM docs/evolution/inbound/ deve virar SOFT (nunca
@@ -4768,6 +4940,9 @@ run_kg_coverage_selftests
 
 # Modo doctrine-freshness — REGRA 42: gate de FRESCOR DOUTRINÁRIO com catraca (irmão temporal da 29; world-sync 2026-07-20/23).
 run_doctrine_freshness_selftests
+
+# Modo kg-born-marker — REGRA 43: integridade do marcador kg: (proveniência virada p/ DENTRO; radar sub-usado, maestro 2026-07-23).
+run_kg_born_marker_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests

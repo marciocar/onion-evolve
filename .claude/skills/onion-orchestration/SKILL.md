@@ -76,7 +76,11 @@ Nativas" (fonte única).
    §SSOT-as-runtime) — é o **bookend simétrico** do read(KG) (passo 0 de `warm-up`/`catch-up`/`engineer:work`).
    **Mecanismo, não conselho:** skills do harness como `deep-research` despejam em `/tmp` efêmero — a
    orquestração Onion é **dona** do leg `write(KG)`; "advice-que-depende-de-lembrar" falhou empiricamente
-   (3 pesquisas perderam o write até o próprio maestro — sinal de campo 2026-07-18).
+   (3 pesquisas perderam o write até o próprio maestro — sinal de campo 2026-07-18; ver também
+   `radar-is-runtime-investigations-born-as-graph` — 8 passadas de Elenxo evaporaram em prosa e só
+   viraram grafo depois, a mão). **Template canônico da fase abaixo** — para a classe FINDINGS isto é a
+   **SHAPE do passo 7, não opcional**: fase final que materializa `.kg.yaml` + roda o radar + carimba
+   `kg:` no doc de síntese (o marcador que o gate de integridade de frontmatter valida).
 8. **Relatório ao usuário** em pt-BR: padrão escolhido, nº de workers, tier de
    modelo, budget gasto, o resultado consolidado **e onde o `write(KG)` persistiu** (path do `.md`
    + `.kg.yaml` + veredito do radar).
@@ -127,6 +131,36 @@ const collided = paths.filter((p, i) => paths.indexOf(p) !== i);
 if (collided.length) return gateHumano(collided, results);  // partição falhou
 // sem colisão → consolida numa branch → /git:flow feature finish | /engineer:pr
 ```
+
+### `write(KG)` — template canônico de fase (classe FINDINGS)
+
+Fase **final e obrigatória** de toda orquestração que produz síntese/achados/decisões (audit, research,
+investigação, design) — não é advice, é a **SHAPE** do passo 7. Pega a síntese consolidada do fan-in,
+materializa o grafo, roda o radar e **carimba** o doc de síntese com `kg:` — o marcador que o gate de
+integridade de frontmatter (migalhas `decision`/`error`/`learning`/`reflection`) valida quando declarado.
+
+```javascript
+// write(KG) — fase canônica final para orquestração classe FINDINGS
+const synthesis = consolidate(findings);                          // já rodou o fan-in
+const synthesisPath = `docs/analysis/${slug}-${today}.md`;
+await write(synthesisPath, synthesisToMarkdown(synthesis));       // persiste no repo — nunca só /tmp efêmero
+
+const kgPath = `docs/onion/graph/${slug}-${today}.kg.yaml`;
+await agent(                                                      // ou: /meta:kg <slug> (mesmo efeito)
+  `Modele a síntese consolidada como Knowledge Graph SDAAL (.kg.yaml): claims/evidência/decisões
+   tipados, arestas SUPPORTS/REFUTES/SUPERSEDES. Escreva em ${kgPath}.\n\n${JSON.stringify(synthesis)}`,
+  { schema: KgWriteSchema, model: "sonnet", effort: "medium" }
+);
+
+const radar = await bash(`bash .claude/validation/kg-radar.sh ${kgPath}`);
+if (radar.exitCode !== 0) throw new Error(`kg-radar falhou em ${kgPath} — a fase write(KG) não fecha sem exit 0`);
+
+// carimba o doc de síntese com o marcador que o gate de integridade de frontmatter valida
+await editFrontmatter(synthesisPath, { kg: kgPath });
+```
+
+Sem este carimbo, a síntese não deixa rastro estrutural de que **nasceu no grafo** — só prosa que
+"evapora" entre sessões (o próprio buraco que este template fecha).
 
 ## Model tiering — PADRÃO OBRIGATÓRIO (tier por complexidade, sempre)
 

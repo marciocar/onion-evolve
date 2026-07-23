@@ -11,8 +11,8 @@ model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *) Bash(find *) Bash(awk *) Bash(grep *) Bash(sort *)
 argument-hint: "create | list [--classification <c>] [--type <t>] [--sharable] | export-sharable [--dry-run] | index | review"
 category: meta
-version: "1.3.0"
-updated: "2026-07-19"
+version: "1.4.0"
+updated: "2026-07-23"
 ---
 
 # 🧅 /meta:diary — Diário de Aprendizado Onion
@@ -78,6 +78,14 @@ INSTANCE_ID="$(awk '/^instance:/{print $2}' "$REPO/.claude/.onion-version" 2>/de
      barato). Exige `valid_when`.
 7. **valid_when** *(obrigatório se `conditional`; opcional nas demais)* — a condição de
    aplicabilidade em 1 linha testável (ex: `"o adotante segue sem node_modules na worktree"`).
+8. **Nasceu no grafo?** *(pergunta guiada só para `type` em `decision`/`error`/`learning`/`reflection`
+   — os tipos epistêmicos)* — esta migalha veio de uma investigação/audit/verify-multi-round (algo que
+   valeu a pena modelar como claims/evidência/decisões)?
+   - **Sim** → informe `kg: <path/para/o.kg.yaml>` (born-in-graph — o grafo é o destino, a migalha é
+     projeção dele; ver `write(KG)` canônico em `onion-orchestration`).
+   - **Não, foi prosa-só** → não preencha `kg:` (o campo é **opcional** — ausência não é violação,
+     não retro-reprova migalhas antigas), mas diga numa linha **por que** não valeu grafo (ex.: "insight
+     pontual de 1 fonte, sem cadeia de evidência a modelar").
 
 **Gerar arquivo:**
 
@@ -104,6 +112,7 @@ review_after: ${REVIEW_DATE}
 conflict_class: <dynamic|static|conditional>
 valid_when: "<condição testável — obrigatória se conditional; REMOVER a linha se não se aplica>"
 significance: "<frase orgulhosa e honesta, ≤1 linha — por que esta migalha vale e qual seu papel no continuum dogfoodado; OPCIONAL, REMOVER a linha se ainda não estiver clara>"
+kg: "<path/para/o.kg.yaml> — OPCIONAL: só se esta migalha nasceu de investigação/audit/verify-multi-round; REMOVER a linha se foi prosa-só (ausência não é violação — só kg: declarado-mas-inválido reprova no gate de integridade)"
 ---
 
 ## Signal
@@ -273,6 +282,13 @@ auto-reforçante — [ADR work-models §4](../../../docs/analysis/onion-adr-work
    `superseded` no `review` (não se vende com orgulho uma migalha morta). Campo **opcional e
    retrocompatível** — entradas pré-1.3.0 sem ele continuam válidas; o `diary-index.sh` degrada
    gracioso ("—") quando ausente.
+9. **`kg:` é opcional, mas se declarado exige integridade** — para tipos epistêmicos
+   (`decision`/`error`/`learning`/`reflection`), a pergunta guiada oferece registrar o path do
+   `.kg.yaml` quando a migalha **nasceu de investigação/audit/verify-multi-round** (born-in-graph — ver
+   `write(KG)` canônico em `onion-orchestration`). **Ausência não é violação** — não retro-reprova as
+   migalhas existentes; só `kg:` **declarado** e apontando para um grafo pendurado/quebrado é. A
+   integridade de `kg:` (path existe + `kg-radar.sh --integrity --schema` sai 0) é validada no gate de
+   frontmatter (dono: `validation/`), não neste comando.
 
 ---
 

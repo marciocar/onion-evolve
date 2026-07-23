@@ -1547,6 +1547,42 @@ check_doctrine_freshness() {
 }
 
 # ===========================================================================
+# REGRA 43 — Integridade do marcador kg: (proveniência virada p/ DENTRO) [HARD]
+#   Irmão INTERNO da REGRA 29. A 29 pergunta, de fora do grafo p/ dentro, "este
+#   RELATÓRIO existe no grafo?" (algum nó o cita). Esta é de dentro da migalha/doc
+#   p/ o grafo: "o grafo que esta migalha DECLARA ter nascido dela é REAL e são?".
+#   Quem DECLARA `kg:` no frontmatter (migalha epistêmica ou doc de achado) tem de
+#   apontar para um .kg.yaml que EXISTE, é .kg.yaml, e passa no kg-radar --integrity
+#   E --schema. Pendurado/não-grafo/radar-reprova ⇒ HARD.
+#   CRÍTICO (não é a catraca da 29): a AUSÊNCIA de `kg:` NÃO é violação — as ~72
+#   migalhas existentes não declaram kg: e o gate nasce SILENCIOSO. missing != violation
+#   ⇒ sem baseline/catraca (pô-los aqui repetiria o erro que a 29 existe p/ não repetir).
+#   LIMITE HONESTO: investigação não-declarada é indetectável (pode não tocar o repo)
+#   — disciplina + default-path (FASE write(KG) da onion-orchestration), NÃO este gate.
+#   Origem: memória do maestro 2026-07-23 (radar sub-usado). Toda a lógica vive em
+#   kg-born-marker.sh, com o PORQUÊ de cada pressuposto no cabeçalho de lá.
+# ===========================================================================
+check_kg_born_marker() {
+  local helper="${SCRIPT_DIR}/kg-born-marker.sh"
+  [ -f "${helper}" ] || return 0
+  # Honra --only: as raízes desta regra são .claude/diary, docs/analysis e
+  # docs/evolution/research. Alvo fora disso → nada a varrer (O(fixtures×1)).
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/.claude/diary/*|"${REPO_ROOT}"/docs/analysis/*|"${REPO_ROOT}"/docs/evolution/research/*) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out sev tag path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    violation "${sev}" "${REPO_ROOT}/${path}" "[marcador-kg/${tag}] ${msg}"
+  done <<< "${out}"
+}
+
+# ===========================================================================
 # REGRA 32 — Página pública do grafo: números conferidos contra o mapa [HARD]
 #   A página /historia/grafo/ publica contagens do .kg.yaml em prosa e em
 #   BARRAS. Número no site é promessa: se o grafo cresce e a página não, ela
@@ -2073,6 +2109,7 @@ check_knowledge_base_links
 check_research_kg
 check_kg_provenance_coverage
 check_doctrine_freshness
+check_kg_born_marker
 check_kg_view_sync
 check_site_graph_sync
 check_projection_safety
