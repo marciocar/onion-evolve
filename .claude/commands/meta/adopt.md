@@ -270,6 +270,14 @@ if [ -f "$DEST/.claude/validation/inventory.sh" ]; then
   bash "$DEST/.claude/validation/inventory.sh" --markdown > "$DEST/docs/onion/inventory.md" 2>/dev/null || true
 fi
 
+# (8b) SSOT graph.md — REGENERA (mesma razão do inventory: a REGRA 21 exige docs/onion/graph.md e o hook
+#      NATIVO recém-instalado bloqueia o 1º commit da adoção sem ele. Gap achado ao DOGFOODAR o adopt
+#      canônico 2026-07-23 — o hand-roll gerava o graph à mão e mascarava a ausência; o --no-verify do
+#      commit durável mascararia commitando vermelho. Determinístico, idempotente, sem LLM.
+if [ -f "$DEST/.claude/validation/graph.sh" ]; then
+  bash "$DEST/.claude/validation/graph.sh" --markdown > "$DEST/docs/onion/graph.md" 2>/dev/null || true
+fi
+
 # (9) BASELINE de cobertura de KG — REGENERA do filesystem do alvo (mesmo padrão do passo 8, mesma razão).
 #     O manifesto copia `.claude/validation/` INTEIRO, então o baseline DO CORE viaja junto. Sem regenerar,
 #     o adotante herda o passivo do core (paths que não existem lá → ruído órfão) e, pior, vê **todo
