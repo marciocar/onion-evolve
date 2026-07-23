@@ -40,6 +40,23 @@ Mapear: **`role: source` → CORE** (`onion-evolve`, dono do framework + protoco
 > `método pessoal-usando-dogfood-kg-sdaal` "não chegou" na 1ª leitura por checkout 3 commits atrás. Isto
 > **complementa** o invariante "git fetch antes de evoluir" (Passo 4) — aqui é antes de **ler**, não só de escrever.
 
+> **Passo 2.1 — reconciliar `outbox×inbound` (core, adotante na MESMA máquina) — recomendado.** A
+> entrega-sem-commit escolhe UM checkout do adotante; se o repo vive em N máquinas (notebook + VPS), o
+> carteiro pode ter entregue no checkout que **não trabalha** — **falha silenciosa**: o core acha que
+> anunciou (arquivo em `outbox/<id>/_processed/`), o adotante nunca viu, e **nenhum gate dispara**. Só o
+> cruzamento revela. Quando o adotante vive na mesma máquina, cruze o que o core diz ter transportado
+> contra o que de fato chegou:
+> ```bash
+> id=<member>; adopter=<local_path do adotante em members.yaml>   # o checkout que TRABALHA
+> comm -13 \
+>   <(ls "$adopter"/docs/evolution/inbound{,/_processed}/*.md 2>/dev/null | xargs -rn1 basename | sort -u) \
+>   <(ls docs/evolution/federation/outbox/$id/_processed/*.md 2>/dev/null | xargs -rn1 basename | sort -u)
+> # saída não-vazia = anúncios que o core marcou transportado mas NÃO chegaram → re-entregar com --target certo
+> ```
+> Lição de campo 2026-07-21 (um adotante multi-máquina): 7 anúncios caíram no checkout de uma máquina
+> enquanto o trabalho vivia em outra — só o `comm -13` achou. **Entregue sempre com `/meta:co-deliver
+> --target` = o checkout que trabalha** (resolva pelo `local_path` do `members.yaml`).
+
 Listar de 1º nível (excluir `_processed/` e `README.md`) **os dois canais** do doc-bridge:
 - **`docs/evolution/inbox/*.md`** — upstream (sinal/feedback). No core: chegando dos projetos; no consumidor: a relayar ao core.
 - **`docs/evolution/inbound/*.md`** — downstream (core→consumidor): relatório de adoção/update + anúncios. **Só existe no consumidor.**
