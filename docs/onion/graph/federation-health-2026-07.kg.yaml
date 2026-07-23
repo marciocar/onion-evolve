@@ -55,11 +55,33 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 1.0
-    status: open
+    status: superseded
     verified_against: commit
     label: "metagamify linhagem production: pin 8e22352 verificado 2026-07-03 mas o commit ficou pendente na sessao do rhilo (entrega-sem-commit I3) — verificado no artefato, nao no ledger"
     verified_at: 2026-07-03
     trace: "docs/evolution/federation/members.yaml:73"
+  - id: E_METAGAMIFY_PIN_REVERIFIED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_against: pin
+    verified_at: 2026-07-23
+    label: "re-verificado 2026-07-23: rhilo atualizou 8e22352->9547ca7 (commit 880fab34 presente, branch chore/onion-framework); pin-integrity pin-ok 9547ca7. O 'commit pendente' de 07-03 esta resolvido."
+    trace: "docs/evolution/federation/members.yaml:61"
+  - id: C_METAGAMIFY_VENDOR_VNEXTPIN
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: open
+    verified_against: pin
+    verified_at: 2026-07-23
+    label: "metagamify onion/vendor tem 1 pin INVALIDO na historia: '2026-07-12' (uma DATA, nao commit — vnextpin). Merge-base pode ficar errada; dano latente. Fix e adopter-side (sessao do rhilo re-stampa o vendor); --audit-vendor detecta do core."
+    trace: "docs/evolution/federation/members.yaml:61"
   - id: C_GRANAAI_LINEAGES_UNKNOWN
     node_type: claim
     layer: audit
@@ -137,3 +159,10 @@ edges:
   - from: E_GRANAAI_PIN_REVERIFIED
     to: C_GRANAAI_PIN_UNTRUSTED
     edge_type: SUPERSEDES
+  # reconciliação 2026-07-23: commit-pendente resolvido; mas o passivo do vendor (vnextpin) é achado novo
+  - from: E_METAGAMIFY_PIN_REVERIFIED
+    to: C_METAGAMIFY_PROD_UNCOMMITTED
+    edge_type: SUPERSEDES
+  - from: C_METAGAMIFY_VENDOR_VNEXTPIN
+    to: C_FED_RADAR_ABSENT
+    edge_type: SUPPORTS

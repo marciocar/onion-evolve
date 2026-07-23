@@ -58,12 +58,15 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
     local_path: "/home/marcio/rhilo-metagamify"   # dir físico legado no disco (privado, não-exposto); doc-bridge depende dele — não renomear sem migrar o clone
-    onion_version: 8e22352da32f   # pin mais recente VERIFICADO entre as linhagens (pin-ok 2026-07-03).
-                                  # Membro MULTI-LINHAGEM: pins por linhagem no mapa lineages: abaixo
-                                  # (parecer onion-parecer-rhilo-lineages-2026-07, decisão D2). Regra: um
-                                  # pin só entra aqui VERIFICADO por pin-integrity-check.sh — nunca do
-                                  # stamp declarado (histórico: a458a0fc6b71 era FORJADO por restore
-                                  # manual de 06-30; sinal 2026-07-02-sinal-lint-only-ausente-no-vendor).
+    onion_version: 9547ca7b3f72   # VERIFICADO por pin-integrity-check.sh (pin-ok 2026-07-23). A sessão do
+                                  # rhilo atualizou 8e22352->9547ca7 (commit presente: 880fab34, branch
+                                  # chore/onion-framework) — RESOLVE o "commit pendente" de 07-03.
+                                  # ⚠️ PASSIVO adopter-side: --audit-vendor achou 1 pin INVÁLIDO no onion/vendor
+                                  # ('2026-07-12' — uma DATA, não commit; vnextpin). Fix é da sessão do rhilo
+                                  # (re-stampar o vendor). Membro MULTI-LINHAGEM: pins por linhagem em lineages:
+                                  # abaixo (parecer onion-parecer-rhilo-lineages-2026-07, D2). Regra: pin só
+                                  # entra aqui VERIFICADO por pin-integrity-check.sh — nunca do stamp declarado
+                                  # (histórico: a458a0fc6b71 era FORJADO por restore manual de 06-30).
     lineages:                     # estado declarado E verificado por linhagem (D2; linhagem = 4º membro da família "declarado ≠ verificado")
       framework:                  # onde a co-evolução vive (inbox/inbound commitados, sinais, diário)
         branch: develop

@@ -31,7 +31,7 @@ flowchart TD
 | id | tier | mode | specializations | pin |
 |----|------|------|-----------------|-----|
 | onion-evolve | source |  | framework-template, sdaal, co-evolution, dogfooding, breadcrumbs | `—` |
-| metagamify | hub | legacy | gamification, nx-monorepo, asana-integration, metagamification | `8e22352da32f` |
+| metagamify | hub | legacy | gamification, nx-monorepo, asana-integration, metagamification | `9547ca7b3f72` |
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `6cc162f32d1c` |
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |

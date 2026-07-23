@@ -337,7 +337,7 @@ metagamify	adopts	onion-evolve
 metagamify	lineage	framework	
 metagamify	lineage	production	
 metagamify	mode	legacy	
-metagamify	pin	8e22352da32f	
+metagamify	pin	9547ca7b3f72	
 metagamify	specialization	asana-integration	
 metagamify	specialization	gamification	
 metagamify	specialization	metagamification	
