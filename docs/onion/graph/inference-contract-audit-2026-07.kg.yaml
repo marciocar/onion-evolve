@@ -1,0 +1,200 @@
+meta:
+  schema_version: 1
+  title: "Audit das 8 passadas adversariais do contrato de conformidade de inferência (L1/L2)"
+  layer: audit
+  baseline: 2026-07-23
+  note: >
+    Elenxo materializado. Cada passada pôs uma correção (claim "está fechado") e o verify
+    a REFUTOU um nível mais fundo — até a Regra de Admissão fechar o regresso. Fecha a perna
+    write(KG) que a própria sessão provou faltar (conhecimento nascia em prosa, fora do grafo).
+    Doutrina: knowledge-graph-sdaal.md §SSOT-as-runtime · onion-guardrails.md §7 (catraca) / §8.
+
+nodes:
+  # ── A raiz e a decisão fundadora ──────────────────────────────────────────
+  - id: Q_INFERENCE_GATE
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "como um KG de vida se defende do motor legitimo que o le, sem capar a feature de inferir para o dono?"
+    trace: "docs/knowledge-base/concepts/inference-mitigation.md"
+
+  - id: D_CONTRACT_IS_AUTHORITY
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    label: "sem impl de referencia no core (INVARIANTE 0), o CONTRATO e a autoridade — logo forma executavel, nunca prosa"
+    trace: "docs/knowledge-base/concepts/inference-mitigation.md"
+
+  # ── A escada de refutacoes (cada nivel REFUTES o anterior 'esta fechado') ──
+  - id: C_PAIR_SUFFICIENT
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.2
+    label: "P1: o par categoria x proposito basta para o gate de L2"
+
+  - id: C_GRANT_SUFFICIENT
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.2
+    label: "P2-3: acrescentar destinatario + concessao duravel fecha a emissao"
+
+  - id: C_SIGNATURE_SUFFICIENT
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.2
+    label: "P4-5: exigir assinatura verificada na concessao fecha a forja"
+
+  - id: C_ANCHOR_SUFFICIENT
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.2
+    label: "P6-7: proteger a ancora (pubkey) + enumerar pressupostos fecha o regresso"
+
+  - id: C_POLICY_GAP
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    label: "P8: a POLITICA (matriz + rotulagem) e a superficie de ESCRITA do motor escaparam 7 passadas — o motor edita a regra e as fixtures ficam verdes por construcao"
+
+  # ── A evidencia adversarial (as 8 passadas) ───────────────────────────────
+  - id: E_VERIFY_RECIPIENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "verify P1-P4: o dano e o CRUZAMENTO a terceiro (3,75 dono vs 2,34 terceiros); o par sem destinatario, e o destinatario auto-declarado, deixam o vazamento passar pelo rotulo"
+
+  - id: E_VERIFY_UNPROVEN_MECHANISM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    label: "verify P2-P7: MESMA falha de forma cada rodada — o mecanismo criado para fechar o furo anterior entra ELE PROPRIO sem provar seus pressupostos (destinatario->concessao->assinatura->ancora->revogacao/relogio->politica)"
+
+  - id: E_VERIFY_BACKGROUND_BLINDSPOT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    label: "verify P8: a politica escapou 7 passadas porque TODA fixture a usa como DADO — o que e pano de fundo nao e observado"
+    trace: "docs/knowledge-base/concepts/inference-mitigation.md:139"
+
+  - id: E_VERIFY_APPROVED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "verify P8: APPROVED — enumeracao de pressupostos fechada (superficie de escrita, politica, chave, revogacao, relogio, lista, canal, origem); mutation test provou severidade load-bearing"
+
+  # ── A tese-nucleo que fecha o regresso ────────────────────────────────────
+  - id: D_ADMISSION_RULE
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    label: "REGRA DE ADMISSAO: todo mecanismo que fecha um furo entra provando os PROPRIOS pressupostos (chave, lista, canal, relogio, baseline); pressuposto nao enumerado e rodada adversarial futura"
+    trace: "docs/knowledge-base/concepts/inference-mitigation.md:104"
+
+  - id: D_HONEST_LIMITS
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "limites declarados simetricos: L1 fecha so topologia ROTULADA; L2 nao fecha inferencia DENTRO do proposito; ambos por-TURNO (composicao = L3/L6 gated); nao quantifica reducao"
+
+  # ── O artefato e a migalha ────────────────────────────────────────────────
+  - id: A_CONTRACT_KB
+    node_type: artifact
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-07-23
+    label: "docs/knowledge-base/concepts/inference-mitigation.md — contrato L1/L2 no origin/main (commit ba6a85b); L3-L6 gated por dogfood do adotante"
+    trace: "docs/knowledge-base/concepts/inference-mitigation.md"
+
+  - id: A_ADMISSION_CRUMB
+    node_type: artifact
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-07-20
+    label: "migalha 2026-07-20-admission-rule-blindspot — a licao de metodo saiu do contrato para o diario, reusavel no proximo contrato"
+    trace: ".claude/diary/2026-07-20-admission-rule-blindspot.md"
+
+edges:
+  - from: D_CONTRACT_IS_AUTHORITY
+    to: Q_INFERENCE_GATE
+    edge_type: SUPPORTS
+  # a escada: cada passo REFUTA o 'esta fechado' anterior; o seguinte o SUPERSEDE
+  - from: E_VERIFY_RECIPIENT
+    to: C_PAIR_SUFFICIENT
+    edge_type: REFUTES
+  - from: C_GRANT_SUFFICIENT
+    to: C_PAIR_SUFFICIENT
+    edge_type: SUPERSEDES
+  - from: E_VERIFY_UNPROVEN_MECHANISM
+    to: C_GRANT_SUFFICIENT
+    edge_type: REFUTES
+  - from: C_SIGNATURE_SUFFICIENT
+    to: C_GRANT_SUFFICIENT
+    edge_type: SUPERSEDES
+  - from: E_VERIFY_UNPROVEN_MECHANISM
+    to: C_SIGNATURE_SUFFICIENT
+    edge_type: REFUTES
+  - from: C_ANCHOR_SUFFICIENT
+    to: C_SIGNATURE_SUFFICIENT
+    edge_type: SUPERSEDES
+  - from: E_VERIFY_BACKGROUND_BLINDSPOT
+    to: C_ANCHOR_SUFFICIENT
+    edge_type: REFUTES
+  - from: C_POLICY_GAP
+    to: C_ANCHOR_SUFFICIENT
+    edge_type: SUPERSEDES
+  # a tese-nucleo emerge da familia de refutacoes e fecha o regresso
+  - from: E_VERIFY_UNPROVEN_MECHANISM
+    to: D_ADMISSION_RULE
+    edge_type: CAUSES
+  - from: D_ADMISSION_RULE
+    to: C_POLICY_GAP
+    edge_type: SUPPORTS
+  - from: E_VERIFY_APPROVED
+    to: D_ADMISSION_RULE
+    edge_type: SUPPORTS
+  - from: E_VERIFY_BACKGROUND_BLINDSPOT
+    to: D_ADMISSION_RULE
+    edge_type: SUPPORTS
+  # decisoes -> artefato (rastreabilidade)
+  - from: D_ADMISSION_RULE
+    to: A_CONTRACT_KB
+    edge_type: TRACES_TO
+  - from: D_HONEST_LIMITS
+    to: A_CONTRACT_KB
+    edge_type: TRACES_TO
+  - from: D_ADMISSION_RULE
+    to: A_ADMISSION_CRUMB
+    edge_type: TRACES_TO
+  - from: D_CONTRACT_IS_AUTHORITY
+    to: A_CONTRACT_KB
+    edge_type: TRACES_TO
