@@ -8,6 +8,91 @@
 
 ---
 
+## 2026-07-23 · Gates REGRA 29 + REGRA 42 — declarado≠verificado contra o GRAFO e contra o TEMPO (com catraca) · COMPATÍVEL · alvo: todos
+
+- **REGRA 29 — proveniência invertida (`kg-provenance-coverage.sh`, commit `0ea48df`, 2026-07-20).
+  Crédito: sinal de campo da granaai.** A doutrina KG-SSOT só tinha *forcing function* na LEITURA
+  (`/catch-up` abre o grafo primeiro, `kg-radar` reprova grafo inconsistente, STALE-TRACE pega trace
+  movido) — nenhuma protegia conhecimento de **nascer FORA do grafo**. Evidência auto-incriminadora do
+  sinal: avaliação orquestrada com 70 agentes, 0 erros, 50 achados confirmados — e nada ingerido no
+  `.kg.yaml`. O gate faz a pergunta espelho do radar: **"este relatório existe no grafo?"** — um documento
+  em `docs/analysis/*.md` ou `docs/evolution/research/**/*.md` está coberto quando algum nó de algum
+  `.kg.yaml` do repo o cita em `trace:`/`evidence:`. Doutrina: [`knowledge-graph-sdaal.md`](../../knowledge-base/concepts/knowledge-graph-sdaal.md)
+  + [`onion-guardrails.md` §7](../../knowledge-base/concepts/onion-guardrails.md) (a catraca).
+- **REGRA 42 — frescor doutrinário (`doctrine-freshness.sh`, commit `44d7e05`, 2026-07-23).** Irmã
+  temporal da 29: **declarado≠verificado contra o TEMPO**, não contra o grafo. NÃO bate na web em CI
+  (impossível/no-op num runner sem rede) — checa que afirmações world-facing carregam `verified_at:` +
+  fonte e não passaram do TTL (default 90 dias), forçando **re-verificação periódica** (a re-verificação
+  em si é o `/meta:kb-freshness`; o gate só cobra a cadência). Nível A (HARD): lista enumerada e auditável
+  de KBs world-facing sem `verified_at` e fora do baseline. Nível B (SOFT-only): rede léxica sobre prosa
+  de KB — convenção com rede, não gate. Doutrina: [`onion-guardrails.md` §8](../../knowledge-base/concepts/onion-guardrails.md).
+- **AMBOS têm CATRACA — é o que torna o gate ADOTÁVEL.** Sem ela, o gate nasce reprovando o passivo
+  inteiro e é desligado no 1º dia. Passivo existente → **baseline versionado, tolerado (SOFT)**; documento
+  **novo** fora do baseline e sem cobertura/`verified_at` → **HARD**; o baseline **só pode encolher**
+  (crescer é regressão, também HARD). A métrica de saúde é o baseline diminuindo, não o gate passando.
+- **⚠️ AÇÃO OBRIGATÓRIA PARA ADOTANTES — sem isto o gate nasce reprovando o SEU passivo (HARD) no dia
+  do `--update`.** Depois de `/meta:adopt --update` (que vendoriza os dois `.sh` + o lint que os invoca),
+  semeie os dois baselines ANTES do próximo commit:
+  ```bash
+  bash .claude/validation/kg-provenance-coverage.sh --emit-baseline > .claude/validation/kg-coverage-baseline.txt
+  bash .claude/validation/doctrine-freshness.sh --emit-baseline > .claude/validation/doctrine-freshness-baseline.txt
+  git add .claude/validation/kg-coverage-baseline.txt .claude/validation/doctrine-freshness-baseline.txt
+  ```
+  Sem baseline versionado, **ambos degradam FAIL-CLOSED** (ausência de baseline ≠ "sem passivo" — é
+  tratada como regressão). Depois de semear, o baseline só deve **encolher**: cobrir um documento antigo
+  ou re-verificar uma KB velha e remover a entrada correspondente é o sinal de saúde.
+
+## 2026-07-23 · A Condução do Onion: SSOT-topologia no KG + tríade wizard/onboarding + 3 transições gated · COMPATÍVEL · alvo: todos
+
+- **Camada acima da costura HUB (commit `7802216`, 2026-07-23, 09:50): a EMPRESA adota os próprios
+  projetos.** Sinal de campo (dogfood-de-fronteira, sessão do Pedro): `/meta:adopt` local barrava no
+  PASSO 0 (`role: source` obrigatório) — o padrão que toda empresa-adotante repete. Modelo de 3 camadas:
+  (1) autoria do framework = source-only; (2) adoção+controle LOCAL dos próprios projetos = source + HUB,
+  **abre agora**; (3) federação cross-empresa = gated. `write-stamp.sh --role adopted|hub` (default
+  `adopted`; update preserva; inválido → exit 2), `/meta:adopt --promote-hub` re-carimba o repo atual.
+- **Aprendizados de campo incorporados no MECANISMO (commit `2805f2d`, 2026-07-23):** REGRA 40 (nova, HARD)
+  cobre `role: adopted|hub` — exige o `.claude/.onion-version` **trackeado** no git (achado de campo: stamp
+  gitignored na fonte, `git add -A` numa cópia não o commitava → clone perdia o marcador → role-guards
+  desligavam). Fix irmão da REGRA 36 na REGRA 16 (grep vazio + `set -e` abortava o lint inteiro num adotante
+  recém-adotado, achado testando a 40). Doutrina:
+  [`adopter-onboarding.md`](../../knowledge-base/concepts/adopter-onboarding.md).
+- **Fix de adoção canônica (commit `16afa8b`, 2026-07-23, 12:49):** a Fase 3 do `/meta:adopt` regenerava
+  `inventory.md` mas não `docs/onion/graph.md` — REGRA 21 bloqueava o **1º commit** de toda adoção
+  greenfield. Passo (8b) novo: gera `graph.md` ao lado do `inventory.md`, determinístico e idempotente.
+- **FUNDAÇÃO da Condução (commit `9c94e67`, 2026-07-23, 13:33).** A pergunta: como o Onion conduz pelos
+  movimentos da família (criar/adotar/promover/atualizar/convidar/transferir/desacoplar) sem que os
+  fluxos de ajuda dessincronizem dos procedimentos reais. A tríade: **Wizard** = ajuda a FAZER (colhe
+  intenção, guiado) · **Scaffold** = GERA (os geradores determinísticos que já existem) · **Onboarding** =
+  ajuda a CONHECER/USAR (Orient→Activate→Reinforce, multi-sessão). As três são **projeção de UMA fonte**
+  — não SDAAL (providers intercambiáveis), é projeção/CQRS. Fundação: (1) SSOT nascida no KG —
+  `docs/knowledge-base/graph/onion-family-topology-2026-07.kg.yaml` (papéis + transições, cada transição
+  traceando o procedimento real); (2) doutrina vendorizada
+  [`onion-guided-lifecycle.md`](../../knowledge-base/concepts/onion-guided-lifecycle.md); (3) **REGRA 41**
+  (drift-guard, HARD) — toda transição ATIVA tem que resolver a um procedimento real e todo papel tem que
+  bater com `roles.yaml`; transição `status: open` (gated) é ignorada. O SSOT não pode mentir.
+- **Skill `onion-wizard`** (commit `17e89a0`, 13:47) — a face "ajuda a FAZER". Lê as transições do
+  KG-topologia via `.claude/utils/wizard/topology-projection.sh` (não hand-lista movimentos): se a
+  topologia mudar, o wizard reflete sozinho. UX: progressive disclosure, conversacional
+  (`AskUserQuestion`), resumível, dry-run-first.
+- **Skill `onion-onboarding`** (commit `a8a0b80`, 13:58) — a face "ajuda a CONHECER". Lê os PAPÉIS do
+  mesmo KG (`topology-projection.sh --roles`). Não executa — quando é hora de FAZER, entrega ao wizard.
+  Ciclo Orient (situa o repo + a família) → Activate (1ª vitória, unifica LEIA-ME/warm-up/onion) →
+  Reinforce (valor repetível, não "completou a tela", multi-sessão).
+- **As 3 transições GATED viraram ATIVAS (commit `d48ffef`, 14:27) — a arquitetura se provou.** Escreveu-se
+  os procedimentos + virou o status no KG, e wizard/onboarding passaram a oferecer 7 transições (eram 4)
+  **sem editar as skills** — pura projeção da SSOT. `invite-collaborator.sh` (convidar, `gh api PUT
+  collaborators`, dry-run-first), `transfer-ownership.sh` (transferir, `gh transfer` + ressalvas), e
+  `decouple-source.sh` (fonte-desacoplada: adotado/hub vira fonte soberana própria — `role: source` +
+  `decoupled_from`, T0 próprio, autora o próprio framework, corta o `--update` do core). Os 4
+  role-guards + a REGRA 40 reconhecem `decoupled_from` (pulam links/plugins core-only); REGRA 41 aceita
+  `decoupled_source` como variante de `source`.
+- **Ambos os pacotes (`onion-wizard` + `onion-onboarding`) são registrados no manifesto do plugin
+  cross-cutting `onion-work-tools`** — chegam junto com o `--update` a fontes, hubs e adotantes standalone.
+- **Ação p/ adotantes:** nenhuma manual — chega vendorizado via `/meta:adopt --update` (2 skills novas +
+  a KB de topologia + REGRA 41 no lint). Quem já é HUB (adotou os próprios projetos): as 3 transições
+  gated (convidar/transferir/desacoplar) agora aparecem no wizard como opções reais, não mais como
+  "backlog".
+
 ## 2026-07-20 · 3º eixo da evidência: **interesse da fonte** (verificado ≠ neutro) · COMPATÍVEL · alvo: todos
 
 - **Crédito: sinal de campo da granaai (2026-07-20)**, durante auditoria de compliance para due diligence.
@@ -35,6 +120,67 @@
 - **Ação p/ adotantes:** nenhuma — chega vendorizada via `/meta:adopt --update` (KB + os dois comandos).
   Quem ingere laudo/parecer/relatório de fornecedor: leia a §"Como ler a ESTRUTURA" antes de propagar a
   métrica que o documento estampa.
+
+## 2026-07-20 · World-sync: lineup de modelos, tetos de sessão e correção de citações fabricadas (commit `77b701d`) · COMPATÍVEL · alvo: todos
+
+- **Reconciliação de 6 meses de drift desde o cutoff**, contra fontes primárias, em 2026-07-20. Três das
+  correções são de afirmações que **esta própria casa** tinha errado — registradas ao lado do fix, não
+  silenciosamente substituídas.
+- **Tiering de modelos — existe tier ACIMA do opus: classe Mythos.** Fable 5 é o **GA** (disponível ao
+  mercado); Mythos 5 fica restrito a um conjunto de organizações dos EUA (Glasswing). Linha do tempo
+  verificada: ambos suspensos em 12/jun sob controle de exportação dos EUA, controles suspensos em 30/jun,
+  acesso restaurado em 1/jul. **O que decide o tiering de fato é CUSTO, não disponibilidade**: em planos
+  pagos Fable 5 esteve incluso até 7/jul, depois só via créditos comprados — GA no mercado ≠ habilitado na
+  sua conta ≠ grátis na margem. **Na dúvida, opus.**
+- **Consumidores (skill `onion-orchestration`, `/meta:orchestrate`) não citam mais IDs exatos de modelo** —
+  citam por **TIER** e apontam para a fonte única. **Fonte única do lineup:**
+  [`agent-orchestration.md` §Disponibilidade de modelos](../../knowledge-base/concepts/agent-orchestration.md).
+  KBs-irmãs que ainda prescreviam o lineup antigo como vigente (`best-practices`, `context-window-optimization`,
+  `ai-agent-design-patterns`) agora são marcadas como **snapshot**, apontando para a fonte única.
+- **Tetos de sessão — a correção importa mais que o fato.** A afirmação "o teto de sessão bate antes do
+  teto de run" é **FALSA**, e falsa exatamente no caso que esta doutrina cobria: agentes que um script
+  Workflow spawna via `agent()` **não contam** no teto de subagentes da sessão — Workflows têm teto próprio
+  por-run. O que conta: spawns da ferramenta Agent (incluindo aninhados de dentro de agentes de workflow) e
+  `/subtask`. `/fork` não conta (sessão separada, budget próprio). Erro de origem: inferido de "200 < 1000"
+  sem ler a fonte, e propagado para a KB. **O modo de falha também estava invertido**: bater no teto de
+  subagentes dá erro explícito ("Subagent spawn limit reached"); o teto **silencioso** é o de WebSearch —
+  o que de fato já mordeu esta casa antes. Diagnosticar um teto pelo sintoma do outro é o oposto do que a
+  doutrina de percepção pede.
+- **Correção de citações fabricadas** na KB de mitigação de inferência — adicionada à tabela "threat model
+  errado", onde pertence.
+- **Gate intocado:** L3–L6 do contrato de inferência continuam gated no sinal de dogfood do adotante —
+  literatura é prior-art, não gatilho.
+- **Ação p/ adotantes:** nenhuma — chega vendorizado via `/meta:adopt --update`. Quem cita modelo por ID
+  fixo em prompt/doc próprio: troque por referência de **tier** + a fonte única acima (o lineup drifta).
+
+## 2026-07-20 · Contrato de conformidade de inferência L1/L2 — nova KB `inference-mitigation.md` (commit `474b194`) · COMPATÍVEL · alvo: todos
+
+- **Fecha o lado core de F2** do programa de mitigação de inferência: defender um KG do próprio motor que
+  o lê. A **SSOT executável continua do adotante** (INVARIANTE 0) — o que o core deve é o **contrato**
+  contra o qual o mecanismo é medido, e é isto que a KB entrega. Diferença estrutural do contrato do
+  `kg-radar`: lá existe um `.sh` soberano ao qual conformar; aqui **não existe implementação de referência
+  no core por desenho** — o contrato **é** a autoridade, por isso precisa ser executável em forma (dado X
+  e propósito P → Y esperado), nunca prosa solta.
+- **L1 (acesso):** mediação completa (o gate é a única superfície que alimenta o motor; leitores só são
+  privilegiados como validadores de canal limitado ou sobre projeções já mediadas), fatiamento
+  need-to-know por igualdade, mascaramento, topologia rotulada, dado derivado herda o escopo, fail-closed
+  em propósito desconhecido/não-atestado, escopo de sessão, e a política + o código do próprio gate fora
+  da superfície de escrita do motor.
+- **L2 (ação/saída):** a tupla de Integridade Contextual com **destinatário resolvido do SINK real**
+  (nunca tirado da chamada), recusa como sentinela tipada com payload vazio, propósito vinculado ao turno
+  e herdado por sub-agentes/tool-calls/retries, atestação de quem declara o propósito (ao vivo pelo canal,
+  ou concessão durável de dono com assinatura verificada + teto de TTL/escopo fixados por fixture,
+  não-delegável), origem em cada nó, deny-by-default em categoria desconhecida.
+- **Oito passadas adversariais**, sem defeito de conteúdo novo depois da terceira — sempre a mesma classe
+  de objeção reaparecendo em ângulo diferente até esgotar.
+- **KB:** [`inference-mitigation.md`](../../knowledge-base/concepts/inference-mitigation.md). Irmãs:
+  `knowledge-graph-sdaal.md` (o KG que o motor lê), `onion-guardrails.md` (REGRA 15 — gate de
+  efeito/proveniência).
+- **Escopo explícito: L3–L6 ficam GATED**, sob sinal de dogfood do adotante — a doutrina não avança sem
+  caso real que a force.
+- **Ação p/ adotantes:** nenhuma — chega vendorizado via `/meta:adopt --update`. Quem opera um KG que
+  concentra verdade sensível de um domínio (vida, organização, cliente) lido por um motor legítimo: a KB é
+  o contrato de referência antes de desenhar L1/L2 próprios.
 
 ## 2026-07-20 · `significance:` FECHADO — ancorado em `breadcrumb-patterns.md` (faceta avaliativa de ①) + contrato federado na RFC-0003 · COMPATÍVEL · alvo: todos
 

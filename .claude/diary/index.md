@@ -4,14 +4,17 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 69 entradas · **Stale:** 0 · **Compartilháveis:** 57 · **Com significância:** 9
+**Total:** 72 entradas · **Stale:** 0 · **Compartilháveis:** 60 · **Com significância:** 12
 
-Gerado em: 2026-07-22
+Gerado em: 2026-07-23
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-07-23 | innovation | collective 📤 | runflow-doctrine-freshness-proves-value-day-one | A REGRA 42, recém-nascida há horas, pegou no primeiro uso real uma KB de parceiro 8 meses defasada — e a reescrita inteira saiu 100% verificada contra a fonte viva, zero fabricação, no mesmo dia em que o gate nasceu. | 2026-10-21 | dynamic |
+| 2026-07-23 | innovation | collective 📤 | doctrine-freshness-ratchet-composed-not-new | Quase nada aqui é novo — a REGRA 42 é composição de três peças que a casa já tinha (STALE do radar, catraca da 29, clock-untrusted do a2a-verify) — e é exatamente essa economia que a torna barata de manter e fácil de confiar. | 2026-10-21 | conditional |
+| 2026-07-23 | error | collective 📤 | doctrine-fades-declared-not-verified | O world-sync de hoje achou um tier de modelo inteiro que a doutrina não sabia existir e aspas fabricadas na própria KB de inferência — e essa descoberta é o que pariu a REGRA 42, não uma auditoria de rotina. | 2026-10-21 | static |
 | 2026-07-22 | reflection | collective 📤 | verify-before-rewriting-foreign-history | A disciplina de verificar-antes-de-agir, no seu teste de maior aposta do dia: impediu reescrever 640 commits do repo de outra pessoa para consertar um problema que não existia. | 2026-10-20 | static |
 | 2026-07-22 | innovation | collective 📤 | pin-enters-proving-itself | O 'drift silencioso de pin' que o grafo do core registrava só em abstrato ganhou nome (vnextpin), mecanismo de entrada (o pin prova ser commit) e ferramenta de auditoria — porque a capacidade foi exercida contra adotantes reais, não desenhada. | 2026-10-20 | dynamic |
 | 2026-07-22 | learning | collective 📤 | guard-matches-threat-model | Uma guarda não é definida pelo que ela pega, mas pelo threat model que ela encarna — estender a lógica sem estender o modelo transforma proteção em ruído que se auto-desliga. | 2026-10-20 | static |
