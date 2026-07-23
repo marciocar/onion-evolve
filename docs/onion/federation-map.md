@@ -33,7 +33,7 @@ flowchart TD
 | onion-evolve | source |  | framework-template, sdaal, co-evolution, dogfooding, breadcrumbs | `—` |
 | metagamify | hub | legacy | gamification, nx-monorepo, asana-integration, metagamification | `8e22352da32f` |
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
-| granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `91d5dbb05a6d` |
+| granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `6cc162f32d1c` |
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
 | onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `514dda85833a` |

@@ -116,11 +116,12 @@ members:
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — não citar em superfície pública
     local_path: "/home/marcio/granaai"   # re-clonado 2026-07-08 no novo lar (KVM 8); acesso via token gh de marciocar (org GranaAi privada)
-    onion_version: 91d5dbb05a6d   # update de 2026-07-19 aplicado pela PRÓPRIA sessão do adotante
-                                  # (b8208cc1a3da -> 91d5dbb05a6d); merge limpo, único conflito foi
-                                  # docs/onion/inventory.md, resolvido regenerando do filesystem (correto:
-                                  # é SSOT gerado). Lint 0 violações. Pin anterior (b8208cc1a3da) tinha
-                                  # sido verificado pin-ok antes deste update.
+    onion_version: 6cc162f32d1c   # VERIFICADO por pin-integrity-check.sh (pin-ok 2026-07-23) +
+                                  # vendor-audit 5/0 limpo. A sessão do adotante atualizou 91d5dbb->6cc162f
+                                  # (via /meta:adopt --update, branch chore/onion-update-*); re-verificado
+                                  # do core em 2026-07-23 — RESOLVE o "pin untrusted 74c470e" do grafo
+                                  # federation-health (nó C_GRANAAI_PIN_UNTRUSTED era STALE).
+                                  # Pin anterior verificado: 91d5dbb05a6d (07-19, sessão do adotante).
                                   # Membro MULTI-LINHAGEM: pins por linhagem no mapa lineages: abaixo
                                   # (regra: pin só entra aqui VERIFICADO por pin-integrity-check.sh —
                                   # nunca do stamp declarado).

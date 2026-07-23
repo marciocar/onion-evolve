@@ -284,7 +284,7 @@ granaai	adopts	onion-evolve
 granaai	lineage	leonardo-offline	
 granaai	lineage	mauricio	
 granaai	mode	regulated	
-granaai	pin	91d5dbb05a6d	
+granaai	pin	6cc162f32d1c	
 granaai	specialization	canonicalization	
 granaai	specialization	regulated-fintech	
 granaai	specialization	ssot-governance	
