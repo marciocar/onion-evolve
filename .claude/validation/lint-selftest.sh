@@ -549,6 +549,13 @@ run_onion_version_tracked_selftests() {
   if ! printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
     record_pass "onion-version-tracked: (c) role: source + untracked → guarda pula (gate de papel)"
   else record_fail "onion-version-tracked: (c)" "disparou em role: source (não-adotante)"; fi
+
+  # (d) role: hub + UNTRACKED → HARD (o hub também é stamp de adoção que o clone precisa trackear)
+  printf 'framework: onion-pedro\nrole: hub\n' > "${sb}/.claude/.onion-version"
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+    record_pass "onion-version-tracked: (d) role: hub + untracked → HARD (hub trackeia o stamp)"
+  else record_fail "onion-version-tracked: (d)" "não pegou hub untracked (o clone do hub perderia o papel)"; fi
 }
 
 run_kg_view_selftests() {
@@ -1821,6 +1828,17 @@ run_write_stamp_selftests() {
       record_pass "write-stamp: adopted_at perdido → restaurado do members.yaml"
     else record_fail "write-stamp: restore" "$(cat "${wsb}/t/.claude/.onion-version")"; fi
   else record_pass "write-stamp: restore pulado (sem python+yaml)"; fi
+  # 4. --role hub (Camada 2): fresh grava role: hub; update SEM --role preserva hub (não rebaixa)
+  rm -rf "${wsb}/h"; mkdir -p "${wsb}/h/.claude"
+  bash "${helper}" "${wsb}/h" --framework onion-pedro --commit aaa111 --commit-date 2026-07-23 --role hub >/dev/null 2>&1
+  bash "${helper}" "${wsb}/h" --framework onion-pedro --commit bbb222 --commit-date 2026-07-23 >/dev/null 2>&1  # update sem --role
+  if grep -q '^role: hub$' "${wsb}/h/.claude/.onion-version" && grep -q '^source_commit: bbb222$' "${wsb}/h/.claude/.onion-version"; then
+    record_pass "write-stamp: --role hub grava hub; update sem --role PRESERVA hub (não rebaixa)"
+  else record_fail "write-stamp: role hub" "$(cat "${wsb}/h/.claude/.onion-version")"; fi
+  # 5. --role inválido → exit 2 (só adopted|hub)
+  if ! bash "${helper}" "${wsb}/h" --framework x --commit c --commit-date 2026-07-23 --role banana >/dev/null 2>&1; then
+    record_pass "write-stamp: --role inválido → rejeitado (exit 2)"
+  else record_fail "write-stamp: role inválido" "aceitou role fora de adopted|hub"; fi
   rm -rf "${wsb}"
 }
 
@@ -3264,19 +3282,27 @@ run_onion_version_selftests() {
   if [ "${out}" = "role: source" ]; then record_pass "onion-version: sem stamp → source"
   else record_fail "onion-version: sem stamp" "esperava 'role: source', veio '${out}'"; fi
 
-  # (b) stamp role: adopted → adopted (e o guard do /meta:adopt ABORTA — regressão FED-3-1)
+  # (b) stamp role: adopted → o GATE do /meta:adopt (grep '^role: (source|hub)') REJEITA (FED-3-1: consumidor não re-adota)
   printf 'framework: onion\nsource_commit: abc123\nrole: adopted\n' > "${d}/.claude/.onion-version"
   out="$(bash "${d}/.claude/validation/onion-version.sh" | grep '^role:' || true)"
   if [ "${out}" = "role: adopted" ] \
-     && ! bash "${d}/.claude/validation/onion-version.sh" | grep -q '^role: source'; then
-    record_pass "onion-version: stamp adopted → guard do adopt aborta (regressão FED-3-1)"
-  else record_fail "onion-version: stamp adopted" "esperava 'role: adopted', veio '${out}'"; fi
+     && ! bash "${d}/.claude/validation/onion-version.sh" | grep -qE '^role: (source|hub)'; then
+    record_pass "onion-version: stamp adopted → gate do adopt REJEITA (FED-3-1 vivo)"
+  else record_fail "onion-version: stamp adopted" "gate deveria rejeitar adopted; veio '${out}'"; fi
 
   # (c) stamp presente SEM campo role → adopted por definição (nunca 'source' por omissão)
   printf 'framework: onion\n' > "${d}/.claude/.onion-version"
   out="$(bash "${d}/.claude/validation/onion-version.sh" | grep '^role:' || true)"
   if [ "${out}" = "role: adopted" ]; then record_pass "onion-version: stamp sem role → adopted (fail-safe)"
   else record_fail "onion-version: stamp sem role" "esperava 'role: adopted', veio '${out}'"; fi
+
+  # (d) stamp role: hub → o GATE ACEITA (Camada 2 — a empresa adota os próprios projetos)
+  printf 'framework: onion-pedro\nsource_commit: abc123\nrole: hub\n' > "${d}/.claude/.onion-version"
+  out="$(bash "${d}/.claude/validation/onion-version.sh" | grep '^role:' || true)"
+  if [ "${out}" = "role: hub" ] \
+     && bash "${d}/.claude/validation/onion-version.sh" | grep -qE '^role: (source|hub)'; then
+    record_pass "onion-version: stamp hub → gate do adopt ACEITA (Camada 2 aberta)"
+  else record_fail "onion-version: stamp hub" "gate deveria aceitar hub; veio '${out}'"; fi
   rm -rf "${d}"
 }
 

@@ -1891,13 +1891,13 @@ check_rules_registry_sync() {
 #           commitado → o clone perdia o marcador `role: adopted` → o role-guard de _scan_relative_links
 #           e os guards de plugins tratavam o clone como role: source → links/plugins core-only viravam
 #           156 falso-HARD. O adopt CANÔNICO force-adda; esta guarda garante que qualquer adotante
-#           (à mão ou não) commite o stamp. Só dispara p/ role: adopted, em repo git. Fecha o buraco
-#           no mecanismo (não one-off): [[fix-must-become-mechanism]].
+#           (à mão ou não) commite o stamp. Dispara p/ role: adopted OU hub (ambos são stamps de
+#           adoção), em repo git. Fecha o buraco no mecanismo (não one-off): [[fix-must-become-mechanism]].
 # ===========================================================================
 check_onion_version_tracked() {
   local stamp="${REPO_ROOT}/.claude/.onion-version"
   [ -f "${stamp}" ] || return 0
-  grep -q '^role:[[:space:]]*adopted' "${stamp}" 2>/dev/null || return 0   # só adotante
+  grep -qE '^role:[[:space:]]*(adopted|hub)' "${stamp}" 2>/dev/null || return 0   # adotante OU hub (ambos são stamps de adoção)
   git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1 || return 0     # precisa ser repo git
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in "${stamp}") : ;; *) return 0 ;; esac

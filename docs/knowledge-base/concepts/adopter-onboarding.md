@@ -15,6 +15,32 @@ para tmp, faz *diff*, aplica só após revisão. E carimba um `.claude/.onion-ve
 
 **Sempre comece com `--dry-run`** — mostra o que fará, sem tocar em nada.
 
+## Papéis: quem pode adotar (source · hub · consumer)
+
+Adotar é uma **autoridade**, não um direito de qualquer cópia — senão um consumidor ingênuo re-adotaria por
+acidente (drift cross-tenant). O papel vive em `.claude/.onion-version` (`role:`) e o `/meta:adopt` PASSO 0 o
+checa. **Três camadas de capacidade:**
+
+| Papel | O que é | Pode adotar? |
+|---|---|---|
+| **source** | o **core** do framework (o autor) | sim — autoridade máxima |
+| **hub** | uma **empresa** que centraliza e controla os **próprios** projetos | **sim** — adota/atualiza seus projetos (Camada 2) |
+| **consumer** (`role: adopted`) | um projeto adotado (folha da cadeia) | **não** — não re-adota (FED-3-1) |
+
+Cadeia: **source (core) → hub (empresa) → consumer (projetos)**. O hub **usa** o framework, não o **autora**
+(criar verticais/`evolve` = Camada 1, só o core) e **não** roda a federação cross-empresa (Camada 3, do core).
+
+**Se você é uma empresa** (vai adotar mais de um projeto seu — ex.: Aura, Positivo), sua cópia chega como
+`role: adopted` (consumidor). **Promova-a a hub UMA vez**, deliberadamente:
+
+```
+/meta:adopt --promote-hub
+```
+
+Isso re-carimba `role: hub` (preservando a proveniência) e **commita o stamp** (a REGRA 40 exige que ele viaje
+no clone). A partir daí, este repo adota e atualiza os seus projetos. Um projeto adotado por você vira
+`consumer` — folha da cadeia, não re-adota.
+
 ## Os quatro casos (o comando muda conforme o estado do alvo)
 
 | Estado do projeto-alvo | Comando (no chat do Claude Code) | O que acontece |
