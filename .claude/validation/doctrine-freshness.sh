@@ -132,6 +132,10 @@ DEFAULT_WORLD_FACING=(
   "docs/knowledge-base/concepts/context-window-optimization.md"
   "docs/knowledge-base/concepts/ai-agent-design-patterns.md"
   "docs/knowledge-base/tools/claude-code-commands-best-practices-2026.md"
+  # runflow: SDK de PARCEIRO (spin-off do IFTL) que a KB documenta com nº de versão —
+  # claim datável que drifta (2026-07-23: KB estava 8 meses velha). Rastreado p/ o gate
+  # cobrar re-verificação periódica, não virar ruído de Nível B.
+  "docs/knowledge-base/platforms/runflow.md"
 )
 
 # ---------------------------------------------------------------------------

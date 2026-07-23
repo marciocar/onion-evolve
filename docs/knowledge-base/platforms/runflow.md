@@ -1,6 +1,8 @@
 ---
 title: Runflow
 category: platforms
+verified_at: 2026-07-23
+source: "https://registry.npmjs.org/@runflow-ai/sdk/latest"
 version: 2025-11-18T21:19:48Z
 created: 2025-11-18T21:19:48Z
 updated: 2025-11-18T21:19:48Z
@@ -370,9 +372,17 @@ runflow-agent/
 
 ### Versão Atual
 
-- **SDK**: 1.0.56 (novembro 2025)
-- **Node.js**: Requer >= 22.0.0
-- **TypeScript**: Recomendado >= 5.0.0
+> Verificado em **2026-07-23** contra o registry npm (`@runflow-ai/sdk`, dist-tag `latest`). O pin anterior
+> (`1.0.56`, nov/2025) estava ~8 meses defasado — Runflow (spin-off do IFTL) evoluiu muito no período.
+
+- **SDK**: `@runflow-ai/sdk` **1.6.2** (verificado 2026-07-23 · fonte no frontmatter)
+- **Node.js**: Requer >= 22.0.0 (campo `engines`, confirmado)
+- **Peer opcional**: `playwright` >= 1.40.0
+- **TypeScript**: recomendado (framework type-safe) — **não** é peer-dependency declarada
+
+> ⚠️ **Escopo desta verificação:** só o **número de versão + requisitos** foram re-verificados. O corpo do
+> KB (API, arquitetura, exemplos) descreve o SDK à época do 1.0.x — pode ter driftado no salto 1.0→1.6.
+> Rever com a IFTL antes de usar como referência definitiva (ex.: no Tech Sync).
 
 ### Funcionalidades Principais
 
