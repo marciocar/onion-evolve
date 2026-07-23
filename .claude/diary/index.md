@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 72 entradas · **Stale:** 0 · **Compartilháveis:** 60 · **Com significância:** 12
+**Total:** 73 entradas · **Stale:** 0 · **Compartilháveis:** 61 · **Com significância:** 13
 
 Gerado em: 2026-07-23
 
@@ -12,6 +12,7 @@ Gerado em: 2026-07-23
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-07-23 | learning | collective 📤 | runflow-local-key-is-openai-compatible-only | A demo Runflow só rodou local porque OpenAI é OpenAI-compatible (aceita apiKey inline); Anthropic/Bedrock/Gemini exigem credencial no tenant — uma assimetria da abstração de provider que o plano não previa e só o dogfood do smoke-test revelou, com o falso-'travamento' sendo a observabilidade, não a chamada. | 2026-10-21 | conditional |
 | 2026-07-23 | innovation | collective 📤 | runflow-doctrine-freshness-proves-value-day-one | A REGRA 42, recém-nascida há horas, pegou no primeiro uso real uma KB de parceiro 8 meses defasada — e a reescrita inteira saiu 100% verificada contra a fonte viva, zero fabricação, no mesmo dia em que o gate nasceu. | 2026-10-21 | dynamic |
 | 2026-07-23 | innovation | collective 📤 | doctrine-freshness-ratchet-composed-not-new | Quase nada aqui é novo — a REGRA 42 é composição de três peças que a casa já tinha (STALE do radar, catraca da 29, clock-untrusted do a2a-verify) — e é exatamente essa economia que a torna barata de manter e fácil de confiar. | 2026-10-21 | conditional |
 | 2026-07-23 | error | collective 📤 | doctrine-fades-declared-not-verified | O world-sync de hoje achou um tier de modelo inteiro que a doutrina não sabia existir e aspas fabricadas na própria KB de inferência — e essa descoberta é o que pariu a REGRA 42, não uma auditoria de rotina. | 2026-10-21 | static |
