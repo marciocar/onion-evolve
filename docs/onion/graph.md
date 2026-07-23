@@ -57,6 +57,7 @@
 - **onion** --has-member--> onion
 - **onion** --has-member--> onion-compliance-context
 - **onion** --has-member--> onion-engineering-context
+- **onion** --has-member--> onion-onboarding
 - **onion** --has-member--> onion-orchestration
 - **onion** --has-member--> onion-patterns
 - **onion** --has-member--> onion-product-context
@@ -182,6 +183,7 @@
 - onion-work-tools **provides** constellation-map
 - onion-work-tools **provides** freshness-audits
 - onion-work-tools **provides** guided-conduction
+- onion-work-tools **provides** guided-onboarding
 - onion-work-tools **provides** knowledge-graph-sdaal
 - onion-work-tools **provides** learning-diary
 - onion-work-tools **provides** metaspec-validation
@@ -388,6 +390,7 @@ onion	has-member	nx-monorepo-specialist
 onion	has-member	onion	
 onion	has-member	onion-compliance-context	
 onion	has-member	onion-engineering-context	
+onion	has-member	onion-onboarding	
 onion	has-member	onion-orchestration	
 onion	has-member	onion-patterns	
 onion	has-member	onion-product-context	
@@ -537,6 +540,7 @@ onion-work-tools	provides	co-evolution-upstream
 onion-work-tools	provides	constellation-map	
 onion-work-tools	provides	freshness-audits	
 onion-work-tools	provides	guided-conduction	
+onion-work-tools	provides	guided-onboarding	
 onion-work-tools	provides	knowledge-graph-sdaal	
 onion-work-tools	provides	learning-diary	
 onion-work-tools	provides	metaspec-validation	
