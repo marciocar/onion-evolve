@@ -44,8 +44,9 @@ VALIDATION=(
   ".claude/validation/kg-provenance-coverage.sh"
   ".claude/validation/resolve-integration-branch.sh"
 )
-# Skill de orquestração (orchestrate depende dela).
-SKILLS=(".claude/skills/onion-orchestration")
+# Skills de trabalho: orquestração (orchestrate depende dela) + condução (o wizard "ajuda a FAZER"
+# os movimentos da família — projeta da topologia-SSOT; par futuro: onion-onboarding "ajuda a CONHECER").
+SKILLS=(".claude/skills/onion-orchestration" ".claude/skills/onion-wizard")
 # KB tipo A embarcado — a doutrina que kg/diary mais citam (auto-suficiência sem /meta:adopt).
 DOCS=(
   "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
@@ -53,7 +54,7 @@ DOCS=(
 
 # Capability Contract.
 CONFORMANCE="silver"
-PROVIDES=("knowledge-graph-sdaal" "learning-diary" "orchestration" "metaspec-validation" "freshness-audits" "constellation-map" "co-evolution-upstream")
+PROVIDES=("knowledge-graph-sdaal" "learning-diary" "orchestration" "metaspec-validation" "freshness-audits" "constellation-map" "co-evolution-upstream" "guided-conduction")
 REQUIRES=(
   "agent:metaspec-gate-keeper"
   "skill:onion-orchestration"

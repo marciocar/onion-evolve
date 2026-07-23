@@ -61,6 +61,7 @@
 - **onion** --has-member--> onion-patterns
 - **onion** --has-member--> onion-product-context
 - **onion** --has-member--> onion-validation
+- **onion** --has-member--> onion-wizard
 - **onion** --has-member--> pain-price-specialist
 - **onion** --has-member--> pmbok-specialist
 - **onion** --has-member--> postgres-specialist
@@ -180,6 +181,7 @@
 - onion-work-tools **provides** co-evolution-upstream
 - onion-work-tools **provides** constellation-map
 - onion-work-tools **provides** freshness-audits
+- onion-work-tools **provides** guided-conduction
 - onion-work-tools **provides** knowledge-graph-sdaal
 - onion-work-tools **provides** learning-diary
 - onion-work-tools **provides** metaspec-validation
@@ -390,6 +392,7 @@ onion	has-member	onion-orchestration
 onion	has-member	onion-patterns	
 onion	has-member	onion-product-context	
 onion	has-member	onion-validation	
+onion	has-member	onion-wizard	
 onion	has-member	pain-price-specialist	
 onion	has-member	pmbok-specialist	
 onion	has-member	postgres-specialist	
@@ -533,6 +536,7 @@ onion-work-tools	loads	when:kg backfill -> run:validation/kg-provenance-coverage
 onion-work-tools	provides	co-evolution-upstream	
 onion-work-tools	provides	constellation-map	
 onion-work-tools	provides	freshness-audits	
+onion-work-tools	provides	guided-conduction	
 onion-work-tools	provides	knowledge-graph-sdaal	
 onion-work-tools	provides	learning-diary	
 onion-work-tools	provides	metaspec-validation	
