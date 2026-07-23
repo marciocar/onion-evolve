@@ -77,7 +77,7 @@ role_field() {  # extrai 'role:' do stamp (tira comentário inline, aspas, espa�
     | sed -E 's/^[[:space:]]*role:[[:space:]]*//; s/[[:space:]]*#.*$//; s/[[:space:]]*$//; s/"//g; s/'\''//g'
 }
 if [ ! -f "${STAMP}" ]; then
-  echo "ERRO: ${STAMP} ausente — co-relay roda no ADOTANTE (role: adopted)." >&2
+  echo "ERRO: ${STAMP} ausente — co-relay roda no ADOTANTE (role: adopted ou hub)." >&2
   echo "      Sem stamp = core/fonte ou pré-adoção; o core não relaya upstream (use /meta:co-announce)." >&2
   exit 2
 fi

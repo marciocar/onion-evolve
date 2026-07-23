@@ -558,6 +558,33 @@ run_onion_version_tracked_selftests() {
   else record_fail "onion-version-tracked: (d)" "não pegou hub untracked (o clone do hub perderia o papel)"; fi
 }
 
+# Modo hub-role-guard — costura HUB (2026-07-23): um hub É adotante para os role-guards que pulam os
+# links/plugins core-only (ausentes-por-desenho na superfície vendorizada). Sem isso, o clone de um hub
+# vira 156 falso-HARD — dogfood-de-fronteira: a sessão do Pedro promoveu a hub e o lint explodiu.
+run_hub_role_guard_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  [ -f "${lint}" ] || return 0
+  command -v git >/dev/null 2>&1 || { record_pass "hub-role-guard: git ausente (skip gracioso)"; return; }
+  local sb; sb="$(mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"; trap 'rm -rf "'"${sb}"'"' RETURN
+  mkdir -p "${sb}/.claude/validation" "${sb}/docs/knowledge-base/concepts"
+  cp "${lint}" "${SCRIPT_DIR}/projection-safety.sh" "${sb}/.claude/validation/"
+  printf '# KB\nVer [x](../../analysis/nao-existe.md).\n' > "${sb}/docs/knowledge-base/concepts/x.md"
+  git -C "${sb}" init -q
+  git -C "${sb}" add -A >/dev/null 2>&1
+  git -C "${sb}" -c user.name=t -c user.email=t@t commit -q -m x >/dev/null 2>&1
+  local n
+  # (a) role: hub → link core-only PULADO (hub = adotante para o role-guard de _scan_relative_links)
+  printf 'framework: h\nrole: hub\n' > "${sb}/.claude/.onion-version"
+  n="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 | grep -c 'não resolve' || true)"
+  if [ "${n}" = 0 ]; then record_pass "hub-role-guard: (a) role: hub → link core-only pulado (hub = adotante)"
+  else record_fail "hub-role-guard: (a)" "hub flagou ${n} link(s) core-only — o clone do hub viraria falso-HARD em massa"; fi
+  # (b) role: source → link core-only FLAGADO (no source os docs existem; o guard NÃO pula)
+  printf 'framework: h\nrole: source\n' > "${sb}/.claude/.onion-version"
+  n="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 | grep -c 'não resolve' || true)"
+  if [ "${n}" -ge 1 ]; then record_pass "hub-role-guard: (b) role: source → link core-only flagado (guard não pula no source)"
+  else record_fail "hub-role-guard: (b)" "source não flagou o link ausente (o role-guard pula sempre?)"; fi
+}
+
 run_kg_view_selftests() {
   local view="${SCRIPT_DIR}/kg-view.sh"
   local tmp out rc
@@ -4425,6 +4452,7 @@ run_site_deeplink_selftests
 run_migalhas_generate_selftests
 run_rules_registry_selftests
 run_onion_version_tracked_selftests
+run_hub_role_guard_selftests
 run_kg_view_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.

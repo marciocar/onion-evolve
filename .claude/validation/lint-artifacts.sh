@@ -426,7 +426,7 @@ check_plugins_sync() {
   # consumidor (role: adopted) NÃO distribui plugins — marketplace é superfície do source; a fonte é
   # vendorizada mas a SAÍDA gerada (plugins/ + marketplace.json) não. Guarda POR PAPEL (não só por
   # ferramenta) — sinal de campo 2026-07-10 (12 HARD falsos bloqueavam todo commit do adotante).
-  grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
+  grep -qE '^role: (adopted|hub)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
   [ -f "${asm}" ] || return 0            # sem assembler → nada a checar (repo sem a feature)
   [ -d "${vdir}" ] || return 0
   command -v jq >/dev/null 2>&1 || return 0   # sem jq → pula gracioso (mesma graça dos outros)
@@ -528,7 +528,7 @@ check_role_bundle_sync() {
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   local mkt="${REPO_ROOT}/.claude-plugin/marketplace.json"
   # consumidor não carrega marketplace.json — mesma guarda por papel de check_plugins_sync (sinal de campo)
-  grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
+  grep -qE '^role: (adopted|hub)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
   [ -f "${roles}" ] || return 0
   command -v python3 >/dev/null 2>&1 || return 0
   python3 -c "import yaml" >/dev/null 2>&1 || return 0
@@ -1377,7 +1377,7 @@ _scan_relative_links() {
   # validações meta). KBs de doutrina embarcados citam esses arquivos por link — ausentes-por-desenho no
   # door, exatamente como os docs core-only. Só ATIVA quando o alvo está ausente ([ ! -e ] abaixo): num
   # adotante-cheio o alvo existe (nunca entra); no core (role: source) o guard nem roda. Backward-safe.
-  local adopted=""; grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && adopted=1
+  local adopted=""; grep -qE '^role: (adopted|hub)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && adopted=1
   local f dir lineno target clean rel
   while IFS= read -r -d '' f; do
     dir="$(dirname "${f}")"
@@ -1820,7 +1820,7 @@ check_frontmatter_model_category() {
 #   vazio → todo standalone montado herdava referência morta. Roda no source (o adotante não monta).
 # ===========================================================================
 check_bundled_command_script_deps() {
-  grep -q '^role: adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
+  grep -qE '^role: (adopted|hub)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   [ -d "${vdir}" ] || return 0
   # Harness sempre-presente num repo adotado (não precisa estar no VALIDATION[] do bundle).
@@ -1903,7 +1903,7 @@ check_onion_version_tracked() {
     case "${ONLY_PATH}" in "${stamp}") : ;; *) return 0 ;; esac
   fi
   if ! git -C "${REPO_ROOT}" ls-files --error-unmatch .claude/.onion-version >/dev/null 2>&1; then
-    violation "HARD" ".claude/.onion-version" "adotante (role: adopted) com .onion-version NÃO trackeado — commite-o ('git add -f .claude/.onion-version'): senão o clone perde o marcador de papel e TODOS os guards de adotante desligam (links/plugins core-only viram falso-HARD em massa no clone). Achado 2026-07-22."
+    violation "HARD" ".claude/.onion-version" "adotante/hub (role: adopted|hub) com .onion-version NÃO trackeado — commite-o ('git add -f .claude/.onion-version'): senão o clone perde o marcador de papel e TODOS os guards de adotante desligam (links/plugins core-only viram falso-HARD em massa no clone). Achado 2026-07-22."
   fi
 }
 
