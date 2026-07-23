@@ -34,10 +34,6 @@
 > — Marcio, 2026-07 (ratificada como sua). O KG/repo do adotante mora com ele; o core fica
 > conectado como par, não como dono. O life-KG mora no device; o KG cru nunca sai.
 
-> **"Cunhagens minhas devem ser declaradas."**
-> — Marcio, 2026-07 (verbatim). Contribuição original se declara com autoria + data — nem escondida
-> (nega a contribuição), nem passada por literatura (roubo).
-
 ## Do conjunto — formulações nossas (surgidas da conversa)
 
 > Nem toda frase que fica é de um autor só. Estas nasceram **do trabalho em par** (Marcio + Onion),
