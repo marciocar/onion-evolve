@@ -497,10 +497,20 @@ fi
   ```
 - Regenerar `docs/INDEX.md` do alvo (`/docs:build-index`). Checkpoint: `NEXT: Fase 4`.
 
-### Fase 4 — Configurar integrações (`.env`) — **RODA NO ALVO**
+### Fase 4 — Configurar integrações (ambiente) — **RODA NO ALVO**
 
-Ver [🔁 Transição de Contexto](#-transição-de-contexto-fonte--alvo). No alvo: `cp .env.example .env`
-+ `/meta:setup-integration`. Fallback gracioso se pulado. `NEXT: Fase 5`.
+Ver [🔁 Transição de Contexto](#-transição-de-contexto-fonte--alvo). O objetivo é **AGNÓSTICO de
+transporte**: garantir que `TASK_MANAGER_PROVIDER` e as credenciais cheguem ao **AMBIENTE do processo**
+— que é o que o adapter (`detector.md`) e o hook lêem (`process.env`), **não** um arquivo `.env` por si só.
+Caminhos válidos: `.env` **carregado** (`set -a; source .env; set +a`), `.envrc`+direnv, `pass`, ou o
+mecanismo de secrets do próprio projeto. Depois: `/meta:setup-integration`.
+
+> **⚠️ Legacy — leia o `CLAUDE.md` do alvo ANTES de sugerir mecanismo de secrets.** Não instrua
+> `cp .env.example .env` cegamente: um projeto pode **proibir** `.env` solto (ex.: convenção
+> `.envrc`+direnv+`pass`) — copiar o arquivo violaria a convenção dele E produziria um provider
+> cosmético que o adapter (que lê o ambiente) não enxerga. Respeite o mecanismo declarado do projeto.
+
+Fallback gracioso se pulado. `NEXT: Fase 5`.
 
 ### Fase 5 — Carimbar versão (da identidade da FONTE capturada no PASSO 0)
 
