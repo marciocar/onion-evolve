@@ -576,6 +576,48 @@ run_onion_version_tracked_selftests() {
 # Modo hub-role-guard — costura HUB (2026-07-23): um hub É adotante para os role-guards que pulam os
 # links/plugins core-only (ausentes-por-desenho na superfície vendorizada). Sem isso, o clone de um hub
 # vira 156 falso-HARD — dogfood-de-fronteira: a sessão do Pedro promoveu a hub e o lint explodiu.
+# Modo inventory-adopter-scope — check_inventory_total_drift é adopter-aware: num repo DERIVADO
+# (role: adopted|hub|decoupled) SÓ os docs Onion vendorizados são varridos p/ contagens; os docs de
+# PRODUTO do adotante (docs/specs, …) são EXCLUÍDOS ('100+ agentes' ali é do produto dele). Sinal de
+# campo: arandek 2026-07-24 (docs/specs/capability-registry.md). Testa: (a) adotante → doc de produto
+# NÃO flagado; (b) source → o MESMO doc É flagado (sem scoping); (c) adotante → doc Onion-owned AINDA
+# flagado (o scoping não desliga a regra p/ os docs certos). [[fix-must-become-mechanism]]
+run_inventory_adopter_scope_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"; local inv="${SCRIPT_DIR}/inventory.sh"
+  [ -f "${lint}" ] || return 0
+  [ -f "${inv}" ] || { record_pass "inventory-adopter-scope: inventory.sh ausente → pulado"; return; }
+  local sb; sb="$(mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"; trap 'rm -rf "'"${sb}"'"' RETURN
+  mkdir -p "${sb}/.claude/validation" "${sb}/.claude/agents/development" "${sb}/.claude/commands/meta" \
+           "${sb}/.claude/skills/foo" "${sb}/docs/specs" "${sb}/docs/onion" "${sb}/docs/knowledge-base/concepts"
+  cp "${SCRIPT_DIR}"/*.sh "${sb}/.claude/validation/" 2>/dev/null
+  printf -- '---\nname: foo\ndescription: x\n---\n# s\n' > "${sb}/.claude/skills/foo/SKILL.md"
+  printf '# kb\n' > "${sb}/docs/knowledge-base/concepts/k.md"
+  printf -- '---\nname: foo\ndescription: x\nmodel: sonnet\n---\nrole\n' > "${sb}/.claude/agents/development/foo.md"
+  printf -- '---\ndescription: x\n---\n# c\n' > "${sb}/.claude/commands/meta/c.md"
+  local msg='contagem aproximada de agentes' n
+
+  # (a) role: adopted + doc de PRODUTO (docs/specs) com '100+ agentes' → EXCLUÍDO (não flaga)
+  printf 'framework: h\nrole: adopted\n' > "${sb}/.claude/.onion-version"
+  printf '# Capability Registry\nO produto orquestra 100+ agentes mencionáveis.\n' > "${sb}/docs/specs/capability.md"
+  n="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 | grep -c "${msg}" || true)"
+  if [ "${n}" = 0 ]; then record_pass "inventory-adopter-scope: (a) adotante → doc de produto não flagado"
+  else record_fail "inventory-adopter-scope: (a)" "adotante flagou ${n}× o doc de produto (falso-positivo arandek não fechou)"; fi
+
+  # (b) role: source + o MESMO doc → É flagado (no source não há scoping de adotante)
+  printf 'framework: h\nrole: source\n' > "${sb}/.claude/.onion-version"
+  n="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 | grep -c "${msg}" || true)"
+  if [ "${n}" -ge 1 ]; then record_pass "inventory-adopter-scope: (b) source → mesmo doc flagado (regra ativa no core)"
+  else record_fail "inventory-adopter-scope: (b)" "source não flagou — o scoping vazou p/ o core (regra desligada)"; fi
+
+  # (c) role: adopted + doc ONION-OWNED (docs/onion) com '100+ agentes' → AINDA flagado (whitelist varre)
+  rm -f "${sb}/docs/specs/capability.md"
+  printf '# Nota Onion\nO Onion tem 100+ agentes especializados.\n' > "${sb}/docs/onion/nota.md"
+  printf 'framework: h\nrole: adopted\n' > "${sb}/.claude/.onion-version"
+  n="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 | grep -c "${msg}" || true)"
+  if [ "${n}" -ge 1 ]; then record_pass "inventory-adopter-scope: (c) adotante → doc Onion-owned ainda flagado (scoping não over-exclui)"
+  else record_fail "inventory-adopter-scope: (c)" "scoping excluiu ATÉ o doc Onion-owned (over-exclusão)"; fi
+}
+
 run_hub_role_guard_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   [ -f "${lint}" ] || return 0
@@ -1896,16 +1938,21 @@ run_adopted_role_selftests() {
     record_pass "adopted-role: role adopted sem plugins/ → 0 violações de marketplace (guarda por papel)"
   fi
   # link-check role-guard (sinal de um adotante regulado 2026-07-16): adotante NÃO vendoriza docs core-only → links
-  # vendorizados que os referenciam devem ser PULADOS; MAS link KB-interno quebrado ainda VIOLA (precisão).
+  # vendorizados que os referenciam NÃO devem virar falso "link relativo quebrado" HARD; MAS link KB-interno
+  # quebrado ainda VIOLA (precisão). NOTA (reconciliação com a REGRA 45, 2026-07): um link VIVO p/ caminho
+  # core-privado agora dispara — POR DESIGN — a violação [link-vendorizado] (converta p/ gloss); isso é
+  # INTENCIONAL, não um falso "quebrado". Por isso a asserção escopa à regra de LINK-QUEBRADO (grep na msg
+  # 'link relativo quebrado'), não a QUALQUER menção do path — senão a REGRA 45 mascararia este guard. [[fix-must-become-mechanism]]
   rm -rf "${asb}/docs/analysis" "${asb}/docs/discussions" "${asb}/docs/applying" "${asb}/docs/evolution/federation"
   printf '# t\n[core-only](../analysis/foo.md)\n[kb-interno-faltando](concepts/nao-existe-xyz.md)\n' \
     > "${asb}/docs/knowledge-base/test-link-guard.md"
-  local out2; out2="$(cd "${asb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if printf '%s' "${out2}" | grep -q 'concepts/nao-existe-xyz.md' \
-     && ! printf '%s' "${out2}" | grep -q 'analysis/foo.md'; then
-    record_pass "adopted-role: link-guard pula core-only (analysis) e ainda pega KB-interno quebrado (preciso)"
+  local out2 broken; out2="$(cd "${asb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  broken="$(printf '%s\n' "${out2}" | grep 'link relativo quebrado' || true)"
+  if printf '%s' "${broken}" | grep -q 'concepts/nao-existe-xyz.md' \
+     && ! printf '%s' "${broken}" | grep -q 'analysis/foo.md'; then
+    record_pass "adopted-role: link-guard — broken-link pula core-only e pega KB-interno (REGRA 45 trata core-privado à parte)"
   else
-    record_fail "adopted-role: link-guard" "core-only não-pulado OU KB-interno não-pego: $(printf '%s' "${out2}" | grep -i 'link relativo' | head -3)"
+    record_fail "adopted-role: link-guard" "broken-link impreciso: core-only virou 'quebrado' OU kb-interno não-pego — $(printf '%s' "${broken}" | head -3)"
   fi
   rm -rf "${asb}"
 }
@@ -2509,6 +2556,54 @@ run_prettierignore_selftests() {
   local rc=0; bash "${helper}" "/nao/existe/$$" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 2 ]; then record_pass "prettierignore: dest inválido → exit 2"
   else record_fail "prettierignore: dest inválido" "esperava exit 2, veio ${rc}"; fi
+}
+
+# ---------------------------------------------------------------------------
+# Modo scope-gitignore — exercita .claude/utils/adopt/scope-claude-gitignore.sh
+# (escopa um ignore CEGO de .claude/ p/ que a superfície do framework + stamp sejam
+# TRACKEÁVEIS no adotante; sinal de campo arandek 2026-07-24). Self-contained.
+# ---------------------------------------------------------------------------
+run_scope_gitignore_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/scope-claude-gitignore.sh"
+  if [ ! -f "${helper}" ]; then record_fail "scope-gitignore" "helper ausente: ${helper}"; return; fi
+  local d before after
+
+  # (a) ignore cego DUPLO (caso arandek) → escopa: .claude/ deixa de ser ignorado, efêmeros seguem
+  d="$(mktemp -d)"; printf 'node_modules/\n.claude/\nbackups/\n.codex/\n.claude/\n_private/\n' > "${d}/.gitignore"
+  bash "${helper}" "${d}" >/dev/null 2>&1
+  if ! grep -qxF ".claude/" "${d}/.gitignore" \
+     && grep -qxF ".claude/sessions/" "${d}/.gitignore" \
+     && grep -qxF ".claude/settings.local.json" "${d}/.gitignore" \
+     && grep -qxF "_private/" "${d}/.gitignore"; then
+    record_pass "scope-gitignore: ignore cego duplo escopado (efêmeros mantidos, resto preservado)"
+  else record_fail "scope-gitignore: cego duplo" "não escopou, ou perdeu linha não-relacionada"; fi
+  rm -rf "${d}"
+
+  # (b) idempotência → 2ª execução é no-op byte-a-byte
+  d="$(mktemp -d)"; printf 'x/\n.claude/\ny/\n' > "${d}/.gitignore"
+  bash "${helper}" "${d}" >/dev/null 2>&1; before="$(cat "${d}/.gitignore")"
+  bash "${helper}" "${d}" >/dev/null 2>&1; after="$(cat "${d}/.gitignore")"
+  if [ "${before}" = "${after}" ]; then record_pass "scope-gitignore: idempotente (2ª rodada no-op)"
+  else record_fail "scope-gitignore: idempotência" "mutou um .gitignore já escopado"; fi
+  rm -rf "${d}"
+
+  # (c) já escopado + negação + subpath → intacto (nada cego → no-op)
+  d="$(mktemp -d)"; printf '.claude/sessions/\n.claude/settings.local.json\n!.claude/keep.md\nsrc/\n' > "${d}/.gitignore"
+  before="$(cat "${d}/.gitignore")"; bash "${helper}" "${d}" >/dev/null 2>&1; after="$(cat "${d}/.gitignore")"
+  if [ "${before}" = "${after}" ]; then record_pass "scope-gitignore: sem ignore cego → intacto (subpath/negação preservados)"
+  else record_fail "scope-gitignore: sem-cego" "mexeu num .gitignore sem ignore cego"; fi
+  rm -rf "${d}"
+
+  # (d) sem .gitignore → no-op exit 0 (a superfície .claude/ rastreia naturalmente)
+  d="$(mktemp -d)"; local rc=0; bash "${helper}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ ! -f "${d}/.gitignore" ]; then record_pass "scope-gitignore: sem .gitignore → no-op exit 0"
+  else record_fail "scope-gitignore: sem .gitignore" "criou arquivo ou exit≠0 (rc=${rc})"; fi
+  rm -rf "${d}"
+
+  # (e) $DEST inválido → exit 2 (erro de uso)
+  rc=0; bash "${helper}" "/nao/existe/$$" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "scope-gitignore: dest inválido → exit 2"
+  else record_fail "scope-gitignore: dest inválido" "esperava exit 2, veio ${rc}"; fi
 }
 
 # ---------------------------------------------------------------------------
@@ -4884,6 +4979,9 @@ run_a2a_accept_selftests
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
 
+# Modo scope-gitignore — escopa ignore cego de .claude/ no adotante (sinal arandek).
+run_scope_gitignore_selftests
+
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 run_githook_selftests
 
@@ -4983,6 +5081,7 @@ run_migalhas_generate_selftests
 run_rules_registry_selftests
 run_onion_version_tracked_selftests
 run_hub_role_guard_selftests
+run_inventory_adopter_scope_selftests
 run_family_topology_selftests
 run_decouple_source_selftests
 run_kg_view_selftests

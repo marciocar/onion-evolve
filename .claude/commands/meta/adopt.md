@@ -163,6 +163,15 @@ Snippet self-contained (shell novo a cada fase).
 SOURCE_ROOT="$(git rev-parse --show-toplevel)"
 DEST="<INSTALL_DIR (Fase 3) | TARGET (--update)>"
 
+# (0) .gitignore — ESCOPA um ignore CEGO de .claude/ (never-clobber, idempotente). CRÍTICO e PRIMEIRO:
+#     um adotante que ignora `.claude/` INTEIRO (comum se já usava Cursor/Claude) faz o durable-commit
+#     (`git add .claude`) staja ZERO arquivos → superfície do framework E stamp .onion-version NUNCA
+#     entram no commit → clone perde o marcador e TODOS os guards de adotante desligam (o modo-de-falha
+#     da REGRA 40). O helper detecta o ignore cego e o escopa p/ o padrão Onion (só sessions/ +
+#     settings.local.json ignorados). Sinal de campo: arandek (2026-07-24, ignorava .claude/ em 2 linhas).
+#     Sem .gitignore ou sem ignore cego → no-op. Helper testável (lint-selftest.sh: scope-gitignore).
+bash "$SOURCE_ROOT/.claude/utils/adopt/scope-claude-gitignore.sh" "$DEST"
+
 # (1) settings.json — MERGE never-clobber dos hooks Onion (registro do "you have mail" + worklog).
 #     Helper testável e idempotente (.claude/utils/adopt/merge-onion-hooks.sh; coberto por
 #     lint-selftest.sh kind=merge). Preserva hooks/permissions próprios do alvo.
