@@ -8,6 +8,11 @@
 
 ---
 
+## 2026-07-24 · `/meta:personality-sync` — personalidade emergente (RFC-0003 F2) · COMPATÍVEL · alvo: metagamify, pulse-mais, granaai, gustavo-pulga, onion-standalone
+
+- Novo comando `/meta:personality-sync` (RFC-0003 §2.4, Fase 2): gera `.claude/identity/personality.md` a partir da **evidência de uso** da instância — diário, `.onion-version`, os 30 primeiros commits. A personalidade **emerge do uso**, não é declarada; é projeção A2A-card one-way (não fonte de verdade) e **regenera** a cada sync. Substitui o `personality_summary` seed-manual pré-F2 por um emergente e ancorado.
+- Ação p/ adotantes: opcional mas recomendada. Após o próximo `/meta:adopt --update` (que vendoriza o comando), rode `/meta:personality-sync` na **sua** sessão — a personalidade emerge do **seu** diário/git (o core nunca sintetiza a sua — I3). Relaye o `personality_summary` upstream via `/meta:co-relay` para o core atualizar o `members.yaml`.
+
 ## 2026-07-23 · Gates REGRA 29 + REGRA 42 — declarado≠verificado contra o GRAFO e contra o TEMPO (com catraca) · COMPATÍVEL · alvo: todos
 
 - **REGRA 29 — proveniência invertida (`kg-provenance-coverage.sh`, commit `0ea48df`, 2026-07-20).
