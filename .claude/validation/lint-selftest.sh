@@ -2607,6 +2607,39 @@ run_scope_gitignore_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo task-manager-hook — .claude/hooks/task-manager-provider-hook.sh deve ler o
+# AMBIENTE primeiro (fonte do adapter), com .env como fallback HONESTO. Sinal de campo
+# arandek 2026-07 (D2): hook lia só .env → anunciava 'none' com Linear provado via direnv.
+# ---------------------------------------------------------------------------
+run_task_manager_hook_selftests() {
+  local hook="${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh"
+  if [ ! -f "${hook}" ]; then record_fail "task-manager-hook" "hook ausente: ${hook}"; return; fi
+  local out d
+
+  # (a) ambiente setado → anuncia o provider do ambiente (alinhado ao adapter)
+  out="$(TASK_MANAGER_PROVIDER=jira bash "${hook}" 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q 'ativo = jira'; then
+    record_pass "task-manager-hook: (a) ambiente setado → anuncia do ambiente (fonte do adapter)"
+  else record_fail "task-manager-hook: (a)" "não leu o ambiente: ${out}"; fi
+
+  # (b) ambiente vazio + .env com provider → avisa HONESTO (adapter cego), não anuncia cosmético
+  d="$(mktemp -d)"; printf 'TASK_MANAGER_PROVIDER=linear\n' > "${d}/.env"
+  out="$(cd "${d}" && env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${d}" bash "${hook}" 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q 'declarado no .env' && printf '%s' "${out}" | grep -q 'cego'; then
+    record_pass "task-manager-hook: (b) só no .env → aviso honesto (adapter cego), não cosmético"
+  else record_fail "task-manager-hook: (b)" "não avisou sobre .env não-carregado: ${out}"; fi
+  rm -rf "${d}"
+
+  # (c) ambiente vazio + sem .env → none
+  d="$(mktemp -d)"
+  out="$(cd "${d}" && env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${d}" bash "${hook}" 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q 'ativo = none'; then
+    record_pass "task-manager-hook: (c) sem ambiente e sem .env → none"
+  else record_fail "task-manager-hook: (c)" "esperava none: ${out}"; fi
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo githook — exercita .claude/utils/adopt/install-onion-githook.sh (padrão de
 # hook nativo Onion; ADR native-githooks-standard). Self-contained (mktemp -d).
 # ---------------------------------------------------------------------------
@@ -4981,6 +5014,9 @@ run_prettierignore_selftests
 
 # Modo scope-gitignore — escopa ignore cego de .claude/ no adotante (sinal arandek).
 run_scope_gitignore_selftests
+
+# Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal arandek D2).
+run_task_manager_hook_selftests
 
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 run_githook_selftests
