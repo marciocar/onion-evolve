@@ -46,9 +46,20 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: open
+    status: superseded
+    verified_at: 2026-07-24
     label: "anuncios 07-18 (ingestor + write-kg) estao em STAGING p/ metagamify/pulse-mais/onion-mini — gerados, nao transportados (declarado != entregue)"
     trace: "docs/evolution/federation/outbox/metagamify/2026-07-18-ingestor-doutrina-granaai.md"
+  - id: E_ANNOUNCE_BACKLOG_RECONCILED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-24
+    label: "reconciliado 2026-07-24: os 3 anuncios 07-18 estao TODOS em outbox/_processed dos 3 adotantes (transportados; o backlog era stale). E o Passo 2.1 (reconciliacao outbox×inbound, nascido do sinal multi-checkout 07-23) pegou um caso REAL: 5 anuncios metagamify (07-09/07-16) estavam transportados mas AUSENTES do inbound do checkout VPS — recuperados por re-entrega. Dogfood: o mecanismo de ontem achou a perda de hoje."
+    trace: "docs/evolution/federation/outbox/metagamify/_processed"
   - id: C_METAGAMIFY_PROD_UNCOMMITTED
     node_type: claim
     layer: audit
@@ -166,3 +177,7 @@ edges:
   - from: C_METAGAMIFY_VENDOR_VNEXTPIN
     to: C_FED_RADAR_ABSENT
     edge_type: SUPPORTS
+  # reconciliação 2026-07-24: 07-18 transportados (backlog stale); Passo 2.1 recuperou 5 perdidos do metagamify
+  - from: E_ANNOUNCE_BACKLOG_RECONCILED
+    to: C_ANNOUNCE_BACKLOG
+    edge_type: SUPERSEDES
