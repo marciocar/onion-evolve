@@ -48,11 +48,11 @@ estado (guardado pela REGRA 44). A medição mostra o Onion operando a escada em
 - **HUMAN (ato-3, risco):** entregar/aceitar/aplicar/corrigir/triar — no piso. A **resolução-de-alvo do
   co-deliver** é a candidata madura a MONITORED (**91 entregas** + a falha multi-checkout **documentada** + o
   monitor Passo 2.1), mas só sobe com um run monitorado real (a máxima: não fabricar a subida).
-- **MONITORED (eixo CONFIANÇA) — a máxima JÁ realizada:** **granaai** conquistou o direito de **corrigir a
-  doutrina do core** (`can_correct_to: [onion-evolve]`, 2026-07-06) **por ação provada** — achou+corrigiu um
-  bug real de lint convergente com o nosso PR #215, 7h41 de diferença, zero comunicação. É o exemplo
-  canônico: **autoridade conquistada por ação, não por decreto** — datada, medida, human-gated. gustavo/Tornak
-  alimentou o core com o bug de campo #303.
+- **MONITORED (eixo CONFIANÇA) — a máxima JÁ realizada:** **um adotante regulado** conquistou o direito de
+  **corrigir a doutrina do core** (`can_correct_to`, 2026-07-06) **por ação provada** — achou+corrigiu um bug
+  real de lint convergente com o nosso, com horas de diferença, zero comunicação. É o exemplo canônico:
+  **autoridade conquistada por ação, não por decreto** — datada, medida, human-gated. E **um adotante de
+  campo** alimentou o core com um bug de campo real. (O crédito nominal vive no diário privado, não aqui.)
 - **MOAT:** deploy ao VPS (site, bridge) — irreversível, **manual por desenho**.
 
 A KB **nomeia** o que o dogfood já forjou (o padrão "candidato entra por USO"); o registry o **atesta**.

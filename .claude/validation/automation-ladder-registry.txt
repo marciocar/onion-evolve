@@ -26,10 +26,11 @@ doctrine-correct-ingest|HUMAN|-
 co-evolve-triage|HUMAN|-
 
 # ── MONITORED (eixo CONFIANÇA) — promoção POR EVIDÊNCIA já GANHA, human-gated ──
-# granaai conquistou o direito de CORRIGIR a doutrina do core (can_correct_to) em 2026-07-06 por ação
-# provada: achou+corrigiu um bug real de lint, convergente com o nosso PR #215, 7h41 de diferença, zero
-# comunicação. É a máxima do maestro realizada, datada, medida. A prova vive no members.yaml.
-granaai-correct-to-core|MONITORED|docs/evolution/federation/members.yaml
+# UM ADOTANTE REGULADO conquistou o direito de CORRIGIR a doutrina do core (can_correct_to) em 2026-07-06
+# por ação provada: achou+corrigiu um bug real de lint, convergente com o nosso, com horas de diferença,
+# zero comunicação. É a máxima do maestro realizada, datada, medida. A prova (nominal) vive no members.yaml
+# (core-privado) + no diário privado — não na superfície vendorizada.
+regulated-adopter-correct-to-core|MONITORED|docs/evolution/federation/members.yaml
 
 # ── MOAT — irreversível → NUNCA auto (medir≠decidir; o extremo seguro, manual por desenho) ──
 site-vps-deploy|MOAT|-
