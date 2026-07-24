@@ -83,7 +83,15 @@ done < "${GI}"
 
 if cat "${TMP}" > "${GI}" 2>/dev/null; then
   rm -f "${TMP}"
-  echo "Onion: .gitignore escopado em ${DEST} — .claude/ (framework) agora é TRACKEÁVEL (efêmeros seguem ignorados)." >&2
+  # A estaca do aviso vem de campo (V1, adoção arandek 2026-07): um ignore cego de .claude/ NÃO custa só
+  # o stamp Onion — custa o TRABALHO do próprio adotante. Este repo já perdera 242 arquivos (71 skills, 39
+  # comandos) por ignorar .claude/ INTEIRO; some de todo clone em SILÊNCIO e só aparece meses depois como
+  # referências mortas num doc que parece aspiracional. O aviso carrega essa dimensão — não é cosmético.
+  echo "Onion: .gitignore escopado em ${DEST}." >&2
+  echo "  .claude/ estava ignorado POR INTEIRO — isso impediria commitar a superfície do framework E o stamp" >&2
+  echo "  (.onion-version); pior, QUALQUER coisa sua sob .claude/ (skills/comandos locais) sumiria de todo" >&2
+  echo "  clone em SILÊNCIO, só notada meses depois por referências mortas. Agora .claude/ é TRACKEÁVEL" >&2
+  echo "  (só .claude/sessions/ + .claude/settings.local.json seguem ignorados). Revise o diff do .gitignore." >&2
 else
   rm -f "${TMP}"
   echo "AVISO: não foi possível escrever ${GI} (permissão?) — .claude/ pode seguir ignorado; a superfície do framework não será commitada." >&2
