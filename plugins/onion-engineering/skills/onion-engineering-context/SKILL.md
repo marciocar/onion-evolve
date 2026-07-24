@@ -36,9 +36,12 @@ Ao precisar do motor GitFlow (branch/merge/tag/semver/sessão) ou do protocolo d
 Para ler/gravar o contexto técnico vivo (arquitetura, decisões, estado), resolva o caminho
 **nesta ordem** e use o primeiro que existir:
 
-1. **Layout Onion padrão**: `docs/technical-context/` (índice em `docs/technical-context/index.md`).
-2. **Mapa explícito**: chave `context.technical` em `.onion-version` (JSON) ou `.claude/onion-context.yaml`,
-   se o consumidor declarou um caminho próprio.
+1. **Mapa explícito**: chave `context.technical` em `.onion-version` (JSON) ou `.claude/onion-context.yaml`,
+   se o consumidor declarou um caminho próprio. **Declaração explícita vence convenção** — o específico
+   ganha do default. (Sinal de campo, arandek 2026-07/D1: a adoção CRIA `docs/technical-context/`, então
+   se o layout padrão viesse antes, o mapa explícito seria código morto exatamente para quem foi desenhado
+   — o adotante com SSOT próprio, ex.: `docs/specs/` autoritativa, que quer declará-lo.)
+2. **Layout Onion padrão**: `docs/technical-context/` (índice em `docs/technical-context/index.md`).
 3. **Heurística de layout comum** (projetos não-Onion), em ordem: `contexto-projeto.md` ·
    `docs/INDEX.md` (catálogo) · `ARCHITECTURE.md` · `docs/architecture*` · `README.md`.
 4. **Bootstrap** (só com confirmação do usuário): criar o stub mínimo (seção 3) e passar a usá-lo.
@@ -70,7 +73,8 @@ No bootstrap, criar em `docs/technical-context/index.md` (ou no caminho resolvid
 ```
 
 Manter este arquivo **vivo** (atualizar ao entregar features) é o contrato. É o piso, não o teto:
-num projeto adotado, `docs/technical-context/` completo o supera.
+num projeto adotado, `docs/technical-context/` completo o supera — **exceto** se o consumidor declarou
+um mapa explícito (`context.technical`), que vence a convenção (seção 2).
 
 ## 4. Regra de ouro
 

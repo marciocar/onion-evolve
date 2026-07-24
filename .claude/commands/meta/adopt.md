@@ -163,6 +163,15 @@ Snippet self-contained (shell novo a cada fase).
 SOURCE_ROOT="$(git rev-parse --show-toplevel)"
 DEST="<INSTALL_DIR (Fase 3) | TARGET (--update)>"
 
+# (0) .gitignore — ESCOPA um ignore CEGO de .claude/ (never-clobber, idempotente). CRÍTICO e PRIMEIRO:
+#     um adotante que ignora `.claude/` INTEIRO (comum se já usava Cursor/Claude) faz o durable-commit
+#     (`git add .claude`) staja ZERO arquivos → superfície do framework E stamp .onion-version NUNCA
+#     entram no commit → clone perde o marcador e TODOS os guards de adotante desligam (o modo-de-falha
+#     da REGRA 40). O helper detecta o ignore cego e o escopa p/ o padrão Onion (só sessions/ +
+#     settings.local.json ignorados). Sinal de campo: arandek (2026-07-24, ignorava .claude/ em 2 linhas).
+#     Sem .gitignore ou sem ignore cego → no-op. Helper testável (lint-selftest.sh: scope-gitignore).
+bash "$SOURCE_ROOT/.claude/utils/adopt/scope-claude-gitignore.sh" "$DEST"
+
 # (1) settings.json — MERGE never-clobber dos hooks Onion (registro do "you have mail" + worklog).
 #     Helper testável e idempotente (.claude/utils/adopt/merge-onion-hooks.sh; coberto por
 #     lint-selftest.sh kind=merge). Preserva hooks/permissions próprios do alvo.
@@ -488,10 +497,20 @@ fi
   ```
 - Regenerar `docs/INDEX.md` do alvo (`/docs:build-index`). Checkpoint: `NEXT: Fase 4`.
 
-### Fase 4 — Configurar integrações (`.env`) — **RODA NO ALVO**
+### Fase 4 — Configurar integrações (ambiente) — **RODA NO ALVO**
 
-Ver [🔁 Transição de Contexto](#-transição-de-contexto-fonte--alvo). No alvo: `cp .env.example .env`
-+ `/meta:setup-integration`. Fallback gracioso se pulado. `NEXT: Fase 5`.
+Ver [🔁 Transição de Contexto](#-transição-de-contexto-fonte--alvo). O objetivo é **AGNÓSTICO de
+transporte**: garantir que `TASK_MANAGER_PROVIDER` e as credenciais cheguem ao **AMBIENTE do processo**
+— que é o que o adapter (`detector.md`) e o hook lêem (`process.env`), **não** um arquivo `.env` por si só.
+Caminhos válidos: `.env` **carregado** (`set -a; source .env; set +a`), `.envrc`+direnv, `pass`, ou o
+mecanismo de secrets do próprio projeto. Depois: `/meta:setup-integration`.
+
+> **⚠️ Legacy — leia o `CLAUDE.md` do alvo ANTES de sugerir mecanismo de secrets.** Não instrua
+> `cp .env.example .env` cegamente: um projeto pode **proibir** `.env` solto (ex.: convenção
+> `.envrc`+direnv+`pass`) — copiar o arquivo violaria a convenção dele E produziria um provider
+> cosmético que o adapter (que lê o ambiente) não enxerga. Respeite o mecanismo declarado do projeto.
+
+Fallback gracioso se pulado. `NEXT: Fase 5`.
 
 ### Fase 5 — Carimbar versão (da identidade da FONTE capturada no PASSO 0)
 

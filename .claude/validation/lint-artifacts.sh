@@ -124,6 +124,18 @@ inventory_scope_excluded() {
   case "${f}" in
     */docs/analysis/*|*/.claude/sessions/*|*/docs/materials/*|*/docs/onion/inventory.md|*/validation/fixtures/*) return 0 ;;
   esac
+  # Adopter-aware: num repo DERIVADO (role: adopted|hub|decoupled), SÓ os docs Onion VENDORIZADOS podem
+  # legitimamente afirmar contagens do inventário Onion. Os docs de PRODUTO do adotante (docs/specs,
+  # docs/architecture, CLAUDE.md próprio, relatórios em docs/evolution/, …) falam do sistema DELE —
+  # 'N agentes' ali é do produto, não do Onion. Falso-positivo REAL: arandek (2026-07-24) tinha
+  # docs/specs/capability-registry.md com '100+ agentes' do próprio produto. Restringe a varredura à
+  # superfície Onion. No core (role: source) NÃO se aplica — todos os docs são Onion. [[fix-must-become-mechanism]]
+  if grep -qE '^(role:[[:space:]]*(adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then
+    case "${f}" in
+      */docs/onion/*|*/docs/knowledge-base/*|*/docs/meta-specs/*|*/docs/sdaal/*|*/CLAUDE.onion.md) : ;;  # Onion-owned → varre
+      *) return 0 ;;                                                                                      # doc de produto do adotante → exclui
+    esac
+  fi
   if grep -qiE '^(status:[[:space:]]*snapshot|type:[[:space:]]*(adr|evolution-backlog))' "${f}" 2>/dev/null; then
     return 0
   fi
