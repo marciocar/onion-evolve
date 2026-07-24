@@ -128,16 +128,28 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.8
-    status: open
-    label: "FINDING: a foto-da-federacao-KG e um overlay AUDIT de saude-de-verificacao + um radar de federacao (checks proprios) — NAO um domain-layer forcado (adopts/trust nao cabem nos 6 edge-types domain; nao inventar tipo antes da prova)"
+    status: confirmed
+    verified_at: 2026-07-24
+    label: "FINDING: a foto-da-federacao-KG e um overlay AUDIT de saude-de-verificacao + um radar de federacao (checks proprios) — NAO um domain-layer forcado (adopts/trust nao cabem nos 6 edge-types domain; nao inventar tipo antes da prova). IMPLEMENTADA: ADR + federation-radar.sh + este overlay .kg.yaml."
   - id: C_FED_RADAR_ABSENT
     node_type: claim
     layer: audit
     plane: PROD
     impact: 4
     confidence: 0.9
-    status: open
+    status: superseded
+    verified_at: 2026-07-24
     label: "FALTA um radar de federacao: pin declarado!=verificado, anuncio staging-nao-transportado, hub sem sub-adotado, linhagem sem pin verificado — hoje espalhados em pin-integrity-check.sh/reconcile, fora do motor KG"
+  - id: E_FED_RADAR_BUILT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-24
+    label: "federation-radar.sh EXISTE e roda (exit 0, 2026-07-24), consolidando os 4 checks antes espalhados num veredito de ATENCAO: ① pin declarado!=verificado ② anuncio staging-nao-transportado ③ hub sem sub-adotado ④ linhagem sem pin. Construido conforme a decisao D_FED_KG_AS_AUDIT_OVERLAY (overlay KG + radar proprio, sem forcar domain-layer). O 'FALTA' era stale — o radar nasceu depois do baseline 07-18."
+    trace: ".claude/validation/federation-radar.sh"
 edges:
   - from: C_GRANAAI_PIN_UNTRUSTED
     to: EN_CORE
@@ -180,4 +192,8 @@ edges:
   # reconciliação 2026-07-24: 07-18 transportados (backlog stale); Passo 2.1 recuperou 5 perdidos do metagamify
   - from: E_ANNOUNCE_BACKLOG_RECONCILED
     to: C_ANNOUNCE_BACKLOG
+    edge_type: SUPERSEDES
+  # reconciliação 2026-07-24: o radar de federação foi construído (federation-radar.sh) — o "FALTA" era stale
+  - from: E_FED_RADAR_BUILT
+    to: C_FED_RADAR_ABSENT
     edge_type: SUPERSEDES
