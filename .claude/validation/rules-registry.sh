@@ -29,6 +29,7 @@ rx    = re.compile(r'^# REGRA (\d+) [—-] (.+?)\s*$')   # '# REGRA N — Títul
 fnrx  = re.compile(r'^([a-z_][a-z0-9_]*)\(\)\s*\{')          # 'check_xxx() {'
 sevrx = re.compile(r'violation "(HARD|SOFT)"')
 tagrx = re.compile(r'\[([^\]]*)\]\s*$')                       # '… [HARD]'
+prevrx = re.compile(r'^#\s*previne:\s*(.+?)\s*$')            # '# previne: <modo-de-falha>'
 
 rules, order, dups = {}, [], []
 i, n = 0, len(lines)
@@ -41,10 +42,15 @@ while i < n:
     tagm = tagrx.search(raw)
     declared = tagm.group(1).strip() if tagm else None
     title = tagrx.sub('', raw).strip() if tagm else raw.strip()
-    # da guarda até o próximo docstring: acha a função e as severidades que ela emite
+    # da guarda até o próximo docstring: acha a função, as severidades que ela emite,
+    # e o campo '# previne:' (o modo-de-falha, no bloco de docstring antes da função).
     j = i + 1
-    fname, sev = None, set()
+    fname, sev, previne = None, set(), None
     while j < n and not rx.match(lines[j]):
+        if previne is None:
+            pm = prevrx.match(lines[j])
+            if pm:
+                previne = pm.group(1)
         fm = fnrx.match(lines[j])
         if fm:
             fname = fm.group(1)
@@ -58,12 +64,21 @@ while i < n:
         j += 1
     if num in rules:
         dups.append(num)
-    rules[num] = dict(title=title, declared=declared, sev=sev, fn=fname)
+    rules[num] = dict(title=title, declared=declared, sev=sev, fn=fname, previne=previne)
     order.append(num)
     i += 1
 
 if dups:
     sys.stderr.write("ERRO rules-registry: numero(s) de REGRA duplicado(s): %s\n" % sorted(set(dups)))
+    sys.exit(2)
+
+# Catraca de CLAREZA (irmã da 'sem categoria'): toda regra declara o MODO-DE-FALHA que
+# previne, num '# previne:' logo abaixo do '# REGRA N —'. Sem isso, o registro vira lista
+# de nomes; com isso, mapa navegavel. Regra nova sem previne = erro (nao esquece por design).
+no_previne = sorted(x for x in rules if not rules[x].get('previne'))
+if no_previne:
+    sys.stderr.write("ERRO rules-registry: REGRA(S) sem '# previne: <modo-de-falha>' no docstring: %s "
+                     "(adicione a linha logo abaixo de '# REGRA N —' em lint-artifacts.sh)\n" % no_previne)
     sys.exit(2)
 
 def sev_label(r):
@@ -147,8 +162,10 @@ out.append("> ```bash")
 out.append("> bash .claude/validation/rules-registry.sh > .claude/validation/lint-rules.md")
 out.append("> ```")
 out.append(">")
-out.append("> A REGRA 39 mantém este arquivo em paridade com as guardas e **falha se houver número")
-out.append("> duplicado ou regra sem categoria** — a catraca de clareza.")
+out.append("> A coluna **O que previne** vem do campo `# previne:` no docstring de cada regra (o")
+out.append("> modo-de-falha que ela evita). A REGRA 39 mantém este arquivo em paridade com as guardas")
+out.append("> e **falha se houver número duplicado, regra sem categoria ou regra sem `# previne:`** — a")
+out.append("> catraca de clareza.")
 out.append("")
 out.append("São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o mesmo")
 out.append("lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não")
@@ -164,10 +181,10 @@ for title, desc, nums in CATEGORIES:
     out.append("")
     out.append(desc)
     out.append("")
-    out.append("| Nº | Regra | Severidade |")
-    out.append("|---:|-------|:----------:|")
+    out.append("| Nº | Regra | Severidade | O que previne |")
+    out.append("|---:|-------|:----------:|---------------|")
     for x in present:
-        out.append("| %d | %s | %s |" % (x, esc(rules[x]['title']), labels[x]))
+        out.append("| %d | %s | %s | %s |" % (x, esc(rules[x]['title']), labels[x], esc(rules[x]['previne'])))
     out.append("")
 
 sys.stdout.write('\n'.join(out).rstrip('\n') + '\n')

@@ -9,8 +9,10 @@
 > bash .claude/validation/rules-registry.sh > .claude/validation/lint-rules.md
 > ```
 >
-> A REGRA 39 mantém este arquivo em paridade com as guardas e **falha se houver número
-> duplicado ou regra sem categoria** — a catraca de clareza.
+> A coluna **O que previne** vem do campo `# previne:` no docstring de cada regra (o
+> modo-de-falha que ela evita). A REGRA 39 mantém este arquivo em paridade com as guardas
+> e **falha se houver número duplicado, regra sem categoria ou regra sem `# previne:`** — a
+> catraca de clareza.
 
 São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o mesmo
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
@@ -22,99 +24,99 @@ bloqueia o CI.
 
 Campos obrigatórios, válidos e bem-formados no frontmatter de agentes e comandos.
 
-| Nº | Regra | Severidade |
-|---:|-------|:----------:|
-| 1 | Frontmatter de agente: name:, description:, tools: obrigatórios | HARD |
-| 2 | Frontmatter de comando: description: obrigatório | HARD |
-| 3 | Campo model: não pode conter gpt-4 | HARD |
-| 12 | Nomes de tool de agente válidos no Claude Code | HARD |
-| 17 | Frontmatter: valor escalar com ': ' não-aspado | HARD |
-| 23 | Frontmatter: model: em comandos e category: em agentes | HARD |
+| Nº | Regra | Severidade | O que previne |
+|---:|-------|:----------:|---------------|
+| 1 | Frontmatter de agente: name:, description:, tools: obrigatórios | HARD | agente sem name/description/tools obrigatórios — não carrega nem roteia direito |
+| 2 | Frontmatter de comando: description: obrigatório | HARD | comando sem description — invisível/ambíguo no menu |
+| 3 | Campo model: não pode conter gpt-4 | HARD | model proibido (gpt-4) embarcado num artefato |
+| 12 | Nomes de tool de agente válidos no Claude Code | HARD | agente declara uma tool inexistente no Claude Code |
+| 17 | Frontmatter: valor escalar com ': ' não-aspado | HARD | YAML de frontmatter quebrado por escalar com ': ' não-aspado |
+| 23 | Frontmatter: model: em comandos e category: em agentes | HARD | comando sem model: ou agente sem category: |
 
 ## Higiene de artefato
 
 Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 
-| Nº | Regra | Severidade |
-|---:|-------|:----------:|
-| 5 | Limites de linhas (por TIPO de artefato — tamanho saudável ≠ número universal) | HARD + SOFT |
-| 6 | Filenames em .claude/ devem ser kebab-case | SOFT |
-| 13 | Templates canônicos devem ser dialeto-puro | HARD |
-| 14 | Meta-specs (autoridade L0) sem dialeto Cursor em exemplos | HARD |
-| 15 | Frescor de contexto de domínio: carimbo de atualização | SOFT |
-| 22 | Links relativos quebrados em docs/evolution/ e docs/knowledge-base/ | HARD |
+| Nº | Regra | Severidade | O que previne |
+|---:|-------|:----------:|---------------|
+| 5 | Limites de linhas (por TIPO de artefato — tamanho saudável ≠ número universal) | HARD + SOFT | artefato inchado muito além do saudável para o seu tipo |
+| 6 | Filenames em .claude/ devem ser kebab-case | SOFT | filename fora de kebab-case — inconsistência e link quebrado |
+| 13 | Templates canônicos devem ser dialeto-puro | HARD | template canônico contaminado com dialeto não-canônico |
+| 14 | Meta-specs (autoridade L0) sem dialeto Cursor em exemplos | HARD | exemplo de meta-spec L0 com dialeto Cursor |
+| 15 | Frescor de contexto de domínio: carimbo de atualização | SOFT | contexto de domínio sem carimbo de atualização — frescor incerto |
+| 22 | Links relativos quebrados em docs/evolution/ e docs/knowledge-base/ | HARD | link relativo quebrado em docs/evolution ou docs/knowledge-base |
 
 ## Fronteiras & contratos de arquitetura
 
 Proibições estruturais, documentação no lugar certo e os contratos de conformance e de adoção.
 
-| Nº | Regra | Severidade |
-|---:|-------|:----------:|
-| 4 | Ausência de 'mcp_onion-orchestrator' em .claude/ | HARD |
-| 7 | Nenhum agente pode ter name: contendo 'worker-orchestrator' | HARD |
-| 18 | Sem documentação versionada sob .claude/docs/ | HARD |
-| 20 | Capability Contract: tier de conformance cumprido | HARD |
-| 40 | Adotante: .onion-version DEVE estar trackeado no git | HARD |
+| Nº | Regra | Severidade | O que previne |
+|---:|-------|:----------:|---------------|
+| 4 | Ausência de 'mcp_onion-orchestrator' em .claude/ | HARD | referência a um MCP orquestrador inexistente — runtime quebrado |
+| 7 | Nenhum agente pode ter name: contendo 'worker-orchestrator' | HARD | agente com o nome do anti-padrão 'worker-orchestrator' |
+| 18 | Sem documentação versionada sob .claude/docs/ | HARD | documentação versionada no lugar errado (.claude/docs/) |
+| 20 | Capability Contract: tier de conformance cumprido | HARD | componente reivindica um tier de conformance que não cumpre |
+| 40 | Adotante: .onion-version DEVE estar trackeado no git | HARD | adotante com .onion-version não-trackeado — 156 falso-HARD |
 
 ## SDAAL — abstração de provider
 
 O consumidor fala com a abstração, nunca com o provider direto.
 
-| Nº | Regra | Severidade |
-|---:|-------|:----------:|
-| 10 | SDAAL: sem chamada direta a provider no consumidor | HARD |
-| 11 | Método de abstração usado no consumidor deve existir na interface | HARD |
+| Nº | Regra | Severidade | O que previne |
+|---:|-------|:----------:|---------------|
+| 10 | SDAAL: sem chamada direta a provider no consumidor | HARD | consumidor chamando o provider direto, furando a abstração SDAAL |
+| 11 | Método de abstração usado no consumidor deve existir na interface | HARD | consumidor chama método de abstração que não existe na interface |
 
 ## SSOT anti-drift
 
 Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins, topologia.
 
-| Nº | Regra | Severidade |
-|---:|-------|:----------:|
-| 8 | Inventário canônico sincronizado com o filesystem | HARD |
-| 9 | Contagens no CLAUDE.md em sincronia com a SSOT | HARD |
-| 16 | Contagem de inventário-TOTAL divergente da SSOT | SOFT |
-| 19 | Plugins de vertical (plugins/*) sincronizados com as fontes | HARD |
-| 21 | Grafo (docs/onion/graph.md) sincronizado com a spec-as-code | HARD |
-| 27 | Dependência de script de comando empacotado | HARD |
-| 37 | Mapa role→bundle (roles.yaml) consistente com os verticais | HARD |
-| 39 | Registro de REGRAS derivado e em paridade com as guardas | HARD |
-| 41 | Topologia da família: SSOT no KG resolve a procedimentos REAIS | HARD |
+| Nº | Regra | Severidade | O que previne |
+|---:|-------|:----------:|---------------|
+| 8 | Inventário canônico sincronizado com o filesystem | HARD | inventário mentindo vs o filesystem real (contagem drifta) |
+| 9 | Contagens no CLAUDE.md em sincronia com a SSOT | HARD | contagens no CLAUDE.md drifta da SSOT do inventário |
+| 16 | Contagem de inventário-TOTAL divergente da SSOT | SOFT | contagem-TOTAL do inventário divergindo da SSOT |
+| 19 | Plugins de vertical (plugins/*) sincronizados com as fontes | HARD | plugin de vertical driftando das fontes — bundle de adoção errado |
+| 21 | Grafo (docs/onion/graph.md) sincronizado com a spec-as-code | HARD | docs/onion/graph.md desatualizado vs a spec-as-code |
+| 27 | Dependência de script de comando empacotado | HARD | comando empacotado dependendo de script ausente no bundle |
+| 37 | Mapa role→bundle (roles.yaml) consistente com os verticais | HARD | mapa role->bundle (roles.yaml) driftando dos verticais |
+| 39 | Registro de REGRAS derivado e em paridade com as guardas | HARD | lint-rules.md driftando das guardas (nº duplicado ou regra órfã) |
+| 41 | Topologia da família: SSOT no KG resolve a procedimentos REAIS | HARD | SSOT de topologia da família sem resolver a procedimentos reais |
 
 ## KG & proveniência
 
 Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (por citação e por marcador autodeclarado); e frescor doutrinário — afirmação sensível-ao-tempo carimbada e dentro do TTL.
 
-| Nº | Regra | Severidade |
-|---:|-------|:----------:|
-| 26 | Pesquisa nasce em KG, não morre em prosa | HARD |
-| 29 | Gate de PROVENIÊNCIA INVERTIDO, com catraca | HARD + SOFT |
-| 31 | Lente do grafo: DERIVADA e em paridade com o motor | HARD |
-| 32 | Página pública do grafo: números conferidos contra o mapa | HARD |
-| 42 | Gate de FRESCOR DOUTRINÁRIO, com catraca | HARD + SOFT |
-| 43 | Integridade do marcador kg: (proveniência virada p/ DENTRO) | HARD |
-| 44 | Integridade da escada de Automação Graduada | HARD |
+| Nº | Regra | Severidade | O que previne |
+|---:|-------|:----------:|---------------|
+| 26 | Pesquisa nasce em KG, não morre em prosa | HARD | pesquisa morrendo em prosa, sem .kg.yaml irmão (não nasce no grafo) |
+| 29 | Gate de PROVENIÊNCIA INVERTIDO, com catraca | HARD + SOFT | relatório de análise órfão do grafo (nenhum nó o cita) |
+| 31 | Lente do grafo: DERIVADA e em paridade com o motor | HARD | lente do grafo divergindo do motor que a deriva |
+| 32 | Página pública do grafo: números conferidos contra o mapa | HARD | página pública do grafo com números que não batem com o mapa |
+| 42 | Gate de FRESCOR DOUTRINÁRIO, com catraca | HARD + SOFT | afirmação sensível-ao-tempo sem carimbo ou fora do TTL |
+| 43 | Integridade do marcador kg: (proveniência virada p/ DENTRO) | HARD | marcador kg: (born-in-graph) inconsistente com o grafo |
+| 44 | Integridade da escada de Automação Graduada | HARD | classe sobe de degrau sem gate de promoção alcançável (rung-jump forjado) |
 
 ## Federação
 
 Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.
 
-| Nº | Regra | Severidade |
-|---:|-------|:----------:|
-| 24 | Console da federação (docs/onion/federation-console.html) sincronizado com o SSOT | HARD |
-| 25 | Agent Card A2A do core (docs/onion/agent-card.json) sincronizado com o SSOT | HARD |
-| 28 | Anúncio em staging para membro SEM canal de recepção | SOFT |
-| 38 | Mapa da federação (docs/onion/federation-map.md) sincronizado com members.yaml | HARD |
+| Nº | Regra | Severidade | O que previne |
+|---:|-------|:----------:|---------------|
+| 24 | Console da federação (docs/onion/federation-console.html) sincronizado com o SSOT | HARD | console da federação publica estado que não bate com o SSOT |
+| 25 | Agent Card A2A do core (docs/onion/agent-card.json) sincronizado com o SSOT | HARD | agent-card A2A do core driftando do SSOT — interop mente |
+| 28 | Anúncio em staging para membro SEM canal de recepção | SOFT | anúncio a um membro sem canal de recepção — entrega no vazio |
+| 38 | Mapa da federação (docs/onion/federation-map.md) sincronizado com members.yaml | HARD | mapa da federação driftando de members.yaml |
 
 ## Projeção & privacidade
 
 O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e deep-link privado nunca vazam.
 
-| Nº | Regra | Severidade |
-|---:|-------|:----------:|
-| 30 | Segurança de PROJEÇÃO: nome comercial de membro privado não sai | HARD |
-| 33 | Segurança de projeção no HISTÓRICO DE FEDERAÇÃO (mailbox-aware) | HARD |
-| 34 | Migalhas: superfícies DERIVADAS da fonte, sem drift | HARD |
-| 35 | Site público não linka deep-link do repo PRIVADO (404 garantido) | HARD |
-| 36 | Superfície VENDORIZADA sem nome comercial de cliente | HARD |
-| 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT |
+| Nº | Regra | Severidade | O que previne |
+|---:|-------|:----------:|---------------|
+| 30 | Segurança de PROJEÇÃO: nome comercial de membro privado não sai | HARD | nome comercial de membro privado vazando em superfície pública |
+| 33 | Segurança de projeção no HISTÓRICO DE FEDERAÇÃO (mailbox-aware) | HARD | nome privado vazando no histórico de federação (mailbox) |
+| 34 | Migalhas: superfícies DERIVADAS da fonte, sem drift | HARD | migalha (superfície derivada) driftando da fonte |
+| 35 | Site público não linka deep-link do repo PRIVADO (404 garantido) | HARD | site público linkando deep-link de repo privado — 404 garantido |
+| 36 | Superfície VENDORIZADA sem nome comercial de cliente | HARD | nome comercial de cliente vazando em superfície vendorizada |
+| 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT | link vivo de KB vendorizada para caminho core-privado — morto no adotante |

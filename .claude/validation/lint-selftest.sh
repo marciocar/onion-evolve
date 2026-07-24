@@ -482,31 +482,39 @@ run_rules_registry_selftests() {
   else record_fail "rules-registry: (a)" "lint-rules.md diverge do gerador — regenere: bash .claude/validation/rules-registry.sh > .claude/validation/lint-rules.md"; fi
 
   # (b) fixture MENOR que o conjunto real gera limpo (categoria sem regra presente é omitida)
-  printf '# REGRA 1 — Frontmatter de agente [HARD]\ncheck_a() {\n  violation "HARD" "x" "y"\n}\n# REGRA 6 — Filenames kebab [SOFT]\ncheck_b() {\n  violation "SOFT" "x" "y"\n}\n' > "${tmp}/mini.sh"
+  printf '# REGRA 1 — Frontmatter de agente [HARD]\n# previne: z\ncheck_a() {\n  violation "HARD" "x" "y"\n}\n# REGRA 6 — Filenames kebab [SOFT]\n# previne: z\ncheck_b() {\n  violation "SOFT" "x" "y"\n}\n' > "${tmp}/mini.sh"
   rc=0; RULES_LINT_SRC="${tmp}/mini.sh" bash "${gen}" > "${tmp}/mini.md" 2>/dev/null || rc=$?
   if [ "${rc}" -eq 0 ] && grep -q '^| 1 |' "${tmp}/mini.md" && grep -q '^| 6 |' "${tmp}/mini.md"; then
     record_pass "rules-registry: (b) gera de um lint fixture (subconjunto) sem exigir o conjunto real"
   else record_fail "rules-registry: (b)" "gerador não tolerou fixture menor (rc=${rc})"; fi
 
   # (c) NÚMERO DUPLICADO → exit 2 (a catraca que impede a colisão 22/23 de voltar)
-  printf '# REGRA 1 — a\ncheck_a() {\n  violation "HARD" "x" "y"\n}\n# REGRA 1 — b\ncheck_c() {\n  violation "HARD" "x" "y"\n}\n' > "${tmp}/dup.sh"
+  printf '# REGRA 1 — a\n# previne: z\ncheck_a() {\n  violation "HARD" "x" "y"\n}\n# REGRA 1 — b\n# previne: z\ncheck_c() {\n  violation "HARD" "x" "y"\n}\n' > "${tmp}/dup.sh"
   rc=0; RULES_LINT_SRC="${tmp}/dup.sh" bash "${gen}" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 2 ]; then
     record_pass "rules-registry: (c) número de REGRA duplicado → gerador falha (exit 2)"
   else record_fail "rules-registry: (c)" "duplicata não detectada (rc=${rc}, esperado 2)"; fi
 
   # (d) REGRA ÓRFÃ (sem categoria) → exit 2 (a catraca contra regra nova fora do mapa)
-  printf '# REGRA 97 — regra sem lar\ncheck_x() {\n  violation "HARD" "x" "y"\n}\n' > "${tmp}/orf.sh"
+  #     tem previne (senão a catraca de previne dispararia antes, mascarando o teste da categoria)
+  printf '# REGRA 97 — regra sem lar\n# previne: z\ncheck_x() {\n  violation "HARD" "x" "y"\n}\n' > "${tmp}/orf.sh"
   rc=0; RULES_LINT_SRC="${tmp}/orf.sh" bash "${gen}" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 2 ]; then
     record_pass "rules-registry: (d) REGRA sem categoria → gerador falha (exit 2)"
   else record_fail "rules-registry: (d)" "regra órfã não detectada (rc=${rc}, esperado 2)"; fi
 
   # (e) SEVERIDADE = corpo ∪ tag — guarda de severidade dinâmica + tag declarada → HARD + SOFT
-  printf '# REGRA 29 — dinamica [HARD + SOFT]\ncheck_d() {\n  violation "${sev}" "x" "y"\n  violation "SOFT" "b" "c"\n}\n' > "${tmp}/sev.sh"
+  printf '# REGRA 29 — dinamica [HARD + SOFT]\n# previne: z\ncheck_d() {\n  violation "${sev}" "x" "y"\n  violation "SOFT" "b" "c"\n}\n' > "${tmp}/sev.sh"
   if RULES_LINT_SRC="${tmp}/sev.sh" bash "${gen}" 2>/dev/null | grep -qE '^\| 29 \|.*HARD \+ SOFT'; then
     record_pass "rules-registry: (e) severidade = corpo ∪ tag (dinâmica declarada vira HARD + SOFT)"
   else record_fail "rules-registry: (e)" "união corpo∪tag não produziu HARD + SOFT"; fi
+
+  # (g) REGRA SEM '# previne:' → exit 2 (a catraca de clareza nova — toda regra declara o modo-de-falha)
+  printf '# REGRA 1 — sem previne [HARD]\ncheck_np() {\n  violation "HARD" "x" "y"\n}\n' > "${tmp}/np.sh"
+  rc=0; RULES_LINT_SRC="${tmp}/np.sh" bash "${gen}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then
+    record_pass "rules-registry: (g) REGRA sem '# previne:' → gerador falha (exit 2)"
+  else record_fail "rules-registry: (g)" "regra sem previne não detectada (rc=${rc}, esperado 2)"; fi
 
   # (f) GUARD verde no estado real (--only escopa ao doc)
   if bash "${lint}" --only="${doc}" 2>&1 | grep -q 'OK ✓'; then

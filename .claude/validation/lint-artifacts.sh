@@ -185,6 +185,7 @@ violation() {
 
 # ===========================================================================
 # REGRA 1 — Frontmatter de agente: name:, description:, tools: obrigatórios
+# previne: agente sem name/description/tools obrigatórios — não carrega nem roteia direito
 # ===========================================================================
 check_agent_frontmatter() {
   while IFS= read -r -d '' agent; do
@@ -202,6 +203,7 @@ check_agent_frontmatter() {
 
 # ===========================================================================
 # REGRA 2 — Frontmatter de comando: description: obrigatório
+# previne: comando sem description — invisível/ambíguo no menu
 #           (exceto arquivos em common/ e arquivos README.md)
 # ===========================================================================
 check_command_description() {
@@ -219,6 +221,7 @@ check_command_description() {
 
 # ===========================================================================
 # REGRA 3 — Campo model: não pode conter gpt-4
+# previne: model proibido (gpt-4) embarcado num artefato
 #           Verifica apenas linhas que começam com 'model:' em .claude/**/*.md
 #           NÃO falha por ocorrências dentro de blocos de código
 # ===========================================================================
@@ -235,6 +238,7 @@ check_no_gpt4_model() {
 
 # ===========================================================================
 # REGRA 4 — Ausência de 'mcp_onion-orchestrator' em .claude/ [HARD]
+# previne: referência a um MCP orquestrador inexistente — runtime quebrado
 #           (referência a componente vaporware — nunca foi implementado)
 # ===========================================================================
 check_no_mcp_onion_orchestrator() {
@@ -261,6 +265,7 @@ check_no_mcp_onion_orchestrator() {
 
 # ===========================================================================
 # REGRA 5 — Limites de linhas (por TIPO de artefato — tamanho saudável ≠ número universal)
+# previne: artefato inchado muito além do saudável para o seu tipo
 #           Agente  > 1500 linhas → HARD
 #           Comando > 800  linhas → HARD  (common/templates e common/prompts isentos)
 #           SDAAL núcleo (interface/types/factory/detector) > 500 → SOFT
@@ -318,6 +323,7 @@ check_line_limits() {
 
 # ===========================================================================
 # REGRA 6 — Filenames em .claude/ devem ser kebab-case [SOFT]
+# previne: filename fora de kebab-case — inconsistência e link quebrado
 #           Exceções permitidas (convenções estabelecidas):
 #             • README.md  — convenção universal de documentação
 #             • SKILL.md   — convenção do framework de skills
@@ -354,6 +360,7 @@ check_kebab_case_filenames() {
 
 # ===========================================================================
 # REGRA 7 — Nenhum agente pode ter name: contendo 'worker-orchestrator' [HARD]
+# previne: agente com o nome do anti-padrão 'worker-orchestrator'
 #           (violação arquitetural — §4.2 de architecture.md)
 # ===========================================================================
 check_no_worker_orchestrator_agent() {
@@ -385,6 +392,7 @@ check_branch_agent_distinction() {
 
 # ===========================================================================
 # REGRA 8 — Inventário canônico sincronizado com o filesystem [HARD]
+# previne: inventário mentindo vs o filesystem real (contagem drifta)
 #           docs/onion/inventory.md é gerado por inventory.sh (SSOT).
 #           Regenera para um temp e compara: se divergir, alguém alterou
 #           comandos/agentes/skills/KBs sem regenerar o inventário.
@@ -414,6 +422,7 @@ check_inventory_sync() {
 
 # ===========================================================================
 # REGRA 19 — Plugins de vertical (plugins/*) sincronizados com as fontes [HARD]
+# previne: plugin de vertical driftando das fontes — bundle de adoção errado
 #           Cada plugins/<name> é GERADO por assemble-plugin.sh a partir de
 #           verticals/<name>.manifest.sh. Regenera p/ temp e compara: drift =
 #           alguém editou o plugin à mão OU mudou a fonte sem regenerar.
@@ -460,6 +469,7 @@ check_plugins_sync() {
 
 # ===========================================================================
 # REGRA 20 — Capability Contract: tier de conformance cumprido [HARD]
+# previne: componente reivindica um tier de conformance que não cumpre
 #           Cada verticals/<name>.manifest.sh declara CONFORMANCE (bronze|silver|
 #           gold) + PROVIDES/REQUIRES/LOADS. Valida o tier reivindicado:
 #             bronze = provides + description + version presentes
@@ -519,6 +529,7 @@ check_capability_conformance() {
 
 # ===========================================================================
 # REGRA 37 — Mapa role→bundle (roles.yaml) consistente com os verticais [HARD]
+# previne: mapa role->bundle (roles.yaml) driftando dos verticais
 #           Todo vertical nomeado em roles.yaml (base/optional de qualquer papel)
 #           deve ter manifesto em verticals/ E estar registrado no marketplace.json.
 #           Impede roles.yaml apontar p/ vertical inexistente. Pula gracioso sem python3/yaml.
@@ -585,6 +596,7 @@ PY
 
 # ===========================================================================
 # REGRA 21 — Grafo (docs/onion/graph.md) sincronizado com a spec-as-code [HARD]
+# previne: docs/onion/graph.md desatualizado vs a spec-as-code
 #           graph.md é GERADO por graph.sh (actors.yaml + capability + frontmatter).
 #           Regenera p/ temp e compara: drift = editou à mão OU mudou a fonte sem
 #           regenerar. Espelha check_inventory_sync. Pula gracioso sem jq.
@@ -610,6 +622,7 @@ check_graph_sync() {
 }
 
 # REGRA 38 — Mapa da federação (docs/onion/federation-map.md) sincronizado com members.yaml [HARD]
+# previne: mapa da federação driftando de members.yaml
 #           GERADO por graph.sh --map (SSOT = members.yaml). Espelha check_graph_sync. Pula sem python+yaml.
 check_federation_map_sync() {
   local gen="${SCRIPT_DIR}/graph.sh"
@@ -630,6 +643,7 @@ check_federation_map_sync() {
 }
 
 # REGRA 24 — Console da federação (docs/onion/federation-console.html) sincronizado com o SSOT [HARD]
+# previne: console da federação publica estado que não bate com o SSOT
 #           GERADO por federation-console.sh (members.yaml + CHANGELOG). Espelha check_federation_map_sync.
 check_federation_console_sync() {
   local gen="${SCRIPT_DIR}/federation-console.sh"
@@ -650,6 +664,7 @@ check_federation_console_sync() {
 }
 
 # REGRA 25 — Agent Card A2A do core (docs/onion/agent-card.json) sincronizado com o SSOT [HARD]
+# previne: agent-card A2A do core driftando do SSOT — interop mente
 #           GERADO por a2a-agent-card.sh (members.yaml, FILTRADO ao core — F2.2 fundação a2a-live).
 #           Espelha check_federation_console_sync. Pula sem python+yaml.
 check_agent_card_sync() {
@@ -672,6 +687,7 @@ check_agent_card_sync() {
 
 # ===========================================================================
 # REGRA 28 — Anúncio em staging para membro SEM canal de recepção [SOFT]
+# previne: anúncio a um membro sem canal de recepção — entrega no vazio
 #   Cada anúncio de 1º nível em docs/evolution/federation/outbox/<membro>/*.md
 #   resolve o <membro> em members.yaml; se o membro tem local_path mas esse path
 #   NÃO tem docs/evolution/inbound/, o anúncio é ESTRUTURALMENTE não-entregável
@@ -749,6 +765,7 @@ PY
 
 # ===========================================================================
 # REGRA 9 — Contagens no CLAUDE.md em sincronia com a SSOT [HARD]
+# previne: contagens no CLAUDE.md drifta da SSOT do inventário
 #           Extrai "N comandos invocáveis", "N agentes", "N skills" do CLAUDE.md
 #           e compara com os totais computados por inventory.sh. Impede que a
 #           constituição volte a drifar (foi onde o drift 79≠76 vivia).
@@ -831,6 +848,7 @@ check_claude_md_counts() {
 
 # ===========================================================================
 # REGRA 10 — SDAAL: sem chamada direta a provider no consumidor [HARD]
+# previne: consumidor chamando o provider direto, furando a abstração SDAAL
 #            Comandos/agentes devem operar via abstração (taskManager.*),
 #            não chamar o MCP/SDK do provider direto nem usar var de roteamento
 #            específica. Provider-specific só vive em adapters/ e nos
@@ -864,6 +882,7 @@ ${lines}"
 
 # ===========================================================================
 # REGRA 11 — Método de abstração usado no consumidor deve existir na interface [HARD]
+# previne: consumidor chama método de abstração que não existe na interface
 #            Pega método agnóstico INVENTADO (ex.: taskManager.getTaskList(...)
 #            quando o canônico é searchTasks). Ancora em ".<metodo>(" — acessos a
 #            propriedade (taskManager.provider, .isConfigured) não têm paren e não
@@ -907,6 +926,7 @@ ${where}"
 
 # ===========================================================================
 # REGRA 12 — Nomes de tool de agente válidos no Claude Code
+# previne: agente declara uma tool inexistente no Claude Code
 #   Cursor-style (read_file, run_terminal_cmd, …) [HARD] — sem ferramentas;
 #   MCP underscore único (mcp_<Server>_…) [HARD] — formato é mcp__server__tool
 #   MCP de PROVIDER de task/forge no tools: [HARD] — pega tanto a forma idiomática
@@ -952,6 +972,7 @@ check_agent_tool_names() {
 
 # ===========================================================================
 # REGRA 13 — Templates canônicos devem ser dialeto-puro
+# previne: template canônico contaminado com dialeto não-canônico
 #   Templates em commands/common/templates/ são copiados verbatim ao criar
 #   agentes/comandos; qualquer nome de tool estilo-Cursor [HARD] ou MCP
 #   underscore-único [HARD] aqui re-propaga o bug para toda nova orquestração.
@@ -975,6 +996,7 @@ check_template_dialect() {
 
 # ===========================================================================
 # REGRA 14 — Meta-specs (autoridade L0) sem dialeto Cursor em exemplos
+# previne: exemplo de meta-spec L0 com dialeto Cursor
 #   docs/meta-specs/ define o formato canônico que template e creator-agents
 #   espelham. Token Cursor declarado como ITEM DE LISTA YAML (- token) [HARD]
 #   e MCP underscore-único [HARD]. Tokens em prosa/blockquote (a lista de
@@ -996,6 +1018,7 @@ check_metaspec_dialect() {
 
 # ===========================================================================
 # REGRA 15 — Frescor de contexto de domínio: carimbo de atualização [SOFT]
+# previne: contexto de domínio sem carimbo de atualização — frescor incerto
 #   Cada arquivo POPULADO de docs/*-context/ (exclui README/index) deve carregar
 #   um carimbo de frescor ('Última Atualização' ou 'updated:'/'date:'). Habilita a
 #   fase Manage (/meta:context-freshness): sem carimbo não há como auditar staleness.
@@ -1020,6 +1043,7 @@ check_context_freshness_stamp() {
 
 # ===========================================================================
 # REGRA 16 — Contagem de inventário-TOTAL divergente da SSOT [SOFT]
+# previne: contagem-TOTAL do inventário divergindo da SSOT
 #   Checa SÓ frases-de-total CANÔNICAS contra inventory.sh — nunca 'N comandos' cru
 #   nem 'N especializados' (palavra comum em por-categoria/feature). Marcadores de
 #   total confiáveis: 'N comandos invocáveis', 'N comandos em M categorias',
@@ -1222,6 +1246,7 @@ check_inventory_total_drift() {
 
 # ===========================================================================
 # REGRA 17 — Frontmatter: valor escalar com ': ' não-aspado [HARD]
+# previne: YAML de frontmatter quebrado por escalar com ': ' não-aspado
 #   Causa-raiz do "metadata dropada" no Claude Code (YAML: "mapping values are
 #   not allowed here"): um valor de frontmatter NÃO-aspado contendo ': '
 #   (dois-pontos-espaço) — ex.: `description: Foo (ex: bar)`. Quebrou 22 artefatos
@@ -1252,6 +1277,7 @@ check_frontmatter_scalar_colon() {
 
 # ===========================================================================
 # REGRA 18 — Sem documentação versionada sob .claude/docs/ [HARD]
+# previne: documentação versionada no lugar errado (.claude/docs/)
 #   architecture.md §2: artefato invocável vive em .claude/; descrição/análise
 #   vive em docs/ (raiz). .claude/docs/ é um ponto cego (não varrido pelas demais
 #   regras), onde cruft stale/de-dialeto-errado se esconde. Esta guarda impede a
@@ -1345,6 +1371,7 @@ run_inventory_fixes() {
 
 # ===========================================================================
 # REGRA 22 — Links relativos quebrados em docs/evolution/ e docs/knowledge-base/ [HARD]
+# previne: link relativo quebrado em docs/evolution ou docs/knowledge-base
 #   Origem: auditoria 2026-07-04 (alerta transversal nº 1) + Q_LINT_LINKS do KG —
 #   o ritual de triagem (git mv → _processed/) quebra quem aponta pro arquivo
 #   movido; 4 dos 16 achados confirmados eram exatamente isso.
@@ -1428,6 +1455,7 @@ check_knowledge_base_links() {
 
 # ===========================================================================
 # REGRA 26 — Pesquisa nasce em KG, não morre em prosa [HARD]
+# previne: pesquisa morrendo em prosa, sem .kg.yaml irmão (não nasce no grafo)
 #   Toda pasta docs/evolution/research/<tema>/ com SYNTHESIS.md exige um <tema>.kg.yaml
 #   irmão (doutrina 2026-07-17, born-in-KG — o antídoto do "17/7/2": a contagem de
 #   achados vira consultável pelo radar, não re-derivável da prosa). Legadas pré-doutrina
@@ -1453,6 +1481,7 @@ check_research_kg() {
 
 # ===========================================================================
 # REGRA 29 — Gate de PROVENIÊNCIA INVERTIDO, com catraca [HARD + SOFT]
+# previne: relatório de análise órfão do grafo (nenhum nó o cita)
 #   Espelho da REGRA 26 e do kg-radar. O radar pergunta "esta DECISÃO tem
 #   origem?"; a R26 pergunta "esta PASTA de pesquisa tem .kg.yaml?". Falta a
 #   terceira: "este DOCUMENTO existe no grafo?" — coberto = algum nó de algum
@@ -1494,6 +1523,7 @@ check_kg_provenance_coverage() {
 
 # ===========================================================================
 # REGRA 42 — Gate de FRESCOR DOUTRINÁRIO, com catraca [HARD + SOFT]
+# previne: afirmação sensível-ao-tempo sem carimbo ou fora do TTL
 #   Irmão TEMPORAL da REGRA 29. A 29 fecha conhecimento nascendo FORA do grafo
 #   (eixo ESPACIAL); esta fecha a afirmação doutrinária que EXPIROU EM SILÊNCIO
 #   (eixo TEMPORAL). Ambas são declarado≠verificado — uma contra o grafo, outra
@@ -1548,6 +1578,7 @@ check_doctrine_freshness() {
 
 # ===========================================================================
 # REGRA 43 — Integridade do marcador kg: (proveniência virada p/ DENTRO) [HARD]
+# previne: marcador kg: (born-in-graph) inconsistente com o grafo
 #   Irmão INTERNO da REGRA 29. A 29 pergunta, de fora do grafo p/ dentro, "este
 #   RELATÓRIO existe no grafo?" (algum nó o cita). Esta é de dentro da migalha/doc
 #   p/ o grafo: "o grafo que esta migalha DECLARA ter nascido dela é REAL e são?".
@@ -1584,6 +1615,7 @@ check_kg_born_marker() {
 
 # ===========================================================================
 # REGRA 44 — Integridade da escada de Automação Graduada [HARD]
+# previne: classe sobe de degrau sem gate de promoção alcançável (rung-jump forjado)
 #   Guarda a máxima do maestro "automação se conquista por ação provada":
 #   nenhuma classe de ação sobe de degrau (HUMAN→MONITORED→DYNAMIC→AUTO) sem
 #   gate de promoção ALCANÇÁVEL. Delega a ladder-integrity-check.sh (doutrina:
@@ -1603,6 +1635,7 @@ check_ladder_integrity() {
 
 # ===========================================================================
 # REGRA 45 — Link vendorizado não aponta caminho core-privado, com catraca [HARD+SOFT]
+# previne: link vivo de KB vendorizada para caminho core-privado — morto no adotante
 #   Uma KB vendorizada (docs/knowledge-base/**) não deve carregar link VIVO para
 #   docs/{analysis,onion,evolution,discussions,applying,materials,plans} ou
 #   .claude/{diary,sessions} — ausentes em TODO adotante. O link resolve no core e
@@ -1638,6 +1671,7 @@ check_kb_vendored_links() {
 
 # ===========================================================================
 # REGRA 32 — Página pública do grafo: números conferidos contra o mapa [HARD]
+# previne: página pública do grafo com números que não batem com o mapa
 #   A página /historia/grafo/ publica contagens do .kg.yaml em prosa e em
 #   BARRAS. Número no site é promessa: se o grafo cresce e a página não, ela
 #   mente para o público — e a barra mente pior que o número, porque o leitor
@@ -1703,6 +1737,7 @@ print("\n".join(bad))
 
 # ===========================================================================
 # REGRA 31 — Lente do grafo: DERIVADA e em paridade com o motor [HARD]
+# previne: lente do grafo divergindo do motor que a deriva
 #   Duas obrigações, porque são dois modos de falha distintos:
 #   (a) DRIFT DE CONTEÚDO — a lente é gerada de um .kg.yaml; se o grafo mudou e
 #       a lente não, ela vira relatório desatualizado com cara de atual (mesma
@@ -1742,6 +1777,7 @@ check_kg_view_sync() {
 
 # ===========================================================================
 # REGRA 30 — Segurança de PROJEÇÃO: nome comercial de membro privado não sai [HARD]
+# previne: nome comercial de membro privado vazando em superfície pública
 #   do repo privado [HARD]
 #   Origem: incidente 2026-07-10 — o console PÚBLICO da federação vazou
 #   "<nome> — CONFIDENCIAL" verbatim, porque o `name:` do members.yaml carrega
@@ -1784,6 +1820,7 @@ check_projection_safety() {
 
 # ===========================================================================
 # REGRA 33 — Segurança de projeção no HISTÓRICO DE FEDERAÇÃO (mailbox-aware) [HARD]
+# previne: nome privado vazando no histórico de federação (mailbox)
 #   Irmã da REGRA 30, threat model DIFERENTE. A 30 guarda superfície PÚBLICA
 #   (chapada: nenhum nome comercial). Esta guarda a coordenação CROSS-TENANT:
 #   nome comercial de um membro no mailbox de OUTRO, ou em artefato compartilhado
@@ -1813,6 +1850,7 @@ check_federation_projection() {
 
 # ===========================================================================
 # REGRA 34 — Migalhas: superfícies DERIVADAS da fonte, sem drift [HARD]
+# previne: migalha (superfície derivada) driftando da fonte
 #   ADR onion-adr-blog-publication-generator-2026-07 (D2). As 3 superfícies
 #   (index.html/provas/feed.xml) são PROJEÇÃO de site/historia/migalhas/posts/*.md
 #   pelo migalhas-generate.sh. Editar a região gerada à mão (entre os marcadores
@@ -1841,6 +1879,7 @@ check_migalhas_sync() {
 
 # ===========================================================================
 # REGRA 35 — Site público não linka deep-link do repo PRIVADO (404 garantido) [HARD]
+# previne: site público linkando deep-link de repo privado — 404 garantido
 #   O repo onion-evolve é PRIVADO. Um link github.com/…/onion-evolve/(pull|commit|
 #   blob|tree)/… em site/ dá 404 para todo visitante — a "prova viva" que não prova.
 #   Origem: incidente recorrente — 5 commits de correção de link-404 (jul) + 7 links
@@ -1870,6 +1909,7 @@ check_site_no_private_deeplinks() {
 
 # ===========================================================================
 # REGRA 36 — Superfície VENDORIZADA sem nome comercial de cliente [HARD]
+# previne: nome comercial de cliente vazando em superfície vendorizada
 #   O que /meta:adopt copia (.claude/{agents,commands,skills,utils,validation,
 #   hooks} + docs/{meta-specs,knowledge-base,sdaal}) VIAJA para todo adotante.
 #   Um nome comercial de um cliente ali chega na máquina de OUTRO cliente que
@@ -1929,6 +1969,7 @@ check_vendored_surface_clean() {
 
 # ===========================================================================
 # REGRA 23 — Frontmatter: model: em comandos e category: em agentes [HARD]
+# previne: comando sem model: ou agente sem category:
 #   Origem: Q_LINT_FRONTMATTER do KG (achados D8-20/D8-21 da auditoria
 #   2026-07-04 — o gap deixou 7 artefatos divergirem em silêncio; a regra
 #   impede o 8º). Escopo DELIBERADAMENTE determinístico: granularidade de
@@ -1956,6 +1997,7 @@ check_frontmatter_model_category() {
 
 # ===========================================================================
 # REGRA 27 — Dependência de script de comando empacotado [HARD]
+# previne: comando empacotado dependendo de script ausente no bundle
 #   Todo script .claude/validation/*.sh que um comando EMPACOTADO (num manifesto de
 #   vertical/work-tools) declara em `allowed-tools:` deve estar no VALIDATION[] do MESMO
 #   manifesto — OU ser um script de HARNESS sempre-presente num repo adotado (allowlist).
@@ -1999,6 +2041,7 @@ check_bundled_command_script_deps() {
 
 # ===========================================================================
 # REGRA 39 — Registro de REGRAS derivado e em paridade com as guardas [HARD]
+# previne: lint-rules.md driftando das guardas (nº duplicado ou regra órfã)
 #           GERADO por rules-registry.sh (parseia os docstrings '# REGRA N — …' e o corpo de cada
 #           guarda p/ severidade). É o "documento de conhecimento da rede": vendorizado em
 #           .claude/validation/lint-rules.md, viaja no /meta:adopt. O gerador FALHA se houver
@@ -2030,6 +2073,7 @@ check_rules_registry_sync() {
 
 # ===========================================================================
 # REGRA 40 — Adotante: .onion-version DEVE estar trackeado no git [HARD]
+# previne: adotante com .onion-version não-trackeado — 156 falso-HARD
 #           Achado de campo 2026-07-22: o stamp é GITIGNORED na fonte (lá a identidade é lida ao vivo,
 #           backstop local). Numa cópia gerada à mão (git add -A respeita o ignore) o stamp NÃO era
 #           commitado → o clone perdia o marcador `role: adopted` → o role-guard de _scan_relative_links
@@ -2053,6 +2097,7 @@ check_onion_version_tracked() {
 
 # ===========================================================================
 # REGRA 41 — Topologia da família: SSOT no KG resolve a procedimentos REAIS [HARD]
+# previne: SSOT de topologia da família sem resolver a procedimentos reais
 #           A topologia (docs/onion/graph/onion-family-topology-2026-07.kg.yaml) é a fonte que as faces de
 #           CONDUÇÃO projetam (wizard/onboarding/scaffold — onion-guided-lifecycle.md). Se o SSOT mentir,
 #           os fluxos de ajuda dessincronizam do que os comandos fazem — o medo do maestro. Esta guarda o
