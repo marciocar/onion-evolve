@@ -108,8 +108,29 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.9
-    status: open
+    status: superseded
+    verified_at: 2026-07-24
     label: "todo personality_summary do members.yaml e SEED MANUAL pre-F2 (personality-sync nao existe) — declarado a mao, nunca emergido do uso (declarado != verificado)"
+  - id: E_PERSONALITY_SYNC_BUILT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-24
+    label: "F2 construida: /meta:personality-sync existe (RFC-0003 §2.4) e foi DOGFOODADO no core — .claude/identity/personality.md do onion-evolve gerado a partir de 74 migalhas do diario + git inicial + .onion-version, cada afirmacao ancorada ([[slug]]). O personality_summary do core deixou de ser seed manual. RESTA (por-instancia, gated na sessao de cada adotante): dos 7 adotantes, 6 seguem seed-manual datado + 1 (marcio-pessoal) gated/n-a — so viram emergentes quando cada um rodar o proprio sync."
+    trace: ".claude/commands/meta/personality-sync.md"
+  - id: C_ADOPTER_PERSONALITY_SEEDS_PENDING
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.9
+    status: open
+    verified_at: 2026-07-24
+    label: "6 dos 7 adotantes seguem personality_summary SEED MANUAL datado (o 7o, marcio-pessoal, e gated/n-a soberano) — o sync e por-instancia (sessao do adotante, I3); vira emergente quando cada um rodar /meta:personality-sync e relayar upstream. Estado esperado, nao divida do core."
+    trace: "docs/evolution/federation/members.yaml"
     trace: "docs/evolution/federation/members.yaml:36"
   - id: C_FED_STRUCTURE_IS_TRIPLES
     node_type: claim
@@ -196,4 +217,11 @@ edges:
   # reconciliação 2026-07-24: o radar de federação foi construído (federation-radar.sh) — o "FALTA" era stale
   - from: E_FED_RADAR_BUILT
     to: C_FED_RADAR_ABSENT
+    edge_type: SUPERSEDES
+  # 2026-07-24: personality-sync F2 construída + dogfoodada no core; seeds dos adotantes = sucessor mais estreito
+  - from: E_PERSONALITY_SYNC_BUILT
+    to: C_PERSONALITY_SEEDS
+    edge_type: SUPERSEDES
+  - from: C_ADOPTER_PERSONALITY_SEEDS_PENDING
+    to: C_PERSONALITY_SEEDS
     edge_type: SUPERSEDES

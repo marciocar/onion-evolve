@@ -33,9 +33,9 @@ members:
         # via bridge/PWA (celular), extraída p/ marciocar/whatsapp-sender (privado). Doutrina "declarado ≠
         # verificado" (5º membro da família). Acesso era ssh onion-vps (~/.ssh/hostinger_onion); backup em
         # ~/vps-backup-2026-07-05 na workstation. Ver diário 2026-07-05-vps-lineage-odyssey.
-    personality_summary: "Framework template que se instala em .claude/; orquestra produto/engenharia/compliance; dogfood como padrão master"  # seed manual pré-F2 — substituir no 1º /meta:personality-sync real
+    personality_summary: "A fonte (T0) que nasceu integração-pragmática (ClickUp + specialists de stack) e virou um framework obsessivamente auto-verificador: declarado≠verificado como ansiedade central, KG-como-runtime, catraca de proveniência/frescor, e a lei de que todo fix vira mecanismo (dogfood como padrão master)"  # EMERGENTE — /meta:personality-sync 2026-07-24, âncora em .claude/identity/personality.md (74 migalhas)
     specializations: [framework-template, sdaal, co-evolution, dogfooding, breadcrumbs]
-    personality_last_sync: 2026-07-01   # seed manual (o comando de sync ainda não existe — RFC-0003 F2)
+    personality_last_sync: 2026-07-24   # auto-gerado por /meta:personality-sync (F2) — projeção one-way, âncora no diário
     exposes:
       - public-kbs
       - changelog
