@@ -32,11 +32,25 @@ _emit() { # sev path msg
   else printf 'VIOLATION: %s: [ladder] %s\n' "$2" "$3"; fi
 }
 
+# Um promoted_by pode apontar EVIDÊNCIA core-privada (ex.: members.yaml, o diário) —
+# ausente-por-desenho no adotante. A classe é doutrina HERDADA (o adotante não a
+# promoveu; a prova vive core-side). Mesmo role-guard do _scan_relative_links: no
+# adotante, evidência core-privada inalcançável NÃO é HARD; no core (role:source) é.
+_core_private_prom() {
+  case "$1" in
+    docs/analysis/*|docs/onion/*|docs/evolution/*|docs/discussions/*) return 0 ;;
+    docs/applying/*|docs/materials/*|docs/plans/*)                    return 0 ;;
+    .claude/diary/*|.claude/sessions/*)                              return 0 ;;
+  esac
+  return 1
+}
+
 check_ladder() {
   local root="${1:-.}"
   local rel=".claude/validation/automation-ladder-registry.txt"
   local registry="${root}/${rel}"
   local hard=0 classes=0
+  local adopted=""; grep -qE '^(role: (adopted|hub)|decoupled_from:)' "${root}/.claude/.onion-version" 2>/dev/null && adopted=1
   if [ ! -f "${registry}" ]; then
     [ "${FORMAT}" = "tsv" ] || echo "  (sem registry — escada não declarada; nasce silencioso)"
     return 0
@@ -53,7 +67,10 @@ check_ladder() {
       if [ -z "${prom}" ] || [ "${prom}" = "-" ]; then
         _emit HARD "${rel}" "classe '${cls}' em '${rung}' SEM promoted_by — reivindica autonomia/estrutura sem lastro (rung-jump sem ação provada)"; hard=$((hard+1))
       elif [ ! -e "${root}/${prom}" ] && [ ! -e "${prom}" ]; then
-        _emit HARD "${rel}" "classe '${cls}' em '${rung}' aponta promoted_by='${prom}' INALCANÇÁVEL — evidência não existe"; hard=$((hard+1))
+        # Adotante + evidência core-privada = ausente-por-desenho → não é HARD (doutrina herdada).
+        if [ -n "${adopted}" ] && _core_private_prom "${prom}"; then :; else
+          _emit HARD "${rel}" "classe '${cls}' em '${rung}' aponta promoted_by='${prom}' INALCANÇÁVEL — evidência não existe"; hard=$((hard+1))
+        fi
       fi
     fi
   done < "${registry}"
@@ -81,7 +98,14 @@ run_selftest() {
   if check_ladder "${tmp}" >/dev/null 2>&1; then echo "  ✗ (v) degrau inválido deveria reprovar"; fails=$((fails+1)); else echo "  ✅ (v) degrau inválido reprova"; fi
   # (vi) sem registry → silencioso
   rm -f "${reg}"; check_ladder "${tmp}" >/dev/null 2>&1 && echo "  ✅ (vi) sem registry nasce silencioso" || { echo "  ✗ (vi)"; fails=$((fails+1)); }
-  rm -rf "${tmp}"; echo "  selftest: $((6-fails))/6 verdes"
+  # (vii) role-guard: promoted_by CORE-PRIVADO inalcançável — no CORE reprova, no ADOTANTE passa.
+  #       (o bug de campo que o lint do Pedro pegou: members.yaml não vendoriza.)
+  printf 'regulated-adopter-correct-to-core|MONITORED|docs/evolution/federation/zzz-nonexistent.yaml\n' > "${reg}"
+  printf 'framework: core\nrole: source\n' > "${tmp}/.claude/.onion-version"
+  if check_ladder "${tmp}" >/dev/null 2>&1; then echo "  ✗ (vii-core) core deveria reprovar evidência core-privada inalcançável"; fails=$((fails+1)); else echo "  ✅ (vii-core) core reprova promoted_by core-privado inalcançável"; fi
+  printf 'framework: x\nrole: adopted\n' > "${tmp}/.claude/.onion-version"
+  check_ladder "${tmp}" >/dev/null 2>&1 && echo "  ✅ (vii-adotante) adotante tolera evidência core-privada herdada" || { echo "  ✗ (vii-adotante) adotante deveria tolerar core-privado ausente-por-desenho"; fails=$((fails+1)); }
+  rm -rf "${tmp}"; echo "  selftest: $((8-fails))/8 verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1
 }
 

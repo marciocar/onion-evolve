@@ -4949,7 +4949,7 @@ run_ladder_integrity_selftests() {
   local h="${REPO_ROOT}/.claude/validation/ladder-integrity-check.sh"
   if [ ! -f "${h}" ]; then record_fail "ladder-integrity" "helper ausente: ${h}"; return; fi
   if bash "${h}" --selftest >/dev/null 2>&1; then
-    record_pass "ladder-integrity: escada — 5 casos (incl. mutation AUTO-sem-prova reprova, severidade load-bearing)"
+    record_pass "ladder-integrity: escada — 8 casos (incl. mutation AUTO-sem-prova reprova; role-guard: promoted_by core-privado tolera no adotante, reprova no core)"
   else
     record_fail "ladder-integrity: escada" "o selftest embutido do helper falhou"
   fi
