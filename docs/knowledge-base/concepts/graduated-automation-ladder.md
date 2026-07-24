@@ -36,6 +36,27 @@ negligência (não aplica sozinho).
 | **AUTO** (teto DESENHADO, gated) | auto-merge own-repo | mecânico | as 3 pré-condições duras (nunca cabeadas) |
 | **MOAT** (invariante) | **nunca** — repo-alheio/deploy/irreversível | **sempre humano** | não se promove (`medir≠decidir`, [engine-economy](onion-engine-economy.md)) |
 
+## A escada JÁ RODA — o que a federação provou (medido 2026-07-24)
+
+Esta escada não é futuro a construir; **descreve o que o Onion já faz**, medido. O registry
+[`automation-ladder-registry.txt`](../../../.claude/validation/automation-ladder-registry.txt) é a SSOT desse
+estado (guardado pela REGRA 44). A medição mostra o Onion operando a escada em **dois eixos**:
+
+- **STRUCTURAL (auto-por-construção):** regens (inventory, plugins, graph/map/console), o `--fix` que
+  auto-corrige contagem, o radar — derivações determinísticas do SSOT, **sempre seguras**. Já automáticas
+  **por construção** (o modo estrutural), não por confiança ganha.
+- **HUMAN (ato-3, risco):** entregar/aceitar/aplicar/corrigir/triar — no piso. A **resolução-de-alvo do
+  co-deliver** é a candidata madura a MONITORED (**91 entregas** + a falha multi-checkout **documentada** + o
+  monitor Passo 2.1), mas só sobe com um run monitorado real (a máxima: não fabricar a subida).
+- **MONITORED (eixo CONFIANÇA) — a máxima JÁ realizada:** **granaai** conquistou o direito de **corrigir a
+  doutrina do core** (`can_correct_to: [onion-evolve]`, 2026-07-06) **por ação provada** — achou+corrigiu um
+  bug real de lint convergente com o nosso PR #215, 7h41 de diferença, zero comunicação. É o exemplo
+  canônico: **autoridade conquistada por ação, não por decreto** — datada, medida, human-gated. gustavo/Tornak
+  alimentou o core com o bug de campo #303.
+- **MOAT:** deploy ao VPS (site, bridge) — irreversível, **manual por desenho**.
+
+A KB **nomeia** o que o dogfood já forjou (o padrão "candidato entra por USO"); o registry o **atesta**.
+
 ## Cada degrau tem três garantias (o "como não fracassar")
 
 1. **Gate de promoção** — o que prova que a classe pode subir. A esteira
