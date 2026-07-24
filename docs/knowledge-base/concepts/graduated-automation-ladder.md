@@ -3,7 +3,7 @@
 > **Status: CANDIDATO** — esta KB **não inventa doutrina**: ela **nomeia e unifica** uma escada que o Onion
 > já sobe, espalhada em ~6 docs que nunca se citaram como família. Entra no core **por uso** (padrão
 > `candidato`). O movimento Elenxo que a gerou vive no grafo:
-> [`graduated-automation-elenxo-2026-07.kg.yaml`](../../onion/graph/graduated-automation-elenxo-2026-07.kg.yaml).
+> `graduated-automation-elenxo-2026-07.kg.yaml` (grafo interno do core; não vendorizado).
 > Fonte≠derivação: **cita**, não recopia — cada peça permanece soberana no seu arquivo.
 
 ## A máxima (cunhagem do maestro, 2026-07-24)
@@ -26,7 +26,7 @@ efeito-de-saída no repo dono) é **gated**. É o "melhor dos dois mundos": não
 negligência (não aplica sozinho).
 
 **Eixo vertical — a ESCADA (quanto de autonomia foi ganho).** Fonte:
-[`onion-adr-autonomous-thread-runtime-2026-07.md`](../../analysis/onion-adr-autonomous-thread-runtime-2026-07.md).
+`onion-adr-autonomous-thread-runtime-2026-07.md` (ADR interno do core).
 
 | Degrau | O que roda sozinho | Quem decide o efeito | Gate de promoção (o que prova a subida) |
 |--------|--------------------|----------------------|------------------------------------------|
@@ -88,7 +88,7 @@ SEMPRE; o moat é **a aceitação gated, não a latência**.
 
 ## O mecanismo (senão é prosa)
 
-Por [`mechanism-beats-prose`](../../../.claude/diary/2026-07-21-mechanism-beats-prose.md), esta KB só dura se
+Por `mechanism-beats-prose` (doutrina do core), esta KB só dura se
 vier com um **gate**: [`ladder-integrity-check.sh`](../../../.claude/validation/ladder-integrity-check.sh) —
 um registry `classe × degrau` (baseline à la catraca) que **reprova uma classe que subiu de degrau sem seu
 gate de promoção declarado**. Nasce silencioso (nenhuma classe declara AUTO hoje). É o irmão da catraca
@@ -104,10 +104,10 @@ Confirmadas pela exploração como território **não pisado** (ver o grafo do E
   pré-condição; hoje é juízo humano no checkpoint.
 
 ## 🔗 Referências (as peças que esta escada unifica)
-- Escada de autonomia: [`onion-adr-autonomous-thread-runtime-2026-07.md`](../../analysis/onion-adr-autonomous-thread-runtime-2026-07.md)
+- Escada de autonomia: `onion-adr-autonomous-thread-runtime-2026-07.md` (ADR interno do core)
 - Esteira de promoção: [`onion-promotion-ladder.md`](onion-promotion-ladder.md)
 - A linha intake≠execução: [`authorization-layers-intake-vs-execution.md`](authorization-layers-intake-vs-execution.md)
 - Catraca + 3 modos: [`onion-guardrails.md`](onion-guardrails.md) §3/§7/§8
 - Fronteira medir≠decidir: [`onion-engine-economy.md`](onion-engine-economy.md)
 - Transporte A2A: RFC-0004 · [`a2a-verify.sh`](../../../.claude/utils/federation-transport/a2a-verify.sh)
-- O Elenxo (grafo): [`graduated-automation-elenxo-2026-07.kg.yaml`](../../onion/graph/graduated-automation-elenxo-2026-07.kg.yaml)
+- O Elenxo (grafo): `graduated-automation-elenxo-2026-07.kg.yaml` (grafo interno do core; não vendorizado)
