@@ -4,8 +4,9 @@
 > A **porta de entrada** do método de trabalho do Onion — como o framework **decide e executa** um
 > trabalho, e como **sabe que ficou certo**. É um **mapa**, não uma nova fonte: destila e **aponta** para
 > as fontes canônicas (que permanecem SSOT). Nasceu da pesquisa de evolução de 2026-06-27
-> ([discovery](../../analysis/onion-research-how-we-work-2026-06.md)), que achou o método **maduro mas
-> fragmentado** em 6 lugares — esta KB é o ponto de síntese que faltava.
+> (discovery `onion-research-how-we-work-2026-06.md`, interno do core — 5 lentes convergiram: o método não
+> está ausente, está **fragmentado em 6 lugares**, e a resposta é UMA KB de síntese que aponta, não N
+> meta-specs/guardas novas) — esta KB é o ponto de síntese que faltava.
 
 ---
 
@@ -50,7 +51,9 @@ Não é preferência de estilo: sem forcing function o default é prosa — rein
 
 - **Fonte canônica:** [Knowledge Graph SDAAL §SSOT-as-runtime](knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho)
   (ciclo `read→verify→act→write`; gênero **SSOT-first** × espécie **KG-first**) + ADR
-  [kg-freshness-gate](../../analysis/onion-adr-kg-freshness-gate-2026-07.md).
+  `onion-adr-kg-freshness-gate-2026-07.md` (interno do core — torna frescor cidadão de 1ª classe:
+  `verified_at:` obrigatório em nós `plane: PROD` com o radar emitindo **STALE** quando ausente/vencido,
+  e `schema_version:` com gate de drift).
 - **Onde está cabeado:** `catch-up`, `warm-up`, `engineer:work` — Passo 0.
 
 ## 1. Seleção — qual fluxo aplicar
@@ -59,7 +62,8 @@ Não é preferência de estilo: sem forcing function o default é prosa — rein
 novo.** É a doutrina **catálogo-first / recognition-primed**: seleção antes de composição-do-zero.
 
 - **Fonte canônica:** skill [`onion-patterns`](../../../.claude/skills/onion-patterns/SKILL.md) §Playbooks +
-  [RFC-0002](../../evolution/rfc/rfc-0002-meta-strategy-verdict.md) (veredito que aceitou a doutrina).
+  `rfc-0002-meta-strategy-verdict.md` (RFC interno do core — o veredito que aceitou
+  catálogo-first/recognition-primed como doutrina, com materialização diferida).
 - **Playbooks canônicos** (recognition-primed): descoberta→backlog · planejamento→entrega · adoção-agnóstica
   ("adota não impõe") · agir-em-ambiente-compartilhado · laço-sem-guarda.
 - **Quando deliberar:** sem playbook que case → análise estruturada (`/meta:analyze-complex-problem`), e o
@@ -74,8 +78,9 @@ Workflows não-triviais correm sobre o **PFR**: sessão durável + `STATE.md` (T
 estado determinístico (`[DONE]`/`[ACTIVE]`/`[TODO]`).
 
 - **Fontes canônicas:** [Worklog Protocol](worklog-protocol.md) (mecânica) +
-  [ADR onion-adr-phased-resumable-pattern](../../analysis/onion-adr-phased-resumable-pattern-2026-06.md)
-  (nomeia o PFR — provisório, no caminho de cravar em `commands.md §3`).
+  `onion-adr-phased-resumable-pattern-2026-06.md` (ADR interno do core — nomeia o PFR, um padrão que já
+  é invariante L0 mas carecia de nome próprio; status provisório, com o PR formal a `commands.md §3`
+  diferido até gatilho).
 - **Invariantes:** `product/collect→feature` e `engineer/plan→pr-update` são PFRs do framework (CLAUDE.md).
 
 ### 2b. Coordenação por modo: harness + comunicação = f(escala)
@@ -87,11 +92,13 @@ O **harness** (sessões, subagentes, a ferramenta nativa `Workflow`/orquestraç�
 | Modo | Unidade que se comunica | Mecanismo | Estado |
 |------|-------------------------|-----------|--------|
 | **Solo** | eu-comigo-no-tempo | memória + sessões (recall automático) | ✅ maduro |
-| **Equipe** | devs-no-mesmo-repo | worktrees + handoff (1-escritor/escopo; layout: [worktree-convention](../../evolution/worktree-convention-2026.md)) | 🟡 layout codificado; orquestração N-devs segue **gated** |
+| **Equipe** | devs-no-mesmo-repo | worktrees + handoff (1-escritor/escopo; layout: `worktree-convention-2026.md`, interno do core — fixa `~/worktrees/<repo>/<branch-slug>` para os worktrees **duráveis** do maestro, codificando a prática de campo de um adotante) | 🟡 layout codificado; orquestração N-devs segue **gated** |
 | **Federação** | repos-separados | Ledger git + doc-bridge (`/meta:co-*`, `/meta:federation-*`) | ✅ produção |
 
 - **Fontes canônicas:** [Multi-repo Federation](multi-repo-federation.md) ·
-  [discovery harness+ledger](../../analysis/onion-research-harness-ledger-3-modes-2026-06.md) ·
+  discovery `onion-research-harness-ledger-3-modes-2026-06.md` (interno do core — harness + camada de
+  comunicação = f(escala da unidade); o Ledger é isomórfico `{registry · changelog · contracts}` entre
+  solo/equipe/federação, com solo e federação maduros e **equipe** como o gap) ·
   orquestração de subagentes: [Agent Orchestration](agent-orchestration.md) + skill `onion-orchestration`.
 - **Gated:** o modo **equipe** é o maior eixo de evolução futura — só com dogfood (1º caso N-devs/1-repo).
 
@@ -133,7 +140,7 @@ A disciplina operacional do executor é **regra global** (carrega em toda sessã
 
 - **Fonte canônica:** `~/.claude/rules/working-discipline.md` — git (confirmar PR merged antes de deletar
   branch; add seletivo em repo que recebe correspondência), localização multi-repo/worktree (anunciar onde
-  se opera; layout canônico: [worktree-convention](../../evolution/worktree-convention-2026.md)),
+  se opera; layout canônico: `worktree-convention-2026.md`, interno do core),
   legibilidade (rotular referências opacas), fan-out (detectar é dever, executar é opt-in),
   gestão de memória (híbrido + recall automático + checagem leve de coerência).
 

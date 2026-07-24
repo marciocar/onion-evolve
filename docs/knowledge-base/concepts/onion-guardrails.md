@@ -19,7 +19,7 @@ date: 2026-07-12
 | **Aplicação** | Nomear, indexar e enquadrar os guardrails que o Onion já enforça; base para discutir cobertura por superfície |
 | **Origem** | Discussão isolada `guardrails-nemo-lens` (2026-07-11/12): pesquisa de mercado → mineração de vetos → doutrina de escopo → design R15 → 3 checagens do core |
 | **Consolida** | [`authorization-layers`](authorization-layers-intake-vs-execution.md) · `a2a-verify` · `trust-topology-check` · `metaspec-gate-keeper` · `.claude/validation/*` |
-| **Registro de design** | [`docs/discussions/guardrails-nemo-lens/`](../../discussions/guardrails-nemo-lens/) (pesquisa, taxonomia com read-paths, protótipo R15, checagens) |
+| **Registro de design** | `docs/discussions/guardrails-nemo-lens/` (registro de discussão isolado, interno do core). *Dimensão:* o dossiê da frente `discuss/guardrails-nemo-lens` — pesquisa de mercado, a taxonomia minerada com read-paths, o protótipo R15 em quarentena e as 3 checagens do core (reconciliação, refutador adversarial, escopo) que aterraram esta camada. |
 
 > **`candidato` — entra pra ganhar core por USO, não por estar pronta.** Esta KB nomeia e enquadra; não
 > reivindica maturidade nem capacidade ativa. Toda afirmação de cobertura de mercado é **provisória**.
@@ -50,8 +50,10 @@ Derivada do diferencial-âncora (**determinístico + gated + spec-as-code**):
 3. **A fatia semântica in-scope** é **proveniência de conteúdo não-confiável**: tratar conteúdo externo
    (federação, repo adotado, inbound) como **dado, não instrução**; marcar origem; gatear o efeito. É a
    leitura Onion do OWASP LLM01 — determinística, estendendo a camada de liberação, **nunca** um detector de
-   injeção. (Design: [R15](../../discussions/guardrails-nemo-lens/r15-untrusted-content-provenance.md),
-   protótipo em quarentena — **desenhado, não wired no core**.)
+   injeção. (Design: `r15-untrusted-content-provenance.md` (interno do core) — **em síntese:** R15 disciplina o
+   *canal*, não o conteúdo: origem não-confiável nunca vira instrução nem efeito sem cruzar um gate
+   (proveniência marcada + dado-não-instrução + efeito gated), fechando OWASP LLM01 sem classificador de
+   injeção; protótipo em quarentena — **desenhado, não wired no core**.)
 
 ## 3. Os três modos de enforcement
 
@@ -77,7 +79,8 @@ companheira [`onion-r-taxonomy`](onion-r-taxonomy.md).
 > resolveu isso **rebaixando os números de linha**: a KB `onion-r-taxonomy` ancora cada veto pelo **arquivo**
 > (read-path estável a refactor) + pela **string de veto emitida** (identificador greppável), e declara-se
 > **snapshot a revalidar via `/meta:kb-freshness`** (re-grep dirigido). Os line-anchors datados ficam no
-> registro de design [`taxonomy-onion-r.md`](../../discussions/guardrails-nemo-lens/taxonomy-onion-r.md).
+> registro de design `taxonomy-onion-r.md` (interno do core) — o fio #1 da discussão, onde a taxonomia foi
+> minerada por fan-out (8 mineradores, um por gate) com cada veto ancorado em `arquivo:linha` datado de 2026-07-12.
 
 Índice compacto (placement · modo · análogo de mercado — *nem todos são guardrails de segurança*):
 
@@ -100,8 +103,9 @@ companheira [`onion-r-taxonomy`](onion-r-taxonomy.md).
 | **R15** *(proposta)* | Proveniência de conteúdo não-confiável | input/fed/adopt | estrutural+gated | **OWASP LLM01** |
 
 **11 das 14 categorias destiladas HERDAM por read-path** de gates existentes (reconciliação vs
-`authorization-layers`/`a2a-verify`/`trust`:
-[`reconciliation-authorization-layers.md`](../../discussions/guardrails-nemo-lens/reconciliation-authorization-layers.md)). Só **R15** traz design novo — e mesmo ele **estende** a linha da KB
+`authorization-layers`/`a2a-verify`/`trust`: `reconciliation-authorization-layers.md`, interno do core — a
+checagem #1 do core que deu o veredito HERDA/ESTENDE/NOVO por categoria e concluiu *zero contradição* com as 3
+âncoras: ONION-R é lente/índice sobre gates existentes, não um SSOT paralelo). Só **R15** traz design novo — e mesmo ele **estende** a linha da KB
 [`authorization-layers`](authorization-layers-intake-vs-execution.md) §7 (o "próximo passo" que ela declarou
 faltar), não a reinventa.
 
@@ -111,7 +115,7 @@ R15.3 diz: *efeito irreversível derivado de conteúdo não-confiável cruza o g
 de federação (C1) e doc-bridge (C2) **isso já é verdade hoje, por construção** — o efeito não é *checado*, é
 *impossível* sem gate (modo **estrutural**). **R15.3a é puro vocabulário**: nomear guardas existentes como
 membros de ONION-R15; nenhuma linha de código muda. (O canal **C3** — `adopt`/`reverse-consolidate` — **não**
-tem gate estrutural; fica para **R15.3b**, gated — ver [R15 §6](../../discussions/guardrails-nemo-lens/r15-untrusted-content-provenance.md).)
+tem gate estrutural; fica para **R15.3b**, gated — ver `r15-untrusted-content-provenance.md` §6 (interno do core).)
 
 | Canal | Guarda estrutural existente | Invariante (string real, greppável) | Read-path (arquivo) |
 |-------|-----------------------------|-------------------------------------|---------------------|
@@ -163,8 +167,11 @@ Lente Aristóteles (`igual→transfere / diferente→desenha`):
 
 ## 7. A catraca — doutrina de introdução de gate em base viva
 
-**Origem:** sinal de campo de um adotante regulado (2026-07-20, [inbox](../../evolution/inbox/_processed/2026-07-20-gate-proveniencia-invertido.md))
-sobre o gate de proveniência invertido do KG-SSOT. O mecanismo específico é deles; a forma de **introduzir
+**Origem:** sinal de campo de um adotante regulado (2026-07-20, `2026-07-20-gate-proveniencia-invertido.md`,
+inbox interno do core) — **em síntese:** o adotante mostrou que os 3 mecanismos do KG-SSOT protegem o grafo de
+*estar errado* mas nenhum impede conhecimento de *nascer fora dele*, e propôs um gate de proveniência
+**invertido** ("este relatório existe no grafo?") com **catraca** (baseline tolerado, doc novo sem nó = HARD,
+baseline só encolhe). O mecanismo específico é deles; a forma de **introduzir
 qualquer gate novo** contra um passivo existente é geral o bastante para virar doutrina desta casa.
 
 **Tese.** Um gate novo que nasce reprovando o passivo é desligado no primeiro dia — reprovar dezenas de

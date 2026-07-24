@@ -17,8 +17,8 @@ date: 2026-07-11
 | **Versão** | 1.0.0 |
 | **Categoria** | Concepts |
 | **Aplicação** | O maestro roda N estudos isolados em paralelo; o core assiste sob convite (macro, reconciliação, surfacing) |
-| **Compõe** | [discussion-worktrees](discussion-worktrees-pattern.md) · [worklog-protocol](worklog-protocol.md) · [knowledge-graph-sdaal](knowledge-graph-sdaal.md) · [authorization-layers](authorization-layers-intake-vs-execution.md) · doc-bridge ([co-evolution-reference](../../onion/co-evolution-reference.md)) |
-| **ADR** | [onion-adr-constellation-operating-model-2026-07](../../analysis/onion-adr-constellation-operating-model-2026-07.md) (decisões, trade-offs, rollout gated) |
+| **Compõe** | [discussion-worktrees](discussion-worktrees-pattern.md) · [worklog-protocol](worklog-protocol.md) · [knowledge-graph-sdaal](knowledge-graph-sdaal.md) · [authorization-layers](authorization-layers-intake-vs-execution.md) · doc-bridge (`co-evolution-reference.md`, interno do core — cartão dos comandos de co-evolução: quem-executa × direção-do-dado, os 3 fluxos downstream/upstream/handoff) |
+| **ADR** | `onion-adr-constellation-operating-model-2026-07.md` (interno do core — decisões, trade-offs e rollout gated: nomeia o modelo, institui macro=só-metadados, anti-divergência=composição mapa+radar e o join cross-study como overlay KG curado, não git merge) |
 
 > Este KB **nomeia e amarra** o que já existe num **modelo operacional**. Não inventa mecanismo — compõe seis
 > camadas maduras. As três ferramentas do core (mapa/radar/carteiro) são **design-alvo gated** (ver ADR); a

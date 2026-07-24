@@ -25,7 +25,7 @@ date: 2026-06-15
 | **Última Atualização** | 2026-07-17 |
 | **Categoria** | Meta |
 | **Propósito** | SSOT para materiais externos: landing page, manual, estudos de caso, artigos críticos, press kit |
-| **Fonte completa** | [onion-product-material-raw-2026-06.md](../../analysis/onion-product-material-raw-2026-06.md) — material bruto, toda afirmação citada `arquivo:seção` |
+| **Fonte completa** | `onion-product-material-raw-2026-06.md` (interno do core) — material bruto/levantamento exaustivo onde **toda afirmação da KB é rastreável** à fonte primária citada `arquivo:seção`; é a camada de rastreabilidade sob esta síntese |
 
 > Esta KB é a **síntese canônica**. Cada afirmação aqui é rastreável ao material bruto linkado acima, que por sua vez cita a fonte primária (`CLAUDE.md`, análises em `docs/analysis/`, KBs de conceitos). Para elaborar um material derivado, comece aqui e desça ao bruto só onde precisar de profundidade/citação literal.
 
@@ -43,7 +43,7 @@ date: 2026-06-15
 
 O Sistema Onion é um **framework de orquestração de desenvolvimento** que vive inteiramente em `.claude/` — uma pasta de configuração do Claude Code. Ao instalar o Onion num projeto, o time ganha **99 comandos invocáveis**, **51 agentes especializados de IA** e **8 skills** de orquestração, cobrindo três dimensões **peer**: produto (discovery → backlog), engenharia (planejamento → PR) e compliance (ISO 27001, SOC2, PMBOK, ISO 22301). O Onion se conecta ao gerenciador de tarefas existente (Jira, ClickUp, Asana ou Linear) via uma camada de abstração agnóstica (SDAAL) e ao host de código (GitHub, com GitLab/Bitbucket no roadmap) via adapter de forge. Não é uma CLI, não tem pacote npm, não exige mudança de stack — é configuração pura que transforma o Claude Code no cérebro orquestrador do fluxo de trabalho.
 
-*(Fontes: `CLAUDE.md` §Inventário; [onion-review-2026-05.md](../../analysis/onion-review-2026-05.md) §1)*
+*(Fontes: `CLAUDE.md` §Inventário; `onion-review-2026-05.md` §1 — Revisão Analítica de Maio/2026, interno do core: o snapshot que consolidou a identidade canônica (framework template em `.claude/`, plataforma única Claude Code, três dimensões peer) e o abandono formal de `.onion/`/CLI standalone/v4.0; veredito "substancialmente completo em cobertura, pré-aplicável em validação")*
 
 ### Pitch de 10 minutos (técnico)
 
@@ -51,14 +51,14 @@ A identidade do Onion foi consolidada em **2026-05-18**, quando o framework aban
 
 O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — Produto, Engenharia e Compliance são **peers**, não hierarquizados. Um time pode entrar pelo `@product-agent`, pelo `/engineer:plan`, ou diretamente em `/validate:collab/three-amigos` — o framework não privilegia nenhuma dimensão, e cada uma pode evoluir e ser adotada independentemente.
 
-*(Fontes: `CLAUDE.md` §Identidade canônica; [onion-review-2026-05.md](../../analysis/onion-review-2026-05.md) §2)*
+*(Fontes: `CLAUDE.md` §Identidade canônica; `onion-review-2026-05.md` §2 (interno do core))*
 
 ---
 
 ## 1.5 Invenções nomeadas — o catálogo canônico
 
 **Esta é a SSOT da lista** (o contrato que o [`/warm-up`](../../../.claude/commands/warm-up.md) declara).
-Materiais derivados — o [manual de adoção](../../applying/onion-adoption-manual.md) §1.3, press kit,
+Materiais derivados — o manual de adoção (`onion-adoption-manual.md` §1.3, interno do core — persona autobiográfica em 1ª pessoa "O Despertar", texto canônico do *Autobiographical Marketing*), press kit,
 artigos — **citam esta tabela**; não a reescrevem ([fonte ≠ derivação](../concepts/source-vs-derivation.md)).
 
 **Critério de entrada:** emergiu da prática (não foi projetado), **ganhou nome próprio**, e tem casa
@@ -76,12 +76,12 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | **`gated-until-trigger`** | o artefato nasce do **uso que o prove**, nunca de simetria/plano | [modernization §🚦](../concepts/onion-modernization-doctrine.md) | ✅ ativa |
 | **`declarado ≠ verificado`** | carimbo/doc/branch é DEV; só o artefato vivo é PROD | [verify-read-path-first](../agentic-patterns/ai-strategies/verify-read-path-first.md) (tabela da família) | ✅ ativa |
 | **`fonte ≠ derivação`** | fonte e nossa leitura em artefatos **fisicamente** separados; a derivação **cita** | [`source-vs-derivation.md`](../concepts/source-vs-derivation.md) | ✅ ativa |
-| **PFR** *(Padrão Faseado Retomável)* | sessão durável + `STATE.md` + retomada fria; fases nunca fundidas | [ADR](../../analysis/onion-adr-phased-resumable-pattern-2026-06.md) + [método §2a](../concepts/onion-working-method.md) | 🟡 ADR provisório (a cravar em `commands.md §3`) |
-| **Capability Contract** | o que um repo adotado pode esperar: Bronze/Silver/Gold — contrato **verificável** | [ADR](../../analysis/onion-adr-capability-contract-2026-06.md) + `plugins/*/capability.json` | 🟡 só ADR |
-| **Co-Evolution Protocol** *(doc-bridge)* | sinal bidirecional core↔adotante por arquivo commitado; sem runtime acoplado | [`docs/evolution/README.md`](../../evolution/README.md) + `/meta:co-*` | ✅ ativa |
+| **PFR** *(Padrão Faseado Retomável)* | sessão durável + `STATE.md` + retomada fria; fases nunca fundidas | `onion-adr-phased-resumable-pattern-2026-06.md` (ADR interno do core — nomeia o PFR, padrão já invariante L0; provisório, PR à meta-spec diferido até gatilho) + [método §2a](../concepts/onion-working-method.md) | 🟡 ADR provisório (a cravar em `commands.md §3`) |
+| **Capability Contract** | o que um repo adotado pode esperar: Bronze/Silver/Gold — contrato **verificável** | `onion-adr-capability-contract-2026-06.md` (ADR interno do core — auto-descrição `provides/requires/loads/conformance`, tiers Bronze/Silver/Gold, validada pelo lint REGRA 20; visão-de-fora composta dos contratos, não registry à mão) + `plugins/*/capability.json` | 🟡 só ADR |
+| **Co-Evolution Protocol** *(doc-bridge)* | sinal bidirecional core↔adotante por arquivo commitado; sem runtime acoplado | `docs/evolution/README.md` (interno do core — fonte canônica do protocolo doc-bridge; maestro humano orquestra, execução do que chega é gate humano) + `/meta:co-*` | ✅ ativa |
 | **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | [`breadcrumb-patterns.md`](../agentic-patterns/ai-strategies/breadcrumb-patterns.md) + `/meta:diary` | 🟡 draft (absorção não medida) |
-| **Object-led discovery** | o maestro dirige com o objeto; o Transformer executa com as peças certas | [KB](../agentic-patterns/ai-strategies/object-led-discovery.md) + [ADR](../../analysis/onion-adr-object-led-discovery-2026-07.md) | ✅ ativa |
-| **Autobiographical Marketing** | o framework conta a própria história; os commits **são** a autobiografia | [manual de adoção](../../applying/onion-adoption-manual.md) (persona 1ª pessoa) | 🟡 só prosa de manual |
+| **Object-led discovery** | o maestro dirige com o objeto; o Transformer executa com as peças certas | [KB](../agentic-patterns/ai-strategies/object-led-discovery.md) + `onion-adr-object-led-discovery-2026-07.md` (ADR interno do core — playbook espelhar→descobrir(object-led)→vestir(capability-fitting)→materializar→realimentar; "quem sabe sobre o objeto é o próprio objeto", Information Expert) | ✅ ativa |
+| **Autobiographical Marketing** | o framework conta a própria história; os commits **são** a autobiografia | `onion-adoption-manual.md` (interno do core; persona 1ª pessoa) | 🟡 só prosa de manual |
 
 > **Manutenção:** ao nomear algo novo, **primeiro dê a casa**, depois adicione a linha. Nome anunciado
 > antes de existir é `declarado ≠ verificado` aplicado a nós mesmos — foi o que aconteceu com `KG-first` e
@@ -166,7 +166,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 **Por que importa:** o mesmo comando funciona em projetos com stacks de ferramentas diferentes, sem reescrita — e troca de provider é mudança de `.env`, não de código.
 
-*(Fontes: material bruto §3; [onion-review-2026-05.md](../../analysis/onion-review-2026-05.md) §2; `CLAUDE.md` §Padrões Técnicos)*
+*(Fontes: material bruto §3; `onion-review-2026-05.md` §2 (interno do core); `CLAUDE.md` §Padrões Técnicos)*
 
 ---
 
@@ -235,21 +235,21 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 **Situação:** time com múltiplos repositórios integrados (API + frontend + infra); qualquer mudança de contrato podia quebrar os demais, coordenada manualmente via Slack.
 **O que o Onion fez:** topologia peer + ledger git, implementada em fases (register → publish+check → status+rollback); cada repo valida localmente via `/meta:federation-check`.
 **Resultado:** ciclo `register→publish→check→status→rollback` completo em produção; mudança incompatível é bloqueada com mensagem acionável, rollback coordenado restaura o estado.
-**Citação:** *"Cada Onion defende seus interesses — o repo dono valida localmente as mudanças que o afetam (conhecimento de 1ª mão)."* — [onion-federation-design-v2-2026-06.md](../../analysis/onion-federation-design-v2-2026-06.md) §2
+**Citação:** *"Cada Onion defende seus interesses — o repo dono valida localmente as mudanças que o afetam (conhecimento de 1ª mão)."* — `onion-federation-design-v2-2026-06.md` §2 (interno do core: design da Federation na **topologia peer + ledger git** — cada repo mantém seu Onion soberano e valida em casa as mudanças de contrato que o afetam; documenta o pivô do hub v1, que repousava num spike não-verificado)
 
 ### Caso 2 — `/meta:evolve`: "O Framework se Auto-Auditando"
 
 **Situação:** após um ciclo grande de mudanças (migração Cursor→native, federation, novos comandos), o framework não tinha auditoria formal recente.
 **O que o Onion fez:** `/meta:evolve` disparou 28 agentes em 8 dimensões (peso, redundância, duplicação, KBs stale, conformidade, legado, links, frontmatter); juiz adversarial (opus) refutou 11 de 41 achados brutos.
 **Resultado:** 30 achados sobreviventes → backlog priorizado → 100% executado (8 PRs do ciclo de auto-auditoria #54-#61: sweep MCP-first, índices reconciliados, 51 comandos com `allowed-tools`, calibração de régua de frescor).
-**Citação:** *"28 agentes (8 auditores + ~19 juízes + critic) · 1.27M tokens · 635 tool-uses · ~26 min."* — [onion-evolution-2026-06-15.md](../../analysis/onion-evolution-2026-06-15.md) §0
+**Citação:** *"28 agentes (8 auditores + ~19 juízes + critic) · 1.27M tokens · 635 tool-uses · ~26 min."* — `onion-evolution-2026-06-15.md` §0 (backlog de auto-auditoria do `/meta:evolve`, interno do core: run real que gerou 41 achados brutos → **30 sobreviventes** após o juiz adversarial refutar 11)
 
 ### Caso 3 — Agent Teams: "Decidindo Não Adotar (Com Evidência)"
 
 **Situação:** a Anthropic lançou `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (substrato experimental de peers persistentes) — adotar como novo padrão de orquestração?
 **O que o Onion fez:** smoke-test empírico (TeamCreate→TaskCreate→SendMessage round-trip), demo real com divisão de tarefas por `owner`, e avaliação estruturada das três primitivas (sessões faseadas / `Workflow` / Agent Teams).
 **Resultado:** ADR formal — Agent Teams entra como **3º modo opt-in** com detecção de capacidade e fallback gracioso; os padrões existentes (`Workflow`-first) permanecem.
-**Citação:** *"Workflow = orquestração que o orquestrador desenha. Agent Teams = coordenação que emerge."* — [onion-agent-teams-evaluation-2026-06.md](../../analysis/onion-agent-teams-evaluation-2026-06.md) §3
+**Citação:** *"Workflow = orquestração que o orquestrador desenha. Agent Teams = coordenação que emerge."* — `onion-agent-teams-evaluation-2026-06.md` §3 (interno do core: a avaliação que decidiu **NÃO** tornar Agent Teams padrão — entra como 3º modo de orquestração opt-in, atrás de detecção de capacidade com fallback gracioso; o Workflow-first permanece)
 
 ### Caso 4 — Cursor→Claude Code Native: "Corrigindo o Propagador"
 
@@ -289,7 +289,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | Fases de federation implementadas | 5 (0→ledger, 1→register, 2→publish/check, 3→status/rollback) | `multi-repo-federation.md` |
 
 > **Manutenção (anti-redrift):** as contagens de inventário **presentes** (comandos/agentes/skills/KBs/dimensões)
-> são derivadas da SSOT gerada [`docs/onion/inventory.md`](../../onion/inventory.md) (`.claude/validation/inventory.sh`)
+> são derivadas da SSOT gerada `docs/onion/inventory.md` (interna do core — contagens de comandos/agentes/skills/KBs computadas do filesystem por `.claude/validation/inventory.sh`, validadas no CI, nunca digitadas à mão)
 > — ao resync, leia a SSOT, nunca reescreva de memória. Os números **dentro dos Casos de Uso (§5)** e das
 > métricas de run específico (tokens/agentes/duração do `/meta:evolve` de 2026-06-15) são **congelados-no-tempo**:
 > descrevem um evento histórico e **não** se atualizam com o inventário. Family [`declarado ≠ verificado`](#15-invenções-nomeadas--o-catálogo-canônico).
@@ -307,7 +307,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | `.onion/` agnóstico | Abstração prematura sem ganho real |
 | v4.0 FASES 5-9 (aprendizado contínuo, A2A runtime) | Beira agente autônomo fora de controle; humano-maestro é invariante |
 
-*(Fonte: [onion-review-2026-05.md](../../analysis/onion-review-2026-05.md) §4; `CLAUDE.md` §Identidade canônica)*
+*(Fonte: `onion-review-2026-05.md` §4 (interno do core); `CLAUDE.md` §Identidade canônica)*
 
 ### Diferenciação de "cursor rules" / prompt engineering ad-hoc
 
@@ -329,7 +329,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 3. **Time regulado** (fintech, healthtech, SaaS enterprise) — compliance (ISO 27001/SOC2) integrado ao fluxo, não como silo.
 4. **Mantenedor de múltiplos repos** — coordenar mudanças cross-repo com garantia de não quebrar integrações.
 
-*(Fonte: [onion-review-2026-05.md](../../analysis/onion-review-2026-05.md) §1)*
+*(Fonte: `onion-review-2026-05.md` §1 (interno do core))*
 
 ---
 
@@ -376,20 +376,20 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 ## 9. Citações-chave (Press Kit)
 
 1. *"Framework template em `.claude/` projetado para ser instalado e aplicado em qualquer projeto — novo, legado ou regulado — para orquestrar o ciclo completo de desenvolvimento com Claude Code."* — `CLAUDE.md` (identidade canônica)
-2. *"As três dimensões são peer, não hierarquizadas."* — [onion-review-2026-05.md](../../analysis/onion-review-2026-05.md) §1
-3. *"Workflow = orquestração que o orquestrador desenha. Agent Teams = coordenação que emerge."* — [onion-agent-teams-evaluation-2026-06.md](../../analysis/onion-agent-teams-evaluation-2026-06.md) §3
-4. *"Cada Onion defende seus interesses — o repo dono valida localmente as mudanças que o afetam."* — [onion-federation-design-v2-2026-06.md](../../analysis/onion-federation-design-v2-2026-06.md) §2
-5. *"28 agentes · 1.27M tokens · 635 tool-uses · ~26 min"* — custo de uma auto-auditoria completa, [onion-evolution-2026-06-15.md](../../analysis/onion-evolution-2026-06-15.md) §0
+2. *"As três dimensões são peer, não hierarquizadas."* — `onion-review-2026-05.md` §1 (interno do core)
+3. *"Workflow = orquestração que o orquestrador desenha. Agent Teams = coordenação que emerge."* — `onion-agent-teams-evaluation-2026-06.md` §3 (interno do core)
+4. *"Cada Onion defende seus interesses — o repo dono valida localmente as mudanças que o afetam."* — `onion-federation-design-v2-2026-06.md` §2 (interno do core)
+5. *"28 agentes · 1.27M tokens · 635 tool-uses · ~26 min"* — custo de uma auto-auditoria completa, `onion-evolution-2026-06-15.md` §0 (interno do core)
 6. *"Read-only por contrato. O comando nunca muta `.claude/`; a única escrita é o relatório em `docs/analysis/`."* — `evolve.md` §Objetivo
 7. *"Conserta o propagador, não só as folhas."* — princípio de refatoração em escala (migração Cursor→native)
-8. *"Task Manager Abstraction madura — padrão SDAAL real, 4 adapters, fallback gracioso, formatação tipada por provider."* — [onion-review-2026-05.md](../../analysis/onion-review-2026-05.md) §Top 5 forças
-9. *"O veredito: substantialmente completo em cobertura."* — [onion-review-2026-05.md](../../analysis/onion-review-2026-05.md) §1 (estado pós P0–P3)
+8. *"Task Manager Abstraction madura — padrão SDAAL real, 4 adapters, fallback gracioso, formatação tipada por provider."* — `onion-review-2026-05.md` §Top 5 forças (interno do core)
+9. *"O veredito: substantialmente completo em cobertura."* — `onion-review-2026-05.md` §1 (interno do core; estado pós P0–P3)
 
 ---
 
 ## 10. Ecossistema Vivo (2026-07)
 
-> Fonte: [onion-adoption-manual.md](../../applying/onion-adoption-manual.md) (Partes I-II) +
+> Fonte: `onion-adoption-manual.md` (interno do core, Partes I-II) +
 > verificação ao vivo em 2026-07-03 (endpoints respondendo).
 
 - **Persona autobiográfica**: o Onion conta a própria história em 1ª pessoa — é a invenção
@@ -430,11 +430,11 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 
 ## Referências
 
-- **Material bruto (citações linha-a-linha)**: [onion-product-material-raw-2026-06.md](../../analysis/onion-product-material-raw-2026-06.md)
-- **Identidade canônica**: `CLAUDE.md` · [onion-review-2026-05.md](../../analysis/onion-review-2026-05.md)
-- **Auto-auditoria**: [onion-evolution-2026-06-15.md](../../analysis/onion-evolution-2026-06-15.md)
-- **Agent Teams ADR**: [onion-agent-teams-evaluation-2026-06.md](../../analysis/onion-agent-teams-evaluation-2026-06.md)
-- **Federation v2**: [onion-federation-design-v2-2026-06.md](../../analysis/onion-federation-design-v2-2026-06.md) · [multi-repo-federation.md](../concepts/multi-repo-federation.md)
+- **Material bruto (citações linha-a-linha)**: `onion-product-material-raw-2026-06.md` (interno do core)
+- **Identidade canônica**: `CLAUDE.md` · `onion-review-2026-05.md` (interno do core)
+- **Auto-auditoria**: `onion-evolution-2026-06-15.md` (interno do core)
+- **Agent Teams ADR**: `onion-agent-teams-evaluation-2026-06.md` (interno do core)
+- **Federation v2**: `onion-federation-design-v2-2026-06.md` (interno do core) · [multi-repo-federation.md](../concepts/multi-repo-federation.md)
 - **Doutrina de orquestração**: [agent-orchestration.md](../concepts/agent-orchestration.md)
 - **Task Manager Abstraction**: [task-manager-abstraction.md](../concepts/task-manager-abstraction.md)
 - **Getting started**: `docs/onion/getting-started.md`

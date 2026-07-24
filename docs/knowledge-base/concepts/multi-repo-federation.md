@@ -177,7 +177,9 @@ no GitHub). O ciclo completo:
   completo num ledger scratch (cross-repo simulável num repo só).
 - Membros **não-Onion** / stacks heterogêneos — fases seguintes.
 - **A2A — distinção de camadas** (refinada em 2026-06-15; razão, mapeamento e gatilho no
-  [ADR A2A](../../analysis/onion-federation-adr-a2a-format-interop-2026-06.md)):
+  ADR `onion-federation-adr-a2a-format-interop-2026-06.md`, interno do core — parte a linha vermelha A2A em
+  duas: runtime A2A permanece proibido; o formato/vocabulário Agent Card como projeção one-way é permitido em
+  princípio, com implementação diferida até o gatilho):
   - 🔴 **Runtime A2A / instâncias vivas distribuídas** — **linha vermelha** (Fase 5 ABANDONADA, design §2):
     a federação é **assíncrona via git + forge**, **nunca IA-fala-IA em tempo real**. Inegociável.
   - 🟢 **Formato/vocabulário A2A (Agent Card) como projeção one-way** — **permitido em princípio**:

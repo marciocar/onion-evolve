@@ -21,7 +21,7 @@ a régua `worst-truth-is-uncertain` condena: **certeza de fase é CAMPO, não TO
 > **Correção factual (2026-07-17):** referências a *"a régua de promoção do `radar.md`"* apontam para um
 > **artefato do adotante** (o radar de backlog de um adotante — *"mova os blips no SEU radar.md"*), **não**
 > para uma SSOT ausente do core. A régua `assess→trial→adopt` **vive** em
-> [toolbox-lifecycle](../../analysis/onion-adr-toolbox-lifecycle-2026-06.md) §Decisão 4; este KB a **completa**
+> `onion-adr-toolbox-lifecycle-2026-06.md` §Decisão 4 (ADR interno do core — **em síntese:** o ciclo de vida do toolbox como régua de classificação P0-P3 + coesão dos `create-*` sobre o substrato já existente, com promoção de padrão por **gate-de-uso** — trial→adopt só com uso real, espelhando o `domain-context-lifecycle`); este KB a **completa**
 > com as camadas de experimentação que faltavam.
 
 ## A esteira (o eixo de maturação)
@@ -76,7 +76,7 @@ proíbe promover um ao outro sem o gate. Todas são **descartáveis por padrão*
 ## Fontes (as SSOTs que esta esteira cita)
 
 - Régua de caixa: [`onion/SKILL.md`](../../../.claude/skills/onion/SKILL.md) §"Criar Componentes" · P0-P3 em
-  [toolbox-lifecycle](../../analysis/onion-adr-toolbox-lifecycle-2026-06.md).
+  `onion-adr-toolbox-lifecycle-2026-06.md` (interno do core).
 - Quando construir: [modernization-doctrine](onion-modernization-doctrine.md) §`gated-until-trigger`.
 - Como validar: [dogfooding-doctrine](onion-dogfooding-doctrine.md) §gate mecânico vs gate de uso.
 - Promoção de padrão: toolbox-lifecycle §Decisão 4 (`assess→trial→adopt`, espelha `domain-context-lifecycle`).

@@ -92,7 +92,7 @@ docs/knowledge-base/
 - [Spec-Driven Development Tools 2025](frameworks/spec-driven-development-tools-2025.md) — análise comparativa de ferramentas
 - [Test Strategy Scoring](frameworks/test-strategy-scoring.md) — thresholds e detecção de gaps de teste
 
-> _As 4 KBs de visões abandonadas (onion-complete-cycle, onion-ide-integration-strategy, onion-multi-context-orchestrator-vision, onion-system-critical-analysis-2025) foram removidas na curadoria de 2026-06-14 — suas conclusões estão sintetizadas em [onion-review-2026-05.md](../analysis/onion-review-2026-05.md); o conteúdo verboso é recuperável via git history._
+> _As 4 KBs de visões abandonadas (onion-complete-cycle, onion-ide-integration-strategy, onion-multi-context-orchestrator-vision, onion-system-critical-analysis-2025) foram removidas na curadoria de 2026-06-14 — suas conclusões estão sintetizadas em `onion-review-2026-05.md` (interno do core — a revisão-snapshot que fixa a identidade canônica: framework template em `.claude/`, plataforma única Claude Code, três dimensões peer produto/engenharia/compliance, e o abandono formal de `.onion/` + v4.0/CLI standalone); o conteúdo verboso é recuperável via git history._
 
 ---
 

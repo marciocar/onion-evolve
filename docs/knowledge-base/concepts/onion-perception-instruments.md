@@ -57,6 +57,6 @@ de `declarado≠verificado` (não é canary-deployment). Sensor de ESTADO-DURÁV
 
 ## 🔗 Referências
 - Doutrina irmã (as marcas): [breadcrumb-patterns.md](../agentic-patterns/ai-strategies/breadcrumb-patterns.md)
-- Par presença-viva: [onion-adr-telescope-session-observation-2026-07.md](../../analysis/onion-adr-telescope-session-observation-2026-07.md) (telescópio `doctrine-gated`)
-- Frescor/⏰: [onion-adr-work-models-session-topologies-2026-07.md](../../analysis/onion-adr-work-models-session-topologies-2026-07.md) §4 · RFC-0003 §2.3
+- **Par presença-viva:** `onion-adr-telescope-session-observation-2026-07.md` (ADR interno do core, `doctrine-gated`). *Dimensão:* nomeia o **telescópio** — observação read-only de sessões vivas, par por **oposição** ao farol (farol = metadado que a observada *escolhe* emitir; telescópio = recepção unilateral de conteúdo pleno). Carrega o invariante `observar≠comunicar` por construção: on-demand (nunca daemon), mediado pelo maestro, opt-in local-only, e um vislumbre prova nada (declarado≠verificado).
+- **Frescor/⏰:** `onion-adr-work-models-session-topologies-2026-07.md` §4 (ADR interno do core) · RFC-0003 §2.3. *Dimensão:* institui o **Eixo E — topologias de sessão (W1-W7)**, "quem trabalha onde, a partir de onde"; rejeita W7 (cron/daemon) como base — o padrão soberano é **cadência lazy acionada por sessão** (⏰ por hook SessionStart/End, não relógio), preservando o gate humano sempre-presente.
 - SSOT-as-runtime (o ciclo): [knowledge-graph-sdaal.md](./knowledge-graph-sdaal.md) §SSOT-as-runtime

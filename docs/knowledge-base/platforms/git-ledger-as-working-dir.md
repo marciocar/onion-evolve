@@ -17,7 +17,7 @@ related:
 > directories* do Claude Code — **sem** servidor, sem CLI standalone, sem IA-fala-IA.
 >
 > Resultado do spike da **Fase 0** (GATE) do backlog Federation v2. De-risca o alerta
-> sistêmico **SA-3** da [review adversarial](../../analysis/onion-federation-design-review-2026-06.md).
+> sistêmico **SA-3** da review adversarial (`onion-federation-design-review-2026-06.md`, interno do core — **em síntese:** review de 6 lentes × 6 achados sobre o design v1 hub, 24/36 confirmados; SA-3 era o *spike load-bearing* não-verificado — uma sessão Claude Code operar o dir de outro repo como raiz de subagente — cujo risco justificou o pivô para a topologia peer).
 
 ## 1. Contexto — por que este spike existiu
 
@@ -122,6 +122,6 @@ principal (§4.2:203, §10.1:332-333).
 ## 6. Conexão com a evolução
 
 Esta KB fecha a parte técnica da **Fase 0** (GATE) do
-[Onion Federation v2](../../analysis/onion-federation-design-v2-2026-06.md) §7. Com SA-3 de-riscado
+Onion Federation v2 (`onion-federation-design-v2-2026-06.md` §7, interno do core — o design da topologia **peer**: cada repo mantém seu Onion soberano, coordenação assíncrona via ledger git compartilhado, humano-maestro leva decisões entre instâncias; a camada de contrato/segurança é *realocada* para o repo dono do código, não removida). Com SA-3 de-riscado
 e o placement liberado (Sim-com-ajustes), o caminho para a **Fase 1** (formato de contrato +
 bootstrap do ledger real, testável num repo só) está aberto — respeitados os ajustes 2a e 6a acima.

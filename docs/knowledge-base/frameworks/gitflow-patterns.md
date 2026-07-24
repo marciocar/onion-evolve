@@ -984,7 +984,10 @@ Decida uma postura por projeto e registre-a no `.gitignore` com um comentário. 
 
 > 🔭 **Design-alvo (gated) — papéis resolvidos, não regex.** Hoje a classificação de papel é derivada do
 > **nome literal** da branch (regex `^(main|master|develop)$`). O ADR
-> [branch-roles-sdaal](../../analysis/onion-adr-branch-roles-sdaal-2026-07.md) (`status: proposto`) propõe que
+> `onion-adr-branch-roles-sdaal-2026-07.md` (interno do core, `status: proposto`) — **em síntese:** estende a
+> resolução agnóstica de base de **um** papel (`integration`) para **N** papéis de branch/ambiente resolvidos
+> por-projeto via SDAAL, porque nenhuma meta-spec modela ambientes de deploy e `develop` faz papel duplo
+> (integração vs staging/homolog) na maioria dos adotantes — propõe que
 > o papel de cada branch seja **resolvido** (`roleOf(branch)` do SDAAL `branch-roles`), não assumido pelo nome —
 > corrigindo 2 bugs latentes: (i) uma branch de **produção por-cliente** (ex. `<adopter>/main`) **é** produção mas
 > não casa o regex → não é protegida; (ii) um adotante com `develop`=**staging** (ex. um adotante regulado) casa como

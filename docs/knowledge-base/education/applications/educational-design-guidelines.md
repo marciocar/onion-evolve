@@ -15,7 +15,7 @@
 | **Data de Criação** | 2026-07-05 |
 | **Última Atualização** | 2026-07-05 |
 | **Evidência citada (SSOT)** | [srl-zimmerman.md §4](../theories/srl-zimmerman.md) · [plea-rosario.md](../theories/plea-rosario.md) |
-| **Vinculante por** | [ADR onion-adr-education-vertical](../../../analysis/onion-adr-education-vertical-2026-07.md) |
+| **Vinculante por** | `onion-adr-education-vertical-2026-07.md` (ADR interno do core) — funda a vertical `onion-education` (F0 aberto, rampa gated) e torna estas diretrizes vinculantes para todo artefato da vertical |
 
 ---
 

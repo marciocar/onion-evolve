@@ -3,8 +3,9 @@
 > **Versão**: 1.0.0 | **Última atualização**: 2026-07-05 | **Camada**: THEORIES (fiel à fonte — zero Onion)
 > Catálogo fiel do modelo, verificado por painel adversarial (3 votos por alegação; fontes
 > primárias). Veredito desta camada é só de **fidelidade** (representamos a teoria corretamente?).
-> Pesquisa de origem com verbatims e votos:
-> [onion-research-srl-plea-2026-07.md](../../../analysis/onion-research-srl-plea-2026-07.md).
+> Pesquisa de origem com verbatims e votos: `onion-research-srl-plea-2026-07.md` (pesquisa interna do
+> core) — deep-research multi-fonte com painel adversarial (3 votos por alegação, fontes primárias);
+> registra os verbatims e vereditos que esta camada representa fielmente.
 
 ---
 

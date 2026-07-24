@@ -275,8 +275,8 @@ rastreada por `git archive`).
 
 ## 6. Casos de uso reais — os perfis hoje registrados
 
-Fonte: [`members.yaml`](../../evolution/federation/members.yaml) — nenhum número inventado. **Perfis
-anonimizados para circulação pública.**
+Fonte: `members.yaml` (interno do core — o SSOT versionado dos membros da federação: tiers, pins, trust,
+personality) — nenhum número inventado. **Perfis anonimizados para circulação pública.**
 
 ### 6.1 Destilação curada — a exceção que define a fronteira
 `role: standalone`, mas **`onion_version: n/a`**. Não é adoção — é **destilação curada**: reescreve a
@@ -368,4 +368,4 @@ entre o repo A e o repo B pode mudar sem quebrar o B".
 - [public-door-vs-private-core.md](public-door-vs-private-core.md) — o litmus porta pública ≠ core privado (§6.7)
 - [`/meta:adopt`](../../../.claude/commands/meta/adopt.md) — o comando fonte de toda a §4
 - [`/meta:co-evolve`](../../../.claude/commands/meta/co-evolve.md) — o orientador do doc-bridge leve (§4.6)
-- [`members.yaml`](../../evolution/federation/members.yaml) — os perfis reais da §6 (uso interno)
+- `members.yaml` (interno do core) — os perfis reais da §6 (uso interno)

@@ -17,7 +17,7 @@
 | **Data de Criação** | 2026-07-10 |
 | **Última Atualização** | 2026-07-10 |
 | **Categoria** | Frameworks |
-| **Origem** | Sinal upstream um adotante ([método](../../evolution/inbox/_processed/2026-07-09-metodo-consolidacao-segura-multibranch.md)) + [artefato verificado](../../evolution/inbox/_processed/2026-07-09-artefato-mapa-consolidacao.md) (mapa-SSOT com vereditos 6-branch, build-green, salvage) |
+| **Origem** | Sinal upstream de um adotante — `2026-07-09-metodo-consolidacao-segura-multibranch.md` (sinal interno do core): destila os 8 movimentos do método (2 lanes que não se misturam, verificação adversarial por fan-out read-only, prova de "não quebra prod" em código E dado, salvage antes de drop) como candidato a padrão do core; + `2026-07-09-artefato-mapa-consolidacao.md` (artefato verificado interno do core): o mapa-SSOT real (2 repos, ~19 branches) com vereditos 6-branch, build-green (tsc EXIT=0), salvage e sequência de PRs sob comando |
 | **Relacionado** | [gitflow-patterns](gitflow-patterns.md) (motor git local) · [knowledge-graph-sdaal](../concepts/knowledge-graph-sdaal.md) (C_DEVPROD_GAP; o mapa vira nó do KG) |
 
 ---
@@ -101,7 +101,7 @@ payload por outro caminho · `STRAGGLER-DROP` = o Δ **não é** payload (artefa
 typecheck **EXIT=0**; validação com dado (backlog SLA: baseline 45 · composta 29 · controle 167 — o
 reconcile sozinho **reintroduziria** 167, provando por que a composição importa); salvage 2/3
 cherry-picked + 1 preservado-em-branch; higiene em 2 branches dedicadas (backup de auth e 2016
-arquivos de sessão untracked). Detalhe completo: [artefato-mapa-consolidacao](../../evolution/inbox/_processed/2026-07-09-artefato-mapa-consolidacao.md).
+arquivos de sessão untracked). Detalhe completo: `2026-07-09-artefato-mapa-consolidacao.md` (interno do core).
 
 ## Relações
 

@@ -76,10 +76,10 @@ Verificado ao vivo via `gh` em 2026-07-19:
 ## 5. Os tipos de repo da família (aplicação da doutrina ao split)
 
 Quando o core é selado e a família vira um **ecossistema de repos**, a fronteira porta≠core se aplica
-**por tipo**. O recorte não é "uma fatia do SSOT" (isso criaria segunda fonte, vetada por
-[RFC-0004](../../evolution/rfc/rfc-0004-a2a-live-interop.md) single-source + `fonte≠derivação`) — é
-**derivação que cita**, keyed ao tipo. Ratificado em
-[ADR family-repo-topology](../../analysis/onion-adr-family-repo-topology-2026-07.md).
+**por tipo**. O recorte não é "uma fatia do SSOT" (isso criaria segunda fonte, vetada pelo
+veredito single-source de `rfc-0004-a2a-live-interop.md` (RFC interno do core — mantém SSOT única para
+identidade/contratos e federa apenas a comunicação) + `fonte≠derivação`) — é
+**derivação que cita**, keyed ao tipo. Ratificado no ADR `onion-adr-family-repo-topology-2026-07.md` (interno do core).
 
 | Tipo | Repos | O que da doutrina viaja | Mecanismo |
 |---|---|---|---|
@@ -95,7 +95,7 @@ refresca; KG de cada um fica no seu repo.
 
 ## 6. Relações
 
-- Topologia de repos da família (ratifica os tipos): [`onion-adr-family-repo-topology-2026-07`](../../analysis/onion-adr-family-repo-topology-2026-07.md)
-- ADR que decide o destino da porta Claude: [`onion-adr-claude-door-topology-2026-07`](../../analysis/onion-adr-claude-door-topology-2026-07.md)
-- Fonte da tese: [`source-vs-derivation.md`](source-vs-derivation.md) · registro: [`members.yaml`](../../evolution/federation/members.yaml)
-- Distribuição/destilação: [`onion-adr-mini-distillation-2026-07`](../../analysis/onion-adr-mini-distillation-2026-07.md) · [`onion-distribution-strategy-2026-06`](../../analysis/onion-distribution-strategy-2026-06.md)
+- Topologia de repos da família (ratifica os tipos): `onion-adr-family-repo-topology-2026-07.md` (ADR interno do core). *Dimensão:* desmembra a família em repos próprios mantendo `onion-evolve` como core privado selável; fixa a taxonomia de 4 tipos (porta de framework · meta/vitrine · destilação curada · app de runtime), cada um com 1 mecanismo de nascimento/sync, e resolve o destino da porta Claude em favor de adoção via `/meta:adopt`.
+- ADR que decide o destino da porta Claude: `onion-adr-claude-door-topology-2026-07.md` (ADR interno do core). *Dimensão:* documenta (verificado ao vivo via `gh`) o duplo colapso — `onion-claude` renomeado no core privado `onion-evolve` (a porta pública Claude não existe) + vitrine congelada em 2026-06-04 — e conclui que o adotante ancorado na fonte viva está correto; o problema é só o cold-adopter externo.
+- Fonte da tese: [`source-vs-derivation.md`](source-vs-derivation.md) · registro dos adotantes: `members.yaml` (registro de federação interno do core — quem adota, o pin de `.onion-version` e o thread `Q_COLD_ADOPTER`).
+- Distribuição/destilação: `onion-adr-mini-distillation-2026-07.md` (ADR interno do core — o Onion Mini como destilação federada curada: porta de entrada pública/multi-plataforma que **nunca** vendoriza `.claude/`, enquanto o core segue Claude-Code-only) · `onion-distribution-strategy-2026-06.md` (análise interna do core — estratégia de ouro **por camada**: a camada 1 `.claude/` vai ao plugin/marketplace nativo; as camadas 2 spec-as-code e 3 co-evolução/federação são o moat sem equivalente nativo).

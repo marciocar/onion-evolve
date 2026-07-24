@@ -107,7 +107,7 @@ Casos reais onde o dogfood pegou o que o happy-path escondia:
 | **Self-heal de inventário** (PR #126) | Dogfood do fluxo: adicionar **e remover** um recurso real e rodar `/meta:inventory` | Bug real: o `CLAUDE.md` vive **fora** dos scan-roots do lint (`.claude/`+`docs/`); o `--fix` global não o alcançava. O happy-path (CLAUDE.md já correto) escondia — só a mudança real de contagem expôs. |
 | **`/meta:all-tools`** (PR #128) | Rodar o comando reescrito e produzir o catálogo real da sessão | Lacunas: faltava marcar **status de conexão MCP** (conectado vs exige-auth) e tratar **tools deferidas por nome** (sem inventar descrição — o pecado do dialeto-Cursor em outra roupagem). |
 | **Limpeza `.claude/docs/`** (PR #127) | Verificação **adversarial** do veredito do explorer | O veredito "deletar os c4" teria **quebrado** os agentes c4 (que os referenciam); a verificação reverteu para "mover" (e o move **reparou** refs já penduradas). |
-| **`.env.example`** (fix #89) | Dogfooding do Onion **no adotante** (um adotante, ao vivo) | Bug de campo que virou fix never-clobber no core, via [upstream do inbox](../../evolution/README.md). |
+| **`.env.example`** (fix #89) | Dogfooding do Onion **no adotante** (um adotante, ao vivo) | Bug de campo que virou fix never-clobber no core, via upstream do inbox (`docs/evolution/README.md`, interno do core). |
 | **Update de campo** (2026-07-21, um adotante de campo) | **Dogfood de fronteira**: rodar `/meta:adopt --update` num adotante real e rodar o lint DENTRO do clone dele | **Dois** bugs verdes no core: a Segurança de Projeção (REGRA 30) exigia `members.yaml`, que só o core tem → HARD em todo adotante; um índice de KB vendorizado linkava alvos fora do manifesto → link pendurado no adotante. O lint do core **nunca veria** — lá os alvos existem. |
 | **Validação de pin** (2026-07-21, vendor-branch) | Auditar os 3 adotantes reais com `--audit-vendor` | 2 de 3 tinham **pin inválido carimbado** (`vnextpin`; uma data). O drift silencioso que o grafo só refutava em abstrato ganhou mecanismo. E: 5 fixtures usavam **pins fictícios** — praticavam o hábito que deixou o lixo real passar. |
 
@@ -163,8 +163,9 @@ Nenhum dos três é opcional, e nenhum é novo — o que faltava era dizer que s
 | **re-verificação** do KG | [knowledge-graph-sdaal §Frescor](knowledge-graph-sdaal.md#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou) | `verified_at` × `meta.baseline` | ⚠ STALE (radar `--freshness`) | `REFUTES`/`SUPERSEDES` (append-mostly) |
 
 O parentesco é **declarado, não analogia**: o gate de frescor do KG é filho do `review_after` do diário
-([ADR kg-freshness-gate](../../analysis/onion-adr-kg-freshness-gate-2026-07.md) — *"paralelo direto do
-`review_after` do diário; o padrão de TTL já é testado no core"*). E a ponta oposta também se encontra:
+(`onion-adr-kg-freshness-gate-2026-07.md`, ADR interno do core — *"paralelo direto do
+`review_after` do diário; o padrão de TTL já é testado no core"*; institui o campo `verified_at:` + gate
+STALE no `kg-radar.sh`, tornando frescor cidadão de 1ª classe no KG SDAAL). E a ponta oposta também se encontra:
 o re-teste `dynamic` do diário — *"RODE o artefato de novo; **exit code é evidência, leitura é
 hipótese**"* — **é esta doutrina**, em outra roupa.
 
@@ -176,7 +177,7 @@ hipótese**"* — **é esta doutrina**, em outra roupa.
    nem TTL nem sinal. **O diário está à frente.** Levar `conflict_class` ao KG é candidato **gated** — o
    gatilho é um dogfood que prove a falta, não a simetria bonita (`gated-until-trigger`).
 2. **Escrever migalha é fácil; ler é o gargalo.** O recall passivo é quase perfeito e **despenca para
-   40-60% no uso ativo em decisão** ([work-models-research](../../analysis/onion-work-models-research-2026-07.md)).
+   40-60% no uso ativo em decisão** (`onion-work-models-research-2026-07.md`, pesquisa interna do core — deep-research com verificação adversarial 3-votos que confirmou, entre 24 achados, que a **absorção** da migalha na decisão seguinte é o gargalo, não a escrita).
    É por isso que o "re-" precisa de **sinal automático** (⏰/STALE) e não de disciplina: sem forcing
    function, o default é prosa — provado em campo e no próprio core.
 
@@ -187,6 +188,6 @@ hipótese**"* — **é esta doutrina**, em outra roupa.
 - Irmã: [Doutrina de Modernização do Onion](onion-modernization-doctrine.md)
 - Gate mecânico: [`lint-artifacts.sh`](../../../.claude/validation/lint-artifacts.sh) · [`lint-selftest.sh`](../../../.claude/validation/lint-selftest.sh) · [`inventory.sh`](../../../.claude/validation/inventory.sh)
 - Governança: [@metaspec-gate-keeper](../../../.claude/agents/meta/metaspec-gate-keeper.md) (Regra Zero — evidência ou abstenção)
-- Co-evolução (upstream = dogfooding de campo): [docs/evolution/README.md](../../evolution/README.md)
+- Co-evolução (upstream = dogfooding de campo): `docs/evolution/README.md` (interno do core) — *dimensão:* fonte canônica do protocolo doc-bridge core↔adotante, sinal bidirecional por markdown commitado (`inbox/` upstream, `inbound/` downstream); maestro humano orquestra e transporta, execução do que chega é gate humano
 - Reforço aplicado: `CONTRIBUTING.md` (fluxo de PR) · `.claude/skills/onion-validation/SKILL.md` (regra de gerador) · `CLAUDE.md` (recall por sessão no core)
 - Evidência (PRs): self-heal de inventário (#126), limpeza `.claude/docs/` (#127), `/meta:all-tools` (#128)

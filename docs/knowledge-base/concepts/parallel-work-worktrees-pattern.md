@@ -17,11 +17,11 @@ date: 2026-07-11
 | **Versão** | 1.0.0 |
 | **Categoria** | Concepts |
 | **Aplicação** | Tocar N questões do Onion em paralelo, cada uma isolada, sem colisão de escopo |
-| **SSOT de layout** | [worktree-convention-2026.md](../../evolution/worktree-convention-2026.md) (localização, nomenclatura, doutrina W3) |
+| **SSOT de layout** | `worktree-convention-2026.md` (interno do core). *Dimensão:* a convenção que fixa localização e nomenclatura (`~/worktrees/<repo>/<branch-slug>`, umbrella dir), a doutrina W3 (um-escritor-por-escopo, handoff commitado) e o caveat do farol por-working-tree. |
 | **KBs irmãs** | [agent-orchestration.md](agent-orchestration.md) · [worklog-protocol.md](worklog-protocol.md) · [federation-usage-modes.md](federation-usage-modes.md) |
 
 > Esta KB é o **padrão operacional** (o passo-a-passo reutilizável). A **estrutura** (onde a worktree vive, como
-> se chama, a doutrina de um-escritor-por-escopo) é da SSOT [worktree-convention-2026.md](../../evolution/worktree-convention-2026.md) —
+> se chama, a doutrina de um-escritor-por-escopo) é da SSOT `worktree-convention-2026.md` (interno do core) —
 > **não duplicada aqui**. Esta KB cobre o **como fazer**; a convenção cobre o **contrato**.
 
 ## 1. Quando usar (e quando NÃO)
@@ -50,7 +50,9 @@ git worktree add -b <tipo>/<slug> \
 ```
 - `<tipo>/<slug>` = branch em kebab (`docs/veredito-x`, `feat/y`, `chore/z`); o slug do path troca `/`→`-`.
 - A **base** é a branch de integração **resolvida** (não hardcode `main`/`develop`) — ver
-  [branching-base-agnostic](../../analysis/onion-adr-branching-base-agnostic-2026-06.md). Layout `~/worktrees/<repo>/<slug>`:
+  `onion-adr-branching-base-agnostic-2026-06.md` (ADR interno do core): a base de integração é **dado
+  resolvido, agnóstico** (`.onion-version` → `git config` → detecção), aplicação do princípio "adota não
+  impõe" ao eixo branching. Layout `~/worktrees/<repo>/<slug>`:
   convenção SSOT.
 
 ### 3.2 Abrir a sessão (uma tela por worktree)

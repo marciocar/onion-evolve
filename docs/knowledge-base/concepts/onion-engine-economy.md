@@ -10,7 +10,10 @@
 
 ## 📋 Metadata
 
-- **Relacionadas:** [Transformer — o reasoner](transformer-architecture.md) · [SDAAL whitepaper](../../sdaal/sdaal.md) · [Doutrina de Dogfooding](onion-dogfooding-doctrine.md) · [Vocabulário de relações](onion-relation-vocabulary.md) · régua P0-P3 em [`onion/SKILL.md`](../../../.claude/skills/onion/SKILL.md) · [ADR SLM-como-ferramenta](../../analysis/onion-adr-slm-as-tool-de-identification-2026-06.md) · [ADR toolbox lifecycle](../../analysis/onion-adr-toolbox-lifecycle-2026-06.md)
+- **Relacionadas:** [Transformer — o reasoner](transformer-architecture.md) · [SDAAL whitepaper](../../sdaal/sdaal.md) · [Doutrina de Dogfooding](onion-dogfooding-doctrine.md) · [Vocabulário de relações](onion-relation-vocabulary.md) · régua P0-P3 em [`onion/SKILL.md`](../../../.claude/skills/onion/SKILL.md)
+- **ADRs de origem (internos do core):**
+  - `onion-adr-slm-as-tool-de-identification-2026-06.md` (interno do core). *Dimensão:* fixa a fronteira **runtime-vs-ferramenta** — um SLM local entra como ferramenta atrás de um adapter SDAAL, **nunca** como orquestrador; estende a tese SDAAL (`LLM=runtime`) para admitir um "segundo runtime" de capacidade estreita (de-id de PII), com o provider `none` em fail-safe que recusa redigir-e-passar sem override humano.
+  - `onion-adr-toolbox-lifecycle-2026-06.md` (interno do core). *Dimensão:* institui a régua de classificação **P0-P3** como porta de entrada do toolbox (já-existe→extend · determinístico→script · juízo→skill/comando/KB/SDAAL · irreversível→+gate humano) e acopla todo `create-*` à sincronização da SSOT de inventário.
 - **Tese-mãe (SDAAL):** o Transformer é o reasoner, o Markdown é o bytecode — sem store externo.
 
 ---
@@ -30,7 +33,7 @@ P0 já-existe?→*extend* · **P1 determinístico?→script** · P2 juízo→Cla
 
 ## 2. Ancoragem ao vocabulário canônico (indústria, jul/2026)
 
-O Onion **mantém seus termos** com mapa explícito ao consenso — legibilidade externa, à prova de futuro (mesmo padrão "doméstico + âncora canônica" da [ontologia de orquestração](../../analysis/onion-orchestration-ontology-2026-06.md)).
+O Onion **mantém seus termos** com mapa explícito ao consenso — legibilidade externa, à prova de futuro (mesmo padrão "doméstico + âncora canônica" da ontologia de orquestração — `onion-orchestration-ontology-2026-06.md`, interno do core, que constata que a indústria de 2026 abandonou *grand ontologies* formais por semântica implícita + protocolos leves, **confirmando** a tese SDAAL, e que o vocabulário adequado é o consenso de padrões — orchestrator-worker, fan-out/fan-in, pipeline, router, evaluator-optimizer — que o Onion já fala em ~80%).
 
 | Conceito Onion | Termo canônico da indústria |
 |---|---|

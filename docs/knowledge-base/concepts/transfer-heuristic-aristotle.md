@@ -28,7 +28,7 @@ date: 2026-07-12
 | **Categoria** | Concepts |
 | **Aplicação** | Decidir, com evidência, se um conhecimento/artefato existente **transfere** ou se o caso exige **design fresco** |
 | **Fonte** | Aristóteles, *Ética a Nicômaco* V (justiça formal: *tratar igual o que é igual, diferente o que é diferente*) |
-| **Réguas irmãs** | [Hegel — limite/movimento](../../analysis/onion-plan-identity-kg-dogfood-2026-07.md) §2.6 (quando o conhecimento deixa de ser monotônico → KG) · [Bloom revisado](../../analysis/onion-plan-identity-kg-dogfood-2026-07.md) §2.2 (teto de esforço) |
+| **Réguas irmãs** | **Hegel — limite/movimento** (`onion-plan-identity-kg-dogfood-2026-07.md` §2.6, interno do core): o critério *Grenze* (o que a técnica é boa em fazer) × *Schranke* (barreira a ultrapassar) governa "KG vs outras técnicas" — no limite a coisa **é e não-é**, por isso a fronteira é a sede da inquietude (quando o conhecimento deixa de ser monotônico → vira KG) · **Bloom revisado** (`onion-plan-identity-kg-dogfood-2026-07.md` §2.2, interno do core): etiqueta cada pesquisa pelo nível cognitivo mais alto que ela exige (Lembrar→Criar) e gasta esforço só até lá — anti-desperdício (teto de esforço) |
 | **Já vivida em** | [SDAAL](specification-driven-ai-abstraction-layer.md) (reuso × especialista) · `/meta:adopt` (adotar × fresh) |
 
 ## 1. O problema — transferir ou desenhar?

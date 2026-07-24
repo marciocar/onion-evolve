@@ -1,7 +1,7 @@
 # Doutrina de Modernização do Onion
 
 > **Versão**: 1.0.0 | **Última atualização**: 2026-06-13 | **Categoria**: Conceitos
-> Método reutilizável para evoluir o Sistema Onion com mais assertividade, menos peso e orquestração moderna — preservando as invariantes constitucionais. Extraído do **piloto git** (jun/2026) e validado contra a [Baseline de V&V](../../analysis/onion-vv-baseline-2026-06.md) (a retrospectiva T3.2 do piloto, que corroborou o método, foi removida na curadoria de 2026-06-14 — recuperável via git history).
+> Método reutilizável para evoluir o Sistema Onion com mais assertividade, menos peso e orquestração moderna — preservando as invariantes constitucionais. Extraído do **piloto git** (jun/2026) e validado contra a baseline de V&V `onion-vv-baseline-2026-06.md` — interna do core: o estado "antes" do framework (inventário de tamanhos de agentes/comandos), linha de base para medir o "depois" da modernização; a retrospectiva T3.2 do piloto, que corroborou o método, foi removida na curadoria de 2026-06-14 (recuperável via git history).
 
 ---
 
@@ -182,6 +182,6 @@ A serem modernizados em iterações seguintes aplicando esta doutrina (cada um e
 - [SDAAL — padrão de adapter](specification-driven-ai-abstraction-layer.md)
 - [Agent Orchestration — 6 padrões canônicos](agent-orchestration.md)
 - Meta-specs (constituição): [commands.md](../../meta-specs/commands.md) · [architecture.md](../../meta-specs/architecture.md) · [integrations.md](../../meta-specs/integrations.md)
-- [Baseline de V&V — jun/2026](../../analysis/onion-vv-baseline-2026-06.md) (auditoria manual que `/meta:evolve` automatiza)
+- Baseline de V&V — jun/2026: `onion-vv-baseline-2026-06.md` (interno do core — a auditoria manual que `/meta:evolve` automatiza)
 - Adapters de referência: [`utils/task-manager/`](../../../.claude/utils/task-manager/README.md) · [`utils/forge/`](../../../.claude/utils/forge/README.md)
 - Motor GitFlow (worked example): [gitflow-patterns.md](../frameworks/gitflow-patterns.md)

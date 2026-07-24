@@ -3,7 +3,9 @@
 > **Versão**: 1.0.0 | **Última atualização**: 2026-07-05 | **Camada**: THEORIES (fiel à fonte — zero Onion)
 > Catálogo fiel da base de Autorregulação da Aprendizagem que o PLEA parcimoniza, mais a
 > evidência empírica recente sobre IA como andaime — **como está na literatura**, sem derivações.
-> Vereditos e verbatims: [onion-research-srl-plea-2026-07.md](../../../analysis/onion-research-srl-plea-2026-07.md).
+> Vereditos e verbatims: `onion-research-srl-plea-2026-07.md` (pesquisa interna do core) — deep-research
+> multi-fonte (25 fontes, 24 claims confirmados / 1 refutado → 11 achados) com verificação adversarial
+> de 3 votos por alegação; é a fonte dos vereditos e verbatims que esta camada cataloga fielmente.
 
 ---
 

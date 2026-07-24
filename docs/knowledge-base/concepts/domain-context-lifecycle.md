@@ -1,7 +1,7 @@
 # Ciclo de Vida do Contexto de Domínio
 
 > **Versão**: 1.0.0 | **Última atualização**: 2026-06-16 | **Categoria**: Conceitos
-> Gramática operacional que trata cada contexto de domínio (`business-context/`, `technical-context/`, `compliance-context/`) como **SSOT viva com ciclo de vida CRUD+**, não como artefato snapshot gerado uma única vez. Fundamenta a regra L0 em [architecture.md](../../meta-specs/architecture.md) e a decisão em [onion-adr-domain-context-lifecycle-2026-06.md](../../analysis/onion-adr-domain-context-lifecycle-2026-06.md).
+> Gramática operacional que trata cada contexto de domínio (`business-context/`, `technical-context/`, `compliance-context/`) como **SSOT viva com ciclo de vida CRUD+**, não como artefato snapshot gerado uma única vez. Fundamenta a regra L0 em [architecture.md](../../meta-specs/architecture.md) e a decisão em `onion-adr-domain-context-lifecycle-2026-06.md` (ADR interno do core) — **em síntese:** ratifica que cada contexto de domínio é uma SSOT viva com ciclo CRUD+, não um snapshot gerado uma vez; a geração é só o primeiro tick e a fase *Manage* (validar/remover-stale/pesar-por-frescor) é operação de primeira classe.
 
 ---
 

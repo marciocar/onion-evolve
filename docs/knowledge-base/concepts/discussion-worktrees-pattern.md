@@ -18,7 +18,7 @@ date: 2026-07-11
 | **Categoria** | Concepts |
 | **Aplicação** | Explorar N temas do Onion em paralelo, sem misturar assuntos e sem "surpreender" o core |
 | **Estende** | [parallel-work-worktrees-pattern](parallel-work-worktrees-pattern.md) (a mecânica; este é o modo exploração) |
-| **KBs irmãs** | [worktree-convention-2026](../../evolution/worktree-convention-2026.md) (layout SSOT) · [worklog-protocol](worklog-protocol.md) |
+| **KBs irmãs** | `worktree-convention-2026.md` (interno do core — SSOT de layout: `~/worktrees/<repo>/<branch-slug>`, um-escritor-por-escopo W3, caveat do farol por-working-tree) · [worklog-protocol](worklog-protocol.md) |
 
 > É o `parallel-work-worktrees` **+ um contrato de isolamento + modo exploração**. Onde aquele entrega (feature
 > → PR), este **pensa** (tema → notas/decisão) e só toca o core **sob pedido explícito** do maestro.
@@ -68,7 +68,7 @@ Quatro invariantes — é o que separa "discussão" de "frente de trabalho":
 Cada worktree abre com um `docs/discussions/<slug>/SEED.md`: **enquadramento** (o que é o tema) · **por que
 importa pro Onion** · **perguntas de partida** · **conexões** com o que já existe (pra a sessão nova começar
 aterrada, não do zero). O seed é o análogo do `STATE.md` do worklog, mas para *explorar* em vez de *executar*.
-Template: [`docs/discussions/_template/SEED.md`](../../discussions/_template/SEED.md).
+Template: `docs/discussions/_template/SEED.md` (interno do core) — enquadramento + o bloco Tier-0 no frontmatter (`phase`/`next_action`/`scope_globs`/`objective_tags`) que o mapa da constelação consome.
 
 ### 4.1 Bloco Tier-0 do SEED (o que o mapa da constelação consome)
 
@@ -99,7 +99,9 @@ entrega, **merge não é o objetivo** — o objetivo é *pensar até clarear*.
 
 ## 6. Encaixe no branch-roles (faceta `exploration`)
 
-No SDAAL de [branch-roles](../../analysis/onion-adr-branch-roles-sdaal-2026-07.md), `discuss/*` é uma **faceta
+No SDAAL de branch-roles (`onion-adr-branch-roles-sdaal-2026-07.md`, interno do core — o ADR que modela "qual
+branch cumpre qual papel" como SDAAL resolvido por-projeto, de 1 papel para N por faceta, sem impor
+convenção), `discuss/*` é uma **faceta
 nova, `exploration`**: uma linha que existe pra **pensar, não pra versão nem entrega**. Distinta de `flow`
 (integração), `environment` (deploy) e `lineage` (cliente). Não é protegida, não é base de PR, não sincroniza
 com `main` — é estado de pensamento do maestro.
@@ -108,7 +110,7 @@ com `main` — é estado de pensamento do maestro.
 
 Um bootstrap (ex.: `fleet-up.sh`) sobe uma sessão tmux com **uma janela por worktree** (discussão + trabalho),
 cada uma no diretório certo. O maestro dá `attach`, navega (`Ctrl-b w`) e roda `claude` na frente que quiser.
-Ver [remote-parallel-operation](../../onion/remote-parallel-operation.md) para a operação remota (tmux/mosh).
+Ver `remote-parallel-operation.md` (interno do core) para a operação remota — as duas camadas transporte (`mosh`/`ssh`) × persistência (`tmux` sempre), com a dobradinha `mosh`+`tmux` como default.
 
 ## 8. Quando NÃO usar
 

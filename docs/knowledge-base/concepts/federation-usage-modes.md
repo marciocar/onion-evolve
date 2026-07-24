@@ -16,8 +16,9 @@ related:
 
 > **O que esta KB resolve:** o papel da federação muda conforme o **tipo de uso** do Onion — mas os eixos
 > que definem "tipo de uso" viviam espalhados em 4 artefatos que nunca foram cruzados
-> ([adoption-lifecycle](../../applying/adoption-lifecycle.md), [RFC-0003](../../evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md),
-> [cartão de co-evolução](../../onion/co-evolution-reference.md), [members.yaml](../../evolution/federation/members.yaml)).
+> (`adoption-lifecycle.md`, `rfc-0003-federated-identity-collective-intelligence.md`,
+> `co-evolution-reference.md` e `members.yaml` — todos internos do core; este último é o **SSOT versionado
+> dos membros da federação** (tiers, pins, trust). A dimensão dos outros três está em §Referências).
 > Esta KB é a **reconciliação canônica**: nomeia os eixos, cruza-os numa matriz única e consolida os
 > gatilhos de graduação com o estado real verificado (auditoria orquestrada de 2026-07-01,
 > run `wf_48c138b0-5f6`).
@@ -29,8 +30,8 @@ related:
 | **A. Cenário do alvo** | `greenfield` · `legacy` · `regulated` | `--mode` do `/meta:adopt`; campo `mode:` do members.yaml | o **estado do repo** no momento da adoção |
 | **B. Modelo de controle** | `install` (vendorizado, durável) · `in-place` (efêmero) | flag `--in-place` do adopt | **como** o Onion vive no alvo |
 | **C. Tier de federação** | `source` (T0) · `hub` (T1) · `consumer` (T2) · `standalone` (T3) | `role:` do members.yaml (RFC-0003 §2.1) | a **posição na rede** pós-adoção |
-| **D. Operação de co-evolução** | quem-executa × direção-do-dado | [cartão de referência](../../onion/co-evolution-reference.md) | **cada comando** individual |
-| **E. Topologia de sessão** | W1 source-por-path · W2 sessão-do-alvo · W3 duas-sessões-mesmo-repo · W4 par local · W5 remoto · W6 responder-gated · W7 agendada (🔴 rejeitada como base) | [ADR work-models](../../analysis/onion-adr-work-models-session-topologies-2026-07.md) | **quem trabalha onde, a partir de onde** |
+| **D. Operação de co-evolução** | quem-executa × direção-do-dado | `co-evolution-reference.md` (interno do core) | **cada comando** individual |
+| **E. Topologia de sessão** | W1 source-por-path · W2 sessão-do-alvo · W3 duas-sessões-mesmo-repo · W4 par local · W5 remoto · W6 responder-gated · W7 agendada (🔴 rejeitada como base) | `onion-adr-work-models-session-topologies-2026-07.md` (ADR interno do core) | **quem trabalha onde, a partir de onde** |
 
 **Regra de reconciliação:**
 
@@ -42,13 +43,13 @@ related:
   O cruzamento `regulated` × classificação de dados tem doutrina própria (RFC-0003 §2.2, decisão
   2026-07-02): default **`protected`**, promoção a `public`/`collective` só com revisão humana explícita.
 
-### 1.0 Eixo E — as sete topologias de sessão (resumo; canônico no [ADR](../../analysis/onion-adr-work-models-session-topologies-2026-07.md))
+### 1.0 Eixo E — as sete topologias de sessão (resumo; canônico no ADR `onion-adr-work-models-session-topologies-2026-07.md`, interno do core — **em síntese:** institui o Eixo E das topologias W1-W7 "quem trabalha onde, a partir de onde", decide **W6 responder-gated** como modelo e **rejeita W7 sessão-agendada** como base soberana; ACEITO 2026-07-02)
 
 | W | Topologia | Uma linha |
 |---|-----------|-----------|
 | W1 | Source-driven por path | sessão do core opera o alvo por path (adopt por-path, `--in-place`, ponta adormecida com commit isolado + log) |
 | W2 | Sessão do alvo (canônico) | um escritor por repo (I3); o core **indica**, a instância executa |
-| W3 | Duas sessões, mesmo repo | handoff por worktree (escopo) OU sala-de-design/sala-de-obra (função); layout dos worktrees: [worktree-convention](../../evolution/worktree-convention-2026.md) |
+| W3 | Duas sessões, mesmo repo | handoff por worktree (escopo) OU sala-de-design/sala-de-obra (função); layout dos worktrees: `worktree-convention-2026.md` (interno do core — fixa localização/nomenclatura `~/worktrees/<repo>/<branch-slug>` dos worktrees duráveis do maestro) |
 | W4 | Par local (1 máquina) | carteiro-local automatiza transporte+notificação (`co-deliver`/`co-relay`) |
 | W5 | Membro remoto | git-async mediado pelo maestro (sem carteiro-local) |
 | W6 | **Responder-gated** | a sessão do destino **propõe rascunho** ao ver 📬/📥/⏰; maestro confirma (ato 3 = propor→confirmar) |
@@ -56,7 +57,11 @@ related:
 
 As topologias **compõem** (W4 pode conter W3 em cada repo; W6 opera sobre W2/W4/W5). O **gatilho
 invariável de reflexão** (⏰ migalha vencida no boot + protocolo de re-teste no `/meta:diary`) é parte
-do eixo E — decidido com pesquisa fundamentada ([relatório](../../analysis/onion-work-models-research-2026-07.md)).
+do eixo E — decidido com pesquisa fundamentada (`onion-work-models-research-2026-07.md`, interno do core —
+deep-research de 24 claims verificados 3-votos: vendor scheduled-agents são incompatíveis como base
+soberana, os padrões repo-nativos — inbox commitado, breadcrumbs versionados, consolidação lazy por sessão —
+são a família do Onion, e o risco nº1 documentado é a reflexão falsa persistida, o que exige gate humano na
+absorção).
 
 ### 1.1 Os três namespaces de "role" (fonte de metade da confusão)
 
@@ -71,7 +76,7 @@ como eixos separados até esta KB:
 
 > Regra prática: **contrato fala producer/consumers; rede fala tier; stamp fala source/adopted.**
 > Um doc que use `producer` para membro (pré-RFC-0003) está desatualizado — ver backlog da
-> [auditoria 2026-07-01](../../analysis/onion-federation-audit-2026-07-01.md).
+> auditoria de 2026-07-01 (`onion-federation-audit-2026-07-01.md`, interno do core).
 
 ## 2. A matriz canônica — tier × adoção × maquinaria
 
@@ -102,7 +107,8 @@ Legenda (herdada do adoption-lifecycle): 🟢 implementado/vivo · 🟠 parcial/
   membros. É o tier default para um novo adotante sem ambição de rede própria.
 - **Membro remoto (outra máquina):** qualquer tier T1/T3 **sem** `local_path` — os atalhos Carteiro-local
   (`co-deliver`/`co-relay`) recusam operar e a comunicação vira git-async mediada pelo maestro
-  ([onboarding-remote-member](../../evolution/federation/onboarding-remote-member.md)).
+  (`onboarding-remote-member.md`, interno do core — guia de como federar um onion que vive em outra máquina:
+  sem filesystem compartilhado os atalhos Carteiro-local não operam e a troca vira git-async mediada pelo maestro).
 - **in-place:** sessão efêmera de inspeção/operação. Sem stamp, sem canais, sem tier. Se o repo precisar
   entrar na rede, o caminho é re-adotar com install.
 
@@ -113,14 +119,14 @@ Consolidação dos gatilhos hoje espalhados em ≥4 docs, com o **estado real** 
 
 | Graduação | Gatilho | Fonte canônica | Estado real (2026-07-01) |
 |---|---|---|---|
-| Doc-bridge → **Federação formal** (contratos + publish/check/status/rollback) | contrato que pode quebrar consumers **OU** ≥3-5 adotantes | RFC-0001 §gatilho; [ADR ledger](../../analysis/onion-adr-ledger-format-location-2026-06.md) | 🔒 corretamente desligada (1 adotante, 0 contratos); núcleo mecânico saudável (scripts + fixtures ✓) |
+| Doc-bridge → **Federação formal** (contratos + publish/check/status/rollback) | contrato que pode quebrar consumers **OU** ≥3-5 adotantes | RFC-0001 §gatilho; ADR `onion-adr-ledger-format-location-2026-06.md` (interno do core — decide manter o ledger em **markdown** (repo-neutro fica gated); o que resolve o atrito do transporte manual não é trocar formato/localização e sim **automatizar o transporte**) | 🔒 corretamente desligada (1 adotante, 0 contratos); núcleo mecânico saudável (scripts + fixtures ✓) |
 | **F1 diary** → F2 | 10 entradas reais + 1 semana de dogfood | RFC-0003 §4 | 🟠 comando existe; **0 entradas** — gate pendente |
 | F2 **personality-sync** → F3 | híbrido (decisão 2026-07-02): mecânico (personality.md gerado pelo sync, 5 seções preenchidas) + confirmação do maestro | RFC-0003 §4 | 🟠 comando não existe; campos semeados à mão no members.yaml (marcados como seed) |
 | F3 **trust + co-relay peer** → F4 | 1º relay peer real bem-sucedido | RFC-0003 §4 | 🟠 infra construída **antecipadamente** (antes do gate F1); parsing do bloco `trust:` com bug; `--to peer` não existe |
 | F4 **synthesize-collective** | 3+ instâncias com diários maduros (90+ dias) | RFC-0003 §4 | 🔒 não existe (correto) |
 | F5 **market-scan** | híbrido (decisão 2026-07-02): mecânico (≥1 entrada `market-signal` no diário OU pedido em `inbox/`) + confirmação do maestro | RFC-0003 §4 | 🔒 não existe (correto) |
-| Carteiro-local → **Carteiro distribuído** (transporte automático entre máquinas) | mesmo gatilho da graduação formal / membro remoto real | [ADR ledger §3.3](../../analysis/onion-adr-ledger-format-location-2026-06.md) | 🟢 local entregue (`co-deliver`/`co-relay`); distribuído 🔒 a-desenhar (correto) |
-| **Agent Card A2A** (projeção one-way do members.yaml) | 1º consumer não-Onion **OU** necessidade nomeada de interop | [ADR A2A](../../analysis/onion-federation-adr-a2a-format-interop-2026-06.md) | 🔒 não construído (correto — "não é dívida ativa") |
+| Carteiro-local → **Carteiro distribuído** (transporte automático entre máquinas) | mesmo gatilho da graduação formal / membro remoto real | `onion-adr-ledger-format-location-2026-06.md` §3.3 (interno do core) | 🟢 local entregue (`co-deliver`/`co-relay`); distribuído 🔒 a-desenhar (correto) |
+| **Agent Card A2A** (projeção one-way do members.yaml) | 1º consumer não-Onion **OU** necessidade nomeada de interop | ADR `onion-federation-adr-a2a-format-interop-2026-06.md` (interno do core — parte a linha vermelha A2A em duas: **runtime A2A proibido**; **Agent Card como projeção one-way** permitido em princípio, implementação diferida até gatilho) | 🔒 não construído (correto — "não é dívida ativa") |
 
 ## 5. Invariantes que atravessam todos os tipos de uso
 
@@ -137,8 +143,8 @@ Consolidação dos gatilhos hoje espalhados em ≥4 docs, com o **estado real** 
 
 ## Referências
 
-- Auditoria que verificou o estado real: [onion-federation-audit-2026-07-01.md](../../analysis/onion-federation-audit-2026-07-01.md)
+- **Auditoria que verificou o estado real:** `onion-federation-audit-2026-07-01.md` (interno do core). *Dimensão:* auditoria orquestrada (run `wf_48c138b0-5f6`) do estado real vs RFC-0003 — núcleo mecânico saudável, mas achou bug no `trust-topology-check`, guard de identidade do adopt estruturalmente vazio e drift dos 3 namespaces de "role".
 - Federação formal (contratos, ledger): [multi-repo-federation.md](multi-repo-federation.md)
-- Ciclo de vida da adoção (eixos A+B): [adoption-lifecycle.md](../../applying/adoption-lifecycle.md)
-- Tiers e identidade federada: [RFC-0003](../../evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md)
-- Referência rápida de comandos (eixo D): [co-evolution-reference.md](../../onion/co-evolution-reference.md)
+- **Ciclo de vida da adoção (eixos A+B):** `adoption-lifecycle.md` (interno do core). *Dimensão:* cruza as operações do ciclo (adoção→update→revisão→sincronização) com os três modos (greenfield/legacy/regulated), marcando o que é 🟢 real vs 🟠 a-desenhar.
+- **Tiers e identidade federada:** `rfc-0003-federated-identity-collective-intelligence.md` (interno do core). *Dimensão:* define o diário por instância, a hierarquia de tiers T0-T3, a classificação de dados (private→collective), a topologia de confiança e a arquitetura Trust SDAAL; aceita em 2026-07-02.
+- **Referência rápida de comandos (eixo D):** `co-evolution-reference.md` (interno do core). *Dimensão:* o cartão dos comandos de co-evolução — quem-executa × direção-do-dado (downstream/upstream/handoff) por comando.

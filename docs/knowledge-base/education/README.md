@@ -1,7 +1,9 @@
 # 🎓 Knowledge Bases — `education/` (vertical educacional)
 
-Camada de conhecimento da vertical **`onion-education`** (F0 aberto 2026-07-05; rampa e
-diretrizes no [ADR](../../analysis/onion-adr-education-vertical-2026-07.md)).
+Camada de conhecimento da vertical **`onion-education`** (F0 aberto 2026-07-05; rampa e diretrizes
+no `onion-adr-education-vertical-2026-07.md` — ADR interno do core, que funda a vertical com rampa
+gated: só a camada de conhecimento em 2 camadas é construída agora, com as diretrizes vinculantes
+derivadas da evidência; agentes/comandos/plugin ficam gated até o uso pedir).
 
 ## A regra das DUAS CAMADAS (fronteira física — decisão do maestro, 2026-07-05)
 
@@ -26,6 +28,6 @@ derivações · uma ponte refutada não contamina o catálogo teórico.
 |---|---|---|
 | [theories/plea-rosario.md](theories/plea-rosario.md) | 1 | O modelo PLEA de Pedro Rosário + intervenções narrativas (Testas→Gervásio→Sarilhos) |
 | [theories/srl-zimmerman.md](theories/srl-zimmerman.md) | 1 | Base SRL (Zimmerman/Bandura/Winne&Hadwin) + evidência empírica IA-como-andaime |
-| *(futuro)* `theories/hegel-system.md` | 1 | Catálogo do sistema hegeliano (Q0a-e da [semente](../../analysis/onion-research-seed-hegel-dialectics-2026-07.md)) — quando a pesquisa rodar |
+| *(futuro)* `theories/hegel-system.md` | 1 | Catálogo do sistema hegeliano (Q0a-e da semente `onion-research-seed-hegel-dialectics-2026-07.md`, interna do core — hipótese Aufhebung ↔ append-mostly do KG, deep-research gated) — quando a pesquisa rodar |
 | [applications/onion-srl-bridges.md](applications/onion-srl-bridges.md) | 2 | Pontes Onion↔SRL/PLEA (analogias PLAUSÍVEL) + lacuna volitiva |
 | [applications/educational-design-guidelines.md](applications/educational-design-guidelines.md) | 2 | 7 diretrizes de desenho vinculantes (derivadas da evidência) |

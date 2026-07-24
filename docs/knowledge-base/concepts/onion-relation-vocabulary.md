@@ -16,8 +16,12 @@ updated: 2026-07-04
 >
 > **Por quê:** dar nomes estáveis às relações para que (a) consultas determinísticas (impacto, órfãos,
 > caminho) sejam confiáveis e (b) o Transformer navegue o grafo para achar soluções/caminhos e orquestrar —
-> a serviço do **dogfood**. Decisão: [onion-adr-capability-contract-2026-06](../../analysis/onion-adr-capability-contract-2026-06.md)
-> · Pesquisa/contexto: [onion-research-self-describing-components-2026-06](../../analysis/onion-research-self-describing-components-2026-06.md).
+> a serviço do **dogfood**. Decisão: `onion-adr-capability-contract-2026-06.md` (ADR interno do core — cada
+> componente carrega um Capability Contract auto-descritivo `provides`/`requires`/`loads`/`conformance`, e a
+> visão-de-fora é **composta** dos contratos, nunca um registry central; rejeição explícita do registry).
+> · Pesquisa/contexto: `onion-research-self-describing-components-2026-06.md` (interno do core — mapeia as
+> famílias progressive disclosure / Information Expert / self-evolving agents / conformance tiers e confirma
+> que o Onion já tem o substrato: `inventory.md` gerado do filesystem é a visão-de-fora composta da de-dentro).
 
 ## Classes
 
@@ -62,7 +66,10 @@ Cada predicado: **domínio → alcance** + onde já é declarado.
 ## Dois domínios de orquestração (desambiguação)
 
 "Orquestração" é **sobrecarregada** no Onion — significa duas coisas distintas. O grafo as separa por
-predicado e canal; esta tabela fixa a fronteira. Diagnóstico completo: [onion-orchestration-ontology-2026-06](../../analysis/onion-orchestration-ontology-2026-06.md).
+predicado e canal; esta tabela fixa a fronteira. Diagnóstico completo: `onion-orchestration-ontology-2026-06.md`
+(interno do core) — o diagnóstico que separou **orquestração-de-evolução** (cross-repo, assíncrona) de
+**orquestração-de-workers** (intra-repo, síncrona) como duas ontologias ortogonais, e aposentou os apelidos
+`frota`/`fleet` em favor do vocabulário canônico da indústria (orchestrator-worker/fan-out/fan-in).
 
 | Eixo | **Orquestração-de-evolução** | **Orquestração-de-workers** |
 |---|---|---|
@@ -86,7 +93,7 @@ ser implementado por* uma **forma** de orquestração-de-workers — sem que uma
 O Onion **adotou o vocabulário canônico** da indústria de orquestração multi-agente — os apelidos PT/EN
 **`frota`/`fleet` foram aposentados** em favor de `orquestração` / `orchestrator-worker` / `workers`.
 Tabela longa + fontes + a decisão de migração:
-[onion-orchestration-ontology-2026-06](../../analysis/onion-orchestration-ontology-2026-06.md) §5.
+`onion-orchestration-ontology-2026-06.md` §5 (interno do core).
 
 | Conceito Onion | Canônico da indústria |
 |---|---|

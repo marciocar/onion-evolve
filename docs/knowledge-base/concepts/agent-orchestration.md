@@ -35,7 +35,7 @@ source: "https://platform.claude.com/docs/en/about-claude/models/introducing-cla
 **Relacionados no Onion:**
 
 - [`ai-agent-design-patterns.md`](ai-agent-design-patterns.md) — KB irmã (design de agentes)
-- [`docs/analysis/onion-agent-teams-evaluation-2026-06.md`](../../analysis/onion-agent-teams-evaluation-2026-06.md) — decisão de framework sobre Agent Teams (opt-in, não padrão)
+- `onion-agent-teams-evaluation-2026-06.md` (análise interna do core) — decisão de framework sobre Agent Teams. *Dimensão:* Agent Teams **não** vira padrão do Onion nem obriga rever os padrões vigentes (sessões faseadas, Workflow/onion-orchestration); seu lugar canônico é um **terceiro modo de orquestração opt-in**, atrás de detecção de capacidade com fallback gracioso (mesmo espírito SDAAL dos adapters). Ganho real só num nicho: **negociação viva peer-a-peer** (ex.: front e back acertando um contrato de API em runtime).
 
 ---
 
@@ -83,7 +83,7 @@ Orquestração **não é default**. Ela paga overhead de coordenação, multipli
 
 ## 🔀 Dois Substratos de Orquestração: Workflow vs Agent Teams
 
-> **Status (jun/2026):** Agent Teams é **experimental**, atrás da flag `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (off por default). O substrato **default e portável** da orquestração Onion é a ferramenta **Workflow**. Esta seção fixa a fronteira; a decisão de framework está registrada em [`docs/analysis/onion-agent-teams-evaluation-2026-06.md`](../../analysis/onion-agent-teams-evaluation-2026-06.md).
+> **Status (jun/2026):** Agent Teams é **experimental**, atrás da flag `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` (off por default). O substrato **default e portável** da orquestração Onion é a ferramenta **Workflow**. Esta seção fixa a fronteira; a decisão de framework está registrada em `onion-agent-teams-evaluation-2026-06.md` (análise interna do core).
 
 Decididos a usar uma orquestração (acima), restam **dois substratos** com modelos de coordenação opostos. Não competem — cobrem **shapes de trabalho diferentes**:
 
@@ -122,7 +122,7 @@ Agent Teams entra como **terceiro modo opt-in**, nunca requisito duro — mesmo 
 - **Fallback gracioso:** flag off → degrade para Workflow (ou serial), avisando em pt-BR; **nunca** assumir a flag ligada.
 - **Portabilidade preservada:** o Onion é template instalável em **qualquer** projeto; não pode depender de feature experimental gated → o default permanece Workflow.
 - **Mesma invariante arquitetural:** orquestre no **nível principal** (skill/comando) — o "lead" do time é a própria sessão principal. **Nunca** dentro de um agente (§4.2; ver [Aplicação no Onion](#-aplicação-no-onion)).
-- **Escopo é DENTRO de um repo, nunca cross-repo.** Agent Teams coordena dentro de **uma sessão/worktree** — **não há suporte multi-repo nativo** (limitação oficial, jun/2026). Coordenação multi-repo na prática se faz por **git + file-lock** (o próprio caso do compilador C da Anthropic — *Building a C compiler with a team of parallel Claudes*), não por Agent Teams. Logo, **Agent Teams ≠ co-evolução entre repos** — esta vive na camada git-async (ledger + doc-bridge), com a linha vermelha do A2A-runtime cross-repo intacta. Ver [`onion-adr-comms-transport-vs-execution-2026-06.md`](../../analysis/onion-adr-comms-transport-vs-execution-2026-06.md).
+- **Escopo é DENTRO de um repo, nunca cross-repo.** Agent Teams coordena dentro de **uma sessão/worktree** — **não há suporte multi-repo nativo** (limitação oficial, jun/2026). Coordenação multi-repo na prática se faz por **git + file-lock** (o próprio caso do compilador C da Anthropic — *Building a C compiler with a team of parallel Claudes*), não por Agent Teams. Logo, **Agent Teams ≠ co-evolução entre repos** — esta vive na camada git-async (ledger + doc-bridge), com a linha vermelha do A2A-runtime cross-repo intacta. Ver `onion-adr-comms-transport-vs-execution-2026-06.md` (ADR interno do core) — **em síntese:** o eixo de risco da comunicação cross-repo não é "A2A sim/não" e sim **três atos** — transportar e notificar (determinísticos, automatizáveis) vs **ler+interpretar+executar** (gate humano obrigatório); a linha vermelha do A2A-runtime permanece pela razão certa (evitar auto-execução distribuída + a atomicidade multi-repo inexistente), não por "agentes não podem se falar".
 
 > **Postura da Anthropic (fonte oficial):** autonomia **com salvaguardas**, não launch-and-forget —
 > *stopping conditions*, sandbox + guardrails, e gates por **classificador de risco** (Claude Code
@@ -455,7 +455,7 @@ const branches = (await parallel([
 > irreversível. **Transportar** e **notificar** (mover resultado, avisar) são
 > determinísticos e automatizáveis; **executar** o passo crítico é gate humano. A2A é
 > ortogonal ao risco. Eixo completo (co-evolução e orquestração) em
-> [`onion-adr-comms-transport-vs-execution-2026-06.md`](../../analysis/onion-adr-comms-transport-vs-execution-2026-06.md).
+> `onion-adr-comms-transport-vs-execution-2026-06.md` (ADR interno do core).
 
 A orquestração **propõe**; o humano **confirma** o passo crítico. Exija **gate humano**
 quando:
@@ -509,7 +509,7 @@ Logo, a camada de orquestração mora em **skill + comando**, **nunca** num agen
 
 > **Nunca crie um agente `worker-orchestrator`.** Isso violaria §4.2 e esconderia a orquestração no lugar mais caro. A orquestração é responsabilidade do nível principal.
 
-> **Locus ≠ forma — hierarquia NÃO é proibida.** O que se proíbe é o **locus** (orquestração *dentro* de um agente). A **forma do grafo** é livre: plano (default) ou **árvore** (workers agrupados sob nós sumarizadores — *aggregator/sub-synthesizer*) é **legítima**, desde que **composta no nível principal** (`parallel`/`pipeline` aninhados), nunca por um agente que orquestra. Não infira "hierarquia = proibida" do silêncio: o proibido é a inversão de controle (worker dirigindo a orquestração), não a topologia. Quando usar árvore (síntese por LLM que estoura 1 agente) é caso-limite estreito — ver [ADR de topologia](../../analysis/onion-orchestration-topology-adr-2026-06-21.md). É a mesma lógica da [economia de motores](onion-engine-economy.md): o fan-in determinístico em JS vence por default; o motor LLM (nó sumarizador) entra só por necessidade.
+> **Locus ≠ forma — hierarquia NÃO é proibida.** O que se proíbe é o **locus** (orquestração *dentro* de um agente). A **forma do grafo** é livre: plano (default) ou **árvore** (workers agrupados sob nós sumarizadores — *aggregator/sub-synthesizer*) é **legítima**, desde que **composta no nível principal** (`parallel`/`pipeline` aninhados), nunca por um agente que orquestra. Não infira "hierarquia = proibida" do silêncio: o proibido é a inversão de controle (worker dirigindo a orquestração), não a topologia. Quando usar árvore (síntese por LLM que estoura 1 agente) é caso-limite estreito — ver `onion-orchestration-topology-adr-2026-06-21.md` (ADR interno do core) — **em síntese:** separa dois eixos que se confundem — o **locus** da orquestração (sempre no nível principal — invariante) e a **forma do grafo** (plano por padrão; árvore com nós sumarizadores só sob gatilho); a invariante restringe o locus, não a forma, então hierarquia composta no nível principal é legítima e o proibido é a orquestração migrar para dentro de um worker. É a mesma lógica da [economia de motores](onion-engine-economy.md): o fan-in determinístico em JS vence por default; o motor LLM (nó sumarizador) entra só por necessidade.
 
 ### Cross-links
 

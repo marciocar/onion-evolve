@@ -431,8 +431,9 @@ O **Task Manager Abstraction** (`.claude/utils/task-manager/`) é a **implementa
 > **O eixo abstraído varia; o contrato não.** O `adapter` não precisa ser um *provider externo*. O SDAAL já
 > generaliza para **papéis**: `trust` (`.claude/utils/trust/`) tem adapters por **tier** (source/hub/standalone/
 > consumer); `federation-transport`, por **via** (git-async/local/a2a-live). E o design-alvo **`branch-roles`**
-> (ADR [branch-roles-sdaal](../../analysis/onion-adr-branch-roles-sdaal-2026-07.md),
-> `status: proposto/gated`) abstrai **papéis de branch/ambiente** — o adapter é a **topologia de branching**
+> (ADR `onion-adr-branch-roles-sdaal-2026-07.md`, interno do core — `status: proposto/gated`, design-only:
+> de **um** papel `integration` para **N** papéis de branch por-projeto, adapter = topologia de branching,
+> código diferido ao gatilho) abstrai **papéis de branch/ambiente** — o adapter é a **topologia de branching**
 > (gitflow/trunk-based/multi-lineage/none), e cada projeto declara qual branch cumpre qual papel
 > (`integration`/`staging`/`production`/…). Provider externo, tier, topologia — o eixo muda; **interface +
 > factory + adapters permanecem**.

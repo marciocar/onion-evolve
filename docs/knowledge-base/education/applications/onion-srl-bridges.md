@@ -48,12 +48,21 @@ ciclo · priorização do backlog como orientação-a-metas.
 
 ## 4. Abertos que travam derivações (não construir em cima)
 
-- **Q3** (prompts móveis): sem lastro → eixo `messenger` pedagógico segue **gated**
-  ([parecer whatsapp §4-C](../../../analysis/onion-parecer-whatsapp-sender-2026-07.md)).
+- **Q3** (prompts móveis): sem lastro → eixo `messenger` pedagógico segue **gated** —
+  `onion-parecer-whatsapp-sender-2026-07.md` (parecer interno do core, §4-C): a *capacidade* de
+  mensageria (inclusive prompts autorregulatórios/pedagógicos) é reconhecida, mas o eixo SDAAL só
+  nasce quando o gatilho real disparar (demanda em 2+ contextos), à moda Onion (LLM-as-VM, provider
+  oficial primeiro) — nunca código vendorizado no core.
 - **Q5** (LLM-as-VM vs ACT-R/SOAR): originalidade da tese **não-avaliada**.
 
 ## 5. Relações
 
 - Diretrizes de desenho que estas pontes informam: [educational-design-guidelines.md](educational-design-guidelines.md)
-- ADR da vertical: [onion-adr-education-vertical-2026-07.md](../../../analysis/onion-adr-education-vertical-2026-07.md)
-- Analogias filosóficas irmãs (semente): [onion-research-seed-hegel-dialectics-2026-07.md](../../../analysis/onion-research-seed-hegel-dialectics-2026-07.md)
+- ADR da vertical: `onion-adr-education-vertical-2026-07.md` (ADR interno do core). *Dimensão:* funda
+  a vertical `onion-education` com rampa gated — só a camada de conhecimento (2 camadas:
+  theories/applications) é construída agora; agentes/comandos/plugin ficam gated até o uso pedir —
+  e fixa as diretrizes vinculantes derivadas da evidência; a vertical é **capacidade**, não 4ª dimensão peer.
+- Analogias filosóficas irmãs (semente): `onion-research-seed-hegel-dialectics-2026-07.md` (semente de
+  pesquisa interna do core). *Dimensão:* hipótese de que a dialética hegeliana (Aufhebung =
+  negar+conservar+elevar) descreve formalmente o append-mostly do KG (claim refutado permanece,
+  superado-preservando); catálogo do sistema + Q1-Q5, com Q5 como crivo anti-decoração. Deep-research gated.
