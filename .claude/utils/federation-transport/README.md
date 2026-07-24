@@ -16,7 +16,7 @@ A *spec* (interface) define **o quê**; o *adapter* define **o como**; `FEDERATI
 |-----|-------|--------|---------|
 | **`git-async`** (default) | doc-bridge: `CHANGELOG` + `outbox/` + entrega-sem-commit; assíncrono, maestro transporta | ✅ em uso | [`adapters/git-async.md`](adapters/git-async.md) |
 | **`local`** | carteiro same-machine: `co-deliver.sh`/`co-relay.sh` entregam untracked no repo vizinho | ✅ em uso | [`adapters/local.md`](adapters/local.md) |
-| **`a2a-live`** | endpoint A2A sobre o `onion-bridge` — só **sinais gated**, verificados pelo `a2a-verify` | ✅ **vivo (F2.2)** — 1º handshake real (um adotante multi-linhagem) em 2026-07-09 | [`adapters/a2a-live.md`](adapters/a2a-live.md) |
+| **`a2a-live`** | endpoint A2A sobre o `onion-bridge` — só **sinais gated**, verificados pelo `a2a-verify` | 🔒 **fundação viva, endpoint stub gated** — o gate de recepção (`a2a-verify`, 6 camadas) roda no core + 1º handshake regulado provado (2026-07-09); o endpoint/canal vivo é **stub** no `~/onion-bridge` (privado, gated) | [`adapters/a2a-live.md`](adapters/a2a-live.md) |
 
 ## Nomenclatura canônica — ATO vs VIA (fecha o sinal 2026-07-09)
 

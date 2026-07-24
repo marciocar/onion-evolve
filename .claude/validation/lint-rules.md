@@ -16,7 +16,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**43 regras** no total — **39 HARD**, **7 SOFT**.
+**44 regras** no total — **40 HARD**, **7 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -93,6 +93,7 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 32 | Página pública do grafo: números conferidos contra o mapa | HARD |
 | 42 | Gate de FRESCOR DOUTRINÁRIO, com catraca | HARD + SOFT |
 | 43 | Integridade do marcador kg: (proveniência virada p/ DENTRO) | HARD |
+| 44 | Integridade da escada de Automação Graduada | HARD |
 
 ## Federação
 

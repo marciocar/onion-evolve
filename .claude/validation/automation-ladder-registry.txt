@@ -1,0 +1,16 @@
+# SSOT do estado da Automação Graduada — a escada por CLASSE DE AÇÃO.
+# Guardado por ladder-integrity-check.sh (doutrina: graduated-automation-ladder.md).
+# formato:  <classe>|<degrau>|<promoted_by>
+#   degrau ∈ HUMAN | MONITORED | DYNAMIC | AUTO   (HUMAN = piso, não exige prova)
+#   promoted_by = caminho de evidência da promoção (um .kg.yaml / migalha / ADR), ou '-' em HUMAN
+#
+# REGRA DE OURO (a máxima do maestro): uma classe só sobe de degrau com ação PROVADA —
+# promoted_by tem que apontar para evidência ALCANÇÁVEL. Subir sem prova = HARD.
+# Hoje TODA classe está em HUMAN: a escada nasce silenciosa. Promover é ato deliberado, gated.
+#
+# Classes de ação (o ato-3 / execução — os candidatos a subir a escada):
+thread-conduction-merge|HUMAN|-
+a2a-accept-signal|HUMAN|-
+adopt-update-apply|HUMAN|-
+doctrine-correct-ingest|HUMAN|-
+co-evolve-triage-apply|HUMAN|-

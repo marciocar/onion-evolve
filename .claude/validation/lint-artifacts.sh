@@ -1583,6 +1583,25 @@ check_kg_born_marker() {
 }
 
 # ===========================================================================
+# REGRA 44 — Integridade da escada de Automação Graduada [HARD]
+#   Guarda a máxima do maestro "automação se conquista por ação provada":
+#   nenhuma classe de ação sobe de degrau (HUMAN→MONITORED→DYNAMIC→AUTO) sem
+#   gate de promoção ALCANÇÁVEL. Delega a ladder-integrity-check.sh (doutrina:
+#   graduated-automation-ladder.md). Nasce silencioso (tudo em HUMAN hoje).
+check_ladder_integrity() {
+  local helper="${SCRIPT_DIR}/ladder-integrity-check.sh"
+  [ -f "${helper}" ] || return 0
+  [ -n "${ONLY_PATH}" ] && return 0
+  local out sev tag path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    violation "${sev}" "${REPO_ROOT}/${path}" "[escada-automacao/${tag}] ${msg}"
+  done <<< "${out}"
+}
+
+# ===========================================================================
 # REGRA 32 — Página pública do grafo: números conferidos contra o mapa [HARD]
 #   A página /historia/grafo/ publica contagens do .kg.yaml em prosa e em
 #   BARRAS. Número no site é promessa: se o grafo cresce e a página não, ela
@@ -2110,6 +2129,7 @@ check_research_kg
 check_kg_provenance_coverage
 check_doctrine_freshness
 check_kg_born_marker
+check_ladder_integrity
 check_kg_view_sync
 check_site_graph_sync
 check_projection_safety

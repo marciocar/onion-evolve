@@ -1,0 +1,181 @@
+meta:
+  schema_version: 1
+  title: "Elenxo — a superação honesta da Automação Graduada do Onion"
+  layer: audit
+  baseline: 2026-07-24
+  note: >
+    Movimento Elenxo pedido pelo maestro sobre sua tese de automação graduada (quais ações A2A/federação
+    automáticas vs gated; gates superados dinamicamente vs humano-no-controle; "melhor dos dois mundos").
+    Régua: a máxima do maestro "Toda automação vem de uma ação; automatizar o que nunca foi realizado tem
+    grandes chances de fracasso". Achado de 3 exploradores: doutrina ~75% já existe (espalhada), mecanismo
+    órfão, 3 degraus faltam. Nasce no grafo (REGRA 43). Plano: plans/sim-mas-acho-que-tingly-puzzle.md.
+
+nodes:
+  - id: Q_GRADUATED_AUTOMATION
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "qual a superacao HONESTA da automacao graduada — o melhor dos dois mundos (auto x humano) sem fracassar?"
+
+  - id: D_MAXIM
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "MAXIMA (cunhagem do maestro, 2026-07-24): automacao se CONQUISTA por acao provada; automatizar o que nunca foi realizado tem grandes chances de fracasso — HITL enquanto amadurece, depois testes/monitores/alertas/contencao"
+
+  # ── A escada de refutacoes (cada claim 'esta pronto' cai) ──────────────────
+  - id: C1_HAVE_GRADUATED
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.2
+    label: "C1: 'ja temos automacao graduada' — como capacidade coerente e usavel"
+
+  - id: C2_AUTOMATE_READY
+    node_type: claim
+    plane: PROD
+    status: refuted
+    impact: 4
+    confidence: 0.2
+    label: "C2: 'o nivel AUTOMATE esta pronto para ativar' (auto-merge own-repo)"
+
+  - id: C3_LADDER_COMPLETE
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.2
+    label: "C3: 'a escada esta completa' — os degraus cobrem o espectro"
+
+  # ── A evidencia adversarial (o que os 3 exploradores acharam) ──────────────
+  - id: E_DOCTRINE_EXISTS_SCATTERED
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-24
+    label: "a DOUTRINA existe ~75% mas ESPALHADA em 6 docs sem citar-se como familia: escada Audit->Automate->Moat (ADR), esteira assess->trial->adopt (onion-promotion-ladder), catraca, 3 modos, linha INTAKE!=EXECUCAO — 2 escadas nunca unidas"
+    trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
+
+  - id: E_MECHANISM_ORPHAN
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-24
+    label: "o MECANISMO e orfao: o runtime de conducao de fios NUNCA virou comando (roda a mao por um crumb); AUTOMATE gated por 3 pre-condicoes NUNCA cabeadas (sem branch auto/*, sem branch-protection); o onion-effect-gate.sh e a UI HITL->HOTL dormentes em worktrees discuss"
+    trace: ".claude/worktrees/discuss+onion-pessoal-app/docs/discussions/guardrails-nemo-lens/prototype/onion-effect-gate.sh"
+
+  - id: E_ACTION_NOT_PROVEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-24
+    label: "AUTOMATE esta CORRETAMENTE gated: a acao (rodar a escada a mao, monitorada) ainda nao acumulou execucoes provadas — a maxima do maestro em ato. O ADR e 'proposed — TRIAL autorizado', nao ativo"
+
+  - id: E_RUNGS_MISSING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-24
+    label: "3 degraus genuinamente NOVOS faltam: (a) o degrau MONITORADO/shadow explicito entre HUMANO e AUTO; (b) ALERTAS PREDITIVOS (o core e reativo por design, CI-safe); (c) CRITERIOS de promocao CONTAVEIS (N execucoes provadas => sobe; hoje e juizo humano)"
+    trace: "docs/knowledge-base/concepts/onion-promotion-ladder.md"
+
+  # ── A tese-nucleo: a superacao ─────────────────────────────────────────────
+  - id: D_OVERCOMING
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    label: "SUPERACAO: nao ativar AUTOMATE. Nomear a escada unica (human->monitorado->dinamico->auto + MOAT invariante), CITAR (nao recopiar) as pecas, mecanizar os degraus BAIXOS + um gate de integridade da escada (senao e prosa), acumular acao provada, deixar AUTOMATE ser GANHO"
+
+  - id: D_MECHANISM_OR_PROSE
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "mechanism-beats-prose: a KB da escada so dura se vier com MECANISMO — um gate de lint que reprova 'classe subiu de degrau sem gate de promocao'. Sem ele, prosa de meia-vida curta"
+    trace: ".claude/diary/2026-07-21-mechanism-beats-prose.md"
+
+  # ── Os 3 degraus faltantes como perguntas abertas (Ondas 2-4) ──────────────
+  - id: Q_MONITORED_RUNG
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "Onda 2: como nomear+mecanizar o degrau MONITORADO (shadow, roda+observado)? promover o onion-effect-gate.sh orfao; dogfood INTERNO primeiro (decisao do maestro, nao no Pedro)"
+
+  - id: Q_PREDICTIVE_ALERTS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    label: "Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela acontecer"
+
+  - id: Q_COUNTABLE_CRITERIA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    label: "Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de subir a AUTO"
+
+edges:
+  # a escada de refutacoes
+  - from: E_MECHANISM_ORPHAN
+    to: C1_HAVE_GRADUATED
+    edge_type: REFUTES
+  - from: E_DOCTRINE_EXISTS_SCATTERED
+    to: C1_HAVE_GRADUATED
+    edge_type: REFUTES
+  - from: E_ACTION_NOT_PROVEN
+    to: C2_AUTOMATE_READY
+    edge_type: REFUTES
+  - from: E_RUNGS_MISSING
+    to: C3_LADDER_COMPLETE
+    edge_type: REFUTES
+  # a maxima sustenta o gating de C2 (esta certo estar gated)
+  - from: D_MAXIM
+    to: E_ACTION_NOT_PROVEN
+    edge_type: SUPPORTS
+  # a superacao emerge das refutacoes e as supera
+  - from: E_MECHANISM_ORPHAN
+    to: D_OVERCOMING
+    edge_type: CAUSES
+  - from: D_MAXIM
+    to: D_OVERCOMING
+    edge_type: SUPPORTS
+  - from: D_OVERCOMING
+    to: C1_HAVE_GRADUATED
+    edge_type: SUPERSEDES
+  - from: D_OVERCOMING
+    to: Q_GRADUATED_AUTOMATION
+    edge_type: SUPPORTS
+  - from: D_MECHANISM_OR_PROSE
+    to: D_OVERCOMING
+    edge_type: SUPPORTS
+  # os degraus faltantes dependem da superacao (as ondas)
+  - from: Q_MONITORED_RUNG
+    to: D_OVERCOMING
+    edge_type: DEPENDS_ON
+  - from: Q_COUNTABLE_CRITERIA
+    to: D_OVERCOMING
+    edge_type: DEPENDS_ON
+  - from: Q_PREDICTIVE_ALERTS
+    to: D_OVERCOMING
+    edge_type: DEPENDS_ON

@@ -4944,6 +4944,18 @@ run_doctrine_freshness_selftests
 # Modo kg-born-marker — REGRA 43: integridade do marcador kg: (proveniência virada p/ DENTRO; radar sub-usado, maestro 2026-07-23).
 run_kg_born_marker_selftests
 
+# Modo ladder-integrity — REGRA 44: integridade da escada de Automação Graduada (rung-jump sem prova = HARD; máxima do maestro 2026-07-24).
+run_ladder_integrity_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/ladder-integrity-check.sh"
+  if [ ! -f "${h}" ]; then record_fail "ladder-integrity" "helper ausente: ${h}"; return; fi
+  if bash "${h}" --selftest >/dev/null 2>&1; then
+    record_pass "ladder-integrity: escada — 5 casos (incl. mutation AUTO-sem-prova reprova, severidade load-bearing)"
+  else
+    record_fail "ladder-integrity: escada" "o selftest embutido do helper falhou"
+  fi
+}
+run_ladder_integrity_selftests
+
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
 run_site_deeplink_selftests
