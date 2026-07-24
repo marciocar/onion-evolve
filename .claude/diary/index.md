@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 74 entradas · **Stale:** 0 · **Compartilháveis:** 62 · **Com significância:** 14
+**Total:** 75 entradas · **Stale:** 0 · **Compartilháveis:** 63 · **Com significância:** 15
 
 Gerado em: 2026-07-24
 
@@ -13,6 +13,7 @@ Gerado em: 2026-07-24
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
 | 2026-07-24 | innovation | collective 📤 | reconciliation-catches-real-loss-next-day | A reconciliação outbox×inbound (Passo 2.1), mecanizada em 2026-07-23 a partir de um sinal de campo, caçou uma perda REAL menos de 24h depois — 5 anúncios do metagamify marcados transportados mas ausentes do checkout que trabalha — provando o loop fix-becomes-mechanism no menor intervalo possível. | 2026-10-22 | static |
+| 2026-07-24 | innovation | collective 📤 | personality-sync-f2-identity-emerges | A Fase 2 (personality-sync) shipou virando o declarado≠verificado — a ansiedade central do core — para dentro, sobre a PRÓPRIA identidade: a personalidade do onion-evolve deixou de ser um seed manual e passou a EMERGIR de 74 migalhas do diário, dogfoodada, com as 27 âncoras todas reais. A ferramenta que torna a identidade honesta foi validada tornando a identidade do core honesta. | 2026-10-22 | static |
 | 2026-07-23 | learning | collective 📤 | runflow-local-key-is-openai-compatible-only | A demo Runflow só rodou local porque OpenAI é OpenAI-compatible (aceita apiKey inline); Anthropic/Bedrock/Gemini exigem credencial no tenant — uma assimetria da abstração de provider que o plano não previa e só o dogfood do smoke-test revelou, com o falso-'travamento' sendo a observabilidade, não a chamada. | 2026-10-21 | conditional |
 | 2026-07-23 | innovation | collective 📤 | runflow-doctrine-freshness-proves-value-day-one | A REGRA 42, recém-nascida há horas, pegou no primeiro uso real uma KB de parceiro 8 meses defasada — e a reescrita inteira saiu 100% verificada contra a fonte viva, zero fabricação, no mesmo dia em que o gate nasceu. | 2026-10-21 | dynamic |
 | 2026-07-23 | innovation | collective 📤 | doctrine-freshness-ratchet-composed-not-new | Quase nada aqui é novo — a REGRA 42 é composição de três peças que a casa já tinha (STALE do radar, catraca da 29, clock-untrusted do a2a-verify) — e é exatamente essa economia que a torna barata de manter e fácil de confiar. | 2026-10-21 | conditional |
