@@ -326,10 +326,11 @@ faltava em `members.yaml`: drift de registro regularizado em 07-19).
 `role: standalone`, mas é **porta de framework**, não projeto-adotante: distribui o **bundle
 standalone** (eng/product/testing/docs), **sem meta-factory nem memória privada de evolução**. Nasceu
 2026-07-19 via `/meta:adopt` **role-scoped**, com pin verificado — a 1ª peça que desfaz o colapso
-"porta ≡ core" ([public-door-vs-private-core.md](public-door-vs-private-core.md)). **Nasce PRIVADA**;
-o flip público + reapontar o redirect `onion-claude → onion-standalone` seguem **gated ao maestro**.
-(Nota: o ADR de topologia ainda lista essa linha da rampa como "F2 ⏳ gated" — **stale**: F2 já rodou
-em privado; só o flip público segue gated.)
+"porta ≡ core" ([public-door-vs-private-core.md](public-door-vs-private-core.md)). Nasceu privada e **flipou PÚBLICA em 2026-07-19** (`onion-standalone` é público — verificado ao vivo).
+Resta **gated** só **reapontar o redirect** `onion-claude → onion-standalone`: o `onion-claude` segue
+**privado** (descrição ainda da era Cursor), então quem chega por ele ainda não cai na porta pública.
+(Nota: qualquer linha de rampa que ainda liste o *flip público* como gated está **stale** — o flip
+aconteceu; só o **repoint do redirect** segue.)
 
 ### 6.8 O braço de pesquisa — método, não vendor
 `role: standalone`, `onion_version: n/a` — adota o **MÉTODO** (KG SDAAL: `kg-radar` + `/meta:kg` +

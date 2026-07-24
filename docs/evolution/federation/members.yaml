@@ -223,7 +223,7 @@ members:
     name: onion-standalone (porta pública Claude — instância adotada role-scoped, bundle standalone)
     role: standalone            # TIER 3 — mas é PORTA DE FRAMEWORK (distribui o bundle standalone), não projeto-adotante
     parent: onion-evolve
-    remote: github.com/marciocar/onion-standalone   # PRIVADO até o flip (gate do maestro); ≡ onion-claude (redirect re-aponta no flip)
+    remote: github.com/marciocar/onion-standalone   # PÚBLICO desde 2026-07-19 (flip feito, verificado ao vivo). Resta gated: reapontar o redirect onion-claude→onion-standalone (onion-claude segue privado)
     local_path: "/home/marcio/onion-standalone"
     onion_version: 514dda85833a   # VERIFICADO por pin-integrity-check.sh (pin-ok 2026-07-19) — vendoriza .claude/ role-scoped (dif. do onion-mini, destilação sem stamp)
     adopted_at: 2026-07-19
