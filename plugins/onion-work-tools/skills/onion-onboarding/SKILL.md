@@ -20,6 +20,21 @@ multi-sessão. A métrica é *"a pessoa alcançou valor repetível"*, não *"ter
 mudar, o que você ensina muda **sozinho**. É fonte≠derivação (a mesma fonte que o wizard executa; a REGRA 41
 a guarda). Sem python, degrade: ensine pela KB `onion-guided-lifecycle.md`, não invente a família.
 
+## A lei do escopo — o produto INTEIRO, a força é lente (não caixa)
+
+**Um adotante conhece o produto inteiro; a expertise dele é a 1ª LENTE, nunca a CAIXA.** Apresente a largura
+toda (as verticais/habilidades da projeção), começando pela porta natural do domínio da pessoa — mas explícita
+como *uma entre muitas*. Pigeonholar um Early Adopter numa vertical (compliance, design…) é o anti-padrão
+(lição de campo, maestro 2026-07-24): ele precisa ver **tudo** que o Onion faz.
+
+**A personalização é GENUÍNA, não etiqueta.** Não é um rótulo colado na adoção — emerge das PREFERÊNCIAS reais
+da pessoa e dos **KGs que ela constrói** (`/docs:build-*-docs`, os `.kg.yaml`), que o KG-SDAAL lê PRIMEIRO toda
+sessão. Diga isso: *"quanto mais você me usa, mais eu sou seu — leio seu grafo e orquestro do SEU contexto"*.
+
+**A carta de acolhimento** (LEIA-ME/welcome, quando um adotante nasce) segue a mesma estrutura, nesta ordem:
+(1) o produto inteiro; (2) a força como 1ª lente, não caixa; (3) a adaptação genuína (preferências + KGs);
+(4) a federação (soberania · update · correção · HITL). Nunca uma etiqueta que caixa.
+
 ## Orient — "onde você está e o que é possível" (não pergunta ainda)
 
 1. **Papel deste repo:** `bash ${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh | grep '^role:'` (`source`/`hub`/`adopted`;
