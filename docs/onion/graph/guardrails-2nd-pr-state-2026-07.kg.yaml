@@ -1,0 +1,113 @@
+meta:
+  id: guardrails-2nd-pr-state-2026-07
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-07-24
+  date: 2026-07-24
+  note: >
+    Investigação nasce no grafo (REGRA 43 / radar-is-runtime): "atacar o 2º PR de guardrails".
+    O KG-first não existia p/ guardrails; esta é a materialização. Achado central: o wire-in R15
+    (o "2º PR") JÁ FOI FEITO (PR #452, 6 fases, 2026-07-19) — a memória discuss-guardrails-nemo-lens-state
+    dizia "falta o 2º PR", declarado≠verificado. Só resta a superfície /meta:guardrails, gated.
+
+nodes:
+  - id: Q_2ND_PR
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 1.0
+    label: "'atacar o 2º PR de guardrails' — o que ele é e o que de fato resta?"
+    trace: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
+
+  - id: C_MEMORY_SAYS_2ND_PR_PENDING
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-24
+    label: "a memoria diz FALTA o 2o PR gated (wire-in R15 + gate anti-drift taxonomia + superficie /meta:guardrails)"
+    trace: "memory/discuss-guardrails-nemo-lens-state.md"
+
+  - id: E_WIRE_IN_DONE_PR452
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-24
+    label: "o wire-in R15 JA FOI: PR #452 (2026-07-19), 6 fases faseadas — helpers, anti-drift por construcao, dogfood comportamental 3/3 injecao 0%. O '2o PR' aconteceu; a memoria e stale."
+    trace: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
+
+  - id: E_WIRE_IN_LIVE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-07-24
+    label: "VIVO no core (nao quarentena): .claude/utils/guardrails/onion-untrusted-wrap.sh + .claude/validation/guardrails/onion-effect-gate.sh; wired em lint-artifacts.sh + lint-selftest.sh (run_guardrails_selftests); fragmento SSOT common/prompts/untrusted-content-provenance.md existe"
+    trace: ".claude/validation/guardrails/onion-effect-gate.sh"
+
+  - id: C_ANTI_DRIFT_BY_CONSTRUCTION
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-24
+    label: "o gate anti-drift da taxonomia (memoria: 'falta') foi resolvido POR CONSTRUCAO na F1: numeros de linha rebaixados -> read-path a nivel de arquivo + string de veto greppavel + escopo /meta:kb-freshness. Sem numero perpetuo = nada a driftar (nao violou o proprio ONION-R1)"
+    trace: "docs/knowledge-base/concepts/onion-guardrails.md"
+
+  - id: C_STRUCTURAL_OVER_GATED
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-24
+    label: "F4 refinou o design: 'estrutural>gated' = impossivel-por-construcao, nao cercar todo transporte. a2a-accept NUNCA inlineia o corpo (R15.1 by-construction); co-relay copia verbatim (protecao migrou p/ read-time R15.2). Consumidores VERIFICADOS (co-evolve+adopt+reverse-consolidate), nao os produtores listados (F5)"
+    trace: "docs/knowledge-base/concepts/onion-guardrails.md"
+
+  - id: C_SURFACE_REMAINS_GATED
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-24
+    label: "o UNICO residuo real e a superficie /meta:guardrails — GATED (fio #4 do promotion-plan). Relabel ONION-Rn amplo = docs-pass opcional; fios #2/#5 = pesquisa, nao entrega"
+    trace: "docs/discussions/guardrails-nemo-lens/promotion-plan.md:34"
+
+  - id: Q_INDEX_VS_DSL
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    label: "o /meta:guardrails e um INDICE-DE-LEITURA (aponta pros gates/KB que ja rodam) ou uma DSL (linguagem p/ definir guardrails)? — o gate que trava a superficie; precisa da decisao do maestro"
+    trace: "docs/discussions/guardrails-nemo-lens/promotion-plan.md"
+
+edges:
+  - from: E_WIRE_IN_DONE_PR452
+    to: C_MEMORY_SAYS_2ND_PR_PENDING
+    edge_type: REFUTES
+  - from: E_WIRE_IN_LIVE
+    to: E_WIRE_IN_DONE_PR452
+    edge_type: SUPPORTS
+  - from: C_ANTI_DRIFT_BY_CONSTRUCTION
+    to: C_MEMORY_SAYS_2ND_PR_PENDING
+    edge_type: REFUTES
+  - from: E_WIRE_IN_DONE_PR452
+    to: Q_2ND_PR
+    edge_type: SUPPORTS
+  - from: C_STRUCTURAL_OVER_GATED
+    to: E_WIRE_IN_DONE_PR452
+    edge_type: SUPPORTS
+  - from: C_SURFACE_REMAINS_GATED
+    to: Q_2ND_PR
+    edge_type: SUPPORTS
+  - from: Q_INDEX_VS_DSL
+    to: C_SURFACE_REMAINS_GATED
+    edge_type: CAUSES
