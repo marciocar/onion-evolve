@@ -3,7 +3,10 @@
 > **Status: CANDIDATO** — esta KB **não inventa doutrina**: ela **nomeia e unifica** uma escada que o Onion
 > já sobe, espalhada em ~6 docs que nunca se citaram como família. Entra no core **por uso** (padrão
 > `candidato`). O movimento Elenxo que a gerou vive no grafo:
-> `graduated-automation-elenxo-2026-07.kg.yaml` (grafo interno do core; não vendorizado).
+> `graduated-automation-elenxo-2026-07.kg.yaml` (grafo interno do core; não vendorizado) — **em síntese:**
+> nele os claims C1/C2/C3 ("temos automação graduada" / "AUTOMATE pronto" / "a escada está completa") são
+> **refutados**, e a superação (nomear a escada única, mecanizar os degraus baixos, deixar AUTOMATE ser ganho)
+> **emerge no topo por peso**.
 > Fonte≠derivação: **cita**, não recopia — cada peça permanece soberana no seu arquivo.
 
 ## A máxima (cunhagem do maestro, 2026-07-24)
@@ -26,7 +29,9 @@ efeito-de-saída no repo dono) é **gated**. É o "melhor dos dois mundos": não
 negligência (não aplica sozinho).
 
 **Eixo vertical — a ESCADA (quanto de autonomia foi ganho).** Fonte:
-`onion-adr-autonomous-thread-runtime-2026-07.md` (ADR interno do core).
+`onion-adr-autonomous-thread-runtime-2026-07.md` (ADR interno do core) — **em síntese:** a escada de
+autonomia **Audit → Automate → Moat**, com os degraus explícitos e as **3 pré-condições duras** que travam o
+AUTOMATE (enabler git-nativo + path-allowlist mecânica + política 100% mecânica).
 
 | Degrau | O que roda sozinho | Quem decide o efeito | Gate de promoção (o que prova a subida) |
 |--------|--------------------|----------------------|------------------------------------------|
@@ -88,7 +93,8 @@ SEMPRE; o moat é **a aceitação gated, não a latência**.
 
 ## O mecanismo (senão é prosa)
 
-Por `mechanism-beats-prose` (doutrina do core), esta KB só dura se
+Por `mechanism-beats-prose` (doutrina do core — **a durabilidade de uma decisão vem de ter um mecanismo que
+a carregue, não da qualidade do argumento; o teste é procurar o mecanismo, não reler o doc**), esta KB só dura se
 vier com um **gate**: [`ladder-integrity-check.sh`](../../../.claude/validation/ladder-integrity-check.sh) —
 um registry `classe × degrau` (baseline à la catraca) que **reprova uma classe que subiu de degrau sem seu
 gate de promoção declarado**. Nasce silencioso (nenhuma classe declara AUTO hoje). É o irmão da catraca
@@ -104,10 +110,37 @@ Confirmadas pela exploração como território **não pisado** (ver o grafo do E
   pré-condição; hoje é juízo humano no checkpoint.
 
 ## 🔗 Referências (as peças que esta escada unifica)
-- Escada de autonomia: `onion-adr-autonomous-thread-runtime-2026-07.md` (ADR interno do core)
+- **Escada de autonomia:** `onion-adr-autonomous-thread-runtime-2026-07.md` (ADR interno do core).
+  *Dimensão:* o ADR que separou o runtime de condução de fios em três degraus — **Audit** (observar/registrar,
+  sempre ligado), **Automate** (agir dentro do escopo, gated pelas 3 pré-condições git-nativas) e **Moat**
+  (o que nunca automatiza). Status `proposed — TRIAL autorizado`, não ativo: é a fonte do eixo vertical desta KB.
 - Esteira de promoção: [`onion-promotion-ladder.md`](onion-promotion-ladder.md)
 - A linha intake≠execução: [`authorization-layers-intake-vs-execution.md`](authorization-layers-intake-vs-execution.md)
 - Catraca + 3 modos: [`onion-guardrails.md`](onion-guardrails.md) §3/§7/§8
 - Fronteira medir≠decidir: [`onion-engine-economy.md`](onion-engine-economy.md)
 - Transporte A2A: RFC-0004 · [`a2a-verify.sh`](../../../.claude/utils/federation-transport/a2a-verify.sh)
-- O Elenxo (grafo): `graduated-automation-elenxo-2026-07.kg.yaml` (grafo interno do core; não vendorizado)
+- **O Elenxo (grafo):** `graduated-automation-elenxo-2026-07.kg.yaml` (grafo interno do core; não vendorizado).
+  *Dimensão:* o movimento adversarial que **gerou** esta KB — 3 exploradores refutaram "já temos automação
+  graduada" / "AUTOMATE pronto" / "a escada está completa"; a evidência mostrou doutrina ~75% já existente mas
+  espalhada em 6 docs, mecanismo parcialmente órfão e 3 degraus faltando; a superação (`D_OVERCOMING`, peso 40.5)
+  emergiu no topo. É a prova de que a KB **consolida**, não inventa.
+
+---
+
+## 📎 Convenção — referência a artefato core-privado numa KB vendorizada (o "gloss")
+
+Esta KB é **vendorizada** (embarca em todo adotante); vários artefatos que ela cita **não são** (`docs/analysis`,
+`docs/onion`, `docs/evolution`, `.claude/diary`…). Um **link vivo** para eles resolve aqui no core e o lint local
+passa — mas no adotante é um **link morto**: ele lê o nome e não alcança nada. A convenção (pedido do maestro,
+2026-07-24) resolve isso sem quebrar `fonte≠derivação`:
+
+> **Toda referência a um artefato core-privado numa KB vendorizada vira texto simples (não link) + um _gloss_
+> que carrega a DIMENSÃO REAL do artefato** — não uma linha-teaser, mas a essência: o que ele decide/prova e por
+> que importa. A citação preserva a soberania da fonte (não recopia); o gloss preserva o VALOR pro adotante que
+> não pode clicar.
+
+Isto **não é conselho que depende de eu lembrar** — é **mecanismo**: a **REGRA 45** do lint
+([`kb-vendored-link-check.sh`](../../../.claude/validation/kb-vendored-link-check.sh)) reprova, com catraca, um
+link vivo novo de KB vendorizada para caminho core-privado. É "o adotante é o oráculo" mecanizado: o core passa a
+checar a perspectiva do adotante que ele mesmo não enxerga. Nasceu de um bug de campo (adoção do Pedro: um link
+para `.claude/diary` reprovou o lint DENTRO do repo dele; o do core não via). As seções acima são o exemplar vivo.

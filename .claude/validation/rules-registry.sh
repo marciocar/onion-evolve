@@ -108,7 +108,7 @@ CATEGORIES = [
     ("Projeção & privacidade",
      "O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e "
      "deep-link privado nunca vazam.",
-     [30, 33, 34, 35, 36]),
+     [30, 33, 34, 35, 36, 45]),
 ]
 
 seen = {}

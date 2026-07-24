@@ -4956,6 +4956,18 @@ run_ladder_integrity_selftests() {
 }
 run_ladder_integrity_selftests
 
+# Modo kb-vendored-link — REGRA 45: link vendorizado não aponta caminho core-privado (catraca; guard core-side do bug de campo do Pedro).
+run_kb_vendored_link_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/kb-vendored-link-check.sh"
+  if [ ! -f "${h}" ]; then record_fail "kb-vendored-link" "helper ausente: ${h}"; return; fi
+  if bash "${h}" --selftest >/dev/null 2>&1; then
+    record_pass "kb-vendored-link: 6 casos (incl. .claude/diary reprova, .claude/skills vendorizado ignora, baseline tolera, catraca)"
+  else
+    record_fail "kb-vendored-link" "o selftest embutido do helper falhou"
+  fi
+}
+run_kb_vendored_link_selftests
+
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
 run_site_deeplink_selftests

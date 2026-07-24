@@ -1602,6 +1602,41 @@ check_ladder_integrity() {
 }
 
 # ===========================================================================
+# REGRA 45 — Link vendorizado não aponta caminho core-privado, com catraca [HARD+SOFT]
+#   Uma KB vendorizada (docs/knowledge-base/**) não deve carregar link VIVO para
+#   docs/{analysis,onion,evolution,discussions,applying,materials,plans} ou
+#   .claude/{diary,sessions} — ausentes em TODO adotante. O link resolve no core e
+#   o lint local passa, mas no adotante é morto (o bug de campo da adoção do Pedro:
+#   link p/ .claude/diary reprovou DENTRO do repo dele; o do core não via).
+#   Guard core-side que mecaniza "o adotante é o oráculo": força a conversão em
+#   referência plain-text + GLOSS (a essência, fonte≠derivação com dimensão).
+#   Catraca idêntica à REGRA 29 (passivo baselined = SOFT; novo = HARD; só encolhe).
+#   Toda a lógica vive em kb-vendored-link-check.sh. Nasce com 101 links de passivo.
+# ===========================================================================
+check_kb_vendored_links() {
+  local helper="${SCRIPT_DIR}/kb-vendored-link-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/docs/knowledge-base/*|*/kb-vendored-link-baseline.txt) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out passivo=0 sev tag path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    if [ "${tag}" = "PASSIVO" ]; then passivo=$(( passivo + 1 )); continue; fi
+    violation "${sev}" "${REPO_ROOT}/${path}" "[link-vendorizado/${tag}] ${msg}"
+  done <<< "${out}"
+  if [ "${passivo}" -gt 0 ]; then
+    violation "SOFT" "${REPO_ROOT}/.claude/validation/kb-vendored-link-baseline.txt" \
+      "[link-vendorizado/PASSIVO] ${passivo} link(s) core-privado(s) em KB vendorizada, tolerados pelo baseline — a métrica de saúde é este número DIMINUINDO (migre link→plain-text+gloss; detalhe: bash .claude/validation/kb-vendored-link-check.sh)"
+  fi
+}
+
+# ===========================================================================
 # REGRA 32 — Página pública do grafo: números conferidos contra o mapa [HARD]
 #   A página /historia/grafo/ publica contagens do .kg.yaml em prosa e em
 #   BARRAS. Número no site é promessa: se o grafo cresce e a página não, ela
@@ -2130,6 +2165,7 @@ check_kg_provenance_coverage
 check_doctrine_freshness
 check_kg_born_marker
 check_ladder_integrity
+check_kb_vendored_links
 check_kg_view_sync
 check_site_graph_sync
 check_projection_safety

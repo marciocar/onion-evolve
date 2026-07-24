@@ -16,7 +16,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**44 regras** no total — **40 HARD**, **7 SOFT**.
+**45 regras** no total — **41 HARD**, **8 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -117,3 +117,4 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 34 | Migalhas: superfícies DERIVADAS da fonte, sem drift | HARD |
 | 35 | Site público não linka deep-link do repo PRIVADO (404 garantido) | HARD |
 | 36 | Superfície VENDORIZADA sem nome comercial de cliente | HARD |
+| 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT |
