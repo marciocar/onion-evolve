@@ -38,5 +38,9 @@ if [ -x "${REPO_ROOT}/node_modules/.bin/lint-staged" ]; then
     exit 1
   fi
 elif [ -f "${REPO_ROOT}/.lintstagedrc.js" ] || grep -q '"lint-staged"' "${REPO_ROOT}/package.json" 2>/dev/null; then
-  echo "⏭️  lint-staged configurado, mas node_modules ausente (worktree?) — pulando. Rode 'pnpm install' p/ ativar."
+  # Package manager do ALVO, não chute (sinal arandek 2026-07-25): o hook instruía 'pnpm install' num
+  # repo bun-only (packageManager: bun, engines pnpm >=999). Lê o campo packageManager; senão, agnóstico.
+  onion_pm="$(grep -oE '"packageManager"[[:space:]]*:[[:space:]]*"[a-z]+' "${REPO_ROOT}/package.json" 2>/dev/null | grep -oE '[a-z]+$' | tail -1)"
+  if [ -n "${onion_pm}" ]; then onion_hint="rode '${onion_pm} install'"; else onion_hint="instale as dependências do projeto"; fi
+  echo "⏭️  lint-staged configurado, mas node_modules ausente (worktree?) — pulando. ${onion_hint} p/ ativar."
 fi
