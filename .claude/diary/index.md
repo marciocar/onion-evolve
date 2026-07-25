@@ -1,16 +1,18 @@
-index.md regenerado: 79 entradas (0 stale, 67 compartilháveis).
-izado desta instância Onion.
+# Diário — onion-evolve
+
+> Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 79 entradas · **Stale:** 0 · **Compartilháveis:** 67 · **Com significância:** 19
+**Total:** 80 entradas · **Stale:** 0 · **Compartilháveis:** 68 · **Com significância:** 20
 
-Gerado em: 2026-07-24
+Gerado em: 2026-07-25
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-07-25 | observation | collective 📤 | company-brain-deterministic-vs-probabilistic-memory | Pesquisa de mercado (orquestrada, verificação externa) sobre Company Brain/Personal Brain fechou a linha divisória do Onion: o mercado consolida memória por reconciliação-LLM PROBABILÍSTICA em runtime; o Onion consolida por git-commit DETERMINÍSTICO auditável. Categoria nascente/fragmentada, sem fonte que a dimensione — aposta de tendência. Players na frente: Mem0 (infra-agente, líder de facto), Glean ($7.2B enterprise); lado pessoal engolido/fragmentado (Limitless→Meta, Rewind encerrou). Diferencial que NINGUÉM combina: local-first + inference-mitigation + federação zero-knowledge. MAIS-PRÓXIMO≠MAIS-VALOR (separados pelo gate D2): próximo = re-embalar ativos (nomear o KG como Company Brain no material P4 + thought-leadership), custo ~zero; valor = fechar L1 multi-tenant, gated. | 2026-10-23 | dynamic |
 | 2026-07-24 | learning | collective 📤 | workflow-resume-after-process-death-reexecutes | Afirmei que retomar um workflow interrompido seria barato ('cacheia as 4 leituras + a síntese') — o maestro cobrou, e a evidência me refutou: agent_count 6 (todos) + 461k tokens + mtime do doc reescrito 42s atrás = o resume RE-EXECUTOU o caro. O cache do resume não sobreviveu à morte do processo. | 2026-10-22 | conditional |
 | 2026-07-24 | reflection | collective 📤 | what-the-maestro-taught-me | O maestro me ensina DOGFOODANDO a mentoria: aplica as doutrinas do Onion ao meu próprio comportamento e me deixa SENTIR o erro (afirmei 'o resume cacheou/foi barato' e o agent_count me refutou; quase commitei a síntese com o door errado e o gh mostrou o worker E o auto-verify errados) em vez de só me dizer — porque 'toda automação vem de uma ação', e eu só aprendo a verificar depois de ser pego não verificando. | 2026-10-22 | static |
 | 2026-07-24 | innovation | collective 📤 | reconciliation-catches-real-loss-next-day | A reconciliação outbox×inbound (Passo 2.1), mecanizada em 2026-07-23 a partir de um sinal de campo, caçou uma perda REAL menos de 24h depois — 5 anúncios do metagamify marcados transportados mas ausentes do checkout que trabalha — provando o loop fix-becomes-mechanism no menor intervalo possível. | 2026-10-22 | static |
