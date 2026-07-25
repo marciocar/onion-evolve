@@ -123,6 +123,10 @@ inventory_scope_excluded() {
   local f="$1"
   case "${f}" in
     */docs/analysis/*|*/.claude/sessions/*|*/docs/materials/*|*/docs/onion/inventory.md|*/validation/fixtures/*) return 0 ;;
+    # canais de mail (co-evolução): sinais relayados do adotante + relatórios downstream CITAM números
+    # do produto alheio ('100+ agentes' do sistema do adotante) — não são claims do inventário Onion.
+    # Mesma doutrina do adopter-aware abaixo, mas vale inclusive no core (role: source). Sinal arandek 2026-07-25.
+    */docs/evolution/inbox/*|*/docs/evolution/inbound/*) return 0 ;;
   esac
   # Adopter-aware: num repo DERIVADO (role: adopted|hub|decoupled), SÓ os docs Onion VENDORIZADOS podem
   # legitimamente afirmar contagens do inventário Onion. Os docs de PRODUTO do adotante (docs/specs,
