@@ -1,0 +1,357 @@
+# KG SDAAL — TREND Company Brain / Personal Brain 2026: o mapa decision-ready da onda + a jogada do Onion.
+# Convenção: E_<slug> = evidence (mercado/interno; url no label + verified_at quando verificado externo, plane PROD);
+# C_<slug> = claim (tese/diferencial-Onion; SUPPORTS a decisão ou é REFUTADA/SUPORTADA por evidência);
+# D_<slug> = decision (o "mais-próximo"/"mais-valor" e as amarras D3/D6); Q_<slug> = question (o que falta instrumentar);
+# entity = player. Todo nó tem >=1 aresta. Camada audit (meta/estratégico). Doc-irmão: docs/analysis/company-brain-market-2026-07.md
+meta:
+  id: company-brain-market-2026-07
+  schema_version: "1"
+  date: 2026-07-25
+nodes:
+  # ---- PLAYERS (entity) ----
+  - id: E_player_mem0
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Mem0 — líder de facto memory-for-agents. $24M Series A (Basis Set), 41k stars, 14M downloads, API 35M→186M; provider EXCLUSIVO de memória do AWS Agent SDK. FORÇA: adoção dev/ecossistema. FRAQUEZA: infra pura (vetor+extração), não produto brain fim-a-fim. url: mem0.ai/series-a"
+  - id: E_player_glean
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Glean — incumbente enterprise mais valioso. $7.2B valuation, ARR ~$200M→$300M (+89% YoY); saiu de busca p/ grafo de conhecimento permission-aware (Agentic Engine 2 + Canvas). FORÇA: dado+permissões corporativas, tração em receita. FRAQUEZA: preço/complexidade enterprise, não serve prosumer. url: valueaddvc.com/blog/glean-valuation-revenue-2026"
+  - id: E_player_clickup_brain2
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "ClickUp Brain² (23/06/2026) — Company Brain via work-graph interno + compound memory + roteamento multi-LLM; compliance SOC2/ISO42001/HIPAA/GDPR nativo. FORÇA: distribuição embutida na suíte. FRAQUEZA: fechado no ClickUp, não agnóstico. Claim de preferência 100% = do vendor. url: clickup.com/blog/brain-2-launch"
+  - id: E_player_ms_recall
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Microsoft Copilot Memory + Windows Recall — FORÇA: distribuição Windows/M365 (maior base do mundo) + compliance embutido (Purview). FRAQUEZA: Recall carrega estigma de segurança persistente — vetores de exfiltração ainda achados 1 ano+ após lançamento. url: geekwire.com/2026/one-year-after-windows-recall-security-red-flags"
+  - id: E_player_limitless_meta
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Personal brain hardware NÃO sustentou negócio independente: Limitless (pendant) ADQUIRIDA pela Meta dez/2025 (parou de vender, features de captura descontinuadas); Rewind.ai (precursor) ENCERROU 19/12/2025. Sinal duro de mercado no lado pessoal. url: becomefluent.io/what-happened-to-limitless-pendant + rewind.ai/what-happened-to-rewind"
+  - id: E_player_pkm_frag
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.75
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Notas+IA (Reflect, Capacities, Obsidian+IA, Notion AI, Tana, Mem X, <$40/mês) — categoria pessoal VIVA mas fragmentada, sem player dominante nem funding/ARR relevante. Nicho/prosumer, não consolidada. url: iwoszapar.com/best-ai-second-brain-solutions"
+
+  # ---- EVIDÊNCIA DE MERCADO/TREND (evidence) ----
+  - id: E_bottleneck_context
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Causa-raiz da trend (múltiplas fontes independentes): 'frontier model quality stopped being the bottleneck for enterprise AI; organizational context became the bottleneck'. Ganho individual com memory NÃO escala p/ o time. url: vectorize.io/articles/brain-stack-second-company-single-brain"
+  - id: E_brain_stack_3seg
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Não é 1 trend, são 3 sub-segmentos ('The Brain Stack'): Second Brain (pessoal), Company Brain (empresa, termo 2026-nativo), Single/Shared Brain (multi-agente). Company Brain fragmentado — múltiplos players correndo p/ DEFINIR a categoria (não-verificado que haja líder). url: vectorize.io/articles/second-brain-vs-company-brain"
+  - id: E_consolidation_is_the_line
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Critério que separa 'brain de verdade' de índice de busca: CONSOLIDAÇÃO AUTOMÁTICA (reconciliar contradição sem edição manual). Mercado consolida por reconciliação-LLM probabilística em runtime. Ecoa P5/inference-mitigation (SSOT executável vs cerimônia). url: cognee.ai/blog/guides/open-source-memory-frameworks-llm-agents"
+  - id: E_market_memory_cagr
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Segmento mais quente = Agentic AI Orchestration & Memory: $6,16-6,27bi (2025) → $28,45bi (2030)/$69bi (2033), CAGR ~35,3%. Personal Knowledge Base AI: $1,36bi→$11,87bi, CAGR 27,2%. Confirma trajetória notas→grafo→memória-de-agente. url: skyquestt.com/report/agentic-ai-orchestration-and-memory-systems-market"
+  - id: E_context_drift_failures
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "~65% das falhas de agentes enterprise em 2025 = context drift/perda de memória em raciocínio multi-etapa; agentes sem contexto institucional: -38% acurácia. Aponta p/ grafo de memória persistente/versionado/governado (= KG do Onion). url: zylos.ai/research/2026-04-05-ai-agent-memory-architectures"
+  - id: E_knowledge_loss_cost
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.7
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Dor quantificada: perda de conhecimento institucional custa $1,3tri/ano (EUA, Deloitte); 42% do conhecimento só na cabeça de funcionários; turnover 22-25%/ano. Enquadramento 'Centaur CEO' (Forbes jul/2026): remover 10% da dependência do fundador move valuation M&A 'em milhões'. url: forbes.com/sites/lewisschiff/2026/07/22"
+  - id: E_gartner_shakeup
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Gartner Top Tech Trends 2026: 40% das apps enterprise com agentes task-specific até 2026 (vs <5% em 2025); 'shakeup' de $58bi em ferramentas de produtividade até 2027. a16z: IA vira ambiente/sistema/agente, assume conectar docs/políticas numa camada NL (confirma direção Company Brain). url: gartner.com/en/articles/top-technology-trends-2026"
+  - id: E_no_named_market
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "HONESTIDADE: NÃO há fonte primária (CB Insights/a16z com número) nomeando+dimensionando 'Company Brain' ou 'federação de memória' como categoria. O enquadramento é síntese/aposta de tendência, não número de mercado existente sob esse nome. url: a16z.com/notes-on-ai-apps-in-2026"
+  - id: E_whitespace_no_unified
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "WHITESPACE: (1) ninguém cobre pessoal+empresa+agente com a MESMA camada; (2) governança-first NÃO amarrada a framework de DESENVOLVIMENTO — todos são camada de conhecimento, não motor de execução; (3) device-first + zero-knowledge sync SEM equivalente direto verificado (majors são cloud/OS-vendor). url: valueaddvc.com/blog/the-ai-memory-problem"
+
+  # ---- EVIDÊNCIA INTERNA (evidence, trace) — o que o Onion TEM ----
+  - id: E_onion_kg_dogfood
+    node_type: evidence
+    trace: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Onion JÁ TEM KG local-first como 'cérebro' (.kg.yaml SDAAL): modela audit+SSOT durável, radar determinístico (kg-radar.sh) p/ atenção/reconciliação/integridade/frescor, arestas REFUTES/SUPERSEDES auto-corrigem contradição. 3 dogfoods de campo — não é hipótese"
+  - id: E_onion_n1_device
+    node_type: evidence
+    trace: user memory onion-pessoal-app-state
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Onion JÁ TEM N=1 provado no device (Moto G54): cifra XChaCha20 at-rest + life-KG runtime store + sync zero-knowledge (só ciphertext sobe p/ marciocar/onion-pessoal-kg). Prova funcionando vs. maioria dos personal brain = wrapper de RAG sobre vetor centralizado"
+  - id: E_onion_inference_doctrine
+    node_type: evidence
+    trace: docs/knowledge-base/concepts/inference-mitigation.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Onion JÁ TEM a peça que a concorrência NÃO tem: doutrina de mitigação de INFERÊNCIA — risco real = o motor deduzindo o não-declarado (Staab et al. 2024, até 85% top-1), não dado em repouso. Stack L1-L6 + mapa do que já-transfere (query-gate, gerador≠porteiro, de-id fail-safe, R15)"
+  - id: E_onion_l1l6_gated
+    node_type: evidence
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "FALTA/GATED: o motor executável L1-L6 é declaradamente NÃO-embarcado no core (fronteira core=doutrina/adotante=SSOT executável). Onion vende FRAME de conformidade (REGRA DE ADMISSÃO G0-G8), não produto plug-and-play de brain seguro. Extrapolação N-tenant = 'a verificar', threat model muda (RBAC real)"
+
+  # ---- CLAIMS / TESES DE DIFERENCIAL (claim) ----
+  - id: C_diff_git_vs_llm
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "TESE-NÚCLEO: o diferencial do Onion é consolidação por GIT-COMMIT determinístico auditável vs. o mercado que reconcilia por LLM probabilística em runtime. Para P4 (regulado), 'toda mudança de memória é revisável em PR' É a feature (context drift = 65% das falhas), não legado"
+  - id: C_diff_triad
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: confirmed
+    label: "IR-ALÉM: a tríade que NENHUM player combina — local-first (device) + inference-mitigation (Staab) + federação zero-knowledge. Mercado optimiza recall (lembrar tudo); Onion optimiza recall GOVERNADO (revelar só o permitido + provar que não inferiu além). Em regulado, 'prova de não-vazamento por inferência' > 'lembra mais'"
+  - id: C_diff_ir_alem_gated
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "RESSALVA DURA: ir-além ≠ prometer-já. A jogada 'ir além' é POSICIONAMENTO/PESQUISA (ser a autoridade citando Staab), não venda de garantia não-construída. Ativação do motor L1-L6 segue o gate de D2. Guardrail anti declarado≠verificado"
+
+  # ---- DECISÕES (decision) — mais-próximo / mais-valor + amarras ----
+  - id: D_mais_proximo
+    node_type: decision
+    trace: docs/analysis/company-brain-market-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: open
+    label: "MAIS-PRÓXIMO (menor esforço × maior prob.): re-embalar ativos que já existem — nomear o KG como 'Company Brain de projeto' no material P4 + publicar a doutrina de inferência como thought-leadership. Zero código novo, risco doutrinário ~zero, alavanca whitespace. Amarra em D6=MENSAGEM P4"
+  - id: D_mais_valor
+    node_type: decision
+    trace: docs/analysis/company-brain-market-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.6
+    status: open
+    label: "MAIS-VALOR: fechar o gap N-tenant do L1 (schema-masking multi-tenant) — transforma 'Personal Brain N=1' em 'Company Brain provável' (segmento ~35% CAGR, dor $1,3tri). MAS gated: depende do gate D2-ativação; mais-valor NÃO é mais-próximo, são fases do mesmo caminho"
+  - id: D_amarra_d3_d6
+    node_type: decision
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: done
+    verified_at: 2026-07-25
+    label: "AMARRA GTM (ratificada 2026-07-25): D6=MENSAGEM P4 (regulado, whitespace) — promessa 'workflows faseados + auditabilidade estrutural', SEM prometer 'federação segura de dado regulado' (L1-L6 gated). D3=C: app-consumer/Company Brain N=1 DESACOPLADO e gated (lacuna de GTM, não técnica)"
+
+  # ---- QUESTÕES (question) ----
+  - id: Q_ntenant_proof
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.55
+    status: open
+    label: "Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo grafo, RBAC real). Falta desenho + prova de campo do L1 (schema-masking + fatia-por-propósito) em contexto multi-usuário. Trava D_mais_valor"
+  - id: Q_p4_instrument
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.55
+    status: open
+    label: "Pré-req de D2/mais-valor: instrumentar 1-2 prospects P4 reais + 'valor medido por adotante'. Sem isso, 'Company Brain regulado' é chute educado. Mesma lacuna Q_instrument do brief GTM. Zero adotante P4 provado hoje"
+
+edges:
+  # players sustentam a evidência de fragmentação/whitespace
+  - from: E_player_mem0
+    to: E_whitespace_no_unified
+    edge_type: SUPPORTS
+  - from: E_player_glean
+    to: E_whitespace_no_unified
+    edge_type: SUPPORTS
+  - from: E_player_clickup_brain2
+    to: E_whitespace_no_unified
+    edge_type: SUPPORTS
+  - from: E_player_ms_recall
+    to: E_whitespace_no_unified
+    edge_type: SUPPORTS
+  - from: E_player_limitless_meta
+    to: E_brain_stack_3seg
+    edge_type: SUPPORTS
+  - from: E_player_pkm_frag
+    to: E_brain_stack_3seg
+    edge_type: SUPPORTS
+  # causa-raiz e consolidação sustentam a tese-núcleo
+  - from: E_bottleneck_context
+    to: C_diff_git_vs_llm
+    edge_type: SUPPORTS
+  - from: E_consolidation_is_the_line
+    to: C_diff_git_vs_llm
+    edge_type: SUPPORTS
+  - from: E_context_drift_failures
+    to: C_diff_git_vs_llm
+    edge_type: SUPPORTS
+  # whitespace + doutrina interna sustentam a tríade diferencial
+  - from: E_whitespace_no_unified
+    to: C_diff_triad
+    edge_type: SUPPORTS
+  - from: E_onion_inference_doctrine
+    to: C_diff_triad
+    edge_type: SUPPORTS
+  - from: E_onion_n1_device
+    to: C_diff_triad
+    edge_type: SUPPORTS
+  - from: E_onion_kg_dogfood
+    to: C_diff_git_vs_llm
+    edge_type: SUPPORTS
+  # a ressalva gated é sustentada pelo fato de o motor não estar embarcado
+  - from: E_onion_l1l6_gated
+    to: C_diff_ir_alem_gated
+    edge_type: SUPPORTS
+  # a tese-núcleo e a doutrina sustentam a decisão do mais-próximo
+  - from: C_diff_git_vs_llm
+    to: D_mais_proximo
+    edge_type: SUPPORTS
+  - from: E_onion_inference_doctrine
+    to: D_mais_proximo
+    edge_type: SUPPORTS
+  # a tríade e o CAGR/dor sustentam o mais-valor
+  - from: C_diff_triad
+    to: D_mais_valor
+    edge_type: SUPPORTS
+  - from: E_market_memory_cagr
+    to: D_mais_valor
+    edge_type: SUPPORTS
+  - from: E_knowledge_loss_cost
+    to: D_mais_valor
+    edge_type: SUPPORTS
+  - from: E_gartner_shakeup
+    to: D_mais_valor
+    edge_type: SUPPORTS
+  # a honestidade 'sem categoria nomeada' sustenta a questão de instrumentar antes de vender (não refuta a decisão em si)
+  - from: E_no_named_market
+    to: Q_p4_instrument
+    edge_type: SUPPORTS
+  # amarras GTM: mais-próximo e mais-valor dependem de D3/D6
+  - from: D_mais_proximo
+    to: D_amarra_d3_d6
+    edge_type: DEPENDS_ON
+  - from: D_mais_valor
+    to: D_amarra_d3_d6
+    edge_type: DEPENDS_ON
+  # a ressalva gated governa o mais-valor
+  - from: D_mais_valor
+    to: C_diff_ir_alem_gated
+    edge_type: DEPENDS_ON
+  # questões abertas traceiam ao mais-valor que travam
+  - from: Q_ntenant_proof
+    to: D_mais_valor
+    edge_type: TRACES_TO
+  - from: Q_p4_instrument
+    to: D_mais_valor
+    edge_type: TRACES_TO
+  # o gap gated interno trace à questão N-tenant
+  - from: E_onion_l1l6_gated
+    to: Q_ntenant_proof
+    edge_type: SUPPORTS
