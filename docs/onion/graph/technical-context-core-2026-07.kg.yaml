@@ -1,0 +1,269 @@
+# KG SDAAL — TECHNICAL-CONTEXT do CORE Onion: as 4 camadas + os subsistemas-âncora do framework,
+# traçando cada conceito de domínio ao arquivo technical-context/ que o documenta. Nascido do dogfood
+# M1b (o próprio /docs:build-tech-docs rodado sobre o core, 2026-07-25). Camada domain = os subsistemas
+# reais do framework (SDAAL, KG-radar, validação, co-evolução, workflows faseados); camada audit = os
+# artefatos de documentação (as 4 layers + os 8 arquivos gerados). Convenção: F_* = artifact (arquivos),
+# L* = entity (camadas), SUB_* = entity domain (subsistemas). Todo nó tem >=1 aresta.
+meta:
+  id: technical-context-core-2026-07
+  schema_version: "1"
+  date: 2026-07-25
+  note: "Grafo de proveniência do technical-context do CORE (dogfood M1b). Subsistemas de domínio TRACES_TO os arquivos gerados; as 4 camadas TRACES_TO seus arquivos; o index hub DEPENDS_ON as 4 camadas."
+
+nodes:
+  # ---- ARQUIVOS GERADOS (artifact, layer: audit) ----
+  - id: F_INDEX
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "index.md — hub de navegação das 4 camadas (link + 1 linha por arquivo), gerado por M1b"
+    trace: "docs/technical-context/index.md"
+
+  - id: F_CHARTER
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "project-charter.md — vision/success/scope/stakeholders/constraints do core; identidade canônica (framework template, não npm, não CLI)"
+    trace: "docs/technical-context/01-core/project-charter.md"
+
+  - id: F_ADR
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "adr/index.md — índice dos 36 ADRs reais (docs/analysis/onion-adr-*.md) agrupados em 5 temas; não recria, só indexa"
+    trace: "docs/technical-context/01-core/adr/index.md"
+
+  - id: F_AIDEV
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "ai-development-guide.md — idioma por camada, fronteiras §4.2/4.3, as 45 regras do lint, guardrails R15.2/R15.3b, gotchas"
+    trace: "docs/technical-context/02-ai-context/ai-development-guide.md"
+
+  - id: F_CODEBASE
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "codebase-guide.md — mapa de diretórios .claude/+docs/, 99 comandos/51 agentes/10 skills, utils SDAAL, validation, hooks"
+    trace: "docs/technical-context/02-ai-context/codebase-guide.md"
+
+  - id: F_BIZLOGIC
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "business-logic.md — o domínio do core: SDAAL, KG SDAAL, co-evolução/federação, workflows faseados"
+    trace: "docs/technical-context/03-domain/business-logic.md"
+
+  - id: F_CONTRIB
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "contributing.md — GitFlow via /git:flow, ciclo plan→pr-update, review 2 camadas, testes, githook nativo, dogfood"
+    trace: "docs/technical-context/04-workflow/contributing.md"
+
+  - id: F_CHALLENGES
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "architecture-challenges.md — retrato honesto: sinais do inbox sem mecanismo, federação formal 0 contratos vs co-evo ativa, gate SOFT persistente"
+    trace: "docs/technical-context/04-workflow/architecture-challenges.md"
+
+  # ---- CAMADAS (entity, layer: audit) ----
+  - id: L1_CORE
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Camada 1 — Núcleo (01-core/): charter + índice de ADRs; escopo é o core, não um projeto-alvo"
+    trace: "docs/technical-context/01-core/"
+
+  - id: L2_AICTX
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Camada 2 — AI-Context (02-ai-context/): guia de desenvolvimento p/ IA + guia de navegação do codebase"
+    trace: "docs/technical-context/02-ai-context/"
+
+  - id: L3_DOMAIN
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Camada 3 — Domínio (03-domain/): business-logic; api-specification N/A (core não é app com API HTTP)"
+    trace: "docs/technical-context/03-domain/"
+
+  - id: L4_WORKFLOW
+    node_type: entity
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Camada 4 — Workflow (04-workflow/): contributing + architecture-challenges (o retrato honesto)"
+    trace: "docs/technical-context/04-workflow/"
+
+  # ---- SUBSISTEMAS-ÂNCORA (entity, layer: domain) ----
+  - id: SUB_SDAAL
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "SDAAL — abstração provider-agnóstica; instâncias reais task-manager (API-first) e forge (CLI-first); consumidor nunca chama provider direto"
+    trace: "docs/meta-specs/integrations.md; .claude/utils/{task-manager,forge}/"
+
+  - id: SUB_KG
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "KG SDAAL / kg-radar — 2 layers (audit epistêmica + domain SSOT durável); investigação nasce em .kg.yaml; radar determinístico soberano"
+    trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md; .claude/validation/kg-radar.sh"
+
+  - id: SUB_VALIDATION
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Validação — gate mecânico do dogfood: lint-artifacts.sh (45 regras, 41 HARD/8 SOFT) + lint-selftest.sh + inventory.sh (SSOT gerada)"
+    trace: ".claude/validation/; docs/onion/inventory.md; docs/onion/lint-rules.md"
+
+  - id: SUB_COEVO
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Co-evolução/federação — tiers RFC-0003, invariante I3 (um escritor/repo, entrega-sem-commit), /meta:adopt never-clobber vendor-branch 3-way"
+    trace: "docs/knowledge-base/concepts/onion-federation-and-adoption.md; .claude/utils/co-evolution/"
+
+  - id: SUB_PHASED
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Workflows faseados retomáveis — contrato de fase plan.md ([DONE]/[ACTIVE]/[TODO], exatamente-uma-ACTIVE), sessões persistentes em .claude/sessions/"
+    trace: ".claude/commands/engineer/plan.md; .claude/sessions/"
+
+edges:
+  # index hub -> depende das 4 camadas que ele indexa
+  - from: F_INDEX
+    to: L1_CORE
+    edge_type: DEPENDS_ON
+  - from: F_INDEX
+    to: L2_AICTX
+    edge_type: DEPENDS_ON
+  - from: F_INDEX
+    to: L3_DOMAIN
+    edge_type: DEPENDS_ON
+  - from: F_INDEX
+    to: L4_WORKFLOW
+    edge_type: DEPENDS_ON
+
+  # cada camada -> traceia seus arquivos gerados
+  - from: L1_CORE
+    to: F_CHARTER
+    edge_type: TRACES_TO
+  - from: L1_CORE
+    to: F_ADR
+    edge_type: TRACES_TO
+  - from: L2_AICTX
+    to: F_AIDEV
+    edge_type: TRACES_TO
+  - from: L2_AICTX
+    to: F_CODEBASE
+    edge_type: TRACES_TO
+  - from: L3_DOMAIN
+    to: F_BIZLOGIC
+    edge_type: TRACES_TO
+  - from: L4_WORKFLOW
+    to: F_CONTRIB
+    edge_type: TRACES_TO
+  - from: L4_WORKFLOW
+    to: F_CHALLENGES
+    edge_type: TRACES_TO
+
+  # subsistemas de domínio -> traceiam o(s) arquivo(s) que os documentam
+  - from: SUB_SDAAL
+    to: F_BIZLOGIC
+    edge_type: TRACES_TO
+  - from: SUB_SDAAL
+    to: F_CODEBASE
+    edge_type: TRACES_TO
+  - from: SUB_KG
+    to: F_BIZLOGIC
+    edge_type: TRACES_TO
+  - from: SUB_VALIDATION
+    to: F_AIDEV
+    edge_type: TRACES_TO
+  - from: SUB_VALIDATION
+    to: F_CONTRIB
+    edge_type: TRACES_TO
+  - from: SUB_COEVO
+    to: F_BIZLOGIC
+    edge_type: TRACES_TO
+  - from: SUB_COEVO
+    to: F_CHALLENGES
+    edge_type: TRACES_TO
+  - from: SUB_PHASED
+    to: F_CONTRIB
+    edge_type: TRACES_TO
+  - from: SUB_PHASED
+    to: F_BIZLOGIC
+    edge_type: TRACES_TO
