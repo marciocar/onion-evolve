@@ -1,0 +1,403 @@
+# KG SDAAL — M3: plataforma admin da federação Onion (SPEC-agora / BUILD-gated).
+# Nó central = D_spec_now_build_gated: ESPECIFICAR o command-side + auth agora, CONSTRUIR só no gatilho objetivo.
+# Convenção: D_ = decision (a postura), Q_ = question (o gatilho + tensões abertas), C_ = claim (requisitos/
+# operações de mutação/recomendações), E_ = entity (artefatos do read-model existente que o command-side
+# DEPENDS_ON), A_ = artifact (este spec). Camada audit (meta/estratégico). Quem decide/liga o build é o maestro.
+# Spec-irmão: docs/analysis/onion-m3-federation-admin-spec-2026-07.md.
+meta:
+  id: m3-federation-admin-2026-07
+  schema_version: "1"
+  date: 2026-07-25
+nodes:
+  # ---- DECISÃO CENTRAL (postura) ----
+  - id: D_spec_now_build_gated
+    node_type: decision
+    trace: docs/analysis/onion-m3-federation-admin-spec-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: open
+    label: "SPEC-agora / BUILD-gated — especificar o command-side (mutação de members.yaml) + modelo de auth (Logto Organizations) SEM construir; o build só liga no gatilho objetivo. Read-model já existe e basta ao operador-único de hoje"
+
+  # ---- GATILHO + TENSÕES (question) ----
+  - id: Q_gatilho
+    node_type: question
+    trace: docs/evolution/README.md:131-138
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "GATILHO objetivo do build: o 1º membro role:consumer (T2) REAL em members.yaml (introduz hub-owner que precisa de visão/ação escopada ao próprio subgrafo) OU o 1º contrato breaking registrado em contracts/. Hoje: 0 T2; o diretório contracts/ AINDA NÃO EXISTE (nasce no 1º /meta:federation-register) → gate FECHADO"
+  - id: Q_onprem_tension
+    node_type: question
+    trace: docs/evolution/gtm-decision-brief-2026-07.md:73-74
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code-only RATIFICADA. Direção do spec: servir auditoria de P4 a partir de artefatos que JÁ existem dentro do Claude Code (sessions/git/CI), não infra on-prem nova"
+  - id: Q_auth_decision
+    node_type: question
+    trace: /home/marcio/onion-logto/README.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.55
+    status: open
+    label: "Plugar Logto no command-side é decisão do maestro, ainda NÃO tomada (o bridge hoje usa AUTH_TOKEN próprio, não Logto). Auth backend só entra no gatilho MULTI-OPERADOR (1º role:consumer real) — NÃO é pré-requisito das OP-1..4 (nativas, editam members.yaml + commit, zero backend). Limite operacional a registrar: Logto OSS self-hosted = 1 conta admin no console (multi-admin exige Cloud ou toda gestão de org via Management API pelo control-plane)"
+  - id: Q_wake_session
+    node_type: question
+    trace: docs/evolution/research/federation-2026/GAPS-ADDENDUM.md:268-287
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.5
+    status: open
+    label: "GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pull-first/I3. Segue gated — o hook 'you have mail' hoje é SessionStart pull-based"
+
+  # ---- GAP CENTRAL + OPERAÇÕES DE MUTAÇÃO (claim) ----
+  - id: C_command_side_gap
+    node_type: claim
+    trace: .claude/commands/meta/adopt.md:545
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "GAP confirmado: existe read-model completo (SSOT + event-log + 3 read-views) e 1 gate de escrita determinístico (trust-topology-check, mas só grava LOG de decisão). NENHUMA mutação do registro (members.yaml) tem comando dedicado — /meta:adopt só SUGERE registrar; toda mutação é edição manual de YAML + commit"
+  - id: C_op_register
+    node_type: claim
+    trace: docs/evolution/federation/members.yaml:267-288
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: open
+    label: "OP-1 REGISTRAR (create): comando que escreve a entrada do membro no ledger seguindo o template comentado, reusando o pin já VERIFICADO por pin-integrity-check.sh. Hoje parado no passo final de /meta:adopt (só sugere)"
+  - id: C_op_promote
+    node_type: claim
+    trace: docs/evolution/federation/members.yaml:57
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "OP-2 PROMOVER (role: standalone→hub / consumer→T2): atualizar o campo role: no members.yaml do core. Hoje --promote-hub só re-carimba o STAMP local do adotante; federation-radar ③ detecta drift pós-hoc mas não corrige"
+  - id: C_op_update
+    node_type: claim
+    trace: docs/evolution/federation/members.yaml:61-69
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "OP-3 ATUALIZAR (pin/trust/specializations/personality_summary): escrever onion_version novo (pós pin-integrity-check) e editar a matriz de trust (can_correct_to/can_advise_to/...) que trust-topology-check hoje só CONSULTA. Hoje 100% edição manual anotada em comentário"
+  - id: C_op_revoke
+    node_type: claim
+    trace: docs/evolution/federation/members.yaml:29-35
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.65
+    status: open
+    label: "OP-4 REVOGAR/DESATIVAR (status: retired / remover linhagem obsoleta): nenhum script/comando existe; o padrão observado é anotar status: retired à mão + comentário. Nenhuma das 5 checagens de saúde tem comando companheiro de revogação"
+
+  # ---- REQUISITOS POR COMPRADOR D6 (claim) ----
+  - id: C_p4_audit_trail
+    node_type: claim
+    trace: docs/business-context/01-customer/personas.md:32-37
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivada de .claude/sessions/ + visibilidade do resultado do gate mecânico (lint/selftest/inventory) por execução. É 'auditabilidade estrutural' REAL e dogfoodada — não promete L1-L6"
+  - id: C_p4_gate_visibility
+    node_type: claim
+    trace: CLAUDE.md:15
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e trilha acima de velocidade'. Serve do que existe, sem prometer isolamento/classificação por sensibilidade (D2/L1-L6, gated)"
+  - id: C_p3_self_service
+    node_type: claim
+    trace: docs/business-context/01-customer/personas.md:25-30
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "REQ P3 (SHOULD condicional): self-service de onboarding multi-squad (mata a dor 'cada dev usa IA de um jeito; nenhuma trilha'). O hub JÁ é 'federação como camada de time' (D7) — a plataforma admin é a superfície natural do onboarding org"
+  - id: C_p3_agg_view
+    node_type: claim
+    trace: docs/business-context/decisions.md:23-29
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "REQ P3 (SHOULD condicional): visão agregada de adoção/consistência entre N repos/times DA MESMA empresa (multi-tenant no sentido 'uma empresa, N squads', nunca cross-empresa) + métricas de ROI/consistência p/ comprador org. GATED: qualquer flywheel de dado cross-tenant (é D2)"
+
+  # ---- AUTH + FRONTEIRA (claim) ----
+  - id: C_auth_logto_sdaal
+    node_type: claim
+    trace: docs/meta-specs/integrations.md:61-121
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariância. ILUSTRATIVO/não-comprometido (re-derivar no gatilho): forma SDAAL (3ª instância, factory/interface/adapter), protocolo/tipo-de-client, mapa Organization Logto↔tier (source=global/M2M, hub=1 org, consumer=org-member, standalone=SEM org). Read-side segue público; OP-1..4 nativas sem auth p/ operador-único"
+  - id: C_commodity_vs_diff
+    node_type: claim
+    trace: /home/marcio/onion-logto/README.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "FRONTEIRA commodity-BUY (Logto) × diferencial-BUILD (Onion): comprar identidade/sessão/token/MFA/CRUD de org/Secret Vault (undifferentiated); construir a tradução papel-grosso→semântica de tier (D7) + matriz de confiança fina de members.yaml (nunca delegável ao Logto sem duplicar a SSOT)"
+  - id: C_trust_matrix_stays_onion
+    node_type: claim
+    trace: docs/evolution/federation/members.yaml:57-83
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "RBAC do Logto (admin/member por org) é grosso demais p/ a matriz fina (can_receive_from/can_advise_to/can_correct_to/diary_readable_by/exposes_downstream). Essa autorização fica ENFORCED no control-plane Onion lendo members.yaml como dado; Logto Orgs = PROJEÇÃO da topologia hub, nunca a fonte"
+  - id: C_not_backstage
+    node_type: claim
+    trace: .claude/validation/federation-console.sh:6-9
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: open
+    label: "ANTI-plataforma p/ N=8: Backstage/Port custam 3+ engenheiros + US$450k/ano e só compensam a 200-1000+ devs (S3·F1). A fronteira 'NÃO é plataforma' JÁ está fisicamente amarrada ao artefato (federation-console.sh:6-9) e travada por REGRA 24/38 — read-only projeção, zero backend/DB, git como event store"
+  - id: C_reuse_readmodel
+    node_type: claim
+    trace: docs/evolution/research/federation-2026/SYNTHESIS.md:15-36
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: open
+    label: "REUSAR o read-model já entregue: console HTML (F1.3), federation-radar (3 checks advisory), pin-integrity-check (gate real), graph.sh --map (Mermaid), seletor fino key:value. Os '4 slices' do SYNTHESIS JÁ foram construídos — tratar como 'entregue, avaliar evolução', não redesenhar"
+  - id: C_naive_admin_platform
+    node_type: claim
+    trace: docs/evolution/federation-roadmap-2026.md:32-39
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: refuted
+    label: "REFUTADO: 'construir agora uma plataforma admin write/multi-operador com RBAC' — não há hub-owner autônomo (o maestro é operador-único nos 8 membros), 0 T2, 0 contrato registrado. Pré-cozinhar spec de build gated é anti-padrão (gated-work-derives-fresh)"
+
+  # ---- READ-MODEL EXISTENTE (entity) ----
+  - id: E_members_yaml
+    node_type: entity
+    trace: docs/evolution/federation/members.yaml:9-289
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: done
+    label: "SSOT policy-as-data única da federação: 8 membros (1 source, 1 hub, 6 standalone, 0 consumer), schema por membro (id/name/role/parent/remote/pin/lineages/mode/trust matrix). Mutação hoje = edição manual seguindo template comentado (:267-288). Sem JSON Schema/validador"
+  - id: E_changelog
+    node_type: entity
+    trace: docs/evolution/federation/CHANGELOG.md:1-9
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: done
+    label: "Event-log append-only (formato '## <data> · <assunto> · <COMPAT> · alvo: <ids>'), escrito à mão, nunca reescrito (auditoria). O append é edição manual sem comando que valide alvo:/compat: antes de gravar — só reconstruído por regex na leitura do console"
+  - id: E_console
+    node_type: entity
+    trace: .claude/validation/federation-console.sh:1-110
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: done
+    label: "Projeção read-only (CQRS leve): python3+yaml → HTML self-contained (docs/onion/federation-console.html), sanitiza name e projeta membros+timeline. Puro projetor (não escreve). Roda no lint-selftest; travado por REGRA 24"
+  - id: E_trust_topology_check
+    node_type: entity
+    trace: .claude/validation/trust-topology-check.sh:69-260
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: done
+    label: "Único script que já FAZ escrita determinística+auditável: append em docs/evolution/trust-log.md a cada --from/--to/--action (exit 0/1/2). Mas grava só LOG de decisão de trust, não o registro (members.yaml) em si; e CONSULTA a matriz, não a EDITA"
+  - id: E_pin_integrity_check
+    node_type: entity
+    trace: .claude/validation/pin-integrity-check.sh:1-62
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: done
+    label: "Gate real de CONFIABILIDADE do pin (.claude/.onion-version vs histórico git da fonte + canário), usado por /meta:adopt --update; modo --audit-vendor. Já VERIFICA o pin do candidato antes do registro — mas quem escreve o onion_version novo é o maestro à mão"
+  - id: E_projection_safety
+    node_type: entity
+    trace: .claude/validation/projection-safety.sh:1-352
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: done
+    label: "REGRA 30 — gate HARD que impede nome comercial/marcador de confidencialidade vazar de members.yaml p/ superfícies públicas (site/console/mailbox cross-tenant). Deriva os termos sensíveis do próprio SSOT"
+  - id: E_adopt_cmd
+    node_type: entity
+    trace: .claude/commands/meta/adopt.md:95-99
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: done
+    label: "/meta:adopt — único comando command-side que toca federação: clona/vendoriza/carimba .claude/.onion-version, --promote-hub re-carimba o alvo. Fronteira Camada 2×3: federação é autoridade do core. PARA no registro (adopt.md:545 só sugere)"
+  - id: E_logto
+    node_type: entity
+    trace: /home/marcio/onion-logto/README.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: done
+    label: "Logto self-hosted 1.41.0 vivo em auth.onionevolve.com (OIDC público, MFA/passkeys disponíveis). Consumidor de auth hoje = só o bridge, que usa AUTH_TOKEN próprio (NÃO Logto). Nenhum admin-platform existe ainda — design prospectivo/gated"
+
+  # ---- ARTEFATO (artifact) ----
+  - id: A_spec_doc
+    node_type: artifact
+    trace: docs/analysis/onion-m3-federation-admin-spec-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: done
+    label: "Este SPEC/PRD M3 — registra a postura spec-agora/build-gated, o command-side sobre o read-model, o modelo de auth Logto, os requisitos por D6, o reuso da pesquisa e o que fica dormente até o gatilho"
+
+edges:
+  # o GAP motiva o spec; a decisão é registrada no artefato
+  - from: C_command_side_gap
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: D_spec_now_build_gated
+    to: A_spec_doc
+    edge_type: TRACES_TO
+  # o build DEPENDE do gatilho e das tensões abertas
+  - from: D_spec_now_build_gated
+    to: Q_gatilho
+    edge_type: DEPENDS_ON
+  - from: D_spec_now_build_gated
+    to: Q_onprem_tension
+    edge_type: DEPENDS_ON
+  - from: C_auth_logto_sdaal
+    to: Q_auth_decision
+    edge_type: DEPENDS_ON
+  - from: C_reuse_readmodel
+    to: Q_wake_session
+    edge_type: DEPENDS_ON
+  # operações de mutação SUPPORTS o spec e DEPENDS_ON o read-model existente
+  - from: C_op_register
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_op_register
+    to: E_members_yaml
+    edge_type: DEPENDS_ON
+  - from: C_op_register
+    to: E_adopt_cmd
+    edge_type: DEPENDS_ON
+  - from: C_op_register
+    to: E_pin_integrity_check
+    edge_type: DEPENDS_ON
+  - from: C_op_promote
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_op_promote
+    to: E_members_yaml
+    edge_type: DEPENDS_ON
+  - from: C_op_update
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_op_update
+    to: E_pin_integrity_check
+    edge_type: DEPENDS_ON
+  - from: C_op_update
+    to: E_trust_topology_check
+    edge_type: DEPENDS_ON
+  - from: C_op_revoke
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_op_revoke
+    to: E_members_yaml
+    edge_type: DEPENDS_ON
+  # requisitos por comprador SUPPORTS o spec
+  - from: C_p4_audit_trail
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_p4_gate_visibility
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_p3_self_service
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_p3_agg_view
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  # auth: SUPPORTS o spec, DEPENDS_ON Logto; fronteira e matriz refinam o auth
+  - from: C_auth_logto_sdaal
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_auth_logto_sdaal
+    to: E_logto
+    edge_type: DEPENDS_ON
+  - from: C_commodity_vs_diff
+    to: C_auth_logto_sdaal
+    edge_type: SUPPORTS
+  - from: C_trust_matrix_stays_onion
+    to: C_auth_logto_sdaal
+    edge_type: SUPPORTS
+  - from: C_trust_matrix_stays_onion
+    to: E_members_yaml
+    edge_type: DEPENDS_ON
+  # anti-plataforma: SUPPORTS o spec, ancorada no artefato, REFUTA o build ingênuo
+  - from: C_not_backstage
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_not_backstage
+    to: E_console
+    edge_type: TRACES_TO
+  - from: C_not_backstage
+    to: C_naive_admin_platform
+    edge_type: REFUTES
+  # reuso do read-model
+  - from: C_reuse_readmodel
+    to: D_spec_now_build_gated
+    edge_type: SUPPORTS
+  - from: C_reuse_readmodel
+    to: E_console
+    edge_type: DEPENDS_ON
+  - from: C_reuse_readmodel
+    to: E_trust_topology_check
+    edge_type: DEPENDS_ON
+  - from: C_reuse_readmodel
+    to: E_pin_integrity_check
+    edge_type: DEPENDS_ON
+  # topologia interna do read-model
+  - from: E_console
+    to: E_members_yaml
+    edge_type: READS
+  - from: E_console
+    to: E_changelog
+    edge_type: READS
+  - from: E_projection_safety
+    to: E_console
+    edge_type: CONSTRAINS
