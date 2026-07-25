@@ -1,6 +1,6 @@
 # 🗂️ Registro de Decisões Estratégicas
 
-**Última Atualização:** 2026-07-19
+**Última Atualização:** 2026-07-25
 
 > Mecanismo de rastreio das decisões de negócio em aberto. Cada card é uma pergunta que você resolve **escolhendo** uma opção ou **descrevendo** livremente. Versionado no git → cada sessão avança daqui, não recomeça. Spec-as-code aplicado às decisões de negócio (dogfood do próprio Onion).
 >
@@ -9,16 +9,16 @@
 
 ---
 
-## D1 — Postura comercial
+## D1 — Postura comercial `[ratificado 2026-07-25]`
 
 **Pergunta:** o Onion vira comercial? Como reconciliar "não é produto, não distribuído" com "fazer dinheiro / vender como ouro"?
 
 - ( ) Pivot explícito para comercial
-- (•) **Camadas: mini-funil aberto + captura adjacente (serviço/certificação/curadoria)** ← inclinação
+- (•) **A: Camadas — mini-funil aberto + captura adjacente (serviço/certificação/curadoria)** ← ratificado
 - ( ) Exploratório (registrar opção, não decidir)
 - ( ) Não-comercial, foco em sustentação
 
-**Status:** `hipótese` · **Lean:** camadas (BMAD/Wardley + selo SAFe/EOS). **Trava:** decidir o modelo **antes** de abrir publicamente (guardrail anti-relicenciamento). **Refina:** falta escolher gatilho de "abrir".
+**Status:** `ratificado` (2026-07-25) = **A (camadas)**. Sob D6 cindido, a postura em camadas deixa de ser hipótese — o modelo está fechado (BMAD/Wardley + selo SAFe/EOS). **Trava mantida:** decidir/abrir só com o guardrail anti-relicenciamento ativo. **Refina (não bloqueia o modelo):** falta o **gatilho de "abrir"** — é operacional, não de modelo. **Base:** brief [`gtm-decision-brief-2026-07`](gtm-decision-brief-2026-07.md).
 
 ## D7 — Semântica de tiers (hub / standalone / consumer) `[ratificado 2026-07-19]`
 
@@ -56,14 +56,14 @@ nunca zero — LLM reconstrói atributos mesmo do destilado); **nunca relicencia
 
 **Status:** `ratificado` (direção) · `gated` (ativação) · **Base:** pesquisa [`onion-d2-data-currency-2026-07`](../evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md). **Destrava:** D7 (federação como upsell limpo).
 
-## D3 — Onion Pessoal / leigo final + mentoria
+## D3 — Onion Pessoal / leigo final + mentoria `[ratificado 2026-07-25 — DESACOPLADO]`
 
 **Pergunta:** perseguir a linha consumidor (Company Brain N=1) e mentoria (Evolução + Pessoal)?
 
-- (•) **Registrado como hipótese de maior incerteza** ← escolhido
-- Requisitos: **super storytelling + branding + posicionamento** (muda comprador e promessa).
+- (•) **C: DESACOPLAR — mentoria/curadoria avança JÁ (fatura; alinha com P3/P4 e D4); app-consumer (leigo/pessoal) fica `gated`** ← ratificado
+- Requisitos do trilho consumer: **super storytelling + branding + posicionamento** (muda comprador e promessa) — só quando amadurecer.
 
-**Status:** `aberto` · **Depende de:** acionar `@branding-positioning-specialist` + `@storytelling-business-specialist` quando amadurecer. Ligado a `discuss/onion-pessoal-marcio` e `discuss/onion-mobile-app`. **Não** comprometer como pilar sem esse trabalho.
+**Status:** `ratificado` (2026-07-25) = **desacoplar**. A mentoria não espera o app-consumer: avança já como captura adjacente (D1=A). O trilho **consumer/leigo** (Company Brain N=1, app mobile) segue `gated` — não comprometer como pilar sem branding/storytelling. Ligado a `discuss/onion-pessoal-marcio` e `discuss/onion-mobile-app`. **Base:** brief [`gtm-decision-brief-2026-07`](gtm-decision-brief-2026-07.md).
 
 ## D4 — Priorização das receitas
 
@@ -81,13 +81,14 @@ nunca zero — LLM reconstrói atributos mesmo do destilado); **nunca relicencia
 
 **Status:** `aberto` · **Diretriz da pesquisa:** ticket premium ($129+) > pipoca ($5–10) para maestro solo; vender selo/curadoria/serviço, não o texto; preço por outcome só depois de instrumentar (ver `metrics.md`). **Falta:** hipótese de número por camada.
 
-## D6 — Comprador primário
+## D6 — Comprador primário `[ratificado 2026-07-25 — CINDIDO mensagem/pipeline]`
 
 **Pergunta:** quem é o comprador-alvo primário?
 
 - Candidatos: empresas c/ sistemas internos (P3) · times regulados (P4) · dev solo (P5) · leigo/pessoal (P6).
+- (•) **CINDIR: MENSAGEM = P4 (regulado) · PIPELINE = P3 (empresa/sistemas internos)** ← ratificado
 
-**Status:** `aberto` (a validar) · **Sinais:** P4 (regulado) é a cunha de maior valor + whitespace; P3 é o volume org mais provável. **Falta:** escolher 1 primário para focar mensagem/GTM.
+**Status:** `ratificado` (2026-07-25 — a decisão-raiz). O card fundia duas perguntas; o maestro cindiu. **MENSAGEM/posicionamento = P4** (único whitespace confirmado — compliance-peer; dá categoria própria em vez de competir na faixa genérica). **PIPELINE/receita primeiro = P3** (mais líquido, ciclo curto, **não** depende de L1-L6). **Guardrail duro:** a mensagem P4 vai ao ar **sem prometer** o mecanismo L1-L6 (gated) — promessa hoje = "workflows faseados + auditabilidade estrutural" (existe/dogfoodado), **não** "federação segura de dado regulado" (não construído) = `declarado≠verificado`/queima de moat. **P5** = MOAT/advocacy (D7), não primário; **P6** fora (pré-req de branding). **Base:** brief [`gtm-decision-brief-2026-07`](gtm-decision-brief-2026-07.md) + KG [`gtm-decisions-2026-07`](../onion/graph/gtm-decisions-2026-07.kg.yaml). **Falta (não bloqueia):** 1-2 entrevistas P4 + instrumentar conversão do "aha" por persona.
 
 ---
 

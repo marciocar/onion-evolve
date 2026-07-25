@@ -17,7 +17,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.75
-    status: open
+    status: done
     label: "D6 — comprador-alvo primário: P3 (empresa/sistemas internos) vs P4 (regulado/enterprise) vs P5 (dev solo) vs P6 (leigo). RAIZ: calibra D1/D5/D3. Recomenda-se cindir em MENSAGEM (P4, whitespace) vs PIPELINE (P3, mais líquido)"
   - id: D_D1
     node_type: decision
@@ -26,7 +26,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.7
-    status: open
+    status: done
     label: "D1 — postura comercial: A (camadas/mini-funil+captura adjacente) vs B (licença restritiva) vs C (SaaS control-plane) vs D (consultoria-only). Decisão-mãe do eixo receita; trava D4/D5, pré-req de D6"
   - id: D_D5
     node_type: decision
@@ -44,7 +44,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.6
-    status: open
+    status: done
     label: "D3 — perseguir linha consumer (Company Brain N=1 / Onion Pessoal) + mentoria como pilar GTM? A (comprometer já) vs B (gated) vs C (desacoplar mentoria do app) vs D (spin-off de marca)"
   - id: D_D2_activation
     node_type: decision
@@ -63,7 +63,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.7
-    status: open
+    status: confirmed
     label: "REC D6: cindir a pergunta. MENSAGEM/posicionamento = P4 (único whitespace confirmado), MAS sem prometer L1-L6 gated (só workflows faseados + auditabilidade estrutural, que já existem). PIPELINE/1ª receita = P3 (mais líquido, ciclo curto). P5 descartado como primário (D7 já decidiu = MOAT). P6 fora (pré-req branding)"
   - id: C_D1_rec
     node_type: claim
@@ -71,7 +71,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.7
-    status: open
+    status: confirmed
     label: "REC D1: RATIFICAR A (camadas) — deixa de ser hipótese; o que falta fechar é o GATILHO de abrir, não o modelo. C (SaaS control-plane) = HORIZONTE pós-D2, não escolha imediata (colide com identidade sem-infra). B (licença) contraria guardrail anti-relicenciamento. D (consultoria-only) = não-decidir disfarçado"
   - id: C_D5_rec
     node_type: claim
@@ -87,7 +87,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.65
-    status: open
+    status: confirmed
     label: "REC D3: opção C — DESACOPLAR mentoria (receita D4, sem artefato não-provado, pricing $149-399/mês compatível com D5) do app-consumer (F0/F1, N=1, mantém gated). D como refinamento de marca depois. Preserva opcionalidade sem travar receita nem furar D5"
 
   # ---- EVIDÊNCIA (evidence) ----
@@ -190,7 +190,28 @@ nodes:
     status: open
     label: "Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Falta entrevistar 1-2 prospects regulados + reconciliar 'Claude Code-only' com demanda enterprise de multi-ambiente/on-prem (pressão sobre M3)"
 
+  - id: E_maestro_ratify_20260725
+    node_type: evidence
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-25
+    label: "Maestro ratificou 2026-07-25: D6 CINDIDO (MENSAGEM=P4 / PIPELINE=P3), D1=A (camadas), D3=C (desacoplar mentoria do app-consumer). Aplicado em decisions.md. D5 segue parcial (blend, número pendente instrumentação); D2-ativação segue gated"
+
 edges:
+  # ratificação do maestro (2026-07-25) SUPPORTS as decisões fechadas
+  - from: E_maestro_ratify_20260725
+    to: D_D6
+    edge_type: SUPPORTS
+  - from: E_maestro_ratify_20260725
+    to: D_D1
+    edge_type: SUPPORTS
+  - from: E_maestro_ratify_20260725
+    to: D_D3
+    edge_type: SUPPORTS
   # recomendações SUPPORTS suas decisões
   - from: C_D6_rec
     to: D_D6
