@@ -1307,17 +1307,6 @@ run_resolve_selftests() {
   if [ "${out}" = "develop" ]; then record_pass "resolve: default develop-se-existe"
   else record_fail "resolve: default develop-se-existe" "esperava 'develop', veio '${out}'"; fi
 
-  # (c2) develop SÓ no remoto (clone fresco de GitFlow) → develop (remote-aware; sinal arandek 2026-07-25)
-  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
-  printf 'role: adopted\n' > "${d}/.claude/.onion-version"
-  GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
-  GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test \
-    git -C "${d}" commit -q --allow-empty -m x
-  git -C "${d}" update-ref refs/remotes/origin/develop HEAD   # develop só no remoto, nenhum local
-  out="$(bash "${helper}" "${d}" 2>/dev/null || true)"; rm -rf "${d}"
-  if [ "${out}" = "develop" ]; then record_pass "resolve: develop só no remoto (origin/develop) → develop"
-  else record_fail "resolve: develop remote-only" "esperava 'develop' (remote-aware), veio '${out}' — o clone fresco de GitFlow cairia em main"; fi
-
   # (d) sem campo, sem config, sem develop → branch principal (default literal 'main')
   d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude"
   printf 'role: source\n' > "${d}/.claude/.onion-version"

@@ -45,12 +45,8 @@ fi
 ib="$(git -C "${REPO_DIR}" config --get gitflow.branch.develop 2>/dev/null || true)"
 if [ -n "${ib:-}" ]; then printf '%s\n' "${ib}"; exit 0; fi
 
-# (3) Default detectado: develop se existir (LOCAL ou só no REMOTO) — senão a branch principal.
-#     Remote-aware (sinal arandek 2026-07-25): um clone FRESCO de um repo GitFlow tem develop só em
-#     refs/remotes/origin/develop (nenhum local ainda) → antes caía no palpite "main" e a adoção
-#     mirava a branch errada. show-ref --verify aceita o caminho remoto explícito. [[fix-must-become-mechanism]]
-if git -C "${REPO_DIR}" show-ref --verify --quiet refs/heads/develop \
-   || git -C "${REPO_DIR}" show-ref --verify --quiet refs/remotes/origin/develop; then
+# (3) Default detectado: develop se existir; senão a branch principal.
+if git -C "${REPO_DIR}" show-ref --verify --quiet refs/heads/develop; then
   printf 'develop\n'; exit 0
 fi
 master="$(git -C "${REPO_DIR}" config --get gitflow.branch.master 2>/dev/null || true)"
