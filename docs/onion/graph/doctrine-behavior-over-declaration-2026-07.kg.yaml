@@ -1,0 +1,75 @@
+meta:
+  id: doctrine-behavior-over-declaration-2026-07
+  schema_version: "1"
+  date: 2026-07-25
+  title: "Comportamento acima de declaracao — nao confie no que o artefato DIZ sobre si, confie no que ele FAZ"
+  layer: audit
+  note: >
+    Sintese de 3 casos de campo REAIS da mesma jornada (adotante Arandek + stack Logto do core):
+    catraca de fronteira verde num escopo estreito (1/8 travessias), branch develop-fantasma
+    (existencia+prosa declaram GitFlow, triggers executam trunk-based), e pin de versao herdado
+    nao-auditado (1.36.0 vs 1.41.0, componente de seguranca). Irmao um nivel acima de
+    declarado != verificado: o artefato mente sobre si, o comportamento nao.
+
+nodes:
+  - id: C_TESE
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    label: "TESE: nao confie no que o artefato DIZ sobre si (gate verde / ref existe / prosa GitFlow / pin herdado) — confie no que ele FAZ/EXECUTA/ENTREGA (o que o gate PEGA, o que os triggers disparam, o release ATUAL); a cura e sempre mecanismo (fixture/ler-triggers/pin+verifier), nunca disciplina"
+    trace: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
+
+  - id: E_L1
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-25
+    label: "L1 catraca de escopo — DECLARADO: gate '0 violacoes, verde, allowlist completa' le-se como fronteira coberta; VERIFICADO: das 8 travessias reais so 1 e pega, 7/8 invisiveis (wrapper streamAgent + export que lava a origem); falso-verde por ESCOPO DE DETECCAO (3o modo, gate correto mas mede a coisa errada)"
+    trace: "docs/evolution/inbox/_processed/2026-07-25-sinal-catraca-falso-verde-arandek.md L24-61 (esp. L33-48); Arandek scripts/lint-provider-boundary.ts; source_commit 5e3ea5ee46ac"
+
+  - id: E_DEVFANTASMA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-25
+    label: "develop-fantasma — DECLARADO: existencia do ref origin/develop + prosa dos comentarios de deploy-staging.yml afirmam GitFlow (develop=integracao); VERIFICADO: triggers reais executam trunk-based (deploy-prod push em main; staging por tag staging-*), develop nao gateia nada, 95 commits atras / 43 dias parada; existencia != autoridade"
+    trace: "docs/evolution/inbox/_processed/2026-07-25-contra-sinal-develop-fantasma-v2.md L24-72; core resolve-integration-branch.sh:49-51 (existencia antes de origin/HEAD); acao adotante commit b7182ccb"
+
+  - id: E_L2
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-25
+    label: "L2 pin herdado — DECLARADO: pin 1.36.0 do compose destilado tratado (pela acao) como transporte neutro herdado; VERIFICADO: versao e conteudo, 5 minors atras (1.36->1.41), faltavam fixes de seguranca reais (account enumeration 1.39, MFA adaptativa 1.38, KEK do Secret Vault) — heranca seletiva de ceticismo, gap so achado por pergunta do maestro"
+    trace: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md; source_commit 65d8a7501a03; stack /home/marcio/onion-logto commit 7c008b2"
+
+  - id: D_KB
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 1.0
+    label: "KB adotante-facing behavior-over-declaration.md — tese + 1 secao por caso + regra generalizavel (verifique COMPORTAMENTO nao declaracao, peso extra em seguranca) + corolario mecanico (cura = verificador/fixture/mecanismo)"
+    trace: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
+
+edges:
+  - from: E_L1
+    to: C_TESE
+    edge_type: SUPPORTS
+  - from: E_DEVFANTASMA
+    to: C_TESE
+    edge_type: SUPPORTS
+  - from: E_L2
+    to: C_TESE
+    edge_type: SUPPORTS
+  - from: D_KB
+    to: C_TESE
+    edge_type: TRACES_TO
