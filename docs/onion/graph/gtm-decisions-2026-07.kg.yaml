@@ -1,0 +1,269 @@
+# KG SDAAL — DECISÕES GTM do Onion (D6→D1/D5/D3): o mapa do ACOPLAMENTO comercial decision-ready.
+# D6 (comprador-alvo) é a decisão-RAIZ: calibra vocabulário/risco de D1 (postura), D5 (preço), D3 (consumer/mentoria).
+# Convenção: D_<id> = decision (status:open, a pergunta em aberto); C_<id>_rec = claim (a recomendação do analista,
+# SUPPORTS a decisão); E_<slug> = evidence (mercado/interno, SUPPORTS/REFUTES, url/trace no label); Q_<slug> = question
+# (o que falta instrumentar). Acoplamento = arestas DEPENDS_ON. Quem decide é o maestro — todo D_ fica open.
+# Brief-irmão: docs/business-context/gtm-decision-brief-2026-07.md. Camada audit (meta/estratégico).
+meta:
+  id: gtm-decisions-2026-07
+  schema_version: "1"
+  date: 2026-07-25
+nodes:
+  # ---- DECISÕES (decision, status:open) ----
+  - id: D_D6
+    node_type: decision
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.75
+    status: open
+    label: "D6 — comprador-alvo primário: P3 (empresa/sistemas internos) vs P4 (regulado/enterprise) vs P5 (dev solo) vs P6 (leigo). RAIZ: calibra D1/D5/D3. Recomenda-se cindir em MENSAGEM (P4, whitespace) vs PIPELINE (P3, mais líquido)"
+  - id: D_D1
+    node_type: decision
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "D1 — postura comercial: A (camadas/mini-funil+captura adjacente) vs B (licença restritiva) vs C (SaaS control-plane) vs D (consultoria-only). Decisão-mãe do eixo receita; trava D4/D5, pré-req de D6"
+  - id: D_D5
+    node_type: decision
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "D5 — preço por camada (treino→certificação→compliance-pack→curadoria SOTA): A (escada por comparáveis) vs B (adiar/sob-consulta) vs C (bundle único) vs D (segmentado por comprador). Diretriz: ticket premium ($129+) > pipoca ($5-10)"
+  - id: D_D3
+    node_type: decision
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "D3 — perseguir linha consumer (Company Brain N=1 / Onion Pessoal) + mentoria como pilar GTM? A (comprometer já) vs B (gated) vs C (desacoplar mentoria do app) vs D (spin-off de marca)"
+  - id: D_D2_activation
+    node_type: decision
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "D2-ATIVAÇÃO — ligar o flywheel de moeda-dado (SSOT 6 camadas L1-L6 de mitigação de inferência, dogfoodado). Direção RATIFICADA (local-first+destilado); ativação `gated`. Gate: declarado≠verificado — não vender garantia não-construída"
+
+  # ---- RECOMENDAÇÕES (claim, SUPPORTS a decisão) ----
+  - id: C_D6_rec
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "REC D6: cindir a pergunta. MENSAGEM/posicionamento = P4 (único whitespace confirmado), MAS sem prometer L1-L6 gated (só workflows faseados + auditabilidade estrutural, que já existem). PIPELINE/1ª receita = P3 (mais líquido, ciclo curto). P5 descartado como primário (D7 já decidiu = MOAT). P6 fora (pré-req branding)"
+  - id: C_D1_rec
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "REC D1: RATIFICAR A (camadas) — deixa de ser hipótese; o que falta fechar é o GATILHO de abrir, não o modelo. C (SaaS control-plane) = HORIZONTE pós-D2, não escolha imediata (colide com identidade sem-infra). B (licença) contraria guardrail anti-relicenciamento. D (consultoria-only) = não-decidir disfarçado"
+  - id: C_D5_rec
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "REC D5: BLEND A+B — escada por comparáveis SÓ p/ degraus vendíveis já (treino day-rate ~$1.2-2k; certificação $795-$1.5k + renovação baixa); trava 'sob consulta'/faixa larga p/ compliance-pack ($15-40k/ano citável não-fechado) e SOTA até 2-3 cases instrumentados. SOTA amarrado a D2 gated"
+  - id: C_D3_rec
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: open
+    label: "REC D3: opção C — DESACOPLAR mentoria (receita D4, sem artefato não-provado, pricing $149-399/mês compatível com D5) do app-consumer (F0/F1, N=1, mantém gated). D como refinamento de marca depois. Preserva opcionalidade sem travar receita nem furar D5"
+
+  # ---- EVIDÊNCIA (evidence) ----
+  - id: E_anthropic_pricing
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "Anthropic opera a MESMA fronteira no ecossistema onde o Onion vive: Claude Code pleno em Pro $20/Max $100 (individual); marketplace privado/department-agents gated a Team Premium ($100-150/seat, min 5) ou Enterprise. url: claude.com/pricing + adwaitx.com/claude-marketplace-enterprise (fev/2026)"
+  - id: E_whitespace_compliance
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "Whitespace confirmado (10+ buscas): nenhum concorrente SDD trata compliance como dimensão peer. trace: docs/business-context/02-product/strategy.md §Posicionamento; personas.md P4 (shadow AI 82%, riscos FINRA — Zylos 2026)"
+  - id: E_compliance_grc_market
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "GRC/compliance software $10-40k/ano (Scytale, Vanta ~$15-60k, Drata ~$15-75k); add-on AI governance $40-150k/ano (Credo AI/Holistic AI). Mercado compliance projetado $15.2B até 2026 (14.8% CAGR). url: layer3labs.io/guides/ai-compliance-software, reco.ai"
+  - id: E_safe_cert
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "Certificação de metodologia (âncora): SAFe SPC $795 exame + $3.5-7k total, renovação $195-995/ano; EOS implementer ~$3.500/mês por engajamento (capacidade limitada). url: staragile.com, agile36.com, guestcanpost.com"
+  - id: E_consulting_daterate
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "Consultoria sênior de IA solo $1.200-$2.800/dia; dev-tool premium tier recorrente $130-260/mês — âncora dos 2 degraus vendíveis já (treino/consultoria = receita 'mais próxima' de D4). url: groovyweb.co, pertamapartners.com, promptstoproduct.com"
+  - id: E_consumer_pipoca
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "Apps 'AI second brain' consumer precificam PIPOCA: Reflect/Capacities/Mem $9,99-40/mês ou pacote único $197 — CONTRADIZ a diretriz D5 ($129+ > pipoca). Comprometer app-consumer agora forçaria furar D5 ou vender caro demais p/ leigo. url: iwoszapar.com, Taskade, toolfinder (jul/2026)"
+  - id: E_mentoria_pricing
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "Mentoria/comunidade premium com coaching: $149-399/mês (180-420 membros) ou cohorts $97-497/vaga — ordem de grandeza COMPATÍVEL com ticket premium de D5, ao contrário do app-consumer puro. url: communipass.com, kourses.com (jul/2026)"
+  - id: E_hybrid_pricing_trend
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    label: "Mercado IA migra p/ pricing híbrido/por outcome: 43%→61% hybrid em 2026, seat-based caindo 21%→15% (Bessemer VP) — mas depende de telemetria que o Onion NÃO tem instrumentada (mesma lacuna que trava preço-por-outcome). url: flexprice.io/blog/top-solutions-for-ai-and-agentic-monetization; BCG 2025"
+
+  # ---- QUESTÕES ABERTAS (question) ----
+  - id: Q_d6_message_vs_pipeline
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.6
+    status: open
+    label: "D6 mistura 'comprador da MENSAGEM' com 'comprador que fatura PRIMEIRO' — o maestro precisa decidir se D6 é POSICIONAMENTO (a quem falar) ou PIPELINE (a quem vender antes). A recomendação assume perguntas separadas; o card não distingue"
+  - id: Q_open_trigger
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.55
+    status: open
+    label: "Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É o que realmente falta fechar em D1 — nenhuma fonte externa resolve, é decisão do maestro"
+  - id: Q_instrument_metrics
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de metodologia dev). Sem isso, preço de compliance-pack/SOTA é chute educado; D4 fica sem valor por degrau"
+  - id: Q_p4_no_field_proof
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.55
+    status: open
+    label: "Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Falta entrevistar 1-2 prospects regulados + reconciliar 'Claude Code-only' com demanda enterprise de multi-ambiente/on-prem (pressão sobre M3)"
+
+edges:
+  # recomendações SUPPORTS suas decisões
+  - from: C_D6_rec
+    to: D_D6
+    edge_type: SUPPORTS
+  - from: C_D1_rec
+    to: D_D1
+    edge_type: SUPPORTS
+  - from: C_D5_rec
+    to: D_D5
+    edge_type: SUPPORTS
+  - from: C_D3_rec
+    to: D_D3
+    edge_type: SUPPORTS
+  # ACOPLAMENTO — D6 é a raiz; D1/D5/D3 dependem dela
+  - from: D_D1
+    to: D_D6
+    edge_type: DEPENDS_ON
+  - from: D_D5
+    to: D_D6
+    edge_type: DEPENDS_ON
+  - from: D_D3
+    to: D_D6
+    edge_type: DEPENDS_ON
+  # postura (D1) é herdada por preço (D5) e consumer (D3)
+  - from: D_D5
+    to: D_D1
+    edge_type: DEPENDS_ON
+  - from: D_D3
+    to: D_D1
+    edge_type: DEPENDS_ON
+  # degrau SOTA (D5) e Company Brain (D3) amarrados à ativação D2 gated
+  - from: D_D5
+    to: D_D2_activation
+    edge_type: DEPENDS_ON
+  - from: D_D3
+    to: D_D2_activation
+    edge_type: DEPENDS_ON
+  # evidência sustenta as recomendações
+  - from: E_anthropic_pricing
+    to: C_D1_rec
+    edge_type: SUPPORTS
+  - from: E_whitespace_compliance
+    to: C_D6_rec
+    edge_type: SUPPORTS
+  - from: E_compliance_grc_market
+    to: C_D6_rec
+    edge_type: SUPPORTS
+  - from: E_safe_cert
+    to: C_D5_rec
+    edge_type: SUPPORTS
+  - from: E_consulting_daterate
+    to: C_D5_rec
+    edge_type: SUPPORTS
+  - from: E_hybrid_pricing_trend
+    to: C_D5_rec
+    edge_type: SUPPORTS
+  - from: E_mentoria_pricing
+    to: C_D3_rec
+    edge_type: SUPPORTS
+  # o pricing do app-consumer REFUTA comprometer o app já (sustenta desacoplar)
+  - from: E_consumer_pipoca
+    to: C_D3_rec
+    edge_type: SUPPORTS
+  # questões abertas traceiam às decisões que travam
+  - from: Q_d6_message_vs_pipeline
+    to: D_D6
+    edge_type: TRACES_TO
+  - from: Q_p4_no_field_proof
+    to: D_D6
+    edge_type: TRACES_TO
+  - from: Q_open_trigger
+    to: D_D1
+    edge_type: TRACES_TO
+  - from: Q_instrument_metrics
+    to: D_D5
+    edge_type: TRACES_TO
