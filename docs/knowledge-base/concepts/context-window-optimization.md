@@ -49,15 +49,15 @@ Lineup atual do Claude no Claude Code — use estes modelos; não há modelos Op
 | Modelo | Papel típico em orquestração | Context Window | ~Linhas de Código |
 |--------|-----------------------|----------------|-------------------|
 | Claude Fable 5 | Orquestração de raciocínio profundo | 1M tokens | ~400K linhas |
-| Claude Opus 4.8 | Orquestrador (planeja, sintetiza, decide) | 200K tokens (1M na variante `[1m]`) | ~80K–400K linhas |
-| Claude Sonnet 4.6 | Worker de uso geral (implementação, análise) | 200K tokens | ~80K linhas |
-| Claude Haiku 4.5 | Worker barato/rápido (classificação, extração, filtro) | 200K tokens | ~80K linhas |
+| tier `opus` (hoje **Opus 5**) | Orquestrador (planeja, sintetiza, decide) | 1M tokens | ~400K linhas |
+| tier `sonnet` (hoje Sonnet 5) | Worker de uso geral (implementação, análise) | 200K–1M tokens | ~80K linhas |
+| tier `haiku` (hoje Haiku 5) | Worker barato/rápido (classificação, extração, filtro) | 200K tokens | ~80K linhas |
 
 > ⚠️ **Versões acima são SNAPSHOT (jun/2026), não lineup vigente** — o lineup drifta (em jul/2026 já há Sonnet 5, e **fable** é tier *acima* de opus, não par). Os **limites de contexto por tier** seguem úteis; para *qual modelo usar*, cite por **tier** e consulte a fonte única do lineup: [`agent-orchestration.md` §Disponibilidade de modelos](agent-orchestration.md).
 
 **Nota**: 1 token ≈ 4 caracteres em inglês, ~3 em código.
 
-**Tiering de modelos** (doutrina "orchestration era"): o orquestrador roda em Opus 4.8 (ou Fable 5 quando o raciocínio domina); os workers paralelos rodam em Sonnet 4.6 ou Haiku 4.5. Reservar o modelo caro só para o nível que decide reduz custo agregado sem perder qualidade no resultado final. Veja [Custo em Orquestração (Multi-Agente)](#-custo-em-orquestração-multi-agente).
+**Tiering de modelos** (doutrina "orchestration era"): o orquestrador roda no tier `opus` (hoje **Opus 5**; ou o tier Mythos-class/`fable` quando o raciocínio domina **e a conta tem acesso**); os workers paralelos rodam em `sonnet` ou `haiku`. Reservar o modelo caro só para o nível que decide reduz custo agregado sem perder qualidade no resultado final. **Referência por-tier (evergreen)**: o lineup e a disponibilidade vivem na fonte única [`agent-orchestration.md` §Disponibilidade de modelos](agent-orchestration.md) — atualizar SÓ lá mantém isto corrente (não hardcodar versão aqui). Veja [Custo em Orquestração (Multi-Agente)](#-custo-em-orquestração-multi-agente).
 
 ---
 
@@ -476,15 +476,15 @@ Cada subagente disparado por `agent(...)` recebe seu próprio budget (parâmetro
 
 ### 2. Model tiering
 
-Não use o modelo do orquestrador em todo worker. O orquestrador (que planeja, sintetiza e decide) roda em **Opus 4.8** — ou **Fable 5** quando o raciocínio domina; os workers paralelos rodam em **Sonnet 4.6** (uso geral) ou **Haiku 4.5** (classificação, extração, filtro, tarefas mecânicas). Reservar o tier caro para o nível de decisão é o que torna a orquestração economicamente viável.
+Não use o modelo do orquestrador em todo worker. O orquestrador (que planeja, sintetiza e decide) roda no tier **`opus`** (hoje Opus 5) — ou no tier **Mythos-class/`fable`** quando o raciocínio domina e há acesso; os workers paralelos rodam em **`sonnet`** (uso geral) ou **`haiku`** (classificação, extração, filtro, tarefas mecânicas). Reservar o tier caro para o nível de decisão é o que torna a orquestração economicamente viável. (Versões correntes: ver `agent-orchestration.md` §Disponibilidade — fonte única.)
 
 ```
-Opus 4.8 (orquestrador)  ── planeja, distribui, sintetiza
+opus/Opus 5 (orquestrador) ── planeja, distribui, sintetiza
    │
-   ├── Sonnet 4.6  (worker — implementa / analisa)
-   ├── Sonnet 4.6  (worker — implementa / analisa)
-   ├── Haiku 4.5   (worker — classifica / extrai)
-   └── Haiku 4.5   (worker — classifica / extrai)
+   ├── sonnet      (worker — implementa / analisa)
+   ├── sonnet      (worker — implementa / analisa)
+   ├── haiku       (worker — classifica / extrai)
+   └── haiku       (worker — classifica / extrai)
 ```
 
 ### 3. Alocação de budget: orquestrador + N workers
