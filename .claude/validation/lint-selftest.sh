@@ -2683,6 +2683,28 @@ run_githook_selftests() {
   else record_fail "githook: idempotente" "gerou sidecar espúrio na 2ª rodada"; fi
   rm -rf "${d}"
 
+  # (d2) hook Onion-AUTORADO porém DESATUALIZADO → REFRESH (não sidecar).
+  #      Sinal de campo (arandek, 2026-07-25): no `--update` o template evoluído virava
+  #      sidecar e o hook VELHO seguia ativo — o update não atualizava nada.
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.githooks"
+  # simula hook Onion de versão ANTIGA: marcador de autoria presente, conteúdo diferente
+  { head -4 "${tpl}"; printf '# versao ANTIGA do template\necho onion-velho\n'; } > "${d}/.githooks/pre-commit"
+  bash "${helper}" "${d}" >/dev/null 2>&1
+  if cmp -s "${tpl}" "${d}/.githooks/pre-commit" 2>/dev/null && [ ! -f "${d}/.githooks/pre-commit.onion" ]; then
+    record_pass "githook: hook Onion desatualizado → REFRESCADO (sem sidecar)"
+  else record_fail "githook: refresh" "não refrescou o hook Onion-autorado antigo (virou sidecar ou ficou velho)"; fi
+  rm -rf "${d}"
+
+  # (d3) REGRESSÃO: hook de TERCEIRO com conteúdo parecido NÃO pode ser refrescado.
+  #      Garante que o refresh discrimina por MARCADOR DE AUTORIA, não por heurística frouxa.
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.githooks"
+  printf '#!/usr/bin/env bash\n# pre-commit hook do projeto (lint proprio)\necho terceiro\n' > "${d}/.githooks/pre-commit"
+  bash "${helper}" "${d}" >/dev/null 2>&1
+  if grep -q 'terceiro' "${d}/.githooks/pre-commit" && [ -f "${d}/.githooks/pre-commit.onion" ]; then
+    record_pass "githook: hook de terceiro segue never-clobber (sidecar)"
+  else record_fail "githook: refresh discrimina autoria" "refrescou/clobrou hook de TERCEIRO"; fi
+  rm -rf "${d}"
+
   # (e) dest não-git → exit 2 (erro de uso)
   d="$(mktemp -d)"; rc=0; bash "${helper}" "${d}" >/dev/null 2>&1 || rc=$?; rm -rf "${d}"
   if [ "${rc}" -eq 2 ]; then record_pass "githook: dest não-git → exit 2"

@@ -4,7 +4,7 @@ date: 2026-07-25
 status: decision-ready
 audience: maestro
 decides: maestro (este brief NÃO decide — estrutura para decidir)
-kg: ../onion/graph/gtm-decisions-2026-07.kg.yaml
+kg: docs/onion/graph/gtm-decisions-2026-07.kg.yaml
 related:
   - decisions.md
   - 02-product/strategy.md
