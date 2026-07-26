@@ -116,7 +116,7 @@ record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} —
 # Onde só existem "lançar" e "não lançar", "não verifiquei" se disfarça de "verifiquei e está
 # bom" — falso-verde por VACUIDADE (architecture-challenges.md §1.3). Antes disto, 32 sítios
 # registravam skip como ✓: uma máquina sem jq/python3 produzia o MESMO "N passaram" de uma
-# máquina saudável. Sinal de campo 2026-07-25 (arandek): o mesmo defeito custou um deploy.
+# máquina saudável. Sinal de campo 2026-07-25 (adotante): o mesmo defeito custou um deploy.
 # Em STRICT (CI) um skip é FALHA — ver bloco do sumário. [[fix-must-become-mechanism]]
 record_skip() { SKIP=$((SKIP + 1)); SKIPPED_CASES+=("${1}"); echo "  ⊘ ${1}"; }
 
@@ -591,7 +591,7 @@ run_onion_version_tracked_selftests() {
   else record_fail "onion-version-tracked: (c)" "disparou em role: source (não-adotante)"; fi
 
   # (d) role: hub + UNTRACKED → HARD (o hub também é stamp de adoção que o clone precisa trackear)
-  printf 'framework: onion-pedro\nrole: hub\n' > "${sb}/.claude/.onion-version"
+  printf 'framework: acme-adopter\nrole: hub\n' > "${sb}/.claude/.onion-version"
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
   if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
     record_pass "onion-version-tracked: (d) role: hub + untracked → HARD (hub trackeia o stamp)"
@@ -607,11 +607,11 @@ run_onion_version_tracked_selftests() {
 
 # Modo hub-role-guard — costura HUB (2026-07-23): um hub É adotante para os role-guards que pulam os
 # links/plugins core-only (ausentes-por-desenho na superfície vendorizada). Sem isso, o clone de um hub
-# vira 156 falso-HARD — dogfood-de-fronteira: a sessão do Pedro promoveu a hub e o lint explodiu.
+# vira 156 falso-HARD — dogfood-de-fronteira: a sessão de um adotante promoveu a hub e o lint explodiu.
 # Modo inventory-adopter-scope — check_inventory_total_drift é adopter-aware: num repo DERIVADO
 # (role: adopted|hub|decoupled) SÓ os docs Onion vendorizados são varridos p/ contagens; os docs de
 # PRODUTO do adotante (docs/specs, …) são EXCLUÍDOS ('100+ agentes' ali é do produto dele). Sinal de
-# campo: arandek 2026-07-24 (docs/specs/capability-registry.md). Testa: (a) adotante → doc de produto
+# campo: um adotante 2026-07-24 (doc de produto do alvo). Testa: (a) adotante → doc de produto
 # NÃO flagado; (b) source → o MESMO doc É flagado (sem scoping); (c) adotante → doc Onion-owned AINDA
 # flagado (o scoping não desliga a regra p/ os docs certos). [[fix-must-become-mechanism]]
 run_inventory_adopter_scope_selftests() {
@@ -633,7 +633,7 @@ run_inventory_adopter_scope_selftests() {
   printf '# Capability Registry\nO produto orquestra 100+ agentes mencionáveis.\n' > "${sb}/docs/specs/capability.md"
   n="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 | grep -c "${msg}" || true)"
   if [ "${n}" = 0 ]; then record_pass "inventory-adopter-scope: (a) adotante → doc de produto não flagado"
-  else record_fail "inventory-adopter-scope: (a)" "adotante flagou ${n}× o doc de produto (falso-positivo arandek não fechou)"; fi
+  else record_fail "inventory-adopter-scope: (a)" "adotante flagou ${n}× o doc de produto (falso-positivo de adotante não fechou)"; fi
 
   # (b) role: source + o MESMO doc → É flagado (no source não há scoping de adotante)
   printf 'framework: h\nrole: source\n' > "${sb}/.claude/.onion-version"
@@ -2029,8 +2029,8 @@ run_write_stamp_selftests() {
   else record_skip "write-stamp: restore pulado (sem python+yaml)"; fi
   # 4. --role hub (Camada 2): fresh grava role: hub; update SEM --role preserva hub (não rebaixa)
   rm -rf "${wsb}/h"; mkdir -p "${wsb}/h/.claude"
-  bash "${helper}" "${wsb}/h" --framework onion-pedro --commit aaa111 --commit-date 2026-07-23 --role hub >/dev/null 2>&1
-  bash "${helper}" "${wsb}/h" --framework onion-pedro --commit bbb222 --commit-date 2026-07-23 >/dev/null 2>&1  # update sem --role
+  bash "${helper}" "${wsb}/h" --framework acme-adopter --commit aaa111 --commit-date 2026-07-23 --role hub >/dev/null 2>&1
+  bash "${helper}" "${wsb}/h" --framework acme-adopter --commit bbb222 --commit-date 2026-07-23 >/dev/null 2>&1  # update sem --role
   if grep -q '^role: hub$' "${wsb}/h/.claude/.onion-version" && grep -q '^source_commit: bbb222$' "${wsb}/h/.claude/.onion-version"; then
     record_pass "write-stamp: --role hub grava hub; update sem --role PRESERVA hub (não rebaixa)"
   else record_fail "write-stamp: role hub" "$(cat "${wsb}/h/.claude/.onion-version")"; fi
@@ -2593,14 +2593,14 @@ run_prettierignore_selftests() {
 # ---------------------------------------------------------------------------
 # Modo scope-gitignore — exercita .claude/utils/adopt/scope-claude-gitignore.sh
 # (escopa um ignore CEGO de .claude/ p/ que a superfície do framework + stamp sejam
-# TRACKEÁVEIS no adotante; sinal de campo arandek 2026-07-24). Self-contained.
+# TRACKEÁVEIS no adotante; sinal de campo de adotante 2026-07-24). Self-contained.
 # ---------------------------------------------------------------------------
 run_scope_gitignore_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/scope-claude-gitignore.sh"
   if [ ! -f "${helper}" ]; then record_fail "scope-gitignore" "helper ausente: ${helper}"; return; fi
   local d before after
 
-  # (a) ignore cego DUPLO (caso arandek) → escopa: .claude/ deixa de ser ignorado, efêmeros seguem
+  # (a) ignore cego DUPLO (caso de campo) → escopa: .claude/ deixa de ser ignorado, efêmeros seguem
   d="$(mktemp -d)"; printf 'node_modules/\n.claude/\nbackups/\n.codex/\n.claude/\n_private/\n' > "${d}/.gitignore"
   bash "${helper}" "${d}" >/dev/null 2>&1
   if ! grep -qxF ".claude/" "${d}/.gitignore" \
@@ -2641,7 +2641,7 @@ run_scope_gitignore_selftests() {
 # ---------------------------------------------------------------------------
 # Modo task-manager-hook — .claude/hooks/task-manager-provider-hook.sh deve ler o
 # AMBIENTE primeiro (fonte do adapter), com .env como fallback HONESTO. Sinal de campo
-# arandek 2026-07 (D2): hook lia só .env → anunciava 'none' com Linear provado via direnv.
+# adoção legacy 2026-07 (D2): hook lia só .env → anunciava 'none' com Linear provado via direnv.
 # ---------------------------------------------------------------------------
 run_task_manager_hook_selftests() {
   local hook="${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh"
@@ -2716,7 +2716,7 @@ run_githook_selftests() {
   rm -rf "${d}"
 
   # (d2) hook Onion-AUTORADO porém DESATUALIZADO → REFRESH (não sidecar).
-  #      Sinal de campo (arandek, 2026-07-25): no `--update` o template evoluído virava
+  #      Sinal de campo (adotante, 2026-07-25): no `--update` o template evoluído virava
   #      sidecar e o hook VELHO seguia ativo — o update não atualizava nada.
   d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.githooks"
   # simula hook Onion de versão ANTIGA: marcador de autoria presente, conteúdo diferente
@@ -3599,7 +3599,7 @@ run_onion_version_selftests() {
   else record_fail "onion-version: stamp sem role" "esperava 'role: adopted', veio '${out}'"; fi
 
   # (d) stamp role: hub → o GATE ACEITA (Camada 2 — a empresa adota os próprios projetos)
-  printf 'framework: onion-pedro\nsource_commit: abc123\nrole: hub\n' > "${d}/.claude/.onion-version"
+  printf 'framework: acme-adopter\nsource_commit: abc123\nrole: hub\n' > "${d}/.claude/.onion-version"
   out="$(bash "${d}/.claude/validation/onion-version.sh" | grep '^role:' || true)"
   if [ "${out}" = "role: hub" ] \
      && bash "${d}/.claude/validation/onion-version.sh" | grep -qE '^role: (source|hub)'; then
@@ -4449,7 +4449,7 @@ run_outbox_channel_selftests() {
   # GREENFIELD (terms vazio): um adotante SEM members.yaml não pode ABORTAR o lint na derivação de
   # termos da REGRA 36 — 'grep -v' sem match sai 1 e sob 'set -euo pipefail' derrubaria tudo. O core
   # nunca vê (sempre tem termos); todo adotante greenfield veria. Regressão de 2026-07-22, achada
-  # rodando o lint DENTRO da cópia limpa do Pedro (o core é o pior oráculo do que viaja).
+  # rodando o lint DENTRO da cópia limpa de um adotante (o core é o pior oráculo do que viaja).
   rm -f "${sb}/docs/evolution/federation/members.yaml"
   local out3; out3="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
   if printf '%s' "${out3}" | grep -q 'Viola..es HARD'; then
@@ -5066,10 +5066,10 @@ run_a2a_accept_selftests
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 run_prettierignore_selftests
 
-# Modo scope-gitignore — escopa ignore cego de .claude/ no adotante (sinal arandek).
+# Modo scope-gitignore — escopa ignore cego de .claude/ no adotante (sinal de campo).
 run_scope_gitignore_selftests
 
-# Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal arandek D2).
+# Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal de campo D2).
 run_task_manager_hook_selftests
 
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
@@ -5167,7 +5167,7 @@ run_kb_vendored_link_selftests
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois
 #
-# Origem: sinal de campo 2026-07-25 (arandek). Um runner que só distingue "lançar" de
+# Origem: sinal de campo 2026-07-25 (adotante). Um runner que só distingue "lançar" de
 # "não lançar" soma o `skip` em `passed`; um ambiente sem o serviço produz o MESMO
 # "N passed" de um ambiente saudável. Aqui isso valia para 32 sítios.
 #

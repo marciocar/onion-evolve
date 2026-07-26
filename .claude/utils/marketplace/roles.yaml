@@ -58,7 +58,7 @@ roles:
     base: [onion-engineering, onion-product, onion-testing, onion-docs]
     optional: [onion-design, onion-compliance]
     work_tools: full
-    # 3 CAMADAS de capacidade (2026-07-23, sinal de campo Pedro/Aura — o "multi" chegou):
+    # 3 CAMADAS de capacidade (2026-07-23, sinal de campo de um adotante — o "multi" chegou):
     #   Camada 1 (autoria do framework: create-*/evolve/graph/inventory) = source-only. Hub USA, nao autora.
     #   Camada 2 (adocao+controle LOCAL dos proprios projetos: /meta:adopt e --update) = source + HUB. ABERTA
     #     (gate em adopt.md PASSO 0 = grep role: source|hub; NAO e um campo de bundle aqui): o hub carimba

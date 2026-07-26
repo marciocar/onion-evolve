@@ -38,7 +38,7 @@ Para ler/gravar o contexto técnico vivo (arquitetura, decisões, estado), resol
 
 1. **Mapa explícito**: chave `context.technical` em `.onion-version` (JSON) ou `.claude/onion-context.yaml`,
    se o consumidor declarou um caminho próprio. **Declaração explícita vence convenção** — o específico
-   ganha do default. (Sinal de campo, arandek 2026-07/D1: a adoção CRIA `docs/technical-context/`, então
+   ganha do default. (Sinal de campo, adoção legacy 2026-07/D1: a adoção CRIA `docs/technical-context/`, então
    se o layout padrão viesse antes, o mapa explícito seria código morto exatamente para quem foi desenhado
    — o adotante com SSOT próprio, ex.: `docs/specs/` autoritativa, que quer declará-lo.)
 2. **Layout Onion padrão**: `docs/technical-context/` (índice em `docs/technical-context/index.md`).

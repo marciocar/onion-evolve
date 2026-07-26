@@ -3,7 +3,7 @@ description: >
   Conduz o maestro por um MOVIMENTO da família Onion — criar um repo p/ cliente, adotar um projeto,
   promover a hub, atualizar um adotado. É a face "ajuda a FAZER" da Condução (par da onion-onboarding,
   "ajuda a CONHECER"). Ative quando o maestro quer EXECUTAR um desses e quer ser guiado (ex.: "cria um
-  repo pro cliente", "adota a aura", "promove a hub", "atualiza o X"), mesmo sem dizer "wizard". NÃO é
+  repo pro cliente", "adota o projeto X", "promove a hub", "atualiza o X"), mesmo sem dizer "wizard". NÃO é
   para ensinar/orientar (isso é onboarding) nem para operações fora da topologia.
 allowed-tools: AskUserQuestion Read Bash(bash .claude/utils/wizard/*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh*) Bash(git rev-parse*) Skill
 ---

@@ -9,7 +9,7 @@
 #             do framework (agents/commands/skills/utils/validation/hooks) E do stamp
 #             `.claude/.onion-version` entram no commit. Um clone perde o marcador e
 #             TODOS os guards de adotante desligam (o modo-de-falha que a REGRA 40
-#             existe para evitar). Sinal de campo REAL: arandek (2026-07-24) ignorava
+#             existe para evitar). Sinal de campo REAL: um adotante legacy (2026-07-24) ignorava
 #             `.claude/` em DUAS linhas → 0 arquivos .claude/ commitados. [[fix-must-become-mechanism]]
 #
 # Mecânica  : Detecta linhas de ignore CEGO de .claude (`.claude`, `.claude/`,
@@ -83,7 +83,7 @@ done < "${GI}"
 
 if cat "${TMP}" > "${GI}" 2>/dev/null; then
   rm -f "${TMP}"
-  # A estaca do aviso vem de campo (V1, adoção arandek 2026-07): um ignore cego de .claude/ NÃO custa só
+  # A estaca do aviso vem de campo (V1, adoção legacy 2026-07): um ignore cego de .claude/ NÃO custa só
   # o stamp Onion — custa o TRABALHO do próprio adotante. Este repo já perdera 242 arquivos (71 skills, 39
   # comandos) por ignorar .claude/ INTEIRO; some de todo clone em SILÊNCIO e só aparece meses depois como
   # referências mortas num doc que parece aspiracional. O aviso carrega essa dimensão — não é cosmético.

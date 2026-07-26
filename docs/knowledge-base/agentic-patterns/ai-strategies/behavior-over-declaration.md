@@ -7,7 +7,7 @@ kg: docs/onion/graph/doctrine-behavior-over-declaration-2026-07.kg.yaml
 
 # Comportamento acima de declaração
 
-> **Origem (crédito):** três casos de campo REAIS da mesma jornada — o adotante Arandek e a
+> **Origem (crédito):** três casos de campo REAIS da mesma jornada — um adotante de campo e a
 > stack Logto do próprio core — triados e sintetizados pelo core em 2026-07-25. Sinais no
 > `_processed` do inbox (trace em cada seção).
 
@@ -48,8 +48,8 @@ verifica contra a fonte externa viva, nunca do cutoff).
   varredura paralela de subagentes (perguntando só por `'ai'`) também não viu as 7 travessias
   por propagador nem um arquivo inteiro omitido — **varredura de subagente não substitui
   re-derivação quando o resultado vai virar catraca**.
-- **Trace:** `docs/evolution/inbox/_processed/2026-07-25-sinal-catraca-falso-verde-arandek.md`
-  (L24-61, esp. L33-48); Arandek `scripts/lint-provider-boundary.ts`; `source_commit 5e3ea5ee46ac`.
+- **Trace:** `docs/evolution/inbox/_processed/2026-07-25-sinal-catraca-falso-verde-*.md`
+  (L24-61, esp. L33-48); o `scripts/lint-provider-boundary.ts` do adotante; `source_commit 5e3ea5ee46ac`.
 - **Cura (mecanismo):** o teste de aceite de um gate **não é** "roda e passa" — é **"ele pega
   o caso que motivou a existência dele?"**. Se o gate nasceu de um achado concreto de
   auditoria, esse achado é o **fixture obrigatório**. Verde na primeira execução *sem* esse
@@ -94,7 +94,7 @@ verifica contra a fonte externa viva, nunca do cutoff).
 
 ## Caso 3 — L2: pin de versão herdado não-auditado (herança seletiva de ceticismo)
 
-- **Declarado:** ao destilar o `docker-compose.self-hosted.yml` do Arandek para montar o Logto
+- **Declarado:** ao destilar o `docker-compose.self-hosted.yml` de um adotante para montar o Logto
   do core, a sessão tratou (pela ação, não por afirmação) o pin herdado — `1.36.0` — como
   "detalhe de transporte". Todo o resto do artefato herdado foi revisado com ceticismo
   (removido o logto-init específico, portas no loopback, `mem_limit`, ENDPOINT corrigido) —

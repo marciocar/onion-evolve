@@ -326,7 +326,7 @@ END {
         # UNANCHORED — o carimbo existe mas NÃO diz contra O QUÊ. "Verificado" sem alvo
         # declarado é declaração, não verificação: o radar não consegue julgar a semântica,
         # mas pode EXIGIR que o alvo seja escrito — e é escrevendo-o que o desalinhamento
-        # fica legível a quem lê. Sinal de campo 2026-07-25 (arandek): nós com plane:PROD e
+        # fica legível a quem lê. Sinal de campo 2026-07-25 (adotante): nós com plane:PROD e
         # verified_at "porque um curl respondera" — mas o curl mediu o CORE e a claim era
         # sobre o ADOTANTE. O carimbo estava no artefato errado, e nada no arquivo denunciava.
         if (verifiedAgainst[id] == "") {

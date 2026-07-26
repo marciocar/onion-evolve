@@ -104,7 +104,7 @@ aplicado à automação: a escada não drifta porque um gate a guarda.
 
 Confirmadas pela exploração como território **não pisado** (ver o grafo do Elenxo):
 - **Degrau MONITORADO/shadow** (Onda 2) — promover o `onion-effect-gate.sh` órfão da worktree discuss;
-  dogfood **interno primeiro** (decisão do maestro), não no onboarding do Pedro.
+  dogfood **interno primeiro** (decisão do maestro), não no onboarding de um adotante.
 - **Alertas preditivos** (Onda 4) — o core é reativo/CI-safe por design; antecipar a falha é novo.
 - **Critérios de promoção contáveis** (Onda 3) — "N execuções provadas ⇒ destrava" + rollback como
   pré-condição; hoje é juízo humano no checkpoint.
@@ -142,5 +142,5 @@ passa — mas no adotante é um **link morto**: ele lê o nome e não alcança n
 Isto **não é conselho que depende de eu lembrar** — é **mecanismo**: a **REGRA 45** do lint
 ([`kb-vendored-link-check.sh`](../../../.claude/validation/kb-vendored-link-check.sh)) reprova, com catraca, um
 link vivo novo de KB vendorizada para caminho core-privado. É "o adotante é o oráculo" mecanizado: o core passa a
-checar a perspectiva do adotante que ele mesmo não enxerga. Nasceu de um bug de campo (adoção do Pedro: um link
+checar a perspectiva do adotante que ele mesmo não enxerga. Nasceu de um bug de campo (numa adoção real: um link
 para `.claude/diary` reprovou o lint DENTRO do repo dele; o do core não via). As seções acima são o exemplar vivo.

@@ -38,7 +38,7 @@ métricas), resolva o caminho **nesta ordem** e use o primeiro que existir:
 
 1. **Mapa explícito**: chave `context.business` em `.onion-version` (JSON) ou `.claude/onion-context.yaml`,
    se o consumidor declarou um caminho próprio. **Declaração explícita vence convenção** — o específico
-   ganha do default (senão o mapa vira código morto: a adoção CRIA `docs/business-context/`; sinal arandek/D1).
+   ganha do default (senão o mapa vira código morto: a adoção CRIA `docs/business-context/`; sinal de campo/D1).
 2. **Layout Onion padrão**: `docs/business-context/` (índice em `docs/business-context/index.md`).
 3. **Heurística de layout comum**: `contexto-projeto.md` · `docs/INDEX.md` (catálogo) ·
    `docs/base-conhecimento-*.md` (KB/RAG do produto) · `README.md` · `PRODUCT.md`/`VISION.md`.

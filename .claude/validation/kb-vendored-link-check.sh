@@ -18,7 +18,7 @@
 #           o mecanismo que força a conversão NO CORE, antes de o link morto
 #           embarcar. É "o adotante é o oráculo" mecanizado: o core passa a checar
 #           a perspectiva do adotante que ele mesmo não enxerga.
-#           Origem: bug de campo na adoção do Pedro (link p/ .claude/diary numa KB
+#           Origem: bug de campo numa adoção (link p/ .claude/diary numa KB
 #           vendorizada reprovou o lint DENTRO do repo dele; o do core deixou passar).
 #
 # ---------------------------------------------------------------------------
@@ -53,7 +53,7 @@ REPO_DIR=""
 
 # Prefixos CORE-PRIVADOS: ausentes em TODO adotante (cheio ou door). Alinhado ao
 # skip-list de _scan_relative_links (docs/*) + .claude/{diary,sessions} (que NÃO
-# estão lá e por isso QUEBRAM o lint do adotante, o bug do Pedro).
+# estão lá e por isso QUEBRAM o lint do adotante — o bug de campo).
 _is_core_private() {
   case "$1" in
     docs/analysis/*|docs/onion/*|docs/evolution/*|docs/discussions/*) return 0 ;;
@@ -124,10 +124,10 @@ run_selftest() {
   printf '# baseline vazio\n' > "${BL}"; _run
   if printf '%s' "${out}" | grep -q "b.md"; then echo "  ✗ (iii) link intra-KB não deveria violar"; fails=$((fails+1)); else echo "  ✅ (iii) link intra-KB ignorado"; fi
 
-  # (iv) link p/ .claude/diary (o bug do Pedro) => HARD
+  # (iv) link p/ .claude/diary (o bug de campo) => HARD
   printf '# c\nver [w](../../../.claude/diary/2026-07-21-x.md) fim\n' > "${kbdir}/c.md"
   printf '# baseline vazio\n' > "${BL}"; _run
-  if printf '%s' "${out}" | grep -q "diary"; then echo "  ✅ (iv) link p/ .claude/diary reprova (o bug do Pedro)"; else echo "  ✗ (iv)"; fails=$((fails+1)); fi
+  if printf '%s' "${out}" | grep -q "diary"; then echo "  ✅ (iv) link p/ .claude/diary reprova (o bug de campo)"; else echo "  ✗ (iv)"; fails=$((fails+1)); fi
 
   # (v) link p/ .claude/skills (VENDORIZADO — adotante recebe) => IGNORADO
   rm -f "${kbdir}/c.md"
