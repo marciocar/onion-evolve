@@ -235,7 +235,7 @@ SSOT-as-runtime à KB), a mesma máquina com duas referências — *o radar recu
   não tinha *nenhuma* disciplina de frescor, nem em PROD nem no nó DEV de estratégia `C_CONSOLIDATION_MAP`).
   **STALE-OLD**: `verified_at` anterior a **`meta.baseline:`** (uma data no `meta:`) → ⚠, a verdade envelheceu.
 - **UNANCHORED**: tem `verified_at:` mas **não diz `verified_against:`** → ⚠. Carimbo **sem alvo declarado**
-  não distingue verificado de declarado. Modo-de-falha de campo (2026-07-25, arandek): nós `plane: PROD` com
+  não distingue verificado de declarado. Modo-de-falha de campo (2026-07-25, adotante): nós `plane: PROD` com
   `verified_at` *porque um `curl` respondera* — só que o `curl` mediu o **core** e a claim era sobre o
   **adotante**. O carimbo estava no artefato errado e **nada no arquivo denunciava**. O radar não julga a
   semântica do alvo (não pode); ele **exige que o alvo seja escrito** — e é escrevendo-o que o desalinhamento

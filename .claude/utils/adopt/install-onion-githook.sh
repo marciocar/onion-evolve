@@ -44,7 +44,7 @@ mkdir -p "${HOOKDIR}" 2>/dev/null || { echo "AVISO: não criou ${HOOKDIR} (permi
 
 # (1) Provisiona o pre-commit — NEVER-CLOBBER, com REFRESH do hook Onion-autorado.
 #
-#   Três casos (o do meio nasceu de um sinal de campo do arandek, 2026-07-25):
+#   Três casos (o do meio nasceu de um sinal de campo de adotante, 2026-07-25):
 #     (a) idêntico ao template          -> no-op
 #     (b) DIFERENTE mas Onion-AUTORADO  -> REFRESH (sobrescreve): é a NOSSA versão antiga,
 #                                          o template evoluiu. Sidecar aqui deixava o hook

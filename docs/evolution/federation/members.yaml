@@ -264,6 +264,78 @@ members:
       diary_classifications_shared: []   # ZERADO — nada sobe proativamente
       exposes_downstream: []
 
+  # REGULARIZAÇÃO DE REGISTRO (2026-07-26) — três adotantes REAIS de 2026-07-24 tinham o stamp
+  # (.claude/.onion-version com adopted_from: onion-evolve, pin conferido) e faltavam AQUI. É o mesmo
+  # drift que a entrada gustavo-pulga corrigiu em 2026-07-19 (ADR claude-door-topology D4): o stamp
+  # nasce no ALVO, o registro é do CORE, e nada obriga os dois a andarem juntos.
+  # Achado triando o sinal do arandek: o remetente não constava da federação que recebeu o sinal.
+  # Os 3 pins foram VERIFICADOS com pin-integrity-check.sh nesta data (pin-ok), não lidos do stamp.
+  - id: onion-pedro
+    name: onion-pedro (adotante de campo — framework cheio, ênfase em compliance)
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    parent: onion-evolve
+    remote: github.com/marciocar/onion-pedro   # PRIVADO
+    local_path: "/home/marcio/onion-pedro"
+    onion_version: 165e1e13b11f   # VERIFICADO por pin-integrity-check.sh (pin-ok, 2026-07-26)
+    adopted_at: 2026-07-24
+    mode: greenfield              # repo novo; framework cheio commitado na main (sem branch onion/adopt)
+    personality_summary: "Adotante de campo do grupo fechado, com o framework cheio e ênfase na vertical de compliance. O dogfood da adoção rodando o lint DENTRO da cópia achou um bug greenfield da REGRA 36, e o oráculo-adotante forjou a REGRA 45 + a REGRA 44 adopter-aware."  # seed manual
+    specializations: [field-dogfood, greenfield-adoption, compliance]
+    personality_last_sync: 2026-07-26   # seed manual (registro; sem /meta:personality-sync no alvo)
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
+  - id: onion-arthur
+    name: onion-arthur (adotante de campo — todas as verticais, ênfase em design/branding/storytelling)
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    parent: onion-evolve
+    remote: github.com/marciocar/onion-arthur   # PRIVADO
+    local_path: "/home/marcio/onion-arthur"
+    onion_version: 165e1e13b11f   # VERIFICADO por pin-integrity-check.sh (pin-ok, 2026-07-26)
+    adopted_at: 2026-07-24
+    mode: greenfield              # criado via TX_create do HEAD 165e1e1; lint 0 HARD na origem
+    personality_summary: "Adotante completão (todas as verticais), com onboarding tailorizado para design, branding e storytelling — usa o Onion nos próprios negócios, não como engenheiro."  # seed manual
+    specializations: [greenfield-adoption, design, branding, storytelling]
+    personality_last_sync: 2026-07-26   # seed manual (registro; sem /meta:personality-sync no alvo)
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
+  - id: arandek
+    name: arandek (monorepo de plataforma de agentes IA — PRIVADO)
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    parent: onion-evolve
+    remote: github.com/ArandekBR/arandek   # PRIVADO
+    # ATENÇÃO doc-bridge: o local_path é a WORKTREE, não o checkout do produto. A adoção é `legacy`
+    # e vive em onion/adopt + onion/vendor (a main do produto NÃO tem .claude/). Só a worktree tem
+    # docs/evolution/{inbox,inbound}/ — entregar em /home/marcio/arandek seria correio no vazio.
+    # É exatamente o modo-de-falha medido no granaai (anúncios no checkout que não trabalha).
+    local_path: "/home/marcio/onion-adopt-arandek"
+    onion_version: 65d8a7501a03   # VERIFICADO por pin-integrity-check.sh (pin-ok, 2026-07-26)
+    adopted_at: 2026-07-24
+    updated_at: 2026-07-25        # do stamp .claude/.onion-version
+    mode: legacy                  # monorepo existente (NX + Bun + SST); adoção por worktree
+    integration_branch: onion/adopt
+    personality_summary: "Adotante legacy num monorepo de plataforma de agentes IA. É o remetente mais produtivo do canal upstream: o dogfood da adoção rendeu os gaps de durable-commit e approx-count adopter-aware, e a autocorreção do sinal do entrypoint virou o terceiro desfecho do auto-teste e a âncora UNANCHORED do radar."  # seed manual
+    specializations: [field-dogfood, legacy-adoption, monorepo, upstream-signal]
+    personality_last_sync: 2026-07-26   # seed manual (registro; sem /meta:personality-sync no alvo)
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>

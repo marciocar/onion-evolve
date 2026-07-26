@@ -125,13 +125,13 @@ inventory_scope_excluded() {
     */docs/analysis/*|*/.claude/sessions/*|*/docs/materials/*|*/docs/onion/inventory.md|*/validation/fixtures/*) return 0 ;;
     # canais de mail (co-evolução): sinais relayados do adotante + relatórios downstream CITAM números
     # do produto alheio ('100+ agentes' do sistema do adotante) — não são claims do inventário Onion.
-    # Mesma doutrina do adopter-aware abaixo, mas vale inclusive no core (role: source). Sinal arandek 2026-07-25.
+    # Mesma doutrina do adopter-aware abaixo, mas vale inclusive no core (role: source). Sinal de campo 2026-07-25.
     */docs/evolution/inbox/*|*/docs/evolution/inbound/*) return 0 ;;
   esac
   # Adopter-aware: num repo DERIVADO (role: adopted|hub|decoupled), SÓ os docs Onion VENDORIZADOS podem
   # legitimamente afirmar contagens do inventário Onion. Os docs de PRODUTO do adotante (docs/specs,
   # docs/architecture, CLAUDE.md próprio, relatórios em docs/evolution/, …) falam do sistema DELE —
-  # 'N agentes' ali é do produto, não do Onion. Falso-positivo REAL: arandek (2026-07-24) tinha
+  # 'N agentes' ali é do produto, não do Onion. Falso-positivo REAL: um adotante (2026-07-24) tinha
   # docs/specs/capability-registry.md com '100+ agentes' do próprio produto. Restringe a varredura à
   # superfície Onion. No core (role: source) NÃO se aplica — todos os docs são Onion. [[fix-must-become-mechanism]]
   if grep -qE '^(role:[[:space:]]*(adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then
@@ -1655,7 +1655,7 @@ check_ladder_integrity() {
 #   Uma KB vendorizada (docs/knowledge-base/**) não deve carregar link VIVO para
 #   docs/{analysis,onion,evolution,discussions,applying,materials,plans} ou
 #   .claude/{diary,sessions} — ausentes em TODO adotante. O link resolve no core e
-#   o lint local passa, mas no adotante é morto (o bug de campo da adoção do Pedro:
+#   o lint local passa, mas no adotante é morto (o bug de campo de uma adoção real:
 #   link p/ .claude/diary reprovou DENTRO do repo dele; o do core não via).
 #   Guard core-side que mecaniza "o adotante é o oráculo": força a conversão em
 #   referência plain-text + GLOSS (a essência, fonte≠derivação com dimensão).
@@ -1929,8 +1929,8 @@ check_site_no_private_deeplinks() {
 #   O que /meta:adopt copia (.claude/{agents,commands,skills,utils,validation,
 #   hooks} + docs/{meta-specs,knowledge-base,sdaal}) VIAJA para todo adotante.
 #   Um nome comercial de um cliente ali chega na máquina de OUTRO cliente que
-#   não o conhece — cross-tenant por adoção. Origem: onboarding do Pedro (Aura,
-#   2026-07-22) exigiu uma "cópia limpa"; o scrub permanente + esta guarda
+#   não o conhece — cross-tenant por adoção. Origem: o onboarding de um adotante-empresa
+#   (2026-07-22) exigiu uma "cópia limpa"; o scrub permanente + esta guarda
 #   fecham o gate de uma vez, em vez de um scrub que alguém tem que lembrar.
 #   Termos DERIVADOS do members.yaml (nunca hardcoded — nome no script é o
 #   próprio vazamento), MENOS os marcadores (CONFIDENCIAL/PRIVADO são vocabulário
@@ -1967,7 +1967,7 @@ check_vendored_surface_clean() {
   # '|| true': num adotante LIMPO (sem members.yaml nem nome comercial) terms+ids são vazios;
   # grep -v não casa nada → exit 1 → sob 'set -euo pipefail' abortaria o LINT INTEIRO. O core
   # nunca vê isso (sempre tem termos), mas todo adotante greenfield veria — achado ao rodar o
-  # lint DENTRO da cópia do Pedro (a lição de campo: o core é o pior oráculo do que viaja).
+  # lint DENTRO da cópia de um adotante (a lição de campo: o core é o pior oráculo do que viaja).
   terms="$(printf '%s\n%s\n' "${terms}" "${ids}" | grep -v '^[[:space:]]*$' | sort -u || true)"
   [ -n "${terms}" ] || return 0
   while IFS= read -r term; do

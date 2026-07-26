@@ -99,7 +99,7 @@ run_selftest() {
   # (vi) sem registry → silencioso
   rm -f "${reg}"; check_ladder "${tmp}" >/dev/null 2>&1 && echo "  ✅ (vi) sem registry nasce silencioso" || { echo "  ✗ (vi)"; fails=$((fails+1)); }
   # (vii) role-guard: promoted_by CORE-PRIVADO inalcançável — no CORE reprova, no ADOTANTE passa.
-  #       (o bug de campo que o lint do Pedro pegou: members.yaml não vendoriza.)
+  #       (o bug de campo que o lint de um adotante pegou: members.yaml não vendoriza.)
   printf 'regulated-adopter-correct-to-core|MONITORED|docs/evolution/federation/zzz-nonexistent.yaml\n' > "${reg}"
   printf 'framework: core\nrole: source\n' > "${tmp}/.claude/.onion-version"
   if check_ladder "${tmp}" >/dev/null 2>&1; then echo "  ✗ (vii-core) core deveria reprovar evidência core-privada inalcançável"; fails=$((fails+1)); else echo "  ✅ (vii-core) core reprova promoted_by core-privado inalcançável"; fi

@@ -4,7 +4,7 @@
 #
 # Propósito : O hook antigo (inline no settings.json) lia SÓ o ARQUIVO .env; o adapter
 #             (detector.md) lê o AMBIENTE (process.env). Fontes diferentes → as duas
-#             podiam divergir. Sinal de campo (adoção arandek 2026-07, D2): o projeto
+#             podiam divergir. Sinal de campo (adoção legacy 2026-07, D2): o projeto
 #             usa direnv+pass (SEM .env solto), o Linear está provado e2e, e mesmo assim
 #             o hook anunciava 'none' a cada boot. Pior caso simétrico: .env declara um
 #             provider que o ambiente não tem → o hook anunciava um ✅ cosmético que o

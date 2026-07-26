@@ -30,7 +30,7 @@ checa. **Três camadas de capacidade:**
 Cadeia: **source (core) → hub (empresa) → consumer (projetos)**. O hub **usa** o framework, não o **autora**
 (criar verticais/`evolve` = Camada 1, só o core) e **não** roda a federação cross-empresa (Camada 3, do core).
 
-**Se você é uma empresa** (vai adotar mais de um projeto seu — ex.: Aura, Positivo), sua cópia chega como
+**Se você é uma empresa** (vai adotar mais de um projeto seu), sua cópia chega como
 `role: adopted` (consumidor). **Promova-a a hub UMA vez**, deliberadamente:
 
 ```

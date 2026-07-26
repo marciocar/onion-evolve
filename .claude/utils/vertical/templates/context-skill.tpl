@@ -19,7 +19,7 @@ projeto, o contrato mínimo que ele deve ter, e como fazer bootstrap quando falt
 1. **Mapa explícito** — campo apontando o book em `.onion-version` / `.claude/onion-context.yaml`.
    **Declaração vence convenção** — o específico ganha do default (senão, como a adoção CRIA
    `docs/{{PROJECT}}-context/`, o layout padrão sempre casaria antes e o mapa viraria código morto;
-   sinal de campo arandek 2026-07/D1).
+   sinal de campo 2026-07/D1).
 2. **Layout padrão** — `docs/{{PROJECT}}-context/` (ou o diretório de book do projeto).
 3. **Heurística** — arquivos de contexto comuns na raiz (`README.md`, `docs/INDEX.md`, o book do projeto).
 4. **Bootstrap só com confirmação** — se nada casar, proponha criar o stub mínimo (abaixo) e **confirme**.
