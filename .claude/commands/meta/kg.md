@@ -79,7 +79,7 @@ nodes:
     impact: 4                # 1-5
     confidence: 0.9          # 0-1
     status: open             # open | confirmed | refuted | superseded | done
-    verified_against: branch # opt-in: nomeia o artefato MÓVEL rastreado (branch|commit|deploy|config|dump:) — torna o nó rastreado por frescor mesmo em DEV
+    verified_against: branch # nomeia o ALVO verificado (branch|commit|deploy|config|dump:) — rastreia por frescor mesmo em DEV; OBRIGATÓRIO junto de verified_at (ausente = ⚠ UNANCHORED)
     verified_at: AAAA-MM-DD  # quando a claim foi cruzada com o vivo (nó PROD ou com verified_against; ausente = ⚠ STALE-MISSING)
     label: "afirmacao verificavel em uma frase"
     trace: "arquivo:linha"   # migalha inline (o radar ignora; humanos e LLMs seguem)
@@ -131,7 +131,7 @@ eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção de um a
 bash .claude/validation/kg-radar.sh docs/onion/graph/<slug>.kg.yaml            # todas as saídas (radar+reconcile+integrity+domain+freshness+schema)
 bash .claude/validation/kg-radar.sh <arquivo> --integrity                      # só o gate estrutural (exit 1 se problema)
 bash .claude/validation/kg-radar.sh <arquivo> --schema                         # só o gate de schema (exit 1 se schema_version divergir)
-bash .claude/validation/kg-radar.sh <arquivo> --freshness                      # só o frescor da SSOT (⚠ STALE-MISSING/STALE-OLD, não reprova)
+bash .claude/validation/kg-radar.sh <arquivo> --freshness                      # só o frescor da SSOT (⚠ STALE-MISSING/STALE-OLD/UNANCHORED, não reprova)
 bash .claude/validation/kg-radar.sh <arquivo> --domain                         # só completude da camada domain
 bash .claude/validation/kg-radar.sh <arquivo> --triples                        # triplas p/ consumo por LLM
 bash .claude/validation/kg-console.sh <arquivo> > grafo.html                    # VER o grafo (projeção HTML self-contained)

@@ -21,8 +21,10 @@
 #                     é história — não cobrada (mesmo racional do FRESCOR).
 #   FRESCOR         = frescor da SSOT (⚠ atenção, NÃO reprova — nó stale mente, não corrompe):
 #                     STALE-MISSING (nó plane:PROD sem verified_at:) · STALE-OLD (verified_at
-#                     anterior à meta.baseline). Determinístico: compara duas datas do arquivo,
-#                     sem "agora" (ADR onion-adr-kg-freshness-gate, proposta #2 (dogfood de campo)).
+#                     anterior à meta.baseline) · UNANCHORED (tem verified_at: mas NÃO diz
+#                     verified_against: — carimbo sem alvo declarado). Determinístico: compara
+#                     duas datas do arquivo, sem "agora" (ADR onion-adr-kg-freshness-gate,
+#                     proposta #2 (dogfood de campo)).
 #   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
 #                     meta.schema_version ≠ a versão que o radar entende → recusa; ausente → ⚠
 #                     retrocompat (ADR onion-adr-kg-freshness-gate, proposta #1).
@@ -320,8 +322,19 @@ END {
       ntracked++
       if (verifiedAt[id] == "") {
         print "  ⚠ STALE-MISSING: " id " (frescor rastreado — plane:PROD ou verified_against: — sem verified_at:; re-verifique contra o vivo)"; fwarns++
-      } else if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") {
-        print "  ⚠ STALE-OLD: " id " (verified_at " verifiedAt[id] " anterior à baseline " metaBaseline " — a verdade pode ter envelhecido)"; fwarns++
+      } else {
+        # UNANCHORED — o carimbo existe mas NÃO diz contra O QUÊ. "Verificado" sem alvo
+        # declarado é declaração, não verificação: o radar não consegue julgar a semântica,
+        # mas pode EXIGIR que o alvo seja escrito — e é escrevendo-o que o desalinhamento
+        # fica legível a quem lê. Sinal de campo 2026-07-25 (arandek): nós com plane:PROD e
+        # verified_at "porque um curl respondera" — mas o curl mediu o CORE e a claim era
+        # sobre o ADOTANTE. O carimbo estava no artefato errado, e nada no arquivo denunciava.
+        if (verifiedAgainst[id] == "") {
+          print "  ⚠ UNANCHORED: " id " (verified_at " verifiedAt[id] " SEM verified_against:; declare o ALVO da claim — carimbo sem alvo não distingue verificado de declarado)"; fwarns++
+        }
+        if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") {
+          print "  ⚠ STALE-OLD: " id " (verified_at " verifiedAt[id] " anterior à baseline " metaBaseline " — a verdade pode ter envelhecido)"; fwarns++
+        }
       }
     }
     if (ntracked == 0) print "  (nenhum nó com frescor rastreado — nada a verificar)"

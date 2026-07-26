@@ -195,7 +195,7 @@ sem erro visível**. Evite:
    - **fonte-única**: nó de domínio com >1 `READS` saindo (1 átomo = 1 fonte — ver §design abaixo).
 5. **FRESCOR** (`--freshness`, ⚠ atenção, **não reprova**) — a SSOT foi re-verificada contra o vivo?
    **STALE-MISSING** (nó `plane:PROD` sem `verified_at:`) · **STALE-OLD** (`verified_at` anterior à
-   `meta.baseline`). Ver §[Frescor e versão de schema](#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou).
+   `meta.baseline`) · **UNANCHORED** (`verified_at:` sem `verified_against:` — carimbo sem alvo declarado). Ver §[Frescor e versão de schema](#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou).
 6. **SCHEMA** (`--schema`, ✗ **reprova**) — `meta.schema_version` bate com a versão que o radar entende?
    Divergência = recusa (o radar não sabe ler o arquivo); ausência = ⚠ retrocompat.
 
@@ -234,6 +234,13 @@ SSOT-as-runtime à KB), a mesma máquina com duas referências — *o radar recu
 - **STALE-MISSING**: nó rastreado sem `verified_at:` → ⚠ (o modo-de-falha exato do campo — a SSOT de um adotante
   não tinha *nenhuma* disciplina de frescor, nem em PROD nem no nó DEV de estratégia `C_CONSOLIDATION_MAP`).
   **STALE-OLD**: `verified_at` anterior a **`meta.baseline:`** (uma data no `meta:`) → ⚠, a verdade envelheceu.
+- **UNANCHORED**: tem `verified_at:` mas **não diz `verified_against:`** → ⚠. Carimbo **sem alvo declarado**
+  não distingue verificado de declarado. Modo-de-falha de campo (2026-07-25, arandek): nós `plane: PROD` com
+  `verified_at` *porque um `curl` respondera* — só que o `curl` mediu o **core** e a claim era sobre o
+  **adotante**. O carimbo estava no artefato errado e **nada no arquivo denunciava**. O radar não julga a
+  semântica do alvo (não pode); ele **exige que o alvo seja escrito** — e é escrevendo-o que o desalinhamento
+  fica legível a quem lê. Em PROD, `verified_against:` deixa de ser opt-in na prática: passa a ser o que
+  separa "cruzei com o vivo" de "afirmei".
 - **Aviso, não erro** — um nó stale **mente**, não corrompe; o veredito certo é "re-verifique", não
   "recuse o arquivo". Determinístico: compara **duas datas do próprio arquivo** (`verified_at` × `baseline`),
   **sem "agora"** — reproduzível.
