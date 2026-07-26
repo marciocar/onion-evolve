@@ -2,7 +2,7 @@
 title: "M2 — DESENHO de auth do Onion-Bridge (Logto OIDC, grant DUPLO) + perguntas abertas ao host"
 category: meta
 tags: [seguranca-defensiva, onion-bridge, logto, oidc, pkce, authorization-code, m2m, client-credentials, jwt, jwks, rfc8707, route-scoping, path-traversal, middleware-order, fail-closed, auth-token, bypasspermissions, systemd, cgroup-v2, memorymin, turnkey, spec-as-code]
-status: DESENHO verificado + PERGUNTAS ABERTAS (NÃO é runbook executável — ver §0)
+status: DESENHO verificado + BRIDGE LIDO (4/5 perguntas respondidas — ver §0.0/§0.2; premissa do "buraco" corrigida)
 date: 2026-07-26
 revision: "v3 — corrigido após o 2º verify adversarial (14 fixes A–N), com achados MEDIDOS ao vivo neste host: teto de ancestral zerando os floors, path-traversal furando a allowlist, ordem de registro do middleware, slice path errado, comando de prova do RFC 8707 quebrado"
 deciders: maestro (Marcio)
@@ -14,10 +14,72 @@ kg: docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 
 ## §0 — O que este documento É e o que NÃO é (leia antes de executar qualquer coisa)
 
+> ## ⚠️ §0.0 — LEIA PRIMEIRO: o bridge FOI LIDO (2026-07-26) e a premissa deste doc estava ERRADA
+>
+> **Tudo abaixo desta caixa foi escrito ANTES de ler o código do bridge.** O bridge é legível deste
+> host com `sudo` (`sudo ls /home/onion/onion-bridge/`) — a sessão não tentou, e por isso três rodadas
+> especificaram *em volta* de desconhecidos que eram **um comando de distância**. As respostas estão
+> em **§0.2**, que **SUPERSEDE** o que o corpo do documento afirma sobre rotas, ambiente e SSE.
+>
+> **A correção que mais importa — o buraco NÃO era o que se afirmou.** Este doc (e o plano que o
+> originou) descreve `app.onionevolve.com` como tendo o Agent SDK **"sem gate de identidade"**.
+> **Falso.** Toda rota sensível já exige `Bearer` hoje: `/chat` e `/commands` (`authGuard`),
+> `/a2a` (`a2aGuard`), `/admin/*` (`adminGuard`) — e o `serveStatic` catch-all é o **último**
+> registrado (ordem já correta). O que **falta é IDENTIDADE, não gate**: `AUTH_TOKEN` é segredo
+> **compartilhado** e os `INVITE_TOKENS_{COURTESY,BYOK,A2A}` são **convites**, não usuários.
+> Logo o M2 é **melhoria** (trocar segredo compartilhado por identidade por-pessoa), **não incêndio**.
+> O risco real e nomeável é `PERMISSION_MODE` default = **`bypassPermissions`** (`src/config.ts:26`):
+> quem porta qualquer token válido executa irrestrito no clone do core — e hoje **não se sabe quem**.
+>
+> ---
+>
+> ### §0.2 — RESPOSTAS medidas (superseden o corpo)
+>
+> **1. Rotas** — inventário real (`src/server.ts`). **Não existe `/invoke`**; o doc o inventou.
+>
+> | Rota | Estado HOJE |
+> |---|---|
+> | `POST /chat` | **já protegida** (`authGuard`) — é aqui que o Agent SDK roda |
+> | `GET /commands` | **já protegida** (`authGuard`) |
+> | `POST /a2a` | **já protegida** (`a2aGuard`, pool `INVITE_TOKENS_A2A` dedicado) |
+> | `/admin/*` | **já protegida** (`adminGuard`) |
+> | `GET /health` | aberta (correto) |
+> | `GET /.well-known/agent-card.json` | aberta **por design** (descoberta A2A) |
+> | `/*` | `serveStatic` da PWA — **último registrado** |
+>
+> Bônus medido: `/chat` já tem **rate-limit** (janela deslizante, `RATE_LIMIT_PER_MIN`, default 20).
+>
+> **2. Ambiente** — `process.loadEnvFile()` (Node 22 nativo, `src/config.ts:6`) lendo
+> **`/home/onion/onion-bridge/.env`** (existe, 671 B; há 4 `.env.bak-*` de rotações anteriores).
+> **Não é `EnvironmentFile=` do systemd** — a unit só tem `Environment=NODE_ENV=production`.
+> ⇒ `BRIDGE_AUTH_MODE` vai no **`.env`**, e o rollback é editar/remover a linha + `systemctl restart onion-bridge`.
+>
+> **3. SSE** — **já resolvido no código, sem trabalho a fazer.** `POST /chat` responde SSE via
+> `streamSSE` (Hono), e a PWA consome com **`fetch` + `ReadableStream`** — não `EventSource`.
+> O comentário em `web/src/runtime/sse.ts:2` e `public/app.js:2` diz o porquê ("EventSource só faz GET
+> sem body"). ⇒ o header `Authorization` **já trafega**; a preocupação do corpo **não se aplica**.
+>
+> **4. `/a2a`** — tem guard próprio, pool de token dedicado, e **rejeita explicitamente** courtesy/byok
+> (*"um remetente a2a não ganha acesso ao /chat"*). **Não é buraco**; não precisa de cobertura dupla.
+>
+> **5. Usuário no Logto** — ÚNICA ainda aberta (é no tenant Logto, não no bridge).
+>
+> ### §0.3 — O que isso muda no trabalho
+>
+> O desenho de auth (grant duplo PKCE+M2M, fail-closed, alg pinado, escada do `resource=`) **permanece
+> válido**. O que encolhe é a **execução**: não há default-deny a construir (as rotas certas já estão
+> protegidas, na ordem certa), não há SSE a migrar, e o inventário de rotas é o da tabela acima.
+> **O trabalho real é: adicionar validação de JWT como caminho alternativo dentro do `authGuard` que
+> já existe** (`src/server.ts`), preservando os tokens legados atrás do `BRIDGE_AUTH_MODE` até o P9.
+> As seções §3.4/§3.4b/§3.4c (route-scoping, canonicalização, ordem de registro) viram
+> **defesa-em-profundidade opcional**, não pré-requisito.
+>
+> ---
+
 > **Correção de moldura (2026-07-26).** Este documento nasceu rotulado "SPEC TURNKEY" e passou por **três
-> rodadas de verificação adversarial**. As duas primeiras corrigiram o desenho; a terceira revelou o
-> **limite estrutural**: os passos executáveis prescreviam comandos contra um sistema que esta sessão
-> **não consegue ler** — o bridge vive em `/home/onion/onion-bridge` (outro usuário). Medições que
+> rodadas de verificação adversarial**. As duas primeiras corrigiram o desenho; a terceira concluiu que os
+> passos prescreviam comandos contra um sistema que a sessão **não havia lido** — conclusão correta na
+> época, mas o motivo estava errado: não era *impossível* ler, era *não-tentado* (ver §0.0). Medições que
 > derrubaram passos "turnkey": o serviço roda `tsx src/server.ts` (**não há `dist/`**, então o dump de
 > rotas do P0.2 não roda), a unit **não tem `EnvironmentFile=`** (só `Environment=NODE_ENV=production`,
 > então o flip e o rollback "por uma linha" não têm base), e `crontab -l` como `marcio` volta **vazio**
@@ -35,7 +97,11 @@ kg: docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 > **O que ISTO NÃO É:** um runbook pronto para colar. Os passos **P0–P9 são ESQUELETO** — a sequência e a
 > intenção estão certas; **cada comando precisa ser validado contra o bridge real** antes de rodar.
 >
-> ### §0.1 — Perguntas abertas (respondê-las converte o esqueleto em runbook)
+> ### §0.1 — Perguntas abertas ~~(respondê-las converte o esqueleto em runbook)~~
+>
+> ✅ **4 das 5 RESPONDIDAS em 2026-07-26 — ver §0.2.** Restou só a (4) Logto. As perguntas ficam
+> registradas abaixo como estavam (append-mostly: a história da investigação não se apaga), mas
+> **o que vale hoje é o §0.2**.
 > 1. **Rotas:** qual o inventário real de rotas do app Hono, e quais tocam o Agent SDK? (o default-deny
 >    depende disso — e `app.use('*', …)` precisa ser o **primeiro** handler registrado)
 > 2. **Ambiente:** de onde vem `process.env` no bridge — drop-in systemd, `.env` + dotenv, outro? (define

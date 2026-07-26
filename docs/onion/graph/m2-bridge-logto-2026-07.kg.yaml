@@ -658,7 +658,22 @@ nodes:
     verified_against: host-vps-medido
     label: "FIX A APLICADO 2026-07-26 (sessão do core, permissão explícita do maestro; hardening NAO-AUTH, sem risco de lockout). Drop-in system.slice.d/10-memory-protection.conf com MemoryMin=384M/MemoryLow=768M + daemon-reload. VERIFICADO NO EFETIVO lendo o cgroup: system.slice/memory.min 0 -> 402653184 e memory.low 0 -> 805306368; caddy (67108864) e onion-bridge (268435456) agora tem ancestral que concede protecao. Reverter: rm o arquivo + daemon-reload. A CLASSE do problema (varredura dos demais floors) segue aberta em Q_floors_effective"
 
+  - id: E_bridge_source_read
+    node_type: evidence
+    trace: /home/onion/onion-bridge/src/server.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: host-vps-medido
+    label: "BRIDGE LIDO 2026-07-26 (sudo neste host; a sessao NAO havia tentado). REFINA C_identity_hole: nao ha ausencia de gate — TODA rota sensivel ja exige Bearer (/chat e /commands via authGuard; /a2a via a2aGuard com pool INVITE_TOKENS_A2A dedicado que REJEITA courtesy/byok; /admin/* via adminGuard) e o serveStatic catch-all e o ULTIMO registrado (ordem correta). Abertas por design: /health e /.well-known/agent-card.json. NAO EXISTE /invoke (o spec inventou). /chat ja tem rate-limit. Env vem de process.loadEnvFile() lendo /home/onion/onion-bridge/.env (NAO EnvironmentFile do systemd). SSE ja usa fetch+ReadableStream (NAO EventSource) — Authorization ja trafega. Logo o alvo real e IDENTIDADE (AUTH_TOKEN e segredo compartilhado; INVITE_TOKENS_* sao convites, nao usuarios), e o risco nomeavel e PERMISSION_MODE=bypassPermissions (config.ts:26): quem porta token executa irrestrito e nao se sabe QUEM"
+
 edges:
+  - from: E_bridge_source_read
+    to: C_identity_hole
+    edge_type: SUPPORTS
   - from: E_ancestor_floor_applied
     to: D_fix_ancestor_floor
     edge_type: SUPPORTS
