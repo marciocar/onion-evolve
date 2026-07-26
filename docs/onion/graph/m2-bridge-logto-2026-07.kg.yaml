@@ -1,0 +1,935 @@
+# KG SDAAL — M2: fechar o buraco de identidade do Onion-Bridge via Logto OIDC + endurecer.
+# Nó central = D_gate_oidc_dual: trocar o AUTH_TOKEN estático por identidade emitida, com GRANT DUPLO
+# (Authorization Code+PKCE p/ o HUMANO na PWA + client_credentials p/ o SERVIÇO) — SPEC turnkey, o
+# maestro executa o FLIP DE AUTH ao vivo (risco de lockout; "o servidor é o verificado").
+#
+# REVISÃO v3 (2026-07-26): o 2º verify adversarial REPROVOU a v2 com achados MEDIDOS AO VIVO neste host
+# (o VPS É esta máquina). As posições superadas ficam NO GRAFO (status: superseded/refuted) com arestas
+# SUPERSEDES/REFUTES — não se apaga o erro, ele é o que explica o desenho novo.
+# 14 fixes A–N. Os três estruturais:
+#   A · TETO DE ANCESTRAL zera os floors "JÁ FEITOS" (configurado != protegido) — C_memory_floors_done
+#       REBAIXADO, C_ancestor_cap_zeroes_floors nasce, D_fix_ancestor_floor fecha, Q_floors_effective abre
+#   B · PATH-TRAVERSAL fura a allowlist (bypass REAL reproduzido em node v22.23.1) — D_path_canon_guard
+#   C · ORDEM DE REGISTRO do middleware no Hono = bypass total silencioso — D_middleware_order_first
+# Demais: D slice path errado · E comando de prova do RFC 8707 quebrado (falso-vermelho que roteia p/
+# plano-B mais fraco) · F ordem circular dos passos · G citação errada de I3 · H atribuição do
+# endurecimento · I risco novo do PKCE (token no device) · J prova para o B1 · K placeholders ·
+# L /a2a pós-flip + cgroup driver · M SSE/EventSource · N higiene de fonte.
+#
+# Convenção: C_ = claim, D_ = decision, A_ = artifact, Q_ = question, E_ = entity. Camada audit
+# (segurança defensiva). Quem executa o flip de auth = maestro.
+# Frescor: verified_against/verified_at só nos nós REALMENTE medidos. "host-vps-medido" = lido do kernel
+# nesta sessão com comando read-only; "host-vps-declarado" = afirmado por sessão anterior, não re-medido.
+# A distinção NASCEU do fix A: a v2 carimbou host-vps em coisa configurada-mas-inefetiva.
+# Spec-irmão: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md.
+meta:
+  id: m2-bridge-logto-2026-07
+  schema_version: "1"
+  date: 2026-07-26
+nodes:
+  # ---- O BURACO (claim central, risco VIVO em PROD) ----
+  - id: C_identity_hole
+    node_type: claim
+    trace: docs/evolution/federation/members.yaml:24
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "BURACO VIVO: o bridge (app.onionevolve.com) roda o Agent SDK com --permission-mode bypassPermissions contra um clone do core no VPS, e o ÚNICO portão de entrada é posse de um AUTH_TOKEN estático (segredo compartilhado, não identidade). Sem QUEM (0 usuario/papel/tier), sem RBAC (nao distingue ler de mutar), sem vinculo a members.yaml/Logto"
+
+  - id: C_real_precedent
+    node_type: claim
+    trace: docs/analysis/onion-parecer-whatsapp-sender-2026-07.md:69
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "NÃO é hipotético: precedente REAL de escrita de código de um celular por esse caminho (SDK bypassPermissions + git local no VPS). Escrita real já aconteceu — o buraco é risco materializado, não teórico"
+
+  - id: C_a2a_gate_narrow
+    node_type: claim
+    trace: docs/evolution/outbox/diary/2026-07-09-security-gate-degrades-to-veto.md:42
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: "Mitigação parcial existente NÃO cobre o bridge: a2a-verify.sh (6 camadas, fail-safe) gateia SÓ o canal /a2a (handshake entre cores, propose-only) — canal diferente e mais estreito. O bridge/PWA mobile segue autenticado só por AUTH_TOKEN + bypassPermissions irrestrito"
+
+  # ---- ENTIDADES (o terreno) ----
+  - id: E_logto_live
+    node_type: entity
+    trace: docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_against: endpoint-vivo
+    verified_at: 2026-07-25
+    label: "Logto self-hosted 1.41.0 VIVO em auth.onionevolve.com (OIDC, emite JWT assinado + JWKS) desde 2026-07-25 — mas SEM NENHUM CONSUMIDOR plugado, nem o bridge. Capacidade de identidade já paga e ociosa. Com o flip deixa de ser ociosa E deixa de ser opcional (vira caminho crítico — C_logto_now_critical). FIX N: o sinal-fonte recebeu CORREÇÃO formal (Q_source_correction) — citar as duas juntas"
+
+  - id: E_auth_token
+    node_type: entity
+    trace: docs/analysis/onion-m3-federation-admin-spec-2026-07.md:156
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: "AUTH_TOKEN próprio do bridge — segredo estático/compartilhado do serviço, não ligado a members.yaml nem a papel/tier. É o artefato a APOSENTAR (P9), IMEDIATAMENTE após o verde do P8 (não 'dias depois' — enquanto legacyAuthTokenOk() existir no binário, uma env mal reposta o reativa)"
+
+  # ---- FIX G: A CITAÇÃO DE I3 ESTAVA ERRADA (a POSTURA se mantém, a âncora muda) ----
+  - id: C_i3_miscited
+    node_type: claim
+    trace: docs/technical-context/03-domain/business-logic.md:179
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: superseded
+    label: "POSIÇÃO SUPERADA (v1/v2, 4 lugares: spec:17, spec:397, kg:4, kg:273): citou-se 'invariante I3' como 'a sessão do core não opera o host remoto'. FALSO. O I3 canônico é 'UM ESCRITOR POR REPO / entrega-sem-commit — o core nunca commita em repo alheio' (business-logic.md:179; rfc-0003:233) — é sobre commit cross-repo, não sobre operar host"
+
+  - id: D_posture_anchored_correctly
+    node_type: decision
+    trace: docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md:48
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "FIX G — a POSTURA (o maestro executa o flip de auth, a sessão especifica) se MANTÉM, mas ancorada onde de fato se ancora: (1) doutrina 'docs de deploy são declaração; O SERVIDOR É O VERIFICADO' (vps-lineage-odyssey:48) e (2) RISCO DE LOCKOUT — errar o gate de identidade da própria porta de entrada tranca o operador fora, e o rollback exige acesso ao host por outro canal. Citação de I3 corrigida nos 4 lugares"
+
+  - id: C_hardening_applied_by_core_session
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "FIX H — QUEM aplicou o endurecimento não-auth: foi uma SESSÃO ANTERIOR DO CORE ao vivo neste host, não o maestro à mão. Evidência medida: /etc/systemd/system/{caddy,onion-bridge}.service.d/10-memory-protection.conf, mtime 2026-07-25 19:00, com comentário-narrativa em pt-BR da própria sessão. FRONTEIRA HONESTA: este VPS É a casa do core (a sessão roda dentro dele) — hardening NÃO-AUTH a sessão aplica e mede; FLIP DE AUTH não (lockout). Confundir as duas produziu o erro do §5 (fix A)"
+
+  # ---- FIX A: TETO DE ANCESTRAL ZERA OS FLOORS (o achado mais importante da rodada) ----
+  - id: C_ancestor_cap_zeroes_floors
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "FIX A — CONFIGURADO != PROTEGIDO. MEDIDO neste host (kernel 6.8.0-134, systemd 255): caddy.service memory.min=67108864 e onion-bridge.service memory.min=268435456 estão configurados E ESCRITOS no próprio cgroup — MAS /sys/fs/cgroup/system.slice/memory.min = 0. Em cgroup v2 a proteção EFETIVA é LIMITADA pela do ANCESTRAL (o kernel distribui aos filhos uma fração do que o PAI afora; pai=0 => fração=0). Logo os floors 'JÁ FEITOS' de Caddy/bridge têm proteção efetiva ZERO. Não existe arquivo memory.min.effective — a verificação TEM de percorrer a cadeia de ancestrais"
+
+  - id: C_recursiveprot_is_not_the_gate
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "FIX A(2) — A CONDIÇÃO QUE A v2 MANDAVA CONFERIR ERA A ERRADA. MEDIDO: findmnt -no OPTIONS /sys/fs/cgroup => rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot — memory_recursiveprot ESTÁ PRESENTE. Ele NÃO é o gate: o que ele faz é distribuir aos descendentes a proteção NÃO-REIVINDICADA do pai, sem cada um declarar a sua; ele NÃO levanta o teto do ancestral (zero no pai continua zero para distribuir). O que MORDE é memory.min do ANCESTRAL, não a opção de montagem"
+
+  - id: C_oom_bias_still_works
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.95
+    status: confirmed
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "FIX A(3) — o que NÃO estava quebrado, para a honestidade ser simétrica: OOMScoreAdjust=-500 FUNCIONA e independe do teto de ancestral. MEDIDO no processo real: cat /proc/63903/oom_score_adj => -500. Ou seja METADE do endurecimento (viés de QUEM MORRE no OOM killer) está de pé; a outra metade (proteção contra RECLAMAÇÃO de página) está zerada. O risco residual é 'sem floor de reclaim', não 'nenhuma proteção'"
+
+  - id: C_memory_floors_done
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.5
+    status: refuted
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "REBAIXADO (era confidence 0.9 / status done / verified_against host-vps). A afirmação 'MemoryMin/MemoryLow JÁ FEITO para Caddy (64M/128M) e onion-bridge (256M/512M), confirmado no cgroup via systemctl show' é DECLARAÇÃO DE CONFIGURAÇÃO, NÃO PROTEÇÃO EFETIVA — refutada por C_ancestor_cap_zeroes_floors. O erro de MÉTODO: ler systemctl show (e até o memory.min do próprio cgroup, um nível só) e chamar de 'verificado'. O que sobrevive é só o OOMScoreAdjust (C_oom_bias_still_works)"
+
+  - id: D_fix_ancestor_floor
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "FIX A fecho — o conserto NÃO é mexer em Caddy/bridge (estão corretos no nível deles): é DECLARAR A PROTEÇÃO NO ANCESTRAL. MEDIDO: system.slice é filho direto de -.slice (raiz), e filho-direto-da-raiz NÃO TEM TETO ACIMA (o kernel usa o caminho curto pai==raiz), então basta UM nível. Comando: drop-in /etc/systemd/system/system.slice.d/10-memory-protection.conf com [Slice] MemoryMin=384M MemoryLow=768M (= soma APERTADA do que os descendentes reivindicam: 64+256 e 128+512, +folga) + daemon-reload + systemctl set-property --runtime. ATENÇÃO: memory.min é reserva DURA e não-reclamável — inflá-la aproxima o OOM global; manter apertado e SOMAR ao acrescentar serviço"
+
+  - id: Q_floors_effective
+    node_type: question
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "GAP NOVO ABERTO (fix A) — 'floors aplicados podem estar INEFETIVOS: verificar o EFETIVO, não o configurado'. É uma CLASSE, não um caso: qualquer MemoryMin/MemoryLow declarado em qualquer unit deste VPS pode estar decorativo pelo mesmo motivo. A verificação passa a ser o CAMINHADOR DE CADEIA check_floor() do §5b — lê memory.min do alvo e de TODOS os ancestrais até /sys/fs/cgroup, e falha se qualquer ancestral estiver abaixo. NUNCA mais aceitar systemctl show como prova de proteção. Varredura dos demais floors do host = gated (§7)"
+
+  # ---- FIX B: PATH-TRAVERSAL FURA A ALLOWLIST (bypass REAL) ----
+  - id: C_path_traversal_bypass
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_against: node-v22.23.1-neste-host
+    verified_at: 2026-07-26
+    label: "FIX B — BYPASS REAL, REPRODUZIDO (node v22.23.1, o runtime deste host): decodeURI('/assets/%2e%2e/invoke') === '/assets/../invoke' e .startsWith('/assets/') === TRUE; decodeURIComponent('/assets/%2f%2f..%2finvoke') === '/assets///../invoke' também TRUE; '/assets/..%2finvoke' fura SEM decode nenhum. Ou seja: um PREFIXO ABERTO da allowlist ALCANÇA /invoke — o endpoint que aciona o Agent SDK sob bypassPermissions. O default-deny inteiro cai por uma string. Causa-raiz: o comentário '// c.req.path já vem normalizado' (v2:207) era CONFIANÇA SEM PROVA"
+
+  - id: D_path_canon_guard
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "FIX B fecho — GUARDA DE CANONICALIZAÇÃO OBRIGATÓRIA (canonicalPath), fail-closed: (1) decodifica em laço curto (3 voltas, pega %252e duplo-encode) e erro de decode => PROTEGIDO; (2) QUALQUER path que, no BRUTO ou em qualquer rodada decodificada, contenha '..', '//', '\\', %2e, %2f, %5c ou byte de controle => PROTEGIDO — não normaliza, NEGA; (3) ainda mudando na 3a volta => PROTEGIDO; (4) NUNCA assumir 'c.req.path já vem normalizado' sem prova, e mesmo com prova a guarda PERMANECE (defesa em profundidade — a premissa 'o framework normaliza' muda numa bump sem aviso). PROPRIEDADE que a torna segura: a guarda só sabe NEGAR MAIS — descasamento com o router só pode gerar 401 a mais, nunca 401 a menos. RODADA contra corpus: 12/12 ataques bloqueados, 11/11 paths legítimos abertos (inclusive /assets/logo%20final.svg)"
+
+  # ---- FIX C: ORDEM DE REGISTRO DO MIDDLEWARE (Hono) ----
+  - id: C_hono_registration_order_bypass
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "FIX C — no Hono a cadeia segue a ORDEM DE REGISTRO: um handler registrado ANTES do app.use('*', requireIdentity) responde SEM PASSAR POR ELE = BYPASS TOTAL do default-deny. Silencioso, e invisível para qualquer teste que só exercite as rotas que alguém lembrou de listar. A v2 dizia 'montado globalmente' sem nunca exigir a POSIÇÃO — e 'montado globalmente' é verdade mesmo quando um app.route()/serveStatic veio antes"
+
+  - id: D_middleware_order_first
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "FIX C fecho — EXIGÊNCIA no P5: app.use('*', requireIdentity) é o PRIMEIRO handler registrado, antes de TODA rota, de TODO app.route()/app.mount() e de TODO serveStatic. Nada de 'quase no topo'. Sub-app montado por app.route() só herda se o use global vier antes. E vira MECANISMO, não disciplina — ASSERTION DE BOOT que derruba o serviço: if (app.routes.findIndex(r => r.handler === requireIdentity) !== 0) { console.error('[FATAL] ...'); process.exit(1) }. Sem a assertion, 'o middleware é o primeiro' é afirmação de code review — a classe de garantia que o repo já decidiu não aceitar (fix-must-become-mechanism). P0.2b levanta a ordem atual; teste #14 prova"
+
+  # ---- FIX D: SLICE PATH ERRADO (erro COMPOSTO com o fix A) ----
+  - id: C_slice_path_wrong
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "FIX D — MEDIDO: systemctl show onion-auth.slice -p Slice => Slice=onion.slice. No systemd o HÍFEN é SEPARADOR DE HIERARQUIA em nome de slice: onion-auth.slice é filho de onion.slice, que é filho de -.slice. O cgroup real é /sys/fs/cgroup/onion.slice/onion-auth.slice/ — a verificação #18 e o bloco do §5b' da v2 liam /sys/fs/cgroup/onion-auth.slice/, caminho INEXISTENTE (um cat de arquivo ausente daria 'erro', não 'gap', mascarando a causa). ERRO COMPOSTO com o fix A: onion.slice NÃO tem unit em disco (medido: /etc/systemd/system/onion*.slice não existe; LoadState=loaded era o systemd sintetizando slice implícito) e teria MemoryMin=0 => criar só onion-auth.slice produziria OUTRO FLOOR DECORATIVO"
+
+  - id: D_logto_same_protection_tier
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: "FIX D+A fecho — elevar Logto+Postgres ao MESMO patamar, agora em 3 CAMADAS (a v2 tinha 2 e a de baixo era decorativa): (1) /etc/systemd/system/onion.slice EXPLÍCITO com MemoryMin=512M/MemoryLow=768M — o slice PAI, sem o qual a camada 2 é decorativa (teto de ancestral); (2) /etc/systemd/system/onion-auth.slice com os mesmos floors; (3) compose: mem_reservation (memory.low) + oom_score_adj -500 (este funciona, medido) + cgroup_parent: onion-auth.slice. VERIFICAÇÃO no path REAL: systemctl show -p Slice, cat /sys/fs/cgroup/onion.slice/onion-auth.slice/memory.min, systemd-cgls e check_floor() percorrendo a cadeia. Se os containers não entrarem no slice, fica só o oom_score_adj e o gap é DECLARADO E ABERTO"
+
+  - id: Q_docker_cgroup_driver
+    node_type: question
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.85
+    status: open
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "FIX L2 — PROVA NOVA no P0.6: a semântica de cgroup_parent DEPENDE do cgroup driver do docker. MEDIDO hoje: driver = systemd (há /sys/fs/cgroup/system.slice/docker-<hash>.scope e NÃO há /sys/fs/cgroup/docker). Com driver systemd, cgroup_parent recebe NOME DE SLICE (onion-auth.slice); com cgroupfs, recebe CAMINHO (/onion-auth). Errar NÃO GERA ERRO — os containers ficam onde estavam e o floor não se aplica (falha silenciosa). Segue question e não claim porque um daemon.json novo muda o driver sem aviso: RE-CONFERIR no dia com docker info --format '{{.CgroupDriver}}'"
+
+  - id: C_docker_floor_gap
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: os scopes docker-<hash>.scope sob system.slice têm memory.min=0 memory.low=0, e memory.max = 1073741824 (logto) / 536870912 (postgres). Causa: o nome do scope muda a cada recriação, então o drop-in fixo de Caddy/bridge não se aplica. Fecho em D_logto_same_protection_tier (slice pai + slice auth + compose)"
+
+  # ---- FIX E: O COMANDO DE PROVA DO RFC 8707 ESTAVA QUEBRADO ----
+  - id: C_proof_command_broken
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "FIX E — o comando de prova do P1.2 (v2:436-437) NÃO FUNCIONA. REPRODUZIDO neste host: (1) 'base64 -d' não lê base64url sem padding — GNU coreutils 9.4 devolve 'base64: invalid input' (rc=1) sempre que o comprimento não é múltiplo de 4 (2 em cada 3 JWTs reais) e quebra de vez com o alfabeto base64url ('-'/'_'): com payload realista contendo '-', o pipeline deu 'jq: parse error: Unfinished string at EOF', EXIT 5; (2) o '2>/dev/null' ESCONDE exatamente o erro que explicaria o vermelho. GRAVIDADE: o passo de prova ROTEIA a decisão A->B1->B2->B3, então um FALSO-VERMELHO empurra o desenho a um plano-B MAIS FRACO (B2 acopla mais, B3 abre mão do aud-binding) SEM MOTIVO REAL — perde-se segurança por bug de shell"
+
+  - id: D_proof_command_fixed
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: "FIX E fecho — e o 'fix óbvio' TAMBÉM não serve: jq -R 'split(\".\")|.[1]|@base64d|fromjson' FALHA IGUAL (medido: jq-1.7 implementa @base64d como base64 ESTRITO, não base64url — com payload contendo '-' retorna 'is not valid base64 data', exit 5; ele tolera padding ausente, não o alfabeto). COMANDOS CORRETOS, ambos validados neste host: PRIMÁRIO decode_jwt() em node (MESMO runtime do bridge, v22.23.1, Buffer.from(s,'base64url') nativo, distingue 'NAO E JWT / token opaco' de 'meu decoder quebrou'); FALLBACK jq com gsub('-';'+')|gsub('_';'/') + repadding EXPLÍCITO. REGRA: a prova NUNCA silencia stderr e SEMPRE separa os 3 vereditos (3 partes+aud ok / 3 partes+aud errado / token opaco)"
+
+  # ---- FIX F: A ORDEM DOS PASSOS ERA CIRCULAR ----
+  - id: C_steps_circular
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: superseded
+    label: "FIX F — ORDEM CIRCULAR na v2: o P1.2 (prova do resource=) exigia o client M2M que só nascia no P2 E o scope concedido pela role que só nascia no P3.2; e o P2 mandava 'atribuir a role bridge-operator' que AINDA NÃO EXISTIA. Duas dependências para trás. A nota '(este passo depende do P2 já existir — na prática, executar P2 e voltar aqui)' admitia o defeito em vez de corrigi-lo — num spec turnkey, 'volte dois passos' é onde o operador erra"
+
+  - id: D_steps_renumbered
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "FIX F fecho — ORDEM LINEAR: P0 pré-flight -> P1 API RESOURCE -> P2 M2M APP (sem role ainda) -> P3 ROLE/PERMISSÃO (P3.1 criar role, P3.2 atribuir a M2M+maestro, P3.3 SPA pública PKCE, P3.4 sign-up OFF, P3.5 token curto+refresh rotation) -> P4 PROVA (P4.1 RFC 8707, P4.1b prova do B1, P4.2 emissão humana, P4.3 registrar o plano adotado no spec+KG) -> P5 middleware -> P6 os dois chamadores -> P7 O FLIP -> P8 verificar -> P9 aposentar. Nenhum passo consome artefato de passo posterior"
+
+  # ---- FIX I: RISCO NOVO DO PKCE (não nomeado na v2) ----
+  - id: C_pkce_moves_credential_to_device
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "FIX I — RISCO NOVO QUE A v2 NÃO NOMEAVA: com PKCE o material bearer passa a VIVER NO BROWSER DA PWA (localStorage por padrão no SDK do Logto), com o MESMO PODER DE EXECUÇÃO — bridge:invoke é o ÚNICO scope e por trás dele está o Agent SDK em bypassPermissions; não há 'token de leitura'. O flip MOVE, não elimina, a superfície: de 'um segredo num EnvironmentFile no servidor' para 'um token num device'. Três vetores: ARMAZENAMENTO (localStorage é legível por qualquer JS da origem e persiste), XSS (dependência comprometida ou sw.js envenenado EXFILTRA o bearer e ganha execução de agente no clone do core), PERDA DE DEVICE (o token válido vai junto). Um spec de segurança que só lista ganhos não é um spec de segurança"
+
+  - id: D_pkce_risk_mitigations
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: "FIX I fecho — mitigações BARATAS fixadas neste flip (P3.5): (1) ACCESS TOKEN CURTO 10-15min + ROTAÇÃO DE REFRESH TOKEN (Logto suporta — ligar); preferir memória+refresh se o SDK permitir, aceitando re-login mais frequente como custo de segurança; (2) CSP restritiva no Caddy (default-src 'self', sem unsafe-inline/unsafe-eval) + SRI + lockfile auditado; (3) perda de device => SUSPENDER O USUÁRIO NO LOGTO ANTES de qualquer outra coisa (procedimento escrito). E a declaração honesta: a BASE DE CONFIANÇA CRESCEU de 'host+AUTH_TOKEN' para 'host+Logto+PWA+device' — trade real, saldo positivo em N=1 com device do maestro, REAVALIAR se entrar 2º operador (vira input do M3). Endurecimento pleno da PWA como cliente = GATED"
+
+  # ---- F1 (preservado): O CALLER É HÍBRIDO ----
+  - id: C_caller_is_hybrid
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_against: decisao-do-maestro
+    verified_at: 2026-07-25
+    label: "RESOLVIDO PELO MAESTRO: o chamador do bridge é HÍBRIDO — (a) HUMANO operando a PWA no celular E (b) automação/serviço. Não é inferência do core: é entrada de decisão. Daqui sai o desenho de GRANT DUPLO; sem isto, todo o resto da v1 caía junto"
+
+  - id: D_gate_m2m_only
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: superseded
+    label: "POSIÇÃO SUPERADA (v1): 'o consumidor do bridge é outro processo/serviço, não um humano interativo; o encaixe correto é M2M, não login humano'. FALSA (C_caller_is_hybrid). Consequência se executada: client_secret DISTRIBUÍDO dentro da PWA no celular (client público não guarda segredo — extraível do device/bundle) = trocar um segredo compartilhado por outro PIOR, com aparência de identidade, e SEM fechar o alvo (a) 'não há QUEM'"
+
+  # ---- A DECISÃO CENTRAL (o gate OIDC de grant duplo) — PRESERVADA ----
+  - id: D_gate_oidc_dual
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: open
+    label: "GATE OIDC DUPLO: 1 API Resource (https://bridge.onionevolve.com) + 2 clients. (a) HUMANO = SPA/Native PÚBLICO com Authorization Code+PKCE — ZERO client_secret distribuído, sub = id do USUÁRIO (fecha o alvo 'não há QUEM'), revogável por pessoa. (b) SERVIÇO = M2M client_credentials, secret só no servidor (pass do VPS), sub == client_id. MESMA audiência, MESMO middleware, UM caminho de validação (distingue quem DEPOIS de validar). Substitui o AUTH_TOKEN; NÃO altera o bypassPermissions. Custo nomeado: C_pkce_moves_credential_to_device"
+
+  - id: D_rbac_two_layers
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "Corolário do grant duplo — com PKCE, sign-up ABERTO no Logto = qualquer pessoa vira usuário do tenant e passa em iss/aud. Fecho em 2 CAMADAS: (1) desligar o sign-up na Sign-in Experience (P3.4); (2) role bridge-operator concede o scope bridge:invoke só ao maestro e ao client M2M — usuário sem role recebe JWT válido SEM scope e leva 403 insufficient_scope (≠ 401). A camada 2 sustenta o fecho mesmo se a 1 for reaberta por engano"
+
+  - id: D_logto_not_ssot
+    node_type: decision
+    trace: docs/analysis/onion-m3-federation-admin-spec-2026-07.md:159
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorização de domínio (membro/tier/escopo) é do control-plane Onion (members.yaml). O scope do JWT é ESPELHO de permissão, não a fonte da verdade. Vale também no plano B3: a allowlist de client_id mora no BRIDGE, não no Logto"
+
+  # ---- F2 (preservado): ROUTE-SCOPING default-deny ----
+  - id: C_global_middleware_breaks_pwa
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: superseded
+    label: "POSIÇÃO SUPERADA (v1): middleware 'a cada request', sem escopo de rota. Aplicado a um app que TAMBÉM serve a PWA estática, exigiria Bearer para o index.html — e o browser NÃO TEM TOKEN ANTES DE LOGAR. Resultado: tela branca, login impossível, e a pressão prática de desligar o gate 'só para os assets' — que é como um gate morre"
+
+  - id: D_default_deny_routes
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "DEFAULT-DENY (aprovado pelos verifies, PRESERVADO): o middleware É montado globalmente, mas existe uma ALLOWLIST ANCORADA do que é ABERTO (assets da PWA, /health, /callback do OIDC, .well-known — só GET/HEAD). INVARIANTE: toda rota que toca o Agent SDK está coberta POR CONSTRUÇÃO — rota nova nasce PROTEGIDA. O inverso (lista de rotas protegidas) falha do lado errado: UM POST /invoke esquecido = bypass TOTAL. Auditoria vira 'a allowlist tem algo que não devia?' (lista curta e fixa) em vez de 'listei todas?'. MAS o default-deny só vale se D_path_canon_guard e D_middleware_order_first estiverem no lugar — sem eles, é allowlist furada e middleware pulável"
+
+  - id: Q_route_inventory
+    node_type: question
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumera com comando — dump de RUNTIME (app.routes, comportamento) como autoritativo + grep na fonte (agora incluindo route|mount) como rede de segurança — e classifica cada rota PROTEGIDA/ABERTA/DUPLO-GATE. P0.2b anota o ÍNDICE de cada handler (fix C). P0.2c localiza o /a2a (fix L1)"
+
+  - id: Q_a2a_after_flip
+    node_type: question
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "FIX L1 — PROVA NOVA: na v2 o /a2a era 'CASO À PARTE' sem NENHUM teste, ou seja uma exceção sem verificação. Agora: o DEFAULT é COBERTURA DUPLA (requireIdentity E a2a-verify.sh, 6 camadas), a exceção exige justificativa escrita, e o TESTE #23 prova o que foi decidido — cobertura dupla: POST /a2a com envelope a2a válido e SEM Bearer => 401, e com Bearer válido mas envelope inválido => rejeitado pelo a2a-verify (não 200), provando as duas camadas vivas e INDEPENDENTES; exceção documentada: POST /a2a sem Bearer não dá 200 por conta do gate a2a, e o teste #16 confirma que /a2a não entrou na allowlist. P0.2c resolve onde ele vive"
+
+  - id: Q_pwa_sse_headers
+    node_type: question
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "FIX M — MANTIDO E DESTACADO (§3.4d próprio, não mais nota de rodapé). LOAD-BEARING a confirmar (P0.3): EventSource NÃO permite header customizado — não manda Authorization. É limitação da API do browser, não do desenho. Se a PWA consome SSE por EventSource, o CAMINHO HUMANO NÃO FUNCIONA depois do flip; o caminho correto é migrar para fetch + ReadableStream (aceita header, e dá controle de reconexão/abort que o EventSource não dá). RECUSADO explicitamente: token por QUERY STRING — vaza no log de acesso do Caddy, no header Referer e no histórico; um bearer com poder de bypassPermissions num log de acesso é o mesmo buraco com outra roupa. Se um ticket de curta duração por query for a única saída, vira decisão do maestro com risco declarado e PRAZO, não default do spec"
+
+  # ---- F3 (preservado): ENFORCEMENT FAIL-CLOSED ----
+  - id: C_enforce_optin_regression
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: superseded
+    label: "POSIÇÃO SUPERADA (v1): OIDC_ENFORCE=false como DEFAULT, com o texto 'com OIDC_ENFORCE ausente o caminho legado é o padrão'. Isso embute uma REGRESSÃO SILENCIOSA no desenho: a env var sumir num update do systemd/EnvironmentFile faz o bridge voltar sozinho, sem avisar, ao segredo compartilhado"
+
+  - id: D_fail_closed_default
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: "FAIL-CLOSED (aprovado pelos verifies, PRESERVADO): BRIDGE_AUTH_MODE com AUSENTE = enforce; qualquer valor que não seja exatamente 'dual-legacy' (typo, vazio, 'false', '0') também cai em enforce (falhar fechado inclui falhar fechado no PARSING). O opt-out é explícito, nomeado, comentado com DATA DE EXPIRAÇÃO CONCRETA (fix K: '# EXPIRA 2026-08-08', não mais o placeholder '2026-07-2X' que ia COLADO pro EnvironmentFile) e loga WARN a cada boot. O FLIP (P7) é REMOVER a linha — o estado seguro é o estado SEM configuração, e o rollback é re-adicionar"
+
+  - id: D_legacy_fn_defined
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "FIX K — legacyAuthTokenOk() era USADA (v2:219) e NUNCA DEFINIDA: num spec turnkey, um placeholder no caminho de auth é onde o operador improvisa (e improviso em comparação de segredo costuma virar '==' com vazamento por timing). Agora DEFINIDA: lê process.env.AUTH_TOKEN (ausente => nega), aceita x-auth-token ou o Bearer legado, compara em TEMPO CONSTANTE (crypto.timingSafeEqual, com checagem de comprimento antes para não estourar), e vive numa função SÓ para o P9 ser exclusão cirúrgica. Também corrigido o outro placeholder: '2026-07-2X' (v2:303,469) => 2026-08-08"
+
+  - id: D_retire_legacy_immediately
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "Corolário do fail-closed — P9 (remover legacyAuthTokenOk e a leitura de BRIDGE_AUTH_MODE do CÓDIGO + rotacionar/apagar o valor) vem IMEDIATAMENTE após o P8 verde, na MESMA janela. A v1 recomendava 'depois de dias de OIDC verde' — isso mantém viva, sem prazo, a única linha que ainda honra o segredo compartilhado, reativável por variável mal reposta"
+
+  # ---- F4 (preservado): ACOPLAMENTO BRIDGE->LOGTO ----
+  - id: C_logto_now_critical
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "O flip CRIA uma dependência dura que não existia (hoje o bridge compara uma string sozinho). Sob Logto-down: JWKS cacheado (cacheMaxAge 10min/cooldown 30s) segue validando JWTs já emitidos até rotação/expiração => 200; emissão de token novo falha => depois da expiração, 401 = entrada INACESSÍVEL. Fail-closed: SEGURO, porém INDISPONÍVEL. RECUSADO explicitamente: fallback 'se o Logto não responder, aceita o AUTH_TOKEN' — DOWNGRADE ACIONÁVEL POR ATACANTE (derrubar o IdP reativa o segredo). Mitigações: /health do bridge NÃO consulta o Logto (senão vira loop de restart); SSH por chave independe do Logto — o maestro nunca fica trancado fora da MÁQUINA, só da conveniência mobile, e é isso que sustenta o rollback do P7"
+
+  - id: C_logto_lower_tier_ok
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: refuted
+    label: "RACIOCÍNIO REFUTADO (v1): 'mem_reservation (Low) é o teto do praticável — aceitável, pois Logto está um degrau ABAIXO de Caddy/bridge na hierarquia de proteção (não é o site público)'. Deixou de ser verdade no instante em que o Logto virou o PORTÃO DE ENTRADA: sob pressão de memória, o OOM killer escolheria justamente o componente que, morto, fecha o bridge inteiro. RESSALVA DA v3: o 'patamar de Caddy/bridge' a que se queria igualar era MENOR DO QUE SE PENSAVA (C_ancestor_cap_zeroes_floors) — igualar-se a um floor inefetivo não teria adiantado nada"
+
+  # ---- F5 (preservado): ALGORITMO PINADO ----
+  - id: D_pin_jwt_algorithms
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: open
+    label: "ALG PINADO (aprovado pelos verifies, PRESERVADO): no jwtVerify (jose) do §3.3, fixar explicitamente algorithms: ['RS256'] (ou ['ES256'], conforme o alg REAL que o Logto emitir, provado no P4.1 decodificando o HEADER do JWT — agora com o decode_jwt que funciona, D_proof_command_fixed). Nunca deixar a lib herdar o alg do header do token: endurecimento padrão contra CONFUSÃO DE ALGORITMO (alg:none, HS256 com chave pública como segredo). Custo zero, uma linha"
+
+  # ---- F6 (preservado + fix J): RFC 8707 LOAD-BEARING ----
+  - id: Q_resource_indicators
+    node_type: question
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "LOAD-BEARING (não nota de rodapé): o aud-binding do §3.3 DEPENDE de o Logto 1.41.0 self-hosted honrar resource=<api-identifier> (RFC 8707). Se não honrar, o Logto tende a emitir token OPACO (userinfo), não JWT com aud do bridge — e a validação local NÃO FUNCIONA. Q aberta até o P4.1 provar contra o endpoint real, com o comando corrigido (C_proof_command_broken)"
+
+  - id: Q_default_api_resource_b1
+    node_type: question
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.4
+    status: open
+    label: "FIX J — o 'default API resource do tenant' era apresentado como FALLBACK PREFERIDO (B1) SEM VERIFICAÇÃO NENHUMA: tão VPS-DECLARADO quanto o RFC 8707 que ele deveria substituir. Adotá-lo assim é trocar uma suposição por outra. Agora tem PASSO DE PROVA PRÓPRIO (P4.1b): marcar o recurso como default no console, pedir token SEM o parâmetro resource= e decodificar. VERDE do B1 = 3 partes E aud contém https://bridge.onionevolve.com sem ter mandado resource=. Qualquer outra coisa = B1 REPROVADO => descer para B2"
+
+  - id: D_resource_plan_b
+    node_type: decision
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: "ESCADA A->B1->B2->B3 (aprovada pelos verifies, PRESERVADA) — PROVA ANTES do desenho depender (P4.1) + PLANO-B escrito: A = resource honrado (§3.3 como está) -> B1 = marcar como DEFAULT API RESOURCE, agora COM PROVA PRÓPRIA (Q_default_api_resource_b1) -> B2 = token opaco: validar por GET /oidc/me (round-trip por request, cache 60s; acopla MAIS — Logto down fecha na hora) -> B3 ÚLTIMO RECURSO = iss+exp+scope+ALLOWLIST de client_id no bridge, com risco DECLARADO (sem aud-binding, token de outra audiência do mesmo tenant é replayável) e data de revisão. B3 só com aceite explícito do maestro. Em NENHUM cenário afrouxa para 'aceita qualquer JWT do issuer'. P4.3 registra no spec+KG o plano adotado ANTES de escrever o middleware"
+
+  # ---- OS ARTEFATOS (spec + passos + verificação) ----
+  - id: A_spec_turnkey
+    node_type: artifact
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: open
+    label: "SPEC TURNKEY M2 v3 (este doc, corrigido pelos 14 fixes A-N do 2º verify adversarial) — desenho do gate OIDC DUPLO + guarda de canonicalização + ordem de middleware por assertion + passos LINEARES reversíveis + endurecimento QUE PROTEGE DE FATO + 23 provas. Segurança defensiva; NÃO promete L1-L6. As posições superadas ficam inline marcadas, não apagadas. LIÇÃO-EIXO da revisão: CONFIGURADO NÃO É PROTEGIDO, DECLARADO NÃO É VERIFICADO — apareceu 3x (floor zerado pelo ancestral, allowlist atravessada por %2e%2e, comando de prova que rotearia a um plano-B mais fraco por bug de shell), e as 3 só apareceram porque alguém RODOU O COMANDO em vez de reler o texto"
+
+  - id: A_flip_steps_reversible
+    node_type: artifact
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: open
+    label: "PASSOS TURNKEY v3 (ordem LINEAR, cada um com rollback): P0 pré-flight (P0.1 systemd/Caddyfile · P0.2 ENUMERAR ROTAS · P0.2b ORDEM DE REGISTRO · P0.2c onde vive o /a2a · P0.3 SSE · P0.4 cortesia/BYOK · P0.5 sign-up · P0.6 CGROUP DRIVER do docker) -> P1 API Resource -> P2 M2M App -> P3 role+atribuição+SPA PKCE+sign-up OFF+token curto -> P4 PROVAS (RFC 8707 com decode_jwt que funciona · prova do B1 · emissão humana · registrar o plano) -> P5 middleware (use PRIMEIRO + assertion de boot + guarda de path + alg pinado + legacyAuthTokenOk definida + EXPIRA 2026-08-08) -> P6 os DOIS chamadores mandam Bearer -> P7 O FLIP = REMOVER a linha -> P8 as 23 provas -> P9 aposentar na MESMA janela. Reversível em segundos por UMA LINHA DE ENV até P8"
+
+  - id: A_verification
+    node_type: artifact
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: open
+    label: "VERIFICAÇÃO v3 (23 provas; a v2 tinha 19). NOVAS/CORRIGIDAS: #3 prova do B1 (fix J); #12 PATH-TRAVERSAL — o MESMO corpus de 12 payloads que a guarda passou em bancada (%2e%2e, ..%2f, %2f%2f, //, %252e duplo-encode, %zz decode inválido, %00, %5c, sob /icons e /.well-known) todos 401 contra o host real, com --path-as-is OBRIGATÓRIO (sem ele o próprio curl normaliza e o teste vira teatro), MAIS o contra-teste que impede zelo cego: /assets/logo%20final.svg segue 200 (espaço percent-encoded não é traversal; guarda que nega isso quebra a PWA e será desligada); #13 nenhum 5xx no traversal (exceção não-tratada poderia contornar o gate); #14 ORDEM — assertion de boot não dispara, requireIdentity no índice 0, e teste NEGATIVO em dev (mover o use => o serviço TEM de morrer no boot); #21 FLOORS EFETIVOS via check_floor() percorrendo a cadeia (antes do fix, medido: TETO DE ANCESTRAL system.slice=0) + oom_score_adj do processo; #22 slice no PATH REAL /sys/fs/cgroup/onion.slice/onion-auth.slice/; #23 /a2a segue gateado após o flip. MANTIDAS: emissão M2M+HUMANA, 401 sem/inválido/expirado/AUDIÊNCIA ERRADA, 403 sem scope, 200 nos dois, assets 200 sem token, /health 200, mutação em prefixo aberto 401, env some/lixo => 401, AUTH_TOKEN recusado após P9, janela real do JWKS medida"
+
+  # ---- ENDURECIMENTO (estado, com o frescor honesto) ----
+  - id: C_pin_verifier_done
+    node_type: claim
+    trace: docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.7
+    status: done
+    verified_against: host-vps-declarado
+    verified_at: 2026-07-25
+    label: "PIN+VERIFIER do Logto — DECLARADO por sessão anterior, NÃO RE-MEDIDO nesta rodada (o sandbox desta sessão bloqueou a leitura do crontab), por isso verified_against desce de host-vps para host-vps-DECLARADO e a confidence de 0.9 para 0.7. Conteúdo: check-version.sh no crontab (seg 09:00 --quiet->logger) + backup diário 03:20; roda ✓ em dia (1.41.0). RE-MEDIR no P0: crontab -l | grep -i logto e ls -la /home/marcio/onion-logto/backups/. Guardrail (PROPOSTA não-ratificada, inbox 2026-07-25): pin de auth exige checar delta antes de subir, peso extra. Com o flip o guardrail GANHA PESO"
+
+  - id: C_console_autooff_gap
+    node_type: claim
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.85
+    status: open
+    verified_against: host-vps-medido
+    verified_at: 2026-07-26
+    label: "GAP: console.sh só tem on/off/status manuais (medido: o case tem on) off) status) e mais nada; console desligado agora). Fecho: no case on) agendar systemd-run --unit=onion-logto-console-autooff --on-active=30m em modo SYSTEM (sudo, NÃO --user — timers de usuário morrem com a sessão SSH); no case off) parar o timer. Reversível, sem estado persistente"
+
+  # ---- FONTES E O QUE É VPS-DECLARADO ----
+  - id: Q_source_correction
+    node_type: question
+    trace: docs/evolution/inbox/2026-07-25-correcao-o-sinal-do-entrypoint-estava-errado.md
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.9
+    status: open
+    label: "FIX N — HIGIENE DE FONTE: o sinal citado por este spec (inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md) RECEBEU CORREÇÃO FORMAL. A correção REFUTA o diagnóstico do entrypoint ('o 503 do staging do Arandek vinha de seed && node init.mjs && npm start') — a causa real era AUTO-SHUTDOWN AGENDADO (min=0/max=0, desired=0, num sábado fora da janela seg-sex 07:00-21:00). NÃO ATINGE o que o M2 cita daquele sinal (Logto 1.41.0 vivo, pin+verifier), MAS as duas fontes têm de ser citadas JUNTAS: citar o sinal sem a correção reintroduz por transporte uma inferência já refutada. É a MESMA CLASSE de erro desta revisão — observação correta promovida a causa"
+
+  - id: Q_vps_declared
+    node_type: question
+    trace: docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md:48
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "VPS-DECLARADO ('o servidor é o verificado') — o que esta sessão NÃO mediu: valor real do AUTH_TOKEN vivo; systemd unit/Caddyfile reais do bridge (inclusive se o reverse_proxy preserva o header Authorization e se não loga query string); config real de bypassPermissions/allowedTools do Agent SDK; inventário e ORDEM DE REGISTRO das rotas do Hono; como a PWA consome o SSE; modos cortesia/BYOK; estado do sign-up no Logto; onde vive o /a2a. P0 pré-flight resolve lendo no host antes de agir. NOTA: a v3 introduziu a distinção host-vps-MEDIDO vs host-vps-DECLARADO justamente porque o fix A mostrou que 'verificado' vinha sendo usado para configuração"
+
+  - id: Q_byok_courtesy_mode
+    node_type: question
+    trace: docs/discussions/onion-pessoal-app/SEED.md:9
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.4
+    status: open
+    label: "INFERÊNCIA A VERIFICAR: a citação '2 modos cortesia-login + BYOK (X-Anthropic-Key)' vem do app-irmão onion-pessoal-app, NÃO do bridge. Não confirmado que o bridge tem esse par nem se OIDC deve gatear ambos — confirmar no host no P0.4"
+
+  # ---- O QUE FICA GATED ----
+  - id: Q_gated_m3
+    node_type: question
+    trace: docs/analysis/onion-m3-federation-admin-spec-2026-07.md:159
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "GATED (não neste flip): RBAC MULTI-OPERADOR / plataforma admin M3 (Logto Organizations só no gatilho 1º role:consumer real) — o login humano PKCE SAIU do gated; o que segue gated é a MALHA multi-operador. Também gated: ENDURECIMENTO DA PWA como cliente (CSP completa, SRI, auditoria de dependência, storage fora do localStorage — este flip só fixa as 3 mitigações baratas e NOMEIA que a PWA entrou na base de confiança, D_pkce_risk_mitigations); Caddy forward_auth/oauth2-proxy (redundante com PKCE in-app); RBAC fino por operação; revisão do bypassPermissions do SDK (eixo separado); cgroup delegation ao dockerd (se cgroup_parent não pegar); AUDITORIA DOS DEMAIS FLOORS do host com check_floor (o fix A é uma CLASSE, não um caso). Derivar fresco quando o gate abrir"
+
+  - id: E_ancestor_floor_applied
+    node_type: evidence
+    trace: /etc/systemd/system/system.slice.d/10-memory-protection.conf
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: host-vps-medido
+    label: "FIX A APLICADO 2026-07-26 (sessão do core, permissão explícita do maestro; hardening NAO-AUTH, sem risco de lockout). Drop-in system.slice.d/10-memory-protection.conf com MemoryMin=384M/MemoryLow=768M + daemon-reload. VERIFICADO NO EFETIVO lendo o cgroup: system.slice/memory.min 0 -> 402653184 e memory.low 0 -> 805306368; caddy (67108864) e onion-bridge (268435456) agora tem ancestral que concede protecao. Reverter: rm o arquivo + daemon-reload. A CLASSE do problema (varredura dos demais floors) segue aberta em Q_floors_effective"
+
+edges:
+  - from: E_ancestor_floor_applied
+    to: D_fix_ancestor_floor
+    edge_type: SUPPORTS
+  # o buraco depende do segredo estático e da estreiteza do gate A2A; o precedente real o sustenta
+  - from: C_identity_hole
+    to: E_auth_token
+    edge_type: DEPENDS_ON
+  - from: C_identity_hole
+    to: C_a2a_gate_narrow
+    edge_type: DEPENDS_ON
+  - from: C_real_precedent
+    to: C_identity_hole
+    edge_type: SUPPORTS
+  # FIX G — a citação de I3 é superada; a postura passa a se ancorar em 'o servidor é o verificado' + lockout
+  - from: D_posture_anchored_correctly
+    to: C_i3_miscited
+    edge_type: SUPERSEDES
+  - from: D_posture_anchored_correctly
+    to: A_spec_turnkey
+    edge_type: CONSTRAINS
+  # FIX H — a fronteira real de execução: a sessão do core aplicou o hardening não-auth neste host
+  - from: C_hardening_applied_by_core_session
+    to: D_posture_anchored_correctly
+    edge_type: SUPPORTS
+  # F1: a entrada do maestro SUPERA a premissa M2M-só, e é o que a decisão dupla traça
+  - from: C_caller_is_hybrid
+    to: D_gate_m2m_only
+    edge_type: REFUTES
+  - from: D_gate_oidc_dual
+    to: D_gate_m2m_only
+    edge_type: SUPERSEDES
+  - from: D_gate_oidc_dual
+    to: C_caller_is_hybrid
+    edge_type: TRACES_TO
+  # a decisão RESPONDE ao buraco (ainda não o refuta — o flip é spec/gated, o risco segue vivo)
+  - from: D_gate_oidc_dual
+    to: C_identity_hole
+    edge_type: DEPENDS_ON
+  - from: D_gate_oidc_dual
+    to: E_logto_live
+    edge_type: DEPENDS_ON
+  - from: D_gate_oidc_dual
+    to: E_auth_token
+    edge_type: DEPENDS_ON
+  - from: D_gate_oidc_dual
+    to: D_logto_not_ssot
+    edge_type: DEPENDS_ON
+  - from: D_logto_not_ssot
+    to: E_logto_live
+    edge_type: TRACES_TO
+  - from: D_rbac_two_layers
+    to: D_gate_oidc_dual
+    edge_type: SUPPORTS
+  # FIX A — o teto de ancestral REFUTA o floor 'já feito'; recursiveprot presente refuta a condição da v2
+  - from: C_ancestor_cap_zeroes_floors
+    to: C_memory_floors_done
+    edge_type: REFUTES
+  - from: C_recursiveprot_is_not_the_gate
+    to: C_ancestor_cap_zeroes_floors
+    edge_type: SUPPORTS
+  - from: C_oom_bias_still_works
+    to: C_memory_floors_done
+    edge_type: CONSTRAINS
+  - from: D_fix_ancestor_floor
+    to: C_ancestor_cap_zeroes_floors
+    edge_type: TRACES_TO
+  - from: Q_floors_effective
+    to: C_ancestor_cap_zeroes_floors
+    edge_type: DEPENDS_ON
+  - from: Q_floors_effective
+    to: D_fix_ancestor_floor
+    edge_type: CONSTRAINS
+  - from: A_verification
+    to: Q_floors_effective
+    edge_type: TRACES_TO
+  # FIX B — o traversal REFUTA a allowlist crua; a guarda de canonicalização a constrange
+  - from: C_path_traversal_bypass
+    to: D_default_deny_routes
+    edge_type: CONSTRAINS
+  - from: D_path_canon_guard
+    to: C_path_traversal_bypass
+    edge_type: TRACES_TO
+  - from: D_path_canon_guard
+    to: D_default_deny_routes
+    edge_type: CONSTRAINS
+  # FIX C — a ordem de registro constrange o default-deny; a assertion fecha
+  - from: C_hono_registration_order_bypass
+    to: D_default_deny_routes
+    edge_type: CONSTRAINS
+  - from: D_middleware_order_first
+    to: C_hono_registration_order_bypass
+    edge_type: TRACES_TO
+  - from: D_middleware_order_first
+    to: D_default_deny_routes
+    edge_type: CONSTRAINS
+  # F2 preservado: o route-scoping supera o middleware global cego
+  - from: D_default_deny_routes
+    to: C_global_middleware_breaks_pwa
+    edge_type: SUPERSEDES
+  - from: D_default_deny_routes
+    to: D_gate_oidc_dual
+    edge_type: CONSTRAINS
+  - from: D_default_deny_routes
+    to: Q_route_inventory
+    edge_type: DEPENDS_ON
+  - from: Q_pwa_sse_headers
+    to: D_gate_oidc_dual
+    edge_type: CONSTRAINS
+  - from: Q_a2a_after_flip
+    to: D_default_deny_routes
+    edge_type: CONSTRAINS
+  - from: Q_a2a_after_flip
+    to: C_a2a_gate_narrow
+    edge_type: DEPENDS_ON
+  # F3 preservado: fail-closed supera o enforcement opt-in; legacy definida e retirada logo
+  - from: D_fail_closed_default
+    to: C_enforce_optin_regression
+    edge_type: SUPERSEDES
+  - from: D_fail_closed_default
+    to: D_gate_oidc_dual
+    edge_type: CONSTRAINS
+  - from: D_legacy_fn_defined
+    to: D_fail_closed_default
+    edge_type: SUPPORTS
+  - from: D_retire_legacy_immediately
+    to: D_fail_closed_default
+    edge_type: SUPPORTS
+  - from: D_retire_legacy_immediately
+    to: E_auth_token
+    edge_type: DEPENDS_ON
+  - from: D_retire_legacy_immediately
+    to: D_legacy_fn_defined
+    edge_type: DEPENDS_ON
+  # F4 preservado + FIX D: acoplamento, paridade de proteção e o path do slice
+  - from: C_logto_now_critical
+    to: D_gate_oidc_dual
+    edge_type: DEPENDS_ON
+  - from: C_logto_now_critical
+    to: E_logto_live
+    edge_type: DEPENDS_ON
+  - from: D_logto_same_protection_tier
+    to: C_logto_lower_tier_ok
+    edge_type: REFUTES
+  - from: D_logto_same_protection_tier
+    to: C_logto_now_critical
+    edge_type: TRACES_TO
+  - from: D_logto_same_protection_tier
+    to: C_docker_floor_gap
+    edge_type: DEPENDS_ON
+  - from: D_logto_same_protection_tier
+    to: C_slice_path_wrong
+    edge_type: TRACES_TO
+  - from: D_logto_same_protection_tier
+    to: D_fix_ancestor_floor
+    edge_type: DEPENDS_ON
+  - from: D_logto_same_protection_tier
+    to: Q_docker_cgroup_driver
+    edge_type: DEPENDS_ON
+  - from: C_ancestor_cap_zeroes_floors
+    to: C_slice_path_wrong
+    edge_type: SUPPORTS
+  # F5 preservado: o alg pinado constrange a validação, e depende do decode que funciona
+  - from: D_pin_jwt_algorithms
+    to: D_gate_oidc_dual
+    edge_type: CONSTRAINS
+  - from: D_pin_jwt_algorithms
+    to: D_proof_command_fixed
+    edge_type: DEPENDS_ON
+  # F6 preservado + FIX E/J: o plano-B responde à Q load-bearing, e a prova precisa de comando que funcione
+  - from: D_resource_plan_b
+    to: Q_resource_indicators
+    edge_type: SUPPORTS
+  - from: D_resource_plan_b
+    to: D_gate_oidc_dual
+    edge_type: CONSTRAINS
+  - from: D_resource_plan_b
+    to: Q_default_api_resource_b1
+    edge_type: DEPENDS_ON
+  - from: D_resource_plan_b
+    to: D_proof_command_fixed
+    edge_type: DEPENDS_ON
+  - from: Q_resource_indicators
+    to: D_gate_oidc_dual
+    edge_type: DEPENDS_ON
+  - from: D_proof_command_fixed
+    to: C_proof_command_broken
+    edge_type: TRACES_TO
+  - from: C_proof_command_broken
+    to: D_resource_plan_b
+    edge_type: CONSTRAINS
+  # FIX F: a ordem linear supera a circular
+  - from: D_steps_renumbered
+    to: C_steps_circular
+    edge_type: SUPERSEDES
+  - from: D_steps_renumbered
+    to: A_flip_steps_reversible
+    edge_type: CONSTRAINS
+  # FIX I: o PKCE move a credencial para o device; as mitigações constrangem o gate
+  - from: C_pkce_moves_credential_to_device
+    to: D_gate_oidc_dual
+    edge_type: DEPENDS_ON
+  - from: D_pkce_risk_mitigations
+    to: C_pkce_moves_credential_to_device
+    edge_type: TRACES_TO
+  - from: D_pkce_risk_mitigations
+    to: D_gate_oidc_dual
+    edge_type: CONSTRAINS
+  # o spec ancora a decisão; os passos a implementam e aposentam o token; a verificação prova
+  - from: A_spec_turnkey
+    to: D_gate_oidc_dual
+    edge_type: TRACES_TO
+  - from: A_flip_steps_reversible
+    to: D_gate_oidc_dual
+    edge_type: SUPPORTS
+  - from: A_flip_steps_reversible
+    to: E_auth_token
+    edge_type: DEPENDS_ON
+  - from: A_flip_steps_reversible
+    to: Q_vps_declared
+    edge_type: DEPENDS_ON
+  - from: A_flip_steps_reversible
+    to: Q_route_inventory
+    edge_type: DEPENDS_ON
+  - from: A_flip_steps_reversible
+    to: D_resource_plan_b
+    edge_type: DEPENDS_ON
+  - from: A_verification
+    to: A_flip_steps_reversible
+    edge_type: SUPPORTS
+  - from: A_verification
+    to: D_default_deny_routes
+    edge_type: TRACES_TO
+  - from: A_verification
+    to: D_fail_closed_default
+    edge_type: TRACES_TO
+  - from: A_verification
+    to: D_gate_oidc_dual
+    edge_type: TRACES_TO
+  - from: A_verification
+    to: D_path_canon_guard
+    edge_type: TRACES_TO
+  - from: A_verification
+    to: D_middleware_order_first
+    edge_type: TRACES_TO
+  - from: A_verification
+    to: Q_a2a_after_flip
+    edge_type: TRACES_TO
+  # endurecimento: pin sustenta o Logto vivo; os gaps dependem do Logto vivo
+  - from: C_pin_verifier_done
+    to: E_logto_live
+    edge_type: SUPPORTS
+  - from: C_docker_floor_gap
+    to: E_logto_live
+    edge_type: DEPENDS_ON
+  - from: C_console_autooff_gap
+    to: E_logto_live
+    edge_type: DEPENDS_ON
+  # higiene de fonte: a correção constrange a entidade que a cita
+  - from: Q_source_correction
+    to: E_logto_live
+    edge_type: CONSTRAINS
+  - from: Q_source_correction
+    to: C_pin_verifier_done
+    edge_type: CONSTRAINS
+  # questões abertas de que o fecho de verdade depende
+  - from: Q_byok_courtesy_mode
+    to: D_gate_oidc_dual
+    edge_type: DEPENDS_ON
+  - from: Q_vps_declared
+    to: C_identity_hole
+    edge_type: DEPENDS_ON
+  - from: Q_gated_m3
+    to: D_gate_oidc_dual
+    edge_type: DEPENDS_ON
