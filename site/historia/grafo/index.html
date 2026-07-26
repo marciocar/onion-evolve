@@ -5,7 +5,15 @@
      interno de adotantes e detalhes de infraestrutura; a guarda de projeção (REGRA 30) NÃO
      pegaria isso (ela só barra nome comercial de parceiro), então a contenção é editorial e
      está aqui declarada. Se um dia rótulos forem publicados, cada um é decisão do maestro.
-     Os números são GUARDADOS pelo lint (REGRA 32) contra kg-view.sh — não edite à mão. -->
+     Os números são GUARDADOS pelo lint (REGRA 32) — não chute; leia da fonte.
+     ATENÇÃO: os números vêm de DUAS fontes distintas (achado 2026-07-26):
+       · nós/arestas/status/tipo/barras -> bash .claude/validation/kg-view.sh \
+             docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml --json
+       · data-kg="coverage"             -> bash .claude/validation/kg-provenance-coverage.sh \
+             | awk -F: '/Cobertos pelo grafo/ {print $2}'
+     Este comentário antes mandava usar só kg-view.sh, que NÃO produz o coverage — quem
+     seguisse a instrução não achava o número. O lint sempre informa o valor esperado na
+     própria mensagem de violação: use-o. -->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">

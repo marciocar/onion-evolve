@@ -42,13 +42,35 @@ HOOKDIR="${DEST}/.githooks"
 HOOK="${HOOKDIR}/pre-commit"
 mkdir -p "${HOOKDIR}" 2>/dev/null || { echo "AVISO: não criou ${HOOKDIR} (permissão?) — hook não provisionado." >&2; exit 0; }
 
-# (1) Provisiona o pre-commit — NEVER-CLOBBER.
+# (1) Provisiona o pre-commit — NEVER-CLOBBER, com REFRESH do hook Onion-autorado.
+#
+#   Três casos (o do meio nasceu de um sinal de campo do arandek, 2026-07-25):
+#     (a) idêntico ao template          -> no-op
+#     (b) DIFERENTE mas Onion-AUTORADO  -> REFRESH (sobrescreve): é a NOSSA versão antiga,
+#                                          o template evoluiu. Sidecar aqui deixava o hook
+#                                          VELHO ativo e o novo parado ao lado — o `--update`
+#                                          não atualizava nada (declarado != verificado).
+#     (c) DIFERENTE e de TERCEIRO       -> sidecar .onion (never-clobber de verdade)
+#   O marcador de autoria é a linha de cabeçalho do template, estável desde a criação.
+ONION_MARK='Onion — pre-commit hook NATIVO (provisionado por /meta:adopt)'
 if [ -f "${HOOK}" ]; then
   if cmp -s "${TPL}" "${HOOK}" 2>/dev/null; then
     echo "Onion: .githooks/pre-commit já é o template Onion (no-op)." >&2
+  elif grep -qF "${ONION_MARK}" "${HOOK}" 2>/dev/null; then
+    # (b) hook Onion DESATUALIZADO -> refrescar. Não é clobber: estamos sobrescrevendo
+    #     o nosso próprio artefato por uma versão mais nova.
+    if cp "${TPL}" "${HOOK}" 2>/dev/null && chmod +x "${HOOK}" 2>/dev/null; then
+      echo "Onion: .githooks/pre-commit era Onion-autorado e DESATUALIZADO — REFRESCADO para o template atual." >&2
+      # Higiene: sidecar de rodada antiga vira lixo confuso depois do refresh.
+      [ -f "${HOOK}.onion" ] && rm -f "${HOOK}.onion" 2>/dev/null \
+        && echo "Onion: removido ${HOOK}.onion obsoleto (o hook ativo já é o template atual)." >&2
+    else
+      echo "AVISO: falha ao refrescar ${HOOK}." >&2
+    fi
   else
+    # (c) hook de TERCEIRO -> never-clobber (sidecar p/ merge manual).
     if cp "${TPL}" "${HOOK}.onion" 2>/dev/null && chmod +x "${HOOK}.onion" 2>/dev/null; then
-      echo "Onion: .githooks/pre-commit já existe — Onion gravado como pre-commit.onion (merge manual)." >&2
+      echo "Onion: .githooks/pre-commit já existe (de terceiro) — Onion gravado como pre-commit.onion (merge manual)." >&2
     else
       echo "AVISO: falha ao gravar ${HOOK}.onion." >&2
     fi
