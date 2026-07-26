@@ -24,13 +24,30 @@
 #   modo "contract" : roda federation-contract-validate.sh <fixture> e assere o
 #                     exit code (pass=0 / fail≠0). Não precisa de sandbox.
 #
+# Desfechos : TRÊS, nunca dois — ✓ passou · ✗ falhou · ⊘ NÃO VERIFICADO (o SUT não foi
+#             exercido porque tooling/feature falta). Um runner de dois desfechos soma o
+#             "pulei" no "passei" e produz o mesmo "N passaram" de uma máquina saudável:
+#             falso-verde por vacuidade. Ver record_skip().
+#
 # Uso       : bash .claude/validation/lint-selftest.sh
-# Saída     : exit 0 se todos os vereditos batem; exit 1 se algum diverge.
+#             ONION_SELFTEST_STRICT=1 bash ... → ⊘ vira FALHA (asserção de capacidade; é o
+#             modo do CI, onde tooling ausente é defeito de ambiente, não degrade aceitável)
+# Saída     : exit 0 se todos os vereditos batem; exit 1 se algum diverge (ou, em STRICT,
+#             se algo ficou por verificar).
 #
 # Determinístico, sem LLM. Par do princípio inventory.sh/lint-artifacts.sh.
 # =============================================================================
 
 set -euo pipefail
+
+# Git hooks EXPORTAM GIT_DIR/GIT_INDEX_FILE (e o `git commit` os aponta para o repo do
+# commit em curso). Cada sandbox git forjada aqui os herdaria e operaria no repo ERRADO.
+# Medido: sob `git commit`, a suíte ABORTAVA no caso 93 de 472 — e o hook anunciava
+# "self-test das guardas falhou", quando o real era "379 guardas nunca rodaram". Um abort
+# apresentado como veredito é a MESMA vacuidade que o record_skip conserta, uma camada
+# acima: o pre-commit era inutilizável exatamente nos commits que tocam as guardas.
+# Defeito PRÉ-EXISTENTE, achado dogfoodando o próprio fix (a main aborta idêntico).
+unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
@@ -41,7 +58,15 @@ INJECT_NAME="${INJECT_BASE}.md"
 
 PASS=0
 FAIL=0
+SKIP=0
 FAILED_CASES=()
+SKIPPED_CASES=()
+# ONION_SELFTEST_STRICT=1 → skip vira FALHA (assercão de capacidade). Local, o degrade
+# gracioso é intencional: nem toda máquina tem jq/pyyaml e o autor não deve ser bloqueado.
+# No CI ele é inaceitável — um runner sem tooling passaria em verde sem validar nada. É a
+# MESMA postura que o step de design tokens já aplica (onion-validate.yml, fail-loud sem jq),
+# aqui generalizada para a suíte inteira em vez de um gate só.
+STRICT="${ONION_SELFTEST_STRICT:-0}"
 
 # Nota: o loop de fixtures (lint/fix/contract/merge) é core-only — exige as fixtures
 # vendorizadas em ${FIX_DIR}. Um adotante não as vendoriza, então NÃO abortamos aqui:
@@ -87,6 +112,13 @@ SSOT_KB_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/
 
 record_pass() { PASS=$((PASS + 1)); echo "  ✓ ${1}"; }
 record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} — ${2}"; }
+# TERCEIRO DESFECHO — o SUT NÃO foi exercido (tooling/feature ausente). Nunca soma em PASS.
+# Onde só existem "lançar" e "não lançar", "não verifiquei" se disfarça de "verifiquei e está
+# bom" — falso-verde por VACUIDADE (architecture-challenges.md §1.3). Antes disto, 32 sítios
+# registravam skip como ✓: uma máquina sem jq/python3 produzia o MESMO "N passaram" de uma
+# máquina saudável. Sinal de campo 2026-07-25 (arandek): o mesmo defeito custou um deploy.
+# Em STRICT (CI) um skip é FALHA — ver bloco do sumário. [[fix-must-become-mechanism]]
+record_skip() { SKIP=$((SKIP + 1)); SKIPPED_CASES+=("${1}"); echo "  ⊘ ${1}"; }
 
 # ---------------------------------------------------------------------------
 # Modo lint — injeta a fixture no sandbox e assere por path
@@ -389,7 +421,7 @@ run_migalhas_generate_selftests() {
   local gen="${SCRIPT_DIR}/migalhas-generate.sh"
   local tmp
   [ -f "${gen}" ] || return 0
-  command -v python3 >/dev/null 2>&1 || { record_pass "migalhas-generate: python3 ausente (skip gracioso, coerente com REGRA 34)"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "migalhas-generate: python3 ausente (skip gracioso, coerente com REGRA 34)"; return; }
   tmp="$(mktemp -d)"
   trap 'rm -rf "${tmp}"' RETURN
   local M="${tmp}/site/historia/migalhas"
@@ -470,7 +502,7 @@ run_rules_registry_selftests() {
   local doc="${SCRIPT_DIR}/lint-rules.md"
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   [ -f "${gen}" ] || return 0
-  command -v python3 >/dev/null 2>&1 || { record_pass "rules-registry: python3 ausente (skip gracioso, coerente com REGRA 39)"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "rules-registry: python3 ausente (skip gracioso, coerente com REGRA 39)"; return; }
   local tmp; tmp="$(mktemp -d)"
   trap 'rm -rf "${tmp}"' RETURN
   local rc
@@ -529,7 +561,7 @@ run_rules_registry_selftests() {
 run_onion_version_tracked_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   [ -f "${lint}" ] || return 0
-  command -v git >/dev/null 2>&1 || { record_pass "onion-version-tracked: git ausente (skip gracioso)"; return; }
+  command -v git >/dev/null 2>&1 || { record_skip "onion-version-tracked: git ausente (skip gracioso)"; return; }
   local sb; sb="$(mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"; trap 'rm -rf "'"${sb}"'"' RETURN
   mkdir -p "${sb}/.claude/validation"
   cp "${lint}" "${sb}/.claude/validation/"
@@ -585,7 +617,7 @@ run_onion_version_tracked_selftests() {
 run_inventory_adopter_scope_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"; local inv="${SCRIPT_DIR}/inventory.sh"
   [ -f "${lint}" ] || return 0
-  [ -f "${inv}" ] || { record_pass "inventory-adopter-scope: inventory.sh ausente → pulado"; return; }
+  [ -f "${inv}" ] || { record_skip "inventory-adopter-scope: inventory.sh ausente → pulado"; return; }
   local sb; sb="$(mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"; trap 'rm -rf "'"${sb}"'"' RETURN
   mkdir -p "${sb}/.claude/validation" "${sb}/.claude/agents/development" "${sb}/.claude/commands/meta" \
            "${sb}/.claude/skills/foo" "${sb}/docs/specs" "${sb}/docs/onion" "${sb}/docs/knowledge-base/concepts"
@@ -621,7 +653,7 @@ run_inventory_adopter_scope_selftests() {
 run_hub_role_guard_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   [ -f "${lint}" ] || return 0
-  command -v git >/dev/null 2>&1 || { record_pass "hub-role-guard: git ausente (skip gracioso)"; return; }
+  command -v git >/dev/null 2>&1 || { record_skip "hub-role-guard: git ausente (skip gracioso)"; return; }
   local sb; sb="$(mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"; trap 'rm -rf "'"${sb}"'"' RETURN
   mkdir -p "${sb}/.claude/validation" "${sb}/docs/knowledge-base/concepts"
   cp "${lint}" "${SCRIPT_DIR}/projection-safety.sh" "${sb}/.claude/validation/"
@@ -655,7 +687,7 @@ run_family_topology_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   [ -f "${lint}" ] || return 0
   if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
-    record_pass "family-topology: sem python+yaml (skip gracioso, coerente com REGRA 41)"; return; fi
+    record_skip "family-topology: sem python+yaml (skip gracioso, coerente com REGRA 41)"; return; fi
   local sb; sb="$(mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"; trap 'rm -rf "'"${sb}"'"' RETURN
   mkdir -p "${sb}/.claude/validation" "${sb}/.claude/utils/marketplace" "${sb}/docs/onion/graph"
   cp "${lint}" "${SCRIPT_DIR}/projection-safety.sh" "${sb}/.claude/validation/"
@@ -697,7 +729,7 @@ K
 run_decouple_source_selftests() {
   local dec="${SCRIPT_DIR}/../utils/adopt/decouple-source.sh"
   [ -f "${dec}" ] || return 0
-  command -v git >/dev/null 2>&1 || { record_pass "decouple-source: git ausente (skip gracioso)"; return; }
+  command -v git >/dev/null 2>&1 || { record_skip "decouple-source: git ausente (skip gracioso)"; return; }
   local sb; sb="$(mktemp -d)"; trap 'rm -rf "'"${sb}"'"' RETURN
   mkdir -p "${sb}/.claude"
   git -C "${sb}" init -q
@@ -1235,7 +1267,7 @@ run_merge_fixture() {
   local helper="${SANDBOX}/.claude/utils/adopt/merge-onion-hooks.sh"
 
   if ! command -v jq >/dev/null 2>&1; then
-    record_pass "${fixture} (skip: jq ausente)"; return
+    record_skip "${fixture} (skip: jq ausente)"; return
   fi
   if [ ! -f "${tgt}" ]; then record_fail "${fixture}" "fixture inexistente: ${tgt}"; return; fi
   if [ ! -f "${helper}" ]; then record_fail "${fixture}" "helper ausente: ${helper}"; return; fi
@@ -1716,7 +1748,7 @@ run_vendor_branch_selftests() {
 run_compose_settings_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/scope/compose-settings.sh"
   if [ ! -f "${helper}" ]; then record_fail "compose-settings" "helper ausente: ${helper}"; return; fi
-  if ! command -v jq >/dev/null 2>&1; then record_pass "compose-settings: jq ausente → pulado (gracioso)"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_skip "compose-settings: jq ausente → pulado (gracioso)"; return; fi
   local d; d="$(mktemp -d)"
   printf '%s' '{"theme":"dark","permissions":{"allow":["Bash(git *)"],"deny":[]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"fw"}]}]}}' > "$d/fw.json"
   printf '%s' '{"permissions":{"deny":["x"]},"env":{"ORG":"acme"}}' > "$d/org.json"
@@ -1761,7 +1793,7 @@ run_resolve_target_selftests() {
   if [ "${rc}" -eq 3 ]; then record_pass "resolve-target: chave desconhecida → exit 3"
   else record_fail "resolve-target: chave" "esperava exit 3, veio ${rc}"; fi
   if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
-    record_pass "resolve-target: seletor sobre membros pulado (sem python+yaml — gracioso)"; return; fi
+    record_skip "resolve-target: seletor sobre membros pulado (sem python+yaml — gracioso)"; return; fi
   local todos hub
   todos="$(bash "${helper}" todos 2>/dev/null | LC_ALL=C sort)"
   hub="$(bash "${helper}" 'tier:hub' 2>/dev/null | grep -v '^$' | LC_ALL=C sort)"
@@ -1802,7 +1834,7 @@ run_reconcile_inputs_selftests() {
   else record_fail "reconcile-inputs: determinismo" "varia entre execuções"; fi
   # conteúdo de [ENTRIES] depende de resolve-target (python+yaml) → pula gracioso
   if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
-    record_pass "reconcile-inputs: conteúdo de entries pulado (sem python+yaml — gracioso)"; return; fi
+    record_skip "reconcile-inputs: conteúdo de entries pulado (sem python+yaml — gracioso)"; return; fi
   entries="$(bash "${helper}" --entries 2>/dev/null)"   # 1× (memoizado no helper)
   if [ "$(printf '%s\n' "${entries}" | head -1)" = "[ENTRIES]" ]; then
     record_pass "reconcile-inputs: --entries emite cabeçalho [ENTRIES]"
@@ -1848,7 +1880,7 @@ run_federation_console_selftests() {
   if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
     local rc=0; bash "${helper}" >/dev/null 2>&1 || rc=$?
     if [ "${rc}" -eq 3 ]; then record_pass "federation-console: sem python+yaml → exit 3 (gracioso)"
-    else record_pass "federation-console: pulado (sem python+yaml)"; fi
+    else record_skip "federation-console: pulado (sem python+yaml)"; fi
     return; fi
   local H; H="$(bash "${helper}" 2>/dev/null)"
   if printf '%s' "${H}" | grep -q '<!doctype html>' && printf '%s' "${H}" | grep -q '</html>' \
@@ -1994,7 +2026,7 @@ run_write_stamp_selftests() {
     if grep -q '^adopted_at: 2026-06-15$' "${wsb}/t/.claude/.onion-version"; then
       record_pass "write-stamp: adopted_at perdido → restaurado do members.yaml"
     else record_fail "write-stamp: restore" "$(cat "${wsb}/t/.claude/.onion-version")"; fi
-  else record_pass "write-stamp: restore pulado (sem python+yaml)"; fi
+  else record_skip "write-stamp: restore pulado (sem python+yaml)"; fi
   # 4. --role hub (Camada 2): fresh grava role: hub; update SEM --role preserva hub (não rebaixa)
   rm -rf "${wsb}/h"; mkdir -p "${wsb}/h/.claude"
   bash "${helper}" "${wsb}/h" --framework onion-pedro --commit aaa111 --commit-date 2026-07-23 --role hub >/dev/null 2>&1
@@ -2021,7 +2053,7 @@ run_kg_console_selftests() {
   if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
     local rc=0; bash "${helper}" "${fixture}" >/dev/null 2>&1 || rc=$?
     if [ "${rc}" -eq 3 ]; then record_pass "kg-console: sem python+yaml → exit 3 (gracioso)"
-    else record_pass "kg-console: pulado (sem python+yaml)"; fi
+    else record_skip "kg-console: pulado (sem python+yaml)"; fi
     return; fi
   local H; H="$(bash "${helper}" "${fixture}" 2>/dev/null)"
   if printf '%s' "${H}" | grep -q '<!doctype html>' && printf '%s' "${H}" | grep -q '</html>' \
@@ -2163,7 +2195,7 @@ run_a2a_verify_selftests() {
   if [ ! -f "${helper}" ]; then record_fail "a2a-verify" "helper ausente: ${helper}"; return; fi
   if ! command -v openssl >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1 \
      || ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import yaml' >/dev/null 2>&1; then
-    record_pass "a2a-verify: tooling p/ forjar fixtures ausente → skip (não-SUT)"; return
+    record_skip "a2a-verify: tooling p/ forjar fixtures ausente → skip (não-SUT)"; return
   fi
   local sb; sb="$(mktemp -d)"; mkdir -p "${sb}/docs/evolution/federation" "${sb}/jwks"
   cat > "${sb}/docs/evolution/federation/members.yaml" <<'YML'
@@ -2283,7 +2315,7 @@ run_agent_card_selftests() {
   local gen="${REPO_ROOT}/.claude/validation/a2a-agent-card.sh"
   if [ ! -f "${gen}" ]; then record_fail "agent-card" "gerador ausente: ${gen}"; return; fi
   if ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import yaml' >/dev/null 2>&1; then
-    record_pass "agent-card: python+yaml ausente → skip (não-SUT)"; return
+    record_skip "agent-card: python+yaml ausente → skip (não-SUT)"; return
   fi
   local mf mf2 out rc a b n
   mf="$(mktemp)"
@@ -2336,7 +2368,7 @@ YML
 run_a2a_accept_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/federation-transport/a2a-accept.sh"
   if [ ! -f "${helper}" ]; then record_fail "a2a-accept" "helper ausente: ${helper}"; return; fi
-  if ! command -v jq >/dev/null 2>&1; then record_pass "a2a-accept: jq ausente → skip (não-SUT)"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_skip "a2a-accept: jq ausente → skip (não-SUT)"; return; fi
   local d ib rec out rc doc
   d="$(mktemp -d)"; ib="${d}/inbox"; mkdir -p "${ib}"
   rec="${d}/verified.json"
@@ -2392,7 +2424,7 @@ run_resolve_scope_layers_selftests() {
        && [ "$(printf '%s' "${eff}" | jq -c '.permissions.allow')" = '["Bash(git *)","Bash(nx *)"]' ]; then
       record_pass "resolve-scope-layers: compõe efetivo (last-wins pessoa + model time + união)"
     else record_fail "resolve-scope-layers: compose" "efetivo incorreto"; fi
-  else record_pass "resolve-scope-layers: compose pulado (sem jq)"; fi
+  else record_skip "resolve-scope-layers: compose pulado (sem jq)"; fi
   rm -rf "$t" "$us"
 }
 
@@ -2407,7 +2439,7 @@ run_show_scope_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/scope/compose-settings.sh"
   local resolver="${REPO_ROOT}/.claude/utils/scope/resolve-scope-layers.sh"
   if [ ! -f "${helper}" ]; then record_fail "show-scope" "helper ausente: ${helper}"; return; fi
-  if ! command -v jq >/dev/null 2>&1; then record_pass "show-scope: jq ausente → pulado (gracioso)"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_skip "show-scope: jq ausente → pulado (gracioso)"; return; fi
   local TAB=$'\t'
   local d; d="$(mktemp -d)"
   printf '%s' '{"theme":"dark","permissions":{"allow":["Bash(git *)"],"deny":[]},"hooks":{"SessionStart":[{"matcher":"","hooks":[{"type":"command","command":"fw"}]}]}}' > "$d/fw.json"
@@ -2728,12 +2760,12 @@ run_assemble_plugin_selftests() {
   local mdesign="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion-design.manifest.sh"
   local mcompl="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion-compliance.manifest.sh"
   if [ ! -f "${helper}" ]; then record_fail "assemble-plugin" "helper ausente: ${helper}"; return; fi
-  if ! command -v jq >/dev/null 2>&1; then record_pass "assemble-plugin: jq ausente → pulado (gracioso)"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_skip "assemble-plugin: jq ausente → pulado (gracioso)"; return; fi
   # Maquinaria de marketplace é core-only: validar a MONTAGEM de plugin só faz sentido
   # em quem publica plugins (o core tem plugins/ committed). Um consumidor não republica
   # → pular gracioso em vez de cair no assemble (que exige todos os componentes-fonte do
   # manifest presentes) sob set -e e abortar o harness inteiro.
-  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_pass "assemble-plugin: sem plugins/ vendorizados → pulado (consumidor não publica plugins)"; return; fi
+  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_skip "assemble-plugin: sem plugins/ vendorizados → pulado (consumidor não publica plugins)"; return; fi
   local d rc
 
   # (a) DESIGN: estrutura com utils + gate (commands+agents+utils+validation+manifest+proveniência)
@@ -2950,10 +2982,10 @@ run_plugins_sync_selftests() {
   local asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
   local vdir="${REPO_ROOT}/.claude/utils/marketplace/verticals"
   if [ ! -f "${asm}" ] || [ ! -d "${vdir}" ]; then record_fail "plugins-sync" "assembler/verticals ausentes"; return; fi
-  if ! command -v jq >/dev/null 2>&1; then record_pass "plugins-sync: jq ausente → pulado (gracioso)"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_skip "plugins-sync: jq ausente → pulado (gracioso)"; return; fi
   # Drift-guard de plugins committed é core-only: o adotante não vendoriza plugins/
   # (só verticals/*.manifest.sh). Sem plugins/ não há "committed" para comparar → pular.
-  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_pass "plugins-sync: sem plugins/ vendorizados → pulado (consumidor não publica plugins)"; return; fi
+  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_skip "plugins-sync: sem plugins/ vendorizados → pulado (consumidor não publica plugins)"; return; fi
   local manifest name committed d csha tsha
 
   for manifest in "${vdir}"/*.manifest.sh; do
@@ -2997,8 +3029,8 @@ run_role_bundle_selftests() {
   local resolver="${REPO_ROOT}/.claude/utils/marketplace/resolve-role-bundle.sh"
   local vdir="${REPO_ROOT}/.claude/utils/marketplace/verticals"
   local mkt="${REPO_ROOT}/.claude-plugin/marketplace.json"
-  if [ ! -f "${roles}" ] || [ ! -f "${resolver}" ]; then record_pass "role-bundle: roles.yaml/resolver ausentes → pulado (repo sem a feature)"; return; fi
-  if ! python3 -c "import yaml" >/dev/null 2>&1; then record_pass "role-bundle: pyyaml ausente → pulado (gracioso)"; return; fi
+  if [ ! -f "${roles}" ] || [ ! -f "${resolver}" ]; then record_skip "role-bundle: roles.yaml/resolver ausentes → pulado (repo sem a feature)"; return; fi
+  if ! python3 -c "import yaml" >/dev/null 2>&1; then record_skip "role-bundle: pyyaml ausente → pulado (gracioso)"; return; fi
 
   if [ -n "$(bash "${resolver}" source 2>/dev/null)" ]; then record_pass "role-bundle: resolver source → não-vazio"
   else record_fail "role-bundle: resolver source" "esperava verticais para source"; fi
@@ -3106,7 +3138,7 @@ run_graph_selftests() {
     record_fail "graph: sem ruído de template" "triplas contêm placeholders (agente-N/comando-N/autonomy:)"
   else record_pass "graph: triplas sem ruído de template (placeholders de exemplos)"; fi
 
-  if ! command -v jq >/dev/null 2>&1; then record_pass "graph: jq ausente → demais checks pulados (gracioso)"; return; fi
+  if ! command -v jq >/dev/null 2>&1; then record_skip "graph: jq ausente → demais checks pulados (gracioso)"; return; fi
   # Core-only: o grafo canônico (graph.md em-sync) e o --impact assumem as verticais
   # PUBLICADAS (ex.: onion-design). Um consumidor não vendoriza plugins/ → a regeneração
   # local diverge do graph.md committed por construção. Pular gracioso (a guarda de drift
@@ -3164,7 +3196,7 @@ run_graph_selftests() {
       record_pass "graph: --map determinístico"
     else record_fail "graph: --map determinismo" "mapa varia entre execuções"; fi
   else
-    record_pass "graph: members/--map pulados (sem python+yaml — gracioso)"
+    record_skip "graph: members/--map pulados (sem python+yaml — gracioso)"
   fi
 }
 
@@ -3179,7 +3211,7 @@ run_design_tokens_selftests() {
   local gate="${REPO_ROOT}/.claude/validation/lint-design-tokens.sh"
   if [ ! -f "${gate}" ]; then record_fail "design-tokens" "gate ausente: ${gate}"; return; fi
   if ! command -v jq >/dev/null 2>&1 || ! command -v awk >/dev/null 2>&1; then
-    record_pass "design-tokens (skip: jq/awk ausente)"; return
+    record_skip "design-tokens (skip: jq/awk ausente)"; return
   fi
   local d rc
   local mkdc # cria docs/design-context com 1 arquivo de tokens + pares de contraste
@@ -3416,7 +3448,7 @@ run_codeliver_selftests() {
 run_de_identification_selftests() {
   local s="${REPO_ROOT}/.claude/utils/de-identification/scripts/redact-deterministic.sh"
   if [ ! -f "${s}" ]; then record_fail "de-id" "script ausente: ${s}"; return; fi
-  if ! command -v python3 >/dev/null 2>&1; then record_pass "de-id: python3 ausente → pulado (gracioso)"; return; fi
+  if ! command -v python3 >/dev/null 2>&1; then record_skip "de-id: python3 ausente → pulado (gracioso)"; return; fi
 
   local map red restored
   local sample='email a@b.com.br, CPF 123.456.789-09, CNPJ 12.345.678/0001-99, tel (11) 98765-4321, cartão 4111 1111 1111 1111, IP 10.0.0.1; de novo a@b.com.br'
@@ -4327,7 +4359,7 @@ run_outbox_channel_selftests() {
   local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
   if [ ! -f "${lint}" ]; then record_fail "outbox-channel" "lint ausente: ${lint}"; return; fi
   if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
-    record_pass "outbox-channel: pulado (sem python3+yaml — gracioso)"; return
+    record_skip "outbox-channel: pulado (sem python3+yaml — gracioso)"; return
   fi
 
   local sb; sb="$(mktemp -d)"
@@ -4736,7 +4768,7 @@ EOF
       record_pass "constellation-map: --json bem-formado (jq: count=4)"
     else record_fail "constellation-map: json" "jq count=${jc} rc=${rc}"; fi
   else
-    record_pass "constellation-map: --json (skip: jq ausente)"
+    record_skip "constellation-map: --json (skip: jq ausente)"
   fi
 
   # (f) MODO-DE-FALHA só-metadados: o decoy no CORPO ('SECRET') NUNCA pode aparecer na saída.
@@ -4960,7 +4992,7 @@ if [ -f "${MANIFEST}" ]; then
     esac
   done < "${MANIFEST}"
 else
-  record_pass "fixtures: manifest ausente → loop de fixture pulado (core-only; adotante não vendoriza fixtures/)"
+  record_skip "fixtures: manifest ausente → loop de fixture pulado (core-only; adotante não vendoriza fixtures/)"
 fi
 
 # Modo kg-freshness/schema — guardas de frescor + versão de schema (ADR kg-freshness-gate F1).
@@ -5132,6 +5164,79 @@ run_kb_vendored_link_selftests() {
 }
 run_kb_vendored_link_selftests
 
+# ---------------------------------------------------------------------------
+# O harness testando a SI MESMO — os três desfechos não podem colapsar em dois
+#
+# Origem: sinal de campo 2026-07-25 (arandek). Um runner que só distingue "lançar" de
+# "não lançar" soma o `skip` em `passed`; um ambiente sem o serviço produz o MESMO
+# "N passed" de um ambiente saudável. Aqui isso valia para 32 sítios.
+#
+# O aceite de uma guarda nascida de auditoria não é "roda e passa" — é "ela pega o caso
+# que a motivou?" (architecture-challenges.md §1.3). O caso é a REINTRODUÇÃO do skip-como-
+# ✓, e (a) o pega POR CONSTRUÇÃO: guard de tooling na mesma linha de record_pass reprova.
+# ---------------------------------------------------------------------------
+run_selftest_outcomes_selftests() {
+  local me="${SCRIPT_DIR}/lint-selftest.sh"
+  [ -f "${me}" ] || { record_fail "selftest-outcomes" "não achei a mim mesmo: ${me}"; return; }
+  local n out rc block
+
+  # (a) ANTI-DRIFT: nenhum guard de tooling/import pode registrar record_pass.
+  n="$(grep -cE '(command -v [a-z0-9]+|import yaml)[^#]*record_pass' "${me}" || true)"
+  if [ "${n}" = 0 ]; then
+    record_pass "selftest-outcomes: (a) nenhum guard de tooling soma em ✓ (skip-como-passe não volta)"
+  else record_fail "selftest-outcomes: (a) anti-drift" "${n} guard(s) de tooling registram record_pass — falso-verde por vacuidade reintroduzido"; fi
+
+  # (b) o terceiro desfecho tem CONTADOR PRÓPRIO (não é apelido de record_pass).
+  if grep -q '^record_skip()' "${me}" && grep -q 'SKIP=\$((SKIP + 1))' "${me}"; then
+    record_pass "selftest-outcomes: (b) record_skip existe com contador próprio"
+  else record_fail "selftest-outcomes: (b)" "record_skip ausente ou sem contador próprio"; fi
+
+  # (c) FUNCIONAL — extrai o trio real de record_* e confere a aritmética: ⊘ nunca vira ✓.
+  block="$(sed -n '/^record_pass()/,/^record_skip()/p' "${me}")"
+  out="$(bash -c 'PASS=0; FAIL=0; SKIP=0; FAILED_CASES=(); SKIPPED_CASES=()
+'"${block}"'
+record_skip a >/dev/null; record_skip b >/dev/null; record_pass c >/dev/null
+printf "%s/%s" "${PASS}" "${SKIP}"' 2>/dev/null || true)"
+  if [ "${out}" = "1/2" ]; then
+    record_pass "selftest-outcomes: (c) 2 skips + 1 pass ⇒ PASS=1 SKIP=2 (⊘ não soma em ✓)"
+  else record_fail "selftest-outcomes: (c) aritmética" "esperava PASS/SKIP='1/2', veio '${out}'"; fi
+
+  # (d)+(e) FUNCIONAL — o bloco REAL de sumário, com contadores forjados.
+  block="$(sed -n '/^echo "=== Sumário do auto-teste de guardas ==="/,$p' "${me}")"
+  # (d) STRICT=1 + skip ⇒ exit 1 (asserção de capacidade — o modo do CI).
+  rc=0; out="$(bash -c 'PASS=3; FAIL=0; SKIP=2; FAILED_CASES=(); SKIPPED_CASES=(x y); STRICT=1
+'"${block}"'' 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'FALHOU (STRICT)'; then
+    record_pass "selftest-outcomes: (d) STRICT=1 + skip ⇒ exit 1 (CI não aceita 'não verifiquei')"
+  else record_fail "selftest-outcomes: (d) strict" "esperava exit 1 + 'FALHOU (STRICT)'; rc=${rc} out=${out}"; fi
+
+  # (e) sem STRICT ⇒ exit 0, MAS os pulados aparecem: gracioso não pode ser silencioso.
+  rc=0; out="$(bash -c 'PASS=3; FAIL=0; SKIP=2; FAILED_CASES=(); SKIPPED_CASES=(x y); STRICT=0
+'"${block}"'' 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'NÃO VERIFICADOS' \
+     && printf '%s' "${out}" | grep -q 'Pularam  : 2'; then
+    record_pass "selftest-outcomes: (e) sem STRICT ⇒ exit 0 com os ⊘ VISÍVEIS (gracioso ≠ silencioso)"
+  else record_fail "selftest-outcomes: (e) visibilidade" "esperava exit 0 + contagem/lista de pulados; rc=${rc} out=${out}"; fi
+
+  # (f) ISOLAMENTO DO ENV DE HOOK. `git commit` exporta GIT_DIR/GIT_INDEX_FILE; herdados,
+  # envenenam toda sandbox git da suíte (medido: abort no caso 93 de 472, anunciado pelo
+  # hook como "falhou"). Usa o preâmbulo REAL do script, com GIT_DIR envenenado.
+  local pre; pre="$(grep -m1 '^unset GIT_DIR' "${me}")"
+  if [ -z "${pre}" ]; then
+    record_fail "selftest-outcomes: (f) env de hook" "o preâmbulo 'unset GIT_DIR …' sumiu — o pre-commit volta a abortar no meio"
+  elif (cd "${REPO_ROOT}" && GIT_DIR=/nao/existe GIT_INDEX_FILE=/nao/existe \
+        bash -c "${pre}"'; git rev-parse --show-toplevel' >/dev/null 2>&1); then
+    # (MUT) sem o unset, o MESMO comando tem de quebrar — senão o teste não prova nada.
+    if (cd "${REPO_ROOT}" && GIT_DIR=/nao/existe GIT_INDEX_FILE=/nao/existe \
+        git rev-parse --show-toplevel >/dev/null 2>&1); then
+      record_fail "selftest-outcomes: (f) MUT" "GIT_DIR envenenado NÃO quebra o git — o caso (f) é vacuidade, não prova"
+    else
+      record_pass "selftest-outcomes: (f) env de hook neutralizado + (MUT) sem o unset o git quebra — a guarda é load-bearing"
+    fi
+  else record_fail "selftest-outcomes: (f) env de hook" "GIT_DIR envenenado sobrevive ao preâmbulo"; fi
+}
+run_selftest_outcomes_selftests
+
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
 run_site_deeplink_selftests
@@ -5157,8 +5262,25 @@ run_federation_projection_selftests
 echo ""
 echo "=== Sumário do auto-teste de guardas ==="
 echo "  Passaram : ${PASS}"
+echo "  Pularam  : ${SKIP}   (⊘ NÃO VERIFICADO — o SUT não foi exercido)"
 echo "  Falharam : ${FAIL}"
 echo ""
+
+# O bloco dos pulados vem ANTES do veredito e é impresso mesmo com FAIL>0: um skip
+# silencioso é justamente o que se está consertando; escondê-lo atrás de uma falha
+# reintroduziria o buraco pela porta dos fundos.
+if [ "${SKIP}" -gt 0 ]; then
+  echo "⊘ ${SKIP} caso(s) NÃO VERIFICADOS — tooling ou feature ausente (não são aprovações):"
+  for c in "${SKIPPED_CASES[@]}"; do echo "  - ${c}"; done
+  echo ""
+fi
+
+if [ "${STRICT}" = "1" ] && [ "${SKIP}" -gt 0 ]; then
+  echo "FALHOU (STRICT) — ${SKIP} guarda(s) não puderam ser exercidas neste ambiente."
+  echo "  ONION_SELFTEST_STRICT=1 exige capacidade completa: instale o tooling ausente"
+  echo "  (jq, python3, python3-yaml, git, openssl) ou rode sem STRICT para o degrade local."
+  exit 1
+fi
 
 if [ "${FAIL}" -gt 0 ]; then
   echo "FALHOU — guardas que não reagiram conforme esperado:"
@@ -5166,5 +5288,9 @@ if [ "${FAIL}" -gt 0 ]; then
   exit 1
 fi
 
-echo "OK ✓ — todas as guardas reagiram conforme esperado."
+if [ "${SKIP}" -gt 0 ]; then
+  echo "OK ✓ — as ${PASS} guardas EXERCIDAS reagiram conforme esperado (⊘ ${SKIP} não verificadas)."
+else
+  echo "OK ✓ — todas as guardas reagiram conforme esperado."
+fi
 exit 0

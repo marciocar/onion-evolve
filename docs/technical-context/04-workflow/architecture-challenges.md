@@ -69,6 +69,35 @@ gate nunca soube procurar. Lição generalizável proposta pela fonte, ainda **s
 caso que motivou a existência dele?'". Sugestão de destino:
 `docs/knowledge-base/agentic-patterns/` (família `declarado ≠ verificado`) — não criado.
 
+### 1.3b Vacuidade, exemplar do próprio core — o runner de dois desfechos (RESOLVIDO)
+
+Fonte: `docs/evolution/inbox/_processed/2026-07-25-correcao-o-sinal-do-entrypoint-estava-errado.md`.
+
+O modo **vacuidade** do §1.3 tinha um exemplar dentro de casa, e caro. O `lint-selftest.sh` só
+distinguia `record_pass` de `record_fail`: **32 sítios registravam um skip por tooling ausente como
+✓**. Medido, removendo só o `jq`: a suíte reportava `409 passaram / 0 falharam`, exit 0 — verde
+indistinguível de uma máquina saudável, que roda **472** casos. Os 12 skips **escondiam 63 asserções**
+(a função faz `return` após o skip, e as sub-provas dentro dela nunca rodam). Nada no sumário
+denunciava as ausentes, porque não havia total esperado contra o que comparar.
+
+Fecho: **terceiro desfecho** `record_skip` (⊘ NÃO VERIFICADO, contador e lista próprios) +
+`ONION_SELFTEST_STRICT=1`, que transforma ⊘ em falha e é o modo do CI, precedido de uma asserção de
+capacidade do runner. Generaliza para a suíte inteira o fail-loud que o gate de design tokens já
+aplicava só a si mesmo. A guarda anti-drift é **por construção** (`selftest-outcomes` (a)): um
+`record_pass` na mesma linha de um guard de tooling reprova — o skip-como-✓ não volta por descuido.
+
+**Terceira ocorrência, achada dogfoodando o próprio fix (pré-existente, corrigida junto).** O
+pre-commit **nunca conseguiu** rodar o auto-teste: `git commit` exporta `GIT_DIR`/`GIT_INDEX_FILE`, as
+sandboxes git da suíte os herdavam e operavam no repo errado — a suíte **abortava no caso 93 de 472**
+e o hook anunciava *"self-test das guardas falhou"*. **Abort apresentado como veredito**: o gate era
+inutilizável exatamente nos commits que tocam as guardas, e a saída empurrava para `--no-verify`.
+Fecho: `unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE …` no preâmbulo, com teste `(f)` **load-bearing**
+(a mutação prova que, sem o unset, o `git` de fato quebra). Sob o env do hook: 93 → **473** casos.
+
+**Resíduo declarado:** não há asserção de *total esperado* de casos. Uma guarda que deixe de ser
+chamada (não que pule — que suma) ainda reduz a cobertura em silêncio. O ⊘ cobre o skip, não o
+desaparecimento. Foi essa mesma cegueira que deixou o abort no caso 93 passar por "falha de guarda".
+
 ### 1.4 Resolver remote-aware de `develop`: heurística de existência é insuficiente
 
 Fonte: `docs/evolution/inbox/_processed/2026-07-25-contra-sinal-develop-fantasma-v2.md` (supersede de

@@ -39,7 +39,31 @@ jobs:
       - name: Executar linter determinístico de artefatos Onion
         run: bash .claude/validation/lint-artifacts.sh
 
+      # Asserção de CAPACIDADE antes do auto-teste. A suíte degrada gracioso sem tooling
+      # (⊘ NÃO VERIFICADO) — correto na máquina do autor, inaceitável aqui: um runner sem
+      # jq/pyyaml pularia dezenas de guardas e o job ficaria VERDE sem tê-las exercido.
+      # Generaliza para a suíte inteira o fail-loud que o gate de design tokens já aplicava
+      # a si mesmo. Sinal de campo 2026-07-25 (arandek): um waiter que aceita 0 == 0 carimbou
+      # verde com o serviço desligado, e o custo apareceu só no deploy seguinte.
+      - name: Asserção de capacidade do runner (o auto-teste não pode pular nada)
+        run: |
+          command -v jq >/dev/null 2>&1 || { sudo apt-get update -qq && sudo apt-get install -y -qq jq; }
+          python3 -c "import yaml" >/dev/null 2>&1 || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml; }
+          missing=""
+          for t in jq git openssl awk python3; do command -v "$t" >/dev/null 2>&1 || missing="${missing} $t"; done
+          python3 -c "import yaml" >/dev/null 2>&1 || missing="${missing} python3-yaml"
+          if [ -n "${missing}" ]; then
+            echo "ERRO: capacidade incompleta no runner —${missing}"
+            echo "Sem isto o auto-teste PULA guardas e o verde não significa nada."
+            exit 1
+          fi
+          echo "OK — capacidade completa: jq git openssl awk python3 + pyyaml"
+
       - name: Auto-teste das guardas (fixtures determinísticas)
+        # STRICT=1: qualquer ⊘ (guarda não exercida) REPROVA o job. É o que separa
+        # "verifiquei e está bom" de "não verifiquei" — no CI só o primeiro vale verde.
+        env:
+          ONION_SELFTEST_STRICT: '1'
         run: bash .claude/validation/lint-selftest.sh
 
       - name: Gate determinístico de design tokens (DTCG + refs + WCAG)
