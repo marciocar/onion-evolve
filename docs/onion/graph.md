@@ -207,6 +207,15 @@ agent-skills-specialist	related	/meta/create-skill
 agent-skills-specialist	related	agent-creator-specialist	
 agent-skills-specialist	related	claude-code-specialist	
 agent-skills-specialist	related	command-creator-specialist	
+arandek	adopts	onion-evolve	
+arandek	mode	legacy	
+arandek	pin	65d8a7501a03	
+arandek	specialization	field-dogfood	
+arandek	specialization	legacy-adoption	
+arandek	specialization	monorepo	
+arandek	specialization	upstream-signal	
+arandek	tier	standalone	
+arandek	trust-advises	onion-evolve	
 assistant	asks	maestro	conversa-plan-gate
 assistant	evolves	onion	
 assistant	executes	onion	
@@ -428,6 +437,15 @@ onion	related	product-agent
 onion	related	task-specialist	
 onion	related	test-engineer	
 onion	serves	maestro	
+onion-arthur	adopts	onion-evolve	
+onion-arthur	mode	greenfield	
+onion-arthur	pin	165e1e13b11f	
+onion-arthur	specialization	branding	
+onion-arthur	specialization	design	
+onion-arthur	specialization	greenfield-adoption	
+onion-arthur	specialization	storytelling	
+onion-arthur	tier	standalone	
+onion-arthur	trust-advises	onion-evolve	
 onion-compliance	loads	when:build -> resolve:compliance-context (skill onion-compliance-context)	
 onion-compliance	loads	when:framework=iso27001 -> template:compliance_iso27001_template.md	
 onion-compliance	loads	when:framework=soc2 -> template:compliance_soc2_template.md	
@@ -502,6 +520,14 @@ onion-mini	specialization	plea-cycles
 onion-mini	specialization	task-management-lite	
 onion-mini	tier	standalone	
 onion-mini	trust-advises	onion-evolve	
+onion-pedro	adopts	onion-evolve	
+onion-pedro	mode	greenfield	
+onion-pedro	pin	165e1e13b11f	
+onion-pedro	specialization	compliance	
+onion-pedro	specialization	field-dogfood	
+onion-pedro	specialization	greenfield-adoption	
+onion-pedro	tier	standalone	
+onion-pedro	trust-advises	onion-evolve	
 onion-product	loads	embed:kb/framework-story-points.md	
 onion-product	loads	embed:kb/identificar-precificar-dor-cliente.md	
 onion-product	loads	when:spec -> resolve:business-context (skill onion-product-context)	
