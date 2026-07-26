@@ -708,6 +708,42 @@ nodes:
     verified_against: bridge-source-e-env-medidos
     label: "O 'pool dedicado' do /a2a nao isola nada — DOIS motivos medidos. (1) a2aGuard (server.ts:38) aceita `bearer === config.authToken` ANTES de consultar a2aTokens: o segredo de admin abre o /a2a por cima do pool. (2) o .env vivo NAO define INVITE_TOKENS_A2A (chaves presentes: AUTH_TOKEN, ONION_CWD, PORT, PERMISSION_MODE, ANTHROPIC_API_KEY, INVITE_TOKENS_COURTESY, INVITE_TOKENS_BYOK), logo config.a2aTokens e um Set VAZIO. Somando: hoje o UNICO caminho para o /a2a e o AUTH_TOKEN de admin. PRECISAO: isso NAO refuta o E_bridge_source_read — a clausula dele ('pool dedicado que REJEITA courtesy/byok') e literalmente verdadeira, courtesy/byok de fato nao estao em a2aTokens. O que cai e a ISOLACAO IMPLICADA, e com ela a conclusao em prosa da §0.2 do spec ('/a2a tem guard proprio e pool dedicado — nao e buraco'). Reabre o P0.2c (cobertura dupla vs excecao documentada): a excecao se apoiava num isolamento que nao existe. Efeito colateral a verificar: se ha remetentes a2a ativos, eles so podem estar usando o token de admin, ou o canal esta morto"
 
+  - id: C_console_not_the_path
+    node_type: claim
+    trace: /etc/caddy/conf.d/logto-console.caddy.disabled
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: caddy-conf-e-logto-db-medidos
+    label: "O CONSOLE NAO ESTA NO CAMINHO CRITICO — o objetivo e PROVISIONAR o tenant, nao entrar numa tela. Medido: o vhost console.onionevolve.com existe PRONTO e DESLIGADO (conf.d/logto-console.caddy.disabled; o Caddyfile importa *.caddy, e .disabled nunca carrega — dai o TLS falhar), o console vive so em 127.0.0.1:3012 (HTTP 302), e auth.onionevolve.com e o ISSUER OIDC (porta 3011) — bater nele no browser da /unknown-session. As duas saidas obvias sao ruins: expor o console publica o painel do provedor de identidade que esta virando caminho critico (e o sign_up esta ABERTO nos dois tenants); tunel SSH e inviavel do celular, que e como o maestro opera. A saida BOA dissolve o problema: o app M2M 'm-default' ja existe COM secret e ha o papel machine:mapi:default — da para provisionar headless pela Management API. Melhor que clicar: reproduzivel, auditavel, versionado, sem exposicao nova. E e o MESMO caminho que o P1-P3 precisa (API Resource + app M2M + app SPA/PKCE + role)"
+
+  - id: E_p1p3_provisioned
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: logto-api-e-db-conferidos
+    label: "P1-P3 EXECUTADOS HEADLESS 2026-07-26, por script versionado e IDEMPOTENTE (re-run diz 'ja existe' nos 5 passos). No tenant default: usuario do maestro (senha aleatoria em /root/.onion-logto-bootstrap 0600, NUNCA no transcript, a trocar no 1o login) · API Resource https://bridge.onionevolve.com · scope bridge:invoke · app M2M onion-bridge-service · app SPA PUBLICO onion-bridge-pwa (PKCE, zero secret no device) · role M2M bridge-operator com o scope, atribuida ao app de servico. CONFERIDO DE FONTE INDEPENDENTE (psql no banco, nao a saida do script): users default=1, 2 apps, resource presente. O bootstrap circular foi quebrado com vhost do console LOOPBACK-ONLY (bind 127.0.0.1 + tls internal), autorizado nominalmente pelo maestro — zero exposicao publica, e o ss confirma 127.0.0.1:443"
+
+  - id: E_p4_rfc8707_proven
+    node_type: evidence
+    trace: /home/onion/onion-bridge
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: token-emitido-e-decodificado
+    label: "P4.1 PROVADO — PLANO A. Token client_credentials do app onion-bridge-service com resource=https://bridge.onionevolve.com decodificado (node, base64url nativo): aud=https://bridge.onionevolve.com · scope=bridge:invoke · iss=https://auth.onionevolve.com/oidc · header alg=ES384 typ=at+jwt. O Logto 1.41.0 self-hosted HONRA Resource Indicators (RFC 8707) e emite audiencia vinculada. A escada B1->B2->B3 do §3.6 NAO sera necessaria e o aud-binding do §3.3 se sustenta. ALG A PINAR: ES384 (nao RS256). Prova colateral de que o binding e REAL, e nao decorativo: durante o bootstrap, apresentar um token com aud=https://default.logto.app/api ao endpoint do tenant admin devolveu ERR_JWT_CLAIM_VALIDATION_FAILED/aud — o gate rejeitou o uso errado antes de qualquer codigo nosso"
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -993,6 +1029,29 @@ edges:
   - from: E_p0_logto_tenant_measured
     to: A_flip_steps_reversible
     edge_type: CONSTRAINS
+  # A superacao do obstaculo operacional: o console sai do caminho critico.
+  - from: E_p0_logto_tenant_measured
+    to: C_console_not_the_path
+    edge_type: SUPPORTS
+  - from: C_console_not_the_path
+    to: A_flip_steps_reversible
+    edge_type: CONSTRAINS
+  - from: E_p1p3_provisioned
+    to: C_console_not_the_path
+    edge_type: SUPPORTS
+  - from: E_p1p3_provisioned
+    to: A_flip_steps_reversible
+    edge_type: SUPPORTS
+  # A prova que o desenho inteiro aguardava: o resource= e honrado, entao o plano-B morre.
+  - from: E_p4_rfc8707_proven
+    to: D_resource_plan_b
+    edge_type: CONSTRAINS
+  - from: E_p4_rfc8707_proven
+    to: D_gate_oidc_dual
+    edge_type: SUPPORTS
+  - from: E_p4_rfc8707_proven
+    to: Q_resource_indicators
+    edge_type: SUPPORTS
   - from: E_p0_logto_tenant_measured
     to: D_gate_oidc_dual
     edge_type: CONSTRAINS
