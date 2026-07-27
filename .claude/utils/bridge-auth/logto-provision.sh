@@ -27,6 +27,7 @@ APPLY=0
 BRIDGE_USER="marcio"
 RESOURCE_INDICATOR="https://bridge.onionevolve.com"
 SCOPE_NAME="bridge:invoke"
+ADMIN_SCOPE="bridge:admin"       # P9 — admin por IDENTIDADE, nao por segredo compartilhado
 ROLE_NAME="bridge-operator"      # M2M — o chamador SERVIÇO
 USER_ROLE_NAME="bridge-user"     # User — a PESSOA (tipo diferente no Logto; a M2M não serve)
 PASS_FILE="/root/.onion-logto-bootstrap"
@@ -308,6 +309,39 @@ if [ "${APPLY}" = "1" ] && [ -n "${_sid:-}" ] && [ -n "${_uid:-}" ]; then
   fi
 else
   say "   [DRY-RUN ou pré-requisito ausente] criaria role ${USER_ROLE_NAME} e atribuiria ao usuário"
+fi
+
+# --- 8. scope bridge:admin + role de admin humano (P9) ---------------------
+# O flip (P7) fechou o authGuard, mas adminGuard e a2aGuard eram guards SEPARADOS que
+# comparavam direto com AUTH_TOKEN — logo o segredo compartilhado seguia abrindo /admin/*
+# (incluindo POST /admin/tokens, que CUNHA convites) enquanto o token OIDC do humano NÃO
+# abria. Estado invertido: o velho entrava, o novo não. Este passo cria a autorização de
+# admin como IDENTIDADE, pré-requisito para aposentar o AUTH_TOKEN de vez.
+step "8. scope ${ADMIN_SCOPE} + admin por identidade (P9)"
+if [ "${APPLY}" = "1" ] && [ -n "${_rid:-}" ] && [ -n "${_urid:-}" ]; then
+  _scopes="$(api GET "/resources/${_rid}/scopes")"
+  _asid="$(printf '%s' "${_scopes}" | jq -r --arg s "${ADMIN_SCOPE}" '.[]? | select(.name==$s) | .id' | head -1)"
+  if [ -n "${_asid}" ]; then
+    say "   scope já existe (id=${_asid})"
+  else
+    _asid="$(api POST "/resources/${_rid}/scopes" \
+      "$(jq -nc --arg s "${ADMIN_SCOPE}" '{name:$s, description:"Administrar o onion-bridge (stats, cunhar/revogar convites)"}')" \
+      | jq -r '.id // empty')"
+    say "   scope criado (id=${_asid:-FALHOU})"
+  fi
+  # Só a role HUMANA recebe admin. O app de serviço NÃO — um chamador M2M não precisa
+  # cunhar convites, e conceder por conveniência é como o menor privilégio morre.
+  if [ -n "${_asid}" ]; then
+    _rs="$(api GET "/roles/${_urid}/scopes")"
+    if printf '%s' "${_rs}" | jq -e --arg s "${_asid}" '.[]? | select(.id==$s)' >/dev/null 2>&1; then
+      say "   role humana já tem ${ADMIN_SCOPE}"
+    else
+      api POST "/roles/${_urid}/scopes" "$(jq -nc --arg s "${_asid}" '{scopeIds:[$s]}')" >/dev/null
+      say "   ${ADMIN_SCOPE} concedido à role humana (serviço NÃO recebe — menor privilégio)"
+    fi
+  fi
+else
+  say "   [DRY-RUN ou pré-requisito ausente] criaria ${ADMIN_SCOPE} e concederia à role humana"
 fi
 
 step "RESUMO"

@@ -73,7 +73,7 @@ function b64uToBuf(s: string): Buffer {
  * Valida um access token. Devolve a Identity, ou `null` se o token não vale.
  * FALHA FECHADO: qualquer exceção (rede, parse, chave ausente) ⇒ null.
  */
-export async function verifyAccessToken(token: string): Promise<Identity | null> {
+export async function verifyAccessToken(token: string, required?: string): Promise<Identity | null> {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
@@ -123,8 +123,10 @@ export async function verifyAccessToken(token: string): Promise<Identity | null>
     if (typeof claims.nbf === "number" && claims.nbf > nowSec + 60) return null;
 
     // (4) SCOPE. Audiência certa sem o scope certo ainda não autoriza invocar.
+    // `required` permite ao chamador exigir OUTRO scope (ex.: bridge:admin) sem duplicar
+    // a verificação de assinatura/audiência — um caminho de validação, dois níveis de acesso.
     const scopes = typeof claims.scope === "string" ? claims.scope.split(" ").filter(Boolean) : [];
-    if (!scopes.includes(REQUIRED_SCOPE)) return null;
+    if (!scopes.includes(required ?? REQUIRED_SCOPE)) return null;
 
     const sub = typeof claims.sub === "string" ? claims.sub : "";
     const clientId = typeof claims.client_id === "string" ? claims.client_id : "";
