@@ -31,7 +31,13 @@
 const ISSUER    = "https://auth.onionevolve.com/oidc";
 const CLIENT_ID = "o5i5f4wb2x2r5ulut9j61";          // app SPA público `onion-bridge-pwa`
 const RESOURCE  = "https://bridge.onionevolve.com"; // RFC 8707 — o aud que o bridge exige
-const SCOPES    = "openid profile offline_access bridge:invoke";
+// `bridge:admin` é PEDIDO aqui de propósito, para todo mundo. Scope OAuth é REQUISITADO,
+// não concedido automaticamente: a role carregar o scope NÃO basta se o app não o pedir —
+// foi exatamente esse o defeito (2026-07-27: o guard de admin funcionava, a role tinha o
+// scope, e o token não o carregava porque ninguém pediu). Pedir para todos é seguro: o
+// Logto emite APENAS o que a role concede, então um usuário sem admin recebe só invoke —
+// a autorização continua no servidor, não no que o cliente pede.
+const SCOPES    = "openid profile offline_access bridge:invoke bridge:admin";
 const REDIRECT  = window.location.origin + "/";
 
 const K_ACCESS  = "onion_oidc_access";

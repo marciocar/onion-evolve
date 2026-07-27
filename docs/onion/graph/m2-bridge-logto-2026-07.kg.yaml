@@ -848,6 +848,18 @@ nodes:
     verified_against: rotas-medidas-apos-restart-e-remocao
     label: "P9 COMPLETO 2026-07-27. (1) scope bridge:admin criado e concedido SO a role humana — o app de servico NAO recebe (M2M nao cunha convite; conceder por conveniencia e como menor privilegio morre). (2) adminGuard passou a exigir identidade com bridge:admin; verifyAccessToken ganhou parametro `required` para exigir outro scope sem duplicar a verificacao de assinatura/audiencia — um caminho de validacao, dois niveis de acesso. (3) a2aGuard perdeu o bypass do segredo de admin: so o pool dedicado entra (zero trafego em 30 dias, fechar nao interrompeu ninguem). (4) AUTH_TOKEN REMOVIDO do .env. PROVAS apos restart: segredo aposentado => 401 em /commands, /admin/stats E /a2a (era 200 no admin); identidade de SERVICO => 200 em /commands e 401 em /admin (menor privilegio visivel); pool a2a => 400 (passa o guard, falha no payload); PWA e /health => 200. FRONTEIRA: o caminho ADMIN pelo token HUMANO nao foi provado por esta sessao — exige browser e a role e do maestro; recusei conceder bridge:admin ao servico 'para testar'"
 
+  - id: E_p9_human_admin_proven
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/bridge-src/web-oidc.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: pwa-do-maestro-e-token-de-servico-medidos
+    label: "A FRONTEIRA DECLARADA FOI FECHADA — e o defeito era meu, na costura. O guard de admin estava CERTO desde o restart (a PWA recebeu literalmente 'nao autorizado — acesso admin requer identidade com bridge:admin'), mas o token do maestro nao carregava o scope por DUAS causas somadas: (a) a PWA pedia so `bridge:invoke` — scope OAuth e REQUISITADO, nao concedido automaticamente, entao a role ter o scope NAO BASTA se o cliente nao o pede; (b) o login era de 18:02 e o scope nasceu 23:23, logo o token era anterior a existencia dele. Consertado: SCOPES da PWA passou a pedir bridge:admin para TODOS. PROVA DE QUE ISSO E SEGURO, medida e nao afirmada: o app de SERVICO pediu `bridge:invoke bridge:admin` e o Logto emitiu token com scope=`bridge:invoke` APENAS — pedir nao e receber, a autorizacao mora no servidor. /admin/stats devolve 401 ao servico mesmo tendo pedido. Maestro confirmou a engrenagem visivel na PWA apos re-login"
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -1193,6 +1205,12 @@ edges:
   - from: E_p9_complete
     to: D_gate_oidc_dual
     edge_type: SUPPORTS
+  - from: E_p9_human_admin_proven
+    to: E_p9_complete
+    edge_type: SUPPORTS
+  - from: E_p9_human_admin_proven
+    to: C_identity_hole
+    edge_type: REFUTES
   - from: C_scaffold_removed_proof_was_invalid
     to: C_console_not_the_path
     edge_type: SUPPORTS
