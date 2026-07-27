@@ -430,6 +430,46 @@ run_kg_freshness_selftests() {
   if [ "${nmut}" -gt "${nori}" ]; then
     record_pass "kg-freshness: (p) (MUT) sem a exclusão, a história volta à fila (${nori}→${nmut}) — a guarda é load-bearing"
   else record_fail "kg-freshness: (p) (MUT) exclusão de história" "mutação não mudou nada (${nori}→${nmut}) — vacuidade?"; fi
+
+  # ── MISPLANED: coerência plane × verified_against ────────────────────────────────────────
+  # Crédito: sinal de campo de um adotante (2026-07-27). Ele MEDIU 21 nós do próprio repo afirmando
+  # sobre produção com evidência de leitura de código — radar VERDE o tempo todo. Escapavam pelo
+  # filtro por tipo que este mesmo arquivo passou a testar horas antes: quase todos eram
+  # `evidence`, o tipo que o UNANCHORED isenta. Reduzir ruído cegou o gate para outra classe.
+  local fxm="${fx}/misplaned.kg.yaml"
+  rc=0; out=$(bash "${radar}" "${fxm}" --freshness 2>&1) || rc=$?
+
+  # (q) dispara no claim E no evidence — o segundo é o ponto: MISPLANED NÃO filtra por tipo.
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q 'MISPLANED: C_PROD_MAS_LEU_BRANCH' \
+     && printf '%s' "${out}" | grep -q 'MISPLANED: E_PROD_MAS_LEU_COMMIT'; then
+    record_pass "kg-freshness: (q) MISPLANED dispara em claim E em evidence (a contradição não depende do tipo)"
+  else record_fail "kg-freshness: (q) MISPLANED" "rc=${rc} out=${out}"; fi
+
+  # (r) os coerentes ficam quietos — inclusive `pin`, ambíguo e não-cobrado de propósito.
+  if ! printf '%s' "${out}" | grep -qE 'MISPLANED: (E_PROD_MEDIU_O_VIVO|C_DEV_LEU_BRANCH|C_PROD_PIN_AMBIGUO|C_PROD_BRANCH_SUPERSEDED)'; then
+    record_pass "kg-freshness: (r) PROD+deploy, DEV+branch, pin e histórico NÃO disparam (sem falso-positivo)"
+  else record_fail "kg-freshness: (r) falso-positivo do MISPLANED" "out=${out}"; fi
+
+  # (s) a fixture é íntegra — veredito sobre grafo quebrado seria vacuidade.
+  rc=0; bash "${radar}" "${fxm}" --integrity --schema >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "kg-freshness: (s) a fixture do MISPLANED é íntegra"
+  else record_fail "kg-freshness: (s) integridade" "rc=${rc}"; fi
+
+  # (t) (MUT) restringindo a checagem a `claim` — como o UNANCHORED faz — o evidence VOLTA a
+  # escapar. É a reprodução exata do modo-de-falha que o sinal reportou.
+  cp "${radar}" "${mut}/mut-mis.sh"
+  sed -i 's/if (plane\[id\] == "PROD" \&\& verifiedAgainst\[id\] ~/if (ntype[id] == "claim" \&\& plane[id] == "PROD" \&\& verifiedAgainst[id] ~/' "${mut}/mut-mis.sh"
+  if grep -q 'ntype\[id\] == "claim" && plane\[id\] == "PROD"' "${mut}/mut-mis.sh"; then
+    local mmis; mmis="$(bash "${mut}/mut-mis.sh" "${fxm}" --freshness 2>&1 || true)"
+    if ! printf '%s' "${mmis}" | grep -q 'MISPLANED: E_PROD_MAS_LEU_COMMIT' \
+       && printf '%s' "${mmis}" | grep -q 'MISPLANED: C_PROD_MAS_LEU_BRANCH'; then
+      record_pass "kg-freshness: (t) (MUT) restrito a claim, o evidence escapa — reproduz o modo-de-falha do sinal"
+    else record_fail "kg-freshness: (t) (MUT)" "a restrição por tipo não mudou o veredito; out=${mmis}"; fi
+  else
+    record_fail "kg-freshness: (t) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
 }
 
 # ---------------------------------------------------------------------------

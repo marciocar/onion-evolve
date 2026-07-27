@@ -234,6 +234,14 @@ SSOT-as-runtime à KB), a mesma máquina com duas referências — *o radar recu
 - **STALE-MISSING**: nó rastreado sem `verified_at:` → ⚠ (o modo-de-falha exato do campo — a SSOT de um adotante
   não tinha *nenhuma* disciplina de frescor, nem em PROD nem no nó DEV de estratégia `C_CONSOLIDATION_MAP`).
   **STALE-OLD**: `verified_at` anterior a **`meta.baseline:`** (uma data no `meta:`) → ⚠, a verdade envelheceu.
+- **MISPLANED** (todos os tipos): `plane: PROD` com `verified_against: branch|commit` → ⚠. `plane: PROD` afirma
+  "cruzei com o **artefato vivo**"; `branch`/`commit` declara "olhei a **fonte**". É contradição **interna ao
+  próprio nó** — detectável sem rede, sem contexto, sem heurística. Crédito: sinal de campo do adotante um adotante
+  (2026-07-27), que **mediu 21 nós** do próprio repo afirmando sobre produção com evidência de leitura de código,
+  **com o radar verde**. Escapavam pelo filtro por tipo do UNANCHORED (quase todos eram `evidence`) — reduzir
+  ruído tinha cegado o gate para outra classe, e por isso o MISPLANED **não** filtra por tipo. **Teto declarado
+  pelo próprio autor do sinal:** audita a procedência *declarada*, não se a declaração é verdadeira. `pin` não é
+  cobrado por ser ambíguo (ler o stamp do checkout vivo é PROD legítimo).
 - **UNANCHORED** (só em `node_type: claim`): tem `verified_at:` mas **não diz `verified_against:`** → ⚠. Carimbo **sem alvo declarado**
   não distingue verificado de declarado. Modo-de-falha de campo (2026-07-25, adotante): nós `plane: PROD` com
   `verified_at` *porque um `curl` respondera* — só que o `curl` mediu o **core** e a claim era sobre o

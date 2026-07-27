@@ -23,9 +23,11 @@
 #                     STALE-MISSING (nó plane:PROD sem verified_at:) · STALE-OLD (verified_at
 #                     anterior à meta.baseline) · UNANCHORED (node_type: claim com verified_at:
 #                     mas SEM verified_against: — carimbo sem alvo declarado; os demais tipos
-#                     ancoram por trace:/TRACES_TO e não são cobrados). Determinístico: compara
-#                     duas datas do arquivo, sem "agora" (ADR onion-adr-kg-freshness-gate,
-#                     proposta #2 (dogfood de campo)).
+#                     ancoram por trace:/TRACES_TO e não são cobrados) · MISPLANED (plane:PROD
+#                     com verified_against: branch|commit — o nó afirma sobre o VIVO e declara
+#                     ter olhado a FONTE; contradição interna, vale p/ TODOS os tipos).
+#                     Determinístico: compara duas datas / dois campos do arquivo, sem "agora"
+#                     (ADR onion-adr-kg-freshness-gate, proposta #2 (dogfood de campo)).
 #   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
 #                     meta.schema_version ≠ a versão que o radar entende → recusa; ausente → ⚠
 #                     retrocompat (ADR onion-adr-kg-freshness-gate, proposta #1).
@@ -387,6 +389,24 @@ END {
         if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") {
           print "  ⚠ STALE-OLD: " id " (verified_at " verifiedAt[id] " anterior à baseline " metaBaseline " — a verdade pode ter envelhecido)"; fwarns++
         }
+      }
+      # MISPLANED — CONTRADIÇÃO INTERNA ao próprio nó, e vale para TODOS os tipos.
+      # `plane: PROD` afirma "cruzei com o ARTEFATO VIVO"; `verified_against: branch|commit`
+      # declara "olhei a FONTE". Os dois campos falam da mesma coisa (a natureza da evidência)
+      # e até aqui o radar nunca os confrontava.
+      # Crédito: sinal de campo de um adotante (2026-07-27), que MEDIU no próprio repo
+      # 21 nós afirmando sobre produção com evidência de leitura de código — com o radar VERDE
+      # o tempo todo. E o motivo de escapar era o filtro que eu mesmo shipei horas antes: o
+      # UNANCHORED isenta os tipos não-claim ("ancoram por trace:/TRACES_TO"), e quase todos os
+      # 21 eram `evidence`. Reduzir ruído cegou o gate para uma classe que ele nunca vira.
+      # Por isso esta checagem NÃO se restringe a claim: a contradição não depende do tipo.
+      # Determinística: dois campos do mesmo nó, sem rede, sem heurística, sem campo novo.
+      # TETO DECLARADO (pelo próprio autor do sinal): audita a procedência DECLARADA, não se a
+      # declaração é verdadeira — um nó que escreve `deploy` medindo bench local passa. Isso é
+      # limite honesto, não defeito: fecha a contradição legível, não a mentira deliberada.
+      # `pin` NÃO é cobrado de propósito: é ambíguo (ler o stamp do checkout vivo é PROD legítimo).
+      if (plane[id] == "PROD" && verifiedAgainst[id] ~ /(^|[^a-zA-Z])(branch|commit)([^a-zA-Z]|$)/) {
+        print "  ⚠ MISPLANED: " id " (plane:PROD mas verified_against: " verifiedAgainst[id] " — o nó afirma sobre o VIVO e declara ter olhado a FONTE; reclassifique para plane:DEV ou re-verifique contra o artefato vivo)"; fwarns++
       }
     }
     if (ntracked == 0) print "  (nenhum nó com frescor rastreado — nada a verificar)"
