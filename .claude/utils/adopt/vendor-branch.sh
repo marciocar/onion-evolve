@@ -32,6 +32,41 @@ _manifest() {  # $1=SOURCE_ROOT → imprime pathspecs existentes, um por linha
   for p in "${want[@]}"; do git -C "$1" ls-tree HEAD -- "$p" | grep -q . && printf '%s\n' "$p"; done
 }
 
+# ── GUARDA DE BASE CRUZADA ──────────────────────────────────────────────────────────────────
+# Um `onion/vendor` só é fonte-de-merge legítima para uma integração se, em relação à BASE do
+# merge com ela, ele mudou APENAS framework. Quando o seed cai no fallback (_seed do HEAD da
+# integração — o caso "legado entrelaçado"), o vendor passa a carregar o SNAPSHOT DE PRODUTO
+# daquela branch e fica casado com ela. Pedi-lo para uma SEGUNDA integração arrasta a
+# divergência de produto para dentro do 3-way: conflito CONTÁBIL, em código de aplicação.
+#
+# Sinal de campo 2026-07-27 (adotante com duas integration branches divergentes): ~110 arquivos
+# em conflito, incluindo serviços da API. REPRODUZIDO no core em 3 tentativas — e a reprodução
+# derrubou a hipótese inicial: `merge-base --is-ancestor` dá SIM nos DOIS casos, então
+# ANCESTRALIDADE NÃO DISCRIMINA. O que discrimina é o conteúdo NÃO-framework:
+#     seguro  → tree(vendor) == tree(base) fora do manifesto
+#     cruzado → tree(vendor) != tree(base) fora do manifesto
+# Vantagem sobre registrar a origem na semeadura: funciona no vendor LEGADO, que é justamente
+# quem tem o problema (nasceu antes de qualquer registro existir).
+_vendor_is_framework_pure() {  # <TARGET> <SOURCE_ROOT> <INTEGRATION_BRANCH> → 0 puro · 1 cruzado
+  local T="$1" SRC="$2" IB="$3" mb mf changed
+  mb="$(git -C "$T" merge-base "$VENDOR" "$IB" 2>/dev/null)" || return 0
+  [ -n "$mb" ] || return 0
+  mf="$(_manifest "$SRC")"; [ -n "$mf" ] || return 0
+  changed="$(git -C "$T" diff --name-only "$mb" "$VENDOR" 2>/dev/null)" || return 0
+  [ -n "$changed" ] || return 0
+  # Remove do diff tudo que está sob o manifesto de framework; o que sobrar é produto alheio.
+  local p keep="$changed"
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    keep="$(printf '%s\n' "$keep" | grep -v "^${p}/" || true)"
+  done <<< "$mf"
+  # .claude/.onion-version é carimbo do framework, não produto.
+  keep="$(printf '%s\n' "$keep" | grep -vE '^\.claude/\.onion-version$|^$' || true)"
+  [ -z "$keep" ] && return 0
+  printf '%s\n' "$keep" | head -8
+  return 1
+}
+
 _seed() {  # <TARGET> <INTEGRATION_BRANCH>
   local T="$1" IB="$2"
   git -C "$T" rev-parse --git-dir >/dev/null 2>&1 || { echo "⚠️  $T não é repo git — seed pulado." >&2; return 0; }
@@ -126,6 +161,23 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   ( cd "$SRC" && git archive HEAD -- $(printf '%s ' $mf) ) | tar -x -C "$wt" 2>/dev/null
   bash "$HERE/durable-commit.sh" "$wt" update "$PIN" "$VENDOR" >/dev/null 2>&1
   git -C "$T" worktree remove --force "$wt" 2>/dev/null
+
+  # BASE CRUZADA — recusa ANTES de mergear. Um despejo de N conflitos contábeis não é veredito,
+  # é o maestro descobrindo sozinho o que a ferramenta já podia ter dito.
+  local alien
+  if ! alien="$(_vendor_is_framework_pure "$T" "$SRC" "$IB")"; then
+    echo "ERRO: BASE CRUZADA — '$VENDOR' não é fonte-de-merge legítima para '$IB'." >&2
+    echo "  Ele difere da base do merge em arquivos que NÃO são framework, ou seja: carrega o" >&2
+    echo "  snapshot de PRODUTO de outra integration branch (seed pelo fallback do HEAD). Mergear" >&2
+    echo "  arrastaria essa divergência para dentro do 3-way — conflito contábil, não real." >&2
+    echo "  Arquivos alheios (amostra):" >&2
+    printf '%s\n' "$alien" | sed 's/^/    /' >&2
+    echo "  CONSERTO — um vendor por integration branch:" >&2
+    echo "    git -C '$T' branch -m $VENDOR ${VENDOR}-<branch-de-origem>" >&2
+    echo "    # depois re-rode este update; ele semeia do baseline LIMPO de '$IB'." >&2
+    echo "    # Se a saída disser '⚠️ legado entrelaçado', PARE: '$IB' também está entrelaçada." >&2
+    return 11
+  fi
 
   # Merge do onion/vendor na integração (3-way; base comum). Conflito = never-clobber estrutural.
   if git -C "$T" merge "$VENDOR" -m "chore(onion): update to pin ${PIN}" >/dev/null 2>&1; then

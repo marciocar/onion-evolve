@@ -1,0 +1,89 @@
+# Fixture do veredito MISPLANED — coerência plane × verified_against.
+# Crédito: sinal de campo de um adotante (2026-07-27), que mediu 21 nós afirmando sobre
+# produção com evidência de leitura de código, COM O RADAR VERDE. Vale para TODOS os tipos de
+# nó — de propósito: os 21 casos dele eram quase todos `evidence`, o tipo que o UNANCHORED isenta.
+meta:
+  schema_version: "1"
+
+nodes:
+  - id: C_PROD_MAS_LEU_BRANCH
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-20
+    verified_against: branch
+    label: "claim sobre o VIVO declarando ter olhado a FONTE — contradicao interna, o caso positivo"
+
+  - id: E_PROD_MAS_LEU_COMMIT
+    node_type: evidence
+    trace: docs/exemplo.md:10
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-20
+    verified_against: commit
+    label: "MESMO defeito num EVIDENCE — o tipo que o UNANCHORED isenta. E por isto que MISPLANED nao filtra por tipo"
+
+  - id: E_PROD_MEDIU_O_VIVO
+    node_type: evidence
+    trace: docs/exemplo.md:20
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-20
+    verified_against: deploy
+    label: "PROD medindo deploy — coerente, NAO deve disparar"
+
+  - id: C_DEV_LEU_BRANCH
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-07-20
+    verified_against: branch
+    label: "DEV declarando branch — coerente, NAO deve disparar"
+
+  - id: C_PROD_PIN_AMBIGUO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-07-20
+    verified_against: pin
+    label: "pin e AMBIGUO (ler o stamp do checkout vivo e PROD legitimo) — NAO cobrado de proposito"
+
+  - id: C_PROD_BRANCH_SUPERSEDED
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.5
+    status: superseded
+    verified_at: 2026-07-20
+    verified_against: branch
+    label: "mesmo defeito, mas RECONCILIADO — historia nao se cobra (mesmo racional do STALE)"
+
+edges:
+  - from: E_PROD_MAS_LEU_COMMIT
+    to: C_PROD_MAS_LEU_BRANCH
+    edge_type: SUPPORTS
+  - from: E_PROD_MEDIU_O_VIVO
+    to: C_DEV_LEU_BRANCH
+    edge_type: SUPPORTS
+  - from: C_PROD_PIN_AMBIGUO
+    to: C_PROD_MAS_LEU_BRANCH
+    edge_type: DEPENDS_ON
+  - from: C_PROD_BRANCH_SUPERSEDED
+    to: C_PROD_MAS_LEU_BRANCH
+    edge_type: DEPENDS_ON

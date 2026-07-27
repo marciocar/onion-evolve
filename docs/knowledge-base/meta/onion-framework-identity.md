@@ -41,7 +41,7 @@ date: 2026-06-15
 
 ### Pitch de 2 minutos
 
-O Sistema Onion é um **framework de orquestração de desenvolvimento** que vive inteiramente em `.claude/` — uma pasta de configuração do Claude Code. Ao instalar o Onion num projeto, o time ganha **99 comandos invocáveis**, **51 agentes especializados de IA** e **10 skills** de orquestração, cobrindo três dimensões **peer**: produto (discovery → backlog), engenharia (planejamento → PR) e compliance (ISO 27001, SOC2, PMBOK, ISO 22301). O Onion se conecta ao gerenciador de tarefas existente (Jira, ClickUp, Asana ou Linear) via uma camada de abstração agnóstica (SDAAL) e ao host de código (GitHub, com GitLab/Bitbucket no roadmap) via adapter de forge. Não é uma CLI, não tem pacote npm, não exige mudança de stack — é configuração pura que transforma o Claude Code no cérebro orquestrador do fluxo de trabalho.
+O Sistema Onion é um **framework de orquestração de desenvolvimento** que vive inteiramente em `.claude/` — uma pasta de configuração do Claude Code. Ao instalar o Onion num projeto, o time ganha **100 comandos invocáveis**, **51 agentes especializados de IA** e **10 skills** de orquestração, cobrindo três dimensões **peer**: produto (discovery → backlog), engenharia (planejamento → PR) e compliance (ISO 27001, SOC2, PMBOK, ISO 22301). O Onion se conecta ao gerenciador de tarefas existente (Jira, ClickUp, Asana ou Linear) via uma camada de abstração agnóstica (SDAAL) e ao host de código (GitHub, com GitLab/Bitbucket no roadmap) via adapter de forge. Não é uma CLI, não tem pacote npm, não exige mudança de stack — é configuração pura que transforma o Claude Code no cérebro orquestrador do fluxo de trabalho.
 
 *(Fontes: `CLAUDE.md` §Inventário; `onion-review-2026-05.md` §1 — Revisão Analítica de Maio/2026, interno do core: o snapshot que consolidou a identidade canônica (framework template em `.claude/`, plataforma única Claude Code, três dimensões peer) e o abandono formal de `.onion/`/CLI standalone/v4.0; veredito "substancialmente completo em cobertura, pré-aplicável em validação")*
 
@@ -91,7 +91,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 | # | Problema | Sem Onion | Com Onion |
 |---|----------|-----------|-----------|
-| 1 | Orquestração manual da IA | Prompts ad-hoc por tarefa, sem memória de workflow nem tiering de agentes | 99 comandos = workflows codificados (`/engineer:plan` já sabe delegar a `@task-specialist`) |
+| 1 | Orquestração manual da IA | Prompts ad-hoc por tarefa, sem memória de workflow nem tiering de agentes | 100 comandos = workflows codificados (`/engineer:plan` já sabe delegar a `@task-specialist`) |
 | 2 | Cada integração de task manager é caso especial | Reescrever prompts/formatos por provider (Jira exige ADF, ClickUp Unicode, Asana HTML) | SDAAL Task Manager Abstraction — `TASK_MANAGER_PROVIDER` no `.env` roteia ao adapter certo, formatação tipada |
 | 3 | Trabalho interrompido = contexto perdido | Reexplicar contexto do zero a cada retomada de sessão | Workflows faseados retomáveis + `STATE.md` (ponteiro Tier-0 ~1KB) em `.claude/sessions/` |
 | 4 | Compliance é silo separado do dev | Documentação ISO/SOC2 criada depois, manualmente, desconectada da entrega | 5 agentes de compliance integrados ao mesmo ciclo; `/docs:build-compliance-docs` gera a partir do estado real |
@@ -441,5 +441,5 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 
 ---
 
-**Última atualização**: 2026-07-24 (resync de inventário presente → SSOT: 99 comandos / 51 agentes / 10 skills / 86 KBs / 10 dimensões; nota anti-redrift em §6; casos históricos preservados)
+**Última atualização**: 2026-07-24 (resync de inventário presente → SSOT: 100 comandos / 51 agentes / 10 skills / 86 KBs / 10 dimensões; nota anti-redrift em §6; casos históricos preservados)
 **Mantido por**: Sistema Onion (síntese — gerada via `/meta:create-knowledge-base`, Fase 3 do plano de materiais externos)

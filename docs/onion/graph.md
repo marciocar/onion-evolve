@@ -478,6 +478,15 @@ onion-design	requires	agent:design-system-specialist
 onion-design	requires	util:design-sink	
 onion-design	requires	util:design-source	
 onion-design	requires	validation:lint-design-tokens.sh	
+onion-dist	adopts	onion-evolve	
+onion-dist	mode	greenfield	
+onion-dist	pin	e88c1e11e051	
+onion-dist	specialization	benchmarking	
+onion-dist	specialization	distribution-algorithms	
+onion-dist	specialization	kg-sdaal-method	
+onion-dist	specialization	research-arm	
+onion-dist	tier	standalone	
+onion-dist	trust-advises	onion-evolve	
 onion-docs	provides	business-technical-context	
 onion-docs	provides	c4-model-mermaid	
 onion-docs	provides	docs-health-validacao	

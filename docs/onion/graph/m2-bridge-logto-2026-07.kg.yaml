@@ -122,7 +122,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.95
-    status: confirmed
+    status: superseded
     verified_against: host-vps-medido
     verified_at: 2026-07-26
     label: "FIX A — CONFIGURADO != PROTEGIDO. MEDIDO neste host (kernel 6.8.0-134, systemd 255): caddy.service memory.min=67108864 e onion-bridge.service memory.min=268435456 estão configurados E ESCRITOS no próprio cgroup — MAS /sys/fs/cgroup/system.slice/memory.min = 0. Em cgroup v2 a proteção EFETIVA é LIMITADA pela do ANCESTRAL (o kernel distribui aos filhos uma fração do que o PAI afora; pai=0 => fração=0). Logo os floors 'JÁ FEITOS' de Caddy/bridge têm proteção efetiva ZERO. Não existe arquivo memory.min.effective — a verificação TEM de percorrer a cadeia de ancestrais"
@@ -670,6 +670,129 @@ nodes:
     verified_against: host-vps-medido
     label: "BRIDGE LIDO 2026-07-26 (sudo neste host; a sessao NAO havia tentado). REFINA C_identity_hole: nao ha ausencia de gate — TODA rota sensivel ja exige Bearer (/chat e /commands via authGuard; /a2a via a2aGuard com pool INVITE_TOKENS_A2A dedicado que REJEITA courtesy/byok; /admin/* via adminGuard) e o serveStatic catch-all e o ULTIMO registrado (ordem correta). Abertas por design: /health e /.well-known/agent-card.json. NAO EXISTE /invoke (o spec inventou). /chat ja tem rate-limit. Env vem de process.loadEnvFile() lendo /home/onion/onion-bridge/.env (NAO EnvironmentFile do systemd). SSE ja usa fetch+ReadableStream (NAO EventSource) — Authorization ja trafega. Logo o alvo real e IDENTIDADE (AUTH_TOKEN e segredo compartilhado; INVITE_TOKENS_* sao convites, nao usuarios), e o risco nomeavel e PERMISSION_MODE=bypassPermissions (config.ts:26): quem porta token executa irrestrito e nao se sabe QUEM"
 
+  # ---- P0 PRE-FLIGHT EXECUTADO 2026-07-26 (read-only). Tres achados; dois REFUTAM premissa. ----
+
+  - id: E_p0_logto_tenant_measured
+    node_type: evidence
+    trace: /home/marcio/onion-logto/docker-compose.yml
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: logto-db-consultada-read-only
+    label: "PERGUNTA 4 RESPONDIDA — e a resposta e NAO. Consulta read-only ao postgres do Logto (docker exec, psql -U logto): a tabela users tem UM registro e ele vive no tenant ADMIN (o login do console), nao no tenant DEFAULT. O tenant default tem ZERO usuarios e ZERO applications (a tabela applications so traz os built-in do Logto, todos no tenant admin) e a tabela resources so traz os built-in (*.logto.app/api, logto.io/api) — nenhum API Resource do bridge existe ainda. sign_up esta ABERTO nos dois tenants (username+password, verify:false). CONSEQUENCIA DIRETA: o P3.4 (desligar sign-up ANTES do login humano do P4.2) FECHARIA o caminho do maestro exatamente como o spec temia. Criar o usuario no tenant DEFAULT vira PRE-REQUISITO explicito do flip, antes do P3.4"
+
+  - id: C_permission_mode_fail_open
+    node_type: claim
+    trace: /home/onion/onion-bridge/src/config.ts:26
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: refuted
+    verified_at: 2026-07-26
+    verified_against: bridge-config-lido-e-env-medido
+    label: "[CORRIGIDO 2026-07-27 — ver E_p5_identity_live] PERMISSION_MODE era FAIL-OPEN no artefato mais perigoso do sistema. config.ts:26 le `(process.env.PERMISSION_MODE ?? \"bypassPermissions\")` — o DEFAULT, na AUSENCIA da variavel, e o modo irrestrito. Medido no .env vivo: PERMISSION_MODE=bypassPermissions (declarado E efetivo). Se a variavel sumir num update do .env, o bridge NAO degrada para seguro: ele permanece irrestrito, em silencio. E a MESMA regressao silenciosa que o proprio spec combate no BRIDGE_AUTH_MODE (§3.5: 'o estado seguro e o estado SEM configuracao'), aqui invertida e JA VIVA. Fix candidato: inverter o default para o modo restrito e exigir opt-in explicito para bypassPermissions"
+
+  - id: C_a2a_pool_empty_admin_bypasses
+    node_type: claim
+    trace: /home/onion/onion-bridge/src/server.ts:38
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: bridge-source-e-env-medidos
+    label: "O 'pool dedicado' do /a2a nao isola nada — DOIS motivos medidos. (1) a2aGuard (server.ts:38) aceita `bearer === config.authToken` ANTES de consultar a2aTokens: o segredo de admin abre o /a2a por cima do pool. (2) o .env vivo NAO define INVITE_TOKENS_A2A (chaves presentes: AUTH_TOKEN, ONION_CWD, PORT, PERMISSION_MODE, ANTHROPIC_API_KEY, INVITE_TOKENS_COURTESY, INVITE_TOKENS_BYOK), logo config.a2aTokens e um Set VAZIO. Somando: hoje o UNICO caminho para o /a2a e o AUTH_TOKEN de admin. PRECISAO: isso NAO refuta o E_bridge_source_read — a clausula dele ('pool dedicado que REJEITA courtesy/byok') e literalmente verdadeira, courtesy/byok de fato nao estao em a2aTokens. O que cai e a ISOLACAO IMPLICADA, e com ela a conclusao em prosa da §0.2 do spec ('/a2a tem guard proprio e pool dedicado — nao e buraco'). Reabre o P0.2c (cobertura dupla vs excecao documentada): a excecao se apoiava num isolamento que nao existe. Efeito colateral a verificar: se ha remetentes a2a ativos, eles so podem estar usando o token de admin, ou o canal esta morto"
+
+  - id: C_console_not_the_path
+    node_type: claim
+    trace: /etc/caddy/conf.d/logto-console.caddy.disabled
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: caddy-conf-e-logto-db-medidos
+    label: "O CONSOLE NAO ESTA NO CAMINHO CRITICO — o objetivo e PROVISIONAR o tenant, nao entrar numa tela. Medido: o vhost console.onionevolve.com existe PRONTO e DESLIGADO (conf.d/logto-console.caddy.disabled; o Caddyfile importa *.caddy, e .disabled nunca carrega — dai o TLS falhar), o console vive so em 127.0.0.1:3012 (HTTP 302), e auth.onionevolve.com e o ISSUER OIDC (porta 3011) — bater nele no browser da /unknown-session. As duas saidas obvias sao ruins: expor o console publica o painel do provedor de identidade que esta virando caminho critico (e o sign_up esta ABERTO nos dois tenants); tunel SSH e inviavel do celular, que e como o maestro opera. A saida BOA dissolve o problema: o app M2M 'm-default' ja existe COM secret e ha o papel machine:mapi:default — da para provisionar headless pela Management API. Melhor que clicar: reproduzivel, auditavel, versionado, sem exposicao nova. E e o MESMO caminho que o P1-P3 precisa (API Resource + app M2M + app SPA/PKCE + role)"
+
+  - id: E_p1p3_provisioned
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: logto-api-e-db-conferidos
+    label: "P1-P3 EXECUTADOS HEADLESS 2026-07-26, por script versionado e IDEMPOTENTE (re-run diz 'ja existe' nos 5 passos). No tenant default: usuario do maestro (senha aleatoria em /root/.onion-logto-bootstrap 0600, NUNCA no transcript, a trocar no 1o login) · API Resource https://bridge.onionevolve.com · scope bridge:invoke · app M2M onion-bridge-service · app SPA PUBLICO onion-bridge-pwa (PKCE, zero secret no device) · role M2M bridge-operator com o scope, atribuida ao app de servico. CONFERIDO DE FONTE INDEPENDENTE (psql no banco, nao a saida do script): users default=1, 2 apps, resource presente. O bootstrap circular foi quebrado com vhost do console LOOPBACK-ONLY (bind 127.0.0.1 + tls internal), autorizado nominalmente pelo maestro — zero exposicao publica, e o ss confirma 127.0.0.1:443"
+
+  - id: E_p4_rfc8707_proven
+    node_type: evidence
+    trace: /home/onion/onion-bridge
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-26
+    verified_against: token-emitido-e-decodificado
+    label: "P4.1 PROVADO — PLANO A. Token client_credentials do app onion-bridge-service com resource=https://bridge.onionevolve.com decodificado (node, base64url nativo): aud=https://bridge.onionevolve.com · scope=bridge:invoke · iss=https://auth.onionevolve.com/oidc · header alg=ES384 typ=at+jwt. O Logto 1.41.0 self-hosted HONRA Resource Indicators (RFC 8707) e emite audiencia vinculada. A escada B1->B2->B3 do §3.6 NAO sera necessaria e o aud-binding do §3.3 se sustenta. ALG A PINAR: ES384 (nao RS256). Prova colateral de que o binding e REAL, e nao decorativo: durante o bootstrap, apresentar um token com aud=https://default.logto.app/api ao endpoint do tenant admin devolveu ERR_JWT_CLAIM_VALIDATION_FAILED/aud — o gate rejeitou o uso errado antes de qualquer codigo nosso"
+
+  - id: E_p5_identity_live
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/bridge-src/identity.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: bridge-reiniciado-e-7-provas-executadas
+    label: "P5 VIVO 2026-07-27. src/identity.ts instalado no bridge (copia REVISAVEL no repo — codigo de seguranca que so existe no host e codigo que ninguem revisa). authGuard tenta OIDC PRIMEIRO; o legado so e alcancavel sob BRIDGE_AUTH_MODE=dual-legacy. Sem `jose`: o bridge e producao SEM repo git e o alg e PINADO (ES384), o que fecha a confusao de algoritmo — em troca, cada caso negativo foi PROVADO contra o issuer vivo. Verificacao ES384 = ECDSA P-384 + SHA-384 com assinatura IEEE-P1363 (nao DER). Fail-closed em toda excecao (JWKS fora do ar nao vira 'pode entrar'). JWKS com cache 1h + piso de re-fetch 60s (kid desconhecido pode ser rotacao, mas re-buscar por request faria de um token forjado um amplificador de DoS). Assert de boot: 'JWKS OK (1 chave ES384) | auth: dual-legacy'. PROVAS 7/7 contra app.onionevolve.com/commands: OIDC valido 200 · legado 200 (janela) · sem token 401 · aud de OUTRO recurso 401 · sem scope bridge:invoke 401 · assinatura adulterada 401 · lixo 401. BONUS: C_permission_mode_fail_open CORRIGIDO — o default do PERMISSION_MODE deixou de ser bypassPermissions"
+
+  - id: C_pwa_has_no_pkce
+    node_type: claim
+    trace: /home/onion/onion-bridge/web/src/App.tsx:21
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: refuted
+    verified_at: 2026-07-27
+    verified_against: grep-no-fonte-da-pwa
+    superseded_note: "fechado pelo P6 — ver E_p6_pkce_live"
+    label: "O FLIP ESTA BLOQUEADO, e nao pelo que o spec supunha. A PWA NAO TEM UMA LINHA DE OIDC/PKCE: grep por code_verifier|pkce|oidc|authorize|logto em web/src e public devolve ZERO; ela obtem o token de getToken() (convite colado pelo usuario). Logo, flipar agora (remover BRIDGE_AUTH_MODE) trancaria o caminho HUMANO inteiro — o lockout que o spec teme, pela porta que o spec nao olhou. O P6 nao e formalidade ('os dois chamadores mandam Bearer'): para a PWA e implementar Authorization Code + PKCE de verdade (redirect ao authorize com code_challenge, rota /callback ja registrada como redirect URI do app SPA, troca do code com code_verifier, storage, refresh). CONSEQUENCIA DE ESCOPO: o item 1 fica num plato seguro (mecanismo pronto e provado, rollback de uma linha) e o P6 merece passada propria"
+
+  - id: C_scaffold_removed_proof_was_invalid
+    node_type: claim
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: caddy-conf-e-handshake-tls-medidos
+    label: "ANDAIME REMOVIDO + UMA PROVA MINHA ERA INVALIDA. (a) O vhost loopback do console cumpriu o proposito (quebrar o bootstrap circular) e foi REMOVIDO — andaime nao sobrevive ao proposito, e o estado seguro e o estado SEM configuracao. Host restaurado ao exato anterior: so o listener publico pre-existente; o SNI console.onionevolve.com volta a RECUSAR handshake (no peer certificate). (b) A PROVA QUE EU DEI ONTEM ERA INVALIDA: `curl https://console.onionevolve.com` devolveu HTTP 000 e eu li como 'nao responde' — 000 ali era o curl RECUSANDO O CERTIFICADO, nao ausencia de servico. Medi outra coisa e declarei a conclusao certa. Re-medido corretamente com -k e comparacao de bytes contra controle de loopback: publico devolve 200 com 0 BYTES em / e /console e /oidc/token e /oidc/.well-known e /api/.well-known; loopback devolve 2295 bytes. A conclusao ('nada do console exposto') SOBREVIVE, a prova nao. E o mesmo modo-de-falha do UNANCHORED — carimbo no artefato errado — cometido por mim no dia em que o mecanizei. (c) O DNS console.onionevolve.com -> 179.197.65.94 JA EXISTIA; nao foi criado nesta sessao. (d) O conhecimento virou MECANISMO: pre-flight no script falha com exit 6 e entrega o comando exato do andaime, em vez do `invalid_client` mudo que custou uma sessao para diagnosticar"
+
+  - id: E_p6_pkce_live
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/bridge-src/web-oidc.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: bundle-servido-e-authorize-medidos
+    label: "P6 VIVO 2026-07-27 — a PWA agora faz Authorization Code + PKCE. TRES escolhas de desenho: (1) client PUBLICO, zero segredo no device; (2) redirect na RAIZ e nao /callback, porque o bridge serve a PWA com catch-all estatico SEM fallback de SPA — /callback daria 404 e exigiria mudar o roteamento do servidor; na raiz o ?code= chega e o app limpa a URL com replaceState: ZERO mudanca no servidor; (3) getToken() continua SINCRONO — e a costura unica por onde todo o app ja passava, entao o login entra por ali e nada mais muda. BURACO DO P3 FECHADO no caminho: todas as roles eram MachineToMachine e o usuario NAO TINHA ROLE — o token humano sairia sem bridge:invoke e o gate recusaria: login funcionaria e acesso nao, o pior desfecho (parece configurado, nao e). Criada role bridge-user (type User) com o scope, atribuida. PROVAS: 6/6 marcas de PKCE no bundle SERVIDO (nao no build), authorize com os parametros reais devolve 303 -> /sign-in?app_id=<spa>, banco confirma marcio->bridge-user->bridge:invoke, redirect URIs raiz+/callback, refresh token 14d. Regressao: OIDC 200 · convite legado 200 (janela) · sem token 401 · PWA 200. FRONTEIRA: o login humano completo (senha + troca do code) NAO foi executado — exige browser; e o passo do maestro"
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -948,3 +1071,89 @@ edges:
   - from: Q_gated_m3
     to: D_gate_oidc_dual
     edge_type: DEPENDS_ON
+
+  # ---- P0 PRE-FLIGHT 2026-07-26: o que a medicao sustenta e o que ela derruba ----
+  # A pergunta 4 sai de aberta por MEDICAO, nao por suposicao — e a resposta inverte o pressuposto
+  # do runbook (o spec assumia "o usuario provavelmente existe"; o tenant que importa esta vazio).
+  - from: E_p0_logto_tenant_measured
+    to: A_flip_steps_reversible
+    edge_type: CONSTRAINS
+  # A superacao do obstaculo operacional: o console sai do caminho critico.
+  - from: E_p0_logto_tenant_measured
+    to: C_console_not_the_path
+    edge_type: SUPPORTS
+  - from: C_console_not_the_path
+    to: A_flip_steps_reversible
+    edge_type: CONSTRAINS
+  - from: E_p1p3_provisioned
+    to: C_console_not_the_path
+    edge_type: SUPPORTS
+  - from: E_p1p3_provisioned
+    to: A_flip_steps_reversible
+    edge_type: SUPPORTS
+  # A prova que o desenho inteiro aguardava: o resource= e honrado, entao o plano-B morre.
+  - from: E_p4_rfc8707_proven
+    to: D_resource_plan_b
+    edge_type: CONSTRAINS
+  - from: E_p4_rfc8707_proven
+    to: D_gate_oidc_dual
+    edge_type: SUPPORTS
+  - from: E_p4_rfc8707_proven
+    to: Q_resource_indicators
+    edge_type: SUPPORTS
+  - from: E_p5_identity_live
+    to: D_gate_oidc_dual
+    edge_type: SUPPORTS
+  - from: E_p5_identity_live
+    to: D_fail_closed_default
+    edge_type: SUPPORTS
+  # O default fail-open do PERMISSION_MODE foi corrigido junto do P5.
+  - from: E_p5_identity_live
+    to: C_permission_mode_fail_open
+    edge_type: REFUTES
+  # O bloqueio real do flip — e ele nao estava no runbook.
+  - from: C_pwa_has_no_pkce
+    to: A_flip_steps_reversible
+    edge_type: CONSTRAINS
+  - from: C_pwa_has_no_pkce
+    to: C_identity_hole
+    edge_type: SUPPORTS
+  - from: E_p6_pkce_live
+    to: C_pwa_has_no_pkce
+    edge_type: REFUTES
+  - from: E_p6_pkce_live
+    to: D_gate_oidc_dual
+    edge_type: SUPPORTS
+  - from: C_scaffold_removed_proof_was_invalid
+    to: C_console_not_the_path
+    edge_type: SUPPORTS
+  - from: C_scaffold_removed_proof_was_invalid
+    to: E_p1p3_provisioned
+    edge_type: CONSTRAINS
+  # RECONCILIAÇÃO do 1º dogfood de /meta:kg-freshness (2026-07-27): veredito DRIFTED.
+  # A evidência do conserto JÁ EXISTIA no grafo desde 26/07 — faltava a ARESTA, e sem ela
+  # nem o FRESCOR (carimbo impecável) nem a INTEGRIDADE (só olha REFUTES) enxergavam a mentira.
+  # Medido: `cat /sys/fs/cgroup/system.slice/memory.min` => 402653184, contra a claim de ZERO.
+  - from: E_ancestor_floor_applied
+    to: C_ancestor_cap_zeroes_floors
+    edge_type: SUPERSEDES
+  - from: E_p0_logto_tenant_measured
+    to: D_gate_oidc_dual
+    edge_type: CONSTRAINS
+  # O default fail-open do PERMISSION_MODE agrava o buraco de identidade: nao e so "nao se sabe QUEM",
+  # e "nao se sabe QUEM e o modo irrestrito volta sozinho se a env sumir".
+  - from: C_permission_mode_fail_open
+    to: C_identity_hole
+    edge_type: SUPPORTS
+  # CONSTRAINS, nao REFUTES — e a distincao importa. Reli o codigo: a clausula do E_bridge_source_read
+  # ('pool dedicado que REJEITA courtesy/byok') e LITERALMENTE VERDADEIRA, courtesy/byok nao estao em
+  # a2aTokens. O que e falso e a ISOLACAO que ela sugere: o admin fura por cima e o pool esta vazio.
+  # Refutar o no inteiro por causa da implicacao seria over-correction — ele carrega o inventario de
+  # rotas, a ordem, o SSE e o env, todos corretos e load-bearing. A evidencia nao errou; a conclusao
+  # tirada dela e que era larga demais.
+  - from: C_a2a_pool_empty_admin_bypasses
+    to: E_bridge_source_read
+    edge_type: CONSTRAINS
+  - from: C_a2a_pool_empty_admin_bypasses
+    to: Q_a2a_after_flip
+    edge_type: CONSTRAINS

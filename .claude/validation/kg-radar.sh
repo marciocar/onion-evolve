@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--schema|--triples]
+# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]
 #      (sem flag = radar + reconcile + integrity + domain + provenance + freshness + schema)
 #
 # Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
@@ -21,13 +21,21 @@
 #                     é história — não cobrada (mesmo racional do FRESCOR).
 #   FRESCOR         = frescor da SSOT (⚠ atenção, NÃO reprova — nó stale mente, não corrompe):
 #                     STALE-MISSING (nó plane:PROD sem verified_at:) · STALE-OLD (verified_at
-#                     anterior à meta.baseline) · UNANCHORED (tem verified_at: mas NÃO diz
-#                     verified_against: — carimbo sem alvo declarado). Determinístico: compara
-#                     duas datas do arquivo, sem "agora" (ADR onion-adr-kg-freshness-gate,
-#                     proposta #2 (dogfood de campo)).
+#                     anterior à meta.baseline) · UNANCHORED (node_type: claim com verified_at:
+#                     mas SEM verified_against: — carimbo sem alvo declarado; os demais tipos
+#                     ancoram por trace:/TRACES_TO e não são cobrados) · MISPLANED (plane:PROD
+#                     com verified_against: branch|commit — o nó afirma sobre o VIVO e declara
+#                     ter olhado a FONTE; contradição interna, vale p/ TODOS os tipos).
+#                     Determinístico: compara duas datas / dois campos do arquivo, sem "agora"
+#                     (ADR onion-adr-kg-freshness-gate, proposta #2 (dogfood de campo)).
 #   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
 #                     meta.schema_version ≠ a versão que o radar entende → recusa; ausente → ⚠
 #                     retrocompat (ADR onion-adr-kg-freshness-gate, proposta #1).
+#   FRESCOR-TSV     = a FILA de re-verificação, legível por máquina (irmão do FRESCOR, como
+#                     TRIPLES é do grafo): 1 linha/nó vivo rastreado, ordenada por atenção.
+#                     Colunas: id·node_type·plane·status·impact·confidence·atenção·verified_at·
+#                     verified_against·trace·verdict. Escopo NÃO é "o flagado" — nó com verdict
+#                     OK entra igual (o caso que criou o fluxo mente COM carimbo do dia).
 #   TRIPLES         = grafo como triplas `from EDGE to [on evento]` p/ consumo por LLM
 #
 # Camadas (campo opcional `layer`, default audit — retrocompatível):
@@ -47,7 +55,7 @@ RADAR_SCHEMA="1"
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--schema|--triples]" >&2; exit 2; }
+[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]" >&2; exit 2; }
 
 awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" '
 function statusFactor(s) {
@@ -201,6 +209,37 @@ END {
     exit 0
   }
 
+  # Irmão-MÁQUINA do --freshness (como --triples é do grafo): a fila de re-verificação, em TSV.
+  # Existe porque a saída humana do --freshness é prosa pt-BR com emoji — parseá-la para
+  # alimentar um fluxo seria frágil por construção. Uma linha por nó frescor-rastreado e VIVO.
+  #
+  # ORDEM: atenção desc — MESMA fórmula do --radar (impact × confidence × statusFactor × (1+grau)).
+  # A decisão que carrega peso aqui: o escopo NÃO é "o que o radar flagou". O caso que motivou o
+  # fluxo (C_ancestor_cap_zeroes_floors do grafo do M2) tem verdict OK — carimbo do dia, alvo
+  # declarado, os três vereditos passam — e MENTE assim mesmo. Filtrar por flagado nasceria cego
+  # ao caso fundador. O carimbo diz se a SSOT está bem-formada; a atenção diz o que custa caro
+  # estar errado. Re-verifica-se pelo CUSTO DO ERRO, não pela ausência do carimbo.
+  if (mode == "--freshness-tsv") {
+    for (i = 1; i <= nn; i++) {
+      id = order[i]
+      if (plane[id] != "PROD" && verifiedAgainst[id] == "") continue
+      if (nstatus[id] == "superseded" || nstatus[id] == "refuted") continue   # história, não SSOT viva
+      sf = statusFactor(nstatus[id]); if (sf < 0) sf = 0
+      att[id] = impact[id] * conf[id] * sf * (1 + deg[id])
+      if (verifiedAt[id] == "") verdict = "STALE-MISSING"
+      else if (verifiedAgainst[id] == "" && ntype[id] == "claim") verdict = "UNANCHORED"
+      else if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") verdict = "STALE-OLD"
+      else verdict = "OK"
+      printf "%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%s\n",
+        id, ntype[id], plane[id], nstatus[id], impact[id], conf[id], att[id],
+        (verifiedAt[id] == "" ? "-" : verifiedAt[id]),
+        (verifiedAgainst[id] == "" ? "-" : verifiedAgainst[id]),
+        (traceInline[id] == "" ? "-" : traceInline[id]),
+        verdict
+    }
+    exit 0
+  }
+
   if (mode == "--all" || mode == "--radar") {
     print "══ RADAR — atenção (peso × centralidade) ══"
     for (i = 1; i <= nn; i++) {
@@ -310,7 +349,7 @@ END {
     # declare verified_against: (opt-in — nomeia o artefato MÓVEL que rastreia: branch/commit/
     # deploy/config). Um nó DEV que aponta p/ branch/commit também apodrece (sinal de campo
     # ssot-como-runtime, §2: C_CONSOLIDATION_MAP stale). Não inunda claims epistêmicos comuns.
-    fwarns = 0; ntracked = 0
+    fwarns = 0; ntracked = 0; fsuppressed = 0
     for (i = 1; i <= nn; i++) {
       id = order[i]
       if (plane[id] != "PROD" && verifiedAgainst[id] == "") continue
@@ -329,16 +368,52 @@ END {
         # fica legível a quem lê. Sinal de campo 2026-07-25 (adotante): nós com plane:PROD e
         # verified_at "porque um curl respondera" — mas o curl mediu o CORE e a claim era
         # sobre o ADOTANTE. O carimbo estava no artefato errado, e nada no arquivo denunciava.
-        if (verifiedAgainst[id] == "") {
+        # UNANCHORED cobra quem AFIRMA — não quem ANCORA, nem quem PERGUNTA. Whitelist por
+        # `node_type: claim`, mesmo idioma do bloco PROVENIÊNCIA (que filtra por `decision`).
+        # MEDIDO nos 22 grafos do core (2026-07-26): sem o filtro são 275 avisos, 170 deles em
+        # tipos que JÁ carregam a âncora por outro campo — 114 `evidence` (a evidência É a
+        # âncora; 101 delas já trazem `trace:`), 17 `decision` (a proveniência já é cobrada no
+        # bloco acima: dois nomes para a mesma obrigação), 21 `entity` (domínio ancora por
+        # `trace:` + READS/WRITES, o contrato do modo `map`), 15 `artifact` (o nó NOMEIA o
+        # alvo — alvo do alvo é tautologia) e 3 `question` (pergunta não afirma).
+        # 275 avisos treinam o leitor a ignorar: é o mesmo racional que já pula superseded/refuted.
+        # A guarda vive AQUI, no ramo, e NÃO como `continue` no laço: STALE-MISSING e STALE-OLD
+        # continuam valendo para TODOS os tipos. (Um `continue` quebraria os casos (b)/(c)/(f)
+        # do selftest, cujos sujeitos são `state` e `decision` — a suíte é a guarda desta guarda.)
+        # Whitelist, não blacklist: ntype vazio/inválido já REPROVA na INTEGRIDADE (VN, exit 1).
+        if (verifiedAgainst[id] == "" && ntype[id] == "claim") {
           print "  ⚠ UNANCHORED: " id " (verified_at " verifiedAt[id] " SEM verified_against:; declare o ALVO da claim — carimbo sem alvo não distingue verificado de declarado)"; fwarns++
+        } else if (verifiedAgainst[id] == "") {
+          fsuppressed++   # supressão CONTADA, nunca silenciosa — ver linha-resumo abaixo
         }
         if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") {
           print "  ⚠ STALE-OLD: " id " (verified_at " verifiedAt[id] " anterior à baseline " metaBaseline " — a verdade pode ter envelhecido)"; fwarns++
         }
       }
+      # MISPLANED — CONTRADIÇÃO INTERNA ao próprio nó, e vale para TODOS os tipos.
+      # `plane: PROD` afirma "cruzei com o ARTEFATO VIVO"; `verified_against: branch|commit`
+      # declara "olhei a FONTE". Os dois campos falam da mesma coisa (a natureza da evidência)
+      # e até aqui o radar nunca os confrontava.
+      # Crédito: sinal de campo de um adotante (2026-07-27), que MEDIU no próprio repo
+      # 21 nós afirmando sobre produção com evidência de leitura de código — com o radar VERDE
+      # o tempo todo. E o motivo de escapar era o filtro que eu mesmo shipei horas antes: o
+      # UNANCHORED isenta os tipos não-claim ("ancoram por trace:/TRACES_TO"), e quase todos os
+      # 21 eram `evidence`. Reduzir ruído cegou o gate para uma classe que ele nunca vira.
+      # Por isso esta checagem NÃO se restringe a claim: a contradição não depende do tipo.
+      # Determinística: dois campos do mesmo nó, sem rede, sem heurística, sem campo novo.
+      # TETO DECLARADO (pelo próprio autor do sinal): audita a procedência DECLARADA, não se a
+      # declaração é verdadeira — um nó que escreve `deploy` medindo bench local passa. Isso é
+      # limite honesto, não defeito: fecha a contradição legível, não a mentira deliberada.
+      # `pin` NÃO é cobrado de propósito: é ambíguo (ler o stamp do checkout vivo é PROD legítimo).
+      if (plane[id] == "PROD" && verifiedAgainst[id] ~ /(^|[^a-zA-Z])(branch|commit)([^a-zA-Z]|$)/) {
+        print "  ⚠ MISPLANED: " id " (plane:PROD mas verified_against: " verifiedAgainst[id] " — o nó afirma sobre o VIVO e declara ter olhado a FONTE; reclassifique para plane:DEV ou re-verifique contra o artefato vivo)"; fwarns++
+      }
     }
     if (ntracked == 0) print "  (nenhum nó com frescor rastreado — nada a verificar)"
     else if (fwarns == 0) print "  ✅ " ntracked " nó(s) com frescor declarado" (metaBaseline != "" ? " (baseline " metaBaseline ")" : "")
+    # `if` próprio, FORA da cadeia else-if: a supressão tem de aparecer mesmo quando fwarns==0.
+    # Uma linha no lugar de N, e o filtro fica auditável em vez de mágico.
+    if (fsuppressed > 0) print "  ℹ " fsuppressed " nó(s) não-claim com carimbo sem verified_against: — não cobrados (evidência/decisão/domínio/artefato ancoram por trace:/TRACES_TO; pergunta não afirma)"
     print ""
   }
 

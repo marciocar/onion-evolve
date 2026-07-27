@@ -336,6 +336,30 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  # BRAÇO DE INVESTIGAÇÃO (não projeto-produto) — mapa vivo de algoritmos de distribuição.
+  # Adotado com o ferramental de GRAFOS completo de propósito: o trabalho é mapear alternativas e
+  # matá-las com evidência, que é exatamente o que o KG SDAAL sustenta (alternativa = nó, medição =
+  # evidence, comparação = aresta). O maestro OPERA DE LÁ.
+  - id: onion-dist
+    name: onion-dist (algoritmos de distribuição — investigação)
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    parent: onion-evolve
+    remote: "(local — ainda sem remote; criar quando/se sair da máquina)"
+    local_path: "/home/marcio/onion-dist"
+    onion_version: e88c1e11e051   # VERIFICADO por pin-integrity-check.sh (pin-ok, 2026-07-27)
+    adopted_at: 2026-07-27
+    mode: greenfield              # pasta vazia → TX_create; framework cheio + canais de co-evolução
+    personality_summary: "Braço de investigação sobre algoritmos de distribuição: nasce com o KG como SSOT em vez de tabela comparativa, e com regra de admissão que exige função objetivo, harness e trade-off declarado — alternativa sem o que ela piora é folheto, não candidato."  # seed manual
+    specializations: [distribution-algorithms, kg-sdaal-method, research-arm, benchmarking]
+    personality_last_sync: 2026-07-27   # seed manual
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>

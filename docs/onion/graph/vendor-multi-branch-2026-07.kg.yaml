@@ -1,0 +1,177 @@
+# KG SDAAL — base cruzada do onion/vendor em adotante com MÚLTIPLAS integration branches.
+# Elenxo: a hipótese inicial (ancestralidade) foi REFUTADA pela própria reprodução, e superada
+# pelo teste de conteúdo não-framework. As posições caídas ficam — são elas que explicam o guard.
+# ADR: docs/analysis/onion-adr-vendor-multi-integration-branch-2026-07.md
+meta:
+  schema_version: "1"
+  baseline: 2026-07-01
+
+nodes:
+  - id: C_field_report
+    node_type: claim
+    trace: docs/evolution/inbox/_processed/2026-07-27-develop-onion-update-base-cruzada.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: sinal-do-adotante-lido
+    label: "SINAL DE CAMPO (metagamify, 2026-07-27): --update mirando a 2a integration branch (develop) deu exit 10 com ~110 arquivos em conflito, INCLUINDO codigo de aplicacao (apps/api/src/...). Abortou limpo; nada quebrou. Diagnostico do adotante: conflito CONTABIL por base de merge errada — o onion/vendor seguiu a linhagem da chore, nao da develop"
+
+  - id: C_cause_is_two_branches
+    node_type: claim
+    trace: docs/evolution/inbox/_processed/2026-07-27-develop-onion-update-base-cruzada.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.3
+    status: refuted
+    verified_at: 2026-07-27
+    verified_against: reproducao-tentativa-2
+    label: "HIPOTESE INICIAL (do sinal e da 1a leitura do core): a causa e o adotante ter DUAS integration branches com um onion/vendor unico. REFUTADA pela tentativa 2 da reproducao: com _clean_baseline achando a baseline limpa, o update funciona nas DUAS branches, 0 conflitos, produto intacto. Duas branches nao sao, por si, o problema"
+
+  - id: C_test_is_ancestry
+    node_type: claim
+    trace: docs/evolution/federation/outbox/metagamify/_processed/2026-07-27-resposta-base-cruzada-vendor.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.2
+    status: refuted
+    verified_at: 2026-07-27
+    verified_against: merge-base-medido-nas-duas-fixtures
+    label: "HIPOTESE DE TESTE (minha, anunciada ao adotante): o discriminador e ANCESTRALIDADE, e o mecanismo seria registrar a origem do vendor em git config na semeadura. REFUTADA por medicao: `merge-base --is-ancestor(vendor, develop)` devolve SIM nos DOIS casos — o seguro e o cruzado. Ancestralidade NAO discrimina. O git config tambem falharia no vendor LEGADO, que e justamente quem tem o problema"
+
+  - id: C_trigger_is_fallback_seed
+    node_type: claim
+    trace: .claude/utils/adopt/vendor-branch.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: reproducao-tentativa-3
+    label: "CAUSA RAIZ: o caminho de FALLBACK do seed. Sem commit na historia da integracao cujo tree do framework seja identico ao pin adotado (o 'legado entrelacado', tipico de quem CUSTOMIZOU framework), _clean_baseline falha e o seed ramifica do HEAD da integracao. Ai o onion/vendor deixa de ser portador de framework e passa a carregar o SNAPSHOT DE PRODUTO daquela branch, ficando casado com ela. Pedi-lo para uma 2a integracao arrasta a divergencia de produto para dentro do 3-way. Reproduzido: exit 10 com conflito em apps/api/src/wrr.service.ts"
+
+  - id: E_reproduction_3_tries
+    node_type: evidence
+    trace: .claude/validation/lint-selftest.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: fixtures-executadas-contra-o-helper-real
+    label: "REPRODUCAO em 3 tentativas contra o vendor-branch.sh REAL, cada uma estreitando o gatilho: (1) branches divergentes, produto so numa => conflito de 1 arquivo de FRAMEWORK, nao e o caso — eu poderia ter parado aqui e declarado sucesso reproduzindo a coisa errada; (2) produto divergente E baseline limpa disponivel => 0 conflitos, produto intacto (a prova de que 2 branches nao quebram); (3) framework customizado => _clean_baseline falha => exit 10 em codigo de aplicacao, a assinatura do campo"
+
+  - id: E_content_test_discriminates
+    node_type: evidence
+    trace: .claude/utils/adopt/vendor-branch.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: md5-das-trees-nas-duas-fixtures
+    label: "O DISCRIMINADOR, medido nas duas fixtures: tree(vendor) vs tree(base do merge) FORA do manifesto de framework. Seguro => identicos (vendor e framework-puro). Cruzado => diferentes (vendor carrega produto de outra branch). Vantagem decisiva sobre registrar a origem na semeadura: funciona no vendor LEGADO, que nasceu antes de qualquer registro existir"
+
+  - id: D_structural_guard
+    node_type: decision
+    trace: docs/analysis/onion-adr-vendor-multi-integration-branch-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: selftest-g-e-g-mut-verdes
+    label: "GUARD ESTRUTURAL antes do merge (_vendor_is_framework_pure): recusa com exit 11 quando o vendor difere da base fora do manifesto, NOMEIA os arquivos alheios e entrega o conserto. Criterio de aceite explicito: a integracao fica INTACTA (0 alteracoes, 0 conflitos) — recusar DEPOIS de sujar a arvore seria trocar 110 conflitos por 110 conflitos com mensagem bonita. Convencao onion/vendor-<branch> quando ha mais de uma integracao; vendor de baseline limpa PODE servir duas (proibe-se o contaminado, nao o compartilhamento)"
+
+  - id: Q_three_or_more_branches
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.5
+    status: open
+    label: "Tres ou mais integration branches nao foram exercitadas. A convencao por-branch se estende por CONSTRUCAO, mas isso e inferencia, nao medicao. Abrir fixture se um adotante real aparecer com esse shape"
+
+  - id: Q_volume_not_reproduced
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.6
+    status: open
+    verified_at: 2026-07-27
+    verified_against: fixture-vs-repo-do-adotante
+    label: "Reproduzimos a CLASSE (conflito contabil em codigo de aplicacao por vendor branch-especifico), NAO os 110 arquivos. O volume depende da divergencia real do repo do adotante e nao foi medido la. Nao afirmar igualdade"
+
+  - id: C_warn_is_not_a_stop
+    node_type: claim
+    trace: docs/evolution/inbox/_processed/2026-07-27-desfecho-receita-develop-warn-falso-positivo.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: desfecho-do-adotante-e-fixture-reproduzida
+    label: "FALSO-VERMELHO MEU. Eu instrui 'se vier o warn legado-entrelacado, PARE'. O warn disparou CORRETAMENTE (nao havia baseline limpa) e mesmo assim o desfecho certo era SEGUIR: o entrelacamento era so framework VELHO, nao customizacao. Vendor re-semeado do HEAD da MESMA branch da 3-way trivial — o adotante mediu 194 arquivos de framework e ZERO de produto. Transformar 'revise' em 'pare' e o erro SIMETRICO ao falso-verde: trava operacao segura e ensina a ignorar o aviso. REGRA REVISTA: o warn e 'revise o merge'; o sinal de parada e o EXIT 11, nao o aviso"
+
+  - id: E_guard_already_covers
+    node_type: evidence
+    trace: .claude/utils/adopt/vendor-branch.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: fixture-do-caso-do-adotante-executada
+    label: "O adotante propos que o criterio fosse 'o merge toca paths FORA do manifesto?' — que e EXATAMENTE o que _vendor_is_framework_pure ja faz, so que ANTES de mergear (eles tiveram que revisar 194 arquivos para concluir framework-only; o guard conclui sem sujar a arvore). REPRODUZIDO em vez de deduzido: fixture sem baseline limpa, vendor do HEAD da propria develop, produto divergente => exit 0, 2 arquivos de framework, 0 de app, produto intacto. Convergencia INDEPENDENTE: eles chegaram pelo uso, o teste chegou pela medicao das duas fixtures"
+
+edges:
+  - from: E_reproduction_3_tries
+    to: C_cause_is_two_branches
+    edge_type: REFUTES
+  - from: C_trigger_is_fallback_seed
+    to: C_cause_is_two_branches
+    edge_type: SUPERSEDES
+  - from: E_content_test_discriminates
+    to: C_test_is_ancestry
+    edge_type: REFUTES
+  - from: D_structural_guard
+    to: C_test_is_ancestry
+    edge_type: SUPERSEDES
+  - from: E_reproduction_3_tries
+    to: C_trigger_is_fallback_seed
+    edge_type: SUPPORTS
+  - from: E_content_test_discriminates
+    to: D_structural_guard
+    edge_type: SUPPORTS
+  - from: C_field_report
+    to: C_trigger_is_fallback_seed
+    edge_type: SUPPORTS
+  - from: D_structural_guard
+    to: C_field_report
+    edge_type: CONSTRAINS
+  - from: Q_three_or_more_branches
+    to: D_structural_guard
+    edge_type: DEPENDS_ON
+  - from: Q_volume_not_reproduced
+    to: C_field_report
+    edge_type: DEPENDS_ON
+  - from: C_warn_is_not_a_stop
+    to: D_structural_guard
+    edge_type: CONSTRAINS
+  - from: E_guard_already_covers
+    to: D_structural_guard
+    edge_type: SUPPORTS
+  - from: E_guard_already_covers
+    to: C_warn_is_not_a_stop
+    edge_type: SUPPORTS

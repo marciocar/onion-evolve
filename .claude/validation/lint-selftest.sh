@@ -336,6 +336,140 @@ run_kg_freshness_selftests() {
      && ! printf '%s' "${out}" | grep -q 'C_READ'; then
     record_pass "kg-freshness: DEV+verified_against → STALE-MISSING; DEV puro NÃO flagado (não inunda)"
   else record_fail "kg-freshness: dev-tracked" "esperava STALE C_STRAT sem C_READ; rc=${rc} out=${out}"; fi
+
+  # ── UNANCHORED com filtro por node_type ───────────────────────────────────────────────────
+  # O veredito nasceu em 2026-07-26 SEM teste — o único dos três de frescor sem cobertura, e
+  # com alcance largo demais (275 avisos nos 22 grafos, 170 em tipos que já ancoram por
+  # trace:/TRACES_TO). Estes casos fecham as duas dívidas de uma vez.
+  local fxu="${fx}/unanchored-typed.kg.yaml"
+  rc=0; out=$(bash "${radar}" "${fxu}" --freshness 2>&1) || rc=$?
+
+  # (g) cobra o claim, silencia os demais tipos — os dois lados no MESMO caso.
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q 'UNANCHORED: C_AFIRMA' \
+     && ! printf '%s' "${out}" | grep -qE 'UNANCHORED: (C_ANCORADA|E_MEDIU|D_DECIDE|EN_DOM|A_DOC|Q_ABERTA)'; then
+    record_pass "kg-freshness: (g) UNANCHORED cobra claim e NÃO cobra evidence/decision/entity/artifact/question"
+  else record_fail "kg-freshness: (g) filtro por node_type" "rc=${rc} out=${out}"; fi
+
+  # (h) o filtro NÃO virou `continue` no laço: os outros vereditos seguem valendo p/ não-claim,
+  # e num mesmo nó UNANCHORED e STALE-OLD compõem em vez de se excluírem.
+  if printf '%s' "${out}" | grep -q 'STALE-MISSING: E_SEM_CARIMBO' \
+     && printf '%s' "${out}" | grep -q 'UNANCHORED: C_VELHA' \
+     && printf '%s' "${out}" | grep -q 'STALE-OLD: C_VELHA'; then
+    record_pass "kg-freshness: (h) STALE-MISSING ainda vale p/ não-claim + UNANCHORED e STALE-OLD compõem"
+  else record_fail "kg-freshness: (h) escopo dos outros vereditos" "o filtro virou continue? out=${out}"; fi
+
+  # (i) supressão CONTADA, nunca silenciosa — 5 não-claim carimbados sem alvo na fixture.
+  if printf '%s' "${out}" | grep -q 'ℹ 5 nó(s) não-claim'; then
+    record_pass "kg-freshness: (i) supressão contada e visível (ℹ 5) — filtro auditável, não mágico"
+  else record_fail "kg-freshness: (i) linha de supressão" "esperava 'ℹ 5 nó(s) não-claim'; out=${out}"; fi
+
+  # (j) o veredito acima só vale sobre grafo íntegro — senão é opinião sobre arquivo quebrado.
+  rc=0; bash "${radar}" "${fxu}" --integrity --schema >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "kg-freshness: (j) a fixture do UNANCHORED é íntegra (veredito não é sobre grafo quebrado)"
+  else record_fail "kg-freshness: (j) integridade da fixture" "rc=${rc}"; fi
+
+  # (k) (MUT) — desfeito o filtro, o evidence VOLTA a ser cobrado e a linha ℹ some. Sem esta
+  # prova, (g) passaria igual se o filtro fosse vacuidade (ex.: nenhum nó não-claim rastreado).
+  local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'"' RETURN
+  cp "${radar}" "${mut}/mutado.sh"
+  sed -i 's/ && ntype\[id\] == "claim"//' "${mut}/mutado.sh"
+  if ! grep -q 'verifiedAgainst\[id\] == "" && ntype\[id\] == "claim"' "${mut}/mutado.sh"; then
+    local mout; mout="$(bash "${mut}/mutado.sh" "${fxu}" --freshness 2>&1 || true)"
+    if printf '%s' "${mout}" | grep -q 'UNANCHORED: E_MEDIU' \
+       && ! printf '%s' "${mout}" | grep -q 'ℹ '; then
+      record_pass "kg-freshness: (k) (MUT) sem o filtro o evidence volta a ser cobrado — a guarda é load-bearing"
+    else record_fail "kg-freshness: (k) (MUT)" "mutação não mudou o veredito — o filtro é vacuidade? out=${mout}"; fi
+  else
+    record_fail "kg-freshness: (k) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+
+  # ── --freshness-tsv: a FILA de re-verificação (insumo de /meta:kg-freshness) ──────────────
+  # Contrato de máquina: se as colunas variarem, o consumidor quebra em silêncio.
+  local tsv; tsv="$(bash "${radar}" "${fxu}" --freshness-tsv 2>/dev/null || true)"
+
+  # (l) forma: 11 colunas em TODA linha, e nenhuma linha vazia.
+  local badcols; badcols="$(printf '%s\n' "${tsv}" | awk -F'\t' 'NF>0 && NF!=11' | wc -l)"
+  if [ -n "${tsv}" ] && [ "${badcols}" = "0" ]; then
+    record_pass "kg-freshness: (l) --freshness-tsv com 11 colunas em todas as linhas (contrato de máquina)"
+  else record_fail "kg-freshness: (l) forma do TSV" "linhas fora do contrato: ${badcols}"; fi
+
+  # (m) ESCOPO — nó com verdict OK ENTRA na fila. É a decisão que carrega o fluxo: o caso que
+  # o motivou (C_ancestor_cap_zeroes_floors, no grafo do M2) tem carimbo do dia, alvo declarado,
+  # os três vereditos passam — e mente. Filtrar por flagado nasceria cego ao caso fundador.
+  if printf '%s\n' "${tsv}" | awk -F'\t' '$1=="C_ANCORADA" && $11=="OK"' | grep -q . \
+     && printf '%s\n' "${tsv}" | awk -F'\t' '$1=="C_AFIRMA" && $11=="UNANCHORED"' | grep -q .; then
+    record_pass "kg-freshness: (m) a fila inclui nó com verdict OK (escopo ≠ 'o que o radar flagou')"
+  else record_fail "kg-freshness: (m) escopo da fila" "C_ANCORADA(OK) e/ou C_AFIRMA(UNANCHORED) ausentes"; fi
+
+  # (n) o que é HISTÓRIA fica fora — mesmo racional do FRESCOR humano.
+  if ! printf '%s\n' "${tsv}" | awk -F'\t' '$4=="superseded" || $4=="refuted"' | grep -q .; then
+    record_pass "kg-freshness: (n) superseded/refuted fora da fila (história não se re-verifica)"
+  else record_fail "kg-freshness: (n) exclusão de história" "nó reconciliado apareceu na fila"; fi
+
+  # (o) ORDENÁVEL por atenção: a coluna 7 é numérica e o topo bate com o --radar.
+  local top_tsv top_radar
+  top_tsv="$(printf '%s\n' "${tsv}" | sort -t"$(printf '\t')" -k7 -rn | head -1 | cut -f1)"
+  top_radar="$(bash "${radar}" "${fxu}" --radar 2>/dev/null | sed -n '2p' | awk '{print $2}')"
+  if [ -n "${top_tsv}" ] && [ "${top_tsv}" = "${top_radar}" ]; then
+    record_pass "kg-freshness: (o) topo por atenção do TSV == topo do --radar (mesma fórmula, sem drift)"
+  else record_fail "kg-freshness: (o) ordenação" "tsv=${top_tsv} radar=${top_radar}"; fi
+
+  # (p) (MUT) sem a exclusão de história, o nó reconciliado VOLTA a aparecer — prova que (n)
+  # não é vacuidade (a fixture PRECISA ter um nó reconciliado para isso significar algo).
+  cp "${radar}" "${mut}/mut-tsv.sh"
+  # remove só a exclusão DENTRO do bloco --freshness-tsv (a 2ª ocorrência do padrão no arquivo)
+  awk '/mode == "--freshness-tsv"/{inblk=1} inblk && /nstatus\[id\] == "superseded"/{sub(/if \(nstatus\[id\] == "superseded" \|\| nstatus\[id\] == "refuted"\) continue.*$/,""); inblk=0} {print}' \
+    "${radar}" > "${mut}/mut-tsv.sh"
+  local mtsv; mtsv="$(bash "${mut}/mut-tsv.sh" "${fx}/superseded-not-chased.kg.yaml" --freshness-tsv 2>/dev/null || true)"
+  local otsv; otsv="$(bash "${radar}" "${fx}/superseded-not-chased.kg.yaml" --freshness-tsv 2>/dev/null || true)"
+  local nmut nori
+  nmut="$(printf '%s\n' "${mtsv}" | awk -F'\t' 'NF==11' | wc -l)"
+  nori="$(printf '%s\n' "${otsv}" | awk -F'\t' 'NF==11' | wc -l)"
+  if [ "${nmut}" -gt "${nori}" ]; then
+    record_pass "kg-freshness: (p) (MUT) sem a exclusão, a história volta à fila (${nori}→${nmut}) — a guarda é load-bearing"
+  else record_fail "kg-freshness: (p) (MUT) exclusão de história" "mutação não mudou nada (${nori}→${nmut}) — vacuidade?"; fi
+
+  # ── MISPLANED: coerência plane × verified_against ────────────────────────────────────────
+  # Crédito: sinal de campo de um adotante (2026-07-27). Ele MEDIU 21 nós do próprio repo afirmando
+  # sobre produção com evidência de leitura de código — radar VERDE o tempo todo. Escapavam pelo
+  # filtro por tipo que este mesmo arquivo passou a testar horas antes: quase todos eram
+  # `evidence`, o tipo que o UNANCHORED isenta. Reduzir ruído cegou o gate para outra classe.
+  local fxm="${fx}/misplaned.kg.yaml"
+  rc=0; out=$(bash "${radar}" "${fxm}" --freshness 2>&1) || rc=$?
+
+  # (q) dispara no claim E no evidence — o segundo é o ponto: MISPLANED NÃO filtra por tipo.
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q 'MISPLANED: C_PROD_MAS_LEU_BRANCH' \
+     && printf '%s' "${out}" | grep -q 'MISPLANED: E_PROD_MAS_LEU_COMMIT'; then
+    record_pass "kg-freshness: (q) MISPLANED dispara em claim E em evidence (a contradição não depende do tipo)"
+  else record_fail "kg-freshness: (q) MISPLANED" "rc=${rc} out=${out}"; fi
+
+  # (r) os coerentes ficam quietos — inclusive `pin`, ambíguo e não-cobrado de propósito.
+  if ! printf '%s' "${out}" | grep -qE 'MISPLANED: (E_PROD_MEDIU_O_VIVO|C_DEV_LEU_BRANCH|C_PROD_PIN_AMBIGUO|C_PROD_BRANCH_SUPERSEDED)'; then
+    record_pass "kg-freshness: (r) PROD+deploy, DEV+branch, pin e histórico NÃO disparam (sem falso-positivo)"
+  else record_fail "kg-freshness: (r) falso-positivo do MISPLANED" "out=${out}"; fi
+
+  # (s) a fixture é íntegra — veredito sobre grafo quebrado seria vacuidade.
+  rc=0; bash "${radar}" "${fxm}" --integrity --schema >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "kg-freshness: (s) a fixture do MISPLANED é íntegra"
+  else record_fail "kg-freshness: (s) integridade" "rc=${rc}"; fi
+
+  # (t) (MUT) restringindo a checagem a `claim` — como o UNANCHORED faz — o evidence VOLTA a
+  # escapar. É a reprodução exata do modo-de-falha que o sinal reportou.
+  cp "${radar}" "${mut}/mut-mis.sh"
+  sed -i 's/if (plane\[id\] == "PROD" \&\& verifiedAgainst\[id\] ~/if (ntype[id] == "claim" \&\& plane[id] == "PROD" \&\& verifiedAgainst[id] ~/' "${mut}/mut-mis.sh"
+  if grep -q 'ntype\[id\] == "claim" && plane\[id\] == "PROD"' "${mut}/mut-mis.sh"; then
+    local mmis; mmis="$(bash "${mut}/mut-mis.sh" "${fxm}" --freshness 2>&1 || true)"
+    if ! printf '%s' "${mmis}" | grep -q 'MISPLANED: E_PROD_MAS_LEU_COMMIT' \
+       && printf '%s' "${mmis}" | grep -q 'MISPLANED: C_PROD_MAS_LEU_BRANCH'; then
+      record_pass "kg-freshness: (t) (MUT) restrito a claim, o evidence escapa — reproduz o modo-de-falha do sinal"
+    else record_fail "kg-freshness: (t) (MUT)" "a restrição por tipo não mudou o veredito; out=${mmis}"; fi
+  else
+    record_fail "kg-freshness: (t) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -1735,7 +1869,64 @@ run_vendor_branch_selftests() {
   else record_fail "vendor-branch: legado baseline §8" "exit=$rcf ou customização clobada"; fi
   git -C "$t4" merge --abort 2>/dev/null || true
 
-  rm -rf "$core" "$t" "$c2" "$t2" "$c3" "$t3" "$c4" "$t4" 2>/dev/null
+  # (g) BASE CRUZADA — duas integration branches divergentes, vendor semeado pelo FALLBACK.
+  #     Sinal de campo 2026-07-27: ~110 arquivos em conflito, incluindo código de aplicação.
+  #     Reproduzido em 3 tentativas; a reprodução DERRUBOU a hipótese inicial (ancestralidade
+  #     dá "sim" nos dois casos e NÃO discrimina). O que discrimina é o conteúdo não-framework.
+  #     O aceite deste gate não é "roda e passa" — é: ele pega o caso que o motivou, E recusa
+  #     ANTES de mergear (a integração tem de ficar INTACTA, senão trocamos 110 conflitos por 110
+  #     conflitos com mensagem bonita).
+  local c5 t5 pin5a pin5b
+  c5="$(mktemp -d)/c5"; t5="$(mktemp -d)/a5"
+  mkdir -p "$c5/.claude/commands"; git -C "$c5" init -q
+  printf 'cmd v1\n' > "$c5/.claude/commands/foo.md"; git -C "$c5" add -A; git -C "$c5" commit -qm "core v1"
+  pin5a="$(git -C "$c5" rev-parse HEAD)"
+  printf 'cmd v2\n' > "$c5/.claude/commands/foo.md"; git -C "$c5" add -A; git -C "$c5" commit -qm "core v2"
+  pin5b="$(git -C "$c5" rev-parse --short=12 HEAD)"
+  mkdir -p "$t5/src"; git -C "$t5" init -q
+  printf 'produto base\n' > "$t5/src/app.js"; git -C "$t5" add -A; git -C "$t5" commit -qm "produto base"
+  git -C "$c5" archive "$pin5a" -- .claude | tar -x -C "$t5"
+  # customização COMMITADA ⇒ _clean_baseline falha ⇒ o seed cai no fallback (HEAD da integração)
+  printf 'CUSTOM do adotante\n' >> "$t5/.claude/commands/foo.md"
+  printf 'source_commit: %s\nrole: adopted\n' "$pin5a" > "$t5/.claude/.onion-version"
+  git -C "$t5" add -A; git -C "$t5" commit -qm "adopt + custom"
+  git -C "$t5" branch chore/onion-framework
+  git -C "$t5" checkout -q -b develop
+  printf 'develop\n' > "$t5/src/app.js"; git -C "$t5" add -A; git -C "$t5" commit -qm "develop diverge"
+  git -C "$t5" checkout -q chore/onion-framework
+  printf 'chore\n' > "$t5/src/app.js"; git -C "$t5" add -A; git -C "$t5" commit -qm "chore diverge"
+  bash "${helper}" update "$t5" "$c5" "$pin5b" chore/onion-framework >/dev/null 2>&1 || true
+  git -C "$t5" checkout -q develop
+  local rcx=0 outx
+  outx="$(bash "${helper}" update "$t5" "$c5" "$pin5b" develop 2>&1)" || rcx=$?
+  local dirty; dirty="$(git -C "$t5" status --porcelain | wc -l)"
+  local uconf; uconf="$(git -C "$t5" diff --name-only --diff-filter=U 2>/dev/null | wc -l)"
+  if [ "$rcx" -eq 11 ] \
+     && printf '%s' "$outx" | grep -q 'BASE CRUZADA' \
+     && printf '%s' "$outx" | grep -q 'src/app.js' \
+     && [ "$dirty" = "0" ] && [ "$uconf" = "0" ]; then
+    record_pass "vendor-branch: (g) base cruzada → exit 11 ANTES do merge, nomeia o arquivo alheio, integração INTACTA"
+  else record_fail "vendor-branch: (g) base cruzada" "exit=$rcx dirty=$dirty conflitos=$uconf out=${outx}"; fi
+
+  # (g-MUT) sem a guarda, o MESMO caso passa a mergear e suja a integração — prova que (g) não é
+  # vacuidade (um gate que nunca dispara passaria em (g) se o caso não fosse realmente cruzado).
+  local mutd; mutd="$(mktemp -d)"
+  sed 's/^  if ! alien="\$(_vendor_is_framework_pure.*$/  if false; then :/' "${helper}" > "${mutd}/mut.sh"
+  if ! grep -q '_vendor_is_framework_pure "\$T"' "${mutd}/mut.sh"; then
+    git -C "$t5" merge --abort 2>/dev/null || true
+    git -C "$t5" reset -q --hard HEAD
+    local rcm=0; bash "${mutd}/mut.sh" update "$t5" "$c5" "$pin5b" develop >/dev/null 2>&1 || rcm=$?
+    local dirtym; dirtym="$(git -C "$t5" status --porcelain | wc -l)"
+    if [ "$rcm" -ne 11 ] && { [ "$rcm" -eq 10 ] || [ "$dirtym" != "0" ]; }; then
+      record_pass "vendor-branch: (g-MUT) sem a guarda o merge acontece e suja a integração — a guarda é load-bearing"
+    else record_fail "vendor-branch: (g-MUT)" "mutação não mudou o desfecho (exit=$rcm dirty=$dirtym) — vacuidade?"; fi
+    git -C "$t5" merge --abort 2>/dev/null || true
+  else
+    record_fail "vendor-branch: (g-MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+  rm -rf "$mutd" 2>/dev/null
+
+  rm -rf "$core" "$t" "$c2" "$t2" "$c3" "$t3" "$c4" "$t4" "$c5" "$t5" 2>/dev/null
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
 }
 
