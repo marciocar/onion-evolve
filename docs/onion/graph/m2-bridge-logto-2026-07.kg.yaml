@@ -691,10 +691,10 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: confirmed
+    status: refuted
     verified_at: 2026-07-26
     verified_against: bridge-config-lido-e-env-medido
-    label: "PERMISSION_MODE e FAIL-OPEN no artefato mais perigoso do sistema. config.ts:26 le `(process.env.PERMISSION_MODE ?? \"bypassPermissions\")` — o DEFAULT, na AUSENCIA da variavel, e o modo irrestrito. Medido no .env vivo: PERMISSION_MODE=bypassPermissions (declarado E efetivo). Se a variavel sumir num update do .env, o bridge NAO degrada para seguro: ele permanece irrestrito, em silencio. E a MESMA regressao silenciosa que o proprio spec combate no BRIDGE_AUTH_MODE (§3.5: 'o estado seguro e o estado SEM configuracao'), aqui invertida e JA VIVA. Fix candidato: inverter o default para o modo restrito e exigir opt-in explicito para bypassPermissions"
+    label: "[CORRIGIDO 2026-07-27 — ver E_p5_identity_live] PERMISSION_MODE era FAIL-OPEN no artefato mais perigoso do sistema. config.ts:26 le `(process.env.PERMISSION_MODE ?? \"bypassPermissions\")` — o DEFAULT, na AUSENCIA da variavel, e o modo irrestrito. Medido no .env vivo: PERMISSION_MODE=bypassPermissions (declarado E efetivo). Se a variavel sumir num update do .env, o bridge NAO degrada para seguro: ele permanece irrestrito, em silencio. E a MESMA regressao silenciosa que o proprio spec combate no BRIDGE_AUTH_MODE (§3.5: 'o estado seguro e o estado SEM configuracao'), aqui invertida e JA VIVA. Fix candidato: inverter o default para o modo restrito e exigir opt-in explicito para bypassPermissions"
 
   - id: C_a2a_pool_empty_admin_bypasses
     node_type: claim
@@ -743,6 +743,30 @@ nodes:
     verified_at: 2026-07-26
     verified_against: token-emitido-e-decodificado
     label: "P4.1 PROVADO — PLANO A. Token client_credentials do app onion-bridge-service com resource=https://bridge.onionevolve.com decodificado (node, base64url nativo): aud=https://bridge.onionevolve.com · scope=bridge:invoke · iss=https://auth.onionevolve.com/oidc · header alg=ES384 typ=at+jwt. O Logto 1.41.0 self-hosted HONRA Resource Indicators (RFC 8707) e emite audiencia vinculada. A escada B1->B2->B3 do §3.6 NAO sera necessaria e o aud-binding do §3.3 se sustenta. ALG A PINAR: ES384 (nao RS256). Prova colateral de que o binding e REAL, e nao decorativo: durante o bootstrap, apresentar um token com aud=https://default.logto.app/api ao endpoint do tenant admin devolveu ERR_JWT_CLAIM_VALIDATION_FAILED/aud — o gate rejeitou o uso errado antes de qualquer codigo nosso"
+
+  - id: E_p5_identity_live
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/bridge-src/identity.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: bridge-reiniciado-e-7-provas-executadas
+    label: "P5 VIVO 2026-07-27. src/identity.ts instalado no bridge (copia REVISAVEL no repo — codigo de seguranca que so existe no host e codigo que ninguem revisa). authGuard tenta OIDC PRIMEIRO; o legado so e alcancavel sob BRIDGE_AUTH_MODE=dual-legacy. Sem `jose`: o bridge e producao SEM repo git e o alg e PINADO (ES384), o que fecha a confusao de algoritmo — em troca, cada caso negativo foi PROVADO contra o issuer vivo. Verificacao ES384 = ECDSA P-384 + SHA-384 com assinatura IEEE-P1363 (nao DER). Fail-closed em toda excecao (JWKS fora do ar nao vira 'pode entrar'). JWKS com cache 1h + piso de re-fetch 60s (kid desconhecido pode ser rotacao, mas re-buscar por request faria de um token forjado um amplificador de DoS). Assert de boot: 'JWKS OK (1 chave ES384) | auth: dual-legacy'. PROVAS 7/7 contra app.onionevolve.com/commands: OIDC valido 200 · legado 200 (janela) · sem token 401 · aud de OUTRO recurso 401 · sem scope bridge:invoke 401 · assinatura adulterada 401 · lixo 401. BONUS: C_permission_mode_fail_open CORRIGIDO — o default do PERMISSION_MODE deixou de ser bypassPermissions"
+
+  - id: C_pwa_has_no_pkce
+    node_type: claim
+    trace: /home/onion/onion-bridge/web/src/App.tsx:21
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: grep-no-fonte-da-pwa
+    label: "O FLIP ESTA BLOQUEADO, e nao pelo que o spec supunha. A PWA NAO TEM UMA LINHA DE OIDC/PKCE: grep por code_verifier|pkce|oidc|authorize|logto em web/src e public devolve ZERO; ela obtem o token de getToken() (convite colado pelo usuario). Logo, flipar agora (remover BRIDGE_AUTH_MODE) trancaria o caminho HUMANO inteiro — o lockout que o spec teme, pela porta que o spec nao olhou. O P6 nao e formalidade ('os dois chamadores mandam Bearer'): para a PWA e implementar Authorization Code + PKCE de verdade (redirect ao authorize com code_challenge, rota /callback ja registrada como redirect URI do app SPA, troca do code com code_verifier, storage, refresh). CONSEQUENCIA DE ESCOPO: o item 1 fica num plato seguro (mecanismo pronto e provado, rollback de uma linha) e o P6 merece passada propria"
 
 edges:
   - from: E_bridge_source_read
@@ -1051,6 +1075,23 @@ edges:
     edge_type: SUPPORTS
   - from: E_p4_rfc8707_proven
     to: Q_resource_indicators
+    edge_type: SUPPORTS
+  - from: E_p5_identity_live
+    to: D_gate_oidc_dual
+    edge_type: SUPPORTS
+  - from: E_p5_identity_live
+    to: D_fail_closed_default
+    edge_type: SUPPORTS
+  # O default fail-open do PERMISSION_MODE foi corrigido junto do P5.
+  - from: E_p5_identity_live
+    to: C_permission_mode_fail_open
+    edge_type: REFUTES
+  # O bloqueio real do flip — e ele nao estava no runbook.
+  - from: C_pwa_has_no_pkce
+    to: A_flip_steps_reversible
+    edge_type: CONSTRAINS
+  - from: C_pwa_has_no_pkce
+    to: C_identity_hole
     edge_type: SUPPORTS
   - from: E_p0_logto_tenant_measured
     to: D_gate_oidc_dual
