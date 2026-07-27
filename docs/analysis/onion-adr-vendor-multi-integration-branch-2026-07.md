@@ -106,6 +106,27 @@ limpo.
 - Casos com **três ou mais** integration branches não foram exercitados. A convenção D2 se estende por
   construção, mas isso é inferência, não medição.
 
+## Desfecho de campo (2026-07-27, mesmo dia) — e um falso-vermelho meu
+
+O adotante aplicou a receita e reportou o resultado. **As duas integration branches ficaram no mesmo
+pin, cada uma com vendor próprio, zero conflito.** A convenção por-branch (**D2**) foi adotada por eles
+**antes** de este ADR ser publicado — fica como precedente de campo, não como sugestão do core.
+
+**O erro foi meu, e é simétrico ao que combatemos.** Eu instruí *"se vier o ⚠️ 'legado entrelaçado',
+PARE"*. O ⚠️ disparou — corretamente, porque de fato não havia baseline limpa — e mesmo assim o
+desfecho certo era **seguir**: o entrelaçamento era só framework velho, não customização; vendor
+re-semeado do HEAD da **mesma** branch dá 3-way trivial e delta só de framework (194 arquivos de
+framework, **0 de produto**). Transformar *"revise"* em *"pare"* é **falso-vermelho** — trava operação
+segura e ensina a ignorar o aviso.
+
+**Regra revista:** o ⚠️ é *revise o merge*; o sinal de parada é o **exit 11**, não o aviso.
+
+O adotante propôs que o critério do guard fosse *"o merge toca paths fora do manifesto?"* — que é
+**exatamente** o que `_vendor_is_framework_pure` faz, só que **antes** de mergear. Reproduzido para
+confirmar (fixture: sem baseline limpa, vendor do HEAD da própria branch): `exit 0`, merge
+framework-only, produto intacto. Eles chegaram ao critério pela experiência, o teste chegou pela
+medição — convergência independente.
+
 ## Crédito
 
 O caso, o diagnóstico inicial e o pedido de guard vieram do **metagamify** (adotante), no sinal de

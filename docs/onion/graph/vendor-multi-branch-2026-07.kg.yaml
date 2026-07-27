@@ -111,6 +111,30 @@ nodes:
     verified_against: fixture-vs-repo-do-adotante
     label: "Reproduzimos a CLASSE (conflito contabil em codigo de aplicacao por vendor branch-especifico), NAO os 110 arquivos. O volume depende da divergencia real do repo do adotante e nao foi medido la. Nao afirmar igualdade"
 
+  - id: C_warn_is_not_a_stop
+    node_type: claim
+    trace: docs/evolution/inbox/_processed/2026-07-27-desfecho-receita-develop-warn-falso-positivo.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: desfecho-do-adotante-e-fixture-reproduzida
+    label: "FALSO-VERMELHO MEU. Eu instrui 'se vier o warn legado-entrelacado, PARE'. O warn disparou CORRETAMENTE (nao havia baseline limpa) e mesmo assim o desfecho certo era SEGUIR: o entrelacamento era so framework VELHO, nao customizacao. Vendor re-semeado do HEAD da MESMA branch da 3-way trivial — o adotante mediu 194 arquivos de framework e ZERO de produto. Transformar 'revise' em 'pare' e o erro SIMETRICO ao falso-verde: trava operacao segura e ensina a ignorar o aviso. REGRA REVISTA: o warn e 'revise o merge'; o sinal de parada e o EXIT 11, nao o aviso"
+
+  - id: E_guard_already_covers
+    node_type: evidence
+    trace: .claude/utils/adopt/vendor-branch.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: fixture-do-caso-do-adotante-executada
+    label: "O adotante propos que o criterio fosse 'o merge toca paths FORA do manifesto?' — que e EXATAMENTE o que _vendor_is_framework_pure ja faz, so que ANTES de mergear (eles tiveram que revisar 194 arquivos para concluir framework-only; o guard conclui sem sujar a arvore). REPRODUZIDO em vez de deduzido: fixture sem baseline limpa, vendor do HEAD da propria develop, produto divergente => exit 0, 2 arquivos de framework, 0 de app, produto intacto. Convergencia INDEPENDENTE: eles chegaram pelo uso, o teste chegou pela medicao das duas fixtures"
+
 edges:
   - from: E_reproduction_3_tries
     to: C_cause_is_two_branches
@@ -142,3 +166,12 @@ edges:
   - from: Q_volume_not_reproduced
     to: C_field_report
     edge_type: DEPENDS_ON
+  - from: C_warn_is_not_a_stop
+    to: D_structural_guard
+    edge_type: CONSTRAINS
+  - from: E_guard_already_covers
+    to: D_structural_guard
+    edge_type: SUPPORTS
+  - from: E_guard_already_covers
+    to: C_warn_is_not_a_stop
+    edge_type: SUPPORTS
