@@ -763,9 +763,10 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: confirmed
+    status: refuted
     verified_at: 2026-07-27
     verified_against: grep-no-fonte-da-pwa
+    superseded_note: "fechado pelo P6 — ver E_p6_pkce_live"
     label: "O FLIP ESTA BLOQUEADO, e nao pelo que o spec supunha. A PWA NAO TEM UMA LINHA DE OIDC/PKCE: grep por code_verifier|pkce|oidc|authorize|logto em web/src e public devolve ZERO; ela obtem o token de getToken() (convite colado pelo usuario). Logo, flipar agora (remover BRIDGE_AUTH_MODE) trancaria o caminho HUMANO inteiro — o lockout que o spec teme, pela porta que o spec nao olhou. O P6 nao e formalidade ('os dois chamadores mandam Bearer'): para a PWA e implementar Authorization Code + PKCE de verdade (redirect ao authorize com code_challenge, rota /callback ja registrada como redirect URI do app SPA, troca do code com code_verifier, storage, refresh). CONSEQUENCIA DE ESCOPO: o item 1 fica num plato seguro (mecanismo pronto e provado, rollback de uma linha) e o P6 merece passada propria"
 
   - id: C_scaffold_removed_proof_was_invalid
@@ -779,6 +780,18 @@ nodes:
     verified_at: 2026-07-27
     verified_against: caddy-conf-e-handshake-tls-medidos
     label: "ANDAIME REMOVIDO + UMA PROVA MINHA ERA INVALIDA. (a) O vhost loopback do console cumpriu o proposito (quebrar o bootstrap circular) e foi REMOVIDO — andaime nao sobrevive ao proposito, e o estado seguro e o estado SEM configuracao. Host restaurado ao exato anterior: so o listener publico pre-existente; o SNI console.onionevolve.com volta a RECUSAR handshake (no peer certificate). (b) A PROVA QUE EU DEI ONTEM ERA INVALIDA: `curl https://console.onionevolve.com` devolveu HTTP 000 e eu li como 'nao responde' — 000 ali era o curl RECUSANDO O CERTIFICADO, nao ausencia de servico. Medi outra coisa e declarei a conclusao certa. Re-medido corretamente com -k e comparacao de bytes contra controle de loopback: publico devolve 200 com 0 BYTES em / e /console e /oidc/token e /oidc/.well-known e /api/.well-known; loopback devolve 2295 bytes. A conclusao ('nada do console exposto') SOBREVIVE, a prova nao. E o mesmo modo-de-falha do UNANCHORED — carimbo no artefato errado — cometido por mim no dia em que o mecanizei. (c) O DNS console.onionevolve.com -> 179.197.65.94 JA EXISTIA; nao foi criado nesta sessao. (d) O conhecimento virou MECANISMO: pre-flight no script falha com exit 6 e entrega o comando exato do andaime, em vez do `invalid_client` mudo que custou uma sessao para diagnosticar"
+
+  - id: E_p6_pkce_live
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/bridge-src/web-oidc.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: bundle-servido-e-authorize-medidos
+    label: "P6 VIVO 2026-07-27 — a PWA agora faz Authorization Code + PKCE. TRES escolhas de desenho: (1) client PUBLICO, zero segredo no device; (2) redirect na RAIZ e nao /callback, porque o bridge serve a PWA com catch-all estatico SEM fallback de SPA — /callback daria 404 e exigiria mudar o roteamento do servidor; na raiz o ?code= chega e o app limpa a URL com replaceState: ZERO mudanca no servidor; (3) getToken() continua SINCRONO — e a costura unica por onde todo o app ja passava, entao o login entra por ali e nada mais muda. BURACO DO P3 FECHADO no caminho: todas as roles eram MachineToMachine e o usuario NAO TINHA ROLE — o token humano sairia sem bridge:invoke e o gate recusaria: login funcionaria e acesso nao, o pior desfecho (parece configurado, nao e). Criada role bridge-user (type User) com o scope, atribuida. PROVAS: 6/6 marcas de PKCE no bundle SERVIDO (nao no build), authorize com os parametros reais devolve 303 -> /sign-in?app_id=<spa>, banco confirma marcio->bridge-user->bridge:invoke, redirect URIs raiz+/callback, refresh token 14d. Regressao: OIDC 200 · convite legado 200 (janela) · sem token 401 · PWA 200. FRONTEIRA: o login humano completo (senha + troca do code) NAO foi executado — exige browser; e o passo do maestro"
 
 edges:
   - from: E_bridge_source_read
@@ -1104,6 +1117,12 @@ edges:
     edge_type: CONSTRAINS
   - from: C_pwa_has_no_pkce
     to: C_identity_hole
+    edge_type: SUPPORTS
+  - from: E_p6_pkce_live
+    to: C_pwa_has_no_pkce
+    edge_type: REFUTES
+  - from: E_p6_pkce_live
+    to: D_gate_oidc_dual
     edge_type: SUPPORTS
   - from: C_scaffold_removed_proof_was_invalid
     to: C_console_not_the_path

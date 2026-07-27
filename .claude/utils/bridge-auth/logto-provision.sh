@@ -27,7 +27,8 @@ APPLY=0
 BRIDGE_USER="marcio"
 RESOURCE_INDICATOR="https://bridge.onionevolve.com"
 SCOPE_NAME="bridge:invoke"
-ROLE_NAME="bridge-operator"
+ROLE_NAME="bridge-operator"      # M2M — o chamador SERVIÇO
+USER_ROLE_NAME="bridge-user"     # User — a PESSOA (tipo diferente no Logto; a M2M não serve)
 PASS_FILE="/root/.onion-logto-bootstrap"
 PG_CONTAINER="onion-logto-postgres"
 # BOOTSTRAP CIRCULAR, e como se quebra (medido 2026-07-26):
@@ -222,6 +223,33 @@ else
   say "   criado (id=${_spa:-DRY-RUN})"
 fi
 
+# --- 5b. redirect URIs do app SPA ------------------------------------------
+# A PWA usa a RAIZ como redirect, não /callback: o bridge serve a PWA com um catch-all
+# estático SEM fallback de SPA, então /callback daria 404 e exigiria mudar o roteamento do
+# servidor. Na raiz o `?code=` chega e o app limpa a URL — zero mudança no servidor.
+# /callback fica registrado também, para não quebrar nada que já aponte para lá.
+step "5b. redirect URIs do app SPA (raiz + /callback)"
+if [ "${APPLY}" = "1" ] && [ -n "${_spa:-}" ]; then
+  _cur="$(api GET "/applications/${_spa}" | jq -c '.oidcClientMetadata.redirectUris // []')"
+  if printf '%s' "${_cur}" | jq -e 'index("https://app.onionevolve.com/")' >/dev/null 2>&1; then
+    say "   raiz já registrada"
+  else
+    api PATCH "/applications/${_spa}" \
+      '{"oidcClientMetadata":{"redirectUris":["https://app.onionevolve.com/","https://app.onionevolve.com/callback"],"postLogoutRedirectUris":["https://app.onionevolve.com/"]}}' >/dev/null
+    say "   raiz adicionada aos redirect URIs"
+  fi
+  # Refresh token: sem isto o humano re-loga a cada hora (accessTokenTtl=3600).
+  if api GET "/applications/${_spa}" | jq -e '.customClientMetadata.alwaysIssueRefreshToken == true' >/dev/null 2>&1; then
+    say "   refresh token já habilitado"
+  else
+    api PATCH "/applications/${_spa}" \
+      '{"customClientMetadata":{"alwaysIssueRefreshToken":true,"refreshTokenTtlInDays":14}}' >/dev/null
+    say "   refresh token habilitado (14 dias)"
+  fi
+else
+  say "   [DRY-RUN ou app ausente] registraria a raiz e habilitaria refresh token"
+fi
+
 # --- 6. role bridge-operator + scope + atribuicao ao app M2M ---------------
 # Sem role o app M2M NAO recebe bridge:invoke — o token sai sem scope e o gate do §3.3
 # (que exige scope, nao so audiencia) recusa. Este passo faltou na 1a versao do script:
@@ -250,6 +278,36 @@ if [ "${APPLY}" = "1" ] && [ -n "${_sid:-}" ] && [ -n "${_m2m:-}" ]; then
   fi
 else
   say "   [DRY-RUN ou pré-requisito ausente] criaria role ${ROLE_NAME} e atribuiria ao app M2M"
+fi
+
+# --- 7. role de USUÁRIO + atribuição ao humano -----------------------------
+# BURACO FECHADO 2026-07-27: o passo 6 criava só a role M2M. Um usuário humano SEM role sai com
+# token sem `bridge:invoke`, e o requireScope do bridge recusa — o login funcionaria e o acesso
+# não, que é o pior desfecho possível (parece configurado, não é). Role de usuário é OUTRO tipo
+# no Logto (`type: User`); a M2M não serve para pessoa.
+step "7. role ${USER_ROLE_NAME} (User) + scope + atribuição a '${BRIDGE_USER}'"
+if [ "${APPLY}" = "1" ] && [ -n "${_sid:-}" ] && [ -n "${_uid:-}" ]; then
+  _roles="$(api GET "/roles")"
+  _urid="$(printf '%s' "${_roles}" | jq -r --arg n "${USER_ROLE_NAME}" '.[]? | select(.name==$n) | .id' | head -1)"
+  if [ -n "${_urid}" ]; then
+    say "   role já existe (id=${_urid})"
+  else
+    _urid="$(api POST "/roles" "$(jq -nc --arg n "${USER_ROLE_NAME}" --arg s "${_sid}" \
+      '{name:$n, description:"Humano que opera o onion-bridge pela PWA", type:"User", scopeIds:[$s]}')" \
+      | jq -r '.id // empty')"
+    say "   role criada (id=${_urid:-FALHOU})"
+  fi
+  if [ -n "${_urid}" ]; then
+    _users_of_role="$(api GET "/roles/${_urid}/users")"
+    if printf '%s' "${_users_of_role}" | jq -e --arg u "${_uid}" '.[]? | select(.id==$u)' >/dev/null 2>&1; then
+      say "   usuário já atribuído à role"
+    else
+      api POST "/roles/${_urid}/users" "$(jq -nc --arg u "${_uid}" '{userIds:[$u]}')" >/dev/null
+      say "   usuário atribuído à role"
+    fi
+  fi
+else
+  say "   [DRY-RUN ou pré-requisito ausente] criaria role ${USER_ROLE_NAME} e atribuiria ao usuário"
 fi
 
 step "RESUMO"
