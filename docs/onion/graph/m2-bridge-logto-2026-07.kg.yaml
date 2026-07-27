@@ -36,7 +36,9 @@ nodes:
     impact: 5
     confidence: 0.9
     status: open
-    label: "BURACO VIVO: o bridge (app.onionevolve.com) roda o Agent SDK com --permission-mode bypassPermissions contra um clone do core no VPS, e o ÚNICO portão de entrada é posse de um AUTH_TOKEN estático (segredo compartilhado, não identidade). Sem QUEM (0 usuario/papel/tier), sem RBAC (nao distingue ler de mutar), sem vinculo a members.yaml/Logto"
+    verified_at: 2026-07-27
+    verified_against: host-vps-medido-pos-flip
+    label: "[EIXO DE EXECUÇÃO FECHADO 2026-07-27 — flip P7, ver E_p7_flip_live. /chat e /commands só entram por identidade OIDC (JWT Logto aud=bridge scope=bridge:invoke); o AUTH_TOKEN não abre mais execução com bypassPermissions. RESIDUAL VIVO, por isso status=open: AUTH_TOKEN ainda abre /admin e /a2a (sem QUEM ali) + a credencial OIDC agora mora no device (C_pkce_moves_credential_to_device) + P9 gated (C_p9_blocked_no_admin_oidc).] ORIGEM (verdadeiro até o flip): BURACO VIVO: o bridge (app.onionevolve.com) roda o Agent SDK com --permission-mode bypassPermissions contra um clone do core no VPS, e o ÚNICO portão de entrada é posse de um AUTH_TOKEN estático (segredo compartilhado, não identidade). Sem QUEM (0 usuario/papel/tier), sem RBAC (nao distingue ler de mutar), sem vinculo a members.yaml/Logto"
 
   - id: C_real_precedent
     node_type: claim
@@ -56,7 +58,9 @@ nodes:
     impact: 3
     confidence: 0.8
     status: open
-    label: "Mitigação parcial existente NÃO cobre o bridge: a2a-verify.sh (6 camadas, fail-safe) gateia SÓ o canal /a2a (handshake entre cores, propose-only) — canal diferente e mais estreito. O bridge/PWA mobile segue autenticado só por AUTH_TOKEN + bypassPermissions irrestrito"
+    verified_at: 2026-07-27
+    verified_against: host-vps-medido-pos-flip
+    label: "[ATUALIZADO 2026-07-27 pós-flip P7: a cláusula final CAIU — o bridge/PWA NÃO segue mais autenticado só por AUTH_TOKEN; /chat e /commands agora exigem OIDC. Medido: /a2a segue caso à parte (a2aGuard não olha authMode) — 403 com token a2a = gate vivo, 3 tokens dedicados no pool.] Mitigação parcial existente NÃO cobre o bridge: a2a-verify.sh (6 camadas, fail-safe) gateia SÓ o canal /a2a (handshake entre cores, propose-only) — canal diferente e mais estreito"
 
   # ---- ENTIDADES (o terreno) ----
   - id: E_logto_live
@@ -79,7 +83,9 @@ nodes:
     impact: 4
     confidence: 0.9
     status: open
-    label: "AUTH_TOKEN próprio do bridge — segredo estático/compartilhado do serviço, não ligado a members.yaml nem a papel/tier. É o artefato a APOSENTAR (P9), IMEDIATAMENTE após o verde do P8 (não 'dias depois' — enquanto legacyAuthTokenOk() existir no binário, uma env mal reposta o reativa)"
+    verified_at: 2026-07-27
+    verified_against: host-vps-medido-pos-flip
+    label: "[PÓS-FLIP 2026-07-27: REBAIXADO — não abre mais /chat nem /commands (execução exige OIDC). Sobrevive como chave de /admin (adminGuard) e /a2a (a2aGuard), que não olham o authMode. P9 (aposentar de vez) NÃO feito: gated em C_p9_blocked_no_admin_oidc, senão o /admin/* morre sem reposição.] AUTH_TOKEN próprio do bridge — segredo estático/compartilhado do serviço, não ligado a members.yaml nem a papel/tier. Era o artefato a APOSENTAR (P9) imediatamente após o P8; a janela dual-legacy fechou no P7, mas o valor sobrevive para admin/a2a"
 
   # ---- FIX G: A CITAÇÃO DE I3 ESTAVA ERRADA (a POSTURA se mantém, a âncora muda) ----
   - id: C_i3_miscited
@@ -793,6 +799,31 @@ nodes:
     verified_against: bundle-servido-e-authorize-medidos
     label: "P6 VIVO 2026-07-27 — a PWA agora faz Authorization Code + PKCE. TRES escolhas de desenho: (1) client PUBLICO, zero segredo no device; (2) redirect na RAIZ e nao /callback, porque o bridge serve a PWA com catch-all estatico SEM fallback de SPA — /callback daria 404 e exigiria mudar o roteamento do servidor; na raiz o ?code= chega e o app limpa a URL com replaceState: ZERO mudanca no servidor; (3) getToken() continua SINCRONO — e a costura unica por onde todo o app ja passava, entao o login entra por ali e nada mais muda. BURACO DO P3 FECHADO no caminho: todas as roles eram MachineToMachine e o usuario NAO TINHA ROLE — o token humano sairia sem bridge:invoke e o gate recusaria: login funcionaria e acesso nao, o pior desfecho (parece configurado, nao e). Criada role bridge-user (type User) com o scope, atribuida. PROVAS: 6/6 marcas de PKCE no bundle SERVIDO (nao no build), authorize com os parametros reais devolve 303 -> /sign-in?app_id=<spa>, banco confirma marcio->bridge-user->bridge:invoke, redirect URIs raiz+/callback, refresh token 14d. Regressao: OIDC 200 · convite legado 200 (janela) · sem token 401 · PWA 200. FRONTEIRA: o login humano completo (senha + troca do code) NAO foi executado — exige browser; e o passo do maestro"
 
+  # ---- P7 O FLIP EXECUTADO 2026-07-27 (carta branca do maestro) ----
+  - id: E_p7_flip_live
+    node_type: evidence
+    trace: /home/onion/onion-bridge/.env
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: bridge-reiniciado-e-gates-medidos-pos-flip
+    label: "P7 O FLIP EXECUTADO 2026-07-27 (carta branca do maestro). Removida a linha BRIDGE_AUTH_MODE=dual-legacy do .env (backup .env.bak-pre-flip-20260727-152720; rollback = re-adicionar + restart, segundos) e systemctl restart onion-bridge. Boot mede 'JWKS OK (1 chave ES384) | auth: ENFORCE' e o AVISO dual-legacy SUMIU. PROVAS em localhost:8787 (probe barato /commands, que NAO dispara o Agent SDK): sem token 401 · AUTH_TOKEN legado 401 (era 200 na baseline pre-flip) · convite courtesy 401 (era 200) · POST /chat com AUTH_TOKEN 401 (barrado no gate, agente nao roda). CONTROLES intactos: /health 200 · PWA raiz 200 · /admin/tokens com AUTH_TOKEN 200 (adminGuard nao olha authMode) · /a2a com token a2a 403 (handler, nao 401 — gate vivo). ESCOPO: so P7 por decisao do maestro; convites courtesy/byok podem ser cortados (sem usuario dependente). PROVA POSITIVA FECHADA 2026-07-27: login humano OIDC na PWA -> /chat EXECUTOU o Agent SDK (custo/tokens medidos na propria UI) e /commands 200 (menu de comandos carregou). PRE-REQUISITO DESCOBERTO NO CAMINHO: o maestro criou a conta 'marciocar' por SIGN-UP (o sign-up do Logto esta ABERTO — P3.4 nunca executado) e ela nasceu SEM role; a camada 2 do RBAC (D_rbac_two_layers) SEGUROU — token sem scope bridge:invoke -> 401 — e o acesso so liberou apos atribuir a role bridge-user a marciocar (INSERT em users_roles no DB do Logto + re-login). /admin/stats segue 401 sob OIDC: ESPERADO, confirma C_p9_blocked_no_admin_oidc (adminGuard so AUTH_TOKEN, Identity OIDC sem conceito de admin). GAP ABERTO: sign-up do tenant default ABERTO (fechar = P3.4)."
+
+  - id: C_p9_blocked_no_admin_oidc
+    node_type: claim
+    trace: /home/onion/onion-bridge/src/server.ts:27
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: open
+    verified_at: 2026-07-27
+    verified_against: bridge-source-lido-pos-flip
+    label: "P9 NAO pode seguir 'na mesma janela do P8' como manda D_retire_legacy_immediately — ACHADO do flip (dogfood). Medido no server.ts: adminGuard (~linha 27) aceita APENAS config.authToken; a2aGuard (~linha 38) aceita config.authToken OU a2aTokens; NENHUM dos dois olha o authMode nem chama verifyAccessToken. E o Identity OIDC (identity.ts) so tem subject/scopes/isMachine — SEM conceito de admin. Logo apagar o AUTH_TOKEN (P9) mataria o /admin/* inteiro (401 sempre, sem reposicao) e o caminho admin do /a2a. A doutrina 'aposentar imediatamente' assumia legado==execucao; mas o AUTH_TOKEN tambem carrega admin/a2a, superficies que o OIDC ainda nao cobre. PRE-REQUISITO do P9: um caminho admin via OIDC (scope/sub -> admin) — trabalho NAO feito, decidido GATED com o maestro em 2026-07-27."
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -1157,3 +1188,32 @@ edges:
   - from: C_a2a_pool_empty_admin_bypasses
     to: Q_a2a_after_flip
     edge_type: CONSTRAINS
+
+  # ---- P7 O FLIP EXECUTADO 2026-07-27 (carta branca) ----
+  # A decisao central agora VIVE: identidade OIDC e o unico caminho de execucao.
+  - from: E_p7_flip_live
+    to: D_gate_oidc_dual
+    edge_type: SUPPORTS
+  - from: E_p7_flip_live
+    to: D_fail_closed_default
+    edge_type: SUPPORTS
+  # o flip so foi seguro porque o P6 pos o PKCE no bundle SERVIDO — senao lockout humano.
+  - from: E_p7_flip_live
+    to: E_p6_pkce_live
+    edge_type: DEPENDS_ON
+  # CONSTRAINS, nao REFUTES: o eixo de EXECUCAO do buraco fechou (AUTH_TOKEN nao abre /chat|/commands),
+  # mas o residual segue vivo (AUTH_TOKEN ainda abre /admin e /a2a; credencial OIDC no device; P9 gated).
+  - from: E_p7_flip_live
+    to: C_identity_hole
+    edge_type: CONSTRAINS
+  # o AUTH_TOKEN foi rebaixado de "portao unico" a "chave de admin/a2a" — nao aposentado.
+  - from: E_p7_flip_live
+    to: E_auth_token
+    edge_type: CONSTRAINS
+  # ACHADO do flip: a doutrina "aposentar imediatamente" nao pode rodar — admin/a2a nao tem caminho OIDC.
+  - from: C_p9_blocked_no_admin_oidc
+    to: D_retire_legacy_immediately
+    edge_type: CONSTRAINS
+  - from: C_p9_blocked_no_admin_oidc
+    to: E_auth_token
+    edge_type: SUPPORTS
