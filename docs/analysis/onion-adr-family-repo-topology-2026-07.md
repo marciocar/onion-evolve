@@ -2,7 +2,7 @@
 title: 'ADR — Topologia de repositórios da família Onion: core selável + doors + apps'
 date: 2026-07-19
 type: adr
-status: aceito (F0-F1 doutrina; F2+ execução gated fora deste worktree)
+status: aceito (F0-F1 doutrina; F2 executada 2026-07-19 — onion-standalone público; F3+ execução gated fora deste worktree)
 decision-scope: meta / família-onion / distribuição / topologia-de-repos
 supersedes: none
 extends: onion-adr-claude-door-topology-2026-07.md
@@ -20,8 +20,9 @@ related:
 
 # ADR — Topologia de repositórios da família Onion
 
-> **Status: ACEITO (2026-07-19).** F0-F1 (doutrina/taxonomia) decididos aqui; F2+ (nascer os repos
-> públicos, extrair site/hub) são execução **gated**, fora deste worktree, sob gate do maestro.
+> **Status: ACEITO (2026-07-19).** F0-F1 (doutrina/taxonomia) decididos aqui; **F2 executada em 2026-07-19**
+> (a 1ª porta `onion-standalone` nasceu e flipou pública — verificado ao vivo; resta só reapontar o redirect).
+> F3+ (extrair site/hub, demais portas) seguem execução **gated**, fora deste worktree, sob gate do maestro.
 > Este ADR **resolve** a D2 pendente do [door-topology ADR](onion-adr-claude-door-topology-2026-07.md).
 
 ## Contexto
@@ -108,7 +109,7 @@ drift-guard) é **`gated-until-trigger`** — nasce só quando ≥2 doors provar
 |---|---|---|
 | F0 | Ratificar topologia (este ADR) + doutrina `porta≠core` (§tipos de repo) | ✅ 2026-07-19 (este worktree) |
 | F1 | Selar a fronteira (D4) — escrito; reusa `roles.yaml` | ✅ 2026-07-19 (doutrina) |
-| F2 | 1ª porta `onion-standalone` (≡`onion-claude`): adopt role-scoped → push; re-apontar redirect; registrar em members.yaml (pin verificado) | ⏳ gated (repo público, fora da árvore) |
+| F2 | 1ª porta `onion-standalone` (≡`onion-claude`): adopt role-scoped → push; registrar em members.yaml (pin verificado) | ✅ 2026-07-19 (repo **PÚBLICO**, verificado ao vivo; pin `514dda8`). Resta gated só **reapontar o redirect** `onion-claude→onion-standalone` (`onion-claude` segue privado) |
 | F3 | `onion-site`: extrair `site/` p/ repo próprio (⚠️ webroot mistura 3 fontes — cuidado com `rsync --delete`) | ⏳ gated |
 | F4 | `onion-hub`: des-congelar + re-narrar (deriva da identity KB) | ⏳ gated |
 | F5 | Automação `project-door.sh` (assemble→push + drift-guard) | ⏳ gated (≥2 doors provarem o padrão) |
