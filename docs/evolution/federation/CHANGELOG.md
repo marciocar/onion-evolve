@@ -8,6 +8,27 @@
 
 ---
 
+## 2026-07-27 · Guard de BASE CRUZADA no `--update` (múltiplas integration branches) · COMPATÍVEL · alvo: todos
+
+- **Crédito: sinal de campo do metagamify (2026-07-27).** Um adotante com **duas integration branches
+  vivas e divergentes** rodou `--update` na segunda e recebeu **~110 arquivos em conflito**, incluindo
+  código de aplicação. Abortou limpo e sinalizou upstream.
+- **A causa NÃO é ter duas branches** — isso foi refutado pela reprodução no core (com a baseline limpa
+  disponível, o update funciona nas duas, 0 conflitos). O gatilho é o **caminho de fallback** do seed:
+  sem commit na história da integração cujo framework seja idêntico ao pin adotado (o "legado
+  entrelaçado", típico de quem **customizou** framework), o `onion/vendor` é ramificado do **HEAD** e
+  passa a carregar o **snapshot de produto daquela branch**, ficando casado com ela.
+- **O que muda:** `vendor-branch.sh` agora **recusa antes de mergear** (**exit 11**) quando o vendor
+  difere da base do merge em arquivos que **não** são framework. A recusa nomeia os arquivos alheios e
+  entrega o conserto. A integração fica **intacta** — recusar depois de sujar a árvore seria trocar
+  110 conflitos por 110 conflitos com mensagem bonita.
+- **Convenção:** havendo mais de uma integration branch adotada, use `onion/vendor-<branch>`. Vendor de
+  **baseline limpa** pode servir duas branches — proíbe-se o contaminado, não o compartilhamento.
+- **Ação p/ adotantes:** nenhuma se você tem **uma** integration branch (nada muda; retrocompatível).
+  Com duas: o próximo `--update` na segunda vai recusar com instrução em vez de despejar conflitos.
+- ADR: `docs/analysis/onion-adr-vendor-multi-integration-branch-2026-07.md` · KG:
+  `docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml` · testes: `run_vendor_branch_selftests` (g) e (g-MUT).
+
 ## 2026-07-24 · `/meta:personality-sync` — personalidade emergente (RFC-0003 F2) · COMPATÍVEL · alvo: metagamify, pulse-mais, granaai, gustavo-pulga, onion-standalone
 
 - Novo comando `/meta:personality-sync` (RFC-0003 §2.4, Fase 2): gera `.claude/identity/personality.md` a partir da **evidência de uso** da instância — diário, `.onion-version`, os 30 primeiros commits. A personalidade **emerge do uso**, não é declarada; é projeção A2A-card one-way (não fonte de verdade) e **regenera** a cada sync. Substitui o `personality_summary` seed-manual pré-F2 por um emergente e ancorado.

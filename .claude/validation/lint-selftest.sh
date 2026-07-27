@@ -1829,7 +1829,64 @@ run_vendor_branch_selftests() {
   else record_fail "vendor-branch: legado baseline §8" "exit=$rcf ou customização clobada"; fi
   git -C "$t4" merge --abort 2>/dev/null || true
 
-  rm -rf "$core" "$t" "$c2" "$t2" "$c3" "$t3" "$c4" "$t4" 2>/dev/null
+  # (g) BASE CRUZADA — duas integration branches divergentes, vendor semeado pelo FALLBACK.
+  #     Sinal de campo 2026-07-27: ~110 arquivos em conflito, incluindo código de aplicação.
+  #     Reproduzido em 3 tentativas; a reprodução DERRUBOU a hipótese inicial (ancestralidade
+  #     dá "sim" nos dois casos e NÃO discrimina). O que discrimina é o conteúdo não-framework.
+  #     O aceite deste gate não é "roda e passa" — é: ele pega o caso que o motivou, E recusa
+  #     ANTES de mergear (a integração tem de ficar INTACTA, senão trocamos 110 conflitos por 110
+  #     conflitos com mensagem bonita).
+  local c5 t5 pin5a pin5b
+  c5="$(mktemp -d)/c5"; t5="$(mktemp -d)/a5"
+  mkdir -p "$c5/.claude/commands"; git -C "$c5" init -q
+  printf 'cmd v1\n' > "$c5/.claude/commands/foo.md"; git -C "$c5" add -A; git -C "$c5" commit -qm "core v1"
+  pin5a="$(git -C "$c5" rev-parse HEAD)"
+  printf 'cmd v2\n' > "$c5/.claude/commands/foo.md"; git -C "$c5" add -A; git -C "$c5" commit -qm "core v2"
+  pin5b="$(git -C "$c5" rev-parse --short=12 HEAD)"
+  mkdir -p "$t5/src"; git -C "$t5" init -q
+  printf 'produto base\n' > "$t5/src/app.js"; git -C "$t5" add -A; git -C "$t5" commit -qm "produto base"
+  git -C "$c5" archive "$pin5a" -- .claude | tar -x -C "$t5"
+  # customização COMMITADA ⇒ _clean_baseline falha ⇒ o seed cai no fallback (HEAD da integração)
+  printf 'CUSTOM do adotante\n' >> "$t5/.claude/commands/foo.md"
+  printf 'source_commit: %s\nrole: adopted\n' "$pin5a" > "$t5/.claude/.onion-version"
+  git -C "$t5" add -A; git -C "$t5" commit -qm "adopt + custom"
+  git -C "$t5" branch chore/onion-framework
+  git -C "$t5" checkout -q -b develop
+  printf 'develop\n' > "$t5/src/app.js"; git -C "$t5" add -A; git -C "$t5" commit -qm "develop diverge"
+  git -C "$t5" checkout -q chore/onion-framework
+  printf 'chore\n' > "$t5/src/app.js"; git -C "$t5" add -A; git -C "$t5" commit -qm "chore diverge"
+  bash "${helper}" update "$t5" "$c5" "$pin5b" chore/onion-framework >/dev/null 2>&1 || true
+  git -C "$t5" checkout -q develop
+  local rcx=0 outx
+  outx="$(bash "${helper}" update "$t5" "$c5" "$pin5b" develop 2>&1)" || rcx=$?
+  local dirty; dirty="$(git -C "$t5" status --porcelain | wc -l)"
+  local uconf; uconf="$(git -C "$t5" diff --name-only --diff-filter=U 2>/dev/null | wc -l)"
+  if [ "$rcx" -eq 11 ] \
+     && printf '%s' "$outx" | grep -q 'BASE CRUZADA' \
+     && printf '%s' "$outx" | grep -q 'src/app.js' \
+     && [ "$dirty" = "0" ] && [ "$uconf" = "0" ]; then
+    record_pass "vendor-branch: (g) base cruzada → exit 11 ANTES do merge, nomeia o arquivo alheio, integração INTACTA"
+  else record_fail "vendor-branch: (g) base cruzada" "exit=$rcx dirty=$dirty conflitos=$uconf out=${outx}"; fi
+
+  # (g-MUT) sem a guarda, o MESMO caso passa a mergear e suja a integração — prova que (g) não é
+  # vacuidade (um gate que nunca dispara passaria em (g) se o caso não fosse realmente cruzado).
+  local mutd; mutd="$(mktemp -d)"
+  sed 's/^  if ! alien="\$(_vendor_is_framework_pure.*$/  if false; then :/' "${helper}" > "${mutd}/mut.sh"
+  if ! grep -q '_vendor_is_framework_pure "\$T"' "${mutd}/mut.sh"; then
+    git -C "$t5" merge --abort 2>/dev/null || true
+    git -C "$t5" reset -q --hard HEAD
+    local rcm=0; bash "${mutd}/mut.sh" update "$t5" "$c5" "$pin5b" develop >/dev/null 2>&1 || rcm=$?
+    local dirtym; dirtym="$(git -C "$t5" status --porcelain | wc -l)"
+    if [ "$rcm" -ne 11 ] && { [ "$rcm" -eq 10 ] || [ "$dirtym" != "0" ]; }; then
+      record_pass "vendor-branch: (g-MUT) sem a guarda o merge acontece e suja a integração — a guarda é load-bearing"
+    else record_fail "vendor-branch: (g-MUT)" "mutação não mudou o desfecho (exit=$rcm dirty=$dirtym) — vacuidade?"; fi
+    git -C "$t5" merge --abort 2>/dev/null || true
+  else
+    record_fail "vendor-branch: (g-MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+  rm -rf "$mutd" 2>/dev/null
+
+  rm -rf "$core" "$t" "$c2" "$t2" "$c3" "$t3" "$c4" "$t4" "$c5" "$t5" 2>/dev/null
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
 }
 
