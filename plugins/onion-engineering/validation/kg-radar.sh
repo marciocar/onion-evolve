@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--schema|--triples]
+# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]
 #      (sem flag = radar + reconcile + integrity + domain + provenance + freshness + schema)
 #
 # Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
@@ -29,6 +29,11 @@
 #   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
 #                     meta.schema_version ≠ a versão que o radar entende → recusa; ausente → ⚠
 #                     retrocompat (ADR onion-adr-kg-freshness-gate, proposta #1).
+#   FRESCOR-TSV     = a FILA de re-verificação, legível por máquina (irmão do FRESCOR, como
+#                     TRIPLES é do grafo): 1 linha/nó vivo rastreado, ordenada por atenção.
+#                     Colunas: id·node_type·plane·status·impact·confidence·atenção·verified_at·
+#                     verified_against·trace·verdict. Escopo NÃO é "o flagado" — nó com verdict
+#                     OK entra igual (o caso que criou o fluxo mente COM carimbo do dia).
 #   TRIPLES         = grafo como triplas `from EDGE to [on evento]` p/ consumo por LLM
 #
 # Camadas (campo opcional `layer`, default audit — retrocompatível):
@@ -48,7 +53,7 @@ RADAR_SCHEMA="1"
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--schema|--triples]" >&2; exit 2; }
+[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]" >&2; exit 2; }
 
 awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" '
 function statusFactor(s) {
@@ -198,6 +203,37 @@ END {
       t = efrom[i] " " etype[i] " " eto[i]
       if (eon[i] != "") t = t " on " eon[i]
       print t
+    }
+    exit 0
+  }
+
+  # Irmão-MÁQUINA do --freshness (como --triples é do grafo): a fila de re-verificação, em TSV.
+  # Existe porque a saída humana do --freshness é prosa pt-BR com emoji — parseá-la para
+  # alimentar um fluxo seria frágil por construção. Uma linha por nó frescor-rastreado e VIVO.
+  #
+  # ORDEM: atenção desc — MESMA fórmula do --radar (impact × confidence × statusFactor × (1+grau)).
+  # A decisão que carrega peso aqui: o escopo NÃO é "o que o radar flagou". O caso que motivou o
+  # fluxo (C_ancestor_cap_zeroes_floors do grafo do M2) tem verdict OK — carimbo do dia, alvo
+  # declarado, os três vereditos passam — e MENTE assim mesmo. Filtrar por flagado nasceria cego
+  # ao caso fundador. O carimbo diz se a SSOT está bem-formada; a atenção diz o que custa caro
+  # estar errado. Re-verifica-se pelo CUSTO DO ERRO, não pela ausência do carimbo.
+  if (mode == "--freshness-tsv") {
+    for (i = 1; i <= nn; i++) {
+      id = order[i]
+      if (plane[id] != "PROD" && verifiedAgainst[id] == "") continue
+      if (nstatus[id] == "superseded" || nstatus[id] == "refuted") continue   # história, não SSOT viva
+      sf = statusFactor(nstatus[id]); if (sf < 0) sf = 0
+      att[id] = impact[id] * conf[id] * sf * (1 + deg[id])
+      if (verifiedAt[id] == "") verdict = "STALE-MISSING"
+      else if (verifiedAgainst[id] == "" && ntype[id] == "claim") verdict = "UNANCHORED"
+      else if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") verdict = "STALE-OLD"
+      else verdict = "OK"
+      printf "%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%s\n",
+        id, ntype[id], plane[id], nstatus[id], impact[id], conf[id], att[id],
+        (verifiedAt[id] == "" ? "-" : verifiedAt[id]),
+        (verifiedAgainst[id] == "" ? "-" : verifiedAgainst[id]),
+        (traceInline[id] == "" ? "-" : traceInline[id]),
+        verdict
     }
     exit 0
   }

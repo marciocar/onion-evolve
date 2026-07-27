@@ -768,6 +768,18 @@ nodes:
     verified_against: grep-no-fonte-da-pwa
     label: "O FLIP ESTA BLOQUEADO, e nao pelo que o spec supunha. A PWA NAO TEM UMA LINHA DE OIDC/PKCE: grep por code_verifier|pkce|oidc|authorize|logto em web/src e public devolve ZERO; ela obtem o token de getToken() (convite colado pelo usuario). Logo, flipar agora (remover BRIDGE_AUTH_MODE) trancaria o caminho HUMANO inteiro — o lockout que o spec teme, pela porta que o spec nao olhou. O P6 nao e formalidade ('os dois chamadores mandam Bearer'): para a PWA e implementar Authorization Code + PKCE de verdade (redirect ao authorize com code_challenge, rota /callback ja registrada como redirect URI do app SPA, troca do code com code_verifier, storage, refresh). CONSEQUENCIA DE ESCOPO: o item 1 fica num plato seguro (mecanismo pronto e provado, rollback de uma linha) e o P6 merece passada propria"
 
+  - id: C_scaffold_removed_proof_was_invalid
+    node_type: claim
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: caddy-conf-e-handshake-tls-medidos
+    label: "ANDAIME REMOVIDO + UMA PROVA MINHA ERA INVALIDA. (a) O vhost loopback do console cumpriu o proposito (quebrar o bootstrap circular) e foi REMOVIDO — andaime nao sobrevive ao proposito, e o estado seguro e o estado SEM configuracao. Host restaurado ao exato anterior: so o listener publico pre-existente; o SNI console.onionevolve.com volta a RECUSAR handshake (no peer certificate). (b) A PROVA QUE EU DEI ONTEM ERA INVALIDA: `curl https://console.onionevolve.com` devolveu HTTP 000 e eu li como 'nao responde' — 000 ali era o curl RECUSANDO O CERTIFICADO, nao ausencia de servico. Medi outra coisa e declarei a conclusao certa. Re-medido corretamente com -k e comparacao de bytes contra controle de loopback: publico devolve 200 com 0 BYTES em / e /console e /oidc/token e /oidc/.well-known e /api/.well-known; loopback devolve 2295 bytes. A conclusao ('nada do console exposto') SOBREVIVE, a prova nao. E o mesmo modo-de-falha do UNANCHORED — carimbo no artefato errado — cometido por mim no dia em que o mecanizei. (c) O DNS console.onionevolve.com -> 179.197.65.94 JA EXISTIA; nao foi criado nesta sessao. (d) O conhecimento virou MECANISMO: pre-flight no script falha com exit 6 e entrega o comando exato do andaime, em vez do `invalid_client` mudo que custou uma sessao para diagnosticar"
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -1093,6 +1105,12 @@ edges:
   - from: C_pwa_has_no_pkce
     to: C_identity_hole
     edge_type: SUPPORTS
+  - from: C_scaffold_removed_proof_was_invalid
+    to: C_console_not_the_path
+    edge_type: SUPPORTS
+  - from: C_scaffold_removed_proof_was_invalid
+    to: E_p1p3_provisioned
+    edge_type: CONSTRAINS
   - from: E_p0_logto_tenant_measured
     to: D_gate_oidc_dual
     edge_type: CONSTRAINS

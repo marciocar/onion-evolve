@@ -384,6 +384,52 @@ run_kg_freshness_selftests() {
   else
     record_fail "kg-freshness: (k) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi
+
+  # ── --freshness-tsv: a FILA de re-verificação (insumo de /meta:kg-freshness) ──────────────
+  # Contrato de máquina: se as colunas variarem, o consumidor quebra em silêncio.
+  local tsv; tsv="$(bash "${radar}" "${fxu}" --freshness-tsv 2>/dev/null || true)"
+
+  # (l) forma: 11 colunas em TODA linha, e nenhuma linha vazia.
+  local badcols; badcols="$(printf '%s\n' "${tsv}" | awk -F'\t' 'NF>0 && NF!=11' | wc -l)"
+  if [ -n "${tsv}" ] && [ "${badcols}" = "0" ]; then
+    record_pass "kg-freshness: (l) --freshness-tsv com 11 colunas em todas as linhas (contrato de máquina)"
+  else record_fail "kg-freshness: (l) forma do TSV" "linhas fora do contrato: ${badcols}"; fi
+
+  # (m) ESCOPO — nó com verdict OK ENTRA na fila. É a decisão que carrega o fluxo: o caso que
+  # o motivou (C_ancestor_cap_zeroes_floors, no grafo do M2) tem carimbo do dia, alvo declarado,
+  # os três vereditos passam — e mente. Filtrar por flagado nasceria cego ao caso fundador.
+  if printf '%s\n' "${tsv}" | awk -F'\t' '$1=="C_ANCORADA" && $11=="OK"' | grep -q . \
+     && printf '%s\n' "${tsv}" | awk -F'\t' '$1=="C_AFIRMA" && $11=="UNANCHORED"' | grep -q .; then
+    record_pass "kg-freshness: (m) a fila inclui nó com verdict OK (escopo ≠ 'o que o radar flagou')"
+  else record_fail "kg-freshness: (m) escopo da fila" "C_ANCORADA(OK) e/ou C_AFIRMA(UNANCHORED) ausentes"; fi
+
+  # (n) o que é HISTÓRIA fica fora — mesmo racional do FRESCOR humano.
+  if ! printf '%s\n' "${tsv}" | awk -F'\t' '$4=="superseded" || $4=="refuted"' | grep -q .; then
+    record_pass "kg-freshness: (n) superseded/refuted fora da fila (história não se re-verifica)"
+  else record_fail "kg-freshness: (n) exclusão de história" "nó reconciliado apareceu na fila"; fi
+
+  # (o) ORDENÁVEL por atenção: a coluna 7 é numérica e o topo bate com o --radar.
+  local top_tsv top_radar
+  top_tsv="$(printf '%s\n' "${tsv}" | sort -t"$(printf '\t')" -k7 -rn | head -1 | cut -f1)"
+  top_radar="$(bash "${radar}" "${fxu}" --radar 2>/dev/null | sed -n '2p' | awk '{print $2}')"
+  if [ -n "${top_tsv}" ] && [ "${top_tsv}" = "${top_radar}" ]; then
+    record_pass "kg-freshness: (o) topo por atenção do TSV == topo do --radar (mesma fórmula, sem drift)"
+  else record_fail "kg-freshness: (o) ordenação" "tsv=${top_tsv} radar=${top_radar}"; fi
+
+  # (p) (MUT) sem a exclusão de história, o nó reconciliado VOLTA a aparecer — prova que (n)
+  # não é vacuidade (a fixture PRECISA ter um nó reconciliado para isso significar algo).
+  cp "${radar}" "${mut}/mut-tsv.sh"
+  # remove só a exclusão DENTRO do bloco --freshness-tsv (a 2ª ocorrência do padrão no arquivo)
+  awk '/mode == "--freshness-tsv"/{inblk=1} inblk && /nstatus\[id\] == "superseded"/{sub(/if \(nstatus\[id\] == "superseded" \|\| nstatus\[id\] == "refuted"\) continue.*$/,""); inblk=0} {print}' \
+    "${radar}" > "${mut}/mut-tsv.sh"
+  local mtsv; mtsv="$(bash "${mut}/mut-tsv.sh" "${fx}/superseded-not-chased.kg.yaml" --freshness-tsv 2>/dev/null || true)"
+  local otsv; otsv="$(bash "${radar}" "${fx}/superseded-not-chased.kg.yaml" --freshness-tsv 2>/dev/null || true)"
+  local nmut nori
+  nmut="$(printf '%s\n' "${mtsv}" | awk -F'\t' 'NF==11' | wc -l)"
+  nori="$(printf '%s\n' "${otsv}" | awk -F'\t' 'NF==11' | wc -l)"
+  if [ "${nmut}" -gt "${nori}" ]; then
+    record_pass "kg-freshness: (p) (MUT) sem a exclusão, a história volta à fila (${nori}→${nmut}) — a guarda é load-bearing"
+  else record_fail "kg-freshness: (p) (MUT) exclusão de história" "mutação não mudou nada (${nori}→${nmut}) — vacuidade?"; fi
 }
 
 # ---------------------------------------------------------------------------

@@ -70,6 +70,45 @@ step() { printf '\n── %s\n' "$*"; }
 # O app `m-default` vive no tenant `admin` e carrega o papel machine:mapi:default,
 # que concede a Management API do tenant `default`. O issuer do tenant admin só
 # escuta em 127.0.0.1:3012 (vhost público desligado) — daí o Host forjado.
+# PRÉ-FLIGHT do nó circular. Sem isto, a ausência do vhost loopback aparece lá embaixo como
+# `invalid_client` — erro que não diz NADA sobre a causa e custou uma sessão inteira para
+# diagnosticar. O andaime é removido de propósito depois de cada uso (o estado seguro é o
+# estado SEM configuração); então a falta dele é o caso NORMAL, não a exceção. Falhe cedo,
+# falhe explicando, e entregue o comando exato. [[fix-must-become-mechanism]]
+step "pré-flight: o issuer do tenant admin está alcançável?"
+if ! curl -sS -k --max-time 5 --resolve "${RESOLVE}" \
+     "${TOKEN_ORIGIN}/oidc/.well-known/openid-configuration" 2>/dev/null \
+     | grep -q "console.onionevolve.com/oidc"; then
+  cat >&2 <<'HELP'
+ERRO: o issuer do tenant `admin` não responde no loopback.
+
+  POR QUÊ: o app M2M `m-default` (o único que concede a Management API do tenant
+  `default`) vive no tenant `admin`, e o Logto só RESOLVE esse tenant quando a
+  requisição chega com origem exatamente igual ao ADMIN_ENDPOINT
+  (https://console.onionevolve.com). Sem o vhost, tudo cai no OIDC do tenant
+  `default` e o token endpoint responde `invalid_client` — sem dizer o motivo.
+
+  CONSERTO (andaime temporário, loopback-only, NADA exposto — remova ao terminar):
+
+    sudo tee /etc/caddy/conf.d/logto-console-local.caddy >/dev/null <<'EOF'
+    https://console.onionevolve.com {
+        bind 127.0.0.1
+        tls internal
+        reverse_proxy 127.0.0.1:3012
+    }
+    EOF
+    sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy
+
+  AO TERMINAR:
+    sudo rm /etc/caddy/conf.d/logto-console-local.caddy && sudo systemctl reload caddy
+
+  NOTA: mexer no Caddy de produção é mudança que o maestro precisa AUTORIZAR NOMEANDO
+  — não é inferível de um "pode seguir" genérico.
+HELP
+  exit 6
+fi
+say "   issuer do tenant admin OK (loopback)"
+
 step "0. token M2M para a Management API do tenant default"
 _secret="$(docker exec "${PG_CONTAINER}" psql -U logto -d logto -tAc \
   "select secret from applications where id='m-default';" 2>/dev/null | tr -d ' \r\n')"
