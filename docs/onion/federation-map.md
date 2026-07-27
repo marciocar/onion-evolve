@@ -16,6 +16,7 @@ flowchart TD
   onion_pedro["onion-pedro<br/>standalone · greenfield"]:::standalone
   onion_arthur["onion-arthur<br/>standalone · greenfield"]:::standalone
   arandek["arandek<br/>standalone · legacy"]:::standalone
+  onion_dist["onion-dist<br/>standalone · greenfield"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
@@ -27,6 +28,7 @@ flowchart TD
   onion_pedro -->|adopts| onion_evolve
   onion_arthur -->|adopts| onion_evolve
   arandek -->|adopts| onion_evolve
+  onion_dist -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
   classDef hub fill:#238636,color:#fff,stroke:#033a16;
   classDef standalone fill:#8957e5,color:#fff,stroke:#3c1e70;
@@ -47,3 +49,4 @@ flowchart TD
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
 | onion-arthur | standalone | greenfield | greenfield-adoption, design, branding, storytelling | `165e1e13b11f` |
 | arandek | standalone | legacy | field-dogfood, legacy-adoption, monorepo, upstream-signal | `65d8a7501a03` |
+| onion-dist | standalone | greenfield | distribution-algorithms, kg-sdaal-method, research-arm, benchmarking | `e88c1e11e051` |
