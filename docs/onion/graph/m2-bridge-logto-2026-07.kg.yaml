@@ -122,7 +122,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.95
-    status: confirmed
+    status: superseded
     verified_against: host-vps-medido
     verified_at: 2026-07-26
     label: "FIX A — CONFIGURADO != PROTEGIDO. MEDIDO neste host (kernel 6.8.0-134, systemd 255): caddy.service memory.min=67108864 e onion-bridge.service memory.min=268435456 estão configurados E ESCRITOS no próprio cgroup — MAS /sys/fs/cgroup/system.slice/memory.min = 0. Em cgroup v2 a proteção EFETIVA é LIMITADA pela do ANCESTRAL (o kernel distribui aos filhos uma fração do que o PAI afora; pai=0 => fração=0). Logo os floors 'JÁ FEITOS' de Caddy/bridge têm proteção efetiva ZERO. Não existe arquivo memory.min.effective — a verificação TEM de percorrer a cadeia de ancestrais"
@@ -1111,6 +1111,13 @@ edges:
   - from: C_scaffold_removed_proof_was_invalid
     to: E_p1p3_provisioned
     edge_type: CONSTRAINS
+  # RECONCILIAÇÃO do 1º dogfood de /meta:kg-freshness (2026-07-27): veredito DRIFTED.
+  # A evidência do conserto JÁ EXISTIA no grafo desde 26/07 — faltava a ARESTA, e sem ela
+  # nem o FRESCOR (carimbo impecável) nem a INTEGRIDADE (só olha REFUTES) enxergavam a mentira.
+  # Medido: `cat /sys/fs/cgroup/system.slice/memory.min` => 402653184, contra a claim de ZERO.
+  - from: E_ancestor_floor_applied
+    to: C_ancestor_cap_zeroes_floors
+    edge_type: SUPERSEDES
   - from: E_p0_logto_tenant_measured
     to: D_gate_oidc_dual
     edge_type: CONSTRAINS
