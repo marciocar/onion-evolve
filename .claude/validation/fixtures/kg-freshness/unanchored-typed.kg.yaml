@@ -1,0 +1,128 @@
+# Fixture do veredito UNANCHORED com filtro por node_type (REGRA de frescor do kg-radar).
+# Existe porque UNANCHORED nasceu em 2026-07-26 SEM teste — o único dos três vereditos de
+# frescor sem cobertura. Um veredito sem teste é opinião, não mecanismo.
+#
+# Todos os nós: plane PROD + verified_at, e SEM verified_against. Só o `claim` deve ser cobrado.
+# Os demais ancoram por trace:/TRACES_TO (ou não afirmam) e entram na linha de supressão contada.
+# Cada nó tem ≥1 aresta — órfão reprova na INTEGRIDADE e o teste ficaria sobre grafo quebrado.
+meta:
+  schema_version: "1"
+  baseline: 2026-07-01
+
+nodes:
+  - id: C_AFIRMA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-20
+    label: "claim PROD carimbada sem dizer contra O QUE — o caso positivo"
+
+  - id: C_ANCORADA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-20
+    verified_against: host-medido
+    label: "claim com alvo declarado — silencia pelo CAMPO, não pelo filtro"
+
+  - id: E_MEDIU
+    node_type: evidence
+    trace: docs/exemplo.md:10
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-20
+    label: "evidence É a âncora — pedir âncora da âncora é recursivo"
+
+  - id: D_DECIDE
+    node_type: decision
+    trace: docs/exemplo.md:20
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-20
+    label: "decision já é cobrada pelo bloco PROVENIÊNCIA — dois nomes, uma obrigação"
+
+  - id: EN_DOM
+    node_type: entity
+    trace: src/exemplo.ts:5
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-20
+    label: "entity de domínio ancora por trace + READS/WRITES (contrato do modo map)"
+
+  - id: A_DOC
+    node_type: artifact
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-20
+    label: "artifact NOMEIA o alvo — alvo do alvo é tautologia"
+
+  - id: Q_ABERTA
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.5
+    status: open
+    verified_at: 2026-07-20
+    label: "pergunta não afirma — não há o que ancorar"
+
+  - id: E_SEM_CARIMBO
+    node_type: evidence
+    trace: docs/exemplo.md:30
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "evidence SEM verified_at — tem de disparar STALE-MISSING mesmo sendo não-claim (prova que o filtro não virou `continue` no laço)"
+
+  - id: C_VELHA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-06-01
+    label: "claim anterior à baseline e sem alvo — UNANCHORED e STALE-OLD ao mesmo tempo (os vereditos compõem, não se excluem)"
+
+edges:
+  - from: E_MEDIU
+    to: C_AFIRMA
+    edge_type: SUPPORTS
+  - from: E_MEDIU
+    to: C_ANCORADA
+    edge_type: SUPPORTS
+  - from: D_DECIDE
+    to: C_AFIRMA
+    edge_type: DEPENDS_ON
+  - from: D_DECIDE
+    to: EN_DOM
+    edge_type: TRACES_TO
+  - from: A_DOC
+    to: D_DECIDE
+    edge_type: SUPPORTS
+  - from: Q_ABERTA
+    to: C_AFIRMA
+    edge_type: DEPENDS_ON
+  - from: E_SEM_CARIMBO
+    to: C_VELHA
+    edge_type: SUPPORTS

@@ -21,8 +21,9 @@
 #                     é história — não cobrada (mesmo racional do FRESCOR).
 #   FRESCOR         = frescor da SSOT (⚠ atenção, NÃO reprova — nó stale mente, não corrompe):
 #                     STALE-MISSING (nó plane:PROD sem verified_at:) · STALE-OLD (verified_at
-#                     anterior à meta.baseline) · UNANCHORED (tem verified_at: mas NÃO diz
-#                     verified_against: — carimbo sem alvo declarado). Determinístico: compara
+#                     anterior à meta.baseline) · UNANCHORED (node_type: claim com verified_at:
+#                     mas SEM verified_against: — carimbo sem alvo declarado; os demais tipos
+#                     ancoram por trace:/TRACES_TO e não são cobrados). Determinístico: compara
 #                     duas datas do arquivo, sem "agora" (ADR onion-adr-kg-freshness-gate,
 #                     proposta #2 (dogfood de campo)).
 #   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
@@ -310,7 +311,7 @@ END {
     # declare verified_against: (opt-in — nomeia o artefato MÓVEL que rastreia: branch/commit/
     # deploy/config). Um nó DEV que aponta p/ branch/commit também apodrece (sinal de campo
     # ssot-como-runtime, §2: C_CONSOLIDATION_MAP stale). Não inunda claims epistêmicos comuns.
-    fwarns = 0; ntracked = 0
+    fwarns = 0; ntracked = 0; fsuppressed = 0
     for (i = 1; i <= nn; i++) {
       id = order[i]
       if (plane[id] != "PROD" && verifiedAgainst[id] == "") continue
@@ -329,8 +330,23 @@ END {
         # fica legível a quem lê. Sinal de campo 2026-07-25 (adotante): nós com plane:PROD e
         # verified_at "porque um curl respondera" — mas o curl mediu o CORE e a claim era
         # sobre o ADOTANTE. O carimbo estava no artefato errado, e nada no arquivo denunciava.
-        if (verifiedAgainst[id] == "") {
+        # UNANCHORED cobra quem AFIRMA — não quem ANCORA, nem quem PERGUNTA. Whitelist por
+        # `node_type: claim`, mesmo idioma do bloco PROVENIÊNCIA (que filtra por `decision`).
+        # MEDIDO nos 22 grafos do core (2026-07-26): sem o filtro são 275 avisos, 170 deles em
+        # tipos que JÁ carregam a âncora por outro campo — 114 `evidence` (a evidência É a
+        # âncora; 101 delas já trazem `trace:`), 17 `decision` (a proveniência já é cobrada no
+        # bloco acima: dois nomes para a mesma obrigação), 21 `entity` (domínio ancora por
+        # `trace:` + READS/WRITES, o contrato do modo `map`), 15 `artifact` (o nó NOMEIA o
+        # alvo — alvo do alvo é tautologia) e 3 `question` (pergunta não afirma).
+        # 275 avisos treinam o leitor a ignorar: é o mesmo racional que já pula superseded/refuted.
+        # A guarda vive AQUI, no ramo, e NÃO como `continue` no laço: STALE-MISSING e STALE-OLD
+        # continuam valendo para TODOS os tipos. (Um `continue` quebraria os casos (b)/(c)/(f)
+        # do selftest, cujos sujeitos são `state` e `decision` — a suíte é a guarda desta guarda.)
+        # Whitelist, não blacklist: ntype vazio/inválido já REPROVA na INTEGRIDADE (VN, exit 1).
+        if (verifiedAgainst[id] == "" && ntype[id] == "claim") {
           print "  ⚠ UNANCHORED: " id " (verified_at " verifiedAt[id] " SEM verified_against:; declare o ALVO da claim — carimbo sem alvo não distingue verificado de declarado)"; fwarns++
+        } else if (verifiedAgainst[id] == "") {
+          fsuppressed++   # supressão CONTADA, nunca silenciosa — ver linha-resumo abaixo
         }
         if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") {
           print "  ⚠ STALE-OLD: " id " (verified_at " verifiedAt[id] " anterior à baseline " metaBaseline " — a verdade pode ter envelhecido)"; fwarns++
@@ -339,6 +355,9 @@ END {
     }
     if (ntracked == 0) print "  (nenhum nó com frescor rastreado — nada a verificar)"
     else if (fwarns == 0) print "  ✅ " ntracked " nó(s) com frescor declarado" (metaBaseline != "" ? " (baseline " metaBaseline ")" : "")
+    # `if` próprio, FORA da cadeia else-if: a supressão tem de aparecer mesmo quando fwarns==0.
+    # Uma linha no lugar de N, e o filtro fica auditável em vez de mágico.
+    if (fsuppressed > 0) print "  ℹ " fsuppressed " nó(s) não-claim com carimbo sem verified_against: — não cobrados (evidência/decisão/domínio/artefato ancoram por trace:/TRACES_TO; pergunta não afirma)"
     print ""
   }
 

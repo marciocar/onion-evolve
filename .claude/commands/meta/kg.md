@@ -79,7 +79,7 @@ nodes:
     impact: 4                # 1-5
     confidence: 0.9          # 0-1
     status: open             # open | confirmed | refuted | superseded | done
-    verified_against: branch # nomeia o ALVO verificado (branch|commit|deploy|config|dump:) — rastreia por frescor mesmo em DEV; OBRIGATÓRIO junto de verified_at (ausente = ⚠ UNANCHORED)
+    verified_against: branch # nomeia o ALVO verificado (branch|commit|deploy|config|dump:) — rastreia por frescor mesmo em DEV; obrigatório junto de verified_at EM node_type: claim (ausente = ⚠ UNANCHORED); nos demais tipos a âncora é trace:/TRACES_TO
     verified_at: AAAA-MM-DD  # quando a claim foi cruzada com o vivo (nó PROD ou com verified_against; ausente = ⚠ STALE-MISSING)
     label: "afirmacao verificavel em uma frase"
     trace: "arquivo:linha"   # migalha inline (o radar ignora; humanos e LLMs seguem)
@@ -146,7 +146,9 @@ bash .claude/validation/kg-console.sh <arquivo> > grafo.html                    
   **Exit 1 = reconciliar antes de commitar.**
 - **FRESCOR** (⚠ **não reprova**) = a SSOT foi re-verificada contra o vivo? **STALE-MISSING** (nó rastreado —
   `plane:PROD` **ou** com `verified_against:` — sem `verified_at:`) · **STALE-OLD** (`verified_at` anterior à
-  `meta.baseline`). Cobre nós DEV que rastreiam artefato móvel (branch/commit), não só PROD. Um nó stale
+  `meta.baseline`) · **UNANCHORED** (`node_type: claim` com `verified_at:` mas **sem** `verified_against:` —
+  carimbo sem alvo declarado; os demais tipos ancoram por `trace:`/`TRACES_TO` e entram numa linha `ℹ` contada,
+  nunca suprimidos em silêncio). Cobre nós DEV que rastreiam artefato móvel (branch/commit), não só PROD. Um nó stale
   **mente**, não corrompe — o veredito é "re-verifique". *Nasceu da lição-mestra do dogfood de campo.*
 - **SCHEMA** (✗ **reprova**, exit 1) = `meta.schema_version` bate com o que o radar entende? Divergência
   = recusa (o radar não sabe ler o arquivo); ausência = ⚠ retrocompat. *Teria pego o fork de ferramenta

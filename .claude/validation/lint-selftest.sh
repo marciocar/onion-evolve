@@ -336,6 +336,54 @@ run_kg_freshness_selftests() {
      && ! printf '%s' "${out}" | grep -q 'C_READ'; then
     record_pass "kg-freshness: DEV+verified_against → STALE-MISSING; DEV puro NÃO flagado (não inunda)"
   else record_fail "kg-freshness: dev-tracked" "esperava STALE C_STRAT sem C_READ; rc=${rc} out=${out}"; fi
+
+  # ── UNANCHORED com filtro por node_type ───────────────────────────────────────────────────
+  # O veredito nasceu em 2026-07-26 SEM teste — o único dos três de frescor sem cobertura, e
+  # com alcance largo demais (275 avisos nos 22 grafos, 170 em tipos que já ancoram por
+  # trace:/TRACES_TO). Estes casos fecham as duas dívidas de uma vez.
+  local fxu="${fx}/unanchored-typed.kg.yaml"
+  rc=0; out=$(bash "${radar}" "${fxu}" --freshness 2>&1) || rc=$?
+
+  # (g) cobra o claim, silencia os demais tipos — os dois lados no MESMO caso.
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q 'UNANCHORED: C_AFIRMA' \
+     && ! printf '%s' "${out}" | grep -qE 'UNANCHORED: (C_ANCORADA|E_MEDIU|D_DECIDE|EN_DOM|A_DOC|Q_ABERTA)'; then
+    record_pass "kg-freshness: (g) UNANCHORED cobra claim e NÃO cobra evidence/decision/entity/artifact/question"
+  else record_fail "kg-freshness: (g) filtro por node_type" "rc=${rc} out=${out}"; fi
+
+  # (h) o filtro NÃO virou `continue` no laço: os outros vereditos seguem valendo p/ não-claim,
+  # e num mesmo nó UNANCHORED e STALE-OLD compõem em vez de se excluírem.
+  if printf '%s' "${out}" | grep -q 'STALE-MISSING: E_SEM_CARIMBO' \
+     && printf '%s' "${out}" | grep -q 'UNANCHORED: C_VELHA' \
+     && printf '%s' "${out}" | grep -q 'STALE-OLD: C_VELHA'; then
+    record_pass "kg-freshness: (h) STALE-MISSING ainda vale p/ não-claim + UNANCHORED e STALE-OLD compõem"
+  else record_fail "kg-freshness: (h) escopo dos outros vereditos" "o filtro virou continue? out=${out}"; fi
+
+  # (i) supressão CONTADA, nunca silenciosa — 5 não-claim carimbados sem alvo na fixture.
+  if printf '%s' "${out}" | grep -q 'ℹ 5 nó(s) não-claim'; then
+    record_pass "kg-freshness: (i) supressão contada e visível (ℹ 5) — filtro auditável, não mágico"
+  else record_fail "kg-freshness: (i) linha de supressão" "esperava 'ℹ 5 nó(s) não-claim'; out=${out}"; fi
+
+  # (j) o veredito acima só vale sobre grafo íntegro — senão é opinião sobre arquivo quebrado.
+  rc=0; bash "${radar}" "${fxu}" --integrity --schema >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "kg-freshness: (j) a fixture do UNANCHORED é íntegra (veredito não é sobre grafo quebrado)"
+  else record_fail "kg-freshness: (j) integridade da fixture" "rc=${rc}"; fi
+
+  # (k) (MUT) — desfeito o filtro, o evidence VOLTA a ser cobrado e a linha ℹ some. Sem esta
+  # prova, (g) passaria igual se o filtro fosse vacuidade (ex.: nenhum nó não-claim rastreado).
+  local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'"' RETURN
+  cp "${radar}" "${mut}/mutado.sh"
+  sed -i 's/ && ntype\[id\] == "claim"//' "${mut}/mutado.sh"
+  if ! grep -q 'verifiedAgainst\[id\] == "" && ntype\[id\] == "claim"' "${mut}/mutado.sh"; then
+    local mout; mout="$(bash "${mut}/mutado.sh" "${fxu}" --freshness 2>&1 || true)"
+    if printf '%s' "${mout}" | grep -q 'UNANCHORED: E_MEDIU' \
+       && ! printf '%s' "${mout}" | grep -q 'ℹ '; then
+      record_pass "kg-freshness: (k) (MUT) sem o filtro o evidence volta a ser cobrado — a guarda é load-bearing"
+    else record_fail "kg-freshness: (k) (MUT)" "mutação não mudou o veredito — o filtro é vacuidade? out=${mout}"; fi
+  else
+    record_fail "kg-freshness: (k) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
 }
 
 # ---------------------------------------------------------------------------
