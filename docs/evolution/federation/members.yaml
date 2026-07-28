@@ -2,6 +2,15 @@
 # Quem adota o Onion, em que tier, versão e configuração de confiança.
 # Fonte canônica: o core (onion-evolve). Adicionar projeto = 1 entrada aqui + /meta:adopt.
 # RFC-0003: hierarquia de tiers (source | hub | standalone | consumer) substitui producer/consumer.
+# `kind:` (2026-07-28, ADR onion-adr-logto-as-projection D4) separa NATUREZA de TIER. Ate entao a
+# natureza vivia so em COMENTARIO — invisivel a qualquer projetor, e projetar sobre um campo
+# sobrecarregado produz estrutura errada SEM ERRO. Valores:
+#   source        — a propria fonte (nao se projeta)
+#   adopter       — projeto que vendoriza o framework p/ o proprio trabalho  (recebe Organization)
+#   distillation  — reescrita curada da doutrina, sem vendor  (onion_version: n/a)
+#   door          — vendoriza, mas o proposito e DISTRIBUIR o bundle
+#   method        — adota o METODO (KG SDAAL) sem vendorizar  (onion_version: n/a)
+# Discriminador medivel por tras: `onion_version: n/a` marca quem NAO vendoriza.
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../rfc/rfc-0001 §gatilho.)
 version: 2
 trust_policy_version: 1
@@ -10,6 +19,7 @@ members:
   - id: onion-evolve
     name: onion-evolve
     role: source              # TIER 0 — core; autoridade emissora; lê tudo; escreve só em si
+    kind: source        # a propria fonte — nao se projeta: e o emissor
     remote: github.com/marciocar/onion-evolve
     path: "."                 # este repo
     local_path: "/home/marcio/onion-evolve"   # migrado 2026-07-08: notebook local → Hostinger KVM 8 (srv1812846), user marciocar→marcio
@@ -55,6 +65,7 @@ members:
   - id: metagamify
     name: MetaGamify          # id/name públicos = SÓ "metagamify" (o nome da empresa NÃO entra em superfície — correção 2026-07-09)
     role: hub                 # TIER 1 — central; pode ter sub-adotados
+    kind: adopter       # projeto que vendoriza o framework p/ o proprio trabalho
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
     local_path: "/home/marcio/rhilo-metagamify"   # dir físico legado no disco (privado, não-exposto); doc-bridge depende dele — não renomear sem migrar o clone
@@ -95,6 +106,7 @@ members:
     name: pulse-mais (Pulse Mais — materiais educacionais)
     org_url: "https://pulsemais.org.br"   # ORGANIZAÇÃO REAL E EXTERNA — não é produto/propriedade do Onion; correção do maestro 2026-07-06 (não confundir "adotante" com "nosso")
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter       # organizacao real externa que vendoriza o framework
     parent: onion-evolve
     remote: github.com/marciocar/pulse-mais
     local_path: "/home/marcio/pulse-mais"
@@ -116,6 +128,7 @@ members:
   - id: granaai
     name: granaai (Grana.Ai — CONFIDENCIAL, ver onion-adr-granaai-consolidation-2026-07.md)
     role: standalone            # TIER 3 — adota o core direto; NÃO confundir com "origem" (ver ADR — é consolidação, não origem)
+    kind: adopter       # projeto regulado que vendoriza o framework
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — não citar em superfície pública
     local_path: "/home/marcio/granaai"   # re-clonado 2026-07-08 no novo lar (KVM 8); acesso via token gh de marciocar (org GranaAi privada)
@@ -170,6 +183,7 @@ members:
   - id: gustavo-pulga
     name: gustavo-pulga (projeto-betahauss-tornak — Tornak/BetaHauss; PRIVADO)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter       # projeto que vendoriza o framework
     parent: onion-evolve
     remote: github.com/marciocar/projeto-betahauss-tornak   # PRIVADO
     local_path: "/home/marcio/gustavo-pulga"   # dir físico difere do nome do repo (não renomear sem migrar o clone)
@@ -194,6 +208,7 @@ members:
   - id: onion-mini
     name: onion-mini (Onion Mini — a versão mini e portátil, ex-onion-portable)
     role: standalone            # DESTILAÇÃO CURADA, não adoção (não vendoriza .claude/) — role
+    kind: distillation  # reescrita curada da doutrina; onion_version: n/a — NAO vendoriza
                                 # 'distilled' formal é costura gated (2ª destilação; ADR mini-distillation D2)
     parent: onion-evolve
     remote: github.com/marciocar/onion-mini
@@ -222,6 +237,7 @@ members:
   - id: onion-standalone
     name: onion-standalone (porta pública Claude — instância adotada role-scoped, bundle standalone)
     role: standalone            # TIER 3 — mas é PORTA DE FRAMEWORK (distribui o bundle standalone), não projeto-adotante
+    kind: door          # vendoriza, mas o proposito e DISTRIBUIR o bundle, nao usar num projeto
     parent: onion-evolve
     remote: github.com/marciocar/onion-standalone   # PÚBLICO desde 2026-07-19 (flip feito, verificado ao vivo). Resta gated: reapontar o redirect onion-claude→onion-standalone (onion-claude segue privado)
     local_path: "/home/marcio/onion-standalone"
@@ -245,6 +261,7 @@ members:
   - id: marcio-pessoal
     name: Onion pessoal do Marcio (cérebro reconciliado N=1 — BRAÇO DE PESQUISA, não prova de mercado)
     role: standalone            # T3 — adota o core direto. Mas adota o MÉTODO (KG SDAAL), NÃO vendoriza .claude/
+    kind: method        # adota o METODO (KG SDAAL); onion_version: n/a — NAO vendoriza
                                 # (gap G1 dimensionado no spike F1; --profile de domínio é F2). Fonte≠derivação: uma só fonte.
     parent: onion-evolve
     remote: "(privado — repo do KG de vida; endereço não publicado, só o Marcio acessa)"
@@ -273,6 +290,7 @@ members:
   - id: onion-pedro
     name: onion-pedro (adotante de campo — framework cheio, ênfase em compliance)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter       # projeto que vendoriza o framework
     parent: onion-evolve
     remote: github.com/marciocar/onion-pedro   # PRIVADO
     local_path: "/home/marcio/onion-pedro"
@@ -293,6 +311,7 @@ members:
   - id: onion-arthur
     name: onion-arthur (adotante de campo — todas as verticais, ênfase em design/branding/storytelling)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter       # projeto que vendoriza o framework
     parent: onion-evolve
     remote: github.com/marciocar/onion-arthur   # PRIVADO
     local_path: "/home/marcio/onion-arthur"
@@ -313,6 +332,7 @@ members:
   - id: arandek
     name: arandek (monorepo de plataforma de agentes IA — PRIVADO)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter       # monorepo legacy que vendoriza o framework
     parent: onion-evolve
     remote: github.com/ArandekBR/arandek   # PRIVADO
     # ATENÇÃO doc-bridge: o local_path é a WORKTREE, não o checkout do produto. A adoção é `legacy`
@@ -343,6 +363,7 @@ members:
   - id: onion-dist
     name: onion-dist (algoritmos de distribuição — investigação)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter       # braco de investigacao, mas vendoriza framework cheio e opera como projeto
     parent: onion-evolve
     remote: "(local — ainda sem remote; criar quando/se sair da máquina)"
     local_path: "/home/marcio/onion-dist"
@@ -364,6 +385,7 @@ members:
 #  - id: <slug-do-projeto>
 #    name: <nome>
 #    role: hub | standalone | consumer   # hub = terá sub-adotados; standalone = adota core direto sem sub-adotados; consumer = T2, adota um HUB (não o core)
+#    kind: adopter | distillation | door | method   # NATUREZA (≠ tier). Só `adopter` vira Organization no Logto.
 #    parent: onion-evolve      # p/ hub/standalone; um T2 (role: consumer) usa parent: <id-do-hub>.
 #                              # T2 onboarda VIA CORE (source-driven; RFC-0003 §5, decisão 2026-07-02) —
 #                              # o hub NÃO roda adopt; hub-driven adoption é gatilho futuro (1º T2 real)
