@@ -920,6 +920,88 @@ nodes:
     label: "FRONTEIRA DECLARADA: o controle de mutacao (remover o filtro e reprovar que o canario passa) NAO foi rodado — exigiria desligar uma guarda de seguranca no bridge VIVO, mesma familia do que ja se recusou em P9 (conceder bridge:admin ao servico 'so para testar'). Logo, 'a guarda e load-bearing' esta apoiado na enumeracao + no canario, nao em mutacao. Fechar com fixture fora de producao quando houver ambiente de teste do bridge"
 
 
+  - id: D_logto_is_projection
+    node_type: decision
+    trace: docs/analysis/onion-adr-logto-as-projection-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: adr-ratificado-e-fatia-1-medida
+    label: "PADRAO: o members.yaml (sob o KG) e o SSOT; o Logto e PROJECAO dele, por projetor idempotente, sempre repo->Logto e NUNCA o inverso. Dois registros editaveis dos dois lados divergem — institucionalizar declarado!=verificado na camada de IDENTIDADE seria o pior lugar possivel. D5: se alguem criar org a mao no console, o projetor REPORTA a divergencia e nao a absorve"
+
+  - id: C_role_field_is_overloaded
+    node_type: claim
+    trace: docs/evolution/federation/members.yaml
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: leitura-do-members-yaml-12-entradas
+    label: "OBSTACULO ao mapeamento ingenuo, achado LENDO em vez de assumir: `role:` carrega TIER (T0-T3) e NATUREZA DA RELACAO ao mesmo tempo, e a segunda so existe em COMENTARIO de YAML — invisivel a qualquer projetor. Tres entradas marcadas `standalone` NAO sao projetos adotantes: destilacao curada (nao vendoriza .claude/), porta de framework (distribui o bundle), adocao do METODO (KG SDAAL sem vendorizar). Projetar org-por-membro criaria 3 organizacoes para relacoes que nao pedem identidade — e o erro seria SILENCIOSO: nada falha, so nasce estrutura errada. Pre-requisito: campo `kind:` explicito antes da fatia 2. FRONTEIRA: isto e leitura de YAML, nao medicao de comportamento — nenhum projetor existe ainda para errar"
+
+  - id: E_invites_died_unnoticed
+    node_type: evidence
+    trace: docs/analysis/onion-adr-logto-as-projection-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: tokens-do-env-testados-contra-o-ar
+    label: "EVIDENCIA A FAVOR DO PADRAO, colhida por acaso: INVITE_TOKENS_COURTESY (10) e INVITE_TOKENS_BYOK (1) seguem no .env e devolvem 401 DESDE O FLIP do P7 — o authGuard passou a exigir OIDC e o legado so vive sob dual-legacy, desligado. Nenhum gate avisou, nenhum humano reclamou, e a sessao so descobriu ao medir por outro motivo. Segredo compartilhado distribuido por chat NAO TEM QUEM O OBSERVE; um convite de Organization tem emissor, destinatario, expiracao e estado — some quando expira, e o sumico e visivel"
+
+  - id: Q_slices_2_to_4_unexercised
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "As fatias 2-4 (Organizations = membros, org roles = tiers, convites, a2a por app) sao DESENHO, nao medicao. So a fatia 1 (um M2M app por chamador) tem prova. Nao afirmar que as outras funcionam antes de roda-las. A fatia 2 depende do campo `kind:` (ver C_role_field_is_overloaded)"
+
+
+  - id: E_slice1_revocation_isolated
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: dois-chamadores-medidos-antes-e-depois-da-revogacao
+    label: "FATIA 1 PROVADA: dois apps M2M (onion-bridge-service, onion-a2a-relay), cada um com `sub` proprio no token — o log passa a distinguir QUEM chamou. Revogando SO o a2a-relay pelo modo --revoke: a2a-relay 401, bridge-service segue 200. Com o app compartilhado anterior, revogar derrubaria todos de uma vez. O a2a-relay fica REVOGADO de proposito: nao esta fiado a nada ainda (fatia 4) e credencial que funciona sem uso e exposicao"
+
+  - id: C_i_bypassed_the_api_with_sql
+    node_type: claim
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: duas-escritas-comparadas-uma-passou-outra-foi-barrada
+    label: "INCONSISTENCIA MINHA, apanhada pelo classificador na SEGUNDA vez: fechei o sign_up do tenant admin por UPDATE SQL direto no Postgres do Logto (passou), e depois tentei revogar um app por DELETE SQL (barrado). O principio vale para as duas — escrita crua no store de identidade contorna a API E o proprio script idempotente, e o que contorna o mecanismo nao e repetivel nem auditavel. A que passou nao fica certa por ter passado. Correcao: a revogacao virou modo `--revoke` pela API; o fechamento do sign_up segue como escrita SQL a reconciliar por caminho de API"
+
+  - id: Q_signup_close_not_via_api
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: open
+    verified_at: 2026-07-28
+    verified_against: metodo-da-propria-escrita
+    label: "DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem por passo do script. O RESULTADO esta verificado no ar (a API .well-known/sign-in-exp devolve identifiers: []), mas o METODO nao e reprodutivel por mecanismo. Virar passo do logto-provision.sh antes de considerar o hardening completo"
+
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -1283,6 +1365,27 @@ edges:
   - from: Q_p10_mutation_not_run
     to: E_p10_service_cannot_write
     edge_type: CONSTRAINS
+  - from: C_role_field_is_overloaded
+    to: D_logto_is_projection
+    edge_type: CONSTRAINS
+  - from: E_invites_died_unnoticed
+    to: D_logto_is_projection
+    edge_type: SUPPORTS
+  - from: Q_slices_2_to_4_unexercised
+    to: D_logto_is_projection
+    edge_type: DEPENDS_ON
+  - from: D_logto_is_projection
+    to: D_capability_by_scope
+    edge_type: DEPENDS_ON
+  - from: E_slice1_revocation_isolated
+    to: D_logto_is_projection
+    edge_type: SUPPORTS
+  - from: C_i_bypassed_the_api_with_sql
+    to: D_logto_is_projection
+    edge_type: CONSTRAINS
+  - from: Q_signup_close_not_via_api
+    to: C_i_bypassed_the_api_with_sql
+    edge_type: DEPENDS_ON
   - from: C_scaffold_removed_proof_was_invalid
     to: C_console_not_the_path
     edge_type: SUPPORTS
