@@ -303,6 +303,50 @@ nodes:
     label: "relay do sinal (docs/evolution/inbox do arandek → inbox do core via /meta:co-relay) pendente — território da sessão do adotante (I3)"
     trace: "arandek docs/evolution/inbox/2026-07-24-sinal-adocao-arandek.md"
 
+  # ── PIN VENCIDO EM ARTEFATO DERIVADO (sinal de 2026-07-27, backlog) ──
+  - id: C_PIN_LIVES_DERIVED
+    node_type: claim
+    trace: docs/analysis/onion-adopt-update-pin-staleness-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: stamps-e-frontmatter-do-adotante-comparados
+    label: "O pin canonico vive DERIVADO em artefatos que o --update nao toca: memorias de sessao gravadas na adocao original, frontmatter de sinais em rascunho, docs que citam a versao do core. O update avanca o .onion-version e as copias ficam para tras EM SILENCIO — o artefato derivado passa a declarar um pin que nao e mais o vivo. Familia declarado!=verificado"
+
+  - id: E_PIN_STALE_IN_SIGNAL
+    node_type: evidence
+    trace: docs/evolution/inbox/_processed/2026-07-27-correcao-pin-declarado-no-sinal-anterior.md
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-27
+    verified_against: frontmatter-do-sinal-vs-onion-version
+    label: "CASO REAL: adocao em 24/07 (pin 5e3ea5ee46ac), update em 25/07 (pin 65d8a7501a03, branch develop). Um sinal upstream posterior carimbou no frontmatter source_commit: 5e3ea5e — o pin da ADOCAO ORIGINAL, nao o vivo — porque o valor veio da memoria de sessao nunca reconciliada no update. O CONTEUDO nao foi afetado (o adotante verificou os fixes contra o FILESYSTEM, nao a prosa), mas a classe de erro e real: se a triagem usasse o pin para aferir se um fix ja alcancou o adotante, a conta partiria de dois dias e um update de distancia"
+
+  - id: D_GREP_OLD_PIN
+    node_type: decision
+    trace: docs/analysis/onion-adopt-update-pin-staleness-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: "BACKLOG (nao implementado; priorizar e do maestro). No /meta:adopt --update, apos reescrever o .onion-version: `grep -rl <pin-antigo>` no repo do adotante (excluindo .git/ e node_modules/) e reportar a CONTAGEM no relatorio — 'N referencias ao pin anterior neste repo — revise'. DETECTA, nao conserta: corrigir cada artefato exigiria entender a semantica de cada um (uma memoria pode citar o pin historicamente de proposito). Custo: um grep + uma linha. Toque em .claude/commands/meta/adopt.md, com selftest plantando um pin antigo"
+
+  - id: Q_PIN_GREP_WORTH_IT
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.5
+    status: open
+    label: "FRONTEIRA DECLARADA PELO PROPRIO ADOTANTE (R15.2 — registrada como observacao, nao como pedido): 'pode ser que o custo nao compense para uma classe de erro que so morde quem escreve frontmatter a mao'. Vale medir quantos artefatos derivados citam pin nos adotantes reais antes de implementar"
+
 edges:
   - from: E_GAP2_ZERO
     to: C_GAP2
@@ -406,3 +450,12 @@ edges:
   - from: Q_RELAY
     to: D_WAIT_RELAY
     edge_type: DEPENDS_ON
+  - from: E_PIN_STALE_IN_SIGNAL
+    to: C_PIN_LIVES_DERIVED
+    edge_type: SUPPORTS
+  - from: D_GREP_OLD_PIN
+    to: C_PIN_LIVES_DERIVED
+    edge_type: DEPENDS_ON
+  - from: Q_PIN_GREP_WORTH_IT
+    to: D_GREP_OLD_PIN
+    edge_type: CONSTRAINS
