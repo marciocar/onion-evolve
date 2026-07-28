@@ -1288,6 +1288,31 @@ nodes:
     label: "REGRESSAO MINHA, de duas horas antes, apanhada por medicao: no P10 escrevi `required ?? REQUIRED_SCOPE`, entao passar `undefined` NAO desliga a checagem de scope — cai em bridge:invoke. O token de organizacao vem com scope VAZIO, logo era recusado, e os quatro casos de teste falhavam identicamente (o que denunciou a causa comum). Corrigido com sentinela explicita: `required === \"\"` desliga de fato; undefined mantem o default historico"
 
 
+  - id: E_session_hook_pulls
+    node_type: evidence
+    trace: .claude/hooks/co-evolution-inbox-check.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: tres-casos-cronometrados
+    label: "GANCHO DE SESSAO FECHA O LOOP: o SessionStart puxa ANTES de contar, entao o aviso 📥 reflete o que existe AGORA e nao o que sobrou da ultima copia manual. Medido em adotante simulado: inbound vazio => puxou 12 => aviso disse 12. Tres exigencias que brigam, resolvidas por construcao: nao trava (timeout duro), nao falha a sessao (tudo sob || true), nao custa (sem credencial sai em 4 testes de variavel e ZERO syscall de rede — comportamento inalterado para todo adotante nao-configurado)"
+
+  - id: E_timeout_is_load_bearing
+    node_type: evidence
+    trace: .claude/hooks/co-evolution-inbox-check.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: buraco-negro-de-rede-cronometrado
+    label: "A PRIMEIRA PROVA DE 'nao trava' ERA FRACA e eu percebi ao ler o numero: apontei para 127.0.0.1:9 e deu 0.076s — conexao RECUSADA volta na hora, nao pendura. O caso que trava e rede que ENGOLE o pacote. Repetido contra 10.255.255.1 (nao-roteavel) com ONION_FED_TIMEOUT=3: 3.012s exatos. O timeout duro segurou o que o curl nao segura sozinho. Testar o modo-de-falha facil no lugar do dificil e falso-verde por escolha de alvo"
+
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -1744,6 +1769,12 @@ edges:
   - from: E_backlog_was_not_where_i_said
     to: D_downstream_by_pull
     edge_type: CONSTRAINS
+  - from: E_session_hook_pulls
+    to: E_pull_endpoint_works
+    edge_type: SUPPORTS
+  - from: E_timeout_is_load_bearing
+    to: E_session_hook_pulls
+    edge_type: SUPPORTS
   - from: D_downstream_by_pull
     to: D_org_born_on_demand
     edge_type: DEPENDS_ON

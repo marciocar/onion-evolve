@@ -11,6 +11,40 @@ O Onion (framework) evolui; **muitos projetos** o adotam. Sem método, duas dore
 1. **Instâncias de IA colidem** — duas sessões mexendo no mesmo repo geram trabalho duplicado e pontes meio-construídas.
 2. **O sinal do campo não volta** — bugs e pedidos dos projetos não chegam ao framework de forma rastreável.
 
+
+## Downstream por PULL (opcional, recomendado)
+
+O carteiro de arquivo (`/meta:co-deliver`) exige que os dois repos estejam **na mesma
+máquina** — ou que o core tenha credencial no repo alheio, o que fura o invariante I3.
+O pull dissolve isso: a sessão do adotante busca os próprios anúncios no endpoint do core.
+
+**Configurar** (no `.env` do adotante, `chmod 600`):
+
+```sh
+ONION_FED_CLIENT_ID=...        # app M2M deste adotante (o core provisiona)
+ONION_FED_CLIENT_SECRET=...    # entregue UMA vez, fora de banda, na adoção
+ONION_FED_ORG_ID=...           # organização deste membro no Logto
+ONION_FED_MEMBER=<id>          # o id deste membro no members.yaml
+# opcionais: ONION_FED_ISSUER, ONION_FED_CORE, ONION_FED_TIMEOUT (default 20s)
+```
+
+Com isso, o hook de SessionStart puxa **antes** de contar — o 📥 passa a refletir o que
+existe agora, não o que sobrou da última cópia manual. Manualmente:
+`bash .claude/utils/federation-transport/inbox-pull.sh --apply`.
+
+**Propriedades que o desenho garante** (medidas, não prometidas):
+
+- **Sync, não fila.** O core serve *tudo que já foi anunciado* a este membro, com `sha256`;
+  o adotante baixa o que falta. Um clone novo recupera o histórico inteiro.
+- **Idempotente.** Rodar duas vezes seguidas não baixa nada na segunda.
+- **Integridade não é opcional.** Conteúdo que não bate com o manifesto é descartado.
+- **Não trava a sessão.** Timeout duro; core inalcançável = a sessão abre igual, contando o
+  que já está em disco. Sem credencial configurada, o hook sai sem tocar a rede.
+- **Só o próprio inbox.** Pedir o de outro membro devolve 403 nomeando o conflito — a
+  identidade do transporte amarra no recurso pedido.
+
+Detalhes e fronteiras: [ADR transporte por pull](../analysis/onion-adr-federation-transport-pull-2026-07.md).
+
 ## Princípios (estado da arte 2026)
 
 - **Orquestração, não autonomia:** o humano (você) é o **maestro**; agentes rodam async, cada um no seu escopo. O risco que se controla é **ler+interpretar+executar** automático sem gate — **não** "agentes se falarem". **Transportar** e **notificar** mensagens podem ser automáticos (determinísticos); **executar** o que chega é gate humano. A2A é ortogonal. Por isso o **A2A-runtime cross-repo fica `hold`** (auto-execução distribuída + atomicidade multi-repo inexistente), não por proibir conversa. Eixo completo: [`../analysis/onion-adr-comms-transport-vs-execution-2026-06.md`](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md).
