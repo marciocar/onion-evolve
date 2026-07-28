@@ -1021,7 +1021,7 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: confirmed
+    status: superseded
     verified_at: 2026-07-28
     verified_against: 8-orgs-e-2-org-roles-criadas-no-ar
     label: "FATIA 2 (estrutura): modo --project-federation le o members.yaml e cria Organizations para kind=adopter apenas. 8 orgs + 2 org-roles (hub, standalone) criadas; 4 membros IGNORADOS por natureza, nomeados no relatorio em vez de sumirem em silencio. Bug meu apanhado no proprio relatorio: `printf '%s' | wc -l` conta QUEBRAS, nao linhas — 8 adotantes viravam '7'. Numero plausivel e errado passa despercebido; corrigido para grep -c"
@@ -1096,6 +1096,67 @@ nodes:
     verified_at: 2026-07-28
     verified_against: contagem-por-org-no-tenant-default
     label: "O MECANISMO esta provado, a POVOACAO nao: 1 de 8 organizacoes tem membro. As outras 7 precisam de pessoas reais com conta no Logto, e criar identidade humana e ato do maestro — o `--enroll` se recusa a criar (exit 7) de proposito. Nao dizer 'a federacao esta no Logto' enquanto 7 orgs estiverem vazias"
+
+
+  - id: C_kind_answers_the_wrong_question
+    node_type: claim
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: superseded
+    verified_at: 2026-07-28
+    verified_against: logins-medidos-uma-unica-pessoa-jamais-autenticou
+    label: "ERRO DE CATEGORIA MEU, mesma familia do `role:` sobrecarregado que consertei no mesmo dia: `kind: adopter` responde 'VENDORIZA o framework?' — NAO 'alguem AUTENTICA como isso?'. Sao perguntas diferentes e eu projetei na errada. A medicao que expoe: UMA UNICA pessoa jamais autenticou neste IdP. Os adotantes rodam Claude Code nos repos deles e nunca tocaram o bridge. Resultado: 7 organizacoes que ninguem autenticava, e o D5 ficando verde sobre estrutura inutil"
+
+  - id: D_org_born_on_demand
+    node_type: decision
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: 7-orgs-removidas-e-projetor-mudado
+    label: "DECISAO DO MAESTRO (2026-07-28): org NASCE NA 1a MATRICULA, nao em massa. As 7 vazias foram removidas; `--project-federation` deixou de criar organizacoes e passou a RELATAR quem do SSOT ainda nao tem org (a lacuna fica visivel sem virar lixo); `--enroll` cria sob demanda, exigindo que o id exista no members.yaml. Mudou o MECANISMO, nao so o estado — sem isso a proxima rodada do projetor recriaria as 7"
+
+  - id: E_dormant_privileged_duplicate
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: last-sign-in-das-duas-contas
+    label: "ACHADO ao perguntar 'quem de fato autentica?': DUAS contas para a mesma pessoa no tenant default, AMBAS com invoke+admin+write. `marcio` (criada pelo meu script, era o BRIDGE_USER default) nunca logou; `marciocar` e quem o maestro usa. Conta privilegiada dormente e superficie de ataque sem contrapartida — e foi nela que eu matriculei o onion-dist por engano. Removida sob decisao nomeada; default do script corrigido para marciocar"
+
+  - id: E_near_miss_guard_on_live_account
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: comando-barrado-e-depois-provado-em-dry-run
+    label: "QUASE-ACIDENTE, o mais perigoso da sessao: eu ia rodar `--drop-user marciocar --apply` — a conta VIVA do maestro — para dar denominador a uma guarda de dormencia que eu tinha escrito SEGUNDOS antes e nunca exercido. Se o parsing de lastSignInAt estivesse errado, a identidade viva sumia. O instinto (guarda sem denominador nao vale) estava certo; o ALVO estava insano. Barrado; refeito em DRY-RUN, onde a delecao e impossivel: RECUSADO para marciocar (lastSignInAt presente), [DRY-RUN] removeria para marcio (nunca logou). So depois o --apply, e so na dormente. REGRA: guarda nao-exercida nunca se testa no irreplacavel"
+
+  - id: C_blocked_chain_kills_inner_edit
+    node_type: claim
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: argumento-desconhecido-drop-user
+    label: "REINCIDENCIA na mesma sessao: cadeia barrada pelo classificador mata TAMBEM os passos inofensivos dentro dela, e eu sigo assumindo que rodaram. Aqui o `python3` que ESCREVIA a guarda morreu junto com o `--apply` bloqueado; o dry-run seguinte devolveu 'argumento desconhecido: --drop-user' e so entao percebi. O dry-run me avisou no lugar de eu supor — o que reforça a regra: depois de um bloqueio, RE-VERIFICAR o que foi escrito, nunca continuar de onde se imaginava estar"
 
 
 edges:
@@ -1506,6 +1567,24 @@ edges:
   - from: Q_seven_orgs_still_empty
     to: E_org_has_member_with_role
     edge_type: CONSTRAINS
+  - from: C_kind_answers_the_wrong_question
+    to: E_federation_projected
+    edge_type: REFUTES
+  - from: D_org_born_on_demand
+    to: C_kind_answers_the_wrong_question
+    edge_type: SUPERSEDES
+  - from: D_org_born_on_demand
+    to: Q_seven_orgs_still_empty
+    edge_type: SUPERSEDES
+  - from: E_dormant_privileged_duplicate
+    to: D_org_born_on_demand
+    edge_type: SUPPORTS
+  - from: E_near_miss_guard_on_live_account
+    to: D_org_born_on_demand
+    edge_type: CONSTRAINS
+  - from: C_blocked_chain_kills_inner_edit
+    to: E_near_miss_guard_on_live_account
+    edge_type: SUPPORTS
   - from: C_scaffold_removed_proof_was_invalid
     to: C_console_not_the_path
     edge_type: SUPPORTS
