@@ -939,7 +939,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: confirmed
+    status: superseded
     verified_at: 2026-07-28
     verified_against: leitura-do-members-yaml-12-entradas
     label: "OBSTACULO ao mapeamento ingenuo, achado LENDO em vez de assumir: `role:` carrega TIER (T0-T3) e NATUREZA DA RELACAO ao mesmo tempo, e a segunda so existe em COMENTARIO de YAML — invisivel a qualquer projetor. Tres entradas marcadas `standalone` NAO sao projetos adotantes: destilacao curada (nao vendoriza .claude/), porta de framework (distribui o bundle), adocao do METODO (KG SDAAL sem vendorizar). Projetar org-por-membro criaria 3 organizacoes para relacoes que nao pedem identidade — e o erro seria SILENCIOSO: nada falha, so nasce estrutura errada. Pre-requisito: campo `kind:` explicito antes da fatia 2. FRONTEIRA: isto e leitura de YAML, nao medicao de comportamento — nenhum projetor existe ainda para errar"
@@ -1000,6 +1000,54 @@ nodes:
     verified_at: 2026-07-28
     verified_against: metodo-da-propria-escrita
     label: "DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem por passo do script. O RESULTADO esta verificado no ar (a API .well-known/sign-in-exp devolve identifiers: []), mas o METODO nao e reprodutivel por mecanismo. Virar passo do logto-provision.sh antes de considerar o hardening completo"
+
+
+  - id: E_kind_field_added
+    node_type: evidence
+    trace: docs/evolution/federation/members.yaml
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: 12-entradas-classificadas-e-yaml-revalidado
+    label: "PRE-REQUISITO D4 CUMPRIDO: campo `kind:` nas 12 entradas + template, separando NATUREZA de TIER. 8 adopter · 1 source · 1 distillation (onion-mini) · 1 door (onion-standalone) · 1 method (marcio-pessoal). Discriminador MEDIVEL por tras da classificacao: `onion_version: n/a` marca quem nao vendoriza — nao e so leitura de comentario. Ler o arquivo INTEIRO mudou a conta: o grep anterior sugeria 3 nao-adotantes, sao 4 (o core tambem nao se projeta)"
+
+  - id: E_federation_projected
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: 8-orgs-e-2-org-roles-criadas-no-ar
+    label: "FATIA 2 (estrutura): modo --project-federation le o members.yaml e cria Organizations para kind=adopter apenas. 8 orgs + 2 org-roles (hub, standalone) criadas; 4 membros IGNORADOS por natureza, nomeados no relatorio em vez de sumirem em silencio. Bug meu apanhado no proprio relatorio: `printf '%s' | wc -l` conta QUEBRAS, nao linhas — 8 adotantes viravam '7'. Numero plausivel e errado passa despercebido; corrigido para grep -c"
+
+  - id: E_d5_divergence_fires
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: ssot-mutado-em-copia-temporaria-com-denominador
+    label: "D5 PROVADO COM DENOMINADOR, nao por vacuidade: recem-aplicada, a checagem dizia 'sem divergencia' porque Logto == SSOT por construcao — 0 == 0 nao prova guarda. Teste real: copia TEMPORARIA do members.yaml com arandek reclassificado, rodando via MEMBERS_YAML=. Com 7 adotantes no SSOT e 8 orgs no Logto, a checagem NOMEIA arandek e recusa absorver. Producao nunca foi tocada — a mutacao viveu no arquivo temporario, nao no store de identidade"
+
+  - id: Q_orgs_are_empty_scaffolding
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: 2026-07-28
+    verified_against: nenhum-membro-atribuido-as-orgs
+    label: "FRONTEIRA HONESTA da fatia 2: as 8 Organizations existem e estao VAZIAS — nenhum usuario, nenhum app, nenhum org-role atribuido a ninguem. E estrutura, nao funcao. Dizer 'a federacao esta no Logto' agora seria declarado!=verificado: o que existe e o esqueleto. Falta ligar identidade a org (quem pertence a que) e org-scopes (o que se pode fazer NAQUELA org) — e so ai `bridge:write` vira por-organizacao, que era o ganho prometido no ADR"
 
 
 edges:
@@ -1386,6 +1434,18 @@ edges:
   - from: Q_signup_close_not_via_api
     to: C_i_bypassed_the_api_with_sql
     edge_type: DEPENDS_ON
+  - from: E_kind_field_added
+    to: C_role_field_is_overloaded
+    edge_type: SUPERSEDES
+  - from: E_federation_projected
+    to: D_logto_is_projection
+    edge_type: SUPPORTS
+  - from: E_d5_divergence_fires
+    to: D_logto_is_projection
+    edge_type: SUPPORTS
+  - from: Q_orgs_are_empty_scaffolding
+    to: E_federation_projected
+    edge_type: CONSTRAINS
   - from: C_scaffold_removed_proof_was_invalid
     to: C_console_not_the_path
     edge_type: SUPPORTS

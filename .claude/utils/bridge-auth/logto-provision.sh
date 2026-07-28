@@ -65,6 +65,8 @@ while [ $# -gt 0 ]; do
     # SQL direto no Postgres: escrita crua no store de identidade contorna a API E o
     # proprio script, e o que contorna o mecanismo nao e repetivel nem auditavel.
     --revoke) REVOKE_APP="${2:?--revoke precisa do nome do app M2M}"; shift ;;
+    # ADR D1/D2 — projeta a federacao (members.yaml) em Organizations. Sempre repo->Logto.
+    --project-federation) PROJECT_FED=1 ;;
     *) echo "argumento desconhecido: $1" >&2; exit 2 ;;
   esac
   shift
@@ -159,6 +161,69 @@ mutate() { # mutate <descrição> <METHOD> <PATH> <json>
 }
 
 # --- 1. usuário do maestro no tenant default -------------------------------
+# --- MODO --project-federation: members.yaml -> Organizations (ADR D1/D2) -----
+# O members.yaml e o SSOT; o Logto e PROJECAO dele. Sentido unico, sempre. So `kind: adopter`
+# vira Organization — `source` e o emissor, e distillation/door/method nao pedem identidade
+# (D4: sem o campo `kind:` isto projetaria estrutura errada SEM ERRO).
+if [ "${PROJECT_FED:-0}" = "1" ]; then
+  MEMBERS="${MEMBERS_YAML:-docs/evolution/federation/members.yaml}"
+  [ -f "${MEMBERS}" ] || { echo "ERRO: ${MEMBERS} nao encontrado (rode da raiz do core)" >&2; exit 5; }
+  step "projetar federacao: ${MEMBERS} -> Organizations"
+
+  _rows="$(python3 - "${MEMBERS}" <<'PYEOF'
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1], encoding="utf-8"))
+for m in d.get("members", []):
+    k = m.get("kind", "?")
+    print(f"{m['id']}\t{m.get('role','?')}\t{k}")
+PYEOF
+)"
+  [ -n "${_rows}" ] || { echo "ERRO: nenhum membro lido" >&2; exit 5; }
+
+  _adopters="$(printf '%s\n' "${_rows}" | awk -F'\t' '$3=="adopter"{print $1}')"
+  _tiers="$(printf '%s\n' "${_rows}" | awk -F'\t' '$3=="adopter"{print $2}' | sort -u)"
+  # `printf '%s' | wc -l` conta QUEBRAS, nao linhas — sem \n final, 8 itens viram "7".
+  # Numero plausivel e errado e pior que erro: passa despercebido. Usa -c com regex.
+  say "   adotantes (kind=adopter): $(printf '%s\n' "${_adopters}" | grep -c '[^[:space:]]') · tiers: $(printf '%s' "${_tiers}" | tr '\n' ' ')"
+  say "   ignorados por natureza  : $(printf '%s\n' "${_rows}" | awk -F'\t' '$3!="adopter"{printf "%s(%s) ", $1, $3}')"
+
+  # org roles = tiers
+  _existing_roles="$(api GET "/organization-roles" 2>/dev/null || echo '[]')"
+  for _t in ${_tiers}; do
+    _has="$(printf '%s' "${_existing_roles}" | jq -r --arg n "${_t}" '.[]? | select(.name==$n) | .id' | head -1)"
+    if [ -n "${_has}" ]; then say "   org-role ${_t}: já existe"
+    elif [ "${APPLY}" = "1" ]; then
+      api POST "/organization-roles" "$(jq -nc --arg n "${_t}" '{name:$n, description:"Tier RFC-0003 projetado do members.yaml"}')" >/dev/null 2>&1
+      say "   org-role ${_t}: criada"
+    else say "   [DRY-RUN] criaria org-role ${_t}"; fi
+  done
+
+  # organizations = adotantes
+  _existing_orgs="$(api GET "/organizations" 2>/dev/null || echo '[]')"
+  for _a in ${_adopters}; do
+    _oid="$(printf '%s' "${_existing_orgs}" | jq -r --arg n "${_a}" '.[]? | select(.name==$n) | .id' | head -1)"
+    if [ -n "${_oid}" ]; then say "   org ${_a}: já existe (id=${_oid})"
+    elif [ "${APPLY}" = "1" ]; then
+      _oid="$(api POST "/organizations" "$(jq -nc --arg n "${_a}" '{name:$n, description:"Membro da federacao Onion — projetado do members.yaml (SSOT)"}')" | jq -r '.id // empty')"
+      say "   org ${_a}: criada (id=${_oid:-FALHOU})"
+    else say "   [DRY-RUN] criaria org ${_a}"; fi
+  done
+
+  # D5 — DIVERGENCIA: org no Logto que nao esta no SSOT. Reporta, NUNCA absorve: absorver
+  # deixaria o plano de execucao redefinir o SSOT pelas costas.
+  _orphans="$(printf '%s' "$(api GET "/organizations" 2>/dev/null || echo '[]')" \
+    | jq -r '.[]?.name' | sort -u | comm -23 - <(printf '%s\n' "${_adopters}" | sort -u))"
+  if [ -n "${_orphans}" ]; then
+    say ""
+    say "   ⚠ DIVERGENCIA (D5) — org no Logto sem entrada kind=adopter no SSOT:"
+    printf '%s\n' "${_orphans}" | while read -r o; do [ -n "$o" ] && say "       ${o}"; done
+    say "     NAO absorvida de proposito. Ou vira entrada no members.yaml, ou sai do Logto."
+  else
+    say "   ✅ sem divergencia: Logto == SSOT"
+  fi
+  exit 0
+fi
+
 # --- MODO --revoke: tira UM app M2M da role, deixando os demais intactos ------
 if [ -n "${REVOKE_APP:-}" ]; then
   step "revogar '${REVOKE_APP}' da role ${ROLE_NAME}"
