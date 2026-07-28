@@ -12,8 +12,11 @@
 #             Decisão: docs/analysis/onion-adr-native-githooks-standard-2026-06.md
 #
 # Mecânica  : (1) copia githook-pre-commit-onion.tpl → <DEST>/.githooks/pre-commit
-#                 (NEVER-CLOBBER: se já há pre-commit próprio e DIFERENTE, grava
-#                 sidecar pre-commit.onion p/ merge manual; idêntico → no-op).
+#                 (NEVER-CLOBBER, 3 casos: idêntico → no-op; hook ONION
+#                 DESATUALIZADO (--update, o template evoluiu) → REFRESCA/overwrite
+#                 (senão o --update deixaria o hook Onion ANTIGO ativo e o novo inerte
+#                 como .onion); pre-commit PRÓPRIO do alvo e diferente → sidecar
+#                 pre-commit.onion p/ merge manual).
 #             (2) detecta husky → AVISA migração (não desinstala — é do adotante).
 #             (3) core.hooksPath: seta .githooks SÓ se UNSET (never-clobber). Se já
 #                 aponta p/ husky/custom, NÃO sobrescreve — avisa p/ ativar consciente.
