@@ -1044,10 +1044,58 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.9
-    status: open
+    status: superseded
     verified_at: 2026-07-28
     verified_against: nenhum-membro-atribuido-as-orgs
     label: "FRONTEIRA HONESTA da fatia 2: as 8 Organizations existem e estao VAZIAS — nenhum usuario, nenhum app, nenhum org-role atribuido a ninguem. E estrutura, nao funcao. Dizer 'a federacao esta no Logto' agora seria declarado!=verificado: o que existe e o esqueleto. Falta ligar identidade a org (quem pertence a que) e org-scopes (o que se pode fazer NAQUELA org) — e so ai `bridge:write` vira por-organizacao, que era o ganho prometido no ADR"
+
+
+  - id: C_slice3_invitations_premise
+    node_type: claim
+    trace: docs/analysis/onion-adr-logto-as-projection-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.2
+    status: refuted
+    verified_at: 2026-07-28
+    verified_against: doc-do-logto-consultada-e-conectores-medidos
+    label: "PREMISSA DA FATIA 3, REFUTADA antes de virar promessa: 'convites de Organization substituem os tokens de cortesia/BYOK'. Dois bloqueios INDEPENDENTES, ambos medidos: (1) ZERO conectores de e-mail no Logto — convite e entregue por e-mail e nao tinha como sair; (2) a doc do Logto diz textualmente 'Logto does not provide a built-in invitation flow' e convite de organizacao NAO e o desvio para registro fechado — o desvio documentado e magic link ('targeted user invitation'), outro mecanismo. O convite que criei para teste ficou Pending com ninguem capaz de agir sobre ele"
+
+  - id: D_enroll_instead_of_invite
+    node_type: decision
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: matricula-executada-e-verificada-no-ar
+    label: "FATIA 3 REDESENHADA para `--enroll`: por um usuario JA EXISTENTE dentro de uma organizacao, com org-role. Sem e-mail, sem conector, funciona com registro fechado — e CABE MELHOR no Onion: membro da federacao nao e estranho de auto-servico, ja esta no members.yaml. O modo se RECUSA a criar usuario (exit 7): criar identidade humana e ato do maestro, nao efeito colateral de script. `--uninvite` retira convite pela API — nunca por SQL, pela licao ja registrada nesta sessao"
+
+  - id: E_org_has_member_with_role
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: relacao-usuario-org-papel-lida-no-banco
+    label: "A ORG DEIXOU DE SER ESQUELETO: `marcio em onion-dist como standalone`, lido das relacoes org-usuario-papel. Nota de rigor: a contagem crua deu 'orgs com membro: 2' e eu conferi em vez de aceitar — o segundo e a org interna do proprio Logto no tenant `admin` (pre-existente). No tenant `default` e exatamente 1, como esperado; minha query e que conflava tenants"
+
+  - id: Q_seven_orgs_still_empty
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_at: 2026-07-28
+    verified_against: contagem-por-org-no-tenant-default
+    label: "O MECANISMO esta provado, a POVOACAO nao: 1 de 8 organizacoes tem membro. As outras 7 precisam de pessoas reais com conta no Logto, e criar identidade humana e ato do maestro — o `--enroll` se recusa a criar (exit 7) de proposito. Nao dizer 'a federacao esta no Logto' enquanto 7 orgs estiverem vazias"
 
 
 edges:
@@ -1445,6 +1493,18 @@ edges:
     edge_type: SUPPORTS
   - from: Q_orgs_are_empty_scaffolding
     to: E_federation_projected
+    edge_type: CONSTRAINS
+  - from: D_enroll_instead_of_invite
+    to: C_slice3_invitations_premise
+    edge_type: SUPERSEDES
+  - from: E_org_has_member_with_role
+    to: D_enroll_instead_of_invite
+    edge_type: SUPPORTS
+  - from: E_org_has_member_with_role
+    to: Q_orgs_are_empty_scaffolding
+    edge_type: REFUTES
+  - from: Q_seven_orgs_still_empty
+    to: E_org_has_member_with_role
     edge_type: CONSTRAINS
   - from: C_scaffold_removed_proof_was_invalid
     to: C_console_not_the_path
