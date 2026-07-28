@@ -91,19 +91,19 @@ ERRO: o issuer do tenant `admin` não responde no loopback.
   (https://console.onionevolve.com). Sem o vhost, tudo cai no OIDC do tenant
   `default` e o token endpoint responde `invalid_client` — sem dizer o motivo.
 
-  CONSERTO (andaime temporário, loopback-only, NADA exposto — remova ao terminar):
+  CONSERTO — USE O MECANISMO QUE JA EXISTE, nao erga um vhost paralelo:
 
-    sudo tee /etc/caddy/conf.d/logto-console-local.caddy >/dev/null <<'EOF'
-    https://console.onionevolve.com {
-        bind 127.0.0.1
-        tls internal
-        reverse_proxy 127.0.0.1:3012
-    }
-    EOF
-    sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy
+    bash ~/onion-logto/console.sh on      # liga o vhost do console (publico, cert real)
+    bash ~/onion-logto/console.sh status  # confere
+    bash ~/onion-logto/console.sh off     # DESLIGUE ao terminar
 
-  AO TERMINAR:
-    sudo rm /etc/caddy/conf.d/logto-console-local.caddy && sudo systemctl reload caddy
+  O maestro construiu esse liga/desliga de proposito: o console fica FORA do ar por
+  padrao e so sobe na janela de configuracao. Ate 2026-07-28 este bloco mandava
+  escrever um vhost loopback proprio — o autor ergueu e derrubou SEIS vezes num dia
+  sem procurar o mecanismo que ja existia. Conselho nao se repete sozinho; ponteiro sim.
+
+  ANTES DE DEIXAR LIGADO ALEM DA JANELA: o tenant `admin` esta com registro ABERTO
+  (sign_up identifiers ["username"], password). Fechar antes de publicar de vez.
 
   NOTA: mexer no Caddy de produção é mudança que o maestro precisa AUTORIZAR NOMEANDO
   — não é inferível de um "pode seguir" genérico.
