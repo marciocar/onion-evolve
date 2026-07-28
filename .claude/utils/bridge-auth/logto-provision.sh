@@ -67,6 +67,20 @@ while [ $# -gt 0 ]; do
     --revoke) REVOKE_APP="${2:?--revoke precisa do nome do app M2M}"; shift ;;
     # ADR D1/D2 — projeta a federacao (members.yaml) em Organizations. Sempre repo->Logto.
     --project-federation) PROJECT_FED=1 ;;
+    # ADR fatia 3 — convite RASTREAVEL no lugar do segredo compartilhado.
+    --invite)      INVITE_EMAIL="${2:?--invite precisa do e-mail do convidado}"; shift ;;
+    --invite-org)  INVITE_ORG="${2:?--invite-org precisa do id da organizacao}"; shift ;;
+    --invite-role) INVITE_ROLE="${2:?--invite-role precisa do tier}"; shift ;;
+    --invite-days) INVITE_DAYS="${2:?--invite-days precisa de numero}"; shift ;;
+    --invites)     LIST_INVITES=1 ;;
+    --uninvite)    UNINVITE_ID="${2:?--uninvite precisa do id do convite}"; shift ;;
+    # Fatia 3 REDESENHADA: convite por e-mail nao funciona aqui (0 conectores + sign_up
+    # fechado, e a doc do Logto diz que convite de organizacao NAO e o desvio p/ registro
+    # fechado — o desvio documentado e magic link). Pre-provisionar cabe melhor: membro da
+    # federacao nao e estranho, ja esta no members.yaml.
+    --enroll)      ENROLL_USER="${2:?--enroll precisa do username ou e-mail}"; shift ;;
+    --enroll-org)  ENROLL_ORG="${2:?--enroll-org precisa do id da organizacao}"; shift ;;
+    --enroll-role) ENROLL_ROLE="${2:?--enroll-role precisa do tier}"; shift ;;
     *) echo "argumento desconhecido: $1" >&2; exit 2 ;;
   esac
   shift
@@ -161,6 +175,98 @@ mutate() { # mutate <descrição> <METHOD> <PATH> <json>
 }
 
 # --- 1. usuário do maestro no tenant default -------------------------------
+# --- MODO --uninvite: retira um convite (pela API, nunca por SQL) -------------
+if [ -n "${UNINVITE_ID:-}" ]; then
+  step "retirar convite ${UNINVITE_ID}"
+  if [ "${APPLY}" = "1" ]; then
+    api DELETE "/organization-invitations/${UNINVITE_ID}" >/dev/null 2>&1 || true
+    say "   removido"
+  else say "   [DRY-RUN] removeria ${UNINVITE_ID}"; fi
+  exit 0
+fi
+
+# --- MODO --enroll: por um usuario JA EXISTENTE dentro de uma organizacao -----
+# Fecha a lacuna declarada na fatia 2 (orgs vazias = estrutura, nao funcao). Nao cria
+# usuario: exige que ele exista, porque criar identidade humana e ato do maestro.
+if [ -n "${ENROLL_USER:-}" ]; then
+  : "${ENROLL_ORG:?--enroll exige --enroll-org <organizacao>}"
+  step "matricular '${ENROLL_USER}' na org ${ENROLL_ORG}"
+  _uid_e="$(api GET "/users?search=${ENROLL_USER}" 2>/dev/null \
+    | jq -r --arg u "${ENROLL_USER}" '.[]? | select(.username==$u or .primaryEmail==$u) | .id' | head -1)"
+  [ -n "${_uid_e}" ] || { say "   ERRO: usuario '${ENROLL_USER}' nao existe. Criar identidade humana e ato do maestro."; exit 7; }
+  _oid_e="$(api GET "/organizations" | jq -r --arg n "${ENROLL_ORG}" '.[]? | select(.name==$n or .id==$n) | .id' | head -1)"
+  [ -n "${_oid_e}" ] || { say "   ERRO: organizacao '${ENROLL_ORG}' nao existe. Rode --project-federation antes."; exit 7; }
+
+  if [ "${APPLY}" = "1" ]; then
+    if api GET "/organizations/${_oid_e}/users" | jq -e --arg u "${_uid_e}" '.[]? | select(.id==$u)' >/dev/null 2>&1; then
+      say "   já era membro"
+    else
+      api POST "/organizations/${_oid_e}/users" "$(jq -nc --arg u "${_uid_e}" '{userIds:[$u]}')" >/dev/null
+      say "   membro adicionado (user=${_uid_e} org=${_oid_e})"
+    fi
+    if [ -n "${ENROLL_ROLE:-}" ]; then
+      _orid="$(api GET "/organization-roles" | jq -r --arg n "${ENROLL_ROLE}" '.[]? | select(.name==$n) | .id' | head -1)"
+      if [ -n "${_orid}" ]; then
+        api POST "/organizations/${_oid_e}/users/${_uid_e}/roles" "$(jq -nc --arg r "${_orid}" '{organizationRoleIds:[$r]}')" >/dev/null 2>&1
+        say "   org-role '${ENROLL_ROLE}' atribuida"
+      else
+        say "   ⚠ org-role '${ENROLL_ROLE}' nao existe — membro sem papel"
+      fi
+    fi
+  else
+    say "   [DRY-RUN] matricularia user=${_uid_e} na org=${_oid_e} com papel ${ENROLL_ROLE:-—}"
+  fi
+  exit 0
+fi
+
+# --- MODO --invites: lista convites com estado e validade (ADR fatia 3) -------
+if [ "${LIST_INVITES:-0}" = "1" ]; then
+  step "convites de organizacao"
+  api GET "/organization-invitations" 2>/dev/null \
+    | jq -r '.[]? | "   \(.invitee)  org=\(.organizationId)  status=\(.status)  expira=\(.expiresAt)"' \
+    | sed 's/^/  /' || say "   (nenhum)"
+  exit 0
+fi
+
+# --- MODO --invite: convite rastreavel no lugar do segredo compartilhado ------
+# O que se aposenta aqui: INVITE_TOKENS_COURTESY/BYOK eram strings no .env, coladas no
+# chat. Ninguem sabia quem tinha qual, nem quando parava de valer — e quando o flip do P7
+# as matou, NINGUEM NOTOU (nem gate, nem humano). Um convite tem inviter, invitee, status
+# e expires_at: some quando expira, e o sumico e visivel.
+if [ -n "${INVITE_EMAIL:-}" ]; then
+  : "${INVITE_ORG:?--invite exige --invite-org <id-da-organizacao>}"
+  _days="${INVITE_DAYS:-7}"
+  step "convidar ${INVITE_EMAIL} para a org ${INVITE_ORG} (validade ${_days}d)"
+
+  _oid="$(api GET "/organizations" | jq -r --arg n "${INVITE_ORG}" '.[]? | select(.name==$n or .id==$n) | .id' | head -1)"
+  [ -n "${_oid}" ] || { say "   ERRO: organizacao '${INVITE_ORG}' nao existe. Rode --project-federation antes."; exit 6; }
+
+  _rids="[]"
+  if [ -n "${INVITE_ROLE:-}" ]; then
+    _rid_o="$(api GET "/organization-roles" | jq -r --arg n "${INVITE_ROLE}" '.[]? | select(.name==$n) | .id' | head -1)"
+    [ -n "${_rid_o}" ] || { say "   ERRO: org-role '${INVITE_ROLE}' nao existe"; exit 6; }
+    _rids="$(jq -nc --arg r "${_rid_o}" '[$r]')"
+  fi
+
+  _exp="$(( ($(date +%s) + _days*86400) * 1000 ))"
+  if [ "${APPLY}" = "1" ]; then
+    _resp="$(api POST "/organization-invitations" "$(jq -nc \
+      --arg o "${_oid}" --arg e "${INVITE_EMAIL}" --argjson x "${_exp}" --argjson r "${_rids}" \
+      '{organizationId:$o, invitee:$e, expiresAt:$x} + (if ($r|length)>0 then {organizationRoleIds:$r} else {} end)')")"
+    _iid="$(printf '%s' "${_resp}" | jq -r '.id // empty')"
+    if [ -n "${_iid}" ]; then
+      say "   convite criado: id=${_iid} status=$(printf '%s' "${_resp}" | jq -r '.status // "?"')"
+      say "   ⚠ o convidado precisa conseguir ENTRAR: o sign_up do tenant default esta fechado."
+      say "     Verifique se o convite dispensa registro aberto ANTES de prometer acesso a alguem."
+    else
+      say "   FALHOU: $(printf '%s' "${_resp}" | jq -r '.message // .code // .' | head -c 200)"; exit 6
+    fi
+  else
+    say "   [DRY-RUN] criaria convite para ${INVITE_EMAIL} na org ${_oid} (expira em ${_days}d)"
+  fi
+  exit 0
+fi
+
 # --- MODO --project-federation: members.yaml -> Organizations (ADR D1/D2) -----
 # O members.yaml e o SSOT; o Logto e PROJECAO dele. Sentido unico, sempre. So `kind: adopter`
 # vira Organization — `source` e o emissor, e distillation/door/method nao pedem identidade
