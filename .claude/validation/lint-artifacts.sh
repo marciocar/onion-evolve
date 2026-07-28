@@ -747,6 +747,8 @@ PY
     ver="${meta%%|*}"; local_path="${meta#*|}"
 
     # Há anúncio de 1º nível aguardando transporte? (_processed/ já foi entregue — não varrer)
+    # `_`-prefixado é área reservada (`_processed`, `_archive`), não canal de membro.
+    case "${member_id}" in _*) continue ;; esac
     pend=0
     for f in "${member_dir}"*.md; do [ -f "${f}" ] && pend=1 && break; done
     [ "${pend}" -eq 1 ] || continue
@@ -2098,6 +2100,52 @@ check_rules_registry_sync() {
 #           (à mão ou não) commite o stamp. Dispara p/ role: adopted OU hub (ambos são stamps de
 #           adoção), em repo git. Fecha o buraco no mecanismo (não one-off): [[fix-must-become-mechanism]].
 # ===========================================================================
+# REGRA 46 — Canal da federação: diretório de outbox tem membro correspondente [SOFT]
+# previne: anúncio órfão — diretório de outbox cujo nome não é id de membro nunca é servido pelo pull, e some em silêncio
+# ------------------------------------------------------------------------------------
+# Enquanto a entrega downstream era `cp` guiado por --target, o NOME do diretório de
+# outbox nunca importou: o carteiro sabia o caminho. Com o pull (ADR transport-pull), o
+# nome VIRA A CHAVE — o endpoint serve `outbox/<member-id>/_processed/` e resolve o
+# membro pela organização do token. Diretório que não corresponde a membro é anúncio que
+# NUNCA será servido, e some em silêncio.
+#
+# Achado de campo 2026-07-28: uma correção de id de membro (tirar o nome de uma empresa
+# da superfície pública) renomeou o membro e deixou o diretório de outbox antigo para
+# trás. 25 anúncios ficaram órfãos por 19 dias, e só apareceram quando o pull tornou a
+# convenção executável. Esta guarda os teria pego no mesmo dia da renomeação.
+check_federation_outbox_membership() {
+  local base="docs/evolution/federation/outbox" members="docs/evolution/federation/members.yaml"
+  [ -d "${REPO_ROOT}/${base}" ] && [ -f "${REPO_ROOT}/${members}" ] || return 0
+  command -v python3 >/dev/null 2>&1 || return 0   # sem python3, não fingir que passou
+  local orfaos
+  orfaos="$(cd "${REPO_ROOT}" && python3 - "${members}" "${base}" <<'PYEOF'
+import sys, os, re
+members, base = sys.argv[1], sys.argv[2]
+# leitura tolerante: `  - id: <slug>` no topo de cada membro (sem exigir pyyaml)
+ids = set(re.findall(r'^\s*-\s+id:\s*([A-Za-z0-9._-]+)\s*$', open(members, encoding='utf-8').read(), re.M))
+for d in sorted(os.listdir(base)):
+    # `_`-prefixado e convenção de área reservada (como `_processed`, `_archive`):
+    # não é canal de membro e portanto não pede membro correspondente.
+    if d.startswith('_') or not os.path.isdir(os.path.join(base, d)) or d in ids:
+        continue
+    n = 0
+    for root, _, files in os.walk(os.path.join(base, d)):
+        n += sum(1 for f in files if f.endswith('.md') and f.lower() != 'readme.md')
+    print(f"{d}\t{n}")
+PYEOF
+)"
+  [ -n "${orfaos}" ] || return 0
+  local d n
+  while IFS=$'\t' read -r d n; do
+    [ -n "${d}" ] || continue
+    # SOFT, nunca HARD — e a escolha NAO e minha: o selftest da REGRA 28 (caso 7) defende
+    # essa propriedade desde 2026-07-19, porque anuncio orfao PRE-EXISTENTE bloquearia o CI
+    # de qualquer adotante que ja tenha um. Eu tinha escrito HARD sem saber, e o selftest
+    # reprovou — que e exatamente para isso que ele existe.
+    violation "SOFT" "${base}/${d}" "[federação/outbox-órfã] diretório sem membro correspondente em members.yaml — ${n} anúncio(s) que o pull NUNCA servirá (o endpoint resolve por member-id). Renomeie o diretório para o id do membro, ou registre o membro"
+  done <<< "${orfaos}"
+}
+
 check_onion_version_tracked() {
   local stamp="${REPO_ROOT}/.claude/.onion-version"
   [ -f "${stamp}" ] || return 0
@@ -2238,6 +2286,7 @@ check_frontmatter_model_category
 check_rules_registry_sync
 check_onion_version_tracked
 check_family_topology_sync
+check_federation_outbox_membership
 
 # ===========================================================================
 # SUMÁRIO FINAL
