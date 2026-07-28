@@ -18,7 +18,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**45 regras** no total — **41 HARD**, **8 SOFT**.
+**46 regras** no total — **41 HARD**, **9 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -107,6 +107,7 @@ Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.
 | 25 | Agent Card A2A do core (docs/onion/agent-card.json) sincronizado com o SSOT | HARD | agent-card A2A do core driftando do SSOT — interop mente |
 | 28 | Anúncio em staging para membro SEM canal de recepção | SOFT | anúncio a um membro sem canal de recepção — entrega no vazio |
 | 38 | Mapa da federação (docs/onion/federation-map.md) sincronizado com members.yaml | HARD | mapa da federação driftando de members.yaml |
+| 46 | Canal da federação: diretório de outbox tem membro correspondente | SOFT | anúncio órfão — diretório de outbox cujo nome não é id de membro nunca é servido pelo pull, e some em silêncio |
 
 ## Projeção & privacidade
 

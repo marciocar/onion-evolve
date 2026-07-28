@@ -1313,6 +1313,43 @@ nodes:
     label: "A PRIMEIRA PROVA DE 'nao trava' ERA FRACA e eu percebi ao ler o numero: apontei para 127.0.0.1:9 e deu 0.076s — conexao RECUSADA volta na hora, nao pendura. O caso que trava e rede que ENGOLE o pacote. Repetido contra 10.255.255.1 (nao-roteavel) com ONION_FED_TIMEOUT=3: 3.012s exatos. O timeout duro segurou o que o curl nao segura sozinho. Testar o modo-de-falha facil no lugar do dificil e falso-verde por escolha de alvo"
 
 
+  - id: E_outbox_split_by_rename
+    node_type: evidence
+    trace: docs/evolution/federation/outbox/
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: sha256-e-datas-dos-dois-diretorios
+    label: "NAO ERAM DUPLICATAS — verificado por CONTEUDO, nao por nome: 0 sha256 em comum, 0 nomes em comum, periodos DISJUNTOS (22/06-04/07 num dir, 09/07-27/07 no outro). Sao 49 anuncios reais, as duas metades da mesma historia. A fratura tem data e motivo: a correcao do id do membro em 09/07 (tirar nome de empresa da superficie) renomeou o membro e deixou o diretorio antigo para tras. Consolidado com git mv (renames preservados): 24 + 25 = 49"
+
+  - id: D_rule_46_outbox_membership
+    node_type: decision
+    trace: .claude/validation/lint-artifacts.sh
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: denominador-com-diretorio-fantasma
+    label: "REGRA 46 [SOFT] — diretorio de outbox sem membro correspondente. NAO duplica a regra SOFT preexistente: aquela olha so a STAGING (1o nivel), e o caso real tinha a staging VAZIA com os 25 todos em _processed/ — por isso o drift sobreviveu 19 dias. Provado com denominador: diretorio fantasma com anuncio SO em _processed => a nova DISPARA, a SOFT preexistente da 0 disparos. Enquanto a entrega era `cp --target`, o nome do diretorio nao importava; o pull tornou a convencao EXECUTAVEL e a divergencia apareceu no 1o uso real. SEVERIDADE CORRIGIDA PELO SELFTEST: eu escrevi HARD e o caso (7) da REGRA 28 reprovou — ele defende 'SOFT, nunca HARD' desde 2026-07-19, porque anuncio orfao PRE-EXISTENTE bloquearia o CI de qualquer adotante que ja tenha um. Eu reverti uma decisao documentada sem saber que existia, e a guarda mecanica me pegou onde a leitura nao pegou"
+
+  - id: C_vendor_scrub_caught_me_again
+    node_type: claim
+    trace: .claude/validation/lint-artifacts.sh
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: violacao-do-lint-na-propria-regra
+    label: "REINCIDENCIA: escrevi o nome de um adotante no COMENTARIO da regra nova, e a REGRA 36 (vendor-scrub) me pegou — comentario em lint-artifacts.sh viaja vendorizado para todo adotante. Generalizado para 'uma correcao de id de membro'. E a 2a vez nesta sessao que o vendor-scrub apanha credito nominal indo para superficie que viaja; o lugar do nome e o diario privado"
+
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -1775,6 +1812,15 @@ edges:
   - from: E_timeout_is_load_bearing
     to: E_session_hook_pulls
     edge_type: SUPPORTS
+  - from: E_outbox_split_by_rename
+    to: D_rule_46_outbox_membership
+    edge_type: SUPPORTS
+  - from: D_rule_46_outbox_membership
+    to: E_pull_endpoint_works
+    edge_type: SUPPORTS
+  - from: C_vendor_scrub_caught_me_again
+    to: D_rule_46_outbox_membership
+    edge_type: CONSTRAINS
   - from: D_downstream_by_pull
     to: D_org_born_on_demand
     edge_type: DEPENDS_ON
