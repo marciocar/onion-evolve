@@ -32,6 +32,29 @@ count_overdue_diary() {
   echo "$n"
 }
 
+# ── PULL DOWNSTREAM antes de contar (ADR transport-pull D1) ───────────────────
+# Puxa do core os anúncios deste membro ANTES da contagem, para o 📥 refletir o que
+# existe agora — e não o que sobrou da última cópia manual.
+#
+# Três exigências que brigam entre si, resolvidas por construção:
+#   1. NÃO PODE TRAVAR  → `timeout` duro; sem ele, um bridge lento congela toda sessão.
+#   2. NÃO PODE FALHAR  → tudo sob `|| true`; rede fora do ar não é motivo para a sessão
+#                         do adotante não abrir. O que já está em disco continua contando.
+#   3. NÃO PODE CUSTAR  → sem credencial no ambiente, sai em 4 testes de variável e ZERO
+#                         syscall de rede. É o caso de todo adotante ainda não configurado,
+#                         ou seja: comportamento inalterado para quem não optou.
+pull_inbox() {
+  local sh="${CLAUDE_PROJECT_DIR:-.}/.claude/utils/federation-transport/inbox-pull.sh"
+  [ -f "$sh" ] || return 0
+  # .env do adotante é a fonte das credenciais; ausente = não configurado = silêncio.
+  [ -f .env ] && { set -a; . ./.env 2>/dev/null || true; set +a; }
+  [ -n "${ONION_FED_CLIENT_ID:-}" ] && [ -n "${ONION_FED_CLIENT_SECRET:-}" ] \
+    && [ -n "${ONION_FED_ORG_ID:-}" ] && [ -n "${ONION_FED_MEMBER:-}" ] || return 0
+  command -v timeout >/dev/null 2>&1 || return 0
+  timeout "${ONION_FED_TIMEOUT:-20}" bash "$sh" --apply >/dev/null 2>&1 || true
+}
+pull_inbox
+
 nb="$(count_unread docs/evolution/inbox)"     # upstream
 na="$(count_unread docs/evolution/inbound)"   # downstream
 nd="$(count_overdue_diary)"                   # reflexão (diário vencido)
