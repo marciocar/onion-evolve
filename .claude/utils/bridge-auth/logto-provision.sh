@@ -28,6 +28,7 @@ BRIDGE_USER="marcio"
 RESOURCE_INDICATOR="https://bridge.onionevolve.com"
 SCOPE_NAME="bridge:invoke"
 ADMIN_SCOPE="bridge:admin"       # P9 — admin por IDENTIDADE, nao por segredo compartilhado
+WRITE_SCOPE="bridge:write"       # P10 — CAPACIDADE por identidade (escrever/executar vs so ler)
 ROLE_NAME="bridge-operator"      # M2M — o chamador SERVIÇO
 USER_ROLE_NAME="bridge-user"     # User — a PESSOA (tipo diferente no Logto; a M2M não serve)
 PASS_FILE="/root/.onion-logto-bootstrap"
@@ -342,6 +343,41 @@ if [ "${APPLY}" = "1" ] && [ -n "${_rid:-}" ] && [ -n "${_urid:-}" ]; then
   fi
 else
   say "   [DRY-RUN ou pré-requisito ausente] criaria ${ADMIN_SCOPE} e concederia à role humana"
+fi
+
+# --- 9. scope bridge:write + capacidade por identidade (P10) ----------------
+# P0-P9 fecharam QUEM entra. Nao tocaram O QUE se pode fazer: `bridge:invoke` era
+# tudo-ou-nada e todo chamador autenticado executava irrestrito (PERMISSION_MODE=
+# bypassPermissions). O ganho real da identidade e poder DIFERENCIAR — sem isto,
+# trocamos "quem tem o segredo faz tudo" por "quem tem identidade faz tudo".
+# Sem este scope o chamador LE e PROPOE (Read/Grep/Glob/WebFetch/WebSearch/TodoWrite);
+# com ele, o conjunto completo. A restricao vive em `tools` do Agent SDK — NAO em
+# `allowedTools`, que a doc do pacote diz explicitamente que so AUTO-APROVA, nao limita.
+step "9. scope ${WRITE_SCOPE} + capacidade por identidade (P10)"
+if [ "${APPLY}" = "1" ] && [ -n "${_rid:-}" ] && [ -n "${_urid:-}" ]; then
+  _scopes2="$(api GET "/resources/${_rid}/scopes")"
+  _wsid="$(printf '%s' "${_scopes2}" | jq -r --arg s "${WRITE_SCOPE}" '.[]? | select(.name==$s) | .id' | head -1)"
+  if [ -n "${_wsid}" ]; then
+    say "   scope já existe (id=${_wsid})"
+  else
+    _wsid="$(api POST "/resources/${_rid}/scopes" \
+      "$(jq -nc --arg s "${WRITE_SCOPE}" '{name:$s, description:"Escrever e executar (Bash, Write, Edit). Sem ele: so leitura e proposta"}')" \
+      | jq -r '.id // empty')"
+    say "   scope criado (id=${_wsid:-FALHOU})"
+  fi
+  # Mesma regra do admin: só a role HUMANA. Um chamador M2M que so precisa consultar
+  # nao recebe execucao — e a diferenca fica VISIVEL na medicao, nao afirmada.
+  if [ -n "${_wsid}" ]; then
+    _rs2="$(api GET "/roles/${_urid}/scopes")"
+    if printf '%s' "${_rs2}" | jq -e --arg s "${_wsid}" '.[]? | select(.id==$s)' >/dev/null 2>&1; then
+      say "   role humana já tem ${WRITE_SCOPE}"
+    else
+      api POST "/roles/${_urid}/scopes" "$(jq -nc --arg s "${_wsid}" '{scopeIds:[$s]}')" >/dev/null
+      say "   ${WRITE_SCOPE} concedido à role humana (serviço NÃO recebe)"
+    fi
+  fi
+else
+  say "   [DRY-RUN ou pré-requisito ausente] criaria ${WRITE_SCOPE} e concederia à role humana"
 fi
 
 step "RESUMO"

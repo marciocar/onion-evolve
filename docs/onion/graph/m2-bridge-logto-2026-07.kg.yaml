@@ -860,6 +860,66 @@ nodes:
     verified_against: pwa-do-maestro-e-token-de-servico-medidos
     label: "A FRONTEIRA DECLARADA FOI FECHADA — e o defeito era meu, na costura. O guard de admin estava CERTO desde o restart (a PWA recebeu literalmente 'nao autorizado — acesso admin requer identidade com bridge:admin'), mas o token do maestro nao carregava o scope por DUAS causas somadas: (a) a PWA pedia so `bridge:invoke` — scope OAuth e REQUISITADO, nao concedido automaticamente, entao a role ter o scope NAO BASTA se o cliente nao o pede; (b) o login era de 18:02 e o scope nasceu 23:23, logo o token era anterior a existencia dele. Consertado: SCOPES da PWA passou a pedir bridge:admin para TODOS. PROVA DE QUE ISSO E SEGURO, medida e nao afirmada: o app de SERVICO pediu `bridge:invoke bridge:admin` e o Logto emitiu token com scope=`bridge:invoke` APENAS — pedir nao e receber, a autorizacao mora no servidor. /admin/stats devolve 401 ao servico mesmo tendo pedido. Maestro confirmou a engrenagem visivel na PWA apos re-login"
 
+  - id: C_identity_bought_who_not_what
+    node_type: claim
+    trace: .claude/utils/bridge-auth/bridge-src/chat.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: env-e-toolset-do-sdk-medidos
+    label: "P0-P9 fecharam QUEM entra e NAO tocaram O QUE se pode fazer. PERMISSION_MODE=bypassPermissions seguia vivo e `bridge:invoke` era tudo-ou-nada: toda identidade autenticada executava irrestrito. Sem diferenciar capacidade, o flip so trocou 'quem tem o segredo faz tudo' por 'quem tem identidade faz tudo' — melhor (revogavel, nominal, auditavel) mas nao MENOS PODER"
+
+  - id: C_allowedtools_does_not_restrict
+    node_type: claim
+    trace: .claude/utils/bridge-auth/bridge-src/chat.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: tipos-do-pacote-instalado-v0.3.195
+    label: "CORRECAO DE PREMISSA, apanhada ANTES de virar codigo: eu ia usar `allowedTools` como allowlist. A doc do @anthropic-ai/claude-agent-sdk v0.3.195 instalado diz o oposto — allowedTools 'auto-allows without prompting', e 'to restrict which tools are available, use the `tools` option instead'. Escrito de memoria, teria entregue uma restricao que NAO RESTRINGE: falso-verde por construcao, na propria guarda de capacidade. Quem limita e `tools` (com [] desligando tudo) e `disallowedTools` (remove do contexto). A skill que carreguei tambem era a errada — cobre a Claude API, nao o Agent SDK; a fonte que valeu foi o pacote em disco"
+
+  - id: D_capability_by_scope
+    node_type: decision
+    trace: .claude/utils/bridge-auth/logto-provision.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: grants-no-db-e-toolset-medido-no-ar
+    label: "P10 — CAPACIDADE por identidade via scope `bridge:write` (autorizado nominalmente pelo maestro apos o classificador barrar a versao que eu ia inventar sozinho). Concedido SO a role humana; o app de SERVICO nao recebe. Sem o scope: Read/Grep/Glob/WebFetch/WebSearch/TodoWrite — le e propoe. Com ele: conjunto completo. `Task` fica de fora de proposito — um subagente poderia receber o conjunto completo e a restricao vazaria pelo delegado. Provisionamento incorporado ao script idempotente (passo 9), nao aplicado a mao"
+
+  - id: E_p10_service_cannot_write
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/bridge-src/chat.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: canario-de-escrita-e-enumeracao-no-ar
+    label: "PROVA COMPORTAMENTAL, nao declaracao: o app de servico (scope=bridge:invoke apenas) recebeu 'crie o arquivo X, use qualquer meio disponivel' e o arquivo NAO existe depois (denominador explicito: o prompt pedia a escrita, a resposta veio com 14294 bytes, nao foi turno vazio). Enumeracao concorda: Glob/Grep/Read/WebFetch/WebSearch, sem Bash/Write/Edit. A 1a medicao foi DESCARTADA por ambigua — o marcador 'SEM_BASH' convivia com 'onion' na saida, e `id -un` no bridge devolve exatamente 'onion'"
+
+  - id: Q_p10_mutation_not_run
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.7
+    status: open
+    verified_at: 2026-07-28
+    verified_against: controle-recusado-por-desenho
+    label: "FRONTEIRA DECLARADA: o controle de mutacao (remover o filtro e reprovar que o canario passa) NAO foi rodado — exigiria desligar uma guarda de seguranca no bridge VIVO, mesma familia do que ja se recusou em P9 (conceder bridge:admin ao servico 'so para testar'). Logo, 'a guarda e load-bearing' esta apoiado na enumeracao + no canario, nao em mutacao. Fechar com fixture fora de producao quando houver ambiente de teste do bridge"
+
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -1211,6 +1271,18 @@ edges:
   - from: E_p9_human_admin_proven
     to: C_identity_hole
     edge_type: REFUTES
+  - from: D_capability_by_scope
+    to: C_identity_bought_who_not_what
+    edge_type: SUPERSEDES
+  - from: C_allowedtools_does_not_restrict
+    to: D_capability_by_scope
+    edge_type: CONSTRAINS
+  - from: E_p10_service_cannot_write
+    to: D_capability_by_scope
+    edge_type: SUPPORTS
+  - from: Q_p10_mutation_not_run
+    to: E_p10_service_cannot_write
+    edge_type: CONSTRAINS
   - from: C_scaffold_removed_proof_was_invalid
     to: C_console_not_the_path
     edge_type: SUPPORTS

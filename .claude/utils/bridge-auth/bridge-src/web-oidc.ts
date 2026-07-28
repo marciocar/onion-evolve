@@ -37,7 +37,7 @@ const RESOURCE  = "https://bridge.onionevolve.com"; // RFC 8707 — o aud que o 
 // scope, e o token não o carregava porque ninguém pediu). Pedir para todos é seguro: o
 // Logto emite APENAS o que a role concede, então um usuário sem admin recebe só invoke —
 // a autorização continua no servidor, não no que o cliente pede.
-const SCOPES    = "openid profile offline_access bridge:invoke bridge:admin";
+const SCOPES    = "openid profile offline_access bridge:invoke bridge:admin bridge:write";
 const REDIRECT  = window.location.origin + "/";
 
 const K_ACCESS  = "onion_oidc_access";
