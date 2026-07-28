@@ -74,6 +74,8 @@ while [ $# -gt 0 ]; do
     --invite-days) INVITE_DAYS="${2:?--invite-days precisa de numero}"; shift ;;
     --invites)     LIST_INVITES=1 ;;
     --uninvite)    UNINVITE_ID="${2:?--uninvite precisa do id do convite}"; shift ;;
+    --drop-org)    DROP_ORG="${2:?--drop-org precisa do nome da organizacao}"; shift ;;
+    --drop-user)   DROP_USER="${2:?--drop-user precisa do username}"; shift ;;
     # Fatia 3 REDESENHADA: convite por e-mail nao funciona aqui (0 conectores + sign_up
     # fechado, e a doc do Logto diz que convite de organizacao NAO e o desvio p/ registro
     # fechado — o desvio documentado e magic link). Pre-provisionar cabe melhor: membro da
@@ -175,6 +177,40 @@ mutate() { # mutate <descrição> <METHOD> <PATH> <json>
 }
 
 # --- 1. usuário do maestro no tenant default -------------------------------
+# --- MODO --drop-user: remove conta DORMENTE (guarda: nunca logou) ------------
+# Conta privilegiada que ninguem usa e superficie de ataque sem contrapartida. A guarda
+# nao e conselho: se a conta JA LOGOU alguma vez, o modo recusa — apagar identidade viva
+# nao pode ser efeito colateral de uma limpeza.
+if [ -n "${DROP_USER:-}" ]; then
+  step "remover conta dormente '${DROP_USER}'"
+  _du="$(api GET "/users?search=${DROP_USER}" | jq -c --arg u "${DROP_USER}" '[.[]? | select(.username==$u)] | .[0] // {}')"
+  _duid="$(printf '%s' "${_du}" | jq -r '.id // empty')"
+  [ -n "${_duid}" ] || { say "   nao existe — nada a fazer"; exit 0; }
+  _last="$(printf '%s' "${_du}" | jq -r '.lastSignInAt // "null"')"
+  if [ "${_last}" != "null" ] && [ -n "${_last}" ]; then
+    say "   RECUSADO: '${DROP_USER}' JA LOGOU (lastSignInAt=${_last}) — nao e conta dormente."; exit 9
+  fi
+  if [ "${APPLY}" = "1" ]; then
+    api DELETE "/users/${_duid}" >/dev/null 2>&1 || true
+    say "   removida (id=${_duid}, nunca logou)"
+  else say "   [DRY-RUN] removeria ${DROP_USER} (id=${_duid}, nunca logou)"; fi
+  exit 0
+fi
+
+# --- MODO --drop-org: remove uma organizacao (pela API) -----------------------
+if [ -n "${DROP_ORG:-}" ]; then
+  step "remover organizacao ${DROP_ORG}"
+  _did="$(api GET "/organizations" | jq -r --arg n "${DROP_ORG}" '.[]? | select(.name==$n or .id==$n) | .id' | head -1)"
+  [ -n "${_did}" ] || { say "   nao existe — nada a fazer"; exit 0; }
+  _mem="$(api GET "/organizations/${_did}/users" | jq -r 'length')"
+  if [ "${_mem:-0}" != "0" ]; then say "   RECUSADO: org tem ${_mem} membro(s). Retire-os antes."; exit 8; fi
+  if [ "${APPLY}" = "1" ]; then
+    api DELETE "/organizations/${_did}" >/dev/null 2>&1 || true
+    say "   removida (id=${_did})"
+  else say "   [DRY-RUN] removeria ${DROP_ORG} (id=${_did}, 0 membros)"; fi
+  exit 0
+fi
+
 # --- MODO --uninvite: retira um convite (pela API, nunca por SQL) -------------
 if [ -n "${UNINVITE_ID:-}" ]; then
   step "retirar convite ${UNINVITE_ID}"
@@ -195,7 +231,18 @@ if [ -n "${ENROLL_USER:-}" ]; then
     | jq -r --arg u "${ENROLL_USER}" '.[]? | select(.username==$u or .primaryEmail==$u) | .id' | head -1)"
   [ -n "${_uid_e}" ] || { say "   ERRO: usuario '${ENROLL_USER}' nao existe. Criar identidade humana e ato do maestro."; exit 7; }
   _oid_e="$(api GET "/organizations" | jq -r --arg n "${ENROLL_ORG}" '.[]? | select(.name==$n or .id==$n) | .id' | head -1)"
-  [ -n "${_oid_e}" ] || { say "   ERRO: organizacao '${ENROLL_ORG}' nao existe. Rode --project-federation antes."; exit 7; }
+  # ORG NASCE SOB DEMANDA (decisao do maestro 2026-07-28): criar as 8 de uma vez produziu
+  # 7 organizacoes que ninguem autenticava — esqueleto que envelhece. `kind: adopter`
+  # responde "vendoriza?", nao "alguem autentica como isso?" — sao perguntas diferentes.
+  if [ -z "${_oid_e}" ]; then
+    _in_ssot="$(grep -c "id: ${ENROLL_ORG}\$" "${MEMBERS_YAML:-docs/evolution/federation/members.yaml}" 2>/dev/null || echo 0)"
+    [ "${_in_ssot}" != "0" ] || { say "   ERRO: '${ENROLL_ORG}' nao existe no members.yaml (SSOT). Registre la primeiro."; exit 7; }
+    if [ "${APPLY}" = "1" ]; then
+      _oid_e="$(api POST "/organizations" "$(jq -nc --arg n "${ENROLL_ORG}" '{name:$n, description:"Membro da federacao Onion — criada sob demanda na 1a matricula"}')" | jq -r '.id // empty')"
+      say "   org '${ENROLL_ORG}' criada sob demanda (id=${_oid_e})"
+    else say "   [DRY-RUN] criaria a org '${ENROLL_ORG}' sob demanda"; fi
+  fi
+  [ -n "${_oid_e}" ] || { say "   [DRY-RUN] sem org, parando aqui"; exit 0; }
 
   if [ "${APPLY}" = "1" ]; then
     if api GET "/organizations/${_oid_e}/users" | jq -e --arg u "${_uid_e}" '.[]? | select(.id==$u)' >/dev/null 2>&1; then
@@ -304,16 +351,21 @@ PYEOF
     else say "   [DRY-RUN] criaria org-role ${_t}"; fi
   done
 
-  # organizations = adotantes
+  # ORGS NAO SAO MAIS CRIADAS EM MASSA (decisao 2026-07-28). Criar as 8 de uma vez deu
+  # 7 organizacoes vazias que ninguem autenticava — esqueleto que envelhece e faz o D5
+  # ficar verde sobre estrutura inutil. A org nasce na 1a matricula (--enroll). Aqui so
+  # se RELATA quem do SSOT ainda nao tem org, para a lacuna ficar visivel sem virar lixo.
   _existing_orgs="$(api GET "/organizations" 2>/dev/null || echo '[]')"
+  _sem_org=""
   for _a in ${_adopters}; do
-    _oid="$(printf '%s' "${_existing_orgs}" | jq -r --arg n "${_a}" '.[]? | select(.name==$n) | .id' | head -1)"
-    if [ -n "${_oid}" ]; then say "   org ${_a}: já existe (id=${_oid})"
-    elif [ "${APPLY}" = "1" ]; then
-      _oid="$(api POST "/organizations" "$(jq -nc --arg n "${_a}" '{name:$n, description:"Membro da federacao Onion — projetado do members.yaml (SSOT)"}')" | jq -r '.id // empty')"
-      say "   org ${_a}: criada (id=${_oid:-FALHOU})"
-    else say "   [DRY-RUN] criaria org ${_a}"; fi
+    printf '%s' "${_existing_orgs}" | jq -e --arg n "${_a}" '.[]? | select(.name==$n)' >/dev/null 2>&1 \
+      || _sem_org="${_sem_org} ${_a}"
   done
+  if [ -n "${_sem_org}" ]; then
+    say "   sem org (nasce na 1a matricula):${_sem_org}"
+  else
+    say "   todos os adotantes do SSOT ja tem org"
+  fi
 
   # D5 — DIVERGENCIA: org no Logto que nao esta no SSOT. Reporta, NUNCA absorve: absorver
   # deixaria o plano de execucao redefinir o SSOT pelas costas.
