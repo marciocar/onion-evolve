@@ -76,6 +76,9 @@ while [ $# -gt 0 ]; do
     --uninvite)    UNINVITE_ID="${2:?--uninvite precisa do id do convite}"; shift ;;
     --drop-org)    DROP_ORG="${2:?--drop-org precisa do nome da organizacao}"; shift ;;
     --drop-user)   DROP_USER="${2:?--drop-user precisa do username}"; shift ;;
+    # ADR transport-pull D3 — uma credencial M2M por adotante, associada a org dele.
+    --enroll-app)  ENROLL_APP="${2:?--enroll-app precisa do nome do app M2M}"; shift ;;
+    --write-org-map) WRITE_ORG_MAP=1 ;;
     # Fatia 3 REDESENHADA: convite por e-mail nao funciona aqui (0 conectores + sign_up
     # fechado, e a doc do Logto diz que convite de organizacao NAO e o desvio p/ registro
     # fechado — o desvio documentado e magic link). Pre-provisionar cabe melhor: membro da
@@ -177,6 +180,60 @@ mutate() { # mutate <descrição> <METHOD> <PATH> <json>
 }
 
 # --- 1. usuário do maestro no tenant default -------------------------------
+# --- MODO --write-org-map: cache id-da-org -> nome do membro ------------------
+# O token de organizacao NAO carrega o nome (medido 2026-07-28): a org vive so na
+# audience, como `urn:logto:organization:<id>`. O bridge precisa do nome para saber qual
+# outbox servir — e dar-lhe credencial da Management API para consultar seria conceder o
+# universo por conveniencia. Entao gera-se um MAPA DERIVADO, regeneravel por comando.
+#
+# Isto NAO fere o D5 do ADR de projecao: o SSOT segue decidindo QUAIS orgs existem; o id
+# e so a alca interna que o Logto atribuiu — como um pin, cacheado e reverificavel. Um id
+# ausente do mapa faz o endpoint recusar (fail-closed), nunca adivinhar.
+if [ "${WRITE_ORG_MAP:-0}" = "1" ]; then
+  _dest="${ORG_MAP_PATH:-docs/onion/federation-orgs.json}"
+  step "gerar mapa org-id -> membro em ${_dest}"
+  _map="$(api GET "/organizations" | jq -c 'map({(.id): .name}) | add // {}')"
+  if [ "${APPLY}" = "1" ]; then
+    printf '%s\n' "${_map}" | jq . > "${_dest}"
+    say "   escrito: $(printf '%s' "${_map}" | jq -r 'length') organizacao(oes)"
+  else
+    say "   [DRY-RUN] escreveria: $(printf '%s' "${_map}" | jq -c .)"
+  fi
+  exit 0
+fi
+
+# --- MODO --enroll-app: associa um app M2M a uma organizacao ------------------
+# Sem isso o token de organizacao e recusado com "app has not associated with the
+# organization" (medido 2026-07-28). E a associacao que permite ao endpoint saber QUAL
+# membro o chamador pode ler, sem consulta extra e sem segundo registro.
+if [ -n "${ENROLL_APP:-}" ]; then
+  : "${ENROLL_ORG:?--enroll-app exige --enroll-org <organizacao>}"
+  step "associar app '${ENROLL_APP}' a org ${ENROLL_ORG}"
+  _aid_a="$(api GET "/applications" | jq -r --arg n "${ENROLL_APP}" '.[]? | select(.name==$n) | .id' | head -1)"
+  if [ -z "${_aid_a}" ]; then
+    if [ "${APPLY}" = "1" ]; then
+      _aid_a="$(api POST "/applications" "$(jq -nc --arg n "${ENROLL_APP}" '{name:$n, type:"MachineToMachine", description:"Adotante puxando o proprio inbox da federacao"}')" | jq -r '.id // empty')"
+      say "   app criado (id=${_aid_a:-FALHOU})"
+    else say "   [DRY-RUN] criaria o app ${ENROLL_APP}"; fi
+  else say "   app ja existe (id=${_aid_a})"; fi
+
+  _oid_a="$(api GET "/organizations" | jq -r --arg n "${ENROLL_ORG}" '.[]? | select(.name==$n or .id==$n) | .id' | head -1)"
+  if [ -z "${_oid_a}" ]; then
+    _in_ssot="$(grep -c "id: ${ENROLL_ORG}\$" "${MEMBERS_YAML:-docs/evolution/federation/members.yaml}" 2>/dev/null || echo 0)"
+    [ "${_in_ssot}" != "0" ] || { say "   ERRO: '${ENROLL_ORG}' nao esta no members.yaml (SSOT)"; exit 7; }
+    if [ "${APPLY}" = "1" ]; then
+      _oid_a="$(api POST "/organizations" "$(jq -nc --arg n "${ENROLL_ORG}" '{name:$n, description:"Membro da federacao — criada sob demanda"}')" | jq -r '.id // empty')"
+      say "   org criada sob demanda (id=${_oid_a})"
+    else say "   [DRY-RUN] criaria a org ${ENROLL_ORG}"; fi
+  fi
+
+  if [ "${APPLY}" = "1" ] && [ -n "${_aid_a}" ] && [ -n "${_oid_a}" ]; then
+    api POST "/organizations/${_oid_a}/applications" "$(jq -nc --arg a "${_aid_a}" '{applicationIds:[$a]}')" >/dev/null 2>&1
+    say "   associado (app=${_aid_a} org=${_oid_a})"
+  fi
+  exit 0
+fi
+
 # --- MODO --drop-user: remove conta DORMENTE (guarda: nunca logou) ------------
 # Conta privilegiada que ninguem usa e superficie de ataque sem contrapartida. A guarda
 # nao e conselho: se a conta JA LOGOU alguma vez, o modo recusa — apagar identidade viva
