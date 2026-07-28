@@ -28,6 +28,11 @@ BRIDGE_USER="marcio"
 RESOURCE_INDICATOR="https://bridge.onionevolve.com"
 SCOPE_NAME="bridge:invoke"
 ADMIN_SCOPE="bridge:admin"       # P9 — admin por IDENTIDADE, nao por segredo compartilhado
+# ADR onion-adr-logto-as-projection-2026-07 D3 — UM app M2M POR CHAMADOR, nunca um
+# compartilhado: revogar um compartilhado derruba todos de uma vez, e o log nao distingue
+# quem chamou. Adicione chamadores aqui (separados por espaco); o script e idempotente.
+M2M_CALLERS="${M2M_CALLERS:-onion-bridge-service}"
+WRITE_SCOPE="bridge:write"       # P10 — CAPACIDADE por identidade (escrever/executar vs so ler)
 ROLE_NAME="bridge-operator"      # M2M — o chamador SERVIÇO
 USER_ROLE_NAME="bridge-user"     # User — a PESSOA (tipo diferente no Logto; a M2M não serve)
 PASS_FILE="/root/.onion-logto-bootstrap"
@@ -56,6 +61,10 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --apply) APPLY=1 ;;
     --user)  BRIDGE_USER="${2:?--user precisa de valor}"; shift ;;
+    # ADR D3 — revogar UM chamador sem tocar nos outros. Pela API do Logto, nunca por
+    # SQL direto no Postgres: escrita crua no store de identidade contorna a API E o
+    # proprio script, e o que contorna o mecanismo nao e repetivel nem auditavel.
+    --revoke) REVOKE_APP="${2:?--revoke precisa do nome do app M2M}"; shift ;;
     *) echo "argumento desconhecido: $1" >&2; exit 2 ;;
   esac
   shift
@@ -90,19 +99,19 @@ ERRO: o issuer do tenant `admin` não responde no loopback.
   (https://console.onionevolve.com). Sem o vhost, tudo cai no OIDC do tenant
   `default` e o token endpoint responde `invalid_client` — sem dizer o motivo.
 
-  CONSERTO (andaime temporário, loopback-only, NADA exposto — remova ao terminar):
+  CONSERTO — USE O MECANISMO QUE JA EXISTE, nao erga um vhost paralelo:
 
-    sudo tee /etc/caddy/conf.d/logto-console-local.caddy >/dev/null <<'EOF'
-    https://console.onionevolve.com {
-        bind 127.0.0.1
-        tls internal
-        reverse_proxy 127.0.0.1:3012
-    }
-    EOF
-    sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy
+    bash ~/onion-logto/console.sh on      # liga o vhost do console (publico, cert real)
+    bash ~/onion-logto/console.sh status  # confere
+    bash ~/onion-logto/console.sh off     # DESLIGUE ao terminar
 
-  AO TERMINAR:
-    sudo rm /etc/caddy/conf.d/logto-console-local.caddy && sudo systemctl reload caddy
+  O maestro construiu esse liga/desliga de proposito: o console fica FORA do ar por
+  padrao e so sobe na janela de configuracao. Ate 2026-07-28 este bloco mandava
+  escrever um vhost loopback proprio — o autor ergueu e derrubou SEIS vezes num dia
+  sem procurar o mecanismo que ja existia. Conselho nao se repete sozinho; ponteiro sim.
+
+  ANTES DE DEIXAR LIGADO ALEM DA JANELA: o tenant `admin` esta com registro ABERTO
+  (sign_up identifiers ["username"], password). Fechar antes de publicar de vez.
 
   NOTA: mexer no Caddy de produção é mudança que o maestro precisa AUTORIZAR NOMEANDO
   — não é inferível de um "pode seguir" genérico.
@@ -150,6 +159,23 @@ mutate() { # mutate <descrição> <METHOD> <PATH> <json>
 }
 
 # --- 1. usuário do maestro no tenant default -------------------------------
+# --- MODO --revoke: tira UM app M2M da role, deixando os demais intactos ------
+if [ -n "${REVOKE_APP:-}" ]; then
+  step "revogar '${REVOKE_APP}' da role ${ROLE_NAME}"
+  _rid_r="$(api GET "/roles" | jq -r --arg n "${ROLE_NAME}" '.[]? | select(.name==$n) | .id' | head -1)"
+  _aid_r="$(api GET "/applications" | jq -r --arg n "${REVOKE_APP}" '.[]? | select(.name==$n) | .id' | head -1)"
+  if [ -z "${_rid_r}" ] || [ -z "${_aid_r}" ]; then
+    say "   ERRO: role ou app nao encontrado (role=${_rid_r:-—} app=${_aid_r:-—})"; exit 4
+  fi
+  if [ "${APPLY}" = "1" ]; then
+    api DELETE "/roles/${_rid_r}/applications/${_aid_r}" >/dev/null 2>&1 || true
+    say "   ${REVOKE_APP} (${_aid_r}) removido da role — os demais chamadores seguem intactos"
+  else
+    say "   [DRY-RUN] removeria ${REVOKE_APP} (${_aid_r}) da role ${_rid_r}"
+  fi
+  exit 0
+fi
+
 step "1. usuário '${BRIDGE_USER}' no tenant default"
 _users="$(api GET "/users?search=${BRIDGE_USER}")"
 _uid="$(printf '%s' "${_users}" | jq -r --arg u "${BRIDGE_USER}" '.[]? | select(.username==$u) | .id' | head -1)"
@@ -201,16 +227,22 @@ else
 fi
 
 # --- 4. app M2M (o chamador SERVIÇO) ---------------------------------------
-step "4. app M2M 'onion-bridge-service'"
-_apps="$(api GET "/applications")"
-_m2m="$(printf '%s' "${_apps}" | jq -r '.[]? | select(.name=="onion-bridge-service") | .id' | head -1)"
-if [ -n "${_m2m}" ]; then say "   já existe (id=${_m2m})"
-else
-  _m2m="$(mutate "criaria app M2M onion-bridge-service" POST "/applications" \
-    '{"name":"onion-bridge-service","type":"MachineToMachine","description":"Chamador servico do onion-bridge (client_credentials)"}' \
-    | jq -r '.id // empty')"
-  say "   criado (id=${_m2m:-DRY-RUN})"
-fi
+step "4. apps M2M (um por chamador): ${M2M_CALLERS}"
+_m2m_ids=""
+for _caller in ${M2M_CALLERS}; do
+  _apps="$(api GET "/applications")"
+  _one="$(printf '%s' "${_apps}" | jq -r --arg n "${_caller}" '.[]? | select(.name==$n) | .id' | head -1)"
+  if [ -n "${_one}" ]; then
+    say "   ${_caller}: já existe (id=${_one})"
+  else
+    _one="$(mutate "criaria app M2M ${_caller}" POST "/applications" \
+      "$(jq -nc --arg n "${_caller}" '{name:$n, type:"MachineToMachine", description:"Chamador de servico do onion-bridge (client_credentials)"}')" \
+      | jq -r '.id // empty')"
+    say "   ${_caller}: criado (id=${_one:-DRY-RUN})"
+  fi
+  [ -n "${_one}" ] && _m2m_ids="${_m2m_ids} ${_one}"
+done
+_m2m="$(printf '%s' "${_m2m_ids}" | awk '{print $1}')"   # compat: resumo/passos citam o 1o
 
 # --- 5. app SPA público com PKCE (o chamador HUMANO) -----------------------
 # Client PÚBLICO: zero client_secret distribuído no device (o risco que o §3.10 nomeia).
@@ -268,15 +300,16 @@ if [ "${APPLY}" = "1" ] && [ -n "${_sid:-}" ] && [ -n "${_m2m:-}" ]; then
     say "   role criada (id=${_rlid:-FALHOU})"
   fi
   if [ -n "${_rlid}" ]; then
-    _apps_of_role="$(api GET "/roles/${_rlid}/applications")"
-    if printf '%s' "${_apps_of_role}" | jq -e --arg a "${_m2m}" '.[]? | select(.id==$a)' >/dev/null 2>&1; then
-      say "   app de serviço já atribuído à role"
-    else
-      api POST "/roles/${_rlid}/applications" \
-        "$(jq -nc --arg a "${_m2m}" '{applicationIds:[$a]}')" >/dev/null
-      say "   app de serviço atribuído à role"
+      _apps_of_role="$(api GET "/roles/${_rlid}/applications")"
+      for _aid in ${_m2m_ids}; do
+        if printf '%s' "${_apps_of_role}" | jq -e --arg a "${_aid}" '.[]? | select(.id==$a)' >/dev/null 2>&1; then
+          say "   app ${_aid}: já atribuído à role"
+        else
+          api POST "/roles/${_rlid}/applications" "$(jq -nc --arg a "${_aid}" '{applicationIds:[$a]}')" >/dev/null
+          say "   app ${_aid}: atribuído à role"
+        fi
+      done
     fi
-  fi
 else
   say "   [DRY-RUN ou pré-requisito ausente] criaria role ${ROLE_NAME} e atribuiria ao app M2M"
 fi
@@ -342,6 +375,41 @@ if [ "${APPLY}" = "1" ] && [ -n "${_rid:-}" ] && [ -n "${_urid:-}" ]; then
   fi
 else
   say "   [DRY-RUN ou pré-requisito ausente] criaria ${ADMIN_SCOPE} e concederia à role humana"
+fi
+
+# --- 9. scope bridge:write + capacidade por identidade (P10) ----------------
+# P0-P9 fecharam QUEM entra. Nao tocaram O QUE se pode fazer: `bridge:invoke` era
+# tudo-ou-nada e todo chamador autenticado executava irrestrito (PERMISSION_MODE=
+# bypassPermissions). O ganho real da identidade e poder DIFERENCIAR — sem isto,
+# trocamos "quem tem o segredo faz tudo" por "quem tem identidade faz tudo".
+# Sem este scope o chamador LE e PROPOE (Read/Grep/Glob/WebFetch/WebSearch/TodoWrite);
+# com ele, o conjunto completo. A restricao vive em `tools` do Agent SDK — NAO em
+# `allowedTools`, que a doc do pacote diz explicitamente que so AUTO-APROVA, nao limita.
+step "9. scope ${WRITE_SCOPE} + capacidade por identidade (P10)"
+if [ "${APPLY}" = "1" ] && [ -n "${_rid:-}" ] && [ -n "${_urid:-}" ]; then
+  _scopes2="$(api GET "/resources/${_rid}/scopes")"
+  _wsid="$(printf '%s' "${_scopes2}" | jq -r --arg s "${WRITE_SCOPE}" '.[]? | select(.name==$s) | .id' | head -1)"
+  if [ -n "${_wsid}" ]; then
+    say "   scope já existe (id=${_wsid})"
+  else
+    _wsid="$(api POST "/resources/${_rid}/scopes" \
+      "$(jq -nc --arg s "${WRITE_SCOPE}" '{name:$s, description:"Escrever e executar (Bash, Write, Edit). Sem ele: so leitura e proposta"}')" \
+      | jq -r '.id // empty')"
+    say "   scope criado (id=${_wsid:-FALHOU})"
+  fi
+  # Mesma regra do admin: só a role HUMANA. Um chamador M2M que so precisa consultar
+  # nao recebe execucao — e a diferenca fica VISIVEL na medicao, nao afirmada.
+  if [ -n "${_wsid}" ]; then
+    _rs2="$(api GET "/roles/${_urid}/scopes")"
+    if printf '%s' "${_rs2}" | jq -e --arg s "${_wsid}" '.[]? | select(.id==$s)' >/dev/null 2>&1; then
+      say "   role humana já tem ${WRITE_SCOPE}"
+    else
+      api POST "/roles/${_urid}/scopes" "$(jq -nc --arg s "${_wsid}" '{scopeIds:[$s]}')" >/dev/null
+      say "   ${WRITE_SCOPE} concedido à role humana (serviço NÃO recebe)"
+    fi
+  fi
+else
+  say "   [DRY-RUN ou pré-requisito ausente] criaria ${WRITE_SCOPE} e concederia à role humana"
 fi
 
 step "RESUMO"
