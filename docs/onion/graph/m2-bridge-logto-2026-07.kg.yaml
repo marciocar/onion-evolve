@@ -1159,6 +1159,74 @@ nodes:
     label: "REINCIDENCIA na mesma sessao: cadeia barrada pelo classificador mata TAMBEM os passos inofensivos dentro dela, e eu sigo assumindo que rodaram. Aqui o `python3` que ESCREVIA a guarda morreu junto com o `--apply` bloqueado; o dry-run seguinte devolveu 'argumento desconhecido: --drop-user' e so entao percebi. O dry-run me avisou no lugar de eu supor — o que reforça a regra: depois de um bloqueio, RE-VERIFICAR o que foi escrito, nunca continuar de onde se imaginava estar"
 
 
+  - id: E_twelve_clones_one_machine
+    node_type: evidence
+    trace: docs/analysis/onion-adr-federation-transport-pull-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: local-paths-testados-no-filesystem
+    label: "O TETO DA FEDERACAO, medido: 12 de 12 membros declaram local_path e os 12 estao DE FATO clonados nesta unica maquina; 1 unico membro (o core) hospeda endpoint. O correio de arquivo escala ate 'o que couber num VPS que pertence a uma pessoa'. A alternativa que o desenho atual deixa e pior — o core precisaria de credencial de push no repo alheio, furando o invariante I3 (um escritor por repo) que o proprio protocolo declara"
+
+  - id: E_a2a_is_not_vaporware
+    node_type: evidence
+    trace: .claude/utils/federation-transport/a2a-verify.sh
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: state-de-replay-e-resposta-do-endpoint
+    label: "CORRECAO DE PRESSUPOSTO MEU: eu ia tratar o a2a como desenho no papel. O endpoint invoca a2a-verify.sh do core por spawnSync, rejeita fail-safe NOMEANDO a camada que falhou (layer_failed: parse), e o state de replay guarda um handshake REAL aceito em 2026-07-11 21:40 (hs-real-1783806004). Chaves metagamify-1.pem e granaai-1.pem pinadas em disco. O gate funciona; o que falta e o REMETENTE"
+
+  - id: C_no_sender_exists
+    node_type: claim
+    trace: .claude/utils/federation-transport/
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: listagem-do-diretorio-de-transporte
+    label: "ASSIMETRIA ESTRUTURAL: existem a2a-verify.sh, a2a-accept.sh, a2a-ssrf-check.sh e as chaves pinadas — e NENHUM script do core assina e posta. Construimos o receptor e a alfandega, nunca o remetente. Por isso 'o adotante pode enviar' e declaracao: cada um teria que construir o lado remetente do zero, e ninguem construiu"
+
+  - id: D_downstream_by_pull
+    node_type: decision
+    trace: docs/analysis/onion-adr-federation-transport-pull-2026-07.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: open
+    label: "DESENHO (nao construido, gated na ratificacao): downstream por PULL — a sessao do adotante busca os proprios anuncios em GET /federation/inbox/<member-id> autenticado. Dissolve o filesystem compartilhado sem exigir que ninguem alem do core hospede endpoint (exigir isso e irreal: adotante nao tem servidor). Upstream segue push assinado e ganha o `a2a-send` que falta. Uma credencial M2M por adotante; organizacao por adotante volta SOB DEMANDA, pelo mecanismo ja construido. Puxar != aplicar: regulated mantem never-live-pull"
+
+  - id: C_adopters_never_authenticate
+    node_type: claim
+    trace: docs/analysis/onion-adr-federation-transport-pull-2026-07.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.3
+    status: superseded
+    verified_at: 2026-07-28
+    verified_against: enunciado-do-maestro-sobre-insustentabilidade
+    label: "POSICAO MINHA QUE CAIU NA MESMA SESSAO: eu afirmei 'os adotantes nao autenticam em lugar nenhum, logo o Logto nao se aplica a eles' e usei isso para justificar remover as 7 organizacoes. Era verdadeira DO DESENHO ATUAL e falsa DO PROBLEMA. A remocao segue correta — eram esqueleto sem consumidor no momento — mas generalizar de 'nao autentica hoje' para 'nao autentica' foi o erro. Sob o pull, cada adotante vira chamador de rede autenticado"
+
+  - id: Q_offline_fallback_truth
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "NAO RESPONDIDO pelo ADR: hoje o correio funciona OFFLINE — o arquivo esta la e o adotante le quando quiser. Com pull, bridge fora do ar = federacao muda. Se o arquivo continuar valendo como fallback, QUAL E A VERDADE quando os dois divergirem? Sem resposta, o fallback vira o segundo registro editavel dos dois lados que o ADR logto-as-projection existe para impedir"
+
+
 edges:
   - from: E_bridge_source_read
     to: C_identity_hole
@@ -1585,6 +1653,24 @@ edges:
   - from: C_blocked_chain_kills_inner_edit
     to: E_near_miss_guard_on_live_account
     edge_type: SUPPORTS
+  - from: E_twelve_clones_one_machine
+    to: D_downstream_by_pull
+    edge_type: SUPPORTS
+  - from: C_no_sender_exists
+    to: D_downstream_by_pull
+    edge_type: CONSTRAINS
+  - from: E_a2a_is_not_vaporware
+    to: C_no_sender_exists
+    edge_type: SUPPORTS
+  - from: D_downstream_by_pull
+    to: C_adopters_never_authenticate
+    edge_type: SUPERSEDES
+  - from: Q_offline_fallback_truth
+    to: D_downstream_by_pull
+    edge_type: CONSTRAINS
+  - from: D_downstream_by_pull
+    to: D_org_born_on_demand
+    edge_type: DEPENDS_ON
   - from: C_scaffold_removed_proof_was_invalid
     to: C_console_not_the_path
     edge_type: SUPPORTS
