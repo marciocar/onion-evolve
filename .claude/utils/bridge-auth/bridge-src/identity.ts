@@ -22,6 +22,7 @@ export type Identity = {
   clientId: string;
   scopes: string[];
   isMachine: boolean;    // sub === client_id ⇒ M2M; senão, humano
+  orgId?: string;        // presente só em token de ORGANIZAÇÃO (aud urn:logto:organization:<id>)
 };
 
 const ISSUER = process.env.OIDC_ISSUER ?? "https://auth.onionevolve.com/oidc";
@@ -73,7 +74,24 @@ function b64uToBuf(s: string): Buffer {
  * Valida um access token. Devolve a Identity, ou `null` se o token não vale.
  * FALHA FECHADO: qualquer exceção (rede, parse, chave ausente) ⇒ null.
  */
-export async function verifyAccessToken(token: string, required?: string): Promise<Identity | null> {
+/**
+ * Verifica um token de ORGANIZACAO (client_credentials com organization_id).
+ * Medido 2026-07-28: esse token NAO traz claim de organizacao — a org vive so na
+ * audience, como `urn:logto:organization:<id>`. Logo o binding de audiencia do
+ * verificador normal (AUDIENCE = recurso do bridge) o recusaria, e com razao: sao
+ * audiencias diferentes para publicos diferentes. Aqui exige-se o prefixo urn e
+ * devolve-se o ID — quem traduz id->membro e o mapa derivado, nao este modulo.
+ * Devolve null em qualquer excecao: fail-closed, como todo o resto deste arquivo.
+ */
+export async function verifyOrganizationToken(token: string): Promise<string | null> {
+  // ATENCAO: passar `undefined` como `required` NAO desliga a checagem de scope — o P10
+  // fez `required ?? REQUIRED_SCOPE`, entao undefined cai em bridge:invoke. O token de
+  // organizacao vem com scope vazio (medido), logo seria recusado. `""` desliga de fato.
+  const id = await verifyAccessToken(token, "", /^urn:logto:organization:(.+)$/);
+  return id ? (id.orgId ?? null) : null;
+}
+
+export async function verifyAccessToken(token: string, required?: string, audPattern?: RegExp): Promise<Identity | null> {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
@@ -113,9 +131,17 @@ export async function verifyAccessToken(token: string, required?: string): Promi
     // `aud` pode ser string ou array (RFC 7519). O binding de audiência é o que
     // impede replay de um token emitido para outro serviço do mesmo tenant.
     const aud = claims.aud;
-    const audOk = typeof aud === "string"
-      ? aud === AUDIENCE
-      : Array.isArray(aud) && aud.includes(AUDIENCE);
+    // Com audPattern, aceita-se uma audiencia ALTERNATIVA (token de organizacao) e
+    // captura-se o id no grupo 1. Sem ele, o binding e o recurso do bridge, como antes.
+    let orgId: string | undefined;
+    const audList = typeof aud === "string" ? [aud] : Array.isArray(aud) ? aud : [];
+    let audOk = audList.includes(AUDIENCE);
+    if (!audOk && audPattern) {
+      for (const a of audList) {
+        const m = typeof a === "string" ? audPattern.exec(a) : null;
+        if (m) { audOk = true; orgId = m[1]; break; }
+      }
+    }
     if (!audOk) return null;
 
     const nowSec = Math.floor(Date.now() / 1000);
@@ -126,13 +152,15 @@ export async function verifyAccessToken(token: string, required?: string): Promi
     // `required` permite ao chamador exigir OUTRO scope (ex.: bridge:admin) sem duplicar
     // a verificação de assinatura/audiência — um caminho de validação, dois níveis de acesso.
     const scopes = typeof claims.scope === "string" ? claims.scope.split(" ").filter(Boolean) : [];
-    if (!scopes.includes(required ?? REQUIRED_SCOPE)) return null;
+    // `required === ""` = sem exigencia de scope (token de organizacao, cuja autorizacao
+    // e a AUDIENCIA, nao o scope). `undefined` mantem o default historico.
+    if (required !== "" && !scopes.includes(required ?? REQUIRED_SCOPE)) return null;
 
     const sub = typeof claims.sub === "string" ? claims.sub : "";
     const clientId = typeof claims.client_id === "string" ? claims.client_id : "";
     if (!sub) return null;
 
-    return { subject: sub, clientId, scopes, isMachine: sub === clientId };
+    return { subject: sub, clientId, scopes, isMachine: sub === clientId, ...(orgId ? { orgId } : {}) };
   } catch {
     // FAIL-CLOSED: Logto fora do ar, JWKS inacessível, JSON quebrado — nada disso
     // vira "pode entrar". O caminho legado (se ligado) é quem decide o resto.

@@ -7,6 +7,7 @@ import { existsSync } from "node:fs";
 import { config, assertConfig } from "./config.ts";
 import { handleChat } from "./chat.ts";
 import { handleCommands } from "./commands.ts";
+import { handleFederationInbox } from "./federation.ts";
 import { adminRouter } from "./admin.ts";
 import { handleAgentCard, handleA2A } from "./a2a.ts";
 import { verifyAccessToken, jwksSelfCheck, type Identity } from "./identity.ts";
@@ -144,6 +145,10 @@ app.post("/chat", (c) => handleChat(c as Context));
 app.get("/commands", (c) => handleCommands(c as Context));
 // Endpoint a2a-live (RFC-0004 F2.2): recebe SINAIS gated, verifica no core, enfileira input_required.
 app.post("/a2a", (c) => handleA2A(c as Context));
+// Downstream por PULL (ADR transport-pull D1). Auth PROPRIA: exige token de ORGANIZACAO,
+// nao o authGuard — sao publicos diferentes (adotante puxando o proprio inbox, nao humano
+// conversando). Por isso NAO entra na lista de app.use(authGuard) acima.
+app.get("/federation/inbox/:member", (c) => handleFederationInbox(c as Context));
 
 // Em produção, serve o build do front em web/dist (se existir).
 // Em dev, o front é servido pela pasta public (vanilla de referência).

@@ -1202,7 +1202,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.8
-    status: open
+    status: confirmed
     label: "DESENHO (nao construido, gated na ratificacao): downstream por PULL — a sessao do adotante busca os proprios anuncios em GET /federation/inbox/<member-id> autenticado. Dissolve o filesystem compartilhado sem exigir que ninguem alem do core hospede endpoint (exigir isso e irreal: adotante nao tem servidor). Upstream segue push assinado e ganha o `a2a-send` que falta. Uma credencial M2M por adotante; organizacao por adotante volta SOB DEMANDA, pelo mecanismo ja construido. Puxar != aplicar: regulated mantem never-live-pull"
 
   - id: C_adopters_never_authenticate
@@ -1225,6 +1225,67 @@ nodes:
     confidence: 0.5
     status: open
     label: "NAO RESPONDIDO pelo ADR: hoje o correio funciona OFFLINE — o arquivo esta la e o adotante le quando quiser. Com pull, bridge fora do ar = federacao muda. Se o arquivo continuar valendo como fallback, QUAL E A VERDADE quando os dois divergirem? Sem resposta, o fallback vira o segundo registro editavel dos dois lados que o ADR logto-as-projection existe para impedir"
+
+
+  - id: E_backlog_was_not_where_i_said
+    node_type: evidence
+    trace: docs/evolution/federation/outbox/
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: inbound-de-todos-os-adotantes-contado
+    label: "MEMORIA VENCIDA QUE EU REPETI A SESSAO INTEIRA, inclusive no ADR: '23 anuncios parados no metagamify'. Medido: metagamify tem 26 PROCESSADOS e 0 parados — e o MELHOR canal, nao o pior. O backlog real e outro: pulse-mais 14, granaai 7, onion-mini 6, gustavo-pulga 4, outros 4. Total 35 chegaram e ninguem abriu. Isso e falha de LEITURA, nao de entrega — e o pull NAO conserta: puxar arquivo que ninguem le e igual a copiar arquivo que ninguem le. A justificativa do pull e TOPOLOGIA (12 clones numa maquina), nao backlog"
+
+  - id: D_pull_serves_history_not_queue
+    node_type: decision
+    trace: .claude/utils/bridge-auth/bridge-src/federation.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: clone-vazio-puxou-12-e-idempotencia-medida
+    label: "DECISAO QUE A MEDICAO FORCOU: as outboxes do core estao VAZIAS (tudo em _processed/, porque a entrega marca como transportado). Servir uma FILA daria sempre zero. Serve-se entao O HISTORICO — tudo que ja foi anunciado aquele membro, com sha256 — e o adotante baixa o que lhe falta. Sem estado de fila, idempotente, e AUTO-CURATIVO: clone vazio puxou os 12 e a 2a rodada baixou 0. Integridade nao e opcional: conteudo que nao bate com o manifesto e DESCARTADO no cliente"
+
+  - id: E_pull_endpoint_works
+    node_type: evidence
+    trace: .claude/utils/bridge-auth/bridge-src/federation.ts
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: quatro-casos-medidos-no-ar
+    label: "PULL DOWNSTREAM VIVO em GET /federation/inbox/:member. Medido: token de org do pulse-mais puxa os 12 proprios com sha; pedir o inbox de OUTRO membro devolve 403 nomeando o conflito ('identidade pertence a pulse-mais, pediu granaai'); sem token 401; token do bridge-service (nao-org) 401. Os 12 baixados sao BYTE-IDENTICOS ao que o core anunciou. O adotante real nao foi tocado — a prova de clone-novo rodou em diretorio temporario"
+
+  - id: C_org_token_has_no_org_claim
+    node_type: claim
+    trace: .claude/utils/bridge-auth/bridge-src/identity.ts
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: token-decodificado
+    label: "MEDIDO, contra o que eu ia supor: o token de organizacao do Logto NAO traz claim de organizacao. A org vive so na AUDIENCE, como `urn:logto:organization:<id>` — e so o ID, nunca o nome. Consequencia de desenho: o bridge precisa de um mapa id->membro, e dar-lhe credencial da Management API para consultar seria conceder o universo por conveniencia. Solucao: mapa DERIVADO regeneravel (--write-org-map), fail-closed em id desconhecido. Nao fere o D5 da projecao: o SSOT segue decidindo QUAIS orgs existem; o id e so a alca que o Logto atribuiu"
+
+  - id: C_p10_broke_scope_default
+    node_type: claim
+    trace: .claude/utils/bridge-auth/bridge-src/identity.ts
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-28
+    verified_against: quatro-casos-falhando-identicamente
+    label: "REGRESSAO MINHA, de duas horas antes, apanhada por medicao: no P10 escrevi `required ?? REQUIRED_SCOPE`, entao passar `undefined` NAO desliga a checagem de scope — cai em bridge:invoke. O token de organizacao vem com scope VAZIO, logo era recusado, e os quatro casos de teste falhavam identicamente (o que denunciou a causa comum). Corrigido com sentinela explicita: `required === \"\"` desliga de fato; undefined mantem o default historico"
 
 
 edges:
@@ -1666,6 +1727,21 @@ edges:
     to: C_adopters_never_authenticate
     edge_type: SUPERSEDES
   - from: Q_offline_fallback_truth
+    to: D_downstream_by_pull
+    edge_type: CONSTRAINS
+  - from: E_pull_endpoint_works
+    to: D_downstream_by_pull
+    edge_type: SUPPORTS
+  - from: D_pull_serves_history_not_queue
+    to: D_downstream_by_pull
+    edge_type: SUPERSEDES
+  - from: C_org_token_has_no_org_claim
+    to: D_pull_serves_history_not_queue
+    edge_type: CONSTRAINS
+  - from: C_p10_broke_scope_default
+    to: E_pull_endpoint_works
+    edge_type: CONSTRAINS
+  - from: E_backlog_was_not_where_i_said
     to: D_downstream_by_pull
     edge_type: CONSTRAINS
   - from: D_downstream_by_pull
