@@ -287,6 +287,56 @@ O gate mede **cobertura, não verdade**: exige que cada documento tenha *um nó*
 fechado; virando rotina apressada, o gate fica verde sobre grafo oco — e aí mente com autoridade de
 mecanismo. Ver [[inverted-provenance-ratchet]] no diário.
 
+## 🎙️ Modo narrate — a IA que EXPLICA o grafo (narração pré-cozida)
+
+`narrate <slug>` autora a **narração** que o `kg-console.sh` embute e toca **offline**: um tour
+guiado que dirige a câmera e o foco em **ordem de atenção**, mais um resumo por nó. É o leg que
+faltava do "explicado por IA" — não é live-chat (que quebraria o autocontido/CSP), é **autorado
+uma vez e embutido**; o grafo se explica no cliente.
+
+> **A narração é PROJEÇÃO dos 4 vereditos do radar, nunca fonte paralela.** Cita **ids de nó**,
+> nunca re-deriva da prosa. Todo id citado **existe no grafo** — garantido por mecanismo
+> (`kg-narrate-validate.sh`, **REGRA 47**), não por promessa. Ordem do tour = atenção; passos de
+> Aufhebung = arestas REFUTES/SUPERSEDES; passo "o que re-verificar" = os nós STALE.
+
+**Artefato** (irmão do `.kg.yaml`): `docs/onion/graph/<slug>.narration.json`
+```json
+{ "graph":"<slug>", "generated_from":"kg-radar+kg-view", "generated_at":"AAAA-MM-DD",
+  "node_summaries": { "<id>": "resumo pt-BR (1 frase)" },
+  "guided_tour": [ { "focus":["<id>"], "camera":"fit", "narration":"texto pt-BR" } ] }
+```
+
+### F0 — Ler o veredito (a narração projeta ISTO)
+```bash
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --radar          # atenção → ordem do tour
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --reconcile      # REFUTES/SUPERSEDES → passos de Aufhebung
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --freshness-tsv  # STALE → passo "o que re-verificar"
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-view.sh  <arquivo> --json           # os ids canônicos (paridade com o radar)
+```
+
+### F1 — Autorar (escala decide serial × orquestração)
+- **≤ ~40 nós:** autore em sessão única — leia o radar e escreva o tour + resumos direto.
+- **Grande:** delegue à skill **`onion-orchestration`** (fan-out): 1 worker `sonnet`/`medium` por
+  lote de nós de alta atenção resume (recebe `--triples`+`--freshness-tsv`+`label` — **não
+  inventa**); 1 sintetizador `opus`/`high` monta o `guided_tour`. **Arco canônico**: abertura (leia
+  por atenção) → focos de maior atenção → escada de reconciliação (incl. refutação retrógrada
+  PROD→DEV) → fronteira honesta (nós STALE). O último passo é sempre "o que fazer agora".
+
+### F2 — Validar (o gate, não opcional)
+```bash
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-narrate-validate.sh <arquivo.kg.yaml>   # exit 0 = todos os ids existem
+```
+Exit 1 = cita id que o grafo não tem → corrija antes de commitar (a REGRA 47 reprova no CI).
+
+### F3 — Regenerar o console e ver
+```bash
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-console.sh <arquivo.kg.yaml> > /tmp/console.html
+```
+O console detecta o `.narration.json` irmão e o embute (opt-in). Sem ele, degrada para o
+**tour-esqueleto** (ordem de atenção, sem prosa). O `kg-console.sh` continua **LLM-free** — só
+EMBUTE a narração; o único ponto com IA é a autoria (F1), fora do script. Na federação viaja o
+**schema + método** (o arco canônico), nunca o JS do renderer.
+
 ## 💡 Exemplos
 
 ```bash
@@ -294,6 +344,7 @@ mecanismo. Ver [[inverted-provenance-ratchet]] no diário.
 /meta:kg docs/onion/graph/onion-evolution-2026-07.kg.yaml   # modela/atualiza e roda radar
 /meta:kg                                    # localiza o mais recente e roda o radar
 /meta:kg map command-center                 # PFR F0-F4: inventário → atom-map → .kg.yaml → radar
+/meta:kg narrate m2-bridge-logto-2026-07     # autora a narração pré-cozida (tour + resumos) p/ o console
 ```
 
 ## ⚠️ Notas

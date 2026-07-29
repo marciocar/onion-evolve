@@ -2146,6 +2146,36 @@ PYEOF
   done <<< "${orfaos}"
 }
 
+# REGRA 47 — Narração do KG cita ids que existem no grafo [HARD]
+# previne: narração que mente — o console embute <slug>.narration.json e DROPA ids mortos em silêncio; um tour que cita nó inexistente engana o leitor com cara de projeção fiel
+# ------------------------------------------------------------------------------------
+# A narração pré-cozida é o único ponto com LLM do console (kg-console.sh a embute opt-in).
+# A doutrina KG-SSOT manda "citar ids de nó, nunca re-derivar da prosa"; sem mecanismo isso
+# é promessa. Esta guarda a torna determinística: todo <slug>.narration.json COMMITADO tem de
+# validar contra seu .kg.yaml irmão (via kg-narrate-validate.sh) — todo id do tour/resumos
+# existe no grafo. Senão o console dropa o id morto sem avisar (o no-op silencioso de sempre).
+# Pula gracioso sem python3 (o validador degrada a exit 3). [[fix-must-become-mechanism]]
+check_kg_narration_valid() {
+  local validator="${REPO_ROOT}/.claude/validation/kg-narrate-validate.sh"
+  [ -f "${validator}" ] || return 0
+  command -v python3 >/dev/null 2>&1 || return 0   # sem python3 o validador degrada — não fingir que passou
+  local narr rel kg rc out
+  while IFS= read -r narr; do
+    [ -n "${narr}" ] || continue
+    rel="${narr#${REPO_ROOT}/}"
+    if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in "${rel}") : ;; *) continue ;; esac; fi
+    kg="${narr%.narration.json}.kg.yaml"
+    if [ ! -f "${kg}" ]; then
+      violation "HARD" "${rel}" "[kg/narração] narração sem .kg.yaml irmão ($(basename "${kg}")) — narração órfã não projeta grafo nenhum"
+      continue
+    fi
+    rc=0; out="$(bash "${validator}" "${kg}" 2>&1)" || rc=$?
+    if [ "${rc}" -eq 1 ]; then
+      violation "HARD" "${rel}" "[kg/narração] INVÁLIDA — cita id que o grafo não tem (o console o dropa em silêncio). Detalhe: $(printf '%s' "${out}" | tr '\n' ' ' | sed 's/  */ /g')"
+    fi
+  done < <(find "${REPO_ROOT}" -type f -name '*.narration.json' -path '*/graph/*' 2>/dev/null)
+}
+
 check_onion_version_tracked() {
   local stamp="${REPO_ROOT}/.claude/.onion-version"
   [ -f "${stamp}" ] || return 0
@@ -2287,6 +2317,7 @@ check_rules_registry_sync
 check_onion_version_tracked
 check_family_topology_sync
 check_federation_outbox_membership
+check_kg_narration_valid
 
 # ===========================================================================
 # SUMÁRIO FINAL

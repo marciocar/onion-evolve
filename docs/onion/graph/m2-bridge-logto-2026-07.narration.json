@@ -1,0 +1,43 @@
+{
+  "graph": "m2-bridge-logto-2026-07",
+  "generated_from": "kg-radar (atenção/reconciliação/freshness) + kg-view --json — projeção, não fonte paralela",
+  "generated_at": "2026-07-29",
+  "node_summaries": {
+    "D_gate_oidc_dual": "O foco de maior atenção do grafo (119): o gate OIDC duplo — 1 API Resource + 2 clients — que substituiu o desenho m2m-only. É a decisão central da postura de identidade da bridge.",
+    "D_gate_m2m_only": "A decisão anterior (só machine-to-machine) que o gate OIDC duplo superou. Fica no grafo, superseded — é ela que explica por que o desenho atual existe.",
+    "A_flip_steps_reversible": "Os passos turnkey do flip, em ordem linear e cada um com rollback — o desenho (DEV) que virou execução real.",
+    "E_p7_flip_live": "O flip EXECUTADO em 2026-07-27 (carta branca do maestro). É o nó PROD que prova que o desenho saiu do papel e foi ao ar.",
+    "D_logto_is_projection": "A doutrina PROD/confirmed: o members.yaml (sob o KG) é o SSOT; o Logto é PROJEÇÃO dele. Inverte a tentação de tratar o IdP como fonte da verdade.",
+    "D_default_deny_routes": "Default-deny no middleware, preservado pelos verifies: rota sem permissão explícita é negada — a postura que sobreviveu à verificação.",
+    "D_fail_closed_default": "Fail-closed: o modo de auth da bridge fecha por padrão quando em dúvida. Par de segurança do default-deny.",
+    "A_verification": "As 23 provas da verificação v3 (a v2 tinha 19) — o lastro empírico que sustenta as decisões de alta atenção.",
+    "D_downstream_by_pull": "O desenho do downstream por PULL — o adotante busca, não é empurrado. Confirmado como direção, gated na ratificação.",
+    "E_ancestor_floor_applied": "A evidência viva que SUPERA a claim de que a proteção de memória era zero: os floors de ancestral foram aplicados e medidos efetivos. Uma correção que fluiu de PROD para DEV.",
+    "C_ancestor_cap_zeroes_floors": "A claim (agora superseded) de que o teto do ancestral zerava os floors de memória. A medição no host a refutou — fica no grafo como a posição superada que explica o conserto.",
+    "D_org_born_on_demand": "A decisão: organizações nascem sob demanda (na 1ª matrícula), não pré-provisionadas. Superou a pergunta das 'sete orgs vazias'.",
+    "Q_seven_orgs_still_empty": "A pergunta (superseded) sobre por que sete orgs seguiam vazias — respondida ao mudar o projetor para org-sob-demanda.",
+    "Q_floors_effective": "Pergunta STALE-MISSING de maior atenção na fronteira (8.0): a classe host-wide dos floors de memória segue gated — medimos o caso caddy/bridge, não a classe inteira. O grafo é honesto sobre o que ainda NÃO foi re-verificado.",
+    "Q_a2a_after_flip": "Pergunta STALE-MISSING (7.5): o comportamento do a2a após o flip ainda cobra re-verificação contra o vivo.",
+    "E_logto_live": "O endpoint Logto vivo (PROD, HTTP 200), re-verificado em 2026-07-29 — a âncora concreta de que a projeção de identidade está no ar."
+  },
+  "guided_tour": [
+    { "focus": [], "camera": "fit",
+      "narration": "Este é o grafo da integração M2 — a Bridge do Onion com o Logto (identidade). Não leia por ordem de escrita; leia por ATENÇÃO (peso × centralidade), que é o que o radar calcula. Vou te levar pelos focos que custam caro estar errado, pela escada de reconciliação (onde uma verdade corrigiu outra) e pela fronteira do que ainda não foi re-verificado." },
+    { "focus": ["D_gate_oidc_dual"], "camera": "fit",
+      "narration": "O foco máximo (atenção 119): o GATE OIDC DUPLO. É a decisão central da postura de identidade — 1 API Resource mais 2 clients. Tudo de peso no grafo orbita esta escolha. Repare no tamanho do nó: ele emergiu sozinho no topo, você não o apontou." },
+    { "focus": ["D_gate_oidc_dual", "D_gate_m2m_only"], "camera": "fit",
+      "narration": "Aufhebung — a história não se apaga, se reconcilia. O gate OIDC duplo SUPERA a decisão anterior (só machine-to-machine). O nó m2m-only fica no grafo, superseded, com borda tracejada: é ELE que explica por que o desenho atual existe. Um merge de texto jogaria isso fora; o grafo o preserva." },
+    { "focus": ["A_flip_steps_reversible", "E_p7_flip_live"], "camera": "fit",
+      "narration": "Do desenho à realidade. À esquerda o DESENHO (DEV): passos reversíveis, cada um com rollback. À direita a EVIDÊNCIA (PROD): o flip foi EXECUTADO em 27/07. A doutrina do Onion só fecha um nó em PROD quando o artefato vivo confirma — 'o código deveria' não conta." },
+    { "focus": ["D_logto_is_projection", "E_logto_live"], "camera": "fit",
+      "narration": "A doutrina que rege a identidade (PROD/confirmed): o members.yaml, sob o Knowledge Graph, é o SSOT; o Logto é PROJEÇÃO dele. E o endpoint está vivo — HTTP 200, re-verificado em 29/07. Isto inverte a tentação de tratar o provedor de identidade como fonte da verdade." },
+    { "focus": ["D_default_deny_routes", "D_fail_closed_default"], "camera": "fit",
+      "narration": "A postura de segurança que sobreviveu aos verifies: default-deny nas rotas e fail-closed por padrão. Duas decisões que os verificadores aprovaram e PRESERVARAM — em dúvida, nega e fecha." },
+    { "focus": ["E_ancestor_floor_applied", "C_ancestor_cap_zeroes_floors"], "camera": "fit",
+      "narration": "O achado mais raro e mais valioso: uma refutação que flui de PROD para DEV. A claim dizia que o teto do ancestral ZERAVA os floors de memória. A medição no host provou o contrário — os floors estão efetivos. A evidência viva SUPERA a claim. Nenhum merge de texto produz isso; só o confronto verdade × verdade no grafo." },
+    { "focus": ["D_org_born_on_demand", "Q_seven_orgs_still_empty"], "camera": "fit",
+      "narration": "Outra reconciliação: a pergunta 'por que sete orgs seguem vazias?' foi respondida ao mudar o projetor — organizações NASCEM sob demanda, na 1ª matrícula, não pré-provisionadas. A pergunta fica, superseded, marcando o caminho." },
+    { "focus": ["Q_floors_effective", "Q_a2a_after_flip"], "camera": "fit",
+      "narration": "A fronteira honesta. Estes nós pulsam com halo âmbar: STALE-MISSING — o grafo NÃO os re-verificou contra o vivo. Q_floors_effective (atenção 8.0) é a classe host-wide dos floors, que segue gated; Q_a2a_after_flip cobra checar o a2a depois do flip. O grafo mente por omissão se você confiar no que não tem carimbo — por isso ele te avisa em vez de esconder. Este é o fim do tour: o que fazer agora mora aqui, na fronteira." }
+  ]
+}

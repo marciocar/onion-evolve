@@ -35,6 +35,13 @@ UTILS=()
 VALIDATION=(
   ".claude/validation/kg-radar.sh"
   ".claude/validation/kg-console.sh"
+  # O console rico depende da lente (kg-view --json) e do renderer VENDORIZADO inline.
+  # Sem estes dois, o kg-console.sh degrada gracioso (exit 3) — o door perderia a visualização.
+  ".claude/validation/kg-view.sh"
+  ".claude/validation/vendor/kg-console/cytoscape.min.js"
+  # Validador da narração pré-cozida (REGRA 47, modo `kg narrate`): o door que autora narração
+  # precisa do guard que garante "cita ids que existem" — senão o console dele dropa id morto em silêncio.
+  ".claude/validation/kg-narrate-validate.sh"
   ".claude/validation/diary-index.sh"
   ".claude/validation/constellation-map.sh"
   # Gate de proveniência invertido (modo `kg backfill`). O resolve-integration-branch

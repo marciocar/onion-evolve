@@ -62,7 +62,7 @@ fi
 if [ "${MODE}" = "--assert-parity" ]; then
   # FAIL-LOUD se o motor não está lá. Sem o radar não há com o que comparar, e
   # "passou" seria uma afirmação sobre nada — o no-op silencioso de sempre.
-  # Achado pela guarda V4, que roda o mutante fora de .claude/validation/ e viu
+  # Achado pela guarda V4, que roda o mutante fora de ${CLAUDE_PLUGIN_ROOT}/validation/ e viu
   # a paridade sair VERDE por ausência do irmão. (Mesmo pecado que o P0 da
   # REGRA 30 proíbe: fonte ausente nunca vira aprovação.)
   if [ ! -f "${HERE}/kg-radar.sh" ]; then
@@ -177,8 +177,8 @@ END {
   }
 
   # ── markdown ──────────────────────────────────────────────────────────────
-  printf "<!-- GERADO por .claude/validation/kg-view.sh — NÃO EDITE À MÃO. -->\n"
-  printf "<!-- Fonte: %s · regenere: bash .claude/validation/kg-view.sh %s --markdown -->\n\n", src, src
+  printf "<!-- GERADO por ${CLAUDE_PLUGIN_ROOT}/validation/kg-view.sh — NÃO EDITE À MÃO. -->\n"
+  printf "<!-- Fonte: %s · regenere: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-view.sh %s --markdown -->\n\n", src, src
   printf "# Lente do grafo — `%s`\n\n", gid
   printf "**%d nós · %d arestas · %d órfãos**\n\n", nn, ne, orphans+0
   printf "> Projeção DERIVADA. O veredito (integridade, reconciliação, frescor) é do\n"
