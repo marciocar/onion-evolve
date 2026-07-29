@@ -48,6 +48,27 @@ worktree_of() {
 
 now_epoch() { date +%s; }
 
+# Ledger de CICLO-DE-VIDA (tracked) — só timestamps de sessão, NUNCA conteúdo.
+# O conteúdo de sessão (.claude/sessions/) segue LOCAL por desenho; aqui vira
+# durável apenas o que o sinal de VELOCIDADE precisa: session_id + branch +
+# started_at/ended_at/duração. Apendado em `down` (fim limpo) e `sweep` (a sessão
+# morreu sem cleanup — ended_at = último refresh). merge=union no .gitattributes
+# evita conflito entre sessões concorrentes.
+LEDGER="$REPO/.claude/session-lifecycle.jsonl"
+ledger_append() { # $1 = arquivo .beacon · $2 = ended_at (epoch)
+  local B="$1" ended="$2" sid br started dur
+  [ -f "$B" ] || return 0
+  [ -f "$LEDGER" ] || return 0   # só apenda se o ledger existe (opt-in por trackear o arquivo)
+  sid="$(awk -F': ' '/^session_id:/{print $2; exit}' "$B" 2>/dev/null || true)"
+  br="$(awk -F': ' '/^branch:/{print $2; exit}' "$B" 2>/dev/null || true)"
+  started="$(awk -F': ' '/^started_at:/{print $2; exit}' "$B" 2>/dev/null || true)"
+  [ -n "$sid" ] && [ -n "$started" ] || return 0
+  case "$started$ended" in *[!0-9]*) return 0 ;; esac  # ambos numéricos, ou aborta
+  dur=$(( ended - started )); [ "$dur" -lt 0 ] && dur=0
+  printf '{"session_id":"%s","branch":"%s","started_at":%s,"ended_at":%s,"duration_s":%s}\n' \
+    "$sid" "${br:-unknown}" "$started" "$ended" "$dur" >> "$LEDGER" 2>/dev/null || true
+}
+
 case "$CMD" in
   up)
     SID="${3:?uso: session-beacon.sh up <repo> <session_id> [hat]}"
@@ -76,6 +97,7 @@ case "$CMD" in
     ;;
   down)
     SID="${3:?uso: session-beacon.sh down <repo> <session_id>}"
+    ledger_append "$BEACON_DIR/$SID.beacon" "$(now_epoch)"   # fim limpo → carimba a duração
     rm -f "$BEACON_DIR/$SID.beacon"
     ;;
   check)
@@ -110,7 +132,10 @@ case "$CMD" in
         [ -f "$B" ] || continue
         REF="$(awk -F': ' '/^refreshed_at:/{print $2; exit}' "$B")"
         AGE_MIN=$(( (NOW - ${REF:-0}) / 60 ))
-        [ "$AGE_MIN" -le "$TTL_MIN" ] || rm -f "$B"
+        if [ "$AGE_MIN" -gt "$TTL_MIN" ]; then
+          ledger_append "$B" "${REF:-$NOW}"   # morreu sem cleanup → ended_at = último refresh
+          rm -f "$B"
+        fi
       done
     fi
     ;;

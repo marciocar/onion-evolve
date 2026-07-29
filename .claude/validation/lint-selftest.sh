@@ -5341,6 +5341,46 @@ run_context_freshness_metric_selftests() {
 }
 run_context_freshness_metric_selftests
 
+# Modo session-velocity — sinal 3 (duração de sessão via ledger de ciclo-de-vida).
+# Cobre: beacon down apenda o ledger (só timestamps); opt-in (sem ledger tracked → não
+# cria); e o read do ledger → mediana. O ledger é a promoção de timestamps a tracked
+# que destrava a velocidade (as sessões seguem gitignored por desenho).
+run_session_velocity_selftests() {
+  local vel="${REPO_ROOT}/.claude/validation/session-velocity.sh"
+  local sb="${REPO_ROOT}/.claude/validation/session-beacon.sh"
+  if [ ! -f "${vel}" ] || [ ! -f "${sb}" ]; then record_fail "session-velocity" "script ausente"; return; fi
+  local d out led started
+  # (a) beacon down apenda o ledger (só quando o ledger existe = opt-in por trackear) + remove beacon.
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude/beacons"
+  : > "${d}/.claude/session-lifecycle.jsonl"
+  started=$(( $(date +%s) - 3600 ))
+  printf 'session_id: s1\nbranch: feat/x\nstarted_at: %s\nrefreshed_at: %s\n' "${started}" "$(date +%s)" > "${d}/.claude/beacons/s1.beacon"
+  bash "${sb}" down "${d}" s1 >/dev/null 2>&1
+  if grep -q '"session_id":"s1"' "${d}/.claude/session-lifecycle.jsonl" 2>/dev/null \
+     && grep -qE '"duration_s":3[0-9]{3}' "${d}/.claude/session-lifecycle.jsonl" 2>/dev/null \
+     && [ ! -f "${d}/.claude/beacons/s1.beacon" ]; then
+    record_pass "session-velocity: beacon down apenda ledger (só timestamps) + remove beacon"
+  else record_fail "session-velocity: ledger-append" "down não apendou o ledger"; fi
+  rm -rf "${d}"
+  # (a2) SEM ledger tracked → down NÃO cria (opt-in, não vaza timestamps sem consentimento de trackear).
+  d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude/beacons"
+  printf 'session_id: s2\nstarted_at: 0\nrefreshed_at: 1\n' > "${d}/.claude/beacons/s2.beacon"
+  bash "${sb}" down "${d}" s2 >/dev/null 2>&1
+  if [ ! -f "${d}/.claude/session-lifecycle.jsonl" ]; then
+    record_pass "session-velocity: sem ledger tracked → down não cria (opt-in)"
+  else record_fail "session-velocity: opt-in" "criou ledger sem opt-in"; fi
+  rm -rf "${d}"
+  # (b) velocity lê o ledger → mediana.
+  led="$(mktemp)"
+  printf '{"duration_s":3600}\n{"duration_s":7200}\n{"duration_s":1800}\n' > "${led}"
+  out="$(ONION_LIFECYCLE_LEDGER="${led}" bash "${vel}" --summary-json 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '"sessions":3' && printf '%s' "${out}" | grep -q '"median_seconds":"3600"'; then
+    record_pass "session-velocity: lê ledger → mediana correta"
+  else record_fail "session-velocity: mediana" "esperado sessions3/median3600, veio: ${out}"; fi
+  rm -f "${led}"
+}
+run_session_velocity_selftests
+
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 run_githook_selftests
 
