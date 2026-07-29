@@ -102,6 +102,8 @@ header .sp{flex:1}
 .chip.on{opacity:1;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
 .grp{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
 .grp .lbl{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;margin-right:2px}
+#fx{position:absolute;inset:0;pointer-events:none;z-index:3}
+#minimap{position:absolute;right:10px;bottom:10px;width:168px;height:120px;background:color-mix(in srgb,var(--card) 88%,transparent);border:1px solid var(--line);border-radius:6px;z-index:8;cursor:crosshair;opacity:.92}
 #tip{position:absolute;z-index:20;max-width:300px;background:var(--card);border:1px solid var(--line);border-radius:8px;
  padding:9px 11px;font-size:12px;box-shadow:0 6px 24px rgba(0,0,0,.35);pointer-events:none;display:none}
 #tip b{font-size:12px}#tip .k{color:var(--mut)}
@@ -124,12 +126,15 @@ header .sp{flex:1}
  <h1>🧠 KG Console</h1><span class=meta id=head></span><span class=sp></span>
  <button class=btn id=btnTour>▶ Tour</button>
  <button class=btn id=btnPhysics>Física</button>
+ <button class=btn id=btnFx class=on>✨ Fluxo</button>
  <button class=btn id=btnFit>Ajustar</button>
  <button class=btn id=btnTheme>◐</button>
 </header>
 <div id=stage>
  <div class=controls id=controls></div>
  <div id=cy></div>
+ <canvas id=fx></canvas>
+ <canvas id=minimap></canvas>
  <div id=tip></div>
  <div class=narr id=narr><p class=txt id=narrTxt></p><div class=bar>
    <span id=narrPos></span><span class=sp></span>
@@ -218,6 +223,8 @@ const cy=cytoscape({
     {selector:'edge[k="REFUTES"]',style:{'target-arrow-shape':'tee','width':2,'line-style':'solid'}},
     {selector:'edge[k="SUPERSEDES"]',style:{'line-style':'dashed','target-arrow-shape':'chevron'}},
     {selector:'edge[k="SUPPORTS"]',style:{'width':1.8}},
+    // semantic-zoom: rótulo de baixa atenção some ao afastar (vem ANTES de .faded/.hl, que vencem)
+    {selector:'node.hideLabel',style:{'text-opacity':0}},
     // foco+contexto
     {selector:'.faded',style:{'opacity':0.09,'text-opacity':0}},
     {selector:'.hl',style:{'opacity':1,'text-opacity':1,'z-index':99}},
@@ -396,7 +403,7 @@ function playStep(i){
     cy.animate({fit:{eles:sub,padding:100}},{duration:600});
     if(ids.length===1)showDetail(ids[0]);}
   document.getElementById('narrTxt').textContent=st.narration||'';
-  document.getElementById('narrPos').textContent=(tstep+1)+' / '+tour.length
+  document.getElementById('narrPos').textContent=(tstep+1)+' / '+tour.length+'  · scroll/setas'
     +(NARRATION?'':'  · tour-esqueleto (sem narração autorada)');
 }
 function openTour(){tour=buildTour();narrBox.style.display='block';playStep(0);}
@@ -413,6 +420,81 @@ document.getElementById('btnTheme').onclick=()=>{
   const cur=isDark()?'light':'dark';document.documentElement.setAttribute('data-theme',cur);
   cy.style().selector('node').style('color',labelCol()).update();
 };
+
+// ═══ F3 — camada de brilho: partículas · semantic-zoom · minimapa · scrollytelling ═══
+const stageEl=document.getElementById('stage');
+const dpr=Math.max(1,window.devicePixelRatio||1);
+
+// — partículas: pontos fluem pelas arestas (coords RENDERIZADAS → sincronizam com pan/zoom) —
+const fx=document.getElementById('fx'),fxc=fx.getContext('2d');
+let fxOn=true;
+function sizeFx(){const r=document.getElementById('cy').getBoundingClientRect();
+  fx.width=Math.max(1,r.width*dpr);fx.height=Math.max(1,r.height*dpr);
+  fx.style.width=r.width+'px';fx.style.height=r.height+'px';fxc.setTransform(dpr,0,0,dpr,0,0);}
+const FX_CAP=350;   // acima disso, só arestas em foco (perf no grafo grande)
+function fxFrame(ts){
+  requestAnimationFrame(fxFrame);
+  const w=fx.width/dpr,h=fx.height/dpr;fxc.clearRect(0,0,w,h);
+  if(!fxOn)return;
+  let eds=cy.edges().filter(e=>e.visible()&&!e.hasClass('faded')&&!e.hasClass('planeDim'));
+  if(eds.length>FX_CAP)eds=cy.edges('.hl').filter(e=>!e.hasClass('faded'));
+  if(!eds.length)return;
+  const ph=(ts%1800)/1800;
+  fxc.globalCompositeOperation=isDark()?'lighter':'source-over';
+  eds.forEach(e=>{
+    const s=e.renderedSourceEndpoint(),t=e.renderedTargetEndpoint(),col=e.data('ecol');
+    [ph,(ph+0.5)%1].forEach(p=>{const x=s.x+(t.x-s.x)*p,y=s.y+(t.y-s.y)*p;
+      fxc.fillStyle=col;fxc.globalAlpha=0.20;fxc.beginPath();fxc.arc(x,y,5,0,7);fxc.fill();
+      fxc.globalAlpha=0.95;fxc.beginPath();fxc.arc(x,y,2,0,7);fxc.fill();});
+  });
+  fxc.globalAlpha=1;fxc.globalCompositeOperation='source-over';
+}
+sizeFx();requestAnimationFrame(fxFrame);
+document.getElementById('btnFx').onclick=function(){fxOn=!fxOn;this.classList.toggle('on',fxOn);
+  if(!fxOn)fxc.clearRect(0,0,fx.width/dpr,fx.height/dpr);};
+
+// — semantic-zoom: rótulo de baixa atenção some ao afastar; reaparece ao aproximar (.hl sempre mostra) —
+function semanticZoom(){const show=cy.zoom()>=0.72;
+  cy.batch(()=>{cy.nodes().forEach(n=>n.toggleClass('hideLabel',!show&&n.data('w')<maxW*0.5));});}
+cy.on('zoom',semanticZoom);semanticZoom();
+
+// — minimapa: overview + retângulo do viewport, clique p/ centralizar —
+const mm=document.getElementById('minimap'),mmc=mm.getContext('2d');
+mm.width=168*dpr;mm.height=120*dpr;mm.style.width='168px';mm.style.height='120px';mmc.setTransform(dpr,0,0,dpr,0,0);
+let mmMap=null;
+function drawMinimap(){
+  const W=168,H=120,pad=8;mmc.clearRect(0,0,W,H);
+  const bb=cy.elements().boundingBox();if(!isFinite(bb.w)||bb.w<=0)return;
+  const sc=Math.min((W-2*pad)/bb.w,(H-2*pad)/bb.h),ox=(W-bb.w*sc)/2,oy=(H-bb.h*sc)/2;
+  mmMap={sc,ox,oy,x1:bb.x1,y1:bb.y1};
+  const mx=x=>ox+(x-bb.x1)*sc,my=y=>oy+(y-bb.y1)*sc;
+  cy.edges().forEach(e=>{if(e.hasClass('faded'))return;const s=e.source().position(),t=e.target().position();
+    mmc.strokeStyle=e.data('ecol');mmc.globalAlpha=0.3;mmc.beginPath();mmc.moveTo(mx(s.x),my(s.y));mmc.lineTo(mx(t.x),my(t.y));mmc.stroke();});
+  mmc.globalAlpha=1;
+  cy.nodes().forEach(n=>{if(n.hasClass('faded'))return;const p=n.position();
+    mmc.fillStyle=n.data('col');mmc.beginPath();mmc.arc(mx(p.x),my(p.y),1.7,0,7);mmc.fill();});
+  const ext=cy.extent();mmc.strokeStyle='#f0c000';mmc.lineWidth=1.2;
+  mmc.strokeRect(mx(ext.x1),my(ext.y1),(ext.x2-ext.x1)*sc,(ext.y2-ext.y1)*sc);
+}
+cy.on('pan zoom dragfree layoutstop',drawMinimap);cy.ready(drawMinimap);
+mm.addEventListener('click',ev=>{if(!mmMap)return;const r=mm.getBoundingClientRect();
+  const px=mmMap.x1+(ev.clientX-r.left-mmMap.ox)/mmMap.sc,py=mmMap.y1+(ev.clientY-r.top-mmMap.oy)/mmMap.sc;
+  const z=cy.zoom(),cont=cy.container().getBoundingClientRect();
+  cy.animate({pan:{x:cont.width/2-px*z,y:cont.height/2-py*z}},{duration:300});});
+addEventListener('resize',()=>{sizeFx();drawMinimap();});
+cy.on('resize',()=>{sizeFx();drawMinimap();});
+
+// — scrollytelling: com o tour aberto, scroll/setas conduzem os passos (o wheel deixa de dar zoom) —
+let wheelLock=0;
+stageEl.addEventListener('wheel',e=>{
+  if(narrBox.style.display!=='block')return;
+  e.preventDefault();const now=performance.now();if(now-wheelLock<520)return;wheelLock=now;
+  playStep(tstep+(e.deltaY>0?1:-1));},{passive:false});
+addEventListener('keydown',e=>{
+  if(narrBox.style.display!=='block')return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){playStep(tstep+1);e.preventDefault();}
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){playStep(tstep-1);e.preventDefault();}
+  else if(e.key==='Escape')closeTour();});
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 </script></body></html>
