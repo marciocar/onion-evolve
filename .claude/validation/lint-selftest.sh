@@ -5297,6 +5297,50 @@ run_cycle_completion_selftests() {
 }
 run_cycle_completion_selftests
 
+# Modo federation-engagement — sinal 4 (ativo/dormente por membro; proxy doc-bridge).
+run_federation_engagement_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/federation-engagement.sh"
+  if [ ! -f "${helper}" ]; then record_fail "federation-engagement" "helper ausente"; return; fi
+  local d out today old
+  d="$(mktemp -d)"
+  mkdir -p "${d}/outbox/m-active/_processed" "${d}/outbox/m-dormant/_processed"
+  printf 'members:\n  - id: onion-evolve\n  - id: m-active\n  - id: m-dormant\n  - id: m-never\n' > "${d}/members.yaml"
+  today="$(date +%F)"; old="$(date -d '90 days ago' +%F 2>/dev/null || echo 2000-01-01)"
+  : > "${d}/outbox/m-active/_processed/${today}-x.md"
+  : > "${d}/outbox/m-dormant/_processed/${old}-y.md"
+  out="$(ONION_FED_DIR="${d}" bash "${helper}" --summary-json --dormant-days 30 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '"members":3' \
+     && printf '%s' "${out}" | grep -q '"active":1' \
+     && printf '%s' "${out}" | grep -q '"dormant":1' \
+     && printf '%s' "${out}" | grep -q '"never":1'; then
+    record_pass "federation-engagement: active/dormant/never + exclui o core"
+  else record_fail "federation-engagement" "esperado members3/active1/dormant1/never1, veio: ${out}"; fi
+  rm -rf "${d}"
+}
+run_federation_engagement_selftests
+
+# Modo context-freshness-metric — sinal 2 (camada determinística: carimbo ≤ threshold).
+run_context_freshness_metric_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/context-freshness-metric.sh"
+  if [ ! -f "${helper}" ]; then record_fail "context-freshness-metric" "helper ausente"; return; fi
+  local d out today old
+  d="$(mktemp -d)"
+  mkdir -p "${d}/bc" "${d}/tc" "${d}/cc"
+  today="$(date +%F)"; old="$(date -d '3 years ago' +%F 2>/dev/null || echo 2000-01-01)"
+  printf -- '---\ndate: %s\n---\n# doc atual\n' "${today}" > "${d}/bc/a.md"
+  printf '# doc velho\n\n**Última Atualização:** %s\n' "${old}" > "${d}/tc/b.md"
+  printf '# doc sem carimbo\n(nada)\n' > "${d}/cc/c.md"
+  out="$(ONION_CONTEXT_DIRS="${d}/bc ${d}/tc ${d}/cc" bash "${helper}" --summary-json --months 18 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '"docs":3' \
+     && printf '%s' "${out}" | grep -q '"current":1' \
+     && printf '%s' "${out}" | grep -q '"stale":1' \
+     && printf '%s' "${out}" | grep -q '"no_stamp":1'; then
+    record_pass "context-freshness-metric: current/stale/no-stamp + denominador exclui no-stamp"
+  else record_fail "context-freshness-metric" "esperado docs3/current1/stale1/nostamp1, veio: ${out}"; fi
+  rm -rf "${d}"
+}
+run_context_freshness_metric_selftests
+
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 run_githook_selftests
 
