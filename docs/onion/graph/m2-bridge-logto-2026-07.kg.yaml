@@ -72,7 +72,7 @@ nodes:
     confidence: 0.9
     status: open
     verified_against: endpoint-vivo
-    verified_at: 2026-07-25
+    verified_at: 2026-07-29
     label: "Logto self-hosted 1.41.0 VIVO em auth.onionevolve.com (OIDC, emite JWT assinado + JWKS) desde 2026-07-25 — mas SEM NENHUM CONSUMIDOR plugado, nem o bridge. Capacidade de identidade já paga e ociosa. Com o flip deixa de ser ociosa E deixa de ser opcional (vira caminho crítico — C_logto_now_critical). FIX N: o sinal-fonte recebeu CORREÇÃO formal (Q_source_correction) — citar as duas juntas"
 
   - id: E_auth_token
@@ -1349,8 +1349,22 @@ nodes:
     verified_against: violacao-do-lint-na-propria-regra
     label: "REINCIDENCIA: escrevi o nome de um adotante no COMENTARIO da regra nova, e a REGRA 36 (vendor-scrub) me pegou — comentario em lint-artifacts.sh viaja vendorizado para todo adotante. Generalizado para 'uma correcao de id de membro'. E a 2a vez nesta sessao que o vendor-scrub apanha credito nominal indo para superficie que viaja; o lugar do nome e o diario privado"
 
+  - id: E_floors_effective_measured_20260729
+    node_type: evidence
+    trace: /etc/systemd/system/system.slice.d/10-memory-protection.conf
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-29
+    verified_against: host-vps-medido
+    label: "RE-VERIFY (kg-freshness 2026-07-29, medido read-only): o fix do teto de ancestral SEGUE EFETIVO. cat /sys/fs/cgroup/system.slice/memory.min => 402653184 (384M); caddy.service=67108864 (64M); onion-bridge.service=268435456 (256M); drop-in 10-memory-protection.conf presente. Com memory_recursiveprot a protecao do ancestral desce as folhas — os floors de caddy/bridge estao EFETIVOS, confirmando a supersessao de C_ancestor_cap_zeroes_floors. RESSALVA: mede o caso caddy/bridge, NAO a classe host-wide de Q_floors_effective (varredura dos demais floors segue gated)"
 
 edges:
+  - from: E_floors_effective_measured_20260729
+    to: D_fix_ancestor_floor
+    edge_type: SUPPORTS
   - from: E_bridge_source_read
     to: C_identity_hole
     edge_type: SUPPORTS
