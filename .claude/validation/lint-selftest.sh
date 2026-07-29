@@ -5263,6 +5263,40 @@ run_scope_gitignore_selftests
 # Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal de campo D2).
 run_task_manager_hook_selftests
 
+# Modo cycle-completion — métrica de ciclos concluídos vs abandonados (D5 instrumentação,
+# barato-primeiro). Classifica done/open-stale/no-signal e mantém o SEM-sinal FORA do
+# denominador (o metric é honesto sobre o gap de schema do STATE.md que ele mesmo mede).
+run_cycle_completion_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/cycle-completion.sh"
+  if [ ! -f "${helper}" ]; then record_fail "cycle-completion" "helper ausente: ${helper}"; return; fi
+  local d out
+  d="$(mktemp -d)"
+  mkdir -p "${d}/s-done" "${d}/s-open" "${d}/s-stale" "${d}/s-nosignal"
+  printf '## NEXT\nphase: DONE (F1)\nstatus: done\n' > "${d}/s-done/STATE.md"
+  printf '## NEXT\nphase: 2\nstatus: in_progress\n'  > "${d}/s-open/STATE.md"
+  printf '## NEXT\nphase: 2\nstatus: in_progress\n'  > "${d}/s-stale/STATE.md"
+  printf '## NEXT\n(sem campo de status)\n'          > "${d}/s-nosignal/STATE.md"
+  touch -d '60 days ago' "${d}/s-stale/STATE.md" 2>/dev/null || true
+  out="$(ONION_SESSIONS_DIR="${d}" bash "${helper}" --summary-json --stale-days 21 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '"total":4' \
+     && printf '%s' "${out}" | grep -q '"done":1' \
+     && printf '%s' "${out}" | grep -q '"open_abandoned":1' \
+     && printf '%s' "${out}" | grep -q '"no_signal":1' \
+     && printf '%s' "${out}" | grep -q '"with_signal":3'; then
+    record_pass "cycle-completion: classifica done/open-stale/no-signal + denominador exclui no-signal"
+  else record_fail "cycle-completion: classificação" "esperado total4/done1/aband1/nosignal1/with3, veio: ${out}"; fi
+  rm -rf "${d}"
+  # (b) phase: DONE SEM linha status: → ainda conta como concluída (schema real observado)
+  d="$(mktemp -d)"; mkdir -p "${d}/s"
+  printf '## NEXT\nphase: DONE (F0-F6)\nphase_title: x\n' > "${d}/s/STATE.md"
+  out="$(ONION_SESSIONS_DIR="${d}" bash "${helper}" --summary-json 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '"done":1'; then
+    record_pass "cycle-completion: phase:DONE sem status: → conta como concluída"
+  else record_fail "cycle-completion: phase:DONE" "não contou phase:DONE como done: ${out}"; fi
+  rm -rf "${d}"
+}
+run_cycle_completion_selftests
+
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 run_githook_selftests
 
