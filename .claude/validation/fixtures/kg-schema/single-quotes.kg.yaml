@@ -1,0 +1,24 @@
+meta:
+  id: single-quotes-regression
+  schema_version: '1'
+nodes:
+  - id: C_claim
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: 'afirmacao citada com aspas simples (a forma que o prettier normaliza)'
+  - id: E_ev
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-29
+    verified_against: fixture-regressao
+    label: 'evidencia tambem com aspas simples'
+edges:
+  - from: E_ev
+    to: C_claim
+    edge_type: SUPPORTS

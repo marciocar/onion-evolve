@@ -102,7 +102,7 @@ function statusFactor(s) {
   if (s == "done") return 0.1
   return -1
 }
-function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^"|"$/, "", s); return s }
+function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["'\'']$/, "", s); return s }
 # Markdown lê para humano: aspas escapadas do YAML (\") viram aspas de verdade.
 # NÃO usar no JSON — lá o escape é a gramática, não sujeira.
 function unesc(s) { gsub(/\\"/, "\"", s); return s }
