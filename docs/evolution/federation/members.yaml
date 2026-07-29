@@ -69,9 +69,12 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
     local_path: "/home/marcio/rhilo-metagamify"   # dir físico legado no disco (privado, não-exposto); doc-bridge depende dele — não renomear sem migrar o clone
-    onion_version: 9547ca7b3f72   # VERIFICADO por pin-integrity-check.sh (pin-ok 2026-07-23). A sessão do
-                                  # rhilo atualizou 8e22352->9547ca7 (commit presente: 880fab34, branch
-                                  # chore/onion-framework) — RESOLVE o "commit pendente" de 07-03.
+    onion_version: 21213cc6c3d6   # VERIFICADO por pin-integrity-check.sh (pin-ok 2026-07-29). Reconciliado
+                                  # de 9547ca7 (stale desde 07-23): o clone avançou a 21213cc em 07-25 sem o
+                                  # pin subir. O update do console rico (core e34b858) está preparado na branch
+                                  # chore/onion-console-rich-e34b858c5ec4 do clone, AINDA NÃO mergeada na
+                                  # integração — o pin sobe a e34b858 quando ela entrar (declarado≠verificado:
+                                  # não carimbo e34b858 antes de estar na árvore committed do metagamify).
                                   # ⚠️ PASSIVO adopter-side: --audit-vendor achou 1 pin INVÁLIDO no onion/vendor
                                   # ('2026-07-12' — uma DATA, não commit; vnextpin). Fix é da sessão do rhilo
                                   # (re-stampar o vendor). Membro MULTI-LINHAGEM: pins por linhagem em lineages:
