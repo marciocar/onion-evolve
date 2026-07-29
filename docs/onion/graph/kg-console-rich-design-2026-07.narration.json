@@ -1,0 +1,40 @@
+{
+  "graph": "kg-console-rich-design-2026-07",
+  "generated_from": "kg-radar (atenção/reconciliação/freshness) + kg-view --json — o desenho projetado por si mesmo",
+  "generated_at": "2026-07-29",
+  "node_summaries": {
+    "D_promote_to_core": "A decisão de maior peso: promover ao core o console rico narrável, evoluindo o kg-console.sh in-place. Tira do gated o que o estudo SEED tinha deixado como design-only.",
+    "C_seed_gated": "A posição anterior (superseded): o estudo kg-visualization-dashboards deixou o console Cytoscape gated, nada promovido. Fica no grafo — é ela que explica por que a promoção foi uma decisão, não um default.",
+    "D_renderer_cytoscape_core": "Renderer = Cytoscape core 3.34, vendorizado em UM arquivo, com o layout cose EMBUTIDO. A escolha que mantém o vendoring num artefato só.",
+    "C_fcose_planned": "O plano aprovado previa fcose — mas fcose puxa cose-base + layout-base, uma cadeia frágil. Superseded pela decisão de usar o cose embutido: o desenho evoluiu ao ser construído.",
+    "C_single_artifact_ethos": "O porquê do renderer de um arquivo: é mais fiel ao ethos 'um artefato' do Onion do que três libs encadeadas.",
+    "D_contract_travels": "A fronteira de soberania: o que viaja na federação é o CONTRATO JSON + o método de encoding + o arco de narração, nunca o JS. Cytoscape é uma implementação; ver ≠ distribuir.",
+    "D_narration_prebaked": "A decisão que responde 'explicado por IA': narração PRÉ-COZIDA, autorada por agente e embutida, tocada offline. Não live-chat — isso quebraria o autocontido. O console segue LLM-free.",
+    "C_narrative_beats_ceiling": "A tese que justifica a narração: é a narrativa que torna o grafo grande legível — resolve o teto de ~50 nós conduzindo por atenção em vez de desenhar tudo de uma vez.",
+    "D_regra47_mechanism": "A cura é mecanismo, não promessa: a REGRA 47 (kg-narrate-validate.sh) reprova narração que cite id inexistente — senão o console dropava id morto em silêncio.",
+    "C_offline_csp": "A propriedade verificada em PROD: HTML autocontido, CSP-safe, zero rede — injeção base64, vendor inline, sem fetch.",
+    "E_36_selftests": "A prova determinística: 36 selftests verdes + lint 0 HARD + CI #486 pass.",
+    "E_scale_881": "A prova de escala: gera para 19/116/881 nós; o maior em 0.35s. É o que sustenta a tese de que a narrativa vence o teto.",
+    "E_m2_dogfood": "A prova de que a narração funciona de verdade: o console do m2-bridge, narrado em 9 passos — o primeiro grafo a se explicar.",
+    "Q_f3_wow": "A fronteira: o polish wow (partículas, semantic-zoom, minimapa) fica gated, por último — eye-candy destacável.",
+    "Q_live_narration": "A fronteira: narração live opcional como enhancement futuro, gated — a pré-cozida é o default de propósito."
+  },
+  "guided_tour": [
+    { "focus": [], "camera": "fit",
+      "narration": "Você está vendo o grafo do PRÓPRIO desenho deste console — o instrumento provado em si mesmo. Ele se explica pela mesma máquina que explica qualquer grafo: ordem de atenção, escada de reconciliação, fronteira honesta. Vamos." },
+    { "focus": ["D_promote_to_core"], "camera": "fit",
+      "narration": "O foco de maior peso: a decisão de PROMOVER ao core o console rico narrável, evoluindo o kg-console.sh in-place. Note o tamanho — ela emergiu no topo porque é a decisão de que tudo mais depende." },
+    { "focus": ["D_promote_to_core", "C_seed_gated"], "camera": "fit",
+      "narration": "Aufhebung: esta promoção SUPERA a posição anterior — o estudo SEED tinha deixado o console gated, design-only. O nó gated fica, superseded, com borda tracejada: é ele que prova que promover foi uma DECISÃO, não um default." },
+    { "focus": ["D_renderer_cytoscape_core", "C_fcose_planned"], "camera": "fit",
+      "narration": "O desenho evoluiu ao ser construído — a segunda reconciliação. O plano aprovado previa fcose, mas fcose puxa uma cadeia frágil de dependências. A decisão de usar o cose EMBUTIDO (um arquivo só) superou o plano. Um grafo honesto mostra onde o próprio plano mudou." },
+    { "focus": ["D_contract_travels"], "camera": "fit",
+      "narration": "A fronteira de soberania, o que impede isto de virar 'motor de UI de adotante': o que viaja na federação é o CONTRATO JSON e o método de encoding — nunca o JS. Cytoscape é uma implementação de renderer. Ver não é distribuir." },
+    { "focus": ["D_narration_prebaked", "D_regra47_mechanism"], "camera": "fit",
+      "narration": "O coração do 'explicado por IA': a narração é PRÉ-COZIDA — autorada por agente, embutida, tocada offline (live-chat quebraria o autocontido). E à direita a cura por mecanismo: a REGRA 47 reprova narração que cite id inexistente. Sem ela, o console dropava o id morto em silêncio — o no-op que a doutrina combate." },
+    { "focus": ["E_36_selftests", "E_scale_881", "E_m2_dogfood"], "camera": "fit",
+      "narration": "O lastro em PROD: 36 selftests verdes, escala provada até 881 nós em 0.35s, e a narração real do m2 que provou que o grafo se explica. Não é 'deveria funcionar' — é medido." },
+    { "focus": ["Q_f3_wow", "Q_live_narration"], "camera": "fit",
+      "narration": "A fronteira honesta, e o fim do tour: o que fica gated de propósito. O polish wow (partículas, semantic-zoom) e a narração live são melhorias destacáveis — por último, porque valor e mecanismo vêm antes do enfeite. É aqui que mora o próximo trabalho." }
+  ]
+}

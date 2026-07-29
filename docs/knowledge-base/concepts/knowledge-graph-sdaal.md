@@ -553,8 +553,22 @@ ortogonais — dois papéis, um substrato.
 **Motor de projeção ≠ motor de UI de adotante.** O core **não** distribui componentes de front
 (identidade + soberania: o `SourceTag` é sempre implementação local do adotante). O que o core tem é
 **projeção read-only dos próprios artefatos** — `kg-console.sh` renderiza o `.kg.yaml` em HTML
-self-contained (grafo interativo + veredito do `kg-radar.sh` embutido), mesmo padrão do
+self-contained (grafo interativo Cytoscape + veredito do `kg-radar.sh` embutido), mesmo padrão do
 `federation-console.sh` (zero backend, zero CDN, determinístico). Ver ≠ distribuir.
+
+**A IA que EXPLICA o grafo — narração pré-cozida** (ratificado no ADR *console rico do KG*,
+`docs/analysis/onion-adr-kg-console-rich-2026-07.md` — decisão de arquitetura core-only). O console evoluiu de
+SVG estático para um grafo Cytoscape com **encoding epistêmico** (tamanho ∝ atenção, opacidade ∝
+confiança, borda por status, halo âmbar = stale, aresta por SUPPORTS/REFUTES⊣/SUPERSEDES⇢) e um
+**tour narrado** que conduz o leitor por atenção — a narrativa é o que torna o grafo grande legível
+(vence o teto de ~50 nós). A narração é um artefato `<slug>.narration.json` **autorado por agente**
+(modo `/meta:kg narrate`) e **embutido** pelo console, tocado **offline** (não live-chat, que quebraria
+o CSP): o `kg-console.sh` continua **LLM-free** — o único ponto com IA é a autoria. Ela é **projeção
+dos 4 vereditos do radar** (atenção→ordem; REFUTES/SUPERSEDES→Aufhebung; STALE→"o que re-verificar"),
+nunca fonte paralela — e **cita só ids que existem**, garantido por mecanismo (`kg-narrate-validate.sh`,
+**REGRA 47**), não promessa. Fronteira de soberania: o que viaja na federação é o **contrato JSON**
+(`kg-view.sh --json`) + o método de encoding + o arco de narração — **nunca o JS do renderer** (o
+Cytoscape é *uma* implementação). Ver ≠ distribuir, uma camada acima.
 
 ## Mapeamento completo — o playbook (`/meta:kg map <área>`)
 
