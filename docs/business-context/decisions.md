@@ -1,6 +1,6 @@
 # 🗂️ Registro de Decisões Estratégicas
 
-**Última Atualização:** 2026-07-25
+**Última Atualização:** 2026-07-29
 
 > Mecanismo de rastreio das decisões de negócio em aberto. Cada card é uma pergunta que você resolve **escolhendo** uma opção ou **descrevendo** livremente. Versionado no git → cada sessão avança daqui, não recomeça. Spec-as-code aplicado às decisões de negócio (dogfood do próprio Onion).
 >
@@ -75,11 +75,19 @@ nunca zero — LLM reconstrói atributos mesmo do destilado); **nunca relicencia
 
 **Status:** `hipótese` · **Lean:** sequencial (receita mais próxima primeiro). **Refina:** definir marco que dispara passar de uma pra próxima.
 
-## D5 — Preço / ticket
+## D5 — Preço / ticket `[parcialmente ratificado 2026-07-29]`
 
 **Pergunta:** como precificar cada camada?
 
-**Status:** `aberto` · **Diretriz da pesquisa:** ticket premium ($129+) > pipoca ($5–10) para maestro solo; vender selo/curadoria/serviço, não o texto; preço por outcome só depois de instrumentar (ver `metrics.md`). **Falta:** hipótese de número por camada.
+**Status:** `parcialmente ratificado` (2026-07-29). Escada de 4 degraus preparada no [`d5-pricing-brief-2026-07`](d5-pricing-brief-2026-07.md) (comparáveis 2026, KG [`d5-pricing-2026-07`](../onion/graph/d5-pricing-2026-07.kg.yaml)). **Decisões do maestro:**
+
+- **Degrau 1 — treino/consultoria:** faixa **$1.800–3.000/dia**; **NÃO fixar ainda** — testar 2-3 pontos em propostas P3/P4 reais e ler a conversão antes de cravar (preço-por-descoberta, não por palpite).
+- **Degrau 2 — certificação:** **só o inicial ~$1.250** por ora; a renovação (~$249/ano) fica **gated no diretório público de certificados existir** — não cobrar recorrência por um valor ainda não-construído (`declarado≠verificado`).
+- **Degrau 3 — compliance-pack:** **$15–40k/ano sob-consulta** (faixa de negociação, não fechada) — gated: zero P4 entrevistado + escopo do pack v1 a definir.
+- **Degrau 4 — assinatura SOTA:** faixa interna $150–400/mês · $250–600+seat, **NÃO cotável a cliente** até o D2 destravar (L1-L6 dogfoodado); cotar antes = queima de moat.
+- **Instrumentação:** **AUTORIZADA** — construir o agregador barato-primeiro (scanner de `STATE.md` custo-zero + persistência JSONL do `context-freshness`). É a precondição de mover qualquer degrau de preço-por-camada para preço-por-outcome.
+
+**Falta (não bloqueia):** o teste de campo do degrau 1; entrevistas P4 p/ fechar o degrau 3; o **gatilho de repricing** (o marco que sobe cada degrau — a escada de hoje é piso, não teto).
 
 ## D6 — Comprador primário `[ratificado 2026-07-25 — CINDIDO mensagem/pipeline]`
 
