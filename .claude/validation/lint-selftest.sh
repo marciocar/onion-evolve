@@ -957,6 +957,51 @@ KGEOF
   if ! bash "${tmp}/mutated.sh" "${tmp}/v.kg.yaml" --assert-parity >/dev/null 2>&1; then
     record_pass "kg-view: (V5) motor ausente ⇒ paridade REPROVA (não vira verde por ausência)"
   else record_fail "kg-view: (V5)" "sem kg-radar.sh a paridade passou — fail-open"; fi
+
+  # (V6) CONTRATO DO CONSOLE RICO — o --json carrega os campos que o encoding
+  # epistêmico consome (impact, confidence, layer, verified_at/against no nó; on
+  # na aresta). Sem eles o kg-console.sh cairia mudo para opacidade/freshness.
+  # Trava o contrato de dados de que a projeção rica depende.
+  cat > "${tmp}/w.kg.yaml" <<'KGEOF'
+meta:
+  id: fixture-view6
+  schema_version: "1"
+nodes:
+  - id: C_UM
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "primeira afirmacao"
+  - id: E_UM
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-07-29
+    verified_against: endpoint-vivo
+    label: "evidencia que sustenta"
+edges:
+  - from: E_UM
+    to: C_UM
+    edge_type: SUPPORTS
+KGEOF
+  out="$(bash "${view}" "${tmp}/w.kg.yaml" --json 2>/dev/null)"
+  if printf '%s' "${out}" | python3 -c '
+import json,sys
+d=json.load(sys.stdin)
+for n in d["nodes"]:
+    assert all(k in n for k in ("i","c","ly","va","vg")), "campo de nó ausente: %r" % sorted(n)
+for e in d["edges"]:
+    assert "on" in e, "campo on ausente na aresta"
+e=[n for n in d["nodes"] if n["id"]=="E_UM"][0]
+assert e["va"]=="2026-07-29" and e["vg"]=="endpoint-vivo", "verified_* não propagou: %r" % e
+assert e["i"]==3 and abs(e["c"]-1.0)<0.01, "impact/confidence não propagou: %r" % e
+' 2>/dev/null; then
+    record_pass "kg-view: (V6) --json carrega impact/confidence/layer/verified_*/on (contrato do console rico)"
+  else record_fail "kg-view: (V6)" "campos do encoding epistêmico ausentes no --json: ${out}"; fi
 }
 
 # ---------------------------------------------------------------------------
@@ -2239,29 +2284,152 @@ run_write_stamp_selftests() {
 run_kg_console_selftests() {
   local helper="${REPO_ROOT}/.claude/validation/kg-console.sh"
   local fixture="${FIX_DIR}/kg-domain/good-domain.kg.yaml"
+  local vendor="${REPO_ROOT}/.claude/validation/vendor/kg-console/cytoscape.min.js"
   if [ ! -f "${helper}" ]; then record_fail "kg-console" "helper ausente: ${helper}"; return; fi
   if [ ! -f "${fixture}" ]; then record_fail "kg-console" "fixture ausente: ${fixture}"; return; fi
-  if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
-    local rc=0; bash "${helper}" "${fixture}" >/dev/null 2>&1 || rc=$?
-    if [ "${rc}" -eq 3 ]; then record_pass "kg-console: sem python+yaml → exit 3 (gracioso)"
-    else record_skip "kg-console: pulado (sem python+yaml)"; fi
-    return; fi
-  local H; H="$(bash "${helper}" "${fixture}" 2>/dev/null)"
-  if printf '%s' "${H}" | grep -q '<!doctype html>' && printf '%s' "${H}" | grep -q '</html>' \
-     && ! printf '%s' "${H}" | grep -q '__DATA__' \
-     && printf '%s' "${H}" | grep -q '"nodes"' && printf '%s' "${H}" | grep -q 'RADAR'; then
-    record_pass "kg-console: HTML self-contained (nodes+veredito do radar, sem placeholder)"
-  else record_fail "kg-console: html" "HTML inválido/incompleto"; fi
-  if printf '%s' "${H}" | grep -qiE 'src=.?https?://|<script src|href=.?https?://[^"]*\.(js|css)|fetch\('; then
+  if [ ! -f "${vendor}" ]; then record_fail "kg-console: vendor" "renderer vendorizado ausente: ${vendor}"; return; fi
+
+  # NB: o console agora embute o renderer vendorizado (461 KB) — a saída é grande.
+  # `printf "$H" | grep -q` sob `set -o pipefail` dá FALSO-NEGATIVO: grep -q casa
+  # cedo e sai, o printf leva SIGPIPE (141) e pipefail propaga o 141 mesmo com match.
+  # Por isso gravamos H num ARQUIVO e grepamos o arquivo (sem pipe). Bug latente do
+  # harness que só o HTML grande expôs.
+  local hdir; hdir="$(mktemp -d)"; local hf="${hdir}/console.html"
+  bash "${helper}" "${fixture}" 2>/dev/null > "${hf}"
+
+  # HTML rico self-contained: doctype + /html, SEM placeholder legado, dados em base64
+  # (_B64), renderer Cytoscape VENDORIZADO inline, e o app (função b64d + cytoscape()).
+  if grep -q '<!doctype html>' "${hf}" && grep -q '</html>' "${hf}" \
+     && ! grep -q '__DATA__' "${hf}" \
+     && grep -q '_B64=' "${hf}" \
+     && grep -q 'The Cytoscape Consortium' "${hf}" \
+     && grep -q 'function b64d' "${hf}" \
+     && grep -qF 'cytoscape({' "${hf}"; then
+    record_pass "kg-console: HTML rico self-contained (Cytoscape inline + app + dados base64)"
+  else record_fail "kg-console: html" "HTML inválido/incompleto (falta vendor/app/dados)"; fi
+
+  # O contrato de DADOS embutiu de fato: o blob base64 `kg` decodifica para o
+  # grafo (não é uma casca vazia). Sem python no console — mas o selftest pode usá-lo.
+  if command -v python3 >/dev/null 2>&1; then
+    local kgb; kgb="$(grep -oE '_B64=\{kg:"[^"]+"' "${hf}" | sed 's/_B64={kg:"//;s/"$//')"
+    if printf '%s' "${kgb}" | base64 -d 2>/dev/null | python3 -c 'import json,sys;d=json.load(sys.stdin);assert d["node_count"]>0 and d["nodes"]' 2>/dev/null; then
+      record_pass "kg-console: o blob base64 kg decodifica para o grafo (não é casca vazia)"
+    else record_fail "kg-console: dados" "blob kg não decodifica/vazio"; fi
+  fi
+
+  # Self-contained: nenhuma dependência externa (CDN/fetch). O vendor não usa fetch/XHR.
+  if grep -qiE 'src=.?https?://|<script src|href=.?https?://[^"]*\.(js|css)|fetch\(' "${hf}"; then
     record_fail "kg-console: self-contained" "tem dependência externa (CDN/fetch)"
   else record_pass "kg-console: self-contained (sem CDN/fetch externo)"; fi
-  local H2; H2="$(bash "${helper}" "${fixture}" 2>/dev/null)"
-  if [ "$(printf '%s' "${H}" | sha256sum)" = "$(printf '%s' "${H2}" | sha256sum)" ]; then
+
+  # Determinismo (mesma entrada → mesmo byte).
+  local hf2="${hdir}/console2.html"; bash "${helper}" "${fixture}" 2>/dev/null > "${hf2}"
+  if [ "$(sha256sum < "${hf}")" = "$(sha256sum < "${hf2}")" ]; then
     record_pass "kg-console: determinístico"
   else record_fail "kg-console: determinismo" "varia entre execuções"; fi
+
+  # Degradação graciosa: SEM <slug>.narration.json → HTML ainda sai, com tour-esqueleto.
+  if grep -q 'buildTour' "${hf}" && grep -q 'tour-esqueleto' "${hf}"; then
+    record_pass "kg-console: sem narração → degrada para tour-esqueleto (não quebra)"
+  else record_fail "kg-console: degradação" "faltou o fallback de tour sem narração"; fi
+  rm -rf "${hdir}"
+
+  # Embutimento OPT-IN da narração: com um <slug>.narration.json irmão, o blob narr
+  # decodifica para o objeto autorado (a IA que explica viaja embutida, offline).
+  if command -v python3 >/dev/null 2>&1; then
+    local nt; nt="$(mktemp -d)"; cp "${fixture}" "${nt}/g.kg.yaml"
+    printf '{"guided_tour":[{"focus":["S_novo"],"narration":"passo de teste"}]}' > "${nt}/g.narration.json"
+    cp "${helper}" "${REPO_ROOT}/.claude/validation/kg-view.sh" "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${nt}/" 2>/dev/null
+    mkdir -p "${nt}/vendor/kg-console"; cp "${vendor}" "${nt}/vendor/kg-console/"
+    local HN; HN="$(bash "${nt}/kg-console.sh" "${nt}/g.kg.yaml" 2>/dev/null)"
+    local nb; nb="$(printf '%s' "${HN}" | grep -oE 'narr:"[^"]*"' | head -1 | sed 's/narr:"//;s/"$//')"
+    if printf '%s' "${nb}" | base64 -d 2>/dev/null | grep -q 'passo de teste'; then
+      record_pass "kg-console: narração irmã é embutida (base64) quando presente (opt-in)"
+    else record_fail "kg-console: narração" "narration.json não embutiu"; fi
+    rm -rf "${nt}"
+  fi
+
+  # Exit 2 — arquivo inexistente.
   local rc2=0; bash "${helper}" "/nonexistent/x.kg.yaml" >/dev/null 2>&1 || rc2=$?
   if [ "${rc2}" -eq 2 ]; then record_pass "kg-console: arquivo inexistente → exit 2"
   else record_fail "kg-console: uso" "esperava exit 2, veio ${rc2}"; fi
+
+  # Exit 3 — dependência ausente (vendor). Cópia isolada SEM o vendor.
+  local t3; t3="$(mktemp -d)"
+  cp "${helper}" "${REPO_ROOT}/.claude/validation/kg-view.sh" "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${t3}/" 2>/dev/null
+  local rc3=0; bash "${t3}/kg-console.sh" "${fixture}" >/dev/null 2>&1 || rc3=$?
+  if [ "${rc3}" -eq 3 ]; then record_pass "kg-console: vendor ausente → exit 3 (gracioso)"
+  else record_fail "kg-console: dep" "esperava exit 3 sem vendor, veio ${rc3}"; fi
+  rm -rf "${t3}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo kg-narrate-validate — REGRA 47. O validador da narração pré-cozida é o MECANISMO
+# que torna "cita ids que existem" determinístico (não promessa). Fixtures self-contained.
+# ---------------------------------------------------------------------------
+run_kg_narrate_validate_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/kg-narrate-validate.sh"
+  [ -f "${helper}" ] || { record_fail "kg-narrate-validate" "helper ausente: ${helper}"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "kg-narrate-validate: python3 ausente (skip gracioso)"; return; }
+  local t; t="$(mktemp -d)"; trap 'rm -rf "${t}"' RETURN
+  # kg-view.sh + kg-radar.sh ao lado (o validador consome a lente vigiada)
+  cp "${SCRIPT_DIR}/kg-view.sh" "${SCRIPT_DIR}/kg-radar.sh" "${t}/" 2>/dev/null
+  cp "${helper}" "${t}/kg-narrate-validate.sh"
+  cat > "${t}/g.kg.yaml" <<'KGEOF'
+meta:
+  id: fx-narr
+  schema_version: "1"
+nodes:
+  - id: C_UM
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "afirmacao um"
+  - id: E_UM
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    label: "evidencia"
+edges:
+  - from: E_UM
+    to: C_UM
+    edge_type: SUPPORTS
+KGEOF
+  local rc
+
+  # (N1) narração válida (ids existem) → exit 0
+  printf '{"guided_tour":[{"focus":["C_UM"],"narration":"foco no claim"},{"focus":[],"narration":"abertura"}],"node_summaries":{"E_UM":"a evidencia"}}' > "${t}/g.narration.json"
+  rc=0; bash "${t}/kg-narrate-validate.sh" "${t}/g.kg.yaml" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "kg-narrate-validate: (N1) narração com ids reais → válida (exit 0)"
+  else record_fail "kg-narrate-validate: (N1)" "narração válida reprovou (rc=${rc})"; fi
+
+  # (N2) id morto no tour → exit 1 (o guard que impede a narração de mentir)
+  printf '{"guided_tour":[{"focus":["Z_FANTASMA"],"narration":"mentira"}]}' > "${t}/g.narration.json"
+  rc=0; bash "${t}/kg-narrate-validate.sh" "${t}/g.kg.yaml" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ]; then record_pass "kg-narrate-validate: (N2) id inexistente no tour → REPROVA (exit 1)"
+  else record_fail "kg-narrate-validate: (N2)" "id morto passou (rc=${rc}, esperado 1)"; fi
+
+  # (N3) id morto em node_summaries → exit 1
+  printf '{"guided_tour":[{"focus":["C_UM"],"narration":"ok"}],"node_summaries":{"Z_NAO":"x"}}' > "${t}/g.narration.json"
+  rc=0; bash "${t}/kg-narrate-validate.sh" "${t}/g.kg.yaml" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ]; then record_pass "kg-narrate-validate: (N3) id morto em node_summaries → REPROVA (exit 1)"
+  else record_fail "kg-narrate-validate: (N3)" "summary de id morto passou (rc=${rc})"; fi
+
+  # (N4) tour vazio → exit 1 (narração sem passo não narra nada)
+  printf '{"guided_tour":[]}' > "${t}/g.narration.json"
+  rc=0; bash "${t}/kg-narrate-validate.sh" "${t}/g.kg.yaml" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ]; then record_pass "kg-narrate-validate: (N4) guided_tour vazio → REPROVA (exit 1)"
+  else record_fail "kg-narrate-validate: (N4)" "tour vazio passou (rc=${rc})"; fi
+
+  # (N5) passo com narration vazio → exit 1 (passo sem voz)
+  printf '{"guided_tour":[{"focus":["C_UM"],"narration":"  "}]}' > "${t}/g.narration.json"
+  rc=0; bash "${t}/kg-narrate-validate.sh" "${t}/g.kg.yaml" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ]; then record_pass "kg-narrate-validate: (N5) passo com narration vazio → REPROVA (exit 1)"
+  else record_fail "kg-narrate-validate: (N5)" "passo mudo passou (rc=${rc})"; fi
 }
 
 # ---------------------------------------------------------------------------
@@ -5232,6 +5400,7 @@ run_federation_radar_selftests
 # Modo federation-console — console estático read-only do SSOT (F1.3 federação).
 run_federation_console_selftests
 run_kg_console_selftests
+run_kg_narrate_validate_selftests
 run_site_inventory_selftests
 run_adopted_role_selftests
 run_write_stamp_selftests

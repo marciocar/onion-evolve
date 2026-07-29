@@ -81,11 +81,16 @@ if [ "${#UTILS[@]}" -gt 0 ]; then
   mkdir -p "${DEST}/utils" 2>/dev/null
   for u in "${UTILS[@]}"; do cp -R "${SRC}/${u}" "${DEST}/utils/" 2>/dev/null; done
 fi
-# validation/ — arquivos (só cria a pasta se houver).
+# validation/ — arquivos, PRESERVANDO subdiretório relativo a .claude/validation/.
+# (Flat vira validation/<arquivo>; aninhado como vendor/kg-console/cytoscape.min.js
+#  precisa manter a estrutura — o kg-console.sh resolve o renderer por HERE/vendor/…)
 if [ "${#VALIDATION[@]}" -gt 0 ]; then
   mkdir -p "${DEST}/validation" 2>/dev/null
   for v in "${VALIDATION[@]}"; do
-    cp "${SRC}/${v}" "${DEST}/validation/" 2>/dev/null && chmod +x "${DEST}/validation/$(basename "${v}")" 2>/dev/null
+    rel="${v#.claude/validation/}"; sub="$(dirname "${rel}")"
+    mkdir -p "${DEST}/validation/${sub}" 2>/dev/null
+    cp "${SRC}/${v}" "${DEST}/validation/${sub}/" 2>/dev/null
+    case "${v}" in *.sh) chmod +x "${DEST}/validation/${sub}/$(basename "${v}")" 2>/dev/null ;; esac
   done
 fi
 # templates/ — arquivos (só cria a pasta se houver).
