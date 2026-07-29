@@ -65,7 +65,7 @@ function statusFactor(s) {
   if (s == "done") return 0.1
   return -1  # inválido
 }
-function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^"|"$/, "", s); return s }
+function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["'\'']$/, "", s); return s }
 
 BEGIN { section = ""; nid = ""; ne = 0 }
 

@@ -328,6 +328,22 @@ run_kg_freshness_selftests() {
     record_pass "kg-schema: ausente → ⚠ + exit 0 (retrocompat, degradê)"
   else record_fail "kg-schema: ausente/retrocompat" "esperava exit 0 + ⚠; rc=${rc} out=${out}"; fi
 
+  # (e2) ASPAS SIMPLES — schema_version: '1' PASSA (não reprova). Sinal de campo de um adotante 2026-07-29:
+  # o prettier normaliza "1" → '1' e roda no pre-commit → todo .kg.yaml nasce reprovando o próprio gate.
+  # As 9 fixtures kg-* usavam SÓ aspas duplas, então a suíte não pegava essa classe (o adotante apontou).
+  # O trim() de kg-radar/kg-view passou a tirar aspas simples E duplas. Esta guarda fecha o flanco.
+  rc=0; out=$(bash "${radar}" "${sx}/single-quotes.kg.yaml" --schema 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'bate com o radar'; then
+    record_pass "kg-schema: (e2) aspas simples ('1') → PASSA (regressão prettier-quebra-grafo, sinal de campo)"
+  else record_fail "kg-schema: (e2) aspas simples" "esperava exit 0 + 'bate com o radar'; rc=${rc} out=${out}"; fi
+
+  # (e3) o mesmo trim() limpa label/on citados com aspas simples (o fix é mais amplo que o schema):
+  # a paridade kg-view × kg-radar tem de casar num grafo TODO em aspas simples.
+  rc=0; bash "${SCRIPT_DIR}/kg-view.sh" "${sx}/single-quotes.kg.yaml" --assert-parity >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "kg-schema: (e3) grafo todo em aspas simples → paridade kg-view × kg-radar casa"
+  else record_fail "kg-schema: (e3) paridade aspas simples" "os 2 parsers divergiram num grafo aspas-simples; rc=${rc}"; fi
+
   # (f) F1.1 — frescor estende a DEV que rastreia artefato móvel (verified_against), sem inundar
   # claim epistêmico DEV puro. Sinal de um adotante: ssot-como-runtime §2 (C_CONSOLIDATION_MAP stale).
   rc=0; out=$(bash "${radar}" "${fx}/dev-tracked-stale.kg.yaml" --freshness 2>&1) || rc=$?
