@@ -1,0 +1,254 @@
+# KG SDAAL — D5 PRICING do Onion: a escada treino→cert→compliance→SOTA, decision-ready.
+# D_D5 é a decision central (status:open — quem decide os números é o maestro). Cada camada = C_ (claim de preço)
+# SUPPORTS D_D5, sustentado por E_ (comparável 2026, url no label). Q_ = gate de instrumentação/entrevista que os
+# degraus superiores DEPENDS_ON. A escada = arestas DEPENDS_ON (cert→treino, compliance→cert, sota→compliance).
+# Brief-irmão: docs/business-context/d5-pricing-brief-2026-07.md. Camada audit (meta/estratégico).
+meta:
+  id: d5-pricing-2026-07
+  schema_version: "1"
+  date: 2026-07-28
+nodes:
+  # ---- DECISÃO CENTRAL (decision, status:open) ----
+  - id: D_D5
+    node_type: decision
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.65
+    status: open
+    label: "D5 — preço por camada (escada treino→certificação→compliance-pack→SOTA). Blend A+B: degraus 1-2 vendíveis-já (comparável direto); degraus 3-4 sob-consulta (gated D6/D2). Diretriz: ticket premium ($129+) > pipoca ($5-10); vender selo/curadoria, não o texto; preço-por-outcome só após instrumentar. Quem decide os números = maestro"
+
+  # ---- CLAIMS DE PREÇO POR CAMADA (SUPPORTS D_D5) ----
+  - id: C_treino_daterate
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: confirmed
+    label: "DEGRAU 1 Treino/Consultoria: faixa $1.800-3.000/dia (lançamento, sem selo). Ancorada no teto do consultor sênior de AI/dev-tooling e acima do piso de setup Claude Code — Onion vende metodologia própria, não config de ferramenta. VENDÍVEL-JÁ (blend-A, sem gate). M1a prévio ($1.2-2k) fica no chão da faixa. Confiança: média"
+  - id: C_cert_selo
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.65
+    status: confirmed
+    label: "DEGRAU 2 Certificação (selo Onion Certified Implementer): ~$1.250 inicial + ~$249/ano renovação. Ancora no cluster CONSULTOR/alto-touch (SAFe SPC), NÃO no exame de massa (PSM/CSM). Renovação com entrega real (KB atualizado + diretório + desconto pack), não taxa-pela-taxa. VENDÍVEL-JÁ p/ 1ª turma; renovação GATED (falta rubric+diretório). Confiança: média"
+  - id: C_compliance_pack
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "DEGRAU 3 Compliance-pack (cunha P4): faixa $15k-40k/ano CITÁVEL não-fechado. Terço inferior do mercado compliance-automation (abaixo/na mediana Vanta $20k até Drata-Foundation $25-50k; muito abaixo de GRC enterprise $50-500k). Vende compliance-as-code (spec auditável), NÃO monitoramento contínuo. SOB-CONSULTA (gated D6: zero P4 entrevistado + escopo aberto). Confiança: média"
+  - id: C_sota_subscription
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.45
+    status: open
+    label: "DEGRAU 4 Assinatura SOTA: $150-400/mês indiv. · $250-600 base + $60-120/seat empresa. Acima das ferramentas de codificação genéricas (Cursor/Copilot/Claude Code Max) — vende curadoria+governança de contexto federado, não assistência de código. SOB-CONSULTA (gated D2: vende L1-L6 não-construído; cotar = declarado≠verificado = queima de moat). Faixa = ancoragem, não oferta. Confiança: baixa"
+
+  # ---- EVIDÊNCIA — comparáveis 2026 (evidence, url no label) ----
+  - id: E_ai_consulting_dayrate
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "AI consultant sênior/arquiteto (7+ anos) $1.500-3.000/dia; solo premium ex-FAANG teto $1.500-3.000+ (elite $1.800-4.000+). url: rockstardeveloperuniversity.com/ai-consulting-rates-statistics, consultingheads.com/en/blog/freelance-consultant-costs-in-2026"
+  - id: E_claude_code_consulting
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "Claude Code / agentic-coding consulting (CLAUDE.md, hooks, MCP, rollout de time) $100-300/h → ~$800-2.400/dia (8h), sprint 1-3 semanas — análogo DIRETO de dev-tooling AI-native (piso da faixa Onion). url: ayautomate.com/blog/claude-code-consulting-services"
+  - id: E_eos_implementer
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "EOS Implementer (metodologia proprietária certificada, marca própria) $4.500-6.600/sessão dia-completo — análogo ESTRUTURAL do horizonte de repricing 2-3x quando o selo Onion amadurecer (não o número de hoje). url: shiftfocusos.com/post/eos-implementer-cost-binder-vs-enforcement, guestcanpost.com"
+  - id: E_safe_spc_cert
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "SAFe SPC — curso 4 dias $2.795-3.856 + exame $795; renovação ANUAL $995/ano (plataforma). Cluster CONSULTOR/alto-touch (certifica quem IMPLEMENTA em orgs cliente = natureza da cert Onion). url: cprime.com/courses/implementing-safe-spc, agilemania.com/cost-of-spc-certification, scaledagile.com renewal-faqs"
+  - id: E_mass_cert_floor
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "Cert de MASSA/baixo-touch (piso a NÃO copiar — contradiz D5 anti-pipoca): PSM I/II $200-250 vitalício; CSM/CSPO $100/2anos; ICP $250-2.500 renovação $0; PMI-ACP ~$435-495 + $60-150/3anos. Sustentadas por VOLUME/infra de exame que o maestro solo não tem. url: scrum.org, staragile.com, icagile.com, masterofproject.com"
+  - id: E_vanta_drata_pricing
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "Vanta $7.5k-56.8k/ano (mediana $20k; 50-200 FTE 1-framework $15-35k); Drata $7.5k-100k+ (Foundation ~$15k; startups <50 FTE $12-25k) — confirmam faixa $15-40k no terço inferior do mercado. url: costbench.com/software/compliance-management/vanta, sprinto.com/blog/vanta-pricing, costbench.com/.../drata"
+  - id: E_grc_enterprise_ceiling
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    label: "GRC platform enterprise $50k-500k/ano (típ. $25-150k p/ 3-5 módulos); full-stack frequentemente >€250k/ano (serviços 20-40% da licença) — TETO que o Onion NÃO alcança (sem monitoramento contínuo); posiciona compliance-pack como complemento/pré-req, não substituto full-stack. url: securityboulevard.com/2026/05/grc-software-pricing, getmonetizely.com"
+  - id: E_devtool_subscription
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    label: "Ferramentas de codificação AI (piso que a SOTA deve superar): Claude Code Max $100-200/mês; Cursor Teams $40-120/seat; Copilot Enterprise $39/user; Devin Teams $80+$40/seat, Max $200/mês. Vendem execução de código, NÃO curadoria+governança de contexto federado. url: claude.com/pricing, cursor.com/blog/teams-pricing-june-2026, github.blog, pensero.ai/blog/devin-pricing"
+
+  # ---- QUESTÕES ABERTAS / GATES (question) ----
+  - id: Q_instrument_value_per_adopter
+    node_type: question
+    trace: docs/business-context/02-product/metrics.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "GATE de instrumentação: 'valor medido por adotante' (metrics.md `[a instrumentar]`) — agregação por adotante de 4 sinais que já têm mecanismo host no core (ciclos concluídos via STATE.md barato-primeiro; frescor via /meta:context-freshness; velocidade/retrabalho via git+done_log; saúde federação via /meta:federation-status). Sem série temporal, nenhum degrau migra p/ preço-por-outcome (barreira BCG 2025)"
+  - id: Q_p4_interviews
+    node_type: question
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.55
+    status: open
+    label: "Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entrevistas P4 como pendência; falta também fechar o escopo do pack v1 (frameworks, nº artefatos, acompanhamento de auditoria) p/ achar custo-base/margem"
+  - id: Q_d2_l1l6_activation
+    node_type: question
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "GATE D2: a assinatura SOTA vende o mecanismo L1-L6 (classificação-por-inferência + gate-por-propósito + ε-ledger) que segue GATED — construído+dogfoodado + threat model N-tenant verificado (hoje só N=1 pessoal). Cotar número antes = declarado≠verificado = queima de moat. Nenhum preço SOTA a cliente antes deste gate"
+  - id: Q_train_cert_chaining
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.55
+    status: open
+    label: "Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento de percepção de valor entre dia-avulso ($1.8-3k) e cert inicial (~$1.25k). Só instrumentando 3+ engajamentos se confirma que não colidem. Decisão do maestro"
+
+  # ---- ENTIDADE — a diretriz D5 que rege toda a escada ----
+  - id: A_d5_directive
+    node_type: entity
+    trace: docs/business-context/decisions.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "Diretriz D5 (rege todos os degraus): ticket PREMIUM ($129+) > pipoca ($5-10) p/ maestro solo; vender SELO/curadoria/serviço, não o texto; preço-por-outcome SÓ depois de instrumentar (metrics.md). Nenhum degrau vira faixa-volume/pipoca"
+
+edges:
+  # cada camada de preço SUPPORTS a decisão central D5
+  - from: C_treino_daterate
+    to: D_D5
+    edge_type: SUPPORTS
+  - from: C_cert_selo
+    to: D_D5
+    edge_type: SUPPORTS
+  - from: C_compliance_pack
+    to: D_D5
+    edge_type: SUPPORTS
+  - from: C_sota_subscription
+    to: D_D5
+    edge_type: SUPPORTS
+  # a diretriz D5 rege a decisão
+  - from: A_d5_directive
+    to: D_D5
+    edge_type: SUPPORTS
+  # evidência sustenta cada claim de preço
+  - from: E_ai_consulting_dayrate
+    to: C_treino_daterate
+    edge_type: SUPPORTS
+  - from: E_claude_code_consulting
+    to: C_treino_daterate
+    edge_type: SUPPORTS
+  - from: E_eos_implementer
+    to: C_treino_daterate
+    edge_type: SUPPORTS
+  - from: E_safe_spc_cert
+    to: C_cert_selo
+    edge_type: SUPPORTS
+  - from: E_mass_cert_floor
+    to: C_cert_selo
+    edge_type: SUPPORTS
+  - from: E_eos_implementer
+    to: C_cert_selo
+    edge_type: SUPPORTS
+  - from: E_vanta_drata_pricing
+    to: C_compliance_pack
+    edge_type: SUPPORTS
+  - from: E_grc_enterprise_ceiling
+    to: C_compliance_pack
+    edge_type: SUPPORTS
+  - from: E_devtool_subscription
+    to: C_sota_subscription
+    edge_type: SUPPORTS
+  # A ESCADA — cada degrau DEPENDS_ON o anterior (ancoragem coerente)
+  - from: C_cert_selo
+    to: C_treino_daterate
+    edge_type: DEPENDS_ON
+  - from: C_compliance_pack
+    to: C_cert_selo
+    edge_type: DEPENDS_ON
+  - from: C_sota_subscription
+    to: C_compliance_pack
+    edge_type: DEPENDS_ON
+  # gates de instrumentação — os degraus superiores DEPENDS_ON as questões abertas
+  - from: C_compliance_pack
+    to: Q_p4_interviews
+    edge_type: DEPENDS_ON
+  - from: C_sota_subscription
+    to: Q_d2_l1l6_activation
+    edge_type: DEPENDS_ON
+  - from: C_compliance_pack
+    to: Q_instrument_value_per_adopter
+    edge_type: DEPENDS_ON
+  - from: C_sota_subscription
+    to: Q_instrument_value_per_adopter
+    edge_type: DEPENDS_ON
+  - from: C_cert_selo
+    to: Q_train_cert_chaining
+    edge_type: DEPENDS_ON
+  # as questões traceiam de volta à decisão central que travam
+  - from: Q_instrument_value_per_adopter
+    to: D_D5
+    edge_type: TRACES_TO
+  - from: Q_p4_interviews
+    to: D_D5
+    edge_type: TRACES_TO
+  - from: Q_d2_l1l6_activation
+    to: D_D5
+    edge_type: TRACES_TO
+  - from: Q_train_cert_chaining
+    to: D_D5
+    edge_type: TRACES_TO
