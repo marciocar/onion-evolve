@@ -60,6 +60,19 @@ nodes:
     status: confirmed
     label: "fonte-desacoplada — cliente que OWNA o proprio framework: role: source + decoupled_from, vira seu proprio T0, autora sozinho, corta o --update do core. 'A fonte e soberana de quem a usa' no limite. Mecanismo: decouple-source.sh"
 
+  # ---- AUTORIDADE DE PESSOA (entity, prefixo AUTH_) — dimensao ORTOGONAL aos tiers de REPO acima ----
+  # Um ROLE_ e o tier do REPO (source/hub/adopted); um AUTH_ e o que uma PESSOA pode fazer DENTRO de um
+  # repo. Prefixo distinto de proposito: nao e um tier da familia (a REGRA 41 so cobra roles.yaml de ROLE_).
+  # Projetado pela onion-onboarding (--authorities), lente separada dos --roles.
+  - id: AUTH_visitor
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "colaborador visitante — pessoa convidada a um repo (via TX_invite) com AUTORIDADE RESTRITA: ENTREGA sinais como arquivos (inbox) mas NAO relaya nem acessa o core (reforcado pelo SO); um-escritor-por-arquivo (I3, entrega-sem-commit); vinculo com a marca pode ser assimetrico (o framework nao precisa dos detalhes). So o maestro relaya/tria ao core. Sinal 8 do relay 2026-07-30"
+
   # ---- TRANSIÇÕES (decision) — os movimentos; trace: = o procedimento REAL (o scaffold) ----
   - id: TX_create
     node_type: decision
@@ -164,4 +177,8 @@ edges:
     edge_type: DEPENDS_ON
   - from: ROLE_decoupled_source
     to: TX_decouple
+    edge_type: DEPENDS_ON
+  # o visitante nasce do convite: a autoridade-de-pessoa depende da transição que a cria
+  - from: AUTH_visitor
+    to: TX_invite
     edge_type: DEPENDS_ON

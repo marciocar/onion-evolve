@@ -9,12 +9,13 @@
 #
 # Consumido por DUAS faces da Condução (ambas projetam da MESMA fonte — fonte≠derivação):
 #   - onion-wizard (ajuda a FAZER): as TRANSIÇÕES (default).
-#   - onion-onboarding (ajuda a CONHECER): os PAPÉIS (--roles).
+#   - onion-onboarding (ajuda a CONHECER): os PAPÉIS (--roles) e as AUTORIDADES (--authorities).
 #
 # Saída (TSV, uma por linha):
-#   default : <status>\t<id>\t<trace>\t<label>   — transições (TX_*); status confirmed=ativa, open=gated
-#   --roles : <status>\t<id>\t<label>            — papéis (ROLE_*); os tiers da família
-# Uso   : bash .claude/utils/wizard/topology-projection.sh [--roles]
+#   default       : <status>\t<id>\t<trace>\t<label>   — transições (TX_*); confirmed=ativa, open=gated
+#   --roles       : <status>\t<id>\t<label>            — papéis de REPO (ROLE_*); os tiers da família
+#   --authorities : <status>\t<id>\t<label>            — autoridades de PESSOA (AUTH_*); ex.: colaborador visitante
+# Uso   : bash .claude/utils/wizard/topology-projection.sh [--roles|--authorities]
 # Exit  : 0 = ok · 3 = KG ausente ou sem python+yaml (a skill degrada: pede/ensina à mão)
 # ===========================================================================
 set -euo pipefail
@@ -37,6 +38,9 @@ for n in (d.get('nodes') or []):
     label = (n.get('label', '') or '').replace('\t', ' ')
     if mode == '--roles':
         if nid.startswith('ROLE_'):
+            print('\t'.join([status, nid, label]))
+    elif mode == '--authorities':
+        if nid.startswith('AUTH_'):
             print('\t'.join([status, nid, label]))
     else:  # transitions (default)
         if nid.startswith('TX_'):
