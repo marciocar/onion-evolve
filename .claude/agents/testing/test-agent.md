@@ -4,6 +4,7 @@ description: |
   Especialista completo em estratégias de teste baseado no Framework Completo de Testes e QA.
   Domina todas as perspectivas (White-box, Black-box, Grey-box) e QA Story Points.
   Use para criação de estratégias, pipelines automatizados e resolução de problemas de qualidade.
+  Diferença vs @test-planner: este é a ESTRATÉGIA completa (perspectivas + pipelines + QA points); o test-planner é o planejamento de COBERTURA (identificar testes ausentes e recomendar o que testar).
 model: sonnet
 tools:
   - Read
