@@ -422,6 +422,34 @@ bash .claude/validation/kg-radar.sh docs/<área>/graph/<slug>.kg.yaml --reconcil
 bash .claude/validation/kg-radar.sh docs/<área>/graph/<slug>.kg.yaml --integrity --schema   # o GATE por lote
 ```
 
+### Automação parcial — o mecânico, NUNCA o julgamento
+
+O que dá pra automatizar sem virar caixa-preta: **o fan-out mecânico**, preservando a **PAUSA** como
+gate humano duro. É `generate-and-filter` com selo humano — o pipeline gera candidatos, o radar filtra
+por atenção, o **humano sela**. O precedente no core: o eixo `interactive` do `/product:transform-consolidated`
+(a análise roda sozinha; a validação por bloco só com o humano) e o dry-run-como-gate do `onion-wizard`.
+
+- **F0 — store (auto):** `bash .claude/utils/diagnose/scaffold-diagnose-store.sh <slug> [--area <área>]`
+  cria o store inteiro (skeleton `.kg.yaml` de 2 camadas + `STATE.md` com `NEXT` retomável + `notes.md`
+  append-only + `sources/ extracts/ consolidated/`). Never-clobber, `--dry-run`, idempotente. Fecha o
+  "skeleton à mão". → **PAUSA:** preencha `sources/` e confirme o escopo antes de extrair.
+- **Extração/consolidação (auto):** `/product:extract-meeting` por fonte → `/product:consolidate-meetings`.
+  Rodam ponta-a-ponta (nenhum tem gate). Produzem o consolidado com Convergências/**Divergências**.
+- **Candidatos (auto):** as **Divergências** viram nós `question`/`claim` **candidatos** no `.kg.yaml`; o
+  radar ranqueia por atenção. É o fan-out mecânico — não o diagnóstico.
+- **→ PAUSA (o selo — inegociável):** o humano **revisa os candidatos por bloco**, responde as
+  `question`, sela as `claim`, decide as reconciliações. `Q_… → RESOLVIDA → D_…` no `notes.md`
+  (carimbado autor+data). **Nenhuma reconciliação/decisão se materializa sem o selo humano.**
+- **Gate por lote (auto):** ao fechar o lote, `kg-radar --integrity --schema` (exit 0) roda sozinho; o
+  `STATE.md.NEXT` avança. Retoma frio pelo NEXT-pointer.
+
+> **🚩 A linha vermelha:** a automação substitui **só o fan-out mecânico** (scaffold, extract/consolidate,
+> geração de candidatos, gate-do-radar). **Nunca** o selo humano na PAUSA. **Não existe `--auto` de
+> diagnóstico** de propósito — ao contrário do `transform` (onde `auto` é legítimo porque tasks não são
+> diagnóstico). O diagnóstico sem a pausa vira gerador-de-conteúdo, o anti-padrão que o KG-SDAAL combate:
+> o skeleton **vazio reprova o radar de propósito** (0 nós não é grafo — anti-falso-verde); o valor
+> nasce do humano que preenche e sela, lote a lote.
+
 ### ⚠️ Soberania — o engajamento é do adotante, o método é do core
 
 O **método/modo** viaja na federação (schema + a cadência + a releitura das primitivas). O **KG do

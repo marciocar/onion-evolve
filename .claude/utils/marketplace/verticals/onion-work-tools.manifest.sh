@@ -30,7 +30,9 @@ COMMANDS=(
 AGENTS=(
   ".claude/agents/meta/metaspec-gate-keeper.md"
 )
-UTILS=()
+# O scaffold do store de diagnose (o modo `kg diagnose` o cabeia — sem ele o door teria a referência
+# quebrada). O dir inteiro viaja (helper + templates/), copiado com estrutura preservada.
+UTILS=(".claude/utils/diagnose")
 # Motores determinísticos que os comandos cabeiam (kg→radar+console; diary→index; constellation→map).
 VALIDATION=(
   ".claude/validation/kg-radar.sh"
