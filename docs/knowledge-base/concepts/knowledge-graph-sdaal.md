@@ -598,6 +598,21 @@ comando [`/meta:kg`](../../../.claude/commands/meta/kg.md) §Modo map. O essenci
 - **Invariante grep-verificável no repo do adotante**: cada endpoint-dono aparece como fonte de
   exibição em 1 componente ("cara-crachá" — `verify-read-path-first` aplicado ao front).
 
+### A 3ª aplicação — o mesmo motor como DIAGNÓSTICO de engajamento (`/meta:kg diagnose`)
+
+O `map` mapeia **software**; a mesma máquina — 2 camadas + radar — mapeia um **engajamento de
+consultoria** (descoberta de negócio). É a **tese-núcleo aplicada ao diagnóstico**: o grafo é
+runtime, o **radar diagnostica**. Cada primitiva ganha leitura de negócio: **atenção** = onde focar
+a consultoria (não a dedo — o radar ranqueia); **reconciliação** = a hipótese que a descoberta
+refutou (fontes conflitam → `claim` a reconciliar); **estado-absorvente** (`--domain`) = **o gargalo
+do cliente**, onde a jornada morre (a mesma detecção que achou o SLOT-limbo num software). As 2
+camadas: `domain` = o negócio do cliente (SSOT), `audit` = a epistemologia da consultoria
+(hipóteses/teses) que `TRACES_TO` o domínio. A cadência é humano-no-loop —
+**construir→pausar→perguntar→responder**, radar como gate por lote. **Soberania:** o método/modo vai
+ao core; o **KG do engajamento** (dado do cliente) fica no repo dev do adotante e **nunca sai** —
+mesma partição do gate client-safe. Nasceu de dogfood de campo (~107 nós/172 arestas). Detalhe:
+`.claude/commands/meta/kg.md` §Modo diagnose — decisão de arquitetura core-only.
+
 ## Generalização para o core — EXECUTADA (2026-07-10) + Fase 2
 
 O gate abriu (2026-07-04) e a camada domain foi promovida (2026-07-10, sinal

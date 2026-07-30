@@ -13,7 +13,7 @@ tags: [kg, knowledge-graph, investigation, sdaal, radar, reconciliation, domain-
 version: "1.4.0"
 updated: "2026-07-21"
 allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/kg-radar.sh*) Bash(bash .claude/validation/kg-provenance-coverage.sh*) Bash(ls docs/*)
-argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área> | backfill [<escopo>]]  (vazio = localizar .kg.yaml existente e rodar radar)"
+argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área> | diagnose <slug> | backfill [<escopo>]]  (vazio = localizar .kg.yaml existente e rodar radar)"
 related_commands:
   - /meta:evolve
   - /meta:graph
@@ -337,13 +337,107 @@ O console detecta o `.narration.json` irmão e o embute (opt-in). Sem ele, degra
 EMBUTE a narração; o único ponto com IA é a autoria (F1), fora do script. Na federação viaja o
 **schema + método** (o arco canônico), nunca o JS do renderer.
 
+## 🩺 Modo diagnose — o KG como DIAGNÓSTICO de engajamento
+
+`diagnose <slug>` mapeia um **engajamento de consultoria** (descoberta de negócio) como KG SDAAL de
+2 camadas, e usa o **radar como motor de diagnóstico**. É o **irmão de negócio do `map`**: o `map`
+mapeia software (UI/backend, atom-map, fonte-única); o `diagnose` mapeia um cliente/processo. Nasceu
+de dogfood de campo (um engajamento real, ~107 nós/172 arestas, 9 lotes — o radar **ranqueou o foco**
+por atenção e a **camada de domínio flagou os gargalos**; a reconciliação é modelada pelo humano e o
+radar a **torna visível**, não a inventa).
+
+> **A tese-núcleo do Onion aplicada ao diagnóstico:** o grafo é runtime, o **radar diagnostica**.
+> Cada primitiva do radar ganha leitura de consultoria (tabela abaixo). O consultor **não escolhe o
+> foco a dedo** — o radar ranqueia por atenção; o humano sela.
+
+### A releitura das primitivas (o que o `map` NÃO tem)
+
+| Primitiva do radar | No `map` (software) | No `diagnose` (engajamento) |
+|---|---|---|
+| **atenção** (`--radar`) | o nó crítico do sistema | **onde focar a consultoria** (impact × confidence × conectividade) |
+| **reconciliação** (`--reconcile`) | verdade × verdade no código | **a hipótese que a descoberta REFUTOU** (fontes conflitam → `claim` a reconciliar) |
+| **estado-absorvente** (`--domain`) | SLOT-limbo / drop-off de dado | **o gargalo/drop-off do CLIENTE** — onde a jornada morre |
+| **STATE-sem-dona** (`--domain`) | estado sem entity dona | **ator/etapa sem responsável** no processo |
+| **EVENT-sem-efeito** (`--domain`) | evento que não origina aresta | **evento sem consequência** no engajamento |
+
+**Não transfere do `map`:** `atom-map`, `SourceTag`, invariante de `fonte-única` (READS>1) e o
+adaptador F4 — são conceitos de **front-end**. O que transfere é o padrão **"fatias de domínio /
+máquina de estados por identidade"** (a jornada do cliente/processo como `state` + `TRANSITIONS`).
+
+### As 2 camadas, no diagnóstico
+
+- **`layer: domain`** = o **negócio do cliente** (SSOT durável): `entity` (stakeholders, produtos,
+  ativos), `state`/`event`/`TRANSITIONS` (a jornada/processo), `rule`/`policy` (as regras do negócio).
+  `plane: PROD` = fato consolidado do domínio.
+- **`layer: audit`** = a **epistemologia da consultoria** (efêmero): `claim` (hipóteses/teses),
+  `evidence` (o que as fontes afirmam), `question` (o que ainda cobra resposta), `decision` (o que se
+  decidiu), `artifact` (os entregáveis). `plane: DEV` = hipótese/trabalho.
+- **Ponte:** cada nó de audit `TRACES_TO` o nó de domínio que ele afeta — o "join" que ancora a
+  crença no negócio real (a aresta dominante no dogfood: 67 `TRACES_TO`).
+
+### O pipeline de ingestão (reusa o que já existe)
+
+```
+sources/  (transcrições, docs, deck do cliente → proxy textual .md; binário pesado no .gitignore)
+   │  F0 inventário / descoberta
+   ▼
+extracts/  ← /product:extract-meeting (EXTRACT: decisões, gaps, contradições, deps, stakeholders, timeline)
+   │  extração (um .md por fonte)
+   ▼
+consolidated/  ← /product:consolidate-meetings (bloco de proveniência F1..Fn + Convergências/Divergências)
+   │  fusão multi-fonte — DIVERGÊNCIA entre fontes = claim a reconciliar
+   ▼
+docs/<área>/graph/<slug>.kg.yaml  ← ESTE modo: modela o consolidado como KG de 2 camadas
+```
+
+O `extract-meeting` e o `consolidate-meetings` **já existem** — o `diagnose` **consome** a saída
+deles; não os reimplementa. A triagem de proveniência da consolidação (nada entra no grafo sem
+passar pelo crivo Convergência/Divergência) é o que mantém o KG honesto.
+
+### A cadência — construir → pausar → perguntar → responder (humano-no-loop)
+
+Faseado retomável, **serial** (como o `map`, não orquestração). Checkpoint durável = o `.kg.yaml`
+commitado por lote + um `STATE.md` com ponteiro `NEXT` retomável.
+
+- **F0 — inventário:** varre as fontes, classifica textual vs binário (binário → proxy textual),
+  levanta pendências → primeira PAUSA.
+- **LOTE 1..N:** cada lote é um incremento **temático** fechado do grafo (ciclo comercial → pessoas
+  → hipótese → entrega → …), com o **delta de nós/arestas anotado** e o **radar como GATE** ao
+  fechar: `kg-radar.sh <arquivo> --integrity --schema` tem de sair **exit 0** (todo nó ≥1 aresta,
+  enums válidos). Só passa com integridade limpa.
+- **PAUSA numerada (entre lotes):** o construtor **para**, as perguntas abertas viram nós
+  `question`; o maestro **responde** em texto **carimbado** (autor + data); cada resposta resolve
+  uma ou mais `question` — marque `Q_… → RESOLVIDA → D_…`. Toda pergunta tem rastro de nascimento e
+  de morte. Registre num `notes.md` **append-only** (nunca reescreva; só anexe).
+- **Reconciliação é cidadã de 1ª classe:** hipótese que a descoberta derrubou **não se apaga** —
+  `status: refuted`/`superseded` + aresta `REFUTES`/`SUPERSEDES`. O grafo guarda a história
+  epistêmica: o que se achou, o que caiu, quem derrubou.
+
+### Rodar o diagnóstico (o radar é o motor)
+
+```bash
+bash .claude/validation/kg-radar.sh docs/<área>/graph/<slug>.kg.yaml --radar        # o FOCO (atenção)
+bash .claude/validation/kg-radar.sh docs/<área>/graph/<slug>.kg.yaml --domain       # o GARGALO (estado-absorvente)
+bash .claude/validation/kg-radar.sh docs/<área>/graph/<slug>.kg.yaml --reconcile    # as hipóteses refutadas
+bash .claude/validation/kg-radar.sh docs/<área>/graph/<slug>.kg.yaml --integrity --schema   # o GATE por lote
+```
+
+### ⚠️ Soberania — o engajamento é do adotante, o método é do core
+
+O **método/modo** viaja na federação (schema + a cadência + a releitura das primitivas). O **KG do
+engajamento** — dado do cliente, nós confidenciais marcados — **fica no repo dev do adotante e NUNCA
+sai**. O core segura o padrão, jamais o cliente (mesma partição de visibilidade do gate client-safe).
+Antes de qualquer projeção cruzar fronteira (material pro cliente, sinal pro core), rode o gate:
+`bash .claude/validation/projection-safety.sh --terms <lista-de-clientes> <artefato>` → `grep`=0.
+
 ## 💡 Exemplos
 
 ```bash
 /meta:kg novo auditoria-seguranca          # cria docs/onion/graph/auditoria-seguranca.kg.yaml
 /meta:kg docs/onion/graph/onion-evolution-2026-07.kg.yaml   # modela/atualiza e roda radar
 /meta:kg                                    # localiza o mais recente e roda o radar
-/meta:kg map command-center                 # PFR F0-F4: inventário → atom-map → .kg.yaml → radar
+/meta:kg map command-center                 # PFR F0-F4: inventário → atom-map → .kg.yaml → radar (software)
+/meta:kg diagnose cliente-acme-2026-07       # engajamento como KG 2-camadas; radar = diagnóstico (atenção/gargalo/reconciliação)
 /meta:kg narrate m2-bridge-logto-2026-07     # autora a narração pré-cozida (tour + resumos) p/ o console
 ```
 

@@ -1,0 +1,133 @@
+meta:
+  id: kg-diagnose-design-2026-07
+  schema_version: "1"
+  date: 2026-07-30
+nodes:
+  - id: D_diagnose_mode
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: done
+    verified_at: 2026-07-30
+    verified_against: modo-documentado-em-kg.md
+    label: "ENTREGUE: modo /meta:kg diagnose — o KG-SDAAL como diagnóstico de engajamento de consultoria. Método canônico documentado (não comando novo, não automação): F0→lotes→PAUSA→radar-gate + a releitura das primitivas + a soberania. Reusa kg-radar + 2 camadas + pipeline extract/consolidate"
+    trace: ".claude/commands/meta/kg.md"
+  - id: C_p6_wrapper_fino
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: refuted
+    label: "MEU VEREDITO DE TRIAGEM (errado): #6 é wrapper fino sobre /meta:kg map, baixo valor. Conflou dois objetos"
+    trace: "docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml"
+  - id: E_map_e_software_diagnose_e_negocio
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: leitura-do-kg.md-e-pipeline
+    label: "REFUTA o wrapper-fino: /meta:kg map mapeia SOFTWARE (UI/backend, atom-map, fonte-única, SourceTag, F4-adaptador-React); o diagnose mapeia um ENGAJAMENTO DE NEGÓCIO. Objetos diferentes — o atom-map/SourceTag/F4 do map NÃO transferem. Behavior-over-declaration contra a própria triagem"
+    trace: ".claude/commands/meta/kg.md"
+  - id: E_lacuna_pipeline
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: exploracao-pipeline-descoberta
+    label: "A LACUNA real: o pipeline de descoberta (extract-meeting → consolidate-meetings → transform-consolidated) termina em markdown/tasks — NENHUM emite .kg.yaml SDAAL. O diagnose é a ponte descoberta→KG que falta"
+    trace: ".claude/commands/product/consolidate-meetings.md"
+  - id: E_radar_ja_diagnostica
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: kg-radar-domain-existe
+    label: "O motor já existe: kg-radar.sh --domain detecta estado-absorvente (state com transIn>0 e transOut=0) = onde a jornada morre. No diagnose isso É o gargalo do cliente. Atenção=foco, reconciliação=hipótese refutada. Zero código novo"
+    trace: ".claude/validation/kg-radar.sh"
+  - id: E_dogfood_de_campo
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: prototipo-do-adotante-medido
+    label: "PROVADO no campo (client-safe): um engajamento real foi mapeado como KG de 2 camadas (~107 nós/172 arestas, 73 audit / 34 domain), em 9 lotes com PAUSA numerada, o radar como gate por lote; a reconciliação pegou hipótese refutada pela descoberta (REFUTES/SUPERSEDES). A cadência construir→pausar→perguntar→responder é o coração do método"
+    trace: "método destilado do dogfood do adotante (client-safe)"
+  - id: D_reusa_nao_duplica
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-07-30
+    verified_against: modo-nao-codigo
+    label: "REUSA, não duplica: kg-radar (motor de diagnóstico), as 2 camadas SDAAL, a cadência faseada serial do map, o pipeline extract/consolidate. É MÉTODO documentado, zero script novo. Modo do /meta:kg (não comando) — evita a cascata de contagem, fica ao lado do map"
+    trace: ".claude/commands/meta/kg.md"
+  - id: C_soberania_engajamento
+    node_type: claim
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "SOBERANIA (inegociável): o MÉTODO/modo vai pro core; o KG do ENGAJAMENTO (dado do cliente, nós confidenciais) fica no repo dev do adotante e NUNCA sai. Reforçado pelo gate projection-safety.sh --terms antes de qualquer projeção cruzar fronteira. Mesma partição do #7"
+    trace: ".claude/validation/projection-safety.sh"
+  - id: A_kg_md
+    node_type: artifact
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: secao-diagnose-em-kg.md
+    label: "kg.md — a seção 🩺 Modo diagnose (a releitura das primitivas, as 2 camadas, o pipeline de ingestão, a cadência PAUSA-numerada, a soberania)"
+    trace: ".claude/commands/meta/kg.md"
+  - id: Q_automacao_pipeline
+    node_type: question
+    plane: DEV
+    impact: 2
+    confidence: 0.6
+    status: open
+    label: "Follow-up GATED: um orquestrador que encadeia extract→consolidate→diagnose automaticamente? Decisão do maestro: NÃO agora — o dogfood fez humano-no-loop de propósito (a PAUSA é o valor); automatizar arrisca engessar a cadência. Este PR entrega o método canônico, não o orquestrador"
+    trace: ".claude/commands/meta/kg.md"
+edges:
+  - from: E_map_e_software_diagnose_e_negocio
+    to: C_p6_wrapper_fino
+    edge_type: REFUTES
+  - from: D_diagnose_mode
+    to: C_p6_wrapper_fino
+    edge_type: SUPERSEDES
+  - from: E_map_e_software_diagnose_e_negocio
+    to: D_diagnose_mode
+    edge_type: SUPPORTS
+  - from: E_lacuna_pipeline
+    to: D_diagnose_mode
+    edge_type: SUPPORTS
+  - from: E_radar_ja_diagnostica
+    to: D_diagnose_mode
+    edge_type: SUPPORTS
+  - from: E_dogfood_de_campo
+    to: D_diagnose_mode
+    edge_type: SUPPORTS
+  - from: E_radar_ja_diagnostica
+    to: D_reusa_nao_duplica
+    edge_type: SUPPORTS
+  - from: D_reusa_nao_duplica
+    to: D_diagnose_mode
+    edge_type: DEPENDS_ON
+  - from: C_soberania_engajamento
+    to: D_diagnose_mode
+    edge_type: CONSTRAINS
+  - from: A_kg_md
+    to: D_diagnose_mode
+    edge_type: TRACES_TO
+  - from: Q_automacao_pipeline
+    to: D_diagnose_mode
+    edge_type: DEPENDS_ON
