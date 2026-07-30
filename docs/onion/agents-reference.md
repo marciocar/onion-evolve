@@ -52,7 +52,7 @@ Este guia documenta os agentes especializados disponíveis no sistema `.claude/`
 ```
 
 **Capacidades**:
-- Conhecimento completo: 100 comandos, 51 agentes, 10 skills, 87 knowledge bases
+- Conhecimento completo: 100 comandos, 51 agentes, 11 skills, 87 knowledge bases
 - Análise inteligente de contexto e recomendação de abordagem
 - Orquestração de workflows end-to-end
 - Delegação para agentes especializados
