@@ -227,7 +227,7 @@ Templates de formatação para cada provider devem viver em:
 .claude/utils/<dominio>/templates/<provider>-<tipo>.md   # quando aplicável
 ```
 
-Para ClickUp especificamente, existe documento de referência: `.claude/utils/clickup-formatting.md`.
+Para ClickUp especificamente, existe documento de referência: `.claude/commands/common/prompts/clickup-patterns.md` (fragmento `common:prompts:clickup-patterns`).
 
 ---
 
