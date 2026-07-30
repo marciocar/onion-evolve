@@ -124,7 +124,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: confirmed
+    status: superseded
     label: "PRODUTO 7 — SSOT com partição de visibilidade + gate client-safe determinístico (grep de termos sensíveis = 0, versionável). Método transversal que sustentou todos"
     trace: "relay Sinal 6"
   - id: E_sem_gate_client_safe
@@ -132,11 +132,31 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 1.0
-    status: confirmed
+    status: refuted
     verified_at: 2026-07-30
     verified_against: validation-scripts-zero
-    label: "GAP: 0 scripts de validação com gate client-safe no core. Mas o método foi dogfoodado — este próprio relay passou por um gate grep=0 de identificadores do cliente"
+    label: "GAP (REFUTADO): a 1ª triagem disse '0 scripts de gate client-safe' — errado. projection-safety.sh já existia (grep varreu só commands/skills/validation, não achou o nome 'projection-safety')"
     trace: ".claude/validation/"
+  - id: E_projection_safety_exists
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: helper-rodado-em-artefato-arbitrario
+    label: "JÁ EXISTIA: projection-safety.sh (REGRA 30, dogfoodado P0-P4) é o gate determinístico — deriva termos de members.yaml, audita artefato arbitrário, exit 1 no vazamento. Como o #1 (create-vertical), o adotante propôs mecanismo que o core já tinha (behavior-over-declaration)"
+    trace: ".claude/validation/projection-safety.sh"
+  - id: D_p7_terms_extension
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-07-30
+    verified_against: selftests-T1-T3-verdes
+    label: "ENTREGUE: o gap RESIDUAL real do #7 era o SOURCE dos termos (members.yaml = nomes de MEMBRO). Estendi projection-safety.sh com --terms <lista>: o adotante declara os PRÓPRIOS nomes de cliente e gateia um artefato antes de cruzar a fronteira. Mesma disciplina P0 fail-loud; run_audit fatorado (uma verdade só); selftests T1-T3"
+    trace: ".claude/validation/projection-safety.sh"
   - id: D_prioridade
     node_type: decision
     plane: DEV
@@ -167,6 +187,18 @@ edges:
   - from: E_sem_gate_client_safe
     to: C_p7_gate_client_safe
     edge_type: SUPPORTS
+  - from: E_projection_safety_exists
+    to: E_sem_gate_client_safe
+    edge_type: REFUTES
+  - from: D_p7_terms_extension
+    to: C_p7_gate_client_safe
+    edge_type: SUPERSEDES
+  - from: E_projection_safety_exists
+    to: D_p7_terms_extension
+    edge_type: SUPPORTS
+  - from: D_p7_terms_extension
+    to: D_prioridade
+    edge_type: TRACES_TO
   - from: C_p2_gerador_decks
     to: D_prioridade
     edge_type: SUPPORTS
