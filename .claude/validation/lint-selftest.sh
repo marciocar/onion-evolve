@@ -3372,6 +3372,80 @@ run_scaffold_book_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo scaffold-diagnose — exercita .claude/utils/diagnose/scaffold-diagnose-store.sh
+# (o store do /meta:kg diagnose: skeleton .kg.yaml 2-camadas + STATE.md + notes.md + dirs).
+# Cobre: os 6 artefatos, substituição sem placeholder, never-clobber, dry-run, slug inválido,
+# e o TESTE-CHAVE — o skeleton é bem-formado (schema_version) e VIRA um grafo válido no 1º lote.
+# (Skeleton VAZIO reprova a guarda de legibilidade do radar de propósito — 0 nós não é grafo.)
+# ---------------------------------------------------------------------------
+run_scaffold_diagnose_selftests() {
+  local helper="${SCRIPT_DIR}/../utils/diagnose/scaffold-diagnose-store.sh"
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  if [ ! -f "${helper}" ]; then record_fail "scaffold-diagnose" "helper ausente: ${helper}"; return; fi
+  local d rc out g
+  d="$(mktemp -d)"
+
+  # (a) gera os 6 artefatos, substitui {{SLUG}}/{{TITLE}}/{{DATE}} sem deixar placeholder
+  DIAGNOSE_SCAFFOLD_DATE=2026-07-30 bash "${helper}" cliente-x --title "Cliente X" --dir "${d}" >/dev/null 2>&1
+  g="${d}/docs/onion/graph/cliente-x.kg.yaml"
+  if [ -f "${g}" ] \
+     && [ -f "${d}/docs/onion/diagnose/cliente-x/STATE.md" ] \
+     && [ -f "${d}/docs/onion/diagnose/cliente-x/notes.md" ] \
+     && [ -f "${d}/docs/onion/diagnose/cliente-x/sources/.gitkeep" ] \
+     && [ -f "${d}/docs/onion/diagnose/cliente-x/extracts/.gitkeep" ] \
+     && [ -f "${d}/docs/onion/diagnose/cliente-x/consolidated/.gitkeep" ] \
+     && ! grep -rq '{{' "${g}" "${d}/docs/onion/diagnose/cliente-x/STATE.md"; then
+    record_pass "scaffold-diagnose: (a) 6 artefatos + substituição sem placeholder"
+  else record_fail "scaffold-diagnose: (a)" "faltou artefato ou sobrou placeholder {{...}}"; fi
+
+  # (b) o skeleton é BEM-FORMADO: schema_version "1" + meta.id = slug + seções nodes:/edges:
+  if grep -q 'schema_version: "1"' "${g}" && grep -q '^  id: cliente-x' "${g}" \
+     && grep -q '^nodes:' "${g}" && grep -q '^edges:' "${g}"; then
+    record_pass "scaffold-diagnose: (b) skeleton bem-formado (schema_version + meta.id + nodes/edges)"
+  else record_fail "scaffold-diagnose: (b)" "skeleton mal-formado"; fi
+
+  # (c) TESTE-CHAVE — o skeleton VAZIO não é grafo válido (0 nós → radar reprova legibilidade, de
+  #     propósito: anti-falso-verde). Adicionar o 1º par de nós + aresta (LOTE 1) o torna VÁLIDO.
+  rc=0; bash "${radar}" "${g}" --integrity --schema >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    record_pass "scaffold-diagnose: (c1) skeleton vazio → radar reprova (0 nós não é grafo; anti-falso-verde)"
+  else record_fail "scaffold-diagnose: (c1)" "skeleton vazio passou o radar — falso-verde"; fi
+  # preenche o 1º lote no skeleton: nós DENTRO da seção nodes:, aresta DENTRO da edges:.
+  # (o skeleton tem `nodes:` e `edges:` só com comentários; reescrevemos as duas seções cheias
+  #  para provar que o skeleton scaffoldado É a base de um grafo válido — o LOTE 1 do diagnose.)
+  local seeded="${d}/seeded.kg.yaml"
+  {
+    printf 'meta:\n  id: cliente-x\n  schema_version: "1"\n  date: 2026-07-30\n'
+    printf 'nodes:\n'
+    printf '  - id: ENT_processo\n    node_type: entity\n    layer: domain\n    plane: PROD\n    impact: 4\n    confidence: 0.9\n    status: confirmed\n    label: "o processo do cliente"\n    trace: "sources/reuniao.md"\n'
+    printf '  - id: C_gargalo\n    node_type: claim\n    layer: audit\n    plane: DEV\n    impact: 4\n    confidence: 0.7\n    status: open\n    label: "hipotese: o gargalo esta na etapa X"\n    trace: "consolidated/c.md"\n'
+    printf 'edges:\n'
+    printf '  - from: C_gargalo\n    to: ENT_processo\n    edge_type: TRACES_TO\n'
+  } > "${seeded}"
+  rc=0; bash "${radar}" "${seeded}" --integrity --schema >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "scaffold-diagnose: (c2) skeleton + 1º lote (2 nós/1 aresta, domain+audit) → radar exit 0"
+  else record_fail "scaffold-diagnose: (c2)" "skeleton com 1º lote não passou o radar (rc=${rc})"; fi
+
+  # (d) never-clobber: re-rodar não sobrescreve
+  out="$(DIAGNOSE_SCAFFOLD_DATE=2026-07-30 bash "${helper}" cliente-x --dir "${d}" 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q 'never-clobber'; then record_pass "scaffold-diagnose: (d) never-clobber (não sobrescreve o store existente)"
+  else record_fail "scaffold-diagnose: (d)" "não pulou artefatos existentes"; fi
+  rm -rf "${d}"
+
+  # (e) dry-run não escreve
+  d="$(mktemp -d)"; bash "${helper}" yp --dir "${d}" --dry-run >/dev/null 2>&1
+  if [ "$(find "${d}/docs" -type f 2>/dev/null | wc -l)" -eq 0 ]; then record_pass "scaffold-diagnose: (e) dry-run não escreve"
+  else record_fail "scaffold-diagnose: (e)" "escreveu em dry-run"; fi
+  rm -rf "${d}"
+
+  # (f) slug não-kebab → exit 2
+  d="$(mktemp -d)"; rc=0; bash "${helper}" "Bad_Slug" --dir "${d}" >/dev/null 2>&1 || rc=$?; rm -rf "${d}"
+  if [ "${rc}" -eq 2 ]; then record_pass "scaffold-diagnose: (f) slug não-kebab → exit 2"
+  else record_fail "scaffold-diagnose: (f)" "esperava exit 2, veio ${rc}"; fi
+}
+
+# ---------------------------------------------------------------------------
 # Modo plugins-sync — exercita o drift-guard (REGRA 19 check_plugins_sync) do
 # lint-artifacts: cada plugins/<name> committado DEVE bater com a regeneração da
 # fonte (diff -x provenance + tree_sha). Cobre: em-sync (catch de regen esquecida)
@@ -5609,6 +5683,7 @@ run_assemble_plugin_selftests || true
 run_marketplace_generate_selftests || true
 run_bootstrap_vertical_selftests || true
 run_scaffold_book_selftests || true
+run_scaffold_diagnose_selftests || true
 
 # Modo plugins-sync — drift-guard (REGRA 19): committed bate com a regeneração da fonte.
 run_plugins_sync_selftests || true

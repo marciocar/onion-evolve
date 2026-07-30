@@ -1,0 +1,112 @@
+meta:
+  id: kg-diagnose-automation-2026-07
+  schema_version: "1"
+  date: 2026-07-30
+nodes:
+  - id: D_scaffold_e_doutrina
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: done
+    verified_at: 2026-07-30
+    verified_against: helper-testado-7-selftests-verdes
+    label: "ENTREGUE: automação parcial do pipeline diagnose = scaffold-diagnose-store.sh (o gap mecânico real) + o bloco 'Automação parcial' no kg.md. Escopo escolhido pelo maestro: só o mecânico, NÃO o orquestrador que dispara agentes"
+    trace: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
+  - id: C_pausa_e_o_valor
+    node_type: claim
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "A PAUSA (construir→pausar→perguntar→responder) é o VALOR — o dogfood fez humano-no-loop de propósito. Automatizar o julgamento apaga o selo humano; um orquestrador caixa-preta que ingere transcrições e cospe KG é o anti-padrão que o KG-SDAAL combate"
+    trace: ".claude/commands/meta/kg.md"
+  - id: D_linha_vermelha
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "LINHA VERMELHA: a automação substitui só o fan-out MECÂNICO (scaffold, extract/consolidate, candidatos, gate-do-radar). NUNCA o selo na PAUSA. Não existe --auto de diagnóstico de propósito (ao contrário do transform, onde auto é legítimo p/ tasks)"
+    trace: ".claude/commands/meta/kg.md"
+  - id: E_gap_scaffold
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: exploracao-nenhum-scaffold-de-kg-nem-state
+    label: "GAP mecânico REAL: não existia scaffold de .kg.yaml nem de STATE.md em .claude/utils/ — o store do diagnose era 100% manual (o LLM escrevia o skeleton à mão). O scaffold-diagnose-store.sh fecha isso (contrato F1: never-clobber/dry-run/idempotente)"
+    trace: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
+  - id: E_reusa_state_pointer
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: worklog-protocol-e-adopt
+    label: "REUSA, não inventa: o STATE.md-NEXT-pointer (worklog-protocol, provado no /meta:adopt) é o mecanismo de retomada — já prescrito p/ o diagnose. O scaffold só materializa o template. Radar, extract, consolidate: reusados sem tocar"
+    trace: "docs/knowledge-base/concepts/worklog-protocol.md"
+  - id: E_skeleton_vazio_reprova
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: radar-legibilidade-medida
+    label: "MEU CLAIM DE PLANO ERRADO, corrigido: 'o skeleton passa o --schema' é FALSO — skeleton vazio (0 nós) REPROVA a guarda de legibilidade do radar (anti-falso-verde). Isso é CORRETO e vira feature: o valor nasce quando o humano preenche o 1º lote. Selftest c1 (vazio reprova) + c2 (1º lote → exit 0)"
+    trace: ".claude/validation/lint-selftest.sh"
+  - id: C_precedente_interactive
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "O precedente EXATO de 'automatiza o mecânico, preserva o julgamento' já existe: o eixo interactive/auto do /product:transform-consolidated (análise auto sempre; validação humana por bloco só no interactive) + o dry-run-como-gate do onion-wizard"
+    trace: ".claude/commands/product/transform-consolidated.md"
+  - id: Q_orquestrador_gated
+    node_type: question
+    plane: DEV
+    impact: 2
+    confidence: 0.6
+    status: open
+    label: "Follow-up GATED (2º passo): um comando que ROLA a sequência extract→consolidate→candidatos disparando agentes sozinho? Mereceria seu próprio gate. Este PR entrega o scaffold + a doutrina, não o orquestrador — a decisão do maestro foi 'scaffold + doutrina'"
+    trace: ".claude/commands/meta/kg.md"
+  - id: A_helper
+    node_type: artifact
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: 7-selftests-verdes
+    label: "scaffold-diagnose-store.sh + 3 templates (kg-2layer/diagnose-state/notes-stub) + selftest (6 artefatos, bem-formado, vazio-reprova, 1º-lote-válido, never-clobber, dry-run, slug)"
+    trace: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
+edges:
+  - from: C_pausa_e_o_valor
+    to: D_linha_vermelha
+    edge_type: SUPPORTS
+  - from: D_linha_vermelha
+    to: D_scaffold_e_doutrina
+    edge_type: CONSTRAINS
+  - from: E_gap_scaffold
+    to: D_scaffold_e_doutrina
+    edge_type: SUPPORTS
+  - from: E_reusa_state_pointer
+    to: D_scaffold_e_doutrina
+    edge_type: SUPPORTS
+  - from: E_skeleton_vazio_reprova
+    to: C_pausa_e_o_valor
+    edge_type: SUPPORTS
+  - from: C_precedente_interactive
+    to: D_linha_vermelha
+    edge_type: SUPPORTS
+  - from: A_helper
+    to: D_scaffold_e_doutrina
+    edge_type: TRACES_TO
+  - from: Q_orquestrador_gated
+    to: D_scaffold_e_doutrina
+    edge_type: DEPENDS_ON
