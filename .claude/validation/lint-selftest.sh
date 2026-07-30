@@ -4369,6 +4369,8 @@ _df_make_repo() {
   printf '%s\n' '---' 'verified_at: 2020-01-01' 'source: "https://ex.test/d"' '---' '# stale'   > "${kc}/stale.md"
   printf '%s\n' '---' "verified_at: ${today}"                                 '---' '# nosource' > "${kc}/nosource.md"
   printf '%s\n' '# lexical' 'O lineup vigente e X; latest.'                                     > "${kc}/lexical.md"
+  # code-fence: `latest` só DENTRO de ``` (tag Docker) — é código, não prosa doutrinária → NÃO flaga.
+  printf '%s\n' '# codefence' 'Sem gatilho na prosa aqui.' '```yaml' 'image: pg:latest' '```'   > "${kc}/codefence.md"
   { for f in fresh missing passivo malformed future stale nosource; do
       printf 'docs/knowledge-base/concepts/%s.md\n' "$f"; done; } > "${d}/.claude/validation/df-list.txt"
   printf '# baseline\ndocs/knowledge-base/concepts/passivo.md\n' > "${d}/.claude/validation/doctrine-freshness-baseline.txt"
@@ -4433,6 +4435,13 @@ run_doctrine_freshness_selftests() {
   _df_has "${out}" SOFT LEXICAL 'docs/knowledge-base/concepts/lexical\.md' \
     && record_pass "doctrine: (NÍVEL B) doc fora da lista com token gatilho, sem carimbo → SOFT LEXICAL" \
     || record_fail "doctrine: lexical" "rede lexical não pegou 'lineup vigente/latest' sem verified_at"
+
+  # (SKIP-FENCE) `latest` SÓ dentro de ``` code ``` (tag Docker, nome de método, env-example) é CÓDIGO,
+  # não afirmação doutrinária em prosa — NÃO deve flagar. Varrer código gerava uma classe inteira de
+  # falso-positivo (docker :latest, getLatestRuns). O guard pula code fences; este caso trava o fix.
+  if _df_has "${out}" SOFT LEXICAL 'docs/knowledge-base/concepts/codefence\.md'; then
+    record_fail "doctrine: skip-fence" "'latest' em bloco de código foi flagado — o guard varre código (falso-positivo)"
+  else record_pass "doctrine: (NÍVEL B skip-fence) 'latest' só em code fence → NÃO flaga (só a prosa conta)"; fi
 
   [ "${_DF_RC}" -eq 1 ] \
     && record_pass "doctrine: (P2) DECIDIDO SÓ COM O REPO — sandbox sem git/rede/home produziu veredito HARD (rc=1); não é no-op no CI" \

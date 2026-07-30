@@ -222,7 +222,7 @@ Metodologia de 4 etapas para descobrir e validar clientes antes de construir o p
 2. Fale com 20-30 clientes potenciais
 3. Use perguntas como:
    - "Conte-me sobre a última vez que você [contexto do problema]"
-   - "O que você faz atualmente para resolver isso?"
+   - "O que você faz hoje para resolver isso?"
    - "Quanto tempo/dinheiro você gasta nisso?"
    - "O que aconteceria se isso não fosse resolvido?"
 
@@ -259,7 +259,7 @@ Metodologia de vendas que usa quatro tipos de perguntas para identificar e explo
 
 **S - Situational Questions (Perguntas Situacionais)**
 - Entender o contexto atual do cliente
-- Exemplo: "Como você gerencia seu estoque atualmente?"
+- Exemplo: "Como você gerencia seu estoque hoje?"
 
 **P - Problem Questions (Perguntas de Problema)**
 - Identificar problemas e dificuldades
@@ -281,7 +281,7 @@ Metodologia de vendas que usa quatro tipos de perguntas para identificar e explo
 
 **Exemplo de Sequência:**
 ```
-S: "Quantos fornecedores você trabalha atualmente?"
+S: "Quantos fornecedores você trabalha hoje?"
 P: "Você já teve problemas com atrasos de entrega?"
 I: "Quando há atraso, como isso impacta sua produção?"
 N: "Se você pudesse prever atrasos com antecedência, o que isso significaria para seu negócio?"
@@ -494,7 +494,7 @@ Conversas estruturadas ou semi-estruturadas com clientes para entender suas expe
 
 **Sobre o Problema:**
 - "Conte-me sobre a última vez que você [contexto do problema]"
-- "O que você faz atualmente para resolver isso?"
+- "O que você faz hoje para resolver isso?"
 - "Quanto tempo você gasta nisso por semana?"
 - "O que aconteceria se isso não fosse resolvido?"
 
