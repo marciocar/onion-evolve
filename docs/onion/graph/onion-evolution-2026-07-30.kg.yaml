@@ -1,0 +1,159 @@
+meta:
+  id: onion-evolution-2026-07-30
+  schema_version: "1"
+  date: 2026-07-30
+# /meta:evolve — auto-auditoria (fan-out D1-D8 + juiz adversarial + verificação no fan-in).
+# 13 achados brutos → 5 refutados (3 juiz + 2 verificação-principal) → 8 sobreviventes, 0 blocker.
+nodes:
+  - id: Q_saude_do_framework
+    node_type: question
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: done
+    label: "O Sistema Onion tem dívida de modernização acionável (peso/redundância/duplicação/legado/links/frontmatter)?"
+    trace: ".claude/commands/meta/evolve.md"
+  - id: D_veredito_saudavel
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: fan-out-6-dims-mais-verificacao
+    label: "VEREDITO: framework SAUDÁVEL — 0 blocker, 0 dívida estrutural. Nenhum agente acima do limite de peso; nenhum resíduo .onion/CLI/npm/multi-IDE; lint 0 HARD. Os 8 sobreviventes são polimento (notas de diferenciação, consolidação de common/, 1 dep MCP não-declarada)"
+    trace: ".claude/validation/lint-artifacts.sh"
+  # ── SOBREVIVENTES (recommended) ──
+  - id: C_d6_sysdoc_mcp
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "D6/recommended: system-documentation-orchestrator usa mcp_code-understanding_* (4 chamadas sequenciais em prosa) mas NÃO o declara no frontmatter tools: e não gateia sua ausência. As 4 leituras independentes são candidatas a Workflow fan-out (o próprio arquivo já cita Workflow 2 linhas abaixo). Padrão: declarar+gatear o MCP + prosa-sequencial→fan-out"
+    trace: ".claude/agents/development/system-documentation-orchestrator.md:6-13,177-201"
+  - id: C_d3_storypoints_dup
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: open
+    label: "D3/recommended: workflow de story-points duplicado em 3 comandos (task/estimate/feature, ~100 linhas cumulativas). Padrão: consolidar em common/prompts/story-points-gate.md (já existe parcial); comandos só invocam"
+    trace: ".claude/commands/product/{task,estimate,feature}.md"
+  # ── SOBREVIVENTES (opportunistic) ──
+  - id: C_d2_test_diff
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.6
+    status: open
+    label: "D2/opportunistic (ENFRAQUECIDO na verificação): test-agent × test-planner. O corpo do test-agent JÁ TEM '### Com test-planner:'; só falta a linha de diferenciação na DESCRIPTION (frontmatter) — um orquestrador que escolhe por description sozinha não desambigua. Padrão: self-differentiating description"
+    trace: ".claude/agents/testing/test-agent.md:1-6"
+  - id: C_d2_analysis_diff
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.7
+    status: open
+    label: "D2/opportunistic: /quick:analysis × /meta:analyze-complex-problem — mesmo verbo, mesmo destino (docs/analysis/), sem nota de diferenciação. Padrão: linha 'Diferença vs analyze-complex-problem: caminho RÁPIDO, sem tipagem, sem gate' (molde create-agent vs create-agent-express)"
+    trace: ".claude/commands/quick/analysis.md:2-8"
+  - id: C_d3_comment_dup
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.7
+    status: open
+    label: "D3/opportunistic: template de comentário Unicode duplicado entre product/task.md e product/feature.md (~40 linhas). Padrão: common/prompts/ snippet (formatação é implementação, não decisão)"
+    trace: ".claude/commands/product/{task,feature}.md"
+  - id: C_d7_discussion_links
+    node_type: claim
+    plane: DEV
+    impact: 1
+    confidence: 0.6
+    status: open
+    label: "D7/opportunistic (baixo valor): docs de DISCUSSÃO (onion-pessoal-marcio, proto/README, technical-context/contributing) usam links relativos internos que RESOLVEM mas divergem da convenção de links absolutos do .claude/. Fora da superfície de comando/agente — cosmético"
+    trace: "docs/discussions/onion-pessoal-marcio/"
+  # ── REFUTADOS (a auto-correção — o que a auditoria pegou de si mesma) ──
+  - id: C_refut_frontmatter_skills
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: refuted
+    label: "REFUTADO (verificação principal): '24 fragmentos common/ aparecem como skills sem frontmatter'. FALSO — common/prompts e common/templates são FRAGMENTOS incluídos por comandos, NÃO skills (skills vivem em .claude/skills/ com SKILL.md). Não precisam de frontmatter de skill"
+    trace: ".claude/commands/common/"
+  - id: C_refut_kebab_compliance
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: refuted
+    label: "REFUTADO (verificação principal): 'compliance_*_template violam kebab-case'. FALSO — o lint (REGRA 6) NÃO os reclama: templates são isentos por contrato. O achado contradiz a própria autoridade (o lint sai 0 HARD)"
+    trace: ".claude/validation/lint-artifacts.sh"
+  - id: E_verificacao_principal
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: grep-e-lint-medidos
+    label: "O juiz adversarial só julgou os 'risky' (engineer/product); 2 falso-positivos não-risky escaparam dele e foram pegos na VERIFICAÇÃO do fan-in (rodei grep/lint contra o vivo). Behavior-over-declaration nos próprios achados da auditoria — o backstop de completude"
+    trace: "docs/onion/graph/onion-evolution-2026-07-30.kg.yaml"
+  - id: E_juiz_refutou_3
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: verdicts-do-workflow
+    label: "O juiz adversarial (opus) refutou 3 achados de D3: duplicações que eram na verdade ADAPTERS finos (engineer/pr.md) ou CITAÇÕES ao fragmento canônico (common:prompts:task-manager-*) — conceito compartilhado, não texto duplicado. Protegeu contra consolidação falsa"
+    trace: "wf_7a6ca1e6-064 journal"
+  - id: A_relatorio_evolve
+    node_type: artifact
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: relatorio-escrito
+    label: "O relatório do evolve (projeção deste grafo — vista markdown, não fonte paralela)"
+    trace: "docs/analysis/onion-evolution-2026-07-30.md"
+edges:
+  - from: D_veredito_saudavel
+    to: Q_saude_do_framework
+    edge_type: TRACES_TO
+  - from: C_d6_sysdoc_mcp
+    to: D_veredito_saudavel
+    edge_type: SUPPORTS
+  - from: C_d3_storypoints_dup
+    to: D_veredito_saudavel
+    edge_type: SUPPORTS
+  - from: C_d2_test_diff
+    to: D_veredito_saudavel
+    edge_type: SUPPORTS
+  - from: C_d2_analysis_diff
+    to: D_veredito_saudavel
+    edge_type: SUPPORTS
+  - from: C_d3_comment_dup
+    to: D_veredito_saudavel
+    edge_type: SUPPORTS
+  - from: C_d7_discussion_links
+    to: D_veredito_saudavel
+    edge_type: SUPPORTS
+  - from: E_verificacao_principal
+    to: C_refut_frontmatter_skills
+    edge_type: REFUTES
+  - from: E_verificacao_principal
+    to: C_refut_kebab_compliance
+    edge_type: REFUTES
+  - from: E_verificacao_principal
+    to: D_veredito_saudavel
+    edge_type: SUPPORTS
+  - from: E_juiz_refutou_3
+    to: D_veredito_saudavel
+    edge_type: SUPPORTS
+  - from: A_relatorio_evolve
+    to: D_veredito_saudavel
+    edge_type: TRACES_TO
