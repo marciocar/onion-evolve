@@ -177,6 +177,13 @@ Equivalente canônico: **`/meta:inventory`**. Mecanismo: `common:prompts:invento
 > **Escopo do Passo 5:** só quando o alvo é o **core** (`--dir .` neste repo). Ao scaffoldar
 > num repo-cliente (`--new`/`--dir <outro>`), a SSOT a sincronizar é a **daquele** repo —
 > rodar o `inventory.sh`/lint de lá (se o repo tiver o framework), não a do core.
+>
+> **Greenfield sem framework (o caso comum do `--new`):** um repo novo nasce **sem** as
+> ferramentas do core (`inventory.sh`/lint), então o Passo 5 **não tem o que rodar** — e
+> tudo bem: o skeleton gerado (hub + help + resolver + book) é válido por si. Para ganhar o
+> gate mecânico (lint/inventory) e o resto do framework, **adote** depois com
+> `/meta:adopt <path>`; o esqueleto da vertical convive com a adoção (never-clobber).
+> Sinal de campo (dogfood F3, 2026-07-30): sem esta nota, o greenfield ficava sem close acionável.
 
 ## 📤 Output Esperado
 
