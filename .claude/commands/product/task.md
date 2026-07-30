@@ -102,17 +102,15 @@ Consultar `@task-specialist` para a estrutura. Cada action item deve caber em **
 
 ### Passo 4: Estimar Story Points (Automático)
 
-Após decompor, **SEMPRE** estimar via `@story-points-framework-specialist`:
+Após decompor, **SEMPRE** estimar seguindo o fragmento canônico
+`common:prompts:story-points-estimation` (invocação do
+`@story-points-framework-specialist` + output estruturado + validação de
+consistência/épico). Especificidade deste comando:
 
 1. **Task principal** — passar descrição, lista de subtasks e complexidade inicial.
-   Obter: story points, análise de complexidade/risco/incerteza e recomendações.
-2. **Cada subtask** — passar nome, descrição e action items. Obter story points e
-   armazenar o total (soma das subtasks).
-3. **Validar consistência:**
-   - Se `soma(subtasks) > task_principal` → ajustar task principal para a soma.
-   - Se `task_principal > 13 pontos` → alertar **ÉPICO** e propor quebra em tasks menores.
-
-> Framework: `docs/knowledge-base/frameworks/framework-story-points.md`.
+2. **Cada subtask** — passar nome, descrição e action items; somar os pontos.
+3. Aplicar a **validação de consistência** do fragmento (soma das subtasks vs
+   principal; `> 13` → alertar **ÉPICO** e propor quebra).
 
 ### Passo 5: Apresentar Plano e Obter Confirmação (OBRIGATÓRIO ANTES DE CRIAR)
 

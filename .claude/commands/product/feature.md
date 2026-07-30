@@ -189,19 +189,11 @@ console.log(`✅ Task created: ${TASK_ID}`);
 
 ### **4. Estimar Story Points (Automático)**
 
-**CRÍTICO:** Após criar task, SEMPRE estimar story points automaticamente.
-
-```markdown
-@story-points-framework-specialist
-
-Por favor, analise e estime a seguinte feature de backlog:
-
-**Feature:** $FEATURE_NAME
-**Descrição:** [descrição da feature]
-**Status:** Backlog (planejamento inicial)
-
-Forneça estimativa inicial de story points para planejamento.
-```
+**CRÍTICO:** Após criar task, SEMPRE estimar story points seguindo o fragmento
+canônico `common:prompts:story-points-estimation` (invocação do
+`@story-points-framework-specialist` + output + gate de épico). Especificidade
+deste comando: é uma estimativa **INICIAL de backlog** (planejamento) — status
+`Backlog`, refinável depois no `/product/refine`.
 
 **Atualizar Task com Estimativa:**
 

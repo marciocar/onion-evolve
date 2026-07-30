@@ -14,6 +14,7 @@ Este diretório contém prompts abrangentes projetados para guiar o Claude Code 
 | `code-review-checklist.md` | Checklist de code review | Reviews de PR |
 | `git-workflow-patterns.md` | Padrões de workflow Git | GitFlow, commits |
 | `story-points-gate.md` | Gate de estimativa antes de iniciar dev | `engineer/start`, `work`, `hotfix` |
+| `story-points-estimation.md` | Protocolo de PRODUÇÃO da estimativa (invoca o especialista + output + gate de épico) | `product/estimate`, `task`, `feature` |
 
 ### 📄 Prompts de Geração
 
