@@ -342,8 +342,9 @@ EMBUTE a narração; o único ponto com IA é a autoria (F1), fora do script. Na
 `diagnose <slug>` mapeia um **engajamento de consultoria** (descoberta de negócio) como KG SDAAL de
 2 camadas, e usa o **radar como motor de diagnóstico**. É o **irmão de negócio do `map`**: o `map`
 mapeia software (UI/backend, atom-map, fonte-única); o `diagnose` mapeia um cliente/processo. Nasceu
-de dogfood de campo (um engajamento real, ~107 nós/172 arestas, 9 lotes — o radar pegou as
-auto-correções sozinho).
+de dogfood de campo (um engajamento real, ~107 nós/172 arestas, 9 lotes — o radar **ranqueou o foco**
+por atenção e a **camada de domínio flagou os gargalos**; a reconciliação é modelada pelo humano e o
+radar a **torna visível**, não a inventa).
 
 > **A tese-núcleo do Onion aplicada ao diagnóstico:** o grafo é runtime, o **radar diagnostica**.
 > Cada primitiva do radar ganha leitura de consultoria (tabela abaixo). O consultor **não escolhe o
