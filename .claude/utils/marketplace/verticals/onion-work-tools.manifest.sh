@@ -52,8 +52,9 @@ VALIDATION=(
   ".claude/validation/resolve-integration-branch.sh"
 )
 # Skills de trabalho: orquestração (orchestrate depende dela) + condução (o wizard "ajuda a FAZER"
-# os movimentos da família — projeta da topologia-SSOT; par futuro: onion-onboarding "ajuda a CONHECER").
-SKILLS=(".claude/skills/onion-orchestration" ".claude/skills/onion-wizard" ".claude/skills/onion-onboarding")
+# os movimentos da família — projeta da topologia-SSOT; par futuro: onion-onboarding "ajuda a CONHECER")
+# + retro (retro/feedback como spec-as-code — o adotante que a inspirou topou co-evoluí-la).
+SKILLS=(".claude/skills/onion-orchestration" ".claude/skills/onion-wizard" ".claude/skills/onion-onboarding" ".claude/skills/onion-retro")
 # KB tipo A embarcado — a doutrina que kg/diary mais citam (auto-suficiência sem /meta:adopt).
 DOCS=(
   "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
@@ -61,7 +62,7 @@ DOCS=(
 
 # Capability Contract.
 CONFORMANCE="silver"
-PROVIDES=("knowledge-graph-sdaal" "learning-diary" "orchestration" "metaspec-validation" "freshness-audits" "constellation-map" "co-evolution-upstream" "guided-conduction" "guided-onboarding")
+PROVIDES=("knowledge-graph-sdaal" "learning-diary" "orchestration" "metaspec-validation" "freshness-audits" "constellation-map" "co-evolution-upstream" "guided-conduction" "guided-onboarding" "retro-feedback")
 REQUIRES=(
   "agent:metaspec-gate-keeper"
   "skill:onion-orchestration"
