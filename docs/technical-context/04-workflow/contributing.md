@@ -11,7 +11,7 @@ date: 2026-07-25
 > app com API. Não há seção "deployment de produção" no sentido convencional: "deploy" aqui é
 > **merge na branch de integração/produção do próprio framework**, consumido por adotantes via
 > `/meta:adopt`/`/meta:co-*`. Números de comandos/agentes/skills citados abaixo vêm da SSOT
-> gerada [`docs/onion/inventory.md`](../../onion/inventory.md) (100 comandos, 51 agentes, 10 skills — nunca
+> gerada [`docs/onion/inventory.md`](../../onion/inventory.md) (102 comandos, 51 agentes, 10 skills — nunca
 > digitados à mão, regenerados por `/meta:inventory`).
 
 ---
