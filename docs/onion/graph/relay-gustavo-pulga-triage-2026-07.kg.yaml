@@ -1,0 +1,193 @@
+meta:
+  id: relay-gustavo-pulga-triage-2026-07
+  schema_version: '1'
+  date: 2026-07-30
+nodes:
+  - id: Q_triage
+    node_type: question
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: done
+    label: "Dos 7 produtos deriváveis do relay do adotante, quais o core promove — e quais já existem?"
+    trace: "docs/evolution/inbox/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+  - id: C_p1_gerador_vertical
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: superseded
+    label: "PRODUTO 1 — gerador de vertical (scaffold book+hub+helpers). Adotante: prioridade alta, em dupla"
+    trace: "relay Sinal 4"
+  - id: E_create_vertical_existe
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: comando-real-no-core
+    label: "JÁ EXISTE: /meta:create-vertical (211 linhas, orquestrador fino) + helpers F1 reais (bootstrap-new-project.sh, scaffold-book-dir.sh, templates). Nasceu de sinal de adotante A1. Behavior-over-declaration: o adotante propôs construir o que o core já tem"
+    trace: ".claude/commands/meta/create-vertical.md"
+  - id: C_p2_gerador_decks
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "PRODUTO 2 — gerador de deck de treino/onboarding auto-guiado (spec → HTML progressive-disclosure, copiar, offline). Adotante TOPA TOCAR (montou os decks; molde existe) — maior prontidão"
+    trace: "relay Sinal 4"
+  - id: E_sem_gerador_decks
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: grep-core-zero
+    label: "GAP: nenhum gerador de deck dedicado no core (os matches de grep eram ruído — README/design/skill onion)"
+    trace: ".claude/commands/ .claude/skills/"
+  - id: C_p3_retro_skill
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "PRODUTO 3 — skill de retro/feedback como spec-as-code (par perguntas/respostas, NPS+CSAT+eixos). Adotante TOPA TOCAR (baixo esforço; a retro fechada é o protótipo)"
+    trace: "relay Sinal 3/4"
+  - id: E_sem_retro_skill
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: ls-skills-zero
+    label: "GAP: sem skill de retro/feedback em .claude/skills/. Mas o protótipo funcionou ponta a ponta (a retro do Gustavo foi coletada e fechada 2026-07-29)"
+    trace: ".claude/skills/"
+  - id: C_p5_absorcao_skill
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "PRODUTO 5 — fluxo de absorção+auditoria de skill de terceiro (importar → adherence-lint → fonte self-contained → registrar). Adotante TOPA TOCAR (a skill de design é contribuição dele)"
+    trace: "relay Sinal 2/4"
+  - id: E_sem_absorcao
+    node_type: evidence
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: grep-core-zero
+    label: "GAP: sem fluxo de absorção/auditoria de skill de terceiro no core"
+    trace: ".claude/commands/ .claude/skills/ .claude/validation/"
+  - id: C_p4_perfil_visitante
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "PRODUTO 4 — perfil 'colaborador visitante' no onboarding (SSH + acesso repo-only + canal de recados + boundary de relay maestro-only). Adotante é o caso de teste, TOPA VALIDAR"
+    trace: "relay Sinal 4/8"
+  - id: E_sem_perfil_visitante
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: adopter-onboarding-zero-mencoes
+    label: "GAP: adopter-onboarding.md tem 0 menções a visitante/visitor. O boundary (maestro relaya, visitante entrega) é praticado mas não documentado no core"
+    trace: "docs/knowledge-base/concepts/adopter-onboarding.md"
+  - id: C_p6_kg_consultoria
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: confirmed
+    label: "PRODUTO 6 — KG-dogfood-para-consultoria produtizado (mapear engajamento como KG SDAAL 2 camadas). Adotante: mais do maestro, apoia como usuário"
+    trace: "relay Sinal 4/7"
+  - id: E_kg_map_existe
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: modo-map-no-comando
+    label: "PARCIAL: /meta:kg map já é o motor de mapeamento de domínio (inventário → atom-map/fatias → .kg.yaml → radar). O 'produtizado para consultoria' é wrapper/posicionamento fino sobre o que já existe"
+    trace: ".claude/commands/meta/kg.md"
+  - id: C_p7_gate_client_safe
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "PRODUTO 7 — SSOT com partição de visibilidade + gate client-safe determinístico (grep de termos sensíveis = 0, versionável). Método transversal que sustentou todos"
+    trace: "relay Sinal 6"
+  - id: E_sem_gate_client_safe
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-07-30
+    verified_against: validation-scripts-zero
+    label: "GAP: 0 scripts de validação com gate client-safe no core. Mas o método foi dogfoodado — este próprio relay passou por um gate grep=0 de identificadores do cliente"
+    trace: ".claude/validation/"
+  - id: D_prioridade
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "VEREDITO: #1 já servido (create-vertical existe — avisar o adotante + fechar F2 se pendente). Promover primeiro #2/#3/#5 (GAP + adotante topa tocar = prontidão máxima). #4 e #7 design de onboarding/gate. #6 wrapper fino sobre /meta:kg map. Quem decide números/ordem final = maestro"
+    trace: "docs/evolution/inbox/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+edges:
+  - from: E_create_vertical_existe
+    to: C_p1_gerador_vertical
+    edge_type: REFUTES
+  - from: E_sem_gerador_decks
+    to: C_p2_gerador_decks
+    edge_type: SUPPORTS
+  - from: E_sem_retro_skill
+    to: C_p3_retro_skill
+    edge_type: SUPPORTS
+  - from: E_sem_absorcao
+    to: C_p5_absorcao_skill
+    edge_type: SUPPORTS
+  - from: E_sem_perfil_visitante
+    to: C_p4_perfil_visitante
+    edge_type: SUPPORTS
+  - from: E_kg_map_existe
+    to: C_p6_kg_consultoria
+    edge_type: SUPPORTS
+  - from: E_sem_gate_client_safe
+    to: C_p7_gate_client_safe
+    edge_type: SUPPORTS
+  - from: C_p2_gerador_decks
+    to: D_prioridade
+    edge_type: SUPPORTS
+  - from: C_p3_retro_skill
+    to: D_prioridade
+    edge_type: SUPPORTS
+  - from: C_p5_absorcao_skill
+    to: D_prioridade
+    edge_type: SUPPORTS
+  - from: D_prioridade
+    to: Q_triage
+    edge_type: TRACES_TO
+  - from: C_p4_perfil_visitante
+    to: D_prioridade
+    edge_type: DEPENDS_ON
+  - from: C_p6_kg_consultoria
+    to: D_prioridade
+    edge_type: DEPENDS_ON
+  - from: C_p7_gate_client_safe
+    to: D_prioridade
+    edge_type: DEPENDS_ON
+  - from: C_p1_gerador_vertical
+    to: D_prioridade
+    edge_type: DEPENDS_ON
