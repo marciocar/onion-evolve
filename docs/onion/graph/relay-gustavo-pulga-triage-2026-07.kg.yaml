@@ -88,7 +88,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.8
-    status: confirmed
+    status: superseded
     label: "PRODUTO 4 — perfil 'colaborador visitante' no onboarding (SSH + acesso repo-only + canal de recados + boundary de relay maestro-only). Adotante é o caso de teste, TOPA VALIDAR"
     trace: "relay Sinal 4/8"
   - id: E_sem_perfil_visitante
@@ -96,11 +96,21 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 1.0
-    status: confirmed
+    status: superseded
     verified_at: 2026-07-30
     verified_against: adopter-onboarding-zero-mencoes
-    label: "GAP: adopter-onboarding.md tem 0 menções a visitante/visitor. O boundary (maestro relaya, visitante entrega) é praticado mas não documentado no core"
+    label: "GAP (superado): o boundary do visitante era praticado mas não projetado. Metade já existia — TX_invite (convite, no wizard) + onion-onboarding (papel de repo). O gap real era estreito: faltava a AUTORIDADE-DE-PESSOA como fonte + a lente na Orient"
     trace: "docs/knowledge-base/concepts/adopter-onboarding.md"
+  - id: D_p4_visitor_authority
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-07-30
+    verified_against: radar-topologia-exit0-e-projecao-authorities
+    label: "ENTREGUE: encaixado no onion-onboarding (não skill nova). Nó AUTH_visitor na topologia-SSOT (autoridade-de-pessoa, dimensão ORTOGONAL aos tiers de repo ROLE_) + modo --authorities no topology-projection.sh + lente na fase Orient (entrega-não-relaya, I3, repo-only, relay maestro-only). fonte≠derivação: a fronteira muda sozinha se a topologia mudar. Fecha o Sinal 8"
+    trace: "docs/onion/graph/onion-family-topology-2026-07.kg.yaml"
   - id: C_p6_kg_consultoria
     node_type: claim
     plane: DEV
@@ -181,6 +191,12 @@ edges:
   - from: E_sem_perfil_visitante
     to: C_p4_perfil_visitante
     edge_type: SUPPORTS
+  - from: D_p4_visitor_authority
+    to: C_p4_perfil_visitante
+    edge_type: SUPERSEDES
+  - from: D_p4_visitor_authority
+    to: D_prioridade
+    edge_type: TRACES_TO
   - from: E_kg_map_existe
     to: C_p6_kg_consultoria
     edge_type: SUPPORTS

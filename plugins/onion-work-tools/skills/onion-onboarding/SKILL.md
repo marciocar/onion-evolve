@@ -15,10 +15,11 @@ multi-sessão. A métrica é *"a pessoa alcançou valor repetível"*, não *"ter
 
 ## A lei (anti-dessincronização)
 
-**Você PROJETA da fonte única, nunca hand-descreve a família.** Os papéis vêm do KG-topologia via
-`bash .claude/utils/wizard/topology-projection.sh --roles`; os movimentos, sem `--roles`. Se a topologia
-mudar, o que você ensina muda **sozinho**. É fonte≠derivação (a mesma fonte que o wizard executa; a REGRA 41
-a guarda). Sem python, degrade: ensine pela KB `onion-guided-lifecycle.md`, não invente a família.
+**Você PROJETA da fonte única, nunca hand-descreve a família.** Os papéis de REPO vêm do KG-topologia via
+`bash .claude/utils/wizard/topology-projection.sh --roles`; as **autoridades de PESSOA** (ex.: colaborador
+visitante), via `--authorities`; os movimentos, sem flag. Se a topologia mudar, o que você ensina muda
+**sozinho**. É fonte≠derivação (a mesma fonte que o wizard executa; a REGRA 41 a guarda). Sem python, degrade:
+ensine pela KB `onion-guided-lifecycle.md`, não invente a família nem as autoridades.
 
 ## A lei do escopo — o produto INTEIRO, a força é lente (não caixa)
 
@@ -44,6 +45,22 @@ sessão. Diga isso: *"quanto mais você me usa, mais eu sou seu — leio seu gra
    então os demais se perguntarem. Não despeje os 6 papéis de uma vez.
 3. **O que este papel pode fazer:** as transições **válidas** para o papel (projeção default) — em linguagem de
    valor ("daqui você adota seus projetos"), não de comando.
+4. **Quem é VOCÊ neste repo — a autoridade de PESSOA** (projeção `--authorities`): o papel do repo (tier) é uma
+   dimensão; o que **você** pode fazer aqui é outra. Se a pessoa é um **colaborador visitante** (foi convidada
+   via `TX_invite`, tem acesso repo-only, não é o maestro/dono), ensine a fronteira **antes que ela bata a
+   cabeça** — projete de `bash .claude/utils/wizard/topology-projection.sh --authorities`, nunca hand-descreva:
+   - **Você ENTREGA, não relaya.** Sinais/feedback ao core vão como **arquivos no `docs/evolution/inbox/`** do
+     próprio repo; **só o maestro relaya/tria ao core** (boundary de autorização). Você contribui conhecimento;
+     o commit no core não cruza a fronteira de confiança (I3 "entrega-sem-commit").
+   - **Um-escritor-por-arquivo (I3).** Em arquivos compartilhados (retro, recados), cada um escreve no **seu**
+     arquivo/seção — zero colisão de merge. O condutor não toca o arquivo de respostas do outro.
+   - **Acesso repo-only.** Seu ambiente é este repo (reforçado pelo SO); você **não acessa o core**. É desenho,
+     não punição — a fronteira protege a soberania das duas pontas.
+   - **Vínculo com a marca pode ser assimétrico** — o framework não precisa dos detalhes; o que importa é a
+     autoridade (o que você pode FAZER), não o vínculo comercial.
+   Diga em linguagem de valor: *"aqui você contribui entregando; o relay ao core é do maestro — assim seu
+   trabalho cruza a fronteira sem você precisar de acesso ao core"*. Sem `python`/topologia, degrade: ensine a
+   fronteira pela KB, não invente autoridades.
 
 ## Activate — a 1ª ação de valor (e o handoff pro wizard)
 
