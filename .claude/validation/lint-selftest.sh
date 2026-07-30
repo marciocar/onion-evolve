@@ -426,7 +426,10 @@ run_kg_freshness_selftests() {
 
   # (o) ORDENÁVEL por atenção: a coluna 7 é numérica e o topo bate com o --radar.
   local top_tsv top_radar
-  top_tsv="$(printf '%s\n' "${tsv}" | sort -t"$(printf '\t')" -k7 -rn | head -1 | cut -f1)"
+  # sed -n '1p' (não head -1): drena o stream até EOF, então o `sort` upstream nunca
+  # leva EPIPE no fflush de saída sob `set -o pipefail` (`head` fecha o pipe cedo → corrida
+  # que falha o run às vezes; sinal de campo do CI 2026-07-30). Mesmo idioma da linha abaixo.
+  top_tsv="$(printf '%s\n' "${tsv}" | sort -t"$(printf '\t')" -k7 -rn | sed -n '1p' | cut -f1)"
   top_radar="$(bash "${radar}" "${fxu}" --radar 2>/dev/null | sed -n '2p' | awk '{print $2}')"
   if [ -n "${top_tsv}" ] && [ "${top_tsv}" = "${top_radar}" ]; then
     record_pass "kg-freshness: (o) topo por atenção do TSV == topo do --radar (mesma fórmula, sem drift)"
@@ -518,6 +521,32 @@ run_kg_freshness_selftests() {
 # derivado do members.yaml → HARD; sem ele → limpo. Termo do members.yaml, não
 # hardcoded (nome no teste seria o próprio vazamento que a regra combate).
 # ---------------------------------------------------------------------------
+run_shell_pipefail_robustness_selftests() {
+  # GUARD de classe (fix-must-become-mechanism): sob `set -o pipefail`, `sort … | head`
+  # deixa o `sort` upstream levar EPIPE no fflush de saída quando o `head` fecha o pipe
+  # cedo — uma corrida que reprova o run às VEZES (sinal de campo do CI 2026-07-30, exit 2
+  # `sort: fflush failed: Broken pipe`). A cura é `sed -n '1p'` (drena até EOF). Este guard
+  # impede a regressão do idioma frágil em qualquer script strict-mode da casa.
+  local hits
+  # Casa o PIPELINE frágil (o sort seguido do fechador precoce) como código real:
+  #  - ignora linhas de comentário (a nota da própria cura menciona o fechador);
+  #  - exige que o fechador venha seguido de opção/EOL (`-N`|fim), o que descarta as
+  #    strings de mensagem deste guard (onde o token vem colado a aspas).
+  # Cobre validation/ + utils/ + hooks/ + .githooks/. `sed -n` (não o fechador) por dogfood.
+  hits="$(grep -rnE 'sort[^|]*\|[[:space:]]*head([[:space:]]+-|[[:space:]]*$)' \
+            "${REPO_ROOT}/.claude/validation" \
+            "${REPO_ROOT}/.claude/utils" \
+            "${REPO_ROOT}/.claude/hooks" \
+            "${REPO_ROOT}/.githooks" 2>/dev/null \
+          | grep -vE ':[[:space:]]*#' || true)"
+  if [ -z "${hits}" ]; then
+    record_pass "shell-pipefail: nenhum pipeline sort→fechador-precoce frágil nos scripts strict-mode (drene com sed -n '1p')"
+  else
+    record_fail "shell-pipefail: pipeline sort→fechador-precoce frágil sob pipefail" \
+      "drene com sed em vez de fechar cedo (sem EPIPE): $(printf '%s' "${hits}" | sed -n '1,3p' | tr '\n' ';')"
+  fi
+}
+
 run_vendor_scrub_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   local helper="${SCRIPT_DIR}/projection-safety.sh"
@@ -4803,7 +4832,9 @@ run_kg_born_marker_selftests() {
     # existente, sonda em outro; ambos dentro das raízes da regra).
     local probe=".claude/diary/selftest-born-dangling.md"
     local base_crumb o0 h0 o1 h1
-    base_crumb="$(cd "${sb}" && find .claude/diary -maxdepth 1 -type f -name '*.md' 2>/dev/null | sort | head -1)"
+    # sed -n '1p' (não head -1): drena até EOF → o `sort` upstream não leva EPIPE sob pipefail
+    # (ver nota em run_kg_freshness_selftests; CI SIGPIPE 2026-07-30).
+    base_crumb="$(cd "${sb}" && find .claude/diary -maxdepth 1 -type f -name '*.md' 2>/dev/null | sort | sed -n '1p')"
     if [ -z "${base_crumb}" ]; then
       record_fail "kg-born-marker: delta setup" "sandbox sem migalha real p/ baseline do delta"
     else
@@ -5838,6 +5869,7 @@ printf "%s/%s" "${PASS}" "${SKIP}"' 2>/dev/null || true)"
   else record_fail "selftest-outcomes: (f) env de hook" "GIT_DIR envenenado sobrevive ao preâmbulo"; fi
 }
 run_selftest_outcomes_selftests
+run_shell_pipefail_robustness_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
