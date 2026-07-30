@@ -1,0 +1,438 @@
+# Colaboração Onion — mapa de conhecimento (KG SDAAL, 2 camadas). META-ONION (não é dado de cliente).
+# Modela o PROCESSO de colaboração core↔consumidor↔colaborador e as teses sobre o que funciona.
+# LOTE 1 (2026-07-16): domínio do processo (papéis/canais/invariantes) + audit (treino, migalhas, retro em curso).
+# LOTE 2 (2026-07-16): evidências da pesquisa "colaboração moderna" — valida I3/delivery-without-commit (KPR),
+#   refuta NPS-preditor e spec-−50%; reconciliação via REFUTES/SUPERSEDES.
+# LOTE 3 (2026-07-16): método — partição de visibilidade (SSOT interna×client-safe), dois KGs por fronteira de
+#   confiança, marca com vínculos assimétricos, autorização de relay não formalizada. Pendente: respostas da retro.
+# Fontes: .claude/diary/*, docs/<vertical-do-adotante>/retro/*, docs/evolution/inbox|inbound/*, docs/<vertical-do-adotante>/README-COLABORACAO.md
+meta:
+  id: colaboracao-onion-2026-07
+  schema_version: "1"
+  date: 2026-07-16
+nodes:
+  # ---- camada domain (SSOT durável — o que o processo de colaboração É) ----
+  - id: EN_MAESTRO
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "maestro/mantenedor — dono do core; unico que relaya sinais ao core"
+  - id: EN_VISITANTE
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "colaborador visitante — acesso repo-only; entrega sinais como arquivos"
+  - id: EN_REPO
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "repositorio — meio de colaboracao assincrona e SSOT-de-registro"
+  - id: EN_VERTICAL
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "vertical Onion (book/SSOT + hub + helpers) — produzida a partir de spec"
+  - id: ST_SINAL_INBOX
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "sinal pendente no inbox (entregue, nao relayado)"
+  - id: ST_SINAL_PROCESSED
+    node_type: state
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "sinal relayado ao core e arquivado em _processed"
+  - id: EV_RELAY
+    node_type: event
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "relay — maestro transporta o sinal ao inbox do core (entrega-sem-commit)"
+  - id: IN_I3
+    node_type: invariant
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "I3 — um escritor por recurso; entrega-sem-commit (sem commit cross-repo)"
+  - id: RU_RELAY_MAESTRO
+    node_type: rule
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "so o maestro relaya/tria; o visitante entrega, nao relaya"
+  - id: RU_BRANCH_TWO_TIER
+    node_type: rule
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "branch two-tier — vendor(core)/adopt(integracao)/master(release)/work(pessoal)"
+  - id: PO_SSOT_GIT
+    node_type: policy
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "git e o SSOT-de-registro canonico; ambientes sao vistas que leem/escrevem de volta"
+  # ---- camada audit (epistemica — teses e evidencias do que funciona) ----
+  - id: E_TREINO_OK
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "treino de cliente entregue com sucesso a partir de specs (2026-07-15)"
+  - id: E_DIARY_MIGALHAS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "5 migalhas do diario (branch-model, visitante, ssot, ssh, design-vertical)"
+  - id: E_RETRO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "retro do parceiro (Gustavo) — instrumento criado; coleta em andamento"
+  - id: C_SPEC_MULTIPLICADOR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "uma boa spec e multiplicador de artefatos (skill/plugin/doc/deck/onboarding)"
+  - id: C_ASYNC_REPO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "colaboracao assincrona via repo (I3) escala sem chat ao vivo compartilhado"
+  - id: C_ONBOARDING_AUTOGUIADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "onboarding auto-guiado (usar+ajustar, exemplo preenchido) reduz friccao de adocao"
+  - id: D_KG_SEPARADO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: done
+    label: "manter o KG de colaboracao fora do KG-cliente (append-mostly) — e meta-Onion"
+  - id: D_PRODUTOS_CORE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "propor 6 produtos deriaveis ao core (gerador de vertical, deck de treino, retro-skill, etc.)"
+  - id: Q_RETRO_PENDENTE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: "o que a retro do Gustavo vai confirmar/refutar sobre o processo?"
+  # ---- LOTE 2: evidencias da pesquisa "colaboracao moderna 2026" ----
+  - id: E_RESEARCH
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.7
+    status: confirmed
+    label: "deep-research colaboracao moderna 2026 (24 fontes, 9 findings verificados) — preprints, cautela"
+  - id: C_I3_VALIDADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "delivery-without-commit (I3) validado externamente pelo KPR (Knowledge-Based Pull Requests)"
+  - id: C_RETRO_CIENTIFICA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "retro que combina perceptual + dado objetivo e a recomendada pela ciencia (DevEx)"
+  - id: C_NPS_PREDITOR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.2
+    status: refuted
+    label: "NPS prediz comportamento do cliente (share-of-wallet) — refutado (Wallet Allocation Rule ~1%)"
+  - id: C_SPEC_50PCT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.1
+    status: refuted
+    label: "spec refinada por humano reduz erros de codigo em ate 50% — refutado (voto 0-3)"
+  - id: D_NPS_DIRECIONAL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: done
+    label: "tratar o NPS-parceiro como pulso direcional/conversa, nao como preditor"
+  # ---- LOTE 3: metodo de particao de visibilidade + dois KGs + autorizacao ----
+  - id: PO_VISIBILIDADE
+    node_type: policy
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "particao de visibilidade — uma SSOT, duas projecoes (interna completa x client-safe despida)"
+  - id: IN_CLIENT_SAFE
+    node_type: invariant
+    layer: domain
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "artefato que sai (cliente/core) passa por gate determinístico grep client-safe = 0"
+  - id: EN_KG_CLIENTE
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "KG do engajamento — confidencial (nos 🔒 marcados); fica no repo dev, nunca sai"
+  - id: EN_KG_COLAB
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "KG de colaboracao (este) — meta-Onion, sem dado de cliente; shareable ao core"
+  - id: EN_MARCA
+    node_type: entity
+    layer: domain
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "marca/entidade entregadora — vinculos assimetricos com os consultores (detalhes fora do escopo do framework)"
+  - id: D_VISIBILIDADE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: done
+    label: "adotar particao de visibilidade com gate determinístico como convencao"
+  - id: D_DOIS_KGS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: done
+    label: "um KG SDAAL por camada de confianca (engajamento-confidencial x meta-shareable)"
+  - id: C_ASYMMETRIC_TIES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "consultores tem vinculos assimetricos com a marca; o role-model deve acomodar sem conhecer detalhes"
+  - id: Q_AUTORIZACAO_NAO_FORMALIZADA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "perfil colaborador-visitante + boundary de autorizacao de relay ainda nao formalizados no core"
+edges:
+  # domain — papeis e canais
+  - from: EN_VISITANTE
+    to: EN_REPO
+    edge_type: WRITES
+  - from: EN_MAESTRO
+    to: EN_REPO
+    edge_type: READS
+  - from: EN_MAESTRO
+    to: EN_VERTICAL
+    edge_type: WRITES
+  - from: EN_MAESTRO
+    to: EV_RELAY
+    edge_type: EMITS
+  # domain — ciclo de vida do sinal
+  - from: EN_REPO
+    to: ST_SINAL_INBOX
+    edge_type: HAS_STATE
+  - from: EN_REPO
+    to: ST_SINAL_PROCESSED
+    edge_type: HAS_STATE
+  - from: ST_SINAL_INBOX
+    to: ST_SINAL_PROCESSED
+    edge_type: TRANSITIONS
+    on: EV_RELAY
+  # domain — invariantes/regras/politica
+  - from: IN_I3
+    to: EN_REPO
+    edge_type: CONSTRAINS
+  - from: RU_RELAY_MAESTRO
+    to: EV_RELAY
+    edge_type: CONSTRAINS
+  - from: RU_BRANCH_TWO_TIER
+    to: EN_REPO
+    edge_type: CONSTRAINS
+  - from: PO_SSOT_GIT
+    to: EN_REPO
+    edge_type: CONSTRAINS
+  # audit — evidencias sustentam teses
+  - from: E_TREINO_OK
+    to: C_SPEC_MULTIPLICADOR
+    edge_type: SUPPORTS
+  - from: E_TREINO_OK
+    to: D_PRODUTOS_CORE
+    edge_type: SUPPORTS
+  - from: E_DIARY_MIGALHAS
+    to: C_ASYNC_REPO
+    edge_type: SUPPORTS
+  - from: E_DIARY_MIGALHAS
+    to: C_ONBOARDING_AUTOGUIADO
+    edge_type: SUPPORTS
+  - from: Q_RETRO_PENDENTE
+    to: E_RETRO
+    edge_type: DEPENDS_ON
+  # audit TRACES_TO domain
+  - from: C_SPEC_MULTIPLICADOR
+    to: EN_VERTICAL
+    edge_type: TRACES_TO
+  - from: C_ASYNC_REPO
+    to: IN_I3
+    edge_type: TRACES_TO
+  - from: C_ONBOARDING_AUTOGUIADO
+    to: EN_VISITANTE
+    edge_type: TRACES_TO
+  - from: E_RETRO
+    to: EN_VISITANTE
+    edge_type: TRACES_TO
+  - from: D_KG_SEPARADO
+    to: EN_REPO
+    edge_type: TRACES_TO
+  - from: D_PRODUTOS_CORE
+    to: EN_MAESTRO
+    edge_type: TRACES_TO
+  # LOTE 2 — pesquisa sustenta/refuta teses (reconciliação)
+  - from: E_RESEARCH
+    to: C_ASYNC_REPO
+    edge_type: SUPPORTS
+  - from: E_RESEARCH
+    to: C_I3_VALIDADO
+    edge_type: SUPPORTS
+  - from: E_RESEARCH
+    to: C_RETRO_CIENTIFICA
+    edge_type: SUPPORTS
+  - from: E_RESEARCH
+    to: C_NPS_PREDITOR
+    edge_type: REFUTES
+  - from: E_RESEARCH
+    to: C_SPEC_50PCT
+    edge_type: REFUTES
+  - from: D_NPS_DIRECIONAL
+    to: C_NPS_PREDITOR
+    edge_type: SUPERSEDES
+  - from: C_I3_VALIDADO
+    to: IN_I3
+    edge_type: TRACES_TO
+  - from: C_RETRO_CIENTIFICA
+    to: EN_VISITANTE
+    edge_type: TRACES_TO
+  - from: D_NPS_DIRECIONAL
+    to: EN_VISITANTE
+    edge_type: TRACES_TO
+  # LOTE 3 — particao de visibilidade + dois KGs + marca + autorizacao
+  - from: PO_VISIBILIDADE
+    to: EN_REPO
+    edge_type: CONSTRAINS
+  - from: PO_VISIBILIDADE
+    to: EN_KG_CLIENTE
+    edge_type: CONSTRAINS
+  - from: IN_CLIENT_SAFE
+    to: EV_RELAY
+    edge_type: CONSTRAINS
+  - from: EN_MAESTRO
+    to: EN_KG_CLIENTE
+    edge_type: WRITES
+  - from: EN_MAESTRO
+    to: EN_KG_COLAB
+    edge_type: WRITES
+  - from: EN_MARCA
+    to: EN_VERTICAL
+    edge_type: CONSTRAINS
+  - from: E_TREINO_OK
+    to: D_VISIBILIDADE
+    edge_type: SUPPORTS
+  - from: D_VISIBILIDADE
+    to: PO_VISIBILIDADE
+    edge_type: TRACES_TO
+  - from: D_DOIS_KGS
+    to: EN_KG_COLAB
+    edge_type: TRACES_TO
+  - from: D_DOIS_KGS
+    to: EN_KG_CLIENTE
+    edge_type: TRACES_TO
+  - from: E_DIARY_MIGALHAS
+    to: C_ASYMMETRIC_TIES
+    edge_type: SUPPORTS
+  - from: C_ASYMMETRIC_TIES
+    to: EN_MARCA
+    edge_type: TRACES_TO
+  - from: Q_AUTORIZACAO_NAO_FORMALIZADA
+    to: RU_RELAY_MAESTRO
+    edge_type: DEPENDS_ON

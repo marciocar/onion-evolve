@@ -189,6 +189,7 @@
 - onion-work-tools **provides** learning-diary
 - onion-work-tools **provides** metaspec-validation
 - onion-work-tools **provides** orchestration
+- onion-work-tools **provides** retro-feedback
 - onion-work-tools **requires** agent:metaspec-gate-keeper
 - onion-work-tools **requires** skill:onion-orchestration
 
@@ -582,6 +583,7 @@ onion-work-tools	provides	knowledge-graph-sdaal
 onion-work-tools	provides	learning-diary	
 onion-work-tools	provides	metaspec-validation	
 onion-work-tools	provides	orchestration	
+onion-work-tools	provides	retro-feedback	
 onion-work-tools	requires	agent:metaspec-gate-keeper	
 onion-work-tools	requires	skill:onion-orchestration	
 pain-price-specialist	related	product-agent	
