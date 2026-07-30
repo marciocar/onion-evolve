@@ -473,7 +473,12 @@ if [ -d "${KB_ROOT}" ]; then
     esac
     grep -qxF "${rel}" "${TMP}/list" && continue          # da lista dura → Nível A já cuida
     [ -n "$(read_fm_field "${abs}" verified_at)" ] && continue   # já carimbado → honesto
-    hits="$(grep -ioE "${_re}" "${abs}" 2>/dev/null | sort -u | tr '\n' ',' | sed 's/,$//' || true)"
+    # PULA BLOCOS DE CÓDIGO: `latest` numa tag Docker (`image:latest`), num nome de método
+    # (`getLatestRuns`) ou num env-example é CÓDIGO, não afirmação doutrinária em prosa — não
+    # é o que esta rede pega. Varrer código gerava uma classe inteira de falso-positivo (docker,
+    # exemplos). O awk alterna dentro/fora da cerca ``` e só entrega a PROSA ao grep.
+    hits="$(awk '/^[[:space:]]*```/{c=!c; next} !c' "${abs}" 2>/dev/null \
+             | grep -ioE "${_re}" 2>/dev/null | sort -u | tr '\n' ',' | sed 's/,$//' || true)"
     [ -n "${hits}" ] || continue
     say "SOFT" "LEXICAL" "${rel}" "usa linguagem sensível-ao-tempo (${hits}) sem verified_at — é snapshot? Se afirma lineup/versão/GA, carimbe verified_at+source (ou promova à lista world-facing); se é atemporal, ignore (rede frágil, SOFT-only)"
   done < <(find "${KB_ROOT}" -type f -name '*.md' 2>/dev/null | sort)
