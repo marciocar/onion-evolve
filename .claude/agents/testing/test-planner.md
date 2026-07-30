@@ -3,6 +3,7 @@ name: test-planner
 description: |
   Especialista em planejamento e cobertura de testes para análise sistemática.
   Use para identificar testes ausentes e recomendar estratégia de testing.
+  Diferença vs @test-agent: este é o planejamento de COBERTURA (identificar testes ausentes); o test-agent é a ESTRATÉGIA completa (perspectivas White/Black/Grey-box + pipelines + QA points).
 model: sonnet
 tools:
   - Read

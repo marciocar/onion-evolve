@@ -2251,6 +2251,82 @@ PY
 }
 
 # ===========================================================================
+# REGRA 48 — Referência de caminho `.claude/…` em backtick (prosa) que não resolve [HARD]
+# previne: referência .claude/ em backtick na prosa apontando p/ arquivo inexistente (ponteiro morto silencioso)
+#   Origem: dogfood de campo 2026-07-30 — `.claude/utils/clickup-formatting.md` era citado em
+#   CLAUDE.md, integrations.md e no agente @onion, mas o arquivo NÃO existe (o fragmento real é
+#   common:prompts:clickup-patterns). A REGRA 22 só pega LINKS markdown [x](path) em docs/evolution|
+#   knowledge-base; referência de caminho em BACKTICK na prosa da constituição/meta-specs/agentes/
+#   comandos ficava sem guarda determinística — só revisor semântico a pegaria. Esta a fecha.
+#   Escopo do ALVO: SÓ `.claude/…ext` (presente em todo repo com o framework → sem o falso-HARD de
+#   adotante que a REGRA 22 precisa contornar p/ docs core-only). Filtros contra falso-positivo
+#   (dogfood do desenho: 143 refs reais no core → 0 broken, 0 FP):
+#   - IGNORA code fences ``` (o path pode ser do arquivo GERADO, não deste — lição da REGRA 22);
+#   - IGNORA alvo NÃO-kebab (`MyAgent.md`/`X.md`/`misc/MyCommand.md` são EXEMPLOS; arquivo .claude/
+#     real é kebab-case por REGRA 6) — basenames all-caps convencionais (SKILL/README/…) exentos;
+#   - IGNORA placeholders/globs (`<>[]{}*$ ` e `...`) e paths sem extensão de arquivo (ref de diretório);
+#   - ALLOWLIST de alvos OPCIONAIS documentados (resolvidos-se-existirem): `.claude/onion-context.yaml`
+#     (override de contexto do consumidor, resolvido pelos resolvers das skills *-context).
+#   Role-guard (espelha REGRA 22): num door role-scoped a meta-factory + verticais não-base são selados
+#   (ausentes-por-desenho) — pular SÓ o alvo-ausente nesses prefixos quando adopted/hub. Sem jq. [[fix-must-become-mechanism]]
+# ===========================================================================
+# Lista de arquivos da superfície de framework (honra --only via _find; CLAUDE.md tratado à parte
+# por viver na raiz, fora das raízes de _find). Poda de worktrees vem de graça no _find.
+_backtick_ref_files() {
+  if [ -z "${ONLY_PATH}" ] || [ "${ONLY_PATH}" = "${REPO_ROOT}/CLAUDE.md" ]; then
+    [ -f "${REPO_ROOT}/CLAUDE.md" ] && printf '%s\0' "${REPO_ROOT}/CLAUDE.md"
+  fi
+  _find "${CLAUDE_DIR}" -name '*.md' -print0 2>/dev/null
+  _find "${REPO_ROOT}/docs/meta-specs" -name '*.md' -print0 2>/dev/null
+}
+
+check_backtick_path_refs() {
+  local adopted=""
+  grep -qE '^(role: (adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && adopted=1
+  local f lineno tok
+  while IFS= read -r -d '' f; do
+    [ -f "${f}" ] || continue
+    while IFS=$'\t' read -r lineno tok; do
+      [ -n "${tok}" ] || continue
+      # allowlist: alvos OPCIONAIS documentados (override do consumidor, resolvido-se-existir)
+      case "${tok}" in
+        .claude/onion-context.yaml) continue ;;
+      esac
+      [ -e "${REPO_ROOT}/${tok}" ] && continue
+      if [ -n "${adopted}" ]; then
+        # door role-scoped: meta-factory + verticais não-base selados (ausentes-por-desenho)
+        case "${tok}" in
+          .claude/commands/meta/*|.claude/commands/design/*|.claude/commands/development/*|.claude/commands/quick/*) continue ;;
+          .claude/agents/meta/*|.claude/agents/compliance/*|.claude/agents/research/*) continue ;;
+          .claude/validation/lint-selftest.sh|.claude/validation/federation-*|.claude/validation/kg-*|.claude/validation/graph.sh|.claude/validation/constellation-map.sh|.claude/validation/diary-index.sh|.claude/validation/a2a-*|.claude/validation/trust-topology-check.sh|.claude/validation/lint-design-tokens.sh) continue ;;
+        esac
+      fi
+      violation "HARD" "${f}" "referência de caminho em backtick (linha ${lineno}): \`${tok}\` não resolve — ponteiro morto (arquivo movido/renomeado? cite o fragmento/caminho real)"
+    done < <(awk '
+      /^[[:space:]]*```/ { fence = !fence; next }
+      fence { next }
+      {
+        line = $0
+        while (match(line, /`[^`]+`/)) {
+          tok = substr(line, RSTART + 1, RLENGTH - 2)
+          line = substr(line, RSTART + RLENGTH)
+          if (tok !~ /^\.claude\//) continue
+          if (tok !~ /\.(md|sh|json|ya?ml|html|txt)$/) continue
+          if (tok ~ /[<>\[\]{}*$ ]/) continue
+          if (tok ~ /\.\.\./) continue
+          # gate kebab-case: arquivo .claude/ real é kebab (REGRA 6). Remove basenames all-caps
+          # convencionais; se sobrou maiúscula → EXEMPLO (MyAgent/X), não referência real → pula.
+          probe = tok
+          gsub(/\/(SKILL|README|CLAUDE|MEMORY|INDEX|CHANGELOG|LICENSE)\.[a-z]+$/, "/", probe)
+          if (probe ~ /[A-Z]/) continue
+          printf "%d\t%s\n", NR, tok
+        }
+      }
+    ' "${f}")
+  done < <(_backtick_ref_files)
+}
+
+# ===========================================================================
 # EXECUÇÃO DAS CHECAGENS
 # ===========================================================================
 echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
@@ -2318,6 +2394,7 @@ check_onion_version_tracked
 check_family_topology_sync
 check_federation_outbox_membership
 check_kg_narration_valid
+check_backtick_path_refs
 
 # ===========================================================================
 # SUMÁRIO FINAL

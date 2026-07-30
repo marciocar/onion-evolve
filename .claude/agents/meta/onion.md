@@ -698,7 +698,7 @@ Vou diagnosticar o problema. Verificando...
 **Formato de Comentários (varia por provider):**
 A formatação muda conforme o provider ativo — delegue ao especialista correto:
 - **Jira**: ADF (Atlassian Document Format / JSON estruturado); status via `transitions`
-- **ClickUp**: formatação visual Unicode (`━━━`, `▶`, `∟`), conforme `.claude/utils/clickup-formatting.md`:
+- **ClickUp**: formatação visual Unicode (`━━━`, `▶`, `∟`), conforme `.claude/commands/common/prompts/clickup-patterns.md`:
   ```
   ━━━━━━━━━━━━━━━━━━━━━━━━
   📋 [TÍTULO]

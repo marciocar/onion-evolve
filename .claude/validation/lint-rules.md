@@ -18,7 +18,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**47 regras** no total — **42 HARD**, **9 SOFT**.
+**48 regras** no total — **43 HARD**, **9 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -45,6 +45,7 @@ Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 | 14 | Meta-specs (autoridade L0) sem dialeto Cursor em exemplos | HARD | exemplo de meta-spec L0 com dialeto Cursor |
 | 15 | Frescor de contexto de domínio: carimbo de atualização | SOFT | contexto de domínio sem carimbo de atualização — frescor incerto |
 | 22 | Links relativos quebrados em docs/evolution/ e docs/knowledge-base/ | HARD | link relativo quebrado em docs/evolution ou docs/knowledge-base |
+| 48 | Referência de caminho `.claude/…` em backtick (prosa) que não resolve | HARD | referência .claude/ em backtick na prosa apontando p/ arquivo inexistente (ponteiro morto silencioso) |
 
 ## Fronteiras & contratos de arquitetura
 

@@ -154,14 +154,14 @@ A formatação de descrições e comentários **muda conforme o provider ativo**
 - **📋 Task Descriptions (`markdown_description`)**: Markdown nativo
   - Use: `## Headers`, `| Tabelas |`, `**Bold**`, `- Listas`
   - Quando: `create_task`, `update_task` descriptions
-  - Templates: `.claude/utils/clickup-formatting.md` — seção DESCRIPTIONS
+  - Templates: `.claude/commands/common/prompts/clickup-patterns.md` — §"Task Descriptions"
 
 - **💬 Task Comments (`commentText`)**: Formatação visual Unicode
   - Use: `━━━`, `∟`, `▶`, `◆`, `✅`
   - Quando: `create_task_comment`, progress updates, PR comments
   - **Obrigatório**: timestamp + status em todos os comments
   - **Estrutura**: Header + separador + conteúdo + footer
-  - Templates: `.claude/utils/clickup-formatting.md` — seção COMMENTS
+  - Templates: `.claude/commands/common/prompts/clickup-patterns.md` — §"Task Comments"
 
 ### Asana / Linear
 - Asana: descrição em HTML notes (subset) ou plain text

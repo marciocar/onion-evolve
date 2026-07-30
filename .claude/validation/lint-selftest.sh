@@ -572,6 +572,38 @@ run_vendor_scrub_selftests() {
   rm -f "${tf}"
 }
 
+# REGRA 48 — referência de caminho `.claude/…` em backtick (prosa) que não resolve.
+# Fixture VIVE sob .claude/ (raiz da guarda) com nome improvável, removida no RETURN — único
+# jeito de exercitar a guarda REAL via --only. Dois casos: (A) reage a ref morta; (B) NÃO
+# superreage aos 4 filtros de falso-positivo (kebab/fence/allowlist/válida) num só fôlego.
+run_backtick_ref_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  [ -f "${lint}" ] || { record_fail "backtick-ref" "lint ausente: ${lint}"; return; }
+  local tf="${REPO_ROOT}/.claude/validation/__backtickreftest__.md"
+  trap 'rm -f "'"${tf}"'"' RETURN
+  local out rc=0
+  # (A) reage: ref kebab p/ arquivo .claude/ ausente → HARD com o token
+  printf '# fixture\nCite `.claude/utils/__absent-xyz-fixture__.md` na prosa.\n' > "${tf}"
+  out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'referência de caminho em backtick' \
+     && printf '%s' "${out}" | grep -q '__absent-xyz-fixture__'; then
+    record_pass "backtick-ref: (A) ref .claude/ kebab p/ arquivo ausente → HARD (ponteiro morto pego)"
+  else record_fail "backtick-ref: (A)" "ref morta não virou HARD: rc=${rc}"; fi
+  # (B) NÃO superreage: válida(existe) + exemplo(não-kebab) + em fence + allowlist(ausente) → 0 flag
+  {
+    printf '# fixture limpo\n'
+    printf 'Válida: `.claude/validation/lint-artifacts.sh` (existe).\n'
+    printf 'Exemplo ilustrativo: `.claude/agents/misc/MyAgent.md`.\n'
+    printf 'Opcional documentada: `.claude/onion-context.yaml`.\n'
+    printf '```\n`.claude/utils/__fenced-absent__.md`\n```\n'
+  } > "${tf}"
+  rc=0; out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
+  if ! printf '%s' "${out}" | grep -q 'referência de caminho em backtick'; then
+    record_pass "backtick-ref: (B) válida/exemplo-não-kebab/fence/allowlist → 0 flag (os 4 filtros de FP)"
+  else record_fail "backtick-ref: (B)" "falso-positivo: $(printf '%s' "${out}" | grep 'referência de caminho em backtick' | head -2)"; fi
+  rm -f "${tf}"
+}
+
 run_site_deeplink_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   local site="${REPO_ROOT}/site"
@@ -5873,6 +5905,7 @@ run_shell_pipefail_robustness_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
+run_backtick_ref_selftests
 run_site_deeplink_selftests
 run_migalhas_generate_selftests
 run_rules_registry_selftests

@@ -13,6 +13,12 @@ tools:
   - WebSearch
   - TodoWrite
   - Bash
+  # MCP genérico opcional (não-provider) — enriquece a análise; degrada p/ nativo (Glob/Read) se ausente
+  - mcp__code-understanding__get_repo_status
+  - mcp__code-understanding__get_repo_structure
+  - mcp__code-understanding__get_source_repo_map
+  - mcp__code-understanding__get_repo_critical_files
+  - mcp__code-understanding__get_repo_documentation
 
 color: blue
 priority: alta
@@ -118,13 +124,15 @@ Você NÃO cria diagramas ou documentos isolados. Você **orquestra especialista
 
 ### 🛠️ Ferramentas Especializadas
 
-#### **Code Understanding MCP Server**
-Você tem acesso privilegiado para análise profunda:
+#### **Code Understanding MCP Server** (opcional — degrada p/ nativo)
+MCP genérico (não-provider) que enriquece a análise **se disponível**; na ausência,
+caia para as ferramentas nativas (Glob/Read) da Fase 1.2 — nunca bloqueie por causa dele.
+Declarado no frontmatter `tools:` com naming canônico `mcp__code-understanding__*`.
 
-- `mcp_code-understanding_get_repo_structure` - Mapeia estrutura completa
-- `mcp_code-understanding_get_source_repo_map` - Análise semântica de código
-- `mcp_code-understanding_get_repo_critical_files` - Identifica arquivos críticos
-- `mcp_code-understanding_get_repo_documentation` - Extrai docs existentes
+- `mcp__code-understanding__get_repo_structure` - Mapeia estrutura completa
+- `mcp__code-understanding__get_source_repo_map` - Análise semântica de código
+- `mcp__code-understanding__get_repo_critical_files` - Identifica arquivos críticos
+- `mcp__code-understanding__get_repo_documentation` - Extrai docs existentes
 
 #### **Orquestração de subagentes (nativa)**
 Para orquestração paralela de múltiplos especialistas, use a ferramenta **Workflow** nativa do Claude Code (fan-out/fan-in) — ver a skill `onion-orchestration` e o comando `/meta:orchestrate`. Não há MCP de orquestração.
@@ -180,25 +188,34 @@ Glob → "docs/" (se existir)
 
 ```typescript
 // 1. Verificar status do repositório
-mcp_code-understanding_get_repo_status(repo_path: ".")
+mcp__code-understanding__get_repo_status(repo_path: ".")
 
 // 2. Estrutura detalhada
-mcp_code-understanding_get_repo_structure(
+mcp__code-understanding__get_repo_structure(
   repo_path: ".",
   directories: ["apps", "libs"],
   include_files: true
 )
 
 // 3. Identificar arquivos críticos
-mcp_code-understanding_get_repo_critical_files(
+mcp__code-understanding__get_repo_critical_files(
   repo_path: ".",
   include_metrics: true,
   limit: 30
 )
 
 // 4. Extrair documentação existente
-mcp_code-understanding_get_repo_documentation(repo_path: ".")
+mcp__code-understanding__get_repo_documentation(repo_path: ".")
 ```
+
+> **Gate de ausência:** se o servidor MCP `code-understanding` não estiver conectado,
+> **pule esta fase** e siga com o inventário nativo da 1.2 — a documentação sai completa,
+> só sem o enriquecimento semântico. Nunca bloqueie por causa do MCP.
+>
+> **Fan-out:** após o `get_repo_status` (precondição), os três reads seguintes
+> (`get_repo_structure`, `get_repo_critical_files`, `get_repo_documentation`) são
+> **independentes** — dispare-os em paralelo via a ferramenta **Workflow** (fan-out/fan-in;
+> ver skill `onion-orchestration`), não em série.
 
 #### 1.4. Criar Inventário do Sistema
 
