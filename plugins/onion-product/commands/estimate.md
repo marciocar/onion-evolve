@@ -57,6 +57,11 @@ Fornecer estimativas precisas e acionáveis de story points para tarefas de dese
 
 ## ⚡ Fluxo de Execução
 
+> Este comando é a **aplicação interativa completa** do protocolo canônico
+> `common:prompts:story-points-estimation` (a SSOT do "como produzir a estimativa",
+> reusada também por `/product/task` e `/product/feature`). Os passos abaixo o
+> detalham com red flags, seleção metodológica e calibração por senioridade.
+
 ### Passo 1: Carregar Base de Conhecimento
 
 ```bash
