@@ -116,7 +116,7 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.8
-    status: confirmed
+    status: superseded
     label: "PRODUTO 6 — KG-dogfood-para-consultoria produtizado (mapear engajamento como KG SDAAL 2 camadas). Adotante: mais do maestro, apoia como usuário"
     trace: "relay Sinal 4/7"
   - id: E_kg_map_existe
@@ -124,11 +124,21 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 1.0
-    status: confirmed
+    status: refuted
     verified_at: 2026-07-30
     verified_against: modo-map-no-comando
-    label: "PARCIAL: /meta:kg map já é o motor de mapeamento de domínio (inventário → atom-map/fatias → .kg.yaml → radar). O 'produtizado para consultoria' é wrapper/posicionamento fino sobre o que já existe"
+    label: "PARCIAL (REFUTADO): eu disse 'wrapper fino sobre /meta:kg map'. Errado — conflei software (map) com engajamento de negócio (diagnose). map=atom-map/SourceTag/front-end; diagnose=descoberta→KG diagnóstico. Objetos diferentes"
     trace: ".claude/commands/meta/kg.md"
+  - id: D_p6_diagnose_delivered
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-07-30
+    verified_against: modo-diagnose-documentado-radar-exit0
+    label: "ENTREGUE: modo /meta:kg diagnose — o KG-SDAAL como diagnóstico de engajamento. Reformulei meu próprio veredito (o único produto que subiu de valor na re-análise). Método canônico: reusa kg-radar (--domain estado-absorvente=gargalo do cliente) + 2 camadas + pipeline extract/consolidate; cadência PAUSA-numerada; soberania do engajamento. Dogfood: kg-diagnose-design-2026-07.kg.yaml (radar exit 0). Follow-up gated: automação do pipeline"
+    trace: "docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml"
   - id: C_p7_gate_client_safe
     node_type: claim
     plane: DEV
@@ -200,6 +210,15 @@ edges:
   - from: E_kg_map_existe
     to: C_p6_kg_consultoria
     edge_type: SUPPORTS
+  - from: D_p6_diagnose_delivered
+    to: C_p6_kg_consultoria
+    edge_type: SUPERSEDES
+  - from: D_p6_diagnose_delivered
+    to: E_kg_map_existe
+    edge_type: REFUTES
+  - from: D_p6_diagnose_delivered
+    to: D_prioridade
+    edge_type: TRACES_TO
   - from: E_sem_gate_client_safe
     to: C_p7_gate_client_safe
     edge_type: SUPPORTS
