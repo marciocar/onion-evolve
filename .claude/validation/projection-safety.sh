@@ -63,6 +63,7 @@ MARKERS='CONFIDENCIAL|PRIVADO'          # P1 — vocabulário fechado
 EMIT_ONLY=0
 FEDERATION=0
 FORMAT=human
+TERMS_FILE=""                           # #7 do relay: lista de termos DECLARADA (client-safe do adotante)
 SURFACES=()
 
 while [ $# -gt 0 ]; do
@@ -70,6 +71,7 @@ while [ $# -gt 0 ]; do
     --emit-terms) EMIT_ONLY=1; shift ;;
     --federation) FEDERATION=1; shift ;;
     --members)    MEMBERS="$2"; shift 2 ;;
+    --terms)      TERMS_FILE="$2"; shift 2 ;;   # gate client-safe genérico: o adotante declara os PRÓPRIOS termos (nomes de cliente)
     --format)     FORMAT="$2"; shift 2 ;;
     -h|--help)    sed -n '1,50p' "$0"; exit 0 ;;
     *)            SURFACES+=("$1"); shift ;;
@@ -77,6 +79,94 @@ while [ $# -gt 0 ]; do
 done
 
 [ ${#SURFACES[@]} -eq 0 ] && SURFACES=("${REPO_DIR}/site")
+
+# ── run_audit — auditoria compartilhada (P2/P3/P4) ───────────────────────────
+# Varre as SURFACES contra TERMS_CI (nomes, caixa-insensível — pegam identificador)
+# e TERMS_CS (marcadores, caixa-sensível). Uma verdade só: tanto o gate de membro
+# (members.yaml) quanto o gate client-safe declarado (--terms) chamam ESTA função —
+# evita dois-parsers/duas-verdades numa guarda de segurança.
+run_audit() {
+  local violations=0 scanned=0 s f term hits
+  for s in "${SURFACES[@]}"; do
+    if [ ! -e "${s}" ]; then echo "  ⚠️  superfície inexistente, pulada: ${s}"; continue; fi
+    echo "  Auditando (P3)   : ${s#${REPO_DIR}/}"
+    while IFS= read -r f; do
+      scanned=$((scanned + 1))
+      while IFS= read -r term; do
+        [ -z "${term}" ] && continue
+        if grep -qiF -- "${term}" "${f}" 2>/dev/null; then
+          hits="$(grep -ciF -- "${term}" "${f}" 2>/dev/null || echo 0)"
+          echo "  ✗ HARD  ${f#${REPO_DIR}/}: nome sensível presente (${hits}x)"
+          violations=$((violations + 1))
+        fi
+      done <<EOF
+${TERMS_CI}
+EOF
+      while IFS= read -r term; do
+        [ -z "${term}" ] && continue
+        if grep -qF -- "${term}" "${f}" 2>/dev/null; then
+          hits="$(grep -cF -- "${term}" "${f}" 2>/dev/null || echo 0)"
+          echo "  ✗ HARD  ${f#${REPO_DIR}/}: marcador de confidencialidade presente (${hits}x)"
+          violations=$((violations + 1))
+        fi
+      done <<EOF
+${TERMS_CS}
+EOF
+    done <<EOF
+$(find "${s}" -type f \( -name '*.html' -o -name '*.xml' -o -name '*.md' -o -name '*.json' -o -name '*.yaml' -o -name '*.txt' \) 2>/dev/null | sort)
+EOF
+  done
+  echo "  Arquivos varridos: ${scanned}"
+  echo ""
+  if [ "${violations}" -gt 0 ]; then
+    echo "✗ REPROVA — ${violations} violação(ões) HARD de projeção."
+    echo "  Termo sensível não sai por esta fronteira. Use o \`id:\` público / a projeção client-safe."
+    return 1
+  fi
+  echo "OK ✓ — nenhuma superfície carrega termo sensível."
+  return 0
+}
+
+# ── #7 do relay — GATE CLIENT-SAFE GENÉRICO (`--terms <arquivo>`) ─────────────
+# O core deriva os termos de members.yaml (nomes de MEMBRO). Mas um adotante quer
+# gatear os PRÓPRIOS nomes de cliente antes de um artefato cruzar a fronteira
+# (doc pro cliente, sinal pro core) — "SSOT com partição de visibilidade" (Sinal 6
+# do relay do adotante 2026-07). Com `--terms`, a fonte é a lista DECLARADA: um
+# termo sensível por linha (`#`/vazio ignorados). MESMA disciplina P0 do
+# members.yaml: se o arquivo de termos sumir/for ilegível → FALHA ALTO (um verde
+# por ausência de fonte seria falso). Curto-circuita a derivação de federação —
+# um adotante não precisa de members.yaml para gatear os próprios clientes.
+if [ -n "${TERMS_FILE}" ]; then
+  if [ ! -r "${TERMS_FILE}" ]; then
+    if [ "${FORMAT}" = "tsv" ]; then
+      printf 'HARD\tSEM-FONTE\t%s\tlista de termos declarada ausente/ilegível — sem fonte não há proteção; verde seria falso (P0)\n' "${TERMS_FILE}"
+    else
+      echo "✗ HARD projection-safety: lista de termos '--terms ${TERMS_FILE}' ausente ou ilegível."
+      echo "  (P0) A proteção é DERIVADA da lista declarada; sem fonte, um verde seria falso."
+    fi
+    exit 1
+  fi
+  # termos DECLARADOS = linhas não-comentário/não-vazias. Nome de cliente é sensível
+  # em qualquer caixa (como o nome de membro) → todos entram em TERMS_CI; sem marcadores.
+  TERMS_CI="$(grep -vE '^[[:space:]]*(#|$)' "${TERMS_FILE}" | sed 's/[[:space:]]*$//' | grep -v '^$' | sort -u)"
+  TERMS_CS=""
+  if [ "${EMIT_ONLY}" = "1" ]; then printf '%s\n' "${TERMS_CI}"; exit 0; fi
+  if [ -z "${TERMS_CI}" ]; then
+    if [ "${FORMAT}" = "tsv" ]; then
+      printf 'HARD\tSEM-TERMOS\t%s\tlista de termos declarada vazia — nada a proteger seria proteção nenhuma (P0)\n' "${TERMS_FILE}"
+    else
+      echo "✗ HARD projection-safety: lista de termos '${TERMS_FILE}' está vazia — nada a proteger é proteção nenhuma."
+    fi
+    exit 1
+  fi
+  if [ "${FORMAT}" != "tsv" ]; then
+    echo "=== Gate client-safe — termos declarados ==="
+    echo "  Fonte dos termos : ${TERMS_FILE} (lista declarada — #7 do relay)"
+    echo "  Termos           : $(printf '%s\n' "${TERMS_CI}" | grep -c .)"
+  fi
+  run_audit   # função compartilhada (definida acima): audita as SURFACES contra TERMS_CI/TERMS_CS
+  exit $?
+fi
 
 # ── P0-bis: ESTE REPO TEM FEDERAÇÃO? ─────────────────────────────────────────
 # Só o CORE mantém registro de membros. Um adotante não tem — e para ele a
@@ -301,51 +391,6 @@ echo "  Fonte dos termos : ${MEMBERS#${REPO_DIR}/}"
 echo "  Marcadores (P1)  : ${MARKERS}"
 echo "  Termos derivados : ${n_terms} (caixa-sensível; ids públicos excluídos)"
 
-violations=0
-scanned=0
-for s in "${SURFACES[@]}"; do
-  if [ ! -e "${s}" ]; then
-    echo "  ⚠️  superfície inexistente, pulada: ${s}"
-    continue
-  fi
-  echo "  Auditando (P3)   : ${s#${REPO_DIR}/}"
-  while IFS= read -r f; do
-    scanned=$((scanned + 1))
-    # NOMES (P2/P4): qualquer caixa, qualquer posição — inclusive dentro de
-    # identificadores minúsculos, que é por onde o vazamento real passou.
-    while IFS= read -r term; do
-      [ -z "${term}" ] && continue
-      if grep -qiF -- "${term}" "${f}" 2>/dev/null; then
-        hits="$(grep -ciF -- "${term}" "${f}" 2>/dev/null || echo 0)"
-        echo "  ✗ HARD  ${f#${REPO_DIR}/}: nome sensível presente (${hits}x)"
-        violations=$((violations + 1))
-      fi
-    done <<EOF
-${TERMS_CI}
-EOF
-    # MARCADORES (P2): literal em caixa alta — minúsculo é palavra comum.
-    while IFS= read -r term; do
-      [ -z "${term}" ] && continue
-      if grep -qF -- "${term}" "${f}" 2>/dev/null; then
-        hits="$(grep -cF -- "${term}" "${f}" 2>/dev/null || echo 0)"
-        echo "  ✗ HARD  ${f#${REPO_DIR}/}: marcador de confidencialidade presente (${hits}x)"
-        violations=$((violations + 1))
-      fi
-    done <<EOF
-${TERMS_CS}
-EOF
-  done <<EOF
-$(find "${s}" -type f \( -name '*.html' -o -name '*.xml' -o -name '*.md' -o -name '*.json' -o -name '*.yaml' -o -name '*.txt' \) 2>/dev/null | sort)
-EOF
-done
-
-echo "  Arquivos varridos: ${scanned}"
-echo ""
-if [ "${violations}" -gt 0 ]; then
-  echo "✗ REPROVA — ${violations} violação(ões) HARD de projeção."
-  echo "  Nome comercial de membro privado não sai do repo privado. Use o \`id:\` público."
-  exit 1
-fi
-
-echo "OK ✓ — nenhuma projeção pública carrega termo sensível."
-exit 0
+# Caminho members: a auditoria compartilhada (run_audit) contra TERMS_CI/TERMS_CS derivados.
+run_audit
+exit $?

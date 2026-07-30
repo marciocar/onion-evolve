@@ -1245,6 +1245,30 @@ MEOF
   if bash "${tmp}/mutated.sh" --members "${tmp}/members.yaml" "${tmp}/surface" >/dev/null 2>&1; then
     record_pass "projection-safety: (MUT) condição desfeita ⇒ (b) escapa — o teste é load-bearing"
   else record_fail "projection-safety: (MUT)" "com a condição desfeita o caso (b) ainda reprovou — o teste não prova nada"; fi
+
+  # ── #7 do relay — GATE CLIENT-SAFE GENÉRICO (`--terms <lista>`) ──────────────
+  # O adotante declara os PRÓPRIOS termos sensíveis (nomes de cliente) e gateia um
+  # artefato antes de cruzar a fronteira. Reusa run_audit (uma verdade só). Termos
+  # INVENTADOS — a fixture não carrega nome de cliente real.
+  printf 'AcmeCorp\nProjeto-Fantasma\n' > "${tmp}/meus-termos.txt"
+
+  # (T1) artefato que VAZA um termo declarado → HARD
+  printf '# doc\nA AcmeCorp aprovou.\n' > "${tmp}/surface/index.html"
+  if ! bash "${helper}" --terms "${tmp}/meus-termos.txt" "${tmp}/surface" >/dev/null 2>&1; then
+    record_pass "projection-safety: (T1) --terms declarado + artefato que vaza → HARD"
+  else record_fail "projection-safety: (T1)" "termo declarado presente não reprovou — o gate client-safe não vigia"; fi
+
+  # (T2) artefato client-safe → OK (exit 0)
+  printf '# doc\nO cliente aprovou.\n' > "${tmp}/surface/index.html"
+  if bash "${helper}" --terms "${tmp}/meus-termos.txt" "${tmp}/surface" >/dev/null 2>&1; then
+    record_pass "projection-safety: (T2) --terms declarado + artefato limpo → OK"
+  else record_fail "projection-safety: (T2)" "artefato sem termo sensível reprovou — falso-positivo"; fi
+
+  # (T3) P0 na lista declarada: arquivo de termos ausente → HARD (não verde por ausência)
+  printf '# doc\nlimpo\n' > "${tmp}/surface/index.html"
+  if ! bash "${helper}" --terms "${tmp}/nao-existe.txt" "${tmp}/surface" >/dev/null 2>&1; then
+    record_pass "projection-safety: (T3) --terms ausente → HARD (P0, mesma disciplina do members)"
+  else record_fail "projection-safety: (T3)" "sem lista de termos a guarda passou verde — proteção fantasma"; fi
 }
 
 run_kg_provenance_selftests() {
