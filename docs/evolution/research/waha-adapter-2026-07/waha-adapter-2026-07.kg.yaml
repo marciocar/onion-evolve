@@ -1,0 +1,163 @@
+meta:
+  id: waha-adapter-2026-07
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-07-31
+  date: 2026-07-31
+  note: >
+    F1 da investigação de ferramentas VPS (catálogo): pesquisa do WAHA (estado current,
+    web-verificada em fontes primárias) + a forma do adapter WhatsApp SDAAL (repo-grounded).
+    Achado central: o Teste do EIXO passou (2 providers) mas o Teste do GATILHO NÃO —
+    1 provider real (whatsapp-web.js na VPS) + 1 dirigido (WAHA não deployado) = script.
+    Veredito: DOGFOOD PRIMEIRO (deployar WAHA + medir degradações), SDAAL DEPOIS — com
+    critério de RETRAÇÃO escrito antes de construir. Projeção: SYNTHESIS.md.
+
+nodes:
+  # ── EVIDÊNCIA WEB-VERIFICADA (fontes primárias) ──
+  - id: E_waha_current
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-07-31
+    verified_against: webfetch-github-releases-e-waha.devlike.pro-docs
+    label: "WAHA CURRENT (web-verificado): release 2026.7.2 (29/07/2026); Plus FUNDIDO no Core na 2026.6.1 -> 100% gratis; licenca Apache-2.0; engines WEBJS/NOWEB/GOWS; Docker devlikeapro/waha :3000 + volume /app/.sessions; auth por header X-Api-Key (WAHA_API_KEY); sessao POST/GET/PUT/DELETE /api/sessions + start|stop|restart|logout + GET /api/{s}/auth/qr + pairing-code; envio POST /api/sendText {chatId:'<num>@c.us',text,session}; webhooks WHATSAPP_HOOK_* com eventos message/session.status/message.ack/call.*"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: C_waha_plus_contradiction
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-07-31
+    verified_against: readme-do-repo-vs-changelog-2026.6.1
+    label: "CONTRADICAO RESIDUAL: o README do repo GitHub ainda cita 'WAHA Plus' + 'docker login -u devlikeapro -p {KEY}', divergindo do changelog 2026.6.1 (Plus fundido no Core). Verificacao decisiva NO DEPLOY: 'docker pull devlikeapro/waha' funciona SEM login? Se exigir credencial, a premissa 'tudo gratis' cai e o default merece re-litigio (so esse ponto — o risco de ToS ja esta decidido)"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: C_engine_weight_hypothesis
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.4
+    label: "HYPOTHESIS (nao verificado): 'NOWEB/GOWS sao mais leves que WEBJS'. Importa material — a KVM8 tem RAM finita e WEBJS carrega browser. Escolher engine default por MEDICAO no deploy, nunca por presuncao. NOTA: se o default for WEBJS, WAHA e whatsapp-web.js compartilham o MESMO mecanismo por baixo — reforca intercambialidade, ENFRAQUECE o argumento de isolamento de recursos"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  # ── A FORMA DO ADAPTER (decisões de design) ──
+  - id: D_domain_whatsapp_not_messaging
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-07-31
+    verified_against: teste-do-eixo-regra-a-mesmo-contrato
+    label: "DOMINIO = 'whatsapp' (NAO 'messaging'), env prefix 'WA_' (NAO 'WHATSAPP_'). (1) O eixo que varia e GATEWAY DE WHATSAPP, nao canal: 'messaging' convidaria telegram/slack como adapters, e eles NAO cumprem o mesmo contrato (sem pareamento QR, sem identidade de numero) — diluiria a interface e violaria a regra (a) do Eixo. (2) Prefix WA_ por motivo VERIFICADO: o proprio WAHA consome WHATSAPP_HOOK_* como config DO CONTAINER; mesmo .env lido por duas autoridades no mesmo namespace = confusao de dono. Precedente interno: de-identification -> DEID_"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: D_interface_v01
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-07-31
+    verified_against: matriz-provider-x-capacidade
+    label: "INTERFACE v0.1 = 4 operacoes: sendText (UNICA de negocio que ambos cumprem; MessageReceipt.id NULLABLE por contrato — o CLI do wwebjs pode nao devolver id, prometer string vazaria a garantia do WAHA) · getSessionStatus (enum com 'unknown' — forma honesta de acomodar assimetria) · connect (devolve CERIMONIA de pareamento, nao imagem: channel 'payload'|'tty' + instructions pt-BR) · validateConfiguration. FORA (declarado): logout (so WAHA), inbound/webhook (1 implementacao real -> script), sendMedia/grupos (gated), multi-sessao. WAHA = default por superset estrito + isolamento (container vs Chromium no host). NONE = no-op VISIVEL (status 'skipped', JAMAIS 'sent')"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: D_no_wa_transport
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: anti-padrao-3-env-switch-ficticio
+    label: "NAO criar WA_TRANSPORT agora: hoje o transporte e DETERMINADO pelo provider (WAHA->http; wwebjs->local-process), nao escolhido pelo ambiente. Variavel que nao pode variar dentro de um provider e o anti-padrao #3 (env switch ficticio) e violaria §3.4. O transport fica na INTERFACE como readonly resolvido pelo detector (precedente IForge.transport); a variavel nasce quando existir 2o transporte real. Divergencia vs task-manager/forge DECLARADA no README (como o forge declarou seu cli-default)"
+    trace: "docs/meta-specs/integrations.md"
+
+  # ── O ACHADO CENTRAL ──
+  - id: D_dogfood_before_sdaal
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: teste-do-gatilho-1-real-mais-N-prometidos
+    label: "VEREDITO F1: DOGFOOD PRIMEIRO, SDAAL DEPOIS. O Teste do EIXO passou no papel (2 providers) mas o Teste do GATILHO NAO disparou — 1 provider REAL rodando (whatsapp-web.js) + 1 DIRIGIDO (WAHA nao deployado) = script. Escrever a interface antes do WAHA existir seria catedral, e escrita contra uma DOC, nao contra um COMPORTAMENTO (behavior-over-declaration). ORDEM: (1) deployar WAHA + 1 sendText real = O GATILHO; (2) medir as 2 degradacoes do wwebjs; (3) so entao escrever .claude/utils/whatsapp/; (4) .env.example sem WA_TRANSPORT; (5) nomear o 1o consumidor cego"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: C_retraction_criterion
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-31
+    verified_against: escrito-antes-de-construir
+    label: "CRITERIO DE RETRACAO (escrito ANTES de construir — e o que separa isto de catedral): SE o wwebjs nao responder getSessionStatus a custo aceitavel E nao houver 1 consumidor real que precise ser cego, ENTAO o eixo passou no papel e FALHOU no contrato -> retrair para SCRIPT + env switch (WAHA ferramenta unica, whatsapp-sender legado) e esperar o 2o consumidor. 'Um adapter de UMA operacao, com um consumidor que sabe qual provider esta ativo, e cerimonia'"
+    trace: "docs/knowledge-base/concepts/onion-abstraction-doctrine.md"
+
+  # ── GAPS QUE DECIDEM ──
+  - id: Q_wwebjs_unread
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "GAP MAIS CARO: o whatsapp-sender NAO esta clonado localmente (repo privado marciocar/whatsapp-sender). Tudo sobre client.js/login.js/send.js (exit codes, o que o stdout devolve, se da p/ saber status da sessao SEM subir o Chromium) veio do PROMPT, nao de LEITURA. Isto decide se o contrato minimo tem 2 operacoes ou 1 — e alimenta o criterio de retracao"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: Q_no_consumer
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "NENHUM CONSUMIDOR REAL NOMEADO: a regra (c) do Teste do Eixo ('o consumidor precisa ser CEGO ao provider') nao tem sujeito enquanto ninguem chama getWhatsApp(). Sem 1o consumidor e abstracao sem cliente. Candidatos a NOMEAR (nao presumir): notificacao de PR/CI mergeado; alerta de queda/sessao longa na VPS (hoje ntfy); aviso do hook 'you have mail'"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: Q_maestro_ratify_names
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 1.0
+    label: "RATIFICACAO DO MAESTRO pendente em 2 pontos de nome: dominio 'whatsapp' vs 'messaging'; env prefix 'WA_' vs 'WHATSAPP_'. Ambos com justificativa verificada (ver D_domain_whatsapp_not_messaging), mas nome e ato do maestro"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+edges:
+  - from: E_waha_current
+    to: D_interface_v01
+    edge_type: SUPPORTS
+  - from: E_waha_current
+    to: D_domain_whatsapp_not_messaging
+    edge_type: SUPPORTS
+  - from: D_dogfood_before_sdaal
+    to: D_interface_v01
+    edge_type: CAUSES
+  - from: C_retraction_criterion
+    to: D_dogfood_before_sdaal
+    edge_type: SUPPORTS
+  - from: Q_wwebjs_unread
+    to: C_retraction_criterion
+    edge_type: SUPPORTS
+  - from: Q_no_consumer
+    to: C_retraction_criterion
+    edge_type: SUPPORTS
+  - from: C_waha_plus_contradiction
+    to: E_waha_current
+    edge_type: SUPPORTS
+  - from: C_engine_weight_hypothesis
+    to: D_dogfood_before_sdaal
+    edge_type: SUPPORTS
+  - from: D_no_wa_transport
+    to: D_interface_v01
+    edge_type: SUPPORTS
+  - from: Q_maestro_ratify_names
+    to: D_domain_whatsapp_not_messaging
+    edge_type: SUPPORTS
