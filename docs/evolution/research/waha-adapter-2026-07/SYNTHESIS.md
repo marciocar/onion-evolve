@@ -10,6 +10,37 @@ kg: docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
 
 # WAHA + a forma do adapter WhatsApp — síntese F1
 
+> ## ⚑ CORREÇÃO 2026-07-31 (ratificada pelo maestro — SUPERSEDE a nomenclatura abaixo)
+>
+> Esta síntese recomendou domínio **`whatsapp`** (não `messaging`) e prefix `WA_`. **Estava errada** —
+> foi produzida **sem** o ADR canônico [`onion-adr-sdaal-nested-two-level-2026-07.md`](../../../analysis/onion-adr-sdaal-nested-two-level-2026-07.md)
+> em contexto (falha de aterramento da orquestração: os workers foram apontados a `task-manager`/`forge`/
+> `integrations.md`, não ao ADR). A pergunta do maestro pegou a defasagem.
+>
+> **O correto (ADR 2026-07-17, `accepted`):** **SDAAL aninhado de 2 níveis — canal → solução.**
+> **Nível-1 = CANAL** (`messaging`: whatsapp/sms/email/push) · **Nível-2 = SOLUÇÃO** (whatsapp → waha/web-js/cloud-api).
+> Teste do Eixo é **recursivo** ("aninhar não relaxa o gate — multiplica-o"); canal→solução é **faceta** (escolhe-1);
+> default de solução é **por canal**, declarado; fallback nos **dois** eixos. Validado por mercado (Novu/Knock).
+>
+> **Convenção de env ratificada** (recursiva, deriva da convenção viva `<DOMAIN>_PROVIDER`):
+> `<CAMINHO>_PROVIDER` **seleciona** em cada nível · `<CAMINHO>_<SOLUÇÃO>_<CONFIG>` **configura**.
+> ```
+> MESSAGING_PROVIDER=whatsapp|ntfy|email
+> MESSAGING_WHATSAPP_PROVIDER=waha|web-js
+> MESSAGING_WHATSAPP_WAHA_BASE_URL / _API_KEY
+> ```
+> Diretórios espelham: `.claude/utils/messaging/` → `adapters/whatsapp.md`, que é sub-SDAAL em `messaging/whatsapp/`.
+> **Bônus:** resolve melhor que o `WA_` a colisão real (o WAHA consome `WHATSAPP_HOOK_*` como config **do container**).
+>
+> **2ª correção ratificada:** o **`whatsapp-sender` é a APLICAÇÃO (consumidor)**; WAHA e whatsapp-web.js são os
+> **meios** (soluções de nível-2). Isso **resolve o gap mais caro** ("nenhum consumidor real nomeado") — a régua (c)
+> do Eixo ganha sujeito — e o trabalho vira **refatorar o sender para chamar a abstração** (hoje ele importa a lib
+> direto = anti-padrão #2). **Metade do critério de retração abaixo já caiu**; resta só a degradação do `getSessionStatus`.
+>
+> **Ganho de ordem:** o gatilho do **nível-1** já está quase completo — `ntfy` (push) **já existe** ad-hoc em
+> `mail-receiver.sh`; subir o WAHA dispara os **dois** níveis de uma vez.
+
+
 > **Projeção do grafo.** SSOT: [`waha-adapter-2026-07.kg.yaml`](./waha-adapter-2026-07.kg.yaml).
 > Contexto: F1 da investigação de ferramentas VPS (catálogo — ver
 > [`vps-shared-tools-2026-07.kg.yaml`](../../../onion/graph/vps-shared-tools-2026-07.kg.yaml)).

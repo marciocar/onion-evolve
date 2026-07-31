@@ -49,7 +49,7 @@ nodes:
   - id: D_domain_whatsapp_not_messaging
     node_type: decision
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 3
     confidence: 0.85
     verified_at: 2026-07-31
@@ -99,7 +99,7 @@ nodes:
     confidence: 0.85
     verified_at: 2026-07-31
     verified_against: escrito-antes-de-construir
-    label: "CRITERIO DE RETRACAO (escrito ANTES de construir — e o que separa isto de catedral): SE o wwebjs nao responder getSessionStatus a custo aceitavel E nao houver 1 consumidor real que precise ser cego, ENTAO o eixo passou no papel e FALHOU no contrato -> retrair para SCRIPT + env switch (WAHA ferramenta unica, whatsapp-sender legado) e esperar o 2o consumidor. 'Um adapter de UMA operacao, com um consumidor que sabe qual provider esta ativo, e cerimonia'"
+    label: "CRITERIO DE RETRACAO (escrito ANTES de construir — e o que separa isto de catedral) — ATUALIZADO 2026-07-31: a 2a condicao CAIU (o consumidor existe e foi nomeado: o whatsapp-sender, ver D_sender_is_consumer). Resta SO a 1a: SE o wwebjs nao responder getSessionStatus a custo aceitavel [E nao houver consumidor cego — CONDICAO JA RESOLVIDA], ENTAO o eixo passou no papel e FALHOU no contrato -> retrair para SCRIPT + env switch (WAHA ferramenta unica, whatsapp-sender legado) e esperar o 2o consumidor. 'Um adapter de UMA operacao, com um consumidor que sabe qual provider esta ativo, e cerimonia'"
     trace: "docs/knowledge-base/concepts/onion-abstraction-doctrine.md"
 
   # ── GAPS QUE DECIDEM ──
@@ -128,6 +128,40 @@ nodes:
     impact: 2
     confidence: 1.0
     label: "RATIFICACAO DO MAESTRO pendente em 2 pontos de nome: dominio 'whatsapp' vs 'messaging'; env prefix 'WA_' vs 'WHATSAPP_'. Ambos com justificativa verificada (ver D_domain_whatsapp_not_messaging), mas nome e ato do maestro"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  # ── CORREÇÃO 2026-07-31: o ADR de aninhamento SUPERSEDE a nomenclatura da F1 ──
+  - id: E_adr_nested_two_level
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-31
+    verified_against: leitura-do-ADR-onion-adr-sdaal-nested-two-level-2026-07
+    label: "EXISTE ADR CANONICO (2026-07-17, accepted, nascido de pedido do maestro): 'SDAAL aninhado de 2 niveis (canal -> solucao)'. NIVEL-1 = CANAL (whatsapp/sms/email/push); NIVEL-2 = SOLUCAO dentro do canal (whatsapp -> waha/cloud-api). 5 regras: Teste do Eixo RECURSIVO (cada nivel passa por si; 'aninhar nao relaxa o gate, multiplica-o'); canal->solucao e FACETA (escolhe-1), nao escopo; adapter de nivel-1 e o CANAL; default de solucao e POR CANAL declarado; fallback nos DOIS eixos independentes. Validado por mercado (Novu/Knock modelam channel->provider). Gatilho do nivel-1 JA quase pronto: ntfy (push, ad-hoc em mail-receiver.sh) + whatsapp (WAHA)"
+    trace: "docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md"
+
+  - id: D_naming_messaging_nested
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-07-31
+    verified_against: ADR-aninhado-mais-ratificacao-do-maestro
+    label: "CORRECAO RATIFICADA: dominio = 'messaging' com aninhamento, NAO 'whatsapp' plano. A F1 recomendou 'whatsapp' por NAO ter o ADR de aninhamento em contexto (falha de aterramento da orquestracao — os workers foram apontados a task-manager/forge/integrations, nao ao ADR). CONVENCAO DE ENV recursiva (deriva da convencao viva <DOMAIN>_PROVIDER): '<CAMINHO>_PROVIDER' SELECIONA em cada nivel e '<CAMINHO>_<SOLUCAO>_<CONFIG>' CONFIGURA — MESSAGING_PROVIDER=whatsapp|ntfy|email · MESSAGING_WHATSAPP_PROVIDER=waha|web-js · MESSAGING_WHATSAPP_WAHA_BASE_URL/API_KEY · MESSAGING_EMAIL_PROVIDER=smtp|resend. Diretorios espelham: .claude/utils/messaging/ -> adapters/whatsapp.md que e sub-SDAAL em messaging/whatsapp/. BONUS: resolve MELHOR que o WA_ proposto a colisao real (o WAHA consome WHATSAPP_HOOK_* como config DO CONTAINER; com MESSAGING_ nao ha colisao)"
+    trace: "docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md"
+
+  - id: D_sender_is_consumer
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: ratificacao-do-maestro
+    label: "CORRECAO RATIFICADA: o whatsapp-sender e a APLICACAO (consumidor), WAHA e whatsapp-web.js sao os MEIOS (solucoes de nivel-2). RESOLVE O GAP MAIS CARO da F1 ('nenhum consumidor real nomeado') — a regra (c) do Teste do Eixo (consumidor CEGO ao provider) ganha sujeito. TRABALHO: refatorar o whatsapp-sender p/ chamar a abstracao em vez de importar whatsapp-web.js direto (hoje e literalmente o anti-padrao #2, provider hardcoded no consumidor). ENFRAQUECE o criterio de retracao da F1, que exigia 'consumidor real cego' — agora tem"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
 
 edges:
@@ -161,3 +195,12 @@ edges:
   - from: Q_maestro_ratify_names
     to: D_domain_whatsapp_not_messaging
     edge_type: SUPPORTS
+  - from: D_naming_messaging_nested
+    to: D_domain_whatsapp_not_messaging
+    edge_type: SUPERSEDES
+  - from: E_adr_nested_two_level
+    to: D_naming_messaging_nested
+    edge_type: SUPPORTS
+  - from: D_sender_is_consumer
+    to: Q_no_consumer
+    edge_type: SUPERSEDES
