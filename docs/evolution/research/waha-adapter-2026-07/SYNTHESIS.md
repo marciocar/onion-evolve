@@ -67,6 +67,29 @@ houver 1 consumidor real que precise ser cego → o eixo **passou no papel e fal
 retrair para **script + env switch** (WAHA como ferramenta única; `whatsapp-sender` legado) e esperar o
 2º consumidor. *Um adapter de uma operação, com um consumidor que sabe qual provider está ativo, é cerimônia.*
 
+## 🐕 Dogfood LOCAL executado (2026-07-31) — comportamento, não doc
+
+Rodei o WAHA de verdade (`docker run` + `curl` contra a API viva). **Três achados que só o comportamento dá:**
+
+| Verificação | Resultado |
+|---|---|
+| `docker pull devlikeapro/waha` **sem login** | ✅ **funciona** → a contradição do README ("Plus" + `docker login`) é **doc velha**. Claim `C_waha_plus_contradiction` **refutada por comportamento** |
+| Tamanho da imagem | ⚠️ **4.1 GB** — dado **novo e material** para a KVM8 |
+| Auth `X-Api-Key` | ✅ sem key → **401**; com key → **200** |
+| `POST /api/sessions {name,start:true}` | ✅ → `status: STARTING`, `engine: NOWEB` |
+| `GET /api/sessions/default` | ✅ → **`SCAN_QR_CODE`** (o enum real) |
+| `GET /api/{s}/auth/qr` | ✅ → **200 `image/png`, 5418 bytes** (QR real) |
+| **Engine — a hypothesis virou número** | **NOWEB 420.7 MiB** × **WEBJS 788.8 MiB** → WEBJS é **~1,9× mais pesado** |
+
+**Decide o engine default = `NOWEB`** (KVM8 tem RAM finita). **Efeito colateral que fortalece o design:** com NOWEB,
+o WAHA **não** compartilha mecanismo com o `whatsapp-web.js` (browser-based) — o argumento de **isolamento** do
+default WAHA se sustenta, e os dois providers são **genuinamente diferentes em ambiente** (régua (b) do Eixo).
+
+> **⛔ Bloqueio medido (o que NÃO é desta sessão):** `ssh` com `id_ed25519` **e** com `onion_vps_deploy`
+> (comentário `onion-kvm8(srv1812846)-deploy-2026-07-08`), usuários `onion`/`marcio`/`root` → **todos
+> "Permission denied (publickey)"**; o alias `onion-kvm8` não resolve. Logo **o deploy em produção e o
+> pareamento do número (QR) são atos do maestro**. O dogfood local cobriu tudo que não exige a VPS nem o telefone.
+
 ## WAHA — estado current (web-verificado, fontes primárias)
 
 | Fato | Status |

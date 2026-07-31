@@ -28,7 +28,7 @@ nodes:
   - id: C_waha_plus_contradiction
     node_type: claim
     plane: PROD
-    status: open
+    status: refuted
     impact: 2
     confidence: 0.85
     verified_at: 2026-07-31
@@ -39,7 +39,7 @@ nodes:
   - id: C_engine_weight_hypothesis
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
     impact: 2
     confidence: 0.4
     label: "HYPOTHESIS (nao verificado): 'NOWEB/GOWS sao mais leves que WEBJS'. Importa material — a KVM8 tem RAM finita e WEBJS carrega browser. Escolher engine default por MEDICAO no deploy, nunca por presuncao. NOTA: se o default for WEBJS, WAHA e whatsapp-web.js compartilham o MESMO mecanismo por baixo — reforca intercambialidade, ENFRAQUECE o argumento de isolamento de recursos"
@@ -164,9 +164,55 @@ nodes:
     label: "CORRECAO RATIFICADA: o whatsapp-sender e a APLICACAO (consumidor), WAHA e whatsapp-web.js sao os MEIOS (solucoes de nivel-2). RESOLVE O GAP MAIS CARO da F1 ('nenhum consumidor real nomeado') — a regra (c) do Teste do Eixo (consumidor CEGO ao provider) ganha sujeito. TRABALHO: refatorar o whatsapp-sender p/ chamar a abstracao em vez de importar whatsapp-web.js direto (hoje e literalmente o anti-padrao #2, provider hardcoded no consumidor). ENFRAQUECE o criterio de retracao da F1, que exigia 'consumidor real cego' — agora tem"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
 
+  # ── GATILHO PARCIAL 2026-07-31: dogfood LOCAL do WAHA (comportamento medido, não doc lida) ──
+  - id: E_dogfood_local_waha
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-07-31
+    verified_against: docker-run-local-curl-contra-a-API-viva
+    label: "DOGFOOD LOCAL EXECUTADO (comportamento, nao doc): 'docker pull devlikeapro/waha' funciona SEM LOGIN -> a contradicao do README ('Plus' + docker login) e DOC VELHA, RESOLVIDA por comportamento. Imagem = 4.1GB (dado NOVO e material p/ a KVM8). API confirmada viva: sem X-Api-Key -> 401; com key -> 200. POST /api/sessions {name,start:true} -> status STARTING; GET /api/sessions/default -> SCAN_QR_CODE (enum real); GET /api/{s}/auth/qr -> 200 image/png 5418 bytes (QR real). Fluxo da doc bate 1:1 com o vivo"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: E_engine_measured
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-07-31
+    verified_against: docker-stats-dois-containers-sessao-iniciada
+    label: "ENGINE MEDIDO (a hypothesis virou numero): NOWEB = 420.7 MiB · WEBJS = 788.8 MiB, ambos com sessao iniciada aguardando QR -> WEBJS e ~1.9x mais pesado. DECIDE o engine default = NOWEB p/ a KVM8 (RAM finita). Consequencia colateral: com NOWEB o WAHA NAO compartilha mecanismo com o whatsapp-web.js (que e browser-based) — o argumento de ISOLAMENTO do default WAHA se sustenta, e os dois providers sao genuinamente diferentes em ambiente"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: Q_vps_access_blocked
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-07-31
+    verified_against: ssh-permission-denied-2-chaves-3-usuarios
+    label: "BLOQUEIO MEDIDO: esta sessao NAO tem acesso a VPS. ssh com id_ed25519 E com onion_vps_deploy (comentario 'onion-kvm8(srv1812846)-deploy-2026-07-08'), usuarios onion/marcio/root -> todos 'Permission denied (publickey)'. O alias 'onion-kvm8' nao resolve; bridge.onionevolve.com NAO resolve daqui (auth./onionevolve.com resolvem -> 179.197.65.94). Logo o deploy em PRODUCAO e o pareamento do numero (QR) sao atos do MAESTRO, nao desta sessao. O dogfood local cobriu tudo que nao exige a VPS nem o telefone"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
 edges:
   - from: E_waha_current
     to: D_interface_v01
+    edge_type: SUPPORTS
+  - from: E_dogfood_local_waha
+    to: E_waha_current
+    edge_type: SUPPORTS
+  - from: E_dogfood_local_waha
+    to: C_waha_plus_contradiction
+    edge_type: REFUTES
+  - from: E_engine_measured
+    to: C_engine_weight_hypothesis
+    edge_type: SUPERSEDES
+  - from: Q_vps_access_blocked
+    to: D_dogfood_before_sdaal
     edge_type: SUPPORTS
   - from: E_waha_current
     to: D_domain_whatsapp_not_messaging
