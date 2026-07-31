@@ -83,11 +83,140 @@ nodes:
   - id: Q_INDEX_VS_DSL
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 1.0
-    label: "o /meta:guardrails e um INDICE-DE-LEITURA (aponta pros gates/KB que ja rodam) ou uma DSL (linguagem p/ definir guardrails)? — o gate que trava a superficie; precisa da decisao do maestro"
+    label: "o /meta:guardrails e um INDICE-DE-LEITURA (aponta pros gates/KB que ja rodam) ou uma DSL (linguagem p/ definir guardrails)? — RESOLVIDO PELA EVIDENCIA via Elenxo orquestrado (wf_15cebeba-773): indice fortificado. DSL/hibrido nao sobrevivem hoje"
+    trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+
+  # ── ELENXO 2026-07-31 (wf_15cebeba-773): resolucao de Q_INDEX_VS_DSL ──
+  - id: D_INDEX_FORTIFIED
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: elenxo-3-steelman-6-refutacao-1-sintese
+    label: "VEREDITO: /meta:guardrails = INDICE-DE-LEITURA fortificado (lente-viva, so-leitura), NAO DSL nem hibrido. 3 propriedades nao-negociaveis: (1) lente-viva por grep AO VIVO contra os gates reais (CONFIRMADO/DIVERGENTE), nunca espelho da taxonomia-snapshot; (2) codigo proprio = so a ESTRUTURA que um grep unico nao da (join reverso arquivo->categorias + resolucao canal C1/C2/C3->R15); (3) toda linha RE-PROVADA no call-time, zero veredito PASS/FAIL novo. Restricao: o re-grep de verificacao E o mesmo do gate anti-drift da Fase 1 — UM mecanismo, nao dois. Promocao a comando GANHA por dogfood (senao: helper/companheira-de-KB)"
+    trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+
+  - id: E_DSL_REFUTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-31
+    verified_against: refutacao-adversarial-2-lentes-opus
+    label: "DSL REFUTADA nas 2 lentes: inverte estrutural>gated (move logica de decisao do gate — verbos hardcoded no .sh selftestado — p/ dado de config fora da superficie testada); so sobrevive com condicoes que NAO valem hoje (effect-gate em quarentena nao-wired; N=0 demanda de campo; sua evidencia-ancora descreve ERRADO o artefato vivo — e whitelist INTAKE/EXECUTION deny-by-default JA em bash). Deferida, nao proposicao viva"
+    trace: "docs/knowledge-base/concepts/onion-guardrails.md"
+
+  - id: E_HYBRID_REFUTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: refutacao-adversarial-doutrina-conf-alta
+    label: "HIBRIDO REFUTADO conf ALTA (doutrina): a Fase B (compilador) repousa em transferencia FALSA — a catraca REGRA 42 NAO e 'declaracao compila p/ gate', e dado TIPADO consumido por runner FIXO escrito a mao (zero codegen). Fase B so sobrevive colapsando ate deixar de ser DSL/compilador — e ai DISSOLVE no indice. Seu custo confessa: compilador exige disciplina de revisor a cada PR (o anti-padrao que a discussao mata)"
     trace: "docs/discussions/guardrails-nemo-lens/promotion-plan.md"
+
+  - id: E_INDEX_LIVE_LENS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-31
+    verified_against: lint-artifacts-em-REGRA-48-vs-taxonomia-148-vetos-14-cat
+    label: "INDICE tambem refutado (espelho-de-snapshot cai): a taxonomy-onion-r.md e snapshot 2026-07-12 de 148 vetos/14 categorias, mas o lint JA esta em REGRA 48 (~20 regras nasceram depois, sem categorizar) — o snapshot JA DRIFTOU. MAS as condicoes de sobrevivencia CONVERGEM e ELEVAM: espelho->lente-viva (grep ao vivo). DSL e hibrido tambem terminam em 'indice agora + autoria deferida'"
+    trace: ".claude/validation/lint-rules.md"
+
+  - id: Q_AUTHORING_TRIGGER
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "EIXO 2 (a UNICA escolha genuina do maestro, gated): o GATILHO p/ reabrir autoria/DSL algum dia — (a) FECHADA ate demanda de campo concreta (>=N guardrails recorrentes de adotantes reais que nao sejam append a INTAKE/EXECUTION nem .sh fresco), re-derivada FRESCA entao; OU (b) sancionar um scaffold-generator (stub .sh editavel + fixture selftest sob /engineer:plan, estilo create-command, JAMAIS compilador runtime). Evidencia que decide: quantos adotantes pediram autoria — hoje ZERO"
+    trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+
+  # ── SPIKE 2026-07-31 (dogfood da promessa "promocao ganha por dogfood") ──
+  - id: E_SPIKE_THIN
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: spike-grep-vivo-vs-lente-em-task.md-e-canal-C2
+    label: "SPIKE refuta o 'construir': (1) FORWARD categoria->vetos = grep que o maestro JA tem; lente-viva so sobrepoe o lint. (2) CANAL-RESOLUCAO carrega peso MAS a resposta JA vive na KB §4.1/4.2 (tabela curada) — nao precisa de comando. (3) JOIN-REVERSO (arquivo->categorias que governam) responde pergunta real que grep e --only NAO respondem, MAS nao ha escopo machine-readable por guarda (vive espalhado em _find roots/case-globs) -> hand-curar tabela DRIFTA (a ironia que mata a doutrina) ou instrumentar 48 guardas (churn, decisao maior). Nenhuma das 3 pecas ganha um comando /meta: hoje"
+    trace: ".claude/validation/lint-artifacts.sh"
+
+  - id: D_NO_COMMAND
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-07-31
+    verified_against: spike-behavior-over-declaration
+    label: "VEREDITO PÓS-SPIKE: NAO construir /meta:guardrails como comando — nao se paga hoje. Os guardrails JA rodam (48 gates + selftest) e JA sao navegaveis (grep + taxonomia-KB + tabela-canal §4.1/4.2). Fecha fio #4 como resolvido-sem-comando; reabrir so na demanda de autoria. O unico gap real (join-reverso) fica DEFERIDO atras de uma decisao maior: escopo self-declarado machine-readable pelas guardas. Behavior-over-declaration: a promessa 'ganha por dogfood' rodou o dogfood e nao ganhou"
+    trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+
+  - id: Q_REVERSE_JOIN_SCOPE
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 1.0
+    label: "GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar escopo machine-readable (ex.: campo # scope: por guarda, consumido por um resolver). E uma decisao de mecanismo maior, gated na demanda real (hoje: hipotetica, N=0 pediu). NAO pre-cozinhar"
+    trace: ".claude/validation/lint-artifacts.sh"
+
+  # ── AUTORIA DE GUARDRAIL PELO USUARIO 2026-07-31 (demanda do maestro: guardrail a frente de agente/skill) ──
+  - id: Q_AUTHORING_RESOLVED
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "'usuario pode construir guardrail a frente de agente/skill (tema/palavras/escopo)?' — RESOLVIDO: sim para palavras/escopo (determinístico), soft-so para tema, e a REGRA e pull-not-push (ver D_GUARDRAIL_PULL_NOT_PUSH). Demanda concreta: Gustavo P7 + maestro (N>=2), NAO N=0"
+    trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+
+  - id: D_GUARDRAIL_PULL_NOT_PUSH
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: substrato-verificado-projection-safety+hooks+guia-claude-code
+    label: "REGRA: autoria de guardrail se PUXA por caso concreto recorrente, nunca se EMPURRA por hipotese. (1) O primitivo determinístico JA EXISTE e funciona: projection-safety.sh --terms (adotante declara os proprios termos -> gate exit-1, fail-loud P0-P5), dogfoodado no Gustavo P7. NAO construir camada. (2) Caso concreto aparece -> fiar A MAO ~15min (PostToolUse/UserPromptSubmit -> tmp -> projection-safety --terms), fresco e descartavel. (3) O scaffold /meta:create-guardrail so se paga apos o MESMO padrao ser fiado a mao 2-3x (boilerplate vira peso morto). (4) NUNCA construir por padrao: gate de TEMA (determinístico impossivel -> soft-only, invariante #3) nem gate por-agente no INPUT (tool_input carregar o prompt do subagente e NAO-verificado -> Fase-0 teste empirico e o gate). behavior-over-declaration + gated-work-derives-fresh: nao ficar preso em camada que nao funciona/ineficiente/ineficaz"
+    trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+
+  - id: E_PRIMITIVE_EXISTS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-31
+    verified_against: projection-safety.sh-linha-74-run_audit-e-KG-relay-gustavo-P7
+    label: "O mecanismo efetivo JA EXISTE: projection-safety.sh audita artefato ARBITRARIO (path posicional) contra termos DECLARADOS pelo adotante (--terms), exit 1 no vazamento, disciplina fail-loud P0-P5 (lista vazia=falha, nunca verde-falso). Shipado + dogfoodado (Gustavo Produto 7 = gate client-safe: adotante declara proprios nomes de cliente, gateia artefato antes de cruzar a fronteira). Nenhuma engine/DSL nova necessaria"
+    trace: ".claude/validation/projection-safety.sh"
+
+  - id: E_HOOK_SUBSTRATE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-07-31
+    verified_against: guia-claude-code-hooks-oficial
+    label: "Substrato de hook verificado (guia Claude Code): UserPromptSubmit ve o prompt e BLOQUEIA (exit 2) = gate de input nivel-sessao; PostToolUse ve/bloqueia OUTPUT = o analogo EXATO do gate-de-artefato do Gustavo; PreToolUse matcher Agent/Skill bloqueia por NOME. INCERTO (nao-documentado): tool_input carregar o texto do prompt que vai ao subagente -> o gate por-agente no input pede teste empirico. TEMA semantico so soft (invariante #3 proibe classificador no caminho critico)"
+    trace: ".claude/settings.json"
 
 edges:
   - from: E_WIRE_IN_DONE_PR452
@@ -111,3 +240,51 @@ edges:
   - from: Q_INDEX_VS_DSL
     to: C_SURFACE_REMAINS_GATED
     edge_type: CAUSES
+  # ── Elenxo 2026-07-31: resolucao ──
+  - from: D_INDEX_FORTIFIED
+    to: Q_INDEX_VS_DSL
+    edge_type: SUPERSEDES
+  - from: E_DSL_REFUTED
+    to: D_INDEX_FORTIFIED
+    edge_type: SUPPORTS
+  - from: E_HYBRID_REFUTED
+    to: D_INDEX_FORTIFIED
+    edge_type: SUPPORTS
+  - from: E_INDEX_LIVE_LENS
+    to: D_INDEX_FORTIFIED
+    edge_type: SUPPORTS
+  - from: D_INDEX_FORTIFIED
+    to: C_SURFACE_REMAINS_GATED
+    edge_type: SUPPORTS
+  - from: D_INDEX_FORTIFIED
+    to: Q_AUTHORING_TRIGGER
+    edge_type: CAUSES
+  # ── Spike 2026-07-31: a evidencia refina "construir o indice" -> "nao construir comando" ──
+  - from: E_SPIKE_THIN
+    to: D_NO_COMMAND
+    edge_type: SUPPORTS
+  - from: D_NO_COMMAND
+    to: D_INDEX_FORTIFIED
+    edge_type: SUPERSEDES
+  - from: D_NO_COMMAND
+    to: C_SURFACE_REMAINS_GATED
+    edge_type: SUPERSEDES
+  - from: D_NO_COMMAND
+    to: Q_REVERSE_JOIN_SCOPE
+    edge_type: CAUSES
+  # ── Autoria pull-not-push 2026-07-31 ──
+  - from: E_PRIMITIVE_EXISTS
+    to: D_GUARDRAIL_PULL_NOT_PUSH
+    edge_type: SUPPORTS
+  - from: E_HOOK_SUBSTRATE
+    to: D_GUARDRAIL_PULL_NOT_PUSH
+    edge_type: SUPPORTS
+  - from: D_GUARDRAIL_PULL_NOT_PUSH
+    to: Q_AUTHORING_TRIGGER
+    edge_type: SUPERSEDES
+  - from: D_GUARDRAIL_PULL_NOT_PUSH
+    to: Q_AUTHORING_RESOLVED
+    edge_type: SUPERSEDES
+  - from: E_PRIMITIVE_EXISTS
+    to: E_DSL_REFUTED
+    edge_type: SUPPORTS
