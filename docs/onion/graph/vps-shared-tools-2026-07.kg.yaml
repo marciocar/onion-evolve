@@ -168,6 +168,67 @@ nodes:
     label: "ESTRUTURA DE ANALISE INICIAL (4 fases, antes do plano): F0 frame+invariantes+Elenxo catalogo-vs-plataforma · F1 pesquisa por-tool documentada born-in-KG (verify-external) · F2 arquitetura cross-tool (SDAAL/bridge/Logto-spine) · F3 Elenxo por-decisao-real → F4 sintese que DERIVA a doutrina + o plano faseado gated"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
+  # ── F0 EXECUTADO 2026-07-31 (Elenxo de framing wf_8a8eca55 + classificacao Teste-do-Eixo) ──
+  - id: D_framing_catalogo
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: elenxo-framing-2-steelman-1-juiz-opus
+    label: "VEREDITO F0: o conjunto e CATALOGO (nao plataforma; HIBRIDO recusado — reservaria vaga pro dead-layer com folha-de-figueira build-gated). E a soma de N adapters individualmente justificados por demanda (pull-not-push): cada tool = 1 SDAAL se passa o Teste-do-Eixo, senao 1 script-gated, atras do bridge, roteado por .env como task-manager/forge. NAO E: zero backend/registry/UI propria; members.yaml=unica fonte de identidade; NENHUMA visao agregada/cross-tool e pre-autorizada (qualquer painel composto e capacidade NOVA sujeita ao proprio pull-not-push). Precedente vivo decisivo: task-manager+forge ja escalam 1->N sem registry central"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  - id: C_dissent_auth_transversal
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-07-31
+    verified_against: dissent-do-juiz-elenxo
+    label: "DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como dado. O catalogo-puro trata Logto como 'so mais uma entrada' e nao tem lar limpo p/ 'auth e o chao comum'. SE a divida de integracao ponto-a-ponto se acumular, o catalogo pode pagar MAIS que uma fina camada de auth compartilhada. NAO vira o veredito: (a) Logto=projecao de members.yaml ja da lar doutrinario (nao camada nova); (b) a cura, se morder, e UMA composicao de auth-compartilhada PUXADA pela propria demanda — ainda catalogo-nativa, pull-driven, nunca plataforma preemptiva"
+    trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
+
+  - id: C_axis_whatsapp
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: teste-do-eixo-2-providers-reais
+    label: "TESTE-DO-EIXO whatsapp: whatsapp-web.js (shipped) + WAHA (a adicionar) = 2 providers reais intercambiaveis -> SDAAL QUALIFICA (dominio comms/messaging), WAHA default. Unica tool com SDAAL imediato"
+    trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
+
+  - id: C_axis_email
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "TESTE-DO-EIXO email: SMTP self-host x API transacional (Resend/Postmark/SES) — SDAAL-CANDIDATO se >=2 reais intencionados; hoje provavelmente 1 -> script-gated no 2o. Conector do Logto e concern SEPARADO (config do proprio Logto). Decidir na F1"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  - id: C_axis_monitoring
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "TESTE-DO-EIXO monitoramento: DIVIDE em (a) obs-de-MAQUINA (PM2/OTel/Prometheus) = contratos DISTINTOS nao-intercambiaveis -> STACK, NAO SDAAL unico; (b) obs-de-IA/tokens (Langfuse/Phoenix/Helicone) = LLM-obs intercambiavel -> SDAAL-candidato se >=2 reais. Decidir por sub-dimensao na F1"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  - id: C_axis_tunneling
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de provider (dev-preview? webhook inbound? adotante-sem-servidor via downstream-by-pull?). Se 1 real intencionado -> script-gated. Caso-de-uso decide na F1"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
 edges:
   - from: ENT_logto
     to: ENT_substrate
@@ -200,5 +261,24 @@ edges:
     to: ENT_monitoring
     edge_type: SUPPORTS
   - from: Q_tunneling
+    to: ENT_tunneling
+    edge_type: SUPPORTS
+  # ── F0 executado 2026-07-31 ──
+  - from: D_framing_catalogo
+    to: Q_catalog_vs_platform
+    edge_type: SUPERSEDES
+  - from: D_framing_catalogo
+    to: C_dissent_auth_transversal
+    edge_type: CAUSES
+  - from: C_axis_whatsapp
+    to: ENT_whatsapp
+    edge_type: SUPPORTS
+  - from: C_axis_email
+    to: ENT_email
+    edge_type: SUPPORTS
+  - from: C_axis_monitoring
+    to: ENT_monitoring
+    edge_type: SUPPORTS
+  - from: C_axis_tunneling
     to: ENT_tunneling
     edge_type: SUPPORTS
