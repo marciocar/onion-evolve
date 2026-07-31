@@ -1,0 +1,204 @@
+meta:
+  id: vps-shared-tools-2026-07
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-07-31
+  date: 2026-07-31
+  note: >
+    SEED de investigação (born-in-KG): catálogo de FERRAMENTAS COMPARTILHADAS na VPS,
+    usáveis por membros da federação E pelo Onion, + a DOUTRINA a derivar. Materializa o
+    gather 2026-07-31 (auth/Logto maduro; whatsapp-sender shipped; email=gap; monitoramento/
+    ngrok=candidatos) + as direções do maestro. Ainda é ANÁLISE INICIAL — spec-now/build-gated,
+    pull-not-push. Projeção legível: docs/discussions/vps-shared-tools/SEED.md.
+
+nodes:
+  # ── SUBSTRATO (o que hospeda) ──
+  - id: ENT_substrate
+    node_type: entity
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-07-31
+    verified_against: federation-roadmap+VPS-vivo
+    label: "SUBSTRATO VIVO: Hostinger KVM8 (srv1812846) + Caddy (reverse proxy) + onion-bridge (Node/Agent SDK) + Logto. Dominios: auth./bridge./app.onionevolve.com. Doutrina do roadmap: reuso-nao-invencao"
+    trace: "docs/evolution/federation-roadmap-2026.md"
+
+  # ── TOOL 1: AUTH/IDENTIDADE (maduro) ──
+  - id: ENT_logto
+    node_type: entity
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-31
+    verified_against: m2-bridge-logto-KG+flip-P7
+    label: "AUTH/IDENTIDADE: Logto self-hosted 1.41.0 VIVO (OIDC/JWT+JWKS), flip P7 executado (AUTH_TOKEN->OIDC), gate duplo humano-PKCE/servico-M2M. members.yaml=SSOT, Logto=PROJECAO. Federation-admin spec-now/build-gated. GAP: sign-up default aberto (P3.4)"
+    trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
+
+  # ── TOOL 2: WHATSAPP ──
+  - id: ENT_whatsapp
+    node_type: entity
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: research-whatsapp-api+whatsapp-sender-vivo
+    label: "WHATSAPP: whatsapp-sender VIVO (~onion/whatsapp-sender, whatsapp-web.js nao-oficial, repo privado). Pesquisa research/whatsapp-api-2026-07 decide eixo oficial×nao-oficial (regulado->Cloud API; dogfood->WAHA>Evolution)"
+    trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
+
+  # ── TOOL 3: EMAIL (gap) ──
+  - id: ENT_email
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "EMAIL: NAO EXISTE — gap nomeado. Logto SEM conector de email travou convite por org (forcou redesenho --enroll). Servico de email na VPS destravaria convites E seria ferramenta de membro"
+    trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
+
+  # ── TOOL 4: MONITORAMENTO/OBSERVABILIDADE (candidato) ──
+  - id: ENT_monitoring
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "MONITORAMENTO/OBSERVABILIDADE: candidato, zero desenho. Maestro nomeou P2 (a esclarecer — Prometheus/Posthog/Phoenix?), Langfuse (LLM observability), OpenTelemetry (traces/metrics) e afins. Exige pesquisa documentada (verify-external-for-current) + Elenxo de stack"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  # ── TOOL 5: EXPOSICAO/TUNNELING (candidato) ──
+  - id: ENT_tunneling
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "EXPOSICAO/TUNNELING: ngrok nomeado como interessante. Avaliar fit vs o Caddy ja vivo + alternativas (Cloudflare Tunnel, Tailscale Funnel). Pesquisa + Elenxo"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  # ── DIRECOES DO MAESTRO (decisoes confirmadas) ──
+  - id: D_whatsapp_dual_waha_default
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-07-31
+    verified_against: direcao-do-maestro
+    label: "DIRECAO: MANTER o whatsapp-web.js nao-oficial (whatsapp-sender) E ADICIONAR o adapter do WAHA como PADRAO. Forma SDAAL: dois adapters sob a abstracao de mensageria, WAHA default. (A pesquisa ja lastreia WAHA>Evolution p/ nao-oficial)"
+    trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
+
+  - id: D_email_plus_logto_connector
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-07-31
+    verified_against: direcao-do-maestro
+    label: "DIRECAO: construir o servico de EMAIL E LIGAR o conector de email no LOGTO (destrava convite por org, o gap medido). Um so servico serve duas bocas: ferramenta de membro + connector do Logto"
+    trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
+
+  - id: D_structured_plan_and_doctrine
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-07-31
+    verified_against: direcao-do-maestro
+    label: "DIRECAO: trazer TUDO para um PLANO ESTRUTURADO do Onion e DERIVAR dele uma DOUTRINA, usando todo o potencial do Onion — Elenxo, KG-SSOT first+runtime, pesquisas documentadas e mapeadas. CAVEAT (disciplina pull-not-push): derivar doutrina+estrutura AGORA, mas o PLANO e spec-now/build-gated por-ferramenta — nunca uma PLATAFORMA empurrada por hipotese"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  # ── QUESTOES DE PESQUISA (research-first-over-priors) ──
+  - id: Q_catalog_vs_platform
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "ELENXO DE FRAMING (fazer 1o): 'catalogo de adapters SDAAL atras do bridge, gov por doutrina' vs 'plataforma' (o anti-padrao dead-layer que o fio #4 acabou de nomear). O pull-not-push guarda: cada tool ENTRA no catalogo por demanda concreta, nao por completude"
+    trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+
+  - id: Q_p2_clarify
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 1.0
+    label: "ESCLARECER com o maestro: o que e 'P2' no monitoramento? (Prometheus? Posthog? Phoenix/Arize? Pydantic Logfire?) — nome nao resolvido; bloqueia a pesquisa de observabilidade"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  - id: Q_monitoring_stack
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    label: "PESQUISA+ELENXO: stack de observabilidade — Langfuse (LLM) × OpenTelemetry (traces/metrics padrao) × P2(?) × afins. Eixo: LLM-observability vs infra-observability vs os dois; self-host na VPS vs SaaS; custo/atrito. verify-external-for-current OBRIGATORIO (versoes/GA mudam)"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  - id: Q_email_provider
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    label: "PESQUISA: provider de email — SMTP self-host (Postfix/maddy) vs transacional (Resend/Postmark/SES) — deliverability, custo, e compatibilidade com o CONECTOR do Logto (o Logto tem lista de conectores de email suportados: cruzar)"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  - id: Q_tunneling
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 1.0
+    label: "PESQUISA+ELENXO: ngrok × Cloudflare Tunnel × Tailscale Funnel × Caddy-so. Para QUE (dev-preview? webhook inbound? exposicao efemera de adotante sem servidor?) — o caso-de-uso decide; ligar ao downstream-by-pull ja desenhado (adotante sem servidor)"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+  # ── ARTEFATO: a estrutura de analise (o que este seed entrega) ──
+  - id: A_analysis_structure
+    node_type: artifact
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "ESTRUTURA DE ANALISE INICIAL (4 fases, antes do plano): F0 frame+invariantes+Elenxo catalogo-vs-plataforma · F1 pesquisa por-tool documentada born-in-KG (verify-external) · F2 arquitetura cross-tool (SDAAL/bridge/Logto-spine) · F3 Elenxo por-decisao-real → F4 sintese que DERIVA a doutrina + o plano faseado gated"
+    trace: "docs/discussions/vps-shared-tools/SEED.md"
+
+edges:
+  - from: ENT_logto
+    to: ENT_substrate
+    edge_type: DEPENDS_ON
+  - from: ENT_whatsapp
+    to: ENT_substrate
+    edge_type: DEPENDS_ON
+  - from: ENT_email
+    to: ENT_logto
+    edge_type: SUPPORTS
+  - from: D_whatsapp_dual_waha_default
+    to: ENT_whatsapp
+    edge_type: SUPPORTS
+  - from: D_email_plus_logto_connector
+    to: ENT_email
+    edge_type: SUPPORTS
+  - from: D_email_plus_logto_connector
+    to: Q_email_provider
+    edge_type: CAUSES
+  - from: D_structured_plan_and_doctrine
+    to: A_analysis_structure
+    edge_type: CAUSES
+  - from: Q_catalog_vs_platform
+    to: A_analysis_structure
+    edge_type: SUPPORTS
+  - from: Q_p2_clarify
+    to: Q_monitoring_stack
+    edge_type: CAUSES
+  - from: Q_monitoring_stack
+    to: ENT_monitoring
+    edge_type: SUPPORTS
+  - from: Q_tunneling
+    to: ENT_tunneling
+    edge_type: SUPPORTS
