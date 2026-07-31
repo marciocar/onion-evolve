@@ -190,13 +190,47 @@ nodes:
   - id: Q_vps_access_blocked
     node_type: question
     plane: PROD
-    status: open
+    status: refuted
     impact: 4
     confidence: 1.0
     verified_at: 2026-07-31
     verified_against: ssh-permission-denied-2-chaves-3-usuarios
     label: "BLOQUEIO MEDIDO: esta sessao NAO tem acesso a VPS. ssh com id_ed25519 E com onion_vps_deploy (comentario 'onion-kvm8(srv1812846)-deploy-2026-07-08'), usuarios onion/marcio/root -> todos 'Permission denied (publickey)'. O alias 'onion-kvm8' nao resolve; bridge.onionevolve.com NAO resolve daqui (auth./onionevolve.com resolvem -> 179.197.65.94). Logo o deploy em PRODUCAO e o pareamento do numero (QR) sao atos do MAESTRO, nao desta sessao. O dogfood local cobriu tudo que nao exige a VPS nem o telefone"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  # ── CORREÇÃO 2026-07-31 (2ª): a sessão RODA NA VPS — o "sem acesso" era erro meu ──
+  - id: E_session_is_on_vps
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-07-31
+    verified_against: hostname-whoami-hostnamectl-systemctl
+    label: "REFUTA Q_vps_access_blocked: a sessao RODA NA PROPRIA VPS. hostname=srv1812846, user=marcio, Virtualization=kvm, Ubuntu 24.04.4; caddy+docker+onion-bridge ativos aqui. O ssh falhava porque 179.197.65.94 NAO e a VPS (auth./onionevolve.com resolvem p/ la, mas o host e este) — eu inferi 'maquina local' das falhas de ssh SEM antes rodar `hostname`. Licao verify-access-before-specifying aplicada ao contrario: tentei o acesso REMOTO sem checar se ja estava DENTRO. CONSEQUENCIA POSITIVA: o dogfood do WAHA foi executado NA VPS — as medicoes (NOWEB 420.7 vs WEBJS 788.8 MiB) sao representativas de PRODUCAO, nao de laptop"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: E_sender_absent_on_vps
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-07-31
+    verified_against: ls-home-onion-mais-find-whatsapp-web.js-na-vps
+    label: "ACHADO GRANDE: o whatsapp-sender NAO EXISTE MAIS na VPS. /home/onion/ contem apenas onion-bridge (+ dotfiles); find por 'whatsapp-web.js' na maquina inteira = ZERO. O parecer de 2026-07-05 dizia 'reinstalado no VPS (~onion/whatsapp-sender)' — declarado != verificado, 26 dias depois sumiu. REFUTA a premissa da F1 ('1 provider REAL rodando + 1 dirigido'): hoje ha ZERO capacidade de WhatsApp na VPS. Resolve Q_wwebjs_unread por AUSENCIA (nao ha o que ler) e muda o Teste do Eixo — com o WAHA deployado passamos a ter 1 provider real, nao 2"
+    trace: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
+
+  - id: E_waha_deployed_prod
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-07-31
+    verified_against: docker-compose-up-mais-curl-na-vps
+    label: "WAHA DEPLOYADO NA VPS (o gatilho, metade infra): /home/marcio/onion-waha/docker-compose.yml no padrao da casa (stacks em /home/marcio/<projeto>). container onion-waha, restart unless-stopped, bind 127.0.0.1:3999 (SEM superficie publica — o consumidor roda no mesmo host), engine NOWEB (decidido POR MEDICAO), volume ./sessions persistente, segredos gerados por openssl em .env com umask 077 + .gitignore. PROVAS: 401 sem X-Api-Key / 200 com; POST /api/sessions -> SCAN_QR_CODE; GET /auth/qr -> 200 png 5379 bytes; RAM em producao 412.9 MiB. FALTA SO o ato fisico do maestro: escanear o QR (parear o numero)"
+    trace: "/home/marcio/onion-waha/docker-compose.yml"
 
 edges:
   - from: E_waha_current
@@ -211,8 +245,17 @@ edges:
   - from: E_engine_measured
     to: C_engine_weight_hypothesis
     edge_type: SUPERSEDES
-  - from: Q_vps_access_blocked
+  - from: E_session_is_on_vps
+    to: Q_vps_access_blocked
+    edge_type: REFUTES
+  - from: E_sender_absent_on_vps
     to: D_dogfood_before_sdaal
+    edge_type: SUPPORTS
+  - from: E_sender_absent_on_vps
+    to: Q_wwebjs_unread
+    edge_type: SUPERSEDES
+  - from: E_waha_deployed_prod
+    to: E_dogfood_local_waha
     edge_type: SUPPORTS
   - from: E_waha_current
     to: D_domain_whatsapp_not_messaging
