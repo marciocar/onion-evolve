@@ -11,7 +11,7 @@
 # o obstáculo e é melhor pelos critérios da casa: reproduzível, auditável, versionado,
 # idempotente, sem superfície nova. Nó do KG: C_console_not_the_path.
 #
-# Uso : bash .claude/utils/bridge-auth/logto-provision.sh [--apply] [--user <username>]
+# Uso : bash ops/bridge-auth/logto-provision.sh [--apply] [--user <username>]
 #       Sem --apply é DRY-RUN: mostra o que faria e não muta nada.
 #
 # Segredos: o client_secret é lido do banco para a memória e NUNCA impresso. A senha do

@@ -5,8 +5,10 @@
  * (deploy fora deste repo). Está aqui para ser REVISÁVEL no PR — código de segurança
  * que só existe no host é código que ninguém revisa.
  *
- * Por que sem `jose`: o bridge é serviço de produção SEM rollback por git (não é repo)
- * e o `alg` é PINADO por desenho (§3.3 do spec M2), o que fecha a armadilha principal
+ * Por que sem `jose`: superfície de dependência zero num serviço de produção
+ * (medido 2026-08-01: `marciocar/onion-bridge` JÁ é repo com `main` pushado — a
+ * premissa "não é repo" que estava aqui ficou stale; corrigida para não induzir a
+ * próxima sessão a re-derivar doutrina de fato morto), e o `alg` é PINADO por desenho (§3.3 do spec M2), o que fecha a armadilha principal
  * do JWT — confusão de algoritmo. Em troca da superfície de dependência zero, cada
  * caso negativo é PROVADO contra o issuer vivo (assinatura adulterada, aud errada,
  * expirado, scope ausente, alg trocado).

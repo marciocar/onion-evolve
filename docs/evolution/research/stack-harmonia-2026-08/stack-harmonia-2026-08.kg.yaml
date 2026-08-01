@@ -145,7 +145,7 @@ nodes:
     verified_at: 2026-08-01
     verified_against: leitura-do-server.ts-do-bridge
     label: "DISSENT DE SEGURANCA (do F2-b, INCORPORADO — e corrige a propria REGRA): no MESMO processo do bridge estao /chat com CREDENCIAIS ANTHROPIC e /admin que CUNHA CONVITES. Por ali um parser de HMAC processando bytes hostis de fora significa que UM BUG NO PARSER ALCANCA A CUNHAGEM DE CONVITES. CONCESSAO ADOTADA: se a rota de webhook for construida um dia, que rode como SEGUNDO PROCESSO DO MESMO CODIGO — mesmo repo, mesmo dono, porta propria, ambiente SEM AUTH_TOKEN, SEM chave Anthropic, SEM /admin. COROLARIO QUE CORRIGE A REGRA: os 5 portoes otimizam MENOS PECAS; seguranca as vezes quer UMA PECA A MAIS que so compra ISOLAMENTO — e ai o portao de seguranca vence os 5"
-    trace: ".claude/utils/bridge-auth/bridge-src/server.ts"
+    trace: "ops/bridge-auth/bridge-src/server.ts"
 
   # ── ANTI-CATALOGO (sobreviveu inteiro) ──
   - id: D_anti_catalogo
