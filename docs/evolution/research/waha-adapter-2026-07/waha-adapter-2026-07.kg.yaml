@@ -232,6 +232,29 @@ nodes:
     label: "WAHA DEPLOYADO NA VPS (o gatilho, metade infra): /home/marcio/onion-waha/docker-compose.yml no padrao da casa (stacks em /home/marcio/<projeto>). container onion-waha, restart unless-stopped, bind 127.0.0.1:3999 (SEM superficie publica — o consumidor roda no mesmo host), engine NOWEB (decidido POR MEDICAO), volume ./sessions persistente, segredos gerados por openssl em .env com umask 077 + .gitignore. PROVAS: 401 sem X-Api-Key / 200 com; POST /api/sessions -> SCAN_QR_CODE; GET /auth/qr -> 200 png 5379 bytes; RAM em producao 412.9 MiB. FALTA SO o ato fisico do maestro: escanear o QR (parear o numero)"
     trace: "/home/marcio/onion-waha/docker-compose.yml"
 
+  # ── GATILHO FECHADO 2026-08-01: 1a mensagem REAL enviada ──
+  - id: E_gatilho_fechado
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: post-api-sendText-contra-waha-vivo-na-vps
+    label: "GATILHO FECHADO: sessao PAREADA (status WORKING, me.pushName 'Marcio Carvalho') via PAIRING CODE (nao QR) e 1a MENSAGEM REAL ENVIADA por POST /api/sendText. Resposta observada: {key:{remoteJid,fromMe:true,id:'3EB0F3FD25A3BD038FC7EE'}, messageTimestamp, status:'PENDING'}. DECIDE 2 pontos do contrato que estavam no papel: (1) o WAHA DEVOLVE key.id real -> MessageReceipt.id e preenchivel neste provider (a nullabilidade existe pelo OUTRO provider, nao por este); (2) status PENDING prova CICLO DE VIDA de entrega (webhook message.ack) -> os estados queued/sent do MessageReceipt tem lastro, nao sao invencao. OBSERVACAO A VERIFICAR: me.id voltou '555197702725@c.us' (sem o 9), mas o envio para '5551997702725@c.us' funcionou — normalizacao de numero BR e assimetrica e o adapter precisa tratar"
+    trace: "/home/marcio/onion-waha/docker-compose.yml"
+
+  - id: C_pairing_needs_primary
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: dogfood-de-campo-mais-fonte-oficial
+    label: "ACHADO DE CAMPO (custou 4 tentativas): so o aparelho PRINCIPAL pode vincular dispositivos — companheiro NAO tem o menu 'Dispositivos conectados' (confirmado em fonte: 'only the primary device can initiate the process of adding additional connected sessions'). O maestro migrou de celular e o principal antigo foi FORMATADO. Alem disso: sessao WAHA cai SCAN_QR_CODE->FAILED em ~2-3min sem pareamento, e o restart as vezes nasce FAILED (precisa stop+DELETE+create limpo). RECOMENDACAO DE DESIGN QUE NASCE DAQUI: bot NAO deve parear no numero PESSOAL do maestro — numero DEDICADO (chip separado) ou Cloud API oficial. Reforca a operacao getSessionStatus no contrato (sessao expira: primary precisa logar a cada ~14 dias)"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
 edges:
   - from: E_waha_current
     to: D_interface_v01
@@ -256,6 +279,18 @@ edges:
     edge_type: SUPERSEDES
   - from: E_waha_deployed_prod
     to: E_dogfood_local_waha
+    edge_type: SUPPORTS
+  - from: E_gatilho_fechado
+    to: E_waha_deployed_prod
+    edge_type: SUPPORTS
+  - from: E_gatilho_fechado
+    to: D_dogfood_before_sdaal
+    edge_type: SUPPORTS
+  - from: E_gatilho_fechado
+    to: D_interface_v01
+    edge_type: SUPPORTS
+  - from: C_pairing_needs_primary
+    to: E_gatilho_fechado
     edge_type: SUPPORTS
   - from: E_waha_current
     to: D_domain_whatsapp_not_messaging
