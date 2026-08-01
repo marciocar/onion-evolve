@@ -241,6 +241,14 @@ async function runQuery(
         options: {
           cwd,
           settingSources: ["project"],
+          // MODELO EXPLÍCITO (diretriz permanente do maestro: sempre latest, máximo
+          // do modelo). Sem isto o SDK usa o default dele — MEDIDO 2026-08-01 pelo
+          // próprio medidor: rodava `claude-opus-4-8`, uma geração atrás. É por env
+          // para trocar sem deploy de código quando a lineup avançar; deixar VAZIO
+          // devolve o default do SDK (escape hatch se um id novo for recusado).
+          ...(process.env.ONION_MODEL !== ""
+            ? { model: process.env.ONION_MODEL ?? "claude-opus-5" }
+            : {}),
           permissionMode: config.permissionMode,
           ...(config.permissionMode === "bypassPermissions"
             ? { allowDangerouslySkipPermissions: true }
