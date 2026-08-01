@@ -1,0 +1,118 @@
+meta:
+  id: email-logto-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-01
+  date: 2026-08-01
+  note: >
+    F1-email da investigação de ferramentas VPS: conectores do Logto 1.41, providers de email
+    transacional (preço/free-tier/webhook verificados 2026) e deliverability em VPS. Achados
+    centrais: (1) a premissa "falta de conector TRAVOU o convite" é PARCIALMENTE FALSA — o Logto
+    cria convite sem conector (messagePayload:false); (2) email é SCRIPT, não SDAAL — falha o
+    Teste do Eixo nos dois níveis; (3) o DISSENT contradiz a recomendação e invoca a régua do
+    maestro (efficiency-over-economy). Projeção: SYNTHESIS.md.
+
+nodes:
+  - id: E_logto_connectors
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: docs.logto.io-e-openapi.logto.io-webfetch
+    label: "CONECTORES LOGTO (web-verificado): oficiais = SMTP generico, AWS SES, Mailgun, SendGrid, Aliyun, Postmark + HTTP custom. O 'built-in email service' e EXCLUSIVO do Logto CLOUD — self-hosted precisa configurar provider (confirma o gap). Conector SMTP exige host/port(string)/fromEmail/user/pass + templates[] por usageType. SO 1 conector de email ATIVO por tenant. Releases oficiais (docker) ja trazem conectores pre-embutidos. Email usado em 9 usageTypes (SignIn/Register/ForgotPassword/OrganizationInvitation/BindNewIdentifier/MfaVerification/BindMfa/UserPermissionValidation/Generic)"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
+  - id: C_premise_partially_false
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: openapi.logto.io-operation-createorganizationinvitation
+    label: "CORRECAO DE PREMISSA: a premissa registrada ('a falta de conector de email TRAVOU o convite de organizacao') e PARCIALMENTE FALSA. O Logto CRIA o convite SEM conector — POST /api/organizations/{id}/invitations com messagePayload:false retorna o id p/ entrega manual. Sem conector so o ENVIO AUTOMATICO falha (501 'No email connector is configured'). EMAIL E ACELERADOR DE ENTREGA, NAO PRE-REQUISITO DO CONVITE — e o --enroll que o gap forcou e o modo degradado LEGITIMO (o Null Object nativo do canal), a MANTER, nao a descartar"
+    trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
+
+  - id: D_email_is_script_not_sdaal
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: teste-do-eixo-aplicado-as-duas-bocas
+    label: "VEREDITO: email e SCRIPT, nao SDAAL — falha nos DOIS niveis. BOCA (a) conector do Logto: condicao (a) PASSA (providers intercambiaveis POR CONSTRUCAO — o contrato ja existe e se chama SMTP/RFC5321), mas (b) FALHA (a escolha vive no DB do Logto, nao no .env; 1 conector ativo por tenant = sem selecao em runtime) e (c) FALHA POR VACUIDADE (o consumidor e o LOGTO, que nao e nosso codigo e JA e cego). Envolver isso em interface+factory = RE-EMBRULHAR abstracao existente. BOCA (b) ferramenta de membro: (a) falha duro — ZERO solucao real hoje; ligar a 1a leva 0->1. NIVEL-1 tambem nao gradua: o ntfy e curl HARDCODED em mail-receiver.sh:59-66, nao adapter; somar script de email da DOIS SCRIPTS, nao dois adapters"
+    trace: "docs/knowledge-base/concepts/onion-abstraction-doctrine.md"
+
+  - id: D_no_self_host_mta
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: hostinger-rate-limit-mais-consenso-de-deliverability
+    label: "NAO self-hospedar MTA de saida na VPS. Tres razoes MEDIDAS: (1) Hostinger limita 5 EMAILS/MIN (hostinger.com/support/7854530) — baixo p/ rajada de convites; (2) IP de datacenter frio e estruturalmente desconfiado por Gmail/Outlook/Yahoo (consenso qualitativo forte, sem taxa numerica publicada — declarado); (3) SEM webhook de bounce/complaint — bounces voltam como NDR a parsear a mao. 'Um convite de auth que cai no spam e um convite SILENCIOSAMENTE QUEBRADO' — o modo de falha exato da licao do whatsapp"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
+  - id: D_ack_from_provider_not_logto
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-01
+    verified_against: licao-do-whatsapp-aplicada-ao-email
+    label: "A LICAO DO WHATSAPP REENCENADA: o Logto e FIRE-AND-FORGET (Nodemailer, sem ACK nativo — hipotese nao refutada). Logo A PROVA DE ENTREGA VEM DO WEBHOOK DO PROVIDER, fora do Logto (email.delivered/bounced/complained), COM IDEMPOTENCIA (o Resend pode duplicar evento). Sem isso 'o convite foi enviado' e DECLARACAO, nao medicao. E o 'Send test email' do console prova SO o aceite SMTP 250 — o teste real e o convite caindo na INBOX de duas caixas distintas (Gmail + Outlook)"
+    trace: "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml"
+
+  - id: D_dns_is_critical_path
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: requisitos-gmail-yahoo-2024-mais-propagacao-dns
+    label: "O CAMINHO CRITICO E DNS, NAO O LOGTO: SPF+DKIM obrigatorios na pratica, DMARC comecando em p=none, PROPAGACAO 24-48h, so entao subir enforcement. A config do conector leva 10 MINUTOS. Enviar de SUBDOMINIO DEDICADO (mail.onionevolve.com), nao do apex — isola reputacao transacional e deixa o apex livre p/ MX humano. GAP: o DNS atual NUNCA foi verificado (dig TXT/MX) — SPF preexistente conflitante quebra tudo (so 1 SPF por dominio)"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
+  - id: Q_provider_resend_vs_postmark
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "DECISAO DO MAESTRO (a sintese e o dissent DIVERGEM): RESEND (3.000/mes gratis, sem branding, logs 30d, webhooks ricos) vs POSTMARK (US$15/mes; free permanente 100/mes; reputacao construida 100% em transacional, RECUSA mala-direta, o que mantem IPs compartilhados limpos). O DISSENT se auto-acusa: 'escolhi otimizando o FREE TIER, e free tier e ECONOMIA — nao eficacia', contra a regra declarada efficiency-over-economy. Para email de AUTENTICACAO, entregabilidade E o produto inteiro — e a pesquisa NAO MEDIU que a Resend entrega tao bem quanto a Postmark. O argumento de volume e CIRCULAR (depende de habilitar sign-in por codigo, decisao nao tomada; sem isso o volume fica <100/mes, coberto pelo free permanente da Postmark)"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
+  - id: C_gaps_require_deploy_verification
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "GAPS QUE SO O DEPLOY RESOLVE (doc != comportamento, a licao ja paga uma vez): (1) conectores realmente pre-embutidos na imagem 1.41.0? (2) usageType OrganizationInvitation existe em 1.41.0? (a doc consultada e 'latest', nao versionada); (3) QUAL O PLACEHOLDER do link de convite? — a doc so documenta {{code}}, mas convite e LINK: template errado PASSA no 'send test email' e entrega convite quebrado; (4) o rate-limit de 5 msg/min da Hostinger vale so p/ porta 25 ou p/ saida SMTP em geral? (testar openssl s_client ANTES; plano B = custom connector HTTP por 443); (5) DNS atual nunca verificado; (6) o Logto tem RETRY se o SMTP falhar ou o convite se perde em silencio?"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
+edges:
+  - from: E_logto_connectors
+    to: D_email_is_script_not_sdaal
+    edge_type: SUPPORTS
+  - from: C_premise_partially_false
+    to: E_logto_connectors
+    edge_type: SUPPORTS
+  - from: D_no_self_host_mta
+    to: Q_provider_resend_vs_postmark
+    edge_type: CAUSES
+  - from: D_ack_from_provider_not_logto
+    to: D_no_self_host_mta
+    edge_type: SUPPORTS
+  - from: D_dns_is_critical_path
+    to: Q_provider_resend_vs_postmark
+    edge_type: SUPPORTS
+  - from: C_gaps_require_deploy_verification
+    to: D_email_is_script_not_sdaal
+    edge_type: SUPPORTS
