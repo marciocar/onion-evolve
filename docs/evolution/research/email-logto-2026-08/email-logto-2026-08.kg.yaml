@@ -164,6 +164,17 @@ nodes:
     label: "METODO QUE RESOLVEU O IMPASSE (o maestro dizia 'nao esta pendente', a API dizia 412): em vez de discutir, ISOLAR A VARIAVEL — enviei p/ o PROPRIO dominio (permitido no estado pendente) e deu ErrorCode 0 + MessageID; p/ gmail deu 412. Isso PROVOU que todo o pipeline (DKIM/RP/SPF/porta 587/token/dominio) estava OK e que a unica trava era a flag de aprovacao DA CONTA — separada da verificacao de DOMINIO (que ja estava True). A confusao era real e nomeavel: o Postmark tem DUAS coisas que parecem 'aprovado'"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
 
+  - id: E_inbox_confirmed_by_human
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: confirmacao-humana-do-destinatario
+    label: "PROVA FINAL — CAIXA DE ENTRADA, NAO SPAM: os DOIS envios (0b6d6ffb e 5220c9d3) chegaram na caixa NORMAL do Gmail, confirmado pelo destinatario humano. Isto fecha a unica lacuna que NENHUMA API mostra: o evento Delivered + '250 OK' provava entrega AO SERVIDOR; inbox-vs-spam so o humano ve. Dominio NOVO caindo direto na caixa normal = DKIM+SPF+Return-Path alinhados fizeram o trabalho, sem periodo de aquecimento. A cadeia de prova esta COMPLETA: aceite (MessageID) -> entrega ao servidor (evento Delivered) -> INBOX (humano). Os tres degraus sao distintos e so o terceiro decide se o canal serve p/ convite de auth"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
 edges:
   - from: E_logto_connectors
     to: D_email_is_script_not_sdaal
@@ -197,6 +208,12 @@ edges:
     edge_type: SUPERSEDES
   - from: E_email_delivered_proven
     to: D_ack_from_provider_not_logto
+    edge_type: SUPPORTS
+  - from: E_inbox_confirmed_by_human
+    to: E_email_delivered_proven
+    edge_type: SUPPORTS
+  - from: E_inbox_confirmed_by_human
+    to: D_no_self_host_mta
     edge_type: SUPPORTS
   - from: C_isolate_variable_method
     to: E_email_delivered_proven
