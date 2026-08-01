@@ -197,6 +197,26 @@ nodes:
     label: "CINCO doc!=comportamento numa sessao so (a instancia viva e a SSOT, confirmado na pratica): (1) a Management API TEM CRUD de conector (POST /api/connectors) — a pesquisa marcou como 'nao documentado'; (2) o token M2M da Management API NAO sai do endpoint publico nem do 127.0.0.1:3012 — so de console.onionevolve.com (tenant admin); (3) 'port' e NUMBER, nao string como a doc dizia; (4) a rota de convite e /api/organization-invitations, NAO /api/organizations/{id}/invitations como a doc publica; (5) o conector NATIVO postmark-mail exige templateAlias (templates criados NO Postmark) — mais lock-in e mais setup que o SMTP generico, o que CONFIRMA a decisao D3 por outro motivo. GAP #5 fechado: 9 factories de Email vem pre-embutidos na 1.41.0"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
 
+  - id: E_no_invite_acceptance_page
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-01
+    verified_against: openapi-da-instancia-mais-rotas-do-bridge-mais-404-visto-pelo-maestro
+    label: "ACHADO DE ARQUITETURA (so o dogfood revelou): o LOGTO NAO TEM PAGINA DE ACEITE DE CONVITE. As unicas rotas sao de API (PUT /api/organization-invitations/{id}/status). O link do convite e RESPONSABILIDADE DA APLICACAO — o Logto so envia o que vier em messagePayload.link, nao sabe nem inventa destino. Verificado: o bridge NAO tem rota de aceite (rotas reais: /chat /commands /a2a /federation/inbox/:member /admin/* /health); o 'INVITE_TOKENS_*' do bridge e OUTRA coisa (tokens de cortesia da era pre-OIDC). CONSEQUENCIA: o email do convite FUNCIONA (renderizou {{link}}, chegou na INBOX — confirmado pelo maestro) mas o fluxo NAO FECHA ponta a ponta sem uma pagina que: (1) receba o invitationId, (2) autentique o convidado via Logto, (3) chame o PUT de status. ERRO MEU SOMADO: inventei a URL 'auth.onionevolve.com/invite' como placeholder, que nunca existiu — o 404 tem duas causas empilhadas"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
+  - id: Q_where_acceptance_page_lives
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "DECISAO ABERTA: onde mora a pagina de aceite de convite? (a) construir no bridge PWA (app.onionevolve.com) — ja e cliente OIDC do Logto, ganharia login de graca, mas e trabalho real (rota + UI + chamada de API); (b) NAO construir e seguir com o --enroll (o caminho degradado que JA funciona e que a pesquisa recomendou MANTER como Null Object nativo), enviando convite sem link ou com link informativo; (c) link interino manual. PELA DOUTRINA (pull-not-push + spec-now/build-gated): (b) ate existir um CONVIDADO REAL — hoje o unico convite foi de teste, para o proprio maestro. O gatilho de (a) e o 1o convidado externo de verdade"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
 edges:
   - from: E_logto_connectors
     to: D_email_is_script_not_sdaal
@@ -238,6 +258,15 @@ edges:
     to: D_no_self_host_mta
     edge_type: SUPPORTS
   - from: E_connector_live_invite_sent
+    to: C_premise_partially_false
+    edge_type: SUPPORTS
+  - from: E_no_invite_acceptance_page
+    to: E_connector_live_invite_sent
+    edge_type: SUPPORTS
+  - from: E_no_invite_acceptance_page
+    to: Q_where_acceptance_page_lives
+    edge_type: CAUSES
+  - from: E_no_invite_acceptance_page
     to: C_premise_partially_false
     edge_type: SUPPORTS
   - from: E_five_doc_vs_behavior
