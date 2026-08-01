@@ -175,6 +175,28 @@ nodes:
     label: "PROVA FINAL — CAIXA DE ENTRADA, NAO SPAM: os DOIS envios (0b6d6ffb e 5220c9d3) chegaram na caixa NORMAL do Gmail, confirmado pelo destinatario humano. Isto fecha a unica lacuna que NENHUMA API mostra: o evento Delivered + '250 OK' provava entrega AO SERVIDOR; inbox-vs-spam so o humano ve. Dominio NOVO caindo direto na caixa normal = DKIM+SPF+Return-Path alinhados fizeram o trabalho, sem periodo de aquecimento. A cadeia de prova esta COMPLETA: aceite (MessageID) -> entrega ao servidor (evento Delivered) -> INBOX (humano). Os tres degraus sao distintos e so o terceiro decide se o canal serve p/ convite de auth"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
 
+  - id: E_connector_live_invite_sent
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: convite-real-201-mais-mensagem-Sent-no-postmark
+    label: "GAP ORIGINAL FECHADO: conector SMTP criado no Logto (id 9ajv2zogz065, type Email) via MANAGEMENT API + CONVITE REAL de organizacao criado com messagePayload -> HTTP 201 (antes: 501 'No email connector is configured'), e o email SAIU (visto na fila do Postmark: 'Convite para a federacao Onion', status Sent). Cadeia completa provada: Logto -> conector SMTP (587) -> Postmark -> Gmail. Templates criados p/ 5 usageTypes incluindo OrganizationInvitation"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
+  - id: E_five_doc_vs_behavior
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: erros-de-validacao-e-404-da-instancia-viva
+    label: "CINCO doc!=comportamento numa sessao so (a instancia viva e a SSOT, confirmado na pratica): (1) a Management API TEM CRUD de conector (POST /api/connectors) — a pesquisa marcou como 'nao documentado'; (2) o token M2M da Management API NAO sai do endpoint publico nem do 127.0.0.1:3012 — so de console.onionevolve.com (tenant admin); (3) 'port' e NUMBER, nao string como a doc dizia; (4) a rota de convite e /api/organization-invitations, NAO /api/organizations/{id}/invitations como a doc publica; (5) o conector NATIVO postmark-mail exige templateAlias (templates criados NO Postmark) — mais lock-in e mais setup que o SMTP generico, o que CONFIRMA a decisao D3 por outro motivo. GAP #5 fechado: 9 factories de Email vem pre-embutidos na 1.41.0"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
 edges:
   - from: E_logto_connectors
     to: D_email_is_script_not_sdaal
@@ -214,6 +236,15 @@ edges:
     edge_type: SUPPORTS
   - from: E_inbox_confirmed_by_human
     to: D_no_self_host_mta
+    edge_type: SUPPORTS
+  - from: E_connector_live_invite_sent
+    to: C_premise_partially_false
+    edge_type: SUPPORTS
+  - from: E_five_doc_vs_behavior
+    to: C_gaps_require_deploy_verification
+    edge_type: SUPERSEDES
+  - from: E_five_doc_vs_behavior
+    to: D_email_is_script_not_sdaal
     edge_type: SUPPORTS
   - from: C_isolate_variable_method
     to: E_email_delivered_proven
