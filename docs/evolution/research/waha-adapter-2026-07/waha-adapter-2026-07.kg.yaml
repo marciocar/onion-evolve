@@ -236,7 +236,7 @@ nodes:
   - id: E_gatilho_fechado
     node_type: evidence
     plane: PROD
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 1.0
     verified_at: 2026-08-01
@@ -253,6 +253,51 @@ nodes:
     verified_at: 2026-08-01
     verified_against: dogfood-de-campo-mais-fonte-oficial
     label: "ACHADO DE CAMPO (custou 4 tentativas): so o aparelho PRINCIPAL pode vincular dispositivos — companheiro NAO tem o menu 'Dispositivos conectados' (confirmado em fonte: 'only the primary device can initiate the process of adding additional connected sessions'). O maestro migrou de celular e o principal antigo foi FORMATADO. Alem disso: sessao WAHA cai SCAN_QR_CODE->FAILED em ~2-3min sem pareamento, e o restart as vezes nasce FAILED (precisa stop+DELETE+create limpo). RECOMENDACAO DE DESIGN QUE NASCE DAQUI: bot NAO deve parear no numero PESSOAL do maestro — numero DEDICADO (chip separado) ou Cloud API oficial. Reforca a operacao getSessionStatus no contrato (sessao expira: primary precisa logar a cada ~14 dias)"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  # ── ACHADO RAIZ 2026-08-01: ENDERECAMENTO LID (o mais valioso da rodada) ──
+  - id: E_lid_addressing_root_cause
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: tres-envios-controlados-com-9-sem-9-e-lid
+    label: "CAUSA RAIZ (medida, 3 envios controlados): o WhatsApp moderno endereca por LID (Linked ID), nao por telefone. '5551997702725@c.us' (com 9) -> ERRO 'No LID for user'; '555197702725@c.us' (sem 9) -> falha; '84190032855084@lid' -> ENVIOU E CHEGOU (confirmado pelo maestro). GET /api/contacts/check-exists?phone=... devolve {numberExists:true, chatId:'84190032855084@lid'} — o telefone e CHAVE DE BUSCA, o LID e a identidade. O mesmo LID ja aparecia no me.lid da sessao NOWEB (consistente)"
+    trace: "/home/marcio/onion-waha/docker-compose.yml"
+
+  - id: D_resolve_is_contract
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-01
+    verified_against: achado-LID-medido
+    label: "CORRIGE O CONTRATO DA F1: a sintese especificou que o adapter faria '${digits}@c.us' — ERRADO p/ contas LID. O correto: sendText(to: PhoneRef) -> (1) RESOLVE via check-exists(phone) -> chatId (@lid ou @c.us); (2) envia ao chatId resolvido. RESOLUCAO DE DESTINATARIO E PARTE DO CONTRATO, nao detalhe de implementacao — e e CARA (chamada extra por envio) -> o adapter precisa de CACHE de resolucao. Implicacao: PhoneRef nao e endereco, e chave de busca"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: C_engine_decision_reopened
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-08-01
+    verified_against: causa-raiz-era-enderecamento-nao-engine
+    label: "AUTOCORRECAO: troquei NOWEB->WEBJS presumindo que o ENGINE era a causa do PENDING. NAO ERA — era endereçamento. Logo a troca foi por motivo ERRADO, e a decisao de engine esta REABERTA: o NOWEB (412 MiB, 35% mais leve) pode funcionar perfeitamente COM endereçamento LID correto — nao foi re-testado. O que o WEBJS deu de fato: MENSAGEM DE ERRO MAIS CLARA ('No LID for user' vs o WARN silencioso 'USync yielded no results' do NOWEB) — isso e valor de DIAGNOSTICO, nao de funcionalidade. RE-TESTAR NOWEB+LID antes de cravar o default"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: C_first_message_never_delivered
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-08-01
+    verified_against: nenhum-dos-3-destinatarios-recebeu
+    label: "DECLARADO != VERIFICADO no sentido mais literal: as 3 primeiras mensagens (NOWEB) voltaram HTTP 200 com key.id e status PENDING — e eu declarei 'GATILHO FECHADO'. NENHUMA foi entregue (nem ao maestro nem ao 2o numero). O 200 do POST /sendText prova ACEITE NA FILA, NAO ENTREGA. O USync falhava em silencio (WARN, nao erro). LICAO P/ O CONTRATO: status 'PENDING' NAO pode ser reportado como sucesso pelo adapter; so ACK (webhook message.ack) prova entrega. O gatilho so fechou DE FATO no envio ao LID, confirmado pelo destinatario humano"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
 
 edges:
@@ -292,6 +337,21 @@ edges:
   - from: C_pairing_needs_primary
     to: E_gatilho_fechado
     edge_type: SUPPORTS
+  - from: E_lid_addressing_root_cause
+    to: D_resolve_is_contract
+    edge_type: SUPPORTS
+  - from: D_resolve_is_contract
+    to: D_interface_v01
+    edge_type: SUPERSEDES
+  - from: E_lid_addressing_root_cause
+    to: C_engine_decision_reopened
+    edge_type: SUPPORTS
+  - from: C_engine_decision_reopened
+    to: E_engine_measured
+    edge_type: SUPERSEDES
+  - from: C_first_message_never_delivered
+    to: E_gatilho_fechado
+    edge_type: REFUTES
   - from: E_waha_current
     to: D_domain_whatsapp_not_messaging
     edge_type: SUPPORTS

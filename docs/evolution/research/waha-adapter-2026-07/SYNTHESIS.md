@@ -67,6 +67,34 @@ houver 1 consumidor real que precise ser cego → o eixo **passou no papel e fal
 retrair para **script + env switch** (WAHA como ferramenta única; `whatsapp-sender` legado) e esperar o
 2º consumidor. *Um adapter de uma operação, com um consumidor que sabe qual provider está ativo, é cerimônia.*
 
+## 🔴 ACHADO RAIZ (2026-08-01) — endereçamento **LID**, e três autocorreções
+
+**O WhatsApp moderno endereça por LID (*Linked ID*), não por telefone.** Três envios controlados:
+
+| chatId enviado | Resultado |
+|---|---|
+| `5551997702725@c.us` (com o 9) | ❌ `Error: No LID for user` |
+| `555197702725@c.us` (sem o 9) | ❌ falha |
+| **`84190032855084@lid`** | ✅ **enviou e CHEGOU** (confirmado pelo destinatário) |
+
+`GET /api/contacts/check-exists?phone=…` → `{"numberExists":true,"chatId":"84190032855084@lid"}`.
+**O telefone é chave de busca; o LID é a identidade.**
+
+### 1. Corrige o contrato (supersede a interface v0.1)
+A síntese abaixo especificou `${digits}@c.us` — **errado** para contas LID. O correto:
+```
+sendText(to: PhoneRef) → 1. resolve check-exists(phone) → chatId (@lid | @c.us)
+                         2. envia ao chatId resolvido
+```
+**Resolução de destinatário é parte do CONTRATO**, não detalhe de implementação — e é **cara** (chamada extra por envio) → o adapter precisa de **cache de resolução**. `PhoneRef` **não é endereço**, é **chave de busca**.
+
+### 2. Reabre a decisão de engine (autocorreção)
+Troquei NOWEB→WEBJS **presumindo que o engine era a causa**. **Não era.** A troca foi por motivo errado, e a decisão está **reaberta**: o NOWEB (412 MiB, 35% mais leve) pode funcionar com endereçamento correto — **não foi re-testado**. O que o WEBJS entregou de fato foi **erro mais legível** (`No LID for user` vs o `WARN` silencioso `USync yielded no results`) — valor de **diagnóstico**, não de funcionalidade.
+
+### 3. "Gatilho fechado" foi prematuro (declarado ≠ verificado, literal)
+As 3 primeiras mensagens voltaram **HTTP 200 + `key.id` + `status:PENDING`** e eu declarei o gatilho fechado. **Nenhuma foi entregue.** O `200` do `POST /sendText` prova **aceite na fila, não entrega**.
+→ **Regra para o contrato:** o adapter **não pode** reportar `PENDING` como sucesso; só o **ACK** (webhook `message.ack`) prova entrega. O gatilho só fechou **de fato** no envio ao LID, confirmado por **humano**.
+
 ## 🐕 Dogfood LOCAL executado (2026-07-31) — comportamento, não doc
 
 Rodei o WAHA de verdade (`docker run` + `curl` contra a API viva). **Três achados que só o comportamento dá:**
