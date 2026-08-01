@@ -728,7 +728,7 @@ nodes:
 
   - id: E_p1p3_provisioned
     node_type: evidence
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 5
@@ -752,7 +752,7 @@ nodes:
 
   - id: E_p5_identity_live
     node_type: evidence
-    trace: .claude/utils/bridge-auth/bridge-src/identity.ts
+    trace: ops/bridge-auth/bridge-src/identity.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -777,7 +777,7 @@ nodes:
 
   - id: C_scaffold_removed_proof_was_invalid
     node_type: claim
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 4
@@ -789,7 +789,7 @@ nodes:
 
   - id: E_p6_pkce_live
     node_type: evidence
-    trace: .claude/utils/bridge-auth/bridge-src/web-oidc.ts
+    trace: ops/bridge-auth/bridge-src/web-oidc.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -838,7 +838,7 @@ nodes:
 
   - id: E_p9_complete
     node_type: evidence
-    trace: .claude/utils/bridge-auth/bridge-src/identity.ts
+    trace: ops/bridge-auth/bridge-src/identity.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -850,7 +850,7 @@ nodes:
 
   - id: E_p9_human_admin_proven
     node_type: evidence
-    trace: .claude/utils/bridge-auth/bridge-src/web-oidc.ts
+    trace: ops/bridge-auth/bridge-src/web-oidc.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -862,7 +862,7 @@ nodes:
 
   - id: C_identity_bought_who_not_what
     node_type: claim
-    trace: .claude/utils/bridge-auth/bridge-src/chat.ts
+    trace: ops/bridge-auth/bridge-src/chat.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -874,7 +874,7 @@ nodes:
 
   - id: C_allowedtools_does_not_restrict
     node_type: claim
-    trace: .claude/utils/bridge-auth/bridge-src/chat.ts
+    trace: ops/bridge-auth/bridge-src/chat.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -886,7 +886,7 @@ nodes:
 
   - id: D_capability_by_scope
     node_type: decision
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 5
@@ -898,7 +898,7 @@ nodes:
 
   - id: E_p10_service_cannot_write
     node_type: evidence
-    trace: .claude/utils/bridge-auth/bridge-src/chat.ts
+    trace: ops/bridge-auth/bridge-src/chat.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -968,7 +968,7 @@ nodes:
 
   - id: E_slice1_revocation_isolated
     node_type: evidence
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 5
@@ -980,7 +980,7 @@ nodes:
 
   - id: C_i_bypassed_the_api_with_sql
     node_type: claim
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 4
@@ -1016,7 +1016,7 @@ nodes:
 
   - id: E_federation_projected
     node_type: evidence
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 4
@@ -1028,7 +1028,7 @@ nodes:
 
   - id: E_d5_divergence_fires
     node_type: evidence
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 4
@@ -1064,7 +1064,7 @@ nodes:
 
   - id: D_enroll_instead_of_invite
     node_type: decision
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 4
@@ -1076,7 +1076,7 @@ nodes:
 
   - id: E_org_has_member_with_role
     node_type: evidence
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 4
@@ -1100,7 +1100,7 @@ nodes:
 
   - id: C_kind_answers_the_wrong_question
     node_type: claim
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 5
@@ -1112,7 +1112,7 @@ nodes:
 
   - id: D_org_born_on_demand
     node_type: decision
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 5
@@ -1124,7 +1124,7 @@ nodes:
 
   - id: E_dormant_privileged_duplicate
     node_type: evidence
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 4
@@ -1136,7 +1136,7 @@ nodes:
 
   - id: E_near_miss_guard_on_live_account
     node_type: evidence
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 5
@@ -1148,7 +1148,7 @@ nodes:
 
   - id: C_blocked_chain_kills_inner_edit
     node_type: claim
-    trace: .claude/utils/bridge-auth/logto-provision.sh
+    trace: ops/bridge-auth/logto-provision.sh
     layer: audit
     plane: PROD
     impact: 3
@@ -1241,7 +1241,7 @@ nodes:
 
   - id: D_pull_serves_history_not_queue
     node_type: decision
-    trace: .claude/utils/bridge-auth/bridge-src/federation.ts
+    trace: ops/bridge-auth/bridge-src/federation.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -1253,7 +1253,7 @@ nodes:
 
   - id: E_pull_endpoint_works
     node_type: evidence
-    trace: .claude/utils/bridge-auth/bridge-src/federation.ts
+    trace: ops/bridge-auth/bridge-src/federation.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -1265,7 +1265,7 @@ nodes:
 
   - id: C_org_token_has_no_org_claim
     node_type: claim
-    trace: .claude/utils/bridge-auth/bridge-src/identity.ts
+    trace: ops/bridge-auth/bridge-src/identity.ts
     layer: audit
     plane: PROD
     impact: 4
@@ -1277,7 +1277,7 @@ nodes:
 
   - id: C_p10_broke_scope_default
     node_type: claim
-    trace: .claude/utils/bridge-auth/bridge-src/identity.ts
+    trace: ops/bridge-auth/bridge-src/identity.ts
     layer: audit
     plane: PROD
     impact: 3
