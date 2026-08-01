@@ -1,0 +1,221 @@
+meta:
+  id: stack-harmonia-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-01
+  date: 2026-08-01
+  note: >
+    F2 (harmonia da stack VPS x necessidades do Onion/federacao) + F2-b (o que vale INTERNALIZAR).
+    Dois Elenxos orquestrados, 10 workers. RESULTADO PRINCIPAL: a sintese da F2 foi REPROVADA pelo
+    critico adversarial — era catedral sobre DOIS erros verificaveis — e a verificacao independente
+    CONFIRMOU o critico. O que sobrevive e um inventario medido, sem arquitetura nova, mais a REGRA
+    DOS 5 PORTOES (do F2-b). NAO promover a doutrina candidata a KB. Projecao: SYNTHESIS.md.
+
+nodes:
+  # ── O RESULTADO DOMINANTE: a critica ──
+  - id: D_sintese_reprovada
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-01
+    verified_against: critico-adversarial-mais-re-medicao-independente
+    label: "A SINTESE DA F2 FOI REPROVADA como arquitetura, aproveitada como inventario. O critico mostrou que as 4 'Leis', a doutrina candidata e a costura-estrela eram CATEDRAL sobre dois erros verificaveis. Eu RE-MEDI de forma independente e CONFIRMEI o critico nos 3 pontos decisivos. Caem justamente os itens rotulados '[GATILHO JA DISPAROU]' — ou seja, O GATILHO E QUE FOI FABRICADO. Este e o melhor exemplo da sessao de verificacao adversarial ganhando o proprio custo: sem o critico, uma arquitetura inteira teria sido construida sobre um 'ls' lido ao contrario e um 'git pull' nao executado"
+    trace: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
+
+  - id: E_tres_erros_medidos
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: grep-c-members-mais-find-outbox-mais-git-log
+    label: "OS TRES ERROS, RE-MEDIDOS POR MIM (nao aceitos do critico): (1) 'e membros' -> grep -c '^  - id:' em members.yaml da 12 ENTRADAS, nao 9; logo o '44% da federacao sem canal' era percentual FABRICADO carregando a peca mais cara do plano. (2) 'canal partido, 4 membros sem nada' -> os 8 outboxes tem ZERO PENDENTES (tudo em _processed/); ausencia de diretorio e ausencia de EMISSAO, nao canal partido, e os 4 membros foram registrados DEPOIS do ultimo anuncio. (3) 'deriva de projecao do org-map' -> federation-orgs.json entrou no repo em 9d17c5e 2026-07-28 e o checkout de producao esta em 965224c 07-27, um dia ANTES do arquivo existir: e GIT PULL PENDENTE, nao deriva. Divergencia menor do critico: ele disse 'ultimo anuncio 07-18', eu medi 07-27 por nome de arquivo — nao muda a substancia"
+    trace: "docs/evolution/federation/members.yaml"
+
+  - id: C_nao_promover_doutrina
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: critico-mais-verificacao
+    label: "NAO PROMOVER a doutrina candidata ('Git e o barramento e a VPS e a borda') a KB. Metade e falsa: (a) confunde VOLUME com PROVISIONAMENTO — o a2a-live tem 2 exercicios porque so 2 membros tem bloco a2a: no members.yaml (e o denominador, nao o comportamento); (b) git e o LEDGER, nao o transporte — o downstream real e /meta:co-deliver, copia de arquivo MANUAL na mesma maquina; (c) 'identidade sem canal e divida disfarcada de progresso' descreve divida de custo ~0 (provisionar org num Logto que ja roda). fix-must-become-mechanism exige que a licao venha do USO REAL; aqui o 'fix' veio de um ls lido ao contrario. Doutrina errada vira guarda errada — o core ja provou isso"
+    trace: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
+
+  # ── O QUE SOBREVIVE (acionavel) ──
+  - id: C_waha_orfao_desligar
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: docker-ps-mais-grep-no-src-do-bridge
+    label: "MELHOR ITEM DA LISTA INTEIRA — DESLIGAR O WAHA: container Up 15h, ZERO referencias a waha/3999/whatsapp em todo o src/ do bridge, ZERO cron/systemd-timer, WAHA_API_KEY e WAHA_DASHBOARD_PASSWORD legiveis via docker inspect, e as 3 primeiras mensagens de teste voltaram HTTP 200 e NUNCA chegaram. Custo de seguranca > 0, entrega comprovada = 0, esforco = docker stop, totalmente reversivel. NOTA DE HONESTIDADE: o canal FOI provado depois (LID + ack READ) — mas provado != consumido; nao ha consumidor nomeado num artefato versionado"
+    trace: "/home/marcio/onion-waha/docker-compose.yml"
+
+  - id: C_producao_nao_e_o_repo
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: git-log-do-checkout-de-producao
+    label: "BEHAVIOR-OVER-DECLARATION VIRADO PARA DENTRO: o artefato que RODA nao e o artefato do REPO — checkout de producao em 965224c (07-27) contra main de 07-31. CONSEQUENCIA EPISTEMICA: toda conclusao sobre 'o que o bridge faz' tirada do main pode estar ERRADA. A cura e HABITO (git pull + restart), NAO contrato /health {sha,dirty} + 409 fail-closed — que derrubaria a federacao hoje por condicao cosmetica, para N=1 operador (dead-layer). A 'deriva do org-map' e SUBPRODUTO disto, nao causa independente"
+    trace: "/home/onion/onion-bridge"
+
+  - id: C_bypass_permissions_exposto
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: env-de-producao-do-bridge
+    label: "PERMISSION_MODE=bypassPermissions EXPLICITO no .env de producao, atras de porta publica via Caddy. O flip P7 entregou IDENTIDADE na borda e NAO reduziu o que o agente pode fazer DEPOIS de entrar. A contencao certa e de PROCESSO (usuario dedicado, checkout read-only onde possivel, sem socket do Docker, sem credencial de outro tenant no ambiente), nao flag do SDK — o modo foi escolhido porque o agente precisa agir"
+    trace: "/home/onion/onion-bridge/.env"
+
+  - id: C_medir_firewall_antes
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-08-01
+    verified_against: critica-ao-rotulo-gatilho-disparado
+    label: "8+ portas dos stacks de adotante (onion-adopt-arandek-*) publicadas em 0.0.0.0 na MESMA maquina do core e de um negocio nao-Onion. A superficie e FATO; o risco liquido NAO FOI MEDIDO. Ordenar a edicao de 8+ bindings antes de rodar UM comando de firewall repetiria verify-access-before-specifying — a propria sintese admitiu 'o unico guarda hoje e um firewall de borda que nao foi verificado' e mesmo assim rotulou '[GATILHO JA DISPAROU]'. MEDIR PRIMEIRO"
+    trace: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
+
+  - id: C_ntfy_default_publico
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-08-01
+    verified_against: leitura-do-mail-receiver.sh
+    label: "mail-receiver.sh cai no host PUBLICO ntfy.sh sem auth quando NTFY_URL nao esta setado (topico adivinhavel = qualquer um publica/assina) E nao esta agendado por nenhum cron/systemd-timer. A promessa e MAIOR que o mecanismo. Cura barata: NTFY_URL obrigatorio (sem default publico) + DECLARAR que o wake e PULL (hook SessionStart), removendo do texto qualquer promessa de push. Corrigir a promessa custa menos que construir o agendador"
+    trace: ".claude/utils/co-evolution/mail-receiver.sh"
+
+  - id: E_downstream_parado_nao_partido
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-08-01
+    verified_against: find-nos-8-outboxes
+    label: "O ACHADO QUE A SINTESE TINHA NA MAO E LEU INVERTIDO: o downstream nao esta PARTIDO, esta PARADO. Zero pendentes nos 8 outboxes (granaai 15, gustavo-pulga 4, marcio-pessoal 6, metagamify 49, onion-mini 5, onion-standalone 2, pulse-mais 12 — todos 100% processados). Se algo merece acao no eixo de entrega e PUBLICAR (ou decidir conscientemente NAO publicar), nao instrumentar um canal que ninguem usou porque ninguem emitiu"
+    trace: "docs/evolution/federation/outbox/"
+
+  # ── A REGRA QUE SOBREVIVE (do F2-b) ──
+  - id: D_regra_5_portoes
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: F2b-veredito-3-dimensoes-web-verificadas
+    label: "REGRA DOS 5 PORTOES (candidata a doutrina; esta SOBREVIVE a critica porque nao constroi nada): internalizar so se passar em TODOS — (1) PULL DATADO: dor concreta com data, nao categoria ('observabilidade' nao e dor; 'nao soubemos que o email bounced no dia X' e); (2) NAO-REUSO PROVADO: nenhuma peca ja paga (Caddy/bridge/Logto/ntfy/cron/gh) resolve com uma rota — TENTAR antes de decidir; (3) DADO NOVO: se o dado ja esta num log e so falta uma query, a peca e dead-layer POR DEFINICAO; (4) O VOLUME FORCA: punhado/dia -> arquivo + jq vence sempre; (5) DONO NOMEADO — o portao que ninguem aplica, e o que FABRICA CATEDRAL. TESTE DE CATEDRAL (qualquer um -> nao internalize): traz 2o banco · so da valor via dashboard · o valor e 'visao agregada' · e confortavel so porque o volume e zero"
+    trace: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
+
+  - id: C_assimetria_do_custo
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: F2b-custo-total-e-contrafactual
+    label: "A ASSIMETRIA QUE SUSTENTA A REGRA: com 31GB, RAM e o custo BARATO — e e o unico que todo mundo calcula. Os caros (superficie de ataque, atualizacao, dono) NAO escalam com a fatura: escalam com a CONTAGEM DE PECAS. Por isso efficiency-over-economy NAO vira 'entao pode tudo': a pergunta certa nunca e 'cabe?', e 'QUANTAS PECAS A MAIS PASSAM A TER DONO?'. US$15/mes de fato nao e argumento — 1 dono a mais e. CONTRAFACTUAL medido: internalizar as 'ferramentas boas' (Langfuse 6 conteineres + Prometheus/Grafana + gateway de webhook + servidor de tunel) = ~4 pecas, ~5-6GB, 4 superficies, 4 ciclos de atualizacao e 4 donos que NAO EXISTEM. Caberia nos 31GB. E seria catedral"
+    trace: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
+
+  - id: C_dissent_seguranca_isolamento
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-01
+    verified_against: leitura-do-server.ts-do-bridge
+    label: "DISSENT DE SEGURANCA (do F2-b, INCORPORADO — e corrige a propria REGRA): no MESMO processo do bridge estao /chat com CREDENCIAIS ANTHROPIC e /admin que CUNHA CONVITES. Por ali um parser de HMAC processando bytes hostis de fora significa que UM BUG NO PARSER ALCANCA A CUNHAGEM DE CONVITES. CONCESSAO ADOTADA: se a rota de webhook for construida um dia, que rode como SEGUNDO PROCESSO DO MESMO CODIGO — mesmo repo, mesmo dono, porta propria, ambiente SEM AUTH_TOKEN, SEM chave Anthropic, SEM /admin. COROLARIO QUE CORRIGE A REGRA: os 5 portoes otimizam MENOS PECAS; seguranca as vezes quer UMA PECA A MAIS que so compra ISOLAMENTO — e ai o portao de seguranca vence os 5"
+    trace: ".claude/utils/bridge-auth/bridge-src/server.ts"
+
+  # ── ANTI-CATALOGO (sobreviveu inteiro) ──
+  - id: D_anti_catalogo
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: evidencia-herdada-mais-critica
+    label: "ANTI-CATALOGO (o que NAO construir — sobreviveu inteiro a critica, porque foi HERDADO da evidencia, nao inventado): admin platform/painel agregado (ja status:refuted no KG m3) · SDAAL para email e para whatsapp (falham o Teste do Eixo COM evidencia) · OTel/Prometheus/Grafana AGORA · Langfuse AGORA (v3 = 6 conteineres com ClickHouse; Helicone em maintenance mode desde mar/2026) · gateway dedicado de webhook (Svix/Outpost sao para ENVIAR; Hookdeck e SaaS-only; webhook.site e debug-tool; n8n nem e OSI) · multi-tenancy de adotante no Logto do CORE (o isolamento por container ja e limpo) · tunneling (Caddy+Logto ja sao a porta unica; ssh -L resolve o caso real) · F1.2 seletor fino / F2.1 SDAAL de transporte / F2.3 veto por reputacao (nenhum dos 87 sinais de inbox pediu) · decompor o bridge em servicos (anti-padrao p/ 1 operador) · E a rota POST /hooks/:provider — que com o WAHA desligado tem N=0 produtores"
+    trace: "docs/onion/graph/m3-federation-admin-2026-07.kg.yaml"
+
+  - id: C_tunneling_nome_errado
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-08-01
+    verified_against: F2b-pesquisa-tunneling
+    label: "REFORMULACAO: 'tunneling' e o NOME ERRADO da capacidade. O que se quer e INGRESSO AUTENTICADO — e as duas metades ja estao instaladas e pagas: Caddy (ingress/TLS) + Logto (IdP). Um forward_auth do Caddy contra o Logto expoe qualquer UI interna com identidade real, revogavel por pessoa, sem NENHUMA peca nova (reuso-nao-invencao literal). GATILHO NOMEADO, e esta mais perto do que parece: no dia em que um humano que NAO e o maestro precisar de uma UI nessa caixa — a equipe granaai ja tem contas na VPS, e ssh -L para eles significa ENTREGAR SHELL, que e a resposta errada. Enquanto for so o maestro, -L e otimo e nada deve ser construido"
+    trace: "/etc/caddy/Caddyfile"
+
+  - id: Q_publicar_ou_nao
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "DECISAO DO MAESTRO no eixo de entrega: o downstream esta PARADO (0 pendentes, nada emitido ha dias) — publicar os anuncios represados (a sessao gerou MUITO material: WAHA, email/Postmark, LID, os 5 doc!=comportamento, a REGRA DOS 5 PORTOES) OU decidir CONSCIENTEMENTE nao publicar? Ambas sao respostas legitimas; o que nao e legitimo e o estado atual (parado sem decisao). Nao instrumentar o canal — ele funciona; falta EMITIR"
+    trace: "docs/evolution/federation/outbox/"
+
+edges:
+  - from: E_tres_erros_medidos
+    to: D_sintese_reprovada
+    edge_type: SUPPORTS
+  - from: D_sintese_reprovada
+    to: C_nao_promover_doutrina
+    edge_type: CAUSES
+  - from: E_downstream_parado_nao_partido
+    to: E_tres_erros_medidos
+    edge_type: SUPPORTS
+  - from: E_downstream_parado_nao_partido
+    to: Q_publicar_ou_nao
+    edge_type: CAUSES
+  - from: C_producao_nao_e_o_repo
+    to: D_sintese_reprovada
+    edge_type: SUPPORTS
+  - from: D_regra_5_portoes
+    to: D_anti_catalogo
+    edge_type: SUPPORTS
+  - from: C_assimetria_do_custo
+    to: D_regra_5_portoes
+    edge_type: SUPPORTS
+  - from: C_dissent_seguranca_isolamento
+    to: D_regra_5_portoes
+    edge_type: SUPPORTS
+  - from: C_ntfy_default_publico
+    to: E_downstream_parado_nao_partido
+    edge_type: SUPPORTS
+  - from: C_tunneling_nome_errado
+    to: D_anti_catalogo
+    edge_type: SUPPORTS
+  - from: C_waha_orfao_desligar
+    to: D_anti_catalogo
+    edge_type: SUPPORTS
+  - from: C_medir_firewall_antes
+    to: D_sintese_reprovada
+    edge_type: SUPPORTS
+  - from: C_bypass_permissions_exposto
+    to: C_producao_nao_e_o_repo
+    edge_type: SUPPORTS
