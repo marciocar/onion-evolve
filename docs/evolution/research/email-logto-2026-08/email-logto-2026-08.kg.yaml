@@ -134,12 +134,34 @@ nodes:
   - id: Q_postmark_pending_approval
     node_type: question
     plane: PROD
-    status: open
+    status: done
     impact: 5
     confidence: 1.0
     verified_at: 2026-08-01
     verified_against: erro-412-da-api-em-2-tentativas
     label: "BLOQUEIO ATIVO (medido 2x): a conta Postmark esta PENDING APPROVAL — erro 412 'While your account is pending approval, all recipient addresses must share the same domain as the From address'. Nesse estado so da p/ enviar para @mail.onionevolve.com (que nao tem MX, logo ninguem recebe). IMPEDE o teste que mais importa: convite caindo na INBOX de Gmail/Outlook (a licao do whatsapp: aceite != entrega). ACAO DO MAESTRO: solicitar aprovacao no painel do Postmark. ATRITO DE ONBOARDING QUE A PESQUISA NAO PREVIU — nao muda a decisao (aprovacao e uma vez so), mas e diferenca real vs Resend"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
+  - id: E_email_delivered_proven
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: postmark-messages-outbound-details-evento-Delivered
+    label: "CANAL DE EMAIL PROVADO PONTA A PONTA (nao so aceito): apos a aprovacao da conta, envio p/ marciocar@gmail.com retornou MessageID 0b6d6ffb + Status 'Sent', e o detalhe da mensagem mostra evento **Delivered** com a resposta LITERAL do Google: 'smtp;250 2.0.0 OK ... - gsmtp'. ESTE E O ACK DO EMAIL — o analogo exato do ack=3 READ do whatsapp. A licao foi APLICADA: eu poderia ter parado no MessageID (aceite) e declarado sucesso, que foi exatamente o erro cometido 3x no canal whatsapp. RESSALVA HONESTA: o 250 OK prova ENTREGA AO SERVIDOR, nao INBOX-vs-SPAM — so o humano confirma essa parte"
+    trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+
+  - id: C_isolate_variable_method
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: envio-mesmo-dominio-200-vs-externo-412
+    label: "METODO QUE RESOLVEU O IMPASSE (o maestro dizia 'nao esta pendente', a API dizia 412): em vez de discutir, ISOLAR A VARIAVEL — enviei p/ o PROPRIO dominio (permitido no estado pendente) e deu ErrorCode 0 + MessageID; p/ gmail deu 412. Isso PROVOU que todo o pipeline (DKIM/RP/SPF/porta 587/token/dominio) estava OK e que a unica trava era a flag de aprovacao DA CONTA — separada da verificacao de DOMINIO (que ja estava True). A confusao era real e nomeavel: o Postmark tem DUAS coisas que parecem 'aprovado'"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
 
 edges:
@@ -169,6 +191,15 @@ edges:
     edge_type: SUPERSEDES
   - from: Q_postmark_pending_approval
     to: D_ack_from_provider_not_logto
+    edge_type: SUPPORTS
+  - from: E_email_delivered_proven
+    to: Q_postmark_pending_approval
+    edge_type: SUPERSEDES
+  - from: E_email_delivered_proven
+    to: D_ack_from_provider_not_logto
+    edge_type: SUPPORTS
+  - from: C_isolate_variable_method
+    to: E_email_delivered_proven
     edge_type: SUPPORTS
   - from: E_domain_verified
     to: D_dns_is_critical_path
