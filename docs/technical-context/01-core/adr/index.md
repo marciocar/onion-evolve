@@ -92,6 +92,7 @@ Decisões que criam ou ampliam uma vertical/dimensão do próprio Onion.
 | [Unidade de troca do Onion: "vertical-skill" SDAAL via marketplace](../../../analysis/onion-adr-exchange-unit-2026-06.md) | A unidade de troca do Onion é a vertical-skill, empacotada como plugin Claude Code (marketplace + proveniência); monetização gated | aceito |
 | [Blog/publicação do Onion: fonte-no-repo, gerador determinístico](../../../analysis/onion-adr-blog-publication-generator-2026-07.md) | Publicação editorial do Onion usa fonte-no-repo + gerador determinístico + voz autoral gated, em plataforma SSG-git | aceito (plataforma + arquitetura do gerador); gated (1º ensaio real; costura SDAAL) |
 | [SLM como ferramenta via SDAAL: de-identificação de PII](../../../analysis/onion-adr-slm-as-tool-de-identification-2026-06.md) | Um SLM local faz de-identificação de PII como "segundo runtime" (ferramenta via SDAAL), não como orquestrador | aceito |
+| [Onion como framework + serviço hospedado: medir para limitar](../../../analysis/onion-adr-hosted-service-identity-2026-08.md) | O core ganha 2ª natureza (hospeda recursos que federados consomem); medição autorizada e auditável desde já, cobrança POR UNIDADE explicitamente não adotada (contradiria a diretriz premium-sobre-pipoca do D5); unidade de conta = Organization do Logto projetada de members.yaml | aceito (identidade + medição); cobrança por unidade NÃO adotada; painel gated |
 
 ---
 

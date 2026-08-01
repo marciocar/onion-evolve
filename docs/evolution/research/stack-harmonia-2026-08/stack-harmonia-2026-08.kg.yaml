@@ -179,6 +179,17 @@ nodes:
     label: "DECISAO DO MAESTRO no eixo de entrega: o downstream esta PARADO (0 pendentes, nada emitido ha dias) — publicar os anuncios represados (a sessao gerou MUITO material: WAHA, email/Postmark, LID, os 5 doc!=comportamento, a REGRA DOS 5 PORTOES) OU decidir CONSCIENTEMENTE nao publicar? Ambas sao respostas legitimas; o que nao e legitimo e o estado atual (parado sem decisao). Nao instrumentar o canal — ele funciona; falta EMITIR"
     trace: "docs/evolution/federation/outbox/"
 
+  - id: D_hosted_service_identity
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: adr-ratificado-pelo-maestro-2026-08-01
+    label: "ADR ACEITO (identidade + medicao): o Onion ganha 2a NATUREZA — framework template (copiado, soberano no repo do adotante) E servico hospedado (consumido na VPS do core). Invariante: o adotante pode usar TUDO do framework sem tocar a VPS; o servico e acrescimo OPCIONAL, jamais pre-requisito. DECISOES: (1) MEDIR PARA LIMITAR, nao cobrar por unidade — cobranca por GB/arquivo/usuario e o modelo PIPOCA que a diretriz D5 (ratificada 07-29) rejeita; cobranca por unidade exige OUTRO ADR. (2) 'MEDIDO != COBRAVEL' — o medidor nasce append-only e auditavel mesmo servindo so a observabilidade (primo do aceite!=entrega que custou 3 mensagens fantasma nesta sessao). (3) Unidade de conta = Organization do Logto, projetada de members.yaml (SSOT), com sub do ator. (4) Escopo fechado: so metadado numerico (ts/org/sub/recurso/quantidade/unidade + modelo) — conteudo exige ADR. (5) O painel de administracao NAO e ressuscitado: a refutacao se re-deriva FRESCA quando o gate abrir, e o gate agora e factual e barato — existe >=1 federado migrado ao Logto consumindo recurso hospedado? Hoje: 1 usuario no Logto, e o maestro. LIBERADO: medidor de IA (o dado nao existe hoje em lugar nenhum — portao 3 dos 5 portoes)"
+    trace: "docs/analysis/onion-adr-hosted-service-identity-2026-08.md"
+
 edges:
   - from: E_tres_erros_medidos
     to: D_sintese_reprovada
@@ -219,3 +230,9 @@ edges:
   - from: C_bypass_permissions_exposto
     to: C_producao_nao_e_o_repo
     edge_type: SUPPORTS
+  - from: D_regra_5_portoes
+    to: D_hosted_service_identity
+    edge_type: SUPPORTS
+  - from: D_hosted_service_identity
+    to: Q_publicar_ou_nao
+    edge_type: CAUSES
