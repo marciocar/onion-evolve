@@ -300,6 +300,40 @@ nodes:
     label: "DECLARADO != VERIFICADO no sentido mais literal: as 3 primeiras mensagens (NOWEB) voltaram HTTP 200 com key.id e status PENDING — e eu declarei 'GATILHO FECHADO'. NENHUMA foi entregue (nem ao maestro nem ao 2o numero). O 200 do POST /sendText prova ACEITE NA FILA, NAO ENTREGA. O USync falhava em silencio (WARN, nao erro). LICAO P/ O CONTRATO: status 'PENDING' NAO pode ser reportado como sucesso pelo adapter; so ACK (webhook message.ack) prova entrega. O gatilho so fechou DE FATO no envio ao LID, confirmado pelo destinatario humano"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
 
+  # ── PENDENCIAS FECHADAS 2026-08-01 ──
+  - id: D_engine_noweb_confirmed
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: reteste-noweb-mais-LID-confirmado-por-humano
+    label: "PENDENCIA 1 FECHADA — ENGINE DEFAULT = NOWEB. Re-teste com endereçamento LID correto: NOWEB enviou e a mensagem CHEGOU (confirmado pelo destinatario humano), com ZERO erros de USync nos logs (antes falhava sempre). Portanto o engine NUNCA foi a causa — era enderecamento. NOWEB e o default por medicao (412.9 MiB vs 638.8 do WEBJS, ~35% mais leve) SEM perda de funcionalidade. O valor real do WEBJS foi DIAGNOSTICO: mensagem de erro legivel ('No LID for user') vs o WARN silencioso do NOWEB ('USync yielded no results') — registrar como nota de troubleshooting, nao como default"
+    trace: "/home/marcio/onion-waha/docker-compose.yml"
+
+  - id: E_ack_lifecycle_proven
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-01
+    verified_against: webhook-message.ack-capturado-em-container-na-rede-do-compose
+    label: "PENDENCIA 2 FECHADA — CICLO DE ENTREGA PROVADO por webhook: capturado 'message.ack ack=1 SERVER' e depois 'ack=3 READ' (destinatario LEU). ack e numerico com nome: 1=SERVER, 2=DEVICE, 3=READ. E A UNICA PROVA REAL DE ENTREGA — confirma que HTTP 201 + PENDING nao prova nada. CONTRATO: sendText retorna 'queued'; confirmacao e ASSINCRONA (quem quiser assina o ack e correlaciona pelo MessageReceipt.id). ACHADO OPERACIONAL: ufw bloqueia container->host, entao o receptor de webhook precisa estar NA REDE DO COMPOSE (alcancado por nome DNS), nao no host"
+    trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+
+  - id: C_webhook_event_scope_is_guardrail
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-01
+    verified_against: erro-real-cometido-nesta-sessao
+    label: "REGRA DE GUARDRAIL NASCIDA DE ERRO PROPRIO: assinei os eventos 'message' + 'message.ack' para medir ENTREGA — mas 'message' faz as mensagens RECEBIDAS pelo dono trafegarem pelo receptor (mensagens pessoais de terceiros apareceram nos logs do catcher). Para provar entrega bastava 'message.ack'. ASSINATURA DE EVENTO DE WEBHOOK E DECISAO DE ESCOPO, NAO CONVENIENCIA: allowlist de eventos, minimo necessario, NUNCA '*'. Mesmo modo-de-falha do 'peca so os campos necessarios' (field selection). Webhook removido e receptor destruido assim que percebido. Item da doutrina de webhook (aresta de ENTRADA do catalogo)"
+    trace: "docs/knowledge-base/concepts/onion-guardrails.md"
+
 edges:
   - from: E_waha_current
     to: D_interface_v01
@@ -352,6 +386,21 @@ edges:
   - from: C_first_message_never_delivered
     to: E_gatilho_fechado
     edge_type: REFUTES
+  - from: D_engine_noweb_confirmed
+    to: C_engine_decision_reopened
+    edge_type: SUPERSEDES
+  - from: E_lid_addressing_root_cause
+    to: D_engine_noweb_confirmed
+    edge_type: SUPPORTS
+  - from: E_ack_lifecycle_proven
+    to: C_first_message_never_delivered
+    edge_type: SUPPORTS
+  - from: E_ack_lifecycle_proven
+    to: D_resolve_is_contract
+    edge_type: SUPPORTS
+  - from: C_webhook_event_scope_is_guardrail
+    to: E_ack_lifecycle_proven
+    edge_type: SUPPORTS
   - from: E_waha_current
     to: D_domain_whatsapp_not_messaging
     edge_type: SUPPORTS
