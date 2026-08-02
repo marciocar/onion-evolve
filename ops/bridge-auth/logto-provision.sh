@@ -11,7 +11,7 @@
 # o obstáculo e é melhor pelos critérios da casa: reproduzível, auditável, versionado,
 # idempotente, sem superfície nova. Nó do KG: C_console_not_the_path.
 #
-# Uso : bash ops/bridge-auth/logto-provision.sh [--apply] [--user <username>]
+# Uso : bash ops/bridge-auth/logto-provision.sh [--apply] [--user <username>] [--smtp]
 #       Sem --apply é DRY-RUN: mostra o que faria e não muta nada.
 #
 # Segredos: o client_secret é lido do banco para a memória e NUNCA impresso. A senha do
@@ -73,6 +73,7 @@ while [ $# -gt 0 ]; do
     --invite-role) INVITE_ROLE="${2:?--invite-role precisa do tier}"; shift ;;
     --invite-days) INVITE_DAYS="${2:?--invite-days precisa de numero}"; shift ;;
     --invites)     LIST_INVITES=1 ;;
+    --smtp)        SMTP_PROVISION=1 ;;
     --uninvite)    UNINVITE_ID="${2:?--uninvite precisa do id do convite}"; shift ;;
     --drop-org)    DROP_ORG="${2:?--drop-org precisa do nome da organizacao}"; shift ;;
     --drop-user)   DROP_USER="${2:?--drop-user precisa do username}"; shift ;;
@@ -142,9 +143,32 @@ fi
 say "   issuer do tenant admin OK (loopback)"
 
 step "0. token M2M para a Management API do tenant default"
-_secret="$(docker exec "${PG_CONTAINER}" psql -U logto -d logto -tAc \
-  "select secret from applications where id='m-default';" 2>/dev/null | tr -d ' \r\n')"
-[ -n "${_secret}" ] || { echo "ERRO: secret de m-default não encontrado." >&2; exit 4; }
+# `|| true` NÃO é desleixo: sem ele, sob `set -euo pipefail`, a falha do docker mata o script
+# NA ATRIBUIÇÃO — e a checagem abaixo, que existe e dá a mensagem certa, NUNCA RODA.
+# Medido 2026-08-02: o script morria mudo (exit 1, zero saída) e só o `bash -x` revelou onde.
+# Guarda INALCANÇÁVEL é pior que guarda ausente: dá a impressão de estar coberto.
+#
+# E o docker exige sudo para usuário fora do grupo `docker` (medido: `docker ps` → denied).
+# Tenta direto e cai para `sudo -n` — serve tanto rodando como root (cron) quanto como o maestro,
+# sem exigir que o chamador saiba qual dos dois é.
+_dk() { docker "$@" 2>/dev/null || sudo -n docker "$@" 2>/dev/null; }
+_secret="$(_dk exec "${PG_CONTAINER}" psql -U logto -d logto -tAc \
+  "select secret from applications where id='m-default';" | tr -d ' \r\n' || true)"
+[ -n "${_secret}" ] || {
+  cat >&2 <<'HELPSEC'
+ERRO: não consegui ler o secret do app M2M `m-default` no banco do Logto.
+
+  CAUSAS POSSÍVEIS, em ordem de probabilidade:
+   1. docker exige sudo para este usuário e o `sudo -n` (sem senha) falhou;
+   2. o container do Postgres não está de pé  → sudo docker ps | grep logto-postgres
+   3. o app `m-default` não existe no tenant admin → rode este script SEM --smtp para provisioná-lo.
+
+  DIAGNÓSTICO EM UM COMANDO:
+    sudo docker exec onion-logto-postgres psql -U logto -d logto -tAc \
+      "select id from applications where id='m-default';"
+HELPSEC
+  exit 4
+}
 
 _tok_resp="$(curl -sS -k --resolve "${RESOLVE}" -X POST "${TOKEN_ORIGIN}/oidc/token" \
   --data-urlencode grant_type=client_credentials \
@@ -329,6 +353,76 @@ if [ "${LIST_INVITES:-0}" = "1" ]; then
   api GET "/organization-invitations" 2>/dev/null \
     | jq -r '.[]? | "   \(.invitee)  org=\(.organizationId)  status=\(.status)  expira=\(.expiresAt)"' \
     | sed 's/^/  /' || say "   (nenhum)"
+  exit 0
+fi
+
+# --- MODO --smtp: provisiona o conector de EMAIL do Logto -----------------------
+#
+# POR QUE EXISTE (buraco medido 2026-08-02): o conector SMTP foi criado AD-HOC em 2026-08-01 por
+# chamada direta a Management API. Ficou SO no banco do Logto. Se o Logto for reconstruido, o
+# conector some e ninguem sabe refazer sem redescobrir — e o convite de organizacao volta a dar
+# 501 "No email connector is configured".
+#
+# O QUE E REPRODUZIVEL AQUI: host, port, secure, fromEmail e os 5 templates (usageType + assunto +
+# corpo). O QUE NAO ENTRA NUNCA: as credenciais SMTP — vem do ambiente (SMTP_USER/SMTP_PASS), pelo
+# mesmo principio do resto do script ("o client_secret e lido do banco para a memoria e NUNCA
+# impresso"). Com Postmark, user e pass sao o MESMO Server Token.
+#
+# IDEMPOTENTE como todo o resto: consulta antes de criar; se ja existe conector de email, ATUALIZA
+# (PATCH) em vez de duplicar — o Logto aceita 1 conector de email ATIVO por tenant, entao criar um
+# segundo quebraria o canal em silencio.
+if [ "${SMTP_PROVISION:-0}" = "1" ]; then
+  step "conector SMTP de email (Postmark)"
+
+  : "${SMTP_USER:?--smtp exige SMTP_USER no ambiente (Postmark: o Server Token)}"
+  : "${SMTP_PASS:?--smtp exige SMTP_PASS no ambiente (Postmark: o MESMO Server Token)}"
+  _host="${SMTP_HOST:-smtp.postmarkapp.com}"
+  _port="${SMTP_PORT:-587}"
+  _from="${SMTP_FROM:-Onion <noreply@mail.onionevolve.com>}"
+
+  # Os 5 usageType que o fluxo do Onion exerce. OrganizationInvitation e o que destrava o convite
+  # por organizacao — foi a AUSENCIA dele que apareceu como 501 no dogfood de 2026-08-01.
+  # {{code}} e o placeholder do Logto; em OrganizationInvitation o link vem em {{link}}.
+  # ⚠️ EXTRAIDOS DO CONECTOR VIVO em 2026-08-02, verbatim — NAO reescritos de memoria.
+  # A 1a versao deste bloco tinha texto que EU inventei, e diferia do vivo em dois pontos
+  # (Register dizia "cadastro" em vez de "confirmacao"; OrganizationInvitation era 1 linha em vez
+  # de 2). Um --apply teria SOBRESCRITO producao com a minha versao, silenciosamente. Reproduzir
+  # != recriar: um script de provisionamento que "melhora" o que encontra e um script que corrompe.
+  # Extraidos com:
+  #   sudo docker exec onion-logto-postgres psql -U logto -d logto -tAc \
+  #     "select jsonb_pretty(config::jsonb->'templates') from connectors;"
+  _templates="$(jq -nc '[
+    {usageType:"Generic",                subject:"Onion - codigo de verificacao",  content:"Seu codigo: {{code}}",                        contentType:"text/plain"},
+    {usageType:"SignIn",                 subject:"Onion - codigo de acesso",       content:"Seu codigo de acesso: {{code}}",              contentType:"text/plain"},
+    {usageType:"Register",               subject:"Onion - confirme seu cadastro",  content:"Seu codigo de confirmacao: {{code}}",         contentType:"text/plain"},
+    {usageType:"ForgotPassword",         subject:"Onion - redefinir senha",        content:"Seu codigo para redefinir a senha: {{code}}", contentType:"text/plain"},
+    {usageType:"OrganizationInvitation", subject:"Convite para a federacao Onion", content:"Voce foi convidado para uma organizacao no Onion.\n\nAcesse: {{link}}", contentType:"text/plain"}
+  ]')"
+
+  _cfg="$(jq -nc --arg h "${_host}" --argjson p "${_port}" --arg f "${_from}" \
+                 --arg u "${SMTP_USER}" --arg w "${SMTP_PASS}" --argjson t "${_templates}" \
+    '{host:$h, port:$p, secure:false, fromEmail:$f, auth:{type:"login", user:$u, pass:$w}, templates:$t}')"
+
+  _existing="$(api GET "/connectors" | jq -r '.[]? | select(.connectorId=="simple-mail-transfer-protocol") | .id' | head -1)"
+
+  if [ "${APPLY}" = "1" ]; then
+    if [ -n "${_existing}" ]; then
+      api PATCH "/connectors/${_existing}" "$(jq -nc --argjson c "${_cfg}" '{config:$c}')" >/dev/null
+      say "   conector ATUALIZADO (id=${_existing}) — 1 conector de email ativo por tenant, entao nao se duplica"
+    else
+      _resp="$(api POST "/connectors" "$(jq -nc --argjson c "${_cfg}" '{connectorId:"simple-mail-transfer-protocol", config:$c}')")"
+      _nid="$(printf '%s' "${_resp}" | jq -r '.id // empty')"
+      [ -n "${_nid}" ] || { say "   FALHOU: $(printf '%s' "${_resp}" | jq -r '.message // .code // .' | head -c 200)"; exit 6; }
+      say "   conector CRIADO: id=${_nid}"
+    fi
+    say "   host=${_host}:${_port} from=${_from} · 5 templates (incl. OrganizationInvitation)"
+    say "   ⚠ ACEITE SMTP != ENTREGA. O Logto e fire-and-forget: a prova de entrega vem do webhook"
+    say "     do provider (delivered/bounced), fora do Logto. Teste real = convite caindo na INBOX."
+  else
+    if [ -n "${_existing}" ]; then say "   [DRY-RUN] ATUALIZARIA o conector existente id=${_existing}"
+    else say "   [DRY-RUN] CRIARIA conector simple-mail-transfer-protocol em ${_host}:${_port}"; fi
+    say "   [DRY-RUN] 5 templates: Generic, SignIn, Register, ForgotPassword, OrganizationInvitation"
+  fi
   exit 0
 fi
 
