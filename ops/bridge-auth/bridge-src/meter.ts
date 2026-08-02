@@ -73,19 +73,35 @@ export function record(baseDir: string, line: MeterLine): void {
 export function fromSdkResult(msg: unknown): {
   inputTokens: number | null;
   outputTokens: number | null;
+  cacheReadTokens: number | null;
+  cacheWriteTokens: number | null;
   costUsd: number | null;
   model: string | null;
 } {
   const m = (msg ?? {}) as Record<string, unknown>;
-  const usage = (m.usage ?? {}) as Record<string, unknown>;
   const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
   const str = (v: unknown): string | null => (typeof v === "string" && v.length > 0 ? v : null);
 
+  // FORMA REAL, MEDIDA em 2026-08-01 contra o SDK vivo (doc != comportamento — a
+  // 6a divergencia desta sessao): o evento `result` traz `modelUsage`, um objeto
+  // CHAVEADO PELO NOME DO MODELO, com inputTokens/outputTokens/costUSD em camelCase
+  // e — decisivo — cacheCreationInputTokens, que DOMINA o custo real (medido:
+  // 9635 tokens de cache-write contra 40 de input). Ignorar cache e reportar
+  // custo errado por ordem de grandeza.
+  const mu = (m.modelUsage ?? {}) as Record<string, Record<string, unknown>>;
+  const modelKey = Object.keys(mu)[0] ?? null;
+  const u = (modelKey ? mu[modelKey] : {}) ?? {};
+
+  // Os fallbacks snake_case ficam: se o SDK voltar ao formato documentado, ainda lemos.
+  const legacy = (m.usage ?? {}) as Record<string, unknown>;
+
   return {
-    inputTokens: num(usage.input_tokens) ?? num(usage.inputTokens),
-    outputTokens: num(usage.output_tokens) ?? num(usage.outputTokens),
-    costUsd: num(m.total_cost_usd) ?? num(m.cost_usd) ?? num(m.totalCostUsd),
-    model: str(m.model) ?? str((m.message as Record<string, unknown> | undefined)?.model),
+    inputTokens: num(u.inputTokens) ?? num(legacy.input_tokens),
+    outputTokens: num(u.outputTokens) ?? num(legacy.output_tokens),
+    cacheReadTokens: num(u.cacheReadInputTokens) ?? num(legacy.cache_read_input_tokens),
+    cacheWriteTokens: num(u.cacheCreationInputTokens) ?? num(legacy.cache_creation_input_tokens),
+    costUsd: num(u.costUSD) ?? num(m.total_cost_usd) ?? num(m.cost_usd),
+    model: modelKey ?? str(m.model),
   };
 }
 
@@ -100,7 +116,8 @@ export function recordAiResult(
   ctx: { org: string | null; sub: string | null; tokenType: string | null },
   sdkResult: unknown,
 ): void {
-  const { inputTokens, outputTokens, costUsd, model } = fromSdkResult(sdkResult);
+  const { inputTokens, outputTokens, cacheReadTokens, cacheWriteTokens, costUsd, model } =
+    fromSdkResult(sdkResult);
   const base = {
     ts: new Date().toISOString(),
     org: ctx.org,
@@ -114,6 +131,8 @@ export function recordAiResult(
   const metrics: Array<{ quantity: number | null; unit: string }> = [];
   if (inputTokens !== null) metrics.push({ quantity: inputTokens, unit: "tokens.input" });
   if (outputTokens !== null) metrics.push({ quantity: outputTokens, unit: "tokens.output" });
+  if (cacheReadTokens !== null) metrics.push({ quantity: cacheReadTokens, unit: "tokens.cache_read" });
+  if (cacheWriteTokens !== null) metrics.push({ quantity: cacheWriteTokens, unit: "tokens.cache_write" });
   if (costUsd !== null) metrics.push({ quantity: costUsd, unit: "usd" });
 
   if (metrics.length === 0) {

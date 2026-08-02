@@ -10,6 +10,18 @@ on:
       # Sem este path, um PR que só toca plugins/ contorna o drift-guard
       # (incidente 2026-07-04: fix de drift do #241 mergeou sem o lint rodar).
       - 'plugins/**'
+      # .github/workflows/ = o proprio CI. Sem este path, um PR que mexe no
+      # workflow NAO dispara o lint — foi medido no #509: adicionar 'ops/**' aos
+      # paths nao fez o lint rodar, porque o filtro e avaliado contra a definicao
+      # da BASE e a mudanca do workflow nao casava path nenhum. CI que nao se
+      # valida quando muda e a mesma classe de ponto cego, um nivel acima.
+      - '.github/workflows/**'
+      # ops/ = codigo de SERVICO (fora do payload do /meta:adopt, PR #508). Sem
+      # este path, um PR que so toca ops/ nao dispara lint NENHUM — foi o que
+      # aconteceu no #509, que rodou so o onion-review. Terceira ocorrencia da
+      # mesma classe (#241 plugins, #254 docs, agora ops/): path novo nasce
+      # invisivel ao CI ate alguem notar. O lint nao valida .ts, mas valida as
+      # REFERENCIAS (REGRA 48) e a SSOT que um PR de ops/ pode mexer.
       # docs/ + CLAUDE.md são guardados pelas regras de SSOT (R9/R15/R16/R22:
       # contagens vivas, carimbo de frescor, links da co-evolução). Sem estes
       # paths, um PR docs-only deriva contagens sem o CI ver (observado no #254:

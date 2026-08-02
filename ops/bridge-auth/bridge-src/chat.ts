@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { config } from "./config.ts";
 import { ensureWorkspace } from "./workspace.ts";
+import { recordAiResult } from "./meter.ts";
 
 // MIME types aceitos para imagens inline e upload.
 const ALLOWED_IMAGE_MIME = new Set([
@@ -240,6 +241,14 @@ async function runQuery(
         options: {
           cwd,
           settingSources: ["project"],
+          // MODELO EXPLÍCITO (diretriz permanente do maestro: sempre latest, máximo
+          // do modelo). Sem isto o SDK usa o default dele — MEDIDO 2026-08-01 pelo
+          // próprio medidor: rodava `claude-opus-4-8`, uma geração atrás. É por env
+          // para trocar sem deploy de código quando a lineup avançar; deixar VAZIO
+          // devolve o default do SDK (escape hatch se um id novo for recusado).
+          ...(process.env.ONION_MODEL !== ""
+            ? { model: process.env.ONION_MODEL ?? "claude-opus-5" }
+            : {}),
           permissionMode: config.permissionMode,
           ...(config.permissionMode === "bypassPermissions"
             ? { allowDangerouslySkipPermissions: true }
@@ -267,6 +276,26 @@ async function runQuery(
       let sentSession = false;
       for await (const message of conversation) {
         const type = (message as { type?: string }).type ?? "message";
+
+        // MEDIÇÃO (ADR onion-adr-hosted-service-identity-2026-08): o SDK emite um
+        // evento `result` ao fim da conversa, com usage/custo. Registramos SÓ
+        // metadado numérico — nunca prompt, completion ou nome de arquivo.
+        // Nunca lança: medir não pode derrubar o que se mede.
+        if (type === "result") {
+          const idv = (c as Context & { var?: { identity?: { subject?: string; orgId?: string } } }).var?.identity;
+          const tt = (c as Context & { var?: { tokenType?: string } }).var?.tokenType;
+          // Destino: o dir de ESTADO do bridge, JAMAIS o onionCwd — medido
+          // 2026-08-01: ONION_CWD é o checkout git do core, e escrever ali fez
+          // nascer `?? meter/` no `git status`. Dado de runtime não mora em
+          // checkout: suja o repo, pode ser commitado por acidente e some num
+          // `git clean`. MEDIDOR_DIR permite override; o default é o mesmo
+          // diretório que já guarda tokens.json (e que o backup já cobre).
+          recordAiResult(process.env.METER_DIR ?? "/home/onion/onion-bridge/data", {
+            org: idv?.orgId ?? null,
+            sub: idv?.subject ?? null,
+            tokenType: tt ?? null,
+          }, message);
+        }
 
         // Devolve o session_id uma única vez (para resume no cliente).
         if (!sentSession) {
