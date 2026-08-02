@@ -43,10 +43,29 @@ Nativas" (fonte única).
 2. **Escolher 1 dos 6 padrões canônicos** (tabela abaixo) conforme a forma do
    trabalho: classificar antes de agir, fan-out→sintetizar, verificação
    adversarial, gerar→filtrar, torneio, ou loop até convergir.
-3. **Autorar um script Workflow.** Use `parallel([...])` quando precisa de
-   **barreira** (todos terminam antes do fan-in) e `pipeline(items, ...)` quando
-   o fluxo corre **sem barreira** entre itens (estágios encadeados por item).
-   Defina `schema` por worker para output estruturado e validado.
+3. **Autorar um script Workflow — EM ARQUIVO, nunca inline.** Escreva o script com `Write` em
+   `$CLAUDE_JOB_DIR/tmp/` (ou no dir de scratch), rode o check de sintaxe, e só então invoque
+   `Workflow({scriptPath})`. **Três ganhos de uma vez, e só o primeiro é óbvio:**
+
+   ```bash
+   node --input-type=module --check < <script>   # exit 1 = sintaxe quebrada
+   ```
+
+   ⚠️ **`node --check` sozinho MENTE** — trata `.js` como CommonJS e deixa passar erro de módulo
+   (medido 2026-08-02: backtick perdido dentro de template literal → `--check` exit 0, `import()`
+   exit 1). Use `--input-type=module`, ou extensão `.mjs`.
+
+   - **(a) Sintaxe pega antes de gastar worker.** O modo-de-falha recorrente: o script é um
+     template literal gigante, e **backtick em prosa** (hábito de markdown) o parte ao meio.
+   - **(b) O script vira EDITÁVEL** — corrigir uma fase não exige reenviar tudo.
+   - **(c) O script vira RETOMÁVEL** — `Workflow({scriptPath, resumeFromRunId})` replica do cache
+     os agentes já concluídos. **É o ganho maior**: em 2026-08-02, dois workflows morreram com a
+     sessão e sem arquivo não havia de onde retomar (um deles foi relançado em duplicata — que por
+     acidente virou a medição de que descoberta precisa de N passadas).
+
+   Use `parallel([...])` quando precisa de **barreira** (todos terminam antes do fan-in) e
+   `pipeline(items, ...)` quando o fluxo corre **sem barreira** entre itens. Defina `schema` por
+   worker para output estruturado e validado.
 4. **Modo mutação (quando os workers ESCREVEM).** Decida partição-vs-worktree:
    workers em arquivos **disjuntos** → particione, **sem** worktree; sobreposição
    real / branches independentes → `isolation:'worktree'` por worker. No fan-in:

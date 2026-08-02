@@ -191,6 +191,47 @@ nodes:
     label: "VIES ESTRUTURAL, NAO DESCUIDO: as 8 pistas de mercado buscaram por NOMES CONHECIDOS (Sourcegraph, Harness, Neo4j, Zep, Mem0, Letta, GraphRAG) e perderam o Graphify (100.765 estrelas em 120 dias, skill para Claude Code — o nosso substrato exato). Buscar por nome so acha o que JA ERA FAMOSO: o emergente nao esta no modelo mental, logo nao entra na consulta. CURA: todo levantamento externo carrega pelo menos 1 eixo por TRAJETORIA (gh api search com created:> ordenado por estrelas; HN via API do Algolia; batches de YC), e o worker devolve campo obrigatorio 'o_que_descartei_por_ja_ser_famoso' — worker que so devolve nome conhecido FALHOU"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
 
+  # ── AS 3 SUBSTÂNCIAS REPROVADAS NO RE-LITÍGIO ──────────────────────────────────────────
+  # Estes 3 nós foram ACRESCENTADOS em 2026-08-02 depois que o estudo de mecanização do Elenxo
+  # (wf_d3f249a1-096) mediu que ESTE grafo tinha REFUTES=0 / SUPERSEDES=0 / refuted=0 enquanto o
+  # SYNTHESIS.md:133 narrava "cinco instrumentos reprovados". Era a 5a/6a ocorrência da cicatriz
+  # registrada em kg-born-marker.sh:26 ("8 passadas de Elenxo evaporaram em prosa") — cometida por
+  # mim, no mesmo dia em que a diagnostiquei. A refutação existiu; só não tinha virado ARESTA.
+  # Sem isto, o radar não acha o que foi derrubado — e o próximo a perguntar "isso já foi testado?"
+  # re-derivaria do zero, que é exatamente a falha que esta pesquisa inteira investiga.
+  - id: C_sub_rules_paths
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-02
+    verified_against: replay-7-casos-wf_eb01875e-962
+    label: "SUBSTANCIA D — .claude/rules/ com frontmatter paths como cura da perna de leitura. PLACAR 1/7 (aceite era 5/7), e o unico caso que pega e o MESMO C7 que as curas A e B ja pegavam: a uniao nao cresce. DISANALOGIA QUE MATA: os gatilhos do corpus sao TOPICOS (oficializar WAHA, pagina de convite, fios abertos) e o glob de paths casa ARQUIVO TOCADO — sao eixos diferentes. Ataque adversarial: 'passivo liquido'"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: C_sub_hook_injeta
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: code.claude.com-docs-hooks
+    label: "SUBSTANCIA E — hook tipo prompt/agent que RODA o radar e INJETA o veredito. PLACAR 3/7, o melhor do corpus e 3x a cura B (1/9): a distincao 'roda e injeta o RESULTADO' vs 'injeta prosa pedindo que o modelo rode' e REAL e MENSURAVEL. Mas REPROVADA por fato externo que nenhuma introspeccao acharia: hooks prompt e agent NAO retornam additionalContext (sao decisores sim/nao, nao injetores) e ha teto de 10.000 chars — a forma completa mede 138.433 bytes. NAO E CONSTRUTIVEL COMO DESCRITA"
+    trace: "https://code.claude.com/docs/en/hooks"
+
+  - id: C_sub_residuo
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-02
+    verified_against: replay-7-casos-wf_eb01875e-962
+    label: "SUBSTANCIA F — cura de RESIDUO (id de no citado em artefato duravel: commit/PR/doc). PLACAR 1/7, e de novo o mesmo C7. O replay provou que commit/PR/doc e O PLANO ERRADO: 6 das 7 falhas sao CONVERSACIONAIS e nao produzem commit — em 2026-08-02 o repo tinha 1 commit, a propria pesquisa. Ataque: 0 de 5 portoes. O QUE MORREU FOI A ENCARNACAO, NAO A LENTE: 'residuo material auditado por terceiro, desacoplado do ator' segue de pe e segue sem candidata"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
   - id: A_RESEARCH_MARKET
     node_type: artifact
     plane: DEV
@@ -222,6 +263,18 @@ edges:
   - from: E_placar_relitigio
     to: D_ratificado_e_refinado
     edge_type: SUPPORTS
+  # As arestas que faltavam: o placar REFUTA cada substância, e o fato da plataforma refuta a que
+  # chegou mais perto. Sem elas o radar reportava "nenhuma contradição" sobre um grafo que registrava
+  # 3 reprovações — falso-verde por omissão, não por erro.
+  - from: E_placar_relitigio
+    to: C_sub_rules_paths
+    edge_type: REFUTES
+  - from: E_placar_relitigio
+    to: C_sub_residuo
+    edge_type: REFUTES
+  - from: E_plataforma_desqualifica
+    to: C_sub_hook_injeta
+    edge_type: REFUTES
   - from: E_plataforma_desqualifica
     to: D_ratificado_e_refinado
     edge_type: SUPPORTS
