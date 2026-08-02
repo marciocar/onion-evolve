@@ -38,7 +38,7 @@ faça `cat` de pastas inteiras (anti-pattern Context Dump).
 ### 0. KG-first — o `.kg.yaml` é o SSOT de "onde estamos" (acima do git)
 **Antes** de reconstruir de git/memória, **se existir um `.kg.yaml` no repo, abra-o PRIMEIRO** — ele é a
 fonte da verdade de estado, acima do git. É o **primeiro ato**, não um passo opcional no fim.
-- Localizar: `ls docs/onion/graph/*.kg.yaml docs/*/graph/*.kg.yaml *.kg.yaml 2>/dev/null`.
+- Localizar: `git ls-files '*.kg.yaml' | grep -v '/fixtures/'`.
 - Rodar o veredito: `bash .claude/validation/kg-radar.sh <arquivo>` (atenção · reconciliação · integridade ·
   frescor). Cite os **ids de nó** de maior atenção no briefing, em vez de re-derivar da prosa.
 - **Drive-to-verify:** claim `plane: PROD` de alto impacto → cruze contra o vivo (código `arquivo:linha`/dump)
