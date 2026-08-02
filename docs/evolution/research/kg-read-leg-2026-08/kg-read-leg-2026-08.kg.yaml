@@ -1,0 +1,226 @@
+meta:
+  id: kg-read-leg-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-02
+  date: 2026-08-02
+  note: >
+    Elenxo sobre a PERNA DA LEITURA do KG-SSOT: por que read(KG) nao dispara na hora da decisao.
+    Gatilho: o agente respondeu 3 perguntas decisivas sem abrir o grafo e contradisse uma decisao
+    selada. Metodo: 4 lentes de diagnostico + 3 curas em steelman + refutacao adversarial e REPLAY
+    contra corpus de 9 falhas reais. VEREDITO: as 3 curas somam 1/9, 1/9 e 0/9 e o unico caso que
+    qualquer uma pega e O MESMO (C7) — a uniao NAO cobre mais que a melhor isolada. A hipotese-mae
+    (timing) foi REFUTADA pelo corpus. O unico acionavel e um DEFEITO MEDIDO no mecanismo vigente.
+    Projecao: SYNTHESIS.md.
+
+nodes:
+  - id: Q_read_leg
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "A PERGUNTA: a doutrina KG-SSOT-first e densamente declarada (KB de 637 linhas, 4 ADRs, 3 comandos, 4 skills) e a perna da ESCRITA esta mecanizada (REGRA 26/29/43/47). Por que a perna da LEITURA nao dispara no momento da decisao — e o que a faria disparar?"
+
+  - id: E_recurrence_is_the_data
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-02
+    verified_against: repo-HEAD-5c6e2cf
+    label: "NAO E FALHA NOVA — e a 8a+ ocorrencia de modo de falha ja diagnosticado, medido e nomeado. O autor da doutrina ignorou o KG 3x na MESMA sessao minutos apos monta-lo, e >=4x DEPOIS de escrever a doutrina. A KB ja cravou o veredito: 'A reincidencia E o dado. Nao e falha de disciplina do consumidor — e falha de DESIGN DO LOOP'. Numero do gargalo registrado: recall passivo quase perfeito 'despenca para 40-60% no uso ativo em decisao'"
+    trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md:431"
+
+  - id: E_write_leg_only
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-02
+    verified_against: lint-artifacts.sh-HEAD
+    label: "ASSIMETRIA ESTRUTURAL MEDIDA: as ~11 regras de lint que tocam KG (26, 29, 31, 32, 41, 42, 43, 47) verificam ARTEFATO — nasceu arquivo / e citado / ponteiro e sao. read(KG) NAO TEM MECANISMO NENHUM. Nenhum hook toca KG (.claude/hooks/ tem 5 scripts, zero mencionam kg). CLAUDE.md — o unico texto sempre carregado — tem ZERO mencao a KG/grafo. Os niveis 2 e 3 da hierarquia de forcing-function da propria doutrina nunca foram instalados"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: E_cost_is_not_the_barrier
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-02
+    verified_against: medicao-direta-VPS
+    label: "CUSTO NAO E O OBSTACULO (medido): kg-radar.sh em 1 grafo = 16ms; grep cross-grafo nos 43 arquivos = 11ms. Ler e praticamente de graca. Logo o problema NAO e custo nem capacidade — e DISPARO. Isto elimina de antemao toda classe de cura do tipo 'torne a leitura mais barata'"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: C_timing_hypothesis
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.9
+    label: "HIPOTESE-MAE (do agente, portanto suspeita): os 3 comandos cabeados sao nivel 4 e FUNCIONARAM — a sessao rodou /warm-up. Mas disparam UMA VEZ, na abertura; as decisoes acontecem continuamente, horas depois. A trava cobriria o inicio da sessao, nao o momento da decisao"
+
+  - id: E_proximity_zero_failed
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-02
+    verified_against: _processed/2026-07-16-ssot-como-runtime-para-adr.md
+    label: "O QUE REFUTA O TIMING: os casos C4-C6 aconteceram MINUTOS depois de o proprio agente AUTORAR o grafo, na mesma sessao, com arquivo e ids no contexto imediato. Distancia temporal ~0, salienciamaxima — e falhou 3x. SE DISTANCIA 0 FALHOU TRES VEZES, nao ha evidencia de que distancia 1 (additionalContext no mesmo prompt) funcione. PRESENCA != CONSULTA. O timing e verdadeiro como observacao de escopo e irrelevante para 6 dos 7 casos de leitura"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: E_glob_blind_36pct
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-02
+    verified_against: execucao-verbatim-do-glob-no-HEAD
+    label: "DEFEITO MEDIDO E VERIFICADO INDEPENDENTEMENTE: o glob de descoberta do passo-0 dos 3 comandos cabeados ('ls docs/onion/graph/*.kg.yaml docs/*/graph/*.kg.yaml *.kg.yaml') enxerga 31 grafos unicos; existem 49 rastreados no git (sem fixtures). CEGO PARA 18 (36%) — porque docs/*/graph/ NAO alcanca docs/evolution/research/<tema>/. Os grafos que responderiam C1 (waha-adapter-2026-07) e C2 (email-logto-2026-08) estao entre os cegos. MESMO SE o modelo tivesse obedecido perfeitamente ao passo 0, nao teria achado. ARMADILHA: o glob casa docs/onion/graph/ em DOIS padroes e duplica a saida (31x2=62) — a primeira contagem do proprio agente caiu nela"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: E_replay_scoreboard
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: elenxo-14-workers-wf_38afb1f2-ee7
+    label: "O PLACAR (a regua): cura A (secao no CLAUDE.md) = 1/9; cura B (hook UserPromptSubmit sensor-de-ausencia) = 1/9; cura C (kg-radar --grep cross-grafo) = 0/9. O UNICO caso que A e B pegam e O MESMO (C7) — logo a uniao das tres e 1/9, identica a melhor isolada. Somar as tres e somar superficie, nao cobertura. Descontando C8/C9 (perna da escrita, ja curados), na perna de LEITURA: 1/7, 1/7, 0/7"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: E_claude_md_has_control
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-02
+    verified_against: CLAUDE.md-git-blame
+    label: "CONTROLE EMPIRICO DA CURA A, e reprovou: a secao 'Dogfood e o padrao master' entrou no CLAUDE.md em 2026-06-22 — prosa imperativa, mesmo registro, mesmo arquivo sempre-carregado. O caso C1 falhou ~6 semanas depois SOB ESSA SECAO CARREGADA. Pior: em C1 o agente APLICOU outra doutrina em prosa (os 5 portoes, de memoria) e PULOU o grafo — ele ja arbitra entre imperativos concorrentes, e o de KG perdeu a disputa"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: E_ammunition_not_trigger
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: replay-corpus-9-casos
+    label: "A PINCA QUE MATA A CURA DE DESCOBERTA: em 0 de 9 casos ha registro de alguem que QUIS consultar e NAO ACHOU — sete sao 'nao consultou'. Em C4-C6 a descoberta ja custava zero (grafo recem-autorado pelo proprio agente) e a leitura falhou; em C7 a leitura aconteceu e o instrumento ATUAL bastou (corrigiu 4 erros, revelou que metade do redesenho ja existia como no). Onde descobrir era gratis, falhou; onde leu, o velho serviu. --grep e MUNICAO, nao GATILHO. E o repo ja tem TRES nivel-4 disponiveis-e-ignorados — somar um quarto nome e somar ao denominador"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: C_residue_is_the_property
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    label: "A PROPRIEDADE QUE SEPARA O QUE PEGOU DO QUE FALHOU: as 4 travas que pegaram (REGRA 26/29/43/47) compartilham RESIDUO MATERIAL AUDITADO POR TERCEIRO — script deterministico em CI, DESACOPLADO do ator que deveria obedecer. As 3 curas do dossie nao produzem residuo nenhum; A e B ainda tentam carona num marcador cujo regime o proprio repo declara silencioso ('a AUSENCIA de kg: NAO e violacao... investigacao nao-declarada e indetectavel'). ESTA LENTE FOI A UNICA A ATRAVESSAR O REPLAY INTACTA — E SUA CANDIDATA NUNCA ENTROU NO RING"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: D_build_none_of_three
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: elenxo-wf_38afb1f2-ee7
+    label: "VEREDITO: NAO CONSTRUIR nenhuma das tres curas na forma proposta. As tres sao, respectivamente, disciplina em prosa (A), disciplina em prosa injetada com mais frequencia (B) e ferramenta melhor para um ato que nunca e emitido (C). O corpus sustenta a leitura dura que a propria KB ja tinha: e DESIGN DO LOOP e nao tem cura barata. Escopo ratificado pelo maestro: core primeiro, adotante gated; regua = replay primeiro, depois repensar"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: D_fix_glob_not_a_cure
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "UNICO ACIONAVEL, e DECLARADAMENTE NAO VENDIDO COMO CURA: trocar o glob hardcoded dos 3 comandos cabeados por resolucao AO VIVO (git ls-files '*.kg.yaml' sem fixtures). ~1 linha x 3 arquivos, zero artefato persistido, zero tabela — logo imune ao veredito do spike de guardrails ('hand-curar tabela DRIFTA'): nao ha copia para envelhecer. Papel SENSOR/advisory, momento de disparo INALTERADO. 5 portoes: P1 (pull datado) FALHA PARCIAL — nao existe pull 'nao achei o grafo'; entra como BUG-FIX, nao como promocao de mecanismo"
+    trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+
+  - id: C_dissent_declare_victory
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    label: "DISSENT PRESERVADO (a objecao mais forte contra a propria recomendacao): consertar o glob e fazer exatamente o que se acabou de reprovar na cura C — melhorar um instrumento que o corpus mostra que nao e invocado. O fix nao move o placar; os 7 casos de leitura falharam por NAO-INVOCACAO, e um git ls-files correto dentro de um passo 0 que ninguem executa e um botao melhor num painel que ninguem aperta. RISCO REAL: permite DECLARAR VITORIA sobre um corpus que nao toca, fechando o caso sem fechar o buraco. Defesa estreita e declarada estreita: nao se promove mecanismo, remove-se uma MENTIRA MECANICA — uma trava que declara 'consulte TODOS os .kg.yaml' enquanto enumera 63% deles e declaracao falsa em producao"
+
+  - id: Q_residue_gate
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: "GATED, E O ACHADO DEVOLVIDO AO MAESTRO: cura de RESIDUO — decisao de alto impacto que toca tema com grafo carrega kg:<path> + node:<id> no artefato DURAVEL (commit/PR/doc), auditada por gate HARD FORA da sessao (a sessao nao pode ser testemunha de si mesma). Criterio de aceite: replay >=5/7 na perna de leitura contra ESTE corpus. Restricoes ja levantadas: NAO reusar a marca kg: (ja e da REGRA 43 com semantica de caminho) e NAO alegar carona na REGRA 47. LIMITE HONESTO: audita DEPOIS — transforma reincidencia invisivel em detectavel, que e o que curou a perna da escrita 4x; nao promete impedir C4-C6"
+
+  - id: Q_hook_injects_verdict
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "GATED (nao e a cura B): hook per-turno que RODA o radar e INJETA O VEREDITO (ids + top-atencao), sem clausula de mtime, escopo = TODOS os .kg.yaml. E a unica forma que atende ao pedido LITERAL do campo ('o KG nao esta no meu contexto por default'). GATILHO para reabrir: o mesmo padrao fiado A MAO, fresco e descartavel, 2-3x em sessao real, com run monitorado registrando se o veredito injetado MUDOU A RESPOSTA. Sem esse dogfood e decreto sem lastro; gated-work-derives-fresh proibe pre-cozinhar"
+
+edges:
+  - from: E_recurrence_is_the_data
+    to: Q_read_leg
+    edge_type: SUPPORTS
+  - from: E_write_leg_only
+    to: Q_read_leg
+    edge_type: SUPPORTS
+  - from: E_cost_is_not_the_barrier
+    to: Q_read_leg
+    edge_type: SUPPORTS
+  - from: E_proximity_zero_failed
+    to: C_timing_hypothesis
+    edge_type: REFUTES
+  - from: E_replay_scoreboard
+    to: D_build_none_of_three
+    edge_type: SUPPORTS
+  - from: E_claude_md_has_control
+    to: E_replay_scoreboard
+    edge_type: SUPPORTS
+  - from: E_ammunition_not_trigger
+    to: E_replay_scoreboard
+    edge_type: SUPPORTS
+  - from: D_build_none_of_three
+    to: Q_read_leg
+    edge_type: TRACES_TO
+  - from: E_glob_blind_36pct
+    to: D_fix_glob_not_a_cure
+    edge_type: CAUSES
+  - from: D_fix_glob_not_a_cure
+    to: E_glob_blind_36pct
+    edge_type: TRACES_TO
+  # CONSTRAINS, nao REFUTES: o dissent NAO derruba a decisao — ela sobrevive a ele com defesa
+  # declaradamente estreita. Modelar dissent-sobrevivente como REFUTES cria contradicao estrutural
+  # (no refutado que segue open) — o proprio radar pegou isto na 1a rodada. Dissent que MATA e
+  # REFUTES; dissent que LIMITA e CONSTRAINS.
+  - from: C_dissent_declare_victory
+    to: D_fix_glob_not_a_cure
+    edge_type: CONSTRAINS
+  - from: C_residue_is_the_property
+    to: Q_residue_gate
+    edge_type: SUPPORTS
+  - from: E_replay_scoreboard
+    to: C_residue_is_the_property
+    edge_type: SUPPORTS
+  - from: Q_residue_gate
+    to: Q_read_leg
+    edge_type: DEPENDS_ON
+  - from: Q_hook_injects_verdict
+    to: Q_read_leg
+    edge_type: DEPENDS_ON
+  - from: E_proximity_zero_failed
+    to: Q_hook_injects_verdict
+    edge_type: CONSTRAINS
