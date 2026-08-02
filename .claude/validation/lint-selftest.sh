@@ -3172,6 +3172,22 @@ run_empty_result_guard_selftests() {
   if printf '%s' "${out}" | grep -q 'GLOB-SOB-SUDO' && printf '%s' "${out}" | grep -q 'ERRO-ENGOLIDO'; then
     record_pass "empty-result-guard: (g) MESMO comando, padrao FORA do heredoc → AINDA DISPARA (o filtro nao cegou)"
   else record_fail "empty-result-guard: (g)" "o filtro de heredoc CEGOU a guarda — silenciou comando real: ${out}"; fi
+
+  # (h) e (i) sao PAR — nasceram do 2o falso-positivo achado POR USO no mesmo dia: o detector de $?
+  # casava pipe em QUALQUER lugar com $? em QUALQUER lugar, mesmo em instrucoes separadas. Agora e
+  # por PROXIMIDADE (mesma linha ou a imediatamente anterior). (h) prova que o ruido morreu;
+  # (i) prova que a versao MULTI-LINHA do caso real — `cmd | tail` numa linha, `echo $?` na de
+  # baixo — continua sendo pega. Sem (i), "proximidade" poderia ter virado "so mesma linha" e o
+  # caso que originou a guarda escaparia.
+  out="$(_erg '"find x | sed s/a/b/\n\n\nbash script.sh > /tmp/o 2>&1\necho exit=$?"' '"x"' || true)"
+  if ! printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+    record_pass "empty-result-guard: (h) \$? longe do pipe (instrucoes distintas) → SILENCIOSO"
+  else record_fail "empty-result-guard: (h)" "falso-positivo cross-statement: ${out}"; fi
+
+  out="$(_erg '"bash radar.sh f 2>&1 | tail -22\necho EXIT=$?"' '"x"' || true)"
+  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+    record_pass "empty-result-guard: (i) pipe numa linha + \$? na SEGUINTE → AINDA DISPARA (o caso real)"
+  else record_fail "empty-result-guard: (i)" "a proximidade cegou o caso multi-linha que originou a guarda: ${out}"; fi
 }
 
 run_task_manager_hook_selftests() {

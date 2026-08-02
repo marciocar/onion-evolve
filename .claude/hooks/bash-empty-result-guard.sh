@@ -68,12 +68,24 @@ add() { warn="${warn}
   · $1"; }
 
 # (1) $? lido depois de um pipe — o exit é do ÚLTIMO elemento, não do comando que importa.
-#     Só dispara se NÃO houver `set -o pipefail` no próprio comando.
-case "$cmd" in
-  *'|'*'$?'*)
-    case "$cmd" in *pipefail*) : ;; *)
-      add 'EXIT-CODE-DE-PIPE: você leu `$?` depois de um pipe — ele é do ÚLTIMO elemento (o `tail`/`head`/`grep`), não do comando que interessa. Rode o comando sozinho e capture `$?` na linha seguinte, ou use `set -o pipefail`.' ;;
-    esac ;;
+#
+# CORREÇÃO 2026-08-02 (2º falso-positivo achado POR USO, no mesmo dia): a versão anterior era
+# `case "$cmd" in *'|'*'$?'*)` — casava um pipe em QUALQUER lugar com um `$?` em QUALQUER lugar,
+# mesmo em instruções separadas por linhas. Disparou num comando onde o `$?` vinha logo após um
+# `bash ... > arquivo 2>&1` (correto), só porque HAVIA um `find | sed` cinco linhas acima.
+# Agora é POR PROXIMIDADE: o pipe tem de estar na MESMA linha do `$?` ou na linha imediatamente
+# anterior. Cobre os dois casos reais (o pipe-e-$?-na-mesma-linha e o `cmd | tail` seguido de
+# `echo $?` na linha de baixo) e mata o cross-statement.
+# `set -o pipefail` em qualquer lugar do comando desarma — quem o declara já sabe do problema.
+case "$cmd" in *pipefail*) : ;; *)
+  if printf '%s\n' "$cmd" | awk '
+      { cur = $0
+        if (cur ~ /\$\?/ && (cur ~ /\|/ || prev ~ /\|/)) { found = 1; exit }
+        if (cur ~ /[^ \t]/) prev = cur       # linha em branco não quebra a vizinhança
+      }
+      END { exit(found ? 0 : 1) }'; then
+    add 'EXIT-CODE-DE-PIPE: você leu `$?` logo depois de um pipe — ele é do ÚLTIMO elemento (o `tail`/`head`/`grep`), não do comando que interessa. Rode o comando sozinho e capture `$?` na linha seguinte, ou use `set -o pipefail`.'
+  fi ;;
 esac
 
 # (2) glob dentro de path sob sudo — expande no shell do CHAMADOR, que pode não ter acesso.
