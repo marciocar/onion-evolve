@@ -1,0 +1,310 @@
+meta:
+  id: onion-market-kg-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-02
+  date: 2026-08-02
+  note: >
+    Elenxo imersivo de DOIS EIXOS: interno (valor real de KG-SSOT, SDAAL e Elenxo — 5 lentes
+    adversariais com mandato de PROCURAR CERIMONIA) x externo (mercado, 8 pistas + varredura por
+    trajetoria; 132 achados, 100% com URL primaria). Fecha com re-litigio do veredito
+    D_build_none_of_three contra 3 substancias novas. VEREDITO: ratificado E refinado — maximo
+    alcancado 3/7, aceite era 5/7. Projecao: SYNTHESIS.md.
+
+nodes:
+  - id: Q_coevolucao
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "A PERGUNTA: rever o que temos (KG-SSOT first+runtime, SDAAL, Elenxo) em instrumentacao, procedimentos, fluxos e VALOR REAL — e cruzar com o mercado para prever a co-evolucao, aproveitando o que sabemos sem ficar cego para fora"
+
+  - id: C_tese_texto_vs_script
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-02
+    verified_against: medicao-direta-HEAD-2026-08-02
+    label: "A TESE QUE ORGANIZA TUDO: o laco read(KG) esta protegido por TEXTO; o laco write(KG) esta protegido por SCRIPT. write: 6 gates HARD no CI (REGRA 26/29/31/32/43/47) com resultado medivel — 103/103 docs cobertos, 50/50 grafos passando integridade. read: ZERO gates; e prosa nos 3 comandos cabeados e nada mede se foi lido"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_cerimonia_medida
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-02
+    verified_against: 5-lentes-adversariais-wf_0b0267b9-362
+    label: "3 DAS 5 LENTES INTERNAS VOLTARAM COM ZERO VALOR PROVADO. 13 pecas de cerimonia com numero: kg-console.sh (31 KB, a maior peca do motor KG) = 0 call-sites reais, so fixture de teste, 0 no CI, 1 pagina em 34 dias · /meta:kg-freshness = 0 runs em 34 dias · narrate = 2 narracoes para 50 grafos · 459/566 nos 'open' (81%) sem NENHUMA data · 13/50 grafos sem verified_at · camada domain com 6/6 instancias de 1 UNICO commit, e 4/6 PRE-ESCREVEM o veredito do radar no cabecalho (infalseavel por construcao). CONTRA-PESO: o ciclo de trabalho RODA (60 commits/7 dias) — a cerimonia esta na camada de AUTO-OBSERVACAO, nao no trabalho"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_kg_e_arquivo_nao_motor
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: pista-dev-problema-wf_a489acb8-067
+    label: "O KG E ARQUIVO DE AUDITORIA, NAO MOTOR DE TRABALHO (medido). O modo 'map' (F0-F4, o UNICO caminho especificado para popular a camada domain) NUNCA rodou dentro do onion-evolve; seu unico dogfood produziu grafo no repo de um ADOTANTE. 29 dos 30 grafos do core nascem NO MESMO COMMIT do doc de analise que sintetizam. engineer/start.md e engineer/plan.md — onde a feature NASCE — tem ZERO mencoes a KG. Fluxo de problema: existe-so-como-spec; o estado de um bug aberto vive em PROSA no diario, sem maquina de estados. PROVA REFLEXIVA: a propria pesquisa sobre por que o KG nao e consultado modelou seus 9 casos como TABELA EM PROSA e manteve o grafo 100% audit"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_cmdb_e_o_mesmo_sintoma
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: pesquisa-externa-itsm-cmdb-aiops
+    label: "O CAMPO MADURO JA PAGOU ESSA CONTA: o CMDB fracassou por mais de 30 ANOS precisamente porque dependia de HUMANOS preencherem um repositorio PARALELO ao trabalho real. A correcao historica foi AUTOMATIZAR identificacao e reconciliacao, NAO disciplinar gente — a Forrester ja declarou 'CMDB is dead'. Nossa camada domain apresenta o MESMO sintoma medido: mantida a mao, paralela ao trabalho (plan/start sem mencao a KG), 6/6 com 1 commit, 81% dos nos open sem data. E o CodeSee (mapa visual de codebase para leitura humana passiva) MORREU em 2024-02-22 por ser visualizacao sem acao"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_categoria_kg_codebase
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-02
+    verified_against: gh-api-repos-2026-08-02
+    label: "NAO E UM PROJETO VIRAL, E UMA CATEGORIA FORMADA: 5 players independentes de 'KG de codebase para agente', ~230k estrelas somadas, TODOS nascidos em 2026 — colbymchenry/codegraph 64.059 (18/jan, o PRIMEIRO), Graphify-Labs/graphify 100.765 (03/abr, YC S26, skill /graphify para Claude Code), DeusData/codebase-memory-mcp 37.080 (24/fev, C puro, SLSA3+provenance+Scorecard), tirth8205/code-review-graph 28.032, harshkedia177/axon 725. AUTENTICIDADE VERIFICADA: razao estrela/fork entre 7 e 17 e forks na casa dos milhares (36.020 no maior) — nao e star-farming. TESE COMUM: grafo LOCAL, DETERMINISTICO, SEM LLM na indexacao, SEM vector store, consultado ANTES de agir"
+    trace: "https://github.com/Graphify-Labs/graphify"
+
+  - id: D_categoria_diferente_nao_concorrente
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-02
+    verified_against: correlacao-aristoteles-wf_eb01875e-962
+    label: "ARISTOTELES COM RIGOR: o KG deles NAO e o nosso. (1) CONSTRUCAO — eles DERIVAM automaticamente de artefato objetivo e parseavel (codigo, via tree-sitter); nos ESCREVEMOS a mao um julgamento sobre decisao e evidencia, que nao tem fonte parseavel. (2) CONTEUDO — eles modelam ESTRUTURA (funcao chama funcao); nos modelamos DECISAO/PROVENIENCIA (por que X, o que refuta Y, quando foi verificado). (3) CONSUMO — eles sao consultados a cada acao; o nosso por auditoria pontual. Logo: CATEGORIA DIFERENTE, nao 'transfere' nem 'nao-transfere'. E o nosso lado nao tem ocupante — mas e MOAT NAO-REALIZADO, porque ninguem le o que escrevemos"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: D_extracted_inferred_transfere
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-08-02
+    verified_against: readme-graphify-2026-08-02
+    label: "TRANSFERE, E E BARATO: o Graphify marca CADA ARESTA com confidence tag EXTRACTED (explicito na fonte) vs INFERRED (derivado por resolucao) — e a doutrina declarado!=verificado MECANIZADA DENTRO do grafo. Nosso analogo e derivavel de graca: no COM trace: = EXTRACTED, SEM trace: = INFERRED, computavel no kg-radar.sh SEM mudar o schema .kg.yaml — logo sem disparar a clausula de 'gramatica nova custa a todos os adotantes' que mantem gated o gate de interesse-de-fonte. Sao eixos ORTOGONAIS: interesse (vies) vs metodo (obtencao). Este e o barato"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_placar_relitigio
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: replay-corpus-7-casos-wf_eb01875e-962
+    label: "PLACAR DO RE-LITIGIO (aceite era pelo menos 5/7): D = .claude/rules/ path-scoped -> 1/7 · E = hook prompt/agent que roda o radar e injeta o veredito -> 3/7 · F = cura de residuo com id de no em artefato duravel -> 1/7. Maximo alcancado: 3/7. Nenhum placar voltou '?'. E o refinamento que importa: a substancia E fez 3x melhor que a cura B (1/9) — A DISTINCAO DO MAESTRO ERA REAL E MENSURAVEL, nao era a mesma cura"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_plataforma_desqualifica
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-02
+    verified_against: code.claude.com-docs-hooks
+    label: "O FATO EXTERNO QUE FECHA A PORTA — e que NENHUMA introspeccao acharia: hooks do tipo 'prompt' e 'agent' NAO retornam additionalContext. Sao decisores sim/nao, nao injetores. E ha teto de 10.000 chars por saida de hook: a forma completa mede 138.433 bytes (13,8x acima) e a unica versao que cabe (so ids, 8.092 bytes) e LITERALMENTE a condicao de C4-C6, onde ja falhou 3x. A forma que chegou a 3/7 NAO E CONSTRUTIVEL COMO DESCRITA"
+    trace: "https://code.claude.com/docs/en/hooks"
+
+  - id: D_ratificado_e_refinado
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-02
+    verified_against: elenxo-w2-wf_eb01875e-962
+    label: "VEREDITO: D_build_none_of_three fica RATIFICADO — agora POR EVIDENCIA EXTERNA, nao por introspeccao — e REFINADO. Tres ancoras de fora: (1) a plataforma desqualifica o mecanismo (prompt/agent nao injetam); (2) a Anthropic desqualifica a classe ('quando algo absolutamente nao pode acontecer, uma instrucao e a ferramenta errada — um guardrail real precisa ser DETERMINISTICO'); (3) o mercado nao tem contra-exemplo. FORMULACAO CORRETA, imposta pelo dissent: 'NAO CONSTRUIR POR FALTA DE EVIDENCIA A FAVOR', nunca 'esta provado que nao funciona' — a primeira mantem o gate honesto, a segunda o transforma em decreto"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: C_dissent_corpus_e_cmdb
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    label: "DISSENT PRESERVADO, E QUASE INVERTE O RESULTADO: o corpus de 9 casos e ele mesmo um CMDB — hand-curado, feito de falhas que ALGUEM LEMBROU E REGISTROU. As falhas de leitura NAO NOTADAS (o denominador real) nunca entraram no ringue: vies de sobrevivencia na direcao mais desfavoravel. E o placar 3/7 pende de UMA UNICA INFERENCIA NAO MEDIDA (que 'veredito ranqueado injetado no turno' equivale a 'arquivo e ids no contexto imediato'); se ela for falsa, sobe para 6/7 e a substancia PASSA. Alem disso o limiar de 5/7 foi ESCOLHIDO, nao derivado — com 7 casos, um julgamento contrafactual move o veredito em ~14 pontos"
+
+  - id: E_unico_disparo_foi_social
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: corpus-9-casos-C7
+    label: "A OBSERVACAO QUE SOBROU SEM RESPOSTA DEPOIS DE 5 INSTRUMENTOS REPROVADOS: o unico disparo que COMPROVADAMENTE funcionou no corpus inteiro (C7) foi SOCIAL — um humano perguntando 'voce esta fazendo SSOT-first?'. Nenhum dos cinco instrumentos testados reproduz isso, e o corpus nao tem candidato barato que reproduza. Nesta propria sessao o padrao se repetiu duas vezes: o maestro perguntou 'o KG-SSOT entrou para a pesquisa tambem?' e 'tem alguma ferramenta de KG com yy no final?' — e as duas perguntas corrigiram a pesquisa"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: C_objecao_mattpocock_vence
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-02
+    verified_against: gh-api-e-leitura-do-HEAD
+    label: "A OBJECAO DE MERCADO VENCE EM 2 DOS 3 EIXOS: mattpocock/skills (199.551 estrelas) critica publicamente frameworks 'que tomam conta do processo' (cita GSD, BMAD, Spec-Kit) em favor de skills modulares e componiveis. O CLAUDE.md:12 declara que os workflows faseados sao 'invariantes do framework, nao devem ser consolidados' — o oposto literal. Nao ha disanalogia de dominio que nos separe de GSD/BMAD. ONDE NAO VENCE: compliance como dimensao peer, onde o acoplamento E o produto (rastreabilidade e o entregavel, nao overhead). AGRAVANTE: ja comecamos a lhe dar razao sem admitir — plugins/ no HEAD tem 7 verticais empacotadas e instalaveis em separado, enquanto a doutrina diz que e indivisivel"
+    trace: "https://github.com/mattpocock/skills"
+
+  - id: D_consumivel_em_fatias
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    label: "ACAO IMPLICADA PELA OBJECAO: a resposta honesta nao e rebater — e DECLARAR que o Onion e consumivel em fatias e PROVAR por plugins/ (7 verticais ja empacotadas). Isso exige parar de descrever os workflows faseados como invariantes indivisiveis quando o proprio empacotamento ja os divide. E decisao de doutrina, gated no maestro"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_descoberta_precisa_n_passadas
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: dois-runs-identicos-wf_7725217c-e1c-e-wf_9f6d7daf-8f7
+    label: "LICAO DE METODO MEDIDA POR ACIDENTE: dois runs IDENTICOS (mesmo script, prompt, modelo e effort) de uma varredura de DESCOBERTA acharam 46 e 41 achados, com uniao de 74 — cada um cobriu so 55-62% do que os dois juntos acharam. E foi na BORDA (nao no nucleo) que apareceram os dois achados decisivos: o Company Brain da YC e o microsoft/agent-governance-toolkit. REGRA: DESCOBERTA em espaco de tamanho desconhecido exige N passadas com uniao (ou loop-until-dry); JULGAMENTO converge e nao precisa. Agravante: loop-until-dry JA E um dos 6 padroes canonicos da skill onion-orchestration e nao foi usado"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_busca_por_nome_acha_incumbente
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-08-02
+    verified_against: furo-do-graphify
+    label: "VIES ESTRUTURAL, NAO DESCUIDO: as 8 pistas de mercado buscaram por NOMES CONHECIDOS (Sourcegraph, Harness, Neo4j, Zep, Mem0, Letta, GraphRAG) e perderam o Graphify (100.765 estrelas em 120 dias, skill para Claude Code — o nosso substrato exato). Buscar por nome so acha o que JA ERA FAMOSO: o emergente nao esta no modelo mental, logo nao entra na consulta. CURA: todo levantamento externo carrega pelo menos 1 eixo por TRAJETORIA (gh api search com created:> ordenado por estrelas; HN via API do Algolia; batches de YC), e o worker devolve campo obrigatorio 'o_que_descartei_por_ja_ser_famoso' — worker que so devolve nome conhecido FALHOU"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  # ── AS 3 SUBSTÂNCIAS REPROVADAS NO RE-LITÍGIO ──────────────────────────────────────────
+  # Estes 3 nós foram ACRESCENTADOS em 2026-08-02 depois que o estudo de mecanização do Elenxo
+  # (wf_d3f249a1-096) mediu que ESTE grafo tinha REFUTES=0 / SUPERSEDES=0 / refuted=0 enquanto o
+  # SYNTHESIS.md:133 narrava "cinco instrumentos reprovados". Era a 5a/6a ocorrência da cicatriz
+  # registrada em kg-born-marker.sh:26 ("8 passadas de Elenxo evaporaram em prosa") — cometida por
+  # mim, no mesmo dia em que a diagnostiquei. A refutação existiu; só não tinha virado ARESTA.
+  # Sem isto, o radar não acha o que foi derrubado — e o próximo a perguntar "isso já foi testado?"
+  # re-derivaria do zero, que é exatamente a falha que esta pesquisa inteira investiga.
+  - id: C_sub_rules_paths
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-02
+    verified_against: replay-7-casos-wf_eb01875e-962
+    label: "SUBSTANCIA D — .claude/rules/ com frontmatter paths como cura da perna de leitura. PLACAR 1/7 (aceite era 5/7), e o unico caso que pega e o MESMO C7 que as curas A e B ja pegavam: a uniao nao cresce. DISANALOGIA QUE MATA: os gatilhos do corpus sao TOPICOS (oficializar WAHA, pagina de convite, fios abertos) e o glob de paths casa ARQUIVO TOCADO — sao eixos diferentes. Ataque adversarial: 'passivo liquido'"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: C_sub_hook_injeta
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-02
+    verified_against: code.claude.com-docs-hooks
+    label: "SUBSTANCIA E — hook tipo prompt/agent que RODA o radar e INJETA o veredito. PLACAR 3/7, o melhor do corpus e 3x a cura B (1/9): a distincao 'roda e injeta o RESULTADO' vs 'injeta prosa pedindo que o modelo rode' e REAL e MENSURAVEL. Mas REPROVADA por fato externo que nenhuma introspeccao acharia: hooks prompt e agent NAO retornam additionalContext (sao decisores sim/nao, nao injetores) e ha teto de 10.000 chars — a forma completa mede 138.433 bytes. NAO E CONSTRUTIVEL COMO DESCRITA"
+    trace: "https://code.claude.com/docs/en/hooks"
+
+  - id: C_sub_residuo
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-02
+    verified_against: replay-7-casos-wf_eb01875e-962
+    label: "SUBSTANCIA F — cura de RESIDUO (id de no citado em artefato duravel: commit/PR/doc). PLACAR 1/7, e de novo o mesmo C7. O replay provou que commit/PR/doc e O PLANO ERRADO: 6 das 7 falhas sao CONVERSACIONAIS e nao produzem commit — em 2026-08-02 o repo tinha 1 commit, a propria pesquisa. Ataque: 0 de 5 portoes. O QUE MORREU FOI A ENCARNACAO, NAO A LENTE: 'residuo material auditado por terceiro, desacoplado do ator' segue de pe e segue sem candidata"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: A_RESEARCH_MARKET
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "Pesquisa Elenxo imersiva de dois eixos, 2026-08-02: 5 lentes internas adversariais + 8 pistas externas + varredura por trajetoria + pista dev/problema + correlacao com regua de Aristoteles + re-litigio com replay + refutacao adversarial. 38 workers somados em 4 workflows; 132 achados externos, 100% com URL primaria"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+edges:
+  - from: C_tese_texto_vs_script
+    to: Q_coevolucao
+    edge_type: SUPPORTS
+  - from: E_cerimonia_medida
+    to: C_tese_texto_vs_script
+    edge_type: SUPPORTS
+  - from: E_kg_e_arquivo_nao_motor
+    to: C_tese_texto_vs_script
+    edge_type: SUPPORTS
+  - from: E_cmdb_e_o_mesmo_sintoma
+    to: E_kg_e_arquivo_nao_motor
+    edge_type: SUPPORTS
+  - from: E_categoria_kg_codebase
+    to: D_categoria_diferente_nao_concorrente
+    edge_type: SUPPORTS
+  - from: E_categoria_kg_codebase
+    to: D_extracted_inferred_transfere
+    edge_type: CAUSES
+  - from: E_placar_relitigio
+    to: D_ratificado_e_refinado
+    edge_type: SUPPORTS
+  # As arestas que faltavam: o placar REFUTA cada substância, e o fato da plataforma refuta a que
+  # chegou mais perto. Sem elas o radar reportava "nenhuma contradição" sobre um grafo que registrava
+  # 3 reprovações — falso-verde por omissão, não por erro.
+  - from: E_placar_relitigio
+    to: C_sub_rules_paths
+    edge_type: REFUTES
+  - from: E_placar_relitigio
+    to: C_sub_residuo
+    edge_type: REFUTES
+  - from: E_plataforma_desqualifica
+    to: C_sub_hook_injeta
+    edge_type: REFUTES
+  - from: E_plataforma_desqualifica
+    to: D_ratificado_e_refinado
+    edge_type: SUPPORTS
+  # CONSTRAINS, nao REFUTES: o dissent NAO derruba o veredito — ele o LIMITA, forcando a
+  # formulacao "por falta de evidencia a favor" em vez de "esta provado que nao funciona".
+  # (Licao do proprio radar, 2026-08-02: dissent que MATA e REFUTES; dissent que LIMITA e CONSTRAINS.)
+  - from: C_dissent_corpus_e_cmdb
+    to: D_ratificado_e_refinado
+    edge_type: CONSTRAINS
+  - from: E_unico_disparo_foi_social
+    to: D_ratificado_e_refinado
+    edge_type: CONSTRAINS
+  - from: C_objecao_mattpocock_vence
+    to: D_consumivel_em_fatias
+    edge_type: CAUSES
+  - from: E_busca_por_nome_acha_incumbente
+    to: E_descoberta_precisa_n_passadas
+    edge_type: SUPPORTS
+  - from: D_ratificado_e_refinado
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+  - from: D_categoria_diferente_nao_concorrente
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+  - from: D_extracted_inferred_transfere
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+  - from: D_consumivel_em_fatias
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+  - from: E_descoberta_precisa_n_passadas
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO

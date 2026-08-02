@@ -4,7 +4,15 @@
 # é auto-populável por comando" (ver docs/knowledge-base/concepts/worklog-protocol.md §2).
 #
 # Apenas side-effect; não emite saída. Safe no-op quando: não é repo git, branch
-# não é feature/hotfix/release, ou não existe STATE.md. Nunca falha a sessão (exit 0).
+# sem prefixo (main/develop), ou não existe STATE.md. Nunca falha a sessão (exit 0).
+#
+# CORREÇÃO 2026-08-02 (medida, não hipótese): o filtro era `feature/*|hotfix/*|release/*` e
+# resultava em NO-OP em 56 de 58 branches reais (96%) — o uso real migrou para prefixos de
+# conventional-commit: docs/ (35), feat/ (10), fix/ (7), chore/ (4), feature/ (2). Consequência
+# medida: session-lifecycle.jsonl com 1 linha em ~60 commits. Um instrumento de auto-observação
+# calibrado para uma convenção que o próprio uso abandonou não observa nada — e sem ele NENHUM
+# dogfood de campo é mensurável. O gate correto é a EXISTÊNCIA do STATE.md (linha 30), que é
+# fato de filesystem, não o nome da branch, que é escolha do humano (acoplado ao ator).
 input=$(cat 2>/dev/null) || exit 0
 
 # session_id (jq se disponível; senão fallback grep/sed para JSON flat)
@@ -15,11 +23,11 @@ else
 fi
 [ -n "${sid:-}" ] || exit 0
 
-# slug = branch sem o prefixo GitFlow
+# slug = branch sem o prefixo (qualquer um: feature/, feat/, fix/, docs/, chore/, hotfix/…)
 branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || exit 0
 case "$branch" in
-  feature/*|hotfix/*|release/*) slug="${branch#*/}" ;;
-  *) exit 0 ;;
+  */*) slug="${branch#*/}" ;;   # qualquer branch prefixada
+  *)   exit 0 ;;                # main/develop/HEAD destacado — não têm worklog
 esac
 
 state=".claude/sessions/${slug}/STATE.md"

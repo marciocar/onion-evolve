@@ -87,7 +87,7 @@ Verifique se a documentação reflete as mudanças:
 - Comentários de código em pt-BR para lógica complexa
 - Atualizações da pasta `docs/`
 - `CHANGELOG` ou notas de release
-- Conformidade com `.claude/rules/language-and-documentation.mdc`
+- Conformidade com a skill `language-standards` (autoridade canônica, ver `CLAUDE.md`)
 
 ### 4. Análise de Cobertura de Testes
 Avalie os testes:
@@ -155,7 +155,7 @@ Forneça uma revisão estruturada com:
 - Priorize problemas por impacto
 - Considere o contexto e padrões do projeto
 - Foque nas mudanças, não em todo o codebase
-- Valide conformidade com `.claude/rules/language-and-documentation.mdc`:
+- Valide conformidade com a skill `language-standards` (autoridade canônica, ver `CLAUDE.md`):
   - ✅ Código em inglês (variáveis, funções, classes, nomes de arquivos)
   - ✅ Comentários em pt-BR
   - ✅ Commits em inglês seguindo Conventional Commits

@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# PostToolUse(Bash) — a guarda anti-fail-open do SHELL.
+#
+# POR QUE EXISTE (3 falhas medidas na mesma sessão, 2026-08-02):
+#   1. `ls -d <path-errado>` → vazio → concluí "o workflow não sobreviveu". Estava vivo; o path
+#      é que omitia um segmento. Relancei em duplicata.
+#   2. `bash script > /tmp/x 2>&1; RC=$?` … `tail x | ...; echo $?` → li o exit do `tail`, não do script.
+#   3. `sudo -n ls /home/onion/.../.env.bak-*` → o glob expande no MEU shell (sem acesso a /home/onion),
+#      não sob sudo; `2>/dev/null` engoliu o erro; `wc -l` deu 0 → "a dívida sumiu". Eram 7.
+#
+# O PADRÃO COMUM, e é UM só: resultado VAZIO/ZERO por motivo OPERACIONAL (sem acesso, path errado,
+# pipe comendo o exit code) lido como FATO SOBRE O MUNDO ("não existe", "falhou", "são zero").
+#
+# O PRECEDENTE QUE ESTA GUARDA GENERALIZA: `kg-radar.sh:162` — quando o parse extrai 0 nós, o radar
+# ABORTA SEM OPINAR em vez de dizer "nenhum problema encontrado" (guarda anti-fail-open, nascida de
+# um falso-verde de campo em 2026-07-17). A casa já resolveu isto PARA O RADAR e nunca generalizou.
+#
+# POR QUE HOOK, e por que este caso é diferente do que reprovou no KG (research/kg-read-leg-2026-08,
+# curas 1/9 e 3/7): lá se pedia ao hook que me fizesse FAZER algo (ir ler o grafo) — depende do meu
+# julgamento, e é o desenho do Letta que o corpus mediu falhando. Aqui o hook ANOTA UM FATO sobre um
+# evento que JÁ ocorreu ("o exit que você leu é do último elemento do pipe"). Não é instrução, é
+# MEDIÇÃO — desacoplada do ator, que é a única propriedade que funcionou 4× nesta casa.
+#
+# CONTRATO: silencioso quando nada dispara (exit 0). Quando dispara, exit 2 — a ÚNICA via MEDIDA em
+# que o stderr de um PostToolUse chega ao modelo. Não bloqueia nem desfaz: PostToolUse é posterior ao
+# comando por definição; o "blocking error" só injeta o texto. Dogfood 2026-08-02: com exit 0 a guarda
+# comprovadamente EXECUTA (marcador confirmou 2 execuções) e o aviso EVAPORA — seria cerimônia perfeita.
+set -uo pipefail
+
+input=$(cat 2>/dev/null) || exit 0
+
+if command -v jq >/dev/null 2>&1; then
+  cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)
+  out=$(printf '%s' "$input" | jq -r '(.tool_response.stdout // .tool_response.output // "")' 2>/dev/null)
+else
+  # Sem jq a guarda se cala — declarar que NÃO SABE é o comportamento correto (certeza é campo, não tom).
+  exit 0
+fi
+[ -n "${cmd:-}" ] || exit 0
+
+# ── ANTI-RUÍDO: descarta o CORPO de heredoc antes de escanear ────────────────────────────────
+# FALSO-POSITIVO MEDIDO no 1º dia da guarda (2026-08-02): a mensagem de commit que DESCREVIA os 4
+# detectores disparou os 4 de uma vez — porque vinha num heredoc e o corpo entrou no escaneamento.
+# Corpo de heredoc é TEXTO (mensagem de commit, documento, payload), não comando. A linha que ABRE
+# o heredoc continua sendo escaneada — ela é comando de verdade.
+# LIMITE DECLARADO: heredoc usado como SCRIPT (ex.: `bash <<EOF ... EOF`) deixa de ser inspecionado.
+# Aceito conscientemente: heredoc-como-texto é a esmagadora maioria, e um alarme que grita em prosa
+# vira fadiga — e alarme ignorado é pior que alarme ausente. A asserção (g) do selftest prova que o
+# filtro NÃO cegou a guarda: padrão FORA do heredoc continua disparando.
+cmd_scan=$(printf '%s\n' "$cmd" | awk '
+  d != "" {                                  # dentro do corpo: descarta até o fechador
+    line=$0; sub(/^[ \t]+/, "", line)
+    if (line == d) d=""
+    next
+  }
+  {
+    print                                    # a linha que ABRE o heredoc É comando: mantém
+    if (match($0, /<<-?[ \t]*['"'"'"]?[A-Za-z_][A-Za-z0-9_]*['"'"'"]?/)) {
+      tok = substr($0, RSTART, RLENGTH)
+      sub(/^<<-?[ \t]*/, "", tok); gsub(/['"'"'"]/, "", tok)
+      d = tok
+    }
+  }')
+cmd="${cmd_scan}"
+
+warn=""
+add() { warn="${warn}
+  · $1"; }
+
+# (1) $? lido depois de um pipe — o exit é do ÚLTIMO elemento, não do comando que importa.
+#     Só dispara se NÃO houver `set -o pipefail` no próprio comando.
+case "$cmd" in
+  *'|'*'$?'*)
+    case "$cmd" in *pipefail*) : ;; *)
+      add 'EXIT-CODE-DE-PIPE: você leu `$?` depois de um pipe — ele é do ÚLTIMO elemento (o `tail`/`head`/`grep`), não do comando que interessa. Rode o comando sozinho e capture `$?` na linha seguinte, ou use `set -o pipefail`.' ;;
+    esac ;;
+esac
+
+# (2) glob dentro de path sob sudo — expande no shell do CHAMADOR, que pode não ter acesso.
+case "$cmd" in
+  *sudo*)
+    if printf '%s' "$cmd" | grep -qE 'sudo[^|;]*(ls|cat|stat|head|tail|wc)[^|;]*/[^ ]*\*'; then
+      add 'GLOB-SOB-SUDO: o `*` expande no SEU shell ANTES do sudo — se você não tem acesso ao diretório, ele não casa nada e o comando recebe o literal. Use `sudo find <dir> -name "<padrão>"`, que expande DENTRO do sudo.'
+    fi ;;
+esac
+
+# (3) erro engolido alimentando contagem/decisão — zero indistinguível de falha.
+if printf '%s' "$cmd" | grep -qE '2>/dev/null.*\|[[:space:]]*(wc[[:space:]]+-l|grep[[:space:]]+-c)'; then
+  add 'ERRO-ENGOLIDO-VIRANDO-NÚMERO: há `2>/dev/null` a montante de uma contagem — um comando que FALHOU e um objeto que NÃO EXISTE produzem o mesmo `0`. Mostre o stderr, ou conte com um comando que distinga (`find`, ou `|| echo FALHOU`).'
+fi
+
+# (4) comando de DESCOBERTA com saída vazia — o caso que mais custou (o falso "não sobreviveu").
+# CALIBRAÇÃO ANTI-RUÍDO (o risco real de qualquer alarme é virar fadiga e ser ignorado):
+#   · `grep -q`/`grep -c` são TESTE e CONTAGEM, não descoberta-para-ler — vazio ali é resposta, não sinal.
+#   · comando que JÁ trata o ramo vazio (`|| echo`, `|| printf`, `|| true`, `else`) mostra que o autor
+#     considerou a hipótese — a guarda não tem o que ensinar.
+# Sobra exatamente a forma que me mordeu: descoberta nua cujo vazio eu ia ler como ausência.
+if [ -z "${out//[[:space:]]/}" ] \
+   && ! printf '%s' "$cmd" | grep -qE 'grep[[:space:]]+-[a-zA-Z]*[qc]' \
+   && ! printf '%s' "$cmd" | grep -qE '\|\|[[:space:]]*(echo|printf|true)|[[:space:]]else[[:space:]]' \
+   && printf '%s' "$cmd" | grep -qE '(^|[|;&[:space:]])(ls|find|git ls-files)([[:space:]]|$)'; then
+  add 'VAZIO ≠ AUSÊNCIA: comando de descoberta devolveu NADA. Vazio pode ser (a) o objeto não existe, (b) o path/glob está errado, (c) você não tem acesso. São conclusões OPOSTAS. Confirme o caminho-pai antes de afirmar que algo não existe.'
+fi
+
+[ -n "$warn" ] || exit 0
+printf '🔎 guarda anti-fail-open do shell — o que você acabou de rodar pode MENTIR:%s\n' "$warn" >&2
+# exit 2 — a ÚNICA via MEDIDA em que o stderr de um PostToolUse chega ao modelo (dogfood 2026-08-02:
+# com exit 0 o hook comprovadamente EXECUTA — marcador em /tmp confirmou 2 execuções — e o aviso
+# EVAPORA). Não desfaz nada: o comando já rodou; PostToolUse é posterior por definição.
+# Se um dia exit 2 passar a bloquear de fato, o teto é este arquivo — e o selftest pega.
+exit 2

@@ -3103,6 +3103,77 @@ run_scope_gitignore_selftests() {
 # AMBIENTE primeiro (fonte do adapter), com .env como fallback HONESTO. Sinal de campo
 # adoção legacy 2026-07 (D2): hook lia só .env → anunciava 'none' com Linear provado via direnv.
 # ---------------------------------------------------------------------------
+# Modo empty-result-guard — .claude/hooks/bash-empty-result-guard.sh é a guarda anti-fail-open do
+# SHELL: generaliza a guarda de legibilidade do kg-radar.sh:162 ("0 nós → aborta SEM OPINAR") para o
+# caso em que um comando devolve VAZIO/ZERO por motivo OPERACIONAL (sem acesso, path errado, pipe
+# comendo o exit code) e isso é lido como FATO sobre o mundo. Origem: 3 falhas medidas na mesma sessão
+# (2026-08-02). O teste (d) é o que importa mais: uma guarda barulhenta vira fadiga e é ignorada.
+run_empty_result_guard_selftests() {
+  local hook="${REPO_ROOT}/.claude/hooks/bash-empty-result-guard.sh"
+  if [ ! -f "${hook}" ]; then record_fail "empty-result-guard" "hook ausente: ${hook}"; return; fi
+  local out rc
+  _erg() {  # $1=comando  $2=stdout simulado  → imprime stderr, devolve exit
+    printf '{"tool_input":{"command":%s},"tool_response":{"stdout":%s}}' "$1" "$2" \
+      | bash "${hook}" 2>&1
+  }
+
+  # (a) REAGE: descoberta nua com saída vazia (o falso "o workflow não sobreviveu")
+  out="$(_erg '"ls -d /home/x/projects/y/subagents"' '""' || true)"
+  if printf '%s' "${out}" | grep -q 'VAZIO'; then
+    record_pass "empty-result-guard: (a) descoberta vazia → avisa que vazio != ausência"
+  else record_fail "empty-result-guard: (a)" "não reagiu a ls com saída vazia: ${out}"; fi
+
+  # (b) REAGE: \$? lido depois de pipe (li o exit do tail, não o do script)
+  # NB: $? vai LITERAL no JSON (as aspas simples do shell protegem). Um \$ aqui seria escape JSON
+  #     INVALIDO — o jq recusaria o parse, o hook sairia cedo e o teste passaria vazio: falso-verde.
+  out="$(_erg '"tail -4 /tmp/x | sed s/a/b/; echo EXIT=$?"' '"x"' || true)"
+  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+    record_pass "empty-result-guard: (b) \$? pós-pipe → avisa que o exit é do último elemento"
+  else record_fail "empty-result-guard: (b)" "não reagiu a \$? após pipe: ${out}"; fi
+
+  # (c) REAGE: glob sob sudo + erro engolido virando número (os 7 .env.bak que viraram 0)
+  out="$(_erg '"sudo -n ls -1 /home/onion/.env.bak-* 2>/dev/null | wc -l"' '"0"' || true)"
+  if printf '%s' "${out}" | grep -q 'GLOB-SOB-SUDO' && printf '%s' "${out}" | grep -q 'ERRO-ENGOLIDO'; then
+    record_pass "empty-result-guard: (c) glob sob sudo + erro engolido em contagem → avisa os dois"
+  else record_fail "empty-result-guard: (c)" "não reagiu ao glob/erro engolido: ${out}"; fi
+
+  # (d) NÃO REAGE (anti-ruído — o teste que impede a guarda de virar fadiga de alerta)
+  local noisy=0 c
+  for c in '"git status --short"' '"grep -q foo /etc/hostname && echo sim"' \
+           '"ls /tmp/x 2>/dev/null || echo nenhum"' '"set -o pipefail; a | tail -1; echo \$?"'; do
+    out="$(_erg "${c}" '"saida"' || true)"
+    if printf '%s' "${out}" | grep -q 'pode MENTIR'; then noisy=1; fi
+  done
+  if [ "${noisy}" -eq 0 ]; then
+    record_pass "empty-result-guard: (d) comando saudável / com ramo-vazio tratado → SILENCIOSO"
+  else record_fail "empty-result-guard: (d)" "falso-positivo: guarda barulhenta vira fadiga e é ignorada"; fi
+
+  # (e) exit 2 quando dispara — é a ÚNICA via medida em que o stderr de PostToolUse chega ao modelo.
+  #     Com exit 0 a guarda roda e o aviso EVAPORA (dogfood 2026-08-02). Esta asserção é load-bearing.
+  rc=0
+  printf '{"tool_input":{"command":"ls -d /nada"},"tool_response":{"stdout":""}}' | bash "${hook}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then
+    record_pass "empty-result-guard: (e) dispara com exit 2 (a única via que o aviso chega ao modelo)"
+  else record_fail "empty-result-guard: (e)" "exit ${rc} != 2 — o aviso não chegaria ao modelo"; fi
+
+  # (f) e (g) sao PAR e so valem juntas — nasceram de um falso-positivo MEDIDO no 1o dia da guarda
+  # (2026-08-02: a mensagem de commit que DESCREVIA os 4 detectores disparou os 4, porque o corpo do
+  # heredoc entrou no escaneamento). (f) prova que o ruido morreu; (g) prova que a cura NAO CEGOU a
+  # guarda. Filtro anti-ruido sem o par (g) e como se silencia um alarme inteiro e passa no teste.
+  local hd_quiet hd_loud
+  hd_quiet='{"tool_input":{"command":"git commit -F - <<'"'"'EOF'"'"'\nfeat: descreve os detectores\n  tail f | sed x; echo $?\n  sudo -n ls /home/onion/.env.bak-*\n  cmd 2>/dev/null | wc -l\nEOF"},"tool_response":{"stdout":"ok"}}'
+  out="$(printf '%s' "${hd_quiet}" | bash "${hook}" 2>&1 || true)"
+  if ! printf '%s' "${out}" | grep -q 'pode MENTIR'; then
+    record_pass "empty-result-guard: (f) padroes dentro de CORPO de heredoc (texto) → SILENCIOSO"
+  else record_fail "empty-result-guard: (f)" "falso-positivo em prosa de heredoc: ${out}"; fi
+
+  hd_loud='{"tool_input":{"command":"sudo -n ls /home/onion/x/.env.bak-* 2>/dev/null | wc -l\ngit commit -F - <<'"'"'EOF'"'"'\ntexto inocente\nEOF"},"tool_response":{"stdout":"0"}}'
+  out="$(printf '%s' "${hd_loud}" | bash "${hook}" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'GLOB-SOB-SUDO' && printf '%s' "${out}" | grep -q 'ERRO-ENGOLIDO'; then
+    record_pass "empty-result-guard: (g) MESMO comando, padrao FORA do heredoc → AINDA DISPARA (o filtro nao cegou)"
+  else record_fail "empty-result-guard: (g)" "o filtro de heredoc CEGOU a guarda — silenciou comando real: ${out}"; fi
+}
+
 run_task_manager_hook_selftests() {
   local hook="${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh"
   if [ ! -f "${hook}" ]; then record_fail "task-manager-hook" "hook ausente: ${hook}"; return; fi
@@ -5617,6 +5688,7 @@ run_scope_gitignore_selftests
 
 # Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal de campo D2).
 run_task_manager_hook_selftests
+run_empty_result_guard_selftests
 
 # Modo cycle-completion — métrica de ciclos concluídos vs abandonados (D5 instrumentação,
 # barato-primeiro). Classifica done/open-stale/no-signal e mantém o SEM-sinal FORA do

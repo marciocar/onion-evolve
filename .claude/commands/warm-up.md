@@ -26,8 +26,9 @@ Estabelecer contexto completo do projeto incluindo:
 ## 📋 Checklist de Preparação
 
 ### 0. KG-first — o `.kg.yaml` é o SSOT vivo do estado/domínio (antes da prosa)
-- ✅ **Se existir um `.kg.yaml` no repo, consulte-o PRIMEIRO** (`ls docs/onion/graph/*.kg.yaml
-  docs/*/graph/*.kg.yaml *.kg.yaml 2>/dev/null`) — ele é a fonte da verdade de estado/domínio, **acima**
+- ✅ **Se existir um `.kg.yaml` no repo, consulte-o PRIMEIRO** (`git ls-files '*.kg.yaml' | grep -v '/fixtures/'`
+  — resolve AO VIVO; o glob hardcoded anterior enumerava só 31 de 49 grafos, **36% cegos**, e os invisíveis
+  eram justamente os de `docs/evolution/research/<tema>/`) — ele é a fonte da verdade de estado/domínio, **acima**
   da prosa dos docs. Rode `bash .claude/validation/kg-radar.sh <arquivo>` e absorva o veredito (atenção,
   reconciliação, integridade, frescor) citando **ids de nó**.
 - ✅ **Drive-to-verify:** claims `plane: PROD` de alto impacto → cruzar contra o vivo antes de assumir; nó
