@@ -152,7 +152,7 @@ Padrões para integrações:
 - **Documentação Onion**: `docs/onion/`
 - **Agentes**: `.claude/agents/`
 - **Comandos**: `.claude/commands/`
-- **Regras de linguagem**: skill `language-standards` (o Onion não usa `.claude/rules/`)
+- **Regras de linguagem**: skill `language-standards` · **Regras path-scoped**: `.claude/rules/` (carregam só quando o arquivo casa o glob)
 
 ---
 
