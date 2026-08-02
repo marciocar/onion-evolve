@@ -38,6 +38,31 @@ else
 fi
 [ -n "${cmd:-}" ] || exit 0
 
+# ── ANTI-RUÍDO: descarta o CORPO de heredoc antes de escanear ────────────────────────────────
+# FALSO-POSITIVO MEDIDO no 1º dia da guarda (2026-08-02): a mensagem de commit que DESCREVIA os 4
+# detectores disparou os 4 de uma vez — porque vinha num heredoc e o corpo entrou no escaneamento.
+# Corpo de heredoc é TEXTO (mensagem de commit, documento, payload), não comando. A linha que ABRE
+# o heredoc continua sendo escaneada — ela é comando de verdade.
+# LIMITE DECLARADO: heredoc usado como SCRIPT (ex.: `bash <<EOF ... EOF`) deixa de ser inspecionado.
+# Aceito conscientemente: heredoc-como-texto é a esmagadora maioria, e um alarme que grita em prosa
+# vira fadiga — e alarme ignorado é pior que alarme ausente. A asserção (g) do selftest prova que o
+# filtro NÃO cegou a guarda: padrão FORA do heredoc continua disparando.
+cmd_scan=$(printf '%s\n' "$cmd" | awk '
+  d != "" {                                  # dentro do corpo: descarta até o fechador
+    line=$0; sub(/^[ \t]+/, "", line)
+    if (line == d) d=""
+    next
+  }
+  {
+    print                                    # a linha que ABRE o heredoc É comando: mantém
+    if (match($0, /<<-?[ \t]*['"'"'"]?[A-Za-z_][A-Za-z0-9_]*['"'"'"]?/)) {
+      tok = substr($0, RSTART, RLENGTH)
+      sub(/^<<-?[ \t]*/, "", tok); gsub(/['"'"'"]/, "", tok)
+      d = tok
+    }
+  }')
+cmd="${cmd_scan}"
+
 warn=""
 add() { warn="${warn}
   · $1"; }

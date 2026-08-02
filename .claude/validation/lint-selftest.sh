@@ -3155,6 +3155,23 @@ run_empty_result_guard_selftests() {
   if [ "${rc}" -eq 2 ]; then
     record_pass "empty-result-guard: (e) dispara com exit 2 (a única via que o aviso chega ao modelo)"
   else record_fail "empty-result-guard: (e)" "exit ${rc} != 2 — o aviso não chegaria ao modelo"; fi
+
+  # (f) e (g) sao PAR e so valem juntas — nasceram de um falso-positivo MEDIDO no 1o dia da guarda
+  # (2026-08-02: a mensagem de commit que DESCREVIA os 4 detectores disparou os 4, porque o corpo do
+  # heredoc entrou no escaneamento). (f) prova que o ruido morreu; (g) prova que a cura NAO CEGOU a
+  # guarda. Filtro anti-ruido sem o par (g) e como se silencia um alarme inteiro e passa no teste.
+  local hd_quiet hd_loud
+  hd_quiet='{"tool_input":{"command":"git commit -F - <<'"'"'EOF'"'"'\nfeat: descreve os detectores\n  tail f | sed x; echo $?\n  sudo -n ls /home/onion/.env.bak-*\n  cmd 2>/dev/null | wc -l\nEOF"},"tool_response":{"stdout":"ok"}}'
+  out="$(printf '%s' "${hd_quiet}" | bash "${hook}" 2>&1 || true)"
+  if ! printf '%s' "${out}" | grep -q 'pode MENTIR'; then
+    record_pass "empty-result-guard: (f) padroes dentro de CORPO de heredoc (texto) → SILENCIOSO"
+  else record_fail "empty-result-guard: (f)" "falso-positivo em prosa de heredoc: ${out}"; fi
+
+  hd_loud='{"tool_input":{"command":"sudo -n ls /home/onion/x/.env.bak-* 2>/dev/null | wc -l\ngit commit -F - <<'"'"'EOF'"'"'\ntexto inocente\nEOF"},"tool_response":{"stdout":"0"}}'
+  out="$(printf '%s' "${hd_loud}" | bash "${hook}" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'GLOB-SOB-SUDO' && printf '%s' "${out}" | grep -q 'ERRO-ENGOLIDO'; then
+    record_pass "empty-result-guard: (g) MESMO comando, padrao FORA do heredoc → AINDA DISPARA (o filtro nao cegou)"
+  else record_fail "empty-result-guard: (g)" "o filtro de heredoc CEGOU a guarda — silenciou comando real: ${out}"; fi
 }
 
 run_task_manager_hook_selftests() {
