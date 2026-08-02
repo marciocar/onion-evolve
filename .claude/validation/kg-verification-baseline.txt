@@ -1,0 +1,57 @@
+# Baseline da REGRA 49 — PASSIVO TOLERADO de nós PROD/impact>=4 sem verified_at.
+# Gerado por: bash .claude/validation/kg-verification-coverage.sh --emit-baseline
+# Esta lista SO PODE ENCOLHER. Acrescentar entrada aqui e REGRESSAO (HARD).
+# Para remover uma entrada: MEÇA o no contra o vivo (/meta:kg-freshness) e carimbe.
+docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml::15c1995fb0f2
+docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml::3839f40df814
+docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml::3c4004d13745
+docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml::c233c568f391
+docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml::d077c113d31e
+docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml::05a3adb629e5
+docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml::1320154a5874
+docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml::22c8bd113394
+docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml::4dbab3d98f2d
+docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml::9007ea050289
+docs/discussions/onion-pessoal-marcio/proto/inference-mitigation.kg.yaml::017aee71a450
+docs/discussions/onion-pessoal-marcio/proto/inference-mitigation.kg.yaml::3e4eee5d101d
+docs/discussions/onion-pessoal-marcio/proto/inference-mitigation.kg.yaml::59357f95a4b2
+docs/discussions/onion-pessoal-marcio/proto/inference-mitigation.kg.yaml::5e8848cce7b3
+docs/discussions/onion-pessoal-marcio/proto/inference-mitigation.kg.yaml::b8e32d3320b7
+docs/discussions/onion-pessoal-marcio/proto/inference-mitigation.kg.yaml::b9d606777ce8
+docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml::602f44f87e6d
+docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml::6a790b872f54
+docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml::a9566ae692c7
+docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml::1ecf3717b0ca
+docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml::440ff04c5767
+docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml::b1df732aada1
+docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml::cf12fc8306d5
+docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml::fa9c5aea08a9
+docs/evolution/research/autonomous-thread-runtime-2026-07/autonomous-thread-runtime.kg.yaml::b9a9faacc151
+docs/materials/cold-adopter-2026-07/example-domain.kg.yaml::6edb7e25cda8
+docs/materials/cold-adopter-2026-07/example-domain.kg.yaml::6faa19d8b2d1
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::029a5cd2fb5a
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::0f922fc79d2a
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::149d516ff7f3
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::1751ba5a66be
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::1b1a29001864
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::1d2ed3e3aa6c
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::44287364ebb5
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::57ddf81760f5
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::59501347ddac
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::6e9a4b5da390
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::7209a1cd29bf
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::7d7801c9e26f
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::a87c11a1ef0f
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::e9a670c07fbe
+docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::ef01f06d8799
+docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml::3253df7386c0
+docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml::18bdaacce52f
+docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml::58040018761a
+docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml::77155224e1ef
+docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml::8c2b97fb23fd
+docs/onion/graph/onion-identity-2026-07.kg.yaml::22c8bd113394
+docs/onion/graph/onion-identity-2026-07.kg.yaml::263220d244c8
+docs/onion/graph/onion-identity-2026-07.kg.yaml::8b7a77d74372
+docs/onion/graph/onion-identity-2026-07.kg.yaml::9258730bb2b2
+docs/onion/graph/onion-identity-2026-07.kg.yaml::ad268610bdb8
+docs/onion/graph/onion-identity-2026-07.kg.yaml::f3ebd2bfb4ce
