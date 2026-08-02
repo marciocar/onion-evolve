@@ -18,7 +18,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**48 regras** no total — **43 HARD**, **9 SOFT**.
+**49 regras** no total — **44 HARD**, **10 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -98,6 +98,7 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 43 | Integridade do marcador kg: (proveniência virada p/ DENTRO) | HARD | marcador kg: (born-in-graph) inconsistente com o grafo |
 | 44 | Integridade da escada de Automação Graduada | HARD | classe sobe de degrau sem gate de promoção alcançável (rung-jump forjado) |
 | 47 | Narração do KG cita ids que existem no grafo | HARD | narração que mente — o console embute <slug>.narration.json e DROPA ids mortos em silêncio; um tour que cita nó inexistente engana o leitor com cara de projeção fiel |
+| 49 | Nó plane:PROD de alto impacto carrega VERIFICAÇÃO, com catraca | HARD + SOFT | nó afirmando sobre produção sem nunca ter sido medido contra o vivo |
 
 ## Federação
 

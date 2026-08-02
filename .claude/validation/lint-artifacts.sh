@@ -1540,6 +1540,45 @@ check_kg_provenance_coverage() {
 }
 
 # ===========================================================================
+# REGRA 49 — Nó plane:PROD de alto impacto carrega VERIFICAÇÃO, com catraca [HARD + SOFT]
+# previne: nó afirmando sobre produção sem nunca ter sido medido contra o vivo
+#   Terceiro irmão da família de catraca (29 = documento existe no grafo; 42 = doutrina
+#   carimbada e dentro do TTL; 49 = nó que AFIRMA SOBRE PRODUÇÃO foi medido alguma vez).
+#   Origem: o kg-radar DETECTA frescor (STALE-MISSING/OLD/UNANCHORED) e PARA AÍ, como
+#   "⚠ atenção, NÃO reprova" — logo o passivo CRESCE SEM LIMITE. Medido 2026-08-02:
+#   53 nós vivos plane:PROD impact>=4 sem NENHUM verified_at.
+#   O GATILHO É O DESENHO: esta regra nunca manda rodar /meta:kg-freshness — ela torna
+#   RODÁ-LO a única forma de encolher o baseline. A cadência vem do trabalho, não do aviso.
+#   LIMITE HONESTO (igual à 42): não checa se o carimbo é VERDADE, só que existe. Quem
+#   testa a verdade é o worker do kg-freshness, contra o vivo.
+#   Toda a lógica (escopo, catraca, fail-closed) vive em kg-verification-coverage.sh.
+#   MEIA-VIDA POR CLASSE fica GATED (hoje 0 nós com carimbo vencido — regra sobre conjunto
+#   vazio é cerimônia): docs/analysis/onion-adr-kg-halflife-2026-08.md.
+# ===========================================================================
+check_kg_verification_coverage() {
+  local helper="${SCRIPT_DIR}/kg-verification-coverage.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.kg.yaml|*/kg-verification-baseline.txt) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out passivo=0 sev tag path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    if [ "${tag}" = "PASSIVO" ]; then passivo=$(( passivo + 1 )); continue; fi
+    violation "${sev}" "${REPO_ROOT}/${path}" "[kg-verificacao/${tag}] ${msg}"
+  done <<< "${out}"
+  if [ "${passivo}" -gt 0 ]; then
+    violation "SOFT" "${REPO_ROOT}/.claude/validation/kg-verification-baseline.txt" \
+      "[kg-verificacao/PASSIVO] ${passivo} no(s) plane:PROD impact>=4 ainda sem verified_at, tolerados pelo baseline — a metrica de saude e este numero DIMINUINDO (/meta:kg-freshness mede, voce carimba)"
+  fi
+}
+
+# ===========================================================================
 # REGRA 42 — Gate de FRESCOR DOUTRINÁRIO, com catraca [HARD + SOFT]
 # previne: afirmação sensível-ao-tempo sem carimbo ou fora do TTL
 #   Irmão TEMPORAL da REGRA 29. A 29 fecha conhecimento nascendo FORA do grafo
@@ -2377,6 +2416,7 @@ check_evolution_links
 check_knowledge_base_links
 check_research_kg
 check_kg_provenance_coverage
+check_kg_verification_coverage
 check_doctrine_freshness
 check_kg_born_marker
 check_ladder_integrity

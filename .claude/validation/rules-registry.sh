@@ -116,7 +116,7 @@ CATEGORIES = [
      "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca "
      "(por citação e por marcador autodeclarado); e frescor doutrinário — afirmação "
      "sensível-ao-tempo carimbada e dentro do TTL.",
-     [26, 29, 31, 32, 42, 43, 44, 47]),
+     [26, 29, 31, 32, 42, 43, 44, 47, 49]),
     ("Federação",
      "Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.",
      [24, 25, 28, 38, 46]),

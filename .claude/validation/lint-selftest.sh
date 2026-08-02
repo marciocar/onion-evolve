@@ -3190,6 +3190,85 @@ run_empty_result_guard_selftests() {
   else record_fail "empty-result-guard: (i)" "a proximidade cegou o caso multi-linha que originou a guarda: ${out}"; fi
 }
 
+# Modo kg-verificacao — REGRA 49. O gate garante que no plane:PROD impact>=4 NASCA carimbado e que
+# o passivo NAO CRESCA. Nao checa se o carimbo e verdade (limite declarado: quem mede e o worker do
+# /meta:kg-freshness). O teste (d) e o anti-falso-positivo; o (g) e o MUTATION que prova load-bearing.
+run_kg_verification_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/kg-verification-coverage.sh"
+  if [ ! -f "${helper}" ]; then record_fail "kg-verificacao" "helper ausente"; return; fi
+  local d out rc
+
+  _mk() {  # $1=dir $2=id $3=plane $4=impact $5=status $6=verified_at("" p/ nenhum)
+    mkdir -p "$1/docs/onion/graph"
+    { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+      printf '  - id: %s\n    node_type: claim\n    plane: %s\n    impact: %s\n    status: %s\n' "$2" "$3" "$4" "$5"
+      [ -n "$6" ] && printf '    verified_at: %s\n' "$6"
+      printf '    label: "x"\n'
+    } > "$1/docs/onion/graph/t.kg.yaml"
+    ( cd "$1" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+  }
+
+  # (a) no NOVO PROD/impact>=4 sem carimbo, baseline vazio -> HARD
+  d="$(mktemp -d)"; _mk "$d" C_NOVO PROD 5 confirmed ""
+  mkdir -p "$d/.claude/validation"; printf '# vazio\n' > "$d/.claude/validation/kg-verification-baseline.txt"
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | grep -q '^HARD.*NOVO'; then
+    record_pass "kg-verificacao: (a) no novo PROD/impact>=4 sem verified_at → HARD"
+  else record_fail "kg-verificacao: (a)" "nao reprovou no novo sem carimbo: ${out}"; fi
+
+  # (b) o MESMO no, agora no baseline -> SOFT PASSIVO (tolerado), sem HARD
+  bash "${helper}" "$d" --emit-baseline > "$d/.claude/validation/kg-verification-baseline.txt" 2>/dev/null
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | grep -q '^SOFT.*PASSIVO' && ! printf '%s' "${out}" | grep -q '^HARD'; then
+    record_pass "kg-verificacao: (b) mesmo no no baseline → SOFT PASSIVO, sem HARD (catraca tolera)"
+  else record_fail "kg-verificacao: (b)" "baseline nao tolerou o passivo: ${out}"; fi
+
+  # (c) no COM verified_at -> silencio total
+  d="$(mktemp -d)"; _mk "$d" C_OK PROD 5 confirmed 2026-08-01
+  mkdir -p "$d/.claude/validation"; printf '# vazio\n' > "$d/.claude/validation/kg-verification-baseline.txt"
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if [ -z "${out}" ]; then
+    record_pass "kg-verificacao: (c) no com verified_at → silencio"
+  else record_fail "kg-verificacao: (c)" "falso-positivo em no carimbado: ${out}"; fi
+
+  # (d) ANTI-FALSO-POSITIVO: impact 3, plane DEV e status superseded ficam FORA do escopo
+  local noisy=0 spec
+  for spec in "C_LOW PROD 3 confirmed" "C_DEV DEV 5 confirmed" "C_SUP PROD 5 superseded"; do
+    set -- ${spec}
+    d="$(mktemp -d)"; _mk "$d" "$1" "$2" "$3" "$4" ""
+    mkdir -p "$d/.claude/validation"; printf '# vazio\n' > "$d/.claude/validation/kg-verification-baseline.txt"
+    out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+    printf '%s' "${out}" | grep -q '^HARD' && noisy=1
+  done
+  if [ "${noisy}" -eq 0 ]; then
+    record_pass "kg-verificacao: (d) impact<4, plane DEV e superseded → FORA do escopo (sem falso-positivo)"
+  else record_fail "kg-verificacao: (d)" "escopo largo demais — cobrou no que nao deveria"; fi
+
+  # (e) FAIL-CLOSED: baseline AUSENTE nao libera tudo
+  d="$(mktemp -d)"; _mk "$d" C_X PROD 5 confirmed ""
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | grep -q 'NO-BASELINE'; then
+    record_pass "kg-verificacao: (e) baseline ausente → HARD NO-BASELINE (fail-closed, nao libera tudo)"
+  else record_fail "kg-verificacao: (e)" "sem baseline o gate ficou mudo: ${out}"; fi
+
+  # (f) o baseline NAO pode conter id de no cru (viaja vendorizado — REGRA 36 pegou isto de verdade)
+  d="$(mktemp -d)"; _mk "$d" E_NOME_DE_CLIENTE PROD 5 confirmed ""
+  out="$(bash "${helper}" "$d" --emit-baseline 2>/dev/null || true)"
+  if ! printf '%s' "${out}" | grep -q 'E_NOME_DE_CLIENTE'; then
+    record_pass "kg-verificacao: (f) baseline guarda hash, NAO o id cru (id carrega nome de adotante)"
+  else record_fail "kg-verificacao: (f)" "VAZAMENTO: o id cru foi para o baseline versionado"; fi
+
+  # (g) MUTATION TEST — sem a condicao central (ver == ""), o caso (a) para de reprovar
+  d="$(mktemp -d)"; _mk "$d" C_NOVO PROD 5 confirmed ""
+  mkdir -p "$d/.claude/validation"; printf '# vazio\n' > "$d/.claude/validation/kg-verification-baseline.txt"
+  local mut="$d/mutante.sh"
+  sed 's/&& ver == ""/\&\& ver != ver/' "${helper}" > "${mut}"
+  out="$(bash "${mut}" "$d" --format tsv 2>/dev/null || true)"
+  if ! printf '%s' "${out}" | grep -q '^HARD.*NOVO'; then
+    record_pass "kg-verificacao: (g) (MUT) sem a condicao central o caso (a) FALHA — a guarda e load-bearing"
+  else record_fail "kg-verificacao: (g)" "mutante ainda reprova — o teste (a) nao prova nada"; fi
+}
+
 run_task_manager_hook_selftests() {
   local hook="${REPO_ROOT}/.claude/hooks/task-manager-provider-hook.sh"
   if [ ! -f "${hook}" ]; then record_fail "task-manager-hook" "hook ausente: ${hook}"; return; fi
@@ -5704,6 +5783,7 @@ run_scope_gitignore_selftests
 
 # Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal de campo D2).
 run_task_manager_hook_selftests
+run_kg_verification_selftests
 run_empty_result_guard_selftests
 
 # Modo cycle-completion — métrica de ciclos concluídos vs abandonados (D5 instrumentação,
