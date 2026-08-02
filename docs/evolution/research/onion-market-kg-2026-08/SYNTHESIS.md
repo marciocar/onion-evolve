@@ -98,9 +98,19 @@ separe de GSD/BMAD.
 
 **Onde não vence:** compliance como dimensão peer — lá o acoplamento **é** o produto.
 
-**O agravante:** já começamos a lhe dar razão sem admitir. O `plugins/` no HEAD tem **7 verticais
-empacotadas e instaláveis em separado**. A resposta honesta não é rebater — é **declarar que o Onion é
-consumível em fatias e provar por `plugins/`**.
+**O agravante — ⚠️ CORRIGIDO em 2026-08-02, algumas horas depois:** este parágrafo afirmava que
+*"a doutrina diz indivisível enquanto o `plugins/` divide"*. **É falso.** O `CLAUDE.md:12` diz que os
+workflows *"não devem ser **CONSOLIDADOS**"* — ou seja, **não devem ser fundidos um no outro**. Ler
+*"consolidados"* como *"divididos"* inverte o sentido: manter `product/` e `engineer/` como fluxos
+distintos é **compatível** com enviá-los como verticais separadas.
+
+**A objeção segue de pé; o agravante cai.** E o que sobrevive é positivo, não defensivo: o `plugins/`
+tem **7 verticais instaláveis**, e já houve **teste de instalação e uso de skills em separado** — o
+consumo em fatias é **estratégia de distribuição já exercitada**, não concessão a uma crítica.
+SSOT da correção: nó `E_leitura_errada_consolidados` (aresta `REFUTES`).
+
+> Causa do erro: afirmei contradição **sem reler a frase**. É a mesma família `declarado ≠ verificado`
+> que esta pesquisa investiga — desta vez **dentro da própria pesquisa**.
 
 ## 🏢 O "Company Brain" da YC — e o que ele **não** significa
 

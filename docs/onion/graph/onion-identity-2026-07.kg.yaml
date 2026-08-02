@@ -614,7 +614,124 @@ nodes:
     label: "org externa e o mesmo que adotante frio? pulse-mais e ORGANIZACAO REAL E EXTERNA (members.yaml:93, correcao do maestro) mas o repo e de Marcio — decide o caveat de orbita e o pitch"
     trace: "docs/evolution/federation/members.yaml:93"
 
+  # ═══ HISTÓRIA E POSTURA (2026-08-02) — o contexto que faltava e cuja AUSÊNCIA gerou erro ═══
+  # Registrado depois que a sessão concluiu "contradição entre doutrina e plugins/" — conclusão
+  # FALSA, nascida de ler CLAUDE.md sem esta história. O grafo existe para isto: sem o porquê,
+  # o leitor (humano ou agente) reconstrói por inferência e erra.
+  - id: E_ORIGEM_CURSOR_AGNOSTICO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-02
+    verified_against: relato-do-maestro-2026-08-02
+    label: "ORIGEM: o Onion nasceu nos experimentos do maestro com o CURSOR, e desde o inicio buscando ser AGNOSTICO. O repo mais antigo da familia e onion-architect (marciocar/onion-architect, criado 2025-12-01, publico, 'framework de comandos Cursor com abstracao de Task Manager') — a abstracao de provider ja estava la, antes de existir Claude Code no desenho"
+    trace: "https://github.com/marciocar/onion-architect"
+
+  - id: E_PORTE_PARA_O_CURSO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-02
+    verified_against: relato-do-maestro-2026-08-02
+    label: "O MULTI-IDE FOI ATO DELIBERADO COM PROPOSITO DE NEGOCIO, nao dispersao: para atender ao Curso de Desenvolvimento com IA (spec-as-code) na PULSE MAIS, a versao Cursor foi TRANSPORTADA para Claude, Antigravity, Codex e outros — cada repo adaptado as REGRAS DA FERRAMENTA. Os ALUNOS usaram o onion-portable como padrao. Ou seja: houve USO DE CAMPO com alunos reais, nao prova de conceito"
+
+  - id: E_FAMILIA_MULTIIDE_CONGELADA
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-02
+    verified_against: gh-api-2026-08-02-e-relato-do-maestro
+    label: "A FAMILIA MULTI-IDE EXISTE, E PUBLICA, E ESTA CONGELADA (confirmado pelo maestro 2026-08-02). Medido via gh api: marciocar/onion (hub, 'uma metodologia, SEIS ferramentas de IA, prova de universalidade'), onion-cursor, onion-antigravity, onion-copilot, onion-architect, onion-mini, onion-standalone — todos PUBLICOS. Seis dos sete nasceram DEPOIS da decisao de 2026-05-18. CONGELADO = material de curso e prova de portabilidade, NAO linha de manutencao ativa"
+    trace: "https://github.com/marciocar/onion"
+
+  - id: D_CLAUDE_CODE_POR_CAPACIDADE
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-02
+    verified_against: relato-do-maestro-2026-08-02
+    label: "A DECISAO FOI TECNICA, NAO ABANDONO DO AGNOSTICISMO: optou-se por PARAR DE GASTAR ENERGIA sendo agnostico e assumir o Claude Code como ferramenta principal PARA PODER USAR RECURSOS MODERNOS — nominalmente o SendMessage entre agentes no modo Teams. Trade-off explicito: capacidade de fronteira > portabilidade horizontal. Isto REENQUADRA a linha 'Plataforma unica: Claude Code' do CLAUDE.md: ela e a CONCLUSAO de um experimento multi-IDE de escala real, nao uma restricao de origem"
+    trace: "docs/analysis/onion-review-2026-05.md"
+
+  - id: C_POSTURA_ACOPLAMENTO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-02
+    verified_against: formulacao-do-maestro-2026-08-02
+    label: "A POSTURA DE ACOPLAMENTO (formulacao do maestro, criterio de decisao e NAO documentacao): 'o Onion esta ACOPLADO ao Claude Code para tirar vantagem de sua ESTRUTURA E MAQUINARIA, mas buscando manter INDEPENDENCIA sempre que isso for MAIS VANTAJOSO e o acoplamento NAO FOR NECESSIDADE'. E o teste que decide toda adocao de substrato: acoplar so quando a capacidade que se ganha nao existe fora — nunca por conveniencia nem por simetria. Governa decisoes ja tomadas hoje (.claude/rules/, tipos de hook, o slice de rules) e as futuras"
+
+  - id: C_CORE_NAO_E_FAMILIA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-02
+    verified_against: leitura-do-CLAUDE.md-mais-gh-api
+    label: "A DISTINCAO QUE FALTAVA NA DOUTRINA: CLAUDE.md:9-10 ('nao e distribuido publicamente' + 'Plataforma unica: Claude Code') descreve O CORE (onion-evolve) e e lido como descrevendo TUDO. A FAMILIA multi-IDE e outro objeto, com outro proposito (curso + prova de portabilidade) e outro ciclo de vida (CONGELADO). Sem a distincao escrita, quem le conclui violacao — foi exatamente o que esta sessao concluiu, errado, em 2026-08-02"
+
+  - id: C_FATIAS_JA_TESTADAS
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: open
+    verified_at: 2026-08-02
+    verified_against: relato-do-maestro-2026-08-02
+    label: "CONSUMO EM FATIAS NAO E HIPOTESE — JA HOUVE TESTE: criacao de plugin e skills para o Onion, incluindo testes de INSTALACAO E USO DAS SKILLS DE FORMA SEPARADA, e uso do Onion (inclusive com a ponte junto ao Claude Code) COMO PARTE, sendo usado por outros projetos. ABERTO porque o RESULTADO desses testes nao esta registrado em lugar nenhum do repo — e conhecimento que existe fora do grafo. Proximo passo: o maestro relata o que mostraram, ou roda-se um teste novo com medicao"
+
+  - id: C_ERRO_CONSOLIDADO_VS_DIVIDIDO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "ERRO DE LEITURA REGISTRADO (2026-08-02, para nao se repetir): esta sessao afirmou que 'a doutrina diz indivisivel enquanto o plugins/ divide'. FALSO. CLAUDE.md:12 diz que os workflows faseados 'nao devem ser CONSOLIDADOS' — isto e, nao devem ser FUNDIDOS UM NO OUTRO. Ler 'consolidados' como 'divididos' inverte o sentido: manter product/ e engineer/ como fluxos distintos e COMPATIVEL com envia-los como verticais separadas. A afirmacao falsa foi commitada em docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md e no no C_objecao_mattpocock_vence"
+
 edges:
+  # a historia (2026-08-02) sustenta a distincao, e a distincao refuta o erro desta sessao
+  - from: E_ORIGEM_CURSOR_AGNOSTICO
+    to: E_PORTE_PARA_O_CURSO
+    edge_type: CAUSES
+  - from: E_PORTE_PARA_O_CURSO
+    to: D_CLAUDE_CODE_POR_CAPACIDADE
+    edge_type: CAUSES
+  - from: D_CLAUDE_CODE_POR_CAPACIDADE
+    to: C_POSTURA_ACOPLAMENTO
+    edge_type: SUPPORTS
+  - from: E_FAMILIA_MULTIIDE_CONGELADA
+    to: C_CORE_NAO_E_FAMILIA
+    edge_type: SUPPORTS
+  - from: E_PORTE_PARA_O_CURSO
+    to: C_CORE_NAO_E_FAMILIA
+    edge_type: SUPPORTS
+  - from: C_CORE_NAO_E_FAMILIA
+    to: C_ERRO_CONSOLIDADO_VS_DIVIDIDO
+    edge_type: SUPPORTS
+  # o teste de fatias é evidência A FAVOR da postura: já se experimentou usar partes SEM o todo,
+  # que é a metade "independência quando for mais vantajoso" do critério.
+  - from: C_FATIAS_JA_TESTADAS
+    to: C_POSTURA_ACOPLAMENTO
+    edge_type: SUPPORTS
   - from: E_CLAUDE_MD
     to: C_IDENTITY_CANON
     edge_type: SUPPORTS

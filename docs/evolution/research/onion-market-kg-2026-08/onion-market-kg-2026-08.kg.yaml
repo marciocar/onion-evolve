@@ -149,10 +149,14 @@ nodes:
     label: "A OBSERVACAO QUE SOBROU SEM RESPOSTA DEPOIS DE 5 INSTRUMENTOS REPROVADOS: o unico disparo que COMPROVADAMENTE funcionou no corpus inteiro (C7) foi SOCIAL — um humano perguntando 'voce esta fazendo SSOT-first?'. Nenhum dos cinco instrumentos testados reproduz isso, e o corpus nao tem candidato barato que reproduza. Nesta propria sessao o padrao se repetiu duas vezes: o maestro perguntou 'o KG-SSOT entrou para a pesquisa tambem?' e 'tem alguma ferramenta de KG com yy no final?' — e as duas perguntas corrigiram a pesquisa"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
 
+  # PARCIALMENTE REFUTADO em 2026-08-02 por E_leitura_errada_consolidados: o AGRAVANTE deste no
+  # ("plugins/ ja contradiz a doutrina") era LEITURA ERRADA de CLAUDE.md:12. A objecao em si segue
+  # de pe; o agravante nao. Status vai a refuted porque o no recebe REFUTES — no que recebe REFUTES
+  # e segue confirmed e contradicao estrutural, e o radar reprova (licao do proprio radar, 08-02).
   - id: C_objecao_mattpocock_vence
     node_type: claim
     plane: PROD
-    status: confirmed
+    status: refuted
     impact: 5
     confidence: 0.85
     verified_at: 2026-08-02
@@ -232,6 +236,17 @@ nodes:
     label: "SUBSTANCIA F — cura de RESIDUO (id de no citado em artefato duravel: commit/PR/doc). PLACAR 1/7, e de novo o mesmo C7. O replay provou que commit/PR/doc e O PLANO ERRADO: 6 das 7 falhas sao CONVERSACIONAIS e nao produzem commit — em 2026-08-02 o repo tinha 1 commit, a propria pesquisa. Ataque: 0 de 5 portoes. O QUE MORREU FOI A ENCARNACAO, NAO A LENTE: 'residuo material auditado por terceiro, desacoplado do ator' segue de pe e segue sem candidata"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
 
+  - id: E_leitura_errada_consolidados
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-02
+    verified_against: leitura-verbatim-de-CLAUDE.md-linha-12
+    label: "CORRECAO DE LEITURA (mesma sessao, algumas horas depois): esta pesquisa afirmou que 'a doutrina diz indivisivel enquanto o plugins/ divide'. E FALSO. CLAUDE.md:12 diz que product/collect->feature e engineer/plan->pr-update 'nao devem ser CONSOLIDADOS' — isto e, nao devem ser FUNDIDOS UM NO OUTRO. Ler 'consolidados' como 'divididos' INVERTE o sentido: manter os dois fluxos distintos e COMPATIVEL com envia-los como verticais separadas em plugins/. A objecao do mattpocock (framework que toma conta do processo) SEGUE DE PE — o que cai e o agravante 'ja nos contradizemos'. Causa: afirmei contradicao sem reler a frase, a mesma familia declarado!=verificado que a pesquisa investiga, agora dentro da propria pesquisa"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
   - id: A_RESEARCH_MARKET
     node_type: artifact
     plane: DEV
@@ -290,6 +305,9 @@ edges:
   - from: C_objecao_mattpocock_vence
     to: D_consumivel_em_fatias
     edge_type: CAUSES
+  - from: E_leitura_errada_consolidados
+    to: C_objecao_mattpocock_vence
+    edge_type: REFUTES
   - from: E_busca_por_nome_acha_incumbente
     to: E_descoberta_precisa_n_passadas
     edge_type: SUPPORTS

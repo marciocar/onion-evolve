@@ -6,8 +6,22 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
 
 **Identidade canônica** (decisões de 2026-05-18, consolidadas em [docs/analysis/onion-review-2026-05.md](docs/analysis/onion-review-2026-05.md)):
 
-- Framework template em `.claude/` — **não é produto npm**, não é distribuído publicamente, **não tem CLI standalone**
-- Plataforma única: **Claude Code**
+- Framework template em `.claude/` — **não é produto npm**, **não tem CLI standalone**
+- **Plataforma única: Claude Code** — por **capacidade**, não por origem. O Onion nasceu no **Cursor**
+  buscando ser agnóstico, e foi de fato **portado** para Claude/Antigravity/Codex para o Curso de
+  Desenvolvimento com IA (Pulse Mais), com alunos usando. A decisão de 2026-05-18 foi **parar de
+  gastar energia em agnosticismo** para poder usar recursos de fronteira (ex.: `SendMessage` entre
+  agentes no modo Teams). É conclusão de experimento real, não restrição de nascença.
+- **A postura de acoplamento** (o critério que decide toda adoção de substrato): *acoplado ao Claude
+  Code para tirar vantagem da sua estrutura e maquinaria, **mas mantendo independência sempre que
+  isso for mais vantajoso e o acoplamento não for necessidade***. Acople só quando a capacidade
+  ganha não existe fora — nunca por conveniência nem por simetria.
+- **CORE ≠ FAMÍLIA** — estas linhas descrevem **este repo** (o core). Existe uma **família multi-IDE
+  pública e CONGELADA** (`onion`, `onion-cursor`, `onion-antigravity`, `onion-copilot`,
+  `onion-architect`, `onion-mini`, `onion-standalone`): material de curso e **prova de
+  portabilidade**, não linha de manutenção ativa. Sem esta distinção, quem lê conclui que os repos
+  públicos violam a doutrina — **conclusão errada, já cometida em 2026-08-02**. SSOT:
+  `docs/onion/graph/onion-identity-2026-07.kg.yaml` (`C_CORE_NAO_E_FAMILIA`, `C_POSTURA_ACOPLAMENTO`)
 - Cobre **três dimensões peer** do ciclo: produto, engenharia, compliance/governança
 - **Workflows faseados retomáveis** com sessões persistentes — `product/collect→feature` (descoberta a backlog) e `engineer/plan→pr-update` (planejamento a entrega) são invariantes do framework, não devem ser consolidados
 - `.onion/` (estrutura agnóstica) e plano v4.0 FASES 5-9 (CLI standalone, multi-IDE, aprendizado contínuo) foram **formalmente abandonados em 2026-05-18**
