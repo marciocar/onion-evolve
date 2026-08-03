@@ -236,19 +236,31 @@ check_command_description() {
 }
 
 # ===========================================================================
-# REGRA 3 — Campo model: não pode conter gpt-4 [HARD]
-# previne: model proibido (gpt-4) embarcado num artefato
-#           Verifica apenas linhas que começam com 'model:' em .claude/**/*.md
-#           NÃO falha por ocorrências dentro de blocos de código
+# REGRA 3 — Campo model: restrito à allowlist sonnet|opus|haiku|fable [HARD]
+# previne: model fora da allowlist embarcado num artefato
+#           Era denylist de 1 item (gpt-4) para um campo que na prática é
+#           allowlist fechada de 3-4 valores — 'model: gpt-5', 'o3' ou
+#           'claude-3-opus' passariam hoje, sem barrar nada além do literal
+#           'gpt-4'. Allowlist medida contra o uso real (153 arquivos com
+#           frontmatter): sonnet/opus/haiku; 'fable' é o 4o valor documentado
+#           pela SSOT dos templates (command-template.md e agent-template.md).
+#           Checa SÓ o `model:` do FRONTMATTER real (entre o par de '---' no
+#           TOPO do arquivo) — não o corpo, onde exemplos ilustrativos
+#           ('model: [sonnet|opus]' em agent-creator-specialist.md,
+#           'model: sonnet|opus|haiku' em onion-patterns/SKILL.md) usam a
+#           sintaxe como PROSA, não como valor de campo, e disparariam
+#           falso-positivo sob varredura ingênua do arquivo inteiro.
 # ===========================================================================
 check_no_gpt4_model() {
   while IFS= read -r -d '' file; do
-    # Extrai apenas as linhas que iniciam com 'model:' e verifica gpt-4
-    if grep -q "^model:.*gpt-4" "${file}"; then
-      local lines
-      lines=$(grep -n "^model:.*gpt-4" "${file}" | head -3)
-      violation "HARD" "${file}" "campo model: contém gpt-4 (linha(s): ${lines})"
-    fi
+    local model_line token
+    model_line="$(awk 'NR==1 && $0=="---" { infm=1; next } infm && $0=="---" { exit } infm && /^model:/ { print; exit }' "${file}")"
+    [ -n "${model_line}" ] || continue
+    token="$(printf '%s' "${model_line}" | sed -E 's/^model:[[:space:]]*//' | awk '{print $1}')"
+    case "${token}" in
+      sonnet|opus|haiku|fable) : ;;
+      *) violation "HARD" "${file}" "campo model: fora da allowlist (sonnet|opus|haiku|fable): '${token}'" ;;
+    esac
   done < <(_find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
 }
 
@@ -2397,7 +2409,7 @@ PYEOF
 }
 
 # REGRA 47 — Narração do KG cita ids que existem no grafo [HARD]
-# previne: narração que mente — o console embute <slug>.narration.json e DROPA ids mortos em silêncio; um tour que cita nó inexistente engana o leitor com cara de projeção fiel
+# previne: narração que cita nó inexistente no grafo — console embute e DROPA ids mortos silenciosamente
 # ------------------------------------------------------------------------------------
 # A narração pré-cozida é o único ponto com LLM do console (kg-console.sh a embute opt-in).
 # A doutrina KG-SSOT manda "citar ids de nó, nunca re-derivar da prosa"; sem mecanismo isso
@@ -2445,12 +2457,12 @@ check_onion_version_tracked() {
 }
 
 # ===========================================================================
-# REGRA 41 — Topologia da família: SSOT no KG resolve a procedimentos REAIS [HARD]
-# previne: SSOT de topologia da família sem resolver a procedimentos reais
+# REGRA 41 — Topologia da família: SSOT no KG com procedimentos EXISTENTES [HARD]
+# previne: SSOT de topologia da família apontando a procedimentos inexistentes
 #           A topologia (docs/onion/graph/onion-family-topology-2026-07.kg.yaml) é a fonte que as faces de
 #           CONDUÇÃO projetam (wizard/onboarding/scaffold — onion-guided-lifecycle.md). Se o SSOT mentir,
 #           os fluxos de ajuda dessincronizam do que os comandos fazem — o medo do maestro. Esta guarda o
-#           impede: (a) toda TRANSIÇÃO ativa (TX_*, status: confirmed) traceia um procedimento que EXISTE;
+#           impede: (a) toda TRANSIÇÃO ativa (TX_*, status: confirmed) traceia um procedimento que EXISTE no filesystem;
 #           (b) todo PAPEL ativo (ROLE_*, status: confirmed) existe em roles.yaml. Gated (status: open) é
 #           pulado. Molde de check_role_bundle_sync. Pula gracioso sem python+yaml. [[fix-must-become-mechanism]]
 # ===========================================================================

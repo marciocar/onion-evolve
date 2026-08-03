@@ -37,7 +37,7 @@ Campos obrigatórios, válidos e bem-formados no frontmatter de agentes e comand
 |---:|-------|:----------:|---------------|
 | 1 | Frontmatter de agente: name:, description:, tools: obrigatórios | HARD | agente sem name/description/tools obrigatórios — não carrega nem roteia direito |
 | 2 | Frontmatter de comando: description: obrigatório | HARD | comando sem description — invisível/ambíguo no menu |
-| 3 | Campo model: não pode conter gpt-4 | HARD | model proibido (gpt-4) embarcado num artefato |
+| 3 | Campo model: restrito à allowlist sonnet\|opus\|haiku\|fable | HARD | model fora da allowlist embarcado num artefato |
 | 12 | Nomes de tool de agente válidos no Claude Code | HARD | agente declara uma tool inexistente no Claude Code |
 | 17 | Frontmatter: valor escalar com ': ' não-aspado | HARD | YAML de frontmatter quebrado por escalar com ': ' não-aspado |
 | 23 | Frontmatter: model: em comandos e category: em agentes | HARD | comando sem model: ou agente sem category: |
@@ -93,7 +93,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 27 | Dependência de script de comando empacotado | HARD | comando empacotado dependendo de script ausente no bundle |
 | 37 | Mapa role→bundle (roles.yaml) consistente com os verticais | HARD | mapa role->bundle (roles.yaml) driftando dos verticais |
 | 39 | Registro de REGRAS derivado e em paridade com as guardas | HARD | lint-rules.md driftando das guardas (nº duplicado ou regra órfã) |
-| 41 | Topologia da família: SSOT no KG resolve a procedimentos REAIS | HARD | SSOT de topologia da família sem resolver a procedimentos reais |
+| 41 | Topologia da família: SSOT no KG com procedimentos EXISTENTES | HARD | SSOT de topologia da família apontando a procedimentos inexistentes |
 | 50 | Contagens do SITE público sincronizadas com a SSOT | HARD | pitch público driftando da SSOT — número que mente para quem não pode conferir |
 
 ## KG & proveniência
@@ -108,10 +108,17 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 32 | Página pública do grafo: números conferidos contra o mapa | HARD | página pública do grafo com números que não batem com o mapa |
 | 42 | Gate de FRESCOR DOUTRINÁRIO, com catraca | HARD + SOFT | afirmação sensível-ao-tempo sem carimbo ou fora do TTL |
 | 43 | Integridade do marcador kg: (proveniência virada p/ DENTRO) | HARD | marcador kg: (born-in-graph) inconsistente com o grafo |
-| 44 | Integridade da escada de Automação Graduada | HARD | classe sobe de degrau sem gate de promoção alcançável (rung-jump forjado) |
-| 47 | Narração do KG cita ids que existem no grafo | HARD | narração que mente — o console embute <slug>.narration.json e DROPA ids mortos em silêncio; um tour que cita nó inexistente engana o leitor com cara de projeção fiel |
+| 47 | Narração do KG cita ids que existem no grafo | HARD | narração que cita nó inexistente no grafo — console embute e DROPA ids mortos silenciosamente |
 | 49 | Nó plane:PROD de alto impacto carrega VERIFICAÇÃO, com catraca | HARD + SOFT | nó afirmando sobre produção sem nunca ter sido medido contra o vivo |
 | 52 | Todo .kg.yaml do repo passa no radar de INTEGRIDADE | HARD | grafo com contradição estrutural vivendo no repo sem ninguém medir |
+
+## Automação Graduada
+
+Classes de ação (HUMAN→MONITORED→DYNAMIC→AUTO) sobem de degrau com gate de promoção alcançável — nenhum rung-jump forjado.
+
+| Nº | Regra | Severidade | O que previne |
+|---:|-------|:----------:|---------------|
+| 44 | Integridade da escada de Automação Graduada | HARD | classe sobe de degrau sem gate de promoção alcançável (rung-jump forjado) |
 
 ## Federação
 
