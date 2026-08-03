@@ -91,6 +91,40 @@ jobs:
           fi
           rm -f "${body}"
 
+      # (2b) REVOGADA × MAL-COLADA — o fix é DIFERENTE em cada caso, e o 401 sozinho não separa:
+      #      um secret com \n ou espaço nas bordas manda header inválido e devolve o MESMO 401.
+      #      Aqui o valor é normalizado e re-testado. Nada do segredo é impresso: só comprimento,
+      #      se o prefixo público `sk-ant-` casa, e se a normalização mudou o tamanho.
+      - name: 2b. A chave está revogada ou apenas mal-colada?
+        if: ${{ env.HAS_KEY == 'true' }}
+        env:
+          KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set +e
+          limpa="$(printf '%s' "${KEY}" | tr -d ' \t\r\n' | sed -E 's/^["'"'"']//; s/["'"'"']$//')"
+          n_raw=${#KEY}; n_lim=${#limpa}
+          prefixo=nao; case "${limpa}" in sk-ant-*) prefixo=sim ;; esac
+          echo "comprimento bruto=${n_raw} normalizado=${n_lim} prefixo_sk_ant=${prefixo}"
+          body=$(mktemp)
+          code="$(curl -sS -o "${body}" --max-time 60 -w '%{http_code} %{time_total}' \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: ${limpa}" -H "anthropic-version: 2023-06-01" -H "content-type: application/json" \
+            -d '{"model":"claude-sonnet-5","max_tokens":16,"messages":[{"role":"user","content":"ok"}]}' 2>&1)"
+          http="${code%% *}"; secs="${code##* }"
+          etype="$(jq -r '.error.type // "—"' "${body}" 2>/dev/null || echo '—')"
+          echo "normalizada → http=${http} tempo=${secs}s tipo=${etype}"
+          {
+            echo "- forma do secret: ${n_raw} chars (normalizado ${n_lim}), prefixo \`sk-ant-\`: **${prefixo}**"
+            if [ "${n_raw}" -ne "${n_lim}" ] && [ "${http}" = "200" ]; then
+              echo "- 🎯 **MAL-COLADA** — o secret tem espaço/quebra nas bordas; normalizado ele responde 200. Fix: **re-colar** o mesmo valor, sem gerar chave nova."
+            elif [ "${http}" = "200" ]; then
+              echo "- 🎯 a chave normalizada responde **200** — investigar como o header é montado."
+            else
+              echo "- ❌ **inválida de fato** (\`${etype}\`) mesmo normalizada — o valor gravado não é uma chave ativa."
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
+          rm -f "${body}"
+
       - name: 3. Veredito legível
         if: always()
         run: |
