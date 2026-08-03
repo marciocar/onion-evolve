@@ -1,24 +1,33 @@
 # Registro de REGRAS do lint — Onion
 
 > **Documento GERADO** por `.claude/validation/rules-registry.sh` a partir dos docstrings
-> `# REGRA N — …` de `lint-artifacts.sh`. A **severidade** é derivada do que cada guarda
-> *realmente emite* (`violation "HARD"` / `"SOFT"`), não de um comentário que pode ter
-> driftado. **Não edite à mão** — rode:
+> `# REGRA N — …` de `lint-artifacts.sh`. A **severidade** é a UNIÃO do que a guarda
+> *realmente emite* (`violation "HARD"` / `"SOFT"`) com o tag `[SEV]` declarado no
+> docstring. **Não edite à mão** — rode:
 >
 > ```bash
 > bash .claude/validation/rules-registry.sh > .claude/validation/lint-rules.md
 > ```
 >
 > A coluna **O que previne** vem do campo `# previne:` no docstring de cada regra (o
-> modo-de-falha que ela evita). A REGRA 39 mantém este arquivo em paridade com as guardas
-> e **falha se houver número duplicado, regra sem categoria ou regra sem `# previne:`** — a
-> catraca de clareza.
+> modo-de-falha que ela evita). A REGRA 39 mantém este arquivo em paridade com as guardas,
+> e o gerador **falha (exit 2)** nas **5 catracas de clareza** — número duplicado · regra
+> sem categoria · regra sem `# previne:` · regra sem o tag `[SEV]` · severidade que não
+> resolve. Regra nova sem essas quatro declarações não entra: é anti-drift por construção.
+>
+> **Limite conhecido da derivação** (medido 2026-08-03, `gated-until-trigger`: sem dano
+> observado, não vale reescrever o parser): o scan associa a cada regra o **primeiro**
+> `nome() {` após o header, então em regras cujo header antecede um *helper* — ou que
+> **delegam** a um script externo com `violation "${sev}"` dinâmico — a severidade vem do
+> tag `[SEV]`, não do corpo. Hoje as duas fontes concordam em **todas** as regras (nenhuma
+> sai com severidade indefinida). Se um dia divergirem, o tag ganha — por isso ele é o
+> contrato para as guardas delegadas.
 
 São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o mesmo
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**49 regras** no total — **44 HARD**, **10 SOFT**.
+**53 regras** no total — **47 HARD**, **11 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -32,6 +41,7 @@ Campos obrigatórios, válidos e bem-formados no frontmatter de agentes e comand
 | 12 | Nomes de tool de agente válidos no Claude Code | HARD | agente declara uma tool inexistente no Claude Code |
 | 17 | Frontmatter: valor escalar com ': ' não-aspado | HARD | YAML de frontmatter quebrado por escalar com ': ' não-aspado |
 | 23 | Frontmatter: model: em comandos e category: em agentes | HARD | comando sem model: ou agente sem category: |
+| 51 | Agentes branch-* documentam a distinção vs o par geral | SOFT | par de agentes com overlap invisível — dispatcher que roteia por description não escolhe |
 
 ## Higiene de artefato
 
@@ -58,6 +68,7 @@ Proibições estruturais, documentação no lugar certo e os contratos de confor
 | 18 | Sem documentação versionada sob .claude/docs/ | HARD | documentação versionada no lugar errado (.claude/docs/) |
 | 20 | Capability Contract: tier de conformance cumprido | HARD | componente reivindica um tier de conformance que não cumpre |
 | 40 | Adotante: .onion-version DEVE estar trackeado no git | HARD | adotante com .onion-version não-trackeado — 156 falso-HARD |
+| 53 | Regra path-scoped declara `paths:` que casa algo real | HARD | regra em .claude/rules/ que nunca carrega — instrução que o modelo jamais vê |
 
 ## SDAAL — abstração de provider
 
@@ -83,6 +94,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 37 | Mapa role→bundle (roles.yaml) consistente com os verticais | HARD | mapa role->bundle (roles.yaml) driftando dos verticais |
 | 39 | Registro de REGRAS derivado e em paridade com as guardas | HARD | lint-rules.md driftando das guardas (nº duplicado ou regra órfã) |
 | 41 | Topologia da família: SSOT no KG resolve a procedimentos REAIS | HARD | SSOT de topologia da família sem resolver a procedimentos reais |
+| 50 | Contagens do SITE público sincronizadas com a SSOT | HARD | pitch público driftando da SSOT — número que mente para quem não pode conferir |
 
 ## KG & proveniência
 
@@ -99,6 +111,7 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 44 | Integridade da escada de Automação Graduada | HARD | classe sobe de degrau sem gate de promoção alcançável (rung-jump forjado) |
 | 47 | Narração do KG cita ids que existem no grafo | HARD | narração que mente — o console embute <slug>.narration.json e DROPA ids mortos em silêncio; um tour que cita nó inexistente engana o leitor com cara de projeção fiel |
 | 49 | Nó plane:PROD de alto impacto carrega VERIFICAÇÃO, com catraca | HARD + SOFT | nó afirmando sobre produção sem nunca ter sido medido contra o vivo |
+| 52 | Todo .kg.yaml do repo passa no radar de INTEGRIDADE | HARD | grafo com contradição estrutural vivendo no repo sem ninguém medir |
 
 ## Federação
 

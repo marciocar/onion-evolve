@@ -3193,6 +3193,66 @@ run_empty_result_guard_selftests() {
 # Modo kg-verificacao — REGRA 49. O gate garante que no plane:PROD impact>=4 NASCA carimbado e que
 # o passivo NAO CRESCA. Nao checa se o carimbo e verdade (limite declarado: quem mede e o worker do
 # /meta:kg-freshness). O teste (d) e o anti-falso-positivo; o (g) e o MUTATION que prova load-bearing.
+run_kg_radar_integrity_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/kg-radar-integrity.sh"
+  if [ ! -f "${helper}" ]; then record_fail "kg-integridade" "helper ausente"; return; fi
+  local d out
+
+  # Monta um repo git com UM grafo. $2=são|contraditório
+  _mki() {
+    mkdir -p "$1/.claude/validation" "$1/docs/onion/graph"
+    cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "$1/.claude/validation/"
+    { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+      printf '  - id: C_alvo\n    node_type: claim\n    plane: DEV\n    impact: 3\n    status: %s\n    label: "x"\n' \
+             "$([ "$2" = contraditorio ] && echo confirmed || echo refuted)"
+      printf '  - id: E_ref\n    node_type: evidence\n    plane: DEV\n    impact: 3\n    status: confirmed\n    label: "y"\n'
+      printf 'edges:\n  - from: E_ref\n    to: C_alvo\n    edge_type: REFUTES\n'
+    } > "$1/docs/onion/graph/t.kg.yaml"
+    ( cd "$1" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+  }
+
+  # (a) grafo com CONTRADIÇÃO (recebe REFUTES e segue confirmed) → HARD
+  d="$(mktemp -d)"; _mki "$d" contraditorio
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | grep -q '^HARD.*CONTRADICAO'; then
+    record_pass "kg-integridade: (a) grafo com REFUTES sobre nó confirmed → HARD"
+  else record_fail "kg-integridade: (a)" "não reprovou grafo contraditório: ${out}"; fi
+  rm -rf "$d"
+
+  # (b) MESMO grafo reconciliado (status refuted) → silêncio. Prova que (a) não é vacuidade:
+  #     se a guarda reprovasse sempre, (b) falharia aqui.
+  d="$(mktemp -d)"; _mki "$d" sao
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if [ -z "${out}" ]; then
+    record_pass "kg-integridade: (b) mesmo grafo reconciliado → silêncio (a guarda não reprova sempre)"
+  else record_fail "kg-integridade: (b)" "falso-positivo em grafo são: ${out}"; fi
+  rm -rf "$d"
+
+  # (c) contrato TSV — 4 campos separados por TAB, como as irmãs 29/42/45/49. O lint
+  #     consome por `IFS=$'\t' read -r sev tag path msg`; formato errado quebra o fan-in.
+  d="$(mktemp -d)"; _mki "$d" contraditorio
+  # `|| true` NÃO é decorativo: o helper sai 1 de propósito quando há HARD, e sob o
+  # `set -euo pipefail` deste script isso ABORTA a suíte inteira. Sem ele, a suíte morria
+  # aqui e o exit 1 parecia "uma guarda falhou" quando era "o teste se matou". Medido 2026-08-03.
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null | head -1 || true)"
+  if [ "$(printf '%s' "${out}" | awk -F'\t' '{print NF}')" = "4" ]; then
+    record_pass "kg-integridade: (c) contrato TSV com 4 campos (sev/tag/path/msg)"
+  else record_fail "kg-integridade: (c)" "TSV fora do contrato das irmãs: ${out}"; fi
+  rm -rf "$d"
+
+  # (d) MUT do PONTO CEGO declarado: o helper usa `git ls-files`, então grafo NÃO-RASTREADO
+  #     é invisível. Este teste FIXA o comportamento declarado no cabeçalho — se alguém trocar
+  #     para `find`, ele falha e obriga a atualizar a declaração (guarda contra doc mentindo).
+  d="$(mktemp -d)"; _mki "$d" sao
+  cp "$d/docs/onion/graph/t.kg.yaml" "$d/docs/onion/graph/untracked.kg.yaml"
+  sed -i 's/status: refuted/status: confirmed/' "$d/docs/onion/graph/untracked.kg.yaml"
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if [ -z "${out}" ]; then
+    record_pass "kg-integridade: (d) grafo UNTRACKED contraditório é invisível — ponto cego declarado no cabeçalho"
+  else record_fail "kg-integridade: (d)" "o ponto cego declarado não confere: ${out}"; fi
+  rm -rf "$d"
+}
+
 run_kg_verification_selftests() {
   local helper="${REPO_ROOT}/.claude/validation/kg-verification-coverage.sh"
   if [ ! -f "${helper}" ]; then record_fail "kg-verificacao" "helper ausente"; return; fi
@@ -5784,6 +5844,7 @@ run_scope_gitignore_selftests
 # Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal de campo D2).
 run_task_manager_hook_selftests
 run_kg_verification_selftests
+run_kg_radar_integrity_selftests
 run_empty_result_guard_selftests
 
 # Modo cycle-completion — métrica de ciclos concluídos vs abandonados (D5 instrumentação,

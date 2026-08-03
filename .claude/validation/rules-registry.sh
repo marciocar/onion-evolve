@@ -95,28 +95,65 @@ def sev_label(r):
     if s == {'SOFT'}:         return 'SOFT'
     return '—'
 
+# Catraca de CLAREZA nº5 — toda regra DECLARA o tag [SEV] no header.
+#
+# A nº4 (abaixo) pega quem não tem tag NEM literal. Esta pega quem OMITE o tag mesmo
+# tendo literal no corpo — o caso que valia por disciplina até 2026-08-03, quando 7 das
+# 53 regras (1,2,3,5,12,13,14) não declaravam. Elas passavam porque o corpo tinha
+# `violation "HARD"` literal; mas isso torna a leitura do header uma aposta ("é HARD ou
+# SOFT? vá ler o corpo") e deixa a porta aberta para a próxima guarda DELEGADA nascer
+# muda. Os 7 tags foram preenchidos com o que o corpo REALMENTE emitia — o registro
+# gerado ficou byte-a-byte idêntico, provando que é padronização, não mudança de contrato.
+# Threat models distintos, por isso as duas coexistem:
+#   nº5 = "esqueceu de declarar"   ·   nº4 = "declarou algo que não resolve" (ex.: [CRITICO])
+sem_tag = sorted(x for x in rules if not rules[x].get('declared'))
+if sem_tag:
+    sys.stderr.write(
+        "ERRO rules-registry: REGRA(S) sem o tag [SEV] no header: %s\n"
+        "  Toda regra declara a severidade no fim da linha `# REGRA N — Titulo`: [HARD],\n"
+        "  [SOFT] ou [HARD + SOFT]. Use o que a guarda REALMENTE emite no corpo.\n" % sem_tag)
+    sys.exit(2)
+
+# Catraca de CLAREZA nº4 — nenhuma regra sai com severidade INDEFINIDA ('—').
+#
+# Nasceu da pergunta do maestro em 2026-08-03 ("então a tag [SEV] não é cosmético?"). Medição:
+#   · REGRAS 43 e 44 têm ZERO `violation "HARD"` literal no corpo (delegam a script externo com
+#     `violation "${sev}"`) — para elas o tag [SEV] é a ÚNICA fonte de severidade;
+#   · as 7 regras que não declaravam tag (1,2,3,5,12,13,14) têm de 1 a 4 literais — por isso passavam.
+# Havia uma regra IMPLÍCITA — "quem delega precisa do tag" — valendo por DISCIPLINA. Uma guarda
+# delegada nova sem tag sairia '—' em silêncio, e o registro publicaria uma regra sem dizer se ela
+# bloqueia o merge. Threat model distinto da nº5: aqui é "declarou algo que não resolve" (ex.: [CRITICO]).
+sem_sev = sorted(x for x in rules if sev_label(rules[x]) == '—')
+if sem_sev:
+    sys.stderr.write(
+        "ERRO rules-registry: REGRA(S) com severidade INDEFINIDA: %s\n"
+        "  A guarda nao emite `violation \"HARD\"/\"SOFT\"` literal no corpo (delega a helper ou usa\n"
+        "  `violation \"${sev}\"`), e o docstring nao declara o tag. Adicione [HARD] ou [SOFT] ao\n"
+        "  final da linha `# REGRA N — Titulo` em lint-artifacts.sh.\n" % sem_sev)
+    sys.exit(2)
+
 # --- classificação (SSOT da categoria; a cobertura é guardada abaixo) --------
 CATEGORIES = [
     ("Frontmatter & conformidade de artefato",
      "Campos obrigatórios, válidos e bem-formados no frontmatter de agentes e comandos.",
-     [1, 2, 3, 12, 17, 23]),
+     [1, 2, 3, 12, 17, 23, 51]),
     ("Higiene de artefato",
      "Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.",
      [5, 6, 13, 14, 15, 22, 48]),
     ("Fronteiras & contratos de arquitetura",
      "Proibições estruturais, documentação no lugar certo e os contratos de conformance e de adoção.",
-     [4, 7, 18, 20, 40]),
+     [4, 7, 18, 20, 40, 53]),
     ("SDAAL — abstração de provider",
      "O consumidor fala com a abstração, nunca com o provider direto.",
      [10, 11]),
     ("SSOT anti-drift",
      "Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins, topologia.",
-     [8, 9, 16, 19, 21, 27, 37, 39, 41]),
+     [8, 9, 16, 19, 21, 27, 37, 39, 41, 50]),
     ("KG & proveniência",
      "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca "
      "(por citação e por marcador autodeclarado); e frescor doutrinário — afirmação "
      "sensível-ao-tempo carimbada e dentro do TTL.",
-     [26, 29, 31, 32, 42, 43, 44, 47, 49]),
+     [26, 29, 31, 32, 42, 43, 44, 47, 49, 52]),
     ("Federação",
      "Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.",
      [24, 25, 28, 38, 46]),
@@ -154,18 +191,27 @@ out = []
 out.append("# Registro de REGRAS do lint — Onion")
 out.append("")
 out.append("> **Documento GERADO** por `.claude/validation/rules-registry.sh` a partir dos docstrings")
-out.append("> `# REGRA N — …` de `lint-artifacts.sh`. A **severidade** é derivada do que cada guarda")
-out.append("> *realmente emite* (`violation \"HARD\"` / `\"SOFT\"`), não de um comentário que pode ter")
-out.append("> driftado. **Não edite à mão** — rode:")
+out.append("> `# REGRA N — …` de `lint-artifacts.sh`. A **severidade** é a UNIÃO do que a guarda")
+out.append("> *realmente emite* (`violation \"HARD\"` / `\"SOFT\"`) com o tag `[SEV]` declarado no")
+out.append("> docstring. **Não edite à mão** — rode:")
 out.append(">")
 out.append("> ```bash")
 out.append("> bash .claude/validation/rules-registry.sh > .claude/validation/lint-rules.md")
 out.append("> ```")
 out.append(">")
 out.append("> A coluna **O que previne** vem do campo `# previne:` no docstring de cada regra (o")
-out.append("> modo-de-falha que ela evita). A REGRA 39 mantém este arquivo em paridade com as guardas")
-out.append("> e **falha se houver número duplicado, regra sem categoria ou regra sem `# previne:`** — a")
-out.append("> catraca de clareza.")
+out.append("> modo-de-falha que ela evita). A REGRA 39 mantém este arquivo em paridade com as guardas,")
+out.append("> e o gerador **falha (exit 2)** nas **5 catracas de clareza** — número duplicado · regra")
+out.append("> sem categoria · regra sem `# previne:` · regra sem o tag `[SEV]` · severidade que não")
+out.append("> resolve. Regra nova sem essas quatro declarações não entra: é anti-drift por construção.")
+out.append(">")
+out.append("> **Limite conhecido da derivação** (medido 2026-08-03, `gated-until-trigger`: sem dano")
+out.append("> observado, não vale reescrever o parser): o scan associa a cada regra o **primeiro**")
+out.append("> `nome() {` após o header, então em regras cujo header antecede um *helper* — ou que")
+out.append("> **delegam** a um script externo com `violation \"${sev}\"` dinâmico — a severidade vem do")
+out.append("> tag `[SEV]`, não do corpo. Hoje as duas fontes concordam em **todas** as regras (nenhuma")
+out.append("> sai com severidade indefinida). Se um dia divergirem, o tag ganha — por isso ele é o")
+out.append("> contrato para as guardas delegadas.")
 out.append("")
 out.append("São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o mesmo")
 out.append("lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não")
