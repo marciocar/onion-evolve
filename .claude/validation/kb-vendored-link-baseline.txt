@@ -1,3 +1,47 @@
 # Baseline de links vendorizados p/ caminho core-privado — PASSIVO TOLERADO.
 # Gerado por: bash .claude/validation/kb-vendored-link-check.sh --emit-baseline > .claude/validation/kb-vendored-link-baseline.txt
-# formato: <kb_rel>|<resolved_core_private_rel>. SÓ PODE ENCOLHER (migre link→gloss e remova a linha).
+# formato: <rel>|<resolved_core_private_rel>. SÓ PODE ENCOLHER (migre link→gloss e remova a linha).
+# scope: .claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks docs/meta-specs docs/knowledge-base docs/sdaal
+.claude/agents/development/README.md|docs/onion/inventory.md
+.claude/agents/meta/README.md|docs/onion/inventory.md
+.claude/agents/meta/onion.md|docs/onion/inventory.md
+.claude/commands/engineer/warm-up.md|docs/evolution/README.md
+.claude/commands/meta/README.md|docs/onion/inventory.md
+.claude/commands/meta/adopt.md|docs/analysis/onion-adr-capability-update-out-of-git-2026-07.md
+.claude/commands/meta/adopt.md|docs/analysis/onion-adr-repo-adoption-2026-06.md
+.claude/commands/meta/adopt.md|docs/applying/README.md
+.claude/commands/meta/co-announce.md|docs/analysis/onion-coevolution-backlog-2026-06-18.md
+.claude/commands/meta/co-announce.md|docs/evolution/README.md
+.claude/commands/meta/co-announce.md|docs/evolution/federation/CHANGELOG.md
+.claude/commands/meta/co-announce.md|docs/evolution/federation/members.yaml
+.claude/commands/meta/co-deliver.md|docs/analysis/onion-adr-ledger-format-location-2026-06.md
+.claude/commands/meta/co-deliver.md|docs/evolution/README.md
+.claude/commands/meta/co-deliver.md|docs/evolution/federation/members.yaml
+.claude/commands/meta/co-evolve.md|docs/analysis/onion-adr-work-models-session-topologies-2026-07.md
+.claude/commands/meta/co-relay.md|docs/analysis/onion-adr-comms-transport-vs-execution-2026-06.md
+.claude/commands/meta/co-relay.md|docs/analysis/onion-adr-manual-relay-subprotocol-2026-06.md
+.claude/commands/meta/co-relay.md|docs/evolution/README.md
+.claude/commands/meta/co-relay.md|docs/evolution/federation/members.yaml
+.claude/commands/meta/constellation.md|docs/analysis/onion-adr-constellation-operating-model-2026-07.md
+.claude/commands/meta/constellation.md|docs/discussions/_template/SEED.md
+.claude/commands/meta/context-freshness.md|docs/analysis/onion-adr-domain-context-lifecycle-2026-06.md
+.claude/commands/meta/diary.md|docs/analysis/onion-adr-work-models-session-topologies-2026-07.md
+.claude/commands/meta/diary.md|docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md
+.claude/commands/meta/evolve.md|docs/analysis/onion-vv-baseline-2026-06.md
+.claude/commands/meta/federation-publish.md|docs/analysis/onion-federation-design-v2-2026-06.md
+.claude/commands/meta/kg.md|docs/analysis/onion-adr-design-extends-kg-2026-07.md
+.claude/commands/meta/kg.md|docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md
+.claude/commands/meta/kg.md|docs/analysis/onion-evolution-2026-07-04.md
+.claude/commands/meta/kg.md|docs/evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md
+.claude/commands/meta/personality-sync.md|docs/evolution/federation/members.yaml
+.claude/commands/meta/personality-sync.md|docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md
+.claude/commands/meta/recover.md|docs/applying/rescue-prompt.md
+.claude/commands/quick/README.md|docs/onion/inventory.md
+.claude/skills/onion/SKILL.md|docs/analysis/onion-toolbox-s1-scoping-2026-06.md
+.claude/utils/design-sink/README.md|docs/materials/theme.shadcn.css
+.claude/utils/design-sink/README.md|docs/materials/theme.tailwind.css
+docs/meta-specs/architecture.md|docs/analysis/onion-adr-branch-roles-sdaal-2026-07.md
+docs/meta-specs/architecture.md|docs/analysis/onion-adr-domain-context-lifecycle-2026-06.md
+docs/meta-specs/architecture.md|docs/analysis/onion-adr-repo-adoption-2026-06.md
+docs/meta-specs/commands.md|docs/onion/ci.md
+docs/meta-specs/index.md|docs/analysis/onion-review-2026-05.md

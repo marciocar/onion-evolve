@@ -1810,16 +1810,27 @@ check_ladder_integrity() {
 
 # ===========================================================================
 # REGRA 45 — Link vendorizado não aponta caminho core-privado, com catraca [HARD + SOFT]
-# previne: link vivo de KB vendorizada para caminho core-privado — morto no adotante
-#   Uma KB vendorizada (docs/knowledge-base/**) não deve carregar link VIVO para
+# previne: link vivo em superfície vendorizada para caminho core-privado — morto no adotante
+#   Nenhuma das 9 RAÍZES VENDORIZADAS (as mesmas do `want=` do /meta:adopt e do `roots=`
+#   da REGRA 36) deve carregar link VIVO para
 #   docs/{analysis,onion,evolution,discussions,applying,materials,plans} ou
 #   .claude/{diary,sessions} — ausentes em TODO adotante. O link resolve no core e
 #   o lint local passa, mas no adotante é morto (o bug de campo de uma adoção real:
 #   link p/ .claude/diary reprovou DENTRO do repo dele; o do core não via).
 #   Guard core-side que mecaniza "o adotante é o oráculo": força a conversão em
 #   referência plain-text + GLOSS (a essência, fonte≠derivação com dimensão).
-#   Catraca idêntica à REGRA 29 (passivo baselined = SOFT; novo = HARD; só encolhe).
-#   Toda a lógica vive em kb-vendored-link-check.sh. Nasce com 101 links de passivo.
+#   Catraca idêntica à REGRA 29 (passivo baselined = SOFT; novo = HARD; só encolhe),
+#   agora ciente de ESCOPO: o baseline declara `# scope:` e, quando ele muda, a checagem
+#   de crescimento é suspensa com SOFT visível — senão a catraca DEFENDERIA o ponto cego
+#   que existe para expor (ampliar a varredura dispararia dezenas de CATRACA VIOLADA).
+#   Toda a lógica vive em kb-vendored-link-check.sh.
+#
+#   HISTÓRICO DO PASSIVO (o docstring dizia "nasce com 101" muito depois de o número
+#   morrer — `declarado ≠ verificado` dentro da própria guarda, achado 2026-08-03):
+#     · nasceu com 101 na KB · drenado a 0 em 165e1e1 · escopo ampliado de 1 para 9
+#       raízes em 2026-08-03, revelando 43 links que NENHUMA guarda via.
+#   O baseline em 0 tinha DECLARADO VITÓRIA com o mesmo modo de falha vivo em 8 raízes
+#   ao lado. Métrica de saúde = o número no CI diminuindo; leia-o, não este comentário.
 # ===========================================================================
 check_kb_vendored_links() {
   local helper="${SCRIPT_DIR}/kb-vendored-link-check.sh"
@@ -1840,7 +1851,7 @@ check_kb_vendored_links() {
   done <<< "${out}"
   if [ "${passivo}" -gt 0 ]; then
     violation "SOFT" "${REPO_ROOT}/.claude/validation/kb-vendored-link-baseline.txt" \
-      "[link-vendorizado/PASSIVO] ${passivo} link(s) core-privado(s) em KB vendorizada, tolerados pelo baseline — a métrica de saúde é este número DIMINUINDO (migre link→plain-text+gloss; detalhe: bash .claude/validation/kb-vendored-link-check.sh)"
+      "[link-vendorizado/PASSIVO] ${passivo} link(s) core-privado(s) em superfície VENDORIZADA (9 raízes, não só a KB), tolerados pelo baseline — a métrica de saúde é este número DIMINUINDO (migre link→plain-text+gloss; detalhe: bash .claude/validation/kb-vendored-link-check.sh)"
   fi
 }
 
