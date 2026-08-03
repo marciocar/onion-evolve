@@ -85,3 +85,13 @@ lint	r2-command-description/bad-no-description.md	.claude/commands/meta	bad	sem 
 lint	r2-command-description/good-with-description.md	.claude/commands/meta	good	
 lint	r48-backtick-refs/bad-dead-pointer.md	.claude/agents/development	bad	ponteiro morto
 lint	r48-backtick-refs/good-live-pointer.md	.claude/agents/development	good	
+lint	r3-model-allowlist/bad-gpt5-model.md	.claude/agents/development	bad	fora da allowlist
+lint	r3-model-allowlist/good-sonnet-model.md	.claude/agents/development	good	
+lint	r7-no-worker-orchestrator/bad-name-worker-orchestrator.md	.claude/agents/development	bad	worker-orchestrator
+lint	r7-no-worker-orchestrator/good-task-orchestrator-neighbor.md	.claude/agents/development	good	
+lint	r11-abstraction-methods/bad-invented-method.md	.claude/commands/meta	bad	inexistente na interface
+lint	r11-abstraction-methods/good-canonical-method.md	.claude/commands/meta	good	
+lint	r13-template-dialect/bad-cursor-token.md	.claude/commands/common/templates	bad	dialeto
+lint	r13-template-dialect/good-native-tools.md	.claude/commands/common/templates	good	
+lint	r14-metaspec-dialect/bad-cursor-list-item.md	docs/meta-specs	bad	dialeto Cursor
+lint	r14-metaspec-dialect/good-cursor-prose-mention.md	docs/meta-specs	good	

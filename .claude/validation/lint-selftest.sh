@@ -3199,6 +3199,114 @@ run_empty_result_guard_selftests() {
 # Modo kg-verificacao — REGRA 49. O gate garante que no plane:PROD impact>=4 NASCA carimbado e que
 # o passivo NAO CRESCA. Nao checa se o carimbo e verdade (limite declarado: quem mede e o worker do
 # /meta:kg-freshness). O teste (d) e o anti-falso-positivo; o (g) e o MUTATION que prova load-bearing.
+run_safe_count_selftests() {
+  # O helper existe para que "zero" e "falhou" nunca mais colidam. Se ELE colidir, o
+  # remédio vira a doença — por isso nasce com teste, ao contrário das 4 guardas cujos
+  # furos esta mesma sessão descobriu por elas não terem nenhum.
+  local h="${REPO_ROOT}/.claude/utils/safe-count.sh"
+  if [ ! -f "${h}" ]; then record_fail "safe-count" "helper ausente"; return; fi
+  local d out rc
+  # shellcheck source=/dev/null
+  . "${h}"
+
+  d="$(mktemp -d)"; printf 'x\n' > "${d}/a.md"; printf 'y\n' > "${d}/b.md"
+
+  # (a) contagem real
+  out="$(count_files "${d}" '*.md')"; rc=$?
+  if [ "${out}" = "2" ] && [ "${rc}" -eq 0 ]; then
+    record_pass "safe-count: (a) conta arquivos reais (2) com exit 0"
+  else record_fail "safe-count: (a)" "esperava '2'/exit0, veio '${out}'/exit${rc}"; fi
+
+  # (b) VAZIO DE VERDADE → '0' com exit 0
+  out="$(count_files "${d}" '*.xyz')"; rc=$?
+  if [ "${out}" = "0" ] && [ "${rc}" -eq 0 ]; then
+    record_pass "safe-count: (b) vazio real → '0' com exit 0"
+  else record_fail "safe-count: (b)" "esperava '0'/exit0, veio '${out}'/exit${rc}"; fi
+
+  # (c) O CASO QUE JUSTIFICA O HELPER — alvo AUSENTE não pode virar '0'
+  # `|| rc=$?` e NAO `|| true`: o comando falha DE PROPOSITO, e sob `set -e` capturar sua
+  # saida sem tratamento mata a suite. Mas `|| true` zeraria o exit code que este caso
+  # EXISTE para verificar — o teste passaria a nao testar nada. A forma abaixo satisfaz o
+  # set -e E preserva o codigo. (Errei as duas coisas em sequencia ao escrever isto.)
+  rc=0; out="$(count_files "${d}/nao-existe" '*.md' 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 2 ] && [ "${out}" != "0" ]; then
+    record_pass "safe-count: (c) alvo ausente → exit 2 e NÃO '0' (a distinção que o 2>/dev/null apaga)"
+  else record_fail "safe-count: (c)" "alvo ausente virou '${out}'/exit${rc} — o helper reproduz o defeito"; fi
+
+  # (d) MUT do contrato de stdout: a saída tem de ser SÓ o número, consumível por $( ).
+  #     Se vazar mensagem para stdout, todo `n=$(count_files ...)` a jusante quebra.
+  out="$(count_files "${d}" '*.md')"
+  if printf '%s' "${out}" | grep -qE '^[0-9]+$'; then
+    record_pass "safe-count: (d) stdout é SÓ o número (contrato de \$( ) preservado)"
+  else record_fail "safe-count: (d)" "stdout poluído: '${out}'"; fi
+
+  # (e) count_matches: zero-que-casa-nada é resultado legítimo, não erro
+  out="$(count_matches 'zzz-inexistente' "${d}/a.md")"; rc=$?
+  if [ "${out}" = "0" ] && [ "${rc}" -eq 0 ]; then
+    record_pass "safe-count: (e) count_matches sem match → '0' com exit 0 (grep exit 1 não é falha)"
+  else record_fail "safe-count: (e)" "esperava '0'/exit0, veio '${out}'/exit${rc}"; fi
+
+  # (f) count_matches com ARQUIVO ausente → erro, nunca zero
+  rc=0; out="$(count_matches 'x' "${d}/nao-existe.md" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 2 ]; then
+    record_pass "safe-count: (f) count_matches com arquivo ausente → exit 2"
+  else record_fail "safe-count: (f)" "arquivo ausente não deu exit 2: '${out}'/exit${rc}"; fi
+
+  rm -rf "${d}"
+}
+
+run_line_limits_selftests() {
+  # REGRA 5 — limites POR TIPO. Modo dedicado em vez de fixture-de-arquivo: o caso `bad`
+  # exige >800 linhas, e commitar um .md de 801 linhas só para testar contagem seria peso
+  # morto permanente no repo. Aqui o arquivo grande é GERADO no sandbox e morre com ele.
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  local d out
+  _mkbig() { # $1=dir $2=nome $3=nlinhas
+    mkdir -p "$1"
+    { printf -- '---\ndescription: fixture de limite de linhas\nmodel: haiku\n---\n\n'
+      local i=1
+      while [ "$i" -le "$3" ]; do printf 'Linha de corpo %s do comando sintetico.\n' "$i"; i=$((i+1)); done
+    } > "$1/$2"
+  }
+  _sandbox() { # monta um repo minimo com o lint real
+    local s; s="$(mktemp -d)"
+    cp -a "${REPO_ROOT}/.claude" "$s/.claude"; cp -a "${REPO_ROOT}/docs" "$s/docs"
+    cp -a "${REPO_ROOT}/CLAUDE.md" "$s/CLAUDE.md" 2>/dev/null || true
+    printf '%s' "$s"
+  }
+
+  # (a) comando ACIMA do teto hard (800) → HARD
+  d="$(_sandbox)"; _mkbig "$d/.claude/commands/meta" "probe-grande.md" 810
+  out="$(bash "$d/.claude/validation/lint-artifacts.sh" --only="$d/.claude/commands/meta/probe-grande.md" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'limite: 800'; then
+    record_pass "line-limits: (a) comando com 810+ linhas → HARD (limite 800)"
+  else record_fail "line-limits: (a)" "não reprovou comando acima do teto: ${out}"; fi
+  rm -rf "$d"
+
+  # (b) FRONTEIRA — comando logo ABAIXO do teto → silêncio. Sem este caso, (a) passaria
+  #     mesmo que o limiar fosse reescrito para 20 linhas: é o par que prova a FRONTEIRA,
+  #     não só a existência da guarda.
+  d="$(_sandbox)"; _mkbig "$d/.claude/commands/meta" "probe-limite.md" 790
+  out="$(bash "$d/.claude/validation/lint-artifacts.sh" --only="$d/.claude/commands/meta/probe-limite.md" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'limite: 800'; then
+    record_fail "line-limits: (b)" "falso-positivo logo abaixo do teto: ${out}"
+  else record_pass "line-limits: (b) comando logo abaixo do teto → silêncio (a fronteira é o que importa)"; fi
+  rm -rf "$d"
+
+  # (c) TIPO importa — o MESMO tamanho que reprova como comando (810) passa como AGENTE,
+  #     cujo teto é 1500. É a tese da regra: "tamanho saudável ≠ número universal".
+  d="$(_sandbox)"
+  mkdir -p "$d/.claude/agents/development"
+  { printf -- '---\nname: probe-agente\ndescription: fixture de limite\nmodel: haiku\ncategory: development\ntools:\n  - Read\n---\n\n'
+    i=1; while [ "$i" -le 810 ]; do printf 'Linha de corpo %s do agente sintetico.\n' "$i"; i=$((i+1)); done
+  } > "$d/.claude/agents/development/probe-agente.md"
+  out="$(bash "$d/.claude/validation/lint-artifacts.sh" --only="$d/.claude/agents/development/probe-agente.md" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -qE 'limite: (800|1500)'; then
+    record_fail "line-limits: (c)" "810 linhas não deveria reprovar como AGENTE (teto 1500): ${out}"
+  else record_pass "line-limits: (c) 810 linhas reprova como COMANDO mas passa como AGENTE — o teto é por TIPO"; fi
+  rm -rf "$d"
+}
+
 run_kg_radar_integrity_selftests() {
   local helper="${REPO_ROOT}/.claude/validation/kg-radar-integrity.sh"
   if [ ! -f "${helper}" ]; then record_fail "kg-integridade" "helper ausente"; return; fi
@@ -5897,6 +6005,8 @@ run_scope_gitignore_selftests
 # Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal de campo D2).
 run_task_manager_hook_selftests
 run_kg_verification_selftests
+run_safe_count_selftests
+run_line_limits_selftests
 run_kg_radar_integrity_selftests
 run_empty_result_guard_selftests
 
