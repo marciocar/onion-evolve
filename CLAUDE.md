@@ -103,7 +103,8 @@ A skill **`language-standards`** é a **autoridade canônica** (alinhada à meta
 
 - **Chat, comentários, instruções, documentação, READMEs, mensagens ao usuário**: Português brasileiro (pt-BR)
 - **Código, variáveis, funções, nomes de arquivo/branch**: Inglês
-- **Commits**: Inglês (Conventional Commits — `feat:`, `fix:`, `refactor:`, `docs:`, `chore:` …)
+- **Commits**: **prefixo** Conventional em inglês (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:` …) + **assunto e corpo em pt-BR** — ex.: `docs(kg): o radar reconstrói a escada de Elenxo`. O prefixo é contrato de máquina; o assunto é narrativa de decisão (ver [`code-standards.md §3.4`](docs/meta-specs/code-standards.md))
+- **Branches**: Inglês (`fix/inventory-drift`, `chore/onion-saneamento`)
 - **Logs e debugging**: Inglês
 
 ---

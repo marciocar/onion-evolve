@@ -60,7 +60,9 @@ Fonte: `code-standards.md` §2–§3.
   underscore/PascalCase. Exceções aceitas pelo lint: `README.md`, `SKILL.md` (convenções universais —
   `.claude/validation/lint-artifacts.sh:341-345`, REGRA 6, SOFT).
 - **Branches**: GitFlow (`feature/<nome>`, `hotfix/<nome>`, `release/<versao>`) ou `chore/<descricao>`.
-- **Commits**: Conventional Commits em inglês (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`).
+- **Commits**: Conventional Commits com **prefixo em inglês** (`feat:`, `fix:`, `chore:`, `docs:`,
+  `refactor:`, `test:`) e **assunto/corpo em pt-BR** — ex.: `docs(kg): o radar reconstrói a escada`.
+  O prefixo é contrato de máquina; o assunto é narrativa de decisão (`code-standards.md` §3.4).
 - **Emojis**: permitidos em READMEs/comandos/guias com moderação; **proibidos** em meta-specs, análises
   críticas e código (`code-standards.md` §4.2).
 - **Referências opacas** (`T1`, `#7`, `regra r16`, `PR #144`): sempre com **rótulo mnemônico de 2-5

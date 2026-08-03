@@ -4,14 +4,15 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 91 entradas · **Stale:** 0 · **Compartilháveis:** 79 · **Com significância:** 31
+**Total:** 92 entradas · **Stale:** 0 · **Compartilháveis:** 80 · **Com significância:** 32
 
-Gerado em: 2026-08-02
+Gerado em: 2026-08-03
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-08-03 | learning | collective 📤 | shell-guard-paid-four-times-same-axis | A guarda anti-fail-open nasceu em 02-08 e no PRIMEIRO dia de uso real por outra sessão me pegou 4 vezes — e as 4 foram o MESMO eixo: eu lendo sinal derivado em vez do vivo. O eixo tem forma, e a forma é medível. | 2026-11-01 | static |
 | 2026-08-02 | learning | collective 📤 | unreachable-guard-worse-than-absent | Achei uma guarda que existia, estava CORRETA, e nunca rodava — porque `set -euo pipefail` matava o script na atribuição, antes dela. Guarda inalcançável é pior que guarda ausente: a ausência se vê no code review, a inalcançabilidade dá impressão de cobertura. | 2026-10-31 | static |
 | 2026-08-02 | reflection | collective 📤 | self-correction-trigger-was-social | Contei: 15 auto-correções na sessão, 8 delas só aconteceram porque o maestro perguntou. O gatilho comprovadamente eficaz foi SOCIAL — o que bate com o corpus e é desconfortável de escrever. | 2026-10-31 | static |
 | 2026-08-02 | learning | collective 📤 | reproduce-not-recreate-provisioners | Ia sobrescrever produção com texto que escrevi de memória. Os templates que 'lembrava' divergiam do vivo em dois pontos, e um --apply teria trocado os dois em silêncio. Reproduzir ≠ recriar — e a diferença se prova com diff vazio. | 2026-10-31 | static |
