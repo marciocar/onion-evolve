@@ -200,7 +200,7 @@ violation() {
 }
 
 # ===========================================================================
-# REGRA 1 — Frontmatter de agente: name:, description:, tools: obrigatórios
+# REGRA 1 — Frontmatter de agente: name:, description:, tools: obrigatórios [HARD]
 # previne: agente sem name/description/tools obrigatórios — não carrega nem roteia direito
 # ===========================================================================
 check_agent_frontmatter() {
@@ -218,7 +218,7 @@ check_agent_frontmatter() {
 }
 
 # ===========================================================================
-# REGRA 2 — Frontmatter de comando: description: obrigatório
+# REGRA 2 — Frontmatter de comando: description: obrigatório [HARD]
 # previne: comando sem description — invisível/ambíguo no menu
 #           (exceto arquivos em common/ e arquivos README.md)
 # ===========================================================================
@@ -236,7 +236,7 @@ check_command_description() {
 }
 
 # ===========================================================================
-# REGRA 3 — Campo model: não pode conter gpt-4
+# REGRA 3 — Campo model: não pode conter gpt-4 [HARD]
 # previne: model proibido (gpt-4) embarcado num artefato
 #           Verifica apenas linhas que começam com 'model:' em .claude/**/*.md
 #           NÃO falha por ocorrências dentro de blocos de código
@@ -280,7 +280,7 @@ check_no_mcp_onion_orchestrator() {
 }
 
 # ===========================================================================
-# REGRA 5 — Limites de linhas (por TIPO de artefato — tamanho saudável ≠ número universal)
+# REGRA 5 — Limites de linhas (por TIPO de artefato — tamanho saudável ≠ número universal) [HARD + SOFT]
 # previne: artefato inchado muito além do saudável para o seu tipo
 #           Agente  > 1500 linhas → HARD
 #           Comando > 800  linhas → HARD  (common/templates e common/prompts isentos)
@@ -388,7 +388,58 @@ check_no_worker_orchestrator_agent() {
 }
 
 # ===========================================================================
-# REGRA — Agentes branch-* documentam a distinção vs o par geral [SOFT]
+# REGRA 52 — Todo .kg.yaml do repo passa no radar de INTEGRIDADE [HARD]
+# previne: grafo com contradição estrutural vivendo no repo sem ninguém medir
+#   O kg-radar.sh é o único mecanismo que reprova CONTRADIÇÃO (nó que recebe REFUTES
+#   e segue status:confirmed) — e NADA o rodava por cadência. Chegava ao CI só
+#   indiretamente: REGRA 43 (só grafos citados em `kg:`) e REGRA 31 (só grafos com
+#   lente). Grafo não-citado e sem lente NUNCA era verificado.
+#
+#   ⚠ SOBREPOSIÇÃO DECLARADA com a REGRA 43 (disciplina das irmãs R30/R33 e R31/R8/R21):
+#   a R43 JÁ roda `--integrity` (+ `--schema`) nos grafos que algum doc declara em `kg:`
+#   — hoje **11 dos 51**. Esta regra é SUPERSET: o ganho real são os **40 grafos** que
+#   ninguém cita e que, por isso, nunca eram verificados.
+#   Reproduza os dois números (a 1ª redação deste docstring dizia 18/33, não-reproduzíveis
+#   — corrigido na revisão de 2026-08-03; regra que nasce com número não-medido carrega o
+#   defeito que ela existe para pegar):
+#     grep -rhE '^kg:' --include='*.md' .claude/diary docs/analysis docs/evolution/research \
+#       | sed 's/^kg:[[:space:]]*//; s/^["'"'"']//; s/["'"'"'].*$//; s/ .*//' | sort -u | wc -l
+#     git ls-files '*.kg.yaml' | grep -v '/fixtures/' | wc -l
+#   Threat models distintos, por isso as duas coexistem:
+#     · R43 = "o grafo que ESTA MIGALHA declara é real e são?" (proveniência p/ dentro)
+#     · R52 = "TODOS os grafos do repo estão sãos hoje?" (integridade do acervo)
+#   Um grafo citado é checado duas vezes. É custo aceito: a R43 morre com a migalha que
+#   a invoca, a R52 não depende de ninguém citar nada.
+#   A convocação já existia em .claude/rules/kg-grammar.md:41 ("exit 0 obrigatório"),
+#   mas é COGNITIVA: só carrega ao TOCAR um .kg.yaml, depende do ator obedecer, e não
+#   pega DEGRADAÇÃO PASSIVA (um REFUTES que chega depois contradiz o alvo sem ninguém
+#   editar o arquivo). Esta regra é a mesma convocação, promovida a MECÂNICA.
+#   [[fix-must-become-mechanism]] Lacuna medida em 2026-08-03.
+#   SEM CATRACA por medição, não por descuido: 51 grafos no escopo, 0 reprovam hoje.
+#   A medição foi provada não-vazia (MUT): grafo com REFUTES sobre nó confirmed → exit 1.
+#   fixtures/ fica FORA por desenho (lá vivem grafos inválidos que alimentam o selftest).
+# ===========================================================================
+check_kg_radar_integrity() {
+  local helper="${SCRIPT_DIR}/kg-radar-integrity.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.kg.yaml|*/kg-radar.sh|*/kg-radar-integrity.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out sev tag path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    violation "${sev}" "${REPO_ROOT}/${path}" "[kg-integridade/${tag}] ${msg}"
+  done <<< "${out}"
+}
+
+# ===========================================================================
+# REGRA 51 — Agentes branch-* documentam a distinção vs o par geral [SOFT]
+# previne: par de agentes com overlap invisível — dispatcher que roteia por description não escolhe
 #   Um agente DIFF-SCOPED (branch-code-reviewer, branch-metaspec-checker, ...)
 #   tem um par de escopo geral (@code-reviewer, @metaspec-gate-keeper, ...). A
 #   'description' É o contrato de roteamento que um dispatcher lê — sem cláusula
@@ -404,6 +455,68 @@ check_branch_agent_distinction() {
       fi
     fi
   done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
+}
+
+# ===========================================================================
+# REGRA 53 — Regra path-scoped declara `paths:` que casa algo real [HARD]
+# previne: regra em .claude/rules/ que nunca carrega — instrução que o modelo jamais vê
+#   `.claude/rules/*.md` são regras COGNITIVAS: o harness as injeta no contexto quando
+#   o arquivo tocado casa o glob de `paths:`. Sem `paths:`, ou com um glob que não casa
+#   NADA no repo, a regra existe no disco e nunca chega ao modelo — e a ausência é
+#   silenciosa (ninguém percebe uma instrução que não apareceu).
+#   Lacuna medida em 2026-08-03: `grep 'claude/rules' lint-artifacts.sh` → ZERO. Era a
+#   única superfície de .claude/ sem guarda nenhuma, num diretório que estreou 2026-08-02.
+#   É a mesma classe da guarda-verde-vazia que a própria kg-grammar.md nasceu para evitar
+#   (grep de `type: REFUTES` que devolve zero) — só que aplicada ao continente, não ao conteúdo.
+#   [[fix-must-become-mechanism]]
+# ===========================================================================
+# Um glob de `paths:` casa algo REAL?
+# Preferimos o índice do git (rastreado = o que a rede de fato vê). Mas o sandbox do
+# lint-selftest é uma CÓPIA sem `.git` — ali `git ls-files` falha e TODO glob pareceria
+# morto, reprovando até a fixture `good`. Falso-positivo medido no dogfood, 2026-08-03:
+# a guarda acusaria a si mesma no próprio auto-teste. Fora de repo git, cai para `find`.
+_rule_glob_matches() { # $1=glob
+  local g="$1" pat
+  if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
+    git -C "${REPO_ROOT}" ls-files -- "${g}"        | grep -q . && return 0
+    # o harness escreve '**/x'; o pathspec do git resolve o mesmo com o sufixo puro
+    git -C "${REPO_ROOT}" ls-files -- "${g#\*\*/}"  | grep -q . && return 0
+    return 1
+  fi
+  pat="${g##*/}"                                   # '**/*.kg.yaml' → '*.kg.yaml'
+  [ -n "${pat}" ] || return 1
+  find "${REPO_ROOT}" -name "${pat}" -not -path '*/.git/*' -print -quit | grep -q .
+}
+
+check_rules_pathscoped() {
+  local rules_dir="${CLAUDE_DIR}/rules"
+  [ -d "${rules_dir}" ] || return 0          # sem rules/ → nada a checar (adotante)
+  local rule globs g matched
+  while IFS= read -r -d '' rule; do
+    # (a) frontmatter com `paths:` — sem isso a regra nunca é elegível a carregar
+    if ! grep -qE '^paths:' "${rule}"; then
+      violation "HARD" "${rule}" "regra path-scoped sem 'paths:' no frontmatter — nunca carrega (regra que não chega ao modelo é indistinguível de regra ausente)"
+      continue
+    fi
+    # (b) ao menos um glob declarado
+    # O `---` de fechamento do frontmatter TAMBÉM casa "^[[:space:]]*-", e sem o guard abaixo
+    # ele entrava como o item de lista "--" — o ramo `paths:` VAZIO nunca disparava e caía no
+    # ramo errado. Achado no dogfood da própria regra, 2026-08-03.
+    globs="$(awk '/^---[[:space:]]*$/{f=0;next} /^paths:/{f=1;next} /^[a-zA-Z_-]+:/{f=0} f&&/^[[:space:]]*-[[:space:]]+/{gsub(/^[[:space:]]*-[[:space:]]+/,""); gsub(/^["'"'"']|["'"'"']$/,""); print}' "${rule}")"
+    if [ -z "${globs}" ]; then
+      violation "HARD" "${rule}" "'paths:' declarado mas VAZIO — nenhum glob, a regra nunca carrega"
+      continue
+    fi
+    # (c) ao menos um glob casa arquivo RASTREADO — glob que não casa nada é regra morta
+    matched=0
+    while IFS= read -r g; do
+      [ -n "${g}" ] || continue
+      if _rule_glob_matches "${g}"; then matched=1; break; fi
+    done <<< "${globs}"
+    if [ "${matched}" -eq 0 ]; then
+      violation "HARD" "${rule}" "nenhum glob de 'paths:' casa arquivo rastreado ($(printf '%s' "${globs}" | tr '\n' ' ')) — a regra existe no disco e NUNCA carrega"
+    fi
+  done < <(_find "${rules_dir}" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
 
 # ===========================================================================
@@ -782,14 +895,8 @@ PY
 }
 
 # ===========================================================================
-# REGRA 9 — Contagens no CLAUDE.md em sincronia com a SSOT [HARD]
-# previne: contagens no CLAUDE.md drifta da SSOT do inventário
-#           Extrai "N comandos invocáveis", "N agentes", "N skills" do CLAUDE.md
-#           e compara com os totais computados por inventory.sh. Impede que a
-#           constituição volte a drifar (foi onde o drift 79≠76 vivia).
-# ===========================================================================
-# ===========================================================================
-# REGRA — Contagens do SITE público sincronizadas com a SSOT [HARD]
+# REGRA 50 — Contagens do SITE público sincronizadas com a SSOT [HARD]
+# previne: pitch público driftando da SSOT — número que mente para quem não pode conferir
 #           O site hardcoda números que a inventory.sh GERA. Sem gate, o pitch
 #           público drifta silencioso a cada comando criado — e mente para quem
 #           não pode conferir. Achado 2026-07-17 (re-verificação do grafo de
@@ -834,6 +941,17 @@ check_site_inventory_sync() {
   done
 }
 
+# ===========================================================================
+# REGRA 9 — Contagens no CLAUDE.md em sincronia com a SSOT [HARD]
+# previne: contagens no CLAUDE.md drifta da SSOT do inventário
+#           Extrai "N comandos invocáveis", "N agentes", "N skills" do CLAUDE.md
+#           e compara com os totais computados por inventory.sh. Impede que a
+#           constituição volte a drifar (foi onde o drift 79≠76 vivia).
+#   [[fix-must-become-mechanism]] Docstring movido para junto da SUA função em
+#   2026-08-03: estava 45 linhas acima, antes do bloco da REGRA 50, e o parser do
+#   rules-registry.sh (que associa o 1º `nome() {` após o header) publicava a
+#   severidade de check_site_inventory_sync como se fosse a da REGRA 9.
+# ===========================================================================
 check_claude_md_counts() {
   local claude_md="${REPO_ROOT}/CLAUDE.md"
   local inv_script="${SCRIPT_DIR}/inventory.sh"
@@ -943,7 +1061,7 @@ ${where}"
 }
 
 # ===========================================================================
-# REGRA 12 — Nomes de tool de agente válidos no Claude Code
+# REGRA 12 — Nomes de tool de agente válidos no Claude Code [HARD]
 # previne: agente declara uma tool inexistente no Claude Code
 #   Cursor-style (read_file, run_terminal_cmd, …) [HARD] — sem ferramentas;
 #   MCP underscore único (mcp_<Server>_…) [HARD] — formato é mcp__server__tool
@@ -989,7 +1107,7 @@ check_agent_tool_names() {
 }
 
 # ===========================================================================
-# REGRA 13 — Templates canônicos devem ser dialeto-puro
+# REGRA 13 — Templates canônicos devem ser dialeto-puro [HARD]
 # previne: template canônico contaminado com dialeto não-canônico
 #   Templates em commands/common/templates/ são copiados verbatim ao criar
 #   agentes/comandos; qualquer nome de tool estilo-Cursor [HARD] ou MCP
@@ -1013,7 +1131,7 @@ check_template_dialect() {
 }
 
 # ===========================================================================
-# REGRA 14 — Meta-specs (autoridade L0) sem dialeto Cursor em exemplos
+# REGRA 14 — Meta-specs (autoridade L0) sem dialeto Cursor em exemplos [HARD]
 # previne: exemplo de meta-spec L0 com dialeto Cursor
 #   docs/meta-specs/ define o formato canônico que template e creator-agents
 #   espelham. Token Cursor declarado como ITEM DE LISTA YAML (- token) [HARD]
@@ -1691,7 +1809,7 @@ check_ladder_integrity() {
 }
 
 # ===========================================================================
-# REGRA 45 — Link vendorizado não aponta caminho core-privado, com catraca [HARD+SOFT]
+# REGRA 45 — Link vendorizado não aponta caminho core-privado, com catraca [HARD + SOFT]
 # previne: link vivo de KB vendorizada para caminho core-privado — morto no adotante
 #   Uma KB vendorizada (docs/knowledge-base/**) não deve carregar link VIVO para
 #   docs/{analysis,onion,evolution,discussions,applying,materials,plans} ou
@@ -2202,7 +2320,12 @@ check_kg_narration_valid() {
   while IFS= read -r narr; do
     [ -n "${narr}" ] || continue
     rel="${narr#${REPO_ROOT}/}"
-    if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in "${rel}") : ;; *) continue ;; esac; fi
+    # ONLY_PATH é ABSOLUTO (normalizado no topo do arquivo); comparar com `rel` NUNCA casava,
+    # e a regra dava `continue` em toda narração — no-op SILENCIOSO exatamente no modo `--only`,
+    # que é o do pre-commit e o do selftest. Uma fixture de R47 passaria como "good" para sempre.
+    # Na rodada completa a guarda funcionava, então o furo era invisível. Achado 2026-08-03.
+    # [[fix-must-become-mechanism]] As irmãs (R29 etc.) já comparavam absoluto — este era o ímpar.
+    if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in "${narr}") : ;; *) continue ;; esac; fi
     kg="${narr%.narration.json}.kg.yaml"
     if [ ! -f "${kg}" ]; then
       violation "HARD" "${rel}" "[kg/narração] narração sem .kg.yaml irmão ($(basename "${kg}")) — narração órfã não projeta grafo nenhum"
@@ -2394,6 +2517,7 @@ check_line_limits
 check_kebab_case_filenames
 check_no_worker_orchestrator_agent
 check_branch_agent_distinction
+check_rules_pathscoped
 check_inventory_sync
 check_claude_md_counts
 check_site_inventory_sync
@@ -2417,6 +2541,7 @@ check_knowledge_base_links
 check_research_kg
 check_kg_provenance_coverage
 check_kg_verification_coverage
+check_kg_radar_integrity
 check_doctrine_freshness
 check_kg_born_marker
 check_ladder_integrity
