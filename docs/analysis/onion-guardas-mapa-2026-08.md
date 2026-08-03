@@ -33,8 +33,11 @@ visibilidade**:
 | Guarda que **ninguém executava por cadência** | `kg-radar.sh` → hoje REGRA 52 |
 | Superfície **sem guarda nenhuma** | `.claude/rules/` → hoje REGRA 53 |
 | Guarda que existe e **não cobre onde o drift aparece** | inventário: cobria `CLAUDE.md` e o site, **não** `docs/INDEX.md` nem a KB de identidade — e foram exatamente esses dois que driftaram (PR #517) |
+| Guarda que **roda, sai VERDE e não verificou nada** | `onion-review` → §3.3. O caso mais severo do conjunto: aqui não faltava cobertura nem visibilidade — **a guarda executava e reportava sucesso** |
 
-**A régua deste mapa:** *uma guarda que ninguém vê e uma guarda que ninguém roda falham do mesmo jeito.*
+**A régua deste mapa:** *uma guarda que ninguém vê e uma guarda que ninguém roda falham do mesmo
+jeito.* O `onion-review` (§3.3) acrescentou um terceiro modo, pior que os dois: **uma guarda que
+roda e reporta verde sem ter verificado** não deixa nem a ausência como pista.
 
 ---
 
@@ -98,7 +101,7 @@ Sem dano observado → `gated-until-trigger`: corrigiu-se a **promessa** do cabe
 ```bash
 find .claude/rules   -name '*.md' | wc -l     # 1
 find .claude/hooks   -name '*.sh' | wc -l     # 6
-find .claude/validation -maxdepth 1 -name '*.sh' | wc -l   # 37
+find .claude/validation -maxdepth 1 -name '*.sh' | wc -l   # 38
 ```
 
 | Família | Onde | Aciona em | Bloqueia? |
@@ -134,6 +137,53 @@ convocação a mecânica, sem remover a rule.
 O `kg-radar.sh` era o caso extremo até 2026-08-03 (fechado pela REGRA 52). **Seguem manuais:**
 `pin-integrity-check.sh --audit-vendor` · `trust-topology-check.sh` · `federation-radar.sh` · os 3
 scripts de métrica (`context-freshness-metric`, `cycle-completion`, `session-velocity`).
+
+### 3.3 O verde que não verificou — o modo-de-falha mais severo do conjunto
+
+Achado em 2026-08-03 ao **conferir** o CI de um PR desta própria revisão, não por suspeita prévia.
+
+O `onion-review` tinha a máquina de resiliência **completa**: retry na 2ª tentativa e aviso visível
+(annotation + comentário no PR) quando ambas falhavam, documentada em três blocos de comentário.
+**Nenhuma das duas peças disparou uma única vez.**
+
+Ambas eram gated em `steps.review.outcome == 'failure'`. A `claude-code-action` **sai com exit 0
+mesmo com `is_error: true`** — o log de uma run que custou 0 e deu 1 turno registra
+`outcome=success;conclusion=success`. O exit code é do **invólucro**; o veredito mora **dentro** do
+JSON. A condição jamais era satisfeita.
+
+Medido em 4 runs do dia (03:34 · 12:10 · 17:11 · 19:17): `is_error: true`, `num_turns: 1`,
+`cost: 0` em **todas**, e **zero** comentários em qualquer PR. Os **11 PRs** daquele dia mergearam
+sem revisão semântica, com o check verde.
+
+**Por que é pior que os outros quatro sintomas da §1.** Guarda invisível, guarda sem cadência e
+guarda com cobertura curta deixam ao menos a **ausência** como pista — nada aparece, e um dia
+alguém pergunta por quê. Aqui a guarda **produzia sinal positivo**: verde a cada PR. Não havia
+ausência a notar; havia afirmação a acreditar.
+
+**A cura (PR #529), e por que é mecanismo e não disciplina:**
+
+| Peça | O que faz |
+|---|---|
+| `.claude/validation/review-verdict.sh` | classifica pelo `is_error` do `execution_file` — 8 casos + `(MUT)` no `lint-selftest.sh` |
+| retry e aviso | passam a ler `outputs.revisou`, nunca o `outcome` |
+| `GITHUB_STEP_SUMMARY` | carimbado nos **dois** desfechos — "verde revisado" e "verde vazio" deixam de ser indistinguíveis |
+
+A leitura virou **script** porque **YAML de workflow não tem selftest**: só se prova em produção,
+um PR por vez — e foi exatamente assim que a máquina quebrada sobreviveu semanas parecendo sã.
+
+**Duas armadilhas registradas para quem re-testar:**
+
+- a action **se auto-pula** quando o PR altera o próprio `onion-review.yml` (*"Skipping action due
+  to workflow validation"*) → motivo `sem-arquivo`, **benigno**. O aviso já nomeia essa causa. Logo,
+  **só um PR que NÃO toca o workflow** exerce o caminho real.
+- o alarme atualiza **um** comentário por PR em vez de criar um por push (medido: 2 e-mails no
+  #529). Alarme que chega repetido é alarme que se aprende a ignorar.
+
+**Segue ABERTO:** por que a action erra na 1ª volta. O pin subiu para `v1.0.183` (#530) como
+experimento — a hipótese de 07-18 (*"a regressão é da v1.0.172+, o pin v1.0.171 cura"*) foi
+**refutada**: com o pin correto no lugar, as 4 runs acima falharam. Verificado no mesmo dia que API
+e modelo estão sãos (`claude-sonnet-5` responde HTTP 200 fora do CI) e que a assinatura é **hang de
+~186s**, não recusa de credencial (`401` volta instantâneo).
 
 ---
 
