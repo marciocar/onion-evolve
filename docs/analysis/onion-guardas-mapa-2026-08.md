@@ -179,11 +179,29 @@ um PR por vez — e foi exatamente assim que a máquina quebrada sobreviveu sema
 - o alarme atualiza **um** comentário por PR em vez de criar um por push (medido: 2 e-mails no
   #529). Alarme que chega repetido é alarme que se aprende a ignorar.
 
-**Segue ABERTO:** por que a action erra na 1ª volta. O pin subiu para `v1.0.183` (#530) como
-experimento — a hipótese de 07-18 (*"a regressão é da v1.0.172+, o pin v1.0.171 cura"*) foi
-**refutada**: com o pin correto no lugar, as 4 runs acima falharam. Verificado no mesmo dia que API
-e modelo estão sãos (`claude-sonnet-5` responde HTTP 200 fora do CI) e que a assinatura é **hang de
-~186s**, não recusa de credencial (`401` volta instantâneo).
+**CAUSA-RAIZ FECHADA em 2026-08-03** — o secret `ANTHROPIC_API_KEY` não autenticava. Medido de
+dentro do runner: `GET /v1/models` → **401 `authentication_error` em 0,07s**, com a rede impecável
+(DNS 3,5ms · TCP 5,6ms · TLS 27ms) e a chave **bem formada** (108 chars, prefixo `sk-ant-`, mesmo
+comprimento antes e depois de normalizar — revogada, não mal-colada). Chave trocada → o mesmo
+diagnóstico devolveu **HTTP 200 em 2,2s**.
+
+**Por que custou três semanas e três rodadas de diagnóstico:** a action **não repassa o 401**. Ela
+pendura ~180s e devolve `is_error` sem mensagem — um erro de auth chegando **vestido de timeout**.
+A investigação de 07-18 fechou numa **coincidência de data** (falha começou em 07-14; a action
+lançou v1.0.172/173/174 em 07-14) e escreveu *"o pin v1.0.171 cura"* no workflow. Não curava:
+testado nas duas pontas (v1.0.171 e v1.0.183), falha idêntica.
+
+> **A lição que não é sobre CI.** As três rodadas descartaram "credencial" pelo mesmo raciocínio:
+> *"401 é instantâneo, isto pendura 180s, logo não é auth"*. Cada premissa era **verdadeira e
+> verificada**. A conclusão dependia de uma terceira, **nunca testada** — que a action repassaria o
+> 401. **Medir certo e inferir errado** é modo de falha distinto de medir errado, e mais perigoso:
+> a medição empresta confiança à conclusão. É `behavior-over-declaration` aplicado ao próprio
+> raciocínio — ao deduzir sobre um componente, nomeie qual comportamento dele você está **assumindo**.
+
+**O que sobrou como mecanismo:** o **pré-voo** em `onion-review.yml` checa `/v1/models` (não consome
+tokens) antes de invocar o revisor e nomeia a credencial no aviso do PR — 6 minutos de mistério
+viram 1 segundo de causa dita. E `.github/workflows/onion-review-diagnose.yml` separa, sob demanda,
+rede × credencial × chave mal-colada.
 
 ---
 
