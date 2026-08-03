@@ -75,6 +75,12 @@ jobs:
       # inline e o job sai verde). Logo, reprovar por is_error bloqueia o PR pelo crash do
       # bot, carregando ZERO informação sobre o código. O gate de qualidade duro é o
       # determinístico (onion-validate.yml); a revisão semântica é advisory-quando-roda.
+      # ORÇAMENTO (2026-08-03): era `--max-turns 8` e o revisor batia no teto. Medido no PR #533,
+      # a PRIMEIRA run após a credencial ser consertada: `subtype: error_max_turns`, 9 turnos,
+      # US$ 0,34, 35s — trabalho REAL interrompido por orçamento, não crash. O prompt manda
+      # descobrir as meta-specs dinamicamente, ler os arquivos e postar comentários inline; 8
+      # turnos não pagam isso. 30 dá folga sem virar cheque em branco (o teto existe para conter
+      # loop, não para racionar leitura), e o custo medido por turno torna o pior caso barato.
       - name: Revisor Onion (gate-keeper + code review)
         id: review
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.preflight.outputs.ok == 'true' }}
@@ -115,7 +121,7 @@ jobs:
             Seja conciso e factual; se o diff estiver conforme, aprove explicitamente.
           claude_args: |
             --model claude-sonnet-5
-            --max-turns 8
+            --max-turns 30
 
       # ═══ O SINAL VERDADEIRO (2026-08-03) ═══
       # `steps.review.outcome` MENTE: a action sai com exit 0 mesmo quando o agente morre —
@@ -177,7 +183,7 @@ jobs:
             Seja conciso e factual; se o diff estiver conforme, aprove explicitamente.
           claude_args: |
             --model claude-sonnet-5
-            --max-turns 8
+            --max-turns 30
 
       - name: Veredito da 2ª tentativa (is_error, não o outcome)
         id: v2
@@ -231,7 +237,11 @@ jobs:
           nota=""
           # Credencial primeiro: é a causa que a action esconde atrás de um hang, e a
           # única do lote cujo conserto não é código.
-          if [ "${PREFLIGHT_OK}" != "true" ]; then
+          # Orçamento estourado NÃO é "o revisor morreu": ele leu, analisou e foi interrompido.
+          # Dizer isso muda o conserto de quem lê o aviso — subir o teto, não caçar fantasma.
+          if [ "${M1}" = "orcamento-de-turnos" ] || [ "${M2}" = "orcamento-de-turnos" ]; then
+            nota=" _O revisor **trabalhou** e bateu no teto de turnos (\`--max-turns\`) antes de concluir — não é crash. Conserto: subir o teto em \`onion-review.yml\`._"
+          elif [ "${PREFLIGHT_OK}" != "true" ]; then
             nota=" **Causa medida: a credencial do CI não autentica** (pré-voo: HTTP \`${PREFLIGHT_HTTP}\`). O revisor sequer foi chamado — a action não repassa erro de auth, ela pendura ~180s e devolve \`is_error\` sem mensagem. Conserto: gravar um \`ANTHROPIC_API_KEY\` válido no repo."
           elif git diff --name-only "${BASE_SHA}" HEAD | grep -q '^\.github/workflows/onion-review\.yml$'; then
             nota=" _Causa provável: este PR altera o próprio \`onion-review.yml\`, e a action se auto-pula quando o workflow difere da branch default. **Esperado aqui** — o caminho real volta a ser exercido no PR seguinte ao merge._"

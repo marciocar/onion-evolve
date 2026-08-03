@@ -48,6 +48,23 @@ emit() { # $1=revisou $2=motivo $3=turnos $4=custo
   printf 'revisou=%s\nmotivo=%s\nturnos=%s\ncusto=%s\n' "$1" "$2" "$3" "$4"
 }
 
+# Traduz o `subtype` do resultado para um motivo que DIZ O QUE FAZER. Nasceu em 2026-08-03,
+# quando o revisor voltou a funcionar após a troca da chave e passou a falhar por outro
+# motivo: `error_max_turns` após 9 turnos e US$ 0,34 — trabalho REAL interrompido por
+# orçamento. Classificar isso como `is-error` genérico, igual a "morreu sem fazer nada",
+# apaga a diferença que decide o conserto (subir `--max-turns` × investigar a origem).
+motivo_do_subtipo() { # $1=subtype
+  case "${1}" in
+    error_max_turns)     printf 'orcamento-de-turnos' ;;
+    error_during_execution) printf 'erro-na-execucao' ;;
+    # `subtype: success` COM `is_error: true` é a contradição do caso de 07-14→08-03: o wrapper
+    # se declarava bem-sucedido enquanto o agente morria. É o balde genérico por direito — a
+    # própria ausência de subtipo útil É o sintoma.
+    success | '' | null) printf 'is-error' ;;
+    *)                   printf 'is-error:%s' "${1}" ;;
+  esac
+}
+
 verdict() {
   local f="${1:-}"
 
@@ -88,15 +105,17 @@ verdict() {
     return 0
   fi
 
-  local is_err turns cost
+  local is_err turns cost subtype
   is_err="$(printf '%s' "${res}" | jq -r '.is_error // false')"
   turns="$(printf '%s' "${res}" | jq -r '.num_turns // 0')"
   cost="$(printf '%s' "${res}" | jq -r '.total_cost_usd // 0')"
+  subtype="$(printf '%s' "${res}" | jq -r '.subtype // empty')"
 
   if [ "${is_err}" = "true" ]; then
-    printf 'review-verdict: is_error=true (turnos=%s, custo=%s) — NÃO houve revisão\n' \
-      "${turns}" "${cost}" >&2
-    emit false is-error "${turns}" "${cost}"
+    local motivo; motivo="$(motivo_do_subtipo "${subtype}")"
+    printf 'review-verdict: is_error=true subtype=%s (turnos=%s, custo=%s) — NÃO houve revisão\n' \
+      "${subtype:-—}" "${turns}" "${cost}" >&2
+    emit false "${motivo}" "${turns}" "${cost}"
     return 0
   fi
 
@@ -169,6 +188,27 @@ JSON
     '{"type":"result","is_error":true,"num_turns":1,"total_cost_usd":0}' > "${d}/jsonl.jsonl"
   _case 'review-verdict: formato JSONL também classifica (tolerância testada, não só prometida)' \
     "${d}/jsonl.jsonl" false is-error
+
+  # (h) ORÇAMENTO ESGOTADO — o caso real de 2026-08-03, DEPOIS da troca da chave: o revisor
+  #     trabalhou 9 turnos e US$ 0,34 e bateu no `--max-turns`. Continua "não revisou" (não
+  #     entregou veredito), mas o MOTIVO tem de separá-lo de "morreu sem fazer nada": o conserto
+  #     de um é subir o orçamento, o do outro é investigar a origem.
+  cat > "${d}/maxturns.json" <<'JSON'
+[
+  { "type": "result", "subtype": "error_max_turns", "is_error": true,
+    "duration_ms": 35225, "num_turns": 9, "total_cost_usd": 0.3367 }
+]
+JSON
+  _case 'review-verdict: error_max_turns → NÃO revisou, motivo `orcamento-de-turnos` (não `is-error` genérico)' \
+    "${d}/maxturns.json" false orcamento-de-turnos
+
+  # (i) subtype DESCONHECIDO não some — vira `is-error:<subtype>`, para que um modo de falha
+  #     novo chegue NOMEADO em vez de cair no balde genérico e virar mistério (foi o balde
+  #     genérico que escondeu um 401 por três semanas).
+  printf '[{"type":"result","subtype":"error_coisa_nova","is_error":true,"num_turns":3,"total_cost_usd":0.1}]\n' \
+    > "${d}/novo.json"
+  _case 'review-verdict: subtype desconhecido chega NOMEADO (`is-error:error_coisa_nova`)' \
+    "${d}/novo.json" false is-error:error_coisa_nova
 
   # (MUT) a distinção é LOAD-BEARING: se o critério ignorasse `is_error`, o caso (a) — o
   # incidente real — passaria como revisão. Prova que (a) e (b) não coincidem por acaso.
