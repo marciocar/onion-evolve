@@ -5199,12 +5199,13 @@ run_outbox_channel_selftests() {
 
   # (1) vendorizado COM canal + anúncio           -> silêncio
   mkdir -p "${ob}/selftest-com-canal";  printf '# t\n' > "${ob}/selftest-com-canal/2026-01-01-t.md"
-  # (2) vendorizado SEM canal + anúncio           -> SOFT [classe 3, local]
+  # (2) vendorizado SEM canal + anúncio           -> SOFT [classe 2, local]
   mkdir -p "${ob}/selftest-sem-canal";  printf '# t\n' > "${ob}/selftest-sem-canal/2026-01-01-t.md"
   # (3) SEM anúncio em staging                    -> silêncio (nenhum dir criado)
-  # (4) membro onion_version n/a + anúncio        -> SOFT [classe 2, roda no CI]
+  # (4) membro onion_version n/a + anúncio        -> SOFT [classe 1, roda no CI]
   mkdir -p "${ob}/selftest-nao-vendoriza"; printf '# t\n' > "${ob}/selftest-nao-vendoriza/2026-01-01-t.md"
-  # (5) dir órfão (não é id de membro) + anúncio  -> SOFT [classe 1, roda no CI]
+  # (5) dir órfão (não é id de membro) + anúncio  -> R28 SILENCIOSA (amputada 2026-08);
+  #     SOFT vem só da REGRA 46 (owner), asserido em run_outbox_channel_selftests
   mkdir -p "${ob}/selftest-orfao-xyz";  printf '# t\n' > "${ob}/selftest-orfao-xyz/2026-01-01-t.md"
   # (6) SÓ _processed/ (já entregue)              -> silêncio (1º nível apenas)
   mkdir -p "${ob}/selftest-so-processed/_processed"
@@ -5240,8 +5241,13 @@ run_outbox_channel_selftests() {
     || record_fail "outbox-channel: n/a" "não acusou membro que não vendoriza (a classe que roda no CI)"
 
   printf '%s' "${out}" | grep -qF "selftest-orfao-xyz', que NÃO é id de membro" \
-    && record_pass "outbox-channel: dir órfão → SOFT (classe decidível no CI)" \
-    || record_fail "outbox-channel: órfão" "não acusou dir de staging que não resolve a membro"
+    && record_fail "outbox-channel: órfão" "REGRA 28 ainda emite p/ dir órfão — amputação de double-firing (R28×R46) não se sustentou" \
+    || record_pass "outbox-channel: dir órfão → REGRA 28 silenciosa (classe amputada 2026-08, dona é a 46)"
+
+  printf '%s' "${out}" | grep -qF "outbox-órfã] diretório sem membro correspondente em members.yaml" \
+    && printf '%s' "${out}" | grep -qF "selftest-orfao-xyz" \
+    && record_pass "outbox-channel: dir órfão → SOFT único, via REGRA 46 (dona da classe)" \
+    || record_fail "outbox-channel: órfão-R46" "REGRA 46 não acusou dir de staging que não resolve a membro"
 
   printf '%s' "${out}" | grep -qF "selftest-so-processed" \
     && record_fail "outbox-channel: só _processed" "varreu _processed/ (já entregue) — deve ser 1º nível apenas" \
