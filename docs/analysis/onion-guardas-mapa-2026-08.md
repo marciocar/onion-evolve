@@ -146,8 +146,11 @@ threat model DIFERENTE"; a R31 cita "mesma classe das REGRAS 8/21/24"). As famí
 | **Outbox ↔ members** | 28, 46 | as duas pontas do mesmo par |
 
 **Sobreposição nova, declarada em 2026-08-03:** REGRA 52 × REGRA 43. A R43 já roda
-`kg-radar --integrity` nos grafos citados em `kg:` — **18 dos 51**. A R52 é superset: o ganho real
-são os **33 grafos** que ninguém cita. Um grafo citado é checado duas vezes; custo aceito, porque a
+`kg-radar --integrity` nos grafos citados em `kg:` — **11 dos 51**. A R52 é superset: o ganho real
+são os **40 grafos** que ninguém cita. *(A 1ª redação deste mapa dizia 18/33 — números
+não-reproduzíveis, corrigidos quando a revisão adversarial os mediu. O docstring da R52 carrega o
+comando de medição; este mapa deriva dele, não o contrário.)* Um grafo citado é checado duas vezes;
+custo aceito, porque a
 R43 morre com a migalha que a invoca e a R52 não depende de ninguém citar nada.
 
 ---
