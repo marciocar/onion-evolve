@@ -3330,6 +3330,27 @@ run_line_limits_selftests() {
   rm -rf "$d"
 }
 
+run_review_verdict_selftests() {
+  # O onion-review REVISOU, ou só saiu verde? A leitura mora em `review-verdict.sh` porque
+  # YAML de workflow não tem selftest — e foi exatamente assim que a máquina de resiliência
+  # do onion-review sobreviveu meses parecendo sã, condicionada a um sinal que nunca dispara
+  # (`steps.review.outcome`, que sai 'success' mesmo com is_error). Aqui os desfechos são
+  # exercidos a cada rodada, incluindo o (MUT) que prova que crash e revisão-sã divergem.
+  local helper="${REPO_ROOT}/.claude/validation/review-verdict.sh"
+  if [ ! -f "${helper}" ]; then record_fail "review-verdict" "helper ausente"; return; fi
+  local out rc=0
+  out="$(bash "${helper}" --selftest 2>&1)" || rc=$?
+  while IFS= read -r line; do
+    case "${line}" in
+      *"  ✓ "*) record_pass "${line#*✓ }" ;;
+      *"  ✗ "*) record_fail "review-verdict" "${line#*✗ }" ;;
+    esac
+  done <<< "${out}"
+  if [ "${rc}" -ne 0 ]; then
+    record_fail "review-verdict" "o selftest do helper saiu ${rc}"
+  fi
+}
+
 run_kg_radar_integrity_selftests() {
   local helper="${REPO_ROOT}/.claude/validation/kg-radar-integrity.sh"
   if [ ! -f "${helper}" ]; then record_fail "kg-integridade" "helper ausente"; return; fi
@@ -6031,6 +6052,7 @@ run_kg_verification_selftests
 run_safe_count_selftests
 run_line_limits_selftests
 run_kg_radar_integrity_selftests
+run_review_verdict_selftests
 run_empty_result_guard_selftests
 
 # Modo cycle-completion — métrica de ciclos concluídos vs abandonados (D5 instrumentação,

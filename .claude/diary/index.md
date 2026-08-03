@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 93 entradas · **Stale:** 0 · **Compartilháveis:** 81 · **Com significância:** 33
+**Total:** 94 entradas · **Stale:** 0 · **Compartilháveis:** 82 · **Com significância:** 34
 
 Gerado em: 2026-08-03
 
@@ -13,6 +13,7 @@ Gerado em: 2026-08-03
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
 | 2026-08-03 | learning | collective 📤 | shell-guard-paid-four-times-same-axis | A guarda anti-fail-open nasceu em 02-08 e no PRIMEIRO dia de uso real por outra sessão me pegou 4 vezes — e as 4 foram o MESMO eixo: eu lendo sinal derivado em vez do vivo. O eixo tem forma, e a forma é medível. | 2026-11-01 | static |
+| 2026-08-03 | learning | collective 📤 | o-revisor-verde-que-nunca-revisou | O onion-review tinha retry E aviso de soft-pass — máquina completa, comentada em 3 blocos — condicionados a um sinal que NUNCA dispara; 11 PRs mergearam num dia sob um revisor que não leu nada, e o CI dizia verde o tempo todo. | 2026-11-01 | dynamic |
 | 2026-08-03 | error | collective 📤 | nota-nao-e-mecanismo-o-waiter-provou | Identifiquei um bug, escrevi a cura no plano, e reincidi DUAS vezes nas horas seguintes — porque registrei como NOTA. No mesmo dia, três mecanismos que criei tiveram 100% de eficácia. A diferença não é a qualidade do registro; é onde ele mora. | 2026-11-01 | static |
 | 2026-08-02 | learning | collective 📤 | unreachable-guard-worse-than-absent | Achei uma guarda que existia, estava CORRETA, e nunca rodava — porque `set -euo pipefail` matava o script na atribuição, antes dela. Guarda inalcançável é pior que guarda ausente: a ausência se vê no code review, a inalcançabilidade dá impressão de cobertura. | 2026-10-31 | static |
 | 2026-08-02 | reflection | collective 📤 | self-correction-trigger-was-social | Contei: 15 auto-correções na sessão, 8 delas só aconteceram porque o maestro perguntou. O gatilho comprovadamente eficaz foi SOCIAL — o que bate com o corpus e é desconfortável de escrever. | 2026-10-31 | static |
