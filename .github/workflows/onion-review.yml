@@ -196,9 +196,37 @@ jobs:
             echo "::notice::o alarme acima tem causa conhecida: este PR edita o próprio workflow, e a action se auto-pula nesse caso."
           fi
           echo "::warning::onion-review não revisou após 2 tentativas (1ª: ${M1:-nao-rodou} · 2ª: ${M2:-nao-rodou}) — nenhum veredito produzido. Revise manualmente. O gate determinístico (onion-validate) segue valendo."
-          gh pr comment "${PR}" \
-            --body "⚠️ **onion-review não revisou após 2 tentativas** (1ª: \`${M1:-nao-rodou}\` · 2ª: \`${M2:-nao-rodou}\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: falha persistente do revisor não bloqueia o PR (resiliência 2026-07-14 + leitura do sinal correto 2026-08-03)._${nota}" \
-            || echo "::warning::não consegui postar o comentário de aviso (segue soft-pass)"
+
+          # UM comentário por PR, ATUALIZADO — nunca um por push (medido no PR #529: o workflow
+          # roda em `synchronize`, então 2 pushes viraram 2 comentários e 2 e-mails). Editar um
+          # comentário existente NÃO dispara notificação nova no GitHub, então o autor recebe no
+          # máximo um e-mail por PR. Alarme que chega repetido é alarme que se aprende a ignorar —
+          # o mesmo princípio que manteve o critério do review-verdict.sh estreito.
+          # Corpo montado com printf: interpolar multilinha dentro do YAML herdaria a
+          # indentação do bloco, e 4+ espaços no início de uma linha viram BLOCO DE CÓDIGO em
+          # Markdown — o aviso chegaria ilegível.
+          MARCA='<!-- onion-review-softpass -->'
+          corpo="$(printf '%s\n\n%s\n\n%s\n' \
+            "${MARCA}" \
+            "⚠️ **onion-review não revisou após 2 tentativas** (1ª: \`${M1:-nao-rodou}\` · 2ª: \`${M2:-nao-rodou}\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: falha persistente do revisor não bloqueia o PR (resiliência 2026-07-14 + leitura do sinal correto 2026-08-03)._${nota}" \
+            "<sub>atualizado pela run [\`${GITHUB_RUN_ID}\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})</sub>")"
+
+          # Casa pela MARCA ou pelo texto antigo — senão os comentários já postados antes desta
+          # mudança ficariam órfãos e o próximo viraria duplicata mesmo com a correção no lugar.
+          existente="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" --paginate \
+            --jq '[.[] | select(.user.login == "github-actions[bot]")
+                       | select(.body | test("onion-review-softpass|onion-review não revisou"))]
+                  | last | .id // empty' 2>/dev/null || true)"
+
+          if [ -n "${existente}" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${existente}" -f body="${corpo}" >/dev/null \
+              && echo "aviso ATUALIZADO no comentário ${existente} (edição não gera e-mail novo)" \
+              || echo "::warning::não consegui atualizar o comentário de aviso (segue soft-pass)"
+          else
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" -f body="${corpo}" >/dev/null \
+              && echo "aviso POSTADO (primeiro deste PR)" \
+              || echo "::warning::não consegui postar o comentário de aviso (segue soft-pass)"
+          fi
 
       - name: Aviso — revisor Onion pulado (sem ANTHROPIC_API_KEY)
         if: ${{ env.HAS_ANTHROPIC_KEY != 'true' }}
