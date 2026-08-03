@@ -20,9 +20,9 @@ date: 2026-06-15
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.2.0 |
+| **Versão** | 1.3.0 |
 | **Data de Criação** | 2026-06-15 |
-| **Última Atualização** | 2026-07-17 |
+| **Última Atualização** | 2026-08-03 |
 | **Categoria** | Meta |
 | **Propósito** | SSOT para materiais externos: landing page, manual, estudos de caso, artigos críticos, press kit |
 | **Fonte completa** | `onion-product-material-raw-2026-06.md` (interno do core) — material bruto/levantamento exaustivo onde **toda afirmação da KB é rastreável** à fonte primária citada `arquivo:seção`; é a camada de rastreabilidade sob esta síntese |
@@ -41,7 +41,7 @@ date: 2026-06-15
 
 ### Pitch de 2 minutos
 
-O Sistema Onion é um **framework de orquestração de desenvolvimento** que vive inteiramente em `.claude/` — uma pasta de configuração do Claude Code. Ao instalar o Onion num projeto, o time ganha **102 comandos invocáveis**, **51 agentes especializados de IA** e **11 skills** de orquestração, cobrindo três dimensões **peer**: produto (discovery → backlog), engenharia (planejamento → PR) e compliance (ISO 27001, SOC2, PMBOK, ISO 22301). O Onion se conecta ao gerenciador de tarefas existente (Jira, ClickUp, Asana ou Linear) via uma camada de abstração agnóstica (SDAAL) e ao host de código (GitHub, com GitLab/Bitbucket no roadmap) via adapter de forge. Não é uma CLI, não tem pacote npm, não exige mudança de stack — é configuração pura que transforma o Claude Code no cérebro orquestrador do fluxo de trabalho.
+O Sistema Onion é um **framework de orquestração de desenvolvimento** que vive inteiramente em `.claude/` — uma pasta de configuração do Claude Code. Ao instalar o Onion num projeto, o time ganha **102 comandos invocáveis**, **51 agentes especializados de IA** e **11 skills** de orquestração, cobrindo três dimensões **peer**: produto (discovery → backlog), engenharia (planejamento → PR) e compliance (ISO 27001, SOC2, PMBOK, ISO 22301). O Onion se conecta ao gerenciador de tarefas existente (Jira, ClickUp, Asana ou Linear) via uma camada de abstração agnóstica (SDAAL) e ao host de código (GitHub; GitLab/Bitbucket têm a **costura pronta**, não implementados — o gatilho declarado é *um adotante que os use*) via adapter de forge. Não é uma CLI, não tem pacote npm, não exige mudança de stack — é configuração pura que transforma o Claude Code no cérebro orquestrador do fluxo de trabalho.
 
 *(Fontes: `CLAUDE.md` §Inventário; `onion-review-2026-05.md` §1 — Revisão Analítica de Maio/2026, interno do core: o snapshot que consolidou a identidade canônica (framework template em `.claude/`, plataforma única Claude Code, três dimensões peer) e o abandono formal de `.onion/`/CLI standalone/v4.0; veredito "substancialmente completo em cobertura, pré-aplicável em validação")*
 
@@ -71,15 +71,15 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | **Abstraction Doctrine** | **quando** algo vira SDAAL (Teste do Eixo + Teste do Gatilho) | [`onion-abstraction-doctrine.md`](../concepts/onion-abstraction-doctrine.md) | ✅ ativa (2026-07-17) |
 | **Economy of Motors** | 3 motores (Transformer · SLM-ferramenta · Shell); use o mais barato capaz | [`onion-engine-economy.md`](../concepts/onion-engine-economy.md) | ✅ ativa |
 | **SDAAL** *(Specification-Driven AI Abstraction Layer)* | uma interface, N providers; o spec é o artefato e o LLM o runtime | [KB](../concepts/specification-driven-ai-abstraction-layer.md) · [whitepaper](../../sdaal/sdaal.md) | ✅ ativa |
-| **KG SDAAL** | investigação/domínio como grafo tipado; verdades **reconciliadas** (`REFUTES`/`SUPERSEDES`), radar determinístico | [`knowledge-graph-sdaal.md`](../concepts/knowledge-graph-sdaal.md) | 🟡 candidata (dogfoodada) |
+| **KG SDAAL** | investigação/domínio como grafo tipado; verdades **reconciliadas** (`REFUTES`/`SUPERSEDES`), radar determinístico | [`knowledge-graph-sdaal.md`](../concepts/knowledge-graph-sdaal.md) | ✅ ativa — **é infraestrutura**: 51 grafos, `kg-radar`, `kg-console`, `/meta:kg`, `/meta:kg-freshness`, REGRAS 43/47/49/52 e regra path-scoped nativa |
 | **SSOT-as-runtime** | a SSOT é o **programa que se executa**: `read→verify→act→write`; KG-first + drive-to-verify | [KG SDAAL §SSOT-as-runtime](../concepts/knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho) | ✅ ativa (cabeada nos 3 loops) |
 | **`gated-until-trigger`** | o artefato nasce do **uso que o prove**, nunca de simetria/plano | [modernization §🚦](../concepts/onion-modernization-doctrine.md) | ✅ ativa |
 | **`declarado ≠ verificado`** | carimbo/doc/branch é DEV; só o artefato vivo é PROD | [verify-read-path-first](../agentic-patterns/ai-strategies/verify-read-path-first.md) (tabela da família) | ✅ ativa |
 | **`fonte ≠ derivação`** | fonte e nossa leitura em artefatos **fisicamente** separados; a derivação **cita** | [`source-vs-derivation.md`](../concepts/source-vs-derivation.md) | ✅ ativa |
 | **PFR** *(Padrão Faseado Retomável)* | sessão durável + `STATE.md` + retomada fria; fases nunca fundidas | `onion-adr-phased-resumable-pattern-2026-06.md` (ADR interno do core — nomeia o PFR, padrão já invariante L0; provisório, PR à meta-spec diferido até gatilho) + [método §2a](../concepts/onion-working-method.md) | 🟡 ADR provisório (a cravar em `commands.md §3`) |
-| **Capability Contract** | o que um repo adotado pode esperar: Bronze/Silver/Gold — contrato **verificável** | `onion-adr-capability-contract-2026-06.md` (ADR interno do core — auto-descrição `provides/requires/loads/conformance`, tiers Bronze/Silver/Gold, validada pelo lint REGRA 20; visão-de-fora composta dos contratos, não registry à mão) + `plugins/*/capability.json` | 🟡 só ADR |
+| **Capability Contract** | o que um repo adotado pode esperar: Bronze/Silver/Gold — contrato **verificável** | `onion-adr-capability-contract-2026-06.md` (ADR interno do core — auto-descrição `provides/requires/loads/conformance`, tiers Bronze/Silver/Gold, validada pelo lint REGRA 20; visão-de-fora composta dos contratos, não registry à mão) + **7** `plugins/*/.claude-plugin/capability.json` | ✅ ativa — ADR **+ mecanismo** (REGRA 20 [HARD]) |
 | **Co-Evolution Protocol** *(doc-bridge)* | sinal bidirecional core↔adotante por arquivo commitado; sem runtime acoplado | `docs/evolution/README.md` (interno do core — fonte canônica do protocolo doc-bridge; maestro humano orquestra, execução do que chega é gate humano) + `/meta:co-*` | ✅ ativa |
-| **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | [`breadcrumb-patterns.md`](../agentic-patterns/ai-strategies/breadcrumb-patterns.md) + `/meta:diary` | 🟡 draft (absorção não medida) |
+| **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | [`breadcrumb-patterns.md`](../agentic-patterns/ai-strategies/breadcrumb-patterns.md) + `/meta:diary` | ✅ ativa — 92 entradas, TTL + `conflict_class` por entrada, e o `personality-sync` F2 fez a **identidade emergir de 74 migalhas** |
 | **Object-led discovery** | o maestro dirige com o objeto; o Transformer executa com as peças certas | [KB](../agentic-patterns/ai-strategies/object-led-discovery.md) + `onion-adr-object-led-discovery-2026-07.md` (ADR interno do core — playbook espelhar→descobrir(object-led)→vestir(capability-fitting)→materializar→realimentar; "quem sabe sobre o objeto é o próprio objeto", Information Expert) | ✅ ativa |
 | **Autobiographical Marketing** | o framework conta a própria história; os commits **são** a autobiografia | `onion-adoption-manual.md` (interno do core; persona 1ª pessoa) | 🟡 só prosa de manual |
 
@@ -126,7 +126,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 ├──────────────────┴──────────────────────────────────────────┤
 │  ABSTRAÇÕES (.claude/utils/) — padrão SDAAL                    │
 │    Task Manager (Jira · ClickUp · Asana · Linear)              │
-│    Forge (GitHub; GitLab/Bitbucket 🔜)                          │
+│    Forge (GitHub; GitLab/Bitbucket = costura, não capability)  │
 ├─────────────────────────────────────────────────────────────┤
 │  DOCUMENTAÇÃO CONSTITUCIONAL (docs/)                           │
 │    Meta-specs L0 · Knowledge Bases (87) · Spec as Code         │
@@ -278,7 +278,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | Skills | 11 | `docs/onion/inventory.md` (SSOT gerada) |
 | Knowledge Bases | 87 | `docs/onion/inventory.md` (SSOT gerada) |
 | Task Manager providers suportados | 4 (Jira, ClickUp, Asana, Linear) | `CLAUDE.md` §Task Manager |
-| PRs na jornada completa de auto-evolução (Agent Teams + Federation + Evolve) | 22 | `.claude/sessions/INDEX.md` |
+| PRs na jornada completa de auto-evolução (Agent Teams + Federation + Evolve) | 22 | ⚠️ **não-verificável** — a fonte (`.claude/sessions/INDEX.md`) é **gitignored**; número congelado-no-tempo, sem como re-medir |
 | Workers no `/meta:evolve` | 28 agentes | onion-evolution-2026-06-15.md §0 |
 | Tokens no `/meta:evolve` | 1.27M | onion-evolution-2026-06-15.md §0 |
 | Tool-uses no `/meta:evolve` | 635 | onion-evolution-2026-06-15.md §0 |
@@ -289,6 +289,12 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | Dimensões da auto-auditoria | 10 (D1–D10) | `evolve.md` §Dimensões |
 | Fases de federation implementadas | 5 (0→ledger, 1→register, 2→publish/check, 3→status/rollback) | `multi-repo-federation.md` |
 
+> ⚠️ **Um TERCEIRO tipo que esta nota não classificava** (achado 2026-08-03): a linha
+> "Fases de federation implementadas | 5" **não é** contagem de inventário (não vem de
+> `inventory.md`) **nem é** congelada-no-tempo declarada — e houve o redesign RFC-0004 desde então.
+> Números assim, de estado-de-programa, precisam de re-verificação própria; não herdam nem a
+> atualização automática do inventário nem a imunidade do histórico.
+>
 > **Manutenção (anti-redrift):** as contagens de inventário **presentes** (comandos/agentes/skills/KBs/dimensões)
 > são derivadas da SSOT gerada `docs/onion/inventory.md` (interna do core — contagens de comandos/agentes/skills/KBs computadas do filesystem por `.claude/validation/inventory.sh`, validadas no CI, nunca digitadas à mão)
 > — ao resync, leia a SSOT, nunca reescreva de memória. Os números **dentro dos Casos de Uso (§5)** e das
@@ -304,11 +310,41 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | Direção abandonada | Por quê |
 |---------------------|---------|
 | CLI standalone (`packages/onion-cli/`) | Distribuir como produto contradiz a identidade de template instalável |
-| Multi-IDE (Cursor, Zed, Windsurf) | Dilui integração; Claude Code é a plataforma certa |
+| Multi-IDE **no core** | Ver o quadro abaixo — a nuance importa, e ler esta linha sem ela leva a uma conclusão errada |
 | `.onion/` agnóstico | Abstração prematura sem ganho real |
 | v4.0 FASES 5-9 (aprendizado contínuo, A2A runtime) | Beira agente autônomo fora de controle; humano-maestro é invariante |
 
-*(Fonte: `onion-review-2026-05.md` §4 (interno do core); `CLAUDE.md` §Identidade canônica)*
+#### ⚠️ CORE ≠ FAMÍLIA — a distinção sem a qual a linha acima mente
+
+Esta tabela descreve **o core** (`onion-evolve`). A **família multi-IDE é outro objeto**, com outro
+propósito e outro ciclo de vida:
+
+| | Core (`onion-evolve`) | Família multi-IDE |
+|---|---|---|
+| O que é | o framework vivo | material de curso + **prova de portabilidade** |
+| Plataforma | Claude Code, **por capacidade** | Cursor, Antigravity, Copilot e outros |
+| Ciclo de vida | manutenção ativa | **CONGELADA** — não é linha ativa |
+| Repos | este | `onion` (hub) · `onion-cursor` · `onion-antigravity` · `onion-copilot` · `onion-architect` · `onion-mini` · `onion-standalone` |
+
+**E a decisão de 2026-05-18 foi por CAPACIDADE, não abandono do agnosticismo.** O Onion nasceu no
+Cursor buscando ser agnóstico e foi de fato **portado** para Claude/Antigravity/Codex para o Curso de
+Desenvolvimento com IA (Pulse Mais), **com alunos usando em campo**. A escolha foi *parar de gastar
+energia em agnosticismo* para poder usar recursos de fronteira (nominalmente `SendMessage` entre
+agentes no modo Teams). É **conclusão de um experimento multi-IDE de escala real** — não restrição
+de origem.
+
+O critério que decide toda adoção de substrato é **a postura de acoplamento**: acoplado ao Claude
+Code para tirar vantagem da sua maquinaria, *mas mantendo independência sempre que isso for mais
+vantajoso e o acoplamento não for necessidade*. Acople só quando a capacidade ganha não existe fora.
+
+> **Por que este quadro existe:** sem a distinção escrita, quem lê a linha "Multi-IDE abandonado"
+> conclui que os repos públicos violam a doutrina — **conclusão errada, já cometida em 2026-08-02**.
+> Esta KB, além disso, se **contradizia**: dizia "multi-IDE abandonado" aqui e celebrava "família
+> multi-plataforma" na §10.
+
+*(Fontes: `CLAUDE.md` §Identidade canônica; `onion-review-2026-05.md` §4 (interno do core); SSOT do
+grafo: `docs/onion/graph/onion-identity-2026-07.kg.yaml` → `C_CORE_NAO_E_FAMILIA`,
+`D_CLAUDE_CODE_POR_CAPACIDADE`, `E_FAMILIA_MULTIIDE_CONGELADA`, `E_PORTE_PARA_O_CURSO`)*
 
 ### Diferenciação de "cursor rules" / prompt engineering ad-hoc
 
@@ -403,12 +439,17 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
   Vivo") e backend **`app.onionevolve.com`** (VPS com Caddy/TLS + clone do core em
   `/home/onion/onion-evolve`), deploy ~2026-06-29.
 - **Adotantes reais**: vários adotantes em campo — co-evolução ativa (lineages mapeadas em
-  `federation/members.yaml`), sessões persistentes (Jira/ADF, multi-contexto) e um adotante da
+  `docs/evolution/federation/members.yaml`), sessões persistentes (Jira/ADF, multi-contexto) e um adotante da
   vertical educacional (materiais publicados).
-- **Família multi-plataforma**: hub `onion` ("prova de universalidade") + destilações por
-  plataforma (cursor/codex/copilot/zed/antigravity) e o **Onion Mini** (`marciocar/onion-mini`,
-  público) — a destilação máxima e produto de ENTRADA da família (destilação federada, ADR
-  mini-distillation 2026-07). O core segue Claude-Code-only; quem é multi-plataforma é a família.
+- **Família multi-plataforma — pública e CONGELADA**: hub `onion` + destilações por plataforma
+  (`onion-cursor`, `onion-antigravity`, `onion-copilot`, `onion-architect`), o **Onion Mini**
+  (`marciocar/onion-mini`, público — destilação máxima e produto de ENTRADA) e o
+  **`onion-standalone`**. **Congelada** significa: material de curso e **prova de portabilidade**,
+  **não linha de manutenção ativa** — os repos existem e não recebem evolução. O core segue
+  Claude-Code-only **por capacidade** (ver §7); quem é multi-plataforma é a família.
+  *(Lista medida via `gh api` em 2026-08-02 — `E_FAMILIA_MULTIIDE_CONGELADA`. A redação anterior
+  desta linha listava `codex` e `zed`, que não foram medidos, e omitia `architect` e `standalone`,
+  que existem: um press kit derivado dela publicaria repos possivelmente inexistentes.)*
 
 ---
 
@@ -442,5 +483,25 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 
 ---
 
-**Última atualização**: 2026-08-03 (resync de inventário presente → SSOT: 102 comandos / 51 agentes / **11 skills** / **87 KBs** / 10 dimensões. O resync de 2026-07-24 deixou a KB inconsistente **consigo mesma** — o pitch de 2 min dizia 102 comandos e a tabela §6 dizia 99; §3, §6 e §7 agora derivam todas da mesma SSOT. Casos históricos §5 preservados como congelados-no-tempo, conforme a nota anti-redrift)
+**Última atualização**: 2026-08-03 — **v1.3.0**
+
+Duas rodadas no mesmo dia:
+
+**(a) resync de inventário** → SSOT: 102 comandos / 51 agentes / **11 skills** / **87 KBs** / 10
+dimensões. O resync de 2026-07-24 deixara a KB inconsistente **consigo mesma** (o pitch dizia 102
+comandos e a tabela §6 dizia 99); §3, §6 e §7 passaram a derivar da mesma SSOT.
+
+**(b) atualidade doutrinária** — o drift que importava, num artefato voltado ao **público externo**:
+
+| Onde | Estava | Ficou |
+|---|---|---|
+| §7 | "Multi-IDE abandonado", sem nuance — e **contradizendo** a §10 | quadro **CORE ≠ FAMÍLIA** + a decisão reenquadrada **por capacidade** (`SendMessage`/Teams), conclusão de experimento real com alunos |
+| §10 | família como "ecossistema **vivo**"; lista com `codex`/`zed` **não medidos**, sem `architect`/`standalone` | **CONGELADA**, com os 7 repos medidos por `gh api` |
+| §1 e §3 | forge "GitLab/Bitbucket **no roadmap**" / `🔜` nu | **costura pronta, não capability**, com o gatilho nomeado — a `gated-until-trigger` que a própria KB lista em §1.5 |
+| §1.5 | KG SDAAL `🟡 candidata` · Capability Contract `🟡 só ADR` · Breadcrumbs `🟡 draft` | os três **✅ ativos**, com a evidência que os promoveu |
+| §6 e §10 | 3 caminhos em prosa que não resolvem | corrigidos; a métrica "22 PRs" marcada **não-verificável** (fonte gitignored) |
+| §6 | nota anti-redrift classificava 2 tipos de número | explicitado o **3º tipo** (estado-de-programa) que ela não cobria |
+
+Casos históricos §5 seguem **intactos** como congelados-no-tempo. SSOT da doutrina:
+`docs/onion/graph/onion-identity-2026-07.kg.yaml`.
 **Mantido por**: Sistema Onion (síntese — gerada via `/meta:create-knowledge-base`, Fase 3 do plano de materiais externos)
