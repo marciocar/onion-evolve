@@ -45,11 +45,20 @@ jobs:
         id: review
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
         continue-on-error: true
-        # PINADO em v1.0.171 (2026-07-11, último release pré-07-14) — experimento:
-        # a @v1 (tag móvel) lançou v1.0.172/173/174 em 07-14, mesmo dia em que o
-        # onion-review passou a crashar 100% (is_error, ~180s hang, cost 0). Isola
-        # se a regressão é da action (não do modelo claude-sonnet-5). Ver diário.
-        uses: anthropics/claude-code-action@e90deca47693f9457b72f2b53c17d7c445a87342
+        # PINADO em v1.0.183 (2026-07-25). HISTÓRICO — o pin anterior era v1.0.171, posto em
+        # 2026-07-18 sob a hipótese "a regressão veio da v1.0.172+, lançada em 07-14, mesmo dia
+        # em que o revisor passou a crashar". Essa hipótese NÃO SOBREVIVEU: medido em 2026-08-03,
+        # com o v1.0.171 no lugar, 4 runs seguidas deram `is_error: true`, `num_turns: 1`,
+        # `cost: 0` — o pin não curava nada. Verificado no mesmo dia que API e modelo estão sãos
+        # (claude-sonnet-5 responde HTTP 200 fora do CI) e que a assinatura da falha é HANG de
+        # ~186s, não recusa de credencial (401 volta instantâneo). Sobra o eixo action-no-runner.
+        # Subir o pin é o experimento controlado seguinte — e agora ele SE MEDE SOZINHO: o
+        # review-verdict.sh carimba o resumo do job nos dois desfechos, então o resultado não
+        # some no verde como sumiu por semanas.
+        # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
+        # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
+        # claude_args seguem válidos — o review-verdict.sh depende dos três.
+        uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -97,11 +106,20 @@ jobs:
         id: review2
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.v1.outputs.revisou != 'true' }}
         continue-on-error: true
-        # PINADO em v1.0.171 (2026-07-11, último release pré-07-14) — experimento:
-        # a @v1 (tag móvel) lançou v1.0.172/173/174 em 07-14, mesmo dia em que o
-        # onion-review passou a crashar 100% (is_error, ~180s hang, cost 0). Isola
-        # se a regressão é da action (não do modelo claude-sonnet-5). Ver diário.
-        uses: anthropics/claude-code-action@e90deca47693f9457b72f2b53c17d7c445a87342
+        # PINADO em v1.0.183 (2026-07-25). HISTÓRICO — o pin anterior era v1.0.171, posto em
+        # 2026-07-18 sob a hipótese "a regressão veio da v1.0.172+, lançada em 07-14, mesmo dia
+        # em que o revisor passou a crashar". Essa hipótese NÃO SOBREVIVEU: medido em 2026-08-03,
+        # com o v1.0.171 no lugar, 4 runs seguidas deram `is_error: true`, `num_turns: 1`,
+        # `cost: 0` — o pin não curava nada. Verificado no mesmo dia que API e modelo estão sãos
+        # (claude-sonnet-5 responde HTTP 200 fora do CI) e que a assinatura da falha é HANG de
+        # ~186s, não recusa de credencial (401 volta instantâneo). Sobra o eixo action-no-runner.
+        # Subir o pin é o experimento controlado seguinte — e agora ele SE MEDE SOZINHO: o
+        # review-verdict.sh carimba o resumo do job nos dois desfechos, então o resultado não
+        # some no verde como sumiu por semanas.
+        # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
+        # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
+        # claude_args seguem válidos — o review-verdict.sh depende dos três.
+        uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
