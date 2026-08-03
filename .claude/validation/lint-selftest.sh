@@ -6046,7 +6046,7 @@ run_ladder_integrity_selftests() {
 }
 run_ladder_integrity_selftests
 
-# Modo kb-vendored-link — REGRA 45: link vendorizado não aponta caminho core-privado (catraca; guard core-side do bug de campo do Pedro).
+# Modo kb-vendored-link — REGRA 45: link vendorizado não aponta caminho core-privado (catraca; guard core-side do bug de campo de adotante real).
 run_kb_vendored_link_selftests() {
   local h="${REPO_ROOT}/.claude/validation/kb-vendored-link-check.sh"
   if [ ! -f "${h}" ]; then record_fail "kb-vendored-link" "helper ausente: ${h}"; return; fi

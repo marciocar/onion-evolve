@@ -343,7 +343,6 @@ check_line_limits() {
 #           Exceções permitidas (convenções estabelecidas):
 #             • README.md  — convenção universal de documentação
 #             • SKILL.md   — convenção do framework de skills
-#             • ESPERANTO.md — arquivo canônico do sistema
 #             • *_template.md em common/templates — legado aceito pelo framework
 # ===========================================================================
 check_kebab_case_filenames() {
@@ -353,7 +352,7 @@ check_kebab_case_filenames() {
 
     # Exceções explícitas (nomes em maiúsculas ou com underscore aceitos)
     case "${base}" in
-      README.md|SKILL.md|ESPERANTO.md) continue ;;
+      README.md|SKILL.md) continue ;;
     esac
 
     # Sessões são artefatos de trabalho gitignored (nomes arbitrários do usuário: INDEX.md,
@@ -1000,9 +999,6 @@ check_no_direct_provider_calls() {
       */utils/task-manager/adapters/*) continue ;;
       */utils/forge/adapters/*)        continue ;;
       */agents/development/clickup-specialist.md) continue ;;
-      */agents/development/jira-specialist.md)    continue ;;
-      */commands/common/prompts/clickup-patterns.md) continue ;;
-      */commands/common/templates/*)  continue ;;
     esac
 
     if grep -qE "${pattern}" "${file}"; then
@@ -1622,7 +1618,7 @@ check_research_kg() {
 #   origem?"; a R26 pergunta "esta PASTA de pesquisa tem .kg.yaml?". Falta a
 #   terceira: "este DOCUMENTO existe no grafo?" — coberto = algum nó de algum
 #   .kg.yaml o cita em trace:/evidence:.
-#   Origem de campo: sinal de um adotante regulado 2026-07-20 (docs/evolution/inbox/
+#   Origem de campo: sinal de um adotante regulado 2026-07-20 (docs/evolution/inbox/_processed/
 #   2026-07-20-gate-proveniencia-invertido.md) — a doutrina KG-SSOT tinha forcing
 #   function só na LEITURA; nada impedia conhecimento de NASCER fora do grafo.
 #   CATRACA (o que torna adotável): passivo no baseline versionado = SOFT;
@@ -1794,7 +1790,7 @@ check_kg_born_marker() {
 #   Guarda a máxima do maestro "automação se conquista por ação provada":
 #   nenhuma classe de ação sobe de degrau (HUMAN→MONITORED→DYNAMIC→AUTO) sem
 #   gate de promoção ALCANÇÁVEL. Delega a ladder-integrity-check.sh (doutrina:
-#   graduated-automation-ladder.md). Nasce silencioso (tudo em HUMAN hoje).
+#   graduated-automation-ladder.md). Hoje: 6 HUMAN, 6 STRUCTURAL, 1 MONITORED, 2 MOAT (medido 2026-07-24).
 check_ladder_integrity() {
   local helper="${SCRIPT_DIR}/ladder-integrity-check.sh"
   [ -f "${helper}" ] || return 0
@@ -1976,6 +1972,7 @@ check_kg_view_sync() {
 #   guarda compartilhada, com os pressupostos enumerados no próprio helper.
 #   Termos são DERIVADOS de members.yaml (nunca hardcoded — nome de cliente no
 #   script seria o próprio vazamento).
+#   Hub de privacidade: as REGRAS 33 e 36 derivam desta (threat models distintos).
 # ===========================================================================
 check_projection_safety() {
   local helper="${SCRIPT_DIR}/projection-safety.sh"
