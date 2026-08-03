@@ -839,6 +839,14 @@ check_agent_card_sync() {
 #   co-announce pular membros sem canal — é do maestro, não do lint.
 #   Degrade gracioso: sem python3/yaml, membro não resolvido/sem local_path, ou
 #   local_path inexistente no filesystem → pula sem falhar.
+#   AMPUTAÇÃO 2026-08 (double-firing, revisão das 53 regras): a classe "dir de
+#   outbox que não resolve a NENHUM id" saiu daqui — é a MESMA condição da
+#   REGRA 46, que já a cobre de forma estritamente mais geral (recursiva, inclui
+#   _processed/). Um dir órfão com N anúncios emitia N SOFT aqui + 1 SOFT
+#   agregado na 46, para o MESMO fato. A 46 fica dona; esta regra agora só fala
+#   de membro que EXISTE em members.yaml mas não tem canal — o que finalmente
+#   torna o título "membro SEM canal" literal (antes, a classe removida
+#   violava "membro nenhum", não "membro sem canal").
 # ===========================================================================
 check_outbox_channel_exists() {
   local outbox="${REPO_ROOT}/docs/evolution/federation/outbox"
@@ -846,10 +854,13 @@ check_outbox_channel_exists() {
   [ -d "${outbox}" ] && [ -f "${members}" ] || return 0
   have_py_yaml || return 0
 
-  # TRÊS classes de "anúncio que não tem para onde ir". As DUAS primeiras são decidíveis
-  # SÓ COM O REPO — por isso rodam no CI. (A 1ª versão desta regra só olhava o filesystem
-  # do adotante e era NO-OP no CI: nenhum local_path existe no runner, logo zero membros
-  # avaliados — a regra dependia do mesmo ato humano cuja ausência causou o furo original.)
+  # DUAS classes de "anúncio a um membro que EXISTE mas não tem canal" (a classe do
+  # dir órfão — que não resolve a NENHUM id — foi amputada em 2026-08: é a REGRA 46,
+  # que já a cobre sem repetir violation por arquivo). A 1ª (onion_version n/a) é
+  # decidível SÓ COM O REPO — por isso roda no CI. (A 1ª versão desta regra só olhava
+  # o filesystem do adotante e era NO-OP no CI: nenhum local_path existe no runner,
+  # logo zero membros avaliados — a regra dependia do mesmo ato humano cuja ausência
+  # causou o furo original.)
   local member_dir member_id f meta resolved ver local_path pend
   for member_dir in "${outbox}"/*/; do
     [ -d "${member_dir}" ] || continue
@@ -877,16 +888,13 @@ PY
     for f in "${member_dir}"*.md; do [ -f "${f}" ] && pend=1 && break; done
     [ "${pend}" -eq 1 ] || continue
 
-    # (1) [CI] dir de staging que não resolve a NENHUM id de members.yaml -> órfão.
-    if [ "${resolved}" != "1" ]; then
-      for f in "${member_dir}"*.md; do
-        [ -f "${f}" ] || continue
-        violation "SOFT" "${f}" "anúncio em staging no diretório '${member_id}', que NÃO é id de membro em members.yaml (órfão: typo, id renomeado ou membro removido) — é ainda menos entregável que um membro sem canal"
-      done
-      continue
-    fi
+    # Dir que NÃO resolve a NENHUM id de members.yaml é órfão — mas "órfão" não é
+    # "membro sem canal" (não há membro nenhum aqui). Classe AMPUTADA desta regra
+    # em 2026-08 (double-firing: a REGRA 46 já cobre isto, de forma mais geral e
+    # SEM repetir 1 violation por arquivo). A 46 é a dona; aqui, silêncio.
+    [ "${resolved}" = "1" ] || continue
 
-    # (2) [CI] membro que NÃO vendoriza (onion_version: n/a) não tem doc-bridge por desenho.
+    # (1) [CI] membro que NÃO vendoriza (onion_version: n/a) não tem doc-bridge por desenho.
     if [ "${ver}" = "n/a" ]; then
       for f in "${member_dir}"*.md; do
         [ -f "${f}" ] || continue
@@ -895,7 +903,7 @@ PY
       continue
     fi
 
-    # (3) [LOCAL, bônus] membro vendorizado cujo clone existe aqui mas está sem o canal.
+    # (2) [LOCAL, bônus] membro vendorizado cujo clone existe aqui mas está sem o canal.
     [ -n "${local_path}" ] && [ -d "${local_path}" ] || continue
     [ -d "${local_path}/docs/evolution/inbound" ] && continue
     for f in "${member_dir}"*.md; do
