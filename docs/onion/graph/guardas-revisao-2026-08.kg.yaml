@@ -1,0 +1,341 @@
+meta:
+  id: guardas-revisao-2026-08
+  schema_version: '1'
+  layer: audit
+  label: 'Revisao das regras e guardas do Onion — agosto/2026'
+  trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
+
+nodes:
+  # ── a pergunta que abriu a revisao ────────────────────────────────────────
+  - id: Q_GUARDAS_COERENTES
+    node_type: question
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: 'as guardas nascidas reativamente formam um sistema coerente, sem sobreposicao cega nem lacuna?'
+
+  # ── o diagnostico central ─────────────────────────────────────────────────
+  - id: C_LACUNA_E_COBERTURA
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'lint-artifacts.sh + rules-registry.sh + medicao dos 51 grafos'
+    label: 'o debito das guardas NAO e formato — e COBERTURA e VISIBILIDADE: guarda que ninguem ve e guarda que ninguem roda falham igual'
+
+  # ── as 4 lacunas medidas, cada uma fechada por uma regra nova ─────────────
+  - id: E_GUARDA_HARD_INVISIVEL
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'grep de headers # REGRA em lint-artifacts.sh'
+    label: 'check_site_inventory_sync era HARD ATIVA com header sem numero — o regex do gerador nao a capturava, invisivel no registro que a rede le'
+
+  - id: E_GUARDA_SOFT_INVISIVEL
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'grep de headers # REGRA em lint-artifacts.sh'
+    label: 'check_branch_agent_distinction era SOFT ativa sem numero E sem o campo previne obrigatorio'
+
+  # plane:DEV e nao PROD — o radar apontou MISPLANED e tem razao: a evidencia e um
+  # grep na FONTE (codigo), nao uma medicao do artefato vivo.
+  - id: E_RADAR_SEM_CADENCIA
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'grep kg-radar em lint-artifacts.sh, workflows e pre-commit'
+    label: 'kg-radar.sh — unico mecanismo que reprova contradicao estrutural — nao era executado por NENHUMA cadencia; so alcance indireto via R43 (18 de 51 grafos) e R31'
+
+  - id: E_RULES_SEM_GUARDA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'grep claude/rules em lint-artifacts.sh → zero ocorrencias'
+    label: '.claude/rules/ era a UNICA superficie de .claude/ sem guarda nenhuma — frontmatter nao validado, glob nao verificado'
+
+  # ── a decisao estruturante ────────────────────────────────────────────────
+  - id: D_PROMOVER_COGNITIVO_A_MECANICO
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: done
+    verified_at: 2026-08-03
+    verified_against: 'REGRA 52 no lint + kg-radar-integrity.sh cobrindo 51 grafos'
+    trace: ".claude/validation/kg-radar-integrity.sh + .claude/rules/kg-grammar.md:41"
+    label: 'promover a convocacao COGNITIVA do radar (rules/kg-grammar.md) a MECANICA (REGRA 52), sem remover a rule — ela ensina antes de escrever, o gate mede depois'
+
+  - id: C_RULE_NAO_BASTA
+    node_type: claim
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'kg-grammar.md:41 declara exit 0 obrigatorio; nenhum mecanismo o executa'
+    label: 'regra path-scoped nao substitui gate: so carrega ao TOCAR o arquivo, depende do ator obedecer, e nao pega degradacao passiva (REFUTES que chega depois)'
+
+  # ── a pergunta do maestro que virou mecanismo ─────────────────────────────
+  - id: Q_SEV_COSMETICO
+    node_type: question
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: 'a tag [SEV] no header das regras e cosmetica?'
+
+  - id: E_SEV_LOAD_BEARING
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'contagem de literais violation HARD/SOFT no corpo de cada guarda'
+    label: 'NAO e cosmetica: REGRAS 43 e 44 tem ZERO literal no corpo (delegam com violation ${sev}) — o tag e a UNICA fonte de severidade delas'
+
+  - id: D_TAG_OBRIGATORIO
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: done
+    verified_at: 2026-08-03
+    verified_against: 'catracas 4 e 5 no rules-registry.sh, provadas por MUT'
+    trace: ".claude/validation/rules-registry.sh:catracas-4-e-5"
+    label: 'tornar o tag [SEV] obrigatorio nas 53 e gatear severidade indefinida — a regra implicita que valia por disciplina virou mecanica'
+
+  # ── o que a revisao adversarial refutou ───────────────────────────────────
+  - id: C_INDEX_SEM_COBERTURA
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.3
+    status: refuted
+    label: 'docs/INDEX.md e a KB de identidade nao eram cobertos por NENHUMA guarda de contagem (diagnostico do PR 517)'
+
+  - id: E_R16_JA_COBRE
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'feeders da R16 rodados a mao contra docs/INDEX.md — 3 hits em comandos invocaveis'
+    label: 'ambos ESTAO no escopo da R16 e os feeders disparam neles; o que escapou foi FORMA DE FRASE (skills avulso, substantivo antes do numero, tabela), nao arquivo'
+
+  - id: C_PARSER_PREVINE_MULTILINHA
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.4
+    status: refuted
+    label: 'corrigir o parser do rules-registry para aceitar previne: multi-linha (sugestao da revisao)'
+
+  - id: E_FIX_PIORA_23_REGRAS
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'diff do registro gerado apos aplicar o fix — 46 linhas alteradas'
+    label: 'o fix engolia o CORPO do docstring no campo previne de 23 regras (o repo tem 2 convencoes de indentacao); a cura certa foi seguir a convencao de 1 linha'
+
+  # ── sobreposicao real, declarada ──────────────────────────────────────────
+  - id: C_R52_SOBREPOE_R43
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'contagem de docs com kg: no frontmatter — 18 grafos distintos de 51'
+    label: 'a R52 sobrepoe a R43 em 18 dos 51 grafos; e superset com ganho real de 33 — sobreposicao aceita e DECLARADA no docstring'
+
+  # ── o debito que a revisao encontrou e nao fechou ─────────────────────────
+  - id: C_DUPLICACAO_4_CLONES
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_at: 2026-08-03
+    verified_against: 'normalizacao e diff dos corpos das REGRAS 21, 38, 24, 25'
+    label: 'REGRAS 21/38/24/25 sao clones byte-identicos apos normalizar literais — helper economizaria ~69 linhas e daria UM lugar p/ o 2>/dev/null que engole erro de gerador'
+
+  - id: C_R28_R46_DOUBLE_FIRING
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_at: 2026-08-03
+    verified_against: 'leitura dos corpos: R28 classe (1) e R46 detectam a mesma condicao'
+    label: 'R28 classe (1) e R46 detectam a MESMA condicao — um dir orfao com 3 anuncios emite 4 SOFT para um fato so; cura e amputar a classe (1) da R28'
+
+  - id: C_SEM_GATE_REGRA_SEM_TESTE
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_at: 2026-08-03
+    verified_against: 'leitura do lint-selftest.sh — STRICT reprova skip por tooling, nao regra sem fixture'
+    label: 'nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca'
+
+  - id: C_R45_COBERTURA_FALSA
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: open
+    verified_at: 2026-08-03
+    verified_against: 'varredura de links markdown vivos p/ caminho core-privado fora de docs/knowledge-base'
+    label: 'a R45 cobre 1 de 9 raizes vendorizadas — 46 links vivos p/ caminho core-privado em 21 arquivos ficam fora; o baseline em 0 declara vitoria falsa'
+
+  - id: C_R43_KG_PENDURADO
+    node_type: claim
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: open
+    verified_at: 2026-08-03
+    verified_against: 'grep de kg: fora do escopo da R43 + test -e no alvo'
+    label: 'um kg: PENDURADO vivo e invisivel — inbox/_processed aponta p/ promocao-main-elenxo.kg.yaml que nao existe; e o MISSING-PATH HARD que a R43 existe p/ emitir'
+
+  - id: C_DOCSTRINGS_STALE
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: open
+    verified_at: 2026-08-03
+    verified_against: 'contagem real dos baselines vs o que o docstring afirma'
+    label: 'R45 diz "nasce com 101" (baseline tem 0) e R44 diz "tudo em HUMAN" (15 classes, 1 MONITORED) — declarado != verificado DENTRO da propria guarda'
+
+  - id: E_R47_MORTA_SOB_ONLY
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'MUT: --only na propria narracao dava silencio antes do fix, acusa id inexistente depois'
+    label: 'a R47 comparava ONLY_PATH (absoluto) com caminho relativo — no-op SILENCIOSO no modo que o pre-commit e o selftest usam; fixture dela passaria como good para sempre'
+
+  - id: D_CORRIGIR_R47
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-08-03
+    verified_against: 'lint-artifacts.sh — comparacao agora absoluta, MUT versionado no relato'
+    trace: ".claude/validation/lint-artifacts.sh:check_kg_narration_valid"
+    label: 'corrigir a comparacao da R47 para absoluto, como as 15 irmas ja faziam — uma palavra'
+
+  - id: E_R52_NUMEROS_ERRADOS
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'contagem de grafos distintos citados em kg: no escopo da R43'
+    label: 'a 1a redacao do docstring da R52 dizia 18/33; o medido e 11/40 — regra nascida hoje ja carregava numero nao-reproduzivel, o defeito que ela existe p/ pegar'
+
+  - id: A_MAPA
+    node_type: artifact
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'arquivo commitado com contagens medidas do filesystem'
+    trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
+    label: 'o mapa das guardas — vista markdown deste grafo, baseline para a proxima revisao'
+
+edges:
+  - from: C_LACUNA_E_COBERTURA
+    to: Q_GUARDAS_COERENTES
+    edge_type: SUPPORTS
+  - from: E_GUARDA_HARD_INVISIVEL
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_GUARDA_SOFT_INVISIVEL
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_RADAR_SEM_CADENCIA
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_RULES_SEM_GUARDA
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_RADAR_SEM_CADENCIA
+    to: D_PROMOVER_COGNITIVO_A_MECANICO
+    edge_type: CAUSES
+  - from: C_RULE_NAO_BASTA
+    to: D_PROMOVER_COGNITIVO_A_MECANICO
+    edge_type: SUPPORTS
+  - from: Q_SEV_COSMETICO
+    to: E_SEV_LOAD_BEARING
+    edge_type: CAUSES
+  - from: E_SEV_LOAD_BEARING
+    to: D_TAG_OBRIGATORIO
+    edge_type: SUPPORTS
+  - from: E_R16_JA_COBRE
+    to: C_INDEX_SEM_COBERTURA
+    edge_type: REFUTES
+  - from: E_FIX_PIORA_23_REGRAS
+    to: C_PARSER_PREVINE_MULTILINHA
+    edge_type: REFUTES
+  - from: C_R52_SOBREPOE_R43
+    to: D_PROMOVER_COGNITIVO_A_MECANICO
+    edge_type: CONSTRAINS
+  - from: A_MAPA
+    to: C_LACUNA_E_COBERTURA
+    edge_type: TRACES_TO
+  - from: C_DUPLICACAO_4_CLONES
+    to: Q_GUARDAS_COERENTES
+    edge_type: SUPPORTS
+  - from: C_R28_R46_DOUBLE_FIRING
+    to: Q_GUARDAS_COERENTES
+    edge_type: SUPPORTS
+  - from: C_SEM_GATE_REGRA_SEM_TESTE
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: C_R45_COBERTURA_FALSA
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: C_R43_KG_PENDURADO
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: C_DOCSTRINGS_STALE
+    to: Q_GUARDAS_COERENTES
+    edge_type: SUPPORTS
+  - from: E_R47_MORTA_SOB_ONLY
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_R47_MORTA_SOB_ONLY
+    to: D_CORRIGIR_R47
+    edge_type: CAUSES
+  - from: E_R52_NUMEROS_ERRADOS
+    to: C_R52_SOBREPOE_R43
+    edge_type: CONSTRAINS

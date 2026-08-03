@@ -65,3 +65,7 @@ kg	kg-domain/warn-domain-gaps.kg.yaml	-	pass
 kg	kg-domain/bad-integrity.kg.yaml	-	fail
 lint	branch-distinction/bad-no-clause.md	.claude/agents/development	bad	cláusula de distinção
 lint	branch-distinction/good-with-clause.md	.claude/agents/development	good	
+lint	r53-rules-pathscoped/bad-no-paths.md	.claude/rules	bad	sem 'paths:' no frontmatter
+lint	r53-rules-pathscoped/bad-empty-paths.md	.claude/rules	bad	declarado mas VAZIO
+lint	r53-rules-pathscoped/bad-dead-glob.md	.claude/rules	bad	NUNCA carrega
+lint	r53-rules-pathscoped/good-live-glob.md	.claude/rules	good	
