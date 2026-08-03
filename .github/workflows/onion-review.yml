@@ -73,13 +73,29 @@ jobs:
             --model claude-sonnet-5
             --max-turns 8
 
+      # ═══ O SINAL VERDADEIRO (2026-08-03) ═══
+      # `steps.review.outcome` MENTE: a action sai com exit 0 mesmo quando o agente morre —
+      # o log de uma run que custou 0 e deu 1 turno registra `outcome=success;conclusion=success`
+      # com `is_error: true` DENTRO do JSON. Enquanto o retry e o aviso abaixo liam o outcome,
+      # NENHUM DOS DOIS disparou uma única vez: medido em 4 runs de 2026-08-03 (03:34, 12:10,
+      # 17:11, 19:17), todas com is_error=true e ZERO comentários em qualquer PR. Onze PRs
+      # mergearam naquele dia sob um revisor que não leu nada, e o CI dizia verde.
+      # A leitura vive em script TESTÁVEL (o YAML não tem selftest — foi assim que a máquina
+      # quebrada sobreviveu meses parecendo sã).
+      - name: Veredito da 1ª tentativa (is_error, não o outcome)
+        id: v1
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
+        env:
+          EXEC_FILE: ${{ steps.review.outputs.execution_file }}
+        run: bash .claude/validation/review-verdict.sh "${EXEC_FILE}" >> "${GITHUB_OUTPUT}"
+
       # RETRY (2026-07-14): o crash do revisor é TRANSITÓRIO (rate-limit/overload sob carga —
       # diagnosticado: o mesmo diff que "sempre crashava" passa quando o CI está quieto, e
       # revisa liso localmente). Logo, uma 2ª tentativa quase sempre vira revisão REAL, em vez
-      # de soft-passar sem revisar. Só roda se a 1ª crashou. Mesma config do step acima.
-      - name: Revisor Onion (retry — só se a 1ª tentativa crashou)
+      # de soft-passar sem revisar. Só roda se a 1ª NÃO revisou. Mesma config do step acima.
+      - name: Revisor Onion (retry — só se a 1ª tentativa não revisou)
         id: review2
-        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.review.outcome == 'failure' }}
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.v1.outputs.revisou != 'true' }}
         continue-on-error: true
         # PINADO em v1.0.171 (2026-07-11, último release pré-07-14) — experimento:
         # a @v1 (tag móvel) lançou v1.0.172/173/174 em 07-14, mesmo dia em que o
@@ -109,18 +125,48 @@ jobs:
             --model claude-sonnet-5
             --max-turns 8
 
-      # Só soft-passa se AMBAS as tentativas crasharam (o crash persistiu além do transitório).
-      # Se a 2ª tentativa não rodou (a 1ª passou) ou passou, este step é pulado.
-      # avisa de forma VISÍVEL (annotation + comentário no PR) e passa verde. Um crash produz
-      # ZERO veredito → não bloqueia; mas o humano vê que o PR não foi revisado semanticamente.
-      - name: Aviso se o revisor crashou nas 2 tentativas (soft-pass, não bloqueia)
-        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.review.outcome == 'failure' && steps.review2.outcome == 'failure' }}
+      - name: Veredito da 2ª tentativa (is_error, não o outcome)
+        id: v2
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.review2.outcome != 'skipped' }}
+        env:
+          EXEC_FILE: ${{ steps.review2.outputs.execution_file }}
+        run: bash .claude/validation/review-verdict.sh "${EXEC_FILE}" >> "${GITHUB_OUTPUT}"
+
+      # RASTRO SEMPRE (2026-08-03) — o pedido que originou esta correção: "verde revisado" e
+      # "verde sem revisar" eram INDISTINGUÍVEIS de fora. Este step roda nos dois desfechos e
+      # carimba o resumo do job, então o estado da revisão é legível sem abrir log nenhum.
+      - name: Rastro do veredito (o verde diz QUAL verde é)
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
+        env:
+          R1: ${{ steps.v1.outputs.revisou }}
+          M1: ${{ steps.v1.outputs.motivo }}
+          T1: ${{ steps.v1.outputs.turnos }}
+          R2: ${{ steps.v2.outputs.revisou }}
+          M2: ${{ steps.v2.outputs.motivo }}
+          T2: ${{ steps.v2.outputs.turnos }}
+        run: |
+          if [ "${R1}" = "true" ] || [ "${R2}" = "true" ]; then
+            turnos="${T1}"; [ "${R2}" = "true" ] && turnos="${T2}"
+            echo "::notice::onion-review REVISOU este PR (${turnos} turnos). Ausência de comentários = nada a apontar."
+            echo "✅ **onion-review revisou** — ${turnos} turnos. Sem comentários significa **nada a apontar**." >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "⚠️ **onion-review NÃO revisou** — 1ª: \`${M1:-nao-rodou}\` · 2ª: \`${M2:-nao-rodou}\`. Este verde é soft-pass." >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
+      # Só soft-passa se NENHUMA das tentativas revisou. Avisa de forma VISÍVEL (annotation +
+      # comentário no PR) e passa verde: um crash produz ZERO veredito sobre o código, então
+      # bloquear o PR puniria o autor pela falha do bot. Mas o humano VÊ que não houve revisão.
+      # A condição lê o veredito (`revisou`), nunca o outcome do step — ver o bloco do v1.
+      - name: Aviso se nenhuma tentativa revisou (soft-pass, não bloqueia)
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.v1.outputs.revisou != 'true' && steps.v2.outputs.revisou != 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          M1: ${{ steps.v1.outputs.motivo }}
+          M2: ${{ steps.v2.outputs.motivo }}
         run: |
-          echo "::warning::onion-review não pôde executar após 2 tentativas (crash do agente / is_error) — nenhum veredito produzido. Revise manualmente. O gate determinístico (onion-validate) segue valendo."
+          echo "::warning::onion-review não revisou após 2 tentativas (1ª: ${M1:-nao-rodou} · 2ª: ${M2:-nao-rodou}) — nenhum veredito produzido. Revise manualmente. O gate determinístico (onion-validate) segue valendo."
           gh pr comment "${{ github.event.pull_request.number }}" \
-            --body "⚠️ **onion-review não pôde executar após 2 tentativas** (crash do agente, \`is_error\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: um crash persistente do revisor não bloqueia o PR (resiliência + retry 2026-07-14)._" \
+            --body "⚠️ **onion-review não revisou após 2 tentativas** (1ª: \`${M1:-nao-rodou}\` · 2ª: \`${M2:-nao-rodou}\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: falha persistente do revisor não bloqueia o PR (resiliência 2026-07-14 + leitura do sinal correto 2026-08-03)._" \
             || echo "::warning::não consegui postar o comentário de aviso (segue soft-pass)"
 
       - name: Aviso — revisor Onion pulado (sem ANTHROPIC_API_KEY)
