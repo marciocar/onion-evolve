@@ -1,0 +1,103 @@
+name: Onion Review — Diagnóstico (runner × API)
+
+# POR QUE ESTE WORKFLOW EXISTE
+# O onion-review falha com uma assinatura estável desde 2026-07-14: init OK → ~180s de espera na
+# PRIMEIRA inferência → `is_error: true`, `num_turns: 1`, `total_cost_usd: 0`, sem mensagem.
+#
+# Três hipóteses já MORRERAM por medição (2026-08-03):
+#   · versão da action — testada nas duas pontas, v1.0.171 (11/07) e v1.0.183 (25/07): falha igual;
+#   · modelo — `claude-sonnet-5` responde HTTP 200 fora do CI;
+#   · credencial — 401 volta INSTANTÂNEO; este caso pendura ~180s.
+#
+# Sobra o eixo **runner × API**, e ele se parte com um teste cru: se um `curl` simples, de DENTRO
+# do runner, com o MESMO secret, responder rápido, então rede e chave estão sãs e o hang é da
+# camada action/SDK. Se pendurar, é egress. Se der 401/400 na hora, é credencial — e aí a
+# assinatura de 180s precisaria de outra explicação.
+#
+# NUNCA imprime o valor do secret: só código HTTP, tempos e `error.type` da resposta.
+#
+# Roda só quando ELE MESMO muda (ou sob demanda) — diagnóstico não é imposto a todo PR.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/onion-review-diagnose.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ github.event.pull_request.head.repo.fork == false || github.event_name == 'workflow_dispatch' }}
+    env:
+      HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - name: O secret existe?
+        run: |
+          echo "ANTHROPIC_API_KEY presente: ${HAS_KEY}"
+          echo "### Diagnóstico onion-review — runner × API" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "- secret presente: \`${HAS_KEY}\`" >> "${GITHUB_STEP_SUMMARY}"
+
+      # (1) ALCANCE — a rota até a API existe? Separa DNS, TCP e TLS para que "não conecta" não
+      #     se confunda com "conecta e a resposta demora". Sem chave: só a camada de transporte.
+      - name: 1. Alcance de rede (DNS · TCP · TLS), sem credencial
+        run: |
+          set +e
+          out="$(curl -sS -o /dev/null --max-time 30 \
+            -w 'http=%{http_code} dns=%{time_namelookup}s conn=%{time_connect}s tls=%{time_appconnect}s total=%{time_total}s\n' \
+            https://api.anthropic.com/v1/models 2>&1)"
+          rc=$?
+          echo "curl rc=${rc} :: ${out}"
+          # rc 28 = timeout. É O ACHADO se aparecer aqui: significa que o runner não fala com a API.
+          if [ "${rc}" -eq 28 ]; then
+            echo "- ❌ **TIMEOUT de transporte** — o runner não alcança a API: \`${out}\`" >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "- ✅ transporte OK (rc=${rc}) — \`${out}\`" >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
+      # (2) O CORTE DECISIVO — a MESMA chamada que o revisor faz, crua, com o MESMO secret.
+      #     Responde rápido? Então rede e chave estão sãs e o hang mora na action/SDK.
+      - name: 2. Inferência mínima com o secret do CI (o corte decisivo)
+        if: ${{ env.HAS_KEY == 'true' }}
+        env:
+          KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set +e
+          body=$(mktemp)
+          # --max-time 120: se pendurar como o revisor (~180s), o timeout PROVA o hang aqui também.
+          code="$(curl -sS -o "${body}" --max-time 120 -w '%{http_code} %{time_total}' \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: ${KEY}" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "content-type: application/json" \
+            -d '{"model":"claude-sonnet-5","max_tokens":16,"messages":[{"role":"user","content":"responda apenas: ok"}]}' 2>&1)"
+          rc=$?
+          http="${code%% *}"; secs="${code##* }"
+          # Só metadados do erro — NUNCA o corpo inteiro, nunca a chave.
+          etype="$(jq -r '.error.type // .type // "—"' "${body}" 2>/dev/null || echo '—')"
+          emsg="$(jq -r '.error.message // "—"' "${body}" 2>/dev/null | head -c 200 || echo '—')"
+          echo "rc=${rc} http=${http} tempo=${secs}s tipo=${etype}"
+          echo "mensagem: ${emsg}"
+          if [ "${rc}" -eq 28 ]; then
+            echo "- ❌ **HANG confirmado no curl cru** (>120s) → o eixo é REDE/EGRESS, não a action" >> "${GITHUB_STEP_SUMMARY}"
+          elif [ "${http}" = "200" ]; then
+            echo "- ✅ **HTTP 200 em ${secs}s com o secret do CI** → rede e chave SÃS. O hang de ~180s do revisor é da camada **action/SDK**, não daqui." >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "- ⚠️ **HTTP ${http}** em ${secs}s — tipo \`${etype}\`: ${emsg}" >> "${GITHUB_STEP_SUMMARY}"
+          fi
+          rm -f "${body}"
+
+      - name: 3. Veredito legível
+        if: always()
+        run: |
+          {
+            echo ""
+            echo "**Como ler:** um 200 rápido aqui refuta rede e credencial de uma vez — sobra a"
+            echo "camada action/SDK. Um timeout aqui move o eixo para egress do runner. Um 401/400"
+            echo "instantâneo aponta credencial, e aí a assinatura de ~180s do revisor precisaria"
+            echo "de outra explicação."
+          } >> "${GITHUB_STEP_SUMMARY}"
