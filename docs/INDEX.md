@@ -1,6 +1,6 @@
 # 📚 Índice Central de Documentação
 
-> **Última atualização**: 2026-07-13 | **Gerado por**: `/docs:build-index` | **Contagens**: rescaneadas do filesystem
+> **Última atualização**: 2026-08-03 | **Gerado por**: `/docs:build-index` | **Contagens**: rescaneadas do filesystem
 
 Bem-vindo ao índice central de documentação do projeto. Este documento serve como hub de navegação para toda a documentação disponível.
 
@@ -10,51 +10,51 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- 🤖 **102 comandos invocáveis** Claude Code em 10 categorias + root (+ 24 fragmentos compartilhados em `common/` e 10 READMEs de categoria)
+- 🤖 **102 comandos invocáveis** Claude Code em 10 categorias + root (+ 26 fragmentos compartilhados em `common/` e 11 READMEs de categoria)
 - 🎯 **51 agentes de IA especializados** em 9 categorias
-- 🧩 **8 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes; `onion-{engineering,product,compliance}-context` — resolvers de SSOT por vertical)
+- 🧩 **11 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes; `onion-{engineering,product,compliance}-context` — resolvers de SSOT por vertical; `onion-wizard` / `onion-onboarding` — a Condução (FAZER × CONHECER); `onion-retro` — retro/feedback como spec-as-code)
 - 📚 **87 Knowledge Bases** estruturadas para consumo por IA (+ KB viva `agentic-patterns/` + vertical `education/`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente com ativação automática
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
-- 🏗️ **Spec as Code Multi-Context** — business, technical, compliance (peer) + design (provisório, gated). O `business-context/` está **populado como dogfood** neste repo (seed real do Onion); technical/compliance seguem templates.
+- 🏗️ **Spec as Code Multi-Context** — business, technical, compliance (peer) + design (provisório, gated). Neste repo, `business-context/` **e** `technical-context/` estão **populados como dogfood** (seed real do Onion); `compliance-context/` segue template.
 
 ---
 
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **431 arquivos markdown** em `docs/`
-- **19 arquivos** em `docs/onion/` (Sistema Onion)
-- **81 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 80 KBs — conteúdo + (sub)categoria READMEs — + `index.md`)
-  - 42 em `concepts/` (Conceitos fundamentais)
+- **585 arquivos markdown** em `docs/`
+- **20 arquivos** em `docs/onion/` (Sistema Onion)
+- **88 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 87 KBs — conteúdo + (sub)categoria READMEs — + `index.md`)
+  - 48 em `concepts/` (Conceitos fundamentais)
   - 9 em `frameworks/` (Frameworks e metodologias)
   - 5 em `tools/` (Ferramentas, incl. Agent Skills e PostgreSQL)
   - 3 em `platforms/`, 3 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
   - 5 em `education/` (vertical educacional: theories/ + applications/, fonte≠derivação — 4 + 1 README)
-  - 10 em `agentic-patterns/` (KB viva do campo: harness/ai-strategies/field-observations — 6 docs + 4 READMEs)
+  - 11 em `agentic-patterns/` (KB viva do campo: harness/ai-strategies/field-observations — 7 docs + 4 READMEs)
   - 1 `index.md`
 - **6 arquivos** em `docs/meta-specs/` (Meta Especificações: 5 meta-specs L0 + `index.md`)
-- **9 arquivos** em `docs/materials/` (materiais derivados externos — Fase 4; inclui subpasta `cold-adopter-2026-07/`)
+- **10 arquivos** em `docs/materials/` (materiais derivados externos — Fase 4; inclui subpasta `cold-adopter-2026-07/`)
 - **7 arquivos** em `docs/applying/` (guias de aplicação: greenfield, legacy, regulado, adoption-lifecycle, manual, rescue-prompt)
 - **7 arquivos** em `docs/design-context/` (vertical de design, **provisória** — 4 md + 3 `tokens.json`; ver nota abaixo)
-- **90 arquivos** em `docs/analysis/` (análises ativas — ver [analysis/README.md](analysis/README.md) para o critério de retenção; só baselines/ADRs duráveis são navegados individualmente aqui)
-- **155 arquivos** em `docs/evolution/` (co-evolução: inbox/inbound, federation/{members,CHANGELOG,outbox}, RFCs)
-- **50 arquivos** em `docs/discussions/` (**Constelação de Estudos** — README + estudos isolados por slug; ver nota abaixo)
-- **Contextos spec-as-code peer**: `docs/business-context/` **populado como dogfood** (13 arquivos — seed real do Onion nas 4 camadas); `docs/technical-context/` e `docs/compliance-context/` seguem **templates** (1 `README.md` cada), populados no projeto-alvo por `/docs:build-*-docs`
+- **120 arquivos** em `docs/analysis/` (análises ativas — ver [analysis/README.md](analysis/README.md) para o critério de retenção; só baselines/ADRs duráveis são navegados individualmente aqui)
+- **246 arquivos** em `docs/evolution/` (co-evolução: inbox/inbound, federation/{members,CHANGELOG,outbox}, RFCs)
+- **57 arquivos** em `docs/discussions/` (**Constelação de Estudos** — README + estudos isolados por slug; ver nota abaixo)
+- **Contextos spec-as-code peer**: `docs/business-context/` (15 arquivos — 13 de conteúdo + README + index) e `docs/technical-context/` (9 arquivos — 6 de conteúdo + README/index) estão **populados como dogfood** (seed real do Onion); `docs/compliance-context/` segue **template** (só `README.md`), populado no projeto-alvo por `/docs:build-compliance-docs`
 
 ### Sistema Onion (`.claude/`)
 - **102 comandos invocáveis** Claude Code distribuídos em:
-  - 30 em `meta/` (meta-comandos, criadores, validação, orquestração de subagentes, frescor de KB e de contexto, federação, adoção e co-evolução)
+  - 35 em `meta/` (meta-comandos, criadores, validação, orquestração de subagentes, frescor de KB e de contexto, federação, adoção e co-evolução)
   - 21 em `product/` (gestão de produto e descoberta)
   - 12 em `engineer/` (engenharia e desenvolvimento)
   - 11 em `docs/` (geração e validação de documentação)
   - 6 em `validate/` (validação e testes — inclui subpastas `collab/`, `qa-points/`, `test-strategy/`)
   - 6 em `git/` (GitFlow e versionamento)
   - 3 em `test/` (unit, integration, e2e)
-  - 2 em `design/`, 1 em `development/`, 1 em `quick/`
+  - 3 em `design/`, 1 em `development/`, 1 em `quick/`
   - 3 no root: `onion.md`, `warm-up.md`, `catch-up.md`
-  - **não-invocáveis**: 24 fragmentos em `common/` (11 templates + 13 prompts, incl. READMEs) e 10 READMEs de categoria
-- **8 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`, `onion-engineering-context`, `onion-product-context`, `onion-compliance-context`)
+  - **não-invocáveis**: 26 fragmentos em `common/` (11 templates + 15 prompts, incl. READMEs) e 11 READMEs de categoria
+- **11 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`, `onion-engineering-context`, `onion-product-context`, `onion-compliance-context`, `onion-wizard`, `onion-onboarding`, `onion-retro`)
 - **51 agentes** IA distribuídos em:
   - 20 em `development/` (frontend, backend, infra, integrações)
   - 9 em `product/` (gestão e narrativa)
@@ -65,10 +65,10 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **431 arquivos** de documentação markdown em `docs/`
-- **102 comandos invocáveis** em 10 categorias + root (+ 24 fragmentos `common/` + 10 READMEs de categoria)
+- **585 arquivos** de documentação markdown em `docs/`
+- **102 comandos invocáveis** em 10 categorias + root (+ 26 fragmentos `common/` + 11 READMEs de categoria)
 - **51 agentes** especializados em 9 categorias
-- **8 skills** (`.claude/skills/`) · **87 Knowledge Bases**
+- **11 skills** (`.claude/skills/`) · **87 Knowledge Bases**
 
 ---
 
@@ -78,7 +78,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 docs/
 ├── INDEX.md                    # Este arquivo (hub central)
 │
-├── onion/                      # Sistema Onion (19 arquivos)
+├── onion/                      # Sistema Onion (20 arquivos)
 │   ├── index.md                # Índice da seção
 │   ├── inventory.md            # SSOT de contagens (gerado por /meta:inventory)
 │   ├── commands-guide.md       # Guia completo de comandos
@@ -99,8 +99,8 @@ docs/
 │   ├── ESPERANTO.md            # documento do framework
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
-├── knowledge-base/             # Knowledge Bases (74 arquivos, incl. index)
-│   ├── concepts/               # Conceitos fundamentais (35 arquivos)
+├── knowledge-base/             # Knowledge Bases (88 arquivos, incl. index)
+│   ├── concepts/               # Conceitos fundamentais (48 arquivos)
 │   ├── frameworks/             # Frameworks e metodologias (9 arquivos)
 │   ├── platforms/              # Plataformas e tecnologias (3 arquivos)
 │   ├── tools/                  # Ferramentas e recursos (5 arquivos)
@@ -110,7 +110,7 @@ docs/
 │   ├── education/              # Vertical educacional — fonte≠derivação (4 arquivos + 1 README)
 │   │   ├── theories/           #   Fiel à fonte, zero Onion
 │   │   └── applications/       #   Nossas derivações — cita, nunca reescreve
-│   └── agentic-patterns/       # KB viva: IA + harness (6 docs + 4 READMEs)
+│   └── agentic-patterns/       # KB viva: IA + harness (7 docs + 4 READMEs)
 │       ├── harness/            #   Internals de harnesses específicos
 │       ├── ai-strategies/      #   Padrões de guiar o transformer
 │       └── field-observations/ #   Observações brutas do campo
@@ -123,7 +123,7 @@ docs/
 │   ├── code-standards.md        # Idioma, formatação, naming, estilo
 │   └── integrations.md          # Task Manager Abstraction, padrão de adapter, MCPs
 │
-├── business-context/            # Contexto de negócio — POPULADO (dogfood, 13 arquivos)
+├── business-context/            # Contexto de negócio — POPULADO (dogfood, 15 arquivos)
 │   ├── index.md · README.md · decisions.md  # hub + registro de decisões (D1–D6)
 │   ├── 01-customer/             # personas · journey · voice-of-customer
 │   ├── 02-product/              # strategy · metrics
@@ -139,9 +139,9 @@ docs/
 │   ├── governance/contrast-pairs.json  # SSOT das regras WCAG de contraste
 │   └── decisions/                # ADRs de design
 │
-├── analysis/                   # Análises ativas (90 arquivos; ver analysis/README.md — ciclo de vida e critério de retenção)
+├── analysis/                   # Análises ativas (120 arquivos; ver analysis/README.md — ciclo de vida e critério de retenção)
 │
-├── discussions/                 # Constelação de Estudos (50 arquivos)
+├── discussions/                 # Constelação de Estudos (57 arquivos)
 │   ├── README.md                # O padrão discussion-worktrees + modelo Constelação
 │   ├── _template/SEED.md        # copie para começar uma estrela nova
 │   └── <slug>/                  # cada estudo isolado (SEED.md Tier-0 + notas)
@@ -151,7 +151,7 @@ docs/
 │   ├── applying-legacy.md · applying-regulated.md
 │   └── onion-adoption-manual.md · rescue-prompt.md
 │
-├── materials/                  # Materiais derivados externos (Fase 4 — 9 arquivos)
+├── materials/                  # Materiais derivados externos (Fase 4 — 10 arquivos)
 │   ├── README.md               # Índice e guia de uso dos materiais
 │   ├── landing-page.md         # Esqueleto da landing page
 │   ├── manual-toc.md           # Sumário do manual técnico
@@ -161,7 +161,7 @@ docs/
 │   ├── press-kit.md            # One-pager, FAQ imprensa, bio, citações
 │   └── cold-adopter-2026-07/   # Kit de adotante frio (concierge + one-pager KG)
 │
-├── evolution/                   # Co-evolução core↔derivados (doc-bridge — 155 arquivos)
+├── evolution/                   # Co-evolução core↔derivados (doc-bridge — 246 arquivos)
 │   ├── README.md                # Modelo dos 3 fluxos (downstream/upstream/handoff)
 │   ├── trust-log.md             # Ledger de confiança da federação
 │   ├── trial-object-led-discovery-fitting.md
@@ -172,9 +172,15 @@ docs/
 ├── sdaal/                       # Specification-Driven AI Abstraction Layer
 │   └── sdaal.md
 │
-└── technical-context/ · compliance-context/
-    # 2 contextos spec-as-code PEER — templates no framework (só README.md),
-    # populados no projeto-alvo por /docs:build-*-docs
+├── technical-context/           # Contexto técnico — POPULADO (dogfood, 9 arquivos)
+│   ├── 01-core/                 # project-charter + adr/
+│   ├── 02-ai-context/           # ai-development-guide · codebase-guide
+│   ├── 03-domain/               # business-logic
+│   └── 04-workflow/             # architecture-challenges · contributing
+│
+└── compliance-context/
+    # contexto spec-as-code PEER — template no framework (só README.md),
+    # populado no projeto-alvo por /docs:build-compliance-docs
 ```
 
 ---
@@ -225,7 +231,7 @@ docs/
 
 Knowledge Bases estruturadas para consumo por IA e referência técnica — índice completo e sempre fresco em **[knowledge-base/index.md](knowledge-base/index.md)**. Resumo por categoria:
 
-- **[Conceitos Fundamentais](knowledge-base/index.md)** (35) — Domain Context Lifecycle, Task Manager Abstraction, Spec-as-Code/Driven Development, SDAAL, Agent Orchestration, Onion Dogfooding Doctrine, Onion Engine Economy, Onion Relation Vocabulary, Onion Working Method, Knowledge Graph SDAAL, Secret Handling (Agent), Federation Usage Modes, Onion Federation and Adoption, Fonte≠Derivação, Session Memory Lifecycle, Decision Snapshot Retention, Discussion-Worktrees, Constellation of Studies, Authorization Layers, e mais
+- **[Conceitos Fundamentais](knowledge-base/index.md)** (48) — Domain Context Lifecycle, Task Manager Abstraction, Spec-as-Code/Driven Development, SDAAL, Agent Orchestration, Onion Dogfooding Doctrine, Onion Engine Economy, Onion Relation Vocabulary, Onion Working Method, Knowledge Graph SDAAL, Secret Handling (Agent), Federation Usage Modes, Onion Federation and Adoption, Fonte≠Derivação, Session Memory Lifecycle, Decision Snapshot Retention, Discussion-Worktrees, Constellation of Studies, Authorization Layers, e mais
 - **[Frameworks e Metodologias](knowledge-base/index.md)** (9) — GitFlow, Story Points, Framework de Testes, Collaborative Testing, Test Strategy Scoring
 - **[Plataformas](knowledge-base/index.md)** (3) — Gamma.App API, Git Ledger as Working Dir, Runflow
 - **[Ferramentas](knowledge-base/index.md)** (5) — Agent Skills, Claude Code Commands Best Practices, Docker, PostgreSQL, Whisper
@@ -233,7 +239,7 @@ Knowledge Bases estruturadas para consumo por IA e referência técnica — índ
 - **[Architectures](knowledge-base/index.md)** (1) — C4 + ADR Patterns
 - **[Meta](knowledge-base/index.md)** (2) — Command Creation Patterns, Onion Framework Identity
 - **[Education](knowledge-base/index.md)** (4 + 1 README) — vertical `onion-education`: PLEA/SRL (theories/, fiel à fonte) + diretrizes/pontes (applications/, nossa derivação)
-- **[Agentic Patterns](knowledge-base/index.md)** (6 docs + 4 READMEs, KB viva) — internals de harness, estratégias de guiar o transformer, observações brutas do campo
+- **[Agentic Patterns](knowledge-base/index.md)** (7 docs + 4 READMEs, KB viva) — internals de harness, estratégias de guiar o transformer, observações brutas do campo
 
 **Localização:** `docs/knowledge-base/`
 
@@ -262,7 +268,7 @@ Contexto de negócio spec-as-code do **próprio Onion** — semeado por `/docs:b
 - **[Registro de Decisões (D1–D6)](business-context/decisions.md)** - Decisões estratégicas em aberto (modelo comercial, preço, comprador, branding) — mecanismo de rastreio spec-as-code
 - Camadas: [01-customer](business-context/01-customer/personas.md) · [02-product](business-context/02-product/strategy.md) · [03-market](business-context/03-market/competitive-landscape.md) · [04-operations](business-context/04-operations/sales-process.md)
 
-**Localização:** `docs/business-context/` · **Peers (templates):** `docs/technical-context/`, `docs/compliance-context/`
+**Localização:** `docs/business-context/` · **Peers:** `docs/technical-context/` (também populado como dogfood) · `docs/compliance-context/` (template)
 
 ---
 
@@ -584,7 +590,7 @@ Este índice é gerado automaticamente pelo comando `/docs/build-index`.
 /docs/build-index knowledge-base   # Reconstruir índice da seção knowledge-base
 ```
 
-**Última atualização:** 2026-07-13 (`/docs:build-index` — contagens reescaneadas do filesystem: docs/ 327→431 md; knowledge-base 67→74 [concepts 28→35, agentic-patterns 6→10]; analysis 82→90; evolution 131→155; materials 7→9 [+`cold-adopter-2026-07/`]; onion/ 18→19 [+`remote-parallel-operation.md`]; **`business-context/` populado como dogfood — 13 arquivos**; **nova seção `discussions/` — 50 arquivos, Constelação de Estudos**. SSOT `/meta:inventory`: 96 comandos, 51 agentes, 8 skills, 73 KBs — inalterados)
+**Última atualização:** 2026-08-03 (`/docs:build-index` — contagens reescaneadas do filesystem: docs/ 431→585 md; knowledge-base 81→88 [concepts 42→48, agentic-patterns 10→11]; analysis 90→120; evolution 155→246; discussions 50→57; materials 9→10; onion/ 19→20; business-context 13→15; **`technical-context/` reclassificado — estava descrito como template, está POPULADO (9 arquivos)**. Resync com a SSOT `/meta:inventory`: **102 comandos** [meta 30→35, design 2→3], 51 agentes, **11 skills** [8→11: +`onion-wizard`, +`onion-onboarding`, +`onion-retro`], **87 KBs**; `common/` 24→26 fragmentos, READMEs de categoria 10→11)
 **Mantido por:** Sistema Onion
 
 ---
