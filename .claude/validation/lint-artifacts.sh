@@ -298,7 +298,7 @@ check_line_limits() {
     local lines
     lines=$(wc -l < "${agent}")
     if [ "${lines}" -gt 1500 ]; then
-      violation "HARD" "${agent}" "agente com ${lines} linhas (limite: 1500)"
+      violation "HARD" "${agent}" "agente com ${lines} linhas (limite: 1500) — extraia para KB, skill ou sub-agente delegável (agents.md §4)"
     fi
   done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 
@@ -307,7 +307,7 @@ check_line_limits() {
     local lines
     lines=$(wc -l < "${cmd}")
     if [ "${lines}" -gt 800 ]; then
-      violation "HARD" "${cmd}" "comando com ${lines} linhas (limite: 800)"
+      violation "HARD" "${cmd}" "comando com ${lines} linhas (limite: 800) — extraia para common/templates, common/prompts, KB ou sub-comando (commands.md §5)"
     fi
   done < <(
     _find "${CLAUDE_DIR}/commands" -name "*.md" \

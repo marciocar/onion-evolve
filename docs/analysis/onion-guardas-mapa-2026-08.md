@@ -38,12 +38,18 @@ visibilidade**:
 
 ---
 
-## 2. As REGRAS numeradas — 53
+## 2. As REGRAS numeradas — 52
 
 ```bash
-grep -cE '^# REGRA [0-9]+ —' .claude/validation/lint-artifacts.sh     # 53
+grep -cE '^# REGRA [0-9]+ —' .claude/validation/lint-artifacts.sh     # 52
 bash .claude/validation/rules-registry.sh                             # gera lint-rules.md
 ```
+
+> **Numeração 1–53 com a 4 AUSENTE.** A REGRA 4 (`mcp_onion-orchestrator`) foi **aposentada** em
+> 2026-08-03 — guardava um token que nunca existiu como uso real. O número **não se reutiliza**;
+> a nota de aposentadoria vive no lugar dela em `lint-artifacts.sh`.
+> *(Este bloco dizia "53" — inclusive ao lado do comando que o mede. Comando de re-medição com
+> resultado errado documentado ao lado é pior que número solto: ensina a não conferir.)*
 
 **SSOT navegável:** [`.claude/validation/lint-rules.md`](../../.claude/validation/lint-rules.md) —
 documento **gerado** por `rules-registry.sh` a partir dos docstrings. Nunca editado à mão; a
@@ -51,12 +57,14 @@ REGRA 39 mantém a paridade.
 
 | Severidade | Regras |
 |---|---:|
-| `[HARD]` | 42 |
+| `[HARD]` | 41 |
 | `[SOFT]` | 6 |
 | `[HARD + SOFT]` | 5 |
 
-Numeração **sem lacunas e sem duplicatas** (1–53). A ordem física no arquivo **não** é numérica —
-as regras estão agrupadas por afinidade temática.
+Numeração **sem duplicatas**, faixa 1–53 com **uma lacuna deliberada**: a **4 foi aposentada** e o
+número **não se reutiliza** (reciclar número faria toda referência histórica a "REGRA 4" apontar
+para outra guarda). A ordem física no arquivo **não** é numérica — as regras estão agrupadas por
+afinidade temática.
 
 ### 2.1 As 5 catracas de clareza do gerador
 
@@ -80,7 +88,7 @@ O `rules-registry.sh` falha com **exit 2** — regra nova não entra muda:
 
 O parser associa a cada regra o **primeiro** `nome() {` após o header. Em regras cujo header
 antecede um *helper*, ou que **delegam** a script externo, a severidade vem do tag, não do corpo.
-Medido em 2026-08-03: **as duas fontes concordam em todas as 53**; nenhuma sai indefinida.
+Medido em 2026-08-03: **as duas fontes concordam em todas as 52**; nenhuma sai indefinida.
 Sem dano observado → `gated-until-trigger`: corrigiu-se a **promessa** do cabeçalho, não o parser.
 
 ---
@@ -179,17 +187,47 @@ done
 ## 6. Cobertura de teste
 
 ```bash
-grep -vcE '^#|^$|^kind' .claude/validation/fixtures/manifest.tsv    # 57 fixtures
-ONION_SELFTEST_STRICT=1 bash .claude/validation/lint-selftest.sh    # 542 asserções
+grep -vcE '^#|^$|^kind' .claude/validation/fixtures/manifest.tsv    # 83 fixtures
+ONION_SELFTEST_STRICT=1 bash .claude/validation/lint-selftest.sh    # 587 asserções
 ```
 
-O `lint-selftest.sh` roda **542 asserções**; no CI com `ONION_SELFTEST_STRICT=1`, um **skip por
+O `lint-selftest.sh` roda **587 asserções**; no CI com `ONION_SELFTEST_STRICT=1`, um **skip por
 tooling ausente** vira falha (asserção de capacidade — runner sem `jq` passaria em verde sem
 validar nada).
 
 **Limite honesto:** o STRICT **não** verifica se toda REGRA tem fixture. Não existe hoje um gate
-"regra sem teste". Das 53, o `manifest.tsv` cobre um subconjunto — as demais são exercidas por modos
+"regra sem teste". Das 52, o `manifest.tsv` cobre um subconjunto — as demais são exercidas por modos
 dedicados do selftest ou não são exercidas.
+
+### 6.1 O gate "regra sem teste" — desenhado, NÃO construído
+
+Este é o **fio aberto de maior valor** que a revisão deixou. O lastro são os 4 furos que ela achou
+(REGRAS 47, 48, 16, 14): nenhum **falhava** — todos **deixavam de existir** em silêncio, e só
+apareceram quando alguém escreveu a primeira fixture deles.
+
+**Por que não nasceu junto:** medir "quais regras têm teste" por **heurística** não funciona. Casar
+o nome da função no `lint-selftest.sh` deu **8 falsos positivos** — os modos dedicados
+(`run_*_selftests`) testam o comportamento sem citar a função. Catraca sobre heurística emite HARD
+falso, e ela roda em **todo adotante**, não só aqui.
+
+**O desenho que sobreviveu ao juiz adversarial** (2026-08-03) — vínculo **declarado**, não inferido:
+
+| Peça | Forma |
+|---|---|
+| campo `# testado-por:` no docstring | mesma máquina do `# previne:` já existente |
+| valores | `fixture:<dir>` · `selftest:<modo>` · `n/a:<código>` |
+| **catraca 6a** no `rules-registry.sh` | campo presente + valor com prefixo válido (exit 2) |
+| vocabulário de `n/a` | **fechado** — senão vira escape hatch universal e a catraca não mede nada |
+
+**Custo real medido:** 26 das 52 regras se resolvem por join automático (16 via `manifest.tsv`,
+10 por delegação). As **outras 26 exigem investigação caso a caso** — é aí que mora o trabalho, e é
+por isso que este item merece ciclo próprio, não o rabo de uma sessão.
+
+**Descartado com razão registrada** (o juiz reprovou, não é backlog esquecido):
+- *modo fraco da catraca* (verificar que existe "alguma" função) — **tautológico**: faria a métrica
+  subir sem a mensagem ficar mais útil.
+- *catraca com baseline/ratchet* — depende do 6a existir primeiro, e o baseline de uma catraca que
+  "só encolhe" é caro de errar no dia 1.
 
 ---
 

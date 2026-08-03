@@ -3281,6 +3281,12 @@ run_line_limits_selftests() {
   if printf '%s' "${out}" | grep -q 'limite: 800'; then
     record_pass "line-limits: (a) comando com 810+ linhas → HARD (limite 800)"
   else record_fail "line-limits: (a)" "não reprovou comando acima do teto: ${out}"; fi
+  # (a2) a mensagem TERMINA EM AÇÃO — cita a prescrição de fragmentação (commands.md §5).
+  #      Sem esta asserção a cura pode cair na próxima edição e a guarda volta a só ACUSAR,
+  #      que é o defeito que a revisão de 2026-08-03 mediu em 17 mensagens.
+  if printf '%s' "${out}" | grep -q 'commands.md §5'; then
+    record_pass "line-limits: (a2) mensagem cita a cura (commands.md §5), não só acusa"
+  else record_fail "line-limits: (a2)" "mensagem sem prescrição de fragmentação: ${out}"; fi
   rm -rf "$d"
 
   # (b) FRONTEIRA — comando logo ABAIXO do teto → silêncio. Sem este caso, (a) passaria
@@ -3304,6 +3310,23 @@ run_line_limits_selftests() {
   if printf '%s' "${out}" | grep -qE 'limite: (800|1500)'; then
     record_fail "line-limits: (c)" "810 linhas não deveria reprovar como AGENTE (teto 1500): ${out}"
   else record_pass "line-limits: (c) 810 linhas reprova como COMANDO mas passa como AGENTE — o teto é por TIPO"; fi
+  rm -rf "$d"
+
+  # (d) o ramo do AGENTE acima de 1500 nunca tinha teste POSITIVO — só o negativo (c). Sem ele,
+  #     a R5a podia ter parado de emitir e (c) seguiria verde (ele espera silêncio). Cobre os
+  #     dois eixos de uma vez: reprova E ensina a cura (agents.md §4).
+  d="$(_sandbox)"
+  mkdir -p "$d/.claude/agents/development"
+  { printf -- '---\nname: probe-agente-grande\ndescription: fixture de limite\nmodel: haiku\ncategory: development\ntools:\n  - Read\n---\n\n'
+    i=1; while [ "$i" -le 1510 ]; do printf 'Linha de corpo %s do agente sintetico.\n' "$i"; i=$((i+1)); done
+  } > "$d/.claude/agents/development/probe-agente-grande.md"
+  out="$(bash "$d/.claude/validation/lint-artifacts.sh" --only="$d/.claude/agents/development/probe-agente-grande.md" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'limite: 1500'; then
+    record_pass "line-limits: (d) agente com 1510 linhas → HARD (limite 1500)"
+  else record_fail "line-limits: (d)" "não reprovou agente acima do teto: ${out}"; fi
+  if printf '%s' "${out}" | grep -q 'agents.md §4'; then
+    record_pass "line-limits: (d2) mensagem cita a cura (agents.md §4), não só acusa"
+  else record_fail "line-limits: (d2)" "mensagem sem prescrição de fragmentação: ${out}"; fi
   rm -rf "$d"
 }
 
