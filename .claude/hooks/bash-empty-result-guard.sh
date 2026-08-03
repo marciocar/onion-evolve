@@ -98,7 +98,7 @@ esac
 
 # (3) erro engolido alimentando contagem/decisão — zero indistinguível de falha.
 if printf '%s' "$cmd" | grep -qE '2>/dev/null.*\|[[:space:]]*(wc[[:space:]]+-l|grep[[:space:]]+-c)'; then
-  add 'ERRO-ENGOLIDO-VIRANDO-NÚMERO: há `2>/dev/null` a montante de uma contagem — um comando que FALHOU e um objeto que NÃO EXISTE produzem o mesmo `0`. Mostre o stderr, ou conte com um comando que distinga (`find`, ou `|| echo FALHOU`).'
+  add 'ERRO-ENGOLIDO-VIRANDO-NÚMERO: há `2>/dev/null` a montante de uma contagem — um comando que FALHOU e um objeto que NÃO EXISTE produzem o mesmo `0`. Mostre o stderr, ou use o helper: `source .claude/utils/safe-count.sh` → `count_files <dir> <glob>` / `count_matches <padrão> <arquivos>` / `count_lines <arquivo>` (alvo ausente = exit 2 + stderr, nunca zero silencioso).'
 fi
 
 # (4) comando de DESCOBERTA com saída vazia — o caso que mais custou (o falso "não sobreviveu").

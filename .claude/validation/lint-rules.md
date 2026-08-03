@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**53 regras** no total — **47 HARD**, **11 SOFT**.
+**52 regras** no total — **46 HARD**, **11 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -63,7 +63,6 @@ Proibições estruturais, documentação no lugar certo e os contratos de confor
 
 | Nº | Regra | Severidade | O que previne |
 |---:|-------|:----------:|---------------|
-| 4 | Ausência de 'mcp_onion-orchestrator' em .claude/ | HARD | referência a um MCP orquestrador inexistente — runtime quebrado |
 | 7 | Nenhum agente pode ter name: contendo 'worker-orchestrator' | HARD | agente com o nome do anti-padrão 'worker-orchestrator' |
 | 18 | Sem documentação versionada sob .claude/docs/ | HARD | documentação versionada no lugar errado (.claude/docs/) |
 | 20 | Capability Contract: tier de conformance cumprido | HARD | componente reivindica um tier de conformance que não cumpre |

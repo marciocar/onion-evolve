@@ -212,7 +212,7 @@ check_agent_frontmatter() {
     grep -q "^tools:" "${agent}"       || missing="${missing} tools:"
 
     if [ -n "${missing}" ]; then
-      violation "HARD" "${agent}" "frontmatter de agente incompleto — campos ausentes:${missing}"
+      violation "HARD" "${agent}" "frontmatter de agente incompleto — campos ausentes:${missing} — copie do template .claude/commands/common/templates/agent-template.md"
     fi
   done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
@@ -225,7 +225,7 @@ check_agent_frontmatter() {
 check_command_description() {
   while IFS= read -r -d '' cmd; do
     if ! grep -q "^description:" "${cmd}"; then
-      violation "HARD" "${cmd}" "frontmatter de comando sem description:"
+      violation "HARD" "${cmd}" "frontmatter de comando sem description: — copie do template .claude/commands/common/templates/command-template.md"
     fi
   done < <(
     _find "${CLAUDE_DIR}/commands" -name "*.md" \
@@ -259,38 +259,28 @@ check_no_gpt4_model() {
     token="$(printf '%s' "${model_line}" | sed -E 's/^model:[[:space:]]*//' | awk '{print $1}')"
     case "${token}" in
       sonnet|opus|haiku|fable) : ;;
-      *) violation "HARD" "${file}" "campo model: fora da allowlist (sonnet|opus|haiku|fable): '${token}'" ;;
+      *) violation "HARD" "${file}" "campo model: fora da allowlist (sonnet|opus|haiku|fable): '${token}' — troque '${token}' por um destes quatro valores" ;;
     esac
   done < <(_find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
 }
 
 # ===========================================================================
-# REGRA 4 — Ausência de 'mcp_onion-orchestrator' em .claude/ [HARD]
-# previne: referência a um MCP orquestrador inexistente — runtime quebrado
-#           (referência a componente vaporware — nunca foi implementado)
+# [NUMERO APOSENTADO] A regra 4 foi REMOVIDA em 2026-08-03 — não reutilizar o número.
+#   (o cabeçalho não usa a forma "# REGRA N —" de propósito: o parser do
+#    rules-registry a capturaria como regra VIVA sem `previne:` e o gerador
+#    falharia com exit 2 — foi o que aconteceu na 1a tentativa desta remoção)
+#   Guardava a string `mcp_onion-orchestrator` — um componente VAPORWARE que nunca
+#   existiu como uso real. Medido: zero ocorrências vivas; a guarda precisava de 3
+#   exclusões auto-referenciais só para não se acusar (o próprio script, o registro
+#   gerado e as fixtures). Guardava contra algo que NUNCA aconteceu.
+#   A generalização proposta ("MCP declarado que não está no .mcp.json") foi avaliada
+#   e REFUTADA: não existe .mcp.json neste repo, e as duas generalizações naturais já
+#   são cobertas pela REGRA 12 (formato mcp__server__tool; MCP de provider no tools:).
+#   Sem espaço próprio e sem dano medido → gated-until-trigger manda remover.
+#   Contraste deliberado com as REGRAS 13/14 (dialeto Cursor), MANTIDAS na mesma
+#   rodada: aquele dialeto EXISTIU em 49 agentes e foi migrado — guarda contra o que
+#   já aconteceu é catraca de regressão, não profilaxia especulativa.
 # ===========================================================================
-check_no_mcp_onion_orchestrator() {
-  local self
-  self="$(realpath "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")"
-
-  local hits
-  # O próprio script contém a string como padrão de busca — excluí-lo da varredura.
-  # lint-rules.md (o registro GERADO) cita o TÍTULO desta regra, que contém a string:
-  # é documentação derivada legítima, não uma referência ao componente. Mesma classe de
-  # ironia da REGRA 36 (guarda que se pega na própria documentação) — exclusão dirigida.
-  hits=$(grep -rl "mcp_onion-orchestrator" "${CLAUDE_DIR}" 2>/dev/null \
-    | grep -v "^${self}$" \
-    | grep -v "/validation/lint-rules.md$" \
-    | grep -v "/validation/fixtures/" \
-    | grep -v "/.claude/worktrees/" || true)
-
-  if [ -n "${hits}" ]; then
-    while IFS= read -r file; do
-      violation "HARD" "${file}" "referência a 'mcp_onion-orchestrator' (componente vaporware)"
-    done <<< "${hits}"
-  fi
-}
-
 # ===========================================================================
 # REGRA 5 — Limites de linhas (por TIPO de artefato — tamanho saudável ≠ número universal) [HARD + SOFT]
 # previne: artefato inchado muito além do saudável para o seu tipo
@@ -331,7 +321,7 @@ check_line_limits() {
     local lines
     lines=$(wc -l < "${core}")
     if [ "${lines}" -gt 500 ]; then
-      violation "SOFT" "${core}" "núcleo SDAAL com ${lines} linhas (alvo: 500 — ver docs/sdaal/sdaal.md §7)"
+      violation "SOFT" "${core}" "núcleo SDAAL com ${lines} linhas (alvo: 500) — fragmente via progressive disclosure (sdaal.md §14.5)"
     fi
   done < <(
     _find "${CLAUDE_DIR}/utils" \
@@ -380,7 +370,7 @@ check_kebab_case_filenames() {
     local name_part="${base%.*}"  # remove extensão para checagem
 
     if echo "${name_part}" | grep -qE '[A-Z]| |_'; then
-      violation "SOFT" "${file}" "filename não segue kebab-case (maiúsculas, espaço ou underscore em '${base}')"
+      violation "SOFT" "${file}" "filename não segue kebab-case (maiúsculas, espaço ou underscore em '${base}') — renomeie '${base}' para kebab-case"
     fi
   done < <(_find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
 }
@@ -393,7 +383,7 @@ check_kebab_case_filenames() {
 check_no_worker_orchestrator_agent() {
   while IFS= read -r -d '' agent; do
     if grep -q "^name:.*worker-orchestrator" "${agent}"; then
-      violation "HARD" "${agent}" "agente com name: 'worker-orchestrator' viola §4.2 da arquitetura"
+      violation "HARD" "${agent}" "agente com name: 'worker-orchestrator' viola §4.2 da arquitetura — mova a orquestração para skill/comando (onion-orchestration / /meta:orchestrate), não para um agente"
     fi
   done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
@@ -462,7 +452,7 @@ check_branch_agent_distinction() {
   while IFS= read -r -d '' agent; do
     if grep -qE "^name:[[:space:]]*branch-" "${agent}"; then
       if ! grep -qiE 'Diferença vs|DIFF-SCOPED' "${agent}"; then
-        violation "SOFT" "${agent}" "agente branch-* sem cláusula de distinção ('Diferença vs'/'DIFF-SCOPED') — contrato de roteamento por description incompleto (achado D2, evolve 2026-07-17)"
+        violation "SOFT" "${agent}" "agente branch-* sem cláusula de distinção ('Diferença vs'/'DIFF-SCOPED') — contrato de roteamento por description incompleto (achado D2, evolve 2026-07-17) — adicione na description uma frase 'Diferença vs @<par-geral>'"
       fi
     fi
   done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
@@ -506,7 +496,7 @@ check_rules_pathscoped() {
   while IFS= read -r -d '' rule; do
     # (a) frontmatter com `paths:` — sem isso a regra nunca é elegível a carregar
     if ! grep -qE '^paths:' "${rule}"; then
-      violation "HARD" "${rule}" "regra path-scoped sem 'paths:' no frontmatter — nunca carrega (regra que não chega ao modelo é indistinguível de regra ausente)"
+      violation "HARD" "${rule}" "regra path-scoped sem 'paths:' no frontmatter — nunca carrega (regra que não chega ao modelo é indistinguível de regra ausente) — adicione 'paths:' com ao menos um glob no frontmatter da regra"
       continue
     fi
     # (b) ao menos um glob declarado
@@ -515,7 +505,7 @@ check_rules_pathscoped() {
     # ramo errado. Achado no dogfood da própria regra, 2026-08-03.
     globs="$(awk '/^---[[:space:]]*$/{f=0;next} /^paths:/{f=1;next} /^[a-zA-Z_-]+:/{f=0} f&&/^[[:space:]]*-[[:space:]]+/{gsub(/^[[:space:]]*-[[:space:]]+/,""); gsub(/^["'"'"']|["'"'"']$/,""); print}' "${rule}")"
     if [ -z "${globs}" ]; then
-      violation "HARD" "${rule}" "'paths:' declarado mas VAZIO — nenhum glob, a regra nunca carrega"
+      violation "HARD" "${rule}" "'paths:' declarado mas VAZIO — nenhum glob, a regra nunca carrega — adicione ao menos um glob sob 'paths:' (ex.: '  - \"**/*.sh\"')"
       continue
     fi
     # (c) ao menos um glob casa arquivo RASTREADO — glob que não casa nada é regra morta
@@ -525,7 +515,7 @@ check_rules_pathscoped() {
       if _rule_glob_matches "${g}"; then matched=1; break; fi
     done <<< "${globs}"
     if [ "${matched}" -eq 0 ]; then
-      violation "HARD" "${rule}" "nenhum glob de 'paths:' casa arquivo rastreado ($(printf '%s' "${globs}" | tr '\n' ' ')) — a regra existe no disco e NUNCA carrega"
+      violation "HARD" "${rule}" "nenhum glob de 'paths:' casa arquivo rastreado ($(printf '%s' "${globs}" | tr '\n' ' ')) — a regra existe no disco e NUNCA carrega — corrija o glob para casar um arquivo real rastreado (git ls-files), ou remova a regra se obsoleta"
     fi
   done < <(_find "${rules_dir}" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
@@ -697,8 +687,8 @@ PY
 )"
   for v in ${refs}; do
     [ -n "${v}" ] || continue
-    [ -f "${vdir}/${v}.manifest.sh" ] || violation "HARD" "utils/marketplace/roles.yaml" "papel referencia vertical '${v}' sem manifesto em verticals/${v}.manifest.sh"
-    grep -q "\"${v}\"" "${mkt}" 2>/dev/null || violation "HARD" "utils/marketplace/roles.yaml" "vertical '${v}' referenciado em roles.yaml não registrado no marketplace.json"
+    [ -f "${vdir}/${v}.manifest.sh" ] || violation "HARD" "utils/marketplace/roles.yaml" "papel referencia vertical '${v}' sem manifesto em verticals/${v}.manifest.sh — crie com /meta:create-vertical ${v} --plugin (materializa manifesto + marketplace.json)"
+    grep -q "\"${v}\"" "${mkt}" 2>/dev/null || violation "HARD" "utils/marketplace/roles.yaml" "vertical '${v}' referenciado em roles.yaml não registrado no marketplace.json — registre '${v}' em .claude-plugin/marketplace.json (mesmo padrão dos demais verticais)"
   done
 
   # --- WORK_TOOLS (eixo cross-cutting, 2026-07-19) — drift-guard próprio ---
@@ -723,13 +713,13 @@ PY
   while IFS=$'\t' read -r kind a b; do
     case "${kind}" in
       BADSET) violation "HARD" "utils/marketplace/roles.yaml" "papel '${a}' referencia work_tools set '${b}' inexistente em work_tool_sets" ;;
-      TOOL) [ -f "${REPO_ROOT}/.claude/commands/meta/${a}.md" ] || violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' sem comando em .claude/commands/meta/${a}.md" ;;
+      TOOL) [ -f "${REPO_ROOT}/.claude/commands/meta/${a}.md" ] || violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' sem comando em .claude/commands/meta/${a}.md — crie com /meta:create-command ${a} (ou corrija o nome em work_tool_sets se foi digitado errado)" ;;
     esac
   done <<< "${wt_out}"
   local wtman="${vdir}/onion-work-tools.manifest.sh" ft
   if [ -f "${wtman}" ]; then
     for ft in $(python3 -c "import yaml; d=yaml.safe_load(open('${roles}')) or {}; print(' '.join((d.get('work_tool_sets') or {}).get('full') or []))" 2>/dev/null); do
-      grep -q "commands/meta/${ft}.md" "${wtman}" || violation "HARD" "utils/marketplace/verticals/onion-work-tools.manifest.sh" "work_tool 'full:${ft}' (roles.yaml) ausente do manifesto onion-work-tools"
+      grep -q "commands/meta/${ft}.md" "${wtman}" || violation "HARD" "utils/marketplace/verticals/onion-work-tools.manifest.sh" "work_tool 'full:${ft}' (roles.yaml) ausente do manifesto onion-work-tools — adicione 'commands/meta/${ft}.md' ao manifesto onion-work-tools.manifest.sh"
     done
   fi
 }
@@ -1158,7 +1148,13 @@ check_template_dialect() {
 # ===========================================================================
 check_metaspec_dialect() {
   local CURSOR='read_file|search_replace|run_terminal_cmd|codebase_search|glob_file_search|list_dir|web_search|todo_write|read_lints|update_memory|edit_file|edit_notebook|MultiEdit'
-  local mdir="docs/meta-specs"
+  # Raiz ABSOLUTA — era `docs/meta-specs` relativo, a ÚNICA das 53 regras assim. Como o
+  # `[ -d ]` resolve contra o CWD, rodar o lint de qualquer outro diretório fazia a guarda
+  # retornar 0 e EVAPORAR em silêncio (medido 2026-08-03: do repo root acusa 1 violação; de
+  # /tmp, zero — mesma guarda, mesmo repo, mesma violação presente). Mesma classe do bug da
+  # REGRA 47: a guarda não falha, ela deixa de existir. Achado ao escrever a fixture dela —
+  # a regra não tinha teste, e por isso o furo viveu invisível.
+  local mdir="${REPO_ROOT}/docs/meta-specs"
   [ -d "${mdir}" ] || return 0
   while IFS= read -r -d '' spec; do
     while IFS= read -r tok; do
@@ -2268,7 +2264,7 @@ check_vendored_surface_clean() {
 check_frontmatter_model_category() {
   while IFS= read -r -d '' cmd; do
     if ! grep -q "^model:" "${cmd}"; then
-      violation "HARD" "${cmd}" "frontmatter de comando sem model: — todo comando invocável declara o tier (achado D8-20, auditoria 2026-07-04)"
+      violation "HARD" "${cmd}" "frontmatter de comando sem model: — todo comando invocável declara o tier (achado D8-20, auditoria 2026-07-04) — adicione 'model: sonnet|opus|haiku|fable' ao frontmatter"
     fi
   done < <(
     _find "${CLAUDE_DIR}/commands" -name "*.md" \
@@ -2278,7 +2274,7 @@ check_frontmatter_model_category() {
   )
   while IFS= read -r -d '' agent; do
     if ! grep -q "^category:" "${agent}"; then
-      violation "HARD" "${agent}" "frontmatter de agente sem category: — exigido pelo inventário/roteamento (achado D8-21, auditoria 2026-07-04)"
+      violation "HARD" "${agent}" "frontmatter de agente sem category: — exigido pelo inventário/roteamento (achado D8-21, auditoria 2026-07-04) — adicione 'category: <categoria>' ao frontmatter (ex.: o nome do subdiretório em .claude/agents/)"
     fi
   done < <(_find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
@@ -2520,7 +2516,7 @@ PY
   if [ -n "${out}" ]; then
     while IFS=$'\t' read -r tag msg; do
       [ -n "${msg}" ] || continue
-      violation "HARD" "docs/onion/graph/onion-family-topology-2026-07.kg.yaml" "[topologia/${tag}] ${msg}"
+      violation "HARD" "docs/onion/graph/onion-family-topology-2026-07.kg.yaml" "[topologia/${tag}] ${msg} — edite o node no .kg.yaml: preencha/corrija 'trace:' apontando a um procedimento existente, ou alinhe o papel a uma chave real de roles.yaml"
     done <<< "${out}"
   fi
 }
@@ -2630,7 +2626,6 @@ check_template_dialect
 check_metaspec_dialect
 check_command_description
 check_no_gpt4_model
-check_no_mcp_onion_orchestrator
 check_line_limits
 check_kebab_case_filenames
 check_no_worker_orchestrator_agent
