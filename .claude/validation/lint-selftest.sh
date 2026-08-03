@@ -109,6 +109,10 @@ SSOT_SKILL_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/d
   | grep '^ONION_SKILLS_TOTAL=' | cut -d= -f2)"
 SSOT_KB_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
   | grep '^ONION_KBS_TOTAL=' | cut -d= -f2)"
+# __ONION_SKILLS_DRIFT__ / __ONION_KBS_DRIFT__ → total + offset (fixtures BAD dos novos
+# feeders 'N skills' bare-ancorado, tabela invertida e 'Knowledge Bases (N documentos)').
+SSOT_SKILL_DRIFT="$(( ${SSOT_SKILL_TOTAL:-0} + 3 ))"
+SSOT_KB_DRIFT="$(( ${SSOT_KB_TOTAL:-0} + 5 ))"
 
 record_pass() { PASS=$((PASS + 1)); echo "  ✓ ${1}"; }
 record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} — ${2}"; }
@@ -142,7 +146,9 @@ run_lint_fixture() {
       -e "s/__ONION_AGENTS_TOTAL__/${SSOT_AGENT_TOTAL}/g" \
       -e "s/__ONION_AGENTS_DRIFT__/${SSOT_AGENT_DRIFT}/g" \
       -e "s/__ONION_SKILLS_TOTAL__/${SSOT_SKILL_TOTAL}/g" \
+      -e "s/__ONION_SKILLS_DRIFT__/${SSOT_SKILL_DRIFT}/g" \
       -e "s/__ONION_KBS_TOTAL__/${SSOT_KB_TOTAL}/g" \
+      -e "s/__ONION_KBS_DRIFT__/${SSOT_KB_DRIFT}/g" \
       -e "s/__ONION_AGENT_CATEGORIES_DRIFT__/${SSOT_AGENT_CATS_DRIFT}/g" \
       -e "s/__ONION_AGENT_CATEGORIES__/${SSOT_AGENT_CATS}/g" \
       "${src}" > "${dst}"
@@ -3866,6 +3872,47 @@ run_capability_selftests() {
      && ! find "${REPO_ROOT}/.claude/agents" -name "__nao_existe__.md" 2>/dev/null | grep -q .; then
     record_pass "capability: resolução de REQUIRES acerta presente/ausente"
   else record_fail "capability: resolução" "primitiva de resolução incorreta"; fi
+
+  # (c)/(d) — MUT do desfecho REAL, não da réplica acima. (a) só prova que os manifestos
+  # de HOJE são honestos; nunca prova que um desonesto seria pego. Injeta no vdir do
+  # SANDBOX (cp -a de .claude — ver topo do arquivo) um manifesto sintético e roda o
+  # lint-artifacts.sh de VERDADE (caixa-preta, sem refator — mesma disciplina do resto
+  # deste arquivo). check_plugins_sync (REGRA 19) sempre dispara 'plugin ausente' pra
+  # qualquer manifesto injetado (não há plugins/selftest-fixture-probe committado) — por
+  # isso a asserção grepa a MENSAGEM específica de over-claim ('mas só cumpre'), não
+  # 'nenhuma violação citando o path' (que reprovaria SEMPRE, até no caso honesto).
+  local cap_vdir="${SANDBOX}/.claude/utils/marketplace/verticals"
+  local cap_dst="${cap_vdir}/selftest-fixture-probe.manifest.sh"
+
+  local ov_src="${FIX_DIR}/r20-capability-contract/bad-overclaim.manifest.sh"
+  if [ -f "${ov_src}" ]; then
+    cp "${ov_src}" "${cap_dst}"
+    local ov_out
+    ov_out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${cap_dst}" 2>&1)" || true
+    rm -f "${cap_dst}"
+    if printf '%s\n' "${ov_out}" | grep -F "selftest-fixture-probe" | grep -q "mas só cumpre"; then
+      record_pass "capability: over-claim sintético é pego pela guarda real (fixture r20)"
+    else
+      record_fail "capability: over-claim sintético" "guarda real não pegou o over-claim (rank/tier quebrados?)"
+    fi
+  else
+    record_skip "capability: over-claim sintético → fixture r20 ausente"
+  fi
+
+  local gd_src="${FIX_DIR}/r20-capability-contract/good-honest.manifest.sh"
+  if [ -f "${gd_src}" ]; then
+    cp "${gd_src}" "${cap_dst}"
+    local gd_out
+    gd_out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${cap_dst}" 2>&1)" || true
+    rm -f "${cap_dst}"
+    if printf '%s\n' "${gd_out}" | grep -F "selftest-fixture-probe" | grep -q "mas só cumpre"; then
+      record_fail "capability: honesto sintético" "falso-positivo — guarda acusou over-claim num manifesto honesto"
+    else
+      record_pass "capability: honesto sintético não gera over-claim (fixture r20)"
+    fi
+  else
+    record_skip "capability: honesto sintético → fixture r20 ausente"
+  fi
 }
 
 # ---------------------------------------------------------------------------

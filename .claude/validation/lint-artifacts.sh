@@ -929,7 +929,7 @@ check_site_inventory_sync() {
       [ -n "${claim}" ] || continue
       [ "${claim}" = "${truth}" ] || violation "HARD" "${site}" \
         "site afirma ${claim} ${noun}, filesystem tem ${truth} — alinhe à SSOT (/meta:inventory)"
-    done < <(grep -oE "[0-9]+ ${noun}" "${site}" 2>/dev/null | grep -oE '^[0-9]+')
+    done < <(grep -oiE "[0-9]+ ${noun}" "${site}" 2>/dev/null | grep -oE '^[0-9]+')
     # (b) contador animado: data-n="<N>">0</b><span><noun></span>
     while read -r claim; do
       [ -n "${claim}" ] || continue
@@ -958,27 +958,29 @@ check_claude_md_counts() {
   [ -f "${inv_script}" ] || return 0
 
   # Totais canônicos do filesystem
-  local env_out cmd_truth agent_truth skill_truth
+  local env_out
   env_out="$(bash "${inv_script}" --env 2>/dev/null || true)"
-  cmd_truth="$(echo "${env_out}"   | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
-  agent_truth="$(echo "${env_out}" | grep '^ONION_AGENTS_TOTAL='   | cut -d= -f2)"
-  skill_truth="$(echo "${env_out}" | grep '^ONION_SKILLS_TOTAL='   | cut -d= -f2)"
 
-  # Números declarados no CLAUDE.md (primeira ocorrência de cada padrão)
-  local cmd_claim agent_claim skill_claim
-  cmd_claim="$(grep -oE '[0-9]+ comandos invocáveis' "${claude_md}"      | head -1 | grep -oE '^[0-9]+' || true)"
-  agent_claim="$(grep -oE '[0-9]+ agentes' "${claude_md}"               | head -1 | grep -oE '^[0-9]+' || true)"
-  skill_claim="$(grep -oE '[0-9]+ skills' "${claude_md}"                | head -1 | grep -oE '^[0-9]+' || true)"
-
-  if [ -n "${cmd_claim}" ] && [ "${cmd_claim}" != "${cmd_truth}" ]; then
-    violation "HARD" "${claude_md}" "CLAUDE.md afirma ${cmd_claim} comandos, filesystem tem ${cmd_truth} — alinhe à SSOT (/meta:inventory)"
-  fi
-  if [ -n "${agent_claim}" ] && [ "${agent_claim}" != "${agent_truth}" ]; then
-    violation "HARD" "${claude_md}" "CLAUDE.md afirma ${agent_claim} agentes, filesystem tem ${agent_truth} — alinhe à SSOT (/meta:inventory)"
-  fi
-  if [ -n "${skill_claim}" ] && [ "${skill_claim}" != "${skill_truth}" ]; then
-    violation "HARD" "${claude_md}" "CLAUDE.md afirma ${skill_claim} skills, filesystem tem ${skill_truth} — alinhe à SSOT (/meta:inventory)"
-  fi
+  # Checa TODAS as ocorrências de cada padrão — não só a 1a ('head -1' escondia
+  # divergência ENTRE ocorrências no mesmo arquivo, o mesmo modo-de-falha que a
+  # REGRA 50 (irmã, site/index.html) já trata corretamente. Formato do trio:
+  # '<padrão no CLAUDE.md>:<var ONION_*_TOTAL>:<substantivo na mensagem>'.
+  local truth noun pattern rest truth_var claim
+  for trio in "comandos invocáveis:ONION_COMMANDS_TOTAL:comandos" \
+              "agentes:ONION_AGENTS_TOTAL:agentes" \
+              "skills:ONION_SKILLS_TOTAL:skills"; do
+    pattern="${trio%%:*}"
+    rest="${trio#*:}"
+    truth_var="${rest%%:*}"
+    noun="${rest#*:}"
+    truth="$(echo "${env_out}" | grep "^${truth_var}=" | cut -d= -f2)"
+    [ -n "${truth}" ] || continue
+    while read -r claim; do
+      [ -n "${claim}" ] || continue
+      [ "${claim}" = "${truth}" ] || violation "HARD" "${claude_md}" \
+        "CLAUDE.md afirma ${claim} ${noun}, filesystem tem ${truth} — alinhe à SSOT (/meta:inventory)"
+    done < <(grep -oE "[0-9]+ ${pattern}" "${claude_md}" | grep -oE '^[0-9]+')
+  done
 }
 
 # ===========================================================================
@@ -1187,13 +1189,21 @@ check_context_freshness_stamp() {
 #   K knowledge bases' (ordem inversa da combinada → não colidem). Assim NÃO flaga métricas de frota
 #   ('28 agentes' de um run), breakdowns ('4 comandos especializados de docs',
 #   '3 agentes especializados criados') nem snapshots. Complementa a Regra 9 (só CLAUDE.md).
+#   FORMATOS 2026-08 (achado PR #517 — 'N skills' driftou em docs/INDEX.md e na KB de
+#   identidade SEM nenhum feeder disparar; causa: forma de frase, não ausência de guarda):
+#   bare 'N skills' ANCORADO ('.claude/skills/' ou 'skills de orquestração' na MESMA
+#   linha — sem âncora, 'skills' é ruído de prosa comum demais para o SOFT confiar);
+#   forma INVERTIDA rótulo→número em TABELA ('| Skills | 5 |', '| Comandos invocáveis |
+#   99 |' — os 4 rótulos canônicos, valor = 1º inteiro da célula); parentética invertida
+#   'Knowledge Bases (N documentos...)' (âncora 'documentos' — não 'arquivos', que tem
+#   semântica DIFERENTE em sítios reais, ex. '(N arquivos, incl. index)').
 #   SOFT: heurística sobre linguagem natural — surfaca drift sem bloquear CI por FP.
 #   ISENTA: docs/analysis/ (datado), .claude/sessions/ (gitignored), docs/materials/
 #   (derivado — deferido), docs/onion/inventory.md (SSOT), e frontmatter
 #   status:snapshot / type:adr / type:evolution-backlog.
 # ===========================================================================
 check_inventory_total_drift() {
-  local env_out cmd agent cats agent_cats kb skill n pair num ct line cn an sn kn
+  local env_out cmd agent cats agent_cats kb skill n pair num ct line cn an sn kn lbl
   env_out="$(bash "${SCRIPT_DIR}/inventory.sh" --env 2>/dev/null || true)"
   # Sem env (inventário ausente/vazio num adotante mínimo ou recém-adotado, antes de gerar o
   # inventário) → nada a comparar; a ausência é da REGRA 8, não desta. Sem este guard, os 'grep'
@@ -1365,6 +1375,73 @@ check_inventory_total_drift() {
         violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '${n} agentes (especializados/IA)' (esperado ${agent}) — /meta:inventory"
       fi
     done < <(grep -iE '[0-9]+ agentes' "${f}" 2>/dev/null)
+
+    # 'N skills' — forma BARE do total (sem 'comandos'/'agentes' companheiros na mesma
+    # frase, que os padrões compostos acima já cobrem). Achado PR #517: 'N skills'
+    # driftou em docs/INDEX.md e na KB de identidade SEM nenhum feeder disparar — a
+    # única forma composta ('N comandos, M agentes, P skills, K knowledge bases') exige
+    # as QUATRO contagens juntas, e a prosa real usa 'skills' isolado ('**11 skills**
+    # em `.claude/skills/`', '5 skills de orquestração'). ÂNCORA obrigatória — 'skills'
+    # sozinho é ruído comum demais em prosa ('soft skills', 'skills de comunicação do
+    # time') para o SOFT confiar sem marcador; exige '.claude/skills/' OU 'skills de
+    # orquestração' na MESMA linha — as duas formas que o corpus usa de fato para o
+    # total. Guarda anti-tabela: a forma tabular tem feeder PRÓPRIO logo abaixo (o
+    # valor não é a 1ª palavra da linha ali, então esta guarda não competiria).
+    while IFS= read -r line; do
+      [ -z "${line}" ] && continue
+      case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
+      printf '%s' "${line}" | grep -qE '\.claude/skills/|skills de orquestração' || continue
+      n="$(printf '%s' "${line}" | grep -oiE '[0-9]+ skills' | grep -oE '^[0-9]+' | head -1 || true)"
+      if [ -n "${n}" ] && [ "${n}" != "${skill}" ]; then
+        violation "SOFT" "${f}" "contagem-total de skills divergente da SSOT: '${n} skills' (esperado ${skill}) — /meta:inventory"
+      fi
+    done < <(grep -iE '[0-9]+ skills' "${f}" 2>/dev/null)
+
+    # 'Knowledge Bases (N documentos...)' — forma PARENTÉTICA INVERTIDA (substantivo
+    # ANTES do número; achado PR #517, a 2ª classe que escapou). Âncora 'documentos'
+    # logo após o número — não 'arquivos': esse termo tem semântica DIFERENTE em
+    # sítios reais (.claude/commands/warm-up.md, docs/INDEX.md usam '(N arquivos,
+    # incl. index)' = contagem de ARQUIVO físico, +1 pelo próprio index.md — não o
+    # total de KBs do inventário). Casar 'arquivos' também flagaria essa forma
+    # legítima como falso-positivo.
+    while IFS= read -r line; do
+      [ -z "${line}" ] && continue
+      n="$(printf '%s' "${line}" | grep -oiE 'knowledge bases \([0-9]+ documentos' | grep -oE '[0-9]+' | head -1 || true)"
+      [ -z "${n}" ] && continue
+      if [ "${n}" != "${kb}" ]; then
+        violation "SOFT" "${f}" "contagem-total de KBs divergente da SSOT: 'Knowledge Bases (${n} documentos)' (esperado ${kb}) — /meta:inventory"
+      fi
+    done < <(grep -iE 'knowledge bases \([0-9]+ documentos' "${f}" 2>/dev/null)
+
+    # FORMA INVERTIDA em TABELA rótulo→valor (achado PR #517, a mesma 2ª classe): o
+    # número é a 2ª CÉLULA, não a 1ª palavra da linha — por isso as guardas anti-
+    # tabela das frases acima (que pulam TODA linha '|') não competem aqui, e esta é
+    # a única forma que PRECISA da linha '|' para disparar. Rótulos restritos aos 4
+    # canônicos (forma curta e longa de comandos/agentes) para não colidir com
+    # tabelas de BREAKDOWN que reusam a palavra em métrica de FROTA/RUN (ex.: '|
+    # Agentes | 36 (9 scan + 27 juízes) |' — vive hoje só em docs/analysis/, já
+    # isento pelo escopo, mas a restrição de rótulo vale por doutrina, não por sorte
+    # de escopo). Extrai o PRIMEIRO inteiro da célula de valor — mesma doutrina do
+    # '(N total)' parentético acima.
+    while IFS= read -r line; do
+      [ -z "${line}" ] && continue
+      lbl=""
+      case "${line}" in
+        '| Comandos invocáveis |'*|'| Comandos |'*)   lbl="cmd" ;;
+        '| Agentes especializados |'*|'| Agentes |'*) lbl="agent" ;;
+        '| Skills |'*)                                lbl="skill" ;;
+        '| Knowledge Bases |'*)                        lbl="kb" ;;
+        *) continue ;;
+      esac
+      n="$(printf '%s' "${line}" | cut -d'|' -f3 | grep -oE '[0-9]+' | head -1 || true)"
+      [ -z "${n}" ] && continue
+      case "${lbl}" in
+        cmd)   [ "${n}" != "${cmd}" ]   && violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT (forma tabela): '${n}' (esperado ${cmd}) — /meta:inventory" ;;
+        agent) [ "${n}" != "${agent}" ] && violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT (forma tabela): '${n}' (esperado ${agent}) — /meta:inventory" ;;
+        skill) [ "${n}" != "${skill}" ] && violation "SOFT" "${f}" "contagem-total de skills divergente da SSOT (forma tabela): '${n}' (esperado ${skill}) — /meta:inventory" ;;
+        kb)    [ "${n}" != "${kb}" ]    && violation "SOFT" "${f}" "contagem-total de KBs divergente da SSOT (forma tabela): '${n}' (esperado ${kb}) — /meta:inventory" ;;
+      esac
+    done < <(grep -E '^\|[[:space:]]*(Comandos invocáveis|Comandos|Agentes especializados|Agentes|Skills|Knowledge Bases)[[:space:]]*\|' "${f}" 2>/dev/null)
   # PRÉ-FILTRO (perf, 2026-07-13): só varre .md que CONTÊM uma frase-de-contagem candidata.
   #   Antes: 750 arquivos × ~8 greps/arquivo (esta é ~50% do tempo total do lint); ~90% dos .md
   #   não têm número+substantivo-de-inventário → puro overhead. O pattern abaixo é SUPERSET de
@@ -1372,8 +1449,16 @@ check_inventory_total_drift() {
   #   a forma aproximada 'N+ comandos'; '(N total' cobre a parentética) → nenhum arquivo candidato
   #   é excluído: comportamento IDÊNTICO (arquivo sem match não geraria violação alguma).
   #   'xargs -r' evita rodar grep quando _find não emite nada (ex.: ONLY_PATH fora das raízes).
+  #   ⚠️ INVARIANTE QUEBRADA E RESTAURADA (2026-08-03): os feeders de forma INVERTIDA
+  #   (substantivo ANTES do número — `| Skills | 14 |` e `Knowledge Bases (87 documentos)`)
+  #   nasceram sem alternativa correspondente aqui. O pattern antigo exigia
+  #   `[0-9]+ <substantivo>`, então um arquivo que só tivesse a forma invertida era
+  #   EXCLUÍDO antes de chegar ao feeder — cego por construção. Só era visto quando o
+  #   arquivo tinha, por acaso, também uma frase em prosa (foi o caso do getting-started,
+  #   que mascarou o furo). Duas fixtures BAD não dispararam e expuseram isto.
+  #   O superset acima é PROMESSA VERIFICÁVEL: feeder novo exige alternativa nova aqui.
   done < <(_find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null \
-    | xargs -0 -r grep -lZ -iE '[0-9]+\+?[[:space:]]+(comandos|agentes|knowledge[[:space:]]+bases|categorias|skills)|\([0-9]+[[:space:]]+total' 2>/dev/null)
+    | xargs -0 -r grep -lZ -iE '[0-9]+\+?[[:space:]]+(comandos|agentes|knowledge[[:space:]]+bases|categorias|skills)|\([0-9]+[[:space:]]+total|^\|[[:space:]]*(comandos|comandos[[:space:]]+invocáveis|agentes|agentes[[:space:]]+especializados|skills|knowledge[[:space:]]+bases)[[:space:]]*\||(comandos|agentes|skills|knowledge[[:space:]]+bases)[[:space:]]*\([0-9]' 2>/dev/null)
 }
 
 # ===========================================================================
@@ -2446,7 +2531,12 @@ _backtick_ref_files() {
   if [ -z "${ONLY_PATH}" ] || [ "${ONLY_PATH}" = "${REPO_ROOT}/CLAUDE.md" ]; then
     [ -f "${REPO_ROOT}/CLAUDE.md" ] && printf '%s\0' "${REPO_ROOT}/CLAUDE.md"
   fi
-  _find "${CLAUDE_DIR}" -name '*.md' -print0 2>/dev/null
+  # Isenta fixtures (convenção do topo deste arquivo, ~L67): a regra varre `.claude/**`,
+  # e é ali que as fixtures VIVEM — uma fixture `bad` com ponteiro morto DELIBERADO
+  # dispararia a guarda real e o repo reprovaria por ter teste.
+  # Furo PRÉ-EXISTENTE, latente desde que a R48 nasceu (2026-07-30) e invisível porque
+  # ela não tinha fixture nenhuma; apareceu no minuto em que a primeira foi criada.
+  _find "${CLAUDE_DIR}" -name '*.md' ! -path '*/validation/fixtures/*' -print0 2>/dev/null
   _find "${REPO_ROOT}/docs/meta-specs" -name '*.md' -print0 2>/dev/null
 }
 

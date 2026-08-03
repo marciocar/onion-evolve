@@ -8,10 +8,10 @@ Bem-vindo ao sistema Onion v3.0! Este guia vai te ajudar a começar rapidamente 
 
 | Componente | Quantidade | Descrição |
 |------------|------------|-----------|
-| Comandos | 84 | Organizados em 9 categorias |
-| Agentes | 49 | 9 categorias especializadas |
-| Skills | 5 | Orquestração e validação |
-| Knowledge Bases | 35 | Documentação estruturada |
+| Comandos | 102 | Organizados em 10 categorias + root |
+| Agentes | 51 | 9 categorias especializadas |
+| Skills | 11 | Orquestração, validação e resolvers de contexto |
+| Knowledge Bases | 87 | Documentação estruturada |
 
 ## 📋 Checklist de Setup
 
@@ -46,7 +46,7 @@ seu-projeto/
 ├── .claude/
 │   ├── commands/           # 102 comandos em 10 categorias
 │   ├── agents/             # 51 agentes especializados
-│   ├── skills/             # 5 skills de orquestração
+│   ├── skills/             # 11 skills de orquestração
 │   ├── sessions/           # Sessões de desenvolvimento
 │   └── utils/              # Task Manager + Forge adapters
 ├── docs/
