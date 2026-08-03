@@ -163,10 +163,23 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           M1: ${{ steps.v1.outputs.motivo }}
           M2: ${{ steps.v2.outputs.motivo }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
+          # CAUSA CONHECIDA E BENIGNA (medida no PR #529, o primeiro a exercitar este aviso):
+          # a claude-code-action SE RECUSA a rodar quando o workflow do PR difere do que está
+          # na branch default ("Skipping action due to workflow validation") — proteção dela
+          # contra um PR que reescreve o próprio revisor. Sem nomear isso, TODO PR que edite
+          # este arquivo dispararia alarme sem haver defeito, e alarme impreciso é como um
+          # alarme morre — o mesmo motivo pelo qual o critério do review-verdict.sh é estreito.
+          nota=""
+          if git diff --name-only "${BASE_SHA}" HEAD | grep -q '^\.github/workflows/onion-review\.yml$'; then
+            nota=" _Causa provável: este PR altera o próprio \`onion-review.yml\`, e a action se auto-pula quando o workflow difere da branch default. **Esperado aqui** — o caminho real volta a ser exercido no PR seguinte ao merge._"
+            echo "::notice::o alarme acima tem causa conhecida: este PR edita o próprio workflow, e a action se auto-pula nesse caso."
+          fi
           echo "::warning::onion-review não revisou após 2 tentativas (1ª: ${M1:-nao-rodou} · 2ª: ${M2:-nao-rodou}) — nenhum veredito produzido. Revise manualmente. O gate determinístico (onion-validate) segue valendo."
-          gh pr comment "${{ github.event.pull_request.number }}" \
-            --body "⚠️ **onion-review não revisou após 2 tentativas** (1ª: \`${M1:-nao-rodou}\` · 2ª: \`${M2:-nao-rodou}\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: falha persistente do revisor não bloqueia o PR (resiliência 2026-07-14 + leitura do sinal correto 2026-08-03)._" \
+          gh pr comment "${PR}" \
+            --body "⚠️ **onion-review não revisou após 2 tentativas** (1ª: \`${M1:-nao-rodou}\` · 2ª: \`${M2:-nao-rodou}\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: falha persistente do revisor não bloqueia o PR (resiliência 2026-07-14 + leitura do sinal correto 2026-08-03)._${nota}" \
             || echo "::warning::não consegui postar o comentário de aviso (segue soft-pass)"
 
       - name: Aviso — revisor Onion pulado (sem ANTHROPIC_API_KEY)
