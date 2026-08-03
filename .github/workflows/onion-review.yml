@@ -35,6 +35,40 @@ jobs:
         with:
           fetch-depth: 0
 
+      # ═══ PRÉ-VOO (2026-08-03) — a action MASCARA 401 como hang ═══
+      # CAUSA-RAIZ do crash que durou de 07-14 a 08-03: o secret ANTHROPIC_API_KEY está
+      # INVÁLIDO. Medido de dentro do runner: `GET /v1/models` responde **401
+      # authentication_error "API key is invalid" em 0,07s**, com a rede impecável (DNS 17ms,
+      # TCP 23ms, TLS 51ms) e a chave bem formada (108 chars, prefixo `sk-ant-`, sem espaço nas
+      # bordas — testada normalizada e não normalizada).
+      #
+      # POR QUE NINGUÉM VIU POR SEMANAS: a action **não repassa o 401**. Ela pendura ~180s e
+      # devolve `is_error: true`, `num_turns: 1`, `cost: 0`, SEM MENSAGEM. Um erro de
+      # credencial chegava com cara de timeout — o que fez TRÊS rodadas de diagnóstico
+      # (07-18 e duas em 08-03) procurarem no lugar errado, inclusive descartando "credencial"
+      # exatamente por raciocinar que "401 é instantâneo e isto pendura".
+      #
+      # Este pré-voo converte 6 minutos de mistério em 1 segundo de causa dita. `/v1/models`
+      # é o alvo por não consumir tokens. Nunca imprime o secret — só o código HTTP.
+      - name: Pré-voo — a credencial responde? (a action mascara 401 como hang)
+        id: preflight
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
+        env:
+          KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set +e
+          code="$(curl -sS -o /dev/null --max-time 30 -w '%{http_code}' \
+            https://api.anthropic.com/v1/models \
+            -H "x-api-key: ${KEY}" -H "anthropic-version: 2023-06-01" 2>/dev/null)"
+          [ -z "${code}" ] && code=000
+          echo "pré-voo: HTTP ${code}"
+          if [ "${code}" = "200" ]; then
+            echo "ok=true" >> "${GITHUB_OUTPUT}"; echo "http=200" >> "${GITHUB_OUTPUT}"
+          else
+            echo "ok=false" >> "${GITHUB_OUTPUT}"; echo "http=${code}" >> "${GITHUB_OUTPUT}"
+            echo "::warning::pré-voo da credencial falhou (HTTP ${code}) — o revisor NÃO será chamado. Chamá-lo agora custaria ~6min e devolveria 'is_error' sem mensagem, porque a action não repassa erro de auth."
+          fi
+
       # RESILIÊNCIA (2026-07-14): continue-on-error faz um CRASH do agente (is_error)
       # NÃO reprovar o PR. Motivo (achado por dogfood): este job só fica VERMELHO quando
       # o revisor não consegue rodar — nunca quando acha violações (essas viram comentários
@@ -43,18 +77,19 @@ jobs:
       # determinístico (onion-validate.yml); a revisão semântica é advisory-quando-roda.
       - name: Revisor Onion (gate-keeper + code review)
         id: review
-        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.preflight.outputs.ok == 'true' }}
         continue-on-error: true
-        # PINADO em v1.0.183 (2026-07-25). HISTÓRICO — o pin anterior era v1.0.171, posto em
-        # 2026-07-18 sob a hipótese "a regressão veio da v1.0.172+, lançada em 07-14, mesmo dia
-        # em que o revisor passou a crashar". Essa hipótese NÃO SOBREVIVEU: medido em 2026-08-03,
-        # com o v1.0.171 no lugar, 4 runs seguidas deram `is_error: true`, `num_turns: 1`,
-        # `cost: 0` — o pin não curava nada. Verificado no mesmo dia que API e modelo estão sãos
-        # (claude-sonnet-5 responde HTTP 200 fora do CI) e que a assinatura da falha é HANG de
-        # ~186s, não recusa de credencial (401 volta instantâneo). Sobra o eixo action-no-runner.
-        # Subir o pin é o experimento controlado seguinte — e agora ele SE MEDE SOZINHO: o
-        # review-verdict.sh carimba o resumo do job nos dois desfechos, então o resultado não
-        # some no verde como sumiu por semanas.
+        # PINADO em v1.0.183 (2026-07-25). A VERSÃO NUNCA FOI A CAUSA — o pin anterior
+        # (v1.0.171) nasceu em 07-18 da hipótese "a regressão veio da v1.0.172+, lançada em
+        # 07-14, mesmo dia em que o revisor passou a crashar". Era COINCIDÊNCIA DE DATA: o que
+        # aconteceu por volta de 07-14 foi a credencial deixar de valer. Testado nas duas
+        # pontas em 2026-08-03 — v1.0.171 e v1.0.183 falham idêntico —, e o pré-voo acima
+        # depois mostrou 401 na origem. Fica na v1.0.183 por ser a mais recente verificada
+        # compatível, não por curar nada.
+        # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
+        # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
+        # AQUI com confiança. Ambas caíram por medição. Não reescreva causa neste bloco sem
+        # rodar o diagnóstico (`.github/workflows/onion-review-diagnose.yml`).
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
@@ -104,18 +139,19 @@ jobs:
       # de soft-passar sem revisar. Só roda se a 1ª NÃO revisou. Mesma config do step acima.
       - name: Revisor Onion (retry — só se a 1ª tentativa não revisou)
         id: review2
-        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.v1.outputs.revisou != 'true' }}
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.preflight.outputs.ok == 'true' && steps.v1.outputs.revisou != 'true' }}
         continue-on-error: true
-        # PINADO em v1.0.183 (2026-07-25). HISTÓRICO — o pin anterior era v1.0.171, posto em
-        # 2026-07-18 sob a hipótese "a regressão veio da v1.0.172+, lançada em 07-14, mesmo dia
-        # em que o revisor passou a crashar". Essa hipótese NÃO SOBREVIVEU: medido em 2026-08-03,
-        # com o v1.0.171 no lugar, 4 runs seguidas deram `is_error: true`, `num_turns: 1`,
-        # `cost: 0` — o pin não curava nada. Verificado no mesmo dia que API e modelo estão sãos
-        # (claude-sonnet-5 responde HTTP 200 fora do CI) e que a assinatura da falha é HANG de
-        # ~186s, não recusa de credencial (401 volta instantâneo). Sobra o eixo action-no-runner.
-        # Subir o pin é o experimento controlado seguinte — e agora ele SE MEDE SOZINHO: o
-        # review-verdict.sh carimba o resumo do job nos dois desfechos, então o resultado não
-        # some no verde como sumiu por semanas.
+        # PINADO em v1.0.183 (2026-07-25). A VERSÃO NUNCA FOI A CAUSA — o pin anterior
+        # (v1.0.171) nasceu em 07-18 da hipótese "a regressão veio da v1.0.172+, lançada em
+        # 07-14, mesmo dia em que o revisor passou a crashar". Era COINCIDÊNCIA DE DATA: o que
+        # aconteceu por volta de 07-14 foi a credencial deixar de valer. Testado nas duas
+        # pontas em 2026-08-03 — v1.0.171 e v1.0.183 falham idêntico —, e o pré-voo acima
+        # depois mostrou 401 na origem. Fica na v1.0.183 por ser a mais recente verificada
+        # compatível, não por curar nada.
+        # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
+        # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
+        # AQUI com confiança. Ambas caíram por medição. Não reescreva causa neste bloco sem
+        # rodar o diagnóstico (`.github/workflows/onion-review-diagnose.yml`).
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
@@ -183,6 +219,8 @@ jobs:
           M2: ${{ steps.v2.outputs.motivo }}
           PR: ${{ github.event.pull_request.number }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PREFLIGHT_OK: ${{ steps.preflight.outputs.ok }}
+          PREFLIGHT_HTTP: ${{ steps.preflight.outputs.http }}
         run: |
           # CAUSA CONHECIDA E BENIGNA (medida no PR #529, o primeiro a exercitar este aviso):
           # a claude-code-action SE RECUSA a rodar quando o workflow do PR difere do que está
@@ -191,7 +229,11 @@ jobs:
           # este arquivo dispararia alarme sem haver defeito, e alarme impreciso é como um
           # alarme morre — o mesmo motivo pelo qual o critério do review-verdict.sh é estreito.
           nota=""
-          if git diff --name-only "${BASE_SHA}" HEAD | grep -q '^\.github/workflows/onion-review\.yml$'; then
+          # Credencial primeiro: é a causa que a action esconde atrás de um hang, e a
+          # única do lote cujo conserto não é código.
+          if [ "${PREFLIGHT_OK}" != "true" ]; then
+            nota=" **Causa medida: a credencial do CI não autentica** (pré-voo: HTTP \`${PREFLIGHT_HTTP}\`). O revisor sequer foi chamado — a action não repassa erro de auth, ela pendura ~180s e devolve \`is_error\` sem mensagem. Conserto: gravar um \`ANTHROPIC_API_KEY\` válido no repo."
+          elif git diff --name-only "${BASE_SHA}" HEAD | grep -q '^\.github/workflows/onion-review\.yml$'; then
             nota=" _Causa provável: este PR altera o próprio \`onion-review.yml\`, e a action se auto-pula quando o workflow difere da branch default. **Esperado aqui** — o caminho real volta a ser exercido no PR seguinte ao merge._"
             echo "::notice::o alarme acima tem causa conhecida: este PR edita o próprio workflow, e a action se auto-pula nesse caso."
           fi
