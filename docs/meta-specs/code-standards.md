@@ -34,7 +34,9 @@ Skill que automatiza aplicação: `.claude/skills/language-standards/` (quando a
 | Respostas do assistente IA | **pt-BR** | Conversas no chat com o operador |
 | Código (variáveis, funções, classes, módulos) | **inglês** | `calculateTotalWithDiscount()`, `class TaskAdapter` |
 | Nomes de arquivos | **inglês** | `task-manager-abstraction.md`, `react-developer.md` |
-| Commits e branches | **inglês** | `feat: add jira adapter retry logic`, `chore/onion-saneamento` |
+| Commits — prefixo Conventional | **inglês** | `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`, `test:` |
+| Commits — assunto e corpo | **pt-BR** | `docs(kg): o radar reconstrói a escada de Elenxo` |
+| Branches | **inglês** | `fix/inventory-drift`, `chore/onion-saneamento` |
 | Logs e debugging | **inglês** | `Error: provider not configured` |
 | YAML frontmatter (campos) | **inglês** | `name:`, `description:`, `tools:` |
 | YAML frontmatter (valores narrativos) | pt-BR aceito | `description: "Especialista em..."` |
@@ -135,9 +137,22 @@ status: <active | historical | draft | candidato>
 
 ### 3.4 Commits
 
-- Conventional Commits em inglês: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`
+- **Prefixo Conventional em inglês**, **assunto e corpo em pt-BR**:
+  `docs(inventario): o INDEX driftou da SSOT — e o technical-context não era template`
+- Tipos válidos: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:` (+ escopo opcional entre parênteses)
 - Mensagem descritiva curta na primeira linha, contexto opcional após linha em branco
 - Quando aplicável, referenciar issue/ID de task
+
+> **Por que o assunto é pt-BR** (ratificado pelo maestro em 2026-08-03): o commit deste repo é
+> **narrativa de decisão**, não rótulo de mudança — é o material bruto da autobiografia
+> (*Autobiographical Marketing*, [identidade §1.5](../knowledge-base/meta/onion-framework-identity.md)).
+> Um assunto que precisa dizer *"a síntese foi REPROVADA pelo crítico, o inventário sobrevive"*
+> perde precisão traduzido. O **prefixo** segue em inglês porque é **contrato de máquina**
+> (changelog, semver, tooling) — não prosa. Fronteira: prefixo = máquina; assunto = humano.
+>
+> Esta linha **corrige uma divergência declarado ≠ verificado**: até 2026-08-03 a spec dizia
+> "commits em inglês" enquanto **15/15** dos commits recentes eram pt-BR — a prática era unânime
+> e o papel nunca acompanhou. Alinhamos o papel à prática, não o contrário.
 
 ---
 

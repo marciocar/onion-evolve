@@ -3,9 +3,10 @@ description: >
   Aplica padrões de idioma e documentação do projeto. Use ao escrever código,
   commits, comentários, READMEs, documentação técnica, mensagens de erro ou
   qualquer artefato textual. Garante código em inglês (variáveis, funções,
-  classes, arquivos, commits, branches) e comentários/docs em português
-  brasileiro (comments, JSDoc, READMEs, mensagens ao usuário, respostas do
-  assistente). Ative mesmo sem o usuário mencionar "idioma" ou "padrão".
+  classes, arquivos, branches, prefixo Conventional dos commits) e
+  comentários/docs em português brasileiro (comments, JSDoc, READMEs, mensagens
+  ao usuário, respostas do assistente, assunto e corpo dos commits). Ative mesmo
+  sem o usuário mencionar "idioma" ou "padrão".
 allowed-tools: Read Grep Glob
 ---
 
@@ -16,7 +17,7 @@ allowed-tools: Read Grep Glob
 ### Inglês (en-US) — SEMPRE
 - Nomes de **variáveis, funções, classes, interfaces, types**
 - Nomes de **arquivos e diretórios** (kebab-case: `user-profile.tsx`)
-- **Mensagens de commit** (Conventional Commits: `feat: add user auth`)
+- **Prefixo** das mensagens de commit (Conventional Commits: `feat:`, `fix:`, `docs(kg):`) — só o prefixo; o **assunto vai em pt-BR** (ver abaixo)
 - **Nomes de branches** Git (`feature/user-dashboard`, `fix/auth-bug`)
 - **Documentação técnica de API** (schemas, endpoints, response shapes)
 - **Logs e mensagens de debug** (`Error: provider not configured`)
@@ -27,6 +28,7 @@ allowed-tools: Read Grep Glob
 - **Documentação de processos e workflows**
 - **READMEs e guias de uso**
 - **Mensagens de erro** para usuário final (UI/UX)
+- **Assunto e corpo das mensagens de commit** (só o prefixo Conventional é EN)
 
 ## Quick Reference
 
@@ -34,7 +36,8 @@ allowed-tools: Read Grep Glob
 |----------|--------|---------|
 | Variáveis, funções, classes | EN | `getUserProfile()` |
 | Comentários no código | PT-BR | `// Busca perfil do usuário` |
-| Commits | EN | `fix: resolve auth bug` |
+| Commits — prefixo | EN | `fix:`, `docs(kg):` |
+| Commits — assunto/corpo | PT-BR | `fix(lint): a guarda existia e nunca rodava` |
 | Branches | EN | `feature/payment-flow` |
 | Documentação técnica | PT-BR | `## Instalação` |
 | Respostas do assistente | PT-BR | `Vou criar o componente...` |
@@ -118,7 +121,7 @@ TASK_MANAGER_PROVIDER=jira
 
 ## Gotchas
 
-- **Commits em PT-BR são erro comum em pair-programming** — sempre rever antes do `git commit`
+- **Commit inteiro em inglês é o erro comum aqui** — o prefixo é EN (`docs(kg):`), mas o **assunto é pt-BR**. Traduzir o assunto perde a precisão da narrativa de decisão. O inverso — assunto em pt-BR com prefixo traduzido (`documentos(kg):`) — quebra o contrato de máquina (changelog/semver)
 - **JSDoc em inglês passa despercebido** porque a maioria das ferramentas é EN — manter PT-BR consistente
 - **Nomes de arquivos em PT-BR** quebram convenções de framework (ex: Next.js routing) — sempre EN
 - **Mensagens de erro técnicas vs UX** — `Error: invalid user ID` (técnico, EN) vs `Usuário não encontrado` (UX, PT-BR)

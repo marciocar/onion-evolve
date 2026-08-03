@@ -99,7 +99,7 @@ Restrições **não-negociáveis** do core, extraídas de `CLAUDE.md` e `docs/me
 6. **Provider-agnóstico por design, nunca hardcoded.** Antes de operar com tasks ou host remoto, sempre verificar `TASK_MANAGER_PROVIDER`/`FORGE_PROVIDER` em `.env` — nunca inventar valores nem assumir provider ausente.
    *(Fonte: `CLAUDE.md` §Fluxo obrigatório antes de operar com tasks; §Fallback gracioso)*
 
-7. **Idioma segregado por camada.** Chat/comentários/documentação/mensagens ao usuário em português brasileiro; código/variáveis/nomes de arquivo/branch em inglês; commits em inglês (Conventional Commits); logs/debugging em inglês. Autoridade canônica: skill `language-standards`, alinhada a `docs/meta-specs/code-standards.md`.
+7. **Idioma segregado por camada.** Chat/comentários/documentação/mensagens ao usuário em português brasileiro; código/variáveis/nomes de arquivo/branch em inglês; commits com **prefixo** Conventional em inglês e **assunto/corpo em pt-BR**; logs/debugging em inglês. Autoridade canônica: skill `language-standards`, alinhada a `docs/meta-specs/code-standards.md`.
    *(Fonte: `CLAUDE.md` §Diretrizes de Linguagem)*
 
 8. **Versão do framework é derivada do git, não semver formal do repo.** Meta-specs têm `version` semver simples no frontmatter; o repo-fonte não carrega stamp de versão committado (evita auto-referência arquivo↔commit); repos **adotados** recebem `.claude/.onion-version` gravado por `/meta:adopt`.
