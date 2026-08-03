@@ -66,10 +66,26 @@ _is_core_private() {
 # só resolve o alvo cujo texto CRU contém um segmento core-privado plausível.
 _maybe_core_private='(analysis|onion|evolution|discussions|applying|materials|plans|diary|sessions)/'
 
-# Extrai (kb_rel|resolved_rel) de cada link relativo core-privado vivo do corpus.
-collect_violations() { # <repo_dir>  -> stdout: "<kb_rel>|<resolved_rel>"
-  local repo="$1" base="${1}/docs/knowledge-base"
-  [ -d "${base}" ] || return 0
+# AS RAÍZES VENDORIZADAS — o que o adotante de fato RECEBE.
+# Espelha `want=` de .claude/commands/meta/adopt.md:113 e `roots=` da REGRA 36. Um path novo
+# vendorizado no adopt precisa entrar aqui também, ou nasce descoberto.
+#
+# ⚠️ ATÉ 2026-08-03 ESTE GUARD VARRIA SÓ `docs/knowledge-base` — 1 DE 9.
+# A revisão das guardas mediu o custo: 46 links markdown VIVOS p/ caminho core-privado, em 21
+# arquivos das outras 8 raízes (ex.: .claude/skills/onion/SKILL.md, .claude/commands/meta/adopt.md,
+# .claude/agents/meta/onion.md → ../../../docs/analysis/*.md), TODOS 404 em qualquer adotante.
+# Ninguém os cobria: a REGRA 22 não varre `.claude/`, a 48 só pega backtick, esta só pegava KB.
+# O incômodo maior era a MÉTRICA: o guard drenou 101 links da KB até o baseline zerar e
+# DECLAROU VITÓRIA com o mesmo modo de falha vivo na porta ao lado — `declarado ≠ verificado`
+# dentro da própria métrica de saúde de uma guarda. [[fix-must-become-mechanism]]
+VENDORED_ROOTS=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation
+                .claude/hooks docs/meta-specs docs/knowledge-base docs/sdaal)
+
+# Extrai (rel|resolved_rel) de cada link relativo core-privado vivo do corpus vendorizado.
+collect_violations() { # <repo_dir>  -> stdout: "<rel>|<resolved_rel>"
+  local repo="$1" r bases=()
+  for r in "${VENDORED_ROOTS[@]}"; do [ -d "${repo}/${r}" ] && bases+=("${repo}/${r}"); done
+  [ "${#bases[@]}" -gt 0 ] || return 0
   local f dir rel lineno target clean res
   while IFS= read -r -d '' f; do
     dir="$(dirname "${f}")"; rel="${f#${repo}/}"
@@ -94,7 +110,7 @@ collect_violations() { # <repo_dir>  -> stdout: "<kb_rel>|<resolved_rel>"
           printf "%d\t%s\n", NR, tgt
         }
       }' "${f}")
-  done < <(find "${base}" -type f -name '*.md' -print0 2>/dev/null) | sort -u
+  done < <(find "${bases[@]}" -type f -name '*.md' -print0 2>/dev/null) | sort -u
 }
 
 # ---------------------------------------------------------------------------
@@ -178,7 +194,11 @@ collect_violations "${REPO_DIR}" > "${TMP}/current"
 if [ "${EMIT_BASELINE}" -eq 1 ]; then
   printf '# Baseline de links vendorizados p/ caminho core-privado — PASSIVO TOLERADO.\n'
   printf '# Gerado por: bash .claude/validation/kb-vendored-link-check.sh --emit-baseline > %s\n' "${BASELINE_REL}"
-  printf '# formato: <kb_rel>|<resolved_core_private_rel>. SÓ PODE ENCOLHER (migre link→gloss e remova a linha).\n'
+  printf '# formato: <rel>|<resolved_core_private_rel>. SÓ PODE ENCOLHER (migre link→gloss e remova a linha).\n'
+  # SCOPE — a catraca compara passivos; passivos de ESCOPOS diferentes não são comparáveis.
+  # Sem esta linha, ampliar a varredura dispara "CATRACA VIOLADA" em massa e o autor é
+  # empurrado a NÃO ampliar — a catraca passa a DEFENDER o ponto cego que ela deveria expor.
+  printf '# scope: %s\n' "${VENDORED_ROOTS[*]}"
   cat "${TMP}/current"
   exit 0
 fi
@@ -205,8 +225,9 @@ else
   while IFS= read -r p; do [ -n "${p}" ] && ! grep -qxF "${p}" "${TMP}/current" && say "SOFT" "BASELINE-OBSOLETA" "${BASELINE_REL}" "entrada OBSOLETA '${p}' — já não existe (link migrado?). Remova do baseline (só encolhe)"; done < "${TMP}/baseline"
   # (d) CATRACA — baseline SÓ ENCOLHE (vs origin/integração > HEAD)
   : > "${TMP}/prev"; PREV_SOURCE=""
+  PREV_RAW=""      # de ONDE veio o prev — o `# scope:` tem de sair da mesma fonte que o passivo
   if [ -n "${PREV_BASELINE}" ] && [ -f "${PREV_BASELINE}" ]; then
-    read_baseline "${PREV_BASELINE}" > "${TMP}/prev"; PREV_SOURCE="arquivo"
+    read_baseline "${PREV_BASELINE}" > "${TMP}/prev"; PREV_SOURCE="arquivo"; PREV_RAW="${PREV_BASELINE}"
   elif git -C "${REPO_DIR}" rev-parse --git-dir >/dev/null 2>&1; then
     refs="${BASE_REF}"; if [ -z "${refs}" ]; then
       _sib="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/resolve-integration-branch.sh"
@@ -215,15 +236,31 @@ else
     fi
     for r in ${refs}; do
       if git -C "${REPO_DIR}" show "${r}:${BASELINE_REL}" >"${TMP}/prev.raw" 2>/dev/null; then
-        read_baseline "${TMP}/prev.raw" > "${TMP}/prev"; PREV_SOURCE="git ${r}"
+        read_baseline "${TMP}/prev.raw" > "${TMP}/prev"; PREV_SOURCE="git ${r}"; PREV_RAW="${TMP}/prev.raw"
         case "${r}" in origin/*) : ;; *) [ -n "${BASE_REF}" ] || say "SOFT" "CATRACA-FRACA" "${BASELINE_REL}" "catraca vs '${r}' (ref LOCAL): crescimento já commitado aqui não é detectado — só origin/<integração> é referência forte"; esac
         break
       fi
     done
   fi
+  # Escopo declarado em cada baseline (linha `# scope:`). Ausente = escopo legado (só a KB).
+  _scope_of() { grep -m1 '^# scope:' "$1" 2>/dev/null | sed 's/^# scope:[[:space:]]*//' || true; }
+  CUR_SCOPE="$(_scope_of "${BASELINE}")"; PREV_SCOPE=""
+  # Lê da MESMA fonte que produziu ${TMP}/prev — antes lia sempre de prev.raw, que só existe no
+  # ramo git: sob --previous-baseline o scope vinha vazio, os escopos "divergiam" e a catraca
+  # se suspendia sozinha. Bug achado no MUT-2 desta própria mudança, 2026-08-03.
+  [ -n "${PREV_RAW}" ] && [ -f "${PREV_RAW}" ] && PREV_SCOPE="$(_scope_of "${PREV_RAW}")"
   if [ -n "${PREV_SOURCE}" ]; then
-    comm -13 "${TMP}/prev" "${TMP}/baseline" > "${TMP}/added"
-    while IFS= read -r p; do [ -n "${p}" ] && say "HARD" "CATRACA" "${BASELINE_REL}" "CATRACA VIOLADA: '${p}' ACRESCENTADO ao baseline (vs ${PREV_SOURCE}) — só pode ENCOLHER. Link morto se migra p/ gloss, não se amplia a tolerância"; done < "${TMP}/added"
+    if [ "${CUR_SCOPE}" != "${PREV_SCOPE}" ]; then
+      # EXPANSÃO DE ESCOPO — a comparação de crescimento fica SUSPENSA nesta rodada, com aviso
+      # visível. Não é porta dos fundos: o `scope:` é DERIVADO de VENDORED_ROOTS pelo script (não
+      # se escreve à mão), então usá-lo para mascarar crescimento exige alterar o código do guard
+      # — que aparece no diff. E o SOFT abaixo garante que a suspensão nunca passe em silêncio.
+      say "SOFT" "ESCOPO-EXPANDIDO" "${BASELINE_REL}" \
+        "escopo do guard MUDOU ('${PREV_SCOPE:-<legado: só docs/knowledge-base>}' → '${CUR_SCOPE}') — catraca de crescimento SUSPENSA nesta rodada (passivos de escopos distintos não são comparáveis). Na próxima, a catraca volta a valer sobre o novo escopo."
+    else
+      comm -13 "${TMP}/prev" "${TMP}/baseline" > "${TMP}/added"
+      while IFS= read -r p; do [ -n "${p}" ] && say "HARD" "CATRACA" "${BASELINE_REL}" "CATRACA VIOLADA: '${p}' ACRESCENTADO ao baseline (vs ${PREV_SOURCE}) — só pode ENCOLHER. Link morto se migra p/ gloss, não se amplia a tolerância"; done < "${TMP}/added"
+    fi
   fi
 fi
 

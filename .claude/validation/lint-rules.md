@@ -136,4 +136,4 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 34 | Migalhas: superfícies DERIVADAS da fonte, sem drift | HARD | migalha (superfície derivada) driftando da fonte |
 | 35 | Site público não linka deep-link do repo PRIVADO (404 garantido) | HARD | site público linkando deep-link de repo privado — 404 garantido |
 | 36 | Superfície VENDORIZADA sem nome comercial de cliente | HARD | nome comercial de cliente vazando em superfície vendorizada |
-| 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT | link vivo de KB vendorizada para caminho core-privado — morto no adotante |
+| 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT | link vivo em superfície vendorizada para caminho core-privado — morto no adotante |
