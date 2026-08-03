@@ -69,3 +69,19 @@ lint	r53-rules-pathscoped/bad-no-paths.md	.claude/rules	bad	sem 'paths:' no fron
 lint	r53-rules-pathscoped/bad-empty-paths.md	.claude/rules	bad	declarado mas VAZIO
 lint	r53-rules-pathscoped/bad-dead-glob.md	.claude/rules	bad	NUNCA carrega
 lint	r53-rules-pathscoped/good-live-glob.md	.claude/rules	good	
+lint	r16-count-drift/bad-skills-bare.md	docs	bad	skills divergente da SSOT
+lint	r16-count-drift/good-skills-bare.md	docs	good	
+lint	r16-count-drift/good-skills-no-anchor-fp.md	docs	good	
+lint	r16-count-drift/bad-skills-orquestracao.md	docs	bad	skills divergente da SSOT
+lint	r16-count-drift/bad-table-metrics.md	docs	bad	forma tabela
+lint	r16-count-drift/good-table-metrics.md	docs	good	
+lint	r16-count-drift/good-table-unrecognized-label-fp.md	docs	good	
+lint	r16-count-drift/bad-kb-documentos.md	docs	bad	KBs divergente da SSOT
+lint	r16-count-drift/good-kb-documentos.md	docs	good	
+lint	r16-count-drift/good-kb-arquivos-fp.md	docs	good	
+lint	r1-agent-frontmatter/bad-missing-tools.md	.claude/agents/development	bad	frontmatter de agente incompleto
+lint	r1-agent-frontmatter/good-complete.md	.claude/agents/development	good	
+lint	r2-command-description/bad-no-description.md	.claude/commands/meta	bad	sem description:
+lint	r2-command-description/good-with-description.md	.claude/commands/meta	good	
+lint	r48-backtick-refs/bad-dead-pointer.md	.claude/agents/development	bad	ponteiro morto
+lint	r48-backtick-refs/good-live-pointer.md	.claude/agents/development	good	
