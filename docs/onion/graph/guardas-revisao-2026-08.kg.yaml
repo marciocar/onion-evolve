@@ -214,11 +214,42 @@ nodes:
     node_type: claim
     plane: PROD
     impact: 4
-    confidence: 0.95
-    status: open
+    confidence: 0.2
+    status: refuted
     verified_at: 2026-08-03
     verified_against: 'grep de kg: fora do escopo da R43 + test -e no alvo'
     label: 'um kg: PENDURADO vivo e invisivel — inbox/_processed aponta p/ promocao-main-elenxo.kg.yaml que nao existe; e o MISSING-PATH HARD que a R43 existe p/ emitir'
+
+  - id: E_KG_PENDURADO_E_DO_REMETENTE
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'frontmatter do sinal (from: arandek) + leitura de extract_kg em kg-born-marker.sh'
+    label: 'os 2 "pendurados" nao sao defeito: um e sinal de campo com from: adotante, cujo kg: aponta p/ grafo do repo DELE; o outro e placeholder de template no heredoc do /meta:diary, fora do frontmatter — e extract_kg le SO o frontmatter, entao nunca seria pego'
+
+  - id: E_MODO_DE_FALHA_NUNCA_OCORREU
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    verified_against: 'git log --diff-filter=D e --diff-filter=R sobre docs/onion/graph/*.kg.yaml'
+    label: 'em 51 grafos e toda a historia do repo, NENHUM foi removido ou renomeado — o modo de falha que a ampliacao preveniria tem ZERO ocorrencias'
+
+  - id: D_NAO_AMPLIAR_R43
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: done
+    verified_at: 2026-08-03
+    verified_against: 'medicao dos 8 arquivos com kg: fora do escopo + historico de remocao/renomeacao'
+    trace: ".claude/validation/kg-born-marker.sh:extract_kg"
+    label: 'NAO ampliar o escopo da R43 — gated-until-trigger: zero achado hoje, zero ocorrencia historica, e ampliar exigiria excluir inbox/inbound sob pena de reprovar sinal de adotante como se fosse defeito nosso'
 
   - id: C_DOCSTRINGS_STALE
     node_type: claim
@@ -326,6 +357,18 @@ edges:
     edge_type: SUPPORTS
   - from: C_R43_KG_PENDURADO
     to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_KG_PENDURADO_E_DO_REMETENTE
+    to: C_R43_KG_PENDURADO
+    edge_type: REFUTES
+  - from: E_MODO_DE_FALHA_NUNCA_OCORREU
+    to: C_R43_KG_PENDURADO
+    edge_type: REFUTES
+  - from: E_KG_PENDURADO_E_DO_REMETENTE
+    to: D_NAO_AMPLIAR_R43
+    edge_type: SUPPORTS
+  - from: E_MODO_DE_FALHA_NUNCA_OCORREU
+    to: D_NAO_AMPLIAR_R43
     edge_type: SUPPORTS
   - from: C_DOCSTRINGS_STALE
     to: Q_GUARDAS_COERENTES
