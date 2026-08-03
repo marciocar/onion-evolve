@@ -209,7 +209,31 @@ raízes vendorizadas** têm o mesmo modo de falha, sem guarda:
 O ponto duro: **a R45 drenou 101 links da KB e deixou 46 da mesma classe na porta ao lado — e o
 baseline em 0 declara vitória.** É `declarado ≠ verificado` na métrica de saúde de uma guarda.
 
-### 7.2 A REGRA 43 tem um `kg:` pendurado vivo e invisível
+### 7.2 ~~A REGRA 43 tem um `kg:` pendurado vivo e invisível~~ — **REFUTADO em 2026-08-03**
+
+> **Veredito: NÃO CONSTRUIR.** Ao ir executar a ampliação de escopo, a medição derrubou a premissa.
+> Registrado no grafo como `REFUTES` sobre `C_R43_KG_PENDURADO`.
+
+**Os dois "pendurados" não são defeito:**
+
+| Arquivo | Causa real |
+|---|---|
+| `inbox/_processed/2026-07-27-…` | é **sinal de campo** (`from: arandek (consumidor)`); o `kg:` aponta para grafo do repo **dele**. Ausente no core **por natureza** |
+| `.claude/commands/meta/diary.md:115` | **placeholder de template** (`kg: "<path/para/o.kg.yaml> …"`) dentro do heredoc. E `extract_kg` lê **só o frontmatter** — nunca seria pego, com ou sem ampliação |
+
+**E o modo de falha nunca ocorreu.** `git log --diff-filter=D` e `--diff-filter=R` sobre
+`docs/onion/graph/*.kg.yaml`: **nenhum grafo removido, nenhum renomeado** em toda a história do repo.
+Os outros 6 arquivos com `kg:` fora do escopo já apontam para grafos válidos.
+
+**Por que ampliar seria pior:** entregaria zero achado, exigiria excluir `inbox/`/`inbound/` — e, sem
+essa exclusão, **reprovaria sinal de adotante como se fosse defeito nosso**. É construir por simetria,
+o antipadrão que o `gated-until-trigger` nomeia. O gatilho para reabrir é concreto: **um grafo ser
+renomeado ou removido**.
+
+<details>
+<summary>Texto original do achado (preservado — o mapa é histórico, não se reescreve)</summary>
+
+### A REGRA 43 tem um `kg:` pendurado vivo e invisível
 
 A R43 varre só `.claude/diary` + `docs/analysis` + `docs/evolution/research`. **9 arquivos declaram
 `kg:` fora desse escopo**, e um deles aponta para um grafo inexistente:
@@ -221,6 +245,8 @@ kg: docs/onion/graph/promocao-main-elenxo.kg.yaml     ← NÃO EXISTE
 
 É exatamente o `MISSING-PATH` HARD que a R43 existe para emitir — vivo, e ninguém vê. A R52 também
 não pega: ela itera sobre grafos que existem, não sobre citações.
+
+</details>
 
 ### 7.3 Double-firing: R28 classe (1) × R46
 
