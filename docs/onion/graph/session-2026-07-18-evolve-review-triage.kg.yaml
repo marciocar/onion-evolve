@@ -119,10 +119,61 @@ nodes:
     layer: audit
     plane: PROD
     impact: 5
+    confidence: 0.05
+    status: superseded
+    verified_at: 2026-08-03
+    label: "ALEGAVA (07-18): a regressao da claude-code-action (v1.0.172+, 07-14) era a causa do crash — REFUTADO em 08-03; era COINCIDENCIA DE DATA"
+    trace: "PR #530, #532, #533; .github/workflows/onion-review-diagnose.yml"
+  - id: E_BOTH_PINS_FAIL
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
-    label: "a regressao da claude-code-action (v1.0.172+, 07-14) era a causa do crash — o modelo sonnet-5 sempre esteve correto"
+    verified_at: 2026-08-03
+    label: "pin testado nas DUAS pontas — v1.0.171 (11/07) e v1.0.183 (25/07): assinatura identica (is_error, num_turns 1, cost 0, ~180s). A versao nunca foi a causa"
+    trace: "runs 30845128611/30835633464/30812516128/30782135096 (v1.0.171); 30858672053 (v1.0.183)"
+  - id: E_401_IN_RUNNER
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    label: "de dentro do runner: GET /v1/models → 401 authentication_error em 0,07s, rede impecavel (DNS 3,5ms/TCP 5,6ms/TLS 27ms), chave BEM FORMADA (108 chars, sk-ant-, mesma normalizada) — revogada, nao mal-colada"
+    trace: ".github/workflows/onion-review-diagnose.yml; run 30861731536"
+  - id: C_CREDENTIAL_CAUSE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    label: "CAUSA-RAIZ: o secret ANTHROPIC_API_KEY nao autenticava. A action NAO REPASSA o 401 — pendura ~180s e devolve is_error sem mensagem, entregando erro de auth vestido de timeout"
+    trace: "docs/analysis/onion-guardas-mapa-2026-08.md §3.3"
+  - id: E_KEY_SWAP_CURED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    label: "chave trocada → diagnostico HTTP 200 em 2,2s, e o revisor passou a TRABALHAR (9 turnos, US$ 0,34, 35s), falhando so por error_max_turns com --max-turns 8"
+    trace: "run 30862182140 (diagnostico); run 30862852519 (revisor, PR #533)"
+  - id: C_MEASURE_RIGHT_INFER_WRONG
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-03
+    label: "MEDIR CERTO E INFERIR ERRADO e modo de falha distinto de medir errado, e mais perigoso: TRES rodadas descartaram credencial por '401 e instantaneo, isto pendura 180s' — premissas verdadeiras, terceira premissa (a action repassaria o 401) NUNCA testada"
+    trace: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
   - id: C_TRANSITORY
     node_type: claim
     layer: audit
@@ -234,4 +285,19 @@ edges:
     edge_type: SUPPORTS
   - from: D_LOCAL_VALIDATOR_DOCTRINE
     to: E_FAILOPEN_FIELD
+    edge_type: TRACES_TO
+  - from: E_BOTH_PINS_FAIL
+    to: C_ACTION_CAUSE
+    edge_type: REFUTES
+  - from: E_401_IN_RUNNER
+    to: C_CREDENTIAL_CAUSE
+    edge_type: SUPPORTS
+  - from: E_KEY_SWAP_CURED
+    to: C_CREDENTIAL_CAUSE
+    edge_type: SUPPORTS
+  - from: C_CREDENTIAL_CAUSE
+    to: C_ACTION_CAUSE
+    edge_type: SUPERSEDES
+  - from: C_MEASURE_RIGHT_INFER_WRONG
+    to: E_401_IN_RUNNER
     edge_type: TRACES_TO
