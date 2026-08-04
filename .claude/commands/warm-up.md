@@ -74,6 +74,10 @@ Estabelecer contexto completo do projeto incluindo:
 - ✅ Conhecer `docs/applying/onion-adoption-manual.md` — a **persona autobiográfica** (1ª pessoa) + ecossistema vivo: adotantes reais, **Onion-Bridge** (mobile via Agent SDK) e o site **`onionevolve.com`** (autobiografia pública; backend `app.onionevolve.com` com clone do core no VPS)
 - ✅ Sem esta etapa, a sessão sabe *operar* o framework mas não sabe *quem ele é* — perguntas de identidade/persona/site ficam sem resposta
 
+### 4.6 Aparte do Maestro — canal lateral tipado (side-channel)
+- ✅ Conhecer `docs/knowledge-base/agentic-patterns/harness/maestro-aside.md` — o vocabulário de **marcadores tipados** que o maestro usa no meio da sessão para rotear a intenção (dúvida/correção/lembrete/etapa/memória/pesquisa-paralela) ao mecanismo certo **sem descarrilhar** a tarefa.
+- ✅ Marcadores (no início da mensagem): `dúvida:` `corrige:` `reforço:` `nota:` `guarda:` `+etapa:` `-etapa:` `paralelo:` `guarda-regra:`. O hook `UserPromptSubmit` (`.claude/hooks/aside-router-hook.sh`) injeta a **rota canônica** como recall (nunca gate; os irreversíveis pedem confirmação — Ato 3/W6).
+
 ### 5. Co-evolução (se `docs/evolution/` existir)
 - ✅ Reconhecer o papel do repo: `source` (core) · `adopted` (consumidor) — via `.claude/.onion-version` ou `.claude/validation/onion-version.sh`
 - ✅ Conferir os canais de co-evolução: `docs/evolution/inbox/` (upstream, sinal/feedback) e, em consumidores, `docs/evolution/inbound/` (downstream, relatório de update/anúncio do core). O hook SessionStart "you have mail" já avisa a **contagem** no boot (📬 inbox / 📥 inbound); o warm-up apenas **orienta** — não re-conta.

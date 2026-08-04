@@ -4,14 +4,15 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 95 entradas · **Stale:** 0 · **Compartilháveis:** 83 · **Com significância:** 35
+**Total:** 96 entradas · **Stale:** 0 · **Compartilháveis:** 84 · **Com significância:** 36
 
-Gerado em: 2026-08-03
+Gerado em: 2026-08-04
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-08-04 | innovation | collective 📤 | maestro-aside-side-channel | Maestro's Aside: 1º protocolo de PREFIXOS TIPADOS de steering (gap aberto no estado-da-arte ago/2026). Marcador pt-BR no início da msg → hook injeta a rota canônica (recall, não gate). Dispatcher, cria zero store. No 1º dogfood, o 'dúvida:' pegou um furo no PRÓPRIO protocolo (o nome violava código=inglês). | 2026-11-04 | static |
 | 2026-08-03 | learning | collective 📤 | shell-guard-paid-four-times-same-axis | A guarda anti-fail-open nasceu em 02-08 e no PRIMEIRO dia de uso real por outra sessão me pegou 4 vezes — e as 4 foram o MESMO eixo: eu lendo sinal derivado em vez do vivo. O eixo tem forma, e a forma é medível. | 2026-11-01 | static |
 | 2026-08-03 | learning | collective 📤 | o-revisor-verde-que-nunca-revisou | O onion-review tinha retry E aviso de soft-pass — máquina completa, comentada em 3 blocos — condicionados a um sinal que NUNCA dispara; 11 PRs mergearam num dia sob um revisor que não leu nada, e o CI dizia verde o tempo todo. | 2026-11-01 | dynamic |
 | 2026-08-03 | error | collective 📤 | o-401-que-chegou-vestido-de-timeout | Três rodadas de diagnóstico em três semanas descartaram 'credencial' pelo MESMO raciocínio correto-mas-inválido — e a causa era a credencial: a action entregava um 401 vestido de timeout de 180s. | 2026-11-01 | static |
