@@ -3196,6 +3196,60 @@ run_empty_result_guard_selftests() {
   else record_fail "empty-result-guard: (i)" "a proximidade cegou o caso multi-linha que originou a guarda: ${out}"; fi
 }
 
+# Modo varredura-sa — REGRA 54. O caso que FALTAVA: rodar o lint de DENTRO de um worktree.
+# Nenhum selftest exercitava isso, e por isso a poda que se comia passou despercebida ate
+# 2026-08-04 — quando o lint, rodando em .claude/worktrees/<name>/ (o caminho que o Claude
+# Code usa nativamente desde a v2.1.49 e que worktree-convention-2026.md declara canonico),
+# varreu 0 dos 51 agentes sem emitir uma linha. O teste (b) e o MUTATION que prova que a
+# REGRA 54 e load-bearing: sem ele, ela poderia ser decorativa e ninguem saberia.
+run_scan_sanity_selftests() {
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_fail "varredura-sa" "lint-artifacts.sh ausente"; return; fi
+
+  # Fixture: uma arvore .claude MINIMA vivendo SOB um caminho que contem
+  # /.claude/worktrees/ — a forma exata do worktree de harness.
+  local d; d="$(mktemp -d)"
+  local wt="${d}/.claude/worktrees/fake-wt"
+  local surface
+  for surface in agents commands skills utils rules; do
+    mkdir -p "${wt}/.claude/${surface}"
+    printf -- '---\nname: x\n---\n\n# x\n' > "${wt}/.claude/${surface}/x.md"
+  done
+  mkdir -p "${wt}/.claude/validation"
+  cp "${lint}" "${wt}/.claude/validation/lint-artifacts.sh"
+  cp "${REPO_ROOT}/.claude/utils/safe-count.sh" "${wt}/.claude/utils/safe-count.sh"
+
+  # (a) de dentro do worktree, a varredura TEM de enxergar a propria arvore
+  local out
+  out="$(bash "${wt}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'varredura-sa'; then
+    record_fail "varredura-sa: (a) lint rodando DE DENTRO de worktree enxerga a própria árvore" \
+                "a varredura se declarou cega no proprio worktree — a poda voltou a se comer"
+  else
+    record_pass "varredura-sa: (a) lint rodando DE DENTRO de worktree enxerga a própria árvore"
+  fi
+
+  # (b) MUTATION — devolve a poda por sufixo (o bug original) e exige que a REGRA 54 REPROVE.
+  #     Se este caso passar sem a mutacao disparar, a regra e decorativa.
+  python3 - "${wt}/.claude/validation/lint-artifacts.sh" <<'PY'
+import sys
+p = sys.argv[1]
+s = open(p).read()
+s = s.replace('find "${roots[@]}" -path "${CLAUDE_DIR}/worktrees/*" -prune -o "${preds[@]}"',
+              'find "${roots[@]}" -path \'*/.claude/worktrees/*\' -prune -o "${preds[@]}"', 1)
+open(p, "w").write(s)
+PY
+  out="$(bash "${wt}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'varredura-sa'; then
+    record_pass "varredura-sa: (b) MUTATION — poda por sufixo volta a cegar e a REGRA 54 REPROVA"
+  else
+    record_fail "varredura-sa: (b) MUTATION" \
+                "reintroduzi o bug e o gate seguiu verde — REGRA 54 e decorativa, nao load-bearing"
+  fi
+
+  rm -rf "${d}"
+}
+
 # Modo gerador-quebrado — o helper _gen_into e a neutralizacao do GIT_DIR.
 # A forma antiga engolia rc e stderr do gerador (`2>/dev/null || true`), e o diff seguinte
 # transformava QUEBRA em DRIFT: a violacao mandava "regenere por cima", o que ZERARIA o
@@ -6097,6 +6151,7 @@ run_scope_gitignore_selftests
 run_task_manager_hook_selftests
 run_kg_verification_selftests
 run_safe_count_selftests
+run_scan_sanity_selftests
 run_generator_failure_selftests
 run_line_limits_selftests
 run_kg_radar_integrity_selftests

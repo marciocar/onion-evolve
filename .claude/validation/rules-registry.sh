@@ -164,6 +164,12 @@ CATEGORIES = [
      "O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e "
      "deep-link privado nunca vazam.",
      [30, 33, 34, 35, 36, 45]),
+    ("Integridade do próprio gate",
+     "As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a "
+     "olhar?' — porque varredura cega devolve zero violações, que é indistinguível de "
+     "conformidade. Categoria nova em 2026-08-04, quando o lint rodou de dentro de um "
+     "worktree de harness e varreu 0 dos 51 agentes sem emitir uma linha de aviso.",
+     [54]),
 ]
 
 seen = {}

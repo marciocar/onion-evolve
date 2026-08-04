@@ -188,7 +188,60 @@ _find() {
   # registra esse caminho como o canônico para worktree de harness. Ancorado em
   # CLAUDE_DIR o predicado poda os worktrees do checkout que está sendo varrido e
   # NUNCA a si mesmo (de dentro do worktree, ${CLAUDE_DIR}/worktrees nem existe).
+  # Guardado por check_scan_sanity() (REGRA 54) — se esta poda voltar a se comer, o
+  # gate reprova ALTO em vez de passar verde.
   find "${roots[@]}" -path "${CLAUDE_DIR}/worktrees/*" -prune -o "${preds[@]}"
+}
+
+# ===========================================================================
+# REGRA 54 — A varredura ENXERGA o que existe (guarda-das-guardas) [HARD]
+# previne: gate que varre ZERO arquivo e mesmo assim reporta OK — verde sem ter olhado
+#   Toda regra deste lint responde "achei violação?". NENHUMA respondia "eu cheguei a
+#   olhar?". São perguntas diferentes, e a segunda é a que falha em silêncio: uma
+#   varredura cega devolve zero violações, que é indistinguível de conformidade.
+#   Medido em 2026-08-04, rodando o lint de dentro de um worktree de harness: 0 dos 51
+#   agentes varridos, nenhum aviso — o gate teria dito "OK ✓" tendo verificado nada
+#   (só não disse porque uma regra vizinha morreu antes, por acaso).
+#   A cura NÃO é consertar aquela poda (isso é o F2): é exigir que a varredura PROVE
+#   ter visto. O chão de verdade vem do safe-count.sh, o helper que nasceu em
+#   2026-08-03 justamente para "zero" e "falhou" nunca mais colidirem — e que até aqui
+#   nenhuma das 38 guardas usava, só o selftest. O antídoto existia, sem estar ligado.
+#   Cobre de uma vez as duas formas de cegueira que se manifestam igual: poda que se
+#   come (o worktree) e raiz que nunca entra (escopo). A forma SEMÂNTICA — veredito que
+#   não cobre a dimensão do erro — é outra natureza e não se resolve aqui.
+#   [[fix-must-become-mechanism]]
+# ===========================================================================
+check_scan_sanity() {
+  # Sob --only=<arquivo> a varredura é escopada DE PROPÓSITO: raiz que não contém o alvo
+  # devolve zero, e isso é a semântica declarada do modo, não cegueira. Acusar aqui seria
+  # falso-positivo — foi o que o selftest (rules-registry (f)) pegou ao estrear esta regra.
+  # Não é fail-open: --only nunca alega cobertura total; quem gateia o CI é a passada cheia.
+  if [ -n "${ONLY_PATH}" ]; then return; fi
+
+  local helper="${REPO_ROOT}/.claude/utils/safe-count.sh"
+  if [ ! -f "${helper}" ]; then
+    violation "HARD" "${helper}" "[varredura-sa] safe-count.sh ausente — sem chão de verdade a sanidade da varredura não é verificável (erro viraria número, que é o que ele existe para impedir)"
+    return
+  fi
+  # shellcheck source=/dev/null
+  . "${helper}"
+
+  local root dir real seen
+  for root in agents commands skills utils rules; do
+    dir="${CLAUDE_DIR}/${root}"
+    [ -d "${dir}" ] || continue     # superfície ausente tem regra própria; aqui não é o assunto
+    if ! real="$(count_files "${dir}" '*.md')"; then
+      violation "HARD" "${dir}" "[varredura-sa] o chão de verdade quebrou em ${root}/ — count_files falhou, e um erro engolido aqui viraria 'zero arquivos' silencioso"
+      continue
+    fi
+    [ "${real}" -gt 0 ] || continue  # vazio DE VERDADE: nada a exigir da varredura
+    # se _find quebrar, o resultado é 0 — e 0 é exatamente a condição que reprova.
+    # Por isso aqui não há 2>/dev/null: falha tem de aparecer, não virar número.
+    seen="$(_find "${dir}" -name '*.md' -print | wc -l | tr -d ' ')"
+    if [ "${seen}" -eq 0 ]; then
+      violation "HARD" "${dir}" "[varredura-sa] a varredura enxergou 0 arquivos em ${root}/, mas existem ${real} — o gate está CEGO nesta superfície e reportaria OK sem ter olhado (causas conhecidas: poda que casa a própria árvore varrida, raiz errada, ou predicado do find vazando para as raízes em _find)"
+    fi
+  done
 }
 
 # ---------------------------------------------------------------------------
@@ -2665,6 +2718,11 @@ if [ "${FIX_MODE}" -eq 1 ]; then
     echo ""
   fi
 fi
+
+# PRIMEIRA de todas por desenho: se a varredura está cega, o veredito de qualquer
+# regra abaixo é vacuidade — a mesma razão pela qual o /meta:kg-freshness checa
+# legibilidade antes de emitir veredito sobre um grafo.
+check_scan_sanity
 
 check_agent_frontmatter
 check_agent_tool_names
