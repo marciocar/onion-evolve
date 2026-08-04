@@ -159,7 +159,11 @@ _find() {
   local roots=() preds=()
   while [ $# -gt 0 ]; do
     case "$1" in
-      -*|'!') preds=("$@"); break ;;
+      # '(' ')' ',' também iniciam EXPRESSÃO do find, não são raízes. Sem eles, o '(' de
+      # uma regra agrupada vazava para roots[] e mudava a forma da expressão montada
+      # abaixo — o -prune passava a imprimir o DIRETÓRIO podado, e o `wc -l < "$dir"`
+      # do chamador morria com "Is a directory" (medido 2026-08-04, regra 5c).
+      -*|'!'|'('|')'|',') preds=("$@"); break ;;
       *) roots+=("$1"); shift ;;
     esac
   done
@@ -175,7 +179,16 @@ _find() {
   # Poda .claude/worktrees/ (git worktrees locais, gitignored) — não são artefatos
   # do framework; varrê-los gera falso-positivo local (o CI nunca os vê). Prune ANTES
   # dos preds: '-o' curto-circuita p/ o alvo podado; o lado direito preserva -print0.
-  find "${roots[@]}" -path '*/.claude/worktrees/*' -prune -o "${preds[@]}"
+  #
+  # ÂNCORA OBRIGATÓRIA (${CLAUDE_DIR}, não glob global): o padrão anterior
+  # '*/.claude/worktrees/*' casava por SUFIXO, então quando o próprio lint rodava de
+  # DENTRO de um worktree ele podava a árvore que estava varrendo — 0 agentes varridos,
+  # sem uma linha de aviso, e o pre-commit morria. Não é caso de borda: Claude Code cria
+  # worktree nativo em .claude/worktrees/ desde a v2.1.49, e worktree-convention-2026.md
+  # registra esse caminho como o canônico para worktree de harness. Ancorado em
+  # CLAUDE_DIR o predicado poda os worktrees do checkout que está sendo varrido e
+  # NUNCA a si mesmo (de dentro do worktree, ${CLAUDE_DIR}/worktrees nem existe).
+  find "${roots[@]}" -path "${CLAUDE_DIR}/worktrees/*" -prune -o "${preds[@]}"
 }
 
 # ---------------------------------------------------------------------------
