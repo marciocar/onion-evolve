@@ -22,7 +22,10 @@ set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # MIGALHAS_ROOT: override do repo-raiz (usado pelas fixtures do selftest, que rodam
 # num mktemp — sem ele o gerador operaria sempre no site REAL, ignorando a fixture).
-ROOT="${MIGALHAS_ROOT:-$(git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || (cd "${HERE}/../.." && pwd))}"
+# GIT_DIR neutralizado: sob hook do git em worktree o GIT_DIR e ABSOLUTO, e com ele
+# setado `git -C <subdir> rev-parse --show-toplevel` devolve o SUBDIR, nao a raiz —
+# o script passa a procurar tudo no lugar errado e emite vazio (medido 2026-08-04).
+ROOT="${MIGALHAS_ROOT:-$(env -u GIT_DIR -u GIT_WORK_TREE git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || (cd "${HERE}/../.." && pwd))}"
 command -v python3 >/dev/null 2>&1 || { echo "migalhas-generate: python3 ausente (skip gracioso)." >&2; exit 3; }
 
 MODE="${1:-write}"

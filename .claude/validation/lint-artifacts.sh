@@ -212,6 +212,40 @@ violation() {
   fi
 }
 
+# ---------------------------------------------------------------------------
+# _gen_into — roda um GERADOR e separa QUEBRA de DRIFT.
+#
+# O padrão anterior era `bash "${gen}" > "${tmp}" 2>/dev/null || true`: engolia o exit
+# code E o stderr. O diff seguinte comparava a saída VAZIA de um gerador quebrado com o
+# arquivo bom e concluía "desatualizado — regenere". A mensagem então MANDAVA sobrescrever
+# o arquivo correto com o vazio. Falha aberta que vira falha DESTRUTIVA: quem obedecesse
+# a própria guarda perdia o conteúdo.
+#
+# Medido em 2026-08-04: sob hook do git em worktree, GIT_DIR absoluto fazia
+# `git -C <subdir> rev-parse --show-toplevel` devolver o subdir; os geradores não achavam
+# members.yaml e emitiam zero byte. 4 falsos "desatualizado" de uma vez.
+#
+# Uso: _gen_into <tmp> <arquivo-rastreado> <rótulo> -- <comando...>
+#   rc 0 → gerou algo utilizável, siga para o diff
+#   rc 1 → QUEBROU; a violação certa já foi emitida e NÃO diz "regenere"
+# ---------------------------------------------------------------------------
+_gen_into() {
+  local tmp="$1" tracked="$2" label="$3"; shift 3
+  [ "${1:-}" = "--" ] && shift
+  local err rc=0
+  err="$(mktemp)"
+  "$@" > "${tmp}" 2>"${err}" || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    violation "HARD" "${label}" "o GERADOR falhou (exit ${rc}) — NÃO regenere por cima: sobrescreveria o arquivo bom com saída inválida. stderr: $(head -c 300 "${err}" | tr '\n' ' ')"
+    rm -f "${err}"; return 1
+  fi
+  if [ ! -s "${tmp}" ] && [ -s "${tracked}" ]; then
+    violation "HARD" "${label}" "o GERADOR devolveu saída VAZIA e o arquivo rastreado tem conteúdo — isto é QUEBRA, não drift. NÃO regenere por cima: zeraria o arquivo. stderr: $(head -c 300 "${err}" | tr '\n' ' ')"
+    rm -f "${err}"; return 1
+  fi
+  rm -f "${err}"; return 0
+}
+
 # ===========================================================================
 # REGRA 1 — Frontmatter de agente: name:, description:, tools: obrigatórios [HARD]
 # previne: agente sem name/description/tools obrigatórios — não carrega nem roteia direito
@@ -555,9 +589,8 @@ check_inventory_sync() {
 
   local tmp
   tmp="$(mktemp)"
-  bash "${inv_script}" --markdown > "${tmp}" 2>/dev/null || true
-
-  if ! diff -q "${inv_file}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${inv_file}" "${inv_file}" -- bash "${inv_script}" --markdown &&
+     ! diff -q "${inv_file}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "${inv_file}" "inventário desatualizado vs filesystem — regenere com '/meta:inventory' (bash .claude/validation/inventory.sh --markdown > docs/onion/inventory.md)"
   fi
   rm -f "${tmp}"
@@ -757,8 +790,8 @@ check_graph_sync() {
     return
   fi
   local tmp; tmp="$(mktemp)"
-  bash "${gen}" --markdown > "${tmp}" 2>/dev/null || true
-  if ! diff -q "${gfile}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${gfile}" "docs/onion/graph.md" -- bash "${gen}" --markdown &&
+     ! diff -q "${gfile}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/graph.md" "grafo desatualizado vs spec-as-code — regenere com '/meta:graph' (bash .claude/validation/graph.sh --markdown > docs/onion/graph.md)"
   fi
   rm -f "${tmp}"
@@ -778,8 +811,8 @@ check_federation_map_sync() {
     return
   fi
   local tmp; tmp="$(mktemp)"
-  bash "${gen}" --map > "${tmp}" 2>/dev/null || true
-  if ! diff -q "${mfile}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${mfile}" "docs/onion/federation-map.md" -- bash "${gen}" --map &&
+     ! diff -q "${mfile}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/federation-map.md" "mapa da federação desatualizado vs members.yaml — regenere: bash .claude/validation/graph.sh --map > docs/onion/federation-map.md"
   fi
   rm -f "${tmp}"
@@ -799,8 +832,8 @@ check_federation_console_sync() {
     return
   fi
   local tmp; tmp="$(mktemp)"
-  bash "${gen}" > "${tmp}" 2>/dev/null || true
-  if ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${cfile}" "docs/onion/federation-console.html" -- bash "${gen}" &&
+     ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/federation-console.html" "console desatualizado vs SSOT — regenere: bash .claude/validation/federation-console.sh > docs/onion/federation-console.html"
   fi
   rm -f "${tmp}"
@@ -821,8 +854,8 @@ check_agent_card_sync() {
     return
   fi
   local tmp; tmp="$(mktemp)"
-  bash "${gen}" > "${tmp}" 2>/dev/null || true
-  if ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${cfile}" "docs/onion/agent-card.json" -- bash "${gen}" &&
+     ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/agent-card.json" "agent card desatualizado vs SSOT — regenere: bash .claude/validation/a2a-agent-card.sh > docs/onion/agent-card.json"
   fi
   rm -f "${tmp}"
@@ -2063,8 +2096,8 @@ check_kg_view_sync() {
     fi
     # (a) drift de conteúdo
     tmp="$(mktemp)"
-    bash "${gen}" "${kg}" --markdown > "${tmp}" 2>/dev/null || true
-    if ! diff -q "${lens}" "${tmp}" >/dev/null 2>&1; then
+    if _gen_into "${tmp}" "${lens}" "${lens}" -- bash "${gen}" "${kg}" --markdown &&
+       ! diff -q "${lens}" "${tmp}" >/dev/null 2>&1; then
       violation "HARD" "${lens}" "[lente/DRIFT] lente desatualizada vs o grafo — regenere: bash .claude/validation/kg-view.sh ${kg#${REPO_ROOT}/} --markdown > ${lens#${REPO_ROOT}/}"
     fi
     rm -f "${tmp}"

@@ -3196,6 +3196,53 @@ run_empty_result_guard_selftests() {
   else record_fail "empty-result-guard: (i)" "a proximidade cegou o caso multi-linha que originou a guarda: ${out}"; fi
 }
 
+# Modo gerador-quebrado — o helper _gen_into e a neutralizacao do GIT_DIR.
+# A forma antiga engolia rc e stderr do gerador (`2>/dev/null || true`), e o diff seguinte
+# transformava QUEBRA em DRIFT: a violacao mandava "regenere por cima", o que ZERARIA o
+# arquivo bom. Falha aberta que vira DESTRUTIVA — quem obedecesse a guarda perdia conteudo.
+# O gatilho medido em 2026-08-04 foi o GIT_DIR absoluto que o git exporta em hook DENTRO de
+# worktree; por isso (c) testa a RAIZ, nao so o sintoma.
+run_generator_failure_selftests() {
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/.claude/validation" "${d}/docs/onion" "${d}/docs/evolution/federation"
+  cp "${lint}" "${d}/.claude/validation/lint-artifacts.sh"
+  printf 'members:\n  - id: onion-evolve\n    role: source\n' > "${d}/docs/evolution/federation/members.yaml"
+  printf '{\n  "name": "conteudo real que NAO pode ser perdido"\n}\n' > "${d}/docs/onion/agent-card.json"
+
+  local out
+  # (a) gerador que FALHA (exit != 0) → violação diz QUEBRA, com o stderr
+  printf '#!/usr/bin/env bash\necho "boom" >&2\nexit 3\n' > "${d}/.claude/validation/a2a-agent-card.sh"
+  out="$(bash "${d}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'o GERADOR falhou (exit 3)'; then
+    record_pass "gerador-quebrado: (a) exit!=0 do gerador vira QUEBRA, não 'desatualizado'"
+  else record_fail "gerador-quebrado: (a)" "exit!=0 do gerador nao produziu a violacao de QUEBRA"; fi
+
+  # (b) gerador que devolve VAZIO com exit 0 (o caso real do GIT_DIR) → QUEBRA, e SEM "regenere"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/.claude/validation/a2a-agent-card.sh"
+  out="$(bash "${d}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'saída VAZIA' &&
+     ! printf '%s' "${out}" | grep -q 'agent card desatualizado'; then
+    record_pass "gerador-quebrado: (b) saída vazia vira QUEBRA e NUNCA o conselho que zera o arquivo"
+  else record_fail "gerador-quebrado: (b)" "saida vazia ainda vira 'desatualizado — regenere' (conselho destrutivo)"; fi
+  rm -rf "${d}"
+
+  # (c) A RAIZ — com GIT_DIR setado (como o git faz em hook dentro de worktree),
+  #     `git -C <subdir> rev-parse --show-toplevel` tem de devolver a RAIZ, não o subdir.
+  local gd top
+  gd="$(git -C "${REPO_ROOT}" rev-parse --git-dir 2>/dev/null || true)"
+  if [ -z "${gd}" ]; then
+    record_fail "gerador-quebrado: (c)" "nao obtive git-dir para o teste de GIT_DIR"
+  else
+    top="$(GIT_DIR="${gd}" env -u GIT_DIR -u GIT_WORK_TREE git -C "${REPO_ROOT}/.claude/validation" rev-parse --show-toplevel 2>/dev/null || true)"
+    if [ "${top}" = "${REPO_ROOT}" ]; then
+      record_pass "gerador-quebrado: (c) GIT_DIR neutralizado — -C <subdir> resolve a RAIZ, não o subdir"
+    else
+      record_fail "gerador-quebrado: (c)" "com GIT_DIR o toplevel virou '${top}' (esperado '${REPO_ROOT}') — geradores voltariam a emitir vazio"
+    fi
+  fi
+}
+
 # Modo kg-verificacao — REGRA 49. O gate garante que no plane:PROD impact>=4 NASCA carimbado e que
 # o passivo NAO CRESCA. Nao checa se o carimbo e verdade (limite declarado: quem mede e o worker do
 # /meta:kg-freshness). O teste (d) e o anti-falso-positivo; o (g) e o MUTATION que prova load-bearing.
@@ -6050,6 +6097,7 @@ run_scope_gitignore_selftests
 run_task_manager_hook_selftests
 run_kg_verification_selftests
 run_safe_count_selftests
+run_generator_failure_selftests
 run_line_limits_selftests
 run_kg_radar_integrity_selftests
 run_review_verdict_selftests
