@@ -47,7 +47,10 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # lente "driftaria" só por causa de quem a invocou, e o drift-guard (REGRA 31)
 # reprovaria para sempre. Achado pelo próprio guard na 1ª execução.
 _abs="$(cd "$(dirname "${FILE}")" && pwd)/$(basename "${FILE}")"
-_repo="$(git -C "$(dirname "${FILE}")" rev-parse --show-toplevel 2>/dev/null || true)"
+# GIT_DIR neutralizado: sob hook do git em worktree o GIT_DIR e ABSOLUTO, e com ele
+# setado `git -C <subdir> rev-parse --show-toplevel` devolve o SUBDIR, nao a raiz —
+# o script passa a procurar tudo no lugar errado e emite vazio (medido 2026-08-04).
+_repo="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "$(dirname "${FILE}")" rev-parse --show-toplevel 2>/dev/null || true)"
 if [ -n "${_repo}" ] && [ "${_abs}" != "${_abs#${_repo}/}" ]; then
   SRC_REL="${_abs#${_repo}/}"          # dentro de um repo: caminho a partir da raiz
 else

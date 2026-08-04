@@ -159,7 +159,11 @@ _find() {
   local roots=() preds=()
   while [ $# -gt 0 ]; do
     case "$1" in
-      -*|'!') preds=("$@"); break ;;
+      # '(' ')' ',' também iniciam EXPRESSÃO do find, não são raízes. Sem eles, o '(' de
+      # uma regra agrupada vazava para roots[] e mudava a forma da expressão montada
+      # abaixo — o -prune passava a imprimir o DIRETÓRIO podado, e o `wc -l < "$dir"`
+      # do chamador morria com "Is a directory" (medido 2026-08-04, regra 5c).
+      -*|'!'|'('|')'|',') preds=("$@"); break ;;
       *) roots+=("$1"); shift ;;
     esac
   done
@@ -175,7 +179,69 @@ _find() {
   # Poda .claude/worktrees/ (git worktrees locais, gitignored) — não são artefatos
   # do framework; varrê-los gera falso-positivo local (o CI nunca os vê). Prune ANTES
   # dos preds: '-o' curto-circuita p/ o alvo podado; o lado direito preserva -print0.
-  find "${roots[@]}" -path '*/.claude/worktrees/*' -prune -o "${preds[@]}"
+  #
+  # ÂNCORA OBRIGATÓRIA (${CLAUDE_DIR}, não glob global): o padrão anterior
+  # '*/.claude/worktrees/*' casava por SUFIXO, então quando o próprio lint rodava de
+  # DENTRO de um worktree ele podava a árvore que estava varrendo — 0 agentes varridos,
+  # sem uma linha de aviso, e o pre-commit morria. Não é caso de borda: Claude Code cria
+  # worktree nativo em .claude/worktrees/ desde a v2.1.49, e worktree-convention-2026.md
+  # registra esse caminho como o canônico para worktree de harness. Ancorado em
+  # CLAUDE_DIR o predicado poda os worktrees do checkout que está sendo varrido e
+  # NUNCA a si mesmo (de dentro do worktree, ${CLAUDE_DIR}/worktrees nem existe).
+  # Guardado por check_scan_sanity() (REGRA 54) — se esta poda voltar a se comer, o
+  # gate reprova ALTO em vez de passar verde.
+  find "${roots[@]}" -path "${CLAUDE_DIR}/worktrees/*" -prune -o "${preds[@]}"
+}
+
+# ===========================================================================
+# REGRA 54 — A varredura ENXERGA o que existe (guarda-das-guardas) [HARD]
+# previne: gate que varre ZERO arquivo e mesmo assim reporta OK — verde sem ter olhado
+#   Toda regra deste lint responde "achei violação?". NENHUMA respondia "eu cheguei a
+#   olhar?". São perguntas diferentes, e a segunda é a que falha em silêncio: uma
+#   varredura cega devolve zero violações, que é indistinguível de conformidade.
+#   Medido em 2026-08-04, rodando o lint de dentro de um worktree de harness: 0 dos 51
+#   agentes varridos, nenhum aviso — o gate teria dito "OK ✓" tendo verificado nada
+#   (só não disse porque uma regra vizinha morreu antes, por acaso).
+#   A cura NÃO é consertar aquela poda (isso é o F2): é exigir que a varredura PROVE
+#   ter visto. O chão de verdade vem do safe-count.sh, o helper que nasceu em
+#   2026-08-03 justamente para "zero" e "falhou" nunca mais colidirem — e que até aqui
+#   nenhuma das 38 guardas usava, só o selftest. O antídoto existia, sem estar ligado.
+#   Cobre de uma vez as duas formas de cegueira que se manifestam igual: poda que se
+#   come (o worktree) e raiz que nunca entra (escopo). A forma SEMÂNTICA — veredito que
+#   não cobre a dimensão do erro — é outra natureza e não se resolve aqui.
+#   [[fix-must-become-mechanism]]
+# ===========================================================================
+check_scan_sanity() {
+  # Sob --only=<arquivo> a varredura é escopada DE PROPÓSITO: raiz que não contém o alvo
+  # devolve zero, e isso é a semântica declarada do modo, não cegueira. Acusar aqui seria
+  # falso-positivo — foi o que o selftest (rules-registry (f)) pegou ao estrear esta regra.
+  # Não é fail-open: --only nunca alega cobertura total; quem gateia o CI é a passada cheia.
+  if [ -n "${ONLY_PATH}" ]; then return; fi
+
+  local helper="${REPO_ROOT}/.claude/utils/safe-count.sh"
+  if [ ! -f "${helper}" ]; then
+    violation "HARD" "${helper}" "[varredura-sa] safe-count.sh ausente — sem chão de verdade a sanidade da varredura não é verificável (erro viraria número, que é o que ele existe para impedir)"
+    return
+  fi
+  # shellcheck source=/dev/null
+  . "${helper}"
+
+  local root dir real seen
+  for root in agents commands skills utils rules; do
+    dir="${CLAUDE_DIR}/${root}"
+    [ -d "${dir}" ] || continue     # superfície ausente tem regra própria; aqui não é o assunto
+    if ! real="$(count_files "${dir}" '*.md')"; then
+      violation "HARD" "${dir}" "[varredura-sa] o chão de verdade quebrou em ${root}/ — count_files falhou, e um erro engolido aqui viraria 'zero arquivos' silencioso"
+      continue
+    fi
+    [ "${real}" -gt 0 ] || continue  # vazio DE VERDADE: nada a exigir da varredura
+    # se _find quebrar, o resultado é 0 — e 0 é exatamente a condição que reprova.
+    # Por isso aqui não há 2>/dev/null: falha tem de aparecer, não virar número.
+    seen="$(_find "${dir}" -name '*.md' -print | wc -l | tr -d ' ')"
+    if [ "${seen}" -eq 0 ]; then
+      violation "HARD" "${dir}" "[varredura-sa] a varredura enxergou 0 arquivos em ${root}/, mas existem ${real} — o gate está CEGO nesta superfície e reportaria OK sem ter olhado (causas conhecidas: poda que casa a própria árvore varrida, raiz errada, ou predicado do find vazando para as raízes em _find)"
+    fi
+  done
 }
 
 # ---------------------------------------------------------------------------
@@ -197,6 +263,40 @@ violation() {
   else
     SOFT_COUNT=$(( SOFT_COUNT + 1 ))
   fi
+}
+
+# ---------------------------------------------------------------------------
+# _gen_into — roda um GERADOR e separa QUEBRA de DRIFT.
+#
+# O padrão anterior era `bash "${gen}" > "${tmp}" 2>/dev/null || true`: engolia o exit
+# code E o stderr. O diff seguinte comparava a saída VAZIA de um gerador quebrado com o
+# arquivo bom e concluía "desatualizado — regenere". A mensagem então MANDAVA sobrescrever
+# o arquivo correto com o vazio. Falha aberta que vira falha DESTRUTIVA: quem obedecesse
+# a própria guarda perdia o conteúdo.
+#
+# Medido em 2026-08-04: sob hook do git em worktree, GIT_DIR absoluto fazia
+# `git -C <subdir> rev-parse --show-toplevel` devolver o subdir; os geradores não achavam
+# members.yaml e emitiam zero byte. 4 falsos "desatualizado" de uma vez.
+#
+# Uso: _gen_into <tmp> <arquivo-rastreado> <rótulo> -- <comando...>
+#   rc 0 → gerou algo utilizável, siga para o diff
+#   rc 1 → QUEBROU; a violação certa já foi emitida e NÃO diz "regenere"
+# ---------------------------------------------------------------------------
+_gen_into() {
+  local tmp="$1" tracked="$2" label="$3"; shift 3
+  [ "${1:-}" = "--" ] && shift
+  local err rc=0
+  err="$(mktemp)"
+  "$@" > "${tmp}" 2>"${err}" || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    violation "HARD" "${label}" "o GERADOR falhou (exit ${rc}) — NÃO regenere por cima: sobrescreveria o arquivo bom com saída inválida. stderr: $(head -c 300 "${err}" | tr '\n' ' ')"
+    rm -f "${err}"; return 1
+  fi
+  if [ ! -s "${tmp}" ] && [ -s "${tracked}" ]; then
+    violation "HARD" "${label}" "o GERADOR devolveu saída VAZIA e o arquivo rastreado tem conteúdo — isto é QUEBRA, não drift. NÃO regenere por cima: zeraria o arquivo. stderr: $(head -c 300 "${err}" | tr '\n' ' ')"
+    rm -f "${err}"; return 1
+  fi
+  rm -f "${err}"; return 0
 }
 
 # ===========================================================================
@@ -542,9 +642,8 @@ check_inventory_sync() {
 
   local tmp
   tmp="$(mktemp)"
-  bash "${inv_script}" --markdown > "${tmp}" 2>/dev/null || true
-
-  if ! diff -q "${inv_file}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${inv_file}" "${inv_file}" -- bash "${inv_script}" --markdown &&
+     ! diff -q "${inv_file}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "${inv_file}" "inventário desatualizado vs filesystem — regenere com '/meta:inventory' (bash .claude/validation/inventory.sh --markdown > docs/onion/inventory.md)"
   fi
   rm -f "${tmp}"
@@ -744,8 +843,8 @@ check_graph_sync() {
     return
   fi
   local tmp; tmp="$(mktemp)"
-  bash "${gen}" --markdown > "${tmp}" 2>/dev/null || true
-  if ! diff -q "${gfile}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${gfile}" "docs/onion/graph.md" -- bash "${gen}" --markdown &&
+     ! diff -q "${gfile}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/graph.md" "grafo desatualizado vs spec-as-code — regenere com '/meta:graph' (bash .claude/validation/graph.sh --markdown > docs/onion/graph.md)"
   fi
   rm -f "${tmp}"
@@ -765,8 +864,8 @@ check_federation_map_sync() {
     return
   fi
   local tmp; tmp="$(mktemp)"
-  bash "${gen}" --map > "${tmp}" 2>/dev/null || true
-  if ! diff -q "${mfile}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${mfile}" "docs/onion/federation-map.md" -- bash "${gen}" --map &&
+     ! diff -q "${mfile}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/federation-map.md" "mapa da federação desatualizado vs members.yaml — regenere: bash .claude/validation/graph.sh --map > docs/onion/federation-map.md"
   fi
   rm -f "${tmp}"
@@ -786,8 +885,8 @@ check_federation_console_sync() {
     return
   fi
   local tmp; tmp="$(mktemp)"
-  bash "${gen}" > "${tmp}" 2>/dev/null || true
-  if ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${cfile}" "docs/onion/federation-console.html" -- bash "${gen}" &&
+     ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/federation-console.html" "console desatualizado vs SSOT — regenere: bash .claude/validation/federation-console.sh > docs/onion/federation-console.html"
   fi
   rm -f "${tmp}"
@@ -808,8 +907,8 @@ check_agent_card_sync() {
     return
   fi
   local tmp; tmp="$(mktemp)"
-  bash "${gen}" > "${tmp}" 2>/dev/null || true
-  if ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
+  if _gen_into "${tmp}" "${cfile}" "docs/onion/agent-card.json" -- bash "${gen}" &&
+     ! diff -q "${cfile}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/agent-card.json" "agent card desatualizado vs SSOT — regenere: bash .claude/validation/a2a-agent-card.sh > docs/onion/agent-card.json"
   fi
   rm -f "${tmp}"
@@ -2050,8 +2149,8 @@ check_kg_view_sync() {
     fi
     # (a) drift de conteúdo
     tmp="$(mktemp)"
-    bash "${gen}" "${kg}" --markdown > "${tmp}" 2>/dev/null || true
-    if ! diff -q "${lens}" "${tmp}" >/dev/null 2>&1; then
+    if _gen_into "${tmp}" "${lens}" "${lens}" -- bash "${gen}" "${kg}" --markdown &&
+       ! diff -q "${lens}" "${tmp}" >/dev/null 2>&1; then
       violation "HARD" "${lens}" "[lente/DRIFT] lente desatualizada vs o grafo — regenere: bash .claude/validation/kg-view.sh ${kg#${REPO_ROOT}/} --markdown > ${lens#${REPO_ROOT}/}"
     fi
     rm -f "${tmp}"
@@ -2619,6 +2718,11 @@ if [ "${FIX_MODE}" -eq 1 ]; then
     echo ""
   fi
 fi
+
+# PRIMEIRA de todas por desenho: se a varredura está cega, o veredito de qualquer
+# regra abaixo é vacuidade — a mesma razão pela qual o /meta:kg-freshness checa
+# legibilidade antes de emitir veredito sobre um grafo.
+check_scan_sanity
 
 check_agent_frontmatter
 check_agent_tool_names

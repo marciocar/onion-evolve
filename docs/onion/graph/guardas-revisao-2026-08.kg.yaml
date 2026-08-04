@@ -303,6 +303,62 @@ nodes:
     trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
     label: 'o mapa das guardas — vista markdown deste grafo, baseline para a proxima revisao'
 
+  # ── 2026-08-04: tres furos MEDIDOS no mesmo dia, todos "verde sem ter olhado" ──
+  # Achados de campo rodando /meta:kg-freshness. O maestro VETOU corrigir o primeiro
+  # isoladamente ("nao podemos ficar mudando e bagunçando a doutrina") e mandou abrir
+  # estudo da familia antes de tocar em qualquer guarda. Estes nos SAO esse estudo.
+
+  - id: E_FUROPRUNE_LINT_0804
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-04
+    verified_against: 'execucao do lint-artifacts.sh de dentro de .claude/worktrees/kg-freshness-identity-0804'
+    label: 'FURO DE PRUNE: o lint poda */.claude/worktrees/* — exatamente o caminho que worktree-convention-2026.md define como canonico para worktree de HARNESS. Rodando de la, varre 0 agentes (deveria varrer 51) SEM reclamar, e morre em "wc: standard input: Is a directory" (o "(" do grupo find vaza para as raizes em _find, e o -prune imprime o diretorio podado). Como o pre-commit chama o lint, NENHUM commit sai de um worktree de harness'
+
+  - id: E_FUROESCOPO_EVOLUTION_0804
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-04
+    verified_against: 'find docs/evolution -maxdepth 1 -name *.md + grep ^kg: em cada um + saida de kg-provenance-coverage.sh'
+    label: 'FURO DE ESCOPO: kg-born-marker.sh e kg-provenance-coverage.sh compartilham o escopo hardcoded "docs/analysis + docs/evolution/research". docs/evolution/*.md na RAIZ fica invisivel para AMBOS: sao 6 arquivos e ZERO tem marcador kg: — entre eles worktree-convention-2026.md, scope-convention-2026.md, federation-roadmap-2026.md e trust-log.md. O provenance reporta "105/105 cobertos" verde, sem nunca olhar a pasta onde vivem as CONVENCOES'
+
+  - id: E_FUROSEMANTICO_RADAR_0804
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-04
+    verified_against: 'kg-radar.sh --integrity em onion-identity-2026-07.kg.yaml antes da correcao (exit 0 com a contradicao dentro)'
+    label: 'FURO SEMANTICO: a INTEGRIDADE do kg-radar so ve contradicao ESTRUTURAL (REFUTES entrando em no que segue confirmed). Nao ve evidencia que SUPPORTS um claim que ela CONTRADIZ TEXTUALMENTE — E_LSTREE_MAIN_0717 ("main segue adotando, NAO parada") sustentou C_TOPO_MAIN_HAS_FW ("nao vazia, apenas PARADA") por 18 dias, com o radar exit 0 o tempo todo'
+
+  - id: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-04
+    verified_against: 'os 3 nos de evidencia E_FURO*_0804, cada um medido de forma independente em 2026-08-04'
+    label: 'RESPOSTA PARCIAL A Q_GUARDAS_COERENTES: ha lacuna, e ela tem TRES FORMAS DISTINTAS que produzem o MESMO sintoma (verde sem ter olhado) — (1) PRUNE: a guarda se apaga no lugar onde roda; (2) ESCOPO: a pasta nunca entra na varredura; (3) SEMANTICA: o veredito nao cobre a dimensao em que o erro mora. Corrigir uma NAO corrige as outras, e nenhuma das tres e detectavel pela saida da propria guarda — todas dizem OK. E por isso que o fix pontual foi vetado'
+
+  - id: D_ESTUDAR_FAMILIA_ANTES_DE_CORRIGIR_0804
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-08-04
+    verified_against: 'REGRA 54 no lint + 2 casos novos no lint-selftest.sh (um deles MUTATION) + selftest exit 0'
+    label: 'DECISAO DO MAESTRO (2026-08-04), em DOIS tempos. Primeiro o VETO: "nao podemos ficar mudando e bagunçando a doutrina" — a correcao de 2 linhas do _find, ja testada, foi REVERTIDA e virou estudo da familia. Depois, revisto o caminho a luz do padrao Onion+Claude Code de agosto/2026 (worktree nativo em .claude/worktrees/ desde a v2.1.49; v2.1.218 de 22/07 endureceu a fronteira do git -C em subagente isolado), veio o GO para F1+F2. O que mudou entre um e outro NAO foi a pressa: foi descobrir que o antidoto ja existia no repo (safe-count.sh, nascido 2026-08-03) e que NENHUMA das 38 guardas o usava — logo a cura certa era o CONTRATO, nao o remendo'
+    trace: 'docs/evolution/worktree-convention-2026.md + .claude/utils/safe-count.sh'
+
 edges:
   - from: C_LACUNA_E_COBERTURA
     to: Q_GUARDAS_COERENTES
@@ -382,3 +438,28 @@ edges:
   - from: E_R52_NUMEROS_ERRADOS
     to: C_R52_SOBREPOE_R43
     edge_type: CONSTRAINS
+
+  # ── as tres medicoes de 08-04 sustentam a resposta parcial, que reforca o diagnostico ──
+  - from: E_FUROPRUNE_LINT_0804
+    to: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
+    edge_type: SUPPORTS
+  - from: E_FUROESCOPO_EVOLUTION_0804
+    to: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
+    edge_type: SUPPORTS
+  - from: E_FUROSEMANTICO_RADAR_0804
+    to: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
+    edge_type: SUPPORTS
+  - from: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: Q_GUARDAS_COERENTES
+    to: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
+    edge_type: DEPENDS_ON
+  - from: D_ESTUDAR_FAMILIA_ANTES_DE_CORRIGIR_0804
+    to: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
+    edge_type: DEPENDS_ON
+
+  # ── o que a execucao do F1+F2 produziu (2026-08-04, pos-go) ──
+  - from: D_ESTUDAR_FAMILIA_ANTES_DE_CORRIGIR_0804
+    to: E_FUROPRUNE_LINT_0804
+    edge_type: CAUSES

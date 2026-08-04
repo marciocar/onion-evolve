@@ -42,7 +42,10 @@ ensure_exclude() {
 # Fallback gracioso p/ dir não-git. A coluna PRESENÇA do mapa da constelação lê isto.
 worktree_of() {
   local wt
-  wt="$(git -C "$REPO" rev-parse --show-toplevel 2>/dev/null)" || wt="$REPO"
+# GIT_DIR neutralizado: sob hook do git em worktree o GIT_DIR e ABSOLUTO, e com ele
+# setado `git -C <subdir> rev-parse --show-toplevel` devolve o SUBDIR, nao a raiz —
+# o script passa a procurar tudo no lugar errado e emite vazio (medido 2026-08-04).
+  wt="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "$REPO" rev-parse --show-toplevel 2>/dev/null)" || wt="$REPO"
   realpath "$wt" 2>/dev/null || echo "$wt"
 }
 

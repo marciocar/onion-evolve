@@ -91,7 +91,8 @@ nodes:
     status: confirmed
     label: "Onion e framework template em .claude, 3 dimensoes peer, plataforma unica Claude Code"
     trace: "CLAUDE.md:identidade-canonica"
-    verified_at: 2026-07-17
+    verified_at: 2026-08-04
+    verified_against: "filesystem do core 2026-08-04, INDEPENDENTE do texto do CLAUDE.md (senao seria circular): package.json AUSENTE (nao e npm), nenhum .cursor*/.antigravity*/.codex* na raiz (plataforma unica), docs/{business,technical,compliance}-context presentes (3 peer)"
   - id: C_RFC4_INTER_INSTANCE
     node_type: claim
     layer: audit
@@ -147,7 +148,14 @@ nodes:
     status: confirmed
     label: "main tem 239 arquivos .claude (adotou Onion 26/06); nao vazia, apenas parada"
     trace: "git ls-tree origin/main .claude"
-    verified_at: 2026-07-17
+    verified_at: 2026-08-04
+    # ATENCAO AO ALVO: este no fala da main do METAGAMIFY (marciocar/metagamify), nao do core.
+    # A ausencia dessa desambiguacao ja produziu DOIS erros de medicao (E_LSTREE_MAIN_0717 em
+    # 07-17 e um worker de /meta:kg-freshness em 08-04) — ambos contaram o .claude do core.
+    # MEDIDO 2026-08-04 (git ls-remote contra o remoto vivo, sem fetch): 239 arquivos .claude
+    # EXATOS na main do metagamify; ultima gravacao nela em 2026-06-26 — 39 dias parada enquanto
+    # a develop andou ate 07-14. As tres asserções do no batem verbatim; "apenas parada" REFORCADO.
+    verified_against: "marciocar/metagamify@origin/main-bfb9bce2-2026-08-04"
   - id: C_VERTICALS_EMPTY
     node_type: claim
     layer: audit
@@ -270,7 +278,9 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.95
-    status: confirmed
+    # SUPERSEDIDO em 2026-08-04 por E_ORBIT_0804 — por CONTAGEM, nao por refutacao:
+    # a substancia ("todos na orbita; ZERO frio") continua VERDADEIRA. Era um snapshot de 07-11.
+    status: superseded
     label: "5 adotantes = repos de Marcio ou consultoria/CTO; ZERO adotante frio/externo"
     trace: "F2 Q2 (members.yaml + remotes)"
   - id: E_SITE_LIVE
@@ -292,7 +302,8 @@ nodes:
     status: confirmed
     label: "VALOR PROVADO: dogfood pega bug real que revisao-no-papel nao pega"
     trace: "F2 Q4"
-    verified_at: 2026-07-17
+    verified_at: 2026-08-04
+    verified_against: "PRs #126, #89, #128 (gh pr view, todos MERGED) — cada corpo nomeia 'dogfood' como origem do bug: CLAUDE.md fora dos roots de varredura, .env.example clobbered em adocao real, lacunas do /meta:all-tools so visiveis rodando"
   - id: C_MARKET_COMMODITY
     node_type: claim
     layer: audit
@@ -302,6 +313,8 @@ nodes:
     status: confirmed
     label: "comandos/agentes/skills/plugins + spec-driven-dev sao COMMODITY, nao moat"
     trace: "F2 Q3"
+    verified_at: 2026-08-04
+    verified_against: "re-scan externo (WebSearch 2026-08-04): Spec Kit 120.2k estrelas, BMAD-METHOD 48.6k, awesome-claude-code 51.5k — eram 93k/49k/36.8k em F2 Q3; a commodity ficou MAIS densa, claim reforcada"
   - id: C_ORBIT_CAVEAT
     node_type: claim
     layer: audit
@@ -311,6 +324,8 @@ nodes:
     status: confirmed
     label: "TODOS adotantes na orbita de Marcio; dor+ICP validados so intra-orbita (funciona != vende)"
     trace: "F2 Q2"
+    verified_at: 2026-08-04
+    verified_against: "docs/evolution/federation/members.yaml @ 27ce2b4 (12 membros, 8 kind:adopter, nenhum frio) + varredura Q_COLD_ADOPTER em docs/ (segue aberto, experimento em 'desenhado-para-execucao')"
   - id: C_MARKET_PULL
     node_type: claim
     layer: audit
@@ -422,7 +437,8 @@ nodes:
     status: confirmed
     label: "EDGE HAGEL: rhilo/metagamify dogfoodou o KG SDAAL e PUXOU o core (/meta:kg + kg-radar nasceram da vivencia)"
     trace: "F2 Q5 (56 nos/81 arestas, /meta:evolve 2026-07-04)"
-    verified_at: 2026-07-17
+    verified_at: 2026-08-04
+    verified_against: "commits 70f9a26 (.claude/validation/kg-radar.sh: comentario 'NAO port do radar.js do rhilo' + 'prometido ao rhilo no D3') e 3823978 (plano tecendo 'Hagel edge-core' em Q3/Q5) — evidencia git de 1a mao de que o dogfood do rhilo PRECEDEU e puxou /meta:kg + kg-radar no core"
   # -- decisao de north-star + candidatos --
   - id: Q_NORTHSTAR
     node_type: question
@@ -470,7 +486,8 @@ nodes:
     status: confirmed
     label: "pesquisa knowledge-centric 2026-07 (26+ fontes datadas; hype vs implementado)"
     trace: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
-    verified_at: 2026-07-17
+    verified_at: 2026-08-04
+    verified_against: "o proprio SYNTHESIS.md lido (311 linhas, 42 URLs unicas >= '26+ fontes', frase 'HYPE/discurso vs. IMPLEMENTADO/produto' literal) — evidencia sobre O ARTEFATO existir e conter isso, NAO checagem de mercado (essa e C_AXIS_HOT)"
   - id: C_AXIS_HOT
     node_type: claim
     layer: audit
@@ -489,7 +506,8 @@ nodes:
     status: confirmed
     label: "NINGUEM trata negocio+eng+compliance como 3 verticais IGUAIS; todo player ancora numa e trata o resto como contexto"
     trace: "KC research (o eixo unico do Onion)"
-    verified_at: 2026-07-17
+    verified_at: 2026-08-04
+    verified_against: "WebSearch 2026-08-04 (2 buscas, KG/compliance enterprise): Vanta, Purview, Atlan, Collibra, Glean, OvalEdge, Promethium — todos ancorados numa vertical, resto como contexto; NENHUM trata as 3 como peer. RESSALVA: e negativa existencial ('NINGUEM'), logo sampling = nao-refutacao, nao prova exaustiva"
   - id: C_COMBO_UNOCCUPIED
     node_type: claim
     layer: audit
@@ -508,6 +526,8 @@ nodes:
     status: confirmed
     label: "RAG/GraphRAG e recuperacao, nao reconciliacao (VersionRAG 64%/10%) — reconciliar VERDADE e o diferencial"
     trace: "KC research (VersionRAG arXiv:2510.08109)"
+    verified_at: 2026-08-04
+    verified_against: "abstract do arXiv:2510.08109 lido via WebFetch em 2026-08-04 — GraphRAG 64% em VersionQA; o '10%' e o TETO da faixa de baselines (0-10%) em deteccao implicita de mudanca, nao um numero solto: ajustar o label nessa precisao numa proxima edicao"
   - id: C_TOKI_TWIN
     node_type: claim
     layer: audit
@@ -526,6 +546,8 @@ nodes:
     status: confirmed
     label: "a validacao de mercado e do EIXO (YC RFS), NAO do Onion; segue zero adotante frio — 'funciona != vende'"
     trace: "KC research + C_ORBIT_CAVEAT"
+    verified_at: 2026-08-04
+    verified_against: "docs/evolution/federation/members.yaml @ 27ce2b4 — 8 adotantes (kind:adopter) / 11 membros nao-source; TODOS remetem a marciocar/*, GranaAi (CTO) ou consultoria; 'zero adotante frio' segue verdadeiro pelo mesmo metodo (members.yaml + remotes) de E_ORBIT"
   - id: C_NAME_SLICES
     node_type: claim
     layer: audit
@@ -570,7 +592,9 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: confirmed
+    # SUPERSEDIDO em 2026-08-04: o FATO (publico defasado) persiste, mas a CAUSA mudou —
+    # em 07-17 era autoria atrasada; hoje o fonte no repo ja esta certo e quem parou e o DEPLOY.
+    status: superseded
     label: "curl onionevolve.com exibe 96 comandos; SSOT inventory.md diz 97 desde 2026-07-15 — o site publico esta stale"
     trace: "curl https://onionevolve.com x docs/onion/inventory.md"
     verified_at: 2026-07-17
@@ -590,7 +614,11 @@ nodes:
     plane: PROD
     impact: 2
     confidence: 1.0
-    status: confirmed
+    # REFUTADO em 2026-08-04 por E_LSTREE_METAGAMIFY_0804: mediu o REPO ERRADO.
+    # 399 e a contagem de .claude da main do PROPRIO core (onion-evolve) na janela 07-16/07-17
+    # (medido: 397 em 16/07 16h50, 410-412 em 17/07 20h) — a main do metagamify, alvo real do no,
+    # esta congelada em 239 desde 2026-06-26 e nao poderia ter ido a 399.
+    status: refuted
     label: "git ls-tree origin/main .claude conta 399 arquivos (era 239 em 11/07) — main segue adotando, nao parada"
     trace: "git ls-tree -r --name-only origin/main -- .claude"
     verified_at: 2026-07-17
@@ -706,6 +734,97 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "ERRO DE LEITURA REGISTRADO (2026-08-02, para nao se repetir): esta sessao afirmou que 'a doutrina diz indivisivel enquanto o plugins/ divide'. FALSO. CLAUDE.md:12 diz que os workflows faseados 'nao devem ser CONSOLIDADOS' — isto e, nao devem ser FUNDIDOS UM NO OUTRO. Ler 'consolidados' como 'divididos' inverte o sentido: manter product/ e engineer/ como fluxos distintos e COMPATIVEL com envia-los como verticais separadas. A afirmacao falsa foi commitada em docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md e no no C_objecao_mattpocock_vence"
+
+  # ═══ RE-VERIFICACAO CONTRA O VIVO (/meta:kg-freshness, 2026-08-04) ═══
+  # Fila do radar: 31 nos; medidos os 16 de maior atencao (15 fora do corte). 16 workers
+  # sonnet/medium + 3 juizes adversariais opus/high. O juiz DERRUBOU o worker em 1 de 3 e
+  # corrigiu o MECANISMO em outro — a fase de julgamento mudou 2 dos 3 vereditos que iam
+  # virar escrita. Vereditos finais: 12 CONFIRMED · 2 DRIFTED · 2 UNVERIFIABLE.
+
+  - id: E_LSTREE_METAGAMIFY_0804
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "metagamify origin/main = 239 arquivos .claude, ultimo commit 2026-06-26 (bfb9bce2, 39 dias parada); develop = f016e3d3 (andou ate 07-14), rhilo/main = f7e4b034 e rhilo/develop = 07e19aaf VIVAS — a topologia de 3 linhagens NAO colapsou"
+    trace: "git ls-remote --heads + git ls-tree -r --name-only origin/main -- .claude, em /home/marcio/rhilo-metagamify (origin = github.com/marciocar/metagamify)"
+    verified_at: 2026-08-04
+    verified_against: "marciocar/metagamify @ 2026-08-04, medido no clone local com ls-remote (estado remoto vivo, sem fetch)"
+
+  - id: C_MEDICAO_NO_REPO_ERRADO_0804
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "MODO DE FALHA NOMEADO — 'medicao no repo errado': nos que falam de OUTRO repo (aqui, a main do metagamify) sao medidos no repo onde a sessao esta rodando (o core). Aconteceu DUAS vezes com o MESMO no: em 07-17 (E_LSTREE_MAIN_0717 contou 399 = o .claude do core naquela janela) e em 08-04 (um worker contou 562 = o core hoje). O no nunca disse qual repo era o alvo — e o campo que faltava e verified_against, nao trace"
+    trace: "E_LSTREE_MAIN_0717 (refutado) + veredito do worker medir:C_TOPO_MAIN_HAS_FW (derrubado pelo juiz)"
+    verified_at: 2026-08-04
+    # MEDIDO 2026-08-04: a main do CORE tinha 397 arquivos .claude em 2026-07-16 16h50 e 410-412
+    # em 2026-07-17 20h — o "399" de E_LSTREE_MAIN_0717 cai exatamente nessa janela. A main do
+    # metagamify esta congelada em 239 desde 06-26, logo nunca esteve em 399. Cadeia fechada.
+    verified_against: "onion-evolve@main-historico-2026-07-16..17 x marciocar/metagamify@origin/main"
+
+  - id: C_SUPERSEDE_NAO_PROPAGA_0804
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "LACUNA DE MECANISMO: uma evidencia CONTAMINADA (E_LSTREE_MAIN_0717) SUPERSEDEU uma evidencia CORRETA (E_GIT_LSTREE_MAIN, '239 arquivos' — verdade ate hoje) e passou a SUSTENTAR (SUPPORTS) um claim que ela CONTRADIZ TEXTUALMENTE ('main segue adotando, nao parada' sustentando 'nao vazia, apenas parada'). Ficou assim 18 dias. NENHUM veredito do radar viu: INTEGRIDADE so olha contradicao ESTRUTURAL (REFUTES sem reconciliar status), nao contradicao SEMANTICA entre label de evidencia e label do claim que ela sustenta. Candidato a guarda determinista"
+    trace: "arestas E_LSTREE_MAIN_0717 -SUPERSEDES-> E_GIT_LSTREE_MAIN e -SUPPORTS-> C_TOPO_MAIN_HAS_FW"
+    verified_at: 2026-08-04
+    verified_against: "kg-radar.sh --integrity saiu 0 no grafo contendo a contradicao (medido antes desta passada, no Passo 0 do /meta:kg-freshness)"
+
+  - id: E_ORBIT_0804
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    label: "8 adotantes (kind: adopter) / 11 membros nao-source — eram 4-5 em 07-11; TODOS seguem repos de Marcio ou consultoria/CTO; ZERO adotante frio/externo. O 'arandek' sob org externa (ArandekBR) NAO quebra o padrao: a main dele compartilha historia git com marciocar/metagamify, a adocao vive em worktree na maquina do maestro, e o maestro opera CI/staging/PRs do ArandekBR — consultoria/CTO operacional, nao pull frio"
+    trace: "docs/evolution/federation/members.yaml (awk ancorado em '^    kind: adopter' — o grep -c ingenuo devolve 9 porque casa o bloco TEMPLATE comentado) + handoff arandek + inbox/_processed"
+    verified_at: 2026-08-04
+    verified_against: "docs/evolution/federation/members.yaml @ 27ce2b4"
+
+  - id: E_SITE_DEPLOY_STALE_0804
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "curl onionevolve.com (HTTP 200, 45884 bytes) serve 98 comandos / 82 KBs / 8 skills; a SSOT (docs/onion/inventory.md) diz 102 / 87 / 11 desde 2026-07-30 — o publico segue defasado"
+    trace: "curl https://onionevolve.com x docs/onion/inventory.md"
+    verified_at: 2026-08-04
+    verified_against: "onionevolve.com @ 2026-08-04 (data-n servidos: 98 comandos, 51 agentes, 82 KBs) x inventory.md @ 27ce2b4"
+
+  - id: C_SITE_LAG_E_DEPLOY_NAO_AUTORIA_0804
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    label: "A CAUSA DA DEFASAGEM DO SITE MUDOU — nao e mais autoria atrasada (07-17), e DEPLOY parado: site/index.html NO REPO ja diz 102/51/87 e a string data-n=\"98\" NAO EXISTE MAIS no fonte (grep -c = 0 com o arquivo comprovadamente presente); o commit 2785f02 (2026-07-30) atualizou inventory.md E site/index.html NO MESMO COMMIT. A VPS serve um build anterior a 07-30. Consequencia pratica: a correcao NAO e reescrever a copy (ja esta certa) — e republicar"
+    trace: "git show --stat 2785f02 (toca inventory.md + site/index.html); grep -c 'data-n=\"98\"' site/index.html = 0; data-n do fonte = 102/51/87 vs servidos 98/51/82"
+    verified_at: 2026-08-04
+    verified_against: "site/index.html @ 27ce2b4 (mtime 2026-07-30 08:47) x resposta viva de onionevolve.com em 2026-08-04"
+
+  - id: Q_TESTEMUNHO_NAO_MEDIVEL_0804
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: open
+    label: "nos da classe TESTEMUNHO (verified_against: relato-do-maestro-*) sao estruturalmente nao-re-verificaveis por maquina: afirmam INTENCAO ('proposito de negocio') ou fato de campo fora do repo ('alunos reais usaram'), e a unica checagem disponivel — o texto que codificou o relato — e circular. Hoje eles passam nos tres vereditos do radar exibindo carimbo fresco, indistinguiveis de um no medido. Precisam de marcador proprio (ex.: evidence_class: testimony) para o radar parar de trata-los como mensuraveis?"
+    trace: "/meta:kg-freshness 2026-08-04 — 2 de 16 nos vieram UNVERIFIABLE por esta razao, ambos de alta atencao (E_PORTE_PARA_O_CURSO 20.0, D_CLAUDE_CODE_POR_CAPACIDADE 15.0)"
 
 edges:
   # a historia (2026-08-02) sustenta a distincao, e a distincao refuta o erro desta sessao
@@ -959,4 +1078,41 @@ edges:
     edge_type: DEPENDS_ON
   - from: Q_COLD_ADOPTER_0717
     to: E_ORBIT
+    edge_type: DEPENDS_ON
+
+  # ==== reconciliacao da re-verificacao contra o vivo (2026-08-04) ====
+  # a medicao no repo CERTO sustenta o claim e refuta a evidencia contaminada de 07-17
+  - from: E_LSTREE_METAGAMIFY_0804
+    to: C_TOPO_MAIN_HAS_FW
+    edge_type: SUPPORTS
+  - from: E_LSTREE_METAGAMIFY_0804
+    to: E_LSTREE_MAIN_0717
+    edge_type: REFUTES
+  - from: E_LSTREE_METAGAMIFY_0804
+    to: C_MEDICAO_NO_REPO_ERRADO_0804
+    edge_type: SUPPORTS
+  # medir o repo errado foi o que permitiu a supersede ruim passar despercebida
+  - from: C_MEDICAO_NO_REPO_ERRADO_0804
+    to: C_SUPERSEDE_NAO_PROPAGA_0804
+    edge_type: SUPPORTS
+  # orbita: drift de CONTAGEM (5 -> 8), substancia intacta
+  - from: E_ORBIT_0804
+    to: E_ORBIT
+    edge_type: SUPERSEDES
+  - from: E_ORBIT_0804
+    to: C_ORBIT_CAVEAT
+    edge_type: SUPPORTS
+  # site: o fato persiste, a CAUSA mudou de autoria para deploy
+  - from: E_SITE_DEPLOY_STALE_0804
+    to: E_SITE_STALE_0717
+    edge_type: SUPERSEDES
+  - from: E_SITE_DEPLOY_STALE_0804
+    to: C_SITE_LAG_E_DEPLOY_NAO_AUTORIA_0804
+    edge_type: SUPPORTS
+  # a pergunta aberta pende dos dois nos que vieram UNVERIFIABLE
+  - from: Q_TESTEMUNHO_NAO_MEDIVEL_0804
+    to: E_PORTE_PARA_O_CURSO
+    edge_type: DEPENDS_ON
+  - from: Q_TESTEMUNHO_NAO_MEDIVEL_0804
+    to: D_CLAUDE_CODE_POR_CAPACIDADE
     edge_type: DEPENDS_ON

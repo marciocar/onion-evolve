@@ -15,7 +15,10 @@
 # =============================================================================
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || (cd "${HERE}/../.." && pwd))"
+# GIT_DIR neutralizado: sob hook do git em worktree o GIT_DIR e ABSOLUTO, e com ele
+# setado `git -C <subdir> rev-parse --show-toplevel` devolve o SUBDIR, nao a raiz —
+# o script passa a procurar tudo no lugar errado e emite vazio (medido 2026-08-04).
+ROOT="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || (cd "${HERE}/../.." && pwd))"
 MEMBERS="${ROOT}/docs/evolution/federation/members.yaml"
 GRAPH="${ROOT}/.claude/validation/graph.sh"
 RECON="${ROOT}/.claude/utils/co-evolution/reconcile-inputs.sh"
