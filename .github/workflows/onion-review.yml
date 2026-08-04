@@ -228,24 +228,42 @@ jobs:
           PREFLIGHT_OK: ${{ steps.preflight.outputs.ok }}
           PREFLIGHT_HTTP: ${{ steps.preflight.outputs.http }}
         run: |
-          # CAUSA CONHECIDA E BENIGNA (medida no PR #529, o primeiro a exercitar este aviso):
-          # a claude-code-action SE RECUSA a rodar quando o workflow do PR difere do que está
-          # na branch default ("Skipping action due to workflow validation") — proteção dela
-          # contra um PR que reescreve o próprio revisor. Sem nomear isso, TODO PR que edite
-          # este arquivo dispararia alarme sem haver defeito, e alarme impreciso é como um
-          # alarme morre — o mesmo motivo pelo qual o critério do review-verdict.sh é estreito.
+          # ═══ ALARME SÓ QUANDO EXIGE DECISÃO (2026-08-04) ═══
+          # Sinal de campo do maestro: "não entendo porque estamos sempre com esta mensagem".
+          # Medido: dos 6 PRs de 08-03/04, QUATRO editavam este workflow — e a
+          # claude-code-action SE RECUSA a rodar quando o workflow do PR difere da branch
+          # default ("Skipping action due to workflow validation"), protegendo-se de um PR que
+          # reescreve o próprio revisor. Ou seja: condição ESPERADA, AUTO-INFLIGIDA e BENIGNA.
+          #
+          # A versão anterior detectava isso e mesmo assim disparava ⚠️ + comentário + e-mail,
+          # com "Esperado aqui" escrito no próprio corpo. Alarme que anuncia a própria
+          # irrelevância não é alarme — é ruído com justificativa anexa, e ensina a ignorar os
+          # que importam. Agora o caso benigno vira NOTA no resumo do job e o PR fica em
+          # silêncio; ⚠️ e e-mail ficam para o que pede decisão humana.
           nota=""
-          # Credencial primeiro: é a causa que a action esconde atrás de um hang, e a
-          # única do lote cujo conserto não é código.
-          # Orçamento estourado NÃO é "o revisor morreu": ele leu, analisou e foi interrompido.
-          # Dizer isso muda o conserto de quem lê o aviso — subir o teto, não caçar fantasma.
+          benigno=false
           if [ "${M1}" = "orcamento-de-turnos" ] || [ "${M2}" = "orcamento-de-turnos" ]; then
+            # Orçamento estourado NÃO é "o revisor morreu": ele leu, analisou e foi interrompido.
+            # Muda o conserto de quem lê — subir o teto, não caçar fantasma.
             nota=" _O revisor **trabalhou** e bateu no teto de turnos (\`--max-turns\`) antes de concluir — não é crash. Conserto: subir o teto em \`onion-review.yml\`._"
           elif [ "${PREFLIGHT_OK}" != "true" ]; then
+            # Credencial: a causa que a action esconde atrás de um hang, e a única do lote cujo
+            # conserto não é código.
             nota=" **Causa medida: a credencial do CI não autentica** (pré-voo: HTTP \`${PREFLIGHT_HTTP}\`). O revisor sequer foi chamado — a action não repassa erro de auth, ela pendura ~180s e devolve \`is_error\` sem mensagem. Conserto: gravar um \`ANTHROPIC_API_KEY\` válido no repo."
           elif git diff --name-only "${BASE_SHA}" HEAD | grep -q '^\.github/workflows/onion-review\.yml$'; then
-            nota=" _Causa provável: este PR altera o próprio \`onion-review.yml\`, e a action se auto-pula quando o workflow difere da branch default. **Esperado aqui** — o caminho real volta a ser exercido no PR seguinte ao merge._"
-            echo "::notice::o alarme acima tem causa conhecida: este PR edita o próprio workflow, e a action se auto-pula nesse caso."
+            benigno=true
+          fi
+
+          if [ "${benigno}" = "true" ]; then
+            echo "::notice::onion-review pulado por desenho: este PR edita o próprio workflow, e a action se auto-pula quando ele difere da branch default. Nada a fazer — o caminho real volta no PR seguinte ao merge."
+            {
+              echo "ℹ️ **onion-review pulado por desenho** — este PR edita o próprio \`onion-review.yml\`,"
+              echo "e a action se auto-pula quando o workflow difere da branch default."
+              echo "**Nada a fazer**: o caminho real volta a ser exercido no PR seguinte ao merge."
+              echo ""
+              echo "<sub>Sem comentário no PR de propósito: condição esperada não gera alarme.</sub>"
+            } >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
           fi
           echo "::warning::onion-review não revisou após 2 tentativas (1ª: ${M1:-nao-rodou} · 2ª: ${M2:-nao-rodou}) — nenhum veredito produzido. Revise manualmente. O gate determinístico (onion-validate) segue valendo."
 
