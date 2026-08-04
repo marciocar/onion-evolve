@@ -8,6 +8,23 @@
 
 ---
 
+## 2026-08-04 · Maestro's Aside — entrada lateral tipada (side-channel) · COMPATÍVEL · alvo: todos
+- **Novo protocolo "Aparte do Maestro" / Maestro's Aside.** O maestro escreve um **marcador tipado** no
+  INÍCIO da mensagem (`dúvida:` `corrige:` `reforço:` `nota:` `guarda:` `+etapa:` `-etapa:` `paralelo:`
+  `guarda-regra:`) e o hook `UserPromptSubmit` (`.claude/hooks/aside-router-hook.sh` + motor
+  `.claude/validation/aside-router.sh`) injeta a **ROTA canônica** como `additionalContext` — **recall, não
+  gate**. É um DISPATCHER: roteia p/ diário/memória/STATE/orquestração que já existem (cria **zero store novo**).
+- **COMPATÍVEL / regressão-zero:** SILENCIOSO quando não há marcador (custo-zero, não polui contexto); NUNCA
+  bloqueia (maestro é fonte confiável, R15.2 — sem envelope untrusted); irreversíveis (`-etapa:`,
+  `guarda-regra:`) injetam **propor→confirmar** (Ato 3/W6).
+- **Idioma:** código em inglês (`aside` = o aparte teatral; `maestro` preservado); marcadores e nome-produto
+  ("Aparte do Maestro") em pt-BR — vocabulário de interação.
+- **Ação p/ adotantes:** OPCIONAL. Após o próximo `/meta:adopt --update` (que vendoriza o hook + a KB + a seção
+  §4.6 do warm-up), os marcadores passam a valer na SUA sessão. Nada muda se você não usar (retrocompatível).
+  Vocabulário e tabela de roteamento: `docs/knowledge-base/agentic-patterns/harness/maestro-aside.md`.
+- Fundamento: pesquisa 3-frentes (ago/2026) — consenso "steer, don't stop"; prefixo tipado é gap aberto no
+  estado-da-arte. Identidade §1.5 (invenção nomeada) · warm-up §4.6 · diário `2026-08-04-maestro-aside-side-channel`.
+
 ## 2026-07-27 · Guard de BASE CRUZADA no `--update` (múltiplas integration branches) · COMPATÍVEL · alvo: todos
 
 - **Crédito: sinal de campo do metagamify (2026-07-27).** Um adotante com **duas integration branches
