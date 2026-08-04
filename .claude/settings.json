@@ -58,6 +58,16 @@
             "statusMessage": "Refrescando farol de sessão (Onion)"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/aside-router-hook.sh\"",
+            "timeout": 5,
+            "statusMessage": "Roteando aparte do maestro (Onion)"
+          }
+        ]
       }
     ],
     "SessionEnd": [

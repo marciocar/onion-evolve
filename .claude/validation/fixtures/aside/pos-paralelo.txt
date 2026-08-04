@@ -1,0 +1,1 @@
+paralelo: pesquisa como o LangGraph faz interrupt

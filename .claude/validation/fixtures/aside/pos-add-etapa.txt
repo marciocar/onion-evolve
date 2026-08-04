@@ -1,0 +1,1 @@
++etapa: rodar o lint-selftest antes do commit

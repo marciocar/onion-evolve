@@ -1,0 +1,1 @@
+lembre-se de sempre rodar os testes antes do PR

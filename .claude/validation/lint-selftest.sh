@@ -553,6 +553,31 @@ run_shell_pipefail_robustness_selftests() {
   fi
 }
 
+run_aside_router_selftests() {
+  # GUARD do motor "Aparte do Maestro" (.claude/validation/aside-router.sh): as fixtures
+  # POSITIVAS (marcador tipado no início) DEVEM rotear; as NEGATIVAS (prosa casual, marcador
+  # sem ':' , palavra no meio) DEVEM ficar MUDAS. Impede regressão silenciosa do detector
+  # (falso-negativo perde o roteamento; falso-positivo polui contexto em prosa comum).
+  local eng="${REPO_ROOT}/.claude/validation/aside-router.sh"
+  local fxdir="${REPO_ROOT}/.claude/validation/fixtures/aside" f out miss=""
+  [ -f "$eng" ] || { record_pass "aside-router: motor ausente — pulado"; return; }
+  for f in "$fxdir"/pos-*.txt; do
+    [ -f "$f" ] || continue
+    out="$(bash "$eng" detect < "$f" 2>/dev/null)"
+    [ -n "$out" ] || miss="${miss} $(basename "$f")(sem-rota)"
+  done
+  for f in "$fxdir"/neg-*.txt; do
+    [ -f "$f" ] || continue
+    out="$(bash "$eng" detect < "$f" 2>/dev/null)"
+    [ -z "$out" ] || miss="${miss} $(basename "$f")(falso-positivo)"
+  done
+  if [ -z "$miss" ]; then
+    record_pass "aside-router: marcadores tipados roteiam; prosa casual fica muda (fixtures pos/neg)"
+  else
+    record_fail "aside-router: detector regrediu" "casos:${miss}"
+  fi
+}
+
 run_vendor_scrub_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   local helper="${SCRIPT_DIR}/projection-safety.sh"
@@ -6442,6 +6467,7 @@ printf "%s/%s" "${PASS}" "${SKIP}"' 2>/dev/null || true)"
 }
 run_selftest_outcomes_selftests
 run_shell_pipefail_robustness_selftests
+run_aside_router_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests

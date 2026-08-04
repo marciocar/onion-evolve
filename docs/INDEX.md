@@ -13,7 +13,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - 🤖 **102 comandos invocáveis** Claude Code em 10 categorias + root (+ 26 fragmentos compartilhados em `common/` e 11 READMEs de categoria)
 - 🎯 **51 agentes de IA especializados** em 9 categorias
 - 🧩 **11 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes; `onion-{engineering,product,compliance}-context` — resolvers de SSOT por vertical; `onion-wizard` / `onion-onboarding` — a Condução (FAZER × CONHECER); `onion-retro` — retro/feedback como spec-as-code)
-- 📚 **87 Knowledge Bases** estruturadas para consumo por IA (+ KB viva `agentic-patterns/` + vertical `education/`)
+- 📚 **88 Knowledge Bases** estruturadas para consumo por IA (+ KB viva `agentic-patterns/` + vertical `education/`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente com ativação automática
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
 - 🏗️ **Spec as Code Multi-Context** — business, technical, compliance (peer) + design (provisório, gated). Neste repo, `business-context/` **e** `technical-context/` estão **populados como dogfood** (seed real do Onion); `compliance-context/` segue template.
@@ -25,7 +25,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ### Documentação Principal
 - **585 arquivos markdown** em `docs/`
 - **20 arquivos** em `docs/onion/` (Sistema Onion)
-- **88 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 87 KBs — conteúdo + (sub)categoria READMEs — + `index.md`)
+- **89 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 88 KBs — conteúdo + (sub)categoria READMEs — + `index.md`)
   - 48 em `concepts/` (Conceitos fundamentais)
   - 9 em `frameworks/` (Frameworks e metodologias)
   - 5 em `tools/` (Ferramentas, incl. Agent Skills e PostgreSQL)
@@ -68,7 +68,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **585 arquivos** de documentação markdown em `docs/`
 - **102 comandos invocáveis** em 10 categorias + root (+ 26 fragmentos `common/` + 11 READMEs de categoria)
 - **51 agentes** especializados em 9 categorias
-- **11 skills** (`.claude/skills/`) · **87 Knowledge Bases**
+- **11 skills** (`.claude/skills/`) · **88 Knowledge Bases**
 
 ---
 
