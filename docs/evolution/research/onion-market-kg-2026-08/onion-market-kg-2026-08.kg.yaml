@@ -256,6 +256,112 @@ nodes:
     label: "Pesquisa Elenxo imersiva de dois eixos, 2026-08-02: 5 lentes internas adversariais + 8 pistas externas + varredura por trajetoria + pista dev/problema + correlacao com regua de Aristoteles + re-litigio com replay + refutacao adversarial. 38 workers somados em 4 workflows; 132 achados externos, 100% com URL primaria"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
 
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # LEVA W2 (2026-08-05, wf_b516b6a2-b84) — o eixo que faltava: 5 posicoes em
+  # steelman, cada uma atacada por lente adversarial propria. PLACAR: 5 de 5
+  # REFUTADAS, todas por MEDICAO. Correlacao: 44 itens (18 desenha / 14
+  # nao-transfere / 12 transfere).
+  # ─────────────────────────────────────────────────────────────────────────────
+
+  - id: E_w2_placar_cinco_de_cinco
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-05
+    verified_against: wf_b516b6a2-b84
+    label: "PLACAR W2: 5 posicoes em steelman (T1 derivavel, T2 irredutivel, E1 plataforma, E2 porta, E3 moat), 5 REFUTADAS — todas por medicao, nenhuma por retorica. Correlacao: 44 itens = 18 desenha, 14 nao-transfere, 12 transfere. Que 12 transferem importa mais que o placar: MAGMA (grafo SO vale com politica de travessia), CMDB (mesmo modo de falha da camada domain), Graphify (proveniencia mecanizada por ARESTA), EU AI Act (rastro auditavel exigivel), Graphiti (retrieval deterministico), ICLR-gargalo (retrieval domina 20 pontos, escrita 3-8)"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: C_w2_tese_mae_refutada_na_junta
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-05
+    verified_against: contagem-direta-nos-53-grafos
+    label: "A TESE-MAE ('os dois eixos sao o mesmo movimento: derivar o derivavel libera esforco para o julgamento, e julgamento e o que o Graphify nao tem') e REFUTADA NA JUNTA — duas afirmacoes verdadeiras que NAO COMPOEM. (a) A premissa 'o repo nunca aplicou derivacao ao .kg.yaml' e FALSA. (b) A ARITMETICA DO PROPONENTE ESTAVA ERRADA E DO LADO QUE SUSTENTAVA A TESE: claim+decision+question = 1.437/2.049 = 70,1%, nao ~90%; so chega a 89% contando os 390 'evidence' — que sao justamente o que PODE ser parcialmente derivado. (c) O ganho declarado nao existe: 8% de 2.049 = 167 nos, escritos UMA VEZ CADA; o gargalo medido e LEITURA, nao escrita. (d) 'julgamento e o que o Graphify nao tem' e verdade de FORMA, falsa de MOTOR: dos 221 alvos de SUPERSEDES/REFUTES, so 11 (5,0%) tem trace resolvivel para superficie executavel"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: D_w2_nao_derivar_nada_novo
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-05
+    verified_against: wf_b516b6a2-b84
+    label: "VEREDITO DO EIXO TECNICO: NAO derivar nada de novo no .kg.yaml; ZERO gate novo nesta rodada. Dos 5 itens de T1 e do gate de T2, nenhum passa o crivo 'item sem gate nao entra' na direcao que importa — ou o gate nasce cego, ou verde-vazio, ou opera sobre conjunto vazio. O que ENTRA e REPARO, nao mecanismo: os 8 numeros errados de docs/technical-context/ corrigidos A MAO, um commit. A FRONTEIRA correta nao e 'derivavel x nao-derivavel', e 'JA LEGIVEL NO DADO x PEDE CAMPO NOVO' — node_type + presenca de trace ja classificam; campo novo custa gramatica a todo adotante"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: C_w2_mecanizar_pode_ser_a_catedral
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-05
+    verified_against: taxa-de-defeito-medida
+    label: "REFINAMENTO DOUTRINARIO que vale mais que o conserto: taxa de defeito medida = 8 numeros errados em MESES. Custo do gate (gerador + guarda + selftest + manutencao) > custo do conserto manual => MECANIZAR E A CATEDRAL. 'fix-must-become-mechanism' NAO e 'todo fix vira gate' — e 'todo fix vira mecanismo QUANDO O VOLUME JUSTIFICA'. Sem o portao 4 (o volume forca), a propria doutrina anti-catedral fabrica catedral"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_w2_plataforma_confirmada_por_junho
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-05
+    verified_against: docs/analysis/onion-agent-teams-evaluation-2026-06.md
+    label: "E1 — PLATAFORMA UNICA CONFIRMADA, e a 'correcao' proposta foi REFUTADA por evidencia que estava no repo desde junho: smoke-test PASS 6/6 em 2026-06-15 (TeamCreate -> spawn -> SendMessage). A doutrina NAO cita capacidade fantasma; '0 hits' de uso nao e vaporware, e a assinatura de uma decisao registrada FUNCIONANDO. C_POSTURA_ACOPLAMENTO e C_CORE_NAO_E_FAMILIA ficam INTOCADOS — selar leitura refutada seria fabricar historia. Resta SO uma question ao maestro: a decisao e datada 2026-05-18 e nomeia ferramenta validada em 2026-06-15"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: E_w2_porta_contra_experimento_n6
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-05
+    verified_against: gh-api-repos-marciocar-2026-08-05
+    label: "E2 — A PORTA e HIPOTESE, e o motivo e um CONTRA-EXPERIMENTO N=6 DENTRO DA PROPRIA FAMILIA: medidos ao vivo os 7 repos publicos (onion 0 estrelas com description+MIT; onion-cursor 0; onion-antigravity 0 mesmo com +3 topics; onion-copilot 0; ...). A teoria causal 'publique e melhore o metadado' JA RODOU EM CASA e deu ZERO. O mecanismo ausente NAO e copy nem topic-search: e ROTA DE CHEGADA. C_MARKET_COMMODITY ja cravou que comandos/skills/SDD sao commodity — arrumar o rotulo de uma commodity nao muda a commodity"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: C_w2_moat_substancia_sim_palavra_nao
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-08-05
+    verified_against: contagem-supersedes-refutes-53-grafos
+    label: "E3 — A SUBSTANCIA SE SUSTENTA, A PALAVRA NAO. 'Moat' e termo de DEFENSABILIDADE COMPETITIVA — afirmacao de negocio, exatamente o que C_NS1_KG declara NAO PROVADO ('edge mais forte, negocio nao provado'). E o edge e de FORMA: dos 221 alvos de SUPERSEDES/REFUTES, so 11 (5,0%) tem trace casavel com superficie executavel. O experimento que decide e GRATIS e nao pede uma linha de codigo: rodar o gate hipotetico contra os 9 casos do kg-read-leg"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+  - id: C_w2_dissent_paralisia_vestida_de_rigor
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    label: "DISSENT PRESERVADO, e e a objecao mais forte da rodada: 'isto e indistinguivel de PARALISIA VESTIDA DE RIGOR — cinco posicoes, cinco refutacoes, todas pelo mesmo movimento (medido, nao se sustenta)'. Tres fios: (1) um metodo que refuta 5/5 das proprias posicoes numa rodada pode estar medindo bem OU calibrado para nunca aprovar; (2) o replay 'gratis' recomendado e ELE MESMO INFALSEAVEL — se declaro que da 0/9 por construcao ANTES de rodar, rodar nao e medicao, e cerimonia; (3) ASSIMETRIA DE RIGOR real e nao acidental: forca maxima de refutacao contra propostas BARATAS (8 linhas de edicao, um campo de schema) e forca zero contra re-perguntar o caro"
+
+  - id: E_w2_rules_existe_agora
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-08-05
+    verified_against: filesystem-HEAD-fb4b672
+    label: "CORRECAO DE ESTADO (deriva de 42 commits em 3 dias): .claude/rules/ EXISTE — 1 arquivo (kg-grammar.md), path-scoped via frontmatter paths: ['**/*.kg.yaml']. A afirmacao '.claude/rules/ NAO EXISTE' de 2026-08-02 esta STALE. E sao 9 hooks, nao 7 — todos type=command, o que o W2 julgou ESCOLHA CERTA e nao atraso: command e o unico tipo com exit-code + injecao garantida, e o Onion precisa de decisao DETERMINISTICA"
+    trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+
+
+
 edges:
   - from: C_tese_texto_vs_script
     to: Q_coevolucao
@@ -324,5 +430,49 @@ edges:
     to: A_RESEARCH_MARKET
     edge_type: TRACES_TO
   - from: E_descoberta_precisa_n_passadas
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+
+  # ── arestas da leva W2 ──
+  - from: E_w2_placar_cinco_de_cinco
+    to: C_w2_tese_mae_refutada_na_junta
+    edge_type: SUPPORTS
+  - from: C_w2_tese_mae_refutada_na_junta
+    to: D_w2_nao_derivar_nada_novo
+    edge_type: SUPPORTS
+  - from: C_w2_mecanizar_pode_ser_a_catedral
+    to: D_w2_nao_derivar_nada_novo
+    edge_type: SUPPORTS
+  # CONSTRAINS, nao REFUTES: o dissent LIMITA a decisao, nao a derruba — ela
+  # sobrevive com defesa declaradamente estreita. Dissent que MATA e REFUTES;
+  # dissent que LIMITA e CONSTRAINS. (O radar pegou esta mesma confusao em 08-02.)
+  - from: C_w2_dissent_paralisia_vestida_de_rigor
+    to: D_w2_nao_derivar_nada_novo
+    edge_type: CONSTRAINS
+  - from: E_w2_plataforma_confirmada_por_junho
+    to: E_plataforma_desqualifica
+    edge_type: SUPPORTS
+  - from: E_w2_porta_contra_experimento_n6
+    to: C_w2_moat_substancia_sim_palavra_nao
+    edge_type: SUPPORTS
+  - from: E_w2_rules_existe_agora
+    to: C_sub_rules_paths
+    edge_type: SUPPORTS
+  - from: E_w2_placar_cinco_de_cinco
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+  - from: D_w2_nao_derivar_nada_novo
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+  - from: E_w2_plataforma_confirmada_por_junho
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+  - from: E_w2_porta_contra_experimento_n6
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+  - from: C_w2_moat_substancia_sim_palavra_nao
+    to: A_RESEARCH_MARKET
+    edge_type: TRACES_TO
+  - from: C_w2_mecanizar_pode_ser_a_catedral
     to: A_RESEARCH_MARKET
     edge_type: TRACES_TO

@@ -173,3 +173,83 @@ foi usado. Mesma classe de falha que a pesquisa investiga: doutrina que existe e
 E o viés que a originou: **buscar por nome conhecido só acha incumbente**. As 8 pistas perderam o
 [Graphify](https://github.com/Graphify-Labs/graphify) — **100.765 ★ em 120 dias, skill para Claude Code**,
 o nosso substrato exato. Quem o achou foi o maestro, de memória.
+
+---
+
+# Adendo W2 (2026-08-05) — os dois eixos, e as cinco posições que caíram
+
+> **Projeção da leva W2** do grafo irmão (`wf_b516b6a2-b84`, 15 workers). O W1 correlacionou e
+> ratificou; o W2 pôs **cinco propostas concretas em steelman** e atacou cada uma com lente própria.
+
+## O placar
+
+```
+correlação ..... 44 itens    18 desenha · 14 não-transfere · 12 transfere
+posições ....... 5 propostas → 5 REFUTADAS, todas por MEDIÇÃO
+```
+
+**Os 12 que transferem** (o que importa, não o placar): MAGMA — *grafo só vale com política de
+travessia* · **CMDB** — *a camada `domain` tem o mesmo modo de falha* · **Graphify** — *proveniência
+mecanizada por **aresta***, enquanto o Onion tipa só o **nó** · **EU AI Act** — rastro auditável
+exigível desde 2026-08-02 · **Graphiti** — retrieval determinístico do lado do sistema ·
+**ICLR-gargalo** — *retrieval domina 20 pontos; escrita/estrutura, 3-8*.
+
+## A tese-mãe foi refutada na junta — e o erro era do proponente
+
+Ela sobrevive só como **duas afirmações verdadeiras que não compõem**. O `logo` quebra em quatro
+pontos medidos, e o segundo é aritmético:
+
+> `claim + decision + question` = **1.437 / 2.049 = 70,1%**, não os ~90% alegados. Só chega a 89,2%
+> contando os **390 `evidence`** — e `evidence` é justamente o que **pode** ser parcialmente derivado.
+> **O erro estava do lado que sustentava a tese.**
+
+E o ganho declarado não existe: 8% de 2.049 = **167 nós, escritos uma vez cada**. O gargalo medido é
+**leitura**, não escrita. Por fim, *"julgamento é o que o Graphify não tem"* é verdade de **forma** e
+falsa de **motor**: dos **221** alvos de `SUPERSEDES`/`REFUTES`, só **11 (5,0%)** têm `trace:`
+resolvível para superfície executável.
+
+> *"Por que ela seduz: porque faz técnico e estratégico coincidirem. Mas o único jeito de fazê-los
+> coincidir foi escolher, nos dois eixos, o trabalho **confortável porque o volume é zero**."*
+
+## Eixo técnico — **não derivar nada de novo; zero gate novo**
+
+A fronteira correta **não é** *derivável × não-derivável*. É **já legível no dado × pede campo novo**:
+`node_type` + presença de `trace:` já classificam; campo novo custa **gramática a todo adotante**.
+
+O que entra é **reparo, não mecanismo**: os 8 números errados de `docs/technical-context/`, à mão, um
+commit. E vem com o refinamento que vale mais que o conserto:
+
+> **Taxa de defeito medida: 8 números em meses. Custo do gate > custo do conserto ⇒ mecanizar É a
+> catedral.** `fix-must-become-mechanism` **não** é *"todo fix vira gate"* — é *"todo fix vira
+> mecanismo **quando o volume justifica**"*. Sem o portão 4, a doutrina anti-catedral fabrica catedral.
+
+## Eixo estratégico
+
+**E1 — plataforma única: CONFIRMADA**, e a "correção" proposta foi refutada por evidência que estava no
+repo **desde junho**: smoke-test **PASS 6/6** em 2026-06-15 (`TeamCreate` → spawn → `SendMessage`).
+*"`0 hits` de uso não é vaporware — é a assinatura de uma decisão registrada funcionando."*
+`C_POSTURA_ACOPLAMENTO` e `C_CORE_NAO_E_FAMILIA` ficam **intocados**.
+
+**E2 — a porta: HIPÓTESE.** Contra-experimento **N=6 na própria família**, medido ao vivo: `onion` 0★
+(com description+MIT), `onion-cursor` 0★, `onion-antigravity` 0★ **mesmo com +3 topics**… A teoria
+*"publique e melhore o metadado"* **já rodou em casa e deu zero**. O ausente é **rota de chegada**.
+
+**E3 — o moat: a substância se sustenta, a palavra não.** *Moat* é termo de defensabilidade
+competitiva — exatamente o que `C_NS1_KG` declara **não provado**.
+
+## Dissent (preservado — é a objeção mais forte da rodada)
+
+> *"Isto é indistinguível de **paralisia vestida de rigor**. Um método que refuta 5/5 das próprias
+> posições pode estar medindo bem — ou estar calibrado para nunca aprovar."*
+>
+> *"O replay 'grátis' que recomendo é ele mesmo **infalseável**: se declaro que dá 0/9 por construção
+> antes de rodar, rodar não é medição, é cerimônia."*
+>
+> *"A **assimetria de rigor** é real e não é acidente: força máxima contra propostas **baratas**, força
+> zero contra re-perguntar o caro."*
+
+## Correção de estado (deriva de 42 commits em 3 dias)
+
+`.claude/rules/` **existe** — `kg-grammar.md`, path-scoped em `paths: ["**/*.kg.yaml"]`. A afirmação
+*"não existe"* de 08-02 está **stale**. E são **9** hooks, não 7 — todos `type=command`, o que o W2
+julgou **escolha certa**: `command` é o único tipo com exit-code + injeção garantida.
