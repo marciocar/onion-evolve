@@ -275,7 +275,7 @@ interrompida (`.claude/commands/engineer/plan.md:24`).
 ## 5. Números-âncora (SSOT — nunca hardcode; sempre `docs/onion/inventory.md`)
 
 Lido de `docs/onion/inventory.md:11-14` (gerado por `.claude/validation/inventory.sh`, validado no
-CI): 102 comandos invocáveis (10 categorias + root), 51 agentes (9 categorias), 10 skills, 87
+CI): 102 comandos invocáveis (10 categorias + root), 51 agentes (9 categorias), 11 skills, 90
 Knowledge Bases. Contextos de domínio no próprio framework (template, ainda não populados):
 `business-context/` 11 arquivos, `technical-context/` 0, `compliance-context/` 0
 (`docs/onion/inventory.md:58-61`) — **este arquivo que você está lendo é parte do preenchimento
