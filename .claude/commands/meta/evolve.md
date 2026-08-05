@@ -3,13 +3,15 @@ name: evolve
 description: |
   Auto-auditoria do Sistema Onion via orquestração (fan-out-and-synthesize) que produz
   um backlog priorizado, com evidência citada, de refatorações de modernização.
-  Read-only: propõe, não muta (a única escrita é o relatório em docs/analysis/).
+  Read-only sobre .claude/: propõe, não muta. Escreve em DOIS lugares — o .kg.yaml de
+  auditoria (destino dos achados) e o relatório em docs/analysis/ (projeção do grafo);
+  mais a memória de sessão em D10, exceção declarada fora do repo.
 model: opus
 category: meta
 tags: [evolve, audit, orchestration, self-evolution, modernization]
-version: "1.3.0"
-updated: "2026-07-04"
-allowed-tools: Read Write Grep Glob Bash(find *) Bash(wc *) Bash(git log*) Bash(cat .env*)
+version: "1.4.0"
+updated: "2026-08-05"
+allowed-tools: Read Write Grep Glob Bash(bash .claude/validation/*) Bash(find *) Bash(wc *) Bash(ls *) Bash(git log*) Bash(git ls-files*)
 argument-hint: "[dimensão específica (D1..D10) | vazio = auditoria completa]"
 related_commands:
   - /meta:orchestrate
@@ -32,10 +34,16 @@ Olhar para o **próprio Sistema Onion** com fan-out de auditores e produzir um
 automação contínua da [Baseline de V&V manual](../../../docs/analysis/onion-vv-baseline-2026-06.md):
 em vez de auditar à mão, dispara uma orquestração e sintetiza.
 
-**Read-only por contrato.** O comando **nunca muta `.claude/`**; a única escrita
-é o relatório em `docs/analysis/`. Ele **propõe**; a execução das correções é dos
-atuadores (`/meta:create-*`, ou `/product:spec → /engineer:plan` para
-consolidações de cluster) sob validação do `@metaspec-gate-keeper`.
+**Read-only sobre `.claude/`.** O comando **nunca muta `.claude/`**. Ele escreve em
+**dois** lugares, por desenho: o `.kg.yaml` de auditoria (**destino** dos achados, Passo 4.4)
+e o relatório em `docs/analysis/` (**projeção** do grafo, nunca fonte paralela). A terceira
+escrita é a memória de sessão no D10 — exceção declarada, fora do repo. Ele **propõe**; a
+execução das correções é dos atuadores (`/meta:create-*`, ou `/product:spec → /engineer:plan`
+para consolidações de cluster) sob validação do `@metaspec-gate-keeper`.
+
+> **Nota de honestidade (2026-08-05).** Até esta versão a `description` dizia "a única escrita
+> é o relatório", o que era **falso desde 2026-07-20** (o gate de grafo entrou em `0ea48df`).
+> Era `behavior-over-declaration` violado no comando que prega a doutrina.
 
 O **julgamento** de qual padrão aplicar a cada achado vem da
 [Doutrina de Modernização](../../../docs/knowledge-base/concepts/onion-modernization-doctrine.md);
@@ -75,7 +83,7 @@ existentes, **não** reimplementam (e não aninham orquestração dentro de orqu
 | D7 | **Cross-refs / links** | `find .claude -xtype l` (symlinks quebrados) + links relativos `[..](..)` que apontam para arquivos inexistentes. | haiku |
 | D8 | **Plataforma/frontmatter + inventário** | Cobertura de `allowed-tools`/`model:`, frontmatter completo, kebab-case ([commands.md §1](../../../docs/meta-specs/commands.md), [agents.md](../../../docs/meta-specs/agents.md)). **Inventário:** roda `bash .claude/validation/inventory.sh --markdown` e compara com `docs/onion/inventory.md` + contagens em `CLAUDE.md`; divergência = achado (atuador `/meta:inventory`, **não** edição manual — ver doutrina §regra de inventário). | haiku |
 | D9 | **Frescor de contexto de domínio** | **DELEGA a `/meta:context-freshness`** — ingere `FreshnessSchema[]` dos `docs/*-context/`. Herda o threshold ≤18mo (item 1 da régua de contexto). No framework = **no-op** (contextos são templates, só README); o valor é em projeto-alvo que populou os contextos. Não reimplementar; não aninhar orquestração. | (context-freshness) |
-| D10 | **Frescor da memória de sessão** | **CONTEXTO PRINCIPAL, não worker** (a memória `~/.claude/projects/<projeto>/memory/` é da sessão que roda o evolve; subagente não a enxerga). Para cada entrada do `MEMORY.md`: **1 teste barato de validade** conforme a classe de apodrecimento — fato-de-ambiente (`command -v`/`curl`/`ls`), estado-de-trabalho (`git log`/`ls` no artefato resolutor), preferência-do-maestro (**não expira sozinha** — só o maestro invalida). Corrigir/apagar na hora; nunca re-carimbar sem re-testar. Carimbar a varredura no índice (`última varredura: <data>, N rot em M`). **No-op gracioso** se a sessão não tem memória. Reporta ao relatório só contagens/vereditos (privacidade — nunca colar conteúdo de memória). Doutrina: [session-memory-lifecycle.md](../../../docs/knowledge-base/concepts/session-memory-lifecycle.md). | (principal) |
+| D10 | **Frescor da memória de sessão** | **CONTEXTO PRINCIPAL, não worker** (a memória `~/.claude/projects/<projeto>/memory/` é da sessão que roda o evolve; subagente não a enxerga). Para cada entrada do `MEMORY.md`: **1 teste barato de validade** conforme a classe de apodrecimento — estado-de-trabalho (`git log`/`ls` no artefato resolutor), preferência-do-maestro (**não expira sozinha** — só o maestro invalida). **Fato-de-ambiente** (exigiria `command -v`/`curl`) está **fora do `allowed-tools` por desenho**: devolva `UNVERIFIABLE` nomeando o comando que faltou, nunca um veredito adivinhado — carimbar sem medir é exatamente o que esta dimensão existe para impedir. Corrigir/apagar na hora; nunca re-carimbar sem re-testar. Carimbar a varredura no índice (`última varredura: <data>, N rot em M`). **No-op gracioso** se a sessão não tem memória. Reporta ao relatório só contagens/vereditos (privacidade — nunca colar conteúdo de memória). Doutrina: [session-memory-lifecycle.md](../../../docs/knowledge-base/concepts/session-memory-lifecycle.md). | (principal) |
 
 ## ⚡ Etapas de Execução
 
@@ -124,7 +132,15 @@ const scanFindings = await parallel(
   ))
 );
 
-// Composição (NÃO fan-out): delega aos comandos existentes no fluxo principal
+// ⚠️ COMPOSIÇÃO — NÃO IMPLEMENTADA (medido 2026-08-05). `runCommand()` NÃO existe: aparece
+// apenas nestas linhas, em todo o repo, e NENHUM artefato de .claude/ declara a tool
+// `SlashCommand` (grep -rl em commands/agents/skills = vazio). Logo D4/D5/D9 NUNCA rodaram
+// por este caminho — não é regressão, é mecanismo que nunca nasceu. O run de 2026-07-30
+// registra o sintoma: "a 1ª rodada falhou (schema bug) e o '0 findings' era FALSO".
+// Até o conserto (PR 3), execute D4/D5 como INVOCAÇÃO no contexto principal, antes do
+// fan-out, e mescle os resultados à mão — e DECLARE no relatório que foram assim obtidos.
+// Zero achados numa destas dimensões só é resultado válido se vier com o comando executado
+// e o output verbatim que sustenta o zero.
 const kbFindings = await runCommand("/meta:kb-freshness");         // D4 — ingere FreshnessSchema[]
 const specFindings = await runCommand("/meta:metaspec-validate");  // D5 — por artefato de alto risco
 const ctxFindings = await runCommand("/meta:context-freshness");   // D9 — FreshnessSchema[] dos docs/*-context/ (vazio no framework)
