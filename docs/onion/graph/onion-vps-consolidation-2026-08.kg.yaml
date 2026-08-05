@@ -1,0 +1,72 @@
+meta:
+  id: onion-vps-consolidation-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-05
+  date: 2026-08-05
+  note: >
+    Consolidação do catálogo VPS (2026-08-05), estende vps-shared-tools-2026-07:
+    (1) incidente de exposição de rede — Docker furando o ufw — achado por MEDIÇÃO e
+    contido; (2) promoção da doutrina do catálogo a KB durável; (3) convenção de
+    nomenclatura onion-vps- + renomes dos serviços core. Projeções legíveis:
+    docs/analysis/onion-vps-network-exposure-2026-08.md +
+    docs/knowledge-base/concepts/onion-vps-catalog-doctrine.md.
+
+nodes:
+  - id: CL_net_exposure_incident
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-05
+    verified_against: iptables-nat-DOCKER+DOCKER-USER-vazio+redis-auth-probe-vivo
+    label: "INCIDENTE MEDIDO (não presumido): o Docker publica portas furando o ufw (DOCKER-FORWARD antes das regras ufw na FORWARD, DOCKER-USER vazio, DNAT incondicional) → data stores alcançáveis da internet (179.197.65.94). 2 Redis SEM SENHA (prodfiel:6390, onionfresh:6391 — ambientes do maestro) + postgres/milvus/minio/attu do arandek (redis do arandek COM senha)."
+    trace: "docs/analysis/onion-vps-network-exposure-2026-08.md"
+
+  - id: D_containment_docker_user
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-05
+    verified_against: iptables-S-DOCKER-USER+systemctl-active
+    label: "CONTENÇÃO aplicada+persistida: regra DOCKER-USER default-deny (-i eth0; RETURN established + DROP novo) em onion-vps-docker-firewall.service (systemd oneshot idempotente, After=docker). Reversível, não toca compose de adotante, zero lockout (não mexe em INPUT). Cura durável na FONTE = rebind ports 0.0.0.0->127.0.0.1 (gated por-tenant; arandek notificado via co-deliver; prodfiel/onionfresh = fix direto do maestro)."
+    trace: "docs/analysis/onion-vps-network-exposure-2026-08.md"
+
+  - id: D_catalog_doctrine_promoted
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-05
+    verified_against: KB-escrita+lint-verde
+    label: "DOUTRINA PROMOVIDA: o veredito D_framing_catalogo (catálogo != plataforma) virou KB durável (4a irmã das doutrinas de decisão), citando abstraction-doctrine + ADR nested + integrations.md (L0), sem recopiar. Gate 'premissas medidas' codificado (lição da F2 reprovada). Esqueleto repo-por-ferramenta documentado."
+    trace: "docs/knowledge-base/concepts/onion-vps-catalog-doctrine.md"
+
+  - id: D_naming_onion_vps
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-08-05
+    verified_against: docker-ps+systemctl-vivo+logto-users2-apps10
+    label: "CONVENÇÃO (maestro): serviços Onion+padrão-VPS usam prefixo onion-vps- (waha/logto/logto-postgres/bridge/docker-firewall renomeados e VIVOS, dados preservados: Logto users=2/apps=10), distinto de onion-adopt-<nome>-* e dos nomes próprios do adotante. Método seguro: só container_name (projeto/volumes intactos)."
+    trace: "docs/knowledge-base/tools/vps-tool-repo-skeleton.md"
+
+edges:
+  - from: CL_net_exposure_incident
+    to: D_containment_docker_user
+    edge_type: CAUSES
+  - from: D_containment_docker_user
+    to: CL_net_exposure_incident
+    edge_type: TRACES_TO
+  - from: CL_net_exposure_incident
+    to: D_catalog_doctrine_promoted
+    edge_type: SUPPORTS
+  - from: D_catalog_doctrine_promoted
+    to: D_naming_onion_vps
+    edge_type: SUPPORTS

@@ -16,7 +16,8 @@
 #   --repo   : repo alvo (default: git-root do cwd). Canais: docs/evolution/{inbox,inbound}.
 #   --force  : ignora o dedup (avisa mesmo se já avisou este conjunto).
 #   --dry-run: computa + imprime a mensagem, NÃO toca estado nem envia ntfy.
-# Wake: se $NTFY_TOPIC setado → POST p/ ${NTFY_URL:-https://ntfy.sh}/$NTFY_TOPIC; senão → stdout (cron loga).
+# Wake (PULL-first): push só se $NTFY_TOPIC E $NTFY_URL setados → POST p/ $NTFY_URL/$NTFY_TOPIC;
+# senão → stdout (cron loga). SEM default público ntfy.sh (tópico adivinhável = exposição).
 # Gracioso, determinístico. Exercitado por lint-selftest.sh (run_mail_receiver_selftests).
 # =============================================================================
 set -uo pipefail
@@ -56,9 +57,11 @@ MSG="${MSG} — rode /meta:co-evolve para pull/triagem."
 
 if [ -n "${DRY}" ]; then printf '%s\n' "${MSG}"; exit 0; fi
 
-# WAKE: ntfy se configurado, senão stdout (cron/log captura). Gracioso.
-if [ -n "${NTFY_TOPIC:-}" ] && command -v curl >/dev/null 2>&1; then
-  curl -s -H "Title: Onion co-evolução" -d "${MSG}" "${NTFY_URL:-https://ntfy.sh}/${NTFY_TOPIC}" >/dev/null 2>&1 \
+# WAKE (PULL-first): o canal primário é o hook SessionStart (PULL). O ntfy é um
+# acelerador OPCIONAL — e exige NTFY_URL explícito: SEM default público `ntfy.sh`
+# (tópico adivinhável em host público = qualquer um assina/publica). Ausente → stdout.
+if [ -n "${NTFY_TOPIC:-}" ] && [ -n "${NTFY_URL:-}" ] && command -v curl >/dev/null 2>&1; then
+  curl -s -H "Title: Onion co-evolução" -d "${MSG}" "${NTFY_URL}/${NTFY_TOPIC}" >/dev/null 2>&1 \
     && echo "mail-receiver: acordou via ntfy (${N} não-lido)." \
     || echo "mail-receiver: ntfy falhou — ${MSG}"
 else
