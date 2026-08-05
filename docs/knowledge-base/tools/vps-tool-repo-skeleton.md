@@ -128,10 +128,27 @@ Outras convenções observadas no compose de referência:
 
 ---
 
-## 5. Segredos — pass(GPG) + direnv, nunca `.env` plaintext
+## 5. Segredos — princípio invariante, mecanismo por modelo de serviço
 
-Padrão da casa, sem exceção: segredos vivem no password store GPG (`pass`), nunca em arquivo plano
-no disco.
+**Princípio da casa, sem exceção:** nenhum segredo em **plaintext em repouso**; leitura **fail-closed**
+(faltou o segredo → o serviço NÃO sobe, nunca com default fraco); o segredo **nunca** entra no
+artefato versionado (`.env.example` só placeholders).
+
+O **mecanismo** depende de **como o serviço sobe** — porque `pass`+GPG é **interativo** (um humano
+destrava a chave) e por isso **não serve** para um serviço que sobe sozinho no boot:
+
+| Modelo de serviço | Mecanismo | Exemplo |
+|---|---|---|
+| **Humano-rodado** (compose subido por `up.sh`/`direnv`) | **`pass`(GPG) + direnv** — o humano já destravou o GPG na sessão | `onion-vps-logto`, `onion-vps-waha` |
+| **systemd não-atendido** (sobe no boot, sem humano) | **systemd encrypted credentials** (`LoadCredentialEncrypted`, decifra com chave do host) — `pass` NÃO se aplica | `onion-vps-bridge` |
+
+> **Não force `pass` num serviço systemd** (premissa medida 2026-08-05): o `onion-vps-bridge` sobe por
+> systemd como user `onion`, que não tem GPG destravado no boot. Enquanto for **N=1 operador**, o `.env`
+> modo 600 legível só por `onion`/root é **aceito** (sem `docker inspect`, sem rede — risco baixo);
+> a migração p/ `systemd-creds` fica **gated** ao gatilho **multi-operador** (ou à janela da limpeza do
+> `dual-legacy`, 2026-08-10). Isto é `pull-not-push`: não migrar por simetria com o WAHA.
+
+O detalhe abaixo é o mecanismo **humano-rodado** (o mais comum no catálogo — `pass`+direnv):
 
 - **`.env.example`** — versionado, só placeholders/estrutura (nomes de variável, comentário do que
   cada uma é). Nunca um valor real, nem de dev.
