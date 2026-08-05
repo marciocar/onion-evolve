@@ -27,7 +27,7 @@ onion-evolve/
 ├── .claude/                    # o FRAMEWORK propriamente dito (o "produto")
 │   ├── commands/                # 102 comandos invocáveis, 10 categorias
 │   ├── agents/                  # 51 agentes especializados, 9 categorias
-│   ├── skills/                  # 10 skills (Claude Code-nativas)
+│   ├── skills/                  # 11 skills (Claude Code-nativas)
 │   ├── utils/                   # abstrações SDAAL (task-manager, forge, ...)
 │   ├── validation/               # scripts determinísticos (lint, inventory, kg-radar...)
 │   ├── hooks/                    # hooks de ciclo de vida de sessão (SessionStart, PreCompact...)
@@ -35,7 +35,7 @@ onion-evolve/
 │   └── settings.json              # registro dos hooks + permissions
 ├── docs/                        # Spec as Code (documentação estruturada, L0→L4)
 │   ├── meta-specs/                # L0 — constituição (architecture, code-standards, integrations, agents, commands)
-│   ├── knowledge-base/            # 87 KBs (conceitos/frameworks/padrões, técnica)
+│   ├── knowledge-base/            # 90 KBs (conceitos/frameworks/padrões, técnica)
 │   ├── onion/                     # documentação operacional do próprio framework (SSOT, guias, grafo)
 │   ├── evolution/                 # co-evolução core↔adotantes (inbox/outbox/federation/rfc)
 │   ├── business-context/          # spec-as-code de negócio (gerado por /docs:build-business-docs)
@@ -123,9 +123,10 @@ Listagem direta (`ls .claude/skills/`, 2026-07-25):
 `onion-engineering-context`, `onion-onboarding`, `onion-orchestration`,
 `onion-patterns`, `onion-product-context`, `onion-validation`, `onion-wizard`.
 
-> Nota de frescor: `docs/onion/index.md:14` ainda lista "5 skills" — está **stale**
-> frente à SSOT atual (10). Não corrigir manualmente; rodar `/meta:inventory` +
-> `/docs:build-index onion` propaga o número certo.
+> Nota de frescor (re-testada 2026-08-05): o drift que esta nota descrevia **foi corrigido** —
+> `docs/onion/index.md:14` já lista **11 skills**, igual à SSOT gerada. A nota fica como registro
+> do mecanismo, não do defeito: quando um número aqui divergir, **não corrija à mão** — rode
+> `/meta:inventory` + `/docs:build-index onion`, que propagam a partir de `docs/onion/inventory.md`.
 
 ---
 
@@ -258,7 +259,7 @@ Integrações externas são **sempre** opt-in via `.env` (`TASK_MANAGER_PROVIDER
 | Diretório | Conteúdo | Gerado por |
 |-----------|----------|------------|
 | `docs/meta-specs/` | L0 — constituição (`architecture.md`, `code-standards.md`, `integrations.md`, `agents.md`, `commands.md`) | mantido à mão, é a autoridade máxima |
-| `docs/knowledge-base/` | 87 KBs em 9 subcategorias (`concepts/` é a maior, 48 arquivos de conteúdo) | `/meta:create-knowledge-base` |
+| `docs/knowledge-base/` | 90 KBs em 9 subcategorias (`concepts/` é a maior, 48 arquivos de conteúdo) | `/meta:create-knowledge-base` |
 | `docs/onion/` | Documentação operacional do próprio framework: `inventory.md` (SSOT), `getting-started.md`, `graph.md`, `federation-map.md`, `agents-reference.md`, `commands-guide.md`, entre outros | mistura gerado (`inventory.md`) + mantido à mão |
 | `docs/evolution/` | Co-evolução core↔adotantes: `inbox/`, `outbox/`, `inbound/`, `federation/`, `rfc/`, `research/` | fluxo `/meta:co-*` e `/meta:federation-*` |
 | `docs/business-context/` | Spec-as-code de negócio (`01-customer` a `04-operations`) | `/docs:build-business-docs` |

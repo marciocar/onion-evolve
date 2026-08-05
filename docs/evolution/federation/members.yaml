@@ -236,7 +236,10 @@ members:
   # colapso porta≡core (ADR onion-adr-family-repo-topology-2026-07 F2; doutrina public-door-vs-private-core).
   # Nasceu 2026-07-19 via /meta:adopt role-scoped (composição: resolve-role-bundle standalone → verticais →
   # vendor .claude/), SEM meta-factory nem memória privada. Doutrina que circula anonimizada na raiz (PR #438).
-  # Nasce PRIVADA; o flip público e o re-apontar do redirect onion-claude são gate do maestro (MOAT-lock-4).
+  # PÚBLICA desde 2026-07-19 — o flip FOI FEITO e está verificado ao vivo (ver `remote:` abaixo).
+  # Corrigido 2026-08-05: este comentário ainda dizia "Nasce PRIVADA; o flip é gate do maestro",
+  # contradizendo a própria linha `remote:` do mesmo bloco — declarado≠verificado dentro do registro.
+  # Segue gated APENAS o re-apontar do redirect onion-claude (MOAT-lock-4).
   - id: onion-standalone
     name: onion-standalone (porta pública Claude — instância adotada role-scoped, bundle standalone)
     role: standalone            # TIER 3 — mas é PORTA DE FRAMEWORK (distribui o bundle standalone), não projeto-adotante
