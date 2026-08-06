@@ -19,9 +19,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 1.0
-    verified_at: 2026-07-31
-    verified_against: federation-roadmap+VPS-vivo
-    label: "SUBSTRATO VIVO: Hostinger KVM8 (srv1812846) + Caddy (reverse proxy) + onion-bridge (Node/Agent SDK) + Logto. Dominios: auth./bridge./app.onionevolve.com. Doutrina do roadmap: reuso-nao-invencao"
+    verified_at: 2026-08-06
+    verified_against: m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps
+    label: "SUBSTRATO VIVO: Hostinger KVM8 (srv1812846) + Caddy (reverse proxy) + onion-bridge (Node/Agent SDK, reverse_proxy 127.0.0.1:8787) + Logto 1.41.0 (OIDC em 127.0.0.1:3011). DOMINIOS REAIS (medidos no /etc/caddy/Caddyfile 2026-08-06): raiz+www (landing estatica), app. (onion-bridge), auth. (OIDC do Logto) e console. (admin do Logto, bloco opcional em conf.d, respondendo no momento da medicao). NAO EXISTE bridge.onionevolve.com: nao tem vhost no Caddy e da NXDOMAIN no resolver local, no 1.1.1.1 e no 8.8.8.8 (curl 000). O onion-bridge serve sob app., nunca sob bridge. — o rotulo anterior listava auth./bridge./app. e o bridge. era ficcao. Doutrina do roadmap: reuso-nao-invencao"
     trace: "docs/evolution/federation-roadmap-2026.md"
 
   # ── TOOL 1: AUTH/IDENTIDADE (maduro) ──
@@ -43,9 +43,9 @@ nodes:
     status: open
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-31
-    verified_against: research-whatsapp-api+whatsapp-sender-vivo
-    label: "WHATSAPP: whatsapp-sender VIVO (~onion/whatsapp-sender, whatsapp-web.js nao-oficial, repo privado). Pesquisa research/whatsapp-api-2026-07 decide eixo oficial×nao-oficial (regulado->Cloud API; dogfood->WAHA>Evolution)"
+    verified_at: 2026-08-06
+    verified_against: m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find
+    label: "WHATSAPP: o unico lado VIVO hoje e o WAHA — container onion-vps-waha (devlikeapro/waha:latest), running desde 2026-08-05, bind 127.0.0.1:3999, API responde 401 (exige key). O whatsapp-sender NAO ESTA VIVO: zero processo (ps), zero container (docker ps -a), zero unit systemd, sem pm2 instalado. O CODIGO e a sessao pareada (.wwebjs_auth, mtime 2026-07-05) EXISTEM EM DISCO, mas em /home/onion/onion-bridge/workspaces/7f2a16301adad917/whatsapp-sender (workspace de agente do bridge, 234M, sem .git) e NAO em ~onion/whatsapp-sender, que e o caminho que o parecer de 2026-07-05 e o rotulo anterior afirmavam. RESSALVA SOBRE A PROPRIA MEDICAO: o worker do M8 concluiu que nao havia nem diretorio — a busca dele foi incompleta e o diretorio existe; o que nao existe e o SERVICO. Pesquisa research/whatsapp-api-2026-07 decide eixo oficial x nao-oficial (regulado->Cloud API; dogfood->WAHA>Evolution)"
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
 
   # ── TOOL 3: EMAIL (gap) ──
@@ -85,9 +85,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 1.0
-    verified_at: 2026-07-31
-    verified_against: direcao-do-maestro
-    label: "DIRECAO: MANTER o whatsapp-web.js nao-oficial (whatsapp-sender) E ADICIONAR o adapter do WAHA como PADRAO. Forma SDAAL: dois adapters sob a abstracao de mensageria, WAHA default. (A pesquisa ja lastreia WAHA>Evolution p/ nao-oficial)"
+    verified_at: 2026-08-06
+    verified_against: direcao-do-maestro+estado-material-medido-no-host-2026-08-06
+    label: "DIRECAO: MANTER o whatsapp-web.js nao-oficial (whatsapp-sender) E ADICIONAR o adapter do WAHA como PADRAO. Forma SDAAL: dois adapters sob a abstracao de mensageria, WAHA default. (A pesquisa ja lastreia WAHA>Evolution p/ nao-oficial). ESTADO MATERIAL EM 2026-08-06, MEDIDO E NAO PRESUMIDO: o dual tem UM SO LADO — WAHA up (onion-vps-waha), whatsapp-sender sem processo/unit/container (so codigo + sessao pareada em disco, no workspace do bridge). E nenhum dos dois adapters foi construido: .claude/utils/whatsapp NAO existe. A DIRECAO segue de pe porque nao foi revogada pelo maestro; o que falta e EXECUCAO — e o F1 ja a reordenou para DOGFOOD ANTES DE SDAAL (D_f1_whatsapp_dogfood_first)"
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
 
   - id: D_email_plus_logto_connector
@@ -107,9 +107,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-31
-    verified_against: direcao-do-maestro
-    label: "DIRECAO: trazer TUDO para um PLANO ESTRUTURADO do Onion e DERIVAR dele uma DOUTRINA, usando todo o potencial do Onion — Elenxo, KG-SSOT first+runtime, pesquisas documentadas e mapeadas. CAVEAT (disciplina pull-not-push): derivar doutrina+estrutura AGORA, mas o PLANO e spec-now/build-gated por-ferramenta — nunca uma PLATAFORMA empurrada por hipotese"
+    verified_at: 2026-08-06
+    verified_against: direcao-do-maestro+estado-de-execucao-medido-2026-08-06
+    label: "DIRECAO: trazer TUDO para um PLANO ESTRUTURADO do Onion e DERIVAR dele uma DOUTRINA, usando todo o potencial do Onion — Elenxo, KG-SSOT first+runtime, pesquisas documentadas e mapeadas. CAVEAT (disciplina pull-not-push): derivar doutrina+estrutura AGORA, mas o PLANO e spec-now/build-gated por-ferramenta — nunca uma PLATAFORMA empurrada por hipotese. ESTADO DE EXECUCAO EM 2026-08-06, MEDIDO: a DOUTRINA EXISTE (docs/knowledge-base/concepts/onion-vps-catalog-doctrine.md v1.0.0, 2026-08-05, commit 5a5768f) mas nasceu do F0 DIRETO (D_framing_catalogo), pulando a escada de A_analysis_structure — F1 rodou para UMA tool (whatsapp/WAHA), F2 (arquitetura cross-tool) foi FORMALMENTE REPROVADA como arquitetura (stack-harmonia-2026-08, no D_sintese_reprovada: premissas fabricadas, 9 membros contra 12 reais), F3 e F4 nunca rodaram e A_analysis_structure segue status open. O PLANO ESTRUTURADO — a outra metade da direcao — AINDA NAO EXISTE. A direcao segue valida; o que drifou foi a suposicao de que ela tinha sido cumprida pela escada prevista"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
   # ── QUESTOES DE PESQUISA (research-first-over-priors) ──

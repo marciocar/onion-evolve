@@ -1587,6 +1587,475 @@ run_kg_trace_resolve_selftests() {
   rm -rf "${d}" "${d2}" "${mut}"
 }
 
+# ---------------------------------------------------------------------------
+# Modo worklog-precompact-breadcrumb — exercita o hook do evento PreCompact
+# (hooks/worklog-precompact-breadcrumb.sh). É o momento em que a sessão PERDE
+# contexto; a saída do PreCompact é ignorada pós-compactação, então o ÚNICO
+# side-effect útil é a migalha datada gravada em notes.md (worklog-protocol.md
+# §7). Se este hook falhar, a migalha não é escrita e NINGUÉM percebe — o hook
+# sempre sai 0 (contrato "non-blocking"), então um hook quebrado é
+# INDISTINGUÍVEL de um no-op saudável do lado de fora. É por isso que o caso
+# (MUT) é o mais importante desta bateria: prova que o "passou" dos demais
+# casos não é vácuo.
+#
+# Sandbox: repo git real em mktemp (o hook precisa de HEAD resolvível — em
+# repo sem commit `git rev-parse --abbrev-ref HEAD` falha e o hook no-opa;
+# por isso todo sandbox nasce com um commit --allow-empty).
+#
+# Payload REAL do Claude Code (verificado 2026-08-06 via docs.claude.com/
+# hooks-reference + gist de schemas): o evento PreCompact manda `trigger`
+# ("manual"|"auto") + `custom_instructions`, NUNCA um campo `source`. O hook
+# lê `.source` (linha `jq -r '.source // "?"'`) — ver caso (i).
+# ---------------------------------------------------------------------------
+run_worklog_precompact_breadcrumb_selftests() {
+  local hk="${REPO_ROOT}/.claude/hooks/worklog-precompact-breadcrumb.sh"
+  if [ ! -f "${hk}" ]; then record_fail "worklog-precompact-breadcrumb" "hook ausente: ${hk}"; return; fi
+  local d out rc
+
+  # payload REAL do Claude Code para PreCompact (trigger, não source)
+  local real_payload='{"session_id":"abc123","transcript_path":"/tmp/x.jsonl","hook_event_name":"PreCompact","trigger":"manual","custom_instructions":""}'
+  # regex do formato da migalha (worklog-protocol.md §7)
+  local crumb_re='^- ⚠️ \[[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\] compaction \([^)]*\) — verifique se STATE\.md\.NEXT reflete o último raciocínio antes de prosseguir\.$'
+
+  # helper local: sandbox git com 1 commit base + hook copiado
+  _wpb_sandbox() {
+    local sd; sd="$(mktemp -d)"
+    git -C "${sd}" init -q
+    git -C "${sd}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m base
+    mkdir -p "${sd}/.claude/hooks"
+    cp "${hk}" "${sd}/.claude/hooks/"
+    printf '%s' "${sd}"
+  }
+
+  # (a) happy-path com o SHAPE REAL do Claude Code, branch feature/*, notes.md
+  # ativo → exit 0 + migalha no formato certo anexada (não sobrescreve).
+  d="$(_wpb_sandbox)"
+  git -C "${d}" checkout -q -b feature/happy-path
+  mkdir -p "${d}/.claude/sessions/happy-path"
+  printf 'linha-preexistente\n' > "${d}/.claude/sessions/happy-path/notes.md"
+  rc=0; out="$(cd "${d}" && printf '%s' "${real_payload}" | bash .claude/hooks/worklog-precompact-breadcrumb.sh)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ] \
+     && grep -q '^linha-preexistente$' "${d}/.claude/sessions/happy-path/notes.md" \
+     && grep -qE "${crumb_re}" "${d}/.claude/sessions/happy-path/notes.md"; then
+    record_pass "worklog-precompact-breadcrumb: (a) shape REAL do Claude Code → migalha anexada (preserva o que já tinha)"
+  else record_fail "worklog-precompact-breadcrumb: (a) happy-path" "esperava anexar+preservar; rc=${rc} conteúdo=$(cat "${d}/.claude/sessions/happy-path/notes.md")"; fi
+  rm -rf "${d}"
+
+  # (b) hotfix/* e release/* também disparam — a REGRA de escopo do worklog
+  # cobre os 3 tipos de branch (gitflow-patterns.md), não só feature/*.
+  local pfx
+  for pfx in hotfix release; do
+    d="$(_wpb_sandbox)"
+    git -C "${d}" checkout -q -b "${pfx}/urgent"
+    mkdir -p "${d}/.claude/sessions/urgent"
+    : > "${d}/.claude/sessions/urgent/notes.md"
+    (cd "${d}" && printf '%s' "${real_payload}" | bash .claude/hooks/worklog-precompact-breadcrumb.sh >/dev/null 2>&1)
+    if grep -qE "${crumb_re}" "${d}/.claude/sessions/urgent/notes.md"; then
+      record_pass "worklog-precompact-breadcrumb: (b) branch ${pfx}/* também grava a migalha"
+    else record_fail "worklog-precompact-breadcrumb: (b) ${pfx}" "migalha não apareceu em notes.md"; fi
+    rm -rf "${d}"
+  done
+
+  # (c) branch NÃO elegível (main) → no-op silencioso: notes.md fica
+  # BYTE-IDÊNTICO (não pode vazar migalha pra sessão errada nem criar ruído).
+  d="$(_wpb_sandbox)"
+  git -C "${d}" checkout -q -b main
+  mkdir -p "${d}/.claude/sessions/main"
+  printf 'nao-mexer\n' > "${d}/.claude/sessions/main/notes.md"
+  local before after
+  before="$(cat "${d}/.claude/sessions/main/notes.md")"
+  rc=0; (cd "${d}" && printf '%s' "${real_payload}" | bash .claude/hooks/worklog-precompact-breadcrumb.sh >/dev/null 2>&1) || rc=$?
+  after="$(cat "${d}/.claude/sessions/main/notes.md")"
+  if [ "${rc}" -eq 0 ] && [ "${before}" = "${after}" ]; then
+    record_pass "worklog-precompact-breadcrumb: (c) branch main → no-op, notes.md byte-idêntico"
+  else record_fail "worklog-precompact-breadcrumb: (c) branch main" "esperava no-op; rc=${rc} before=[${before}] after=[${after}]"; fi
+  rm -rf "${d}"
+
+  # (d) notes.md AUSENTE numa branch elegível → no-op: exit 0, sem criar
+  # arquivo/diretório fantasma (o hook não pode inventar um worklog).
+  d="$(_wpb_sandbox)"
+  git -C "${d}" checkout -q -b feature/no-notes
+  rc=0; out="$(cd "${d}" && printf '%s' "${real_payload}" | bash .claude/hooks/worklog-precompact-breadcrumb.sh)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ ! -d "${d}/.claude/sessions" ]; then
+    record_pass "worklog-precompact-breadcrumb: (d) notes.md ausente → no-op, não cria diretório fantasma"
+  else record_fail "worklog-precompact-breadcrumb: (d) notes.md ausente" "rc=${rc}; sessions/ existe? $([ -d "${d}/.claude/sessions" ] && echo sim || echo não)"; fi
+  rm -rf "${d}"
+
+  # (e) fora de um repo git → exit 0, não trava (não pode derrubar o
+  # PreCompact do Claude Code por um cwd sem .git).
+  d="$(mktemp -d)"
+  mkdir -p "${d}/.claude/hooks"
+  cp "${hk}" "${d}/.claude/hooks/"
+  rc=0; out="$(cd "${d}" && printf '%s' "${real_payload}" | bash .claude/hooks/worklog-precompact-breadcrumb.sh)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "worklog-precompact-breadcrumb: (e) fora de repo git → exit 0 silencioso"
+  else record_fail "worklog-precompact-breadcrumb: (e) fora de repo git" "rc=${rc} out=[${out}]"; fi
+  rm -rf "${d}"
+
+  # (f) jq AUSENTE do PATH → cai no fallback trig="?", mas a ESCRITA não pode
+  # ser pulada (modo de falha: se o guard do jq virar `|| exit 0` por engano,
+  # a migalha some inteira em qualquer ambiente sem jq — silencioso, igual
+  # ao (MUT) abaixo). PATH restrito só com os binários que o hook usa.
+  local mkbin c p
+  mkbin="$(mktemp -d)"
+  for c in cat git date bash sed grep mkdir rm cp mktemp; do
+    p="$(command -v "${c}" 2>/dev/null)"; [ -n "${p}" ] && ln -s "${p}" "${mkbin}/${c}"
+  done
+  d="$(_wpb_sandbox)"
+  git -C "${d}" checkout -q -b feature/no-jq
+  mkdir -p "${d}/.claude/sessions/no-jq"
+  : > "${d}/.claude/sessions/no-jq/notes.md"
+  rc=0; out="$(cd "${d}" && printf '%s' "${real_payload}" | PATH="${mkbin}" bash .claude/hooks/worklog-precompact-breadcrumb.sh)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qE "${crumb_re}" "${d}/.claude/sessions/no-jq/notes.md" \
+     && grep -q 'compaction (?)' "${d}/.claude/sessions/no-jq/notes.md"; then
+    record_pass "worklog-precompact-breadcrumb: (f) jq ausente do PATH → fallback '?' mas a escrita SOBREVIVE"
+  else record_fail "worklog-precompact-breadcrumb: (f) jq ausente" "rc=${rc}; conteúdo=$(cat "${d}/.claude/sessions/no-jq/notes.md")"; fi
+  rm -rf "${d}" "${mkbin}"
+
+  # (g) JSON malformado / stdin vazio → jq falha ao parsear mas o script não
+  # pode morrer por isso (comando substituído engole rc≠0); a escrita ainda
+  # acontece com fallback "?".
+  d="$(_wpb_sandbox)"
+  git -C "${d}" checkout -q -b feature/bad-input
+  mkdir -p "${d}/.claude/sessions/bad-input"
+  : > "${d}/.claude/sessions/bad-input/notes.md"
+  rc=0; (cd "${d}" && printf 'isto não é json {{{' | bash .claude/hooks/worklog-precompact-breadcrumb.sh >/dev/null 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qE "${crumb_re}" "${d}/.claude/sessions/bad-input/notes.md"; then
+    record_pass "worklog-precompact-breadcrumb: (g) JSON malformado → não trava, migalha ainda sai (fallback '?')"
+  else record_fail "worklog-precompact-breadcrumb: (g) JSON malformado" "rc=${rc}; conteúdo=$(cat "${d}/.claude/sessions/bad-input/notes.md")"; fi
+  rm -rf "${d}"
+
+  # (MUT) guard-of-guard — prova que (a)-(g) não passam por vácuo. Sabota uma
+  # CÓPIA do hook (short-circuit logo antes do printf que grava a migalha),
+  # confirma por grep/diff que a mutação FOI aplicada e então exige que o
+  # comportamento MUDE (notes.md deve ficar vazio) — sem isso, nada acima
+  # provaria que o hook realmente escreve nada além de "passou por acaso".
+  d="$(_wpb_sandbox)"
+  local hookfile="${d}/.claude/hooks/worklog-precompact-breadcrumb.sh"
+  sed -i "s/^printf '\\\\n- ⚠️/exit 0; printf '\\\\n- ⚠️/" "${hookfile}"
+  if grep -q "^exit 0; printf '\\\\n- ⚠️" "${hookfile}"; then
+    git -C "${d}" checkout -q -b feature/mutation
+    mkdir -p "${d}/.claude/sessions/mutation"
+    : > "${d}/.claude/sessions/mutation/notes.md"
+    rc=0; (cd "${d}" && printf '%s' "${real_payload}" | bash .claude/hooks/worklog-precompact-breadcrumb.sh >/dev/null 2>&1) || rc=$?
+    if [ "${rc}" -eq 0 ] && [ ! -s "${d}/.claude/sessions/mutation/notes.md" ]; then
+      record_pass "worklog-precompact-breadcrumb: (MUT) hook sabotado → migalha NÃO sai (exit 0 idêntico ao no-op saudável — prova que (a)-(g) não são vácuos)"
+    else record_fail "worklog-precompact-breadcrumb: (MUT)" "esperava notes.md vazio com o hook sabotado; conteúdo=$(cat "${d}/.claude/sessions/mutation/notes.md")"; fi
+  else
+    record_fail "worklog-precompact-breadcrumb: (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+  rm -rf "${d}"
+
+  # (i) BUG CONFIRMADO (2026-08-06, docs.claude.com/en/docs/claude-code/
+  # hooks-reference) — o payload REAL do PreCompact usa `trigger`
+  # ("manual"|"auto"), nunca `source`. O hook lê `.source`, então em TODO
+  # disparo real de compactação a migalha grava "compaction (?)" — o dado que
+  # o drift-guard existe para cruzar (manual vs auto) nunca chega no
+  # notes.md. É silencioso: exit 0, sem erro, breadcrumb gravada com formato
+  # correto — só o conteúdo do parêntese está sempre errado. Este caso
+  # ESPERA o comportamento CORRETO (o valor de `trigger` aparecendo) e por
+  # isso REPROVA hoje — é a prova viva do defeito, não um teste quebrado.
+  d="$(_wpb_sandbox)"
+  git -C "${d}" checkout -q -b feature/trigger-field-bug
+  mkdir -p "${d}/.claude/sessions/trigger-field-bug"
+  : > "${d}/.claude/sessions/trigger-field-bug/notes.md"
+  (cd "${d}" && printf '%s' "${real_payload}" | bash .claude/hooks/worklog-precompact-breadcrumb.sh >/dev/null 2>&1)
+  if grep -q 'compaction (manual)' "${d}/.claude/sessions/trigger-field-bug/notes.md"; then
+    record_pass "worklog-precompact-breadcrumb: (i) trigger real do Claude Code chega na migalha"
+  else record_fail "worklog-precompact-breadcrumb: (i) BUG — campo errado" "hook lê .source mas o Claude Code manda .trigger; migalha real sempre grava '(?)', nunca 'manual'/'auto'. conteúdo=$(cat "${d}/.claude/sessions/trigger-field-bug/notes.md")"; fi
+  rm -rf "${d}"
+
+  unset -f _wpb_sandbox
+}
+
+run_aside_router_hook_selftests() {
+  local hk="${REPO_ROOT}/.claude/hooks/aside-router-hook.sh"
+  local eng="${REPO_ROOT}/.claude/validation/aside-router.sh"
+  if [ ! -f "$hk" ]; then record_fail "aside-router-hook" "hook ausente: ${hk}"; return; fi
+  if [ ! -f "$eng" ]; then record_fail "aside-router-hook" "motor ausente: ${eng}"; return; fi
+  local d out rc
+
+  d="$(mktemp -d)"
+  mkdir -p "${d}/.claude/hooks" "${d}/.claude/validation"
+  cp "$hk" "${d}/.claude/hooks/"
+  cp "$eng" "${d}/.claude/validation/"
+
+  # payload no formato REAL do UserPromptSubmit (session_id/transcript_path/cwd/
+  # hook_event_name/prompt) — não o fixture minimalista {"prompt":"..."} que esconderia
+  # regressão se a extração dependesse (por engano) de ser o único campo.
+  local payload_marker payload_prosa payload_no_prompt
+  payload_marker='{"session_id":"s1","transcript_path":"/tmp/t","cwd":"/x","hook_event_name":"UserPromptSubmit","prompt":"dúvida: isso quebra sob carga?"}'
+  payload_prosa='{"session_id":"s1","transcript_path":"/tmp/t","cwd":"/x","hook_event_name":"UserPromptSubmit","prompt":"por favor continue o trabalho normalmente"}'
+  payload_no_prompt='{"session_id":"s1","transcript_path":"/tmp/t","cwd":"/x","hook_event_name":"UserPromptSubmit"}'
+
+  # (a) marcador tipado, INVOCADO DE FORA do repo (cwd neutro, sem .claude, sem git) —
+  # obriga a resolução de $REPO a vir de CLAUDE_PROJECT_DIR (linha 23 do hook), não de
+  # `pwd`/git-toplevel. Regressão nessa prioridade FICA MUDA (nunca crasha) — silenciosa.
+  local elsewhere; elsewhere="$(mktemp -d)"
+  rc=0
+  out="$(cd "${elsewhere}" && CLAUDE_PROJECT_DIR="${d}" bash "${d}/.claude/hooks/aside-router-hook.sh" <<<"${payload_marker}")" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"hookEventName":"UserPromptSubmit"' \
+     && printf '%s' "${out}" | grep -q 'APARTE dúvida'; then
+    record_pass "aside-router-hook: marcador tipado + cwd neutro → resolve via CLAUDE_PROJECT_DIR, rota certa"
+  else record_fail "aside-router-hook: marcador (CLAUDE_PROJECT_DIR)" "esperava JSON com APARTE dúvida; out='${out}' rc=${rc}"; fi
+  rm -rf "${elsewhere}"
+
+  # (b) prosa comum (sem marcador) → SILÊNCIO TOTAL (custo-zero). Regressão aqui = poluir
+  # additionalContext em TODO prompt, para sempre, sem ninguém perceber (nada quebra/loga).
+  rc=0
+  out="$(cd "${d}" && CLAUDE_PROJECT_DIR="${d}" bash .claude/hooks/aside-router-hook.sh <<<"${payload_prosa}")" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "aside-router-hook: prosa comum → silêncio total (custo-zero, exit 0)"
+  else record_fail "aside-router-hook: prosa" "esperava vazio+0; out='${out}' rc=${rc}"; fi
+
+  # (c) envelope sem campo .prompt → no-op silencioso, nunca crash (harness pode mudar o shape)
+  rc=0
+  out="$(cd "${d}" && CLAUDE_PROJECT_DIR="${d}" bash .claude/hooks/aside-router-hook.sh <<<"${payload_no_prompt}")" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "aside-router-hook: sem campo prompt → no-op silencioso"
+  else record_fail "aside-router-hook: sem prompt" "esperava vazio+0; out='${out}' rc=${rc}"; fi
+
+  # (d) motor ausente (instalação incompleta / vendor desatualizado) → hook não quebra a
+  # sessão, silêncio, exit 0 (contrato explícito do header: "NUNCA falha a sessão").
+  mv "${d}/.claude/validation/aside-router.sh" "${d}/.claude/validation/aside-router.sh.bak"
+  rc=0
+  out="$(cd "${d}" && CLAUDE_PROJECT_DIR="${d}" bash .claude/hooks/aside-router-hook.sh <<<"${payload_marker}")" || rc=$?
+  mv "${d}/.claude/validation/aside-router.sh.bak" "${d}/.claude/validation/aside-router.sh"
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "aside-router-hook: motor ausente → silêncio gracioso, exit 0 (nunca quebra a sessão)"
+  else record_fail "aside-router-hook: motor ausente" "esperava vazio+0; out='${out}' rc=${rc}"; fi
+
+  # (e) CAMINHO SEM JQ — o fallback grep/sed (linha 19) é a superfície que ninguém exercita
+  # em dev (jq quase sempre presente na VPS/máquina do maestro); é EXATAMENTE o tipo de
+  # ramo-morto-em-teste apontado como risco (validar o modo que ninguém usa). Força a
+  # ausência forjando um PATH sem o binário jq.
+  if command -v jq >/dev/null 2>&1; then
+    local nojq_bin p exe base
+    nojq_bin="$(mktemp -d)"
+    IFS=':' read -ra _patharr <<<"${PATH}"
+    for p in "${_patharr[@]}"; do
+      [ -d "$p" ] || continue
+      for exe in "$p"/*; do
+        [ -e "$exe" ] || continue
+        base="$(basename "$exe")"
+        [ "$base" = "jq" ] && continue
+        [ -e "${nojq_bin}/${base}" ] || ln -s "$exe" "${nojq_bin}/${base}" 2>/dev/null
+      done
+    done
+    if PATH="${nojq_bin}" command -v jq >/dev/null 2>&1; then
+      record_fail "aside-router-hook: fallback sem jq (setup)" "jq ainda visível no PATH forjado — guarda-da-guarda"
+    else
+      rc=0
+      out="$(cd "${d}" && CLAUDE_PROJECT_DIR="${d}" PATH="${nojq_bin}" bash .claude/hooks/aside-router-hook.sh <<<"${payload_marker}")" || rc=$?
+      if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"hookEventName":"UserPromptSubmit"' \
+         && printf '%s' "${out}" | grep -q 'APARTE dúvida'; then
+        record_pass "aside-router-hook: fallback SEM jq produz o mesmo contrato (rota certa, JSON válido)"
+      else record_fail "aside-router-hook: fallback sem jq" "esperava JSON com APARTE dúvida; out='${out}' rc=${rc}"; fi
+
+      rc=0
+      out="$(cd "${d}" && CLAUDE_PROJECT_DIR="${d}" PATH="${nojq_bin}" bash .claude/hooks/aside-router-hook.sh <<<"${payload_prosa}")" || rc=$?
+      if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+        record_pass "aside-router-hook: fallback sem jq — prosa comum ainda silenciosa"
+      else record_fail "aside-router-hook: fallback sem jq prosa" "esperava vazio+0; out='${out}' rc=${rc}"; fi
+    fi
+    rm -rf "${nojq_bin}"
+  else
+    record_skip "aside-router-hook: fallback sem jq (skip: jq já ausente no host)"
+  fi
+
+  # (f) MUTATION + guarda-da-guarda: quebra a extração jq do .prompt (typo na chave) e prova
+  # que o hook DEGRADA (fica mudo, exit 0) em vez de crashar — se a mutação não tivesse sido
+  # aplicada de fato, o teste não provaria nada (o caso (a) já passaria do mesmo jeito).
+  cp "${d}/.claude/hooks/aside-router-hook.sh" "${d}/.claude/hooks/aside-router-hook.sh.orig"
+  sed -i "s#'\.prompt // empty'#'.promptXXX // empty'#" "${d}/.claude/hooks/aside-router-hook.sh"
+  if ! grep -q '\.promptXXX // empty' "${d}/.claude/hooks/aside-router-hook.sh"; then
+    record_fail "aside-router-hook: (MUT) guarda-da-guarda" "a mutação NÃO foi aplicada — o teste não prova nada"
+  else
+    rc=0
+    out="$(cd "${d}" && CLAUDE_PROJECT_DIR="${d}" bash .claude/hooks/aside-router-hook.sh <<<"${payload_marker}")" || rc=$?
+    if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+      record_pass "aside-router-hook: (MUT) extração .prompt quebrada → fica mudo, não crasha (prova (a) load-bearing)"
+    else record_fail "aside-router-hook: (MUT)" "esperava vazio+0 mesmo com extração quebrada; out='${out}' rc=${rc}"; fi
+  fi
+  mv "${d}/.claude/hooks/aside-router-hook.sh.orig" "${d}/.claude/hooks/aside-router-hook.sh"
+
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo worklog-capture-session — exercita hooks/worklog-capture-session.sh
+# (SessionStart: grava/atualiza resume_command no STATE.md do worklog ACTIVE).
+# Zero cobertura até 2026-08-06. Contrato (worklog-capture-session.sh:16-45):
+# stdin = payload JSON do SessionStart nativo (session_id + outros campos,
+# NÃO o `{"session_id":"x"}` minimalista de outros selftests); grava em
+# `.claude/sessions/<slug>/STATE.md` relativo ao CWD do processo — settings.json
+# não faz `cd`, então o CWD real É o project root (mesma premissa do hook
+# session-beacon-hook.sh). Self-contained: repo git em mktemp com 1 commit
+# (git rev-parse --abbrev-ref HEAD falha em HEAD "unborn" sem commit algum —
+# verificado; sem isso o sandbox nem chegaria a exercitar o hook).
+#
+# MODO DE FALHA SILENCIOSO ALVEJADO: o parse tem 2 caminhos — jq (linha 20) e
+# um fallback grep/sed (linha 22) para ambientes sem jq. Esta máquina TEM jq
+# (ver memória lint-graph-needs-jq), então qualquer selftest ingênuo cai SEMPRE
+# no caminho jq — o fallback fica invisível e pode apodrecer sem ninguém notar
+# (paralelo exato ao aviso desta tarefa: mutation test recente validava o modo
+# HUMANO enquanto o consumidor real usava TSV). O caso (h) esconde jq do PATH
+# e usa o payload MULTI-CAMPO real (session_id fora da 1ª posição, não o
+# `{"session_id":"x"}` trivial) para provar que o fallback extrai o sid certo.
+# Falsificado empiricamente: com o regex do fallback quebrado E jq escondido,
+# o hook grava NADA e sai 0 — falha 100% silenciosa que só (h) pega.
+#
+# 2º modo de falha visado: duplicação silenciosa. O template real
+# (.claude/commands/engineer/start.md:143-144) já semeia o STATE.md com
+# `resume_command: claude --resume <id>`, então o caminho de produção É o
+# ramo de ATUALIZAÇÃO (sed), não o de criação (append) — testar só "sem
+# seção prévia" testaria a forma que o template real nunca produz. Se a
+# detecção `grep -q '^resume_command:'` (linha 37) alguma vez parar de casar,
+# cada SessionStart da MESMA sessão duplica a seção `## Native transcript`
+# no STATE.md — crescimento silencioso, invisível até alguém abrir o arquivo.
+# Caso (i) é o mutation test que prova essa detecção é load-bearing.
+# ---------------------------------------------------------------------------
+run_worklog_capture_session_selftests() {
+  local hk="${REPO_ROOT}/.claude/hooks/worklog-capture-session.sh"
+  if [ ! -f "${hk}" ]; then record_fail "worklog-capture-session" "hook ausente: ${hk}"; return; fi
+  local d rc out
+
+  d="$(mktemp -d)"
+  git -C "${d}" init -q
+  git -C "${d}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m init
+  git -C "${d}" checkout -q -b "feature/test-slug"
+  mkdir -p "${d}/.claude/hooks" "${d}/.claude/sessions/test-slug"
+  cp "${hk}" "${d}/.claude/hooks/"
+
+  # payload REAL do SessionStart: multi-campo, session_id fora da 1ª posição
+  # (stress-test do fallback regex, que não pode depender de ordem de chave)
+  local payload='{"hook_event_name":"SessionStart","cwd":"/x","transcript_path":"/y.jsonl","session_id":"sess-real-001","source":"startup"}'
+
+  # (a) STATE.md SEM '## Native transcript' prévio → cria a seção + a linha
+  printf '# STATE — test-slug\n\n## NEXT\nphase: 1\n' > "${d}/.claude/sessions/test-slug/STATE.md"
+  rc=0; (cd "${d}" && printf '%s' "${payload}" | bash .claude/hooks/worklog-capture-session.sh) >/dev/null || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qx 'resume_command: claude --resume sess-real-001' "${d}/.claude/sessions/test-slug/STATE.md"; then
+    record_pass "worklog-capture-session: (a) sem seção prévia → cria '## Native transcript' + resume_command (exit 0)"
+  else record_fail "worklog-capture-session: (a) cria seção" "esperava a linha de resume_command; rc=${rc}; conteúdo: $(cat "${d}/.claude/sessions/test-slug/STATE.md")"; fi
+
+  # (b) shape REAL do /engineer/start.md (linha 143-144): STATE.md JÁ NASCE
+  # com o placeholder `resume_command: claude --resume <id>   # conveniência
+  # opcional (...)`. Este É o caminho de produção — (a) sozinho testaria uma
+  # forma que o template real nunca produz.
+  printf '# STATE — test-slug\n\n## NEXT\nphase: 1\n\n## Native transcript\nresume_command: claude --resume <id>   # conveniência opcional (colada pelo usuário/hook)\n' \
+    > "${d}/.claude/sessions/test-slug/STATE.md"
+  rc=0; (cd "${d}" && printf '%s' "${payload}" | bash .claude/hooks/worklog-capture-session.sh) >/dev/null || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && grep -qx 'resume_command: claude --resume sess-real-001' "${d}/.claude/sessions/test-slug/STATE.md" \
+     && [ "$(grep -c '^resume_command:' "${d}/.claude/sessions/test-slug/STATE.md")" = "1" ]; then
+    record_pass "worklog-capture-session: (b) placeholder do template real (/engineer/start.md) → substituído, sem duplicar"
+  else record_fail "worklog-capture-session: (b) placeholder" "esperava 1 linha resume_command substituída; conteúdo: $(cat "${d}/.claude/sessions/test-slug/STATE.md")"; fi
+
+  # (c) idempotência: mesmo session_id de novo → NO-OP, arquivo byte-a-byte
+  # IGUAL (guarda contra o STATE.md crescer a cada SessionStart da mesma
+  # sessão — o próprio hook nasceu de um incidente de subcobertura, ver
+  # header do hook linhas 9-15; um regressor aqui apaga o instrumento de
+  # dogfood que ele mesmo existe para alimentar).
+  local before after
+  before="$(cat "${d}/.claude/sessions/test-slug/STATE.md")"
+  rc=0; (cd "${d}" && printf '%s' "${payload}" | bash .claude/hooks/worklog-capture-session.sh) >/dev/null || rc=$?
+  after="$(cat "${d}/.claude/sessions/test-slug/STATE.md")"
+  if [ "${rc}" -eq 0 ] && [ "${before}" = "${after}" ]; then
+    record_pass "worklog-capture-session: (c) re-run com o MESMO session_id → no-op idempotente (arquivo intocado)"
+  else record_fail "worklog-capture-session: (c) idempotência" "esperava arquivo igual; before/after divergem ou rc=${rc}"; fi
+
+  # (d) NOVO session_id na mesma sessão (ex.: /clear, nova janela) →
+  # substitui, continua com EXATAMENTE 1 linha (não acumula histórico)
+  local payload2='{"session_id":"sess-real-002","hook_event_name":"SessionStart","source":"resume"}'
+  rc=0; (cd "${d}" && printf '%s' "${payload2}" | bash .claude/hooks/worklog-capture-session.sh) >/dev/null || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && grep -qx 'resume_command: claude --resume sess-real-002' "${d}/.claude/sessions/test-slug/STATE.md" \
+     && [ "$(grep -c '^resume_command:' "${d}/.claude/sessions/test-slug/STATE.md")" = "1" ]; then
+    record_pass "worklog-capture-session: (d) novo session_id → substitui, continua com 1 linha só"
+  else record_fail "worklog-capture-session: (d) novo sid" "esperava a linha nova e única; conteúdo: $(cat "${d}/.claude/sessions/test-slug/STATE.md")"; fi
+
+  # (e) sem session_id no payload (harness antigo/malformado) → no-op total,
+  # exit 0, NENHUMA mutação (com jq presente)
+  before="$(cat "${d}/.claude/sessions/test-slug/STATE.md")"
+  rc=0; (cd "${d}" && printf '{"hook_event_name":"SessionStart"}' | bash .claude/hooks/worklog-capture-session.sh) >/dev/null || rc=$?
+  after="$(cat "${d}/.claude/sessions/test-slug/STATE.md")"
+  if [ "${rc}" -eq 0 ] && [ "${before}" = "${after}" ]; then
+    record_pass "worklog-capture-session: (e) payload sem session_id → no-op silencioso (exit 0, arquivo intocado)"
+  else record_fail "worklog-capture-session: (e) sem session_id" "esperava no-op; rc=${rc}"; fi
+
+  # (f) branch SEM prefixo (ex.: main) → no-op, NENHUM diretório
+  # .claude/sessions/<branch> fantasma é criado (guarda contra slug
+  # mal-parseado escrever fora do worklog certo)
+  git -C "${d}" checkout -q -b main-selftest
+  rc=0; (cd "${d}" && printf '%s' "${payload}" | bash .claude/hooks/worklog-capture-session.sh) >/dev/null || rc=$?
+  if [ "${rc}" -eq 0 ] && [ ! -d "${d}/.claude/sessions/main-selftest" ]; then
+    record_pass "worklog-capture-session: (f) branch sem prefixo → no-op, sem criar worklog fantasma"
+  else record_fail "worklog-capture-session: (f) branch sem prefixo" "esperava no-op; rc=${rc}"; fi
+  git -C "${d}" checkout -q feature/test-slug
+
+  # ---- MODO DE FALHA SILENCIOSO ALVEJADO: fallback sem jq, payload REAL ----
+  # Esconde jq do PATH (não desinstala — cria um PATH mínimo simbólico) e
+  # prova que `command -v jq` falha de fato e que o grep/sed do fallback
+  # (linha 22) extrai o session_id do payload MULTI-CAMPO de produção.
+  local nojq_dir; nojq_dir="$(mktemp -d)"
+  local b p
+  for b in bash cat git grep head mktemp mv printf rm sed mkdir; do
+    p="$(command -v "${b}" 2>/dev/null)" && ln -sf "${p}" "${nojq_dir}/${b}"
+  done
+
+  # (g) guarda: sem jq no PATH restrito, `command -v jq` REALMENTE falha
+  # (senão o caso (h) estaria testando o caminho errado — o mesmo erro
+  # apontado no aviso desta tarefa: validar a superfície que ninguém usa)
+  # `|| rc=$?` e NÃO `; rc=$?`: o runner roda sob `set -euo pipefail` (linha 41), e este
+  # comando DEVE falhar (é o ponto do teste — jq ausente). Com `;` o shell morre ANTES de
+  # capturar, levando o selftest INTEIRO junto. Achado ao rodar o gate real: a bancada onde
+  # esta função foi escrita não tinha `set -e`, então passava lá e matava aqui — o mesmo
+  # "testar a superfície errada" que esta bateria existe para pegar, uma camada acima.
+  rc=0; (PATH="${nojq_dir}" command -v jq >/dev/null 2>&1) || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    record_pass "worklog-capture-session: (g) guarda — jq de fato AUSENTE do PATH restrito (o (h) mira o caminho certo)"
+  else
+    record_fail "worklog-capture-session: (g) guarda jq ausente" "jq ainda visível no PATH restrito — (h) testaria o caminho errado"
+  fi
+
+  # (h) fallback grep/sed, SEM jq, payload real multi-campo fora de ordem →
+  # extrai sess-real-001 corretamente e atualiza o STATE.md (o caminho que
+  # roda em qualquer clone sem jq instalado — hoje 0% coberto). Falsificado:
+  # com o regex do fallback quebrado de propósito, este caso REPROVA (out vazio,
+  # STATE.md intocado) — prova que não é vacuamente verde.
+  printf '# STATE — test-slug\n\n## NEXT\nphase: 1\n' > "${d}/.claude/sessions/test-slug/STATE.md"
+  rc=0; out="$(cd "${d}" && PATH="${nojq_dir}" bash .claude/hooks/worklog-capture-session.sh <<< "${payload}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qx 'resume_command: claude --resume sess-real-001' "${d}/.claude/sessions/test-slug/STATE.md"; then
+    record_pass "worklog-capture-session: (h) SEM jq — fallback grep/sed extrai session_id do payload real (campo fora de ordem)"
+  else record_fail "worklog-capture-session: (h) fallback sem jq" "esperava resume_command com sess-real-001; rc=${rc}; out=${out}"; fi
+
+  # ---- MUTATION TEST com guarda-da-guarda ----
+  # Neutraliza a detecção `grep -q '^resume_command:'` (linha 37 — decide
+  # ATUALIZAR vs APPENDAR) para nunca casar → o hook mutante SEMPRE cai no
+  # ramo `else` (append), mesmo quando a linha já existe. Prova que a
+  # detecção é load-bearing: sem ela, cada SessionStart duplica a seção
+  # `## Native transcript` — crescimento silencioso do STATE.md.
+  local mut="${d}/.claude/hooks/worklog-capture-session.sh"
+  cp "${hk}" "${mut}"
+  sed -i.bak "s|if grep -q '^resume_command:' \"\\\$state\" 2>/dev/null; then|if false; then|" "${mut}"
+  if ! grep -q "if false; then" "${mut}"; then
+    record_fail "worklog-capture-session: (i) mutation" "a mutação não foi aplicada — âncora do sed mudou; o teste não prova nada"
+  else
+    printf '# STATE — test-slug\n\n## NEXT\nphase: 1\n\n## Native transcript\nresume_command: claude --resume sess-old\n' \
+      > "${d}/.claude/sessions/test-slug/STATE.md"
+    (cd "${d}" && printf '%s' "${payload}" | bash .claude/hooks/worklog-capture-session.sh) >/dev/null 2>&1
+    (cd "${d}" && printf '%s' "${payload2}" | bash .claude/hooks/worklog-capture-session.sh) >/dev/null 2>&1
+    local n_dup; n_dup="$(grep -c '^resume_command:' "${d}/.claude/sessions/test-slug/STATE.md")"
+    if [ "${n_dup}" -gt 1 ]; then
+      record_pass "worklog-capture-session: (i) MUTATION TEST — sem a detecção, 2 SessionStart duplicam resume_command (${n_dup} linhas); a detecção original é load-bearing"
+    else
+      record_fail "worklog-capture-session: (i) mutation" "com a detecção DESFEITA o arquivo ainda tem ${n_dup} linha(s) — o teste não é load-bearing"
+    fi
+  fi
+
+  rm -rf "${d}" "${nojq_dir}"
+}
+
 # Guardas do bloco RECONCILIAÇÃO do kg-radar.sh — o PRIMEIRO teste deste bloco.
 #
 # POR QUE EXISTE (medido 2026-08-05): a INTEGRIDADE cobra contradição só para REFUTES
@@ -6408,6 +6877,9 @@ run_kg_reconcile_selftests
 # Modo state — a fila de abertos, complementar ao radar por construção
 run_kg_state_selftests
 run_kg_trace_resolve_selftests
+run_worklog_precompact_breadcrumb_selftests
+run_aside_router_hook_selftests
+run_worklog_capture_session_selftests
 
 # Modo kg-label-collision — conteúdo de label não pode ser lido como configuração
 # (sinal de campo onion-pessoal-app, 2026-07-19).

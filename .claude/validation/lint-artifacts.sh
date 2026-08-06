@@ -81,6 +81,21 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 CLAUDE_DIR="${REPO_ROOT}/.claude"
 
+# ── PAPEL DO REPO, resolvido UMA VEZ (era três predicados divergentes e um grep por arquivo) ──
+# MEDIDO 2026-08-06: o mesmo predicado existia em TRÊS formas neste arquivo — com espaço
+# LITERAL (`'^(role: (adopted|hub)|decoupled_from:)'`, 5 usos), tolerante-a-espaço (2 usos) e
+# só-folha (2 usos). O write-stamp.sh emite `role: %s` com UM espaço, então a máquina sempre
+# casava as três; o rombo é o stamp EDITADO À MÃO. Com `role:adopted` (sem espaço) o repo se
+# partia ao meio — metade das guardas via adotante, metade via core — e o dano foi medido em
+# sandbox: 7 HARD espúrios. Um predicado, um lugar.
+# A âncora de fim (`_ROLE_TAIL`) também mata o casamento por PREFIXO que a forma antiga aceitava:
+# `role: adoptedX` deixava de ser confundido com `adopted`. E resolver uma vez, em vez de um
+# `grep` dentro do predicado por-arquivo, tira ~1.461 execuções de grep por varredura.
+_stamp_has() { grep -qE "$1" "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; }
+_ROLE_TAIL='[[:space:]]*(#.*)?$'
+IS_DERIVED=0; _stamp_has "^([[:space:]]*role:[[:space:]]*(adopted|hub)${_ROLE_TAIL}|[[:space:]]*decoupled_from:)" && IS_DERIVED=1
+IS_LEAF=0;    _stamp_has "^[[:space:]]*role:[[:space:]]*adopted${_ROLE_TAIL}" && IS_LEAF=1
+
 # ---------------------------------------------------------------------------
 # Contadores de violações
 # ---------------------------------------------------------------------------
@@ -134,7 +149,7 @@ inventory_scope_excluded() {
   # 'N agentes' ali é do produto, não do Onion. Falso-positivo REAL: um adotante (2026-07-24) tinha
   # docs/specs/capability-registry.md com '100+ agentes' do próprio produto. Restringe a varredura à
   # superfície Onion. No core (role: source) NÃO se aplica — todos os docs são Onion. [[fix-must-become-mechanism]]
-  if grep -qE '^(role:[[:space:]]*(adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then
+  if [ "${IS_DERIVED}" -eq 1 ]; then
     case "${f}" in
       # Varre o que é DO ALVO e REGENERÁVEL: docs/onion/ (inventory.md e graph.md nascem do
       # filesystem dele) e o CLAUDE.onion.md dele. Aí a contagem é claim sobre a instalação DELE.
@@ -719,7 +734,7 @@ check_plugins_sync() {
   # consumidor (role: adopted) NÃO distribui plugins — marketplace é superfície do source; a fonte é
   # vendorizada mas a SAÍDA gerada (plugins/ + marketplace.json) não. Guarda POR PAPEL (não só por
   # ferramenta) — sinal de campo 2026-07-10 (12 HARD falsos bloqueavam todo commit do adotante).
-  grep -qE '^(role: (adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
   [ -f "${asm}" ] || return 0            # sem assembler → nada a checar (repo sem a feature)
   [ -d "${vdir}" ] || return 0
   command -v jq >/dev/null 2>&1 || return 0   # sem jq → pula gracioso (mesma graça dos outros)
@@ -823,7 +838,7 @@ check_role_bundle_sync() {
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   local mkt="${REPO_ROOT}/.claude-plugin/marketplace.json"
   # consumidor não carrega marketplace.json — mesma guarda por papel de check_plugins_sync (sinal de campo)
-  grep -qE '^(role: (adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
   [ -f "${roles}" ] || return 0
   command -v python3 >/dev/null 2>&1 || return 0
   python3 -c "import yaml" >/dev/null 2>&1 || return 0
@@ -1798,7 +1813,7 @@ _scan_relative_links() {
   # validações meta). KBs de doutrina embarcados citam esses arquivos por link — ausentes-por-desenho no
   # door, exatamente como os docs core-only. Só ATIVA quando o alvo está ausente ([ ! -e ] abaixo): num
   # adotante-cheio o alvo existe (nunca entra); no core (role: source) o guard nem roda. Backward-safe.
-  local adopted=""; grep -qE '^(role: (adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && adopted=1
+  local adopted=""; [ "${IS_DERIVED}" -eq 1 ] && adopted=1
   local f dir lineno target clean rel
   while IFS= read -r -d '' f; do
     dir="$(dirname "${f}")"
@@ -2259,7 +2274,7 @@ check_projection_safety() {
   # MEDIDO 2026-08-06: um adotante levou HARD por citar a MARCA DELE no grafo DELE, dentro do
   # repo DELE. `site/` FICA no escopo — um adotante pode publicar site, e aí a regra vale.
   local surfaces=("${REPO_ROOT}/site")
-  if ! grep -qE '^role:[[:space:]]*adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then
+  if [ "${IS_LEAF}" -ne 1 ]; then
     surfaces+=("${REPO_ROOT}/docs/onion/graph" "${REPO_ROOT}/docs/onion/federation-console.html")
   fi
   out="$(bash "${helper}" --format tsv "${surfaces[@]}" 2>/dev/null || true)"
@@ -2388,7 +2403,7 @@ check_vendored_surface_clean() {
   # `hub` NÃO é isento: um hub vendoriza para os projetos dele, e lá a regra continua valendo.
   # [[vendor-scrub-blind-spot]] · irmão do GAP3 (approx-count adopter-aware, dogfood de campo 2026-07-24).
   # (o crédito nominal do adotante fica no diário privado — esta guarda cobra isso, inclusive de mim)
-  grep -qE '^role:[[:space:]]*adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
+  [ "${IS_LEAF}" -eq 1 ] && return 0
   local roots=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks \
                docs/meta-specs docs/knowledge-base docs/sdaal)
   local targets=() r
@@ -2472,7 +2487,7 @@ check_frontmatter_model_category() {
 #   vazio → todo standalone montado herdava referência morta. Roda no source (o adotante não monta).
 # ===========================================================================
 check_bundled_command_script_deps() {
-  grep -qE '^(role: (adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   [ -d "${vdir}" ] || return 0
   # Harness sempre-presente num repo adotado (não precisa estar no VALIDATION[] do bundle).
@@ -2740,7 +2755,7 @@ _backtick_ref_files() {
 
 check_backtick_path_refs() {
   local adopted=""
-  grep -qE '^(role: (adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && adopted=1
+  [ "${IS_DERIVED}" -eq 1 ] && adopted=1
   local f lineno tok
   while IFS= read -r -d '' f; do
     [ -f "${f}" ] || continue

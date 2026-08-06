@@ -33,6 +33,8 @@ jobs:
       revisou: ${{ steps.v1.outputs.revisou == 'true' && 'true' || steps.v2.outputs.revisou }}
       motivo1: ${{ steps.v1.outputs.motivo }}
       motivo2: ${{ steps.v2.outputs.motivo }}
+      benigno: ${{ steps.aviso.outputs.benigno }}
+      sem_chave: ${{ steps.sem_chave.outputs.sem_chave }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -222,6 +224,7 @@ jobs:
       # bloquear o PR puniria o autor pela falha do bot. Mas o humano VÊ que não houve revisão.
       # A condição lê o veredito (`revisou`), nunca o outcome do step — ver o bloco do v1.
       - name: Aviso se nenhuma tentativa revisou (soft-pass, não bloqueia)
+        id: aviso
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.v1.outputs.revisou != 'true' && steps.v2.outputs.revisou != 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -255,10 +258,28 @@ jobs:
             # conserto não é código.
             nota=" **Causa medida: a credencial do CI não autentica** (pré-voo: HTTP \`${PREFLIGHT_HTTP}\`). O revisor sequer foi chamado — a action não repassa erro de auth, ela pendura ~180s e devolve \`is_error\` sem mensagem. Conserto: gravar um \`ANTHROPIC_API_KEY\` válido no repo."
           elif git diff --name-only "${BASE_SHA}" HEAD | grep -q '^\.github/workflows/onion-review\.yml$'; then
-            benigno=true
+            # DUAS CONDIÇÕES, não uma — e a segunda entrou na revisão adversarial de 2026-08-06.
+            # O diff sozinho é PROXY da causa, não a causa. Enquanto `benigno` só suprimia
+            # comentário, o proxy bastava; agora ele ANISTIA O CHECK, e aí a diferença importa:
+            # sem a 2ª condição, QUALQUER PR que edite o revisor ficaria dispensado do veredito
+            # do revisor — inclusive se ele tivesse morrido por `is-error`, `json-ilegivel` ou
+            # `sem-jq`. Anistia auto-referencial na classe de PR que reescreve o próprio gate.
+            # `sem-arquivo` é a assinatura do auto-pulo da action (medido: M1=M2=sem-arquivo no
+            # run 31111058204). Exigi-la transforma o proxy em MEDIÇÃO.
+            # `orcamento-de-turnos` e pré-voo ruim já estavam protegidos pela ordem do elif acima.
+            if [ "${M1:-}" = "sem-arquivo" ] && { [ "${M2:-}" = "sem-arquivo" ] || [ -z "${M2:-}" ]; }; then
+              benigno=true
+            else
+              nota=" _O PR edita o próprio \`onion-review.yml\` (a action se auto-pula nesse caso), MAS o motivo medido foi \`${M1:-nao-rodou}\`/\`${M2:-nao-rodou}\` — não a assinatura do auto-pulo. Tratado como falha real, não como benigno._"
+            fi
           fi
 
           if [ "${benigno}" = "true" ]; then
+            # EXPORTA para o job de veredito. A detecção continua acontecendo AQUI, uma vez só:
+            # duplicar o predicado no job novo repetiria o defeito que a revisão adversarial
+            # nomeou noutro lugar (`role: adopted` escrito de duas formas, e um stamp sem espaço
+            # partindo o repo ao meio). Um predicado, um lugar.
+            echo "benigno=true" >> "${GITHUB_OUTPUT}"
             echo "::notice::onion-review pulado por desenho: este PR edita o próprio workflow, e a action se auto-pula quando ele difere da branch default. Nada a fazer — o caminho real volta no PR seguinte ao merge."
             {
               echo "ℹ️ **onion-review pulado por desenho** — este PR edita o próprio \`onion-review.yml\`,"
@@ -303,8 +324,20 @@ jobs:
           fi
 
       - name: Aviso — revisor Onion pulado (sem ANTHROPIC_API_KEY)
+        id: sem_chave
         if: ${{ env.HAS_ANTHROPIC_KEY != 'true' }}
         run: |
+          # EXPORTA para o job de veredito, no MESMO step que já detecta — mesmo padrão do
+          # `benigno`. Sem isto o veredito ficava VERMELHO PARA SEMPRE em todo repo sem a chave,
+          # e o motivo é sutil: o `if` do job `onion-review` filtra só FORK, então num repo sem
+          # secret o job RODA, todos os steps pulam por conta própria, e o job conclui `success`
+          # — NÃO `skipped`. O ramo `RESULT = skipped` do veredito, que parecia cobrir isso, é
+          # CÓDIGO MORTO: só fork produz `skipped`, e ali o veredito nem roda (ele também exige
+          # fork == false). Achado em revisão adversarial 2026-08-06.
+          # DANO POTENCIAL, não hipotético: o /meta:setup-code-review distribui este workflow e
+          # o próprio output dele prevê a janela "workflow instalado, secret ainda não" —
+          # todo PR do adotante nasceria com "❌ NÃO foi revisado semanticamente".
+          echo "sem_chave=true" >> "${GITHUB_OUTPUT}"
           echo "Revisor Onion pulado: configure o secret ANTHROPIC_API_KEY e instale o GitHub App do Claude."
           echo "A validação determinística (onion-validate.yml) continua cobrindo estrutura/YAML/naming."
 
@@ -341,7 +374,12 @@ jobs:
   onion-review-verdict:
     runs-on: ubuntu-latest
     needs: onion-review
-    if: ${{ always() && github.event.pull_request.head.repo.fork == false }}
+    # `!cancelled()` e NÃO `always()`: com always(), cancelar a run NÃO cancela este job — o
+    # GitHub re-avalia o `if` e always() dá true. Um `gh run cancel` humano virava
+    # "❌ NÃO foi revisado semanticamente" no PR: cancelamento deliberado transformado em
+    # acusação. `!cancelled()` preserva o comportamento em failure/skipped do needs (que é onde
+    # o vermelho é CERTO — timeout do job dá `failure`, e ali não houve revisão mesmo).
+    if: ${{ !cancelled() && github.event.pull_request.head.repo.fork == false }}
     steps:
       - name: O PR foi revisado semanticamente?
         env:
@@ -349,13 +387,48 @@ jobs:
           M1: ${{ needs.onion-review.outputs.motivo1 }}
           M2: ${{ needs.onion-review.outputs.motivo2 }}
           RESULT: ${{ needs.onion-review.result }}
+          BENIGNO: ${{ needs.onion-review.outputs.benigno }}
+          SEM_CHAVE: ${{ needs.onion-review.outputs.sem_chave }}
         run: |
           if [ "${RESULT}" = "skipped" ]; then
-            echo "::notice::onion-review pulado (fork ou sem chave) — nada a verificar."
+            # Só FORK chega aqui (o job de veredito exige fork == false, então na prática este
+            # ramo é inalcançável — mantido por defesa, não por cobertura). O texto anterior
+            # dizia "fork ou sem chave" e MENTIA: sem chave o job sai `success`, não `skipped`.
+            echo "::notice::onion-review pulado — nada a verificar."
+            exit 0
+          fi
+          if [ "${SEM_CHAVE}" = "true" ]; then
+            echo "::notice::ANTHROPIC_API_KEY ausente — o revisor sequer foi chamado. Não é falha de revisão; é ambiente sem credencial."
+            {
+              echo "ℹ️ **Revisor não configurado neste repo**"
+              echo ""
+              echo "Sem \`ANTHROPIC_API_KEY\`, o revisor não é chamado. O gate determinístico"
+              echo "(\`onion-validate\`) segue cobrindo estrutura/YAML/naming."
+            } >> "${GITHUB_STEP_SUMMARY}"
             exit 0
           fi
           if [ "${REVISOU}" = "true" ]; then
             echo "✅ revisão semântica CONFIRMADA neste PR." >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
+          fi
+          # CASO BENIGNO — e ele existe porque este check ERROU no seu primeiro run real.
+          # No PR #549 (o que criou este job) ele ficou VERMELHO em 4s. Causa: a claude-code-action
+          # SE AUTO-PULA quando o PR edita o próprio onion-review.yml, e o job principal já
+          # classifica isso como benigno, com nota e sem alarme. Ou seja: o check gritava
+          # exatamente no caso que a máquina sabe ser inofensivo.
+          # Isso é o defeito contra o qual o próprio workflow adverte algumas linhas acima —
+          # "alarme que anuncia a própria irrelevância não é alarme; é ruído com justificativa
+          # anexa, e ensina a ignorar os que importam". Um check que grita no caso inócuo perde
+          # a credibilidade justo para quando o caso for grave, que é a razão de ele existir.
+          if [ "${BENIGNO}" = "true" ]; then
+            echo "::notice::onion-review pulado por desenho (este PR edita o próprio workflow) — não é falha de revisão. O caminho real volta a ser exercido no PR seguinte ao merge."
+            {
+              echo "ℹ️ **Revisão pulada por desenho, não por falha**"
+              echo ""
+              echo "Este PR edita o próprio \`onion-review.yml\`, e a action se auto-pula quando o"
+              echo "workflow difere da branch default. **Nada a fazer** — o caminho real volta a ser"
+              echo "exercido no PR seguinte ao merge."
+            } >> "${GITHUB_STEP_SUMMARY}"
             exit 0
           fi
           {
