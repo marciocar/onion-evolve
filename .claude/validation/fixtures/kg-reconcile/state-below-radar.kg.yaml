@@ -1,0 +1,197 @@
+# Fixture: modo --state (a fila de abertos) — grafo GRANDE o bastante para haver aberto ABAIXO do top-10.
+#
+# POR QUE ESTA FIXTURE EXISTE, e não bastou a supersedes-mixed: naquela (9 nós) o top-10 do RADAR é o
+# grafo INTEIRO, então o --state legitimamente mostra zero — e um teste de "zero sobreposição" passaria
+# VACUAMENTE, sem nunca exercitar a exclusão. Aqui há 15 nós: 10 pesados `confirmed` (impact 5, bem
+# conectados) e 4 abertos leves (impact 1, grau 1) que o radar AFUNDA.
+#
+# E o 15º nó existe por causa de um teste que REPROVOU (2026-08-06): com só os 4 leves, remover a
+# exclusão do top-10 era um NO-OP — nenhum aberto estava no radar para ela suprimir, então o mutation
+# test (d) não podia falhar de verdade. `Q_PESADA_OPEN` é o aberto que o radar MOSTRA (grau alto,
+# impact 5): é o único caso em que a exclusão faz trabalho, e portanto o único que a prova.
+#
+# Espera: --radar mostra Q_PESADA_OPEN + os pesados · --state mostra só os 4 leves · sobreposição ZERO.
+# Sem a exclusão: Q_PESADA_OPEN vaza para o --state e a sobreposição vira 1.
+meta:
+  id: fixture-state-below-radar
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: D_PESO_01
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 01 — ocupa o topo do radar"
+  - id: D_PESO_02
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 02"
+  - id: D_PESO_03
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 03"
+  - id: D_PESO_04
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 04"
+  - id: D_PESO_05
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 05"
+  - id: D_PESO_06
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 06"
+  - id: D_PESO_07
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 07"
+  - id: D_PESO_08
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 08"
+  - id: D_PESO_09
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 09"
+  - id: D_PESO_10
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    label: "decisao pesada 10"
+  - id: Q_LEVE_A
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 1
+    confidence: 0.5
+    status: open
+    label: "pergunta aberta leve A — o radar afunda, o estado mostra"
+  - id: Q_LEVE_B
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 1
+    confidence: 0.5
+    status: open
+    label: "pergunta aberta leve B"
+  - id: C_LEVE_C
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 1
+    confidence: 0.4
+    status: open
+    label: "claim aberta leve C"
+  - id: D_LEVE_D
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 1
+    confidence: 0.4
+    status: open
+    label: "decisao aberta leve D"
+  - id: Q_PESADA_OPEN
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: open
+    label: "pergunta aberta PESADA — o radar mostra, logo o estado NAO deve repetir"
+edges:
+  - from: D_PESO_01
+    to: D_PESO_02
+    edge_type: SUPPORTS
+  - from: D_PESO_02
+    to: D_PESO_03
+    edge_type: SUPPORTS
+  - from: D_PESO_03
+    to: D_PESO_04
+    edge_type: SUPPORTS
+  - from: D_PESO_04
+    to: D_PESO_05
+    edge_type: SUPPORTS
+  - from: D_PESO_05
+    to: D_PESO_06
+    edge_type: SUPPORTS
+  - from: D_PESO_06
+    to: D_PESO_07
+    edge_type: SUPPORTS
+  - from: D_PESO_07
+    to: D_PESO_08
+    edge_type: SUPPORTS
+  - from: D_PESO_08
+    to: D_PESO_09
+    edge_type: SUPPORTS
+  - from: D_PESO_09
+    to: D_PESO_10
+    edge_type: SUPPORTS
+  - from: D_PESO_10
+    to: D_PESO_01
+    edge_type: SUPPORTS
+  - from: D_PESO_01
+    to: Q_LEVE_A
+    edge_type: CAUSES
+  - from: D_PESO_02
+    to: Q_LEVE_B
+    edge_type: CAUSES
+  - from: D_PESO_03
+    to: C_LEVE_C
+    edge_type: CAUSES
+  - from: D_PESO_04
+    to: D_LEVE_D
+    edge_type: CAUSES
+  - from: D_PESO_05
+    to: Q_PESADA_OPEN
+    edge_type: CAUSES
+  - from: D_PESO_06
+    to: Q_PESADA_OPEN
+    edge_type: CAUSES
+  - from: D_PESO_07
+    to: Q_PESADA_OPEN
+    edge_type: CAUSES
+  - from: D_PESO_08
+    to: Q_PESADA_OPEN
+    edge_type: CAUSES
+  - from: Q_PESADA_OPEN
+    to: D_PESO_09
+    edge_type: DEPENDS_ON

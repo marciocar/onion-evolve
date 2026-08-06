@@ -1363,6 +1363,96 @@ MEOF
   else record_fail "projection-safety: (T3)" "sem lista de termos a guarda passou verde — proteção fantasma"; fi
 }
 
+# Guardas do modo --state (a fila de abertos) — irmão do --radar.
+#
+# POR QUE EXISTE: a 1ª versão do modo ordenava TODOS os `open` por atenção e ficou 51% redundante
+# com o --radar (num grafo, 100%) — medido antes de commitar. A cura foi EXCLUIR o top-10 do radar
+# por construção. Estes testes existem para que essa exclusão não se perca: sem ela o modo volta a
+# ser vista filtrada do que já se via, e ninguém notaria.
+run_kg_state_selftests() {
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  local sx="${FIX_DIR}/kg-reconcile"
+  local out rc
+
+  # (a) COMPLEMENTARIDADE — nenhum id exibido pelo --state pode estar na coluna de id do --radar.
+  # É a propriedade que define o modo; se cair, ele deixa de ter razão de existir.
+  local st rd dupes
+  st=$(bash "${radar}" "${sx}/state-below-radar.kg.yaml" --state 2>&1)
+  rd=$(bash "${radar}" "${sx}/state-below-radar.kg.yaml" --radar 2>&1)
+  dupes=0
+  while read -r id; do
+    [ -n "${id}" ] || continue
+    if printf '%s' "${rd}" | awk '{print $2}' | grep -qx "${id}"; then dupes=$((dupes + 1)); fi
+  done <<< "$(printf '%s' "${st}" | awk '/^ +[0-9.]+ +/ {print $2}')"
+  local exibidos; exibidos=$(printf '%s' "${st}" | grep -cE '^ +[0-9.]+ +' || true)
+  if [ "${exibidos}" -eq 0 ]; then
+    record_fail "kg-state: (a) complementaridade" "a fixture não exibiu NADA — o teste passaria vacuamente"
+  elif [ "${dupes}" -eq 0 ]; then
+    record_pass "kg-state: (a) ${exibidos} exibidos, zero sobreposição com o --radar — complementar por construção"
+  else record_fail "kg-state: (a) complementaridade" "${dupes} id(s) repetido(s) do radar. state=${st}"; fi
+
+  # (b) SÓ `open` — nenhum nó com outro status entra na fila. A fixture tem confirmed, superseded
+  # e done de propósito, então o lado negativo é real e não vacuidade.
+  local st2; st2=$(bash "${radar}" "${sx}/supersedes-mixed.kg.yaml" --state 2>&1)
+  if ! printf '%s' "${st2}" | grep -qE 'D_JA_RECONCILIADO|Q_JA_FECHADA|D_PESO_'; then
+    record_pass "kg-state: (b) só nós open entram — confirmed/superseded/done ficam fora"
+  else record_fail "kg-state: (b) só open" "state=${st2}"; fi
+
+  # (c) GRAFO SEM ABERTO diz isso, em vez de imprimir cabeçalho vazio (o no-op silencioso que esta
+  # casa já pagou várias vezes).
+  local tmp; tmp="$(mktemp -d)"; trap 'rm -rf "'"${tmp}"'"' RETURN
+  cat > "${tmp}/sem-aberto.kg.yaml" <<'KGEOF'
+meta:
+  id: fixture-sem-aberto
+  schema_version: "1"
+nodes:
+  - id: D_UM
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "decisao fechada"
+  - id: D_DOIS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "outra decisao fechada"
+edges:
+  - from: D_UM
+    to: D_DOIS
+    edge_type: SUPPORTS
+KGEOF
+  rc=0; out=$(bash "${radar}" "${tmp}/sem-aberto.kg.yaml" --state 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'nada em aberto'; then
+    record_pass "kg-state: (c) grafo sem aberto DIZ que não há — não imprime cabeçalho mudo"
+  else record_fail "kg-state: (c) sem aberto" "rc=${rc} out=${out}"; fi
+
+  # (d) (MUT) — removida a exclusão do top-10, a sobreposição REAPARECE. Sem esta prova, (a)
+  # passaria igual se a fixture não tivesse nenhum open pesado o bastante para entrar no radar.
+  local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${tmp}"'" "'"${mut}"'"' RETURN
+  cp "${radar}" "${mut}/mutado.sh"
+  sed -i 's/^      if (id in noRadar) continue.*$//' "${mut}/mutado.sh"
+  if ! grep -q 'if (id in noRadar) continue' "${mut}/mutado.sh"; then
+    local mst mdup
+    mst=$(bash "${mut}/mutado.sh" "${sx}/state-below-radar.kg.yaml" --state 2>&1 || true)
+    mdup=0
+    while read -r id; do
+      [ -n "${id}" ] || continue
+      if printf '%s' "${rd}" | awk '{print $2}' | grep -qx "${id}"; then mdup=$((mdup + 1)); fi
+    done <<< "$(printf '%s' "${mst}" | awk '/^ +[0-9.]+ +/ {print $2}')"
+    if [ "${mdup}" -gt 0 ]; then
+      record_pass "kg-state: (d) (MUT) sem a exclusão a sobreposição volta (${mdup}) — a exclusão é load-bearing"
+    else record_fail "kg-state: (d) (MUT)" "mutação não trouxe sobreposição — a exclusão é vacuidade? out=${mst}"; fi
+  else
+    record_fail "kg-state: (d) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+}
+
 # Guardas do bloco RECONCILIAÇÃO do kg-radar.sh — o PRIMEIRO teste deste bloco.
 #
 # POR QUE EXISTE (medido 2026-08-05): a INTEGRIDADE cobra contradição só para REFUTES
@@ -6180,6 +6270,9 @@ run_kg_provenance_selftests
 
 # Modo reconcile — o ⚠ de alvo de SUPERSEDES não reconciliado (primeiro teste do bloco)
 run_kg_reconcile_selftests
+
+# Modo state — a fila de abertos, complementar ao radar por construção
+run_kg_state_selftests
 
 # Modo kg-label-collision — conteúdo de label não pode ser lido como configuração
 # (sinal de campo onion-pessoal-app, 2026-07-19).

@@ -30,7 +30,8 @@ Estabelecer contexto completo do projeto incluindo:
   — resolve AO VIVO; o glob hardcoded anterior enumerava só 31 de 49 grafos, **36% cegos**, e os invisíveis
   eram justamente os de `docs/evolution/research/<tema>/`) — ele é a fonte da verdade de estado/domínio, **acima**
   da prosa dos docs. Rode `bash .claude/validation/kg-radar.sh <arquivo>` e absorva o veredito (atenção,
-  reconciliação, integridade, frescor) citando **ids de nó**.
+  **estado**, reconciliação, integridade, frescor) citando **ids de nó**. A seção **ESTADO**
+  lista o que segue `open` e que o radar afunda — o trabalho que sobrou, não o que pesa.
 - ✅ **Drive-to-verify:** claims `plane: PROD` de alto impacto → cruzar contra o vivo antes de assumir; nó
   stale mente (`--freshness`). Sem `.kg.yaml` → siga para o item 1.
 - ⚙️ **Mecanismo, não conselho** (sinal de campo 2026-07-16): consultar o KG **por padrão** é a forcing
