@@ -17,7 +17,14 @@ notes=".claude/sessions/${slug}/notes.md"
 [ -f "$notes" ] || exit 0
 
 if command -v jq >/dev/null 2>&1; then
-  trig=$(printf '%s' "$input" | jq -r '.source // "?"' 2>/dev/null)
+  # CAMPO CERTO É `.trigger`, NÃO `.source` — bug medido em 2026-08-06, vivo desde edf14c4
+  # (2026-06-14). O evento PreCompact do Claude Code manda `trigger` ("manual"|"auto") +
+  # `custom_instructions`; NÃO existe campo `source` no schema. Resultado: TODA compactação
+  # desde a introdução do hook gravou `compaction (?)` — exit 0, formato correto, conteúdo
+  # sempre errado. O dado que distingue compactação MANUAL de AUTOMÁTICA nunca chegou a existir.
+  # Modo de falha exemplar desta casa: nada reclama, nada quebra, e o valor some.
+  # `.source` fica como fallback secundário para não regredir caso o schema mude de volta.
+  trig=$(printf '%s' "$input" | jq -r '.trigger // .source // "?"' 2>/dev/null)
 else
   trig="?"
 fi

@@ -51,7 +51,19 @@ jobs:
     # + gate de design tokens ≈ 7,5min. Com teto de 10 o job rodava a ~75% do orçamento — margem que
     # some no primeiro runner lento e vira CI vermelho por TEMPO, não por defeito. A suíte cresce a
     # cada guarda nova (é o objetivo); o teto acompanha, com a medição registrada para o próximo ajuste.
-    timeout-minutes: 15
+    #
+    # RE-MEDIDO 2026-08-06 (KVM 8), e o aviso acima se cumpriu à risca: o job foi CANCELADO aos
+    # 15m02s — vermelho por TEMPO, não por defeito. Números desta passada:
+    #   · lint-selftest local : 908s = 15,1 min · 646 guardas · 0 falhas
+    #   · lint-artifacts      : ~44s
+    #   · CI vinha passando em 11-12 min = ~77% do teto de 15 — a mesma margem-fantasma de julho
+    # A HIPÓTESE ÓBVIA ERA FALSA e vale registrada para o próximo não repetir: culpei as 34 guardas
+    # acrescentadas naquele dia, e a medição refutou — 908s AGORA contra 921s de manhã com 612
+    # guardas, ou seja 13s MAIS RÁPIDO com 34 guardas A MAIS (1.406ms/guarda contra 1.505ms).
+    # As guardas novas não engordaram nada; o teto é que estava colado no trabalho que já existia.
+    # Subir para 25 dá ~40% de folga sobre o pior caso local — e o pior caso é o LOCAL, porque o
+    # runner do CI é mais rápido que a KVM 8. Próximo ajuste: re-medir, não estimar.
+    timeout-minutes: 25
 
     steps:
       - name: Checkout Repository
