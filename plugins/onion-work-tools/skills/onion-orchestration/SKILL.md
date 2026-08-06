@@ -174,12 +174,48 @@ await agent(                                                      // ou: /meta:k
 const radar = await bash(`bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh ${kgPath}`);
 if (radar.exitCode !== 0) throw new Error(`kg-radar falhou em ${kgPath} — a fase write(KG) não fecha sem exit 0`);
 
-// carimba o doc de síntese com o marcador que o gate de integridade de frontmatter valida
-await editFrontmatter(synthesisPath, { kg: kgPath });
+// carimba o doc de síntese: o marcador do grafo E o CUSTO do run (contrato abaixo)
+await editFrontmatter(synthesisPath, {
+  kg: kgPath,
+  run_id: runId,                 // wf_xxxxxxxx-xxx — quem produziu
+  tokens: budget.spent(),        // quanto custou
+  agents: agentCount,            // com quantos workers
+  duration_min: elapsedMin,      // em quanto tempo
+});
 ```
 
 Sem este carimbo, a síntese não deixa rastro estrutural de que **nasceu no grafo** — só prosa que
 "evapora" entre sessões (o próprio buraco que este template fecha).
+
+### Contrato de frontmatter — a proveniência de custo do run
+
+**Toda síntese de orquestração declara os quatro campos** `run_id` · `tokens` · `agents` ·
+`duration_min`, no frontmatter, **na mesma unidade que o `kg:`**: um carimbo estrutural, não prosa.
+
+**POR QUE ISTO EXISTE (medido 2026-08-06, no repo rastreado):**
+
+```
+66 arquivos citam um run de workflow · 42 run ids DISTINTOS
+37 mencionam custo em ALGUM lugar        ← proximidade, não atribuição
+ 2 registram o custo DO RUN, atribuível  ← 4,8% dos runs
+```
+
+E a causa não era descuido: **não existia contrato nenhum**. O `run_id:` que aparece em algumas
+sínteses veio de **imitação**, não de especificação — ninguém podia cumprir o que não estava escrito.
+
+**O que se perde sem os campos:** a decisão *"vale a pena orquestrar isto ou faço serial?"* é
+**exatamente** a que mais se repete nesta casa, e ela precisa de série histórica — custo por padrão,
+por nº de workers, por tier de modelo. Mencionar "~1,4M tokens" três parágrafos abaixo de um `wf_` não
+responde **quanto aquele run custou**; só a co-locação no frontmatter responde.
+
+**TETO DECLARADO — a janela é PROSPECTIVA, e por isso o atraso destrói dado.** Os 40 runs sem custo
+atribuível **não são recuperáveis**: os journals dos runs antigos não sobrevivem à sessão. A série
+começa na próxima síntese, e cada síntese escrita sem os campos é uma medição perdida **para sempre**.
+É o único item desta leva onde adiar não é adiar — é apagar.
+
+**Emissão automática segue GATED, por desenho.** O gatilho é: se a próxima síntese nascer **sem** os
+quatro campos, aí — e só aí — mecanize. Mecanizar antes é catedral pelo portão 4 (o volume ainda não
+força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quando o volume justifica**.
 
 ## Model tiering — PADRÃO OBRIGATÓRIO (tier por complexidade, sempre)
 
