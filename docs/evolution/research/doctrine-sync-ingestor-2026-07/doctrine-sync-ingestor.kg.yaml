@@ -43,7 +43,7 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "deep-research (skill do harness) despeja em /tmp efemero e nao persiste no KG-SSOT — write(KG) depende de lembrar (semente + desbloqueio do onion-pessoal)"
-    trace: "docs/evolution/inbox/2026-07-18-deep-research-no-auto-kg-persist.md"
+    trace: "docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md"
   - id: E_GRANAAI_DOCTRINE
     node_type: evidence
     layer: audit

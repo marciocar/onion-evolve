@@ -155,6 +155,56 @@ falha exato que esta casa já mediu: *verde que não verificou*.
 Aplicado nesta leva: os 9 números do `technical-context` viraram **conserto manual** (PR #542); o
 `SUPERSEDES` não-reconciliado — **15 casos vivos, classe recorrente** — virou **guarda**.
 
+### M4 — a medição refutou a própria especificação, duas vezes
+
+**A forma mudou antes de existir.** A "fila de 70 candidatos" morreu: **64 já estão ancorados**, e o
+bloco PROVENIÊNCIA **já cobre** âncora ausente. Emiti-la seria **91% de ruído**. O que o radar **nunca**
+fez foi verificar se a âncora **resolve** — `behavior-over-declaration` virado para a própria âncora.
+
+**E a especificação do lugar caiu na medição:**
+
+| refutação | evidência |
+|---|---|
+| o `--freshness-tsv` era o lugar errado | dos 13 casos reais, **2** caem nesse escopo — nasceria vendo **15%** e *declarando* cobertura |
+| não era "uma cláusula" | o `kg-radar.sh` tem **zero** I/O, e essa pureza é o que o faz rodar sob `env -i` (o número do M3) |
+
+**Superação:** script-irmão `kg-trace-resolve.sh` (padrão do `kg-radar-integrity.sh`), cobrindo **13/13**.
+
+### O achado mais valioso do M4 é contra mim
+
+Durante a construção, uma edição minha **comentou o resto da linha do `awk`** que casa `trace:`. O
+parser passou a ler **zero nós** — e o script imprimiu **"✅ todo `trace:` julgável resolve"** com
+**exit 0**.
+
+> **Uma guarda completamente quebrada reportando sucesso.** Só peguei porque tinha o número 1.300 para
+> comparar. Ninguém depois de mim teria esse número.
+
+A cura não foi *"prestar mais atenção"* — cura nula. Virou **guarda de vacuidade** no próprio script
+(há `trace:` no corpus e nada foi julgado ⇒ o parser morreu ⇒ exit 1) mais o **caso (e)** do selftest,
+um mutante que reproduz o incidente exato. Antes, o mutante saía 0 com ✅; agora sai 1 com `VACUIDADE`.
+
+**Terceira vez nesta rodada que a mesma lição aparece.** Verde-não-verificado é o modo de falha desta
+casa, e a única cura é mecânica.
+
+### Todo filtro nasceu de um falso-positivo medido
+
+Sem os cortes seriam **24 avisos com ~46% de falso-positivo**. Três rodadas, cada uma pega comparando
+contra o número anterior:
+
+- resolvedor de **raiz única** dava 8 mortos, **7 falsos** — eram `SYNTHESIS.md` relativo ao diretório
+  do grafo. **Duas raízes é requisito, não detalhe** (87% de falso-positivo)
+- **absoluto/URL** (`/home/onion/onion-bridge`, `/etc/caddy`) não é julgável: existe, só não aqui
+- **`memory/`** é raiz externa declarada
+- e os filtros de forma: argumento de comando, prosa entre parênteses e **domínio sem esquema**
+  passavam por "tem barra"
+
+**Teto declarado em vez de escondido:** âncora de **nome solto** (`SYNTHESIS.md`, 7 casos reais) **não é
+vigiada**. Cobertura menor e crível vence cobertura maior e barulhenta — aviso que adivinha é o que
+treina o leitor a ignorar.
+
+**Entregue:** REGRA 55 (HARD, **sem baseline** — os 13 foram consertados antes) · 5 casos de selftest,
+2 deles mutation · fixture de 9 nós com **7 motivos distintos** de silêncio.
+
 ## O que fica para a próxima decisão
 
 A leva **para aqui**, por escolha do maestro: **M7 é a evidência barata que pode inverter a ordem**. Ele
@@ -203,5 +253,5 @@ vermelho. Cura: `Q_PESADA_OPEN`, o único caso em que a exclusão faz trabalho.
 
 ## O que fica para a próxima decisão
 
-**Restam no menu, para escolha e ordem do maestro:** M4 (fila de âncora) · M6 (colheita do ledger de
+**Restam no menu:** M6 (colheita do ledger de
 custo) · M8 (corrida serial reescopada) · M9 (a lacuna do porte).

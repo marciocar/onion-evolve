@@ -10,7 +10,7 @@ nodes:
     confidence: 1.0
     status: done
     label: "Dos 7 produtos deriváveis do relay do adotante, quais o core promove — e quais já existem?"
-    trace: "docs/evolution/inbox/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+    trace: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
   - id: C_p1_gerador_vertical
     node_type: claim
     plane: DEV
@@ -184,7 +184,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "VEREDITO: #1 já servido (create-vertical existe — avisar o adotante + fechar F2 se pendente). Promover primeiro #2/#3/#5 (GAP + adotante topa tocar = prontidão máxima). #4 e #7 design de onboarding/gate. #6 wrapper fino sobre /meta:kg map. Quem decide números/ordem final = maestro"
-    trace: "docs/evolution/inbox/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+    trace: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
 edges:
   - from: E_create_vertical_existe
     to: C_p1_gerador_vertical

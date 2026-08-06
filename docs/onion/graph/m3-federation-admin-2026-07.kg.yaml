@@ -32,7 +32,7 @@ nodes:
     label: "GATILHO objetivo do build: o 1º membro role:consumer (T2) REAL em members.yaml (introduz hub-owner que precisa de visão/ação escopada ao próprio subgrafo) OU o 1º contrato breaking registrado em contracts/. Hoje: 0 T2; o diretório contracts/ AINDA NÃO EXISTE (nasce no 1º /meta:federation-register) → gate FECHADO"
   - id: Q_onprem_tension
     node_type: question
-    trace: docs/evolution/gtm-decision-brief-2026-07.md:73-74
+    trace: docs/business-context/gtm-decision-brief-2026-07.md:73-74
     layer: audit
     plane: DEV
     impact: 4

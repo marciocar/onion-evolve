@@ -118,7 +118,7 @@ nodes:
     confidence: 0.9
     status: done
     label: "Path relativo errado em anuncio da outbox (../ deveria ser ../../../)"
-    trace: "docs/evolution/federation/outbox/rhilo-metagamify/_processed/2026-06-27-s1-toolbox-resolvido.md:17"
+    trace: "docs/evolution/federation/outbox/metagamify/_processed/2026-06-27-s1-toolbox-resolvido.md:17"
   - id: C_D1_3
     node_type: claim
     plane: DEV
@@ -184,7 +184,7 @@ nodes:
     confidence: 0.7
     status: refuted
     label: "ALEGAVA: qualificador (REST API; MCP opcional) e duplicacao de prosa"
-    trace: ".claude/commands/git/pr-update.md:65"
+    trace: ".claude/commands/engineer/pr-update.md:65"
   - id: C_D7_13
     node_type: claim
     plane: DEV
@@ -250,7 +250,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     label: "Qualificador de 3 palavras e afordance inline; ocorrencias substantivas citam a SSOT"
-    trace: ".claude/commands/git/pr-update.md:65"
+    trace: ".claude/commands/engineer/pr-update.md:65"
   - id: E_J_FENCES
     node_type: evidence
     plane: DEV

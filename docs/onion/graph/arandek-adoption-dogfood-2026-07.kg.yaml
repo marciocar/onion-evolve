@@ -154,7 +154,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     label: "SKILL.md:73 crava 'docs/technical-context/ completo supera o mapa explícito'; a Fase 3 do adopt.md CRIA os 3 *-context/ → item 1 sempre casa antes"
-    trace: "onion-engineering-context/SKILL.md:73; adopt.md Fase 3"
+    trace: ".claude/skills/onion-engineering-context/SKILL.md:73; adopt.md Fase 3"
 
   - id: E_STALE_R45
     node_type: evidence
