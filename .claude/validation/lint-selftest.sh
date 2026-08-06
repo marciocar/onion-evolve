@@ -1453,6 +1453,86 @@ KGEOF
   fi
 }
 
+# Guardas da REGRA 55 / kg-trace-resolve.sh — a âncora declarada EXISTE?
+#
+# POR QUE EXISTE (medido 2026-08-06): o bloco PROVENIÊNCIA do kg-radar cobra que a decisão APONTE
+# para a origem; nunca que o alvo EXISTA. 13 ponteiros mortos vivos no corpus, todos consertados
+# antes da regra entrar (por isso HARD sem baseline).
+#
+# O CASO (e) É O MAIS IMPORTANTE DA SUÍTE, e nasceu de um incidente durante a própria construção:
+# uma edição comentou sem querer o resto da linha do awk que casa `trace:`. O parser passou a ler
+# ZERO nós e o script imprimiu "✅ todo trace: julgável resolve" com EXIT 0. Guarda quebrada
+# reportando sucesso — fail-open perfeito, pego só porque eu tinha um número conhecido (1300) para
+# comparar. O caso (e) é esse número virado mecanismo.
+run_kg_trace_resolve_selftests() {
+  local helper="${SCRIPT_DIR}/kg-trace-resolve.sh"
+  local fix="${FIX_DIR}/kg-trace/trace-mixed.kg.yaml"
+  local out rc d
+
+  if [ ! -f "${helper}" ]; then record_fail "kg-trace-resolve" "helper ausente: ${helper}"; return; fi
+  if [ ! -f "${fix}" ];    then record_fail "kg-trace-resolve" "fixture ausente: ${fix}"; return; fi
+
+  # Sandbox: a fixture vive sob fixtures/, que o script EXCLUI por desenho. Para exercitá-la é
+  # preciso um repo git onde ela seja o corpus — e com o MESMO basename, porque um dos nós testa
+  # justamente a resolução relativa ao diretório do grafo.
+  _mk_trace_sandbox() {
+    mkdir -p "$1/docs/onion/graph/sub"
+    cp "${fix}" "$1/docs/onion/graph/trace-mixed.kg.yaml"
+    : > "$1/docs/onion/graph/sub/alvo-vivo.md"     # o alvo que C_VIVO_RELATIVO resolve pela 2a raiz
+    ( cd "$1" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+  }
+
+  d="$(mktemp -d)"; _mk_trace_sandbox "${d}"
+  out="$(bash "${helper}" "${d}" --format tsv 2>/dev/null || true)"
+
+  # (a) ACUSA os dois mortos — um por raiz, um por relativo-ao-grafo.
+  if printf '%s' "${out}" | grep -q 'C_MORTO_RAIZ' && printf '%s' "${out}" | grep -q 'C_MORTO_REL'; then
+    record_pass "kg-trace: (a) acusa ponteiro morto por raiz E por relativo-ao-grafo"
+  else record_fail "kg-trace: (a) acusa mortos" "out=${out}"; fi
+
+  # (b) CALA nos 6 sãos, e cada um por um MOTIVO DIFERENTE (resolve-na-raiz · resolve-relativo ·
+  #     absoluto · raiz externa · comando com argumento · domínio sem esquema · nome solto). Um teste de silêncio
+  #     com um motivo só passaria por acidente se um único filtro estivesse fazendo todo o trabalho.
+  local ruido=0 n
+  for n in C_VIVO_RAIZ C_VIVO_RELATIVO C_ABSOLUTO C_RAIZ_EXTERNA C_COMANDO C_DOMINIO C_NOME_SOLTO; do
+    if printf '%s' "${out}" | grep -q "${n}"; then ruido=$((ruido + 1)); fi
+  done
+  if [ "${ruido}" -eq 0 ]; then
+    record_pass "kg-trace: (b) cala nos 7 sãos — 7 motivos distintos, nenhum filtro carregando o resto"
+  else record_fail "kg-trace: (b) silêncio" "${ruido} falso-positivo(s). out=${out}"; fi
+
+  # (c) EXIT CODE — o veredito tem de reprovar, não só imprimir.
+  rc=0; bash "${helper}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ]; then record_pass "kg-trace: (c) exit 1 com ponteiro morto (reprova, não só avisa)"
+  else record_fail "kg-trace: (c) exit" "esperava 1, veio ${rc}"; fi
+
+  # (d) CORPUS SÃO → exit 0. Sem este lado, (c) não distingue "reprova certo" de "reprova sempre".
+  local d2; d2="$(mktemp -d)"; _mk_trace_sandbox "${d2}"
+  # Cura os dois mortos APONTANDO-OS para alvos que existem — em vez de deletar nós, o que mexeria
+  # nas arestas e poderia reprovar por órfão em vez de por trace.
+  sed -i 's|docs/evolution/inbox/2026-01-01-arquivo-que-nunca-existiu.md|docs/onion/graph/trace-mixed.kg.yaml|; s|sub/alvo-que-nunca-existiu.md|sub/alvo-vivo.md|' \
+    "${d2}/docs/onion/graph/trace-mixed.kg.yaml"
+  rc=0; bash "${helper}" "${d2}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "kg-trace: (d) corpus são → exit 0 (não reprova por reflexo)"
+  else record_fail "kg-trace: (d) corpus são" "esperava 0, veio ${rc}"; fi
+
+  # (e) (MUT) A GUARDA DE VACUIDADE — reproduz o incidente da construção: parser cego.
+  #     Antes dela, o mutante saía 0 imprimindo ✅. Se este caso cair, o script voltou a poder
+  #     mentir verde, que é pior do que não existir.
+  local mut; mut="$(mktemp -d)"; cp "${helper}" "${mut}/m.sh"
+  sed -i 's|^  /\^    trace:/|  /^    NUNCA_CASA_XYZ:/|' "${mut}/m.sh"
+  if grep -q 'NUNCA_CASA_XYZ' "${mut}/m.sh"; then
+    rc=0; out="$(bash "${mut}/m.sh" "${d}" 2>&1)" || rc=$?
+    if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'VACUIDADE'; then
+      record_pass "kg-trace: (e) (MUT) parser cego → VACUIDADE + exit 1 (não mente verde)"
+    else record_fail "kg-trace: (e) (MUT) vacuidade" "parser morto passou: rc=${rc} out=${out}"; fi
+  else
+    record_fail "kg-trace: (e) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+
+  rm -rf "${d}" "${d2}" "${mut}"
+}
+
 # Guardas do bloco RECONCILIAÇÃO do kg-radar.sh — o PRIMEIRO teste deste bloco.
 #
 # POR QUE EXISTE (medido 2026-08-05): a INTEGRIDADE cobra contradição só para REFUTES
@@ -6273,6 +6353,7 @@ run_kg_reconcile_selftests
 
 # Modo state — a fila de abertos, complementar ao radar por construção
 run_kg_state_selftests
+run_kg_trace_resolve_selftests
 
 # Modo kg-label-collision — conteúdo de label não pode ser lido como configuração
 # (sinal de campo onion-pessoal-app, 2026-07-19).

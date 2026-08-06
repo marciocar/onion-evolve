@@ -172,7 +172,51 @@ nodes:
     label: "BEHAVIOR-OVER-DECLARATION NO GATE, medido hoje: o .githooks/pre-commit declara no proprio comentario que o self-test e mais lento, '~1min'. CRONOMETRADO: 921s = 15,3 min, 612 guardas, 0 falhas. DESVIO DE 15x. E o lugar mais caro possivel para uma declaracao falsa, porque e exatamente por esse numero que alguem decide se roda o gate local ou empurra para o CI — quem le '~1min' e recebe 15 min tende a passar a usar --no-verify, e o gate vira decorativo. MESMO MODO DE FALHA ja diagnosticado nesta rodada para o lint-artifacts.sh (o historico de ~16s so existia em memoria de sessao, nunca no repo, e a regressao para 44s cresceu invisivel). CURA APLICADA: o comentario agora carrega o numero MEDIDO e DATADO, mais a instrucao de RE-MEDIR ao mexer — carimbo versionado, que e a unica forma de a proxima regressao ser visivel. Guarda mecanica para isso segue NAO construida: seria preciso decidir onde mora o carimbo e o que faz falhar, e o volume (2 casos) ainda nao paga o gate pelo portao 4"
     trace: ".githooks/pre-commit"
 
+  - id: E_m4_trace_resolve_refutou_a_spec
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-08-06
+    verified_against: "medicao-1659-traces-em-54-grafos-e-contagem-de-escopo-do-freshness-tsv"
+    label: "M4 EXECUTADO, e a MEDICAO REFUTOU A PROPRIA ESPECIFICACAO em dois pontos. (1) LUGAR: o W3 mandou a clausula para dentro do kg-radar --freshness-tsv; medido, dos 13 casos reais so 2 caem nesse escopo (que cobre apenas plane:PROD ou no com verified_against) — a guarda nasceria vendo 15% do defeito e DECLARANDO cobertura, falso-verde por construcao. (2) ARQUITETURA: o kg-radar tem ZERO acesso a filesystem (0 chamadas system()/getline<), e essa pureza e load-bearing — e o que o faz rodar sob env -i (a portabilidade que o M3 mediu); embutir I/O custaria a propriedade para cobrir menos. SUPERACAO: script-irmao kg-trace-resolve.sh (padrao do kg-radar-integrity.sh), cobrindo 13/13. E a FORMA do M4 tambem mudou duas vezes antes disso: a fila de 70 candidatos morreu porque 64 ja estao ancorados (91% de ruido) e porque o bloco PROVENIENCIA ja cobre ancora ausente — o que o radar NUNCA fez foi verificar se a ancora RESOLVE, que e o behavior-over-declaration virado para a propria ancora"
+    trace: ".claude/validation/kg-trace-resolve.sh"
+
+  - id: E_minha_guarda_deu_fail_open
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-06
+    verified_against: "incidente-reproduzido-e-mutation-test-que-o-mata"
+    label: "O ACHADO MAIS VALIOSO DO M4 E CONTRA MIM. Durante a construcao, uma edicao minha comentou sem querer o resto da linha do awk que casa `trace:`. O parser passou a ler ZERO nos — e o script imprimiu '✅ todo trace: julgavel resolve' e saiu com EXIT 0. UMA GUARDA COMPLETAMENTE QUEBRADA REPORTANDO SUCESSO: fail-open perfeito, invisivel, e so peguei porque eu tinha um numero conhecido (1300 julgaveis) para comparar — ninguem depois de mim teria esse numero. A cura NAO foi 'prestar mais atencao' (cura nula, [[fix-must-become-mechanism]]): virou GUARDA DE VACUIDADE no proprio script (se ha `trace:` no corpus e NADA foi julgado, o parser morreu → exit 1) mais o caso (e) do selftest, um mutante que reproduz o incidente exato. Antes da guarda o mutante saia 0 com ✅; agora sai 1 com VACUIDADE. Terceira vez nesta rodada que a mesma licao aparece: verde nao verificado e o modo de falha desta casa, e a unica cura e mecanica"
+    trace: ".claude/validation/lint-selftest.sh"
+
+  - id: C_m4_falso_positivo_e_o_inimigo
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-06
+    verified_against: "24-avisos-sem-corte-contra-13-com-corte"
+    label: "TODO FILTRO DESTA GUARDA NASCEU DE UM FALSO-POSITIVO MEDIDO, nao de prudencia — e o numero mostra por que: sem os cortes seriam 24 avisos com ~46% de falso-positivo. Foram tres rodadas de correcao, cada uma pega comparando contra o numero anterior: (1) resolvedor de raiz unica dava 8 mortos, dos quais 7 eram SYNTHESIS.md relativo ao DIRETORIO DO GRAFO — 87% de falso-positivo; duas raizes e requisito, nao detalhe. (2) caminho ABSOLUTO (/home/onion/onion-bridge na VPS, /etc/caddy) e URL nao sao julgaveis: existem, so nao aqui. (3) `memory/` e raiz externa declarada (dir de memoria da sessao). Mais os filtros de forma: argumento de comando, prosa entre parenteses e dominio-sem-esquema passavam por 'tem barra'. TETO DECLARADO em vez de escondido: ancora de NOME SOLTO (SYNTHESIS.md, 7 casos reais) NAO e vigiada — preferi cobertura menor e crivel a cobertura maior e barulhenta, porque aviso que adivinha e o que treina o leitor a ignorar"
+
 edges:
+  - from: E_m4_trace_resolve_refutou_a_spec
+    to: C_elenxo_refuta_para_superar
+    edge_type: SUPPORTS
+  - from: E_minha_guarda_deu_fail_open
+    to: C_mecanizar_pode_ser_a_catedral
+    edge_type: SUPPORTS
+  - from: C_m4_falso_positivo_e_o_inimigo
+    to: E_m4_trace_resolve_refutou_a_spec
+    edge_type: CONSTRAINS
+  - from: E_m4_trace_resolve_refutou_a_spec
+    to: A_RESEARCH_REFINARIA
+    edge_type: TRACES_TO
   - from: E_gate_declara_1min_e_leva_15
     to: Q_lint_granularidade_por_secao
     edge_type: SUPPORTS

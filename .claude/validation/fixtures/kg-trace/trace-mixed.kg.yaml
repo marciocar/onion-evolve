@@ -1,0 +1,100 @@
+# Fixture: REGRA 55 / kg-trace-resolve.sh — os DOIS lados no mesmo grafo.
+#
+# Cada nó existe por um falso-positivo REAL medido no corpus em 2026-08-06. Sem o filtro que
+# ele exercita, o número sobe de 13 para 24 (46% de falso-positivo) e o aviso vira ruído.
+#
+# ACUSAM (2): C_MORTO_RAIZ · C_MORTO_REL
+# CALAM (7) : os demais — e cada um por um MOTIVO DIFERENTE, para que o teste de silêncio
+#             não passe por acidente de um filtro só.
+meta:
+  id: fixture-trace-mixed
+  schema_version: "1"
+nodes:
+  - id: C_VIVO_RAIZ
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "trace que resolve na RAIZ do repo — deve calar"
+    trace: "docs/onion/graph/trace-mixed.kg.yaml"
+  - id: C_VIVO_RELATIVO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "trace relativo ao DIRETORIO DO GRAFO — a segunda raiz; sem ela, 87% de falso-positivo"
+    trace: "sub/alvo-vivo.md"
+  - id: C_ABSOLUTO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "caminho ABSOLUTO — outra maquina (VPS); existe, so nao aqui; nao julgavel"
+    trace: "/etc/caddy/conf.d/nao-existe-aqui.caddy"
+  - id: C_RAIZ_EXTERNA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "raiz externa DECLARADA — o dir de memoria da sessao vive fora do repo"
+    trace: "memory/qualquer-migalha-inexistente.md"
+  - id: C_COMANDO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "trace com ARGUMENTO — e comando, nao arquivo; o campo aceita mais que caminho"
+    trace: ".claude/validation/kg-radar.sh --state"
+  - id: C_DOMINIO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "DOMINIO sem esquema — passa em 'tem barra' e em 'so [a-z./-]'; so o teste de extensao mata"
+    trace: "support.claude.com/pt-BR/articles/13837433"
+  - id: C_MORTO_RAIZ
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "PONTEIRO MORTO — caminho do repo que nao existe; deve ACUSAR"
+    trace: "docs/evolution/inbox/2026-01-01-arquivo-que-nunca-existiu.md"
+  - id: C_MORTO_REL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "PONTEIRO MORTO relativo ao grafo — nem raiz nem dir do grafo resolvem; deve ACUSAR"
+    trace: "sub/alvo-que-nunca-existiu.md"
+  - id: C_NOME_SOLTO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "NOME SOLTO sem barra — TETO DECLARADO: nao e julgado. Mata roles.yaml e chave de config com zero falso-positivo, ao preco de nao vigiar ancora tipo SYNTHESIS.md (7 casos reais no corpus). Limite honesto, nao defeito"
+    trace: "roles.yaml"
+edges:
+  - from: C_VIVO_RAIZ
+    to: C_VIVO_RELATIVO
+    edge_type: SUPPORTS
+  - from: C_MORTO_RAIZ
+    to: C_MORTO_REL
+    edge_type: SUPPORTS

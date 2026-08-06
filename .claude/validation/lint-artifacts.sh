@@ -136,8 +136,19 @@ inventory_scope_excluded() {
   # superfície Onion. No core (role: source) NÃO se aplica — todos os docs são Onion. [[fix-must-become-mechanism]]
   if grep -qE '^(role:[[:space:]]*(adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then
     case "${f}" in
-      */docs/onion/*|*/docs/knowledge-base/*|*/docs/meta-specs/*|*/docs/sdaal/*|*/CLAUDE.onion.md) : ;;  # Onion-owned → varre
-      *) return 0 ;;                                                                                      # doc de produto do adotante → exclui
+      # Varre o que é DO ALVO e REGENERÁVEL: docs/onion/ (inventory.md e graph.md nascem do
+      # filesystem dele) e o CLAUDE.onion.md dele. Aí a contagem é claim sobre a instalação DELE.
+      */docs/onion/*|*/CLAUDE.onion.md) : ;;
+      # NÃO varre a prosa VENDORIZADA do core (knowledge-base, meta-specs, sdaal): ela viaja
+      # INTACTA e afirma sobre o FRAMEWORK, não sobre a instalação do adotante. Gateá-la contra o
+      # inventário do alvo é comparar maçã com laranja — e o defeito não é teórico:
+      # MEDIDO 2026-08-06 num adotante que tem 1 KB e 1 skill PRÓPRIAS: o vendorizado
+      # onion-framework-identity.md diz 90 KBs / 11 skills (verdade sobre o core) e o inventário
+      # regenerado dele diz 91 / 12 (verdade sobre ele) → 3 HARD permanentes, insolúveis no alvo,
+      # porque "consertar" significaria editar prosa do core que o próximo update sobrescreve.
+      # Todo adotante com artefato próprio nasce vermelho. [[fix-must-become-mechanism]]
+      */docs/knowledge-base/*|*/docs/meta-specs/*|*/docs/sdaal/*) return 0 ;;
+      *) return 0 ;;                                                    # doc de produto do adotante → exclui
     esac
   fi
   if grep -qiE '^(status:[[:space:]]*snapshot|type:[[:space:]]*(adr|evolution-backlog))' "${f}" 2>/dev/null; then
@@ -535,6 +546,43 @@ check_kg_radar_integrity() {
   while IFS=$'\t' read -r sev tag path msg; do
     [ -n "${sev}" ] || continue
     violation "${sev}" "${REPO_ROOT}/${path}" "[kg-integridade/${tag}] ${msg}"
+  done <<< "${out}"
+}
+
+# ===========================================================================
+# REGRA 55 — O `trace:` de um nó APONTA para alvo que EXISTE [HARD]
+# previne: âncora declarada que não resolve — quem tenta voltar ao "porquê" cai no vazio
+#   Irmã da REGRA 52 (integridade do acervo) e do bloco PROVENIÊNCIA do kg-radar.
+#   A PROVENIÊNCIA cobra que a decisão APONTE para a origem; nunca que o alvo EXISTA.
+#   É o behavior-over-declaration da casa virado para a própria âncora: um `trace:`
+#   apontando para arquivo movido passa no gate e MENTE.
+#   MEDIDO 2026-08-06 (54 grafos, 1.659 nós com trace:): 13 ponteiros mortos — 7 por
+#   arquivo movido para _processed/, 4 por prefixo perdido (commands/git → engineer),
+#   2 por reorganização de pasta. TODOS consertados antes desta regra entrar, e é por
+#   isso que ela nasce HARD SEM BASELINE: não há passivo tolerado a carregar.
+#   POR QUE SCRIPT-IRMÃO e não cláusula no kg-radar (refutação medida): (1) o escopo
+#   mandado — `--freshness-tsv` — cobre 2 dos 13 casos, nasceria vendo 15% e DECLARANDO
+#   cobertura; (2) o kg-radar tem ZERO acesso a filesystem, e essa pureza é o que o faz
+#   rodar sob `env -i` (portabilidade medida no M3) — embutir I/O custaria a propriedade
+#   para cobrir menos. Toda a lógica (duas raízes, 3 classes não-julgáveis, guarda de
+#   vacuidade) vive em kg-trace-resolve.sh.
+# ===========================================================================
+check_kg_trace_resolve() {
+  local helper="${SCRIPT_DIR}/kg-trace-resolve.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.kg.yaml|*/kg-trace-resolve.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out g nid ntype target verdict
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r g nid ntype target verdict; do
+    [ -n "${nid}" ] || continue
+    violation "HARD" "${REPO_ROOT}/${g}" \
+      "[trace-resolve/${verdict}] ${nid} (${ntype}): \`trace:\` aponta para '${target}', que não existe — arquivo movido/renomeado? cite o caminho real (detalhe: bash .claude/validation/kg-trace-resolve.sh)"
   done <<< "${out}"
 }
 
@@ -2190,10 +2238,17 @@ check_projection_safety() {
   # Toda superfície pública nova precisa ser acrescentada aqui à mão; o que não está
   # nesta linha é invisível para a guarda.
   local out sev tag path msg
-  out="$(bash "${helper}" --format tsv \
-          "${REPO_ROOT}/site" \
-          "${REPO_ROOT}/docs/onion/graph" \
-          "${REPO_ROOT}/docs/onion/federation-console.html" 2>/dev/null || true)"
+  # SUPERFÍCIES PÚBLICAS — e num ADOTANTE FOLHA elas não são as mesmas. `docs/onion/graph/` e o
+  # `federation-console.html` são públicos NO CORE, porque alimentam o console de KG e o mapa da
+  # federação que vão para a web. No repo de um `role: adopted` nada disso é publicado: os grafos
+  # dele são privados e nomear o próprio cliente ali é legítimo, não vazamento.
+  # MEDIDO 2026-08-06: um adotante levou HARD por citar a MARCA DELE no grafo DELE, dentro do
+  # repo DELE. `site/` FICA no escopo — um adotante pode publicar site, e aí a regra vale.
+  local surfaces=("${REPO_ROOT}/site")
+  if ! grep -qE '^role:[[:space:]]*adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then
+    surfaces+=("${REPO_ROOT}/docs/onion/graph" "${REPO_ROOT}/docs/onion/federation-console.html")
+  fi
+  out="$(bash "${helper}" --format tsv "${surfaces[@]}" 2>/dev/null || true)"
   [ -n "${out}" ] || return 0
   while IFS=$'\t' read -r sev tag path msg; do
     [ -n "${sev}" ] || continue
@@ -2306,6 +2361,20 @@ check_site_no_private_deeplinks() {
 check_vendored_surface_clean() {
   local helper="${SCRIPT_DIR}/projection-safety.sh"
   [ -f "${helper}" ] || return 0
+
+  # ADOTANTE FOLHA (role: adopted) NÃO é sujeito desta regra — correção de campo, não conveniência.
+  # A regra existe porque a superfície `.claude/` do CORE (e de um HUB) VIAJA para outros repos:
+  # nome de cliente ali é vazamento cross-tenant. Um adotante `role: adopted` é FOLHA — nada sai
+  # dele — e sua `.claude/skills/<marca>-design/` é artefato PRÓPRIO, não vendor.
+  # O defeito era CIRCULAR: no adotante o `members.yaml` é o VENDORIZADO do core, então a regra
+  # derivava dali o nome do próprio dono e o acusava de vazar consigo mesmo.
+  # MEDIDO 2026-08-06, atualizando um adotante do pin d9c447f para 0c3ac9c: 9 HARD, TODOS sobre
+  # artefatos dele (a skill de design da marca dele; o nome dele na KB dele). Ele estava 0 HARD
+  # antes do update, e os 9 travariam TODO commit seu — regressão entregue pelo próprio update.
+  # `hub` NÃO é isento: um hub vendoriza para os projetos dele, e lá a regra continua valendo.
+  # [[vendor-scrub-blind-spot]] · irmão do GAP3 (approx-count adopter-aware, dogfood de campo 2026-07-24).
+  # (o crédito nominal do adotante fica no diário privado — esta guarda cobra isso, inclusive de mim)
+  grep -qE '^role:[[:space:]]*adopted' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null && return 0
   local roots=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks \
                docs/meta-specs docs/knowledge-base docs/sdaal)
   local targets=() r
@@ -2759,6 +2828,7 @@ check_research_kg
 check_kg_provenance_coverage
 check_kg_verification_coverage
 check_kg_radar_integrity
+check_kg_trace_resolve
 check_doctrine_freshness
 check_kg_born_marker
 check_ladder_integrity
