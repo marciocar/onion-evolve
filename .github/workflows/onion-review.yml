@@ -29,6 +29,10 @@ jobs:
     if: ${{ github.event.pull_request.head.repo.fork == false }}
     env:
       HAS_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    outputs:
+      revisou: ${{ steps.v1.outputs.revisou == 'true' && 'true' || steps.v2.outputs.revisou }}
+      motivo1: ${{ steps.v1.outputs.motivo }}
+      motivo2: ${{ steps.v2.outputs.motivo }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -121,7 +125,7 @@ jobs:
             Seja conciso e factual; se o diff estiver conforme, aprove explicitamente.
           claude_args: |
             --model claude-sonnet-5
-            --max-turns 30
+            --max-turns 60
 
       # ═══ O SINAL VERDADEIRO (2026-08-03) ═══
       # `steps.review.outcome` MENTE: a action sai com exit 0 mesmo quando o agente morre —
@@ -183,7 +187,7 @@ jobs:
             Seja conciso e factual; se o diff estiver conforme, aprove explicitamente.
           claude_args: |
             --model claude-sonnet-5
-            --max-turns 30
+            --max-turns 60
 
       - name: Veredito da 2ª tentativa (is_error, não o outcome)
         id: v2
@@ -303,3 +307,68 @@ jobs:
         run: |
           echo "Revisor Onion pulado: configure o secret ANTHROPIC_API_KEY e instale o GitHub App do Claude."
           echo "A validação determinística (onion-validate.yml) continua cobrindo estrutura/YAML/naming."
+
+  # ═══════════════════════════════════════════════════════════════════════════════════
+  # VEREDITO VISÍVEL — o check que diz se houve revisão, e não se o job rodou
+  #
+  # POR QUE EXISTE (medido 2026-08-06, e o dano é meu): mergeei DOIS PRs (#546 e #548)
+  # sob `gh pr checks` verde, sem revisão nenhuma. O job `onion-review` sai com exit 0
+  # POR DESENHO — soft-pass, decisão deliberada de 2026-07-14: revisor é dependência
+  # externa e travar todo merge quando ele falha é pior que o contrário. Isso NÃO muda
+  # aqui, e não deve mudar.
+  #
+  # O BURACO NÃO ERA "não bloqueia" — era que o aviso não CHEGA em quem mergeia. Ele já
+  # existia como comentário no PR e como nota no resumo do job; nenhuma das duas
+  # superfícies é lida por `gh pr checks`, que é a que o fluxo de merge consulta. O
+  # resultado prático: "revisou" e "não revisou" ficavam INDISTINGUÍVEIS no ponto exato
+  # da decisão. Cura de disciplina ("prestar atenção ao comentário") é cura nula nesta
+  # casa — a cura é mecânica: um check PRÓPRIO, que fica VERMELHO quando não houve
+  # revisão semântica.
+  #
+  # E NÃO BLOQUEIA POR CONSTRUÇÃO, não por gentileza: este repo não tem branch
+  # protection (privado sem Pro — `gh api .../branches/main/protection` devolve 403),
+  # logo nenhum check é obrigatório. Vermelho aqui INFORMA; merge segue possível. Se um
+  # dia houver protection, este check NÃO deve entrar nos obrigatórios sem decisão
+  # explícita do maestro — senão o soft-pass morre por acidente de configuração.
+  #
+  # A MEDIÇÃO QUE ACOMPANHA: das 40 runs de 2026-08-03 a 08-06, 15 não revisaram — 12
+  # são o próprio incidente de credencial de 08-03/04 (branches `diagnose-*`,
+  # `causa-raiz-do-revisor-mudo`), já curado, e 3 são a classe NOVA
+  # `orcamento-de-turnos` (08-05 e 08-06). As revisões que FECHARAM usaram 27 e 28
+  # turnos contra teto de 30: marginal por construção. Daí o teto ir a 60 neste mesmo
+  # commit — subir o número sem tornar a falha visível só adiaria o próximo silêncio.
+  # ═══════════════════════════════════════════════════════════════════════════════════
+  onion-review-verdict:
+    runs-on: ubuntu-latest
+    needs: onion-review
+    if: ${{ always() && github.event.pull_request.head.repo.fork == false }}
+    steps:
+      - name: O PR foi revisado semanticamente?
+        env:
+          REVISOU: ${{ needs.onion-review.outputs.revisou }}
+          M1: ${{ needs.onion-review.outputs.motivo1 }}
+          M2: ${{ needs.onion-review.outputs.motivo2 }}
+          RESULT: ${{ needs.onion-review.result }}
+        run: |
+          if [ "${RESULT}" = "skipped" ]; then
+            echo "::notice::onion-review pulado (fork ou sem chave) — nada a verificar."
+            exit 0
+          fi
+          if [ "${REVISOU}" = "true" ]; then
+            echo "✅ revisão semântica CONFIRMADA neste PR." >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
+          fi
+          {
+            echo "## ❌ Este PR NÃO foi revisado semanticamente"
+            echo ""
+            echo "1ª tentativa: \`${M1:-nao-rodou}\` · 2ª tentativa: \`${M2:-nao-rodou}\`"
+            echo ""
+            echo "O job \`onion-review\` saiu **verde por desenho** (soft-pass: revisor é dependência"
+            echo "externa e não bloqueia merge). Este check existe para que o verde de lá **não seja"
+            echo "confundido com revisão** por quem lê \`gh pr checks\` na hora de mergear."
+            echo ""
+            echo "**Não bloqueia o merge** — informa. A decisão de mergear sem revisão é humana e"
+            echo "deve ser consciente, que é exatamente o que faltava."
+          } >> "${GITHUB_STEP_SUMMARY}"
+          echo "::error::onion-review NÃO revisou (1ª: ${M1:-nao-rodou} · 2ª: ${M2:-nao-rodou}) — mergear sem revisão semântica é decisão humana, tome-a de olhos abertos."
+          exit 1
