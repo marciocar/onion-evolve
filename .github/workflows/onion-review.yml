@@ -33,6 +33,7 @@ jobs:
       revisou: ${{ steps.v1.outputs.revisou == 'true' && 'true' || steps.v2.outputs.revisou }}
       motivo1: ${{ steps.v1.outputs.motivo }}
       motivo2: ${{ steps.v2.outputs.motivo }}
+      benigno: ${{ steps.aviso.outputs.benigno }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -222,6 +223,7 @@ jobs:
       # bloquear o PR puniria o autor pela falha do bot. Mas o humano VÊ que não houve revisão.
       # A condição lê o veredito (`revisou`), nunca o outcome do step — ver o bloco do v1.
       - name: Aviso se nenhuma tentativa revisou (soft-pass, não bloqueia)
+        id: aviso
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.v1.outputs.revisou != 'true' && steps.v2.outputs.revisou != 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -259,6 +261,11 @@ jobs:
           fi
 
           if [ "${benigno}" = "true" ]; then
+            # EXPORTA para o job de veredito. A detecção continua acontecendo AQUI, uma vez só:
+            # duplicar o predicado no job novo repetiria o defeito que a revisão adversarial
+            # nomeou noutro lugar (`role: adopted` escrito de duas formas, e um stamp sem espaço
+            # partindo o repo ao meio). Um predicado, um lugar.
+            echo "benigno=true" >> "${GITHUB_OUTPUT}"
             echo "::notice::onion-review pulado por desenho: este PR edita o próprio workflow, e a action se auto-pula quando ele difere da branch default. Nada a fazer — o caminho real volta no PR seguinte ao merge."
             {
               echo "ℹ️ **onion-review pulado por desenho** — este PR edita o próprio \`onion-review.yml\`,"
@@ -349,6 +356,7 @@ jobs:
           M1: ${{ needs.onion-review.outputs.motivo1 }}
           M2: ${{ needs.onion-review.outputs.motivo2 }}
           RESULT: ${{ needs.onion-review.result }}
+          BENIGNO: ${{ needs.onion-review.outputs.benigno }}
         run: |
           if [ "${RESULT}" = "skipped" ]; then
             echo "::notice::onion-review pulado (fork ou sem chave) — nada a verificar."
@@ -356,6 +364,26 @@ jobs:
           fi
           if [ "${REVISOU}" = "true" ]; then
             echo "✅ revisão semântica CONFIRMADA neste PR." >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
+          fi
+          # CASO BENIGNO — e ele existe porque este check ERROU no seu primeiro run real.
+          # No PR #549 (o que criou este job) ele ficou VERMELHO em 4s. Causa: a claude-code-action
+          # SE AUTO-PULA quando o PR edita o próprio onion-review.yml, e o job principal já
+          # classifica isso como benigno, com nota e sem alarme. Ou seja: o check gritava
+          # exatamente no caso que a máquina sabe ser inofensivo.
+          # Isso é o defeito contra o qual o próprio workflow adverte algumas linhas acima —
+          # "alarme que anuncia a própria irrelevância não é alarme; é ruído com justificativa
+          # anexa, e ensina a ignorar os que importam". Um check que grita no caso inócuo perde
+          # a credibilidade justo para quando o caso for grave, que é a razão de ele existir.
+          if [ "${BENIGNO}" = "true" ]; then
+            echo "::notice::onion-review pulado por desenho (este PR edita o próprio workflow) — não é falha de revisão. O caminho real volta a ser exercido no PR seguinte ao merge."
+            {
+              echo "ℹ️ **Revisão pulada por desenho, não por falha**"
+              echo ""
+              echo "Este PR edita o próprio \`onion-review.yml\`, e a action se auto-pula quando o"
+              echo "workflow difere da branch default. **Nada a fazer** — o caminho real volta a ser"
+              echo "exercido no PR seguinte ao merge."
+            } >> "${GITHUB_STEP_SUMMARY}"
             exit 0
           fi
           {
