@@ -1476,9 +1476,10 @@ run_kg_trace_resolve_selftests() {
   # preciso um repo git onde ela seja o corpus — e com o MESMO basename, porque um dos nós testa
   # justamente a resolução relativa ao diretório do grafo.
   _mk_trace_sandbox() {
-    mkdir -p "$1/docs/onion/graph/sub"
+    mkdir -p "$1/docs/onion/graph/sub" "$1/docs/onion/vizinho"
     cp "${fix}" "$1/docs/onion/graph/trace-mixed.kg.yaml"
     : > "$1/docs/onion/graph/sub/alvo-vivo.md"     # o alvo que C_VIVO_RELATIVO resolve pela 2a raiz
+    : > "$1/docs/onion/vizinho/alvo-no-pai.md"     # o alvo que C_VIVO_PAI resolve pela 3a raiz (pai do grafo)
     ( cd "$1" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
   }
 
@@ -1494,11 +1495,11 @@ run_kg_trace_resolve_selftests() {
   #     absoluto · raiz externa · comando com argumento · domínio sem esquema · nome solto). Um teste de silêncio
   #     com um motivo só passaria por acidente se um único filtro estivesse fazendo todo o trabalho.
   local ruido=0 n
-  for n in C_VIVO_RAIZ C_VIVO_RELATIVO C_ABSOLUTO C_RAIZ_EXTERNA C_COMANDO C_DOMINIO C_NOME_SOLTO; do
+  for n in C_VIVO_RAIZ C_VIVO_RELATIVO C_VIVO_PAI C_ABSOLUTO C_RAIZ_EXTERNA C_COMANDO C_DOMINIO C_NOME_SOLTO; do
     if printf '%s' "${out}" | grep -q "${n}"; then ruido=$((ruido + 1)); fi
   done
   if [ "${ruido}" -eq 0 ]; then
-    record_pass "kg-trace: (b) cala nos 7 sãos — 7 motivos distintos, nenhum filtro carregando o resto"
+    record_pass "kg-trace: (b) cala nos 8 sãos — 8 motivos distintos (3 raízes + 5 exclusões), nenhum filtro carregando o resto"
   else record_fail "kg-trace: (b) silêncio" "${ruido} falso-positivo(s). out=${out}"; fi
 
   # (c) EXIT CODE — o veredito tem de reprovar, não só imprimir.

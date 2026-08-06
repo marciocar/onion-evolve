@@ -826,7 +826,32 @@ nodes:
     label: "nos da classe TESTEMUNHO (verified_against: relato-do-maestro-*) sao estruturalmente nao-re-verificaveis por maquina: afirmam INTENCAO ('proposito de negocio') ou fato de campo fora do repo ('alunos reais usaram'), e a unica checagem disponivel — o texto que codificou o relato — e circular. Hoje eles passam nos tres vereditos do radar exibindo carimbo fresco, indistinguiveis de um no medido. Precisam de marcador proprio (ex.: evidence_class: testimony) para o radar parar de trata-los como mensuraveis?"
     trace: "/meta:kg-freshness 2026-08-04 — 2 de 16 nos vieram UNVERIFIABLE por esta razao, ambos de alta atencao (E_PORTE_PARA_O_CURSO 20.0, D_CLAUDE_CODE_POR_CAPACIDADE 15.0)"
 
+  - id: Q_CUSTO_DO_PORTE_NUNCA_MEDIDO
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: "A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara que Claude-Code-only foi 'conclusao de experimento real, nao restricao de nascenca', e a decisao de 2026-05-18 e citada como FECHADA. Mas TRES numeros nunca existiram: (1) o CUSTO DO PORTE — quanto custou portar para Cursor/Antigravity/Codex, em tempo e retrabalho; (2) O QUE SE PERDEU ao parar de gastar energia com agnosticismo — quais capacidades ficaram para tras, nominalmente; (3) o CUSTO DE SAIR — o que custaria hoje reverter o acoplamento, que e o unico numero capaz de transformar o TESTE DO TERRENO ALUGADO ('so vale construir em terreno alugado se gerar mais valor do que preparar terreno proprio') de intuicao em conta. A razao de abandono foi QUALITATIVA — e isso nao e defeito da decisao, e defeito do REGISTRO. Consequencia observada: cada rodada de identidade/portabilidade redescobre esta lacuna do zero, ao menos duas vezes ate aqui (2026-08-02 e 2026-08-06). ESTE NO NAO PEDE A MEDICAO — pede que a lacuna pare de ser invisivel. Vizinho de Q_TESTEMUNHO_NAO_MEDIVEL_0804, mas nao o mesmo: la o problema e ser nao-re-verificavel por maquina; aqui o numero nunca foi produzido por ninguem, nem uma vez"
+    trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+
+  - id: C_M8_FECHA_SO_UM_TERCO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: "GATILHO DECLARADO, com o teto junto: o item M8 do menu da refinaria (corrida serial reescopada, ~300k tokens) fecha UM dos tres numeros — mede se o FALLBACK SERIAL (orchestration-fallback.md, escrito, testavel, e que NUNCA RODOU nem uma vez) de fato executa. Isso responde 'a rede de seguranca da portabilidade e real ou ficcao?', que e a metade viva do custo-de-sair. NAO fecha o custo do porte de 2026-05 (retrospectivo, evidencia primaria evaporada) nem o inventario do que se perdeu. Declarar o teto AQUI e o ponto: sem isso, rodar o M8 seria lido como 'lacuna fechada' e ela voltaria a ser invisivel — trocando uma redescoberta por um FALSO ENCERRAMENTO, que e pior"
+
 edges:
+  - from: C_M8_FECHA_SO_UM_TERCO
+    to: Q_CUSTO_DO_PORTE_NUNCA_MEDIDO
+    edge_type: CONSTRAINS
+  - from: Q_CUSTO_DO_PORTE_NUNCA_MEDIDO
+    to: D_CLAUDE_CODE_POR_CAPACIDADE
+    edge_type: DEPENDS_ON
   # a historia (2026-08-02) sustenta a distincao, e a distincao refuta o erro desta sessao
   - from: E_ORIGEM_CURSOR_AGNOSTICO
     to: E_PORTE_PARA_O_CURSO

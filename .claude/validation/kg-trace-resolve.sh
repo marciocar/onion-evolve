@@ -40,9 +40,20 @@
 # positivo. Julgar nome solto exigiria adivinhar a raiz pretendida — e um aviso que adivinha é o
 # que treina o leitor a ignorar. Preferi cobertura menor e crível a cobertura maior e barulhenta.
 #
-# DUAS RAÍZES, e isto é requisito e não detalhe: `trace:` resolve contra a raiz do repo OU contra o
-# diretório do próprio grafo (7 dos 8 primeiros "quebrados" que encontrei eram `SYNTHESIS.md`
-# relativo ao grafo — um resolvedor de raiz única nasceria com 87% de falso-positivo).
+# TRÊS RAÍZES, e cada uma foi paga por um falso-positivo medido:
+#   1. raiz do REPO            — o caso comum.
+#   2. diretório DO GRAFO      — 7 dos 8 primeiros "quebrados" eram `SYNTHESIS.md` ao lado do grafo;
+#                                 um resolvedor de raiz única nascia com 87% de falso-positivo.
+#   3. diretório PAI do grafo  — quando o grafo mora em `<base>/graph/x.kg.yaml`, o `trace:` ancora
+#                                 naturalmente em `<base>/` (`consolidated/…`, `site/…`).
+#
+# A RAIZ 3 CUSTOU UM VEXAME, e ele vale registrado: shipei esta regra como HARD **sem baseline**
+# tendo verificado só que o CORE tinha zero. No primeiro adotante que a recebeu, ela acusou 11
+# ponteiros — TODOS falsos, todos por esta raiz faltando. O corpus do core é cego a ela porque
+# aqui todo grafo mora em `docs/onion/graph/` ou `docs/evolution/research/<tema>/`, onde as duas
+# primeiras raízes bastam; o adotante organiza por vertical (`docs/<vertical>/graph/`) e a terceira
+# aparece. Terceira confirmação, no mesmo dia, de que O CORE É O PIOR ORÁCULO DO QUE VIAJA.
+# E a lição de gate: "HARD sem baseline" só é seguro para o repo ONDE se mediu. Ver o teto abaixo.
 #
 # Uso  : bash .claude/validation/kg-trace-resolve.sh [<repo_root>] [--format tsv]
 # Saída: relatório humano (default) ou TSV (grafo·id·node_type·alvo·verdict)
@@ -87,7 +98,7 @@ while IFS= read -r g; do
     case "${target}" in */*) : ;; *) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;; esac
     case "${target##*/}" in *.*) : ;; *) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;; esac
     JUDGED=$((JUDGED + 1))
-    if [ -e "${target}" ] || [ -e "${gdir}/${target}" ]; then continue; fi
+    if [ -e "${target}" ] || [ -e "${gdir}/${target}" ] || [ -e "${gdir}/../${target}" ]; then continue; fi
     MISSING=$((MISSING + 1))
     if [ "${FORMAT}" = tsv ]; then
       REPORT="${REPORT}${g}	${nid}	${ntype}	${target}	TARGET-MISSING

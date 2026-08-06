@@ -4,7 +4,7 @@
 # ele exercita, o número sobe de 13 para 24 (46% de falso-positivo) e o aviso vira ruído.
 #
 # ACUSAM (2): C_MORTO_RAIZ · C_MORTO_REL
-# CALAM (7) : os demais — e cada um por um MOTIVO DIFERENTE, para que o teste de silêncio
+# CALAM (8) : os demais — e cada um por um MOTIVO DIFERENTE, para que o teste de silêncio
 #             não passe por acidente de um filtro só.
 meta:
   id: fixture-trace-mixed
@@ -91,6 +91,15 @@ nodes:
     status: confirmed
     label: "NOME SOLTO sem barra — TETO DECLARADO: nao e julgado. Mata roles.yaml e chave de config com zero falso-positivo, ao preco de nao vigiar ancora tipo SYNTHESIS.md (7 casos reais no corpus). Limite honesto, nao defeito"
     trace: "roles.yaml"
+  - id: C_VIVO_PAI
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "trace relativo ao PAI do diretorio do grafo — a 3a raiz. Existe porque a regra shipou HARD sem baseline validada SO no core, e no 1o adotante que a recebeu acusou 11 ponteiros, TODOS falsos por esta raiz faltar: o adotante organiza por vertical (docs/<vertical>/graph/) e ancora em docs/<vertical>/"
+    trace: "vizinho/alvo-no-pai.md"
 edges:
   - from: C_VIVO_RAIZ
     to: C_VIVO_RELATIVO
