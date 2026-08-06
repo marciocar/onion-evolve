@@ -23,7 +23,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.4
-    status: open
+    status: done
     label: "qual dor atendemos e para quem (ICP concreto, nao generico)"
   - id: Q_MARKET
     node_type: question
@@ -39,7 +39,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.4
-    status: open
+    status: done
     label: "o que gera valor de verdade e quais quick-wins reais"
   - id: Q_FUTURE
     node_type: question
@@ -446,7 +446,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.4
-    status: open
+    status: done
     label: "qual north-star: NS1-KG-conhecimento, NS2-portatil, NS3-educacao, NS4-controlplane"
     trace: "F2 Q5 (F3 nivel Criar — nao decidida)"
   - id: C_NS1_KG
@@ -844,8 +844,72 @@ nodes:
     confidence: 0.8
     status: open
     label: "GATILHO DECLARADO, com o teto junto: o item M8 do menu da refinaria (corrida serial reescopada, ~300k tokens) fecha UM dos tres numeros — mede se o FALLBACK SERIAL (orchestration-fallback.md, escrito, testavel, e que NUNCA RODOU nem uma vez) de fato executa. Isso responde 'a rede de seguranca da portabilidade e real ou ficcao?', que e a metade viva do custo-de-sair. NAO fecha o custo do porte de 2026-05 (retrospectivo, evidencia primaria evaporada) nem o inventario do que se perdeu. Declarar o teto AQUI e o ponto: sem isso, rodar o M8 seria lido como 'lacuna fechada' e ela voltaria a ser invisivel — trocando uma redescoberta por um FALSO ENCERRAMENTO, que e pior"
+  - id: D_NORTHSTAR_NS1_KG
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-06
+    verified_against: direcao-do-maestro-2026-08-06
+    label: "NORTH-STAR = NS1, KG/CONHECIMENTO (decisao do maestro, 2026-08-06, fechando Q_NORTHSTAR que estava aberta ha semanas com atencao 10,0). O diferencial e o GRAFO COMO SSOT-RUNTIME: conhecimento que nao evapora entre sessoes, com radar, Elenxo e declarado!=verificado. E a capacidade que nao existe pronta fora. CONSEQUENCIA DE ORDENACAO, e e por isso que a pergunta importava: o MESMO trabalho tem valor diferente sob cada norte — sob NS3 (educacao) as curas de adopter-awareness de 2026-08-06 eram o dia inteiro; sob NS2 o achado do M8 sobre o fallback era o item mais valioso; sob NS4 quase nada daquele dia importaria. Com NS1, ado\u00e7ao/curso/portabilidade sao VEICULO do KG, nao fim. AS DESCARTADAS NAO SUMIRAM: NS2 fica registrada em Q_CUSTO_DO_PORTE (registrada, nao trabalhada); NS3 sobrevive como restricao (o curso e a familia congelada nao podem quebrar); NS4 fica com o dissent de auth-transversal aberto"
+    trace: "docs/onion/graph/onion-identity-2026-07.kg.yaml"
+
+  - id: D_ICP_EMPRESA_MAIS_N1
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-06
+    verified_against: direcao-do-maestro-2026-08-06+members-yaml-como-evidencia-de-campo
+    label: "ICP COMPOSTO, e a composicao e o ponto (decisao do maestro, 2026-08-06, fechando Q_ICP — atencao 12,0, a maior do grafo). PRIMARIO: a empresa que roda os PROPRIOS projetos (evidencia viva no members.yaml: metagamify com role hub e sub-adotados; arandek, monorepo NX+Bun+SST). ESTENDIDO: o individuo com Company Brain N=1 (evidencia: marcio-pessoal e o app companheiro com F0 fechado no device real). CONSULTORIA NAO EXCLUIDA — e isto e RESTRICAO DE DESENHO, nao nota de rodape: gustavo-pulga e onion-arthur sao adotantes vivos (ids publicos; o credito nominal fica no diario privado), e NADA pode quebrar para eles. Foi exatamente essa classe que produziu os 3 defeitos de core achados em 2026-08-06 rodando o lint DENTRO da copia. LIMITE DECLARADO: o primario e ASPIRACIONAL na parte hub — ha UM unico role:hub no members.yaml e ele e do maestro; priorizar por ele sem medir seria chute com aparencia de metodo"
+    trace: "docs/evolution/federation/members.yaml"
+
+  - id: D_VALOR_ORQUESTRACAO_ANCORADA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-08-06
+    verified_against: direcao-do-maestro-2026-08-06
+    label: "VALOR = ORQUESTRACAO ANCORADA NO GRAFO (decisao do maestro, 2026-08-06, fechando Q_VALUE). Nao e orquestracao por si — e Elenxo/Workflow FUNDADO no KG: o grafo alimenta a orquestracao e a orquestracao devolve ao grafo. A palavra ANCORADA carrega a decisao inteira. E ELA JA NASCE COM UMA CONTRADICAO MEDIDA, registrada aqui em vez de escondida (ver C_ANCORA_SOLTA_79PCT): 77 orquestracoes com transcript produziram 19 sinteses versionadas (25%) e 16 grafos irmaos (21%) — a ancora solta em 4 de cada 5 casos. Enquanto isso nao fechar, o proprio conjunto escolhido se desmente, e fechar o laco deixa de ser higiene para ser CONDICAO da decisao"
+    trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+
+  - id: C_ANCORA_SOLTA_79PCT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: open
+    verified_at: 2026-08-06
+    verified_against: "contagem-direta-transcripts-x-sinteses-x-grafos-irmaos"
+    label: "A CONTRADICAO MEDIDA DENTRO DA PROPRIA DECISAO DE VALOR: 77 runs de orquestracao com transcript · 19 sinteses versionadas (25%) · 16 com grafo irmao (21%). QUATRO EM CADA CINCO ORQUESTRACOES NAO DEIXARAM RASTRO NO GRAFO. E o vazamento tem forma conhecida e datada: em 2026-08-06 a corrida serial do M8 mediu 4 DRIFTED contra o host vivo, escreveu na sintese, e a SSOT seguiu afirmando que o whatsapp-sender estava VIVO por 12 HORAS — ate alguem ir procurar. O /meta:kg-freshness declara o contrato certo ('o worker propoe, o maestro sela') e o SELO NAO TEM FORCING FUNCTION. Com NS1 escolhido, este laco E O PRODUTO operando a 21%, nao divida de higiene. FALSIFICADOR: se a medicao do volume mostrar que existe UM unico veredito sem selo (o do M8), entao e conserto manual e mecanizar seria catedral pelo portao 4 — a medicao decide, nao a vontade"
 
 edges:
+  - from: D_NORTHSTAR_NS1_KG
+    to: Q_NORTHSTAR
+    edge_type: SUPERSEDES
+  - from: D_ICP_EMPRESA_MAIS_N1
+    to: Q_ICP
+    edge_type: SUPERSEDES
+  - from: D_VALOR_ORQUESTRACAO_ANCORADA
+    to: Q_VALUE
+    edge_type: SUPERSEDES
+  - from: C_ANCORA_SOLTA_79PCT
+    to: D_VALOR_ORQUESTRACAO_ANCORADA
+    edge_type: CONSTRAINS
+  - from: D_NORTHSTAR_NS1_KG
+    to: D_VALOR_ORQUESTRACAO_ANCORADA
+    edge_type: CAUSES
+  - from: D_ICP_EMPRESA_MAIS_N1
+    to: D_NORTHSTAR_NS1_KG
+    edge_type: DEPENDS_ON
   - from: C_M8_FECHA_SO_UM_TERCO
     to: Q_CUSTO_DO_PORTE_NUNCA_MEDIDO
     edge_type: CONSTRAINS
