@@ -239,12 +239,27 @@ END {
   # ao caso fundador. O carimbo diz se a SSOT está bem-formada; a atenção diz o que custa caro
   # estar errado. Re-verifica-se pelo CUSTO DO ERRO, não pela ausência do carimbo.
   if (mode == "--freshness-tsv") {
+    # PRIMEIRA PASSADA — calcula atenção e ELEGE quem entra. A segunda passada emite ORDENADO.
+    # POR QUE EXISTE (achado de revisão adversarial, 2026-08-06): o cabeçalho deste bloco DECLARA
+    # "ORDEM: atenção desc — MESMA fórmula do --radar" desde que nasceu, e a implementação iterava
+    # `order[i]` — ORDEM DE ARQUIVO. O `asorti()` só existia no --radar. Ou seja: o instrumento que
+    # esta casa usa para medir declarado-vs-verificado tinha, ele mesmo, uma declaração não
+    # verificada. Medido no grafo da VPS: ENT_logto (14.25) saía ANTES de ENT_whatsapp (14.40).
+    # O dano não é cosmético: quem consome a fila corta em --top N, e um corte sobre ordem errada
+    # descarta o nó de MAIOR atenção. E numa corrida serial a ordem decide qual worker aprende
+    # primeiro — foi essa ambiguidade que quase inverteu a conclusão do M8.
     for (i = 1; i <= nn; i++) {
       id = order[i]
       if (plane[id] != "PROD" && verifiedAgainst[id] == "") continue
       if (nstatus[id] == "superseded" || nstatus[id] == "refuted") continue   # história, não SSOT viva
       sf = statusFactor(nstatus[id]); if (sf < 0) sf = 0
       att[id] = impact[id] * conf[id] * sf * (1 + deg[id])
+      elegivel[id] = 1
+    }
+    fn = asorti(att, fsorted, "@val_num_desc")
+    for (i = 1; i <= fn; i++) {
+      id = fsorted[i]
+      if (!(id in elegivel)) continue
       if (verifiedAt[id] == "") verdict = "STALE-MISSING"
       else if (verifiedAgainst[id] == "" && ntype[id] == "claim") verdict = "UNANCHORED"
       else if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") verdict = "STALE-OLD"

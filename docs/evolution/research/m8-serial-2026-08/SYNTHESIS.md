@@ -8,7 +8,9 @@ kg: docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml
 run_id: serial-2026-08-06-m8
 tokens: 697710
 agents: 9
-duration_min: 12
+duration_min: 37
+ledger: docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv
+agent_time_min: 12
 verified_at: 2026-08-06
 source: "docs/onion/graph/vps-shared-tools-2026-07.kg.yaml @ 7fd9392 + host vivo srv1812846"
 ---
@@ -24,12 +26,32 @@ source: "docs/onion/graph/vps-shared-tools-2026-07.kg.yaml @ 7fd9392 + host vivo
 ## A pergunta que valia mais que a corrida
 
 O W3 escreveu, sobre o M8: *"se o fallback **não rodar**, a rede de segurança da portabilidade é
-**ficção** — o maior achado possível do menu."* O `orchestration-fallback.md` estava escrito, testável,
+**ficção** — o maior achado possível do menu."*
+
+> **⚠️ Esta citação, e a de "~300k / meia sessão" mais abaixo, NÃO são verificáveis neste repo.** Vieram
+> do journal do workflow do W3, que vive fora do versionamento e não sobrevive à sessão. A **substância**
+> está ancorada em `onion-identity-2026-07.kg.yaml` (`C_M8_FECHA_SO_UM_TERCO`); **as aspas, não**. Num
+> documento cuja tese é rastreabilidade, citar fonte que evapora é o defeito que ele denuncia — fica
+> declarado em vez de disfarçado. O `orchestration-fallback.md` estava escrito, testável,
 e **nunca havia sido executado nem uma vez**.
 
-> **Não é ficção. O fallback roda.** Os 4 passos do fragmento executaram como escritos — health-check,
-> aviso, iteração serial mantendo o mesmo `schema`, tratamento de falha parcial e fan-in — em **9 de 9**
-> itens, **zero SKIP**.
+> **Não é ficção. O caminho serial roda** — a **iteração com `Agent` mantendo o mesmo `schema`** (Passo 2),
+> o **tratamento de falha parcial** (Passo 3) e o **fan-in** (Passo 4) executaram em **9 de 9** itens,
+> **zero SKIP**.
+
+**Correção da versão original, que dizia "os 4 passos executaram como escritos" — e isso era falso em
+dois deles.** A revisão adversarial mostrou que a frase não sobrevivia ao lado da própria ressalva:
+
+- **Passo 0 é uma detecção.** Executado *como escrito*, com Workflow disponível, ele manda **prosseguir
+  com fan-out nativo** — ou seja, executado como escrito ele **não aciona o fallback**. Contá-lo entre os
+  passos "executados" é logicamente incompatível com o teste ter sido forçado.
+- **Passo 1** manda avisar *"a ferramenta nativa Workflow **não está acessível**"* — falso neste ambiente.
+  Emiti-lo seria mentir; não emiti-lo é o passo não ter executado. Eu não o emiti (declarei a natureza
+  forçada no lugar), o que é o certo — mas então **o Passo 1 não executou**.
+- **Passo 4 não executou por inteiro:** seu item 4 manda manter a verificação adversarial planejada, e o
+  `/meta:kg-freshness` exige **juiz adversarial `opus`/`high` quando > 30% vier DRIFTED**. Deu **44%** —
+  e **nenhum juiz rodou**. Isso não é detalhe: é a etapa que existe para não deixar 4 vereditos DRIFTED
+  passarem sem contraditório.
 
 **E a ressalva vem junto, porque sem ela o resultado seria lido como mais do que é.** O Passo 0 manda
 acionar o fallback **só** se o Workflow estiver indisponível — e aqui ele estava **disponível**. Foi
@@ -48,16 +70,34 @@ item 2 · ENT_whatsapp  (sem notas do anterior) : 15 tool-uses · 132s
 item 3 · ENT_logto     (com notas repassadas)  :  4 tool-uses ·  25s
 ```
 
-O item 2 gastou o dobro do tempo descobrindo o ambiente sozinho — que `docker ps` sem `sudo` dá
-*permission denied* e `sudo -n docker ps` funciona. Repassei a descoberta ao item 3 como **nota de
-ambiente**: **5× mais rápido, 73% menos ferramentas**.
+Repassei ao item 3 o que o item 2 descobriu do ambiente — que `docker ps` sem `sudo` dá *permission
+denied* e `sudo -n docker ps` funciona.
 
-> **Workers paralelos são cegos entre si por construção** e redescobrem o mesmo terreno N vezes. **O
-> serial acumula.** Isso não é "paralelo mais lento": são **dois regimes com trade-offs diferentes** — o
-> paralelo compra wall-clock, o serial compra contexto compartilhado.
+### ⚠️ Esta inferência foi REBAIXADA — o confounder é meu, e a revisão o nomeou
 
-**O M8 foi especificado comparando custo e qualidade. O eixo estava incompleto.** Onde a descoberta de
-ambiente é cara e compartilhada, o serial pode ser **mais barato em tokens**, não só mais lento.
+A versão original desta seção afirmava que *"o serial acumula contexto e o paralelo é cego"*, tratando
+o delta 15→4 como prova. **Não é.** Os dois itens são **nós diferentes em espécie de tarefa**:
+
+| | |
+|---|---|
+| `ENT_whatsapp` | **prova negativa** — demonstrar que algo **não existe** em lugar nenhum do host |
+| `ENT_logto` | **health-check** de um container que responde |
+
+Provar ausência é caro **por natureza da tarefa**. E a nota repassada economiza **uma ou duas** chamadas
+de permissão — **não onze**. Variável confundida, **n = 1**.
+
+**O que a evidência sustenta, e só isso:** repassar a nota eliminou a redescoberta do fato `sudo`/docker.
+O restante do delta **não é atribuível**. Direção plausível, **magnitude desconhecida**.
+
+**O que faltaria para sustentar de verdade:** A/B no **mesmo** nó (rodar `ENT_whatsapp` com e sem nota),
+ou notas alternadas nos 9 itens (n≈4/5), ou — o mais barato, e que dava para fazer no dia — **contar
+quantas das 15 chamadas do item 2 foram probes de permissão**. Se forem duas, a tese morre ali.
+
+**E há uma ambiguidade que só o ledger resolveu:** o `kg-radar.sh --freshness-tsv` **documenta** "ORDEM:
+atenção desc" e **não ordena** (bug pré-existente, medido nesta revisão). Quem executou aplicou `sort`
+por fora — mas isso não estava registrado, então um leitor não conseguia distinguir *"o run reordenou"*
+de *"os rótulos estão trocados"*. Se estivessem trocados, **a conclusão se inverteria**. A ordem real
+está agora em [`ledger-por-item.tsv`](./ledger-por-item.tsv).
 
 ## A estimativa errou por 2,3×
 
@@ -65,7 +105,14 @@ ambiente é cara e compartilhada, o serial pode ser **mais barato em tokens**, n
 |---|---|
 | estimativa do W3, para o **M8 inteiro** | ~300k tokens, "meia sessão" |
 | medido, **só o lado serial** | **697.710 tokens** · 78 tool-uses · 699s de agente · 37 min de relógio |
-| projeção da corrida completa | **~1,4M** — o patamar da corrida cheia que o M8 foi reescopado para **evitar** |
+| projeção da corrida completa | **≥ 1,4M** — ver o método e a ressalva abaixo |
+
+**O método da projeção, que a versão original não declarava:** é `serial × 2` — pura extrapolação
+linear. E ela **contradiz a seção anterior deste mesmo documento**: se repassar contexto barateia o
+serial, então o paralelo (cego por construção) custaria **mais**, não o mesmo. Logo **1,4M é PISO, não
+estimativa** — e a versão original que a apresentava como "exatamente o patamar da corrida cheia"
+comparava grandezas sem relação. **Retirada a coincidência retórica; mantido o piso, com o método à
+vista.**
 
 O item foi aprovado com um número que não se sustentou, e **só a execução disse isso**. É a
 justificativa concreta do contrato de custo do M6: sem carimbo por run, a próxima estimativa erraria
