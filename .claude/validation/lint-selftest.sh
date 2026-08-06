@@ -3902,6 +3902,179 @@ run_scope_gitignore_selftests() {
 # AMBIENTE primeiro (fonte do adapter), com .env como fallback HONESTO. Sinal de campo
 # adoção legacy 2026-07 (D2): hook lia só .env → anunciava 'none' com Linear provado via direnv.
 # ---------------------------------------------------------------------------
+# Modo review-artifact — REGRA 56. O gate que converte "preciso lembrar de revisar" em "o gate recusa
+# sem o registro da revisão". Nasceu do dano de 2026-08-06: 8 erros num dia, 6 achados por revisão
+# adversarial rodada À MÃO, e a passada só rodou porque o maestro perguntou. A cura que a casa já
+# provou não funcionar é "prestar mais atenção"; a que funciona é RESÍDUO MATERIAL.
+#
+# O caso (a) é o que impede a guarda de virar tortura: durante o trabalho (sem PR) ela CALA. Exigir
+# artefato a cada commit intermediário travaria o ciclo, e falso-positivo travante é o modo de falha
+# medido desta casa (exit 2 é o único canal → todo disparo interrompe).
+run_review_artifact_selftests() {
+  local helper="${SCRIPT_DIR}/review-artifact-check.sh"
+  if [ ! -f "${helper}" ]; then record_fail "review-artifact" "helper ausente: ${helper}"; return; fi
+  local d out rc
+
+  # Sandbox: repo git com branch != default, um commit de código, e origin/HEAD apontando para main.
+  _mk_pr_repo() {
+    d="$(mktemp -d)"
+    ( cd "${d}"
+      git init -q -b main .
+      mkdir -p .claude/validation docs/evolution/review
+      printf 'v1\n' > .claude/validation/alvo.sh
+      git add -A && git -c user.email=t@t -c user.name=t commit -qm base
+      git branch -q feat/x && git checkout -q feat/x
+      printf 'v2 mudou\n' > .claude/validation/alvo.sh
+      git add -A && git -c user.email=t@t -c user.name=t commit -qm trabalho
+    ) 2>/dev/null
+  }
+  # O hash que o helper vai calcular, computado do MESMO jeito (sem o dir de review).
+  # A FORMA CANÔNICA TEM DE SER A MESMA DOS DOIS LADOS — e este teste provou que importa: sem as
+  # flags, o hash do fixture divergia do hash do helper e (c)/(e) reprovavam por CADUCO. É o mesmo
+  # que aconteceria a quem tem `diff.noprefix` ou `core.abbrev` no ~/.gitconfig: artefato nasce
+  # caduco sem pista do motivo (medido: 3 configs comuns, 3 hashes distintos para o MESMO diff).
+  _sha_of() { ( cd "$1" && git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                  main HEAD -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64 ); }
+  _art() {  # $1=dir $2=sha $3=extra-campos(0/1)
+    { printf -- '---\n'
+      printf 'reviewed_diff_sha256: %s\n' "$2"
+      if [ "$3" = "1" ]; then
+        printf 'findings_total: 3\nfindings_real: 2\ntokens: 118000\nduration_min: 11\nverdict: corrigido-antes-do-PR\n'
+      fi
+      printf -- '---\n\n# revisao\n'
+    } > "$1/docs/evolution/review/feat-x.md"
+    # COMMITA — o gate exige resíduo em HEAD, não arquivo em disco. Antes o teste era `-f` e um
+    # artefato untracked passava: o "resíduo auditado por terceiro" podia nunca sair da máquina do
+    # autor (achado da revisão adversarial). O commit NÃO muda o hash: o dir de review é excluído.
+    ( cd "$1" && git add -A docs/evolution/review \
+      && git -c user.email=t@t -c user.name=t commit -qm "review" ) 2>/dev/null
+  }
+  # PR simulado pelo caminho REAL do CI (evento + ref), não por backdoor de teste.
+  # OS DOIS MODOS, e o TSV vem PRIMEIRO de propósito: é o que `check_review_artifact` consome. Testar
+  # só o humano foi o defeito que deixou a guarda de vacuidade da REGRA 55 verde com o parser morto
+  # (2026-08-06) — e eu o repeti AQUI, no mesmo dia. Quem pegou foi o consumed-mode-check.sh (instrumento, NÃO regra), não uma releitura minha.
+  _run() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${helper}" "$1" --format=tsv 2>&1 ); }
+  _run_humano() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${helper}" "$1" 2>&1 ); }
+
+  # (a) SEM PR (trabalho em curso) → silencioso, exit 0. Sem isto a guarda travaria todo commit.
+  _mk_pr_repo
+  rc=0; out="$( cd "${d}" && bash "${helper}" "${d}" 2>&1 )" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'fora de escopo'; then
+    record_pass "review-artifact: (a) sem PR aberto → CALA (trabalho em curso não é trabalho proposto)"
+  else record_fail "review-artifact: (a) sem PR" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (b) COM PR e SEM artefato → HARD. É o caso que aconteceu de verdade (#546/#548).
+  _mk_pr_repo
+  rc=0; out="$(_run "${d}")" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'ARTEFATO-AUSENTE'; then
+    record_pass "review-artifact: (b) PR sem resíduo de revisão → HARD"
+  else record_fail "review-artifact: (b) PR sem artefato" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (c) COM PR e artefato CASANDO → exit 0. O lado positivo; sem ele (b) não distingue
+  #     "acusa certo" de "acusa sempre".
+  _mk_pr_repo
+  _art "${d}" "$(_sha_of "${d}")" 1
+  # Exige a EVIDÊNCIA do caminho feliz, não só rc=0: um mutante que forçasse BRANCH=HEAD sairia 0 por
+  # FORA DE ESCOPO e esta asserção passaria decorativa — foi assim que o CI ficou cego (achado da
+  # revisão adversarial). O modo humano é usado só aqui, para ler a frase; o veredito é o do TSV.
+  rc=0; out="$(_run "${d}")" || rc=$?
+  local outh; outh="$(_run_humano "${d}")" || true
+  if [ "${rc}" -eq 0 ] && printf '%s' "${outh}" | grep -q 'revisão registrada'; then
+    record_pass "review-artifact: (c) artefato casando → passa PELO CAMINHO CERTO (não por fora de escopo)"
+  else record_fail "review-artifact: (c) artefato válido" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (d) ARTEFATO CADUCO — revisei, e DEPOIS mudei o código. É a fraude honesta mais provável:
+  #     rodar a passada cedo e seguir editando. O hash é o que a impede.
+  _mk_pr_repo
+  _art "${d}" "$(_sha_of "${d}")" 1
+  ( cd "${d}" && printf 'v3 mudou DEPOIS da revisao\n' > .claude/validation/alvo.sh \
+    && git add -A && git -c user.email=t@t -c user.name=t commit -qm depois ) 2>/dev/null
+  rc=0; out="$(_run "${d}")" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'ARTEFATO-CADUCO'; then
+    record_pass "review-artifact: (d) código mudou DEPOIS de revisado → HARD (o hash amarra revisão↔diff)"
+  else record_fail "review-artifact: (d) caduco" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (e) CAMPOS DA REAVALIAÇÃO ausentes → HARD. São o dado que o maestro pediu para julgar a cadência
+  #     em N=10; sem eles o mecanismo chega ao 10º PR sem poder ser avaliado — a falsificação declarada.
+  _mk_pr_repo
+  _art "${d}" "$(_sha_of "${d}")" 0
+  rc=0; out="$(_run "${d}")" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'CAMPO-DE-REAVALIACAO-AUSENTE'; then
+    record_pass "review-artifact: (e) sem os campos de N=10 → HARD (cadência não julgável = mecanismo cego)"
+  else record_fail "review-artifact: (e) campos de reavaliação" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (f) ISENÇÃO ovo-galinha: PR que edita o próprio revisor. CONTADA, nunca silenciosa.
+  # A isenção ficou ESTRITA: só vale quando o diff é EXCLUSIVAMENTE o workflow. Antes bastava TOCAR
+  # o arquivo — medido, um PR de 52 arquivos com uma linha nele saía integralmente isento. Por isso
+  # esta sandbox ramifica de main SEM outra mudança.
+  d="$(mktemp -d)"
+  ( cd "${d}"
+    git init -q -b main .
+    mkdir -p .github/workflows docs/evolution/review
+    printf 'v1\n' > a.sh
+    git add -A && git -c user.email=t@t -c user.name=t commit -qm base
+    git branch -q feat/x && git checkout -q feat/x
+    printf 'on: pull_request\n' > .github/workflows/onion-review.yml
+    git add -A && git -c user.email=t@t -c user.name=t commit -qm revisor ) 2>/dev/null
+  rc=0; out="$(_run_humano "${d}")" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'ovo-galinha'; then
+    record_pass "review-artifact: (f) PR que edita o próprio revisor → isento, e a isenção é CONTADA"
+  else record_fail "review-artifact: (f) isenção ovo-galinha" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (h) A FORMA DO CI — HEAD DESTACADO. É o caso que estava CEGO e que nenhum fixture reproduzia:
+  #     `onion-validate.yml` faz checkout com `ref: head.sha`, então `git rev-parse --abbrev-ref HEAD`
+  #     devolve "HEAD" e a guarda saía por `detached-head` ANTES do ramo escrito PARA o CI. Resultado
+  #     medido em 2026-08-06: a REGRA 56 nunca executava no único caminho que não depende do autor
+  #     lembrar — o gate contra o gatilho social dependia do gatilho social. Sem esta asserção, a
+  #     correção pode ser desfeita sem ninguém ver.
+  _mk_pr_repo
+  ( cd "${d}" && git checkout -q --detach ) 2>/dev/null
+  rc=0
+  out="$( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
+          bash "${helper}" "${d}" --format=tsv 2>&1 )" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'ARTEFATO-AUSENTE'; then
+    record_pass "review-artifact: (h) HEAD destacado + GITHUB_HEAD_REF (a forma do CI) → JULGA (não sai por fora de escopo)"
+  else record_fail "review-artifact: (h) forma do CI" "a regra não roda no CI: rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (i) ISENÇÃO VISÍVEL NO MODO TSV — o modo que o lint consome. Antes, `_skip` só alimentava uma
+  #     variável impressa no modo humano: em TSV toda isenção era ZERO BYTE, e o wire-in trata vazio
+  #     como "nada a relatar". Cinco classes de silêncio foram medidas assim. É a mesma família de
+  #     defeito que este ciclo cura, cometida DENTRO da cura.
+  _mk_pr_repo
+  rc=0; out="$( cd "${d}" && bash "${helper}" "${d}" --format=tsv 2>&1 )" || rc=$?
+  if printf '%s' "${out}" | grep -q 'ISENCAO'; then
+    record_pass "review-artifact: (i) isenção aparece no modo TSV (o que o lint consome), não só no humano"
+  else record_fail "review-artifact: (i) isenção em TSV" "isenção invisível no modo consumido: out=${out}"; fi
+  rm -rf "${d}"
+
+  # (g) (MUT) sem a comparação de hash, o CADUCO passa — prova que o amarre é load-bearing e não
+  #     decoração. Sem esta mutação, (d) poderia estar passando por outro motivo.
+  local mut; mut="$(mktemp -d)"; cp "${helper}" "${mut}/m.sh"
+  sed -i 's/if \[ "${DECL}" != "${DIFF_SHA}" \]; then/if false; then/' "${mut}/m.sh"
+  if grep -q 'if false; then' "${mut}/m.sh"; then
+    _mk_pr_repo
+    _art "${d}" "$(_sha_of "${d}")" 1
+    ( cd "${d}" && printf 'v3\n' > .claude/validation/alvo.sh && git add -A \
+      && git -c user.email=t@t -c user.name=t commit -qm depois ) 2>/dev/null
+    rc=0
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${mut}/m.sh" "${d}" >/dev/null 2>&1 ) || rc=$?
+    if [ "${rc}" -eq 0 ]; then
+      record_pass "review-artifact: (g) (MUT) sem a comparação de hash o caduco PASSA — o amarre é load-bearing"
+    else record_fail "review-artifact: (g) (MUT)" "mutante ainda reprovou (rc=${rc}) — (d) passa por outro motivo"; fi
+    rm -rf "${d}"
+  else
+    record_fail "review-artifact: (g) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+  rm -rf "${mut}"
+}
+
 # Modo empty-result-guard — .claude/hooks/bash-empty-result-guard.sh é a guarda anti-fail-open do
 # SHELL: generaliza a guarda de legibilidade do kg-radar.sh:162 ("0 nós → aborta SEM OPINAR") para o
 # caso em que um comando devolve VAZIO/ZERO por motivo OPERACIONAL (sem acesso, path errado, pipe
@@ -3946,6 +4119,36 @@ run_empty_result_guard_selftests() {
   if [ "${noisy}" -eq 0 ]; then
     record_pass "empty-result-guard: (d) comando saudável / com ramo-vazio tratado → SILENCIOSO"
   else record_fail "empty-result-guard: (d)" "falso-positivo: guarda barulhenta vira fadiga e é ignorada"; fi
+
+  # (j) e (k) sao PAR — o 5o detector (MERGE-SEM-FONTE-LIDA), nascido de dano medido em 2026-08-06:
+  # mergeei os PRs #546 e #548 anunciando "verde", sem revisao semantica nenhuma. O `onion-review`
+  # sai VERDE POR DESENHO quando o revisor falha (soft-pass deliberado), logo `gh pr checks`
+  # mostrando `pass` NAO diz que houve revisao — e essa e a superficie que o fluxo de merge consulta.
+  # (j) prova que dispara nos dois verbos que importam; (k) prova que NAO virou ruido nos verbos
+  # vizinhos de LEITURA (`view`/`checks`/`list`), que sao justamente o que a guarda esta mandando ler.
+  # Sem (k), a guarda ensinaria a ignorar a si mesma no momento exato em que quer ser obedecida.
+  local mg_ok=1 v
+  for v in '"gh pr merge 551 --squash --delete-branch"' '"gh pr create --base main --head x"'; do
+    out="$(_erg "${v}" '"ok"' || true)"
+    printf '%s' "${out}" | grep -qE 'MERGE-SEM-FONTE-LIDA|PR-SEM-PASSADA-ADVERSARIAL' || mg_ok=0
+  done
+  if [ "${mg_ok}" -eq 1 ]; then
+    record_pass "empty-result-guard: (j) gh pr merge/create → aponta a FONTE do veredito (o verde do revisor e soft-pass)"
+  else record_fail "empty-result-guard: (j) merge sem fonte" "nao reagiu a gh pr merge/create"; fi
+
+  # A classe REAL de falso-positivo não é `gh pr checks` (que não CONTÉM a substring — a asserção
+  # antiga era tautológica). É MENÇÃO ao comando dentro de argumento/string: foi ela que fez o
+  # detector disparar 3× nos comandos de LEITURA da revisão adversarial de 2026-08-06, num canal
+  # onde todo disparo interrompe. Por isso os dois primeiros casos abaixo são os que importam.
+  local mg_noisy=0
+  for v in '"grep -rn \"gh pr merge\" .claude/hooks/"' '"echo proximo-passo-gh-pr-create-fill"' \
+           '"gh pr checks 551"' '"gh pr view 551 --json state"' '"gh pr list --state open"'; do
+    out="$(_erg "${v}" '"saida"' || true)"
+    if printf '%s' "${out}" | grep -qE 'MERGE-SEM-FONTE-LIDA|PR-SEM-PASSADA-ADVERSARIAL'; then mg_noisy=1; fi
+  done
+  if [ "${mg_noisy}" -eq 0 ]; then
+    record_pass "empty-result-guard: (k) MENÇÃO ao comando (grep/echo) e verbos de leitura → SILENCIOSO"
+  else record_fail "empty-result-guard: (k) anti-ruido do 5o" "disparou em verbo de LEITURA — ensinaria a ignorar o proprio aviso"; fi
 
   # (e) exit 2 quando dispara — é a ÚNICA via medida em que o stderr de PostToolUse chega ao modelo.
   #     Com exit 0 a guarda roda e o aviso EVAPORA (dogfood 2026-08-02). Esta asserção é load-bearing.
@@ -6960,6 +7163,7 @@ run_line_limits_selftests
 run_kg_radar_integrity_selftests
 run_review_verdict_selftests
 run_empty_result_guard_selftests
+run_review_artifact_selftests
 
 # Modo cycle-completion — métrica de ciclos concluídos vs abandonados (D5 instrumentação,
 # barato-primeiro). Classifica done/open-stale/no-signal e mantém o SEM-sinal FORA do

@@ -164,6 +164,10 @@ CATEGORIES = [
      "O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e "
      "deep-link privado nunca vazam.",
      [30, 33, 34, 35, 36, 45]),
+    ("Processo com resíduo",
+     "O trabalho PROPOSTO carrega rastro material de ter sido revisado — o gate cria a cadência, "
+     "o worker testa a verdade.",
+     [56]),
     ("Integridade do próprio gate",
      "As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a "
      "olhar?' — porque varredura cega devolve zero violações, que é indistinguível de "
