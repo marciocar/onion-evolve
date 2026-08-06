@@ -1587,6 +1587,73 @@ run_kg_trace_resolve_selftests() {
   rm -rf "${d}" "${d2}" "${mut}"
 }
 
+# Guardas do statusFactor — os status de RE-VERIFICAÇÃO (`drifted`/`unverifiable`).
+#
+# POR QUE EXISTEM (Elenxo sobre as decisões de norte, 2026-08-06): o plano ia construir o "selo
+# mecânico" (medição que existe e não foi selada reprova) ANTES de o schema ter onde pousar o
+# resultado. Verificado em sandbox, com o status como ÚNICA variável:
+#   confirmed → atenção 10,0 · drifted → EXIT 1 "status inválido" · refuted → atenção SOME (0.0)
+# Ou seja: selar um drift só dava para ser RECUSADO ou para MENTIR de `refuted` — e o segundo é
+# pior que o vazamento que curaria, porque APAGA o sinal em vez de perdê-lo. O terceiro caminho,
+# praticado por falta de slot, foi apensar nós à mão (identidade, 2026-08-04: 16 nós).
+# SCHEMA PRIMEIRO. Estes casos são o contrato desse slot.
+run_status_reverificacao_selftests() {
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  local d; d="$(mktemp -d)"
+  local st rc out att
+
+  _mkst() {   # grafo de 2 nós; o status de C_A é a ÚNICA variável (sem órfão, sem confundidor)
+    printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: C_A\n    node_type: claim\n    plane: PROD\n    impact: 5\n    confidence: 1.0\n    status: %s\n    label: "x"\n  - id: C_B\n    node_type: claim\n    plane: DEV\n    impact: 2\n    confidence: 1.0\n    status: confirmed\n    label: "y"\nedges:\n  - from: C_A\n    to: C_B\n    edge_type: SUPPORTS\n' "$1" > "${d}/x.kg.yaml"
+  }
+  _att() { grep -E '^[[:space:]]+[0-9.]+[[:space:]]+C_A' "$1" | head -1 | awk '{print $1}'; }
+
+  # (a) `drifted` é status LEGAL — antes disto o radar saía 1 com "status inválido"
+  _mkst drifted; rc=0; bash "${radar}" "${d}/x.kg.yaml" > "${d}/o.txt" 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "status-reverif: (a) \`drifted\` é legal (era exit 1, status inválido)"
+  else record_fail "status-reverif: (a) drifted legal" "rc=${rc} out=$(cat "${d}/o.txt")"; fi
+
+  # (b) drift SOBE no radar. É a cláusula que carrega o desenho: um nó que provou que a realidade
+  #     andou é MAIS urgente que um confirmado de mesmo peso, não menos.
+  att="$(_att "${d}/o.txt")"
+  _mkst confirmed; bash "${radar}" "${d}/x.kg.yaml" > "${d}/c.txt" 2>&1 || true
+  local attc; attc="$(_att "${d}/c.txt")"
+  if awk -v a="${att:-0}" -v c="${attc:-0}" 'BEGIN{exit !(a > c)}'; then
+    record_pass "status-reverif: (b) drifted (${att}) SOBE acima de confirmed (${attc}) — drift aumenta atenção"
+  else record_fail "status-reverif: (b) drifted sobe" "drifted=${att} confirmed=${attc}"; fi
+
+  # (c) `unverifiable` é legal e segue tão urgente quanto aberto — silenciar o que não se sabe
+  #     medir é o oposto do declarado!=verificado.
+  _mkst unverifiable; rc=0; bash "${radar}" "${d}/x.kg.yaml" > "${d}/u.txt" 2>&1 || rc=$?
+  local attu; attu="$(_att "${d}/u.txt")"
+  if [ "${rc}" -eq 0 ] && awk -v u="${attu:-0}" -v c="${attc:-0}" 'BEGIN{exit !(u == c)}'; then
+    record_pass "status-reverif: (c) \`unverifiable\` legal e tão urgente quanto aberto (${attu})"
+  else record_fail "status-reverif: (c) unverifiable" "rc=${rc} att=${attu} vs confirmed=${attc}"; fi
+
+  # (d) O CONTRASTE QUE JUSTIFICA TUDO: `refuted` continua zerando a atenção. Sem este caso,
+  #     (a)-(c) não provam por que o slot novo precisou existir — provam só que ele existe.
+  _mkst refuted; bash "${radar}" "${d}/x.kg.yaml" > "${d}/r.txt" 2>&1 || true
+  if [ -z "$(_att "${d}/r.txt")" ]; then
+    record_pass "status-reverif: (d) \`refuted\` segue SUMINDO do radar — selar drift ali apagaria o sinal"
+  else record_fail "status-reverif: (d) refuted zera" "refuted apareceu com atenção $(_att "${d}/r.txt")"; fi
+
+  # (e) status FORA do enum continua REPROVANDO — a porta não ficou aberta ao abrir o slot.
+  _mkst bananinha; rc=0; bash "${radar}" "${d}/x.kg.yaml" > "${d}/b.txt" 2>&1 || rc=$?
+  if [ "${rc}" -ne 0 ] && grep -q 'inválido' "${d}/b.txt"; then
+    record_pass "status-reverif: (e) status fora do enum ainda reprova (o slot novo não abriu a porta)"
+  else record_fail "status-reverif: (e) enum fechado" "rc=${rc} out=$(cat "${d}/b.txt")"; fi
+
+  # (f) (MUT) sem o fator de `drifted`, o status volta a ser inválido — prova que a linha é
+  #     load-bearing e que (a)-(c) não passam por outro motivo.
+  local mut; mut="$(mktemp -d)"; cp "${radar}" "${mut}/m.sh"
+  sed -i 's|^  if (s == "drifted") return 1.3$||' "${mut}/m.sh"
+  if ! grep -q 'if (s == "drifted") return 1.3' "${mut}/m.sh"; then
+    _mkst drifted; rc=0; bash "${mut}/m.sh" "${d}/x.kg.yaml" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -ne 0 ]; then record_pass "status-reverif: (f) (MUT) sem o fator, \`drifted\` volta a ser inválido — a linha é load-bearing"
+    else record_fail "status-reverif: (f) (MUT)" "sem o fator o radar ainda aceitou drifted (rc=${rc})"; fi
+  else record_fail "status-reverif: (f) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  rm -rf "${mut}" "${d}"
+}
+
 # Guardas do bloco RECONCILIAÇÃO do kg-radar.sh — o PRIMEIRO teste deste bloco.
 #
 # POR QUE EXISTE (medido 2026-08-05): a INTEGRIDADE cobra contradição só para REFUTES
@@ -6408,6 +6475,7 @@ run_kg_reconcile_selftests
 # Modo state — a fila de abertos, complementar ao radar por construção
 run_kg_state_selftests
 run_kg_trace_resolve_selftests
+run_status_reverificacao_selftests
 
 # Modo kg-label-collision — conteúdo de label não pode ser lido como configuração
 # (sinal de campo onion-pessoal-app, 2026-07-19).

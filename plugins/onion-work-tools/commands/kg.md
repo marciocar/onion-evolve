@@ -78,7 +78,8 @@ nodes:
     plane: DEV               # DEV = fonte/branch · PROD = artefato vivo (deploy+config+dados)
     impact: 4                # 1-5
     confidence: 0.9          # 0-1
-    status: open             # open | confirmed | refuted | superseded | done
+    status: open             # open | confirmed | drifted | unverifiable | refuted | superseded | done
+                             # drifted/unverifiable: saída de re-verificação (/meta:kg-freshness)
     verified_against: branch # nomeia o ALVO verificado (branch|commit|deploy|config|dump:) — rastreia por frescor mesmo em DEV; obrigatório junto de verified_at EM node_type: claim (ausente = ⚠ UNANCHORED); nos demais tipos a âncora é trace:/TRACES_TO
     verified_at: AAAA-MM-DD  # quando a claim foi cruzada com o vivo (nó PROD ou com verified_against; ausente = ⚠ STALE-MISSING)
     label: "afirmacao verificavel em uma frase"
