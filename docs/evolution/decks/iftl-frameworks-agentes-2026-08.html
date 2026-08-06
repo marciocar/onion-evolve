@@ -1,0 +1,792 @@
+<meta charset="utf-8">
+<title>A Evolução dos Frameworks para Agentes de IA — Onion · Tech Changers IFTL</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+:root{
+  --bg:#12100E; --bg2:#1C1612; --card:#241D18; --line:#3A2F27;
+  --ink:#FAF7F2; --body:#D9CFC5; --mut:#9A8E82;
+  --orange:#EA580C; --orange2:#C2410C; --purple:#8B5CF6; --green:#4ADE80; --red:#F87171;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:"SF Mono",SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--body);font-family:var(--sans);
+  font-size:clamp(15px,1.45vw,20px);line-height:1.55;-webkit-font-smoothing:antialiased;overflow:hidden}
+
+/* ── palco ── */
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:4.5vh 5vw 8vh}
+.slide{display:none;width:min(1180px,100%);max-height:88vh;overflow-y:auto;scrollbar-width:thin}
+.slide.on{display:block;animation:in .38s cubic-bezier(.2,.7,.3,1)}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── tipografia ── */
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(2.4rem,5.6vw,4.6rem);line-height:1.03;
+  color:var(--ink);letter-spacing:-.02em;text-wrap:balance}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.7rem,3.5vw,2.9rem);line-height:1.1;
+  color:var(--ink);letter-spacing:-.015em;margin-bottom:.75em;text-wrap:balance}
+h3{font-size:clamp(1rem,1.7vw,1.3rem);color:var(--ink);font-weight:640;margin-bottom:.35em}
+p{max-width:60ch;margin-bottom:.85em}
+p.lead{font-size:1.18em;color:var(--ink);max-width:52ch}
+strong{color:var(--ink);font-weight:640}
+em{color:var(--orange);font-style:normal;font-weight:600}
+.mut{color:var(--mut)}
+.small{font-size:.86em;line-height:1.5}
+
+/* ── etiquetas ── */
+.act{display:inline-flex;align-items:center;gap:.55em;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--orange);margin-bottom:1.6em}
+.act::before{content:"";width:26px;height:2px;background:var(--orange);display:block}
+.tag{display:inline-block;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;
+  text-transform:uppercase;padding:.3em .7em;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
+.tag.demo{border-color:var(--purple);color:var(--purple)}
+.tag.mirror{border-color:var(--green);color:var(--green)}
+.tag.gated{border-color:var(--red);color:var(--red)}
+.tag.short{border-color:var(--orange);color:var(--orange)}
+
+/* ── blocos ── */
+.q{font-family:var(--serif);font-size:clamp(1.4rem,2.9vw,2.3rem);line-height:1.25;color:var(--ink);
+  border-left:3px solid var(--orange);padding-left:.9em;max-width:26ch;text-wrap:balance}
+blockquote{border-left:3px solid var(--purple);padding-left:1.1em;margin:1.2em 0;max-width:58ch;
+  font-family:var(--serif);font-size:1.15em;line-height:1.4;color:var(--ink)}
+blockquote cite{display:block;margin-top:.6em;font-family:var(--sans);font-size:.72em;
+  font-style:normal;color:var(--mut);letter-spacing:.02em}
+pre{background:#0C0A09;border:1px solid var(--line);border-radius:10px;padding:1.1em 1.3em;
+  font-family:var(--mono);font-size:clamp(.7rem,1.05vw,.86rem);line-height:1.6;overflow-x:auto;color:#C8E6C9}
+pre .c{color:var(--mut)} pre .g{color:var(--green)} pre .r{color:var(--red)} pre .o{color:var(--orange)}
+.grid{display:grid;gap:1em;margin-top:1.4em}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(155px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1.1em 1.25em}
+.card.hi{border-color:var(--orange);background:linear-gradient(160deg,#2A1F16,#241D18)}
+.num{font-family:var(--serif);font-size:clamp(1.9rem,3.6vw,2.9rem);line-height:1;color:var(--orange);display:block}
+.num.p{color:var(--purple)} .num.g{color:var(--green)}
+.lbl{font-size:.78em;color:var(--mut);margin-top:.35em;display:block;line-height:1.35}
+ul{list-style:none;max-width:62ch} li{padding-left:1.4em;position:relative;margin-bottom:.6em}
+li::before{content:"→";position:absolute;left:0;color:var(--orange);font-weight:700}
+ul.plain li::before{content:"·";color:var(--mut)}
+table{border-collapse:collapse;width:100%;margin-top:1.1em;font-size:.9em}
+th,td{text-align:left;padding:.6em .8em;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-size:.74em;letter-spacing:.09em;text-transform:uppercase;font-weight:600}
+td strong{color:var(--ink)}
+
+/* revelação progressiva */
+.rv{opacity:0;transform:translateY(10px);transition:opacity .45s,transform .45s}
+.rv.on{opacity:1;transform:none}
+
+/* ── cromo ── */
+#bar{position:fixed;top:0;left:0;height:2px;background:var(--orange);transition:width .3s;z-index:9}
+#hud{position:fixed;bottom:1.2rem;left:0;right:0;display:flex;align-items:center;justify-content:center;
+  gap:1.4rem;font-family:var(--mono);font-size:.72rem;color:var(--mut);z-index:9}
+#hud b{color:var(--ink);font-weight:500}
+kbd{border:1px solid var(--line);border-radius:5px;padding:.1em .45em;font-family:var(--mono);font-size:.9em}
+#toc{position:fixed;inset:0;background:rgba(12,10,9,.97);z-index:20;display:none;padding:6vh 6vw;overflow-y:auto}
+#toc.on{display:block}
+#toc h2{margin-bottom:1em}
+.tocg{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:.5em 2em}
+.tocl{padding:.32em 0;cursor:pointer;color:var(--body);font-size:.9em;border:0;background:0;text-align:left;font-family:inherit}
+.tocl:hover{color:var(--orange)}
+.tocl.s{color:var(--orange);font-weight:600}
+.tocl .n{font-family:var(--mono);font-size:.78em;color:var(--mut);margin-right:.6em}
+@media print{body{overflow:visible}.slide{display:block!important;page-break-after:always;max-height:none}#hud,#bar{display:none}}
+</style>
+
+<div id="bar"></div>
+<div id="stage"></div>
+
+<div id="toc">
+  <h2>Mapa da apresentação</h2>
+  <p class="small mut" style="margin-bottom:1.6em">
+    <span class="tag short">caminho curto</span> — os 18 slides essenciais, se o tempo apertar.
+    Clique para saltar · <kbd>M</kbd> fecha.</p>
+  <div class="tocg" id="toclist"></div>
+</div>
+
+<div id="hud">
+  <span><b id="cur">1</b> / <span id="tot">52</span></span>
+  <span class="mut" id="actname"></span>
+  <span><kbd>←</kbd> <kbd>→</kbd> navegar · <kbd>M</kbd> mapa</span>
+</div>
+
+<script>
+const S = [
+
+/* ══════════ ATO 0 — O GANCHO ══════════ */
+{act:"", short:1, html:`
+  <div style="text-align:center">
+    <div class="act" style="justify-content:center">Tech Changers · IFTL · Agosto 2026</div>
+    <h1>A Evolução dos<br>Frameworks para<br>Agentes de IA</h1>
+    <p class="lead rv" style="margin:1.8em auto 0;color:var(--mut)">
+      Como esse ecossistema está evoluindo <em>na prática</em> —
+      passando por frameworks, federação e A2A.</p>
+    <p class="small mut rv" style="margin:2.4em auto 0">Márcio Carvalho · Sistema Onion</p>
+  </div>`},
+
+{act:"Ato 0 · O gancho", short:1, html:`
+  <div class="q">Você consegue dizer <em>por que</em> uma decisão que seu time tomou com IA há três semanas foi tomada?</div>
+  <div class="rv" style="margin-top:2.4em">
+    <p class="lead">Não <em>o que</em> foi decidido — isso está no código.</p>
+    <p><strong>Por quê.</strong> Qual alternativa foi descartada, com base em qual evidência,
+      e o que teria que mudar para reabrir a decisão.</p>
+  </div>
+  <p class="rv mut small" style="margin-top:2em">
+    Se a resposta é "está numa thread do Slack", ou "quem sabe é o fulano" — segura essa sensação.
+    O resto da conversa é sobre ela.</p>`},
+
+{act:"Ato 0 · O gancho", short:1, html:`
+  <h2>O gargalo mudou de lugar</h2>
+  <div class="grid g3">
+    <div class="card rv"><h3>2023–2024</h3><p class="small mut">O gargalo era a <strong>qualidade do modelo</strong>.
+      Esperávamos o próximo release.</p></div>
+    <div class="card rv"><h3>2025</h3><p class="small mut">O gargalo era <strong>orquestração</strong>.
+      Nasceram os frameworks de agentes.</p></div>
+    <div class="card hi rv"><h3>2026</h3><p class="small">O gargalo é <strong>contexto organizacional</strong>.
+      E quase ninguém está tratando disso.</p></div>
+  </div>
+  <blockquote class="rv" style="margin-top:2em">
+    "frontier model quality stopped being the bottleneck for enterprise AI;<br>
+    <em>organizational context became the bottleneck</em>."
+    <cite>Diagnóstico convergente em múltiplas fontes independentes de mercado, 2026</cite></blockquote>`},
+
+/* ══════════ ATO 1 — A EVOLUÇÃO ══════════ */
+{act:"Ato 1 · A evolução do ecossistema", short:0, html:`
+  <h2>Quatro gerações em quatro anos</h2>
+  <table>
+    <tr><th>Geração</th><th>O que resolveu</th><th>O que deixou aberto</th></tr>
+    <tr class="rv"><td><strong>1 · Prompt</strong></td><td>fazer o modelo responder</td><td>não age no mundo</td></tr>
+    <tr class="rv"><td><strong>2 · Tools</strong></td><td>function calling, o modelo age</td><td>uma ação por vez</td></tr>
+    <tr class="rv"><td><strong>3 · Orquestração</strong></td><td>grafos de execução, papéis, estado<br>
+      <span class="small mut">LangGraph · CrewAI · AutoGen</span></td><td>cada sessão começa do zero</td></tr>
+    <tr class="rv"><td><strong>4 · ?</strong></td><td class="mut">—</td><td class="mut">—</td></tr>
+  </table>
+  <p class="rv mut small" style="margin-top:1.6em">
+    A geração 3 é excelente no que faz. A pergunta é o que vem depois dela.</p>`},
+
+{act:"Ato 1 · A evolução do ecossistema", short:1, html:`
+  <h2>Os frameworks evoluíram em <em>orquestrar</em>.<br>Pararam em <em>lembrar</em>.</h2>
+  <div class="grid g2" style="margin-top:1.8em">
+    <div class="card rv"><h3>O que já é excelente</h3>
+      <ul class="plain small"><li>grafo de execução, checkpointing</li><li>papéis, hand-off, streaming</li>
+        <li>observabilidade de execução</li></ul></div>
+    <div class="card hi rv"><h3>O que continua no zero</h3>
+      <ul class="plain small"><li>por que decidimos assim</li><li>o que já foi refutado — e por quem</li>
+        <li>o que envelheceu e ninguém percebeu</li></ul></div>
+  </div>
+  <p class="rv" style="margin-top:1.8em">Toda sessão nova reconstrói o contexto <strong>por inferência</strong>.
+    E inferência sobre um sistema idiossincrático erra — porque o "mais provável no corpus" não é a sua casa.</p>`},
+
+{act:"Ato 1 · A evolução do ecossistema", short:0, html:`
+  <blockquote style="font-size:1.5em;border-left-color:var(--orange)">
+    A IA se acomoda, <em>não absorve</em> — a menos que você force.
+    <cite>Princípio de um dos trilhos de doutrina do Onion</cite></blockquote>
+  <div class="grid g2 rv" style="margin-top:2em">
+    <div class="card"><h3 style="color:var(--red)">Acomodação</h3>
+      <p class="small">O modelo infere o contexto do corpus de treinamento. É o comportamento
+        <strong>padrão</strong> — e o perigoso.</p></div>
+    <div class="card"><h3 style="color:var(--green)">Absorção</h3>
+      <p class="small">O modelo lê estrutura explícita e a segue — <strong>mesmo contra o
+        padrão que ele esperaria</strong>.</p></div>
+  </div>
+  <p class="rv" style="margin-top:1.6em">A diferença entre as duas não é o modelo. É <em>o que você põe na frente dele</em>.</p>`},
+
+{act:"Ato 1 · A evolução do ecossistema", short:1, html:`
+  <h2>Dados são o novo petróleo.<br>Mas ninguém abastece com petróleo cru.</h2>
+  <pre class="rv"><span class="c">BRUTO ──────────→ REFINO ──────────→ MOTOR</span>
+sobra em todo     existe em várias   <span class="r">é onde quase</span>
+lugar             empresas           <span class="r">todo mundo para</span></pre>
+  <p class="rv" style="margin-top:1.6em">
+    Todo mundo tem <strong>dado</strong>. Muita gente já tem <strong>pipeline</strong>.
+    Quase ninguém tem algo que <em>consuma o refinado para decidir</em> — e volte a alimentá-lo.</p>
+  <p class="rv small mut" style="margin-top:1.2em">
+    Essa frase não é minha invenção retórica: é um veredito que saiu de uma auditoria do próprio
+    sistema, quando medimos que tínhamos refinaria de sobra e motor de menos.</p>`},
+
+{act:"Ato 1 · A evolução do ecossistema", short:0, html:`
+  <h2>A pergunta que separa as duas coisas</h2>
+  <div class="q" style="max-width:34ch">Seu agente <em>orquestra</em> bem.<br>Mas o que ele <em>sabe</em> na segunda-feira que não sabia na sexta?</div>
+  <p class="rv" style="margin-top:2.2em">Se a resposta for "nada — ele relê o código", então o que você tem é
+    <strong>automação de execução</strong>, não acúmulo de conhecimento.</p>
+  <p class="rv">As duas coisas são boas. Só não são a mesma, e o mercado está vendendo uma pela outra.</p>`},
+
+/* ══════════ ATO 2 — DE ONDE VEIO ══════════ */
+{act:"Ato 2 · De onde o Onion veio", short:0, html:`
+  <div class="act">Ato 2</div>
+  <h1 style="font-size:clamp(2rem,4.4vw,3.4rem)">Um framework que<br>mudou de ideia em público</h1>
+  <p class="lead rv" style="margin-top:1.4em">A parte mais útil da história do Onion não é o que ele acertou.
+    É uma decisão que <em>contradiz</em> o que ele queria ser — e por quê.</p>`},
+
+{act:"Ato 2 · De onde o Onion veio", short:0, html:`
+  <h2>Nasceu agnóstico. E foi provado agnóstico.</h2>
+  <ul>
+    <li class="rv">Começou nos experimentos com o <strong>Cursor</strong>, buscando não depender de IDE.</li>
+    <li class="rv">Foi <strong>portado de fato</strong> para quatro ambientes diferentes — não como promessa
+      de README, mas como repositórios que rodaram, com alunos usando.</li>
+    <li class="rv">Essa família existe até hoje, <strong>pública e congelada</strong>:
+      é material de curso e <em>prova de portabilidade</em>.</li>
+  </ul>
+  <p class="rv" style="margin-top:1.6em">Ou seja: a portabilidade não foi abandonada por preguiça.
+    Foi <strong>exercida</strong> — e é justamente por isso que a decisão seguinte tem peso.</p>`},
+
+{act:"Ato 2 · De onde o Onion veio", short:0, html:`
+  <h2>Maio de 2026: parar de gastar energia com agnosticismo</h2>
+  <blockquote class="rv">
+    É <em>conclusão de experimento real</em>, não restrição de nascença.
+    <cite>Registrado na constituição do repositório, com a história junto</cite></blockquote>
+  <p class="rv">O trade-off foi escrito, não escondido:
+    <strong>capacidade de fronteira &gt; portabilidade horizontal</strong>.
+    Ser agnóstico custava exatamente os recursos que davam vantagem.</p>
+  <p class="rv small mut" style="margin-top:1.4em">
+    E o custo dessa escolha — quanto o porte custou, o que se perdeu, e o que custaria sair —
+    <strong>nunca foi medido</strong>. Isso está registrado como lacuna aberta no grafo, com data.
+    Voltaremos a esse ponto: é o tipo de honestidade que o método obriga.</p>`},
+
+{act:"Ato 2 · De onde o Onion veio", short:1, html:`
+  <h2>A postura, escrita como critério de decisão</h2>
+  <blockquote style="font-size:1.22em">
+    Acoplado à plataforma para tirar vantagem da sua estrutura e maquinaria,
+    <em>mas mantendo independência sempre que isso for mais vantajoso e o acoplamento não for necessidade</em>.
+    <br><br>Acople só quando a capacidade ganha <strong>não existe fora</strong> —
+    nunca por conveniência nem por simetria.
+    <cite>É o teste que decide toda adoção de substrato. Não é documentação: é critério.</cite></blockquote>
+  <p class="rv small mut">Para um líder de tecnologia, isso é o que separa "escolhemos uma stack" de
+    "temos uma régua para escolher stacks".</p>`},
+
+/* ══════════ ATO 3 — DECLARADO ≠ VERIFICADO ══════════ */
+{act:"Ato 3 · Declarado ≠ verificado", short:1, html:`
+  <div class="act">Ato 3 · o coração da coisa</div>
+  <h1 style="font-size:clamp(2rem,4.4vw,3.4rem)">Seu time declara<br>"feito".<br><span style="color:var(--orange)">O que está verificado?</span></h1>`},
+
+{act:"Ato 3 · Declarado ≠ verificado", short:0, html:`
+  <blockquote style="font-size:1.35em">
+    Não confie no que o artefato <em>diz</em> sobre si.<br>
+    Confie no que ele <em>faz, executa e entrega</em>.
+    <cite>Doutrina nomeada do Onion — e ela tem cura mecânica, não é conselho</cite></blockquote>
+  <p class="rv" style="margin-top:1.8em">Parece óbvio dito assim. Deixa eu mostrar dois casos reais
+    de dentro de casa — porque o ponto não é que <em>outros</em> se enganam.</p>`},
+
+{act:"Ato 3 · Declarado ≠ verificado", short:0, html:`
+  <span class="tag">caso 1 · dentro de casa</span>
+  <h2 style="margin-top:.8em">Um gancho que leu o campo errado por <em>sete semanas</em></h2>
+  <pre class="rv">o código lia   <span class="r">.source</span>
+a plataforma manda  <span class="g">.trigger</span>
+
+resultado:  exit 0 · formato correto · <span class="r">conteúdo sempre errado</span></pre>
+  <ul class="rv" style="margin-top:1.4em">
+    <li>Nenhum erro. Nenhum alerta. Nenhum teste vermelho.</li>
+    <li>O dado que distinguia dois modos de operação <strong>nunca chegou a existir</strong>.</li>
+    <li>Descoberto por acaso, sete semanas depois, ao escrever um teste que não existia.</li>
+  </ul>`},
+
+{act:"Ato 3 · Declarado ≠ verificado", short:1, html:`
+  <span class="tag">caso 2 · pior ainda</span>
+  <h2 style="margin-top:.8em">Uma guarda que disse <span style="color:var(--green)">✅ tudo certo</span> lendo <em>zero</em> registros</h2>
+  <pre class="rv"><span class="c">// a guarda anti-falha, quebrada por uma edição minha</span>
+<span class="g">✅ todo item verificado resolve</span>     <span class="c">exit 0</span>
+<span class="c">// itens lidos:</span> <span class="r">0</span></pre>
+  <p class="rv" style="margin-top:1.4em">Uma verificação <strong>completamente quebrada</strong> reportando sucesso.
+    Só foi pega porque alguém tinha um <em>número conhecido</em> para comparar.</p>
+  <div class="card hi rv" style="margin-top:1.4em">
+    <p class="small" style="margin:0"><strong>A lição que virou regra:</strong> o <em>exit code</em> é uma
+      declaração que o programa faz sobre si mesmo. A verificação é <strong>contar o resultado</strong> e
+      comparar com o esperado.</p></div>`},
+
+{act:"Ato 3 · Declarado ≠ verificado", short:1, html:`
+  <h2>Então o teste de aceite de um controle não é "roda e passa"</h2>
+  <div class="q" style="max-width:32ch">É: <em>ele pega o caso que motivou a existência dele?</em></div>
+  <p class="rv" style="margin-top:2em">Verde na primeira execução, <strong>sem</strong> o caso que originou a
+    regra, é <em>sinal de alarme</em> — não de sucesso.</p>
+  <p class="rv">É a diferença entre ter controles e ter <strong>controles que ainda reagem</strong>.
+    A maioria das organizações tem os primeiros e acha que tem os segundos.</p>`},
+
+{act:"Ato 3 · Declarado ≠ verificado", short:0, html:`
+  <span class="tag demo">demo 1</span><span class="tag mirror" style="margin-left:.5em">tem espelho no próximo slide</span>
+  <h2 style="margin-top:.8em">Rodar o gate ao vivo</h2>
+  <p>Um comando. Sem modelo de linguagem envolvido. Determinístico.</p>
+  <pre>$ bash .claude/validation/lint-artifacts.sh</pre>
+  <p class="small mut">O que observar: a contagem de violações <strong>HARD</strong> (bloqueiam merge)
+    e <strong>SOFT</strong> (avisam com catraca — só podem diminuir).</p>`},
+
+{act:"Ato 3 · Declarado ≠ verificado", short:0, html:`
+  <span class="tag mirror">espelho da demo 1 · saída real</span>
+  <pre style="margin-top:1em">$ bash .claude/validation/lint-artifacts.sh
+
+<span class="c">=== Onion Lint — validação determinística ===</span>
+
+<span class="o">VIOLATION</span>: [kg-verificacao/PASSIVO] 48 nó(s) afirmando sobre
+  produção ainda sem verificação — a métrica de saúde é este
+  número <span class="g">DIMINUINDO</span> (catraca: só encolhe)
+
+<span class="c">=== Sumário ===</span>
+  Violações HARD : <span class="g">0</span>
+  Violações SOFT : 4
+
+<span class="g">OK ✓</span>  — nenhuma violação HARD encontrada</pre>
+  <p class="rv small mut" style="margin-top:1.2em">
+    Repare no aviso SOFT: ele não é um bug. É um <strong>passivo declarado com catraca</strong> —
+    o número só pode cair. Dívida com contador é dívida governada.</p>`},
+
+/* ══════════ ATO 4 — A MAQUINARIA ══════════ */
+{act:"Ato 4 · A maquinaria", short:0, html:`
+  <div class="act">Ato 4</div>
+  <h1 style="font-size:clamp(2rem,4.4vw,3.4rem)">Como se força<br>absorção</h1>
+  <p class="lead rv" style="margin-top:1.4em">Quatro camadas. Cada uma existe porque uma anterior
+    falhou de um jeito que ninguém viu.</p>`},
+
+{act:"Ato 4 · A maquinaria", short:1, html:`
+  <h2>Camada 1 · Markdown não é documentação. É execução.</h2>
+  <blockquote style="font-size:1.3em">
+    O LLM é a <em>VM</em>.<br>O Markdown é o <em>bytecode</em>.<br>Os padrões de projeto são a <em>arquitetura</em>.
+    <cite>Formulação cunhada no Onion para o padrão que ele chama de SDAAL</cite></blockquote>
+  <p class="rv">Não há transpilação. Não há geração de código intermediário.
+    O agente <strong>lê o Markdown e age</strong> — e por isso a especificação pode ser versionada,
+    revisada em pull request e <em>testada</em>.</p>
+  <p class="rv small mut">Consequência prática: a "constituição" do sistema — princípios que nenhum componente
+    pode violar — é um conjunto de arquivos que um comando <strong>aplica</strong> e produz veredito com evidência.</p>`},
+
+{act:"Ato 4 · A maquinaria", short:1, html:`
+  <h2>Camada 2 · O conhecimento nasce <em>grafo</em>, não prosa</h2>
+  <p>Cada investigação, auditoria ou decisão vira um arquivo estruturado: nós tipados
+    (<span class="mut">claim · evidence · decision · question</span>) e arestas que dizem a
+    <strong>relação epistêmica</strong> entre eles.</p>
+  <pre class="rv">SUPPORTS · REFUTES · <span class="o">SUPERSEDES</span> · CONSTRAINS · CAUSES · TRACES_TO</pre>
+  <div class="grid g4 rv" style="margin-top:1.5em">
+    <div class="card"><span class="num">55</span><span class="lbl">grafos vivos</span></div>
+    <div class="card"><span class="num">2.087</span><span class="lbl">nós</span></div>
+    <div class="card"><span class="num">2.466</span><span class="lbl">arestas</span></div>
+    <div class="card"><span class="num g">779</span><span class="lbl">carimbos de verificação contra o vivo</span></div>
+  </div>
+  <p class="rv small mut" style="margin-top:1.2em">Prosa registra o que foi concluído.
+    O grafo registra <strong>o que sustenta</strong>, <strong>o que contradiz</strong> e <strong>o que já morreu</strong>.</p>`},
+
+{act:"Ato 4 · A maquinaria", short:0, html:`
+  <h2>E a diferença que ninguém vê até precisar</h2>
+  <blockquote>
+    <em>git merge</em> reconcilia texto — não reconcilia <em>verdades</em>.
+    <cite>Doutrina que nasceu num adotante, não no core</cite></blockquote>
+  <p class="rv">Quando duas linhas de trabalho chegam a conclusões incompatíveis, o conflito não é de
+    linhas: é <strong>epistêmico</strong>. Ele se resolve na camada de conhecimento — e só então no código.</p>
+  <p class="rv small mut">É por isso que a aresta mais importante do vocabulário é <em>SUPERSEDES</em>:
+    ela não apaga a decisão antiga. Ela diz <strong>quem a aposentou, e com base em quê</strong>.</p>`},
+
+{act:"Ato 4 · A maquinaria", short:1, html:`
+  <h2>Camada 3 · Ler o grafo <em>antes</em> de agir</h2>
+  <p class="lead">Um grafo que só se escreve é arquivo de auditoria.
+    O que o torna motor é ser <strong>consultado no início de cada sessão</strong>.</p>
+  <pre class="rv" style="margin-top:1.4em">atenção = impacto × confiança × fator_de_status × (1 + grau)
+
+<span class="c">// e o fator inverte a intuição:</span>
+aberto/confirmado <span class="g">1.0</span>   ·   <span class="o">DIVERGIU  1.3  ← sobe</span>
+superado          0.2   ·   refutado  0.0</pre>
+  <p class="rv" style="margin-top:1.4em">Um nó que acabou de provar que <strong>a realidade andou</strong>
+    fica <em>mais</em> urgente que um confirmado de mesmo peso. Não menos.</p>`},
+
+{act:"Ato 4 · A maquinaria", short:0, html:`
+  <h2>O veredito tem oito seções — e duas <em>reprovam</em></h2>
+  <table>
+    <tr><th>Seção</th><th>Pergunta que responde</th><th></th></tr>
+    <tr class="rv"><td><strong>Radar</strong></td><td>o que pesa aqui?</td><td class="mut small">avisa</td></tr>
+    <tr class="rv"><td><strong>Estado</strong></td><td>o que ficou em aberto e o radar afunda?</td><td class="mut small">avisa</td></tr>
+    <tr class="rv"><td><strong>Reconciliação</strong></td><td>o grafo se autocorrigiu?</td><td class="mut small">avisa</td></tr>
+    <tr class="rv"><td><strong>Proveniência</strong></td><td>a decisão está ancorada em origem?</td><td class="mut small">avisa</td></tr>
+    <tr class="rv"><td><strong>Frescor</strong></td><td>isso foi reverificado contra o vivo?</td><td class="mut small">avisa</td></tr>
+    <tr class="rv"><td><strong>Integridade</strong></td><td>o grafo é bem-formado?</td><td style="color:var(--red)" class="small">✗ reprova</td></tr>
+    <tr class="rv"><td><strong>Schema</strong></td><td>eu sei ler este arquivo?</td><td style="color:var(--red)" class="small">✗ reprova</td></tr>
+  </table>
+  <p class="rv small mut" style="margin-top:1.2em">Um nó que recebe "foi refutado" e continua marcado como
+    confirmado é <strong>contradição estrutural</strong> — e o sistema não deixa passar.</p>`},
+
+{act:"Ato 4 · A maquinaria", short:0, html:`
+  <span class="tag demo">demo 2</span><span class="tag mirror" style="margin-left:.5em">tem espelho</span>
+  <h2 style="margin-top:.8em">O radar, ao vivo</h2>
+  <pre>$ bash .claude/validation/kg-radar.sh &lt;grafo&gt;.kg.yaml</pre>
+  <p class="small mut">O que observar: os itens ordenados por <strong>atenção</strong>, e a seção
+    <strong>ESTADO</strong> — que mostra justamente o que o radar afundaria.</p>`},
+
+{act:"Ato 4 · A maquinaria", short:0, html:`
+  <span class="tag mirror">espelho da demo 2 · saída real</span>
+  <pre style="margin-top:1em"><span class="c">══ RADAR — atenção (peso × centralidade) ══</span>
+   20.0  D_CLAUDE_CODE_POR_CAPACIDADE  decision(DEV/confirmed)
+   15.0  C_POSTURA_ACOPLAMENTO         claim(DEV/confirmed)
+
+<span class="c">══ ESTADO — a fila de abertos (o que o RADAR afunda) ══</span>
+   <span class="o">10.8  Q_CUSTO_DO_PORTE_NUNCA_MEDIDO   question</span>
+   10.0  C_ANCORA_SOLTA                  claim
+
+<span class="c">══ INTEGRIDADE ══</span>
+  <span class="g">✅ sem contradições estruturais (86 nós, 100 arestas)</span></pre>
+  <p class="rv" style="margin-top:1.2em">Repare no primeiro item da fila de abertos.
+    É o sistema me lembrando, sozinho, de uma <strong>lacuna que eu confessei e não medi</strong>.</p>`},
+
+{act:"Ato 4 · A maquinaria", short:1, html:`
+  <h2>Camada 4 · Controles que provam que ainda reagem</h2>
+  <div class="grid g4">
+    <div class="card rv"><span class="num">55</span><span class="lbl">regras de gate<br>(49 bloqueiam merge)</span></div>
+    <div class="card rv"><span class="num">42</span><span class="lbl">scripts de verificação</span></div>
+    <div class="card rv"><span class="num">18.302</span><span class="lbl">linhas que rodam <strong>sem consumir modelo</strong></span></div>
+    <div class="card rv"><span class="num p">65</span><span class="lbl">testes de mutação</span></div>
+  </div>
+  <div class="card hi rv" style="margin-top:1.6em">
+    <p style="margin:0"><strong>A economia que isso desenha:</strong> o caro (o modelo) fica reservado ao
+      <em>julgamento</em>. O barato (shell determinístico) faz a <em>auditoria</em>.
+      Custo marginal de conformidade tende a zero.</p></div>`},
+
+{act:"Ato 4 · A maquinaria", short:0, html:`
+  <h2>E quem guarda os guardas?</h2>
+  <p class="lead">Um <strong>teste de mutação</strong> quebra de propósito uma linha do controle e
+    exige que o veredito <em>mude</em>. Se não mudar, aquela linha era decoração.</p>
+  <div class="card rv" style="margin-top:1.4em;border-color:var(--purple)">
+    <h3 style="color:var(--purple)">A segunda camada — e essa é a fina</h3>
+    <p class="small" style="margin:0">A <strong>guarda-da-guarda</strong> verifica que a mutação foi
+      <em>de fato aplicada</em>. Se o teste tentou quebrar e não conseguiu, ele <strong>falha</strong> —
+      em vez de passar por omissão.</p></div>
+  <p class="rv small mut" style="margin-top:1.4em">Isso já pegou coisa real: um teste cuja âncora mudou
+    parou de casar, e em vez de continuar "verde", acusou <em>"a mutação não foi aplicada — o teste não
+    prova nada"</em>.</p>`},
+
+{act:"Ato 4 · A maquinaria", short:0, html:`
+  <h2>E o conhecimento tem <em>prazo de validade</em></h2>
+  <p>Cada aprendizado registrado carrega uma data de rerevisão e — a parte inédita —
+    uma <strong>classe de conflito</strong> que diz <em>como</em> retestar quando vencer:</p>
+  <table>
+    <tr class="rv"><td><strong>dinâmico</strong></td><td>o mundo muda</td>
+      <td class="small mut"><em>rode o artefato de novo</em> — exit code é evidência, leitura é hipótese</td></tr>
+    <tr class="rv"><td><strong>estático</strong></td><td>era conclusão</td>
+      <td class="small mut">confronte a melhor fonte atual</td></tr>
+    <tr class="rv"><td><strong>condicional</strong></td><td>vale <em>enquanto</em> algo vale</td>
+      <td class="small mut">cheque só a condição — o mais barato</td></tr>
+  </table>
+  <p class="rv small mut" style="margin-top:1.3em">Motivação citada da literatura: sistemas de memória
+    reconhecem só cerca de <strong>um quarto</strong> das contradições, porque a memória não carrega
+    estrutura de invalidação.</p>`},
+
+/* ══════════ ATO 5 — FEDERAÇÃO E A2A ══════════ */
+{act:"Ato 5 · Federação e A2A", short:0, html:`
+  <div class="act">Ato 5 · o tema que vocês pediram</div>
+  <h1 style="font-size:clamp(2rem,4.4vw,3.4rem)">Um método.<br>Muitos repositórios.<br>Nenhum servidor.</h1>`},
+
+{act:"Ato 5 · Federação e A2A", short:0, html:`
+  <h2>O problema que aparece no segundo projeto</h2>
+  <ul>
+    <li class="rv">O framework evoluiu. <strong>Quem está em qual versão?</strong></li>
+    <li class="rv">O time customizou. <strong>A atualização vai destruir isso?</strong></li>
+    <li class="rv">O projeto achou um bug do método. <strong>Como isso volta?</strong></li>
+  </ul>
+  <p class="rv" style="margin-top:1.6em">A resposta usual é uma planilha e boa vontade.
+    A nossa é um <strong>registro versionado em YAML</strong>, com papéis, permissões e
+    <em>pin de versão verificado</em> — tudo dentro do git, sem servidor central.</p>`},
+
+{act:"Ato 5 · Federação e A2A", short:0, html:`
+  <h2>Os papéis — e o botão de divórcio</h2>
+  <table>
+    <tr class="rv"><td><strong>source</strong></td><td class="small">o núcleo; autoridade emissora, não se carimba</td></tr>
+    <tr class="rv"><td><strong>hub</strong></td><td class="small">empresa que adota e controla os <em>próprios</em> projetos</td></tr>
+    <tr class="rv"><td><strong>standalone</strong></td><td class="small">adota o núcleo direto</td></tr>
+    <tr class="rv"><td><strong>consumer</strong></td><td class="small">adotado por um hub; folha da cadeia</td></tr>
+    <tr class="rv"><td style="color:var(--orange)"><strong>decoupled</strong></td>
+      <td class="small">vira <strong>fonte soberana própria</strong> — autora o próprio framework e
+        <em>corta o vínculo de atualização</em>. Existe como script, não como parágrafo.</td></tr>
+  </table>
+  <p class="rv" style="margin-top:1.5em"><strong>A fonte é soberana de quem a usa.</strong>
+    Um framework que documenta como sair dele está dizendo algo sobre a relação que propõe.</p>`},
+
+{act:"Ato 5 · Federação e A2A", short:1, html:`
+  <h2>O canário — e por que ele existe</h2>
+  <p class="lead">O adotante <em>declara</em> que está na versão X. Como saber se é verdade?</p>
+  <pre class="rv" style="margin-top:1.2em"><span class="c">// pega um arquivo-testemunha que muda com frequência</span>
+extrai do commit <span class="o">declarado</span>  →  compara byte a byte
+                                     com o que está no <span class="o">disco</span>
+
+<span class="g">pin-ok</span> &lt;sha&gt;        ou        <span class="r">pin-untrusted canario-divergente</span></pre>
+  <div class="card hi rv" style="margin-top:1.4em">
+    <p class="small" style="margin:0"><strong>O incidente que fundou a regra:</strong> um restore manual
+      carimbou a versão nova <em>sem copiar os arquivos</em>. O anúncio "você já tem a correção"
+      <strong>saiu falso</strong>. Desde então: <em>o pin é hipótese, não fato</em> — e só entra no
+      registro depois de verificado.</p></div>`},
+
+{act:"Ato 5 · Federação e A2A", short:0, html:`
+  <h2>Registrar "eu não sei" é uma capacidade</h2>
+  <pre class="rv">members.yaml:
+  - id: &lt;adotante&gt;
+    pin: <span class="o">nao-verificavel-deste-host</span>
+  - id: &lt;outro&gt;
+    pin: <span class="o">desconhecido-ate-o-repo-aparecer</span></pre>
+  <p class="rv" style="margin-top:1.5em">Uma planilha te obriga a preencher a célula.
+    Um sistema honesto tem um valor para <strong>"não posso verificar daqui"</strong> —
+    e o gate trata isso diferente de "verificado".</p>
+  <p class="rv small mut">Parece detalhe. É a diferença entre um inventário que você confia
+    e um que você <em>acha</em> que confia.</p>`},
+
+{act:"Ato 5 · Federação e A2A", short:0, html:`
+  <h2>Adoção: legado, greenfield e regulado</h2>
+  <div class="grid g3">
+    <div class="card rv"><h3>Greenfield</h3><p class="small mut">branch dedicada no próprio alvo,
+      scaffold completo</p></div>
+    <div class="card rv"><h3>Legado</h3><p class="small mut">engenharia reversa obrigatória, e a instalação
+      vai numa <strong>worktree separada</strong> — isola a árvore do legado</p></div>
+    <div class="card rv"><h3>Regulado</h3><p class="small mut">+ detecção de normas e contexto de compliance;
+      <strong>nunca</strong> atualização automática</p></div>
+  </div>
+  <blockquote class="rv" style="margin-top:1.6em">
+    <em>Never-clobber</em> — implementado, não só prometido.
+    <cite>Sua customização vira conflito de merge resolvível, nunca sobrescrita silenciosa</cite></blockquote>`},
+
+{act:"Ato 5 · Federação e A2A", short:1, html:`
+  <h2>E isso foi medido em escala real</h2>
+  <div class="grid g3" style="margin-top:.6em">
+    <div class="card rv"><span class="num">392</span><span class="lbl">arquivos de framework aplicados</span></div>
+    <div class="card hi rv"><span class="num">1</span><span class="lbl">único conflito — <strong>isolado</strong></span></div>
+    <div class="card rv"><span class="num g">0</span><span class="lbl">customização perdida · produto intocado</span></div>
+  </div>
+  <p class="rv" style="margin-top:1.8em">E o melhor pedaço: <strong>o plano original estava errado</strong>.
+    O desenho assumia uma estratégia de merge que um experimento <em>refutou</em> antes de virar produção.</p>
+  <blockquote class="rv">O plano errou; o dogfood corrigiu — antes de uma linha em produção.</blockquote>`},
+
+{act:"Ato 5 · Federação e A2A", short:0, html:`
+  <h2>Co-evolução: o sinal do campo <em>volta</em></h2>
+  <pre class="rv">core  ──anúncio──→  adotante        <span class="c">(downstream)</span>
+core  ←──sinal────  adotante        <span class="c">(upstream)</span>
+
+<span class="c">lido/não-lido = git mv para _processed/   — sem banco, sem flag</span></pre>
+  <div class="grid g3 rv" style="margin-top:1.5em">
+    <div class="card"><span class="num">86</span><span class="lbl">sinais de campo triados</span></div>
+    <div class="card"><span class="num">99</span><span class="lbl">anúncios entregues</span></div>
+    <div class="card"><span class="num g">0</span><span class="lbl">pendentes — a caixa está limpa</span></div>
+  </div>
+  <p class="rv small mut" style="margin-top:1.2em">Não são números de demonstração. É um laço que rodou
+    de verdade, por semanas, e cujos bugs viraram correções versionadas no núcleo.</p>`},
+
+{act:"Ato 5 · Federação e A2A", short:0, html:`
+  <h2>A2A — agente falando com agente, <em>com adulto na sala</em></h2>
+  <p>Um sinal assinado sai do agente de um repositório e chega ao agente de outro.
+    O receptor roda <strong>seis a sete camadas</strong> de verificação, da mais barata à mais cara:</p>
+  <pre class="rv">parse → <span class="o">confiança</span> → anti-replay → <span class="o">relógio</span> → SSRF → assinatura → modo</pre>
+  <div class="card hi rv" style="margin-top:1.4em">
+    <p style="margin:0"><strong>E dois valores são fixos no formato da resposta:</strong>
+      <code style="font-family:var(--mono);color:var(--green)">gated: true</code> ·
+      <code style="font-family:var(--mono);color:var(--red)">committed: false</code>.
+      Não são configuráveis. <em>O próprio formato impede a autoaplicação.</em></p></div>
+  <p class="rv small mut" style="margin-top:1.2em">Falta uma ferramenta para avaliar uma camada?
+    <strong>Veto, nunca "pular"</strong>. Ausência jamais é aprovação.</p>`},
+
+{act:"Ato 5 · Federação e A2A", short:0, html:`
+  <h2>E o handshake que endureceu o desenho</h2>
+  <p>Dois apertos de mão reais, ponta a ponta — um deles com um <strong>ambiente regulado de fintech</strong>.
+    O primeiro revelou um furo que o desenho no papel não pegou:</p>
+  <div class="card rv" style="border-color:var(--red);margin-top:1.2em">
+    <p class="small" style="margin:0">Com dois ou mais membros com chave, o dono de <em>qualquer</em>
+      chave confiável poderia assinar dizendo ser outro. <strong>Correção no mesmo ciclo:</strong>
+      a chave passou a ter que pertencer ao remetente declarado — mais um teste de impersonação.</p></div>
+  <p class="rv" style="margin-top:1.4em">O modelo de confiança que ficou: quem envia
+    <strong>gera o próprio par de chaves</strong> — a privada nunca sai da máquina dele.
+    O núcleo fixa a pública <em>sob gate humano</em>.</p>
+  <p class="rv small mut">Estabelecer confiança é ato humano. Nunca automático.</p>`},
+
+{act:"Ato 5 · Federação e A2A", short:1, html:`
+  <span class="tag" style="border-color:var(--purple);color:var(--purple)">o dia que vale a viagem</span>
+  <h2 style="margin-top:.8em">O dia em que o laço girou nos <em>dois</em> sentidos</h2>
+  <p>Numa única jornada: quatro sinais de campo triados e corrigidos → anúncio entregue a um adotante
+    regulado → uma nova guarda de segurança nascendo de uma frase de manhã e <strong>operando no caminho
+    crítico à noite</strong> → o primeiro handshake regulado.</p>
+  <div class="card hi rv" style="margin-top:1.4em">
+    <p style="margin:0">E então o inédito: <strong>enquanto o núcleo fechava o ciclo, a sessão do adotante
+      acordou sozinha</strong> — o anúncio a despertou — rodou a atualização, e devolveu três sinais.
+      Um deles virou emenda de uma decisão aceita no dia anterior, <em>absorvida no mesmo dia</em>.</p></div>
+  <blockquote class="rv" style="margin-top:1.4em">
+    O gargalo já não é transporte — é <em>triagem humana</em>. E é assim que deve ser: o gate é o diferencial.</blockquote>`},
+
+{act:"Ato 5 · Federação e A2A", short:0, html:`
+  <h2>E a coisa mais estranha que aconteceu</h2>
+  <div class="q" style="max-width:30ch">Duas instâncias acharam e corrigiram <em>o mesmo bug</em> com
+    <em>7h41</em> de diferença.<br>Zero comunicação entre elas.</div>
+  <p class="rv" style="margin-top:2em">Não foi coordenação. Foi <strong>convergência</strong> —
+    dois sistemas com o mesmo método, olhando o mesmo artefato, chegando ao mesmo lugar.</p>
+  <p class="rv">A consequência ficou registrada: aquele adotante teve a <strong>confiança elevada</strong>
+    no registro — por rigor comprovado, <em>não por hierarquia</em>.</p>`},
+
+/* ══════════ ATO 6 — VPS ══════════ */
+{act:"Ato 6 · Infraestrutura", short:0, html:`
+  <h2>Por que uma VPS, e não "a nuvem"</h2>
+  <p>Porque tirar o framework de "roda no meu terminal" exige um lugar com domínio, identidade e
+    um único ponto de entrada. Hoje isso hospeda: o servidor que expõe o Onion pela web,
+    o endpoint de agente-a-agente e a distribuição da federação.</p>
+  <div class="card rv" style="margin-top:1.4em;border-color:var(--purple)">
+    <p class="small" style="margin:0"><strong>Um precedente que ainda me diverte:</strong>
+      a primeira funcionalidade da história desse ecossistema <em>autorada de um celular</em> —
+      commit real, via a interface web do bridge.</p></div>`},
+
+{act:"Ato 6 · Infraestrutura", short:0, html:`
+  <h2>E uma doutrina que <em>proíbe</em> a própria casa de virar plataforma</h2>
+  <blockquote style="font-size:1.15em">
+    O conjunto é <em>catálogo</em>, não plataforma — híbrido recusado.<br>
+    Zero backend, registro ou UI próprios. <strong>Nenhuma visão agregada é pré-autorizada.</strong>
+    <cite>Veredito escrito depois que a tentativa de "arquitetar tudo junto" foi formalmente reprovada</cite></blockquote>
+  <p class="rv">Cada ferramenta entra <strong>puxada por demanda real</strong>, não por simetria de arquitetura.</p>
+  <p class="rv small mut">E a síntese que propunha o contrário foi reprovada por um motivo específico:
+    citava um número de membros que <strong>não batia com o <code style="font-family:var(--mono)">grep</code></strong>.
+    Premissa não medida derruba o desenho inteiro.</p>`},
+
+{act:"Ato 6 · Infraestrutura", short:0, html:`
+  <h2>Mensageria com gate humano</h2>
+  <p class="lead">Mandar mensagem para terceiros é ação <em>irreversível</em> e <em>externa</em>.</p>
+  <blockquote class="rv">
+    Jamais entraria no framework <em>sem gate humano</em>.
+    <cite>A régua escrita antes de construir, não depois do incidente</cite></blockquote>
+  <div class="grid g2 rv" style="margin-top:1.5em">
+    <div class="card"><h3 style="color:var(--green)">Autônomo</h3>
+      <p class="small mut" style="margin:0">ler, analisar, propor, rascunhar</p></div>
+    <div class="card"><h3 style="color:var(--red)">Sempre gated</h3>
+      <p class="small mut" style="margin:0">qualquer efeito irreversível — enviar, publicar, aplicar</p></div>
+  </div>
+  <p class="rv small mut" style="margin-top:1.3em">
+    <span class="tag gated">honestidade</span> O canal de WhatsApp está no ar, mas
+    <strong>o adapter ainda não foi construído</strong> — e o de e-mail não existe.
+    Estão no radar como <em>gated</em>, não como entregue.</p>`},
+
+/* ══════════ ATO 7 — N=1 ══════════ */
+{act:"Ato 7 · O mesmo método, N=1", short:0, html:`
+  <h2>Se funciona para uma empresa, funciona para uma pessoa?</h2>
+  <p class="lead">A linha pessoal aplica o mesmo método — conhecimento reconciliado, contradição
+    explícita, prazo de validade — à vida de <strong>um indivíduo</strong>.</p>
+  <p class="rv" style="margin-top:1.4em">E aí a pergunta de privacidade deixa de ser sobre criptografia
+    e passa a ser sobre uma coisa que quase ninguém endereça.</p>`},
+
+{act:"Ato 7 · O mesmo método, N=1", short:0, html:`
+  <h2>O risco não é o dado em repouso. É o <em>motor</em>.</h2>
+  <blockquote>
+    Um modelo sobre o seu grafo <em>deduz o não-declarado</em> — a partir de estilo e tópico,
+    não de strings. Remover todo dado pessoal literal <strong>não resolve</strong>.
+    <cite>Literatura citada no repositório, com número: a recuperação de atributos sensíveis
+      permanece alta mesmo após remoção de identificadores</cite></blockquote>
+  <div class="card hi rv" style="margin-top:1.5em">
+    <p style="margin:0"><strong>A invariante que ficou:</strong> o grafo cru <em>mora no dispositivo</em>;
+      a anonimização acontece <em>localmente</em>; o cérebro na nuvem entra com a chave do próprio dono.
+      A infraestrutura <strong>nunca toca o grafo cru</strong>.</p></div>
+  <p class="rv small mut" style="margin-top:1.2em">E a regra-mãe da classificação:
+    <em>um destilado herda a sensibilidade do que ele permite inferir</em> — não do que literalmente contém.</p>`},
+
+{act:"Ato 7 · O mesmo método, N=1", short:0, html:`
+  <span class="tag gated">o que ainda NÃO existe</span>
+  <h2 style="margin-top:.8em">E aqui é onde eu não vendo o que não tenho</h2>
+  <ul>
+    <li class="rv">Modelo pequeno rodando <em>no dispositivo</em> para detecção contextual — <strong>gated</strong></li>
+    <li class="rv">Divulgação seletiva com prova criptográfica — <strong>não existe</strong></li>
+    <li class="rv">Orçamento de privacidade com contador — <strong>não existe</strong></li>
+    <li class="rv">Mitigação de inferência completa — <strong>a peça mais grave, e está aberta</strong></li>
+  </ul>
+  <p class="rv" style="margin-top:1.6em">Está tudo escrito assim, no repositório, com essas palavras.
+    <strong>Um sistema que não sabe listar o que lhe falta não sabe o que tem.</strong></p>`},
+
+/* ══════════ ATO 8 — FECHO ══════════ */
+{act:"Ato 8 · O que isso muda", short:0, html:`
+  <div class="act">Ato 8</div>
+  <h2>O sistema, em números medidos hoje</h2>
+  <div class="grid g4">
+    <div class="card rv"><span class="num">102</span><span class="lbl">comandos</span></div>
+    <div class="card rv"><span class="num">51</span><span class="lbl">agentes</span></div>
+    <div class="card rv"><span class="num">11</span><span class="lbl">skills</span></div>
+    <div class="card rv"><span class="num">90</span><span class="lbl">bases de conhecimento</span></div>
+  </div>
+  <div class="grid g4 rv" style="margin-top:.9em">
+    <div class="card"><span class="num p">55</span><span class="lbl">regras de gate</span></div>
+    <div class="card"><span class="num p">555</span><span class="lbl">asserções de autoteste</span></div>
+    <div class="card"><span class="num p">2.087</span><span class="lbl">nós de conhecimento</span></div>
+    <div class="card"><span class="num p">97</span><span class="lbl">aprendizados datados</span></div>
+  </div>
+  <p class="rv small mut" style="margin-top:1.4em">
+    E o número de comandos publicado é <strong>byte a byte idêntico</strong> ao que o scanner gera agora —
+    porque ninguém pode digitar um número sobre o sistema sem a máquina confirmar.</p>`},
+
+{act:"Ato 8 · O que isso muda", short:1, html:`
+  <h2>A linha que separa esta aposta de todas as outras</h2>
+  <div class="grid g2" style="margin-top:1.2em">
+    <div class="card rv"><h3 class="mut">O mercado consolida memória por</h3>
+      <p style="font-size:1.1em"><strong>reconciliação probabilística em tempo de execução</strong></p>
+      <p class="small mut">o modelo decide, na hora, o que era verdade</p></div>
+    <div class="card hi rv"><h3 style="color:var(--orange)">O Onion consolida por</h3>
+      <p style="font-size:1.1em"><strong>commit determinístico auditável</strong></p>
+      <p class="small mut">a verdade tem autor, data, evidência — e quem a aposentou</p></div>
+  </div>
+  <p class="rv" style="margin-top:1.8em">Em ambiente regulado, isso deixa de ser preferência de engenharia.
+    <strong>Provar que não vazou por inferência vale mais do que lembrar mais.</strong></p>`},
+
+{act:"Ato 8 · O que isso muda", short:0, html:`
+  <h2>E o que eu <em>não</em> vou dizer</h2>
+  <blockquote style="font-size:1.2em">
+    Todos os membros da federação estão clonados numa única máquina.<br>
+    Não é inconveniência operacional. <em>É um teto.</em>
+    <cite>Escrito no próprio repositório, sobre si mesmo</cite></blockquote>
+  <ul class="rv" style="margin-top:1.6em">
+    <li>Os adotantes estão todos na minha órbita. <strong>Funciona ≠ vende</strong> — e isso está registrado.</li>
+    <li>A federação formal de contratos foi construída e <strong>nunca foi usada</strong>.</li>
+    <li>A categoria disso <strong>ainda não tem nome de mercado</strong>.</li>
+  </ul>
+  <p class="rv" style="margin-top:1.4em">Eu podia ter feito um slide de tração. Preferi este —
+    porque a coisa toda que apresentei existe para <strong>não deixar a gente acreditar em si mesma</strong>.</p>`},
+
+{act:"Ato 8 · Sua vez", short:1, html:`
+  <div class="act">e agora é com vocês</div>
+  <h1 style="font-size:clamp(1.8rem,3.8vw,3rem)">Três perguntas</h1>
+  <div class="grid g3" style="margin-top:2em">
+    <div class="card hi rv"><span class="num">1</span>
+      <p style="margin-top:.5em">Onde <strong>vocês</strong> perdem contexto hoje? Entre sessões,
+        entre pessoas, ou entre projetos?</p></div>
+    <div class="card hi rv"><span class="num">2</span>
+      <p style="margin-top:.5em">Quando um agente diz "feito" — <strong>o que na sua casa
+        verifica isso</strong>, além de um humano lendo?</p></div>
+    <div class="card hi rv"><span class="num">3</span>
+      <p style="margin-top:.5em">Qual foi a última vez que uma decisão foi <strong>refeita</strong>
+        porque ninguém achou o porquê da primeira?</p></div>
+  </div>
+  <p class="rv" style="margin-top:2.2em;text-align:center;color:var(--mut)">
+    Obrigado. <span style="color:var(--orange)">🧅</span></p>`},
+
+];
+
+/* ── runtime ── */
+const stage=document.getElementById('stage'), bar=document.getElementById('bar'),
+      cur=document.getElementById('cur'), tot=document.getElementById('tot'),
+      actname=document.getElementById('actname'), toc=document.getElementById('toc'),
+      toclist=document.getElementById('toclist');
+let i=0, step=0;
+
+S.forEach((s,n)=>{
+  const d=document.createElement('section');
+  d.className='slide'; d.dataset.n=n; d.innerHTML=s.html; stage.appendChild(d);
+  const b=document.createElement('button');
+  b.className='tocl'+(s.short?' s':'');
+  b.innerHTML='<span class="n">'+String(n+1).padStart(2,'0')+'</span>'+
+    (s.act||'Capa')+(s.short?' ·':'');
+  b.onclick=()=>{go(n);toc.classList.remove('on')};
+  toclist.appendChild(b);
+});
+tot.textContent=S.length;
+const slides=[...document.querySelectorAll('.slide')];
+
+function render(){
+  slides.forEach(s=>s.classList.remove('on'));
+  const s=slides[i]; s.classList.add('on');
+  const rvs=[...s.querySelectorAll('.rv')];
+  rvs.forEach((r,k)=>r.classList.toggle('on',k<step));
+  bar.style.width=((i+1)/S.length*100)+'%';
+  cur.textContent=i+1; actname.textContent=S[i].act||'';
+  s.scrollTop=0;
+}
+function steps(){return slides[i].querySelectorAll('.rv').length}
+function next(){ if(step<steps()){step++;render()} else if(i<S.length-1){i++;step=0;render()} }
+function prev(){ if(step>0){step--;render()} else if(i>0){i--;step=steps();render()} }
+function go(n){i=n;step=steps();render()}
+
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next()}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}
+  if(e.key==='Home')go(0); if(e.key==='End')go(S.length-1);
+  if(e.key==='m'||e.key==='M')toc.classList.toggle('on');
+  if(e.key==='Escape')toc.classList.remove('on');
+});
+addEventListener('click',e=>{ if(e.target.closest('#toc')||e.target.closest('#hud'))return;
+  (e.clientX < innerWidth*0.28) ? prev() : next(); });
+render();
+</script>
