@@ -78,7 +78,12 @@ while IFS= read -r g; do
   [ -n "${g}" ] || continue
   gdir="$(dirname "${g}")"
   # Só a seção `nodes:` — `trace:` vive em nó, e varrer `edges:` inventaria alvo.
-  nodes="$(awk '/^edges:/{exit} {print}' "${g}")"
+  # RASTREIA A SEÇÃO em vez de assumir ORDEM. A versão anterior cortava no primeiro `^edges:`,
+  # o que só funciona se `nodes:` vier antes — e YAML não tem ordem. Medido na revisão adversarial
+  # (2026-08-06): um grafo com `edges:` primeiro é ACEITO pelo kg-radar (exit 0, reporta as
+  # decisões) e ficava INTEIRO invisível aqui — zero julgável, zero excluído, zero contado. Falso
+  # negativo que não aparece em bucket nenhum é pior que falso positivo: some sem deixar rastro.
+  nodes="$(awk '/^[A-Za-z_][A-Za-z0-9_]*:/ { insec = ($0 ~ /^nodes:[[:space:]]*$/); next } insec { print }' "${g}")"
   while IFS=$'\t' read -r nid ntype target; do
     [ -n "${target}" ] || continue
     case "${target}" in
@@ -96,9 +101,27 @@ while IFS= read -r g; do
     #       extensão              e `kubernetes.io/.../kustomization/` passam em (a) e (b).
     case "${target}" in *[!A-Za-z0-9_./-]*) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;; esac
     case "${target}" in */*) : ;; *) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;; esac
-    case "${target##*/}" in *.*) : ;; *) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;; esac
+    # (c) O TESTE DE DOMÍNIO MUDOU DE LUGAR — e isso amplia a cobertura sem perder precisão.
+    #     Antes: "o último segmento precisa ter extensão". Matava domínio (`support.claude.com/...`)
+    #     mas também matava CAMINHO REAL sem extensão — medido: 14 âncoras vivas ficavam fora de
+    #     vigilância, entre elas `.githooks/pre-commit`, `.claude/skills/` e 4 diretórios de
+    #     `docs/evolution/federation/outbox/`. Custo não declarado no cabeçalho: se qualquer uma
+    #     fosse movida, a REGRA 55 calaria.
+    #     Agora: o teste mira o PRIMEIRO segmento, que é onde mora o hostname. Um domínio tem
+    #     ponto ali (`support.claude.com`, `kubernetes.io`); um caminho do repo, não (`docs`,
+    #     `.claude` — que começa com ponto, e por isso a exceção do prefixo é necessária, senão
+    #     toda a superfície `.claude/` seria descartada).
+    _first="${target%%/*}"
+    case "${_first}" in
+      .*)  : ;;                                                    # `.claude/…`, `.githooks/…`
+      *.*) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;;         # hostname → não julgável
+    esac
     JUDGED=$((JUDGED + 1))
-    if [ -e "${target}" ] || [ -e "${gdir}/${target}" ] || [ -e "${gdir}/../${target}" ]; then continue; fi
+    # A 3ª raiz (pai do grafo) NÃO se aplica quando o grafo está na raiz do repo: ali `..` sai
+    # DO REPO. Medido: um `trace:` apontando para um repo-irmão resolvia verde na máquina do
+    # maestro e vermelho no clone do CI — gate dependente de quem tem o quê no disco ao lado.
+    if [ -e "${target}" ] || [ -e "${gdir}/${target}" ]; then continue; fi
+    if [ "${gdir}" != "." ] && [ -e "${gdir}/../${target}" ]; then continue; fi
     MISSING=$((MISSING + 1))
     if [ "${FORMAT}" = tsv ]; then
       REPORT="${REPORT}${g}	${nid}	${ntype}	${target}	TARGET-MISSING
@@ -110,11 +133,19 @@ while IFS= read -r g; do
     fi
   done <<EOF
 $(printf '%s\n' "${nodes}" | awk '
-  /^  - id:/       { if (id != "" && tr != "") printf "%s\t%s\t%s\n", id, (ty == "" ? "-" : ty), tr
+  /^[[:space:]]+- id:/ { sub(/\r$/, "")
+                     if (id != "" && tr != "") printf "%s\t%s\t%s\n", id, (ty == "" ? "-" : ty), tr
                      id = $3; ty = ""; tr = ""; next }
-  /^    node_type:/{ ty = $2; next }
+  /^[[:space:]]+node_type:/ { sub(/\r$/, ""); ty = $2; next }
   # Corta em QUALQUER dois-pontos: a âncora aceita `arquivo:linha` E `arquivo:secao`.
-  /^    trace:/    { sub(/^    trace:[[:space:]]*/, ""); gsub(/^"|"$/, "")
+  # ORDEM DAS LIMPEZAS IMPORTA, e a anterior estava errada em duas formas YAML válidas:
+  #   · CRLF   — um arquivo com fim-de-linha Windows fazia TODO o grafo cair em "não-caminho"
+  #              (o \r entrava no alvo e o filtro de caracteres o rejeitava). Some primeiro.
+  #   · aspas  — tirar aspas ANTES do comentário deixava `docs/x.md" # nota` virar `docs/x.md"`.
+  #              Comentário sai primeiro; aspas depois. E aceita aspa SIMPLES, que é YAML válido
+  #              e era silenciosamente descartada.
+  /^[[:space:]]+trace:/ { sub(/\r$/, ""); sub(/^[[:space:]]+trace:[[:space:]]*/, "")
+                     sub(/[[:space:]]+#.*$/, ""); gsub(/^["\047]|["\047]$/, "")
                      sub(/#.*$/, ""); sub(/:.*$/, ""); sub(/[[:space:]]+$/, ""); tr = $0; next }
   END              { if (id != "" && tr != "") printf "%s\t%s\t%s\n", id, (ty == "" ? "-" : ty), tr }
 ')
@@ -123,9 +154,44 @@ done <<EOF
 ${GRAPHS}
 EOF
 
+# ═══ GUARDA DE VACUIDADE — antes da bifurcação de formato, e isso é o ponto ═══
+# HISTÓRIA, em duas camadas, porque a segunda é mais instrutiva que a primeira:
+#
+# (1) 2026-08-06, construindo: uma edição comentou sem querer o resto da linha do awk que casa
+#     `trace:`. O parser passou a ler ZERO nós — e o script imprimiu "✅ todo trace: julgável
+#     resolve" com exit 0. Guarda quebrada reportando SUCESSO. Nasceu esta guarda.
+#
+# (2) HORAS DEPOIS, revisão adversarial do proprio PR: a guarda estava DEPOIS do `exit` do ramo
+#     TSV — e TSV é EXATAMENTE o modo que o lint invoca (lint-artifacts.sh, check_kg_trace_resolve).
+#     Medido com o mesmo mutante: modo humano exit 1 com ✗ VACUIDADE; modo TSV exit 0, saída vazia,
+#     REGRA 55 VERDE. Ou seja: a cura do fail-open era ela mesma fail-open no unico caminho que
+#     roda em CI. E o mutation test (e) do selftest exercitava o modo HUMANO — validava a
+#     superficie que ninguem usa. GUARDA-DA-GUARDA QUE TESTA O MODO ERRADO NAO E GUARDA.
+#     Por isso o bloco subiu para ANTES da bifurcação, e em TSV emite uma linha propria.
+#
+# (3) E o predicado mudou: `JUDGED == 0` sozinho MENTE. Um repo cujas âncoras sejam todas
+#     nao-julgaveis por desenho (um adotante novo com dois grafos ancorando por nome solto — o
+#     "teto declarado" logo acima) tinha JUDGED=0 com o parser PERFEITO, e recebia
+#     "✗ o parser quebrou": diagnostico falso, HARD vermelho no dia 1, saida unica sendo inventar
+#     uma barra no proprio `trace:`. Gemeo exato do bug da 3a raiz. Os contadores de skip PROVAM
+#     que o parser leu — logo so ha vacuidade quando NADA foi lido, julgavel ou nao.
+VACUO=0
+if [ "${JUDGED}" -eq 0 ] && [ "$((SKIP_ABS + SKIP_EXT + SKIP_NOTPATH))" -eq 0 ]; then
+  # Só agora vale perguntar ao disco: o parser leu zero de tudo. Se existe `trace:` no corpus,
+  # ele morreu. Alimentação por stdin (não por $(...) sem aspas): caminho com espaço fazia
+  # word-split, o grep falhava, e o `2>/dev/null` transformava o erro em "não há trace:" —
+  # fail-open dentro da guarda anti-fail-open (achado da mesma revisão).
+  if printf '%s\n' "${GRAPHS}" | xargs -d '\n' grep -lE '^[[:space:]]+trace:' -- 2>/dev/null | grep -q .; then
+    VACUO=1
+  fi
+fi
+
 if [ "${FORMAT}" = tsv ]; then
+  # A linha de vacuidade viaja no MESMO formato de 5 campos que o consumidor já parseia,
+  # para o wire-in não precisar de caminho especial.
+  [ "${VACUO}" -eq 1 ] && printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PARSER' '-' '(nenhum nó lido)' 'VACUIDADE'
   printf '%s' "${REPORT}"
-  [ "${MISSING}" -eq 0 ] && exit 0 || exit 1
+  { [ "${MISSING}" -eq 0 ] && [ "${VACUO}" -eq 0 ]; } && exit 0 || exit 1
 fi
 
 printf '══ TRACE-RESOLVE — a âncora declarada EXISTE? (✗ reprova) ══\n'
@@ -135,23 +201,15 @@ printf '  julgáveis: %d · resolvem: %d · TARGET-MISSING: %d\n' \
 printf '  fora de julgamento (contado, nunca silencioso): %d absoluto/URL · %d raiz externa · %d não-caminho\n' \
   "${SKIP_ABS}" "${SKIP_EXT}" "${SKIP_NOTPATH}"
 
-# ═══ GUARDA DE VACUIDADE — a guarda-da-guarda, e ela existe por INCIDENTE, não por prudência ═══
-# 2026-08-06, durante a própria construção: uma edição comentou sem querer o resto da linha do awk
-# que casa `trace:`. O parser passou a extrair ZERO nós — e este script imprimiu
-# "✅ todo `trace:` julgável resolve" e saiu com exit 0. Uma guarda completamente quebrada
-# reportando SUCESSO: fail-open perfeito, invisível, e só pego porque eu tinha um número conhecido
-# (1300) para comparar. Ninguém depois de mim teria esse número.
-# Por isso o piso: se há grafos e há `trace:` no corpus, é IMPOSSÍVEL que nada seja julgável.
-# Zero julgável não é "repo limpo" — é "o parser morreu".
-if [ "${JUDGED}" -eq 0 ]; then
-  if grep -rqlE '^[[:space:]]+trace:' -- $(printf '%s ' ${GRAPHS}) 2>/dev/null; then
-    printf '  ✗ VACUIDADE: existe `trace:` no corpus e NADA foi julgado — o parser quebrou.\n'
-    printf '    Uma guarda que não lê nada e diz OK é pior que guarda nenhuma (fail-open).\n'
-    exit 1
-  fi
-  printf '  ✅ nenhum `trace:` no corpus — nada a resolver\n'; exit 0
+if [ "${VACUO}" -eq 1 ]; then
+  printf '  ✗ VACUIDADE: existe `trace:` no corpus e o parser não leu NADA — nem julgável, nem excluído.\n'
+  printf '    Uma guarda que não lê nada e diz OK é pior que guarda nenhuma (fail-open).\n'
+  exit 1
 fi
-
+if [ "${JUDGED}" -eq 0 ]; then
+  printf '  ✅ nenhum `trace:` julgável no corpus (o parser leu; tudo caiu nas exclusões declaradas)\n'
+  exit 0
+fi
 if [ "${MISSING}" -eq 0 ]; then
   printf '  ✅ todo `trace:` julgável resolve\n'; exit 0
 fi
