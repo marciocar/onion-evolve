@@ -116,7 +116,7 @@ nodes:
   - id: Q_catalog_vs_platform
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 1.0
     label: "ELENXO DE FRAMING (fazer 1o): 'catalogo de adapters SDAAL atras do bridge, gov por doutrina' vs 'plataforma' (o anti-padrao dead-layer que o fio #4 acabou de nomear). O pull-not-push guarda: cada tool ENTRA no catalogo por demanda concreta, nao por completude"
@@ -194,7 +194,7 @@ nodes:
   - id: C_axis_whatsapp
     node_type: claim
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 3
     confidence: 0.9
     verified_at: 2026-07-31

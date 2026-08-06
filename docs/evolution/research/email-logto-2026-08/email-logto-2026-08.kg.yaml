@@ -82,7 +82,7 @@ nodes:
   - id: Q_provider_resend_vs_postmark
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 1.0
     label: "DECISAO DO MAESTRO (a sintese e o dissent DIVERGEM): RESEND (3.000/mes gratis, sem branding, logs 30d, webhooks ricos) vs POSTMARK (US$15/mes; free permanente 100/mes; reputacao construida 100% em transacional, RECUSA mala-direta, o que mantem IPs compartilhados limpos). O DISSENT se auto-acusa: 'escolhi otimizando o FREE TIER, e free tier e ECONOMIA — nao eficacia', contra a regra declarada efficiency-over-economy. Para email de AUTENTICACAO, entregabilidade E o produto inteiro — e a pesquisa NAO MEDIU que a Resend entrega tao bem quanto a Postmark. O argumento de volume e CIRCULAR (depende de habilitar sign-in por codigo, decisao nao tomada; sem isso o volume fica <100/mes, coberto pelo free permanente da Postmark)"
@@ -271,7 +271,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_five_doc_vs_behavior
     to: C_gaps_require_deploy_verification
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: E_five_doc_vs_behavior
     to: D_email_is_script_not_sdaal
     edge_type: SUPPORTS

@@ -1,0 +1,111 @@
+# Fixture: guarda de RECONCILIAÇÃO (--reconcile) — alvo de SUPERSEDES que ficou por reconciliar.
+# Prova os DOIS lados no mesmo caso (senão "consertar" seria matar a guarda e chamar de fix):
+#   - D_ALVO_VIVO     (decisão confirmed, recebe SUPERSEDES de nó confirmed)  → AVISADA
+#   - Q_RESPONDIDA    (question open, recebe SUPERSEDES de nó confirmed)      → AVISADA, mensagem PRÓPRIA
+#                                                                               ("fechar como `done`")
+#   - D_JA_RECONCILIADO (decisão JÁ superseded)                               → NÃO avisada (é o estado certo)
+#   - Q_JA_FECHADA    (question já `done`)                                    → NÃO avisada
+#   - C_SUPERSEDER_ABERTO (claim confirmed, superseder está `open`)           → NÃO avisada — relação
+#       não assentada não cobra reconciliação do alvo. É o filtro que evita acusar por superação
+#       que ninguém fechou (caso real medido: E_engine_measured, 2026-08-05).
+#   - C_SO_REFUTES    (claim confirmed, recebe REFUTES — não SUPERSEDES)      → NÃO avisada aqui
+#       (é a INTEGRIDADE que cobra REFUTES, linha 438 — não duplicar o veredito)
+# Espera: --reconcile emite ⚠ para EXATAMENTE D_ALVO_VIVO e Q_RESPONDIDA. exit != 0 por causa do
+# C_SO_REFUTES (contradição REFUTES é ✗ HARD na integridade) — este arquivo NÃO é rodado com --all
+# no teste de aviso; o caso de exit-code é asserido à parte.
+meta:
+  id: fixture-supersedes-mixed
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: D_ALVO_VIVO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "decisao que recebe SUPERSEDES de no confirmed e segue confirmed — o defeito que a guarda existe para nomear"
+  - id: D_SUPERSEDER_VIVO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "o superseder, vivo e confirmado"
+  - id: Q_RESPONDIDA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: open
+    label: "pergunta que foi respondida e ficou aberta — merece mensagem propria (done, nao superseded)"
+  - id: D_JA_RECONCILIADO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: superseded
+    label: "alvo JA reconciliado — o estado certo, nao deve ser avisado"
+  - id: Q_JA_FECHADA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: done
+    label: "pergunta ja fechada como done — nao deve ser avisada"
+  - id: C_SUPERSEDER_ABERTO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "alvo cujo superseder esta open — relacao nao assentada, NAO deve ser avisado"
+  - id: C_ABERTO_QUE_SUPERSEDE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: open
+    label: "superseder ainda aberto — sua superacao nao assentou"
+  - id: C_SO_REFUTES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "alvo de REFUTES — cobrado pela INTEGRIDADE, nao por esta guarda"
+  - id: C_REFUTADOR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "quem refuta"
+edges:
+  - from: D_SUPERSEDER_VIVO
+    to: D_ALVO_VIVO
+    edge_type: SUPERSEDES
+  - from: D_SUPERSEDER_VIVO
+    to: Q_RESPONDIDA
+    edge_type: SUPERSEDES
+  - from: D_SUPERSEDER_VIVO
+    to: D_JA_RECONCILIADO
+    edge_type: SUPERSEDES
+  - from: D_SUPERSEDER_VIVO
+    to: Q_JA_FECHADA
+    edge_type: SUPERSEDES
+  - from: C_ABERTO_QUE_SUPERSEDE
+    to: C_SUPERSEDER_ABERTO
+    edge_type: SUPERSEDES
+  - from: C_REFUTADOR
+    to: C_SO_REFUTES
+    edge_type: REFUTES

@@ -867,7 +867,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: confirmed
+    status: superseded
     verified_at: 2026-07-28
     verified_against: env-e-toolset-do-sdk-medidos
     label: "P0-P9 fecharam QUEM entra e NAO tocaram O QUE se pode fazer. PERMISSION_MODE=bypassPermissions seguia vivo e `bridge:invoke` era tudo-ou-nada: toda identidade autenticada executava irrestrito. Sem diferenciar capacidade, o flip so trocou 'quem tem o segredo faz tudo' por 'quem tem identidade faz tudo' — melhor (revogavel, nominal, auditavel) mas nao MENOS PODER"
@@ -1780,7 +1780,7 @@ edges:
     edge_type: SUPERSEDES
   - from: D_org_born_on_demand
     to: Q_seven_orgs_still_empty
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: E_dormant_privileged_duplicate
     to: D_org_born_on_demand
     edge_type: SUPPORTS
@@ -1810,7 +1810,7 @@ edges:
     edge_type: SUPPORTS
   - from: D_pull_serves_history_not_queue
     to: D_downstream_by_pull
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: C_org_token_has_no_org_claim
     to: D_pull_serves_history_not_queue
     edge_type: CONSTRAINS

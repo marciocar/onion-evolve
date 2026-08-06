@@ -192,6 +192,11 @@ END {
   for (i = 1; i <= ne; i++) {
     deg[efrom[i]]++; deg[eto[i]]++
     if (etype[i] == "REFUTES")     refutedBy[eto[i]]++
+    # SUPERSEDES só ACUSA se o superseder está VIVO (confirmed). Superseder `open` significa relação
+    # ainda não assentada — e o alvo legitimamente segue confirmado até que ela assente. Medido: dos 15
+    # alvos não-reconciliados do corpus, 1 (E_engine_measured) tem superseder `open`; acusá-lo seria
+    # cobrar reconciliação de uma superação que ninguém fechou.
+    if (etype[i] == "SUPERSEDES" && nstatus[efrom[i]] == "confirmed") supersededByLive[eto[i]]++
     if (etype[i] == "TRANSITIONS") { transOut[efrom[i]]++; transIn[eto[i]]++ }
     if (etype[i] == "HAS_STATE")   ownedState[eto[i]]++
     if (etype[i] == "TRACES_TO")   traceOut[efrom[i]]++
@@ -266,6 +271,36 @@ END {
         printf "             ∟ alvo: %s\n", label[eto[i]]
       }
     if (!found) print "  (nenhuma — grafo sem auto-correções registradas)"
+
+    # ⚠ ALVO NÃO-RECONCILIADO — o buraco que a INTEGRIDADE não cobre.
+    #
+    # POR QUE EXISTE (medido 2026-08-05): a linha 438 cobra contradição SÓ para REFUTES. SUPERSEDES
+    # passa em silêncio — e de 137 arestas SUPERSEDES no corpus, 15 apontam para um alvo que segue
+    # `confirmed` ou `open`. Duas decisões de impacto 5 vivem hoje superadas e confirmadas ao mesmo
+    # tempo, sem um único aviso.
+    #
+    # POR QUE ⚠ E NÃO ✗ (a refutação que forjou esta forma): o remédio óbvio — virar o status —
+    # PRODUZ DADO ERRADO em boa parte dos casos. `statusFactor(superseded)` = 0.2 corta 80% da
+    # atenção e a linha 226 tira o nó do frescor; 6 dos 15 alvos estão no top-10 do próprio grafo e
+    # sairiam. Há casos em que o superseder apenas REFINA (o alvo segue vigente — é `CONSTRAINS`,
+    # já no enum da linha 148 e idioma dominante no grafo do M2: 43 CONSTRAINS contra 14 SUPERSEDES)
+    # e casos em que o alvo era PERGUNTA respondida (fecha como `done`, não como história superada).
+    # Um gate HARD que compra verde CORROMPENDO o grafo é o verde falso invertido. Por isso: nomeia,
+    # não reprova. `problems` fica intocado.
+    #
+    # PROMOÇÃO A ✗ HARD: gated. Gatilho escrito — um 16º caso aparecer DEPOIS da triagem dos 15.
+    swarn = 0
+    for (i = 1; i <= nn; i++) {
+      id = order[i]
+      if (supersededByLive[id] > 0 && (nstatus[id] == "confirmed" || nstatus[id] == "open")) {
+        if (ntype[id] == "question")
+          printf "  ⚠ %s: pergunta RESPONDIDA segue status=%s — fechar como `done` (respondida ≠ superada)\n", id, nstatus[id]
+        else
+          printf "  ⚠ %s: recebe SUPERSEDES e segue status=%s — reconciliar: `superseded` se deixou de valer · `CONSTRAINS` se o superseder apenas REFINA · ou justificar por escrito\n", id, nstatus[id]
+        swarn++
+      }
+    }
+    if (found && swarn == 0) print "  ✅ nenhum alvo de SUPERSEDES ficou por reconciliar"
     print ""
   }
 

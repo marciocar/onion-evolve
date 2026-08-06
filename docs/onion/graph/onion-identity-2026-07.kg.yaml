@@ -1044,7 +1044,7 @@ edges:
     edge_type: DEPENDS_ON
   - from: C_NAME_SLICES
     to: C_CATEGORY_UNNAMED
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: Q_NORTHSTAR
     to: C_NS2_PORTABLE
     edge_type: DEPENDS_ON

@@ -106,7 +106,7 @@ nodes:
   - id: Q_wwebjs_unread
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 1.0
     label: "GAP MAIS CARO: o whatsapp-sender NAO esta clonado localmente (repo privado marciocar/whatsapp-sender). Tudo sobre client.js/login.js/send.js (exit codes, o que o stdout devolve, se da p/ saber status da sessao SEM subir o Chromium) veio do PROMPT, nao de LEITURA. Isto decide se o contrato minimo tem 2 operacoes ou 1 — e alimenta o criterio de retracao"
@@ -115,7 +115,7 @@ nodes:
   - id: Q_no_consumer
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 1.0
     label: "NENHUM CONSUMIDOR REAL NOMEADO: a regra (c) do Teste do Eixo ('o consumidor precisa ser CEGO ao provider') nao tem sujeito enquanto ninguem chama getWhatsApp(). Sem 1o consumidor e abstracao sem cliente. Candidatos a NOMEAR (nao presumir): notificacao de PR/CI mergeado; alerta de queda/sessao longa na VPS (hoje ntfy); aviso do hook 'you have mail'"
@@ -281,7 +281,7 @@ nodes:
   - id: C_engine_decision_reopened
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
     impact: 3
     confidence: 0.8
     verified_at: 2026-08-01
@@ -376,13 +376,13 @@ edges:
     edge_type: SUPPORTS
   - from: D_resolve_is_contract
     to: D_interface_v01
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: E_lid_addressing_root_cause
     to: C_engine_decision_reopened
     edge_type: SUPPORTS
   - from: C_engine_decision_reopened
     to: E_engine_measured
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: C_first_message_never_delivered
     to: E_gatilho_fechado
     edge_type: REFUTES
