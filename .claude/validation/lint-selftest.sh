@@ -3460,7 +3460,12 @@ run_review_artifact_selftests() {
     ) 2>/dev/null
   }
   # O hash que o helper vai calcular, computado do MESMO jeito (sem o dir de review).
-  _sha_of() { ( cd "$1" && git diff main HEAD -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64 ); }
+  # A FORMA CANÔNICA TEM DE SER A MESMA DOS DOIS LADOS — e este teste provou que importa: sem as
+  # flags, o hash do fixture divergia do hash do helper e (c)/(e) reprovavam por CADUCO. É o mesmo
+  # que aconteceria a quem tem `diff.noprefix` ou `core.abbrev` no ~/.gitconfig: artefato nasce
+  # caduco sem pista do motivo (medido: 3 configs comuns, 3 hashes distintos para o MESMO diff).
+  _sha_of() { ( cd "$1" && git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                  main HEAD -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64 ); }
   _art() {  # $1=dir $2=sha $3=extra-campos(0/1)
     { printf -- '---\n'
       printf 'reviewed_diff_sha256: %s\n' "$2"
@@ -3469,11 +3474,16 @@ run_review_artifact_selftests() {
       fi
       printf -- '---\n\n# revisao\n'
     } > "$1/docs/evolution/review/feat-x.md"
+    # COMMITA — o gate exige resíduo em HEAD, não arquivo em disco. Antes o teste era `-f` e um
+    # artefato untracked passava: o "resíduo auditado por terceiro" podia nunca sair da máquina do
+    # autor (achado da revisão adversarial). O commit NÃO muda o hash: o dir de review é excluído.
+    ( cd "$1" && git add -A docs/evolution/review \
+      && git -c user.email=t@t -c user.name=t commit -qm "review" ) 2>/dev/null
   }
   # PR simulado pelo caminho REAL do CI (evento + ref), não por backdoor de teste.
   # OS DOIS MODOS, e o TSV vem PRIMEIRO de propósito: é o que `check_review_artifact` consome. Testar
   # só o humano foi o defeito que deixou a guarda de vacuidade da REGRA 55 verde com o parser morto
-  # (2026-08-06) — e eu o repeti AQUI, no mesmo dia. Quem pegou foi a REGRA 57, não uma releitura.
+  # (2026-08-06) — e eu o repeti AQUI, no mesmo dia. Quem pegou foi o consumed-mode-check.sh (instrumento, NÃO regra), não uma releitura minha.
   _run() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${helper}" "$1" --format=tsv 2>&1 ); }
   _run_humano() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${helper}" "$1" 2>&1 ); }
 
@@ -3497,9 +3507,13 @@ run_review_artifact_selftests() {
   #     "acusa certo" de "acusa sempre".
   _mk_pr_repo
   _art "${d}" "$(_sha_of "${d}")" 1
+  # Exige a EVIDÊNCIA do caminho feliz, não só rc=0: um mutante que forçasse BRANCH=HEAD sairia 0 por
+  # FORA DE ESCOPO e esta asserção passaria decorativa — foi assim que o CI ficou cego (achado da
+  # revisão adversarial). O modo humano é usado só aqui, para ler a frase; o veredito é o do TSV.
   rc=0; out="$(_run "${d}")" || rc=$?
-  if [ "${rc}" -eq 0 ]; then
-    record_pass "review-artifact: (c) artefato casando com o diff → passa (não reprova por reflexo)"
+  local outh; outh="$(_run_humano "${d}")" || true
+  if [ "${rc}" -eq 0 ] && printf '%s' "${outh}" | grep -q 'revisão registrada'; then
+    record_pass "review-artifact: (c) artefato casando → passa PELO CAMINHO CERTO (não por fora de escopo)"
   else record_fail "review-artifact: (c) artefato válido" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
 
@@ -3526,13 +3540,49 @@ run_review_artifact_selftests() {
   rm -rf "${d}"
 
   # (f) ISENÇÃO ovo-galinha: PR que edita o próprio revisor. CONTADA, nunca silenciosa.
-  _mk_pr_repo
-  ( cd "${d}" && mkdir -p .github/workflows && printf 'on: pull_request\n' > .github/workflows/onion-review.yml \
-    && git add -A && git -c user.email=t@t -c user.name=t commit -qm revisor ) 2>/dev/null
+  # A isenção ficou ESTRITA: só vale quando o diff é EXCLUSIVAMENTE o workflow. Antes bastava TOCAR
+  # o arquivo — medido, um PR de 52 arquivos com uma linha nele saía integralmente isento. Por isso
+  # esta sandbox ramifica de main SEM outra mudança.
+  d="$(mktemp -d)"
+  ( cd "${d}"
+    git init -q -b main .
+    mkdir -p .github/workflows docs/evolution/review
+    printf 'v1\n' > a.sh
+    git add -A && git -c user.email=t@t -c user.name=t commit -qm base
+    git branch -q feat/x && git checkout -q feat/x
+    printf 'on: pull_request\n' > .github/workflows/onion-review.yml
+    git add -A && git -c user.email=t@t -c user.name=t commit -qm revisor ) 2>/dev/null
   rc=0; out="$(_run_humano "${d}")" || rc=$?
   if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'ovo-galinha'; then
     record_pass "review-artifact: (f) PR que edita o próprio revisor → isento, e a isenção é CONTADA"
   else record_fail "review-artifact: (f) isenção ovo-galinha" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (h) A FORMA DO CI — HEAD DESTACADO. É o caso que estava CEGO e que nenhum fixture reproduzia:
+  #     `onion-validate.yml` faz checkout com `ref: head.sha`, então `git rev-parse --abbrev-ref HEAD`
+  #     devolve "HEAD" e a guarda saía por `detached-head` ANTES do ramo escrito PARA o CI. Resultado
+  #     medido em 2026-08-06: a REGRA 56 nunca executava no único caminho que não depende do autor
+  #     lembrar — o gate contra o gatilho social dependia do gatilho social. Sem esta asserção, a
+  #     correção pode ser desfeita sem ninguém ver.
+  _mk_pr_repo
+  ( cd "${d}" && git checkout -q --detach ) 2>/dev/null
+  rc=0
+  out="$( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
+          bash "${helper}" "${d}" --format=tsv 2>&1 )" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'ARTEFATO-AUSENTE'; then
+    record_pass "review-artifact: (h) HEAD destacado + GITHUB_HEAD_REF (a forma do CI) → JULGA (não sai por fora de escopo)"
+  else record_fail "review-artifact: (h) forma do CI" "a regra não roda no CI: rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (i) ISENÇÃO VISÍVEL NO MODO TSV — o modo que o lint consome. Antes, `_skip` só alimentava uma
+  #     variável impressa no modo humano: em TSV toda isenção era ZERO BYTE, e o wire-in trata vazio
+  #     como "nada a relatar". Cinco classes de silêncio foram medidas assim. É a mesma família de
+  #     defeito que este ciclo cura, cometida DENTRO da cura.
+  _mk_pr_repo
+  rc=0; out="$( cd "${d}" && bash "${helper}" "${d}" --format=tsv 2>&1 )" || rc=$?
+  if printf '%s' "${out}" | grep -q 'ISENCAO'; then
+    record_pass "review-artifact: (i) isenção aparece no modo TSV (o que o lint consome), não só no humano"
+  else record_fail "review-artifact: (i) isenção em TSV" "isenção invisível no modo consumido: out=${out}"; fi
   rm -rf "${d}"
 
   # (g) (MUT) sem a comparação de hash, o CADUCO passa — prova que o amarre é load-bearing e não
@@ -3617,13 +3667,18 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (j) gh pr merge/create → aponta a FONTE do veredito (o verde do revisor e soft-pass)"
   else record_fail "empty-result-guard: (j) merge sem fonte" "nao reagiu a gh pr merge/create"; fi
 
+  # A classe REAL de falso-positivo não é `gh pr checks` (que não CONTÉM a substring — a asserção
+  # antiga era tautológica). É MENÇÃO ao comando dentro de argumento/string: foi ela que fez o
+  # detector disparar 3× nos comandos de LEITURA da revisão adversarial de 2026-08-06, num canal
+  # onde todo disparo interrompe. Por isso os dois primeiros casos abaixo são os que importam.
   local mg_noisy=0
-  for v in '"gh pr checks 551"' '"gh pr view 551 --json state"' '"gh pr list --state open"'; do
+  for v in '"grep -rn \"gh pr merge\" .claude/hooks/"' '"echo proximo-passo-gh-pr-create-fill"' \
+           '"gh pr checks 551"' '"gh pr view 551 --json state"' '"gh pr list --state open"'; do
     out="$(_erg "${v}" '"saida"' || true)"
     if printf '%s' "${out}" | grep -qE 'MERGE-SEM-FONTE-LIDA|PR-SEM-PASSADA-ADVERSARIAL'; then mg_noisy=1; fi
   done
   if [ "${mg_noisy}" -eq 0 ]; then
-    record_pass "empty-result-guard: (k) gh pr checks/view/list → SILENCIOSO (ler a fonte nao pode ser punido)"
+    record_pass "empty-result-guard: (k) MENÇÃO ao comando (grep/echo) e verbos de leitura → SILENCIOSO"
   else record_fail "empty-result-guard: (k) anti-ruido do 5o" "disparou em verbo de LEITURA — ensinaria a ignorar o proprio aviso"; fi
 
   # (e) exit 2 quando dispara — é a ÚNICA via medida em que o stderr de PostToolUse chega ao modelo.

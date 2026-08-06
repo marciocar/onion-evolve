@@ -126,19 +126,22 @@ fi
 # merge — é impedir a DECLARAÇÃO FALSA ("mergeei, estava verde"). Mergear sem revisão continua
 # possível; mergear sem revisão SEM SABER, não.
 #
-# FALSO-POSITIVO É ESTRUTURALMENTE IMPOSSÍVEL: dispara em 100% dos `gh pr merge`/`gh pr create` e a
-# frase que imprime é sempre verdadeira — não julga o PR, aponta a fonte. É o oposto de um detector
-# heurístico, e por isso pode viver num canal (exit 2) onde todo disparo interrompe.
+# EU DECLAREI "falso-positivo estruturalmente impossível" E ESTAVA ERRADO — a revisão adversarial
+# fez o detector disparar TRÊS vezes nos próprios comandos de LEITURA dela (`grep -n "gh pr merge"`,
+# `echo "...gh pr create..."`, mensagem de commit). O `case` casava a substring em QUALQUER posição,
+# inclusive dentro de aspas. Num canal onde todo disparo interrompe, isso é fadiga — e o próprio
+# arquivo já alerta contra ela. Agora o casamento é ANCORADO EM INÍCIO DE COMANDO (começo da linha
+# ou depois de `;`/`&&`/`||`/`|`), como o detector (1) já fazia por proximidade.
 #
 # TETO DECLARADO: PostToolUse é posterior por definição — dispara DEPOIS do comando. Um PreToolUse
 # que negasse antes foi PROJETADO E REFUTADO em 2026-08-06 (N pós-cura = 0; ~1 em 3 merges seria
 # travado; e PreToolUse é substrato NÃO-VERIFICADO neste repo). Reabre só com um merge cego novo.
-case "$cmd" in
-  *"gh pr merge"*)
-    add 'MERGE-SEM-FONTE-LIDA: `onion-review` sai VERDE POR DESENHO quando o revisor falha (soft-pass) — `pass` ali NÃO significa que houve revisão. A fonte é a linha `onion-review-verdict` em `gh pr checks <N>`. Se você não leu ESSA linha, você não sabe se este PR foi revisado.' ;;
-  *"gh pr create"*)
-    add 'PR-SEM-PASSADA-ADVERSARIAL: abrir PR sem a passada adversarial deixa a revisão para um CI que estoura turnos justamente nos PRs grandes. O artefato de revisão é exigido pela REGRA 56 (`docs/evolution/review/<branch>.md`) — se ele não existe, o gate vai acusar e você vai descobrir tarde.' ;;
-esac
+if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+merge([[:space:]]|$)'; then
+    add 'MERGE-SEM-FONTE-LIDA: `onion-review` sai VERDE POR DESENHO quando o revisor falha (soft-pass) — `pass` ali NÃO significa que houve revisão. A fonte é a linha `onion-review-verdict` em `gh pr checks <N>`. Se você não leu ESSA linha, você não sabe se este PR foi revisado.'
+fi
+if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+create([[:space:]]|$)'; then
+    add 'PR-SEM-PASSADA-ADVERSARIAL: abrir PR sem a passada adversarial deixa a revisão para um CI que estoura turnos justamente nos PRs grandes. O artefato de revisão é exigido pela REGRA 56 (`docs/evolution/review/<branch>.md`) — se ele não existe, o gate vai acusar e você vai descobrir tarde.'
+fi
 
 [ -n "$warn" ] || exit 0
 printf '🔎 guarda anti-fail-open do shell — o que você acabou de rodar pode MENTIR:%s\n' "$warn" >&2

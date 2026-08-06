@@ -41,7 +41,16 @@ cd "${REPO_ROOT}"
 
 REVIEW_DIR="docs/evolution/review"
 SKIPS=""
-_skip() { SKIPS="${SKIPS}${SKIPS:+ · }$1"; }
+# A ISENÇÃO É EMITIDA NOS DOIS MODOS. O comentário original dizia "declarar a ignorância é o
+# comportamento correto" — e isso só valia no modo HUMANO: em TSV o `_skip` alimentava uma variável
+# que ninguém imprimia, e `check_review_artifact` trata saída vazia como "nada a relatar". Cinco
+# classes de silêncio foram MEDIDAS assim (detached, sem gh, gh não autenticado, sem merge-base,
+# helper quebrado). É a mesma família do defeito que este ciclo cura, cometida DENTRO da cura.
+_skip() {
+  SKIPS="${SKIPS}${SKIPS:+ · }$1"
+  [ "${FORMAT}" = tsv ] && printf 'SOFT\tISENCAO\t.claude/validation/review-artifact-check.sh\tREGRA 56 não julgou este PR: %s — a guarda declara que NÃO SABE, em vez de passar em silêncio\n' "$1"
+  return 0
+}
 
 _out() {  # $1=sev $2=tag $3=path $4=msg
   if [ "${FORMAT}" = tsv ]; then printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"
@@ -51,7 +60,14 @@ _out() {  # $1=sev $2=tag $3=path $4=msg
 [ "${FORMAT}" = tsv ] || printf '══ REVIEW-ARTIFACT — este PR tem resíduo de revisão? ══\n'
 
 # ── ESCOPO ────────────────────────────────────────────────────────────────────────────────────
-BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
+# NO CI O HEAD É DESTACADO — e descobrir isso custou a 4ª ocorrência da mesma família de erro.
+# `onion-validate.yml` faz checkout com `ref: head.sha`, então `git rev-parse --abbrev-ref HEAD`
+# devolve "HEAD" e a guarda saía por `detached-head` ANTES de chegar ao ramo escrito PARA o CI.
+# Resultado medido: a REGRA 56 nunca executava no único caminho que não depende do autor lembrar —
+# o gate contra o gatilho social dependia do gatilho social. `GITHUB_HEAD_REF` traz o nome real do
+# branch no evento pull_request e por isso é consultado PRIMEIRO.
+BRANCH="${GITHUB_HEAD_REF:-}"
+[ -n "${BRANCH}" ] || BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
 DEFAULT="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || true)"
 [ -n "${DEFAULT}" ] || DEFAULT=main
 
@@ -83,6 +99,15 @@ if [ -z "${PR_NUM}" ]; then
   exit 0
 fi
 
+# ADOTANTE FICA DE FORA — e isto é correção do episódio de HOJE, não precaução: uma REGRA HARD
+# validada só no core acusou 11 falsos no 1º adotante que a recebeu. Esta regra cobra um RITUAL DO
+# CORE (a passada adversarial sobre o framework); o adotante tem o dele. `role: adopted|hub`.
+if grep -qE '^(role:[[:space:]]*(adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then
+  _skip "repo-derivado(role-adopted/hub)"
+  [ "${FORMAT}" = tsv ] || printf '  ⊘ fora de escopo: %s\n' "${SKIPS}"
+  exit 0
+fi
+
 BASE="$(git merge-base "origin/${DEFAULT}" HEAD 2>/dev/null || git merge-base "${DEFAULT}" HEAD 2>/dev/null || true)"
 if [ -z "${BASE}" ]; then
   _skip "sem-merge-base-com-${DEFAULT}"
@@ -92,7 +117,10 @@ fi
 # ISENÇÃO DECLARADA, vocabulário FECHADO: um PR que edita o próprio revisor não pode ser gateado por
 # ele — a action se auto-pula quando o workflow difere da branch default (ovo-galinha estrutural,
 # documentado em .github/workflows/onion-review.yml). Isenção CONTADA, nunca silenciosa.
-if git diff --name-only "${BASE}" HEAD 2>/dev/null | grep -qx '.github/workflows/onion-review.yml'; then
+# SÓ quando o diff é EXCLUSIVAMENTE o workflow. Antes bastava TOCAR o arquivo: medido, um PR de 52
+# arquivos com uma linha nele saía integralmente isento — buraco que não exige má-fé.
+if [ -z "$(git diff --name-only "${BASE}" HEAD 2>/dev/null | grep -vx '.github/workflows/onion-review.yml' | head -1)" ] \
+   && git diff --name-only "${BASE}" HEAD 2>/dev/null | grep -qx '.github/workflows/onion-review.yml'; then
   _skip "PR-edita-o-proprio-revisor(ovo-galinha)"
   [ "${FORMAT}" = tsv ] || printf '  ⊘ fora de escopo: %s\n' "${SKIPS}"
   exit 0
@@ -100,17 +128,28 @@ fi
 
 # ── O DIFF REVISADO ───────────────────────────────────────────────────────────────────────────
 # O diretório de review sai do hash, senão o artefato mudaria o hash que ele mesmo declara.
-DIFF_SHA="$(git diff "${BASE}" HEAD -- . ":(exclude)${REVIEW_DIR}" 2>/dev/null | sha256sum | cut -c1-64)"
+# HASH CANÔNICO — sem isto, `diff.noprefix` ou `core.abbrev` no ~/.gitconfig de quem carimba produz
+# um sha diferente de quem valida, e o artefato nasce CADUCO sem nenhuma pista do motivo. Medido:
+# três configs pessoais comuns, três hashes distintos para o MESMO diff.
+DIFF_SHA="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+              "${BASE}" HEAD -- . ":(exclude)${REVIEW_DIR}" 2>/dev/null | sha256sum | cut -c1-64)"
 SLUG="$(printf '%s' "${BRANCH}" | tr '/' '-')"
 ART="${REVIEW_DIR}/${SLUG}.md"
 
-if [ ! -f "${ART}" ]; then
+# COMMITADO, não só em disco. O cabeçalho promete "artefato commitado" e o teste era `-f` — arquivo
+# untracked passava, e o "resíduo auditado por terceiro" podia nunca sair do disco do autor.
+if ! git cat-file -e "HEAD:${ART}" 2>/dev/null; then
   _out HARD ARTEFATO-AUSENTE "${ART}" "PR #${PR_NUM} aberto e sem resíduo de revisão. Rode a passada adversarial e registre o resultado em ${ART} (campos: reviewed_diff_sha256 · findings_total · findings_real · tokens · duration_min · verdict). O hash deste diff é ${DIFF_SHA}."
   [ "${FORMAT}" = tsv ] || printf '  (o verde do onion-review é soft-pass — não substitui esta passada)\n'
   exit 1
 fi
 
-_field() { sed -n "s/^$1:[[:space:]]*//p" "${ART}" | head -1 | tr -d '"'; }
+# SÓ O FRONTMATTER, e campo numérico TEM de ser número. A versão anterior lia o arquivo inteiro com
+# `sed -n s/^campo://p`: um `tokens: gastei uns poucos` escrito na PROSA satisfazia o gate. Como esses
+# campos SÃO o dado da reavaliação em N=10, aceitar string arbitrária significava chegar ao 10º PR com
+# ledger não-numérico — a mesma classe de "declarei medido" que este ciclo existe para curar.
+_field() { awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' "${ART}" \
+             | sed -n "s/^$1:[[:space:]]*//p" | head -1 | tr -d '"'; }
 DECL="$(_field reviewed_diff_sha256)"
 
 if [ -z "${DECL}" ]; then
@@ -126,9 +165,11 @@ fi
 # reavaliada se os dados existirem. Sem eles, no 10º PR eu repetiria o erro que este ciclo cura —
 # declarar "medido" sem ledger. São exigidos, não sugeridos.
 FALTAM=""
-for f in findings_total findings_real tokens duration_min verdict; do
-  [ -n "$(_field "${f}")" ] || FALTAM="${FALTAM}${FALTAM:+, }${f}"
+for f in findings_total findings_real tokens duration_min; do
+  v="$(_field "${f}")"
+  case "${v}" in ''|*[!0-9]*) FALTAM="${FALTAM}${FALTAM:+, }${f}(nao-numerico)" ;; esac
 done
+[ -n "$(_field verdict)" ] || FALTAM="${FALTAM}${FALTAM:+, }verdict"
 if [ -n "${FALTAM}" ]; then
   _out HARD CAMPO-DE-REAVALIACAO-AUSENTE "${ART}" "faltam: ${FALTAM}. São o dado da reavaliação em N=10 — sem eles a cadência 'todo PR' não pode ser julgada, e a falsificação declarada deste mecanismo é justamente chegar ao 10º PR sem os campos."
   exit 1
