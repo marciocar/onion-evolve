@@ -1,0 +1,29 @@
+# LEDGER POR ITEM — corrida serial do M8, 2026-08-06
+#
+# PROVENIÊNCIA, declarada porque ela é o achado: os valores vêm dos blocos `usage` de cada
+# invocação da ferramenta Agent (subagent_tokens · tool_uses · duration_ms), que é medição do
+# runtime, não estimativa. MAS o arquivo de trabalho onde foram acumulados vivia em /tmp e
+# EVAPOROU num restart de sessão — este ledger foi RECONSTRUÍDO do transcript da sessão.
+#
+# POR QUE ISTO EXISTE: a síntese declarava "custo medido POR ITEM, nunca estimado" e commitou
+# só o AGREGADO. Revisão adversarial (2026-08-06) mostrou que nada de 697.710/78/699 era
+# reconstituível por ninguém — inclusive pelo autor, que ao tentar refazer descobriu que o
+# arquivo já não existia. Uma síntese cuja tese é "medir em vez de estimar" não tinha deixado a
+# medição auditável. [[fix-must-become-mechanism]]
+#
+# ORDEM = ordem REAL de execução (atenção desc). Ela importa e estava ambígua: o
+# `kg-radar.sh --freshness-tsv` DOCUMENTA "ORDEM: atenção desc" e NÃO ordena (bug pré-existente,
+# medido na mesma revisão) — quem executou aplicou `sort -t$'\t' -k7 -rn` por fora. Sem este
+# registro, um leitor não conseguia distinguir "o run reordenou" de "os rótulos estão trocados",
+# e a conclusão-manchete depende de qual item rodou primeiro.
+#
+# id	veredito	tokens	tool_uses	duration_ms	atencao	nota
+ENT_substrate	DRIFTED	73856	11	86444	15.00	bridge.onionevolve.com no label, DNS resolve, sem vhost Caddy (curl 000)
+ENT_whatsapp	DRIFTED	83316	15	132214	14.40	WAHA vivo; whatsapp-sender inexistente no host (prova NEGATIVA full-filesystem)
+ENT_logto	CONFIRMED	66332	4	25243	14.25	Logto 1.41.0 healthy; OIDC 200; JWKS 200 (health-check de container)
+D_framing_catalogo	CONFIRMED	75069	5	39987	13.50	doutrina cita o no verbatim; zero artefato de registry/dashboard
+D_whatsapp_dual_waha_default	DRIFTED	82230	11	103391	12.00	o lado MANTER whatsapp-sender do dual nao existe mais
+D_email_plus_logto_connector	UNVERIFIABLE	67382	3	36887	12.00	no afirma so DIRECAO; worker recusou medicao substituta
+D_f1_whatsapp_dogfood_first	CONFIRMED	79020	5	90994	10.80	.claude/utils/whatsapp NAO existe; sessao WhatsApp pareada em disco
+D_structured_plan_and_doctrine	DRIFTED	84995	13	82706	9.00	doutrina promovida por bypass do F0; A_analysis_structure segue open
+C_dissent_auth_transversal	CONFIRMED	85510	11	100694	4.20	dissent segue valido e aberto; sintoma previsto nao materializou

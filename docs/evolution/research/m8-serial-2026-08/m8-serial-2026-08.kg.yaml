@@ -18,7 +18,7 @@ nodes:
   - id: E_FALLBACK_SERIAL_RODA
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -27,16 +27,26 @@ nodes:
     label: "O FALLBACK SERIAL RODA — e esta era a pergunta mais valiosa do menu inteiro. O orchestration-fallback.md estava escrito, testavel, e NUNCA havia sido executado nem uma vez; o proprio W3 dizia que 'se o fallback nao rodar, a rede de seguranca da portabilidade e ficcao — o maior achado possivel do menu'. NAO E FICCAO: os 4 passos do fragmento (health-check do substrato, aviso obrigatorio, iteracao serial com Agent mantendo o mesmo schema, tratamento de falha parcial e fan-in) executaram como escritos, 9 de 9 itens, zero SKIP. RESSALVA DECLARADA, porque o proprio fragmento a exige: o Passo 0 manda acionar o fallback SO se o Workflow estiver indisponivel, e aqui ele estava DISPONIVEL. Foi teste forcado, nao degradacao real — e fingir que o substrato falhou seria a mesma mentira que o fragmento proibe ('nunca fingir paralelismo inexistente' vale nos dois sentidos). O que fica provado e o CAMINHO DE CODIGO, nao o gatilho automatico: o gatilho segue nao-exercido"
     trace: ".claude/commands/common/prompts/orchestration-fallback.md"
 
-  - id: E_SERIAL_ACUMULA_CONTEXTO
+  - id: E_DELTA_ENTRE_ITEM2_E_ITEM3
     node_type: evidence
     layer: audit
     plane: DEV
-    impact: 5
-    confidence: 0.9
+    impact: 3
+    confidence: 1.0
     status: confirmed
     verified_at: 2026-08-06
-    verified_against: "item2-15-tools-132s-contra-item3-4-tools-25s-com-notas-repassadas"
-    label: "O ACHADO QUE NENHUMA HIPOTESE PREVIA, e que muda o EIXO da comparacao: o serial tem uma CAPACIDADE que o paralelo nao tem. Medido nesta corrida: o item 2 (ENT_whatsapp) gastou 15 tool-uses e 132s porque teve de descobrir o ambiente sozinho — que `docker ps` sem sudo da permission denied e `sudo -n docker ps` funciona. Repassei essa descoberta ao item 3 (ENT_logto) como NOTA DE AMBIENTE, e ele gastou 4 tool-uses e 25s: 5x mais rapido, 73% menos ferramentas. Workers PARALELOS sao cegos entre si POR CONSTRUCAO e redescobrem o mesmo terreno N vezes; o serial acumula. CONSEQUENCIA DE DESENHO: 'serial vs paralelo' nao e 'mesmo resultado, mais lento' — sao dois regimes com trade-offs diferentes (o paralelo compra wall-clock, o serial compra contexto compartilhado), e o M8 foi especificado comparando so custo e qualidade. O eixo estava incompleto. Onde a descoberta de ambiente e cara e compartilhada, o serial pode ser mais BARATO em tokens, nao so mais lento"
+    verified_against: "usage-por-item-do-runtime-ver-ledger-por-item.tsv"
+    label: "A MEDICAO, sem a inferencia junto: o item 2 (ENT_whatsapp) gastou 15 tool-uses e 132.214ms; o item 3 (ENT_logto), que recebeu como NOTA DE AMBIENTE o que o item 2 descobriu (`docker ps` sem sudo da permission denied; `sudo -n docker ps` funciona), gastou 4 tool-uses e 25.243ms. Delta: 5,3x em tempo, 73% em ferramentas. ORDEM REAL de execucao registrada no ledger — o --freshness-tsv DOCUMENTA 'atencao desc' e NAO ordena (bug pre-existente), entao quem executou aplicou sort por fora; sem o ledger nao dava para distinguir isso de rotulos trocados, e a inferencia se INVERTERIA se a ordem fosse outra"
+    trace: "docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
+
+  - id: C_SERIAL_ACUMULA_CONTEXTO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.4
+    status: open
+    label: "APOSTA REBAIXADA PELA REVISAO ADVERSARIAL (2026-08-06), e o rebaixamento e o registro: a versao original afirmava como EVIDENCIA CONFIRMADA que 'o serial acumula contexto e o paralelo e cego', usando o delta 15->4 como prova. NAO E PROVA — os dois itens sao nos DIFERENTES EM ESPECIE DE TAREFA: ENT_whatsapp exige PROVA NEGATIVA (demonstrar que algo nao existe em lugar nenhum do host, caro por natureza), ENT_logto e health-check de container que responde. E a nota repassada economiza UMA OU DUAS chamadas de permissao, nao onze. VARIAVEL CONFUNDIDA, n=1. O QUE A EVIDENCIA SUSTENTA: repassar a nota eliminou a redescoberta do fato sudo/docker; o restante do delta NAO e atribuivel. Direcao plausivel, MAGNITUDE DESCONHECIDA. O QUE FALTA para sustentar: A/B no MESMO no (ENT_whatsapp com e sem nota), ou notas alternadas nos 9 itens (n~4/5), ou — o mais barato — contar quantas das 15 chamadas do item 2 foram probes de permissao: se forem duas, a tese morre. CONSEQUENCIA SE VERDADEIRA: 'serial vs paralelo' teria um terceiro eixo (contexto compartilhado) que o M8 nao mediu"
 
   - id: E_CUSTO_ERRADO_POR_2X
     node_type: evidence
@@ -74,11 +84,11 @@ nodes:
     layer: audit
     plane: DEV
     impact: 3
-    confidence: 1.0
-    status: confirmed
+    confidence: 0.5
+    status: open
     verified_at: 2026-08-06
     verified_against: "frontmatter-desta-sintese"
-    label: "O GATILHO DO M6 FOI TESTADO NA PRIMEIRA OPORTUNIDADE E PASSOU. O contrato declarou: 'se a proxima sintese nascer SEM os quatro campos, ai — e so ai — mecanize a emissao automatica'. Esta e a proxima sintese, e ela NASCEU COM os quatro campos. Logo a emissao automatica segue GATED, com razao medida e nao com fe: o contrato escrito bastou. RESSALVA HONESTA, porque sem ela o teste vale pouco: quem escreveu o contrato e quem escreveu esta sintese sao o mesmo agente na mesma sessao — o teste real e a PROXIMA sintese, de outra sessao, que nao viu o contrato nascer. Este resultado e necessario, nao suficiente"
+    label: "O GATILHO DO M6 PASSOU POR FORMA, NAO POR SUBSTANCIA — e a revisao adversarial mostrou que o nó original (status confirmed, confidence 1.0) tratava isso como aprovacao limpa. NASCEU com os 4 campos: verdade literal. MAS DOIS DELES CARREGAVAM A GRANDEZA ERRADA: `duration_min` recebeu TEMPO-DE-AGENTE (12 min, soma dos 9 usage) quando o contrato define `elapsedMin`, tempo de RELOGIO (37 min) — fator 3 de diferenca, e runs Workflow futuros carimbarao wall-clock e serao comparados com este sem marcador; e `tokens` somou so os SUBAGENTES, quando o contrato pede `budget.spent()` (o run inteiro, incluindo o orquestrador). Pior: a sintese pos 12 no frontmatter e '37 min de relogio' no CORPO — o EXATO modo de falha que o contrato do M6 nomeia ('so a co-locacao no frontmatter responde'), cometido pela primeira sintese a cumpri-lo. CORRIGIDO: duration_min=37, agent_time_min=12 como campo proprio. O registro original abaixo fica porque o erro e o achado.\n\nTEXTO ORIGINAL: O GATILHO DO M6 FOI TESTADO NA PRIMEIRA OPORTUNIDADE E PASSOU. O contrato declarou: 'se a proxima sintese nascer SEM os quatro campos, ai — e so ai — mecanize a emissao automatica'. Esta e a proxima sintese, e ela NASCEU COM os quatro campos. Logo a emissao automatica segue GATED, com razao medida e nao com fe: o contrato escrito bastou. RESSALVA HONESTA, porque sem ela o teste vale pouco: quem escreveu o contrato e quem escreveu esta sintese sao o mesmo agente na mesma sessao — o teste real e a PROXIMA sintese, de outra sessao, que nao viu o contrato nascer. Este resultado e necessario, nao suficiente"
 
   - id: C_TESTE_FORCADO_NAO_PROVA_O_GATILHO
     node_type: claim
@@ -93,7 +103,10 @@ edges:
     to: E_FALLBACK_SERIAL_RODA
     edge_type: SUPPORTS
   - from: A_M8_SERIAL_RUN
-    to: E_SERIAL_ACUMULA_CONTEXTO
+    to: E_DELTA_ENTRE_ITEM2_E_ITEM3
+    edge_type: SUPPORTS
+  - from: E_DELTA_ENTRE_ITEM2_E_ITEM3
+    to: C_SERIAL_ACUMULA_CONTEXTO
     edge_type: SUPPORTS
   - from: A_M8_SERIAL_RUN
     to: E_CUSTO_ERRADO_POR_2X
@@ -104,9 +117,13 @@ edges:
   - from: C_TESTE_FORCADO_NAO_PROVA_O_GATILHO
     to: E_FALLBACK_SERIAL_RODA
     edge_type: CONSTRAINS
-  - from: E_SERIAL_ACUMULA_CONTEXTO
+  # A aresta CAUSES anterior (acumulo -> erro de estimativa) estava semanticamente INVERTIDA: se
+  # acumular contexto barateia, ele empurraria o custo para BAIXO, tornando os 697k mais dificeis de
+  # explicar, nao menos. Nenhuma das duas evidencias causa a outra. O que existe de fato e a
+  # LIMITACAO: a aposta do acumulo, se verdadeira, torna a projecao linear (serial x 2) um PISO.
+  - from: C_SERIAL_ACUMULA_CONTEXTO
     to: E_CUSTO_ERRADO_POR_2X
-    edge_type: CAUSES
+    edge_type: CONSTRAINS
   - from: C_CONTRATO_M6_NAO_COBRE_SERIAL
     to: C_GATILHO_M6_DISPAROU_VERDE
     edge_type: CONSTRAINS

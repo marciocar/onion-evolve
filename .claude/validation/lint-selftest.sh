@@ -417,6 +417,34 @@ run_kg_freshness_selftests() {
     record_pass "kg-freshness: (l) --freshness-tsv com 11 colunas em todas as linhas (contrato de máquina)"
   else record_fail "kg-freshness: (l) forma do TSV" "linhas fora do contrato: ${badcols}"; fi
 
+  # (l2) ORDEM — a fila sai por ATENÇÃO DESCENDENTE, como o cabeçalho do bloco sempre declarou.
+  # POR QUE EXISTE (achado de revisão adversarial, 2026-08-06): o comentário prometia
+  # "ORDEM: atenção desc — MESMA fórmula do --radar" desde que o bloco nasceu, e a implementação
+  # iterava ORDEM DE ARQUIVO — o `asorti()` só existia no --radar. O instrumento que esta casa usa
+  # para medir declarado-vs-verificado tinha, ele mesmo, uma declaração não verificada, e por meses.
+  # O dano não é cosmético: o consumidor corta em `--top N`, e cortar sobre ordem errada DESCARTA o
+  # nó de maior atenção. Numa corrida serial, a ordem ainda decide qual worker aprende primeiro.
+  local desordem
+  desordem="$(printf '%s\n' "${tsv}" | awk -F'\t' 'NF==11 { if (NR>1 && $7 > prev + 0.0001) bad++; prev=$7 } END { print bad+0 }')"
+  if [ "${desordem}" = "0" ]; then
+    record_pass "kg-freshness: (l2) --freshness-tsv sai ordenado por atenção desc (o que o cabeçalho promete)"
+  else record_fail "kg-freshness: (l2) ordem do TSV" "${desordem} par(es) fora de ordem decrescente"; fi
+
+  # (l3) (MUT) a ordenação é LOAD-BEARING — sem o asorti a fila volta à ordem de arquivo.
+  # Sem este caso, (l2) passaria por acaso em qualquer fixture cuja ordem de arquivo já coincida
+  # com a de atenção — que é exatamente como o bug sobreviveu tanto tempo.
+  local dmut; dmut="$(mktemp -d)"; cp "${radar}" "${dmut}/r.sh"
+  sed -i 's/fn = asorti(att, fsorted, "@val_num_desc")/fn = 0/' "${dmut}/r.sh"
+  if grep -q 'fn = 0' "${dmut}/r.sh"; then
+    local mtsv; mtsv="$(bash "${dmut}/r.sh" "${fxu}" --freshness-tsv 2>/dev/null || true)"
+    if [ -z "${mtsv}" ]; then
+      record_pass "kg-freshness: (l3) (MUT) sem o asorti a fila some — a ordenação é load-bearing"
+    else record_fail "kg-freshness: (l3) (MUT)" "mutante ainda emitiu fila: ${mtsv}"; fi
+  else
+    record_fail "kg-freshness: (l3) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+  rm -rf "${dmut}"
+
   # (m) ESCOPO — nó com verdict OK ENTRA na fila. É a decisão que carrega o fluxo: o caso que
   # o motivou (C_ancestor_cap_zeroes_floors, no grafo do M2) tem carimbo do dia, alvo declarado,
   # os três vereditos passam — e mente. Filtrar por flagado nasceria cego ao caso fundador.
