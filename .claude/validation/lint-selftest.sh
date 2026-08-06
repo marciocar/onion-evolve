@@ -1521,12 +1521,37 @@ run_kg_trace_resolve_selftests() {
   #     Antes dela, o mutante saía 0 imprimindo ✅. Se este caso cair, o script voltou a poder
   #     mentir verde, que é pior do que não existir.
   local mut; mut="$(mktemp -d)"; cp "${helper}" "${mut}/m.sh"
-  sed -i 's|^  /\^    trace:/|  /^    NUNCA_CASA_XYZ:/|' "${mut}/m.sh"
+  # O padrão casado aqui TEM de acompanhar o do script — quando ele mudou de `^    trace:` para
+  # `^[[:space:]]+trace:`, este sed parou de casar e a guarda-da-guarda ACUSOU ("mutação não
+  # aplicada"), em vez de passar vazia. É o comportamento correto, e a razão de ela existir.
+  sed -i 's|/\^\[\[:space:\]\]+trace:/|/^NUNCA_CASA_XYZ:/|' "${mut}/m.sh"
   if grep -q 'NUNCA_CASA_XYZ' "${mut}/m.sh"; then
+    # TSV É O MODO QUE IMPORTA — e testar o outro foi o defeito desta suíte até 2026-08-06.
+    # A revisão adversarial mediu: com o parser cego, o modo humano saía 1 com ✗ VACUIDADE e o
+    # modo TSV saía 0 com saída vazia. O lint chama TSV (check_kg_trace_resolve). Ou seja: a
+    # guarda-da-guarda validava a superfície que ninguém usa em CI, e a REGRA 55 ficava VERDE
+    # com o parser morto. Agora os DOIS modos são exigidos, e o TSV vem primeiro de propósito.
+    local rct=0 outt
+    outt="$(bash "${mut}/m.sh" "${d}" --format tsv 2>&1)" || rct=$?
     rc=0; out="$(bash "${mut}/m.sh" "${d}" 2>&1)" || rc=$?
-    if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'VACUIDADE'; then
-      record_pass "kg-trace: (e) (MUT) parser cego → VACUIDADE + exit 1 (não mente verde)"
-    else record_fail "kg-trace: (e) (MUT) vacuidade" "parser morto passou: rc=${rc} out=${out}"; fi
+    if [ "${rct}" -eq 1 ] && printf '%s' "${outt}" | grep -q 'VACUIDADE' \
+       && [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'VACUIDADE'; then
+      record_pass "kg-trace: (e) (MUT) parser cego → VACUIDADE + exit 1 nos DOIS modos (tsv é o que o lint usa)"
+    else record_fail "kg-trace: (e) (MUT) vacuidade" "tsv: rc=${rct} out=${outt} · humano: rc=${rc} out=${out}"; fi
+
+    # (f) VACUIDADE NÃO PODE SER FALSA — corpus cujas âncoras são todas não-julgáveis por desenho
+    #     (um adotante com grafos ancorando por nome solto) tem JUDGED=0 com o parser PERFEITO.
+    #     Antes desta correção ele recebia "✗ o parser quebrou": diagnóstico mentiroso e HARD no
+    #     dia 1. Os contadores de skip provam que o parser leu — só há vacuidade quando NADA foi lido.
+    local d3; d3="$(mktemp -d)"; mkdir -p "${d3}/docs/onion/graph"
+    printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: C_SO_NOME_SOLTO\n    node_type: claim\n    layer: audit\n    plane: DEV\n    impact: 3\n    confidence: 1.0\n    status: confirmed\n    label: "ancora por nome solto — nao julgavel por desenho"\n    trace: "SYNTHESIS.md"\nedges:\n' \
+      > "${d3}/docs/onion/graph/so-nao-julgavel.kg.yaml"
+    ( cd "${d3}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+    rc=0; out="$(bash "${helper}" "${d3}" 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ] && ! printf '%s' "${out}" | grep -q 'VACUIDADE'; then
+      record_pass "kg-trace: (f) tudo não-julgável ≠ parser morto (não acusa vacuidade falsa)"
+    else record_fail "kg-trace: (f) vacuidade falsa" "rc=${rc} out=${out}"; fi
+    rm -rf "${d3}"
   else
     record_fail "kg-trace: (e) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi

@@ -581,6 +581,13 @@ check_kg_trace_resolve() {
   [ -n "${out}" ] || return 0
   while IFS=$'\t' read -r g nid ntype target verdict; do
     [ -n "${nid}" ] || continue
+    # VACUIDADE não é um nó com âncora quebrada — é o PARSER morto. Mensagem própria, senão o
+    # aviso sairia como "o nó PARSER aponta para (nenhum nó lido)", que confunde quem lê.
+    if [ "${verdict}" = "VACUIDADE" ]; then
+      violation "HARD" "${SCRIPT_DIR}/kg-trace-resolve.sh" \
+        "[trace-resolve/VACUIDADE] existe \`trace:\` no corpus e o parser não leu NADA — nem julgável, nem excluído. A guarda está cega: ela reportaria verde sem verificar coisa alguma (detalhe: bash .claude/validation/kg-trace-resolve.sh)"
+      continue
+    fi
     violation "HARD" "${REPO_ROOT}/${g}" \
       "[trace-resolve/${verdict}] ${nid} (${ntype}): \`trace:\` aponta para '${target}', que não existe — arquivo movido/renomeado? cite o caminho real (detalhe: bash .claude/validation/kg-trace-resolve.sh)"
   done <<< "${out}"
@@ -1744,7 +1751,14 @@ run_inventory_fixes() {
   # então o loop acima NÃO o alcança (a detecção R9 cobre suas contagens, não a
   # R16). Aplica o MESMO programa de frases canônicas + o fix de 'N skills' (forma
   # curta, seguro só aqui: ocorrência única canônica que espelha a R9 HARD).
-  if [ -f "${REPO_ROOT}/CLAUDE.md" ]; then
+  # ISENÇÃO OBRIGATÓRIA, e ela faltava: o laço acima honra inventory_scope_excluded, mas este
+  # ramo tratava o CLAUDE.md da raiz FORA dele — violando o invariante declarado no cabeçalho
+  # deste bloco ("o --fix NUNCA toca um arquivo que a detecção isenta").
+  # DANO MEDIDO em revisão adversarial (2026-08-06), com diff: num repo `role: adopted`, o
+  # CLAUDE.md da raiz é o doc de PRODUTO do cliente — a detecção corretamente o isenta, e o --fix
+  # gravava nele a contagem de skills do ONION, transformando uma frase verdadeira sobre o produto
+  # dele numa AFIRMAÇÃO FALSA. Corromper dado do adotante é pior que qualquer falso-positivo.
+  if [ -f "${REPO_ROOT}/CLAUDE.md" ] && ! inventory_scope_excluded "${REPO_ROOT}/CLAUDE.md"; then
     _apply_fix_file "${REPO_ROOT}/CLAUDE.md" "${prog}; s/[0-9]+( skills)/${skill}\1/g"
   fi
 }
