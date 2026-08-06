@@ -1,0 +1,115 @@
+meta:
+  id: m8-serial-2026-08
+  schema_version: "1"
+  baseline: 2026-08-01
+nodes:
+  - id: A_M8_SERIAL_RUN
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-06
+    verified_against: "execucao-direta-9-agents-seriais-com-usage-por-item"
+    label: "A CORRIDA SERIAL DO M8, lado serial executado em 2026-08-06 sobre docs/onion/graph/vps-shared-tools-2026-07.kg.yaml (9 nos da fila --freshness-tsv, ordenada por atencao). Contrato de worker identico ao paralelo (KgReverifySchema do /meta:kg-freshness), modelo sonnet/medium, READ-ONLY. Custo medido por item, nao estimado: 697.710 tokens, 78 tool-uses, 699s de tempo-de-agente, 37 min de relogio. Vereditos: 4 CONFIRMED, 4 DRIFTED, 1 UNVERIFIABLE"
+    trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+
+  - id: E_FALLBACK_SERIAL_RODA
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-06
+    verified_against: "9-de-9-itens-executados-pelos-4-passos-do-fragmento"
+    label: "O FALLBACK SERIAL RODA — e esta era a pergunta mais valiosa do menu inteiro. O orchestration-fallback.md estava escrito, testavel, e NUNCA havia sido executado nem uma vez; o proprio W3 dizia que 'se o fallback nao rodar, a rede de seguranca da portabilidade e ficcao — o maior achado possivel do menu'. NAO E FICCAO: os 4 passos do fragmento (health-check do substrato, aviso obrigatorio, iteracao serial com Agent mantendo o mesmo schema, tratamento de falha parcial e fan-in) executaram como escritos, 9 de 9 itens, zero SKIP. RESSALVA DECLARADA, porque o proprio fragmento a exige: o Passo 0 manda acionar o fallback SO se o Workflow estiver indisponivel, e aqui ele estava DISPONIVEL. Foi teste forcado, nao degradacao real — e fingir que o substrato falhou seria a mesma mentira que o fragmento proibe ('nunca fingir paralelismo inexistente' vale nos dois sentidos). O que fica provado e o CAMINHO DE CODIGO, nao o gatilho automatico: o gatilho segue nao-exercido"
+    trace: ".claude/commands/common/prompts/orchestration-fallback.md"
+
+  - id: E_SERIAL_ACUMULA_CONTEXTO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-06
+    verified_against: "item2-15-tools-132s-contra-item3-4-tools-25s-com-notas-repassadas"
+    label: "O ACHADO QUE NENHUMA HIPOTESE PREVIA, e que muda o EIXO da comparacao: o serial tem uma CAPACIDADE que o paralelo nao tem. Medido nesta corrida: o item 2 (ENT_whatsapp) gastou 15 tool-uses e 132s porque teve de descobrir o ambiente sozinho — que `docker ps` sem sudo da permission denied e `sudo -n docker ps` funciona. Repassei essa descoberta ao item 3 (ENT_logto) como NOTA DE AMBIENTE, e ele gastou 4 tool-uses e 25s: 5x mais rapido, 73% menos ferramentas. Workers PARALELOS sao cegos entre si POR CONSTRUCAO e redescobrem o mesmo terreno N vezes; o serial acumula. CONSEQUENCIA DE DESENHO: 'serial vs paralelo' nao e 'mesmo resultado, mais lento' — sao dois regimes com trade-offs diferentes (o paralelo compra wall-clock, o serial compra contexto compartilhado), e o M8 foi especificado comparando so custo e qualidade. O eixo estava incompleto. Onde a descoberta de ambiente e cara e compartilhada, o serial pode ser mais BARATO em tokens, nao so mais lento"
+
+  - id: E_CUSTO_ERRADO_POR_2X
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-06
+    verified_against: "697710-tokens-medidos-contra-300k-estimados"
+    label: "A ESTIMATIVA DO W3 ERRAVA POR 2,3x, e no sentido que importa. O menu dizia 'Alto: ~300k tokens, meia sessao (vs ~1,4M da corrida cheia)' para o M8 INTEIRO. Medido: so o LADO SERIAL consumiu 697.710 tokens — ja 2,3x a estimativa do item completo. Com o lado paralelo, a corrida projeta ~1,4M, que e exatamente o patamar da corrida cheia que o M8 foi reescopado para EVITAR. O item foi aprovado com um numero que nao se sustentou, e so a execucao disse isso — e essa e a justificativa concreta do contrato de custo do M6: sem carimbo por run, a proxima estimativa erraria igual, sem ninguem notar"
+
+  - id: C_DRIFT_44_PCT_NA_VPS
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-06
+    verified_against: "4-DRIFTED-em-9-medidos-contra-o-host-vivo"
+    label: "44% DE DRIFT nas afirmacoes do grafo da VPS (4 DRIFTED em 9), medido contra o host vivo e nao contra doc. Bem acima do limiar de 30% que o proprio /meta:kg-freshness define para acionar juiz adversarial. Os quatro: (1) ENT_substrate — bridge.onionevolve.com esta no label e resolve por DNS, mas NAO tem vhost no Caddy (curl retorna 000); o onion-bridge serve sob app., nao sob bridge. (2) ENT_whatsapp — o nó afirma whatsapp-sender VIVO; busca full-filesystem com sudo nao encontra processo, container, unit systemd nem diretorio, apesar do parecer de 2026-07-05 registrar reinstalacao em ~onion/whatsapp-sender. WAHA, esse sim, confirmado vivo. (3) D_whatsapp_dual_waha_default — o desenho 'dual adapter' tem so UM lado material hoje. (4) D_structured_plan_and_doctrine — a doutrina do catalogo FOI promovida a KB, mas por BYPASS do F0 direto, apos a fase F2 ser formalmente REPROVADA (stack-harmonia-2026-08, sintese com premissas fabricadas); A_analysis_structure segue `open`"
+
+  - id: C_CONTRATO_M6_NAO_COBRE_SERIAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "O CONTRATO DO M6 ENCONTROU SEU PRIMEIRO LIMITE NO PRIMEIRO USO, e o achado e barato demais para nao registrar: os quatro campos (run_id, tokens, agents, duration_min) pressupoem um run de WORKFLOW — `run_id` e um `wf_xxxxxxxx-xxx`. Esta corrida nao teve Workflow: foram 9 invocacoes seriais da ferramenta Agent, e NAO EXISTE wf_ para carimbar. Preenchi `run_id: serial-2026-08-06-m8` e declarei a natureza no frontmatter, em vez de inventar um id falso ou deixar o campo vazio. QUESTAO ABERTA para o maestro: o contrato deve (a) aceitar um id sintetico com prefixo declarado para modo serial, (b) trocar `run_id` por `run_ref` agnostico ao substrato, ou (c) declarar que so vale para Workflow — e ai o modo serial fica fora da serie historica, que e justamente o modo que o M8 existe para avaliar. A opcao (c) e a unica que se refuta sozinha"
+
+  - id: C_GATILHO_M6_DISPAROU_VERDE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-06
+    verified_against: "frontmatter-desta-sintese"
+    label: "O GATILHO DO M6 FOI TESTADO NA PRIMEIRA OPORTUNIDADE E PASSOU. O contrato declarou: 'se a proxima sintese nascer SEM os quatro campos, ai — e so ai — mecanize a emissao automatica'. Esta e a proxima sintese, e ela NASCEU COM os quatro campos. Logo a emissao automatica segue GATED, com razao medida e nao com fe: o contrato escrito bastou. RESSALVA HONESTA, porque sem ela o teste vale pouco: quem escreveu o contrato e quem escreveu esta sintese sao o mesmo agente na mesma sessao — o teste real e a PROXIMA sintese, de outra sessao, que nao viu o contrato nascer. Este resultado e necessario, nao suficiente"
+
+  - id: C_TESTE_FORCADO_NAO_PROVA_O_GATILHO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: open
+    label: "O QUE ESTA CORRIDA NAO PROVOU, dito antes que alguem leia demais no resultado: o Passo 0 do fragmento e uma DETECCAO ('SE Workflow indisponivel → acionar fallback'), e eu acionei o caminho serial A MAO, com o Workflow disponivel. Provei o CAMINHO DE CODIGO (os 4 passos executam, o schema se mantem, o fan-in consolida); NAO provei o GATILHO (que a deteccao dispare sozinha quando o substrato cair de verdade). Sao coisas diferentes, e confundi-las seria o mesmo erro de categoria que esta casa ja mede em outro lugar: declarado != verificado. Fechar isso exige um ambiente SEM Workflow — um adotante em outra IDE, ou uma execucao com a ferramenta desabilitada — e segue GATED"
+edges:
+  - from: A_M8_SERIAL_RUN
+    to: E_FALLBACK_SERIAL_RODA
+    edge_type: SUPPORTS
+  - from: A_M8_SERIAL_RUN
+    to: E_SERIAL_ACUMULA_CONTEXTO
+    edge_type: SUPPORTS
+  - from: A_M8_SERIAL_RUN
+    to: E_CUSTO_ERRADO_POR_2X
+    edge_type: SUPPORTS
+  - from: A_M8_SERIAL_RUN
+    to: C_DRIFT_44_PCT_NA_VPS
+    edge_type: SUPPORTS
+  - from: C_TESTE_FORCADO_NAO_PROVA_O_GATILHO
+    to: E_FALLBACK_SERIAL_RODA
+    edge_type: CONSTRAINS
+  - from: E_SERIAL_ACUMULA_CONTEXTO
+    to: E_CUSTO_ERRADO_POR_2X
+    edge_type: CAUSES
+  - from: C_CONTRATO_M6_NAO_COBRE_SERIAL
+    to: C_GATILHO_M6_DISPAROU_VERDE
+    edge_type: CONSTRAINS
+  - from: C_GATILHO_M6_DISPAROU_VERDE
+    to: A_M8_SERIAL_RUN
+    edge_type: TRACES_TO
