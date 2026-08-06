@@ -265,10 +265,10 @@ edges:
     edge_type: SUPPORTS
   - from: D_NO_COMMAND
     to: D_INDEX_FORTIFIED
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: D_NO_COMMAND
     to: C_SURFACE_REMAINS_GATED
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: D_NO_COMMAND
     to: Q_REVERSE_JOIN_SCOPE
     edge_type: CAUSES

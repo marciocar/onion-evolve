@@ -1,0 +1,156 @@
+meta:
+  id: onion-refinaria-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-06
+  date: 2026-08-06
+  note: >
+    W3 + execucao da leva 1. O maestro reenquadrou o metodo ("uma negativa deve vir com SUGESTAO DE
+    SUPERACAO — por isso criamos o Elenxo") e a metafora ("os dados sao petroleo; os DERIVADOS valem
+    mais; carro a gasolina nao anda com petroleo puro"), que tem TRES termos: bruto -> refino -> MOTOR.
+    O W3 (12 workers) devolveu MENU de 9 itens com superacao para cada refutado — 24 vereditos, ZERO
+    sem superacao. O maestro escolheu a ordem e cortou a leva em M1-M4+M7. Esta pesquisa registra o
+    menu, o que foi EXECUTADO e o que foi MEDIDO. Projecao: SYNTHESIS.md.
+
+nodes:
+  - id: A_RESEARCH_REFINARIA
+    node_type: artifact
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 1.0
+    label: "W3 (wf_083d49f2-3b2, 12 workers) + triagem (wf_7541c420-c55, 9 workers) + execucao da leva 1"
+    trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+
+  - id: C_elenxo_refuta_para_superar
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-06
+    verified_against: wf_083d49f2-3b2
+    label: "CORRECAO DE METODO (do maestro): 'uma escolha ou negativa deve vir acompanhada de uma SUGESTAO DE SUPERACAO — e nao um juiz de sim ou nao, POR ISSO CRIAMOS O ELENXO. As decisoes nem sempre sao zero e um'. O W2 refutou 5 de 5 e nao propos superacao nenhuma — isso nao e Elenxo, e maquina de dizer nao. MECANIZADO no W3 como campo OBRIGATORIO `superacao` no schema do worker, com a consequencia INVERTIDA: refutacao sem superacao e DESCARTADA (cai a refutacao, nao a proposta). RESULTADO MEDIDO: 24 vereditos, 11 refutacoes, ZERO sem superacao"
+    trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+
+  - id: C_o_terceiro_termo_e_o_motor
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-06
+    verified_against: contagem-derivados-vs-bruto-53-grafos
+    label: "A METAFORA TEM TRES TERMOS, e o buraco esta no terceiro: BRUTO (2.049 nos, de sobra) -> REFINO (existe e e BARATO: kg-radar em 1 grafo = 16ms) -> MOTOR (NAO EXISTE). Medido: 3 de 53 grafos tem qualquer derivado publicado (5,7%); ~76 de 2.049 nos aparecem individualmente num derivado (3,7%); commits de refino vs de bruto = 3:130. Os ~5 casos de decisao-por-derivado sao TODOS de sessoes que estavam CONSTRUINDO o instrumento — dogfood do refinador, nao consumo do refinado. VEREDITO: 'o que falta nao e uma refinaria melhor — e um MOTOR QUE PECA GASOLINA'. Consequencia de desenho: derivado sem consumidor nomeado nao entra no menu; vira pergunta"
+    trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+
+  - id: E_m7_ninguem_cita_id_em_pr
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-06
+    verified_against: gh-pr-list-merged-antes-de-2026-08-02
+    label: "M7 MEDIDO — o derivado 'projecao semantica para o revisor' NAO TEM MOTOR: de 13 PRs que tocaram .kg.yaml antes do corte de contaminacao (2026-08-02), APENAS 1 cita id de no no corpo. E o unico positivo (#506) era uma sessao de Elenxo ESCREVENDO grafo — fora de quem autora, ninguem cita. A fatia minima do W3 pedia 'contar nos proximos 3 PRs'; medir RETROATIVAMENTE deu 13 casos, amostra NAO-ENVIESADA (ninguem sabia que estava sendo medido) e resposta HOJE. Custo: zero linha de codigo. MATA o item por medicao, que era o proposito dele"
+    trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+
+  - id: E_triagem_virar_status_erraria_80pct
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-06
+    verified_against: wf_7541c420-c55
+    label: "A TRIAGEM DOS 15 JUSTIFICA A FORMA DA GUARDA: de 137 arestas SUPERSEDES, 15 apontavam para alvo ainda confirmed (6) ou open (9) — o W3 nomeou so os 6. Placar do juizo adversarial: 8 CONSTRAINS (o superseder REFINA, o alvo segue vigente) · 4 done (pergunta RESPONDIDA, nao superada) · 3 superseded. Ou seja: VIRAR O STATUS CEGAMENTE ESTARIA ERRADO EM 12 DE 15 (80%). E por isso que a guarda NOMEIA com menu de remedios em vez de reprovar mandando virar — um gate HARD que compra verde CORROMPENDO o grafo e o verde falso invertido"
+    trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+
+  - id: D_m1_avisa_nao_reprova
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-06
+    verified_against: kg-radar-integrity.sh-53-grafos-exit-0
+    label: "M1 CONSTRUIDO: o bloco RECONCILIACAO do kg-radar.sh passa a NOMEAR alvo de SUPERSEDES nao reconciliado, com mensagem POR TIPO (question -> 'fechar como done'; demais -> menu de 3 remedios). Filtro deliberado: so acusa se o SUPERSEDER estiver `confirmed` — relacao nao assentada nao cobra reconciliacao do alvo (1 dos 15 casos, E_engine_measured, tem superseder open). E AVISO, nao reprovacao: `problems` fica intocado, exit-code de ninguem muda. Verificado: 14 avisos exatos antes da triagem, 0 depois, REGRA 52 exit 0 nos 53 grafos nas duas pontas. PROMOCAO A HARD e gated — gatilho: um 16o caso aparecer DEPOIS da triagem"
+    trace: ".claude/validation/kg-radar.sh"
+
+  - id: E_m2_decisao_sem_ancora_70pct
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-06
+    verified_against: "parser-python-sobre-git-ls-files-kg-yaml-sem-fixtures"
+    label: "M2 SELADO (numeros re-medidos hoje, POS-triagem): 53 grafos · 356 nos node_type=decision · 135 status=confirmed · 95 SEM verified_against (70% dos confirmed) · 90 FORA do bloco de frescor por kg-radar.sh:355 (plane!=PROD e sem verified_against -> continue). O EIXO E ANCORADO/NAO-ANCORADO, nunca 'medido vs aposta': a refutacao do W3 mostrou que ~21 dos 39 verified_against nomeiam METODO ou AUTORIDADE, nao alvo — selar '39 medidos' carimbaria declaracao como medicao, o erro-de-categoria que o item existia para denunciar. O radar pode exigir que o ALVO seja escrito; nunca julgar se a medicao ocorreu"
+    trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+
+  - id: E_m3_portabilidade_executada
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-06
+    verified_against: "env -i PATH=/usr/bin:/bin HOME=/tmp/nohome bash <script>"
+    label: "M3 — PORTABILIDADE EXECUTADA, nao estimada: dos 39 scripts em .claude/validation/, 28 saem exit 0 sob `env -i` (sem HOME, sem PATH do usuario, sem Claude Code) e 9 saem 1/2 por USAGE SEM ARGUMENTO, nao por dependencia. CORRECAO DE UM NUMERO HERDADO: a leitura anterior dizia 30/39; re-executando, os 2 'timeouts' eram ARTEFATO DO INSTRUMENTO (corte de 25s) — lint-artifacts.sh roda sob env -i em 43s e seu exit 1 e VEREDITO DE LINT, nao falha de portabilidade. Este no ACRESCENTA chao a C_POSTURA_ACOPLAMENTO; nao a edita nem a contradiz"
+    trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+
+  - id: Q_lint_granularidade_por_secao
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-08-06
+    verified_against: "cronometragem-3-rodadas-lint-artifacts-e-10-sub-scripts"
+    label: "GUARDA DO MAESTRO (2026-08-06): 'em algum momento vamos precisar rever nossos lint-*.sh, se realmente e necessario rodar TODO ou se e possivel rodar somente as SECOES afetadas. A estrategia do mecanismo pode ser revisada e TEM QUE SER PROVADO, NAO PODE SER ACHISMO'. PULL DATADO, com numeros medidos: (a) rodei 606 guardas (lint-selftest.sh, >600s) para validar 5 casos novos; (b) lint-artifacts.sh = 44,1s / 43,4s / 44,7s em 3 rodadas limpas — contra ~16s registrados apos o PR #357, ou seja REGRESSAO de ~2,75x que ninguem mediu porque o numero historico so existe em memoria de sessao, NAO no repo; (c) a leva tocou 14 arquivos. ONDE ESTA O TEMPO (medido): a soma dos 10 sub-scripts invocados e ~9,2s (21%) — kb-vendored-link-check 3,0s · graph 1,2s · doctrine-freshness 1,2s · kg-radar-integrity 0,9s · projection-safety 0,9s — logo ~35s (79%) estao nas guardas INLINE do proprio lint-artifacts.sh (2.800 linhas, 53 regras). CONSEQUENCIA DE DESENHO: 'rodar so a secao afetada' NAO e pular sub-script; e fatiar o script principal, onde a granularidade NAO e limpa como as 84 funcoes run_*_selftests do selftest. O que FALTA e a PROVA, e ela e o gate: (1) medir que fracao das guardas uma mudanca tipica afeta; (2) provar que a execucao parcial NAO PERDE NADA — rodar o completo em paralelo e comparar vereditos por N rodadas antes de confiar; (3) so entao trocar. Sem (2), 'rodar so a secao' e achismo com cara de otimizacao — o modo de falha exato que esta casa ja mediu: verde que nao verificou"
+
+  - id: C_mecanizar_pode_ser_a_catedral
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-06
+    verified_against: taxa-de-defeito-9-numeros-em-meses
+    label: "REFINAMENTO DOUTRINARIO herdado do W2 e aplicado nesta leva: taxa de defeito medida = 9 numeros errados em MESES; custo do gate (gerador + guarda + selftest + manutencao) > custo do conserto manual => MECANIZAR E A CATEDRAL. 'fix-must-become-mechanism' NAO e 'todo fix vira gate' — e 'todo fix vira mecanismo QUANDO O VOLUME JUSTIFICA'. Sem o portao 4 (o volume forca), a propria doutrina anti-catedral fabrica catedral. Aplicado: os 9 numeros de docs/technical-context viraram CONSERTO manual (PR #542), enquanto o SUPERSEDES nao-reconciliado — 15 casos vivos, classe recorrente — virou GUARDA"
+    trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+
+edges:
+  - from: C_o_terceiro_termo_e_o_motor
+    to: E_m7_ninguem_cita_id_em_pr
+    edge_type: CAUSES
+  - from: E_triagem_virar_status_erraria_80pct
+    to: D_m1_avisa_nao_reprova
+    edge_type: SUPPORTS
+  - from: C_elenxo_refuta_para_superar
+    to: A_RESEARCH_REFINARIA
+    edge_type: TRACES_TO
+  - from: C_o_terceiro_termo_e_o_motor
+    to: A_RESEARCH_REFINARIA
+    edge_type: TRACES_TO
+  - from: E_m7_ninguem_cita_id_em_pr
+    to: A_RESEARCH_REFINARIA
+    edge_type: TRACES_TO
+  - from: E_m2_decisao_sem_ancora_70pct
+    to: A_RESEARCH_REFINARIA
+    edge_type: TRACES_TO
+  - from: E_m3_portabilidade_executada
+    to: A_RESEARCH_REFINARIA
+    edge_type: TRACES_TO
+  - from: E_triagem_virar_status_erraria_80pct
+    to: A_RESEARCH_REFINARIA
+    edge_type: TRACES_TO
+  - from: C_mecanizar_pode_ser_a_catedral
+    to: D_m1_avisa_nao_reprova
+    edge_type: CONSTRAINS
+  - from: Q_lint_granularidade_por_secao
+    to: C_mecanizar_pode_ser_a_catedral
+    edge_type: DEPENDS_ON
+  - from: D_m1_avisa_nao_reprova
+    to: A_RESEARCH_REFINARIA
+    edge_type: TRACES_TO

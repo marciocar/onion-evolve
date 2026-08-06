@@ -1363,6 +1363,81 @@ MEOF
   else record_fail "projection-safety: (T3)" "sem lista de termos a guarda passou verde — proteção fantasma"; fi
 }
 
+# Guardas do bloco RECONCILIAÇÃO do kg-radar.sh — o PRIMEIRO teste deste bloco.
+#
+# POR QUE EXISTE (medido 2026-08-05): a INTEGRIDADE cobra contradição só para REFUTES
+# (kg-radar.sh:438). SUPERSEDES passava em silêncio — e de 137 arestas SUPERSEDES no corpus, 15
+# apontavam para alvo ainda `confirmed`/`open`. A triagem dos 15 mostrou que virar o status seria
+# ERRADO em 12 deles (8 eram CONSTRAINS, 4 eram `done`), o que é a razão de a guarda NOMEAR e não
+# reprovar. Este selftest existe para que a guarda não vire nem falso-positivo nem vacuidade.
+run_kg_reconcile_selftests() {
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  local rx="${FIX_DIR}/kg-reconcile"
+  local out rc
+
+  # (a) OS DOIS LADOS NO MESMO GRAFO — acusa o alvo vivo e a pergunta respondida; cala nos quatro
+  # que estão certos. Sem o lado negativo, "consertar" seria alargar a guarda e chamar de fix.
+  rc=0; out=$(bash "${radar}" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && printf '%s' "${out}" | grep -q '⚠ D_ALVO_VIVO: recebe SUPERSEDES' \
+     && printf '%s' "${out}" | grep -q '⚠ Q_RESPONDIDA: pergunta RESPONDIDA' \
+     && ! printf '%s' "${out}" | grep -q '⚠ D_JA_RECONCILIADO' \
+     && ! printf '%s' "${out}" | grep -q '⚠ Q_JA_FECHADA' \
+     && ! printf '%s' "${out}" | grep -q '⚠ C_SUPERSEDER_ABERTO' \
+     && ! printf '%s' "${out}" | grep -q '⚠ C_SO_REFUTES'; then
+    record_pass "kg-reconcile: (a) acusa alvo-vivo e pergunta-respondida; cala em reconciliado/fechado/superseder-aberto/REFUTES"
+  else record_fail "kg-reconcile: (a) dois lados" "rc=${rc} out=${out}"; fi
+
+  # (b) MENSAGEM PRÓPRIA POR TIPO — `question` recebe "fechar como done", não "reconciliar".
+  # A distinção não é cosmética: pergunta respondida NÃO é história superada, e mandar virar
+  # `superseded` produziria dado errado (4 dos 15 casos reais eram exatamente isto).
+  if printf '%s' "${out}" | grep -q 'Q_RESPONDIDA.*fechar como .done.' \
+     && printf '%s' "${out}" | grep -q 'D_ALVO_VIVO.*CONSTRAINS.*REFINA'; then
+    record_pass "kg-reconcile: (b) mensagem por tipo — question→done, decisão→menu de 3 remédios"
+  else record_fail "kg-reconcile: (b) mensagem por tipo" "out=${out}"; fi
+
+  # (c) A FIXTURE É ÍNTEGRA no que esta guarda cobre — sem isso, (a) e (b) seriam veredito sobre
+  # grafo quebrado. Ressalva declarada: a fixture TEM um alvo de REFUTES não reconciliado de
+  # propósito (C_SO_REFUTES), então --integrity reprova por desenho. O que se assere aqui é que a
+  # reprovação é EXATAMENTE essa e nenhuma outra.
+  rc=0; out=$(bash "${radar}" "${rx}/supersedes-mixed.kg.yaml" --integrity 2>&1) || rc=$?
+  if [ "${rc}" -eq 1 ] \
+     && printf '%s' "${out}" | grep -q 'CONTRADIÇÃO: C_SO_REFUTES' \
+     && [ "$(printf '%s' "${out}" | grep -c '✗ ')" -eq 1 ]; then
+    record_pass "kg-reconcile: (c) fixture íntegra — a única reprovação é o REFUTES declarado"
+  else record_fail "kg-reconcile: (c) integridade da fixture" "rc=${rc} out=${out}"; fi
+
+  # (d) (MUT) — removido o filtro de superseder-vivo, C_SUPERSEDER_ABERTO VOLTA a ser acusado.
+  # Sem esta prova, (a) passaria igual se o filtro fosse vacuidade (ex.: se nenhum superseder da
+  # fixture estivesse `open`). É o padrão guarda-da-guarda: se a mutação não aplicar, o teste
+  # FALHA em vez de passar por omissão.
+  local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'"' RETURN
+  cp "${radar}" "${mut}/mutado.sh"
+  sed -i 's/ \&\& nstatus\[efrom\[i\]\] == "confirmed"//' "${mut}/mutado.sh"
+  if ! grep -q 'etype\[i\] == "SUPERSEDES" && nstatus\[efrom\[i\]\] == "confirmed"' "${mut}/mutado.sh"; then
+    local mout; mout="$(bash "${mut}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
+    if printf '%s' "${mout}" | grep -q '⚠ C_SUPERSEDER_ABERTO'; then
+      record_pass "kg-reconcile: (d) (MUT) sem o filtro o superseder-aberto volta a acusar — o filtro é load-bearing"
+    else record_fail "kg-reconcile: (d) (MUT)" "mutação não mudou o veredito — o filtro é vacuidade? out=${mout}"; fi
+  else
+    record_fail "kg-reconcile: (d) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+
+  # (e) (MUT) — removida a guarda inteira, o ⚠ some. Prova que as linhas novas são o que produz o
+  # veredito, e não algum efeito colateral do bloco antigo.
+  local mut2; mut2="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'" "'"${mut2}"'"' RETURN
+  cp "${radar}" "${mut2}/mutado.sh"
+  sed -i '/supersededByLive\[id\] > 0/,+6d' "${mut2}/mutado.sh"
+  if ! grep -q 'supersededByLive\[id\] > 0' "${mut2}/mutado.sh"; then
+    local mout2; mout2="$(bash "${mut2}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
+    if ! printf '%s' "${mout2}" | grep -q '⚠ '; then
+      record_pass "kg-reconcile: (e) (MUT) sem a guarda o ⚠ some — a guarda é quem produz o veredito"
+    else record_fail "kg-reconcile: (e) (MUT)" "⚠ sobreviveu à remoção da guarda: out=${mout2}"; fi
+  else
+    record_fail "kg-reconcile: (e) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+}
+
 run_kg_provenance_selftests() {
   local radar="${SCRIPT_DIR}/kg-radar.sh"
   local px="${FIX_DIR}/kg-provenance"
@@ -6102,6 +6177,9 @@ run_kg_freshness_selftests
 
 # Modo kg-provenance — guarda de proveniência de decisão (ITEM2).
 run_kg_provenance_selftests
+
+# Modo reconcile — o ⚠ de alvo de SUPERSEDES não reconciliado (primeiro teste do bloco)
+run_kg_reconcile_selftests
 
 # Modo kg-label-collision — conteúdo de label não pode ser lido como configuração
 # (sinal de campo onion-pessoal-app, 2026-07-19).
