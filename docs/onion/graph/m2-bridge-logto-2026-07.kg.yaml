@@ -613,7 +613,7 @@ nodes:
   # ---- FONTES E O QUE É VPS-DECLARADO ----
   - id: Q_source_correction
     node_type: question
-    trace: docs/evolution/inbox/2026-07-25-correcao-o-sinal-do-entrypoint-estava-errado.md
+    trace: docs/evolution/inbox/_processed/2026-07-25-correcao-o-sinal-do-entrypoint-estava-errado.md
     layer: audit
     plane: PROD
     impact: 2

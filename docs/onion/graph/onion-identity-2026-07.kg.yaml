@@ -128,7 +128,7 @@ nodes:
     confidence: 0.3
     status: refuted
     label: "sinal afirma 3 branches disjuntas desde 15/06 e main sem framework"
-    trace: "docs/evolution/inbox/2026-07-10-metodologia-branches-gitflow-main-produto-vs-rhilo.md"
+    trace: "docs/evolution/inbox/_processed/2026-07-10-metodologia-branches-gitflow-main-produto-vs-rhilo.md"
   - id: C_TOPO_SHARED_BASE
     node_type: claim
     layer: audit

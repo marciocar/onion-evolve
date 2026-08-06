@@ -49,7 +49,7 @@ nodes:
     status: superseded
     verified_at: 2026-07-24
     label: "anuncios 07-18 (ingestor + write-kg) estao em STAGING p/ metagamify/pulse-mais/onion-mini — gerados, nao transportados (declarado != entregue)"
-    trace: "docs/evolution/federation/outbox/metagamify/2026-07-18-ingestor-doutrina-granaai.md"
+    trace: "docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md"
   - id: E_ANNOUNCE_BACKLOG_RECONCILED
     node_type: evidence
     layer: audit
