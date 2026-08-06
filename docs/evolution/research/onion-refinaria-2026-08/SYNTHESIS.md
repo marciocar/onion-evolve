@@ -2,7 +2,7 @@
 title: "A refinaria, o motor, e a leva 1 executada — W3 + triagem dos 15 + M1/M2/M3/M7"
 category: research
 date: 2026-08-06
-status: leva-1-executada-menu-aberto-para-escolha
+status: leva-1-executada-mais-M5-menu-aberto-para-escolha
 method: "W3: Elenxo de 12 workers com `superacao` OBRIGATÓRIA em toda refutação (wf_083d49f2-3b2). Triagem: 9 workers, 2 lentes cegas + juiz opus/high por bloco (wf_7541c420-c55). Execução e medição pelo maestro-agente, com re-medição de todo número herdado."
 run_id: "wf_083d49f2-3b2 + wf_7541c420-c55"
 kg: docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
@@ -120,6 +120,25 @@ script principal**, onde a granularidade **não** é limpa como as 84 funções 
 **E o achado incômodo:** o número histórico (16s) **não está no repo** — vive só em memória de sessão.
 A performance do gate **não tem carimbo versionado**, e por isso a regressão cresceu sem ninguém ver.
 
+**E a medição chegou — por acidente, o melhor tipo.** Rodei `--only=lint-rules.md` e ele acusou
+`plugins/onion-engineering` fora de sincronia: um alvo que o `--only` supostamente teria excluído. Puxando
+o fio:
+
+| | |
+|---|---|
+| **o mecanismo já existe** | `--only=<arquivo>`, via o wrapper `_find` (`lint-artifacts.sh:150`) — e ninguém tinha medido o que vale |
+| passada cheia | **44,1 / 43,4 / 44,7 s** |
+| `--only=<um arquivo>` | **12,9 / 12,4 / 12,1 s** — **72% a menos** |
+| cobertura | **21 das 54 guardas (39%)** honram o `--only`; **33 (61%) ignoram** |
+
+**E as 33 não ignoram por descuido.** São as guardas de **coerência global** — `plugins_sync`,
+`inventory_sync`, `graph_sync`, `kg_radar_integrity`, `role_bundle_sync`, `federation_*_sync` — que
+comparam **o todo contra o todo** e cujo veredito seria **falso** se escopado a um arquivo.
+
+> **Consequência: os ~12s do `--only` são piso irredutível, não gordura.** O teto de ganho por escopo já
+> foi quase todo colhido. A economia restante teria de vir de **otimizar as guardas globais**, não de
+> fatiar mais fino.
+
 **A prova é o gate, e ela tem três passos:** (1) medir que fração das guardas uma mudança típica afeta ·
 (2) provar que a execução parcial **não perde nada** — rodando o completo em paralelo e comparando
 vereditos por N rodadas · (3) só então trocar. **Sem (2), é achismo com cara de otimização** — o modo de
@@ -149,5 +168,40 @@ de ninguém ler PR** — o consumidor dele é o `kg-radar --integrity`, que roda
 CI** e em todo PR que toca `.kg.yaml`. Motor provado, não hipotético. O que o M7 refutou foi a projeção
 **para humano no PR**, que é outra coisa.
 
-**Restam no menu, para escolha e ordem do maestro:** M4 (fila de âncora) · M5 (`--state` como modo do
-radar) · M6 (colheita do ledger de custo) · M8 (corrida serial reescopada) · M9 (a lacuna do porte).
+### M5 — executado, e a lição veio de medir o que construí
+
+O sinal inicial quase o matou: **170 de 211 questions do corpus estão `open` (80%)**, 91 num único
+arquivo. Mas isso mata a fila **cross-grafo** (já refutada), não a fila **por grafo** — que é a que a
+sessão abre. Redundância medida **antes** de escrever: das 79 questions abertas nos grafos ativos, só
+**26%** aparecem no radar (nos dois maiores, **1 de 16** e **1 de 13**).
+
+**E então o erro que só a medição pegou.** Construí para *todos* os `open`, mas medi para *questions*:
+
+```
+1ª versão: 51% redundante com o --radar — e num grafo, 100%
+2ª versão: 98% novo (excluindo o top-10 do radar por construção)
+           os 2 restantes eram falso-positivo do meu regex → sobreposição REAL: zero
+```
+
+A causa era estrutural — ordenar por atenção **devolve os mesmos nós pesados** que o radar já mostra.
+**Commitar a 1ª versão teria entregue uma vista filtrada do que já se via:** a cerimônia exata que esta
+rodada existe para evitar.
+
+**Fiação: zero.** `catch-up`, `warm-up` e `engineer/work` já invocam o radar **sem flag** (= `--all`) —
+só a prosa que enumerava as seções estava stale.
+
+**E o mutation test pegou um defeito meu, não do código.** A 1ª fixture tinha os 4 abertos todos
+**leves**, abaixo do top-10 — configuração em que remover a exclusão é **no-op**, logo o caso (d) não
+podia falhar de verdade: teste (a) forte e teste (d) **vácuo** na mesma fixture. A guarda-da-guarda
+provou que a mutação **foi** aplicada, e a sobreposição mesmo assim não apareceu — foi isso que virou o
+vermelho. Cura: `Q_PESADA_OPEN`, o único caso em que a exclusão faz trabalho.
+
+**A aposta está declarada com o que a mata, no código:** 5 aberturas de sessão com o `--state` visível e
+**zero id citado seguido de ação** → o modo sai do caminho padrão. E o aprendizado não seria *"o
+`--state` é ruim"* — seria que **`status: open` é resíduo, não fila**, o que mata a classe inteira
+"projetar estado a partir de status".
+
+## O que fica para a próxima decisão
+
+**Restam no menu, para escolha e ordem do maestro:** M4 (fila de âncora) · M6 (colheita do ledger de
+custo) · M8 (corrida serial reescopada) · M9 (a lacuna do porte).

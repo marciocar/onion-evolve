@@ -120,7 +120,80 @@ nodes:
     label: "REFINAMENTO DOUTRINARIO herdado do W2 e aplicado nesta leva: taxa de defeito medida = 9 numeros errados em MESES; custo do gate (gerador + guarda + selftest + manutencao) > custo do conserto manual => MECANIZAR E A CATEDRAL. 'fix-must-become-mechanism' NAO e 'todo fix vira gate' — e 'todo fix vira mecanismo QUANDO O VOLUME JUSTIFICA'. Sem o portao 4 (o volume forca), a propria doutrina anti-catedral fabrica catedral. Aplicado: os 9 numeros de docs/technical-context viraram CONSERTO manual (PR #542), enquanto o SUPERSEDES nao-reconciliado — 15 casos vivos, classe recorrente — virou GUARDA"
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
 
+  - id: E_m5_state_construido_e_medido
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-06
+    verified_against: "medicao-da-propria-construcao-3-grafos-ativos-e-mutation-test"
+    label: "M5 EXECUTADO — o --state como modo do kg-radar.sh, e a licao veio de MEDIR O QUE CONSTRUI, nao o que planejei. Sinal inicial: 170/211 questions do corpus estao open (80%), 91 num unico arquivo — o que MATA a fila cross-grafo, mas nao a fila POR GRAFO, que e o que a sessao abre. Redundancia medida ANTES de escrever: das 79 questions abertas nos grafos ativos, so 26% aparecem no --radar (nos dois maiores: 1 de 16 e 1 de 13). Mas a 1a versao construida cobria TODOS os open, e ao medi-la deu 51% de sobreposicao com o --radar — e 100% num grafo. Causa estrutural: ordenar por atencao devolve os mesmos nos pesados que o radar ja mostra. CORRECAO POR CONSTRUCAO: excluir o top-10 do radar => 98% novo, e os 2 restantes eram falso-positivo do meu proprio regex (id casando dentro de label), logo sobreposicao REAL = zero. Se eu tivesse commitado a 1a versao, teria entregue uma vista filtrada do que ja se via — a cerimonia que esta rodada existe para evitar. FIACAO: zero — catch-up, warm-up e engineer/work ja invocam o radar SEM flag (= --all), so a prosa que enumerava as secoes estava stale"
+    trace: ".claude/validation/kg-radar.sh --state"
+
+  - id: C_state_e_aposta_com_falsificador
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "APOSTA DECLARADA COM O QUE A MATA (o M7 provou que projetar para humano-em-PR volta ~0, entao esta projecao nasce com gatilho de morte no proprio codigo): se em 5 aberturas de sessao com o --state visivel NENHUM id for citado seguido de acao, o modo sai do caminho padrao. O aprendizado, nesse caso, nao seria 'o --state e ruim' — seria que status:open e RESIDUO e nao fila, o que mataria a classe inteira de 'projetar estado a partir de status', nao so este modo"
+
+  - id: E_fixture_vacua_reprovou_no_mutante
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-08-06
+    verified_against: "lint-selftest-run-2026-08-06-caso-d-reprovou"
+    label: "O MUTATION TEST PEGOU UM DEFEITO MEU, NAO DO CODIGO — e essa e a prova de que ele nao e cerimonia. A 1a fixture state-below-radar tinha os 4 abertos todos LEVES, deliberadamente abaixo do top-10; nessa configuracao remover a exclusao do top-10 e um NO-OP (nao ha aberto pesado para suprimir), logo o caso (d) NAO PODIA falhar de verdade — teste (a) forte e teste (d) vacuo na MESMA fixture. A guarda-da-guarda confirmou que a mutacao FOI aplicada, e mesmo assim a sobreposicao nao apareceu: e isso que virou o veredito vermelho. Cura: Q_PESADA_OPEN (impact 5, grau 5) — o unico caso em que a exclusao faz trabalho. Com ela: com exclusao = 4 exibidos e sobreposicao 0; sem exclusao = 5 exibidos e sobreposicao 1"
+    trace: ".claude/validation/fixtures/kg-reconcile/state-below-radar.kg.yaml"
+
+  - id: E_lint_only_ja_existe_e_e_parcial
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-08-06
+    verified_against: "cronometragem-3-rodadas-only-vs-cheia-e-analise-das-54-guardas"
+    label: "A GUARDA DO MAESTRO GANHA CHAO MEDIDO, e a resposta e mais interessante que sim/nao: o mecanismo de escopo JA EXISTE no lint-artifacts.sh — a flag --only=<arquivo>, implementada pelo wrapper _find (linha 150) — e ninguem tinha medido o que ela vale. MEDIDO HOJE: passada cheia 44,1/43,4/44,7s contra --only 12,9/12,4/12,1s, ou seja 72% A MENOS. MAS A COBERTURA E PARCIAL, e essa e a parte que decide o desenho: das 54 guardas check_*, apenas 21 (39%) usam _find e portanto honram --only; as 33 restantes (61%) o IGNORAM. E elas nao ignoram por descuido — sao as guardas de COERENCIA GLOBAL (check_plugins_sync, check_inventory_sync, check_graph_sync, check_kg_radar_integrity, check_role_bundle_sync, check_federation_*_sync), que comparam O TODO CONTRA O TODO e cujo veredito seria FALSO se escopado a um arquivo. CONSEQUENCIA: os ~12s do --only sao PISO IRREDUTIVEL, nao gordura — o teto de ganho por escopo ja foi quase todo colhido, e a economia restante teria de vir de otimizar as guardas globais, nao de fatiar mais. DESCOBERTO POR ACIDENTE: rodei --only=lint-rules.md e ele acusou plugins/onion-engineering fora de sincronia — um alvo que o --only supostamente teria excluido"
+    trace: ".claude/validation/lint-artifacts.sh --only=<arquivo>"
+
+  - id: E_gate_declara_1min_e_leva_15
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-06
+    verified_against: "cronometragem-do-run-completo-921s-contra-comentario-do-hook"
+    label: "BEHAVIOR-OVER-DECLARATION NO GATE, medido hoje: o .githooks/pre-commit declara no proprio comentario que o self-test e mais lento, '~1min'. CRONOMETRADO: 921s = 15,3 min, 612 guardas, 0 falhas. DESVIO DE 15x. E o lugar mais caro possivel para uma declaracao falsa, porque e exatamente por esse numero que alguem decide se roda o gate local ou empurra para o CI — quem le '~1min' e recebe 15 min tende a passar a usar --no-verify, e o gate vira decorativo. MESMO MODO DE FALHA ja diagnosticado nesta rodada para o lint-artifacts.sh (o historico de ~16s so existia em memoria de sessao, nunca no repo, e a regressao para 44s cresceu invisivel). CURA APLICADA: o comentario agora carrega o numero MEDIDO e DATADO, mais a instrucao de RE-MEDIR ao mexer — carimbo versionado, que e a unica forma de a proxima regressao ser visivel. Guarda mecanica para isso segue NAO construida: seria preciso decidir onde mora o carimbo e o que faz falhar, e o volume (2 casos) ainda nao paga o gate pelo portao 4"
+    trace: ".githooks/pre-commit"
+
 edges:
+  - from: E_gate_declara_1min_e_leva_15
+    to: Q_lint_granularidade_por_secao
+    edge_type: SUPPORTS
+  - from: E_gate_declara_1min_e_leva_15
+    to: C_mecanizar_pode_ser_a_catedral
+    edge_type: SUPPORTS
+  - from: E_lint_only_ja_existe_e_e_parcial
+    to: Q_lint_granularidade_por_secao
+    edge_type: CONSTRAINS
+  - from: E_m5_state_construido_e_medido
+    to: C_o_terceiro_termo_e_o_motor
+    edge_type: SUPPORTS
+  - from: E_m7_ninguem_cita_id_em_pr
+    to: C_state_e_aposta_com_falsificador
+    edge_type: CONSTRAINS
+  - from: E_fixture_vacua_reprovou_no_mutante
+    to: E_m5_state_construido_e_medido
+    edge_type: SUPPORTS
+  - from: E_m5_state_construido_e_medido
+    to: A_RESEARCH_REFINARIA
+    edge_type: TRACES_TO
   - from: C_o_terceiro_termo_e_o_motor
     to: E_m7_ninguem_cita_id_em_pr
     edge_type: CAUSES

@@ -30,9 +30,16 @@ if ! bash "${LINT}"; then
 fi
 
 # Self-test das guardas — condicional. Só roda quando o COMMIT mexe no harness de
-# validação (.claude/validation/**, inclui fixtures/), pois é mais lento (~1min:
-# monta sandbox copiando a árvore). Assim a quebra de fixture/guarda é pega LOCAL,
-# não só no CI — sem penalizar todo commit. CI roda sempre (onion-validate.yml).
+# validação (.claude/validation/**, inclui fixtures/), pois é mais lento (monta sandbox
+# copiando a árvore). Assim a quebra de fixture/guarda é pega LOCAL, não só no CI — sem
+# penalizar todo commit. CI roda sempre (onion-validate.yml).
+#
+# CUSTO MEDIDO — 2026-08-06: **921s (15,3 min)**, 612 guardas. Este comentário declarava
+# "~1min" e ninguém tinha cronometrado: 15x de desvio, um caso de `behavior-over-declaration`
+# no lugar mais caro, porque é por este número que se decide se vale rodar local. Se você
+# mexer aqui, RE-MEDIR e trocar a linha — número de gate sem carimbo versionado é como a
+# regressão cresce sem ninguém ver (é o mesmo modo de falha que apagou o histórico de
+# ~16s do lint-artifacts.sh, hoje em 44s).
 SELFTEST="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
 if [ -f "${SELFTEST}" ] \
    && git diff --cached --name-only --diff-filter=ACMR | grep -qE '^\.claude/validation/'; then
