@@ -594,6 +594,41 @@ check_kg_trace_resolve() {
 }
 
 # ===========================================================================
+# REGRA 56 — PR aberto carrega RESÍDUO da passada adversarial [HARD]
+# previne: trabalho proposto sem revisão semântica — e sem forma de saber que não houve
+#   Irmã da REGRA 55 na forma (feeder determinístico + TSV), mas de outra natureza: as
+#   demais regras julgam ARTEFATO; esta julga se o PROCESSO deixou rastro.
+#   ORIGEM (dano medido 2026-08-06): 8 erros num dia, 6 achados por revisão adversarial
+#   rodada À MÃO — e a passada só rodou porque o maestro perguntou. Em 2026-08-02 o mesmo
+#   já fora medido (15 auto-correções, 8 pelo gatilho social, "nenhuma por auto-revisão").
+#   Nomear não curou; a cura que a casa provou funcionar é RESÍDUO MATERIAL, auditado por
+#   terceiro e desacoplado do ator — não "prestar mais atenção". [[fix-must-become-mechanism]]
+#   O QUE ELA NÃO FAZ: não julga a QUALIDADE da revisão (nenhum script sabe se um achado é
+#   bom). Exige o resíduo e amarra-o ao diff por sha256 — mudou o código depois de revisar,
+#   o artefato caduca. É o mesmo limite honesto do frescor: o GATE cria a cadência, o WORKER
+#   testa a verdade.
+#   ESCOPO — só com PR ABERTO. Exigir a cada commit intermediário travaria o ciclo, e
+#   falso-positivo TRAVANTE é o modo de falha medido desta casa. Trabalho em curso ≠ proposto.
+#   ISENÇÕES, contadas e de vocabulário fechado: branch default · sem PR · sem `gh` (a guarda
+#   declara que não sabe, em vez de passar em silêncio) · PR que edita o próprio onion-review.yml.
+#   TETO DECLARADO: este repo não tem branch protection (403) — NADA impede um merge. O que
+#   esta regra torna impossível não é mergear errado, é mergear SEM SABER.
+#   Toda a lógica vive em review-artifact-check.sh.
+# ===========================================================================
+check_review_artifact() {
+  local helper="${SCRIPT_DIR}/review-artifact-check.sh"
+  [ -f "${helper}" ] || return 0
+  [ -n "${ONLY_PATH}" ] && return 0        # é regra de PR, não de arquivo
+  local out sev tag path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format=tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    violation "${sev}" "${REPO_ROOT}/${path}" "[review-artifact/${tag}] ${msg}"
+  done <<< "${out}"
+}
+
+# ===========================================================================
 # REGRA 51 — Agentes branch-* documentam a distinção vs o par geral [SOFT]
 # previne: par de agentes com overlap invisível — dispatcher que roteia por description não escolhe
 #   Um agente DIFF-SCOPED (branch-code-reviewer, branch-metaspec-checker, ...)
@@ -2843,6 +2878,7 @@ check_kg_provenance_coverage
 check_kg_verification_coverage
 check_kg_radar_integrity
 check_kg_trace_resolve
+check_review_artifact
 check_doctrine_freshness
 check_kg_born_marker
 check_ladder_integrity

@@ -114,6 +114,32 @@ if [ -z "${out//[[:space:]]/}" ] \
   add 'VAZIO ≠ AUSÊNCIA: comando de descoberta devolveu NADA. Vazio pode ser (a) o objeto não existe, (b) o path/glob está errado, (c) você não tem acesso. São conclusões OPOSTAS. Confirme o caminho-pai antes de afirmar que algo não existe.'
 fi
 
+# (5) MERGE/PR SEM A FONTE LIDA — o caso que custou dois PRs mergeados hoje (2026-08-06).
+#
+# POR QUE EXISTE: mergeei os PRs #546 e #548 anunciando "verde", sem revisão semântica nenhuma.
+# O `onion-review` sai VERDE POR DESENHO quando o revisor falha (soft-pass deliberado de 2026-07-14)
+# — logo `gh pr checks` mostrando `pass` NÃO diz que houve revisão. O sinal existia (comentário no
+# PR, nota no resumo do job) e nenhuma dessas superfícies é a que o fluxo de merge consulta.
+#
+# ESTE DETECTOR NÃO BLOQUEIA, E ISSO É DESENHO, NÃO LIMITAÇÃO: o soft-pass é decisão registrada
+# (.github/workflows/onion-review.yml) e negar o merge a contradiria. O valor aqui não é impedir o
+# merge — é impedir a DECLARAÇÃO FALSA ("mergeei, estava verde"). Mergear sem revisão continua
+# possível; mergear sem revisão SEM SABER, não.
+#
+# FALSO-POSITIVO É ESTRUTURALMENTE IMPOSSÍVEL: dispara em 100% dos `gh pr merge`/`gh pr create` e a
+# frase que imprime é sempre verdadeira — não julga o PR, aponta a fonte. É o oposto de um detector
+# heurístico, e por isso pode viver num canal (exit 2) onde todo disparo interrompe.
+#
+# TETO DECLARADO: PostToolUse é posterior por definição — dispara DEPOIS do comando. Um PreToolUse
+# que negasse antes foi PROJETADO E REFUTADO em 2026-08-06 (N pós-cura = 0; ~1 em 3 merges seria
+# travado; e PreToolUse é substrato NÃO-VERIFICADO neste repo). Reabre só com um merge cego novo.
+case "$cmd" in
+  *"gh pr merge"*)
+    add 'MERGE-SEM-FONTE-LIDA: `onion-review` sai VERDE POR DESENHO quando o revisor falha (soft-pass) — `pass` ali NÃO significa que houve revisão. A fonte é a linha `onion-review-verdict` em `gh pr checks <N>`. Se você não leu ESSA linha, você não sabe se este PR foi revisado.' ;;
+  *"gh pr create"*)
+    add 'PR-SEM-PASSADA-ADVERSARIAL: abrir PR sem a passada adversarial deixa a revisão para um CI que estoura turnos justamente nos PRs grandes. O artefato de revisão é exigido pela REGRA 56 (`docs/evolution/review/<branch>.md`) — se ele não existe, o gate vai acusar e você vai descobrir tarde.' ;;
+esac
+
 [ -n "$warn" ] || exit 0
 printf '🔎 guarda anti-fail-open do shell — o que você acabou de rodar pode MENTIR:%s\n' "$warn" >&2
 # exit 2 — a ÚNICA via MEDIDA em que o stderr de um PostToolUse chega ao modelo (dogfood 2026-08-02:
