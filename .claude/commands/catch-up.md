@@ -39,8 +39,10 @@ faça `cat` de pastas inteiras (anti-pattern Context Dump).
 **Antes** de reconstruir de git/memória, **se existir um `.kg.yaml` no repo, abra-o PRIMEIRO** — ele é a
 fonte da verdade de estado, acima do git. É o **primeiro ato**, não um passo opcional no fim.
 - Localizar: `git ls-files '*.kg.yaml' | grep -v '/fixtures/'`.
-- Rodar o veredito: `bash .claude/validation/kg-radar.sh <arquivo>` (atenção · reconciliação · integridade ·
-  frescor). Cite os **ids de nó** de maior atenção no briefing, em vez de re-derivar da prosa.
+- Rodar o veredito: `bash .claude/validation/kg-radar.sh <arquivo>` (atenção · **estado** · reconciliação ·
+  integridade · frescor). Cite os **ids de nó** de maior atenção no briefing, em vez de re-derivar
+  da prosa — e a seção **ESTADO** é a fila de abertos que o radar afunda: é ali que costuma estar
+  o "onde paramos" que este comando existe para reconstruir.
 - **Drive-to-verify:** claim `plane: PROD` de alto impacto → cruze contra o vivo (código `arquivo:linha`/dump)
   **antes** de confiar; um nó stale mente (o `--freshness` avisa STALE).
 - Sem `.kg.yaml` no repo → siga para o passo 1 (git).

@@ -1,13 +1,27 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]
-#      (sem flag = radar + reconcile + integrity + domain + provenance + freshness + schema)
+# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]
+#      (sem flag = radar + state + reconcile + integrity + domain + provenance + freshness + schema)
 #
 # Doutrina: ${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md
 #   RADAR           = atenção — peso do nó × centralidade (grau).
 #                     peso = impact(1-5) × confidence(0-1) × fator de status
 #                     fator: open=1.0 · confirmed=1.0 · refuted=0 · superseded=0.2 · done=0.1
+#   ESTADO          = a FILA DE ABERTOS — o que segue `open` neste grafo, por atenção.
+#                     É o irmão do RADAR, pedido em 2026-07-16 e construído em 2026-08-06.
+#                     POR QUE NÃO É REDUNDANTE COM O RADAR (medido antes de escrever): das 79
+#                     `question` abertas nos grafos ativos, só 21 (26%) aparecem no top-10 do
+#                     --radar; 58 (73%) são INVISÍVEIS hoje. Nos dois maiores grafos ativos,
+#                     1 de 16 e 1 de 13. A fórmula de atenção favorece nó `confirmed` bem
+#                     conectado, e afunda justamente o que ainda está aberto.
+#                     POR QUE MODO, E NÃO SCRIPT NOVO: um `kg-state.sh` seria o TERCEIRO parser
+#                     de YAML do repo, e kg-view.sh:17-31 já escreveu essa dívida em letra
+#                     grande ("DOIS PARSERS, DUAS VERDADES… mentira com cara de relatório").
+#                     POR QUE UM GRAFO POR VEZ: a fila cross-grafo nasce MURO — 319 dos 571
+#                     nós `open` do corpus vivem num único arquivo de reconciliação, que
+#                     sessão nenhuma abre. Por grafo: mediana 4, e o top-7 cobre 100% de 37
+#                     dos 43 grafos com aberto (86%).
 #   RECONCILIAÇÃO   = arestas REFUTES/SUPERSEDES (as auto-correções explícitas do grafo)
 #   INTEGRIDADE     = ids duplicados · aresta para nó inexistente · nó órfão (grau 0) ·
 #                     contradição (REFUTES entrando em nó que segue confirmed/open) ·
@@ -55,7 +69,7 @@ RADAR_SCHEMA="1"
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]" >&2; exit 2; }
+[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]" >&2; exit 2; }
 
 awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" '
 function statusFactor(s) {
@@ -259,6 +273,52 @@ END {
       printf "  %5.1f  %-18s %s(%s/%s)  %s\n", att[id], id, ntype[id], plane[id], nstatus[id], label[id]
     }
     print ""
+  }
+
+  # ESTADO — a fila de abertos. Irmão do RADAR: mesma fórmula de atenção, escopo invertido.
+  # O RADAR responde "o que pesa"; o ESTADO responde "o que falta". Um nó `confirmed` de impacto 5
+  # domina o primeiro e não tem nada a fazer no segundo.
+  #
+  # APOSTA DECLARADA (2026-08-06) — este modo não nasce de pull medido, e sim da convicção de que
+  # a sessão que abre um grafo quer ver o que segue aberto nele. O que o mataria está escrito:
+  # 5 aberturas de sessão com o --state na saída e ZERO id citado seguido de ação. Nesse caso o
+  # modo sai do caminho padrão (do --all) e o aprendizado e que `status: open` e RESIDUO, nao
+  # estado de trabalho — o que mataria a classe inteira "projetar estado a partir de status".
+  # A EXCLUSÃO DO TOP-10 NÃO É DETALHE — É O QUE FAZ O MODO EXISTIR. Medido na 1ª versão, que
+  # ordenava todos os `open` por atenção: 51% do que ela exibia JÁ estava no --radar, e num grafo
+  # (m3-federation-admin) a sobreposição era de 100%. Ordenar por atenção traz de volta os mesmos
+  # nós pesados que o radar mostra — o modo virava vista filtrada do que já se via. Excluindo o
+  # top-10 por construção, o ESTADO passa a ser 100% complementar: só o que o radar AFUNDA.
+  if (mode == "--all" || mode == "--state") {
+    print "══ ESTADO — a fila de abertos (o que o RADAR afunda) ══"
+    for (i = 1; i <= nn; i++) {                       # atenção de TODOS (o --radar pode não ter rodado)
+      id = order[i]; sf2 = statusFactor(nstatus[id]); if (sf2 < 0) sf2 = 0
+      ratt[id] = impact[id] * conf[id] * sf2 * (1 + deg[id])
+    }
+    rn = asorti(ratt, rord, "@val_num_desc")
+    rtop = (rn < 10) ? rn : 10
+    for (i = 1; i <= rtop; i++) if (ratt[rord[i]] > 0) noRadar[rord[i]] = 1
+    nopen = 0
+    for (i = 1; i <= nn; i++) {
+      id = order[i]
+      if (nstatus[id] != "open") continue
+      nopen++
+      if (id in noRadar) continue                    # já visível no RADAR — não repetir
+      satt[id] = ratt[id]
+    }
+    sn = asorti(satt, sord, "@val_num_desc")
+    if (nopen == 0)      print "  ✅ nada em aberto neste grafo"
+    else if (sn == 0)    printf "  ✅ os %d aberto(s) deste grafo já aparecem no RADAR acima\n", nopen
+    else {
+      stop = (sn < 7) ? sn : 7
+      for (i = 1; i <= stop; i++) {
+        id = sord[i]
+        printf "  %5.1f  %-24s %s  %s\n", satt[id], id, ntype[id], label[id]
+      }
+      if (sn > stop) printf "  … e mais %d fora do radar — %d aberto(s) no total\n", sn - stop, nopen
+    }
+    print ""
+    delete satt; delete sord; delete ratt; delete rord; delete noRadar
   }
 
   if (mode == "--all" || mode == "--reconcile") {
