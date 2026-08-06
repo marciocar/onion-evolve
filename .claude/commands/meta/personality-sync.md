@@ -12,7 +12,7 @@ argument-hint: "[--dry-run]  (sem arg = gera/regenera para ESTA instância; --dr
 
 # 🪞 /meta:personality-sync — Personalidade emergente (RFC-0003 §2.4, Fase 2)
 
-Gera `.claude/identity/personality.md` desta instância **a partir do que ela FEZ**, não do que alguém
+Gera o arquivo de identidade **.claude/identity/personality.md** (gerado por este comando — não existe até o 1º sync) desta instância **a partir do que ela FEZ**, não do que alguém
 declarou que ela é. A personalidade **emerge do uso** — cada sync a **regenera** contra a evidência viva.
 É o `declarado≠verificado` (a doutrina do core) virado para dentro: o `personality_summary` do `members.yaml`
 era um **seed manual pré-F2**; este comando o substitui pelo que a evidência sustenta.
@@ -39,7 +39,7 @@ Ler o **stamp `.claude/.onion-version`** (`role:`, `adopted_at`, `mode`, `source
 
 ## Passo 3 — Sintetizar as 5 seções (EMERGENTE, com âncora)
 
-Escrever `.claude/identity/personality.md` no formato da RFC-0003 §2.4. **Regra dura:** cada afirmação
+Escrever o arquivo **.claude/identity/personality.md** (saída deste comando) no formato da RFC-0003 §2.4. **Regra dura:** cada afirmação
 material **traça à evidência** (cite o slug da migalha, o commit, ou o campo do stamp) — se não emerge de
 uma fonte do Passo 2, **não entra** (é o mesmo rigor do `declarado≠verificado`; personalidade inventada é o
 modo-de-falha). Seções:
