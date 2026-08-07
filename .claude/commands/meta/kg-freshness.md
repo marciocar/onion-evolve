@@ -140,6 +140,22 @@ const KgReverifySchema = {
 | **REFUTED** | o nó estava errado | **Novo** nó `evidence` (PROD, `verified_at`, `verified_against`, `trace`) + `REFUTES` → alvo; alvo vira `status: refuted`. |
 | **UNVERIFIABLE** | não deu para medir | **NÃO TOCA `verified_at`.** Rebaixa `confidence` e/ou abre `question` + `DEPENDS_ON`. |
 
+> **`status: drifted` não é atalho para esta tabela.** O motor aceita `drifted` (1.3) e
+> `unverifiable` (1.0) desde 2026-08-06, mas **`status` é marcador de ESTADO, não de processo**:
+> `drifted` = *"diverge do vivo AGORA, alguém precisa reconciliar"*. Um veredito DRIFTED **já
+> reconciliado** (label atualizado + `SUPERSEDES` + posição antiga preservada) deixa o nó
+> `confirmed` — a memória do veredito vive na **aresta**, não no status. Use `drifted` só quando
+> mediu a divergência e **ainda não** escreveu a reconciliação.
+>
+> Medido no Elenxo de 2026-08-07, sobre esta mesma tabela: marcar como `drifted` quatro nós cujos
+> labels já traziam a verdade medida (a) pôs no topo do radar nós corretos, afundando drift real, e
+> (b) tornou a aresta `SUPERSEDES` **invisível** à seção RECONCILIAÇÃO, que só conta superseder
+> `confirmed` (`kg-radar.sh:233`) — um fail-open dentro da própria correção do fail-open.
+>
+> **E `superseded` sempre foi legal.** A ausência de `drifted` no schema antigo nunca impediu
+> cumprir a linha do DRIFTED acima: o 1º dogfood deste comando já o fizera em 2026-07-27
+> (`m2-bridge-logto-2026-07.kg.yaml`). Não use "o schema não deixava" como razão — foi medido falso.
+
 Aufhebung, não apagamento: a posição superada **fica no grafo** — é ela que explica o
 desenho novo.
 

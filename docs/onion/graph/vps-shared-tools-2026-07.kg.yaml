@@ -31,8 +31,8 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-31
-    verified_against: m2-bridge-logto-KG+flip-P7
+    verified_at: 2026-08-06
+    verified_against: m2-bridge-logto-KG+flip-P7+m8-serial-2026-08-reverificado
     label: "AUTH/IDENTIDADE: Logto self-hosted 1.41.0 VIVO (OIDC/JWT+JWKS), flip P7 executado (AUTH_TOKEN->OIDC), gate duplo humano-PKCE/servico-M2M. members.yaml=SSOT, Logto=PROJECAO. Federation-admin spec-now/build-gated. GAP: sign-up default aberto (P3.4)"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
 
@@ -40,7 +40,7 @@ nodes:
   - id: ENT_whatsapp
     node_type: entity
     plane: PROD
-    status: open
+    status: confirmed
     impact: 4
     confidence: 0.9
     verified_at: 2026-08-06
@@ -86,18 +86,18 @@ nodes:
     impact: 4
     confidence: 1.0
     verified_at: 2026-08-06
-    verified_against: direcao-do-maestro+estado-material-medido-no-host-2026-08-06
+    verified_against: direcao-do-maestro+estado-material-medido-no-host-2026-08-06+m8-serial-2026-08-reverificado
     label: "DIRECAO: MANTER o whatsapp-web.js nao-oficial (whatsapp-sender) E ADICIONAR o adapter do WAHA como PADRAO. Forma SDAAL: dois adapters sob a abstracao de mensageria, WAHA default. (A pesquisa ja lastreia WAHA>Evolution p/ nao-oficial). ESTADO MATERIAL EM 2026-08-06, MEDIDO E NAO PRESUMIDO: o dual tem UM SO LADO — WAHA up (onion-vps-waha), whatsapp-sender sem processo/unit/container (so codigo + sessao pareada em disco, no workspace do bridge). E nenhum dos dois adapters foi construido: .claude/utils/whatsapp NAO existe. A DIRECAO segue de pe porque nao foi revogada pelo maestro; o que falta e EXECUCAO — e o F1 ja a reordenou para DOGFOOD ANTES DE SDAAL (D_f1_whatsapp_dogfood_first)"
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
 
   - id: D_email_plus_logto_connector
     node_type: decision
     plane: DEV
-    status: confirmed
+    status: unverifiable
     impact: 4
-    confidence: 1.0
+    confidence: 0.5
     verified_at: 2026-07-31
-    verified_against: direcao-do-maestro
+    verified_against: direcao-do-maestro+m8-serial-2026-08-reverificado
     label: "DIRECAO: construir o servico de EMAIL E LIGAR o conector de email no LOGTO (destrava convite por org, o gap medido). Um so servico serve duas bocas: ferramenta de membro + connector do Logto"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
 
@@ -108,7 +108,7 @@ nodes:
     impact: 5
     confidence: 0.9
     verified_at: 2026-08-06
-    verified_against: direcao-do-maestro+estado-de-execucao-medido-2026-08-06
+    verified_against: direcao-do-maestro+estado-de-execucao-medido-2026-08-06+m8-serial-2026-08-reverificado
     label: "DIRECAO: trazer TUDO para um PLANO ESTRUTURADO do Onion e DERIVAR dele uma DOUTRINA, usando todo o potencial do Onion — Elenxo, KG-SSOT first+runtime, pesquisas documentadas e mapeadas. CAVEAT (disciplina pull-not-push): derivar doutrina+estrutura AGORA, mas o PLANO e spec-now/build-gated por-ferramenta — nunca uma PLATAFORMA empurrada por hipotese. ESTADO DE EXECUCAO EM 2026-08-06, MEDIDO: a DOUTRINA EXISTE (docs/knowledge-base/concepts/onion-vps-catalog-doctrine.md v1.0.0, 2026-08-05, commit 5a5768f) mas nasceu do F0 DIRETO (D_framing_catalogo), pulando a escada de A_analysis_structure — F1 rodou para UMA tool (whatsapp/WAHA), F2 (arquitetura cross-tool) foi FORMALMENTE REPROVADA como arquitetura (stack-harmonia-2026-08, no D_sintese_reprovada: premissas fabricadas, 9 membros contra 12 reais), F3 e F4 nunca rodaram e A_analysis_structure segue status open. O PLANO ESTRUTURADO — a outra metade da direcao — AINDA NAO EXISTE. A direcao segue valida; o que drifou foi a suposicao de que ela tinha sido cumprida pela escada prevista"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
@@ -175,8 +175,8 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-31
-    verified_against: elenxo-framing-2-steelman-1-juiz-opus
+    verified_at: 2026-08-06
+    verified_against: elenxo-framing-2-steelman-1-juiz-opus+m8-serial-2026-08-reverificado
     label: "VEREDITO F0: o conjunto e CATALOGO (nao plataforma; HIBRIDO recusado — reservaria vaga pro dead-layer com folha-de-figueira build-gated). E a soma de N adapters individualmente justificados por demanda (pull-not-push): cada tool = 1 SDAAL se passa o Teste-do-Eixo, senao 1 script-gated, atras do bridge, roteado por .env como task-manager/forge. NAO E: zero backend/registry/UI propria; members.yaml=unica fonte de identidade; NENHUMA visao agregada/cross-tool e pre-autorizada (qualquer painel composto e capacidade NOVA sujeita ao proprio pull-not-push). Precedente vivo decisivo: task-manager+forge ja escalam 1->N sem registry central"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
@@ -186,8 +186,8 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-31
-    verified_against: dissent-do-juiz-elenxo
+    verified_at: 2026-08-06
+    verified_against: dissent-do-juiz-elenxo+m8-serial-2026-08-reverificado
     label: "DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como dado. O catalogo-puro trata Logto como 'so mais uma entrada' e nao tem lar limpo p/ 'auth e o chao comum'. SE a divida de integracao ponto-a-ponto se acumular, o catalogo pode pagar MAIS que uma fina camada de auth compartilhada. NAO vira o veredito: (a) Logto=projecao de members.yaml ja da lar doutrinario (nao camada nova); (b) a cura, se morder, e UMA composicao de auth-compartilhada PUXADA pela propria demanda — ainda catalogo-nativa, pull-driven, nunca plataforma preemptiva"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
 
@@ -236,12 +236,76 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-31
-    verified_against: pesquisa-f1-web-verificada-mais-teste-do-gatilho
+    verified_at: 2026-08-06
+    verified_against: pesquisa-f1-web-verificada-mais-teste-do-gatilho+m8-serial-2026-08-reverificado
     label: "F1 (whatsapp) RESOLVIDO: DOGFOOD PRIMEIRO, SDAAL DEPOIS. O Teste do EIXO passou (2 providers) mas o do GATILHO NAO — 1 real rodando (whatsapp-web.js) + 1 dirigido (WAHA nao deployado) = script. Deployar WAHA + 1 sendText real E o gatilho; medir as 2 degradacoes do wwebjs decide se o contrato tem 2 operacoes ou 1; CRITERIO DE RETRACAO escrito antes de construir. Forma desenhada: dominio 'whatsapp' + prefix WA_ + interface v0.1 de 4 operacoes, WAHA default. Pesquisa completa (web-verificada, radar exit 0): docs/evolution/research/waha-adapter-2026-07/"
     trace: "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml"
 
+  # A DIVIDA que o Elenxo mandou tirar da prosa do commit e por no grafo — e' aqui que
+  # catch-up/warm-up leem, nao na mensagem de commit.
+  - id: Q_juiz_adversarial_nao_rodou_m8
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "ABERTO: a corrida serial do M8 voltou com 44% de veredito DRIFTED (4/9), acima do limiar de 30% que o /meta:kg-freshness usa para escolher TIER de juiz (opus/high, Passo 3 linha 117) — e nenhum juiz rodou. CORRECAO DE LEITURA (Elenxo 2026-08-07): isso e TIERING nao executado, NAO precondicao de escrita; o gate do Passo 4 e o maestro, e o maestro selou. O peso real vem de outro lugar: o worker do M8 ERROU de fato numa medicao (afirmou que nao havia diretorio; ele existe em /home/onion/onion-bridge/workspaces/7f2a16301adad917/whatsapp-sender), e foi so a leitura humana que pegou. Um contraditorio teria pego mais barato"
+    trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+
+  - id: Q_email_logto_conector_nunca_medido
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    label: "ABERTO: D_email_plus_logto_connector e DIRECAO pura ('construir o servico de EMAIL e ligar o conector'), sem estado material medivel — o worker do M8 devolveu UNVERIFIABLE e RECUSOU-SE a inventar uma medicao substituta, que e o contrato funcionando. Esta question existe porque o Passo 4 manda, para UNVERIFIABLE, rebaixar confidence E/OU abrir question + DEPENDS_ON: sem ela o veredito ficava mecanicamente inerte (statusFactor unverifiable == confirmed == 1.0), isto e, um selo que nao muda nada"
+    trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+
+  # A SEGUNDA posicao apagada pelo #552 — o Elenxo mediu 2 reescritas (ENT_substrate, ENT_whatsapp)
+  # e 2 apensos (que preservam o texto antigo como prefixo, logo nao ha o que restaurar neles).
+  # A 1a passada desta branch restaurou 1 de 2: correcao seletiva e correcao arbitraria.
+  - id: C_dominio_bridge_vivo_ate_0806
+    node_type: claim
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.0
+    verified_at: 2026-08-06
+    verified_against: m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps
+    label: "SUPERADA (era a SSOT ate 2026-08-06): 'Dominios: auth./bridge./app.onionevolve.com'. A re-medicao achou que bridge.onionevolve.com RESOLVE por DNS mas NAO tem vhost no Caddy (curl devolve 000) — o onion-bridge serve sob app., nao sob bridge. E esta ficcao de subdominio que explica por que o mapa foi redesenhado"
+    trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+
+  # ── AUFHEBUNG RESTAURADA (2026-08-07) — a posicao que o M8 APAGOU em vez de rebaixar ──
+  # O run de 2026-08-06 (#552) reescreveu o label de ENT_whatsapp com a verdade nova, em vez de
+  # criar no novo + SUPERSEDES. O contrato do /meta:kg-freshness e explicito: "nunca reescreva o
+  # label do antigo — e ela que explica o desenho novo". A afirmacao superada so existia no git.
+  - id: C_whatsapp_sender_vivo_ate_0806
+    node_type: claim
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.0
+    verified_at: 2026-08-06
+    verified_against: m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find
+    label: "SUPERADA (era a SSOT ate 2026-08-06): 'WHATSAPP: whatsapp-sender VIVO (~onion/whatsapp-sender, whatsapp-web.js nao-oficial, repo privado)'. O parecer de 2026-07-05 registrava reinstalacao. A re-medicao no host vivo NAO achou processo, container nem unit systemd; o CODIGO existe em disco, mas em /home/onion/onion-bridge/workspaces/7f2a16301adad917/whatsapp-sender — NAO em ~onion/whatsapp-sender, que e o caminho que esta afirmacao superada dava — e a SSOT seguiu afirmando VIVO por 12h ate alguem ir procurar. Restaurada aqui porque foi APAGADA (label reescrito no #552), nao rebaixada"
+    trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+
 edges:
+  - from: Q_juiz_adversarial_nao_rodou_m8
+    to: ENT_whatsapp
+    edge_type: CONSTRAINS
+  - from: Q_juiz_adversarial_nao_rodou_m8
+    to: C_whatsapp_sender_vivo_ate_0806
+    edge_type: CONSTRAINS
+  - from: Q_email_logto_conector_nunca_medido
+    to: D_email_plus_logto_connector
+    edge_type: DEPENDS_ON
+  - from: ENT_substrate
+    to: C_dominio_bridge_vivo_ate_0806
+    edge_type: SUPERSEDES
+  - from: ENT_whatsapp
+    to: C_whatsapp_sender_vivo_ate_0806
+    edge_type: SUPERSEDES
   - from: ENT_logto
     to: ENT_substrate
     edge_type: DEPENDS_ON
