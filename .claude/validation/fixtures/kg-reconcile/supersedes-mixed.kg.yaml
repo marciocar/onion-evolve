@@ -8,9 +8,17 @@
 #   - C_SUPERSEDER_ABERTO (claim confirmed, superseder está `open`)           → NÃO avisada — relação
 #       não assentada não cobra reconciliação do alvo. É o filtro que evita acusar por superação
 #       que ninguém fechou (caso real medido: E_engine_measured, 2026-08-05).
+#   - C_ALVO_DE_DRIFTED (claim confirmed, superseder está `drifted`)          → AVISADA — o superseder
+#       é nó VIVO (statusFactor 1.3, SOBE no radar). Sob a allowlist antiga (`== "confirmed"`) esta
+#       aresta era INVISÍVEL e a seção imprimia ✅ sem ter avaliado: fail-open medido em 2026-08-07.
+#   - D_ALVO_DRIFTED    (decisão `drifted`, recebe SUPERSEDES de nó confirmed)   → AVISADA — o lado
+#       do ALVO tinha a mesma allowlist (`confirmed || open`), logo alvo `drifted` também sumia.
 #   - C_SO_REFUTES    (claim confirmed, recebe REFUTES — não SUPERSEDES)      → NÃO avisada aqui
-#       (é a INTEGRIDADE que cobra REFUTES, linha 438 — não duplicar o veredito)
-# Espera: --reconcile emite ⚠ para EXATAMENTE D_ALVO_VIVO e Q_RESPONDIDA. exit != 0 por causa do
+#       (é a INTEGRIDADE que cobra REFUTES — `grep -n 'CONTRADIÇÃO'` no radar; não duplicar o
+#       veredito. Era "linha 438" e já estava podre antes desta mudança.)
+# Espera: --reconcile emite ⚠ para EXATAMENTE QUATRO — D_ALVO_VIVO, Q_RESPONDIDA, C_ALVO_DE_DRIFTED
+# e D_ALVO_DRIFTED (os dois últimos entraram em 2026-08-07 e eram invisíveis sob a allowlist; o
+# selftest assere a CONTAGEM, senão um 5º aviso entraria em silêncio). exit != 0 por causa do
 # C_SO_REFUTES (contradição REFUTES é ✗ HARD na integridade) — este arquivo NÃO é rodado com --all
 # no teste de aviso; o caso de exit-code é asserido à parte.
 meta:
@@ -74,6 +82,38 @@ nodes:
     confidence: 0.8
     status: open
     label: "superseder ainda aberto — sua superacao nao assentou"
+  - id: C_ALVO_DE_DRIFTED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    label: "alvo cujo superseder esta DRIFTED — superseder vivo, DEVE ser avisado"
+  - id: C_DRIFTED_QUE_SUPERSEDE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: drifted
+    label: "superseder DRIFTED — mediu e divergiu, segue vivo (fator 1.3)"
+  - id: D_ALVO_DRIFTED
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: drifted
+    label: "alvo DRIFTED que recebe SUPERSEDES de no confirmed — DEVE ser avisado"
+  - id: C_SUPERSEDER_VIVO_2
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "superseder confirmed do caso de alvo drifted"
   - id: C_SO_REFUTES
     node_type: claim
     layer: audit
@@ -102,6 +142,12 @@ edges:
     edge_type: SUPERSEDES
   - from: D_SUPERSEDER_VIVO
     to: Q_JA_FECHADA
+    edge_type: SUPERSEDES
+  - from: C_DRIFTED_QUE_SUPERSEDE
+    to: C_ALVO_DE_DRIFTED
+    edge_type: SUPERSEDES
+  - from: C_SUPERSEDER_VIVO_2
+    to: D_ALVO_DRIFTED
     edge_type: SUPERSEDES
   - from: C_ABERTO_QUE_SUPERSEDE
     to: C_SUPERSEDER_ABERTO

@@ -99,6 +99,56 @@ function statusFactor(s) {
   if (s == "done") return 0.1
   return -1  # inválido
 }
+# ── DENYLIST, NÃO ALLOWLIST — a lição de 2026-08-07 ─────────────────────────────────────────
+# Quando `drifted`/`unverifiable` entraram (2026-08-06), os predicados escritos como ALLOWLIST
+# (`== "confirmed"`, `confirmed || open`) os deixaram de fora EM SILÊNCIO, enquanto os escritos
+# como DENYLIST os trataram certo POR CONSTRUÇÃO — as três denylists corretas se acham grepando
+# pela string  nstatus[id] == "superseded" || nstatus[id] == "refuted"  (FRESCOR, PROVENIÊNCIA,
+# FRESCOR-TSV).
+# ⚠️ SEM ASPAS SIMPLES NESTE ARQUIVO: o programa awk inteiro vive dentro de aspas simples do
+# shell, então uma aspa simples num COMENTÁRIO termina o programa cedo — o radar passa a imprimir
+# NADA com exit 0. Aconteceu aqui, escrevendo justamente o comentário sobre fail-open, e `bash -n`
+# não pega. Só a CONTAGEM de linhas de saída pega.
+# Âncora de grep e não número de linha DE PROPÓSITO: a 1ª versão deste bloco citou
+# "linhas 274/452/490" e elas apodreceram NA PRÓPRIA INSERÇÃO que as escreveu — o comentário é o
+# artefato durável desta mudança e nasceu mentindo, num commit cuja tese é "o texto declara uma
+# coisa e o artefato faz outra". Achado pelo Elenxo 2026-08-07.
+#
+# Um enum que CRESCE quebra allowlist e não quebra denylist — então o predicado nomeia quem NÃO
+# conta, e todo status futuro entra por default.
+#
+# O QUE O CORPUS PROVA, E O QUE NÃO PROVA (medido 2026-08-07, e a 1ª versão exagerou):
+#   · a mudança é INERTE no corpus — 0 avisos novos. Mas o corpus NÃO distingue esta fronteira
+#     de quase nenhuma outra: mesmo `supersederConta(s){return 1}` dá 0 avisos, porque os 137
+#     alvos de SUPERSEDES já estão todos reconciliados (113 superseded · 13 refuted · 11 done) e
+#     os 116 de REFUTES também. A prova de COMPORTAMENTO é a fixture, não o corpus.
+#   · a única alavanca que o corpus expõe é `done` no lado do alvo: 11 acusações — e as 11 são
+#     `question`, o que virou a exclusão TIPADA abaixo.
+#   · efeito interno: `supersededByLive` passa a contar 119 arestas em vez de 102 (+17, os
+#     supersedes de origem `done`), todas inertes hoje porque apontam para alvos já mortos.
+#   · o fail-open é LATENTE, não histórico: 0 nós `drifted` em 2.095, e 0 supersederes
+#     `drifted`/`unverifiable` em 137 arestas. Ele foi demonstrado NA FIXTURE, não no campo.
+
+# O SUPERSEDER conta? Fora: `open` (relação ainda não assentada — justificativa original de
+# 2026-08-05, 1 caso medido: E_engine_measured) e os mortos (`refuted`/`superseded`), cuja
+# própria superação é duvidosa. Dentro: confirmed · drifted · unverifiable · done.
+# `drifted` é o caso que motivou isto: statusFactor lhe dá 1.3 dizendo "nó VIVO, mais urgente que
+# confirmed", e a allowlist antiga dizia "não é confirmed, logo não conta" — duas doutrinas no
+# mesmo arquivo. O efeito era fail-open: a aresta sumia e a seção imprimia ✅ sem ter avaliado.
+function supersederConta(s) { return (s != "open" && s != "refuted" && s != "superseded") }
+
+# O ALVO ainda precisa reconciliar? Fora: `superseded`/`refuted` (já reconciliados) e a
+# `question` fechada como `done` — que é o remédio que ESTA MESMA seção prescreve ("pergunta
+# RESPONDIDA … fechar como `done`"); cobrá-la seria o gate punindo quem obedeceu.
+#
+# A EXCLUSÃO É POR TIPO, NÃO POR STATUS, e a 1ª versão errou nisso (Elenxo 2026-08-07). Excluir
+# `done` de todos os tipos calava um caso com a assinatura EXATA do defeito que este arquivo
+# cura: uma `decision` fechada, superada por nó vivo, saía com "✅ nenhum alvo por reconciliar".
+# Medido: dos 11 alvos `done` do corpus, 11 são `question` — a exclusão tipada tem churn ZERO e
+# fecha o buraco. A razão antiga ("criaria 11 acusações novas") era CONVENIÊNCIA ocupando o lugar
+# do critério: verdadeira no número, errada no motivo.
+function alvoPendente(s, t) { return (s != "superseded" && s != "refuted" && !(s == "done" && t == "question")) }
+
 function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["'\'']$/, "", s); return s }
 
 BEGIN { section = ""; nid = ""; ne = 0 }
@@ -226,11 +276,13 @@ END {
   for (i = 1; i <= ne; i++) {
     deg[efrom[i]]++; deg[eto[i]]++
     if (etype[i] == "REFUTES")     refutedBy[eto[i]]++
-    # SUPERSEDES só ACUSA se o superseder está VIVO (confirmed). Superseder `open` significa relação
-    # ainda não assentada — e o alvo legitimamente segue confirmado até que ela assente. Medido: dos 15
-    # alvos não-reconciliados do corpus, 1 (E_engine_measured) tem superseder `open`; acusá-lo seria
-    # cobrar reconciliação de uma superação que ninguém fechou.
-    if (etype[i] == "SUPERSEDES" && nstatus[efrom[i]] == "confirmed") supersededByLive[eto[i]]++
+    # SUPERSEDES só ACUSA se o superseder está VIVO — ver supersederConta(). Superseder `open`
+    # significa relação ainda não assentada, e o alvo legitimamente segue confirmado até que ela
+    # assente (medido 2026-08-05: dos 15 alvos não-reconciliados do corpus, 1 — E_engine_measured —
+    # tinha superseder `open`; acusá-lo seria cobrar reconciliação de superação que ninguém fechou).
+    # Era ALLOWLIST de um valor até 2026-08-07, e por isso engolia superseder `drifted` — defeito
+    # LATENTE (0 ocorrências no corpus), demonstrado na fixture supersedes-mixed, não em campo.
+    if (etype[i] == "SUPERSEDES" && supersederConta(nstatus[efrom[i]])) supersededByLive[eto[i]]++
     if (etype[i] == "TRANSITIONS") { transOut[efrom[i]]++; transIn[eto[i]]++ }
     if (etype[i] == "HAS_STATE")   ownedState[eto[i]]++
     if (etype[i] == "TRACES_TO")   traceOut[efrom[i]]++
@@ -387,7 +439,7 @@ END {
     swarn = 0
     for (i = 1; i <= nn; i++) {
       id = order[i]
-      if (supersededByLive[id] > 0 && (nstatus[id] == "confirmed" || nstatus[id] == "open")) {
+      if (supersededByLive[id] > 0 && alvoPendente(nstatus[id], ntype[id])) {
         if (ntype[id] == "question")
           printf "  ⚠ %s: pergunta RESPONDIDA segue status=%s — fechar como `done` (respondida ≠ superada)\n", id, nstatus[id]
         else
@@ -565,7 +617,7 @@ END {
       if (statusFactor(nstatus[id]) < 0) { print "  ✗ " id ": status inválido: [" nstatus[id] "]"; problems++ }
       if (impact[id] < 1 || impact[id] > 5) { print "  ✗ " id ": impact fora de 1-5: " impact[id]; problems++ }
       if (conf[id] < 0 || conf[id] > 1) { print "  ✗ " id ": confidence fora de 0-1: " conf[id]; problems++ }
-      if (refutedBy[id] > 0 && (nstatus[id] == "confirmed" || nstatus[id] == "open")) {
+      if (refutedBy[id] > 0 && alvoPendente(nstatus[id], ntype[id])) {
         print "  ✗ CONTRADIÇÃO: " id " recebe REFUTES mas segue status=" nstatus[id] " (reconciliar: refuted ou superseded)"; problems++
       }
     }

@@ -2148,16 +2148,42 @@ run_kg_reconcile_selftests() {
   local out rc
 
   # (a) OS DOIS LADOS NO MESMO GRAFO — acusa o alvo vivo e a pergunta respondida; cala nos quatro
+  # 🔒 A INVARIANTE, NOMEADA — o radar PRODUZ SAÍDA. Antes de qualquer veredito sobre o CONTEÚDO,
+  # prove que houve conteúdo.
+  #
+  # INCIDENTE OBSERVADO (2026-08-07): o programa awk inteiro vive dentro de aspas simples do
+  # shell. Escrevendo o comentário do bloco denylist, entraram DUAS aspas simples e um `||`; as
+  # aspas fecharam a string do awk e o `||` virou operador de SHELL, curto-circuitando o comando.
+  # Resultado medido: kg-radar.sh imprimindo ZERO linhas com EXIT 0, em qualquer grafo. `bash -n`
+  # passou limpo. O sintoma foram 6 casos desta função falhando com `out=` VAZIO, sem dizer o quê.
+  #
+  # HONESTIDADE SOBRE O ALCANCE: NÃO consegui reproduzir o silêncio por mutação sintética — as
+  # quatro tentativas (1 aspa, 2 aspas, com/sem `||`, dentro/fora do bloco awk) falharam ALTO
+  # (exit 1, 2, 127). Ou seja: a maioria das injeções de aspa é barulhenta, e o caso silencioso
+  # é raro e depende do texto exato. Logo esta guarda NÃO está provada por mutação; ela nasce de
+  # um incidente medido e cobre o sintoma observado (zero linhas). Vale por ser barata e por
+  # NOMEAR a falha — não a trate como prova de que a classe inteira está coberta.
+  local viv; viv="$(bash "${radar}" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 | wc -l)"
+  if [ "${viv}" -gt 0 ]; then
+    record_pass "kg-reconcile: radar VIVO — produz saída (aspa simples em comentário do awk trunca o programa e imprime nada com exit 0)"
+  else
+    record_fail "kg-reconcile: radar MUDO" "kg-radar.sh imprimiu ZERO linhas com exit 0 — programa awk truncado? procure aspa simples introduzida num comentário dentro do bloco awk"
+    return
+  fi
+
   # que estão certos. Sem o lado negativo, "consertar" seria alargar a guarda e chamar de fix.
   rc=0; out=$(bash "${radar}" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
      && printf '%s' "${out}" | grep -q '⚠ D_ALVO_VIVO: recebe SUPERSEDES' \
      && printf '%s' "${out}" | grep -q '⚠ Q_RESPONDIDA: pergunta RESPONDIDA' \
+     && printf '%s' "${out}" | grep -q '⚠ C_ALVO_DE_DRIFTED' \
+     && printf '%s' "${out}" | grep -q '⚠ D_ALVO_DRIFTED' \
      && ! printf '%s' "${out}" | grep -q '⚠ D_JA_RECONCILIADO' \
      && ! printf '%s' "${out}" | grep -q '⚠ Q_JA_FECHADA' \
      && ! printf '%s' "${out}" | grep -q '⚠ C_SUPERSEDER_ABERTO' \
-     && ! printf '%s' "${out}" | grep -q '⚠ C_SO_REFUTES'; then
-    record_pass "kg-reconcile: (a) acusa alvo-vivo e pergunta-respondida; cala em reconciliado/fechado/superseder-aberto/REFUTES"
+     && ! printf '%s' "${out}" | grep -q '⚠ C_SO_REFUTES' \
+     && [ "$(printf '%s' "${out}" | grep -c '⚠ ')" -eq 4 ]; then
+    record_pass "kg-reconcile: (a) acusa EXATAMENTE 4 (alvo-vivo, pergunta-respondida e os dois de drifted); cala em reconciliado/fechado/superseder-aberto/REFUTES"
   else record_fail "kg-reconcile: (a) dois lados" "rc=${rc} out=${out}"; fi
 
   # (b) MENSAGEM PRÓPRIA POR TIPO — `question` recebe "fechar como done", não "reconciliar".
@@ -2185,8 +2211,8 @@ run_kg_reconcile_selftests() {
   # FALHA em vez de passar por omissão.
   local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'"' RETURN
   cp "${radar}" "${mut}/mutado.sh"
-  sed -i 's/ \&\& nstatus\[efrom\[i\]\] == "confirmed"//' "${mut}/mutado.sh"
-  if ! grep -q 'etype\[i\] == "SUPERSEDES" && nstatus\[efrom\[i\]\] == "confirmed"' "${mut}/mutado.sh"; then
+  sed -i 's/ \&\& supersederConta(nstatus\[efrom\[i\]\])//' "${mut}/mutado.sh"
+  if ! grep -q 'etype\[i\] == "SUPERSEDES" && supersederConta' "${mut}/mutado.sh"; then
     local mout; mout="$(bash "${mut}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
     if printf '%s' "${mout}" | grep -q '⚠ C_SUPERSEDER_ABERTO'; then
       record_pass "kg-reconcile: (d) (MUT) sem o filtro o superseder-aberto volta a acusar — o filtro é load-bearing"
@@ -2208,6 +2234,79 @@ run_kg_reconcile_selftests() {
   else
     record_fail "kg-reconcile: (e) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi
+
+  # (f) (MUT) A DENYLIST É QUEM COMPRA OS DOIS CASOS DE `drifted` — reverter os predicados às
+  # ALLOWLISTS de antes de 2026-08-07 tem de fazer C_ALVO_DE_DRIFTED e D_ALVO_DRIFTED SUMIREM,
+  # e os dois casos antigos SOBREVIVEREM. Sem esta prova, (a) não distingue "a denylist funciona"
+  # de "a fixture nova acusaria de qualquer jeito" — e a troca seria indistinguível de no-op.
+  # Medido no diff real: radar do main dá 2 avisos nesta fixture, o corrigido dá 4.
+  local mut3; mut3="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'" "'"${mut2}"'" "'"${mut3}"'"' RETURN
+  cp "${radar}" "${mut3}/mutado.sh"
+  # ⚠️ Os dois `sed` casam a ASSINATURA das funções. Se ela mudar (como mudou quando `alvoPendente`
+  # ganhou o parâmetro de tipo), eles param de casar — e é por isso que o `if` abaixo verifica o
+  # resultado: mutação que não pega dá record_fail explícito, nunca silêncio.
+  sed -i 's/^function supersederConta(s) .*/function supersederConta(s) { return (s == "confirmed") }/' "${mut3}/mutado.sh"
+  sed -i 's/^function alvoPendente(s, t) .*/function alvoPendente(s, t) { return (s == "confirmed" || s == "open") }/' "${mut3}/mutado.sh"
+  if grep -q 'supersederConta(s) { return (s == "confirmed") }' "${mut3}/mutado.sh" \
+     && grep -q 'alvoPendente(s, t) { return (s == "confirmed" || s == "open") }' "${mut3}/mutado.sh"; then
+    local mout3; mout3="$(bash "${mut3}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
+    if ! printf '%s' "${mout3}" | grep -q '⚠ C_ALVO_DE_DRIFTED' \
+       && ! printf '%s' "${mout3}" | grep -q '⚠ D_ALVO_DRIFTED' \
+       && printf '%s' "${mout3}" | grep -q '⚠ D_ALVO_VIVO' \
+       && printf '%s' "${mout3}" | grep -q '⚠ Q_RESPONDIDA'; then
+      record_pass "kg-reconcile: (f) (MUT) sob a allowlist antiga os DOIS casos de drifted somem e os antigos ficam — a denylist é load-bearing"
+    else record_fail "kg-reconcile: (f) (MUT) denylist" "a allowlist antiga não mudou o veredito dos drifted: out=${mout3}"; fi
+  else
+    record_fail "kg-reconcile: (f) (MUT) denylist" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+
+  # (g) O LADO QUE REPROVA — contradição de REFUTES com alvo em status NOVO. É o único sítio da
+  # troca que sai ✗ HARD (exit 1); os outros dois só emitem ⚠. Achado do Elenxo 2026-08-07: era o
+  # único SEM COBERTURA NENHUMA — revertendo só essa chamada e comparando os dois binários sobre
+  # os 73 .kg.yaml × 6 modos, deram 0 diffs em 438 comparações. A linha que pode travar o CI era
+  # a que ninguém podia mexer com segurança. Fixture SEPARADA porque (c) assere contagem na outra.
+  rc=0; out=$(bash "${radar}" "${rx}/refutes-drifted.kg.yaml" --integrity 2>&1) || rc=$?
+  if [ "${rc}" -eq 1 ] \
+     && printf '%s' "${out}" | grep -q 'CONTRADIÇÃO: C_ALVO_DRIFTED_REFUTADO' \
+     && printf '%s' "${out}" | grep -q 'CONTRADIÇÃO: C_ALVO_UNVER_REFUTADO' \
+     && ! printf '%s' "${out}" | grep -q 'C_ALVO_JA_REFUTADO' \
+     && ! printf '%s' "${out}" | grep -q 'Q_FECHADA_REFUTADA' \
+     && [ "$(printf '%s' "${out}" | grep -c '✗ ')" -eq 2 ]; then
+    record_pass "kg-reconcile: (g) REFUTES em alvo drifted/unverifiable REPROVA (exatamente 2 ✗); cala em já-refutado e question-done"
+  else record_fail "kg-reconcile: (g) lado HARD" "rc=${rc} out=${out}"; fi
+
+  # (g-MUT) e a prova de que é a denylist que compra o (g): revertida SÓ a chamada do sítio HARD,
+  # os dois ✗ têm de SUMIR. Sem isto, (g) não distingue "a correção funciona" de "a fixture
+  # reprovaria de qualquer jeito".
+  local mut4; mut4="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'" "'"${mut2}"'" "'"${mut3}"'" "'"${mut4}"'"' RETURN
+  cp "${radar}" "${mut4}/mutado.sh"
+  sed -i 's/if (refutedBy\[id\] > 0 \&\& alvoPendente(nstatus\[id\], ntype\[id\])) {/if (refutedBy[id] > 0 \&\& (nstatus[id] == "confirmed" || nstatus[id] == "open")) {/' "${mut4}/mutado.sh"
+  if grep -q 'refutedBy\[id\] > 0 && (nstatus\[id\] == "confirmed"' "${mut4}/mutado.sh"; then
+    local mout4; mout4="$(bash "${mut4}/mutado.sh" "${rx}/refutes-drifted.kg.yaml" --integrity 2>&1 || true)"
+    if [ "$(printf '%s' "${mout4}" | grep -c '✗ ')" -eq 0 ]; then
+      record_pass "kg-reconcile: (g-MUT) sob a allowlist antiga o sítio HARD fica CEGO — a denylist é quem reprova"
+    else record_fail "kg-reconcile: (g-MUT)" "a allowlist antiga ainda reprovou: out=${mout4}"; fi
+  else
+    record_fail "kg-reconcile: (g-MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+
+  # (h) A EXCLUSÃO DE `done` É POR TIPO, NÃO POR STATUS. A 1ª versão excluía `done` de todos os
+  # tipos e com isso calava exatamente o defeito que este arquivo cura: uma `decision` fechada,
+  # superada por nó vivo, saía com "✅ nenhum alvo por reconciliar". A razão antiga ("criaria 11
+  # acusações novas") era verdadeira no número e errada no motivo — os 11 são question, 11/11.
+  local dz; dz="$(mktemp -d)"
+  { printf 'meta:\n  id: t\n  schema_version: "1"\n  baseline: 2026-07-01\nnodes:\n'
+    printf '  - id: D_DEC_DONE\n    node_type: decision\n    plane: DEV\n    impact: 4\n    confidence: 1.0\n    status: done\n    label: "decisao fechada superada por no vivo"\n'
+    printf '  - id: Q_Q_DONE\n    node_type: question\n    plane: DEV\n    impact: 4\n    confidence: 1.0\n    status: done\n    label: "pergunta fechada como done — o remedio prescrito"\n'
+    printf '  - id: C_VIVO\n    node_type: claim\n    plane: DEV\n    impact: 3\n    confidence: 1.0\n    status: confirmed\n    label: "superseder vivo"\n'
+    printf 'edges:\n  - from: C_VIVO\n    to: D_DEC_DONE\n    edge_type: SUPERSEDES\n'
+    printf '  - from: C_VIVO\n    to: Q_Q_DONE\n    edge_type: SUPERSEDES\n'
+  } > "${dz}/tipado.kg.yaml"
+  out="$(bash "${radar}" "${dz}/tipado.kg.yaml" --reconcile 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q '⚠ D_DEC_DONE' && ! printf '%s' "${out}" | grep -q '⚠ Q_Q_DONE'; then
+    record_pass "kg-reconcile: (h) done fica fora SÓ para question — decisão fechada e superada ACUSA (era fail-open com a assinatura do defeito que o arquivo cura)"
+  else record_fail "kg-reconcile: (h) exclusão tipada" "out=${out}"; fi
+  rm -rf "${dz}"
 }
 
 run_kg_provenance_selftests() {
