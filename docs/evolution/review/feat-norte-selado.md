@@ -1,7 +1,7 @@
 ---
 branch: feat/norte-selado
 date: 2026-08-06
-reviewed_diff_sha256: 8f81df4430a8c6d65aa23d0ba489c53ab360918f0d72e86b9ad17352c1b3f68b
+reviewed_diff_sha256: be3761b3f694d1f3a767535fa50bde2e32ade498629f7d8bbf1fe74627b58b05
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
@@ -45,3 +45,29 @@ com o status como única variável.
 
 Fase 1 (as três decisões seladas, com a contradição medida registrada junto) e **Fase 3a**
 (os dois status legais) — o pré-requisito sem o qual o resto seria fail-open.
+
+---
+
+## Re-carimbo — a REGRA 56 acusou ARTEFATO-CADUCO, e estava certa
+
+O hash anterior cobria o estado do fim do Elenxo (`ff48f51`). Depois vieram **dois merges de
+`main`** (#552 e #553), e a regra acusou: *"a revisão registrada cobre outro diff — o código
+mudou DEPOIS de revisado"*. Foi o **primeiro contato dela com um PR real**, e pegou o autor
+da branch vizinha. Funcionou.
+
+**Não bastava carimbar o hash novo — isso seria burlar o gate.** Medi o delta:
+
+| origem | avaliação |
+|---|---|
+| conteúdo de **#552** e **#553** | cada um entrou com **artefato de revisão próprio** (`fix-review-verdict-caso-benigno.md`, `feat-gate-anti-cegueira.md`) — já revisado no seu PR |
+| **minha resolução de conflito** | `lint-selftest.sh` (reaplicação da função de statusFactor) + 2 `provenance.json` (regenerados) |
+
+**A resolução É trabalho novo, e merece a nota** — porque é exatamente onde eu errei uma vez
+neste mesmo merge: a 1ª tentativa foi união cega dos hunks, as 4 funções apareceram
+`def=1 reg=1`, e **o arquivo saiu com sintaxe quebrada** (`bash -n` exit 2). Contei presença
+quando a contagem certa era executabilidade.
+
+**Verificação da resolução (a que vale, não a que engana):** `bash -n` exit 0 · as 4 funções
+`def=1 reg=1` · `lint-selftest` **663/663, 0 falhas** — a união das três frentes rodando
+junta pela primeira vez · `kg-radar-integrity` exit 0 · `provenance.json` **regenerado da
+fonte**, não escolhido por lado.
