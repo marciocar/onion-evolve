@@ -7,7 +7,8 @@
 # Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
 #   RADAR           = atenção — peso do nó × centralidade (grau).
 #                     peso = impact(1-5) × confidence(0-1) × fator de status
-#                     fator: open=1.0 · confirmed=1.0 · refuted=0 · superseded=0.2 · done=0.1
+#                     fator: open=1.0 · confirmed=1.0 · drifted=1.3 (SOBE — mediu e divergiu)
+#                            unverifiable=1.0 · refuted=0 · superseded=0.2 · done=0.1
 #   ESTADO          = a FILA DE ABERTOS — o que segue `open` neste grafo, por atenção.
 #                     É o irmão do RADAR, pedido em 2026-07-16 e construído em 2026-08-06.
 #                     POR QUE NÃO É REDUNDANTE COM O RADAR (medido antes de escrever): das 79
@@ -74,6 +75,25 @@ MODE="${2:---all}"
 awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" '
 function statusFactor(s) {
   if (s == "open" || s == "confirmed") return 1.0
+  # DRIFTED — o nó foi MEDIDO contra o vivo e a realidade DIVERGIU. Fator > 1.0 de propósito:
+  # um nó que acabou de provar que o mundo andou é MAIS urgente que um confirmado de mesmo peso,
+  # porque alguém precisa reconciliar. Ele SOBE no radar, não desce.
+  #
+  # POR QUE ESTE SLOT PRECISOU EXISTIR (verificado em sandbox, 2026-08-06, com o status como
+  # ÚNICA variável): sem ele, selar um drift só tinha dois caminhos, e ambos são fail-open —
+  #   · gravar `drifted`  → exit 1, "status inválido": o gate RECUSA o selo;
+  #   · gravar `refuted`  → statusFactor 0.0 ⇒ atenção 10,0 vira 0 e o nó SOME do radar.
+  # O segundo é pior que o vazamento que ele curaria: apaga o sinal em vez de perdê-lo. O
+  # terceiro caminho, praticado por falta de slot, foi apensar nós à mão (o grafo de identidade
+  # fez isso em 2026-08-04: 16 nós novos porque o campo não existia).
+  # Achado pelo Elenxo sobre as decisões de norte — a Fase "selo mecânico" teria nascido como
+  # fábrica de fail-open se o schema viesse depois. SCHEMA PRIMEIRO.
+  if (s == "drifted") return 1.3
+  # UNVERIFIABLE — mediu-se e NÃO deu para verificar (método não derivável, medição exigiria
+  # mutação, alvo fora do repo). Continua tão urgente quanto `open`: é pergunta aberta sobre
+  # MENSURABILIDADE, não resposta. Nunca 0 — silenciar o que não se sabe medir é o oposto do
+  # declarado!=verificado.
+  if (s == "unverifiable") return 1.0
   if (s == "refuted") return 0.0
   if (s == "superseded") return 0.2
   if (s == "done") return 0.1

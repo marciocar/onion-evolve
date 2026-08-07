@@ -49,6 +49,18 @@ set -euo pipefail
 # Defeito PRÉ-EXISTENTE, achado dogfoodando o próprio fix (a main aborta idêntico).
 unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES
 
+# MESMA CLASSE, UMA CAMADA ACIMA — o runner do CI exporta GITHUB_*, e uma guarda que os lê
+# (hoje review-artifact-check.sh) passa a julgar o PR REAL de dentro da sandbox: procura
+# `feat-<branch-do-PR>.md` num fixture que só tem `feat-x.md`. Medido no PR #554: 6 casos
+# verdes LOCALMENTE (var ausente → o helper cai no git) e reprovando no CI. Pior, o caso (b)
+# passava PELO MOTIVO ERRADO — ele espera ARTEFATO-AUSENTE, que é o que o vazamento produz.
+#
+# A bancada é HERMÉTICA POR CONSTRUÇÃO: quem precisa de GITHUB_* fixa explicitamente no seu
+# próprio caso (é o que (h) sempre fez, e por isso foi o único que passou no CI). Consertar
+# só os 6 casos seria disciplina — curaria os de hoje e não impediria o 7º.
+unset GITHUB_HEAD_REF GITHUB_REF_NAME GITHUB_EVENT_NAME GITHUB_BASE_REF GITHUB_ACTIONS \
+      GITHUB_REPOSITORY GITHUB_RUN_ID GITHUB_EVENT_PATH GITHUB_SHA GITHUB_REF
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 FIX_DIR="${SCRIPT_DIR}/fixtures"
@@ -2056,6 +2068,73 @@ run_worklog_capture_session_selftests() {
   rm -rf "${d}" "${nojq_dir}"
 }
 
+# Guardas do statusFactor — os status de RE-VERIFICAÇÃO (`drifted`/`unverifiable`).
+#
+# POR QUE EXISTEM (Elenxo sobre as decisões de norte, 2026-08-06): o plano ia construir o "selo
+# mecânico" (medição que existe e não foi selada reprova) ANTES de o schema ter onde pousar o
+# resultado. Verificado em sandbox, com o status como ÚNICA variável:
+#   confirmed → atenção 10,0 · drifted → EXIT 1 "status inválido" · refuted → atenção SOME (0.0)
+# Ou seja: selar um drift só dava para ser RECUSADO ou para MENTIR de `refuted` — e o segundo é
+# pior que o vazamento que curaria, porque APAGA o sinal em vez de perdê-lo. O terceiro caminho,
+# praticado por falta de slot, foi apensar nós à mão (identidade, 2026-08-04: 16 nós).
+# SCHEMA PRIMEIRO. Estes casos são o contrato desse slot.
+run_status_reverificacao_selftests() {
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  local d; d="$(mktemp -d)"
+  local st rc out att
+
+  _mkst() {   # grafo de 2 nós; o status de C_A é a ÚNICA variável (sem órfão, sem confundidor)
+    printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: C_A\n    node_type: claim\n    plane: PROD\n    impact: 5\n    confidence: 1.0\n    status: %s\n    label: "x"\n  - id: C_B\n    node_type: claim\n    plane: DEV\n    impact: 2\n    confidence: 1.0\n    status: confirmed\n    label: "y"\nedges:\n  - from: C_A\n    to: C_B\n    edge_type: SUPPORTS\n' "$1" > "${d}/x.kg.yaml"
+  }
+  _att() { grep -E '^[[:space:]]+[0-9.]+[[:space:]]+C_A' "$1" | head -1 | awk '{print $1}'; }
+
+  # (a) `drifted` é status LEGAL — antes disto o radar saía 1 com "status inválido"
+  _mkst drifted; rc=0; bash "${radar}" "${d}/x.kg.yaml" > "${d}/o.txt" 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "status-reverif: (a) \`drifted\` é legal (era exit 1, status inválido)"
+  else record_fail "status-reverif: (a) drifted legal" "rc=${rc} out=$(cat "${d}/o.txt")"; fi
+
+  # (b) drift SOBE no radar. É a cláusula que carrega o desenho: um nó que provou que a realidade
+  #     andou é MAIS urgente que um confirmado de mesmo peso, não menos.
+  att="$(_att "${d}/o.txt")"
+  _mkst confirmed; bash "${radar}" "${d}/x.kg.yaml" > "${d}/c.txt" 2>&1 || true
+  local attc; attc="$(_att "${d}/c.txt")"
+  if awk -v a="${att:-0}" -v c="${attc:-0}" 'BEGIN{exit !(a > c)}'; then
+    record_pass "status-reverif: (b) drifted (${att}) SOBE acima de confirmed (${attc}) — drift aumenta atenção"
+  else record_fail "status-reverif: (b) drifted sobe" "drifted=${att} confirmed=${attc}"; fi
+
+  # (c) `unverifiable` é legal e segue tão urgente quanto aberto — silenciar o que não se sabe
+  #     medir é o oposto do declarado!=verificado.
+  _mkst unverifiable; rc=0; bash "${radar}" "${d}/x.kg.yaml" > "${d}/u.txt" 2>&1 || rc=$?
+  local attu; attu="$(_att "${d}/u.txt")"
+  if [ "${rc}" -eq 0 ] && awk -v u="${attu:-0}" -v c="${attc:-0}" 'BEGIN{exit !(u == c)}'; then
+    record_pass "status-reverif: (c) \`unverifiable\` legal e tão urgente quanto aberto (${attu})"
+  else record_fail "status-reverif: (c) unverifiable" "rc=${rc} att=${attu} vs confirmed=${attc}"; fi
+
+  # (d) O CONTRASTE QUE JUSTIFICA TUDO: `refuted` continua zerando a atenção. Sem este caso,
+  #     (a)-(c) não provam por que o slot novo precisou existir — provam só que ele existe.
+  _mkst refuted; bash "${radar}" "${d}/x.kg.yaml" > "${d}/r.txt" 2>&1 || true
+  if [ -z "$(_att "${d}/r.txt")" ]; then
+    record_pass "status-reverif: (d) \`refuted\` segue SUMINDO do radar — selar drift ali apagaria o sinal"
+  else record_fail "status-reverif: (d) refuted zera" "refuted apareceu com atenção $(_att "${d}/r.txt")"; fi
+
+  # (e) status FORA do enum continua REPROVANDO — a porta não ficou aberta ao abrir o slot.
+  _mkst bananinha; rc=0; bash "${radar}" "${d}/x.kg.yaml" > "${d}/b.txt" 2>&1 || rc=$?
+  if [ "${rc}" -ne 0 ] && grep -q 'inválido' "${d}/b.txt"; then
+    record_pass "status-reverif: (e) status fora do enum ainda reprova (o slot novo não abriu a porta)"
+  else record_fail "status-reverif: (e) enum fechado" "rc=${rc} out=$(cat "${d}/b.txt")"; fi
+
+  # (f) (MUT) sem o fator de `drifted`, o status volta a ser inválido — prova que a linha é
+  #     load-bearing e que (a)-(c) não passam por outro motivo.
+  local mut; mut="$(mktemp -d)"; cp "${radar}" "${mut}/m.sh"
+  sed -i 's|^  if (s == "drifted") return 1.3$||' "${mut}/m.sh"
+  if ! grep -q 'if (s == "drifted") return 1.3' "${mut}/m.sh"; then
+    _mkst drifted; rc=0; bash "${mut}/m.sh" "${d}/x.kg.yaml" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -ne 0 ]; then record_pass "status-reverif: (f) (MUT) sem o fator, \`drifted\` volta a ser inválido — a linha é load-bearing"
+    else record_fail "status-reverif: (f) (MUT)" "sem o fator o radar ainda aceitou drifted (rc=${rc})"; fi
+  else record_fail "status-reverif: (f) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  rm -rf "${mut}" "${d}"
+}
+
 # Guardas do bloco RECONCILIAÇÃO do kg-radar.sh — o PRIMEIRO teste deste bloco.
 #
 # POR QUE EXISTE (medido 2026-08-05): a INTEGRIDADE cobra contradição só para REFUTES
@@ -3915,6 +3994,21 @@ run_review_artifact_selftests() {
   if [ ! -f "${helper}" ]; then record_fail "review-artifact" "helper ausente: ${helper}"; return; fi
   local d out rc
 
+  # 🔒 A INVARIANTE, NOMEADA — a bancada tem de estar hermética ANTES do 1º caso rodar. Sem esta
+  # asserção, quebrar o `unset GITHUB_*` do topo se manifesta como 6 `ARTEFATO-AUSENTE` crípticos
+  # apontando para o branch REAL do PR, e quem lê perde tempo caçando um defeito de guarda que não
+  # existe (foi o que aconteceu no #554). Aqui a falha diz o que é: o ambiente vazou.
+  # Não é mutation test — é mais barato e mais DIAGNÓSTICO: nomeia a causa em vez de exibir sintoma.
+  local vazou=""
+  for _v in GITHUB_HEAD_REF GITHUB_REF_NAME GITHUB_EVENT_NAME GITHUB_BASE_REF; do
+    [ -n "$(eval "printf '%s' \"\${${_v}:-}\"")" ] && vazou="${vazou} ${_v}"
+  done
+  if [ -n "${vazou}" ]; then
+    record_fail "bancada-hermetica" "ambiente do runner VAZOU para a bancada:${vazou} — o \`unset GITHUB_*\` do topo não cobriu. Casos que simulam PR passarão a julgar o PR REAL de dentro da sandbox."
+  else
+    record_pass "bancada-hermetica: nenhum GITHUB_* do runner alcança os fixtures (a hermeticidade é do topo, não de cada caso)"
+  fi
+
   # Sandbox: repo git com branch != default, um commit de código, e origin/HEAD apontando para main.
   _mk_pr_repo() {
     d="$(mktemp -d)"
@@ -3953,11 +4047,22 @@ run_review_artifact_selftests() {
   # OS DOIS MODOS, e o TSV vem PRIMEIRO de propósito: é o que `check_review_artifact` consome. Testar
   # só o humano foi o defeito que deixou a guarda de vacuidade da REGRA 55 verde com o parser morto
   # (2026-08-06) — e eu o repeti AQUI, no mesmo dia. Quem pegou foi o consumed-mode-check.sh (instrumento, NÃO regra), não uma releitura minha.
-  _run() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${helper}" "$1" --format=tsv 2>&1 ); }
-  _run_humano() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${helper}" "$1" 2>&1 ); }
+  # ⚠️ GITHUB_HEAD_REF É OBRIGATÓRIO AQUI, mesmo parecendo redundante com o branch da sandbox: o
+  # helper lê `BRANCH="${GITHUB_HEAD_REF:-}"` ANTES de perguntar ao git. Sem fixá-lo, a bancada
+  # HERDA o valor do runner e passa a julgar o branch REAL do PR dentro da sandbox — procurando
+  # `feat-<branch-real>.md` num repo que só tem `feat-x.md`. Local passava (var ausente → cai no
+  # git), CI reprovava: 6 casos, medido no PR #554. [[bancada-espelha-o-runner]] — mesma lição pela
+  # 3ª vez, agora INVERTIDA: não é a bancada que esqueceu uma opção do runner, é o RUNNER que tem
+  # uma variável que a bancada não neutralizou.
+  _run() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge bash "${helper}" "$1" --format=tsv 2>&1 ); }
+  _run_humano() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge bash "${helper}" "$1" 2>&1 ); }
 
   # (a) SEM PR (trabalho em curso) → silencioso, exit 0. Sem isto a guarda travaria todo commit.
   _mk_pr_repo
+  # 🐤 CANÁRIO DA HERMETICIDADE — invocação NUA de propósito. Este caso testa a AUSÊNCIA de PR,
+  # então só passa se o `unset GITHUB_*` do topo tiver funcionado. Blindá-lo com `env -u` aqui
+  # seria auto-proteção que MASCARA a falha do mecanismo: passaria em silêncio com o unset
+  # quebrado. Nu, ele reprova alto no CI — que é exatamente como o defeito apareceu.
   rc=0; out="$( cd "${d}" && bash "${helper}" "${d}" 2>&1 )" || rc=$?
   if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'fora de escopo'; then
     record_pass "review-artifact: (a) sem PR aberto → CALA (trabalho em curso não é trabalho proposto)"
@@ -4048,6 +4153,7 @@ run_review_artifact_selftests() {
   #     como "nada a relatar". Cinco classes de silêncio foram medidas assim. É a mesma família de
   #     defeito que este ciclo cura, cometida DENTRO da cura.
   _mk_pr_repo
+  # 🐤 segundo canário, no modo TSV (o que o lint consome): nu pela mesma razão que (a).
   rc=0; out="$( cd "${d}" && bash "${helper}" "${d}" --format=tsv 2>&1 )" || rc=$?
   if printf '%s' "${out}" | grep -q 'ISENCAO'; then
     record_pass "review-artifact: (i) isenção aparece no modo TSV (o que o lint consome), não só no humano"
@@ -4064,7 +4170,8 @@ run_review_artifact_selftests() {
     ( cd "${d}" && printf 'v3\n' > .claude/validation/alvo.sh && git add -A \
       && git -c user.email=t@t -c user.name=t commit -qm depois ) 2>/dev/null
     rc=0
-    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${mut}/m.sh" "${d}" >/dev/null 2>&1 ) || rc=$?
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
+        bash "${mut}/m.sh" "${d}" >/dev/null 2>&1 ) || rc=$?
     if [ "${rc}" -eq 0 ]; then
       record_pass "review-artifact: (g) (MUT) sem a comparação de hash o caduco PASSA — o amarre é load-bearing"
     else record_fail "review-artifact: (g) (MUT)" "mutante ainda reprovou (rc=${rc}) — (d) passa por outro motivo"; fi
@@ -7080,6 +7187,7 @@ run_kg_reconcile_selftests
 # Modo state — a fila de abertos, complementar ao radar por construção
 run_kg_state_selftests
 run_kg_trace_resolve_selftests
+run_status_reverificacao_selftests
 run_worklog_precompact_breadcrumb_selftests
 run_aside_router_hook_selftests
 run_worklog_capture_session_selftests
