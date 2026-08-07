@@ -4093,6 +4093,69 @@ run_scope_gitignore_selftests() {
 # Bancada inline (sem fixture em disco) porque o caso é um PAR ledger↔grafo, e o par tem de
 # ficar visível no próprio teste — fixture separada esconderia justamente a relação sob teste.
 # ═══════════════════════════════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+# post-review-comment.sh — o TRANSPORTE `cli` de `addReviewComment` (forge SDAAL).
+# Testável porque tem `--dry-run`: sem ele, um step de CI que posta é código sem cobertura, que
+# é exatamente o padrão que manteve o revisor invisível por 15 commits.
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+run_post_review_comment_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/forge/post-review-comment.sh"
+  if [ ! -f "${helper}" ]; then record_fail "forge-post" "helper ausente: ${helper}"; return; fi
+  local b out rc
+  b="$(mktemp)"; printf '## parecer\n\ncorpo real\n' > "${b}"
+
+  # (a) STICKY, 1ª vez — sem comentário existente → POST
+  out="$(bash "${helper}" --pr 42 --body-file "${b}" --sticky '<!-- m -->' --repo o/r --dry-run 2>&1)"
+  if printf '%s' "${out}" | grep -q '^POST'; then
+    record_pass "forge-post: (a) sticky sem comentário prévio → POST"
+  else record_fail "forge-post: (a) primeiro post" "out=${out}"; fi
+
+  # (b) STICKY, 2ª vez — comentário existe → PATCH, NÃO um segundo POST. É a lição medida no PR
+  #     #529: o workflow roda em `synchronize`, 2 pushes viravam 2 comentários e 2 e-mails.
+  out="$(DRY_EXISTENTE=777 bash "${helper}" --pr 42 --body-file "${b}" --sticky '<!-- m -->' --repo o/r --dry-run 2>&1)"
+  if printf '%s' "${out}" | grep -q '^PATCH.*777'; then
+    record_pass "forge-post: (b) sticky com comentário prévio → PATCH no mesmo id (editar não gera e-mail novo)"
+  else record_fail "forge-post: (b) sticky edita" "out=${out}"; fi
+
+  # (c) SEM --sticky → comportamento da SPEC: sempre cria. O sticky é EXTENSÃO declarada, e o
+  #     modo espec-fiel tem de continuar existindo.
+  out="$(DRY_EXISTENTE=777 bash "${helper}" --pr 42 --body-file "${b}" --repo o/r --dry-run 2>&1)"
+  if printf '%s' "${out}" | grep -q '^POST'; then
+    record_pass "forge-post: (c) sem --sticky sempre CRIA (fidelidade à spec: addReviewComment não tem sticky)"
+  else record_fail "forge-post: (c) modo spec" "out=${out}"; fi
+
+  # (d) CORPO VAZIO não posta. Comentário em branco é pior que nenhum: parece que houve parecer.
+  local vazio; vazio="$(mktemp)"; : > "${vazio}"
+  rc=0; out="$(bash "${helper}" --pr 42 --body-file "${vazio}" --repo o/r --dry-run 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'corpo VAZIO' \
+     && ! printf '%s' "${out}" | grep -qE '^(POST|PATCH)'; then
+    record_pass "forge-post: (d) corpo vazio → avisa e NÃO posta, com exit 0 (posting não reprova PR)"
+  else record_fail "forge-post: (d) corpo vazio" "rc=${rc} out=${out}"; fi
+  rm -f "${vazio}"
+
+  # (e) ERRO DE USO sai 2, não 0. A distinção que review-verdict.sh já estabeleceu: uso quebrado
+  #     é erro de EXECUÇÃO; falha de rede é veredito. Confundir os dois é fail-open.
+  rc=0; bash "${helper}" --pr 42 --repo o/r --dry-run >/dev/null 2>&1 || rc=$?
+  local rc2=0; bash "${helper}" --flag-que-nao-existe >/dev/null 2>&1 || rc2=$?
+  if [ "${rc}" -eq 2 ] && [ "${rc2}" -eq 2 ]; then
+    record_pass "forge-post: (e) erro de USO → exit 2; falha de posting → exit 0 (uso ≠ veredito)"
+  else record_fail "forge-post: (e) exit de uso" "sem-body=${rc} flag-ruim=${rc2} (esperado 2 e 2)"; fi
+
+  # (f) (MUT) sem a busca pela marca, o sticky vira POST sempre — prova que a busca é
+  #     load-bearing e que (b) não passa por acidente.
+  local mut; mut="$(mktemp -d)"; cp "${helper}" "${mut}/m.sh"
+  sed -i 's|EXISTENTE="${DRY_EXISTENTE:-}"|EXISTENTE=""|' "${mut}/m.sh"
+  # `cmp`, NAO `grep`: `EXISTENTE=""` ja existe no arquivo INTACTO (a inicializacao), entao o grep
+  # passava mesmo com sed no-op. Elenxo 2026-08-07. Comparar arquivos nao tem como ser vacuo.
+  if ! cmp -s "${helper}" "${mut}/m.sh"; then
+    out="$(DRY_EXISTENTE=777 bash "${mut}/m.sh" --pr 42 --body-file "${b}" --sticky '<!-- m -->' --repo o/r --dry-run 2>&1)"
+    if printf '%s' "${out}" | grep -q '^POST'; then
+      record_pass "forge-post: (f) (MUT) sem a busca pela marca o sticky duplica — a busca é load-bearing"
+    else record_fail "forge-post: (f) (MUT)" "mutante ainda deu PATCH: out=${out}"; fi
+  else record_fail "forge-post: (f) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  rm -rf "${mut}"; rm -f "${b}"
+}
+
 run_kg_seal_check_selftests() {
   local helper="${SCRIPT_DIR}/kg-seal-check.sh"
   if [ ! -f "${helper}" ]; then record_fail "kg-selo" "helper ausente: ${helper}"; return; fi
@@ -7534,6 +7597,7 @@ run_kg_reconcile_selftests
 run_kg_state_selftests
 run_kg_trace_resolve_selftests
 run_kg_seal_check_selftests
+run_post_review_comment_selftests
 run_status_reverificacao_selftests
 run_worklog_precompact_breadcrumb_selftests
 run_aside_router_hook_selftests

@@ -217,6 +217,30 @@ class GitHubForgeAdapter implements IForge {
     return this.normalizeComment(created);
   }
 
+  // EDITAR COMENTARIO POR ID — nao existe `gh pr comment --edit`, entao os DOIS transportes usam
+  // o endpoint REST; no modo `cli` isso e feito por `gh api`, que ja e o padrao adotado aqui para
+  // o caso inline. Materializado em `.claude/utils/forge/post-review-comment.sh` para consumidor
+  // que nao e LLM (workflow de CI): o SDAAL e Markdown lido por LLM, e um step de Actions e shell.
+  async updateReviewComment(commentId: string, body: string): Promise<ReviewCommentOutput> {
+    const { owner, repo } = await this.resolveRepo();
+    if (this.transport === 'cli') {
+      gh(['api', '-X', 'PATCH', `/repos/${owner}/${repo}/issues/comments/${commentId}`,
+          '-f', `body=${body}`]);
+      return { id: commentId, body, author: 'self', createdAt: new Date().toISOString() };
+    }
+    const updated = await this.rest('PATCH', `/repos/${owner}/${repo}/issues/comments/${commentId}`, { body });
+    return this.normalizeComment(updated);
+  }
+
+  // MODO STICKY de addReviewComment — o upsert por marca. Procura comentario PROPRIO que contenha
+  // `comment.upsertBy` e delega a updateReviewComment; so cria se nao achar.
+  private async upsertByMarca(prRef: PRRef, comment: ReviewCommentInput): Promise<ReviewCommentOutput> {
+    const existentes = await this.getReviewComments(prRef);
+    const meu = existentes.filter(c => c.author === 'self' && c.body.includes(comment.upsertBy!)).pop();
+    if (meu) return this.updateReviewComment(meu.id, comment.body);
+    return this.addReviewComment(prRef, { ...comment, upsertBy: undefined });
+  }
+
   async getReviewComments(prRef: PRRef): Promise<ReviewCommentOutput[]> {
     const number = await this.resolveNumber(prRef);
     const { owner, repo } = await this.resolveRepo();

@@ -138,6 +138,17 @@ interface ReviewCommentInput {
 
   /** Linha do arquivo (comentário inline; requer path) */
   line?: number;
+
+  /**
+   * MARCA STICKY (opcional). Quando presente, o adapter procura um comentário PRÓPRIO que a
+   * contenha e o EDITA em vez de criar outro — upsert por marca. Use um comentário HTML, que é
+   * invisível no render: `<!-- onion-review-parecer -->`.
+   *
+   * NASCEU DE DANO MEDIDO (PR #529): o workflow roda em `synchronize`, então 2 pushes viravam 2
+   * comentários e 2 e-mails. Editar NÃO dispara notificação nova. Sem este campo, cada consumidor
+   * reimplementa a lição — e foi assim que `gh api` cru entrou no onion-review.yml.
+   */
+  upsertBy?: string;
 }
 ```
 

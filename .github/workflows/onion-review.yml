@@ -123,8 +123,29 @@ jobs:
               (Claude 3.x) ou de outro provider (gpt/gemini/llama) citados como modelo de agente.
             - Ausência de vaporware (ex.: `mcp_onion-orchestrator`).
 
-            Poste comentários inline nos pontos problemáticos, citando a regra e a evidência.
-            Seja conciso e factual; se o diff estiver conforme, aprove explicitamente.
+            NÃO tente postar comentário nem aprovar o PR — você não tem ferramenta para isso, e
+            medimos: em 2026-08-07 o log mostrou `permission_denials_count: 14` e `No buffered
+            inline comments`. Quem posta é o Onion, com o que você DEVOLVER.
+
+            TERMINE a resposta com o parecer no formato abaixo — é ele que vira o comentário do
+            PR, e é a única forma de o seu trabalho chegar a um humano:
+
+              VEREDITO: conforme
+            ou
+              VEREDITO: N violações
+              - arquivo:linha — regra — evidência
+              - arquivo:linha — regra — evidência
+
+            `regra` cita a meta-spec como `arquivo:linha`. `evidência` é o que está no diff, não
+            interpretação. Diff conforme ⇒ só a linha VEREDITO, sem lista.
+          # ⚠️ `--json-schema` FOI TENTADO E REVERTIDO (2026-08-07), e o registro fica para ninguem
+          # repetir: o parser da action passa `claude_args` por `shell-quote`, que COME as aspas do
+          # JSON. Medido — 371 bytes entram, 253 saem, `JSON.parse` falha; o CLI real responde
+          # `Error: --json-schema is not valid JSON` e sai 1; o SDK morre em t=0 com ZERO mensagens
+          # e o execution_file sai `[]`. Efeito: `revisou=false / json-ilegivel` nas DUAS
+          # tentativas. Seria REGRESSAO ESTRITA — hoje o revisor roda 41 turnos com sucesso.
+          # Para reabilitar seria preciso passar o schema por ARQUIVO, e o input nao aceita isso
+          # neste pin. Fio registrado; nao adivinhe de novo.
           claude_args: |
             --model claude-sonnet-5
             --max-turns 60
@@ -185,8 +206,29 @@ jobs:
               (Claude 3.x) ou de outro provider (gpt/gemini/llama) citados como modelo de agente.
             - Ausência de vaporware (ex.: `mcp_onion-orchestrator`).
 
-            Poste comentários inline nos pontos problemáticos, citando a regra e a evidência.
-            Seja conciso e factual; se o diff estiver conforme, aprove explicitamente.
+            NÃO tente postar comentário nem aprovar o PR — você não tem ferramenta para isso, e
+            medimos: em 2026-08-07 o log mostrou `permission_denials_count: 14` e `No buffered
+            inline comments`. Quem posta é o Onion, com o que você DEVOLVER.
+
+            TERMINE a resposta com o parecer no formato abaixo — é ele que vira o comentário do
+            PR, e é a única forma de o seu trabalho chegar a um humano:
+
+              VEREDITO: conforme
+            ou
+              VEREDITO: N violações
+              - arquivo:linha — regra — evidência
+              - arquivo:linha — regra — evidência
+
+            `regra` cita a meta-spec como `arquivo:linha`. `evidência` é o que está no diff, não
+            interpretação. Diff conforme ⇒ só a linha VEREDITO, sem lista.
+          # ⚠️ `--json-schema` FOI TENTADO E REVERTIDO (2026-08-07), e o registro fica para ninguem
+          # repetir: o parser da action passa `claude_args` por `shell-quote`, que COME as aspas do
+          # JSON. Medido — 371 bytes entram, 253 saem, `JSON.parse` falha; o CLI real responde
+          # `Error: --json-schema is not valid JSON` e sai 1; o SDK morre em t=0 com ZERO mensagens
+          # e o execution_file sai `[]`. Efeito: `revisou=false / json-ilegivel` nas DUAS
+          # tentativas. Seria REGRESSAO ESTRITA — hoje o revisor roda 41 turnos com sucesso.
+          # Para reabilitar seria preciso passar o schema por ARQUIVO, e o input nao aceita isso
+          # neste pin. Fio registrado; nao adivinhe de novo.
           claude_args: |
             --model claude-sonnet-5
             --max-turns 60
@@ -210,11 +252,33 @@ jobs:
           R2: ${{ steps.v2.outputs.revisou }}
           M2: ${{ steps.v2.outputs.motivo }}
           T2: ${{ steps.v2.outputs.turnos }}
+          SO1: ${{ steps.review.outputs.structured_output }}
+          SO2: ${{ steps.review2.outputs.structured_output }}
+          EXEC1: ${{ steps.review.outputs.execution_file }}
+          EXEC2: ${{ steps.review2.outputs.execution_file }}
+          PR: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          MARCA='<!-- onion-review-parecer -->'
           if [ "${R1}" = "true" ] || [ "${R2}" = "true" ]; then
-            turnos="${T1}"; [ "${R2}" = "true" ] && turnos="${T2}"
-            echo "::notice::onion-review REVISOU este PR (${turnos} turnos). Ausência de comentários = nada a apontar."
-            echo "✅ **onion-review revisou** — ${turnos} turnos. Sem comentários significa **nada a apontar**." >> "${GITHUB_STEP_SUMMARY}"
+            turnos="${T1}"; so="${SO1}"; exec_f="${EXEC1}"
+            [ "${R2}" = "true" ] && { turnos="${T2}"; so="${SO2}"; exec_f="${EXEC2}"; }
+            echo "::notice::onion-review REVISOU este PR (${turnos} turnos) — parecer postado no PR."
+
+            # O revisor DEVOLVEU; quem posta e o Onion. O render mora no script (um 2o parser no
+            # YAML seria a divida "DOIS PARSERS, DUAS VERDADES" que kg-view.sh ja escreveu), e o
+            # posting passa pelo transporte do forge, nunca por `gh api` cru neste bloco.
+            corpo="$(mktemp)"
+            bash .claude/validation/review-verdict.sh --corpo "${MARCA}" "${so}" "${exec_f}" > "${corpo}"
+            bash .claude/utils/forge/post-review-comment.sh \
+              --pr "${PR}" --body-file "${corpo}" --sticky "${MARCA}"
+
+            {
+              echo "✅ **onion-review revisou** — ${turnos} turnos. O parecer foi postado no PR."
+              echo ""
+              cat "${corpo}"
+            } >> "${GITHUB_STEP_SUMMARY}"
+            rm -f "${corpo}"
           else
             echo "⚠️ **onion-review NÃO revisou** — 1ª: \`${M1:-nao-rodou}\` · 2ª: \`${M2:-nao-rodou}\`. Este verde é soft-pass." >> "${GITHUB_STEP_SUMMARY}"
           fi
@@ -294,34 +358,30 @@ jobs:
 
           # UM comentário por PR, ATUALIZADO — nunca um por push (medido no PR #529: o workflow
           # roda em `synchronize`, então 2 pushes viraram 2 comentários e 2 e-mails). Editar um
-          # comentário existente NÃO dispara notificação nova no GitHub, então o autor recebe no
-          # máximo um e-mail por PR. Alarme que chega repetido é alarme que se aprende a ignorar —
-          # o mesmo princípio que manteve o critério do review-verdict.sh estreito.
-          # Corpo montado com printf: interpolar multilinha dentro do YAML herdaria a
-          # indentação do bloco, e 4+ espaços no início de uma linha viram BLOCO DE CÓDIGO em
-          # Markdown — o aviso chegaria ilegível.
+          # comentário existente NÃO dispara notificação nova, então o autor recebe no máximo um
+          # e-mail por PR. Alarme que chega repetido é alarme que se aprende a ignorar.
+          #
+          # O POSTING PASSA PELO TRANSPORTE DO FORGE (2026-08-07). Antes eram três `gh api` crus
+          # aqui — sem isenção declarada, e literalmente a operação que `setup-code-review.md:71`
+          # manda fazer pelo adapter, dentro do workflow que esse mesmo comando distribui. Ninguém
+          # viu porque as REGRAS 10/11 do lint varrem só `.claude/commands` e `.claude/agents`.
+          #
+          # O casamento agora é SÓ pela marca. O `OR texto-antigo` que existia era rede para a
+          # janela de migração, e ela FECHOU: medido em 2026-08-07, do PR #530 em diante todos os
+          # comentários do bot carregam a marca; só o #529 (mergeado) tem dois sem ela.
           MARCA='<!-- onion-review-softpass -->'
-          corpo="$(printf '%s\n\n%s\n\n%s\n' \
-            "${MARCA}" \
-            "⚠️ **onion-review não revisou após 2 tentativas** (1ª: \`${M1:-nao-rodou}\` · 2ª: \`${M2:-nao-rodou}\`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (\`onion-validate\`) passou. _Soft-pass: falha persistente do revisor não bloqueia o PR (resiliência 2026-07-14 + leitura do sinal correto 2026-08-03)._${nota}" \
-            "<sub>atualizado pela run [\`${GITHUB_RUN_ID}\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})</sub>")"
+          corpo="$(mktemp)"
+          {
+            printf '%s\n\n' "${MARCA}"
+            printf '⚠️ **onion-review não revisou após 2 tentativas** (1ª: `%s` · 2ª: `%s`) — este PR **não foi revisado semanticamente**; revise manualmente. O gate determinístico (`onion-validate`) passou. _Soft-pass: falha persistente do revisor não bloqueia o PR._%s\n\n' \
+              "${M1:-nao-rodou}" "${M2:-nao-rodou}" "${nota}"
+            printf '<sub>atualizado pela run [`%s`](%s/%s/actions/runs/%s)</sub>\n' \
+              "${GITHUB_RUN_ID}" "${GITHUB_SERVER_URL}" "${GITHUB_REPOSITORY}" "${GITHUB_RUN_ID}"
+          } > "${corpo}"
 
-          # Casa pela MARCA ou pelo texto antigo — senão os comentários já postados antes desta
-          # mudança ficariam órfãos e o próximo viraria duplicata mesmo com a correção no lugar.
-          existente="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" --paginate \
-            --jq '[.[] | select(.user.login == "github-actions[bot]")
-                       | select(.body | test("onion-review-softpass|onion-review não revisou"))]
-                  | last | .id // empty' 2>/dev/null || true)"
-
-          if [ -n "${existente}" ]; then
-            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${existente}" -f body="${corpo}" >/dev/null \
-              && echo "aviso ATUALIZADO no comentário ${existente} (edição não gera e-mail novo)" \
-              || echo "::warning::não consegui atualizar o comentário de aviso (segue soft-pass)"
-          else
-            gh api -X POST "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" -f body="${corpo}" >/dev/null \
-              && echo "aviso POSTADO (primeiro deste PR)" \
-              || echo "::warning::não consegui postar o comentário de aviso (segue soft-pass)"
-          fi
+          bash .claude/utils/forge/post-review-comment.sh \
+            --pr "${PR}" --body-file "${corpo}" --sticky "${MARCA}"
+          rm -f "${corpo}"
 
       - name: Aviso — revisor Onion pulado (sem ANTHROPIC_API_KEY)
         id: sem_chave
