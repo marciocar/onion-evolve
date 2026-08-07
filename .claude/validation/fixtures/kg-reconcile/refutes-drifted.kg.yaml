@@ -1,0 +1,79 @@
+# Fixture: o LADO QUE REPROVA — alvo de REFUTES em status novo (`drifted`/`unverifiable`).
+#
+# POR QUE FIXTURE SEPARADA, e não mais casos na supersedes-mixed: aquele arquivo tem um caso de
+# integridade assertado por CONTAGEM ("exatamente 1 ✗"), e acrescentar contradições ali quebraria
+# a asserção sem que o novo caso ganhasse nada.
+#
+# POR QUE ELA EXISTE (Elenxo 2026-08-07): a contradição de REFUTES é o ÚNICO sítio da troca
+# allowlist→denylist que REPROVA (✗ HARD, exit 1) — os outros dois só emitem ⚠. E era o único
+# SEM COBERTURA NENHUMA: revertendo só a chamada de alvoPendente() nesse ponto e comparando a
+# saída dos dois binários sobre os 73 .kg.yaml do repo × 6 modos, deram 0 diffs em 438
+# comparações. A linha que pode travar o CI era a que ninguém podia mexer com segurança.
+#
+#   - C_ALVO_DRIFTED_REFUTADO  (claim `drifted`, recebe REFUTES de nó vivo)      → ✗ CONTRADIÇÃO
+#   - C_ALVO_UNVER_REFUTADO    (claim `unverifiable`, recebe REFUTES de nó vivo) → ✗ CONTRADIÇÃO
+#   - C_ALVO_JA_REFUTADO       (claim já `refuted`)                              → NÃO acusado
+#   - Q_FECHADA_REFUTADA       (question `done`, recebe REFUTES)                 → NÃO acusado
+#       (é o remédio que a própria seção prescreve — cobrar seria punir quem obedeceu)
+#
+# Espera: `--integrity` sai 1 com EXATAMENTE 2 `✗ CONTRADIÇÃO` (os dois status novos).
+meta:
+  id: fixture-refutes-drifted
+  schema_version: "1"
+  baseline: 2026-07-01
+nodes:
+  - id: E_MEDICAO_VIVA
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-07
+    verified_against: fixture-sintetica
+    label: "medicao viva que refuta os alvos abaixo"
+  - id: C_ALVO_DRIFTED_REFUTADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: drifted
+    label: "alvo DRIFTED que recebe REFUTES — status novo, DEVE reprovar (era invisivel na allowlist)"
+  - id: C_ALVO_UNVER_REFUTADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: unverifiable
+    label: "alvo UNVERIFIABLE que recebe REFUTES — status novo, DEVE reprovar"
+  - id: C_ALVO_JA_REFUTADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.5
+    status: refuted
+    label: "alvo ja refutado — reconciliado, NAO deve ser acusado"
+  - id: Q_FECHADA_REFUTADA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: done
+    label: "pergunta fechada como done — o remedio que a secao prescreve, NAO deve ser acusada"
+edges:
+  - from: E_MEDICAO_VIVA
+    to: C_ALVO_DRIFTED_REFUTADO
+    edge_type: REFUTES
+  - from: E_MEDICAO_VIVA
+    to: C_ALVO_UNVER_REFUTADO
+    edge_type: REFUTES
+  - from: E_MEDICAO_VIVA
+    to: C_ALVO_JA_REFUTADO
+    edge_type: REFUTES
+  - from: E_MEDICAO_VIVA
+    to: Q_FECHADA_REFUTADA
+    edge_type: REFUTES
