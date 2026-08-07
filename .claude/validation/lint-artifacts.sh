@@ -635,11 +635,80 @@ check_review_artifact() {
   [ -f "${helper}" ] || return 0
   [ -n "${ONLY_PATH}" ] && return 0        # é regra de PR, não de arquivo
   local out sev tag path msg
-  out="$(bash "${helper}" "${REPO_ROOT}" --format=tsv 2>/dev/null || true)"
+  # HELPER MORTO != HELPER LIMPO. `2>/dev/null || true` + `[ -n "$out" ] || return 0` descartava
+  # stderr E exit code: como o modo tsv nao imprime nada quando esta tudo certo, saida vazia
+  # significava ao mesmo tempo "verde" e "explodiu" — e toda a engenharia de ISENCAO/VACUIDADE do
+  # helper morria na fronteira. rc>=2 e erro de execucao (uso/arquivo), nao veredito.
+  # Elenxo 2026-08-07. Aplicado nos DOIS consumidores de propósito: um so seria one-off.
+  local rc=0 errf; errf="$(mktemp)"
+  out="$(bash "${helper}" "${REPO_ROOT}" --format=tsv 2>"${errf}")" || rc=$?
+  if [ "${rc}" -ge 2 ]; then
+    violation "HARD" "${helper}" "[review-artifact/NAO-EXECUTOU] o helper saiu com rc=${rc} — isto e erro de EXECUCAO, nao veredito. stderr: $(head -c 300 "${errf}" | tr '\n' ' ')"
+    rm -f "${errf}"; return 0
+  fi
+  rm -f "${errf}"
   [ -n "${out}" ] || return 0
   while IFS=$'\t' read -r sev tag path msg; do
     [ -n "${sev}" ] || continue
     violation "${sev}" "${REPO_ROOT}/${path}" "[review-artifact/${tag}] ${msg}"
+  done <<< "${out}"
+}
+
+# ===========================================================================
+# REGRA 57 — O veredito do run está SELADO no grafo que ele julgou [HARD]
+# previne: run que mede e não sela — a SSOT segue afirmando o que a medição já derrubou
+#   O radar sai exit 0 nesses casos porque valida o grafo contra SI MESMO, nunca contra o
+#   veredito que o run produziu. (A 1ª linha do `previne:` é a ÚNICA que o rules-registry
+#   projeta em lint-rules.md — se ela não fechar a oração, a regra é publicada truncada.)
+#   ORIGEM (gatilho MEDIDO, não vontade): o falsificador do nó C_ANCORA_SOLTA_79PCT exigia
+#   medir antes de mecanizar — "a medição decide, não a vontade". Ela veio ao contrário do
+#   que o autor supunha. O selo do M8 foi aplicado À MÃO DUAS VEZES e ficou defeituoso NAS
+#   DUAS: em 2026-08-06 (#552) escreveu-se `verified_at` sem status, e a SSOT seguiu
+#   afirmando `whatsapp-sender VIVO` por 12h depois de a medição não achar o serviço; em
+#   2026-08-07 (#555) corrigiu-se o status e ficaram 2 dos 4 DRIFTED sem a reconciliação
+#   que a tabela do Passo 4 manda. Radar exit 0 nas três vezes. [[fix-must-become-mechanism]]
+#   TESTE DE ACEITE, declarado ANTES de escrever o helper e cumprido: contra `964ab1c` acusa
+#   9/9 (os 9 ids do ledger, 0 a mais e 0 a menos); contra `main` pós-#555 acusa exatamente 2
+#   (D_whatsapp_dual_waha_default, D_structured_plan_and_doctrine).
+#   O QUE ELA NÃO COBRA: `status: drifted` para veredito DRIFTED. A doutrina de 2026-08-07
+#   (kg-freshness.md) diz que um DRIFTED já reconciliado deixa o nó `confirmed` — "a memória
+#   do veredito vive na ARESTA, não no status". Cobrar o status daria falso-positivo em 2 dos
+#   4 casos reais e contradiria a própria emenda.
+#   ESCOPO FECHADO, e é o que autoriza HARD com N=1: só julga run que DECLARA `ledger:` no
+#   frontmatter da SYNTHESIS. Repo sem nenhum (o adotante que nunca rodou /meta:kg-freshness)
+#   emite ISENÇÃO CONTADA. É a lição do vexame escrito em kg-trace-resolve.sh: aquela regra
+#   varria TODOS os grafos e acusou 11 falsos no 1º adotante — "o CORE É O PIOR ORÁCULO DO QUE
+#   VIAJA". Aqui a superfície é fechada e conhecida.
+#   TETO DECLARADO: julga se o veredito virou ESCRITA no grafo, nunca se a medição estava
+#   certa — isso é trabalho de worker, não de gate.
+#   Toda a lógica vive em kg-seal-check.sh.
+# ===========================================================================
+check_kg_seal() {
+  local helper="${SCRIPT_DIR}/kg-seal-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.kg.yaml|*SYNTHESIS.md|*ledger-por-item.tsv|*/kg-seal-check.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out sev tag path msg
+  # HELPER MORTO != HELPER LIMPO. `2>/dev/null || true` + `[ -n "$out" ] || return 0` descartava
+  # stderr E exit code: como o modo tsv nao imprime nada quando esta tudo certo, saida vazia
+  # significava ao mesmo tempo "verde" e "explodiu" — e toda a engenharia de ISENCAO/VACUIDADE do
+  # helper morria na fronteira. rc>=2 e erro de execucao (uso/arquivo), nao veredito.
+  # Elenxo 2026-08-07. Aplicado nos DOIS consumidores de propósito: um so seria one-off.
+  local rc=0 errf; errf="$(mktemp)"
+  out="$(bash "${helper}" "${REPO_ROOT}" --format=tsv 2>"${errf}")" || rc=$?
+  if [ "${rc}" -ge 2 ]; then
+    violation "HARD" "${helper}" "[kg-selo/NAO-EXECUTOU] o helper saiu com rc=${rc} — isto e erro de EXECUCAO, nao veredito. stderr: $(head -c 300 "${errf}" | tr '\n' ' ')"
+    rm -f "${errf}"; return 0
+  fi
+  rm -f "${errf}"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ -n "${sev}" ] || continue
+    violation "${sev}" "${REPO_ROOT}/${path}" "[kg-selo/${tag}] ${msg}"
   done <<< "${out}"
 }
 
@@ -2894,6 +2963,7 @@ check_kg_verification_coverage
 check_kg_radar_integrity
 check_kg_trace_resolve
 check_review_artifact
+check_kg_seal
 check_doctrine_freshness
 check_kg_born_marker
 check_ladder_integrity
