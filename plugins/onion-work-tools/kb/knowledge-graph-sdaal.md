@@ -111,7 +111,16 @@ camadas** (campo `layer`, default `audit` — retrocompatível):
   - `edge_type`: `HAS_STATE` · `TRANSITIONS` (com atributo `on:` = evento gatilho) · `EMITS` ·
     `CONSTRAINS` · `READS` · `WRITES`
 - **`plane`**: `DEV` (código/branch/commit) ou `PROD` (artefato vivo: deploy + config + dados)
-- **peso do nó**: `impact` (1–5) × `confidence` (0–1) × `status` (`open|confirmed|refuted|superseded|done`)
+- **peso do nó**: `impact` (1–5) × `confidence` (0–1) × `status`
+  (`open|confirmed|drifted|unverifiable|refuted|superseded|done`)
+  - `drifted` (fator **1.3** — o único que SOBE) e `unverifiable` (1.0) entraram em 2026-08-06.
+    **`status` é marcador de ESTADO, não de processo.** `drifted` significa *"este nó diverge do
+    vivo AGORA e alguém precisa reconciliar"* — não *"um run devolveu veredito DRIFTED"*. Se o
+    label já foi atualizado com a verdade medida, o nó **não** é `drifted`: ele é `confirmed`, e o
+    veredito do run vira a **aresta** `SUPERSEDES` + o nó da posição superada. Confundir os dois é
+    erro medido (Elenxo 2026-08-07): produz nó `drifted` que não diverge de nada, ocupa o topo do
+    radar e — porque a guarda de reconciliação só conta superseder `confirmed` — deixa a aresta
+    recém-criada **invisível**, um fail-open.
 - **migalha unificada**: aresta `TRACES_TO` → `{file:line | task | commit | env | reason | snapshot}`
 
 O grafo é **append-mostly**: auto-correções viram arestas `REFUTES` explícitas — a história não se
