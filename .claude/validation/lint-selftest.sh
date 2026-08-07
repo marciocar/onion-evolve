@@ -49,6 +49,18 @@ set -euo pipefail
 # Defeito PRÉ-EXISTENTE, achado dogfoodando o próprio fix (a main aborta idêntico).
 unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES
 
+# MESMA CLASSE, UMA CAMADA ACIMA — o runner do CI exporta GITHUB_*, e uma guarda que os lê
+# (hoje review-artifact-check.sh) passa a julgar o PR REAL de dentro da sandbox: procura
+# `feat-<branch-do-PR>.md` num fixture que só tem `feat-x.md`. Medido no PR #554: 6 casos
+# verdes LOCALMENTE (var ausente → o helper cai no git) e reprovando no CI. Pior, o caso (b)
+# passava PELO MOTIVO ERRADO — ele espera ARTEFATO-AUSENTE, que é o que o vazamento produz.
+#
+# A bancada é HERMÉTICA POR CONSTRUÇÃO: quem precisa de GITHUB_* fixa explicitamente no seu
+# próprio caso (é o que (h) sempre fez, e por isso foi o único que passou no CI). Consertar
+# só os 6 casos seria disciplina — curaria os de hoje e não impediria o 7º.
+unset GITHUB_HEAD_REF GITHUB_REF_NAME GITHUB_EVENT_NAME GITHUB_BASE_REF GITHUB_ACTIONS \
+      GITHUB_REPOSITORY GITHUB_RUN_ID GITHUB_EVENT_PATH GITHUB_SHA GITHUB_REF
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 FIX_DIR="${SCRIPT_DIR}/fixtures"
@@ -3982,6 +3994,21 @@ run_review_artifact_selftests() {
   if [ ! -f "${helper}" ]; then record_fail "review-artifact" "helper ausente: ${helper}"; return; fi
   local d out rc
 
+  # 🔒 A INVARIANTE, NOMEADA — a bancada tem de estar hermética ANTES do 1º caso rodar. Sem esta
+  # asserção, quebrar o `unset GITHUB_*` do topo se manifesta como 6 `ARTEFATO-AUSENTE` crípticos
+  # apontando para o branch REAL do PR, e quem lê perde tempo caçando um defeito de guarda que não
+  # existe (foi o que aconteceu no #554). Aqui a falha diz o que é: o ambiente vazou.
+  # Não é mutation test — é mais barato e mais DIAGNÓSTICO: nomeia a causa em vez de exibir sintoma.
+  local vazou=""
+  for _v in GITHUB_HEAD_REF GITHUB_REF_NAME GITHUB_EVENT_NAME GITHUB_BASE_REF; do
+    [ -n "$(eval "printf '%s' \"\${${_v}:-}\"")" ] && vazou="${vazou} ${_v}"
+  done
+  if [ -n "${vazou}" ]; then
+    record_fail "bancada-hermetica" "ambiente do runner VAZOU para a bancada:${vazou} — o \`unset GITHUB_*\` do topo não cobriu. Casos que simulam PR passarão a julgar o PR REAL de dentro da sandbox."
+  else
+    record_pass "bancada-hermetica: nenhum GITHUB_* do runner alcança os fixtures (a hermeticidade é do topo, não de cada caso)"
+  fi
+
   # Sandbox: repo git com branch != default, um commit de código, e origin/HEAD apontando para main.
   _mk_pr_repo() {
     d="$(mktemp -d)"
@@ -4020,11 +4047,22 @@ run_review_artifact_selftests() {
   # OS DOIS MODOS, e o TSV vem PRIMEIRO de propósito: é o que `check_review_artifact` consome. Testar
   # só o humano foi o defeito que deixou a guarda de vacuidade da REGRA 55 verde com o parser morto
   # (2026-08-06) — e eu o repeti AQUI, no mesmo dia. Quem pegou foi o consumed-mode-check.sh (instrumento, NÃO regra), não uma releitura minha.
-  _run() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${helper}" "$1" --format=tsv 2>&1 ); }
-  _run_humano() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${helper}" "$1" 2>&1 ); }
+  # ⚠️ GITHUB_HEAD_REF É OBRIGATÓRIO AQUI, mesmo parecendo redundante com o branch da sandbox: o
+  # helper lê `BRANCH="${GITHUB_HEAD_REF:-}"` ANTES de perguntar ao git. Sem fixá-lo, a bancada
+  # HERDA o valor do runner e passa a julgar o branch REAL do PR dentro da sandbox — procurando
+  # `feat-<branch-real>.md` num repo que só tem `feat-x.md`. Local passava (var ausente → cai no
+  # git), CI reprovava: 6 casos, medido no PR #554. [[bancada-espelha-o-runner]] — mesma lição pela
+  # 3ª vez, agora INVERTIDA: não é a bancada que esqueceu uma opção do runner, é o RUNNER que tem
+  # uma variável que a bancada não neutralizou.
+  _run() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge bash "${helper}" "$1" --format=tsv 2>&1 ); }
+  _run_humano() { ( cd "$1" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge bash "${helper}" "$1" 2>&1 ); }
 
   # (a) SEM PR (trabalho em curso) → silencioso, exit 0. Sem isto a guarda travaria todo commit.
   _mk_pr_repo
+  # 🐤 CANÁRIO DA HERMETICIDADE — invocação NUA de propósito. Este caso testa a AUSÊNCIA de PR,
+  # então só passa se o `unset GITHUB_*` do topo tiver funcionado. Blindá-lo com `env -u` aqui
+  # seria auto-proteção que MASCARA a falha do mecanismo: passaria em silêncio com o unset
+  # quebrado. Nu, ele reprova alto no CI — que é exatamente como o defeito apareceu.
   rc=0; out="$( cd "${d}" && bash "${helper}" "${d}" 2>&1 )" || rc=$?
   if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'fora de escopo'; then
     record_pass "review-artifact: (a) sem PR aberto → CALA (trabalho em curso não é trabalho proposto)"
@@ -4115,6 +4153,7 @@ run_review_artifact_selftests() {
   #     como "nada a relatar". Cinco classes de silêncio foram medidas assim. É a mesma família de
   #     defeito que este ciclo cura, cometida DENTRO da cura.
   _mk_pr_repo
+  # 🐤 segundo canário, no modo TSV (o que o lint consome): nu pela mesma razão que (a).
   rc=0; out="$( cd "${d}" && bash "${helper}" "${d}" --format=tsv 2>&1 )" || rc=$?
   if printf '%s' "${out}" | grep -q 'ISENCAO'; then
     record_pass "review-artifact: (i) isenção aparece no modo TSV (o que o lint consome), não só no humano"
@@ -4131,7 +4170,8 @@ run_review_artifact_selftests() {
     ( cd "${d}" && printf 'v3\n' > .claude/validation/alvo.sh && git add -A \
       && git -c user.email=t@t -c user.name=t commit -qm depois ) 2>/dev/null
     rc=0
-    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME=99/merge bash "${mut}/m.sh" "${d}" >/dev/null 2>&1 ) || rc=$?
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
+        bash "${mut}/m.sh" "${d}" >/dev/null 2>&1 ) || rc=$?
     if [ "${rc}" -eq 0 ]; then
       record_pass "review-artifact: (g) (MUT) sem a comparação de hash o caduco PASSA — o amarre é load-bearing"
     else record_fail "review-artifact: (g) (MUT)" "mutante ainda reprovou (rc=${rc}) — (d) passa por outro motivo"; fi
