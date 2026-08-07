@@ -261,6 +261,33 @@ nodes:
     label: "ABERTO: D_email_plus_logto_connector e DIRECAO pura ('construir o servico de EMAIL e ligar o conector'), sem estado material medivel — o worker do M8 devolveu UNVERIFIABLE e RECUSOU-SE a inventar uma medicao substituta, que e o contrato funcionando. Esta question existe porque o Passo 4 manda, para UNVERIFIABLE, rebaixar confidence E/OU abrir question + DEPENDS_ON: sem ela o veredito ficava mecanicamente inerte (statusFactor unverifiable == confirmed == 1.0), isto e, um selo que nao muda nada"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
 
+  # ── AUFHEBUNG dos 2 DRIFTED que faltavam (2026-08-07, achados pela REGRA 57) ──
+  # O #552 APENSOU a medicao ao label destes dois (preservando o texto antigo como prefixo), o que
+  # evitou o apagamento — mas nao criou a posicao superada. Sem ela o veredito DRIFTED do run nao
+  # existe no grafo: some na prosa da sintese. Nos dois casos a DIRECAO sobrevive; o que drifou foi
+  # a PRESUNCAO sobre o estado de execucao, e e ela que vira no.
+  - id: C_dual_adapter_presumido_construido
+    node_type: claim
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.0
+    verified_at: 2026-08-06
+    verified_against: m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find
+    label: "SUPERADA (presuncao ate 2026-08-06): que o desenho dual ja tivesse DOIS LADOS materiais. A re-medicao achou UM: WAHA up (container onion-vps-waha) e whatsapp-sender sem processo, unit nem container — so codigo e sessao pareada em disco. E nenhum dos dois ADAPTERS existe: .claude/utils/whatsapp nao esta la. A direcao nao caiu; caiu a suposicao de que ela ja tinha sido executada"
+    trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+
+  - id: C_escada_analise_presumida_cumprida
+    node_type: claim
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.0
+    verified_at: 2026-08-06
+    verified_against: m8-serial-2026-08+estado-de-execucao-medido-2026-08-06
+    label: "SUPERADA (presuncao ate 2026-08-06): que a doutrina do catalogo tivesse nascido da escada de A_analysis_structure (F1-F4). A re-medicao achou o contrario: ela veio do F0 DIRETO, F1 rodou para UMA tool, F2 foi FORMALMENTE REPROVADA como arquitetura (premissas fabricadas), F3 e F4 nunca rodaram, e A_analysis_structure segue open. O PLANO ESTRUTURADO — a outra metade da direcao — ainda nao existe"
+    trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+
   # A SEGUNDA posicao apagada pelo #552 — o Elenxo mediu 2 reescritas (ENT_substrate, ENT_whatsapp)
   # e 2 apensos (que preservam o texto antigo como prefixo, logo nao ha o que restaurar neles).
   # A 1a passada desta branch restaurou 1 de 2: correcao seletiva e correcao arbitraria.
@@ -291,6 +318,12 @@ nodes:
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
 
 edges:
+  - from: D_whatsapp_dual_waha_default
+    to: C_dual_adapter_presumido_construido
+    edge_type: SUPERSEDES
+  - from: D_structured_plan_and_doctrine
+    to: C_escada_analise_presumida_cumprida
+    edge_type: SUPERSEDES
   - from: Q_juiz_adversarial_nao_rodou_m8
     to: ENT_whatsapp
     edge_type: CONSTRAINS

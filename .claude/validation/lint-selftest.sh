@@ -3989,6 +3989,253 @@ run_scope_gitignore_selftests() {
 # O caso (a) é o que impede a guarda de virar tortura: durante o trabalho (sem PR) ela CALA. Exigir
 # artefato a cada commit intermediário travaria o ciclo, e falso-positivo travante é o modo de falha
 # medido desta casa (exit 2 é o único canal → todo disparo interrompe).
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+# REGRA 57 — kg-seal-check.sh: o veredito do run virou ESCRITA no grafo?
+# Bancada inline (sem fixture em disco) porque o caso é um PAR ledger↔grafo, e o par tem de
+# ficar visível no próprio teste — fixture separada esconderia justamente a relação sob teste.
+# ═══════════════════════════════════════════════════════════════════════════════════════════
+run_kg_seal_check_selftests() {
+  local helper="${SCRIPT_DIR}/kg-seal-check.sh"
+  if [ ! -f "${helper}" ]; then record_fail "kg-selo" "helper ausente: ${helper}"; return; fi
+  local d out rc
+
+  # Monta repo git com um run declarando ledger + o grafo julgado.
+  # $1 = corpo dos nós  ·  $2 = corpo das arestas  ·  $3 = linhas do ledger
+  _mk_seal_repo() {
+    d="$(mktemp -d)"
+    mkdir -p "${d}/docs/evolution/research/run-x" "${d}/docs/onion/graph"
+    { printf -- '---\ntitle: "run de teste"\nverified_at: 2026-08-06\n'
+      printf 'ledger: docs/evolution/research/run-x/ledger-por-item.tsv\n'
+      printf 'source: "docs/onion/graph/alvo.kg.yaml @ abc1234 + host vivo"\n---\n\n# run\n'
+    } > "${d}/docs/evolution/research/run-x/SYNTHESIS.md"
+    printf '%b' "$3" > "${d}/docs/evolution/research/run-x/ledger-por-item.tsv"
+    # `%b\n` e nao `%b`: o `$( )` que monta $1 come a quebra de linha FINAL, e sem ela `edges:`
+    # cola no ultimo `label:`. Foi a TERCEIRA ocorrencia da mesma classe nesta bancada (as outras
+    # duas: verified_at colando no label, e o label de um no colando no `- id:` do seguinte).
+    # Regra: toda saida de `$( )` reinjetada em arquivo precisa da quebra recolocada a mao.
+    { printf 'meta:\n  id: alvo\n  schema_version: "1"\n  baseline: 2026-07-01\nnodes:\n'
+      printf '%b\n' "$1"
+      printf 'edges:\n'
+      printf '%b' "$2"
+    } > "${d}/docs/onion/graph/alvo.kg.yaml"
+    ( cd "${d}" && git init -q -b main . && git add -A \
+      && git -c user.email=t@t -c user.name=t commit -qm base ) 2>/dev/null
+    # $4/$5 = nós/arestas que o CASO pretendia. Vêm do chamador, NÃO da string: os defeitos 1 e 2
+    # corrompiam a própria string, então contá-la concordaria com o arquivo e a guarda seria cega.
+    _fixture_sane "${d}/docs/onion/graph/alvo.kg.yaml" "$4" "$5"
+  }
+  # ╭─ GUARDA-DA-BANCADA — a fixture saiu como se PRETENDIA? ────────────────────────────────╮
+  # │ TRÊS defeitos idênticos nesta função antes desta guarda existir, todos da mesma classe: │
+  # │   1. `verified_at` colou no `label:` (o `$( )` de _va comeu a quebra)                   │
+  # │   2. o `label:` de um nó colou no `- id:` do seguinte (concatenar `$(_no a)$(_no b)`)   │
+  # │   3. `edges:` colou no último `label:` (o `$( )` que monta NODES_OK)                    │
+  # │ Em todos, a bancada gerou YAML MALFORMADO e o caso reprovou com uma mensagem sobre o    │
+  # │ SUT — que estava certo. Diagnosticar isso custou 4 rodadas; a 3ª ocorrência é onde      │
+  # │ comentar deixa de ser resposta. [[fix-must-become-mechanism]]                           │
+  # │ REGRA: toda saída de `$( )` reinjetada em arquivo perde a quebra FINAL — recoloque.     │
+  # ╰────────────────────────────────────────────────────────────────────────────────────────╯
+  # Compara o que se PEDIU com o que o arquivo TEM. Falha aqui acusa a BANCADA, não o SUT.
+  _fixture_sane() {  # $1=arquivo $2=nós esperados $3=arestas esperadas
+    local gn ge gl gsec_n gsec_e
+    gn="$(grep -c '^  - id: '   "$1" || true)"
+    gl="$(grep -c '^    label: ' "$1" || true)"
+    ge="$(grep -c '^  - from: ' "$1" || true)"
+    gsec_n="$(grep -c '^nodes:$' "$1" || true)"
+    gsec_e="$(grep -c '^edges:$' "$1" || true)"
+    if [ "${gn}" -ne "$2" ] || [ "${gl}" -ne "$2" ] || [ "${ge}" -ne "$3" ] \
+       || [ "${gsec_n}" -ne 1 ] || [ "${gsec_e}" -ne 1 ]; then
+      record_fail "kg-selo: BANCADA MALFORMADA" "a fixture nao saiu como pedida — nos=${gn}/$2 labels=${gl}/$2 arestas=${ge}/$3 secao-nodes=${gsec_n}/1 secao-edges=${gsec_e}/1. Classe conhecida: quebra de linha comida por \$( ). O SUT NAO foi exercido."
+      return 1
+    fi
+    return 0
+  }
+
+  # $5 = data de verified_at (opcional). NÃO receber a LINHA pronta: `$( )` come a quebra de
+  # linha final e o campo colaria no label — 4 casos falharam assim antes de eu ver.
+  # `$( )` come a quebra de linha FINAL de cada substituição — concatenar `$(_no a)$(_no b)`
+  # cola o label de `a` no `- id:` de `b` e o parser perde o 2º nó. _cat junta com \n explícito.
+  _cat() { printf '%s\n' "$@"; }
+  _no() {
+    printf '  - id: %s\n    node_type: %s\n    plane: DEV\n    impact: 3\n    confidence: %s\n    status: %s\n' "$1" "$2" "$4" "$3"
+    [ -n "${5:-}" ] && printf '    verified_at: %s\n' "$5"
+    printf '    label: "n"\n'
+  }
+
+  # o par CORRETO, reusado como base: 1 CONFIRMED carimbado + 1 DRIFTED reconciliado por aresta
+  local NODES_OK EDGES_OK LED_OK
+  NODES_OK="$(_cat "$(_no C_CONF claim confirmed 1.0 2026-08-06)" "$(_no D_DRIFT decision confirmed 1.0 2026-08-06)" "$(_no C_ANTIGA claim superseded 0.0 '')")"
+  EDGES_OK='  - from: D_DRIFT\n    to: C_ANTIGA\n    edge_type: SUPERSEDES\n'
+  LED_OK='# comentario\n# id\tveredito\nC_CONF\tCONFIRMED\t1\nD_DRIFT\tDRIFTED\t2\n'
+
+  # (a) O LADO POSITIVO PRIMEIRO — selo correto CALA. Sem ele, os casos negativos não distinguem
+  #     "acusa certo" de "acusa sempre", que é o modo de falha mais barato de escrever.
+  _mk_seal_repo "${NODES_OK}" "${EDGES_OK}" "${LED_OK}" 3 1
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "kg-selo: (a) veredito selado (CONFIRMED carimbado + DRIFTED com SUPERSEDES p/ alvo superseded) → CALA"
+  else record_fail "kg-selo: (a) lado positivo" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (b) CONFIRMED com carimbo VELHO → HARD. É o caso do #552: mediu e o carimbo não registra.
+  _mk_seal_repo "$(_cat "$(_no C_CONF claim confirmed 1.0 2026-07-31)" "$(_no D_DRIFT decision confirmed 1.0 2026-08-06)" "$(_no C_ANTIGA claim superseded 0.0 '')")" "${EDGES_OK}" "${LED_OK}" 3 1
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'SELO-FALTANDO' && printf '%s' "${out}" | grep -q 'C_CONF'; then
+    record_pass "kg-selo: (b) CONFIRMED com verified_at de outro dia → HARD SELO-FALTANDO"
+  else record_fail "kg-selo: (b) confirmed sem carimbo" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (c) DRIFTED sem reconciliação alguma → HARD. É o caso que sobrou do #555.
+  _mk_seal_repo "$(_cat "$(_no C_CONF claim confirmed 1.0 2026-08-06)" "$(_no D_DRIFT decision confirmed 1.0 2026-08-06)")" '' "${LED_OK}" 2 0
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'DRIFT-NAO-RECONCILIADO'; then
+    record_pass "kg-selo: (c) DRIFTED sem SUPERSEDES nem status drifted → HARD"
+  else record_fail "kg-selo: (c) drift nao reconciliado" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (d) DRIFTED com `status: drifted` → CALA. A OUTRA forma legal: mediu, ainda não escreveu a
+  #     reconciliação. Cobrar só a aresta faria falso-positivo no estado intermediário legítimo.
+  _mk_seal_repo "$(_cat "$(_no C_CONF claim confirmed 1.0 2026-08-06)" "$(_no D_DRIFT decision drifted 1.0 2026-08-06)")" '' "${LED_OK}" 2 0
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "kg-selo: (d) DRIFTED com status drifted → CALA (a aresta NÃO é a única forma legal)"
+  else record_fail "kg-selo: (d) drifted como status" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (e) UNVERIFIABLE carimbado com a data do run → HARD. O contrato PROÍBE: não se mediu, não se
+  #     carimba. É o único veredito cuja violação é ESCREVER demais, não de menos.
+  _mk_seal_repo "$(_no C_UNV claim confirmed 0.5 2026-08-06)" '' '# id\tveredito\nC_UNV\tUNVERIFIABLE\t1\n' 1 0
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'UNVER-CARIMBADO'; then
+    record_pass "kg-selo: (e) UNVERIFIABLE com verified_at do run → HARD (o contrato proíbe carimbar o que não se mediu)"
+  else record_fail "kg-selo: (e) unver carimbado" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (f) UNVERIFIABLE INERTE — data velha (certo) mas confidence 1.0 e nenhuma question → HARD.
+  #     statusFactor(unverifiable) == statusFactor(confirmed): sem rebaixar nada, o selo não muda
+  #     NADA no radar. Foi o defeito real do #555, medido: atenção 12.00 antes e 12.00 depois.
+  _mk_seal_repo "$(_no C_UNV claim unverifiable 1.0 2026-07-31)" '' '# id\tveredito\nC_UNV\tUNVERIFIABLE\t1\n' 1 0
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'UNVER-INERTE'; then
+    record_pass "kg-selo: (f) UNVERIFIABLE sem rebaixar confidence nem abrir question → HARD (selo mecanicamente inerte)"
+  else record_fail "kg-selo: (f) unver inerte" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (g) UNVERIFIABLE com confidence rebaixada → CALA. O lado positivo de (f).
+  _mk_seal_repo "$(_no C_UNV claim unverifiable 0.5 2026-07-31)" '' '# id\tveredito\nC_UNV\tUNVERIFIABLE\t1\n' 1 0
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "kg-selo: (g) UNVERIFIABLE com confidence rebaixada → CALA"
+  else record_fail "kg-selo: (g) unver com efeito" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (h) ISENÇÃO POR ESCOPO nos DOIS MODOS — repo sem nenhuma SYNTHESIS declarando ledger. É o
+  #     adotante que nunca rodou /meta:kg-freshness, e é o que autoriza HARD com N=1 no core.
+  #     TSV PRIMEIRO de propósito: é o modo que o lint consome, e testar só o humano foi o defeito
+  #     que deixou a guarda de vacuidade da REGRA 55 verde com o parser morto.
+  d="$(mktemp -d)"; mkdir -p "${d}/docs"
+  ( cd "${d}" && git init -q -b main . && printf 'x\n' > docs/a.md && git add -A \
+    && git -c user.email=t@t -c user.name=t commit -qm base ) 2>/dev/null
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  local outh; outh="$(bash "${helper}" "${d}" 2>&1)" || true
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'ISENCAO' \
+     && printf '%s' "${outh}" | grep -q 'fora de escopo'; then
+    record_pass "kg-selo: (h) repo sem run declarando ledger → ISENÇÃO CONTADA nos dois modos (tsv e humano), nunca silêncio"
+  else record_fail "kg-selo: (h) isencao por escopo" "rc=${rc} tsv=${out} humano=${outh}"; fi
+  rm -rf "${d}"
+
+  # (i) VACUIDADE — ledger existe e ZERO itens julgáveis. Guarda que leu nada não pode dizer que
+  #     está tudo certo. Sem isto, um ledger só de comentários passaria verde.
+  _mk_seal_repo "${NODES_OK}" "${EDGES_OK}" '# so comentario\n# nenhum dado\n' 3 1
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'VACUIDADE'; then
+    record_pass "kg-selo: (i) ledger sem linha de dado → VACUIDADE (ler zero e dizer que está tudo certo é fail-open)"
+  else record_fail "kg-selo: (i) vacuidade" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+
+  # ── OS SEIS CASOS QUE O ELENXO DE 2026-08-07 EXIGIU ────────────────────────────────────────
+  # Cada um corresponde a um falso-positivo ou fail-open MEDIDO na 1a versao desta guarda.
+
+  # (k) A FORMA DO CONTRATO — o no julgado e o ANTIGO: vira `superseded` e RECEBE a aresta
+  #     (Passo 4: "Novo no com a verdade atual + SUPERSEDES -> antigo"). A 1a versao so aceitava a
+  #     direcao inversa e teria acusado 11 arestas do m2-bridge-logto, que o contrato cita como o
+  #     dogfood CERTO. Sem este caso, a regressao volta calada.
+  _mk_seal_repo "$(_cat "$(_no D_ANTIGO decision superseded 1.0 2026-08-06)" "$(_no E_NOVO evidence confirmed 1.0 2026-08-06)")" '  - from: E_NOVO\n    to: D_ANTIGO\n    edge_type: SUPERSEDES\n' '# id\tveredito\nD_ANTIGO\tDRIFTED\t1\n' 2 1
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "kg-selo: (k) forma CANÔNICA do contrato (nó julgado vira superseded e RECEBE a aresta) → CALA"
+  else record_fail "kg-selo: (k) forma do contrato" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (l) SELO DO DIA SEGUINTE — a letra do Passo 4 e `verified_at: <hoje>`, e "hoje" e o dia em que
+  #     o maestro SELA. Com igualdade de data, a regra bloqueava quem obedece o contrato — e
+  #     bloquearia os proprios commits que a embarcaram (8b005f6/1681c7c: 08-07 selando run de 08-06).
+  _mk_seal_repo "$(_no C_CONF claim confirmed 1.0 2026-08-07)" '' '# id\tveredito\nC_CONF\tCONFIRMED\t1\n' 1 0
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "kg-selo: (l) selo do DIA SEGUINTE → CALA (o carimbo é do dia em que se sela, não do run)"
+  else record_fail "kg-selo: (l) selo do dia seguinte" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (m) PRECEDENCIA — nó com carimbo MAIS NOVO que o run: um run posterior já o re-verificou.
+  #     Sem isto a regra vira CATRACA CONTRA RE-VERIFICAR: com dois ledgers sobre o mesmo grafo,
+  #     nenhum estado satisfaz os dois, porque `verified_at` guarda UMA data.
+  _mk_seal_repo "$(_no D_DRIFT decision confirmed 1.0 2026-09-01)" '' '# id\tveredito\nD_DRIFT\tDRIFTED\t1\n' 1 0
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+    record_pass "kg-selo: (m) nó re-verificado por run POSTERIOR → CALA (a regra não pode barrar re-verificação)"
+  else record_fail "kg-selo: (m) precedência" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (n) VOCABULARIO FECHADO — ledger em minuscula (a MESMA caixa que `status:` usa) atravessava os
+  #     quatro ramos sem casar nenhum, e a guarda saia VERDE sobre grafo comprovadamente defeituoso
+  #     (verified_at de 1999). Fail-open dentro da cura do fail-open.
+  _mk_seal_repo "$(_no C_X claim confirmed 1.0 1999-01-01)" '' '# id\tveredito\nC_X\tconfirmed\t1\n' 1 0
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'VOCABULARIO-DESCONHECIDO'; then
+    record_pass "kg-selo: (n) veredito fora do vocabulário fechado → HARD NOMEADO (minúscula não passa calada)"
+  else record_fail "kg-selo: (n) vocabulário" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (o) A RECONCILIACAO TEM DE SER DESTE RUN — aresta de JULHO nao sela veredito de AGOSTO. Medido:
+  #     bastava flipar uma linha do ledger para DRIFTED, sem escrever NADA no grafo, e a guarda
+  #     passava verde porque a aresta ja existia. Era o modo de falha original pela porta da frente.
+  _mk_seal_repo "$(_cat "$(_no D_X decision confirmed 1.0 2026-07-10)" "$(_no C_VELHA claim superseded 0.0 2026-07-10)")" '  - from: D_X\n    to: C_VELHA\n    edge_type: SUPERSEDES\n' '# id\tveredito\nD_X\tDRIFTED\t1\n' 2 1
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'DRIFT-NAO-RECONCILIADO'; then
+    record_pass "kg-selo: (o) aresta ANTERIOR ao run não sela veredito novo → HARD"
+  else record_fail "kg-selo: (o) amarra ao run" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (p) REFUTED e SOFT, NAO HARD — e a severidade e a tese. A guarda cobre 2 das 6 clausulas do
+  #     Passo 4, tem ZERO linhas no ledger real e nunca foi exercitada pelo teste de aceite. Subir
+  #     HARD seria poder emprestado da evidencia dos outros ramos.
+  _mk_seal_repo "$(_no C_R claim confirmed 1.0 2026-08-06)" '' '# id\tveredito\nC_R\tREFUTED\t1\n' 1 0
+  rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q '^SOFT.*REFUTACAO-NAO-SELADA'; then
+    record_pass "kg-selo: (p) REFUTED sai SOFT — severidade proporcional à evidência (2 de 6 cláusulas, 0 casos reais)"
+  else record_fail "kg-selo: (p) REFUTED SOFT" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (j) (MUT) sem a comparação de data, o CONFIRMED sem carimbo PASSA — prova que o amarre
+  #     data-do-run↔verified_at é load-bearing e não decorativo.
+  local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'"' RETURN
+  cp "${helper}" "${mut}/m.sh"
+  # A mutacao casa a comparacao ATUAL. Quando ela muda (como mudou de `!=` para `>=` no Elenxo
+  # de 2026-08-07), o sed para de casar e a guarda-da-guarda abaixo ACUSA em vez de passar mudo.
+  sed -i 's/if (va\[id\] == "" || va\[id\] < runday)/if (0)/' "${mut}/m.sh"
+  if grep -q 'if (0)' "${mut}/m.sh"; then
+    _mk_seal_repo "$(_cat "$(_no C_CONF claim confirmed 1.0 2026-07-31)" "$(_no D_DRIFT decision drifted 1.0 2026-08-06)")" '' "${LED_OK}" 2 0
+    rc=0; out="$(bash "${mut}/m.sh" "${d}" --format=tsv 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ]; then
+      record_pass "kg-selo: (j) (MUT) sem a comparação de data o carimbo velho PASSA — o amarre é load-bearing"
+    else record_fail "kg-selo: (j) (MUT)" "mutante ainda reprovou (rc=${rc}) — a comparação é vacuidade? out=${out}"; fi
+    rm -rf "${d}"
+  else
+    record_fail "kg-selo: (j) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+}
+
 run_review_artifact_selftests() {
   local helper="${SCRIPT_DIR}/review-artifact-check.sh"
   if [ ! -f "${helper}" ]; then record_fail "review-artifact" "helper ausente: ${helper}"; return; fi
@@ -7187,6 +7434,7 @@ run_kg_reconcile_selftests
 # Modo state — a fila de abertos, complementar ao radar por construção
 run_kg_state_selftests
 run_kg_trace_resolve_selftests
+run_kg_seal_check_selftests
 run_status_reverificacao_selftests
 run_worklog_precompact_breadcrumb_selftests
 run_aside_router_hook_selftests
