@@ -1,0 +1,314 @@
+meta:
+  id: fios-abertos
+  schema_version: "1"
+  baseline: 2026-08-08
+  # A FILA DE TRABALHO ABERTO DO CORE — colhida no lugar, por isso sem data no nome.
+  #
+  # ═══ CONTRATO DE LEITURA (não conserte a discordância; ela é informação) ═══
+  # O `--radar` responde O QUE CUSTA CARO ESTAR ERRADO. As arestas DEPENDS_ON entre ondas respondem
+  # O QUE VEM ANTES. Eles NÃO coincidem e não devem ser feitos coincidir: a atenção do radar é
+  # `impact × confidence × statusFactor × (1 + grau)`, e o grau é NÃO-DIRECIONADO — `DEPENDS_ON` não
+  # afunda o bloqueado, SOBE OS DOIS. Medido: a ordem de execução é W0→W1→W2→W3→W4 e a do radar põe
+  # W3 em segundo, porque tem mais itens pendurados.
+  # ⚠️ Commit que muda `impact:`/`confidence:` sem mudar `label:` e sem trazer medição É o sinal de
+  # que este arquivo apodreceu. É o defeito fundador da REGRA 49 cometido na AUTORIA.
+  #
+  # ═══ FRONTEIRA (mecânica, não disciplinar) ═══
+  # NENHUM FATO NASCE AQUI. O radar só enxerga arestas DENTRO de um arquivo — logo a única coisa que
+  # não cabe nos grafos existentes é a RELAÇÃO ENTRE ELES. Nó só entra para ser ponta de aresta
+  # cross-grafo, e o próprio radar cobra isso (órfão grau 0 → exit 1).
+  # Teste antes de criar: "se eu apagar este nó, perco um FATO ou perco só a ORDEM?" Perdeu fato →
+  # você duplicou SSOT. Achado mora onde nasceu; aqui mora o COMPROMISSO, citando o id alheio.
+  #
+  # ═══ POR QUE TUDO É plane: DEV ═══
+  # O backlog afirma sobre TRABALHO, não sobre produção. `impact` é o real, NUNCA rebaixado —
+  # rebaixar seria a FUGA-DE-ESCOPO da própria catraca, cometida na criação. Consequência medida:
+  # zero nós no escopo da REGRA 49, zero HARD, zero linha nova no baseline, zero carimbo mentiroso.
+  # E a R49 volta a morder onde deve: ITEM só vira `done` em `plane: PROD` COM `verified_at` +
+  # `verified_against`. QUEM NÃO CONSEGUE CARIMBAR NÃO PODE DECLARAR FEITO.
+  # As `question` levam `verified_against` SEM `verified_at` de propósito: entram no `--freshness-tsv`
+  # e envelhecem sozinhas. Se algum gate futuro estender a R49 a `plane: DEV`, saiba que esta
+  # população é deliberada.
+  #
+  # ═══ TETO: 20 NÓS. Onda nova exige onda COLHIDA. ═══
+  # Colher = onda e itens saem no MESMO commit; a história fica no git e no artefato de revisão.
+  # O radar impede meia-colheita: item sem onda → aresta órfã (HARD); onda sem item → grau 0 (HARD).
+  # Rotina (branches, higiene) NÃO entra aqui — vai para checklist. O grafo é para RISCO.
+
+nodes:
+  # ── AS TESES QUE ORDENAM ────────────────────────────────────────────────────────────────────
+  - id: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: 15-itens-do-inventario-revalidados-um-a-um-contra-o-vivo-5-mortos
+    label: "Tese fundadora deste arquivo, e ela nasceu MEDIDA: revalidando 15 itens do inventario contra o vivo, CINCO ja estavam mortos (33%) — 4 entregues (R45 tem 43 entradas de baseline e nao 0; double-firing amputado; o `2>/dev/null` do gerador curado por `_gen_into`; R3 virou allowlist) e 1 refutado (producao alcancou o repo). O inventario vinha da §7 de onion-guardas-mapa-2026-08, snapshot de 03/08. Backlog montado de DOCUMENTO, e nao de ARTEFATO, ordena itens mortos — e a mesma sessao ja tinha cometido isso com o GIT_DIR, diagnosticando num checkout de julho um bug curado em 04/08."
+    trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
+
+  - id: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-08
+    verified_against: formula-de-atencao-do-kg-radar-lida-contra-a-topologia-deste-arquivo
+    label: "O radar ordena por `impact × confidence × statusFactor × (1 + grau)`, e o grau e NAO-DIRECIONADO: `DEPENDS_ON` nao afunda o bloqueado, SOBE OS DOIS. Logo a topologia NAO expressa precedencia, e nenhuma escrita de aresta faz o radar emitir ordem de execucao. Isso nao e defeito a consertar — e limite a DECLARAR, porque a tentacao de reconcilia-lo mexendo em `impact`/`confidence` e o defeito fundador da REGRA 49 cometido na autoria."
+    trace: ".claude/validation/kg-radar.sh"
+
+  # ── AS ONDAS ────────────────────────────────────────────────────────────────────────────────
+  - id: W0_FILA_DE_ABERTOS_LEGIVEL
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: kg-radar---state-lido-linha-a-linha-exclusao-do-top10-e-truncamento-em-7
+    label: "Onda 0 — o instrumento antes do conteudo. Sao 584 nos `open` em 46 grafos e o unico modo de leitura (`--state`) EXCLUI o top-10 do radar por construcao e TRUNCA em 7 linhas: voce tem 584 e ve 7. Sem fila legivel por maquina, navegar o proprio backlog e impossivel, e toda priorizacao seguinte e opiniao."
+    trace: ".claude/validation/kg-radar.sh"
+
+  - id: W1_METRICA_NAO_FORJAVEL
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: duas-portas-reproduzidas-pelo-juiz-do-elenxo-de-559
+    label: "Onda 1 — fechar o que torna a metrica forjavel, ANTES de produzir numero com ela. Duas portas encolhem o baseline da REGRA 49 sem verificacao nenhuma (`git mv` para qualquer `fixtures/` tirou CINCO entradas de uma vez; `REMOVIDO` e SOFT), e o `IFS=$'\\t'` corrompe o desempacotador de registros que a onda seguinte vai exercitar. Medir com metrica forjavel produz relatorio infalsificavel."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: W2_DOGFOOD_DAS_CINCO_CLASSES
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-08
+    verified_against: emit-baseline-identico-ao-baseline-versionado-logo-o-laco-nunca-executou
+    label: "Onda 2 — as CINCO classes de saida da catraca da REGRA 49 tem evidencia 100% SINTETICA: `--emit-baseline` e identico ao baseline versionado, logo o laco nunca executou no corpus real, nem uma vez. Nao precisa dos 48 nos, precisa de CINCO — um por classe, incluindo as duas HARD. E NAO os de `proto/` (50% do passivo): sao homogeneos, sairiam todos como CARIMBADO e deixariam as duas HARD sem execucao."
+    trace: ".claude/validation/kg-verification-baseline.txt"
+
+  - id: W3_PRODUCAO_CONTIDA
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: docker-ps-e-.env-de-producao-lidos-nesta-sessao
+    label: "Onda 3 — o que ja esta exposto em producao HOJE, e os dois sobreviveram a revalidacao. Esta onda so pode vir depois do Passo 0 porque a manchete dela ja caiu uma vez: o item de maior impacto que a fundava (`o artefato que RODA nao e o do repo`) foi REFUTADO ao ser medido."
+    trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
+
+  - id: W4_REGRA_SEM_TESTE
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-08-08
+    verified_against: consumed-mode-check.sh-rodado-nesta-sessao-30-pares-4-sem-teste
+    label: "Onda 4 — o gate regra-sem-teste, declarado 'o fio aberto de maior valor'. E ele NAO precisa nascer do zero: o `consumed-mode-check.sh` ja e, nas palavras do proprio cabecalho, 'a generalizacao mecanica' dele, com join OBSERVADO (le a invocacao real dos dois lados) em vez de heuristica por nome — que foi como a 1a tentativa morreu, com 8 falsos positivos."
+    trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
+
+  # ── AS MEDIÇÕES DESTA SESSÃO (nascem carimbadas, e só o que EU medi) ────────────────────────
+  - id: E_PRODUCAO_ALCANCOU_O_REPO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: rev-list-HEAD..origin-main-no-checkout-de-producao-do-bridge-0-e-0
+    label: "REFUTA `C_producao_nao_e_o_repo` (stack-harmonia-2026-08, PROD/5, carimbado 2026-08-01). O checkout de producao em /home/onion/onion-bridge esta em `a1b6c87`, que e EXATAMENTE `origin/main` do proprio bridge — zero commits a frente, zero atras, arvore limpa. O commit que curou esta la e diz o que era: 'versiona o medidor de consumo de IA (existia so em producao)'. A deriva de 4 dias que o no registrava foi paga."
+    trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
+
+  - id: E_DOIS_ITENS_DE_PRODUCAO_SEGUEM_VIVOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: docker-ps-mais-grep-no-src-de-producao-mais-.env-linha-4
+    label: "Os outros dois de producao SOBREVIVERAM a revalidacao. (1) O WAHA segue de pe — `onion-vps-waha`, Up 2 dias — e a unica ocorrencia de waha/3999/whatsapp em todo o `src/` de PRODUCAO e um COMENTARIO em `meter.ts:10` citando-o como exemplo historico: nao e uso, e orfao. (2) `PERMISSION_MODE=bypassPermissions` segue na LINHA 4 do `.env` de producao, atras de porta publica — identidade na borda nao reduz o que o agente pode fazer depois de entrar."
+    trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
+
+  - id: E_CONSUMED_MODE_CHECK_FUNCIONA_E_ESTA_DESLIGADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: script-rodado-nesta-sessao-rc-1-e-grep-de-consumidores-com-stderr-visivel
+    label: "DERRUBA o veredito 'apagar, nao ligar' que eu mesmo escrevi no plano, e o derruba por EXECUCAO. Rodado, ele devolve: 30 pares de producao, 4 SEM TESTE nomeados (`inventory.sh --markdown`, `kg-view.sh` sem flag, `migalhas-generate.sh` sem flag e `--check`), mais 3 isencoes CONTADAS ('1 flag dinamica, 2 cobertos por delegacao'). Nao e guarda cega — e o oposto. O que falta: ZERO consumidores (a unica mencao na bancada e um comentario) e nenhum modo `--selftest` proprio (a linha 56 trata `$1` como raiz do repo, entao `--selftest` vira diretorio invalido, exit 2)."
+    trace: ".claude/validation/consumed-mode-check.sh"
+
+  # ── OS ITENS (compromisso, não achado) ──────────────────────────────────────────────────────
+  - id: I_FILA_COMPLETA_DE_ABERTOS
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 1.0
+    label: "Modo novo no `kg-radar.sh`, IRMAO do `--freshness-tsv` (que ja tem o bloco `elegivel[]`+`asorti` e ja pagou a cicatriz do bug de ordem-de-arquivo), emitindo a fila COMPLETA de abertos em TSV. A armadilha: implementa-lo como '`--state` com `--tsv`' herda a exclusao do top-10 e o truncamento em 7 — decisoes de DISPLAY HUMANO, corretas ali e venenosas numa fila."
+    trace: ".claude/validation/kg-radar.sh"
+
+  - id: I_QUARTO_ALLOWLIST_NO_STATE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "O 4o predicado allowlist do radar (`--state`, `nstatus[id] != \"open\"`) — verificado hoje, segue vivo. Viaja no MESMO PR da fila porque e o mesmo awk e o mesmo teste. E a licao de C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE (elenxos-2026-08-07) no ultimo sitio onde ela ainda nao foi aplicada."
+    trace: ".claude/validation/kg-radar.sh"
+
+  - id: I_FECHAR_GIT_MV_E_REMOVIDO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 1.0
+    label: "As duas portas que encolhem o baseline sem verificacao: `git mv` para qualquer `fixtures/` (resolver a chave por hash em TODO o universo antes de concluir remocao, mais classe MUDOU-DE-PATH para o rename legitimo) e `REMOVIDO` como SOFT (verificado hoje: `emit SOFT REMOVIDO` segue la). Fato ja registrado em Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE (catraca-regra49-2026-08); aqui mora o compromisso."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: I_IFS_PARA_037
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "Trocar `IFS=$'\\t'` por `\\037` nos sitios internos — verificado hoje: ZERO ocorrencias de `037` no arquivo, a migracao nao comecou. TAB e IFS-whitespace, entao campo vazio some e o resto desliza: um no MEDIDO levava HARD FUGA-DE-ESCOPO com `status:2026-08-08` na mensagem. Sozinho num PR de proposito — mudanca mecanica de alto alcance sobre o desempacotador, e misturar semantica torna o bisect inutil."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: I_STATUSFACTOR_EM_SITIO_UNICO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "Pagar E_ALLOWLIST_NO_KG_VIEW (elenxos-2026-08-07) com SITIO UNICO e nao com copias sincronizadas — sao SEIS arquivos com `function statusFactor` no repo hoje. E o `--assert-parity` tem de passar a comparar PESO, nao so contagem: sem isso a cura conserta a instancia e deixa a classe viva. VESPERA da onda 2, nao antes: o defeito e LATENTE (1 no `unverifiable` em 2.141, num grafo sem lente) e so vira ativo no primeiro selo de drift."
+    trace: ".claude/validation/kg-view.sh"
+
+  - id: I_PRIMEIROS_CINCO_NOS_DO_BASELINE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 1.0
+    label: "Compromisso, nao achado: tirar os CINCO primeiros nos do baseline por medicao real via `/meta:kg-freshness`, escolhidos para exercitar UMA classe de saida cada — incluindo `FUGA-SEM-ARESTA` e `FUGA-DE-ESCOPO`, as duas HARD. O fato mora em Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES (catraca-regra49-2026-08). Carimbar os 48 em serie e o gesto oposto: produz `verified_at` sem verificacao, que e o defeito fundador da propria regra."
+    trace: ".claude/validation/kg-verification-baseline.txt"
+
+  - id: I_CONTER_O_QUE_ESTA_EXPOSTO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 1.0
+    label: "Desligar o WAHA orfao (e girar `WAHA_API_KEY`/`WAHA_DASHBOARD_PASSWORD`, legiveis via `docker inspect`) e decidir a contencao do `bypassPermissions` — que e de PROCESSO (usuario dedicado, capacidades), nao de borda: o flip de identidade nao reduziu o que o agente pode fazer DEPOIS de entrar. Ambos verificados vivos hoje. Acao em producao: exige palavra do maestro, nao decisao minha."
+    trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
+
+  - id: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "Dar `--selftest` ao `consumed-mode-check.sh` (hoje a linha 56 come a flag como raiz de repo), escrever o bloco dele na bancada e ENTAO liga-lo ao gate. Nesta ordem — ligar instrumento sem teste e como a casa produz falso-verde. E as 4 lacunas que ele ja acha viram os primeiros casos do W4, em vez de o W4 nascer de classificacao manual das 52 regras."
+    trace: ".claude/validation/consumed-mode-check.sh"
+
+  # ── AS COLETAS (question: entram no --freshness-tsv e envelhecem sozinhas) ──────────────────
+  - id: Q_QUANTAS_DAS_52_REGRAS_JA_JUNTAM_SOZINHAS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    verified_against: as-52-regras-classificadas-em-mecanizavel-x-caso-a-caso-contra-o-manifest
+    label: "26 das 52 regras exigiriam investigacao caso a caso — mas 26 ja juntam automatico (16 via manifest, 10 por delegacao). Sem essa classificacao MEDIDA o W4 vira catedral; com ela, a catraca nasce sobre a metade que ja junta. Tratar as 26 como bloqueio e o que transformou 'o fio aberto de maior valor' em item que nunca comeca."
+    trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
+
+  - id: Q_REGRA56_INSATISFAZIVEL_NO_SEGUNDO_COMMIT
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_against: pre-commit-rodado-duas-vezes-na-mesma-branch-com-PR-aberto
+    label: "Batido de frente nesta sessao: a REGRA 56 compara `BASE..HEAD` (commits), e no pre-commit o HEAD ainda e o commit ANTERIOR — logo o hash prospectivo so passa a valer DEPOIS do commit, e do 2o commit em diante o gate reprova quem obedece. MEDIR o gatilho exato antes de mexer: mudar a base da comparacao ou tirar a regra do hook e decisao de desenho, e guarda que pune quem obedece ensina a ignorar a guarda."
+    trace: ".claude/validation/review-artifact-check.sh"
+
+edges:
+  # itens sustentam suas ondas (e o grau faz a onda subir no --radar)
+  - from: I_FILA_COMPLETA_DE_ABERTOS
+    to: W0_FILA_DE_ABERTOS_LEGIVEL
+    edge_type: SUPPORTS
+  - from: I_QUARTO_ALLOWLIST_NO_STATE
+    to: W0_FILA_DE_ABERTOS_LEGIVEL
+    edge_type: SUPPORTS
+  - from: I_FECHAR_GIT_MV_E_REMOVIDO
+    to: W1_METRICA_NAO_FORJAVEL
+    edge_type: SUPPORTS
+  - from: I_IFS_PARA_037
+    to: W1_METRICA_NAO_FORJAVEL
+    edge_type: SUPPORTS
+  - from: I_STATUSFACTOR_EM_SITIO_UNICO
+    to: W2_DOGFOOD_DAS_CINCO_CLASSES
+    edge_type: SUPPORTS
+  - from: I_PRIMEIROS_CINCO_NOS_DO_BASELINE
+    to: W2_DOGFOOD_DAS_CINCO_CLASSES
+    edge_type: SUPPORTS
+  - from: I_CONTER_O_QUE_ESTA_EXPOSTO
+    to: W3_PRODUCAO_CONTIDA
+    edge_type: SUPPORTS
+  - from: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
+    to: W4_REGRA_SEM_TESTE
+    edge_type: SUPPORTS
+  - from: Q_QUANTAS_DAS_52_REGRAS_JA_JUNTAM_SOZINHAS
+    to: W4_REGRA_SEM_TESTE
+    edge_type: SUPPORTS
+  - from: Q_REGRA56_INSATISFAZIVEL_NO_SEGUNDO_COMMIT
+    to: W1_METRICA_NAO_FORJAVEL
+    edge_type: SUPPORTS
+
+  # a precedência — legível por humano e por LLM, INVISÍVEL ao ranking (ver o contrato no meta:)
+  - from: W1_METRICA_NAO_FORJAVEL
+    to: W0_FILA_DE_ABERTOS_LEGIVEL
+    edge_type: DEPENDS_ON
+  - from: W2_DOGFOOD_DAS_CINCO_CLASSES
+    to: W1_METRICA_NAO_FORJAVEL
+    edge_type: DEPENDS_ON
+  - from: W3_PRODUCAO_CONTIDA
+    to: W0_FILA_DE_ABERTOS_LEGIVEL
+    edge_type: DEPENDS_ON
+  - from: W4_REGRA_SEM_TESTE
+    to: W2_DOGFOOD_DAS_CINCO_CLASSES
+    edge_type: DEPENDS_ON
+  - from: I_PRIMEIROS_CINCO_NOS_DO_BASELINE
+    to: I_FECHAR_GIT_MV_E_REMOVIDO
+    edge_type: DEPENDS_ON
+
+  # as medições, e o que elas fazem com o inventário
+  - from: E_PRODUCAO_ALCANCOU_O_REPO
+    to: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
+    edge_type: SUPPORTS
+  - from: E_DOIS_ITENS_DE_PRODUCAO_SEGUEM_VIVOS
+    to: W3_PRODUCAO_CONTIDA
+    edge_type: SUPPORTS
+  - from: E_CONSUMED_MODE_CHECK_FUNCIONA_E_ESTA_DESLIGADO
+    to: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
+    edge_type: CAUSES
+  - from: E_CONSUMED_MODE_CHECK_FUNCIONA_E_ESTA_DESLIGADO
+    to: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
+    edge_type: SUPPORTS
+  - from: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
+    to: W0_FILA_DE_ABERTOS_LEGIVEL
+    edge_type: SUPPORTS
+  - from: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
+    to: W0_FILA_DE_ABERTOS_LEGIVEL
+    edge_type: CONSTRAINS
