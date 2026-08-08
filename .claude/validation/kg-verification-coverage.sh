@@ -55,6 +55,10 @@
 #   gramática) está em docs/analysis/onion-adr-kg-halflife-2026-08.md.
 #
 # Uso : bash .claude/validation/kg-verification-coverage.sh [<repo_root>] [--emit-baseline] [--format tsv]
+# SEPARADORES (invariante, declarado UMA vez): registro INTERNO usa \037 (US); a SAIDA usa \t
+#   porque e contrato externo — lint-artifacts.sh agrega a classe PASSIVO por ele. TAB NUNCA
+#   volta para dentro: e IFS-whitespace, runs colapsam e campo vazio SOME, deslocando o resto
+#   (selftests (t) e (t2)).
 # TSV : sev<TAB>tag<TAB>path<TAB>msg  (mesmo contrato do kg-provenance-coverage.sh, para o lint
 #       agregar a classe PASSIVO numa linha só — dezenas de linhas iguais afogam o acionável)
 # Exit: 0 = sem HARD · 1 = HARD presente · 2 = erro de uso
@@ -118,7 +122,7 @@ load_universe() {
   UNIVERSE="$(for f in $(git ls-files '*.kg.yaml' 2>/dev/null | grep -v '/fixtures/'); do
     awk -v F="$f" '
       function flush(   ) {
-        if (id != "") printf "%s\t%s\t%s\t%s\t%s\t%s\n", F, id, plane, imp, st, ver
+        if (id != "") printf "%s\037%s\037%s\037%s\037%s\037%s\n", F, id, plane, imp, st, ver
         id=""; plane=""; imp=0; ver=""; st=""
       }
       /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ { flush(); id=$3; next }
@@ -132,7 +136,9 @@ load_universe() {
   UNIVERSE_LOADED=1
 }
 
-# `path::sha1(id)<TAB>id` — a CHAVE VERSIONADA nunca carrega o id cru.
+# `path::sha1(id)\037id` — registro INTERNO, separado por US (\037) e nao por TAB. O irmao
+# `resolve_key` foi corrigido no mesmo diff e este ficou para tras: comentario que descreve o
+# formato errado e a semente do proximo parser errado. A CHAVE VERSIONADA nunca carrega o id cru.
 # POR QUÊ (a REGRA 36 pegou isto na 1ª rodada, 2026-08-02): ids de nó carregam nome de adotante, e
 # ESTE BASELINE VIAJA na superfície vendorizada — seria vazamento cross-tenant por adoção. O path já
 # é público (está no repo); o id não precisa estar. O hash mantém a identidade estável sem publicar
@@ -141,23 +147,23 @@ load_universe() {
 scope_pairs() {
   load_universe
   printf '%s\n' "${UNIVERSE}" \
-    | awk -F'\t' "${SCOPE_PREDICATE}"' inScope($3, $4, $5, $6) { printf "%s\t%s\n", $1, $2 }' \
-    | while IFS=$'\t' read -r p id; do
+    | awk -F'\037' "${SCOPE_PREDICATE}"' inScope($3, $4, $5, $6) { printf "%s\037%s\n", $1, $2 }' \
+    | while IFS=$'\037' read -r p id; do
         [ -n "${id}" ] || continue
-        printf '%s::%s\t%s\n' "${p}" "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" "${id}"
+        printf '%s::%s\037%s\n' "${p}" "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" "${id}"
       done | sort -u
 }
 
-# resolve uma CHAVE do baseline contra o vivo → "id<TAB>plane<TAB>imp<TAB>st<TAB>ver", ou vazio se o
+# resolve uma CHAVE do baseline contra o vivo → "id\037plane\037imp\037st\037ver" (US, nao TAB), ou vazio se o
 # nó não existe mais. O hash aqui é LAZY: só roda quando há entrada FORA do escopo. No estado
 # saudável (baseline == escopo) o custo é ZERO.
 resolve_key() { # $1 = path::hash
   load_universe
   local p="${1%%::*}" h="${1##*::}"
-  printf '%s\n' "${UNIVERSE}" | awk -F'\t' -v P="${p}" '$1 == P' \
-    | while IFS=$'\t' read -r _f id plane imp st ver; do
+  printf '%s\n' "${UNIVERSE}" | awk -F'\037' -v P="${p}" '$1 == P' \
+    | while IFS=$'\037' read -r _f id plane imp st ver; do
         [ "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" = "${h}" ] || continue
-        printf '%s\t%s\t%s\t%s\t%s\n' "${id}" "${plane}" "${imp}" "${st}" "${ver}"
+        printf '%s\037%s\037%s\037%s\037%s\n' "${id}" "${plane}" "${imp}" "${st}" "${ver}"
       done | head -1
 }
 
@@ -207,7 +213,7 @@ has_reconciliation_edge() { # $1=arquivo $2=id → exit 0 se ALGUÉM reconciliou
 load_universe
 
 PAIRS="$(scope_pairs)"
-UNVERIFIED="$(printf '%s\n' "${PAIRS}" | cut -f1 | grep -v '^$' || true)"
+UNVERIFIED="$(printf '%s\n' "${PAIRS}" | cut -d$'\037' -f1 | grep -v '^$' || true)"
 
 if [ "${EMIT}" -eq 1 ]; then
   printf '# Baseline da REGRA 49 — PASSIVO TOLERADO de nós PROD/impact>=4 sem verified_at.\n'
@@ -244,7 +250,7 @@ hard=0; soft=0
 # (1) nó sem carimbo FORA do baseline → HARD (nasce verificado)
 # O id vem JUNTO da chave (`PAIRS`), então a mensagem nomeia o nó sem nenhuma busca reversa — a
 # versão anterior refazia sha1 dentro de um `cmd | getline` por candidato só para reencontrar o nome.
-while IFS=$'\t' read -r n nid; do
+while IFS=$'\037' read -r n nid; do
   [ -n "${n}" ] || continue
   if ! printf '%s\n' "${known}" | grep -qxF "${n}"; then
     emit HARD NOVO "${n%%::*}" \
@@ -292,7 +298,7 @@ while IFS= read -r k; do
       "no que NAO EXISTE MAIS em ${kp} — ${hint}: ${k}"
     soft=$((soft+1)); continue
   fi
-  IFS=$'\t' read -r rid rplane rimp rst rver <<< "${rec}"
+  IFS=$'\037' read -r rid rplane rimp rst rver <<< "${rec}"
   if [ -n "${rver}" ]; then
     emit SOFT CARIMBADO ".claude/validation/kg-verification-baseline.txt" \
       "no '${rid}' foi MEDIDO (verified_at: ${rver}) — ${hint}: ${k}"
