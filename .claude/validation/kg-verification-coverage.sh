@@ -31,8 +31,21 @@
 # ═══ A CATRACA (doutrina da casa: REGRA 28/29/42) ═══
 #   · passivo existente vai para BASELINE VERSIONADO e é TOLERADO (SOFT);
 #   · nó NOVO fora do baseline sem carimbo é HARD;
-#   · o baseline SÓ PODE ENCOLHER — acrescentar path é REGRESSÃO (HARD).
+#   · o baseline SÓ PODE ENCOLHER — acrescentar path é REGRESSÃO (HARD);
+#   · e ENCOLHER SÓ VALE POR MEDIÇÃO — sair do escopo por reetiqueta é FUGA (HARD).
 #   A métrica de saúde é o BASELINE DIMINUINDO, não o gate passando.
+#
+# ⚠️ O FAIL-OPEN QUE ESTA CATRACA TINHA — reproduzido em 2026-08-07, curado em 2026-08-08.
+#   Bastava trocar UM nó `plane: PROD` / `impact>=4` de `confirmed` para `drifted`, SEM medir nada
+#   e sem escrever uma linha de evidência, e o gate caía de 48 para 47 dizendo:
+#       [OBSOLETA] entrada OBSOLETA (no ja carimbado ou removido) — remova do baseline
+#   O gate AFIRMAVA um carimbo que não existia. Duas raízes, e as duas eram de desenho:
+#     1. o predicado de escopo era ALLOWLIST (`st == "open" || st == "confirmed"`), em DUAS cópias.
+#        `drifted` e `unverifiable` NASCERAM em 2026-08-06 como saída do `/meta:kg-freshness` — o
+#        enum cresceu POR BAIXO do predicado. Allowlist quebra quando o enum cresce; denylist não.
+#     2. o `OBSOLETA` não distinguia nó REMOVIDO de nó REETIQUETADO — e essa distinção É a catraca.
+#   Sem isso, a única propriedade que funda a REGRA 49 ("a única forma de diminuir o número é MEDIR")
+#   tinha porta dos fundos aberta, e ela se abria com um `sed`.
 #
 # ⚠️ MEIA-VIDA POR CLASSE — GATED, deliberadamente fora daqui.
 #   Medido 2026-08-02: nós com `verified_at` VENCIDO (>30d) = ZERO. A doutrina do KG tem 29 dias;
@@ -69,23 +82,43 @@ emit() { # $1=sev $2=tag $3=path $4=msg
 
 cd "${REPO_ROOT}" || exit 2
 
-# ── extrai os nós no escopo: plane PROD + impact>=4 + status vivo, SEM verified_at ──────────────
-# Um nó fecha quando aparece o próximo `- id:` ou o fim do arquivo — por isso o flush no END e na
-# abertura.
+# ══ O PREDICADO DE ESCOPO — DENYLIST, SITE ÚNICO ═══════════════════════════════════════════════
+# Era ALLOWLIST em DUAS cópias (ver o bloco do fail-open no cabeçalho). Agora existe UM literal, e
+# ele é o único lugar do repo que decide o que a REGRA 49 enxerga.
 #
-# ⚠️ ERRO REAL QUE ESTE DESENHO CORRIGE (2026-08-02): a primeira medição fechava o nó no `label:` e
-# contou 64. São 53. Onze nós, como `C_COEVOLVE_VALUE` em onion-identity-2026-07.kg.yaml:323-332,
-# têm `verified_at:` DEPOIS do `label:` — o scanner lia o nó pela METADE, via `ver=""` e acusava
-# falta de carimbo em nó carimbado. Instrumento que lê estado PARCIAL e reporta como FATO: a mesma
-# família de `declarado != verificado`, agora dentro do próprio medidor. Por isso o flush é no
-# delimitador do nó (`- id:` / EOF), nunca num campo que pode vir em qualquer ordem.
-scan() {
+# A denylist tem exatamente DOIS estados, e são os dois em que o nó DEIXA DE AFIRMAR sobre produção:
+#   `superseded` — outro nó carrega a verdade agora;  `refuted` — a afirmação caiu.
+# `open`, `confirmed`, `done`, `drifted` e `unverifiable` PERMANECEM no escopo. `drifted` mais que
+# todos: é justamente o estado em que a reconciliação é DEVIDA, e era por onde a fuga passava.
+#
+# CUSTO MEDIDO no corpus real antes de escrever (PROD + impact>=4 + sem carimbo):
+#   allowlist antiga: 43 confirmed + 5 open                       = 48
+#   denylist nova   : os mesmos 48 + 0 drifted + 0 unverifiable + 0 done = 48
+# A porta fecha SEM mexer no número — o que é o teste de que isto é cura, e não aperto disfarçado.
+SCOPE_PREDICATE='
+function inScope(plane, imp, st, ver) {
+  return (plane == "PROD" && imp+0 >= 4 && ver == "" && st != "superseded" && st != "refuted")
+}'
+
+# ══ O UNIVERSE — UMA passada, TODOS os nós, TODOS os campos ════════════════════════════════════
+# Antes eram DUAS varreduras idênticas (`scan` e `scan_named`) diferindo só no hash da saída — a
+# mesma família de duplicação que deixou a allowlist em dois lugares. Agora os arquivos são lidos
+# UMA vez e todo o resto é filtro sobre este TSV. E o guarda de direção PRECISA do universo inteiro,
+# inclusive dos nós FORA do escopo: é exatamente a SAÍDA do escopo que ele julga.
+#
+# ⚠️ O flush é no DELIMITADOR do nó (`- id:` / EOF), NUNCA num campo. Erro real de 2026-08-02: a
+# primeira medição fechava o nó no `label:` e contou 64 onde eram 53 — onze nós, como
+# `C_COEVOLVE_VALUE` em onion-identity-2026-07.kg.yaml, têm `verified_at:` DEPOIS do `label:`, e o
+# scanner lia o nó pela METADE, via `ver=""` e acusava falta de carimbo em nó carimbado. Instrumento
+# que lê estado PARCIAL e reporta como FATO é `declarado != verificado` dentro do próprio medidor.
+UNIVERSE=""; UNIVERSE_LOADED=0
+load_universe() {
+  [ "${UNIVERSE_LOADED}" -eq 1 ] && return 0
   local f
-  for f in $(git ls-files '*.kg.yaml' 2>/dev/null | grep -v '/fixtures/'); do
+  UNIVERSE="$(for f in $(git ls-files '*.kg.yaml' 2>/dev/null | grep -v '/fixtures/'); do
     awk -v F="$f" '
       function flush(   ) {
-        if (id != "" && plane == "PROD" && imp >= 4 && (st == "open" || st == "confirmed") && ver == "")
-          print F "::" id
+        if (id != "") printf "%s\t%s\t%s\t%s\t%s\t%s\n", F, id, plane, imp, st, ver
         id=""; plane=""; imp=0; ver=""; st=""
       }
       /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ { flush(); id=$3; next }
@@ -95,39 +128,86 @@ scan() {
       /^[[:space:]]*status:[[:space:]]*/          { st=$2;     next }
       END { flush() }
     ' "$f"
-  done | while IFS= read -r line; do
-    # CHAVE DO BASELINE = path::sha1(id), NUNCA o id cru.
-    # POR QUÊ (a REGRA 36 pegou isto na 1a rodada, 2026-08-02): ids de nó carregam nome de
-    # adotante (a 1a rodada tinha um id assim) e ESTE BASELINE VIAJA na superficie vendorizada — seria
-    # vazamento cross-tenant por adoção. O path já é público (está no repo); o id não precisa
-    # estar. O hash mantém a catraca funcionando (identidade estável) sem publicar o nome.
-    # A mensagem de violação (que NÃO é versionada) segue nomeando o nó, para ser acionável.
-    printf '%s::%s\n' "${line%%::*}" "$(printf '%s' "${line##*::}" | sha1sum | cut -c1-12)"
-  done | sort -u
+  done)"
+  UNIVERSE_LOADED=1
 }
 
-# o mapa id->hash fica só em memória, para a mensagem poder nomear o nó sem o baseline guardá-lo
-scan_named() {
-  local f
-  for f in $(git ls-files '*.kg.yaml' 2>/dev/null | grep -v '/fixtures/'); do
-    awk -v F="$f" '
-      function flush(   ) {
-        if (id != "" && plane == "PROD" && imp >= 4 && (st == "open" || st == "confirmed") && ver == "")
-          print F "::" id
-        id=""; plane=""; imp=0; ver=""; st=""
-      }
-      /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ { flush(); id=$3; next }
-      /^[[:space:]]*plane:[[:space:]]*/           { plane=$2; next }
-      /^[[:space:]]*impact:[[:space:]]*/          { imp=$2+0;  next }
-      /^[[:space:]]*verified_at:[[:space:]]*/     { ver=$2;    next }
-      /^[[:space:]]*status:[[:space:]]*/          { st=$2;     next }
-      END { flush() }
-    ' "$f"
-  done | sort -u
+# `path::sha1(id)<TAB>id` — a CHAVE VERSIONADA nunca carrega o id cru.
+# POR QUÊ (a REGRA 36 pegou isto na 1ª rodada, 2026-08-02): ids de nó carregam nome de adotante, e
+# ESTE BASELINE VIAJA na superfície vendorizada — seria vazamento cross-tenant por adoção. O path já
+# é público (está no repo); o id não precisa estar. O hash mantém a identidade estável sem publicar
+# o nome. O id anda JUNTO em memória, só para a MENSAGEM (que não é versionada) poder nomear o nó —
+# num corpus de 881 nós, "o arquivo tem problema" é inacionável.
+scope_pairs() {
+  load_universe
+  printf '%s\n' "${UNIVERSE}" \
+    | awk -F'\t' "${SCOPE_PREDICATE}"' inScope($3, $4, $5, $6) { printf "%s\t%s\n", $1, $2 }' \
+    | while IFS=$'\t' read -r p id; do
+        [ -n "${id}" ] || continue
+        printf '%s::%s\t%s\n' "${p}" "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" "${id}"
+      done | sort -u
 }
 
-UNVERIFIED="$(scan)"
-NAMED="$(scan_named)"
+# resolve uma CHAVE do baseline contra o vivo → "id<TAB>plane<TAB>imp<TAB>st<TAB>ver", ou vazio se o
+# nó não existe mais. O hash aqui é LAZY: só roda quando há entrada FORA do escopo. No estado
+# saudável (baseline == escopo) o custo é ZERO.
+resolve_key() { # $1 = path::hash
+  load_universe
+  local p="${1%%::*}" h="${1##*::}"
+  printf '%s\n' "${UNIVERSE}" | awk -F'\t' -v P="${p}" '$1 == P' \
+    | while IFS=$'\t' read -r _f id plane imp st ver; do
+        [ "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" = "${h}" ] || continue
+        printf '%s\t%s\t%s\t%s\t%s\n' "${id}" "${plane}" "${imp}" "${st}" "${ver}"
+      done | head -1
+}
+
+# ══ A ARESTA QUE JUSTIFICA A SAÍDA — e as três coisas que ela NÃO pode aceitar ═════════════════
+# A 1ª versão casava `(ef == ID || eto == ID)` com o tipo DERIVADO do status. O Elenxo desta branch
+# a derrubou com três rotas, duas delas medidas no corpus REAL e sem forjar uma linha:
+#   · DIREÇÃO — um nó que REFUTA outro ganhava passe livre para se declarar `refuted`. OITO das 48
+#     entradas do baseline são `from` de uma aresta REFUTES/SUPERSEDES: fugiam com UM `sed` no
+#     `status:`. A convenção do corpus é inequívoca no outro sentido — nas 3 conformidades reais o
+#     refutado/superseded é sempre o `to`.
+#     (⚠️ a 1ª redação deste comentário NOMEAVA os oito nós, e o `vendor-scrub` reprovou: ids de nó
+#     carregam nome de adotante e ESTE ARQUIVO viaja vendorizado. É a mesma REGRA 36 pela qual o
+#     baseline guarda hash e não id — cometida no comentário que explica o hash. Conte, não liste.)
+#   · DUAS PONTAS — `from: X / to: X / edge_type: REFUTES`, três linhas, comprava RECONCILIADO.
+#     Um nó não se refuta sozinho.
+#   · TIPO DERIVADO DO STATUS — exigir SUPERSEDES só porque o status é `superseded` acusa a
+#     reconciliação que o `kg-radar.sh:620-621` SANCIONA: *"recebe REFUTES mas segue status=…
+#     (reconciliar: refuted ou superseded)"*. Quem escolhe `superseded` nesse fork não tem — e não
+#     deve ter — aresta SUPERSEDES. Mesma família dos 3 falsos-positivos que o Elenxo da REGRA 57
+#     derrubou, e no mesmo grafo (`m2-bridge-logto`) que o contrato chama de "o dogfood CERTO".
+# Logo o predicado é: aresta ENTRANDO (o nó é o `to`), com as DUAS PONTAS distintas, de qualquer um
+# dos dois tipos de reconciliação. Não é *"existe uma aresta por perto"* — é *"ALGUÉM, que não ele
+# mesmo, o reconciliou"*.
+#
+# Flush no DELIMITADOR (`- from:` / EOF), não posicional: o `kg-seal-check.sh` guarda `to:` e consome
+# no `edge_type:`, o que só funciona porque as arestas do corpus estão na ordem canônica — dívida
+# declarada no Elenxo dele. Aqui a ordem from/edge_type/to é indiferente.
+has_reconciliation_edge() { # $1=arquivo $2=id → exit 0 se ALGUÉM reconciliou o nó
+  awk -v ID="$2" '
+    function flush(   ) {
+      if (ef != "" && ef != eto && eto == ID && (et == "REFUTES" || et == "SUPERSEDES")) achou=1
+      ef=""; et=""; eto=""
+    }
+    /^[[:space:]]*-[[:space:]]*from:[[:space:]]*/ { flush(); ef=$3;  next }
+    /^[[:space:]]*to:[[:space:]]*/                { eto=$2; next }
+    /^[[:space:]]*edge_type:[[:space:]]*/         { et=$2;  next }
+    END { flush(); exit(achou ? 0 : 1) }
+  ' "$1"
+}
+
+# ⚠️ IÇADO DE PROPÓSITO, e a linha vale 12 segundos. `load_universe` memoiza numa variável de
+# shell, e TODO consumidor abaixo roda em command substitution — a atribuição morria com o subshell
+# e o universo era relido a CADA chave. Medido no estado-ALVO da própria catraca (os 48 nós já
+# medidos): 19,9s contra 0,67s do script que este substitui. Chamando aqui, no escopo pai, os
+# subshells HERDAM: 7,4s, saída byte-idêntica. O gradiente era perverso — quanto mais a doutrina
+# fosse obedecida, mais lento ficaria o gate que a cobra.
+load_universe
+
+PAIRS="$(scope_pairs)"
+UNVERIFIED="$(printf '%s\n' "${PAIRS}" | cut -f1 | grep -v '^$' || true)"
 
 if [ "${EMIT}" -eq 1 ]; then
   printf '# Baseline da REGRA 49 — PASSIVO TOLERADO de nós PROD/impact>=4 sem verified_at.\n'
@@ -146,35 +226,98 @@ if [ ! -f "${BASELINE}" ]; then
 fi
 
 known="$(grep -vE '^[[:space:]]*(#|$)' "${BASELINE}" 2>/dev/null | sort -u)"
+# O baseline do commit ANTERIOR. Lido aqui, e não lá embaixo no bloco (3), porque o laço (2) precisa
+# dele: ver TO_JUDGE.
+prev="$(git show HEAD:.claude/validation/kg-verification-baseline.txt 2>/dev/null | grep -vE '^[[:space:]]*(#|$)' | sort -u || true)"
+
+# ⚠️ O UNIVERSE DE JULGAMENTO É `prev ∪ known`, NÃO `known`. O Elenxo desta branch reproduziu o
+# bypass total: reetiquetar o nó E apagar a linha do baseline NO MESMO COMMIT. Iterando só o baseline
+# ATUAL, a chave apagada some do julgamento e ninguém a classifica; e o bloco (3) só reprova quando
+# o baseline CRESCE, então encolher era sempre livre. Saída medida antes da correção:
+#   `exit=0 · 0 VIOLATION · no escopo sem carimbo: 47 · passivo tolerado: 47 · HARD: 0`
+# O custo do bypass tinha subido de UM `sed` para UM `sed` + UM `grep -v` — e o desenho punia quem
+# fazia a coisa MENOS encoberta (deixava a linha e levava HARD) e liberava quem apagava o rastro
+# inteiro. Com a união, a linha apagada continua sendo cobrada até que o nó explique a própria saída.
+TO_JUDGE="$(printf '%s\n%s\n' "${prev}" "${known}" | grep -v '^$' | sort -u || true)"
 hard=0; soft=0
 
 # (1) nó sem carimbo FORA do baseline → HARD (nasce verificado)
-while IFS= read -r n; do
+# O id vem JUNTO da chave (`PAIRS`), então a mensagem nomeia o nó sem nenhuma busca reversa — a
+# versão anterior refazia sha1 dentro de um `cmd | getline` por candidato só para reencontrar o nome.
+while IFS=$'\t' read -r n nid; do
   [ -n "${n}" ] || continue
   if ! printf '%s\n' "${known}" | grep -qxF "${n}"; then
-    # A mensagem nomeia o NÓ, não só o arquivo: num grafo de 881 nós, "o arquivo tem problema"
-    # é inacionável. O path vai no campo que o lint agrega; o id vai no texto.
-    nid="$(printf '%s\n' "${NAMED}" | awk -F'::' -v F="${n%%::*}" -v H="${n##*::}" '
-             $1==F { h=$2; cmd="printf %s \"" $2 "\" | sha1sum | cut -c1-12"; cmd | getline g; close(cmd);
-                     if (g==H) { print $2; exit } }')"
     emit HARD NOVO "${n%%::*}" \
       "no '${nid:-<id oculto>}' e plane:PROD impact>=4 SEM verified_at e FORA do baseline — meca contra o vivo antes de selar (/meta:kg-freshness), ou o grafo afirma sobre producao sem nunca ter olhado."
     hard=$((hard+1))
   fi
-done <<< "${UNVERIFIED}"
+done <<< "${PAIRS}"
 
-# (2) entrada obsoleta (nó já carimbado ou já não existe) → SOFT "remova"
+# ══ (2) GUARDA DE DIREÇÃO — POR QUE esta entrada saiu do escopo? ═══════════════════════════════
+# ANTES: toda saída virava um SOFT único — "OBSOLETA — no ja carimbado ou removido". A mensagem
+# AFIRMAVA um carimbo sem nunca ter olhado se ele existia, e era FALSA em todo caso de reetiqueta.
+# É o `declarado != verificado` dentro do instrumento que existe para cobrar verificação.
+#
+# AGORA a saída é CLASSIFICADA contra o vivo. Três classes são legítimas e duas são fuga:
+#   CARIMBADO        o nó está lá e ganhou `verified_at`                          → SOFT (é a saída que o gate EXISTE para produzir)
+#   RECONCILIADO     virou refuted/superseded COM a aresta que justifica          → SOFT
+#   REMOVIDO         o nó não existe mais naquele arquivo                         → SOFT (ato visível no diff)
+#   FUGA-SEM-ARESTA  virou refuted/superseded por reetiqueta NUA, sem aresta      → HARD
+#   FUGA-DE-ESCOPO   segue sem carimbo e saiu rebaixando plane/impact             → HARD
+#
+# ⚠️ SOBRE A COBERTURA DESTE BLOCO — a versão anterior deste comentário afirmava um número que
+# NINGUÉM OBSERVOU, e o Elenxo o falsificou em um comando. Ela dizia: *"sem a checagem de aresta o
+# guarda acusaria 3 CONFORMIDADES"*. FALSO. Hoje `--emit-baseline` é IDÊNTICO ao baseline versionado,
+# logo este laço NUNCA EXECUTA no corpus real, e nenhum dos 3 nós citados está no baseline. Medição:
+#   sed 's/exit(achou ? 0 : 1)/exit(1)/' kg-verification-coverage.sh > /tmp/sem-aresta.sh
+#   bash /tmp/sem-aresta.sh --format tsv | awk -F'\t' '{print $1,$2}' | sort | uniq -c
+#   → 48 SOFT PASSIVO, ZERO HARD
+# A checagem é PREVENTIVA, e o que prova que ela discrimina é o selftest (p), não o corpus. Escrever
+# consequência não-observada no cabeçalho de um gate cuja tese é `declarado != verificado` é o
+# defeito da própria REGRA 49 cometido dentro do instrumento — por isso a correção fica aqui, com o
+# comando que a falsifica junto.
+#
+# ⚠️ E o corolário, que é o fio mais honesto deste PR: as CINCO classes abaixo não têm NENHUMA
+# cobertura de campo. Toda a evidência é sintética. O primeiro nó que sair do baseline de verdade —
+# via `/meta:kg-freshness` — é o PRIMEIRO dogfood real desta guarda. O verde do CI não substitui isso.
 while IFS= read -r k; do
   [ -n "${k}" ] || continue
-  if ! printf '%s\n' "${UNVERIFIED}" | grep -qxF "${k}"; then
-    emit SOFT OBSOLETA ".claude/validation/kg-verification-baseline.txt" \
-      "entrada OBSOLETA (no ja carimbado ou removido) — remova do baseline: ${k}"
-    soft=$((soft+1))
+  printf '%s\n' "${UNVERIFIED}" | grep -qxF "${k}" && continue
+  kp="${k%%::*}"
+  # a linha ainda está no baseline, ou o operador já a removeu? muda só o conselho da mensagem
+  if printf '%s\n' "${known}" | grep -qxF "${k}"; then hint="remova do baseline"; else hint="a linha ja saiu do baseline"; fi
+  rec="$(resolve_key "${k}")"
+  if [ -z "${rec}" ]; then
+    emit SOFT REMOVIDO ".claude/validation/kg-verification-baseline.txt" \
+      "no que NAO EXISTE MAIS em ${kp} — ${hint}: ${k}"
+    soft=$((soft+1)); continue
   fi
-done <<< "${known}"
+  IFS=$'\t' read -r rid rplane rimp rst rver <<< "${rec}"
+  if [ -n "${rver}" ]; then
+    emit SOFT CARIMBADO ".claude/validation/kg-verification-baseline.txt" \
+      "no '${rid}' foi MEDIDO (verified_at: ${rver}) — ${hint}: ${k}"
+    soft=$((soft+1)); continue
+  fi
+  case "${rst}" in
+    refuted|superseded)
+      if has_reconciliation_edge "${kp}" "${rid}"; then
+        emit SOFT RECONCILIADO ".claude/validation/kg-verification-baseline.txt" \
+          "no '${rid}' saiu do escopo como '${rst}' COM aresta de reconciliacao (REFUTES|SUPERSEDES) ENTRANDO, vinda de OUTRO no — ${hint}: ${k}"
+        soft=$((soft+1))
+      else
+        emit HARD FUGA-SEM-ARESTA "${kp}" \
+          "no '${rid}' virou '${rst}' SEM carimbo e SEM aresta de reconciliacao ENTRANDO (REFUTES ou SUPERSEDES, vinda de OUTRO no — aresta SAINDO nao reconcilia, e no nao se refuta sozinho). Ou meca contra o vivo (/meta:kg-freshness), ou escreva a aresta que justifica o '${rst}'."
+        hard=$((hard+1))
+      fi ;;
+    *)
+      emit HARD FUGA-DE-ESCOPO "${kp}" \
+        "no '${rid}' saiu do escopo SEM carimbo (hoje plane:${rplane:-<vazio>} impact:${rimp:-0} status:${rst:-<vazio>}) — o baseline so encolhe por MEDICAO, nunca por rebaixar plane/impact."
+      hard=$((hard+1)) ;;
+  esac
+done <<< "${TO_JUDGE}"
 
-# (3) CATRACA — baseline que CRESCEU vs a versão anterior no git → HARD (regressão)
-prev="$(git show HEAD:.claude/validation/kg-verification-baseline.txt 2>/dev/null | grep -vE '^[[:space:]]*(#|$)' | sort -u || true)"
+# (3) CATRACA — baseline que CRESCEU vs a versão anterior no git → HARD (regressão).
+# `prev` é lido lá em cima, junto do `known`, porque o laço (2) depende dele (TO_JUDGE = prev ∪ known).
 if [ -n "${prev}" ]; then
   np=$(printf '%s\n' "${prev}"  | grep -c . || true)
   nk=$(printf '%s\n' "${known}" | grep -c . || true)

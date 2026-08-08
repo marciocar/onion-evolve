@@ -38,13 +38,26 @@ nodes:
   - id: E_ALLOWLIST_NA_CATRACA_49_ATIVO
     node_type: evidence
     plane: PROD
-    status: open
+    status: superseded
     impact: 5
     confidence: 1.0
     verified_at: 2026-08-07
     verified_against: reproducao-propria-trocar-um-no-PROD-para-drifted-sem-carimbar
     label: "SITIO 2 (NAO CURADO, e aqui o fail-open e ATIVO): kg-verification-coverage.sh:87,115 — a catraca da REGRA 49 — tem a MESMA allowlist, duplicada. Reproduzido por mim: trocar UM no plane:PROD impact 5 de `confirmed` para `drifted`, sem medir nem carimbar NADA, leva o gate de 48 para 47 no escopo e emite '[OBSOLETA] entrada OBSOLETA (no ja carimbado ou removido) — remova do baseline'. O gate AFIRMA um carimbo que nao existe e convida a encolher um baseline que so pode encolher por medicao. Destroi a propriedade fundadora escrita no cabecalho do proprio script: 'rodar o kg-freshness e a UNICA forma de diminuir o numero'"
     trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+
+  # SUCESSOR do no acima (2026-08-08). O rotulo antigo NAO foi reescrito: ele continua descrevendo o
+  # fail-open como ele era, que e o unico jeito de a escada continuar legivel depois da correcao.
+  - id: E_CATRACA_49_CURADA_NA_F2_5
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: mesma-mutacao-nos-dois-scripts-lado-a-lado-47-com-OBSOLETA-vs-48-limpo
+    label: "SITIO 2 CURADO na F2.5: o predicado virou DENYLIST em sitio unico e a saida do escopo passou a ser CLASSIFICADA contra o vivo (CARIMBADO/RECONCILIADO/REMOVIDO sao SOFT; FUGA-SEM-ARESTA e FUGA-DE-ESCOPO sao HARD). Provado no par: a MESMA mutacao devolve 47 + [OBSOLETA] no script antigo e 48 limpo no novo. Custo no corpus real: ZERO nos a mais (48 -> 48) — fecha a porta sem mexer no gate. Detalhe e achados vizinhos em docs/onion/graph/catraca-regra49-2026-08.kg.yaml"
+    trace: ".claude/validation/kg-verification-coverage.sh"
 
   - id: E_ALLOWLIST_NO_KG_VIEW
     node_type: evidence
@@ -216,6 +229,12 @@ edges:
     to: C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE
     edge_type: SUPPORTS
   - from: E_ALLOWLIST_NA_CATRACA_49_ATIVO
+    to: C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE
+    edge_type: SUPPORTS
+  - from: E_CATRACA_49_CURADA_NA_F2_5
+    to: E_ALLOWLIST_NA_CATRACA_49_ATIVO
+    edge_type: SUPERSEDES
+  - from: E_CATRACA_49_CURADA_NA_F2_5
     to: C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE
     edge_type: SUPPORTS
   - from: E_ALLOWLIST_NO_KG_VIEW
