@@ -40,6 +40,28 @@
 
 set -euo pipefail
 
+# ── A BANCADA NÃO PODE MORRER CALADA ───────────────────────────────────────────────────────────
+# Medido em 2026-08-08: reescrevi um mutation test usando `cmd; rc=$?` — padrão que, sob `set -e`,
+# MATA a suíte no `cmd` que retorna != 0, antes da atribuição. A bancada abortou logo depois do caso
+# `kg-verificacao (f)`, com exit 1, ZERO `✗` registrados e NENHUMA soma impressa. Rodando o bloco
+# isolado num runner meu — que não copiava o `set` daqui — os 16 casos davam verde. Duas leituras
+# possíveis do mesmo estado, e a errada era a confortável.
+# Este trap remove a leitura confortável: se a suíte terminar sem imprimir a soma, ela DIZ isso.
+# É a mesma doutrina do `record_skip` uma camada acima — abort apresentado como veredito é vacuidade.
+SUMARIO_IMPRESSO=0
+_bancada_abort_guard() {
+  local rc=$?
+  [ "${SUMARIO_IMPRESSO}" -eq 1 ] && return 0
+  echo ""
+  echo "✗✗ BANCADA ABORTOU ANTES DA SOMA (exit ${rc}) — o último ✓ acima NÃO é o fim da suíte."
+  echo "   Sob 'set -e', um comando que retorna != 0 fora de if/&&/|| mata a suíte na hora: os casos"
+  echo "   seguintes NUNCA RODARAM e nenhum ✗ foi registrado. NÃO leia esta saída como verde."
+  echo "   Suspeito nº 1: 'cmd; rc=\$?' — troque por 'if cmd; then rc=0; else rc=1; fi'."
+  echo "   E se você extraiu um bloco para um runner isolado: copie o 'set -euo pipefail' daqui,"
+  echo "   senão o runner mente a favor (foi exatamente assim que este defeito passou)."
+}
+trap _bancada_abort_guard EXIT
+
 # Git hooks EXPORTAM GIT_DIR/GIT_INDEX_FILE (e o `git commit` os aponta para o repo do
 # commit em curso). Cada sandbox git forjada aqui os herdaria e operaria no repo ERRADO.
 # Medido: sob `git commit`, a suíte ABORTAVA no caso 93 de 472 — e o hook anunciava
@@ -128,6 +150,30 @@ SSOT_KB_DRIFT="$(( ${SSOT_KB_TOTAL:-0} + 5 ))"
 
 record_pass() { PASS=$((PASS + 1)); echo "  ✓ ${1}"; }
 record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} — ${2}"; }
+
+# ── DISCIPLINA DO MUTATION TEST, EM UM LUGAR SÓ ────────────────────────────────────────────────
+# Um mutation test só prova algo se TRÊS coisas forem verdade, e a casa já perdeu duas delas em
+# dias seguidos:
+#   1. a MUTAÇÃO foi APLICADA — 2026-08-07: três guardas usavam `grep` de padrão, e o padrão
+#      aparecia no arquivo INTACTO (dentro da própria linha do `sed`), então um `sed` no-op "passava";
+#   2. o INTACTO SATISFAZ o caso — 2026-08-08: sabotei a fixture de propósito e o mutation test da
+#      catraca da REGRA 49 sobreviveu, porque afirmava uma AUSÊNCIA, e ausência é o que uma fixture
+#      morta entrega de graça;
+#   3. o MUTANTE NÃO satisfaz o caso — a única das três que costuma estar escrita.
+# Este helper cobra as três, e nomeia QUAL falhou. Quem escrever o próximo mutation test não precisa
+# lembrar da lição: ela está no chamador obrigatório.
+_prova_mutacao() { # $1=nome $2=arq_intacto $3=arq_mutante $4=rc_caso_no_intacto $5=rc_caso_no_mutante (0=caso passa)
+  if cmp -s "$2" "$3"; then
+    record_fail "$1" "GUARDA-DA-GUARDA: a mutacao NAO foi aplicada (arquivos identicos) — o sed virou no-op"; return
+  fi
+  if [ "$4" -ne 0 ]; then
+    record_fail "$1" "FIXTURE MORTA: o arquivo INTACTO ja nao satisfaz o caso — o mutante nao prova nada"; return
+  fi
+  if [ "$5" -eq 0 ]; then
+    record_fail "$1" "o mutante AINDA satisfaz o caso — a linha mutada nao e load-bearing"; return
+  fi
+  record_pass "$1"
+}
 # TERCEIRO DESFECHO — o SUT NÃO foi exercido (tooling/feature ausente). Nunca soma em PASS.
 # Onde só existem "lançar" e "não lançar", "não verifiquei" se disfarça de "verifiquei e está
 # bom" — falso-verde por VACUIDADE (architecture-challenges.md §1.3). Antes disto, 32 sítios
@@ -5092,12 +5138,218 @@ run_kg_verification_selftests() {
   # (g) MUTATION TEST — sem a condicao central (ver == ""), o caso (a) para de reprovar
   d="$(mktemp -d)"; _mk "$d" C_NOVO PROD 5 confirmed ""
   mkdir -p "$d/.claude/validation"; printf '# vazio\n' > "$d/.claude/validation/kg-verification-baseline.txt"
-  local mut="$d/mutante.sh"
+  local mut="$d/mutante.sh" rc_int rc_mut
   sed 's/&& ver == ""/\&\& ver != ver/' "${helper}" > "${mut}"
-  out="$(bash "${mut}" "$d" --format tsv 2>/dev/null || true)"
-  if ! printf '%s' "${out}" | grep -q '^HARD.*NOVO'; then
-    record_pass "kg-verificacao: (g) (MUT) sem a condicao central o caso (a) FALHA — a guarda e load-bearing"
-  else record_fail "kg-verificacao: (g)" "mutante ainda reprova — o teste (a) nao prova nada"; fi
+  # ⚠️ DUAS armadilhas do `set -euo pipefail` desta bancada (linha 41), as duas medidas em 2026-08-08:
+  #   · `cmd; rc=$?` MATA a suite no comando que retorna != 0 — ela abortou logo depois do caso (f),
+  #     exit 1, zero ✗ e NENHUMA soma. Por isso `if`, nunca `; rc=$?`.
+  #   · `pipefail` faz `helper | grep -q` devolver o exit do HELPER, e o helper sai 1 justamente
+  #     quando ACHA HARD. Sem capturar a saida antes, o caso le "nao achou" quando achou — e o
+  #     `_prova_mutacao` acusa FIXTURE MORTA sobre uma fixture perfeitamente viva.
+  local o_int o_mut
+  o_int="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  o_mut="$(bash "${mut}"    "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${o_int}" | grep -q '^HARD.*NOVO'; then rc_int=0; else rc_int=1; fi
+  if printf '%s' "${o_mut}" | grep -q '^HARD.*NOVO'; then rc_mut=0; else rc_mut=1; fi
+  _prova_mutacao "kg-verificacao: (g) (MUT) sem a condicao central (ver == \"\") o caso (a) para de reprovar" \
+                 "${helper}" "${mut}" "${rc_int}" "${rc_mut}"
+}
+
+# ── REGRA 49 · GUARDA DE DIREÇÃO — o baseline só encolhe por MEDIÇÃO ────────────────────────────
+# Bloco nascido de um fail-open ATIVO, reproduzido em 2026-08-07 no corpus real: trocar UM nó
+# PROD/impact>=4 de `confirmed` para `drifted`, sem medir nada, derrubava o gate de 48 para 47 com a
+# mensagem "[OBSOLETA] entrada OBSOLETA (no ja carimbado ou removido)" — o gate AFIRMAVA um carimbo
+# inexistente. Duas raízes: o predicado era ALLOWLIST (e o enum de `status` cresceu por baixo dele,
+# com `drifted`/`unverifiable` nascendo em 2026-08-06), e a saída do escopo não era classificada.
+run_kg_ratchet_direction_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/kg-verification-coverage.sh"
+  if [ ! -f "${helper}" ]; then record_fail "kg-catraca" "helper ausente"; return; fi
+  local d out mut
+
+  # $1=dir $2=status $3=impact $4=plane $5=verified_at $6=aresta $7=id(default C_ALVO)
+  # $6 = "" (nenhuma) | "TIPO" (entrando, o canônico) | "TIPO:in" | "TIPO:out" | "TIPO:self"
+  # A DIREÇÃO e a IDENTIDADE das pontas viraram parâmetro porque o Elenxo mostrou que 5 mutações da
+  # guarda sobreviviam 9/9 sem elas: a fixture só sabia fabricar `refuted` + REFUTES entrando.
+  _g49() {
+    mkdir -p "$1/docs/onion/graph"
+    { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+      printf '  - id: %s\n    node_type: claim\n    plane: %s\n    impact: %s\n    status: %s\n' "${7:-C_ALVO}" "$4" "$3" "$2"
+      # `if`, e nao `[ -n "$X" ] && printf`: sob `set -e` o `&&` com condicao FALSA devolve 1, e como
+      # este e o ULTIMO comando do grupo, a funcao inteira devolvia 1 e MATAVA a bancada na primeira
+      # fixture sem aresta — antes de qualquer caso rodar. Medido em 2026-08-08.
+      if [ -n "$5" ]; then printf '    verified_at: %s\n' "$5"; fi
+      printf '    label: "x"\n'
+      if [ -n "$6" ]; then
+        local _t="${6%%:*}" _dir="${6#*:}" _no="${7:-C_ALVO}" _de _para
+        [ "${_dir}" = "$6" ] && _dir=in          # sem sufixo → ENTRANDO (o caso canônico do corpus)
+        case "${_dir}" in
+          out)  _de="${_no}"; _para=E_OUTRO ;;   # o nó REFUTA outro — não reconcilia a si
+          self) _de="${_no}"; _para="${_no}" ;;  # nó não se refuta sozinho
+          *)    _de=E_OUTRO;  _para="${_no}" ;;
+        esac
+        printf 'edges:\n  - from: %s\n    edge_type: %s\n    to: %s\n' "${_de}" "${_t}" "${_para}"
+      fi
+    } > "$1/docs/onion/graph/t.kg.yaml"
+  }
+  _commit49() { ( cd "$1" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null; }
+  # nasce EM CONFORMIDADE (confirmed/PROD/5, no baseline) e só DEPOIS muda — é a única forma de
+  # exercitar a SAÍDA do escopo, que é o que este guarda julga.
+  # ⚠️ o baseline é COMMITADO: o guarda compara `prev ∪ known`, e sem baseline no HEAD o `prev` fica
+  # vazio e a metade que fecha o bypass do `grep -v` nunca é exercitada.
+  _cena49() { local dir="$1"; shift
+    _g49 "${dir}" confirmed 5 PROD "" ""
+    _commit49 "${dir}"
+    mkdir -p "${dir}/.claude/validation"
+    bash "${helper}" "${dir}" --emit-baseline > "${dir}/.claude/validation/kg-verification-baseline.txt" 2>/dev/null
+    ( cd "${dir}" && git add -A && git -c user.email=t@t -c user.name=t commit -qm baseline ) >/dev/null 2>&1
+    _g49 "${dir}" "$@"
+  }
+  _tags49() { printf '%s' "$1" | awk -F'\t' 'NF>1 {print $1":"$2}' | sort -u | tr '\n' ' '; }
+  # roda o helper SEM subshell, para que o EXIT sobreviva: nenhum caso da 1ª versão aferia o exit do
+  # gate, e por isso zerar o `hard=$((hard+1))` do FUGA-DE-ESCOPO passava 9/9.
+  _roda49() { RC49=0; OUT49="$(bash "${helper}" "$1" --format tsv 2>/dev/null)" || RC49=$?; }
+
+  # (h) O ENUM QUE CRESCEU: allowlist quebra, denylist nao. `drifted`/`unverifiable`/`done` sao
+  #     status VIVOS e tem de continuar DENTRO do escopo — `drifted` mais que todos, porque e o
+  #     estado em que a reconciliacao e DEVIDA.
+  local st fora=""
+  for st in drifted unverifiable done open confirmed; do
+    d="$(mktemp -d)"; _g49 "$d" "${st}" 5 PROD "" ""; _commit49 "$d"
+    mkdir -p "$d/.claude/validation"; printf '# vazio\n' > "$d/.claude/validation/kg-verification-baseline.txt"
+    out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+    printf '%s' "${out}" | grep -q '^HARD.*NOVO' || fora="${fora} ${st}"
+  done
+  if [ -z "${fora}" ]; then
+    record_pass "kg-catraca: (h) drifted/unverifiable/done/open/confirmed DENTRO do escopo (denylist nao quebra quando o enum cresce)"
+  else record_fail "kg-catraca: (h)" "status VIVO fora do escopo — allowlist de volta:${fora}"; fi
+
+  # (i) O FAIL-OPEN EM ESPECIE: no do baseline reetiquetado para `drifted`, sem medir nada.
+  #     Nao pode sair do escopo, e nao pode aparecer NENHUMA mensagem de saida.
+  d="$(mktemp -d)"; _cena49 "$d" drifted 5 PROD "" ""
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if [ "$(_tags49 "${out}")" = "SOFT:PASSIVO " ]; then
+    record_pass "kg-catraca: (i) confirmed→drifted NU segue no escopo (o fail-open que fundou o bloco)"
+  else record_fail "kg-catraca: (i)" "a reetiqueta tirou o no do escopo — fail-open ativo. tags: $(_tags49 "${out}")"; fi
+
+  # (j) fuga por reetiqueta NUA para refuted (sem a aresta que a justifica) -> HARD **e exit 1**
+  d="$(mktemp -d)"; _cena49 "$d" refuted 5 PROD "" ""
+  _roda49 "$d"
+  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD" && $2=="FUGA-SEM-ARESTA"{f=1} END{exit !f}' && [ "${RC49}" -ne 0 ]; then
+    record_pass "kg-catraca: (j) confirmed→refuted SEM aresta → HARD FUGA-SEM-ARESTA E exit != 0"
+  else record_fail "kg-catraca: (j)" "reetiqueta nua escapou (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
+
+  # (k) ANTI-FALSO-POSITIVO, e e o caso mais importante do bloco: refutar COM a aresta e
+  #     CONFORMIDADE. Guarda que pune quem obedece e pior que guarda nenhuma — os tres
+  #     falsos-positivos HARD que o Elenxo da REGRA 57 derrubou eram exatamente esta forma.
+  #     No corpus real ha 3 nos assim (C2_AUTOMATE_READY, C_VERTICALS_EMPTY, E_ORBIT).
+  d="$(mktemp -d)"; _cena49 "$d" refuted 5 PROD "" REFUTES
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | awk -F'\t' '$1=="HARD"{h=1} $2=="RECONCILIADO"{r=1} END{exit !(r && !h)}'; then
+    record_pass "kg-catraca: (k) refuted COM aresta REFUTES entrando → SOFT RECONCILIADO, ZERO HARD (nao pune conformidade)"
+  else record_fail "kg-catraca: (k)" "acusou uma CONFORMIDADE: $(_tags49 "${out}")"; fi
+
+  # (k') a METADE `superseded` do mapa. Inverter o tipo exigido sobrevivia 9/9 porque nenhum caso
+  #      exercitava este status — e o `kg-radar.sh:620-621` SANCIONA reconciliar um REFUTES como
+  #      `superseded`, logo os dois tipos tem de valer para os dois status.
+  local par falha_par=""
+  for par in "superseded SUPERSEDES" "superseded REFUTES" "refuted SUPERSEDES"; do
+    set -- ${par}
+    d="$(mktemp -d)"; _cena49 "$d" "$1" 5 PROD "" "$2"
+    out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+    printf '%s' "${out}" | awk -F'\t' '$1=="HARD"{h=1} $2=="RECONCILIADO"{r=1} END{exit !(r && !h)}' || falha_par="${falha_par} ${1}+${2}"
+  done
+  if [ -z "${falha_par}" ]; then
+    record_pass "kg-catraca: (k') os 4 pares status×tipo de reconciliacao valem — o tipo NAO se deriva do status (kg-radar sanciona o fork)"
+  else record_fail "kg-catraca: (k')" "par legitimo acusado:${falha_par}"; fi
+
+  # (k2) o TIPO da aresta importa: SUPPORTS nao reconcilia nada. Remover o `et == T` sobrevivia 9/9.
+  d="$(mktemp -d)"; _cena49 "$d" refuted 5 PROD "" SUPPORTS
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | awk -F'\t' '$1=="HARD" && $2=="FUGA-SEM-ARESTA"{f=1} END{exit !f}'; then
+    record_pass "kg-catraca: (k2) aresta SUPPORTS NAO compra reconciliacao → HARD (o tipo e load-bearing)"
+  else record_fail "kg-catraca: (k2)" "qualquer aresta virou alibi: $(_tags49 "${out}")"; fi
+
+  # (q) DIRECAO — o no como `from` da aresta. Achado do Elenxo no corpus REAL: 8 das 48 entradas do
+  #     baseline sao `from` de um REFUTES/SUPERSEDES e fugiam com UM `sed`, sem forjar nada.
+  d="$(mktemp -d)"; _cena49 "$d" refuted 5 PROD "" REFUTES:out
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | awk -F'\t' '$1=="HARD" && $2=="FUGA-SEM-ARESTA"{f=1} END{exit !f}'; then
+    record_pass "kg-catraca: (q) aresta SAINDO nao reconcilia — quem refuta outro nao se refuta → HARD"
+  else record_fail "kg-catraca: (q)" "rota da direcao aberta (8/48 do corpus real): $(_tags49 "${out}")"; fi
+
+  # (r) DUAS PONTAS — `from: X / to: X`. Tres linhas compravam RECONCILIADO.
+  d="$(mktemp -d)"; _cena49 "$d" refuted 5 PROD "" REFUTES:self
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | awk -F'\t' '$1=="HARD" && $2=="FUGA-SEM-ARESTA"{f=1} END{exit !f}'; then
+    record_pass "kg-catraca: (r) self-edge nao reconcilia — um no nao se refuta sozinho → HARD"
+  else record_fail "kg-catraca: (r)" "self-edge comprou a saida: $(_tags49 "${out}")"; fi
+
+  # (s) O BYPASS TOTAL: reetiquetar E apagar a linha do baseline no MESMO commit. A 1a versao iterava
+  #     so o baseline ATUAL, entao a chave apagada sumia do julgamento — `exit=0`, zero VIOLATION,
+  #     48→47. O julgamento agora e dirigido por `prev ∪ known`.
+  d="$(mktemp -d)"; _cena49 "$d" refuted 5 PROD "" ""
+  : > "$d/.claude/validation/kg-verification-baseline.txt"      # o operador apaga o rastro junto
+  _roda49 "$d"
+  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD"{h=1} END{exit !h}' && [ "${RC49}" -ne 0 ]; then
+    record_pass "kg-catraca: (s) reetiqueta + linha apagada no mesmo commit → HARD e exit != 0 (o bypass total)"
+  else record_fail "kg-catraca: (s)" "apagar o rastro ainda liberta (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
+
+  # (l) fuga por rebaixamento de impact/plane — sair do escopo tambem e sair. Afere o EXIT tambem:
+  #     zerar o contador `hard` do FUGA-DE-ESCOPO sobrevivia a bancada inteira.
+  local rota falhou=""
+  for rota in "5 DEV" "3 PROD"; do
+    set -- ${rota}
+    d="$(mktemp -d)"; _cena49 "$d" confirmed "$1" "$2" "" ""
+    _roda49 "$d"
+    printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD" && $2=="FUGA-DE-ESCOPO"{f=1} END{exit !f}' || falhou="${falhou} impact=$1/plane=$2(tag)"
+    [ "${RC49}" -ne 0 ] || falhou="${falhou} impact=$1/plane=$2(exit=0)"
+  done
+  if [ -z "${falhou}" ]; then
+    record_pass "kg-catraca: (l) rebaixar plane ou impact → HARD FUGA-DE-ESCOPO E exit != 0"
+  else record_fail "kg-catraca: (l)" "rota de fuga aberta:${falhou}"; fi
+
+  # (m) a saida LEGITIMA: o no foi medido -> SOFT CARIMBADO, e a mensagem cita a data
+  d="$(mktemp -d)"; _cena49 "$d" confirmed 5 PROD 2026-08-08 ""
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | awk -F'\t' '$1=="HARD"{h=1} $2=="CARIMBADO" && $4 ~ /2026-08-08/{c=1} END{exit !(c && !h)}'; then
+    record_pass "kg-catraca: (m) verified_at aposto → SOFT CARIMBADO citando a data, zero HARD (a saida que o gate EXISTE para produzir)"
+  else record_fail "kg-catraca: (m)" "a medicao nao foi reconhecida: $(_tags49 "${out}")"; fi
+
+  # (n) no que sumiu do arquivo -> SOFT REMOVIDO (ato visivel no diff, nao fuga silenciosa)
+  # afere a SEVERIDADE, nao so a presenca da tag: trocar `emit SOFT REMOVIDO` por HARD sobrevivia 9/9
+  # o substituto nasce CARIMBADO de proposito: sem isso ele e um no NOVO em escopo e gera um
+  # `HARD NOVO` legitimo, que afogaria a severidade e o exit que este caso existe para aferir.
+  d="$(mktemp -d)"; _cena49 "$d" confirmed 5 PROD 2026-08-08 "" C_OUTRO
+  _roda49 "$d"
+  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="SOFT" && $2=="REMOVIDO"{r=1} $1=="HARD"{h=1} END{exit !(r && !h)}' && [ "${RC49}" -eq 0 ]; then
+    record_pass "kg-catraca: (n) no que nao existe mais → SOFT REMOVIDO e exit 0 (distinto de reetiquetado — a distincao E a catraca)"
+  else record_fail "kg-catraca: (n)" "classificacao/severidade errada (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
+
+  # (o) MUTATION — devolver a ALLOWLIST faz o caso (i) parar de proteger.
+  #     ⚠️ o caso (i) afirma uma AUSÊNCIA de acusação, e ausência é o que uma fixture MORTA entrega
+  #     de graça: este teste sobreviveu a uma fixture sabotada de propósito em 2026-08-08. Por isso
+  #     passa pelo `_prova_mutacao`, que exige o INTACTO satisfazer o caso antes de julgar o mutante.
+  local rc_int rc_mut
+  d="$(mktemp -d)"; _cena49 "$d" drifted 5 PROD "" ""
+  mut="$d/mut-allow.sh"
+  sed 's/st != "superseded" \&\& st != "refuted"/st == "open"/' "${helper}" > "${mut}"
+  if [ "$(_tags49 "$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)")" = "SOFT:PASSIVO " ]; then rc_int=0; else rc_int=1; fi
+  if [ "$(_tags49 "$(bash "${mut}"    "$d" --format tsv 2>/dev/null || true)")" = "SOFT:PASSIVO " ]; then rc_mut=0; else rc_mut=1; fi
+  _prova_mutacao "kg-catraca: (o) (MUT) com a allowlist de volta o caso (i) para de proteger — o predicado e load-bearing" \
+                 "${helper}" "${mut}" "${rc_int}" "${rc_mut}"
+
+  # (p) MUTATION — sem a checagem de aresta, o caso (k) passa a ACUSAR CONFORMIDADE
+  d="$(mktemp -d)"; _cena49 "$d" refuted 5 PROD "" REFUTES
+  mut="$d/mut-aresta.sh"
+  # ⚠️ RANGE limitado à função. O padrão `exit(achou ? 0 : 1)` aparece DUAS vezes no helper: na
+  # função e dentro do comentário que documenta o comando de falsificação. Um `sed` solto mutaria os
+  # dois, e o `cmp` passaria a diferir por duas razões — a mesma armadilha de padrão-que-casa-a-si-
+  # mesmo que derrubou três guardas-da-guarda em 2026-08-07, um passo adiante.
+  sed '/^tem_aresta_reconciliacao()/,/^}$/ s/exit(achou ? 0 : 1)/exit(1)/' "${helper}" > "${mut}"
+  if printf '%s' "$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)" | awk -F'\t' '$1=="HARD"{h=1} $2=="RECONCILIADO"{r=1} END{exit !(r && !h)}'; then rc_int=0; else rc_int=1; fi
+  if printf '%s' "$(bash "${mut}"    "$d" --format tsv 2>/dev/null || true)" | awk -F'\t' '$1=="HARD"{h=1} $2=="RECONCILIADO"{r=1} END{exit !(r && !h)}'; then rc_mut=0; else rc_mut=1; fi
+  _prova_mutacao "kg-catraca: (p) (MUT) sem a checagem de aresta o (k) passa a punir conformidade — a aresta e o discriminador" \
+                 "${helper}" "${mut}" "${rc_int}" "${rc_mut}"
 }
 
 run_task_manager_hook_selftests() {
@@ -7675,6 +7927,7 @@ run_scope_gitignore_selftests
 # Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal de campo D2).
 run_task_manager_hook_selftests
 run_kg_verification_selftests
+run_kg_ratchet_direction_selftests
 run_safe_count_selftests
 run_scan_sanity_selftests
 run_generator_failure_selftests
@@ -7993,6 +8246,7 @@ run_federation_projection_selftests
 # ---------------------------------------------------------------------------
 # Sumário
 # ---------------------------------------------------------------------------
+SUMARIO_IMPRESSO=1     # a partir daqui o trap de abort se cala — a suíte chegou ao fim
 echo ""
 echo "=== Sumário do auto-teste de guardas ==="
 echo "  Passaram : ${PASS}"

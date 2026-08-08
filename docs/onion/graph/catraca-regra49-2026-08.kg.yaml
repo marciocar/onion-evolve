@@ -1,0 +1,350 @@
+meta:
+  id: catraca-regra49-2026-08
+  schema_version: "1"
+  baseline: 2026-08-08
+  # A F2.5 — a catraca da REGRA 49 — como grafo.
+  # O que entra aqui NAO e o resumo do PR (isso e do artefato de revisao): sao os achados que
+  # ATRAVESSAM PRs. Dois deles nasceram FORA do escopo desta correcao e valem por si:
+  #   · um mutation test que sobreviveu a uma fixture deliberadamente MORTA;
+  #   · o pre-commit acusando 2 HARD fantasmas dentro de QUALQUER worktree.
+  # O no que este trabalho paga (E_ALLOWLIST_NA_CATRACA_49_ATIVO) vive em elenxos-2026-08-07 e foi
+  # selado LA, com sucessor e SUPERSEDES — o radar so enxerga arestas dentro de um arquivo.
+
+nodes:
+  # ── O DEFEITO, MEDIDO NOS DOIS SENTIDOS ─────────────────────────────────────────────────────
+  - id: E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: mesma-mutacao-rodada-no-script-ANTIGO-e-no-NOVO-lado-a-lado
+    label: "A prova nao e 'o novo passa' — e o par. MESMA mutacao (um no PROD/impact 5 de `confirmed` para `drifted`, sem medir nada), scripts lado a lado: ANTIGO devolve 'no escopo: 47' + SOFT [OBSOLETA] 'no ja carimbado ou removido' — afirmando um carimbo inexistente; NOVO devolve 'no escopo: 48', zero acusacao. Sem rodar o antigo eu teria so a metade que me favorece."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: E_CUSTO_ZERO_PROVA_QUE_E_CURA_E_NAO_APERTO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: populacao-PROD-impact4-por-status-antes-de-escrever-a-primeira-linha
+    label: "Medido ANTES de escrever: 43 confirmed + 5 open sem carimbo = 48; drifted, unverifiable e done sem carimbo = ZERO. Logo a denylist inclui tres status a mais e o numero NAO SE MOVE (48 -> 48). Uma guarda que fecha porta sem mexer no gate e cura; se o numero tivesse subido, seria aperto disfarcado de correcao — e a diferenca so aparece medindo antes."
+    trace: ".claude/validation/kg-verification-baseline.txt"
+
+  # ── A FORMA DA CURA ─────────────────────────────────────────────────────────────────────────
+  - id: C_SAIR_DO_ESCOPO_E_ENCOLHER_O_BASELINE
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-08
+    verified_against: quatro-rotas-de-fuga-exercitadas-uma-a-uma-no-corpus-real
+    label: "A catraca vigiava o TAMANHO do baseline e nao o MOTIVO da mudanca — e por isso tinha quatro portas dos fundos equivalentes a encolhe-lo: reetiquetar para drifted, reetiquetar para refuted/superseded sem aresta, rebaixar plane PROD->DEV, rebaixar impact 5->3. Nenhuma delas mede coisa alguma, e as quatro faziam o numero cair. Contar entradas nao e vigiar direcao."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: D_DENYLIST_EM_SITIO_UNICO
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: selftest-h-cinco-status-vivos-dentro-do-escopo
+    label: "O predicato vira DENYLIST num literal unico (`st != superseded && st != refuted`), e as duas varreduras identicas viram UMA. A denylist tem exatamente os dois estados em que o no DEIXA DE AFIRMAR sobre producao. drifted, unverifiable, done e open ficam DENTRO — drifted mais que todos, porque e o estado em que a reconciliacao e DEVIDA, e era por ele que a fuga passava."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: D_CINCO_SAIDAS_CLASSIFICADAS_CONTRA_O_VIVO
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: selftests-i-a-n-uma-saida-por-caso
+    label: "O SOFT unico [OBSOLETA] ('no ja carimbado ou removido') vira CINCO saidas julgadas contra o vivo: CARIMBADO (ganhou verified_at) e RECONCILIADO (refuted/superseded COM a aresta) e REMOVIDO (sumiu do arquivo) sao SOFT; FUGA-SEM-ARESTA e FUGA-DE-ESCOPO sao HARD. A mensagem antiga AFIRMAVA um carimbo sem nunca ter olhado se existia — declarado != verificado dentro do instrumento que existe para cobrar verificacao."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  # ⚠️ SUPERSEDIDO pelo Elenxo (E_MEDICAO_NAO_OBSERVADA_ERA_MINHA). O rótulo abaixo NÃO foi reescrito:
+  # ele continua afirmando o que eu afirmei, que é o único jeito de a escada ficar legível.
+  - id: E_A_ARESTA_E_O_DISCRIMINADOR_MEDIDO
+    node_type: evidence
+    plane: PROD
+    status: superseded
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: os-3-nos-refuted-superseded-sem-carimbo-do-corpus-real
+    label: "Sem a checagem de aresta o guarda acusaria TRES CONFORMIDADES. Medido antes de escrever: os unicos nos PROD/impact>=4 `refuted|superseded` sem carimbo do corpus (C2_AUTOMATE_READY, C_VERTICALS_EMPTY, E_ORBIT) TEM cada um a sua aresta REFUTES/SUPERSEDES. Refutar com aresta e obediencia a gramatica do KG; puni-la seria repetir os tres falsos-positivos HARD que o Elenxo da REGRA 57 derrubou."
+    trace: "docs/onion/graph/elenxos-2026-08-07.kg.yaml"
+
+  - id: C_GUARDA_QUE_PUNE_CONFORMIDADE_E_PIOR_QUE_NENHUMA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-08
+    verified_against: reincidencia-em-dois-dias-REGRA-57-e-REGRA-49
+    label: "Tese que ja reincidiu: uma guarda cujo falso-positivo dispara para quem OBEDECE a doutrina ensina a ignorar a guarda, e o custo e maior que o de nao te-la. Na REGRA 57 foram 3 falsos-positivos HARD achados pelo Elenxo DEPOIS de escrita; aqui a mesma classe foi antecipada MEDINDO o corpus antes — o que mudou nao foi o cuidado, foi a ordem: medir a populacao antes de escrever o predicado."
+    trace: "docs/evolution/review/feat-kg-seal-check.md"
+
+  # ── O ACHADO QUE VEIO DE FORA: O TESTE DO TESTE ─────────────────────────────────────────────
+  - id: E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: sabotagem-deliberada-da-fixture-8-de-9-casos-morreram-1-sobreviveu
+    label: "Sabotei o gerador de fixture de proposito (todo no nascendo plane:DEV impact:1) para ver quais dos 9 casos novos passavam por vacuidade. Oito morreram. UM sobreviveu — o mutation test (o) — e a razao e estrutural: ele afirma uma AUSENCIA de acusacao, e ausencia e exatamente o que uma fixture morta entrega de graca. O `cmp` provava que a MUTACAO fora aplicada; nada provava que a FIXTURE estava viva."
+    trace: ".claude/validation/lint-selftest.sh"
+
+  - id: C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-08
+    verified_against: 8-casos-que-afirmam-PRESENCA-morreram-1-que-afirma-ausencia-sobreviveu
+    label: "Regra que a sabotagem entregou de graca: teste que afirma a PRESENCA de algo morre junto com a fixture; teste que afirma a AUSENCIA de algo sobrevive a ela. Isso da uma triagem barata e mecanica — para cada asserção negativa, perguntar 'o que garante que o caminho feliz ainda funciona aqui?'. Nao e sobre atencao; e sobre a forma da asserção."
+    trace: ".claude/validation/lint-selftest.sh"
+
+  - id: D_PROVA_MUTACAO_COBRA_AS_TRES_CONDICOES
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: helper-unico-usado-por-3-mutation-tests-acusando-FIXTURE-MORTA-por-nome
+    label: "A licao vira CHAMADOR OBRIGATORIO, nao comentario: `_prova_mutacao` cobra as tres condicoes de um mutation test — (1) a mutacao foi APLICADA (cmp, nao grep de padrao: em 2026-08-07 o padrao aparecia no arquivo intacto, na propria linha do sed); (2) o INTACTO satisfaz o caso (senao a fixture esta morta); (3) o MUTANTE nao satisfaz. Quem escrever o proximo nao precisa lembrar da licao — ela esta no helper que ele chama."
+    trace: ".claude/validation/lint-selftest.sh"
+
+  # ── O ACHADO QUE VEIO DA HIGIENE (F5) ───────────────────────────────────────────────────────
+  - id: E_GIT_DIR_QUEBRA_A_RAIZ_DENTRO_DE_WORKTREE
+    node_type: evidence
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: lint-artifacts.sh-rodado-no-mesmo-worktree-com-e-sem-GIT_DIR-2-HARD-vs-0-HARD
+    label: "O pre-commit acusa 2 HARD FANTASMAS dentro de qualquer worktree: federation-console.html e agent-card.json 'desatualizados vs SSOT', com os arquivos CORRETOS (regerados dao saida byte-identica). Causa: `ROOT=$(git -C $HERE rev-parse --show-toplevel)` devolve o PROPRIO $HERE quando GIT_DIR esta setado — o gerador nao acha members.yaml, emite `members: []` e o diff acusa. No repo principal GIT_DIR e RELATIVO, o git falha e o fallback salva; em worktree ele e ABSOLUTO e o erro passa calado. ~35 scripts com o mesmo padrao, numa casa que recomenda worktrees por doutrina."
+    trace: ".claude/validation/federation-console.sh"
+
+  - id: Q_QUANTOS_DOS_35_SITIOS_SAO_ALCANCAVEIS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "Os ~35 sitios do padrao `rev-parse --show-toplevel` compartilham a falha, mas nem todos rodam sob GIT_DIR. Antes de varrer os 35: quais sao ALCANCAVEIS por hook/CI dentro de worktree? Consertar sitio inalcancavel e a cerimonia que a REGRA 57 quase cometeu — cobrir ramo sem caso real. A medicao decide o tamanho do PR, e ela ainda nao foi feita."
+    trace: ".claude/validation/lint-artifacts.sh"
+
+  - id: E_BRANCH_MAESTRO_ASIDE_ERA_MORTA_DE_FATO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: git-cherry-mais-diff-de-arvore-antes-de-apagar
+    label: "Re-verificado contra o vivo em vez de confiar na nota: `git cherry main` marca os dois commits com '-' (ja aplicados) e a arvore da branch esta 8683 delecoes atras do main, com inventario defasado (88 Knowledge Bases contra 90). Apagar era certo; mergear seria REGRESSAO. Sha registrado antes de apagar: f33afad."
+    trace: "docs/onion/inventory.md"
+
+  - id: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-08
+    verified_against: tres-notas-desta-semana-conferidas-contra-o-vivo-antes-de-agir
+    label: "Uma nota de sessao anterior (minha inclusive) e HIPOTESE, nao fato — e o custo de tratar como fato ja apareceu nos dois sentidos nesta semana. A favor: a nota dizia que feat/maestro-aside era morta, e medir confirmou. Contra: a premissa da 1a F4 ('falta github_token') era falsa e teria virado REGRESSAO. A regra pratica e barata: antes de AGIR sobre uma nota, rode o comando que a produziu."
+    trace: "docs/evolution/review/fix-revisor-invisivel.md"
+
+  # ══ O QUE O ELENXO MUDOU (4 lentes, 21 achados, as QUATRO deram CAI) ═══════════════════════════
+  - id: E_O_FECHO_ERA_FALSO_TRES_ROTAS_ABERTAS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: tres-bypass-reproduzidos-pelo-juiz-e-refeitos-por-mim-em-sandbox
+    label: "O eixo do PR sobreviveu; a AFIRMACAO DE FECHO nao. Tres rotas continuavam abertas, DUAS delas sem forjar nada: (1) apagar a linha do baseline no MESMO commit — o laco era dirigido por `known`, entao a chave apagada sumia do julgamento (exit 0, 47, zero VIOLATION); (2) a DIRECAO da aresta — `tem_aresta` casava origem OU alvo, e 8 das 48 entradas reais sao `from` de um REFUTES/SUPERSEDES: fugiam com UM `sed`; (3) self-edge de 3 linhas comprava RECONCILIADO. O custo do bypass tinha subido de um `sed` para um `sed` + um `grep -v` — e o desenho punia quem deixava rastro e libertava quem o apagava."
+    trace: "docs/evolution/review/fix-catraca-regra49.md"
+
+  - id: C_ALIBI_POR_PROXIMIDADE_NAO_E_RECONCILIACAO
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-08
+    verified_against: predicado-reescrito-e-6-mutacoes-que-sobreviviam-passando-a-acusar
+    label: "A raiz das tres rotas e uma so: o predicado perguntava 'existe uma aresta POR PERTO?' quando a pergunta e 'ALGUEM, que nao ele mesmo, o reconciliou?'. Alibi por proximidade nao e prova. O predicado passa a exigir aresta ENTRANDO (o no e o `to`), com as DUAS PONTAS distintas, de qualquer um dos dois tipos de reconciliacao — e derivar o tipo do status estava errado de ida e de volta, porque o `kg-radar.sh:620-621` SANCIONA reconciliar um REFUTES como `superseded`."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: E_MEDICAO_NAO_OBSERVADA_ERA_MINHA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: falsificacao-em-um-comando-pelo-juiz-48-SOFT-PASSIVO-zero-HARD
+    label: "Eu escrevi no cabecalho do gate que 'sem a checagem de aresta o guarda acusaria 3 CONFORMIDADES'. O FATO de base era verdadeiro (os 3 nos existem e tem sua aresta); a CONSEQUENCIA era inventada, e o juiz a falsificou em um comando: hoje `--emit-baseline` e identico ao baseline versionado, o laco NUNCA EXECUTA no corpus real, e nenhum dos 3 esta no baseline — neutralizar a checagem da ZERO HARD. Medicao nao-observada no cabecalho do gate cuja tese e `declarado != verificado` e o defeito da REGRA 49 cometido DENTRO do instrumento."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: E_MEMOIZACAO_MORTA_EM_SUBSHELL
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: cronometragem-no-estado-alvo-com-os-48-carimbados-saida-byte-identica
+    label: "A memoizacao `UNIVERSO_CARREGADO` era MORTA: todo consumidor roda em command substitution, a atribuicao morria com o subshell e o universo era relido a cada chave. No estado-ALVO da propria catraca (os 48 medidos): 20,1s contra 0,67s do script substituido. Uma linha — `carrega_universo` icado ao escopo pai, onde os subshells HERDAM — leva a 7,2s com saida BYTE-IDENTICA. O gradiente estava invertido: quanto mais a doutrina fosse obedecida, mais lento ficaria o gate que a cobra."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: E_BANCADA_MORREU_CALADA_POR_SET_E
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: bancada-solo-abortando-duas-vezes-no-mesmo-caso-com-rc-1-e-zero-falhas
+    label: "A bancada morreu DUAS vezes no mesmo ponto — rc=1, zero ✗, nenhuma soma — e eu li a primeira como colisao de corrida. Era deterministico, e eram TRES defeitos empilhados, todos do `set -euo pipefail` que meu runner isolado nao copiava: `cmd; rc=$?` mata a suite; `pipefail` faz `helper | grep -q` devolver o exit do HELPER, que sai 1 justamente quando ACHA HARD (o `_prova_mutacao` acusava FIXTURE MORTA sobre fixture viva); e `_g49` terminava em `[ -n \"$6\" ] && printf`, derrubando a suite antes do 1o caso. No meu runner: 16/16 verdes. Na bancada real: morta no caso 7."
+    trace: ".claude/validation/lint-selftest.sh"
+
+  - id: D_TRAP_QUE_GRITA_QUANDO_A_SUITE_MORRE
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: trap-provado-nos-dois-sentidos-grita-ao-abortar-cala-ao-chegar-ao-fim
+    label: "A cura nao e atencao, e um trap de EXIT: se a suite terminar SEM imprimir a soma, ela DIZ isso, nomeia os dois suspeitos (`cmd; rc=$?` e pipefail) e manda copiar o `set` para runners extraidos. Mesma doutrina do `record_skip` uma camada acima — abort apresentado como veredito e vacuidade. Provado nos dois sentidos: grita quando morre, cala quando chega ao fim."
+    trace: ".claude/validation/lint-selftest.sh"
+
+  - id: C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-08
+    verified_against: dois-dos-quatro-achados-confirmados-nao-sao-variantes-do-defeito-curado
+    label: "Fio de METODO, e e o que esta rodada mais ensina. Dois dos quatro achados confirmados (a direcao da aresta e o `git mv` para `fixtures/`) NAO sao variantes do defeito curado — sao a MESMA CLASSE reaparecendo num campo diferente a cada rodada. A pergunta que sobra nao e 'esta porta fechou?', e 'por que este guarda e fundado num predicado que aceita qualquer coisa que TOQUE o no, num arquivo que qualquer `git mv` remove do universo?'. Enquanto a identidade do no for `path::hash` e o alibi for proximidade, cada Elenxo rende mais um `sed` de uma linha."
+    trace: "docs/evolution/review/fix-catraca-regra49.md"
+
+  - id: Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: emit-baseline-identico-ao-baseline-versionado-logo-o-laco-nunca-executou
+    label: "As CINCO classes novas nao tem NENHUMA cobertura de campo. `--emit-baseline` e hoje identico ao baseline versionado, logo o laco da guarda de direcao nunca executou no corpus real, nem uma vez — toda a evidencia e sintetica. O primeiro no que sair do baseline de verdade, via `/meta:kg-freshness`, e o PRIMEIRO dogfood real desta guarda, e e ai que ela vale ou cai. O verde do CI nao substitui essa medicao, e este no existe para nao deixar que substitua."
+    trace: ".claude/validation/kg-verification-baseline.txt"
+
+  - id: Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: git-mv-de-um-arquivo-tirando-5-entradas-de-uma-vez-com-exit-0
+    label: "Divida que sai deste PR de proposito: um `git mv` de UM grafo para qualquer pasta `fixtures/` tirou CINCO entradas do baseline de uma vez, com o gate mandando remove-las e os nos intactos no disco, versionados, afirmando sobre producao. A cura exige resolver a chave por hash em TODO o universo antes de concluir remocao, mais uma classe MUDOU-DE-PATH para o rename legitimo — e mexe na convencao `grep -v '/fixtures/'` que e da casa inteira (kg-radar-integrity.sh:41), nao deste PR."
+    trace: ".claude/validation/kg-radar-integrity.sh"
+
+edges:
+  # o defeito e a forma da cura
+  - from: E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS
+    to: C_SAIR_DO_ESCOPO_E_ENCOLHER_O_BASELINE
+    edge_type: SUPPORTS
+  - from: D_DENYLIST_EM_SITIO_UNICO
+    to: E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS
+    edge_type: CAUSES
+  - from: D_CINCO_SAIDAS_CLASSIFICADAS_CONTRA_O_VIVO
+    to: C_SAIR_DO_ESCOPO_E_ENCOLHER_O_BASELINE
+    edge_type: DEPENDS_ON
+  - from: E_CUSTO_ZERO_PROVA_QUE_E_CURA_E_NAO_APERTO
+    to: D_DENYLIST_EM_SITIO_UNICO
+    edge_type: SUPPORTS
+
+  # a aresta como discriminador, e a tese que ela serve
+  - from: E_A_ARESTA_E_O_DISCRIMINADOR_MEDIDO
+    to: C_GUARDA_QUE_PUNE_CONFORMIDADE_E_PIOR_QUE_NENHUMA
+    edge_type: SUPPORTS
+  - from: C_GUARDA_QUE_PUNE_CONFORMIDADE_E_PIOR_QUE_NENHUMA
+    to: D_CINCO_SAIDAS_CLASSIFICADAS_CONTRA_O_VIVO
+    edge_type: CONSTRAINS
+
+  # o teste do teste
+  - from: E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA
+    to: C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA
+    edge_type: SUPPORTS
+  - from: D_PROVA_MUTACAO_COBRA_AS_TRES_CONDICOES
+    to: E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA
+    edge_type: CAUSES
+  - from: C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA
+    to: D_PROVA_MUTACAO_COBRA_AS_TRES_CONDICOES
+    edge_type: DEPENDS_ON
+
+  # a higiene que virou achado
+  - from: E_GIT_DIR_QUEBRA_A_RAIZ_DENTRO_DE_WORKTREE
+    to: Q_QUANTOS_DOS_35_SITIOS_SAO_ALCANCAVEIS
+    edge_type: SUPPORTS
+  - from: Q_QUANTOS_DOS_35_SITIOS_SAO_ALCANCAVEIS
+    to: C_GUARDA_QUE_PUNE_CONFORMIDADE_E_PIOR_QUE_NENHUMA
+    edge_type: SUPPORTS
+  - from: E_BRANCH_MAESTRO_ASIDE_ERA_MORTA_DE_FATO
+    to: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
+    edge_type: SUPPORTS
+  - from: E_CUSTO_ZERO_PROVA_QUE_E_CURA_E_NAO_APERTO
+    to: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
+    edge_type: SUPPORTS
+
+  # ── o que o Elenxo mudou ──
+  - from: E_MEDICAO_NAO_OBSERVADA_ERA_MINHA
+    to: E_A_ARESTA_E_O_DISCRIMINADOR_MEDIDO
+    edge_type: SUPERSEDES
+  - from: E_MEDICAO_NAO_OBSERVADA_ERA_MINHA
+    to: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
+    edge_type: SUPPORTS
+  - from: E_O_FECHO_ERA_FALSO_TRES_ROTAS_ABERTAS
+    to: C_ALIBI_POR_PROXIMIDADE_NAO_E_RECONCILIACAO
+    edge_type: SUPPORTS
+  - from: C_ALIBI_POR_PROXIMIDADE_NAO_E_RECONCILIACAO
+    to: D_CINCO_SAIDAS_CLASSIFICADAS_CONTRA_O_VIVO
+    edge_type: CONSTRAINS
+  - from: E_O_FECHO_ERA_FALSO_TRES_ROTAS_ABERTAS
+    to: C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA
+    edge_type: SUPPORTS
+  - from: Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE
+    to: C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA
+    edge_type: SUPPORTS
+  - from: E_MEMOIZACAO_MORTA_EM_SUBSHELL
+    to: D_DENYLIST_EM_SITIO_UNICO
+    edge_type: CONSTRAINS
+  - from: E_BANCADA_MORREU_CALADA_POR_SET_E
+    to: C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA
+    edge_type: SUPPORTS
+  - from: D_TRAP_QUE_GRITA_QUANDO_A_SUITE_MORRE
+    to: E_BANCADA_MORREU_CALADA_POR_SET_E
+    edge_type: CAUSES
+  - from: Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES
+    to: E_MEDICAO_NAO_OBSERVADA_ERA_MINHA
+    edge_type: SUPPORTS
