@@ -1,7 +1,7 @@
 ---
 branch: fix/catraca-regra49
 date: 2026-08-08
-reviewed_diff_sha256: e335863d53b477421a233f0b9efa6eda52f3981c1c24826adf303ece19f32b12
+reviewed_diff_sha256: 6f946f7c83a8bbf961a19320e15063d9b2797df551c9c4bf1976b294a87f9fd5
 findings_total: 21
 findings_real: 17
 findings_fixed: 9
@@ -35,7 +35,7 @@ O custo do bypass tinha subido de **um `sed`** para **um `sed` + um `grep -v`**.
 punia quem fazia a coisa **menos** encoberta (deixava a linha e levava HARD) e libertava quem
 apagava o rastro inteiro. **Curado:** o julgamento passa a ser dirigido por `prev ∪ known`.
 
-**2 · A direção da aresta — e este é o achado mais forte da rodada.** `tem_aresta` casava
+**2 · A direção da aresta — e este é o achado mais forte da rodada.** `has_reconciliation_edge` (então `tem_aresta`) casava
 `(ef == ID || eto == ID)`: o nó servia como **origem** ou como alvo. Um nó que **refuta outro**
 ganhava passe livre para se declarar `refuted`. O juiz mediu no corpus real: **8 das 48 entradas do
 baseline** são `from` de uma aresta REFUTES/SUPERSEDES, e fugiam com **um `sed` no `status:`**, sem
@@ -71,7 +71,7 @@ alguém o viu disparar.
 
 ## O gradiente que estava invertido
 
-A memoização `UNIVERSO_CARREGADO` era **morta**: todo consumidor roda em command substitution, a
+A memoização `UNIVERSE_LOADED` era **morta**: todo consumidor roda em command substitution, a
 atribuição morria com o subshell, e o universo era relido a cada chave. Medido no **estado-alvo da
 própria catraca** (os 48 nós já medidos):
 
@@ -79,7 +79,7 @@ própria catraca** (os 48 nós já medidos):
 antes  20,1 s      depois  7,2 s      saída byte-idêntica (diff vazio)
 ```
 
-Uma linha — `carrega_universo` içado para o escopo pai. Sem ela, quanto mais a doutrina fosse
+Uma linha — `load_universe` içado para o escopo pai. Sem ela, quanto mais a doutrina fosse
 obedecida, mais lento ficaria o gate que a cobra.
 
 ## O que eu escrevi no cabeçalho e ninguém tinha observado
@@ -110,8 +110,8 @@ que a bancada tem e que **meu runner isolado não copiava**:
 
 1. `cmd; rc=$?` mata a suíte no comando que retorna ≠ 0, antes da atribuição;
 2. `pipefail` faz `helper | grep -q` devolver o exit do **helper** — e ele sai `1` justamente quando
-   **acha** HARD, então o `_prova_mutacao` acusava `FIXTURE MORTA` sobre fixture viva;
-3. `_g49` terminava em `[ -n "$6" ] && printf`, que devolve `1` sem aresta — a fixture derrubava a
+   **acha** HARD, então o `_prove_mutation` acusava `FIXTURE MORTA` sobre fixture viva;
+3. `_graph49` terminava em `[ -n "$6" ] && printf`, que devolve `1` sem aresta — a fixture derrubava a
    suíte **antes do primeiro caso**.
 
 No meu runner: 16/16 verdes. Na bancada real: morta no caso 7. **Dois números, e o confortável era o
@@ -146,6 +146,65 @@ a armadilha de padrão-que-casa-a-si-mesmo, um passo adiante.
 - içamento: 20,1s → 7,2s com saída byte-idêntica (`diff` vazio)
 - bancada completa, corrida **SOLO**, sob as opções reais: ver rodapé
 - `lint-artifacts` 0 HARD · `kg-radar` exit 0 nos dois grafos
+
+## O revisor invisível ficou visível, e achou algo no primeiro tiro
+
+Este é o **primeiro PR depois do merge da F4** — e portanto a primeira verificação real daquilo que
+eu havia declarado **não-verificável** em `#558`. O revisor rodou **3m59s** (contra os 19s do
+auto-pulo) e postou o comentário pegajoso com a marca `<!-- onion-review-parecer -->`.
+
+E o parecer não foi decorativo: ele citou `code-standards.md:35` (*"Código (variáveis, funções…) |
+inglês"*) contra os identificadores em pt-BR que eu havia introduzido. **Ele mesmo mitigou o achado**
+dizendo que era padrão pré-existente nos dois arquivos — e a mitigação **não se sustenta**:
+
+```
+kg-verification-coverage.sh ANTES do meu commit:  emit()  scan()  scan_named()   ← 100% inglês
+kg-verification-coverage.sh DEPOIS:               carrega_universo() escopo_pares() resolve_chave() …
+```
+
+Eu converti um arquivo inteiramente em inglês para pt-BR. Não é padrão herdado, é **regressão minha**,
+e no `lint-selftest.sh` os helpers vizinhos (`_prov_run`, `_df_has`, `_born_make_repo`) também são
+inglês. Renomeado: `load_universe`, `scope_pairs`, `resolve_key`, `has_reconciliation_edge`,
+`SCOPE_PREDICATE`, `UNIVERSE`, `TO_JUDGE`, `PAIRS`, `_prove_mutation`, `_bench_abort_guard`,
+`_graph49`, `_scene49`, `_run49`.
+
+**E o rename por `sed` quebrou três sítios** — `outside="${outside} …"` cuja atribuição ficou com o
+nome velho (o que tornou o caso **(h) vácuo**: lia uma variável que nunca era escrita), e dois
+`set -- ${par}` / `set -- ${rota}` que abortavam a suíte com `unbound variable`. Os três só
+apareceram porque o bloco foi rodado **sob as opções reais** depois de cada passo. Renomear com
+`sed` sem re-executar é a mesma família de tudo o mais neste PR.
+
+**Fio que fica:** não existe guarda de idioma de identificador em shell — verificado, nenhum script
+de `.claude/validation/` menciona `code-standards.md:35`. Foi por isso que a deriva passou sem
+ninguém ver, e é por isso que ela dependeu de um revisor LLM para aparecer.
+
+E o `sed` cego cobrou mais caro que isso: `s/\bfalhou\b/failed/g` alterou **16 sítios de prosa e de
+string**, incluindo a asserção `grep -q 'o GERADOR falhou (exit 3)'` de um selftest alheio — que
+passou a procurar um texto que o lint não emite. **A bancada acusou** (`gerador-quebrado: (a)`), e
+foi por esse fio que o próximo erro apareceu.
+
+## Correção de um relato meu: o "defeito de família" do `GIT_DIR` não existe
+
+Durante a higiene (F5) um commit num worktree foi bloqueado por 2 HARD que eu apurei serem
+fantasmas, diagnostiquei como `git -C "$HERE" rev-parse --show-toplevel` devolvendo `$HERE` sob
+`GIT_DIR`, e **declarei defeito de família em ~35 scripts, com PR próprio**.
+
+**Errado.** O selftest que falhou por causa do meu `sed` tem no cabeçalho: *"o gatilho medido em
+2026-08-04 foi o GIT_DIR absoluto que o git exporta em hook DENTRO de worktree"*. A casa já mediu e
+já curou — `_gen_into` separa QUEBRA de DRIFT e captura `rc`/stderr do gerador, e há três selftests
+dedicados. Medido agora, em sandbox git:
+
+```
+lint do main SEM GIT_DIR: 0 violações      COM GIT_DIR: 0 violações
+```
+
+O que eu encontrei foi um worktree com `lint-artifacts.sh` de **2026-07-17**, anterior à cura. Eu
+medi o sintoma num **checkout velho** e não perguntei se o vivo já o resolvia — teria aberto um PR
+para consertar algo consertado quatro dias antes. É instância exata da tese que este mesmo PR
+escreveu no grafo (*nota de sessão é hipótese até ser medida*), cometida por mim três horas depois de
+escrevê-la, e o único sinal de que estava errado veio de um selftest falhando **por outro motivo**.
+
+Registrado no grafo com aresta `REFUTES` sobre o nó errado, e não por reescrita do rótulo.
 
 ## Dívida declarada — sai deste PR de propósito
 

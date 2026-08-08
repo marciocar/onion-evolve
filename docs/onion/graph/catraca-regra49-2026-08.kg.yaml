@@ -127,10 +127,12 @@ nodes:
     trace: ".claude/validation/lint-selftest.sh"
 
   # ── O ACHADO QUE VEIO DA HIGIENE (F5) ───────────────────────────────────────────────────────
+  # ⚠️ REFUTADO no mesmo dia, por E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO. O rótulo NÃO foi
+  # reescrito: ele registra o que eu afirmei, e a aresta registra que estava errado.
   - id: E_GIT_DIR_QUEBRA_A_RAIZ_DENTRO_DE_WORKTREE
     node_type: evidence
     plane: PROD
-    status: open
+    status: refuted
     impact: 5
     confidence: 1.0
     verified_at: 2026-08-08
@@ -141,11 +143,33 @@ nodes:
   - id: Q_QUANTOS_DOS_35_SITIOS_SAO_ALCANCAVEIS
     node_type: question
     plane: DEV
-    status: open
+    status: refuted
     impact: 4
     confidence: 0.6
     label: "Os ~35 sitios do padrao `rev-parse --show-toplevel` compartilham a falha, mas nem todos rodam sob GIT_DIR. Antes de varrer os 35: quais sao ALCANCAVEIS por hook/CI dentro de worktree? Consertar sitio inalcancavel e a cerimonia que a REGRA 57 quase cometeu — cobrir ramo sem caso real. A medicao decide o tamanho do PR, e ela ainda nao foi feita."
     trace: ".claude/validation/lint-artifacts.sh"
+
+  - id: E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: lint-do-main-rodado-com-e-sem-GIT_DIR-em-sandbox-git-0-e-0-violacoes
+    label: "REFUTA o no acima, e o erro foi meu. Diagnostiquei o GIT_DIR olhando SO o worktree e conclui defeito de familia em ~35 scripts, com PR proprio. Medido depois: o lint do MAIN da 0 violacoes com e sem GIT_DIR — a cura (`_gen_into`, que separa QUEBRA de DRIFT e captura rc/stderr do gerador) foi medida e embarcada em 2026-08-04, e ha selftests dedicados (`gerador-quebrado` a/b/c) cujo cabecalho nomeia esse mesmo gatilho. O que eu encontrei foi um worktree com lint de 2026-07-17, ANTERIOR a cura. Instancia exata de C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA cometida por mim: medi o sintoma num checkout velho e nao perguntei se o vivo ja o resolvia."
+    trace: ".claude/validation/lint-artifacts.sh"
+
+  - id: C_MEDIR_NO_CHECKOUT_VELHO_E_MEDIR_O_PASSADO
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-08
+    verified_against: um-defeito-de-familia-inventado-e-um-PR-que-teria-sido-desperdicio
+    label: "Regra pratica que sai daqui: worktree, sandbox e copia vendorizada carregam a DATA do checkout, nao o estado do vivo. Antes de declarar defeito a partir de um deles, reproduzir no HEAD do main — custa um comando e evita inventar defeito de familia. Sem isso eu teria aberto um PR para consertar algo consertado quatro dias antes, e o unico sinal de que estava errado veio de um selftest FALHANDO por outro motivo."
+    trace: "docs/evolution/review/fix-catraca-regra49.md"
 
   - id: E_BRANCH_MAESTRO_ASIDE_ERA_MORTA_DE_FATO
     node_type: evidence
@@ -347,4 +371,18 @@ edges:
     edge_type: CAUSES
   - from: Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES
     to: E_MEDICAO_NAO_OBSERVADA_ERA_MINHA
+    edge_type: SUPPORTS
+
+  # ── a refutação do meu próprio achado da F5 ──
+  - from: E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO
+    to: E_GIT_DIR_QUEBRA_A_RAIZ_DENTRO_DE_WORKTREE
+    edge_type: REFUTES
+  - from: E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO
+    to: Q_QUANTOS_DOS_35_SITIOS_SAO_ALCANCAVEIS
+    edge_type: REFUTES
+  - from: E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO
+    to: C_MEDIR_NO_CHECKOUT_VELHO_E_MEDIR_O_PASSADO
+    edge_type: SUPPORTS
+  - from: C_MEDIR_NO_CHECKOUT_VELHO_E_MEDIR_O_PASSADO
+    to: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
     edge_type: SUPPORTS

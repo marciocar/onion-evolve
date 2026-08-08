@@ -95,12 +95,12 @@ cd "${REPO_ROOT}" || exit 2
 #   allowlist antiga: 43 confirmed + 5 open                       = 48
 #   denylist nova   : os mesmos 48 + 0 drifted + 0 unverifiable + 0 done = 48
 # A porta fecha SEM mexer no número — o que é o teste de que isto é cura, e não aperto disfarçado.
-PREDICADO_ESCOPO='
-function emEscopo(plane, imp, st, ver) {
+SCOPE_PREDICATE='
+function inScope(plane, imp, st, ver) {
   return (plane == "PROD" && imp+0 >= 4 && ver == "" && st != "superseded" && st != "refuted")
 }'
 
-# ══ O UNIVERSO — UMA passada, TODOS os nós, TODOS os campos ════════════════════════════════════
+# ══ O UNIVERSE — UMA passada, TODOS os nós, TODOS os campos ════════════════════════════════════
 # Antes eram DUAS varreduras idênticas (`scan` e `scan_named`) diferindo só no hash da saída — a
 # mesma família de duplicação que deixou a allowlist em dois lugares. Agora os arquivos são lidos
 # UMA vez e todo o resto é filtro sobre este TSV. E o guarda de direção PRECISA do universo inteiro,
@@ -111,11 +111,11 @@ function emEscopo(plane, imp, st, ver) {
 # `C_COEVOLVE_VALUE` em onion-identity-2026-07.kg.yaml, têm `verified_at:` DEPOIS do `label:`, e o
 # scanner lia o nó pela METADE, via `ver=""` e acusava falta de carimbo em nó carimbado. Instrumento
 # que lê estado PARCIAL e reporta como FATO é `declarado != verificado` dentro do próprio medidor.
-UNIVERSO=""; UNIVERSO_CARREGADO=0
-carrega_universo() {
-  [ "${UNIVERSO_CARREGADO}" -eq 1 ] && return 0
+UNIVERSE=""; UNIVERSE_LOADED=0
+load_universe() {
+  [ "${UNIVERSE_LOADED}" -eq 1 ] && return 0
   local f
-  UNIVERSO="$(for f in $(git ls-files '*.kg.yaml' 2>/dev/null | grep -v '/fixtures/'); do
+  UNIVERSE="$(for f in $(git ls-files '*.kg.yaml' 2>/dev/null | grep -v '/fixtures/'); do
     awk -v F="$f" '
       function flush(   ) {
         if (id != "") printf "%s\t%s\t%s\t%s\t%s\t%s\n", F, id, plane, imp, st, ver
@@ -129,7 +129,7 @@ carrega_universo() {
       END { flush() }
     ' "$f"
   done)"
-  UNIVERSO_CARREGADO=1
+  UNIVERSE_LOADED=1
 }
 
 # `path::sha1(id)<TAB>id` — a CHAVE VERSIONADA nunca carrega o id cru.
@@ -138,10 +138,10 @@ carrega_universo() {
 # é público (está no repo); o id não precisa estar. O hash mantém a identidade estável sem publicar
 # o nome. O id anda JUNTO em memória, só para a MENSAGEM (que não é versionada) poder nomear o nó —
 # num corpus de 881 nós, "o arquivo tem problema" é inacionável.
-escopo_pares() {
-  carrega_universo
-  printf '%s\n' "${UNIVERSO}" \
-    | awk -F'\t' "${PREDICADO_ESCOPO}"' emEscopo($3, $4, $5, $6) { printf "%s\t%s\n", $1, $2 }' \
+scope_pairs() {
+  load_universe
+  printf '%s\n' "${UNIVERSE}" \
+    | awk -F'\t' "${SCOPE_PREDICATE}"' inScope($3, $4, $5, $6) { printf "%s\t%s\n", $1, $2 }' \
     | while IFS=$'\t' read -r p id; do
         [ -n "${id}" ] || continue
         printf '%s::%s\t%s\n' "${p}" "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" "${id}"
@@ -151,10 +151,10 @@ escopo_pares() {
 # resolve uma CHAVE do baseline contra o vivo → "id<TAB>plane<TAB>imp<TAB>st<TAB>ver", ou vazio se o
 # nó não existe mais. O hash aqui é LAZY: só roda quando há entrada FORA do escopo. No estado
 # saudável (baseline == escopo) o custo é ZERO.
-resolve_chave() { # $1 = path::hash
-  carrega_universo
+resolve_key() { # $1 = path::hash
+  load_universe
   local p="${1%%::*}" h="${1##*::}"
-  printf '%s\n' "${UNIVERSO}" | awk -F'\t' -v P="${p}" '$1 == P' \
+  printf '%s\n' "${UNIVERSE}" | awk -F'\t' -v P="${p}" '$1 == P' \
     | while IFS=$'\t' read -r _f id plane imp st ver; do
         [ "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" = "${h}" ] || continue
         printf '%s\t%s\t%s\t%s\t%s\n' "${id}" "${plane}" "${imp}" "${st}" "${ver}"
@@ -185,7 +185,7 @@ resolve_chave() { # $1 = path::hash
 # Flush no DELIMITADOR (`- from:` / EOF), não posicional: o `kg-seal-check.sh` guarda `to:` e consome
 # no `edge_type:`, o que só funciona porque as arestas do corpus estão na ordem canônica — dívida
 # declarada no Elenxo dele. Aqui a ordem from/edge_type/to é indiferente.
-tem_aresta_reconciliacao() { # $1=arquivo $2=id → exit 0 se ALGUÉM reconciliou o nó
+has_reconciliation_edge() { # $1=arquivo $2=id → exit 0 se ALGUÉM reconciliou o nó
   awk -v ID="$2" '
     function flush(   ) {
       if (ef != "" && ef != eto && eto == ID && (et == "REFUTES" || et == "SUPERSEDES")) achou=1
@@ -198,16 +198,16 @@ tem_aresta_reconciliacao() { # $1=arquivo $2=id → exit 0 se ALGUÉM reconcilio
   ' "$1"
 }
 
-# ⚠️ IÇADO DE PROPÓSITO, e a linha vale 12 segundos. `carrega_universo` memoiza numa variável de
+# ⚠️ IÇADO DE PROPÓSITO, e a linha vale 12 segundos. `load_universe` memoiza numa variável de
 # shell, e TODO consumidor abaixo roda em command substitution — a atribuição morria com o subshell
 # e o universo era relido a CADA chave. Medido no estado-ALVO da própria catraca (os 48 nós já
 # medidos): 19,9s contra 0,67s do script que este substitui. Chamando aqui, no escopo pai, os
 # subshells HERDAM: 7,4s, saída byte-idêntica. O gradiente era perverso — quanto mais a doutrina
 # fosse obedecida, mais lento ficaria o gate que a cobra.
-carrega_universo
+load_universe
 
-PARES="$(escopo_pares)"
-UNVERIFIED="$(printf '%s\n' "${PARES}" | cut -f1 | grep -v '^$' || true)"
+PAIRS="$(scope_pairs)"
+UNVERIFIED="$(printf '%s\n' "${PAIRS}" | cut -f1 | grep -v '^$' || true)"
 
 if [ "${EMIT}" -eq 1 ]; then
   printf '# Baseline da REGRA 49 — PASSIVO TOLERADO de nós PROD/impact>=4 sem verified_at.\n'
@@ -227,10 +227,10 @@ fi
 
 known="$(grep -vE '^[[:space:]]*(#|$)' "${BASELINE}" 2>/dev/null | sort -u)"
 # O baseline do commit ANTERIOR. Lido aqui, e não lá embaixo no bloco (3), porque o laço (2) precisa
-# dele: ver JULGAR.
+# dele: ver TO_JUDGE.
 prev="$(git show HEAD:.claude/validation/kg-verification-baseline.txt 2>/dev/null | grep -vE '^[[:space:]]*(#|$)' | sort -u || true)"
 
-# ⚠️ O UNIVERSO DE JULGAMENTO É `prev ∪ known`, NÃO `known`. O Elenxo desta branch reproduziu o
+# ⚠️ O UNIVERSE DE JULGAMENTO É `prev ∪ known`, NÃO `known`. O Elenxo desta branch reproduziu o
 # bypass total: reetiquetar o nó E apagar a linha do baseline NO MESMO COMMIT. Iterando só o baseline
 # ATUAL, a chave apagada some do julgamento e ninguém a classifica; e o bloco (3) só reprova quando
 # o baseline CRESCE, então encolher era sempre livre. Saída medida antes da correção:
@@ -238,11 +238,11 @@ prev="$(git show HEAD:.claude/validation/kg-verification-baseline.txt 2>/dev/nul
 # O custo do bypass tinha subido de UM `sed` para UM `sed` + UM `grep -v` — e o desenho punia quem
 # fazia a coisa MENOS encoberta (deixava a linha e levava HARD) e liberava quem apagava o rastro
 # inteiro. Com a união, a linha apagada continua sendo cobrada até que o nó explique a própria saída.
-JULGAR="$(printf '%s\n%s\n' "${prev}" "${known}" | grep -v '^$' | sort -u || true)"
+TO_JUDGE="$(printf '%s\n%s\n' "${prev}" "${known}" | grep -v '^$' | sort -u || true)"
 hard=0; soft=0
 
 # (1) nó sem carimbo FORA do baseline → HARD (nasce verificado)
-# O id vem JUNTO da chave (`PARES`), então a mensagem nomeia o nó sem nenhuma busca reversa — a
+# O id vem JUNTO da chave (`PAIRS`), então a mensagem nomeia o nó sem nenhuma busca reversa — a
 # versão anterior refazia sha1 dentro de um `cmd | getline` por candidato só para reencontrar o nome.
 while IFS=$'\t' read -r n nid; do
   [ -n "${n}" ] || continue
@@ -251,7 +251,7 @@ while IFS=$'\t' read -r n nid; do
       "no '${nid:-<id oculto>}' e plane:PROD impact>=4 SEM verified_at e FORA do baseline — meca contra o vivo antes de selar (/meta:kg-freshness), ou o grafo afirma sobre producao sem nunca ter olhado."
     hard=$((hard+1))
   fi
-done <<< "${PARES}"
+done <<< "${PAIRS}"
 
 # ══ (2) GUARDA DE DIREÇÃO — POR QUE esta entrada saiu do escopo? ═══════════════════════════════
 # ANTES: toda saída virava um SOFT único — "OBSOLETA — no ja carimbado ou removido". A mensagem
@@ -285,24 +285,24 @@ while IFS= read -r k; do
   printf '%s\n' "${UNVERIFIED}" | grep -qxF "${k}" && continue
   kp="${k%%::*}"
   # a linha ainda está no baseline, ou o operador já a removeu? muda só o conselho da mensagem
-  if printf '%s\n' "${known}" | grep -qxF "${k}"; then acao="remova do baseline"; else acao="a linha ja saiu do baseline"; fi
-  rec="$(resolve_chave "${k}")"
+  if printf '%s\n' "${known}" | grep -qxF "${k}"; then hint="remova do baseline"; else hint="a linha ja saiu do baseline"; fi
+  rec="$(resolve_key "${k}")"
   if [ -z "${rec}" ]; then
     emit SOFT REMOVIDO ".claude/validation/kg-verification-baseline.txt" \
-      "no que NAO EXISTE MAIS em ${kp} — ${acao}: ${k}"
+      "no que NAO EXISTE MAIS em ${kp} — ${hint}: ${k}"
     soft=$((soft+1)); continue
   fi
   IFS=$'\t' read -r rid rplane rimp rst rver <<< "${rec}"
   if [ -n "${rver}" ]; then
     emit SOFT CARIMBADO ".claude/validation/kg-verification-baseline.txt" \
-      "no '${rid}' foi MEDIDO (verified_at: ${rver}) — ${acao}: ${k}"
+      "no '${rid}' foi MEDIDO (verified_at: ${rver}) — ${hint}: ${k}"
     soft=$((soft+1)); continue
   fi
   case "${rst}" in
     refuted|superseded)
-      if tem_aresta_reconciliacao "${kp}" "${rid}"; then
+      if has_reconciliation_edge "${kp}" "${rid}"; then
         emit SOFT RECONCILIADO ".claude/validation/kg-verification-baseline.txt" \
-          "no '${rid}' saiu do escopo como '${rst}' COM aresta de reconciliacao (REFUTES|SUPERSEDES) ENTRANDO, vinda de OUTRO no — ${acao}: ${k}"
+          "no '${rid}' saiu do escopo como '${rst}' COM aresta de reconciliacao (REFUTES|SUPERSEDES) ENTRANDO, vinda de OUTRO no — ${hint}: ${k}"
         soft=$((soft+1))
       else
         emit HARD FUGA-SEM-ARESTA "${kp}" \
@@ -314,10 +314,10 @@ while IFS= read -r k; do
         "no '${rid}' saiu do escopo SEM carimbo (hoje plane:${rplane:-<vazio>} impact:${rimp:-0} status:${rst:-<vazio>}) — o baseline so encolhe por MEDICAO, nunca por rebaixar plane/impact."
       hard=$((hard+1)) ;;
   esac
-done <<< "${JULGAR}"
+done <<< "${TO_JUDGE}"
 
 # (3) CATRACA — baseline que CRESCEU vs a versão anterior no git → HARD (regressão).
-# `prev` é lido lá em cima, junto do `known`, porque o laço (2) depende dele (JULGAR = prev ∪ known).
+# `prev` é lido lá em cima, junto do `known`, porque o laço (2) depende dele (TO_JUDGE = prev ∪ known).
 if [ -n "${prev}" ]; then
   np=$(printf '%s\n' "${prev}"  | grep -c . || true)
   nk=$(printf '%s\n' "${known}" | grep -c . || true)
