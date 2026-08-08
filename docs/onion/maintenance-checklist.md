@@ -1,35 +1,416 @@
-# Checklist de manutenção do core
+# 🔧 Checklist de Manutenção - Sistema Onion
 
-**Por que este arquivo existe, e o que ele NÃO é.** O backlog de risco vive no grafo
-([`fios-abertos.kg.yaml`](graph/fios-abertos.kg.yaml)), onde o `kg-radar` ordena por peso e o gate de
-frescor envelhece o que ninguém tocou. Rotina não é risco: item cujo custo é **tempo**, não **erro**,
-não pode disputar atenção com item cujo custo é erro. É essa linha que impede o grafo de virar lista
-de tarefas — e é por isso que ela está escrita em dois lugares (aqui e no `meta:` do grafo).
+## 📋 Índice
 
-Cada item abaixo traz **como medir** — porque "está limpo?" respondido de memória é a forma de
-`declarado ≠ verificado` que esta casa persegue.
+- [Adicionar Novo Comando](#-adicionar-novo-comando)
+- [Adicionar Novo Agente](#-adicionar-novo-agente)
+- [Atualizar Documentação](#-atualizar-documentação)
+- [Checklist de Qualidade](#-checklist-de-qualidade)
+- [Processo de Release](#-processo-de-release)
+- [Troubleshooting](#-troubleshooting)
 
 ---
 
-## Branches
+## ➕ Adicionar Novo Comando
+
+### **Checklist Completo:**
+
+- [ ] **1. Criar Arquivo do Comando**
+  - Criar arquivo `.md` em `.claude/commands/[categoria]/`
+  - Usar nomenclatura kebab-case
+  - Seguir template padrão de comando
+
+- [ ] **2. Definir Estrutura do Comando**
+  ```markdown
+  # Nome do Comando
+  
+  Descrição clara do propósito do comando.
+  
+  ## 🎯 Funcionalidades
+  - Lista de funcionalidades principais
+  
+  ## 🚀 Uso do Comando
+  ### Sintaxe:
+  ```bash
+  /categoria/comando "argumentos"
+  ```
+  
+  ### Exemplos:
+  ```bash
+  /categoria/comando "exemplo-1"
+  /categoria/comando "exemplo-2"
+  ```
+  
+  ## ⚙️ Workflow Automático
+  Descrição detalhada do workflow
+  
+  ## 🔗 Integração com Sistema Onion
+  Como o comando se integra com outros comandos
+  ```
+
+- [ ] **3. Atualizar Documentação**
+  - Adicionar ao `commands-guide.md`
+  - Atualizar contador no `README.md`
+  - Adicionar exemplos em `practical-examples.md`
+  - Atualizar `engineering-flows.md` (se aplicável)
+
+- [ ] **4. Testar Comando**
+  - Testar sintaxe básica
+  - Testar com diferentes argumentos
+  - Verificar integração com outros comandos
+  - Validar output esperado
+
+- [ ] **5. Commit e Documentação**
+  - Commit com mensagem descritiva: `feat: adicionar comando /categoria/comando`
+  - Atualizar CHANGELOG (se houver)
+  - Criar PR com descrição completa
+
+### **Categorias de Comandos:**
+- `engineer/` - Comandos de engenharia
+- `product/` - Comandos de produto
+- `git/` - Comandos Git
+- `docs/` - Comandos de documentação
+- `meta/` - Comandos meta (sistema)
+
+---
+
+## 🤖 Adicionar Novo Agente
+
+### **Checklist Completo:**
+
+- [ ] **1. Criar Arquivo do Agente**
+  - Criar arquivo `.md` em `.claude/agents/[categoria]/`
+  - Usar nomenclatura kebab-case
+  - Seguir template padrão de agente com YAML front matter
+
+- [ ] **2. Definir YAML Front Matter**
+  ```yaml
+  ---
+  name: nome-do-agente
+  description: Descrição clara e concisa do agente
+  model: sonnet
+  tools: Read, write, Edit, Bash, Grep
+  color: lightblue
+  priority: alta
+  expertise: ["área-1", "área-2", "área-3"]
+  related_agents: ["agente-relacionado-1", "agente-relacionado-2"]
+  related_commands: ["/comando-1", "/comando-2"]
+  autonomy: alta
+  updated: "YYYY-MM-DD"
+  claude_code_version: "v2"
+  ---
+  ```
+
+- [ ] **3. Definir Conteúdo do Agente**
+  ```markdown
+  # Você é o [Nome do Agente]
+  
+  ## 🎯 Missão Principal
+  Descrição clara da missão do agente
+  
+  ## 🔧 Áreas de Especialização
+  1. **Área 1**: Descrição
+  2. **Área 2**: Descrição
+  3. **Área 3**: Descrição
+  
+  ## 🛠️ Metodologia Técnica
+  Como o agente trabalha
+  
+  ## 🎯 Protocolo de Operação
+  Passo a passo de como o agente opera
+  
+  ## 🔗 Integração com Outros Agentes
+  Como o agente se integra com outros
+  
+  ## 📋 Checklist de Execução
+  - [ ] Passo 1
+  - [ ] Passo 2
+  - [ ] Passo 3
+  
+  ## 🎯 Casos de Uso
+  Exemplos práticos de uso
+  ```
+
+- [ ] **4. Atualizar Documentação**
+  - Adicionar ao `agents-reference.md`
+  - Atualizar contador no `README.md`
+  - Documentar casos de uso
+  - Adicionar à matriz de decisão (se aplicável)
+
+- [ ] **5. Testar Invocação**
+  - Testar invocação com `@nome-do-agente`
+  - Verificar comportamento esperado
+  - Validar integração com comandos
+  - Testar com casos de uso reais
+
+- [ ] **6. Commit e Documentação**
+  - Commit com mensagem descritiva: `feat: adicionar agente @nome-do-agente`
+  - Atualizar CHANGELOG (se houver)
+  - Criar PR com descrição completa
+
+### **Categorias de Agentes:**
+- `development/` - Agentes de desenvolvimento
+- `product/` - Agentes de produto
+- `review/` - Agentes de revisão
+- `architecture/` - Agentes de arquitetura
+- `compliance/` - Agentes de compliance
+
+---
+
+## 📝 Atualizar Documentação
+
+### **Checklist Completo:**
+
+- [ ] **1. Identificar Mudanças Necessárias**
+  - Revisar comandos/agentes modificados
+  - Identificar documentação impactada
+  - Listar exemplos que precisam atualização
+
+- [ ] **2. Atualizar Documentos Relevantes**
+  - `commands-guide.md` - Se comandos mudaram
+  - `agents-reference.md` - Se agentes mudaram
+  - `engineering-flows.md` - Se fluxos mudaram
+  - `practical-examples.md` - Se exemplos mudaram
+  - `getting-started.md` - Se setup mudou
+  - `.claude/utils/task-manager/adapters/*.md` - Se integração de task manager mudou
+  - `naming-conventions.md` - Se nomenclatura mudou
+
+- [ ] **3. Atualizar Exemplos Práticos**
+  - Verificar se exemplos ainda funcionam
+  - Atualizar sintaxe se necessário
+  - Adicionar novos exemplos se aplicável
+  - Remover exemplos obsoletos
+
+- [ ] **4. Testar Todos os Links**
+  - Links internos entre documentos
+  - Links para comandos e agentes
+  - Âncoras de seções
+  - Links externos (se houver)
+
+- [ ] **5. Verificar Nomenclatura Consistente**
+  - Usar `<feature-slug>` (kebab-case)
+  - Evitar `task-slug`, `feature_slug`, etc.
+  - Manter consistência em exemplos
+
+- [ ] **6. Commit e PR**
+  - Commit com mensagem descritiva: `docs: atualizar [documento]`
+  - Criar PR com lista de mudanças
+  - Solicitar review se necessário
+
+---
+
+## ✅ Checklist de Qualidade
+
+### **Antes de Cada Commit:**
+
+- [ ] **Links Funcionam**
+  - Todos os links internos resolvem
+  - Âncoras de seções corretas
+  - Caminhos de arquivos válidos
+
+- [ ] **Contadores Corretos**
+  - Badge de comandos no README
+  - Badge de agentes no README
+  - Números em documentação
+
+- [ ] **Nomenclatura Consistente**
+  - Usar `<feature-slug>` (kebab-case)
+  - Evitar variações antigas
+  - Manter padrão em exemplos
+
+- [ ] **Exemplos Executáveis**
+  - Sintaxe correta
+  - Argumentos válidos
+  - Resultados esperados documentados
+
+- [ ] **Sem Erros de Markdown**
+  - Formatação correta
+  - Blocos de código fechados
+  - Listas bem formatadas
+  - Tabelas válidas
+
+- [ ] **Documentação Atualizada**
+  - README reflete mudanças
+  - Guias atualizados
+  - Exemplos relevantes
+
+### **Comandos Úteis para Validação:**
+
+```bash
+# Contar comandos
+find .claude/commands -name "*.md" -type f ! -name "README.md" | wc -l
+
+# Contar agentes
+find .claude/agents -name "*.md" -type f ! -name "README.md" | wc -l
+
+# Buscar nomenclatura antiga
+grep -r "task-slug\|task_slug\|feature_slug" .claude/commands/
+grep -r "task-slug\|task_slug\|feature_slug" 
+
+# Listar arquivos de documentação
+ls -la *.md
+
+# Verificar links quebrados (manual)
+# Abrir cada documento e testar links
+```
+
+---
+
+## 🚀 Processo de Release
+
+### **Checklist de Release:**
+
+- [ ] **1. Preparação**
+  - Revisar todas as mudanças desde última release
+  - Atualizar CHANGELOG com mudanças
+  - Verificar que todos os testes passam
+  - Validar documentação atualizada
+
+- [ ] **2. Validação Final**
+  - Executar checklist de qualidade completo
+  - Testar comandos principais
+  - Testar agentes principais
+  - Verificar integrações
+
+- [ ] **3. Atualização de Versão**
+  - Atualizar número de versão (se aplicável)
+  - Atualizar data de última atualização
+  - Atualizar badges e contadores
+
+- [ ] **4. Documentação de Release**
+  - Criar release notes
+  - Documentar breaking changes (se houver)
+  - Listar novas funcionalidades
+  - Listar bugs corrigidos
+
+- [ ] **5. Publicação**
+  - Merge para branch principal
+  - Tag de versão (se aplicável)
+  - Anunciar mudanças (se aplicável)
+
+---
+
+## 🔍 Troubleshooting
+
+### **Problemas Comuns e Soluções:**
+
+#### **1. Links Quebrados**
+**Problema:** Links não resolvem ou retornam 404  
+**Solução:**
+- Verificar caminho relativo correto
+- Confirmar que arquivo existe
+- Verificar nome do arquivo (case-sensitive)
+- Usar `` para docs do sistema
+
+#### **2. Contadores Incorretos**
+**Problema:** Badges mostram números errados  
+**Solução:**
+```bash
+# Recontar comandos
+find .claude/commands -name "*.md" -type f ! -name "README.md" | wc -l
+
+# Recontar agentes
+find .claude/agents -name "*.md" -type f ! -name "README.md" | wc -l
+
+# Atualizar README.md com números corretos
+```
+
+#### **3. Nomenclatura Inconsistente**
+**Problema:** Uso de `task-slug`, `feature_slug`, etc.  
+**Solução:**
+- Buscar todas as ocorrências
+- Substituir por `<feature-slug>` (kebab-case)
+- Verificar em comandos e documentação
+- Atualizar exemplos
+
+#### **4. Agente Não Encontrado**
+**Problema:** `@agente-nome` não é reconhecido  
+**Solução:**
+- Verificar se arquivo existe em `.claude/agents/`
+- Verificar nome correto (kebab-case)
+- Verificar YAML front matter
+- Reiniciar Claude Code se necessário
+
+#### **5. Comando Não Funciona**
+**Problema:** Comando não executa como esperado  
+**Solução:**
+- Verificar sintaxe do comando
+- Verificar argumentos obrigatórios
+- Revisar workflow do comando
+- Testar com exemplos documentados
+- Verificar logs de erro
+
+---
+
+## 📚 Referências Rápidas
+
+### **Estrutura de Arquivos:**
+```
+.claude/
+├── commands/           # Comandos do sistema
+│   ├── engineer/      # Comandos de engenharia
+│   ├── product/       # Comandos de produto
+│   ├── git/          # Comandos Git
+│   ├── docs/         # Comandos de documentação
+│   └── meta/         # Comandos meta
+├── agents/            # Agentes especializados
+│   ├── development/  # Agentes de desenvolvimento
+│   ├── product/      # Agentes de produto
+│   ├── review/       # Agentes de revisão
+│   └── architecture/ # Agentes de arquitetura
+├── docs/onion/       # Documentação do Sistema Onion
+│   ├── commands-guide.md
+│   ├── agents-reference.md
+│   ├── engineering-flows.md
+│   ├── practical-examples.md
+│   ├── getting-started.md
+│   ├── naming-conventions.md
+│   └── maintenance-checklist.md (este arquivo)
+└── sessions/         # Sessões de trabalho
+    └── <feature-slug>/
+```
+
+### **Links Úteis:**
+- [Guia de Comandos](commands-guide.md)
+- [Agentes Disponíveis](agents-reference.md)
+- [Fluxos de Engenharia](engineering-flows.md)
+- [Exemplos Práticos](practical-examples.md)
+- [Configuração Inicial](getting-started.md)
+- [Adapters de Task Manager](../../.claude/utils/task-manager/adapters/)
+- [Padrões de Nomenclatura](naming-conventions.md)
+
+---
+
+**Última atualização:** 2025-10-27  
+**Versão:** 2.0 (Claude Code)  
+**Mantido por:** Sistema Onion Team
+
+
+---
+
+## 🖥️ Rotina de infraestrutura (VPS, branches, sessão)
+
+**Acrescentado em 2026-08-08.** O backlog de RISCO vive em
+[`fios-abertos.kg.yaml`](graph/fios-abertos.kg.yaml), onde o `kg-radar` ordena por peso e o gate de
+frescor envelhece o que ninguém tocou. Rotina não é risco: item cujo custo é **tempo**, não **erro**,
+não pode disputar atenção com item cujo custo é erro — é essa linha que impede o grafo de virar
+lista de tarefas. Cada item abaixo traz **como medir**, porque *"está limpo?"* respondido de memória
+é a forma de `declarado ≠ verificado` que esta casa persegue.
+
+### Branches
 
 | o quê | como medir | estado em 2026-08-08 |
 |---|---|---|
-| branches remotas mergeadas não deletadas | `gh pr list --state merged --limit 60 --json headRefName -q '.[].headRefName'` cruzado com `git branch -r` | **~40** — o auto-delete no merge está **desligado**; ligá-lo dissolve o passivo e impede o próximo |
-| branches locais mortas | `git branch --merged main \| grep -v main` | 3 |
-| branches `discuss/*` paradas | `git for-each-ref --sort=committerdate --format='%(committerdate:short) %(refname:short)' refs/remotes/origin/discuss` | 4 paradas há ~27 dias, somando **35 commits**. Decisão do maestro: retomar ou arquivar — **não** é backlog de engenharia |
+| remotas mergeadas não deletadas | `gh pr list --state merged --limit 60 --json headRefName -q '.[].headRefName'` × `git branch -r` | ~40 — o **auto-delete no merge foi LIGADO** em 08/08, então o passivo para de crescer |
+| locais mortas | `git branch --merged main \| grep -v main` | 3 |
+| `discuss/*` paradas | `git for-each-ref --sort=committerdate --format='%(committerdate:short) %(refname:short)' refs/remotes/origin/discuss` | 4 paradas há ~27 dias, **35 commits** — decisão do maestro, não backlog de engenharia |
 
-⚠️ **Antes de apagar qualquer branch:** `git cherry main <branch>` marca `+` mesmo em branch cujo PR
-foi **mergeado por squash** (o SHA some no squash). Cruze com `gh pr list --state all` antes de
-concluir "não aplicado". E confira a árvore: uma branch **atrás** do main mostra diff de regressão —
-foi assim que a `feat/maestro-aside` apareceu como "trabalho pendente" sendo 8683 deleções atrás.
+⚠️ **Antes de apagar branch:** `git cherry main <branch>` marca `+` mesmo em PR mergeado por
+**squash** (o SHA some). Cruze com `gh pr list --state all`. E confira a árvore: branch **atrás** do
+main mostra diff de regressão — foi assim que a `feat/maestro-aside` pareceu trabalho pendente
+sendo 8683 deleções atrás.
 
-## Worktrees
-
-`git worktree list` — e para cada um, se o branch está em `origin`. Worktree em diretório temporário
-de job é **efêmero**: o commit sobrevive se o branch estiver em `origin`, o checkout não.
-
-## `/tmp` na VPS
+### `/tmp` na VPS
 
 ```bash
 df -h /                                            # o número que importa
@@ -37,21 +418,19 @@ sudo du -sh /tmp/* 2>/dev/null | sort -rh | head   # quem ocupa
 find /tmp -maxdepth 1 -name 'tmp.*' -type d | wc -l
 ```
 
-**Medido em 2026-08-08:** disco em **26%** (287 G livres) — sem risco. `/tmp` tem 14 G, dos quais
-**8,6 G são de `/tmp/claude-1000`** (o próprio Claude Code), não dos sandboxes de selftest. Dos 9.275
-diretórios `tmp.*`, **6.608 estão vazios**.
+**Medido em 2026-08-08:** disco em **26%** (287 G livres). `/tmp` tem 14 G, dos quais **8,6 G são de
+`/tmp/claude-1000`** (o próprio Claude Code), não dos sandboxes; dos 9.275 diretórios `tmp.*`,
+**6.608 estão vazios**.
 
-**Por que o limpador nunca dispara, e é o achado desta linha:** a política é
-`D /tmp 1777 root root 30d`, mas o `systemd-tmpfiles` usa o timestamp **mais recente** entre
-mtime/atime/ctime. O diretório mais antigo tem `mtime=2026-07-09` e **`atime=2026-08-07`** — qualquer
-varredura de `/tmp` (inclusive um `find` de diagnóstico) **rejuvenesce o atime e zera o relógio**.
-O limpador roda todo dia e nunca acha nada com 30 dias.
+**Por que o limpador nunca dispara:** a política é `D /tmp 1777 root root 30d`, mas o
+`systemd-tmpfiles` usa o timestamp **mais recente** entre mtime/atime/ctime. O diretório mais antigo
+tem `mtime=2026-07-09` e **`atime=2026-08-07`** — qualquer varredura de `/tmp` (inclusive um `find`
+de diagnóstico) **rejuvenesce o atime e zera o relógio**. Nada consegue envelhecer 30 dias.
 
-## Higiene de sessão
+### Higiene de sessão
 
-- **`consumed-mode-check.sh`** — hoje **desligado** (zero consumidores) e **sem `--selftest`** (a
-  linha 56 trata `$1` como raiz de repo, então a flag vira diretório inválido, exit 2). Rodado à
-  mão, acha **4 modos de produção sem teste**. Não é rotina — é o item
-  `I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA` no grafo. Fica citado aqui só para não parecer esquecido.
 - **A bancada exige corrida SOLO** (`lint-selftest.sh`, ~13 min). Duas em paralelo produzem falha
-  falsa: já aconteceu, e eu li a primeira como determinística.
+  falsa — já aconteceu, e a primeira foi lida como determinística.
+- **`consumed-mode-check.sh`** está desligado (zero consumidores) e sem `--selftest` próprio. Rodado
+  à mão, acha **4 modos de produção sem teste**. Não é rotina — é item no grafo
+  (`I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA`); fica citado aqui só para não parecer esquecido.

@@ -57,11 +57,15 @@
 #                     certo lá) e TRUNCA em 7 (display humano). Medido no corpus: 584 nós de
 #                     trabalho aberto em 46 grafos, e o único modo de leitura mostrava SETE.
 #                     Colunas: arquivo·id·node_type·plane·status·impact·confidence·atenção·
-#                     verified_at·trace·label. A 1ª é o ARQUIVO porque o radar lê um grafo por vez
-#                     (arestas não cruzam arquivo) e a fila do corpus é o laço de quem chama.
+#                     verified_at·trace·VEREDITO·label. A 1ª é o ARQUIVO porque o radar lê um grafo
+#                     por vez (arestas não cruzam arquivo) e a fila do corpus é o laço de quem chama.
 #                     ESCOPO por DENYLIST (`trabalhoPendente`): fora só `confirmed`/`done`/
 #                     `superseded`/`refuted`. `drifted` e `unverifiable` ENTRAM — são reconciliação
 #                     DEVIDA, e eram exatamente o que a allowlist do ESTADO perdia em silêncio.
+#                     VEREDITO: `STATUS-DESCONHECIDO` (fora do enum) · `SEM-STATUS` · `-`. Status
+#                     fora do enum recebe fator 1.3 e SOBE — clamp em 0 o mandava para o fim da
+#                     fila, que é onde o `--top N` corta: promessa de fail-visible entregando
+#                     fail-quiet por afundamento.
 #   TRIPLES         = grafo como triplas `from EDGE to [on evento]` p/ consumo por LLM
 #
 # Camadas (campo opcional `layer`, default audit — retrocompatível):
@@ -390,7 +394,17 @@ END {
     for (i = 1; i <= nn; i++) {
       id = order[i]
       if (!trabalhoPendente(nstatus[id])) continue
-      sf3 = statusFactor(nstatus[id]); if (sf3 < 0) sf3 = 0
+      # ⚠️ STATUS DESCONHECIDO SOBE, NAO AFUNDA — e a diferenca entre fail-visible e fail-quiet.
+      # O comentario do `trabalhoPendente` promete que "um status NOVO entra na fila por default".
+      # Ele entrava — e o clamp em 0 o mandava para o FIM da fila ordenada por atencao, que e
+      # exatamente onde o `--top N` corta. Medido: no com `status: blocked` e impact 5 saia em 16o de
+      # 17, abaixo de nos de impact 1. Promessa de visibilidade entregando invisibilidade por
+      # afundamento — o mesmo modo de falha que o comentario do `refuted` neste arquivo ja nomeia
+      # ("apaga o sinal em vez de perde-lo"). 1.3 e a MESMA escolha ja tomada para `drifted`, e pelo
+      # mesmo motivo: status fora do enum e pergunta aberta sobre o proprio enum.
+      # Escopo LOCAL ao --open-tsv de proposito: mexer no clamp do --radar/--state mudaria a janela
+      # de top-10 e quebraria a complementaridade que funda o --state.
+      sf3 = statusFactor(nstatus[id]); if (sf3 < 0) sf3 = 1.3
       oatt[id] = impact[id] * conf[id] * sf3 * (1 + deg[id])
       oelegivel[id] = 1
     }
@@ -398,10 +412,11 @@ END {
     for (i = 1; i <= on; i++) {
       id = osorted[i]
       if (!(id in oelegivel)) continue
-      printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\n",
-        arq, id, ntype[id], plane[id], nstatus[id], impact[id], conf[id], oatt[id],
+      printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%s\n",
+        arq, id, ntype[id], (plane[id]=="" ? "-" : plane[id]), (nstatus[id]=="" ? "-" : nstatus[id]), impact[id], conf[id], oatt[id],
         (verifiedAt[id] == "" ? "-" : verifiedAt[id]),
         (traceInline[id] == "" ? "-" : traceInline[id]),
+        (nstatus[id] == "" ? "SEM-STATUS" : (statusFactor(nstatus[id]) < 0 ? "STATUS-DESCONHECIDO" : "-")),
         label[id]
     }
     exit 0

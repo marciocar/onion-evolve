@@ -1530,10 +1530,44 @@ run_kg_open_queue_selftests() {
     record_pass "kg-fila: (e) o --state mostra drifted/unverifiable (a allowlist os perdia em silencio)"
   else record_fail "kg-fila: (e)" "a fila de abertos segue cega para reconciliacao devida: ${st}"; fi
 
+  # (g) STATUS FORA DO ENUM — o caso que separa DENYLIST de allowlist, e que o Elenxo desta branch
+  #     mostrou faltar: com (a)-(f) so, um mutante `s == "open" || s == "drifted" ||
+  #     s == "unverifiable"` (allowlist EQUIVALENTE ao denylist para os 7 status conhecidos) passava
+  #     6/6. So um valor NOVO os distingue.
+  #     E nao basta ENTRAR: o clamp `sf < 0 → 0` mandava o no para o FIM da fila ordenada, que e
+  #     onde o `--top N` corta. Fail-visible que entrega invisibilidade por afundamento.
+  { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+    printf '  - id: X_TYPO\n    node_type: claim\n    plane: DEV\n    status: blocked\n    impact: 5\n    confidence: 1.0\n    label: "typo no status"\n'
+    printf '  - id: N_BAIXO\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 1.0\n    label: "baixo"\n'
+    printf 'edges:\n  - from: X_TYPO\n    edge_type: SUPPORTS\n    to: N_BAIXO\n'
+  } > "$d/typo.kg.yaml"
+  out="$(bash "${radar}" "$d/typo.kg.yaml" --open-tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | awk -F'\t' '
+        $2=="X_TYPO" {viu=1; att=$8+0; ver=$11}
+        END{exit !(viu && att>0 && ver=="STATUS-DESCONHECIDO")}' \
+     && printf '%s' "${out}" | head -1 | cut -f2 | grep -qx 'X_TYPO'; then
+    record_pass "kg-fila: (g) status FORA do enum entra, SOBE (nao afunda) e traz veredito STATUS-DESCONHECIDO"
+  else record_fail "kg-fila: (g)" "status desconhecido tratado errado: $(printf '%s' "${out}" | cut -f2,5,8,11 | tr '\n' ' ')"; fi
+
+  # (b2) O VALOR da formula, verbatim sobre a fixture — amarra as tres constantes que ninguem mais
+  #      amarra: a centralidade (N_OPEN tem grau 5 → 3×1×1×6=18), o 1.3 do `drifted` (5×1×1.3×2=13)
+  #      e o 1.0 do `unverifiable` (4×1×1×2=8). Sem isto, mutar qualquer um dos tres passa 6/6.
+  out="$(bash "${radar}" "${fx}" --open-tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | awk -F'\t' '
+        $2=="N_OPEN"         {a=($8=="18.00")}
+        $2=="N_DRIFTED"      {b=($8=="13.00")}
+        $2=="N_UNVERIFIABLE" {c=($8=="8.00")}
+        END{exit !(a&&b&&c)}'; then
+    record_pass "kg-fila: (b2) a formula vale 18.00/13.00/8.00 — centralidade, o 1.3 do drifted e o 1.0 do unverifiable amarrados"
+  else record_fail "kg-fila: (b2)" "formula mudou: $(printf '%s' "${out}" | cut -f2,8 | tr '\n' ' ')"; fi
+
   # (f) MUTATION — devolver a allowlist faz (e) parar de proteger. Passa pelo `_prove_mutation`, que
   #     cobra as tres condicoes (mutacao aplicada · INTACTO satisfaz · MUTANTE nao).
+  #     ⚠️ o `sed` e ANCORADO no ramo do `--state`: o padrao casa DUAS linhas no arquivo (a do
+  #     `--state` e a do `--open-tsv`), e sem ancora o mutante mudaria os dois — o `cmp` passaria a
+  #     diferir por duas razoes e o rotulo do caso mentiria sobre o que foi mutado.
   mut="$d/radar-allow.sh"
-  sed 's/if (!trabalhoPendente(nstatus\[id\])) continue.*/if (nstatus[id] != "open") continue/' "${radar}" > "${mut}"
+  sed '/mode == "--state"/,/^  }$/ s/if (!trabalhoPendente(nstatus\[id\])) continue.*/if (nstatus[id] != "open") continue/' "${radar}" > "${mut}"
   out_int="$(bash "${radar}" "$d/g.kg.yaml" --state 2>/dev/null || true)"
   out_mut="$(bash "${mut}"   "$d/g.kg.yaml" --state 2>/dev/null || true)"
   if printf '%s' "${out_int}" | grep -q 'N_DRIFTED'; then rc_intact=0; else rc_intact=1; fi
