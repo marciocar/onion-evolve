@@ -641,6 +641,489 @@ nodes:
     status: open
     label: "ABERTO: o frontend do app NUNCA foi mapeado como SSOT de domínio. Medição (2026-07-19): 66 nós, TODOS na camada audit, ZERO na camada domain — o radar diz 'camada domain ausente, grafo puramente epistêmico'; TRACES_TO = 2/66, com 3 decisões sinalizadas SEM proveniência (D_STACK, D_DEFINITIVE, D_PLANB) = o modo de falha que a KB nomeia ('integridade perfeita, rastreabilidade órfã'). E o app não tem docs/design-context/. A doutrina do core (/meta:kg modo `map <área>`) manda mapear ANTES de qualquer redesign — 'antes de qualquer pixel, o inventário é o insumo, não o contrato' — e eu já fiz um refactor grande de UI (separar chat/diagnóstico) SEM esse mapa. Direção: (1) atom-map do frontend → .kg.yaml na camada domain; (2) TRACES_TO nós→artefatos reais; (3) docs/design-context/ quando desenhar a superfície. É a ENTRADA correta do F2, não um desvio."
 
+  # ==== PESQUISA EXTERNA CITÁVEL (2026-07-19/20) — cada fonte vira nó com URL e data ====
+  # Por que existe esta seção: até 2026-07-19 o grafo tinha ZERO URLs — a pesquisa externa vivia
+  # como prosa dentro do label de outros nós (ex.: expo#33134 enterrado em E_F1_CLOSED), sem fonte
+  # citável nem data de consulta, portanto impossível de RE-VERIFICAR. É a "proveniência órfã" que
+  # o próprio Q_FRONTEND_MAP nomeia, aplicada à pesquisa. O campo inline `trace` carrega a URL.
+
+  # -- a proposta de superfície da F2 (o alvo que estas fontes sustentam) --
+  - id: D_F2_SURFACE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    verified_at: "2026-07-19"
+    trace: "onion-pessoal-app/docs/f2-surface-proposal.md"
+    label: "PROPOSTA (não ratificada, 2026-07-19) do desenho da superfície F2 — o companheiro: D1 o fio de turnos substitui o formulário (compositor ancorado no rodapé); D2 crescimento da memória vira RECIBO do turno + painel sob demanda, nunca dashboard; D3 compositor único com texto/voz/foto; D4 coach pendurado sem tela (ver D_COACH_NO_STREAK); D5 turno reprovado diz 'não guardei' e devolve o texto ao compositor; D6 fim do estado global de mensagem (quita a dívida #2 do ledger); D7 disclosure progressivo, com 'o que o assistente viu' sob um toque. Entra pela porta que Q_FRONTEND_MAP abriu: contrato (atom-map + KG de domínio) ANTES do pixel."
+  - id: D_COACH_NO_STREAK
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    verified_at: "2026-07-19"
+    trace: "onion-pessoal-app/docs/f2-surface-proposal.md#4-d4"
+    label: "DECISÃO D4 da F2 — o coach NÃO ganha tela, contador, badge nem selo de sequência: a regra de vida é nó do life-KG (declarada conversando), a menção fica pendurada no turno e a sequência, se aparecer, é frase factual dentro do espelho. É o ponto onde a PESQUISA MUDOU a proposta: a evidência de 2026 é bifronte (acende no início, corrói depois), e num app N=1 do próprio maestro otimizar retenção é absurdo — não há usuário a reter. O desenho defensável é o que não cria dívida psicológica."
+
+  # -- fontes da F2 (consultadas na web em 2026-07-19; verificadas, não de memória) --
+  - id: E_RES_MOBILE_PATTERNS_2026
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.6
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://muz.li/blog/whats-changing-in-mobile-app-design-ui-patterns-that-matter-in-2026/"
+    label: "Muzli — tendências de UI móvel 2026: painel deslizante de baixo como contêiner dominante do conteúdo secundário; superfície primária abaixo da metade da tela (alcance do polegar). Sustenta o fio + painéis por cima em vez de abas (D1/D7). Fonte editorial (blog de design), não primária — confiança média."
+  - id: E_RES_CHAT_UI_PATTERNS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.6
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://bricxlabs.com/blogs/message-screen-ui-deisgn"
+    label: "Bricx Labs — padrões de tela de mensagem que funcionam em 2026: compositor ancorado, alvos de toque de pelo menos 44px, esconder o cromo do cabeçalho com o teclado aberto. Sustenta o compositor do D1/D3. Fonte editorial — confiança média."
+  - id: E_RES_AI_CHAT_ANATOMY
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.6
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://www.setproduct.com/blog/ai-chat-interface-ui-design"
+    label: "Setproduct — anatomia, padrões e armadilhas de interface de chat com IA: detalhe/citação EXPANSÍVEL ancorado à resposta, em vez de painel permanente. Sustenta o recibo do turno e 'o que o assistente viu' sob toque (D2/D7). Fonte editorial — confiança média."
+  - id: E_RES_AGENT_MEMORY_UX
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.65
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://aiuxplayground.com/pattern/memory-manage/"
+    label: "AI UX Playground — padrão de gestão de memória de agentes: memória de longo prazo só vale quando a pessoa consegue VER, CORRIGIR e APAGAR o que o agente guardou. Sustenta o painel de memória do D2 — e aqui vale duplo, porque a memória é o PRODUTO (o life-KG), não efeito colateral do chat. Catálogo de padrões — confiança média."
+  - id: E_RES_AGENT_UX_2026
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.6
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://fuselabcreative.com/ui-design-for-ai-agents/"
+    label: "Fuselab — desenho de interface para agentes de IA em 2026: exposição da memória e roteamento de recuperação de falha como padrões de base. Sustenta o par recibo (D2) + turno que diz 'não guardei' e oferece caminho de volta (D5). Fonte editorial — confiança média."
+  - id: E_RES_STREAKS_GROWTH
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.7
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://www.nuancebehavior.com/article/designing-streaks-for-long-term-user-growth"
+    label: "Nuance Behavior — sequências de dias engajam e elevam a interação diária, MAS a fraqueza central é eficácia de curto prazo que canibaliza o crescimento de longo prazo: quando a sequência quebra a motivação despenca (abandono) e, conforme a pessoa avança, a utilidade da repetição cai mais rápido para ela do que para o negócio (desalinhamento). Re-verificado por leitura direta da fonte, 2026-07-20."
+  - id: E_RES_STREAKS_HARM
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.75
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://nerdsip.com/blog/gamification-gone-wrong-when-streaks-become-the-point"
+    label: "NerdSip — quando a gamificação vira o ponto: a sequência migra de motivadora a COERCITIVA (aversão à perda ~2x; a pergunta deixa de ser 'quero aprender hoje?' e vira 'posso perder isto?'), com notificações de culpa, dependência e o efeito de sobrejustificação derrubando a motivação intrínseca abaixo da linha de base quando o prêmio some. Ressalva de leitura direta (2026-07-20): o artigo NÃO diz literalmente 'reduzir o estímulo conforme o hábito se forma' — ele defende que a sequência saudável tem TETO, depois do qual a pressão diminui. É a fonte que mudou a proposta (D_COACH_NO_STREAK)."
+  - id: E_RES_AI_ERROR_STATES
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.65
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://uxpatterns.dev/patterns/ai-intelligence/ai-error-states"
+    label: "UX Patterns for Developers — estados de erro de IA: nomear a falha na língua do usuário, PRESERVAR a entrada e oferecer nova tentativa que muda algo (ou diz o que precisa mudar). É a regra que o app viola hoje (o texto some no erro) e que o D5 conserta. Catálogo de padrões — confiança média."
+  - id: E_RES_ERROR_RECOVERY
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.6
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://www.aiuxdesign.guide/patterns/error-recovery"
+    label: "AI UX Audit — recuperação de erro e degradação graciosa: a falha não pode virar limbo; o produto continua utilizável e a pessoa sabe o que fazer em seguida. Sustenta o D5 (bloco marcado fica no fio e a conversa segue). Catálogo de padrões — confiança média."
+
+  # -- pesquisa RESGATADA de dentro de prosa (estava enterrada em labels, sem fonte citável) --
+  - id: E_RES_EXPO_FETCH_FORMDATA
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://github.com/expo/expo/issues/33134"
+    label: "FONTE PRIMÁRIA do bug que decidiu o upload de áudio do STT: expo/expo#33134 '[expo/fetch] no supporting formData' — a fetch do Expo NÃO suporta FormData ('Unsupported FormDataPart implementation') em Android e iOS no Expo Go, apesar da doc alegar conformidade com a especificação. Por isso o caminho é uploadAsync do expo-file-system, que faz o multipart no lado nativo direto do arquivo. Estava só como prosa dentro do label de E_F1_CLOSED. Data de consulta original derivada do commit 4c5fb8a do app (2026-07-19); URL re-verificada por leitura direta em 2026-07-20."
+  - id: E_RES_PROMPT_OPS_2026
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.7
+    status: confirmed
+    verified_at: "2026-07-19"
+    trace: "https://www.promptfoo.dev/"
+    label: "FONTE do padrão de gestão de prompts que o promptStore do app adotou: Promptfoo — configuração de testes em YAML, iteração e visualização LOCAIS, desenvolvimento guiado por avaliação (eval-driven) e integração com git/CI. É o 'registro de prompts git-native, local-first, versionado' citado no cabeçalho de promptStore.ts sem URL. Data de consulta derivada do commit b08b73b do app (2026-07-19); URL verificada por leitura direta em 2026-07-20. Nota da leitura: o produto hoje se posiciona como plataforma de teste de segurança de IA (red teaming) além de avaliação de prompts."
+
+  # ==== BLOCO A (2026-07-20) — template/boilerplate de RN: a decisão de NÃO adotar ====
+  # Pergunta nascida depois dos spikes validados: sobe-se num boilerplate/kit de componentes ou
+  # segue-se no cru? Os achados abaixo são ELIMINATÓRIOS (compatibilidade com Expo Go) ou de CUSTO.
+  - id: Q_UI_FOUNDATION
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: done
+    label: "RESPONDIDA (2026-07-20): com os spikes já validados no cru, o F2 sobe num boilerplate/kit de componentes ou segue sem? Veredito da pesquisa — não adotar biblioteca de componentes; no máximo a camada de TOKENS. Ver D_NO_BOILERPLATE"
+  - id: D_NO_BOILERPLATE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "DECISÃO (2026-07-20): NÃO adotar biblioteca/kit de componentes para a superfície F2 — no máximo a camada de TOKENS de design. Dois eliminam-se sozinhos por incompatibilidade com o Expo Go (Ignite, unistyles v3); os que rodam (Tamagui, gluestack-ui, Paper) custam reescrever a superfície inteira ou impõem uma linguagem visual sobre a identidade que já existe; o mais barato (NativeWind v4) não paga o ganho sem reescrever os estilos. Só-tokens é o caminho estabelecido e barato. A decisão é de CUSTO-DE-TROCA, não de qualidade das bibliotecas"
+  - id: E_RES_IGNITE_EXPO_GO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://docs.infinite.red/ignite-cli/expo/Expo-and-Ignite/"
+    label: "ELIMINATÓRIO — Ignite (Infinite Red) não suporta Expo Go por padrão desde a v10/Ignite X, porque a base já traz react-native-mmkv (código nativo). Adotar o boilerplate obrigaria dev build, exatamente o que o F0/F1 provou ser dispensável. Doc oficial do projeto, lida em 2026-07-20"
+  - id: E_RES_UNISTYLES_NITRO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://www.unistyl.es/v3/other/frequently-asked-questions"
+    label: "ELIMINATÓRIO — react-native-unistyles v3 (a linha atual) exige react-native-nitro-modules, que é código nativo, e por isso NÃO roda em Expo Go; só a v2 legada roda. Adotar a linha viva custaria dev build; adotar a legada seria começar em versão morta. Perguntas frequentes oficiais, lidas em 2026-07-20"
+  - id: E_RES_TAMAGUI_EXPO_GO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://tamagui.dev/docs/guides/expo"
+    label: "Tamagui (2.4.6) RODA em Expo Go — não é eliminado por compatibilidade; é eliminado por CUSTO, porque adotá-lo significa reescrever a superfície F2 inteira em componentes dele. Mesmo caso do gluestack-ui (v5, 5.0.3). Guia oficial do Expo no site do Tamagui, lido em 2026-07-20"
+  - id: E_RES_NATIVEWIND_V5_PREVIEW
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://github.com/nativewind/nativewind/discussions/1818"
+    label: "Risco de dependência do gluestack-ui v5 — ele depende de NativeWind v5, que em meados de 2026 ainda estava em preview segundo a discussão oficial do próprio projeto. Adotar o kit importaria uma base ainda não estabilizada. Discussão no repositório, lida em 2026-07-20"
+  - id: C_KIT_TRADEOFF
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: confirmed
+    label: "Avaliação de custo dos dois kits restantes, SEM fonte externa própria registrada nesta sessão (é leitura da pesquisa, não citação — por isso confiança baixa): React Native Paper (5.15.3) roda, mas impõe Material Design sobre a identidade visual que o app já tem; NativeWind v4 (4.2.6) é o mais barato de todos porque não troca componente nenhum, mas o ganho é baixo enquanto não se reescrevem os estilos"
+  - id: E_RES_STYLE_DICTIONARY_DTCG
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://styledictionary.com/info/dtcg/"
+    label: "A saída 'só-tokens' é caminho estabelecido, não invenção — o Style Dictionary v4 suporta o formato DTCG nativamente, ou seja, existe ferramenta madura para consumir uma camada de tokens sem nenhuma biblioteca de componentes acoplada. Documentação oficial, lida em 2026-07-20"
+  - id: E_RES_DTCG_SPEC
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.75
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://www.w3.org/community/design-tokens/"
+    label: "A especificação de tokens de design do grupo comunitário do W3C (DTCG) estabilizou em 2025.10 — o formato que o Onion já usa na vertical de design tem base pública e viva, o que sustenta parar na camada de tokens. Página oficial do grupo, lida em 2026-07-20"
+  - id: E_RES_SAFE_AREA_IN_EXPO_GO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://docs.expo.dev/versions/latest/sdk/safe-area-context/"
+    label: "ACHADO COLATERAL da pesquisa de boilerplate — react-native-safe-area-context VEM EMPACOTADO no Expo Go, ou seja, usá-la NÃO exige dev build. Documentação oficial do Expo, lida em 2026-07-20"
+  - id: C_SAFE_AREA_PREMISE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: refuted
+    trace: "onion-pessoal-app/Composer.tsx:82"
+    label: "REFUTADA — havia no código do compositor um comentário afirmando como FATO que a biblioteca de área segura não estava disponível e que instalá-la exigiria dev build. É o modo de falha que o projeto combate (declarado sem verificar) aparecendo dentro do nosso próprio código, achado de raspão por uma pesquisa que era sobre outra coisa"
+  - id: Q_BOILERPLATE_GAPS
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.4
+    status: open
+    label: "LACUNAS DECLARADAS pela própria pesquisa de boilerplate (registradas para não virarem certeza por esquecimento) — (1) não existe literatura sobre 'spike validado vira base sustentável' como prática nomeada; (2) não há nenhum dado de arrependimento nos dois sentidos, nem de quem adotou kit nem de quem ficou no cru; (3) o ângulo N=1 é INFERÊNCIA minha, não fonte — tudo que se escreve sobre desenvolvedor solo pressupõe prazo e cliente pagante, que aqui não existem"
+
+  # ==== BLOCO B (2026-07-20) — apresentação da memória: o painel deve virar mapa do grafo? ====
+  - id: Q_MEMORY_VIEW
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "ABERTA — o recibo/painel de memória do D2 deve abrir um MAPA do grafo? A evidência de 2026-07-20 SUSTENTA a recusa quanto ao grafo GLOBAL (novelo, papel de parede, briga de gesto no celular) e abre uma EXCEÇÃO ESTREITA: a vizinhança de um nó só (ego-graph), que é a única forma com estudo empírico a favor. Fica aberta porque a exceção não foi ratificada nem desenhada"
+  - id: E_RES_GRAPH_HAIRBALL
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.5
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://codeculture.store/blogs/developer-culture/obsidian-graph-view-useful"
+    label: "Crítica do 'novelo' — o desenho por forças degrada em torno de 200 nós e vira emaranhado ilegível perto de 500. ATENÇÃO À FORÇA DA FONTE: os números são heurística de artigo/fórum, não medição de estudo, por isso confiança baixa. Lida em 2026-07-20"
+  - id: E_RES_LOCAL_OVER_GLOBAL_GRAPH
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.55
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://aiproductivity.ai/blog/best-note-taking-apps-graph-views/"
+    label: "Literatura de produto de 2026 converge em grafo LOCAL acima do global — a formulação da fonte é que grafos globais viram papel de parede depois da primeira semana. Fonte editorial (comparativo de produtos), não estudo — confiança média-baixa. Lida em 2026-07-20"
+  - id: E_RES_GRAPH_DEFENSE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.6
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://www.eleanorkonik.com/p/its-not-just-a-pretty-gimmick-in-defense-of-obsidians-graph-view"
+    label: "O CONTRAPONTO, e é o achado mais interessante — quem defende o grafo global o defende para MONITORAR A SAÚDE DA BASE (achar ilhas, órfãos, ligações que faltam), não para viver dentro dele no dia a dia. Ou seja, a defesa chega pelo outro caminho na MESMA distinção que a nossa recusa faz — quem audita não é quem vive. Ensaio de autora individual. Lido em 2026-07-20"
+  - id: E_RES_GRAPH_MOBILE_PINCH
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.7
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://forum.obsidian.md/t/feature-very-difficult-to-pinch-and-zoom-in-ios-in-graph-view/42074"
+    label: "Barreira específica de CELULAR — o gesto de pinça para aproximar briga com a seleção do nó; os relatos no fórum oficial são de 2021 e continuavam ABERTOS em 2026, o que diz que não é bug de uma versão, é dificuldade estrutural do gesto. Fórum oficial (relato de usuários), lido em 2026-07-20"
+  - id: E_RES_EGO_NETWORK_STUDY
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://www.sciencedirect.com/science/article/pii/S0097849324002589"
+    label: "ÚNICA evidência empírica real do bloco (estudo com participantes, revista revisada por pares) — para explorar a vizinhança de UM nó, a representação de nós e ligações em camadas supera a matriz de adjacência. É o que abre a exceção estreita do ego-graph; NÃO diz nada a favor do grafo global. Lido em 2026-07-20"
+  - id: E_RES_CHATGPT_MEMORY_CHIP
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://openai.com/index/chatgpt-memory-dreaming/"
+    label: "Publicação oficial da OpenAI (2026-06-04) — o ChatGPT sinaliza a atualização de memória com um aviso curto embutido no próprio fio da conversa. É exatamente o RECIBO POR TURNO do nosso D2, num produto de escala. Lida em 2026-07-20"
+  - id: E_RES_CLAUDE_MEMORY_PANEL
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.6
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://www.testingcatalog.com/anthropic-plans-claude-memory-update-with-new-memory-files/"
+    label: "Cobertura de imprensa técnica (2026-07-10) — a Anthropic caminha para memória em arquivos, com painel de entradas que a pessoa pode ler e editar. É o PAINEL SOB DEMANDA do nosso D2. ATENÇÃO À FORÇA DA FONTE: é notícia sobre planos, não anúncio oficial nem produto verificado por mim — confiança média. Lida em 2026-07-20"
+  - id: E_RES_AI_MEMORY_PHILOSOPHY
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.55
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://glasp.ai/articles/ai-memory-wars"
+    label: "A bifurcação de filosofia de memória, tal como a fonte a descreve — OpenAI e Google usam memória opaca por vetor, a Anthropic escolheu arquivos legíveis em markdown que a pessoa pode abrir e editar. É a MESMA aposta arquitetural do nosso life-KG (memória que se lê, se corrige e se apaga). Fonte editorial de terceiro, não primária — confiança baixa. Lida em 2026-07-20"
+  - id: E_RES_RN_SVG_EXPO_GO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://docs.expo.dev/versions/latest/sdk/svg/"
+    label: "VIABILIDADE (caso a exceção estreita seja aceita) — a biblioteca de desenho vetorial do React Native está marcada como disponível dentro do Expo Go na documentação oficial, ou seja, desenhar nós e ligações não custaria dev build. Lida em 2026-07-20"
+  - id: E_RES_PANRESPONDER_JS_THREAD
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "https://reactnative.dev/docs/panresponder"
+    label: "VIABILIDADE com ressalva — o sistema de gestos padrão do React Native roda na linha de execução do JavaScript, segundo a documentação oficial, o que significa que arrastar e aproximar num grafo grande concorre com o resto do aplicativo. Casa com a briga de gesto relatada no fórum. Lida em 2026-07-20"
+  - id: C_D2_IS_STATE_OF_ART
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: confirmed
+    label: "CONFIRMAÇÃO do D2 pelo mercado — o par que já desenhamos (recibo embutido no turno + painel sob demanda) não é aposta exótica, é o estado da arte de 2026, e temos OS DOIS lados, um em cada produto de referência. Reforço maior ainda no fundo da questão: a escolha por memória legível e editável em arquivo, em vez de vetor opaco, é a mesma que o life-KG já fez"
+  - id: Q_GRAPH_VIEW_GAPS
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.3
+    status: open
+    label: "LACUNAS DECLARADAS pela pesquisa de apresentação da memória — (1) não existe medição rigorosa de USO real de mapa de grafo; os limiares de 200 e 500 nós são heurística de fórum, não estudo; (2) nenhum produto documentou publicamente ter REMOVIDO o mapa depois de tê-lo, então não há evidência do arrependimento; (3) 'ver a evolução no tempo' de uma base pessoal com um único dono NÃO TEM FONTE — segue não verificado, e qualquer desenho nessa direção é hipótese minha"
+
+  # ==== BLOCO C (2026-07-20) — auditoria de doutrina do CORE: o vínculo atom-map ↔ KG ====
+  # Não é pesquisa web: é leitura do core com proveniência local (arquivo:linha). O gatilho foi o
+  # nosso próprio erro de átomo (um rótulo declarado num mapa e outro renderizado na tela) passar batido.
+  - id: Q_ATOM_MAP_GUARD
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.6
+    status: open
+    label: "ABERTA — que guarda mecânica o core precisa ganhar para que o par atom-map ↔ grafo de domínio deixe de ser doutrina só em prosa? Hoje o mapa de átomos é normativo em texto, nenhuma ferramenta o lê, e o que está DECLARADO no mapa não tem como ser confrontado com o que a tela RENDERIZA"
+  - id: C_CORE_ATOM_MAP_UNGUARDED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "O par atom-map ↔ grafo de domínio NÃO tem guarda nenhuma no core — a forma é normativa em prosa, mas não há template, nem esquema, nem verificação automática; e a checagem de fonte-única que existe é meia checagem. Foi por essa ausência que o nosso erro de átomo (rótulo declarado diferente do renderizado) passou sem ninguém reprovar"
+  - id: E_CORE_ADR_DESIGN_EXTENDS_KG
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "docs/analysis/onion-adr-design-extends-kg-2026-07.md:5"
+    label: "A doutrina EXISTE e está aceita (decisão de 2026-07-09, lida no core em 2026-07-20) — o átomo de interface estende a camada de domínio do grafo dogfoodado, em vez de ganhar um segundo grafo próprio. Ou seja, o vínculo é constitucional, não opinião"
+  - id: E_CORE_ATOM_MAP_PROSE_ONLY
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: ".claude/commands/meta/kg.md:165-179"
+    label: "A FORMA do mapa de átomos é normativa em PROSA — as cinco colunas da tabela, o registro de de-duplicação e a pergunta atômica de cada tela estão escritos como obrigação no comando. Mas não existe template para gerá-lo, nem esquema para validá-lo, nem verificação automática que o cobre. Lido no core em 2026-07-20"
+  - id: E_CORE_NO_ATOM_MAP_READER
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: ".claude/validation/kg-radar.sh:257"
+    label: "LACUNA 1 — NADA no core lê um mapa de átomos. A única aparição do termo dentro da pasta de validação é um COMENTÁRIO explicando de onde veio a regra de fonte-única; nenhuma linha executável abre o arquivo. Verificado no core em 2026-07-20"
+  - id: E_CORE_SINGLE_SOURCE_HALF_CHECK
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: ".claude/validation/kg-radar.sh:138,254,258"
+    label: "LACUNA 2 — a fonte-única é MEIA checagem: o radar avisa quando um nó lê de mais de uma fonte, mas ZERO leituras passa em silêncio; a aresta de ESCRITA existe no vocabulário e não é contada por ninguém; e a exigência de ancorar no artefato só é cobrada de regra, invariante e política, nunca de entidade. Verificado no core em 2026-07-20"
+  - id: E_CORE_DOMAIN_CHECKS_ALL_WARN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: ".claude/validation/kg-radar.sh:232-262"
+    label: "As cinco checagens do radar de domínio são TODAS de atenção — nenhuma reprova a execução. Quem não olhar a saída com cuidado não é impedido de seguir. Verificado no core em 2026-07-20"
+  - id: E_CORE_RENDERED_VS_DECLARED_BLIND
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "docs/knowledge-base/agentic-patterns/ai-strategies/verify-read-path-first.md"
+    label: "LACUNA 3, a central — o DECLARADO e o RENDERIZADO são indistinguíveis por construção: o radar é um programa de texto sobre o arquivo do grafo e não enxerga código nenhum, e a busca textual casa presença de palavra, não exibição real na tela. O core tem a doutrina de verificar o caminho de leitura antes de crer, e toda a família do declarado que não é verificado (guardas para pino de versão, sessão e ramo), mas NENHUMA linha dela cobre exibição. Verificado no core em 2026-07-20"
+  - id: E_CORE_TOKENS_ATOMS_DISJOINT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "docs/design-context/"
+    label: "LACUNA 4 — tokens e átomos não se falam. A decisão aceita chama o mapa de átomos de JUNÇÃO entre o contexto de design e o grafo, mas uma busca por 'átomo' ou por 'grafo' dentro da pasta de contexto de design do core retorna ZERO ocorrências. A junção existe no papel de um lado só. Verificado no core em 2026-07-20"
+  - id: E_CORE_DESIGN_CONTEXT_PROVISIONAL
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-07-20"
+    trace: "docs/design-context/index.md:3"
+    label: "O contexto de design como quarta dimensão par segue PROVISÓRIO (em incubação, promoção formal pendente de evidência) — o que enfraquece qualquer plano que dependa dele como base estável. Verificado no core em 2026-07-20"
+
 edges:
   # --- a decisão responde à pergunta e é sustentada pelos claims de capacidade ---
   - from: D_STACK
@@ -976,4 +1459,169 @@ edges:
     edge_type: SUPPORTS
   - from: Q_FRONTEND_MAP
     to: D_DEFINITIVE
+    edge_type: CONSTRAINS
+
+  # --- a proposta da F2 entra pela porta que o mapeamento do frontend abriu ---
+  - from: D_F2_SURFACE
+    to: Q_FRONTEND_MAP
+    edge_type: DEPENDS_ON
+  - from: D_COACH_NO_STREAK
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+
+  # --- pesquisa externa citável sustenta o desenho da superfície ---
+  - from: E_RES_MOBILE_PATTERNS_2026
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+  - from: E_RES_CHAT_UI_PATTERNS
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+  - from: E_RES_AI_CHAT_ANATOMY
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+  - from: E_RES_AGENT_MEMORY_UX
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+  - from: E_RES_AGENT_UX_2026
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+  - from: E_RES_AI_ERROR_STATES
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+  - from: E_RES_ERROR_RECOVERY
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+
+  # --- as duas fontes de sequência de dias são as que mudaram a decisão D4 ---
+  - from: E_RES_STREAKS_GROWTH
+    to: D_COACH_NO_STREAK
+    edge_type: SUPPORTS
+  - from: E_RES_STREAKS_HARM
+    to: D_COACH_NO_STREAK
+    edge_type: SUPPORTS
+
+  # --- pesquisa resgatada de prosa: cada fonte volta a ancorar o nó onde estava enterrada ---
+  - from: E_RES_EXPO_FETCH_FORMDATA
+    to: E_STT_PROVEN
+    edge_type: SUPPORTS
+  - from: E_RES_EXPO_FETCH_FORMDATA
+    to: E_F1_CLOSED
+    edge_type: SUPPORTS
+  - from: E_RES_PROMPT_OPS_2026
+    to: E_F1_CLOSED
+    edge_type: SUPPORTS
+
+  # --- BLOCO A (2026-07-20): a decisão de não adotar boilerplate ancora na pergunta que a gerou ---
+  - from: D_NO_BOILERPLATE
+    to: Q_UI_FOUNDATION
+    edge_type: TRACES_TO
+  - from: E_RES_IGNITE_EXPO_GO
+    to: D_NO_BOILERPLATE
+    edge_type: SUPPORTS
+  - from: E_RES_UNISTYLES_NITRO
+    to: D_NO_BOILERPLATE
+    edge_type: SUPPORTS
+  - from: E_RES_TAMAGUI_EXPO_GO
+    to: D_NO_BOILERPLATE
+    edge_type: SUPPORTS
+  - from: E_RES_NATIVEWIND_V5_PREVIEW
+    to: D_NO_BOILERPLATE
+    edge_type: SUPPORTS
+  - from: C_KIT_TRADEOFF
+    to: D_NO_BOILERPLATE
+    edge_type: SUPPORTS
+  - from: E_RES_STYLE_DICTIONARY_DTCG
+    to: D_NO_BOILERPLATE
+    edge_type: SUPPORTS
+  - from: E_RES_DTCG_SPEC
+    to: E_RES_STYLE_DICTIONARY_DTCG
+    edge_type: SUPPORTS
+  # as lacunas declaradas LIMITAM a decisão (ela vale sem literatura de apoio nem dado de arrependimento)
+  - from: Q_BOILERPLATE_GAPS
+    to: D_NO_BOILERPLATE
+    edge_type: CONSTRAINS
+  # a decisão de base entra na superfície F2 (é sobre com o que ela vai ser construída)
+  - from: D_NO_BOILERPLATE
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+  # o achado colateral REFUTA a premissa escrita como fato no nosso próprio código
+  - from: E_RES_SAFE_AREA_IN_EXPO_GO
+    to: C_SAFE_AREA_PREMISE
+    edge_type: REFUTES
+  - from: E_RES_SAFE_AREA_IN_EXPO_GO
+    to: D_NO_BOILERPLATE
+    edge_type: SUPPORTS
+
+  # --- BLOCO B (2026-07-20): a apresentação da memória é questão aberta que a F2 escancarou ---
+  - from: Q_MEMORY_VIEW
+    to: D_F2_SURFACE
+    edge_type: DEPENDS_ON
+  - from: E_RES_GRAPH_HAIRBALL
+    to: Q_MEMORY_VIEW
+    edge_type: SUPPORTS
+  - from: E_RES_LOCAL_OVER_GLOBAL_GRAPH
+    to: Q_MEMORY_VIEW
+    edge_type: SUPPORTS
+  - from: E_RES_GRAPH_DEFENSE
+    to: Q_MEMORY_VIEW
+    edge_type: SUPPORTS
+  - from: E_RES_GRAPH_MOBILE_PINCH
+    to: Q_MEMORY_VIEW
+    edge_type: SUPPORTS
+  - from: E_RES_EGO_NETWORK_STUDY
+    to: Q_MEMORY_VIEW
+    edge_type: SUPPORTS
+  - from: E_RES_RN_SVG_EXPO_GO
+    to: Q_MEMORY_VIEW
+    edge_type: SUPPORTS
+  - from: E_RES_PANRESPONDER_JS_THREAD
+    to: Q_MEMORY_VIEW
+    edge_type: SUPPORTS
+  - from: Q_GRAPH_VIEW_GAPS
+    to: Q_MEMORY_VIEW
+    edge_type: CONSTRAINS
+  # o mercado confirma o par recibo + painel que o D2 já desenhou
+  - from: E_RES_CHATGPT_MEMORY_CHIP
+    to: C_D2_IS_STATE_OF_ART
+    edge_type: SUPPORTS
+  - from: E_RES_CLAUDE_MEMORY_PANEL
+    to: C_D2_IS_STATE_OF_ART
+    edge_type: SUPPORTS
+  - from: E_RES_AI_MEMORY_PHILOSOPHY
+    to: C_D2_IS_STATE_OF_ART
+    edge_type: SUPPORTS
+  - from: C_D2_IS_STATE_OF_ART
+    to: D_F2_SURFACE
+    edge_type: SUPPORTS
+
+  # --- BLOCO C (2026-07-20): a ausência de guarda do par atom-map ↔ KG limita o mapa do frontend ---
+  - from: E_CORE_ADR_DESIGN_EXTENDS_KG
+    to: Q_ATOM_MAP_GUARD
+    edge_type: SUPPORTS
+  - from: E_CORE_ATOM_MAP_PROSE_ONLY
+    to: C_CORE_ATOM_MAP_UNGUARDED
+    edge_type: SUPPORTS
+  - from: E_CORE_NO_ATOM_MAP_READER
+    to: C_CORE_ATOM_MAP_UNGUARDED
+    edge_type: SUPPORTS
+  - from: E_CORE_SINGLE_SOURCE_HALF_CHECK
+    to: C_CORE_ATOM_MAP_UNGUARDED
+    edge_type: SUPPORTS
+  - from: E_CORE_DOMAIN_CHECKS_ALL_WARN
+    to: C_CORE_ATOM_MAP_UNGUARDED
+    edge_type: SUPPORTS
+  - from: E_CORE_RENDERED_VS_DECLARED_BLIND
+    to: Q_ATOM_MAP_GUARD
+    edge_type: SUPPORTS
+  - from: E_CORE_TOKENS_ATOMS_DISJOINT
+    to: Q_ATOM_MAP_GUARD
+    edge_type: SUPPORTS
+  - from: E_CORE_DESIGN_CONTEXT_PROVISIONAL
+    to: Q_ATOM_MAP_GUARD
+    edge_type: SUPPORTS
+  - from: C_CORE_ATOM_MAP_UNGUARDED
+    to: Q_ATOM_MAP_GUARD
+    edge_type: SUPPORTS
+  - from: Q_ATOM_MAP_GUARD
+    to: Q_FRONTEND_MAP
     edge_type: CONSTRAINS
