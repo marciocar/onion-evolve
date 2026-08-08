@@ -179,8 +179,26 @@ em 2026-07-14 (`onion-review.yml:36-41`). O prompt aplica a doutrina do `@metasp
 contra `docs/meta-specs/`.
 
 **Semântica de vermelho/verde é contraintuitiva por design**: o job só fica vermelho quando o
-revisor **crasha** (não roda) — nunca quando encontra violações (essas viram comentários inline e
-o job sai verde). `continue-on-error: true` está setado de propósito: reprovar por `is_error`
+revisor **crasha** (não roda) — nunca quando encontra violações.
+
+> ⚠️ **Correção de 2026-08-07.** Este parágrafo afirmava que as violações *"viram comentários
+> inline e o job sai verde"*. A segunda metade era **falsa desde sempre**, e a causa não era a que
+> se supôs: **não faltava credencial** (a action faz OIDC→App token e o log da run confirma
+> *"App token successfully obtained"*) — **faltava ferramenta**. O `claude_args` não declarava
+> `--allowedTools`, então o servidor MCP de comentário nunca era instalado; o log mostra
+> `permission_denials_count: 14` e `No buffered inline comments`. Medido: os PRs **#549 a #557**
+> têm todos `comments=0` e `reviews=0`, a ~US$ 1,27 por PR.
+>
+> **O desenho mudou em vez de ligar o MCP:** o revisor agora **devolve** os achados como dado
+> (`--json-schema`, fail-closed) e **o Onion posta**, pelo transporte `api` do adapter forge
+> (`.claude/utils/forge/post-review-comment.sh`). Isso torna o posting **shell testável** —
+> a ausência disso é o que manteve o defeito vivo por 15 commits.
+>
+> Até que um PR **posterior a este** produza comentário visível, trate "o revisor comenta" como
+> **não-verificado**: um PR que edita o próprio workflow não mede o revisor (a action se auto-pula
+> quando o arquivo difere da branch default).
+
+`continue-on-error: true` está setado de propósito: reprovar por `is_error`
 bloquearia o PR pelo crash do bot, sem informação sobre o código. O gate de qualidade duro é o
 determinístico (§3.1); o semântico é **advisory-quando-roda** (`onion-review.yml:35-42`). Sem o
 secret `ANTHROPIC_API_KEY`, o step é pulado — degrada gracioso.

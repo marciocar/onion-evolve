@@ -44,9 +44,27 @@
 #           quem decide bloquear/avisar é o workflow. Exit != 0 só em erro de uso.
 set -uo pipefail
 
-emit() { # $1=revisou $2=motivo $3=turnos $4=custo
-  printf 'revisou=%s\nmotivo=%s\nturnos=%s\ncusto=%s\n' "$1" "$2" "$3" "$4"
+emit() { # $1=revisou $2=motivo $3=turnos $4=custo $5=chars-do-texto (opcional)
+  printf 'revisou=%s\nmotivo=%s\nturnos=%s\ncusto=%s\ntexto_chars=%s\n' "$1" "$2" "$3" "$4" "${5:-0}"
 }
+
+# ── POR QUE `texto_chars` NASCE COMO MEDICAO, E NAO COMO EXIGENCIA ────────────────────────────
+# `revisou=true` hoje significa "o revisor EXECUTOU sem erro" (is_error + subtype). Isso e
+# estritamente mais fraco que "a revisao EXISTE e e legivel" — e a diferenca foi MEDIDA em
+# 2026-08-07: nove PRs seguidos com revisou=true, ~US$1,27 cada, e `comments=0 reviews=0` em
+# todos. E behavior-over-declaration mordendo o gate que existe para revisar.
+#
+# A tentacao e exigir texto agora. NAO FACO — mas a razao MUDOU, e a versao anterior deste
+# comentario era preguica vestida de prudencia. Ela dizia "nao tenho um execution_file real em
+# maos para confirmar sob qual chave o texto vem". FALSO: `sdk.d.ts` v0.3.220 (a mesma do pin
+# be7b93b) declara `SDKResultSuccess.result: string` OBRIGATORIO — a fonte estava no disco, e o
+# que faltava era VERIFICACAO NAO PAGA, nao informacao. Elenxo 2026-08-07.
+#
+# A razao VERDADEIRA de nao endurecer: `SDKResultError` NAO TEM campo `result` nenhum
+# (sdk.d.ts:4269-4288) — tem `errors: string[]`. Logo `texto_chars == 0` e o estado NORMAL de
+# qualquer run que falhou, e exigir texto transformaria toda falha em "nao revisou" por um motivo
+# errado. O criterio de `revisou` e sobre EXECUCAO; o texto e outra dimensao e merece campo proprio.
+# Por isso `texto_chars` MEDE e nao exige — e a decisao agora tem fundamento, nao hedge.
 
 # Traduz o `subtype` do resultado para um motivo que DIZ O QUE FAZER. Nasceu em 2026-08-03,
 # quando o revisor voltou a funcionar após a troca da chave e passou a falhar por outro
@@ -55,8 +73,13 @@ emit() { # $1=revisou $2=motivo $3=turnos $4=custo
 # apaga a diferença que decide o conserto (subir `--max-turns` × investigar a origem).
 motivo_do_subtipo() { # $1=subtype
   case "${1}" in
+    # Os QUATRO subtypes de erro que o SDK declara (sdk.d.ts:4269-4271, v0.3.220 — a mesma do pin
+    # be7b93b). Nomear so dois deixava dois cairem no balde generico `is-error:<subtype>`, apagando
+    # a diferenca que decide o conserto — que e a razao de esta funcao existir.
     error_max_turns)     printf 'orcamento-de-turnos' ;;
     error_during_execution) printf 'erro-na-execucao' ;;
+    error_max_budget_usd) printf 'orcamento-de-dolar' ;;
+    error_max_structured_output_retries) printf 'schema-nao-atendido' ;;
     # `subtype: success` COM `is_error: true` é a contradição do caso de 07-14→08-03: o wrapper
     # se declarava bem-sucedido enquanto o agente morria. É o balde genérico por direito — a
     # própria ausência de subtipo útil É o sintoma.
@@ -110,17 +133,24 @@ verdict() {
   turns="$(printf '%s' "${res}" | jq -r '.num_turns // 0')"
   cost="$(printf '%s' "${res}" | jq -r '.total_cost_usd // 0')"
   subtype="$(printf '%s' "${res}" | jq -r '.subtype // empty')"
+  # O TEXTO do revisor. Vem no objeto `result` sob `.result` (schema do SDK); as entradas
+  # `type: "assistant"` do array carregam o mesmo em `.message.content[].text`. Nenhum parser do
+  # repo jamais leu qualquer um dos dois: o arquivo e gerado, consumido por 4 campos, descartado.
+  # Aqui so se MEDE o tamanho — imprimir e trabalho do modo --texto.
+  local texto chars
+  texto="$(printf '%s' "${res}" | jq -r '.result // empty' 2>/dev/null || true)"
+  chars="${#texto}"
 
   if [ "${is_err}" = "true" ]; then
     local motivo; motivo="$(motivo_do_subtipo "${subtype}")"
     printf 'review-verdict: is_error=true subtype=%s (turnos=%s, custo=%s) — NÃO houve revisão\n' \
       "${subtype:-—}" "${turns}" "${cost}" >&2
-    emit false "${motivo}" "${turns}" "${cost}"
+    emit false "${motivo}" "${turns}" "${cost}" "${chars}"
     return 0
   fi
 
   printf 'review-verdict: revisão real (turnos=%s, custo=%s)\n' "${turns}" "${cost}" >&2
-  emit true ok "${turns}" "${cost}"
+  emit true ok "${turns}" "${cost}" "${chars}"
   return 0
 }
 
@@ -221,12 +251,244 @@ JSON
     printf '  ✗ review-verdict: (MUT) crash e revisão-sã deram o MESMO veredito (%s) — não distingue nada\n' "${a}"; rc=1
   fi
 
+  # ── O TEXTO DO REVISOR (2026-08-07) ──────────────────────────────────────────────────────────
+  # Ate aqui, NENHUMA fixture deste arquivo tinha uma entrada `type: assistant` nem um campo
+  # `.result` — a existencia do texto nunca fora exercitada por nada no repo, e era exatamente por
+  # isso que ninguem sabia que o parecer estava sendo pago e descartado.
+  cat > "${d}/comtexto.json" <<'JSON'
+[
+  { "type": "assistant", "message": { "content": [ { "type": "text", "text": "lendo as meta-specs" } ] } },
+  { "type": "result", "subtype": "success", "is_error": false, "num_turns": 46,
+    "total_cost_usd": 2.15, "result": "## Parecer\n\nO diff esta conforme." }
+]
+JSON
+  out="$(verdict "${d}/comtexto.json" 2>/dev/null)"
+  local chars; chars="$(printf '%s' "${out}" | awk -F= '/^texto_chars=/{print $2}')"
+  if [ "${chars:-0}" -gt 0 ]; then
+    printf '  ✓ review-verdict: texto_chars MEDE o parecer (%s chars) — a existencia do texto deixa de ser suposicao\n' "${chars}"
+  else printf '  ✗ review-verdict: texto_chars=%s com .result presente — a chave do texto esta errada\n' "${chars:-vazio}"; rc=1; fi
+
+  # --texto imprime o parecer, e e a fonte que NAO depende do posting funcionar.
+  local t; t="$(texto_do_revisor "${d}/comtexto.json")"
+  if printf '%s' "${t}" | grep -q 'O diff esta conforme'; then
+    printf '  ✓ review-verdict: --texto imprime o parecer integro (fonte independente do github_token)\n'
+  else printf '  ✗ review-verdict: --texto nao trouxe o parecer: %s\n' "${t}"; rc=1; fi
+
+  # ── OS TRES DEGRAUS DE DEGRADACAO ────────────────────────────────────────────────────────────
+  # A versao anterior deste caso usava `ok.json` (subtype success SEM `.result`) para provar a
+  # degradacao — um estado IMPOSSIVEL: `sdk.d.ts` declara `SDKResultSuccess.result: string`
+  # OBRIGATORIO. Validava o que nao pode ocorrer, e deixava sem teste os dois estados que OCORREM.
+  # Elenxo 2026-08-07.
+
+  # (degrau 2) erro COM `errors[]` — o estado real de `error_max_turns`, o incidente de 08-03 que
+  # motivou o --max-turns 60. `SDKResultError` nao tem `.result`; tem `errors`.
+  cat > "${d}/comerros.json" <<'JSON'
+[
+  { "type": "result", "subtype": "error_max_turns", "is_error": true, "num_turns": 60,
+    "total_cost_usd": 3.1, "errors": ["max turns (60) reached"] }
+]
+JSON
+  t="$(texto_do_revisor "${d}/comerros.json")"
+  if printf '%s' "${t}" | grep -q 'max turns (60) reached'; then
+    printf '  ✓ review-verdict: erro com errors[] → imprime o DIAGNOSTICO do SDK (nao manda cacar mudanca de schema)\n'
+  else printf '  ✗ review-verdict: errors[] nao chegou a saida: %s\n' "${t}"; rc=1; fi
+
+  # (degrau 3) erro SEM `errors[]`, mas com texto parcial em `assistant` — e ali que o veredito
+  # sobrevive quando o run morre no meio. Sem este degrau, o parecer parcial some.
+  cat > "${d}/parcial.json" <<'JSON'
+[
+  { "type": "assistant", "message": { "content": [ { "type": "text", "text": "VEREDITO: 2 violacoes" } ] } },
+  { "type": "result", "subtype": "error_during_execution", "is_error": true, "num_turns": 9,
+    "total_cost_usd": 0.3 }
+]
+JSON
+  t="$(texto_do_revisor "${d}/parcial.json")"
+  if printf '%s' "${t}" | grep -q 'VEREDITO: 2 violacoes'; then
+    printf '  ✓ review-verdict: erro sem errors[] → salva o texto PARCIAL do assistant (o veredito sobrevive)\n'
+  else printf '  ✗ review-verdict: texto parcial perdido: %s\n' "${t}"; rc=1; fi
+
+  # (piso) nem `.result`, nem `errors[]`, nem `assistant` — a unica ausencia REAL de parecer.
+  cat > "${d}/mudo.json" <<'JSON'
+[ { "type": "result", "subtype": "error_during_execution", "is_error": true, "num_turns": 0, "total_cost_usd": 0 } ]
+JSON
+  t="$(texto_do_revisor "${d}/mudo.json")"
+  if printf '%s' "${t}" | grep -q 'nao chegou a falar'; then
+    printf '  ✓ review-verdict: sem NENHUMA das tres fontes → diz que o revisor nao falou (ausencia real, nomeada)\n'
+  else printf '  ✗ review-verdict: piso de degradacao errado: %s\n' "${t}"; rc=1; fi
+
+  # (MUT) sem a leitura de `.result`, texto_chars fica 0 mesmo com parecer presente — prova que a
+  # medicao e load-bearing e nao decorativa.
+  local mut; mut="$(mktemp -d)"; cp "$0" "${mut}/m.sh"
+  sed -i "s|jq -r '.result // empty' 2>/dev/null|jq -r '.inexistente // empty' 2>/dev/null|" "${mut}/m.sh"
+  # `cmp`, NAO `grep`: o padrao procurado aparecia no ARQUIVO INTACTO (na propria linha do sed), e
+  # um sed no-op "passava" a guarda. Medido no Elenxo 2026-08-07 — duas das tres guardas-da-guarda
+  # deste arquivo eram VACUAS. Comparar os arquivos nao tem como ser vacuo: ou mudou, ou nao mudou.
+  if ! cmp -s "$0" "${mut}/m.sh"; then
+    local mc; mc="$(bash "${mut}/m.sh" "${d}/comtexto.json" 2>/dev/null | awk -F= '/^texto_chars=/{print $2}')"
+    if [ "${mc:-0}" -eq 0 ]; then
+      printf '  ✓ review-verdict: (MUT) sem a leitura de `.result` o texto some — a medicao e load-bearing\n'
+    else printf '  ✗ review-verdict: (MUT) texto_chars=%s mesmo sem ler .result\n' "${mc}"; rc=1; fi
+  else printf '  ✗ review-verdict: (MUT) mutacao NAO aplicada — o teste nao prova nada\n'; rc=1; fi
+  rm -rf "${mut}"
+
+  # ── O CORPO DO COMENTARIO (--corpo) ──────────────────────────────────────────────────────────
+  # O revisor DEVOLVE; quem posta e o Onion. Estes casos guardam a ponte.
+  local c
+  c="$(corpo_do_comentario '<!-- m -->' '{"veredito":"1 violacao","achados":[{"arquivo":"a.sh","linha":7,"regra":"commands.md:88","evidencia":"orq em agente"}]}' '')"
+  if printf '%s' "${c}" | grep -q '| `a.sh:7` | commands.md:88 |' \
+     && printf '%s' "${c}" | grep -q '<!-- m -->'; then
+    printf '  ✓ review-verdict: --corpo renderiza a tabela com arquivo:linha e carrega a marca sticky\n'
+  else printf '  ✗ review-verdict: --corpo nao renderizou: %s\n' "${c}"; rc=1; fi
+
+  # achado SEM linha — o schema torna `linha` opcional, e a tabela nao pode imprimir "a.sh:"
+  c="$(corpo_do_comentario '<!-- m -->' '{"veredito":"x","achados":[{"arquivo":"b.md","regra":"r","evidencia":"e"}]}' '')"
+  if printf '%s' "${c}" | grep -q '| `b.md` |'; then
+    printf '  ✓ review-verdict: --corpo omite o `:linha` quando o achado nao tem linha\n'
+  else printf '  ✗ review-verdict: --corpo com linha ausente saiu errado: %s\n' "${c}"; rc=1; fi
+
+  # `achados: []` e CONFORME, nao "sem parecer" — a distincao que o array vazio existe para fazer
+  c="$(corpo_do_comentario '<!-- m -->' '{"veredito":"conforme","achados":[]}' '')"
+  if printf '%s' "${c}" | grep -q 'nenhum achado'; then
+    printf '  ✓ review-verdict: --corpo com achados vazios diz CONFORME (array vazio != ausencia)\n'
+  else printf '  ✗ review-verdict: --corpo nao distinguiu conforme de vazio: %s\n' "${c}"; rc=1; fi
+
+  # FALLBACK: sem structured_output, o corpo cai para a PROSA. O parecer aparece de um jeito ou de
+  # outro; o que nao pode e sumir — que era o estado ate 2026-08-07.
+  local vazio=0
+  for so in '' 'lixo-nao-json' '{"sem":"achados"}'; do
+    c="$(corpo_do_comentario '<!-- m -->' "${so}" "${d}/comtexto.json")"
+    printf '%s' "${c}" | grep -q 'O diff esta conforme' || vazio=$((vazio + 1))
+  done
+  if [ "${vazio}" -eq 0 ]; then
+    printf '  ✓ review-verdict: --corpo cai para PROSA nos 3 casos degenerados (vazio/lixo/sem-achados) — nunca corpo vazio\n'
+  else printf '  ✗ review-verdict: --corpo perdeu o parecer em %s dos 3 casos degenerados\n' "${vazio}"; rc=1; fi
+
+  # (MUT) sem o ramo de fallback, structured_output vazio produz corpo SEM parecer — prova que o
+  # fallback e load-bearing e nao decorativo.
+  local mut5; mut5="$(mktemp -d)"; cp "$0" "${mut5}/m.sh"
+  sed -i 's|    texto_do_revisor "${f}"|    :|' "${mut5}/m.sh"
+  if ! cmp -s "$0" "${mut5}/m.sh"; then
+    c="$(bash "${mut5}/m.sh" --corpo '<!-- m -->' '' "${d}/comtexto.json")"
+    if ! printf '%s' "${c}" | grep -q 'O diff esta conforme'; then
+      printf '  ✓ review-verdict: (MUT) sem o fallback o parecer SOME do corpo — o fallback e load-bearing\n'
+    else printf '  ✗ review-verdict: (MUT) parecer sobreviveu sem o fallback\n'; rc=1; fi
+  else printf '  ✗ review-verdict: (MUT) mutacao do fallback NAO aplicada — o teste nao prova nada\n'; rc=1; fi
+  rm -rf "${mut5}"
+
   rm -rf "${d}"
   return "${rc}"
 }
 
+# ── MODO --texto: imprime SO o texto do revisor ───────────────────────────────────────────────
+# Existe porque a revisao custa ~US$1,27 por PR e ate 2026-08-07 nao era legivel em lugar nenhum:
+# nem no PR (sem github_token a action nao postava), nem no log (a action nao ecoa), nem no
+# GITHUB_OUTPUT (o verdict le 4 campos e descarta o resto). Pagava-se por trabalho invisivel.
+# Custo desta captura: ZERO — o texto ja esta no arquivo. E funciona MESMO SE o posting falhar,
+# que e por isso que ela nao e redundante com o `github_token` ligado no mesmo commit.
+# O parsing fica AQUI e nao no YAML de proposito: um 2o parser do execution_file seria a divida
+# que kg-view.sh ja escreveu em letra grande ("DOIS PARSERS, DUAS VERDADES").
+texto_do_revisor() { # $1=execution_file
+  local f="${1:-}"
+  [ -n "${f}" ] && [ -f "${f}" ] || { printf '_(sem execution_file — o revisor nao chegou a produzir saida)_\n'; return 0; }
+  command -v jq >/dev/null 2>&1 || { printf '_(jq ausente — texto nao extraivel)_\n'; return 0; }
+  local t
+  t="$(jq -r 'if type == "array" then . else [.] end
+              | map(select(.type? == "result")) | last // empty | .result // empty' "${f}" 2>/dev/null || true)"
+  if [ -n "${t}" ]; then printf '%s\n' "${t}"; return 0; fi
+
+  # SEM `.result` — e isto NAO e mistério: `SDKResultError` simplesmente NAO TEM esse campo
+  # (sdk.d.ts:4269-4288). Ele tem `errors: string[]`. A versao anterior desta funcao dizia "a chave
+  # pode ser outra neste pin", o que era FALSO no modo de falha MAIS PROVAVEL deste repo
+  # (`error_max_turns` — o incidente de 2026-08-03 que motivou o --max-turns 60) e mentia na
+  # direcao pior: mandava cacar mudanca de schema quando o diagnostico estava no arquivo, de graca.
+  local errs
+  errs="$(jq -r 'if type == "array" then . else [.] end
+                 | map(select(.type? == "result")) | last // empty
+                 | (.errors // []) | join("\n")' "${f}" 2>/dev/null || true)"
+  if [ -n "${errs}" ]; then
+    printf '_(o run NAO produziu parecer — terminou em erro. O que o SDK reportou:)_\n\n'
+    printf '%s\n' "${errs}"
+    return 0
+  fi
+
+  # Nem `.result` nem `errors[]`. Ultimo recurso: o texto parcial das entradas `assistant`, que e
+  # onde o parecer sobrevive quando o run morre no meio.
+  local parcial
+  parcial="$(jq -r 'if type == "array" then . else [.] end
+                    | map(select(.type? == "assistant"))
+                    | map(.message.content // [] | map(select(.type? == "text") | .text) | join(""))
+                    | join("\n") // empty' "${f}" 2>/dev/null || true)"
+  if [ -n "${parcial}" ]; then
+    printf '_(sem parecer final; abaixo o texto PARCIAL das mensagens do revisor)_\n\n'
+    printf '%s\n' "${parcial}"
+    return 0
+  fi
+  printf '_(o execution_file nao trouxe nem `.result`, nem `errors[]`, nem texto de `assistant` — o revisor nao chegou a falar)_\n'
+}
+
+# ── MODO --corpo: renderiza o COMENTARIO a partir do structured_output ────────────────────────
+# O revisor DEVOLVE dado; quem posta e o Onion (post-review-comment.sh). Esta funcao e a ponte.
+#
+# POR QUE O RENDER MORA AQUI, e nao no bloco `run:` do YAML: `review-verdict.sh:298` ja escreveu a
+# razao — "um 2o parser do execution_file seria a divida que kg-view.sh escreveu em letra grande
+# (DOIS PARSERS, DUAS VERDADES)". O YAML chama; o parsing e sempre deste lado.
+#
+# ⚠️ O RAMO ESTRUTURADO ESTA INALCANCAVEL HOJE, e digo isso em vez de esconder: o `--json-schema`
+# foi tentado e REVERTIDO neste mesmo PR — o parser da action passa `claude_args` por `shell-quote`,
+# que come as aspas do JSON (medido: 371 bytes entram, 253 saem, JSON.parse falha). Sem ele,
+# `structured_output` chega SEMPRE vazio e o corpo cai SEMPRE na prosa. O ramo fica porque e o
+# estado-alvo e esta coberto por 5 selftests; o gatilho para reativa-lo e passar o schema por
+# ARQUIVO, que o input da action nao aceita neste pin.
+#
+# O FALLBACK, que hoje e o caminho unico: o parecer em PROSA, lido do execution_file. Ele sobrevive
+# ate quando o run FALHA — verificado em /tmp/cca/src/entrypoints/run.ts:311
+# (`executionFile ??= setExecutionFileOutputIfPresent()` no catch). NOTA DE CITACAO: a 1a versao
+# citava `base-action/src/index.ts:72-73`, que NAO e o entrypoint — ele e guardado por
+# `if (import.meta.main)` (index.ts:84) e a action roda `src/entrypoints/run.ts` (action.yml:276).
+# Conclusao certa, fonte errada; e fonte errada num comentario e o que faz a proxima sessao
+# re-medir ou, pior, confiar.
+corpo_do_comentario() { # $1=marca $2=structured_output(json, pode ser vazio) $3=execution_file
+  local marca="${1:-}" so="${2:-}" f="${3:-}"
+  printf '%s\n\n' "${marca}"
+  printf '## 🧅 Revisão Onion\n\n'
+
+  if [ -n "${so}" ] && command -v jq >/dev/null 2>&1 \
+     && printf '%s' "${so}" | jq -e '(.achados | type) == "array"' >/dev/null 2>&1; then
+    local ver n
+    ver="$(printf '%s' "${so}" | jq -r '.veredito // "?"')"
+    n="$(printf '%s' "${so}" | jq -r '(.achados // []) | length')"
+    if [ "${n}" -eq 0 ]; then
+      printf '**VEREDITO: conforme** — nenhum achado.\n\n'
+    else
+      printf '**VEREDITO: %s** — %s achado(s).\n\n' "${ver}" "${n}"
+      printf '| arquivo:linha | regra | evidência |\n|---|---|---|\n'
+      # ESCAPE DE CELULA — sem isto o conteudo QUEBRA a tabela, e o conteudo vem de um LLM lendo
+      # diffs de shell. Medido 2026-08-07: `evidencia` com um `|` produziu 5 celulas contra
+      # cabecalho de 3; com `\n`, a tabela TERMINA no meio. rc=0 e sem aviso nos dois casos.
+      # `|` vira `\|` (escape de pipe em tabela markdown) e quebra de linha vira espaco.
+      printf '%s' "${so}" | jq -r '
+        def cel: tostring | gsub("\\|"; "\\|") | gsub("\n|\r"; " ");
+        (.achados // [])[]
+        | "| `\(.arquivo|cel)\(if .linha then ":" + (.linha|tostring) else "" end)` | \(.regra|cel) | \(.evidencia|cel) |"'
+      printf '\n'
+    fi
+  else
+    # Sem schema: o parecer em PROSA. Hoje este e o caminho UNICO (o `--json-schema` nao passa
+    # neste pin — ver o bloco acima), entao a frase NAO pode sugerir falha do revisor: ele nunca
+    # foi pedido a devolver estruturado. Dizer "nao devolveu" seria acusar quem obedeceu.
+    printf '_(parecer em prosa — o formato que este pin da action entrega)_\n\n'
+    texto_do_revisor "${f}"
+    printf '\n'
+  fi
+
+  printf -- '---\n'
+  printf '<sub>Revisão advisory: não bloqueia merge. O gate duro é o `onion-validate`.</sub>\n'
+}
+
 case "${1:-}" in
   --selftest) run_selftest ;;
+  --corpo)    corpo_do_comentario "${2:-}" "${3:-}" "${4:-}" ;;
+  --texto)    texto_do_revisor "${2:-}" ;;
   -h|--help)  sed -n '2,40p' "$0"; exit 0 ;;
   *)          verdict "${1:-}" ;;
 esac

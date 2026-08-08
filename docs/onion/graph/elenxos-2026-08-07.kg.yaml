@@ -1,0 +1,262 @@
+meta:
+  id: elenxos-2026-08-07
+  schema_version: "1"
+  baseline: 2026-08-07
+  # Os QUATRO Elenxos de 2026-08-07 (#555, #556, #557, F4) como grafo, e nao como prosa.
+  # POR QUE ESTE ARQUIVO EXISTE: o maestro perguntou "voce esta colocando isso no kg corretamente?"
+  # e a medicao respondeu NAO — 55 grafos varridos, zero nos sobre os achados do dia; tudo vivia em
+  # 4 artefatos de revisao e 4 mensagens de commit. O no C_ANCORA_SOLTA_79PCT ja nomeia essa divida
+  # ("QUATRO EM CADA CINCO ORQUESTRACOES NAO DEIXARAM RASTRO NO GRAFO") e ~2,1M tokens de Elenxo
+  # tinham acabado de piorar o numero.
+  # O que entra aqui NAO e o resumo dos PRs (isso e trabalho dos artefatos de revisao): sao os
+  # achados que ATRAVESSAM PRs e por isso precisam de no, com as arestas que os ligam.
+
+nodes:
+  # ── O PADRAO QUE ATRAVESSA TRES SITIOS ──────────────────────────────────────────────────────
+  - id: C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: elenxo-556+varredura-dos-predicados-de-status-no-kg-radar-e-irmaos
+    label: "PADRAO, nao bug pontual: predicado escrito como ALLOWLIST (`== confirmed`, `confirmed || open`) QUEBRA quando o enum CRESCE; escrito como DENYLIST (`!= superseded && != refuted`) trata o valor novo POR CONSTRUCAO. Medido quando `drifted`/`unverifiable` entraram em 2026-08-06: as tres allowlists do kg-radar os engoliram EM SILENCIO enquanto as tres denylists do mesmo arquivo os trataram certo sem uma linha de mudanca"
+    trace: "docs/evolution/review/fix-radar-allowlist-denylist.md"
+
+  - id: E_ALLOWLIST_NO_RADAR_LATENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: corpus-de-55-grafos-137-arestas-SUPERSEDES
+    label: "SITIO 1 (curado no #556, LATENTE): tres allowlists no kg-radar.sh — origem de SUPERSEDES, alvo de SUPERSEDES, alvo de REFUTES. Alcance real ZERO no corpus (0 nos `drifted` em 2.095; os 35 alvos de origem nao-confirmed ja estavam superseded/refuted). Armava no primeiro selo que gravasse `drifted` num no que emite SUPERSEDES"
+    trace: "docs/evolution/review/fix-radar-allowlist-denylist.md"
+
+  - id: E_ALLOWLIST_NA_CATRACA_49_ATIVO
+    node_type: evidence
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: reproducao-propria-trocar-um-no-PROD-para-drifted-sem-carimbar
+    label: "SITIO 2 (NAO CURADO, e aqui o fail-open e ATIVO): kg-verification-coverage.sh:87,115 — a catraca da REGRA 49 — tem a MESMA allowlist, duplicada. Reproduzido por mim: trocar UM no plane:PROD impact 5 de `confirmed` para `drifted`, sem medir nem carimbar NADA, leva o gate de 48 para 47 no escopo e emite '[OBSOLETA] entrada OBSOLETA (no ja carimbado ou removido) — remova do baseline'. O gate AFIRMA um carimbo que nao existe e convida a encolher um baseline que so pode encolher por medicao. Destroi a propriedade fundadora escrita no cabecalho do proprio script: 'rodar o kg-freshness e a UNICA forma de diminuir o numero'"
+    trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+
+  - id: E_ALLOWLIST_NO_KG_VIEW
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-08-07
+    verified_against: elenxo-556-medicao-do-refutador-em-kg-view-json-vs-radar
+    label: "SITIO 3 (NAO CURADO): kg-view.sh:101-107 carrega uma COPIA de statusFactor que nao conhece os status novos — retorna -1, clampado a 0. Os nos mais urgentes do grafo renderizam com peso 0.0 na projecao, e `--assert-parity` passa VERDE porque so compara contagem de nos e arestas, nunca PESO"
+
+  - id: D_DENYLIST_E_A_FORMA_CERTA
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: PR-556-mergeado-7742d8d
+    label: "DECISAO (#556): predicado de status nomeia quem NAO conta, nunca quem conta. E a exclusao por TIPO quando o criterio e de tipo: `done` fica fora so para `question` — porque question fechada como done e o remedio que a propria secao prescreve, e excluir `done` de TODOS os tipos calava uma `decision` fechada e superada, que e o defeito exato que o arquivo cura. A razao antiga ('criaria 11 acusacoes novas') era verdadeira no numero e ERRADA no motivo: os 11 sao question, 11/11"
+    trace: "docs/evolution/review/fix-radar-allowlist-denylist.md"
+
+  # ── A TESE QUE OS TRES PRs CONFIRMARAM, CADA UM DE UM JEITO ─────────────────────────────────
+  - id: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: tres-instancias-medidas-em-PRs-independentes-no-mesmo-dia
+    label: "TESE: o defeito sobrevive exatamente onde nenhum teste olha, e o tempo de sobrevivencia mede a lacuna de cobertura, nao a raridade do bug. TRES instancias medidas em 2026-08-07, em PRs independentes: (1) o sitio de REFUTES que REPROVA era o unico sem cobertura — revertendo so ele, 0 diffs em 438 comparacoes; (2) o step de CI que posta era codigo sem selftest, e o revisor ficou invisivel por 15 commits; (3) a bancada de fixtures nao se verificava, e tres malformacoes identicas acusaram o SUT inocente por 4 rodadas"
+
+  - id: E_SITIO_HARD_SEM_COBERTURA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: elenxo-556-73-grafos-x-6-modos-438-comparacoes
+    label: "INSTANCIA 1: a contradicao de REFUTES e o UNICO sitio da troca allowlist->denylist que REPROVA (exit 1); os outros dois so avisam. E era o unico SEM COBERTURA NENHUMA: revertendo so essa chamada e comparando os dois binarios sobre 73 .kg.yaml x 6 modos, 0 diffs em 438 comparacoes. A linha que pode travar o CI era a que ninguem podia mexer com seguranca"
+
+  - id: E_STEP_DE_CI_SEM_SELFTEST
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: log-da-run-31200047905-job-92937606558+PRs-549-a-557
+    label: "INSTANCIA 2: o job onion-review rodava 41-46 turnos a ~US$1,27 por PR e os PRs #549..#557 tinham TODOS comments=0 e reviews=0. Nenhum teste olhava para o caminho de posting porque ele vivia dentro da action, fora do alcance da casa. O log da run mostra `permission_denials_count: 14` e `No buffered inline comments`"
+
+  - id: E_BANCADA_QUE_NAO_SE_VERIFICAVA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: PR-557-tres-defeitos-identicos-na-mesma-funcao
+    label: "INSTANCIA 3: escrevendo os selftests da REGRA 57, TRES defeitos identicos apareceram na mesma funcao — `$( )` come a quebra de linha FINAL e a linha seguinte cola na anterior (verified_at no label; label no `- id:` seguinte; `edges:` no ultimo label). Em todos, a fixture saia malformada e o caso acusava o SUT, que estava CERTO. Diagnosticar custou 4 rodadas"
+
+  - id: D_GUARDA_DA_BANCADA_NOMEIA_A_CAUSA
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: PR-557-mergeado-ee8067a+sabotagem-provada
+    label: "DECISAO (#557, a pedido explicito do maestro na 3a ocorrencia): a bancada passa a verificar o que ELA MESMA gerou. `_fixture_sane` compara o que o CASO pretendia (nos/arestas declarados na chamada) com o que o arquivo TEM, e falha dizendo 'BANCADA MALFORMADA … O SUT NAO foi exercido', isolando o campo corrompido. O esperado NAO pode vir da string de entrada: dois dos tres defeitos a corrompiam, e conta-la concordaria com o arquivo. Provada por sabotagem"
+    trace: "docs/evolution/review/feat-kg-seal-check.md"
+
+  # ── A PREMISSA FALSA DA F4, E A SUPERACAO ──────────────────────────────────────────────────
+  - id: C_F4_CAUSA_ERA_CREDENCIAL
+    node_type: claim
+    plane: PROD
+    status: refuted
+    impact: 4
+    confidence: 0.0
+    verified_at: 2026-08-07
+    verified_against: log-da-run-31200047905-OIDC-App-token-obtido
+    label: "SUPERADA (foi a premissa da 1a F4, por algumas horas): 'o revisor nao posta porque falta github_token'. REFUTADA por medicao no log real: a action faz OIDC->App token com contents/pull_requests/issues:write por default, e o log diz 'App token successfully obtained'. A credencial NUNCA faltou. Pior, passar github_token seria REGRESSAO: o override troca o App token por secrets.GITHUB_TOKEN, que e limitado pelo bloco permissions"
+
+  - id: E_CAUSA_REAL_ERA_FERRAMENTA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: log-da-run-31200047905+parser-real-da-action-parse-tools-ts
+    label: "A CAUSA REAL: falta de FERRAMENTA, nao de credencial. O `claude_args` nao declara `--allowedTools`, entao o servidor MCP de comentario inline nunca e instalado — e o buffer que o step final drena tem um unico produtor, que nao existe. Assinatura no log: `permission_denials_count: 14` (o revisor TENTOU e foi negado) e `No buffered inline comments`"
+
+  - id: D_REVISOR_DEVOLVE_ONION_POSTA
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: F4-refeita-json-schema-fail-closed+post-review-comment-sh
+    label: "DECISAO (F4, a pedido do maestro que recusou MCP e perguntou por SDAAL): o revisor deixa de POSTAR e passa a DEVOLVER o parecer, e o Onion posta pelo transporte do forge. Ganhos que a rota MCP nao teria: o posting vira SHELL e portanto TESTAVEL; sobrevive a mudanca de pin da action; funciona no modo de falha, onde nao ha `.result` mas ha `errors[]` e texto parcial de `assistant`. ESCOPO REAL DO QUE EMBARCOU: o parecer vem em PROSA formatada, nao em structured_output — ver E_JSON_SCHEMA_NAO_PASSA"
+
+  - id: E_JSON_SCHEMA_NAO_PASSA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: parser-real-da-action-shell-quote+CLI-do-pin+probe-do-SDK
+    label: "MEDIDO E REVERTIDO no mesmo PR, para ninguem tentar de novo: passar `--json-schema` por `claude_args` NAO funciona neste pin. O parser da action passa claude_args por `shell-quote`, que COME as aspas do JSON — 371 bytes entram, 253 saem, `JSON.parse` falha. O CLI real responde `Error: --json-schema is not valid JSON` e sai 1; o SDK morre em t=0 com ZERO mensagens e o execution_file sai `[]`; o review-verdict classifica `revisou=false / json-ilegivel` nas DUAS tentativas. Seria REGRESSAO ESTRITA: hoje o revisor roda 41 turnos com sucesso. Reabilitar exige passar o schema por ARQUIVO, e o input nao aceita isso no pin be7b93b"
+    trace: "docs/evolution/review/fix-revisor-invisivel.md"
+
+  - id: D_LACUNA_DA_SPEC_FECHA_NA_SPEC
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: interface-md-types-md-adapters-github-md-emendados-no-PR-da-F4
+    label: "DECISAO, e ela corrige o METODO da 1a versao (pergunta do maestro: 'a ideia do SDAAL nao e justamente criar as partes que faltam?'): SIM — e criar significa ESCREVER NA SPEC, nao contornar com script. A 1a versao implementou o modo sticky e o edit-por-id DENTRO do helper e chamou de 'extensao declarada'; a interface nao sabia que existiam, e o helper nasceu orfao. Corrigido: `updateReviewComment` e `ReviewCommentInput.upsertBy` entraram em interface.md/types.md/adapters, e o helper passa a CITAR. REGRA QUE FICA: quando um consumidor CONTORNA a abstracao, o defeito e da abstracao ate prova em contrario — o `gh api` cru do onion-review existia porque a operacao de EDITAR comentario nao existia sob nome nenhum"
+
+  - id: Q_SDAAL_EXECUTAVEL_ONDE_PARA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: uma-unica-peca-executavel-em-utils-forge
+    label: "ABERTO: a F4 abriu a primeira peca EXECUTAVEL dentro de `.claude/utils/forge/` — necessaria porque um step de Actions e shell puro e nao ha LLM para ler a spec. A regra declarada no README e 'materializar so o que tem consumidor nao-LLM MEDIDO', e hoje isso e um (o CI). Mas a fronteira e opiniao ate ser testada: qual e o gatilho para a 2a? E se forem 5, o SDAAL virou codigo com documentacao ao lado, que e o oposto do que a KB do padrao declara"
+
+  # ── A TENSAO QUE A F4 EXPOS NO PROPRIO PADRAO SDAAL ────────────────────────────────────────
+  - id: Q_SDAAL_NAO_TEM_CONSUMIDOR_SEM_LLM
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: zero-usos-do-adapter-forge-em-qualquer-workflow
+    label: "ABERTO, e a F4 so tapou o primeiro caso: o SDAAL e Markdown lido por LLM ('documentacao substitui codigo executavel'). Um step de GitHub Actions e SHELL PURO — nao ha LLM ali para ler a spec. Logo um workflow NUNCA pode 'chamar a abstracao', e foi por isso que o onion-review postava com `gh api` cru: sem isencao declarada, e literalmente a operacao que setup-code-review.md:71 manda fazer pelo adapter, no workflow que esse mesmo comando distribui. Medido: ZERO usos do adapter em qualquer workflow. A F4 materializou UMA operacao (addReviewComment, transporte cli). As outras 14 seguem sem consumidor nao-LLM"
+
+  - id: E_LINT_NAO_ENXERGA_WORKFLOWS
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-07
+    verified_against: escopo-das-REGRAS-10-e-11-em-lint-artifacts-sh
+    label: "POR QUE NINGUEM VIU: as REGRAS 10 e 11 (anti-provider-direto e forge-method-existe) varrem APENAS `.claude/commands` e `.claude/agents`. `.github/workflows/` e `.claude/validation/*.sh` estao FORA do alcance do linter. O mesmo vale para review-artifact-check.sh:87, que escreve 'pergunta-se ao forge' no comentario e chama `gh pr view` na linha seguinte"
+
+edges:
+  - from: E_JSON_SCHEMA_NAO_PASSA
+    to: D_REVISOR_DEVOLVE_ONION_POSTA
+    edge_type: CONSTRAINS
+  - from: D_LACUNA_DA_SPEC_FECHA_NA_SPEC
+    to: Q_SDAAL_NAO_TEM_CONSUMIDOR_SEM_LLM
+    edge_type: CONSTRAINS
+  - from: Q_SDAAL_EXECUTAVEL_ONDE_PARA
+    to: D_LACUNA_DA_SPEC_FECHA_NA_SPEC
+    edge_type: DEPENDS_ON
+  - from: E_ALLOWLIST_NO_RADAR_LATENTE
+    to: C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE
+    edge_type: SUPPORTS
+  - from: E_ALLOWLIST_NA_CATRACA_49_ATIVO
+    to: C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE
+    edge_type: SUPPORTS
+  - from: E_ALLOWLIST_NO_KG_VIEW
+    to: C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE
+    edge_type: SUPPORTS
+  - from: D_DENYLIST_E_A_FORMA_CERTA
+    to: C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE
+    edge_type: DEPENDS_ON
+  - from: D_DENYLIST_E_A_FORMA_CERTA
+    to: E_ALLOWLIST_NO_RADAR_LATENTE
+    edge_type: CAUSES
+
+  - from: E_SITIO_HARD_SEM_COBERTURA
+    to: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE
+    edge_type: SUPPORTS
+  - from: E_STEP_DE_CI_SEM_SELFTEST
+    to: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE
+    edge_type: SUPPORTS
+  - from: E_BANCADA_QUE_NAO_SE_VERIFICAVA
+    to: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE
+    edge_type: SUPPORTS
+  - from: D_GUARDA_DA_BANCADA_NOMEIA_A_CAUSA
+    to: E_BANCADA_QUE_NAO_SE_VERIFICAVA
+    edge_type: CAUSES
+
+  - from: E_CAUSA_REAL_ERA_FERRAMENTA
+    to: C_F4_CAUSA_ERA_CREDENCIAL
+    edge_type: REFUTES
+  - from: D_REVISOR_DEVOLVE_ONION_POSTA
+    to: E_CAUSA_REAL_ERA_FERRAMENTA
+    edge_type: DEPENDS_ON
+  - from: D_REVISOR_DEVOLVE_ONION_POSTA
+    to: E_STEP_DE_CI_SEM_SELFTEST
+    edge_type: CAUSES
+
+  - from: E_LINT_NAO_ENXERGA_WORKFLOWS
+    to: Q_SDAAL_NAO_TEM_CONSUMIDOR_SEM_LLM
+    edge_type: SUPPORTS
+  - from: D_REVISOR_DEVOLVE_ONION_POSTA
+    to: Q_SDAAL_NAO_TEM_CONSUMIDOR_SEM_LLM
+    edge_type: CONSTRAINS
+  - from: Q_SDAAL_NAO_TEM_CONSUMIDOR_SEM_LLM
+    to: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE
+    edge_type: SUPPORTS

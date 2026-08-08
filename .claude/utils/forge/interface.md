@@ -90,6 +90,14 @@ interface IForge {
 
   /**
    * Posta um comentário no PR (geral ou inline em arquivo/linha).
+   *
+   * MODO STICKY (`comment.upsertBy`): quando informado, procura um comentário do próprio bot que
+   * contenha essa marca e o EDITA em vez de criar outro — UM comentário por PR, atualizado.
+   * POR QUE É PARTE DA INTERFACE, e não truque de consumidor: a casa MEDIU no PR #529 que o
+   * workflow roda em `synchronize`, então 2 pushes viraram 2 comentários e 2 e-mails; e "alarme
+   * que chega repetido é alarme que se aprende a ignorar". A cura vivia dentro do YAML de um
+   * consumidor. Toda vez que a mesma lição precisa ser reaprendida por quem chama, ela pertence
+   * à abstração.
    */
   addReviewComment(prRef: PRRef, comment: ReviewCommentInput): Promise<ReviewCommentOutput>;
 
@@ -97,6 +105,17 @@ interface IForge {
    * Lista comentários de um PR (alvo do polling de feedback em /engineer/pr).
    */
   getReviewComments(prRef: PRRef): Promise<ReviewCommentOutput[]>;
+
+  /**
+   * EDITA um comentário existente, por id.
+   *
+   * POR QUE ENTROU (2026-08-07): esta operação FALTAVA, e a falta produziu `gh api` cru dentro do
+   * `onion-review.yml` — sem isenção declarada, e justamente a operação que `setup-code-review.md`
+   * manda fazer pelo adapter. O consumidor não tinha onde pôr, então contornou. Regra que isso
+   * ensina: quando um consumidor contorna a abstração, o defeito é da abstração até prova em
+   * contrário.
+   */
+  updateReviewComment(commentId: string, body: string): Promise<ReviewCommentOutput>;
 
   /**
    * Solicita reviewers para um PR.
@@ -157,7 +176,7 @@ interface IForge {
 |-----------|---------|-----------|
 | **Identificação** | `provider`, `transport`, `isConfigured` | Informações do adapter |
 | **Pull Requests** | `createPR`, `updatePR`, `getPR`, `getPRStatus`, `listPRs`, `mergePR` | Ciclo de vida do PR |
-| **Review** | `addReviewComment`, `getReviewComments`, `requestReviewers` | Feedback e revisão |
+| **Review** | `addReviewComment`, `updateReviewComment`, `getReviewComments`, `requestReviewers` | Feedback e revisão |
 | **CI/Checks** | `getCIStatus`, `getCheckRuns` | Estado de pipelines |
 | **Releases** | `createRelease`, `getRelease` | Releases no host |
 | **Validação** | `validateRepo`, `getProviderFromRemote` | Identidade e compatibilidade |
@@ -173,6 +192,7 @@ interface IForge {
 | `createPR` | `gh pr create` | `glab mr create` | `POST /pullrequests` |
 | `getPRStatus` | `gh pr view --json` | `glab mr view` | `GET /pullrequests/{id}` |
 | `addReviewComment` | `gh pr comment` | `glab mr note` | `POST .../comments` |
+| `updateReviewComment` | `gh api -X PATCH .../issues/comments/{id}` | `glab api -X PUT .../notes/{id}` | `PUT .../comments/{id}` |
 | `getCIStatus` | `gh pr checks` | `glab ci status` | `GET /commit/{sha}/statuses` |
 | `createRelease` | `gh release create` | `glab release create` | `POST /downloads` (parcial) |
 

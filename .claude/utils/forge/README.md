@@ -39,10 +39,30 @@ forge/
 ├── types.md           # Tipos compartilhados (PR/Review/CI/Release DTOs + enums)
 ├── detector.md        # Detecção de provider (FORGE_PROVIDER | URL do remote) + transporte
 ├── factory.md         # Factory getForge() + NoForgeAdapter
+├── post-review-comment.sh   # ⚙️ EXECUTÁVEL — ver nota abaixo
 └── adapters/
     ├── github.md      # Adapter GitHub (gh-first; REST fallback) — único implementado
     └── none.md        # NoForgeAdapter (Null Object) — local-only / offline
 ```
+
+### ⚙️ A exceção executável, e por que ela existe
+
+O SDAAL é **Markdown lido por LLM** — a spec *é* a implementação. `post-review-comment.sh` é a
+**única** peça executável desta pasta, e nasceu de uma lacuna estrutural medida em 2026-08-07:
+
+> Um step de GitHub Actions é **shell puro**. Não há LLM ali para ler a spec. Logo um workflow
+> **nunca pôde chamar a abstração** — e foi exatamente por isso que `onion-review.yml` postava
+> comentário com `gh api` cru, sem isenção declarada, sendo essa a operação que
+> `setup-code-review.md:71` manda fazer pelo adapter.
+
+Ele materializa `addReviewComment` (modo sticky) + `updateReviewComment` no transporte **`api`**,
+para consumidores que não são LLM. **Não é a abstração** — é transporte; quem pode ler a spec deve
+lê-la. E não abre precedente para 15 scripts soltos: a regra é **materializar só o que tem
+consumidor não-LLM medido**, e hoje isso é um (o CI). Toda nova materialização entra nesta lista.
+
+**Ordem obrigatória:** a operação nasce na `interface.md` **primeiro**; o executável a cita, nunca
+a estende. A 1ª versão deste script inverteu isso — implementou o sticky e o edit-por-id sem que
+existissem na interface, e nasceu órfão. Foi o Elenxo que pegou.
 
 ## Uso Rápido
 
