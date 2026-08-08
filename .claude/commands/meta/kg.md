@@ -312,6 +312,12 @@ uma vez e embutido**; o grafo se explica no cliente.
 bash .claude/validation/kg-radar.sh <arquivo> --radar          # atenção → ordem do tour
 bash .claude/validation/kg-radar.sh <arquivo> --reconcile      # REFUTES/SUPERSEDES → passos de Aufhebung
 bash .claude/validation/kg-radar.sh <arquivo> --freshness-tsv  # STALE → passo "o que re-verificar"
+bash .claude/validation/kg-radar.sh <arquivo> --open-tsv        # a FILA COMPLETA de trabalho aberto
+
+# a fila do CORPUS INTEIRO (o radar lê um grafo por vez; o laço é de quem chama):
+for f in $(git ls-files '*.kg.yaml' | grep -v /fixtures/); do
+  bash .claude/validation/kg-radar.sh "$f" --open-tsv
+done | sort -t$'\t' -k8 -rn | head -20
 bash .claude/validation/kg-view.sh  <arquivo> --json           # os ids canônicos (paridade com o radar)
 ```
 

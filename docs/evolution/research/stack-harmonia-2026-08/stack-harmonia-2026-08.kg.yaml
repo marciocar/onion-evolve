@@ -50,7 +50,7 @@ nodes:
   - id: C_waha_orfao_desligar
     node_type: claim
     plane: PROD
-    status: open
+    status: superseded
     impact: 5
     confidence: 0.9
     verified_at: 2026-08-01
@@ -61,7 +61,9 @@ nodes:
   - id: C_producao_nao_e_o_repo
     node_type: claim
     plane: PROD
-    status: open
+    status: refuted
+    verified_at: 2026-08-08
+    verified_against: rev-list-HEAD..origin-main-no-checkout-de-producao-do-bridge-0-a-frente-0-atras
     impact: 5
     confidence: 1.0
     verified_at: 2026-08-01
@@ -190,6 +192,33 @@ nodes:
     label: "ADR ACEITO (identidade + medicao): o Onion ganha 2a NATUREZA — framework template (copiado, soberano no repo do adotante) E servico hospedado (consumido na VPS do core). Invariante: o adotante pode usar TUDO do framework sem tocar a VPS; o servico e acrescimo OPCIONAL, jamais pre-requisito. DECISOES: (1) MEDIR PARA LIMITAR, nao cobrar por unidade — cobranca por GB/arquivo/usuario e o modelo PIPOCA que a diretriz D5 (ratificada 07-29) rejeita; cobranca por unidade exige OUTRO ADR. (2) 'MEDIDO != COBRAVEL' — o medidor nasce append-only e auditavel mesmo servindo so a observabilidade (primo do aceite!=entrega que custou 3 mensagens fantasma nesta sessao). (3) Unidade de conta = Organization do Logto, projetada de members.yaml (SSOT), com sub do ator. (4) Escopo fechado: so metadado numerico (ts/org/sub/recurso/quantidade/unidade + modelo) — conteudo exige ADR. (5) O painel de administracao NAO e ressuscitado: a refutacao se re-deriva FRESCA quando o gate abrir, e o gate agora e factual e barato — existe >=1 federado migrado ao Logto consumindo recurso hospedado? Hoje: 1 usuario no Logto, e o maestro. LIBERADO: medidor de IA (o dado nao existe hoje em lugar nenhum — portao 3 dos 5 portoes)"
     trace: "docs/analysis/onion-adr-hosted-service-identity-2026-08.md"
 
+  # ── RECONCILIAÇÃO de 2026-08-08 — e estes nós vivem AQUI de propósito ──────────────────────────
+  # O radar só enxerga arestas DENTRO de um arquivo. Escrevi a refutação e a política num grafo de
+  # backlog (fios-abertos.kg.yaml) e o `--reconcile` DESTE arquivo continuou cego: o nó mais quente
+  # daqui seguia mandando desligar uma ferramenta, sem revogação visível a nenhum modo. É a mecânica
+  # que eu mesmo escrevi no `meta:` do outro arquivo, mordendo quem a conhece.
+  - id: E_producao_alcancou_o_repo
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: rev-list-nos-dois-sentidos-no-checkout-de-producao-mais-status-porcelain-limpo
+    label: "REFUTA C_producao_nao_e_o_repo. O checkout de producao do bridge (/home/onion/onion-bridge, o WorkingDirectory do onion-vps-bridge.service) esta em `a1b6c87`, que e EXATAMENTE `origin/main` do proprio bridge: zero commits a frente, zero atras, arvore limpa. O commit que curou a deriva esta la e nomeia o que era: 'versiona o medidor de consumo de IA (existia so em producao)'. A deriva de 4 dias que o no registrava foi PAGA — e a consequencia epistemica que ele declarava (toda conclusao sobre o bridge tirada do main pode estar errada) deixa de valer."
+    trace: "/home/onion/onion-bridge"
+
+  - id: PO_ferramenta_da_vps_nao_se_encerra
+    node_type: policy
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: diretriz-do-maestro-2026-08-08-dada-depois-de-eu-propor-desligar-o-waha
+    label: "SUPERSEDE a conclusao de C_waha_orfao_desligar, e nao o dado dele. Diretriz permanente do maestro: ferramenta da VPS do Onion NAO se encerra por iniciativa de agente. NUNCA direcionar nem propor encerramento; o que se pode e SUGERIR COM CLAREZA alteracao ou superacao. O dado do no antigo segue valido e re-medido em 2026-08-08 (container de pe; a unica ocorrencia de waha/3999/whatsapp em todo o src/ de producao e um COMENTARIO em meter.ts:10; credenciais legiveis via docker inspect). O que muda e a ACAO: a superacao e tirar as credenciais do ambiente do container e perguntar QUAL consumidor a ferramenta deveria ter — 'sem consumidor hoje' e evidencia de que falta ligar, nao licenca para apagar."
+    trace: "docs/onion/graph/fios-abertos.kg.yaml"
+
 edges:
   - from: E_tres_erros_medidos
     to: D_sintese_reprovada
@@ -236,3 +265,9 @@ edges:
   - from: D_hosted_service_identity
     to: Q_publicar_ou_nao
     edge_type: CAUSES
+  - from: E_producao_alcancou_o_repo
+    to: C_producao_nao_e_o_repo
+    edge_type: REFUTES
+  - from: PO_ferramenta_da_vps_nao_se_encerra
+    to: C_waha_orfao_desligar
+    edge_type: SUPERSEDES

@@ -1,0 +1,91 @@
+meta:
+  id: open-queue-fixture
+  schema_version: "1"
+  baseline: 2026-08-01
+  # Fixture do `--open-tsv` e da DENYLIST do `--state`.
+  # Cobre os SETE status do enum, um por nó, para que a fronteira "é trabalho / não é" seja
+  # exercitada inteira. Os dois que a allowlist antiga perdia — `drifted` e `unverifiable` — têm
+  # impact ALTO de proposito: se sumirem, some o topo da fila, e o teste acusa pela ORDEM tambem.
+
+nodes:
+  - id: N_OPEN
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 1.0
+    label: "trabalho aberto comum"
+
+  - id: N_DRIFTED
+    node_type: claim
+    plane: DEV
+    status: drifted
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-05
+    verified_against: medicao-que-divergiu
+    label: "MEDIDO e o mundo andou — reconciliacao DEVIDA, o trabalho mais urgente que existe"
+
+  - id: N_UNVERIFIABLE
+    node_type: claim
+    plane: DEV
+    status: unverifiable
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-05
+    verified_against: tentou-medir-e-nao-deu
+    label: "pergunta aberta sobre MENSURABILIDADE — nunca zero, silenciar o nao-mensuravel e o oposto da doutrina"
+
+  - id: N_CONFIRMED
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-05
+    verified_against: medicao-que-bateu
+    label: "confirmado NAO e trabalho — peso alto de proposito, para provar que a denylist o exclui"
+
+  - id: N_DONE
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "feito — sai da fila"
+
+  - id: N_SUPERSEDED
+    node_type: claim
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 1.0
+    label: "outro no carrega a verdade agora — sai da fila"
+
+  - id: N_REFUTED
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 1.0
+    label: "caiu — sai da fila"
+
+edges:
+  - from: N_DRIFTED
+    to: N_OPEN
+    edge_type: SUPPORTS
+  - from: N_UNVERIFIABLE
+    to: N_OPEN
+    edge_type: SUPPORTS
+  - from: N_CONFIRMED
+    to: N_OPEN
+    edge_type: SUPPORTS
+  - from: N_DONE
+    to: N_OPEN
+    edge_type: SUPPORTS
+  - from: N_SUPERSEDED
+    to: N_OPEN
+    edge_type: SUPERSEDES
+  - from: N_REFUTED
+    to: N_SUPERSEDED
+    edge_type: REFUTES

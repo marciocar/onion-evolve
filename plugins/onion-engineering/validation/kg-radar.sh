@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]
+# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--schema|--triples]
 #      (sem flag = radar + state + reconcile + integrity + domain + provenance + freshness + schema)
 #
 # Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
@@ -51,6 +51,21 @@
 #                     Colunas: id·node_type·plane·status·impact·confidence·atenção·verified_at·
 #                     verified_against·trace·verdict. Escopo NÃO é "o flagado" — nó com verdict
 #                     OK entra igual (o caso que criou o fluxo mente COM carimbo do dia).
+#   FILA-ABERTA-TSV = a FILA COMPLETA de trabalho aberto, legível por máquina (irmão-máquina do
+#                     ESTADO, `--open-tsv`). Existe porque o ESTADO não pode servir a este
+#                     consumidor: ele EXCLUI o top-10 do radar (o que o faz complementar, e está
+#                     certo lá) e TRUNCA em 7 (display humano). Medido no corpus: 584 nós de
+#                     trabalho aberto em 46 grafos, e o único modo de leitura mostrava SETE.
+#                     Colunas: arquivo·id·node_type·plane·status·impact·confidence·atenção·
+#                     verified_at·trace·VEREDITO·label. A 1ª é o ARQUIVO porque o radar lê um grafo
+#                     por vez (arestas não cruzam arquivo) e a fila do corpus é o laço de quem chama.
+#                     ESCOPO por DENYLIST (`trabalhoPendente`): fora só `confirmed`/`done`/
+#                     `superseded`/`refuted`. `drifted` e `unverifiable` ENTRAM — são reconciliação
+#                     DEVIDA, e eram exatamente o que a allowlist do ESTADO perdia em silêncio.
+#                     VEREDITO: `STATUS-DESCONHECIDO` (fora do enum) · `SEM-STATUS` · `-`. Status
+#                     fora do enum recebe fator 1.3 e SOBE — clamp em 0 o mandava para o fim da
+#                     fila, que é onde o `--top N` corta: promessa de fail-visible entregando
+#                     fail-quiet por afundamento.
 #   TRIPLES         = grafo como triplas `from EDGE to [on evento]` p/ consumo por LLM
 #
 # Camadas (campo opcional `layer`, default audit — retrocompatível):
@@ -70,9 +85,9 @@ RADAR_SCHEMA="1"
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--schema|--triples]" >&2; exit 2; }
+[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--schema|--triples]" >&2; exit 2; }
 
-awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" '
+awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" '
 function statusFactor(s) {
   if (s == "open" || s == "confirmed") return 1.0
   # DRIFTED — o nó foi MEDIDO contra o vivo e a realidade DIVERGIU. Fator > 1.0 de propósito:
@@ -148,6 +163,19 @@ function supersederConta(s) { return (s != "open" && s != "refuted" && s != "sup
 # fecha o buraco. A razão antiga ("criaria 11 acusações novas") era CONVENIÊNCIA ocupando o lugar
 # do critério: verdadeira no número, errada no motivo.
 function alvoPendente(s, t) { return (s != "superseded" && s != "refuted" && !(s == "done" && t == "question")) }
+
+# O nó ainda é TRABALHO por fazer? Pergunta DIFERENTE das duas acima (que são sobre reconciliação),
+# por isso predicado próprio — o pecado é a MESMA pergunta respondida em dois lugares, não perguntas
+# distintas com nomes distintos.
+#
+# ⚠️ DENYLIST, e a forma importa mais que a lista. O `--state` nasceu com ALLOWLIST
+# (`nstatus[id] != "open"`), e em 2026-08-06 o enum cresceu POR BAIXO dela: `drifted` e
+# `unverifiable` são a saída do `/meta:kg-freshness` e significam **reconciliação DEVIDA** — o
+# trabalho mais urgente que existe. A allowlist os descartava em silêncio, e a fila de abertos ficava
+# cega justamente para o que acabou de provar que o mundo andou. Era o 4º sítio da mesma classe
+# (C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE, elenxos-2026-08-07); os outros três já foram curados.
+# Com denylist, um status NOVO entra na fila por default: fail-visible em vez de fail-open.
+function trabalhoPendente(s) { return (s != "confirmed" && s != "done" && s != "superseded" && s != "refuted") }
 
 function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["'\'']$/, "", s); return s }
 
@@ -346,6 +374,54 @@ END {
     exit 0
   }
 
+  # ══ A FILA COMPLETA DE TRABALHO ABERTO, LEGÍVEL POR MÁQUINA ═══════════════════════════════════
+  # Irmão-MÁQUINA do `--state`, como o `--freshness-tsv` é do `--freshness`. E existe porque o
+  # `--state` NÃO PODE servir a este consumidor, por duas decisões que estão CERTAS lá e são
+  # venenosas aqui:
+  #   · ele EXCLUI o top-10 do radar por construção (é o que o faz complementar, e está escrito no
+  #     bloco dele que sem isso 51% da saída — e 100% num grafo — repetia o radar);
+  #   · ele TRUNCA em 7 linhas, porque é display humano.
+  # Medido no corpus: 584 nós de trabalho aberto em 46 grafos, e o único modo de leitura mostra 7.
+  # Navegar o próprio backlog era impossível, e toda priorização feita assim era opinião.
+  #
+  # ORDEM: atenção desc — MESMA fórmula do `--radar`, e pelo mesmo motivo do `--freshness-tsv`:
+  # quem consome uma fila corta em `--top N`, e corte sobre ordem errada descarta o de maior peso.
+  #
+  # ESCOPO POR ARQUIVO, de propósito: o radar lê um grafo por vez (arestas não cruzam arquivo). A
+  # fila do corpus é o laço de quem chama — por isso a 1ª coluna é o ARQUIVO, sem a qual o id
+  # sozinho não localiza nada num corpus de 57 grafos.
+  if (mode == "--open-tsv") {
+    for (i = 1; i <= nn; i++) {
+      id = order[i]
+      if (!trabalhoPendente(nstatus[id])) continue
+      # ⚠️ STATUS DESCONHECIDO SOBE, NAO AFUNDA — e a diferenca entre fail-visible e fail-quiet.
+      # O comentario do `trabalhoPendente` promete que "um status NOVO entra na fila por default".
+      # Ele entrava — e o clamp em 0 o mandava para o FIM da fila ordenada por atencao, que e
+      # exatamente onde o `--top N` corta. Medido: no com `status: blocked` e impact 5 saia em 16o de
+      # 17, abaixo de nos de impact 1. Promessa de visibilidade entregando invisibilidade por
+      # afundamento — o mesmo modo de falha que o comentario do `refuted` neste arquivo ja nomeia
+      # ("apaga o sinal em vez de perde-lo"). 1.3 e a MESMA escolha ja tomada para `drifted`, e pelo
+      # mesmo motivo: status fora do enum e pergunta aberta sobre o proprio enum.
+      # Escopo LOCAL ao --open-tsv de proposito: mexer no clamp do --radar/--state mudaria a janela
+      # de top-10 e quebraria a complementaridade que funda o --state.
+      sf3 = statusFactor(nstatus[id]); if (sf3 < 0) sf3 = 1.3
+      oatt[id] = impact[id] * conf[id] * sf3 * (1 + deg[id])
+      oelegivel[id] = 1
+    }
+    on = asorti(oatt, osorted, "@val_num_desc")
+    for (i = 1; i <= on; i++) {
+      id = osorted[i]
+      if (!(id in oelegivel)) continue
+      printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.2f\t%s\t%s\t%s\t%s\n",
+        arq, id, ntype[id], (plane[id]=="" ? "-" : plane[id]), (nstatus[id]=="" ? "-" : nstatus[id]), impact[id], conf[id], oatt[id],
+        (verifiedAt[id] == "" ? "-" : verifiedAt[id]),
+        (traceInline[id] == "" ? "-" : traceInline[id]),
+        (nstatus[id] == "" ? "SEM-STATUS" : (statusFactor(nstatus[id]) < 0 ? "STATUS-DESCONHECIDO" : "-")),
+        label[id]
+    }
+    exit 0
+  }
+
   if (mode == "--all" || mode == "--radar") {
     print "══ RADAR — atenção (peso × centralidade) ══"
     for (i = 1; i <= nn; i++) {
@@ -388,7 +464,7 @@ END {
     nopen = 0
     for (i = 1; i <= nn; i++) {
       id = order[i]
-      if (nstatus[id] != "open") continue
+      if (!trabalhoPendente(nstatus[id])) continue    # DENYLIST: `drifted`/`unverifiable` SAO trabalho
       nopen++
       if (id in noRadar) continue                    # já visível no RADAR — não repetir
       satt[id] = ratt[id]

@@ -385,3 +385,52 @@ find .claude/agents -name "*.md" -type f ! -name "README.md" | wc -l
 **Versão:** 2.0 (Claude Code)  
 **Mantido por:** Sistema Onion Team
 
+
+---
+
+## 🖥️ Rotina de infraestrutura (VPS, branches, sessão)
+
+**Acrescentado em 2026-08-08.** O backlog de RISCO vive em
+[`fios-abertos.kg.yaml`](graph/fios-abertos.kg.yaml), onde o `kg-radar` ordena por peso e o gate de
+frescor envelhece o que ninguém tocou. Rotina não é risco: item cujo custo é **tempo**, não **erro**,
+não pode disputar atenção com item cujo custo é erro — é essa linha que impede o grafo de virar
+lista de tarefas. Cada item abaixo traz **como medir**, porque *"está limpo?"* respondido de memória
+é a forma de `declarado ≠ verificado` que esta casa persegue.
+
+### Branches
+
+| o quê | como medir | estado em 2026-08-08 |
+|---|---|---|
+| remotas mergeadas não deletadas | `gh pr list --state merged --limit 60 --json headRefName -q '.[].headRefName'` × `git branch -r` | ~40 — o **auto-delete no merge foi LIGADO** em 08/08, então o passivo para de crescer |
+| locais mortas | `git branch --merged main \| grep -v main` | 3 |
+| `discuss/*` paradas | `git for-each-ref --sort=committerdate --format='%(committerdate:short) %(refname:short)' refs/remotes/origin/discuss` | 4 paradas há ~27 dias, **35 commits** — decisão do maestro, não backlog de engenharia |
+
+⚠️ **Antes de apagar branch:** `git cherry main <branch>` marca `+` mesmo em PR mergeado por
+**squash** (o SHA some). Cruze com `gh pr list --state all`. E confira a árvore: branch **atrás** do
+main mostra diff de regressão — foi assim que a `feat/maestro-aside` pareceu trabalho pendente
+sendo 8683 deleções atrás.
+
+### `/tmp` na VPS
+
+```bash
+df -h /                                            # o número que importa
+sudo du -sh /tmp/* 2>/dev/null | sort -rh | head   # quem ocupa
+find /tmp -maxdepth 1 -name 'tmp.*' -type d | wc -l
+```
+
+**Medido em 2026-08-08:** disco em **26%** (287 G livres). `/tmp` tem 14 G, dos quais **8,6 G são de
+`/tmp/claude-1000`** (o próprio Claude Code), não dos sandboxes; dos 9.275 diretórios `tmp.*`,
+**6.608 estão vazios**.
+
+**Por que o limpador nunca dispara:** a política é `D /tmp 1777 root root 30d`, mas o
+`systemd-tmpfiles` usa o timestamp **mais recente** entre mtime/atime/ctime. O diretório mais antigo
+tem `mtime=2026-07-09` e **`atime=2026-08-07`** — qualquer varredura de `/tmp` (inclusive um `find`
+de diagnóstico) **rejuvenesce o atime e zera o relógio**. Nada consegue envelhecer 30 dias.
+
+### Higiene de sessão
+
+- **A bancada exige corrida SOLO** (`lint-selftest.sh`, ~13 min). Duas em paralelo produzem falha
+  falsa — já aconteceu, e a primeira foi lida como determinística.
+- **`consumed-mode-check.sh`** está desligado (zero consumidores) e sem `--selftest` próprio. Rodado
+  à mão, acha **4 modos de produção sem teste**. Não é rotina — é item no grafo
+  (`I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA`); fica citado aqui só para não parecer esquecido.
