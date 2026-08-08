@@ -5447,6 +5447,47 @@ run_kg_ratchet_direction_selftests() {
     record_pass "kg-catraca: (n) no que nao existe mais → SOFT REMOVIDO e exit 0 (distinto de reetiquetado — a distincao E a catraca)"
   else record_fail "kg-catraca: (n)" "classificacao/severidade errada (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
 
+  # (t) O SEPARADOR DE REGISTRO INTERNO — e o caso acusa a guarda punindo quem OBEDECE.
+  #     TAB e IFS-WHITESPACE: campo vazio SOME e o resto desliza. Cenario reproduzido: no MEDIDO e
+  #     CARIMBADO que nao tem campo `status` — o `ver` escorregava para a posicao do `st` e a guarda
+  #     emitia `HARD FUGA-DE-ESCOPO … status:2026-08-08`, acusando de FUGIR justamente quem acabou
+  #     de medir. `\037` (US) nao e whitespace, entao cada ocorrencia separa e o campo vazio fica.
+  #     LATENTE no corpus, e o numero vem COM o comando que o produz — numero sem comando dentro do
+  #     comentario de um caso que cura a REGRA 49 e o defeito da 49 cometido no instrumento:
+  #       git ls-files '*.kg.yaml' | grep -v /fixtures/ | xargs grep -hcE "^[[:space:]]*-[[:space:]]*id:"
+  #       → 2159 nos em 2026-08-08, ZERO sem campo `status` (e o kg-radar-integrity ja reprova isso).
+  #     Mas era REGRESSAO contra o script antigo, que emitia SOFT no mesmo cenario. A PROVA de que
+  #     este caso discrimina nao e o sweep — e rodar a bancada contra
+  #     `git show main:.claude/validation/kg-verification-coverage.sh`: da 1 FAIL, e o FAIL e este.
+  #     (O caso monta o cenario a mao em vez de usar `_scene49` DE PROPOSITO: a fixture do `_scene49`
+  #     sempre escreve `status`, e e a AUSENCIA dele que este caso mede. Nao "conserte" a duplicacao.)
+  d="$(mktemp -d)"; mkdir -p "$d/docs/onion/graph" "$d/.claude/validation"
+  printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: C_ALVO\n    node_type: claim\n    plane: PROD\n    impact: 5\n    status: confirmed\n    label: "x"\n' > "$d/docs/onion/graph/t.kg.yaml"
+  _commit49 "$d"
+  bash "${helper}" "$d" --emit-baseline > "$d/.claude/validation/kg-verification-baseline.txt" 2>/dev/null
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm b ) >/dev/null 2>&1
+  # o no e MEDIDO e CARIMBADO — e perde o campo `status` (o gatilho do colapso)
+  printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: C_ALVO\n    node_type: claim\n    plane: PROD\n    impact: 5\n    verified_at: 2026-08-08\n    label: "x"\n' > "$d/docs/onion/graph/t.kg.yaml"
+  _run49 "$d"
+  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="SOFT" && $2=="CARIMBADO"{c=1} $1=="HARD"{h=1} END{exit !(c && !h)}' && [ "${RC49}" -eq 0 ]; then
+    record_pass "kg-catraca: (t) campo vazio NAO desloca o registro — o no medido leva SOFT CARIMBADO e exit 0 (TAB e IFS-whitespace, \\037 nao)"
+  else record_fail "kg-catraca: (t)" "colapso de campo de volta (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
+
+  # (t2) O IRMAO DO (t): `plane` AUSENTE, o outro campo que colapsa. Achado pelo Elenxo, e o par
+  #      fecha os DOIS unicos campos do registro que podem faltar. Nao e fail-open (HARD nos dois),
+  #      mas em `main` a mensagem era MENTIROSA — `plane:5 impact:confirmed status:<vazio>`, com os
+  #      valores deslocados uma casa — e agora e verdadeira. Guarda cuja MENSAGEM mente ensina a
+  #      ignorar a guarda, que e a mesma familia do falso-positivo.
+  #      (nao ha commit aqui de proposito: o `prev` que a catraca le ja veio do commit do baseline
+  #      feito no (t). Um `git commit` sem nada a commitar sai 1, e sob `set -e` o subshell derruba
+  #      a suite — foi exatamente o que aconteceu na 1a escrita deste caso.)
+  printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: C_ALVO\n    node_type: claim\n    impact: 5\n    status: confirmed\n    label: "x"\n' > "$d/docs/onion/graph/t.kg.yaml"
+  _run49 "$d"
+  if printf '%s' "${OUT49}" | awk -F'\t' '$2=="FUGA-DE-ESCOPO" && $4 ~ /impact:5/ && $4 ~ /status:confirmed/{ok=1} END{exit !ok}'; then
+    record_pass "kg-catraca: (t2) com 'plane' ausente a mensagem diz a VERDADE (impact:5 status:confirmed), nao os campos deslocados uma casa"
+  else record_fail "kg-catraca: (t2)" "mensagem deslocada de volta: $(printf '%s' "${OUT49}" | cut -f4 | head -1 | cut -c1-120)"; fi
+  rm -rf "$d"
+
   # (o) MUTATION — devolver a ALLOWLIST faz o caso (i) parar de proteger.
   #     ⚠️ o caso (i) afirma uma AUSÊNCIA de acusação, e ausência é o que uma fixture MORTA entrega
   #     de graça: este teste sobreviveu a uma fixture sabotada de propósito em 2026-08-08. Por isso
