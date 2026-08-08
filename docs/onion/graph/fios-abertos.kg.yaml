@@ -156,17 +156,9 @@ nodes:
     status: open
     impact: 5
     confidence: 1.0
-    label: "Modo novo no `kg-radar.sh`, IRMAO do `--freshness-tsv` (que ja tem o bloco `elegivel[]`+`asorti` e ja pagou a cicatriz do bug de ordem-de-arquivo), emitindo a fila COMPLETA de abertos em TSV. A armadilha: implementa-lo como '`--state` com `--tsv`' herda a exclusao do top-10 e o truncamento em 7 — decisoes de DISPLAY HUMANO, corretas ali e venenosas numa fila."
+    label: "Modo novo no `kg-radar.sh`, IRMAO do `--freshness-tsv` (que ja tem o bloco `elegivel[]`+`asorti` e ja pagou a cicatriz do bug de ordem-de-arquivo), emitindo a fila COMPLETA de abertos em TSV. A armadilha: implementa-lo como '`--state` com `--tsv`' herda a exclusao do top-10 e o truncamento em 7 — decisoes de DISPLAY HUMANO, corretas ali e venenosas numa fila. VIAJA JUNTO, no MESMO PR: trocar o 4o predicado allowlist do radar (`--state`, `nstatus[id] != \"open\"`, verificado vivo hoje) por denylist — mesmo awk, mesmo teste, e e a licao de C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE (elenxos-2026-08-07) no ultimo sitio onde ela ainda nao foi aplicada."
     trace: ".claude/validation/kg-radar.sh"
 
-  - id: I_QUARTO_ALLOWLIST_NO_STATE
-    node_type: decision
-    plane: DEV
-    status: open
-    impact: 4
-    confidence: 1.0
-    label: "O 4o predicado allowlist do radar (`--state`, `nstatus[id] != \"open\"`) — verificado hoje, segue vivo. Viaja no MESMO PR da fila porque e o mesmo awk e o mesmo teste. E a licao de C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE (elenxos-2026-08-07) no ultimo sitio onde ela ainda nao foi aplicada."
-    trace: ".claude/validation/kg-radar.sh"
 
   - id: I_FECHAR_GIT_MV_E_REMOVIDO
     node_type: decision
@@ -210,7 +202,18 @@ nodes:
     status: open
     impact: 5
     confidence: 1.0
-    label: "Desligar o WAHA orfao (e girar `WAHA_API_KEY`/`WAHA_DASHBOARD_PASSWORD`, legiveis via `docker inspect`) e decidir a contencao do `bypassPermissions` — que e de PROCESSO (usuario dedicado, capacidades), nao de borda: o flip de identidade nao reduziu o que o agente pode fazer DEPOIS de entrar. Ambos verificados vivos hoje. Acao em producao: exige palavra do maestro, nao decisao minha."
+    label: "Reduzir exposicao SEM tocar na existencia da ferramenta. (1) WAHA: as credenciais `WAHA_API_KEY` e `WAHA_DASHBOARD_PASSWORD` sao legiveis via `docker inspect` — a superacao e tira-las do ambiente do container (arquivo de segredo, ou o mecanismo que a VPS ja usa), nao mexer no servico. Se o incomodo for 'esta de pe sem consumidor', a pergunta e QUAL consumidor ele deveria ter, nao se desliga. (2) `bypassPermissions`: a contencao e de PROCESSO (usuario dedicado, capacidades), nao de borda — o flip de identidade nao reduziu o que o agente pode fazer DEPOIS de entrar. Ambos verificados vivos hoje."
+    trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
+
+  - id: PO_FERRAMENTA_DA_VPS_NAO_SE_ENCERRA
+    node_type: policy
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-08
+    verified_against: diretriz-do-maestro-2026-08-08-apos-eu-propor-desligar-o-WAHA
+    label: "DIRETRIZ PERMANENTE do maestro, dada depois de eu propor desligar o WAHA: ferramenta da VPS do Onion NAO se encerra por iniciativa minha. NUNCA direcionar nem propor encerramento; o que se pode e SUGERIR COM CLAREZA alteracao ou superacao. Isto REVOGA a recomendacao de `C_waha_orfao_desligar` (stack-harmonia-2026-08, PROD/5, 'MELHOR ITEM DA LISTA INTEIRA — DESLIGAR O WAHA') como acao: o dado dela segue valido (esta de pe, sem consumidor no `src/`, credenciais legiveis), a CONCLUSAO nao. 'Sem consumidor hoje' e evidencia de que falta ligar, nao licenca para apagar — e quem decide o destino de uma ferramenta e o dono dela."
     trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
 
   - id: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
@@ -248,9 +251,6 @@ edges:
   - from: I_FILA_COMPLETA_DE_ABERTOS
     to: W0_FILA_DE_ABERTOS_LEGIVEL
     edge_type: SUPPORTS
-  - from: I_QUARTO_ALLOWLIST_NO_STATE
-    to: W0_FILA_DE_ABERTOS_LEGIVEL
-    edge_type: SUPPORTS
   - from: I_FECHAR_GIT_MV_E_REMOVIDO
     to: W1_METRICA_NAO_FORJAVEL
     edge_type: SUPPORTS
@@ -266,6 +266,9 @@ edges:
   - from: I_CONTER_O_QUE_ESTA_EXPOSTO
     to: W3_PRODUCAO_CONTIDA
     edge_type: SUPPORTS
+  - from: PO_FERRAMENTA_DA_VPS_NAO_SE_ENCERRA
+    to: I_CONTER_O_QUE_ESTA_EXPOSTO
+    edge_type: CONSTRAINS
   - from: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
     to: W4_REGRA_SEM_TESTE
     edge_type: SUPPORTS
