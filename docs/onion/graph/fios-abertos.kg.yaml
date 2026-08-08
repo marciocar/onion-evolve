@@ -152,11 +152,13 @@ nodes:
   # ── OS ITENS (compromisso, não achado) ──────────────────────────────────────────────────────
   - id: I_FILA_COMPLETA_DE_ABERTOS
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
     impact: 5
     confidence: 1.0
-    label: "Modo novo no `kg-radar.sh`, IRMAO do `--freshness-tsv` (que ja tem o bloco `elegivel[]`+`asorti` e ja pagou a cicatriz do bug de ordem-de-arquivo), emitindo a fila COMPLETA de abertos em TSV. A armadilha: implementa-lo como '`--state` com `--tsv`' herda a exclusao do top-10 e o truncamento em 7 — decisoes de DISPLAY HUMANO, corretas ali e venenosas numa fila. VIAJA JUNTO, no MESMO PR: trocar o 4o predicado allowlist do radar (`--state`, `nstatus[id] != \"open\"`, verificado vivo hoje) por denylist — mesmo awk, mesmo teste, e e a licao de C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE (elenxos-2026-08-07) no ultimo sitio onde ela ainda nao foi aplicada."
+    verified_at: 2026-08-08
+    verified_against: fila-emitida-sobre-os-57-grafos-do-corpus-594-linhas-e-o-no-que-a-allowlist-escondia
+    label: "FEITO, e o carimbo e a medicao, nao a declaracao: `--open-tsv` emitiu 594 linhas sobre o corpus inteiro (contra as 7 por grafo que o `--state` mostrava), e a denylist trouxe de volta `D_email_plus_logto_connector` — o no PENDENTE DE MAIOR ATENCAO do grafo da VPS (`unverifiable`, 8.0), que a allowlist escondia em silencio. 6 selftests, bancada 722/0/0. A COLHEITA (remover este no e a onda W0 no mesmo commit) acontece no MERGE, nao aqui — ate la o trabalho existe e nao esta em main. Modo novo no `kg-radar.sh`, IRMAO do `--freshness-tsv` (que ja tem o bloco `elegivel[]`+`asorti` e ja pagou a cicatriz do bug de ordem-de-arquivo), emitindo a fila COMPLETA de abertos em TSV. A armadilha: implementa-lo como '`--state` com `--tsv`' herda a exclusao do top-10 e o truncamento em 7 — decisoes de DISPLAY HUMANO, corretas ali e venenosas numa fila. VIAJA JUNTO, no MESMO PR: trocar o 4o predicado allowlist do radar (`--state`, `nstatus[id] != \"open\"`, verificado vivo hoje) por denylist — mesmo awk, mesmo teste, e e a licao de C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE (elenxos-2026-08-07) no ultimo sitio onde ela ainda nao foi aplicada."
     trace: ".claude/validation/kg-radar.sh"
 
 

@@ -1455,6 +1455,94 @@ MEOF
 # com o --radar (num grafo, 100%) — medido antes de commitar. A cura foi EXCLUIR o top-10 do radar
 # por construção. Estes testes existem para que essa exclusão não se perca: sem ela o modo volta a
 # ser vista filtrada do que já se via, e ninguém notaria.
+# ── `--open-tsv` · a FILA COMPLETA de trabalho aberto, e a DENYLIST que o `--state` não tinha ──
+# Bloco nascido da medição que fundou a onda: 584 nós de trabalho aberto em 46 grafos, e o único
+# modo de leitura mostrava SETE — porque o `--state` exclui o top-10 do radar (correto lá) e trunca
+# em 7 linhas (display humano). E porque era ALLOWLIST (`nstatus[id] != "open"`): quando `drifted` e
+# `unverifiable` entraram no enum em 2026-08-06, a fila ficou cega justamente para o que acabou de
+# provar que o mundo andou. Medido no corpus real ANTES de escrever: no grafo da VPS, o nó de MAIOR
+# atenção pendente (`D_email_plus_logto_connector`, 8.0, `unverifiable`) NÃO aparecia no `--state`.
+run_kg_open_queue_selftests() {
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  local fx="${FIX_DIR}/kg-reconcile/open-queue.kg.yaml"
+  if [ ! -f "${fx}" ]; then record_fail "kg-fila" "fixture ausente: ${fx}"; return; fi
+  local out st d mut out_int out_mut rc_intact rc_mutant
+
+  # ⚠️ Esta bancada roda com `set -euo pipefail` (linha 41). Captura-se a saída ANTES de grepar, e
+  # nunca `cmd; rc=$?` — as duas armadilhas custaram três defeitos em 2026-08-08.
+
+  # (a) FRONTEIRA — os 3 status de TRABALHO entram; os 4 FECHADOS ficam fora. Os fechados têm
+  #     impact 5 de propósito na fixture: se a denylist virar allowlist frouxa, eles aparecem.
+  out="$(bash "${radar}" "${fx}" --open-tsv 2>/dev/null || true)"
+  if printf '%s' "${out}" | awk -F'\t' '
+        $5=="open"||$5=="drifted"||$5=="unverifiable" {viv++}
+        $5=="confirmed"||$5=="done"||$5=="superseded"||$5=="refuted" {morto++}
+        END{exit !(viv==3 && morto==0)}'; then
+    record_pass "kg-fila: (a) os 3 status de trabalho entram (open/drifted/unverifiable), os 4 fechados ficam fora"
+  else record_fail "kg-fila: (a)" "fronteira errada: $(printf '%s' "${out}" | cut -f5 | sort | uniq -c | tr '\n' ' ')"; fi
+
+  # (b) ORDEM desc por atenção — quem consome fila corta em `--top N`, e corte sobre ordem errada
+  #     descarta o de MAIOR peso. É a mesma cicatriz que o `--freshness-tsv` já pagou.
+  if printf '%s' "${out}" | awk -F'\t' 'NR>1 && $8+0 > prev+0 {bad=1} {prev=$8} END{exit bad?1:0}'; then
+    record_pass "kg-fila: (b) ordenada por atencao DESC"
+  else record_fail "kg-fila: (b)" "fora de ordem: $(printf '%s' "${out}" | cut -f8 | tr '\n' ' ')"; fi
+
+  # (c) a 1a coluna e o ARQUIVO — sem ela o id sozinho nao localiza nada num corpus de 57 grafos,
+  #     e a fila cross-grafo (que e o consumidor) fica inutil.
+  if printf '%s' "${out}" | awk -F'\t' -v F="${fx}" '$1!=F{bad=1} END{exit (bad||NR==0)?1:0}'; then
+    record_pass "kg-fila: (c) 1a coluna e o arquivo de origem (a fila do corpus e o laco de quem chama)"
+  else record_fail "kg-fila: (c)" "coluna de arquivo ausente ou errada: $(printf '%s' "${out}" | head -1 | cut -f1)"; fi
+
+  # ⚠️ A FIXTURE DE (d)-(f) PRECISA SER GRANDE, e isso e calibragem medida, nao estetica: o `--state`
+  # EXCLUI o top-10 do radar por construcao. Na 1a escrita deste bloco usei 7 e 10 nos — o radar
+  # engoliu todos, o `--state` exibiu ZERO, e o caso (d) PASSOU com `nstate=0 <= 7`. Passe vacuo, na
+  # mesma sessao em que eu construi o `_prove_mutation` para caca-los. Com 22 nos (12 de atencao
+  # alta que enchem o radar + os 2 de reconciliacao no meio + 8 baixos), o `--state` exibe 7 e
+  # trunca — que e o comportamento que estes casos existem para medir.
+  d="$(mktemp -d)"
+  { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+    for i in $(seq 1 12); do printf '  - id: H_%02d\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 5\n    confidence: 1.0\n    label: "alto"\n' "$i"; done
+    printf '  - id: N_DRIFTED\n    node_type: claim\n    plane: DEV\n    status: drifted\n    impact: 3\n    confidence: 1.0\n    verified_at: 2026-08-05\n    verified_against: x\n    label: "reconciliacao devida"\n'
+    printf '  - id: N_UNVERIFIABLE\n    node_type: claim\n    plane: DEV\n    status: unverifiable\n    impact: 3\n    confidence: 1.0\n    verified_at: 2026-08-05\n    verified_against: x\n    label: "mensurabilidade aberta"\n'
+    for i in $(seq 1 8); do printf '  - id: L_%02d\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 1.0\n    label: "baixo"\n' "$i"; done
+    printf 'edges:\n'
+    for i in $(seq 2 12); do printf '  - from: H_%02d\n    edge_type: SUPPORTS\n    to: H_01\n' "$i"; done
+    printf '  - from: N_DRIFTED\n    edge_type: SUPPORTS\n    to: H_01\n  - from: N_UNVERIFIABLE\n    edge_type: SUPPORTS\n    to: H_01\n'
+    for i in $(seq 1 8); do printf '  - from: L_%02d\n    edge_type: SUPPORTS\n    to: H_01\n' "$i"; done
+  } > "$d/g.kg.yaml"
+
+  # (d) NAO TRUNCA — a razao de o modo existir.
+  out="$(bash "${radar}" "$d/g.kg.yaml" --open-tsv 2>/dev/null || true)"
+  st="$(bash "${radar}" "$d/g.kg.yaml" --state 2>/dev/null || true)"
+  local nfila nstate
+  nfila=$(printf '%s' "${out}" | grep -c . || true)
+  nstate=$(printf '%s' "${st}" | grep -cE '^ +[0-9.]+ +' || true)
+  if [ "${nstate}" -eq 0 ]; then
+    record_fail "kg-fila: (d)" "FIXTURE MORTA: o --state exibiu ZERO, entao 'a fila mostra mais que o --state' passaria por vacuidade"
+  elif [ "${nfila}" -eq 22 ] && [ "${nstate}" -eq 7 ]; then
+    record_pass "kg-fila: (d) fila emite os 22; o --state exibe 7 e trunca — nao truncar E a razao de o modo existir"
+  else record_fail "kg-fila: (d)" "fila=${nfila} (esperado 22) state=${nstate} (esperado 7)"; fi
+
+  # (e) A CURA DA ALLOWLIST no `--state`: `drifted`/`unverifiable` sao trabalho e tem de APARECER.
+  #     Medido no corpus real antes de escrever: o no de MAIOR atencao pendente do grafo da VPS
+  #     (`unverifiable`, 8.0) nao aparecia — a fila de abertos era cega para reconciliacao devida.
+  if printf '%s' "${st}" | grep -q 'N_DRIFTED' && printf '%s' "${st}" | grep -q 'N_UNVERIFIABLE'; then
+    record_pass "kg-fila: (e) o --state mostra drifted/unverifiable (a allowlist os perdia em silencio)"
+  else record_fail "kg-fila: (e)" "a fila de abertos segue cega para reconciliacao devida: ${st}"; fi
+
+  # (f) MUTATION — devolver a allowlist faz (e) parar de proteger. Passa pelo `_prove_mutation`, que
+  #     cobra as tres condicoes (mutacao aplicada · INTACTO satisfaz · MUTANTE nao).
+  mut="$d/radar-allow.sh"
+  sed 's/if (!trabalhoPendente(nstatus\[id\])) continue.*/if (nstatus[id] != "open") continue/' "${radar}" > "${mut}"
+  out_int="$(bash "${radar}" "$d/g.kg.yaml" --state 2>/dev/null || true)"
+  out_mut="$(bash "${mut}"   "$d/g.kg.yaml" --state 2>/dev/null || true)"
+  if printf '%s' "${out_int}" | grep -q 'N_DRIFTED'; then rc_intact=0; else rc_intact=1; fi
+  if printf '%s' "${out_mut}" | grep -q 'N_DRIFTED'; then rc_mutant=0; else rc_mutant=1; fi
+  _prove_mutation "kg-fila: (f) (MUT) com a allowlist de volta o --state perde o drifted — a denylist e load-bearing" \
+                  "${radar}" "${mut}" "${rc_intact}" "${rc_mutant}"
+  rm -rf "$d"
+}
+
 run_kg_state_selftests() {
   local radar="${SCRIPT_DIR}/kg-radar.sh"
   local sx="${FIX_DIR}/kg-reconcile"
@@ -7847,6 +7935,7 @@ run_kg_reconcile_selftests
 
 # Modo state — a fila de abertos, complementar ao radar por construção
 run_kg_state_selftests
+run_kg_open_queue_selftests
 run_kg_trace_resolve_selftests
 run_kg_seal_check_selftests
 run_post_review_comment_selftests
