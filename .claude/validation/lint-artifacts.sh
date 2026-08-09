@@ -708,6 +708,56 @@ check_consumed_modes() {
 }
 
 # ===========================================================================
+# REGRA 60 — Identificador de código em INGLÊS [HARD]
+# previne: identificador em pt-BR entrando no código porque só um revisor humano (ou LLM) o
+#   pegaria — e o gatilho social não se repete sozinho.
+#   ORIGEM (dano medido, não incômodo estético): o revisor de CI apontou esta classe em SEIS PRs
+#   de uma única sessão (#559, #562, #563, #565, #566 e um rename interno). Cada vez eu
+#   renomeei e cada vez voltou, porque a cura era disciplina. Esta casa já mediu que o gatilho
+#   eficaz de correção é SOCIAL — logo "vou prestar mais atenção" é cura nula.
+#   [[fix-must-become-mechanism]]
+#   O DESENHO FOI DECIDIDO POR MEDIÇÃO (PR #568), antes de existir uma linha de código:
+#   casando identificador INTEIRO, só 3 de 636 casavam — cobertura baixa demais, porque os
+#   achados reais eram COMPOSTOS (`semAspas`, `_lib_ao_lado`, `_dep_faltando`). Por SEGMENTO
+#   (split `_` + fronteira camelCase) contra lista SEM HOMÓGRAFO, pega 10 dos 12 históricos com
+#   ZERO falsos nos substitutos em inglês.
+#   NASCE COM BASELINE, como a REGRA 49 e a REGRA 45: 6 residuais anteriores à sessão ficam
+#   SOFT e ocorrência NOVA é HARD. Nascer HARD sobre dívida velha é como se ensina a desligar
+#   um gate — o CI reprovaria de cara por passado, não por regressão.
+#   SÓ IDENTIFICADOR, NUNCA COMENTÁRIO NEM STRING: a doutrina é código em inglês, PROSA EM
+#   pt-BR. Uma varredura minha à mão já errou assim no #565, acusando 48 "sobras" que eram
+#   todas comentário — grep que não distingue os dois esconde o verdadeiro no meio do falso.
+#   TETO DECLARADO: abreviação não é palavra (`arq`, `donenu` escapam), e identificador dentro
+#   de programa awk embutido em string não é lido.
+#   Toda a lógica vive em identifier-language-check.sh.
+# ===========================================================================
+check_identifier_language() {
+  local helper="${SCRIPT_DIR}/identifier-language-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in *.sh) : ;; *) return 0 ;; esac
+  fi
+  local out rc errf
+  rc=0; errf="$(mktemp)"
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${errf}")" || rc=$?
+  if [ "${rc}" -ge 2 ]; then
+    violation "HARD" "${helper}" "[idioma/NAO-EXECUTOU] o helper saiu com rc=${rc} — erro de EXECUCAO, nao veredito. stderr: $(head -c 300 "${errf}" | tr '\n' ' ')"
+    rm -f "${errf}"; return 0
+  fi
+  # rc=1 com stdout VAZIO e contradicao, nao conformidade — mesma fronteira que a REGRA 59 aprendeu.
+  if [ "${rc}" -eq 1 ] && [ -z "${out}" ]; then
+    violation "HARD" "${helper}" "[idioma/CONTRADICAO] o helper saiu 1 (=ha violacao) e NAO nomeou nenhuma — morreu no meio? stderr: $(head -c 300 "${errf}" | tr '\n' ' ')"
+    rm -f "${errf}"; return 0
+  fi
+  rm -f "${errf}"
+  # process substitution: `printf | while` mataria o incremento de HARD_COUNT no subshell.
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ "${sev}" = "HARD" ] || continue
+    violation "HARD" "${path}" "[idioma/${tag}] ${msg}"
+  done < <(printf '%s\n' "${out}")
+}
+
+# ===========================================================================
 # REGRA 58 — O backlog cumpre as promessas do próprio `meta:` [HARD]
 # previne: backlog que promete teto e carimbo no cabeçalho e não cobra nenhum dos dois — inchando
 #   até virar cemitério, ou declarando `done` sem medição, sem nada acusar.
@@ -3094,6 +3144,7 @@ check_review_artifact
 check_kg_seal
 check_kg_backlog
 check_consumed_modes
+check_identifier_language
 check_doctrine_freshness
 check_kg_born_marker
 check_ladder_integrity

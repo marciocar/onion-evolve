@@ -5556,6 +5556,98 @@ run_kg_verification_selftests() {
 #
 # ⚠️ CADA CASO ASSERE ALGO, nunca so invoca. Chamar o modo para "satisfazer o detector" e cerimonia:
 # transformaria o instrumento num contador de invocacoes, e um teste que nao pode falhar e ruido.
+# ── REGRA 60 — identificador de código em INGLÊS ──────────────────────────────────────────────
+# A classe foi apontada em SEIS PRs de uma sessão e a cura era disciplina. Cada caso aqui existe
+# porque uma escolha de desenho podia ter ido para o outro lado, e a medição decidiu (PR #568).
+run_identifier_language_selftests() {
+  local helper="${SCRIPT_DIR}/identifier-language-check.sh"
+  local words="${SCRIPT_DIR}/lib/pt-br-words.txt"
+  if [ ! -f "${helper}" ]; then record_fail "idioma" "helper ausente"; return; fi
+  local d rc out
+
+  # (a) o repo VIVO passa — sem isto os mutantes abaixo provariam o nada (fixture morta)
+  rc=0; out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "idioma: (a) o repo vivo PASSA (os residuais estao no baseline, o novo e que e HARD)"
+  else record_fail "idioma: (a)" "o repo real ja reprova (rc=${rc}): $(printf '%s' "${out}" | head -c 200)"; fi
+
+  _lang_repo() { # $1=dir  $2=conteudo do script novo
+    mkdir -p "$1/.claude/validation/lib"
+    cp "${helper}" "$1/.claude/validation/"; cp "${words}" "$1/.claude/validation/lib/"
+    cp "${REPO_ROOT}/.claude/validation/identifier-language-baseline.txt" "$1/.claude/validation/" 2>/dev/null || :
+    printf '%s\n' "$2" > "$1/.claude/validation/novo.sh"
+    ( cd "$1" && git init -q . && git add -A ) >/dev/null 2>&1
+  }
+
+  # (b) identificador NOVO em pt-BR e HARD, nomeando o SEGMENTO que o condenou
+  # ⚠️ A FIXTURE E MONTADA EM PEDACOS de proposito: escrita inteira, a linha `local <pt>=0` ficaria
+  #    literal NESTE arquivo e o proprio extrator a leria como declaracao REAL — a bancada viraria a
+  #    maior fonte de violacoes da regra que ela testa. Achado pelo caso (a) na 1a corrida.
+  d="$(mktemp -d)"; _lang_repo "$d" "#!/usr/bin/env bash
+local $(printf 'contagem')_de_erros=0"
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'IDIOMA-DE-IDENTIFICADOR' && printf '%s' "${out}" | grep -q 'contagem'; then
+    record_pass "idioma: (b) identificador NOVO em pt-BR e HARD, nomeando o segmento culpado"
+  else record_fail "idioma: (b)" "nao acusou ou nao nomeou o segmento (rc=${rc}): $(printf '%s' "${out}" | head -c 200)"; fi
+  rm -rf "$d"
+
+  # (c) CAMELCASE — o par de (b). Casando so por `_`, `semAspas` escaparia; e era EXATAMENTE a forma
+  #     dos achados reais. A medicao do #568 mostrou 3 de 636 por palavra inteira contra 10 de 12
+  #     por segmento — este caso amarra essa decisao.
+  d="$(mktemp -d)"; _lang_repo "$d" "#!/usr/bin/env bash
+function sem$(printf 'Aspas')() { :; }"
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'aspas'; then
+    record_pass "idioma: (c) camelCase e quebrado — \`semAspas\` acusa por \`aspas\` (a forma dos achados reais)"
+  else record_fail "idioma: (c) camelCase" "o split nao quebrou camelCase (rc=${rc}): $(printf '%s' "${out}" | head -c 200)"; fi
+  rm -rf "$d"
+
+  # (d) INGLES NAO ACUSA — o falso-positivo e o que mata a guarda. Os quatro nomes aqui sao os
+  #     substitutos REAIS que usei nos renames desta sessao.
+  d="$(mktemp -d)"; _lang_repo "$d" '#!/usr/bin/env bash
+local unquoted=1 _lib_beside=2 _missing_deps=3 dirty_before=4 total=5 base=6 final=7'
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "idioma: (d) identificador em ingles NAO acusa — inclui homografo (total/base/final)"
+  else record_fail "idioma: (d) falso-positivo" "acusou ingles (rc=${rc}): $(printf '%s' "${out}" | head -c 250)"; fi
+  rm -rf "$d"
+
+  # (e) COMENTARIO E PROSA, e prosa e pt-BR POR DOUTRINA. Uma varredura minha a mao ja errou assim
+  #     no PR #565, acusando 48 "sobras" que eram todas comentario.
+  d="$(mktemp -d)"; _lang_repo "$d" '#!/usr/bin/env bash
+# o teto do arquivo e a linha de saida do grafo, com aspas e vereditos
+local ok=1'
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "idioma: (e) COMENTARIO em pt-BR nao acusa — a doutrina e codigo em ingles, PROSA em pt-BR"
+  else record_fail "idioma: (e) acusou comentario" "a guarda cobrou o oposto do padrao (rc=${rc}): $(printf '%s' "${out}" | head -c 250)"; fi
+  rm -rf "$d"
+
+  # (f) FAIL-LOUD: lista ausente e exit 2, nunca "nenhuma violacao". Fonte ausente jamais vira
+  #     aprovacao (P0 da REGRA 30) — e um repo sem a lista e indistinguivel de um repo limpo para
+  #     quem so olha o exit code 0.
+  d="$(mktemp -d)"; _lang_repo "$d" "#!/usr/bin/env bash
+local $(printf 'contagem')=1"
+  rm -f "$d/.claude/validation/lib/pt-br-words.txt"
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ] && printf '%s' "${out}" | grep -q 'AUSENTE'; then
+    record_pass "idioma: (f) lista ausente -> exit 2 NOMEANDO o arquivo (fail-loud, nunca aprovacao)"
+  else record_fail "idioma: (f)" "lista ausente nao deu exit 2 (rc=${rc}): $(printf '%s' "${out}" | head -c 200)"; fi
+  rm -rf "$d"
+
+  # (g) A LISTA NAO PODE CONTER HOMOGRAFO. Guarda-da-guarda: se alguem acrescentar `base`, `total`,
+  #     `local` ou `final`, a REGRA 60 passa a acusar ingles legitimo em massa — falso-positivo em
+  #     regra HARD e a corrente que o Elenxo do #566 reconstruiu.
+  local homografo
+  # ⚠️ `|| true` OBRIGATORIO: aqui NAO ACHAR e o resultado DESEJADO, e `grep` que nao acha sai 1 —
+  #    `x="$(cmd)"` sob `set -e` ABORTA a suite inteira. E a 4a vez que esta armadilha morde nesta
+  #    sessao, e as quatro foram em casos onde o silencio do comando E a conformidade.
+  homografo="$(grep -xE '(base|total|local|global|final|normal|real|original|nota|via|data|error|nome)' "${words}" 2>/dev/null | tr '\n' ' ' || true)"
+  if [ -z "${homografo}" ]; then
+    record_pass "idioma: (g) a lista NAO contem homografo com ingles (o criterio que impede falso-positivo em massa)"
+  else record_fail "idioma: (g) homografo na lista" "estas palavras tambem sao inglesas e acusariam codigo legitimo: ${homografo}"; fi
+}
+
 run_consumed_modes_selftests() {
   local d out rc
   # (0) O PROPRIO detector, no modo que a REGRA 59 consome. Ao ligar a regra, o lint passou a
@@ -8753,6 +8845,7 @@ run_kg_verification_selftests
 run_kg_ratchet_direction_selftests
 run_kg_backlog_selftests
 run_consumed_modes_selftests
+run_identifier_language_selftests
 run_safe_count_selftests
 run_scan_sanity_selftests
 run_generator_failure_selftests
