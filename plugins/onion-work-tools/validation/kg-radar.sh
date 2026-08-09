@@ -83,37 +83,16 @@ set -euo pipefail
 # incompatível — o gate de SCHEMA recusa arquivos que declaram outra versão (proposta #1).
 RADAR_SCHEMA="1"
 
+# SITIO UNICO do fator de status. FAIL-LOUD se faltar: fonte ausente nunca vira aprovacao.
+_LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/status-factor.awk"
+[ -f "${_LIB}" ] || { echo "kg-radar: lib/status-factor.awk AUSENTE (${_LIB}) — o fator de status vive la, e sem ele o radar nao sabe pesar nada." >&2; exit 2; }
+STATUS_FACTOR="$(cat "${_LIB}")"
+
 FILE="${1:-}"
 MODE="${2:---all}"
 [ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--schema|--triples]" >&2; exit 2; }
 
-awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" '
-function statusFactor(s) {
-  if (s == "open" || s == "confirmed") return 1.0
-  # DRIFTED — o nó foi MEDIDO contra o vivo e a realidade DIVERGIU. Fator > 1.0 de propósito:
-  # um nó que acabou de provar que o mundo andou é MAIS urgente que um confirmado de mesmo peso,
-  # porque alguém precisa reconciliar. Ele SOBE no radar, não desce.
-  #
-  # POR QUE ESTE SLOT PRECISOU EXISTIR (verificado em sandbox, 2026-08-06, com o status como
-  # ÚNICA variável): sem ele, selar um drift só tinha dois caminhos, e ambos são fail-open —
-  #   · gravar `drifted`  → exit 1, "status inválido": o gate RECUSA o selo;
-  #   · gravar `refuted`  → statusFactor 0.0 ⇒ atenção 10,0 vira 0 e o nó SOME do radar.
-  # O segundo é pior que o vazamento que ele curaria: apaga o sinal em vez de perdê-lo. O
-  # terceiro caminho, praticado por falta de slot, foi apensar nós à mão (o grafo de identidade
-  # fez isso em 2026-08-04: 16 nós novos porque o campo não existia).
-  # Achado pelo Elenxo sobre as decisões de norte — a Fase "selo mecânico" teria nascido como
-  # fábrica de fail-open se o schema viesse depois. SCHEMA PRIMEIRO.
-  if (s == "drifted") return 1.3
-  # UNVERIFIABLE — mediu-se e NÃO deu para verificar (método não derivável, medição exigiria
-  # mutação, alvo fora do repo). Continua tão urgente quanto `open`: é pergunta aberta sobre
-  # MENSURABILIDADE, não resposta. Nunca 0 — silenciar o que não se sabe medir é o oposto do
-  # declarado!=verificado.
-  if (s == "unverifiable") return 1.0
-  if (s == "refuted") return 0.0
-  if (s == "superseded") return 0.2
-  if (s == "done") return 0.1
-  return -1  # inválido
-}
+awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" "${STATUS_FACTOR}"'
 # ── DENYLIST, NÃO ALLOWLIST — a lição de 2026-08-07 ─────────────────────────────────────────
 # Quando `drifted`/`unverifiable` entraram (2026-08-06), os predicados escritos como ALLOWLIST
 # (`== "confirmed"`, `confirmed || open`) os deixaram de fora EM SILÊNCIO, enquanto os escritos

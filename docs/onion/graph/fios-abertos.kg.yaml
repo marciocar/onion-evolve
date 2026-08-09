@@ -128,29 +128,35 @@ nodes:
 
   - id: I_FECHAR_GIT_MV_E_REMOVIDO
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
+    verified_at: 2026-08-09
+    verified_against: um-git-mv-para-fixtures-passou-de-5-SOFT-exit-0-para-5-HARD-exit-1-medido-em-sandbox
     impact: 5
     confidence: 1.0
-    label: "As duas portas que encolhem o baseline sem verificacao: `git mv` para qualquer `fixtures/` (resolver a chave por hash em TODO o universo antes de concluir remocao, mais classe MUDOU-DE-PATH para o rename legitimo) e `REMOVIDO` como SOFT (verificado hoje: `emit SOFT REMOVIDO` segue la). Fato ja registrado em Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE (catraca-regra49-2026-08); aqui mora o compromisso."
+    label: "PAGO no #562. `git mv` de UM grafo para `fixtures/` tirava CINCO entradas do baseline com `exit 0` e o gate MANDANDO remove-las; agora sao CINCO HARD MUDOU-DE-PATH e `exit 1`. Apagar o no virou HARD REMOVIDO, e o `mv` LEGITIMO (chave reescrita) segue `exit 0` — a cura nao pune conformidade. O universo passou a varrer TUDO com 7a coluna de escopo: resolver a chave exige o corpus inteiro, filtrar o escopo e OUTRA pergunta."
     trace: ".claude/validation/kg-verification-coverage.sh"
 
   - id: I_IFS_PARA_037
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
+    verified_at: 2026-08-09
+    verified_against: no-medido-e-carimbado-sem-campo-status-passou-de-HARD-FUGA-para-SOFT-CARIMBADO
     impact: 4
     confidence: 1.0
-    label: "Trocar `IFS=$'\\t'` por `\\037` nos sitios internos — verificado hoje: ZERO ocorrencias de `037` no arquivo, a migracao nao comecou. TAB e IFS-whitespace, entao campo vazio some e o resto desliza: um no MEDIDO levava HARD FUGA-DE-ESCOPO com `status:2026-08-08` na mensagem. Sozinho num PR de proposito — mudanca mecanica de alto alcance sobre o desempacotador, e misturar semantica torna o bisect inutil."
+    label: "PAGO no #561. TAB e IFS-whitespace: campo vazio some e o resto desliza, e a guarda acusava de FUGIR (`status:2026-08-08`) justamente quem tinha acabado de MEDIR e carimbar. 10 sitios internos migrados para `\037`; o TSV de saida fica em TAB, que e contrato externo. O Elenxo confirmou os 10 load-bearing por mutacao um a um."
     trace: ".claude/validation/kg-verification-coverage.sh"
 
   - id: I_STATUSFACTOR_EM_SITIO_UNICO
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
+    verified_at: 2026-08-09
+    verified_against: zero-copias-em-script-mais-lente-de-0.00-para-8.00-no-no-unverifiable-do-grafo-da-vps
     impact: 4
     confidence: 1.0
-    label: "Pagar E_ALLOWLIST_NO_KG_VIEW (elenxos-2026-08-07) com SITIO UNICO. MEDIDO com `git grep` (nao `grep -rl` sobre o filesystem, que conta lixo de worktree): sao CINCO scripts versionados com `function statusFactor` — kg-radar, kg-view, e as tres copias em plugins/. E o `--assert-parity` tem de passar a comparar PESO: hoje ele compara so CONTAGEM de nos e arestas, entao duas lentes podem concordar em quantos nos existem e discordar em QUAL e o mais urgente — que e a unica pergunta que o painel responde. ⚠️ A justificativa que eu dei para adiar ('latente, grafo sem lente') foi REFUTADA no mesmo dia: `kg-view --json` roda naquele grafo com rc=0."
+    label: "PAGO nesta branch. Eram CINCO scripts com `function statusFactor`, dois deles defasados: a lente pesava 0.00 o no `D_email_plus_logto_connector` (`unverifiable`) que o radar pesa 8.00 — e o `--assert-parity` nao via, porque comparava CONTAGEM. Agora ha UM arquivo (`lib/status-factor.awk`), ausencia dele e `exit 2` NOMEANDO o arquivo, e a paridade compara a SOMA DOS PESOS. ⚠️ A 1a versao da comparacao de peso olhava so o TOPO e passou VERDE no mutante, porque o no afetado nao era o topo daquele grafo — cobrir ramo sem o caso real, dentro da propria cura."
     trace: ".claude/validation/kg-view.sh"
 
   - id: I_PRIMEIROS_CINCO_NOS_DO_BASELINE

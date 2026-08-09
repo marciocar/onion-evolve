@@ -77,11 +77,24 @@ add() { warn="${warn}
 # anterior. Cobre os dois casos reais (o pipe-e-$?-na-mesma-linha e o `cmd | tail` seguido de
 # `echo $?` na linha de baixo) e mata o cross-statement.
 # `set -o pipefail` em qualquer lugar do comando desarma — quem o declara já sabe do problema.
+# CORREÇÃO 2026-08-09 (3ª classe de falso-positivo achada POR USO — CINCO disparos numa sessão):
+# a proximidade contava `|` DENTRO DE ASPAS como pipe de shell. O caso real, repetido cinco vezes:
+#     bash algo.sh > arquivo 2>&1
+#     echo "rc=$?"; grep -E 'Passaram|Falharam|ABORTOU' arquivo
+# O `$?` vem de um REDIRECT (correto) e o único `|` está no PADRÃO do grep — a guarda acusava assim
+# mesmo. Agora os trechos entre aspas saem ANTES do teste; o que resta é sintaxe de shell, que é o
+# que a heurística sempre quis olhar.
+# GUARDA QUE GRITA ERRADO ENSINA A IGNORAR A GUARDA — é a mesma família dos falsos-positivos HARD
+# que esta casa vem curando nos gates do KG, e por isso vale o mesmo rigor: as duas direções foram
+# medidas (cala no redirect-com-grep; dispara em `find | tail` + `$?` e em `ls | wc -l; echo $?`).
 case "$cmd" in *pipefail*) : ;; *)
   if printf '%s\n' "$cmd" | awk '
-      { cur = $0
-        if (cur ~ /\$\?/ && (cur ~ /\|/ || prev ~ /\|/)) { found = 1; exit }
-        if (cur ~ /[^ \t]/) prev = cur       # linha em branco não quebra a vizinhança
+        function semAspas(s) {          # entre aspas, `|` e TEXTO (padrao de grep), nao pipe
+          gsub(/'"'"'[^'"'"']*'"'"'/, "", s); gsub(/"[^"]*"/, "", s); return s
+        }
+      { cur = $0; nu = semAspas(cur)
+        if (cur ~ /\$\?/ && (nu ~ /\|/ || prevNu ~ /\|/)) { found = 1; exit }
+        if (cur ~ /[^ \t]/) { prev = cur; prevNu = nu }       # linha em branco não quebra a vizinhança
       }
       END { exit(found ? 0 : 1) }'; then
     add 'EXIT-CODE-DE-PIPE: você leu `$?` logo depois de um pipe — ele é do ÚLTIMO elemento (o `tail`/`head`/`grep`), não do comando que interessa. Rode o comando sozinho e capture `$?` na linha seguinte, ou use `set -o pipefail`.'

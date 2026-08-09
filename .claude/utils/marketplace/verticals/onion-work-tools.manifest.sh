@@ -36,6 +36,8 @@ UTILS=(".claude/utils/diagnose")
 # Motores determinísticos que os comandos cabeiam (kg→radar+console; diary→index; constellation→map).
 VALIDATION=(
   ".claude/validation/kg-radar.sh"
+  # SITIO UNICO do fator de status — sem ele o radar e a lente saem 2 (fail-loud, nunca default).
+  ".claude/validation/lib/status-factor.awk"
   ".claude/validation/kg-console.sh"
   # O console rico depende da lente (kg-view --json) e do renderer VENDORIZADO inline.
   # Sem estes dois, o kg-console.sh degrada gracioso (exit 3) — o door perderia a visualização.

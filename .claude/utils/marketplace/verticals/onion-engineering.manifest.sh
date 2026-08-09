@@ -33,7 +33,11 @@ UTILS=()
 # (pesquisa wf_ab57a814-c16 / docs/evolution/research/onion-tier-matrix-2026-07). Viaja o SCRIPT
 # (determinístico, awk/python/jq), nunca o DADO — o door gera seus próprios .kg.yaml soberanos
 # (public-door-vs-private-core.md §5). O assembler copia+reescreve o path (assemble-plugin.sh VALIDATION[]).
-VALIDATION=(".claude/validation/kg-radar.sh")
+# O fator de status vive em SITIO UNICO (lib/status-factor.awk) desde 2026-08-09 — a copia que
+# vivia dentro do kg-view DIVERGIU do radar e passou a pesar ZERO os nos `drifted`/`unverifiable`.
+# Sem a lib no bundle, o radar empacotado sai 2 com mensagem, nunca com fator errado em silencio
+# (medido: foi exatamente o que este plugin fez na 1a montagem sem ela).
+VALIDATION=(".claude/validation/kg-radar.sh" ".claude/validation/lib/status-factor.awk")
 # Skill de contexto: contrato SSOT mínimo + resolver de technical-context (torna a vertical
 # auto-suficiente em repos não-adotados). Ver .claude/skills/onion-engineering-context/.
 SKILLS=(".claude/skills/onion-engineering-context")

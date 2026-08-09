@@ -42,6 +42,12 @@ if [ -z "${FILE}" ] || [ ! -f "${FILE}" ]; then
 fi
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# SITIO UNICO do fator de status — a copia daqui e a que DIVERGIU: quando `drifted`/`unverifiable`
+# entraram no enum em 2026-08-06, o radar ganhou os slots e esta lente NAO, devolvendo -1 (clampado
+# a 0) nos nos mais urgentes. FAIL-LOUD se faltar: fonte ausente nunca vira aprovacao.
+_LIB="${HERE}/lib/status-factor.awk"
+[ -f "${_LIB}" ] || { echo "kg-view: lib/status-factor.awk AUSENTE (${_LIB}) — o fator de status vive la." >&2; exit 2; }
+STATUS_FACTOR="$(cat "${_LIB}")"
 
 # A saída precisa ser IDÊNTICA vinda de caminho relativo ou absoluto — senão a
 # lente "driftaria" só por causa de quem a invocou, e o drift-guard (REGRA 31)
@@ -85,6 +91,38 @@ if [ "${MODE}" = "--assert-parity" ]; then
   fi
   v_n="$(bash "$0" "${FILE}" --json | grep -oE '"node_count":[0-9]+' | grep -oE '[0-9]+')"
   v_e="$(bash "$0" "${FILE}" --json | grep -oE '"edge_count":[0-9]+' | grep -oE '[0-9]+')"
+    # ⚠️ PARIDADE DE **PESO**, e nao so de contagem — a contagem sozinha era o buraco.
+    # As duas lentes podiam concordar em QUANTOS nos existem e discordar em QUAL e o mais urgente,
+    # que e a unica pergunta que o painel responde. Foi o que aconteceu: a copia do `statusFactor`
+    # daqui nao conhecia `drifted`/`unverifiable` e devolvia PESO ZERO neles (medido: 0.00 contra
+    # 8.00 do radar, no no `D_email_plus_logto_connector`), enquanto as contagens batiam e a guarda
+    # saia VERDE. Compara-se o TOPO por atencao — id e valor.
+    # ⚠️ SO O TOPO NAO BASTA — medido: mutando `unverifiable` para -1 na lib, a guarda passou VERDE,
+    # porque o no afetado (8.00) nao era o topo daquele grafo (14.40). Cobrir o ramo sem o caso real.
+    # A SOMA dos pesos pega QUALQUER divergencia, no ou nao no topo.
+    r_sum="$(bash "${HERE}/kg-radar.sh" "${FILE}" --open-tsv 2>/dev/null | awk -F'\t' '{s+=$8} END{printf "%.2f", s}')"
+    v_sum="$(bash "$0" "${FILE}" --json 2>/dev/null | tr '{' '\n' \
+             | sed -nE 's/.*"id":"([^"]+)".*"s":"([^"]*)".*"w":([0-9.]+).*/\2 \3/p' \
+             | awk '$1!="confirmed" && $1!="done" && $1!="superseded" && $1!="refuted" {s+=$2} END{printf "%.2f", s}')"
+    if [ -n "${r_sum}" ] && [ "${r_sum}" != "${v_sum}" ]; then
+      printf '\342\234\227 DIVERGENCIA de PESO: soma da atencao dos nos em aberto — radar %s, projecao %s.\n' "${r_sum}" "${v_sum}" >&2
+      printf '  As contagens batem e os pesos nao. Reconcilie lib/status-factor.awk.\n' >&2
+      exit 1
+    fi
+    # ⚠️ SO O ID, NUNCA O VALOR: o `--radar` imprime com `%5.1f` (display humano), entao comparar o
+    # numero dele com o `w` de 2 casas da lente acusa `42.80` contra `42.75` — divergencia de
+    # ARREDONDAMENTO, nao de peso. Falso-positivo medido no unico grafo com lente do repo, e
+    # falso-positivo de guarda e o que ensina a ignorar a guarda. O VALOR ja e coberto pela SOMA.
+    r_top="$(bash "${HERE}/kg-radar.sh" "${FILE}" --radar 2>/dev/null | awk '/^ +[0-9.]+ +/ {print $2; exit}')"
+    v_top="$(bash "$0" "${FILE}" --json 2>/dev/null | tr '{' '\n' \
+             | sed -nE 's/.*"id":"([^"]+)".*"w":([0-9.]+).*/\1 \2/p' | sort -k2 -rn \
+             | sed -n '1{s/ .*//;p}')"   # `sed` sem `q` DRENA; `head -1` fecha cedo e da EPIPE sob pipefail
+    if [ -n "${r_top}" ] && [ "${r_top}" != "${v_top}" ]; then
+      printf '\342\234\227 DIVERGENCIA de TOPO: o radar diz que o no mais urgente e "%s"; a projecao diz "%s".\n' "${r_top}" "${v_top}" >&2
+      printf '  As contagens batem e mesmo assim os dois discordam de QUAL no e o mais urgente — que e a\n' >&2
+      printf '  unica pergunta que o painel responde. Reconcilie lib/status-factor.awk.\n' >&2
+      exit 1
+    fi
   if [ "${r_n}" = "${v_n}" ] && [ "${r_e}" = "${v_e}" ]; then
     printf '✅ paridade kg-view × kg-radar: %s nós, %s arestas\n' "${r_n}" "${r_e}"
     exit 0
@@ -97,14 +135,7 @@ fi
 
 case "${MODE}" in --markdown|--json) ;; *) printf 'modo inválido: %s\n' "${MODE}" >&2; exit 2 ;; esac
 
-awk -v mode="${MODE}" -v src="${SRC_REL}" '
-function statusFactor(s) {
-  if (s == "open" || s == "confirmed") return 1.0
-  if (s == "refuted") return 0.0
-  if (s == "superseded") return 0.2
-  if (s == "done") return 0.1
-  return -1
-}
+awk -v mode="${MODE}" -v src="${SRC_REL}" "${STATUS_FACTOR}"'
 function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["'\'']$/, "", s); return s }
 # Markdown lê para humano: aspas escapadas do YAML (\") viram aspas de verdade.
 # NÃO usar no JSON — lá o escape é a gramática, não sujeira.
