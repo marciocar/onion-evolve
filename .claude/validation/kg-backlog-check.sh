@@ -9,8 +9,12 @@
 #
 # O QUE JULGA — três checagens, todas contra o arquivo, nenhuma contra a memória de quem edita:
 #   TETO         mais que o teto declarado no próprio `meta:`                        → HARD
-#   DONE-NU      item `done` sem `verified_at` + `verified_against`                  → HARD
-#   PARADO       item `open` mais velho que o `baseline:` do arquivo, sem carimbo     → SOFT
+#   DONE-NU      item `done` sem `verified_at` + `verified_against` com VALOR         → HARD
+#   SEM-TETO     o `meta:` nao declara teto — nao sei o que cobrar, logo nao aprovo    → HARD
+#
+# ⚠️ ESTA TABELA JA MENTIU NA 1a VERSAO, no PR que criou a catraca `(w)` contra tabelas que mentem:
+# ela listava `PARADO → SOFT`, que NUNCA foi emitido, e OMITIA `SEM-TETO`, que e emitido. Escrever a
+# doutrina antes de escrever o codigo e o caminho normal; o que nao pode e a doutrina ficar.
 #
 # ⚠️ O TETO É LIDO DO ARQUIVO, não hardcoded. Um número no script e outro no `meta:` seria a mesma
 # classe de `declarado != verificado` que este gate existe para fechar — e a casa já viu a tabela de
@@ -34,11 +38,20 @@ awk -v fmt="${FMT}" -v arq="${FILE}" '
   /^[[:space:]]*#.*TETO:[[:space:]]*[0-9]+[[:space:]]*N/ { if (match($0, /TETO:[[:space:]]*[0-9]+/)) { t=substr($0,RSTART,RLENGTH); gsub(/[^0-9]/,"",t); teto=t+0 } }
   /^[[:space:]]*baseline:[[:space:]]*[0-9]/ { base=$2 }
 
-  /^[[:space:]]*-[[:space:]]*id:/ { if (id!="") flush(); id=$3; st=""; va=""; vg=""; ty=""; next }
-  /^[[:space:]]*node_type:/  { ty=$2 }
-  /^[[:space:]]*status:/     { st=$2 }
-  /^[[:space:]]*verified_at:/{ va=$2 }
-  /^[[:space:]]*verified_against:/ { vg=$2 }
+  # ⚠️ NORMALIZAR ANTES DE COMPARAR. A 1a versao lia `$2` cru e uma passada adversarial mediu quatro
+  # fugas, todas YAML VALIDO e indistinguivel a olho: `status: "done"` (aspas) escapava do DONE-NU;
+  # `verified_at: ""`, `: null` e `: TODO` passavam como carimbo, e a guarda AFIRMAVA "nenhum `done`
+  # sem carimbo"; e CRLF colava `\r` no valor. Carimbo de ar e pior que carimbo ausente — ele
+  # DECLARA medicao que nao houve, que e o defeito fundador da REGRA 49.
+  function val(s) { sub(/^[^:]*:[[:space:]]*/, "", s); gsub(/\r/, "", s)
+                    gsub(/^["'"'"']|["'"'"']$/, "", s); sub(/[[:space:]]+$/, "", s)
+                    if (s == "null" || s == "~" || s == "TODO" || s == "-") return ""
+                    return s }
+  /^[[:space:]]*-[[:space:]]*id:/ { if (id!="") flush(); id=val($0); st=""; va=""; vg=""; ty=""; next }
+  /^[[:space:]]*node_type:/  { ty=val($0) }
+  /^[[:space:]]*status:/     { st=val($0) }
+  /^[[:space:]]*verified_at:/{ va=val($0) }
+  /^[[:space:]]*verified_against:/ { vg=val($0) }
   /^edges:/ { if (id!="") flush(); id=""; inEdges=1 }
   END { if (id!="") flush(); report() }
 

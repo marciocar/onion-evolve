@@ -683,7 +683,17 @@ check_kg_backlog() {
   local kg out rc errf
   while IFS= read -r kg; do
     [ -n "${kg}" ] || continue
-    grep -qE '^[[:space:]]*#.*TETO:[[:space:]]*[0-9]+[[:space:]]*N' "${kg}" || continue   # escopo: só quem declara teto
+    # ⚠️ O ESCOPO NÃO PODE SER O PRÓPRIO PREDICADO QUE A GUARDA JULGA — e a 1ª versão era.
+    # Ela escopava por `grep TETO`, exatamente o que a classe `SEM-TETO` existe para acusar. Duas
+    # consequências MEDIDAS por passada adversarial, e as duas são fail-open:
+    #   · apagar ou reflowar UMA linha de comentário DESLIGAVA a regra inteira, em silêncio e verde
+    #     — o fail-loud `SEM-TETO` era INALCANÇÁVEL pelo gate (só o helper isolado o via);
+    #   · e o escopo VIAJAVA: um grafo de adotante com "TETO: 3 Nós" num comentário qualquer entrava
+    #     no julgamento e era acusado. É a lição do `kg-trace-resolve` (11 falsos no 1º adotante),
+    #     repetida no PR que a cita no próprio docstring.
+    # Agora o opt-in é um marcador PRÓPRIO, independente do que se julga: quem opta permanece no
+    # escopo mesmo tendo perdido o teto, e é assim que o fail-loud chega ao gate.
+    grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-guard:[[:space:]]*on\b' "${kg}" || continue
     if [ -n "${ONLY_PATH}" ]; then
       case "${ONLY_PATH}" in "${kg}"|*/kg-backlog-check.sh) : ;; *) continue ;; esac
     fi
@@ -695,10 +705,16 @@ check_kg_backlog() {
       rm -f "${errf}"; continue
     fi
     rm -f "${errf}"
-    printf '%s\n' "${out}" | while IFS=$'\t' read -r sev tag path msg; do
+    # ⚠️ PROCESS SUBSTITUTION, NUNCA `printf | while` — e isto e um fail-open MEDIDO, cometido na 1a
+    # versao desta propria regra. `violation()` incrementa `HARD_COUNT`/`TOTAL_COUNT` no shell PAI;
+    # `cmd | while` roda o laco em SUBSHELL e o incremento MORRE com ele. O efeito e o pior possivel:
+    # a linha `VIOLATION:` sai na tela, o humano ve a acusacao, e o lint FECHA COM EXIT 0.
+    # Medido: `printf "HARD\t..." | while read; do violation; done` deixa HARD_COUNT=0 no pai.
+    # Guarda que acusa e nao conta e pior que guarda ausente — ela produz a APARENCIA de rigor.
+    while IFS=$'\t' read -r sev tag path msg; do
       [ "${sev}" = "HARD" ] || continue
       violation "HARD" "${path}" "[kg-backlog/${tag}] ${msg}"
-    done
+    done < <(printf '%s\n' "${out}")
   done < <(find "${REPO_ROOT}/docs" -name '*.kg.yaml' -type f 2>/dev/null | sort)
 }
 

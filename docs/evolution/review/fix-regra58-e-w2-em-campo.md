@@ -1,14 +1,14 @@
 ---
 branch: fix/regra58-e-w2-em-campo
 date: 2026-08-09
-reviewed_diff_sha256: bf725896c3e469bdc08f06224fa5da0cebbc32291dabdaa04c3a986b32274221
-findings_total: 3
-findings_real: 3
-findings_fixed: 3
-tokens: 0
-duration_min: 0
-verdict: SEM-ELENXO-DOIS-DEFEITOS-DE-DOUTRINA-ACHADOS-REVISANDO-O-ALINHAMENTO-E-UM-SANDBOX-QUE-MENTIU
-reviewer: sem passada adversarial — ver "O que NÃO foi feito"
+reviewed_diff_sha256: d75627df6456d4d9a8f38575414a0216186de6959bdfcf8af622a221fee1c1b8
+findings_total: 42
+findings_real: 21
+findings_fixed: 8
+tokens: 846502
+duration_min: 46
+verdict: HARD-MAS-NAO-COMO-ESTAVA-A-REGRA-NOVA-ACUSAVA-SEM-CONTAR-E-O-ESCOPO-ERA-O-PROPRIO-PREDICADO
+reviewer: Elenxo — 3 lentes × 2 refutadores + juiz (opus/high, juiz em max), wf_511ffd3e-2c0
 ---
 
 # Revisar o alinhamento achou dois defeitos, e o meu primeiro sandbox mentiu
@@ -116,9 +116,88 @@ produção** (#564: baseline 48→47, e a medição achou um piso de memória pr
 - as 4 classes em sandbox `git` real, cada uma precedida do controle `47 SOFT / 0 HARD`
 - REGRA 58 classificada no registry e projetada em `lint-rules.md`
 
+## A passada adversarial derrubou a entrega — 3 de 6 refutadores disseram `CAI`
+
+**42 achados brutos → 21 sobrevivem** (9 HARD). Veredito do juiz: **«HARD, mas NÃO como está.»** A
+tese e a parte de campo sobreviveram — ele reproduziu o controle `47 SOFT / 0 HARD` e as 4 mutações
+da W2, e confirmou que a explicação do *"sandbox mentiroso"* é a causa correta **e única**.
+
+O que não sobreviveu foi a REGRA 58 como entregue.
+
+### Dois verdes-falsos, e a raiz é a mesma
+
+**1 · A regra acusava e NÃO contava.** `violation()` incrementa `HARD_COUNT` no shell **pai**;
+`printf | while` roda o laço em **subshell** e o incremento morre com ele. Medido:
+
+```
+lint imprime:  VIOLATION: ... [kg-backlog/DONE-NU] ...
+lint fecha  :  Violações HARD : 0 · OK ✓ · exit 0
+```
+
+**Guarda que acusa e não conta é pior que guarda ausente — produz a aparência de rigor.** Curado com
+process substitution: `HARD 7 → 8`.
+
+**2 · O filtro de escopo ERA o próprio predicado julgado.** Ele escopava por `grep TETO`, que é
+exatamente o que a classe `SEM-TETO` existe para acusar. Duas consequências, ambas medidas:
+
+- reescrever `TETO: 20 NÓS.` para `TETO de 20 nos.` **desligava a regra inteira**, em silêncio e
+  verde — o fail-loud era **estruturalmente inalcançável** pelo gate, e o docstring o vendia como
+  *"HARD, não silêncio"*. `declarado ≠ verificado` **dentro da regra criada para caçar isso**;
+- e o escopo **viajava**: um grafo de adotante com "TETO: 3 Nós" num comentário qualquer entrava no
+  julgamento. É a lição do `kg-trace-resolve` (11 falsos no 1º adotante) repetida no PR que a cita.
+
+Curado com um marcador **próprio** (`# kg-backlog-guard: on`), independente do que se julga. Medido:
+apagando a linha do teto, o `SEM-TETO` agora **chega ao gate** (HARD 8).
+
+### E a raiz, que o juiz nomeou
+
+```
+grep -c check_kg_backlog lint-selftest.sh  →  0
+```
+
+Os 5 selftests mediam `bash "${helper}"`, **nunca o gate**. Ficavam 5/5 verdes com o fail-open ativo
+**e** com a regra comentada fora do dispatcher. É `bancada-espelha-o-runner` na forma mais cara: o
+teste media um artefato que **não é** o que barra o merge.
+
+O caso `(e)` foi reescrito para **atravessar o lint inteiro** num sandbox git, plantar a violação e
+exigir que **o contador suba** — não que a linha apareça. Cobre de uma vez o subshell, o fio no
+dispatcher e o escopo.
+
+### A tabela do helper NOVO já mentia
+
+No PR que mecaniza a catraca contra tabelas que mentem, a tabela do `kg-backlog-check.sh` declarava
+`PARADO → SOFT` (**nunca emitido**) e **omitia** `SEM-TETO` (emitido). Corrigida — e a catraca `(w)`
+ganhou a **segunda direção**: classe emitida e ausente da tabela agora reprova.
+
+### Carimbo de ar
+
+`DONE-NU` aceitava `verified_at: ""`, `null`, `TODO`, e `status: "done"` com aspas escapava; CRLF
+colava `\r` no valor. Todos YAML válido e indistinguíveis a olho. **Carimbo de ar é pior que carimbo
+ausente: declara medição que não houve**, que é o defeito fundador da REGRA 49. Curado com
+normalização (`trim`, aspas, `\r`, placeholders), medido nas cinco formas.
+
+### E o `(w)` era enganável por COMENTÁRIO
+
+Uma linha de comentário contendo o texto `emit SOFT REMOVIDO` re-escondia o drift **fundador** desta
+catraca — o extrator via prosa como se fosse emissão. Comparar prosa com prosa é o oposto do ponto.
+
+## O sétimo "medi o artefato errado", e é uma classe NOVA
+
+A bancada abortou com **erro de sintaxe numa linha que `bash -n` aprovava**. Causa: **eu editei
+`lint-selftest.sh` enquanto a bancada o executava.** Bash lê o script por offset de byte; minhas
+edições deslocaram tudo sob os pés dele.
+
+Não foi medir artefato **defasado** — foi **mutar o artefato durante a própria medição**. A corrida
+seguinte passou a carregar `sha256sum` antes e depois, e a declarar `artefato ESTAVEL` no relatório.
+
+E a primeira tentativa de cura piorou: congelar uma cópia em `$CLAUDE_JOB_DIR` quebrou tudo, porque
+`SCRIPT_DIR` resolve pela **localização do arquivo**. A cura certa era a mais simples — rodar no
+lugar e não tocar no arquivo.
+
 ## O que NÃO foi feito, declarado
 
-- **Sem passada adversarial.** Os achados aqui vieram de *revisar o alinhamento contra a fonte*, que
+- **A passada adversarial aconteceu** (o texto acima), mas as correções dela **não foram
+  re-auditadas** por uma segunda passada. Os achados aqui vieram de *revisar o alinhamento contra a fonte*, que
   é uma forma mais barata do mesmo movimento — mas menos completa. O que um refutador provavelmente
   atacaria: o extrator do `(w)` depende do formato do comentário (o canário cobre o caso vazio, não
   o caso *parcialmente* quebrado), e o `kg-backlog-check.sh` lê o teto por regex no comentário, que

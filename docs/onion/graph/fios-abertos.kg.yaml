@@ -30,6 +30,9 @@ meta:
   # e envelhecem sozinhas. Se algum gate futuro estender a R49 a `plane: DEV`, saiba que esta
   # população é deliberada.
   #
+  # kg-backlog-guard: on
+  # ↑ opt-in da REGRA 58, DELIBERADAMENTE separado da linha do TETO: se o escopo fosse o
+  #   proprio TETO, apagar aquela linha DESLIGARIA a guarda em vez de disparar o SEM-TETO.
   # ═══ TETO: 20 NÓS. Onda nova exige onda COLHIDA. ═══
   # Colher = onda e itens saem no MESMO commit; a história fica no git e no artefato de revisão.
   # O radar impede meia-colheita: item sem onda → aresta órfã (HARD); onda sem item → grau 0 (HARD).
