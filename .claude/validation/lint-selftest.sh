@@ -5566,14 +5566,49 @@ run_consumed_modes_selftests() {
   if [ ! -f "${cmc}" ]; then record_skip "modos: (0) consumed-mode-check.sh ausente"; else
     rc=0; out="$(bash "${cmc}" "${REPO_ROOT}" --format tsv 2>&1)" || rc=$?
     # no verde o modo tsv CALA (o consumidor trata vazio como conforme); no vermelho emite TABULADO
-    if { [ "${rc}" -eq 0 ] && [ -z "${out}" ]; } \
-       || { [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -qP '^HARD\tMODO-SEM-TESTE\t'; }; then
+    # ⚠️ O CONTRATO DO tsv MUDOU e este caso ficou para tras por uma corrida: no verde a saida NAO e
+    # mais vazia — ela carrega a linha `SOFT SUPRESSAO`, porque contar o teto so no modo humano era
+    # contar para quem nao le. O caso agora exige LINHAS TABULADAS ou vazio, nunca prosa, e proibe
+    # HARD no verde. Teste que afirma "vazio" contra um contrato que passou a falar vira falso-alarme
+    # — e falso-alarme em bancada e o que faz alguem afrouxar o caso em vez de ler o codigo.
+    if { [ "${rc}" -eq 0 ] && { [ -z "${out}" ] || { printf '%s' "${out}" | grep -qP '^SOFT\t' && ! printf '%s' "${out}" | grep -qP '^HARD\t'; }; }; } \
+       || { [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -qP '^HARD\t(MODO-SEM-TESTE|PISO-DE-COBERTURA)\t'; }; then
       record_pass "modos: (0) o proprio detector no modo --format tsv que a REGRA 59 consome"
     else record_fail "modos: (0) detector em tsv" "rc=${rc} com saida inesperada: $(printf '%s' "${out}" | head -c 200)"; fi
     rc=0; out="$(bash "${cmc}" --selftest 2>&1)" || rc=$?
     if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '4 passaram, 0 falharam'; then
       record_pass "modos: (0b) o detector se prova (4/4) — guarda que nunca se provou nao sobe ao gate"
     else record_fail "modos: (0b) --selftest" "rc=${rc}: $(printf '%s' "${out}" | head -c 200)"; fi
+  fi
+
+  # (0e) PISO DE COBERTURA — a guarda de vacuidade so disparava em ZERO EXATO, e passada adversarial
+  #      mediu a fuga: um refactor de estilo derrubou 32 pares para 11 e o veredito seguiu ✅. Um
+  #      extrator que perde 2/3 da producao "cobre" tudo o que ainda ve, e o verde fala do que
+  #      SOBROU, nao do que existe.
+  # (0f) E A SUPRESSAO TEM DE APARECER NO MODO QUE O GATE CONSOME: o rodape vivia sob
+  #      `if FORMAT != tsv`, entao a promessa "supressao CONTADA, nunca silenciosa" era FALSA
+  #      justamente no unico modo que o lint invoca — 0 bytes. Contar para quem nao le e nao contar.
+  local cmc2="${SCRIPT_DIR}/consumed-mode-check.sh"
+  if [ ! -f "${cmc2}" ]; then record_skip "modos: (0e) consumed-mode-check.sh ausente"; else
+    d="$(mktemp -d)"; mkdir -p "$d/.claude/validation"
+    cp "${cmc2}" "$d/.claude/validation/"           # o marcador que liga o piso: o detector no root
+    printf '#!/usr/bin/env bash\nbash "${SCRIPT_DIR}/alvo.sh" --modo\n' > "$d/.claude/validation/lint-artifacts.sh"
+    printf '#!/usr/bin/env bash\nbash "${SCRIPT_DIR}/alvo.sh" --modo\n' > "$d/.claude/validation/lint-selftest.sh"
+    rc=0; out="$(bash "${SCRIPT_DIR}/consumed-mode-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+    if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'PISO-DE-COBERTURA'; then
+      record_pass "modos: (0e) extrator que perde visao da producao REPROVA pelo PISO (cobertura, nao so ausencia)"
+    else record_fail "modos: (0e) piso" "1 par contra piso 30 nao acusou (rc=${rc}): $(printf '%s' "${out}" | head -c 180)"; fi
+    rm -rf "$d"
+    # o piso NAO pode julgar repo sintetico — falso-positivo em regra HARD ensina a ignorar o gate
+    rc=0; out="$(bash "${SCRIPT_DIR}/consumed-mode-check.sh" --selftest 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ]; then
+      record_pass "modos: (0e2) o piso NAO acusa as fixtures do proprio --selftest (1 par, de proposito)"
+    else record_fail "modos: (0e2) piso em fixture" "o piso acusou o proprio teste (rc=${rc}): $(printf '%s' "${out}" | head -c 180)"; fi
+    # (0f) a supressao E VISIVEL no modo tsv
+    rc=0; out="$(bash "${SCRIPT_DIR}/consumed-mode-check.sh" "${REPO_ROOT}" --format tsv 2>&1)" || rc=$?
+    if printf '%s' "${out}" | grep -qP '^SOFT\tSUPRESSAO\t'; then
+      record_pass "modos: (0f) a supressao aparece no --format tsv (o modo que o gate le), com o NUMERO"
+    else record_fail "modos: (0f) supressao invisivel" "o tsv nao emitiu a linha de SUPRESSAO — 'contada, nunca silenciosa' seria falso no modo do gate"; fi
   fi
 
   # (0c)(0d) OS DOIS PARES QUE VIVIAM DA ISENCAO POR DELEGACAO. Ela foi REMOVIDA porque matava uma
