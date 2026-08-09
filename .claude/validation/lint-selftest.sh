@@ -5089,6 +5089,20 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (o) apostrofo DENTRO de aspas duplas → AINDA DISPARA (aspa em aspa e literal)"
   else record_fail "empty-result-guard: (o)" "o gsub desemparelhado apagou o pipe real do meio do comando: ${out}"; fi
 
+  # (q)/(r) sao o PAR do 4o filtro anti-ruido (ORDEM na mesma linha, 2026-08-09). O caso real:
+  # `echo "rc=$?"; grep ... arquivo | head -4` — o `$?` e do comando da linha ANTERIOR e o pipe vem
+  # DEPOIS dele. (q) prova que o ruido morreu; (r) prova que o filtro NAO CEGOU: pipe ANTES do `$?`
+  # na mesma linha continua sendo o caso que funda o detector.
+  out="$(_erg '"bash algo.sh > f 2>&1\necho \"rc=$?\"; grep -E x f | head -4"' '"x"' || true)"
+  if ! printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+    record_pass "empty-result-guard: (q) \$? ANTES do pipe na mesma linha → SILENCIOSO"
+  else record_fail "empty-result-guard: (q)" "falso-positivo de ORDEM: o \$? e da linha anterior e o pipe vem depois: ${out}"; fi
+
+  out="$(_erg '"ls | wc -l; echo $?"' '"x"' || true)"
+  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+    record_pass "empty-result-guard: (r) pipe ANTES do \$? na mesma linha → AINDA DISPARA (o caso fundador)"
+  else record_fail "empty-result-guard: (r)" "o filtro de ORDEM cegou o caso que funda o detector: ${out}"; fi
+
   # (p) MUTATION: prova que `unquoted` e load-bearing nas DUAS direcoes. Sem isto, remover o filtro
   # (voltando o falso-positivo) ou neutraliza-lo (voltando os fail-opens) passaria em silencio —
   # que foi literalmente o que aconteceu na 1a versao.
@@ -5100,7 +5114,11 @@ run_empty_result_guard_selftests() {
     record_fail "empty-result-guard: (p) mutation" "a ancora nao pegou — o mutante e IDENTICO ao original, o caso mediria o nada"
   else
     local m_l m_m
-    m_l="$(printf '%s' '{"tool_input":{"command":"bash algo.sh > arq 2>&1\necho \"rc=$?\"; grep -E '"'"'Passaram|Falharam'"'"' arq"},"tool_response":{"stdout":"x"}}' | bash "${gd}/m.sh" 2>&1 || true)"
+    # ⚠️ O CASO TEM DE ISOLAR `unquoted`, e a 1a versao nao isolava: ela mutava contra o caso (l),
+    #    cujo `|` (entre aspas) vem DEPOIS do `$?` — entao o filtro de ORDEM, criado depois, passou a
+    #    cobri-lo sozinho e o mutante "ainda satisfazia". O proprio `_prove_mutation` acusou.
+    #    Aqui o `|` entre aspas vem ANTES do `$?`: a ordem NAO salva, so `unquoted` salva.
+    m_l="$(printf '%s' '{"tool_input":{"command":"grep -E '"'"'Passaram|Falharam'"'"' arq; echo $?"},"tool_response":{"stdout":"x"}}' | bash "${gd}/m.sh" 2>&1 || true)"
     m_m="$(printf '%s' '{"tool_input":{"command":"n=\"$(ls /tmp | wc -l)\"\necho $?"},"tool_response":{"stdout":"x"}}' | bash "${gd}/m.sh" 2>&1 || true)"
     if printf '%s' "${m_l}" | grep -q 'EXIT-CODE-DE-PIPE' && printf '%s' "${m_m}" | grep -q 'EXIT-CODE-DE-PIPE'; then
       record_pass "empty-result-guard: (p) mutation — sem \`unquoted\` o caso (l) REPROVA (o filtro e load-bearing)"
@@ -5521,6 +5539,90 @@ run_kg_verification_selftests() {
 # o `meta:` de fios-abertos.kg.yaml as declarava em letra grande e nada as cobrava. Cada caso
 # aqui muta o backlog REAL (copia em mktemp), nunca uma fixture inventada — o gatilho declarado
 # no plano e "as classes rodam em CAMPO", e fixture sintetica ja existe demais nesta bancada.
+# ── OS MODOS QUE A PRODUCAO CONSOME E A BANCADA NUNCA EXERCITAVA ──────────────────────────────
+# Fechados porque o `consumed-mode-check.sh` os NOMEOU, rodando de verdade: 31 pares de producao,
+# 5 sem teste. Um deles (`kg-backlog-check.sh --format tsv`) e o modo que o LINT consome do script
+# que eu mesmo acabara de mergear — a bancada chamava o helper SEM a flag, entao o caminho que
+# realmente barra o merge nunca foi exercitado.
+#
+# ⚠️ CADA CASO ASSERE ALGO, nunca so invoca. Chamar o modo para "satisfazer o detector" e cerimonia:
+# transformaria o instrumento num contador de invocacoes, e um teste que nao pode falhar e ruido.
+run_consumed_modes_selftests() {
+  local d out rc
+  # (0) O PROPRIO detector, no modo que a REGRA 59 consome. Ao ligar a regra, o lint passou a
+  #     invocar `consumed-mode-check.sh --format tsv` — e a bancada so o chamava com `--selftest`.
+  #     A regra acusou o buraco que ela mesma criou, na primeira corrida. E o comportamento certo:
+  #     um detector que nao se cobre no modo que o gate usa e a definicao do que ele caca.
+  local cmc="${SCRIPT_DIR}/consumed-mode-check.sh"
+  if [ ! -f "${cmc}" ]; then record_skip "modos: (0) consumed-mode-check.sh ausente"; else
+    rc=0; out="$(bash "${cmc}" "${REPO_ROOT}" --format tsv 2>&1)" || rc=$?
+    # no verde o modo tsv CALA (o consumidor trata vazio como conforme); no vermelho emite TABULADO
+    if { [ "${rc}" -eq 0 ] && [ -z "${out}" ]; } \
+       || { [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -qP '^HARD\tMODO-SEM-TESTE\t'; }; then
+      record_pass "modos: (0) o proprio detector no modo --format tsv que a REGRA 59 consome"
+    else record_fail "modos: (0) detector em tsv" "rc=${rc} com saida inesperada: $(printf '%s' "${out}" | head -c 200)"; fi
+    rc=0; out="$(bash "${cmc}" --selftest 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '4 passaram, 0 falharam'; then
+      record_pass "modos: (0b) o detector se prova (4/4) — guarda que nunca se provou nao sobe ao gate"
+    else record_fail "modos: (0b) --selftest" "rc=${rc}: $(printf '%s' "${out}" | head -c 200)"; fi
+  fi
+
+  # (a) inventory.sh --markdown: a producao compara ESTA saida com docs/onion/inventory.md.
+  local inv="${SCRIPT_DIR}/inventory.sh"
+  if [ ! -f "${inv}" ]; then record_skip "modos: (a) inventory.sh ausente"; else
+    rc=0; out="$(bash "${inv}" --markdown 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '|' && printf '%s' "${out}" | grep -qiE 'coman|agent'; then
+      record_pass "modos: (a) inventory.sh --markdown emite TABELA (o formato que a REGRA de SSOT compara)"
+    else record_fail "modos: (a) inventory.sh --markdown" "rc=${rc}, saida sem tabela: $(printf '%s' "${out}" | head -c 200)"; fi
+  fi
+
+  # (b) kg-backlog-check.sh --format tsv: o modo que o LINT consome. Diferenca que importa: em tsv a
+  #     linha OK nao sai (o consumidor trata vazio como verde), e a HARD sai TABULADA.
+  local kbc="${SCRIPT_DIR}/kg-backlog-check.sh" bg="${REPO_ROOT}/docs/onion/graph/fios-abertos.kg.yaml"
+  if [ ! -f "${kbc}" ] || [ ! -f "${bg}" ]; then record_skip "modos: (b) kg-backlog-check/backlog ausente"; else
+    rc=0; out="$(bash "${kbc}" "${bg}" --format tsv 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+      record_pass "modos: (b) kg-backlog-check --format tsv CALA no verde (o lint trata vazio como conforme)"
+    else record_fail "modos: (b) tsv no verde" "esperava saida VAZIA e rc=0; veio rc=${rc} out='${out}'"; fi
+    d="$(mktemp -d)"; sed '0,/^    status: open$/s//    status: done/' "${bg}" > "$d/m.yaml"
+    rc=0; out="$(bash "${kbc}" "$d/m.yaml" --format tsv 2>&1)" || rc=$?
+    if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -qP '^HARD\tDONE-NU\t'; then
+      record_pass "modos: (b2) e no vermelho emite TSV tabulado (HARD<TAB>DONE-NU<TAB>...)"
+    else record_fail "modos: (b2) tsv no vermelho" "rc=${rc}, formato inesperado: $(printf '%s' "${out}" | head -c 200)"; fi
+    rm -rf "$d"
+  fi
+
+  # (c) kg-view.sh SEM flag: a producao o invoca assim, e o default TEM de ser o markdown que ela
+  #     compara — um default que mude de forma quebra a REGRA 31 sem tocar em nenhuma flag.
+  local view="${SCRIPT_DIR}/kg-view.sh" kg="${REPO_ROOT}/docs/onion/graph/fios-abertos.kg.yaml"
+  if [ ! -f "${view}" ] || [ ! -f "${kg}" ]; then record_skip "modos: (c) kg-view/grafo ausente"; else
+    local sem_flag com_flag
+    rc=0; sem_flag="$(bash "${view}" "${kg}" 2>&1)" || rc=$?
+    com_flag="$(bash "${view}" "${kg}" --markdown 2>&1 || true)"
+    if [ "${rc}" -eq 0 ] && [ -n "${sem_flag}" ] && [ "${sem_flag}" = "${com_flag}" ]; then
+      record_pass "modos: (c) kg-view SEM flag == --markdown (o default e o que a REGRA 31 compara)"
+    else record_fail "modos: (c) kg-view default" "rc=${rc}; o default divergiu de --markdown (a producao invoca sem flag)"; fi
+  fi
+
+  # (d)(e) migalhas-generate.sh sem flag e --check: um GERA, o outro VERIFICA. Se os dois fizerem a
+  #        mesma coisa, o `--check` do gate esta escrevendo no repo durante o CI — ou nao verifica nada.
+  local mig="${SCRIPT_DIR}/migalhas-generate.sh"
+  if [ ! -f "${mig}" ]; then record_skip "modos: (d) migalhas-generate.sh ausente"; else
+    rc=0; out="$(bash "${mig}" --check 2>&1)" || rc=$?
+    local sujo_antes sujo_depois
+    sujo_antes="$(git -C "${REPO_ROOT}" status --porcelain 2>/dev/null | wc -l)"
+    rc=0; out="$(bash "${mig}" --check 2>&1)" || rc=$?
+    sujo_depois="$(git -C "${REPO_ROOT}" status --porcelain 2>/dev/null | wc -l)"
+    if [ "${sujo_antes}" = "${sujo_depois}" ]; then
+      record_pass "modos: (d) migalhas-generate --check NAO escreve no repo (verificar != gerar)"
+    else record_fail "modos: (d) --check escreve" "o modo de VERIFICACAO alterou a arvore: ${sujo_antes} -> ${sujo_depois} arquivos sujos"; fi
+    rc=0; out="$(bash "${mig}" 2>&1)" || rc=$?
+    if [ "${rc}" -eq 0 ] || [ "${rc}" -eq 1 ]; then
+      record_pass "modos: (e) migalhas-generate SEM flag roda (rc=${rc}) — o modo que a producao invoca"
+    else record_fail "modos: (e) migalhas sem flag" "rc=${rc} (erro de execucao): $(printf '%s' "${out}" | head -c 200)"; fi
+  fi
+}
+
 run_kg_backlog_selftests() {
   local helper="${SCRIPT_DIR}/kg-backlog-check.sh"
   local bg="${REPO_ROOT}/docs/onion/graph/fios-abertos.kg.yaml"
@@ -8561,6 +8663,7 @@ run_task_manager_hook_selftests
 run_kg_verification_selftests
 run_kg_ratchet_direction_selftests
 run_kg_backlog_selftests
+run_consumed_modes_selftests
 run_safe_count_selftests
 run_scan_sanity_selftests
 run_generator_failure_selftests

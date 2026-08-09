@@ -655,6 +655,50 @@ check_review_artifact() {
 }
 
 # ===========================================================================
+# REGRA 59 — Modo que a produção consome é exercitado pela bancada [HARD]
+# previne: guarda que roda no gate por um caminho que nenhum teste percorreu — o modo consumido
+#   diverge em silêncio e o falso-verde aparece só no adotante.
+#   ORIGEM (o instrumento se provou ANTES de virar regra, e provou contra MIM): o
+#   `consumed-mode-check.sh` existia desde 2026-08 e estava DESLIGADO, com o plano deste ciclo
+#   mandando "apagar, não ligar". Rodá-lo REFUTOU o próprio plano por execução: 31 pares de
+#   produção, 5 sem teste, todos nomeados. E um deles era `kg-backlog-check.sh [--format tsv]`
+#   — o modo que o LINT consome do script mergeado na véspera (REGRA 58), enquanto a bancada
+#   chamava o helper SEM a flag. O caminho que de fato barra o merge nunca fora exercitado.
+#   ORDEM DELIBERADA, escrita no grafo antes de começar e cumprida: dar `--selftest` ao
+#   detector → escrever o bloco dele na bancada → fechar os 5 modos → SÓ ENTÃO o wire-in.
+#   Ligar antes seria acender uma guarda que nunca se provou, e o CI reprovaria de cara por
+#   dívida pré-existente em vez de por regressão.
+#   O detector se prova em 4 casos (modo coberto → silêncio · descoberto → acusa nomeando
+#   script E flag · mesmo script com flag diferente ainda acusa · fonte ausente → exit 2).
+#   O PAR (script, flags) é a unidade, não o script: distinguir `--markdown` de `(sem-flag)`
+#   é o valor inteiro do instrumento.
+#   SUPRESSÃO CONTADA, nunca silenciosa: flag vinda de variável e modo coberto por delegação
+#   saem no rodapé como "fora de julgamento", com número.
+#   Toda a lógica vive em consumed-mode-check.sh.
+# ===========================================================================
+check_consumed_modes() {
+  local helper="${SCRIPT_DIR}/consumed-mode-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in */lint-artifacts.sh|*/lint-selftest.sh|*/consumed-mode-check.sh) : ;; *) return 0 ;; esac
+  fi
+  local out rc errf
+  rc=0; errf="$(mktemp)"
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${errf}")" || rc=$?
+  if [ "${rc}" -ge 2 ]; then
+    violation "HARD" "${helper}" "[modo-consumido/NAO-EXECUTOU] o helper saiu com rc=${rc} — erro de EXECUCAO, nao veredito. stderr: $(head -c 300 "${errf}" | tr '\n' ' ')"
+    rm -f "${errf}"; return 0
+  fi
+  rm -f "${errf}"
+  # process substitution: `printf | while` rodaria o laco em SUBSHELL e o incremento de
+  # HARD_COUNT morreria com ele — fail-open medido na REGRA 58, um dia antes desta.
+  while IFS=$'\t' read -r sev tag path msg; do
+    [ "${sev}" = "HARD" ] || continue
+    violation "HARD" "${path}" "[modo-consumido/${tag}] ${msg}"
+  done < <(printf '%s\n' "${out}")
+}
+
+# ===========================================================================
 # REGRA 58 — O backlog cumpre as promessas do próprio `meta:` [HARD]
 # previne: backlog que promete teto e carimbo no cabeçalho e não cobra nenhum dos dois — inchando
 #   até virar cemitério, ou declarando `done` sem medição, sem nada acusar.
@@ -3040,6 +3084,7 @@ check_kg_trace_resolve
 check_review_artifact
 check_kg_seal
 check_kg_backlog
+check_consumed_modes
 check_doctrine_freshness
 check_kg_born_marker
 check_ladder_integrity

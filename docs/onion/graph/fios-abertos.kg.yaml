@@ -177,18 +177,20 @@ nodes:
     node_type: decision
     plane: DEV
     status: open
-    impact: 5
+    impact: 4
     confidence: 1.0
-    label: "Reduzir exposicao SEM tocar na existencia da ferramenta. (1) WAHA: as credenciais `WAHA_API_KEY` e `WAHA_DASHBOARD_PASSWORD` sao legiveis via `docker inspect` — a superacao e tira-las do ambiente do container (arquivo de segredo, ou o mecanismo que a VPS ja usa), nao mexer no servico. Se o incomodo for 'esta de pe sem consumidor', a pergunta e QUAL consumidor ele deveria ter, nao se desliga. (2) `bypassPermissions`: a contencao e de PROCESSO (usuario dedicado, capacidades), nao de borda — o flip de identidade nao reduziu o que o agente pode fazer DEPOIS de entrar. Ambos verificados vivos hoje."
+    label: "MEDIDO 2026-08-09 em srv1812846, e a medicao QUALIFICA o item em vez de confirma-lo cego. (1) WAHA: `WAHA_API_KEY` e `WAHA_DASHBOARD_PASSWORD` ESTAO no `Config.Env` do container `onion-vps-waha` — a exposicao e real. MAS o raio e ROOT: o socket e `660 root:docker` e o grupo `docker` esta VAZIO; `marcio` e `granaai` sao NEGADOS ao tentar `docker inspect` (testado, nao inferido dos bits). Root ja le tudo, entao isso rebaixa a PRIORIDADE sem anular o item — a superacao segue sendo tirar do env, e ela exige RECRIAR o container, que INTERROMPE ferramenta viva: decisao do maestro, nao minha. (2) `bypassPermissions` esta no `.env` de producao (1 ocorrencia) e a contencao E de processo, como o item dizia — com especificidade nova: o bridge roda como `onion` (nao root), mas `NoNewPrivileges=no` e `ProtectHome=no`. A contencao existe e e PARCIAL. Superacao barata e reversivel: drop-in com `NoNewPrivileges=yes` + `ProtectHome=yes` (restart, nao recriacao) — SUGERIDO, nao executado. IMPACT rebaixado 5->4 POR MEDICAO (raio root-only), com o motivo escrito aqui: rebaixar sem medicao seria a FUGA-DE-ESCOPO da propria catraca, cometida na autoria."
     trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
 
   - id: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    verified_at: 2026-08-09
+    verified_against: regra-59-ligada-com-31-pares-0-sem-teste-e-bancada-759-0-0
+    status: done
     impact: 4
-    confidence: 0.9
-    label: "Dar `--selftest` ao `consumed-mode-check.sh` (hoje a linha 56 come a flag como raiz de repo), escrever o bloco dele na bancada e ENTAO liga-lo ao gate. Nesta ordem — ligar instrumento sem teste e como a casa produz falso-verde. E as 4 lacunas que ele ja acha viram os primeiros casos do W4, em vez de o W4 nascer de classificacao manual das 52 regras."
+    confidence: 1.0
+    label: "PAGO, e NA ORDEM que este no prescreveu: `--selftest` -> bloco na bancada -> fechar os 5 modos -> SO ENTAO o wire-in (REGRA 59). Ligar antes seria acender guarda que nunca se provou, e o CI reprovaria por divida pre-existente em vez de por regressao. O parse era o bloqueio real: `${1:-...}` engolia QUALQUER flag como caminho, entao `--selftest` dava `cd --selftest` e exit 2 — o script que existe para achar MODO SEM TESTE nao conseguia rodar o proprio teste. O detector agora se prova em 4 casos (coberto->silencio · descoberto->acusa NOMEANDO script E flag · mesmo script com flag diferente ainda acusa · fonte ausente->exit 2). Os 5 modos fechados com ASSERCAO, nunca invocacao vazia: chamar o modo so para satisfazer o detector viraria contador de invocacoes. E a REGRA 59, na 1a corrida, acusou o buraco que ELA MESMA criou — o lint passou a invocar `consumed-mode-check --format tsv` e a bancada so o chamava com `--selftest`. Corrigido no caso (0). Estado: 31 pares de producao, 0 sem teste."
     trace: ".claude/validation/consumed-mode-check.sh"
   # ── AS COLETAS (question: entram no --freshness-tsv e envelhecem sozinhas) ──────────────────
 

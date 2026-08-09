@@ -122,7 +122,14 @@ case "$cmd" in *pipefail*) : ;; *)
           return o
         }
       { cur = $0; nu = unquoted(cur)
-        if (cur ~ /\$\?/ && (nu ~ /\|/ || prevNu ~ /\|/)) { found = 1; exit }
+        # ⚠️ NA MESMA LINHA, A ORDEM DECIDE — 4a classe de falso-positivo achada POR USO (2026-08-09).
+        # O caso real: `echo "rc=$?"; grep ... arquivo | head -4`. O `$?` e do comando da linha
+        # ANTERIOR e o pipe vem DEPOIS dele; a heuristica so via "ha $? e ha | na mesma linha" e
+        # acusava. Agora o pipe da PROPRIA linha so conta se estiver ANTES do `$?`. O pipe da linha
+        # anterior segue contando sempre — la ele e necessariamente anterior.
+        p_ord = index(nu, "|"); q_ord = index(nu, "$?")
+        mesmaLinha = (p_ord > 0 && q_ord > 0 && p_ord < q_ord)
+        if (cur ~ /\$\?/ && (mesmaLinha || prevNu ~ /\|/)) { found = 1; exit }
         if (cur ~ /[^ \t]/) { prev = cur; prevNu = nu }       # linha em branco não quebra a vizinhança
       }
       END { exit(found ? 0 : 1) }'; then
