@@ -226,7 +226,12 @@ _pairs "${PROD}" | sort -u > "${TMPDIR:-/tmp}/.cmc-prod.$$"
 _pairs "${TEST}" | sort -u > "${TMPDIR:-/tmp}/.cmc-test.$$"
 trap 'rm -f "${TMPDIR:-/tmp}/.cmc-prod.$$" "${TMPDIR:-/tmp}/.cmc-test.$$"' EXIT
 
-DYN="$(grep -c '^#DYN' "${TMPDIR:-/tmp}/.cmc-prod.$$" || true)"
+# ⚠️ O VALOR, NAO A LINHA. `grep -c '^#DYN'` conta QUANTAS LINHAS casam — e o awk emite UMA linha
+# `#DYN<TAB>N`. O rodape dizia "1 flag dinâmica" tendo perdido 13: erro de 13x num numero que existe
+# para dizer O TAMANHO DO QUE NAO FOI JULGADO. Contador de supressao errado e pior que ausente —
+# ele da a dimensao errada do proprio teto.
+DYN="$(awk -F'\t' '$1=="#DYN"{s+=$2} END{print s+0}' "${TMPDIR:-/tmp}/.cmc-prod.$$" 2>/dev/null || echo 0)"
+DYN_TEST="$(awk -F'\t' '$1=="#DYN"{s+=$2} END{print s+0}' "${TMPDIR:-/tmp}/.cmc-test.$$" 2>/dev/null || echo 0)"
 grep -v '^#DYN' "${TMPDIR:-/tmp}/.cmc-prod.$$" > "${TMPDIR:-/tmp}/.cmc-prod.$$.c" || true
 grep -v '^#DYN' "${TMPDIR:-/tmp}/.cmc-test.$$" > "${TMPDIR:-/tmp}/.cmc-test.$$.c" || true
 mv "${TMPDIR:-/tmp}/.cmc-prod.$$.c" "${TMPDIR:-/tmp}/.cmc-prod.$$"
@@ -303,7 +308,37 @@ while IFS= read -r pair; do
   fi
 done < "${TMPDIR:-/tmp}/.cmc-prod.$$"
 
-if [ "${FORMAT}" != tsv ]; then
+# ── PISO DE COBERTURA — a guarda de vacuidade so disparava em ZERO EXATO ────────────────────────
+# Passada adversarial mediu a fuga: um refactor de estilo derrubou 32 pares para 11 e o veredito
+# seguiu ✅ rc=0. Um extrator que perde 2/3 da producao "cobre" tudo o que ainda ve, e o verde fala
+# do que sobrou — nao do que existe. E este extrator JA errou por essa familia: a cegueira a prefixo
+# de env produziu DUAS acusacoes falsas, cuja "cura" cerimonial gerou um caso que escrevia no repo.
+#
+# O piso e DECLARADO aqui, com data e motivo, e so encolhe por edicao que aparece no diff — mesma
+# doutrina da catraca da REGRA 49. Crescer e livre; encolher exige alguem escrever por que.
+COVERAGE_FLOOR=30   # medido 2026-08-09: 32 pares. Margem de 2 para refactor legitimo.
+# ⚠️ SO ONDE A SUITE INTEIRA VIVE. O piso afirma sobre a cobertura DESTE repo; aplica-lo a um repo
+# sintetico (as fixtures do `--selftest`, que tem 1 par de proposito) faria a guarda acusar o proprio
+# teste — falso-positivo em regra HARD, que e como se ensina a ignorar o gate. O marcador e a
+# presenca deste script no root julgado: as fixtures escrevem so `lint-artifacts.sh` e
+# `lint-selftest.sh`, e um adotante que nao vendoriza o detector simplesmente nao e julgado.
+if [ -f "${REPO_ROOT}/.claude/validation/consumed-mode-check.sh" ] && [ "${PRODN}" -lt "${COVERAGE_FLOOR}" ]; then
+  if [ "${FORMAT}" = tsv ]; then
+    printf 'HARD\tPISO-DE-COBERTURA\t.claude/validation/consumed-mode-check.sh\to extrator achou %s pares e o piso declarado e %s — ele perdeu visao da producao, e o verde falaria so do que sobrou\n' "${PRODN}" "${COVERAGE_FLOOR}"
+  else
+    printf '  ✗ PISO-DE-COBERTURA: %s pares, piso declarado %s — o extrator perdeu visao da producao\n' "${PRODN}" "${COVERAGE_FLOOR}"
+  fi
+  MISS=$((MISS + 1))
+fi
+
+# ── A SUPRESSAO TEM DE APARECER NO MODO QUE O GATE CONSOME ──────────────────────────────────────
+# O rodape inteiro vivia sob `if FORMAT != tsv`, entao a promessa escrita em letra grande no
+# cabecalho — "supressao CONTADA, nunca silenciosa" — era FALSA justamente no unico modo que o
+# lint invoca: 0 bytes. Contar para quem nao le e o mesmo que nao contar.
+if [ "${FORMAT}" = tsv ]; then
+  [ "${DYN}" -gt 0 ] && printf 'SOFT\tSUPRESSAO\t.claude/validation/consumed-mode-check.sh\t%s invocacao(oes) de producao com flag DINAMICA ficaram fora do julgamento — nao sao cobertura, sao teto\n' "${DYN}"
+  : # (o `[ ]` acima nao pode ser o ultimo comando: exit code dele viraria o do script sob `set -e`)
+else
   printf '  pares de produção: %s · sem teste: %s\n' "${PRODN}" "${MISS}"
   printf '  fora de julgamento (contado, nunca silencioso): %s flag dinâmica · %s cobertos por delegação (--selftest)\n' "${DYN}" "${DELEG}"
   [ "${MISS}" -eq 0 ] && printf '  ✅ todo modo consumido é exercitado pelo selftest\n'
