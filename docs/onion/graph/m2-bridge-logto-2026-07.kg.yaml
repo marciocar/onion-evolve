@@ -185,9 +185,11 @@ nodes:
     layer: audit
     plane: PROD
     impact: 4
-    confidence: 0.5
-    status: open
-    label: "GAP NOVO ABERTO (fix A) — 'floors aplicados podem estar INEFETIVOS: verificar o EFETIVO, não o configurado'. É uma CLASSE, não um caso: qualquer MemoryMin/MemoryLow declarado em qualquer unit deste VPS pode estar decorativo pelo mesmo motivo. A verificação passa a ser o CAMINHADOR DE CADEIA check_floor() do §5b — lê memory.min do alvo e de TODOS os ancestrais até /sys/fs/cgroup, e falha se qualquer ancestral estiver abaixo. NUNCA mais aceitar systemctl show como prova de proteção. Varredura dos demais floors do host = gated (§7)"
+    confidence: 1.0
+    verified_at: 2026-08-09
+    verified_against: varredura-host-wide-dos-3-drop-ins-com-caminhador-de-cadeia-em-srv1812846
+    status: confirmed
+    label: "RESPONDIDA 2026-08-09 por varredura host-wide EM srv1812846, e a preocupacao PROCEDIA. A classe tem TRES membros (nao um): os drop-ins de `system.slice`, `caddy.service` e `onion-bridge.service`. Dois valem; UM E INERTE — o do BRIDGE. Ele declara MemoryMin=256M/MemoryLow=512M para `onion-bridge.service`, que hoje esta `LoadState=not-found`; o bridge que roda e `onion-vps-bridge.service`, com MemoryMin=0 e MemoryLow=0. O servico ganhou o prefixo `onion-vps-` e o drop-in ficou para tras, protegendo um FANTASMA. A medicao de 29/07 (E_floors_effective_measured_20260729) estava CERTA quando foi feita e DRIFTOU depois — nao foi erro de quem mediu, foi o mundo andando. METODO, e ele importa: enumerar por RUNTIME (`systemctl list-unit-files --type=service`) achou UM SO membro, porque perde slice (nao e service) e perde unit inexistente (nao responde a `show`). Quem achou os tres foi `grep` nos ARQUIVOS de unit. Enumerar pelo que responde ao runtime e cego justamente para o caso que interessa: a configuracao orfa. SUGESTAO CLARA (nao executada — mudanca em producao e do maestro): renomear o diretorio do drop-in para `onion-vps-bridge.service.d/` e `daemon-reload`, o que restaura os 256M/512M que ja se pretendia dar."
 
   # ---- FIX B: PATH-TRAVERSAL FURA A ALLOWLIST (bypass REAL) ----
   - id: C_path_traversal_bypass
@@ -1356,7 +1358,7 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: confirmed
+    status: drifted
     verified_at: 2026-07-29
     verified_against: host-vps-medido
     label: "RE-VERIFY (kg-freshness 2026-07-29, medido read-only): o fix do teto de ancestral SEGUE EFETIVO. cat /sys/fs/cgroup/system.slice/memory.min => 402653184 (384M); caddy.service=67108864 (64M); onion-bridge.service=268435456 (256M); drop-in 10-memory-protection.conf presente. Com memory_recursiveprot a protecao do ancestral desce as folhas — os floors de caddy/bridge estao EFETIVOS, confirmando a supersessao de C_ancestor_cap_zeroes_floors. RESSALVA: mede o caso caddy/bridge, NAO a classe host-wide de Q_floors_effective (varredura dos demais floors segue gated)"
