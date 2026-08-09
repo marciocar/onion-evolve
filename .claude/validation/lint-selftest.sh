@@ -5516,6 +5516,102 @@ run_kg_verification_selftests() {
 # mensagem "[OBSOLETA] entrada OBSOLETA (no ja carimbado ou removido)" — o gate AFIRMAVA um carimbo
 # inexistente. Duas raízes: o predicado era ALLOWLIST (e o enum de `status` cresceu por baixo dele,
 # com `drifted`/`unverifiable` nascendo em 2026-08-06), e a saída do escopo não era classificada.
+# ── REGRA 58 — o backlog cumpre as promessas do proprio `meta:` ──────────────────────────────
+# As tres promessas (TETO, DONE-NU, e o fail-loud do SEM-TETO) eram DISCIPLINA ate 2026-08-09:
+# o `meta:` de fios-abertos.kg.yaml as declarava em letra grande e nada as cobrava. Cada caso
+# aqui muta o backlog REAL (copia em mktemp), nunca uma fixture inventada — o gatilho declarado
+# no plano e "as classes rodam em CAMPO", e fixture sintetica ja existe demais nesta bancada.
+run_kg_backlog_selftests() {
+  local helper="${SCRIPT_DIR}/kg-backlog-check.sh"
+  local bg="${REPO_ROOT}/docs/onion/graph/fios-abertos.kg.yaml"
+  if [ ! -f "${helper}" ]; then record_fail "kg-backlog" "helper ausente: ${helper}"; return; fi
+  if [ ! -f "${bg}" ]; then record_skip "kg-backlog: grafo de backlog ausente"; return; fi
+  local d rc out
+  d="$(mktemp -d)"
+
+  # (a) o backlog REAL passa — sem isto, todos os mutantes abaixo provariam o nada (fixture morta)
+  rc=0; out="$(bash "${helper}" "${bg}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "kg-backlog: (a) o backlog vivo do repo PASSA (intacto satisfaz o caso)"
+  else record_fail "kg-backlog: (a)" "o backlog real ja reprova (rc=${rc}): ${out}"; fi
+
+  # (b) DONE-NU — o coracao. A REGRA 49 NAO alcanca este arquivo (ele e todo `plane: DEV`, de
+  #     proposito), entao declarar `done` sem carimbo saia DE GRACA antes desta guarda.
+  sed '0,/^    status: open$/s//    status: done/' "${bg}" > "$d/done.yaml"
+  local rc_int rc_mut
+  rc_int=0; bash "${helper}" "${bg}" >/dev/null 2>&1 || rc_int=$?
+  rc_mut=0; out="$(bash "${helper}" "$d/done.yaml" 2>&1)" || rc_mut=$?
+  _prove_mutation "kg-backlog: (b) item \`done\` SEM carimbo REPROVA — quem nao carimba nao declara feito" \
+                  "${bg}" "$d/done.yaml" "${rc_int}" "${rc_mut}"
+  # a mensagem faz parte do contrato: quem le tem de saber QUAL item e o QUE falta
+  if printf '%s' "${out}" | grep -q 'DONE-NU' && printf '%s' "${out}" | grep -q 'verified_at=AUSENTE'; then
+    record_pass "kg-backlog: (b2) a acusacao NOMEIA o item e o campo que falta"
+  else record_fail "kg-backlog: (b2)" "acusacao sem diagnostico acionavel: ${out}"; fi
+
+  # (c) TETO lido DO ARQUIVO. Passar do teto reprova; e o numero da mensagem vem do `meta:`,
+  #     nunca de constante no script — um numero aqui e outro la seria o mesmo
+  #     `declarado != verificado` que esta regra existe para fechar.
+  awk '/^edges:/ && !done { for (k=0;k<3;k++) printf "    - id: N_ENCHENDO_%d\n      node_type: question\n      plane: DEV\n      status: open\n      impact: 1\n      confidence: 1.0\n      label: \"enchendo %d\"\n\n", k, k; done=1 } {print}' \
+    "${bg}" > "$d/teto.yaml"
+  rc=0; out="$(bash "${helper}" "$d/teto.yaml" 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'TETO' && printf '%s' "${out}" | grep -q 'teto declarado 20'; then
+    record_pass "kg-backlog: (c) passar do TETO reprova, citando o numero que esta no \`meta:\`"
+  else record_fail "kg-backlog: (c)" "teto nao mordeu ou nao citou o numero do arquivo (rc=${rc}): ${out}"; fi
+
+  # (d) FAIL-LOUD: `meta:` sem TETO declarado e HARD, nunca silencio. Guarda que nao sabe o que
+  #     cobrar jamais afirma conformidade (P0 da REGRA 30) — e "sem teto" e indistinguivel de
+  #     "teto zero" para quem so olha o exit code.
+  grep -v 'TETO: 20' "${bg}" > "$d/semteto.yaml"
+  rc=0; out="$(bash "${helper}" "$d/semteto.yaml" 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'SEM-TETO'; then
+    record_pass "kg-backlog: (d) \`meta:\` sem TETO e HARD SEM-TETO (fail-loud, nunca conformidade por ausencia)"
+  else record_fail "kg-backlog: (d)" "sem o teto declarado a guarda ficou calada (rc=${rc}): ${out}"; fi
+
+
+  # (e) A ACUSACAO TEM DE CONTAR, nao so aparecer. Fail-open MEDIDO na 1a versao desta regra:
+  #     `violation()` incrementa HARD_COUNT no shell PAI, e `printf | while read` roda o laco em
+  #     SUBSHELL — o incremento morre com ele. O efeito e o pior possivel: a linha `VIOLATION:` sai
+  #     na tela, o humano ve a acusacao, e o lint FECHA COM EXIT 0. Guarda que acusa e nao conta e
+  #     PIOR que guarda ausente: produz a aparencia de rigor. Medido: 8 HARD com process
+  #     substitution, 7 com o pipe — mesma acusacao impressa nas duas.
+  # (e) ATRAVESSA O GATE, nao o helper — e esta e a CURA DE RAIZ que o Elenxo cobrou.
+  #     Os casos (a)-(d) rodam `bash "${helper}"` direto. O juiz mediu a consequencia e ela e total:
+  #     `grep -c check_kg_backlog lint-selftest.sh` = 0, entao a bancada ficava 5/5 VERDE com o
+  #     fail-open de contagem ATIVO **e** com `check_kg_backlog` comentado fora do dispatcher.
+  #     Helper verde nao e gate verde. E a licao `bancada-espelha-o-runner` na sua forma mais cara:
+  #     o teste media um artefato que NAO E o que barra o merge.
+  #     Este caso planta a violacao, roda o LINT INTEIRO num sandbox git, e exige que o CONTADOR
+  #     suba — nao que a linha apareca. Cobre de uma vez: o subshell, o fio no dispatcher, e o
+  #     escopo (se o arquivo sair de escopo, o contador nao sobe e o caso reprova).
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_skip "kg-backlog: (e) lint-artifacts.sh ausente"; else
+    local sb h_ctrl h_mut
+    sb="$(mktemp -d)"
+    if git -C "${REPO_ROOT}" archive HEAD 2>/dev/null | tar -x -C "${sb}" 2>/dev/null &&
+       cp "${lint}" "${helper}" "${sb}/.claude/validation/" 2>/dev/null &&
+       cp "${bg}" "${sb}/docs/onion/graph/" 2>/dev/null; then
+      ( cd "${sb}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm b ) >/dev/null 2>&1
+      # ⚠️ `|| true` OBRIGATORIO: o lint SAI NAO-ZERO quando acha HARD, que e o ponto dele — e
+      #    `x="$(cmd)"` sob `set -e` ABORTA a suite inteira quando cmd falha. Esta armadilha ja
+      #    matou a bancada duas vezes nesta sessao; aqui ela e GARANTIDA, porque o mutante EXISTE
+      #    para produzir HARD.
+      h_ctrl="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+      h_ctrl="$(printf '%s' "${h_ctrl}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
+      sed -i '0,/^    status: open$/s//    status: done/' "${sb}/docs/onion/graph/fios-abertos.kg.yaml"
+      h_mut="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+      h_mut="$(printf '%s' "${h_mut}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
+      if [ -z "${h_ctrl}" ] || [ -z "${h_mut}" ]; then
+        record_fail "kg-backlog: (e) atravessa o gate" "nao consegui ler o contador HARD do lint (ctrl='${h_ctrl}' mut='${h_mut}') — o caso mediria o nada"
+      elif [ "${h_mut}" -gt "${h_ctrl}" ]; then
+        record_pass "kg-backlog: (e) a violacao CONTA no lint inteiro (HARD ${h_ctrl}→${h_mut}), nao so aparece"
+      else record_fail "kg-backlog: (e) FAIL-OPEN" "o lint imprimiu a acusacao e o contador NAO subiu (HARD ${h_ctrl}→${h_mut}): subshell, fio solto no dispatcher, ou arquivo fora de escopo"; fi
+    else record_skip "kg-backlog: (e) sandbox git nao montou"; fi
+    rm -rf "${sb}"
+  fi
+
+  rm -rf "$d"
+}
+
 run_kg_ratchet_direction_selftests() {
   local helper="${REPO_ROOT}/.claude/validation/kg-verification-coverage.sh"
   if [ ! -f "${helper}" ]; then record_fail "kg-catraca" "helper ausente"; return; fi
@@ -5828,6 +5924,63 @@ run_kg_ratchet_direction_selftests() {
   if printf '%s' "$(bash "${mut}"    "$d" --format tsv 2>/dev/null || true)" | awk -F'\t' '$1=="HARD"{h=1} $2=="RECONCILIADO"{r=1} END{exit !(r && !h)}'; then rc_mutant=0; else rc_mutant=1; fi
   _prove_mutation "kg-catraca: (p) (MUT) sem a checagem de aresta o (k) passa a punir conformidade — a aresta e o discriminador" \
                  "${helper}" "${mut}" "${rc_intact}" "${rc_mutant}"
+
+  # (w) A TABELA DE DOUTRINA CONCORDA COM O QUE O CODIGO EMITE.
+  #
+  # Nasceu de um drift REAL: o cabecalho declarava `REMOVIDO → SOFT (ato visivel no diff)` e "tres
+  # classes legitimas" DEPOIS de o PR da 2a porta ter trocado a emissao para HARD. Comportamento
+  # mudou, doutrina nao — e sobreviveu a uma passada adversarial inteira, porque revisor humano e
+  # revisor-LLM leem a tabela COMO SE fosse a verdade em vez de compara-la com o codigo.
+  #
+  # E `declarado != verificado` dentro do cabecalho do gate que existe para cacar isso. A cura nao
+  # podia ser "quem editar a emissao edita a tabela" — disciplina nao se repete sozinha, e esta casa
+  # ja mediu isso. Vira comparacao mecanica.
+  #
+  # ⚠️ CLASSE COM DUAS SEVERIDADES E LEGITIMA: `MUDOU-DE-PATH` sai HARD fora do escopo e SOFT em path
+  # vivo, de proposito. Por isso o teste e "a severidade da TABELA esta ENTRE as emitidas", nunca
+  # igualdade — a versao ingenua nasceria com falso-positivo, que e como se ensina a ignorar guarda.
+  local cov="${SCRIPT_DIR}/kg-verification-coverage.sh" wd wdiv wn
+  if [ ! -f "${cov}" ]; then record_skip "kg-catraca: (w) kg-verification-coverage.sh ausente"; else
+    wd="$(mktemp -d)"
+    awk '/^#   [A-Z][A-Z-]+ +/ && /→ *(SOFT|HARD)/ { print $2"\t"(($0 ~ /→ *HARD/) ? "HARD" : "SOFT") }' \
+      "${cov}" | sort -u > "${wd}/tabela.tsv"
+    # ⚠️ SO LINHAS DE CODIGO. Uma passada adversarial mediu a fuga: um COMENTARIO contendo o texto
+    # `emit SOFT REMOVIDO` re-esconde o drift FUNDADOR desta catraca — o extrator via o comentario
+    # como se fosse emissao, a severidade "batia", e a tabela voltava a mentir com a guarda verde.
+    # Comparar PROSA com prosa e o oposto do ponto: `(w)` existe para comparar doutrina com CODIGO.
+    grep -vE '^[[:space:]]*#' "${cov}" | grep -oE 'emit (SOFT|HARD) [A-Z-]+' | awk '{print $3"\t"$2}' | sort -u > "${wd}/codigo.tsv"
+    wn="$(grep -c . "${wd}/tabela.tsv" || true)"
+    wdiv=""
+    while IFS=$'\t' read -r wcls wsev; do
+      [ -n "${wcls}" ] || continue
+      # a classe TEM de ser emitida em algum lugar (tabela que descreve classe morta tambem mente)
+      if ! grep -q "^${wcls}"$'\t' "${wd}/codigo.tsv"; then
+        wdiv="${wdiv} ${wcls}(na-tabela-mas-NUNCA-emitida)"
+      elif ! grep -qx "${wcls}"$'\t'"${wsev}" "${wd}/codigo.tsv"; then
+        wdiv="${wdiv} ${wcls}(tabela=${wsev}, emitido=$(grep "^${wcls}"$'\t' "${wd}/codigo.tsv" | cut -f2 | tr '\n' '/'))"
+      fi
+    done < "${wd}/tabela.tsv"
+    # ⚠️ A OUTRA DIRECAO. A 1a versao so ia tabela->codigo: uma classe EMITIDA e ausente da tabela
+    # passava despercebida, e a tabela seguia mentindo POR OMISSAO — que e como o drift fundador
+    # (`REMOVIDO`) teria voltado depois de curado. Aqui a tabela e a lista das SAIDAS DO BASELINE,
+    # nao de todo `emit` do arquivo: `NOVO`, `CATRACA`, `NO-BASELINE`, `PASSIVO`, `SEM-BASE`,
+    # `ID-AMBIGUO` e `MUDOU-DE-PATH` sao outra familia (o gate acusando, nao o baseline encolhendo)
+    # e ficam fora POR DESENHO. Por isso a cobranca e sobre a familia FUGA-*/CARIMBADO/RECONCILIADO/
+    # REMOVIDO, que e a tabela; classe NOVA dessa familia sem linha na tabela reprova.
+    while IFS=$'\t' read -r wcls wsev; do
+      [ -n "${wcls}" ] || continue
+      case "${wcls}" in CARIMBADO|RECONCILIADO|REMOVIDO|FUGA-*) : ;; *) continue ;; esac
+      grep -q "^${wcls}"$'\t' "${wd}/tabela.tsv" || wdiv="${wdiv} ${wcls}(EMITIDA mas AUSENTE da tabela)"
+    done < "${wd}/codigo.tsv"
+    rm -rf "${wd}"
+    # 🐤 canario: tabela vazia passaria por VACUIDADE — o awk depende do formato do cabecalho, e um
+    #    reflow de comentario o mataria em silencio, deixando a guarda verde sem comparar nada.
+    if [ "${wn:-0}" -lt 5 ]; then
+      record_fail "kg-catraca: (w) tabela de doutrina" "o extrator achou ${wn:-0} classes na tabela (esperado >=5) — o formato do cabecalho mudou e a guarda mediria o NADA"
+    elif [ -z "${wdiv}" ]; then
+      record_pass "kg-catraca: (w) a tabela de doutrina concorda com as severidades EMITIDAS (${wn} classes)"
+    else record_fail "kg-catraca: (w) doutrina x codigo" "a tabela do cabecalho mente sobre o comportamento:${wdiv}"; fi
+  fi
 }
 
 run_task_manager_hook_selftests() {
@@ -8407,6 +8560,7 @@ run_scope_gitignore_selftests
 run_task_manager_hook_selftests
 run_kg_verification_selftests
 run_kg_ratchet_direction_selftests
+run_kg_backlog_selftests
 run_safe_count_selftests
 run_scan_sanity_selftests
 run_generator_failure_selftests
