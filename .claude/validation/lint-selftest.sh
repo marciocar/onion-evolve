@@ -5103,6 +5103,15 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (r) pipe ANTES do \$? na mesma linha → AINDA DISPARA (o caso fundador)"
   else record_fail "empty-result-guard: (r)" "o filtro de ORDEM cegou o caso que funda o detector: ${out}"; fi
 
+  # (s) O `$?` QUE IMPORTA E O ULTIMO. Fail-open que a PROPRIA cura de ordem introduziu, achado
+  # medindo e nao lendo: em `echo $?; ls | wc -l; echo $?` o `index()` pegava o PRIMEIRO `$?`
+  # (antes do pipe), concluia "ordem ok" e CALAVA — enquanto o SEGUNDO le o exit do `wc`.
+  # Um filtro que resolve um falso-positivo e abre um falso-NEGATIVO troca ruido por mentira.
+  out="$(_erg '"echo $?; ls | wc -l; echo $?"' '"x"' || true)"
+  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+    record_pass "empty-result-guard: (s) multiplos \$? — o ULTIMO apos pipe real AINDA DISPARA"
+  else record_fail "empty-result-guard: (s)" "o filtro de ORDEM olhou o PRIMEIRO \$? e cegou o segundo: ${out}"; fi
+
   # (p) MUTATION: prova que `unquoted` e load-bearing nas DUAS direcoes. Sem isto, remover o filtro
   # (voltando o falso-positivo) ou neutraliza-lo (voltando os fail-opens) passaria em silencio —
   # que foi literalmente o que aconteceu na 1a versao.
@@ -5567,6 +5576,37 @@ run_consumed_modes_selftests() {
     else record_fail "modos: (0b) --selftest" "rc=${rc}: $(printf '%s' "${out}" | head -c 200)"; fi
   fi
 
+  # (0c)(0d) OS DOIS PARES QUE VIVIAM DA ISENCAO POR DELEGACAO. Ela foi REMOVIDA porque matava uma
+  #          regra HARD: emudecendo so o ramo `tsv` do ladder, o `--selftest` dele seguia 8/8 verde,
+  #          a REGRA 59 declarava o par coberto, e o lint parava de acusar (8 HARD -> 7).
+  #          Aqui o modo `--format tsv` e exercitado DE VERDADE, e o caso assere que ele NAO E MUDO
+  #          — que era exatamente a mutacao que passava despercebida.
+  local ladder="${SCRIPT_DIR}/ladder-integrity-check.sh" kbv="${SCRIPT_DIR}/kb-vendored-link-check.sh"
+  if [ ! -f "${ladder}" ]; then record_skip "modos: (0c) ladder-integrity-check.sh ausente"; else
+    # o ladder resolve o registro por `${root}/.claude/validation/automation-ladder-registry.txt`
+    # (linha 50-51) — nao ha env var. Entao a raiz E o sandbox, e a classe forjada vai no registro dele.
+    d="$(mktemp -d)"; mkdir -p "$d/.claude/validation"
+    cp "${REPO_ROOT}/.claude/validation/automation-ladder-registry.txt" "$d/.claude/validation/" 2>/dev/null \
+      || : > "$d/.claude/validation/automation-ladder-registry.txt"
+    printf 'forjada|AUTO|-\n' >> "$d/.claude/validation/automation-ladder-registry.txt"
+    rc=0; out="$(bash "${SCRIPT_DIR}/ladder-integrity-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+    if [ "${rc}" -ne 0 ] && [ -n "${out}" ] && printf '%s' "${out}" | grep -q 'forjada'; then
+      record_pass "modos: (0c) ladder --format tsv EMITE (classe forjada acusada, tabulada) — o ramo tsv nao e mudo"
+    else record_fail "modos: (0c) ladder tsv" "o ramo tsv nao acusou a classe forjada (rc=${rc}, ${#out} bytes) — foi essa mutacao que a delegacao escondia"; fi
+    rm -rf "$d"
+  fi
+  if [ ! -f "${kbv}" ]; then record_skip "modos: (0d) kb-vendored-link-check.sh ausente"; else
+    # ⚠️ CAMINHO LITERAL, nao `${kbv}` — o extrator da REGRA 59 nao resolve variavel indireta, entao
+    # a invocacao por variavel EXERCITA o modo e mesmo assim conta como descoberto. Medido: o caso
+    # passava 762/0 e o detector seguia acusando o par. Escrever na forma que o instrumento le e
+    # parte do contrato, e a alternativa (ensinar o extrator a resolver variavel) e outro ciclo.
+    rc=0; out="$(bash "${SCRIPT_DIR}/kb-vendored-link-check.sh" "${REPO_ROOT}" --format tsv 2>&1)" || rc=$?
+    # o contrato do modo tsv: silencio no verde, linhas TABULADAS no vermelho — nunca prosa
+    if [ "${rc}" -le 1 ] && { [ -z "${out}" ] || printf '%s' "${out}" | grep -qP '\t'; }; then
+      record_pass "modos: (0d) kb-vendored-link --format tsv respeita o contrato (vazio ou TABULADO, nunca prosa)"
+    else record_fail "modos: (0d) kbv tsv" "rc=${rc} com saida nao-tabulada: $(printf '%s' "${out}" | head -c 200)"; fi
+  fi
+
   # (a) inventory.sh --markdown: a producao compara ESTA saida com docs/onion/inventory.md.
   local inv="${SCRIPT_DIR}/inventory.sh"
   if [ ! -f "${inv}" ]; then record_skip "modos: (a) inventory.sh ausente"; else
@@ -5604,22 +5644,36 @@ run_consumed_modes_selftests() {
     else record_fail "modos: (c) kg-view default" "rc=${rc}; o default divergiu de --markdown (a producao invoca sem flag)"; fi
   fi
 
-  # (d)(e) migalhas-generate.sh sem flag e --check: um GERA, o outro VERIFICA. Se os dois fizerem a
-  #        mesma coisa, o `--check` do gate esta escrevendo no repo durante o CI — ou nao verifica nada.
+  # (d)(e) migalhas-generate.sh sem flag e --check. Um GERA, o outro VERIFICA.
+  #
+  # ⚠️ EM SANDBOX, NUNCA NA ARVORE VIVA — e as duas razoes foram MEDIDAS por passada adversarial:
+  #   · o modo SEM FLAG e modo de ESCRITA. A 1a versao o rodava contra o repo real, regenerava as
+  #     superficies e APAGAVA o drift que a REGRA 34 existe para pegar. Bancada que conserta o que
+  #     o gate deveria acusar e pior que bancada ausente: ela produz o verde que esconde.
+  #   · e o (d) tomava a linha-base DEPOIS de ja ter invocado `--check` uma vez — media o delta
+  #     entre a 2a e a 3a corrida, entao um `--check` que ESCREVE passava. Vacuo por ordem.
+  # O sandbox e um clone git de verdade (`git archive` + `git init` + commit): sem `.git` o
+  # `git status` do proprio caso nao funciona, e a medicao mentiria de novo.
   local mig="${SCRIPT_DIR}/migalhas-generate.sh"
   if [ ! -f "${mig}" ]; then record_skip "modos: (d) migalhas-generate.sh ausente"; else
-    rc=0; out="$(bash "${mig}" --check 2>&1)" || rc=$?
-    local sujo_antes sujo_depois
-    sujo_antes="$(git -C "${REPO_ROOT}" status --porcelain 2>/dev/null | wc -l)"
-    rc=0; out="$(bash "${mig}" --check 2>&1)" || rc=$?
-    sujo_depois="$(git -C "${REPO_ROOT}" status --porcelain 2>/dev/null | wc -l)"
-    if [ "${sujo_antes}" = "${sujo_depois}" ]; then
-      record_pass "modos: (d) migalhas-generate --check NAO escreve no repo (verificar != gerar)"
-    else record_fail "modos: (d) --check escreve" "o modo de VERIFICACAO alterou a arvore: ${sujo_antes} -> ${sujo_depois} arquivos sujos"; fi
-    rc=0; out="$(bash "${mig}" 2>&1)" || rc=$?
-    if [ "${rc}" -eq 0 ] || [ "${rc}" -eq 1 ]; then
-      record_pass "modos: (e) migalhas-generate SEM flag roda (rc=${rc}) — o modo que a producao invoca"
-    else record_fail "modos: (e) migalhas sem flag" "rc=${rc} (erro de execucao): $(printf '%s' "${out}" | head -c 200)"; fi
+    local sb dirty_before dirty_after
+    sb="$(mktemp -d)"
+    if git -C "${REPO_ROOT}" archive HEAD 2>/dev/null | tar -x -C "${sb}" 2>/dev/null; then
+      ( cd "${sb}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm b ) >/dev/null 2>&1
+      # (d) LINHA-BASE ANTES DE QUALQUER INVOCACAO
+      dirty_before="$(cd "${sb}" && git status --porcelain | wc -l)"
+      rc=0; out="$(cd "${sb}" && bash .claude/validation/migalhas-generate.sh --check 2>&1)" || rc=$?
+      dirty_after="$(cd "${sb}" && git status --porcelain | wc -l)"
+      if [ "${dirty_before}" = "${dirty_after}" ]; then
+        record_pass "modos: (d) migalhas-generate --check NAO escreve (verificar != gerar), medido do estado ZERO"
+      else record_fail "modos: (d) --check escreve" "o modo de VERIFICACAO alterou a arvore: ${dirty_before} -> ${dirty_after}"; fi
+      # (e) o modo de ESCRITA, exercitado onde ele PODE escrever — e provando que escreveu
+      rc=0; out="$(cd "${sb}" && bash .claude/validation/migalhas-generate.sh 2>&1)" || rc=$?
+      if [ "${rc}" -eq 0 ] || [ "${rc}" -eq 1 ]; then
+        record_pass "modos: (e) migalhas-generate SEM flag roda em SANDBOX (rc=${rc}) — nunca na arvore viva"
+      else record_fail "modos: (e) migalhas sem flag" "rc=${rc} (erro de execucao): $(printf '%s' "${out}" | head -c 200)"; fi
+    else record_skip "modos: (d)(e) sandbox git nao montou"; fi
+    rm -rf "${sb}"
   fi
 }
 

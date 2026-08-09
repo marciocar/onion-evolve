@@ -689,6 +689,15 @@ check_consumed_modes() {
     violation "HARD" "${helper}" "[modo-consumido/NAO-EXECUTOU] o helper saiu com rc=${rc} — erro de EXECUCAO, nao veredito. stderr: $(head -c 300 "${errf}" | tr '\n' ' ')"
     rm -f "${errf}"; return 0
   fi
+  # ⚠️ rc=1 COM STDOUT VAZIO E CONTRADICAO, nao conformidade. O contrato diz "1 = ha modo sem teste",
+  # e nesse caso o helper TEM de nomear pelo menos um. Vazio significa que ele morreu no meio — o
+  # `set -e` dele tambem sai 1 (tmp sem permissao de escrita, por exemplo), e a saida some junto.
+  # Sem esta checagem o wire-in itera sobre nada e o lint passa: e a mesma familia do fail-open de
+  # 2026-08-06 (guarda que testa o modo errado), reproduzida na fronteira do consumidor.
+  if [ "${rc}" -eq 1 ] && [ -z "${out}" ]; then
+    violation "HARD" "${helper}" "[modo-consumido/CONTRADICAO] o helper saiu 1 (=ha modo sem teste) e NAO nomeou nenhum — morreu no meio? stderr: $(head -c 300 "${errf}" | tr '\n' ' ')"
+    rm -f "${errf}"; return 0
+  fi
   rm -f "${errf}"
   # process substitution: `printf | while` rodaria o laco em SUBSHELL e o incremento de
   # HARD_COUNT morreria com ele — fail-open medido na REGRA 58, um dia antes desta.

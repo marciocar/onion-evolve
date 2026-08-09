@@ -255,13 +255,21 @@ fi
 _covered() {
   local scr="${1%%	*}" flg="${1#*	}"
   local tscr tflg f ok
-  # DELEGAÇÃO CONTA COMO COBERTURA, e é isenção declarada: quando o selftest invoca `--selftest`, ele
-  # está delegando ao teste EMBUTIDO do próprio script. Não dá para saber daqui se aquele teste cobre
-  # o modo TSV — e acusar mesmo assim seria julgar o que não se mediu, o erro que esta regra existe
-  # para pegar. TETO: se o `--selftest` de um script não cobrir seu modo de produção, esta regra cala.
-  if grep -qF "${scr}	--selftest" "${TMPDIR:-/tmp}/.cmc-test.$$" 2>/dev/null; then
-    DELEG=$((DELEG + 1)); return 0
-  fi
+  # ⚠️ A DELEGACAO POR `--selftest` FOI REMOVIDA, e a razao e a pior que existe: ela MATAVA UMA
+  # REGRA HARD. Passada adversarial mediu, no core, hoje — emudecendo SO o ramo `tsv` do
+  # `ladder-integrity-check.sh` (o modo que a producao consome), o `--selftest` dele seguia 8/8
+  # VERDE, esta regra declarava o par COBERTO, e o lint deixava de acusar uma classe forjada:
+  # 8 HARD viraram 7. A regra que existe para pegar "o modo consumido diverge do modo testado"
+  # declarava cobertura EXATAMENTE sobre o par onde isso estava acontecendo.
+  #
+  # A isencao vinha de um raciocinio honesto e errado: "nao da para saber daqui se o `--selftest`
+  # embutido cobre o modo tsv, e acusar sem medir e o erro que esta regra caca". Mas o oposto de
+  # ACUSAR-SEM-MEDIR nao e ABSOLVER-SEM-MEDIR — e DECLARAR QUE NAO SABE. Absolver por ignorancia e
+  # o fail-open que o P0 da REGRA 30 proibe, com a agravante de o teto estar escrito no comentario
+  # e ninguem o ler ao ver o ✅.
+  #
+  # No lugar: os pares que viviam disso ganharam caso EXPLICITO na bancada, exercitando `--format
+  # tsv` de verdade. Cobertura PROVADA substitui cobertura PRESUMIDA.
   while IFS= read -r t; do
     [ -n "${t}" ] || continue
     tscr="${t%%	*}"; tflg="${t#*	}"

@@ -1,14 +1,14 @@
 ---
 branch: feat/regra59-modo-consumido
 date: 2026-08-09
-reviewed_diff_sha256: a9c858185f769b4f6d9c9dec80dedef3b6c4596e6b9c5a76ff9e6243cd8b6258
-findings_total: 4
-findings_real: 4
-findings_fixed: 4
-tokens: 0
-duration_min: 0
-verdict: SEM-ELENXO-O-INSTRUMENTO-SE-PROVOU-CONTRA-MIM-TRES-VEZES-ANTES-DE-VIRAR-REGRA
-reviewer: sem passada adversarial — ver "O que NÃO foi feito"
+reviewed_diff_sha256: 3b160a11859372386f3a0ec0c53e15281a812e20dab4a840ee87c0f0d6949175
+findings_total: 29
+findings_real: 12
+findings_fixed: 9
+tokens: 725035
+duration_min: 55
+verdict: HARD-MAS-NAO-COMO-ESTAVA-A-ISENCAO-POR-DELEGACAO-MATAVA-UMA-REGRA-HARD
+reviewer: Elenxo — 2 lentes × 2 refutadores + juiz (opus/high, juiz em max), wf_ec07ce39-714
 ---
 
 # W4 · o instrumento se provou contra mim três vezes antes de virar regra
@@ -128,9 +128,103 @@ interrompe ferramenta viva. A superação barata e reversível de (2) — drop-i
   fundadores gritam)
 - backlog **18/20**, nenhum `done` sem carimbo · radar do grafo verde
 
+## A passada adversarial — 3 de 4 refutadores disseram `CAI`
+
+**29 achados brutos → 12 sobrevivem.** Veredito: **«HARD, mas NÃO como está.»** O juiz refutou
+explicitamente um medo meu (*"a contagem está CORRETA — a process substitution funciona,
+`HARD_COUNT` sobe 7→8; não há eco do defeito da REGRA 58"*) e confirmou que a concepção está certa.
+O que estava errado era cirúrgico — e o pior era grave.
+
+### O pior: a isenção por delegação MATAVA uma regra HARD, hoje, no core
+
+Emudecendo **só o ramo `tsv`** do `ladder-integrity-check.sh` — o modo que a produção consome:
+
+```
+--selftest do ladder :  8/8 VERDE
+REGRA 59             :  rc=0, par COBERTO
+classe forjada       :  o lint DEIXA de acusar  →  8 HARD viram 7
+```
+
+**A regra que existe para pegar *"o modo consumido diverge do modo testado"* declarava cobertura
+exatamente sobre o par onde isso estava acontecendo.**
+
+A isenção vinha de um raciocínio honesto e errado, e eu o escrevi no código: *"não dá para saber
+daqui se o `--selftest` embutido cobre o modo tsv, e acusar sem medir é o erro que esta regra caça"*.
+Mas **o oposto de acusar-sem-medir não é absolver-sem-medir — é declarar que não se sabe.** Absolver
+por ignorância é o fail-open que o P0 da REGRA 30 proíbe, com a agravante de o teto estar escrito no
+comentário e ninguém o ler ao ver o ✅.
+
+**Removida.** Os três pares que viviam dela ganharam caso explícito: `(0)` o próprio detector,
+`(0c)` o ladder — **com a classe forjada, provando que o ramo `tsv` não é mudo**, que era exatamente
+a mutação que passava —, e `(0d)` o `kb-vendored-link`. Cobertura **provada** substitui cobertura
+**presumida**: `32 pares · 0 sem teste · 0 por delegação`.
+
+### O segundo: eu ceguei o modo-de-falha fundador da guarda
+
+```
+ls | wc -l; echo "rc=$?"      main DISPARA  ·  o commit do PR CALA
+```
+
+Pipe real, `$?` **entre aspas**, mesma linha. Causa: eu lia **os dois** em `nu`, e `unquoted()` apaga
+o `$?` junto com as aspas. A assimetria certa: **`|` entre aspas é texto; `$?` entre aspas ainda é
+leitura.** O pipe se lê em `nu`, o `$?` na linha crua.
+
+E o juiz apontou o que faltava mesmo depois de eu curar: **a cura estava desguardada** — ele mutou-a
+de volta e a bancada passou 19/0. Agora há caso.
+
+### O terceiro, e ele explica a corrente inteira
+
+**O extrator é cego a prefixo de env.** `ALVO_ROOT="${tmp}" bash "${h}" --modo` some do lado
+**teste**, porque a regra indireta pega o primeiro `${...}` da linha (o do prefixo), não o adjacente
+ao `bash`. São 25 invocações da bancada invisíveis — e **0 na produção**, que não usa prefixo. A
+cegueira é **assimétrica**, e assimetria produz falso-positivo.
+
+Consequência medida pelo juiz: **duas das cinco acusações originais eram FALSAS.** A bancada já
+exercitava `migalhas-generate` desde as linhas 804/819/826/832, em sandbox.
+
+> falso-positivo em regra HARD → "cura" cerimonial → caso que **escreve no repo** e apaga outra
+> regra HARD.
+
+A ponta final dessa corrente eu também vivi ao curar: escrevi `(0d)` como `bash "${kbv}" ...`, o caso
+**exercitou o modo**, a bancada passou 762/0 — e o detector **seguiu acusando o par**, porque não
+resolve variável indireta. Reescrito em caminho literal.
+
+### O quarto: a bancada escrevia no repo
+
+O caso `(e)` rodava `migalhas-generate.sh` em **modo escrita contra a árvore real** e apagava o drift
+que a REGRA 34 existe para pegar. As 6 invocações **pré-existentes** do mesmo gerador usam
+`MIGALHAS_ROOT="${tmp}"`; só as minhas omitiam. E o `(d)` tomava a linha-base **depois** de já ter
+invocado `--check` uma vez — media o delta entre a 2ª e a 3ª corrida, então um `--check` que escreve
+passava. **Vácuo por ordem.**
+
+Os dois foram para sandbox git de verdade. **Dano não ocorreu**: medi que nenhum arquivo de `site/`
+entrou no diff e que `main` já estava verde no `--check`. O defeito era real; o estrago, não.
+
+### Mais três, fechados
+
+- **`rc=1` com stdout VAZIO era tratado como veredito** — e `rc=1` é também o código de abort do
+  `set -e` do helper. Agora é `CONTRADICAO` HARD: *"saiu 1 (=há modo sem teste) e NÃO nomeou nenhum"*.
+- **A isenção casava por SUBSTRING** (`grep -F`): `radar.sh` ficava coberto por
+  `kg-radar.sh --selftest`. `-xF` fecha.
+- **O `$?` que importa é o ÚLTIMO** — achado por mim, medindo: em `echo $?; ls | wc -l; echo $?` o
+  `index()` pegava o primeiro (antes do pipe) e calava, enquanto o segundo lê o exit do `wc`.
+
+## Dívida que fica, e ela é a raiz
+
+- **O extrator não conta o que perde.** O juiz plantou 4 invocações, saiu **1 par**, e o rodapé disse
+  *"0 flag dinâmica"* — o que **falsifica** a promessa escrita em letra grande no cabeçalho da REGRA
+  59 (*"supressão CONTADA, nunca silenciosa"*). Pior: o rodapé inteiro está sob `if FORMAT != tsv`,
+  então **no único modo que o gate invoca a supressão é invisível**.
+- **Não há PISO.** Um refactor de estilo derrubou 32 → 11 pares e o veredito seguiu ✅ — a guarda de
+  vacuidade só dispara em **zero exato**.
+- **O prefixo de env** segue cego, e é o que produziu os dois falsos.
+
+As três são a mesma família e pedem um ciclo próprio: **o extrator precisa de catraca de cobertura,
+não de mais casos.** Não as forjei aqui porque meia-cura num extrator é como este PR nasceu.
+
 ## O que NÃO foi feito, declarado
 
-- **Sem passada adversarial.** As duas anteriores acharam 18 e 21 defeitos reais, e nas duas os
+- **As correções do Elenxo não foram re-auditadas** por uma segunda passada. As duas anteriores acharam 18 e 21 defeitos reais, e nas duas os
   piores eram fail-opens que eu **introduzi curando outra coisa**. O que substitui aqui é menos: o
   instrumento se provou contra mim três vezes, e a bancada pegou o `(p)` sobreposto. O que um
   refutador provavelmente atacaria: o extrator de pares é regex sobre `bash "${VAR}/script.sh"` —
