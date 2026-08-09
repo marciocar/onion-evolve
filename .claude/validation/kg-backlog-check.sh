@@ -2,15 +2,15 @@
 # kg-backlog-check.sh — mecaniza as promessas do `meta:` do grafo de backlog.
 #
 # POR QUE EXISTE (dano medido, 2026-08-09): o `meta:` de `fios-abertos.kg.yaml` PROMETE, em letra
-# grande, um teto de 20 nós, "onda nova exige onda COLHIDA" e "QUEM NÃO CONSEGUE CARIMBAR NÃO PODE
+# grande, um cap de 20 nós, "onda nova exige onda COLHIDA" e "QUEM NÃO CONSEGUE CARIMBAR NÃO PODE
 # DECLARAR FEITO". Nenhuma das três existia como guarda. Uma passada adversarial anotou isso como
 # `fix-must-become-mechanism` aplicado AO PRÓPRIO ARQUIVO QUE NOMEIA A DOUTRINA — o backlog podia
 # inchar até virar cemitério, ou declarar `done` sem medição, e nada acusaria.
 #
 # O QUE JULGA — três checagens, todas contra o arquivo, nenhuma contra a memória de quem edita:
-#   TETO         mais que o teto declarado no próprio `meta:`                        → HARD
+#   TETO         mais que o cap declarado no próprio `meta:`                        → HARD
 #   DONE-NU      item `done` sem `verified_at` + `verified_against` com VALOR         → HARD
-#   SEM-TETO     o `meta:` nao declara teto — nao sei o que cobrar, logo nao aprovo    → HARD
+#   SEM-TETO     o `meta:` nao declara cap — nao sei o que cobrar, logo nao aprovo    → HARD
 #
 # ⚠️ ESTA TABELA JA MENTIU NA 1a VERSAO, no PR que criou a catraca `(w)` contra tabelas que mentem:
 # ela listava `PARADO → SOFT`, que NUNCA foi emitido, e OMITIA `SEM-TETO`, que e emitido. Escrever a
@@ -33,10 +33,10 @@ FILE="${1:-}"
 [ -n "${FILE}" ] && [ -f "${FILE}" ] || { echo "uso: kg-backlog-check.sh <backlog.kg.yaml> [--format tsv]" >&2; exit 2; }
 FMT="${2:-}"
 
-awk -v fmt="${FMT}" -v arq="${FILE}" '
-  # ── teto e baseline vêm do PRÓPRIO arquivo ────────────────────────────────────────────────
-  /^[[:space:]]*#.*TETO:[[:space:]]*[0-9]+[[:space:]]*N/ { if (match($0, /TETO:[[:space:]]*[0-9]+/)) { t=substr($0,RSTART,RLENGTH); gsub(/[^0-9]/,"",t); teto=t+0 } }
-  /^[[:space:]]*baseline:[[:space:]]*[0-9]/ { base=$2 }
+awk -v fmt="${FMT}" -v file="${FILE}" '
+  # ── cap e baseline vêm do PRÓPRIO arquivo ────────────────────────────────────────────────
+  /^[[:space:]]*#.*TETO:[[:space:]]*[0-9]+[[:space:]]*N/ { if (match($0, /TETO:[[:space:]]*[0-9]+/)) { t=substr($0,RSTART,RLENGTH); gsub(/[^0-9]/,"",t); cap=t+0 } }
+  /^[[:space:]]*baseline:[[:space:]]*[0-9]/ { baseline=$2 }
 
   # ⚠️ NORMALIZAR ANTES DE COMPARAR. A 1a versao lia `$2` cru e uma passada adversarial mediu quatro
   # fugas, todas YAML VALIDO e indistinguivel a olho: `status: "done"` (aspas) escapava do DONE-NU;
@@ -58,24 +58,24 @@ awk -v fmt="${FMT}" -v arq="${FILE}" '
   function flush() {
     n++
     if (st == "done" && (va == "" || vg == "")) {
-      donenu[++dn] = id "(verified_at=" (va==""?"AUSENTE":va) " verified_against=" (vg==""?"AUSENTE":vg) ")"
+      unstamped[++un] = id "(verified_at=" (va==""?"AUSENTE":va) " verified_against=" (vg==""?"AUSENTE":vg) ")"
     }
     id=""
   }
   function report(   i) {
-    if (teto == 0) {
-      # fail-loud: sem o teto declarado a guarda nao sabe o que cobrar, e "nao sei" NUNCA vira "ok"
-      printf "HARD\tSEM-TETO\t%s\to `meta:` nao declara TETO — a guarda nao pode afirmar conformidade sobre um limite que nao existe\n", arq
-      exitcode = 1
-    } else if (n > teto) {
-      printf "HARD\tTETO\t%s\t%d nos, teto declarado %d — onda nova exige onda COLHIDA (o `meta:` deste arquivo)\n", arq, n, teto
-      exitcode = 1
+    if (cap == 0) {
+      # fail-loud: sem o cap declarado a guarda nao sabe o que cobrar, e "nao sei" NUNCA vira "ok"
+      printf "HARD\tSEM-TETO\t%s\to `meta:` nao declara TETO — a guarda nao pode afirmar conformidade sobre um limite que nao existe\n", file
+      rc = 1
+    } else if (n > cap) {
+      printf "HARD\tTETO\t%s\t%d nos, teto declarado %d — onda nova exige onda COLHIDA (o `meta:` deste arquivo)\n", file, n, cap
+      rc = 1
     }
-    for (i = 1; i <= dn; i++) {
-      printf "HARD\tDONE-NU\t%s\titem declarado `done` SEM carimbo: %s — quem nao consegue carimbar nao pode declarar feito\n", arq, donenu[i]
-      exitcode = 1
+    for (i = 1; i <= un; i++) {
+      printf "HARD\tDONE-NU\t%s\titem declarado `done` SEM carimbo: %s — quem nao consegue carimbar nao pode declarar feito\n", file, unstamped[i]
+      rc = 1
     }
-    if (fmt != "--format" && exitcode != 1) printf "OK\tBACKLOG\t%s\t%d/%d nos, nenhum `done` sem carimbo\n", arq, n, teto
-    exit exitcode+0
+    if (fmt != "--format" && rc != 1) printf "OK\tBACKLOG\t%s\t%d/%d nos, nenhum `done` sem carimbo\n", file, n, cap
+    exit rc+0
   }
 ' "${FILE}"

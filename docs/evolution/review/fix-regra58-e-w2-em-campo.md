@@ -1,7 +1,7 @@
 ---
 branch: fix/regra58-e-w2-em-campo
 date: 2026-08-09
-reviewed_diff_sha256: d75627df6456d4d9a8f38575414a0216186de6959bdfcf8af622a221fee1c1b8
+reviewed_diff_sha256: fff45a2289ad22bd161828838fbe91f34fe06b5d06c1113f68827a8d3739d5f0
 findings_total: 42
 findings_real: 21
 findings_fixed: 8
