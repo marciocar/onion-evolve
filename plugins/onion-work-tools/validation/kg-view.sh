@@ -42,6 +42,12 @@ if [ -z "${FILE}" ] || [ ! -f "${FILE}" ]; then
 fi
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# SITIO UNICO do fator de status — a copia daqui e a que DIVERGIU: quando `drifted`/`unverifiable`
+# entraram no enum em 2026-08-06, o radar ganhou os slots e esta lente NAO, devolvendo -1 (clampado
+# a 0) nos nos mais urgentes. FAIL-LOUD se faltar: fonte ausente nunca vira aprovacao.
+_LIB="${HERE}/lib/status-factor.awk"
+[ -f "${_LIB}" ] || { echo "kg-view: lib/status-factor.awk AUSENTE (${_LIB}) — o fator de status vive la." >&2; exit 2; }
+STATUS_FACTOR="$(cat "${_LIB}")"
 
 # A saída precisa ser IDÊNTICA vinda de caminho relativo ou absoluto — senão a
 # lente "driftaria" só por causa de quem a invocou, e o drift-guard (REGRA 31)
@@ -72,6 +78,37 @@ if [ "${MODE}" = "--assert-parity" ]; then
     printf '✗ kg-view: kg-radar.sh não encontrado em %s — paridade não pode ser afirmada.\n' "${HERE}" >&2
     exit 1
   fi
+  # ⚠️ O BLOCO DE PESO VEM ANTES DA INTEGRIDADE, e a ordem é o conserto de um fail-open medido:
+  # a versão anterior comparava peso DEPOIS do early-exit que sai 0 quando o radar não reporta
+  # contagens. Como o radar só as imprime quando está VERDE, UM nó órfão (grau 0) desarmava a
+  # guarda inteira — com a MESMA lente adulterada, grafo limpo reprovava e grafo com um órfão
+  # saía 0. Peso não depende de integridade: `--weights-tsv` produz saída íntegra em grafo não-verde.
+  #
+  # ⚠️ VETOR, NÃO SOMA. A soma era um ESCALAR AGREGADO, e passada adversarial mediu as duas fugas:
+  #   · CANCELAMENTO — trocar os pesos de dois nós inverte a ORDEM DE URGÊNCIA e a soma não muda
+  #     (10.40+8.00 == 8.00+10.40): a projeção dizia que o nó de impact 2 era mais urgente que o de
+  #     impact 4, e a guarda imprimia ✅;
+  #   · ESCOPO — a soma só cobria os nós EM ABERTO, então divergir em `confirmed`/`done`/
+  #     `superseded`/`refuted` (4 dos 7 valores do enum) saía verde POR CONSTRUÇÃO. Medido: uma
+  #     lente que pesa `done` a 0.15 em vez de 0.1 passava em 58 de 58 grafos.
+  # O vetor compara par a par e nomeia o nó que divergiu. E dissolve a razão de existir da denylist
+  # que esta guarda replicava do radar — cópia de regra que só existia para poder somar.
+  v_vec="$(bash "$0" "${FILE}" --json 2>/dev/null | tr '{' '\n' \
+           | sed -nE 's/.*"id":"([^"]+)".*"w":([0-9.]+).*/\1\t\2/p' \
+           | awk -F'\t' '{printf "%s\t%.2f\n", $1, $2}' | LC_ALL=C sort)"
+  r_vec="$(bash "${HERE}/kg-radar.sh" "${FILE}" --weights-tsv 2>/dev/null | LC_ALL=C sort)"
+  if [ -z "${r_vec}" ]; then
+    printf '\342\234\227 kg-view: o motor nao emitiu vetor de pesos (--weights-tsv vazio) — paridade nao pode ser afirmada.\n' >&2
+    exit 1
+  fi
+  if [ "${r_vec}" != "${v_vec}" ]; then
+    printf '\342\234\227 DIVERGENCIA de PESO entre a projecao e o motor. Nos que discordam:\n' >&2
+    diff <(printf '%s\n' "${r_vec}") <(printf '%s\n' "${v_vec}") \
+      | grep -E '^[<>]' | head -12 | sed 's/^</  motor  /; s/^>/  lente  /' >&2
+    printf '  Reconcilie lib/status-factor.awk (o fator de status tem SITIO UNICO).\n' >&2
+    exit 1
+  fi
+
   radar_out="$(bash "${HERE}/kg-radar.sh" "${FILE}" --integrity 2>&1 || true)"
   # "✅ sem contradições estruturais (881 nós, 1086 arestas)"
   r_n="$(printf '%s' "${radar_out}" | grep -oE '\(([0-9]+) nós' | grep -oE '[0-9]+' | head -1)"
@@ -97,14 +134,7 @@ fi
 
 case "${MODE}" in --markdown|--json) ;; *) printf 'modo inválido: %s\n' "${MODE}" >&2; exit 2 ;; esac
 
-awk -v mode="${MODE}" -v src="${SRC_REL}" '
-function statusFactor(s) {
-  if (s == "open" || s == "confirmed") return 1.0
-  if (s == "refuted") return 0.0
-  if (s == "superseded") return 0.2
-  if (s == "done") return 0.1
-  return -1
-}
+awk -v mode="${MODE}" -v src="${SRC_REL}" "${STATUS_FACTOR}"'
 function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["'\'']$/, "", s); return s }
 # Markdown lê para humano: aspas escapadas do YAML (\") viram aspas de verdade.
 # NÃO usar no JSON — lá o escape é a gramática, não sujeira.
@@ -145,7 +175,14 @@ section == "edges" && /^[[:space:]]*edge_type:/{ v=$0; sub(/^[[:space:]]*edge_ty
 section == "edges" && /^[[:space:]]*on:/       { v=$0; sub(/^[[:space:]]*on:/,"",v);        eon[ne]=trim(v); next }
 
 END {
-  for (i = 1; i <= ne; i++) { deg[efrom[i]]++; deg[eto[i]]++ }
+  # ⚠️ O `on:` CONTA NO GRAU — a lente parseava `eon[]` e nunca o usava, enquanto o motor conta
+  # (kg-radar.sh:297, "on: conecta o evento (não é órfão)"). DRIFT DE PARSER real, e exatamente o
+  # modo de falha que a REGRA 31(b) existe para pegar: duas implementações liam o mesmo arquivo e
+  # discordavam do GRAU, logo da atenção, logo de QUAL nó é o mais urgente.
+  # Viveu invisível porque o portão só rodava a paridade em grafo COM lente — 1 de 58 — e aquele
+  # grafo tem ZERO `on:`. Ao estender a paridade aos 58, apareceu na hora, e a correlação foi
+  # perfeita: os 5 que reprovaram são EXATAMENTE os 5 que usam `on:`; os 53 sem `on:` passaram.
+  for (i = 1; i <= ne; i++) { deg[efrom[i]]++; deg[eto[i]]++; if (eon[i] != "") deg[eon[i]]++ }
   for (i = 1; i <= nn; i++) {
     id = order[i]; sf = statusFactor(nstatus[id]); if (sf < 0) sf = 0
     att[id] = impact[id] * conf[id] * sf * (1 + deg[id])

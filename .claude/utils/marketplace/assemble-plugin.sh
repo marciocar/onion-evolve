@@ -59,6 +59,34 @@ for c in "${COMMANDS[@]}"; do [ -e "${SRC}/${c}" ] || { echo "ERRO: command font
 for a in "${AGENTS[@]}"; do [ -f "${SRC}/${a}" ] || { echo "ERRO: agente fonte ausente: ${a}" >&2; exit 2; }; done
 for u in "${UTILS[@]}"; do [ -d "${SRC}/${u}" ] || { echo "ERRO: util fonte ausente: ${u}" >&2; exit 2; }; done
 for v in "${VALIDATION[@]}"; do [ -f "${SRC}/${v}" ] || { echo "ERRO: validation fonte ausente: ${v}" >&2; exit 2; }; done
+
+# ── O BUNDLE TEM DE FECHAR O GRAFO DE DEPENDENCIAS ──────────────────────────────────────────────
+# Script copiado que resolve uma lib por `HERE/lib/<x>` precisa que a lib venha JUNTO. Sem isto o
+# manifesto monta limpo, passa no lint, e o plugin nasce MORTO no adotante — sai 2 no primeiro uso,
+# no ambiente de quem instalou, longe de quem publicou. Nao e hipotetico: aconteceu ao introduzir
+# `lib/status-factor.awk` e foi curado A MAO nos dois manifestos. Cura a mao nao se repete sozinha,
+# entao virou aresta de CONSTRUCAO, aqui, no unico ponto por onde toda vertical passa.
+#
+# ⚠️ AQUI EM CIMA, JUNTO DA VALIDACAO DE FONTE, E NAO NO LACO DE COPIA — e isso foi medido por dano:
+# a 1a versao desta guarda abortava DEPOIS de copiar, e o assembler que desiste deixava o destino
+# em ruinas (21 arquivos sujos, `plugin.json` DELETADO, o lint acusando "fora de sincronia"). Guarda
+# que aborta tem de abortar ANTES de tocar no destino, senao a recusa e mais destrutiva que o defeito
+# que ela recusa. Toda validacao deste script mora antes da 1a escrita, e esta se junta a elas.
+_missing_deps=""
+for v in "${VALIDATION[@]}"; do
+  case "${v}" in *.sh) : ;; *) continue ;; esac
+  while IFS= read -r _need; do
+    [ -n "${_need}" ] || continue
+    _target=".claude/validation/lib/${_need}"
+    case " ${VALIDATION[*]} " in *" ${_target} "*) : ;;
+      *) _missing_deps="${_missing_deps}\n  · ${v} precisa de ${_target}, que NAO esta no VALIDATION[] deste manifesto" ;;
+    esac
+  done < <(grep -oE 'lib/[A-Za-z0-9_.-]+\.(awk|sh)' "${SRC}/${v}" 2>/dev/null | sed 's#^lib/##' | sort -u)
+done
+if [ -n "${_missing_deps}" ]; then
+  printf 'ERRO: o bundle nao fecha o grafo de dependencias — o plugin nasceria morto no adotante:%b\n' "${_missing_deps}" >&2
+  exit 2
+fi
 for t in "${TEMPLATES[@]}"; do [ -f "${SRC}/${t}" ] || { echo "ERRO: template fonte ausente: ${t}" >&2; exit 2; }; done
 for s in "${SKILLS[@]}"; do [ -d "${SRC}/${s}" ] || { echo "ERRO: skill fonte ausente (dir): ${s}" >&2; exit 2; }; done
 for h in "${HOOKS[@]}"; do [ -f "${SRC}/${h}" ] || { echo "ERRO: hook fonte ausente (arquivo): ${h}" >&2; exit 2; }; done

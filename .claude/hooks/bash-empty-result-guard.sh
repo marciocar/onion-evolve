@@ -77,11 +77,53 @@ add() { warn="${warn}
 # anterior. Cobre os dois casos reais (o pipe-e-$?-na-mesma-linha e o `cmd | tail` seguido de
 # `echo $?` na linha de baixo) e mata o cross-statement.
 # `set -o pipefail` em qualquer lugar do comando desarma — quem o declara já sabe do problema.
+# CORREÇÃO 2026-08-09 (3ª classe de falso-positivo achada POR USO — CINCO disparos numa sessão):
+# a proximidade contava `|` DENTRO DE ASPAS como pipe de shell. O caso real, repetido cinco vezes:
+#     bash algo.sh > arquivo 2>&1
+#     echo "rc=$?"; grep -E 'Passaram|Falharam|ABORTOU' arquivo
+# O `$?` vem de um REDIRECT (correto) e o único `|` está no PADRÃO do grep — a guarda acusava assim
+# mesmo.
+#
+# ⚠️ A 1a VERSAO DESTA CURA ABRIU TRES FAIL-OPENS, achados por passada adversarial no PR #563 e
+# reproduzidos com medicao antes/depois. A premissa que escrevi — "entre aspas, `|` e TEXTO" — e
+# FALSA em tres formas, e as tres sao justamente o que esta guarda existe para pegar:
+#   1. `x="$(cmd | wc -l)"; echo $?`  — dentro de $( ) o pipe e REAL. Era o modo-de-falha nº2 que
+#      FUNDOU a guarda, e a cura o cegou. (O proprio diff do PR #563 tinha tres linhas dessa forma.)
+#   2. `sh -c 'a | b'; echo $?`       — em sh/bash/ssh/su/xargs/-exec, a string entre aspas E SHELL.
+#   3. `echo "it's"; ls | wc -l; echo "don't"` — o gsub de apostrofo casava de "it's" ate "don't" e
+#      apagava o miolo INTEIRO, pipe real junto.
+#
+# A regra passou a ser a inversa, e e ela que mantem a guarda honesta: SO remove trecho entre aspas
+# quando da para AFIRMAR que ali e texto. Havendo substituicao de comando, wrapper que recebe
+# comando como string, ou aspas nao fechadas, devolve a LINHA CRUA — a guarda erra para o lado de
+# GRITAR, nunca para o lado de calar. E a varredura passou a ser por ESTADO, caractere a caractere,
+# porque uma aspa dentro de aspa e literal (que e a regra real do bash), coisa que par-de-regex
+# nao sabe.
+# GUARDA QUE GRITA ERRADO ENSINA A IGNORAR A GUARDA — mas guarda que CALA ERRADO nao ensina nada,
+# so mente. Entre os dois erros, este arquivo escolhe o primeiro, por desenho.
 case "$cmd" in *pipefail*) : ;; *)
   if printf '%s\n' "$cmd" | awk '
-      { cur = $0
-        if (cur ~ /\$\?/ && (cur ~ /\|/ || prev ~ /\|/)) { found = 1; exit }
-        if (cur ~ /[^ \t]/) prev = cur       # linha em branco não quebra a vizinhança
+        function unquoted(s,   i, c, q, o) {
+          # inseguro afirmar que e texto -> linha CRUA (falha gritando)
+          if (s ~ /[$]\(/ || s ~ /`/)                                      return s
+          if (s ~ /(^|[ \t;&|(])(sh|bash|zsh|dash|ksh|busybox)[ \t]+-[a-z]*c([ \t]|$)/) return s
+          if (s ~ /(^|[ \t;&|(])(ssh|eval|xargs|doas)([ \t]|$)/)           return s
+          if (s ~ /(^|[ \t;&|(])su[ \t]+[^;|&]*-c([ \t]|$)/)               return s
+          if (s ~ /-exec([ \t]|$)/)                                        return s
+          if (s ~ /(docker|podman|kubectl)[ \t]+[a-z]+[ \t]/)              return s
+          # varredura por ESTADO: aspa dentro de aspa e literal
+          o = ""; q = ""
+          for (i = 1; i <= length(s); i++) {
+            c = substr(s, i, 1)
+            if (q == "") { if (c == "'"'"'" || c == "\"") { q = c } else { o = o c } }
+            else if (c == q) { q = "" }
+          }
+          if (q != "") return s        # aspas ABERTAS no fim da linha: indeterminado -> crua
+          return o
+        }
+      { cur = $0; nu = unquoted(cur)
+        if (cur ~ /\$\?/ && (nu ~ /\|/ || prevNu ~ /\|/)) { found = 1; exit }
+        if (cur ~ /[^ \t]/) { prev = cur; prevNu = nu }       # linha em branco não quebra a vizinhança
       }
       END { exit(found ? 0 : 1) }'; then
     add 'EXIT-CODE-DE-PIPE: você leu `$?` logo depois de um pipe — ele é do ÚLTIMO elemento (o `tail`/`head`/`grep`), não do comando que interessa. Rode o comando sozinho e capture `$?` na linha seguinte, ou use `set -o pipefail`.'
