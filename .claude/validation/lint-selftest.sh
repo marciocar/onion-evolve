@@ -373,20 +373,20 @@ run_kg_freshness_selftests() {
 
   # (a) fresh-verified --all: frescor declarado + schema atual → exit 0, sem STALE, SCHEMA ✅
   rc=0; out=$(bash "${radar}" "${fx}/fresh-verified.kg.yaml" --all 2>&1) || rc=$?
-  if [ "${rc}" -eq 0 ] && ! printf '%s' "${out}" | grep -q 'STALE' \
-     && printf '%s' "${out}" | grep -q 'schema_version 1 (bate'; then
+  if [ "${rc}" -eq 0 ] && ! grep -q 'STALE' <<<"${out}" \
+     && grep -q 'schema_version 1 (bate' <<<"${out}"; then
     record_pass "kg-freshness: fresh-verified → exit 0, sem STALE, schema ✅"
   else record_fail "kg-freshness: fresh-verified" "rc=${rc} out=${out}"; fi
 
   # (b) stale-missing --freshness: nó PROD sem verified_at → STALE-MISSING, exit 0 (aviso)
   rc=0; out=$(bash "${radar}" "${fx}/stale-missing.kg.yaml" --freshness 2>&1) || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'STALE-MISSING: ST_A'; then
+  if [ "${rc}" -eq 0 ] && grep -q 'STALE-MISSING: ST_A' <<<"${out}"; then
     record_pass "kg-freshness: stale-missing → STALE-MISSING + exit 0 (aviso, não reprova)"
   else record_fail "kg-freshness: stale-missing" "rc=${rc} out=${out}"; fi
 
   # (c) stale-old --freshness: verified_at < baseline → STALE-OLD, exit 0 (determinístico, sem "agora")
   rc=0; out=$(bash "${radar}" "${fx}/stale-old.kg.yaml" --freshness 2>&1) || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'STALE-OLD: ST_A'; then
+  if [ "${rc}" -eq 0 ] && grep -q 'STALE-OLD: ST_A' <<<"${out}"; then
     record_pass "kg-freshness: stale-old → STALE-OLD + exit 0"
   else record_fail "kg-freshness: stale-old" "rc=${rc} out=${out}"; fi
 
@@ -394,21 +394,21 @@ run_kg_freshness_selftests() {
   # Os dois lados no mesmo caso: senão "consertar" seria matar a guarda e chamar de fix.
   rc=0; out=$(bash "${radar}" "${fx}/superseded-not-chased.kg.yaml" --freshness 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
-     && ! printf '%s' "${out}" | grep -q 'STALE-MISSING: C_VELHO' \
-     && ! printf '%s' "${out}" | grep -q 'STALE-MISSING: C_MORTO' \
-     && printf '%s' "${out}" | grep -q 'STALE-MISSING: C_VIVO'; then
+     && ! grep -q 'STALE-MISSING: C_VELHO' <<<"${out}" \
+     && ! grep -q 'STALE-MISSING: C_MORTO' <<<"${out}" \
+     && grep -q 'STALE-MISSING: C_VIVO' <<<"${out}"; then
     record_pass "kg-freshness: superseded/refuted não cobrados; nó vivo sem carimbo ainda cobrado"
   else record_fail "kg-freshness: superseded-not-chased" "rc=${rc} out=${out}"; fi
 
   # (d) schema-divergent --schema: schema_version ≠ radar → RECUSA com exit 1 (não é aviso)
   rc=0; out=$(bash "${radar}" "${sx}/schema-divergent.kg.yaml" --schema 2>&1) || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'schema_version divergente'; then
+  if [ "${rc}" -eq 1 ] && grep -q 'schema_version divergente' <<<"${out}"; then
     record_pass "kg-schema: divergente → ✗ + exit 1 (recusa, radar não sabe ler)"
   else record_fail "kg-schema: divergente" "esperava exit 1 + ✗; rc=${rc} out=${out}"; fi
 
   # (e) retrocompat: grafo legado sem schema_version → ⚠ ausente + exit 0 (não quebra grafo válido)
   rc=0; out=$(bash "${radar}" "${FIX_DIR}/kg-domain/good-domain.kg.yaml" --schema 2>&1) || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'schema_version ausente'; then
+  if [ "${rc}" -eq 0 ] && grep -q 'schema_version ausente' <<<"${out}"; then
     record_pass "kg-schema: ausente → ⚠ + exit 0 (retrocompat, degradê)"
   else record_fail "kg-schema: ausente/retrocompat" "esperava exit 0 + ⚠; rc=${rc} out=${out}"; fi
 
@@ -417,7 +417,7 @@ run_kg_freshness_selftests() {
   # As 9 fixtures kg-* usavam SÓ aspas duplas, então a suíte não pegava essa classe (o adotante apontou).
   # O trim() de kg-radar/kg-view passou a tirar aspas simples E duplas. Esta guarda fecha o flanco.
   rc=0; out=$(bash "${radar}" "${sx}/single-quotes.kg.yaml" --schema 2>&1) || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'bate com o radar'; then
+  if [ "${rc}" -eq 0 ] && grep -q 'bate com o radar' <<<"${out}"; then
     record_pass "kg-schema: (e2) aspas simples ('1') → PASSA (regressão prettier-quebra-grafo, sinal de campo)"
   else record_fail "kg-schema: (e2) aspas simples" "esperava exit 0 + 'bate com o radar'; rc=${rc} out=${out}"; fi
 
@@ -432,8 +432,8 @@ run_kg_freshness_selftests() {
   # claim epistêmico DEV puro. Sinal de um adotante: ssot-como-runtime §2 (C_CONSOLIDATION_MAP stale).
   rc=0; out=$(bash "${radar}" "${fx}/dev-tracked-stale.kg.yaml" --freshness 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
-     && printf '%s' "${out}" | grep -q 'STALE-MISSING: C_STRAT' \
-     && ! printf '%s' "${out}" | grep -q 'C_READ'; then
+     && grep -q 'STALE-MISSING: C_STRAT' <<<"${out}" \
+     && ! grep -q 'C_READ' <<<"${out}"; then
     record_pass "kg-freshness: DEV+verified_against → STALE-MISSING; DEV puro NÃO flagado (não inunda)"
   else record_fail "kg-freshness: dev-tracked" "esperava STALE C_STRAT sem C_READ; rc=${rc} out=${out}"; fi
 
@@ -446,21 +446,21 @@ run_kg_freshness_selftests() {
 
   # (g) cobra o claim, silencia os demais tipos — os dois lados no MESMO caso.
   if [ "${rc}" -eq 0 ] \
-     && printf '%s' "${out}" | grep -q 'UNANCHORED: C_AFIRMA' \
-     && ! printf '%s' "${out}" | grep -qE 'UNANCHORED: (C_ANCORADA|E_MEDIU|D_DECIDE|EN_DOM|A_DOC|Q_ABERTA)'; then
+     && grep -q 'UNANCHORED: C_AFIRMA' <<<"${out}" \
+     && ! grep -qE 'UNANCHORED: (C_ANCORADA|E_MEDIU|D_DECIDE|EN_DOM|A_DOC|Q_ABERTA)' <<<"${out}"; then
     record_pass "kg-freshness: (g) UNANCHORED cobra claim e NÃO cobra evidence/decision/entity/artifact/question"
   else record_fail "kg-freshness: (g) filtro por node_type" "rc=${rc} out=${out}"; fi
 
   # (h) o filtro NÃO virou `continue` no laço: os outros vereditos seguem valendo p/ não-claim,
   # e num mesmo nó UNANCHORED e STALE-OLD compõem em vez de se excluírem.
-  if printf '%s' "${out}" | grep -q 'STALE-MISSING: E_SEM_CARIMBO' \
-     && printf '%s' "${out}" | grep -q 'UNANCHORED: C_VELHA' \
-     && printf '%s' "${out}" | grep -q 'STALE-OLD: C_VELHA'; then
+  if grep -q 'STALE-MISSING: E_SEM_CARIMBO' <<<"${out}" \
+     && grep -q 'UNANCHORED: C_VELHA' <<<"${out}" \
+     && grep -q 'STALE-OLD: C_VELHA' <<<"${out}"; then
     record_pass "kg-freshness: (h) STALE-MISSING ainda vale p/ não-claim + UNANCHORED e STALE-OLD compõem"
   else record_fail "kg-freshness: (h) escopo dos outros vereditos" "o filtro virou continue? out=${out}"; fi
 
   # (i) supressão CONTADA, nunca silenciosa — 5 não-claim carimbados sem alvo na fixture.
-  if printf '%s' "${out}" | grep -q 'ℹ 5 nó(s) não-claim'; then
+  if grep -q 'ℹ 5 nó(s) não-claim' <<<"${out}"; then
     record_pass "kg-freshness: (i) supressão contada e visível (ℹ 5) — filtro auditável, não mágico"
   else record_fail "kg-freshness: (i) linha de supressão" "esperava 'ℹ 5 nó(s) não-claim'; out=${out}"; fi
 
@@ -572,13 +572,13 @@ run_kg_freshness_selftests() {
 
   # (q) dispara no claim E no evidence — o segundo é o ponto: MISPLANED NÃO filtra por tipo.
   if [ "${rc}" -eq 0 ] \
-     && printf '%s' "${out}" | grep -q 'MISPLANED: C_PROD_MAS_LEU_BRANCH' \
-     && printf '%s' "${out}" | grep -q 'MISPLANED: E_PROD_MAS_LEU_COMMIT'; then
+     && grep -q 'MISPLANED: C_PROD_MAS_LEU_BRANCH' <<<"${out}" \
+     && grep -q 'MISPLANED: E_PROD_MAS_LEU_COMMIT' <<<"${out}"; then
     record_pass "kg-freshness: (q) MISPLANED dispara em claim E em evidence (a contradição não depende do tipo)"
   else record_fail "kg-freshness: (q) MISPLANED" "rc=${rc} out=${out}"; fi
 
   # (r) os coerentes ficam quietos — inclusive `pin`, ambíguo e não-cobrado de propósito.
-  if ! printf '%s' "${out}" | grep -qE 'MISPLANED: (E_PROD_MEDIU_O_VIVO|C_DEV_LEU_BRANCH|C_PROD_PIN_AMBIGUO|C_PROD_BRANCH_SUPERSEDED)'; then
+  if ! grep -qE 'MISPLANED: (E_PROD_MEDIU_O_VIVO|C_DEV_LEU_BRANCH|C_PROD_PIN_AMBIGUO|C_PROD_BRANCH_SUPERSEDED)' <<<"${out}"; then
     record_pass "kg-freshness: (r) PROD+deploy, DEV+branch, pin e histórico NÃO disparam (sem falso-positivo)"
   else record_fail "kg-freshness: (r) falso-positivo do MISPLANED" "out=${out}"; fi
 

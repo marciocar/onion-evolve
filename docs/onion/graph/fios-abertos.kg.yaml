@@ -153,10 +153,10 @@ nodes:
     plane: PROD
     status: done
     verified_at: 2026-08-09
-    verified_against: zero-copias-em-script-mais-lente-de-0.00-para-8.00-no-no-unverifiable-do-grafo-da-vps
+    verified_against: bancada-742-0-0-mais-lint-0-hard-mais-58-de-58-grafos-em-paridade-por-vetor
     impact: 4
     confidence: 1.0
-    label: "PAGO nesta branch. Eram CINCO scripts com `function statusFactor`, dois deles defasados: a lente pesava 0.00 o no `D_email_plus_logto_connector` (`unverifiable`) que o radar pesa 8.00 — e o `--assert-parity` nao via, porque comparava CONTAGEM. Agora ha UM arquivo (`lib/status-factor.awk`), ausencia dele e `exit 2` NOMEANDO o arquivo, e a paridade compara a SOMA DOS PESOS. ⚠️ A 1a versao da comparacao de peso olhava so o TOPO e passou VERDE no mutante, porque o no afetado nao era o topo daquele grafo — cobrir ramo sem o caso real, dentro da propria cura."
+    label: "PAGO nesta branch. Eram CINCO scripts com `function statusFactor`, dois defasados: a lente pesava 0.00 o no `D_email_plus_logto_connector` (`unverifiable`) que o radar pesa 8.00, e o `--assert-parity` nao via porque comparava CONTAGEM. Agora ha UM arquivo (`lib/status-factor.awk`) e a ausencia dele e `exit 2` NOMEANDO o arquivo. ⚠️ A comparacao de peso passou por TRES versoes e as duas primeiras eram minhas: so-o-TOPO passava VERDE no mutante (o no afetado nao era o topo daquele grafo); a SOMA era cega a 53-64% do peso (4 dos 7 slots fora POR CONSTRUCAO) e ao CANCELAMENTO (10.40+8.00 == 8.00+10.40 inverte a ordem de urgencia sem mudar a soma). Hoje e VETOR `id -> peso` de TODOS os nos, comparado com `diff`, nomeando o culpado — e isso dissolveu a denylist replicada que eu declarara como divida, porque ela so existia para poder somar. A passada adversarial (55 brutos -> 18 defeitos) tambem mostrou que o portao exercitava 1 de 58 grafos, e naquele 1 o defeito curado era INVISIVEL; estendido aos 58, achou drift de parser REAL na hora — a lente parseava `eon[]` e nao o contava no grau, e os 5 grafos que reprovaram eram EXATAMENTE os 5 que usam `on:`."
     trace: ".claude/validation/kg-view.sh"
 
   - id: I_PRIMEIROS_CINCO_NOS_DO_BASELINE
