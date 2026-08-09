@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**57 regras** no total — **51 HARD**, **11 SOFT**.
+**58 regras** no total — **52 HARD**, **11 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -94,6 +94,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 39 | Registro de REGRAS derivado e em paridade com as guardas | HARD | lint-rules.md driftando das guardas (nº duplicado ou regra órfã) |
 | 41 | Topologia da família: SSOT no KG com procedimentos EXISTENTES | HARD | SSOT de topologia da família apontando a procedimentos inexistentes |
 | 50 | Contagens do SITE público sincronizadas com a SSOT | HARD | pitch público driftando da SSOT — número que mente para quem não pode conferir |
+| 59 | Modo que a produção consome é exercitado pela bancada | HARD | guarda que roda no gate por um caminho que nenhum teste percorreu — o modo consumido |
 
 ## KG & proveniência
 

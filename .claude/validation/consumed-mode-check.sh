@@ -53,11 +53,92 @@
 # Exit : 0 = todo modo consumido é exercitado · 1 = há modo sem teste · 2 = uso inválido
 set -euo pipefail
 
-REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)" || {
-  printf 'consumed-mode-check: repo_root inválido\n' >&2; exit 2; }
+# ⚠️ AS FLAGS SAIAM DO CAMINHO ANTES DE `$1` VIRAR RAIZ — e a versao anterior nao fazia isso:
+# `${1:-...}` engolia QUALQUER flag como caminho, entao `--selftest` (e `--format`) davam
+# `cd --selftest` -> "repo_root invalido", exit 2. O script que existe para achar MODO SEM TESTE
+# nao conseguia rodar o proprio teste. Agora o posicional e o 1o argumento que NAO comeca com `-`.
 FORMAT=human
-for a in "$@"; do case "$a" in tsv|--format=tsv) FORMAT=tsv ;; --list) FORMAT=list ;; esac; done
+SELFTEST=0
+_root=""
+for a in "$@"; do
+  case "$a" in
+    --selftest)        SELFTEST=1 ;;
+    tsv|--format=tsv)  FORMAT=tsv ;;
+    --format)          : ;;                      # o valor vem no proximo argumento
+    --list)            FORMAT=list ;;
+    -*)                : ;;                      # flag desconhecida nao vira caminho
+    *)                 [ -z "${_root}" ] && _root="$a" ;;
+  esac
+done
+REPO_ROOT="$(cd "${_root:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)" || {
+  printf 'consumed-mode-check: repo_root inválido: %s\n' "${_root}" >&2; exit 2; }
 cd "${REPO_ROOT}"
+
+# ── --selftest: o detector prova a si mesmo, contra fixture ────────────────────────────────────
+# POR QUE EXISTE: este script acusa "modo consumido sem teste" e ELE PROPRIO nao tinha teste — e nem
+# conseguia ter, porque `${1:-...}` engolia a flag como caminho. Ligar ao gate um detector que nunca
+# se provou seria ligar uma guarda que ja se sabe cega, que e como esta casa produz falso-verde.
+# ORDEM DELIBERADA, escrita no grafo antes de comecar: --selftest -> bloco na bancada -> ENTAO wire-in.
+#
+# As fixtures sao repos FALSOS em mktemp com os dois lados (producao e bancada) escritos a mao, e o
+# script roda de verdade contra eles. Assim o teste exercita o CAMINHO INTEIRO — parse de argumento,
+# extracao de pares, diferenca e formatacao — e nao um pedaco reimplementado.
+if [ "${SELFTEST:-0}" = "1" ]; then
+  _st_pass=0; _st_fail=0
+  _st_ok()  { _st_pass=$((_st_pass+1)); printf '  ✓ consumed-mode: %s\n' "$1"; }
+  _st_bad() { _st_fail=$((_st_fail+1)); printf '  ✗ consumed-mode: %s — %s\n' "$1" "$2"; }
+  _st_repo() { # $1=dir  $2=linha da PRODUCAO  $3=linha da BANCADA
+    mkdir -p "$1/.claude/validation"
+    printf '#!/usr/bin/env bash\n%s\n' "$2" > "$1/.claude/validation/lint-artifacts.sh"
+    printf '#!/usr/bin/env bash\n%s\n' "$3" > "$1/.claude/validation/lint-selftest.sh"
+  }
+  _st_me="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+
+  # (a) modo consumido E exercitado -> SILENCIO, exit 0. Sem este caso, (b) provaria o nada:
+  #     um detector que acusa SEMPRE tambem "pega" o modo sem teste.
+  _d="$(mktemp -d)"
+  _st_repo "$_d" 'bash "${SCRIPT_DIR}/alvo.sh" --modo' 'bash "${SCRIPT_DIR}/alvo.sh" --modo'
+  _rc=0; _out="$(bash "${_st_me}" "$_d" 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 0 ] && ! printf '%s' "${_out}" | grep -q 'MODO-SEM-TESTE'; then
+    _st_ok '(a) modo consumido E exercitado -> silencio, exit 0'
+  else _st_bad '(a)' "acusou modo coberto (rc=${_rc}): ${_out}"; fi
+  rm -rf "$_d"
+
+  # (b) o PAR de (a): mesmo alvo, a bancada deixa de exercitar -> ACUSA, exit 1, NOMEANDO script+flag.
+  #     Filtro anti-ruido sem o par e como silenciar um alarme e passar no teste.
+  _d="$(mktemp -d)"
+  _st_repo "$_d" 'bash "${SCRIPT_DIR}/alvo.sh" --modo' 'bash "${SCRIPT_DIR}/outro.sh" --modo'
+  _rc=0; _out="$(bash "${_st_me}" "$_d" 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 1 ] && printf '%s' "${_out}" | grep -q 'MODO-SEM-TESTE' \
+     && printf '%s' "${_out}" | grep -q 'alvo.sh' && printf '%s' "${_out}" | grep -q -- '--modo'; then
+    _st_ok '(b) modo consumido e NAO exercitado -> acusa, exit 1, nomeando script e flag'
+  else _st_bad '(b)' "nao acusou ou nao nomeou (rc=${_rc}): ${_out}"; fi
+  rm -rf "$_d"
+
+  # (c) A FLAG IMPORTA, nao so o script. Sem isto, "exercitar o script com QUALQUER flag" passaria —
+  #     e o valor inteiro do instrumento e distinguir `--markdown` de `(sem-flag)`.
+  _d="$(mktemp -d)"
+  _st_repo "$_d" 'bash "${SCRIPT_DIR}/alvo.sh" --modo' 'bash "${SCRIPT_DIR}/alvo.sh" --outroModo'
+  _rc=0; _out="$(bash "${_st_me}" "$_d" 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 1 ] && printf '%s' "${_out}" | grep -q -- '--modo'; then
+    _st_ok '(c) mesmo script com flag DIFERENTE ainda acusa — o par e (script, flags)'
+  else _st_bad '(c)' "o detector ignorou a flag (rc=${_rc}): ${_out}"; fi
+  rm -rf "$_d"
+
+  # (d) FAIL-LOUD: fonte ilegivel e exit 2, nunca "nenhum modo sem teste". Fonte ausente jamais vira
+  #     aprovacao (P0 da REGRA 30) — e um repo sem os dois lados e indistinguivel de um repo limpo
+  #     para quem so olha o exit code 0.
+  _d="$(mktemp -d)"; mkdir -p "$_d/.claude/validation"
+  _rc=0; _out="$(bash "${_st_me}" "$_d" 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 2 ] && printf '%s' "${_out}" | grep -qi 'ileg'; then
+    _st_ok '(d) fonte ausente -> exit 2 nomeando o arquivo (fail-loud, nunca aprovacao)'
+  else _st_bad '(d)' "fonte ausente nao deu exit 2 (rc=${_rc}): ${_out}"; fi
+  rm -rf "$_d"
+
+  printf '  consumed-mode --selftest: %d passaram, %d falharam\n' "${_st_pass}" "${_st_fail}"
+  [ "${_st_fail}" -eq 0 ] || exit 1
+  exit 0
+fi
 
 PROD="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
 TEST="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
@@ -174,13 +255,21 @@ fi
 _covered() {
   local scr="${1%%	*}" flg="${1#*	}"
   local tscr tflg f ok
-  # DELEGAÇÃO CONTA COMO COBERTURA, e é isenção declarada: quando o selftest invoca `--selftest`, ele
-  # está delegando ao teste EMBUTIDO do próprio script. Não dá para saber daqui se aquele teste cobre
-  # o modo TSV — e acusar mesmo assim seria julgar o que não se mediu, o erro que esta regra existe
-  # para pegar. TETO: se o `--selftest` de um script não cobrir seu modo de produção, esta regra cala.
-  if grep -qF "${scr}	--selftest" "${TMPDIR:-/tmp}/.cmc-test.$$" 2>/dev/null; then
-    DELEG=$((DELEG + 1)); return 0
-  fi
+  # ⚠️ A DELEGACAO POR `--selftest` FOI REMOVIDA, e a razao e a pior que existe: ela MATAVA UMA
+  # REGRA HARD. Passada adversarial mediu, no core, hoje — emudecendo SO o ramo `tsv` do
+  # `ladder-integrity-check.sh` (o modo que a producao consome), o `--selftest` dele seguia 8/8
+  # VERDE, esta regra declarava o par COBERTO, e o lint deixava de acusar uma classe forjada:
+  # 8 HARD viraram 7. A regra que existe para pegar "o modo consumido diverge do modo testado"
+  # declarava cobertura EXATAMENTE sobre o par onde isso estava acontecendo.
+  #
+  # A isencao vinha de um raciocinio honesto e errado: "nao da para saber daqui se o `--selftest`
+  # embutido cobre o modo tsv, e acusar sem medir e o erro que esta regra caca". Mas o oposto de
+  # ACUSAR-SEM-MEDIR nao e ABSOLVER-SEM-MEDIR — e DECLARAR QUE NAO SABE. Absolver por ignorancia e
+  # o fail-open que o P0 da REGRA 30 proibe, com a agravante de o teto estar escrito no comentario
+  # e ninguem o ler ao ver o ✅.
+  #
+  # No lugar: os pares que viviam disso ganharam caso EXPLICITO na bancada, exercitando `--format
+  # tsv` de verdade. Cobertura PROVADA substitui cobertura PRESUMIDA.
   while IFS= read -r t; do
     [ -n "${t}" ] || continue
     tscr="${t%%	*}"; tflg="${t#*	}"

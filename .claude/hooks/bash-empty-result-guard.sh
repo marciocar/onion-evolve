@@ -121,8 +121,30 @@ case "$cmd" in *pipefail*) : ;; *)
           if (q != "") return s        # aspas ABERTAS no fim da linha: indeterminado -> crua
           return o
         }
+      function ultimoQ(s,   pos, off, ult) {
+        off = 0; ult = 0
+        while ((pos = index(substr(s, off + 1), "$?")) > 0) { ult = off + pos; off = ult + 1 }
+        return ult
+      }
       { cur = $0; nu = unquoted(cur)
-        if (cur ~ /\$\?/ && (nu ~ /\|/ || prevNu ~ /\|/)) { found = 1; exit }
+        # ⚠️ NA MESMA LINHA, A ORDEM DECIDE — 4a classe de falso-positivo achada POR USO (2026-08-09).
+        # O caso real: `echo "rc=$?"; grep ... arquivo | head -4`. O `$?` e do comando da linha
+        # ANTERIOR e o pipe vem DEPOIS dele; a heuristica so via "ha $? e ha | na mesma linha" e
+        # acusava. Agora o pipe da PROPRIA linha so conta se estiver ANTES do `$?`. O pipe da linha
+        # anterior segue contando sempre — la ele e necessariamente anterior.
+        # ⚠️ O `$?` QUE IMPORTA E O ULTIMO, NAO O PRIMEIRO — fail-open que eu introduzi com a
+        # propria cura de ordem e achei medindo: em `echo $?; ls | wc -l; echo $?` o `index()`
+        # pegava o PRIMEIRO `$?` (antes do pipe), concluia "ordem ok" e CALAVA — enquanto o
+        # SEGUNDO `$?`, esse sim, le o exit do `wc`. A pergunta certa e "ALGUM `$?` vem depois de
+        # ALGUM `|`", e ela se responde com o PRIMEIRO pipe contra o ULTIMO `$?`.
+        # ⚠️ A ASSIMETRIA E O PONTO, e a 1a versao a errou: o PIPE se le em `nu` (entre aspas ele e
+        # TEXTO — padrao de grep), mas o `$?` se le na linha CRUA, porque `echo "rc=$?"` LE o exit
+        # de verdade. Lendo os dois em `nu`, `ls | wc -l; echo "rc=$?"` ficava sem `$?` nenhum e a
+        # guarda CALAVA — o modo-de-falha nº2 que a FUNDOU, cegado pela cura de ordem. Achado por
+        # passada adversarial, com main DISPARANDO e HEAD calado no mesmo comando.
+        p_ord = index(nu, "|"); q_ord = ultimoQ(cur)
+        mesmaLinha = (p_ord > 0 && q_ord > 0 && p_ord < q_ord)
+        if (cur ~ /\$\?/ && (mesmaLinha || prevNu ~ /\|/)) { found = 1; exit }
         if (cur ~ /[^ \t]/) { prev = cur; prevNu = nu }       # linha em branco não quebra a vizinhança
       }
       END { exit(found ? 0 : 1) }'; then
