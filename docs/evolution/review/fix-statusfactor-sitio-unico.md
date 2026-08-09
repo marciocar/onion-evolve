@@ -1,7 +1,7 @@
 ---
 branch: fix/statusfactor-sitio-unico
 date: 2026-08-09
-reviewed_diff_sha256: 6196c65a09b9768b393b4fb2d1306536fe9c0dd84dcc30312552e7874c7cda8e
+reviewed_diff_sha256: c98a27875776add8aa9292fdc1174b8791c284e68798fe8f865ddba87a2843ab
 findings_total: 55
 findings_real: 18
 findings_fixed: 14

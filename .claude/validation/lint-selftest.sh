@@ -1143,8 +1143,8 @@ run_kg_status_factor_selftests() {
     # e o nome do arquivo aparecia na mensagem do proprio `cat` — entao apagar a guarda INTEIRA do
     # kg-view mantinha o caso VERDE. Cobrar `AUSENTE` (palavra que so a guarda escreve) num modo
     # que o consumidor REALMENTE tem fecha as duas fugas.
-    case "${g}" in kg-view) local modo="--json" ;; *) local modo="--integrity" ;; esac
-    rc=0; out="$(bash "$d/${g}.sh" "$d/t.kg.yaml" "${modo}" 2>&1)" || rc=$?
+    case "${g}" in kg-view) local mode="--json" ;; *) local mode="--integrity" ;; esac
+    rc=0; out="$(bash "$d/${g}.sh" "$d/t.kg.yaml" "${mode}" 2>&1)" || rc=$?
     { [ "${rc}" -eq 2 ] && printf '%s' "${out}" | grep -q 'AUSENTE' && printf '%s' "${out}" | grep -q 'status-factor.awk'; } \
       || broken="${broken} ${g}(rc=${rc})"
   done
