@@ -2593,13 +2593,13 @@ run_kg_reconcile_selftests() {
   # Medido no diff real: radar do main dá 2 avisos nesta fixture, o corrigido dá 4.
   local mut3; mut3="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'" "'"${mut2}"'" "'"${mut3}"'"' RETURN
   cp "${radar}" "${mut3}/mutado.sh"; _lib_beside "${mut3}"
-  # ⚠️ Os dois `sed` casam a ASSINATURA das funções. Se ela mudar (como mudou quando `alvoPendente`
+  # ⚠️ Os dois `sed` casam a ASSINATURA das funções. Se ela mudar (como mudou quando `pendingTarget`
   # ganhou o parâmetro de tipo), eles param de casar — e é por isso que o `if` abaixo verifica o
   # resultado: mutação que não pega dá record_fail explícito, nunca silêncio.
   sed -i 's/^function supersederConta(s) .*/function supersederConta(s) { return (s == "confirmed") }/' "${mut3}/mutado.sh"
-  sed -i 's/^function alvoPendente(s, t) .*/function alvoPendente(s, t) { return (s == "confirmed" || s == "open") }/' "${mut3}/mutado.sh"
+  sed -i 's/^function pendingTarget(s, t) .*/function pendingTarget(s, t) { return (s == "confirmed" || s == "open") }/' "${mut3}/mutado.sh"
   if grep -q 'supersederConta(s) { return (s == "confirmed") }' "${mut3}/mutado.sh" \
-     && grep -q 'alvoPendente(s, t) { return (s == "confirmed" || s == "open") }' "${mut3}/mutado.sh"; then
+     && grep -q 'pendingTarget(s, t) { return (s == "confirmed" || s == "open") }' "${mut3}/mutado.sh"; then
     local mout3; mout3="$(bash "${mut3}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
     if ! printf '%s' "${mout3}" | grep -q '⚠ C_ALVO_DE_DRIFTED' \
        && ! printf '%s' "${mout3}" | grep -q '⚠ D_ALVO_DRIFTED' \
@@ -2631,7 +2631,7 @@ run_kg_reconcile_selftests() {
   # reprovaria de qualquer jeito".
   local mut4; mut4="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'" "'"${mut2}"'" "'"${mut3}"'" "'"${mut4}"'"' RETURN
   cp "${radar}" "${mut4}/mutado.sh"; _lib_beside "${mut4}"
-  sed -i 's/if (refutedBy\[id\] > 0 \&\& alvoPendente(nstatus\[id\], ntype\[id\])) {/if (refutedBy[id] > 0 \&\& (nstatus[id] == "confirmed" || nstatus[id] == "open")) {/' "${mut4}/mutado.sh"
+  sed -i 's/if (refutedBy\[id\] > 0 \&\& pendingTarget(nstatus\[id\], ntype\[id\])) {/if (refutedBy[id] > 0 \&\& (nstatus[id] == "confirmed" || nstatus[id] == "open")) {/' "${mut4}/mutado.sh"
   if grep -q 'refutedBy\[id\] > 0 && (nstatus\[id\] == "confirmed"' "${mut4}/mutado.sh"; then
     local mout4; mout4="$(bash "${mut4}/mutado.sh" "${rx}/refutes-drifted.kg.yaml" --integrity 2>&1 || true)"
     if [ "$(printf '%s' "${mout4}" | grep -c '✗ ')" -eq 0 ]; then
