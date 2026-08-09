@@ -1,124 +1,181 @@
 ---
 branch: fix/statusfactor-sitio-unico
 date: 2026-08-09
-reviewed_diff_sha256: e9310289f249aad04295ce2b450bca646ec9354f22c517185096c20d07f276da
-findings_total: 7
-findings_real: 7
-findings_fixed: 7
-tokens: 0
-duration_min: 0
-verdict: SEM-ELENXO-DECLARADO-A-VERIFICACAO-FOI-POR-MUTACAO-E-PELA-PROPRIA-BANCADA
-reviewer: sem passada adversarial — ver a seção "O que NÃO foi feito"
+reviewed_diff_sha256: 571b5dc9fb1946761d780fabae9ad451db0eb7d5013589a9c2a92fc772e7d0f4
+findings_total: 55
+findings_real: 18
+findings_fixed: 14
+tokens: 1388731
+duration_min: 69
+verdict: HARD-MAS-NAO-COMO-ESTAVA-A-CURA-DA-GUARDA-CEGOU-A-GUARDA
+reviewer: Elenxo — 3 lentes × 3 refutadores + juiz (opus/high, juiz em max), wf_fc82e4cb-466
 ---
 
-# A lente pesava ZERO o nó mais urgente, e a paridade não via
+# Passada adversarial — eu curei um falso-positivo abrindo três fail-opens na mesma guarda
 
-## O defeito
+**3 lentes, 9 refutadores, 55 achados brutos → 18 defeitos distintos. Nenhuma lente deu `CAI`.**
+Veredito do juiz: **«HARD, mas NÃO como está.»**
 
-O fator de status vivia **copiado** em cinco scripts. Quando `drifted` e `unverifiable` entraram no
-enum (2026-08-06), o radar ganhou os slots e a **lente não** — passou a devolver `-1`, clampado a 0.
+A tese central sobreviveu, e o juiz a mediu sozinho: em `origin/main` a lente dava `w=0.00` no nó
+`D_email_plus_logto_connector` (`unverifiable`) e o radar dava `8.00`; no HEAD os dois dão `8.00`. O
+`diff` dos 7 slots entre o radar de main e a lib nova é **vazio** — não houve reescrita silenciosa de
+fila. **Sítio único, fail-loud e paridade-de-peso são reais.**
 
-Medido, no nó real que a catraca do PR anterior trouxe de volta à vida:
+O que não sobreviveu foi a entrega.
+
+## O defeito que o PR existe para fechar
+
+O fator de status vivia **copiado em cinco scripts**. Quando `drifted` e `unverifiable` entraram no
+enum (06/08), o radar ganhou os slots e a lente não — passou a devolver `-1`, clampado a 0. E o
+`--assert-parity` não via, porque comparava `node_count`/`edge_count`: as duas lentes concordavam em
+**quantos** nós existem e discordavam em **qual é o mais urgente**, que é a única pergunta que o
+painel responde.
+
+## O achado mais duro, e ele é meu
+
+Eu escrevi, no resíduo da primeira versão: *"guarda que grita errado ensina a ignorar a guarda"*. E
+curei o falso-positivo da `bash-empty-result-guard.sh` **cegando a guarda em três formas** — incluindo
+o modo-de-falha que a fundou. Medido pelo juiz, `main` × `HEAD`, quatro casos:
 
 ```
-D_email_plus_logto_connector (unverifiable, grafo da VPS)
-  radar : 8.00        lente : 0.00
+n="$(ls | wc -l)"; echo $?            main DISPARA   HEAD CALA
+bash -c 'ls | tail -1'; echo $?       main DISPARA   HEAD CALA
+ssh h "a | b"; echo $?                main DISPARA   HEAD CALA
+echo "it's"; ls | wc -l; echo "don't" main DISPARA   HEAD CALA
 ```
 
-E o `--assert-parity` **não via**, porque comparava `node_count` e `edge_count`. As duas lentes
-concordavam em **quantos** nós existem e discordavam em **qual é o mais urgente** — que é a única
-pergunta que o painel responde.
+A premissa que escrevi — *"entre aspas, `|` é TEXTO"* — é **falsa em três raízes independentes**:
 
-## A correção
+1. dentro de `$( )` o pipe é **real** (e o próprio diff deste PR tinha **três linhas dessa forma**);
+2. em `sh -c`/`ssh`/`su -c`/`xargs`/`-exec`, a string entre aspas **é shell**;
+3. par-de-regex não sabe que aspa dentro de aspa é literal: o `gsub` de apóstrofo casava de `it's`
+   até `don't` e apagava o **miolo inteiro**, pipe real junto.
 
-- **Sítio único**: `lib/status-factor.awk`. Zero cópias em script (medido com `git grep`), e os dois
-  plugins mais a lente vendorizada leem dele.
-- **Fail-loud**: ausência da lib é `exit 2` **nomeando o arquivo**. Isso se provou sozinho — a
-  primeira montagem sem a lib no manifesto fez o plugin sair 2 em vez de rodar com fator errado.
-- **`--assert-parity` compara PESO**: a **soma** da atenção dos nós em aberto, mais a **identidade**
-  do topo.
+**A regra foi invertida:** só remove trecho entre aspas quando dá para **afirmar** que ali é texto.
+Havendo substituição de comando, wrapper que recebe comando como string, ou aspas não fechadas,
+devolve a linha crua. A varredura passou a ser por **estado**, caractere a caractere. A guarda erra
+para o lado de **gritar**, por desenho — porque guarda que cala errado não ensina nada, só mente.
 
-## Os defeitos que EU criei ao curar, e como cada um apareceu
+## E a cura entrou SEM UMA ASSERÇÃO
 
-**1 · A primeira paridade de peso passou VERDE no mutante.** Eu comparava só o **topo**, e o nó
-afetado (8.00) não era o topo daquele grafo (14.40). Cobrir o ramo sem o caso real — dentro da
-própria cura. Achado pelo meu mutation test, não por leitura.
+O juiz mutou `semAspas` para identidade — a cura inteira revertida — e a bancada fechou **11/11
+verde, saída idêntica**. O cabeçalho afirmava *"as duas direções foram medidas"*: foram, **de mão**, e
+em casos **sem aspas**, que são estruturalmente incapazes de ver sobre-remoção.
 
-**2 · A segunda versão gerou FALSO-POSITIVO** no único grafo com lente do repo: eu comparava o valor
-**arredondado para exibição** do `--radar` (`%5.1f` → `42.8`) contra o preciso da lente (`42.75`).
-O topo passou a comparar **identidade**; o valor ficou com a soma.
+O próprio arquivo já tinha escrito a doutrina que eu violei: `(f)/(g)` e `(h)/(i)` **nasceram em par**,
+porque *"filtro anti-ruído sem o par é como silenciar um alarme inteiro e passar no teste"*. Meu 3º
+filtro entrou sem par. Agora existem `(l)`…`(p)`: uma de silêncio, três de não-cegou (uma por raiz), e
+o **mutation test** que prova que o filtro é load-bearing nas duas direções.
 
-**3 · O sítio único quebrou 6 mutation tests alheios**, que copiavam o motor sem a lib e passaram a
-ver o `fail-loud` em vez do comportamento. Curado com **um helper** (`_lib_ao_lado`), não com seis
-remendos.
+## O gate nunca exercitava a cura — 1 de 58, e naquele 1 o defeito é invisível
 
-**4 · E a minha varredura automática quase destruiu o teste do `fail-loud`**: ela inseriu a lib
-exatamente onde a **ausência dela É o teste**. O caso `(b)` teria passado por vacuidade, com o
-`fail-loud` nunca disparando. Varredura mecânica não sabe qual cópia é deliberada — a razão ficou
-escrita nos dois sítios.
+A REGRA 31 só rodava `--assert-parity` em grafo que **já tem lente**. O juiz reintroduziu o defeito
+original inteiro e rodou no único grafo vigiado: **`✅ paridade, 881 nós`, exit 0**. Motivo medido:
+aquele grafo tem **zero** nós `drifted`/`unverifiable`; o único do corpus que tem **não tem lente**.
 
-**5 · A suíte inteira abortava com `rc=3`, sem soma e sem o grito do trap.** Reproduzido
-deterministicamente (267 linhas, duas vezes) e isolado num **terceiro** sítio de cópia que minha
-enumeração não cobria: o `kg-console` rodava num tmp sem a lib, o radar saía 2, o console saía 3, e
-`HN="$(...)"` sob `set -e` derrubava tudo. Antes de perseguir, **medi e descartei** a hipótese barata
-(disco em 27%, inodes em 5%).
+A separação estava **escrita no comentário do check desde sempre** e o código não a respeitava:
+(a) drift de **conteúdo** compara a lente contra o grafo — sem lente não há o que comparar, opt-in
+certo; (b) drift de **parser** compara **dois motores** sobre o mesmo `.kg.yaml` — a lente não entra
+na conta. A paridade saiu de dentro do `continue`.
 
-**6 · `status-reverif (f)` virou vácuo por INVERSÃO.** Ele mutava o *script* e checava
-`! grep -q <padrão> m.sh` — mas o fator mudou de arquivo, então a linha nunca esteve lá e a negação
-virou sempre-verdadeira. Agora muta a **lib** e prova com `cmp` de arquivo.
+**E estender aos 58 achou drift real na hora.** Cinco grafos reprovaram, com correlação perfeita:
 
-**7 · Uma guarda da casa pegou o meu código**: `sort | head -1` fecha cedo e dá EPIPE sob `pipefail`.
-Trocado por `sed` sem `q`, que **drena**.
-
-## E a guarda que gritava errado — 5 disparos numa sessão
-
-`bash-empty-result-guard.sh` acusava `EXIT-CODE-DE-PIPE` em:
-
-```bash
-bash algo.sh > arquivo 2>&1
-echo "rc=$?"; grep -E 'Passaram|Falharam|ABORTOU' arquivo
+```
+os 5 que reprovaram  = os 5 que usam `on:`
+os 53 que passaram   = os 53 sem `on:`
 ```
 
-O `$?` vem de um **redirect** (correto) e o único `|` está no **padrão do grep**. A heurística
-contava `|` **dentro de aspas** como pipe de shell. É a **3ª classe** de falso-positivo dela achada
-POR USO — o arquivo já documenta as duas anteriores.
+A lente **parseava `eon[]` e nunca o usava no grau**; o motor conta (`kg-radar.sh:297`). `EV_RELAY`:
+motor `4×1×1×(1+4)=20.00`, lente `(1+3)=16.00`. Drift de parser vivo, exatamente o que a REGRA 31(b)
+existe para pegar — invisível porque o gate olhava para o único grafo que não o exercita. Depois da
+cura: **58/58**.
 
-Curado removendo os trechos entre aspas **antes** do teste, com as duas direções medidas: **cala** no
-redirect-com-grep, **dispara** em `find | tail` + `$?` e em `ls | wc -l; echo $?`.
+## A soma era cega a mais da metade do peso
 
-**Guarda que grita errado ensina a ignorar a guarda** — mesma família dos falsos-positivos HARD que
-esta casa vem curando nos gates do KG, e por isso o mesmo rigor.
+O juiz mutou `superseded` 0.2→0.9 (4,5×) e `done` 0.1→0.9 (9×) em grafo **real**: ✅ verde nos dois.
+`r_sum` vinha do `--open-tsv` e `v_sum` replicava a mesma denylist, então **4 dos 7 slots ficavam fora
+por construção** — 53% do peso cego num grafo, 64% noutro. E o comentário que eu escrevi no código
+afirmava o oposto: *"a SOMA pega QUALQUER divergência"*.
+
+Somado ao **cancelamento** (trocar os pesos de dois nós inverte a ordem de urgência e a soma não
+muda: `10.40+8.00 == 8.00+10.40`), a soma foi substituída por **vetor**: `id → peso` de **todos** os
+nós, ordenado por id, comparado com `diff`, nomeando o nó culpado.
+
+**Uma cura que resolveu quatro achados e uma dívida:** some o cancelamento, some o buraco de escopo,
+some o falso-positivo de arredondamento — e some a **denylist replicada** que eu declarara como
+dívida no PR anterior, porque ela só existia para poder somar.
+
+## Mais quatro fail-opens fechados
+
+- **Um nó órfão desarmava a guarda inteira.** O bloco de peso vinha **depois** do early-exit que sai
+  `0` quando o radar não reporta contagens — e ele só as imprime quando está verde. Mesma lente
+  adulterada: grafo limpo reprovava, grafo com um órfão saía 0. Peso não depende de integridade.
+- **Lib corrompida (não só ausente) furava o fail-loud** e a paridade culpava **o grafo**. Agora
+  vetor vazio reprova nomeando o **instrumento**.
+- **O caso `(b)` passava por vácuo** para o `kg-view`: chamava `--integrity`, que ele **não tem** —
+  saía 2 por modo inválido, e o nome do arquivo vinha da mensagem do `cat`. Apagar a guarda inteira
+  mantinha o caso verde. Agora usa um modo que existe e cobra a palavra que **só a guarda escreve**.
+- **O caso `(c)` provava com o mutante já apagado**: `cmp` contra arquivo inexistente devolve 2,
+  nunca 0 — a guarda-da-guarda nº1 estava **morta por construção**. É a 3ª vez que a família
+  *"medi um artefato que não estava lá"* morde nesta casa, então a checagem foi para dentro do
+  `_prove_mutation`, no chamador obrigatório, e não para a memória de quem escrever o próximo.
+
+E o `(c)` tinha um erro conceitual meu: ele mutava **a lib**. Com sítio único, mutar a lib muta os
+**dois** motores — eles voltam a concordar e o caso passa por vácuo. O mutante tem de ser **a lente**.
+
+## O bundle não fechava o grafo de dependências
+
+Um manifesto que leva `kg-radar.sh` sem `lib/status-factor.awk` montava limpo, passava no lint, e o
+plugin **nascia morto no adotante** — saindo 2 no primeiro uso, no ambiente de quem instalou. Não é
+hipotético: aconteceu ao introduzir a lib, e foi curado **à mão** nos dois manifestos.
+
+Cura à mão não se repete sozinha. Virou **aresta de construção** no `assemble-plugin.sh`, o único
+ponto por onde toda vertical passa: ele varre os `.sh` copiados por referência a `lib/<arquivo>` e
+**aborta** se o alvo não estiver no `VALIDATION[]`.
+
+**E a primeira versão dessa guarda era destrutiva** — quinto defeito meu neste PR, achado pelo lint
+logo depois de eu escrevê-la. Ela abortava **dentro do laço de cópia**, então o assembler que desiste
+deixava o destino em ruínas:
+
+```
+recusa da 1ª versão →  21 arquivos sujos em plugins/, plugin.json DELETADO
+                       lint: "plugin fora de sincronia com a fonte"
+```
+
+**Guarda que aborta tem de abortar ANTES de tocar no destino** — senão a recusa é mais destrutiva que
+o defeito que ela recusa. Foi para junto da validação de fonte, onde moram todas as outras checagens
+do script, e o caso `(h)` passou a medir **o estado do destino**, não só o exit code.
 
 ## Verificação
 
-- `git grep -l 'function statusFactor' -- '*.sh'` → **zero**
-- lente × radar no nó `unverifiable`: **8.00 = 8.00** (era 0.00 × 8.00)
-- mutante que zera `unverifiable` na lib → paridade **reprova** (`exit 1`); intacto passa nos 3 grafos
-- 3 selftests novos (`status-factor` a/b/c) · bancada completa e lint: ver rodapé
-- plugins regenerados **depois** da última edição, e a regeneração passou a sair na mesma invocação
-  da medição — cinco vezes nesta sessão eu medi artefato derivado que estava defasado
+- **58/58** grafos em paridade (era 1 de 58 fiscalizado, e 5 divergências reais achadas ao estender)
+- guarda: **7/7** nas quatro direções — as 3 regressões gritam, os 2 casos históricos gritam, o
+  falso-positivo e o `pipefail` calam
+- cancelamento: soma `18.4` nos dois cenários, **vetor diferente** — a guarda antiga não veria
+- assembler: manifesto sem a lib **aborta** (rc=2, nomeando os dois scripts); íntegro **monta**
+- bancada completa e lint: ver rodapé
 
-## O que NÃO foi feito, declarado
+## Dívida declarada — não resolvida neste PR
 
-**Não houve passada adversarial neste PR.** Os PRs anteriores desta sequência tiveram Elenxo; este
-não. O que substitui, e é menos: mutation test em cada afirmação central (paridade de peso, fail-loud,
-sítio único), as duas direções medidas na guarda, e a bancada completa em corrida solo.
+- **O sentinela `-1` tem tradução divergente em 5 sítios** (`0` no radar/state/freshness/lente,
+  `1.3` no `--open-tsv`). O sítio único cobre o **fator**, não o **sentinela**. Neste PR o
+  `--weights-tsv` foi alinhado ao `0` do painel de propósito, e isso está escrito no código — mas a
+  cura estrutural é a lib expor `statusFactorFila()` / `statusFactorRadar()` e as 5 linhas de clamp
+  virarem chamadas.
+- **`--assert-parity` continua sem seletor de grupo na bancada**: verificar os casos novos exige
+  rodar 8.700 linhas. O juiz observou que um `--only <grupo>` é o que teria exposto o vácuo de `(b)`
+  e `(c)` **na própria autoria** — reproduzir um mutation test em segundos muda o que o autor
+  consegue verificar.
+- **`_lib_ao_lado` engole o próprio erro** em ~18 chamadores.
+- **Os detectores (2)(3)(5) da guarda** seguem contando caractere dentro de aspas, com o comentário
+  afirmando o contrário. A `semAspas` curada não foi estendida a eles.
 
-O risco que isso deixa é conhecido e tem nome nesta sessão: **três vezes um Elenxo achou defeito que
-o meu próprio teste não alcançava** — a direção da aresta, o `prev` vazio, a colisão de id. Um
-revisor independente aqui provavelmente atacaria a **soma de pesos** (ela é agregada: duas
-divergências que se cancelam passariam) e o **escopo do filtro** que eu uso para somar (repliquei a
-denylist do radar dentro do `kg-view`, o que é uma **segunda cópia da mesma regra** — exatamente o
-defeito que este PR existe para curar, num campo adiante).
+## O fio de método
 
-Esse último ponto fica declarado como dívida, não como resolvido.
+O juiz registrou o que mais importa, e vale contra mim: **nenhum dos quatro HARD apareceu para quem
+escreveu o código.** Dois deles eu *introduzi curando outra coisa*, e um terceiro eu havia declarado
+como "dívida latente" — quando era **explorável**, e o juiz mediu a exploração.
 
-## Dívida declarada
-
-- **A soma de pesos é agregada** — duas divergências de sinal oposto se cancelariam. Comparar o
-  vetor completo (ou um hash dele) é o passo seguinte, e custa uma passada a mais.
-- **A denylist do escopo está replicada** dentro do `--assert-parity` do `kg-view` para poder somar
-  só os nós em aberto. É cópia de regra, no PR que mata cópia de regra. O certo é o radar expor a
-  soma e a lente consumi-la.
-- **`--assert-parity` roda por grafo e só há UMA lente no repo** — a guarda continua exercitada em
-  1 de 58 grafos. O valor real aparece quando houver a segunda.
+A regra que fica é a que a `semAspas` ensinou por dano: **filtro anti-ruído nasce com o par que prova
+que ele não cegou o alarme.** Sem o par, silenciar a guarda inteira passa no teste — e foi o que
+aconteceu, 11/11 verde, no mesmo arquivo que já tinha essa lição escrita duas vezes.

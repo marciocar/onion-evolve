@@ -2318,16 +2318,27 @@ check_kg_view_sync() {
   while IFS= read -r kg; do
     [ -n "${kg}" ] || continue
     lens="${kg%.kg.yaml}-radar.md"
-    [ -f "${lens}" ] || continue           # lente é opt-in: só cobra o que existe
     if [ -n "${ONLY_PATH}" ]; then
       case "${ONLY_PATH}" in "${kg}"|"${lens}") : ;; *) continue ;; esac
     fi
-    # (b) paridade de parser primeiro — se os parsers divergem, comparar o
-    # conteúdo da lente é comparar contra a projeção errada.
+    # (b) PARIDADE DE PARSER — em TODO grafo, tenha lente ou não.
+    #
+    # ⚠️ A separação das duas obrigações estava escrita AQUI EM CIMA desde sempre, e o código não a
+    # respeitava: o `[ -f "${lens}" ] || continue` vinha ANTES, então as duas dependiam da lente
+    # existir. Passada adversarial mediu a consequência e ela é o pior caso possível — o gate
+    # fiscalizava 1 de 58 grafos, e naquele 1 o defeito que este PR cura é INVISÍVEL: ele não tem
+    # NENHUM nó `drifted`/`unverifiable`, e o único do corpus que tem não tem lente. Reintroduzindo
+    # o defeito ORIGINAL inteiro na lente, o portão dizia `✅ paridade, 881 nós` e saía 0.
+    #
+    # A distinção real: (a) drift de CONTEÚDO compara a lente contra o grafo — sem lente não há o
+    # que comparar, e o opt-in está certo. (b) drift de PARSER compara DOIS MOTORES sobre o mesmo
+    # `.kg.yaml` — a lente não entra na conta, e exigir que ela exista era condição estranha à
+    # pergunta. Custo medido da extensão: 58/58 verdes, 13s, zero falso-positivo.
     if ! out="$(bash "${gen}" "${kg}" --assert-parity 2>&1)"; then
-      violation "HARD" "${lens}" "[lente/PARIDADE] kg-view.sh e kg-radar.sh discordam sobre o tamanho do grafo — a lente está mentindo (${out})"
+      violation "HARD" "${kg}" "[lente/PARIDADE] kg-view.sh e kg-radar.sh discordam sobre o grafo — a projeção está mentindo (${out})"
       continue
     fi
+    [ -f "${lens}" ] || continue           # (a) é opt-in: só cobra conteúdo de lente que existe
     # (a) drift de conteúdo
     tmp="$(mktemp)"
     if _gen_into "${tmp}" "${lens}" "${lens}" -- bash "${gen}" "${kg}" --markdown &&

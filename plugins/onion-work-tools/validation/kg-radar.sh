@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--schema|--triples]
+# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--schema|--triples]
 #      (sem flag = radar + state + reconcile + integrity + domain + provenance + freshness + schema)
 #
 # Doutrina: ${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md
@@ -90,7 +90,7 @@ STATUS_FACTOR="$(cat "${_LIB}")"
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--schema|--triples]" >&2; exit 2; }
+[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--schema|--triples]" >&2; exit 2; }
 
 awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" "${STATUS_FACTOR}"'
 # ── DENYLIST, NÃO ALLOWLIST — a lição de 2026-08-07 ─────────────────────────────────────────
@@ -398,6 +398,35 @@ END {
         (nstatus[id] == "" ? "SEM-STATUS" : (statusFactor(nstatus[id]) < 0 ? "STATUS-DESCONHECIDO" : "-")),
         label[id]
     }
+    exit 0
+  }
+
+  # ══ O VETOR DE PESOS — TODOS os nós, para comparação entre motores ═══════════════════════════
+  # Nasceu de uma passada adversarial que derrubou a versão anterior da paridade do `kg-view`, e o
+  # que ela derrubou vale escrito porque é uma armadilha geral, não um bug local: comparar duas
+  # implementações por um ESCALAR AGREGADO (a soma dos pesos) não prova que elas concordam.
+  #   · o cancelamento é EXPLORÁVEL, e foi medido: uma lente que troca os pesos de dois nós inverte
+  #     a ORDEM DE URGÊNCIA e a soma continua idêntica — 10.40+8.00 == 8.00+10.40, guarda VERDE;
+  #   · e a soma só cobria os nós EM ABERTO: 4 dos 7 valores do enum (`confirmed`/`done`/
+  #     `superseded`/`refuted`) ficavam fora, então divergir neles saía verde por construção.
+  # Por isso aqui é VETOR, e é o corpo INTEIRO: quem compara faz `diff` das duas listas e qualquer
+  # divergência aparece com o id ao lado. De quebra some a razão de o consumidor replicar a denylist
+  # de escopo — cópia de regra que existia só para poder somar.
+  #
+  # ORDEM POR ID (não por atenção): o consumidor é `diff`, que precisa de ordem ESTÁVEL. Ordenar por
+  # peso faria uma divergência de peso deslocar todas as linhas seguintes e o diff apontaria o
+  # arquivo inteiro em vez do nó culpado.
+  # CLAMP EM 0, como o `--radar` e como a lente — NÃO o 1.3 do `--open-tsv`. O 1.3 é declaradamente
+  # LOCAL à fila (fazer status desconhecido SUBIR em vez de afundar onde o `--top N` corta); aqui o
+  # consumidor é a paridade, que compara a lente contra o PAINEL. Usar 1.3 faria toda divergência de
+  # status-fora-do-enum acusar peso, sem que nenhuma das duas implementações estivesse errada.
+  if (mode == "--weights-tsv") {
+    for (i = 1; i <= nn; i++) {
+      id = order[i]; sfw = statusFactor(nstatus[id]); if (sfw < 0) sfw = 0
+      watt[id] = impact[id] * conf[id] * sfw * (1 + deg[id])
+    }
+    wn = asorti(watt, wsorted, "@ind_str_asc")
+    for (i = 1; i <= wn; i++) printf "%s\t%.2f\n", wsorted[i], watt[wsorted[i]]
     exit 0
   }
 
