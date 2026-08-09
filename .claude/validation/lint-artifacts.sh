@@ -655,6 +655,54 @@ check_review_artifact() {
 }
 
 # ===========================================================================
+# REGRA 58 — O backlog cumpre as promessas do próprio `meta:` [HARD]
+# previne: backlog que promete teto e carimbo no cabeçalho e não cobra nenhum dos dois — inchando
+#   até virar cemitério, ou declarando `done` sem medição, sem nada acusar.
+#   ORIGEM (achado por passada adversarial, 2026-08-08): o `meta:` de `fios-abertos.kg.yaml`
+#   promete, em letra grande, TETO DE 20 NÓS, "onda nova exige onda COLHIDA" e "QUEM NÃO
+#   CONSEGUE CARIMBAR NÃO PODE DECLARAR FEITO". As três eram DISCIPLINA. É
+#   `fix-must-become-mechanism` violado dentro do arquivo que nomeia a doutrina — e esta casa
+#   já mediu que o gatilho eficaz de correção é social, logo disciplina não se repete sozinha.
+#   POR QUE A REGRA 49 NÃO ALCANÇA: o backlog nasce todo `plane: DEV`, de propósito, para não
+#   poluir o baseline com nós que afirmam sobre TRABALHO e não sobre produção. A R49 só olha
+#   `plane: PROD`. O efeito colateral, não previsto quando se escolheu DEV, é que declarar
+#   `done` ali sai DE GRAÇA. Esta regra fecha exatamente essa fresta.
+#   O TETO É LIDO DO ARQUIVO, nunca hardcoded: um número no script e outro no `meta:` seria a
+#   mesma classe de `declarado != verificado` que este gate existe para fechar — e a casa
+#   acabou de ver a tabela de doutrina da catraca divergir do código por um PR inteiro.
+#   FAIL-LOUD: `meta:` sem TETO declarado é HARD `SEM-TETO`, não silêncio. Guarda que não sabe
+#   o que cobrar jamais afirma conformidade (P0 da REGRA 30).
+#   ESCOPO FECHADO: só julga grafos que declaram TETO no `meta:` — hoje um. Repo sem nenhum
+#   simplesmente não é julgado, que é a lição do `kg-trace-resolve` (varreu tudo e acusou 11
+#   falsos no 1º adotante: "o CORE É O PIOR ORÁCULO DO QUE VIAJA").
+#   Toda a lógica vive em kg-backlog-check.sh.
+# ===========================================================================
+check_kg_backlog() {
+  local helper="${SCRIPT_DIR}/kg-backlog-check.sh"
+  [ -f "${helper}" ] || return 0
+  local kg out rc errf
+  while IFS= read -r kg; do
+    [ -n "${kg}" ] || continue
+    grep -qE '^[[:space:]]*#.*TETO:[[:space:]]*[0-9]+[[:space:]]*N' "${kg}" || continue   # escopo: só quem declara teto
+    if [ -n "${ONLY_PATH}" ]; then
+      case "${ONLY_PATH}" in "${kg}"|*/kg-backlog-check.sh) : ;; *) continue ;; esac
+    fi
+    # rc>=2 e erro de EXECUCAO, nao veredito — mesma fronteira que o kg-selo aprendeu por Elenxo.
+    rc=0; errf="$(mktemp)"
+    out="$(bash "${helper}" "${kg}" --format tsv 2>"${errf}")" || rc=$?
+    if [ "${rc}" -ge 2 ]; then
+      violation "HARD" "${helper}" "[kg-backlog/NAO-EXECUTOU] o helper saiu com rc=${rc} — erro de EXECUCAO, nao veredito. stderr: $(head -c 300 "${errf}" | tr '\n' ' ')"
+      rm -f "${errf}"; continue
+    fi
+    rm -f "${errf}"
+    printf '%s\n' "${out}" | while IFS=$'\t' read -r sev tag path msg; do
+      [ "${sev}" = "HARD" ] || continue
+      violation "HARD" "${path}" "[kg-backlog/${tag}] ${msg}"
+    done
+  done < <(find "${REPO_ROOT}/docs" -name '*.kg.yaml' -type f 2>/dev/null | sort)
+}
+
+# ===========================================================================
 # REGRA 57 — O veredito do run está SELADO no grafo que ele julgou [HARD]
 # previne: run que mede e não sela — a SSOT segue afirmando o que a medição já derrubou
 #   O radar sai exit 0 nesses casos porque valida o grafo contra SI MESMO, nunca contra o
@@ -2975,6 +3023,7 @@ check_kg_radar_integrity
 check_kg_trace_resolve
 check_review_artifact
 check_kg_seal
+check_kg_backlog
 check_doctrine_freshness
 check_kg_born_marker
 check_ladder_integrity

@@ -365,12 +365,22 @@ done <<< "${PAIRS}"
 # AFIRMAVA um carimbo sem nunca ter olhado se ele existia, e era FALSA em todo caso de reetiqueta.
 # É o `declarado != verificado` dentro do instrumento que existe para cobrar verificação.
 #
-# AGORA a saída é CLASSIFICADA contra o vivo. Três classes são legítimas e duas são fuga:
+# AGORA a saída é CLASSIFICADA contra o vivo. DUAS classes são legítimas e TRÊS são fuga:
 #   CARIMBADO        o nó está lá e ganhou `verified_at`                          → SOFT (é a saída que o gate EXISTE para produzir)
 #   RECONCILIADO     virou refuted/superseded COM a aresta que justifica          → SOFT
-#   REMOVIDO         o nó não existe mais naquele arquivo                         → SOFT (ato visível no diff)
+#   REMOVIDO         o nó não existe mais naquele arquivo                         → HARD
 #   FUGA-SEM-ARESTA  virou refuted/superseded por reetiqueta NUA, sem aresta      → HARD
 #   FUGA-DE-ESCOPO   segue sem carimbo e saiu rebaixando plane/impact             → HARD
+#
+# ⚠️ ESTA TABELA JA MENTIU, e o defeito e instrutivo: ela dizia `REMOVIDO → SOFT (ato visivel no
+# diff)` e "tres classes legitimas" DEPOIS de 2026-08-08, quando o PR da 2a porta ja tinha trocado a
+# emissao para HARD. Comportamento mudou, doutrina nao — `declarado != verificado` DENTRO do
+# cabecalho do gate que existe para cacar isso, e sobrevivendo a uma passada adversarial inteira.
+# O motivo do HARD, que e o que a tabela precisa carregar: o grafo JA TEM a forma honesta de
+# aposentar um no — `superseded`/`refuted` COM a aresta, que sai SOFT pelo ramo RECONCILIADO.
+# Deletar e o atalho que pula a aresta, e apagar tambem encolhe o baseline sem medir.
+# Quem editar a emissao tem de editar ESTA tabela no mesmo commit; nao ha guarda mecanica ligando as
+# duas, e por isso o aviso mora aqui, colado nela.
 #
 # ⚠️ SOBRE A COBERTURA DESTE BLOCO — a versão anterior deste comentário afirmava um número que
 # NINGUÉM OBSERVOU, e o Elenxo o falsificou em um comando. Ela dizia: *"sem a checagem de aresta o

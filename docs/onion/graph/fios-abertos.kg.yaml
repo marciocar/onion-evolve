@@ -161,11 +161,13 @@ nodes:
 
   - id: I_PRIMEIROS_CINCO_NOS_DO_BASELINE
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    verified_at: 2026-08-09
+    verified_against: as-5-classes-com-prova-de-campo-1-em-producao-e-4-em-sandbox-git-real
+    status: done
     impact: 5
     confidence: 1.0
-    label: "Compromisso, nao achado: tirar os CINCO primeiros nos do baseline por medicao real via `/meta:kg-freshness`, escolhidos para exercitar UMA classe de saida cada — incluindo `FUGA-SEM-ARESTA` e `FUGA-DE-ESCOPO`, as duas HARD. O fato mora em Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES (catraca-regra49-2026-08). Carimbar os 48 em serie e o gesto oposto: produz `verified_at` sem verificacao, que e o defeito fundador da propria regra."
+    label: "PAGO. As CINCO classes tem prova de CAMPO — no real do baseline, nunca fixture. CARIMBADO em PRODUCAO (#564: baseline 48->47, e a medicao achou um piso de memoria protegendo unit inexistente). As outras quatro em sandbox `git archive`+`git init`, com CONTROLE de 47 SOFT / 0 HARD antes de cada mutacao. REMOVIDO, FUGA-SEM-ARESTA e FUGA-DE-ESCOPO mordem UMA vez cada, nomeando o no e a razao; RECONCILIADO sai SOFT com 0 HARD. O par que mais importa: a MESMA reetiqueta de EN_MAESTRO da HARD sem a aresta e SOFT com ela — A ARESTA E O DISCRIMINADOR, provado no corpus real. ⚠️ CORRECAO DE LEITURA do plano original: as tres HARD NAO sao saidas legitimas do baseline, e sim o que acontece quando alguem sai errado; o dogfood delas e TENTAR E SER RECUSADO, nunca CONSEGUIR. ⚠️ E o 1o sandbox que montei MENTIU: `git archive | tar -x` nao cria `.git`, o `load_universe` varre com `git ls-files`, e as tres mutacoes deram 47 REMOVIDO — o baseline INTEIRO. Editar um no nao apaga 47; foi o universo vazio. Sexta vez nesta sessao que medi o artefato errado, e o que salvou foi o CONTROLE. FICA DEVENDO: uma refutacao GENUINA de no real (o RECONCILIADO de campo foi em condicoes de campo, nao uma reconciliacao de verdade) — ela depende de uma medicao que derrube um no, e fabricar uma seria o oposto do ponto."
     trace: ".claude/validation/kg-verification-baseline.txt"
 
   - id: I_CONTER_O_QUE_ESTA_EXPOSTO
