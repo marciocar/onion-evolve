@@ -201,6 +201,26 @@ nodes:
     label: "Batido de frente nesta sessao: a REGRA 56 compara `BASE..HEAD` (commits), e no pre-commit o HEAD ainda e o commit ANTERIOR — logo o hash prospectivo so passa a valer DEPOIS do commit, e do 2o commit em diante o gate reprova quem obedece. MEDIR o gatilho exato antes de mexer: mudar a base da comparacao ou tirar a regra do hook e decisao de desenho, e guarda que pune quem obedece ensina a ignorar a guarda."
     trace: ".claude/validation/review-artifact-check.sh"
 
+  - id: I_GUARDA_DE_IDIOMA_DE_IDENTIFICADOR
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "TRES ocorrencias em uma sessao (PRs 559, 562 e o rename intermediario): identificadores em pt-BR entrando em shell contra `code-standards.md:35`, achados so pelo REVISOR LLM porque NAO EXISTE guarda de idioma de identificador — verificado, nenhum script de .claude/validation/ menciona a regra. A cura tem forma conhecida (o `consumed-mode-check.sh` ja faz join OBSERVADO em vez de heuristica por nome) e um teto declarado: so identificador DEFINIDO no diff, nunca prosa de comentario, que e pt-BR por contrato. Enquanto for revisao humana/LLM, a deriva volta — e ja voltou tres vezes."
+    trace: "docs/meta-specs/code-standards.md"
+
+  - id: C_RENAME_MATA_ANCORA_EM_SILENCIO
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-09
+    verified_against: duas-ancoras-quebradas-por-rename-na-mesma-sessao-uma-pega-pela-guarda-outra-nao
+    label: "Renomear identificador MATA ancora de `sed`/`grep` que o cita, e o silencio e o padrao. Duas vezes nesta sessao: `SUMARIO_IMPRESSO`→`SUMMARY_PRINTED` matou a injecao do trap no runner extraido (ninguem viu — o runner so parou de gritar), e `achou`→`found` matou a mutacao do caso (p) (a guarda-da-guarda ACUSOU: 'a mutacao NAO foi aplicada'). A diferenca entre os dois desfechos e ter ou nao ter `_prove_mutation` no caminho. Corolario pratico: rename exige RE-RODAR o que depende de texto, e ancora que cita identificador merece a nota dizendo isso."
+    trace: ".claude/validation/lint-selftest.sh"
+
 edges:
   - from: I_FECHAR_GIT_MV_E_REMOVIDO
     to: W1_METRICA_NAO_FORJAVEL
@@ -250,3 +270,9 @@ edges:
   - from: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
     to: W1_METRICA_NAO_FORJAVEL
     edge_type: CONSTRAINS
+  - from: I_GUARDA_DE_IDIOMA_DE_IDENTIFICADOR
+    to: W4_REGRA_SEM_TESTE
+    edge_type: SUPPORTS
+  - from: C_RENAME_MATA_ANCORA_EM_SILENCIO
+    to: W1_METRICA_NAO_FORJAVEL
+    edge_type: SUPPORTS

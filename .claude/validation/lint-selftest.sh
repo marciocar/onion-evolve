@@ -5329,7 +5329,11 @@ run_kg_ratchet_direction_selftests() {
   _tags49() { printf '%s' "$1" | awk -F'\t' 'NF>1 {print $1":"$2}' | sort -u | tr '\n' ' '; }
   # roda o helper SEM subshell, para que o EXIT sobreviva: nenhum caso da 1ª versão aferia o exit do
   # gate, e por isso zerar o `hard=$((hard+1))` do FUGA-DE-ESCOPO passava 9/9.
-  _run49() { RC49=0; OUT49="$(bash "${helper}" "$1" --format tsv 2>/dev/null)" || RC49=$?; }
+  # ⚠️ GUARDA O STDERR. Antes era `2>/dev/null`: o UNICO canal em que o gate grita erro era
+  # exatamente o que a bancada jogava fora, entao um helper que explodisse passaria como "sem
+  # violacao". Os casos exigem ERR49 VAZIO — silencio no stderr faz parte do contrato.
+  _run49() { RC49=0; ERR49="$(mktemp)"; OUT49="$(bash "${helper}" "$1" --format tsv 2>"${ERR49}")" || RC49=$?; }
+  _err49() { [ -s "${ERR49:-/dev/null}" ] && printf 'STDERR: %s' "$(head -c 200 "${ERR49}")" || printf ''; }
 
   # (h) O ENUM QUE CRESCEU: allowlist quebra, denylist nao. `drifted`/`unverifiable`/`done` sao
   #     status VIVOS e tem de continuar DENTRO do escopo — `drifted` mais que todos, porque e o
@@ -5443,9 +5447,41 @@ run_kg_ratchet_direction_selftests() {
   # `HARD NOVO` legitimo, que afogaria a severidade e o exit que este caso existe para aferir.
   d="$(mktemp -d)"; _scene49 "$d" confirmed 5 PROD 2026-08-08 "" C_OUTRO
   _run49 "$d"
-  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="SOFT" && $2=="REMOVIDO"{r=1} $1=="HARD"{h=1} END{exit !(r && !h)}' && [ "${RC49}" -eq 0 ]; then
-    record_pass "kg-catraca: (n) no que nao existe mais → SOFT REMOVIDO e exit 0 (distinto de reetiquetado — a distincao E a catraca)"
+  # ⚠️ A SEVERIDADE MUDOU EM 2026-08-08, e a razao esta na porta que este par de casos fechou:
+  # apagar o no ENCOLHE o baseline sem medir nada. O grafo JA TEM a forma honesta de aposentar um
+  # no — `superseded`/`refuted` COM a aresta — e ela sai SOFT pelo ramo RECONCILIADO. Deletar e o
+  # atalho que pula a aresta, entao vira HARD.
+  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD" && $2=="REMOVIDO" && $4 ~ /superseded\/refuted/ && $4 ~ /aresta/ {r=1} END{exit !r}' \
+     && [ "${RC49}" -ne 0 ] && [ -z "$(_err49)" ]; then
+    record_pass "kg-catraca: (n) no APAGADO do corpus → HARD REMOVIDO e exit != 0 (apagar nao descarrega a medicao)"
   else record_fail "kg-catraca: (n)" "classificacao/severidade errada (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
+
+  # (u) MOVER NAO E REMOVER — e mover PARA FORA DO ESCOPO e o esvaziamento em lote.
+  #     Porta reproduzida no corpus REAL: um `git mv` de UM grafo para `fixtures/` tirava CINCO
+  #     entradas do baseline de uma vez, com `exit 0`, cinco SOFT, e o gate MANDANDO remove-las —
+  #     com os nos intactos no disco, versionados, afirmando sobre producao.
+  d="$(mktemp -d)"; _scene49 "$d" confirmed 5 PROD "" ""
+  mkdir -p "$d/docs/onion/graph/fixtures"
+  ( cd "$d" && git mv docs/onion/graph/t.kg.yaml docs/onion/graph/fixtures/t.kg.yaml ) >/dev/null 2>&1
+  _run49 "$d"
+  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD" && $2=="MUDOU-DE-PATH" && $4 ~ /fixtures\// {m=1} END{exit !m}' \
+     && [ "${RC49}" -ne 0 ] && [ -z "$(_err49)" ]; then
+    record_pass "kg-catraca: (u) git mv para fixtures/ → HARD MUDOU-DE-PATH (o no segue no disco; mover nao e medir)"
+  else record_fail "kg-catraca: (u)" "esvaziamento em lote de volta (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
+  rm -rf "$d"
+
+  # (u2) ANTI-FALSO-POSITIVO, e e o caso que impede a cura de virar punicao: mover para outro path
+  #      VIVO e reorganizacao. Tem de sair SOFT — e, com a chave reescrita no baseline (o fluxo
+  #      legitimo completo), o gate tem de fechar em exit 0.
+  d="$(mktemp -d)"; _scene49 "$d" confirmed 5 PROD "" ""
+  ( cd "$d" && mkdir -p docs/onion/outro && git mv docs/onion/graph/t.kg.yaml docs/onion/outro/t.kg.yaml \
+      && sed -i 's#^docs/onion/graph/t.kg.yaml::#docs/onion/outro/t.kg.yaml::#' .claude/validation/kg-verification-baseline.txt ) >/dev/null 2>&1
+  _run49 "$d"
+  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="SOFT" && $2=="MUDOU-DE-PATH" && $4 ~ /reescreva a chave/ {m=1} $1=="HARD"{h=1} END{exit !(m && !h)}' \
+     && [ "${RC49}" -eq 0 ] && [ -z "$(_err49)" ]; then
+    record_pass "kg-catraca: (u2) mover para path VIVO com a chave reescrita → SOFT e exit 0 (reorganizar nao e fugir)"
+  else record_fail "kg-catraca: (u2)" "punindo reorganizacao legitima (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
+  rm -rf "$d"
 
   # (t) O SEPARADOR DE REGISTRO INTERNO — e o caso acusa a guarda punindo quem OBEDECE.
   #     TAB e IFS-WHITESPACE: campo vazio SOME e o resto desliza. Cenario reproduzido: no MEDIDO e
@@ -5488,6 +5524,49 @@ run_kg_ratchet_direction_selftests() {
   else record_fail "kg-catraca: (t2)" "mensagem deslocada de volta: $(printf '%s' "${OUT49}" | cut -f4 | head -1 | cut -c1-120)"; fi
   rm -rf "$d"
 
+  # (v) OS TRES DEGRAUS DA BASE — o ref que dirige `TO_JUDGE` E o bloco (3) era codigo sem UM assert,
+  #     e me fez errar TRES vezes seguidas por tentar resolver com uma regra so o que sao situacoes
+  #     diferentes. Cada degrau tem seu cenario, e o que se afere e o COMPORTAMENTO (o bypass e
+  #     pego?), nao o ref escolhido — aferir o ref seria testar a implementacao, nao a propriedade.
+  local failed_v=""
+
+  # v1 · PRE-COMMIT (arvore suja): a mutacao esta no working tree e o HEAD e a base.
+  d="$(mktemp -d)"; _scene49 "$d" drifted 5 PROD "" ""
+  _run49 "$d"
+  [ "$(_tags49 "${OUT49}")" = "SOFT:PASSIVO " ] || failed_v="${failed_v} v1(arvore-suja:$(_tags49 "${OUT49}"))"
+  rm -rf "$d"
+
+  # v2 · POS-COMMIT com PONTO DE RAMIFICACAO: o encolhimento vai COMMITADO numa branch.
+  d="$(mktemp -d)"; _graph49 "$d" confirmed 5 PROD "" ""
+  ( cd "$d" && git init -q -b main . && git add -A && git -c user.email=t@t -c user.name=t commit -qm g ) 2>/dev/null
+  mkdir -p "$d/.claude/validation"
+  bash "${helper}" "$d" --emit-baseline > "$d/.claude/validation/kg-verification-baseline.txt" 2>/dev/null
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm b && git checkout -q -b work
+    git rm -q docs/onion/graph/t.kg.yaml
+    : > .claude/validation/kg-verification-baseline.txt
+    git add -A && git -c user.email=t@t -c user.name=t commit -qm 'apaga tudo' ) >/dev/null 2>&1
+  _run49 "$d"
+  printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD"{h=1} END{exit !h}' || failed_v="${failed_v} v2(commitado-na-branch-passou:$(_tags49 "${OUT49}"))"
+  rm -rf "$d"
+
+  # v3 · SEM BASELINE NO PONTO DE RAMIFICACAO — o adotante recem-instalado, em que o baseline NASCE
+  #      na propria branch. Foi AQUI que o `prev` vazio reabriu o bypass total.
+  d="$(mktemp -d)"; _graph49 "$d" confirmed 5 PROD "" ""
+  ( cd "$d" && git init -q -b main . && git add -A && git -c user.email=t@t -c user.name=t commit -qm 'sem baseline' && git checkout -q -b work ) 2>/dev/null
+  mkdir -p "$d/.claude/validation"
+  bash "${helper}" "$d" --emit-baseline > "$d/.claude/validation/kg-verification-baseline.txt" 2>/dev/null
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm 'nasce o baseline'
+    git rm -q docs/onion/graph/t.kg.yaml
+    : > .claude/validation/kg-verification-baseline.txt
+    git add -A && git -c user.email=t@t -c user.name=t commit -qm 'apaga grafo E linhas' ) >/dev/null 2>&1
+  _run49 "$d"
+  printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD"{h=1} END{exit !h}' || failed_v="${failed_v} v3(adotante-bypass-reaberto:$(_tags49 "${OUT49}"))"
+  rm -rf "$d"
+
+  if [ -z "${failed_v}" ]; then
+    record_pass "kg-catraca: (v) os TRES degraus da base pegam o encolhimento (arvore suja · commitado na branch · adotante sem baseline na base)"
+  else record_fail "kg-catraca: (v)" "degrau(s) cego(s):${failed_v}"; fi
+
   # (o) MUTATION — devolver a ALLOWLIST faz o caso (i) parar de proteger.
   #     ⚠️ o caso (i) afirma uma AUSÊNCIA de acusação, e ausência é o que uma fixture MORTA entrega
   #     de graça: este teste sobreviveu a uma fixture sabotada de propósito em 2026-08-08. Por isso
@@ -5504,11 +5583,14 @@ run_kg_ratchet_direction_selftests() {
   # (p) MUTATION — sem a checagem de aresta, o caso (k) passa a ACUSAR CONFORMIDADE
   d="$(mktemp -d)"; _scene49 "$d" refuted 5 PROD "" REFUTES
   mut="$d/mut-aresta.sh"
-  # ⚠️ RANGE limitado à função. O padrão `exit(achou ? 0 : 1)` aparece DUAS vezes no helper: na
+  # ⚠️ RANGE limitado à função. O padrão `exit(found ? 0 : 1)` aparece DUAS vezes no helper: na
   # função e dentro do comentário que documenta o comando de falsificação. Um `sed` solto mutaria os
   # dois, e o `cmp` passaria a diferir por duas razões — a mesma armadilha de padrão-que-casa-a-si-
   # mesmo que derrubou três guardas-da-guarda em 2026-08-07, um passo adiante.
-  sed '/^has_reconciliation_edge()/,/^}$/ s/exit(achou ? 0 : 1)/exit(1)/' "${helper}" > "${mut}"
+  # ⚠️ E o padrão contém um IDENTIFICADOR (`found`): renomeá-lo mata esta âncora. Já aconteceu
+  # duas vezes nesta sessão (aqui, e o `SUMARIO_IMPRESSO`→`SUMMARY_PRINTED` no extrator). Quem
+  # renomear tem de re-rodar o bloco — o `_prove_mutation` acusa, mas só se alguém o rodar.
+  sed '/^has_reconciliation_edge()/,/^}$/ s/exit(found ? 0 : 1)/exit(1)/' "${helper}" > "${mut}"
   if printf '%s' "$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)" | awk -F'\t' '$1=="HARD"{h=1} $2=="RECONCILIADO"{r=1} END{exit !(r && !h)}'; then rc_intact=0; else rc_intact=1; fi
   if printf '%s' "$(bash "${mut}"    "$d" --format tsv 2>/dev/null || true)" | awk -F'\t' '$1=="HARD"{h=1} $2=="RECONCILIADO"{r=1} END{exit !(r && !h)}'; then rc_mutant=0; else rc_mutant=1; fi
   _prove_mutation "kg-catraca: (p) (MUT) sem a checagem de aresta o (k) passa a punir conformidade — a aresta e o discriminador" \
