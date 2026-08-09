@@ -72,19 +72,19 @@ for v in "${VALIDATION[@]}"; do [ -f "${SRC}/${v}" ] || { echo "ERRO: validation
 # em ruinas (21 arquivos sujos, `plugin.json` DELETADO, o lint acusando "fora de sincronia"). Guarda
 # que aborta tem de abortar ANTES de tocar no destino, senao a recusa e mais destrutiva que o defeito
 # que ela recusa. Toda validacao deste script mora antes da 1a escrita, e esta se junta a elas.
-_dep_faltando=""
+_missing_deps=""
 for v in "${VALIDATION[@]}"; do
   case "${v}" in *.sh) : ;; *) continue ;; esac
   while IFS= read -r _need; do
     [ -n "${_need}" ] || continue
-    _alvo=".claude/validation/lib/${_need}"
-    case " ${VALIDATION[*]} " in *" ${_alvo} "*) : ;;
-      *) _dep_faltando="${_dep_faltando}\n  · ${v} precisa de ${_alvo}, que NAO esta no VALIDATION[] deste manifesto" ;;
+    _target=".claude/validation/lib/${_need}"
+    case " ${VALIDATION[*]} " in *" ${_target} "*) : ;;
+      *) _missing_deps="${_missing_deps}\n  · ${v} precisa de ${_target}, que NAO esta no VALIDATION[] deste manifesto" ;;
     esac
   done < <(grep -oE 'lib/[A-Za-z0-9_.-]+\.(awk|sh)' "${SRC}/${v}" 2>/dev/null | sed 's#^lib/##' | sort -u)
 done
-if [ -n "${_dep_faltando}" ]; then
-  printf 'ERRO: o bundle nao fecha o grafo de dependencias — o plugin nasceria morto no adotante:%b\n' "${_dep_faltando}" >&2
+if [ -n "${_missing_deps}" ]; then
+  printf 'ERRO: o bundle nao fecha o grafo de dependencias — o plugin nasceria morto no adotante:%b\n' "${_missing_deps}" >&2
   exit 2
 fi
 for t in "${TEMPLATES[@]}"; do [ -f "${SRC}/${t}" ] || { echo "ERRO: template fonte ausente: ${t}" >&2; exit 2; }; done

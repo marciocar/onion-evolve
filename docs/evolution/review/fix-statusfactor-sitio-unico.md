@@ -1,7 +1,7 @@
 ---
 branch: fix/statusfactor-sitio-unico
 date: 2026-08-09
-reviewed_diff_sha256: 571b5dc9fb1946761d780fabae9ad451db0eb7d5013589a9c2a92fc772e7d0f4
+reviewed_diff_sha256: ae76a624e098edc54ff67fe4564cc337d6b36b16438ea87c8f8696eab620e7e6
 findings_total: 55
 findings_real: 18
 findings_fixed: 14
@@ -179,3 +179,20 @@ como "dívida latente" — quando era **explorável**, e o juiz mediu a explora�
 A regra que fica é a que a `semAspas` ensinou por dano: **filtro anti-ruído nasce com o par que prova
 que ele não cegou o alarme.** Sem o par, silenciar a guarda inteira passa no teste — e foi o que
 aconteceu, 11/11 verde, no mesmo arquivo que já tinha essa lição escrita duas vezes.
+
+## O revisor de CI, depois do Elenxo
+
+Rodou sobre o diff já corrigido e devolveu **2 violações**, ambas da **mesma classe**: identificador
+em pt-BR (`semAspas`, `_lib_ao_lado`, `_dep_faltando`). O parecer dele é justo — reconheceu que o
+padrão já existia na vizinhança (`alvoPendente`, `trabalhoPendente` são anteriores a este PR), mas
+cobrou que o PR **perpetuou** em código novo.
+
+Renomeados para `unquoted`, `_lib_beside`, `_missing_deps`, `_target`, `sum_a/b`,
+`dirty_before/after`, `broken`, `copies`. E o renome **provou uma âncora**: o mutation test `(p)`
+continua verde citando o nome novo, o que só acontece se ele estiver de fato lendo o arquivo — se a
+âncora tivesse morrido no renome, o caso viraria passe-vácuo em silêncio, que é exatamente a
+armadilha que este PR passou o dia curando.
+
+**É a quarta vez que esta classe é apontada nesta casa.** Não existe guarda mecânica para ela — está
+registrado como `I_GUARDA_DE_IDIOMA_DE_IDENTIFICADOR` no grafo, e continua sendo disciplina, que é
+a forma que esta casa já sabe que não se repete sozinha.

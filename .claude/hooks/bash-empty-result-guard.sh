@@ -103,7 +103,7 @@ add() { warn="${warn}
 # so mente. Entre os dois erros, este arquivo escolhe o primeiro, por desenho.
 case "$cmd" in *pipefail*) : ;; *)
   if printf '%s\n' "$cmd" | awk '
-        function semAspas(s,   i, c, q, o) {
+        function unquoted(s,   i, c, q, o) {
           # inseguro afirmar que e texto -> linha CRUA (falha gritando)
           if (s ~ /[$]\(/ || s ~ /`/)                                      return s
           if (s ~ /(^|[ \t;&|(])(sh|bash|zsh|dash|ksh|busybox)[ \t]+-[a-z]*c([ \t]|$)/) return s
@@ -121,7 +121,7 @@ case "$cmd" in *pipefail*) : ;; *)
           if (q != "") return s        # aspas ABERTAS no fim da linha: indeterminado -> crua
           return o
         }
-      { cur = $0; nu = semAspas(cur)
+      { cur = $0; nu = unquoted(cur)
         if (cur ~ /\$\?/ && (nu ~ /\|/ || prevNu ~ /\|/)) { found = 1; exit }
         if (cur ~ /[^ \t]/) { prev = cur; prevNu = nu }       # linha em branco não quebra a vizinhança
       }

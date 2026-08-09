@@ -157,7 +157,7 @@ record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} —
 # mutation tests que copiavam so o script para um tmp passaram a ver a mensagem de fail-loud em vez
 # do comportamento, e acusaram "vacuidade" onde havia cura. O conserto e UM helper, nao seis
 # remendos — o proximo teste que copiar o motor nao precisa lembrar da lib.
-_lib_ao_lado() {  # $1 = diretorio onde o motor copiado vai rodar
+_lib_beside() {  # $1 = diretorio onde o motor copiado vai rodar
   mkdir -p "$1/lib" && cp "${SCRIPT_DIR}/lib/status-factor.awk" "$1/lib/" 2>/dev/null || true
 }
 
@@ -473,7 +473,7 @@ run_kg_freshness_selftests() {
   # (k) (MUT) — desfeito o filtro, o evidence VOLTA a ser cobrado e a linha ℹ some. Sem esta
   # prova, (g) passaria igual se o filtro fosse vacuidade (ex.: nenhum nó não-claim rastreado).
   local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'"' RETURN
-  cp "${radar}" "${mut}/mutado.sh"; _lib_ao_lado "${mut}"
+  cp "${radar}" "${mut}/mutado.sh"; _lib_beside "${mut}"
   sed -i 's/ && ntype\[id\] == "claim"//' "${mut}/mutado.sh"
   if ! grep -q 'verifiedAgainst\[id\] == "" && ntype\[id\] == "claim"' "${mut}/mutado.sh"; then
     local mout; mout="$(bash "${mut}/mutado.sh" "${fxu}" --freshness 2>&1 || true)"
@@ -511,7 +511,7 @@ run_kg_freshness_selftests() {
   # (l3) (MUT) a ordenação é LOAD-BEARING — sem o asorti a fila volta à ordem de arquivo.
   # Sem este caso, (l2) passaria por acaso em qualquer fixture cuja ordem de arquivo já coincida
   # com a de atenção — que é exatamente como o bug sobreviveu tanto tempo.
-  local dmut; dmut="$(mktemp -d)"; cp "${radar}" "${dmut}/r.sh"; _lib_ao_lado "${dmut}"
+  local dmut; dmut="$(mktemp -d)"; cp "${radar}" "${dmut}/r.sh"; _lib_beside "${dmut}"
   sed -i 's/fn = asorti(att, fsorted, "@val_num_desc")/fn = 0/' "${dmut}/r.sh"
   if grep -q 'fn = 0' "${dmut}/r.sh"; then
     local mtsv; mtsv="$(bash "${dmut}/r.sh" "${fxu}" --freshness-tsv 2>/dev/null || true)"
@@ -549,7 +549,7 @@ run_kg_freshness_selftests() {
 
   # (p) (MUT) sem a exclusão de história, o nó reconciliado VOLTA a aparecer — prova que (n)
   # não é vacuidade (a fixture PRECISA ter um nó reconciliado para isso significar algo).
-  cp "${radar}" "${mut}/mut-tsv.sh"; _lib_ao_lado "${mut}"
+  cp "${radar}" "${mut}/mut-tsv.sh"; _lib_beside "${mut}"
   # remove só a exclusão DENTRO do bloco --freshness-tsv (a 2ª ocorrência do padrão no arquivo)
   awk '/mode == "--freshness-tsv"/{inblk=1} inblk && /nstatus\[id\] == "superseded"/{sub(/if \(nstatus\[id\] == "superseded" \|\| nstatus\[id\] == "refuted"\) continue.*$/,""); inblk=0} {print}' \
     "${radar}" > "${mut}/mut-tsv.sh"
@@ -590,7 +590,7 @@ run_kg_freshness_selftests() {
 
   # (t) (MUT) restringindo a checagem a `claim` — como o UNANCHORED faz — o evidence VOLTA a
   # escapar. É a reprodução exata do modo-de-falha que o sinal reportou.
-  cp "${radar}" "${mut}/mut-mis.sh"; _lib_ao_lado "${mut}"
+  cp "${radar}" "${mut}/mut-mis.sh"; _lib_beside "${mut}"
   sed -i 's/if (plane\[id\] == "PROD" \&\& verifiedAgainst\[id\] ~/if (ntype[id] == "claim" \&\& plane[id] == "PROD" \&\& verifiedAgainst[id] ~/' "${mut}/mut-mis.sh"
   if grep -q 'ntype\[id\] == "claim" && plane\[id\] == "PROD"' "${mut}/mut-mis.sh"; then
     local mmis; mmis="$(bash "${mut}/mut-mis.sh" "${fxm}" --freshness 2>&1 || true)"
@@ -1116,11 +1116,11 @@ run_kg_status_factor_selftests() {
   # ⚠️ EXCLUI ESTA BANCADA: o padrao procurado aparece NESTA linha, entao a busca casava a si mesma
   # e o caso acusava o proprio teste. Mesma armadilha do `sed` cujo padrao vive no arquivo intacto,
   # que ja derrubou tres guardas-da-guarda nesta casa.
-  local copias; copias=$(git -C "${REPO_ROOT}" grep -l 'function statusFactor' -- '*.sh' 2>/dev/null \
+  local copies; copies=$(git -C "${REPO_ROOT}" grep -l 'function statusFactor' -- '*.sh' 2>/dev/null \
                          | grep -v 'lint-selftest.sh' | grep -c . || true)
-  if [ "${copias}" -eq 0 ]; then
-    record_pass "status-factor: (a) ZERO copias em script — a funcao vive so em lib/status-factor.awk"
-  else record_fail "status-factor: (a)" "${copias} script(s) ainda definem statusFactor: $(git -C "${REPO_ROOT}" grep -l 'function statusFactor' -- '*.sh' | grep -v 'lint-selftest.sh' | tr '\n' ' ')"; fi
+  if [ "${copies}" -eq 0 ]; then
+    record_pass "status-factor: (a) ZERO copies em script — a funcao vive so em lib/status-factor.awk"
+  else record_fail "status-factor: (a)" "${copies} script(s) ainda definem statusFactor: $(git -C "${REPO_ROOT}" grep -l 'function statusFactor' -- '*.sh' | grep -v 'lint-selftest.sh' | tr '\n' ' ')"; fi
 
   # (b) FAIL-LOUD, nunca default: sem a lib, os dois consumidores saem 2 com mensagem no stderr.
   #     Fonte ausente jamais vira aprovacao (P0 da REGRA 30) — e este ramo ja disparou de verdade,
@@ -1128,12 +1128,12 @@ run_kg_status_factor_selftests() {
   d="$(mktemp -d)"; mkdir -p "$d/lib"
   cp "${radar}" "${view}" "$d/" 2>/dev/null
     # ⚠️ AQUI A LIB **NAO** VAI: a ausencia dela E o teste. Uma varredura automatica minha inseriu
-    # `_lib_ao_lado` neste ponto e teria destruido o caso em silencio — o `fail-loud` nunca dispararia
+    # `_lib_beside` neste ponto e teria destruido o caso em silencio — o `fail-loud` nunca dispararia
     # e o (b) passaria por vacuidade. Varredura mecanica nao sabe qual copia e deliberada.
   # GRAFO VALIDO de proposito: o `kg-view` valida o ARGUMENTO antes de checar a lib, entao um
   # /dev/null dispararia erro de USO (tambem exit 2) e o caso mediria a coisa errada.
   printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: N\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 1.0\n    label: "x"\nedges: []\n' > "$d/t.kg.yaml"
-  local ruim=""
+  local broken=""
   for g in kg-radar kg-view; do
     # `out=$(cmd)` sob `set -e` ABORTA quando cmd sai != 0 — e este caso EXISTE para ver o exit 2.
     #
@@ -1146,12 +1146,12 @@ run_kg_status_factor_selftests() {
     case "${g}" in kg-view) local modo="--json" ;; *) local modo="--integrity" ;; esac
     rc=0; out="$(bash "$d/${g}.sh" "$d/t.kg.yaml" "${modo}" 2>&1)" || rc=$?
     { [ "${rc}" -eq 2 ] && printf '%s' "${out}" | grep -q 'AUSENTE' && printf '%s' "${out}" | grep -q 'status-factor.awk'; } \
-      || ruim="${ruim} ${g}(rc=${rc})"
+      || broken="${broken} ${g}(rc=${rc})"
   done
   rm -rf "$d"
-  if [ -z "${ruim}" ]; then
+  if [ -z "${broken}" ]; then
     record_pass "status-factor: (b) sem a lib os dois consumidores saem 2 NOMEANDO o arquivo (fail-loud, nunca default)"
-  else record_fail "status-factor: (b)" "consumidor silencioso sem a lib:${ruim}"; fi
+  else record_fail "status-factor: (b)" "consumidor silencioso sem a lib:${broken}"; fi
 
   # (c) PARIDADE POR VETOR — a lente que reintroduz o defeito ORIGINAL (`unverifiable` -> -1) REPROVA.
   #     ⚠️ O MUTANTE E A LENTE, NUNCA A LIB COMPARTILHADA: com sitio unico, mutar a lib muta os DOIS
@@ -1207,15 +1207,15 @@ run_kg_status_factor_selftests() {
   #     A guarda antiga imprimia ✅ enquanto a projecao dizia que o menos urgente era o mais urgente.
   d="$(mktemp -d)"; mkdir -p "$d/lib"; cp "${radar}" "$d/"; cp "${lib}" "$d/lib/"
   printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: A_UM\n    node_type: claim\n    plane: DEV\n    status: drifted\n    impact: 4\n    confidence: 1.0\n    label: "a"\n  - id: B_DOIS\n    node_type: claim\n    plane: DEV\n    status: unverifiable\n    impact: 4\n    confidence: 1.0\n    label: "b"\nedges:\n  - from: A_UM\n    to: B_DOIS\n    edge_type: SUPPORTS\n' > "$d/c.kg.yaml"
-  local soma_a soma_b vec_a vec_b
+  local sum_a sum_b vec_a vec_b
   vec_a="$(bash "$d/kg-radar.sh" "$d/c.kg.yaml" --weights-tsv 2>/dev/null)"
-  soma_a="$(printf '%s\n' "${vec_a}" | awk '{s+=$2} END{printf "%.2f", s}')"
+  sum_a="$(printf '%s\n' "${vec_a}" | awk '{s+=$2} END{printf "%.2f", s}')"
   sed -i 's/"drifted") return 1.3/"drifted") return 1.0/; s/"unverifiable") return 1.0/"unverifiable") return 1.3/' "$d/lib/status-factor.awk"
   vec_b="$(bash "$d/kg-radar.sh" "$d/c.kg.yaml" --weights-tsv 2>/dev/null)"
-  soma_b="$(printf '%s\n' "${vec_b}" | awk '{s+=$2} END{printf "%.2f", s}')"
-  if [ -n "${soma_a}" ] && [ "${soma_a}" = "${soma_b}" ] && [ "${vec_a}" != "${vec_b}" ]; then
-    record_pass "status-factor: (f) o VETOR ve o que a SOMA nao ve — cancelamento (soma ${soma_a} nos dois, vetor diferente)"
-  else record_fail "status-factor: (f)" "o cenario de cancelamento nao se formou: soma ${soma_a}/${soma_b}, vetor $([ "${vec_a}" = "${vec_b}" ] && echo igual || echo diferente)"; fi
+  sum_b="$(printf '%s\n' "${vec_b}" | awk '{s+=$2} END{printf "%.2f", s}')"
+  if [ -n "${sum_a}" ] && [ "${sum_a}" = "${sum_b}" ] && [ "${vec_a}" != "${vec_b}" ]; then
+    record_pass "status-factor: (f) o VETOR ve o que a SOMA nao ve — cancelamento (soma ${sum_a} nos dois, vetor diferente)"
+  else record_fail "status-factor: (f)" "o cenario de cancelamento nao se formou: soma ${sum_a}/${sum_b}, vetor $([ "${vec_a}" = "${vec_b}" ] && echo igual || echo diferente)"; fi
   rm -rf "$d"
 
   # (g) LIB CORROMPIDA (nao so ausente) culpa o INSTRUMENTO, nunca o grafo. O fail-loud original so
@@ -1239,17 +1239,17 @@ run_kg_status_factor_selftests() {
   if [ ! -f "${asm}" ] || [ ! -f "${mf}" ]; then record_skip "status-factor: (h) assembler/manifesto ausente"; else
     d="$(mktemp -d)"
     sed 's#^\s*"\.claude/validation/lib/status-factor\.awk".*$##' "${mf}" > "$d/sem-lib.manifest.sh"
-    local rc_ok rc_sem sujo_antes sujo_depois
+    local rc_ok rc_sem dirty_before dirty_after
     rc_ok=0;  bash "${asm}" "${mf}"                  >/dev/null 2>&1 || rc_ok=$?
     # ⚠️ ABORTAR SEM ESTRAGAR. A 1a versao desta guarda desistia DEPOIS de copiar: o destino ficava
     #    em ruinas (21 arquivos sujos, `plugin.json` deletado) e o lint acusava "fora de sincronia".
     #    Guarda que aborta destruindo e pior que o defeito que recusa — por isso o caso mede o
     #    ESTADO DO DESTINO, nao so o exit code.
-    sujo_antes="$(git -C "${REPO_ROOT}" status --porcelain plugins/ 2>/dev/null | wc -l)"
+    dirty_before="$(git -C "${REPO_ROOT}" status --porcelain plugins/ 2>/dev/null | wc -l)"
     rc_sem=0; bash "${asm}" "$d/sem-lib.manifest.sh" >/dev/null 2>&1 || rc_sem=$?
-    sujo_depois="$(git -C "${REPO_ROOT}" status --porcelain plugins/ 2>/dev/null | wc -l)"
-    if [ "${sujo_antes}" != "${sujo_depois}" ]; then
-      record_fail "status-factor: (h) recusa DESTRUTIVA" "o assembler abortou DEPOIS de tocar no destino: plugins/ passou de ${sujo_antes} para ${sujo_depois} arquivos sujos"
+    dirty_after="$(git -C "${REPO_ROOT}" status --porcelain plugins/ 2>/dev/null | wc -l)"
+    if [ "${dirty_before}" != "${dirty_after}" ]; then
+      record_fail "status-factor: (h) recusa DESTRUTIVA" "o assembler abortou DEPOIS de tocar no destino: plugins/ passou de ${dirty_before} para ${dirty_after} arquivos sujos"
     else
       _prove_mutation "status-factor: (h) manifesto SEM a lib ABORTA a montagem, sem tocar no destino" \
                       "${mf}" "$d/sem-lib.manifest.sh" "${rc_ok}" "${rc_sem}"
@@ -1316,7 +1316,7 @@ KGEOF
   # O mutante precisa do kg-radar.sh AO LADO — senão o que a guarda mede é a
   # ausência do motor, não a divergência de parse (foi o que aconteceu na 1a
   # versão, e revelou o fail-open que o kg-view.sh agora fecha).
-  cp "${SCRIPT_DIR}/kg-radar.sh" "${tmp}/kg-radar.sh"; _lib_ao_lado "${tmp}"
+  cp "${SCRIPT_DIR}/kg-radar.sh" "${tmp}/kg-radar.sh"; _lib_beside "${tmp}"
   sed 's|section == "nodes" && /\^\[\[:space:\]\]+- id:/|section == "nodes" \&\& /^ZZNOMATCHZZ/|' \
       "${view}" > "${tmp}/mutated.sh"
   if ! bash "${tmp}/mutated.sh" "${tmp}/v.kg.yaml" --assert-parity >/dev/null 2>&1; then
@@ -1821,7 +1821,7 @@ KGEOF
   # (d) (MUT) — removida a exclusão do top-10, a sobreposição REAPARECE. Sem esta prova, (a)
   # passaria igual se a fixture não tivesse nenhum open pesado o bastante para entrar no radar.
   local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${tmp}"'" "'"${mut}"'"' RETURN
-  cp "${radar}" "${mut}/mutado.sh"; _lib_ao_lado "${mut}"
+  cp "${radar}" "${mut}/mutado.sh"; _lib_beside "${mut}"
   sed -i 's/^      if (id in noRadar) continue.*$//' "${mut}/mutado.sh"
   if ! grep -q 'if (id in noRadar) continue' "${mut}/mutado.sh"; then
     local mst mdup
@@ -2476,7 +2476,7 @@ run_status_reverificacao_selftests() {
     # `! grep -q ... m.sh` ficou VACUA POR INVERSAO: a linha nunca esteve la, entao a negacao e
     # sempre verdadeira e o caso seguia como se tivesse mutado. A prova agora e `cmp` de ARQUIVO,
     # nao grep de padrao — a mesma licao que derrubou tres guardas-da-guarda em 2026-08-07.
-  local mut; mut="$(mktemp -d)"; cp "${radar}" "${mut}/m.sh"; _lib_ao_lado "${mut}"
+  local mut; mut="$(mktemp -d)"; cp "${radar}" "${mut}/m.sh"; _lib_beside "${mut}"
     sed -i 's|^  if (s == "drifted") return 1.3$||' "${mut}/lib/status-factor.awk"
     if ! cmp -s "${SCRIPT_DIR}/lib/status-factor.awk" "${mut}/lib/status-factor.awk"; then
     _mkst drifted; rc=0; bash "${mut}/m.sh" "${d}/x.kg.yaml" >/dev/null 2>&1 || rc=$?
@@ -2561,7 +2561,7 @@ run_kg_reconcile_selftests() {
   # fixture estivesse `open`). É o padrão guarda-da-guarda: se a mutação não aplicar, o teste
   # FALHA em vez de passar por omissão.
   local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'"' RETURN
-  cp "${radar}" "${mut}/mutado.sh"; _lib_ao_lado "${mut}"
+  cp "${radar}" "${mut}/mutado.sh"; _lib_beside "${mut}"
   sed -i 's/ \&\& supersederConta(nstatus\[efrom\[i\]\])//' "${mut}/mutado.sh"
   if ! grep -q 'etype\[i\] == "SUPERSEDES" && supersederConta' "${mut}/mutado.sh"; then
     local mout; mout="$(bash "${mut}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
@@ -2575,7 +2575,7 @@ run_kg_reconcile_selftests() {
   # (e) (MUT) — removida a guarda inteira, o ⚠ some. Prova que as linhas novas são o que produz o
   # veredito, e não algum efeito colateral do bloco antigo.
   local mut2; mut2="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'" "'"${mut2}"'"' RETURN
-  cp "${radar}" "${mut2}/mutado.sh"; _lib_ao_lado "${mut2}"
+  cp "${radar}" "${mut2}/mutado.sh"; _lib_beside "${mut2}"
   sed -i '/supersededByLive\[id\] > 0/,+6d' "${mut2}/mutado.sh"
   if ! grep -q 'supersededByLive\[id\] > 0' "${mut2}/mutado.sh"; then
     local mout2; mout2="$(bash "${mut2}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
@@ -2592,7 +2592,7 @@ run_kg_reconcile_selftests() {
   # de "a fixture nova acusaria de qualquer jeito" — e a troca seria indistinguível de no-op.
   # Medido no diff real: radar do main dá 2 avisos nesta fixture, o corrigido dá 4.
   local mut3; mut3="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'" "'"${mut2}"'" "'"${mut3}"'"' RETURN
-  cp "${radar}" "${mut3}/mutado.sh"; _lib_ao_lado "${mut3}"
+  cp "${radar}" "${mut3}/mutado.sh"; _lib_beside "${mut3}"
   # ⚠️ Os dois `sed` casam a ASSINATURA das funções. Se ela mudar (como mudou quando `alvoPendente`
   # ganhou o parâmetro de tipo), eles param de casar — e é por isso que o `if` abaixo verifica o
   # resultado: mutação que não pega dá record_fail explícito, nunca silêncio.
@@ -2630,7 +2630,7 @@ run_kg_reconcile_selftests() {
   # os dois ✗ têm de SUMIR. Sem isto, (g) não distingue "a correção funciona" de "a fixture
   # reprovaria de qualquer jeito".
   local mut4; mut4="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'" "'"${mut2}"'" "'"${mut3}"'" "'"${mut4}"'"' RETURN
-  cp "${radar}" "${mut4}/mutado.sh"; _lib_ao_lado "${mut4}"
+  cp "${radar}" "${mut4}/mutado.sh"; _lib_beside "${mut4}"
   sed -i 's/if (refutedBy\[id\] > 0 \&\& alvoPendente(nstatus\[id\], ntype\[id\])) {/if (refutedBy[id] > 0 \&\& (nstatus[id] == "confirmed" || nstatus[id] == "open")) {/' "${mut4}/mutado.sh"
   if grep -q 'refutedBy\[id\] > 0 && (nstatus\[id\] == "confirmed"' "${mut4}/mutado.sh"; then
     local mout4; mout4="$(bash "${mut4}/mutado.sh" "${rx}/refutes-drifted.kg.yaml" --integrity 2>&1 || true)"
@@ -3769,7 +3769,7 @@ run_kg_console_selftests() {
     local nt; nt="$(mktemp -d)"; cp "${fixture}" "${nt}/g.kg.yaml"
     printf '{"guided_tour":[{"focus":["S_novo"],"narration":"passo de teste"}]}' > "${nt}/g.narration.json"
     cp "${helper}" "${REPO_ROOT}/.claude/validation/kg-view.sh" "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${nt}/" 2>/dev/null
-    _lib_ao_lado "${nt}"
+    _lib_beside "${nt}"
     mkdir -p "${nt}/vendor/kg-console"; cp "${vendor}" "${nt}/vendor/kg-console/"
     local HN; HN="$(bash "${nt}/kg-console.sh" "${nt}/g.kg.yaml" 2>/dev/null)"
     local nb; nb="$(printf '%s' "${HN}" | grep -oE 'narr:"[^"]*"' | head -1 | sed 's/narr:"//;s/"$//')"
@@ -3787,7 +3787,7 @@ run_kg_console_selftests() {
   # Exit 3 — dependência ausente (vendor). Cópia isolada SEM o vendor.
   local t3; t3="$(mktemp -d)"
   cp "${helper}" "${REPO_ROOT}/.claude/validation/kg-view.sh" "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${t3}/" 2>/dev/null
-  _lib_ao_lado "${t3}"
+  _lib_beside "${t3}"
   local rc3=0; bash "${t3}/kg-console.sh" "${fixture}" >/dev/null 2>&1 || rc3=$?
   if [ "${rc3}" -eq 3 ]; then record_pass "kg-console: vendor ausente → exit 3 (gracioso)"
   else record_fail "kg-console: dep" "esperava exit 3 sem vendor, veio ${rc3}"; fi
@@ -3804,7 +3804,7 @@ run_kg_narrate_validate_selftests() {
   command -v python3 >/dev/null 2>&1 || { record_skip "kg-narrate-validate: python3 ausente (skip gracioso)"; return; }
   local t; t="$(mktemp -d)"; trap 'rm -rf "${t}"' RETURN
   # kg-view.sh + kg-radar.sh ao lado (o validador consome a lente vigiada)
-  cp "${SCRIPT_DIR}/kg-view.sh" "${SCRIPT_DIR}/kg-radar.sh" "${t}/" 2>/dev/null; _lib_ao_lado "${t}"
+  cp "${SCRIPT_DIR}/kg-view.sh" "${SCRIPT_DIR}/kg-radar.sh" "${t}/" 2>/dev/null; _lib_beside "${t}"
   cp "${helper}" "${t}/kg-narrate-validate.sh"
   cat > "${t}/g.kg.yaml" <<'KGEOF'
 meta:
@@ -4492,7 +4492,7 @@ run_post_review_comment_selftests() {
   local rc2=0; bash "${helper}" --flag-que-nao-existe >/dev/null 2>&1 || rc2=$?
   if [ "${rc}" -eq 2 ] && [ "${rc2}" -eq 2 ]; then
     record_pass "forge-post: (e) erro de USO → exit 2; falha de posting → exit 0 (uso ≠ veredito)"
-  else record_fail "forge-post: (e) exit de uso" "sem-body=${rc} flag-ruim=${rc2} (esperado 2 e 2)"; fi
+  else record_fail "forge-post: (e) exit de uso" "sem-body=${rc} flag-broken=${rc2} (esperado 2 e 2)"; fi
 
   # (f) (MUT) sem a busca pela marca, o sticky vira POST sempre — prova que a busca é
   #     load-bearing e que (b) não passa por acidente.
@@ -5060,7 +5060,7 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (i) pipe numa linha + \$? na SEGUINTE → AINDA DISPARA (o caso real)"
   else record_fail "empty-result-guard: (i)" "a proximidade cegou o caso multi-linha que originou a guarda: ${out}"; fi
 
-  # (l)…(o) sao o PAR do 3o filtro anti-ruido (`semAspas`, 2026-08-09) — e nasceram DEPOIS dele,
+  # (l)…(o) sao o PAR do 3o filtro anti-ruido (`unquoted`, 2026-08-09) — e nasceram DEPOIS dele,
   # o que e exatamente o defeito: a 1a versao do filtro entrou SEM par, e uma passada adversarial
   # provou que muta-la inteira mantinha esta bancada 11/11 VERDE. Medicao de mao nao e mecanismo.
   # (l) prova que o ruido morreu; (m)(n)(o) provam que o filtro NAO CEGOU a guarda — cada uma
@@ -5089,13 +5089,13 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (o) apostrofo DENTRO de aspas duplas → AINDA DISPARA (aspa em aspa e literal)"
   else record_fail "empty-result-guard: (o)" "o gsub desemparelhado apagou o pipe real do meio do comando: ${out}"; fi
 
-  # (p) MUTATION: prova que `semAspas` e load-bearing nas DUAS direcoes. Sem isto, remover o filtro
+  # (p) MUTATION: prova que `unquoted` e load-bearing nas DUAS direcoes. Sem isto, remover o filtro
   # (voltando o falso-positivo) ou neutraliza-lo (voltando os fail-opens) passaria em silencio —
   # que foi literalmente o que aconteceu na 1a versao.
   local gd; gd="$(mktemp -d)"
   cp "${hook}" "${gd}/m.sh"
-  # mutante: `semAspas` vira identidade -> o filtro some -> (l) tem de REPROVAR
-  perl -0pi -e 's/function semAspas\(s,   i, c, q, o\) \{/function semAspas(s,   i, c, q, o) { return s;/' "${gd}/m.sh"
+  # mutante: `unquoted` vira identidade -> o filtro some -> (l) tem de REPROVAR
+  perl -0pi -e 's/function unquoted\(s,   i, c, q, o\) \{/function unquoted(s,   i, c, q, o) { return s;/' "${gd}/m.sh"
   if cmp -s "${hook}" "${gd}/m.sh"; then
     record_fail "empty-result-guard: (p) mutation" "a ancora nao pegou — o mutante e IDENTICO ao original, o caso mediria o nada"
   else
@@ -5103,7 +5103,7 @@ run_empty_result_guard_selftests() {
     m_l="$(printf '%s' '{"tool_input":{"command":"bash algo.sh > arq 2>&1\necho \"rc=$?\"; grep -E '"'"'Passaram|Falharam'"'"' arq"},"tool_response":{"stdout":"x"}}' | bash "${gd}/m.sh" 2>&1 || true)"
     m_m="$(printf '%s' '{"tool_input":{"command":"n=\"$(ls /tmp | wc -l)\"\necho $?"},"tool_response":{"stdout":"x"}}' | bash "${gd}/m.sh" 2>&1 || true)"
     if printf '%s' "${m_l}" | grep -q 'EXIT-CODE-DE-PIPE' && printf '%s' "${m_m}" | grep -q 'EXIT-CODE-DE-PIPE'; then
-      record_pass "empty-result-guard: (p) mutation — sem \`semAspas\` o caso (l) REPROVA (o filtro e load-bearing)"
+      record_pass "empty-result-guard: (p) mutation — sem \`unquoted\` o caso (l) REPROVA (o filtro e load-bearing)"
     else record_fail "empty-result-guard: (p) mutation" "o mutante SEM o filtro ainda satisfaz (l) — o caso (l) passa por vacuo"; fi
   fi
   rm -rf "${gd}"
@@ -5373,7 +5373,7 @@ run_kg_radar_integrity_selftests() {
   # Monta um repo git com UM grafo. $2=são|contraditório
   _mki() {
     mkdir -p "$1/.claude/validation" "$1/docs/onion/graph"
-    cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "$1/.claude/validation/"; _lib_ao_lado "$1/.claude/validation"
+    cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "$1/.claude/validation/"; _lib_beside "$1/.claude/validation"
     { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
       printf '  - id: C_alvo\n    node_type: claim\n    plane: DEV\n    impact: 3\n    status: %s\n    label: "x"\n' \
              "$([ "$2" = contraditorio ] && echo confirmed || echo refuted)"
@@ -7498,7 +7498,7 @@ _born_make_repo() {
   local d; d="$(mktemp -d)"
   mkdir -p "${d}/.claude/validation" "${d}/.claude/diary" "${d}/docs/analysis"
   cp "${REPO_ROOT}/.claude/validation/kg-born-marker.sh" "${d}/.claude/validation/"
-  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh"       "${d}/.claude/validation/"; _lib_ao_lado "${d}/.claude/validation"
+  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh"       "${d}/.claude/validation/"; _lib_beside "${d}/.claude/validation"
 
   # Grafo VÁLIDO (passa --integrity E --schema): 2 nós + 1 aresta (sem órfão).
   cat > "${d}/docs/analysis/probe.kg.yaml" <<'KGEOF'
