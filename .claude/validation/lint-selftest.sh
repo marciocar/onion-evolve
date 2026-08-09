@@ -5528,12 +5528,12 @@ run_kg_ratchet_direction_selftests() {
   #     e me fez errar TRES vezes seguidas por tentar resolver com uma regra so o que sao situacoes
   #     diferentes. Cada degrau tem seu cenario, e o que se afere e o COMPORTAMENTO (o bypass e
   #     pego?), nao o ref escolhido — aferir o ref seria testar a implementacao, nao a propriedade.
-  local falha_v=""
+  local failed_v=""
 
   # v1 · PRE-COMMIT (arvore suja): a mutacao esta no working tree e o HEAD e a base.
   d="$(mktemp -d)"; _scene49 "$d" drifted 5 PROD "" ""
   _run49 "$d"
-  [ "$(_tags49 "${OUT49}")" = "SOFT:PASSIVO " ] || falha_v="${falha_v} v1(arvore-suja:$(_tags49 "${OUT49}"))"
+  [ "$(_tags49 "${OUT49}")" = "SOFT:PASSIVO " ] || failed_v="${failed_v} v1(arvore-suja:$(_tags49 "${OUT49}"))"
   rm -rf "$d"
 
   # v2 · POS-COMMIT com PONTO DE RAMIFICACAO: o encolhimento vai COMMITADO numa branch.
@@ -5546,7 +5546,7 @@ run_kg_ratchet_direction_selftests() {
     : > .claude/validation/kg-verification-baseline.txt
     git add -A && git -c user.email=t@t -c user.name=t commit -qm 'apaga tudo' ) >/dev/null 2>&1
   _run49 "$d"
-  printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD"{h=1} END{exit !h}' || falha_v="${falha_v} v2(commitado-na-branch-passou:$(_tags49 "${OUT49}"))"
+  printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD"{h=1} END{exit !h}' || failed_v="${failed_v} v2(commitado-na-branch-passou:$(_tags49 "${OUT49}"))"
   rm -rf "$d"
 
   # v3 · SEM BASELINE NO PONTO DE RAMIFICACAO — o adotante recem-instalado, em que o baseline NASCE
@@ -5560,12 +5560,12 @@ run_kg_ratchet_direction_selftests() {
     : > .claude/validation/kg-verification-baseline.txt
     git add -A && git -c user.email=t@t -c user.name=t commit -qm 'apaga grafo E linhas' ) >/dev/null 2>&1
   _run49 "$d"
-  printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD"{h=1} END{exit !h}' || falha_v="${falha_v} v3(adotante-bypass-reaberto:$(_tags49 "${OUT49}"))"
+  printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD"{h=1} END{exit !h}' || failed_v="${failed_v} v3(adotante-bypass-reaberto:$(_tags49 "${OUT49}"))"
   rm -rf "$d"
 
-  if [ -z "${falha_v}" ]; then
+  if [ -z "${failed_v}" ]; then
     record_pass "kg-catraca: (v) os TRES degraus da base pegam o encolhimento (arvore suja · commitado na branch · adotante sem baseline na base)"
-  else record_fail "kg-catraca: (v)" "degrau(s) cego(s):${falha_v}"; fi
+  else record_fail "kg-catraca: (v)" "degrau(s) cego(s):${failed_v}"; fi
 
   # (o) MUTATION — devolver a ALLOWLIST faz o caso (i) parar de proteger.
   #     ⚠️ o caso (i) afirma uma AUSÊNCIA de acusação, e ausência é o que uma fixture MORTA entrega
@@ -5583,11 +5583,14 @@ run_kg_ratchet_direction_selftests() {
   # (p) MUTATION — sem a checagem de aresta, o caso (k) passa a ACUSAR CONFORMIDADE
   d="$(mktemp -d)"; _scene49 "$d" refuted 5 PROD "" REFUTES
   mut="$d/mut-aresta.sh"
-  # ⚠️ RANGE limitado à função. O padrão `exit(achou ? 0 : 1)` aparece DUAS vezes no helper: na
+  # ⚠️ RANGE limitado à função. O padrão `exit(found ? 0 : 1)` aparece DUAS vezes no helper: na
   # função e dentro do comentário que documenta o comando de falsificação. Um `sed` solto mutaria os
   # dois, e o `cmp` passaria a diferir por duas razões — a mesma armadilha de padrão-que-casa-a-si-
   # mesmo que derrubou três guardas-da-guarda em 2026-08-07, um passo adiante.
-  sed '/^has_reconciliation_edge()/,/^}$/ s/exit(achou ? 0 : 1)/exit(1)/' "${helper}" > "${mut}"
+  # ⚠️ E o padrão contém um IDENTIFICADOR (`found`): renomeá-lo mata esta âncora. Já aconteceu
+  # duas vezes nesta sessão (aqui, e o `SUMARIO_IMPRESSO`→`SUMMARY_PRINTED` no extrator). Quem
+  # renomear tem de re-rodar o bloco — o `_prove_mutation` acusa, mas só se alguém o rodar.
+  sed '/^has_reconciliation_edge()/,/^}$/ s/exit(found ? 0 : 1)/exit(1)/' "${helper}" > "${mut}"
   if printf '%s' "$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)" | awk -F'\t' '$1=="HARD"{h=1} $2=="RECONCILIADO"{r=1} END{exit !(r && !h)}'; then rc_intact=0; else rc_intact=1; fi
   if printf '%s' "$(bash "${mut}"    "$d" --format tsv 2>/dev/null || true)" | awk -F'\t' '$1=="HARD"{h=1} $2=="RECONCILIADO"{r=1} END{exit !(r && !h)}'; then rc_mutant=0; else rc_mutant=1; fi
   _prove_mutation "kg-catraca: (p) (MUT) sem a checagem de aresta o (k) passa a punir conformidade — a aresta e o discriminador" \

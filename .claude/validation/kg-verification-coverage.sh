@@ -124,10 +124,10 @@ function inScope(plane, imp, st, ver) {
 UNIVERSE=""; UNIVERSE_LOADED=0
 load_universe() {
   [ "${UNIVERSE_LOADED}" -eq 1 ] && return 0
-  local f dentro
+  local f in_scope
   UNIVERSE="$(for f in $(git ls-files '*.kg.yaml' 2>/dev/null); do
-    case "$f" in */fixtures/*) dentro=0 ;; *) dentro=1 ;; esac
-    awk -v F="$f" -v D="${dentro}" '
+    case "$f" in */fixtures/*) in_scope=0 ;; *) in_scope=1 ;; esac
+    awk -v F="$f" -v D="${in_scope}" '
       function flush(   ) {
         if (id != "") printf "%s\037%s\037%s\037%s\037%s\037%s\037%s\n", F, id, plane, imp, st, ver, D
         id=""; plane=""; imp=0; ver=""; st=""
@@ -169,14 +169,14 @@ scope_pairs() {
 # MOVIDO, e mover não é remover.
 resolve_key() { # $1 = path::hash
   load_universe
-  local p="${1%%::*}" h="${1##*::}" achou
+  local p="${1%%::*}" h="${1##*::}" found
   # 1ª passada: no proprio path (o caso normal, e o barato)
-  achou="$(printf '%s\n' "${UNIVERSE}" | awk -F'\037' -v P="${p}" '$1 == P' \
-    | while IFS=$'\037' read -r f id plane imp st ver dentro; do
+  found="$(printf '%s\n' "${UNIVERSE}" | awk -F'\037' -v P="${p}" '$1 == P' \
+    | while IFS=$'\037' read -r f id plane imp st ver in_scope; do
         [ "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" = "${h}" ] || continue
-        printf '%s\037%s\037%s\037%s\037%s\037%s\037%s\n' "${id}" "${plane}" "${imp}" "${st}" "${ver}" "${f}" "${dentro}"
+        printf '%s\037%s\037%s\037%s\037%s\037%s\037%s\n' "${id}" "${plane}" "${imp}" "${st}" "${ver}" "${f}" "${in_scope}"
       done | head -1)"
-  [ -n "${achou}" ] && { printf '%s\n' "${achou}"; return 0; }
+  [ -n "${found}" ] && { printf '%s\n' "${found}"; return 0; }
   # 2ª passada: o corpus INTEIRO — sobre um INDICE construido UMA VEZ.
   # ⚠️ CUSTO MEDIDO pelo Elenxo na versao anterior, que hasheava o universo a cada chave orfa:
   #   0 orfas → 0,88s · 5 orfas → 47,26s (~9,4s/chave) · 15 orfas → TIMEOUT (>120s).
@@ -190,19 +190,19 @@ resolve_key() { # $1 = path::hash
   # SEMPRE vencia — e o gate acusava o operador de ter movido o grafo para dentro de um arquivo de
   # teste que ele nunca abriu. Antes deste diff o `grep -v '/fixtures/'` impedia esse vetor.
   # Empate não se desempata por ordem de arquivo: quem não sabe, DIZ que não sabe.
-  carrega_indice_hash
+  load_hash_index
   printf '%s\n' "${HASH_INDEX}" | awk -F'\037' -v H="${h}" '$1 == H { sub(/^[^\037]*\037/, ""); print }'
 }
 
 # INDICE hash→registro, construido UMA vez e so quando a 2a passada e mesmo necessaria.
 HASH_INDEX=""; HASH_INDEX_LOADED=0
-carrega_indice_hash() {
+load_hash_index() {
   [ "${HASH_INDEX_LOADED}" -eq 1 ] && return 0
   HASH_INDEX="$(printf '%s\n' "${UNIVERSE}" \
-    | while IFS=$'\037' read -r f id plane imp st ver dentro; do
+    | while IFS=$'\037' read -r f id plane imp st ver in_scope; do
         [ -n "${id}" ] || continue
         printf '%s\037%s\037%s\037%s\037%s\037%s\037%s\037%s\n' \
-          "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" "${id}" "${plane}" "${imp}" "${st}" "${ver}" "${f}" "${dentro}"
+          "$(printf '%s' "${id}" | sha1sum | cut -c1-12)" "${id}" "${plane}" "${imp}" "${st}" "${ver}" "${f}" "${in_scope}"
       done)"
   HASH_INDEX_LOADED=1
 }
@@ -234,13 +234,13 @@ carrega_indice_hash() {
 has_reconciliation_edge() { # $1=arquivo $2=id → exit 0 se ALGUÉM reconciliou o nó
   awk -v ID="$2" '
     function flush(   ) {
-      if (ef != "" && ef != eto && eto == ID && (et == "REFUTES" || et == "SUPERSEDES")) achou=1
+      if (ef != "" && ef != eto && eto == ID && (et == "REFUTES" || et == "SUPERSEDES")) found=1
       ef=""; et=""; eto=""
     }
     /^[[:space:]]*-[[:space:]]*from:[[:space:]]*/ { flush(); ef=$3;  next }
     /^[[:space:]]*to:[[:space:]]*/                { eto=$2; next }
     /^[[:space:]]*edge_type:[[:space:]]*/         { et=$2;  next }
-    END { flush(); exit(achou ? 0 : 1) }
+    END { flush(); exit(found ? 0 : 1) }
   ' "$1"
 }
 
@@ -292,9 +292,9 @@ known="$(grep -vE '^[[:space:]]*(#|$)' "${BASELINE}" 2>/dev/null | sort -u)"
 # exit 0. Ou seja: o commit que fechou uma porta reabriu a mesma pelo outro lado.
 # A cura e andar para tras ate o ancestral mais recente que TENHA o baseline — o que responde
 # "o baseline encolheu desde a ultima vez que ele existiu?", que e a pergunta que a catraca faz.
-_tem_baseline() { git cat-file -e "$1:.claude/validation/kg-verification-baseline.txt" 2>/dev/null; }
+_has_baseline() { git cat-file -e "$1:.claude/validation/kg-verification-baseline.txt" 2>/dev/null; }
 _baseline_ref() {
-  local c b ultimo_igual=""
+  local c b last_same=""
   # A BASE E O PRIMEIRO ANCESTRAL (HEAD inclusive) CUJO BASELINE **DIFERE** DO ATUAL.
   # As duas tentativas anteriores erraram por olhar a IDENTIDADE do commit em vez do CONTEUDO:
   #   · "nunca o HEAD"  → quebrava o pre-commit, onde a mutacao esta no working tree e o HEAD e a
@@ -310,27 +310,27 @@ _baseline_ref() {
   # quitadas (medido: 5 SOFT de nos carimbados em 2026-08-04, ruido perpetuo no corpus limpo).
   # Pre-commit e pos-commit sao situacoes DIFERENTES, e tratar as duas com uma regra so foi o que
   # me fez errar tres vezes seguidas nesta funcao.
-  if ! git diff --quiet HEAD 2>/dev/null && _tem_baseline HEAD; then printf 'HEAD'; return 0; fi
+  if ! git diff --quiet HEAD 2>/dev/null && _has_baseline HEAD; then printf 'HEAD'; return 0; fi
 
   # 1o: o PONTO DE RAMIFICACAO, que e a base semantica de um PR — "o baseline encolheu desde que
   # esta branch nasceu?". So ele evita que a busca por conteudo ande historia adentro e ressuscite
   # entradas ha muito quitadas (medido: sem esta prioridade, o corpus limpo ganhava 5 SOFT de nos
   # legitimamente carimbados em 2026-08-04 — ruido perpetuo).
   b="$(git merge-base origin/main HEAD 2>/dev/null || git merge-base main HEAD 2>/dev/null || true)"
-  if [ -n "${b}" ] && [ "${b}" != "$(git rev-parse HEAD 2>/dev/null)" ] && _tem_baseline "${b}"; then
+  if [ -n "${b}" ] && [ "${b}" != "$(git rev-parse HEAD 2>/dev/null)" ] && _has_baseline "${b}"; then
     printf '%s' "${b}"; return 0
   fi
   # 2o: sem ponto de ramificacao util (rodando NA main, repo de uma branch so, ou base sem o
   # arquivo — o caso do adotante recem-instalado), cai para o CONTEUDO.
   for c in $(git rev-list --max-count=200 HEAD 2>/dev/null); do
-    _tem_baseline "${c}" || continue
+    _has_baseline "${c}" || continue
     b="$(git show "${c}:.claude/validation/kg-verification-baseline.txt" 2>/dev/null | grep -vE '^[[:space:]]*(#|$)' | sort -u)"
     [ "${b}" != "${known}" ] && { printf '%s' "${c}"; return 0; }
-    ultimo_igual="${c}"
+    last_same="${c}"
   done
   # nenhum ancestral DIFERE: ou nada mudou, ou o baseline nasceu identico. Usar o mais recente que o
   # tenha e correto e mantem `prev` nao-vazio (o vazio silencia a guarda inteira — foi o bypass).
-  printf '%s' "${ultimo_igual:-}"
+  printf '%s' "${last_same:-}"
   return 0
 }
 
@@ -376,7 +376,7 @@ done <<< "${PAIRS}"
 # NINGUÉM OBSERVOU, e o Elenxo o falsificou em um comando. Ela dizia: *"sem a checagem de aresta o
 # guarda acusaria 3 CONFORMIDADES"*. FALSO. Hoje `--emit-baseline` é IDÊNTICO ao baseline versionado,
 # logo este laço NUNCA EXECUTA no corpus real, e nenhum dos 3 nós citados está no baseline. Medição:
-#   sed 's/exit(achou ? 0 : 1)/exit(1)/' kg-verification-coverage.sh > /tmp/sem-aresta.sh
+#   sed 's/exit(found ? 0 : 1)/exit(1)/' kg-verification-coverage.sh > /tmp/sem-aresta.sh
 #   bash /tmp/sem-aresta.sh --format tsv | awk -F'\t' '{print $1,$2}' | sort | uniq -c
 #   → 48 SOFT PASSIVO, ZERO HARD
 # A checagem é PREVENTIVA, e o que prova que ela discrimina é o selftest (p), não o corpus. Escrever
@@ -392,8 +392,8 @@ done <<< "${PAIRS}"
 # subshell e o indice era reconstruido A CADA CHAVE. Medido: 15 chaves orfas = 2m58s. Icado, o custo
 # e UM sha1sum por no, uma vez — e so quando existe orfa, para o corpus limpo seguir em ~0,8s.
 # (Eu ja tinha consertado exatamente este erro no `load_universe` e o repeti no indice.)
-_orfas="$(printf '%s\n' "${TO_JUDGE}" | grep -v '^$' | grep -vxF -f <(printf '%s\n' "${UNVERIFIED}") 2>/dev/null || true)"
-if [ -n "${_orfas}" ]; then load_universe; carrega_indice_hash; fi
+_orphans="$(printf '%s\n' "${TO_JUDGE}" | grep -v '^$' | grep -vxF -f <(printf '%s\n' "${UNVERIFIED}") 2>/dev/null || true)"
+if [ -n "${_orphans}" ]; then load_universe; load_hash_index; fi
 
 while IFS= read -r k; do
   [ -n "${k}" ] || continue
@@ -421,7 +421,7 @@ while IFS= read -r k; do
       "no APAGADO do corpus (nao existe em NENHUM grafo) — apagar nao descarrega a medicao que o baseline cobra. Se o no morreu de verdade, aposente-o pela forma que o grafo tem: superseded/refuted COM a aresta de reconciliacao, que sai SOFT. Chave: ${k}"
     hard=$((hard+1)); continue
   fi
-  IFS=$'\037' read -r rid rplane rimp rst rver rpath rdentro <<< "${rec}"
+  IFS=$'\037' read -r rid rplane rimp rst rver rpath r_in_scope <<< "${rec}"
 
   # ⚠️ O CARIMBO VEM ANTES DO PATH, e a ordem inversa era o defeito CRÍTICO do Elenxo desta branch:
   # um nó COM `verified_at` movido levava HARD dizendo "SEM ser medido", e o remédio que o gate
@@ -466,14 +466,14 @@ while IFS= read -r k; do
     # sob fixtures/" — nada sobre plane/impact/status/carimbo. O Elenxo mostrou a frase saindo sobre
     # um no `superseded`, que a propria denylist deste script poe FORA do escopo: o gate afirmava
     # sobre uma condicao que nunca avaliou, no arquivo cujo cabecalho existe para cobrar isso.
-    if [ "${rdentro}" = "1" ] && printf '%s\037%s\037%s\037%s\n' "${rplane}" "${rimp}" "${rst}" "${rver}" \
+    if [ "${r_in_scope}" = "1" ] && printf '%s\037%s\037%s\037%s\n' "${rplane}" "${rimp}" "${rst}" "${rver}" \
          | awk -F'\037' "${SCOPE_PREDICATE}"' { exit inScope($1,$2,$3,$4) ? 0 : 1 }'; then
       emit SOFT MUDOU-DE-PATH ".claude/validation/kg-verification-baseline.txt" \
         "no '${rid}' MUDOU DE ARQUIVO (${kp} → ${rpath}) e segue no escopo — reescreva a chave no baseline, nao a remova: ${k}$([ -z "${BASE_REF}" ] && printf ' [sem ponto de ramificacao: NAO deu para checar se e homonimo]')"
       soft=$((soft+1))
     else
       emit HARD MUDOU-DE-PATH "${rpath}" \
-        "no '${rid}' mudou de ${kp} para ${rpath} e NAO esta mais no escopo (path fora: $([ "${rdentro}" = "1" ] && printf nao || printf sim) · plane:${rplane:-<vazio>} impact:${rimp:-0} status:${rst:-<vazio>}) SEM carimbo — o no segue no disco, versionado, afirmando sobre producao, e o baseline encolheu sozinho. Mover nao e medir: ou meca (/meta:kg-freshness), ou traga o grafo de volta ao escopo."
+        "no '${rid}' mudou de ${kp} para ${rpath} e NAO esta mais no escopo (path fora: $([ "${r_in_scope}" = "1" ] && printf nao || printf sim) · plane:${rplane:-<vazio>} impact:${rimp:-0} status:${rst:-<vazio>}) SEM carimbo — o no segue no disco, versionado, afirmando sobre producao, e o baseline encolheu sozinho. Mover nao e medir: ou meca (/meta:kg-freshness), ou traga o grafo de volta ao escopo."
       hard=$((hard+1))
     fi
     continue

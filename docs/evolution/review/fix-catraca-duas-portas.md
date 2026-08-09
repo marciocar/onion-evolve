@@ -1,7 +1,7 @@
 ---
 branch: fix/catraca-duas-portas
 date: 2026-08-09
-reviewed_diff_sha256: 51cca37695739ffc740436126796a732cfae283c7eaff8b953be2eb279c95ab2
+reviewed_diff_sha256: ac88a8f76c17e881d915f486bf038ff8bd3410a498d82d4900230faadf17f09e
 findings_total: 16
 findings_real: 13
 findings_fixed: 11
