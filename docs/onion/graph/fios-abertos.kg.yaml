@@ -179,7 +179,7 @@ nodes:
     status: open
     impact: 4
     confidence: 1.0
-    label: "MEDIDO 2026-08-09 em srv1812846, e a medicao QUALIFICA o item em vez de confirma-lo cego. (1) WAHA: `WAHA_API_KEY` e `WAHA_DASHBOARD_PASSWORD` ESTAO no `Config.Env` do container `onion-vps-waha` — a exposicao e real. MAS o raio e ROOT: o socket e `660 root:docker` e o grupo `docker` esta VAZIO; `marcio` e `granaai` sao NEGADOS ao tentar `docker inspect` (testado, nao inferido dos bits). Root ja le tudo, entao isso rebaixa a PRIORIDADE sem anular o item — a superacao segue sendo tirar do env, e ela exige RECRIAR o container, que INTERROMPE ferramenta viva: decisao do maestro, nao minha. (2) `bypassPermissions` esta no `.env` de producao (1 ocorrencia) e a contencao E de processo, como o item dizia — com especificidade nova: o bridge roda como `onion` (nao root), mas `NoNewPrivileges=no` e `ProtectHome=no`. A contencao existe e e PARCIAL. Superacao barata e reversivel: drop-in com `NoNewPrivileges=yes` + `ProtectHome=yes` (restart, nao recriacao) — SUGERIDO, nao executado. IMPACT rebaixado 5->4 POR MEDICAO (raio root-only), com o motivo escrito aqui: rebaixar sem medicao seria a FUGA-DE-ESCOPO da propria catraca, cometida na autoria."
+    label: "PARTE (2) EXECUTADA PELO MAESTRO em 2026-08-10, e a execucao expos um erro MEU. O drop-in de memoria protegia `onion-bridge.service`, unit que NAO EXISTE desde o rename para o prefixo `onion-vps-`; o bridge vivo rodava com MemoryMin=0. Movido para `onion-vps-bridge.service.d/` + `NoNewPrivileges=yes`. VERIFICADO PELO COMPORTAMENTO: cgroup memory.min = 268435456 (256M) com ancestral de 384M concedendo o piso INTEIRO, e `/health` respondendo 200. ⚠️ EU DERRUBEI O SERVICO NO CAMINHO: sugeri `ProtectHome=yes` junto, e `/home` inacessivel quebra um servico cujo ExecStart vive em `/home/onion/onion-bridge` — `status=203/EXEC`, loop de restart, contador em 8. NAO foi falta de informacao: eu havia LIDO `WorkingDirectory=/home/onion/onion-bridge` NESTA MESMA SESSAO, ao medir a exposicao do `bypassPermissions`. MEDIR E NAO USAR O QUE SE MEDIU e a forma mais cara do erro do dia, e desta vez caiu em PRODUCAO e nao num gate. Restaurado removendo SO o `ProtectHome`. PARTE (1) SEGUE ABERTA e por decisao de custo, nao por esquecimento: as credenciais do WAHA estao no `Config.Env` e tira-las exige RECRIAR o container (interrupcao, nao restart). O raio medido e ROOT — socket `660 root:docker`, grupo `docker` VAZIO, usuario comum NEGADO ao tentar ler. Root ja le tudo, entao a interrupcao nao se paga sozinha: agendar para a proxima janela em que o WAHA for tocado por outro motivo."
     trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
 
   - id: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
@@ -207,12 +207,14 @@ nodes:
 
   - id: Q_REGRA56_INSATISFAZIVEL_NO_SEGUNDO_COMMIT
     node_type: question
-    plane: DEV
-    status: open
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: pr-571-mergeado-e-tres-commits-consecutivos-sem-no-verify
+    status: confirmed
     impact: 4
     confidence: 1.0
     verified_against: pre-commit-rodado-duas-vezes-na-mesma-branch-com-PR-aberto
-    label: "Batido de frente nesta sessao: a REGRA 56 compara `BASE..HEAD` (commits), e no pre-commit o HEAD ainda e o commit ANTERIOR — logo o hash prospectivo so passa a valer DEPOIS do commit, e do 2o commit em diante o gate reprova quem obedece. MEDIR o gatilho exato antes de mexer: mudar a base da comparacao ou tirar a regra do hook e decisao de desenho, e guarda que pune quem obedece ensina a ignorar a guarda."
+    label: "RESPONDIDO E CURADO (PR #571). O no exigia \"MEDIR o gatilho exato antes de mexer\" — medido: 23 commits de UMA sessao com `--no-verify DECLARADO`, cada um sendo alguem que OBEDECEU (escreveu o residuo, calculou o hash) e mesmo assim teve de contornar. A raiz: `DIFF_SHA` comparava `BASE..HEAD`, so COMMITS, e no pre-commit o HEAD e o commit ANTERIOR — o conteudo em stage nao entrava na conta e o hash prospectivo NAO PODIA casar. A cura repetiu a escolha do `_baseline_ref` da REGRA 49: a SITUACAO decide (arvore suja -> indice; limpa -> HEAD, o CI inalterado). Prova: tres commits consecutivos passaram pelo hook SEM bypass, depois de 23 seguidos com ele. ⚠️ ESTE NO FICOU ABERTO POR UM CICLO depois de curado, e eu quase o apresentei ao maestro como tarefa DELE — colher e parte da cura, nao formalidade. TETO DECLARADO: `git diff --quiet HEAD` como detector de pre-commit e HEURISTICA, nao contexto; o caso do `--amend` nao foi medido e a regra nao o cobre."
     trace: ".claude/validation/review-artifact-check.sh"
 
   - id: I_GUARDA_DE_IDIOMA_DE_IDENTIFICADOR

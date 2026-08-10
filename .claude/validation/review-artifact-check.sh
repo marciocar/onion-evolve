@@ -167,7 +167,15 @@ ART="${REVIEW_DIR}/${SLUG}.md"
 
 # COMMITADO, não só em disco. O cabeçalho promete "artefato commitado" e o teste era `-f` — arquivo
 # untracked passava, e o "resíduo auditado por terceiro" podia nunca sair do disco do autor.
-if ! git cat-file -e "HEAD:${ART}" 2>/dev/null; then
+# ⚠️ E A EXISTENCIA SEGUE A MESMA REGRA DO HASH: a SITUACAO decide. `HEAD:` sozinho e o commit
+# ANTERIOR no pre-commit, entao o residuo recem-STAGED "nao existia" e o hook bloqueava o proprio
+# commit que o adicionava — impasse: para commitar o artefato era preciso ja te-lo commitado.
+# Foi medido no PR que colheu a REGRA 56: eu havia curado o HASH para olhar o indice e deixado a
+# EXISTENCIA olhando so o commit. Meia-cura em guarda e como meia-renomeacao em codigo — o lado
+# que sobra e o que quebra.
+# `:${ART}` le o INDICE; `HEAD:${ART}` le o commit. Arvore suja -> indice; limpa -> HEAD.
+if git diff --quiet HEAD 2>/dev/null; then _ART_REF="HEAD:${ART}"; else _ART_REF=":${ART}"; fi
+if ! git cat-file -e "${_ART_REF}" 2>/dev/null; then
   _out HARD ARTEFATO-AUSENTE "${ART}" "PR #${PR_NUM} aberto e sem resíduo de revisão. Rode a passada adversarial e registre o resultado em ${ART} (campos: reviewed_diff_sha256 · findings_total · findings_real · tokens · duration_min · verdict). O hash deste diff é ${DIFF_SHA}."
   [ "${FORMAT}" = tsv ] || printf '  (o verde do onion-review é soft-pass — não substitui esta passada)\n'
   exit 1
