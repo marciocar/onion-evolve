@@ -56,7 +56,7 @@ Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 | 15 | Frescor de contexto de domínio: carimbo de atualização | SOFT | contexto de domínio sem carimbo de atualização — frescor incerto |
 | 22 | Links relativos quebrados em docs/evolution/ e docs/knowledge-base/ | HARD | link relativo quebrado em docs/evolution ou docs/knowledge-base |
 | 48 | Referência de caminho `.claude/…` em backtick (prosa) que não resolve | HARD | referência .claude/ em backtick na prosa apontando p/ arquivo inexistente (ponteiro morto silencioso) |
-| 60 | Identificador de código em INGLÊS | HARD | identificador em pt-BR entrando no código porque só um revisor humano (ou LLM) o |
+| 60 | Identificador de código em INGLÊS | HARD | identificador em pt-BR entrando no código sem que nenhuma guarda mecânica o veja. |
 
 ## Fronteiras & contratos de arquitetura
 

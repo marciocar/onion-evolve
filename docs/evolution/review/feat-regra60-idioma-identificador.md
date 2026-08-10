@@ -1,7 +1,7 @@
 ---
 branch: feat/regra60-idioma-identificador
 date: 2026-08-09
-reviewed_diff_sha256: 8e7f64728310449b2ee1c305dc0d1e1d84dd534368cadb54bbf9d31949795153
+reviewed_diff_sha256: 8334e4ee5dbbede7da6aff852c821627f4770107ed534f45968a7032f4cb61cc
 findings_total: 25
 findings_real: 11
 findings_fixed: 7

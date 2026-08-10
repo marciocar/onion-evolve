@@ -709,8 +709,13 @@ check_consumed_modes() {
 
 # ===========================================================================
 # REGRA 60 — Identificador de código em INGLÊS [HARD]
-# previne: identificador em pt-BR entrando no código porque só um revisor humano (ou LLM) o
-#   pegaria — e o gatilho social não se repete sozinho.
+# previne: identificador em pt-BR entrando no código sem que nenhuma guarda mecânica o veja.
+#   ⚠️ A 1ª LINHA do `previne:` é a ÚNICA que o rules-registry projeta em lint-rules.md — se ela
+#   não fechar a oração, a regra é publicada TRUNCADA. Aconteceu aqui: a versão anterior quebrava
+#   em "...só um revisor humano (ou LLM) o" e a tabela saía com a frase pela metade. O docstring da
+#   REGRA 57 já avisa disso, no mesmo arquivo, e eu repeti mesmo assim.
+#   O que a linha cortada dizia, e que fica no corpo: só um revisor humano (ou LLM) pegaria, e o
+#   gatilho social não se repete sozinho.
 #   ORIGEM (dano medido, não incômodo estético): o revisor de CI apontou esta classe em SEIS PRs
 #   de uma única sessão (#559, #562, #563, #565, #566 e um rename interno). Cada vez eu
 #   renomeei e cada vez voltou, porque a cura era disciplina. Esta casa já mediu que o gatilho

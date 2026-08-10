@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# identifier-language-check.sh — identificador de código em INGLÊS (code-standards.md §3.4).
+# identifier-language-check.sh — identificador de código em INGLÊS (code-standards.md §1).
 #
 # POR QUE EXISTE (dano medido, 2026-08-09): o revisor de CI apontou identificador em pt-BR em SEIS
 # PRs de uma única sessão (#559, #562, #563, #565, #566 e um rename interno). Não havia guarda
