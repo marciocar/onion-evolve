@@ -1662,7 +1662,7 @@ run_kg_open_queue_selftests() {
   # (b) ORDEM desc por atenção — quem consome fila corta em `--top N`, e corte sobre ordem errada
   #     descarta o de MAIOR peso. É a mesma cicatriz que o `--freshness-tsv` já pagou.
   if printf '%s' "${out}" | awk -F'\t' 'NR>1 && $8+0 > prev+0 {bad=1} {prev=$8} END{exit bad?1:0}'; then
-    record_pass "kg-fila: (b) ordenada por atencao DESC"
+    record_pass "kg-fila: (b) ordenada por attention DESC"
   else record_fail "kg-fila: (b)" "fora de ordem: $(printf '%s' "${out}" | cut -f8 | tr '\n' ' ')"; fi
 
   # (c) a 1a coluna e o ARQUIVO — sem ela o id sozinho nao localiza nada num corpus de 57 grafos,
@@ -1674,7 +1674,7 @@ run_kg_open_queue_selftests() {
   # ⚠️ A FIXTURE DE (d)-(f) PRECISA SER GRANDE, e isso e calibragem medida, nao estetica: o `--state`
   # EXCLUI o top-10 do radar por construcao. Na 1a escrita deste bloco usei 7 e 10 nos — o radar
   # engoliu todos, o `--state` exibiu ZERO, e o caso (d) PASSOU com `nstate=0 <= 7`. Passe vacuo, na
-  # mesma sessao em que eu construi o `_prove_mutation` para caca-los. Com 22 nos (12 de atencao
+  # mesma sessao em que eu construi o `_prove_mutation` para caca-los. Com 22 nos (12 de attention
   # alta que enchem o radar + os 2 de reconciliacao no meio + 8 baixos), o `--state` exibe 7 e
   # trunca — que e o comportamento que estes casos existem para medir.
   d="$(mktemp -d)"
@@ -1702,7 +1702,7 @@ run_kg_open_queue_selftests() {
   else record_fail "kg-fila: (d)" "fila=${nfila} (esperado 22) state=${nstate} (esperado 7)"; fi
 
   # (e) A CURA DA ALLOWLIST no `--state`: `drifted`/`unverifiable` sao trabalho e tem de APARECER.
-  #     Medido no corpus real antes de escrever: o no de MAIOR atencao pendente do grafo da VPS
+  #     Medido no corpus real antes de escrever: o no de MAIOR attention pendente do grafo da VPS
   #     (`unverifiable`, 8.0) nao aparecia — a fila de abertos era cega para reconciliacao devida.
   if printf '%s' "${st}" | grep -q 'N_DRIFTED' && printf '%s' "${st}" | grep -q 'N_UNVERIFIABLE'; then
     record_pass "kg-fila: (e) o --state mostra drifted/unverifiable (a allowlist os perdia em silencio)"
@@ -4478,13 +4478,13 @@ run_post_review_comment_selftests() {
   else record_fail "forge-post: (c) modo spec" "out=${out}"; fi
 
   # (d) CORPO VAZIO não posta. Comentário em branco é pior que nenhum: parece que houve parecer.
-  local vazio; vazio="$(mktemp)"; : > "${vazio}"
-  rc=0; out="$(bash "${helper}" --pr 42 --body-file "${vazio}" --repo o/r --dry-run 2>&1)" || rc=$?
+  local empty; empty="$(mktemp)"; : > "${empty}"
+  rc=0; out="$(bash "${helper}" --pr 42 --body-file "${empty}" --repo o/r --dry-run 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'corpo VAZIO' \
      && ! printf '%s' "${out}" | grep -qE '^(POST|PATCH)'; then
     record_pass "forge-post: (d) corpo vazio → avisa e NÃO posta, com exit 0 (posting não reprova PR)"
   else record_fail "forge-post: (d) corpo vazio" "rc=${rc} out=${out}"; fi
-  rm -f "${vazio}"
+  rm -f "${empty}"
 
   # (e) ERRO DE USO sai 2, não 0. A distinção que review-verdict.sh já estabeleceu: uso quebrado
   #     é erro de EXECUÇÃO; falha de rede é veredito. Confundir os dois é fail-open.
@@ -4795,7 +4795,7 @@ run_review_artifact_selftests() {
   # CORRETO. E `bancada-espelha-o-runner`: 26/26 verdes numa bancada que nao copiava as opcoes do
   # runner ja mataram um gate inteiro nesta casa.
   # ⚠️ INVOCACAO INTEIRA EM CADA RAMO, e a razao e um defeito MEDIDO duas vezes no mesmo dia:
-  # montar `${alvo} main` faz o ramo limpo virar `git diff HEAD main` — INVERTIDO —, e hash de diff
+  # montar `${target} main` faz o ramo limpo virar `git diff HEAD main` — INVERTIDO —, e hash de diff
   # invertido e outro hash. Aconteceu no `review-artifact-check.sh` (o CI pegou) e aqui, no espelho
   # dele. Variavel que muda de POSICAO SEMANTICA entre ramos inverte um argumento sem ninguem ver.
   _sha_of() { ( cd "$1"
@@ -8186,7 +8186,7 @@ run_outbox_channel_selftests() {
   local com_canal sem_canal vazio naonvend ob
   com_canal="$(mktemp -d)"; mkdir -p "${com_canal}/docs/evolution/inbound"
   sem_canal="$(mktemp -d)"
-  vazio="$(mktemp -d)"
+  empty="$(mktemp -d)"
   naonvend="$(mktemp -d)"
   ob="${sb}/docs/evolution/federation/outbox"
 
@@ -8207,7 +8207,7 @@ run_outbox_channel_selftests() {
   {
     printf '  - id: selftest-com-canal\n    role: standalone\n    onion_version: abc123\n    local_path: "%s"\n' "${com_canal}"
     printf '  - id: selftest-sem-canal\n    role: standalone\n    onion_version: abc123\n    local_path: "%s"\n' "${sem_canal}"
-    printf '  - id: selftest-vazio\n    role: standalone\n    onion_version: abc123\n    local_path: "%s"\n' "${vazio}"
+    printf '  - id: selftest-vazio\n    role: standalone\n    onion_version: abc123\n    local_path: "%s"\n' "${empty}"
     printf '  - id: selftest-nao-vendoriza\n    role: standalone\n    onion_version: n/a\n    local_path: "%s"\n' "${naonvend}"
     printf '  - id: selftest-so-processed\n    role: standalone\n    onion_version: n/a\n    local_path: "%s"\n' "${naonvend}"
   } >> "${sb}/docs/evolution/federation/members.yaml"
@@ -8273,7 +8273,7 @@ run_outbox_channel_selftests() {
     record_pass "outbox-channel: (GREENFIELD) sem members.yaml → lint COMPLETA (REGRA 36 não aborta com terms vazio)"
   else record_fail "outbox-channel: greenfield" "lint abortou num adotante sem members.yaml (terms vazio + set -e na REGRA 36)"; fi
 
-  rm -rf "${sb}" "${com_canal}" "${sem_canal}" "${vazio}" "${naonvend}"
+  rm -rf "${sb}" "${com_canal}" "${sem_canal}" "${empty}" "${naonvend}"
 }
 
 # ---------------------------------------------------------------------------

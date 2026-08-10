@@ -202,8 +202,8 @@ JSON
   # (d) arquivo ausente → assume o pior (fail-closed no aviso, nunca "revisou").
   _case 'review-verdict: execution_file ausente → NÃO revisou' "${d}/nao-existe.json" false sem-arquivo
 
-  # (e) caminho vazio → mesma postura.
-  _case 'review-verdict: execution_file vazio → NÃO revisou' '' false sem-arquivo
+  # (e) caminho empty → mesma postura.
+  _case 'review-verdict: execution_file empty → NÃO revisou' '' false sem-arquivo
 
   # (f) execução truncada (sem objeto `result`) → não se declara revisão.
   printf '[{"type":"system","subtype":"init"}]\n' > "${d}/truncado.json"
@@ -266,7 +266,7 @@ JSON
   local chars; chars="$(printf '%s' "${out}" | awk -F= '/^texto_chars=/{print $2}')"
   if [ "${chars:-0}" -gt 0 ]; then
     printf '  ✓ review-verdict: texto_chars MEDE o parecer (%s chars) — a existencia do texto deixa de ser suposicao\n' "${chars}"
-  else printf '  ✗ review-verdict: texto_chars=%s com .result presente — a chave do texto esta errada\n' "${chars:-vazio}"; rc=1; fi
+  else printf '  ✗ review-verdict: texto_chars=%s com .result presente — a chave do texto esta errada\n' "${chars:-empty}"; rc=1; fi
 
   # --texto imprime o parecer, e e a fonte que NAO depende do posting funcionar.
   local t; t="$(texto_do_revisor "${d}/comtexto.json")"
@@ -346,24 +346,24 @@ JSON
     printf '  ✓ review-verdict: --corpo omite o `:linha` quando o achado nao tem linha\n'
   else printf '  ✗ review-verdict: --corpo com linha ausente saiu errado: %s\n' "${c}"; rc=1; fi
 
-  # `achados: []` e CONFORME, nao "sem parecer" — a distincao que o array vazio existe para fazer
+  # `achados: []` e CONFORME, nao "sem parecer" — a distincao que o array empty existe para fazer
   c="$(corpo_do_comentario '<!-- m -->' '{"veredito":"conforme","achados":[]}' '')"
   if printf '%s' "${c}" | grep -q 'nenhum achado'; then
-    printf '  ✓ review-verdict: --corpo com achados vazios diz CONFORME (array vazio != ausencia)\n'
-  else printf '  ✗ review-verdict: --corpo nao distinguiu conforme de vazio: %s\n' "${c}"; rc=1; fi
+    printf '  ✓ review-verdict: --corpo com achados vazios diz CONFORME (array empty != ausencia)\n'
+  else printf '  ✗ review-verdict: --corpo nao distinguiu conforme de empty: %s\n' "${c}"; rc=1; fi
 
   # FALLBACK: sem structured_output, o corpo cai para a PROSA. O parecer aparece de um jeito ou de
   # outro; o que nao pode e sumir — que era o estado ate 2026-08-07.
-  local vazio=0
+  local empty=0
   for so in '' 'lixo-nao-json' '{"sem":"achados"}'; do
     c="$(corpo_do_comentario '<!-- m -->' "${so}" "${d}/comtexto.json")"
-    printf '%s' "${c}" | grep -q 'O diff esta conforme' || vazio=$((vazio + 1))
+    printf '%s' "${c}" | grep -q 'O diff esta conforme' || empty=$((empty + 1))
   done
-  if [ "${vazio}" -eq 0 ]; then
-    printf '  ✓ review-verdict: --corpo cai para PROSA nos 3 casos degenerados (vazio/lixo/sem-achados) — nunca corpo vazio\n'
-  else printf '  ✗ review-verdict: --corpo perdeu o parecer em %s dos 3 casos degenerados\n' "${vazio}"; rc=1; fi
+  if [ "${empty}" -eq 0 ]; then
+    printf '  ✓ review-verdict: --corpo cai para PROSA nos 3 casos degenerados (empty/lixo/sem-achados) — nunca corpo empty\n'
+  else printf '  ✗ review-verdict: --corpo perdeu o parecer em %s dos 3 casos degenerados\n' "${empty}"; rc=1; fi
 
-  # (MUT) sem o ramo de fallback, structured_output vazio produz corpo SEM parecer — prova que o
+  # (MUT) sem o ramo de fallback, structured_output empty produz corpo SEM parecer — prova que o
   # fallback e load-bearing e nao decorativo.
   local mut5; mut5="$(mktemp -d)"; cp "$0" "${mut5}/m.sh"
   sed -i 's|    texto_do_revisor "${f}"|    :|' "${mut5}/m.sh"
@@ -436,7 +436,7 @@ texto_do_revisor() { # $1=execution_file
 # ⚠️ O RAMO ESTRUTURADO ESTA INALCANCAVEL HOJE, e digo isso em vez de esconder: o `--json-schema`
 # foi tentado e REVERTIDO neste mesmo PR — o parser da action passa `claude_args` por `shell-quote`,
 # que come as aspas do JSON (medido: 371 bytes entram, 253 saem, JSON.parse falha). Sem ele,
-# `structured_output` chega SEMPRE vazio e o corpo cai SEMPRE na prosa. O ramo fica porque e o
+# `structured_output` chega SEMPRE empty e o corpo cai SEMPRE na prosa. O ramo fica porque e o
 # estado-alvo e esta coberto por 5 selftests; o gatilho para reativa-lo e passar o schema por
 # ARQUIVO, que o input da action nao aceita neste pin.
 #

@@ -37,11 +37,17 @@ for a in "$@"; do
     *)                [ -z "${_root}" ] && _root="$a" ;;
   esac
 done
+# ⚠️ A LIB SE RESOLVE ANTES DO `cd`, e a ordem inversa era um bug MEDIDO nos tres adotantes reais
+# desta maquina: `BASH_SOURCE[0]` costuma ser RELATIVO (`.claude/validation/...`), entao resolve-lo
+# DEPOIS de `cd "${REPO_ROOT}"` faz o caminho apontar para o repo JULGADO, e nao para onde o script
+# vive. Rodando o script do core contra TRES repos adotantes reais desta maquina, os tres davam
+# `exit 2 — lib AUSENTE`: a guarda morria antes de julgar, em 3 de 3.
+# Achado pelo dogfood que a doutrina desta casa chama de padrao master, e que eu nao tinha feito.
+WORDS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/pt-br-words.txt"
+
 REPO_ROOT="$(cd "${_root:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)" || {
   printf 'identifier-language: repo_root inválido: %s\n' "${_root}" >&2; exit 2; }
 cd "${REPO_ROOT}"
-
-WORDS="$(dirname "${BASH_SOURCE[0]}")/lib/pt-br-words.txt"
 # FAIL-LOUD: lista ausente jamais vira "nenhuma violação" (P0 da REGRA 30).
 [ -f "${WORDS}" ] || { printf 'identifier-language: lib/pt-br-words.txt AUSENTE (%s) — sem a lista nao ha o que cobrar, e "nao sei" nunca vira "ok".\n' "${WORDS}" >&2; exit 2; }
 BASELINE="${REPO_ROOT}/.claude/validation/identifier-language-baseline.txt"

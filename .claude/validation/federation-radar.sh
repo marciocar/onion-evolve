@@ -17,13 +17,13 @@ set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # GIT_DIR neutralizado: sob hook do git em worktree o GIT_DIR e ABSOLUTO, e com ele
 # setado `git -C <subdir> rev-parse --show-toplevel` devolve o SUBDIR, nao a raiz —
-# o script passa a procurar tudo no lugar errado e emite vazio (medido 2026-08-04).
+# o script passa a procurar tudo no lugar errado e emite empty (medido 2026-08-04).
 ROOT="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || (cd "${HERE}/../.." && pwd))"
 MEMBERS="${ROOT}/docs/evolution/federation/members.yaml"
 GRAPH="${ROOT}/.claude/validation/graph.sh"
 RECON="${ROOT}/.claude/utils/co-evolution/reconcile-inputs.sh"
 
-atencao=0
+attention=0
 echo "══ FEDERATION RADAR — saúde-de-verificação (declarado≠verificado) ══"
 
 # ① pin declarado ≠ verificado (linhagem/pin marcado não-confiável)
@@ -33,7 +33,7 @@ if [ -f "${MEMBERS}" ]; then
   hits="$(grep -nE 'pin[: ].*(untrusted|nao-verificavel|não-verificável|desconhecido|forjado|proposed)' "${MEMBERS}" 2>/dev/null || true)"
   if [ -n "${hits}" ]; then
     printf '%s\n' "${hits}" | sed -E 's/^([0-9]+):.*/   ⚠ members.yaml:\1 — pin não-verificado/' | head
-    atencao=$((atencao + $(printf '%s\n' "${hits}" | grep -c .)))
+    attention=$((attention + $(printf '%s\n' "${hits}" | grep -c .)))
   else echo "   ✅ nenhum"; fi
 else echo "   (members.yaml ausente — pulado)"; fi
 
@@ -45,7 +45,7 @@ if [ -f "${RECON}" ]; then
   m="$(printf '%s' "${st}" | grep -c . || true)"
   if [ "${m:-0}" -gt 0 ]; then
     printf '%s\n' "${st}" | awk -F'\t' '{print "   ⚠ "$1" ← "$3}' | head
-    atencao=$((atencao + m))
+    attention=$((attention + m))
   else echo "   ✅ nenhum"; fi
 else echo "   (reconcile-inputs.sh ausente — pulado)"; fi
 
@@ -61,7 +61,7 @@ if [ -f "${GRAPH}" ]; then
       [ -n "${h}" ] || continue
       if ! printf '%s\n' "${trip}" | awk -F'\t' -v h="${h}" '$2=="adopts" && $3==h{f=1} END{exit !f}'; then
         echo "   ⚠ ${h} é hub mas não tem sub-adotado (T2) — hub declarado ≠ hub verificado"
-        found=$((found+1)); atencao=$((atencao+1))
+        found=$((found+1)); attention=$((attention+1))
       fi
     done <<< "${hubs}"
   fi
@@ -69,8 +69,8 @@ if [ -f "${GRAPH}" ]; then
 else echo "   (graph.sh ausente — pulado)"; fi
 
 echo
-if [ "${atencao}" -gt 0 ]; then
-  echo "▶ ATENÇÃO: ${atencao} ponto(s) a re-verificar (declarado≠verificado). Advisory — não bloqueia."
+if [ "${attention}" -gt 0 ]; then
+  echo "▶ ATENÇÃO: ${attention} ponto(s) a re-verificar (declarado≠verificado). Advisory — não bloqueia."
 else
   echo "✅ federação sem pontos de atenção de verificação."
 fi
