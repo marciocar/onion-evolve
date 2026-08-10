@@ -141,7 +141,7 @@ function supersederConta(s) { return (s != "open" && s != "refuted" && s != "sup
 # Medido: dos 11 alvos `done` do corpus, 11 são `question` — a exclusão tipada tem churn ZERO e
 # fecha o buraco. A razão antiga ("criaria 11 acusações novas") era CONVENIÊNCIA ocupando o lugar
 # do critério: verdadeira no número, errada no motivo.
-function alvoPendente(s, t) { return (s != "superseded" && s != "refuted" && !(s == "done" && t == "question")) }
+function pendingTarget(s, t) { return (s != "superseded" && s != "refuted" && !(s == "done" && t == "question")) }
 
 # O nó ainda é TRABALHO por fazer? Pergunta DIFERENTE das duas acima (que são sobre reconciliação),
 # por isso predicado próprio — o pecado é a MESMA pergunta respondida em dois lugares, não perguntas
@@ -523,7 +523,7 @@ END {
     swarn = 0
     for (i = 1; i <= nn; i++) {
       id = order[i]
-      if (supersededByLive[id] > 0 && alvoPendente(nstatus[id], ntype[id])) {
+      if (supersededByLive[id] > 0 && pendingTarget(nstatus[id], ntype[id])) {
         if (ntype[id] == "question")
           printf "  ⚠ %s: pergunta RESPONDIDA segue status=%s — fechar como `done` (respondida ≠ superada)\n", id, nstatus[id]
         else
@@ -701,7 +701,7 @@ END {
       if (statusFactor(nstatus[id]) < 0) { print "  ✗ " id ": status inválido: [" nstatus[id] "]"; problems++ }
       if (impact[id] < 1 || impact[id] > 5) { print "  ✗ " id ": impact fora de 1-5: " impact[id]; problems++ }
       if (conf[id] < 0 || conf[id] > 1) { print "  ✗ " id ": confidence fora de 0-1: " conf[id]; problems++ }
-      if (refutedBy[id] > 0 && alvoPendente(nstatus[id], ntype[id])) {
+      if (refutedBy[id] > 0 && pendingTarget(nstatus[id], ntype[id])) {
         print "  ✗ CONTRADIÇÃO: " id " recebe REFUTES mas segue status=" nstatus[id] " (reconciliar: refuted ou superseded)"; problems++
       }
     }
