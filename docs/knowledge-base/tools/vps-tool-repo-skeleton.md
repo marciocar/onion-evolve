@@ -2,7 +2,7 @@
 
 > **Versão**: 1.0.0 | **Última atualização**: 2026-08-05 | **Categoria**: Tools
 > Convenção **existente** do repo-por-ferramenta VPS, registrada a partir da referência viva
-> (`onion-logto`) — não inaugura padrão, documenta o que já é praticado. Irmã da
+> (`onion-vps-logto`) — não inaugura padrão, documenta o que já é praticado. Irmã da
 > [Doutrina do Catálogo VPS](../concepts/onion-vps-catalog-doctrine.md) (a doutrina decide *o que entra*;
 > este esqueleto descreve *como o repo do serviço se estrutura*).
 
@@ -10,7 +10,7 @@ Convenção **existente** para o repo de cada ferramenta compartilhada da VPS do
 documentada aqui a partir da referência viva. Este documento não inaugura o padrão — ele o registra
 para que o próximo repo-de-ferramenta nasça reto sem reconstruir a decisão do zero.
 
-**Referência viva**: `/home/marcio/onion-logto/` (fora deste repo — instância
+**Referência viva**: `/home/marcio/onion-vps-logto/` (fora deste repo — instância
 local, não submódulo). Todo exemplo abaixo é citado dali. Quando este documento e o repo divergirem,
 **o repo vivo é a fonte de verdade**; atualize este KB para refletir a divergência.
 
@@ -31,9 +31,9 @@ que sobe o serviço, guarda seus segredos e o mantém em dia — **não** o lado
 | | Esqueleto repo-por-ferramenta (este doc) | Adapter SDAAL (`integrations.md` §2) |
 |---|---|---|
 | **Governa** | o repo do **serviço** (infra: subir, versionar, migrar, cifrar segredo, fazer backup) | o **consumo** do serviço a partir do Onion (`.claude/utils/<dominio>/`) |
-| **Vive em** | repo próprio, um por ferramenta (`onion-logto`, `onion-waha`, …) | dentro do repo Onion consumidor, em `.claude/utils/` |
+| **Vive em** | repo próprio, um por ferramenta (`onion-vps-logto`, `onion-vps-waha`, …) | dentro do repo Onion consumidor, em `.claude/utils/` |
 | **Roteamento** | nenhum — cada repo é UMA ferramenta, sem troca de provider dentro dele | `factory.md` lê `<DOMINIO>_PROVIDER` do `.env` e escolhe o adapter |
-| **Exemplo** | `onion-logto/docker-compose.yml`, `up.sh`, `logto-provision.sh` | `.claude/utils/task-manager/adapters/jira.md` |
+| **Exemplo** | `onion-vps-logto/docker-compose.yml`, `up.sh`, `logto-provision.sh` | `.claude/utils/task-manager/adapters/jira.md` |
 | **Pergunta que resolve** | "como este serviço sobe, atualiza e não vaza segredo?" | "qual provider está ativo e como o Onion fala com ele?" |
 
 Um serviço pode ter os dois ao mesmo tempo (ex.: Logto tem o repo-esqueleto **e**, quando o bridge
@@ -41,21 +41,38 @@ o consome como IdP, um adapter do lado Onion) — são camadas ortogonais, não 
 
 ### 1.2 Convenção de nomenclatura — prefixo `onion-vps-`
 
-Serviços do padrão-VPS (Onion + infraestrutura de casa) usam o prefixo **`onion-vps-`** nos nomes
-de container/serviço — `onion-vps-waha`, `onion-vps-logto`, `onion-vps-logto-postgres`,
-`onion-vps-bridge`, `onion-vps-docker-firewall`. Distingue de:
+Serviços do padrão-VPS (Onion + infraestrutura de casa) usam o prefixo **`onion-vps-`** em **tudo o
+que os nomeia** — container, serviço systemd **e o repo**: `onion-vps-waha`, `onion-vps-logto`,
+`onion-vps-logto-postgres`, `onion-vps-vaultwarden`, `onion-vps-bridge`,
+`onion-vps-docker-firewall`. Distingue de:
 
 - `onion-adopt-<nome>-*` — recursos de um adotante específico hospedado na mesma VPS;
 - nomes próprios do adotante (recursos com nome próprio do adotante não levam prefixo `onion-`).
 
-Convenção adotada em 2026-08-05 pelo maestro; aplica-se a **serviços novos** (ver §7, não retrofitar).
+Convenção adotada em 2026-08-05 pelo maestro.
+
+> **CORREÇÃO 2026-08-10 — a assimetria caiu, e ela era um erro deste documento.** A v1.0.0 declarava
+> que o *container* levava `onion-vps-` mas o *repo* era `onion-<ferramenta>`, e chamava isso de
+> "assimetria intencional". Não era: era o padrão descrito pela metade a partir de um único exemplo
+> vivo. O maestro corrigiu — **é ferramenta da VPS, o prefixo vale para o nome inteiro**. Os dois
+> repos existentes foram migrados (`onion-logto` → `onion-vps-logto`, `onion-waha` →
+> `onion-vps-waha`); o retrofit foi feito, não adiado, porque a divergência estava na DOUTRINA e
+> doutrina errada replica em cada ferramenta nova.
+>
+> ⚠️ **A migração tem uma armadilha que quase custou o IdP inteiro, e quem for repetir precisa
+> saber:** o Compose deriva o nome do projeto do **nome do diretório**, e os volumes são
+> prefixados por ele (`onion-logto_logto-postgres-data`). Renomear a pasta faz o Compose procurar
+> um volume que não existe, **criar um vazio, e subir limpo — sem erro nenhum**. A cura é fixar
+> `name:` no topo do `docker-compose.yml` **antes** de renomear, o que preserva o projeto e os
+> volumes. Verificado por comportamento nos dois: Logto com as 10 aplicações intactas, WAHA com a
+> sessão `WORKING`. Bind mounts relativos (`./sessions`) seguem a pasta e não precisam de nada.
 
 ---
 
 ## 2. O esqueleto
 
-Cada ferramenta compartilhada vive em seu próprio repo, nomeado `onion-<ferramenta>` (ex.:
-`onion-logto`), com esta forma mínima:
+Cada ferramenta compartilhada vive em seu próprio repo, nomeado `onion-vps-<ferramenta>` (ex.:
+`onion-vps-logto`), com esta forma mínima:
 
 ```
 onion-<ferramenta>/
@@ -79,7 +96,7 @@ tem `provision.sh`) — mas os que existem seguem a forma abaixo.
 
 ## 3. README.md
 
-Estrutura observada em `onion-logto/README.md` (seções, não conteúdo a copiar):
+Estrutura observada em `onion-vps-logto/README.md` (seções, não conteúdo a copiar):
 
 1. **Por quê** — que problema este serviço resolve, por que este host e não um SaaS
 2. **Como está montado** — topologia (portas, volumes, rede), o que é público vs loopback-only
@@ -167,7 +184,7 @@ O detalhe abaixo é o mecanismo **humano-rodado** (o mais comum no catálogo —
 
 ## 6. up.sh / down.sh — idempotentes, fail-closed
 
-Modelo (`onion-logto/up.sh`, verbatim):
+Modelo (`onion-vps-logto/up.sh`, verbatim):
 
 ```bash
 #!/usr/bin/env bash
@@ -203,7 +220,7 @@ Ambos são **idempotentes**: rodar `up.sh` sobre um stack já no ar não duplica
 
 Quando a ferramenta expõe uma API de administração que o Onion precisa provisionar (usuários, apps,
 scopes), o provisionamento é um script separado do `up.sh`, seguindo o modelo de
-`ops/bridge-auth/logto-provision.sh` (deste repo, não do `onion-logto/` — ele provisiona o *consumo*
+`ops/bridge-auth/logto-provision.sh` (deste repo, não do `onion-vps-logto/` — ele provisiona o *consumo*
 do Logto pelo bridge):
 
 - **Uso**: `bash provision.sh [--apply] [outras flags]` — **sem `--apply` é dry-run**: mostra o que
@@ -224,7 +241,7 @@ do Logto pelo bridge):
 
 ## 8. backup.sh
 
-Modelo (`onion-logto/backup.sh`):
+Modelo (`onion-vps-logto/backup.sh`):
 
 - **Uso**: `./backup.sh [rótulo]` — rótulo default (`diario`) para cron; rótulo explícito
   (`pre-upgrade`) para backups que não devem expirar.
@@ -296,6 +313,6 @@ não capacidade ganha. Aplique o esqueleto (ou a correção de uma peça faltant
   `127.0.0.1` (§4)
 - `docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md` — recursão canal→solução (contexto de
   quando um domínio vira adapter aninhado, ex. `MESSAGING_PROVIDER`/`MESSAGING_WHATSAPP_PROVIDER`)
-- `/home/marcio/onion-logto/` — referência viva citada em todo este documento
+- `/home/marcio/onion-vps-logto/` — referência viva citada em todo este documento
 - `/home/marcio/onion-evolve/ops/bridge-auth/logto-provision.sh` — referência de `provision.sh`
   (lado Onion consumidor, não o repo-esqueleto)

@@ -598,7 +598,7 @@ nodes:
     status: done
     verified_against: host-vps-declarado
     verified_at: 2026-07-25
-    label: "PIN+VERIFIER do Logto — DECLARADO por sessão anterior, NÃO RE-MEDIDO nesta rodada (o sandbox desta sessão bloqueou a leitura do crontab), por isso verified_against desce de host-vps para host-vps-DECLARADO e a confidence de 0.9 para 0.7. Conteúdo: check-version.sh no crontab (seg 09:00 --quiet->logger) + backup diário 03:20; roda ✓ em dia (1.41.0). RE-MEDIR no P0: crontab -l | grep -i logto e ls -la /home/marcio/onion-logto/backups/. Guardrail (PROPOSTA não-ratificada, inbox 2026-07-25): pin de auth exige checar delta antes de subir, peso extra. Com o flip o guardrail GANHA PESO"
+    label: "PIN+VERIFIER do Logto — DECLARADO por sessão anterior, NÃO RE-MEDIDO nesta rodada (o sandbox desta sessão bloqueou a leitura do crontab), por isso verified_against desce de host-vps para host-vps-DECLARADO e a confidence de 0.9 para 0.7. Conteúdo: check-version.sh no crontab (seg 09:00 --quiet->logger) + backup diário 03:20; roda ✓ em dia (1.41.0). RE-MEDIR no P0: crontab -l | grep -i logto e ls -la /home/marcio/onion-vps-logto/backups/. Guardrail (PROPOSTA não-ratificada, inbox 2026-07-25): pin de auth exige checar delta antes de subir, peso extra. Com o flip o guardrail GANHA PESO"
 
   - id: C_console_autooff_gap
     node_type: claim
@@ -682,7 +682,7 @@ nodes:
 
   - id: E_p0_logto_tenant_measured
     node_type: evidence
-    trace: /home/marcio/onion-logto/docker-compose.yml
+    trace: /home/marcio/onion-vps-logto/docker-compose.yml
     layer: audit
     plane: PROD
     impact: 5

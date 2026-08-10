@@ -17,7 +17,7 @@
 | **Data de Criação** | 2026-08-05 |
 | **Categoria** | Conceitos |
 | **Origem** | Elenxo de framing F0 (2026-07-31, `wf_8a8eca55`, 2 steelman + 1 juiz Opus) → `D_framing_catalogo`; endurecida pela reprovação de F2 (`stack-harmonia-2026-08`) e pelo incidente de exposição de rede (2026-08-05) |
-| **Comando/artefato relacionado** | `onion-logto` (esqueleto de referência vivo) · `onion-vps-docker-firewall` (contenção durável) · adapters `task-manager`/`forge` (precedente 1→N sem registry) |
+| **Comando/artefato relacionado** | `onion-vps-logto` (esqueleto de referência vivo) · `onion-vps-docker-firewall` (contenção durável) · adapters `task-manager`/`forge` (precedente 1→N sem registry) |
 | **Lei (L0)** | [`integrations.md`](../../meta-specs/integrations.md) — esta KB **cita**, não recopia; **não é** um 2º site-de-edição da lei |
 | **Padrão-pai** | [Doutrina de Abstração](onion-abstraction-doctrine.md) (o Teste do Eixo que cada tool corre) · `onion-adr-sdaal-nested-two-level-2026-07` (ADR de análise do core — recursão canal→solução) |
 | **Irmãs** | [Modernização](onion-modernization-doctrine.md) · [Dogfooding](onion-dogfooding-doctrine.md) · [Abstração](onion-abstraction-doctrine.md) |
@@ -142,8 +142,8 @@ A convenção foi aplicada em 2026-08-05 (renomes: `onion-vps-waha`, `onion-vps-
 (dir/projeto/service-name mantidos), para não quebrar volumes/redes já vivos. É dogfoodada no artefato
 de contenção `onion-vps-docker-firewall` (abaixo).
 
-**Repo-por-ferramenta** é o padrão de casa para o esqueleto de cada entrada do catálogo: `onion-logto`
-(vivo em `/home/marcio/onion-logto/`) é a referência — README, `docker-compose.yml`, `up.sh` que lê
+**Repo-por-ferramenta** é o padrão de casa para o esqueleto de cada entrada do catálogo: `onion-vps-logto`
+(vivo em `/home/marcio/onion-vps-logto/`) é a referência — README, `docker-compose.yml`, `up.sh` que lê
 segredo via `pass`+`direnv` com `${VAR:?}` fail-closed, `upgrade.sh`, `check-version.sh`, `backup.sh`,
 `console.sh`, `.envrc`, `.gitignore`. Segredo da casa é **sempre `pass`(GPG)+`direnv`, nunca `.env`
 plaintext** — o mesmo invariante que o incidente de 2026-08-05 reforçou por outro ângulo (superfície
@@ -201,7 +201,7 @@ nomeia (env switch fictício), só que na camada de rede em vez de configuraçã
   `docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md`.
 - **Incidente de rede (o invariante "atrás do bridge" testado):**
   `docs/analysis/onion-vps-network-exposure-2026-08.md`.
-- **Esqueleto de referência vivo (repo-por-ferramenta):** `/home/marcio/onion-logto/`.
+- **Esqueleto de referência vivo (repo-por-ferramenta):** `/home/marcio/onion-vps-logto/`.
 - **Critério de graduação (o Teste do Eixo/Gatilho, citado não recopiado):**
   [Doutrina de Abstração do Onion](onion-abstraction-doctrine.md).
 - **Recursão canal→solução (citado não recopiado):**

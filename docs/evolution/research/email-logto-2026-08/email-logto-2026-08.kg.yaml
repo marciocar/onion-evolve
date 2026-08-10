@@ -118,7 +118,7 @@ nodes:
     verified_at: 2026-08-01
     verified_against: hostinger-api-put-overwrite-false-mais-releitura-da-zona
     label: "DNS ESCRITO NA HOSTINGER VIA API, NAO-DESTRUTIVO: zona onionevolve.com foi de 26 -> 30 registros, com os 25 A-records PRESERVADOS (verificado relendo a zona depois). Metodo: backup da zona ANTES + PUT /api/dns/v1/zones com overwrite:FALSE (contrato confirmado por pesquisa: false=append/update, true=deleta os que casam name+type). Criados: DKIM TXT (20260801114651pm._domainkey.mail), Return-Path CNAME (pm-bounces.mail -> pm.mtasv.net), SPF TXT (mail -> v=spf1 include:spf.mtasv.net ~all), DMARC TXT (_dmarc -> v=DMARC1; p=none;). DMARC publicado SEM rua= (nao publicar email pessoal no DNS sem decisao do maestro)"
-    trace: "/home/marcio/onion-waha/dns-backup/"
+    trace: "/home/marcio/onion-vps-waha/dns-backup/"
 
   - id: E_domain_verified
     node_type: evidence

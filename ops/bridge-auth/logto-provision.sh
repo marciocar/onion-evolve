@@ -35,8 +35,8 @@ M2M_CALLERS="${M2M_CALLERS:-onion-bridge-service}"
 WRITE_SCOPE="bridge:write"       # P10 — CAPACIDADE por identidade (escrever/executar vs so ler)
 ROLE_NAME="bridge-operator"      # M2M — o chamador SERVIÇO
 USER_ROLE_NAME="bridge-user"     # User — a PESSOA (tipo diferente no Logto; a M2M não serve)
-PASS_FILE="/root/.onion-logto-bootstrap"
-PG_CONTAINER="onion-logto-postgres"
+PASS_FILE="/root/.onion-vps-logto-bootstrap"
+PG_CONTAINER="onion-vps-logto-postgres"
 # BOOTSTRAP CIRCULAR, e como se quebra (medido 2026-07-26):
 #   O app M2M `m-default` — o único que concede a Management API do tenant `default` —
 #   vive no tenant `admin`. E o Logto só RESOLVE o tenant admin quando a requisição chega
@@ -123,9 +123,9 @@ ERRO: o issuer do tenant `admin` não responde no loopback.
 
   CONSERTO — USE O MECANISMO QUE JA EXISTE, nao erga um vhost paralelo:
 
-    bash ~/onion-logto/console.sh on      # liga o vhost do console (publico, cert real)
-    bash ~/onion-logto/console.sh status  # confere
-    bash ~/onion-logto/console.sh off     # DESLIGUE ao terminar
+    bash ~/onion-vps-logto/console.sh on      # liga o vhost do console (publico, cert real)
+    bash ~/onion-vps-logto/console.sh status  # confere
+    bash ~/onion-vps-logto/console.sh off     # DESLIGUE ao terminar
 
   O maestro construiu esse liga/desliga de proposito: o console fica FORA do ar por
   padrao e so sobe na janela de configuracao. Ate 2026-07-28 este bloco mandava
@@ -164,7 +164,7 @@ ERRO: não consegui ler o secret do app M2M `m-default` no banco do Logto.
    3. o app `m-default` não existe no tenant admin → rode este script SEM --smtp para provisioná-lo.
 
   DIAGNÓSTICO EM UM COMANDO:
-    sudo docker exec onion-logto-postgres psql -U logto -d logto -tAc \
+    sudo docker exec onion-vps-logto-postgres psql -U logto -d logto -tAc \
       "select id from applications where id='m-default';"
 HELPSEC
   exit 4
@@ -389,7 +389,7 @@ if [ "${SMTP_PROVISION:-0}" = "1" ]; then
   # de 2). Um --apply teria SOBRESCRITO producao com a minha versao, silenciosamente. Reproduzir
   # != recriar: um script de provisionamento que "melhora" o que encontra e um script que corrompe.
   # Extraidos com:
-  #   sudo docker exec onion-logto-postgres psql -U logto -d logto -tAc \
+  #   sudo docker exec onion-vps-logto-postgres psql -U logto -d logto -tAc \
   #     "select jsonb_pretty(config::jsonb->'templates') from connectors;"
   _templates="$(jq -nc '[
     {usageType:"Generic",                subject:"Onion - codigo de verificacao",  content:"Seu codigo: {{code}}",                        contentType:"text/plain"},

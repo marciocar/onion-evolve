@@ -299,6 +299,31 @@ if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:spac
     add 'PR-SEM-PASSADA-ADVERSARIAL: abrir PR sem a passada adversarial deixa a revisão para um CI que estoura turnos justamente nos PRs grandes. O artefato de revisão é exigido pela REGRA 56 (`docs/evolution/review/<branch>.md`) — se ele não existe, o gate vai acusar e você vai descobrir tarde.'
 fi
 
+# (6) BRANCH NOMEADA EM pt-BR — `code-standards.md:39` exige branch em INGLÊS, e eu nomeei DUAS em
+# pt-BR numa única sessão (2026-08-10): `fix/fixture-nao-depende-do-vivo` e `docs/waha-rotacao-e-hash`.
+# Levantamento do repo mostra que é sistêmico, não lapso: `docs/fios-abertos`,
+# `fix/catraca-duas-portas`, `fix/catraca-separador-de-registro`, `fix/selo-m8-vereditos`.
+#
+# POR QUE AQUI, E NÃO NO LINT: o lint roda no commit — e aí renomear já custa caro (branch publicada,
+# PR aberto, resíduo da REGRA 56 nomeado pela branch). Acusar no commit seria PUNIR QUEM JÁ NÃO PODE
+# CORRIGIR BARATO, que é exatamente o erro da REGRA 56 que ensinou 23 bypasses. O momento em que a
+# correção é grátis é a CRIAÇÃO — e é quando este hook dispara.
+#
+# Reusa a MESMA lista da REGRA 60 (`lib/pt-br-words.txt`): uma fonte de palavras, não duas. Quando um
+# identificador pt-BR novo entra na lista, esta regra passa a cobri-lo de graça.
+# TETO DECLARADO: detector por lista enumerada só vê o que foi enumerado (o mesmo teto da REGRA 60), e
+# PostToolUse é posterior — a branch já foi criada. Mas renomear no ato é `git branch -m`, e é grátis.
+if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)git[[:space:]]+(checkout[[:space:]]+-b|switch[[:space:]]+-c|branch[[:space:]]+-m)([[:space:]]|$)'; then
+  _bn="$(printf '%s\n' "$cmd" | sed -nE 's/.*git[[:space:]]+(checkout[[:space:]]+-b|switch[[:space:]]+-c|branch[[:space:]]+-m)[[:space:]]+["'"'"']?([A-Za-z0-9._\/-]+).*/\2/p' | head -1)"
+  _wl="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/validation/lib/pt-br-words.txt"
+  if [ -n "${_bn:-}" ] && [ -f "${_wl}" ]; then
+    _hits="$(printf '%s' "${_bn}" | tr '/_-' '\n\n\n' | tr '[:upper:]' '[:lower:]' | grep -Fxf "${_wl}" 2>/dev/null | sort -u | tr '\n' ' ')"
+    if [ -n "${_hits% }" ]; then
+      add "BRANCH-EM-PT-BR: \`${_bn}\` tem palavra(s) pt-BR: ${_hits% }. \`code-standards.md:39\` exige branch em INGLÊS (o prefixo Conventional e o nome são contrato de máquina; a narrativa em pt-BR vive no ASSUNTO do commit). Renomeie AGORA, enquanto é grátis: \`git branch -m <nome-em-ingles>\` — depois de publicar, a branch já nomeia o PR e o resíduo da REGRA 56."
+    fi
+  fi
+fi
+
 [ -n "$warn" ] || exit 0
 printf '🔎 guarda anti-fail-open do shell — o que você acabou de rodar pode MENTIR:%s\n' "$warn" >&2
 # exit 2 — a ÚNICA via MEDIDA em que o stderr de um PostToolUse chega ao modelo (dogfood 2026-08-02:

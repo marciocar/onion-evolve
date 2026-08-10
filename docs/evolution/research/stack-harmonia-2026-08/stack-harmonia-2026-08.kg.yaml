@@ -56,7 +56,7 @@ nodes:
     verified_at: 2026-08-01
     verified_against: docker-ps-mais-grep-no-src-do-bridge
     label: "MELHOR ITEM DA LISTA INTEIRA — DESLIGAR O WAHA: container Up 15h, ZERO referencias a waha/3999/whatsapp em todo o src/ do bridge, ZERO cron/systemd-timer, WAHA_API_KEY e WAHA_DASHBOARD_PASSWORD legiveis via docker inspect, e as 3 primeiras mensagens de teste voltaram HTTP 200 e NUNCA chegaram. Custo de seguranca > 0, entrega comprovada = 0, esforco = docker stop, totalmente reversivel. NOTA DE HONESTIDADE: o canal FOI provado depois (LID + ack READ) — mas provado != consumido; nao ha consumidor nomeado num artefato versionado"
-    trace: "/home/marcio/onion-waha/docker-compose.yml"
+    trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
 
   - id: C_producao_nao_e_o_repo
     node_type: claim

@@ -41,7 +41,7 @@ nodes:
     label: "TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code-only RATIFICADA. Direção do spec: servir auditoria de P4 a partir de artefatos que JÁ existem dentro do Claude Code (sessions/git/CI), não infra on-prem nova"
   - id: Q_auth_decision
     node_type: question
-    trace: /home/marcio/onion-logto/README.md
+    trace: /home/marcio/onion-vps-logto/README.md
     layer: audit
     plane: DEV
     impact: 3
@@ -155,7 +155,7 @@ nodes:
     label: "AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariância. ILUSTRATIVO/não-comprometido (re-derivar no gatilho): forma SDAAL (3ª instância, factory/interface/adapter), protocolo/tipo-de-client, mapa Organization Logto↔tier (source=global/M2M, hub=1 org, consumer=org-member, standalone=SEM org). Read-side segue público; OP-1..4 nativas sem auth p/ operador-único"
   - id: C_commodity_vs_diff
     node_type: claim
-    trace: /home/marcio/onion-logto/README.md
+    trace: /home/marcio/onion-vps-logto/README.md
     layer: audit
     plane: DEV
     impact: 4
@@ -265,7 +265,7 @@ nodes:
     label: "/meta:adopt — único comando command-side que toca federação: clona/vendoriza/carimba .claude/.onion-version, --promote-hub re-carimba o alvo. Fronteira Camada 2×3: federação é autoridade do core. PARA no registro (adopt.md:545 só sugere)"
   - id: E_logto
     node_type: entity
-    trace: /home/marcio/onion-logto/README.md
+    trace: /home/marcio/onion-vps-logto/README.md
     layer: audit
     plane: DEV
     impact: 3
