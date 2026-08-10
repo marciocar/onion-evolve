@@ -1,7 +1,14 @@
 ---
 branch: docs/console-ativo-por-decisao
-reviewed_at: 2026-08-10
+date: 2026-08-10
 reviewed_diff_sha256: 4a89fa0472e94c1b039b693ede65601d58825a441c0350c2808823f61cbceec9
+findings_total: 4
+findings_real: 1
+findings_fixed: 1
+tokens: 0
+duration_min: 6
+verdict: UMA-ALEGACAO-MINHA-ERA-HERDADA-E-EU-A-APRESENTEI-COMO-FATO-MEDIDO
+reviewer: passada adversarial contra o proprio PR — quatro alegacoes atacadas (console no ar, interruptor funcional, edicao sobrevive ao ciclo off/on, limite de admin unico); as tres primeiras CONFIRMADAS por execucao, a quarta REFUTADA como nao-verificada
 ---
 
 # O console fica ativo por decisão — e duas declarações viraram mentira
@@ -50,6 +57,15 @@ afirmação falsa.
 
 ## Declarado, e não coberto
 
-O Logto OSS permite **uma só conta de administrador** (sem multi-admin). Com o console público, isso
-concentra o plano de controle numa credencial única — não é regressão introduzida aqui, é limite do
-produto que a decisão torna mais relevante.
+**Medido:** existe hoje **exatamente 1 conta no tenant `admin`** (e 1 no `default`). Com o console
+público, o plano de controle da identidade fica atrás de **uma credencial única**.
+
+⚠️ **Correção de uma alegação minha, feita na passada adversarial contra este próprio PR.** Eu havia
+escrito *"o Logto OSS permite uma só conta de administrador (sem multi-admin)"* como **fato sobre o
+produto**. Isso veio do README do `onion-vps-logto`, **não foi verificado por mim**, e a contagem
+acima **não o prova** — ela mostra que existe uma conta, não que o produto proíba a segunda. Testar
+de verdade exigiria criar uma segunda conta de admin **em produção**, o que não faço de passagem.
+
+Fica como **herdado, não verificado**. A consequência prática é a mesma (uma credencial concentra o
+plano de controle hoje), mas a razão é diferente — e a diferença importa para quem for decidir se
+vale abrir uma segunda conta: se for só ausência de uso, é opção; se for limite do produto, não é.
