@@ -1,7 +1,7 @@
 ---
 branch: docs/colher-regra56
 date: 2026-08-10
-reviewed_diff_sha256: 7fdfbebca2436d21db4870d32b55baf91f94b544e79d8a7504605a9c1206d8c1
+reviewed_diff_sha256: 0958469f2b7f24f05e70f3b5a953006007edb9e482cff40a10e09e9a2d8df7ef
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
@@ -87,3 +87,21 @@ vez de na varredura.
 
 Curado com a mesma escolha: `:${ART}` lê o **índice**, `HEAD:${ART}` lê o commit; a **situação**
 decide. Com caso de bancada `(l)` que exige o resíduo recém-*staged* ser **visto**.
+
+## E o item que restava ao maestro foi executado — com um erro meu no meio
+
+O maestro rodou a parte ② (piso e contenção do bridge) enquanto este PR estava aberto. Verificado
+**pelo comportamento**: `memory.min` do cgroup em **268435456** (256M), ancestral de 384M concedendo o
+piso **inteiro**, `/health` respondendo **200**.
+
+**Mas eu derrubei o serviço no caminho.** Sugeri `ProtectHome=yes` junto — e `/home` inacessível quebra
+um serviço cujo `ExecStart` vive em `/home/onion/onion-bridge`. `status=203/EXEC`, loop de restart,
+contador em **8**.
+
+**Não foi falta de informação:** eu havia lido `WorkingDirectory=/home/onion/onion-bridge` **nesta
+mesma sessão**, ao medir a exposição do `bypassPermissions`. Tinha a medição e não a liguei à
+sugestão.
+
+**Medir e não usar o que se mediu** é a forma mais cara do erro deste dia — e desta vez caiu em
+**produção**, não num gate. Restaurado removendo **só** o `ProtectHome`; o `NoNewPrivileges=yes` fica,
+porque é inofensivo ali e era metade do ganho pretendido.
