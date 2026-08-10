@@ -178,11 +178,20 @@ nodes:
     plane: PROD
     verified_at: 2026-08-10
     verified_against: chave-nova-200-chave-antiga-401-config-env-so-hash-sessao-WORKING
-    status: confirmed
+    status: done
     impact: 4
     confidence: 1.0
-    label: "EXECUTADO 2026-08-10, pelo maestro e por mim, com o que resta DECLARADO como limite de PRODUTO. (A) BRIDGE: o drop-in de memoria protegia `onion-bridge.service`, unit inexistente desde o rename para o prefixo `onion-vps-`; o bridge vivo rodava com MemoryMin=0. Movido + `NoNewPrivileges=yes`; verificado no cgroup (memory.min=268435456, ancestral de 384M concedendo o piso INTEIRO) e por `/health` 200. ⚠️ EU DERRUBEI O SERVICO no caminho sugerindo `ProtectHome=yes` junto — `/home` inacessivel quebra um servico cujo ExecStart vive em `/home/onion/onion-bridge` (203/EXEC, 8 restarts). E eu JA TINHA LIDO o WorkingDirectory nesta mesma sessao: nao faltou dado, faltou usar o que se mediu. (B) WAHA: chave da API ROTACIONADA e o container passou a receber so o HASH — `.envrc`/`up.sh` exportam `sha512:$(printf %s "$(pass show ...)" | sha512sum)`. Verificado nas quatro pontas: `docker inspect` mostra hash, chave nova autentica 200, chave ANTIGA da 401, e a sessao do WhatsApp sobreviveu (bind mount no host, medido antes de agir). A rotacao antes do hash foi o que tornou INERTE a chave que vazara em transcript de sessao anterior. ⚠️ MINHA MEDICAO ERROU DUAS VEZES no caminho e as duas por metodo: procurei o VALOR em arquivos e conclui \"a credencial so existe no container, recriar perde\" — falso, o `pass` (GPG) e a fonte e guarda CIFRADO, meu metodo nao podia achar; e afirmei ter matado um shell preso conferindo um padrao DIFERENTE do que matei. LIMITE DE PRODUTO, sem cura por configuracao: `WAHA_DASHBOARD_PASSWORD` e comparado em TEXTO PURO (`apps/app_sdk/auth.js` usa `password.value` num mapa de basic-auth; `sha512` so existe no `ApiKeyAuthFactory`). Mitigacao possivel, nao cura: rotacionar tambem a senha, para que o valor exposto ao `docker inspect` ao menos nao seja o que ja circulou."
+    label: "EXECUTADO 2026-08-10, pelo maestro e por mim, com o que resta DECLARADO como limite de PRODUTO. (A) BRIDGE: o drop-in de memoria protegia `onion-bridge.service`, unit inexistente desde o rename para o prefixo `onion-vps-`; o bridge vivo rodava com MemoryMin=0. Movido + `NoNewPrivileges=yes`; verificado no cgroup (memory.min=268435456, ancestral de 384M concedendo o piso INTEIRO) e por `/health` 200. ⚠️ EU DERRUBEI O SERVICO no caminho sugerindo `ProtectHome=yes` junto — `/home` inacessivel quebra um servico cujo ExecStart vive em `/home/onion/onion-bridge` (203/EXEC, 8 restarts). E eu JA TINHA LIDO o WorkingDirectory nesta mesma sessao: nao faltou dado, faltou usar o que se mediu. (B) WAHA: chave da API ROTACIONADA e o container passou a receber so o HASH — `.envrc`/`up.sh` exportam `sha512:$(printf %s "$(pass show ...)" | sha512sum)`. Verificado nas quatro pontas: `docker inspect` mostra hash, chave nova autentica 200, chave ANTIGA da 401, e a sessao do WhatsApp sobreviveu (bind mount no host, medido antes de agir). A rotacao antes do hash foi o que tornou INERTE a chave que vazara em transcript de sessao anterior. ⚠️ MINHA MEDICAO ERROU DUAS VEZES no caminho e as duas por metodo: procurei o VALOR em arquivos e conclui \"a credencial so existe no container, recriar perde\" — falso, o `pass` (GPG) e a fonte e guarda CIFRADO, meu metodo nao podia achar; e afirmei ter matado um shell preso conferindo um padrao DIFERENTE do que matei. LIMITE DE PRODUTO, sem cura por configuracao: `WAHA_DASHBOARD_PASSWORD` e comparado em TEXTO PURO (`apps/app_sdk/auth.js` usa `password.value` num mapa de basic-auth; `sha512` so existe no `ApiKeyAuthFactory`). Mitigacao possivel, nao cura: rotacionar tambem a senha, para que o valor exposto ao `docker inspect` ao menos nao seja o que ja circulou — o que deixou de ser opcional em [[I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO]]. ⚠️ CARIMBO CORRIGIDO PELO REVISOR (#574): eu havia deixado `status: confirmed` com carimbo PROD completo, enquanto os outros seis `decision`/PROD verificados do arquivo estao `done` — e `statusFactor(confirmed)=1.0` contra `done=0.1` fazia um item JA EXECUTADO pesar 10x no radar. Colher e mudar o STATUS, nao so escrever o carimbo; carimbo sem status e meia-colheita, e a metade que falta e justamente a que o instrumento le."
     trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
+
+  - id: I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: open
+    label: "DEPENDE DO MAESTRO — eu nao consigo executar. 2026-08-10, medindo o dashboard do WAHA a pedido dele, escolhi `curl -w '%{url_effective}'` para mostrar a cadeia de redirect. Esse formato reimprime a URL COM AS CREDENCIAIS EMBUTIDAS: a senha do dashboard saiu em CLARO no transcript desta sessao. Nao foi o servidor que vazou — foi a MINHA escolha de formato de saida, num comando cujo proposito era conferir seguranca. E o agravante e que o vazamento anterior (chave da API em transcript) tinha acabado de ser curado por rotacao NESTA MESMA SESSAO: repeti a classe que estava fechando. LICAO MECANIZAVEL, nao \"vou prestar atencao\": `-u user:senha` com `%{url_effective}` (ou `-v`, ou `%{url}`) e uma combinacao que IMPRIME SEGREDO por construcao — para conferir redirect autenticado, usar `-o /dev/null -w '%{http_code}'` e, se a cadeia importar, `%{num_redirects}`, nunca a URL efetiva. ⚠️ NAO CONSEGUI ROTACIONAR: duas tentativas bloqueadas pelo classificador de permissoes (rotacao de credencial nao passa por mim neste ambiente), e insistir seria contornar a intencao da negativa. O comando esta entregue ao maestro. ENQUANTO NAO RODAR: a senha vazada e VALIDA, e o raio e `127.0.0.1:3999` — sem rota da internet nem da rede local, so quem ja tem shell na VPS ou le este transcript. Raio pequeno NAO e cura; e a razao de isto ser impact 4 e nao 5."
+    trace: "/home/marcio/onion-waha/.envrc"
 
   - id: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
     node_type: decision
@@ -257,6 +266,12 @@ edges:
   - from: I_CONTER_O_QUE_ESTA_EXPOSTO
     to: W3_PRODUCAO_CONTIDA
     edge_type: SUPPORTS
+  - from: I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO
+    to: W3_PRODUCAO_CONTIDA
+    edge_type: SUPPORTS
+  - from: I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO
+    to: I_CONTER_O_QUE_ESTA_EXPOSTO
+    edge_type: CONSTRAINS
   - from: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
     to: W4_REGRA_SEM_TESTE
     edge_type: SUPPORTS

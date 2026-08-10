@@ -1,7 +1,7 @@
 ---
 branch: docs/waha-rotacao-e-hash
 date: 2026-08-10
-reviewed_diff_sha256: e08ef73fbd1e3bae27ff61593f2038b12a78c74335399cc0299d150177a640c8
+reviewed_diff_sha256: b5e5f09b743a6935bd106388a2dd58e4e3428893d4f7453538529a6358d14503
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
@@ -82,3 +82,29 @@ sempre é o cemitério que o `meta:` deste arquivo proíbe. O limite vive no ró
   pelas quatro pontas acima.
 - **Os transcripts com a chave antiga não foram apagados** — ela vale 401, mas os arquivos seguem.
 - **A senha do dashboard não foi rotacionada** nesta passada.
+
+---
+
+## Segunda rodada — o revisor achou meia-colheita, e a medição criou um vazamento
+
+**1 violação, e procede.** `I_CONTER_O_QUE_ESTA_EXPOSTO` ficou `status: confirmed` com carimbo PROD
+completo, enquanto os outros **seis** `decision`/PROD verificados do arquivo estão `done`. Como
+`statusFactor(confirmed)=1.0` contra `done=0.1`, um item **já executado** pesava **10×** no radar.
+Colher é mudar o **status**, não só escrever o carimbo — e a metade que faltou é justamente a que o
+instrumento lê.
+
+## E um fato novo, que é meu
+
+Medindo o dashboard a pedido do maestro, escolhi `curl -w '%{url_effective}'` para mostrar a cadeia
+de redirect. Esse formato **reimprime a URL com as credenciais embutidas**: a senha do dashboard saiu
+em claro no transcript. Não foi o servidor — foi a minha escolha de formato, num comando cujo
+propósito era **conferir segurança**. E a classe tinha acabado de ser curada nesta mesma sessão
+(chave da API vazada em transcript, resolvida por rotação).
+
+A lição é mecanizável, não "vou prestar atenção": **`-u user:senha` com `%{url_effective}` (ou `-v`,
+ou `%{url}`) imprime segredo por construção.** Para conferir redirect autenticado:
+`-o /dev/null -w '%{http_code}'`, e `%{num_redirects}` se a cadeia importar. Nunca a URL efetiva.
+
+**Não consegui rotacionar**: duas tentativas bloqueadas pelo classificador de permissões. Insistir
+seria contornar a intenção da negativa. O comando está entregue ao maestro, e o nó nasce `open`
+**dependendo dele** — não `done` com carimbo otimista.
