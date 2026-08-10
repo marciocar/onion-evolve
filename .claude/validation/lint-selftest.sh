@@ -5824,7 +5824,7 @@ run_consumed_modes_selftests() {
     if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
       record_pass "modos: (b) kg-backlog-check --format tsv CALA no verde (o lint trata vazio como conforme)"
     else record_fail "modos: (b) tsv no verde" "esperava saida VAZIA e rc=0; veio rc=${rc} out='${out}'"; fi
-    d="$(mktemp -d)"; sed '0,/^    status: open$/s//    status: done/' "${bg}" > "$d/m.yaml"
+    d="$(mktemp -d)"; _fixture_done_nu "${bg}" "$d/m.yaml"
     rc=0; out="$(bash "${kbc}" "$d/m.yaml" --format tsv 2>&1)" || rc=$?
     if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -qP '^HARD\tDONE-NU\t'; then
       record_pass "modos: (b2) e no vermelho emite TSV tabulado (HARD<TAB>DONE-NU<TAB>...)"
@@ -5877,6 +5877,32 @@ run_consumed_modes_selftests() {
   fi
 }
 
+# _fixture_done_nu <src.kg.yaml> <dst.yaml> — produz um backlog cujo ÚNICO defeito é DONE-NU.
+#
+# ⚠️ POR QUE NÃO É MAIS `sed '0,/status: open/s//status: done/'`: aquela forma dependia de o backlog
+#    VIVO ter pelo menos um nó `open`. Em 2026-08-10 o backlog foi colhido a zero abertos — que é o
+#    ESTADO SAUDÁVEL, o alvo declarado do arquivo — e a mutação virou no-op silencioso. A bancada
+#    passaria a medir o nada; só a guarda-da-guarda (`_prove_mutation`) impediu o falso-verde.
+#    Fixture não pode depender do CONTEÚDO daquilo que ela testa: o arquivo vivo é livre para mudar.
+#
+# Duas costuras deliberadas: APPEND de um nó sintético (não depende de nenhum nó existente) e o TETO
+# elevado a 999 na cópia, para que o único HARD possível seja DONE-NU — o nó extra poderia estourar o
+# cap e trocar a acusação, fazendo o caso reprovar pela razão errada.
+_fixture_done_nu() {
+  local _src="$1" _dst="$2"
+  sed -E 's/(#.*TETO:[[:space:]]*)[0-9]+/\1999/' "${_src}" > "${_dst}"
+  cat >> "${_dst}" <<'FIXTURE_DONE_NU'
+
+  - id: I_FIXTURE_DONE_SEM_CARIMBO
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Fixture da bancada: declara done sem verified_at. Nao existe no backlog real."
+FIXTURE_DONE_NU
+}
+
 run_kg_backlog_selftests() {
   local helper="${SCRIPT_DIR}/kg-backlog-check.sh"
   local bg="${REPO_ROOT}/docs/onion/graph/fios-abertos.kg.yaml"
@@ -5893,7 +5919,7 @@ run_kg_backlog_selftests() {
 
   # (b) DONE-NU — o coracao. A REGRA 49 NAO alcanca este arquivo (ele e todo `plane: DEV`, de
   #     proposito), entao declarar `done` sem carimbo saia DE GRACA antes desta guarda.
-  sed '0,/^    status: open$/s//    status: done/' "${bg}" > "$d/done.yaml"
+  _fixture_done_nu "${bg}" "$d/done.yaml"
   local rc_int rc_mut
   rc_int=0; bash "${helper}" "${bg}" >/dev/null 2>&1 || rc_int=$?
   rc_mut=0; out="$(bash "${helper}" "$d/done.yaml" 2>&1)" || rc_mut=$?
@@ -5903,6 +5929,24 @@ run_kg_backlog_selftests() {
   if printf '%s' "${out}" | grep -q 'DONE-NU' && printf '%s' "${out}" | grep -q 'verified_at=AUSENTE'; then
     record_pass "kg-backlog: (b2) a acusacao NOMEIA o item e o campo que falta"
   else record_fail "kg-backlog: (b2)" "acusacao sem diagnostico acionavel: ${out}"; fi
+
+  # (b3) A FIXTURE NAO PODE DEPENDER DO CONTEUDO DO ARQUIVO VIVO — e este caso e o unico jeito de
+  #      saber. Em 2026-08-10 o backlog foi colhido a ZERO abertos (o estado SAUDAVEL, que o arquivo
+  #      existe para perseguir) e o `sed '0,/status: open/s//done/'` das fixtures virou no-op: os
+  #      casos (b) e (e) passaram a comparar dois arquivos IDENTICOS. Em (b) a guarda-da-guarda
+  #      gritou; em (e) NAO HAVIA guarda-da-guarda, e ele teria medido o nada em silencio.
+  #      Aqui a fonte tem zero `open` POR CONSTRUCAO: se alguem voltar a mutar no existente, este
+  #      caso reprova na hora, sem depender de o backlog real estar num estado ou noutro.
+  sed -E 's/^([[:space:]]*status:)[[:space:]]*open[[:space:]]*$/\1 confirmed/' "${bg}" > "$d/sem-abertos.yaml"
+  if grep -qE '^[[:space:]]*status:[[:space:]]*open[[:space:]]*$' "$d/sem-abertos.yaml"; then
+    record_fail "kg-backlog: (b3)" "a fonte do caso ainda tem \`open\` — o caso mediria a situacao errada"
+  else
+    _fixture_done_nu "$d/sem-abertos.yaml" "$d/sem-abertos-mutado.yaml"
+    rc=0; out="$(bash "${helper}" "$d/sem-abertos-mutado.yaml" 2>&1)" || rc=$?
+    if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'DONE-NU'; then
+      record_pass "kg-backlog: (b3) a fixture funciona com o backlog ZERADO — nao depende do conteudo do vivo"
+    else record_fail "kg-backlog: (b3)" "sem nenhum \`open\` na fonte a fixture nao produziu DONE-NU (rc=${rc}): ${out}"; fi
+  fi
 
   # (c) TETO lido DO ARQUIVO. Passar do teto reprova; e o numero da mensagem vem do `meta:`,
   #     nunca de constante no script — um numero aqui e outro la seria o mesmo
@@ -5953,7 +5997,11 @@ run_kg_backlog_selftests() {
       #    para produzir HARD.
       h_ctrl="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
       h_ctrl="$(printf '%s' "${h_ctrl}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
-      sed -i '0,/^    status: open$/s//    status: done/' "${sb}/docs/onion/graph/fios-abertos.kg.yaml"
+      # mesma razão de (b): mutar um `open` existente depende do CONTEÚDO do arquivo vivo, e o
+      # backlog zerado torna o `sed` um no-op. Aqui não há `_prove_mutation` para avisar — o caso
+      # apenas compararia dois lints idênticos e passaria a medir o nada.
+      _fixture_done_nu "${sb}/docs/onion/graph/fios-abertos.kg.yaml" "${sb}/.done-nu.tmp"
+      mv "${sb}/.done-nu.tmp" "${sb}/docs/onion/graph/fios-abertos.kg.yaml"
       h_mut="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
       h_mut="$(printf '%s' "${h_mut}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
       if [ -z "${h_ctrl}" ] || [ -z "${h_mut}" ]; then
