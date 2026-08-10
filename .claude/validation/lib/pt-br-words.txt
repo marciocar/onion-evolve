@@ -1,0 +1,71 @@
+# Palavras pt-BR que aparecem em IDENTIFICADOR — uma por linha, minúsculas, sem acento.
+#
+# ⚠️ CRITÉRIO DE ENTRADA, e ele é o que decide se a guarda serve: a palavra NÃO PODE ser homógrafa
+# do inglês. `base`, `total`, `local`, `final`, `real`, `normal`, `original`, `nota`, `via`, `data`
+# ficam FORA — acusá-las produziria falso-positivo em regra HARD, que é a corrente que o Elenxo do
+# PR #566 reconstruiu: falso-positivo → cura cerimonial → caso que escreve no repo e apaga OUTRA
+# regra HARD. Cobertura menor e honesta vence cobertura maior que ensina a ignorar o gate.
+#
+# TETO DECLARADO: abreviação não é palavra. `arq`, `donenu`, `qtd`, `msg` escapam por desenho —
+# medido no PR #568: a guarda pega 10 dos 12 achados históricos, e os 2 que escapam são estes.
+achado
+achados
+alvo
+alvos
+antes
+aresta
+arestas
+arquivo
+arquivos
+aspas
+atencao
+ausente
+aviso
+avisos
+caminho
+caminhos
+carimbo
+carimbos
+chave
+chaves
+contagem
+copia
+copias
+depois
+escopo
+faltando
+faltante
+faltantes
+fila
+grafo
+grafos
+guarda
+guardas
+intacto
+lado
+linha
+linhas
+medicao
+modo
+modos
+mutante
+nivel
+numero
+pares
+raiz
+ruim
+saida
+saidas
+sitio
+sitios
+soma
+somas
+sujo
+sujos
+tamanho
+teto
+tetos
+vazio
+vazios
+veredito
+vereditos

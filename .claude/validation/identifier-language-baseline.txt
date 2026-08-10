@@ -1,0 +1,7 @@
+# Baseline da REGRA 60 — identificadores em pt-BR TOLERADOS (divida anterior a 2026-08-09).
+# Gerado por: bash .claude/validation/identifier-language-check.sh --emit-baseline
+# Esta lista SO PODE ENCOLHER. Acrescentar entrada aqui e REGRESSAO.
+.claude/utils/co-evolution/reconcile-inputs.sh	alvo
+.claude/validation/federation-radar.sh	atencao
+.claude/validation/lint-selftest.sh	vazio
+.claude/validation/review-verdict.sh	vazio

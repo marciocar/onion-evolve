@@ -139,7 +139,7 @@ CATEGORIES = [
      [1, 2, 3, 12, 17, 23, 51]),
     ("Higiene de artefato",
      "Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.",
-     [5, 6, 13, 14, 15, 22, 48]),
+     [5, 6, 13, 14, 15, 22, 48, 60]),
     ("Fronteiras & contratos de arquitetura",
      "Proibições estruturais, documentação no lugar certo e os contratos de conformance e de adoção.",
      [7, 18, 20, 40, 53]),

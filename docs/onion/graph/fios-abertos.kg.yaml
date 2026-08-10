@@ -197,11 +197,11 @@ nodes:
   - id: Q_QUANTAS_DAS_52_REGRAS_JA_JUNTAM_SOZINHAS
     node_type: question
     plane: DEV
-    status: open
+    status: drifted
     impact: 5
     confidence: 0.7
     verified_against: as-52-regras-classificadas-em-mecanizavel-x-caso-a-caso-contra-o-manifest
-    label: "26 das 52 regras exigiriam investigacao caso a caso — mas 26 ja juntam automatico (16 via manifest, 10 por delegacao). Sem essa classificacao MEDIDA o W4 vira catedral; com ela, a catraca nasce sobre a metade que ja junta. Tratar as 26 como bloqueio e o que transformou 'o fio aberto de maior valor' em item que nunca comeca."
+    label: "DRIFTED 2026-08-09: a classificacao (26 caso-a-caso / 26 automaticas) foi medida contra 52 REGRAS, e o lint tem 58 — mediu CERTO e o mundo andou. Nao e erro de quem mediu; e o status que existe exatamente para isso, e por isso SOBE a atencao (1.3) em vez de zerar. As 6 novas (55, 56, 57, 58, 59, 60) nasceram DEPOIS e nenhuma foi classificada. A tese segue de pe: tratar as 26 caso-a-caso como bloqueio e o que transformou o fio de maior valor em item que nunca comeca; a catraca nasce sobre a metade que ja junta. O que falta e re-medir sobre 58 — e a REGRA 60 deste ciclo e evidencia a favor: ela nasceu com baseline justamente para nao bloquear sobre divida velha."
     trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
 
   - id: Q_REGRA56_INSATISFAZIVEL_NO_SEGUNDO_COMMIT
@@ -216,11 +216,13 @@ nodes:
 
   - id: I_GUARDA_DE_IDIOMA_DE_IDENTIFICADOR
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: regra-60-mergeada-com-as-4-curas-do-juiz-medidas-baseline-7-para-4
+    status: done
     impact: 4
     confidence: 1.0
-    label: "TENTADO E RECUSADO 2026-08-09 — o PR #569 foi FECHADO SEM MERGE por passada adversarial (3 de 4 refutadores disseram CAI), e a recusa e o achado. O decisivo estava no artefato que eu entreguei: 2 dos 7 residuais do baseline NAO ERAM IDENTIFICADORES, eram conteudo de string. Reproduzido por mim: um script cujo UNICO identificador e `target_file` (ingles) levava HARD por `contagem`, que era conteudo de heredoc — falso-positivo HARD em codigo CONFORME de adotante, na regra cujo cabecalho promete "nunca comentario nem string". Mais tres, medidos: `sed s/#.*//` come a linha a partir de ${x#pref} e $# (3 declaracoes pt-BR LEGITIMAS invisiveis); o caso (e) e passe-vacuo (desligar o strip inteiro mantem 7/7 verdes); e o baseline nao tem catraca (appendar 1 linha derruba o HARD sem mover contador). A CONCLUSAO QUE VALE: `grep` sobre LINHA nao distingue codigo de string em shell. Nao e bug a remendar, e o INSTRUMENTO ERRADO — remendar produziria a corrente do Elenxo do #566 (falso-positivo -> cura cerimonial -> dano em outra regra). O proximo ciclo precisa de PARSER, nao regex, ou de escopo drasticamente menor. A viabilidade LEXICAL do #568 continua valida (segmento x palavra inteira, lista sem homografo). O que SOBREVIVEU e foi para main: o rename `alvoPendente` -> `pendingTarget`, a UNICA das 7 dividas que VIAJAVA aos adotantes nos manifestos (medido: 1 de 7). Sem ele, adotante que vendoriza `kg-radar.sh` herdaria HARD sobre divida que nao e dele — a licao `o CORE E O PIOR ORACULO DO QUE VIAJA`."
+    label: "PAGO. E o caminho ate aqui vale mais que o resultado. ⚠️ ESTE ROTULO JA MENTIU: por horas ele afirmou \"FECHADO SEM MERGE, 3 de 4 disseram CAI, a conclusao que vale e que grep sobre LINHA e o instrumento errado\". O juiz dissera FICA-COM-RESSALVA e medira 324 scripts de terceiros com 810 extracoes e ZERO falsos — \"o motor esta certo, nao mexa nisso\". Eu reproduzi UM modo de falha (heredoc lido como declaracao), generalizei dele para o instrumento inteiro, FECHEI o PR, e nao corrigi o no quando fui refutado. Foi a revisao de alinhamento que pegou: o diagnostico que prometi ao \"proximo ciclo\" vivia nos COMENTARIOS DO PR — zero mencoes no grafo — que e literalmente C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO, a tese fundadora deste arquivo, violada por mim. AS 4 CURAS, todas medidas: (a) elidir corpo das aspas ANTES de cortar comentario, e cortar `#` so quando INICIA token — mata DOIS achados de uma vez (o falso-positivo de string e o `sed` que decapitava a linha em `$#`/`${v#pfx}`, invisibilizando 3 declaracoes pt-BR REAIS em 27 arquivos de arg-parsing); (b) baseline regenerado DEPOIS: 7 -> 4, saindo os 2 FANTASMAS (prosa em string carimbada como divida) mais o `alvoPendente` ja curado no #570, e ZERO entradas novas; (c) universo = rastreado UNIAO nao-rastreado, com exit 2 no vazio — o pior caso era o adotante recem-adotado, com 51 scripts no disco e 0 rastreados, recebendo \"✅ nenhum identificador NOVO\" no dia 1; (d) a fixture do caso (e) passou a conter declaracao DENTRO de comentario, porque sem isso o caso NAO PODIA FALHAR — apagar o strip inteiro mantinha 7/7 verdes. A LICAO QUE FICA, e ela e sobre mim: eu quase descartei um instrumento que funciona por ter medido UM caso e concluido sobre TODOS. A medicao do juiz (324 scripts, 0 falsos) e o tipo de evidencia que eu nao produzi antes de decidir descartar."
     trace: "docs/meta-specs/code-standards.md"
 
   - id: C_RENAME_MATA_ANCORA_EM_SILENCIO
