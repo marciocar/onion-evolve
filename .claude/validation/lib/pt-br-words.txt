@@ -1,13 +1,12 @@
-# Palavras pt-BR que aparecem em IDENTIFICADOR — uma por linha, minúsculas, sem acento.
 #
-# ⚠️ CRITÉRIO DE ENTRADA, e ele é o que decide se a guarda serve: a palavra NÃO PODE ser homógrafa
+# PR #566 reconstruiu: falso-positivo → cura cerimonial → caso que escreve no repo e apaga OUTRA
+# Palavras pt-BR que aparecem em IDENTIFICADOR — uma por linha, minúsculas, sem acento.
+# TETO DECLARADO: abreviação não é palavra. `arq`, `donenu`, `qtd`, `msg` escapam por desenho —
 # do inglês. `base`, `total`, `local`, `final`, `real`, `normal`, `original`, `nota`, `via`, `data`
 # ficam FORA — acusá-las produziria falso-positivo em regra HARD, que é a corrente que o Elenxo do
-# PR #566 reconstruiu: falso-positivo → cura cerimonial → caso que escreve no repo e apaga OUTRA
-# regra HARD. Cobertura menor e honesta vence cobertura maior que ensina a ignorar o gate.
-#
-# TETO DECLARADO: abreviação não é palavra. `arq`, `donenu`, `qtd`, `msg` escapam por desenho —
 # medido no PR #568: a guarda pega 10 dos 12 achados históricos, e os 2 que escapam são estes.
+# regra HARD. Cobertura menor e honesta vence cobertura maior que ensina a ignorar o gate.
+# ⚠️ CRITÉRIO DE ENTRADA, e ele é o que decide se a guarda serve: a palavra NÃO PODE ser homógrafa
 achado
 achados
 alvo
@@ -33,6 +32,9 @@ copia
 copias
 depois
 escopo
+falha
+falhar
+falhou
 faltando
 faltante
 faltantes
@@ -52,6 +54,7 @@ mutante
 nivel
 numero
 pares
+passou
 raiz
 ruim
 saida

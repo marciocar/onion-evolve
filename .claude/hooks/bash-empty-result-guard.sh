@@ -165,6 +165,98 @@ if printf '%s' "$cmd" | grep -qE '2>/dev/null.*\|[[:space:]]*(wc[[:space:]]+-l|g
   add 'ERRO-ENGOLIDO-VIRANDO-NÚMERO: há `2>/dev/null` a montante de uma contagem — um comando que FALHOU e um objeto que NÃO EXISTE produzem o mesmo `0`. Mostre o stderr, ou use o helper: `source .claude/utils/safe-count.sh` → `count_files <dir> <glob>` / `count_matches <padrão> <arquivos>` / `count_lines <arquivo>` (alvo ausente = exit 2 + stderr, nunca zero silencioso).'
 fi
 
+# (3b) `pgrep -f` / `pkill -f` que CASA A SI MESMO — o padrão está na linha de comando do próprio
+# shell que o executa, então ele sempre se encontra. Custo medido em UMA sessão (2026-08-10), três
+# vezes, com três danos DIFERENTES — que é o que prova ser classe e não descuido:
+#   1. `pkill -f 'lint-selftest'` com verificação por OUTRO padrão → afirmei ter matado o que não
+#      morreu, e quem viu foi o maestro na tela;
+#   2. `pgrep -fc 'lint-selftest'` devolvendo 1 com a bancada morta — o sobrevivente era o meu shell;
+#   3. `until ! pgrep -f 'git commit -F'` → a condição NUNCA podia virar falsa. Shell preso 1h06,
+#      esperando por si mesmo, enquanto o commit tinha terminado havia muito.
+# O (3) é o mais perigoso porque não erra: ele ESPERA para sempre, e esperar parece trabalhar.
+#
+# A cura é o idioma clássico do colchete: `pgrep -f '[l]int-selftest'` — o regex casa `lint-selftest`,
+# mas a linha de comando literal contém `[l]int-selftest`, que o regex NÃO casa. Alternativa:
+# excluir o próprio PID (`| grep -v "^$$\$"`) ou `--older` (o shell que roda o laço é NOVO). `-x`
+# tambem esta a salvo: casa o NOME do executavel, nao a linha inteira.
+#
+# ⚠️ SEGUNDA VERSÃO — a primeira tinha QUATRO fail-opens, achados na passada adversarial contra ela
+#    mesma, no PR que a introduziu. A raiz era UMA: as isenções valiam para o COMANDO INTEIRO.
+#    Bastava um colchete num redirect (`pgrep -f alvo > /tmp/x[1].txt`), um `$$` presente por outro
+#    motivo, ou um `-x` numa invocação IRMÃ para desarmar a regra sobre a invocação culpada.
+#    É a mesma classe que eu já tinha aberto DUAS vezes nesta sessão curando outra coisa: cura de
+#    fail-open que abre fail-open. Agora o julgamento é POR INVOCAÇÃO, com dois escopos distintos —
+#    o colchete vale só dentro do ARGUMENTO (senão um redirect isenta), e `$$`/`--older` valem no
+#    STATEMENT (senão o pipe que exclui o próprio PID ficaria fora do alcance).
+# ⚠️ TERCEIRA VERSÃO — a segunda passada adversarial derrubou QUATRO coisas na 2ª, e três eram do
+#    lado que mais custa. Todas medidas, nenhuma inferida do regex:
+#      (i)  COBERTURA MENOR QUE A PROMESSA: o regex exigia que o cluster com `f` fosse o PRIMEIRO
+#           token depois do comando. Escapavam `pkill -9 -f` (provavelmente a forma mais comum do
+#           mundo real), `pgrep -a -f`, `pgrep -u root -f` e a opção longa `--full`. O texto do aviso
+#           prometia cobrir a classe; o código cobria um dialeto dela.
+#      (ii) FALSO-POSITIVO EM COMANDO DE LEITURA: `grep -rn "pgrep -f" .claude/` disparava, e a
+#           mensagem de commit que DESCREVIA a regra também. E o meta-defeito é o que dói: quarenta
+#           linhas abaixo, no detector (5), está escrito que ele sofreu EXATAMENTE isto e que a cura
+#           foi ANCORAR EM INÍCIO DE COMANDO. Eu escrevi a (3b) no dia seguinte sem reusar a cura já
+#           paga — a casa tinha o remédio no mesmo arquivo.
+#      (iii) A CURA RECOMENDADA NÃO CURAVA, E A GUARDA A CERTIFICAVA: no idioma lança-e-espera
+#           (`bash x.sh & until ! pgrep -f '[x]'`), a forma NUA do padrão está na linha por causa do
+#           lançamento — o colchete não protege, o laço trava, e a guarda ficava MUDA porque via o
+#           `[`. Fail-open com selo é pior que ausência de guarda.
+#      (iv) `-A`/`--ignore-ancestors` (procps-ng >=4.0) — a cura de VERDADE, que exclui os ancestrais
+#           do próprio shell — passava por acidente, caindo no buraco de cobertura de (i), não por
+#           reconhecimento.
+#
+#    Agora: âncora em INÍCIO DE POSIÇÃO DE COMANDO (mata (ii)), modo-full lido de QUALQUER token de
+#    opção da invocação (mata (i)), desarme por opção da PRÓPRIA invocação (`-A`/`-x`/`-O` e as
+#    longas), e o colchete só isenta quando a forma NUA não co-ocorre no comando (mata (iii)).
+_pg_self=0; _pg_pierced=0
+while IFS= read -r _stmt; do
+  case "${_stmt}" in *'$$'*) continue ;; esac    # exclui o próprio PID — escopo STATEMENT (o pipe)
+  while IFS= read -r _pos; do
+    # ÂNCORA: só conta se `pgrep`/`pkill` ABRE a posição de comando. Sem isto, qualquer comando que
+    # apenas MENCIONE a string (grep, commit -m, comentário) é acusado — a lição do detector (5).
+    _c="$(printf '%s' "${_pos}" | sed -E 's/^[[:space:]]*//
+                                          :a
+                                          s/^(!|until|while|do|then|else|if|elif|\(|\{)[[:space:]]+//; ta
+                                          s/^[[:space:]]*//')"
+    case "${_c}" in pgrep\ *|pkill\ *|pgrep|pkill) ;; *) continue ;; esac
+    # MODO FULL por QUALQUER token de opção — cluster curto com `f`, ou a longa `--full`
+    printf '%s' "${_c}" | grep -qE '(^|[[:space:]])(-[a-zA-Z]*f[a-zA-Z]*|--full)([[:space:]]|$)' || continue
+    # DESARMES por opção da PRÓPRIA invocação: -A (ignora ancestrais, a cura real), -x (casa o NOME
+    # do executável), -O/--older (o shell que roda o laço é NOVO)
+    if printf '%s' "${_c}" | grep -qE '(^|[[:space:]])(-[a-zA-Z]*[AxO][a-zA-Z]*|--ignore-ancestors|--exact|--older)([[:space:]]|$)'; then continue; fi
+    # COLCHETE: isenta só se a forma NUA não co-ocorrer. `bash x.sh & until ! pgrep -f '[x]'` tem o
+    # `x` nu no lançamento, então o colchete não protege nada ali.
+    # o ARGUMENTO termina no primeiro redirect — senão um `[` em `> /tmp/x[1].txt` isentaria a regra
+    # (fail-open medido na 3ª passada: o colchete tem de estar no PADRÃO, não em qualquer lugar).
+    _pg_arg="$(printf '%s' "${_c}" | sed -E 's/[<>].*$//; s/^(pgrep|pkill)//; s/(^|[[:space:]])(-[a-zA-Z-]+|--[a-z-]+=[^[:space:]]*)//g; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^["'"'"']//; s/["'"'"']$//')"
+    case "${_pg_arg}" in
+      *'['*)
+        # A FORMA NUA CO-OCORRE? `[m]arcador` NÃO contém a substring `marcador`, então QUALQUER
+        # ocorrência da nua no comando veio de outro lugar (o lançamento, um echo) e fura o colchete.
+        # ⚠️ `grep -c` conta LINHAS, e o comando costuma ser UMA — foi assim que este caso passou
+        #    despercebido na 1ª rodada da matriz. Contagem de OCORRÊNCIA exige `grep -o | wc -l`.
+        _pg_bare="$(printf '%s' "${_pg_arg}" | tr -d '[]')"
+        if [ -n "${_pg_bare}" ] \
+           && [ "$(printf '%s' "$cmd" | grep -oF -- "${_pg_bare}" 2>/dev/null | wc -l)" -ge 1 ]; then
+          _pg_pierced=1; _pg_self=1
+        fi
+        continue ;;
+    esac
+    _pg_self=1
+  done <<PGPOS
+$(printf '%s' "${_stmt}" | tr '|' '\n')
+PGPOS
+done <<PGSCAN
+$(printf '%s' "$cmd" | sed 's/&&/\n/g; s/||/\n/g; s/;/\n/g; s/\([^>\&]\)\&\([^\&>]\)/\1\n\2/g')
+PGSCAN
+if [ "${_pg_pierced}" -eq 1 ]; then
+  add 'COLCHETE-FURADO: seu `pgrep -f "[x]…"` NÃO protege aqui — a forma NUA do padrão aparece na mesma linha de comando (o lançamento, o `echo`, o caminho do script), então o shell do laço se encontra do mesmo jeito e ele trava para sempre. Use `pgrep -A -f` (`--ignore-ancestors`, exclui o próprio shell) ou espere por PID: `while kill -0 "$PID" 2>/dev/null; do sleep 5; done`.'
+elif [ "${_pg_self}" -eq 1 ]; then
+  add 'PGREP-QUE-SE-ENCONTRA: `pgrep -f`/`pkill -f` casa a linha de comando do PRÓPRIO shell que o roda — o padrão está escrito ali. Num `until ! pgrep ...` isso trava PARA SEMPRE (medido: 1h06 esperando por si mesmo). Cura mais forte: `pgrep -A -f` (`--ignore-ancestors`). Alternativas: o idioma do colchete `pgrep -f "[l]int-selftest"` (só serve se a forma NUA não estiver na mesma linha) ou esperar por PID com `kill -0`. E nunca mate com um padrão e confira com outro: a conferência tem de usar EXATAMENTE o padrão do `pkill`.'
+fi
+
 # (4) comando de DESCOBERTA com saída vazia — o caso que mais custou (o falso "não sobreviveu").
 # CALIBRAÇÃO ANTI-RUÍDO (o risco real de qualquer alarme é virar fadiga e ser ignorado):
 #   · `grep -q`/`grep -c` são TESTE e CONTAGEM, não descoberta-para-ler — vazio ali é resposta, não sinal.

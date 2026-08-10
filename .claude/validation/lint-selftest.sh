@@ -5041,6 +5041,119 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (b) \$? pós-pipe → avisa que o exit é do último elemento"
   else record_fail "empty-result-guard: (b)" "não reagiu a \$? após pipe: ${out}"; fi
 
+  # (b2) REAGE: `pgrep -f`/`pkill -f` que casa a SI MESMO. Três danos DIFERENTES numa sessão
+  #      (2026-08-10) — é o que prova classe e não descuido. O caso do `until` é o pior porque não
+  #      ERRA: ele espera para sempre, e esperar parece trabalhar (shell preso 1h06 enquanto o
+  #      comando aguardado já tinha terminado).
+  out="$(_erg '"until ! pgrep -f (git commit -F) >/dev/null; do sleep 30; done"' '""' || true)"
+  if printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
+    record_pass "empty-result-guard: (b2) \`until ! pgrep -f\` → avisa que o laço espera por SI MESMO"
+  else record_fail "empty-result-guard: (b2)" "não reagiu ao pgrep -f auto-casante: ${out}"; fi
+
+  # (b2b) COBERTURA — a 2ª versão exigia que o cluster com `f` fosse o PRIMEIRO token, e escapavam
+  #       `pkill -9 -f` (a forma mais comum do mundo real), `-a -f`, `-u root -f` e a longa `--full`.
+  #       Promessa maior que cobertura é `declarado != verificado` dentro da própria guarda.
+  local _cov_fail=0 _cvcmd
+  for _cvcmd in '"pkill -9 -f (lint-selftest)"' \
+                '"until ! pgrep --full (git commit -F); do sleep 30; done"' \
+                '"until ! pgrep -a -f (git commit -F); do sleep 30; done"' \
+                '"pgrep -u root -f (deploy.sh)"'; do
+    out="$(_erg "${_cvcmd}" '""' || true)"
+    printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA' || _cov_fail=$((_cov_fail + 1))
+  done
+  if [ "${_cov_fail}" -eq 0 ]; then
+    record_pass "empty-result-guard: (b2b) cobre \`-9 -f\`, \`-a -f\`, \`-u root -f\` e \`--full\` — não só o dialeto"
+  else record_fail "empty-result-guard: (b2b)" "${_cov_fail}/4 formas de invocação escaparam da regra"; fi
+
+  # (b2c) ISENÇÃO POR INVOCAÇÃO, nunca pelo comando inteiro. As três formas abaixo tinham `[`, `$$`
+  #       ou `-x` presentes por OUTRO motivo, e na 2ª versão isso desarmava a regra sobre a invocação
+  #       CULPADA. Fail-open por escopo largo — a mesma classe que eu já abri duas vezes nesta sessão
+  #       curando outra coisa.
+  local _esc_fail=0
+  for _cvcmd in '"pgrep -f alvo > /tmp/x[1].txt"' \
+                '"LOG=/tmp/d.$$X; until ! pgrep -f (alvo); do sleep 5; done"' \
+                '"pkill -x nginx; until ! pgrep -f (deploy.sh); do sleep 5; done"'; do
+    out="$(_erg "${_cvcmd}" '""' || true)"
+    printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA' || _esc_fail=$((_esc_fail + 1))
+  done
+  if [ "${_esc_fail}" -eq 0 ]; then
+    record_pass "empty-result-guard: (b2c) isenção vale por INVOCAÇÃO — \`[\` em redirect, \`\$\$\` e \`-x\` irmão não desarmam"
+  else record_fail "empty-result-guard: (b2c)" "${_esc_fail}/3 isenções ainda valem para o comando inteiro (fail-open)"; fi
+
+  # (b2d) COLCHETE FURADO — o achado mais caro da passada adversarial: no idioma lança-e-espera a
+  #       forma NUA do padrão está na linha por causa do LANÇAMENTO, o colchete não protege, o laço
+  #       trava — e a guarda ficava MUDA porque via o `[`. Fail-open COM SELO é pior que guarda
+  #       ausente: ela certifica como curado o que trava para sempre.
+  # ⚠️ SEM PARÊNTESES no padrão. A 1ª versão deste caso escrevia `([m]arcador-x.sh)` para escapar do
+  #    JSON — e o parêntese ENTRA no argumento, então a forma nua vira `(marcador-x.sh)`, que não
+  #    ocorre no lançamento. O caso reprovava sobre uma regra CORRETA: o artifício de escape do teste
+  #    virou parte do dado medido. É a mesma família de `bancada-espelha-o-runner`.
+  out="$(_erg '"bash marcador-x.sh & until ! pgrep -f [m]arcador-x.sh; do sleep 5; done"' '""' || true)"
+  if printf '%s' "${out}" | grep -q 'COLCHETE-FURADO'; then
+    record_pass "empty-result-guard: (b2d) colchete com a forma NUA co-ocorrendo → acusa FURADO, não certifica"
+  else record_fail "empty-result-guard: (b2d)" "certificou como curado um colchete que não protege: ${out}"; fi
+
+  # (b2e) RECONHECE A CURA FORTE. `-A`/`--ignore-ancestors` (procps-ng >=4.0) exclui os ancestrais do
+  #       próprio shell — é a cura de VERDADE. Na 2ª versão ela passava por ACIDENTE, caindo no buraco
+  #       de cobertura; guarda que cala por acidente volta a acusar assim que o buraco é tapado.
+  out="$(_erg '"until ! pgrep -A -f (git commit -F); do sleep 30; done"' '""' || true)"
+  if printf '%s' "${out}" | grep -qE 'PGREP-QUE-SE-ENCONTRA|COLCHETE-FURADO'; then
+    record_fail "empty-result-guard: (b2e)" "acusou \`pgrep -A -f\`, que é a cura recomendada: ${out}"
+  else record_pass "empty-result-guard: (b2e) cala em \`pgrep -A -f\` — reconhece a cura, não tropeça nela"; fi
+
+  # (b2f) MUTATION — a passada adversarial provou que remover a 3ª cláusula da 2ª versão mantinha a
+  #       bancada 100% VERDE: a cláusula que produzia os fail-opens não era medida em direção nenhuma.
+  #       Sem este par, os casos acima poderiam virar passe-vácuo de novo. Medição de mão não é
+  #       mecanismo — o mesmo comentário já está no caso (p) deste arquivo, pago em 2026-08-09.
+  local _mut_dir _mut_hook _mut_rc
+  _mut_dir="$(mktemp -d)"
+  sed 's/^    case "${_c}" in pgrep\\ \*|pkill\\ \*|pgrep|pkill) ;; \*) continue ;; esac$/    :/' \
+      "${hook}" > "${_mut_dir}/h.sh"
+  if cmp -s "${hook}" "${_mut_dir}/h.sh"; then
+    record_fail "empty-result-guard: (b2f)" "GUARDA-DA-GUARDA: a mutação da ÂNCORA não foi aplicada (arquivos idênticos) — o sed virou no-op"
+  else
+    # ⚠️ A SONDA IMPORTA MAIS QUE A MUTAÇÃO. A 1ª sonda que escolhi foi `grep -rn "pgrep -f" ...` — e
+    #    ela calava nos DOIS lados, porque ali quem silencia é o regex de modo-full (`-f"` não é
+    #    token de opção), não a âncora. Eu teria concluído "cláusula indetectável" sobre uma cláusula
+    #    sadia. `echo pgrep -f alvo` isola a âncora: é MENÇÃO com espaçamento de invocação.
+    _mut_rc=0
+    printf '{"tool_input":{"command":"echo pgrep -f alvo"},"tool_response":{"stdout":""}}' \
+      | bash "${_mut_dir}/h.sh" >/dev/null 2>"${_mut_dir}/err" || _mut_rc=$?
+    if grep -q 'PGREP-QUE-SE-ENCONTRA' "${_mut_dir}/err" 2>/dev/null; then
+      record_pass "empty-result-guard: (b2f) MUTATION — sem a âncora, a MENÇÃO volta a ser acusada (a âncora é load-bearing)"
+    else record_fail "empty-result-guard: (b2f)" "mutar a âncora NÃO mudou o comportamento — a cláusula é indetectável pela bancada"; fi
+  fi
+  rm -rf "${_mut_dir}"
+
+  # (b3) CALA na CURA — o idioma do colchete. Sem este caso a regra poderia ser "acusa sempre que
+  #      vir pgrep", que empurraria quem obedece para o bypass (a lição da REGRA 56, que puniu
+  #      quem obedecia 23 vezes). A guarda tem de reconhecer a forma correta, não só a errada.
+  out="$(_erg '"pgrep -f ([l]int-selftest)"' '"123"' || true)"
+  if printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
+    record_fail "empty-result-guard: (b3)" "acusou o idioma do COLCHETE, que é a cura: ${out}"
+  else record_pass "empty-result-guard: (b3) cala no \`pgrep -f '[l]…'\` — reconhece a forma correta"; fi
+
+  # (b4) OS QUATRO FAIL-OPENS DA PRIMEIRA VERSÃO DESTA REGRA, achados na passada adversarial contra
+  #      ela mesma, no PR que a introduziu. A raiz era UMA: as isenções valiam para o COMANDO
+  #      INTEIRO, então bastava um colchete num redirect, um `$$` presente por outro motivo, ou um
+  #      `-x` numa invocação IRMÃ para desarmar a regra sobre a invocação culpada.
+  #      ⚠️ É a TERCEIRA vez nesta sessão que uma cura de fail-open ABRE fail-open. Por isso os
+  #      quatro ficam aqui: sem eles, a segunda versão seria tão não-provada quanto a primeira, e
+  #      a próxima refatoração reabriria os furos sem ninguém notar.
+  local _b4_fail=0 _b4_desc
+  for _b4_desc in \
+    'pgrep -f meu-alvo > /tmp/saida[1].txt|colchete em REDIRECT, nao no padrao' \
+    'pgrep -f meu-alvo && echo fim-$$|$$ presente por outro motivo' \
+    'pkill -x sleep ; pgrep -f meu-alvo|-x numa invocacao IRMA' \
+    'pgrep -f a[b]c ; pkill -f meu-alvo-real|colchete no 1o, culpado no 2o'; do
+    out="$(_erg "\"${_b4_desc%%|*}\"" '"x"' || true)"
+    if ! printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
+      _b4_fail=1
+      record_fail "empty-result-guard: (b4)" "FAIL-OPEN reaberto — ${_b4_desc##*|}: ${out}"
+    fi
+  done
+  [ "${_b4_fail}" -eq 0 ] && record_pass "empty-result-guard: (b4) os 4 fail-opens da 1a versao seguem fechados (isencao e POR INVOCACAO, nao por comando)"
+
   # (c) REAGE: glob sob sudo + erro engolido virando número (os 7 .env.bak que viraram 0)
   out="$(_erg '"sudo -n ls -1 /home/onion/.env.bak-* 2>/dev/null | wc -l"' '"0"' || true)"
   if printf '%s' "${out}" | grep -q 'GLOB-SOB-SUDO' && printf '%s' "${out}" | grep -q 'ERRO-ENGOLIDO'; then
@@ -5824,7 +5937,7 @@ run_consumed_modes_selftests() {
     if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
       record_pass "modos: (b) kg-backlog-check --format tsv CALA no verde (o lint trata vazio como conforme)"
     else record_fail "modos: (b) tsv no verde" "esperava saida VAZIA e rc=0; veio rc=${rc} out='${out}'"; fi
-    d="$(mktemp -d)"; sed '0,/^    status: open$/s//    status: done/' "${bg}" > "$d/m.yaml"
+    d="$(mktemp -d)"; _fixture_done_nu "${bg}" "$d/m.yaml"
     rc=0; out="$(bash "${kbc}" "$d/m.yaml" --format tsv 2>&1)" || rc=$?
     if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -qP '^HARD\tDONE-NU\t'; then
       record_pass "modos: (b2) e no vermelho emite TSV tabulado (HARD<TAB>DONE-NU<TAB>...)"
@@ -5877,6 +5990,32 @@ run_consumed_modes_selftests() {
   fi
 }
 
+# _fixture_done_nu <src.kg.yaml> <dst.yaml> — produz um backlog cujo ÚNICO defeito é DONE-NU.
+#
+# ⚠️ POR QUE NÃO É MAIS `sed '0,/status: open/s//status: done/'`: aquela forma dependia de o backlog
+#    VIVO ter pelo menos um nó `open`. Em 2026-08-10 o backlog foi colhido a zero abertos — que é o
+#    ESTADO SAUDÁVEL, o alvo declarado do arquivo — e a mutação virou no-op silencioso. A bancada
+#    passaria a medir o nada; só a guarda-da-guarda (`_prove_mutation`) impediu o falso-verde.
+#    Fixture não pode depender do CONTEÚDO daquilo que ela testa: o arquivo vivo é livre para mudar.
+#
+# Duas costuras deliberadas: APPEND de um nó sintético (não depende de nenhum nó existente) e o TETO
+# elevado a 999 na cópia, para que o único HARD possível seja DONE-NU — o nó extra poderia estourar o
+# cap e trocar a acusação, fazendo o caso reprovar pela razão errada.
+_fixture_done_nu() {
+  local _src="$1" _dst="$2"
+  sed -E 's/(#.*TETO:[[:space:]]*)[0-9]+/\1999/' "${_src}" > "${_dst}"
+  cat >> "${_dst}" <<'FIXTURE_DONE_NU'
+
+  - id: I_FIXTURE_DONE_SEM_CARIMBO
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "Fixture da bancada: declara done sem verified_at. Nao existe no backlog real."
+FIXTURE_DONE_NU
+}
+
 run_kg_backlog_selftests() {
   local helper="${SCRIPT_DIR}/kg-backlog-check.sh"
   local bg="${REPO_ROOT}/docs/onion/graph/fios-abertos.kg.yaml"
@@ -5893,7 +6032,7 @@ run_kg_backlog_selftests() {
 
   # (b) DONE-NU — o coracao. A REGRA 49 NAO alcanca este arquivo (ele e todo `plane: DEV`, de
   #     proposito), entao declarar `done` sem carimbo saia DE GRACA antes desta guarda.
-  sed '0,/^    status: open$/s//    status: done/' "${bg}" > "$d/done.yaml"
+  _fixture_done_nu "${bg}" "$d/done.yaml"
   local rc_int rc_mut
   rc_int=0; bash "${helper}" "${bg}" >/dev/null 2>&1 || rc_int=$?
   rc_mut=0; out="$(bash "${helper}" "$d/done.yaml" 2>&1)" || rc_mut=$?
@@ -5903,6 +6042,24 @@ run_kg_backlog_selftests() {
   if printf '%s' "${out}" | grep -q 'DONE-NU' && printf '%s' "${out}" | grep -q 'verified_at=AUSENTE'; then
     record_pass "kg-backlog: (b2) a acusacao NOMEIA o item e o campo que falta"
   else record_fail "kg-backlog: (b2)" "acusacao sem diagnostico acionavel: ${out}"; fi
+
+  # (b3) A FIXTURE NAO PODE DEPENDER DO CONTEUDO DO ARQUIVO VIVO — e este caso e o unico jeito de
+  #      saber. Em 2026-08-10 o backlog foi colhido a ZERO abertos (o estado SAUDAVEL, que o arquivo
+  #      existe para perseguir) e o `sed '0,/status: open/s//done/'` das fixtures virou no-op: os
+  #      casos (b) e (e) passaram a comparar dois arquivos IDENTICOS. Em (b) a guarda-da-guarda
+  #      gritou; em (e) NAO HAVIA guarda-da-guarda, e ele teria medido o nada em silencio.
+  #      Aqui a fonte tem zero `open` POR CONSTRUCAO: se alguem voltar a mutar no existente, este
+  #      caso reprova na hora, sem depender de o backlog real estar num estado ou noutro.
+  sed -E 's/^([[:space:]]*status:)[[:space:]]*open[[:space:]]*$/\1 confirmed/' "${bg}" > "$d/sem-abertos.yaml"
+  if grep -qE '^[[:space:]]*status:[[:space:]]*open[[:space:]]*$' "$d/sem-abertos.yaml"; then
+    record_fail "kg-backlog: (b3)" "a fonte do caso ainda tem \`open\` — o caso mediria a situacao errada"
+  else
+    _fixture_done_nu "$d/sem-abertos.yaml" "$d/sem-abertos-mutado.yaml"
+    rc=0; out="$(bash "${helper}" "$d/sem-abertos-mutado.yaml" 2>&1)" || rc=$?
+    if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'DONE-NU'; then
+      record_pass "kg-backlog: (b3) a fixture funciona com o backlog ZERADO — nao depende do conteudo do vivo"
+    else record_fail "kg-backlog: (b3)" "sem nenhum \`open\` na fonte a fixture nao produziu DONE-NU (rc=${rc}): ${out}"; fi
+  fi
 
   # (c) TETO lido DO ARQUIVO. Passar do teto reprova; e o numero da mensagem vem do `meta:`,
   #     nunca de constante no script — um numero aqui e outro la seria o mesmo
@@ -5953,7 +6110,11 @@ run_kg_backlog_selftests() {
       #    para produzir HARD.
       h_ctrl="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
       h_ctrl="$(printf '%s' "${h_ctrl}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
-      sed -i '0,/^    status: open$/s//    status: done/' "${sb}/docs/onion/graph/fios-abertos.kg.yaml"
+      # mesma razão de (b): mutar um `open` existente depende do CONTEÚDO do arquivo vivo, e o
+      # backlog zerado torna o `sed` um no-op. Aqui não há `_prove_mutation` para avisar — o caso
+      # apenas compararia dois lints idênticos e passaria a medir o nada.
+      _fixture_done_nu "${sb}/docs/onion/graph/fios-abertos.kg.yaml" "${sb}/.done-nu.tmp"
+      mv "${sb}/.done-nu.tmp" "${sb}/docs/onion/graph/fios-abertos.kg.yaml"
       h_mut="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
       h_mut="$(printf '%s' "${h_mut}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
       if [ -z "${h_ctrl}" ] || [ -z "${h_mut}" ]; then

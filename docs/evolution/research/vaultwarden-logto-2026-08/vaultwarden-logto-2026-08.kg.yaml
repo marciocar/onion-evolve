@@ -1,0 +1,164 @@
+meta:
+  id: vaultwarden-logto-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-10
+  date: 2026-08-10
+  note: >
+    Pesquisa profunda: adicionar Vaultwarden (cofre self-hosted) a VPS do Onion, integrado ao Logto.
+    Tres frentes: estado externo do produto/SSO (fonte datada), terreno medido na propria VPS, e uma
+    verificacao focada que so existiu porque as duas primeiras DISCORDARAM. RESULTADO PRINCIPAL: e
+    viavel e o unico bloqueador candidato caiu na medicao — MAS o que o SSO entrega e conveniencia de
+    login, nunca reducao de segredo. A senha mestra permanece o unico segredo raiz do cofre.
+    Dois achados COLATERAIS de producao apareceram no caminho e nao sao sobre Vaultwarden.
+
+nodes:
+  # ── A TESE QUE DECIDE ────────────────────────────────────────────────────────
+  - id: C_SSO_NAO_REDUZ_SEGREDO
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "O CORACAO DA DECISAO, e ele nao e sobre configuracao. A wiki oficial do Vaultwarden diz literalmente `A master password will still be required and not controlled by the SSO`. Num cofre zero-knowledge a chave de cifra deriva da senha mestra NO CLIENTE — logo comprometer a sessao do Logto permite TENTAR logar, nunca ler o cofre. Consequencia que inverte a expectativa ingenua: integrar ao Logto NAO tira um segredo do mundo, ADICIONA um sistema ao caminho. O ganho real e provisionamento/desprovisionamento centralizado e botao unico, que e valor operacional legitimo — mas quem adotar esperando `o Logto passa a guardar a chave` vai adotar cerimonia. ⚠️ E isto ALINHA com o que a casa ja pratica: e a mesma forma do INVARIANTE 0 do onion-pessoal (KG cru nunca sai do device). Nao e limitacao a contornar; e a propriedade a preservar."
+    trace: "https://github.com/dani-garcia/vaultwarden/wiki/Enabling-SSO-support-using-OpenId-Connect"
+
+  - id: E_SEM_EQUIVALENTE_A_KEY_CONNECTOR
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-10
+    verified_against: PR-7534-ABERTO-criado-2026-07-31-nao-mesclado
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "O QUE FECHARIA O BURACO NAO EXISTE NO VAULTWARDEN. O Bitwarden comercial tem duas formas, e elas sao moralmente diferentes: Key Connector (Enterprise) custodia a chave no servidor da empresa e OBRIGA o membro a REMOVER a senha mestra — deixa de ser zero-knowledge no sentido estrito; e Trusted Devices (Business+), que PRESERVA zero-knowledge (um dispositivo destrava com a senha mestra uma vez, os demais sao aprovados por dispositivo confiavel ou admin). No Vaultwarden: Key Connector nao tem equivalente nem no roadmap; Trusted Device Encryption e o PR #7534, ABERTO, criado em 2026-07-31 — dias antes desta pesquisa. Planejar contando com ele seria contar com o que nao existe. A senha mestra e PERMANENTE no desenho de hoje."
+    trace: "https://github.com/dani-garcia/vaultwarden/pull/7534"
+
+  # ── O BLOQUEADOR QUE SO APARECEU NO CRUZAMENTO ───────────────────────────────
+  - id: E_ES384_ERA_O_BLOQUEADOR_CANDIDATO
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: discovery-vivo-declara-ES384-sem-RS256
+    status: refuted
+    impact: 4
+    confidence: 1.0
+    label: "NENHUMA DAS DUAS PESQUISAS ACHOU ISTO SOZINHA — foi o cruzamento. A frente externa marcou como NAO VERIFICADO o path de discovery do Logto; a frente de terreno MEDIU ao vivo: `https://auth.onionevolve.com/oidc/.well-known/openid-configuration` declara `id_token_signing_alg_values_supported: [ES384]`, SEM RS256. Nenhuma das duas cruzou isso com o cliente. E o padrao e documentado: ES384-por-padrao do Logto ja quebrou kubelogin (issue #1210, com o erro literal `expected RS256 got ES384`) e traefik-forward-auth (#358). Nenhum guia existente de Vaultwarden pegaria — Keycloak, Authentik e Zitadel emitem RS256. LICAO DE METODO: duas passadas independentes que DISCORDAM sao sinal, nao ruido; a discordancia foi o que produziu a terceira medicao."
+    trace: "https://github.com/int128/kubelogin/issues/1210"
+
+  - id: E_ES384_CAIU_NA_MEDICAO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-10
+    verified_against: codigo-fonte-openidconnect-4.0.1-p384-VerifyingKey-verify-ativo
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    label: "O BLOQUEADOR CAIU, e o achado e melhor que a resposta. O `doc-comment` do enum `CoreJwsSigningAlgorithm` da crate `openidconnect` 4.0.1 marca `EcdsaP384Sha384` como `(currently unsupported)`. O README do MESMO repo declara ECDSA P-256/P-384 como suportado. Contradicao interna — e quem desempatou foi o CODIGO: `src/core/crypto.rs` da 4.0.1 tem `verify_ec_signature` usando `p384::ecdsa::VerifyingKey` com `.verify()` real; SO `P521` cai em `UnsupportedAlg`. O doc-comment esta STALE. E `declarado != verificado` dentro de uma dependencia de terceiro — a mesma classe que esta casa cacca em si mesma, agora encontrada fora. CONFIRMACAO CRUZADA: o que a crate REALMENTE nao suporta e HMAC, e ai o doc-comment e a wiki do Vaultwarden CONCORDAM. REDE DE SEGURANCA INDEPENDENTE: o Logto permite rotacionar a chave privada escolhendo RSA (Console -> Tenant settings -> OIDC configs), entao mesmo que o codigo surpreendesse em producao ha saida documentada."
+    trace: "https://docs.rs/openidconnect/4.0.1/openidconnect/core/enum.CoreJwsSigningAlgorithm.html"
+
+  # ── MATURIDADE ──────────────────────────────────────────────────────────────
+  - id: E_SSO_MADURO_MAS_JOVEM
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-10
+    verified_against: PR-3899-merged-2025-08-08-v1.35.0-2025-12-27-CVEs-ate-v1.37.x
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    label: "NAO E MAIS FORK: o PR #3899 (`SSO using OpenID Connect`, autor Timshel) foi MESCLADO no upstream `dani-garcia/vaultwarden` em 2025-08-08, e a primeira release estavel com SSO foi a v1.35.0 (2025-12-27). O fork nao morreu — virou o motor do upstream. MAS em seis meses sairam correcoes de MULTIPLOS CVEs especificos de SSO (CSRF no login, enumeracao de usuario/organizacao, SSO binding, SSRF), e a v1.37.0 (2026-07-24) e OBRIGATORIA para clientes >=2026.7.0. E producao com a ressalva de acompanhar release de perto — nao e superficie assentada. Fricoes abertas medidas: usuario `SSO_ONLY` nao recebe convite de organizacao (#7072) e sync falhando no desktop com SSO obrigatorio (#6826)."
+    trace: "https://github.com/dani-garcia/vaultwarden/pull/3899"
+
+  - id: E_PRIMEIRO_CASO_DOCUMENTADO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-10
+    verified_against: busca-literal-vaultwarden-logto-sem-resultado-guias-cobrem-outros-6
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "NAO HA NENHUM RELATO PUBLICO de Vaultwarden + Logto. Os provedores com guia testado (wiki oficial + SSO.md do fork) sao Keycloak, Authentik, Zitadel, Google, Microsoft Entra ID e Casdoor. O protocolo e padrao, entao ausencia de guia nao e impedimento — mas significa depurar detalhes do Logto (formato de claims, comportamento de `offline_access`, o issuer com sufixo `/oidc`) SEM referencia pronta. Bom para o Onion (vira contribuicao publicavel), ruim para o cronograma. ⚠️ `offline_access` merece teste especifico: a wiki cita que o Authentik >=2024.2 precisa dele para obter refresh token, e IdP que so emita access token de vida curta produz sessao que expira mal."
+
+  # ── O TERRENO ───────────────────────────────────────────────────────────────
+  - id: E_TERRENO_E_COPIAVEL
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: KB-vps-tool-repo-skeleton-mais-3-repos-vivos-e-caddy-com-conf.d
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    label: "O PADRAO NAO PRECISA SER INVENTADO — esta escrito como KB canonica (`docs/knowledge-base/tools/vps-tool-repo-skeleton.md`) e vivo em tres repos. Forma a copiar: repo `onion-vaultwarden`, container `onion-vps-vaultwarden`, `ports: '127.0.0.1:<porta>:80'` (OBRIGATORIO — o Docker fura o ufw nesta maquina; o bind e a cura na fonte e o `onion-vps-docker-firewall` e so a rede de seguranca), segredos em `pass onion/vaultwarden-*` via `.envrc`+`up.sh` com `${VAR:?}` (fail-closed), healthcheck no loopback, `mem_limit` explicito, vhost em `/etc/caddy/conf.d/` no molde do `console.sh` (que VALIDA antes de aplicar), e `backup.sh` com verificacao de integridade + retencao 14. Registro: NAO ha registry central por decisao explicita — a ferramenta ganha linha no ledger por-tool de `onion-vps-catalog-doctrine.md` e le `members.yaml` para identidade, nunca inventa tabela propria de usuarios."
+    trace: "docs/knowledge-base/tools/vps-tool-repo-skeleton.md"
+
+  - id: Q_QUATRO_PENDENCIAS_DO_TERRENO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: dns-nxdomain-medido-backup-sem-cifra-em-repouso-swap-8de8-fail2ban-ausente
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "O QUE O TERRENO NAO RESOLVE, e nenhuma e sobre o Vaultwarden em si. (1) DNS: `vault.onionevolve.com` e NXDOMAIN e NAO ha wildcard — sem criar o registro A na Hostinger o Caddy nao emite certificado, e o Web Vault no NAVEGADOR nao funciona sem contexto seguro (restricao da WebCrypto API, nao do produto: so `https://` ou `http://localhost`, sem flag que contorne). E pre-requisito, nao detalhe. (2) BACKUP DE COFRE E OUTRA CATEGORIA: as rotinas da casa funcionam (14 dumps consecutivos, verificacao de integridade que falha alto) mas NAO cifram em repouso nem saem da maquina — tolerantevel para o IdP, decisao consciente para um cofre cujo conteudo E o material sensivel. Alem do banco, o backup precisa de `attachments/`, `config.json` (sensivel em texto plano) e `rsa_key.*`. (3) SWAP 100% CONSUMIDO (8/8 Gi) — foi o que motivou os `mem_limit` do Logto; a ferramenta nova nasce com limite explicito. (4) SEM RATE LIMIT NATIVO: o Vaultwarden nao tem lockout de forca-bruta; a wiki de hardening recomenda Fail2Ban na frente, com deteccao de IP real atras de proxy."
+
+  # ── COLATERAIS: producao, nao Vaultwarden ───────────────────────────────────
+  - id: I_CONSOLE_DO_LOGTO_ESTA_PUBLICO
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: logto-console.caddy-sem-.disabled-e-HTTP-302-no-dominio-publico
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "DEPENDE DO MAESTRO — nao e minha decisao fechar ferramenta da VPS. Medido por mim, nao herdado do agente: `/etc/caddy/conf.d/logto-console.caddy` esta ATIVO (sem sufixo `.disabled`) e `console.onionevolve.com` responde 302. TRES documentos declaram que ele fica DESLIGADO por padrao — o README do onion-logto, o proprio bloco do vhost, e o cabecalho do `logto-provision.sh` (`o vhost console.onionevolve.com esta DESLIGADO por desenho`). E `declarado != verificado` no painel de administracao do provedor de identidade. O interruptor existe e valida antes de aplicar: `/home/marcio/onion-logto/console.sh off`. POR QUE ISTO ENTRA NUMA PESQUISA SOBRE COFRE: somar um cofre de senhas a caixa enquanto o painel do IdP esta aberto e a combinacao que merece decisao explicita, nao silencio."
+    trace: "/etc/caddy/conf.d/logto-console.caddy"
+
+  - id: I_PROVISION_FICOU_PARA_TRAS_NO_RENAME
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 1.0
+    label: "INSTANCIA DA MIGALHA `rename-verifica-por-ausencia-da-palavra`, e o diagnostico do agente estava ERRADO — corrigido por medicao. Ele afirmou que `qualquer caminho por _dk exec ${PG_CONTAINER} falha hoje`. NAO PROCEDE: `PG_CONTAINER` e definida em `logto-provision.sh:39` e NUNCA USADA — nao existe caminho de execucao quebrado. O defeito real e outro e mais sutil: uma variavel MORTA com o nome pre-rename (`onion-logto-postgres`, o container vivo e `onion-vps-logto-postgres`), mais DUAS strings (linhas 167 e 392) que entregam ao operador um `docker exec` que falha — e entregam dentro do bloco `DIAGNOSTICO EM UM COMANDO`, ou seja, exatamente quando quem le ja esta em apuros. A varredura `grep -w` que a migalha prescreve achou os 3 sitios no core; nenhum residuo fora. O doc do incidente afirma que as refs foram atualizadas no rename de 2026-08-05 — este arquivo ficou de fora da varredura, que e literalmente o modo de falha que a migalha descreve."
+    trace: "ops/bridge-auth/logto-provision.sh"
+
+  # ── VEREDITO ────────────────────────────────────────────────────────────────
+  - id: D_VIAVEL_COM_EXPECTATIVA_CALIBRADA
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    label: "VIAVEL, e o unico bloqueador candidato caiu na medicao. Vaultwarden e a escolha obvia sobre Bitwarden self-hosted nesta maquina: AGPL-3.0, ordens de magnitude mais leve (o Bitwarden oficial pede 2GB minimo / 4GB recomendado), clientes oficiais funcionam sem modificacao, e libera de graca o que la exige licenca (organizacoes, grupos, event logs, anexos, TOTP, Send, Emergency Access, 2FA). O que NAO tem: login por Passkey, New Device Login Protection, e a API publica de organizacao completa. A CONDICAO E DE EXPECTATIVA, NAO DE CONFIGURACAO: adotar sabendo que SSO aqui e conveniencia de login e provisionamento — o segredo raiz continua sendo a senha mestra, fora do Logto, sem substituto server-side disponivel. GATED no que depende do maestro: criar o DNS, decidir sobre o console aberto, e decidir se backup de cofre exige cifra em repouso + saida da maquina antes de existir cofre."
+
+edges:
+  - from: C_SSO_NAO_REDUZ_SEGREDO
+    to: D_VIAVEL_COM_EXPECTATIVA_CALIBRADA
+    edge_type: CONSTRAINS
+  - from: E_SEM_EQUIVALENTE_A_KEY_CONNECTOR
+    to: C_SSO_NAO_REDUZ_SEGREDO
+    edge_type: SUPPORTS
+  - from: E_ES384_ERA_O_BLOQUEADOR_CANDIDATO
+    to: D_VIAVEL_COM_EXPECTATIVA_CALIBRADA
+    edge_type: CONSTRAINS
+  - from: E_ES384_CAIU_NA_MEDICAO
+    to: E_ES384_ERA_O_BLOQUEADOR_CANDIDATO
+    edge_type: REFUTES
+  - from: E_SSO_MADURO_MAS_JOVEM
+    to: D_VIAVEL_COM_EXPECTATIVA_CALIBRADA
+    edge_type: SUPPORTS
+  - from: E_PRIMEIRO_CASO_DOCUMENTADO
+    to: D_VIAVEL_COM_EXPECTATIVA_CALIBRADA
+    edge_type: CONSTRAINS
+  - from: E_TERRENO_E_COPIAVEL
+    to: D_VIAVEL_COM_EXPECTATIVA_CALIBRADA
+    edge_type: SUPPORTS
+  - from: Q_QUATRO_PENDENCIAS_DO_TERRENO
+    to: D_VIAVEL_COM_EXPECTATIVA_CALIBRADA
+    edge_type: CONSTRAINS
+  - from: I_CONSOLE_DO_LOGTO_ESTA_PUBLICO
+    to: Q_QUATRO_PENDENCIAS_DO_TERRENO
+    edge_type: SUPPORTS
+  - from: I_PROVISION_FICOU_PARA_TRAS_NO_RENAME
+    to: E_TERRENO_E_COPIAVEL
+    edge_type: CONSTRAINS
