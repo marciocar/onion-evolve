@@ -131,8 +131,37 @@ fi
 # HASH CANÔNICO — sem isto, `diff.noprefix` ou `core.abbrev` no ~/.gitconfig de quem carimba produz
 # um sha diferente de quem valida, e o artefato nasce CADUCO sem nenhuma pista do motivo. Medido:
 # três configs pessoais comuns, três hashes distintos para o MESMO diff.
-DIFF_SHA="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
-              "${BASE}" HEAD -- . ":(exclude)${REVIEW_DIR}" 2>/dev/null | sha256sum | cut -c1-64)"
+# ⚠️ ÁRVORE SUJA → COMPARE COM O ÍNDICE. A versão anterior comparava sempre `BASE..HEAD`, ou seja,
+# só COMMITS. No pre-commit o `HEAD` ainda é o commit ANTERIOR: o conteúdo em stage NAO ENTRAVA na
+# conta, então o hash prospectivo — o que o autor calcula com `--cached`, obedecendo — NAO PODIA
+# casar. Do 2o commit em diante o gate reprovava exatamente quem tinha obedecido.
+#
+# GATILHO MEDIDO ANTES DE MEXER, como o nó do backlog exigia: 23 commits numa única sessão
+# carregam `--no-verify DECLARADO`. Vinte e três vezes o autor escreveu o resíduo, calculou o hash
+# e mesmo assim teve de contornar o hook. GUARDA QUE PUNE QUEM OBEDECE ENSINA A IGNORAR A GUARDA —
+# e o custo não é o bypass, é que o bypass vira idioma e um dia esconde uma falta de verdade.
+#
+# A escolha é a mesma da catraca da REGRA 49 (`_baseline_ref`): perguntar em que SITUAÇÃO se está,
+# em vez de assumir uma. Árvore suja = pré-commit → o alvo é o ÍNDICE. Árvore limpa = pós-commit
+# (o CI, que é quem audita) → o alvo é `HEAD`, exatamente como antes.
+# ⚠️ A DIRECAO DO DIFF IMPORTA, e a 1a versao a INVERTEU no ramo limpo. O codigo montava
+# `${_DIFF_TARGET} "${BASE}"`, que com _DIFF_TARGET=HEAD vira `git diff HEAD BASE` — invertido —,
+# e hash de diff invertido e OUTRO hash. O CI pegou: ARTEFATO-CADUCO sobre o residuo deste PROPRIO
+# PR. Por isso cada ramo escreve a invocacao INTEIRA: variavel que muda de POSICAO SEMANTICA entre
+# ramos e a forma mais barata de inverter um argumento sem ninguem ver.
+#
+# E o meu 1o teste desta cura NAO reproduziu o defeito, porque eu medi a forma PRETENDIDA
+# (`BASE HEAD`) em vez da que o codigo executa. Medir o que se quis dizer, e nao o que roda, foi o
+# erro mais repetido desta sessao.
+if git diff --quiet HEAD 2>/dev/null; then
+  # árvore limpa: pós-commit / CI (quem AUDITA) — exatamente como sempre foi
+  DIFF_SHA="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                "${BASE}" HEAD -- . ":(exclude)${REVIEW_DIR}" 2>/dev/null | sha256sum | cut -c1-64)"
+else
+  # árvore suja: pré-commit — o alvo é o ÍNDICE, o que VAI virar o commit
+  DIFF_SHA="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                --cached "${BASE}" -- . ":(exclude)${REVIEW_DIR}" 2>/dev/null | sha256sum | cut -c1-64)"
+fi
 SLUG="$(printf '%s' "${BRANCH}" | tr '/' '-')"
 ART="${REVIEW_DIR}/${SLUG}.md"
 

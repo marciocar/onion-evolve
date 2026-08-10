@@ -4789,8 +4789,23 @@ run_review_artifact_selftests() {
   # flags, o hash do fixture divergia do hash do helper e (c)/(e) reprovavam por CADUCO. É o mesmo
   # que aconteceria a quem tem `diff.noprefix` ou `core.abbrev` no ~/.gitconfig: artefato nasce
   # caduco sem pista do motivo (medido: 3 configs comuns, 3 hashes distintos para o MESMO diff).
-  _sha_of() { ( cd "$1" && git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
-                  main HEAD -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64 ); }
+  # ⚠️ ESPELHA O RUNNER, inclusive na ESCOLHA DO ALVO. A REGRA 56 passou a decidir por SITUACAO
+  # (arvore suja -> indice; limpa -> HEAD), e uma fixture que fixasse `main HEAD` calcularia um hash
+  # que o gate NUNCA produz naquele estado — a bancada acusaria ARTEFATO-CADUCO sobre artefato
+  # CORRETO. E `bancada-espelha-o-runner`: 26/26 verdes numa bancada que nao copiava as opcoes do
+  # runner ja mataram um gate inteiro nesta casa.
+  # ⚠️ INVOCACAO INTEIRA EM CADA RAMO, e a razao e um defeito MEDIDO duas vezes no mesmo dia:
+  # montar `${alvo} main` faz o ramo limpo virar `git diff HEAD main` — INVERTIDO —, e hash de diff
+  # invertido e outro hash. Aconteceu no `review-artifact-check.sh` (o CI pegou) e aqui, no espelho
+  # dele. Variavel que muda de POSICAO SEMANTICA entre ramos inverte um argumento sem ninguem ver.
+  _sha_of() { ( cd "$1"
+    if git diff --quiet HEAD 2>/dev/null; then
+      git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+          main HEAD -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64
+    else
+      git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+          --cached main -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64
+    fi ); }
   _art() {  # $1=dir $2=sha $3=extra-campos(0/1)
     { printf -- '---\n'
       printf 'reviewed_diff_sha256: %s\n' "$2"
@@ -4942,6 +4957,49 @@ run_review_artifact_selftests() {
     record_fail "review-artifact: (g) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi
   rm -rf "${mut}"
+
+  # (j)(k) A SITUACAO DECIDE O ALVO DO DIFF — e este par nasceu de um dano MEDIDO, nao de teoria:
+  # 23 commits de UMA sessao carregam `--no-verify DECLARADO`. Vinte e tres vezes o autor escreveu
+  # o residuo, calculou o hash prospectivo e MESMO ASSIM teve de contornar o hook, porque a regra
+  # comparava sempre `BASE..HEAD` (so COMMITS) e no pre-commit o HEAD e o commit ANTERIOR — o
+  # conteudo em stage nao entrava na conta e o hash do autor NAO PODIA casar.
+  # GUARDA QUE PUNE QUEM OBEDECE ENSINA A IGNORAR A GUARDA. E o custo nao e o bypass: e o bypass
+  # virar idioma e um dia esconder uma falta de verdade.
+  # (j) arvore SUJA (pre-commit) -> alvo e o INDICE, e obedecer passa.
+  # (k) arvore LIMPA (pos-commit / CI, que e quem AUDITA) -> alvo segue sendo HEAD, inalterado.
+  local rw
+  rw="$(mktemp -d)"
+  if git -C "${REPO_ROOT}" archive HEAD 2>/dev/null | tar -x -C "${rw}" 2>/dev/null; then
+    ( cd "${rw}" && git init -q . && git add -A \
+      && git -c user.email=t@t -c user.name=t commit -qm base && git branch -qm main ) >/dev/null 2>&1
+    local h_prosp h_calc target
+    ( cd "${rw}" && git checkout -q -b feat/t && printf 'x\n' > zz.txt && git add -A ) >/dev/null 2>&1
+    # o hash que o AUTOR calcula, obedecendo (o indice)
+    h_prosp="$(cd "${rw}" && git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                 --cached main -- . ':(exclude)docs/evolution/review' | sha256sum | cut -c1-64)"
+    # o que a REGRA 56 calcula na MESMA situacao (arvore suja)
+    if ( cd "${rw}" && git diff --quiet HEAD 2>/dev/null ); then target="HEAD"; else target="--cached"; fi
+    # invocacao INTEIRA por ramo, pelo mesmo motivo dos outros dois sitios: `${target} main` faria
+    # o ramo limpo virar `HEAD main`, invertido. Aqui e LATENTE (a asercao exige --cached), e
+    # armadilha latente e a que sobrevive ao refactor.
+    if [ "${target}" = "--cached" ]; then
+      h_calc="$(cd "${rw}" && git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                  --cached main -- . ':(exclude)docs/evolution/review' | sha256sum | cut -c1-64)"
+    else
+      h_calc="$(cd "${rw}" && git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                  main HEAD -- . ':(exclude)docs/evolution/review' | sha256sum | cut -c1-64)"
+    fi
+    if [ "${target}" = "--cached" ] && [ "${h_prosp}" = "${h_calc}" ]; then
+      record_pass "review-artifact: (j) arvore SUJA -> alvo e o INDICE; o hash de quem OBEDECE casa"
+    else record_fail "review-artifact: (j) pre-commit" "target=${target}; prospectivo=${h_prosp:0:12} calculado=${h_calc:0:12} — a regra punia quem obedece"; fi
+    # (k) o par: depois de commitar, arvore limpa -> HEAD, e o CI segue vendo o mesmo de sempre
+    ( cd "${rw}" && git -c user.email=t@t -c user.name=t commit -qm c1 ) >/dev/null 2>&1
+    if ( cd "${rw}" && git diff --quiet HEAD 2>/dev/null ); then
+      record_pass "review-artifact: (k) arvore LIMPA -> alvo volta a ser HEAD (o CI, que audita, nao mudou)"
+    else record_fail "review-artifact: (k) pos-commit" "arvore ficou suja depois do commit — o ramo de CI mediria o alvo errado"; fi
+  else record_skip "review-artifact: (j)(k) sandbox git nao montou"; fi
+  rm -rf "${rw}"
+
 }
 
 # Modo empty-result-guard — .claude/hooks/bash-empty-result-guard.sh é a guarda anti-fail-open do
