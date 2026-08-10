@@ -47,20 +47,20 @@ emit_entries() {
     date="${hdr%%  · *}"; date="${hdr%% · *}"          # 1º campo
     # alvo = tudo após o último " · alvo:"
     case "${hdr}" in
-      *" · alvo: "*) alvo="${hdr##* · alvo: }" ;;
+      *" · alvo: "*) target="${hdr##* · alvo: }" ;;
       *) continue ;;                                   # sem alvo declarado → ignora
     esac
     # subject = entre "<date> · " e o " · <CLASS> · alvo:"
     subj="${hdr#"${date}" · }"
     subj="$(printf '%s' "${subj}" | sed -E 's/ · (COMPATÍVEL|BREAKING|COMPATIVEL) · alvo:.*$//')"
     # destinatários resolvidos (resolve-target normaliza o parêntese) — memoizado por alvo
-    recips="${CACHE[$alvo]:-MISS}"
+    recips="${CACHE[$target]:-MISS}"
     if [ "${recips}" = "MISS" ]; then
-      recips="$(bash "${RESOLVE}" "${alvo}" 2>/dev/null | paste -sd, -)"
-      CACHE[$alvo]="${recips}"
+      recips="$(bash "${RESOLVE}" "${target}" 2>/dev/null | paste -sd, -)"
+      CACHE[$target]="${recips}"
     fi
     [ -n "${recips}" ] || continue                     # nenhum/futuros/irresolvível → omite
-    printf '%s\t%s\t%s\t%s\n' "${date}" "${recips}" "${alvo}" "${subj}"
+    printf '%s\t%s\t%s\t%s\n' "${date}" "${recips}" "${target}" "${subj}"
   done < <(grep -nE '^## 20[0-9]{2}-[0-9]{2}-[0-9]{2} · ' "${CHANGELOG}")
 }
 
