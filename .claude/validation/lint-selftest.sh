@@ -5614,9 +5614,13 @@ local unquoted=1 _lib_beside=2 _missing_deps=3 dirty_before=4 total=5 base=6 fin
 
   # (e) COMENTARIO E PROSA, e prosa e pt-BR POR DOUTRINA. Uma varredura minha a mao ja errou assim
   #     no PR #565, acusando 48 "sobras" que eram todas comentario.
-  d="$(mktemp -d)"; _lang_repo "$d" '#!/usr/bin/env bash
-# o teto do arquivo e a linha de saida do grafo, com aspas e vereditos
-local ok=1'
+  # ⚠️ A FIXTURE PRECISA CONTER UMA DECLARACAO DENTRO DO COMENTARIO, senao o caso NAO PODE FALHAR:
+  #    passada adversarial mediu que, sem isso, apagar o strip de comentario INTEIRO mantinha os 7
+  #    casos verdes — a propriedade-manchete da regra era a unica que a bancada nao conseguia
+  #    detectar. Um caso que nao pode falhar nao e teste, e ruido com cara de cobertura.
+  d="$(mktemp -d)"; _lang_repo "$d" "#!/usr/bin/env bash
+# exemplo de uso: $(printf 'contagem')=0 e o teto do arquivo com aspas e vereditos
+local ok=1"
   rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ]; then
     record_pass "idioma: (e) COMENTARIO em pt-BR nao acusa — a doutrina e codigo em ingles, PROSA em pt-BR"

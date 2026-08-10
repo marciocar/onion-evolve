@@ -48,18 +48,53 @@ BASELINE="${REPO_ROOT}/.claude/validation/identifier-language-baseline.txt"
 
 # ── extração: identificadores DECLARADOS, ignorando comentário ────────────────────────────────
 # `local x=` · `x=` no início da linha · `function nome` · `nome() {`
+# ⚠️ A ORDEM E O QUE FAZ A GUARDA SERVIR, e a 1a versao a errou nas DUAS pontas. Passada
+# adversarial mediu os dois danos, e o pior estava no artefato que EU entreguei:
+#   · CORTAR COMENTARIO ANTES DE ELIDIR ASPAS lia `chave=` DENTRO de string como declaracao.
+#     Prova: 2 das 7 "dividas" do baseline que eu gerei NAO ERAM IDENTIFICADORES — eram prosa
+#     pt-BR em mensagem, nascidas carimbadas como divida. E um script com identificadores 100%
+#     INGLES e mensagens em pt-BR (exatamente o que a doutrina MANDA) levava 5 HARD.
+#   · E `sed 's/#.*//'` DECAPITAVA a linha em `$#`, `${v#pfx}` e `"#fff"` — o idioma de
+#     arg-parsing do proprio repo, em 27 arquivos. Declaracao pt-BR REAL depois disso ficava
+#     invisivel: fail-open medido em 3 declaracoes.
+# A ordem certa: elide o CORPO das aspas primeiro (vira vazio), e so entao corta `#`, e apenas
+# quando ele INICIA token — nunca colado a `$` nem dentro de `${...}`.
+_elide() {
+  sed -E 's/"[^"]*"/""/g; s/'"'"'[^'"'"']*'"'"'/'"'"''"'"'/g' "$1" 2>/dev/null \
+    | sed -E 's/(^|[[:space:]])#.*$/\1/'
+}
 _ids() {
   local f="$1"
-  sed 's/#.*//' "$f" 2>/dev/null | grep -oE '(^|[[:space:]])(local[[:space:]]+)?[a-zA-Z_][a-zA-Z0-9_]*=' \
+  _elide "$f" | grep -oE '(^|[[:space:]])(local[[:space:]]+)?[a-zA-Z_][a-zA-Z0-9_]*=' \
     | sed 's/^[[:space:]]*//; s/^local[[:space:]]*//; s/=$//'
-  sed 's/#.*//' "$f" 2>/dev/null | grep -oE '(^|[[:space:]])function[[:space:]]+[a-zA-Z_][a-zA-Z0-9_]*' | sed 's/.*function[[:space:]]*//'
-  sed 's/#.*//' "$f" 2>/dev/null | grep -oE '^[a-zA-Z_][a-zA-Z0-9_]*\(\)' | sed 's/()$//'
+  _elide "$f" | grep -oE '(^|[[:space:]])function[[:space:]]+[a-zA-Z_][a-zA-Z0-9_]*' | sed 's/.*function[[:space:]]*//'
+  _elide "$f" | grep -oE '^[a-zA-Z_][a-zA-Z0-9_]*\(\)' | sed 's/()$//'
 }
 
 WORDLIST="$(grep -v '^[[:space:]]*\(#\|$\)' "${WORDS}" | tr '\n' '|' | sed 's/|$//')"
 [ -n "${WORDLIST}" ] || { printf 'identifier-language: lista VAZIA — a guarda mediria o nada.\n' >&2; exit 2; }
 
+# ── UNIVERSO: rastreado UNIAO nao-rastreado, e VAZIO nunca vira "ok" ─────────────────────────
+# Duas fugas medidas por passada adversarial, e a segunda e a pior:
+#   · `git ls-files` sozinho NAO VE arquivo untracked — e "ocorrencia NOVA e HARD" e justamente o
+#     contrato desta regra. Codigo novo esta untracked no instante exato em que se roda o lint:
+#     medido, o MESMO arquivo passava rc=0 antes do `git add` e reprovava depois.
+#   · e universo VAZIO imprimia `✅ nenhum identificador NOVO em pt-BR`, rc=0. O caso mais afiado e
+#     o adotante recem-adotado: `/meta:adopt` instala `.claude/` SEM commitar, entao 51 scripts no
+#     disco, 0 rastreados, e a guarda nascia MUDA no dia 1 EXIBINDO APROVACAO. E a mesma classe que
+#     a linha da lista ausente ja trata certo (exit 2) e que aqui foi esquecida.
+_universe() {
+  { git ls-files '.claude/**/*.sh' '.claude/*.sh' 2>/dev/null || true
+    find .claude -name '*.sh' -type f 2>/dev/null || true
+  } | sed 's#^\./##' | grep -v '/fixtures/' | sort -u
+}
+
 TMP="$(mktemp)"; trap 'rm -f "${TMP}"' EXIT
+_UNI="$(_universe | grep -c . || true)"
+if [ "${_UNI:-0}" -eq 0 ]; then
+  printf 'identifier-language: universo VAZIO — nenhum .sh sob .claude/. Repo sem git, fora do checkout, ou .claude/ ainda nao instalado. "Nao sei" NUNCA vira "ok".\n' >&2
+  exit 2
+fi
 while IFS= read -r f; do
   [ -f "${f}" ] || continue
   _ids "${f}" | sort -u | awk -v W="${WORDLIST}" -v F="${f}" '
@@ -81,7 +116,7 @@ while IFS= read -r f; do
       m = split(tolower(s), seg, "_")
       for (i = 1; i <= m; i++) if (seg[i] != "" && (seg[i] in dic)) { print F "\t" id "\t" seg[i]; break }
     }'
-done < <(git ls-files '.claude/**/*.sh' '.claude/*.sh' 2>/dev/null | grep -v '/fixtures/') | sort -u > "${TMP}"
+done < <(_universe) | sort -u > "${TMP}"
 
 if [ "${FORMAT}" = emit ]; then
   printf '# Baseline da REGRA 60 — identificadores em pt-BR TOLERADOS (divida anterior a 2026-08-09).\n'

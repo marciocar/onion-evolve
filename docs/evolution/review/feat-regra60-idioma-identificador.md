@@ -1,14 +1,14 @@
 ---
 branch: feat/regra60-idioma-identificador
 date: 2026-08-09
-reviewed_diff_sha256: 93debd6c66ded4a16955e8dca3ed2d27eb4725c57a5395fee250af5cf78e5de0
-findings_total: 3
-findings_real: 3
-findings_fixed: 3
-tokens: 0
-duration_min: 0
-verdict: SEM-ELENXO-A-PROPRIA-BANCADA-ACHOU-OS-TRES-E-UM-DELES-INVALIDAVA-METADE-DA-REGRA
-reviewer: sem passada adversarial — ver "O que NÃO foi feito"
+reviewed_diff_sha256: 8e7f64728310449b2ee1c305dc0d1e1d84dd534368cadb54bbf9d31949795153
+findings_total: 25
+findings_real: 11
+findings_fixed: 7
+tokens: 551632
+duration_min: 49
+verdict: FICA-COM-RESSALVA-O-MOTOR-ESTA-CERTO-E-EU-QUASE-O-DESCARTEI
+reviewer: Elenxo — 2 lentes × 2 refutadores + juiz (opus/high, juiz em max), wf_da308fb9-98b
 ---
 
 # REGRA 60 — e a bancada achou que metade da guarda não funcionava
@@ -86,9 +86,61 @@ Isso é o defeito nº1 medido pelo seu efeito, não pelo argumento.
 classificada. Marcado `drifted`, que é o status feito para isso e que **sobe** a atenção em vez de
 zerá-la.
 
+## A passada adversarial — e ela me impediu de descartar um instrumento que funciona
+
+**Veredito: `FICA-COM-RESSALVA`.** E a parte que mais importa é o que o juiz **mediu** e eu não:
+
+> **324 scripts em inglês de terceiros, 810 extrações, ZERO falsos** (com canário vivo). O motor está
+> certo — lista sem homógrafo, split por segmento, baseline e wire-in são a parte sólida. O wire-in
+> **conta de verdade** (HARD 7→8) e baseline ausente é **fail-CLOSED**. **Não mexa nisso.**
+> Todo o defeito está em **três lugares locais**.
+
+### Eu tinha fechado este PR
+
+Reproduzi **um** modo de falha real — heredoc lido como declaração — e **generalizei dele para o
+instrumento inteiro**: *"`grep` sobre linha é o instrumento errado"*. Fechei o PR.
+
+Nunca produzi a evidência que a decisão exigia. O juiz produziu: **324 scripts, zero falsos.**
+Reaberto.
+
+É o mesmo erro que esta sessão passou o dia curando — concluir sobre o todo a partir de uma medição
+parcial — cometido por mim **na hora de descartar**, que é onde ele custa mais caro.
+
+### E a revisão de alinhamento pegou a segunda metade
+
+Eu escrevi que *"o próximo ciclo começa com o diagnóstico completo"*. Medido: **zero menções no
+grafo**, zero no resíduo, zero em `main`. O diagnóstico vivia nos **comentários do PR** — que é
+literalmente `C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO`, a tese fundadora deste backlog.
+
+Pior: o nó do grafo **afirmava o veredito refutado** (*"fechado sem merge, 3 de 4 disseram CAI"*) por
+horas depois de o juiz me desmentir. `declarado ≠ verificado` no meu próprio backlog.
+
+## As quatro curas, todas medidas
+
+**(a) Elidir o corpo das aspas ANTES de cortar comentário** — e cortar `#` só quando **inicia
+token**. Mata **dois achados de uma vez**:
+
+| dano | medido |
+|---|---|
+| string lida como declaração | **2 das 7** "dívidas" do baseline que eu gerei **não eram identificadores** — eram prosa pt-BR em mensagem, nascidas carimbadas como dívida. Script com identificadores 100% ingleses e mensagens pt-BR (o que a doutrina **manda**) levava **5 HARD** |
+| `sed 's/#.*//'` decapitava a linha | em `$#`, `${v#pfx}` e `"#fff"` — o idioma de arg-parsing do próprio repo, **27 arquivos**. Três declarações pt-BR **legítimas** ficavam invisíveis |
+
+**(b) Baseline regenerado depois: 7 → 4**, saindo os **dois fantasmas** mais o `alvoPendente` já
+curado no #570. **Zero entradas novas.**
+
+**(c) Universo = rastreado ∪ não-rastreado, com `exit 2` no vazio.** O pior caso é o adotante
+recém-adotado: `/meta:adopt` instala `.claude/` **sem commitar**, então **51 scripts no disco, 0
+rastreados**, e a guarda nascia **muda no dia 1 exibindo aprovação**. E o mesmo arquivo passava
+`rc=0` antes do `git add` e reprovava depois — *"ocorrência NOVA é HARD"* é o contrato, e código novo
+está untracked no instante exato em que o lint roda.
+
+**(d) A fixture do caso `(e)` passou a conter declaração DENTRO do comentário** — sem isso o caso
+**não podia falhar**: apagar o strip de comentário **inteiro** mantinha 7/7 verdes. Um caso que não
+pode falhar não é teste, é ruído com cara de cobertura. Provado: íntegro `rc=0`, mutante `rc=1`.
+
 ## O que NÃO foi feito, declarado
 
-- **Sem passada adversarial.** As três anteriores desta sessão acharam 18, 21 e 12 defeitos reais, e
+- **As correções do Elenxo não foram re-auditadas** por uma segunda passada. As três anteriores desta sessão acharam 18, 21 e 12 defeitos reais, e
   nas três os piores eram fail-opens que eu **introduzi curando outra coisa**. O que substitui aqui
   é a própria bancada, que achou os três acima — inclusive um que invalidava metade da regra.
   O que um refutador provavelmente atacaria: o extrator é `grep` sobre linha e **não entende string

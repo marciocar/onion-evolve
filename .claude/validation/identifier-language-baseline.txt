@@ -3,8 +3,5 @@
 # Esta lista SO PODE ENCOLHER. Acrescentar entrada aqui e REGRESSAO.
 .claude/utils/co-evolution/reconcile-inputs.sh	alvo
 .claude/validation/federation-radar.sh	atencao
-.claude/validation/federation-status-scan.sh	arquivo
-.claude/validation/kg-radar.sh	alvoPendente
-.claude/validation/lint-selftest.sh	arestas
 .claude/validation/lint-selftest.sh	vazio
 .claude/validation/review-verdict.sh	vazio
