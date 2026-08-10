@@ -1,7 +1,14 @@
 ---
 branch: fix/fixture-nao-depende-do-vivo
-reviewed_at: 2026-08-10
-reviewed_diff_sha256: 91fe0a9068c3dce6379f428cb6b0c55ff02c3250388bf5e12bf4ef72c3363009
+date: 2026-08-10
+reviewed_diff_sha256: 7ec4d4c25975c7313dfdb90d3d24ab2b37a950ce1e7de7ebf51888b7f9a869b7
+findings_total: 6
+findings_real: 6
+findings_fixed: 5
+tokens: 92072
+duration_min: 12
+verdict: REGRA-DERRUBADA-E-REESCRITA-4-DEFEITOS-REAIS-3-DO-LADO-QUE-MAIS-CUSTA
+reviewer: passada adversarial (refutar-nao-aprovar) + reproducao independente minha de cada achado antes de agir
 ---
 
 # A fixture dependia do conteúdo do arquivo que ela testa
@@ -131,3 +138,63 @@ while kill -0 "$BPID" 2>/dev/null; do sleep 30; done
 ```
 
 Remove a classe em vez de escapar dela: não há padrão a casar, logo não há como casar a si mesmo.
+
+---
+
+## Terceira rodada — a passada adversarial derrubou a regra da segunda
+
+⚠️ **A seção acima descreve a 1ª versão da regra e está SUPERADA.** O número "778 passaram" e a
+descrição *"desarma em `-x` e `--older`"* valiam para um código que não existe mais. Fica registrado
+em vez de reescrito: o resíduo é log de rodadas, e apagar a versão derrubada esconderia o custo.
+
+A passada adversarial contra a regra achou **quatro defeitos**, e três do lado que mais custa. Todos
+reproduzidos por mim antes de agir:
+
+| # | defeito | como escapava |
+|---|---|---|
+| i | **cobertura menor que a promessa** | exigia o cluster com `f` como PRIMEIRO token — escapavam `pkill -9 -f` (a forma mais comum do mundo real), `-a -f`, `-u root -f`, `--full` |
+| ii | **falso-positivo em comando de leitura** | `grep -rn "pgrep -f" .claude/` disparava; a própria mensagem de commit também |
+| iii | **a cura recomendada não curava — e a guarda a certificava** | `bash x.sh & until ! pgrep -f '[x]'`: a forma NUA está na linha pelo lançamento, o laço trava, e a guarda ficava MUDA porque via o `[` |
+| iv | **`-A`/`--ignore-ancestors` passava por acidente** | caía no buraco de (i), não era reconhecida |
+
+O **(ii) é o meta-defeito**: quarenta linhas abaixo, no mesmo arquivo, está escrito que o detector (5)
+sofreu exatamente isso e que a cura foi **ancorar em início de comando**. Escrevi a (3b) no dia
+seguinte sem reusar a cura já paga. A casa tinha o remédio no mesmo arquivo.
+
+### Duas afirmações minhas que estavam erradas
+
+1. Disse que os achados de `$$` e `-x` **"não reproduziram"**. Reproduzem — contra a versão que estava
+   no PR. Eu medi contra uma versão mais nova na árvore de trabalho e li a diferença como refutação.
+2. Meu primeiro teste de mutação **calava dos dois lados**: a sonda `grep -rn "pgrep -f"` é silenciada
+   pelo regex de modo-full (`-f"` não é token de opção), não pela âncora. Eu teria concluído
+   *"cláusula indetectável"* sobre uma cláusula sadia. `echo pgrep -f alvo` isola a âncora.
+
+### E o caso (b2d) reprovava sobre uma regra CORRETA
+
+Eu tinha escrito o padrão como `([m]arcador-x.sh)` para escapar do JSON — o parêntese **entra no
+argumento**, a forma nua vira `(marcador-x.sh)` e não ocorre no lançamento. O artifício de escape do
+teste virou parte do dado medido. Mesma família de `bancada-espelha-o-runner`, do lado do **dado**.
+
+### Estado final
+
+Julgamento **por invocação** com dois escopos · modo-full lido de **qualquer** token · âncora em
+início de posição de comando · `-A` reconhecida · e a mensagem nova **`COLCHETE-FURADO`**, que a
+versão anterior não tinha como emitir.
+
+**Matriz 20/20** · bancada **784 / 0 falharam / 0 pularam** · sha estável na corrida.
+
+---
+
+## Erros conhecidos, cada um com cura ou superação anexada
+
+> Diretriz do maestro (2026-08-10): *situação que se repete tem de ser registrada, reavaliada e
+> corrigida — ou ser conhecida, com todo erro tendo proposta de cura ou superação, mesmo em tempo de
+> execução.* **Limite declarado sem proposta é dívida disfarçada de honestidade.**
+
+| erro conhecido | cura ou superação |
+|---|---|
+| a guarda acusa **dado de teste dentro de string** (me atingiu ao testá-la) | **superação**: reusar `unquoted()` do detector (1) para a **âncora**, mantendo o cru para o **argumento**. Não feito agora: seria a 4ª iteração da cura que abriu buraco 3× hoje. **contorno em runtime**: testar via arquivo de matriz, nunca `printf` inline |
+| **bancada não é hermética** contra outra bancada (foi a falha de `graph: determinismo`) | **cura**: fixtures em `mktemp -d` fora do repo, ou `flock`. **contorno**: rodar solo; se determinismo falhar, conferir instância concorrente ANTES de investigar o script |
+| **três sessões no mesmo branch** — escrevi sobre trabalho de outra | **superação**: o farol avisa no **boot**, quando ainda não há colisão. Falta checagem **no momento da escrita** — `PreToolUse(Edit\|Write)` sobre o mesmo `session-beacon.sh check`. O motor já existe |
+| caso `(c)` compara a constante literal `teto declarado 20` | quebra **fazendo barulho** se o cap mudar — lado certo de falhar. **cura**: ler o cap do `meta:` também no teste. Fora do gatilho |
+| `_fixture_done_nu` assume `TETO:` declarado | num backlog sem teto o `sed` do 999 é no-op e herda `SEM-TETO` — **coberto** pelo caso `(d)`, por outro caminho |

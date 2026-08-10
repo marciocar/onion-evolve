@@ -5050,6 +5050,81 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (b2) \`until ! pgrep -f\` → avisa que o laço espera por SI MESMO"
   else record_fail "empty-result-guard: (b2)" "não reagiu ao pgrep -f auto-casante: ${out}"; fi
 
+  # (b2b) COBERTURA — a 2ª versão exigia que o cluster com `f` fosse o PRIMEIRO token, e escapavam
+  #       `pkill -9 -f` (a forma mais comum do mundo real), `-a -f`, `-u root -f` e a longa `--full`.
+  #       Promessa maior que cobertura é `declarado != verificado` dentro da própria guarda.
+  local _cov_fail=0 _cvcmd
+  for _cvcmd in '"pkill -9 -f (lint-selftest)"' \
+                '"until ! pgrep --full (git commit -F); do sleep 30; done"' \
+                '"until ! pgrep -a -f (git commit -F); do sleep 30; done"' \
+                '"pgrep -u root -f (deploy.sh)"'; do
+    out="$(_erg "${_cvcmd}" '""' || true)"
+    printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA' || _cov_fail=$((_cov_fail + 1))
+  done
+  if [ "${_cov_fail}" -eq 0 ]; then
+    record_pass "empty-result-guard: (b2b) cobre \`-9 -f\`, \`-a -f\`, \`-u root -f\` e \`--full\` — não só o dialeto"
+  else record_fail "empty-result-guard: (b2b)" "${_cov_fail}/4 formas de invocação escaparam da regra"; fi
+
+  # (b2c) ISENÇÃO POR INVOCAÇÃO, nunca pelo comando inteiro. As três formas abaixo tinham `[`, `$$`
+  #       ou `-x` presentes por OUTRO motivo, e na 2ª versão isso desarmava a regra sobre a invocação
+  #       CULPADA. Fail-open por escopo largo — a mesma classe que eu já abri duas vezes nesta sessão
+  #       curando outra coisa.
+  local _esc_fail=0
+  for _cvcmd in '"pgrep -f alvo > /tmp/x[1].txt"' \
+                '"LOG=/tmp/d.$$X; until ! pgrep -f (alvo); do sleep 5; done"' \
+                '"pkill -x nginx; until ! pgrep -f (deploy.sh); do sleep 5; done"'; do
+    out="$(_erg "${_cvcmd}" '""' || true)"
+    printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA' || _esc_fail=$((_esc_fail + 1))
+  done
+  if [ "${_esc_fail}" -eq 0 ]; then
+    record_pass "empty-result-guard: (b2c) isenção vale por INVOCAÇÃO — \`[\` em redirect, \`\$\$\` e \`-x\` irmão não desarmam"
+  else record_fail "empty-result-guard: (b2c)" "${_esc_fail}/3 isenções ainda valem para o comando inteiro (fail-open)"; fi
+
+  # (b2d) COLCHETE FURADO — o achado mais caro da passada adversarial: no idioma lança-e-espera a
+  #       forma NUA do padrão está na linha por causa do LANÇAMENTO, o colchete não protege, o laço
+  #       trava — e a guarda ficava MUDA porque via o `[`. Fail-open COM SELO é pior que guarda
+  #       ausente: ela certifica como curado o que trava para sempre.
+  # ⚠️ SEM PARÊNTESES no padrão. A 1ª versão deste caso escrevia `([m]arcador-x.sh)` para escapar do
+  #    JSON — e o parêntese ENTRA no argumento, então a forma nua vira `(marcador-x.sh)`, que não
+  #    ocorre no lançamento. O caso reprovava sobre uma regra CORRETA: o artifício de escape do teste
+  #    virou parte do dado medido. É a mesma família de `bancada-espelha-o-runner`.
+  out="$(_erg '"bash marcador-x.sh & until ! pgrep -f [m]arcador-x.sh; do sleep 5; done"' '""' || true)"
+  if printf '%s' "${out}" | grep -q 'COLCHETE-FURADO'; then
+    record_pass "empty-result-guard: (b2d) colchete com a forma NUA co-ocorrendo → acusa FURADO, não certifica"
+  else record_fail "empty-result-guard: (b2d)" "certificou como curado um colchete que não protege: ${out}"; fi
+
+  # (b2e) RECONHECE A CURA FORTE. `-A`/`--ignore-ancestors` (procps-ng >=4.0) exclui os ancestrais do
+  #       próprio shell — é a cura de VERDADE. Na 2ª versão ela passava por ACIDENTE, caindo no buraco
+  #       de cobertura; guarda que cala por acidente volta a acusar assim que o buraco é tapado.
+  out="$(_erg '"until ! pgrep -A -f (git commit -F); do sleep 30; done"' '""' || true)"
+  if printf '%s' "${out}" | grep -qE 'PGREP-QUE-SE-ENCONTRA|COLCHETE-FURADO'; then
+    record_fail "empty-result-guard: (b2e)" "acusou \`pgrep -A -f\`, que é a cura recomendada: ${out}"
+  else record_pass "empty-result-guard: (b2e) cala em \`pgrep -A -f\` — reconhece a cura, não tropeça nela"; fi
+
+  # (b2f) MUTATION — a passada adversarial provou que remover a 3ª cláusula da 2ª versão mantinha a
+  #       bancada 100% VERDE: a cláusula que produzia os fail-opens não era medida em direção nenhuma.
+  #       Sem este par, os casos acima poderiam virar passe-vácuo de novo. Medição de mão não é
+  #       mecanismo — o mesmo comentário já está no caso (p) deste arquivo, pago em 2026-08-09.
+  local _mut_dir _mut_hook _mut_rc
+  _mut_dir="$(mktemp -d)"
+  sed 's/^    case "${_c}" in pgrep\\ \*|pkill\\ \*|pgrep|pkill) ;; \*) continue ;; esac$/    :/' \
+      "${hook}" > "${_mut_dir}/h.sh"
+  if cmp -s "${hook}" "${_mut_dir}/h.sh"; then
+    record_fail "empty-result-guard: (b2f)" "GUARDA-DA-GUARDA: a mutação da ÂNCORA não foi aplicada (arquivos idênticos) — o sed virou no-op"
+  else
+    # ⚠️ A SONDA IMPORTA MAIS QUE A MUTAÇÃO. A 1ª sonda que escolhi foi `grep -rn "pgrep -f" ...` — e
+    #    ela calava nos DOIS lados, porque ali quem silencia é o regex de modo-full (`-f"` não é
+    #    token de opção), não a âncora. Eu teria concluído "cláusula indetectável" sobre uma cláusula
+    #    sadia. `echo pgrep -f alvo` isola a âncora: é MENÇÃO com espaçamento de invocação.
+    _mut_rc=0
+    printf '{"tool_input":{"command":"echo pgrep -f alvo"},"tool_response":{"stdout":""}}' \
+      | bash "${_mut_dir}/h.sh" >/dev/null 2>"${_mut_dir}/err" || _mut_rc=$?
+    if grep -q 'PGREP-QUE-SE-ENCONTRA' "${_mut_dir}/err" 2>/dev/null; then
+      record_pass "empty-result-guard: (b2f) MUTATION — sem a âncora, a MENÇÃO volta a ser acusada (a âncora é load-bearing)"
+    else record_fail "empty-result-guard: (b2f)" "mutar a âncora NÃO mudou o comportamento — a cláusula é indetectável pela bancada"; fi
+  fi
+  rm -rf "${_mut_dir}"
+
   # (b3) CALA na CURA — o idioma do colchete. Sem este caso a regra poderia ser "acusa sempre que
   #      vir pgrep", que empurraria quem obedece para o bypass (a lição da REGRA 56, que puniu
   #      quem obedecia 23 vezes). A guarda tem de reconhecer a forma correta, não só a errada.
@@ -5057,6 +5132,27 @@ run_empty_result_guard_selftests() {
   if printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
     record_fail "empty-result-guard: (b3)" "acusou o idioma do COLCHETE, que é a cura: ${out}"
   else record_pass "empty-result-guard: (b3) cala no \`pgrep -f '[l]…'\` — reconhece a forma correta"; fi
+
+  # (b4) OS QUATRO FAIL-OPENS DA PRIMEIRA VERSÃO DESTA REGRA, achados na passada adversarial contra
+  #      ela mesma, no PR que a introduziu. A raiz era UMA: as isenções valiam para o COMANDO
+  #      INTEIRO, então bastava um colchete num redirect, um `$$` presente por outro motivo, ou um
+  #      `-x` numa invocação IRMÃ para desarmar a regra sobre a invocação culpada.
+  #      ⚠️ É a TERCEIRA vez nesta sessão que uma cura de fail-open ABRE fail-open. Por isso os
+  #      quatro ficam aqui: sem eles, a segunda versão seria tão não-provada quanto a primeira, e
+  #      a próxima refatoração reabriria os furos sem ninguém notar.
+  local _b4_falhou=0 _b4_desc
+  for _b4_desc in \
+    'pgrep -f meu-alvo > /tmp/saida[1].txt|colchete em REDIRECT, nao no padrao' \
+    'pgrep -f meu-alvo && echo fim-$$|$$ presente por outro motivo' \
+    'pkill -x sleep ; pgrep -f meu-alvo|-x numa invocacao IRMA' \
+    'pgrep -f a[b]c ; pkill -f meu-alvo-real|colchete no 1o, culpado no 2o'; do
+    out="$(_erg "\"${_b4_desc%%|*}\"" '"x"' || true)"
+    if ! printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
+      _b4_falhou=1
+      record_fail "empty-result-guard: (b4)" "FAIL-OPEN reaberto — ${_b4_desc##*|}: ${out}"
+    fi
+  done
+  [ "${_b4_falhou}" -eq 0 ] && record_pass "empty-result-guard: (b4) os 4 fail-opens da 1a versao seguem fechados (isencao e POR INVOCACAO, nao por comando)"
 
   # (c) REAGE: glob sob sudo + erro engolido virando número (os 7 .env.bak que viraram 0)
   out="$(_erg '"sudo -n ls -1 /home/onion/.env.bak-* 2>/dev/null | wc -l"' '"0"' || true)"
