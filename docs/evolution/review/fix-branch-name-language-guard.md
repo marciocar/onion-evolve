@@ -1,7 +1,7 @@
 ---
 branch: fix/branch-name-language-guard
 date: 2026-08-10
-reviewed_diff_sha256: 4419d3e995c58ff6a718ec6caa3cd6539256661e3a6ac931dc3349b0f8496d78
+reviewed_diff_sha256: a277e4ed3166c6f19b23a79bb6d70472817be81b091a3b407122b5ed83b17ac3
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
@@ -93,3 +93,45 @@ você confia.
 | `PostToolUse` é **posterior** — a branch já foi criada quando o aviso sai | **contorno em runtime**: `git branch -m` é grátis enquanto não há push. **superação**: um `PreToolUse` negaria antes, mas é substrato NÃO-VERIFICADO neste repo (medido e refutado em 2026-08-06) |
 | a morte no caso 666 **não tem causa conhecida** | **superação**: a guarda rearmada passa a NOMEAR o abort e o `rc`. Sem reprodução não há o que consertar — o que se conserta é a cegueira |
 | outros `trap ... EXIT` podem reintroduzir o clobber | **cura mecanizável, não feita**: um caso de bancada contando `trap .* EXIT` e exigindo ≤1 no arquivo. Fora do gatilho medido; fica proposto |
+
+---
+
+## Acrescentado neste diff — o cofre, e o que ele custou para ficar honesto
+
+`onion-vps-vaultwarden` no ar em `https://vault.onionevolve.com`, com as quatro pendências da
+pesquisa pagas. O que vale registrar não é a instalação — é **quanto de "pronto" era falso**.
+
+### A jail nasceu muda, e o contador não sabia dizer
+
+```
+$ sudo fail2ban-client get vaultwarden logpath
+No file is currently monitored          # com 7 falhas já gravadas no arquivo
+```
+
+O backend default desta distro é `systemd`: a jail lia o **journal** e ignorava o `logpath`. O
+status mostrava `Total failed: 0` — exatamente o que mostraria se não houvesse ataque nenhum.
+
+**Guarda lendo o lugar errado é indistinguível de guarda funcionando.** A única coisa que separa os
+dois é provocar o ataque de verdade — e foi só por isso que apareceu.
+
+### O `IP_HEADER` era a diferença entre proteção e incidente
+
+Atrás do Caddy, toda requisição chega de `127.0.0.1`. Sem `IP_HEADER: X-Forwarded-For` o filtro
+leria sempre o mesmo IP, e o primeiro ataque **banaria o loopback** — derrubando o acesso de todos.
+A proteção viraria o incidente.
+
+### Três achados menores, cada um com a cura no arquivo
+
+| achado | consequência |
+|---|---|
+| a imagem não tem `sqlite3` | `sqlite3 ".backup"` sai 127; o embutido `/vaultwarden backup` é o caminho |
+| o log subiu no 1º commit do repo do cofre | IP e e-mail de cada tentativa no git — o `.gitignore` foi escrito **antes** do artefato que precisava proteger |
+| `code_challenge=abc` no meu teste de SSO | `invalid_request` que eu quase li como config quebrada; o PKCE exige 43+ e **o erro era do teste** |
+
+### O que ficou declarado, e não coberto
+
+- **O backup cifrado mora no mesmo disco.** Protege contra `down -v`, engano humano e outro usuário
+  — **não** contra perda do host. Tirá-lo da máquina exige um destino que o maestro confie.
+- **`SSO_ONLY=false` por desenho.** SSO autentica quem entra; a senha mestra segue sendo o único
+  material que decifra o cofre. O equivalente comercial (Trusted Device Encryption) é PR **aberto**
+  no upstream desde 31/07 — planejar com ele seria contar com o que não existe.
