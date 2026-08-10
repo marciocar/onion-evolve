@@ -5140,7 +5140,7 @@ run_empty_result_guard_selftests() {
   #      ⚠️ É a TERCEIRA vez nesta sessão que uma cura de fail-open ABRE fail-open. Por isso os
   #      quatro ficam aqui: sem eles, a segunda versão seria tão não-provada quanto a primeira, e
   #      a próxima refatoração reabriria os furos sem ninguém notar.
-  local _b4_falhou=0 _b4_desc
+  local _b4_fail=0 _b4_desc
   for _b4_desc in \
     'pgrep -f meu-alvo > /tmp/saida[1].txt|colchete em REDIRECT, nao no padrao' \
     'pgrep -f meu-alvo && echo fim-$$|$$ presente por outro motivo' \
@@ -5148,11 +5148,11 @@ run_empty_result_guard_selftests() {
     'pgrep -f a[b]c ; pkill -f meu-alvo-real|colchete no 1o, culpado no 2o'; do
     out="$(_erg "\"${_b4_desc%%|*}\"" '"x"' || true)"
     if ! printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
-      _b4_falhou=1
+      _b4_fail=1
       record_fail "empty-result-guard: (b4)" "FAIL-OPEN reaberto — ${_b4_desc##*|}: ${out}"
     fi
   done
-  [ "${_b4_falhou}" -eq 0 ] && record_pass "empty-result-guard: (b4) os 4 fail-opens da 1a versao seguem fechados (isencao e POR INVOCACAO, nao por comando)"
+  [ "${_b4_fail}" -eq 0 ] && record_pass "empty-result-guard: (b4) os 4 fail-opens da 1a versao seguem fechados (isencao e POR INVOCACAO, nao por comando)"
 
   # (c) REAGE: glob sob sudo + erro engolido virando número (os 7 .env.bak que viraram 0)
   out="$(_erg '"sudo -n ls -1 /home/onion/.env.bak-* 2>/dev/null | wc -l"' '"0"' || true)"

@@ -1,7 +1,7 @@
 ---
 branch: fix/fixture-nao-depende-do-vivo
 date: 2026-08-10
-reviewed_diff_sha256: 7ec4d4c25975c7313dfdb90d3d24ab2b37a950ce1e7de7ebf51888b7f9a869b7
+reviewed_diff_sha256: af6e290af59e098457dd0133df0f81ee4d54c1f5c37e5875718bf9029efa3833
 findings_total: 6
 findings_real: 6
 findings_fixed: 5
@@ -198,3 +198,22 @@ versão anterior não tinha como emitir.
 | **três sessões no mesmo branch** — escrevi sobre trabalho de outra | **superação**: o farol avisa no **boot**, quando ainda não há colisão. Falta checagem **no momento da escrita** — `PreToolUse(Edit\|Write)` sobre o mesmo `session-beacon.sh check`. O motor já existe |
 | caso `(c)` compara a constante literal `teto declarado 20` | quebra **fazendo barulho** se o cap mudar — lado certo de falhar. **cura**: ler o cap do `meta:` também no teste. Fora do gatilho |
 | `_fixture_done_nu` assume `TETO:` declarado | num backlog sem teto o `sed` do 999 é no-op e herda `SEM-TETO` — **coberto** pelo caso `(d)`, por outro caminho |
+
+---
+
+## Quarta rodada — o revisor achou um identificador pt-BR, e a guarda que existe para isso estava cega
+
+`lint-selftest.sh:5143` trazia `local _b4_falhou=0` — pt-BR no mesmo bloco onde `_cov_fail`/`_esc_fail`
+usam inglês. Renomeado para `_b4_fail`, conferido **por ausência da palavra** (`grep -w _b4_falhou` = 0,
+`_b4_fail` = 3), como a migalha `rename-verifica-por-ausencia-da-palavra` prescreve.
+
+**Mas o achado que importa é o segundo:** a REGRA 60 existe exatamente para isto e **passou calada**.
+`falhou` não estava nas 71 palavras da lista. Medido depois de adicionar (`falha`, `falhou`, `falhar`,
+`passou` → 74): com o identificador presente ela acusa **nominalmente** (`✗ IDIOMA: _b4_falhou
+(segmento falhou)`) e sai 1; sem, cala. E o baseline **não cresceu** — nenhum outro identificador do
+repo usa essas palavras, então a cobertura aumentou de graça.
+
+**A cura é hábito, não código:** detector por lista de palavras só enxerga o que foi enumerado — é
+limite de desenho, e até hoje estava *declarado sem cura*. A cura: todo identificador pt-BR achado por
+revisão entra na lista **no mesmo movimento** em que é renomeado. Sem isso, cada achado se paga uma
+vez só, e a regra fica eternamente um passo atrás de quem a viola.
