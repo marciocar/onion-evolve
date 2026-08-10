@@ -111,7 +111,16 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 # Sandbox para o modo lint — cópia fiel para que inventory.sh compute a verdade
 # ---------------------------------------------------------------------------
 SANDBOX="$(mktemp -d)"
-trap 'rm -rf "${SANDBOX}"' EXIT
+# ⚠️ UM HANDLER POR SINAL. `trap ... EXIT` SUBSTITUI o anterior — este `rm -rf` estava, desde que foi
+#    escrito, DESLIGANDO o `_bench_abort_guard` instalado 51 linhas acima. A guarda cujo propósito é
+#    dizer "a suíte terminou SEM somar" ficou muda por construção, e o comentário dela descreve
+#    exatamente o caso que voltou a acontecer em 2026-08-10: 666 casos, nenhum ✗, nenhuma soma, e a
+#    leitura confortável disponível. A cura existia e estava desarmada — é a forma mais cara de
+#    `declarado != verificado`, porque o artefato PARECE protegido.
+#    `_bench_abort_guard` é chamado PRIMEIRO e sua 1ª instrução é `local rc=$?`, então o exit status
+#    real chega intacto; a limpeza vem depois e nunca mascara o veredito.
+_bench_on_exit() { _bench_abort_guard; rm -rf "${SANDBOX:-}"; }
+trap _bench_on_exit EXIT
 cp -a "${REPO_ROOT}/.claude"   "${SANDBOX}/.claude"
 cp -a "${REPO_ROOT}/docs"      "${SANDBOX}/docs"
 cp -a "${REPO_ROOT}/CLAUDE.md" "${SANDBOX}/CLAUDE.md"
@@ -5125,6 +5134,57 @@ run_empty_result_guard_selftests() {
   fi
   rm -rf "${_mut_dir}"
 
+  # (b4) BRANCH EM pt-BR na CRIAÇÃO. `code-standards.md:39` exige branch em inglês, e o repo mostra
+  #      que é sistêmico: `fix/fixture-nao-depende-do-vivo`, `docs/waha-rotacao-e-hash`,
+  #      `docs/fios-abertos`, `fix/catraca-duas-portas`, `fix/selo-m8-vereditos`. A guarda dispara na
+  #      CRIAÇÃO porque é o único instante em que renomear é grátis — no commit a branch já nomeia o
+  #      PR e o resíduo da REGRA 56, e acusar ali seria punir quem já não pode corrigir barato (a
+  #      lição da REGRA 56, que ensinou 23 bypasses).
+  #
+  # ⚠️ ESTA REGRA IA EMBARCAR VERDE-VAZIA. Ela reusa `lib/pt-br-words.txt` da REGRA 60 — e a lista é
+  #    afinada para IDENTIFICADOR DE SHELL: `nao`, `depende`, `vivo`, `rotacao`, `fios`, `abertos`,
+  #    `selo`, `separador`, `registro` estavam TODAS ausentes (11 de 13 medidas). A regra não
+  #    disparava em NENHUM dos nomes reais que motivaram sua criação. Quem pegou foi a matriz, antes
+  #    do embarque; sem ela eu teria entregado uma guarda que passa sempre e guarda nada — a mesma
+  #    falha que `.claude/rules/kg-grammar.md` documenta com o grep de `type: REFUTES`.
+  local _br_fail=0 _br_case _br_cmd _br_want
+  for _br_case in 'git checkout -b fix/fixture-nao-depende-do-vivo|ACUSA' \
+                  'git switch -c fix/catraca-duas-portas|ACUSA' \
+                  'git branch -m docs/fios-abertos|ACUSA' \
+                  'git checkout -b fix/branch-name-language-guard|silencio' \
+                  'git checkout -b fix/inventory-drift|silencio' \
+                  'git checkout main|silencio' \
+                  'echo git checkout -b fix/teste-de-vivo|silencio'; do
+    _br_cmd="${_br_case%%|*}"; _br_want="${_br_case##*|}"
+    out="$(_erg "\"${_br_cmd}\"" '""' || true)"
+    if printf '%s' "${out}" | grep -q 'BRANCH-EM-PT-BR'; then
+      [ "${_br_want}" = "ACUSA" ] || _br_fail=$((_br_fail + 1))
+    else
+      [ "${_br_want}" = "silencio" ] || _br_fail=$((_br_fail + 1))
+    fi
+  done
+  if [ "${_br_fail}" -eq 0 ]; then
+    record_pass "empty-result-guard: (b5) branch pt-BR acusada na CRIAÇÃO; inglês, \`checkout\` sem -b e menção calam"
+  else record_fail "empty-result-guard: (b5)" "${_br_fail}/7 casos de nome de branch divergiram do esperado"; fi
+
+  # (b4b) MUTATION — a lista de palavras é load-bearing. Sem ela a regra vira verde-vazia, que foi
+  #       EXATAMENTE o estado em que ela quase embarcou. Este par existe para que a próxima pessoa que
+  #       mexer na lista descubra pela bancada, não por um revisor meses depois.
+  local _wl_dir
+  _wl_dir="$(mktemp -d)"
+  : > "${_wl_dir}/vazia.txt"
+  sed "s#/validation/lib/pt-br-words.txt#/../${_wl_dir##*/}/vazia.txt#" "${hook}" > "${_wl_dir}/h.sh" 2>/dev/null || cp "${hook}" "${_wl_dir}/h.sh"
+  if cmp -s "${hook}" "${_wl_dir}/h.sh"; then
+    record_fail "empty-result-guard: (b5b)" "GUARDA-DA-GUARDA: a mutação da LISTA não foi aplicada (arquivos idênticos) — o sed virou no-op"
+  else
+    printf '{"tool_input":{"command":"git checkout -b fix/fixture-nao-depende-do-vivo"},"tool_response":{"stdout":""}}' \
+      | bash "${_wl_dir}/h.sh" >/dev/null 2>"${_wl_dir}/err" || true
+    if grep -q 'BRANCH-EM-PT-BR' "${_wl_dir}/err" 2>/dev/null; then
+      record_fail "empty-result-guard: (b5b)" "acusou com a lista APONTANDO PARA VAZIO — a regra não depende da lista, logo não mede o que declara"
+    else record_pass "empty-result-guard: (b5b) MUTATION — lista vazia CALA a regra: a lista é load-bearing, não decorativa"; fi
+  fi
+  rm -rf "${_wl_dir}"
+
   # (b3) CALA na CURA — o idioma do colchete. Sem este caso a regra poderia ser "acusa sempre que
   #      vir pgrep", que empurraria quem obedece para o bypass (a lição da REGRA 56, que puniu
   #      quem obedecia 23 vezes). A guarda tem de reconhecer a forma correta, não só a errada.
@@ -5133,7 +5193,7 @@ run_empty_result_guard_selftests() {
     record_fail "empty-result-guard: (b3)" "acusou o idioma do COLCHETE, que é a cura: ${out}"
   else record_pass "empty-result-guard: (b3) cala no \`pgrep -f '[l]…'\` — reconhece a forma correta"; fi
 
-  # (b4) OS QUATRO FAIL-OPENS DA PRIMEIRA VERSÃO DESTA REGRA, achados na passada adversarial contra
+  # (b4c) OS QUATRO FAIL-OPENS DA PRIMEIRA VERSÃO DESTA REGRA, achados na passada adversarial contra
   #      ela mesma, no PR que a introduziu. A raiz era UMA: as isenções valiam para o COMANDO
   #      INTEIRO, então bastava um colchete num redirect, um `$$` presente por outro motivo, ou um
   #      `-x` numa invocação IRMÃ para desarmar a regra sobre a invocação culpada.
@@ -5149,10 +5209,10 @@ run_empty_result_guard_selftests() {
     out="$(_erg "\"${_b4_desc%%|*}\"" '"x"' || true)"
     if ! printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
       _b4_fail=1
-      record_fail "empty-result-guard: (b4)" "FAIL-OPEN reaberto — ${_b4_desc##*|}: ${out}"
+      record_fail "empty-result-guard: (b4c)" "FAIL-OPEN reaberto — ${_b4_desc##*|}: ${out}"
     fi
   done
-  [ "${_b4_fail}" -eq 0 ] && record_pass "empty-result-guard: (b4) os 4 fail-opens da 1a versao seguem fechados (isencao e POR INVOCACAO, nao por comando)"
+  [ "${_b4_fail}" -eq 0 ] && record_pass "empty-result-guard: (b4c) os 4 fail-opens da 1a versao seguem fechados (isencao e POR INVOCACAO, nao por comando)"
 
   # (c) REAGE: glob sob sudo + erro engolido virando número (os 7 .env.bak que viraram 0)
   out="$(_erg '"sudo -n ls -1 /home/onion/.env.bak-* 2>/dev/null | wc -l"' '"0"' || true)"

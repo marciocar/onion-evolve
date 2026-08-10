@@ -229,8 +229,8 @@ nodes:
     confidence: 1.0
     verified_at: 2026-07-31
     verified_against: docker-compose-up-mais-curl-na-vps
-    label: "WAHA DEPLOYADO NA VPS (o gatilho, metade infra): /home/marcio/onion-waha/docker-compose.yml no padrao da casa (stacks em /home/marcio/<projeto>). container onion-waha, restart unless-stopped, bind 127.0.0.1:3999 (SEM superficie publica — o consumidor roda no mesmo host), engine NOWEB (decidido POR MEDICAO), volume ./sessions persistente, segredos gerados por openssl em .env com umask 077 + .gitignore. PROVAS: 401 sem X-Api-Key / 200 com; POST /api/sessions -> SCAN_QR_CODE; GET /auth/qr -> 200 png 5379 bytes; RAM em producao 412.9 MiB. FALTA SO o ato fisico do maestro: escanear o QR (parear o numero)"
-    trace: "/home/marcio/onion-waha/docker-compose.yml"
+    label: "WAHA DEPLOYADO NA VPS (o gatilho, metade infra): /home/marcio/onion-vps-waha/docker-compose.yml no padrao da casa (stacks em /home/marcio/<projeto>). container onion-waha, restart unless-stopped, bind 127.0.0.1:3999 (SEM superficie publica — o consumidor roda no mesmo host), engine NOWEB (decidido POR MEDICAO), volume ./sessions persistente, segredos gerados por openssl em .env com umask 077 + .gitignore. PROVAS: 401 sem X-Api-Key / 200 com; POST /api/sessions -> SCAN_QR_CODE; GET /auth/qr -> 200 png 5379 bytes; RAM em producao 412.9 MiB. FALTA SO o ato fisico do maestro: escanear o QR (parear o numero)"
+    trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
 
   # ── GATILHO FECHADO 2026-08-01: 1a mensagem REAL enviada ──
   - id: E_gatilho_fechado
@@ -242,7 +242,7 @@ nodes:
     verified_at: 2026-08-01
     verified_against: post-api-sendText-contra-waha-vivo-na-vps
     label: "GATILHO FECHADO: sessao PAREADA (status WORKING, me.pushName 'Marcio Carvalho') via PAIRING CODE (nao QR) e 1a MENSAGEM REAL ENVIADA por POST /api/sendText. Resposta observada: {key:{remoteJid,fromMe:true,id:'3EB0F3FD25A3BD038FC7EE'}, messageTimestamp, status:'PENDING'}. DECIDE 2 pontos do contrato que estavam no papel: (1) o WAHA DEVOLVE key.id real -> MessageReceipt.id e preenchivel neste provider (a nullabilidade existe pelo OUTRO provider, nao por este); (2) status PENDING prova CICLO DE VIDA de entrega (webhook message.ack) -> os estados queued/sent do MessageReceipt tem lastro, nao sao invencao. OBSERVACAO A VERIFICAR: me.id voltou '555197702725@c.us' (sem o 9), mas o envio para '5551997702725@c.us' funcionou — normalizacao de numero BR e assimetrica e o adapter precisa tratar"
-    trace: "/home/marcio/onion-waha/docker-compose.yml"
+    trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
 
   - id: C_pairing_needs_primary
     node_type: claim
@@ -265,7 +265,7 @@ nodes:
     verified_at: 2026-08-01
     verified_against: tres-envios-controlados-com-9-sem-9-e-lid
     label: "CAUSA RAIZ (medida, 3 envios controlados): o WhatsApp moderno endereca por LID (Linked ID), nao por telefone. '5551997702725@c.us' (com 9) -> ERRO 'No LID for user'; '555197702725@c.us' (sem 9) -> falha; '84190032855084@lid' -> ENVIOU E CHEGOU (confirmado pelo maestro). GET /api/contacts/check-exists?phone=... devolve {numberExists:true, chatId:'84190032855084@lid'} — o telefone e CHAVE DE BUSCA, o LID e a identidade. O mesmo LID ja aparecia no me.lid da sessao NOWEB (consistente)"
-    trace: "/home/marcio/onion-waha/docker-compose.yml"
+    trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
 
   - id: D_resolve_is_contract
     node_type: decision
@@ -310,7 +310,7 @@ nodes:
     verified_at: 2026-08-01
     verified_against: reteste-noweb-mais-LID-confirmado-por-humano
     label: "PENDENCIA 1 FECHADA — ENGINE DEFAULT = NOWEB. Re-teste com endereçamento LID correto: NOWEB enviou e a mensagem CHEGOU (confirmado pelo destinatario humano), com ZERO erros de USync nos logs (antes falhava sempre). Portanto o engine NUNCA foi a causa — era enderecamento. NOWEB e o default por medicao (412.9 MiB vs 638.8 do WEBJS, ~35% mais leve) SEM perda de funcionalidade. O valor real do WEBJS foi DIAGNOSTICO: mensagem de erro legivel ('No LID for user') vs o WARN silencioso do NOWEB ('USync yielded no results') — registrar como nota de troubleshooting, nao como default"
-    trace: "/home/marcio/onion-waha/docker-compose.yml"
+    trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
 
   - id: E_ack_lifecycle_proven
     node_type: evidence

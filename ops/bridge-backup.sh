@@ -8,7 +8,7 @@
 # vivas + fila a2a) e `.env` — gitignorados por desenho, e por isso invisíveis a
 # qualquer git. Este é o único risco IRREVERSÍVEL medido no serviço.
 #
-# Molde: /home/marcio/onion-logto/backup.sh (mesmo autor, mesma casa, mesma cron).
+# Molde: /home/marcio/onion-vps-logto/backup.sh (mesmo autor, mesma casa, mesma cron).
 # Diferença declarada: este script vive VERSIONADO em ops/ — o do Logto não vive em
 # repo nenhum, o que é a anomalia, não este. (ops/ = código de serviço, fora do
 # allow-list do /meta:adopt; ver PR #508.)

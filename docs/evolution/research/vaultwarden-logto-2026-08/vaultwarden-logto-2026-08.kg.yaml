@@ -110,7 +110,7 @@ nodes:
     status: open
     impact: 4
     confidence: 1.0
-    label: "DEPENDE DO MAESTRO — nao e minha decisao fechar ferramenta da VPS. Medido por mim, nao herdado do agente: `/etc/caddy/conf.d/logto-console.caddy` esta ATIVO (sem sufixo `.disabled`) e `console.onionevolve.com` responde 302. TRES documentos declaram que ele fica DESLIGADO por padrao — o README do onion-logto, o proprio bloco do vhost, e o cabecalho do `logto-provision.sh` (`o vhost console.onionevolve.com esta DESLIGADO por desenho`). E `declarado != verificado` no painel de administracao do provedor de identidade. O interruptor existe e valida antes de aplicar: `/home/marcio/onion-logto/console.sh off`. POR QUE ISTO ENTRA NUMA PESQUISA SOBRE COFRE: somar um cofre de senhas a caixa enquanto o painel do IdP esta aberto e a combinacao que merece decisao explicita, nao silencio."
+    label: "DEPENDE DO MAESTRO — nao e minha decisao fechar ferramenta da VPS. Medido por mim, nao herdado do agente: `/etc/caddy/conf.d/logto-console.caddy` esta ATIVO (sem sufixo `.disabled`) e `console.onionevolve.com` responde 302. TRES documentos declaram que ele fica DESLIGADO por padrao — o README do onion-logto, o proprio bloco do vhost, e o cabecalho do `logto-provision.sh` (`o vhost console.onionevolve.com esta DESLIGADO por desenho`). E `declarado != verificado` no painel de administracao do provedor de identidade. O interruptor existe e valida antes de aplicar: `/home/marcio/onion-vps-logto/console.sh off`. POR QUE ISTO ENTRA NUMA PESQUISA SOBRE COFRE: somar um cofre de senhas a caixa enquanto o painel do IdP esta aberto e a combinacao que merece decisao explicita, nao silencio."
     trace: "/etc/caddy/conf.d/logto-console.caddy"
 
   - id: I_PROVISION_FICOU_PARA_TRAS_NO_RENAME
