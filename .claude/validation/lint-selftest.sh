@@ -4794,10 +4794,18 @@ run_review_artifact_selftests() {
   # que o gate NUNCA produz naquele estado — a bancada acusaria ARTEFATO-CADUCO sobre artefato
   # CORRETO. E `bancada-espelha-o-runner`: 26/26 verdes numa bancada que nao copiava as opcoes do
   # runner ja mataram um gate inteiro nesta casa.
+  # ⚠️ INVOCACAO INTEIRA EM CADA RAMO, e a razao e um defeito MEDIDO duas vezes no mesmo dia:
+  # montar `${alvo} main` faz o ramo limpo virar `git diff HEAD main` — INVERTIDO —, e hash de diff
+  # invertido e outro hash. Aconteceu no `review-artifact-check.sh` (o CI pegou) e aqui, no espelho
+  # dele. Variavel que muda de POSICAO SEMANTICA entre ramos inverte um argumento sem ninguem ver.
   _sha_of() { ( cd "$1"
-    local _t; if git diff --quiet HEAD 2>/dev/null; then _t="HEAD"; else _t="--cached"; fi
-    git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
-        ${_t} main -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64 ); }
+    if git diff --quiet HEAD 2>/dev/null; then
+      git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+          main HEAD -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64
+    else
+      git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+          --cached main -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64
+    fi ); }
   _art() {  # $1=dir $2=sha $3=extra-campos(0/1)
     { printf -- '---\n'
       printf 'reviewed_diff_sha256: %s\n' "$2"
@@ -4971,8 +4979,16 @@ run_review_artifact_selftests() {
                  --cached main -- . ':(exclude)docs/evolution/review' | sha256sum | cut -c1-64)"
     # o que a REGRA 56 calcula na MESMA situacao (arvore suja)
     if ( cd "${rw}" && git diff --quiet HEAD 2>/dev/null ); then target="HEAD"; else target="--cached"; fi
-    h_calc="$(cd "${rw}" && git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
-                ${target} main -- . ':(exclude)docs/evolution/review' | sha256sum | cut -c1-64)"
+    # invocacao INTEIRA por ramo, pelo mesmo motivo dos outros dois sitios: `${target} main` faria
+    # o ramo limpo virar `HEAD main`, invertido. Aqui e LATENTE (a asercao exige --cached), e
+    # armadilha latente e a que sobrevive ao refactor.
+    if [ "${target}" = "--cached" ]; then
+      h_calc="$(cd "${rw}" && git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                  --cached main -- . ':(exclude)docs/evolution/review' | sha256sum | cut -c1-64)"
+    else
+      h_calc="$(cd "${rw}" && git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                  main HEAD -- . ':(exclude)docs/evolution/review' | sha256sum | cut -c1-64)"
+    fi
     if [ "${target}" = "--cached" ] && [ "${h_prosp}" = "${h_calc}" ]; then
       record_pass "review-artifact: (j) arvore SUJA -> alvo e o INDICE; o hash de quem OBEDECE casa"
     else record_fail "review-artifact: (j) pre-commit" "target=${target}; prospectivo=${h_prosp:0:12} calculado=${h_calc:0:12} — a regra punia quem obedece"; fi

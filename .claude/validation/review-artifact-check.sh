@@ -144,13 +144,24 @@ fi
 # A escolha é a mesma da catraca da REGRA 49 (`_baseline_ref`): perguntar em que SITUAÇÃO se está,
 # em vez de assumir uma. Árvore suja = pré-commit → o alvo é o ÍNDICE. Árvore limpa = pós-commit
 # (o CI, que é quem audita) → o alvo é `HEAD`, exatamente como antes.
+# ⚠️ A DIRECAO DO DIFF IMPORTA, e a 1a versao a INVERTEU no ramo limpo. O codigo montava
+# `${_DIFF_TARGET} "${BASE}"`, que com _DIFF_TARGET=HEAD vira `git diff HEAD BASE` — invertido —,
+# e hash de diff invertido e OUTRO hash. O CI pegou: ARTEFATO-CADUCO sobre o residuo deste PROPRIO
+# PR. Por isso cada ramo escreve a invocacao INTEIRA: variavel que muda de POSICAO SEMANTICA entre
+# ramos e a forma mais barata de inverter um argumento sem ninguem ver.
+#
+# E o meu 1o teste desta cura NAO reproduziu o defeito, porque eu medi a forma PRETENDIDA
+# (`BASE HEAD`) em vez da que o codigo executa. Medir o que se quis dizer, e nao o que roda, foi o
+# erro mais repetido desta sessao.
 if git diff --quiet HEAD 2>/dev/null; then
-  _DIFF_TARGET="HEAD"          # árvore limpa: pós-commit / CI — comportamento inalterado
+  # árvore limpa: pós-commit / CI (quem AUDITA) — exatamente como sempre foi
+  DIFF_SHA="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                "${BASE}" HEAD -- . ":(exclude)${REVIEW_DIR}" 2>/dev/null | sha256sum | cut -c1-64)"
 else
-  _DIFF_TARGET="--cached"      # árvore suja: pré-commit — o que VAI virar o commit
+  # árvore suja: pré-commit — o alvo é o ÍNDICE, o que VAI virar o commit
+  DIFF_SHA="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+                --cached "${BASE}" -- . ":(exclude)${REVIEW_DIR}" 2>/dev/null | sha256sum | cut -c1-64)"
 fi
-DIFF_SHA="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
-              ${_DIFF_TARGET} "${BASE}" -- . ":(exclude)${REVIEW_DIR}" 2>/dev/null | sha256sum | cut -c1-64)"
 SLUG="$(printf '%s' "${BRANCH}" | tr '/' '-')"
 ART="${REVIEW_DIR}/${SLUG}.md"
 
