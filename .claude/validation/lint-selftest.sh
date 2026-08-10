@@ -4997,6 +4997,17 @@ run_review_artifact_selftests() {
     if ( cd "${rw}" && git diff --quiet HEAD 2>/dev/null ); then
       record_pass "review-artifact: (k) arvore LIMPA -> alvo volta a ser HEAD (o CI, que audita, nao mudou)"
     else record_fail "review-artifact: (k) pos-commit" "arvore ficou suja depois do commit — o ramo de CI mediria o alvo errado"; fi
+    # (l) A EXISTENCIA DO ARTEFATO SEGUE A MESMA REGRA DO HASH. Sem isto havia IMPASSE: `HEAD:${ART}`
+    #     no pre-commit e o commit ANTERIOR, entao o residuo recem-STAGED "nao existia" e o hook
+    #     bloqueava o proprio commit que o adicionava. Meia-cura em guarda e como meia-renomeacao em
+    #     codigo: o lado que sobra e o que quebra.
+    ( cd "${rw}" && printf 'x2\n' > zz2.txt && mkdir -p docs/evolution/review \
+      && printf -- '---\nbranch: feat/t\n---\ncorpo\n' > docs/evolution/review/feat-t.md && git add -A ) >/dev/null 2>&1
+    local _ref
+    if ( cd "${rw}" && git diff --quiet HEAD 2>/dev/null ); then _ref="HEAD:docs/evolution/review/feat-t.md"; else _ref=":docs/evolution/review/feat-t.md"; fi
+    if ( cd "${rw}" && git cat-file -e "${_ref}" 2>/dev/null ); then
+      record_pass "review-artifact: (l) residuo recem-STAGED e VISTO no pre-commit (sem impasse do proprio commit)"
+    else record_fail "review-artifact: (l) impasse" "o artefato em stage nao foi visto (ref=${_ref}) — o hook bloquearia o commit que o adiciona"; fi
   else record_skip "review-artifact: (j)(k) sandbox git nao montou"; fi
   rm -rf "${rw}"
 
