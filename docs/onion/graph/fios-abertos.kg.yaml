@@ -202,7 +202,6 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_against: as-52-regras-classificadas-em-mecanizavel-x-caso-a-caso-contra-o-manifest
     label: "RE-MEDIDO 2026-08-10 sobre as 59 regras vivas (a classificacao anterior era contra 52 e DRIFTOU quando as regras 55-60 nasceram). Numero novo: 47 COM cobertura declarada, 12 SEM (8, 9, 10, 24, 25, 26, 27, 32, 38, 50, 51, 52). ⚠️ RESSALVA DE METODO, e ela importa: esta medicao responde \"quantas tem bloco de selftest ou fixture propria\", que e PROXIMO mas NAO IDENTICO a pergunta original (\"quantas juntam automatico, 16 via manifest + 10 por delegacao\"). Sao duas reguas; a nova e mais grossa e mais facil de reproduzir. Declarar isso e o ponto — trocar a regua em silencio e como um numero envelhece sem ninguem notar, que foi exatamente o que aconteceu com o 52. A TESE ORIGINAL SOBREVIVE E FICA MAIS FORTE: tratar as descobertas como bloqueio e o que transforma o fio de maior valor em item que nunca comeca. Com 47 de 59 ja cobertas, a catraca do W4 nasceria sobre 80%% do universo, nao sobre metade. As 12 sem cobertura sao a fila, nao o obstaculo."
     trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
 
