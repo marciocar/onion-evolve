@@ -6,10 +6,21 @@
 # Por quê existe: o runbook do M2 (docs/analysis/onion-m2-bridge-logto-integration-2026-07.md,
 # P1-P3) assume que o maestro clica no console admin. Medido em 2026-07-26, isso custa
 # expor o painel do provedor de identidade que estamos endurecendo (o vhost
-# console.onionevolve.com está DESLIGADO por desenho e o sign_up está ABERTO), ou um
+# console.onionevolve.com ficou ATIVO por decisão do maestro em 2026-08-10 — ver nota
+# abaixo — e o sign_up está ABERTO), ou um
 # túnel SSH inviável do celular — que é como o maestro opera. A Management API dissolve
 # o obstáculo e é melhor pelos critérios da casa: reproduzível, auditável, versionado,
 # idempotente, sem superfície nova. Nó do KG: C_console_not_the_path.
+#
+# ⚠️ ATUALIZAÇÃO 2026-08-10 — o console PASSOU A FICAR ATIVO, por decisão do maestro. Isto NÃO
+#    invalida este script: o argumento dele nunca foi "o console está fechado", foi que provisionar
+#    por API é reprodutível, auditável e versionado, enquanto clicar não é. Esse argumento sobrevive
+#    intacto ao console aberto.
+#    O que MUDA é o raio da senha de admin do Logto: com o painel alcançável da internet, ela vira
+#    a credencial de maior alcance da caixa — plano de controle da identidade (criar apps, usuários,
+#    conectores). Não abre cofre nem chave da Anthropic: o Vaultwarden deriva a chave de cifra da
+#    senha mestra NO CLIENTE, e o bridge guarda os próprios segredos. Mas é o item a tratar como
+#    fronteira.
 #
 # Uso : bash ops/bridge-auth/logto-provision.sh [--apply] [--user <username>] [--smtp]
 #       Sem --apply é DRY-RUN: mostra o que faria e não muta nada.
