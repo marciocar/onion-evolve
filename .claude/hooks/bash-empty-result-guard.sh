@@ -165,6 +165,26 @@ if printf '%s' "$cmd" | grep -qE '2>/dev/null.*\|[[:space:]]*(wc[[:space:]]+-l|g
   add 'ERRO-ENGOLIDO-VIRANDO-NÚMERO: há `2>/dev/null` a montante de uma contagem — um comando que FALHOU e um objeto que NÃO EXISTE produzem o mesmo `0`. Mostre o stderr, ou use o helper: `source .claude/utils/safe-count.sh` → `count_files <dir> <glob>` / `count_matches <padrão> <arquivos>` / `count_lines <arquivo>` (alvo ausente = exit 2 + stderr, nunca zero silencioso).'
 fi
 
+# (3b) `pgrep -f` / `pkill -f` que CASA A SI MESMO — o padrão está na linha de comando do próprio
+# shell que o executa, então ele sempre se encontra. Custo medido em UMA sessão (2026-08-10), três
+# vezes, com três danos DIFERENTES — que é o que prova ser classe e não descuido:
+#   1. `pkill -f 'lint-selftest'` com verificação por OUTRO padrão → afirmei ter matado o que não
+#      morreu, e quem viu foi o maestro na tela;
+#   2. `pgrep -fc 'lint-selftest'` devolvendo 1 com a bancada morta — o sobrevivente era o meu shell;
+#   3. `until ! pgrep -f 'git commit -F'` → a condição NUNCA podia virar falsa. Shell preso 1h06,
+#      esperando por si mesmo, enquanto o commit tinha terminado havia muito.
+# O (3) é o mais perigoso porque não erra: ele ESPERA para sempre, e esperar parece trabalhar.
+#
+# A cura é o idioma clássico do colchete: `pgrep -f '[l]int-selftest'` — o regex casa `lint-selftest`,
+# mas a linha de comando literal contém `[l]int-selftest`, que o regex NÃO casa. Alternativa:
+# excluir o próprio PID (`| grep -v "^$$\$"`). Desarma também quem já usa `-x` (casa o NOME do
+# executável, não a linha inteira) ou `--older`.
+if printf '%s' "$cmd" | grep -qE '(pgrep|pkill)[[:space:]]+-[a-zA-Z]*f' \
+   && ! printf '%s' "$cmd" | grep -qE '(pgrep|pkill)[[:space:]]+-[a-zA-Z]*f[[:space:]]+[^|;&]*\[' \
+   && ! printf '%s' "$cmd" | grep -qE '\$\$|(pgrep|pkill)[[:space:]]+-[a-zA-Z]*x|--older'; then
+  add 'PGREP-QUE-SE-ENCONTRA: `pgrep -f`/`pkill -f` casa a linha de comando do PRÓPRIO shell que o roda — o padrão está escrito ali. Num `until ! pgrep ...` isso trava PARA SEMPRE (medido: 1h06 esperando por si mesmo). Use o idioma do colchete — `pgrep -f "[l]int-selftest"` — ou exclua o próprio PID. E nunca mate com um padrão e confira com outro: a conferência tem de usar EXATAMENTE o padrão do `pkill`.'
+fi
+
 # (4) comando de DESCOBERTA com saída vazia — o caso que mais custou (o falso "não sobreviveu").
 # CALIBRAÇÃO ANTI-RUÍDO (o risco real de qualquer alarme é virar fadiga e ser ignorado):
 #   · `grep -q`/`grep -c` são TESTE e CONTAGEM, não descoberta-para-ler — vazio ali é resposta, não sinal.

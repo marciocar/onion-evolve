@@ -5041,6 +5041,23 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (b) \$? pós-pipe → avisa que o exit é do último elemento"
   else record_fail "empty-result-guard: (b)" "não reagiu a \$? após pipe: ${out}"; fi
 
+  # (b2) REAGE: `pgrep -f`/`pkill -f` que casa a SI MESMO. Três danos DIFERENTES numa sessão
+  #      (2026-08-10) — é o que prova classe e não descuido. O caso do `until` é o pior porque não
+  #      ERRA: ele espera para sempre, e esperar parece trabalhar (shell preso 1h06 enquanto o
+  #      comando aguardado já tinha terminado).
+  out="$(_erg '"until ! pgrep -f (git commit -F) >/dev/null; do sleep 30; done"' '""' || true)"
+  if printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
+    record_pass "empty-result-guard: (b2) \`until ! pgrep -f\` → avisa que o laço espera por SI MESMO"
+  else record_fail "empty-result-guard: (b2)" "não reagiu ao pgrep -f auto-casante: ${out}"; fi
+
+  # (b3) CALA na CURA — o idioma do colchete. Sem este caso a regra poderia ser "acusa sempre que
+  #      vir pgrep", que empurraria quem obedece para o bypass (a lição da REGRA 56, que puniu
+  #      quem obedecia 23 vezes). A guarda tem de reconhecer a forma correta, não só a errada.
+  out="$(_erg '"pgrep -f ([l]int-selftest)"' '"123"' || true)"
+  if printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
+    record_fail "empty-result-guard: (b3)" "acusou o idioma do COLCHETE, que é a cura: ${out}"
+  else record_pass "empty-result-guard: (b3) cala no \`pgrep -f '[l]…'\` — reconhece a forma correta"; fi
+
   # (c) REAGE: glob sob sudo + erro engolido virando número (os 7 .env.bak que viraram 0)
   out="$(_erg '"sudo -n ls -1 /home/onion/.env.bak-* 2>/dev/null | wc -l"' '"0"' || true)"
   if printf '%s' "${out}" | grep -q 'GLOB-SOB-SUDO' && printf '%s' "${out}" | grep -q 'ERRO-ENGOLIDO'; then
