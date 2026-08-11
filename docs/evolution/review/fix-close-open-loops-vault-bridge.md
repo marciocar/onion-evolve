@@ -18,7 +18,13 @@ estava certa em recusar o arredondamento. Ambas fecharam com login real.
 
 ## 1. SSO do cofre — `sso_users: 0 → 1`
 
-Medido no SQLite: `users = 1`, `sso_users = 1`, `devices = 1`, zero erro novo no log. Primeiro caso
+Medido no SQLite: `users = 1`, `sso_users = 1`, zero erro novo no log.
+
+> ⚠️ **Correção de um número meu, achada na passada adversarial contra este PR.** Eu havia escrito
+> `devices = 1` — medido de uma **cópia** do banco tirada antes. No banco **vivo** são **2**: o
+> maestro registrou um segundo dispositivo depois. O erro é pequeno e a classe não é: medi um
+> snapshot e relatei como estado atual. É a quarta vez nesta sessão que confundo *quando* medi com
+> *o que é verdade agora*. Primeiro caso
 público conhecido de **Vaultwarden + Logto** funcionando ponta a ponta.
 
 **Três defeitos reais estavam no caminho, e nenhum era o que eu supus:**
