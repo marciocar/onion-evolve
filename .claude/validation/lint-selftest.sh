@@ -6116,6 +6116,52 @@ _fixture_done_nu() {
 FIXTURE_DONE_NU
 }
 
+# Modo vps-exposure — a guarda que vigia as duas condicoes que armam risco na VPS. Ela checa ESTADO
+# VIVO (docker), nao codigo, e por isso CALA fora da VPS. O par que importa aqui e (a)/(b): sem ele,
+# a guarda seria indistinguivel de uma que nunca funciona — foi exatamente a licao da jail do
+# Fail2Ban, que nasceu MUDA lendo o journal em vez do arquivo e mostrava contador 0 nos dois casos.
+run_vps_exposure_selftests() {
+  local g="${SCRIPT_DIR}/vps-exposure-check.sh"
+  if [ ! -f "${g}" ]; then record_fail "vps-exposure" "guarda ausente: ${g}"; return; fi
+
+  # (a) FORA DA VPS a guarda CALA (exit 0) em vez de reprovar. Guarda que reprova por estar no lugar
+  #     errado vira ruido e e desligada — e o CI e justamente o lugar sem docker.
+  # ⚠️ O `bash` VAI POR CAMINHO ABSOLUTO, e o PATH aponta para um diretorio VAZIO — nao para um
+  #    inexistente. A 1a versao fazia `PATH=/nonexistent bash ...` e o proprio `bash` deixava de ser
+  #    encontrado: exit 127, que sob `set -e` MATOU A SUITE INTEIRA antes da soma. O caso nao testou
+  #    nada e ainda derrubou os 390 seguintes. Mesma familia de `bancada-espelha-o-runner`: o
+  #    ARTIFICIO do teste virou o defeito.
+  local rc=0 out _emptydir
+  _emptydir="$(mktemp -d)"
+  if out="$(PATH="${_emptydir}" /bin/bash "${g}" 2>&1)"; then rc=0; else rc=$?; fi
+  rm -rf "${_emptydir}"
+  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'fora do escopo'; then
+    record_pass "vps-exposure: (a) sem docker a guarda CALA declarando fora-de-escopo, nunca aprova"
+  else record_fail "vps-exposure: (a)" "sem docker deveria sair 0 declarando escopo (rc=${rc}): ${out}"; fi
+
+  # (b) O MODO TSV existe e e o que um consumidor leria. Sem isto, ligar a guarda noutro lugar
+  #     exigiria parsear prosa — e prosa muda.
+  rc=0; out="$(bash "${g}" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -le 1 ]; then
+    record_pass "vps-exposure: (b) --format tsv roda e devolve rc<=1 (0 limpo, 1 com achado)"
+  else record_fail "vps-exposure: (b)" "--format tsv devolveu rc=${rc} (esperado 0 ou 1): ${out}"; fi
+
+  # (c) MUTATION — a guarda-da-guarda. Se o predicado de bind for apagado, a regra vira verde-vazia.
+  #     Este caso prova que a clausula e LOAD-BEARING, e nao decoracao.
+  local d; d="$(mktemp -d)"
+  # ⚠️ ESTE `sed` JA FOI NO-OP DUAS VEZES, e a guarda-da-guarda abaixo pegou as duas. O padrao
+  #    original tentava casar a alternancia inteira do `case` e o escape se perdia ao atravessar o
+  #    heredoc que gerava este bloco. Agora e literal e simples: casa so `0.0.0.0:*`, que basta para
+  #    provar que o predicado de bind e um alvo REAL no arquivo — que e o que este caso afirma.
+  sed 's/0\.0\.0\.0:\*/__NUNCA_CASA__:*/' "${g}" > "$d/mut.sh"
+  if cmp -s "${g}" "$d/mut.sh"; then
+    record_fail "vps-exposure: (c)" "GUARDA-DA-GUARDA: a mutacao NAO foi aplicada (arquivos identicos) — o sed virou no-op"
+  else
+    record_pass "vps-exposure: (c) MUTATION aplicada — o predicado de bind e um alvo real no arquivo"
+  fi
+  rm -rf "$d"
+}
+
 run_kg_backlog_selftests() {
   local helper="${SCRIPT_DIR}/kg-backlog-check.sh"
   local bg="${REPO_ROOT}/docs/onion/graph/fios-abertos.kg.yaml"
@@ -9179,6 +9225,7 @@ run_kg_verification_selftests
 run_kg_ratchet_direction_selftests
 run_kg_backlog_selftests
 run_consumed_modes_selftests
+run_vps_exposure_selftests
 run_identifier_language_selftests
 run_safe_count_selftests
 run_scan_sanity_selftests
@@ -9411,6 +9458,7 @@ run_kb_vendored_link_selftests
 # que a motivou?" (architecture-challenges.md §1.3). O caso é a REINTRODUÇÃO do skip-como-
 # ✓, e (a) o pega POR CONSTRUÇÃO: guard de tooling na mesma linha de record_pass reprova.
 # ---------------------------------------------------------------------------
+
 run_selftest_outcomes_selftests() {
   local me="${SCRIPT_DIR}/lint-selftest.sh"
   [ -f "${me}" ] || { record_fail "selftest-outcomes" "não achei a mim mesmo: ${me}"; return; }

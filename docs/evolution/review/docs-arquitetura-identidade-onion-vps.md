@@ -1,7 +1,7 @@
 ---
 branch: docs/arquitetura-identidade-onion-vps
 date: 2026-08-11
-reviewed_diff_sha256: db9297afb121f4536d18abf601300f3419b0171aa8050c163b99dd1e036d1447
+reviewed_diff_sha256: 2c6f070b5fe2edddae822aafa96c0aa065f440bdf4b0cde3d9044f5a5b8796d6
 findings_total: 11
 findings_real: 6
 findings_fixed: 5
@@ -151,3 +151,43 @@ está de pé e chamar isso de comportamento verificado. Fica declarado em vez de
 
 **Como provar quando houver login**: duas chamadas separadas por um refresh de token devem produzir
 **um** diretório, não dois — e o nome dele não pode ser `sha256` de nenhum token.
+
+---
+
+## Terceira rodada — os dois achados do revisor viraram mecanismo
+
+### 1. Branch em pt-BR — a guarda existia, a LISTA é que não tinha as palavras
+
+O revisor acusou `docs/arquitetura-identidade-onion-vps`. A guarda de nome de branch **existe e
+funciona**; o que faltava era o vocabulário: `grep -cx arquitetura` e `identidade` devolviam **0**.
+
+Acrescentadas 14 palavras mantendo o critério da lista — **pt-BR sem homógrafo em inglês** (`total`,
+`local`, `normal` ficam fora de propósito, senão acusariam identificador inglês legítimo).
+
+**Provado contra o caso real:** o mesmo comando que criou esta branch agora é acusado, nomeando as
+palavras. O achado virou mecanismo, não desculpa.
+
+### 2. Guarda nova sem fixture — e o aparato de teste falhou TRÊS vezes
+
+Bloco `(a)`/`(b)`/`(c)` na bancada. Mas o caminho até ele é a parte que ensina:
+
+| # | defeito | onde estava |
+|---|---|---|
+| i | `PATH=/nonexistent bash` — sumiu com o próprio `bash`, exit **127** matou a suíte | meu aparato |
+| ii | função **definida depois de chamada** (9182 chama, 9419 define) | meu aparato |
+| iii | `sed` de mutação no-op, escape perdido no heredoc | meu aparato |
+| iv | **substituí o `sed` de OUTRO teste** (`migalhas-generate`) | **código alheio** |
+
+**Nenhum estava na guarda** — todos no aparato que a testa. A guarda funcionava desde a primeira
+medição contra o vivo.
+
+O (iv) é o mais grave: usei `re.search` para achar minha linha e o regex casou o **primeiro** `sed`
+do arquivo, quatro mil linhas antes. É a classe de `rename-verifica-por-ausencia-da-palavra` —
+varredura que casa mais do que modelei. A conferência certa era trivial: `grep -n` mostraria **duas**
+ocorrências, não uma. Restaurado e verificado por ausência.
+
+**E o que impediu o falso-verde nas três primeiras foram guardas-da-guarda que a casa já tinha**: o
+detector de abort (*"NÃO leia esta saída como verde"*) e o `GUARDA-DA-GUARDA: a mutação NÃO foi
+aplicada`. Sem eles: 390 verdes com a guarda nova nunca tendo rodado.
+
+**Bancada 790 / 0 falharam / 0 pularam**, sha estável, e o teste que eu havia danificado passa.
