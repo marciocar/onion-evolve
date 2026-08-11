@@ -86,7 +86,15 @@ done
 # E o modo de falha e SILENCIOSO por natureza: um `.sql` a mais no diretorio nao chama atencao.
 # ⚠️ O ESCOPO E DECLARADO, nao adivinhado: so os diretorios `backups/` das ferramentas da casa.
 #    Varrer o disco atras de "coisa que parece backup" produziria falso-positivo em massa.
-for _bdir in /home/marcio/onion-vps-*/backups; do
+# ⚠️ O ESCOPO JA FOI ESTREITO DEMAIS UMA VEZ. A 1a versao olhava so `/home/marcio/onion-vps-*/backups`
+#    e a passada adversarial contra ela achou DOIS diretorios de fora: `/home/marcio/backups/bridge`
+#    (17 arquivos sem cifra, incluindo os `bridge-diario-*.tar.gz` que carregam o `.env` do bridge —
+#    ANTHROPIC_API_KEY e tokens de convite — e um deles em 644) e `/home/onion/.claude/backups`.
+#    Guarda com escopo menor que a classe e verde-vazia onde nao olha.
+#    O escopo agora e DECLARADO E EXPLICITO, um caminho por linha: acrescentar diretorio de backup
+#    novo exige acrescentar aqui, e essa friccao e o ponto — o alternativo (varrer o disco atras de
+#    "coisa que parece backup") produz falso-positivo em massa e vira ruido ignorado.
+for _bdir in /home/marcio/onion-vps-*/backups /home/marcio/backups/* /home/onion/.claude/backups; do
   [ -d "${_bdir}" ] || continue
   # `find` (nao glob) porque o glob expande no shell do chamador e devolve vazio sem acesso —
   # e vazio lido como ausencia e exatamente o fail-open que este arquivo existe para impedir.
