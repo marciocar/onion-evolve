@@ -1,9 +1,9 @@
 ---
 branch: docs/arquitetura-identidade-onion-vps
 date: 2026-08-11
-reviewed_diff_sha256: 8aeaaacd37f8f212b435660008b39ac64a41b305fcbe55a9dc14d0b762827b7d
-findings_total: 6
-findings_real: 5
+reviewed_diff_sha256: db9297afb121f4536d18abf601300f3419b0171aa8050c163b99dd1e036d1447
+findings_total: 11
+findings_real: 6
 findings_fixed: 5
 tokens: 0
 duration_min: 0
@@ -121,3 +121,33 @@ onde lint de repo não alcançaria de qualquer forma.
 
 O laço do SSO fecha com **login real de navegador** — `sso_users` só sai de 0 quando alguém entrar.
 Está **destravado, não provado**. E o backup (W4) segue cifrado no mesmo disco.
+
+---
+
+## Passada adversarial contra este PR
+
+Cinco afirmações atacadas. **Quatro sobrevivem por medição repetida; uma cai como não-provada.**
+
+| # | afirmação | veredito |
+|---|---|---|
+| 1 | 13 portas em loopback | **SOBREVIVE** — 0 containers públicos após todos os restarts |
+| 2 | vetor container→IdP fechado | **SOBREVIVE** — `waha → :3022` segue **timeout** |
+| 3 | `/admin` fora da internet | **SOBREVIVE** — **404**, com `/alive` ainda **200** |
+| 4 | timer sobrevive a reboot | **SOBREVIVE** — `enabled`, agendado |
+| 5 | **chave nova do workspace** | **NÃO PROVADA** |
+
+### O que cai, e por quê importa
+
+Os **2 workspaces em disco foram criados pela chave ANTIGA**. A nova só produz diretório quando
+alguém **autenticado** chamar — e `/chat` sem credencial responde `401`, barrando antes de
+`ensureWorkspace`.
+
+O que está provado: o serviço **boota** com o código novo (o `tsx` interpreta direto, então erro de
+sintaxe derrubaria) e `app.onionevolve.com` responde `200`. O que **não** está: que a chave por `sub`
+produza o diretório certo em uso real.
+
+**É exatamente a classe de erro que este PR corrige em cinco lugares** — verificar que o processo
+está de pé e chamar isso de comportamento verificado. Fica declarado em vez de arredondado.
+
+**Como provar quando houver login**: duas chamadas separadas por um refresh de token devem produzir
+**um** diretório, não dois — e o nome dele não pode ser `sha256` de nenhum token.
