@@ -313,14 +313,68 @@ fi
 # identificador pt-BR novo entra na lista, esta regra passa a cobri-lo de graça.
 # TETO DECLARADO: detector por lista enumerada só vê o que foi enumerado (o mesmo teto da REGRA 60), e
 # PostToolUse é posterior — a branch já foi criada. Mas renomear no ato é `git branch -m`, e é grátis.
-if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)git[[:space:]]+(checkout[[:space:]]+-b|switch[[:space:]]+-c|branch[[:space:]]+-m)([[:space:]]|$)'; then
-  _bn="$(printf '%s\n' "$cmd" | sed -nE 's/.*git[[:space:]]+(checkout[[:space:]]+-b|switch[[:space:]]+-c|branch[[:space:]]+-m)[[:space:]]+["'"'"']?([A-Za-z0-9._\/-]+).*/\2/p' | head -1)"
+# ⚠️ SEGUNDA VERSÃO. A primeira foi derrubada por passada adversarial no PR que a introduziu, com
+#    QUATRO defeitos — e o extrator por `sed` era a raiz de três deles:
+#      (a) `git branch -m <velho> <novo>`: o nome NOVO é o ÚLTIMO (`git branch --help`), e o captor
+#          pegava o PRIMEIRO. Medido: renomear `fix/rotacao-de-chaves` → `rotate-keys` — que é
+#          EXATAMENTE a cura que a mensagem manda — era ACUSADO pelo nome que estava sendo apagado; e
+#          renomear inglês → pt-BR passava calado. A guarda punindo a obediência, de novo.
+#      (b) COBERTURA: escapavam `-B`, `switch --create`/`-C`, `branch -M`, `git branch <nome>` (criação
+#          nua), `worktree add -b`, `git -C <dir> checkout -b` e `checkout --track -b`.
+#      (c) GULOSO: `.*git` no `sed` fazia a linha inteira ser julgada pela ÚLTIMA criação — criar a
+#          branch pt-BR e emendar `&& git checkout -b feat/ok` desarmava a regra.
+#    (b) e (c) são LITERALMENTE o defeito que o detector (3b), 130 linhas acima NESTE ARQUIVO, já
+#    documenta ter sofrido e curado. Segunda vez no mesmo dia que a cura paga não foi reusada.
+#
+# Agora: tokeniza POR STATEMENT (o mesmo split da (3b)), entende as opções globais do git, e aplica a
+# regra de posição CERTA para cada subcomando. Acentos são normalizados antes de segmentar — sem isso
+# `fix/rotação-de-chaves` truncava no captor e passava.
+if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)git([[:space:]]+(-C|-c)[[:space:]]+[^[:space:]]+|[[:space:]]+--git-dir=[^[:space:]]+)*[[:space:]]+(checkout|switch|branch|worktree)([[:space:]]|$)'; then
   _wl="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/validation/lib/pt-br-words.txt"
-  if [ -n "${_bn:-}" ] && [ -f "${_wl}" ]; then
-    _hits="$(printf '%s' "${_bn}" | tr '/_-' '\n\n\n' | tr '[:upper:]' '[:lower:]' | grep -Fxf "${_wl}" 2>/dev/null | sort -u | tr '\n' ' ')"
-    if [ -n "${_hits% }" ]; then
-      add "BRANCH-EM-PT-BR: \`${_bn}\` tem palavra(s) pt-BR: ${_hits% }. \`code-standards.md:39\` exige branch em INGLÊS (o prefixo Conventional e o nome são contrato de máquina; a narrativa em pt-BR vive no ASSUNTO do commit). Renomeie AGORA, enquanto é grátis: \`git branch -m <nome-em-ingles>\` — depois de publicar, a branch já nomeia o PR e o resíduo da REGRA 56."
-    fi
+  if [ -f "${_wl}" ]; then
+    while IFS= read -r _bn; do
+      [ -n "${_bn:-}" ] || continue
+      # normaliza acento: `rotação` → `rotacao`. Sem iconv, degrada declarando (mesma doutrina do jq).
+      _bn_ascii="$(printf '%s' "${_bn}" | iconv -f UTF-8 -t ASCII//TRANSLIT 2>/dev/null || printf '%s' "${_bn}")"
+      _hits="$(printf '%s' "${_bn_ascii}" | tr '/_.-' '\n\n\n\n' | tr '[:upper:]' '[:lower:]' | grep -Fxf "${_wl}" 2>/dev/null | sort -u | tr '\n' ' ')"
+      if [ -n "${_hits% }" ]; then
+        add "BRANCH-EM-PT-BR: \`${_bn}\` tem palavra(s) pt-BR: ${_hits% }. \`code-standards.md:39\` exige branch em INGLÊS (o prefixo Conventional e o nome são contrato de máquina; a narrativa em pt-BR vive no ASSUNTO do commit). Renomeie AGORA, enquanto é grátis: \`git branch -m <atual> <nome-em-ingles>\` — depois de publicar, a branch já nomeia o PR e o resíduo da REGRA 56."
+      fi
+    done <<PGBRANCH
+$(printf '%s' "$cmd" | sed 's/&&/\n/g; s/||/\n/g; s/;/\n/g' | awk '
+  function unq(t) { gsub(/^["'"'"']|["'"'"']$/, "", t); return t }
+  function isopt(t) { return substr(t, 1, 1) == "-" }
+  {
+    n = split($0, T, /[ \t]+/); i = 1
+    while (i <= n && (T[i] == "" || T[i] ~ /^(!|until|while|do|then|else|elif|if|\(|\{)$/)) i++
+    if (T[i] != "git") next
+    i++
+    while (i <= n && isopt(T[i])) { if (T[i] == "-C" || T[i] == "-c") i += 2; else i++ }
+    sc = T[i]; i++
+    if (sc == "worktree") { if (T[i] == "add") i++; else next; sc = "checkout" }
+    # colhe as posições dos argumentos NÃO-opção e a que segue a flag de criação
+    flagged = ""; last = ""
+    for (j = i; j <= n; j++) {
+      if (T[j] == "") continue
+      if (isopt(T[j])) {
+        if (sc == "checkout" && T[j] ~ /^-[bB]$/)                       { if (T[j+1] != "" && !isopt(T[j+1])) flagged = T[j+1] }
+        else if (sc == "switch" && T[j] ~ /^(-[cC]|--create)$/)          { if (T[j+1] != "" && !isopt(T[j+1])) flagged = T[j+1] }
+        else if (sc == "branch" && T[j] ~ /^(-[mMcC]|--move|--copy)$/)   { mv = 1 }
+        # QUALQUER outra opção desliga a leitura de "criação nua": `git branch -d <x>` APAGA, não cria,
+        # e acusar ali seria alarme sobre quem está justamente removendo a branch mal-nomeada.
+        hasopt = 1
+        continue
+      }
+      last = T[j]
+      if (nonopt == "") nonopt = T[j]
+      cnt++
+    }
+    # `branch -m [<velho>] <novo>`: o NOVO é o ULTIMO. `branch <nome>`: criação nua.
+    if (sc == "branch") { if (mv == 1) print unq(last); else if (cnt == 1 && hasopt == 0) print unq(nonopt) }
+    else if (flagged != "") print unq(flagged)
+    mv = 0; cnt = 0; hasopt = 0; nonopt = ""; last = ""
+  }')
+PGBRANCH
   fi
 fi
 

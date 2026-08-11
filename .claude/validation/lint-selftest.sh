@@ -5170,20 +5170,60 @@ run_empty_result_guard_selftests() {
   # (b4b) MUTATION — a lista de palavras é load-bearing. Sem ela a regra vira verde-vazia, que foi
   #       EXATAMENTE o estado em que ela quase embarcou. Este par existe para que a próxima pessoa que
   #       mexer na lista descubra pela bancada, não por um revisor meses depois.
-  local _wl_dir
+  # ⚠️ SEGUNDA VERSÃO DESTE CASO. A primeira era PASSE-VÁCUO, e o modo é instrutivo: o `sed` produzia
+  #    `/tmp/../<dir>/vazia.txt`, que resolve para `/<dir>/vazia.txt` — arquivo INEXISTENTE. A regra
+  #    calava pelo `[ -f "${_wl}" ]`, NÃO por lista vazia. O caso passava pelo motivo errado.
+  #    A passada adversarial provou a consequência: HARDCODAR a lista dentro da regra mantinha a
+  #    bancada inteira em 786/0. O caso afirmava "a lista é load-bearing" sobre uma regra que podia
+  #    ignorá-la por completo.
+  #
+  #    A cura tem DUAS pernas, e é a positiva que fecha o buraco:
+  #      · NEGATIVA  — lista vazia (existente!) deve CALAR;
+  #      · POSITIVA  — lista com UMA palavra FORJADA (`zzmarcador`) deve ACUSAR um nome que a lista
+  #                    real NÃO pega. Uma regra com lista hardcoded reprova esta perna por construção,
+  #                    porque não tem como conhecer a palavra inventada.
+  #    Sem a positiva, "não acusou" é indistinguível de "não leu o arquivo".
+  local _wl_dir _wl_line
   _wl_dir="$(mktemp -d)"
   : > "${_wl_dir}/vazia.txt"
-  sed "s#/validation/lib/pt-br-words.txt#/../${_wl_dir##*/}/vazia.txt#" "${hook}" > "${_wl_dir}/h.sh" 2>/dev/null || cp "${hook}" "${_wl_dir}/h.sh"
-  if cmp -s "${hook}" "${_wl_dir}/h.sh"; then
-    record_fail "empty-result-guard: (b5b)" "GUARDA-DA-GUARDA: a mutação da LISTA não foi aplicada (arquivos idênticos) — o sed virou no-op"
+  printf 'zzmarcador\n' > "${_wl_dir}/forjada.txt"
+  # aponta o `_wl=` da hook para um caminho ABSOLUTO controlado (a aritmética relativa era o defeito)
+  _wl_line="$(grep -cE '^[[:space:]]*_wl=' "${hook}" || true)"
+  if [ "${_wl_line}" != "1" ]; then
+    record_fail "empty-result-guard: (b5b)" "GUARDA-DA-GUARDA: esperava exatamente 1 linha \`_wl=\` na hook, achei ${_wl_line} — a mutação não pode ser aplicada com confiança"
   else
-    printf '{"tool_input":{"command":"git checkout -b fix/fixture-nao-depende-do-vivo"},"tool_response":{"stdout":""}}' \
-      | bash "${_wl_dir}/h.sh" >/dev/null 2>"${_wl_dir}/err" || true
-    if grep -q 'BRANCH-EM-PT-BR' "${_wl_dir}/err" 2>/dev/null; then
-      record_fail "empty-result-guard: (b5b)" "acusou com a lista APONTANDO PARA VAZIO — a regra não depende da lista, logo não mede o que declara"
-    else record_pass "empty-result-guard: (b5b) MUTATION — lista vazia CALA a regra: a lista é load-bearing, não decorativa"; fi
+    _erg_wl() {  # $1=arquivo-de-lista  $2=comando  → imprime stderr da hook mutada
+      sed -E "s#^([[:space:]]*)_wl=.*#\\1_wl=\"$1\"#" "${hook}" > "${_wl_dir}/h.sh"
+      printf '{"tool_input":{"command":"%s"},"tool_response":{"stdout":""}}' "$2" \
+        | bash "${_wl_dir}/h.sh" 2>&1 >/dev/null
+    }
+    if cmp -s "${hook}" "${_wl_dir}/h.sh" 2>/dev/null; then
+      record_fail "empty-result-guard: (b5b)" "GUARDA-DA-GUARDA: a mutação da LISTA não foi aplicada — o sed virou no-op"
+    else
+      local _neg _pos _iso
+      _neg="$(_erg_wl "${_wl_dir}/vazia.txt"   'git checkout -b fix/catraca-duas-portas' || true)"
+      _pos="$(_erg_wl "${_wl_dir}/forjada.txt" 'git checkout -b feat/zzmarcador-probe'   || true)"
+      _iso="$(_erg_wl "${_wl_dir}/forjada.txt" 'git checkout -b fix/catraca-duas-portas' || true)"
+      if printf '%s' "${_neg}" | grep -q 'BRANCH-EM-PT-BR'; then
+        record_fail "empty-result-guard: (b5b)" "lista VAZIA e a regra ainda acusou — ela não depende do arquivo"
+      elif ! printf '%s' "${_pos}" | grep -q 'BRANCH-EM-PT-BR'; then
+        record_fail "empty-result-guard: (b5b)" "lista FORJADA com \`zzmarcador\` e a regra NÃO acusou — ela não LÊ o arquivo (uma lista hardcoded produz exatamente isto)"
+      elif printf '%s' "${_iso}" | grep -q 'BRANCH-EM-PT-BR'; then
+        record_fail "empty-result-guard: (b5b)" "com a lista forjada a regra ainda pegou palavra da lista REAL — há vocabulário embutido além do arquivo"
+      else
+        record_pass "empty-result-guard: (b5b) MUTATION — vazia CALA · forjada ACUSA · e SÓ o que está no arquivo conta (lista hardcoded reprova por construção)"
+      fi
+    fi
   fi
   rm -rf "${_wl_dir}"
+
+  # (b5c) INVARIANTE DE TRAP — a guarda de abort da bancada ficou MUDA a vida inteira porque um
+  #       segundo `trap ... EXIT` a substituiu (bash guarda UM handler por sinal). Re-armar sem
+  #       asserção deixa o próximo `trap` — ou um helper `source`ado — desarmá-la de novo em silêncio.
+  #       Esta checagem roda EM RUNTIME e pega inclusive clobber vindo de arquivo externo.
+  if trap -p EXIT 2>/dev/null | grep -q '_bench_on_exit'; then
+    record_pass "empty-result-guard: (b5c) o handler de EXIT ainda é o combinado — a guarda de abort NÃO está muda"
+  else record_fail "empty-result-guard: (b5c)" "INVARIANTE VIOLADA: o handler de EXIT foi substituído — a guarda de abort está MUDA e um abort passaria como '666 verdes'"; fi
 
   # (b3) CALA na CURA — o idioma do colchete. Sem este caso a regra poderia ser "acusa sempre que
   #      vir pgrep", que empurraria quem obedece para o bypass (a lição da REGRA 56, que puniu
@@ -9459,7 +9499,11 @@ run_federation_projection_selftests
 # ---------------------------------------------------------------------------
 # Sumário
 # ---------------------------------------------------------------------------
-SUMMARY_PRINTED=1     # a partir daqui o trap de abort se cala — a suíte chegou ao fim
+# ⚠️ NÃO desarme a guarda AQUI. Ela ficava muda durante a IMPRESSÃO do sumário, e a janela é real:
+#    com a saída consumida por algo que fecha o pipe (`| head`, `| grep -q`), a suíte morre de
+#    SIGPIPE no meio da soma — medido: `rc=141`, sumário truncado, stderr VAZIO. Exatamente a
+#    "leitura confortável" que esta guarda existe para remover. O desarme foi para DEPOIS do
+#    veredito final, que é o único ponto em que a suíte de fato chegou ao fim.
 echo ""
 echo "=== Sumário do auto-teste de guardas ==="
 echo "  Passaram : ${PASS}"
@@ -9480,13 +9524,13 @@ if [ "${STRICT}" = "1" ] && [ "${SKIP}" -gt 0 ]; then
   echo "FALHOU (STRICT) — ${SKIP} guarda(s) não puderam ser exercidas neste ambiente."
   echo "  ONION_SELFTEST_STRICT=1 exige capacidade completa: instale o tooling ausente"
   echo "  (jq, python3, python3-yaml, git, openssl) ou rode sem STRICT para o degrade local."
-  exit 1
+  SUMMARY_PRINTED=1; exit 1
 fi
 
 if [ "${FAIL}" -gt 0 ]; then
   echo "FALHOU — guardas que não reagiram conforme esperado:"
   for c in "${FAILED_CASES[@]}"; do echo "  - ${c}"; done
-  exit 1
+  SUMMARY_PRINTED=1; exit 1
 fi
 
 if [ "${SKIP}" -gt 0 ]; then
@@ -9494,4 +9538,7 @@ if [ "${SKIP}" -gt 0 ]; then
 else
   echo "OK ✓ — todas as guardas reagiram conforme esperado."
 fi
+SUMMARY_PRINTED=1   # SÓ AQUI: o veredito foi IMPRESSO. Desarmar antes deixava a guarda muda durante
+                    # a própria impressão do sumário — e um SIGPIPE (`| head`, `| grep -q`) matava a
+                    # suíte no meio da soma com rc=141, sumário truncado e stderr VAZIO.
 exit 0
