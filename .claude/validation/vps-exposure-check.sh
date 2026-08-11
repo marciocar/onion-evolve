@@ -78,8 +78,26 @@ for _pg in $(_dk ps --format '{{.Names}}' | grep -iE 'logto.*(postgres|db)|postg
   fi
 done
 
+# ── (3) artefato de backup EM CLARO ─────────────────────────────────────────────────────────
+# Classe achada em 2026-08-11: 19 dumps do Logto viviam `root:root 644` em disco — o banco de
+# IDENTIDADES (hashes de senha, aplicacoes, segredos de cliente), legivel por qualquer uma das 5
+# contas com shell desta maquina. O backup do cofre ja cifrava; este nao, e a assimetria nao tinha
+# razao — so nunca tinha sido feita.
+# E o modo de falha e SILENCIOSO por natureza: um `.sql` a mais no diretorio nao chama atencao.
+# ⚠️ O ESCOPO E DECLARADO, nao adivinhado: so os diretorios `backups/` das ferramentas da casa.
+#    Varrer o disco atras de "coisa que parece backup" produziria falso-positivo em massa.
+for _bdir in /home/marcio/onion-vps-*/backups; do
+  [ -d "${_bdir}" ] || continue
+  # `find` (nao glob) porque o glob expande no shell do chamador e devolve vazio sem acesso —
+  # e vazio lido como ausencia e exatamente o fail-open que este arquivo existe para impedir.
+  _claros="$(find "${_bdir}" -maxdepth 1 -type f ! -name '*.gpg' 2>/dev/null | wc -l)"
+  if [ "${_claros}" -gt 0 ]; then
+    _say "BACKUP-EM-CLARO" "${_bdir}" "${_claros} arquivo(s) sem .gpg — backup nao cifrado e dado sensivel em repouso"
+  fi
+done
+
 if [ "${FORMAT}" != tsv ]; then
-  if [ "${_hard}" -eq 0 ]; then echo "  ✓ nenhuma porta publicada fora do loopback e nenhum conector upstream"
+  if [ "${_hard}" -eq 0 ]; then echo "  ✓ nenhuma porta publica, nenhum conector upstream, nenhum backup em claro"
   else echo "  ── ${_hard} achado(s) HARD"; fi
 fi
 [ "${_hard}" -eq 0 ] || exit 1

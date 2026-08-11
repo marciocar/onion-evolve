@@ -235,7 +235,21 @@ nodes:
     confidence: 0.8
     label: "A OPORTUNIDADE, e ela e de diferenciacao e nao de divida. A pesquisa nao achou NENHUM sistema publico que una grafo de DECISAO e grafo de CODIGO na mesma estrutura consultavel. Os dois movimentos existem em paralelo e nao se tocaram: em 2026 a comunidade redescobriu ADR-como-grafo com uma motivacao que e quase parafrase da doutrina desta casa — 'um agente que nao ve POR QUE algo foi construido de certa forma vai alegremente refatorar a razao para longe' — enquanto o lado do codigo (SCIP, CodexGraph, CGM) modela simbolo SEM `status`, `confidence` ou aresta `REFUTES`. O `.kg.yaml` ja tem `layer:`; a extensao natural seria `layer: code` com no tipado a simbolo e aresta ligando decisao->codigo. ⚠️ GATED E ASSIM DEVE FICAR: a evidencia de ganho de grafo de codigo e ESTREITA (localizacao de simbolo e dependencia cross-file), e o CodexGraph EMPATA com AutoCodeRover no SWE-bench Lite; os claims de '71,5x menos tokens' vem de Medium, nao de paper. O gatilho para abrir e adotante de MONOREPO GRANDE onde grep degrada por ambiguidade de simbolo — e a forma correta e consumir MCP de terceiro, nunca construir indexador."
 
+  - id: Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-11
+    verified_against: pass-show-rc2-sem-interacao-3-up-sh-afetados-backups-curados-nos-4-caminhos
+    status: open
+    impact: 3
+    confidence: 1.0
+    label: "O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de maior alcance da maquina e estava NU), e isso quebrou o acesso NAO-INTERATIVO ao `pass`: `pass show` sai rc=2 com `public key decryption failed`. CONSEQUENCIA MEDIDA: os tres `up.sh` (waha, logto, vaultwarden) leem do `pass`, entao REINICIAR QUALQUER SERVICO agora exige interacao. O que NAO quebrou, porque cifrar usa a chave PUBLICA: os backups — mas so depois de curar TRES defeitos empilhados que so apareceram um apos o outro (`${HOME}` virando /root no cron; `gpg` como root usando chaveiro vazio; e `marcio` sem conseguir LER o claro `root:root 600`). ⚠️ E o terceiro expos uma assimetria que ninguem tinha visto: o dump do Logto nascia **644** e por isso 'funcionava' — havia uma janela em que o banco de IDENTIDADES ficava legivel por qualquer uma das 5 contas com shell. AS OPCOES, com o custo de cada uma: (a) deixar como esta — reinicio manual pede senha, seguranca maxima; (b) presetar a passphrase no gpg-agent no boot a partir de arquivo 600 — devolve a automacao e ENFRAQUECE de volta, porque o arquivo vira o novo segredo nu; (c) chave separada, sem senha, so para automacao — isola o dano mas multiplica segredo. NAO ESCOLHI: (b) e (c) desfazem parte do que acabou de ser ganho, e essa troca e do dono. LICAO QUE FICA: eu testava so como `marcio`, e o cron e `root` — TESTAR NO CAMINHO ERRADO E NAO TESTAR."
+    trace: "/home/marcio/onion-vps-logto/backup.sh"
+
 edges:
+  - from: Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO
+    to: C_IDP_AUTENTICA_NAO_DECIFRA
+    edge_type: CONSTRAINS
   - from: C_TRES_MODELOS_DE_CONFIANCA
     to: C_IDP_AUTENTICA_NAO_DECIFRA
     edge_type: SUPPORTS
