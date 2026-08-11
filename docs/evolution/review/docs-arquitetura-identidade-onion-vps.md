@@ -1,7 +1,7 @@
 ---
 branch: docs/arquitetura-identidade-onion-vps
 date: 2026-08-11
-reviewed_diff_sha256: e6d1e3a943c984ba6a2694de95824a2ac6edb3420d9cabcbfd5123cb65a59eed
+reviewed_diff_sha256: 8aeaaacd37f8f212b435660008b39ac64a41b305fcbe55a9dc14d0b762827b7d
 findings_total: 6
 findings_real: 5
 findings_fixed: 5
@@ -66,3 +66,58 @@ o Logto do core**, derrubando `auth.onionevolve.com`. Movido, versionado, com o 
 
 O cofre **está vazio** e o SSO não completa: a identidade no Logto tem `primary_email` vazio, então o
 `id_token` não carrega a claim que o Vaultwarden exige. Isso é a W1, não este PR.
+
+---
+
+## Segunda rodada — W0, W1, W2 e W3 executadas
+
+### A guarda que nasceu, e por que ela NÃO é uma REGRA do lint
+
+`.claude/validation/vps-exposure-check.sh` vigia as **duas condições que armam risco** e que nada
+observava:
+
+1. **porta publicada em `0.0.0.0`** — medido que ela é alcançável de outro container (o caminho é
+   DNAT/FORWARD e escapa do `ufw INPUT`), enquanto `127.0.0.1` dá timeout;
+2. **conector upstream no Logto** — o evento que **arma os 6 CVEs do VU#492466**, que **não têm
+   patch** (a CERT registra que a mantenedora não foi alcançada).
+
+Ela checa **estado vivo**, não código — por isso **cala** (exit 0) fora da VPS, e por isso o lugar
+dela é um **timer systemd diário**, não o CI, onde não existe docker. Guarda que reprova por estar no
+lugar errado vira ruído e é desligada.
+
+**Par acusa/cala provado por mutação**: com um container-sonda em `0.0.0.0:39999` a guarda sai **1**
+nomeando o container; removida a sonda, sai **0**.
+
+### A regra que eu decidi NÃO construir
+
+O plano previa um lint exigindo `pipefail` em script com pipe a montante de `||`/`$?`. Varri o repo:
+**dois candidatos, ambos falso-positivo** — num o `|` que casou era do próprio `||`, no outro o
+`|| true` liga ao `grep`, que **é** o último elemento.
+
+**Zero casos reais.** Construir seria guarda nascida verde-vazia — o defeito que a própria
+`kg-grammar` desta casa registra. A cura real (`upgrade.sh`) já foi feita e vive **fora** do repo,
+onde lint de repo não alcançaria de qualquer forma.
+
+### O que mudou em produção
+
+| onda | o que | verificação |
+|---|---|---|
+| W0 | 13 portas do adotante → loopback | `waha → :3022` de **302** para **timeout** |
+| W0 | bootstrap do IdP do adotante fechado | `/register` → `/unknown-session`, `PUT Register` → **400** |
+| W0 | `/admin` do cofre fora da internet | **200 → 404**, loopback ainda `200` |
+| W1 | `primary_email` nas 2 identidades | destrava recuperação **e** a claim do cofre |
+| W1 | Postmark no tenant `admin` | era conta pública sem caminho de volta |
+| W1 | `factors: [Totp, BackupCode]` | API viva confirma |
+| W2 | workspace por `identity.subject` | boot limpo, `app` **200**, **23 → 2** workspaces |
+
+### Correções de gravidade que eu tinha declarado a mais
+
+- **Os 23 workspaces não eram vazamento entre pessoas** — 21 eram cascas de 8K. É perda de
+  continuidade e lixo em disco, não incidente de isolamento.
+- **O `working_dir` do postgres do core era falso positivo** — o compose enxerga os dois containers,
+  porque o `name:` fixado faz o projeto ser achado por label, não por diretório.
+
+### Declarado, e não coberto
+
+O laço do SSO fecha com **login real de navegador** — `sso_users` só sai de 0 quando alguém entrar.
+Está **destravado, não provado**. E o backup (W4) segue cifrado no mesmo disco.
