@@ -1,8 +1,8 @@
 ---
 branch: docs/reconcile-graph-and-cleanup
 date: 2026-08-11
-reviewed_diff_sha256: 7d7eaedb14337032e0c7bcfa34b84c2b95690a15d1b2c9a7c36d2bec40179bce
-findings_total: 3
+reviewed_diff_sha256: 57648b6d8d957e4f90ac538eb7764ea5058e51bd9347649cf928b2b72b67a532
+findings_total: 4
 findings_real: 3
 findings_fixed: 3
 tokens: 0
@@ -39,7 +39,7 @@ disso seria a troca invasão→lockout que este nó existia para evitar.
 
 ## 3. `Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA` → segue `open`, com carimbo novo
 
-36 artefatos cifrados, 3 scripts cifrando na origem, pacote de 1,1 MB entregue. **O destino imutável
+38 artefatos cifrados, 3 scripts cifrando na origem, pacote de 1,1 MB entregue. **O destino imutável
 continua aberto** — é conta a contratar, e a decisão é do dono.
 
 ## A guarda me pegou na primeira oportunidade
@@ -58,3 +58,20 @@ já mergeadas.
 
 **Deliberadamente NÃO removidos**, porque apagar antes de haver cópia seria destrutivo:
 `chave-privada-onion.asc` e `onion-backup-offsite-20260811.tar.gz`.
+
+---
+
+## Passada adversarial — três confirmam, uma me corrige
+
+| # | afirmação | veredito |
+|---|---|---|
+| 1 | remote do bridge existe | **SOBREVIVE** — `PRIVATE`, `ls-remote` rc=0 |
+| 2 | MFA e recuperação ligados | **SOBREVIVE** — API viva: `factors: [Totp, BackupCode]`, `forgotPassword.email: true` |
+| 3 | limpeza fez o que declarei | **SOBREVIVE** — 2 removidos, 2 preservados, exatamente como escrito |
+| 4 | **"36 artefatos cifrados"** | **CAI** — são **38** |
+
+O (4) é pequeno e a classe não: contei num instante e relatei como estado atual, sem incluir os
+backups que os próprios testes geraram depois. **Segunda vez no dia** — a primeira foi `devices=1`
+quando eram 2.
+
+A parte que importa se sustenta: **zero em claro**, medido com `stderr` visível.

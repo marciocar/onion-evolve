@@ -213,7 +213,7 @@ nodes:
     plane: PROD
     verified_at: 2026-08-10
     verified_at: 2026-08-11
-    verified_against: 36-artefatos-cifrados-3-scripts-cifram-na-origem-pacote-de-1.1MB-entregue
+    verified_against: 38-artefatos-cifrados-3-scripts-cifram-na-origem-pacote-de-1.1MB-entregue
     status: open
     impact: 4
     confidence: 1.0
