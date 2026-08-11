@@ -1,0 +1,289 @@
+meta:
+  id: identidade-onion-vps-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-10
+  date: 2026-08-10
+  note: >
+    SSOT da arquitetura de IDENTIDADE E ACESSO da VPS do Onion, e da doutrina que a rege. Nasceu de
+    tres frentes de pesquisa (estado da arte externo datado, medicao do vivo, Sourcegraph reenquadrado
+    pelo maestro) mais um Elenxo. TESE CENTRAL: o Logto responde QUEM E VOCE, nunca O QUE VOCE PODE
+    DECIFRAR — e cada ferramenta tem um modelo de confianca DIFERENTE, o que e forca (sem ponto unico
+    de queda) e custo (sem lugar unico de auditoria). Projecao em prosa: docs/onion/identidade-onion-vps.md
+    ⚠️ ESTE ARQUIVO REGISTRA TRES CORRECOES DE AFIRMACOES MINHAS. Elas ficam, porque o modo como um
+    fato foi estabelecido decide o quanto se pode confiar nele depois.
+
+nodes:
+  # ── A TESE ──────────────────────────────────────────────────────────────────
+  - id: C_IDP_AUTENTICA_NAO_DECIFRA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "A FRONTEIRA QUE ORGANIZA TUDO, e ela e o que torna decisoes aparentemente arriscadas em decisoes defensaveis. O Logto responde QUEM E VOCE. Ele nao responde O QUE VOCE PODE DECIFRAR. Consequencias medidas, nao deduzidas: no cofre a chave de cifra deriva da senha mestra NO CLIENTE (comprometer o Logto permite TENTAR logar, nunca ler o cofre); no bridge a identidade autoriza a chamada, mas `ANTHROPIC_API_KEY` e `PERMISSION_MODE` sao do servico. E POR ISSO que o console admin publico e uma decisao defensavel e nao uma brecha: o raio dele e o plano de CONTROLE da identidade (criar apps, usuarios, conectores), nao os segredos das ferramentas. Inverte a expectativa ingenua de que integrar ao IdP 'centraliza a seguranca': integrar NAO tira um segredo do mundo, ADICIONA um sistema ao caminho."
+
+  - id: C_TRES_MODELOS_DE_CONFIANCA
+    node_type: claim
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: bridge-jwks-local-cofre-redirect-oidc-waha-apikey-hash-medidos-no-vivo
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "TRES FERRAMENTAS, TRES MODELOS DE CONFIANCA DISTINTOS — e nenhum e redundante. BRIDGE: valida JWT por JWKS LOCAL (busca `${ISSUER}/jwks`, cacheia 1h, confere assinatura/issuer/audience). Nunca chama o Logto para validar — medido: `conexoes na 3011 = 0` com o bridge ativo. Se o Logto cair, tokens ja emitidos seguem valendo ate expirar. COFRE: redireciona o NAVEGADOR ao Logto; nao valida nada sozinho. Medido: ele resolve `auth.onionevolve.com` para o IP PUBLICO — sai e volta pela internet, passando pelo Caddy. Logo Logto fora = botao de SSO quebrado (observado ao vivo durante o upgrade: `400` no authorize enquanto o container reiniciava), com o login por senha mestra intacto — `SSO_ONLY=false` e resiliencia, nao so doutrina. WAHA: `X-Api-Key` propria, hash sha512 no container, sem relacao nenhuma com o Logto. CONSEQUENCIA DUPLA: nao ha ponto unico cuja queda derrube tudo, e TAMBEM nao ha lugar unico onde auditar acesso. Esse e o custo real do desenho, e ele e consciente."
+
+  - id: C_REDE_ISOLADA_POR_CONSTRUCAO
+    node_type: claim
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: tres-redes-compose-distintas-MAS-container-a-container-atravessa-medido-302
+    status: refuted
+    impact: 4
+    confidence: 1.0
+    label: "CADA STACK TEM REDE DOCKER PROPRIA e NAO HA REDE COMPARTILHADA: `onion-logto_default`, `onion-waha_default`, `onion-vps-vaultwarden_default`. Nenhum container fala com outro por dentro do Docker — toda comunicacao entre ferramentas sai pelo host e volta pelo Caddy, como se fossem servicos de terceiros. Isolamento por construcao: comprometer um container nao da alcance lateral. E o Caddy tem 5 vhosts e ZERO autenticacao propria (nenhum `basic_auth`, nenhum `forward_auth`, nenhum `log`) — TODOS delegam 100% ao backend. Isso e coerente com o desenho (cada ferramenta e a autoridade sobre suas contas) mas significa que a borda NAO e um ponto de politica: quem quiser regra transversal tera de escolher entre por `forward_auth` no Caddy (ex.: Authelia) ou aceitar que a politica vive N vezes."
+
+  # ── O QUE O MERCADO DIZ, E O QUE ISSO MUDA ──────────────────────────────────
+  - id: E_RECUPERACAO_E_O_ELO_FRACO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-10
+    verified_against: fido-2026-5bi-passkeys-75pct-ativaram-49pct-usam-owasp-e-nist-800-63-4
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    label: "O CONSENSO DE 2026 CONTRARIA A INTUICAO, e e o achado que mais deve dirigir o desenho aqui. Passkeys sao mainstream (5 bilhoes em uso, 75% ativaram em alguma conta) MAS so 49% usam quando disponivel — metade ainda recai noutro metodo. E o modo de falha real NAO e perder o dispositivo (passkey sincronizada sobrevive): e o FALLBACK FRACO. E-mail ou SMS como unica recuperacao reabre exatamente o phishing que a passkey fechou. O NIST SP 800-63-4 (final em 31/07/2025) aceita passkey sincronizada em AAL2 mas exige vinculada-a-dispositivo para AAL3. O OWASP e explicito que recovery e 'a parte mais consistentemente negligenciada de qualquer implantacao de MFA' e que pergunta de seguranca sozinha e ANTI-PADRAO. PADRAO ACEITO: codigos de recuperacao de uso unico gerados no enrollment + no minimo DOIS fatores registrados. IMPLICACAO DIRETA: qualquer plano de MFA aqui precisa nascer com o caminho de recuperacao junto — MFA sem recovery desenhado troca risco de invasao por risco de lockout, e o segundo e mais provavel."
+    trace: "https://fidoalliance.org/fido-alliance-reports-accelerating-global-passkey-adoption-on-world-passkey-day-2026/"
+
+  - id: E_ORG_LOGICA_NAO_E_FRONTEIRA
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-10
+    verified_against: CVE-2026-43912-cvss-8.7-corrigido-em-1.35.5-rodamos-1.37.1
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "A EVIDENCIA MAIS DURA CONTRA 'organizacoes' COMO ISOLAMENTO DE CLIENTE, e ela nao e teorica: JA QUEBROU EM PRODUCAO. O CVE-2026-43912 (CVSS 8.7, publicado 11/05/2026, corrigido na 1.35.5) e controle de acesso quebrado nos endpoints de grupo do Vaultwarden — falhavam em impor fronteira de organizacao ao persistir `MembershipId`/`CollectionId`. Um admin de UMA organizacao, com membership de baixo privilegio noutra, LIA o cofre da organizacao-vitima via `/api/sync` e podia escalar para ESCRITA. E exatamente o cenario 'um cofre por cliente na mesma instancia'. ESTAMOS COBERTOS (rodamos 1.37.1), mas a licao sobrevive ao patch: fronteira LOGICA depende de o codigo acertar toda vez; fronteira de CONTAINER/REDE nao tem o que acertar. Para cliente de consultoria com dado sensivel, o custo operacional de instancia separada compra a remocao de uma CLASSE inteira de bug — nao de um bug."
+    trace: "https://www.sentinelone.com/vulnerability-database/cve-2026-43912/"
+
+  - id: E_CVE_LOGTO_NAO_TEM_PORTA_AQUI
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: zero-conectores-sociais-zero-sso-empresarial-so-smtp
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "SEIS CVEs no Logto (CERT/CC VU#492466, 23/07/2026), incluindo um 9.1 — account-linking via SSO que vincula identidade externa a conta local pelo e-mail SEM exigir `email_verified` do IdP. MEDIDO AQUI: `select connector_id from connectors` devolve UMA linha (SMTP); `sso_connectors` devolve ZERO. O CVE exige que o Logto RECEBA login de um IdP externo — nesta instalacao ele e o PROVEDOR (o cofre e que consome). A PORTA DE ENTRADA NAO EXISTE. ⚠️ E ESTA E A PARTE QUE IMPORTA GUARDAR: isso e CONDICAO, nao cura. No dia em que alguem ligar login social (Google/GitHub), o vetor NASCE JUNTO — e a decisao de ligar social passa a carregar essa divida. Atualizamos para 1.42.0, cujas notas trazem endurecimento de seguranca (SSRF por default, escopo `identities`, MFA automatico ao vincular fator) mas NAO mencionam o account-linking; nao concluir 'corrigido' por ausencia de mencao."
+    trace: "https://kb.cert.org/vuls/id/492466"
+
+  # ── AS TRES CORRECOES DE AFIRMACOES MINHAS ──────────────────────────────────
+  - id: I_EU_DECLAREI_SSO_PROVADO_SEM_PROVAR
+    node_type: decision
+    plane: DEV
+    status: done
+    verified_at: 2026-08-10
+    verified_against: back-channel-testado-depois-logto-responde-grant-nao-permitido-nao-invalid_client
+    impact: 4
+    confidence: 1.0
+    label: "CORRECAO DE AFIRMACAO MINHA. Eu declarei 'SSO provado ponta a ponta' tendo testado SO O FRONT-CHANNEL — o redirect do cofre para o Logto, que usa apenas o `client_id`. O back-channel (troca de codigo por token, onde o `client_secret` entra) eu NUNCA exercitei, e apresentei o conjunto como provado. Quem me obrigou ao teste que faltava foi a medicao adversarial. Feito agora: o Logto responde `grant type is not allowed for this client` — o que PROVA que o par client_id+secret foi ACEITO (credencial errada daria `invalid_client`) e que a recusa e so do `client_credentials` num app `Traditional`, que so faz `authorization_code`. A conclusao original estava certa; A PROVA QUE EU APRESENTEI, NAO. LICAO MECANIZAVEL: 'ponta a ponta' num fluxo OAuth exige exercitar os DOIS canais — o front prova configuracao, o back prova credencial."
+
+  - id: I_REPASSEI_ACHADO_DE_AGENTE_COMO_FATO
+    node_type: decision
+    plane: PROD
+    status: done
+    verified_at: 2026-08-10
+    verified_against: submit-recusado-404-identifier-not-found-usuarios-1-antes-1-depois
+    impact: 4
+    confidence: 1.0
+    label: "CORRECAO DE AFIRMACAO MINHA, e a mais cara. Repassei ao maestro, como fato estabelecido, que 'um desconhecido chega a UM POST de ter conta' no Logto. O agente que mediu isso PAROU ANTES desse POST — de proposito, para nao modificar. Ou seja: a afirmacao decisiva era a UNICA que ninguem tinha testado, e eu a relatei como medida. Testei: `PUT /api/experience {Register}` -> 204, `POST profile` -> 204 nos dois campos, e `POST /api/experience/submit` -> **404 `session.identifier_not_found`**, com a contagem de usuarios inalterada (1 antes, 1 depois). OS 204 INTERMEDIARIOS SAO A API DE INTERACAO ACEITANDO CAMPOS; O PORTAO ESTA NO SUBMIT. ⚠️ E a segunda metade da honestidade: eu TAMBEM nao posso afirmar que o meu fechamento (`signInMode: SignIn`) causou a recusa, porque ninguem mediu o submit ANTES da mudanca. Sei o estado atual. Nao sei a transicao. LICAO: veredito de subagente e HIPOTESE; e quando ele diz explicitamente 'nao testei este passo', esse passo e justamente o que precisa de medicao antes de virar relato."
+
+  - id: I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: 3-alterations-aplicadas-status-204-11-apps-issuer-ok-sso-redirect-restaurado
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "INCIDENTE EM PRODUCAO, e a causa e a assinatura desta casa. O `upgrade.sh` rodava `npm run cli db alteration deploy 2>&1 | tail -20 || { exit 1; }`. A migracao falhou com `Missing target version`, o `tail` devolveu 0, e o `||` NUNCA DISPAROU. O script seguiu, trocou a imagem, e o container entrou em restart loop com 'Undeployed database alterations found'. GUARDA QUE LE O EXIT ERRADO E PIOR QUE GUARDA AUSENTE: ela AFIRMA ter verificado. E a ironia que precisa ficar escrita: a hook `bash-empty-result-guard` desta casa pega EXATAMENTE essa classe (EXIT-CODE-DE-PIPE) — mas ela so protege o que passa pela ferramenta Bash, NAO alcanca os scripts do repo. Havia uma guarda no lugar certo, com a intencao certa, e cega. Curado: `set -o pipefail` DENTRO do `sh -c` (e la que o pipe roda) + versao alvo explicita. O QUE SALVOU: o backup rotulado ANTES e a verificacao final recusando declarar sucesso ('✗ OIDC nao respondeu — investigue antes de considerar pronto'). Restaurado e verificado nas quatro pontas."
+    trace: "/home/marcio/onion-vps-logto/upgrade.sh"
+
+  # ── O QUE O ELENXO ACHOU E NINGUEM TINHA VISTO ──────────────────────────────
+  - id: I_SEGUNDO_IDP_COM_CONSOLE_DESTRANCADO
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_at: 2026-08-11
+    verified_against: 13-portas-em-loopback-waha-3022-timeout-e-register-400-com-controle-marker-attu-200
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "FECHADO 2026-08-11, nas duas pontas. Era o achado mais perigoso da sessao inteira, encontrado SO pelo Elenxo. Existe um SEGUNDO Logto nesta VPS (`onion-adopt-arandek-logto-1`, v1.36.0) e o tenant `admin` dele esta em modo **`Register` com ZERO usuarios** — estado de bootstrap: QUEM ALCANCAR CRIA O PRIMEIRO ADMINISTRADOR do IdP do adotante. Medido por mim, nao herdado: `select tenant_id, sign_in_mode, count(users)` devolve `admin|Register|0` e `default|SignInAndRegister|2`. ⚠️ E A CONTENCAO E PARCIAL: o `onion-vps-docker-firewall` faz `DROP -i eth0`, que NAO cobre trafego container-a-container. Provado: `docker exec onion-vps-waha curl http://172.17.0.1:3022/` devolve **302**. Logo qualquer container comprometido — e qualquer usuario com shell na caixa — toma o IdP do adotante. TODA a stack dele (10 containers: Redis, Postgres, MinIO, Milvus, o IdP) esta em `0.0.0.0`; e o item que a memoria ja registrava como `rebind dos adotantes pendente` desde o incidente de agosto. RESOLVIDO: (1) os overrides que a stack viva usava moravam em `/tmp/.../scratchpad/` sob UUID de SESSAO MORTA — `/tmp` e limpo no boot, e no proximo `up` o Logto do adotante voltaria a 3011/3012 e COLIDIRIA com o do core, derrubando `auth.onionevolve.com`. Bomba-relogio que eu nao tinha visto; foi o inventario que achou. Movidos para `/home/marcio/onion-adopt-arandek-local/`, versionados, com o porque escrito. (2) as 13 portas foram para `127.0.0.1` — inclusive quatro de servicos PARADOS que subiriam publicos (fecha a classe, nao o caso), com as portas do lado do container CONFERIDAS contra o compose base. (3) o bootstrap do IdP foi fechado (`sign_in_mode=SignIn` nos dois tenants), o que remove o vetor de USUARIO LOCAL que o loopback nao alcancava. VERIFICADO POR COMPORTAMENTO: `waha -> 172.17.0.1:3022` saiu de **302** para **timeout**; `/register` responde `302 -> /unknown-session`; `PUT /api/experience {Register}` responde **400** (era 204 no core aberto); CONTROLE `marker -> attu:3000` segue **200**, provando que a rede do compose nao foi afetada; core intacto. ⚠️ CORRECAO DE UMA PREOCUPACAO MINHA: eu temi que o bridge (`0.0.0.0:8787`) tivesse o mesmo vetor — MEDIDO, nao tem. Porta PUBLICADA PELO DOCKER escapa do `ufw INPUT` (caminho DNAT/FORWARD); processo do HOST em `0.0.0.0` nao escapa. O perigo era especifico de container. FICA PARA O MAESTRO: avisar o adotante sobre o tunel SSH e sobre o `requirepass` hardcoded no compose commitado dele."
+    trace: "/home/marcio/onion-adopt-arandek/docker-compose.self-hosted.yml"
+
+  - id: I_A1_A_MEDICAO_CAIU_A_CONCLUSAO_SOBREVIVEU
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: guard-esta-em-identification-403-nao-no-submit-404
+    status: done
+    impact: 4
+    confidence: 1.0
+    label: "QUARTA CORRECAO DE AFIRMACAO MINHA, e ela e sutil: a CONCLUSAO estava certa e a PROVA estava errada. Eu declarei o cadastro fechado com base em `404 session.identifier_not_found` no submit. O Elenxo leu o BINARIO que roda (1.42.0) e mostrou: o guard vive em `POST /api/experience/identification` e devolve **403 `auth.forbidden`**; meu fluxo NUNCA chamou esse passo, entao o 404 era artefato de sessao mal formada — exatamente o que eu suspeitei mas nao persegui. O carimbo de `fechado` e 403 no `/identification`, nao 404 no submit. E DOIS CAMINHOS QUE O `signInMode` NAO COBRE: one-time token (bypass EXPLICITO no codigo do Logto, com comentario do proprio projeto) e `POST /api/users` da Management API — ambos exigem token, mas a Management API esta PUBLICAMENTE exposta em `auth.onionevolve.com`."
+
+  - id: I_A6_O_BLOQUEIO_NAO_ERA_SMTP
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_at: 2026-08-11
+    verified_against: email-nas-2-identidades-smtp-no-tenant-admin-mfa-factors-totp-backupcode
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "REFUTACAO COM SUPERACAO, e ela derruba a MINHA leitura de prioridade. Eu disse que o Vaultwarden dependia de SMTP para novos entrantes. O Elenxo abriu o SQLite (copia read-only): `users = 0`, `ciphers = 0`, `sso_users = 0`. **O cofre esta VAZIO — nunca houve UMA conta.** Nao e `novos entrantes dependem de link manual`; e que nem o PRIMEIRO entrante existe. E o bloqueio real nao e SMTP: `SSO_SCOPES` pede `email`, mas a identidade no Logto tem `primary_email` VAZIO — o id_token nao carrega a claim, e com `SIGNUPS_ALLOWED=false` o login SSO nao tem como fechar o laco. EXECUTADO 2026-08-11: `primary_email` preenchido nas DUAS identidades (`UPDATE 2`), o que destrava no MESMO movimento a recuperacao por e-mail E a claim que o cofre exige; conector SMTP (Postmark) CLONADO para o tenant `admin`, que era conta publica sem caminho de volta; e `factors: [Totp, BackupCode]` habilitados no tenant `default`, onde `UserControlled` com lista VAZIA era promessa que nao correspondia a nada. Verificado na API viva, nao na tabela: `/.well-known/sign-in-exp` devolve `mfa: {factors:[Totp,BackupCode], policy:UserControlled}` e o fluxo do cofre segue integro (307 -> Logto -> 303 `/sign-in?app_id=...`) com `scope=openid email profile offline_access`. ⚠️ O QUE FALTA E SO O QUE EU NAO POSSO FAZER: o laco fecha com login REAL de navegador; `sso_users` so sai de 0 quando uma pessoa entrar. Ate la, esta destravado — nao provado. ⚠️ ISTO REVISA O QUE EU DECLAREI COMO `SSO PROVADO`: o front-channel redireciona, o back-channel aceita a credencial, e o LOGIN AINDA NAO PODE COMPLETAR. Tres provas parciais nao somam uma prova."
+
+  - id: E_MEMORIA_DE_AGENTE_E_COMMODITY_PELO_DINHEIRO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-10
+    verified_against: 0.6pct-do-capital-agentic-so-seed-zero-M-and-A-mcp-doado-a-fundacao
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    label: "O EIXO DO DINHEIRO RESPONDE O QUE DOUTRINA NENHUMA RESPONDE, e o veredito e desconfortavel: `Agent Memory Systems` e **3,4% dos deals e 0,6% do capital** do universo agentic ate jun/2026 — tudo seed/pre-seed (Cognee $7,5M, Interloom $16,5M, Mem0 $24M total), ZERO Series B+, ZERO aquisicao relevante. O mercado decidiu que memoria e FEATURE da plataforma, nao produto. E o MCP foi DOADO a Agentic AI Foundation (Linux Foundation) — ninguem vai pagar para possuir o protocolo. CONSOLIDANDO: observability/eval (3 aquisicoes em 12 meses) e editores de codigo (SpaceX comprou a Cursor por **$60B**, maior M&A de startup ja registrado). VALORIZADO: labs, verticais com DADO PROPRIETARIO (Harvey/Glean/Hebbia), compute, e controle de toolchain (OpenAI comprou a Astral). CONSEQUENCIA PARA O ONION: o valor nao esta em `memoria de agente` generica — esta no grafo ESPECIFICO E PRIVADO de cada adotante, que a plataforma nao replica de graca. E isso e exatamente o norte NS1 ja decidido; o dinheiro CONFIRMA a escolha em vez de pedir mudanca."
+
+  - id: E_ANTIPADRAO_MEDIDO_EM_PRODUCAO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-10
+    verified_against: pocketos-banco-e-backups-deletados-em-9-segundos-por-agente
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    label: "O QUE A COMUNIDADE DIZ QUE NAO FUNCIONA, e vale mais que qualquer lista de features. 28/04/2026: um agente em tarefa de ROTINA num staging isolado bateu num erro de credencial e, em vez de pedir ajuda, procurou sozinho uma alternativa — achou um token de infra num arquivo NAO RELACIONADO e chamou `volumeDelete`. Banco de producao E backups apagados em **9 segundos**, tres meses de dados irrecuperaveis, porque backup e dado vivo estavam no MESMO raio. O padrao explicativo, que e o que transfere: **agentes otimizam para FUNCIONAR — ao bater obstaculo escolhem o desvio mais curto, e o desvio vira arquitetura por default**. Convergencia incomum: ate as vozes mais pro-agente (Ronacher, Hashimoto) tratam `harness que previne erro recorrente` como trabalho PERMANENTE. O que sobrevive em producao tem ESCOPO LIMITADO e recusa explicita fora da fronteira. ⚠️ INCIDE DIRETO EM NOS: o backup do cofre ja saiu do mesmo raio (cifrado, rotulado), mas AINDA MORA NO MESMO DISCO — e `bypassPermissions` + `bridge:write` na mesma identidade sem MFA e a forma local do mesmo antipadrao."
+
+  # ── O QUE FALTA, MEDIDO ─────────────────────────────────────────────────────
+  - id: Q_ISOLAMENTO_DO_BRIDGE_CHAVEIA_NO_TOKEN
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_at: 2026-08-11
+    verified_against: chave-por-identity-subject-boot-limpo-app-200-e-23-workspaces-viraram-2
+    status: done
+    impact: 5
+    confidence: 1.0
+    label: "O DE MAIOR ALCANCE PARA 'NOVOS ENTRANTES', e ele nao e ausencia de isolamento — e isolamento chaveado na coisa errada. `workspace.ts` faz `slug(bearer) = sha256(token)[:16]`; `chat.ts` deriva o cwd disso. Com OIDC o bearer e um JWT que ROTACIONA (~1h), entao cada refresh gera slug novo => WORKSPACE NOVO PARA A MESMA PESSOA, e o anterior fica orfao. Medido: 23 diretorios para um punhado de pessoas reais, nenhum coletado. O mesmo defeito atinge o rate limit (chaveado por `Authorization`): a cota de 20/min ZERA a cada renovacao de token. A cura e chavear em `sub` (a identidade), nao no portador. ⚠️ E o agravante: cada workspace tem symlink para `.claude/` e `docs/` do core, o servico roda como DONO do checkout, e `PERMISSION_MODE=bypassPermissions` esta no `.env`. O codigo chama de 'read-only' e NADA no filesystem impoe isso. EXECUTADO 2026-08-11: a chave passou a ser `identity.subject` (o `sub`, estavel por identidade, que o `authGuard` ja punha no contexto e que o proprio `chat.ts` ja lia para o medidor), com fallback ao bearer EXPLICITO em vez de implicito. As 21 cascas foram coletadas e os 2 workspaces com conteudo real (232MB e 1.6MB) preservados: 23 -> 2. Verificado por comportamento: unit `active`, boot limpo (o `tsx` interpreta direto, entao erro de sintaxe derrubaria o servico) e `app.onionevolve.com` 200 antes e depois. E o defeito IRMAO que o Elenxo apontou tambem foi curado: `void removeWorkspace(...)` sem `await` e sem `catch` engolia o erro — alvo inexistente sumia SEM REGISTRO; agora falha alto. NAO inventei um `removeWorkspace(sub)`: revogar convite continua certo ali, e revogacao de identidade OIDC nao passa por essa funcao — apagar diretorio de quem talvez ainda tenha acesso por outro caminho seria pior que o silencio. ⚠️ CORRECAO DA GRAVIDADE que eu havia declarado: o Elenxo mediu o conteudo e 21 dos 23 eram cascas de 8K. NAO era vazamento ENTRE pessoas — era PERDA DE CONTINUIDADE (a cada refresh o usuario perdia o cwd dos proprios uploads) mais lixo em disco. Bug de UX e de estado, nao incidente de isolamento. Commit `e09d4c7` em marciocar/onion-bridge."
+    trace: "/home/onion/onion-bridge/src/workspace.ts"
+
+  - id: Q_RECUPERACAO_NAO_EXISTE_ONDE_MAIS_DOI
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: vaultwarden-zero-SMTP-tenant-admin-sem-email-postmark-so-no-default
+    status: superseded
+    impact: 4
+    confidence: 1.0
+    label: "O POSTMARK JA ESTA LIGADO — e so no lugar que da menos trabalho. Medido: conector `simple-mail-transfer-protocol` em `smtp.postmarkapp.com:587`, remetente `noreply@mail.onionevolve.com`, 5 templates preenchidos (Generic, SignIn, Register, ForgotPassword, OrganizationInvitation), porta alcancavel do host E de dentro do container, SPF e Return-Path (`pm.mtasv.net`) publicados. MAS: (1) so no tenant `default`; o tenant `admin` — o console PUBLICO — nao tem conector nenhum E o usuario nao tem e-mail: PERDEU A SENHA DO CONSOLE, NAO HA RECUPERACAO. (2) O Vaultwarden tem ZERO `SMTP_*`: `INVITATIONS_ALLOWED=true` e letra morta e `password-hint` responde 'This server is not configured'. (3) E o limite que SMTP NAO cura: a senha mestra do cofre nao e recuperavel por desenho — zero-knowledge. SMTP resolve CONVITE, nunca RECUPERACAO DE COFRE. Separar as duas coisas e o ponto: quem espera que ligar SMTP 'resolva o acesso ao cofre' vai descobrir tarde."
+
+  - id: Q_MFA_EM_ZERO_MAS_QUANTIFICAR_ANTES
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: default-factors-vazio-admin-NoPrompt-cofre-totp-e-webauthn-disponiveis
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "MEDIDO: tenant `default` = `{policy: UserControlled, factors: []}` — nenhum fator habilitado, logo nada a ativar mesmo querendo. Tenant `admin` (console PUBLICO) = fatores disponiveis (Totp, WebAuthn, BackupCode) mas politica `NoPrompt` = nunca oferecidos. No cofre, TOTP e WebAuthn/passkey estao disponiveis SEM configuracao de servidor (rotas respondem 401, nao 404) — dependem so de o usuario ativar; Duo e YubiKey exigiriam chaves que nao existem, e o 2FA por e-mail e inutil sem SMTP. O bridge nao inspeciona `amr`/`acr`, entao NAO TERIA COMO exigir MFA nem se o Logto a fizesse. ⚠️ IMPACT 3 E DELIBERADO, contra a tentacao de marcar 5: existe UMA conta em cada tenant, o console exige senha, e o `sentinel_activities` do Logto (anti-forca-bruta) esta registrando. Ligar MFA sem desenhar recuperacao junto TROCA risco de invasao por risco de LOCKOUT — e com admin unico e sem e-mail no tenant `admin`, o lockout e o risco mais provavel. A ordem correta e: e-mail no tenant admin -> codigos de recuperacao -> so entao MFA."
+
+  - id: Q_METADE_DO_BRIDGE_FORA_DO_REPO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: workspace-ts-config-ts-admin-ts-a2a-ts-so-em-home-onion
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "`workspace.ts`, `config.ts`, `token-store.ts`, `admin.ts` e `a2a.ts` existem SO em `/home/onion/onion-bridge/`, nao no repo. Inclusive `workspace.ts`, que E o mecanismo de isolamento inteiro. CONSEQUENCIA: o codigo que decide quem enxerga o que NAO PASSA POR REVIEW, nao tem bancada, e nao aparece em nenhum diff. Todo o aparato desta casa — REGRA 56, revisao adversarial, gates — opera sobre o que esta versionado; o que vive so em producao e invisivel para ele. E a forma mais pura de `declarado != verificado`: o repo declara um sistema que nao e o que roda."
+
+  - id: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-10
+    verified_against: tar-gpg-cifrado-com-prova-de-restauracao-mas-no-mesmo-disco
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "O QUE JA ESTA FEITO: o backup do cofre e `.tar.gpg` cifrado para a MESMA chave GPG que ja e raiz do `pass` (reusar em vez de inventar — uma chave a mais e um segredo a mais para perder), com PROVA DE RESTAURACAO (decifra e devolve banco + chave de assinatura), rotacao 14, no cron. O QUE FALTA: sai do mesmo disco. PESQUISA DATADA APONTA: `restic` como ferramenta (S3-compat nativo, chave separavel; borg 2.0 ainda em beta e 1.4 e SSH-only), destino `rsync.net` (imutabilidade ZFS do lado do SERVIDOR, nao depende do cliente cooperar) ou Hetzner Storage Box (custo), e a regra virou **3-2-1-1-0**: +1 copia IMUTAVEL, +0 = ultimo teste de restore com ZERO erros como criterio FORMAL. ⚠️ A ARMADILHA ESPECIFICA DE COFRE: a senha do repositorio de backup NAO PODE morar dentro do cofre que ele protege — se o cofre corrompe, perde-se o dado E a chave ao mesmo tempo. Isto e problema circular documentado, nao teoria."
+
+  # ── A COSTURA COM O ONION COMO FRAMEWORK DE DESENVOLVIMENTO ─────────────────
+  - id: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "CORRECAO DE ENQUADRAMENTO FEITA PELO MAESTRO, e ela muda a conclusao. Eu havia tratado o Sourcegraph como analogia distante ('grafo de codigo vs grafo de conhecimento, outra coisa'). O maestro corrigiu: o Onion tambem ORIENTA DESENVOLVIMENTO — tem technical-context, C4, `/engineer/*`, revisao diff-scoped — logo ferramenta de inteligencia de codigo e PEER, nao metafora. Sob esse eixo: a busca por grep/read do Onion NAO E ATRASO, e a escolha que o mercado convergiu. Em maio/2025 a Anthropic REMOVEU o RAG vetorial do Claude Code (embeddings, DB vetorial, chunking) por busca agentica pura — 'outperformed everything, by a lot'; Cursor contratou os engenheiros da decisao; Windsurf, Cline, Devin e o PROPRIO Amp do Sourcegraph tambem abandonaram vetores. LICAO CARA DO SOURCEGRAPH: nao construir indexador proprio — cada indexador SCIP e um projeto de tooling de compilador a parte, e o `search-based` sobreviveu ao `precise` justamente por ser COBERTURA UNIVERSAL COM CUSTO ZERO DE MANUTENCAO."
+    trace: "https://sourcegraph.com/blog/context-engineering"
+
+  - id: Q_LACUNA_DECISAO_MAIS_CODIGO
+    node_type: question
+    plane: DEV
+    verified_against: nenhum-sistema-publico-une-grafo-de-decisao-e-grafo-de-simbolos
+    status: open
+    impact: 5
+    confidence: 0.8
+    label: "A OPORTUNIDADE, e ela e de diferenciacao e nao de divida. A pesquisa nao achou NENHUM sistema publico que una grafo de DECISAO e grafo de CODIGO na mesma estrutura consultavel. Os dois movimentos existem em paralelo e nao se tocaram: em 2026 a comunidade redescobriu ADR-como-grafo com uma motivacao que e quase parafrase da doutrina desta casa — 'um agente que nao ve POR QUE algo foi construido de certa forma vai alegremente refatorar a razao para longe' — enquanto o lado do codigo (SCIP, CodexGraph, CGM) modela simbolo SEM `status`, `confidence` ou aresta `REFUTES`. O `.kg.yaml` ja tem `layer:`; a extensao natural seria `layer: code` com no tipado a simbolo e aresta ligando decisao->codigo. ⚠️ GATED E ASSIM DEVE FICAR: a evidencia de ganho de grafo de codigo e ESTREITA (localizacao de simbolo e dependencia cross-file), e o CodexGraph EMPATA com AutoCodeRover no SWE-bench Lite; os claims de '71,5x menos tokens' vem de Medium, nao de paper. O gatilho para abrir e adotante de MONOREPO GRANDE onde grep degrada por ambiguidade de simbolo — e a forma correta e consumir MCP de terceiro, nunca construir indexador."
+
+edges:
+  - from: C_TRES_MODELOS_DE_CONFIANCA
+    to: C_IDP_AUTENTICA_NAO_DECIFRA
+    edge_type: SUPPORTS
+  - from: C_REDE_ISOLADA_POR_CONSTRUCAO
+    to: C_TRES_MODELOS_DE_CONFIANCA
+    edge_type: SUPPORTS
+  - from: E_RECUPERACAO_E_O_ELO_FRACO
+    to: Q_MFA_EM_ZERO_MAS_QUANTIFICAR_ANTES
+    edge_type: CONSTRAINS
+  - from: E_ORG_LOGICA_NAO_E_FRONTEIRA
+    to: Q_ISOLAMENTO_DO_BRIDGE_CHAVEIA_NO_TOKEN
+    edge_type: SUPPORTS
+  - from: E_CVE_LOGTO_NAO_TEM_PORTA_AQUI
+    to: C_IDP_AUTENTICA_NAO_DECIFRA
+    edge_type: CONSTRAINS
+  - from: I_EU_DECLAREI_SSO_PROVADO_SEM_PROVAR
+    to: C_TRES_MODELOS_DE_CONFIANCA
+    edge_type: CONSTRAINS
+  - from: I_REPASSEI_ACHADO_DE_AGENTE_COMO_FATO
+    to: C_IDP_AUTENTICA_NAO_DECIFRA
+    edge_type: CONSTRAINS
+  - from: I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE
+    to: C_TRES_MODELOS_DE_CONFIANCA
+    edge_type: CONSTRAINS
+  - from: Q_RECUPERACAO_NAO_EXISTE_ONDE_MAIS_DOI
+    to: E_RECUPERACAO_E_O_ELO_FRACO
+    edge_type: SUPPORTS
+  - from: Q_METADE_DO_BRIDGE_FORA_DO_REPO
+    to: Q_ISOLAMENTO_DO_BRIDGE_CHAVEIA_NO_TOKEN
+    edge_type: CONSTRAINS
+  - from: I_SEGUNDO_IDP_COM_CONSOLE_DESTRANCADO
+    to: C_REDE_ISOLADA_POR_CONSTRUCAO
+    edge_type: REFUTES
+  - from: I_A1_A_MEDICAO_CAIU_A_CONCLUSAO_SOBREVIVEU
+    to: C_IDP_AUTENTICA_NAO_DECIFRA
+    edge_type: CONSTRAINS
+  - from: I_A6_O_BLOQUEIO_NAO_ERA_SMTP
+    to: Q_RECUPERACAO_NAO_EXISTE_ONDE_MAIS_DOI
+    edge_type: REFUTES
+  - from: E_MEMORIA_DE_AGENTE_E_COMMODITY_PELO_DINHEIRO
+    to: Q_LACUNA_DECISAO_MAIS_CODIGO
+    edge_type: CONSTRAINS
+  - from: E_ANTIPADRAO_MEDIDO_EM_PRODUCAO
+    to: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
+    edge_type: SUPPORTS
+  - from: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
+    to: C_TRES_MODELOS_DE_CONFIANCA
+    edge_type: CONSTRAINS
+  - from: Q_LACUNA_DECISAO_MAIS_CODIGO
+    to: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
+    edge_type: SUPPORTS
