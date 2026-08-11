@@ -78,8 +78,36 @@ for _pg in $(_dk ps --format '{{.Names}}' | grep -iE 'logto.*(postgres|db)|postg
   fi
 done
 
+# ── (3) artefato de backup EM CLARO ─────────────────────────────────────────────────────────
+# Classe achada em 2026-08-11: 19 dumps do Logto viviam `root:root 644` em disco — o banco de
+# IDENTIDADES (hashes de senha, aplicacoes, segredos de cliente), legivel por qualquer uma das 5
+# contas com shell desta maquina. O backup do cofre ja cifrava; este nao, e a assimetria nao tinha
+# razao — so nunca tinha sido feita.
+# E o modo de falha e SILENCIOSO por natureza: um `.sql` a mais no diretorio nao chama atencao.
+# ⚠️ O ESCOPO E DECLARADO, nao adivinhado: so os diretorios `backups/` das ferramentas da casa.
+#    Varrer o disco atras de "coisa que parece backup" produziria falso-positivo em massa.
+# ⚠️ O ESCOPO JA FOI ESTREITO DEMAIS UMA VEZ. A 1a versao olhava so `/home/marcio/onion-vps-*/backups`
+#    e a passada adversarial contra ela achou DOIS diretorios de fora: `/home/marcio/backups/bridge`
+#    (17 arquivos sem cifra, incluindo os `bridge-diario-*.tar.gz` que carregam o `.env` do bridge —
+#    ANTHROPIC_API_KEY e tokens de convite — e um deles em 644) e `/home/onion/.claude/backups`.
+#    Guarda com escopo menor que a classe e verde-vazia onde nao olha.
+#    O escopo agora e DECLARADO E EXPLICITO, um caminho por linha: acrescentar diretorio de backup
+#    novo exige acrescentar aqui, e essa friccao e o ponto — o alternativo (varrer o disco atras de
+#    "coisa que parece backup") produz falso-positivo em massa e vira ruido ignorado.
+# `BACKUP_DIRS_OVERRIDE` existe SO para a bancada poder testar o DETECTOR num diretorio proprio,
+# em vez de depender do estado do disco — teste que depende do vivo passa a mentir quando o vivo muda.
+for _bdir in ${BACKUP_DIRS_OVERRIDE:-/home/marcio/onion-vps-*/backups /home/marcio/backups/* /home/onion/.claude/backups}; do
+  [ -d "${_bdir}" ] || continue
+  # `find` (nao glob) porque o glob expande no shell do chamador e devolve vazio sem acesso —
+  # e vazio lido como ausencia e exatamente o fail-open que este arquivo existe para impedir.
+  _plain="$(find "${_bdir}" -maxdepth 1 -type f ! -name '*.gpg' 2>/dev/null | wc -l)"
+  if [ "${_plain}" -gt 0 ]; then
+    _say "BACKUP-EM-CLARO" "${_bdir}" "${_plain} arquivo(s) sem .gpg — backup nao cifrado e dado sensivel em repouso"
+  fi
+done
+
 if [ "${FORMAT}" != tsv ]; then
-  if [ "${_hard}" -eq 0 ]; then echo "  ✓ nenhuma porta publicada fora do loopback e nenhum conector upstream"
+  if [ "${_hard}" -eq 0 ]; then echo "  ✓ nenhuma porta publica, nenhum conector upstream, nenhum backup em claro"
   else echo "  ── ${_hard} achado(s) HARD"; fi
 fi
 [ "${_hard}" -eq 0 ] || exit 1

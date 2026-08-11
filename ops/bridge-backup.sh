@@ -38,6 +38,37 @@ sudo tar --ignore-failed-read -czf "$OUT" -C "$SRC" data .env 2>/dev/null || tru
 # O tar roda por sudo, então o dump nasce de root — o chmod TAMBÉM precisa de sudo,
 # senão falha em silêncio e o arquivo com segredo fica legível por todo o host.
 sudo chmod 600 "$OUT"
+[ "$(id -u)" -eq 0 ] && chown marcio:marcio "$OUT"
+
+# ── cifra em repouso (2026-08-11) ────────────────────────────────────────────────────────────
+# ⚠️ ESTE TAR CARREGA O `.env` DO BRIDGE — `ANTHROPIC_API_KEY` e tokens de convite. Ficava EM CLARO
+#    em disco: 17 arquivos no destino, um deles em 644. Foi achado pela passada adversarial contra a
+#    própria guarda que eu tinha acabado de escrever, cujo escopo não cobria este diretório.
+#    Cifra para a mesma chave GPG que é raiz do `pass`, como os outros dois backups da casa.
+# ⚠️ `sudo -u marcio` porque como root o `gpg` usa o chaveiro de /root, que é VAZIO — ele cria
+#    /root/.gnupg do zero e falha com "No public key" (medido).
+_KEYOWNER_HOME=/home/marcio
+GPGID="$(cat "${_KEYOWNER_HOME}/.password-store/.gpg-id" 2>/dev/null || true)"
+[ -n "${GPGID}" ] || { echo "✗ sem gpg-id do pass — NAO deixo o .env do bridge em claro"; sudo shred -u "$OUT"; exit 1; }
+if [ "$(id -u)" -eq 0 ]; then
+  sudo -u marcio gpg --batch --yes --trust-model always -r "${GPGID}" -o "${OUT}.gpg" -e "$OUT"
+else
+  gpg --batch --yes --trust-model always -r "${GPGID}" -o "${OUT}.gpg" -e "$OUT"
+fi
+[ -s "${OUT}.gpg" ] || { echo "✗ a cifra falhou — apagando o claro e abortando"; sudo shred -u "$OUT"; exit 1; }
+# a verificação NÃO pode exigir a chave privada (ela tem passphrase): olha o CONTEÚDO, não o exit
+if [ "$(id -u)" -eq 0 ]; then
+  _pkts="$(sudo -u marcio gpg --batch --list-packets "${OUT}.gpg" 2>/dev/null || true)"
+else
+  _pkts="$(gpg --batch --list-packets "${OUT}.gpg" 2>/dev/null || true)"
+fi
+case "${_pkts}" in
+  *"pubkey enc packet"*) : ;;
+  *) echo "✗ o .gpg nao parece OpenPGP valido — abortando"; sudo shred -u "$OUT" "${OUT}.gpg"; exit 1 ;;
+esac
+sudo shred -u "$OUT"
+chmod 600 "${OUT}.gpg" 2>/dev/null || sudo chmod 600 "${OUT}.gpg"
+OUT="${OUT}.gpg"
 sudo chown "$(id -un)":"$(id -gn)" "$OUT" 2>/dev/null || true
 
 # FAIL-LOUD: backup vazio é pior que backup ausente — dá falsa sensação de proteção.
@@ -50,4 +81,8 @@ fi
 # Retenção: só os DIÁRIOS envelhecem; rotulados (pré-upgrade, pré-flip) ficam.
 ls -1t "${DEST}"/bridge-diario-*.tar.gz 2>/dev/null | tail -n +15 | xargs -r rm -f
 
+# ⚠️ O SIZE E RECALCULADO AQUI, depois da cifra. Antes ele media o `.tar` em claro — que o `shred`
+#    ja tinha destruido — e o relato descrevia um arquivo que nao existe mais. Relato que nomeia o
+#    artefato errado e pior que relato ausente: quem le procura o arquivo e nao acha.
+SIZE=$(stat -c%s "${OUT}" 2>/dev/null || echo 0)
 echo "ok: ${OUT} (${SIZE} bytes)"

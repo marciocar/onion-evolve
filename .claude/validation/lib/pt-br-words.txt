@@ -7,12 +7,15 @@
 # medido no PR #568: a guarda pega 10 dos 12 achados históricos, e os 2 que escapam são estes.
 # regra HARD. Cobertura menor e honesta vence cobertura maior que ensina a ignorar o gate.
 # ⚠️ CRITÉRIO DE ENTRADA, e ele é o que decide se a guarda serve: a palavra NÃO PODE ser homógrafa
+aberto
 abertos
 achado
 achados
 alvo
 alvos
 antes
+antigo
+antigos
 aresta
 arestas
 arquitetura
@@ -30,21 +33,29 @@ carimbos
 catraca
 chave
 chaves
+cifrado
+cifrados
+claro
+claros
 conexao
 contagem
 copia
 copias
 depende
 depois
+destino
 duas
 entrada
 escopo
 falha
 falhar
+falhas
 falhou
 faltando
 faltante
 faltantes
+fechado
+fechados
 ferramenta
 fila
 fios
