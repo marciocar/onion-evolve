@@ -1,7 +1,7 @@
 ---
 branch: docs/arquitetura-identidade-onion-vps
 date: 2026-08-11
-reviewed_diff_sha256: 2c6f070b5fe2edddae822aafa96c0aa065f440bdf4b0cde3d9044f5a5b8796d6
+reviewed_diff_sha256: 912ab796eb7518a99cb9ccc8833c04c90a6024d2b238e185ecf6194aeeb2cda6
 findings_total: 11
 findings_real: 6
 findings_fixed: 5
@@ -191,3 +191,21 @@ detector de abort (*"NÃO leia esta saída como verde"*) e o `GUARDA-DA-GUARDA: 
 aplicada`. Sem eles: 390 verdes com a guarda nova nunca tendo rodado.
 
 **Bancada 790 / 0 falharam / 0 pularam**, sha estável, e o teste que eu havia danificado passa.
+
+---
+
+## Quarta rodada — meu `sort -u` apagou uma palavra da lista
+
+O revisor viu o que eu não vi: o diff **removia** `vivo` do `pt-br-words.txt`. Eu rodei
+`sort -u ... -o ...` para normalizar a lista depois de acrescentar 14 termos — e o `-u` comeu uma
+entrada que já estava lá, provavelmente duplicada por algum motivo que eu não investiguei.
+
+**O dano seria silencioso e do pior tipo**: uma guarda de idioma que perde vocabulário **deixa de
+acusar** e ninguém percebe — é exatamente a forma de falha que esta sessão inteira persegue.
+
+Restaurado. O diff agora é **só acréscimo** (100 palavras), e a guarda continua acusando a branch
+que originou o achado.
+
+**A lição é a mesma de duas rodadas atrás**, e é a terceira vez hoje: comando de varredura que faz
+mais do que eu modelei. `sort -u` não é só ordenar — é ordenar **e deduplicar**. A conferência certa
+é a que o revisor fez: **olhar o diff pelo lado do que SAI**, não só pelo que entra.

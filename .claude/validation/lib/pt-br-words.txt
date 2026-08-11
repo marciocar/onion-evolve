@@ -97,3 +97,4 @@ vazio
 vazios
 veredito
 vereditos
+vivo
