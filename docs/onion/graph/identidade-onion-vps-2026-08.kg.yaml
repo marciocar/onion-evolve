@@ -190,27 +190,30 @@ nodes:
     node_type: question
     plane: PROD
     verified_at: 2026-08-10
-    verified_against: default-factors-vazio-admin-NoPrompt-cofre-totp-e-webauthn-disponiveis
-    status: open
+    verified_at: 2026-08-11
+    verified_against: factors-totp-backupcode-habilitados-e-recuperacao-por-email-ligada-nos-2-tenants
+    status: done
     impact: 3
     confidence: 0.8
-    label: "MEDIDO: tenant `default` = `{policy: UserControlled, factors: []}` — nenhum fator habilitado, logo nada a ativar mesmo querendo. Tenant `admin` (console PUBLICO) = fatores disponiveis (Totp, WebAuthn, BackupCode) mas politica `NoPrompt` = nunca oferecidos. No cofre, TOTP e WebAuthn/passkey estao disponiveis SEM configuracao de servidor (rotas respondem 401, nao 404) — dependem so de o usuario ativar; Duo e YubiKey exigiriam chaves que nao existem, e o 2FA por e-mail e inutil sem SMTP. O bridge nao inspeciona `amr`/`acr`, entao NAO TERIA COMO exigir MFA nem se o Logto a fizesse. ⚠️ IMPACT 3 E DELIBERADO, contra a tentacao de marcar 5: existe UMA conta em cada tenant, o console exige senha, e o `sentinel_activities` do Logto (anti-forca-bruta) esta registrando. Ligar MFA sem desenhar recuperacao junto TROCA risco de invasao por risco de LOCKOUT — e com admin unico e sem e-mail no tenant `admin`, o lockout e o risco mais provavel. A ordem correta e: e-mail no tenant admin -> codigos de recuperacao -> so entao MFA."
+    label: "✅ O BLOQUEIO CAIU 2026-08-11 e a ORDEM foi respeitada: e-mail nas duas identidades -> conector SMTP no tenant `admin` -> `forgot_password_methods` ligado -> SO ENTAO os fatores. Hoje `default` = `{policy: UserControlled, factors: [Totp, BackupCode]}`, confirmado na API viva. O QUE FALTA NAO E MEU: a INSCRICAO de um TOTP e ato do dono no console, e ligar politica obrigatoria antes disso seria exatamente a troca invasao->lockout que este no existia para evitar. ESTADO ORIGINAL: tenant `default` = `{policy: UserControlled, factors: []}` — nenhum fator habilitado, logo nada a ativar mesmo querendo. Tenant `admin` (console PUBLICO) = fatores disponiveis (Totp, WebAuthn, BackupCode) mas politica `NoPrompt` = nunca oferecidos. No cofre, TOTP e WebAuthn/passkey estao disponiveis SEM configuracao de servidor (rotas respondem 401, nao 404) — dependem so de o usuario ativar; Duo e YubiKey exigiriam chaves que nao existem, e o 2FA por e-mail e inutil sem SMTP. O bridge nao inspeciona `amr`/`acr`, entao NAO TERIA COMO exigir MFA nem se o Logto a fizesse. ⚠️ IMPACT 3 E DELIBERADO, contra a tentacao de marcar 5: existe UMA conta em cada tenant, o console exige senha, e o `sentinel_activities` do Logto (anti-forca-bruta) esta registrando. Ligar MFA sem desenhar recuperacao junto TROCA risco de invasao por risco de LOCKOUT — e com admin unico e sem e-mail no tenant `admin`, o lockout e o risco mais provavel. A ordem correta e: e-mail no tenant admin -> codigos de recuperacao -> so entao MFA."
 
   - id: Q_METADE_DO_BRIDGE_FORA_DO_REPO
     node_type: question
     plane: PROD
     verified_at: 2026-08-10
-    verified_against: workspace-ts-config-ts-admin-ts-a2a-ts-so-em-home-onion
-    status: open
+    verified_at: 2026-08-11
+    verified_against: repo-git-limpo-remote-privado-gh-repo-view-PRIVATE-e-ls-remote-rc0
+    status: refuted
     impact: 4
     confidence: 1.0
-    label: "`workspace.ts`, `config.ts`, `token-store.ts`, `admin.ts` e `a2a.ts` existem SO em `/home/onion/onion-bridge/`, nao no repo. Inclusive `workspace.ts`, que E o mecanismo de isolamento inteiro. CONSEQUENCIA: o codigo que decide quem enxerga o que NAO PASSA POR REVIEW, nao tem bancada, e nao aparece em nenhum diff. Todo o aparato desta casa — REGRA 56, revisao adversarial, gates — opera sobre o que esta versionado; o que vive so em producao e invisivel para ele. E a forma mais pura de `declarado != verificado`: o repo declara um sistema que nao e o que roda."
+    label: "❌ REFUTADO NA MESMA SESSAO, por medicao. `/home/onion/onion-bridge` E repo git LIMPO, sincronizado com `marciocar/onion-bridge` — remote que EXISTE e e privado (`gh repo view` devolve PRIVATE, `git ls-remote` rc=0). Todos os fontes rastreados, incluindo `workspace.ts`. A afirmacao original veio de um agente que leu `remote -v` e concluiu ausencia; REMOTE CONFIGURADO NAO E REMOTE QUE EXISTE, e eu repassei sem verificar nenhum dos dois lados. A LACUNA REAL e outra e menor: `ops/bridge-auth/bridge-src/` e uma copia manual de 6 arquivos SEM detector de deriva — e ja derivou (um comentario em `identity.ts` corrigido so na copia). Nao ha deploy: o host e a origem. Texto original preservado abaixo porque o modo como um fato foi estabelecido decide quanto se pode confiar nele depois. ORIGINAL: `workspace.ts`, `config.ts`, `token-store.ts`, `admin.ts` e `a2a.ts` existem SO em `/home/onion/onion-bridge/`, nao no repo. Inclusive `workspace.ts`, que E o mecanismo de isolamento inteiro. CONSEQUENCIA: o codigo que decide quem enxerga o que NAO PASSA POR REVIEW, nao tem bancada, e nao aparece em nenhum diff. Todo o aparato desta casa — REGRA 56, revisao adversarial, gates — opera sobre o que esta versionado; o que vive so em producao e invisivel para ele. E a forma mais pura de `declarado != verificado`: o repo declara um sistema que nao e o que roda."
 
   - id: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     node_type: question
     plane: PROD
     verified_at: 2026-08-10
-    verified_against: tar-gpg-cifrado-com-prova-de-restauracao-mas-no-mesmo-disco
+    verified_at: 2026-08-11
+    verified_against: 38-artefatos-cifrados-3-scripts-cifram-na-origem-pacote-de-1.1MB-entregue
     status: open
     impact: 4
     confidence: 1.0
