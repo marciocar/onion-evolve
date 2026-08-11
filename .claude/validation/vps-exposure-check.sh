@@ -94,13 +94,15 @@ done
 #    O escopo agora e DECLARADO E EXPLICITO, um caminho por linha: acrescentar diretorio de backup
 #    novo exige acrescentar aqui, e essa friccao e o ponto — o alternativo (varrer o disco atras de
 #    "coisa que parece backup") produz falso-positivo em massa e vira ruido ignorado.
-for _bdir in /home/marcio/onion-vps-*/backups /home/marcio/backups/* /home/onion/.claude/backups; do
+# `BACKUP_DIRS_OVERRIDE` existe SO para a bancada poder testar o DETECTOR num diretorio proprio,
+# em vez de depender do estado do disco — teste que depende do vivo passa a mentir quando o vivo muda.
+for _bdir in ${BACKUP_DIRS_OVERRIDE:-/home/marcio/onion-vps-*/backups /home/marcio/backups/* /home/onion/.claude/backups}; do
   [ -d "${_bdir}" ] || continue
   # `find` (nao glob) porque o glob expande no shell do chamador e devolve vazio sem acesso —
   # e vazio lido como ausencia e exatamente o fail-open que este arquivo existe para impedir.
-  _claros="$(find "${_bdir}" -maxdepth 1 -type f ! -name '*.gpg' 2>/dev/null | wc -l)"
-  if [ "${_claros}" -gt 0 ]; then
-    _say "BACKUP-EM-CLARO" "${_bdir}" "${_claros} arquivo(s) sem .gpg — backup nao cifrado e dado sensivel em repouso"
+  _plain="$(find "${_bdir}" -maxdepth 1 -type f ! -name '*.gpg' 2>/dev/null | wc -l)"
+  if [ "${_plain}" -gt 0 ]; then
+    _say "BACKUP-EM-CLARO" "${_bdir}" "${_plain} arquivo(s) sem .gpg — backup nao cifrado e dado sensivel em repouso"
   fi
 done
 

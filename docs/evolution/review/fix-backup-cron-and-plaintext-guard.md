@@ -1,10 +1,10 @@
 ---
 branch: fix/backup-cron-and-plaintext-guard
 date: 2026-08-11
-reviewed_diff_sha256: 4f763b0c8c37500126dba09f50dd8ba80ab20f160debaec2265e758f9c3a92ba
-findings_total: 7
-findings_real: 7
-findings_fixed: 7
+reviewed_diff_sha256: f91b61ab49c890fb1467beec742499b19993f6ed3fa3c142f530aa2f5d76b584
+findings_total: 9
+findings_real: 9
+findings_fixed: 9
 tokens: 0
 duration_min: 0
 verdict: TRES-DEFEITOS-EMPILHADOS-NO-CRON-E-UMA-CLASSE-NOVA-QUE-NADA-VIGIAVA
@@ -93,3 +93,25 @@ relato ausente**: quem lê procura e não acha. O `SIZE` passou a ser recalculad
 `Inappropriate ioctl for device` — que é a **minha medição** não podendo rodar, não o arquivo
 quebrado. Distinção que esta sessão errou várias vezes na direção contrária, e que fica declarada em
 vez de arredondada.
+
+---
+
+## Terceira rodada — as duas do revisor, e a segunda repetiu um padrão do dia
+
+**1. `_claros` em português.** A REGRA 60 existe exatamente para isso e **não pegou**: `claros` não
+estava na lista de palavras. Mesma causa de `arquitetura`/`identidade` duas rodadas atrás — **a
+guarda funciona; o vocabulário fica para trás**. Acrescentadas 11 formas mantendo o critério (sem
+homógrafo em inglês), com `sort` **sem `-u`** e conferindo que o diff **só acrescenta** — foi o `-u`
+que apagou `vivo` na rodada anterior.
+
+**2. Terceira condição sem fixture.** Par `(d)`/`(d2)`: acusa `.sql` em diretório de backup, cala
+quando tudo é `.gpg`.
+
+A decisão de desenho que importa: o caso testa o **detector** num diretório próprio, via
+`BACKUP_DIRS_OVERRIDE`, em vez de olhar o disco real. **Teste que depende do vivo passa a mentir
+quando o vivo muda** — e hoje o vivo mudou seis vezes.
+
+Os dois foram verificados **isolados antes** de rodar a suíte: é a lição das três corridas abortadas
+mais cedo, em que um caso mal escrito derrubou 390 casos e o abort parecia verde.
+
+**Bancada 792 / 0 falharam / 0 pularam**, sha estável.

@@ -6146,6 +6146,24 @@ run_vps_exposure_selftests() {
     record_pass "vps-exposure: (b) --format tsv roda e devolve rc<=1 (0 limpo, 1 com achado)"
   else record_fail "vps-exposure: (b)" "--format tsv devolveu rc=${rc} (esperado 0 ou 1): ${out}"; fi
 
+  # (d) A TERCEIRA CONDICAO — backup em claro. Nasceu de 19 dumps `root:root 644` em disco (o banco
+  #     de IDENTIDADES) e, na passada adversarial contra a propria guarda, de mais 17 no diretorio do
+  #     bridge que o escopo NAO cobria. Guarda com escopo menor que a classe e verde-vazia onde nao
+  #     olha — por isso o caso testa o DETECTOR, com diretorio proprio, e nao o estado do disco.
+  local _bd; _bd="$(mktemp -d)"
+  : > "${_bd}/dump-em-claro.sql"
+  rc=0; out="$(BACKUP_DIRS_OVERRIDE="${_bd}" bash "${g}" 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'BACKUP-EM-CLARO'; then
+    record_pass "vps-exposure: (d) arquivo sem .gpg em diretorio de backup e ACUSADO"
+  else record_fail "vps-exposure: (d)" "backup em claro nao foi acusado (rc=${rc}): ${out}"; fi
+  # (d2) e CALA quando tudo esta cifrado — sem este par a regra poderia acusar sempre
+  rm -f "${_bd}/dump-em-claro.sql"; : > "${_bd}/dump.sql.gpg"
+  rc=0; out="$(BACKUP_DIRS_OVERRIDE="${_bd}" bash "${g}" 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'BACKUP-EM-CLARO'; then
+    record_fail "vps-exposure: (d2)" "acusou um diretorio 100% cifrado: ${out}"
+  else record_pass "vps-exposure: (d2) cala quando todo artefato tem .gpg"; fi
+  rm -rf "${_bd}"
+
   # (c) MUTATION — a guarda-da-guarda. Se o predicado de bind for apagado, a regra vira verde-vazia.
   #     Este caso prova que a clausula e LOAD-BEARING, e nao decoracao.
   local d; d="$(mktemp -d)"
