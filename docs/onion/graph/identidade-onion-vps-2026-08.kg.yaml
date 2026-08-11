@@ -211,13 +211,22 @@ nodes:
   - id: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     node_type: question
     plane: PROD
-    verified_at: 2026-08-10
     verified_at: 2026-08-11
-    verified_against: 38-artefatos-cifrados-3-scripts-cifram-na-origem-pacote-de-1.1MB-entregue
+    verified_against: 38-artefatos-cifrados-3-scripts-cifram-na-origem-pacote-de-1.1MB-ainda-no-disco
     status: open
     impact: 4
     confidence: 1.0
     label: "O QUE JA ESTA FEITO: o backup do cofre e `.tar.gpg` cifrado para a MESMA chave GPG que ja e raiz do `pass` (reusar em vez de inventar — uma chave a mais e um segredo a mais para perder), com PROVA DE RESTAURACAO (decifra e devolve banco + chave de assinatura), rotacao 14, no cron. O QUE FALTA: sai do mesmo disco. PESQUISA DATADA APONTA: `restic` como ferramenta (S3-compat nativo, chave separavel; borg 2.0 ainda em beta e 1.4 e SSH-only), destino `rsync.net` (imutabilidade ZFS do lado do SERVIDOR, nao depende do cliente cooperar) ou Hetzner Storage Box (custo), e a regra virou **3-2-1-1-0**: +1 copia IMUTAVEL, +0 = ultimo teste de restore com ZERO erros como criterio FORMAL. ⚠️ A ARMADILHA ESPECIFICA DE COFRE: a senha do repositorio de backup NAO PODE morar dentro do cofre que ele protege — se o cofre corrompe, perde-se o dado E a chave ao mesmo tempo. Isto e problema circular documentado, nao teoria."
+
+  - id: Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-11
+    verified_against: asc-ausente-por-find-na-home-privada-presente-no-chaveiro-sec-160D6543
+    status: open
+    impact: 5
+    confidence: 1.0
+    label: "A chave GPG `160D65435B1F12C8` decifra TODO artefato de backup desta VPS (38 na medicao de 11-08, zero em claro — o numero cresce com o cron, a dependencia nao) e e a raiz do `pass`. MEDIDO agora: o veiculo de exportacao (`chave-privada-onion.asc`, 886 B) foi destruido com `shred -u` e NAO existe mais na VPS (`find` na home = zero `.asc`); a PRIVADA continua no chaveiro (`sec ed25519/160D65435B1F12C8`, expira 2028-07-23), que e de onde ela e usada — nada foi perdido. O QUE EU NAO MEDI, E NAO POSSO: se o download chegou ao destino antes do `shred`. Isso e observavel so do lado do maestro. CONSEQUENCIA SE NAO CHEGOU: a unica copia da chave vive no MESMO disco que o backup que ela protege — perder a VPS perde o dado E a chave no mesmo evento, que e exatamente a armadilha circular descrita em [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA]. A cifra nao falha; ela vira lacre sem dono. GATILHO DE FECHAMENTO: o maestro confirmar que a copia existe fora da VPS e guardada SEPARADA do pacote de backup — chave junto do cofre e cofre destrancado."
 
   # ── A COSTURA COM O ONION COMO FRAMEWORK DE DESENVOLVIMENTO ─────────────────
   - id: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
@@ -300,6 +309,9 @@ edges:
     edge_type: SUPPORTS
   - from: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     to: C_TRES_MODELOS_DE_CONFIANCA
+    edge_type: CONSTRAINS
+  - from: Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS
+    to: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     edge_type: CONSTRAINS
   - from: Q_LACUNA_DECISAO_MAIS_CODIGO
     to: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
