@@ -1,0 +1,140 @@
+meta:
+  id: context-freshness-2026-08-12
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-12
+  date: 2026-08-12
+  run_id: wf_23de8ab6-81b
+  note: >
+    Auditoria de frescor dos contextos de domínio do CORE — a fase Manage do ciclo CRUD+
+    (/meta:context-freshness). 19 arquivos auditados (13 business + 6 technical + 0 compliance,
+    este último template puro, só README). 19 workers sonnet/medium + 1 juiz adversarial opus,
+    acionado pela regra dos >30% (taxa medida: 42%). TESE CENTRAL: dos 8 STALE, SETE falham
+    apenas no item #4 e a causa é UMA — número copiado à mão de uma fonte que já tem SSOT
+    gerada. Onde existe SSOT gerada, prosa que REPETE o número é um segundo lugar para errar.
+
+nodes:
+  - id: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
+    node_type: claim
+    plane: PROD
+    verified_at: 2026-08-12
+    verified_against: sete-de-oito-stale-falham-so-no-item-4-e-a-causa-dominante-e-numero-copiado-a-mao
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "A TESE DESTA AUDITORIA, e ela nasceu MEDIDA: dos 19 arquivos de contexto do core, 8 vieram STALE e SETE deles falham APENAS no item #4 (aderencia a realidade). A causa nao e variada — e uma so: NUMERO COPIADO A MAO de uma fonte que JA TEM SSOT GERADA. Os sitios: contagem de adotantes (`members.yaml`), de comandos/skills (`docs/onion/inventory.md`, gerado por script e validado no CI), de linhas do lint, de regras numeradas, de `timeout-minutes` do workflow. ⚠️ E o `metrics.md` CONFESSA a fragilidade no proprio texto — 'contagem manual: 1 core + 4 adotantes'. Nao e descuido: e divida conhecida, declarada, e nunca mecanizada. O padrao que transfere: onde existe SSOT gerada, prosa que REPETE o numero e um segundo lugar para errar — a cura e a prosa APONTAR para a SSOT, nao copia-la."
+    trace: "docs/business-context/02-product/metrics.md"
+
+  - id: E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-12
+    verified_against: tres-formas-de-99-no-codebase-guide-e-nenhuma-casa-com-os-marcadores-canonicos-da-regra-16
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    label: "POR QUE O LINT NAO PEGOU — e a resposta e REINCIDENCIA, nao ausencia de guarda. A REGRA 16 (count-drift) existe e checa contagem contra a SSOT, mas SO em frases CANONICAS ('N comandos invocaveis', tabela com um dos 4 rotulos canonicos). No `codebase-guide.md` o numero errado aparece em TRES formas e nenhuma casa: (1) linha 54 `## 2. Comandos — 99 invocaveis em 10 categorias` — o travessao INVERTE a ordem numero/substantivo; (2) linha 73 `| **Total** | | **99** |` — o rotulo e 'Total', que nao esta entre os 4 canonicos; (3) linha 111, prosa. ⚠️ O PROPRIO CABECALHO DA REGRA 16 JA REGISTRA ESTA CLASSE: 'achado PR #517 — N skills driftou SEM nenhum feeder disparar; causa: FORMA DE FRASE, nao ausencia de guarda'. A classe foi nomeada, o caso foi curado, e a classe reincidiu num diretorio novo. Instancia de [[guarda-por-lista-falha-pelo-vocabulario]] e de [[fix-must-become-mechanism]]."
+    trace: ".claude/validation/lint-artifacts.sh"
+
+  - id: E_CITACAO_FABRICADA_COM_ANCORA_DE_LINHA
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-12
+    verified_against: sed-4p-do-agente-devolve-102-e-o-doc-cita-99-entre-aspas-com-arquivo-linha
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "O PIOR ACHADO DA PASSADA, e nao e um numero velho — e uma ASPA FALSA COM ENDERECO. `codebase-guide.md:111` escreve, ENTRE ASPAS: \"conhecimento completo de 51 agentes e 99 comandos\", ancorado em `.claude/agents/meta/onion.md:4`. MEDIDO: a linha 4 viva diz `...51 agentes e 102 comandos`. A citacao nunca existiu naquela forma. ⚠️ POR QUE ISSO E PIOR QUE DRIFT COMUM: um numero desatualizado o leitor desconfia; uma CITACAO com `arquivo:linha` o leitor CONFERE — e ao conferir conclui que a FONTE esta errada, nao o doc. O aparato de rastreabilidade, que existe para aumentar a confianca, vira o veiculo do erro. Aspas so devem ser escritas por copia literal verificada; parafrase e mais honesta que aspa aproximada."
+    trace: "docs/technical-context/02-ai-context/codebase-guide.md"
+
+  - id: C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO
+    node_type: claim
+    plane: PROD
+    verified_at: 2026-08-12
+    verified_against: nota-re-testada-2026-08-05-a-nove-linhas-do-cabecalho-skills-10-quando-sao-11
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "CLASSE NOVA, e ela e traicoeira porque o mecanismo de confianca vira anestesia. O `codebase-guide.md` tem uma 'Nota de frescor (re-testada 2026-08-05)' dizendo que o drift 'foi corrigido' e que 'quando um numero aqui divergir, NAO corrija a mao — rode /meta:inventory'. A nota esta a NOVE LINHAS de um cabecalho que diz `## 4. Skills — 10` quando a SSOT e o filesystem dizem 11, e a lista abaixo omite `onion-retro`. ⚠️ A nota fala de OUTRO ARQUIVO (`docs/onion/index.md`), mas quem le nao percebe o salto de referente: le 're-testada 2026-08-05' e assume que a SECAO foi verificada. Uma nota de frescor colada perto de um numero errado NAO e neutra — ela BLINDA o numero contra a proxima passada. Regra que sai disto: carimbo de frescor tem de nomear O QUE foi re-testado, e ficar JUNTO daquilo; carimbo generico perto de conteudo nao-medido e pior que carimbo nenhum. Familia de [[behavior-over-declaration]]."
+    trace: "docs/technical-context/02-ai-context/codebase-guide.md"
+
+  - id: E_O_COMMIT_DE_CORRECAO_AFIRMOU_FALSO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: commit-48a39f0-diz-nao-toquei-no-que-ja-estava-certo-102-comandos-conferem-em-toda-ocorrencia
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "SUSTENTA a tese acima com o caso mais limpo: o commit `48a39f0` (2026-08-05), intitulado 'os 9 numeros que mentiam', afirma no corpo — 'NAO TOQUEI no que ja estava certo: 102 comandos e 51 agentes conferem em toda ocorrencia'. FALSO na data em que foi escrito: as TRES ocorrencias de `99` no `codebase-guide.md` ja estavam la, e o `10` do §4 tambem; o commit corrigiu skills 10->11 SO no diagrama de arvore (linha 30). `declarado != verificado` DENTRO do proprio commit de correcao — a mesma assinatura que o PR #584 encontrou hoje na cura da guarda de KG. Duas vezes no mesmo dia, em trabalhos independentes: quem corrige tende a declarar cobertura maior do que mediu."
+    trace: "docs/technical-context/02-ai-context/codebase-guide.md"
+
+  - id: E_ACUSADOR_ERROU_O_REFERENTE_E_O_JUIZ_DERRUBOU
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: juiz-opus-mediu-decisions-md-e-o-hipotese-a-validar-qualifica-o-whitespace-nao-a-decisao-D6
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    label: "O JUIZ ADVERSARIAL PAGOU O PROPRIO CUSTO derrubando UM dos oito STALE. O worker acusou `competitive-landscape.md` de tratar a decisao D6 como 'hipotese a validar' quando D6 fora ratificada em 2026-07-25. MEDIDO pelo juiz: o 'hipotese a validar' da linha 59 qualifica o WHITESPACE DE MERCADO (lacuna nao confirmada por fonte externa), NAO a decisao — o arquivo apenas CITA D6 como cross-reference. E o proprio card ratificado de D6 fecha com 'Falta (nao bloqueia): 1-2 entrevistas P4', ou seja, a validacao de campo que o arquivo pede SEGUE PENDENTE por admissao da propria decisao. ⚠️ A LICAO DE METODO: o acusador casou a PALAVRA ('hipotese', 'validar') com o REFERENTE ERRADO. E o mesmo eixo de [[guarda-por-lista-falha-pelo-vocabulario]], agora num juiz-LLM em vez de num grep — o vocabulario engana quem procura por forma sem ancorar no sujeito da frase."
+    trace: "docs/business-context/03-market/competitive-landscape.md"
+
+  - id: Q_CONTRADICAO_CROSS_DOMINIO_NA_CONTAGEM_DE_ADOTANTES
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-12
+    verified_against: grep-kind-adopter-em-members-yaml-devolve-8-contra-4-declarado-em-business-e-11-em-technical
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "CONTRADICAO CROSS-DOMINIO — o achado que so o fan-in enxerga, e os TRES numeros divergem entre si E do vivo. `business/metrics.md` diz '1 core + 4 adotantes'; `business/voice-of-customer.md` diz '4 adotantes de campo'; `technical/business-logic.md` diz 11 membros. MEDIDO: `grep -c 'kind: adopter' members.yaml` = **8**. ⚠️ E O '11' REPRODUZ UM ERRO DE REGUA que um dos workers tambem cometeu — contar tudo que nao e `source` (12 entradas - 1), o que engloba `distillation`, `door` e `method`, que o proprio `members.yaml` comenta como 'NAO vendoriza'. Divergencia de fonte entre workers e ACHADO, nao ruido: se eu tivesse aceitado o `refresh_direction` daquele worker, teria corrigido o doc para um numero ERRADO. GATILHO DE FECHAMENTO: decidir a regua canonica ('adotante' = `kind: adopter`?) e faze-la derivar de `members.yaml`, nao de prosa."
+    trace: "docs/evolution/federation/members.yaml"
+
+  - id: Q_ORCAMENTO_DE_CI_MEDIDO_CONTRA_ARTEFATO_41PCT_MENOR
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-12
+    verified_against: wc-l-do-lint-3191-contra-2261-declarado-e-timeout-minutes-25-contra-15-declarado
+    status: open
+    impact: 3
+    confidence: 1.0
+    label: "O `contributing.md` apresenta um ORCAMENTO DE CI como 'medido 2026-07-20': '~7,5min total, teto timeout-minutes: 15', com o lint em '2261 linhas'. MEDIDO HOJE: `timeout-minutes` vivo e **25**; o lint tem **3191** linhas (+41%). ⚠️ O AGRAVANTE E A FORMA: numero apresentado como MEDICAO carrega autoridade que numero solto nao tem — o leitor nao o questiona. E o juiz notou o que a acusacao original nao viu: se o lint cresceu 41%, o '~7,5min' inteiro foi medido contra outro artefato e precisa ser RE-MEDIDO, nao so os dois numeros pegos. GATILHO: re-medir o orcamento do §3.1 inteiro numa execucao real de CI antes de recarimbar."
+    trace: "docs/technical-context/04-workflow/contributing.md"
+
+  - id: A_RUN_DA_AUDITORIA_DE_CONTEXTO
+    node_type: artifact
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: 19-workers-concluidos-zero-descartados-e-zero-com-checked-against-live-igual-nao-medi
+    status: confirmed
+    impact: 2
+    confidence: 1.0
+    label: "O run `wf_23de8ab6-81b`: 19 workers `sonnet`/`medium` (o comando pedia `haiku` — desvio DECLARADO, porque o item #4 exige cruzar `members.yaml`/`inventory.md`/`decisions.md` contra prosa, o que e raciocinio e nao varredura), 102 tool-calls, 1.065.019 tokens, 2min19s; mais 1 juiz adversarial `opus` acionado pela regra dos >30% (taxa medida: 42%). ⚠️ CAMPO ACRESCENTADO AO MOLDE DO COMANDO: `checked_against_live`, obrigando cada worker a declarar O QUE mediu para julgar o item #4, com 'nao-medi' como valor legal que PROIBE acusar falha de #4. Resultado: 19 de 19 mediram. Sem esse campo, 'aderencia a realidade' e opiniao com tipo — foi exatamente o defeito que o lote de /meta:kg-freshness expos hoje no mesmo dia."
+    trace: "docs/onion/graph/context-freshness-2026-08-12.kg.yaml"
+
+edges:
+  - from: E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO
+    to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
+    edge_type: SUPPORTS
+  - from: E_CITACAO_FABRICADA_COM_ANCORA_DE_LINHA
+    to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
+    edge_type: SUPPORTS
+  - from: E_O_COMMIT_DE_CORRECAO_AFIRMOU_FALSO
+    to: C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO
+    edge_type: SUPPORTS
+  - from: C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO
+    to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
+    edge_type: CONSTRAINS
+  - from: Q_CONTRADICAO_CROSS_DOMINIO_NA_CONTAGEM_DE_ADOTANTES
+    to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
+    edge_type: SUPPORTS
+  - from: Q_ORCAMENTO_DE_CI_MEDIDO_CONTRA_ARTEFATO_41PCT_MENOR
+    to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
+    edge_type: SUPPORTS
+  - from: E_ACUSADOR_ERROU_O_REFERENTE_E_O_JUIZ_DERRUBOU
+    to: E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO
+    edge_type: SUPPORTS
+  - from: A_RUN_DA_AUDITORIA_DE_CONTEXTO
+    to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
+    edge_type: TRACES_TO
