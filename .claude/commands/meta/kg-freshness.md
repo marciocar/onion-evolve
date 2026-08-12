@@ -112,24 +112,75 @@ Contrato do worker (cada cláusula paga por um erro real desta casa):
   método costuma estar na própria prosa do nó (ex.: *"a verificação TEM de percorrer a cadeia
   de ancestrais"*). Se o nó não disser como se mede, isso é achado — devolva `UNVERIFIABLE`
   com `blocked_by: método não derivável do nó`.
+- **Bloqueio de acesso só vale TENTADO.** Antes de declarar `permission denied`, **eleve** —
+  `sudo ls`, `sudo cat`, `sudo -u <dono>`. Ler é read-only, logo elevar para LER não fere a
+  cláusula READ-ONLY acima (elevar para MUTAR fere, e continua proibido). *Medido 2026-08-12:*
+  um worker declarou `permission denied` em `/home/onion/onion-bridge/src/`, carimbou o nó por
+  inferência indireta, e `sudo ls` lia o diretório — ele já usara `sudo` em quatro comandos da
+  mesma medição. Falta de acesso é hipótese até você ter tentado ([[verify-access-before-specifying]]).
+- **Nó COMPOSTO: o veredito é do TODO, não da maioria.** Um nó que afirma N mecânicas
+  independentes recebe UM `verdict`. Mediu 3 de 3 ⇒ o veredito que a medição disser. Mediu 2 de 3
+  ⇒ **`UNVERIFIABLE`**, com `blocked_by` nomeando a parte não medida — nunca arredonde para cima.
+  `CONFIRMED` é o desfecho que não pede justificativa, e por isso é para onde um worker escorrega.
 
 Tiering: `sonnet`/`medium` no worker (derivar o método pede raciocínio, não é mecânico);
 `opus`/`high` num juiz adversarial se > 30% vier DRIFTED/REFUTED.
 
 Schema de retorno:
 
+O schema é **JSON Schema de verdade**, passado em `opts.schema` — não pseudocódigo ilustrativo.
+A restrição do `blocked_by` mora **nele**, não na prosa acima: validação falha ⇒ o tool-layer
+força o worker a **retentar**. É a diferença entre mecanismo e conselho.
+
 ```javascript
 const KgReverifySchema = {
-  node_id: "string",
-  kg_file: "string",
-  method:   "string",   // o comando EXECUTADO, verbatim — auditável
-  observed: "string",   // o que voltou, verbatim, não interpretado
-  verdict:  "CONFIRMED|DRIFTED|REFUTED|UNVERIFIABLE",
-  divergence: "string", // o que o nó afirma × o que se mediu ("" se CONFIRMED)
-  blocked_by: "string", // só em UNVERIFIABLE — por que não deu para medir
-  proposed_write: {}    // nós/arestas propostos; o worker NÃO escreve
+  type: "object",
+  required: ["node_id", "kg_file", "method", "observed", "verdict", "divergence", "blocked_by"],
+  properties: {
+    node_id: { type: "string" },
+    kg_file: { type: "string" },
+    method:   { type: "string", minLength: 1 },  // o comando EXECUTADO, verbatim — auditável
+    observed: { type: "string", minLength: 1 },  // o que voltou, verbatim, não interpretado
+    verdict:  { enum: ["CONFIRMED", "DRIFTED", "REFUTED", "UNVERIFIABLE"] },
+    divergence: { type: "string" },  // o que o nó afirma × o que se mediu ("" se CONFIRMED)
+    blocked_by: { type: "string" },  // SÓ em UNVERIFIABLE — ver as guardas abaixo
+    proposed_write: { type: "string" },  // YAML proposto; o worker NÃO escreve
+    // COBERTURA — o antídoto do nó COMPOSTO. Quantas das afirmações independentes do nó
+    // a medição alcançou. Campo obrigatório e declarado ANTES do veredito, de propósito:
+    // obriga a contar as partes em vez de sentir o todo.
+    claims_no_no:     { type: "integer", minimum: 1 },
+    claims_medidos:   { type: "integer", minimum: 0 },
+    cobertura: { enum: ["TOTAL", "PARCIAL"] },
+  },
+  allOf: [
+    // GUARDA 1 (2026-08-12): blocked_by não-vazio com veredito != UNVERIFIABLE é contradição —
+    // o worker diz "não consegui medir" e "está confirmado" na mesma respiração.
+    {
+      if:   { properties: { verdict: { not: { const: "UNVERIFIABLE" } } } },
+      then: { properties: { blocked_by: { const: "" } } },
+    },
+    // GUARDA 2 — a que fecha a porta dos fundos da GUARDA 1. Sem ela o worker escapa
+    // APAGANDO o blocked_by e mantendo CONFIRMED: o rastro some e o defeito fica invisível.
+    // Cobertura PARCIAL só admite UNVERIFIABLE, e aí blocked_by volta a ser obrigatório.
+    {
+      if:   { properties: { cobertura: { const: "PARCIAL" } } },
+      then: {
+        properties: {
+          verdict:    { const: "UNVERIFIABLE" },
+          blocked_by: { type: "string", minLength: 1 },
+        },
+      },
+    },
+  ],
+  required: ["claims_no_no", "claims_medidos", "cobertura"],
 };
 ```
+
+> **Teto declarado da GUARDA 2:** ela obriga a *coerência* entre cobertura e veredito, não a
+> *honestidade* da contagem — um worker que declare `claims_no_no: 1` num nó que afirma três
+> coisas passa. Isso é limite conhecido, não descuido: nenhum schema conta as afirmações de uma
+> prosa. O que a guarda compra é tornar o arredondamento-para-cima um ato **explícito** (declarar
+> 1 quando são 3) em vez de um silêncio — que é a mesma troca que a REGRA 49 faz com o baseline.
 
 ### Passo 4 — Fan-in, gate humano, e só então `write(KG)`
 
