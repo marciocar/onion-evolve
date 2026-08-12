@@ -1924,20 +1924,37 @@ check_inventory_total_drift() {
     # (b) CONJUNTIVA: '51 agentes e 99 comandos' / '102 comandos e 51 agentes'.
     #     Dois substantivos de inventário ligados por 'e' formam frase-de-total — é o que
     #     distingue de 'N comandos' cru, que esta regra NÃO checa por gerar falso-positivo.
+    #
+    #     JUNTA POR PARÁGRAFO (awk RS=""), não o arquivo inteiro. As duas coisas importam:
+    #     (1) o sítio fundador atravessa a quebra de linha — `...51 agentes e 99` numa linha,
+    #         `comandos"` na seguinte —, e `grep` linha-a-linha NÃO o alcança;
+    #     (2) juntar o ARQUIVO todo (a 1ª versão usava `tr`) cola afirmações INDEPENDENTES e
+    #         distantes numa falsa frase-de-total: 'tinha 40 agentes' num parágrafo + 'e 12
+    #         comandos foram removidos' noutro viravam acusação. Medido pelo Elenxo, não suposto.
+    #     O parágrafo é a menor unidade que contém a frase real sem colar as alheias.
+    #
+    #     ALTERNATIVAS EXPLÍCITAS, sem cross-product: `(agentes…e…comandos)|(comandos…e…agentes)`.
+    #     O alternation ingênuo `(agentes|comandos) e (comandos|agentes)` casava também
+    #     'N comandos e M comandos' — e aí o grep do OUTRO substantivo não casava, a substituição
+    #     saía 1 e, sob `set -euo pipefail`, MATAVA O LINT INTEIRO em silêncio (sem sumário, sem
+    #     as regras seguintes). Disparável por prosa hard-wrapped comum. É a classe que o
+    #     cabeçalho desta função (linhas ~1669) já documenta como curada — reincidida aqui.
     while IFS= read -r pair; do
       [ -z "${pair}" ] && continue
-      an="$(printf '%s' "${pair}" | grep -oE '[0-9]+[[:space:]]+agentes' | grep -oE '^[0-9]+')"
-      cn="$(printf '%s' "${pair}" | grep -oE '[0-9]+[[:space:]]+comandos' | grep -oE '^[0-9]+')"
+      # ANTI-DUPLICAÇÃO: se o par cabe INTEIRO numa linha, o feeder irmão (ordem canônica,
+      # ~linha 1729) já o acusa — sem isto a mesma frase gera 4 violações em vez de 2.
+      grep -qF "${pair}" "${f}" 2>/dev/null && continue
+      # GUARDAS DE VOCABULÁRIO dos irmãos: breakdown em tabela e métrica de frota não são total.
+      case "${pair}" in *'|'*) continue ;; esac
+      printf '%s' "${pair}" | grep -qiE 'paralel|frota|fan-out|simultân' && continue
+      an="$(printf '%s' "${pair}" | grep -oiE '[0-9]+[[:space:]]+agentes' | grep -oE '^[0-9]+' | head -1 || true)"
+      cn="$(printf '%s' "${pair}" | grep -oiE '[0-9]+[[:space:]]+comandos' | grep -oE '^[0-9]+' | head -1 || true)"
       [ -n "${an}" ] && [ "${an}" != "${agent}" ] && \
         violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT (forma conjuntiva): '${an} agentes' (esperado ${agent}) — /meta:inventory"
       [ -n "${cn}" ] && [ "${cn}" != "${cmd}" ] && \
         violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT (forma conjuntiva): '${cn} comandos' (esperado ${cmd}) — /meta:inventory"
-    #     ⚠️ LÊ O ARQUIVO COM AS QUEBRAS DE LINHA NORMALIZADAS (`tr`), e isso NÃO é zelo:
-    #     no sítio real que originou o feeder a frase atravessa a quebra — `...51 agentes e 99`
-    #     numa linha, `comandos"` na seguinte. `grep` é linha-a-linha, então a versão sem `tr`
-    #     casava a fixture e NÃO casava o caso fundador: guarda verde que não pega o próprio
-    #     defeito que a motivou. Medido antes de embarcar, não depois.
-    done < <(tr '\n' ' ' < "${f}" 2>/dev/null | grep -oiE '[0-9]+[[:space:]]+(agentes|comandos)[[:space:]]+e[[:space:]]+[0-9]+[[:space:]]+(comandos|agentes)')
+    done < <(awk 'BEGIN{RS="";ORS="\n"}{gsub(/\n/," ");print}' "${f}" 2>/dev/null \
+             | grep -oiE '[0-9]+[[:space:]]+agentes[[:space:]]+e[[:space:]]+[0-9]+[[:space:]]+comandos|[0-9]+[[:space:]]+comandos[[:space:]]+e[[:space:]]+[0-9]+[[:space:]]+agentes' || true)
 
     # (c) LINHA 'Total' DE TABELA: '| **Total** | | **99** |'.
     #     'Total' não diz de QUÊ, então não dá para escolher a SSOT certa — e por isso a
@@ -1945,9 +1962,19 @@ check_inventory_total_drift() {
     #     com NENHUM ⇒ acusa. Conservador de propósito (um 'Total: 51' numa tabela de comandos
     #     passa, porque 51 é o total de agentes) — falso-NEGATIVO é aceitável aqui, falso-POSITIVO
     #     não, e uma guarda que pune quem obedece ensina a ignorar a guarda.
-    #     RISCO MEDIDO antes de escrever (não estimado): no repo inteiro só 3 arquivos têm linha
-    #     '| Total |' — dois são o próprio inventory.md (já isento como SSOT) e o terceiro é o
-    #     arquivo que driftou. Superfície de FP ≈ zero.
+    #     ⚠️ O `grep` abaixo é CASE-SENSITIVE e isso é LOAD-BEARING, não descuido — o pré-filtro
+    #     (linha ~1976) casa com `-i`, então `| TOTAL |` maiúsculo CHEGA aqui e morre no feeder.
+    #     Sem esta assimetria, DOIS sítios reais viram falso-positivo na hora:
+    #       · `.claude/validation/orchestration-smoke-test.md` → `| **TOTAL** | **49** |`
+    #       · `docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md` → `| **TOTAL** | | **1/9** |`
+    #     O `49` não bate com nenhuma SSOT, e o `1/9` seria parseado como `1` pelo `head -1`.
+    #     Quem for "harmonizar o case entre pré-filtro e feeder" — movimento natural, já que o
+    #     cabeçalho declara o pré-filtro SUPERSET — dispara os dois. Harmonize só junto com uma
+    #     âncora de célula puramente numérica.
+    #     ⚠️ CORREÇÃO DE UMA MEDIÇÃO MINHA: a 1ª redação dizia "só 3 arquivos têm '| Total |' no
+    #     repo inteiro". FALSO — o grep original era case-sensitive e não viu os dois acima. A
+    #     frase justificava a regra com uma medição feita pela mesma régua enviesada que a regra
+    #     usa, dentro de um commit que abria com "medição antes da regra". O Elenxo pegou.
     while IFS= read -r line; do
       [ -z "${line}" ] && continue
       n="$(printf '%s' "${line}" | sed 's/^|[^|]*|//' | grep -oE '[0-9]+' | head -1 || true)"
@@ -1972,6 +1999,13 @@ check_inventory_total_drift() {
   #   arquivo tinha, por acaso, também uma frase em prosa (foi o caso do getting-started,
   #   que mascarou o furo). Duas fixtures BAD não dispararam e expuseram isto.
   #   O superset acima é PROMESSA VERIFICÁVEL: feeder novo exige alternativa nova aqui.
+  #   ⚠️ LIMITE DECLARADO (2026-08-12) — a promessa vale LINHA-A-LINHA, e o feeder conjuntivo
+  #   passou a ler por PARÁGRAFO (awk RS=""). Um par cuja metade não caiba em nenhuma linha
+  #   isolada (ex.: '…44\nagentes e 99\ncomandos') não casa nenhuma alternativa e o arquivo é
+  #   excluído antes do feeder. O sítio fundador escapa disso porque tem '51 agentes' inteiro
+  #   numa linha — verificado, não presumido. Dizer isto em voz alta é a alternativa honesta a
+  #   afirmar um superset que o `grep` linha-a-linha estruturalmente não pode entregar; fingir
+  #   cobertura seria a própria classe que esta regra veio curar.
   done < <(_find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null \
     | xargs -0 -r grep -lZ -iE '[0-9]+\+?[[:space:]]+(comandos|agentes|knowledge[[:space:]]+bases|categorias|skills)|\([0-9]+[[:space:]]+total|^\|[[:space:]]*(comandos|comandos[[:space:]]+invocáveis|agentes|agentes[[:space:]]+especializados|skills|knowledge[[:space:]]+bases)[[:space:]]*\||(comandos|agentes|skills|knowledge[[:space:]]+bases)[[:space:]]*\([0-9]|comandos[[:space:]]*[—:–-][[:space:]]*[0-9]|^\|[[:space:]]*\*{0,2}total\*{0,2}[[:space:]]*\|' 2>/dev/null)
 }

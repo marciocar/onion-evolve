@@ -9,20 +9,25 @@ meta:
     Auditoria de frescor dos contextos de domínio do CORE — a fase Manage do ciclo CRUD+
     (/meta:context-freshness). 19 arquivos auditados (13 business + 6 technical + 0 compliance,
     este último template puro, só README). 19 workers sonnet/medium + 1 juiz adversarial opus,
-    acionado pela regra dos >30% (taxa medida: 42%). TESE CENTRAL: dos 8 STALE, SETE falham
-    apenas no item #4 e a causa é UMA — número copiado à mão de uma fonte que já tem SSOT
-    gerada. Onde existe SSOT gerada, prosa que REPETE o número é um segundo lugar para errar.
+    acionado pela regra dos >30% (taxa medida: 42%), mais 2 revisores adversariais sobre o PR.
+    TESE, JÁ ESTREITADA PELO ELENXO: 8 vieram STALE (o juiz derrubou 1 → denominador real 7) e
+    quase todos falham apenas no item #4 — por NÚMERO que envelheceu, não por prosa errada.
+    ⚠️ A 1ª redação afirmava que a causa era UMA — "número copiado de fonte com SSOT gerada" —
+    e isso NÃO se sustentou: dos cinco sítios listados, só o inventário tem SSOT gerada; lint,
+    regras e timeout não têm nenhuma, e members.yaml é mantido à mão. Onde EXISTE SSOT gerada a
+    cura é apontar em vez de copiar; onde não existe, o stale é real e a cura prescrita não se
+    aplica. Projeção em prosa: docs/analysis/context-freshness-core-2026-08-12.md
 
 nodes:
   - id: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
     node_type: claim
     plane: PROD
     verified_at: 2026-08-12
-    verified_against: sete-de-oito-stale-falham-so-no-item-4-e-a-causa-dominante-e-numero-copiado-a-mao
+    verified_against: sete-de-oito-stale-falham-so-no-item-4-mas-so-um-dos-cinco-sitios-tem-ssot-gerada
     status: confirmed
     impact: 5
-    confidence: 1.0
-    label: "A TESE DESTA AUDITORIA, e ela nasceu MEDIDA: dos 19 arquivos de contexto do core, 8 vieram STALE e SETE deles falham APENAS no item #4 (aderencia a realidade). A causa nao e variada — e uma so: NUMERO COPIADO A MAO de uma fonte que JA TEM SSOT GERADA. Os sitios: contagem de adotantes (`members.yaml`), de comandos/skills (`docs/onion/inventory.md`, gerado por script e validado no CI), de linhas do lint, de regras numeradas, de `timeout-minutes` do workflow. ⚠️ E o `metrics.md` CONFESSA a fragilidade no proprio texto — 'contagem manual: 1 core + 4 adotantes'. Nao e descuido: e divida conhecida, declarada, e nunca mecanizada. O padrao que transfere: onde existe SSOT gerada, prosa que REPETE o numero e um segundo lugar para errar — a cura e a prosa APONTAR para a SSOT, nao copia-la."
+    confidence: 0.8
+    label: "A TESE DESTA AUDITORIA, ja ESTREITADA pelo Elenxo. O que se sustenta: dos 19 arquivos de contexto, 8 vieram STALE e a esmagadora maioria falha APENAS no item #4 (aderencia a realidade) — nao por prosa errada, mas por NUMERO que envelheceu. ⚠️ O QUE **NAO** SE SUSTENTAVA, e a 1a redacao afirmava: 'a causa e UMA SO — numero copiado de uma fonte que JA TEM SSOT GERADA', listando cinco sitios. MEDIDO: `docs/onion/inventory.md` cobre EXATAMENTE quatro totais (comandos, agentes, skills, KBs) e `grep -niE 'lint|linha|timeout' inventory.md` nao devolve NADA. Logo linhas do lint, regras numeradas e `timeout-minutes` NAO tem SSOT gerada alguma, e `members.yaml` e mantido A MAO (e fonte de verdade, nao gerada). Dos cinco sitios, **UM** encaixa no mecanismo que eu declarei. A tese valia para o inventario e foi esticada por cima de tudo que estava stale — generalizacao a partir do caso mais bonito. O QUE FICA, mais estreito e verdadeiro: onde EXISTE SSOT gerada, prosa que REPETE o numero e um segundo lugar para errar, e a cura e APONTAR em vez de copiar; onde NAO existe, o stale e real mas a cura prescrita nao se aplica — e prescrever cura inexistente e pior que nao prescrever. ⚠️ CONFIDENCE REBAIXADA de 1.0 para 0.8 por isto e pela ambiguidade do denominador (ver [E_ACUSADOR_ERROU_O_REFERENTE_E_O_JUIZ_DERRUBOU]: o juiz derrubou UM dos oito, entao o denominador da manchete e 7, nao 8 — o numero foi apurado ANTES do juizo e nunca reconciliado)."
     trace: "docs/business-context/02-product/metrics.md"
 
   - id: E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO
@@ -80,15 +85,15 @@ nodes:
     label: "O JUIZ ADVERSARIAL PAGOU O PROPRIO CUSTO derrubando UM dos oito STALE. O worker acusou `competitive-landscape.md` de tratar a decisao D6 como 'hipotese a validar' quando D6 fora ratificada em 2026-07-25. MEDIDO pelo juiz: o 'hipotese a validar' da linha 59 qualifica o WHITESPACE DE MERCADO (lacuna nao confirmada por fonte externa), NAO a decisao — o arquivo apenas CITA D6 como cross-reference. E o proprio card ratificado de D6 fecha com 'Falta (nao bloqueia): 1-2 entrevistas P4', ou seja, a validacao de campo que o arquivo pede SEGUE PENDENTE por admissao da propria decisao. ⚠️ A LICAO DE METODO: o acusador casou a PALAVRA ('hipotese', 'validar') com o REFERENTE ERRADO. E o mesmo eixo de [[guarda-por-lista-falha-pelo-vocabulario]], agora num juiz-LLM em vez de num grep — o vocabulario engana quem procura por forma sem ancorar no sujeito da frase."
     trace: "docs/business-context/03-market/competitive-landscape.md"
 
-  - id: Q_CONTRADICAO_CROSS_DOMINIO_NA_CONTAGEM_DE_ADOTANTES
+  - id: Q_CONTAGEM_DE_ADOTANTES_STALE_EM_DOIS_DOCS_DE_BUSINESS
     node_type: question
     plane: PROD
     verified_at: 2026-08-12
-    verified_against: grep-kind-adopter-em-members-yaml-devolve-8-contra-4-declarado-em-business-e-11-em-technical
+    verified_against: grep-c-circunflexo-espaco-kind-adopter-em-members-yaml-devolve-8-contra-4-declarado-nos-dois-docs
     status: open
-    impact: 4
+    impact: 3
     confidence: 1.0
-    label: "CONTRADICAO CROSS-DOMINIO — o achado que so o fan-in enxerga, e os TRES numeros divergem entre si E do vivo. `business/metrics.md` diz '1 core + 4 adotantes'; `business/voice-of-customer.md` diz '4 adotantes de campo'; `technical/business-logic.md` diz 11 membros. MEDIDO: `grep -c 'kind: adopter' members.yaml` = **8**. ⚠️ E O '11' REPRODUZ UM ERRO DE REGUA que um dos workers tambem cometeu — contar tudo que nao e `source` (12 entradas - 1), o que engloba `distillation`, `door` e `method`, que o proprio `members.yaml` comenta como 'NAO vendoriza'. Divergencia de fonte entre workers e ACHADO, nao ruido: se eu tivesse aceitado o `refresh_direction` daquele worker, teria corrigido o doc para um numero ERRADO. GATILHO DE FECHAMENTO: decidir a regua canonica ('adotante' = `kind: adopter`?) e faze-la derivar de `members.yaml`, nao de prosa."
+    label: "DOIS docs de business afirmam '4 adotantes' e o vivo diz 8: `business/metrics.md` ('1 core + 4 adotantes', e o proprio texto admite 'contagem manual') e `business/voice-of-customer.md` ('4 adotantes de campo'). MEDIDO com a receita que REPRODUZ: `grep -c '^ *kind: adopter' members.yaml` = **8**. ⚠️ DUAS CORRECOES A MIM MESMO, ambas do Elenxo, e a 1a e grave: (1) a redacao anterior deste no se chamava CONTRADICAO CROSS-DOMINIO e acusava `technical/business-logic.md` de dizer '11 membros'. FALSO — a linha 157 dele diz **'8 membros hoje'**, que e o numero CERTO. Eu listei como divergente justamente o arquivo que estava certo, casando a palavra '11' com o referente errado (ha `11 skills` e `11 arquivos` no doc). E o eixo e EXATAMENTE o que o no [E_ACUSADOR_ERROU_O_REFERENTE_E_O_JUIZ_DERRUBOU] deste mesmo grafo celebra ter pego num worker: eu apliquei o Elenxo aos outros e nao a mim. Nao ha contradicao cross-dominio nenhuma — ha stale em DOIS docs, e o dominio technical esta correto. (2) o `verified_against` anterior publicava `grep -c 'kind: adopter'`, que devolve **9**: a 9a ocorrencia e uma LEGENDA COMENTADA do schema (`members.yaml:394`). O numero 8 estava certo e a receita nao reproduzia — carimbo que nao reproduz e a forma de `exit-code-nao-e-a-verificacao` aplicada a citacao de comando. GATILHO DE FECHAMENTO: decidir a regua canonica ('adotante' = `kind: adopter`) e fazer a prosa APONTAR para `members.yaml` em vez de copiar o numero."
     trace: "docs/evolution/federation/members.yaml"
 
   - id: Q_ORCAMENTO_DE_CI_MEDIDO_CONTRA_ARTEFATO_41PCT_MENOR
@@ -102,6 +107,16 @@ nodes:
     label: "O `contributing.md` apresenta um ORCAMENTO DE CI como 'medido 2026-07-20': '~7,5min total, teto timeout-minutes: 15', com o lint em '2261 linhas'. MEDIDO HOJE: `timeout-minutes` vivo e **25**; o lint tem **3191** linhas (+41%). ⚠️ O AGRAVANTE E A FORMA: numero apresentado como MEDICAO carrega autoridade que numero solto nao tem — o leitor nao o questiona. E o juiz notou o que a acusacao original nao viu: se o lint cresceu 41%, o '~7,5min' inteiro foi medido contra outro artefato e precisa ser RE-MEDIDO, nao so os dois numeros pegos. GATILHO: re-medir o orcamento do §3.1 inteiro numa execucao real de CI antes de recarimbar."
     trace: "docs/technical-context/04-workflow/contributing.md"
 
+  - id: C_FALHA_POR_VOCABULARIO_ATRAVESSA_GREP_E_JUIZ_LLM
+    node_type: claim
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: quatro-instancias-no-mesmo-dia-regra16-worker-de-contexto-autor-do-grafo-e-o-proprio-id-deste-no
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "CLAIM QUE NASCEU DE UMA ARESTA-ALIBI DESFEITA, e o nascimento e o ponto. A 1a versao ligava [E_ACUSADOR_ERROU_O_REFERENTE] a [E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO] com `SUPPORTS` — mas um juiz derrubando uma acusacao sobre D6 NAO eleva em nada a credencia de que um regex e cego a tres formas de '99'. Sao proposicoes independentes; o elo real era ANALOGIA DE MODO DE FALHA, e analogia nao e suporte evidencial. A aresta existia para o no nao ficar orfao (grau 0 reprova) — alibi por proximidade, SEGUNDA vez que o autor comete isso em um dia (a 1a foi em identidade-onion-vps, tambem pega pelo Elenxo). A cura nao e apagar a aresta: e NOMEAR a tese que a analogia de fato sustenta. ⚠️ A TESE: casar a PALAVRA sem ancorar no SUJEITO da frase falha igual em `grep`, em juiz-LLM e em humano. QUATRO instancias medidas no mesmo dia: (1) a REGRA 16 nao via '99' em tres formas porque o feeder exigia uma ordem de palavras; (2) um worker acusou `competitive-landscape.md` casando 'hipotese a validar' com a decisao D6 quando qualificava o whitespace de mercado; (3) o AUTOR deste grafo acusou `business-logic.md` de dizer '11 membros' casando o numeral com `11 skills`/`11 arquivos` — o doc diz 8, o valor certo; (4) ao ESCREVER este no, o autor tentou ancora-lo em `A_SINTESE_DO_RUN_DE_REVERIFICACAO`, id que pertence a OUTRO grafo, por lembrar a forma e nao o referente. A quarta aconteceu dentro da cura da terceira. O substrato muda (regex, LLM, humano); o defeito nao."
+
   - id: A_RUN_DA_AUDITORIA_DE_CONTEXTO
     node_type: artifact
     plane: DEV
@@ -110,8 +125,8 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 1.0
-    label: "O run `wf_23de8ab6-81b`: 19 workers `sonnet`/`medium` (o comando pedia `haiku` — desvio DECLARADO, porque o item #4 exige cruzar `members.yaml`/`inventory.md`/`decisions.md` contra prosa, o que e raciocinio e nao varredura), 102 tool-calls, 1.065.019 tokens, 2min19s; mais 1 juiz adversarial `opus` acionado pela regra dos >30% (taxa medida: 42%). ⚠️ CAMPO ACRESCENTADO AO MOLDE DO COMANDO: `checked_against_live`, obrigando cada worker a declarar O QUE mediu para julgar o item #4, com 'nao-medi' como valor legal que PROIBE acusar falha de #4. Resultado: 19 de 19 mediram. Sem esse campo, 'aderencia a realidade' e opiniao com tipo — foi exatamente o defeito que o lote de /meta:kg-freshness expos hoje no mesmo dia."
-    trace: "docs/onion/graph/context-freshness-2026-08-12.kg.yaml"
+    label: "O run `wf_23de8ab6-81b`: 19 workers `sonnet`/`medium` (o comando pedia `haiku` — desvio DECLARADO, porque o item #4 exige cruzar `members.yaml`/`inventory.md`/`decisions.md` contra prosa, o que e raciocinio e nao varredura), 102 tool-calls, 1.065.019 tokens, 2min19s; mais 1 juiz adversarial `opus` acionado pela regra dos >30% (taxa medida: 42%). ⚠️ CAMPO ACRESCENTADO AO MOLDE DO COMANDO: `checked_against_live`, obrigando cada worker a declarar O QUE mediu para julgar o item #4, com 'nao-medi' como valor legal que PROIBE acusar falha de #4. Resultado: 19 de 19 mediram. ⚠️ ESTE NO REINCIDIU, E FOI PEGO: a 1a versao carimbava `confirmed`/`confidence 1.0` sobre numeros que NADA no repo podia conferir — `grep -rn wf_23de8ab6` devolvia DUAS ocorrencias, ambas dentro deste proprio arquivo, e o `trace:` apontava para o proprio grafo (auto-referencia, nao rastro). E a classe tinha sido curada HORAS ANTES no mesmo dia, no grafo irmao `identidade-onion-vps-2026-08` (no `A_SINTESE_DO_RUN_DE_REVERIFICACAO`), com estas palavras: 'carimbo que cita run sem artefato e declarado-nao-verificado'. Virou KB e nao virou GUARDA — por isso reincidiu no arquivo seguinte. CURADO: a sintese esta persistida em `docs/analysis/context-freshness-core-2026-08-12.md`, com `run_id`/`tokens`/`agents`/`duration_min` no frontmatter, e o `trace:` aponta para ELA. CANDIDATO NOMEADO (nao decidido): guarda que reprove `run_id:` citado sem artefato correspondente — o gatilho ja disparou duas vezes em 24h."
+    trace: "docs/analysis/context-freshness-core-2026-08-12.md"
 
 edges:
   - from: E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO
@@ -126,15 +141,27 @@ edges:
   - from: C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO
     to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
     edge_type: CONSTRAINS
-  - from: Q_CONTRADICAO_CROSS_DOMINIO_NA_CONTAGEM_DE_ADOTANTES
+  - from: Q_CONTAGEM_DE_ADOTANTES_STALE_EM_DOIS_DOCS_DE_BUSINESS
     to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
     edge_type: SUPPORTS
+  # CONSTRAINS, nao SUPPORTS: wc -l do lint e timeout-minutes NAO tem SSOT gerada, entao este
+  # no e stale genuino sob uma tese cujo mecanismo declarado nao o alcanca — limita, nao apoia.
   - from: Q_ORCAMENTO_DE_CI_MEDIDO_CONTRA_ARTEFATO_41PCT_MENOR
     to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
-    edge_type: SUPPORTS
+    edge_type: CONSTRAINS
+  # ARESTA-ALIBI DESFEITA: era SUPPORTS -> E_REGRA16, ligada so para o no nao ficar orfao.
+  # Juiz derrubando acusacao sobre D6 nao eleva credencia sobre regex cego. O elo real era
+  # analogia de modo de falha — que agora tem claim propria.
   - from: E_ACUSADOR_ERROU_O_REFERENTE_E_O_JUIZ_DERRUBOU
-    to: E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO
+    to: C_FALHA_POR_VOCABULARIO_ATRAVESSA_GREP_E_JUIZ_LLM
     edge_type: SUPPORTS
+  - from: E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO
+    to: C_FALHA_POR_VOCABULARIO_ATRAVESSA_GREP_E_JUIZ_LLM
+    edge_type: SUPPORTS
+  # O juiz derrubou 1 dos 8 STALE: LIMITA o denominador da tese, nao a derruba.
+  - from: E_ACUSADOR_ERROU_O_REFERENTE_E_O_JUIZ_DERRUBOU
+    to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
+    edge_type: CONSTRAINS
   - from: A_RUN_DA_AUDITORIA_DE_CONTEXTO
     to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
     edge_type: TRACES_TO

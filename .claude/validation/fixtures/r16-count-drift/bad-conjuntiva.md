@@ -1,10 +1,17 @@
-# Fixture de drift — caso BAD (Regra 16, forma CONJUNTIVA 'N agentes e M comandos')
+# Fixture de drift — caso BAD (Regra 16, forma CONJUNTIVA cross-line, ordem INVERTIDA)
 
-O agente `@onion` é o orquestrador master, com conhecimento completo de
-__ONION_AGENTS_DRIFT__ agentes e __ONION_COMMANDS_DRIFT__ comandos.
+O guia afirma que o orquestrador entrega __ONION_COMMANDS_DRIFT__ comandos
+e __ONION_AGENTS_DRIFT__ agentes, e nada mais.
 
-Dois substantivos de inventário ligados por `e` formam frase-de-total — é o que a
-distingue de `N comandos` cru, que a Regra 16 NÃO checa por gerar falso-positivo.
-Esta forma apareceu no codebase-guide.md dentro de uma CITAÇÃO entre aspas com
-âncora `arquivo:linha`, o que é pior que drift comum: quem confere conclui que a
-FONTE está errada, não o documento.
+DUAS coisas tornam esta fixture load-bearing, e a 1a versão dela não tinha nenhuma:
+
+1. ORDEM INVERTIDA (`comandos … e … agentes`). O feeder IRMÃO (ordem canônica
+   `N agentes e M comandos`, mesma linha) NÃO casa esta ordem — se o feeder conjuntivo
+   for removido, esta fixture deixa de ser citada. A 1a versão usava a ordem canônica
+   numa linha só: o irmão já a acusava com a MESMA keyword do manifesto, então o caso
+   passava com a guarda deletada. Fixture que sobrevive à remoção do que ela testa é
+   fixture vazia — provado por mutação pelo Elenxo, não suposto.
+
+2. QUEBRA DE LINHA NO MEIO DO PAR, como no sítio fundador
+   (`codebase-guide.md:111-112`). É o que exige a leitura por parágrafo: trocar o
+   `awk RS=""` por `cat` faz esta fixture deixar de casar.
