@@ -228,6 +228,28 @@ nodes:
     confidence: 1.0
     label: "A chave GPG `160D65435B1F12C8` decifra TODO artefato de backup desta VPS (38 na medicao de 11-08, zero em claro — o numero cresce com o cron, a dependencia nao) e e a raiz do `pass`. MEDIDO agora: o veiculo de exportacao (`chave-privada-onion.asc`, 886 B) foi destruido com `shred -u` e NAO existe mais na VPS (`find` na home = zero `.asc`); a PRIVADA continua no chaveiro (`sec ed25519/160D65435B1F12C8`, expira 2028-07-23), que e de onde ela e usada — nada foi perdido. O QUE EU NAO MEDI, E NAO POSSO: se o download chegou ao destino antes do `shred`. Isso e observavel so do lado do maestro. CONSEQUENCIA SE NAO CHEGOU: a unica copia da chave vive no MESMO disco que o backup que ela protege — perder a VPS perde o dado E a chave no mesmo evento, que e exatamente a armadilha circular descrita em [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA]. A cifra nao falha; ela vira lacre sem dono. GATILHO DE FECHAMENTO: o maestro confirmar que a copia existe fora da VPS e guardada SEPARADA do pacote de backup — chave junto do cofre e cofre destrancado."
 
+  - id: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-11
+    verified_against: grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo
+    trace: docs/analysis/arandek-repo-exposure-2026-08.md
+    status: open
+    impact: 4
+    confidence: 1.0
+    label: "ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. Medido em `/home/marcio/onion-adopt-arandek/docker-compose.yml`, arquivo RASTREADO por git em `ArandekBR/arandek`: (1) cinco segredos LITERAIS — `--requirepass arandek-redis-secret` na linha 60 e `LANGFUSE_INIT_PROJECT_PUBLIC_KEY`/`LANGFUSE_INIT_PROJECT_SECRET_KEY`/`MINIO_ROOT_PASSWORD`/`MINIO_SECRET_ACCESS_KEY` nas linhas 147/148/210/231 (VALORES DELIBERADAMENTE FORA DESTE GRAFO — o core nao guarda segredo de adotante; leia no arquivo dele); (2) as portas publicam em `0.0.0.0` sem prefixo de bind — MinIO 9090/9091, Langfuse 3006, Milvus 19530/19531, Postgres `${POSTGRES_PORT:-5438}` e Redis `${REDIS_PORT:-6379}`. Num host de IP publico isso E internet, e o `ufw` NAO segura: porta publicada por Docker atravessa DNAT/FORWARD e nao ve o `INPUT DROP` — medido nesta VPS, foi assim que dois Redis sem senha ficaram expostos aqui, e e a mesma mecanica que [C_REDE_ISOLADA_POR_CONSTRUCAO] descreve do lado de ca. NESTA VPS os 15 containers dele estao seguros SO por causa do overlay `onion-adopt-arandek-local/compose.local.yml`, que prefixa `127.0.0.1:` — sem o overlay nasceriam publicos. O redis vivo responde `NOAUTH`, entao a senha esta ativa: o defeito e ela ser publica no historico, nao ausente. RECADO REDIGIDO E PRONTO em `docs/analysis/arandek-repo-exposure-2026-08.md`. ⚠️ ARMADILHA QUE ME PEGOU: meu primeiro `grep` de portas voltou VAZIO e eu quase conclui 'ele nao publica nada' — o padrao nao cobria ASPAS SIMPLES (`- '9090:9000'`). Terceira vez no dia que o defeito estava no vocabulario do filtro, nao na logica."
+
+  - id: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-11
+    verified_against: vps-exposure-check-varre-docker-ps-e-diretorios-locais-nao-le-compose-de-repo-adotante
+    trace: docs/analysis/arandek-repo-exposure-2026-08.md
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "A guarda `vps-exposure-check.sh` cobre o lado de CA (bind publico em container vivo, conector upstream, backup em claro) e roda diaria por systemd timer. Ela nao cobre — e por desenho nao poderia, no formato atual — o lado do ADOTANTE: um `docker-compose.yml` no repo dele que publica em `0.0.0.0` so vira risco quando ele sobe no host DELE, que eu nao meco. Esta e a lacuna que [Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO] expos: o achado saiu de `grep` MANUAL meu, nao de mecanismo — e por [[fix-must-become-mechanism]] achado que so existe porque alguem olhou nao se repete sozinho. CANDIDATO (nao decidido, nao pre-cozinhar): regra de lint que, em repo com `role: adopted`, acuse porta publicada sem prefixo de bind e segredo literal em compose rastreado. GATILHO PARA DECIDIR: o segundo adotante com o mesmo defeito — um caso e caso, dois e classe."
+
   # ── A COSTURA COM O ONION COMO FRAMEWORK DE DESENVOLVIMENTO ─────────────────
   - id: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
     node_type: claim
@@ -313,6 +335,12 @@ edges:
   - from: Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS
     to: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     edge_type: CONSTRAINS
+  - from: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
+    to: C_REDE_ISOLADA_POR_CONSTRUCAO
+    edge_type: CONSTRAINS
+  - from: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
+    to: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
+    edge_type: TRACES_TO
   - from: Q_LACUNA_DECISAO_MAIS_CODIGO
     to: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
     edge_type: SUPPORTS
