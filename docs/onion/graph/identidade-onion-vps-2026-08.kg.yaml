@@ -285,7 +285,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 1.0
-    label: "ACHADO QUE SO APARECEU PORQUE FUI ESCREVER. CINCO nos deste grafo carregavam DUAS linhas `verified_at:` cada um — `2026-08-10` seguida de `2026-08-11` (I_SEGUNDO_IDP, I_A6, Q_ISOLAMENTO, Q_MFA, Q_METADE_DO_BRIDGE). A rodada de carimbo de 08-11 ADICIONOU a data nova sem remover a velha. O radar e `awk`, uma chave por linha: o arquivo afirmava DUAS verdades e o motor escolhia uma calado. QUAL? MEDIDO, nao deduzido: o `--freshness-tsv` devolveu `2026-08-11` para os cinco — a ULTIMA vence. Logo o comportamento estava CORRETO POR ACIDENTE, e ninguem sabia que era acidente. ⚠️ A CLASSE, que e maior que o caso: um carimbo aplicado a mao pode INSERIR em vez de SUBSTITUIR, e nenhuma guarda desta casa olha para chave repetida dentro de um no — nem o `--integrity`, nem o `--schema`, nem o lint. E o proximo carimbo ingenuo criaria uma TERCEIRA linha. Curado neste PR (removida a linha antiga dos cinco, mantida a que o radar ja lia — semantica preservada, ambiguidade removida)."
+    label: "ACHADO QUE SO APARECEU PORQUE FUI ESCREVER, e que CRESCEU de 5 para 7 quando virou guarda. CINCO nos DESTE grafo carregavam DUAS linhas `verified_at:` (`2026-08-10` seguida de `2026-08-11`): I_SEGUNDO_IDP, I_A6, Q_ISOLAMENTO, Q_MFA, Q_METADE_DO_BRIDGE. A rodada de carimbo de 08-11 ADICIONOU a data nova sem remover a velha. O radar e `awk`, uma chave por linha: o arquivo afirmava DUAS verdades e o motor escolhia uma calado. QUAL? MEDIDO, nao deduzido — `--freshness-tsv` devolvia a ULTIMA. Logo o comportamento estava CORRETO POR ACIDENTE. ⚠️ PRECISAO SOBRE O QUE ESTE PR FEZ COM OS CINCO (a 1a redacao deste label errava, e o Elenxo pegou): a linha antiga saiu dos cinco, mas so DOIS (Q_MFA, Q_METADE) ficaram com o `2026-08-11` que o radar ja lia — os outros TRES estavam na fila de re-verificacao e receberam `2026-08-12` por MEDICAO NOVA. Sao dois atos distintos (remover ambiguidade × re-verificar) e confundi-los faria o proximo leitor procurar um carimbo que nao esta la. ⚠️ E A CLASSE E MAIOR QUE ESTE GRAFO: com a guarda escrita, a varredura dos 60 grafos achou mais DUAS instancias que ninguem tinha visto — `stack-harmonia` (`C_producao_nao_e_o_repo`, com `verified_at` E `verified_against` duplicados, e a ULTIMA sendo a MAIS ANTIGA: o radar lia `08-01/git-log` e IGNORAVA a medicao nova e mais rigorosa de `08-08/rev-list`) e `fios-abertos` (`Q_REGRA56`, `verified_against` duplicado — e ESSE era a causa do aviso MISPLANED que o proprio warm-up desta sessao exibiu como fio aberto; curou junto). CURADA A CLASSE, nao so os casos: `kg-radar.sh` passa a REPROVAR chave repetida (`verified_at` e `verified_against`) na INTEGRIDADE. Os 60 grafos ficam em zero."
     trace: ".claude/validation/kg-radar.sh"
 
   - id: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
@@ -307,7 +307,29 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    label: "A CLASSE POR TRAS DO ACHADO, e ela e de desenho, nao de descuido do worker. `C_TRES_MODELOS_DE_CONFIANCA` afirma TRES mecanicas independentes (bridge/cofre/waha); o `KgReverifySchema` da UM `verdict` so. Um worker que mede 2 de 3 nao tem onde expressar 'confirmei dois tercos' — e o gradiente natural e arredondar PARA CIMA, porque CONFIRMED e o desfecho que nao pede justificativa. O veredito atomico ESCONDE qual parte foi medida, e o `verified_against:` (que e uma string unica) esconde junto. CANDIDATO, nao decidido: ou o schema ganha cobertura parcial explicita, ou a guarda passa a REPROVAR `blocked_by` nao-vazio quando `verdict != UNVERIFIABLE` — a segunda e barata e pega o caso medido. GATILHO PARA DECIDIR: ja disparou — o maestro selou 'vira mecanismo, em PR proprio' em 2026-08-12."
+    label: "A CLASSE POR TRAS DO ACHADO, e ela e de desenho, nao de descuido do worker. `C_TRES_MODELOS_DE_CONFIANCA` afirma TRES mecanicas independentes (bridge/cofre/waha); o `KgReverifySchema` da UM `verdict` so. Um worker que mede 2 de 3 nao tem onde expressar 'confirmei dois tercos' — e o gradiente natural e arredondar PARA CIMA, porque CONFIRMED e o desfecho que nao pede justificativa. O veredito atomico ESCONDE qual parte foi medida. DECIDIDO E IMPLEMENTADO em 2026-08-12 (PR #584), com os DOIS candidatos que este no listava: (a) cobertura explicita — campos `claims_total`/`claims_measured`/`coverage`, com PARCIAL admitindo so UNVERIFIABLE; (b) `blocked_by` nao-vazio com `verdict != UNVERIFIABLE` REPROVA. ⚠️ TETO QUE O ELENXO IMPOS A ESTA CURA, e ele e duro: JSON Schema puro NAO COMPARA DUAS PROPRIEDADES entre si, entao `claims_measured: 2, claims_total: 3, coverage: TOTAL` PASSA — que e exatamente o modo de falha medido. A promessa 'mediu 2 de 3 => UNVERIFIABLE' NAO e cumprivel no schema; ela se cumpre no FAN-IN, derivando `coverage` da contagem em JS (custo 0 tokens) em vez de confiar na etiqueta que o worker escolheu. Um comentario que afirma cobertura inexistente e PIOR que guarda ausente — desativa a desconfianca do proximo leitor —, e a 1a redacao desta cura cometeu isso."
+
+  - id: A_SINTESE_DO_RUN_DE_REVERIFICACAO
+    node_type: artifact
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: arquivo-versionado-com-frontmatter-run-id-tokens-agents-duration
+    status: confirmed
+    impact: 2
+    confidence: 1.0
+    label: "A PROJECAO humana do run `wf_7804d86f-3a7`, com o contrato de proveniencia de custo que a `onion-orchestration` exige (`run_id`/`tokens`/`agents`/`duration_min` no frontmatter, co-locados com `kg:`). ⚠️ NASCEU DE UM ACHADO CONTRA MIM: eu tinha carimbado nos deste grafo citando um run cujo artefato NUNCA persisti — o `wf_` existia so como comentario YAML, e `grep -rn wf_7804d86f` devolvia UMA ocorrencia, nele mesmo. Carimbo que cita run sem artefato e declarado-nao-verificado, que e a distincao que este comando existe para defender. O grafo e o DESTINO dos achados; este markdown e vista dele, nunca fonte paralela."
+    trace: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
+
+  - id: C_CARIMBO_A_MAO_INSERE_EM_VEZ_DE_SUBSTITUIR
+    node_type: claim
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: sete-instancias-em-tres-grafos-achadas-so-depois-que-a-guarda-existiu
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    label: "A CLASSE, nomeada — e ela e sobre o ATO de carimbar, nao sobre o campo. Quem aplica `verified_at:`/`verified_against:` a mao tende a INSERIR a linha nova em vez de SUBSTITUIR a velha; o parser sobrescreve calado e o grafo passa a afirmar duas coisas. Nao e descuido individual: e o gradiente do gesto (adicionar e mais barato que localizar-e-trocar) somado a um motor que nunca reclamou. ⚠️ A PROVA DE QUE VIRAR MECANISMO ERA O PONTO: enquanto o achado foi CASO, a contagem era 5, num grafo so. Assim que virou GUARDA e varreu os 60, a contagem foi a 7 em TRES grafos — e as duas novas eram piores que as cinco originais, porque nelas a linha que VENCIA era a ERRADA (em `stack-harmonia` o radar lia um carimbo de 08-01 tendo um de 08-08 no arquivo; em `fios-abertos` a duplicata era a causa de um aviso MISPLANED que ja aparecia no warm-up e ninguem tinha explicado). Instancia limpa de [[fix-must-become-mechanism]]: a cura one-off nao teria achado nenhuma das duas, e eu teria fechado o PR convencido de que eram cinco."
+    trace: ".claude/validation/kg-radar.sh"
 
   - id: E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA
     node_type: evidence
@@ -330,8 +352,17 @@ edges:
   - from: E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA
     to: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     edge_type: SUPPORTS
+  # Esta aresta apontava para Q_GUARDA_DE_EXPOSICAO (compose de adotante, bind público) por pura
+  # afinidade temática — "guarda com ponto cego" — para o nó não ficar órfão (grau 0 reprova).
+  # Álibi por proximidade não é suporte: os dois Elenxos pegaram. Re-apontada ao alvo verdadeiro.
   - from: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
-    to: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
+    to: C_CARIMBO_A_MAO_INSERE_EM_VEZ_DE_SUBSTITUIR
+    edge_type: SUPPORTS
+  - from: A_SINTESE_DO_RUN_DE_REVERIFICACAO
+    to: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
+    edge_type: TRACES_TO
+  - from: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
+    to: C_NO_COMPOSTO_RECEBE_VEREDITO_ATOMICO
     edge_type: SUPPORTS
   - from: Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO
     to: C_IDP_AUTENTICA_NAO_DECIFRA

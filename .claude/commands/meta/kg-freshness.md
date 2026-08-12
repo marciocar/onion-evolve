@@ -129,16 +129,27 @@ Tiering: `sonnet`/`medium` no worker (derivar o método pede raciocínio, não �
 Schema de retorno:
 
 O schema é **JSON Schema de verdade**, passado em `opts.schema` — não pseudocódigo ilustrativo.
-A restrição do `blocked_by` mora **nele**, não na prosa acima: validação falha ⇒ o tool-layer
-força o worker a **retentar**. É a diferença entre mecanismo e conselho.
+A restrição do `blocked_by` mora **nele**, não na prosa acima.
+
+> ⚠️ **O que a falha de schema faz, medido e não suposto:** o tool-layer faz o worker **retentar**;
+> se as tentativas se esgotarem, `parallel()` devolve **`null`** para aquele item e a
+> `onion-orchestration` manda `.filter(Boolean)` antes do fan-in. **As duas coisas são verdade, e a
+> segunda é a que importa aqui:** um worker que não converge **some da fila em silêncio**. Por isso
+> o fan-in **tem de reportar quantos foram descartados** — sem isso, o nó de maior atenção pode
+> evaporar e o relatório sair "16/16 medidos" tendo medido 15. Guarda de schema sem contagem de
+> descarte troca um fail-open por outro.
 
 ```javascript
 const KgReverifySchema = {
   type: "object",
-  required: ["node_id", "kg_file", "method", "observed", "verdict", "divergence", "blocked_by"],
+  // UMA lista só. Duas chaves `required` no mesmo objeto = a segunda SOBRESCREVE a primeira,
+  // em silêncio — foi o defeito medido em 2026-08-12, na primeira versão desta própria guarda,
+  // e é a MESMA classe de `verified_at` duplicado que o grafo daquele dia catalogou.
+  required: ["node_id", "kg_file", "method", "observed", "verdict", "divergence", "blocked_by",
+             "claims_total", "claims_measured", "coverage"],
   properties: {
-    node_id: { type: "string" },
-    kg_file: { type: "string" },
+    node_id: { type: "string", minLength: 1 },
+    kg_file: { type: "string", minLength: 1 },
     method:   { type: "string", minLength: 1 },  // o comando EXECUTADO, verbatim — auditável
     observed: { type: "string", minLength: 1 },  // o que voltou, verbatim, não interpretado
     verdict:  { enum: ["CONFIRMED", "DRIFTED", "REFUTED", "UNVERIFIABLE"] },
@@ -146,41 +157,78 @@ const KgReverifySchema = {
     blocked_by: { type: "string" },  // SÓ em UNVERIFIABLE — ver as guardas abaixo
     proposed_write: { type: "string" },  // YAML proposto; o worker NÃO escreve
     // COBERTURA — o antídoto do nó COMPOSTO. Quantas das afirmações independentes do nó
-    // a medição alcançou. Campo obrigatório e declarado ANTES do veredito, de propósito:
-    // obriga a contar as partes em vez de sentir o todo.
-    claims_no_no:     { type: "integer", minimum: 1 },
-    claims_medidos:   { type: "integer", minimum: 0 },
-    cobertura: { enum: ["TOTAL", "PARCIAL"] },
+    // a medição alcançou. Declarada ANTES do veredito, de propósito: obriga a CONTAR as
+    // partes em vez de sentir o todo.
+    claims_total:    { type: "integer", minimum: 1 },
+    claims_measured: { type: "integer", minimum: 0 },
+    coverage: { enum: ["TOTAL", "PARCIAL"] },
   },
   allOf: [
     // GUARDA 1 (2026-08-12): blocked_by não-vazio com veredito != UNVERIFIABLE é contradição —
     // o worker diz "não consegui medir" e "está confirmado" na mesma respiração.
     {
-      if:   { properties: { verdict: { not: { const: "UNVERIFIABLE" } } } },
-      then: { properties: { blocked_by: { const: "" } } },
+      if:   { required: ["verdict"], properties: { verdict: { not: { const: "UNVERIFIABLE" } } } },
+      then: { required: ["blocked_by"], properties: { blocked_by: { const: "" } } },
     },
-    // GUARDA 2 — a que fecha a porta dos fundos da GUARDA 1. Sem ela o worker escapa
-    // APAGANDO o blocked_by e mantendo CONFIRMED: o rastro some e o defeito fica invisível.
+    // GUARDA 2 — fecha a porta dos fundos da GUARDA 1. Sem ela o worker escapa APAGANDO o
+    // blocked_by e mantendo CONFIRMED: o rastro some e o defeito fica invisível.
     // Cobertura PARCIAL só admite UNVERIFIABLE, e aí blocked_by volta a ser obrigatório.
     {
-      if:   { properties: { cobertura: { const: "PARCIAL" } } },
+      if:   { required: ["coverage"], properties: { coverage: { const: "PARCIAL" } } },
       then: {
+        required: ["verdict", "blocked_by"],
         properties: {
           verdict:    { const: "UNVERIFIABLE" },
           blocked_by: { type: "string", minLength: 1 },
         },
       },
     },
+    // GUARDA 3 — UNVERIFIABLE tem de dizer POR QUE. Sem ela, "não consegui medir" com
+    // blocked_by vazio valida: a GUARDA 1 não dispara (o `if` falha) e a 2 só cobre PARCIAL.
+    {
+      if:   { required: ["verdict"], properties: { verdict: { const: "UNVERIFIABLE" } } },
+      then: { required: ["blocked_by"], properties: { blocked_by: { type: "string", minLength: 1 } } },
+    },
   ],
-  required: ["claims_no_no", "claims_medidos", "cobertura"],
 };
 ```
 
-> **Teto declarado da GUARDA 2:** ela obriga a *coerência* entre cobertura e veredito, não a
-> *honestidade* da contagem — um worker que declare `claims_no_no: 1` num nó que afirma três
-> coisas passa. Isso é limite conhecido, não descuido: nenhum schema conta as afirmações de uma
-> prosa. O que a guarda compra é tornar o arredondamento-para-cima um ato **explícito** (declarar
-> 1 quando são 3) em vez de um silêncio — que é a mesma troca que a REGRA 49 faz com o baseline.
+> ⚠️ **O QUE ESTE SCHEMA NÃO PODE FAZER — e a primeira redação afirmou que fazia.** JSON Schema
+> puro **não compara duas propriedades entre si**. Logo `claims_measured: 2, claims_total: 3,
+> coverage: "TOTAL"` **passa** — que é *exatamente* o modo de falha medido em 2026-08-12 (mediu 2
+> de 3, declarou o todo). O mesmo vale para `5 de 3`. A prosa do Passo 3 promete "mediu 2 de 3 ⇒
+> UNVERIFIABLE"; **o schema não entrega isso e não tem como entregar.**
+>
+> **Onde a promessa se cumpre: no fan-in, em JS, custo 0 tokens.** Não confie na etiqueta que o
+> worker escolheu — *derive-a* e confronte:
+>
+> ```javascript
+> for (const r of vivos) {
+>   if (r.claims_measured > r.claims_total) throw new Error(`${r.node_id}: contagem impossível`)
+>   const real = r.claims_measured < r.claims_total ? 'PARCIAL' : 'TOTAL'
+>   if (real !== r.coverage) log(`⚠ ${r.node_id}: declarou ${r.coverage}, a contagem diz ${real}`)
+>   if (real === 'PARCIAL' && r.verdict !== 'UNVERIFIABLE') {
+>     r.verdict = 'UNVERIFIABLE'                 // rebaixa: cobertura parcial não confirma o todo
+>     r.blocked_by ||= `cobertura ${r.claims_measured}/${r.claims_total} — partes não medidas`
+>   }
+> }
+> ```
+>
+> Um comentário que afirma cobertura inexistente é pior que guarda ausente: desativa a
+> desconfiança do próximo leitor. Por isso o teto está aqui, e não numa nota de rodapé.
+
+> **`if`/`then` em JSON Schema aplica-se a chaves PRESENTES.** Sem o `required:` dentro de cada
+> `if` e de cada `then`, **omitir** o campo satisfaz a guarda — a guarda nasce verde-vazia para
+> quem simplesmente não escreve a chave. Foi assim que a primeira versão desta seção furou; os
+> `required:` acima existem por isso e **não são redundância**.
+
+> **Teto declarado da GUARDA 2 — e ele é menor do que a primeira redação prometia.** A guarda
+> obriga *coerência* entre cobertura, contagem e veredito; não obriga *honestidade* da contagem.
+> Um worker que declare `claims_total: 1` num nó que afirma três passa, porque nenhum schema conta
+> as afirmações de uma prosa. **Não afirme que isso torna o arredondamento "explícito"** enquanto
+> os campos não aparecerem na Saída Esperada e na tabela do gate — sem isso o maestro nunca os vê,
+> e um `1/1/TOTAL` mentiroso é indistinguível de um `3/3` real. Por isso eles estão nas duas
+> (Passo 4 e Saída Esperada), e é o que faz a diferença entre medida e adjetivo.
 
 ### Passo 4 — Fan-in, gate humano, e só então `write(KG)`
 
@@ -190,6 +238,14 @@ const KgReverifySchema = {
 | **DRIFTED** | a verdade mudou; o nó não errou | **Novo** nó com a verdade atual + `SUPERSEDES` → antigo; antigo vira `status: superseded`. Nunca reescreva o label do antigo. |
 | **REFUTED** | o nó estava errado | **Novo** nó `evidence` (PROD, `verified_at`, `verified_against`, `trace`) + `REFUTES` → alvo; alvo vira `status: refuted`. |
 | **UNVERIFIABLE** | não deu para medir | **NÃO TOCA `verified_at`.** Rebaixa `confidence` e/ou abre `question` + `DEPENDS_ON`. |
+
+**Antes de aplicar a linha CONFIRMED, leia a cobertura.** A tabela chaveia por `verdict`, mas o
+`verdict` de um nó **composto** é uma etiqueta sobre N afirmações. O gate humano é o único ponto
+onde `claims_measured/claims_total` pode ser confrontado com o `label:` do nó — o schema garante
+coerência interna, nunca honestidade da contagem. Um `1/1/TOTAL` num nó que afirma três mecânicas
+é *exatamente* o que a GUARDA 2 não alcança, e é barato de ver aqui: **se a contagem parece baixa
+para o tamanho do label, o carimbo não sai.** Foi um nó composto (três modelos de confiança, dois
+medidos) que produziu o defeito de 2026-08-12.
 
 > **`status: drifted` não é atalho para esta tabela.** O motor aceita `drifted` (1.3) e
 > `unverifiable` (1.0) desde 2026-08-06, mas **`status` é marcador de ESTADO, não de processo**:
@@ -227,6 +283,13 @@ Substrato Workflow indisponível ⇒ serial, **dizendo que é serial**. Nunca fi
 
 Bloco `KG REVERIFY REPORT` no formato dos irmãos, mais:
 - a **contagem por veredito** e o **corte declarado** (quantos nós ficaram de fora do `--top`)
+- **quantos workers foram descartados** (`null` no `parallel()` — schema não convergiu, timeout,
+  worker morto) **e quais nós ficaram sem medição por isso.** Um relatório que diz "16/16" tendo
+  perdido um worker é o fail-open que a guarda de schema criou ao fechar o outro
+- **a cobertura de cada nó** — `claims_measured/claims_total` — ao lado do veredito, **não só dos
+  não-CONFIRMED**. É o CONFIRMED com cobertura parcial que engana; o não-CONFIRMED já se anuncia.
+  Sem esta linha, os campos existem no schema e morrem antes do gate humano, e a GUARDA 2 vira
+  cerimônia
 - para cada não-CONFIRMED: `method`, `observed`, `divergence`
 - o **path do grafo escrito** (o passo 7 da `onion-orchestration` exige nomear o artefato)
 
