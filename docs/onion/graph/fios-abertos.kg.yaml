@@ -226,7 +226,6 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 1.0
-    verified_against: pre-commit-rodado-duas-vezes-na-mesma-branch-com-PR-aberto
     label: "RESPONDIDO E CURADO (PR #571). O no exigia \"MEDIR o gatilho exato antes de mexer\" — medido: 23 commits de UMA sessao com `--no-verify DECLARADO`, cada um sendo alguem que OBEDECEU (escreveu o residuo, calculou o hash) e mesmo assim teve de contornar. A raiz: `DIFF_SHA` comparava `BASE..HEAD`, so COMMITS, e no pre-commit o HEAD e o commit ANTERIOR — o conteudo em stage nao entrava na conta e o hash prospectivo NAO PODIA casar. A cura repetiu a escolha do `_baseline_ref` da REGRA 49: a SITUACAO decide (arvore suja -> indice; limpa -> HEAD, o CI inalterado). Prova: tres commits consecutivos passaram pelo hook SEM bypass, depois de 23 seguidos com ele. ⚠️ ESTE NO FICOU ABERTO POR UM CICLO depois de curado, e eu quase o apresentei ao maestro como tarefa DELE — colher e parte da cura, nao formalidade. TETO DECLARADO: `git diff --quiet HEAD` como detector de pre-commit e HEURISTICA, nao contexto; o caso do `--amend` nao foi medido e a regra nao o cobre."
     trace: ".claude/validation/review-artifact-check.sh"
 

@@ -199,8 +199,22 @@ section == "nodes" && nid != "" {
   if (line ~ /^[[:space:]]*impact:/)     { v = line; sub(/^[[:space:]]*impact:/, "", v);     impact[nid] = trim(v) + 0 }
   if (line ~ /^[[:space:]]*confidence:/) { v = line; sub(/^[[:space:]]*confidence:/, "", v); conf[nid] = trim(v) + 0 }
   if (line ~ /^[[:space:]]*status:/)     { v = line; sub(/^[[:space:]]*status:/, "", v);     nstatus[nid] = trim(v) }
-  if (line ~ /^[[:space:]]*verified_against:/) { v = line; sub(/^[[:space:]]*verified_against:/, "", v); verifiedAgainst[nid] = trim(v) }
-  else if (line ~ /^[[:space:]]*verified_at:/) { v = line; sub(/^[[:space:]]*verified_at:/, "", v); verifiedAt[nid] = trim(v) }
+  if (line ~ /^[[:space:]]*verified_against:/) {
+    v = line; sub(/^[[:space:]]*verified_against:/, "", v)
+    if (nid in verifiedAgainst && verifiedAgainst[nid] != trim(v)) dupKey[nid "|verified_against"] = verifiedAgainst[nid] " -> " trim(v)
+    verifiedAgainst[nid] = trim(v)
+  }
+  else if (line ~ /^[[:space:]]*verified_at:/) {
+    v = line; sub(/^[[:space:]]*verified_at:/, "", v)
+    # CHAVE REPETIDA: atribuição simples faz a ÚLTIMA vencer, em SILÊNCIO. Medido em 2026-08-12:
+    # cinco nós deste repo carregavam DUAS linhas `verified_at:` (08-10 e 08-11) porque um carimbo
+    # aplicado à mão INSERIU em vez de SUBSTITUIR. O comportamento estava correto POR ACIDENTE — o
+    # arquivo afirmava duas verdades e nenhuma guarda olhava para isso (nem --integrity, nem
+    # --schema, nem o lint). Registrar em vez de sobrescrever calado: o próximo carimbo ingênuo
+    # criaria uma TERCEIRA linha e o grafo continuaria "verde".
+    if (nid in verifiedAt && verifiedAt[nid] != trim(v)) dupKey[nid "|verified_at"] = verifiedAt[nid] " -> " trim(v)
+    verifiedAt[nid] = trim(v)
+  }
   # Proveniência inline: a MIGALHA `arquivo:linha` (suporte de campo 2026-07-17). Âncora
   # em ^…trace: — um match solto casaria com label que cita "trace:"/"TRACES_TO" (este repo fala
   # de rastreabilidade sobre si mesmo), false-positivando a origem. Foi o PROTÓTIPO da defesa acima.
@@ -686,6 +700,13 @@ END {
   if (mode == "--all" || mode == "--integrity") {
     print "══ INTEGRIDADE ══"
     for (id in dup) { print "  ✗ id duplicado: " id; problems++ }
+    # Chave repetida DENTRO de um nó: o parser sobrescreve calado e o arquivo passa a afirmar
+    # duas verdades. Reprova — quem carimba tem de SUBSTITUIR, não INSERIR (medido 2026-08-12).
+    for (k in dupKey) {
+      split(k, _p, "|")
+      print "  ✗ " _p[2] " repetido em " _p[1] ": " dupKey[k] " — a última venceu em silêncio; remova a linha antiga (carimbo SUBSTITUI, não insere)"
+      problems++
+    }
     for (i = 1; i <= ne; i++) {
       if (!(efrom[i] in nodeSeen)) { print "  ✗ aresta " i ": from aponta nó inexistente: " efrom[i]; problems++ }
       if (!(eto[i]   in nodeSeen)) { print "  ✗ aresta " i ": to aponta nó inexistente: " eto[i]; problems++ }

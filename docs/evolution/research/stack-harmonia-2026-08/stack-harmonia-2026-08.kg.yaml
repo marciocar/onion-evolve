@@ -66,8 +66,6 @@ nodes:
     verified_against: rev-list-HEAD..origin-main-no-checkout-de-producao-do-bridge-0-a-frente-0-atras
     impact: 5
     confidence: 1.0
-    verified_at: 2026-08-01
-    verified_against: git-log-do-checkout-de-producao
     label: "BEHAVIOR-OVER-DECLARATION VIRADO PARA DENTRO: o artefato que RODA nao e o artefato do REPO — checkout de producao em 965224c (07-27) contra main de 07-31. CONSEQUENCIA EPISTEMICA: toda conclusao sobre 'o que o bridge faz' tirada do main pode estar ERRADA. A cura e HABITO (git pull + restart), NAO contrato /health {sha,dirty} + 409 fail-closed — que derrubaria a federacao hoje por condicao cosmetica, para N=1 operador (dead-layer). A 'deriva do org-map' e SUBPRODUTO disto, nao causa independente"
     trace: "/home/onion/onion-bridge"
 

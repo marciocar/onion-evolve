@@ -26,7 +26,7 @@ nodes:
   - id: C_TRES_MODELOS_DE_CONFIANCA
     node_type: claim
     plane: PROD
-    verified_at: 2026-08-10
+    verified_at: 2026-08-12
     verified_against: bridge-jwks-local-cofre-redirect-oidc-waha-apikey-hash-medidos-no-vivo
     status: confirmed
     impact: 5
@@ -47,7 +47,7 @@ nodes:
   - id: E_RECUPERACAO_E_O_ELO_FRACO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: 2026-08-12
     verified_against: fido-2026-5bi-passkeys-75pct-ativaram-49pct-usam-owasp-e-nist-800-63-4
     status: confirmed
     impact: 5
@@ -58,7 +58,7 @@ nodes:
   - id: E_ORG_LOGICA_NAO_E_FRONTEIRA
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: 2026-08-12
     verified_against: CVE-2026-43912-cvss-8.7-corrigido-em-1.35.5-rodamos-1.37.1
     status: confirmed
     impact: 5
@@ -69,7 +69,7 @@ nodes:
   - id: E_CVE_LOGTO_NAO_TEM_PORTA_AQUI
     node_type: evidence
     plane: PROD
-    verified_at: 2026-08-10
+    verified_at: 2026-08-12
     verified_against: zero-conectores-sociais-zero-sso-empresarial-so-smtp
     status: confirmed
     impact: 4
@@ -101,7 +101,7 @@ nodes:
   - id: I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-10
+    verified_at: 2026-08-12
     verified_against: 3-alterations-aplicadas-status-204-11-apps-issuer-ok-sso-redirect-restaurado
     status: done
     impact: 5
@@ -113,8 +113,7 @@ nodes:
   - id: I_SEGUNDO_IDP_COM_CONSOLE_DESTRANCADO
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-10
-    verified_at: 2026-08-11
+    verified_at: 2026-08-12
     verified_against: 13-portas-em-loopback-waha-3022-timeout-e-register-400-com-controle-marker-attu-200
     status: done
     impact: 5
@@ -135,8 +134,7 @@ nodes:
   - id: I_A6_O_BLOQUEIO_NAO_ERA_SMTP
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-10
-    verified_at: 2026-08-11
+    verified_at: 2026-08-12
     verified_against: email-nas-2-identidades-smtp-no-tenant-admin-mfa-factors-totp-backupcode
     status: done
     impact: 5
@@ -146,7 +144,7 @@ nodes:
   - id: E_MEMORIA_DE_AGENTE_E_COMMODITY_PELO_DINHEIRO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: 2026-08-12
     verified_against: 0.6pct-do-capital-agentic-so-seed-zero-M-and-A-mcp-doado-a-fundacao
     status: confirmed
     impact: 5
@@ -156,7 +154,7 @@ nodes:
   - id: E_ANTIPADRAO_MEDIDO_EM_PRODUCAO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: 2026-08-12
     verified_against: pocketos-banco-e-backups-deletados-em-9-segundos-por-agente
     status: confirmed
     impact: 5
@@ -167,8 +165,7 @@ nodes:
   - id: Q_ISOLAMENTO_DO_BRIDGE_CHAVEIA_NO_TOKEN
     node_type: question
     plane: PROD
-    verified_at: 2026-08-10
-    verified_at: 2026-08-11
+    verified_at: 2026-08-12
     verified_against: chave-por-identity-subject-boot-limpo-app-200-e-23-workspaces-viraram-2
     status: done
     impact: 5
@@ -189,7 +186,6 @@ nodes:
   - id: Q_MFA_EM_ZERO_MAS_QUANTIFICAR_ANTES
     node_type: question
     plane: PROD
-    verified_at: 2026-08-10
     verified_at: 2026-08-11
     verified_against: factors-totp-backupcode-habilitados-e-recuperacao-por-email-ligada-nos-2-tenants
     status: done
@@ -200,7 +196,6 @@ nodes:
   - id: Q_METADE_DO_BRIDGE_FORA_DO_REPO
     node_type: question
     plane: PROD
-    verified_at: 2026-08-10
     verified_at: 2026-08-11
     verified_against: repo-git-limpo-remote-privado-gh-repo-view-PRIVATE-e-ls-remote-rc0
     status: refuted
@@ -211,7 +206,7 @@ nodes:
   - id: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     node_type: question
     plane: PROD
-    verified_at: 2026-08-11
+    verified_at: 2026-08-12
     verified_against: 38-artefatos-cifrados-3-scripts-cifram-na-origem-pacote-de-1.1MB-ainda-no-disco
     status: open
     impact: 4
@@ -221,7 +216,7 @@ nodes:
   - id: Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS
     node_type: question
     plane: PROD
-    verified_at: 2026-08-11
+    verified_at: 2026-08-12
     verified_against: asc-ausente-por-find-na-home-privada-presente-no-chaveiro-sec-160D6543
     status: open
     impact: 5
@@ -231,7 +226,7 @@ nodes:
   - id: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
     node_type: question
     plane: PROD
-    verified_at: 2026-08-11
+    verified_at: 2026-08-12
     verified_against: grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo
     trace: docs/analysis/arandek-repo-exposure-2026-08.md
     status: open
@@ -242,7 +237,7 @@ nodes:
   - id: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
     node_type: question
     plane: PROD
-    verified_at: 2026-08-11
+    verified_at: 2026-08-12
     verified_against: vps-exposure-check-varre-docker-ps-e-diretorios-locais-nao-le-compose-de-repo-adotante
     trace: docs/analysis/arandek-repo-exposure-2026-08.md
     status: open
@@ -263,6 +258,7 @@ nodes:
   - id: Q_LACUNA_DECISAO_MAIS_CODIGO
     node_type: question
     plane: DEV
+    verified_at: 2026-08-12
     verified_against: nenhum-sistema-publico-une-grafo-de-decisao-e-grafo-de-simbolos
     status: open
     impact: 5
@@ -272,7 +268,7 @@ nodes:
   - id: Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO
     node_type: question
     plane: PROD
-    verified_at: 2026-08-11
+    verified_at: 2026-08-12
     verified_against: pass-show-rc2-sem-interacao-3-up-sh-afetados-backups-curados-nos-4-caminhos
     status: open
     impact: 3
@@ -280,7 +276,94 @@ nodes:
     label: "O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de maior alcance da maquina e estava NU), e isso quebrou o acesso NAO-INTERATIVO ao `pass`: `pass show` sai rc=2 com `public key decryption failed`. CONSEQUENCIA MEDIDA: os tres `up.sh` (waha, logto, vaultwarden) leem do `pass`, entao REINICIAR QUALQUER SERVICO agora exige interacao. O que NAO quebrou, porque cifrar usa a chave PUBLICA: os backups — mas so depois de curar TRES defeitos empilhados que so apareceram um apos o outro (`${HOME}` virando /root no cron; `gpg` como root usando chaveiro vazio; e `marcio` sem conseguir LER o claro `root:root 600`). ⚠️ E o terceiro expos uma assimetria que ninguem tinha visto: o dump do Logto nascia **644** e por isso 'funcionava' — havia uma janela em que o banco de IDENTIDADES ficava legivel por qualquer uma das 5 contas com shell. AS OPCOES, com o custo de cada uma: (a) deixar como esta — reinicio manual pede senha, seguranca maxima; (b) presetar a passphrase no gpg-agent no boot a partir de arquivo 600 — devolve a automacao e ENFRAQUECE de volta, porque o arquivo vira o novo segredo nu; (c) chave separada, sem senha, so para automacao — isola o dano mas multiplica segredo. NAO ESCOLHI: (b) e (c) desfazem parte do que acabou de ser ganho, e essa troca e do dono. LICAO QUE FICA: eu testava so como `marcio`, e o cron e `root` — TESTAR NO CAMINHO ERRADO E NAO TESTAR."
     trace: "/home/marcio/onion-vps-logto/backup.sh"
 
+  # ── O QUE A RE-VERIFICACAO DE 2026-08-12 ACHOU (run wf_7804d86f-3a7) ─────────
+  - id: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-12
+    verified_against: cinco-nos-com-duas-linhas-verified-at-e-o-tsv-do-radar-devolvendo-a-ultima
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    label: "ACHADO QUE SO APARECEU PORQUE FUI ESCREVER, e que CRESCEU de 5 para 7 quando virou guarda. CINCO nos DESTE grafo carregavam DUAS linhas `verified_at:` (`2026-08-10` seguida de `2026-08-11`): I_SEGUNDO_IDP, I_A6, Q_ISOLAMENTO, Q_MFA, Q_METADE_DO_BRIDGE. A rodada de carimbo de 08-11 ADICIONOU a data nova sem remover a velha. O radar e `awk`, uma chave por linha: o arquivo afirmava DUAS verdades e o motor escolhia uma calado. QUAL? MEDIDO, nao deduzido — `--freshness-tsv` devolvia a ULTIMA. Logo o comportamento estava CORRETO POR ACIDENTE. ⚠️ PRECISAO SOBRE O QUE ESTE PR FEZ COM OS CINCO (a 1a redacao deste label errava, e o Elenxo pegou): a linha antiga saiu dos cinco, mas so DOIS (Q_MFA, Q_METADE) ficaram com o `2026-08-11` que o radar ja lia — os outros TRES estavam na fila de re-verificacao e receberam `2026-08-12` por MEDICAO NOVA. Sao dois atos distintos (remover ambiguidade × re-verificar) e confundi-los faria o proximo leitor procurar um carimbo que nao esta la. ⚠️ E A CLASSE E MAIOR QUE ESTE GRAFO: com a guarda escrita, a varredura dos 60 grafos achou mais DUAS instancias que ninguem tinha visto — `stack-harmonia` (`C_producao_nao_e_o_repo`, com `verified_at` E `verified_against` duplicados, e a ULTIMA sendo a MAIS ANTIGA: o radar lia `08-01/git-log` e IGNORAVA a medicao nova e mais rigorosa de `08-08/rev-list`) e `fios-abertos` (`Q_REGRA56`, `verified_against` duplicado — e ESSE era a causa do aviso MISPLANED que o proprio warm-up desta sessao exibiu como fio aberto; curou junto). CURADA A CLASSE, nao so os casos: `kg-radar.sh` passa a REPROVAR chave repetida (`verified_at` e `verified_against`) na INTEGRIDADE. Os 60 grafos ficam em zero."
+    trace: ".claude/validation/kg-radar.sh"
+
+  - id: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: sudo-ls-lendo-o-diretorio-que-o-worker-declarou-permission-denied
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    label: "O INSTRUMENTO COMETEU A FALHA QUE ELE EXISTE PARA PEGAR, e no no de MAIOR atencao do grafo (att 30.0). O worker de `C_TRES_MODELOS_DE_CONFIANCA` devolveu **CONFIRMED com `blocked_by` preenchido** — campo que o schema do `/meta:kg-freshness` reserva a UNVERIFIABLE. Ele mediu DUAS das tres mecanicas (cofre resolvendo para o IP publico da VPS; WAHA com `sha512:`) e INFERIU a terceira, a do bridge, de 'zero conexoes na 3011'. Motivo declarado: permission denied em `/home/onion/onion-bridge/src/`. ⚠️ O BLOQUEIO ERA FALSO: `sudo ls` le o diretorio, e o proprio worker usou `sudo` em quatro outros comandos da MESMA medicao — instancia exata de [[verify-access-before-specifying]]. A medicao foi FECHADA a mao depois e o no e CONFIRMED de verdade: `identity.ts:34` busca JWKS local, `:45` cacheia `3_600_000`ms (1h exata), `:129` confere `iss`, `:133-145` confere `aud`, `:126` so le claims DEPOIS da assinatura. O worker acertou o veredito pelo caminho errado, que e a forma mais cara de acertar — porque nao deixa rastro de que nao mediu."
+    trace: "/home/onion/onion-bridge/src/identity.ts"
+
+  - id: C_NO_COMPOSTO_RECEBE_VEREDITO_ATOMICO
+    node_type: claim
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: c-tres-modelos-afirma-tres-mecanicas-e-o-schema-da-um-verdict-so
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "A CLASSE POR TRAS DO ACHADO, e ela e de desenho, nao de descuido do worker. `C_TRES_MODELOS_DE_CONFIANCA` afirma TRES mecanicas independentes (bridge/cofre/waha); o `KgReverifySchema` da UM `verdict` so. Um worker que mede 2 de 3 nao tem onde expressar 'confirmei dois tercos' — e o gradiente natural e arredondar PARA CIMA, porque CONFIRMED e o desfecho que nao pede justificativa. O veredito atomico ESCONDE qual parte foi medida. DECIDIDO E IMPLEMENTADO em 2026-08-12 (PR #584), com os DOIS candidatos que este no listava: (a) cobertura explicita — campos `claims_total`/`claims_measured`/`coverage`, com PARCIAL admitindo so UNVERIFIABLE; (b) `blocked_by` nao-vazio com `verdict != UNVERIFIABLE` REPROVA. ⚠️ TETO QUE O ELENXO IMPOS A ESTA CURA, e ele e duro: JSON Schema puro NAO COMPARA DUAS PROPRIEDADES entre si, entao `claims_measured: 2, claims_total: 3, coverage: TOTAL` PASSA — que e exatamente o modo de falha medido. A promessa 'mediu 2 de 3 => UNVERIFIABLE' NAO e cumprivel no schema; ela se cumpre no FAN-IN, derivando `coverage` da contagem em JS (custo 0 tokens) em vez de confiar na etiqueta que o worker escolheu. Um comentario que afirma cobertura inexistente e PIOR que guarda ausente — desativa a desconfianca do proximo leitor —, e a 1a redacao desta cura cometeu isso."
+
+  - id: A_SINTESE_DO_RUN_DE_REVERIFICACAO
+    node_type: artifact
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: arquivo-versionado-com-frontmatter-run-id-tokens-agents-duration
+    status: confirmed
+    impact: 2
+    confidence: 1.0
+    label: "A PROJECAO humana do run `wf_7804d86f-3a7`, com o contrato de proveniencia de custo que a `onion-orchestration` exige (`run_id`/`tokens`/`agents`/`duration_min` no frontmatter, co-locados com `kg:`). ⚠️ NASCEU DE UM ACHADO CONTRA MIM: eu tinha carimbado nos deste grafo citando um run cujo artefato NUNCA persisti — o `wf_` existia so como comentario YAML, e `grep -rn wf_7804d86f` devolvia UMA ocorrencia, nele mesmo. Carimbo que cita run sem artefato e declarado-nao-verificado, que e a distincao que este comando existe para defender. O grafo e o DESTINO dos achados; este markdown e vista dele, nunca fonte paralela."
+    trace: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
+
+  - id: C_CARIMBO_A_MAO_INSERE_EM_VEZ_DE_SUBSTITUIR
+    node_type: claim
+    plane: DEV
+    verified_at: 2026-08-12
+    verified_against: sete-instancias-em-tres-grafos-achadas-so-depois-que-a-guarda-existiu
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    label: "A CLASSE, nomeada — e ela e sobre o ATO de carimbar, nao sobre o campo. Quem aplica `verified_at:`/`verified_against:` a mao tende a INSERIR a linha nova em vez de SUBSTITUIR a velha; o parser sobrescreve calado e o grafo passa a afirmar duas coisas. Nao e descuido individual: e o gradiente do gesto (adicionar e mais barato que localizar-e-trocar) somado a um motor que nunca reclamou. ⚠️ A PROVA DE QUE VIRAR MECANISMO ERA O PONTO: enquanto o achado foi CASO, a contagem era 5, num grafo so. Assim que virou GUARDA e varreu os 60, a contagem foi a 7 em TRES grafos — e as duas novas eram piores que as cinco originais, porque nelas a linha que VENCIA era a ERRADA (em `stack-harmonia` o radar lia um carimbo de 08-01 tendo um de 08-08 no arquivo; em `fios-abertos` a duplicata era a causa de um aviso MISPLANED que ja aparecia no warm-up e ninguem tinha explicado). Instancia limpa de [[fix-must-become-mechanism]]: a cura one-off nao teria achado nenhuma das duas, e eu teria fechado o PR convencido de que eram cinco."
+    trace: ".claude/validation/kg-radar.sh"
+
+  - id: E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-12
+    verified_against: crontab-l-do-root-com-4-entradas-e-zero-offsite-find-tar-gpg-num-so-disco-which-restic-presente-password-store-sem-entrada
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    label: "REFINA [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] sem contradiza-lo: a lacuna e real, mas o mecanismo que a fecha JA EXISTE ESCRITO. `backup-offsite.sh` (commit `31cd4f9`) usa `restic`, e o binario esta instalado (`/usr/bin/restic`). Ele sai com **exit 3** declarando que NAO FEZ, em vez de sair 0 parecendo que fez — o oposto do fail-open que derrubou o Logto no `I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE`. FALTAM EXATAMENTE TRES COISAS, e as tres sao do maestro: `pass insert onion/restic-repo`, `pass insert onion/restic-password` (destino e conta a contratar) e a linha de cron. MEDIDO com stderr visivel (nao `2>/dev/null`, que confunde 'falhou' com 'nao ha'): o cron do root tem 4 entradas — logto/backup.sh, check-version, bridge-backup, vaultwarden/backup.sh — e NENHUMA offsite; `find` por `*.tar.gpg` acha UM artefato, no mesmo `/dev/sda1`; `~/.password-store` nao tem entrada `restic`. CONSEQUENCIA PARA A LEITURA DO NO PAI: aquilo nao e pesquisa a fazer, e um interruptor esperando destino contratado."
+    trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh"
+
 edges:
+  - from: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
+    to: C_NO_COMPOSTO_RECEBE_VEREDITO_ATOMICO
+    edge_type: SUPPORTS
+  - from: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
+    to: C_TRES_MODELOS_DE_CONFIANCA
+    edge_type: SUPPORTS
+  - from: E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA
+    to: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
+    edge_type: SUPPORTS
+  # Esta aresta apontava para Q_GUARDA_DE_EXPOSICAO (compose de adotante, bind público) por pura
+  # afinidade temática — "guarda com ponto cego" — para o nó não ficar órfão (grau 0 reprova).
+  # Álibi por proximidade não é suporte: os dois Elenxos pegaram. Re-apontada ao alvo verdadeiro.
+  - from: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
+    to: C_CARIMBO_A_MAO_INSERE_EM_VEZ_DE_SUBSTITUIR
+    edge_type: SUPPORTS
+  - from: A_SINTESE_DO_RUN_DE_REVERIFICACAO
+    to: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
+    edge_type: TRACES_TO
+  - from: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
+    to: C_NO_COMPOSTO_RECEBE_VEREDITO_ATOMICO
+    edge_type: SUPPORTS
   - from: Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO
     to: C_IDP_AUTENTICA_NAO_DECIFRA
     edge_type: CONSTRAINS
