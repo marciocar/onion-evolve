@@ -1903,6 +1903,60 @@ check_inventory_total_drift() {
         kb)    [ "${n}" != "${kb}" ]    && violation "SOFT" "${f}" "contagem-total de KBs divergente da SSOT (forma tabela): '${n}' (esperado ${kb}) — /meta:inventory" ;;
       esac
     done < <(grep -E '^\|[[:space:]]*(Comandos invocáveis|Comandos|Agentes especializados|Agentes|Skills|Knowledge Bases)[[:space:]]*\|' "${f}" 2>/dev/null)
+
+    # ── FORMAS 2026-08-12 (achado /meta:context-freshness) ────────────────────────────────
+    # O `codebase-guide.md` afirmava 99 comandos (SSOT: 102) em TRÊS formas, e NENHUMA casava
+    # com os feeders acima. Os contextos SEMPRE estiveram no escopo do `_find` — a cegueira era
+    # de VOCABULÁRIO, não de alcance (hipótese "está fora do escopo" foi MEDIDA e caiu).
+    # Terceira vez que esta regra falha pela forma da frase (PR #517, 2026-08-03, agora).
+    # [[guarda-por-lista-falha-pelo-vocabulario]]
+
+    # (a) INVERTIDA COM 'invocáveis': 'Comandos — 99 invocáveis em 10 categorias'.
+    #     O separador (travessão/dois-pontos/hífen) põe o número DEPOIS do substantivo, e o
+    #     feeder canônico exige '[0-9]+ comandos invocáveis'. Âncora mantida em 'invocáveis',
+    #     que o cabeçalho desta regra já declara marcador de TOTAL (nunca por-categoria).
+    while IFS= read -r n; do
+      if [ -n "${n}" ] && [ "${n}" != "${cmd}" ]; then
+        violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT (forma invertida com separador): '${n} invocáveis' (esperado ${cmd}) — derive de inventory.md (/meta:inventory)"
+      fi
+    done < <(grep -oiE 'comandos[[:space:]]*[—:–-][[:space:]]*[0-9]+[[:space:]]+invocáveis' "${f}" 2>/dev/null | grep -oE '[0-9]+')
+
+    # (b) CONJUNTIVA: '51 agentes e 99 comandos' / '102 comandos e 51 agentes'.
+    #     Dois substantivos de inventário ligados por 'e' formam frase-de-total — é o que
+    #     distingue de 'N comandos' cru, que esta regra NÃO checa por gerar falso-positivo.
+    while IFS= read -r pair; do
+      [ -z "${pair}" ] && continue
+      an="$(printf '%s' "${pair}" | grep -oE '[0-9]+[[:space:]]+agentes' | grep -oE '^[0-9]+')"
+      cn="$(printf '%s' "${pair}" | grep -oE '[0-9]+[[:space:]]+comandos' | grep -oE '^[0-9]+')"
+      [ -n "${an}" ] && [ "${an}" != "${agent}" ] && \
+        violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT (forma conjuntiva): '${an} agentes' (esperado ${agent}) — /meta:inventory"
+      [ -n "${cn}" ] && [ "${cn}" != "${cmd}" ] && \
+        violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT (forma conjuntiva): '${cn} comandos' (esperado ${cmd}) — /meta:inventory"
+    #     ⚠️ LÊ O ARQUIVO COM AS QUEBRAS DE LINHA NORMALIZADAS (`tr`), e isso NÃO é zelo:
+    #     no sítio real que originou o feeder a frase atravessa a quebra — `...51 agentes e 99`
+    #     numa linha, `comandos"` na seguinte. `grep` é linha-a-linha, então a versão sem `tr`
+    #     casava a fixture e NÃO casava o caso fundador: guarda verde que não pega o próprio
+    #     defeito que a motivou. Medido antes de embarcar, não depois.
+    done < <(tr '\n' ' ' < "${f}" 2>/dev/null | grep -oiE '[0-9]+[[:space:]]+(agentes|comandos)[[:space:]]+e[[:space:]]+[0-9]+[[:space:]]+(comandos|agentes)')
+
+    # (c) LINHA 'Total' DE TABELA: '| **Total** | | **99** |'.
+    #     'Total' não diz de QUÊ, então não dá para escolher a SSOT certa — e por isso a
+    #     comparação é contra o CONJUNTO dos totais conhecidos: bate com algum ⇒ cala; não bate
+    #     com NENHUM ⇒ acusa. Conservador de propósito (um 'Total: 51' numa tabela de comandos
+    #     passa, porque 51 é o total de agentes) — falso-NEGATIVO é aceitável aqui, falso-POSITIVO
+    #     não, e uma guarda que pune quem obedece ensina a ignorar a guarda.
+    #     RISCO MEDIDO antes de escrever (não estimado): no repo inteiro só 3 arquivos têm linha
+    #     '| Total |' — dois são o próprio inventory.md (já isento como SSOT) e o terceiro é o
+    #     arquivo que driftou. Superfície de FP ≈ zero.
+    while IFS= read -r line; do
+      [ -z "${line}" ] && continue
+      n="$(printf '%s' "${line}" | sed 's/^|[^|]*|//' | grep -oE '[0-9]+' | head -1 || true)"
+      [ -z "${n}" ] && continue
+      case "${n}" in
+        "${cmd}"|"${agent}"|"${skill}"|"${kb}") : ;;
+        *) violation "SOFT" "${f}" "linha 'Total' de tabela com valor que não bate com nenhuma contagem da SSOT: '${n}' (comandos ${cmd} · agentes ${agent} · skills ${skill} · KBs ${kb}) — /meta:inventory" ;;
+      esac
+    done < <(grep -E '^\|[[:space:]]*\*{0,2}Total\*{0,2}[[:space:]]*\|' "${f}" 2>/dev/null)
   # PRÉ-FILTRO (perf, 2026-07-13): só varre .md que CONTÊM uma frase-de-contagem candidata.
   #   Antes: 750 arquivos × ~8 greps/arquivo (esta é ~50% do tempo total do lint); ~90% dos .md
   #   não têm número+substantivo-de-inventário → puro overhead. O pattern abaixo é SUPERSET de
@@ -1919,7 +1973,7 @@ check_inventory_total_drift() {
   #   que mascarou o furo). Duas fixtures BAD não dispararam e expuseram isto.
   #   O superset acima é PROMESSA VERIFICÁVEL: feeder novo exige alternativa nova aqui.
   done < <(_find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null \
-    | xargs -0 -r grep -lZ -iE '[0-9]+\+?[[:space:]]+(comandos|agentes|knowledge[[:space:]]+bases|categorias|skills)|\([0-9]+[[:space:]]+total|^\|[[:space:]]*(comandos|comandos[[:space:]]+invocáveis|agentes|agentes[[:space:]]+especializados|skills|knowledge[[:space:]]+bases)[[:space:]]*\||(comandos|agentes|skills|knowledge[[:space:]]+bases)[[:space:]]*\([0-9]' 2>/dev/null)
+    | xargs -0 -r grep -lZ -iE '[0-9]+\+?[[:space:]]+(comandos|agentes|knowledge[[:space:]]+bases|categorias|skills)|\([0-9]+[[:space:]]+total|^\|[[:space:]]*(comandos|comandos[[:space:]]+invocáveis|agentes|agentes[[:space:]]+especializados|skills|knowledge[[:space:]]+bases)[[:space:]]*\||(comandos|agentes|skills|knowledge[[:space:]]+bases)[[:space:]]*\([0-9]|comandos[[:space:]]*[—:–-][[:space:]]*[0-9]|^\|[[:space:]]*\*{0,2}total\*{0,2}[[:space:]]*\|' 2>/dev/null)
 }
 
 # ===========================================================================
