@@ -23,7 +23,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **641 arquivos markdown** em `docs/`
+- **642 arquivos markdown** em `docs/`
 - **21 arquivos** em `docs/onion/` (Sistema Onion)
 - **91 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 90 KBs — conteúdo + (sub)categoria READMEs — + `index.md`)
   - 49 em `concepts/` (Conceitos fundamentais)
@@ -38,7 +38,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **7 arquivos** em `docs/applying/` (guias de aplicação: greenfield, legacy, regulado, adoption-lifecycle, manual, rescue-prompt)
 - **7 arquivos** em `docs/design-context/` (vertical de design, **provisória** — 4 md + 3 `tokens.json`; ver nota abaixo)
 - **125 arquivos** em `docs/analysis/` (análises ativas — ver [analysis/README.md](analysis/README.md) para o critério de retenção; só baselines/ADRs duráveis são navegados individualmente aqui)
-- **293 arquivos** em `docs/evolution/` (co-evolução: inbox/inbound, federation/{members,CHANGELOG,outbox}, RFCs)
+- **294 arquivos** em `docs/evolution/` (co-evolução: inbox/inbound, federation/{members,CHANGELOG,outbox}, RFCs)
 - **57 arquivos** em `docs/discussions/` (**Constelação de Estudos** — README + estudos isolados por slug; ver nota abaixo)
 - **1 arquivo** em `docs/sdaal/` (KB do padrão SDAAL)
 - **Contextos spec-as-code peer**: `docs/business-context/` (15 arquivos — 13 de conteúdo + README + index) e `docs/technical-context/` (9 arquivos — 6 de conteúdo + README/index) estão **populados como dogfood** (seed real do Onion); `docs/compliance-context/` segue **template** (só `README.md`), populado no projeto-alvo por `/docs:build-compliance-docs`
@@ -66,7 +66,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 1 em `research/`, 1 em `deployment/`
 
 ### Total
-- **641 arquivos** de documentação markdown em `docs/`
+- **642 arquivos** de documentação markdown em `docs/`
 - **102 comandos invocáveis** em 10 categorias + root (+ 26 fragmentos `common/` + 11 READMEs de categoria)
 - **51 agentes** especializados em 9 categorias
 - **11 skills** (`.claude/skills/`) · **90 Knowledge Bases**
@@ -162,7 +162,7 @@ docs/
 │   ├── press-kit.md            # One-pager, FAQ imprensa, bio, citações
 │   └── cold-adopter-2026-07/   # Kit de adotante frio (concierge + one-pager KG)
 │
-├── evolution/                   # Co-evolução core↔derivados (doc-bridge — 293 arquivos)
+├── evolution/                   # Co-evolução core↔derivados (doc-bridge — 294 arquivos)
 │   ├── README.md                # Modelo dos 3 fluxos (downstream/upstream/handoff)
 │   ├── trust-log.md             # Ledger de confiança da federação
 │   ├── trial-object-led-discovery-fitting.md
@@ -596,6 +596,13 @@ Este índice é gerado automaticamente pelo comando `/docs/build-index`.
 > ⚠️ **Por que o drift passou — e por que a 1ª correção deste hub só pegou um quarto dele.** A REGRA 16 do lint (count-drift) vigia as frases canônicas de **inventário** (`N comandos invocáveis`, `N agentes`, `N skills`, `N Knowledge Bases`) — e essas estavam **certas** aqui. O que driftou foi a forma `N arquivos em docs/<seção>`, que nenhuma guarda cobre: o lint dá **0 HARD** com este arquivo errado em sete pontos. Mesma classe que a auditoria de 2026-08-12 registrou no `codebase-guide.md`: **a cegueira é de vocabulário, não de escopo**.
 >
 > ⚠️ **E o Elenxo mostrou que a cura parou em 1/4.** Este arquivo tem **quatro sítios independentes** de contagem — o bloco de estatísticas, o bloco `### Total`, a árvore ASCII e a lista de Knowledge Bases — e a 1ª passada corrigiu só o primeiro. O resultado foi o pior caso possível: `641` na linha 26 e `585` na linha 68, **contradição dentro do mesmo arquivo**, sob um rodapé que dizia "reescaneadas, nunca digitadas". Também escapou `tools/` (5→6), e a **aritmética denunciava**: os sub-bullets somavam 90 contra os 91 declarados — faltava exatamente 1. Reescanear não basta; é preciso varrer **todas as formas** em que o número aparece. Enquanto não houver feeder de lint para `N arquivos em docs/<seção>`, a única cura é rodar `/docs:build-index` **e conferir a soma**.
+>
+> ⚠️ **E há um efeito de segunda ordem que o revisor de CI pegou:** o resíduo de revisão exigido
+> pela REGRA 56 é um `.md` **dentro de `docs/evolution/`** — ou seja, **o ato de documentar esta
+> correção invalidou os números que ela acabou de corrigir** (641→642, 293→294). Contagem de um
+> diretório que contém o próprio registro do trabalho é auto-referente por construção. Quem rodar
+> `/docs:build-index` deve fazê-lo **por último**, depois de todos os arquivos do PR existirem —
+> ou aceitar que o total nasce defasado em 1.
 
 **Mantido por:** Sistema Onion
 
