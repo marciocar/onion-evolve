@@ -121,6 +121,16 @@ nodes:
     confidence: 1.0
     label: "O RESULTADO VIVO DO P3, em no proprio (3o Elenxo/B5: a 1a redacao escreveu a cura mais substantiva do PR DENTRO de um no superseded — que o radar pesa a 0.2 e trata como historia; a projecao afundava o proprio resultado). O `--assert-parity` do kg-view.sh spawnava o MESMO parse `self --json` TRES vezes por grafo; a cura captura uma vez e reusa (v_vec + node_count + edge_count da mesma string). MEDIDO: guarda inteira 12,99->8,81s aqui, 12,2->8,2s no A/B intercalado do revisor (-32/-33%), veredito BYTE-IDENTICO nos 62 grafos, lint full 86->78s (71,3s em maquina ociosa — a condicao da medida importa). BONUS que o revisor achou e o commit nao declarava: os 3 parses independentes tinham TOCTOU real se o .kg.yaml mudasse entre eles — a captura unica o elimina."
 
+  - id: Q_R19_AUTOFIX_COM_RASTRO_CANDIDATO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: tres-bloqueios-da-mesma-classe-em-24h-site-coverage-e-2x-plugin-com-cura-mecanica-identica
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "CANDIDATO NOMEADO PELO MAESTRO (aparte 2026-08-13): 'regenerar o plugin pode ser acao deliberada em vez de rodar automatico... evitar este processamento em construcao?'. O GATILHO JA DISPAROU 3x EM 24H: a guarda de cobertura do site (111->112->113 a cada doc novo) e a R19 do plugin (2 bloqueios NA MESMA HORA, ambos meus, ao editar kg-view.sh — fonte bundlada — sem regenerar; custo ~19min de hook por bloqueio). A DISTINCAO QUE DECIDE O DESENHO: a regeneracao ja E deliberada; o automatico e a COBRANCA. E a R19 nunca acusa nada DECIDIVEL — a divergencia tem UMA cura deterministica ('regenere'). Guarda cujo veredito tem cura unica mecanica e candidata natural a AUTO-FIX COM RASTRO (o hook regenera, stagea e DIZ o que fez); guarda que exige julgamento humano, nunca. Alternativa (a): SOFT na branch/HARD no CI — precedente na REGRA 56 (isencao declarada em trabalho-em-curso), mas migra o vermelho para o pior lugar (descobre-se 16min depois do push). REJEITADO: aviso opcional silenciavel — fail-open classico de construcao. DECISAO DO MAESTRO: (a) vs (b) e troca de friccao por revisao do artefato gerado. Mitigante do (b): o plugin e 100% derivado da fonte, nao ha conteudo autoral no gerado."
+
   - id: A_RUN_DO_ELENXO_DE_MECANISMOS
     node_type: artifact
     plane: DEV
@@ -140,6 +150,9 @@ edges:
     to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
     edge_type: SUPPORTS
   - from: Q_GATILHO_DO_WIREIN_NAO_CASA_COM_O_SUT
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: CONSTRAINS
+  - from: Q_R19_AUTOFIX_COM_RASTRO_CANDIDATO
     to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
     edge_type: CONSTRAINS
   - from: I_P4_HIGIENE_DE_VERDADE_DECLARADA_FECHADA
