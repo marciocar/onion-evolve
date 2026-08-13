@@ -1046,7 +1046,7 @@ check_plugins_sync() {
     # apagar uma fonte bundlada não produzia 'fora de sincronia' — matava o lint em rc=2 SEM
     # sumário, e os chamadores por ausência-de-mensagem liam a morte como PASS).
     if ! bash "${asm}" "${manifest}" "${REPO_ROOT}" "${tmp}/${name}" >/dev/null 2>&1; then
-      violation "HARD" "plugins/${name}" "assemble FALHOU (fonte bundlada ausente/quebrada?) — rode 'bash ${asm#${REPO_ROOT}/} ${manifest#${REPO_ROOT}/}' e leia o erro"
+      violation "HARD" "plugins/${name}" "assemble FALHOU (fonte bundlada ausente/quebrada?) — rode 'bash .claude/utils/marketplace/assemble-plugin.sh ${manifest#${REPO_ROOT}/}' e leia o erro"
       rm -rf "${tmp}"
       continue
     fi
