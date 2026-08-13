@@ -40,7 +40,7 @@ O Onion tem **duas máquinas de coordenação entre repos**, com maturidade muit
 
 | | **Co-evolução / Adoção** | **Federação formal por contrato** |
 |---|---|---|
-| Estado | 🟢 **ativo, em uso real** — 8 membros registrados hoje | 🔒 **construído, não graduado** — 0 contratos, 1 adotante de peso |
+| Estado | 🟢 **ativo, em uso real** — **8 adotantes** hoje (de 12 membros; `kind: adopter`, régua D8) | 🔒 **construído, não graduado** — 0 contratos, 1 adotante de peso |
 | Unidade | um **membro** (repo inteiro) | um **contrato** (uma integração específica entre 2 repos) |
 | Mecanismo | `/meta:adopt`, `members.yaml` (tiers + trust), canais `inbox/`/`inbound/`, doc-bridge leve (`co-*`) | `contracts/<id>.md` num ledger git, `CHANGELOG.md` como inbox |
 | Pergunta que responde | "este repo é do Onion — o que ele pode trocar com o resto?" | "esta API específica entre A e B pode mudar sem quebrar nada?" |
@@ -131,7 +131,7 @@ A separação entre tiers deixou de ser "completude do produto" e passou a ser *
 - **consumer (T2)** onboarda **via core** (core-driven: o maestro roda `/meta:adopt` do core e
   registra `parent: <hub-id>`; o hub não roda adopt). Doutrina fechada, **nenhum T2 real existe hoje**.
 
-`members.yaml` hoje: **1 source + 1 hub + 6 standalone** (8 membros, 0 consumer).
+`members.yaml` hoje (medido 2026-08-13): **1 source + 1 hub + 10 standalone** = **12 membros**, dos quais **8 são adotantes** (`kind: adopter`) e 0 consumer. ⚠️ `role` e `kind` respondem perguntas DIFERENTES: `role` é a topologia (quem adota quem), `kind` é a natureza da adoção (quem vendoriza para trabalhar). Contar adotante por `role` infla — `distillation`, `door` e `method` são `standalone` e NÃO são adotantes. **Derive, não copie**: `grep -c '^ *kind: adopter' docs/evolution/federation/members.yaml` (régua D8).
 
 ### 3.3 Identidade emergente — `/meta:personality-sync` (RFC-0003 F2, shipou 2026-07-24)
 
@@ -139,7 +139,7 @@ O `personality_summary` de um membro deixou de ser só um seed manual. O comando
 **`/meta:personality-sync`** (F2, commit `d7807bf`) **gera** `.claude/identity/personality.md` a partir
 do diário + `.onion-version` + primeiros commits — é uma **projeção A2A-card one-way**, não fonte de
 verdade (o diário continua sendo a autobiografia; a personality é uma leitura dele). Estado hoje: dos
-8 membros, **1 (o core) já é emergente** — ancorado em 74 migalhas do diário; os 6 adotantes seguem
+12 membros, **1 (o core) já é emergente** — ancorado em 74 migalhas do diário; os demais adotantes seguem
 `seed manual datado`; `marcio-pessoal` é `n/a` por design (soberania do dado, nada sobe proativamente).
 
 ### 3.4 Saúde de verificação — o overlay de auditoria da federação

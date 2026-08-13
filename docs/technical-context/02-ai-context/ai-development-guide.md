@@ -104,7 +104,7 @@ de path absoluto.
 ## 4. O gate mecânico — as REGRAS do lint
 
 O lint (`.claude/validation/lint-artifacts.sh`, 3279 linhas — medido 2026-08-13) é a autoridade **executável** — SSOT gerada em
-[`docs/onion/lint-rules.md`](../../../.claude/validation/lint-rules.md) via
+[`.claude/validation/lint-rules.md`](../../../.claude/validation/lint-rules.md) via
 `.claude/validation/rules-registry.sh` (a própria REGRA 39 garante paridade registro↔guarda). **59 REGRAS — 53 HARD (bloqueia merge), 11 SOFT (avisa, não bloqueia CI)**, numeradas até a REGRA 60
 (a numeração tem buracos: números aposentados não se reutilizam). Os números vêm da SSOT gerada
 [`lint-rules.md`](../../../.claude/validation/lint-rules.md) — **derive, não copie**: `bash .claude/validation/rules-registry.sh`.
@@ -176,7 +176,7 @@ quem edita o core:
   em superfície pública ou vendorizada; site público nunca linka deep-link de repo privado; link
   vendorizado nunca aponta caminho core-privado
 
-**Como consultar as regras**: `docs/onion/lint-rules.md` (view humana com coluna "O que previne", gerada
+**Como consultar as regras**: `.claude/validation/lint-rules.md` (view humana com coluna "O que previne", gerada
 por `bash .claude/validation/rules-registry.sh`) — nunca leia a lista de regras direto do script sem saber
 que ele é a fonte (o `.md` é derivado, não a autoridade primária de comportamento).
 

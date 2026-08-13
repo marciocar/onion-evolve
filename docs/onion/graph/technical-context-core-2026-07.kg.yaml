@@ -42,7 +42,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: 2026-07-25
-    label: "adr/index.md — índice dos 36 ADRs reais (docs/analysis/onion-adr-*.md) agrupados em 5 temas; não recria, só indexa"
+    label: "adr/index.md — índice dos ADRs reais (indexa 37; o disco tem 42 — a divergência é do índice, medida 2026-08-13) (docs/analysis/onion-adr-*.md) agrupados em 5 temas; não recria, só indexa"
     trace: "docs/technical-context/01-core/adr/index.md"
 
   - id: F_AIDEV
@@ -53,7 +53,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: 2026-07-25
-    label: "ai-development-guide.md — idioma por camada, fronteiras §4.2/4.3, as 45 regras do lint, guardrails R15.2/R15.3b, gotchas"
+    label: "ai-development-guide.md — idioma por camada, fronteiras §4.2/4.3, as **59 regras** do lint (53 HARD/11 SOFT, medido 2026-08-13), guardrails R15.2/R15.3b, gotchas"
     trace: "docs/technical-context/02-ai-context/ai-development-guide.md"
 
   - id: F_CODEBASE
@@ -177,8 +177,8 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: 2026-07-25
-    label: "Validação — gate mecânico do dogfood: lint-artifacts.sh (45 regras, 41 HARD/8 SOFT) + lint-selftest.sh + inventory.sh (SSOT gerada)"
-    trace: ".claude/validation/; docs/onion/inventory.md; docs/onion/lint-rules.md"
+    label: "Validação — gate mecânico do dogfood: lint-artifacts.sh (**59 regras, 53 HARD/11 SOFT** — medido 2026-08-13; SSOT `.claude/validation/lint-rules.md`) + lint-selftest.sh + inventory.sh (SSOT gerada)"
+    trace: ".claude/validation/; docs/onion/inventory.md; .claude/validation/lint-rules.md"
 
   - id: SUB_COEVO
     node_type: entity
