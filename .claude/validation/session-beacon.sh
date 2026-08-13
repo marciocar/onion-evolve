@@ -60,6 +60,10 @@ now_epoch() { date +%s; }
 LEDGER="$REPO/.claude/session-lifecycle.jsonl"
 ledger_append() { # $1 = arquivo .beacon · $2 = ended_at (epoch)
   local B="$1" ended="$2" sid br started dur
+  # CI não é sessão de trabalho: registrar aqui SUJA a árvore do runner (arquivo TRACKED —
+  # falso-positivo em 100% das runs da guarda dirty-tree do onion-review) e polui o sinal de
+  # velocidade com sessões de minutos em branch "unknown". Medido 2026-08-13 (Elenxo #590).
+  [ -z "${GITHUB_ACTIONS:-}" ] || return 0
   [ -f "$B" ] || return 0
   [ -f "$LEDGER" ] || return 0   # só apenda se o ledger existe (opt-in por trackear o arquivo)
   sid="$(awk -F': ' '/^session_id:/{print $2; exit}' "$B" 2>/dev/null || true)"
