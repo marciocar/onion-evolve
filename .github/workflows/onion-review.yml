@@ -41,6 +41,16 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Marco da árvore ANTES da revisão (baseline da guarda dirty-tree). HEAD e stash porque
+      # `git status --porcelain` NÃO vê `git checkout <sha>` nem `git stash` (medido no Elenxo
+      # de 2026-08-13: ambos deixam o porcelain VAZIO) — e são duas das três formas que o
+      # prompt proíbe ao revisor.
+      - name: Marco da árvore antes da revisão (baseline do dirty-tree)
+        id: arvore
+        run: |
+          echo "head=$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
+          echo "stashes=$(git stash list | wc -l | tr -d ' ')" >> "${GITHUB_OUTPUT}"
+
       # ═══ PRÉ-VOO (2026-08-03) — a action MASCARA 401 como hang ═══
       # CAUSA-RAIZ do crash que durou de 07-14 a 08-03: o secret ANTHROPIC_API_KEY está
       # INVÁLIDO. Medido de dentro do runner: `GET /v1/models` responde **401
@@ -122,6 +132,16 @@ jobs:
               use famílias Claude por tier (opus/sonnet/haiku/fable) — sinalize modelos RETIRADOS
               (Claude 3.x) ou de outro provider (gpt/gemini/llama) citados como modelo de agente.
             - Ausência de vaporware (ex.: `mcp_onion-orchestrator`).
+
+            O DIFF CANÔNICO deste PR é `git diff origin/${{ github.event.pull_request.base.ref }}...HEAD`
+            (o checkout é o merge-ref; rode `git fetch origin ${{ github.event.pull_request.base.ref }}`
+            antes se o ref faltar — a base vem do PR, não é main fixo: este arquivo é distribuído
+            a adotantes com default branch diverso). NUNCA modifique a árvore de
+            trabalho — revise só com comandos de LEITURA (`git show`, `git diff`, `git log`);
+            nada de `git checkout -- <arquivo>`, `git restore` ou `git stash` para "comparar
+            versões". Já medimos o dano (PR #590, 2 runs no mesmo dia): a árvore suja fez o
+            parecer acusar como "removido" exatamente o que o PR adicionava — parecer plausível,
+            assertivo e 100% ao contrário.
 
             NÃO tente postar comentário nem aprovar o PR — você não tem ferramenta para isso, e
             medimos: em 2026-08-07 o log mostrou `permission_denials_count: 14` e `No buffered
@@ -206,6 +226,16 @@ jobs:
               (Claude 3.x) ou de outro provider (gpt/gemini/llama) citados como modelo de agente.
             - Ausência de vaporware (ex.: `mcp_onion-orchestrator`).
 
+            O DIFF CANÔNICO deste PR é `git diff origin/${{ github.event.pull_request.base.ref }}...HEAD`
+            (o checkout é o merge-ref; rode `git fetch origin ${{ github.event.pull_request.base.ref }}`
+            antes se o ref faltar — a base vem do PR, não é main fixo: este arquivo é distribuído
+            a adotantes com default branch diverso). NUNCA modifique a árvore de
+            trabalho — revise só com comandos de LEITURA (`git show`, `git diff`, `git log`);
+            nada de `git checkout -- <arquivo>`, `git restore` ou `git stash` para "comparar
+            versões". Já medimos o dano (PR #590, 2 runs no mesmo dia): a árvore suja fez o
+            parecer acusar como "removido" exatamente o que o PR adicionava — parecer plausível,
+            assertivo e 100% ao contrário.
+
             NÃO tente postar comentário nem aprovar o PR — você não tem ferramenta para isso, e
             medimos: em 2026-08-07 o log mostrou `permission_denials_count: 14` e `No buffered
             inline comments`. Quem posta é o Onion, com o que você DEVOLVER.
@@ -258,6 +288,8 @@ jobs:
           EXEC2: ${{ steps.review2.outputs.execution_file }}
           PR: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_ANTES: ${{ steps.arvore.outputs.head }}
+          STASH_ANTES: ${{ steps.arvore.outputs.stashes }}
         run: |
           MARCA='<!-- onion-review-parecer -->'
           if [ "${R1}" = "true" ] || [ "${R2}" = "true" ]; then
@@ -270,6 +302,44 @@ jobs:
             # posting passa pelo transporte do forge, nunca por `gh api` cru neste bloco.
             corpo="$(mktemp)"
             bash .claude/validation/review-verdict.sh --corpo "${MARCA}" "${so}" "${exec_f}" > "${corpo}"
+
+            # ═══ GUARDA DIRTY-TREE (2026-08-13, PR #590 — v2 pós-Elenxo) ═══
+            # O revisor tem Bash e já sujou a árvore do checkout em 2 runs — e o parecer final
+            # acusou como "removido" o que o PR adicionava. Advisory (como o parecer): não
+            # bloqueia, CARIMBA a condição no comentário — o leitor decide sabendo.
+            # v2 porque o porcelain sozinho é cego a `git checkout <sha>` e `git stash` (medido:
+            # ambos o deixam VAZIO) — por isso o marco HEAD/stash capturado ANTES da revisão.
+            # TETO declarado: sujar-e-limpar (checkout+restore) passa invisível; e a guarda só
+            # roda no ramo "revisou" — crash do revisor cai no else sem carimbo.
+            sujas_total="$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
+            suja="$(git status --porcelain 2>/dev/null | head -10)"
+            head_agora="$(git rev-parse HEAD 2>/dev/null || echo desconhecido)"
+            stash_agora="$(git stash list 2>/dev/null | wc -l | tr -d ' ')"
+            motivos=""
+            [ -n "${suja}" ]                         && motivos="árvore modificada (${sujas_total} arquivo(s))"
+            [ "${head_agora}" != "${HEAD_ANTES}" ]   && motivos="${motivos:+${motivos}; }HEAD movido (${HEAD_ANTES:0:8} → ${head_agora:0:8})"
+            [ "${stash_agora}" != "${STASH_ANTES}" ] && motivos="${motivos:+${motivos}; }stash criado (${STASH_ANTES} → ${stash_agora})"
+            if [ -n "${motivos}" ]; then
+              echo "::warning::árvore do runner alterada durante a revisão (${motivos}) — o parecer pode refletir conteúdo que não é do PR"
+              aviso="$(mktemp)"
+              {
+                printf '\n> ⚠️ **Guarda dirty-tree**: a árvore do checkout foi ALTERADA durante a revisão — **%s**. Trechos do parecer podem refletir conteúdo que NÃO é do PR (precedente: PR #590, parecer acusou como "removido" o que o PR adicionava).\n' "${motivos}"
+                if [ -n "${suja}" ]; then
+                  printf '> ```\n'
+                  printf '%s\n' "${suja}" | sed 's/^/> /'
+                  [ "${sujas_total}" -gt 10 ] && printf '> (mostrando 10 de %s)\n' "${sujas_total}"
+                  printf '> ```\n'
+                fi
+                printf '\n'
+              } > "${aviso}"
+              # aviso ENTRA POR CIMA (achado: cair depois do rodapé desqualifica tarde demais),
+              # preservando a MARCA sticky na 1ª linha do corpo
+              corpo_novo="$(mktemp)"
+              { head -1 "${corpo}"; cat "${aviso}"; tail -n +2 "${corpo}"; } > "${corpo_novo}"
+              mv "${corpo_novo}" "${corpo}"
+              rm -f "${aviso}"
+            fi
+
             bash .claude/utils/forge/post-review-comment.sh \
               --pr "${PR}" --body-file "${corpo}" --sticky "${MARCA}"
 
