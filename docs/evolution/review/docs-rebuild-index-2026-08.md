@@ -2,10 +2,10 @@
 branch: docs/rebuild-index-2026-08
 pr: 587
 date: 2026-08-13
-reviewed_diff_sha256: 65eda6bc22f62594af4b05688f32327d960bb2f1562f6031e78878466f2084f7
-findings_total: 12
-findings_real: 12
-findings_fixed: 9
+reviewed_diff_sha256: abd68b0d3b74dea5ca53a13e95e77901e740aa432cc3533881a73324d5b488e7
+findings_total: 13
+findings_real: 13
+findings_fixed: 10
 tokens: 67239
 duration_min: 8
 verdict: CORRIGIDO-E-RE-VALIDADO
@@ -57,6 +57,19 @@ cegueira de vocabulário.
   zero mortos; a validação é verdadeira, mas não é resultado deste PR
 - **A tese do rodapé sobre o lint: VERIFICADA.** O revisor rodou em `main` (com as 7 contagens
   erradas) e obteve `HARD 0 / SOFT 5`, nenhuma relacionada a contagem do INDEX
+
+## Achado nº 13 — do revisor de CI, e é o mesmo defeito em segunda ordem
+
+O `onion-review` do PR notou o que nenhuma passada anterior podia notar: **o resíduo de revisão é
+um `.md` dentro de `docs/evolution/`**, então o ato de escrevê-lo mudou `docs/` 641→642 e
+`evolution/` 293→294 — invalidando os números que este PR acabou de corrigir.
+
+Contagem de um diretório que contém o registro do próprio trabalho é **auto-referente por
+construção**. Corrigido nos quatro sítios; a soma fecha em 642. Fica a regra prática no rodapé do
+hub: rodar `/docs:build-index` **por último**, depois de todos os arquivos do PR existirem.
+
+⚠️ **Este resíduo foi re-carimbado por isso.** O `review-artifact-check` acusou `ARTEFATO-CADUCO`
+— corretamente: o código mudou depois de revisado. O hash acima é o do diff final.
 
 ## Teto declarado
 
