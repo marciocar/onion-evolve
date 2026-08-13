@@ -1,6 +1,6 @@
 ---
 branch: docs/kg-prova-viva-dirty-tree
-pr: pendente
+pr: 594
 date: 2026-08-13
 reviewed_diff_sha256: 7488fb00903eb2477e825001ee9af8bbb78dde98bdbdc442d36e533bac31da39
 findings_total: 7
