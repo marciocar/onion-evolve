@@ -22,6 +22,48 @@ LINT="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
 # Sem o linter no repo (ex.: projeto-alvo sem .claude/validation) → não bloqueia.
 [ -f "${LINT}" ] || exit 0
 
+# ── AUTO-REGENERAÇÃO DE PLUGINS COM RASTRO (decisão do maestro 2026-08-13; Q_R19_AUTOFIX, opção b) ──
+# A R19 nunca acusa nada DECIDÍVEL — a divergência plugin×fonte tem UMA cura determinística
+# ("regenere"). Guarda de cura única mecânica é candidata a auto-fix COM RASTRO; a R19 continua
+# intacta como guarda (e HARD no CI: quem commitar por fora deste hook é pego lá). Evidência do
+# gatilho: 3 bloqueios da mesma classe em 24h, dois na mesma hora, custo ~19min de hook cada.
+ASM="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
+VDIR="${REPO_ROOT}/.claude/utils/marketplace/verticals"
+if [ -f "${ASM}" ] && [ -d "${VDIR}" ]; then
+  _staged="$(git diff --cached --name-only --diff-filter=ACMRD)"
+  if [ -n "${_staged}" ]; then
+    for _m in "${VDIR}"/*.manifest.sh; do
+      [ -f "${_m}" ] || continue
+      # o manifesto declara os paths das fontes LITERAIS entre aspas — extraímos e casamos contra o staged
+      _fontes="$(grep -oE '"(\.claude|docs)/[^"]+"' "${_m}" | tr -d '"' || true)"
+      [ -n "${_fontes}" ] || continue
+      if printf '%s\n' "${_staged}" | grep -qxF -f <(printf '%s\n' "${_fontes}"); then
+        _name="$(basename "${_m}" .manifest.sh)"
+        echo "🔁 fonte bundlada de ${_name} no commit → regenerando o plugin (auto-fix com rastro; a R19 segue HARD no CI)"
+        if ! bash "${ASM}" "${_m}" >/dev/null 2>&1; then
+          echo "❌ assemble de ${_name} FALHOU (fonte ausente/quebrada?) — rode 'bash ${ASM#${REPO_ROOT}/} ${_m#${REPO_ROOT}/}' e leia o erro."
+          exit 1
+        fi
+        git add "${REPO_ROOT}/plugins/${_name}" 2>/dev/null || true
+      fi
+    done
+  fi
+fi
+
+# ── GATILHO DIRETO DO SUT (Q_GATILHO_DO_WIREIN, 3ª via — nem REGRA às pressas, nem esperar o
+# incidente): a guarda kg-reverify-schema-check vigia commands/meta/kg-freshness.md, que NÃO mora
+# em validation/ — sem esta chamada, editar o SUT sozinho passava local e o vermelho apareceria
+# num commit futuro que tocasse validation/, culpando a mudança errada. Custa ~0,2s. ──
+KGCHK="${REPO_ROOT}/.claude/validation/kg-reverify-schema-check.sh"
+if [ -f "${KGCHK}" ] \
+   && git diff --cached --name-only --diff-filter=ACMR | grep -q '^\.claude/commands/meta/kg-freshness\.md$'; then
+  echo "🧪 kg-freshness.md no commit → validando a estrutura do KgReverifySchema…"
+  if ! bash "${KGCHK}"; then
+    echo "❌ Commit bloqueado: o schema embarcado em kg-freshness.md está estruturalmente quebrado."
+    exit 1
+  fi
+fi
+
 echo "🧅 Onion pre-commit — rodando lint determinístico…"
 if ! bash "${LINT}"; then
   echo ""

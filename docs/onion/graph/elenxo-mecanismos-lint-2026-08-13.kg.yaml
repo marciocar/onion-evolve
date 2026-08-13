@@ -105,11 +105,11 @@ nodes:
     node_type: question
     plane: PROD
     verified_at: 2026-08-13
-    verified_against: pre-commit-so-roda-a-bancada-quando-o-commit-toca-validation-e-o-sut-vigiado-e-kg-freshness-md
-    status: open
+    verified_against: schema-sabotado-staged-bloqueia-o-commit-com-required-duplicado-e-o-integro-passa-em-0-2s
+    status: done
     impact: 2
     confidence: 0.9
-    label: "GAP DECLARADO DO WIRE-IN (3o Elenxo/M6): a guarda `kg-reverify-schema-check` vigia `.claude/commands/meta/kg-freshness.md`, mas mora na BANCADA — que no pre-commit so dispara quando o commit toca `.claude/validation/`. Editar o kg-freshness.md sozinho passa LOCAL sem a guarda rodar (o CI cobre, `.claude/**` esta nos paths do workflow) e o vermelho apareceria num commit FUTURO que toque validation/, culpando a mudanca errada. O sitio natural seria uma REGRA no lint-artifacts (roda em todo commit) — NAO feita de proposito: criar REGRA nova as pressas foi o padrao de defeito de 24h inteiras (required duplicado na guarda contra duplicacao, morte-silenciosa na guarda contra cegueira). GATILHO PARA PROMOVER: a 1a vez que um edit de kg-freshness.md quebrar o schema e passar local — ai a REGRA nasce com o incidente como fixture, nao com pressa."
+    label: "GAP DECLARADO DO WIRE-IN (3o Elenxo/M6): a guarda `kg-reverify-schema-check` vigia `.claude/commands/meta/kg-freshness.md`, mas mora na BANCADA — que no pre-commit so dispara quando o commit toca `.claude/validation/`. Editar o kg-freshness.md sozinho passa LOCAL sem a guarda rodar (o CI cobre, `.claude/**` esta nos paths do workflow) e o vermelho apareceria num commit FUTURO que toque validation/, culpando a mudanca errada. O sitio natural seria uma REGRA no lint-artifacts (roda em todo commit) — NAO feita de proposito: criar REGRA nova as pressas foi o padrao de defeito de 24h inteiras (required duplicado na guarda contra duplicacao, morte-silenciosa na guarda contra cegueira). GATILHO PARA PROMOVER: a 1a vez que um edit de kg-freshness.md quebrar o schema e passar local. ✅ FECHADO 2026-08-13 POR UMA TERCEIRA VIA que o no nao previa: nem REGRA as pressas, nem esperar o incidente — o pre-commit chama o check DIRETAMENTE quando kg-freshness.md esta no diff staged (3 linhas, ~0,2s, sem numero de REGRA, sem bancada). PROVADO nas duas direcoes: schema integro passa; schema SABOTADO (required duplicado, o defeito fundador) BLOQUEIA o commit com a violation nomeada. A promocao a REGRA formal continua disponivel se o padrao crescer — mas o furo local que este no documentava nao existe mais."
 
   - id: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO
     node_type: decision
@@ -125,11 +125,21 @@ nodes:
     node_type: question
     plane: PROD
     verified_at: 2026-08-13
-    verified_against: tres-bloqueios-da-mesma-classe-em-24h-site-coverage-e-2x-plugin-com-cura-mecanica-identica
-    status: open
+    verified_against: probe-em-fonte-bundlada-staged-disparou-regeneracao-e-stage-com-rastro-e-a-r19-segue-hard-no-ci
+    status: done
     impact: 3
     confidence: 0.9
-    label: "CANDIDATO NOMEADO PELO MAESTRO (aparte 2026-08-13): 'regenerar o plugin pode ser acao deliberada em vez de rodar automatico... evitar este processamento em construcao?'. O GATILHO JA DISPAROU 3x EM 24H: a guarda de cobertura do site (111->112->113 a cada doc novo) e a R19 do plugin (2 bloqueios NA MESMA HORA, ambos meus, ao editar kg-view.sh — fonte bundlada — sem regenerar; custo ~19min de hook por bloqueio). A DISTINCAO QUE DECIDE O DESENHO: a regeneracao ja E deliberada; o automatico e a COBRANCA. E a R19 nunca acusa nada DECIDIVEL — a divergencia tem UMA cura deterministica ('regenere'). Guarda cujo veredito tem cura unica mecanica e candidata natural a AUTO-FIX COM RASTRO (o hook regenera, stagea e DIZ o que fez); guarda que exige julgamento humano, nunca. Alternativa (a): SOFT na branch/HARD no CI — precedente na REGRA 56 (isencao declarada em trabalho-em-curso), mas migra o vermelho para o pior lugar (descobre-se 16min depois do push). REJEITADO: aviso opcional silenciavel — fail-open classico de construcao. DECISAO DO MAESTRO: (a) vs (b) e troca de friccao por revisao do artefato gerado. Mitigante do (b): o plugin e 100% derivado da fonte, nao ha conteudo autoral no gerado."
+    label: "CANDIDATO NOMEADO PELO MAESTRO (aparte 2026-08-13): 'regenerar o plugin pode ser acao deliberada em vez de rodar automatico... evitar este processamento em construcao?'. O GATILHO JA DISPAROU 3x EM 24H: a guarda de cobertura do site (111->112->113 a cada doc novo) e a R19 do plugin (2 bloqueios NA MESMA HORA, ambos meus, ao editar kg-view.sh — fonte bundlada — sem regenerar; custo ~19min de hook por bloqueio). A DISTINCAO QUE DECIDE O DESENHO: a regeneracao ja E deliberada; o automatico e a COBRANCA. E a R19 nunca acusa nada DECIDIVEL — a divergencia tem UMA cura deterministica ('regenere'). Guarda cujo veredito tem cura unica mecanica e candidata natural a AUTO-FIX COM RASTRO (o hook regenera, stagea e DIZ o que fez); guarda que exige julgamento humano, nunca. Alternativa (a): SOFT na branch/HARD no CI — precedente na REGRA 56 (isencao declarada em trabalho-em-curso), mas migra o vermelho para o pior lugar (descobre-se 16min depois do push). REJEITADO: aviso opcional silenciavel — fail-open classico de construcao. DECISAO DO MAESTRO: (a) vs (b) e troca de friccao por revisao do artefato gerado. Mitigante do (b): o plugin e 100% derivado da fonte, nao ha conteudo autoral no gerado. ✅ EXECUTADO 2026-08-13 — o maestro escolheu (b): o pre-commit detecta fonte bundlada no diff staged (paths LITERAIS extraidos dos manifests, match exato com grep -qxF), regenera o vertical afetado, STAGEA e IMPRIME o rastro. PROVADO com probe real: editar kg.md disparou a regeneracao do onion-work-tools + stage do provenance. Assemble falho no hook = fail-loud com o comando de diagnostico. A R19 segue INTACTA como guarda e HARD no CI — quem commitar por fora do hook e pego la."
+
+  - id: I_ASSEMBLE_FALHO_VIRA_VIOLATION
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: skill-bundlada-removida-e-o-lint-acusa-assemble-FALHOU-e-imprime-sumario-em-vez-de-morrer-rc2
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "FECHA O GAP ORFAO DA LINHA — o achado ADJACENTE do 2o Elenxo que ficou nomeado no residuo do PR #588 e NUNCA virou no (a auditoria de fechamento pegou: item sem estado no grafo e exatamente o que o controle do maestro proibe). O defeito pre-existente: `bash asm ...` como comando simples sob `set -e` — se o assemble falhasse (fonte bundlada apagada/quebrada), o lint MORRIA em rc=2 SEM sumario, e os chamadores por ausencia-de-mensagem liam a morte como PASS. Apagar uma fonte bundlada nao produzia 'fora de sincronia': produzia silencio. CURADO: `if ! bash asm...; then violation HARD 'assemble FALHOU' + continue`. PROVADO removendo uma skill bundlada de verdade: o lint acusou `assemble FALHOU (fonte bundlada ausente/quebrada?)` com o comando de diagnostico E imprimiu o sumario — acusa e soma, nao morre."
 
   - id: A_RUN_DO_ELENXO_DE_MECANISMOS
     node_type: artifact
@@ -155,6 +165,9 @@ edges:
   - from: Q_R19_AUTOFIX_COM_RASTRO_CANDIDATO
     to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
     edge_type: CONSTRAINS
+  - from: I_ASSEMBLE_FALHO_VIRA_VIOLATION
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: SUPPORTS
   - from: I_P4_HIGIENE_DE_VERDADE_DECLARADA_FECHADA
     to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
     edge_type: SUPPORTS
