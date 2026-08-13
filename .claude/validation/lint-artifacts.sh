@@ -1014,6 +1014,22 @@ check_plugins_sync() {
   [ -f "${asm}" ] || return 0            # sem assembler → nada a checar (repo sem a feature)
   [ -d "${vdir}" ] || return 0
   command -v jq >/dev/null 2>&1 || return 0   # sem jq → pula gracioso (mesma graça dos outros)
+  # GATE sob --only (Elenxo 2026-08-13, KG: docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml):
+  # guarda de estado GLOBAL que rodava inteira em toda invocação --only (8,9s para validar 1 arquivo
+  # alheio — 61% do custo somando as irmãs sem gate). A ÁREA desta guarda não é só marketplace/plugins:
+  # é também TODA FONTE BUNDLADA (108 paths declarados nos manifestos — agentes, comandos, skills, KBs).
+  # A 1ª versão do gate casava só o prefixo e ficou CEGA a drift de fonte via --only (2 HARD engolidas,
+  # provado pelo 2º Elenxo: probe em commands/meta/kg.md). Pertencimento se decide no MANIFESTO, que
+  # declara os paths LITERAIS — grep -qF custa ~ms contra os 8,9s da guarda.
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      */utils/marketplace/*|*/plugins/*) : ;;
+      *)
+        local _rel="${ONLY_PATH#"${REPO_ROOT}"/}"
+        grep -qF -- "${_rel}" "${vdir}"/*.manifest.sh 2>/dev/null || return 0
+        ;;
+    esac
+  fi
 
   local manifest name committed tmp
   for manifest in "${vdir}"/*.manifest.sh; do
@@ -1055,9 +1071,19 @@ check_plugins_sync() {
 check_capability_conformance() {
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   [ -d "${vdir}" ] || return 0
+  # ⚠️ NUNCA blanket-skip aqui: o selftest r20 exercita ESTA guarda via --only (fixture
+  # bad-overclaim injetada como manifesto) — um `[ -n ONLY_PATH ] && return 0` a cegaria e o r20
+  # falharia em silêncio. Provado por sabotagem no Elenxo 2026-08-13.
+  # O filtro compara por INODE (-ef), não por string, e isso mata DUAS classes de uma vez
+  # (2º Elenxo): (a) string-compare exigia normalizar o vdir (que carrega `validation/../utils/`
+  # literal) E o ONLY_PATH — e a normalização só cobre o ramo relativo; um --only absoluto com
+  # `/./` ou `//` desligava a REGRA 20 INTEIRA em silêncio; (b) o `cd` da normalização, sob
+  # `set -euo pipefail`, matava o lint sem sumário se o dir sumisse/perdesse permissão — a classe
+  # morte-silenciosa que este arquivo já documenta 4 vezes. `-ef` resolve as duas sem cd.
   local manifest report name claimed bronze silver gold unresolved met
   for manifest in "${vdir}"/*.manifest.sh; do
     [ -f "${manifest}" ] || continue
+    if [ -n "${ONLY_PATH}" ] && ! [ "${manifest}" -ef "${ONLY_PATH}" ]; then continue; fi
     # Subshell: source o manifesto e computa os tiers cumpridos + requires não-resolvidos.
     report="$(
       REPO_ROOT="${REPO_ROOT}"
@@ -1110,6 +1136,10 @@ check_capability_conformance() {
 #           Impede roles.yaml apontar p/ vertical inexistente. Pula gracioso sem python3/yaml.
 # ===========================================================================
 check_role_bundle_sync() {
+  # GATE sob --only — ver o racional em check_plugins_sync (mesmo Elenxo). Inclui commands/meta/:
+  # a REGRA valida work_tool -> comando EXISTENTE, então rename/delete de um comando meta tem de
+  # disparar (2º Elenxo provou a cegueira com mv co-deliver.md: o PRE acusava, o gate estreito não).
+  if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in */utils/marketplace/*|*/.claude-plugin/*|*/commands/meta/*) : ;; *) return 0 ;; esac; fi
   local roles="${SCRIPT_DIR}/../utils/marketplace/roles.yaml"
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   local mkt="${REPO_ROOT}/.claude-plugin/marketplace.json"
@@ -1284,6 +1314,8 @@ check_agent_card_sync() {
 #   violava "membro nenhum", não "membro sem canal").
 # ===========================================================================
 check_outbox_channel_exists() {
+  # GATE POR RELEVÂNCIA sob --only — ver o racional em check_plugins_sync (mesmo Elenxo).
+  if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in */docs/evolution/federation/*) : ;; *) return 0 ;; esac; fi
   local outbox="${REPO_ROOT}/docs/evolution/federation/outbox"
   local members="${REPO_ROOT}/docs/evolution/federation/members.yaml"
   [ -d "${outbox}" ] && [ -f "${members}" ] || return 0
@@ -2236,6 +2268,8 @@ check_knowledge_base_links() {
 #   quando migrar). Origem: 1a pesquisa nascida em KG (research/whatsapp-api-2026-07).
 # ===========================================================================
 check_research_kg() {
+  # GATE POR RELEVÂNCIA sob --only — ver o racional em check_plugins_sync (mesmo Elenxo).
+  if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in */docs/evolution/research/*) : ;; *) return 0 ;; esac; fi
   local base="${REPO_ROOT}/docs/evolution/research"
   [ -d "${base}" ] || return 0
   local legacy=" federation-2026 knowledge-centric-ssot-2026 spec-as-code-evolution-2026 "
@@ -2863,6 +2897,9 @@ check_frontmatter_model_category() {
 # ===========================================================================
 check_bundled_command_script_deps() {
   [ "${IS_DERIVED}" -eq 1 ] && return 0
+  # GATE POR RELEVÂNCIA sob --only — ver o racional em check_plugins_sync (mesmo Elenxo).
+  # Área inclui commands/ e validation/: o manifesto declara scripts que os comandos citam.
+  if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in */utils/marketplace/*|*/commands/*|*/validation/*.sh) : ;; *) return 0 ;; esac; fi
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   [ -d "${vdir}" ] || return 0
   # Harness sempre-presente num repo adotado (não precisa estar no VALIDATION[] do bundle).

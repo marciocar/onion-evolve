@@ -1,0 +1,126 @@
+meta:
+  id: elenxo-mecanismos-lint-2026-08-13
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-13
+  date: 2026-08-13
+  run_id: wf_167fa138-c0a
+  note: >
+    Elenxo dos mecanismos de validação, pedido pelo maestro: "muitas automações .sh para lint com
+    tempo e custo elevados, 700+ conferências num arquivo". Quatro lentes adversariais
+    independentes (custo do --only, anatomia da bancada, parque de 47 scripts, regressão
+    histórica), 19 achados, 241 tool-calls de medição. TESE: as 4 lentes convergiram SEM se verem
+    no mesmo vilão — guardas de ESTADO GLOBAL sem gate de ONLY_PATH, com check_plugins_sync à
+    frente. O custo não é das 700 conferências: é de ~6 guardas que ignoram o escopo.
+    Projeção em prosa: docs/analysis/elenxo-mecanismos-lint-2026-08-13.md
+
+nodes:
+  - id: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    node_type: claim
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: patch-a-b-medido-only-cai-de-16-2s-para-5-3s-com-diff-de-veredito-vazio-em-dois-cenarios
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    label: "A TESE, e ela INVERTE o diagnóstico do pedido. O maestro apontou '700+ conferências num arquivo' como o custo — MEDIDO, o problema não é o número de conferências: é que ~6 guardas de ESTADO GLOBAL ignoram o ONLY_PATH e varrem o repo INTEIRO mesmo quando o escopo é 1 arquivo. Prova A/B da lente 1: `--only` de um arquivo custa 16,2-19,6s no baseline; com 5 guardas ganhando `[ -n \"${ONLY_PATH}\" ] && return 0` + 1 ganhando scope-filter, cai para **5,1-5,5s** — e o `diff` da saida nos DOIS CENARIOS TESTADOS foi vazio — ⚠️ e o 2o Elenxo provou que isso NAO generalizava: a 1a versao do gate (por prefixo de path) perdia violacao em TRES cenarios novos (drift de fonte bundlada, rename de work_tool, --only nao-canonico). A versao final gateia por PERTENCIMENTO AO MANIFESTO + inode-compare (-ef), re-provada contra os tres repros. O custo composto é o que dói: a bancada faz ~90-99 invocações `--only`, então cada segundo ali multiplica. As guardas sem gate: check_plugins_sync (8,9s — reassembla os 7 plugins A CADA invocação), check_bundled_command_script_deps (3,0s), check_capability_conformance (2,5s — ⚠️ esta NÃO pode levar blanket-skip, ver nó próprio), check_outbox_channel_exists (1,5s), check_role_bundle_sync (0,7s), check_agent_tool_names. O padrão do early-return JÁ EXISTE em ~30 guardas do mesmo arquivo — as caras nasceram sem ele."
+    trace: ".claude/validation/lint-artifacts.sh"
+
+  - id: E_QUATRO_LENTES_CONVERGIRAM_SEM_SE_VER
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-13
+    verified_against: as-4-lentes-independentes-nomearam-check-plugins-sync-como-vilao-dominante
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    label: "O sinal de robustez do achado: as QUATRO lentes — que rodaram em paralelo, sem ver umas às outras, com perguntas DIFERENTES (por que --only custa 16,8s / anatomia dos 15min da bancada / sobreposição do parque / história da regressão) — nomearam `check_plugins_sync` como custo dominante, cada uma pelo próprio caminho de medição. Lente 1: 8,9s no trace por função. Lente 2: domina o loop do manifest, ~90 chamadas ≈ 10,5-11,7 MINUTOS da bancada. Lente 3: 'metade do custo de qualquer --only não-relacionado' (16,0→8,1s só ele). Lente 4: '~14,8s por invocação junto com agent_tool_names'. Convergência independente vale mais que qualquer confidence individual — é a versão multi-agente do perspective-diverse verify."
+    trace: ".claude/validation/lint-artifacts.sh"
+
+  - id: C_CAPABILITY_NAO_PODE_LEVAR_BLANKET_SKIP
+    node_type: claim
+    plane: DEV
+    verified_at: 2026-08-13
+    verified_against: fixture-bad-overclaim-injetada-com-blanket-skip-fica-cega-e-com-scope-filter-sem-normalizar-vdir-tambem
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "O CUIDADO QUE IMPEDE A CURA INGÊNUA — e foi provado por SABOTAGEM, não por leitura. `check_capability_conformance` (REGRA 20) É exercitada via `--only` pelo selftest r20: blanket-skip a deixaria CEGA e o caso passaria de PASS a FAIL silenciosamente... não: a guarda ficaria cega e o selftest FALHARIA — o revisor provou injetando a fixture `bad-overclaim` no repo real: com blanket-skip, saída VAZIA (o overclaim 'gold mas cumpre silver' some). ⚠️ E A CORREÇÃO CERTA TAMBÉM FALHAVA: o scope-filter (`[ \"${manifest}\" != \"${ONLY_PATH}\" ] && continue`) não casava NUNCA, porque `vdir` carrega `..` literal não-normalizado enquanto ONLY_PATH vem normalizado — string comparison entre um path com `validation/../utils/` e um path canônico. Bug PRÉ-EXISTENTE, invisível até alguém tentar filtrar. Cura em duas partes: `vdir=\"$(cd \"${vdir}\" && pwd)\"` + o filtro no loop. Com as duas, o overclaim volta a ser detectado e o honesto segue limpo. A lição que transfere: gate por comparação de path exige NORMALIZAR os dois lados — é a família do 'correlação por chave estável, nunca por path' da doutrina de orquestração."
+    trace: ".claude/validation/lint-artifacts.sh"
+
+  - id: E_SHA1SUM_POR_NO_2486_SPAWNS
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: lente-4-mediu-2486-spawns-de-sha1sum-respondendo-por-8-5s-dos-14-1s-da-guarda
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "O SEGUNDO VILÃO É UM BUG DE EFICIÊNCIA, não de escopo: `check_kg_verification_coverage` (14,1s, a guarda mais cara do lint) gasta **8,5s dos 14,1s (60%) em 2.486 spawns de `sha1sum`** — um subprocesso POR NÓ do corpus de .kg.yaml, quando um lote único resolveria (o `load_universe` sozinho mede 0,44s). Guarda nascida DEPOIS da baseline de 16s, já nasceu cara, e o custo é por-commit no pre-commit local. Cura proposta pela lente: hash em lote no `load_hash_index()`. Ganho medido da eliminação: a guarda cai para ~5-6s. Junto: `check_kg_view_sync` (12,3s) gasta 5 subprocessos por arquivo (3× self --json + 2 outros) quando o motor já tem modo combinado — de 5 para 2 spawns × 105 arquivos."
+    trace: ".claude/validation/kg-verification-coverage.sh"
+
+  - id: E_REGRESSAO_16S_86S_E_CONCENTRADA_NAO_LINEAR
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-13
+    verified_against: guardas-27-para-59-2-19x-linhas-2-51x-tempo-5-37x-concentrado-em-3-guardas-novas
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "A REGRESSÃO NÃO FOI O PREÇO DO CRESCIMENTO — foi concentrada. De PR #357 (16s) a hoje (86s): guardas 27→59 (2,19×), linhas 1.307→3.279 (2,51×), tempo 16s→86s (**5,37×**). Se o custo fosse linear com o escopo, 86s seriam ~35s. O desproporcional mora em 3 guardas novas que já nasceram caras (kg_verification_coverage 14,1s, kg_view_sync 12,3s, plugins_sync 8,5s) — e nenhuma delas nasceu com o gate de ONLY_PATH que ~30 guardas irmãs já tinham. ⚠️ ACHADO DE DOUTRINA da mesma lente: o comentário do pre-commit hook declara '44s' de custo — o vivo é 86s, stale há 7 dias. Declarado≠verificado no próprio instrumento que existe para pegar isso. E a régua do maestro se aplica: efficiency-over-economy — a pergunta não é gastar menos, é se cada conferência roda no MOMENTO certo; as lentes recomendaram NÃO mover kg_view_sync para CI-only (o custo só aparece em runs sem --only) e NÃO deletar nenhuma guarda do top-6 (todas têm incidente real documentado no cabeçalho)."
+    trace: ".claude/validation/lint-artifacts.sh"
+
+  - id: Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: grep-de-consumo-real-devolve-zero-invocacao-de-producao-para-6-dos-47-scripts
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "SEIS dos 47 scripts têm ZERO consumidor de produção — só aparecem no próprio bloco `--selftest`: candidatos nomeados pela lente 3 incluem `context-freshness-metric.sh` e `federation-engagement.sh` (lista completa na síntese). São ~690 linhas mantidas sem invocação viva. ⚠️ TRÊS CUIDADOS ANTES DE QUALQUER BAIXA, todos da doutrina: (1) [[never-shutdown-vps-tools]] — 'sem consumidor hoje' = falta LIGAR, não licença para apagar; a decisão é do maestro; (2) o próprio `consumed-mode-check.sh` — o instrumento que mede isso — tem cabeçalho MENTINDO sobre o próprio status de wire-in (diz que não está ligado ao lint quando está); um medidor de consumo com autodescrição errada é ironia a corrigir ANTES de confiar na medição; (3) `vps-exposure-check.sh` aparece como zero-consumidor no grep mas roda por SYSTEMD TIMER — consumo fora do repo, invisível ao grep. A régua: consumo se mede pelo RUNTIME (timer, hook, CI), não só pelo grep no repo. GATILHO: o maestro decidir o destino dos 6, um a um."
+    trace: ".claude/validation/consumed-mode-check.sh"
+
+  - id: E_PISO_IRREDUTIVEL_DA_REFINARIA_SUPERADO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-13
+    verified_against: only-de-12-16s-para-5s-com-diff-vazio-e-bancada-798-de-798-no-mesmo-ambiente
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "RECONCILIA COM O GRAFO DA REFINARIA (onion-refinaria-2026-08, no E_lint_only_ja_existe_e_e_parcial), que concluira em 2026-08-06: 'os ~12s do --only sao PISO IRREDUTIVEL — o veredito das guardas globais seria FALSO se escopado'. A medicao daquele no era verdadeira; a CONCLUSAO foi SUPERADA: o gate por relevancia nao FATIA o que a guarda compara (isso sim falsearia) — decide SE ela roda, por area + pertencimento ao manifesto. Piso medido hoje: ~5s. O no da refinaria foi marcado `superseded` no proprio arquivo — aresta cross-grafo nao existe na gramatica, entao a reconciliacao e textual dos DOIS lados. ⚠️ E UM QUASE-ERRO MEU NA PROPRIA RECONCILIACAO: 'vi' um label duplicado naquele no lendo a saida CONCATENADA de dois comandos como se fosse o arquivo — o assert do meu script derrubou a suposicao (1 label, medido por awk no arquivo), e o cat -A revelou que ate a indentacao que eu 'lia' estava errada (o prefixo NR do awk somava colunas). Ler output formatado como estrutura e casar-a-palavra-com-o-referente-errado; TRES asserts baratos impediram tres afirmacoes falsas de serem publicadas."
+
+  - id: A_RUN_DO_ELENXO_DE_MECANISMOS
+    node_type: artifact
+    plane: DEV
+    verified_at: 2026-08-13
+    verified_against: workflow-de-4-agentes-com-241-tool-calls-e-os-4-schemas-validados
+    status: confirmed
+    impact: 2
+    confidence: 1.0
+    label: "O run `wf_167fa138-c0a`: 4 lentes `sonnet`/`high` em paralelo, 19 achados, 241 tool-calls, 565.393 tokens, 15min06s. Cada lente recebeu os DADOS JÁ MEDIDOS (perfil por guarda, custo do --only, anatomia da bancada) como ponto de partida para não re-medir o óbvio — e ainda assim mediu o próprio caminho (a lente 1 fez patch A/B com diff de veredito; a lente 3 rodou o consumed-mode-check; a lente 4 fez arqueologia git com contagem de guardas por commit). O campo `estimated_gain` do schema obrigou cada achado a declarar se o ganho é MEDIDO ou DERIVADO — a lente 1 rotulou honestamente a extrapolação de 18min como estimativa cuja soma excede o total observado (caching de kernel amortiza). Projeção: docs/analysis/elenxo-mecanismos-lint-2026-08-13.md"
+    trace: "docs/analysis/elenxo-mecanismos-lint-2026-08-13.md"
+
+edges:
+  - from: E_PISO_IRREDUTIVEL_DA_REFINARIA_SUPERADO
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: SUPPORTS
+  - from: E_QUATRO_LENTES_CONVERGIRAM_SEM_SE_VER
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: SUPPORTS
+  - from: E_REGRESSAO_16S_86S_E_CONCENTRADA_NAO_LINEAR
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: SUPPORTS
+  - from: C_CAPABILITY_NAO_PODE_LEVAR_BLANKET_SKIP
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: CONSTRAINS
+  - from: E_SHA1SUM_POR_NO_2486_SPAWNS
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: CONSTRAINS
+  - from: Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: CONSTRAINS
+  - from: A_RUN_DO_ELENXO_DE_MECANISMOS
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: TRACES_TO
