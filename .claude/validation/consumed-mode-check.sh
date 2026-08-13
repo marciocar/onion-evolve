@@ -21,8 +21,15 @@
 # … `bash "${h}" --flag`), que é a forma canônica desta casa. Invocação montada dinamicamente (flag
 # vinda de variável, `eval`, array) NÃO é julgada — e é CONTADA, nunca silenciosa.
 #
-# ═══ ESTE SCRIPT É INSTRUMENTO, NÃO GATE — e a decisão foi MEDIDA, não temida ═══
-# Ele NÃO está ligado ao lint como REGRA HARD, e não deve ser sem o trabalho descrito abaixo.
+# ═══ HISTÓRICO DO WIRE-IN — e a ironia de este cabeçalho ter ficado stale ═══
+# ⚠️ ATUALIZADO 2026-08-13: este script ESTÁ ligado ao lint — a REGRA 59 [HARD]
+# (check_consumed_modes, lint-artifacts.sh) o consome desde que o trabalho descrito abaixo
+# convergiu. A frase anterior ("NÃO está ligado como REGRA HARD, e não deve ser") era verdadeira
+# quando escrita e ficou stale QUANDO o wire-in aconteceu — ninguém voltou aqui. Um Elenxo de
+# 2026-08-13 pegou: o instrumento cuja função é medir `declarado≠consumido` carregava a própria
+# autodescrição divergente do consumo real. O parágrafo original fica abaixo como registro da
+# decisão da época, não como estado atual.
+# ═══ (registro histórico, 2026-08-06) INSTRUMENTO, NÃO GATE — a decisão foi MEDIDA ═══
 # Tentei ligá-lo em 2026-08-06 e a medição não convergiu: a extração encontrou SEIS formas de
 # invocação, cada iteração revelando a seguinte —
 #   1. `bash "${SCRIPT_DIR}/x.sh" --flag`            (produção)
@@ -42,12 +49,15 @@
 # `check_review_artifact` consome `--format=tsv`. O defeito IDÊNTICO ao que eu curara de manhã no
 # kg-trace-resolve. Nenhuma releitura minha o pegou; este join pegou.
 #
-# LACUNAS REAIS QUE ELE ACHOU e que seguem abertas (verificadas à mão, não são artefato):
-#   · inventory.sh          — a produção consome `--markdown`; o selftest NUNCA o invoca
-#   · migalhas-generate.sh  — a produção consome `--check`; o selftest NUNCA o invoca
+# LACUNAS REAIS QUE ELE ACHOU à época — ⚠️ AMBAS FECHADAS DESDE ENTÃO (Elenxo 2026-08-13:
+# lint-selftest.sh:6023 exercita `inventory.sh --markdown`; :6078 exercita
+# `migalhas-generate.sh --check`; o próprio instrumento devolve `0 sem teste` hoje):
+#   · inventory.sh          — a produção consome `--markdown` (era lacuna; coberto)
+#   · migalhas-generate.sh  — a produção consome `--check` (era lacuna; coberto)
 #
-# O QUE FALTA para virar REGRA: (a) distinguir invocação de menção-em-string (parser, não regex);
-# (b) triar o resíduo caso a caso; (c) só então wire-in HARD. É ciclo próprio, não puxado ainda.
+# O QUE FALTAVA para virar REGRA (registro de 2026-08-06 — ⚠️ o ciclo FOI puxado: a REGRA 59
+# [HARD] existe e consome este script, ver o topo deste cabeçalho): (a) distinguir invocação de
+# menção-em-string; (b) triar o resíduo; (c) wire-in HARD. Cumprido.
 #
 # Uso  : bash .claude/validation/consumed-mode-check.sh [<repo_root>] [--format tsv|--list]
 # Exit : 0 = todo modo consumido é exercitado · 1 = há modo sem teste · 2 = uso inválido

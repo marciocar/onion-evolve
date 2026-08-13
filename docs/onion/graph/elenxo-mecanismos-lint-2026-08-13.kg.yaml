@@ -52,11 +52,11 @@ nodes:
     node_type: evidence
     plane: PROD
     verified_at: 2026-08-13
-    verified_against: lente-4-mediu-2486-spawns-de-sha1sum-respondendo-por-8-5s-dos-14-1s-da-guarda
-    status: confirmed
+    verified_against: re-medido-no-caminho-do-lint-format-tsv-0-95s-e-47-spawns-o-caminho-caro-so-dispara-com-orfas
+    status: superseded
     impact: 4
     confidence: 0.9
-    label: "O SEGUNDO VILÃO É UM BUG DE EFICIÊNCIA, não de escopo: `check_kg_verification_coverage` (14,1s, a guarda mais cara do lint) gasta **8,5s dos 14,1s (60%) em 2.486 spawns de `sha1sum`** — um subprocesso POR NÓ do corpus de .kg.yaml, quando um lote único resolveria (o `load_universe` sozinho mede 0,44s). Guarda nascida DEPOIS da baseline de 16s, já nasceu cara, e o custo é por-commit no pre-commit local. Cura proposta pela lente: hash em lote no `load_hash_index()`. Ganho medido da eliminação: a guarda cai para ~5-6s. Junto: `check_kg_view_sync` (12,3s) gasta 5 subprocessos por arquivo (3× self --json + 2 outros) quando o motor já tem modo combinado — de 5 para 2 spawns × 105 arquivos."
+    label: "O SEGUNDO VILÃO É UM BUG DE EFICIÊNCIA, não de escopo: `check_kg_verification_coverage` (14,1s, a guarda mais cara do lint) gasta **8,5s dos 14,1s (60%) em 2.486 spawns de `sha1sum`** — um subprocesso POR NÓ do corpus de .kg.yaml, quando um lote único resolveria (o `load_universe` sozinho mede 0,44s). Guarda nascida DEPOIS da baseline de 16s, já nasceu cara, e o custo é por-commit no pre-commit local. Cura proposta pela lente: hash em lote no `load_hash_index()`. Ganho medido da eliminação: a guarda cai para ~5-6s. Junto: `check_kg_view_sync` (12,3s) gasta 5 subprocessos por arquivo quando 3 deles re-parseiam o MESMO --json. ⚠️ SUPERSEDED NA EXECUCAO DO P3 (2026-08-13): re-medido NO CAMINHO REAL do lint (`--format tsv`), o coverage custa **0,95s com 47 spawns** — os 2.486/8,5s da lente so ocorrem quando ha ORFAS no corpus (o caminho caro e condicional, linha 403 do proprio script), e o corpus esta limpo. testar-no-caminho-errado-e-nao-testar, cometido pela lente. O ALVO REAL do P3 era o item secundario: o kg_view_sync com triplo self --json — CURADO (uma captura, reuso 3x): guarda inteira 12,99s -> 8,81s (-32%) com paridade preservada nos 61 grafos."
     trace: ".claude/validation/kg-verification-coverage.sh"
 
   - id: E_REGRESSAO_16S_86S_E_CONCENTRADA_NAO_LINEAR
@@ -74,11 +74,11 @@ nodes:
     node_type: question
     plane: PROD
     verified_at: 2026-08-13
-    verified_against: grep-de-consumo-real-devolve-zero-invocacao-de-producao-para-6-dos-47-scripts
-    status: open
+    verified_against: tripla-regua-2026-08-13-consumed-mode-oficial-33-pares-0-sem-teste-e-o-unico-orfao-real-foi-ligado
+    status: done
     impact: 3
     confidence: 0.8
-    label: "SEIS dos 47 scripts têm ZERO consumidor de produção — só aparecem no próprio bloco `--selftest`: candidatos nomeados pela lente 3 incluem `context-freshness-metric.sh` e `federation-engagement.sh` (lista completa na síntese). São ~690 linhas mantidas sem invocação viva. ⚠️ TRÊS CUIDADOS ANTES DE QUALQUER BAIXA, todos da doutrina: (1) [[never-shutdown-vps-tools]] — 'sem consumidor hoje' = falta LIGAR, não licença para apagar; a decisão é do maestro; (2) o próprio `consumed-mode-check.sh` — o instrumento que mede isso — tem cabeçalho MENTINDO sobre o próprio status de wire-in (diz que não está ligado ao lint quando está); um medidor de consumo com autodescrição errada é ironia a corrigir ANTES de confiar na medição; (3) `vps-exposure-check.sh` aparece como zero-consumidor no grep mas roda por SYSTEMD TIMER — consumo fora do repo, invisível ao grep. A régua: consumo se mede pelo RUNTIME (timer, hook, CI), não só pelo grep no repo. GATILHO: o maestro decidir o destino dos 6, um a um."
+    label: "SEIS dos 47 scripts têm ZERO consumidor de produção — só aparecem no próprio bloco `--selftest`: candidatos nomeados pela lente 3 incluem `context-freshness-metric.sh` e `federation-engagement.sh` (lista completa na síntese). São ~690 linhas mantidas sem invocação viva. ⚠️ TRÊS CUIDADOS ANTES DE QUALQUER BAIXA, todos da doutrina: (1) [[never-shutdown-vps-tools]] — 'sem consumidor hoje' = falta LIGAR, não licença para apagar; a decisão é do maestro; (2) o próprio `consumed-mode-check.sh` — o instrumento que mede isso — tem cabeçalho MENTINDO sobre o próprio status de wire-in (diz que não está ligado ao lint quando está); um medidor de consumo com autodescrição errada é ironia a corrigir ANTES de confiar na medição; (3) `vps-exposure-check.sh` aparece como zero-consumidor no grep mas roda por SYSTEMD TIMER — consumo fora do repo, invisível ao grep. A régua: consumo se mede pelo RUNTIME (timer, hook, CI), não só pelo grep no repo. GATILHO: o maestro decidir o destino dos 6, um a um. ✅ FECHADO 2026-08-13 — e a contagem de reguas foi CORRIGIDA pelo 3o Elenxo: eram DUAS, nao tres. (1) grep de invocacao real em hooks/CI/comandos/scripts achou UM orfao — `kg-reverify-schema-check.sh`, criado pelo proprio autor em 2026-08-12 e nunca ligado; (2) a regua da lente ('so aparece no proprio --selftest') nao resiste a medicao direta. ⚠️ A REGUA QUE EU CITAVA COMO (2) CAIU: o `consumed-mode-check.sh` compara EXCLUSIVAMENTE producao(lint) x bancada(selftest) — um script com ZERO invocacao de producao contribui ZERO pares e e INVISIVEL por construcao ao instrumento; '33 pares/0 sem teste' e IDENTICO em main e na branch, provando que ele nao ve o proprio wire-in deste PR. Responde 'todo modo consumido e exercitado?', nunca 'existe consumidor?'. Citar um numero verdadeiro como evidencia de uma pergunta que ele nao responde e a forma estatistica de casar-a-palavra-com-o-referente-errado. CURA APLICADA: o orfao real foi LIGADO a bancada (2 casos novos — selftest embutido 6/6 + schema real conforme), honrando 'sem consumidor = falta ligar, nao licenca para apagar'. NADA foi deletado."
     trace: ".claude/validation/consumed-mode-check.sh"
 
   - id: E_PISO_IRREDUTIVEL_DA_REFINARIA_SUPERADO
@@ -90,6 +90,46 @@ nodes:
     impact: 4
     confidence: 0.9
     label: "RECONCILIA COM O GRAFO DA REFINARIA (onion-refinaria-2026-08, no E_lint_only_ja_existe_e_e_parcial), que concluira em 2026-08-06: 'os ~12s do --only sao PISO IRREDUTIVEL — o veredito das guardas globais seria FALSO se escopado'. A medicao daquele no era verdadeira; a CONCLUSAO foi SUPERADA: o gate por relevancia nao FATIA o que a guarda compara (isso sim falsearia) — decide SE ela roda, por area + pertencimento ao manifesto. Piso medido hoje: ~5s. O no da refinaria foi marcado `superseded` no proprio arquivo — aresta cross-grafo nao existe na gramatica, entao a reconciliacao e textual dos DOIS lados. ⚠️ E UM QUASE-ERRO MEU NA PROPRIA RECONCILIACAO: 'vi' um label duplicado naquele no lendo a saida CONCATENADA de dois comandos como se fosse o arquivo — o assert do meu script derrubou a suposicao (1 label, medido por awk no arquivo), e o cat -A revelou que ate a indentacao que eu 'lia' estava errada (o prefixo NR do awk somava colunas). Ler output formatado como estrutura e casar-a-palavra-com-o-referente-errado; TRES asserts baratos impediram tres afirmacoes falsas de serem publicadas."
+
+  - id: I_P4_HIGIENE_DE_VERDADE_DECLARADA_FECHADA
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: pre-commit-carimbado-78s-medido-e-cabecalho-do-consumed-mode-atualizado-para-o-wire-in-da-regra-59
+    status: done
+    impact: 3
+    confidence: 1.0
+    label: "P4 FECHADO nas duas pontas, e a segunda invalidou o proprio achado da lente: (a) o comentario do pre-commit dizia 'hoje em 44s' — re-medido pos-cura do kg-view: **78s**, carimbado com a instrucao de re-medir a cada mexida (o numero ja esteve 2x stale: 16s->44s->86s->78s); (b) o cabecalho do `consumed-mode-check.sh` dizia 'NAO esta ligado ao lint como REGRA HARD' — MEDIDO: a REGRA 59 [HARD] o consome via check_consumed_modes. ⚠️ A lente 3 relatou a direcao INVERTIDA ('o cabecalho mente sobre estar ligado' sugerindo que dizia estar quando nao estava) — o stale era o oposto: dizia NAO estar e ESTA. O instrumento que mede declarado≠consumido carregava a propria autodescricao divergente; o paragrafo original ficou como registro historico datado, nao apagado."
+
+  - id: Q_GATILHO_DO_WIREIN_NAO_CASA_COM_O_SUT
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: pre-commit-so-roda-a-bancada-quando-o-commit-toca-validation-e-o-sut-vigiado-e-kg-freshness-md
+    status: open
+    impact: 2
+    confidence: 0.9
+    label: "GAP DECLARADO DO WIRE-IN (3o Elenxo/M6): a guarda `kg-reverify-schema-check` vigia `.claude/commands/meta/kg-freshness.md`, mas mora na BANCADA — que no pre-commit so dispara quando o commit toca `.claude/validation/`. Editar o kg-freshness.md sozinho passa LOCAL sem a guarda rodar (o CI cobre, `.claude/**` esta nos paths do workflow) e o vermelho apareceria num commit FUTURO que toque validation/, culpando a mudanca errada. O sitio natural seria uma REGRA no lint-artifacts (roda em todo commit) — NAO feita de proposito: criar REGRA nova as pressas foi o padrao de defeito de 24h inteiras (required duplicado na guarda contra duplicacao, morte-silenciosa na guarda contra cegueira). GATILHO PARA PROMOVER: a 1a vez que um edit de kg-freshness.md quebrar o schema e passar local — ai a REGRA nasce com o incidente como fixture, nao com pressa."
+
+  - id: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: a-b-intercalado-12-2-para-8-2s-com-veredito-byte-identico-nos-62-grafos-e-lint-full-78s
+    status: done
+    impact: 4
+    confidence: 1.0
+    label: "O RESULTADO VIVO DO P3, em no proprio (3o Elenxo/B5: a 1a redacao escreveu a cura mais substantiva do PR DENTRO de um no superseded — que o radar pesa a 0.2 e trata como historia; a projecao afundava o proprio resultado). O `--assert-parity` do kg-view.sh spawnava o MESMO parse `self --json` TRES vezes por grafo; a cura captura uma vez e reusa (v_vec + node_count + edge_count da mesma string). MEDIDO: guarda inteira 12,99->8,81s aqui, 12,2->8,2s no A/B intercalado do revisor (-32/-33%), veredito BYTE-IDENTICO nos 62 grafos, lint full 86->78s (71,3s em maquina ociosa — a condicao da medida importa). BONUS que o revisor achou e o commit nao declarava: os 3 parses independentes tinham TOCTOU real se o .kg.yaml mudasse entre eles — a captura unica o elimina."
+
+  - id: Q_R19_AUTOFIX_COM_RASTRO_CANDIDATO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: tres-bloqueios-da-mesma-classe-em-24h-site-coverage-e-2x-plugin-com-cura-mecanica-identica
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "CANDIDATO NOMEADO PELO MAESTRO (aparte 2026-08-13): 'regenerar o plugin pode ser acao deliberada em vez de rodar automatico... evitar este processamento em construcao?'. O GATILHO JA DISPAROU 3x EM 24H: a guarda de cobertura do site (111->112->113 a cada doc novo) e a R19 do plugin (2 bloqueios NA MESMA HORA, ambos meus, ao editar kg-view.sh — fonte bundlada — sem regenerar; custo ~19min de hook por bloqueio). A DISTINCAO QUE DECIDE O DESENHO: a regeneracao ja E deliberada; o automatico e a COBRANCA. E a R19 nunca acusa nada DECIDIVEL — a divergencia tem UMA cura deterministica ('regenere'). Guarda cujo veredito tem cura unica mecanica e candidata natural a AUTO-FIX COM RASTRO (o hook regenera, stagea e DIZ o que fez); guarda que exige julgamento humano, nunca. Alternativa (a): SOFT na branch/HARD no CI — precedente na REGRA 56 (isencao declarada em trabalho-em-curso), mas migra o vermelho para o pior lugar (descobre-se 16min depois do push). REJEITADO: aviso opcional silenciavel — fail-open classico de construcao. DECISAO DO MAESTRO: (a) vs (b) e troca de friccao por revisao do artefato gerado. Mitigante do (b): o plugin e 100% derivado da fonte, nao ha conteudo autoral no gerado."
 
   - id: A_RUN_DO_ELENXO_DE_MECANISMOS
     node_type: artifact
@@ -103,6 +143,21 @@ nodes:
     trace: "docs/analysis/elenxo-mecanismos-lint-2026-08-13.md"
 
 edges:
+  - from: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO
+    to: E_SHA1SUM_POR_NO_2486_SPAWNS
+    edge_type: SUPERSEDES
+  - from: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: SUPPORTS
+  - from: Q_GATILHO_DO_WIREIN_NAO_CASA_COM_O_SUT
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: CONSTRAINS
+  - from: Q_R19_AUTOFIX_COM_RASTRO_CANDIDATO
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: CONSTRAINS
+  - from: I_P4_HIGIENE_DE_VERDADE_DECLARADA_FECHADA
+    to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: SUPPORTS
   - from: E_PISO_IRREDUTIVEL_DA_REFINARIA_SUPERADO
     to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
     edge_type: SUPPORTS

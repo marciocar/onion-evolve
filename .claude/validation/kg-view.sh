@@ -93,7 +93,12 @@ if [ "${MODE}" = "--assert-parity" ]; then
   #     lente que pesa `done` a 0.15 em vez de 0.1 passava em 58 de 58 grafos.
   # O vetor compara par a par e nomeia o nó que divergiu. E dissolve a razão de existir da denylist
   # que esta guarda replicava do radar — cópia de regra que só existia para poder somar.
-  v_vec="$(bash "$0" "${FILE}" --json 2>/dev/null | tr '{' '\n' \
+  # UMA invocação self --json, reusada três vezes (v_vec + node_count + edge_count). A versão
+  # anterior spawnava o MESMO parse completo do grafo 3× por --assert-parity — a 62 grafos no
+  # lint, eram 124 re-parses idênticos jogados fora (Elenxo 2026-08-13, backlog P3 realinhado:
+  # o alvo original, sha1sum do coverage, estava obsoleto — o caminho caro só dispara com órfãs).
+  v_json="$(bash "$0" "${FILE}" --json 2>/dev/null)"
+  v_vec="$(printf '%s' "${v_json}" | tr '{' '\n' \
            | sed -nE 's/.*"id":"([^"]+)".*"w":([0-9.]+).*/\1\t\2/p' \
            | awk -F'\t' '{printf "%s\t%.2f\n", $1, $2}' | LC_ALL=C sort)"
   r_vec="$(bash "${HERE}/kg-radar.sh" "${FILE}" --weights-tsv 2>/dev/null | LC_ALL=C sort)"
@@ -120,8 +125,8 @@ if [ "${MODE}" = "--assert-parity" ]; then
     printf 'kg-view: paridade não verificável (radar não reportou contagens — grafo com contradição?).\n' >&2
     exit 0
   fi
-  v_n="$(bash "$0" "${FILE}" --json | grep -oE '"node_count":[0-9]+' | grep -oE '[0-9]+')"
-  v_e="$(bash "$0" "${FILE}" --json | grep -oE '"edge_count":[0-9]+' | grep -oE '[0-9]+')"
+  v_n="$(printf '%s' "${v_json}" | grep -oE '"node_count":[0-9]+' | grep -oE '[0-9]+')"
+  v_e="$(printf '%s' "${v_json}" | grep -oE '"edge_count":[0-9]+' | grep -oE '[0-9]+')"
   if [ "${r_n}" = "${v_n}" ] && [ "${r_e}" = "${v_e}" ]; then
     printf '✅ paridade kg-view × kg-radar: %s nós, %s arestas\n' "${r_n}" "${r_e}"
     exit 0

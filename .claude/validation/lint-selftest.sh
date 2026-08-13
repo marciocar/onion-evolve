@@ -9589,6 +9589,47 @@ run_aside_router_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
+run_kg_reverify_schema_selftests() {
+  # WIRE-IN 2026-08-13 (Elenxo de mecanismos, P5): o kg-reverify-schema-check.sh nasceu em
+  # 2026-08-12 com selftest embutido (6 casos) e ZERO consumidores — o autor da guarda contra
+  # guardas-órfãs a deixou órfã. "Sem consumidor = falta ligar, não licença para apagar."
+  local chk="${REPO_ROOT}/.claude/validation/kg-reverify-schema-check.sh"
+  [ -f "${chk}" ] || { record_skip "kg-reverify-schema: script ausente"; return; }
+  # (a) selftest embutido — ASSERINDO O PLACAR, não só o rc (Elenxo 2026-08-13/B2: "6/6" era
+  #     string livre nunca conferida; um 7º caso deixaria a bancada anunciando número morto).
+  local st_out
+  st_out="$(bash "${chk}" --selftest 2>&1)" || true
+  if printf '%s\n' "${st_out}" | grep -qE '^[0-9]+/[0-9]+ ' && ! printf '%s\n' "${st_out}" | grep -q '✗'; then
+    record_pass "kg-reverify-schema: selftest embutido verde ($(printf '%s' "${st_out}" | grep -oE '^[0-9]+/[0-9]+' | tail -1))"
+  else
+    record_fail "kg-reverify-schema: selftest" "reprovou ou não somou — rode bash ${chk} --selftest"
+  fi
+  # (b) o schema real do repo está conforme
+  if bash "${chk}" >/dev/null 2>&1; then
+    record_pass "kg-reverify-schema: o KgReverifySchema real está estruturalmente conforme"
+  else
+    record_fail "kg-reverify-schema: schema real" "o schema embarcado em kg-freshness.md reprova — rode bash ${chk}"
+  fi
+  # (c) MUTANTE DE PRODUÇÃO (Elenxo 2026-08-13/M5): (a)+(b) provam que o verde passa — nunca que a
+  #     guarda ACUSA no caminho real ("o oposto de acusar-sem-medir não é absolver-sem-medir",
+  #     doutrina do próprio consumed-mode-check). Monta uma árvore mínima com um kg-freshness.md
+  #     SABOTADO (required duplicado — o defeito fundador de 2026-08-12) e exige a violação.
+  local mroot
+  mroot="$(mktemp -d)"
+  mkdir -p "${mroot}/.claude/commands/meta" "${mroot}/.claude/validation"
+  cp "${chk}" "${mroot}/.claude/validation/"
+  printf '```javascript\nconst KgReverifySchema = {\n  type: "object",\n  required: ["node_id"],\n  properties: { node_id: { type: "string" } },\n  allOf: [\n    { if: { required: ["verdict"], properties: {} },\n      then: { required: ["blocked_by"], properties: {} } },\n  ],\n  required: ["claims_total"],\n};\n```\n' > "${mroot}/.claude/commands/meta/kg-freshness.md"
+  local m_out m_rc=0
+  m_out="$(bash "${mroot}/.claude/validation/kg-reverify-schema-check.sh" 2>&1)" || m_rc=$?
+  rm -rf "${mroot}"
+  if [ "${m_rc}" -eq 1 ] && printf '%s\n' "${m_out}" | grep -q "REQUIRED-DUPLICADO"; then
+    record_pass "kg-reverify-schema: MUTANTE (required duplicado) é ACUSADO no caminho de produção"
+  else
+    record_fail "kg-reverify-schema: mutante" "required duplicado NÃO foi acusado (rc=${m_rc}) — a guarda absolve sem medir"
+  fi
+}
+
+run_kg_reverify_schema_selftests
 run_backtick_ref_selftests
 run_site_deeplink_selftests
 run_migalhas_generate_selftests
