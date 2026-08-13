@@ -1,6 +1,6 @@
 ---
 branch: fix/review-dirty-tree-guard
-pr: pendente
+pr: 592
 date: 2026-08-13
 reviewed_diff_sha256: 10eb53f0a7dd06a9a195feff82864eed337b6bdfb1a60c3a14b99bf0f1a99633
 findings_total: 6
