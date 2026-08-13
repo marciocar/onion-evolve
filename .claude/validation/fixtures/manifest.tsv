@@ -95,3 +95,9 @@ lint	r13-template-dialect/bad-cursor-token.md	.claude/commands/common/templates	
 lint	r13-template-dialect/good-native-tools.md	.claude/commands/common/templates	good	
 lint	r14-metaspec-dialect/bad-cursor-list-item.md	docs/meta-specs	bad	dialeto Cursor
 lint	r14-metaspec-dialect/good-cursor-prose-mention.md	docs/meta-specs	good	
+lint	r16-count-drift/bad-invocaveis-invertida.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/good-invocaveis-invertida.md	docs	good
+lint	r16-count-drift/bad-conjuntiva.md	docs	bad	divergente da SSOT
+lint	r16-count-drift/good-conjuntiva.md	docs	good
+lint	r16-count-drift/bad-table-total.md	docs	bad	não bate com nenhuma contagem
+lint	r16-count-drift/good-table-total.md	docs	good
