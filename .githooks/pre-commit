@@ -34,7 +34,8 @@ fi
 # copiando a árvore). Assim a quebra de fixture/guarda é pega LOCAL, não só no CI — sem
 # penalizar todo commit. CI roda sempre (onion-validate.yml).
 #
-# CUSTO MEDIDO — 2026-08-06: **921s (15,3 min)**, 612 guardas. Este comentário declarava
+# CUSTO MEDIDO — 2026-08-13: **1136s (18,9 min)**, 802 casos (Elenxo re-mediu; era 921s/612
+# em 2026-08-06 — o número cresceu 23% e +190 casos SEM ninguém re-carimbar). Este comentário declarava
 # "~1min" e ninguém tinha cronometrado: 15x de desvio, um caso de `behavior-over-declaration`
 # no lugar mais caro, porque é por este número que se decide se vale rodar local. Se você
 # mexer aqui, RE-MEDIR e trocar a linha — número de gate sem carimbo versionado é como a

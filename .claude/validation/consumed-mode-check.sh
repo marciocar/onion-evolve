@@ -49,12 +49,15 @@
 # `check_review_artifact` consome `--format=tsv`. O defeito IDÊNTICO ao que eu curara de manhã no
 # kg-trace-resolve. Nenhuma releitura minha o pegou; este join pegou.
 #
-# LACUNAS REAIS QUE ELE ACHOU e que seguem abertas (verificadas à mão, não são artefato):
-#   · inventory.sh          — a produção consome `--markdown`; o selftest NUNCA o invoca
-#   · migalhas-generate.sh  — a produção consome `--check`; o selftest NUNCA o invoca
+# LACUNAS REAIS QUE ELE ACHOU à época — ⚠️ AMBAS FECHADAS DESDE ENTÃO (Elenxo 2026-08-13:
+# lint-selftest.sh:6023 exercita `inventory.sh --markdown`; :6078 exercita
+# `migalhas-generate.sh --check`; o próprio instrumento devolve `0 sem teste` hoje):
+#   · inventory.sh          — a produção consome `--markdown` (era lacuna; coberto)
+#   · migalhas-generate.sh  — a produção consome `--check` (era lacuna; coberto)
 #
-# O QUE FALTA para virar REGRA: (a) distinguir invocação de menção-em-string (parser, não regex);
-# (b) triar o resíduo caso a caso; (c) só então wire-in HARD. É ciclo próprio, não puxado ainda.
+# O QUE FALTAVA para virar REGRA (registro de 2026-08-06 — ⚠️ o ciclo FOI puxado: a REGRA 59
+# [HARD] existe e consome este script, ver o topo deste cabeçalho): (a) distinguir invocação de
+# menção-em-string; (b) triar o resíduo; (c) wire-in HARD. Cumprido.
 #
 # Uso  : bash .claude/validation/consumed-mode-check.sh [<repo_root>] [--format tsv|--list]
 # Exit : 0 = todo modo consumido é exercitado · 1 = há modo sem teste · 2 = uso inválido

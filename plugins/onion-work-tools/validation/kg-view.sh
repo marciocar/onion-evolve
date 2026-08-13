@@ -94,8 +94,8 @@ if [ "${MODE}" = "--assert-parity" ]; then
   # O vetor compara par a par e nomeia o nó que divergiu. E dissolve a razão de existir da denylist
   # que esta guarda replicava do radar — cópia de regra que só existia para poder somar.
   # UMA invocação self --json, reusada três vezes (v_vec + node_count + edge_count). A versão
-  # anterior spawnava o MESMO parse completo do grafo 3× por --assert-parity — a 58 grafos no
-  # lint, eram 116 re-parses idênticos jogados fora (Elenxo 2026-08-13, backlog P3 realinhado:
+  # anterior spawnava o MESMO parse completo do grafo 3× por --assert-parity — a 62 grafos no
+  # lint, eram 124 re-parses idênticos jogados fora (Elenxo 2026-08-13, backlog P3 realinhado:
   # o alvo original, sha1sum do coverage, estava obsoleto — o caminho caro só dispara com órfãs).
   v_json="$(bash "$0" "${FILE}" --json 2>/dev/null)"
   v_vec="$(printf '%s' "${v_json}" | tr '{' '\n' \
