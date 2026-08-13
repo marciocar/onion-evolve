@@ -487,11 +487,37 @@ nodes:
     node_type: decision
     trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
     layer: audit
-    plane: DEV
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: p11-em-producao-boot-sem-linha-convites-era-2-agora-0-env-sem-courtesy-byok-e-sdk-0-3-231
     impact: 4
-    confidence: 0.85
+    confidence: 1.0
+    status: done
+    label: "Corolário do fail-closed — P9 (remover legacyAuthTokenOk e a leitura de BRIDGE_AUTH_MODE do CÓDIGO + rotacionar/apagar o valor) vem IMEDIATAMENTE após o P8 verde, na MESMA janela. A v1 recomendava 'depois de dias de OIDC verde' — isso mantém viva, sem prazo, a única linha que ainda honra o segredo compartilhado, reativável por variável mal reposta. ✅ EXECUTADO 2026-08-13 (P11, bridge PRs #3/#4, com atraso de 3 dias sobre o prazo declarado 'EXPIRA 2026-08-10' — a data passou SEM mecanismo que a cobrasse, só comentário; a lição é a classe prazo-em-comentário-não-dispara): AUTH_TOKEN, dual-legacy, convites courtesy/byok como auth e o encanamento byok inteiro SAÍRAM do binário; .env de produção limpo (INVITE_TOKENS_COURTESY/BYOK removidos, backup .pre-update); boot parou de anunciar 'convites' (era 2 linhas, medido 0 após o update) e passou a anunciar o pool a2a real. E o 6º Elenxo achou a lei da linha no próprio corte: PWA coletava sk-ant- vivo sob texto falso, .env.example instruía a config morta, README mandava colar AUTH_TOKEN — 3 superfícies curadas + expurgo do segredo em localStorage no load."
+
+  - id: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
+    node_type: question
+    layer: audit
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: medido-pelo-6o-elenxo-idp-inalcancavel-3-reqs-seguidas-5s-cada-uma-fetch-novo-ao-jwks-por-request
     status: open
-    label: "Corolário do fail-closed — P9 (remover legacyAuthTokenOk e a leitura de BRIDGE_AUTH_MODE do CÓDIGO + rotacionar/apagar o valor) vem IMEDIATAMENTE após o P8 verde, na MESMA janela. A v1 recomendava 'depois de dias de OIDC verde' — isso mantém viva, sem prazo, a única linha que ainda honra o segredo compartilhado, reativável por variável mal reposta"
+    impact: 4
+    confidence: 0.9
+    label: "PRE-EXISTENTE, mas o P11 ELEVOU O RAIO — e essa mudanca de risco precisa morar aqui: antes, numa queda do Logto, o caminho legado ainda autenticava (degradado); agora NINGUEM autentica (queda total) E cada request re-busca o JWKS (medido pelo 6o Elenxo com IdP num buraco negro: 3 reqs seguidas, 5s cada, um fetch novo por request — retry storm contra a dependencia que ja esta caindo). O piso de 60s (identity.ts:41) so guarda o ramo force=true; o ramo normal so retorna cedo com cache POPULADO e fresco, e jwksFetchedAt so atualiza no sucesso. CURA DESENHADA pelo Elenxo (jwksAttemptedAt marcando a TENTATIVA + timeout de 5s no fetch + jwksSelfCheck reportando ok=cache.size>0). GATILHO: PR proprio no bridge; e o /health mentindo ok:true durante queda do IdP entra na mesma cura."
+    trace: "/home/onion/onion-bridge/src/identity.ts"
+
+  - id: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
+    node_type: question
+    layer: audit
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: medido-pelo-6o-elenxo-gate-falso-de-5s-health-foi-de-9-6ms-a-3-99s-durante-um-unico-post-a2a
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "PRE-EXISTENTE, achado pelo 6o Elenxo ao procurar 'outra rota cara fora do rate-limit': POST /a2a faz spawnSync do gate do core (a2a.ts:50, timeout 15s) — e spawnSync BLOQUEIA o event loop do Node inteiro. Medido com gate falso dormindo 5s: /health foi de 9,6ms a 3,99s durante UM unico request a2a; todos os streams SSE de /chat congelam junto. Um remetente a2a (autenticado por token de pool, nao identidade) pode negar servico ao bridge inteiro dentro do timeout. CURA: spawn assincrono (execFile+promise) + rate-limit proprio no /a2a. GATILHO: PR proprio no bridge, junto ou apos o do JWKS."
+    trace: "/home/onion/onion-bridge/src/a2a.ts"
 
   # ---- F4 (preservado): ACOPLAMENTO BRIDGE->LOGTO ----
   - id: C_logto_now_critical
@@ -754,7 +780,7 @@ nodes:
 
   - id: E_p5_identity_live
     node_type: evidence
-    trace: ops/bridge-auth/bridge-src/identity.ts
+    trace: /home/onion/onion-bridge/src/identity.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -791,7 +817,7 @@ nodes:
 
   - id: E_p6_pkce_live
     node_type: evidence
-    trace: ops/bridge-auth/bridge-src/web-oidc.ts
+    trace: /home/onion/onion-bridge/src/web-oidc.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -840,7 +866,7 @@ nodes:
 
   - id: E_p9_complete
     node_type: evidence
-    trace: ops/bridge-auth/bridge-src/identity.ts
+    trace: /home/onion/onion-bridge/src/identity.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -852,7 +878,7 @@ nodes:
 
   - id: E_p9_human_admin_proven
     node_type: evidence
-    trace: ops/bridge-auth/bridge-src/web-oidc.ts
+    trace: /home/onion/onion-bridge/src/web-oidc.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -864,7 +890,7 @@ nodes:
 
   - id: C_identity_bought_who_not_what
     node_type: claim
-    trace: ops/bridge-auth/bridge-src/chat.ts
+    trace: /home/onion/onion-bridge/src/chat.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -876,7 +902,7 @@ nodes:
 
   - id: C_allowedtools_does_not_restrict
     node_type: claim
-    trace: ops/bridge-auth/bridge-src/chat.ts
+    trace: /home/onion/onion-bridge/src/chat.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -900,7 +926,7 @@ nodes:
 
   - id: E_p10_service_cannot_write
     node_type: evidence
-    trace: ops/bridge-auth/bridge-src/chat.ts
+    trace: /home/onion/onion-bridge/src/chat.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -1243,7 +1269,7 @@ nodes:
 
   - id: D_pull_serves_history_not_queue
     node_type: decision
-    trace: ops/bridge-auth/bridge-src/federation.ts
+    trace: /home/onion/onion-bridge/src/federation.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -1255,7 +1281,7 @@ nodes:
 
   - id: E_pull_endpoint_works
     node_type: evidence
-    trace: ops/bridge-auth/bridge-src/federation.ts
+    trace: /home/onion/onion-bridge/src/federation.ts
     layer: audit
     plane: PROD
     impact: 5
@@ -1267,7 +1293,7 @@ nodes:
 
   - id: C_org_token_has_no_org_claim
     node_type: claim
-    trace: ops/bridge-auth/bridge-src/identity.ts
+    trace: /home/onion/onion-bridge/src/identity.ts
     layer: audit
     plane: PROD
     impact: 4
@@ -1279,7 +1305,7 @@ nodes:
 
   - id: C_p10_broke_scope_default
     node_type: claim
-    trace: ops/bridge-auth/bridge-src/identity.ts
+    trace: /home/onion/onion-bridge/src/identity.ts
     layer: audit
     plane: PROD
     impact: 3
@@ -1902,3 +1928,12 @@ edges:
   - from: C_p9_blocked_no_admin_oidc
     to: E_auth_token
     edge_type: SUPPORTS
+  - from: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
+    to: C_logto_now_critical
+    edge_type: SUPPORTS
+  - from: D_retire_legacy_immediately
+    to: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
+    edge_type: CAUSES
+  - from: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
+    to: C_a2a_gate_narrow
+    edge_type: TRACES_TO
