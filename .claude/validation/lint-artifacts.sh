@@ -1042,7 +1042,14 @@ check_plugins_sync() {
       continue
     fi
     tmp="$(mktemp -d)"
-    bash "${asm}" "${manifest}" "${REPO_ROOT}" "${tmp}/${name}" >/dev/null 2>&1
+    # ASSEMBLE FALHO É VIOLATION, NÃO MORTE (2º Elenxo 2026-08-13, achado adjacente pré-existente:
+    # apagar uma fonte bundlada não produzia 'fora de sincronia' — matava o lint em rc=2 SEM
+    # sumário, e os chamadores por ausência-de-mensagem liam a morte como PASS).
+    if ! bash "${asm}" "${manifest}" "${REPO_ROOT}" "${tmp}/${name}" >/dev/null 2>&1; then
+      violation "HARD" "plugins/${name}" "assemble FALHOU (fonte bundlada ausente/quebrada?) — rode 'bash .claude/utils/marketplace/assemble-plugin.sh ${manifest#${REPO_ROOT}/}' e leia o erro"
+      rm -rf "${tmp}"
+      continue
+    fi
     # (a) tudo exceto provenance.json (ref/commit_date voláteis lá dentro)
     if ! diff -r -x provenance.json "${committed}" "${tmp}/${name}" >/dev/null 2>&1; then
       violation "HARD" "plugins/${name}" "plugin fora de sincronia com a fonte — regenere com 'bash .claude/utils/marketplace/assemble-plugin.sh ${manifest#${REPO_ROOT}/}'"

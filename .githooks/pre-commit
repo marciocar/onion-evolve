@@ -22,6 +22,86 @@ LINT="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
 # Sem o linter no repo (ex.: projeto-alvo sem .claude/validation) → não bloqueia.
 [ -f "${LINT}" ] || exit 0
 
+# ── AUTO-REGENERAÇÃO DE PLUGINS COM RASTRO (Q_R19_AUTOFIX, opção b do maestro; v2 pós-4º Elenxo) ──
+# A R19 nunca acusa nada DECIDÍVEL — cura única mecânica é candidata a auto-fix COM RASTRO; a R19
+# segue intacta como guarda e HARD no CI. A v1 deste bloco fechou 57% do que declarava (4º Elenxo):
+# o grep textual do manifesto era CEGO a entradas-DIRETÓRIO (72 de 167 fontes), o `git add` sob
+# commit-por-pathspec ia para um índice TEMPORÁRIO (deixando um revert staged para o commit
+# seguinte), e o assemble lê a ÁRVORE — staging parcial publicaria WIP que o autor deixou fora.
+# TETO DECLARADO: rename de fonte (git mv) não dispara o auto-fix — o assemble-falho da R19
+# bloqueia o commit de qualquer forma (fail-loud, não silêncio).
+ASM="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
+VDIR="${REPO_ROOT}/.claude/utils/marketplace/verticals"
+_autofix_on=1
+# A2: commit por pathspec usa índice temporário (next-index-*.lock) — o add iria para o índice
+# REAL, que o commit em curso não usa: o plugin velho ficaria staged como um revert fantasma.
+case "${GIT_INDEX_FILE:-}" in
+  ""|*/index|*/index.lock) : ;;
+  *) echo "⏭️  auto-fix de plugins PULADO: commit por pathspec usa índice temporário — se tocou fonte bundlada, rode o assemble e 'git add plugins/<vertical>' à mão (a R19 do CI confere)."
+     _autofix_on=0 ;;
+esac
+if [ "${_autofix_on}" -eq 1 ] && [ -f "${ASM}" ] && [ -d "${VDIR}" ]; then
+  _staged_f="$(mktemp)"; _pat_f="$(mktemp)"
+  git diff --cached --name-only --diff-filter=ACMRD > "${_staged_f}" || true
+  if [ -s "${_staged_f}" ]; then
+    for _m in "${VDIR}"/*.manifest.sh; do
+      [ -f "${_m}" ] || continue
+      # A1/A4: as fontes vêm de SOURCE do manifesto — a MESMA leitura do assemble e da R19,
+      # que enxerga arquivos E diretórios como declarados (o grep textual não). O manifesto e o
+      # próprio assembler também mudam a saída, então entram como fontes. Cada fonte vira o par
+      # de padrões ^f$|^f/ (match exato OU qualquer arquivo sob o dir), materializado em ARQUIVO
+      # — não em pipe — porque `printf lista | grep -q` sob pipefail morre de SIGPIPE acima de
+      # ~78KB de lista e o match é ENGOLIDO (fail-open medido pelo 4º Elenxo; classe do PR #502).
+      { ( . "${_m}" >/dev/null 2>&1 || true
+          printf '%s\n' ${COMMANDS[@]+"${COMMANDS[@]}"} ${AGENTS[@]+"${AGENTS[@]}"} \
+            ${SKILLS[@]+"${SKILLS[@]}"} ${VALIDATION[@]+"${VALIDATION[@]}"} \
+            ${UTILS[@]+"${UTILS[@]}"} ${DOCS[@]+"${DOCS[@]}"} ${HOOKS[@]+"${HOOKS[@]}"} )
+        printf '%s\n' "${_m#${REPO_ROOT}/}" "${ASM#${REPO_ROOT}/}"
+      } | sed 's|/$||; /^$/d; s/[.[\*^$()+?{|]/\\&/g; s|.*|^&$\|^&/|' > "${_pat_f}"
+      grep -qEf "${_pat_f}" "${_staged_f}" || continue
+      _name="$(basename "${_m}" .manifest.sh)"
+      # A3: o assemble lê a ÁRVORE. Fonte casada com mudança NÃO-staged = o auto-fix publicaria
+      # conteúdo que o autor deliberadamente deixou fora do commit, dentro de artefato gerado que
+      # ninguém lê em review. Abortar com instrução é a única resposta que não mente.
+      _dirty="$(git diff --name-only | grep -Ef "${_pat_f}" | head -1 || true)"
+      if [ -n "${_dirty}" ]; then
+        echo "❌ auto-fix de ${_name} ABORTADO: '${_dirty}' tem mudança NÃO-staged e o assemble lê a árvore — publicaria conteúdo fora do commit. Stagee tudo (git add) ou guarde (git stash -k) antes."
+        rm -f "${_staged_f}" "${_pat_f}"; exit 1
+      fi
+      echo "🔁 fonte bundlada de ${_name} no commit → regenerando o plugin (auto-fix com rastro; a R19 segue HARD no CI)"
+      if ! bash "${ASM}" "${_m}" >/dev/null 2>&1; then
+        echo "❌ assemble de ${_name} FALHOU (fonte ausente/quebrada?) — rode 'bash ${ASM#${REPO_ROOT}/} ${_m#${REPO_ROOT}/}' e leia o erro."
+        rm -f "${_staged_f}" "${_pat_f}"; exit 1
+      fi
+      # A8: se o add falhar, o rastro acima teria mentido — falha vira aviso explícito, nunca ||true mudo.
+      git add "${REPO_ROOT}/plugins/${_name}" || echo "⚠️  git add de plugins/${_name} FALHOU — stagee à mão antes de commitar de novo."
+    done
+  fi
+  rm -f "${_staged_f}" "${_pat_f}"
+fi
+
+# ── GATILHO DIRETO DO SUT (Q_GATILHO_DO_WIREIN, 3ª via — nem REGRA às pressas, nem esperar o
+# incidente): a guarda kg-reverify-schema-check vigia commands/meta/kg-freshness.md, que NÃO mora
+# em validation/ — sem esta chamada, editar o SUT sozinho passava local e o vermelho apareceria
+# num commit futuro que tocasse validation/, culpando a mudança errada. Custa ~0,2s. ──
+KGCHK="${REPO_ROOT}/.claude/validation/kg-reverify-schema-check.sh"
+if [ -f "${KGCHK}" ] \
+   && git diff --cached --name-only --diff-filter=ACMR | grep -q '^\.claude/commands/meta/kg-freshness\.md$'; then
+  echo "🧪 kg-freshness.md no commit → validando a estrutura do KgReverifySchema…"
+  # TETO DECLARADO (4º Elenxo/A7): o check lê a ÁRVORE, não o índice — com staging parcial do
+  # kg-freshness.md ele valida a versão da árvore. Aceito: o CI valida o commit real.
+  _kgrc=0; bash "${KGCHK}" || _kgrc=$?
+  if [ "${_kgrc}" -eq 1 ]; then
+    echo "❌ Commit bloqueado: o schema embarcado em kg-freshness.md está estruturalmente quebrado."
+    exit 1
+  elif [ "${_kgrc}" -ge 2 ]; then
+    # rc=2 é ERRO DE EXECUÇÃO do check (arquivo movido, schema não encontrado) — culpar o schema
+    # apontaria o defeito errado (4º Elenxo/A7).
+    echo "❌ Commit bloqueado: o kg-reverify-schema-check NÃO PÔDE rodar (rc=${_kgrc}) — leia o erro acima; o defeito é do ambiente/paths, não necessariamente do schema."
+    exit 1
+  fi
+fi
+
 echo "🧅 Onion pre-commit — rodando lint determinístico…"
 if ! bash "${LINT}"; then
   echo ""

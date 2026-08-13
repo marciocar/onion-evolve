@@ -9629,6 +9629,64 @@ run_kg_reverify_schema_selftests() {
   fi
 }
 
+run_hook_autofix_selftests() {
+  # CATRACA DO AUTO-FIX DO PRE-COMMIT (parecer do CI no PR #590: guard alterada/criada SEM fixture
+  # automatizada — commands.md §11; os repros eram manuais e não sobreviviam ao próximo commit).
+  # Roda os blocos REAIS do hook (extraídos por sed do arquivo vivo — não uma cópia que envelhece)
+  # dentro de um CLONE LOCAL descartável, porque o hook precisa de git e o SANDBOX da bancada não é repo.
+  local hook="${REPO_ROOT}/.githooks/pre-commit"
+  [ -f "${hook}" ] || { record_skip "hook-autofix: pre-commit ausente"; return; }
+  grep -q "AUTO-REGENERAÇÃO DE PLUGINS" "${hook}" || { record_skip "hook-autofix: bloco ausente do hook"; return; }
+  local hc; hc="$(mktemp -d)"
+  # clone local raso: hardlinks, ~1-2s; working tree completa para o assemble ler
+  if ! git clone --quiet --local --no-hardlinks --depth 1 "file://${REPO_ROOT}" "${hc}/repo" 2>/dev/null; then
+    record_skip "hook-autofix: clone local falhou"; rm -rf "${hc}"; return
+  fi
+  local blk="${hc}/blk.sh"
+  { echo 'set -euo pipefail'; echo 'REPO_ROOT="$(git rev-parse --show-toplevel)"'
+    sed -n '/AUTO-REGENERAÇÃO DE PLUGINS COM RASTRO/,/^fi$/p' "${hook}"; echo 'echo BLOCO_FIM'; } > "${blk}"
+  local out
+  # (a) entrada-DIRETÓRIO dispara (o repro que a v1 do auto-fix NÃO cobria — 43% das fontes)
+  ( cd "${hc}/repo" && printf '\n<!-- catraca-dir -->\n' >> .claude/commands/engineer/plan.md \
+    && git add .claude/commands/engineer/plan.md ) >/dev/null 2>&1
+  out="$(cd "${hc}/repo" && bash "${blk}" 2>&1)" || true
+  if printf '%s\n' "${out}" | grep -q "onion-engineering" && printf '%s\n' "${out}" | grep -q "BLOCO_FIM"; then
+    record_pass "hook-autofix: (a) fonte em entrada-DIRETÓRIO dispara a regeneração (a cegueira da v1 não volta)"
+  else
+    record_fail "hook-autofix: (a) entrada-dir" "não regenerou — o matcher regrediu para grep textual?"
+  fi
+  ( cd "${hc}/repo" && git checkout -q -- . && git reset -q ) >/dev/null 2>&1
+  # (b) GIT_INDEX_FILE temporário PULA com aviso (o revert-fantasma do commit-por-pathspec não volta)
+  ( cd "${hc}/repo" && printf '\n<!-- x -->\n' >> .claude/commands/meta/kg.md && git add .claude/commands/meta/kg.md ) >/dev/null 2>&1
+  out="$(cd "${hc}/repo" && GIT_INDEX_FILE=".git/next-index-999.lock" bash "${blk}" 2>&1)" || true
+  if printf '%s\n' "${out}" | grep -q "PULADO" && ! printf '%s\n' "${out}" | grep -q "🔁"; then
+    record_pass "hook-autofix: (b) índice temporário pula com aviso (sem revert fantasma)"
+  else
+    record_fail "hook-autofix: (b) índice temporário" "não pulou — o gate por GIT_INDEX_FILE sumiu?"
+  fi
+  ( cd "${hc}/repo" && git checkout -q -- . && git reset -q ) >/dev/null 2>&1
+  # (c) staging PARCIAL de fonte casada ABORTA (o vazamento de WIP não volta)
+  ( cd "${hc}/repo" && printf '\n<!-- staged -->\n' >> .claude/commands/meta/kg.md \
+    && git add .claude/commands/meta/kg.md && printf '\n<!-- unstaged -->\n' >> .claude/commands/meta/kg.md ) >/dev/null 2>&1
+  local rc_c=0
+  out="$(cd "${hc}/repo" && bash "${blk}" 2>&1)" || rc_c=$?
+  if [ "${rc_c}" -ne 0 ] && printf '%s\n' "${out}" | grep -q "ABORTADO"; then
+    record_pass "hook-autofix: (c) staging parcial aborta com instrução (WIP não vaza para o plugin)"
+  else
+    record_fail "hook-autofix: (c) staging parcial" "não abortou (rc=${rc_c}) — o assemble publicaria WIP não-staged"
+  fi
+  # (d) R19 alterada: assemble FALHO acusa E SOMA (era morte rc=2 sem sumário)
+  ( cd "${hc}/repo" && rm -rf .claude/skills/onion-orchestration ) >/dev/null 2>&1
+  out="$(cd "${hc}/repo" && bash .claude/validation/lint-artifacts.sh --only="${hc}/repo/.claude/utils/marketplace/verticals/onion-work-tools.manifest.sh" 2>&1)" || true
+  if printf '%s\n' "${out}" | grep -q "assemble FALHOU" && printf '%s\n' "${out}" | grep -q "Sumário"; then
+    record_pass "hook-autofix: (d) assemble falho vira violation E o lint soma (morte silenciosa não volta)"
+  else
+    record_fail "hook-autofix: (d) assemble falho" "não acusou ou não somou — a R19 regrediu para morte rc=2?"
+  fi
+  rm -rf "${hc}"
+}
+
+run_hook_autofix_selftests
 run_kg_reverify_schema_selftests
 run_backtick_ref_selftests
 run_site_deeplink_selftests
