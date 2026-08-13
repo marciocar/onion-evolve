@@ -1,6 +1,6 @@
 ---
 branch: feat/update-bridge-mechanism
-pr: pendente
+pr: 593
 date: 2026-08-13
 reviewed_diff_sha256: 2a6ecacf5870fc555ddf1c4523a4d55a4ebd8008bea538b01ae01588686d64e8
 findings_total: 19
