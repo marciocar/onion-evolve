@@ -141,6 +141,16 @@ nodes:
     confidence: 1.0
     label: "FECHA O GAP ORFAO DA LINHA — o achado ADJACENTE do 2o Elenxo que ficou nomeado no residuo do PR #588 e NUNCA virou no (a auditoria de fechamento pegou: item sem estado no grafo e exatamente o que o controle do maestro proibe). O defeito pre-existente: `bash asm ...` como comando simples sob `set -e` — se o assemble falhasse (fonte bundlada apagada/quebrada), o lint MORRIA em rc=2 SEM sumario, e os chamadores por ausencia-de-mensagem liam a morte como PASS. Apagar uma fonte bundlada nao produzia 'fora de sincronia': produzia silencio. CURADO: `if ! bash asm...; then violation HARD 'assemble FALHOU' + continue`. PROVADO removendo uma skill bundlada de verdade: o lint acusou `assemble FALHOU (fonte bundlada ausente/quebrada?)` com o comando de diagnostico E imprimiu o sumario — acusa e soma, nao morre."
 
+  - id: Q_PARECER_SOBRE_DIFF_INVERTIDO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: refutado-por-git-show-do-head-remoto-catraca-presente-2x-guarda-na-linha-1049-diff-real-adiciona-58-mais-9-linhas
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "DEFEITO DO INSTRUMENTO DE REVISAO, 1a OCORRENCIA (PR #590, run 31735494448): o parecer final do onion-review revisou um diff INVERTIDO — acusou 'remocao de run_hook_autofix_selftests (58 linhas)' e 'troca do guard HARD do assemble por chamada sem checagem', que sao o ESPELHO EXATO do que o PR adiciona. O rastro no proprio parecer: titulo 'Revisao — diff nao commitado' (em CI nao existe diff nao-commitado — o revisor recebeu ou computou o diff no sentido errado, provavelmente head->base em vez de base->head). REFUTADO POR EVIDENCIA antes do merge: git show do HEAD remoto tem a catraca (definicao+chamada), a violation 'assemble FALHOU' na linha 1049, e git diff main...head ADICIONA +58/+9 nas duas superficies. NOTA DE CALIBRACAO: o parecer ANTERIOR do mesmo instrumento (head 183a0d3) foi CORRETO e util — acusou a falta de fixture (commands.md §11) que virou a catraca; o instrumento nao esta cego, esta INTERMITENTE no sentido do diff. CLASSE-MAE ja conhecida: 'PR que edita o workflow nao mede o revisor' (onion-review-ci-semantics, 08-04) — mas esta e nova: o revisor mediu o ALVO ERRADO com confianca total, e um leitor que nao verificasse o vivo reverteria a cura acreditando proteger o repo (o modo de falha mais caro: parecer plausivel, assertivo e 100% invertido). GATILHO: 2a ocorrencia de parecer citando conteudo que nao esta no diff real → investigar como a action monta o diff entregue ao revisor (checkout? merge-base? sentido?) e criar guarda mecanica no verdict (ex.: exigir que todo trecho citado como REMOVIDO exista em main e todo ADICIONADO exista no head — conferivel por grep, e a mesma verificacao que fiz a mao)."
+
   - id: A_RUN_DO_ELENXO_DE_MECANISMOS
     node_type: artifact
     plane: DEV
@@ -191,4 +201,7 @@ edges:
     edge_type: CONSTRAINS
   - from: A_RUN_DO_ELENXO_DE_MECANISMOS
     to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: TRACES_TO
+  - from: Q_PARECER_SOBRE_DIFF_INVERTIDO
+    to: Q_R19_AUTOFIX_COM_RASTRO_CANDIDATO
     edge_type: TRACES_TO
