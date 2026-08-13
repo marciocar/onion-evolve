@@ -76,8 +76,32 @@ no grep mas roda por **systemd timer** — consumo se mede pelo runtime, não s�
 - **Não** mover `kg_view_sync` para CI-only nem deletar guardas do top-6 — todas têm incidente real no cabeçalho
 - **Não** aplicar blanket-skip em `check_claude_md_counts`/`check_site_inventory_sync` — um arquivo novo escopado **muda** a contagem total; custo (0,8s) não paga o risco
 
+## P1+P2 implementados — e o 2º Elenxo derrubou metade da 1ª versão
+
+O maestro aprovou a implementação na mesma branch. A 1ª versão dos gates (por prefixo de path)
+passou em todos os testes que EU escolhi — e o 2º Elenxo construiu **três cenários novos onde
+violação real virava verde falso**: drift de fonte bundlada (108 paths dos manifestos fora do
+gate), rename de `work_tool`, e `--only` absoluto não-canônico (`/./`) que desligava a REGRA 20
+inteira. Além de o `cd` da normalização ser morte-silenciosa sob `set -e`.
+
+**A versão final:** gate por **pertencimento ao manifesto** (`grep -qF`, ~ms) + `-ef`
+(inode-compare, sem `cd`) + `*/commands/meta/*` no gate da R37. Re-provada contra os três repros
+do revisor, um a um.
+
+## Números finais (A/B, mesmo ambiente)
+
+| medição | antes | depois |
+|---|---|---|
+| `--only` de 1 arquivo | 15,1–16,4s | **4,9–5,2s (3,1×)** |
+| bancada completa | 1487,6s | 1227,8s (**-17,5%**) |
+| casos | 798/0 | 798/0 + **2 casos de catraca novos** |
+| lint completo | 0 HARD | 0 HARD, veredito idêntico |
+
 ## Teto declarado
 
-A extrapolação "18min de bancada recuperáveis" **excede o total observado** (~15min) — a própria
-lente rotulou: caching de kernel amortiza; o número confiável é o ganho **por invocação**
-(10,9s). O ganho real da bancada só se mede aplicando P1 e cronometrando a suíte inteira.
+A extrapolação "18min de bancada recuperáveis" da lente 2 **não se confirmou** — o ganho real são
+4,3min (-17,5%), porque o caching de kernel já amortizava o custo repetido, exatamente como a
+própria lente suspeitava. O ganho transformador é no `--only` avulso (pre-commit parcial e uso
+interativo): 3,1×. E a reconciliação de grafo foi feita nos dois lados: o nó
+`E_lint_only_ja_existe_e_e_parcial` da refinaria (que concluíra "piso irredutível de ~12s") está
+`superseded` — a medição dele era verdadeira; a conclusão caiu.

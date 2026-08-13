@@ -153,11 +153,17 @@ nodes:
   - id: E_lint_only_ja_existe_e_e_parcial
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.95
-    verified_at: 2026-08-06
-    verified_against: "cronometragem-3-rodadas-only-vs-cheia-e-analise-das-54-guardas"
+    verified_at: 2026-08-13
+    verified_against: "superado-pelo-elenxo-de-mecanismos-gates-por-relevancia-derrubaram-o-piso-de-12s-para-5s"
+    # SUPERSEDED 2026-08-13 (KG: docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml): a
+    # medicao de 2026-08-06 era VERDADEIRA; a conclusao "piso irredutivel" caiu. O Elenxo provou que
+    # as guardas globais podem ser GATEADAS POR RELEVANCIA (area + pertencimento ao manifesto) sem
+    # falsear veredito: --only caiu de ~12-16s para ~5s, diff vazio, bancada 798/0. O que SOBREVIVE:
+    # "o veredito seria falso se escopado A UM ARQUIVO" segue certo para o CONTEUDO da guarda — por
+    # isso o gate decide SE ela roda, nunca fatia O QUE ela compara.
     label: "A GUARDA DO MAESTRO GANHA CHAO MEDIDO, e a resposta e mais interessante que sim/nao: o mecanismo de escopo JA EXISTE no lint-artifacts.sh — a flag --only=<arquivo>, implementada pelo wrapper _find (linha 150) — e ninguem tinha medido o que ela vale. MEDIDO HOJE: passada cheia 44,1/43,4/44,7s contra --only 12,9/12,4/12,1s, ou seja 72% A MENOS. MAS A COBERTURA E PARCIAL, e essa e a parte que decide o desenho: das 54 guardas check_*, apenas 21 (39%) usam _find e portanto honram --only; as 33 restantes (61%) o IGNORAM. E elas nao ignoram por descuido — sao as guardas de COERENCIA GLOBAL (check_plugins_sync, check_inventory_sync, check_graph_sync, check_kg_radar_integrity, check_role_bundle_sync, check_federation_*_sync), que comparam O TODO CONTRA O TODO e cujo veredito seria FALSO se escopado a um arquivo. CONSEQUENCIA: os ~12s do --only sao PISO IRREDUTIVEL, nao gordura — o teto de ganho por escopo ja foi quase todo colhido, e a economia restante teria de vir de otimizar as guardas globais, nao de fatiar mais. DESCOBERTO POR ACIDENTE: rodei --only=lint-rules.md e ele acusou plugins/onion-engineering fora de sincronia — um alvo que o --only supostamente teria excluido"
     trace: ".claude/validation/lint-artifacts.sh --only=<arquivo>"
 

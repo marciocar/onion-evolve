@@ -7242,6 +7242,52 @@ run_capability_selftests() {
   else
     record_skip "capability: honesto sintético → fixture r20 ausente"
   fi
+
+  # ── CATRACA DOS GATES DE --only (Elenxo 2026-08-13, 2º round) ─────────────────────────────
+  # Dois furos que a 1ª versão dos gates teve e que estas provas impedem de voltar:
+  # (i) --only ABSOLUTO NÃO-CANÔNICO (/./ no meio) desligava a REGRA 20 inteira — o filtro era
+  #     string-compare e o path não casava; a cura é inode-compare (-ef). Se alguém "simplificar"
+  #     o -ef de volta para string, este caso FALHA.
+  local nc_src="${REPO_ROOT}/.claude/validation/fixtures/r20-capability-contract/bad-overclaim.manifest.sh"
+  local nc_dst="${SANDBOX}/.claude/utils/marketplace/verticals/selftest-noncanon-probe.manifest.sh"
+  if [ -f "${nc_src}" ]; then
+    cp "${nc_src}" "${nc_dst}"
+    local nc_out
+    nc_out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${SANDBOX}/.claude/utils/marketplace/./verticals/selftest-noncanon-probe.manifest.sh" 2>&1)" || true
+    rm -f "${nc_dst}"
+    if printf '%s
+' "${nc_out}" | grep -q "mas só cumpre"; then
+      record_pass "only-gate: --only não-canônico (/./) mantém a R20 detectando (inode-compare vivo)"
+    else
+      record_fail "only-gate: --only não-canônico" "R20 ficou cega a path com /./ — o -ef regrediu para string-compare?"
+    fi
+  else
+    record_skip "only-gate: não-canônico → fixture r20 ausente"
+  fi
+  # (ii) DRIFT EM FONTE BUNDLADA via --only deve acusar a R19 — a 1ª versão do gate (prefixo de
+  #      path) engolia 2 HARD aqui; a cura é pertencimento ao manifesto (grep -qF). Se alguém
+  #      estreitar o gate de volta para só marketplace/plugins, este caso FALHA.
+  local bd_probe="${SANDBOX}/.claude/commands/meta/kg.md"
+  if [ -f "${bd_probe}" ]; then
+    printf '\n<!-- only-gate-probe -->\n' >> "${bd_probe}"
+    local bd_out
+    bd_out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${bd_probe}" 2>&1)" || true
+    # restaura o sandbox (outros casos usam o mesmo)
+    sed -i '/only-gate-probe/d' "${bd_probe}"
+    # A prova de vida da R19 tem DUAS formas, e a diferenca e o AMBIENTE, nao a guarda: no repo
+    # real (plugins/ presente) o drift sai como "fora de sincronia"; no SANDBOX da bancada (que
+    # copia .claude/ + docs/ mas NAO plugins/) sai como "plugin ausente". As duas provam que a
+    # guarda RODOU sob --only de fonte bundlada. Se o gate regredir para prefixo-de-path, NENHUMA
+    # aparece. (A 1a versao asserava so a 1a forma e falhou no sandbox — medido, nao suposto.)
+    if printf '%s
+' "${bd_out}" | grep -qE "fora de sincronia|plugin ausente"; then
+      record_pass "only-gate: drift em fonte bundlada via --only acusa R19 (pertencimento ao manifesto vivo)"
+    else
+      record_fail "only-gate: fonte bundlada" "R19 não viu drift em comando bundlado sob --only — o gate regrediu para prefixo de path?"
+    fi
+  else
+    record_skip "only-gate: fonte bundlada → kg.md ausente no sandbox"
+  fi
 }
 
 # ---------------------------------------------------------------------------
