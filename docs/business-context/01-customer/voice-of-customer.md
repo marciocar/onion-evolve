@@ -2,7 +2,7 @@
 
 **Última Atualização:** 2026-07-13
 
-> ⚠️ **Gap conhecido:** o Onion não tem base de clientes externos ainda. Este arquivo é **N=1 (maestro) + 4 adotantes de campo + sinais da pesquisa**, não voz-de-mercado. Enriquecer quando houver campo. Majoritariamente `[INFERIDO]`.
+> ⚠️ **Gap conhecido:** o Onion não tem base de clientes externos ainda. Este arquivo é **N=1 (maestro) + os adotantes de campo + sinais da pesquisa**, não voz-de-mercado. A contagem viva se **deriva**, não se copia: `grep -c '^ *kind: adopter' docs/evolution/federation/members.yaml` (régua canônica em [`decisions.md`](../decisions.md)). Enriquecer quando houver campo. Majoritariamente `[INFERIDO]`.
 
 ---
 

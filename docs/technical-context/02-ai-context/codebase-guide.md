@@ -1,6 +1,6 @@
 ---
 title: Guia de Navegação do Codebase — Sistema Onion (core)
-date: 2026-07-25
+date: 2026-08-13
 ---
 
 # Guia de Navegação do Codebase — Sistema Onion (core)
@@ -51,7 +51,7 @@ onion-evolve/
 
 ---
 
-## 2. Comandos — 99 invocáveis em 10 categorias
+## 2. Comandos — 102 invocáveis em 10 categorias
 
 Contagem por categoria (SSOT [`docs/onion/inventory.md`](../../onion/inventory.md), regenerada por
 `.claude/validation/inventory.sh` — contrato: "comando invocável" = `.md` em
@@ -59,18 +59,18 @@ Contagem por categoria (SSOT [`docs/onion/inventory.md`](../../onion/inventory.m
 
 | Categoria | Path | Comandos |
 |-----------|------|---------:|
-| `meta/` | `.claude/commands/meta/` | 33 |
+| `meta/` | `.claude/commands/meta/` | 35 |
 | `product/` | `.claude/commands/product/` | 21 |
 | `engineer/` | `.claude/commands/engineer/` | 12 |
 | `docs/` | `.claude/commands/docs/` | 11 |
 | `validate/` | `.claude/commands/validate/` (inclui subpastas `collab/`, `qa-points/`, `test-strategy/`) | 6 |
 | `git/` | `.claude/commands/git/` | 6 |
 | `test/` | `.claude/commands/test/` | 3 |
-| `design/` | `.claude/commands/design/` | 2 |
+| `design/` | `.claude/commands/design/` | 3 |
 | `quick/` | `.claude/commands/quick/` | 1 |
 | `development/` | `.claude/commands/development/` | 1 |
 | _root_ | `onion.md`, `warm-up.md`, `catch-up.md` | 3 |
-| **Total** | | **99** |
+| **Total** | | **102** |
 
 `.claude/commands/common/` **não conta** como categoria — guarda fragmentos
 compartilhados (`common/templates/`, `common/prompts/`) reusados via referência
@@ -108,25 +108,33 @@ SSOT (`.claude/validation/inventory.sh:48-52`, contrato: "agente" = `.md` em
 Cada agente é um `.md` com YAML header obrigatório (`name`, `description`,
 `model`, `tools`, `category`, `expertise`, `related_agents`, ...) — exemplo lido
 em `.claude/agents/meta/onion.md:1-24`. O agente `@onion` é o orquestrador
-master, citado no header como tendo "conhecimento completo de 51 agentes e 99
-comandos" (`.claude/agents/meta/onion.md:4`) — ou seja, o próprio agente-âncora
+master, cujo header declara conhecimento completo dos agentes e comandos do inventário
+(`.claude/agents/meta/onion.md:4` — hoje 51 e 102) — ou seja, o próprio agente-âncora
 referencia os totais da SSOT.
 
 ---
 
-## 4. Skills — 10 em `.claude/skills/`
+## 4. Skills — 11 em `.claude/skills/`
 
 Contrato: "skill" = diretório em `.claude/skills/` (`.claude/validation/inventory.sh:56-58`).
-Listagem direta (`ls .claude/skills/`, 2026-07-25):
+Listagem direta (`ls .claude/skills/`, 2026-08-13):
 
 `language-standards`, `onion` (orquestrador), `onion-compliance-context`,
 `onion-engineering-context`, `onion-onboarding`, `onion-orchestration`,
-`onion-patterns`, `onion-product-context`, `onion-validation`, `onion-wizard`.
+`onion-patterns`, `onion-product-context`, `onion-retro`, `onion-validation`,
+`onion-wizard`.
 
-> Nota de frescor (re-testada 2026-08-05): o drift que esta nota descrevia **foi corrigido** —
-> `docs/onion/index.md:14` já lista **11 skills**, igual à SSOT gerada. A nota fica como registro
-> do mecanismo, não do defeito: quando um número aqui divergir, **não corrija à mão** — rode
-> `/meta:inventory` + `/docs:build-index onion`, que propagam a partir de `docs/onion/inventory.md`.
+> **Nota de frescor — o que foi re-testado, e só isso** (2026-08-13): o cabeçalho desta seção, a
+> lista acima e as contagens da seção 2 foram conferidos contra `docs/onion/inventory.md` **e**
+> contra `ls .claude/skills/`. Quando um número aqui divergir, **não corrija à mão** — rode
+> `/meta:inventory` + `/docs:build-index onion`, que propagam a partir da SSOT gerada.
+>
+> ⚠️ **Por que esta nota mudou de forma.** A redação anterior dizia "re-testada 2026-08-05: o drift
+> foi corrigido" — mas falava de **outro arquivo** (`docs/onion/index.md`), enquanto o cabeçalho a
+> nove linhas dela dizia `Skills — 10` e a lista omitia `onion-retro`. Quem lia via o carimbo
+> recente e assumia que **esta seção** fora verificada: a nota **blindava** o número errado contra
+> a próxima passada. Carimbo de frescor tem de **nomear o que foi medido** e ficar **junto**
+> daquilo; carimbo genérico ao lado de conteúdo não-medido é pior que carimbo nenhum.
 
 ---
 

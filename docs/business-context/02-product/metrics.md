@@ -10,7 +10,7 @@
 
 | KPI | O que mede | Estado |
 |---|---|---|
-| **Adoção / repos ativos na família** | tração real do método (dogfood + adotantes) | mensurável hoje (contagem manual: 1 core + 4 adotantes) |
+| **Adoção / repos ativos na família** | tração real do método (dogfood + adotantes) | mensurável hoje — **derive, não copie**: `grep -c '^ *kind: adopter' docs/evolution/federation/members.yaml` ([régua canônica](../decisions.md)) |
 | **Valor medido por adotante** | retrabalho evitado / velocidade / frescor de contexto | `[a instrumentar]` — é o número que vira prova de venda e base de preço |
 | **Conversão mini→pago** | quem prova o mini e sobe pra uma camada de compromisso | `[hipótese]` — depende do mini existir |
 | **Receita de serviço/certificação** | R$ de treino/consultoria/selo — sustentação concreta | mensurável quando formalizado (D4) |

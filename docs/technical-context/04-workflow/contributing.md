@@ -1,6 +1,6 @@
 ---
 title: "Development Workflow — Contributing (Sistema Onion core)"
-date: 2026-07-25
+date: 2026-08-13
 ---
 
 # Development Workflow — Contribuindo com o Sistema Onion (core)
@@ -152,10 +152,20 @@ Duas camadas complementares e **desacopladas**:
 
 `.github/workflows/onion-validate.yml`: roda em PRs que tocam `.claude/**`, `docs/meta-specs/**`,
 `docs/design-context/**`, `plugins/**`, `docs/**` ou `CLAUDE.md`. Três steps sequenciais
-(orçamento medido 2026-07-20: ~7,5min total, teto `timeout-minutes: 15`):
-1. `bash .claude/validation/lint-artifacts.sh` — linter determinístico (2261 linhas, sem LLM,
-   grep/wc/find), ~21s.
-2. `bash .claude/validation/lint-selftest.sh` — self-test das 374 guardas via fixtures, ~6m59s.
+(teto `timeout-minutes: 25`; **duração medida 2026-08-12 no CI: 15m29s** para o job inteiro —
+run 31560719645):
+1. `bash .claude/validation/lint-artifacts.sh` — linter determinístico (3279 linhas, 59 guardas
+   `check_*`, sem LLM, grep/wc/find).
+2. `bash .claude/validation/lint-selftest.sh` — self-test via fixtures (9610 linhas); **798 casos**
+   na medição de 2026-08-12.
+
+> ⚠️ **Este orçamento foi re-medido em 2026-08-13, e o anterior mentia com autoridade.** A redação
+> antiga dizia "orçamento **medido** 2026-07-20: ~7,5min total, teto 15" com o lint em "2261
+> linhas". Vivo: teto **25**, lint **3279** (+45%), selftest **9610**. Número apresentado como
+> *medição* carrega autoridade que número solto não tem — o leitor não o questiona, e foi assim que
+> ficou 3 semanas errado. **Não re-medi os tempos por step** (só o total do job, pelo CI); os
+> `~21s`/`~6m59s` por step foram **removidos** em vez de atualizados por chute, porque tempo
+> estimado apresentado como medido é a própria classe de defeito que esta nota registra.
 3. `bash .claude/validation/lint-design-tokens.sh` — gate de design tokens (DTCG + refs + WCAG),
    requer `jq` (fail-loud no CI se ausente).
 

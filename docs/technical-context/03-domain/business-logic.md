@@ -1,9 +1,14 @@
 ---
 title: "Lógica de domínio — Sistema Onion (core)"
-date: 2026-07-25
+date: 2026-08-13
 ---
 
 # Lógica de domínio do Sistema Onion (core)
+
+> **Escopo do refresh 2026-08-13** — re-verificada contra `docs/onion/inventory.md` a contagem de
+> arquivos dos três contextos de domínio. **Não** re-verifiquei o restante do documento; carimbo
+> nomeia o que foi medido.
+
 
 > **Escopo desta camada.** O "domínio" do Onion não é entidades de negócio de um app (não há
 > `User`/`Order`/`Invoice`) — o Onion **é** o framework template em `.claude/` (ver
@@ -277,7 +282,7 @@ interrompida (`.claude/commands/engineer/plan.md:24`).
 Lido de `docs/onion/inventory.md:11-14` (gerado por `.claude/validation/inventory.sh`, validado no
 CI): 102 comandos invocáveis (10 categorias + root), 51 agentes (9 categorias), 11 skills, 90
 Knowledge Bases. Contextos de domínio no próprio framework (template, ainda não populados):
-`business-context/` 11 arquivos, `technical-context/` 0, `compliance-context/` 0
+`business-context/` 13 arquivos, `technical-context/` 6, `compliance-context/` 0 (medido 2026-08-13 contra `docs/onion/inventory.md` — o preenchimento greenfield que este arquivo anunciava já avançou; derive de lá, não copie)
 (`docs/onion/inventory.md:58-61`) — **este arquivo que você está lendo é parte do preenchimento
 inicial de `technical-context/`, greenfield**, conforme o pedido que originou esta geração.
 

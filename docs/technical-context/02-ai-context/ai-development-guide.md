@@ -1,10 +1,15 @@
 ---
 title: AI Development Guide — Sistema Onion (core)
-date: 2026-07-25
+date: 2026-08-13
 layer: "Layer 2 — AI Context"
 ---
 
 # AI Development Guide
+
+> **Escopo do refresh 2026-08-13** — re-verificados contra o vivo: linhas do `lint-artifacts.sh`,
+> a contagem de guardas, o teto da numeração de REGRAS e a baixa da REGRA 4. **Não** re-verifiquei
+> o restante do guia linha a linha; carimbo nomeia o que foi medido.
+
 
 > Equivalente a um `CLAUDE.md` de nível de projeto, mas para quem vai **editar o próprio framework Onion**
 > (o repo `onion-evolve`) — não um projeto-alvo onde o Onion está instalado. Escopo: estilo, padrões, gotchas
@@ -98,9 +103,9 @@ de path absoluto.
 
 ## 4. O gate mecânico — as REGRAS do lint
 
-O lint (`.claude/validation/lint-artifacts.sh`, 2261 linhas) é a autoridade **executável** — SSOT gerada em
+O lint (`.claude/validation/lint-artifacts.sh`, 3279 linhas — medido 2026-08-13) é a autoridade **executável** — SSOT gerada em
 [`docs/onion/lint-rules.md`](../../../.claude/validation/lint-rules.md) via
-`.claude/validation/rules-registry.sh` (a própria REGRA 39 garante paridade registro↔guarda). **53 regras —
+`.claude/validation/rules-registry.sh` (a própria REGRA 39 garante paridade registro↔guarda). **59 guardas `check_*`, numeradas até a REGRA 60 (a numeração tem buracos: números aposentados não se reutilizam) —
 47 HARD (bloqueia merge), 11 SOFT (avisa, não bloqueia CI)**. As categorias e regras mais relevantes para
 quem edita o core:
 
@@ -126,7 +131,9 @@ quem edita o core:
 - **REGRA 22** [HARD] — links relativos quebrados em `docs/evolution/` e `docs/knowledge-base/`
 
 ### Fronteiras & contratos de arquitetura
-- **REGRA 4** [HARD] — ausência de referência a `mcp_onion-orchestrator` (MCP inexistente) em `.claude/`
+- ~~**REGRA 4**~~ — **REMOVIDA em 2026-08-03** (número aposentado, não reutilizar). Guardava contra
+  referência a `mcp_onion-orchestrator`, um componente que **nunca existiu**: guarda de vaporware,
+  que passa sempre porque não há o que acusar. O comentário no `lint-artifacts.sh` registra a baixa
 - **REGRA 7** [HARD] — nenhum agente com `name:` contendo `worker-orchestrator` (anti-padrão banido)
 - **REGRA 18** [HARD] — sem documentação versionada sob `.claude/docs/` (ponto cego não varrido pelas
   demais regras — `lint-artifacts.sh:1295`; `architecture.md` §2 é a autoridade: artefato invocável vive
