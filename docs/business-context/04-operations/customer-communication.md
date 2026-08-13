@@ -3,6 +3,11 @@
 **Última Atualização:** 2026-07-13
 
 > ⚠️ **STUB parcial — partes brand-dependentes marcadas `[INFERIDO — D3]`.** As diretrizes operacionais abaixo já valem; o tom de marca definitivo depende de [`../decisions.md`](../decisions.md) `D3`.
+>
+> **Estado de D3 (ratificada 2026-07-25 — DESACOPLAR):** mentoria/curadoria **avança já**; o trilho
+> consumer/leigo (app-consumer) **segue `gated`**. Logo o que abaixo está marcado `[BLOQUEADO — D3]`
+> continua literalmente correto — a ratificação **manteve** o bloqueio dessa faixa, não o levantou.
+> O que passou a existir e este arquivo ainda **não cobre** é a audiência de **mentoria/curadoria**.
 
 ---
 
@@ -31,7 +36,7 @@ Adaptar densidade e ângulo conforme [`../01-customer/personas.md`](../01-custom
 - **P5 dev solo** — onboarding facilitado; aha rápido.
 - **P6 leigo/pessoal** — `[BLOQUEADO — D3]` linguagem não-técnica, depende de branding.
 
-## A fazer quando `D3` avançar
+## A fazer — D3 já avançou (2026-07-25), e o que falta é a faixa que ela LIBEROU
 - Definir tom por canal e por audiência não-técnica.
 - Regras de escalation/atendimento se houver produto pago (SLA, suporte).
 

@@ -13,7 +13,7 @@ Este seed cumpre duplo papel (decisão do maestro):
 - **Produto:** Onion — framework template em `.claude/` que orquestra produto → engenharia → compliance com Claude Code (spec-as-code / SDD).
 - **Categoria:** framework/metodologia para desenvolvimento de software assistido por IA (segmento SDD — spec-driven development).
 - **Plataforma:** Claude Code (única, por design deliberado).
-- **Estágio:** Early — validando problema/solução; N=1 dogfood + 4 adotantes de campo. Sem PMF externo.
+- **Estágio:** Early — validando problema/solução; N=1 dogfood + os adotantes de campo (contagem viva: `grep -c '^ *kind: adopter' docs/evolution/federation/members.yaml`). Sem PMF externo.
 - **Modelo de negócio:** hoje **não-comercial / não-distribuído**. Em avaliação ativa: modelo em **camadas** (funil aberto + captura adjacente em serviço/certificação). Ver [`decisions.md`](decisions.md) `D1`.
 - **Time:** 1 (maestro/criador) + agentes de IA.
 - **Repo:** `onion-evolve` = fork privado de evolução; hub público em github.com/marciocar/onion.

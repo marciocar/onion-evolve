@@ -1,6 +1,6 @@
 ---
 title: "Development Workflow — Contributing (Sistema Onion core)"
-date: 2026-07-25
+date: 2026-08-13
 ---
 
 # Development Workflow — Contribuindo com o Sistema Onion (core)
@@ -151,13 +151,30 @@ Duas camadas complementares e **desacopladas**:
 ### 3.1 Review determinístico (dogfood mecânico — CI)
 
 `.github/workflows/onion-validate.yml`: roda em PRs que tocam `.claude/**`, `docs/meta-specs/**`,
-`docs/design-context/**`, `plugins/**`, `docs/**` ou `CLAUDE.md`. Três steps sequenciais
-(orçamento medido 2026-07-20: ~7,5min total, teto `timeout-minutes: 15`):
-1. `bash .claude/validation/lint-artifacts.sh` — linter determinístico (2261 linhas, sem LLM,
-   grep/wc/find), ~21s.
-2. `bash .claude/validation/lint-selftest.sh` — self-test das 374 guardas via fixtures, ~6m59s.
-3. `bash .claude/validation/lint-design-tokens.sh` — gate de design tokens (DTCG + refs + WCAG),
+`docs/design-context/**`, `plugins/**`, `docs/**` ou `CLAUDE.md`. **Quatro** steps sequenciais
+(teto `timeout-minutes: 25`; **medido no run 31649485283**, o mesmo que mediu os 798 casos:
+job 16m22s · lint 44s · selftest 15m30s):
+1. `bash .claude/validation/lint-artifacts.sh` — linter determinístico — 3279 linhas, 59 regras (53 HARD/11 SOFT, SSOT
+   [`lint-rules.md`](../../../.claude/validation/lint-rules.md)), sem LLM, só grep/wc/find.
+2. **Asserção de capacidade do runner** (`onion-validate.yml:84`) — gating: o auto-teste não pode
+   pular nada. Roda ENTRE o lint e o selftest, não no fim.
+3. `bash .claude/validation/lint-selftest.sh` — self-test via fixtures (9610 linhas); **798 casos**
+   na medição de 2026-08-12 (run 31649485283).
+4. `bash .claude/validation/lint-design-tokens.sh` — gate de design tokens (DTCG + refs + WCAG),
    requer `jq` (fail-loud no CI se ausente).
+
+> ⚠️ **Este orçamento foi corrigido DUAS vezes, e a 2ª correção é a lição.**
+>
+> A redação de julho dizia "orçamento **medido** 2026-07-20: ~7,5min, teto 15" com o lint em "2261
+> linhas". Vivo: teto **25**, lint **3279** (+45%), selftest **9610** — ficou 3 semanas errado
+> porque número apresentado como *medição* carrega autoridade que número solto não tem, e o leitor
+> não o questiona.
+>
+> Ao corrigir, troquei o total pelo run certo **e mantive os steps do run errado** (`42s`/`14m38s`,
+> que são do run 31560719645 ao segundo) — escrevendo, na mesma frase, que "agora total e steps vêm
+> do MESMO run". Os certos são `44s`/`15m30s`, e os antigos nem fechavam com o total
+> (42s + 14m38s = 15m20s ≠ 16m22s). **Num documento cujo argumento é justamente esse, publiquei dois
+> números do run errado na frase que prometia o contrário.** A 2ª passada do Elenxo pegou.
 
 `lint-artifacts.sh` cobre (cabeçalho do arquivo, `lint-artifacts.sh:19-35`, lista parcial):
 frontmatter obrigatório de agente/comando; proibição de `model: gpt-4`; limites de linha (agente

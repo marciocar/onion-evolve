@@ -100,6 +100,45 @@ nunca zero — LLM reconstrói atributos mesmo do destilado); **nunca relicencia
 
 ---
 
+## D8 — Régua canônica de "adotante" `[ratificado 2026-08-13]`
+
+**Pergunta:** quando um doc diz "N adotantes", N é o quê?
+
+- (•) **`kind: adopter` no `members.yaml`** ← ratificado
+- ~~membros não-`source`~~ — inclui quem **não vendoriza** o framework
+
+**Status:** `ratificado` (2026-08-13). **Receita que reproduz** (a forma importa):
+
+```bash
+grep -c '^ *kind: adopter' docs/evolution/federation/members.yaml
+```
+
+> ⚠️ **A âncora `^ *` é load-bearing.** Sem ela o `grep` devolve **9** em vez de 8 — a 9ª ocorrência é
+> uma **legenda comentada** do schema (`members.yaml:394`). Uma auditoria de 2026-08-12 publicou a
+> receita sem âncora: o número estava certo e o comando não reproduzia. Carimbo que não reproduz é a
+> forma de `exit-code-nao-e-a-verificacao` aplicada à citação de comando.
+
+**Por que `kind: adopter` e não "não-`source`":** as duas réguas divergem em **3 membros**, e a
+diferença é semântica, não aritmética — `distillation` e `method` **não vendorizam** o framework
+(`onion_version: n/a`), e `door` vendoriza mas para **distribuir o bundle**, não para usar num
+projeto. "Adotante" = quem instala o framework para **trabalhar** com ele.
+
+**Consequência operacional — a prosa APONTA, não copia.** Os docs de contexto passam a citar a
+receita em vez do número: [`metrics.md`](02-product/metrics.md),
+[`voice-of-customer.md`](01-customer/voice-of-customer.md), [`index.md`](index.md). Onde existe
+fonte de verdade, prosa que **repete** o número é um segundo lugar para errar — e este drift
+(4 → 8) sobreviveu a duas auditorias porque cada doc mantinha a própria cópia.
+
+**Fora do escopo, por desenho:** [`gtm-decision-brief-2026-07`](gtm-decision-brief-2026-07.md) cita
+"1 core + 4 adotantes" numa tabela de tradeoffs **datada** — é registro do que sustentou a decisão
+em julho, não afirmação sobre hoje. Atualizar ali reescreveria a evidência; documento datado
+**registra**, não drifta (mesma doutrina do `status: snapshot` na REGRA 16).
+
+**Base:** auditoria [`context-freshness-core-2026-08-12`](../analysis/context-freshness-core-2026-08-12.md)
++ KG [`context-freshness-2026-08-12`](../onion/graph/context-freshness-2026-08-12.kg.yaml).
+
+---
+
 ## Decisões já ratificadas (fora deste registro)
 
 Vivem no `CLAUDE.md` / `docs/analysis/onion-review-2026-05.md` (identidade canônica 2026-05-18): Claude Code-only, 3 dimensões peer, workflows faseados invariantes, `.onion/` e v4.0 FASES 5-9 abandonados. Este registro **não** as reabre — trata só do eixo comercial/GTM novo.

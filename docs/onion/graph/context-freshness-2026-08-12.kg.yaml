@@ -93,7 +93,7 @@ nodes:
     status: open
     impact: 3
     confidence: 1.0
-    label: "DOIS docs de business afirmam '4 adotantes' e o vivo diz 8: `business/metrics.md` ('1 core + 4 adotantes', e o proprio texto admite 'contagem manual') e `business/voice-of-customer.md` ('4 adotantes de campo'). MEDIDO com a receita que REPRODUZ: `grep -c '^ *kind: adopter' members.yaml` = **8**. ⚠️ DUAS CORRECOES A MIM MESMO, ambas do Elenxo, e a 1a e grave: (1) a redacao anterior deste no se chamava CONTRADICAO CROSS-DOMINIO e acusava `technical/business-logic.md` de dizer '11 membros'. FALSO — a linha 157 dele diz **'8 membros hoje'**, que e o numero CERTO. Eu listei como divergente justamente o arquivo que estava certo, casando a palavra '11' com o referente errado (ha `11 skills` e `11 arquivos` no doc). E o eixo e EXATAMENTE o que o no [E_ACUSADOR_ERROU_O_REFERENTE_E_O_JUIZ_DERRUBOU] deste mesmo grafo celebra ter pego num worker: eu apliquei o Elenxo aos outros e nao a mim. Nao ha contradicao cross-dominio nenhuma — ha stale em DOIS docs, e o dominio technical esta correto. (2) o `verified_against` anterior publicava `grep -c 'kind: adopter'`, que devolve **9**: a 9a ocorrencia e uma LEGENDA COMENTADA do schema (`members.yaml:394`). O numero 8 estava certo e a receita nao reproduzia — carimbo que nao reproduz e a forma de `exit-code-nao-e-a-verificacao` aplicada a citacao de comando. GATILHO DE FECHAMENTO: decidir a regua canonica ('adotante' = `kind: adopter`) e fazer a prosa APONTAR para `members.yaml` em vez de copiar o numero."
+    label: "DOIS docs de business afirmam '4 adotantes' e o vivo diz 8: `business/metrics.md` ('1 core + 4 adotantes', e o proprio texto admite 'contagem manual') e `business/voice-of-customer.md` ('4 adotantes de campo'). MEDIDO com a receita que REPRODUZ: `grep -c '^ *kind: adopter' members.yaml` = **8**. ⚠️ DUAS CORRECOES A MIM MESMO, ambas do Elenxo, e a 1a e grave: (1) a redacao anterior deste no se chamava CONTRADICAO CROSS-DOMINIO e acusava `technical/business-logic.md` de dizer '11 membros'. FALSO — a linha da tabela **'| Estado | ativo, em uso real — ... |'** dizia **'8 membros hoje'**: o VALOR 8 estava certo, o SUBSTANTIVO nao. ⚠️ E A CORRECAO ANTERIOR DESTE MESMO TRECHO INVENTOU UM DEFEITO: eu me auto-acusei de 'ter errado a linha 157', mas 157 estava CERTO na `main` — o 162 so valeu num commit intermediario e ja estava stale de novo no HEAD seguinte. Numero de linha e ancora VOLATIL; num no cuja tese e casar a palavra com o referente errado, citar o CONTEUDO da linha e a ancora honesta. Auto-acusacao tambem precisa ser medida. ⚠️ E D8 falsificou a frase depois: 8 e a contagem de ADOTANTES; MEMBROS sao 12. A propria regua que esta branch ratificou tornou errada a frase que este no defendia como certa — corrigido no mesmo movimento. Eu listei como divergente justamente o arquivo que estava certo, casando a palavra '11' com o referente errado (ha `11 skills` e `11 arquivos` no doc). E o eixo e EXATAMENTE o que o no [E_ACUSADOR_ERROU_O_REFERENTE_E_O_JUIZ_DERRUBOU] deste mesmo grafo celebra ter pego num worker: eu apliquei o Elenxo aos outros e nao a mim. Nao ha contradicao cross-dominio nenhuma — ha stale em DOIS docs, e o dominio technical esta correto. (2) o `verified_against` anterior publicava `grep -c 'kind: adopter'`, que devolve **9**: a 9a ocorrencia e uma LEGENDA COMENTADA do schema (`members.yaml:394`). O numero 8 estava certo e a receita nao reproduzia — carimbo que nao reproduz e a forma de `exit-code-nao-e-a-verificacao` aplicada a citacao de comando. GATILHO DE FECHAMENTO: decidir a regua canonica ('adotante' = `kind: adopter`) e fazer a prosa APONTAR para `members.yaml` em vez de copiar o numero."
     trace: "docs/evolution/federation/members.yaml"
 
   - id: Q_ORCAMENTO_DE_CI_MEDIDO_CONTRA_ARTEFATO_41PCT_MENOR
@@ -128,7 +128,38 @@ nodes:
     label: "O run `wf_23de8ab6-81b`: 19 workers `sonnet`/`medium` (o comando pedia `haiku` — desvio DECLARADO, porque o item #4 exige cruzar `members.yaml`/`inventory.md`/`decisions.md` contra prosa, o que e raciocinio e nao varredura), 102 tool-calls, 1.065.019 tokens, 2min19s; mais 1 juiz adversarial `opus` acionado pela regra dos >30% (taxa medida: 42%). ⚠️ CAMPO ACRESCENTADO AO MOLDE DO COMANDO: `checked_against_live`, obrigando cada worker a declarar O QUE mediu para julgar o item #4, com 'nao-medi' como valor legal que PROIBE acusar falha de #4. Resultado: 19 de 19 mediram. ⚠️ ESTE NO REINCIDIU, E FOI PEGO: a 1a versao carimbava `confirmed`/`confidence 1.0` sobre numeros que NADA no repo podia conferir — `grep -rn wf_23de8ab6` devolvia DUAS ocorrencias, ambas dentro deste proprio arquivo, e o `trace:` apontava para o proprio grafo (auto-referencia, nao rastro). E a classe tinha sido curada HORAS ANTES no mesmo dia, no grafo irmao `identidade-onion-vps-2026-08` (no `A_SINTESE_DO_RUN_DE_REVERIFICACAO`), com estas palavras: 'carimbo que cita run sem artefato e declarado-nao-verificado'. Virou KB e nao virou GUARDA — por isso reincidiu no arquivo seguinte. CURADO: a sintese esta persistida em `docs/analysis/context-freshness-core-2026-08-12.md`, com `run_id`/`tokens`/`agents`/`duration_min` no frontmatter, e o `trace:` aponta para ELA. CANDIDATO NOMEADO (nao decidido): guarda que reprove `run_id:` citado sem artefato correspondente — o gatilho ja disparou duas vezes em 24h."
     trace: "docs/analysis/context-freshness-core-2026-08-12.md"
 
+  - id: I_REFRESH_APLICADO_E_A_GUARDA_CALOU
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: lint-de-8-para-4-SOFT-em-worktree-limpo-3-curadas-e-1-fora-de-escopo-da-catraca-na-branch
+    status: done
+    impact: 4
+    confidence: 1.0
+    label: "✅ CICLO FECHADO 2026-08-13, e o fecho e MEDIDO pela propria guarda: auditoria achou o drift -> REGRA 16 passou a acusa-lo -> refresh curou -> a guarda CALOU. O lint saiu de **8** SOFT (medido em worktree limpo da `main`, deterministico em duas passadas) para **4**, com as TRES acusacoes do `codebase-guide.md` desaparecidas. ⚠️ DUAS CORRECOES DO ELENXO A ESTE PROPRIO CARIMBO: (1) a 1a redacao dizia '7 para 4' — o 4 reproduz, o 7 NAO; (2) dizia '(so os baselines)' e das quatro que sumiram apenas TRES foram CURADAS: a quarta (`kg-verificacao/CARIMBADO`) some por ESCOPO — a catraca da REGRA 49 compara contra o merge-base, e o no nao esta no diff desta branch; volta quando mergear. Atribuir a cura um SOFT que a branch so deixou de avaliar seria inflar o resultado com o mesmo gesto que este PR condena. Isso e o que distingue refresh de reescrita: quem valida o conserto e o mecanismo, nao o autor. REFRESCADOS: `codebase-guide.md` (99->102 em tres formas, 33->35, 2->3, skills 10->11 + `onion-retro` que faltava na lista), `contributing.md` (timeout 15->25, lint 2261->3279), `ai-development-guide.md` (linhas, contagem de guardas, e a REGRA 4 marcada como REMOVIDA), `business-logic.md` (contextos 11/0/0 -> 13/6/0). ⚠️ DUAS COISAS QUE NAO FIZ, e as duas por desenho: (1) a CITACAO FABRICADA virou PARAFRASE, nao aspa corrigida — aspa so se escreve por copia literal verificada, e parafrase e mais honesta que aspa aproximada; (2) o `gtm-decision-brief-2026-07` cita '4 adotantes' numa tabela de tradeoffs DATADA e NAO foi tocado: e registro do que sustentou a decisao em julho, nao afirmacao sobre hoje — documento datado REGISTRA, nao drifta (mesma doutrina do `status: snapshot`). ⚠️ E OS CARIMBOS NOVOS DECLARAM ESCOPO: cada doc refrescado diz O QUE foi re-verificado, porque carimbar a data inteira depois de medir quatro numeros seria repetir [C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO] no ato de cura-lo."
+    trace: "docs/business-context/decisions.md"
+
+  - id: I_REGUA_CANONICA_DE_ADOTANTE_RATIFICADA
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: D8-em-decisions-md-mais-tres-docs-apontando-a-receita-em-vez-de-copiar-o-numero
+    status: done
+    impact: 4
+    confidence: 1.0
+    label: "✅ D8 RATIFICADA: 'adotante' = `kind: adopter` no `members.yaml` (8 hoje), NAO 'membros nao-source' (11). A diferenca sao TRES membros e ela e semantica: `distillation` e `method` NAO vendorizam (`onion_version: n/a`), e `door` vendoriza para DISTRIBUIR o bundle, nao para usar num projeto. Adotante = quem instala o framework para TRABALHAR com ele. ⚠️ A CURA NAO E ATUALIZAR O NUMERO — e fazer a prosa APONTAR: `metrics.md`, `voice-of-customer.md` e `index.md` passam a citar `grep -c '^ *kind: adopter' members.yaml` em vez de carregar a propria copia. Atualizar 4->8 curaria o caso e deixaria a classe viva: o drift sobreviveu a DUAS auditorias justamente porque cada doc mantinha o proprio numero. ⚠️ A ANCORA `^ *` E LOAD-BEARING: sem ela o grep devolve 9 (a 9a e legenda comentada do schema). ACHADO LATERAL: `index.md` carregava o mesmo drift e a auditoria NAO o viu — o comando exclui `README`/`index.md` do escopo por convencao. Convencao de escopo cria ponto cego, e este custou um doc inteiro."
+    trace: "docs/business-context/decisions.md"
+
 edges:
+  - from: I_REFRESH_APLICADO_E_A_GUARDA_CALOU
+    to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
+    edge_type: SUPPORTS
+  - from: I_REGUA_CANONICA_DE_ADOTANTE_RATIFICADA
+    to: Q_CONTAGEM_DE_ADOTANTES_STALE_EM_DOIS_DOCS_DE_BUSINESS
+    edge_type: SUPPORTS
+  - from: I_REFRESH_APLICADO_E_A_GUARDA_CALOU
+    to: C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO
+    edge_type: SUPPORTS
   - from: E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO
     to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
     edge_type: SUPPORTS
