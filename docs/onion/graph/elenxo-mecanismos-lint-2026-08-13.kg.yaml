@@ -141,6 +141,16 @@ nodes:
     confidence: 1.0
     label: "FECHA O GAP ORFAO DA LINHA — o achado ADJACENTE do 2o Elenxo que ficou nomeado no residuo do PR #588 e NUNCA virou no (a auditoria de fechamento pegou: item sem estado no grafo e exatamente o que o controle do maestro proibe). O defeito pre-existente: `bash asm ...` como comando simples sob `set -e` — se o assemble falhasse (fonte bundlada apagada/quebrada), o lint MORRIA em rc=2 SEM sumario, e os chamadores por ausencia-de-mensagem liam a morte como PASS. Apagar uma fonte bundlada nao produzia 'fora de sincronia': produzia silencio. CURADO: `if ! bash asm...; then violation HARD 'assemble FALHOU' + continue`. PROVADO removendo uma skill bundlada de verdade: o lint acusou `assemble FALHOU (fonte bundlada ausente/quebrada?)` com o comando de diagnostico E imprimiu o sumario — acusa e soma, nao morre."
 
+  - id: Q_PARECER_SOBRE_DIFF_INVERTIDO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-13
+    verified_against: 5o-elenxo-refutou-a-tese-da-inversao-a-edicao-18h54-do-pin-upsertado-nomeia-arvore-suja-no-checkout-em-2-runs
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "DEFEITO DO INSTRUMENTO DE REVISAO (PR #590, runs 31732737397 e 31735494448 — DUAS ocorrencias, nao uma): o parecer final acusou a 'remocao' exata do que o PR adiciona (a catraca de 58 linhas e o guard HARD do assemble). MINHA 1a TESE ('diff invertido, head->base') FOI DERRUBADA PELO 5o ELENXO — a lei da linha, desta vez contra o autor do no: a edicao de 18:54 do MESMO pin (soterrada pelo upsert; so acessivel via userContentEdits no GraphQL) dizia em texto claro 'Ignorei a modificacao NAO-COMMITADA de lint-artifacts.sh presente no WORKING TREE do checkout... ela reverte exatamente a cura'. FATO VERIFICADO: nos 2 runs a arvore do runner continha modificacao nao-commitada REVERTENDO a cura ao conteudo da base; diff-invertido e arvore-revertida produzem saida byte-identica (indistinguiveis pelo texto do parecer), e as 2 evidencias discriminantes apontam arvore suja. Eu citei o parecer anterior como calibracao SEM ler a versao soterrada — worst-truth-is-uncertain: inferi 'invertido' com confidence 0.9 quando o instrumento tinha RELATADO a causa alternativa 30min antes. HIPOTESE-LIDER (nao provada): o proprio revisor suja a arvore — o prompt do workflow NAO entrega o diff ('Revise o diff deste Pull Request', checkout no merge-ref refs/pull/N/merge), o revisor tem Bash e improvisa (ex.: git checkout base -- arquivo para comparar, sem restaurar); mesma assinatura nos 2 runs independentes = comportamento sistematico sob este prompt, nao acaso. GUARDA-POR-GREP (minha 1a proposta) REFUTADA pelo 5o Elenxo em 3 golpes: elipses nas citacoes quebram grep -F; trecho com ${} em BRE falha SILENCIOSO (rc=1 = 'ausente') — a classe guarda-por-lista-falha-pelo-vocabulario; e refactor-que-move passa nas duas checagens. ACHADO-BONUS DE MECANISMO: o pin upsertado APAGA os pareceres anteriores da vista — analise futura de 'o revisor errou?' parte de registro mutilado. GATILHO JA SATISFEITO (2 runs) — a acao devida: (a) o prompt do workflow passa a ENTREGAR o comando canonico do diff (git diff origin/main...HEAD) e proibir modificar a arvore; (b) o verdict ganha guarda dirty-tree (git status --porcelain nao-vazio apos a revisao -> anotar no parecer que a arvore estava suja). Lembrete de medicao: PR que edita o workflow nao mede o revisor — a prova vem do 1o PR SEGUINTE ao merge."
+
   - id: A_RUN_DO_ELENXO_DE_MECANISMOS
     node_type: artifact
     plane: DEV
@@ -191,4 +201,7 @@ edges:
     edge_type: CONSTRAINS
   - from: A_RUN_DO_ELENXO_DE_MECANISMOS
     to: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
+    edge_type: TRACES_TO
+  - from: Q_PARECER_SOBRE_DIFF_INVERTIDO
+    to: Q_R19_AUTOFIX_COM_RASTRO_CANDIDATO
     edge_type: TRACES_TO
