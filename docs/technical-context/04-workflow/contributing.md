@@ -151,21 +151,22 @@ Duas camadas complementares e **desacopladas**:
 ### 3.1 Review determinístico (dogfood mecânico — CI)
 
 `.github/workflows/onion-validate.yml`: roda em PRs que tocam `.claude/**`, `docs/meta-specs/**`,
-`docs/design-context/**`, `plugins/**`, `docs/**` ou `CLAUDE.md`. Três steps sequenciais
-(teto `timeout-minutes: 25`; **duração medida 2026-08-12 no CI: 15m29s** para o job inteiro —
-run 31560719645):
-1. `bash .claude/validation/lint-artifacts.sh` — linter determinístico (3279 linhas, 59 guardas
-   `check_*`, sem LLM, grep/wc/find).
+`docs/design-context/**`, `plugins/**`, `docs/**` ou `CLAUDE.md`. Quatro steps sequenciais
+(o 4º é a **asserção de capacidade do runner** — `onion-validate.yml:84`, gating: o auto-teste não
+pode pular nada)
+(teto `timeout-minutes: 25`; **duração medida 2026-08-12 no CI: 16m22s** para o job inteiro —
+run 31649485283, o mesmo que mediu os 798 casos; lint 42s + selftest 14m38s):
+1. `bash .claude/validation/lint-artifacts.sh` — linter determinístico (3279 linhas, 59 regras (53 HARD, 11 SOFT — SSOT `lint-rules.md`), sem LLM, grep/wc/find).
 2. `bash .claude/validation/lint-selftest.sh` — self-test via fixtures (9610 linhas); **798 casos**
-   na medição de 2026-08-12.
+   na medição de 2026-08-12 (run 31649485283).
 
 > ⚠️ **Este orçamento foi re-medido em 2026-08-13, e o anterior mentia com autoridade.** A redação
 > antiga dizia "orçamento **medido** 2026-07-20: ~7,5min total, teto 15" com o lint em "2261
 > linhas". Vivo: teto **25**, lint **3279** (+45%), selftest **9610**. Número apresentado como
 > *medição* carrega autoridade que número solto não tem — o leitor não o questiona, e foi assim que
-> ficou 3 semanas errado. **Não re-medi os tempos por step** (só o total do job, pelo CI); os
-> `~21s`/`~6m59s` por step foram **removidos** em vez de atualizados por chute, porque tempo
-> estimado apresentado como medido é a própria classe de defeito que esta nota registra.
+> ficou 3 semanas errado. ⚠️ **A 1ª redação desta nota citava `15m29s` do run 31560719645 — que mediu 792 casos, não 798,
+> e rodou ANTES do commit que levou o lint a 3279 linhas.** Dois números verdadeiros de runs
+> diferentes colados numa frase só: o Elenxo pegou. Agora total e steps vêm do MESMO run.
 3. `bash .claude/validation/lint-design-tokens.sh` — gate de design tokens (DTCG + refs + WCAG),
    requer `jq` (fail-loud no CI se ausente).
 

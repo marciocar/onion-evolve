@@ -63,8 +63,9 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-25
-    label: "codebase-guide.md — mapa de diretórios .claude/+docs/, 99 comandos/51 agentes/10 skills, utils SDAAL, validation, hooks"
+    verified_at: 2026-08-13
+    verified_against: refresh-do-artefato-em-2026-08-13-conferido-contra-inventory-md-e-ls-skills
+    label: "codebase-guide.md — mapa de diretórios .claude/+docs/, **102 comandos/51 agentes/11 skills** (refrescado 2026-08-13), utils SDAAL, validation, hooks. ⚠️ ESTE NÓ CARREGAVA 99/51/10 com `status: confirmed` e `plane: PROD` desde 2026-07-25, e NENHUMA guarda o pegava: a REGRA 16 (count-drift) varre `.md`, não `.kg.yaml`. Foi achado pelo Elenxo desta branch, que notou o que a branch tinha esquecido — ela carimbou DOIS grafos e deixou justamente o único que DESCREVE o artefato que ela acabou de corrigir. LIÇÃO QUE TRANSFERE: `.kg.yaml` é ponto cego do count-drift; nó que descreve um artefato por seus números envelhece junto com ele, sem sinal."
     trace: "docs/technical-context/02-ai-context/codebase-guide.md"
 
   - id: F_BIZLOGIC

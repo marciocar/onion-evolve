@@ -159,7 +159,7 @@ fontes canônicas: `multi-repo-federation.md`, `federation-usage-modes.md`).
 
 | | Co-evolução / Adoção | Federação formal por contrato |
 |---|---|---|
-| Estado | ativo, em uso real — 8 membros hoje | construído, não graduado — 0 contratos |
+| Estado | ativo, em uso real — 8 ADOTANTES hoje (de 12 membros; `kind: adopter`, régua D8) | construído, não graduado — 0 contratos |
 | Unidade | um **membro** (repo inteiro) | um **contrato** (integração específica entre 2 repos) |
 | Mecanismo | `/meta:adopt`, `members.yaml`, canais `inbox/`/`inbound/`, doc-bridge (`co-*`) | `contracts/<id>.md` em ledger git, `CHANGELOG.md` como inbox |
 

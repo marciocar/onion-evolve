@@ -267,7 +267,7 @@ Integrações externas são **sempre** opt-in via `.env` (`TASK_MANAGER_PROVIDER
 | Diretório | Conteúdo | Gerado por |
 |-----------|----------|------------|
 | `docs/meta-specs/` | L0 — constituição (`architecture.md`, `code-standards.md`, `integrations.md`, `agents.md`, `commands.md`) | mantido à mão, é a autoridade máxima |
-| `docs/knowledge-base/` | 90 KBs em 9 subcategorias (`concepts/` é a maior, 48 arquivos de conteúdo) | `/meta:create-knowledge-base` |
+| `docs/knowledge-base/` | 90 KBs em 9 subcategorias (`concepts/` é a maior, 49 arquivos de conteúdo) | `/meta:create-knowledge-base` |
 | `docs/onion/` | Documentação operacional do próprio framework: `inventory.md` (SSOT), `getting-started.md`, `graph.md`, `federation-map.md`, `agents-reference.md`, `commands-guide.md`, entre outros | mistura gerado (`inventory.md`) + mantido à mão |
 | `docs/evolution/` | Co-evolução core↔adotantes: `inbox/`, `outbox/`, `inbound/`, `federation/`, `rfc/`, `research/` | fluxo `/meta:co-*` e `/meta:federation-*` |
 | `docs/business-context/` | Spec-as-code de negócio (`01-customer` a `04-operations`) | `/docs:build-business-docs` |

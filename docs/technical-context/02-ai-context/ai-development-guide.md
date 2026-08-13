@@ -105,8 +105,10 @@ de path absoluto.
 
 O lint (`.claude/validation/lint-artifacts.sh`, 3279 linhas — medido 2026-08-13) é a autoridade **executável** — SSOT gerada em
 [`docs/onion/lint-rules.md`](../../../.claude/validation/lint-rules.md) via
-`.claude/validation/rules-registry.sh` (a própria REGRA 39 garante paridade registro↔guarda). **59 guardas `check_*`, numeradas até a REGRA 60 (a numeração tem buracos: números aposentados não se reutilizam) —
-47 HARD (bloqueia merge), 11 SOFT (avisa, não bloqueia CI)**. As categorias e regras mais relevantes para
+`.claude/validation/rules-registry.sh` (a própria REGRA 39 garante paridade registro↔guarda). **59 REGRAS — 53 HARD (bloqueia merge), 11 SOFT (avisa, não bloqueia CI)**, numeradas até a REGRA 60
+(a numeração tem buracos: números aposentados não se reutilizam). Os números vêm da SSOT gerada
+[`lint-rules.md`](../../../.claude/validation/lint-rules.md) — **derive, não copie**: `bash .claude/validation/rules-registry.sh`.
+Regra ≠ função: há **60** funções `check_*` porque a REGRA 22 tem duas. As categorias e regras mais relevantes para
 quem edita o core:
 
 ### Frontmatter & conformidade de artefato
