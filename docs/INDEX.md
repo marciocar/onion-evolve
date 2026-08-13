@@ -23,22 +23,22 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 ## 📊 Estatísticas da Documentação
 
 ### Documentação Principal
-- **585 arquivos markdown** em `docs/`
-- **20 arquivos** em `docs/onion/` (Sistema Onion)
-- **89 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 88 KBs — conteúdo + (sub)categoria READMEs — + `index.md`)
-  - 48 em `concepts/` (Conceitos fundamentais)
+- **641 arquivos markdown** em `docs/`
+- **21 arquivos** em `docs/onion/` (Sistema Onion)
+- **91 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 90 KBs — conteúdo + (sub)categoria READMEs — + `index.md`)
+  - 49 em `concepts/` (Conceitos fundamentais)
   - 9 em `frameworks/` (Frameworks e metodologias)
   - 5 em `tools/` (Ferramentas, incl. Agent Skills e PostgreSQL)
   - 3 em `platforms/`, 3 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
   - 5 em `education/` (vertical educacional: theories/ + applications/, fonte≠derivação — 4 + 1 README)
-  - 11 em `agentic-patterns/` (KB viva do campo: harness/ai-strategies/field-observations — 7 docs + 4 READMEs)
+  - 12 em `agentic-patterns/` (KB viva do campo: harness/ai-strategies/field-observations)
   - 1 `index.md`
 - **6 arquivos** em `docs/meta-specs/` (Meta Especificações: 5 meta-specs L0 + `index.md`)
 - **10 arquivos** em `docs/materials/` (materiais derivados externos — Fase 4; inclui subpasta `cold-adopter-2026-07/`)
 - **7 arquivos** em `docs/applying/` (guias de aplicação: greenfield, legacy, regulado, adoption-lifecycle, manual, rescue-prompt)
 - **7 arquivos** em `docs/design-context/` (vertical de design, **provisória** — 4 md + 3 `tokens.json`; ver nota abaixo)
-- **120 arquivos** em `docs/analysis/` (análises ativas — ver [analysis/README.md](analysis/README.md) para o critério de retenção; só baselines/ADRs duráveis são navegados individualmente aqui)
-- **246 arquivos** em `docs/evolution/` (co-evolução: inbox/inbound, federation/{members,CHANGELOG,outbox}, RFCs)
+- **125 arquivos** em `docs/analysis/` (análises ativas — ver [analysis/README.md](analysis/README.md) para o critério de retenção; só baselines/ADRs duráveis são navegados individualmente aqui)
+- **293 arquivos** em `docs/evolution/` (co-evolução: inbox/inbound, federation/{members,CHANGELOG,outbox}, RFCs)
 - **57 arquivos** em `docs/discussions/` (**Constelação de Estudos** — README + estudos isolados por slug; ver nota abaixo)
 - **Contextos spec-as-code peer**: `docs/business-context/` (15 arquivos — 13 de conteúdo + README + index) e `docs/technical-context/` (9 arquivos — 6 de conteúdo + README/index) estão **populados como dogfood** (seed real do Onion); `docs/compliance-context/` segue **template** (só `README.md`), populado no projeto-alvo por `/docs:build-compliance-docs`
 
@@ -590,7 +590,9 @@ Este índice é gerado automaticamente pelo comando `/docs/build-index`.
 /docs/build-index knowledge-base   # Reconstruir índice da seção knowledge-base
 ```
 
-**Última atualização:** 2026-08-03 (`/docs:build-index` — contagens reescaneadas do filesystem: docs/ 431→585 md; knowledge-base 81→88 [concepts 42→48, agentic-patterns 10→11]; analysis 90→120; evolution 155→246; discussions 50→57; materials 9→10; onion/ 19→20; business-context 13→15; **`technical-context/` reclassificado — estava descrito como template, está POPULADO (9 arquivos)**. Resync com a SSOT `/meta:inventory`: **102 comandos** [meta 30→35, design 2→3], 51 agentes, **11 skills** [8→11: +`onion-wizard`, +`onion-onboarding`, +`onion-retro`], **87 KBs**; `common/` 24→26 fragmentos, READMEs de categoria 10→11)
+**Última atualização:** 2026-08-13 (`/docs:build-index` — contagens **reescaneadas do filesystem**, nunca digitadas). Corrigido: docs/ 585→641 md · knowledge-base 89→91 (KBs 88→**90**, batendo com a SSOT `/meta:inventory`) · concepts 48→49 · agentic-patterns 11→12 · analysis 120→125 · evolution 246→293 · onion/ 20→21. Sem drift: meta-specs 6, materials 10, applying 7, discussions 57, business-context 15, technical-context 9. Links: **133 verificados, 0 mortos**. As **13 seções** reais de `docs/` estão cobertas.
+
+> ⚠️ **Por que 7 de 13 contagens driftaram sem ninguém ver.** A REGRA 16 do lint (count-drift) vigia as frases canônicas de **inventário** (`N comandos invocáveis`, `N agentes`, `N skills`, `N Knowledge Bases`) — e essas estavam **certas** aqui. O que driftou foi a forma `N arquivos em docs/<seção>`, que nenhuma guarda cobre: o lint dá **0 HARD** com este arquivo errado em sete pontos. Mesma classe que a auditoria de 2026-08-12 registrou no `codebase-guide.md`: **a cegueira é de vocabulário, não de escopo**. Enquanto não houver feeder para esta forma, a única cura é rodar `/docs:build-index` — que reescaneia, não relembra.
 **Mantido por:** Sistema Onion
 
 ---
