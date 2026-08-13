@@ -39,7 +39,7 @@ fi
 # no lugar mais caro, porque é por este número que se decide se vale rodar local. Se você
 # mexer aqui, RE-MEDIR e trocar a linha — número de gate sem carimbo versionado é como a
 # regressão cresce sem ninguém ver (é o mesmo modo de falha que apagou o histórico de
-# ~16s do lint-artifacts.sh, hoje em 44s).
+# ~16s do lint-artifacts.sh, que chegou a 86s antes dos gates de --only; re-medido 2026-08-13 pós-cura do kg-view: **78s** — o número deste comentário TAMBÉM já esteve 2x stale, cumpra a instrução acima).
 SELFTEST="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
 if [ -f "${SELFTEST}" ] \
    && git diff --cached --name-only --diff-filter=ACMR | grep -qE '^\.claude/validation/'; then

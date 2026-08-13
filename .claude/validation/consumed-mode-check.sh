@@ -21,8 +21,15 @@
 # … `bash "${h}" --flag`), que é a forma canônica desta casa. Invocação montada dinamicamente (flag
 # vinda de variável, `eval`, array) NÃO é julgada — e é CONTADA, nunca silenciosa.
 #
-# ═══ ESTE SCRIPT É INSTRUMENTO, NÃO GATE — e a decisão foi MEDIDA, não temida ═══
-# Ele NÃO está ligado ao lint como REGRA HARD, e não deve ser sem o trabalho descrito abaixo.
+# ═══ HISTÓRICO DO WIRE-IN — e a ironia de este cabeçalho ter ficado stale ═══
+# ⚠️ ATUALIZADO 2026-08-13: este script ESTÁ ligado ao lint — a REGRA 59 [HARD]
+# (check_consumed_modes, lint-artifacts.sh) o consome desde que o trabalho descrito abaixo
+# convergiu. A frase anterior ("NÃO está ligado como REGRA HARD, e não deve ser") era verdadeira
+# quando escrita e ficou stale QUANDO o wire-in aconteceu — ninguém voltou aqui. Um Elenxo de
+# 2026-08-13 pegou: o instrumento cuja função é medir `declarado≠consumido` carregava a própria
+# autodescrição divergente do consumo real. O parágrafo original fica abaixo como registro da
+# decisão da época, não como estado atual.
+# ═══ (registro histórico, 2026-08-06) INSTRUMENTO, NÃO GATE — a decisão foi MEDIDA ═══
 # Tentei ligá-lo em 2026-08-06 e a medição não convergiu: a extração encontrou SEIS formas de
 # invocação, cada iteração revelando a seguinte —
 #   1. `bash "${SCRIPT_DIR}/x.sh" --flag`            (produção)

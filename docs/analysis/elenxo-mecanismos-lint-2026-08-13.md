@@ -105,3 +105,23 @@ própria lente suspeitava. O ganho transformador é no `--only` avulso (pre-comm
 interativo): 3,1×. E a reconciliação de grafo foi feita nos dois lados: o nó
 `E_lint_only_ja_existe_e_e_parcial` da refinaria (que concluíra "piso irredutível de ~12s") está
 `superseded` — a medição dele era verdadeira; a conclusão caiu.
+
+## P3-P5 executados (2026-08-13, autorização do maestro) — e dois se realinharam na medição
+
+**P3 estava obsoleto como escrito.** Re-medido **no caminho real do lint** (`--format tsv`): o
+coverage custa **0,95s com 47 spawns** — os 2.486/8,5s da lente só ocorrem com órfãs no corpus
+(caminho condicional), e o corpus está limpo. `testar-no-caminho-errado-e-não-testar`, cometido
+pela lente. O alvo real era o item secundário: `kg_view_sync` re-parseava o **mesmo `--json` três
+vezes** por grafo. Curado (uma captura, reuso 3×): guarda **12,99s → 8,81s (-32%)**, paridade
+preservada nos 61 grafos. Lint full: **86s → 78s**.
+
+**P4 fechado nas duas pontas** — e a segunda inverteu o achado da lente: o cabeçalho do
+`consumed-mode-check.sh` não mentia dizendo estar ligado; mentia dizendo **não** estar (a REGRA 59
+[HARD] o consome). O pre-commit agora carimba **78s medidos**, com o histórico do número
+(16→44→86→78s) como advertência.
+
+**P5 fechado por tripla régua, sem deletar nada.** A lista dos "6 órfãos" não se sustentou:
+grep de invocação real achou **1** (o `kg-reverify-schema-check.sh` — que EU criei em 2026-08-12 e
+nunca liguei); o instrumento oficial devolve **33 pares, 0 sem teste**; a régua da lente não
+resiste às outras duas. O órfão real foi **ligado à bancada** (2 casos novos) — "sem consumidor =
+falta ligar, não licença para apagar".

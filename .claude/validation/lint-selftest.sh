@@ -9589,6 +9589,26 @@ run_aside_router_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
+run_kg_reverify_schema_selftests() {
+  # WIRE-IN 2026-08-13 (Elenxo de mecanismos, P5): o kg-reverify-schema-check.sh nasceu em
+  # 2026-08-12 com selftest embutido (6 casos) e ZERO consumidores — o autor da guarda contra
+  # guardas-órfãs a deixou órfã. "Sem consumidor = falta ligar, não licença para apagar."
+  local chk="${REPO_ROOT}/.claude/validation/kg-reverify-schema-check.sh"
+  [ -f "${chk}" ] || { record_skip "kg-reverify-schema: script ausente"; return; }
+  if bash "${chk}" --selftest >/dev/null 2>&1; then
+    record_pass "kg-reverify-schema: selftest embutido 6/6 (required único, if/then ancorados)"
+  else
+    record_fail "kg-reverify-schema: selftest" "o selftest embutido reprovou — rode bash ${chk} --selftest"
+  fi
+  if bash "${chk}" >/dev/null 2>&1; then
+    record_pass "kg-reverify-schema: o KgReverifySchema real está estruturalmente conforme"
+  else
+    record_fail "kg-reverify-schema: schema real" "o schema embarcado em kg-freshness.md reprova — rode bash ${chk}"
+  fi
+}
+
+
+run_kg_reverify_schema_selftests
 run_backtick_ref_selftests
 run_site_deeplink_selftests
 run_migalhas_generate_selftests
