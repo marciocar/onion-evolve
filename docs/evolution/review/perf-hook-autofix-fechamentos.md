@@ -2,10 +2,10 @@
 branch: perf/hook-autofix-fechamentos
 pr: 590
 date: 2026-08-13
-reviewed_diff_sha256: 8fccf7eb812df2b7bf5f4dd3fd5dd8de7b1268b62ff673aca38497683f07547c
-findings_total: 9
-findings_real: 9
-findings_fixed: 8
+reviewed_diff_sha256: 2091d0d24100c18115cd697fb9f7a4ccf36990cbc8656616143ada24e637aa61
+findings_total: 10
+findings_real: 10
+findings_fixed: 9
 tokens: 110467
 duration_min: 17
 verdict: CORRIGIDO-E-RE-REVISADO
@@ -58,6 +58,19 @@ diverge no primeiro edit. A v2 lê as fontes **pela mesma via que o assemble** (
 arrays): não pode divergir por construção. É a mesma cura do `kg-reverify-schema-check` extraindo
 o schema do arquivo em vez de copiá-lo. A classe "duas fontes divergem" morre no desenho, não na
 disciplina.
+
+## Achado nº 10 — do revisor de CI, e é a lei da linha apontada de fora
+
+O parecer do `onion-review` acusou: guard **alterada** (R19) + ~80 linhas determinísticas novas no
+hook **sem fixture automatizada** (`commands.md §11`) — os repros eram manuais e *"não sobrevivem
+ao próximo commit"*. Justíssimo: era exatamente o M5 do 3º Elenxo (absolver-sem-medir), cometido
+uma camada acima, no mesmo dia em que o registrei.
+
+**Cura:** `run_hook_autofix_selftests` na bancada — os 4 comportamentos viram casos permanentes,
+rodando os blocos **reais** do hook (extraídos por `sed` do arquivo vivo, não uma cópia que
+envelhece) num **clone local descartável** (o hook precisa de git; o sandbox da bancada não é
+repo): (a) entrada-diretório dispara; (b) índice temporário pula; (c) staging parcial aborta;
+(d) assemble falho acusa E soma. Bancada: 803 → **807 casos**.
 
 ## Teto declarado
 
