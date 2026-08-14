@@ -73,13 +73,13 @@ nodes:
 
   - id: F3_ROSTO_REDESIGN
     node_type: entity
-    plane: DEV
+    plane: PROD
     verified_at: 2026-08-14
-    verified_against: fase-definida-gated-em-g1
-    status: open
+    verified_against: deploy-pelo-mecanismo-ramo-cheio-limpo-bridge-1d45531-health-ok-38-testes-gzip-no-orcamento
+    status: done
     impact: 4
     confidence: 0.85
-    label: "F3 ROSTO (pós-G1): /design:generate (candidatas ancoradas cream #FAF7F2/orange #C2410C + gate WCAG determinístico) → @design-system-specialist (tokens DTCG→Tailwind) sobre o tema 3 camadas existente. PR-12 tokens + DARK LIGADO (já desenhado nos semânticos, toggle + prefers-color-scheme, WCAG AA nas duas) · PR-13 shiki lazy · PR-14 anexos PDF/text (backend JÁ aceita) · PR-15 blocos inline no fio (escopo mínimo do corte G1 — a tendência pós-Canvas) · PR-16 i18n pt-BR primeiro · PR-17 composer novo preservando pickers + sugestões anti-blank-page. GATE G3: WCAG AA claro+escuro, Lighthouse mobile ≥90, demo aprovada."
+    label: "F3 ROSTO (pós-G1): /design:generate (candidatas ancoradas cream #FAF7F2/orange #C2410C + gate WCAG determinístico) → @design-system-specialist (tokens DTCG→Tailwind) sobre o tema 3 camadas existente. PR-12 tokens + DARK LIGADO (já desenhado nos semânticos, toggle + prefers-color-scheme, WCAG AA nas duas) · PR-13 shiki lazy · PR-14 anexos PDF/text (backend JÁ aceita) · PR-15 blocos inline no fio (escopo mínimo do corte G1 — a tendência pós-Canvas) · PR-16 i18n pt-BR primeiro · PR-17 composer novo preservando pickers + sugestões anti-blank-page. GATE G3: WCAG AA claro+escuro, Lighthouse mobile ≥90, demo aprovada. ✅ F3 FECHADA 2026-08-14 (bridge 6510d84/4f7bf7c/0ec9aa9/73a69d2/bd4b3a9/1d45531): dark ligado (WCAG MEDIDO — pegou #7A726A herdado da landing reprovando AA e, no 14º Elenxo, a conversa CREME no tema escuro: o .dark só reapontava primitivos e o registry usa aliases shadcn — coluna completa, pares 6,3-16,6:1); shiki lazy dual-theme (com debounce por token: 7.365ms→122ms num bloco de 19KB em stream); anexos texto/md/código+PDF (o 14º provou o PR-14a DECORATIVO — external-store não funde attachments; curado com testes) + tetos 25MB /chat e 1MB texto; pt-BR 34/34; sugestões anti-blank-page pelo canal nativo. Ajustes de alinhamento declarados: SEM /design:generate (identidade já existia); PR-15 fundido no 13; Lighthouse = TETO (sem Chrome na VPS; substituto: gzip inicial 260KiB medido + WCAG por cálculo). 14º Elenxo: 11 achados/10 curados/16 testes-que-mordem. Escolhas registradas: bordas dark 1,35:1 (convenção shadcn; focus 6,7:1) · splash PWA creme (manifest estático)."
     trace: "/home/onion/onion-bridge/web/src/theme/onion.css"
 
   - id: F4_GOVERNO_ADMIN
@@ -279,6 +279,16 @@ nodes:
     label: "CORREÇÃO DE EVIDÊNCIA VENCIDA (10º Elenxo): as issues de cota do Open WebUI que o G1 citava como 'abertas desde 2023' estão TODAS fechadas como completed — #1430 em 2024-04-05, #23323 em 2026-04-02, #6692 em 2026-04-14. A inferência forte (a conferir no changelog): o Open WebUI ENTREGOU limites por usuário/grupo ~abril/2026. CONSEQUÊNCIA NO CORTE: quota nativa (DO#4) REBAIXA de 'diferencial barato' para TABLE-STAKE — continua DO (o meter já grava o que falta lá, e produto multi-seat exige), mas o posicionamento não pode vendê-la como gap do concorrente. FONTE: https://github.com/open-webui/open-webui/issues/23323 (closed/completed)."
     trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
+  - id: Q_G3_DEMO_DO_MAESTRO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-14
+    verified_against: gate-definido-f3-em-producao-aguarda-demo-humana
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "G3 — a parte HUMANA do gate: demo do maestro no device real. Roteiro: abrir app.onionevolve.com no celular → alternar dark/claro (toggle no header) → criar 2ª conversa e alternar (painel ☰) → buscar → abrir deep-link /t/<id> após refresh → anexar um .md e perguntar sobre ele → um comando com bloco de código (shiki) → conferir os 4 chips do welcome. DECISÕES ABERTAS no mesmo gate: multi-device (last-write-wins hoje; cura desenhada = 409 otimista) · prioridade de bordas dark mais presentes · splash dark. GATILHO: o maestro dizer."
+
 edges:
   - from: D_programa_bridge_evolve
     to: C_plano_poc
@@ -363,4 +373,7 @@ edges:
     edge_type: CONSTRAINS
   - from: E_QUOTA_GAP_FECHADO_ABRIL_2026
     to: D_G1_POSICAO_E_CORTE_SELADOS
+    edge_type: CONSTRAINS
+  - from: Q_G3_DEMO_DO_MAESTRO
+    to: F3_ROSTO_REDESIGN
     edge_type: CONSTRAINS
