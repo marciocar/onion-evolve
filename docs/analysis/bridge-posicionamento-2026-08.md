@@ -26,18 +26,22 @@ meses, control-plane sobre Claude Code/Codex): a diferenciação KG+Elenxo preci
 ## O corte proposto
 
 ### DO (agora, nas fases já aprovadas)
-1. **F0 inteiro** — validado pelo único dado comportamental quantitativo do dossiê: sessões
-   sem progresso visível têm **3× a taxa de abandono** (E_PROGRESSO_VISIVEL). PR-03
-   (tool-results + reasoning) é exatamente essa cura.
+1. **F0 inteiro** — apoiado pelo único dado comportamental quantitativo do dossiê: sessões
+   sem progresso visível teriam **3× a taxa de abandono** (E_PROGRESSO_VISIVEL_3X_RETENCAO —
+   conf 0,5, vendor citando terceiro sem metodologia; a própria lente pede cautela; vale pela
+   triangulação com as dores C3, não como fato duro). PR-03 (tool-results + reasoning) é a cura.
 2. **Aprovação GRANULAR de ferramenta** (novo, sobe de prioridade): o backlash do Auto Mode
    (14/08, fresco) provou que aprovação binária tudo-ou-nada quebra confiança. Canal de
    permissão no backend (canUseTool → SSE → decisão no chip) + allowlist por ferramenta.
    Entra como **PR-03b** na F0/F2 — e é pré-requisito honesto para um dia sair de
    `bypassPermissions`.
-3. **Multi-conversa server-side (F2)** — table-stake unânime; branching ancorado em
-   thread-store resolve a dor "branches inúteis sem gestão" do Open WebUI (#8928).
-4. **Quota nativa por usuário/org (F4)** — o gap de 3 anos do Open WebUI (issues desde
-   2023 abertas); nosso meter já grava o que falta lá. Diferencial barato.
+3. **Multi-conversa server-side (F2)** — table-stake unânime nos players
+   (E_MULTICONVERSA_TABLE_STAKE). [Retificado no 10º Elenxo: a issue #8928 citada como dor
+   viva foi fechada em 2025-01-31 — o DO se sustenta pela unanimidade, não pela dor.]
+4. **Quota nativa por usuário/org (F4)** — REBAIXADA a table-stake
+   (E_QUOTA_GAP_FECHADO_ABRIL_2026): o Open WebUI fechou as issues de cota como completed
+   entre 2024 e abr/2026 — o "gap de 3 anos" venceu. Continua DO (produto multi-seat exige e
+   o meter já grava), mas NÃO se vende como gap do concorrente.
 5. **Auth como P0 testável** — OIDC quebrou 3× em releases do Open WebUI; nosso `oidc.ts`
    é ativo maduro: ganha teste de regressão na bancada do PR-06b.
 6. **Licença honesta como posicionamento** — compromisso público simples desde o dia 1
@@ -55,7 +59,7 @@ meses, control-plane sobre Claude Code/Codex): a diferenciação KG+Elenxo preci
    não do chat. Entra no programa Brain.
 4. **Realtime multi-user (presença/co-edição)** — eixo do Company Brain; o dossiê nem o
    cobriu (teto declarado). Programa Brain.
-5. **Pricing/packaging** — piso de mercado $20/seat + BYOK mapeado (E_PRICING); a decisão
+5. **Pricing/packaging** — piso de mercado $20/seat + BYOK mapeado (E_PRICING_PISO_20_SEAT); a decisão
    é do fio D5-pricing (gated, maestro).
 
 ### DROP (não fazer, com a evidência do porquê)

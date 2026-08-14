@@ -155,7 +155,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    label: "Auto Mode do Claude Code virou padrão forçado em 14/08/2026 e gerou reação de desconfiança explícita no HN na mesma semana — SSH quebrado, 'dano colateral' (C3). — POR QUE DECIDE: É o dado mais fresco e mais diretamente acionável sobre como expor 102 comandos/51 agentes como 'runs' supervisionados sem repetir o erro: aprovação binária (tudo ou nada) já provou gerar backlash até no líder de mercado. Decisivo para o desenho do modelo de permissão do redesign. FONTE: https://news.ycombinator.com/item?id=49214994"
+    label: "ANUNCIADO em 2026-08-07 (efetivo 14/08): Auto Mode vira default do Claude Code — e a reação do HN NO DIA DO ANÚNCIO foi MISTA, não uniforme (23 pontos: 'permanently broken SSH' e 'uneasy' convivem com 'sensible choice' e 'that is why it is a setting'). O QUE SUSTENTA A DECISÃO (aprovação granular, PR-03b): a triangulação com dois outros claims da lente C3 (conf 0,7/0,8) sobre aprovação binária quebrar confiança — não este thread sozinho. 10º Elenxo rebaixou: o nó transformava anúncio em fato consumado e reação mista em backlash uniforme. FONTE: https://news.ycombinator.com/item?id=46138473"
     trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
   - id: E_CHAT_MORTO_VS_GENUI_REJEITADA
@@ -166,7 +166,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    label: "Chat declarado 'morto' como superfície padrão por líderes de produto (OpenAI, Anthropic mudando Markdown→HTML) — mas a própria comunidade técnica rejeita UI que muda a cada sessão (precedente dos menus adaptativos do Office) (C3/E1). — POR QUE DECIDE: Determina se vale investir pesado em generative UI via assistant-ui agora (DO) ou esperar o padrão amadurecer (DEFER) — decisão de arquitetura de front-end com custo alto de reversão. FONTE: https://r-sun.ai/insights/chat-dead-agentic-ui-2026"
+    label: "[2 FONTES: r-sun.ai p/ chat-morto+Cornell>70%; HN 46138473 p/ precedente Office — 10º Elenxo] Chat declarado 'morto' como superfície padrão por líderes de produto (OpenAI, Anthropic mudando Markdown→HTML) — mas a própria comunidade técnica rejeita UI que muda a cada sessão (precedente dos menus adaptativos do Office) (C3/E1). — POR QUE DECIDE: Determina se vale investir pesado em generative UI via assistant-ui agora (DO) ou esperar o padrão amadurecer (DEFER) — decisão de arquitetura de front-end com custo alto de reversão. FONTE: https://r-sun.ai/insights/chat-dead-agentic-ui-2026"
     trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
   - id: E_MEMORIA_BITEMPORAL_VENCE_MEM0
@@ -176,8 +176,8 @@ nodes:
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.9
     status: confirmed
     impact: 4
-    confidence: 0.9
-    label: "Zep/Graphiti (memória bi-temporal) supera Mem0 (líder de mercado, US$24,5M) em benchmark público por +30% relativo — mas a Anthropic já entregou memória editável/temporal-ish grátis para TODOS os tiers desde 02/03/2026 (D1/B2). — POR QUE DECIDE: Valida a aposta técnica do KG-SSOT/kg-radar com evidência de mercado, mas encolhe a janela de diferenciação: o maior player já normalizou memória persistente e legível. Decisivo para DO rápido, não DEFER — a vantagem temporal do Bridge tem prazo de validade. FONTE: https://techcrunch.com/2025/10/28/mem0-raises-24m-from-yc-peak-xv-and-basis-set-to-build-the-memory-layer-for-ai-apps/"
+    confidence: 0.75
+    label: "Zep/Graphiti (memória bi-temporal) supera Mem0 (líder de mercado, US$23,9M) em benchmark público por +30% relativo — mas a Anthropic já entregou memória editável/temporal-ish grátis para TODOS os tiers desde 02/03/2026 (D1/B2). — POR QUE DECIDE: Valida a aposta técnica do KG-SSOT/kg-radar com evidência de mercado, mas encolhe a janela de diferenciação: o maior player já normalizou memória persistente e legível. Decisivo para DO rápido, não DEFER — a vantagem temporal do Bridge tem prazo de validade. FONTE: https://weavai.app (benchmark LongMemEval 63,8%% vs 49,0%% = +30%% relativo; funding Mem0 US$23,9M — 3,9 seed + 20 Series A — via TechCrunch 2025-10-28. 10º Elenxo: URL e confidence corrigidas — o nó fundia 2 lentes sob a URL errada e era a ÚNICA inflação de confidence do grafo)
     trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
   - id: E_PROGRESSO_VISIVEL_3X_RETENCAO
@@ -210,7 +210,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    label: "Open WebUI trocou de licença 6 vezes terminando numa cláusula de branding obrigatório acima de 50 usuários/30 dias — comunidade reage chamando de 'open-washing' (A1/C2). — POR QUE DECIDE: É a lacuna de confiança mais barata e mais rápida de capturar: compromisso público de licença honesta desde o dia 1 é decisão de baixo custo e alto retorno de posicionamento. Decisivo para DO imediato (declaração de licença), não depende de nenhuma feature nova. FONTE: https://docs.openwebui.com/license/"
+    label: "Open WebUI trocou de licença 6 vezes terminando numa cláusula de branding obrigatório acima de 50 usuários/30 dias — comunidade reage chamando de 'open-washing' (A1/C2). — POR QUE DECIDE: É a lacuna de confiança mais barata e mais rápida de capturar: compromisso público de licença honesta desde o dia 1 é decisão de baixo custo e alto retorno de posicionamento. Decisivo para DO imediato (declaração de licença), não depende de nenhuma feature nova. FONTE: https://docs.openwebui.com/license/" [RESSALVA C2: cadeia de 6 licenças e reação 'open-washing' vêm da lente C2, que declarou Reddit INACESSÍVEL e triangulou por fontes secundárias — confiança reduzida propagada, como o critic pediu]
     trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
   - id: E_OIDC_TABLE_STAKE_MAL_RESOLVIDO
@@ -232,7 +232,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    label: "Mercado convergiu para piso de ~$20/seat/mês com uso cobrado à parte (Claude Team, ChatGPT Business, Onyx); preço enterprise segue opaco na maioria dos players, exceto o self-serve enterprise publicado da Anthropic (D2). — POR QUE DECIDE: Decisivo para a decisão de pricing/packaging que acompanha o redesign — determina se o Bridge deveria publicar preço enterprise (diferencial raro) e adotar seat baixo + BYOK/passthrough, em vez de esconder preço atrás de 'fale com vendas' como a maioria do mercado. FONTE: https://www.usecarly.com/blog/chatgpt-agent-mode/"
+    label: "Mercado convergiu para piso de ~$20/seat/mês com uso cobrado à parte (Claude Team, ChatGPT Business, Onyx); preço enterprise segue opaco na maioria dos players, exceto o self-serve enterprise publicado da Anthropic (D2). — POR QUE DECIDE: Decisivo para a decisão de pricing/packaging que acompanha o redesign — determina se o Bridge deveria publicar preço enterprise (diferencial raro) e adotar seat baixo + BYOK/passthrough, em vez de esconder preço atrás de 'fale com vendas' como a maioria do mercado. FONTE: https://claude.com/pricing (D2; corroborado por beam.cloud e onyx.app — 10º Elenxo corrigiu a URL que apontava para a lente errada)"
     trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
   - id: E_TETOS_DA_PESQUISA
@@ -243,7 +243,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    label: "TETOS DECLARADOS DO DOSSIÊ (o critic contra o próprio run): Nenhuma lente cobre desempenho/latência (tokens/s, time-to-first-token) de nenhum concorrente — eixo comum em qualquer decisão de redesign de chat-UI, ausente por completo nas 15 l · Nenhuma lente audita compliance/segurança de dados dos concorrentes (SOC2, GDPR, retenção, residência de dados) apesar de compliance ser dimensão peer declarada do Onion — D1/D2/C2 · Reddit (r/selfhosted, r/LocalLLaMA, r/OpenWebUI) — a fonte PROMETIDA pela lente C2 — ficou INACESSÍVEL ao crawler e foi triangulada por fontes secundárias; a lente é honesta sobre  · Nenhuma lente testa, audita ou faz benchmark da superfície ATUAL do próprio Onion Bridge — o dossiê inteiro é unilateral (só concorrentes); falta o outro lado da comparação para um · Colaboração multi-usuário em tempo real (co-edição, presença, cursores, comentários) — eixo central para a tese 'Company Brain' do Bridge — não é examinado como eixo próprio em nen · O 'fardo operacional' de manter grafo de conhecimento em produção multi-tenant (citado de passagem pelo relatório Mnemoverse em D1) nunca é aprofundado ou quantificado em nenhuma l · Android é quase ausente do dossiê — E2 é quase inteiramente iOS-centrado; a única menção Android é o widget de tela inicial do ChatGPT em B1. Falta eixo próprio de paridade Android. E as contradições vivas: superfície dedicada vs agente-no-mensageiro (OpenClaw); auto-aprovação validada (B2) vs backlash fresco de 14/08 (C3); generative UI desejada em pesquisa vs rejeitada em precedente. Nenhuma lente auditou o PRÓPRIO Bridge (baseline unilateral — o mapa interno de 2026-08-14 cobre esse lado)."
+    label: "TETOS DECLARADOS DO DOSSIÊ (o critic contra o próprio run): Nenhuma lente cobre desempenho/latência (tokens/s, time-to-first-token) de nenhum concorrente — eixo comum em qualquer decisão de redesign de chat-UI, ausente por completo nas 15 lentes. · Nenhuma lente audita compliance/segurança de dados dos concorrentes (SOC2, GDPR, retenção, residência de dados) apesar de compliance ser dimensão peer declarada do Onion — D1/D2/C2 cobrem preço e licença, nunca postura de compliance. · Reddit (r/selfhosted, r/LocalLLaMA, r/OpenWebUI) — a fonte PROMETIDA pela lente C2 — ficou INACESSÍVEL ao crawler e foi triangulada por fontes secundárias; a lente é honesta sobre isso, mas nada no dossiê consolidado carrega esse aviso de confiança reduzida adiante quando C2 é citada. · Nenhuma lente testa, audita ou faz benchmark da superfície ATUAL do próprio Onion Bridge — o dossiê inteiro é unilateral (só concorrentes); falta o outro lado da comparação para uma decisão DO/DEFER/DROP com baseline próprio. · Colaboração multi-usuário em tempo real (co-edição, presença, cursores, comentários) — eixo central para a tese 'Company Brain' do Bridge — não é examinado como eixo próprio em nenhuma lente, só tangenciado (Chatto é chat de time, RBAC é permissão estática). · O 'fardo operacional' de manter grafo de conhecimento em produção multi-tenant (citado de passagem pelo relatório Mnemoverse em D1) nunca é aprofundado ou quantificado em nenhuma lente — é mencionado, não medido, apesar de ser risco direto à aposta central do KG-SSOT. · Android é quase ausente do dossiê — E2 é quase inteiramente iOS-centrado; a única menção Android é o widget de tela inicial do ChatGPT em B1. Falta eixo próprio de paridade Android/PWA (background sync, notificações, instalabilidade) equivalente ao detalhamento dado ao iOS. — e as contradições vivas: superfície dedicada vs agente-no-mensageiro (OpenClaw); auto-aprovação validada (B2) vs reação mista fresca (C3); generative UI desejada em pesquisa vs precedente Office rejeitado. Nenhuma lente auditou o PRÓPRIO Bridge (o mapa interno de 2026-08-14 cobre esse lado)."
     trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
   - id: D_G1_POSICAO_E_CORTE_SELADOS
@@ -256,6 +256,28 @@ nodes:
     confidence: 1.0
     label: "G1 SELADO PELO MAESTRO (2026-08-14, como proposto): POSIÇÃO = 'o cockpit honesto de um agente que roda de verdade' — KG-SSOT temporal + Elenxo VISÍVEIS na UI; não competir em volume (Open WebUI 149k★) nem em onipresença (OpenClaw); concorrente-referência: Mission Control. CORTE: DO = F0 inteiro + APROVAÇÃO GRANULAR DE TOOL (PR-03b NA F0, JÁ — decisão do maestro; canal canUseTool→SSE→decisão no chip + allowlist; pré-requisito honesto para um dia sair de bypassPermissions) + F2 multi-conversa server-side + quota nativa por usuário/org (gap de 3 anos do Open WebUI) + auth como P0 testável + licença honesta como posicionamento + F3 (dark/anexos/shiki/i18n). DEFER c/ gatilho = generative-UI além de blocos inline; canal mensageiro (pós-G5); notebook fonte-fundamentado (programa Brain); realtime-collab (Brain); pricing (fio D5 gated). DROP = RAG-plataforma de embeddings; voz realtime; sync-background PWA iOS (teto DURO de arquitetura — Brain mobile exigirá wrapper nativo); ressuscitar convites. Proposta completa: docs/analysis/bridge-posicionamento-2026-08.md."
     trace: "docs/analysis/bridge-posicionamento-2026-08.md"
+
+  - id: E_MULTICONVERSA_TABLE_STAKE
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lentes-a1-a2-e-issue-8928-relida-ao-vivo-pelo-10o-elenxo-fechada-2025-01-31
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    label: "Multi-conversa/branching é TABLE-STAKE unânime nos players (Open WebUI, LibreChat, big-AGI — lentes A1/A2/A4); a dor citada no G1 ('branches inúteis sem gestão', issue #8928) foi FECHADA em 2025-01-31 — o 10º Elenxo releu as issues ao vivo. O DO#3 (F2 multi-conversa server-side) se sustenta pela unanimidade de table-stake, NÃO por dor aberta no concorrente. FONTE: https://github.com/open-webui/open-webui/issues/8928 (closed/completed)."
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_QUOTA_GAP_FECHADO_ABRIL_2026
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: 10o-elenxo-releu-as-4-issues-na-api-do-github-todas-closed-completed
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    label: "CORREÇÃO DE EVIDÊNCIA VENCIDA (10º Elenxo): as issues de cota do Open WebUI que o G1 citava como 'abertas desde 2023' estão TODAS fechadas como completed — #1430 em 2024-04-05, #23323 em 2026-04-02, #6692 em 2026-04-14. A inferência forte (a conferir no changelog): o Open WebUI ENTREGOU limites por usuário/grupo ~abril/2026. CONSEQUÊNCIA NO CORTE: quota nativa (DO#4) REBAIXA de 'diferencial barato' para TABLE-STAKE — continua DO (o meter já grava o que falta lá, e produto multi-seat exige), mas o posicionamento não pode vendê-la como gap do concorrente. FONTE: https://github.com/open-webui/open-webui/issues/23323 (closed/completed)."
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
 edges:
   - from: D_programa_bridge_evolve
@@ -333,3 +355,12 @@ edges:
   - from: E_AUTOMODE_BACKLASH_APROVACAO_BINARIA
     to: D_G1_POSICAO_E_CORTE_SELADOS
     edge_type: SUPPORTS
+  - from: E_MULTICONVERSA_TABLE_STAKE
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_QUOTA_GAP_FECHADO_ABRIL_2026
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: CONSTRAINS
+  - from: E_QUOTA_GAP_FECHADO_ABRIL_2026
+    to: D_G1_POSICAO_E_CORTE_SELADOS
+    edge_type: CONSTRAINS
