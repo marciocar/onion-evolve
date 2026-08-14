@@ -84,13 +84,13 @@ nodes:
 
   - id: F4_GOVERNO_ADMIN
     node_type: entity
-    plane: DEV
+    plane: PROD
     verified_at: 2026-08-14
-    verified_against: fase-definida-gated-em-g1-decisao-logto-api-selada
-    status: open
+    verified_against: deploy-limpo-3a-vez-invite-anonimo-401-em-producao-usage-guards-ok-spa-admin-200-m2m-no-env
+    status: done
     impact: 4
     confidence: 0.85
-    label: "F4 GOVERNO (pós-G1, ∥ F3): admin passa a administrar o que EXISTE. PR-18 meter reader (agregação org/sub/payer/model/cache × período — o ledger já grava com rigor de ADR e nada lê) · PR-19 usage dashboard (custo CERTO com cache-write) · PR-20 identidades/orgs/convites via Logto Management API (token M2M SÓ no backend Hono; front nunca fala com Logto admin) · PR-21 cotas + rate-limit como UX (orçamento no composer; 429 com retry-after legível, nunca modal genérico). GATE G4: convite→cadastro→1ª conversa→custo no dashboard em <5min, MEDIDO."
+    label: "F4 GOVERNO (pós-G1, ∥ F3): admin passa a administrar o que EXISTE. PR-18 meter reader (agregação org/sub/payer/model/cache × período — o ledger já grava com rigor de ADR e nada lê) · PR-19 usage dashboard (custo CERTO com cache-write) · PR-20 identidades/orgs/convites via Logto Management API (token M2M SÓ no backend Hono; front nunca fala com Logto admin) · PR-21 cotas + rate-limit como UX (orçamento no composer; 429 com retry-after legível, nunca modal genérico). GATE G4: convite→cadastro→1ª conversa→custo no dashboard em <5min, MEDIDO. ✅ F4 FECHADA 2026-08-14 (bridge 84402c0/e79d263/42a22b1/5bccdd6/bd82daa): meter-reader (o ledger parou de morrer em disco) + dashboard /admin no tema + quotas com 429 legível + identidades via Logto Management API fail-soft (M2M m-default extraído pela rota do provisionador, no .env). 15º ELENXO salvou a fase de ser fachada: a pilha MEDIA E MOSTRAVA MAS GOVERNAVA NADA — invite SEM GUARD (anônimo criava usuário no tenant; 201 medido) e a COTA ERA CÓDIGO MORTO (middleware após o handler) — as MESMAS classes já fechadas (use-sem-subpath do 11º, ordem-de-registro) reincidindo; +9 curas (DoS 79x na janela, PATCH gravando diferente do que respondia, convite-que-nunca-loga em tenant username-only agora avisado pelo IdP, token M2M sobrevivendo à revogação, __proto__, cortes silenciosos). PROVA VIVA pós-deploy: invite anônimo 401, usage 401 sem token, SPA /admin 200. FIOS ABERTOS COM GATILHO: S12 corrida do enforcement (ledger grava no FIM do turno — 20 checagens concorrentes passam; rate-limit contém a 20/min; cura = reserva-de-gasto-em-voo, decisão de desenho) · cota SEM SUPERFÍCIE de edição (só curl — UI de quota no admin) · G4 prova humana <5min pendente do maestro (convite pelo dashboard→login→chat→custo; convite útil exige e-mail como identificador no tenant OU criar com username)."
     trace: "/home/onion/onion-bridge/src/meter.ts"
 
   - id: F5_PRACA_DIVULGACAO
