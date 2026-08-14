@@ -79,7 +79,11 @@ if [ "$SIZE" -lt 200 ]; then
 fi
 
 # Retenção: só os DIÁRIOS envelhecem; rotulados (pré-upgrade, pré-flip) ficam.
-ls -1t "${DEST}"/bridge-diario-*.tar.gz 2>/dev/null | tail -n +15 | xargs -r rm -f
+# O padrão SEGUE o formato vivo (.gpg desde 2026-08-11 — a retenção ficou 3 dias
+# morrendo em rc=2 DEPOIS do backup pronto: glob sem match vira literal, ls sai 2,
+# set -e mata; o cron engolia e o update-bridge.sh pegou no 1º uso do ramo cheio).
+# `|| true`: retenção vazia não é falha.
+ls -1t "${DEST}"/bridge-diario-*.tar.gz.gpg 2>/dev/null | tail -n +15 | xargs -r rm -f || true
 
 # ⚠️ O SIZE E RECALCULADO AQUI, depois da cifra. Antes ele media o `.tar` em claro — que o `shred`
 #    ja tinha destruido — e o relato descrevia um arquivo que nao existe mais. Relato que nomeia o
