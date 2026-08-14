@@ -1,6 +1,6 @@
 ---
 branch: research/bridge-produto-2026-08
-pr: pendente
+pr: 595
 date: 2026-08-14
 reviewed_diff_sha256: c60aba9d30d5b51ef73ef90987aad5cfe74d0fed34553d25f5fc81d6bc15e99e
 findings_total: 12
