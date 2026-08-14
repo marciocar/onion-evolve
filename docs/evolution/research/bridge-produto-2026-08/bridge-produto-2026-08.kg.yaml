@@ -1,0 +1,366 @@
+meta:
+  id: bridge-produto-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-14
+  date: 2026-08-14
+  note: >
+    KG-SSOT do programa BRIDGE-EVOLVE: evoluir o Onion Bridge de PoC a produto
+    estado-da-arte (ago/2026). Pedido do maestro 2026-08-14: revisão completa +
+    pesquisa profunda de mercado documentada + redesign completo (Admin, app,
+    convites/cadastro/gestão, chat, ferramentas, anexos, documentos, formatação,
+    design premium) — sem salada de frutas; será força de divulgação do onion-evolve
+    e base futura de Company Brain / Personal Brain Extended. Plano aprovado:
+    /home/marcio/.claude/plans/enumerated-squishing-adleman.md (6 fases, 25 PRs).
+    Os achados da pesquisa (F1, workflow wf_f6c09d35-8a7) entram como evidence
+    neste grafo; o corte DO/DEFER/DROP do gate G1 entra como decisions.
+
+nodes:
+  - id: C_plano_poc
+    node_type: claim
+    plane: PROD
+    verified_at: 2026-08-14
+    verified_against: mapa-completo-do-frontend-2026-08-14-2400-linhas-registry-metade-inerte-zero-persistencia-admin-morto
+    status: superseded
+    impact: 4
+    confidence: 1.0
+    label: "O PLANO IMPLÍCITO DO PoC (histórico, criado para ser superseded — não havia nó): provar que o Onion roda de verdade atrás de um chat mobile. PROVOU — e parou lá. O que o mapa de 2026-08-14 mediu: ~2.400 linhas de registry assistant-ui production-grade com METADE INERTE por fiação ausente (onCancel/onReload/onEdit/onAddToolResult/threadList não passados; SSE thinking/tool_result descartados ⇒ parar-geração/regenerar/editar/branching/reasoning/tool-results mortos); ZERO persistência (F5 evapora conversa/sessão/custo, backend suporta resume); telemetria do front errada por ordem de grandeza (lê total_cost_usd sem cache-write; o meter lê modelUsage — medido 9.635 cache-write vs 40 input num turno real); AdminPanel de 726 linhas administrando convites MORTOS pós-P11; meter.ts com ledger org/sub/payer/model/cache pronto para dashboard SEM leitor; bundle 828KB sem splitting; sem testes/lint; 333 linhas mortas; 1 conversa só."
+    trace: "docs/evolution/research/bridge-produto-2026-08/"
+
+  - id: D_programa_bridge_evolve
+    node_type: decision
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: plano-aprovado-pelo-maestro-com-4-decisoes-seladas-e-reforco-de-versoes-latest
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "O PROGRAMA (aprovado 2026-08-14): 6 fases, 25 PRs pequenos com Elenxo cada, deploy sempre via ops/update-bridge.sh. DECISÕES SELADAS DO MAESTRO: (1) F0 fiação ∥ F1 pesquisa — religar o existente é invariante sob qualquer posicionamento; (2) thread store SERVER-SIDE (multi-device, pré-requisito de share, substrato do Brain futuro); (3) pesquisa COMPLETA ~15 lentes em 5 eixos; (4) admin novo via Logto Management API (M2M só no backend) + meter reader — convites mortos não ressuscitam. REFORÇO (aparte 2026-08-14): 'tudo deve começar com as versões mais modernas' → PR-00 moderniza deps ANTES da fiação (assistant-ui 0.15+ mata o pin 0.14.7 na direção certa; fia-se UMA vez, contra a API nova) — revoga a estratégia congelar-0.14. PRESERVAR: oidc.ts, sse.ts, meter.ts, telemetry/ SDAAL, tema 3 camadas, pickers / e @ (o diferencial: 102 comandos/51 agentes), convert-message.ts. ANTI-SALADA: nenhuma superfície nova antes do corte DO/DEFER/DROP do G1, cada item com aresta para evidência."
+    trace: "/home/marcio/.claude/plans/enumerated-squishing-adleman.md"
+
+  - id: F0_ALICERCE_FIACAO
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-8-prs-nomeados-criterios-medidos
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "F0 ALICERCE (sem. 1-2, começa já): PR-00 modernização de deps para latest (reforço do maestro) · PR-01 poda (333 linhas mortas + AdminPanel de convites + public/) · PR-02 controle (onCancel/onReload/onEdit — parar/regenerar/editar/branching vivos) · PR-03 SSE completo (thinking→reasoning, tool_result→UI, onAddToolResult) · PR-04 telemetria correta (modelUsage c/ cache-write, paridade ≤1% com o meter) · PR-05 persistência mínima (resume + histórico sobrevivem a F5) · PR-06 ErrorBoundary + safe-area bottom · PR-06b bancada (eslint+vitest+bench.sh — substituto do CI ausente) · PR-03b APROVAÇÃO GRANULAR DE TOOL (adicionado no G1 pelo maestro: canal canUseTool→SSE→decisão no chip + allowlist por ferramenta — a reação mista ao anúncio do Auto Mode (07/08) + triangulação C3 mostram que aprovação binária corrói confiança). GATE G0: 9/9 dones MEDIDOS + deploy + smoke."
+    trace: "/home/onion/onion-bridge/web/src/runtime/onion-runtime.ts"
+
+  - id: F1_FAROL_PESQUISA
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: workflow-wf-f6c09d35-8a7-lancado-15-lentes-5-eixos-com-schema-fechado
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "F1 FAROL (∥ F0, core): pesquisa profunda em 5 eixos, 15 lentes sonnet/high com schema fechado (claim/kind/URL-primária/data/confidence/relevance_bridge) + completeness critic. A·players (Open WebUI, LibreChat, AnythingLLM, big-AGI+TypingMind+Msty, emergentes POR TRAJETÓRIA) · B·bigtechs (OpenAI Projects/memória/pós-Canvas, Anthropic memória/Artifacts/UX-de-agente, Google Gemini/NotebookLM+Copilot) · C·dores públicas (r/ChatGPT+ClaudeAI, r/LocalLLaMA+selfhosted+OpenWebUI, HN/power-users) · D·follow-the-money (capital/M&A em memória+second-brain — a fraqueza TEMPORAL dos players valida o KG-SSOT como diferencial; pricing/packaging) · E·design (premium chat UI 2026; PWA mobile). Run: wf_f6c09d35-8a7. Entregáveis: SYNTHESIS.md + evidence neste grafo + docs/analysis/bridge-posicionamento-2026-08.md. GATE G1 (maestro): posição + corte DO/DEFER/DROP."
+    trace: "docs/evolution/research/bridge-produto-2026-08/"
+
+  - id: F2_ESPINHA_THREADS
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-depende-de-g0-nao-de-g1
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "F2 ESPINHA (pós-G0, NÃO espera G1 — multi-conversa é table-stake unânime): PR-07 thread store SERVER-SIDE (CRUD por identidade/org, decisão selada do maestro; IDs estáveis + metadados extensíveis = porta do Brain) · PR-08 ExternalStoreThreadListAdapter + lista/título/arquivar · PR-09 rotas (/chat/:threadId, /admin — fim do useState-navegação; refresh restaura estado exato) · PR-10 busca · PR-11 code-splitting (chunk inicial <300KB dos 828KB)."
+    trace: "/home/onion/onion-bridge/web/src/App.tsx"
+
+  - id: F3_ROSTO_REDESIGN
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-gated-em-g1
+    status: open
+    impact: 4
+    confidence: 0.85
+    label: "F3 ROSTO (pós-G1): /design:generate (candidatas ancoradas cream #FAF7F2/orange #C2410C + gate WCAG determinístico) → @design-system-specialist (tokens DTCG→Tailwind) sobre o tema 3 camadas existente. PR-12 tokens + DARK LIGADO (já desenhado nos semânticos, toggle + prefers-color-scheme, WCAG AA nas duas) · PR-13 shiki lazy · PR-14 anexos PDF/text (backend JÁ aceita) · PR-15 blocos inline no fio (escopo mínimo do corte G1 — a tendência pós-Canvas) · PR-16 i18n pt-BR primeiro · PR-17 composer novo preservando pickers + sugestões anti-blank-page. GATE G3: WCAG AA claro+escuro, Lighthouse mobile ≥90, demo aprovada."
+    trace: "/home/onion/onion-bridge/web/src/theme/onion.css"
+
+  - id: F4_GOVERNO_ADMIN
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-gated-em-g1-decisao-logto-api-selada
+    status: open
+    impact: 4
+    confidence: 0.85
+    label: "F4 GOVERNO (pós-G1, ∥ F3): admin passa a administrar o que EXISTE. PR-18 meter reader (agregação org/sub/payer/model/cache × período — o ledger já grava com rigor de ADR e nada lê) · PR-19 usage dashboard (custo CERTO com cache-write) · PR-20 identidades/orgs/convites via Logto Management API (token M2M SÓ no backend Hono; front nunca fala com Logto admin) · PR-21 cotas + rate-limit como UX (orçamento no composer; 429 com retry-after legível, nunca modal genérico). GATE G4: convite→cadastro→1ª conversa→custo no dashboard em <5min, MEDIDO."
+    trace: "/home/onion/onion-bridge/src/meter.ts"
+
+  - id: F5_PRACA_DIVULGACAO
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-gated-em-g3
+    status: open
+    impact: 3
+    confidence: 0.85
+    label: "F5 PRAÇA (pós-G3): PR-22 PWA real (runtimeCaching, offline shell, install prompt) · PR-23 share read-only com escopo de org · PR-24 onboarding (tour dos pickers — o diferencial apresentado no 1º uso). GATE G5 go-live: 1 semana de dogfood padrão master com 0 crashes; TTI e instalação medidos."
+    trace: "/home/onion/onion-bridge/web/vite.config.ts"
+
+  - id: F6_PONTE_BRAIN_DEFERRED
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: explicitamente-fora-do-programa-portas-abertas-a-custo-zero
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "F6 PONTE (explicitamente FORA deste programa — Company Brain / Personal Brain Extended é PROGRAMA NOVO com SUPERSEDES próprio quando o maestro abrir o gate). NÃO fazer agora: memória no runtime, KG acoplado ao chat, projetos pesados, Elenxo exposto ao usuário. PORTAS ABERTAS A CUSTO ~0 (obrigações das outras fases): thread store com IDs estáveis e metadados extensíveis (F2); ledger JSONL append-only como fonte de ingestão futura (F4); UM hook plugável de contexto-de-sistema no backend (interface só, sem implementação); o eixo D da F1 produz o caso de negócio (memória TEMPORAL é a fraqueza medida do segmento — Mem0 49% no subset temporal do LongMemEval)."
+    trace: "docs/evolution/research/bridge-produto-2026-08/"
+
+  - id: Q_G1_CORTE_DO_DEFER_DROP
+    node_type: question
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: selado-pelo-maestro-2026-08-14-como-proposto-com-pr03b-na-f0
+    status: done
+    impact: 5
+    confidence: 0.9
+    label: "GATE G1 — decisão do maestro que trava as superfícies NOVAS (F3/F4/F5): com a síntese da pesquisa na mesa, selar a POSIÇÃO do Bridge e o corte DO/DEFER/DROP item a item — cada escolha com aresta SUPPORTS/REFUTES para a evidence citada. É o mecanismo anti-salada-de-frutas que o pedido exige: 'não é para fazer uma salada de frutas desconectada da realidade'. F0 e F2 NÃO dependem deste gate (invariantes). GATILHO: workflow wf_f6c09d35-8a7 concluído + SYNTHESIS.md escrita."
+
+  - id: E_OPENCLAW_TESE_MENSAGEIRO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.9
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "OpenClaw (386k stars/9 meses) vence apostando que o agente mora DENTRO de apps de mensagem já usados, não numa superfície dedicada — tese oposta à do Bridge (A5). — POR QUE DECIDE: Questiona a premissa arquitetural mais básica de um redesign de PWA de chat dedicada; se essa é a trajetória mais rápida do mercado, o Bridge pode estar otimizando a superfície errada. Decisivo para DROP ou re-escopo do formato PWA-dedicada como canal único. FONTE: https://api.github.com/repos/openclaw/openclaw"
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_MISSION_CONTROL_CONCORRENTE_DIRETO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.88
+    status: confirmed
+    impact: 4
+    confidence: 0.88
+    label: "Mission Control (builderz-labs, criado fev/2026, 6k stars) já é um control-plane self-hosted operando Claude Code/Codex/OpenClaw como runtimes — mesmo nicho 'dashboard sobre agentes reais rodando' que o Bridge quer ocupar (A5). — POR QUE DECIDE: É o concorrente nomeado mais próximo do posicionamento exato do Bridge, crescendo ~1000 stars/mês. Decisivo para DO com urgência: a diferenciação (KG-SSOT+Elenxo) precisa ficar visível AGORA, antes que a categoria feche em torno de Mission Control. FONTE: https://api.github.com/repos/builderz-labs/mission-control"
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_AUTOMODE_BACKLASH_APROVACAO_BINARIA
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.85
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    label: "ANUNCIADO em 2026-08-07 (efetivo 14/08): Auto Mode vira default do Claude Code — e a reação do HN NO DIA DO ANÚNCIO foi MISTA, não uniforme (23 pontos: 'permanently broken SSH' e 'uneasy' convivem com 'sensible choice' e 'that is why it is a setting'). O QUE SUSTENTA A DECISÃO (aprovação granular, PR-03b): a triangulação com dois outros claims da lente C3 (conf 0,7/0,8) sobre aprovação binária quebrar confiança — não este thread sozinho. 10º Elenxo rebaixou: o nó transformava anúncio em fato consumado e reação mista em backlash uniforme. FONTE: https://news.ycombinator.com/item?id=46138473"
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_CHAT_MORTO_VS_GENUI_REJEITADA
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.65
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    label: "[2 FONTES: r-sun.ai p/ chat-morto+Cornell>70%; HN 46138473 p/ precedente Office — 10º Elenxo] Chat declarado 'morto' como superfície padrão por líderes de produto (OpenAI, Anthropic mudando Markdown→HTML) — mas a própria comunidade técnica rejeita UI que muda a cada sessão (precedente dos menus adaptativos do Office) (C3/E1). — POR QUE DECIDE: Determina se vale investir pesado em generative UI via assistant-ui agora (DO) ou esperar o padrão amadurecer (DEFER) — decisão de arquitetura de front-end com custo alto de reversão. FONTE: https://r-sun.ai/insights/chat-dead-agentic-ui-2026"
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_MEMORIA_BITEMPORAL_VENCE_MEM0
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.9
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    label: "Zep/Graphiti (memória bi-temporal) supera Mem0 (líder de mercado, US$23,9M) em benchmark público por +30% relativo — mas a Anthropic já entregou memória editável/temporal-ish grátis para TODOS os tiers desde 02/03/2026 (D1/B2). — POR QUE DECIDE: Valida a aposta técnica do KG-SSOT/kg-radar com evidência de mercado, mas encolhe a janela de diferenciação: o maior player já normalizou memória persistente e legível. Decisivo para DO rápido, não DEFER — a vantagem temporal do Bridge tem prazo de validade. FONTE: https://weavai.app (benchmark LongMemEval 63,8%% vs 49,0%% = +30%% relativo; funding Mem0 US$23,9M — 3,9 seed + 20 Series A — via TechCrunch 2025-10-28. 10º Elenxo: URL e confidence corrigidas — o nó fundia 2 lentes sob a URL errada e era a ÚNICA inflação de confidence do grafo)
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_PROGRESSO_VISIVEL_3X_RETENCAO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.5
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    label: "Sessões de agente sem visibilidade de progresso mid-run têm 3x a taxa de abandono comparadas a sessões com painel de progresso ao vivo (E1, Zylos AI). — POR QUE DECIDE: É o único dado quantitativo e comportamental (não anedota) de todo o dossiê ligando uma feature específica (tool-call/reasoning disclosure) a retenção. Decisivo para DO: justifica investimento concreto em componentes de transparência de execução no redesign. FONTE: https://zylos.ai/research/2026-05-28-agentic-ux-frontend-design-patterns-ai-agents/"
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_IOS_PWA_TETO_DURO_SYNC
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.75
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    label: "PWA no iOS tem teto de cache de ~50MB com expiração em 7 dias de inatividade e ZERO suporte a Background Sync/Periodic Sync/Background Fetch em qualquer versão do iOS (E2). — POR QUE DECIDE: É restrição técnica dura, não de produto — invalida por arquitetura qualquer ambição de 'Personal Brain com sync em segundo plano' na superfície PWA escolhida. Decisivo para DEFER dessa ambição específica ou para forçar um caminho nativo/companion app em paralelo. FONTE: https://www.magicbell.com/blog/pwa-ios-limitations-safari-support-complete-guide"
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_OPENWEBUI_LICENCA_OPENWASHING
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.85
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    label: "Open WebUI trocou de licença 6 vezes terminando numa cláusula de branding obrigatório acima de 50 usuários/30 dias — comunidade reage chamando de 'open-washing' (A1/C2). — POR QUE DECIDE: É a lacuna de confiança mais barata e mais rápida de capturar: compromisso público de licença honesta desde o dia 1 é decisão de baixo custo e alto retorno de posicionamento. Decisivo para DO imediato (declaração de licença), não depende de nenhuma feature nova. FONTE: https://docs.openwebui.com/license/" [RESSALVA C2: cadeia de 6 licenças e reação 'open-washing' vêm da lente C2, que declarou Reddit INACESSÍVEL e triangulou por fontes secundárias — confiança reduzida propagada, como o critic pediu]
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_OIDC_TABLE_STAKE_MAL_RESOLVIDO
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.8
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    label: "Login OIDC do Open WebUI quebrou repetidamente em pelo menos 3 releases distintos ao longo de ~2 anos — autenticação self-hosted é table-stake mal resolvido, não feature avançada (C2). — POR QUE DECIDE: Redireciona prioridade de engenharia do redesign: antes de qualquer polimento de UI/generative-UI, a estabilidade de auth self-hosted precisa ser tratada como P0 testável, porque é onde concorrentes visivelmente falham e usuários abandonam. FONTE: https://github.com/open-webui/open-webui/issues/16590"
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_PRICING_PISO_20_SEAT
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.55
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    label: "Mercado convergiu para piso de ~$20/seat/mês com uso cobrado à parte (Claude Team, ChatGPT Business, Onyx); preço enterprise segue opaco na maioria dos players, exceto o self-serve enterprise publicado da Anthropic (D2). — POR QUE DECIDE: Decisivo para a decisão de pricing/packaging que acompanha o redesign — determina se o Bridge deveria publicar preço enterprise (diferencial raro) e adotar seat baixo + BYOK/passthrough, em vez de esconder preço atrás de 'fale com vendas' como a maioria do mercado. FONTE: https://claude.com/pricing (D2; corroborado por beam.cloud e onyx.app — 10º Elenxo corrigiu a URL que apontava para a lente errada)"
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_TETOS_DA_PESQUISA
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: completeness-critic-do-proprio-run-7-lacunas-nomeadas
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "TETOS DECLARADOS DO DOSSIÊ (o critic contra o próprio run): Nenhuma lente cobre desempenho/latência (tokens/s, time-to-first-token) de nenhum concorrente — eixo comum em qualquer decisão de redesign de chat-UI, ausente por completo nas 15 lentes. · Nenhuma lente audita compliance/segurança de dados dos concorrentes (SOC2, GDPR, retenção, residência de dados) apesar de compliance ser dimensão peer declarada do Onion — D1/D2/C2 cobrem preço e licença, nunca postura de compliance. · Reddit (r/selfhosted, r/LocalLLaMA, r/OpenWebUI) — a fonte PROMETIDA pela lente C2 — ficou INACESSÍVEL ao crawler e foi triangulada por fontes secundárias; a lente é honesta sobre isso, mas nada no dossiê consolidado carrega esse aviso de confiança reduzida adiante quando C2 é citada. · Nenhuma lente testa, audita ou faz benchmark da superfície ATUAL do próprio Onion Bridge — o dossiê inteiro é unilateral (só concorrentes); falta o outro lado da comparação para uma decisão DO/DEFER/DROP com baseline próprio. · Colaboração multi-usuário em tempo real (co-edição, presença, cursores, comentários) — eixo central para a tese 'Company Brain' do Bridge — não é examinado como eixo próprio em nenhuma lente, só tangenciado (Chatto é chat de time, RBAC é permissão estática). · O 'fardo operacional' de manter grafo de conhecimento em produção multi-tenant (citado de passagem pelo relatório Mnemoverse em D1) nunca é aprofundado ou quantificado em nenhuma lente — é mencionado, não medido, apesar de ser risco direto à aposta central do KG-SSOT. · Android é quase ausente do dossiê — E2 é quase inteiramente iOS-centrado; a única menção Android é o widget de tela inicial do ChatGPT em B1. Falta eixo próprio de paridade Android/PWA (background sync, notificações, instalabilidade) equivalente ao detalhamento dado ao iOS. — e as contradições vivas: superfície dedicada vs agente-no-mensageiro (OpenClaw); auto-aprovação validada (B2) vs reação mista fresca (C3); generative UI desejada em pesquisa vs precedente Office rejeitado. Nenhuma lente auditou o PRÓPRIO Bridge (o mapa interno de 2026-08-14 cobre esse lado)."
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: D_G1_POSICAO_E_CORTE_SELADOS
+    node_type: decision
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: askuserquestion-2026-08-14-selar-como-proposto-e-pr03b-na-f0-ja
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "G1 SELADO PELO MAESTRO (2026-08-14, como proposto): POSIÇÃO = 'o cockpit honesto de um agente que roda de verdade' — KG-SSOT temporal + Elenxo VISÍVEIS na UI; não competir em volume (Open WebUI 149k★) nem em onipresença (OpenClaw); concorrente-referência: Mission Control. CORTE: DO = F0 inteiro + APROVAÇÃO GRANULAR DE TOOL (PR-03b NA F0, JÁ — decisão do maestro; canal canUseTool→SSE→decisão no chip + allowlist; pré-requisito honesto para um dia sair de bypassPermissions) + F2 multi-conversa server-side + quota nativa por usuário/org (gap de 3 anos do Open WebUI) + auth como P0 testável + licença honesta como posicionamento + F3 (dark/anexos/shiki/i18n). DEFER c/ gatilho = generative-UI além de blocos inline; canal mensageiro (pós-G5); notebook fonte-fundamentado (programa Brain); realtime-collab (Brain); pricing (fio D5 gated). DROP = RAG-plataforma de embeddings; voz realtime; sync-background PWA iOS (teto DURO de arquitetura — Brain mobile exigirá wrapper nativo); ressuscitar convites. Proposta completa: docs/analysis/bridge-posicionamento-2026-08.md."
+    trace: "docs/analysis/bridge-posicionamento-2026-08.md"
+
+  - id: E_MULTICONVERSA_TABLE_STAKE
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: lentes-a1-a2-e-issue-8928-relida-ao-vivo-pelo-10o-elenxo-fechada-2025-01-31
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    label: "Multi-conversa/branching é TABLE-STAKE unânime nos players (Open WebUI, LibreChat, big-AGI — lentes A1/A2/A4); a dor citada no G1 ('branches inúteis sem gestão', issue #8928) foi FECHADA em 2025-01-31 — o 10º Elenxo releu as issues ao vivo. O DO#3 (F2 multi-conversa server-side) se sustenta pela unanimidade de table-stake, NÃO por dor aberta no concorrente. FONTE: https://github.com/open-webui/open-webui/issues/8928 (closed/completed)."
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+  - id: E_QUOTA_GAP_FECHADO_ABRIL_2026
+    node_type: evidence
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: 10o-elenxo-releu-as-4-issues-na-api-do-github-todas-closed-completed
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    label: "CORREÇÃO DE EVIDÊNCIA VENCIDA (10º Elenxo): as issues de cota do Open WebUI que o G1 citava como 'abertas desde 2023' estão TODAS fechadas como completed — #1430 em 2024-04-05, #23323 em 2026-04-02, #6692 em 2026-04-14. A inferência forte (a conferir no changelog): o Open WebUI ENTREGOU limites por usuário/grupo ~abril/2026. CONSEQUÊNCIA NO CORTE: quota nativa (DO#4) REBAIXA de 'diferencial barato' para TABLE-STAKE — continua DO (o meter já grava o que falta lá, e produto multi-seat exige), mas o posicionamento não pode vendê-la como gap do concorrente. FONTE: https://github.com/open-webui/open-webui/issues/23323 (closed/completed)."
+    trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
+
+edges:
+  - from: D_programa_bridge_evolve
+    to: C_plano_poc
+    edge_type: SUPERSEDES
+  - from: F0_ALICERCE_FIACAO
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F1_FAROL_PESQUISA
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F2_ESPINHA_THREADS
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F3_ROSTO_REDESIGN
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F4_GOVERNO_ADMIN
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F5_PRACA_DIVULGACAO
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F6_PONTE_BRAIN_DEFERRED
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: Q_G1_CORTE_DO_DEFER_DROP
+    to: F3_ROSTO_REDESIGN
+    edge_type: CONSTRAINS
+  - from: Q_G1_CORTE_DO_DEFER_DROP
+    to: F4_GOVERNO_ADMIN
+    edge_type: CONSTRAINS
+  - from: Q_G1_CORTE_DO_DEFER_DROP
+    to: F5_PRACA_DIVULGACAO
+    edge_type: CONSTRAINS
+  - from: F1_FAROL_PESQUISA
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_OPENCLAW_TESE_MENSAGEIRO
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_MISSION_CONTROL_CONCORRENTE_DIRETO
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_AUTOMODE_BACKLASH_APROVACAO_BINARIA
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_CHAT_MORTO_VS_GENUI_REJEITADA
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_MEMORIA_BITEMPORAL_VENCE_MEM0
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_PROGRESSO_VISIVEL_3X_RETENCAO
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_IOS_PWA_TETO_DURO_SYNC
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_OPENWEBUI_LICENCA_OPENWASHING
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_OIDC_TABLE_STAKE_MAL_RESOLVIDO
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_PRICING_PISO_20_SEAT
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_TETOS_DA_PESQUISA
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: CONSTRAINS
+  - from: D_G1_POSICAO_E_CORTE_SELADOS
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_AUTOMODE_BACKLASH_APROVACAO_BINARIA
+    to: D_G1_POSICAO_E_CORTE_SELADOS
+    edge_type: SUPPORTS
+  - from: E_MULTICONVERSA_TABLE_STAKE
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
+  - from: E_QUOTA_GAP_FECHADO_ABRIL_2026
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: CONSTRAINS
+  - from: E_QUOTA_GAP_FECHADO_ABRIL_2026
+    to: D_G1_POSICAO_E_CORTE_SELADOS
+    edge_type: CONSTRAINS
