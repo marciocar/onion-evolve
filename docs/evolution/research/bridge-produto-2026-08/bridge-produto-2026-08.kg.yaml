@@ -125,6 +125,17 @@ nodes:
     confidence: 0.9
     label: "PEDIDO DO MAESTRO (demo 08-14) — 3 decisões de desenho GATED nele: (1) PERFIL+TIPOS DE USUÁRIO: área de perfil/configurações e papéis além de admin/user (hoje: bridge:admin via Logto role; superfície mínima já corrigida no PR-25). (2) WORKSPACE POR USUÁRIO: hoje TODOS compartilham UM onionCwd (/home/onion/onion-evolve) — mesmo repo, mesmo contexto, e o /onion de um usuário vê o estado de todos; proposta: diretório por sub (workspaces/<hash-sub>/ com clone próprio ou template), com custo de disco/atualização a decidir. (3) CONVITE POR E-MAIL REAL: exige credencial SMTP no bridge (Postmark do tenant só manda código de login); alternativa v1 vigente = 📋 copiar/reenviar manual. NÃO pré-cozinhar (gated-work-derives-fresh): derivar fresco quando o maestro selar."
 
+  - id: E_ROLE_BRIDGE_USER_CARREGAVA_ADMIN
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-14
+    verified_against: management-api-delete-204-role-bridge-admin-criada-201-scopes-finais-listados
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    label: "FURO DE SEGURANÇA achado pela 2ª entrada da Nicole (demo de campo): o papel bridge-user — atribuído a TODO convidado pelo invite — carregava bridge:admin E bridge:write no Logto. Todo convidado era ADMIN (via identidades, convidava, suspendia, APAGAVA usuários, editava quotas — a tela /admin da Nicole provou). Os guards do servidor sempre estiveram corretos; o erro era de PROVISIONAMENTO de papel, invisível a Elenxo de código — behavior-over-declaration na camada IdP. CURADO NA FONTE 2026-08-14: bridge:admin removido do bridge-user (DELETE 204), papel bridge-admin criado (201) e atribuído SÓ ao marciocar; prova: scopes finais bridge-user=[invoke,write], marciocar=[bridge-user,bridge-admin]. Resíduo: tokens JWT emitidos antes da cura valem até expirar (≤1h) — sem revogação stateless. FIO ABERTO: bridge:write continua em TODO convidado (o agente executa/escreve no cwd COMPARTILHADO) — decisão do maestro na Q_GESTAO_USUARIOS_E_WORKSPACES. + PWA: 'nada mudou' era SW novo esperando reload manual (controllerchange→reload, PR-26) e o merge do PR-26 saiu com bancada VERMELHA (cadeia sem abort em rc≠0 — reincidência declarada; curado no PR-27 com split real: admin+página pública fora da carga inicial)."
+    trace: "/home/onion/onion-bridge/web/src/main.tsx"
+
   - id: Q_G5_DOGFOOD_GO_LIVE
     node_type: question
     plane: PROD
@@ -417,3 +428,6 @@ edges:
   - from: Q_GESTAO_USUARIOS_E_WORKSPACES
     to: F5_PRACA_DIVULGACAO
     edge_type: CONSTRAINS
+  - from: E_ROLE_BRIDGE_USER_CARREGAVA_ADMIN
+    to: Q_GESTAO_USUARIOS_E_WORKSPACES
+    edge_type: SUPPORTS
