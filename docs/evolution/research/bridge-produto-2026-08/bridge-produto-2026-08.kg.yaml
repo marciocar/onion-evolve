@@ -1,0 +1,164 @@
+meta:
+  id: bridge-produto-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-14
+  date: 2026-08-14
+  note: >
+    KG-SSOT do programa BRIDGE-EVOLVE: evoluir o Onion Bridge de PoC a produto
+    estado-da-arte (ago/2026). Pedido do maestro 2026-08-14: revisão completa +
+    pesquisa profunda de mercado documentada + redesign completo (Admin, app,
+    convites/cadastro/gestão, chat, ferramentas, anexos, documentos, formatação,
+    design premium) — sem salada de frutas; será força de divulgação do onion-evolve
+    e base futura de Company Brain / Personal Brain Extended. Plano aprovado:
+    /home/marcio/.claude/plans/enumerated-squishing-adleman.md (6 fases, 25 PRs).
+    Os achados da pesquisa (F1, workflow wf_f6c09d35-8a7) entram como evidence
+    neste grafo; o corte DO/DEFER/DROP do gate G1 entra como decisions.
+
+nodes:
+  - id: C_plano_poc
+    node_type: claim
+    plane: PROD
+    verified_at: 2026-08-14
+    verified_against: mapa-completo-do-frontend-2026-08-14-2400-linhas-registry-metade-inerte-zero-persistencia-admin-morto
+    status: superseded
+    impact: 4
+    confidence: 1.0
+    label: "O PLANO IMPLÍCITO DO PoC (histórico, criado para ser superseded — não havia nó): provar que o Onion roda de verdade atrás de um chat mobile. PROVOU — e parou lá. O que o mapa de 2026-08-14 mediu: ~2.400 linhas de registry assistant-ui production-grade com METADE INERTE por fiação ausente (onCancel/onReload/onEdit/onAddToolResult/threadList não passados; SSE thinking/tool_result descartados ⇒ parar-geração/regenerar/editar/branching/reasoning/tool-results mortos); ZERO persistência (F5 evapora conversa/sessão/custo, backend suporta resume); telemetria do front errada por ordem de grandeza (lê total_cost_usd sem cache-write; o meter lê modelUsage — medido 9.635 cache-write vs 40 input num turno real); AdminPanel de 726 linhas administrando convites MORTOS pós-P11; meter.ts com ledger org/sub/payer/model/cache pronto para dashboard SEM leitor; bundle 828KB sem splitting; sem testes/lint; 333 linhas mortas; 1 conversa só."
+    trace: "docs/evolution/research/bridge-produto-2026-08/"
+
+  - id: D_programa_bridge_evolve
+    node_type: decision
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: plano-aprovado-pelo-maestro-com-4-decisoes-seladas-e-reforco-de-versoes-latest
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    label: "O PROGRAMA (aprovado 2026-08-14): 6 fases, 25 PRs pequenos com Elenxo cada, deploy sempre via ops/update-bridge.sh. DECISÕES SELADAS DO MAESTRO: (1) F0 fiação ∥ F1 pesquisa — religar o existente é invariante sob qualquer posicionamento; (2) thread store SERVER-SIDE (multi-device, pré-requisito de share, substrato do Brain futuro); (3) pesquisa COMPLETA ~15 lentes em 5 eixos; (4) admin novo via Logto Management API (M2M só no backend) + meter reader — convites mortos não ressuscitam. REFORÇO (aparte 2026-08-14): 'tudo deve começar com as versões mais modernas' → PR-00 moderniza deps ANTES da fiação (assistant-ui 0.15+ mata o pin 0.14.7 na direção certa; fia-se UMA vez, contra a API nova) — revoga a estratégia congelar-0.14. PRESERVAR: oidc.ts, sse.ts, meter.ts, telemetry/ SDAAL, tema 3 camadas, pickers / e @ (o diferencial: 102 comandos/51 agentes), convert-message.ts. ANTI-SALADA: nenhuma superfície nova antes do corte DO/DEFER/DROP do G1, cada item com aresta para evidência."
+    trace: "/home/marcio/.claude/plans/enumerated-squishing-adleman.md"
+
+  - id: F0_ALICERCE_FIACAO
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-8-prs-nomeados-criterios-medidos
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "F0 ALICERCE (sem. 1-2, começa já): PR-00 modernização de deps para latest (reforço do maestro) · PR-01 poda (333 linhas mortas + AdminPanel de convites + public/) · PR-02 controle (onCancel/onReload/onEdit — parar/regenerar/editar/branching vivos) · PR-03 SSE completo (thinking→reasoning, tool_result→UI, onAddToolResult) · PR-04 telemetria correta (modelUsage c/ cache-write, paridade ≤1% com o meter) · PR-05 persistência mínima (resume + histórico sobrevivem a F5) · PR-06 ErrorBoundary + safe-area bottom · PR-06b bancada (eslint+vitest+bench.sh — substituto do CI ausente). GATE G0: 8/8 dones MEDIDOS + deploy + smoke."
+    trace: "/home/onion/onion-bridge/web/src/runtime/onion-runtime.ts"
+
+  - id: F1_FAROL_PESQUISA
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: workflow-wf-f6c09d35-8a7-lancado-15-lentes-5-eixos-com-schema-fechado
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "F1 FAROL (∥ F0, core): pesquisa profunda em 5 eixos, 15 lentes sonnet/high com schema fechado (claim/kind/URL-primária/data/confidence/relevance_bridge) + completeness critic. A·players (Open WebUI, LibreChat, AnythingLLM, big-AGI+TypingMind+Msty, emergentes POR TRAJETÓRIA) · B·bigtechs (OpenAI Projects/memória/pós-Canvas, Anthropic memória/Artifacts/UX-de-agente, Google Gemini/NotebookLM+Copilot) · C·dores públicas (r/ChatGPT+ClaudeAI, r/LocalLLaMA+selfhosted+OpenWebUI, HN/power-users) · D·follow-the-money (capital/M&A em memória+second-brain — a fraqueza TEMPORAL dos players valida o KG-SSOT como diferencial; pricing/packaging) · E·design (premium chat UI 2026; PWA mobile). Run: wf_f6c09d35-8a7. Entregáveis: SYNTHESIS.md + evidence neste grafo + docs/analysis/bridge-posicionamento-2026-08.md. GATE G1 (maestro): posição + corte DO/DEFER/DROP."
+    trace: "docs/evolution/research/bridge-produto-2026-08/"
+
+  - id: F2_ESPINHA_THREADS
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-depende-de-g0-nao-de-g1
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "F2 ESPINHA (pós-G0, NÃO espera G1 — multi-conversa é table-stake unânime): PR-07 thread store SERVER-SIDE (CRUD por identidade/org, decisão selada do maestro; IDs estáveis + metadados extensíveis = porta do Brain) · PR-08 ExternalStoreThreadListAdapter + lista/título/arquivar · PR-09 rotas (/chat/:threadId, /admin — fim do useState-navegação; refresh restaura estado exato) · PR-10 busca · PR-11 code-splitting (chunk inicial <300KB dos 828KB)."
+    trace: "/home/onion/onion-bridge/web/src/App.tsx"
+
+  - id: F3_ROSTO_REDESIGN
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-gated-em-g1
+    status: open
+    impact: 4
+    confidence: 0.85
+    label: "F3 ROSTO (pós-G1): /design:generate (candidatas ancoradas cream #FAF7F2/orange #C2410C + gate WCAG determinístico) → @design-system-specialist (tokens DTCG→Tailwind) sobre o tema 3 camadas existente. PR-12 tokens + DARK LIGADO (já desenhado nos semânticos, toggle + prefers-color-scheme, WCAG AA nas duas) · PR-13 shiki lazy · PR-14 anexos PDF/text (backend JÁ aceita) · PR-15 blocos inline no fio (escopo mínimo do corte G1 — a tendência pós-Canvas) · PR-16 i18n pt-BR primeiro · PR-17 composer novo preservando pickers + sugestões anti-blank-page. GATE G3: WCAG AA claro+escuro, Lighthouse mobile ≥90, demo aprovada."
+    trace: "/home/onion/onion-bridge/web/src/theme/onion.css"
+
+  - id: F4_GOVERNO_ADMIN
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-gated-em-g1-decisao-logto-api-selada
+    status: open
+    impact: 4
+    confidence: 0.85
+    label: "F4 GOVERNO (pós-G1, ∥ F3): admin passa a administrar o que EXISTE. PR-18 meter reader (agregação org/sub/payer/model/cache × período — o ledger já grava com rigor de ADR e nada lê) · PR-19 usage dashboard (custo CERTO com cache-write) · PR-20 identidades/orgs/convites via Logto Management API (token M2M SÓ no backend Hono; front nunca fala com Logto admin) · PR-21 cotas + rate-limit como UX (orçamento no composer; 429 com retry-after legível, nunca modal genérico). GATE G4: convite→cadastro→1ª conversa→custo no dashboard em <5min, MEDIDO."
+    trace: "/home/onion/onion-bridge/src/meter.ts"
+
+  - id: F5_PRACA_DIVULGACAO
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: fase-definida-gated-em-g3
+    status: open
+    impact: 3
+    confidence: 0.85
+    label: "F5 PRAÇA (pós-G3): PR-22 PWA real (runtimeCaching, offline shell, install prompt) · PR-23 share read-only com escopo de org · PR-24 onboarding (tour dos pickers — o diferencial apresentado no 1º uso). GATE G5 go-live: 1 semana de dogfood padrão master com 0 crashes; TTI e instalação medidos."
+    trace: "/home/onion/onion-bridge/web/vite.config.ts"
+
+  - id: F6_PONTE_BRAIN_DEFERRED
+    node_type: entity
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: explicitamente-fora-do-programa-portas-abertas-a-custo-zero
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "F6 PONTE (explicitamente FORA deste programa — Company Brain / Personal Brain Extended é PROGRAMA NOVO com SUPERSEDES próprio quando o maestro abrir o gate). NÃO fazer agora: memória no runtime, KG acoplado ao chat, projetos pesados, Elenxo exposto ao usuário. PORTAS ABERTAS A CUSTO ~0 (obrigações das outras fases): thread store com IDs estáveis e metadados extensíveis (F2); ledger JSONL append-only como fonte de ingestão futura (F4); UM hook plugável de contexto-de-sistema no backend (interface só, sem implementação); o eixo D da F1 produz o caso de negócio (memória TEMPORAL é a fraqueza medida do segmento — Mem0 49% no subset temporal do LongMemEval)."
+    trace: "docs/evolution/research/bridge-produto-2026-08/"
+
+  - id: Q_G1_CORTE_DO_DEFER_DROP
+    node_type: question
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: gate-definido-aguarda-sintese-da-pesquisa
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "GATE G1 — decisão do maestro que trava as superfícies NOVAS (F3/F4/F5): com a síntese da pesquisa na mesa, selar a POSIÇÃO do Bridge e o corte DO/DEFER/DROP item a item — cada escolha com aresta SUPPORTS/REFUTES para a evidence citada. É o mecanismo anti-salada-de-frutas que o pedido exige: 'não é para fazer uma salada de frutas desconectada da realidade'. F0 e F2 NÃO dependem deste gate (invariantes). GATILHO: workflow wf_f6c09d35-8a7 concluído + SYNTHESIS.md escrita."
+
+edges:
+  - from: D_programa_bridge_evolve
+    to: C_plano_poc
+    edge_type: SUPERSEDES
+  - from: F0_ALICERCE_FIACAO
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F1_FAROL_PESQUISA
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F2_ESPINHA_THREADS
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F3_ROSTO_REDESIGN
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F4_GOVERNO_ADMIN
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F5_PRACA_DIVULGACAO
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: F6_PONTE_BRAIN_DEFERRED
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: Q_G1_CORTE_DO_DEFER_DROP
+    to: F3_ROSTO_REDESIGN
+    edge_type: CONSTRAINS
+  - from: Q_G1_CORTE_DO_DEFER_DROP
+    to: F4_GOVERNO_ADMIN
+    edge_type: CONSTRAINS
+  - from: Q_G1_CORTE_DO_DEFER_DROP
+    to: F5_PRACA_DIVULGACAO
+    edge_type: CONSTRAINS
+  - from: F1_FAROL_PESQUISA
+    to: Q_G1_CORTE_DO_DEFER_DROP
+    edge_type: SUPPORTS
