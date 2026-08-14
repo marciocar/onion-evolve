@@ -30,8 +30,9 @@ meses, control-plane sobre Claude Code/Codex): a diferenciação KG+Elenxo preci
    sem progresso visível teriam **3× a taxa de abandono** (E_PROGRESSO_VISIVEL_3X_RETENCAO —
    conf 0,5, vendor citando terceiro sem metodologia; a própria lente pede cautela; vale pela
    triangulação com as dores C3, não como fato duro). PR-03 (tool-results + reasoning) é a cura.
-2. **Aprovação GRANULAR de ferramenta** (novo, sobe de prioridade): o backlash do Auto Mode
-   (14/08, fresco) provou que aprovação binária tudo-ou-nada quebra confiança. Canal de
+2. **Aprovação GRANULAR de ferramenta** (novo, sobe de prioridade): a reação MISTA ao anúncio
+   do Auto Mode (07/08, efetivo 14/08) + a triangulação com as dores C3 mostram que
+   aprovação binária tudo-ou-nada corrói confiança em parte relevante dos usuários. Canal de
    permissão no backend (canUseTool → SSE → decisão no chip) + allowlist por ferramenta.
    Entra como **PR-03b** na F0/F2 — e é pré-requisito honesto para um dia sair de
    `bypassPermissions`.

@@ -2,7 +2,7 @@
 branch: research/bridge-produto-2026-08
 pr: 595
 date: 2026-08-14
-reviewed_diff_sha256: c60aba9d30d5b51ef73ef90987aad5cfe74d0fed34553d25f5fc81d6bc15e99e
+reviewed_diff_sha256: 9e16dc7b80b5b44262283956d180e81c05be0b49081e78adb88f15e0ea97e95f
 findings_total: 12
 findings_real: 12
 findings_fixed: 12
@@ -46,6 +46,12 @@ registrada como lição (verificar-contra-o-vivo na transposição lente→nó).
 Radar 0/0 (0 órfãos, SUPERSEDES consistente) · lint 0 HARD · contador do site 114/114 correto ·
 confidence disciplinada em 9/10 · números de mercado exatos contra o vivo (OpenClaw 386.204★,
 Mission Control 6.001★, Open WebUI 148.719★) · citações do HN exatas.
+
+## Adendo pós-parecer do CI
+
+O onion-review pegou a MEIA-CURA: os itens 5 e 6 foram corrigidos no nó e deixados na fonte
+(SYNTHESIS com 24,5M em 3 sítios; 'backlash' no posicionamento e no nó F0) — a classe
+superfície-anuncia-o-que-saiu cometida dentro da própria cura. Propagado; hash re-carimbado.
 
 ## Teto declarado
 
