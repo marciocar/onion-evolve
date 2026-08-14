@@ -1,6 +1,6 @@
 ---
 branch: fix/backup-retention-glob
-pr: pendente
+pr: 596
 date: 2026-08-14
 reviewed_diff_sha256: 850a3982a201fbbf59f502fb907fbdc792582b8beaa4d894fcb6ff43fd071f16
 findings_total: 1
