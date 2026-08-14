@@ -1,6 +1,6 @@
 ---
 branch: docs/kg-demo-feedback
-pr: TBD
+pr: 602
 date: 2026-08-14
 reviewed_diff_sha256: fbd5152eb9c345607d463da13acc846f6c33e5674e4622fada071baa1b8c1fa0
 findings_total: 9
