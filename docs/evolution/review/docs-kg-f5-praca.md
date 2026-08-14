@@ -1,6 +1,6 @@
 ---
 branch: docs/kg-f5-praca
-pr: TBD
+pr: 601
 date: 2026-08-14
 reviewed_diff_sha256: 8fe4f9aefacf925532eaebd86ed0cf101397224f87102eaa8a586fb91f199b2b
 findings_total: 12
