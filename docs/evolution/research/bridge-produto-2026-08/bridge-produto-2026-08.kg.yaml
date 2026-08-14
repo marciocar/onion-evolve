@@ -95,14 +95,24 @@ nodes:
 
   - id: F5_PRACA_DIVULGACAO
     node_type: entity
-    plane: DEV
+    plane: PROD
     verified_at: 2026-08-14
-    verified_against: fase-definida-gated-em-g3
-    status: open
-    impact: 3
+    verified_against: deploy-28f3ad96-provas-vivas-shared-404-noindex-nostore-share-anonimo-401-s-noindex-hit31-429-selftest-16-16-bench-verde
+    status: done
+    impact: 4
     confidence: 0.85
-    label: "F5 PRAÇA (pós-G3): PR-22 PWA real (runtimeCaching, offline shell, install prompt) · PR-23 share read-only com escopo de org · PR-24 onboarding (tour dos pickers — o diferencial apresentado no 1º uso). GATE G5 go-live: 1 semana de dogfood padrão master com 0 crashes; TTI e instalação medidos."
+    label: "F5 PRAÇA (pós-G3): PR-22 PWA real (runtimeCaching, offline shell, install prompt) · PR-23 share read-only com escopo de org · PR-24 onboarding (tour dos pickers — o diferencial apresentado no 1º uso). ✅ F5 FECHADA NO CÓDIGO E EM PRODUÇÃO 2026-08-14 (bridge f61ea31/b6b2ce4/57a1545/28f3ad9): PWA instalável (beforeinstallprompt + CacheFirst nos chunks lazy; iOS = teto declarado) · share por link NÃO-LISTADO e revogável (v1 TEXTO declarado: tool-calls/reasoning/synthetic fora POR DESENHO; escopo de org = DEFER com gatilho '1ª org povoada') · tour de 3 cartões pós-login. 16º ELENXO (11 achados, todos endereçados; 2 hipóteses do briefing REFUTADAS com evidência — o guard do subpath e o denylist do SW estavam certos): o CRÍTICO era o índice global shares.json com ler→mutar→escrever fail-open — UMA leitura falha SUBSTITUÍA os links de todos os usuários (medido); e as TRÊS classes do achado eram reincidências de curas que já existiam NO MESMO ARQUIVO (tmp+rename comentado 120 linhas acima; balde de I/O síncrono comentado 50 linhas acima; __proto__ do 13º) — a cura ficou no caso, não no mecanismo. Desta vez virou mecanismo: share-selftest.mts (16 asserts) na bancada. PROVAS VIVAS pós-deploy: /shared 404+noindex+no-store, share anônimo 401, /s/* noindex, 31º hit 429. Ajuste declarado: 'escopo de org' do plano virou v1 sem org (não há orgs povoadas — mesma régua do DEFER)."
     trace: "/home/onion/onion-bridge/web/vite.config.ts"
+
+  - id: Q_G5_DOGFOOD_GO_LIVE
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-14
+    verified_against: gate-definido-f5-em-producao-relogio-de-dogfood-correndo
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "G5 — go-live: 1 SEMANA de dogfood padrão master com 0 crashes (não fecha no dia do deploy POR DEFINIÇÃO — o relógio partiu em 2026-08-14 com a F5 em produção; janela fecha ~2026-08-21). Medir no período: TTI real no device, instalação PWA (Android; iOS = declarar o teto), 1º share real usado por terceiro, tour visto por 1 usuário novo (Nicole é a candidata — cruza com a prova humana do G4). Crash/erro no período NÃO reabre a F5: vira cura pontual + reinício do relógio só se for crash de verdade (erro de UX anotado não zera). GATILHO DE FECHAMENTO: a semana passar limpa E o maestro dizer go."
 
   - id: F6_PONTE_BRAIN_DEFERRED
     node_type: entity
@@ -376,4 +386,7 @@ edges:
     edge_type: CONSTRAINS
   - from: Q_G3_DEMO_DO_MAESTRO
     to: F3_ROSTO_REDESIGN
+    edge_type: CONSTRAINS
+  - from: Q_G5_DOGFOOD_GO_LIVE
+    to: F5_PRACA_DIVULGACAO
     edge_type: CONSTRAINS
