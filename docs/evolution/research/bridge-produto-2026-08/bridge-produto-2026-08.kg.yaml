@@ -104,6 +104,27 @@ nodes:
     label: "F5 PRAÇA (pós-G3): PR-22 PWA real (runtimeCaching, offline shell, install prompt) · PR-23 share read-only com escopo de org · PR-24 onboarding (tour dos pickers — o diferencial apresentado no 1º uso). ✅ F5 FECHADA NO CÓDIGO E EM PRODUÇÃO 2026-08-14 (bridge f61ea31/b6b2ce4/57a1545/28f3ad9): PWA instalável (beforeinstallprompt + CacheFirst nos chunks lazy; iOS = teto declarado) · share por link NÃO-LISTADO e revogável (v1 TEXTO declarado: tool-calls/reasoning/synthetic fora POR DESENHO; escopo de org = DEFER com gatilho '1ª org povoada') · tour de 3 cartões pós-login. 16º ELENXO (11 achados, todos endereçados; 2 hipóteses do briefing REFUTADAS com evidência — o guard do subpath e o denylist do SW estavam certos): o CRÍTICO era o índice global shares.json com ler→mutar→escrever fail-open — UMA leitura falha SUBSTITUÍA os links de todos os usuários (medido); e as TRÊS classes do achado eram reincidências de curas que já existiam NO MESMO ARQUIVO (tmp+rename comentado 120 linhas acima; balde de I/O síncrono comentado 50 linhas acima; __proto__ do 13º) — a cura ficou no caso, não no mecanismo. Desta vez virou mecanismo: share-selftest.mts (16 asserts) na bancada. PROVAS VIVAS pós-deploy: /shared 404+noindex+no-store, share anônimo 401, /s/* noindex, 31º hit 429. Ajuste declarado: 'escopo de org' do plano virou v1 sem org (não há orgs povoadas — mesma régua do DEFER)."
     trace: "/home/onion/onion-bridge/web/vite.config.ts"
 
+  - id: E_DEMO_CAMPO_2026_08_14
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-14
+    verified_against: demo-real-do-maestro-desktop-e-mobile-8-achados-com-screenshot-curas-em-29b946da
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    label: "DEMO DE CAMPO do maestro (desktop+mobile, com a Nicole como 2ª usuária real) — achou o que 16 Elenxos de código não viram, porque a classe era OUTRA: a superfície MENTIA ao usuário. 8 achados: agente respondia em INGLÊS (preset claude_code só entrava com append — sem ele o CLAUDE.md do core nem carregava) · /onion no picker listava design:generate (matcher casa na DESCRIÇÃO) · rótulos COMANDOS/AGENTES flutuando vazios no mobile · catálogo em cache eterno · 'Identidade ativa' sem NOME (anonimato p/ o próprio dono) · 📊 para todo mundo rendia cards de erro confusos a não-admin · 'Identidade criada.' lia-se como convite ENVIADO (nenhum e-mail sai — Nicole só recebeu o código de login) · JSON cru dos args de tool ilegível. TODOS CURADOS no PR-25 (bridge 29b946d, deploy vivo) + 1 bônus da bancada: cache mtime com cegueira de mesmo-ms → chave mtime+size. LIÇÃO DA LINHA: Elenxo adversarial vê CÓDIGO; só uso real vê a MENTIRA DE SUPERFÍCIE — G5 dogfood é gate, não cerimônia."
+    trace: "/home/onion/onion-bridge/web/src/App.tsx"
+
+  - id: Q_GESTAO_USUARIOS_E_WORKSPACES
+    node_type: question
+    plane: DEV
+    verified_at: 2026-08-14
+    verified_against: pedido-do-maestro-na-demo-2026-08-14-decisoes-de-desenho-abertas
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "PEDIDO DO MAESTRO (demo 08-14) — 3 decisões de desenho GATED nele: (1) PERFIL+TIPOS DE USUÁRIO: área de perfil/configurações e papéis além de admin/user (hoje: bridge:admin via Logto role; superfície mínima já corrigida no PR-25). (2) WORKSPACE POR USUÁRIO: hoje TODOS compartilham UM onionCwd (/home/onion/onion-evolve) — mesmo repo, mesmo contexto, e o /onion de um usuário vê o estado de todos; proposta: diretório por sub (workspaces/<hash-sub>/ com clone próprio ou template), com custo de disco/atualização a decidir. (3) CONVITE POR E-MAIL REAL: exige credencial SMTP no bridge (Postmark do tenant só manda código de login); alternativa v1 vigente = 📋 copiar/reenviar manual. NÃO pré-cozinhar (gated-work-derives-fresh): derivar fresco quando o maestro selar."
+
   - id: Q_G5_DOGFOOD_GO_LIVE
     node_type: question
     plane: PROD
@@ -388,5 +409,11 @@ edges:
     to: F3_ROSTO_REDESIGN
     edge_type: CONSTRAINS
   - from: Q_G5_DOGFOOD_GO_LIVE
+    to: F5_PRACA_DIVULGACAO
+    edge_type: CONSTRAINS
+  - from: E_DEMO_CAMPO_2026_08_14
+    to: Q_G5_DOGFOOD_GO_LIVE
+    edge_type: SUPPORTS
+  - from: Q_GESTAO_USUARIOS_E_WORKSPACES
     to: F5_PRACA_DIVULGACAO
     edge_type: CONSTRAINS
