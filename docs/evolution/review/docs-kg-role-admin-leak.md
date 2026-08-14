@@ -1,6 +1,6 @@
 ---
 branch: docs/kg-role-admin-leak
-pr: TBD
+pr: 603
 date: 2026-08-14
 reviewed_diff_sha256: 621dbf1f64e4a6640282b10b80b519f0e5ad6e574a656abc474a3b3e1933a8f1
 findings_total: 1
