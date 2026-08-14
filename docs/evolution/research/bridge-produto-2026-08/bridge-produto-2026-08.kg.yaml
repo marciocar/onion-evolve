@@ -40,13 +40,13 @@ nodes:
 
   - id: F0_ALICERCE_FIACAO
     node_type: entity
-    plane: DEV
+    plane: PROD
     verified_at: 2026-08-14
-    verified_against: fase-definida-8-prs-nomeados-criterios-medidos
-    status: open
+    verified_against: deploy-em-producao-health-ok-pwa-true-invocacao-nova-auth-enforce-noop-do-mecanismo-e-estabilidade
+    status: done
     impact: 5
     confidence: 0.9
-    label: "F0 ALICERCE (sem. 1-2, começa já): PR-00 modernização de deps para latest (reforço do maestro) · PR-01 poda (333 linhas mortas + AdminPanel de convites + public/) · PR-02 controle (onCancel/onReload/onEdit — parar/regenerar/editar/branching vivos) · PR-03 SSE completo (thinking→reasoning, tool_result→UI, onAddToolResult) · PR-04 telemetria correta (modelUsage c/ cache-write, paridade ≤1% com o meter) · PR-05 persistência mínima (resume + histórico sobrevivem a F5) · PR-06 ErrorBoundary + safe-area bottom · PR-06b bancada (eslint+vitest+bench.sh — substituto do CI ausente) · PR-03b APROVAÇÃO GRANULAR DE TOOL (adicionado no G1 pelo maestro: canal canUseTool→SSE→decisão no chip + allowlist por ferramenta — a reação mista ao anúncio do Auto Mode (07/08) + triangulação C3 mostram que aprovação binária corrói confiança). GATE G0: 9/9 dones MEDIDOS + deploy + smoke."
+    label: "F0 ALICERCE (sem. 1-2, começa já): PR-00 modernização de deps para latest (reforço do maestro) · PR-01 poda (333 linhas mortas + AdminPanel de convites + public/) · PR-02 controle (onCancel/onReload/onEdit — parar/regenerar/editar/branching vivos) · PR-03 SSE completo (thinking→reasoning, tool_result→UI, onAddToolResult) · PR-04 telemetria correta (modelUsage c/ cache-write, paridade ≤1% com o meter) · PR-05 persistência mínima (resume + histórico sobrevivem a F5) · PR-06 ErrorBoundary + safe-area bottom · PR-06b bancada (eslint+vitest+bench.sh — substituto do CI ausente) · PR-03b APROVAÇÃO GRANULAR DE TOOL (adicionado no G1 pelo maestro: canal canUseTool→SSE→decisão no chip + allowlist por ferramenta — a reação mista ao anúncio do Auto Mode (07/08) + triangulação C3 mostram que aprovação binária corrói confiança). GATE G0: 9/9 dones MEDIDOS + deploy + smoke. ✅ G0 FECHADO 2026-08-14: os 9 PRs mergeados (bridge #5-#10) com Elenxos 9º-12º no caminho (12º achou BLOQUEADOR: resume atravessava identidades — curado com session-owners + 403 + logout limpando persistência); deploy em produção pelo ops/update-bridge.sh (o 1º uso do ramo cheio desenterrou a retenção do backup morta desde 08-11 — core #596 — e um npm ci transiente que o fail-closed segurou com serviço parado de propósito; triagem humana completou e o NOOP do mecanismo confirmou o estado final); provas: health ok+pwa:true local+público, boot da invocação nova com auth enforce/JWKS OK/a2a 3, bench rc=0 (12 parque + 16 vitest + orçamento 885KB<940KB), estabilidade 10min."
     trace: "/home/onion/onion-bridge/web/src/runtime/onion-runtime.ts"
 
   - id: F1_FAROL_PESQUISA
