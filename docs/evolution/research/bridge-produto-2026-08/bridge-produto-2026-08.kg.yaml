@@ -62,13 +62,13 @@ nodes:
 
   - id: F2_ESPINHA_THREADS
     node_type: entity
-    plane: DEV
+    plane: PROD
     verified_at: 2026-08-14
-    verified_against: fase-definida-depende-de-g0-nao-de-g1
-    status: open
+    verified_against: deploy-em-producao-threads-401-sem-token-spa-fallback-servindo-index-bench-22-testes-gzip-253kib
+    status: done
     impact: 4
     confidence: 0.9
-    label: "F2 ESPINHA (pós-G0, NÃO espera G1 — multi-conversa é table-stake unânime): PR-07 thread store SERVER-SIDE (CRUD por identidade/org, decisão selada do maestro; IDs estáveis + metadados extensíveis = porta do Brain) · PR-08 ExternalStoreThreadListAdapter + lista/título/arquivar · PR-09 rotas (/chat/:threadId, /admin — fim do useState-navegação; refresh restaura estado exato) · PR-10 busca · PR-11 code-splitting (chunk inicial <300KB dos 828KB)."
+    label: "F2 ESPINHA (pós-G0, NÃO espera G1 — multi-conversa é table-stake unânime): PR-07 thread store SERVER-SIDE (CRUD por identidade/org, decisão selada do maestro; IDs estáveis + metadados extensíveis = porta do Brain) · PR-08 ExternalStoreThreadListAdapter + lista/título/arquivar · PR-09 rotas (/chat/:threadId, /admin — fim do useState-navegação; refresh restaura estado exato) · PR-10 busca · PR-11 code-splitting (chunk inicial <300KB dos 828KB). ✅ F2 FECHADA 2026-08-14 (bridge a4d562f+5c67928+cd44569): thread-store server-side com dono mecânico, painel+busca+deep-link /t/<id> (History API, zero dep), save no fim do turno. 13º ELENXO derrubou a v1 INTEIRA: a F2 nunca tinha salvado NADA (cleanup de effect zerava o ref antes da leitura — só execução revelava; a classe ref-como-canal do 12º reincidindo) + DoS por bytes (tetos contavam itens: 100MB/conversa, write síncrono travava o event loop) + 9 SEV-2/3 — todos curados com bancada de 6 cenários rodando o código REAL (6/6 falham no antigo). PR-11 RE-ANCORADO (o <300KB raw era irreal com assistant-ui na view única): orçamento vira GZIP ≤260KiB no bench, medido 253KiB — splitting real chega com F3 (shiki/painéis lazy). DECISÃO ABERTA AO MAESTRO: last-write-wins entre aparelhos (cura desenhada: concorrência otimista PUT+updatedAt→409; muda protocolo cliente). E o deploy desenterrou o 14º achado da linha: o guard [ -d ] do update-bridge SEM sudo mentia DIR-AUSENTE (marcio não atravessa /home/onion) — a mesma classe já escrita no bridge-backup.sh; curado neste PR."
     trace: "/home/onion/onion-bridge/web/src/App.tsx"
 
   - id: F3_ROSTO_REDESIGN

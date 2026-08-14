@@ -127,9 +127,13 @@ trap - EXIT; DEPS_TOUCHED=1
 # e a linha "added N packages" é contagem que o método deste script exige.
 sudo -u onion -H npm --prefix "${BRIDGE}" ci --no-audit --no-fund || fail "npm ci do backend falhou"
 # (-H é seguro barato; nesta máquina o sudoers já reseta HOME — medido idêntico sem ele)
-NM_ROOT="$( [ -d "${BRIDGE}/node_modules" ] && sudo find "${BRIDGE}/node_modules" -user root -print -quit || echo "DIR-AUSENTE" )"
+# O teste TAMBÉM passa por sudo (a MESMA lição escrita no bridge-backup.sh): [ -d ]
+# como marcio não atravessa /home/onion (750) e o guard mentia DIR-AUSENTE com o
+# node_modules SÃO — matou o deploy do G0 (diagnóstico errado: "npm transiente") e o
+# da F2 até a classe ser reconhecida. 14º achado da linha: guard-sem-sudo mente.
+NM_ROOT="$( sudo test -d "${BRIDGE}/node_modules" && sudo find "${BRIDGE}/node_modules" -user root -print -quit || echo "DIR-AUSENTE" )"
 [ -z "${NM_ROOT}" ] || fail "node_modules contaminado/ausente (${NM_ROOT}) — dono errado quebra o próximo npm como onion"
-if [ -f "${BRIDGE}/web/package.json" ]; then
+if sudo test -f "${BRIDGE}/web/package.json"; then
   sudo -u onion -H npm --prefix "${BRIDGE}/web" ci --no-audit --no-fund || fail "npm ci da PWA falhou"
   sudo -u onion -H npm --prefix "${BRIDGE}/web" run build || fail "build da PWA falhou"
 fi
