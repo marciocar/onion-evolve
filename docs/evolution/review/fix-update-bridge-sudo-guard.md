@@ -1,6 +1,6 @@
 ---
 branch: fix/update-bridge-sudo-guard
-pr: pendente
+pr: 598
 date: 2026-08-14
 reviewed_diff_sha256: 7883960cfecb5c0c15ee7de513f0051d9321d3cedbb7bc5770cdea12a9253fee
 findings_total: 1
