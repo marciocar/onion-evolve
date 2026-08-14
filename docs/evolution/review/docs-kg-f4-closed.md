@@ -1,6 +1,6 @@
 ---
 branch: docs/kg-f4-closed
-pr: pendente
+pr: 600
 date: 2026-08-14
 reviewed_diff_sha256: 3678c63215477635f533bee4917fd7b6c5d906aac0d32bbfce4ae21a857d9f69
 findings_total: 0
