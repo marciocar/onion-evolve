@@ -251,7 +251,21 @@ nodes:
     label: "Renomear identificador MATA ancora de `sed`/`grep` que o cita, e o silencio e o padrao. Duas vezes nesta sessao: `SUMARIO_IMPRESSO`→`SUMMARY_PRINTED` matou a injecao do trap no runner extraido (ninguem viu — o runner so parou de gritar), e `achou`→`found` matou a mutacao do caso (p) (a guarda-da-guarda ACUSOU: 'a mutacao NAO foi aplicada'). A diferenca entre os dois desfechos e ter ou nao ter `_prove_mutation` no caminho. Corolario pratico: rename exige RE-RODAR o que depende de texto, e ancora que cita identificador merece a nota dizendo isso."
     trace: ".claude/validation/lint-selftest.sh"
 
+  - id: I_TEMPORARIO_EVAPORA_E_VOLTA_COMO_INCIDENTE
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-15
+    verified_against: mecanismo-recusou-e-destruiu-o-arquivo-exposto-na-propria-execucao
+    label: "O script que protegeu a chave GPG raiz (2026-08-11) FUNCIONOU e foi apagado na mesma sessão, marcado 'temporário'. Quatro dias depois o maestro repetiu a receita de memória (`printf senha > /tmp/np.txt && bash ~/protege-chave.sh`) — o script não existia mais, e o `shred` que ele fazia no fim TAMBÉM NÃO. MEDIDO: a senha ficou em modo 0644 (`-rw-rw-r--`) por ~1h15 numa máquina com CINCO contas com shell, incluindo a conta COMPARTILHADA de uma equipe de membro da federação (id `granaai`). Mesma classe de [[I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO]], por caminho novo: não foi a medição que vazou, foi o PROCEDIMENTO que evaporou. Cura como mecanismo (não conselho): `ops/gpg-protect-key.sh` versionado — RECUSA arquivo de senha legível por outros (o defeito exato), é CIENTE DO ESTADO (a v1 assumia senha antiga vazia e falharia obscuro hoje), tem `--check` que não muda nada, e destrói o arquivo no `trap EXIT` mesmo quando RECUSA. Provado no próprio incidente: rodado sobre `/tmp/np.txt`, recusou com a instrução certa e o arquivo saiu por `shred`. Corolário: procedimento sensível não é 'temporário' — o que evapora volta como exposição."
+    trace: "ops/gpg-protect-key.sh"
+
 edges:
+  - from: I_TEMPORARIO_EVAPORA_E_VOLTA_COMO_INCIDENTE
+    to: I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO
+    edge_type: SUPPORTS
   - from: I_FECHAR_GIT_MV_E_REMOVIDO
     to: W1_METRICA_NAO_FORJAVEL
     edge_type: SUPPORTS
