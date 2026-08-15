@@ -148,6 +148,17 @@ nodes:
     label: "F-ID.2 CONTEXTOS ORG (bridge 83033b25, deploy vivo): o contexto virou par (kind,id) — pessoal (Second Brain) ou org (Company Brain) — atravessando workspace, thread-store e medidor. Org piloto Grana.AI criada+povoada (marcio@grana.ai admin). DUAL-TOKEN (Authorization=recurso + X-Onion-Org-Token=org, audience urn:logto:organization): resolveCtx fail-closed. WORKSPACE DE ORG = repo bare + checkout por membro (decisão selada): origem soberana data/orgs/<id>/repo.git, pull início / commit+push fim, git log audita quem escreveu. Thread-store de org em data/threads/org/<id>. Meter com org (campo já existia). GET /me/contexts (filtra federação por customData.bridge — tenant COMPARTILHADO com onion-dist/arandek). ELENXO F-ID.2 (14 achados MEDIDOS): DUAL-TOKEN RESISTIU A 7 ATAQUES (assinatura/aud/sub-roubado/expirado/alg:none — todos fail-closed) e store-key traversal fechado pelo h16. Curados: CRÍTICO conflito de org ENVENENAVA a origem (commit em rebase conflitado tem exit 0 e empurrava marcadores <<<<<<< para o Company Brain de TODA a org + wedgeava o membro — provado; curado com cleanGitState+recusa-UU+abort) · CRÍTICO guardCwdRead usava path.resolve derrotado por symlink→workspace de outro membro (provado: resolve passa, realpath nega) + deny orgs/** · ALTO resolveCtx aceitava org de federação (gate customData.bridge) · ALTO offboarding não alcançava org (varre por hash) · ALTO escrita na org sem autorização (gate callerCanWrite) · ALTO 2 turnos concorrentes=500 (lock inflight) · +MÉDIOS (bare revalidado, share keyOf, seed try/finally) +BAIXOS (storeKey injetiva, wsSlug delega). DECLARADOS: cota de org na conta pessoal (UX), revogação só no expiry (TTL). RESÍDUO: spike do org token HUMANO real pendente de login do marcio@grana.ai + switcher no front (F-ID.3) + ctx no session-owners."
     trace: "/home/onion/onion-bridge/src/context.ts"
 
+  - id: F_ID_3_SUPERFICIE
+    node_type: entity
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: deploy-3720e47-d4bb1a5-org-token-switcher-membros-convite-nativo-logto-provado-contra-granaai-401-guards
+    status: open
+    impact: 4
+    confidence: 0.82
+    label: "F-ID.3 SUPERFÍCIE (parcial em produção): F-ID.3a (bridge 3720e47) — dual-token de PONTA A PONTA: getOrganizationToken (refresh grant + organization_id; login pede urn:logto:scope:organizations) + activeCtx (orgHeader síncrono anexa X-Onion-Org-Token a /chat e /threads) + ContextSwitcher no header (👤 Pessoal / 🏢 org de /me/contexts; troca ativa o contexto e recarrega). Fecha o resíduo do org token (basta marcio@grana.ai logar+trocar). F-ID.3c (bridge d4bb1a5) — gestão da org SÓ para admin DA ORG (orgAdminGuard consulta isOrgAdmin no Logto, não confia no token; authGuard→withCtx→orgAdminGuard): GET /o/:id/members, POST /o/:id/invite (convite NATIVO do Logto POST /organization-invitations, E-MAIL REAL via Postmark, template OrganizationInvitation, 14d, member|admin — fecha o 'convite que não convida' da demo 08-14), DELETE membro. Front OrgMembers.tsx lazy, botão 👥 no contexto de org. Provado contra Grana.AI (membros, admin=true, convite valida) + 401 sem token em produção. Elenxo F-ID.3 em curso. RESTA na F-ID.3: Home de contextos + perfil /me (F-ID.3b) — nó segue OPEN até essas telas + o Elenxo. Depois F-ID.4 (MGM)."
+    trace: "/home/onion/onion-bridge/web/src/context/activeCtx.ts"
+
   - id: Q_GESTAO_USUARIOS_E_WORKSPACES
     node_type: question
     plane: DEV
@@ -471,6 +482,9 @@ edges:
     to: Q_GESTAO_USUARIOS_E_WORKSPACES
     edge_type: SUPPORTS
   - from: F_ID_2_CONTEXTOS_ORG
+    to: Q_GESTAO_USUARIOS_E_WORKSPACES
+    edge_type: SUPPORTS
+  - from: F_ID_3_SUPERFICIE
     to: Q_GESTAO_USUARIOS_E_WORKSPACES
     edge_type: SUPPORTS
 
