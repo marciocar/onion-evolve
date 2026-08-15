@@ -456,7 +456,20 @@ nodes:
     confidence: 0.9
     label: "Prova humana da rodada (browser real — a classe que sonda/curl não cobre, lição do Elenxo F-ID.3): (1) convidado novo completa o cadastro: e-mail+código → criar username+senha → entra; (2) trocar senha no perfil (verificação reforçada); (3) ativar 2FA (TOTP+backup codes) e logar com 2FA; (4) criar PAT no perfil e revogar; (5) reenviar convite de org pela tela de Membros. GATILHO: roteiro do maestro. Se a sessão for anterior ao scope identities, a seção de segurança degrada com aviso 'saia e entre de novo'."
 
+  - id: E_ELENXO_ROUND_CURADO
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: provas-vivas-5-de-5-bridge-867f95de
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "Elenxo adversarial da rodada (16 achados; 8 REFUTADOS com medição contra o swagger vivo do tenant) — todos curados no bridge 867f95de. CRÍTICO do lote: ALTO 1 o PAT do admin herdava bridge:admin e rodava o /chat em bypassPermissions SEM deny (Read do .env/.ssh/data, Bash com env do serviço) — uma credencial de longa vida = acesso privilegiado ao host; cura na raiz: bridge:admin FORA do exchange (PAT nunca vira admin) + callerIsAdmin(pat)=false + validade 90d. ALTO 2 pat_ anônimo amplificava contra o IdP antes do rate-limit → looksLikePat pré-rede + balde por IP + evicção-por-expiração. ALTO 3 2FA meio-ativado. MÉDIO 4 IDOR de convite (invGuard). Nasceu a bancada que faltava (pat-selftest). Provas vivas 5/5: PAT do admin sai só bridge:invoke, 403 reconhecimento, 200 uso legítimo, 401 pat_ malformado sem tocar IdP. META-LIÇÃO: dogfood-raso mente — sonda/curl passaram; o Elenxo achou o que elas não veem."
+
 edges:
+  - from: E_ELENXO_ROUND_CURADO
+    to: D_ROUND_INVITE_SIGNUP_PROFILE
+    edge_type: SUPPORTS
   - from: D_ROUND_INVITE_SIGNUP_PROFILE
     to: D_FASE_ID_CONTEINER_DE_IDENTIDADE
     edge_type: TRACES_TO
