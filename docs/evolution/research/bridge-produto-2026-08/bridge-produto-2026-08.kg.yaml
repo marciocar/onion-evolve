@@ -126,6 +126,17 @@ nodes:
     label: "F-ID.P0 SONDA (2026-08-15, medida — não inferida): um convidado, no fluxo REAL do bridge (query do Agent SDK, cwd=workspace, permissionMode=bypassPermissions, Read auto-aprovado ANTES do chip), pediu em pt-BR /home/onion/onion-bridge/.env e o agente respondeu '14' — leu o arquivo INTEIRO. Só contas de teste existiam (maestro: nada vazou a terceiros), mas o furo foi fechado antes de convidado real. CONTENÇÃO (bridge 43c2c9c, deploy vivo; cada cura provada por re-sonda comportamental): permissionMode por chamador (admin=bypass, convidado='default' — NÃO 'dontAsk', que bloqueava o core via symlink) · deny CIRÚRGICA na camada settings SÓ p/ não-admin (deny vence bypass, medido) negando .env+data/+home-do-onion+/proc/** mas preservando a LEITURA do core · settingSources:[] p/ não-admin (o settings do core trazia hooks que escrevem no core + allow Bash(grep * .env)) · env FILTRADO (LOGTO_M2M_SECRET/INVITE_TOKENS saíam no ambiente do agente) · GIT_CEILING nos dois dirs (workspaces+core, fechando o escape pelo symlink docs). Provas finais: ENV_BLOQUEADO · core legível ('Sistema') · /proc BLOQUEADO · data/ BLOQUEADO · git-docs 'not a git repository'. + bridge:write REMOVIDO do papel bridge-user no Logto (204) — sem write, sem Bash, fecha o vetor `sh -c cat` (vocabulário infinito, cura-por-lista nula). RESÍDUO (Elenxo P0): sandbox/bwrap é a cura estrutural do Bash mas bwrap NÃO está instalado e liga FAIL-OPEN em silêncio — P0-7 exige instalar+medir antes."
     trace: "/home/onion/onion-bridge/src/chat.ts"
 
+  - id: F_ID_1_ADOCAO_LIMPA
+    node_type: entity
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: deploy-2e10b497-dogfood-catch-up-LIMPO-comandos-onion-50-vivos-cross-workspace-VIZINHO_BLOQUEADO-vendor-manifest-5-5
+    status: done
+    impact: 4
+    confidence: 0.9
+    label: "F-ID.1 ADOÇÃO LIMPA (bridge 2e10b497, deploy vivo): o workspace deixou de ser symlink→core e virou REPO GIT PRÓPRIO com o Onion VENDORIZADO (git archive da árvore tracked: agents/commands/skills/utils + docs/{meta-specs,knowledge-base,sdaal}; hooks e validation FORA de propósito). settings.json escrito pelo bridge (sem hooks). Objetivo PROVADO por dogfood: /catch-up no workspace responde 'LIMPO: só o meu espaço' (fim do vazamento que a 3ª entrada expôs). ELENXO F-ID.1 (agente dedicado, 9 achados MEDIDOS rodando o SDK) — DOIS eram meus: (1) 'curei' uma RACE QUE NÃO EXISTE (bootstrap é single-tick) e minha cura tmp+rename criava WEDGE PERMANENTE → revertida; o problema real era o CONGELAMENTO de ~500ms (bootstrap síncrono trava todo SSE) → agora ASSÍNCRONO + lock inflight; (2) CROSS-WORKSPACE CRÍTICO que EU ABRI no P0-5 (mover p/ /var/lib tirou os workspaces da deny; convidado lia o vizinho por path absoluto) → cura no canUseTool (Read/Grep/Glob de path absoluto fora do cwd negado direto; próprio auto-aprovado). +item 2: settingSources:[] dava ZERO comandos do Onion (o /catch-up 'provado' era o modelo lendo o .md como PROSA) → ['project'] (50+ comandos vivos, seguro porque convidado read-only não adultera o settings). +PAT do maestro via credential.helper=store no gitconfig (GIT_CONFIG_GLOBAL=/dev/null). Provas: comandos onion vivos, próprio legível, VIZINHO_BLOQUEADO, vendor-manifest 5/5. LIÇÃO: dogfood raso (o modelo IMPROVISA lendo prosa) mente 'funcionou' — o gate real é o system/init do SDK, não a resposta parecer certa. RESÍDUO: convidado sem Bash não roda comandos que precisam de git (sandbox deferido, P0-7); ~14M vendor/usuário sem coletor por idade."
+    trace: "/home/onion/onion-bridge/src/workspace.ts"
+
   - id: Q_GESTAO_USUARIOS_E_WORKSPACES
     node_type: question
     plane: DEV
@@ -443,6 +454,9 @@ edges:
     to: Q_GESTAO_USUARIOS_E_WORKSPACES
     edge_type: SUPPORTS
   - from: E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO
+    to: Q_GESTAO_USUARIOS_E_WORKSPACES
+    edge_type: SUPPORTS
+  - from: F_ID_1_ADOCAO_LIMPA
     to: Q_GESTAO_USUARIOS_E_WORKSPACES
     edge_type: SUPPORTS
 
