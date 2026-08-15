@@ -1,6 +1,6 @@
 ---
 branch: docs/kg-fid3
-pr: TBD
+pr: 607
 date: 2026-08-15
 reviewed_diff_sha256: 37df7564a310772c6d48fc2e419fb82f6d9803662f23343851be666dc3470d41
 findings_total: 0
