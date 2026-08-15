@@ -115,6 +115,17 @@ nodes:
     label: "DEMO DE CAMPO do maestro (desktop+mobile, com a Nicole como 2ª usuária real) — achou o que 16 Elenxos de código não viram, porque a classe era OUTRA: a superfície MENTIA ao usuário. 8 achados: agente respondia em INGLÊS (preset claude_code só entrava com append — sem ele o CLAUDE.md do core nem carregava) · /onion no picker listava design:generate (matcher casa na DESCRIÇÃO) · rótulos COMANDOS/AGENTES flutuando vazios no mobile · catálogo em cache eterno · 'Identidade ativa' sem NOME (anonimato p/ o próprio dono) · 📊 para todo mundo rendia cards de erro confusos a não-admin · 'Identidade criada.' lia-se como convite ENVIADO (nenhum e-mail sai — Nicole só recebeu o código de login) · JSON cru dos args de tool ilegível. TODOS CURADOS no PR-25 (bridge 29b946d, deploy vivo) + 1 bônus da bancada: cache mtime com cegueira de mesmo-ms → chave mtime+size. LIÇÃO DA LINHA: Elenxo adversarial vê CÓDIGO; só uso real vê a MENTIRA DE SUPERFÍCIE — G5 dogfood é gate, não cerimônia."
     trace: "/home/onion/onion-bridge/web/src/App.tsx"
 
+  - id: E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: sonda-agente-real-cwd-workspace-bypass-respondeu-14-linhas-do-.env-e-16-re-sondas-das-curas
+    status: confirmed
+    impact: 5
+    confidence: 0.98
+    label: "F-ID.P0 SONDA (2026-08-15, medida — não inferida): um convidado, no fluxo REAL do bridge (query do Agent SDK, cwd=workspace, permissionMode=bypassPermissions, Read auto-aprovado ANTES do chip), pediu em pt-BR /home/onion/onion-bridge/.env e o agente respondeu '14' — leu o arquivo INTEIRO. Só contas de teste existiam (maestro: nada vazou a terceiros), mas o furo foi fechado antes de convidado real. CONTENÇÃO (bridge 43c2c9c, deploy vivo; cada cura provada por re-sonda comportamental): permissionMode por chamador (admin=bypass, convidado='default' — NÃO 'dontAsk', que bloqueava o core via symlink) · deny CIRÚRGICA na camada settings SÓ p/ não-admin (deny vence bypass, medido) negando .env+data/+home-do-onion+/proc/** mas preservando a LEITURA do core · settingSources:[] p/ não-admin (o settings do core trazia hooks que escrevem no core + allow Bash(grep * .env)) · env FILTRADO (LOGTO_M2M_SECRET/INVITE_TOKENS saíam no ambiente do agente) · GIT_CEILING nos dois dirs (workspaces+core, fechando o escape pelo symlink docs). Provas finais: ENV_BLOQUEADO · core legível ('Sistema') · /proc BLOQUEADO · data/ BLOQUEADO · git-docs 'not a git repository'. + bridge:write REMOVIDO do papel bridge-user no Logto (204) — sem write, sem Bash, fecha o vetor `sh -c cat` (vocabulário infinito, cura-por-lista nula). RESÍDUO (Elenxo P0): sandbox/bwrap é a cura estrutural do Bash mas bwrap NÃO está instalado e liga FAIL-OPEN em silêncio — P0-7 exige instalar+medir antes."
+    trace: "/home/onion/onion-bridge/src/chat.ts"
+
   - id: Q_GESTAO_USUARIOS_E_WORKSPACES
     node_type: question
     plane: DEV
@@ -431,3 +442,7 @@ edges:
   - from: E_ROLE_BRIDGE_USER_CARREGAVA_ADMIN
     to: Q_GESTAO_USUARIOS_E_WORKSPACES
     edge_type: SUPPORTS
+  - from: E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO
+    to: Q_GESTAO_USUARIOS_E_WORKSPACES
+    edge_type: SUPPORTS
+
