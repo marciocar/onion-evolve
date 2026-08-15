@@ -2,7 +2,7 @@
 branch: docs/round-invite-profile-announce
 pr: 610
 date: 2026-08-15
-reviewed_diff_sha256: 2aa034ddc3375e92082647eed76576c14f9b53ac4a973baa0c001c0e63ae2e4b
+reviewed_diff_sha256: 3ec114547fe79fbafc83501205c27febcc2ca4aad0de07a9002c0e53c8a67b77
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
