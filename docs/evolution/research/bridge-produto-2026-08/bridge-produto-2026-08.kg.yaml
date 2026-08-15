@@ -436,7 +436,36 @@ nodes:
     confidence: 0.9
     label: "G-ID — a prova HUMANA da fase: marcio@grana.ai convidado por e-mail real → aceita → vê a org Grana.AI na Home, alterna Pessoal↔Grana.AI com listas de conversa isoladas, e uma linha do meter do dia sai com org preenchido. Nicole MANTIDA como 2ª prova humana (decisão do maestro). GATILHO: o maestro rodar o roteiro no device real e confirmar."
 
+  - id: D_ROUND_INVITE_SIGNUP_PROFILE
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: rodada-completa-em-producao-bridge-9ba71af0-provas-curl
+    status: done
+    impact: 4
+    confidence: 0.9
+    label: "Rodada convite/cadastro/nome/perfil (pós-F-ID, pedido do maestro 08-15) — TUDO em produção (bridge 9ba71af0): F0 baseline sign-in-exp (contradição 08-14×08-15 resolvida: as duas medições eram certas nos seus tempos; tenant aceita e-mail+código) · F1 nome no lugar do sub (displayName canônico name??username??email, bySub do dashboard traduzido, byName resolvido no Logto) · F2a convite pessoal idempotente (alreadyExisted, sem 502) · F2b reenvio de convite de org NATIVO (resend/revogar/recriar; MEDIDO: Expired é estado FINAL — revoke dá 422, recriar = DELETE+invite; e a cura do 204-que-virava-falha em mapi: removeOrgMember/deleteUser eram bugs latentes) · F3 signUp username+senha (PATCH aditivo, MissingProfile, campo único por decisão) · F4 PATs (exchange RFC 8693 server-side; 3 sondas até a chave allowTokenExchange; scope vazio ≠ todos — herança por FILTRAGEM; prova viva 4/4: 200 sub-correto/403 anti-fabricação/401 lixo/401 revogado) · F5 segurança no perfil (Account API direto do navegador, CORS medido, verificação reforçada, MFA NoPrompt opt-in, /me/access). Decisões seladas: PAT (não app M2M) · reenvio nos 2 fluxos · senha campo único · 2FA opcional via perfil · aplicar direto + CHANGELOG."
+
+  - id: Q_ROUND_HUMAN_PROOF
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: gate-humano-fluxos-de-navegador-da-rodada
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "Prova humana da rodada (browser real — a classe que sonda/curl não cobre, lição do Elenxo F-ID.3): (1) convidado novo completa o cadastro: e-mail+código → criar username+senha → entra; (2) trocar senha no perfil (verificação reforçada); (3) ativar 2FA (TOTP+backup codes) e logar com 2FA; (4) criar PAT no perfil e revogar; (5) reenviar convite de org pela tela de Membros. GATILHO: roteiro do maestro. Se a sessão for anterior ao scope identities, a seção de segurança degrada com aviso 'saia e entre de novo'."
+
 edges:
+  - from: D_ROUND_INVITE_SIGNUP_PROFILE
+    to: D_FASE_ID_CONTEINER_DE_IDENTIDADE
+    edge_type: TRACES_TO
+  - from: Q_ROUND_HUMAN_PROOF
+    to: D_ROUND_INVITE_SIGNUP_PROFILE
+    edge_type: CONSTRAINS
+  - from: E_CONVITE_FUNCIONA_EMAIL_LOGIN
+    to: D_ROUND_INVITE_SIGNUP_PROFILE
+    edge_type: SUPPORTS
   - from: D_FASE_ID_CONTEINER_DE_IDENTIDADE
     to: D_programa_bridge_evolve
     edge_type: TRACES_TO

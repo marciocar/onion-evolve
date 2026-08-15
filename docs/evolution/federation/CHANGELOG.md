@@ -8,6 +8,22 @@
 
 ---
 
+## 2026-08-15 · Tenant Logto compartilhado — cadastro c/ username+senha, MFA opt-in, Account API · COMPATÍVEL · alvo: todos
+
+- **O que mudou no tenant `auth.onionevolve.com`** (compartilhado bridge+federação; mudanças ADITIVAS,
+  aplicadas com baseline de rollback salvo e teste antes — decisão do maestro "aplicar direto, registrar
+  depois"): (1) `signUp.identifiers=["username"]` + `password:true` — usuário humano SEM username será
+  convidado a criá-lo (+senha) no PRÓXIMO login, um prompt único, sem lockout; login existente com
+  username+senha não muda em nada; registro público segue FECHADO (`signInMode=SignIn`). (2) MFA
+  `[Totp,BackupCode]` com policy **`NoPrompt`** — 2FA é opt-in puro pela UI do bridge; NINGUÉM vê prompt
+  no login (a policy anterior `UserControlled` está deprecada no Logto). (3) **Account API habilitada**
+  (`account-center` com password/mfa/username/name em Edit) — self-service de senha/2FA direto do
+  navegador do usuário.
+- **M2M novo no tenant default:** app `bridge-pat-exchange` (token exchange RFC 8693, flag
+  `customClientMetadata.allowTokenExchange`) — troca PAT→access token do bridge, server-side.
+- **Ação p/ adotantes/federação:** NENHUMA. Quem tem username+senha não percebe. Se algum usuário humano
+  de federação sem username estranhar o prompt de "criar usuário", é este anúncio.
+
 ## 2026-08-04 · Maestro's Aside — entrada lateral tipada (side-channel) · COMPATÍVEL · alvo: todos
 - **Novo protocolo "Aparte do Maestro" / Maestro's Aside.** O maestro escreve um **marcador tipado** no
   INÍCIO da mensagem (`dúvida:` `corrige:` `reforço:` `nota:` `guarda:` `+etapa:` `-etapa:` `paralelo:`
