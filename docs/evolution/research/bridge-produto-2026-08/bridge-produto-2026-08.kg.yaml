@@ -386,7 +386,75 @@ nodes:
     confidence: 0.9
     label: "G3 — a parte HUMANA do gate: demo do maestro no device real. Roteiro: abrir app.onionevolve.com no celular → alternar dark/claro (toggle no header) → criar 2ª conversa e alternar (painel ☰) → buscar → abrir deep-link /t/<id> após refresh → anexar um .md e perguntar sobre ele → um comando com bloco de código (shiki) → conferir os 4 chips do welcome. DECISÕES ABERTAS no mesmo gate: multi-device (last-write-wins hoje; cura desenhada = 409 otimista) · prioridade de bordas dark mais presentes · splash dark. GATILHO: o maestro dizer."
 
+  - id: D_FASE_ID_CONTEINER_DE_IDENTIDADE
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: fase-f-id-entregue-em-producao-bridge-c91374d
+    status: done
+    impact: 5
+    confidence: 0.95
+    label: "F-ID (Identidade e Contextos) — o CONTÊINER Pessoal (Second Brain) × Organização (Company Brain) na camada de conta/workspace/superfície. NÃO é o F6/Brain; é onde ele vai morar. Nasceu do 3º uso real: marcio@grana.ai rodou /catch-up e viu os PRs do Onion Bridge (não-dev enxergando o contexto de dev do produto). Entregue fim-a-fim em produção: P0 contenção + F-ID.1 adoção limpa + F-ID.2 dual-token + F-ID.3 superfície/org + F-ID.4 member-get-member. Deploy vivo (bridge c91374d, /health ok, /me/referrals 401 sem token)."
+
+  - id: F_ID_2_DUAL_TOKEN_CONTEXTO
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: resolveCtx-fail-closed-em-producao-403-sem-vinculo
+    status: done
+    impact: 4
+    confidence: 0.9
+    label: "F-ID.2 — contêiner de contexto (kind,id): p:<sub> | o:<orgId>. Dual-token: Authorization (recurso, aud=bridge) + X-Onion-Org-Token (aud=urn:logto:organization). resolveCtx faz isBridgeOrg+isMember em Promise.all, fail-closed (inválido/outra-identidade/org-não-bridge/não-membro → 403); nunca aceita org token sozinho (mantém binding anti-replay). storeKey de org hasheado por injetividade; workspace de org = repo bare + checkout por membro. Org Grana.AI id=9mt40fgqoudb (customData.bridge=true, filtra da federação)."
+
+  - id: F_ID_4_MGM_REFERRALS
+    node_type: decision
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: elenxo-f-id-4-13-achados-curados-bridge-c91374d
+    status: done
+    impact: 3
+    confidence: 0.9
+    label: "F-ID.4 — member-get-member: POST /me/referrals cria pedido pendente → admin aprova em Membros → convite Logto dispara. Store atômico (tmp+rename), teto 20 pendentes/user, poda decididos >90d, id opaco, idempotente. Revisado pelo Elenxo (13 achados, todos curados): approve-carimba-só-se-convite-deu-certo, mutex de token cross-aba (navigator.locks), bodySizeGuard, /usage/me-em-org=meu-consumo. Autorização RESISTIU (10 ataques de path). DECLARADOS não-feitos: cota de ORG própria (feature nova), byName mostra sub (UX), baldes rate-limit combinados (aceitável)."
+
+  - id: E_CONVITE_FUNCIONA_EMAIL_LOGIN
+    node_type: evidence
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: tenant-signInAcceptsEmail-medido-vivo-08-15
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    label: "DESCOBERTA do Elenxo F-ID.4: o tenant Logto AGORA aceita e-mail como identificador de login (a medição 08-14 'só username' ficou stale). Logo o CONVITE FUNCIONA — o convidado entra por e-mail+código de verificação; a mensagem 'em construção' era falsa e foi corrigida. Convite de ORG envia e-mail real (organization-invitations/Postmark); convite PESSOAL (member-get-member) cria o usuário mas NÃO envia e-mail automático (o admin avisa; a pessoa entra por e-mail+código). REFUTA a premissa 'tela de aceite necessária'."
+
+  - id: Q_G_ID_PROVA_HUMANA
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-15
+    verified_against: gate-humano-aguarda-marcio-grana-ai-aceitar-convite
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "G-ID — a prova HUMANA da fase: marcio@grana.ai convidado por e-mail real → aceita → vê a org Grana.AI na Home, alterna Pessoal↔Grana.AI com listas de conversa isoladas, e uma linha do meter do dia sai com org preenchido. Nicole MANTIDA como 2ª prova humana (decisão do maestro). GATILHO: o maestro rodar o roteiro no device real e confirmar."
+
 edges:
+  - from: D_FASE_ID_CONTEINER_DE_IDENTIDADE
+    to: D_programa_bridge_evolve
+    edge_type: TRACES_TO
+  - from: D_FASE_ID_CONTEINER_DE_IDENTIDADE
+    to: F6_PONTE_BRAIN_DEFERRED
+    edge_type: SUPPORTS
+  - from: F_ID_2_DUAL_TOKEN_CONTEXTO
+    to: D_FASE_ID_CONTEINER_DE_IDENTIDADE
+    edge_type: TRACES_TO
+  - from: F_ID_4_MGM_REFERRALS
+    to: D_FASE_ID_CONTEINER_DE_IDENTIDADE
+    edge_type: TRACES_TO
+  - from: E_CONVITE_FUNCIONA_EMAIL_LOGIN
+    to: F_ID_4_MGM_REFERRALS
+    edge_type: SUPPORTS
+  - from: Q_G_ID_PROVA_HUMANA
+    to: D_FASE_ID_CONTEINER_DE_IDENTIDADE
+    edge_type: CONSTRAINS
   - from: D_programa_bridge_evolve
     to: C_plano_poc
     edge_type: SUPERSEDES
