@@ -115,6 +115,20 @@ fi
 # Agora o instalador PROVA por comportamento (commit-sonda descartável, índice temporário,
 # nunca toca o índice do alvo) e o EXIT CODE passa a significar "o gate está vivo", não
 # "eu fiz a minha parte". Fail-closed: quem chama (o /meta:adopt) vê a falha.
+# APLICABILIDADE — a bancada pegou isto (2026-08-16): provar gate onde não há gate é
+# reprovar o contexto errado. Dois casos em que a prova NÃO se aplica, e ambos declaram
+# em vez de falhar: (i) alvo sem `.claude/validation/lint-artifacts.sh` — não há o que
+# bloquear ainda (o próprio template do hook degrada gracioso nesse caso); (ii) repo sem
+# nenhum commit (greenfield recém-iniciado) — não há HEAD de onde partir o commit-sonda.
+if [ ! -f "${DEST}/.claude/validation/lint-artifacts.sh" ]; then
+  echo "Onion: alvo ainda sem lint — gate instalado, prova ADIADA (rode ops/verify-adopter-gate.sh após instalar o framework)." >&2
+  exit 0
+fi
+if ! git -C "${DEST}" rev-parse HEAD >/dev/null 2>&1; then
+  echo "Onion: alvo sem commits — gate instalado, prova ADIADA (o commit-sonda exige um HEAD)." >&2
+  exit 0
+fi
+
 VERIFY="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/ops/verify-adopter-gate.sh"
 if [ -f "${VERIFY}" ]; then
   echo "" >&2
