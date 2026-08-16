@@ -277,6 +277,36 @@ nodes:
     verified_against: derivada-da-medicao-dos-11-adotantes-aguarda-decisao-do-maestro
     label: "A medição abre três caminhos que se excluem, e a escolha é do maestro porque é de PRODUTO, não de engenharia. (A) EMBARCAR o que faltou: vendorizar `review-artifact-check.sh` + o wire-in de CI mínimo, e medir de novo em 30 dias se resíduo e grafo aparecem — ataca a metade acionável (não-envio) e é barata. (B) ACEITAR que o corpus é do CORE e não do produto: nesse caso a promessa ao adotante muda de 'você ganha a maquinaria que aprende' para 'você ganha as guardas; o aprendizado é do core e chega por update' — e a ADR da superação precisa dizer isso, porque hoje ela diz que o fosso é a arqueologia de defeito, que é justamente o que não viaja. (C) INVESTIGAR o não-uso: 1 de 7 mantém diário mesmo tendo o comando — antes de embarcar mais coisa, medir por que a que já foi não pegou (é o mesmo padrão do gate social medido na perna de leitura, agora do lado de fora). GATILHO: o maestro escolher; e (C) tem precedência lógica sobre (A), porque embarcar mais maquinaria sem entender o não-uso da anterior é repetir a aposta que já não pagou."
 
+  - id: E_NAO_HA_NAO_USO_HA_ASSIMETRIA_POR_DESENHO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-16
+    verified_against: diario-autoral-do-outlier-mais-creditos-nomeados-em-artefatos-do-core
+    label: "A investigação do 'não-uso' (escolhida pelo maestro sobre embarcar mais maquinaria) DISSOLVEU a própria premissa. O outlier gustavo-pulga tem 9 entradas de diário AUTORAIS (nenhuma existe no core — verificado arquivo a arquivo), com `instance: gustavo-pulga`, `share_with: [core]` e `review_after` — protocolo completo. E uma delas propõe literalmente 'avaliar uma skill de retro/feedback como produto do core' — skill que o core TEM hoje (`onion-retro`). Medindo o fluxo INVERSO: artefatos do core creditam nominalmente sinais de campo de metagamify (guard de base cruzada, CHANGELOG 07-27), granaai (07-17), gustavo-pulga, arandek (GAP2/GAP3 no lint) e onion-pessoal. CONCLUSÃO QUE INVERTE A PERGUNTA: o corpus não deixa de transferir por desuso — ele CENTRALIZA POR DESENHO. O adotante usa a maquinaria, gera SINAL, o sinal sobe pela co-evolução, o core o converte em guarda/regra/KB, e a guarda volta para TODOS por update. O corpus local fica fino porque o valor foi absorvido acima. Isso não é falha: é a federação funcionando — e muda a promessa correta de 'você acumula o aprendizado' para 'você herda guardas nascidas do dano dos outros, e o seu dano vira guarda para eles'."
+
+  - id: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-16
+    verified_against: core-hooksPath-e-githooks-medidos-repo-a-repo-apos-eu-medir-o-lugar-errado
+    label: "O DEFEITO ACIONÁVEL que a investigação encontrou, e ele é NOSSO: o gate determinístico do adotante está INERTE em 4 de 6 medidos — e em nenhum caso isso é visível sem medir. granaai e gustavo-pulga: `core.hooksPath=.githooks` + hook presente = VIVO. metagamify: hook PRESENTE mas `core.hooksPath=.husky` — o husky ganha e o hook do Onion nunca roda (guarda INALCANÇÁVEL: 'a ausência se vê no code review, a inalcançabilidade dá impressão de cobertura', registrado no core em 2026-08-02). onion-pedro e onion-arthur: `core.hooksPath=.githooks` CONFIGURADO apontando para diretório SEM hook — gate declarado e inexistente. onion-dist: nada. Some-se CI rodando a maquinaria em 1 de 7. Os 13–40 scripts vendorizados são INVENTÁRIO, não capacidade, na maioria. ⚠️ NOTA DE MÉTODO: minha primeira medição olhou `.git/hooks` e teria reportado '6 de 6 ausentes' — errado, porque o adopt usa `core.hooksPath`. Medir o lugar errado é não ter medido; só não virou número publicado porque desconfiei da uniformidade."
+
+  - id: D_CURAR_O_GATE_INERTE_DO_ADOTANTE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-08-16
+    verified_against: derivada-do-defeito-medido-aguarda-decisao-do-maestro
+    label: "CURA PROPOSTA (decisão do maestro): o problema não é o adotante não usar — é o gate estar inerte sem ninguém saber. A cura que esta casa exige é COMPORTAMENTAL: um verificador que PROVA que o gate roda no adotante (ex.: etapa do adopt que faz um commit-sonda com violação plantada e confirma que foi BARRADO), em vez de conferir que o arquivo existe. Casos que ele tem de pegar, todos medidos hoje: hooksPath apontando para outro gestor (husky), hooksPath apontando para diretório vazio, ausência total. Segunda perna, mais barata: embarcar o workflow de CI no bundle (o core tem `onion-validate.yml`; o adopt não leva nenhum), porque githook local é pulável com `--no-verify` — como EU fiz três vezes nesta sessão. Métrica de re-teste direta: quantos adotantes têm gate PROVADO vivo — hoje 2 de 6."
+
 edges:
   - from: E_COMUNIDADE_MEMORIA_3_CAMADAS
     to: Q_ONDE_MORA_A_SUPERACAO
@@ -353,6 +383,18 @@ edges:
   - from: Q_O_QUE_FAZER_COM_A_NAO_TRANSFERENCIA
     to: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
     edge_type: TRACES_TO
+  - from: E_NAO_HA_NAO_USO_HA_ASSIMETRIA_POR_DESENHO
+    to: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
+    edge_type: CONSTRAINS
+  - from: E_NAO_HA_NAO_USO_HA_ASSIMETRIA_POR_DESENHO
+    to: Q_O_QUE_FAZER_COM_A_NAO_TRANSFERENCIA
+    edge_type: CONSTRAINS
+  - from: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
+    to: D_CURAR_O_GATE_INERTE_DO_ADOTANTE
+    edge_type: SUPPORTS
+  - from: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
+    to: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    edge_type: CONSTRAINS
   - from: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
     to: Q_RISCO_ACERVO_VIRA_CEMITERIO
     edge_type: SUPPORTS
