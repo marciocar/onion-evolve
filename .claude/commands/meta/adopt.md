@@ -274,6 +274,20 @@ if ! bash "$SOURCE_ROOT/.claude/utils/adopt/install-onion-githook.sh" "$DEST"; t
   exit 1
 fi
 
+# (6b) CI — OFERTA, nunca imposição (costurado 2026-08-16 a pedido do maestro).
+#      O githook de (6) é o gate LOCAL, e ele é pulável: `git commit --no-verify`. O CI é o
+#      que não se pula — e a medição de 2026-08-16 achou CI rodando a maquinaria em 1 de 7
+#      adotantes. Mas embarcar calado erraria três vezes, e as três estão travadas no helper:
+#      FORGE (1 dos 7 medidos não está no GitHub — o Onion tem adapter de forge para não
+#      assumir), CONTA ALHEIA (minutos de CI são do adotante) e DIA 1 VERMELHO (repo
+#      recém-adotado quase sempre tem violação; CI vermelho na primeira hora é o que faz
+#      apagarem o arquivo — perde-se o gate E a confiança).
+#      SEM --apply o helper apenas RELATA. Mostre o resultado ao dono, PERGUNTE, e só então
+#      rode com --apply. Nunca aplique por conta própria: é configuração e custo dele.
+bash "$SOURCE_ROOT/.claude/utils/adopt/offer-onion-ci.sh" "$DEST" || true
+# ↑ rc≠0 aqui significa "lint do alvo reprovando" — NÃO aborta a adoção (o gate local de (6)
+#   já está vivo); é convite a consertar o lint e reofertar o CI depois.
+
 # (7) .gitattributes merge=union — reduz conflito ESPÚRIO no merge de vendor-branch (Achado #2) em
 #     arquivos append-only do doc-bridge (CHANGELOG/_processed): duas pontas apendam → união, não conflito.
 #     Never-clobber por-linha (idempotente): só adiciona as regras Onion ausentes.
