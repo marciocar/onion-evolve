@@ -22,9 +22,20 @@
 # Uso: bash ops/pr-merge-verified.sh <numero> [--repo owner/nome]
 set -uo pipefail
 
-PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome]}"; shift || true
+PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch]}"; shift || true
 REPO_ARG=()
-[ "${1:-}" = "--repo" ] && { REPO_ARG=(--repo "$2"); shift 2; }
+DEL=(--delete-branch)
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
+    # BASE DE STACK: apagar a branch da base FECHA o PR filho (não re-aponta) — está
+    # registrado como mecânica de stack desde 2026-07. Ao mergear uma base com PR
+    # empilhado em cima, use --keep-branch; o GitHub re-aponta o filho, e a branch se
+    # apaga à mão depois. Sem esta opção o mecanismo teria destruído um PR ao "acertar".
+    --keep-branch) DEL=(); shift ;;
+    *) shift ;;
+  esac
+done
 
 say() { printf '  %s\n' "$*"; }
 die() { printf '✗ %s\n' "$*"; exit 1; }
@@ -47,7 +58,7 @@ else
 fi
 
 # 3 — o RC do merge, que é o defeito de origem
-gh pr merge "$PR" "${REPO_ARG[@]}" --rebase --delete-branch
+gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${DEL[@]}"
 rc=$?
 [ "$rc" -ne 0 ] && die "gh pr merge saiu com rc=${rc} — NÃO declaro merge (foi exatamente assim que o #618 'mergeou' sem mergear)"
 
