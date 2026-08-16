@@ -230,12 +230,12 @@ nodes:
   - id: Q_GATE_REABRE_POR_DOGFOOD_NAO_POR_CHANGELOG
     node_type: question
     plane: DEV
-    status: open
+    status: confirmed
     impact: 4
     confidence: 0.85
     verified_at: 2026-08-16
     verified_against: gatilho-de-reabertura-declarado-no-synthesis-da-perna-de-leitura
-    label: "A ARMADILHA desta rodada, nomeada antes de cair nela: a superfície nova de hooks (18 eventos, handlers `prompt`/`agent`/`http`/`mcp_tool` — verificados no binário por DOIS medidores independentes) torna CONSTRUÍVEL exatamente a cura da perna de leitura que a casa REFUTOU por medição há 14 dias (1/9, NÃO CONSTRUIR). Três janelas novas são de natureza diferente do que foi testado: `InstructionsLoaded` (dispara quando a doutrina entra, antes de a tarefa existir e competir por atenção), `PermissionDenied`/`PostToolUseFailure` (disparam NO DANO, não no relógio — e a doutrina da casa diz que o gatilho eficaz é o dano), `FileChanged` (dispara quando um .kg.yaml muda, que é quando ele deixa de valer). MAS: construir agora PORQUE FICOU FÁCIL é acoplar por CONVENIÊNCIA — a refutação da postura de 2026-05-18, cometida na mesma semana em que se escreveria a ADR que a reafirma. O SYNTHESIS declarou o gatilho de reabertura e ele NÃO é changelog: 'o mesmo padrão fiado à mão, fresco e descartável, 2–3× em sessão real, REGISTRANDO SE O VEREDITO INJETADO MUDOU A RESPOSTA'. GATILHO: esse dogfood. Se mudou a resposta, vira mecanismo com lastro; se não mudou, o NÃO CONSTRUIR sobrevive mais forte, por ter resistido à facilidade."
+    label: "A ARMADILHA desta rodada, nomeada antes de cair nela: a superfície nova de hooks (18 eventos, handlers `prompt`/`agent`/`http`/`mcp_tool` — verificados no binário por DOIS medidores independentes) torna CONSTRUÍVEL exatamente a cura da perna de leitura que a casa REFUTOU por medição há 14 dias (1/9, NÃO CONSTRUIR). Três janelas novas são de natureza diferente do que foi testado: `InstructionsLoaded` (dispara quando a doutrina entra, antes de a tarefa existir e competir por atenção), `PermissionDenied`/`PostToolUseFailure` (disparam NO DANO, não no relógio — e a doutrina da casa diz que o gatilho eficaz é o dano), `FileChanged` (dispara quando um .kg.yaml muda, que é quando ele deixa de valer). MAS: construir agora PORQUE FICOU FÁCIL é acoplar por CONVENIÊNCIA — a refutação da postura de 2026-05-18, cometida na mesma semana em que se escreveria a ADR que a reafirma. O SYNTHESIS declarou o gatilho de reabertura e ele NÃO é changelog: 'o mesmo padrão fiado à mão, fresco e descartável, 2–3× em sessão real, REGISTRANDO SE O VEREDITO INJETADO MUDOU A RESPOSTA'. GATILHO: esse dogfood. RODADO em 2026-08-16 a pedido do maestro — resultado 3/3 NÃO MUDOU ([[E_DOGFOOD_DA_PERNA_DE_LEITURA_3_DE_3_NAO_MUDOU]]): o gate NÃO reabre, e o NÃO CONSTRUIR sai mais forte por ter resistido à facilidade E a um teste de boa-fé. Fica aberto o desenho SEGUINTE, que ataca o modo de falha certo: sessão executando TAREFA cujo caminho óbvio contradiz um nó, medindo se a injeção muda a AÇÃO (não a resposta a uma pergunta dirigida)."
 
   - id: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
     node_type: evidence
@@ -246,6 +246,16 @@ nodes:
     verified_at: 2026-08-16
     verified_against: medicao-de-proposito-de-cada-script-antes-de-remover-qualquer-coisa
     label: "Executar a lista do 'que parar' produziu a refutação de 3 dos seus 5 itens — e o método que os derrubou foi o mesmo que a tese defende: MEDIR ANTES DE APAGAR. (1) MARKETPLACE/EMPACOTAMENTO — REFUTADO: o nativo tem `plugin init` (scaffold de plugin NOVO), `validate` (schema de manifesto), `tag` (confere plugin.json × entrada no marketplace) e `marketplace add/update` (distribuição) — NENHUM faz PROJEÇÃO. O `assemble-plugin.sh` projeta a SSOT `.claude/` no layout de plugin dirigido por manifesto, e o `generate-marketplace.sh` agrega o REGISTRO — e nasceu de defeito de campo MEDIDO (adotante 2026-07-13: o repo dele falhava o próprio lint por ausência de marketplace.json e não havia gerador; escrevia à mão). Pior para a recomendação: delegar a validação ao `claude plugin validate` ACOPLARIA a metade que hoje REPROVA — que a medição desta mesma rodada identificou como o fosso agnóstico. (2) CURAR MEMORY.md — REFUTADO: o framework não cura; `catch-up` LÊ para orientação e o `evolve` D10 VARRE testando a validade de cada entrada com veredito UNVERIFIABLE explícito quando não pode medir. O auto-memory nativo MANTÉM o arquivo; o Onion testa se o CONTEÚDO ainda é verdade — atos diferentes, e o segundo é a camada de aprendizagem autorregulada. (3) SCAFFOLDING GENÉRICO — REFUTADO: os `setup-*` são específicos (integração de task manager, code review no CI), não o `/init` genérico. SOBREVIVERAM e foram EXECUTADOS os dois itens de VERDADE: parar de anunciar 'KG como SSOT de runtime' (corrigido na KB canônica) e parar de justificar o acoplamento por `SendMessage` (corrigido no CLAUDE.md, trocado pelo `exit 2` de hook, que é o que a medição prova comprado). LIÇÃO DE CLASSE: recomendação derivada de CAPACIDADE-do-outro é hipótese; só medir o PROPÓSITO do próprio código a converte em decisão."
+
+  - id: E_DOGFOOD_DA_PERNA_DE_LEITURA_3_DE_3_NAO_MUDOU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-08-16
+    verified_against: ab-cego-3-casos-sessao-headless-opus-5-com-e-sem-hook-fiado-a-mao
+    label: "O dogfood do gatilho RODOU (pedido do maestro 2026-08-16) e o resultado é NEGATIVO para construir: **3 de 3 — o veredito injetado NÃO mudou a resposta**. Desenho: hook DESCARTÁVEL em SessionStart injetando o veredito do radar (com ids de nó) via additionalContext, e A/B cego — a MESMA pergunta em sessão headless nova (Opus 5), com e sem o hook, comparando as respostas. Casos: (1) 'devemos construir a cura agora que os hooks novos permitem?' → NÃO nos dois; (2) 'devemos descartar o empacotamento próprio pelo nativo?' → NÃO nos dois; (3) 'qual o critério numérico de acervo-cemitério?' (fato que só existe no grafo) → os dois acertaram, e o CONTROLE citou o nó `Q_RISCO_ACERVO_VIRA_CEMITERIO` com arquivo:linha. Em 3 de 3 a sessão SEM hook foi ao grafo por conta própria. Efeito do hook: mudou a FORMA (mais ids citados, mais conciso), não a DECISÃO. LIMITE DE DESENHO DECLARADO, e é o que impede transformar isto em veredito universal: eu testei 'acha quando PERGUNTADO de forma dirigida', e o modo de falha medido no corpus de 08-02 é outro — 'consulta enquanto está OCUPADO com outra tarefa', onde o grafo compete por atenção com o trabalho em curso. Para atacar aquele modo, o desenho certo é uma sessão executando TAREFA cujo caminho óbvio contradiz um nó, medindo se a injeção muda a AÇÃO — não a resposta a uma pergunta. Consequência imediata: o `NÃO CONSTRUIR` de 2026-08-02 SOBREVIVE e sai mais forte, por ter resistido à facilidade E a um teste feito de boa-fé para derrubá-lo."
 
 edges:
   - from: E_COMUNIDADE_MEMORIA_3_CAMADAS
@@ -308,6 +318,12 @@ edges:
   - from: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
     to: D_O_QUE_PARAR_DE_FAZER
     edge_type: CONSTRAINS
+  - from: E_DOGFOOD_DA_PERNA_DE_LEITURA_3_DE_3_NAO_MUDOU
+    to: Q_GATE_REABRE_POR_DOGFOOD_NAO_POR_CHANGELOG
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_DA_PERNA_DE_LEITURA_3_DE_3_NAO_MUDOU
+    to: E_A_CASA_JA_TINHA_REFUTADO_A_PERNA_DA_LEITURA
+    edge_type: SUPPORTS
   - from: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
     to: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
     edge_type: SUPPORTS
