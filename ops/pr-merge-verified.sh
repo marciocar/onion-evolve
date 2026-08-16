@@ -41,7 +41,14 @@ say() { printf '  %s\n' "$*"; }
 die() { printf '✗ %s\n' "$*"; exit 1; }
 
 # 1+2 — checks e a FONTE do veredito
-checks="$(gh pr checks "$PR" "${REPO_ARG[@]}" 2>&1)" || die "não consegui ler os checks do PR #${PR}"
+# ⚠️ `gh pr checks` sai NÃO-ZERO quando algum check FALHOU (e 8 quando há pendente) — não só
+# quando não consegue ler. A v1 traduzia qualquer rc≠0 como "não consegui ler os checks", e
+# no PR #623 isso ESCONDEU a verdade (o lint tinha reprovado): mensagem errada é diagnóstico
+# errado, e mandou o autor procurar problema de acesso onde havia regressão. Agora a saída é
+# capturada SEM matar o script, e quem decide é o conteúdo — não o código de saída do gh.
+checks="$(gh pr checks "$PR" "${REPO_ARG[@]}" 2>&1)"
+GHRC=$?
+[ -z "$checks" ] && die "não consegui ler os checks do PR #${PR} (saída vazia, rc=${GHRC})"
 printf '%s\n' "$checks" | sed 's/^/  /'
 printf '%s\n' "$checks" | awk '{print $2}' | grep -q pending && die "há check PENDENTE — merge recusado (esperar não é opcional)"
 printf '%s\n' "$checks" | awk '{print $2}' | grep -q fail && die "há check FALHO — merge recusado"
