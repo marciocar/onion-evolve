@@ -1,78 +1,54 @@
 ---
 branch: docs/adopter-gate-inert
-pr: 623
+pr: 624
 date: 2026-08-16
-reviewed_diff_sha256: b890693ecc740743e6cbb3d3bcc721db9b3a1a60fb6bdb969c26b262762fe9b1
-findings_total: 5
-findings_real: 5
-findings_fixed: 5
+reviewed_diff_sha256: b4949cc975f2a3d9fe6ca6c05ebd71bc8767a6e86a4244d98e9f1a75deb269a2
+findings_total: 6
+findings_real: 6
+findings_fixed: 6
 tokens: 0
-duration_min: 45
-verdict: CONFORME-COM-CAUSA-RAIZ-ACHADA
-reviewer: passada por EXECUÇÃO em 3 adotantes reais (2 estados de falha + 1 vivo) — a sonda encontrou defeitos NELA MESMA nas duas primeiras rodadas
+duration_min: 20
+verdict: CONFORME
+reviewer: passada por EXECUÇÃO nos quatro caminhos do helper, em adotantes reais — e a guarda de idioma pegou um identificador meu
 REVISOU: true
 ---
 
-# Resíduo — `docs/adopter-gate-inert`
+# Resíduo — `docs/adopter-gate-inert` (oferta de CI)
 
-Investigação do não-uso (escolha do maestro) + o verificador de gate + a costura no
-`/meta:adopt`. Os três achados vieram de **rodar**, não de ler.
+O #623 (verificador de gate) já mergeou; este PR acrescenta a **oferta de CI** que o maestro
+aprovou com duas condições: forge detectado e lint verde antes.
 
-## Achado 1 — a causa raiz estava no instalador, não no adotante
+## O desenho, e por que cada trava existe
 
-`install-onion-githook.sh` tem never-clobber em `core.hooksPath`: com husky no caminho,
-ele avisa no stderr e **sai 0**. A adoção reportava sucesso com o gate morto. Instalar
-nunca foi sinônimo de proteger — e o exit code dizia "fiz a minha parte", não "a guarda
-está viva". É a mesma classe do `echo "MERGED"` de hoje cedo, num artefato de junho.
+O githook que o `adopt` instala é o gate **local** — e é pulável com `--no-verify` (o autor
+deste resíduo o pulou três vezes hoje). O CI é o que não se pula. Mas embarcá-lo calado
+erraria três vezes, e as três viraram trava executável:
 
-## Achado 2 — a sonda deu falso positivo na 1ª execução real
+1. **Forge** — 1 dos 7 adotantes medidos não está no GitHub. Cravar `.github/workflows`
+   assume plataforma, e o Onion tem adapter de forge exatamente para não assumir.
+2. **Conta alheia** — minutos de CI são dinheiro do adotante; ligar sem perguntar é gastar
+   por ele. Sem `--apply`, o helper só relata (propor→confirmar).
+3. **Dia 1 vermelho** — repo recém-adotado quase sempre tem violação. CI vermelho na
+   primeira hora é o que faz **apagarem** o arquivo: perde-se o gate *e* a confiança.
 
-No metagamify ela declarou "bloqueio provado" porque o lint reprovava e o commit falhou —
-mas quem barrou foi o **husky**, não o gate do Onion, que nem executou. Atribuir a outro o
-mérito de barrar é exatamente o que a sonda existe para pegar. Corrigido: só afirma
-bloqueio se o **nosso** hook comprovadamente executou; senão declara "não avaliado".
+## Verificação por execução (adotantes reais, nenhum modificado)
 
-## Achado 3 — a sonda tocaria o índice de quem verifica
-
-A v1 fazia `git add` no índice real. Rodando dentro do `/meta:adopt`, um `git add`
-pendente do adotante entraria no commit-sonda e seria commitado junto — e depois "desfeito"
-por um reset que ele não pediu. Corrigido com `GIT_INDEX_FILE` temporário. **Ferramenta de
-verificação que altera o estado de quem verifica não é verificação, é dano.** Provado: com
-mudança staged no alvo, o índice ficou idêntico antes e depois.
-
-## Verificação por execução (3 adotantes reais)
-
-| alvo | veredito | exit |
+| alvo | estado | resultado |
 |---|---|---|
-| granaai | gate VIVO — hook executou **e barrou** com lint reprovando | 0 |
-| metagamify | INERTE — hook do Onion em `.githooks` que o git ignora (`hooksPath=.husky`) | 1 |
-| onion-pedro | INERTE — `hooksPath=.githooks` sem pre-commit lá | 1 |
+| onion-dist | sem remote GitHub | ⊘ não se aplica, rc 0 |
+| granaai | lint reprovando | ✗ rc 1, **não instala**, entrega o comando de conserto |
+| onion-pedro | GitHub + lint verde | ✓ **propõe sem criar arquivo** (confirmado: arquivo ausente após rodar) |
+| onion-standalone | já tem workflow | ⊘ never-clobber |
 
-Nenhum deixou rastro: sonda apagada, HEAD original preservado nos três.
+## Achado 6 — a guarda de idioma me pegou
+
+O identificador `ALVO` violava `code-standards` (código em inglês, prosa em pt-BR). HARD no
+lint, renomeado para `TARGET`, re-testado. Vale registrar porque é o tipo de deslize que
+passa em revisão humana e não passa em guarda determinística — que é a tese da ADR de hoje.
 
 ## Limite declarado
 
-O **bloqueio** só é provado quando o lint do alvo já reprova por conta própria — não existe
-gatilho HARD portátil entre adotantes, e inventar um testaria a sonda, não o gate. Quando o
-lint está limpo, o script diz "bloqueio não exercido" em vez de contar como aprovado.
-
-E um limite de processo, não de código: o PR anterior (#622) foi **fechado** quando o
-monitor já armado mergeou a base com `--delete-branch` — a correção `--keep-branch` chegou
-minutos depois. **Corrigir o artefato não retroage sobre o trabalho já disparado.**
-
-## Achados 4 e 5 — os que o CI encontrou depois do primeiro push
-
-**4. Provar gate onde não há gate reprovava o contexto errado.** O `lint-selftest.sh`
-exercita o instalador num repo temporário sem commits e sem lint; o fail-closed novo tentava
-provar o gate ali e matava a suíte sob `set -e`. Conserto semântico: a prova só se aplica
-quando existe `.claude/validation/lint-artifacts.sh` no alvo e o repo tem HEAD — nos dois
-casos inaplicáveis, declara "prova adiada" e sai 0. Bancada depois: **0 falhas, 0 pulados**.
-
-**5. O meu mecanismo de merge mentia no diagnóstico.** `gh pr checks` sai não-zero quando um
-check FALHA, e o script traduzia qualquer rc≠0 como "não consegui ler os checks" — mandando
-procurar problema de acesso onde havia regressão. Curado: captura sem morrer, decide pelo
-conteúdo. Revalidado contra o próprio #623.
-
-**Falha de processo, registrada porque é a causa dos dois:** rodei `lint-artifacts.sh` antes
-de subir e **pulei** `lint-selftest.sh` — script separado, >10 min. A bancada existe para
-pegar exatamente isso, e só não pegou antes porque não a rodei.
+O template escolhe **deliberadamente** rodar só `lint-artifacts.sh` (segundos), não o
+`lint-selftest.sh` (~15 min): a bancada existe para provar as guardas do **core**; ao
+adotante custaria minutos de CI sem lhe dizer nada sobre o próprio repositório. Se algum dia
+um adotante quiser provar as guardas dele, é outra decisão — e outro template.
