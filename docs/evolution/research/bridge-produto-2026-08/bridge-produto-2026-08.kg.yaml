@@ -379,12 +379,12 @@ nodes:
   - id: Q_G3_DEMO_DO_MAESTRO
     node_type: question
     plane: PROD
-    verified_at: 2026-08-14
-    verified_against: gate-definido-f3-em-producao-aguarda-demo-humana
-    status: open
+    verified_at: 2026-08-16
+    verified_against: roteiro-conferido-item-a-item-contra-evidencia-6-de-8-com-rastro
+    status: done
     impact: 3
     confidence: 0.9
-    label: "G3 — a parte HUMANA do gate: demo do maestro no device real. Roteiro: abrir app.onionevolve.com no celular → alternar dark/claro (toggle no header) → criar 2ª conversa e alternar (painel ☰) → buscar → abrir deep-link /t/<id> após refresh → anexar um .md e perguntar sobre ele → um comando com bloco de código (shiki) → conferir os 4 chips do welcome. DECISÕES ABERTAS no mesmo gate: multi-device (last-write-wins hoje; cura desenhada = 409 otimista) · prioridade de bordas dark mais presentes · splash dark. GATILHO: o maestro dizer."
+    label: "G3 — FECHADO pelo maestro (2026-08-16) com EVIDÊNCIA, item a item, não por declaração. COM RASTRO (6): celular — os relatos dele com captura de tela ('layout não responsivo', 'cabeçalho sobrescrito') vieram de navegador em celular e geraram correção (flex-wrap, marca só-🧅); dark/claro — ele registrou escolhas de dark (bordas 1,35:1, splash creme) e o 14º Elenxo achou o `.dark` não pintando a conversa, curado; 2ª conversa e alternar — MEDIDO no thread-store: 4 fios pessoais com 3+4+3+1 = 11 conversas; deep-link /t/<id> — MEDIDO vivo, SPA fallback responde 200; comando com bloco de código — ele rodou /catch-up e reportou slug errado + args de tool ilegíveis, ambos corrigidos; chips do welcome — vistos nas capturas do redesign. SEM RASTRO, DECLARADOS (2): a BUSCA (a rota existe — /threads?q= sobre searchThreads — mas uso não deixa registro) e o ANEXO DE ARQUIVO (zero threads com o marcador que o servidor injeta, verificado com o padrão validado contra o chat.ts; anexo de IMAGEM, esse sim, foi exercitado — o bug 'prompt obrigatório com imagem' de 08-15 nasceu daí e foi curado). As três decisões que viajavam neste nó saíram para [[Q_F3_DECISOES_DE_ACABAMENTO]] — gate fechado não pode levar decisão viva junto."
 
   - id: D_FASE_ID_CONTEINER_DE_IDENTIDADE
     node_type: decision
@@ -455,6 +455,16 @@ nodes:
     impact: 3
     confidence: 0.9
     label: "Prova humana da rodada — o maestro rodou 2026-08-15 e os RASTROS confirmam 4 dos 5 itens (medidos no tenant, não declarados): (1) CADASTRO COMPLETO — identidade nova criada 21:58, entrou 22:08 com **username definido** e senha, isto é, o fluxo MissingProfile (e-mail+código → criar usuário e senha) fechou de ponta a ponta num navegador de verdade; (2)+(3) 2FA — Totp **e** BackupCode em duas contas distintas (a nova e a da 2ª prova humana), que é a sequência obrigatória do Logto, com a senha trocada/definida antes (hasPassword=sim); (4) PAT — 1 token vivo em cada uma das duas contas. **(5) reenviar convite de ORG: SEM RASTRO** — 0 convites na org e ela segue com 1 membro; ou não foi exercido, ou foi apagado depois. É o único item do roteiro sem evidência, e por isso o nó fica `confirmed` e não `done`. GATILHO do fechamento: o maestro dizer se rodou o reenvio, ou rodá-lo (tela de Membros → 🔁)."
+
+  - id: Q_F3_DECISOES_DE_ACABAMENTO
+    node_type: question
+    plane: PROD
+    verified_at: 2026-08-16
+    verified_against: extraidas-do-G3-ao-fechar-para-nao-morrerem-com-o-gate
+    status: open
+    impact: 2
+    confidence: 0.9
+    label: "Três decisões de acabamento que viajavam dentro do G3 e sobrevivem ao fechamento dele (gate fechado não pode levar decisão viva junto): (1) MULTI-DEVICE — hoje é last-write-wins: dois aparelhos na mesma conversa, o último a salvar vence e o outro perde silenciosamente; cura desenhada = concorrência otimista com 409, não implementada; (2) prioridade de BORDAS DARK mais presentes (a escolha registrada foi 1,35:1); (3) SPLASH dark (hoje creme). Nenhuma bloqueia uso — por isso não seguraram o G3. GATILHO: o maestro pedir, ou o multi-device morder alguém de verdade (é o único dos três com modo de falha silencioso)."
 
   - id: E_ELENXO_ROUND_CURADO
     node_type: evidence
@@ -582,6 +592,9 @@ edges:
     to: D_G1_POSICAO_E_CORTE_SELADOS
     edge_type: CONSTRAINS
   - from: Q_G3_DEMO_DO_MAESTRO
+    to: F3_ROSTO_REDESIGN
+    edge_type: SUPPORTS
+  - from: Q_F3_DECISOES_DE_ACABAMENTO
     to: F3_ROSTO_REDESIGN
     edge_type: CONSTRAINS
   - from: Q_G5_DOGFOOD_GO_LIVE
