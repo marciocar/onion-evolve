@@ -8,6 +8,34 @@
 
 ---
 
+## 2026-08-16 · Claude Code 2.1.x mudou contratos que o seu `.claude/` usa · COMPATÍVEL (com AÇÃO recomendada) · alvo: todos
+
+- **Contexto:** o core atualizou o Claude Code (nativo) para **2.1.233** e levantou o que mudou nas
+  versões até aqui, contra fonte primária (CHANGELOG + docs oficiais) e **medindo na máquina**. Três
+  itens mexem em coisa que adotante configura — nenhum quebra o Onion em si, mas todos podem mudar o
+  comportamento do SEU repositório sem você ter tocado em nada.
+- **1) Regras de permissão e `if:` de hook com `dir/**` de segmento único mudaram de significado**
+  (2.1.211/2.1.214): `Edit(src/**)` deixou de auto-aprovar em QUALQUER profundidade e agora vale só
+  `<cwd>/src`. Para o comportamento antigo, use `**/src/**`. ⚠️ **Assimetria que confunde**: regras
+  `deny`/`ask` continuam casando qualquer profundidade — o mesmo padrão significa coisas diferentes
+  conforme o lado. **Ação:** revise `permissions` no seu `.claude/settings.json` e o `if:` dos seus
+  hooks; caminhos ABSOLUTOS multi-segmento (`//home/você/**`) não são afetados.
+- **2) Task/todo tools (TaskCreate/TaskList/TaskUpdate) vêm DESLIGADOS em Opus 4.8+** (2.1.233).
+  Medido por dogfood no core: sessão nova + `--model claude-opus-5` não tem as ferramentas.
+  O **framework Onion não depende delas** (zero instruções em commands/agents/skills — verificado por
+  grep), então nada quebra; mas se o SEU fluxo depende, religue com `CLAUDE_CODE_ENABLE_TODO_TOOLS=1`.
+  Nota honesta: a desativação é deliberada nos modelos novos (que planejam sem o andaime) — religar
+  por reflexo pode piorar; decida medindo.
+- **3) `/fork` mudou de semântica** (2.1.212): virou sessão de background própria; o subagente
+  in-session antigo agora é `/subtask`. Se sua documentação interna cita `/fork` como "subagente",
+  está desatualizada.
+- **Oportunidade (não é ação obrigatória):** a superfície de hooks saltou de ~8 para ~30 eventos
+  (`PermissionDenied`, `PostToolUseFailure`, `FileChanged`, `InstructionsLoaded`, `DirectoryAdded`,
+  `TeammateIdle`…) e os handlers deixaram de ser só `command` — agora há `http`, `mcp_tool`, `prompt`
+  e `agent`. Verificado no binário instalado, não só em doc. Guarda que hoje é script pode passar a
+  ser um subagente. O core vai explorar isso; o SSOT da análise é
+  `docs/evolution/research/claude-code-2.1-onion-2026-08/`.
+
 ## 2026-08-15 · Tenant Logto compartilhado — cadastro c/ username+senha, MFA opt-in, Account API · COMPATÍVEL · alvo: todos
 
 - **O que mudou no tenant `auth.onionevolve.com`** (compartilhado bridge+federação; mudanças ADITIVAS,

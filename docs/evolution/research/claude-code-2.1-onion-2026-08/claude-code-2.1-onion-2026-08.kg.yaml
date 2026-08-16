@@ -1,0 +1,315 @@
+meta:
+  id: claude-code-2.1-onion-2026-08
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-08-16
+  date: 2026-08-16
+  note: >
+    KG-SSOT da pergunta do maestro (2026-08-16): atualizamos o Claude Code (nativo
+    2.1.232 → 2.1.233) — o que mudou nas versões até aqui, o que isso altera no que o
+    Onion usa, o que ajustar, vantagens, cuidados, o que copiar/evitar, padrões
+    emergentes, alinhamento com os caminhos da IA, e o que a comunidade diz. E a
+    pergunta que governa todas: qual é a SUPERAÇÃO do Onion diante disto.
+    Nasce como grafo por doutrina (investigação nasce .kg.yaml, não prosa) e porque a
+    própria pergunta pede validação pela maquinaria: KG-SSOT-first, SDAAL, Elenxo,
+    regras, artefatos, ADR. Duas frentes de pesquisa alimentam os `evidence`:
+    changelog/docs (fonte primária Anthropic) e comunidade (HN + GitHub API; Reddit
+    ficou INACESSÍVEL e está declarado como lacuna, não preenchido com prior).
+
+nodes:
+  - id: C_PERGUNTA_DA_SUPERACAO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-16
+    verified_against: pergunta-do-maestro-registrada-integralmente
+    label: "A pergunta do maestro não é 'o que mudou no Claude Code' — é 'o que o Onion SUPERA'. Um framework acoplado a uma plataforma que evolui rápido vive sob a ameaça permanente de ser engolido por ela (a plataforma absorve a função) ou de virar dívida (a plataforma muda o contrato). A resposta honesta exige separar TRÊS coisas que costumam vir grudadas: (a) o que a plataforma passou a fazer sozinha — e portanto o Onion deve PARAR de fazer; (b) o que a plataforma expôs de novo — e o Onion deve ADOTAR; (c) o que a plataforma não faz e não vai fazer — e é onde a superação mora. Sem essa separação, 'superação' vira slogan."
+
+  - id: E_COMUNIDADE_MEMORIA_3_CAMADAS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-16
+    verified_against: issue-34556-anthropics-claude-code-78-comentarios-lida-via-api
+    label: "A comunidade convergiu, SEM coordenação, para a MESMA arquitetura de memória do Onion: issue #34556 do repo oficial (78 comentários) documenta '59 compactações em 26 dias' e propõe memória em 3 camadas — L1 sempre carregado, L2 por tópico, L3 vault — pedindo suporte NATIVO. É exatamente o `MEMORY.md` + arquivos por tópico que o Onion já opera. Leitura: a forma está validada externamente; o diferencial do Onion NÃO é ter memória em camadas (isso virou convenção), é o que ele faz com ela. FONTE: github.com/anthropics/claude-code/issues/34556"
+
+  - id: E_DOR_DOMINANTE_E_CONTEXTO_E_CUSTO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-08-16
+    verified_against: hn-e-github-issues-lidos-via-api-agosto-2026
+    label: "A dor #1 do ecossistema é CONTEXTO/CUSTO, e ela já gerou uma categoria inteira de ferramentas-parasita cujo único trabalho é comprimir a saída de OUTRAS ferramentas antes que cheguem ao agente (Context Mode: 315KB→5.4KB de saída MCP; Graft: -42% dos tokens de grep; Smooth CLI). Relato de campo: schemas de MCP consomem 50k+ tokens antes de qualquer trabalho útil; orçamento de US$2 vira US$8 por tarefa. Cuidado direto para o Onion: cada superfície que ele injeta (skills, regras, recall de hooks, KB vendorizada) compete pelo MESMO orçamento — a virtude 'mais contexto curado' vira vício quando o mercado inteiro está cortando contexto."
+
+  - id: E_FRAGMENTACAO_NAO_ABSORCAO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: 2026-08-16
+    verified_against: varredura-por-trajetoria-github-created-maior-2026-05-01-sort-stars
+    label: "A hipótese 'a plataforma engoliu os frameworks' NÃO se confirma na medição — o padrão observado é FRAGMENTAÇÃO ATIVA. Busca por trajetória (created:>2026-05-01, sort:stars) devolve uma safra inteira apostando que orquestração/memória/convenção-de-diretório é camada que vale construir FORA da Anthropic: ponytail (~104k★ em ~2 meses), loop-engineering (10,4k★), omnigent (8,9k★, 'meta-harness' que troca de harness sem reescrever), gsd-core (8,3k★). Também emerge uma convenção `.agents/` cross-ferramenta (commands/skills/hooks/subagents/workflows/rules) — 'um Onion sem o nome', porém AGNÓSTICO. Ninguém achou dizendo que framework-sobre-CC é bobagem; a crítica achada é a genérica de 'abstraction debt' (wrappers truncando contexto e minando o raciocínio)."
+
+  - id: E_CONCORRENTE_DE_POSICAO_COMPANY_BRAIN
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-08-16
+    verified_against: hn-thread-03-jun-2026-79-pontos-78-comentarios
+    label: "Existe concorrência DE POSICIONAMENTO, não só de feature, no norte NS1 do Onion: Hyper (YC P26) se apresenta literalmente como 'company brain for agentic development' (heyhyper.ai). O Onion decidiu NS1 = conhecimento/KG com ICP 'empresa nos próprios projetos + Company Brain'. Quando um YC ocupa o MESMO vocabulário, a diferenciação precisa ser demonstrável, não declarada. Este nó existe para que a superação seja formulada CONTRA um concorrente real, não no vácuo."
+
+  - id: E_FRAGILIDADE_HERDADA_DA_PLATAFORMA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-08-16
+    verified_against: issues-87145-87146-54394-abertas-e-vivas-em-2026-08-16
+    label: "Acoplar herda fragilidade sem controle, e isso é MEDIDO, não temido: #87145 (OAuth token não repassado a subprocessos de hook no Windows — plugin de segurança fica cego), #87146 (ScheduleWakeup nunca dispara em sessão filha de Remote Control), #54394 (heap V8 estoura 8GB+ em WSL2 por backtracking de regex no ugrep embutido; aberta desde abril). O Onion depende de hooks em TODA guarda determinística. Consequência de desenho: guarda que só existe como hook é guarda que a plataforma pode apagar — a redundância (lint no CI + hook local) deixa de ser zelo e vira requisito."
+
+  - id: Q_ONDE_MORA_A_SUPERACAO
+    node_type: question
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-16
+    verified_against: elenxo-mediu-47-scripts-63-grafos-e-derrubou-duas-clausulas-centrais
+    label: "Formulação candidata (a REFUTAR pelo Elenxo antes de virar decisão): a superação do Onion não está em ter skills/commands/subagentes — isso a plataforma dá e a safra de 2026 replica —, mas em ser o único que trata CONHECIMENTO E DECISÃO como artefato executável e verificável: KG como SSOT de runtime (radar que reprova), doutrina com cura mecânica anexada, Elenxo adversarial como etapa obrigatória, R56 (revisão com hash do diff), guardas que provam comportamento em vez de aceitar declaração. Ou seja: o mercado está otimizando CONTEXTO (comprimir tokens) e o Onion otimiza VERDADE (o que foi medido, por quem, contra o quê, e o que reprova). REFUTADA em 2026-08-16 pelo Elenxo, em duas cláusulas centrais: 'KG como SSOT de RUNTIME' (falso — o radar valida o grafo contra SI MESMO, não contra o trabalho; e a perna da LEITURA não tem mecanismo) e 'o ÚNICO' (falso — Cruxible e AsDecided atacam a mesma tese, um com mais rigor criptográfico). Substituída por [[D_SUPERACAO_REESCRITA_REINCIDENCIA]]."
+
+  - id: E_REDDIT_INALCANCAVEL_LACUNA_DECLARADA
+    node_type: evidence
+    plane: PROD
+    status: unverifiable
+    impact: 2
+    confidence: 0.95
+    verified_at: 2026-08-16
+    verified_against: nove-transportes-tentados-todos-barrados-em-2026-08-16
+    label: "LACUNA DECLARADA, não preenchida com prior: o maestro pediu nominalmente 'o que o Reddit tem dito', e o Reddit está inalcançável deste ambiente. Transportes tentados e o que cada um devolveu — pelo agente de pesquisa: reddit.com e old.reddit.com (bloqueio), proxy r.jina.ai, API .json, espelho redlib.catsarch.com, DuckDuckGo (CAPTCHA), Bing (sem indexação p/ os termos); por mim, depois: WebSearch (TETO da sessão, 200/200), Bing RSS com site:reddit.com (ignora o operador e devolve genérico), espelho safereddit.com (Access Denied/Anubis), lite.duckduckgo.com (CAPTCHA do pato), api.pullpush.io — o arquivo canônico — via WebFetch e via curl (HTTP 429 nos dois). Registrado para que a próxima sessão NÃO re-gaste orçamento repetindo a mesma escada. O que DEU para medir veio de HN (API Algolia) e GitHub (API autenticada) — fonte primária, mas enviesada a early-adopter dev. Reabrir com credencial de API do Reddit ou quando o teto do WebSearch resetar."
+
+  - id: E_TASK_TOOLS_SOMEM_EM_OPUS_5
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-16
+    verified_against: dogfood-headless-sessao-nova-2.1.233-opus-5-respondeu-TASK_TOOLS_AUSENTES
+    label: "BREAKING medido, não lido: a 2.1.233 desliga Task/todo tools por padrão em Opus 4.8+ (`CLAUDE_CODE_ENABLE_TODO_TOOLS=1` religa). Verificado por DOGFOOD — sessão headless nova, versão nova, `--model claude-opus-5`, instruída a chamar TaskList: respondeu `TASK_TOOLS_AUSENTES`. Duas leituras que só a medição separa: (a) o FRAMEWORK Onion NÃO depende disso — grep em .claude/{commands,agents,skills} devolve ZERO instruções de TaskCreate/TaskUpdate/TaskList; a dependência era do fluxo do orquestrador, não dos artefatos; (b) a desativação é DELIBERADA da Anthropic nos modelos novos, provavelmente porque Opus 4.8+/5 planejam nativamente sem o andaime — logo religar por reflexo pode PIORAR, e a decisão de religar é do maestro, não minha. O risco real que fica: o maestro trocou o default para Opus 5 hoje; sessões novas perdem o rastreio de tarefas sem avisar."
+
+  - id: E_CONTRATO_DE_HOOKS_EXPLODIU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-16
+    verified_against: docs-primarias-MAIS-verificacao-no-binario-2.1.233-instalado-com-controle
+    label: "A superfície de hooks — onde vive TODA a maquinaria determinística do Onion — multiplicou. Eventos hoje: PreToolUse, PermissionRequest, PermissionDenied, PostToolUse, PostToolUseFailure, PostToolBatch, UserPromptSubmit, UserPromptExpansion, Stop, StopFailure, SessionStart, SessionEnd, Setup, PreCompact, PostCompact, SubagentStart, SubagentStop, TaskCreated, TaskCompleted, TeammateIdle, WorktreeCreate, WorktreeRemove, Notification, ConfigChange, InstructionsLoaded, CwdChanged, DirectoryAdded, FileChanged, MessageDisplay, Elicitation, ElicitationResult (~30, contra os ~8 clássicos). E os HANDLERS deixaram de ser só `command`: agora há `http`, `mcp_tool`, `prompt` e `agent` — ou seja, uma guarda pode ser um PROMPT ou um SUBAGENTE, não só um script. Timeouts e exit codes documentados (2 bloqueia; e desde 2.1.214 exit 2 com JSON inválido BLOQUEIA corretamente — antes não bloqueava, o que valida a guarda anti-fail-open do Onion). É a maior oportunidade técnica do levantamento para quem, como o Onion, faz da guarda o produto. CONFIRMADO LOCALMENTE, não só em doc: grep no ELF instalado (2.1.233) acha PermissionDenied(46), TeammateIdle(23), InstructionsLoaded(20), FileChanged(31), DirectoryAdded(28), PostToolUseFailure(30), hookSpecificOutput(35) — com CONTROLE (PreToolUse 93, SessionStart 79) provando que o método enxerga. Ou seja: está disponível NESTA máquina, hoje, não é roadmap."
+
+  - id: E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-08-16
+    verified_against: changelog-2.1.219-a-2.1.233-fonte-primaria
+    label: "A plataforma passou a fazer sozinha coisas que um framework faria: plugin source `archive` (zip por HTTPS com pin SHA-256 — distribuição sem git/npm), `claude self-hosted-runner` (rodar sessões na própria infra), marketplaces com allowlist/blocklist e wildcard, sandbox com CREDENTIAL MASKING ciente de JWT e re-assinatura AWS SigV4, isolamento de worktree corrigido (sessões isoladas conseguiam rodar git destrutivo no checkout principal — fix de segurança), `--max-budget-usd` cortando subagente de background, nesting de subagentes 1→3 e cap de concorrência 20. Consequência para o Onion: a régua da postura de acoplamento (2026-05-18: 'acople só quando a capacidade não existe fora') tem itens novos para reavaliar — parte do que o Onion carrega em `adopt/vendor` pode virar `archive` com pin, e parte do que ele guarda com disciplina pode virar sandbox nativo."
+
+  - id: E_ASSIMETRIA_DE_PERMISSAO_DIR
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-08-16
+    verified_against: changelog-2.1.211-e-2.1.214-mais-varredura-do-settings-do-core
+    label: "Semântica de padrão mudou por baixo de configuração existente: `dir/**` de segmento único em REGRA DE PERMISSÃO e em `if:` de HOOK deixou de auto-aprovar em qualquer profundidade e passou a valer só `<cwd>/dir` (2.1.211/2.1.214) — mas as regras `deny`/`ask` MANTIVERAM o casamento em qualquer profundidade. Assimetria viva: o mesmo padrão significa coisas diferentes conforme o lado. Varredura no core: o `settings.local.json` usa caminhos ABSOLUTOS multi-segmento (`Read(//home/marcio/**)`), que não caem na mudança — o core passou ileso POR ACIDENTE de estilo, não por desenho. Registrado porque adotante com `Edit(src/**)` relativo teve o efeito da regra alterado sem tocar em nada."
+
+  - id: E_ELENXO_DERRUBOU_METADE_DA_TESE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-16
+    verified_against: passada-adversarial-com-47-scripts-e-63-grafos-medidos-no-repo
+    label: "O Elenxo mediu, não opinou: 63 grafos · 2.278 nós · 964 (42%) com verified_at · 60 guardas no lint (3.323 linhas) · 59 REGRAs, TODAS com modo-de-falha declarado · 204 emissões HARD · bancada com 689 asserções e 29 fixtures · 63/63 artefatos de revisão com sha256 · 22.710 linhas de shell determinístico. DERRUBOU duas cláusulas: (1) 'KG como SSOT de RUNTIME' — o próprio lint-artifacts.sh:832 diz que o radar 'valida o grafo contra SI MESMO, nunca contra o veredito que o run produziu', NENHUM dos 7 hooks lê .kg.yaml, e quem lê são 10 .md de comando (instrução ao modelo = a categoria que a casa chama de CONSELHO); (2) 'o único' — Cruxible (grafo tipado em runtime, recibo com content-hash + assinatura, ZERO LLM na verificação) e AsDecided (290★, `decided gate` que bloqueia PR violando decisão registrada) atacam a mesma tese, e o primeiro tem MAIS rigor numa fatia. CONFIRMOU o eixo do custo, invertendo meu próprio nó: o sempre-ligado é ~9k tokens (CLAUDE.md+MEMORY.md) e as 22.710 linhas rodam FORA da janela, em CI, a custo zero de token — a pressão de contexto do Onion vem da PROSA doutrinária, não da maquinaria."
+
+  - id: E_A_CASA_JA_TINHA_REFUTADO_A_PERNA_DA_LEITURA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-16
+    verified_against: docs-evolution-research-kg-read-leg-2026-08-SYNTHESIS-lido-integralmente
+    label: "A refutação mais dura não veio de fora: a própria casa mediu e publicou (2026-08-02, PR #510, Elenxo de 14 workers) que dos 9 casos documentados de falha da perna de LEITURA do KG, 7 falharam por NÃO-CONSULTA e ZERO por 'consultei e não achei' — e que as três curas candidatas cobriam 1/9, 1/9 e 0/9, com veredito NÃO CONSTRUIR. A frase que fecha: 'o que de fato disparou a consulta na realidade foi um humano perguntando — gate social, não instrumento'. Em três casos o agente ignorou 3× em minutos um grafo que ELE MESMO acabara de autorar. Consequência imediata nesta sessão: eu estava prestes a construir um relógio (review_after nos grafos) como cura da leitura — seria a QUARTA cura da mesma classe, cobrindo o defeito errado (o medido é não-consulta, não obsolescência). O registro me parou. É a porosidade funcionando: a fonte guardou a evidência que impede a fonte de repetir o erro."
+
+  - id: E_ACOPLAMENTO_DECLARADO_E_NAO_EXERCIDO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-16
+    verified_against: grep-SendMessage-em-claude-devolve-zero-na-maquinaria-viva
+    label: "Refutação PARCIAL da própria doutrina de acoplamento, medida: o CLAUDE.md nomeia `SendMessage` entre agentes como A capacidade de fronteira que justificou 'parar de gastar energia em agnosticismo' (decisão de 2026-05-18) — e `grep -rn SendMessage .claude --include=*.md --include=*.sh --include=*.json` devolve ZERO na maquinaria viva. O termo só aparece em docs/analysis, KG e KB: é ARGUMENTO, não uso. É a pior categoria de acoplamento — paga-se o preço doutrinário (perder o agnosticismo) sem receber a capacidade. Segundo item por conveniência: marketplace e empacotamento próprios (7 verticais, assemble-plugin.sh, generate-marketplace.sh) enquanto o nativo já entrega marketplace GitHub+GitLab, fonte `archive` com pin SHA-256 e `plugin validate --strict`. O que cumpre a postura à risca são as 22.710 linhas de shell, que rodam em QUALQUER CI sem Claude Code."
+
+  - id: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-08-16
+    verified_against: forma-que-sobreviveu-a-passada-adversarial-aguarda-ratificacao-do-maestro
+    label: "A SUPERAÇÃO, na forma que sobreviveu ao ataque: o Onion não supera por injetar contexto (skills/comandos/subagentes — a plataforma dá e a safra de 2026 replica), nem por 'tratar conhecimento como artefato verificável' (Cruxible e AsDecided já fazem, um com mais rigor). Supera por INDUSTRIALIZAR A REINCIDÊNCIA: cada defeito REAL medido vira guarda determinística que roda FORA da janela de contexto, exercitada por bancada, num catálogo cuja SEVERIDADE É DERIVADA DO COMPORTAMENTO da guarda (rules-registry.sh) e não do que ela declara — e o mesmo loop é aplicado contra si mesmo, a ponto de publicar NÃO CONSTRUIR sobre a própria cura preferida. Slogan corrigido: o mercado otimiza CONTEXTO; os concorrentes de nicho otimizam PROVA; o Onion otimiza REINCIDÊNCIA. O que não se copia num fim de semana não é o radar (734 linhas de awk) — é a arqueologia de defeito: 59 REGRAs amarradas a danos datados, 689 asserções, ~460 PRs de história, e a disposição de perder em público. GATED: só vira ADR publicada com a perna de LEITURA declarada como BURACO ABERTO, nunca como capacidade entregue."
+
+  - id: Q_RISCO_ACERVO_VIRA_CEMITERIO
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-08-16
+    verified_against: 52-por-cento-dos-grafos-sem-toque-ha-mais-de-14-dias
+    label: "RISCO 1 (o mais provável): o KG passa a ser escrito por gate e nunca consultado por decisão — acervo vira cemitério. Sinal já presente: 52% dos grafos sem toque há >14 dias, 41% num único commit, 58% dos nós sem verified_at, nenhum carimbo anterior a 2026-07 (o hábito tem ~6 semanas). GATILHOS OBSERVÁVEIS: >60% dos grafos sem toque há >30 dias; OU o próximo replay do corpus da perna de leitura voltar <5/7; OU `refuted+superseded` (hoje 119+127) parar de crescer por 60 dias — acervo que não derruba nada deixou de ser fonte e virou arquivo."
+
+  - id: Q_RISCO_PLATAFORMA_COME_O_GATE
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-08-16
+    verified_against: hooks-type-agent-ja-existem-em-experimental-no-2.1.233
+    label: "RISCO 2: a plataforma come o gate por baixo. Hooks `type: agent` já existem — spawnam um subagente para VERIFICAR uma condição antes de permitir `Stop`: é o dogfood do Onion virando primitiva nativa. GATILHOS: `type: agent` sair de experimental com contrato estável; OU `claude plugin validate` passar de schema para semântica (qualquer checagem de drift/SSOT); OU a Anthropic responder oficialmente à issue #34556 com roadmap de memória estruturada (hoje: ZERO comentários de funcionário, sem milestone). Nota que corta nos dois sentidos: a própria doc da Anthropic diz que CLAUDE.md e rules são 'contexto, não configuração forçada' e manda usar hook para bloquear — ou seja, o dono da plataforma RATIFICA por escrito o 'declarado ≠ verificado' que sustenta o Onion."
+
+  - id: Q_RISCO_CONCORRENTE_MAIS_RIGOROSO
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-08-16
+    verified_against: cruxible-e-asdecided-medidos-por-trajetoria-hoje
+    label: "RISCO 3: um concorrente mais ESTREITO e mais RIGOROSO acumula corpus mais rápido. Cruxible (16★, 488 commits, ativo) exige evidência+revisão antes de um julgamento virar vivo, emite recibo com content-hash das fontes + assinatura do ator e não põe LLM no caminho de verificação; AsDecided (290★, 1.433 commits) tem `decided gate` bloqueando PR que viola decisão registrada. Estreito com tração acumula corpus mais rápido que largo sem distribuição. GATILHOS: Cruxible passar de ~100★ ou ganhar CI que emita recibo verificável; OU a convenção `.agents/` (>60k projetos) adotar QUALQUER cláusula de verificação — hoje ela declara 'não há campos obrigatórios', e é essa ausência que mantém o espaço aberto."
+
+  - id: D_O_QUE_PARAR_DE_FAZER
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-08-16
+    verified_against: lista-derivada-do-que-a-plataforma-passou-a-fazer-melhor
+    label: "O que o Onion deve PARAR (proposto pelo Elenxo, decisão do maestro): (1) MARKETPLACE E EMPACOTAMENTO próprios — o nativo já faz GitHub+GitLab, `archive` com pin SHA-256, `plugin validate --strict` e `plugin init`; manter os MANIFESTOS (a semântica das verticais é do Onion), descartar a MECÂNICA de empacotar. (2) CURAR MEMORY.md como camada do framework — o auto-memory nativo já faz MEMORY.md + tópicos, sobrevive a compaction, é por-projeto; manter só a DOUTRINA do que merece entrar. (3) SCAFFOLDING genérico de configuração — o `/init` multifase nativo já explora o codebase com subagente; ao Onion sobra o que ele não sabe (3 dimensões peer, workflows faseados retomáveis). (4) O MAIS DURO, e não é sobre a plataforma: PARAR DE ANUNCIAR 'KG como SSOT de runtime' enquanto a leitura for gate social — a KB de identidade já registra que `KG-first` e `drive-to-verify` foram anunciados a 3 adotantes antes de terem casa no core; repetir agora numa ADR seria a TERCEIRA da mesma classe. (5) NOVO, do adendo: PARAR DE JUSTIFICAR O ACOPLAMENTO POR `SendMessage` — a capacidade citada no CLAUDE.md como razão de abandonar o agnosticismo tem ZERO uso na maquinaria; ou se usa, ou a justificativa migra para o que de fato compra acoplamento: o `exit 2` de hook que vale sob bypassPermissions, real, medido e insubstituível."
+
+  - id: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-16
+    verified_against: massa-medida-26596-linhas-de-shell-vs-52655-de-markdown-acoplado
+    label: "A INVERSÃO que ninguém tinha olhado, medida em linhas: shell AGNÓSTICO (validation + hooks + utils, roda em qualquer CI sem Claude Code) = 26.596 linhas; markdown ACOPLADO ao contrato do Claude Code (commands + agents + skills) = 52.655. Cruzando com `SendMessage` = ZERO na maquinaria viva, a leitura vira: **100% do que REPROVA no Onion é agnóstico; 100% do que ACONSELHA é acoplado** — e a própria Anthropic documenta que a metade que aconselha 'é contexto, não configuração forçada'. Ou seja: o Onion declarou acoplamento em 2026-05-18 por uma capacidade que nunca exercitou, e construiu o fosso inteiro na metade que não precisa de acoplamento nenhum. É `declarado ≠ verificado` na direção CONTRÁRIA — dependência anunciada que não existe. NÃO é motivo para voltar ao agnosticismo (parar de gastar energia nele segue certo); é motivo para parar de anunciar dependência inexistente. O único acoplamento que COMPRA o que se pagou: o `exit 2` determinístico de hook, que vale inclusive sob bypassPermissions e não existe fora do Claude Code."
+
+  - id: Q_GATE_REABRE_POR_DOGFOOD_NAO_POR_CHANGELOG
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-16
+    verified_against: gatilho-de-reabertura-declarado-no-synthesis-da-perna-de-leitura
+    label: "A ARMADILHA desta rodada, nomeada antes de cair nela: a superfície nova de hooks (18 eventos, handlers `prompt`/`agent`/`http`/`mcp_tool` — verificados no binário por DOIS medidores independentes) torna CONSTRUÍVEL exatamente a cura da perna de leitura que a casa REFUTOU por medição há 14 dias (1/9, NÃO CONSTRUIR). Três janelas novas são de natureza diferente do que foi testado: `InstructionsLoaded` (dispara quando a doutrina entra, antes de a tarefa existir e competir por atenção), `PermissionDenied`/`PostToolUseFailure` (disparam NO DANO, não no relógio — e a doutrina da casa diz que o gatilho eficaz é o dano), `FileChanged` (dispara quando um .kg.yaml muda, que é quando ele deixa de valer). MAS: construir agora PORQUE FICOU FÁCIL é acoplar por CONVENIÊNCIA — a refutação da postura de 2026-05-18, cometida na mesma semana em que se escreveria a ADR que a reafirma. O SYNTHESIS declarou o gatilho de reabertura e ele NÃO é changelog: 'o mesmo padrão fiado à mão, fresco e descartável, 2–3× em sessão real, REGISTRANDO SE O VEREDITO INJETADO MUDOU A RESPOSTA'. GATILHO: esse dogfood. Se mudou a resposta, vira mecanismo com lastro; se não mudou, o NÃO CONSTRUIR sobrevive mais forte, por ter resistido à facilidade."
+
+edges:
+  - from: E_COMUNIDADE_MEMORIA_3_CAMADAS
+    to: Q_ONDE_MORA_A_SUPERACAO
+    edge_type: CONSTRAINS
+  - from: E_DOR_DOMINANTE_E_CONTEXTO_E_CUSTO
+    to: Q_ONDE_MORA_A_SUPERACAO
+    edge_type: CONSTRAINS
+  - from: E_FRAGMENTACAO_NAO_ABSORCAO
+    to: Q_ONDE_MORA_A_SUPERACAO
+    edge_type: SUPPORTS
+  - from: E_CONCORRENTE_DE_POSICAO_COMPANY_BRAIN
+    to: Q_ONDE_MORA_A_SUPERACAO
+    edge_type: CONSTRAINS
+  - from: E_FRAGILIDADE_HERDADA_DA_PLATAFORMA
+    to: C_PERGUNTA_DA_SUPERACAO
+    edge_type: SUPPORTS
+  - from: E_REDDIT_INALCANCAVEL_LACUNA_DECLARADA
+    to: E_FRAGMENTACAO_NAO_ABSORCAO
+    edge_type: CONSTRAINS
+  - from: Q_ONDE_MORA_A_SUPERACAO
+    to: C_PERGUNTA_DA_SUPERACAO
+    edge_type: TRACES_TO
+  - from: E_TASK_TOOLS_SOMEM_EM_OPUS_5
+    to: E_FRAGILIDADE_HERDADA_DA_PLATAFORMA
+    edge_type: SUPPORTS
+  - from: E_ELENXO_DERRUBOU_METADE_DA_TESE
+    to: Q_ONDE_MORA_A_SUPERACAO
+    edge_type: REFUTES
+  - from: E_A_CASA_JA_TINHA_REFUTADO_A_PERNA_DA_LEITURA
+    to: Q_ONDE_MORA_A_SUPERACAO
+    edge_type: REFUTES
+  - from: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    to: Q_ONDE_MORA_A_SUPERACAO
+    edge_type: SUPERSEDES
+  - from: E_ELENXO_DERRUBOU_METADE_DA_TESE
+    to: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    edge_type: SUPPORTS
+  - from: E_ACOPLAMENTO_DECLARADO_E_NAO_EXERCIDO
+    to: D_O_QUE_PARAR_DE_FAZER
+    edge_type: SUPPORTS
+  - from: E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO
+    to: D_O_QUE_PARAR_DE_FAZER
+    edge_type: SUPPORTS
+  - from: Q_RISCO_ACERVO_VIRA_CEMITERIO
+    to: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    edge_type: CONSTRAINS
+  - from: Q_RISCO_PLATAFORMA_COME_O_GATE
+    to: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    edge_type: CONSTRAINS
+  - from: Q_RISCO_CONCORRENTE_MAIS_RIGOROSO
+    to: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    edge_type: CONSTRAINS
+  - from: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
+    to: E_ACOPLAMENTO_DECLARADO_E_NAO_EXERCIDO
+    edge_type: SUPPORTS
+  - from: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
+    to: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    edge_type: SUPPORTS
+  - from: Q_GATE_REABRE_POR_DOGFOOD_NAO_POR_CHANGELOG
+    to: E_CONTRATO_DE_HOOKS_EXPLODIU
+    edge_type: CONSTRAINS
+  - from: E_A_CASA_JA_TINHA_REFUTADO_A_PERNA_DA_LEITURA
+    to: Q_GATE_REABRE_POR_DOGFOOD_NAO_POR_CHANGELOG
+    edge_type: SUPPORTS
+  - from: E_A_CASA_JA_TINHA_REFUTADO_A_PERNA_DA_LEITURA
+    to: Q_RISCO_ACERVO_VIRA_CEMITERIO
+    edge_type: SUPPORTS
+  - from: E_ASSIMETRIA_DE_PERMISSAO_DIR
+    to: E_FRAGILIDADE_HERDADA_DA_PLATAFORMA
+    edge_type: SUPPORTS
+  - from: E_CONTRATO_DE_HOOKS_EXPLODIU
+    to: Q_ONDE_MORA_A_SUPERACAO
+    edge_type: SUPPORTS
+  - from: E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO
+    to: Q_ONDE_MORA_A_SUPERACAO
+    edge_type: CONSTRAINS
