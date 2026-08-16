@@ -450,11 +450,11 @@ nodes:
     node_type: question
     plane: PROD
     verified_at: 2026-08-16
-    verified_against: rastros-no-tenant-4-de-5-itens-com-evidencia-o-5o-sem-rastro
-    status: confirmed
+    verified_against: 5-de-5-o-ultimo-item-fechado-por-acao-humana-na-tela-revoked-medido-mais-email-atestado
+    status: done
     impact: 3
     confidence: 0.9
-    label: "Prova humana da rodada — o maestro rodou 2026-08-15 e os RASTROS confirmam 4 dos 5 itens (medidos no tenant, não declarados): (1) CADASTRO COMPLETO — identidade nova criada 21:58, entrou 22:08 com **username definido** e senha, isto é, o fluxo MissingProfile (e-mail+código → criar usuário e senha) fechou de ponta a ponta num navegador de verdade; (2)+(3) 2FA — Totp **e** BackupCode em duas contas distintas (a nova e a da 2ª prova humana), que é a sequência obrigatória do Logto, com a senha trocada/definida antes (hasPassword=sim); (4) PAT — 1 token vivo em cada uma das duas contas. **(5) reenviar convite de ORG: SEM RASTRO** — 0 convites na org e ela segue com 1 membro; ou não foi exercido, ou foi apagado depois. É o único item do roteiro sem evidência, e por isso o nó fica `confirmed` e não `done`. GATILHO do fechamento: o maestro dizer se rodou o reenvio, ou rodá-lo (tela de Membros → 🔁)."
+    label: "Prova humana da rodada — o maestro rodou 2026-08-15 e os RASTROS confirmam 4 dos 5 itens (medidos no tenant, não declarados): (1) CADASTRO COMPLETO — identidade nova criada 21:58, entrou 22:08 com **username definido** e senha, isto é, o fluxo MissingProfile (e-mail+código → criar usuário e senha) fechou de ponta a ponta num navegador de verdade; (2)+(3) 2FA — Totp **e** BackupCode em duas contas distintas (a nova e a da 2ª prova humana), que é a sequência obrigatória do Logto, com a senha trocada/definida antes (hasPassword=sim); (4) PAT — 1 token vivo em cada uma das duas contas. **(5) reenviar convite de ORG — FECHADO em 2026-08-16, e com as duas naturezas de prova separadas de propósito:** o maestro entrou como marcio@grana.ai (único admin da org), trocou para o contexto 🏢, abriu Membros e agiu sobre o convite. O **✖️ cancelar** está MEDIDO por mim: o convite saiu de `Pending` para `Revoked` no tenant. O **🔁 reenviar** NÃO deixa rastro de estado (só dispara e-mail; o status permanece Pending) — a prova é o **e-mail ter chegado, ATESTADO pelo maestro**, não medido por mim. Registro a diferença porque testemunho e medição não são a mesma coisa, e a caixa de entrada dele é a única fonte possível aqui. Antes disto, o reenvio estava provado só pelo NOSSO código em produção (inviteToOrg → listOrgInvitations → resendOrgInvitation = TRUE, com o 204 passando pelo mapiNoContent). Agora está provado também pela mão humana, na tela — que é a classe que sonda não cobre."
 
   - id: Q_F3_DECISOES_DE_ACABAMENTO
     node_type: question
