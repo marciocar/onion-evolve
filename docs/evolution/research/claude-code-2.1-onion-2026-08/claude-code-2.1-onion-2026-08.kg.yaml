@@ -170,12 +170,12 @@ nodes:
   - id: D_SUPERACAO_REESCRITA_REINCIDENCIA
     node_type: decision
     plane: DEV
-    status: open
+    status: done
     impact: 5
-    confidence: 0.8
+    confidence: 0.9
     verified_at: 2026-08-16
-    verified_against: forma-que-sobreviveu-a-passada-adversarial-aguarda-ratificacao-do-maestro
-    label: "A SUPERAÇÃO, na forma que sobreviveu ao ataque: o Onion não supera por injetar contexto (skills/comandos/subagentes — a plataforma dá e a safra de 2026 replica), nem por 'tratar conhecimento como artefato verificável' (Cruxible e AsDecided já fazem, um com mais rigor). Supera por INDUSTRIALIZAR A REINCIDÊNCIA: cada defeito REAL medido vira guarda determinística que roda FORA da janela de contexto, exercitada por bancada, num catálogo cuja SEVERIDADE É DERIVADA DO COMPORTAMENTO da guarda (rules-registry.sh) e não do que ela declara — e o mesmo loop é aplicado contra si mesmo, a ponto de publicar NÃO CONSTRUIR sobre a própria cura preferida. Slogan corrigido: o mercado otimiza CONTEXTO; os concorrentes de nicho otimizam PROVA; o Onion otimiza REINCIDÊNCIA. O que não se copia num fim de semana não é o radar (734 linhas de awk) — é a arqueologia de defeito: 59 REGRAs amarradas a danos datados, 689 asserções, ~460 PRs de história, e a disposição de perder em público. GATED: só vira ADR publicada com a perna de LEITURA declarada como BURACO ABERTO, nunca como capacidade entregue."
+    verified_against: RATIFICADA-pelo-maestro-2026-08-16-e-materializada-em-ADR
+    label: "A SUPERAÇÃO, na forma que sobreviveu ao ataque: o Onion não supera por injetar contexto (skills/comandos/subagentes — a plataforma dá e a safra de 2026 replica), nem por 'tratar conhecimento como artefato verificável' (Cruxible e AsDecided já fazem, um com mais rigor). Supera por INDUSTRIALIZAR A REINCIDÊNCIA: cada defeito REAL medido vira guarda determinística que roda FORA da janela de contexto, exercitada por bancada, num catálogo cuja SEVERIDADE É DERIVADA DO COMPORTAMENTO da guarda (rules-registry.sh) e não do que ela declara — e o mesmo loop é aplicado contra si mesmo, a ponto de publicar NÃO CONSTRUIR sobre a própria cura preferida. Slogan corrigido: o mercado otimiza CONTEXTO; os concorrentes de nicho otimizam PROVA; o Onion otimiza REINCIDÊNCIA. O que não se copia num fim de semana não é o radar (734 linhas de awk) — é a arqueologia de defeito: 59 REGRAs amarradas a danos datados, 689 asserções, ~460 PRs de história, e a disposição de perder em público. RATIFICADA pelo maestro em 2026-08-16 e materializada em `docs/analysis/onion-adr-superacao-reincidencia-2026-08.md`, COM a perna de LEITURA declarada buraco aberto — nunca como capacidade entregue."
 
   - id: Q_RISCO_ACERVO_VIRA_CEMITERIO
     node_type: question
@@ -209,12 +209,12 @@ nodes:
 
   - id: D_O_QUE_PARAR_DE_FAZER
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
     impact: 4
-    confidence: 0.8
+    confidence: 0.9
     verified_at: 2026-08-16
-    verified_against: lista-derivada-do-que-a-plataforma-passou-a-fazer-melhor
+    verified_against: executada-2-de-5-itens-os-outros-3-REFUTADOS-ao-medir-antes-de-apagar
     label: "O que o Onion deve PARAR (proposto pelo Elenxo, decisão do maestro): (1) MARKETPLACE E EMPACOTAMENTO próprios — o nativo já faz GitHub+GitLab, `archive` com pin SHA-256, `plugin validate --strict` e `plugin init`; manter os MANIFESTOS (a semântica das verticais é do Onion), descartar a MECÂNICA de empacotar. (2) CURAR MEMORY.md como camada do framework — o auto-memory nativo já faz MEMORY.md + tópicos, sobrevive a compaction, é por-projeto; manter só a DOUTRINA do que merece entrar. (3) SCAFFOLDING genérico de configuração — o `/init` multifase nativo já explora o codebase com subagente; ao Onion sobra o que ele não sabe (3 dimensões peer, workflows faseados retomáveis). (4) O MAIS DURO, e não é sobre a plataforma: PARAR DE ANUNCIAR 'KG como SSOT de runtime' enquanto a leitura for gate social — a KB de identidade já registra que `KG-first` e `drive-to-verify` foram anunciados a 3 adotantes antes de terem casa no core; repetir agora numa ADR seria a TERCEIRA da mesma classe. (5) NOVO, do adendo: PARAR DE JUSTIFICAR O ACOPLAMENTO POR `SendMessage` — a capacidade citada no CLAUDE.md como razão de abandonar o agnosticismo tem ZERO uso na maquinaria; ou se usa, ou a justificativa migra para o que de fato compra acoplamento: o `exit 2` de hook que vale sob bypassPermissions, real, medido e insubstituível."
 
   - id: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
@@ -236,6 +236,16 @@ nodes:
     verified_at: 2026-08-16
     verified_against: gatilho-de-reabertura-declarado-no-synthesis-da-perna-de-leitura
     label: "A ARMADILHA desta rodada, nomeada antes de cair nela: a superfície nova de hooks (18 eventos, handlers `prompt`/`agent`/`http`/`mcp_tool` — verificados no binário por DOIS medidores independentes) torna CONSTRUÍVEL exatamente a cura da perna de leitura que a casa REFUTOU por medição há 14 dias (1/9, NÃO CONSTRUIR). Três janelas novas são de natureza diferente do que foi testado: `InstructionsLoaded` (dispara quando a doutrina entra, antes de a tarefa existir e competir por atenção), `PermissionDenied`/`PostToolUseFailure` (disparam NO DANO, não no relógio — e a doutrina da casa diz que o gatilho eficaz é o dano), `FileChanged` (dispara quando um .kg.yaml muda, que é quando ele deixa de valer). MAS: construir agora PORQUE FICOU FÁCIL é acoplar por CONVENIÊNCIA — a refutação da postura de 2026-05-18, cometida na mesma semana em que se escreveria a ADR que a reafirma. O SYNTHESIS declarou o gatilho de reabertura e ele NÃO é changelog: 'o mesmo padrão fiado à mão, fresco e descartável, 2–3× em sessão real, REGISTRANDO SE O VEREDITO INJETADO MUDOU A RESPOSTA'. GATILHO: esse dogfood. Se mudou a resposta, vira mecanismo com lastro; se não mudou, o NÃO CONSTRUIR sobrevive mais forte, por ter resistido à facilidade."
+
+  - id: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-16
+    verified_against: medicao-de-proposito-de-cada-script-antes-de-remover-qualquer-coisa
+    label: "Executar a lista do 'que parar' produziu a refutação de 3 dos seus 5 itens — e o método que os derrubou foi o mesmo que a tese defende: MEDIR ANTES DE APAGAR. (1) MARKETPLACE/EMPACOTAMENTO — REFUTADO: o nativo tem `plugin init` (scaffold de plugin NOVO), `validate` (schema de manifesto), `tag` (confere plugin.json × entrada no marketplace) e `marketplace add/update` (distribuição) — NENHUM faz PROJEÇÃO. O `assemble-plugin.sh` projeta a SSOT `.claude/` no layout de plugin dirigido por manifesto, e o `generate-marketplace.sh` agrega o REGISTRO — e nasceu de defeito de campo MEDIDO (adotante 2026-07-13: o repo dele falhava o próprio lint por ausência de marketplace.json e não havia gerador; escrevia à mão). Pior para a recomendação: delegar a validação ao `claude plugin validate` ACOPLARIA a metade que hoje REPROVA — que a medição desta mesma rodada identificou como o fosso agnóstico. (2) CURAR MEMORY.md — REFUTADO: o framework não cura; `catch-up` LÊ para orientação e o `evolve` D10 VARRE testando a validade de cada entrada com veredito UNVERIFIABLE explícito quando não pode medir. O auto-memory nativo MANTÉM o arquivo; o Onion testa se o CONTEÚDO ainda é verdade — atos diferentes, e o segundo é a camada de aprendizagem autorregulada. (3) SCAFFOLDING GENÉRICO — REFUTADO: os `setup-*` são específicos (integração de task manager, code review no CI), não o `/init` genérico. SOBREVIVERAM e foram EXECUTADOS os dois itens de VERDADE: parar de anunciar 'KG como SSOT de runtime' (corrigido na KB canônica) e parar de justificar o acoplamento por `SendMessage` (corrigido no CLAUDE.md, trocado pelo `exit 2` de hook, que é o que a medição prova comprado). LIÇÃO DE CLASSE: recomendação derivada de CAPACIDADE-do-outro é hipótese; só medir o PROPÓSITO do próprio código a converte em decisão."
 
 edges:
   - from: E_COMUNIDADE_MEMORIA_3_CAMADAS
@@ -294,6 +304,12 @@ edges:
     edge_type: SUPPORTS
   - from: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
     to: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    edge_type: SUPPORTS
+  - from: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
+    to: D_O_QUE_PARAR_DE_FAZER
+    edge_type: CONSTRAINS
+  - from: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
+    to: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
     edge_type: SUPPORTS
   - from: Q_GATE_REABRE_POR_DOGFOOD_NAO_POR_CHANGELOG
     to: E_CONTRATO_DE_HOOKS_EXPLODIU

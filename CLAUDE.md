@@ -10,8 +10,17 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
 - **Plataforma única: Claude Code** — por **capacidade**, não por origem. O Onion nasceu no **Cursor**
   buscando ser agnóstico, e foi de fato **portado** para Claude/Antigravity/Codex para o Curso de
   Desenvolvimento com IA (Pulse Mais), com alunos usando. A decisão de 2026-05-18 foi **parar de
-  gastar energia em agnosticismo** para poder usar recursos de fronteira (ex.: `SendMessage` entre
-  agentes no modo Teams). É conclusão de experimento real, não restrição de nascença.
+  gastar energia em agnosticismo** para poder usar recursos de fronteira. É conclusão de experimento
+  real, não restrição de nascença.
+  **A capacidade que COMPRA o acoplamento** (corrigido em 2026-08-16, medido): o **`exit 2`
+  determinístico de hook**, que barra a ação inclusive sob `bypassPermissions` — isso não existe fora
+  do Claude Code e nenhum CI replica. O exemplo antigo era `SendMessage` no modo Teams, e a medição o
+  derrubou: `grep -rn SendMessage .claude` devolve **ZERO** — a capacidade citada como razão de
+  abandonar o agnosticismo **nunca foi exercitada na maquinaria**. Acoplamento declarado e não usado é
+  a pior categoria: paga-se o preço doutrinário sem receber a capacidade. E há uma inversão a saber:
+  medidas as massas, **26.596 linhas de shell agnóstico (o que REPROVA, roda em qualquer CI)** contra
+  **52.655 de markdown acoplado (o que ACONSELHA)** — o fosso do Onion está, de fato, na metade que
+  não precisa de acoplamento nenhum. SSOT: `docs/evolution/research/claude-code-2.1-onion-2026-08/`.
 - **A postura de acoplamento** (o critério que decide toda adoção de substrato): *acoplado ao Claude
   Code para tirar vantagem da sua estrutura e maquinaria, **mas mantendo independência sempre que
   isso for mais vantajoso e o acoplamento não for necessidade***. Acople só quando a capacidade
