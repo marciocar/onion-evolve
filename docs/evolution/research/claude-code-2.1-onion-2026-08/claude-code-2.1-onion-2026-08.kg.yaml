@@ -257,6 +257,26 @@ nodes:
     verified_against: ab-cego-3-casos-sessao-headless-opus-5-com-e-sem-hook-fiado-a-mao
     label: "O dogfood do gatilho RODOU (pedido do maestro 2026-08-16) e o resultado é NEGATIVO para construir: **3 de 3 — o veredito injetado NÃO mudou a resposta**. Desenho: hook DESCARTÁVEL em SessionStart injetando o veredito do radar (com ids de nó) via additionalContext, e A/B cego — a MESMA pergunta em sessão headless nova (Opus 5), com e sem o hook, comparando as respostas. Casos: (1) 'devemos construir a cura agora que os hooks novos permitem?' → NÃO nos dois; (2) 'devemos descartar o empacotamento próprio pelo nativo?' → NÃO nos dois; (3) 'qual o critério numérico de acervo-cemitério?' (fato que só existe no grafo) → os dois acertaram, e o CONTROLE citou o nó `Q_RISCO_ACERVO_VIRA_CEMITERIO` com arquivo:linha. Em 3 de 3 a sessão SEM hook foi ao grafo por conta própria. Efeito do hook: mudou a FORMA (mais ids citados, mais conciso), não a DECISÃO. LIMITE DE DESENHO DECLARADO, e é o que impede transformar isto em veredito universal: eu testei 'acha quando PERGUNTADO de forma dirigida', e o modo de falha medido no corpus de 08-02 é outro — 'consulta enquanto está OCUPADO com outra tarefa', onde o grafo compete por atenção com o trabalho em curso. Para atacar aquele modo, o desenho certo é uma sessão executando TAREFA cujo caminho óbvio contradiz um nó, medindo se a injeção muda a AÇÃO — não a resposta a uma pergunta. Consequência imediata: o `NÃO CONSTRUIR` de 2026-08-02 SOBREVIVE e sai mais forte, por ter resistido à facilidade E a um teste feito de boa-fé para derrubá-lo."
 
+  - id: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-16
+    verified_against: 11-repos-de-adotante-medidos-no-disco-com-ausencia-distinguida-de-vazio
+    label: "A medição que o Elenxo declarou como a mais importante (se o corpus não transfere, o fosso é biografia deste repo e não produto) FOI FEITA — 11 dos 12 membros da federação medidos no disco. Resultado em três camadas. (1) A MAQUINARIA TRANSFERE: 9 de 11 têm `.claude/validation/` com 13–40 scripts; `kg-radar.sh`, `diary-index.sh` e o comando `/meta:diary` estão em TODOS os adotantes verificados. (2) A PRÁTICA QUASE NÃO TRANSFERE: grafo autoral em 3 de 7 (gustavo-pulga 2, arandek 3, onion-dist 1); diário em 1 de 7 (gustavo-pulga, 9 entradas); e — o número que decide — CI rodando a maquinaria em 1 de 7 (só o onion-standalone; 5 nunca tiveram `.github/workflows`, e o metagamify tem workflow que não cita o Onion). Guarda que existe como arquivo e não roda em CI é guarda inalcançável: a mesma classe que o core já registrou em 2026-08-02. (3) A INVERSÃO QUE A MEDIÇÃO REVELOU, e que salva os adotantes da acusação: `docs/evolution/review/` está AUSENTE nos 11, mas `review-artifact-check.sh` NUNCA FOI VENDORIZADO para nenhum deles — o zero de resíduos R56 não é prática que não pegou, é CAPACIDADE QUE NUNCA ENVIAMOS. A medição sugerida pelo revisor ('contar .kg.yaml e docs/evolution/review/ nos adotantes') teria produzido exatamente a conclusão errada, culpando o adotante por uma ausência do core. VEREDITO HONESTO: o corpus NÃO transfere hoje — mas a causa se reparte entre não-uso (grafo/diário, enviados e pouco usados) e não-envio (R56, jamais embarcado), e só a segunda é acionável por nós agora."
+
+  - id: Q_O_QUE_FAZER_COM_A_NAO_TRANSFERENCIA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    verified_at: 2026-08-16
+    verified_against: derivada-da-medicao-dos-11-adotantes-aguarda-decisao-do-maestro
+    label: "A medição abre três caminhos que se excluem, e a escolha é do maestro porque é de PRODUTO, não de engenharia. (A) EMBARCAR o que faltou: vendorizar `review-artifact-check.sh` + o wire-in de CI mínimo, e medir de novo em 30 dias se resíduo e grafo aparecem — ataca a metade acionável (não-envio) e é barata. (B) ACEITAR que o corpus é do CORE e não do produto: nesse caso a promessa ao adotante muda de 'você ganha a maquinaria que aprende' para 'você ganha as guardas; o aprendizado é do core e chega por update' — e a ADR da superação precisa dizer isso, porque hoje ela diz que o fosso é a arqueologia de defeito, que é justamente o que não viaja. (C) INVESTIGAR o não-uso: 1 de 7 mantém diário mesmo tendo o comando — antes de embarcar mais coisa, medir por que a que já foi não pegou (é o mesmo padrão do gate social medido na perna de leitura, agora do lado de fora). GATILHO: o maestro escolher; e (C) tem precedência lógica sobre (A), porque embarcar mais maquinaria sem entender o não-uso da anterior é repetir a aposta que já não pagou."
+
 edges:
   - from: E_COMUNIDADE_MEMORIA_3_CAMADAS
     to: Q_ONDE_MORA_A_SUPERACAO
@@ -326,6 +346,15 @@ edges:
     edge_type: SUPPORTS
   - from: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
     to: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
+    edge_type: SUPPORTS
+  - from: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
+    to: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    edge_type: CONSTRAINS
+  - from: Q_O_QUE_FAZER_COM_A_NAO_TRANSFERENCIA
+    to: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
+    edge_type: TRACES_TO
+  - from: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
+    to: Q_RISCO_ACERVO_VIRA_CEMITERIO
     edge_type: SUPPORTS
   - from: Q_GATE_REABRE_POR_DOGFOOD_NAO_POR_CHANGELOG
     to: E_CONTRATO_DE_HOOKS_EXPLODIU
