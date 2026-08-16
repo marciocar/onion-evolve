@@ -282,7 +282,39 @@ valida não é fonte da verdade (no campo: a SSOT viva estava no schema de uma f
 > *verificado* (doutrina `declarado ≠ verificado`). Re-execute a claim PROD contra o vivo — **KG +
 > código `arquivo:linha` + dump fresco** — antes de confiar. O `verified_at` é o carimbo desse cruzamento.
 
-## SSOT-as-runtime — o KG é o primeiro ato (mecanismo, não conselho)
+## SSOT-as-runtime — o KG é o primeiro ato (a ESCRITA é mecanismo; a LEITURA ainda é conselho)
+
+> ⚠️ **CORREÇÃO DE HONESTIDADE — 2026-08-16 (ratificada pelo maestro).** Esta seção se chamava
+> *"mecanismo, não conselho"*. A medição derrubou a segunda metade do título, e o registro fica aqui
+> porque apagá-lo transformaria a vitrine em propaganda.
+>
+> **O que É mecanismo (medido):** a ESCRITA. O `kg-radar.sh` reprova contradição estrutural, o schema
+> é guarda, o frescor tem baseline no lint, e 63/63 PRs carregam resíduo com sha256 do diff.
+>
+> **O que NÃO é mecanismo (medido):** a LEITURA. `lint-artifacts.sh:832` diz, literal, que *"o radar
+> sai exit 0 nesses casos porque valida o grafo contra SI MESMO, nunca contra o veredito que o run
+> produziu"*. **Nenhum dos hooks lê `.kg.yaml`** — quem manda ler são arquivos `.md` de comando, isto
+> é, instrução obedecida pelo modelo: exatamente a categoria que esta KB chama de conselho. A própria
+> doc da Anthropic ratifica a limitação: *"Claude treats them as context, not enforced configuration.
+> To block an action, use a PreToolUse hook."*
+>
+> **A evidência é interna e é dura:** `docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md`
+> (2026-08-02, PR #510) replayou 9 casos reais — **7 falharam por NÃO-CONSULTA**, zero por "consultei e
+> não achei" — e mediu três curas candidatas cobrindo **1/9, 1/9 e 0/9**, com veredito **NÃO CONSTRUIR**.
+> O que de fato disparou a consulta na realidade foi **um humano perguntando: gate social, não
+> instrumento**. Em três casos o agente ignorou 3×, em minutos, um grafo que ele mesmo acabara de autorar.
+>
+> **Por que a doutrina FICA, mesmo assim:** ela continua certa como norte — um KG consultado *quando
+> lembra* não é SSOT. O que sai é a **afirmação de capacidade entregue**. Anunciar mecanismo onde há
+> conselho é `declarado ≠ verificado` aplicado a nós mesmos — e seria a terceira vez desta classe
+> (`KG-first` e `drive-to-verify` já foram anunciados a adotantes antes de terem casa no core).
+>
+> **GATILHO de reabertura** (declarado no próprio SYNTHESIS, e NÃO é changelog): fiar o disparo à mão,
+> fresco e descartável, **2–3× em sessão real, registrando se o veredito injetado MUDOU a resposta**.
+> A superfície nova de hooks (2026-08: ~30 eventos, handlers `prompt`/`agent`, com `InstructionsLoaded`,
+> `PermissionDenied` e `FileChanged` disparando no dano e não no relógio) tornou a cura **construível** —
+> não a tornou **justificada**. Construir porque ficou fácil é acoplar por conveniência, que é a
+> refutação da postura de acoplamento no ato de aplicá-la.
 
 > **Origem da decisão:** ADR `onion-adr-kg-freshness-gate-2026-07.md` (interno do core)
 > §*SSOT como runtime, não artefato* — que é a **SSOT do desenho** (frescor/schema, evidência, ciclo,

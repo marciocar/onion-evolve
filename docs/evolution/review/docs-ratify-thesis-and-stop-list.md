@@ -2,7 +2,7 @@
 branch: docs/ratify-thesis-and-stop-list
 pr: 617
 date: 2026-08-16
-reviewed_diff_sha256: 547de4475fec474de6b9096247fe7a627fe79e53efd52d012a080e500277e05b
+reviewed_diff_sha256: f4fd4de638be79c0fd4afccb7d6bae2a715f327e3279327f6b321bff58ff2c31
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
@@ -53,3 +53,17 @@ Registrado como classe no grafo — vale para toda futura leitura de changelog a
 Limite declarado: não removi nada nesta rodada, então não há regressão a medir; o risco que
 sobra é o inverso (manter mecânica duplicada), e ele fica endereçado pelos gatilhos dos nós
 `Q_RISCO_*`.
+
+## Pós-escrito medido — a mecânica que eu ia descartar se provou 20 minutos depois
+
+Ao fechar este PR, o lint acusou **2 violações HARD**: `plugins/onion-work-tools` fora de
+sincronia (`tree_sha` divergente) — porque a minha edição na KB `knowledge-graph-sdaal.md`
+mudou a FONTE que aquele plugin vendoriza. A cura foi rodar
+`assemble-plugin.sh` — **exatamente o script que a recomendação do revisor mandava
+descartar**, e que eu havia acabado de defender por medição de propósito.
+
+Ou seja: a guarda detectou deriva de projeção que nenhum comando nativo detecta (o
+`plugin validate` valida schema; o `tag` confere plugin.json × marketplace — nenhum
+compara o artefato com a SSOT que o originou), e o remédio foi a projeção. É a tese desta
+ADR acontecendo em miniatura no ato de escrevê-la: **defeito detectado por guarda
+determinística fora da janela, cura mecânica, zero disciplina envolvida**.
