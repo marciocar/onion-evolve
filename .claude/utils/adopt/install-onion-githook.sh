@@ -104,4 +104,28 @@ else
   echo "AVISO: core.hooksPath já = '${CURRENT}' (husky/custom) — NÃO sobrescrito." \
        "Para ativar o hook nativo Onion: git -C ${DEST} config core.hooksPath .githooks" >&2
 fi
+
+# ── (4) PROVA DE VIDA — costurada em 2026-08-16 a pedido do maestro ─────────────────────
+# DEFEITO MEDIDO que motivou: este instalador saía 0 mesmo deixando o gate MORTO. O passo
+# (3) é NEVER-CLOBBER: se o husky já ocupou o core.hooksPath, ele avisa no stderr e retorna
+# SUCESSO — e a adoção reporta "ok". Foi exatamente assim que um adotante ficou com o hook
+# do Onion em .githooks/ que o git nunca lê. Medição de 2026-08-16 nos 6 adotantes com
+# .claude/: gate INERTE em 4 (husky sombreando · hooksPath para diretório vazio · ausente).
+# Instalar e conferir que o arquivo existe declarava 3 desses como instalados.
+# Agora o instalador PROVA por comportamento (commit-sonda descartável, índice temporário,
+# nunca toca o índice do alvo) e o EXIT CODE passa a significar "o gate está vivo", não
+# "eu fiz a minha parte". Fail-closed: quem chama (o /meta:adopt) vê a falha.
+VERIFY="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)/ops/verify-adopter-gate.sh"
+if [ -f "${VERIFY}" ]; then
+  echo "" >&2
+  echo "Onion: provando o gate por EXECUÇÃO (não por existência de arquivo)…" >&2
+  if bash "${VERIFY}" "${DEST}" >&2; then
+    exit 0
+  fi
+  echo "ERRO: o hook foi provisionado mas o gate NÃO está vivo — a adoção não entregou a" \
+       "guarda que promete. Corrija os ✗ acima e rode este instalador de novo." >&2
+  exit 1
+fi
+# Sem o verificador ao alcance (ex.: bundle vendorizado sem ops/), diz o que NÃO sabe.
+echo "AVISO: verify-adopter-gate.sh não encontrado — gate instalado mas NÃO provado vivo." >&2
 exit 0

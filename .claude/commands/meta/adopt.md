@@ -261,7 +261,18 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/merge-prettierignore.sh" "$DEST"
 #     gracioso sem node_modules. Never-clobber (pre-commit próprio → sidecar .onion); husky detectado →
 #     avisa migração; core.hooksPath só seta se UNSET. Helper testável (lint-selftest.sh: githook).
 #     Doutrina: docs/analysis/onion-adr-native-githooks-standard-2026-06.md
-bash "$SOURCE_ROOT/.claude/utils/adopt/install-onion-githook.sh" "$DEST"
+#     ⚠️ PROVA DE VIDA (2026-08-16): desde esta data o instalador não devolve apenas "fiz a minha
+#     parte" — ele PROVA por execução que o gate roda (commit-sonda descartável, índice temporário,
+#     não toca o índice do alvo) e sai NÃO-ZERO se o gate estiver inerte. Motivo medido: o passo de
+#     `core.hooksPath` é never-clobber, então com husky no caminho ele avisava no stderr e saía 0 —
+#     e a adoção reportava sucesso com o gate MORTO. Medição nos adotantes em 2026-08-16: gate
+#     INERTE em 4 de 6 (husky sombreando · hooksPath para diretório vazio · ausente), nenhum
+#     visível sem executar. Por isso a falha aqui é BLOQUEANTE: adoção que não entrega guarda viva
+#     não entregou o produto. Se sair não-zero, mostre os ✗ ao adotante e PARE — não siga para (7).
+if ! bash "$SOURCE_ROOT/.claude/utils/adopt/install-onion-githook.sh" "$DEST"; then
+  echo "ABORTADO: o gate do Onion não ficou vivo em $DEST — conserte e rode /meta:adopt de novo." >&2
+  exit 1
+fi
 
 # (7) .gitattributes merge=union — reduz conflito ESPÚRIO no merge de vendor-branch (Achado #2) em
 #     arquivos append-only do doc-bridge (CHANGELOG/_processed): duas pontas apendam → união, não conflito.
