@@ -429,12 +429,12 @@ nodes:
   - id: Q_G_ID_PROVA_HUMANA
     node_type: question
     plane: PROD
-    verified_at: 2026-08-15
-    verified_against: gate-humano-aguarda-marcio-grana-ai-aceitar-convite
-    status: open
+    verified_at: 2026-08-16
+    verified_against: rastros-medidos-no-tenant-e-no-ledger-apos-a-prova-do-maestro
+    status: done
     impact: 4
-    confidence: 0.9
-    label: "G-ID — a prova HUMANA da fase: marcio@grana.ai convidado por e-mail real → aceita → vê a org Grana.AI na Home, alterna Pessoal↔Grana.AI com listas de conversa isoladas, e uma linha do meter do dia sai com org preenchido. Nicole MANTIDA como 2ª prova humana (decisão do maestro). GATILHO: o maestro rodar o roteiro no device real e confirmar."
+    confidence: 0.95
+    label: "G-ID — FECHADO. O maestro rodou e os RASTROS confirmam (medidos, não declarados): marcio@grana.ai é membro da org (1 membro, último login 08-15) e o ledger do bridge tem **25 linhas com `org` preenchido** em 1 org distinta, sobre 4 subs — que era exatamente o critério do gate ('uma linha do meter do dia sai com org preenchido'). Nicole entrou como 2ª prova humana (senha + Totp + BackupCode + 1 PAT na conta dela). O contêiner de identidade está exercitado por gente de verdade, não por sonda."
 
   - id: D_ROUND_INVITE_SIGNUP_PROFILE
     node_type: decision
@@ -449,12 +449,12 @@ nodes:
   - id: Q_ROUND_HUMAN_PROOF
     node_type: question
     plane: PROD
-    verified_at: 2026-08-15
-    verified_against: gate-humano-fluxos-de-navegador-da-rodada
-    status: open
+    verified_at: 2026-08-16
+    verified_against: rastros-no-tenant-4-de-5-itens-com-evidencia-o-5o-sem-rastro
+    status: confirmed
     impact: 3
     confidence: 0.9
-    label: "Prova humana da rodada (browser real — a classe que sonda/curl não cobre, lição do Elenxo F-ID.3): (1) convidado novo completa o cadastro: e-mail+código → criar username+senha → entra; (2) trocar senha no perfil (verificação reforçada); (3) ativar 2FA (TOTP+backup codes) e logar com 2FA; (4) criar PAT no perfil e revogar; (5) reenviar convite de org pela tela de Membros. GATILHO: roteiro do maestro. Se a sessão for anterior ao scope identities, a seção de segurança degrada com aviso 'saia e entre de novo'."
+    label: "Prova humana da rodada — o maestro rodou 2026-08-15 e os RASTROS confirmam 4 dos 5 itens (medidos no tenant, não declarados): (1) CADASTRO COMPLETO — identidade nova criada 21:58, entrou 22:08 com **username definido** e senha, isto é, o fluxo MissingProfile (e-mail+código → criar usuário e senha) fechou de ponta a ponta num navegador de verdade; (2)+(3) 2FA — Totp **e** BackupCode em duas contas distintas (a nova e a da 2ª prova humana), que é a sequência obrigatória do Logto, com a senha trocada/definida antes (hasPassword=sim); (4) PAT — 1 token vivo em cada uma das duas contas. **(5) reenviar convite de ORG: SEM RASTRO** — 0 convites na org e ela segue com 1 membro; ou não foi exercido, ou foi apagado depois. É o único item do roteiro sem evidência, e por isso o nó fica `confirmed` e não `done`. GATILHO do fechamento: o maestro dizer se rodou o reenvio, ou rodá-lo (tela de Membros → 🔁)."
 
   - id: E_ELENXO_ROUND_CURADO
     node_type: evidence
