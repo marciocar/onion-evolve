@@ -2,10 +2,10 @@
 branch: fix/adopt-regen-all-baselines
 pr: 628
 date: 2026-08-17
-reviewed_diff_sha256: d0929fa351015d69643f1018c6ef357b125a8164f5d8d62066c70ed4ea841306
-findings_total: 6
-findings_real: 6
-findings_fixed: 6
+reviewed_diff_sha256: 18f4b5a93e65846123bc5f67c8fbd2c0544f9d68c5d7998ff990ad6f5ed8e868
+findings_total: 8
+findings_real: 8
+findings_fixed: 8
 tokens: 0
 duration_min: 55
 verdict: CONFORME-COM-SEIS-DEFEITOS-PROPRIOS-CORRIGIDOS-EM-LOOP
@@ -60,6 +60,36 @@ trecho antes de `" ("`; toda a força da `projection-safety` mira a **anotação
    helpers saem 2/3 de propósito. A **guarda da própria bancada** acusou (`BENCH_RC=2`, *"NÃO leia
    esta saída como verde"*), nomeando o suspeito nº 1 que era exatamente o meu padrão. Corrigido de
    passagem um defeito latente pré-existente da mesma classe.
+
+## Achado 7 — a minha própria cura enfraqueceria a catraca no `--update`
+
+Revendo o que eu tinha acabado de costurar: o passo (9) roda **também** no `--update`, e ali
+re-emitir o baseline **re-tolera toda a dívida acumulada desde a última atualização**. A guarda
+ficaria verde sobre crescimento real, em silêncio — o oposto do que a catraca existe para fazer.
+São duas operações e eu havia juntado as duas:
+
+- **adoção** → *emitir*: dia 1, e tolerar o estado pré-existente do adotante **é** a intenção;
+- **update** → *filtrar*: derruba só a chave **estrangeira** (arquivo inexistente no alvo = passivo
+  que veio na cópia) e **preserva a local**, que é dívida dele.
+
+A 2ª versão pedia `export BASELINE_MODE=--filter` no caminho do update — isto é, **disciplina** de
+quem chama, e quem esquecesse enfraqueceria a catraca sem sinal nenhum. A 3ª e definitiva move a
+decisão para o **helper** (`--auto`, por baseline) pela pergunta objetiva *"este baseline já esteve
+na história deste alvo?"*. E o discriminador **não** é "o alvo tem história": adoção de repo
+**legado** tem história, e ali emitir é o certo — é a **primeira chegada** daquele baseline.
+
+**Medição que dá valor à cura:** dos 8 adotantes locais, **4 não têm** `kg-verification-baseline.txt`
+e a guarda emite `HARD NO-BASELINE` (fail-closed); no próximo `--update` eles receberiam o lint novo
+**e** o baseline do core — exatamente os 47 HARD. Nenhum está envenenado hoje (o único que tem o
+arquivo, `gustavo-pulga`, traz 32 chaves e **zero** de path do core).
+
+## Achado 8 — fixture pobre acusou o código inocente
+
+O caso novo `(auto) 1ª chegada` reprovou de primeira, e o defeito era da **bancada**: a fixture
+criava `.claude/validation/` **sem os scripts emissores**, então o helper não resolvia emissor e
+preservava o baseline — que é o comportamento **correto** dele. Antes de gastar os 15 min da suíte,
+extraí o kind para um harness isolado **com `set -euo pipefail`**, espelhando as opções do runner:
+harness sem as opções do runner mente a favor, e foi assim que um defeito real já passou aqui.
 
 ## Erros de MEDIÇÃO desta rodada, registrados sem apagar
 
