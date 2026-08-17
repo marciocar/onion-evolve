@@ -269,9 +269,26 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/merge-prettierignore.sh" "$DEST"
 #     INERTE em 4 de 6 (husky sombreando · hooksPath para diretório vazio · ausente), nenhum
 #     visível sem executar. Por isso a falha aqui é BLOQUEANTE: adoção que não entrega guarda viva
 #     não entregou o produto. Se sair não-zero, mostre os ✗ ao adotante e PARE — não siga para (7).
-if ! bash "$SOURCE_ROOT/.claude/utils/adopt/install-onion-githook.sh" "$DEST"; then
+#     ⚠️ A saída é CAPTURADA porque o instalador tem um terceiro resultado além de vivo/inerte: ele
+#     pode DEFERIR a prova (alvo sem commits, ou lint indisponível) e sair 0 legitimamente. "Saiu 0"
+#     não distingue "provei que barra" de "não pude provar" — e essa diferença é justamente o que o
+#     grafo semeado no passo (8c) registra como `confirmed` ou como `open`. Sem capturar, o grafo
+#     nasceria afirmando prova que ninguém fez, que é o defeito que este passo existe para não repetir.
+GATE_OUT="$(bash "$SOURCE_ROOT/.claude/utils/adopt/install-onion-githook.sh" "$DEST" 2>&1)"; GATE_RC=$?
+printf '%s\n' "$GATE_OUT"
+if [ "$GATE_RC" -ne 0 ]; then
   echo "ABORTADO: o gate do Onion não ficou vivo em $DEST — conserte e rode /meta:adopt de novo." >&2
   exit 1
+fi
+#     O marcador é a linha de sucesso do PRÓPRIO verificador ("GATE VIVO"), que o instalador emite
+#     no stderr — capturado acima. ⚠️ A 1ª versão deste trecho grepava 'bloqueio provado', string que
+#     NÃO EXISTE no instalador (é de outro script): o flag daria sempre --gate-unproven. Errou para o
+#     lado seguro (subdeclarar), mas errou — e a polaridade é deliberada: só afirma prova quem VÊ a
+#     prova; ausência de marcador é "não sei", nunca "sim".
+if printf '%s' "$GATE_OUT" | grep -q 'GATE VIVO'; then
+  GATE_FLAG=--gate-proven
+else
+  GATE_FLAG=--gate-unproven   # instalado, prova ADIADA ou verificador fora de alcance — o grafo diz isso
 fi
 
 # (6b) CI — OFERTA, nunca imposição (costurado 2026-08-16 a pedido do maestro).
@@ -310,6 +327,27 @@ fi
 #      commit durável mascararia commitando vermelho. Determinístico, idempotente, sem LLM.
 if [ -f "$DEST/.claude/validation/graph.sh" ]; then
   bash "$DEST/.claude/validation/graph.sh" --markdown > "$DEST/docs/onion/graph.md" 2>/dev/null || true
+fi
+
+# (8c) SEMENTE DO KG — o primeiro `.kg.yaml` do adotante (achado de campo, 2026-08-17).
+#      A adoção entregava todos os RECURSOS (warm-up, catch-up, onion, 11 skills, agentes, comandos)
+#      e ZERO ESTADO. E o passo 0 do /warm-up é "se existir um .kg.yaml, consulte-o PRIMEIRO",
+#      resolvido ao vivo por `git ls-files '*.kg.yaml'` — com zero grafos ele não falha, fica VAZIO,
+#      a sessão degrada para ler prosa, e o conhecimento do projeto continua preso ao contexto de uma
+#      conversa. Foi assim que um adotante real nasceu (2026-08-17) e o dono perguntou, com razão:
+#      "não tem nem KG para mapear? como vou operar sem ficar preso a uma sessão?".
+#
+#      ⚠️ E A CAUSA TEM A FORMA DE UM ACHADO ANTERIOR: a medição de 2026-08-16 viu grafo autoral em
+#      3 de 7 adotantes e ia atribuir a não-uso — exatamente como ia culpar o adotante pelo zero de
+#      resíduos R56 até se medir que a guarda NUNCA FOI VENDORIZADA. Parte do "não usam KG" é
+#      CAPACIDADE QUE NUNCA ENVIAMOS: a adoção nunca semeou o primeiro nó.
+#
+#      A semente NÃO inventa o domínio do adotante: carrega só o que a adoção verifica de si (pin,
+#      modo, papel, integração, e o gate como `confirmed` OU `open` conforme (6) tenha provado ou
+#      deferido) mais UMA `question` aberta pedindo o primeiro nó de domínio — que o radar afunda na
+#      seção ESTADO a cada leitura. Never-clobber: alvo que JÁ tem grafo não recebe nada.
+if [ -f "$SOURCE_ROOT/.claude/utils/adopt/seed-adoption-graph.sh" ]; then
+  bash "$SOURCE_ROOT/.claude/utils/adopt/seed-adoption-graph.sh" "$DEST" "${GATE_FLAG:-}" || true
 fi
 
 # (9) BASELINES de catraca — REGENERA **TODOS** do corpus do alvo (mesmo padrão do passo 8, mesma razão).
