@@ -2,7 +2,11 @@
 # grafo, o markdown e vista"). Fonte: o rascunho gated docs/analysis/onion-doctrine-elenxo-bulbo-draft-
 # 2026-07.md. Modela o que ja esta assentado: as decisoes de nomeacao, as auto-incriminacoes REAIS
 # (Pintrich->Zimmerman, Hegel->Chalybaus, o gate de 50 achados), as ancoras cientificas e a fronteira
-# aberta. Camada audit (epistemico). Design-only, GATED — a pagina nao esta publicada nem vendorizada.
+# aberta. Camada audit (epistemico).
+# ATUALIZADO 2026-08-17: a doutrina GRADUOU para docs/knowledge-base/concepts/onion-elenxo-doctrine.md
+# (superficie VENDORIZADA, viaja a todo adotante). O gatilho foi um defeito de ALCANCE medido em campo
+# — ver E_ADOPTER_DID_NOT_KNOW_ELENXO e E_PATH_SCOPED_SKILL_INVISIBLE. A metade PUBLICAR segue GATED
+# (Q_PUBLICATION_AREA, `open`); o rascunho original fica, marcado como graduado (Aufhebung).
 meta:
   id: onion-doctrine-elenxo-bulbo-2026-07
   schema_version: "1"
@@ -43,8 +47,8 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: open
-    label: "a pagina e rascunho GATED — aguarda a area de publicacao de doutrinas; nao publicar nem vendorizar ainda"
+    status: superseded
+    label: "a pagina e rascunho GATED — aguarda a area de publicacao de doutrinas; nao publicar nem vendorizar ainda [SUPERADO em 2026-08-17 pela METADE VENDORIZAR: graduou para a KB; a metade PUBLICAR segue gated em Q_PUBLICATION_AREA]"
   - id: D_QUADRO_CITACOES
     node_type: decision
     trace: docs/analysis/onion-quadro-citacoes-draft-2026-07.md
@@ -173,6 +177,41 @@ nodes:
     status: confirmed
     label: "Falseabilidade (Popper, A Logica da Descoberta Cientifica, 1934) — PARENTE, nao identidade, da porosidade epistemica"
 
+  # ---- 2026-08-17: a GRADUACAO (o rascunho saiu de gated e virou KB vendorizada) ----
+  - id: E_ADOPTER_DID_NOT_KNOW_ELENXO
+    node_type: evidence
+    trace: docs/knowledge-base/concepts/onion-elenxo-doctrine.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-17
+    verified_against: "sinal de campo do maestro numa adocao real (PoC): a sessao do adotante encontrou o termo em prosa normativa e foi grepar o repo antes de responder"
+    label: "adotante de campo NAO SABIA o que e o Elenxo — o termo chegava como vocabulario estabelecido (4 KBs vendorizadas + 2 skills sempre-carregadas) sem definicao alcancavel"
+  - id: E_PATH_SCOPED_SKILL_INVISIBLE
+    node_type: evidence
+    trace: docs/knowledge-base/concepts/onion-elenxo-doctrine.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-17
+    verified_against: "observado na propria sessao: 11 skills no disco, 9 na lista da sessao; as 2 ausentes sao exatamente as 2 com paths: (onion-patterns, onion-validation)"
+    label: "a definicao VIAJAVA no manifesto e era INALCANCAVEL: morava so em onion-patterns, escopada por paths: [.claude/**, docs/onion/**] — e docs/onion/ nem viaja, logo metade do escopo apontava p/ diretorio inexistente no adotante"
+  - id: D_GRADUATED_TO_VENDORED_KB
+    node_type: decision
+    trace: docs/knowledge-base/concepts/onion-elenxo-doctrine.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-17
+    verified_against: "PR #630: KB criada em docs/knowledge-base/concepts/ (superficie vendorizada, sem escopo de path), 4 KBs + 2 skills religadas por link, onion-patterns virou derivacao com ponteiro; lint 0 HARD, passivo de link vendorizado intacto em 43"
+    label: "o rascunho gated de 2026-07-22 GRADUOU para KB vendorizada — decisao do maestro; o rascunho FICA marcado como graduado (Aufhebung: cancela, preserva, eleva), nao e apagado"
+
 edges:
   # as auto-incriminacoes reais sustentam a tese central (a forma prova a filosofia)
   - from: E_ZIMMERMAN_FIX
@@ -221,3 +260,21 @@ edges:
   - from: D_QUADRO_CITACOES
     to: D_COINAGES_DECLARED
     edge_type: DEPENDS_ON
+  # ---- 2026-08-17: a graduacao, e as duas medicoes que a fundam ----
+  # o sinal de campo (adotante nao sabia) e o mecanismo (skill escopada invisivel) sustentam a decisao
+  - from: E_ADOPTER_DID_NOT_KNOW_ELENXO
+    to: D_GRADUATED_TO_VENDORED_KB
+    edge_type: SUPPORTS
+  - from: E_PATH_SCOPED_SKILL_INVISIBLE
+    to: D_GRADUATED_TO_VENDORED_KB
+    edge_type: SUPPORTS
+  # a graduacao SUPERA o gate — mas so a metade VENDORIZAR; a metade PUBLICAR segue aberta em
+  # Q_PUBLICATION_AREA, que continua `open` de proposito (Aufhebung: cancela, preserva, eleva)
+  - from: D_GRADUATED_TO_VENDORED_KB
+    to: D_PAGE_GATED
+    edge_type: SUPERSEDES
+  # o adotante sem alcance e a porosidade falhando PARA FORA — irmao do E_GATE_50_FINDINGS, que
+  # e a mesma falha para DENTRO: conhecimento produzido que nao atravessa a membrana
+  - from: E_ADOPTER_DID_NOT_KNOW_ELENXO
+    to: C_POROSITY_STRUCTURAL
+    edge_type: SUPPORTS
