@@ -62,6 +62,10 @@ SKILLS=(".claude/skills/onion-orchestration" ".claude/skills/onion-wizard" ".cla
 # KB tipo A embarcado — a doutrina que kg/diary mais citam (auto-suficiência sem /meta:adopt).
 DOCS=(
   "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+  # A doutrina do Elenxo: as skills embarcadas (onion-onboarding, onion-wizard) têm seções `## Elenxo`
+  # e o kg cita a etapa 5 dela. Sem embarcar, os links viram MORTOS dentro do plugin — medido no PR
+  # #630, e o achado veio do revisor do CI depois de a minha passada manual contar 1 onde eram 3.
+  "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
 )
 
 # Capability Contract.
@@ -73,6 +77,7 @@ REQUIRES=(
 )
 LOADS=(
   "embed:kb/knowledge-graph-sdaal.md"
+  "embed:kb/onion-elenxo-doctrine.md"
   "when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)"
   "when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)"
   "when:diary -> run:validation/diary-index.sh"
