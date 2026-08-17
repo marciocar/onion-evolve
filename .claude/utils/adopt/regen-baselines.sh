@@ -24,15 +24,46 @@
 # ficar SEM emissor resolvido, o helper NÃO devolve zero fingindo sucesso — ele reporta e sai 3.
 # Um baseline não regenerado é passivo alheio cobrado do adotante, e isso tem de ser visível.
 #
-# Uso:  bash regen-baselines.sh <DEST>
+# ── DUAS OPERAÇÕES, E CONFUNDI-LAS ENFRAQUECE A CATRACA ──────────────────────────────────
+# `--emit` (regenerar do corpus do alvo) é o certo na ADOÇÃO: dia 1, história vazia, e a intenção
+# é justamente TOLERAR o estado pré-existente do adotante — sem isso o gate vê todo documento
+# próprio dele como HARD-novo e ele desliga a guarda.
+#
+# No `--update` a MESMA operação estaria errada, e o erro seria invisível: o adotante já tem
+# história, então re-emitir re-tolera toda a dívida acumulada DESDE a última atualização — a
+# catraca perderia justamente o que ela mede. Ali a operação correta é FILTRAR: derrubar só as
+# chaves ESTRANGEIRAS (cujo arquivo não existe no alvo — o passivo do core que veio na cópia) e
+# preservar as locais.
+#
+# ⚙️ E A ESCOLHA É MECÂNICA, NÃO DO CHAMADOR (`--auto`, o default). A 1ª versão exigia que o
+# procedimento exportasse `--filter` no caminho do update — isto é, pedia DISCIPLINA de quem chama,
+# e quem esquecesse enfraquecia a catraca EM SILÊNCIO. O discriminador correto é objetivo e não é
+# "tem história?" (adoção de repo LEGADO tem história, e ali emitir é o certo): é **este baseline já
+# esteve na história deste alvo?**
+#   · NÃO esteve → é a PRIMEIRA vez que ele chega aqui → `emit` (tolerar o dia 1 do adotante).
+#   · JÁ esteve  → o alvo já tinha catraca → `filter` (só a chave estrangeira cai).
+# Decidido POR BASELINE, porque baseline novo do core chega depois num alvo antigo. `--emit` e
+# `--filter` seguem disponíveis para forçar à mão.
+#
+# Uso:  bash regen-baselines.sh <DEST> [--auto|--filter|--emit]
 # Saída: relatório por baseline (chaves antes → depois) no stdout; avisos no stderr.
 # Códigos: 0 = todos resolvidos · 2 = uso inválido/alvo inexistente · 3 = algum não resolvido.
 
 set -u
 
-DEST="${1:-}"
+DEST=""
+MODE=auto
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --auto)   MODE=auto; shift ;;
+    --filter) MODE=filter; shift ;;
+    --emit|--emit-baseline) MODE=emit; shift ;;
+    -*) echo "regen-baselines: opção desconhecida '$1'" >&2; exit 2 ;;
+    *) [ -z "${DEST}" ] && DEST="$1" || { echo "regen-baselines: alvo já informado ('${DEST}')" >&2; exit 2; }; shift ;;
+  esac
+done
 if [ -z "${DEST}" ] || [ ! -d "${DEST}" ]; then
-  echo "uso: regen-baselines.sh <DEST>   (alvo inexistente: '${DEST}')" >&2
+  echo "uso: regen-baselines.sh <DEST> [--auto|--filter|--emit]   (alvo inexistente: '${DEST}')" >&2
   exit 2
 fi
 
@@ -80,6 +111,50 @@ regenerated=0
 shopt -s nullglob
 for bpath in "${VDIR}"/*-baseline.txt; do
   bname="$(basename "${bpath}")"
+
+  # `--auto`: decide POR BASELINE pela pergunta objetiva "este arquivo já esteve na história deste
+  # alvo?". Nunca por "o alvo tem história" — adoção de repo LEGADO tem, e ali emitir é o certo.
+  bmode="${MODE}"
+  if [ "${bmode}" = "auto" ]; then
+    rel=".claude/validation/${bname}"
+    if git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1 \
+       && [ -n "$(git -C "${DEST}" log -1 --format=%H -- "${rel}" 2>/dev/null)" ]; then
+      bmode=filter    # já esteve versionado aqui → o alvo já tinha catraca
+    else
+      bmode=emit      # 1ª chegada deste baseline → tolerar o estado do dia 1
+    fi
+  fi
+
+  # ── MODO FILTER: derruba só a chave ESTRANGEIRA, preserva a local ──────────────────────
+  # Estrangeira = a linha cita um arquivo que NÃO EXISTE no alvo, logo é passivo que veio na
+  # cópia do core. Local = arquivo existe ali; é dívida do adotante e a catraca tem de continuar
+  # cobrando. Linha sem forma de caminho reconhecível é PRESERVADA (conservador: na dúvida a
+  # catraca cobra, nunca perdoa — perdoar em silêncio é o modo-de-falha caro).
+  if [ "${bmode}" = "filter" ]; then
+    before="$(count_keys "${bpath}")"
+    tmpf="$(mktemp)"; foreign=0
+    while IFS= read -r line || [ -n "${line}" ]; do
+      case "${line}" in ''|\#*) printf '%s\n' "${line}" >> "${tmpf}"; continue ;; esac
+      # separadores de chave observados nos baselines desta casa: `path::hash` e `path|target`
+      p="${line%%::*}"; [ "${p}" = "${line}" ] && p="${line%%|*}"
+      if [ "${p}" != "${line}" ] && case "${p}" in */*) true ;; *) false ;; esac; then
+        if [ ! -e "${DEST}/${p}" ]; then foreign=$((foreign + 1)); continue; fi
+      fi
+      printf '%s\n' "${line}" >> "${tmpf}"
+    done < "${bpath}"
+    if [ "${foreign}" -gt 0 ]; then
+      mv "${tmpf}" "${bpath}"
+      printf '  ✓ %-38s %s → %s chave(s)   [filtradas %s estrangeira(s)]\n' \
+        "${bname}" "${before}" "$(count_keys "${bpath}")" "${foreign}"
+      regenerated=$((regenerated + 1))
+    else
+      rm -f "${tmpf}"
+      printf '  · %-38s %s chave(s), nenhuma estrangeira — INTACTO (dívida local segue cobrada)\n' \
+        "${bname}" "${before}"
+      regenerated=$((regenerated + 1))
+    fi
+    continue
+  fi
 
   # Resolve o EMISSOR: script que (a) aceita --emit-baseline e (b) menciona este baseline.
   # `lint-selftest.sh` é a BANCADA — ela cita todos os baselines por exercitá-los, e tomá-la
@@ -129,6 +204,10 @@ if [ "${regenerated}" -eq 0 ] && [ "${unresolved}" -eq 0 ]; then
   exit 0
 fi
 
-echo "  → ${regenerated} baseline(s) regenerado(s) do corpus do ALVO; ${unresolved} não resolvido(s)."
+case "${MODE}" in
+  filter) echo "  → ${regenerated} baseline(s) conferido(s) (só chave ESTRANGEIRA cai; dívida local segue cobrada); ${unresolved} não resolvido(s)." ;;
+  emit)   echo "  → ${regenerated} baseline(s) regenerado(s) do corpus do ALVO; ${unresolved} não resolvido(s)." ;;
+  *)      echo "  → ${regenerated} baseline(s) tratado(s) (modo decidido por baseline: 1ª chegada emite, já-versionado filtra); ${unresolved} não resolvido(s)." ;;
+esac
 [ "${unresolved}" -eq 0 ] || exit 3
 exit 0
