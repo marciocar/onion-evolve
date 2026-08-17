@@ -4,14 +4,17 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 96 entradas · **Stale:** 0 · **Compartilháveis:** 84 · **Com significância:** 36
+**Total:** 99 entradas · **Stale:** 0 · **Compartilháveis:** 87 · **Com significância:** 39
 
-Gerado em: 2026-08-06
+Gerado em: 2026-08-17
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-08-17 | observation | collective 📤 | cron-da-bancada-e-a-rede-por-provar | A bancada saiu do gate de todo PR (12 min → 49s) atrás de um filtro de path — e filtro de path já criou TRÊS pontos cegos nesta casa. A rede que o justifica é um cron noturno que AINDA NÃO DISPAROU. Enquanto não disparar, o filtro está nu e eu não sei disso. | 2026-08-18 | dynamic |
+| 2026-08-16 | error | collective 📤 | elenxo-reduzido-ao-revisor | Chamei o MÉTODO pelo nome de uma das suas jogadas: 'Elenxo' virou, na minha boca, 'subagente que ataca'. Medido: 12 nós criados na sessão, ZERO com review_after; zero entradas de diário numa sessão densa de achados. Rodei o corpo sem o relógio — e quem pegou foi o maestro, gate social, não instrumento. | 2026-11-16 | static |
+| 2026-08-16 | learning | collective 📤 | dogfood-que-refutou-a-propria-cura | Rodei o dogfood que reabriria um NÃO CONSTRUIR de 14 dias e o resultado foi 3/3 NÃO MUDOU — a sessão-controle achou o grafo sozinha nos três casos, uma delas citando nó com arquivo:linha. O gate não reabre. E o desenho do meu teste tinha um limite que eu só vi depois: testei 'acha quando perguntado', não 'consulta enquanto ocupado' — que é o modo de falha real. | 2026-10-16 | dynamic |
 | 2026-08-04 | innovation | collective 📤 | maestro-aside-side-channel | Maestro's Aside: 1º protocolo de PREFIXOS TIPADOS de steering (gap aberto no estado-da-arte ago/2026). Marcador pt-BR no início da msg → hook injeta a rota canônica (recall, não gate). Dispatcher, cria zero store. No 1º dogfood, o 'dúvida:' pegou um furo no PRÓPRIO protocolo (o nome violava código=inglês). | 2026-11-04 | static |
 | 2026-08-03 | learning | collective 📤 | shell-guard-paid-four-times-same-axis | A guarda anti-fail-open nasceu em 02-08 e no PRIMEIRO dia de uso real por outra sessão me pegou 4 vezes — e as 4 foram o MESMO eixo: eu lendo sinal derivado em vez do vivo. O eixo tem forma, e a forma é medível. | 2026-11-01 | static |
 | 2026-08-03 | learning | collective 📤 | o-revisor-verde-que-nunca-revisou | O onion-review tinha retry E aviso de soft-pass — máquina completa, comentada em 3 blocos — condicionados a um sinal que NUNCA dispara; 11 PRs mergearam num dia sob um revisor que não leu nada, e o CI dizia verde o tempo todo. | 2026-11-01 | dynamic |
@@ -62,7 +65,7 @@ Gerado em: 2026-08-06
 | 2026-07-18 | observation | collective 📤 | runtime-drained-safe-backlog | — | 2026-09-15 | static |
 | 2026-07-18 | decision | collective 📤 | perception-instruments-doctrine | — | 2026-10-15 | static |
 | 2026-07-18 | learning | public 📤 | method-adopter-has-no-doc-bridge | — | 2026-10-15 | static |
-| 2026-07-18 | reflection | collective 📤 | marathon-close-resume-trail | — | 2026-08-15 | static |
+| 2026-07-18 | reflection | collective 📤 | marathon-close-resume-trail | — | 2026-11-17 | static |
 | 2026-07-18 | decision | collective 📤 | doctrine-ingestor-core-absorbs-field | — | 2026-10-15 | static |
 | 2026-07-18 | decision | collective 📤 | breadcrumb-doctrine-three-genera | — | 2026-10-15 | static |
 | 2026-07-18 | decision | collective 📤 | autonomous-thread-runtime-graduated-ladder | — | 2026-10-15 | static |
