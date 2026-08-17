@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 99 entradas · **Stale:** 0 · **Compartilháveis:** 87 · **Com significância:** 39
+**Total:** 100 entradas · **Stale:** 0 · **Compartilháveis:** 88 · **Com significância:** 40
 
 Gerado em: 2026-08-17
 
@@ -12,6 +12,7 @@ Gerado em: 2026-08-17
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-08-17 | error | collective 📤 | teste-do-gatilho-contra-a-propria-proposta | Propus construir uma guarda de base-de-branch e só rodei o Teste do Gatilho quando o maestro perguntou 'o que o Onion pede e tem valor de fato nisso?'. O teste REPROVOU a minha própria proposta em três frentes. A diretriz de rodar esse teste ANTES de propor existe como memória desde 05/08 — o problema não é conhecimento, é APLICAÇÃO, e o gatilho eficaz continua sendo social. | 2026-11-17 | static |
 | 2026-08-17 | observation | collective 📤 | cron-da-bancada-e-a-rede-por-provar | A bancada saiu do gate de todo PR (12 min → 49s) atrás de um filtro de path — e filtro de path já criou TRÊS pontos cegos nesta casa. A rede que o justifica é um cron noturno que AINDA NÃO DISPAROU. Enquanto não disparar, o filtro está nu e eu não sei disso. | 2026-08-18 | dynamic |
 | 2026-08-16 | error | collective 📤 | elenxo-reduzido-ao-revisor | Chamei o MÉTODO pelo nome de uma das suas jogadas: 'Elenxo' virou, na minha boca, 'subagente que ataca'. Medido: 12 nós criados na sessão, ZERO com review_after; zero entradas de diário numa sessão densa de achados. Rodei o corpo sem o relógio — e quem pegou foi o maestro, gate social, não instrumento. | 2026-11-16 | static |
 | 2026-08-16 | learning | collective 📤 | dogfood-que-refutou-a-propria-cura | Rodei o dogfood que reabriria um NÃO CONSTRUIR de 14 dias e o resultado foi 3/3 NÃO MUDOU — a sessão-controle achou o grafo sozinha nos três casos, uma delas citando nó com arquivo:linha. O gate não reabre. E o desenho do meu teste tinha um limite que eu só vi depois: testei 'acha quando perguntado', não 'consulta enquanto ocupado' — que é o modo de falha real. | 2026-10-16 | dynamic |
