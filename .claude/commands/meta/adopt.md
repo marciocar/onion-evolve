@@ -330,6 +330,19 @@ fi
 #     rc=3 significa "algum baseline não resolvido" → NÃO aborta a adoção (o gate local de (6) está vivo),
 #     mas MOSTRE ao adotante: um baseline não regenerado é passivo alheio cobrado dele.
 #     Helper testável (lint-selftest.sh: regen-baselines). Recusa rodar no core (role: source).
+#
+#     ⚠️ DUAS OPERAÇÕES, e confundi-las enfraquece a catraca em silêncio:
+#       · ADOÇÃO (Fase 3) → `--emit`: dia 1, história vazia, e a intenção É tolerar o estado
+#         pré-existente do adotante (senão o gate vê todo documento próprio dele como HARD-novo).
+#       · `--update` → `--filter` (DEFAULT): o adotante já tem história, então re-emitir
+#         re-toleraria toda a dívida acumulada DESDE a última atualização — a catraca perderia
+#         exatamente o que mede. Ali derruba-se só a chave ESTRANGEIRA (arquivo que não existe no
+#         alvo = passivo que veio na cópia) e PRESERVA-SE a local.
+#     ⚙️ E QUEM DECIDE É O HELPER, não este procedimento: `--auto` (default) resolve POR BASELINE
+#        pela pergunta objetiva "este arquivo já esteve na história deste alvo?" — não esteve, é 1ª
+#        chegada, emite; já esteve, o alvo já tinha catraca, filtra. Assim o caminho do `--update`
+#        não depende de ninguém lembrar de passar uma flag (disciplina), e adoção de repo LEGADO
+#        (que TEM história) continua emitindo, como deve.
 if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ]; then
   bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$DEST" || true
 fi
@@ -662,10 +675,17 @@ manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p
   limpo. (Adotante legado sem `onion/vendor` → o helper o **semeia** antes de mergear.) `.env.example` segue
   o never-clobber por-arquivo (grava `.env.example.onion` se o alvo já tem) — fora do merge, específico do alvo.
 - **Re-aplicar a configuração install-only** via o [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
-  (`DEST="$TARGET"`). **Crítico:** sem isto, um adotante com `settings.json` próprio recebe os *scripts* dos
-  hooks (no manifesto acima) mas **não** o registro → o "you have mail" não dispara. O Procedimento faz o
-  merge idempotente do `settings.json` + garante o starter `docs/evolution/`. (Fecha
-  `docs/evolution/inbox/2026-06-18-adopt-update-skips-phase3-steps.md`.)
+  (`DEST="$TARGET"`). **Crítico:** sem isto, um adotante com
+  `settings.json` próprio recebe os *scripts* dos hooks (no manifesto acima) mas **não** o registro → o
+  "you have mail" não dispara. O Procedimento faz o merge idempotente do `settings.json` + garante o
+  starter `docs/evolution/`. (Fecha `docs/evolution/inbox/2026-06-18-adopt-update-skips-phase3-steps.md`.)
+  **O helper filtra em vez de re-emitir aqui, e ele decide isso sozinho** (`--auto`). A razão é a catraca: no update o alvo **já tem história**, então
+  re-emitir o baseline re-toleraria toda a dívida acumulada desde a última atualização — a guarda ficaria
+  verde sobre crescimento real. Com `--filter` cai só a chave **estrangeira** (arquivo inexistente no
+  alvo = passivo que veio na cópia do core) e a dívida **local** segue cobrada. Medido em 2026-08-17: 4
+  dos 8 adotantes locais **não têm** `kg-verification-baseline.txt` e a guarda emite `HARD NO-BASELINE`
+  (fail-closed) — no próximo update eles receberiam o lint novo **e** o baseline do core, que é
+  exatamente o defeito de 47 HARD que esta rodada curou.
 - **Re-carimbar** com a identidade NOVA da fonte (re-derivar — não há PASSO 0 aqui). **Sempre via
   helper determinístico** — a semântica (preserve + updated_at) vive no script, não em quem o chama:
   ```bash
