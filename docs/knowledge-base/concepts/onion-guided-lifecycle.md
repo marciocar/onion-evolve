@@ -51,7 +51,7 @@ O Onion não é GUI — roda **dentro** do Claude Code. O wizard é **conversaci
 - **Onboarding em 3 fases:** **Orient** (o que é possível — a família, o papel deste repo) → **Activate**
   (a 1ª ação de valor — pode conter um wizard) → **Reinforce** (fixa o hábito com feedback).
 
-## Alinhamento com o Elenxo (a forma prova a filosofia)
+## Alinhamento com o [Elenxo](onion-elenxo-doctrine.md) (a forma prova a filosofia)
 
 - **O wizard é auto-refutável:** ele **mostra o raciocínio** da recomendação (por que sugere `hub` e não
   `standalone`) e é **corrigível** — a pessoa pega um erro de recomendação. Porosidade: a condução não esconde

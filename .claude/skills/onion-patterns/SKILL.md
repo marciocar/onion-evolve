@@ -216,55 +216,39 @@ object-led** (Capability Contract do objeto: `provides/requires`/tier atual; inv
 catálogo/SDAAL antes de introduzir dependência nova) → **materializar** (gate por etapa + verificação) →
 **realimentar** (o perfil descoberto vira entrada de catálogo para a próxima promoção do mesmo tipo de objeto).
 
-### validação de doutrina — o **ELENXO** (superação de alto risco — sinal de campo)
+### validação de doutrina — o **ELENXO** (superação de alto risco)
 
-> **O nome é PRESCRIÇÃO, não rótulo.** *Elenxo* (do grego *élenchos*, a refutação socrática) não batiza
-> o que já se fazia — **define as etapas que uma superação de doutrina tem de cumprir para valer**.
-> A diferença não é semântica: como descrição, "esta corrida pulou a refutação" seria só uma
-> imprecisão de nome; como prescrição, é **não-conformidade** — e é isso que permite reprovar.
-> Mesmo padrão do **Teste do Eixo** (SDAAL), que não descreve abstrações existentes: define 3
-> condições, e por isso pôde reprovar 3 propostas em 3 dias.
+> 📖 **SSOT: [`docs/knowledge-base/concepts/onion-elenxo-doctrine.md`](../../../docs/knowledge-base/concepts/onion-elenxo-doctrine.md)**
+> — a doutrina inteira (as 5 etapas com o que cada uma reprova, a medição da etapa 5, por que não há
+> gate mecânico, o Bulbo e a porosidade). Esta seção é **derivação**; divergiu, a KB ganha.
+>
+> **A definição morava SÓ aqui até 2026-08-17** — e esta skill é escopada por `paths:`, logo ficava
+> **inalcançável para o adotante**, que recebia a palavra (usada como termo estabelecido em 4 KBs
+> vendorizadas) sem a definição. Foi por isso que ela graduou para a KB, que viaja sem escopo.
 
-**AS 5 ETAPAS.** Uma corrida só é Elenxo se cumpriu **todas**. Falhou uma → foi
-`fan-out-and-synthesize`, que é legítimo e mais barato — **use o nome certo**.
+**Quando aplica:** decisão de **doutrina** de alto risco — nomear um conceito, criar um invariante,
+**superar** uma ideia anterior. Não decida por prior, estética ou votação.
 
-| # | Etapa | O que reprova |
-|---|---|---|
-| **1** | **Fan-out de lentes INDEPENDENTES** — cegas entre si, cada uma com um eixo próprio (absorção, coerência-doutrinária, mercado/prior-art, risco-adversarial) | lentes que se leem = uma lente com N vozes |
-| **2** | **Steelman** — a versão mais forte de cada posição, não a de palha | atacar a versão fraca é vitória vazia |
-| **3** | **Refutação adversarial** — worker(s) cujo mandato é **REFUTAR**, com default `refutado` na dúvida | sem esta etapa **não é Elenxo** — é síntese |
-| **4** | **Síntese que arbitra por RAZÃO e preserva DISSENT** — a objeção sobrevivente mais forte **contra a própria conclusão** fica no artefato | placar de votos; síntese sem dissent |
-| **5** | **`write(KG)` com `SUPERSEDES`/`REFUTES`** — a ideia nova supera a antiga **sem apagá-la** (Aufhebung); genealogia auditável | **refutação narrada em prosa e grafo em 0/0/0/0** |
+**O nome é PRESCRIÇÃO, não rótulo:** *Elenxo* não batiza o que já se fazia — define o que uma
+superação **tem de cumprir para valer**, e por isso permite **reprovar**. Mesmo padrão do **Teste do
+Eixo** (SDAAL).
 
-⚠️ **A etapa 5 é a que mais falha, e é medida.** Em 2026-08-02, de 6 corridas que declararam Elenxo,
-**2 narravam refutação em prosa com o grafo vazio** — 5ª e 6ª ocorrência da cicatriz de
-[`kg-born-marker.sh:26`](../../validation/kg-born-marker.sh). Refutação que não virou **aresta** não
-é consultável: o próximo a perguntar *"isso já foi testado?"* re-deriva do zero.
+**AS 5 ETAPAS — todas obrigatórias.** Falhou uma → foi `fan-out-and-synthesize`, que é legítimo e mais
+barato: **use o nome certo**.
 
-**Por que NÃO há gate mecânico disto** (medido, não presumido): testou-se exigir rastro de refutação
-de quem declara "Elenxo" no `method:`. O candidato **não separa** — das corridas COM etapa
-adversarial, 2 de 4 **falhariam**; das SEM, 2 de 2 **passariam**. Correlação zero a invertida: o gate
-puniria justamente quem refutou. E `method:` tem **zero consumidores** no repo — ninguém lê, logo
-ninguém foi enganado (portão 1 fecha com N=0 provado). **A conformidade aqui é lida por humano
-contra esta tabela**, e isso está declarado, não escondido.
+1. **Fan-out de lentes INDEPENDENTES** (cegas entre si) · 2. **Steelman** · 3. **Refutação
+adversarial** (default `refutado` na dúvida — sem ela **não é Elenxo**) · 4. **Síntese que arbitra por
+RAZÃO e preserva DISSENT** · 5. **`write(KG)` com `SUPERSEDES`/`REFUTES`** (*Aufhebung*: supera sem
+apagar).
 
-**Aristóteles ao invocar:** o Elenxo é caro (fan-out orquestrado + tier `opus/high` na refutação).
+⚠️ **A etapa 5 é a que mais falha, e é medida** — cicatriz registrada em
+[`kg-born-marker.sh:26`](../../validation/kg-born-marker.sh). Refutação que não virou **aresta** não é
+consultável: o próximo a perguntar *"isso já foi testado?"* re-deriva do zero.
+
+**Aristóteles ao invocar:** o Elenxo é caro (fan-out orquestrado + tier alto na refutação).
 `efficiency-over-economy` **não** significa usar sempre — significa usar **onde o custo de errar é
-doutrinário**. Para escolha reversível de baixo risco, fan-out simples basta.
-
-
-Situação: uma decisão de **doutrina** de alto risco está na mesa (nomear um conceito, um invariante novo, uma
-ideia que **supera** uma anterior) — onde a qualidade da superação importa e o custo de errar é doutrinário.
-Não decida por prior/estética/votação.
-Playbook: **fan-out de lentes independentes** (ex.: absorção-pelo-Transformer, coerência-doutrinária,
-mercado/prior-art, risco-adversarial) → **síntese** que arbitra por razão (não placar) → **verificação
-adversarial** que tenta REFUTAR e faz a ideia *merecer* selar (é ela que acha os furos reais) → **`write(KG)`**
-com arestas **`SUPERSEDES`**: a ideia nova supera a antiga **sem apagá-la** (Aufhebung), e a genealogia fica
-**auditável** no KG-SSOT (*"git merge não reconcilia verdades"*). Gate: **não sela** até o adversário passar +
-1 dogfood de uso. É o motor de **qualidade da superação de doutrina** — decisões "já existem" como evolução de
-ideias; isto as faz evoluir com rigor. **Tiere** (`efficiency-over-economy`): é caro (fan-out orquestrado) — só
-para superações de alto risco, nunca toda escolha. 1º dogfood: a doutrina do `telescópio`
-(`docs/analysis/onion-adr-telescope-session-observation-2026-07.md`).
+doutrinário**. Para escolha reversível de baixo risco, fan-out simples basta. 1º dogfood: a doutrina do
+`telescópio` (ADR interno do core — **em síntese:** observar a sessão como instrumento, não como log).
 
 ## Gotchas
 

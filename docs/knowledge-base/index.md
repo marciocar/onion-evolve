@@ -55,6 +55,7 @@ docs/knowledge-base/
 - [Multi-repo Federation](concepts/multi-repo-federation.md) — contratos spec-as-code + ledger git (topologia peer)
 - [Onion Abstraction Doctrine](concepts/onion-abstraction-doctrine.md) — quando algo vira SDAAL (e quando não vira): Teste do Eixo (≥2 impls reais · escolha do `.env` · consumidor cego) + Teste do Gatilho; 3ª irmã das doutrinas de decisão
 - [Onion Dogfooding Doctrine](concepts/onion-dogfooding-doctrine.md) — padrão master de evolução: rodar de verdade → aprender → resolver (fix → re-dogfood); o "re-" unificado (toda verdade tem TTL) + `read(KG)`/`write(KG)` no loop
+- [Elenxo & Bulbo](concepts/onion-elenxo-doctrine.md) — **a doutrina fundacional**: o método que se refuta em público (5 etapas obrigatórias — prescrição que reprova, não rótulo) + a arquitetura de 4 camadas com porosidade epistêmica; inclui a tabela empréstimo-vs-cunhagem
 - [Onion Engine Economy](concepts/onion-engine-economy.md) — qual motor para qual tarefa: os três motores de execução e o critério explícito de escolha
 - [Onion Federation and Adoption](concepts/onion-federation-and-adoption.md) — guia de síntese: processo completo de `/meta:adopt` fase-a-fase, matriz de permissão dos 4 tiers, 5 perfis reais registrados
 - [Onion Guardrails](concepts/onion-guardrails.md) — **CANDIDATO** — a camada de guardrails nomeada: lente ONION-R sobre gates existentes (herda por read-path); motor determinístico + gated + estrutural, nunca classificador
