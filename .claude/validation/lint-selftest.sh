@@ -713,7 +713,7 @@ run_projection_name_selftests() {
   # (a) nome de TERCEIRO no trecho projetado → HARD NOME-PROJETADO. Este é o vazamento real.
   f="$(mktemp)"
   printf 'members:\n  - id: poc-x\n    name: Nome Comercial Alheio (rotulo — CONFIDENCIAL Acme)\n' > "${f}"
-  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)"
+  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)" || true   # sob set -e, exit != 0 do helper abortaria a suíte
   if printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
     record_pass "projection-name: (a) nome de terceiro no trecho projetado → HARD"
   else record_fail "projection-name: (a)" "nome de terceiro no trecho publicado NÃO foi pego"; fi
@@ -724,7 +724,7 @@ run_projection_name_selftests() {
   #     superfície que viaja para todo adotante é vazamento cross-tenant por adoção).
   f="$(mktemp)"
   printf 'members:\n  - id: poc-x\n    name: Nome Comercial Alheio (rotulo — CONFIDENCIAL Acme)\n    projection_name_exempt: true\n' > "${f}"
-  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)"
+  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)" || true   # sob set -e, exit != 0 do helper abortaria a suíte
   if ! printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
     record_pass "projection-name: (b) projection_name_exempt no dado é honrado"
   else record_fail "projection-name: (b)" "isenção declarada no membro foi ignorada"; fi
@@ -733,7 +733,7 @@ run_projection_name_selftests() {
   # (c) VARIAÇÃO DE CAIXA do próprio slug → passa sem isenção. É o mesmo nome, não terceiro.
   f="$(mktemp)"
   printf 'members:\n  - id: acme-slug\n    name: AcmeSlug (rotulo — CONFIDENCIAL Acme)\n' > "${f}"
-  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)"
+  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)" || true   # sob set -e, exit != 0 do helper abortaria a suíte
   if ! printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
     record_pass "projection-name: (c) variação de caixa do slug passa sem isenção"
   else record_fail "projection-name: (c)" "falso-positivo em variação de caixa do próprio slug"; fi
@@ -745,7 +745,7 @@ run_projection_name_selftests() {
   #     sobre o que é projetado está medindo outra coisa que não a superfície.
   f="$(mktemp)"
   printf 'members:\n  - id: acme-slug\n    name: acme-slug          # anotacao interna qualquer\n' > "${f}"
-  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)"
+  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)" || true   # sob set -e, exit != 0 do helper abortaria a suíte
   if ! printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
     record_pass "projection-name: (d) (MUT) comentário de fim de linha não é projeção"
   else record_fail "projection-name: (d)" "comentário YAML tratado como nome projetado"; fi
@@ -1463,7 +1463,9 @@ run_kg_scope_selftests() {
   printf '# fora do escopo canonico\n' > "${repo}/docs/outro-corpus/alheio.md"
 
   # (S1) --scope troca a raiz: o corpus alheio é medido, o canônico não entra.
-  out="$(bash "${repo}/.claude/validation/kg-provenance-coverage.sh" "${repo}" --scope docs/outro-corpus 2>&1)"; rc=$?
+  # mesma classe do defeito de 2026-08-17: `cmd; rc=$?` aborta a suíte sob `set -e` se o script
+  # algum dia passar a sair != 0 neste caminho. Latente, corrigido de passagem.
+  rc=0; out="$(bash "${repo}/.claude/validation/kg-provenance-coverage.sh" "${repo}" --scope docs/outro-corpus 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ] \
      && printf '%s' "${out}" | grep -q 'EXPLORATÓRIA' \
      && printf '%s' "${out}" | grep -q 'docs/outro-corpus/alheio.md' \
@@ -6770,7 +6772,9 @@ run_regen_baselines_selftests() {
   #     ⚠️ Este caso nasceu de um defeito meu: a 1ª guarda lia o ARQUIVO .onion-version e ficava
   #     MUDA no core (que não tem o arquivo — ali o papel é COMPUTADO). Passou por idempotência,
   #     não por verificação. Por isso o teste checa o rc, não a ausência de dano.
-  out="$(bash "${helper}" "${REPO_ROOT}" 2>&1)"; rc=$?
+  # ⚠️ `cmd; rc=$?` sob `set -e` MATA a suíte (a bancada tem guarda que acusa isso, e ela me
+  #    pegou aqui em 2026-08-17): o helper sai 2/3 DE PROPÓSITO. Idioma da casa: `|| rc=$?`.
+  rc=0; out="$(bash "${helper}" "${REPO_ROOT}" 2>&1)" || rc=$?
   if [ "${rc}" -eq 2 ] && printf '%s' "${out}" | grep -q 'CORE'; then
     record_pass "regen-baselines: recusa no core (role: source computado pela autoridade)"
   else record_fail "regen-baselines: guarda do core" "rc=${rc} (esperado 2) — regeneraria o ledger do core"; fi
@@ -6781,7 +6785,7 @@ run_regen_baselines_selftests() {
   printf 'role: adopted\n' > "${d}/.claude/.onion-version"
   printf '# herdado do core\ndocs/discussions/x/proto/y.kg.yaml::15c1995fb0f2\n' \
     > "${d}/.claude/validation/kg-verification-baseline.txt"
-  bash "${helper}" "${d}" >/dev/null 2>&1
+  bash "${helper}" "${d}" >/dev/null 2>&1 || true
   if ! grep -q 'docs/discussions/x/proto' "${d}/.claude/validation/kg-verification-baseline.txt"; then
     record_pass "regen-baselines: passivo de path do core sai do baseline do adotante"
   else record_fail "regen-baselines: passivo herdado" "chave de path do core sobreviveu no alvo"; fi
@@ -6792,7 +6796,7 @@ run_regen_baselines_selftests() {
   #     não cobra nada e passa a mentir verde.
   d="$(mktemp -d)"; mkdir -p "${d}/.claude/validation"
   printf 'chave/orfa::deadbeef\n' > "${d}/.claude/validation/inventado-baseline.txt"
-  bash "${helper}" "${d}" >/dev/null 2>&1; rc=$?
+  rc=0; bash "${helper}" "${d}" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 3 ] && grep -q 'deadbeef' "${d}/.claude/validation/inventado-baseline.txt"; then
     record_pass "regen-baselines: sem emissor → rc=3 ruidoso e baseline preservado"
   else record_fail "regen-baselines: sem emissor" "rc=${rc} (esperado 3) ou baseline virou vazio"; fi
@@ -6800,7 +6804,7 @@ run_regen_baselines_selftests() {
 
   # (d) alvo sem maquinaria vendorizada → no-op silencioso (rc=0), não erro.
   d="$(mktemp -d)"
-  bash "${helper}" "${d}" >/dev/null 2>&1; rc=$?
+  rc=0; bash "${helper}" "${d}" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 0 ]; then
     record_pass "regen-baselines: alvo sem .claude/validation é no-op (rc=0)"
   else record_fail "regen-baselines: no-op" "rc=${rc} (esperado 0) em alvo sem maquinaria"; fi
