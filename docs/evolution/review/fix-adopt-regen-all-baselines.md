@@ -1,6 +1,6 @@
 ---
 branch: fix/adopt-regen-all-baselines
-pr: 0
+pr: 628
 date: 2026-08-17
 reviewed_diff_sha256: d0929fa351015d69643f1018c6ef357b125a8164f5d8d62066c70ed4ea841306
 findings_total: 6
