@@ -6878,6 +6878,83 @@ run_regen_baselines_selftests() {
   rm -rf "${d}"
 }
 
+# Modo seed-adoption-graph — exercita .claude/utils/adopt/seed-adoption-graph.sh.
+#
+# O QUE PROTEGE (achado de campo, 2026-08-17): a adoção entregava todos os RECURSOS e ZERO ESTADO —
+# nenhum `.kg.yaml`. O passo 0 do /warm-up é "se existir um .kg.yaml, consulte-o PRIMEIRO", resolvido
+# por `git ls-files '*.kg.yaml'`: com zero grafos ele não falha, fica VAZIO, e a sessão degrada para
+# ler prosa. Um adotante real nasceu assim e o dono perguntou "não tem nem KG para mapear?".
+#
+# O caso (a) é o que mais importa e é auto-referente: o que o semeador GERA tem de passar no RADAR
+# desta casa. Gerador que produz artefato que a própria validação reprova entrega dívida, não valor.
+run_seed_adoption_graph_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/seed-adoption-graph.sh"
+  if [ ! -f "${helper}" ]; then record_fail "seed-graph" "helper ausente: ${helper}"; return; fi
+  local d rc out
+
+  _seed_fixture() {   # alvo com a maquinaria vendorizada + stamp
+    local dd; dd="$(mktemp -d)"
+    git -C "${dd}" init -q 2>/dev/null
+    git -C "${REPO_ROOT}" archive HEAD -- .claude/validation .claude/rules 2>/dev/null | tar -x -C "${dd}" 2>/dev/null
+    mkdir -p "${dd}/.claude"
+    printf 'framework: onion-evolve\ncommit: abc123def456\nrole: adopted\nmode: greenfield\nadopted_at: 2026-08-17\nintegration_branch: main\n' \
+      > "${dd}/.claude/.onion-version"
+    printf '%s' "${dd}"
+  }
+
+  # (a) alvo virgem → semeia, E o RADAR aprova o grafo gerado (exit 0, sem contradição estrutural).
+  d="$(_seed_fixture)"
+  bash "${helper}" "${d}" --gate-proven >/dev/null 2>&1 || true
+  rc=0
+  ( cd "${d}" && bash .claude/validation/kg-radar.sh docs/onion/graph/onion-adoption.kg.yaml >/dev/null 2>&1 ) || rc=$?
+  if [ -f "${d}/docs/onion/graph/onion-adoption.kg.yaml" ] && [ "${rc}" -eq 0 ]; then
+    record_pass "seed-graph: (a) semeia e o RADAR aprova o próprio artefato gerado"
+  else record_fail "seed-graph: (a)" "não semeou, ou o radar reprovou o grafo gerado (rc=${rc})"; fi
+  rm -rf "${d}"
+
+  # (b) NEVER-CLOBBER pela pergunta certa — "o alvo TEM grafo?", não "este arquivo existe?": semear
+  #     um 2º grafo em repo que já mapeia o próprio domínio é empurrar ruído a quem já pegou o hábito.
+  d="$(_seed_fixture)"
+  mkdir -p "${d}/docs"; printf 'nodes: []\n' > "${d}/docs/meu-dominio.kg.yaml"
+  bash "${helper}" "${d}" --gate-proven >/dev/null 2>&1 || true
+  if [ ! -f "${d}/docs/onion/graph/onion-adoption.kg.yaml" ]; then
+    record_pass "seed-graph: (b) alvo que já tem grafo não recebe semente (never-clobber)"
+  else record_fail "seed-graph: (b)" "semeou sobre adotante que já tinha grafo"; fi
+  rm -rf "${d}"
+
+  # (c) --gate-unproven → o nó do gate fica `open`. É a asserção de HONESTIDADE do artefato: o
+  #     instalador tem TRÊS resultados (vivo / inerte / prova ADIADA) e "saiu 0" não distingue os
+  #     dois primeiros do terceiro. Grafo que nasce afirmando prova que ninguém fez é o defeito
+  #     que a medição de 2026-08-16 (gate inerte em 4 de 6, invisível sem executar) já cobrou.
+  d="$(_seed_fixture)"
+  bash "${helper}" "${d}" --gate-unproven >/dev/null 2>&1 || true
+  out="$(awk '/id: DETERMINISTIC_GATE/,/label:/' "${d}/docs/onion/graph/onion-adoption.kg.yaml" 2>/dev/null || true)"
+  if printf '%s' "${out}" | grep -qE '^[[:space:]]*status:[[:space:]]*open'; then
+    record_pass "seed-graph: (c) gate não provado → nó \`open\`, não afirma prova inexistente"
+  else record_fail "seed-graph: (c)" "gate sem prova ficou como confirmed — o grafo mentiria de saída"; fi
+  rm -rf "${d}"
+
+  # (d) flag VAZIA não é erro: o chamador usa "${GATE_FLAG:-}" e a variável pode não estar setada.
+  #     Sem isto, o argumento vazio caía no ramo de alvo e o helper morria com "alvo já informado".
+  d="$(_seed_fixture)"
+  rc=0; bash "${helper}" "${d}" "" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${d}/docs/onion/graph/onion-adoption.kg.yaml" ]; then
+    record_pass "seed-graph: (d) flag vazia é ausência, não erro (rc=0)"
+  else record_fail "seed-graph: (d)" "flag vazia quebrou o helper (rc=${rc})"; fi
+  rm -rf "${d}"
+
+  # (e) SEM stamp → campo honesto, nunca em branco. Campo vazio num grafo lido por máquina e por
+  #     humano é pior que a ausência declarada: parece dado.
+  d="$(mktemp -d)"; git -C "${d}" init -q 2>/dev/null
+  bash "${helper}" "${d}" --gate-unproven >/dev/null 2>&1 || true
+  if grep -q 'não carimbado' "${d}/docs/onion/graph/onion-adoption.kg.yaml" 2>/dev/null; then
+    record_pass "seed-graph: (e) sem stamp → '(não carimbado)' explícito, não campo vazio"
+  else record_fail "seed-graph: (e)" "campo sem stamp saiu em branco (parece dado)"; fi
+  rm -rf "${d}"
+
+  unset -f _seed_fixture
+}
+
 run_githook_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/install-onion-githook.sh"
   local tpl="${REPO_ROOT}/.claude/utils/adopt/githook-pre-commit-onion.tpl"
@@ -9603,6 +9680,7 @@ run_session_velocity_selftests
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 run_githook_selftests
 run_regen_baselines_selftests
+run_seed_adoption_graph_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).
 # Core-only: já pula gracioso sem plugins/ (ver função). O `|| true` é rede de segurança —
