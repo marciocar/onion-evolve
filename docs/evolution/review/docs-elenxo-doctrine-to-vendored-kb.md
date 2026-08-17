@@ -2,14 +2,14 @@
 branch: docs/elenxo-doctrine-to-vendored-kb
 pr: 630
 date: 2026-08-17
-reviewed_diff_sha256: ddc44ba6aa2c8d163ca2dc991df5666de851cee3f66adfcff26a70f69345dc89
-findings_total: 7
-findings_real: 5
-findings_fixed: 4
+reviewed_diff_sha256: 293fd1d974fb05a1877176d0c22d1346b0dc3f63665d39b7ecbc859a76179714
+findings_total: 8
+findings_real: 6
+findings_fixed: 5
 tokens: 0
-duration_min: 65
+duration_min: 80
 verdict: CONFORME-DEPOIS-QUE-O-REVISOR-DO-CI-CORRIGIU-A-MINHA-PROPRIA-AUDITORIA
-reviewer: passada adversarial manual (3 ataques dirigidos) + revisor do CI (2 achados que a manual perdeu, ambos confirmados por medição) + medição no vivo; sem subagentes por restrição da sessão
+reviewer: passada adversarial manual (3 ataques dirigidos) + revisor do CI em 3 rodadas (3 achados que a manual perdeu, todos confirmados por medição — e num deles a minha própria régua de verificação saiu errada); sem subagentes por restrição da sessão
 REVISOU: true
 ---
 
@@ -25,10 +25,11 @@ subagentes sem pedido explícito. Rodei **3 ataques dirigidos** ao meu próprio 
 independentes. Isso é **menos** que uma refutação adversarial de verdade — e por isso **este PR não é
 um Elenxo**, é uma revisão. Usar o nome certo é a primeira exigência da doutrina que o PR entrega.
 
-> **E o limite não ficou teórico — ele cobrou.** O revisor do CI achou **2 defeitos reais que a minha
-> passada perdeu** (Achados 2-corrigido e 4), ambos confirmados por medição minha depois. Os dois são
-> da **mesma família do que eu estava curando**: link que não resolve, e contagem que não foi varrida
-> inteira. Uma lente sozinha — ainda que a minha, ainda que atenta — **não é fan-out de lentes
+> **E o limite não ficou teórico — ele cobrou.** O revisor do CI achou **3 defeitos reais que a minha
+> passada perdeu** (Achados 2-corrigido, 4 e 5), todos confirmados por medição minha depois — e num
+> deles a régua que improvisei para conferir o achado **também saiu errada**. São da mesma família do
+> que eu estava curando: link que não resolve, contagem não varrida inteira, convenção de escrita.
+> Uma lente sozinha — ainda que a minha, ainda que atenta — **não é fan-out de lentes
 > independentes**; e a etapa 1 do Elenxo existe exatamente porque *lente única não vê o próprio ponto
 > cego*. Este resíduo é a evidência empírica disso, colhida contra o autor.
 
@@ -131,6 +132,27 @@ cura anterior desta classe *"parou em 1/4"* — eu li esse aviso, citei-o no PR 
 lição aprendida, e **reincidi na linha seguinte do mesmo arquivo**. Ler o aviso não é o mecanismo;
 enquanto não houver feeder de lint para sub-totais de `docs/<seção>`, a única cura é **conferir a
 soma**, não confiar na varredura.
+
+## Achado 5 — introduzi emoji numa análise crítica (REAL, curado)
+
+Terceiro achado do revisor do CI, e ele me pegou **duas** vezes na mesma linha.
+
+`code-standards.md:171` proíbe emoji em **meta-specs e análises críticas**, e `architecture.md:106`
+define `docs/analysis/` como *"análises críticas datadas (snapshots)"*. O cabeçalho de graduação que
+escrevi levava um `⬆️` — e o arquivo **não tinha emoji nenhum** antes deste PR.
+
+**E a minha primeira verificação do achado saiu errada**, o que é a lição de verdade aqui: gerei uma
+regex de emoji na hora, ela devolveu *"3 emojis antes"* — e os 3 eram **setas `→` (U+2192)**,
+tipografia, não emoji. Pior: a mesma regex **não pegava** o `⬆️` (U+2B06), que era exatamente o
+caractere em questão. **Régua improvisada mediu o alvo errado e deixou passar o certo** — eu quase
+refutei um achado verdadeiro com um instrumento que eu mesmo tinha acabado de inventar.
+
+Refiz com faixa correta (`FE0F`, `2B00-2BFF`, `1F300-1FAFF`): **zero antes, um agora**. O revisor
+estava certo. Curado removendo o emoji.
+
+**Contexto que não é desculpa, e por isso fica anotado:** 65 dos 128 arquivos de `docs/analysis/` já
+violam essa regra hoje. O padrão não nasce aqui — mas a instância é minha e é nova, e "os outros
+também" nunca foi critério.
 
 ## Os dois ataques que não acharam nada (e por isso valem)
 
