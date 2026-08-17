@@ -327,6 +327,47 @@ nodes:
     verified_against: origem-de-cada-conclusao-rastreada-mais-o-update-verificado-no-adopt
     label: "SUPERAÇÃO da segunda questão pendente ('medir os remotos dos adotantes'): ela perdeu valor de decisão, e a checagem mostra por quê. Rastreando a ORIGEM de cada conclusão: 'o corpus centraliza' veio dos CRÉDITOS medidos DENTRO DO CORE (13 no CHANGELOG de co-evolução, 7 no lint) — independe do disco de ninguém; já 'gate inerte em 4 de 6' veio do disco local, e essa é justamente a parte que a cura mecânica resolve sem eu auditar mais nada. Ou seja: medir os remotos hoje seria vigiar repo alheio para confirmar um defeito que já tem cura automática, com dado que envelhece no instante em que a medição termina. A SUPERAÇÃO é inverter o fluxo — em vez de EU auditar, o veredito do gate CHEGA pelo canal que já funciona (co-evolução upstream), porque o `--update` re-aplica o procedimento de configuração pós-cópia, onde o instalador agora PROVA o gate e falha alto. VERIFICADO ao escrever este nó, e vale a nota: eu havia AFIRMADO duas vezes ao maestro que 'os 4 serão pegos no próximo --update' SEM ter checado se o --update passa por lá. Passa (adopt.md §'Atualizar um repo adotado' → 'Re-aplicar a configuração install-only'). A afirmação estava certa por sorte, não por verificação — e é a classe que esta rodada inteira existe para curar."
 
+
+  - id: E_O_GATE_DO_ADOTANTE_NASCE_REPROVADO_POR_PASSIVO_ALHEIO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-17
+    verified_against: adocao-greenfield-real-com-47-HARD-medidos-e-defeito-reproduzido-em-fixture
+    label: "O IRMÃO do gate inerte, e é pior porque o gate está VIVO: numa adoção greenfield real (2026-08-17) o lint do adotante nasceu com 47 violações HARD, todas [kg-verificacao/REMOVIDO], cobrando nós de grafos que só existem no core (docs/discussions, onion-pessoal-marcio, bridge-produto-2026-08). CAUSA: o manifesto copia `.claude/validation/` INTEIRO, então os CINCO baselines de catraca viajam com o passivo do core, e o passo (9) do adopt regenerava UM — e o comentário desse mesmo passo já descrevia o modo-de-falha da omissão ('o gate nasceria reprovando o repo do adotante no dia 1 e seria desligado'). AGRAVANTE: a catraca resolve a referência caminhando até o PRIMEIRO commit que tenha o baseline, então o passivo entra na história antes de tudo e regenerar depois não basta — no alvo a história foi reescrita para o commit raiz já trazer os baselines dele. Simetria que fecha o diagnóstico: os MESMOS 47 são, no core, `PASSIVO` tolerado. Gate vivo que reprova por dívida alheia é gate que o adotante desliga — e aí perde-se a guarda inteira, não só o baseline."
+
+  - id: E_A_GUARDA_DE_PROJECAO_CONFIAVA_NA_METADE_SEGURA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-17
+    verified_against: nome-de-cliente-sob-NDA-apareceu-no-console-gerado-com-lint-verde
+    label: "O PRESSUPOSTO da guarda falhou, não um caso dela: registrei o adotante novo no members.yaml com o nome comercial do cliente (sob NDA) no campo `name:`, e ele APARECEU no federation-console.html publicado — com o lint VERDE. O console publica só o trecho antes de ' (' (o parêntese é anotação interna do maestro), e toda a força da projection-safety mira essa ANOTAÇÃO: o trecho anterior era seguro POR CONSTRUÇÃO. Duas cegueiras somadas: (1) o termo não era derivado do members.yaml, porque o próprio membro o introduzia; (2) a superfície `federation-map.md` — projeção gerada pelo MESMO graph.sh do console — nunca esteve na lista auditada, embora o console esteja desde o incidente de 2026-07-10. Nomear terceiro em superfície projetada era proibido por convenção e permitido pela máquina."
+
+  - id: D_INVARIANTE_PROJETADO_IGUAL_AO_SLUG_COM_ISENCAO_NO_DADO
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-17
+    verified_against: P6-provado-em-4-casos-na-bancada-inclusive-o-falso-positivo
+    label: "A cura escolhida e a POLARIDADE que a faz funcionar: não é lista de nomes proibidos — essas falham pelo VOCABULÁRIO (o nome novo nunca está nelas; 4ª ocorrência dessa classe nesta casa) — é a invariante 'trecho projetado == slug' com allowlist de ids ISENTOS, que falha FECHADA: membro novo tem de cumprir e a isenção é ato deliberado com motivo escrito. E a isenção mora NO DADO (`projection_name_exempt` no members.yaml), não no script: a 1ª versão a punha como variável no projection-safety.sh e a REGRA 36 (vendor-scrub) reprovou com razão, porque script vendorizado viaja para todo adotante e id de adotante ali é vazamento cross-tenant por adoção. O modo-de-falha vira excesso de bloqueio, que é visível, em vez de vazamento, que não é."
+
+  - id: D_REGENERAR_BASELINE_POR_DESCOBERTA_NAO_POR_LISTA
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-17
+    verified_against: helper-com-5-casos-na-bancada-e-defeito-original-reproduzido-em-fixture
+    label: "regen-baselines.sh varre `*-baseline.txt` e resolve o emissor de cada um, em vez de listar os cinco nomes: baseline novo entra coberto POR CONSTRUÇÃO. Três decisões de desenho, cada uma contra um modo-de-falha medido: (a) falha RUIDOSA (rc=3) quando não resolve o emissor, e PRESERVA o baseline em vez de trocá-lo por vazio, porque catraca vazia não cobra nada e passa a mentir verde; (b) RECUSA rodar no core, onde o baseline é o ledger legítimo da dívida própria; (c) o papel se PERGUNTA ao onion-version.sh — a 1ª guarda lia o arquivo `.claude/.onion-version` e ficava MUDA no core, que não o tem, e só passou por idempotência (os baselines saíram byte-idênticos), isto é: certo por sorte, não por verificação."
+
 edges:
   - from: E_COMUNIDADE_MEMORIA_3_CAMADAS
     to: Q_ONDE_MORA_A_SUPERACAO
@@ -448,3 +489,24 @@ edges:
   - from: E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO
     to: Q_ONDE_MORA_A_SUPERACAO
     edge_type: CONSTRAINS
+
+
+  - from: E_O_GATE_DO_ADOTANTE_NASCE_REPROVADO_POR_PASSIVO_ALHEIO
+    to: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
+    edge_type: SUPPORTS
+    label: "Duas faces do MESMO furo — 'instalado' não é 'protegendo': lá a guarda não roda; aqui ela roda e cobra dívida que não é do adotante. As duas terminam no mesmo lugar (o adotante desliga o gate), e nenhuma era visível sem executar no repo dele."
+
+  - from: E_O_GATE_DO_ADOTANTE_NASCE_REPROVADO_POR_PASSIVO_ALHEIO
+    to: D_REGENERAR_BASELINE_POR_DESCOBERTA_NAO_POR_LISTA
+    edge_type: CAUSES
+    label: "A evidência produziu a decisão: o passo (9) do /meta:adopt passou a regenerar TODOS os baselines do corpus do alvo antes do commit durável, então o commit raiz já nasce com a dívida do próprio repo — que é o que a catraca precisa para medir crescimento em vez de cobrar passado alheio."
+
+  - from: E_A_GUARDA_DE_PROJECAO_CONFIAVA_NA_METADE_SEGURA
+    to: D_INVARIANTE_PROJETADO_IGUAL_AO_SLUG_COM_ISENCAO_NO_DADO
+    edge_type: CAUSES
+    label: "P6 no projection-safety.sh + federation-map.md admitido às superfícies auditadas + 4 casos na bancada, incluindo o falso-positivo do comentário YAML (que era defeito da minha primeira versão da checagem)."
+
+  - from: E_A_GUARDA_DE_PROJECAO_CONFIAVA_NA_METADE_SEGURA
+    to: E_O_GATE_DO_ADOTANTE_NASCE_REPROVADO_POR_PASSIVO_ALHEIO
+    edge_type: SUPPORTS
+    label: "Achados da MESMA adoção, e a mesma forma: o mecanismo cobria o caso e confiava no pressuposto. Um regenerava 1 de 5 baselines com o comentário certo escrito ao lado; o outro auditava a metade do campo que o gerador não publica. Nos dois, a prosa estava correta e a máquina não a alcançava."
