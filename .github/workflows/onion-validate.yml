@@ -47,23 +47,20 @@ permissions:
 jobs:
   lint-onion-artifacts:
     runs-on: ubuntu-latest
-    # Orçamento medido em 2026-07-20 (KVM 8): lint-selftest 6m59s (374 guardas) + lint-artifacts 21s
-    # + gate de design tokens ≈ 7,5min. Com teto de 10 o job rodava a ~75% do orçamento — margem que
-    # some no primeiro runner lento e vira CI vermelho por TEMPO, não por defeito. A suíte cresce a
-    # cada guarda nova (é o objetivo); o teto acompanha, com a medição registrada para o próximo ajuste.
-    #
-    # RE-MEDIDO 2026-08-06 (KVM 8), e o aviso acima se cumpriu à risca: o job foi CANCELADO aos
-    # 15m02s — vermelho por TEMPO, não por defeito. Números desta passada:
-    #   · lint-selftest local : 908s = 15,1 min · 646 guardas · 0 falhas
-    #   · lint-artifacts      : ~44s
-    #   · CI vinha passando em 11-12 min = ~77% do teto de 15 — a mesma margem-fantasma de julho
-    # A HIPÓTESE ÓBVIA ERA FALSA e vale registrada para o próximo não repetir: culpei as 34 guardas
-    # acrescentadas naquele dia, e a medição refutou — 908s AGORA contra 921s de manhã com 612
-    # guardas, ou seja 13s MAIS RÁPIDO com 34 guardas A MAIS (1.406ms/guarda contra 1.505ms).
-    # As guardas novas não engordaram nada; o teto é que estava colado no trabalho que já existia.
-    # Subir para 25 dá ~40% de folga sobre o pior caso local — e o pior caso é o LOCAL, porque o
-    # runner do CI é mais rápido que a KVM 8. Próximo ajuste: re-medir, não estimar.
-    timeout-minutes: 25
+    # ── DIVISÃO DE 2026-08-16: este job é o GATE SOBRE A MUDANÇA (lê o diff e reprova o
+    #    artefato). A BANCADA (lint-selftest.sh, 689 asserções) saiu para `onion-selftest.yml`
+    #    porque é TESTE DE REGRESSÃO DA MAQUINARIA, e os dois têm gatilhos diferentes.
+    #    Medido: a bancada era 686s de 729s — 94% do CI — e rodava em todo PR; dos 8 PRs
+    #    daquele dia, 6 tocaram ZERO arquivo de maquinaria e esperaram 12 min por uma suíte
+    #    que não podia lhes dizer nada. O filtro de path do workflow novo NÃO repete os três
+    #    pontos cegos históricos (#241 plugins, #254 docs, #509 ops) porque tem rede debaixo:
+    #    um `schedule` noturno roda a bancada inteira na main, independente de path.
+    # Orçamento: sem a bancada, este job é lint-artifacts (~44s medido) + gate de design tokens.
+    # O teto de 10 min dá folga de ordem de grandeza. O HISTÓRICO de teto colado — job CANCELADO
+    # aos 15m02s em 2026-08-06, com a hipótese óbvia (guardas novas) REFUTADA na medição (908s com
+    # 646 guardas contra 921s com 612: 13s mais RÁPIDO com 34 guardas A MAIS) — migrou para
+    # `onion-selftest.yml`, junto com o trabalho que o causava. Comentário fica onde o trabalho está.
+    timeout-minutes: 10
 
     steps:
       - name: Checkout Repository
@@ -74,33 +71,6 @@ jobs:
 
       - name: Executar linter determinístico de artefatos Onion
         run: bash .claude/validation/lint-artifacts.sh
-
-      # Asserção de CAPACIDADE antes do auto-teste. A suíte degrada gracioso sem tooling
-      # (⊘ NÃO VERIFICADO) — correto na máquina do autor, inaceitável aqui: um runner sem
-      # jq/pyyaml pularia dezenas de guardas e o job ficaria VERDE sem tê-las exercido.
-      # Generaliza para a suíte inteira o fail-loud que o gate de design tokens já aplicava
-      # a si mesmo. Sinal de campo 2026-07-25 (arandek): um waiter que aceita 0 == 0 carimbou
-      # verde com o serviço desligado, e o custo apareceu só no deploy seguinte.
-      - name: Asserção de capacidade do runner (o auto-teste não pode pular nada)
-        run: |
-          command -v jq >/dev/null 2>&1 || { sudo apt-get update -qq && sudo apt-get install -y -qq jq; }
-          python3 -c "import yaml" >/dev/null 2>&1 || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml; }
-          missing=""
-          for t in jq git openssl awk python3; do command -v "$t" >/dev/null 2>&1 || missing="${missing} $t"; done
-          python3 -c "import yaml" >/dev/null 2>&1 || missing="${missing} python3-yaml"
-          if [ -n "${missing}" ]; then
-            echo "ERRO: capacidade incompleta no runner —${missing}"
-            echo "Sem isto o auto-teste PULA guardas e o verde não significa nada."
-            exit 1
-          fi
-          echo "OK — capacidade completa: jq git openssl awk python3 + pyyaml"
-
-      - name: Auto-teste das guardas (fixtures determinísticas)
-        # STRICT=1: qualquer ⊘ (guarda não exercida) REPROVA o job. É o que separa
-        # "verifiquei e está bom" de "não verifiquei" — no CI só o primeiro vale verde.
-        env:
-          ONION_SELFTEST_STRICT: '1'
-        run: bash .claude/validation/lint-selftest.sh
 
       - name: Gate determinístico de design tokens (DTCG + refs + WCAG)
         run: |

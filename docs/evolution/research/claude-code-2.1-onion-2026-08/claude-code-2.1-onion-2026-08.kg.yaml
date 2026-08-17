@@ -307,6 +307,26 @@ nodes:
     verified_against: derivada-do-defeito-medido-aguarda-decisao-do-maestro
     label: "CURA PROPOSTA (decisão do maestro): o problema não é o adotante não usar — é o gate estar inerte sem ninguém saber. A cura que esta casa exige é COMPORTAMENTAL: um verificador que PROVA que o gate roda no adotante (ex.: etapa do adopt que faz um commit-sonda com violação plantada e confirma que foi BARRADO), em vez de conferir que o arquivo existe. Casos que ele tem de pegar, todos medidos hoje: hooksPath apontando para outro gestor (husky), hooksPath apontando para diretório vazio, ausência total. Segunda perna, mais barata: embarcar o workflow de CI no bundle (o core tem `onion-validate.yml`; o adopt não leva nenhum), porque githook local é pulável com `--no-verify` — como EU fiz três vezes nesta sessão. Métrica de re-teste direta: quantos adotantes têm gate PROVADO vivo — hoje 2 de 6."
 
+  - id: D_CI_GATE_SEPARADO_DA_BANCADA
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-16
+    verified_against: medicao-8-prs-do-dia-6-tocaram-zero-maquinaria-mais-686s-de-729s
+    label: "SUPERAÇÃO da questão 'CI longo' — a pergunta era errada. Eu tinha proposto shardar a bancada em matriz (mesmo trabalho, em paralelo, mais minutos de runner). A medição reformulou: a bancada era **686s de 729s = 94% do CI** e rodava em TODO PR, mas dos 8 PRs daquele dia **6 tocaram ZERO arquivo de maquinaria** — esperaram 12 min por uma suíte que não podia lhes dizer nada, porque ela prova as GUARDAS e as guardas não estavam no diff. A distinção que dissolve o problema: `onion-validate` é GATE SOBRE A MUDANÇA (lê o diff, reprova o artefato, ~44s); a bancada é TESTE DE REGRESSÃO DA MAQUINARIA. Gatilhos diferentes, workflows diferentes. Resultado: PR de docs cai de ~12 min para ~1 min, e o custo em minutos de runner DIMINUI (em vez de aumentar, como no sharding). ⚠️ E o filtro de path NÃO repete os três pontos cegos históricos (#241 plugins, #254 docs, #509 ops): o defeito comum daqueles não foi filtrar, foi filtrar e não ter mais nada — path fora da lista nunca era coberto. Aqui há REDE DEBAIXO: `schedule` noturno roda a bancada inteira na main, independente de path, então a cobertura deixa de depender de alguém tocar o arquivo certo."
+
+  - id: E_MEDICAO_DOS_REMOTOS_PERDEU_VALOR_DE_DECISAO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-08-16
+    verified_against: origem-de-cada-conclusao-rastreada-mais-o-update-verificado-no-adopt
+    label: "SUPERAÇÃO da segunda questão pendente ('medir os remotos dos adotantes'): ela perdeu valor de decisão, e a checagem mostra por quê. Rastreando a ORIGEM de cada conclusão: 'o corpus centraliza' veio dos CRÉDITOS medidos DENTRO DO CORE (13 no CHANGELOG de co-evolução, 7 no lint) — independe do disco de ninguém; já 'gate inerte em 4 de 6' veio do disco local, e essa é justamente a parte que a cura mecânica resolve sem eu auditar mais nada. Ou seja: medir os remotos hoje seria vigiar repo alheio para confirmar um defeito que já tem cura automática, com dado que envelhece no instante em que a medição termina. A SUPERAÇÃO é inverter o fluxo — em vez de EU auditar, o veredito do gate CHEGA pelo canal que já funciona (co-evolução upstream), porque o `--update` re-aplica o procedimento de configuração pós-cópia, onde o instalador agora PROVA o gate e falha alto. VERIFICADO ao escrever este nó, e vale a nota: eu havia AFIRMADO duas vezes ao maestro que 'os 4 serão pegos no próximo --update' SEM ter checado se o --update passa por lá. Passa (adopt.md §'Atualizar um repo adotado' → 'Re-aplicar a configuração install-only'). A afirmação estava certa por sorte, não por verificação — e é a classe que esta rodada inteira existe para curar."
+
 edges:
   - from: E_COMUNIDADE_MEMORIA_3_CAMADAS
     to: Q_ONDE_MORA_A_SUPERACAO
@@ -390,6 +410,18 @@ edges:
     to: Q_O_QUE_FAZER_COM_A_NAO_TRANSFERENCIA
     edge_type: CONSTRAINS
   - from: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
+    to: D_CURAR_O_GATE_INERTE_DO_ADOTANTE
+    edge_type: SUPPORTS
+  - from: E_DOR_DOMINANTE_E_CONTEXTO_E_CUSTO
+    to: D_CI_GATE_SEPARADO_DA_BANCADA
+    edge_type: SUPPORTS
+  - from: D_CI_GATE_SEPARADO_DA_BANCADA
+    to: D_SUPERACAO_REESCRITA_REINCIDENCIA
+    edge_type: SUPPORTS
+  - from: E_MEDICAO_DOS_REMOTOS_PERDEU_VALOR_DE_DECISAO
+    to: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
+    edge_type: CONSTRAINS
+  - from: E_MEDICAO_DOS_REMOTOS_PERDEU_VALOR_DE_DECISAO
     to: D_CURAR_O_GATE_INERTE_DO_ADOTANTE
     edge_type: SUPPORTS
   - from: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6

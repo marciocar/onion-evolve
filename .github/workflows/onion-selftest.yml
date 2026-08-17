@@ -1,0 +1,75 @@
+name: Onion Guard Selftest
+
+# ── POR QUE ESTE WORKFLOW EXISTE SEPARADO (medido em 2026-08-16) ─────────────────────────
+# A bancada (`lint-selftest.sh`, 689 asserções · 28 fixtures) levava 686s de 729s do job —
+# **94% do CI**. E ela roda em TODO PR. Medição dos 8 PRs daquele dia: **6 tocaram ZERO
+# arquivo de maquinaria**; cada um esperou ~12 min por uma suíte que não podia lhes dizer
+# nada, porque a bancada prova as GUARDAS, e as guardas não mudaram naquele diff.
+#
+# A distinção que separa os dois workflows: `onion-validate` é **gate sobre a MUDANÇA** (o
+# lint lê o diff e reprova o artefato); esta bancada é **teste de regressão da MAQUINARIA**
+# (prova que as guardas reagem certo). Gate e teste de regressão têm gatilhos diferentes.
+#
+# ⚠️ E POR QUE O FILTRO DE PATH AQUI NÃO REPETE O ERRO DE TRÊS VEZES: o histórico desta casa
+# tem três pontos cegos nascidos de filtro de path (`plugins/` #241, `docs/` #254, `ops/`
+# #509) — e o defeito comum não foi filtrar: foi filtrar e **não ter mais nada**. Um path
+# fora da lista nunca era coberto por ninguém. Aqui o filtro tem uma REDE DEBAIXO: o
+# `schedule` noturno roda a bancada INTEIRA na main, independente de path. Logo a cobertura
+# deixa de depender de alguém ter tocado o arquivo certo — que era exatamente a aposta que
+# falhou nas três vezes.
+
+on:
+  pull_request:
+    paths:
+      # a maquinaria que a bancada exercita
+      - '.claude/validation/**'
+      - '.claude/hooks/**'
+      - '.claude/utils/**'
+      - 'ops/**'
+      # os próprios workflows: PR que mexe no CI dispara o CI (a 4ª ocorrência da classe)
+      - '.github/workflows/**'
+  schedule:
+    # 04:17 UTC — a rede debaixo do filtro. Roda a bancada inteira na main todo dia, então
+    # nenhum path fica descoberto por não estar na lista acima.
+    - cron: '17 4 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    # 25 min: medido 908s (15,1 min) local na KVM 8 com 646 guardas; o runner é mais rápido
+    # (686s com 689). A folga existe porque a suíte CRESCE por desenho — e o teto colado no
+    # trabalho já existente foi o que cancelou o job em 15m02s em 2026-08-06.
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      # Capacidade ANTES da suíte: ela degrada gracioso sem tooling (⊘ NÃO VERIFICADO) —
+      # correto na máquina do autor, inaceitável aqui: um runner sem jq/pyyaml pularia
+      # dezenas de guardas e o job ficaria VERDE sem tê-las exercido.
+      - name: Asserção de capacidade do runner (a bancada não pode pular nada)
+        run: |
+          command -v jq >/dev/null 2>&1 || { sudo apt-get update -qq && sudo apt-get install -y -qq jq; }
+          python3 -c "import yaml" >/dev/null 2>&1 || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml; }
+          missing=""
+          for t in jq git openssl awk python3; do command -v "$t" >/dev/null 2>&1 || missing="${missing} $t"; done
+          python3 -c "import yaml" >/dev/null 2>&1 || missing="${missing} python3-yaml"
+          if [ -n "${missing}" ]; then
+            echo "ERRO: capacidade incompleta no runner —${missing}"
+            echo "Sem isto a bancada PULA guardas e o verde não significa nada."
+            exit 1
+          fi
+          echo "OK — capacidade completa: jq git openssl awk python3 + pyyaml"
+
+      - name: Auto-teste das guardas (fixtures determinísticas)
+        # STRICT=1: qualquer ⊘ (guarda não exercida) REPROVA. É o que separa "verifiquei e
+        # está bom" de "não verifiquei" — no CI só o primeiro vale verde.
+        env:
+          ONION_SELFTEST_STRICT: '1'
+        run: bash .claude/validation/lint-selftest.sh
