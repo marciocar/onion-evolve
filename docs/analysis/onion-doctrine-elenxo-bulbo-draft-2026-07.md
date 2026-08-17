@@ -1,6 +1,6 @@
 # [GRADUADO — superado, preservado] Elenxo & Bulbo — a fonte-da-verdade que se refuta em público
 
-> ## ⬆️ Este rascunho GRADUOU em 2026-08-17
+> ## Este rascunho GRADUOU em 2026-08-17
 >
 > **SSOT viva:** `docs/knowledge-base/concepts/onion-elenxo-doctrine.md` — a doutrina graduada para a
 > **KB vendorizada**, que viaja a todo adotante sem escopo de path.
