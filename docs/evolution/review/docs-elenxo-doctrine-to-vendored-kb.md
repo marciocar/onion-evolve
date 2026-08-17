@@ -2,7 +2,7 @@
 branch: docs/elenxo-doctrine-to-vendored-kb
 pr: 630
 date: 2026-08-17
-reviewed_diff_sha256: 28a13f04877f25a05131d5f1610c7315b0ba2ae9e149e734f44e19fdfc2b9234
+reviewed_diff_sha256: ddc44ba6aa2c8d163ca2dc991df5666de851cee3f66adfcff26a70f69345dc89
 findings_total: 7
 findings_real: 5
 findings_fixed: 4
@@ -150,10 +150,19 @@ soma**, não confiar na varredura.
 - Contagem `90 → 91` varrida em **7 sítios independentes**, incluindo as 4 formas distintas do
   `INDEX.md` — cujo próprio rodapé (linha 598) avisa que a cura anterior desta classe parou em 1/4.
 
-## Ressalva declarada (não é achado, é limite)
+## Ressalva declarada — e a minha própria ressalva ficou FALSA no meio do PR
 
-Este PR **não dispara a bancada**: `onion-selftest.yml` filtra por `.claude/{validation,hooks,utils}`,
-`ops/`, `.github/workflows/` — e eu não toquei maquinaria nenhuma, só doutrina, docs e skills. O
-filtro está correto aqui. Mas a rede que o justifica — o cron de 04:17 UTC — **ainda não disparou uma
-única vez** (nasceu hoje, 12:54 UTC). Enquanto não disparar, o filtro segue nu, e este PR passa por
-baixo dele legitimamente e sem cobertura de regressão.
+A versão original desta seção afirmava: *"este PR **não dispara a bancada** — não toquei maquinaria
+nenhuma, só doutrina, docs e skills"*. Era verdade quando escrevi, e **deixou de ser** quando a cura
+do Achado 2 me levou a editar `.claude/utils/marketplace/verticals/onion-work-tools.manifest.sh` —
+que casa `.claude/utils/**`. **A bancada rodou.** O filtro de path se comportou exatamente como
+desenhado: mudou maquinaria, o teste de regressão veio junto.
+
+Corrijo em vez de reescrever em silêncio, porque a afirmação falsa é do mesmo gênero do que este
+resíduo já teve de corrigir uma vez (a contagem de links).
+
+**O limite que permanece:** a rede que justifica o filtro — o `schedule` de 04:17 UTC em
+`onion-selftest.yml` — **ainda não disparou uma única vez** (nasceu hoje, 12:54 UTC; primeira janela
+2026-08-18 04:17 UTC). Todos os runs até agora são `pull_request`. Enquanto não disparar, o filtro
+segue **nu**: um path fora da lista não tem ninguém por baixo, que é o defeito comum dos três pontos
+cegos anteriores (#241, #254, #509).
