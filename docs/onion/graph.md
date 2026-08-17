@@ -591,6 +591,15 @@ pain-price-specialist	related	research-agent
 pmbok-specialist	related	/docs/build-compliance-docs	
 pmbok-specialist	related	product-agent	
 pmbok-specialist	related	security-information-master	
+poc-venda-direta-pdi	adopts	onion-evolve	
+poc-venda-direta-pdi	mode	greenfield	
+poc-venda-direta-pdi	pin	b9580a520e5b	
+poc-venda-direta-pdi	specialization	compliance-nda	
+poc-venda-direta-pdi	specialization	document-comparison	
+poc-venda-direta-pdi	specialization	greenfield-adoption	
+poc-venda-direta-pdi	specialization	public-procurement	
+poc-venda-direta-pdi	tier	standalone	
+poc-venda-direta-pdi	trust-advises	onion-evolve	
 postgres-specialist	related	nodejs-specialist	
 presentation-orchestrator	related	/product/presentation	
 presentation-orchestrator	related	gamma-api-specialist	

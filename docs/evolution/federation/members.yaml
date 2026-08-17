@@ -266,6 +266,10 @@ members:
   # segue north-star: prova o MÉTODO, não o MERCADO (Q_COLD_ADOPTER aberto; Marcio = centro da órbita).
   - id: marcio-pessoal
     name: Onion pessoal do Marcio (cérebro reconciliado N=1 — BRAÇO DE PESQUISA, não prova de mercado)
+    # Isenta da invariante "trecho projetado == slug" (projection-safety P6): o rótulo é prosa em
+    # pt-BR e não nomeia TERCEIRO — é a instância pessoal do próprio maestro. A isenção mora aqui,
+    # no dado, e não numa allowlist dentro do script vendorizado (que seria vazamento cross-tenant).
+    projection_name_exempt: true
     role: standalone            # T3 — adota o core direto. Mas adota o MÉTODO (KG SDAAL), NÃO vendoriza .claude/
     kind: method        # adota o METODO (KG SDAAL); onion_version: n/a — NAO vendoriza
                                 # (gap G1 dimensionado no spike F1; --profile de domínio é F2). Fonte≠derivação: uma só fonte.
@@ -333,6 +337,40 @@ members:
       can_correct_to: []
       diary_readable_by: [onion-evolve]
       diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
+  - id: poc-venda-direta-pdi
+    # ⚠️ NOME NEUTRO DE PROPÓSITO: `name` e `personality_summary` são PROJETADOS para superfícies
+    #    publicadas (federation-console.html, federation-map.md). A 1ª versão desta entrada trazia o
+    #    nome comercial do cliente e ele APARECEU no console — e o lint não pegou, porque a guarda
+    #    projeção/NOME reconhece por LISTA e não conhecia esses nomes (a falha por vocabulário, 4ª
+    #    ocorrência da classe). Cliente sob NDA não vai para superfície projetada nem em repo privado:
+    #    o identificador é o slug. Quem é o cliente vive no CLAUDE.md do próprio adotante.
+    name: poc-venda-direta-pdi (adotante de campo — PoC com cliente sob NDA; comparação documento×especificação)
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter       # projeto que vendoriza o framework
+    parent: onion-evolve
+    remote: github.com/marciocar/poc-venda-direta-pdi   # PRIVADO
+    local_path: "/home/marcio/poc-venda-direta-pdi"
+    onion_version: b9580a520e5b   # pin da adoção (2026-08-17); confirmar com pin-integrity-check.sh
+    adopted_at: 2026-08-17
+    mode: greenfield              # repo novo; gate PROVADO por execução na adoção; lint 0 HARD / 4 SOFT
+    # ⚠️ CONFIDENCIALIDADE — este membro carrega material de TERCEIRO sob NDA em análise no Jurídico
+    #    (desde 2026-07-09). O material do cliente vive em `_material/`, IGNORADO pelo git, e NUNCA
+    #    entra em commit/PR/nome de arquivo. Ao operar sobre este membro (doc-bridge, anúncio,
+    #    co-deliver), trate o conteúdo como não-publicável por padrão: referencie (número de projeto,
+    #    órgão, data), não cole. O registro aqui é, ele próprio, ato de segurança — a REGRA 36
+    #    (vendor-scrub) só protege quem está neste arquivo.
+    personality_summary: "PoC com cliente real (sob NDA): agente que cruza a exigência de um edital de compra pública com a especificação do item entregue e produz o checklist de inspeção, apontando inconsistências."  # seed manual; sem nome de cliente (campo projetado)
+    specializations: [greenfield-adoption, document-comparison, compliance-nda, public-procurement]
+    personality_last_sync: 2026-08-17   # seed manual (registro; sem /meta:personality-sync no alvo)
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      # ⚠️ NADA compartilhado por padrão: diário deste membro pode citar caso de cliente sob NDA.
+      diary_classifications_shared: []
       exposes_downstream: []
 
   - id: arandek

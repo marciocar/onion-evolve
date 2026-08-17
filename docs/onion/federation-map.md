@@ -15,6 +15,7 @@ flowchart TD
   marcio_pessoal["marcio-pessoal<br/>standalone · regulated"]:::standalone
   onion_pedro["onion-pedro<br/>standalone · greenfield"]:::standalone
   onion_arthur["onion-arthur<br/>standalone · greenfield"]:::standalone
+  poc_venda_direta_pdi["poc-venda-direta-pdi<br/>standalone · greenfield"]:::standalone
   arandek["arandek<br/>standalone · legacy"]:::standalone
   onion_dist["onion-dist<br/>standalone · greenfield"]:::standalone
   metagamify -->|adopts| onion_evolve
@@ -27,6 +28,7 @@ flowchart TD
   marcio_pessoal -->|adopts| onion_evolve
   onion_pedro -->|adopts| onion_evolve
   onion_arthur -->|adopts| onion_evolve
+  poc_venda_direta_pdi -->|adopts| onion_evolve
   arandek -->|adopts| onion_evolve
   onion_dist -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
@@ -48,5 +50,6 @@ flowchart TD
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
 | onion-arthur | standalone | greenfield | greenfield-adoption, design, branding, storytelling | `165e1e13b11f` |
+| poc-venda-direta-pdi | standalone | greenfield | greenfield-adoption, document-comparison, compliance-nda, public-procurement | `b9580a520e5b` |
 | arandek | standalone | legacy | field-dogfood, legacy-adoption, monorepo, upstream-signal | `65d8a7501a03` |
 | onion-dist | standalone | greenfield | distribution-algorithms, kg-sdaal-method, research-arm, benchmarking | `e88c1e11e051` |

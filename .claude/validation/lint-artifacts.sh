@@ -2691,7 +2691,11 @@ check_projection_safety() {
   # repo DELE. `site/` FICA no escopo — um adotante pode publicar site, e aí a regra vale.
   local surfaces=("${REPO_ROOT}/site")
   if [ "${IS_LEAF}" -ne 1 ]; then
-    surfaces+=("${REPO_ROOT}/docs/onion/graph" "${REPO_ROOT}/docs/onion/federation-console.html")
+    # federation-map.md entrou em 2026-08-17: é projeção GERADA do members.yaml pelo MESMO graph.sh
+    # que alimenta o console, e estava fora da lista — o console é auditado desde 07-10 e o irmão
+    # dele nunca foi. Superfície enumerada erra pelo lado do que NINGUÉM acrescentou (P3).
+    surfaces+=("${REPO_ROOT}/docs/onion/graph" "${REPO_ROOT}/docs/onion/federation-console.html"
+               "${REPO_ROOT}/docs/onion/federation-map.md")
   fi
   out="$(bash "${helper}" --format tsv "${surfaces[@]}" 2>/dev/null || true)"
   [ -n "${out}" ] || return 0

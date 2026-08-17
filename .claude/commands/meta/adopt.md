@@ -312,15 +312,26 @@ if [ -f "$DEST/.claude/validation/graph.sh" ]; then
   bash "$DEST/.claude/validation/graph.sh" --markdown > "$DEST/docs/onion/graph.md" 2>/dev/null || true
 fi
 
-# (9) BASELINE de cobertura de KG — REGENERA do filesystem do alvo (mesmo padrão do passo 8, mesma razão).
-#     O manifesto copia `.claude/validation/` INTEIRO, então o baseline DO CORE viaja junto. Sem regenerar,
-#     o adotante herda o passivo do core (paths que não existem lá → ruído órfão) e, pior, vê **todo
-#     documento de análise PRÓPRIO pré-existente como HARD-novo** — o gate nasceria reprovando o repo do
-#     adotante no dia 1 e seria desligado, que é exatamente o modo-de-falha que a catraca existe para
-#     evitar. A catraca só é adotável se o baseline for do ALVO, não do core. Determinístico, idempotente.
-if [ -f "$DEST/.claude/validation/kg-provenance-coverage.sh" ]; then
-  bash "$DEST/.claude/validation/kg-provenance-coverage.sh" --emit-baseline \
-    > "$DEST/.claude/validation/kg-coverage-baseline.txt" 2>/dev/null || true
+# (9) BASELINES de catraca — REGENERA **TODOS** do corpus do alvo (mesmo padrão do passo 8, mesma razão).
+#     O manifesto copia `.claude/validation/` INTEIRO, então TODO baseline DO CORE viaja junto. Sem
+#     regenerar, o adotante herda o passivo do core (paths que não existem lá → ruído órfão) e, pior, vê
+#     **todo documento de análise PRÓPRIO pré-existente como HARD-novo** — o gate nasceria reprovando o
+#     repo do adotante no dia 1 e seria desligado, que é exatamente o modo-de-falha que a catraca existe
+#     para evitar. A catraca só é adotável se o baseline for do ALVO, não do core.
+#
+#     ⚠️ ESTE PASSO JÁ COBRIU 1 DE 5 — e o modo-de-falha acima ACONTECEU (medido 2026-08-17, adoção
+#     greenfield real da PoC BW&P / HPE Autos): ele regenerava só o `kg-coverage-baseline.txt`, e o irmão
+#     `kg-verification-baseline.txt` chegou com **47 chaves de grafos do core** → o lint do alvo nasceu
+#     com **47 violações HARD** cobrando nós que o adotante nunca teve. O comentário deste passo já
+#     descrevia o defeito com precisão; faltava aplicá-lo aos outros quatro. Agora o helper VARRE
+#     `*-baseline.txt` e resolve o emissor de cada um — baseline novo entra coberto por construção, sem
+#     lista para envelhecer (guarda de lista falha pelo VOCABULÁRIO, não pela lógica).
+#
+#     rc=3 significa "algum baseline não resolvido" → NÃO aborta a adoção (o gate local de (6) está vivo),
+#     mas MOSTRE ao adotante: um baseline não regenerado é passivo alheio cobrado dele.
+#     Helper testável (lint-selftest.sh: regen-baselines). Recusa rodar no core (role: source).
+if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ]; then
+  bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$DEST" || true
 fi
 ```
 
