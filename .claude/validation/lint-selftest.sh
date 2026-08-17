@@ -6802,6 +6802,61 @@ run_regen_baselines_selftests() {
   else record_fail "regen-baselines: sem emissor" "rc=${rc} (esperado 3) ou baseline virou vazio"; fi
   rm -rf "${d}"
 
+  # (e) MODO FILTER — a operação do `--update`: derruba a chave ESTRANGEIRA e PRESERVA a local.
+  #     ⚠️ ESTE CASO EXISTE POR UM DEFEITO QUE EU IA COLOCAR EM PRODUÇÃO: a 1ª versão da cura
+  #     regenerava o baseline também no update, e ali re-emitir RE-TOLERA toda a dívida acumulada
+  #     desde a última atualização — a catraca ficaria verde sobre crescimento real, em silêncio.
+  #     Emitir é certo no dia 1 (tolerar o estado do adotante é a intenção); no update é filtrar.
+  d="$(mktemp -d)"; mkdir -p "${d}/.claude/validation" "${d}/docs/meu"
+  : > "${d}/docs/meu/proprio.kg.yaml"
+  printf 'role: adopted\n' > "${d}/.claude/.onion-version"
+  printf '# misto\ndocs/discussions/x/y.kg.yaml::aaaa\ndocs/meu/proprio.kg.yaml::bbbb\n' \
+    > "${d}/.claude/validation/kg-verification-baseline.txt"
+  bash "${helper}" "${d}" --filter >/dev/null 2>&1 || true
+  if ! grep -q 'docs/discussions/x' "${d}/.claude/validation/kg-verification-baseline.txt" \
+     && grep -q 'docs/meu/proprio' "${d}/.claude/validation/kg-verification-baseline.txt"; then
+    record_pass "regen-baselines: (filter) estrangeira cai, dívida LOCAL segue cobrada"
+  else record_fail "regen-baselines: filter" "filtrou a chave local (perdoou dívida do adotante) ou manteve a estrangeira"; fi
+  rm -rf "${d}"
+
+  # (f) `--auto` DECIDE PELA PRIMEIRA CHEGADA, não por "o alvo tem história" — e a distinção é
+  #     load-bearing: adoção de repo LEGADO tem história, e ali emitir é o certo. Aqui o alvo tem
+  #     commit próprio mas o baseline NUNCA foi versionado → 1ª chegada → emite (esvazia o passivo).
+  #     ⚠️ A fixture PRECISA dos scripts emissores. A 1ª versão dela criava só o diretório e o caso
+  #     reprovava por não resolver emissor (rc=3, baseline preservado — comportamento CERTO do
+  #     helper): era defeito da BANCADA, não do SUT. Fixture pobre acusa o código inocente.
+  d="$(mktemp -d)"
+  git -C "${d}" init -q 2>/dev/null
+  git -C "${REPO_ROOT}" archive HEAD -- .claude/validation 2>/dev/null | tar -x -C "${d}" 2>/dev/null
+  mkdir -p "${d}/.claude/validation" "${d}/docs/legado"
+  : > "${d}/docs/legado/antigo.md"
+  printf 'role: adopted\n' > "${d}/.claude/.onion-version"
+  printf '# core\ndocs/discussions/x/y.kg.yaml::aaaa\n' > "${d}/.claude/validation/kg-verification-baseline.txt"
+  git -C "${d}" add docs >/dev/null 2>&1 || true
+  git -C "${d}" -c user.email=t@t -c user.name=t commit -q --no-verify -m legado >/dev/null 2>&1 || true
+  bash "${helper}" "${d}" >/dev/null 2>&1 || true
+  if ! grep -q 'docs/discussions/x' "${d}/.claude/validation/kg-verification-baseline.txt"; then
+    record_pass "regen-baselines: (auto) baseline nunca versionado → 1ª chegada emite, mesmo em repo COM história"
+  else record_fail "regen-baselines: auto/1a-chegada" "tratou repo legado como update e manteve o passivo do core"; fi
+  rm -rf "${d}"
+
+  # (g) `--auto` no caso oposto: baseline JÁ versionado → filtra (não re-emite, não perdoa local).
+  d="$(mktemp -d)"
+  git -C "${d}" init -q 2>/dev/null
+  mkdir -p "${d}/.claude/validation" "${d}/docs/meu"
+  : > "${d}/docs/meu/proprio.kg.yaml"
+  printf 'role: adopted\n' > "${d}/.claude/.onion-version"
+  printf '# misto\ndocs/discussions/x/y.kg.yaml::aaaa\ndocs/meu/proprio.kg.yaml::bbbb\n' \
+    > "${d}/.claude/validation/kg-verification-baseline.txt"
+  git -C "${d}" add -A >/dev/null 2>&1 || true
+  git -C "${d}" -c user.email=t@t -c user.name=t commit -q --no-verify -m "adoção anterior" >/dev/null 2>&1 || true
+  bash "${helper}" "${d}" >/dev/null 2>&1 || true
+  if grep -q 'docs/meu/proprio' "${d}/.claude/validation/kg-verification-baseline.txt" \
+     && ! grep -q 'docs/discussions/x' "${d}/.claude/validation/kg-verification-baseline.txt"; then
+    record_pass "regen-baselines: (auto) baseline já versionado → filtra, dívida local intacta"
+  else record_fail "regen-baselines: auto/ja-versionado" "re-emitiu no caminho de update (perdoaria dívida acumulada)"; fi
+  rm -rf "${d}"
+
   # (d) alvo sem maquinaria vendorizada → no-op silencioso (rc=0), não erro.
   d="$(mktemp -d)"
   rc=0; bash "${helper}" "${d}" >/dev/null 2>&1 || rc=$?
