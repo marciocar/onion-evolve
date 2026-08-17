@@ -693,6 +693,65 @@ run_aside_router_selftests() {
   fi
 }
 
+# Modo projection-name — REGRA 30 / P6 do projection-safety.sh. A invariante do TRECHO
+# PROJETADO: o que vem antes de " (" no `name:` do membro tem de ser o próprio slug.
+#
+# ORIGEM (2026-08-17, e é o PRESSUPOSTO da guarda que falhou, não um caso solto): a guarda de
+# projeção nasceu do vazamento do console em 07-10 e mira a ANOTAÇÃO entre parênteses — o trecho
+# ANTERIOR era tratado como seguro POR CONSTRUÇÃO, porque o gerador publica só ele. Um membro novo
+# com nome de cliente sob NDA nesse trecho vazou para o console publicado com a guarda VERDE: o
+# termo não era derivado (o próprio membro o introduzia) e a metade "segura" ninguém conferia.
+#
+# Os DOIS lados no mesmo conjunto, como manda o irmão projection-safety: o que DEVE reprovar (a) e
+# o que NÃO pode reprovar (b, c, d) — guarda que grita em caso legítimo é guarda que se desliga.
+run_projection_name_selftests() {
+  local helper="${SCRIPT_DIR}/projection-safety.sh"
+  [ -f "${helper}" ] || { record_fail "projection-name" "helper ausente"; return; }
+  local f out surf="${REPO_ROOT}/docs/onion/federation-console.html"
+  [ -e "${surf}" ] || surf="${REPO_ROOT}/docs/evolution/federation/members.yaml"
+
+  # (a) nome de TERCEIRO no trecho projetado → HARD NOME-PROJETADO. Este é o vazamento real.
+  f="$(mktemp)"
+  printf 'members:\n  - id: poc-x\n    name: Nome Comercial Alheio (rotulo — CONFIDENCIAL Acme)\n' > "${f}"
+  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)"
+  if printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
+    record_pass "projection-name: (a) nome de terceiro no trecho projetado → HARD"
+  else record_fail "projection-name: (a)" "nome de terceiro no trecho publicado NÃO foi pego"; fi
+  rm -f "${f}"
+
+  # (b) ISENÇÃO DECLARADA NO DADO → passa. A allowlist mora no members.yaml, não no script
+  #     vendorizado (a 1ª versão a punha no script e a REGRA 36 reprovou: id de adotante em
+  #     superfície que viaja para todo adotante é vazamento cross-tenant por adoção).
+  f="$(mktemp)"
+  printf 'members:\n  - id: poc-x\n    name: Nome Comercial Alheio (rotulo — CONFIDENCIAL Acme)\n    projection_name_exempt: true\n' > "${f}"
+  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)"
+  if ! printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
+    record_pass "projection-name: (b) projection_name_exempt no dado é honrado"
+  else record_fail "projection-name: (b)" "isenção declarada no membro foi ignorada"; fi
+  rm -f "${f}"
+
+  # (c) VARIAÇÃO DE CAIXA do próprio slug → passa sem isenção. É o mesmo nome, não terceiro.
+  f="$(mktemp)"
+  printf 'members:\n  - id: acme-slug\n    name: AcmeSlug (rotulo — CONFIDENCIAL Acme)\n' > "${f}"
+  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)"
+  if ! printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
+    record_pass "projection-name: (c) variação de caixa do slug passa sem isenção"
+  else record_fail "projection-name: (c)" "falso-positivo em variação de caixa do próprio slug"; fi
+  rm -f "${f}"
+
+  # (d) (MUT) COMENTÁRIO DE FIM DE LINHA não conta — o gerador lê YAML com parser e o descarta.
+  #     A 1ª versão desta checagem não o descartava e acusou FALSO-POSITIVO num membro real cujo
+  #     `name:` traz a anotação "# id/name públicos = SÓ <slug>". Guarda que discorda do GERADOR
+  #     sobre o que é projetado está medindo outra coisa que não a superfície.
+  f="$(mktemp)"
+  printf 'members:\n  - id: acme-slug\n    name: acme-slug          # anotacao interna qualquer\n' > "${f}"
+  out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)"
+  if ! printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
+    record_pass "projection-name: (d) (MUT) comentário de fim de linha não é projeção"
+  else record_fail "projection-name: (d)" "comentário YAML tratado como nome projetado"; fi
+  rm -f "${f}"
+}
+
 run_vendor_scrub_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   local helper="${SCRIPT_DIR}/projection-safety.sh"
@@ -6696,6 +6755,70 @@ run_task_manager_hook_selftests() {
 # Modo githook — exercita .claude/utils/adopt/install-onion-githook.sh (padrão de
 # hook nativo Onion; ADR native-githooks-standard). Self-contained (mktemp -d).
 # ---------------------------------------------------------------------------
+# Modo regen-baselines — exercita .claude/utils/adopt/regen-baselines.sh.
+#
+# O QUE ESTA BANCADA PROTEGE (defeito MEDIDO em 2026-08-17): a adoção regenerava 1 de 5 baselines
+# de catraca, e numa adoção greenfield real o `kg-verification-baseline.txt` chegou com 47 chaves
+# de grafos do CORE → o lint do adotante nasceu com 47 HARD cobrando nós que ele nunca teve. O
+# caso (b) abaixo é ESSE defeito, reduzido a fixture: se alguém quebrar a regeneração, ele volta.
+run_regen_baselines_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh"
+  if [ ! -f "${helper}" ]; then record_fail "regen-baselines" "helper ausente: ${helper}"; return; fi
+  local d rc out
+
+  # (a) recusa rodar no CORE (role: source) — ali o baseline é o LEDGER da dívida própria.
+  #     ⚠️ Este caso nasceu de um defeito meu: a 1ª guarda lia o ARQUIVO .onion-version e ficava
+  #     MUDA no core (que não tem o arquivo — ali o papel é COMPUTADO). Passou por idempotência,
+  #     não por verificação. Por isso o teste checa o rc, não a ausência de dano.
+  out="$(bash "${helper}" "${REPO_ROOT}" 2>&1)"; rc=$?
+  if [ "${rc}" -eq 2 ] && printf '%s' "${out}" | grep -q 'CORE'; then
+    record_pass "regen-baselines: recusa no core (role: source computado pela autoridade)"
+  else record_fail "regen-baselines: guarda do core" "rc=${rc} (esperado 2) — regeneraria o ledger do core"; fi
+
+  # (b) O DEFEITO ORIGINAL: baseline herdado com paths do core → regenerado para o corpus do ALVO.
+  d="$(mktemp -d)"
+  git -C "${REPO_ROOT}" archive HEAD -- .claude/validation 2>/dev/null | tar -x -C "${d}" 2>/dev/null
+  printf 'role: adopted\n' > "${d}/.claude/.onion-version"
+  printf '# herdado do core\ndocs/discussions/x/proto/y.kg.yaml::15c1995fb0f2\n' \
+    > "${d}/.claude/validation/kg-verification-baseline.txt"
+  bash "${helper}" "${d}" >/dev/null 2>&1
+  if ! grep -q 'docs/discussions/x/proto' "${d}/.claude/validation/kg-verification-baseline.txt"; then
+    record_pass "regen-baselines: passivo de path do core sai do baseline do adotante"
+  else record_fail "regen-baselines: passivo herdado" "chave de path do core sobreviveu no alvo"; fi
+  rm -rf "${d}"
+
+  # (c) baseline SEM emissor resolvível → rc=3 (falha RUIDOSA) e baseline PRESERVADO.
+  #     Preservar é proposital: trocar passivo alheio por baseline VAZIO é pior — catraca vazia
+  #     não cobra nada e passa a mentir verde.
+  d="$(mktemp -d)"; mkdir -p "${d}/.claude/validation"
+  printf 'chave/orfa::deadbeef\n' > "${d}/.claude/validation/inventado-baseline.txt"
+  bash "${helper}" "${d}" >/dev/null 2>&1; rc=$?
+  if [ "${rc}" -eq 3 ] && grep -q 'deadbeef' "${d}/.claude/validation/inventado-baseline.txt"; then
+    record_pass "regen-baselines: sem emissor → rc=3 ruidoso e baseline preservado"
+  else record_fail "regen-baselines: sem emissor" "rc=${rc} (esperado 3) ou baseline virou vazio"; fi
+  rm -rf "${d}"
+
+  # (d) alvo sem maquinaria vendorizada → no-op silencioso (rc=0), não erro.
+  d="$(mktemp -d)"
+  bash "${helper}" "${d}" >/dev/null 2>&1; rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "regen-baselines: alvo sem .claude/validation é no-op (rc=0)"
+  else record_fail "regen-baselines: no-op" "rc=${rc} (esperado 0) em alvo sem maquinaria"; fi
+  rm -rf "${d}"
+
+  # (e) o relatório não pode sair DEFORMADO: `grep -c` sem casamento imprime 0 E sai 1, então
+  #     `grep -c || echo 0` emitia "0\n0" e quebrava a linha do relatório (defeito real, mesmo dia).
+  d="$(mktemp -d)"
+  git -C "${REPO_ROOT}" archive HEAD -- .claude/validation 2>/dev/null | tar -x -C "${d}" 2>/dev/null
+  printf 'role: adopted\n' > "${d}/.claude/.onion-version"
+  out="$(bash "${helper}" "${d}" 2>/dev/null | grep -c 'chave(s)' || true)"
+  local lines; lines="$(bash "${helper}" "${d}" 2>/dev/null | grep -c '^  [✓✗]' || true)"
+  if [ "${out}" = "${lines}" ] && [ "${out}" -gt 0 ]; then
+    record_pass "regen-baselines: uma linha por baseline (relatório não deformado)"
+  else record_fail "regen-baselines: relatório" "linhas com 'chave(s)'=${out} != linhas ✓/✗=${lines}"; fi
+  rm -rf "${d}"
+}
+
 run_githook_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/install-onion-githook.sh"
   local tpl="${REPO_ROOT}/.claude/utils/adopt/githook-pre-commit-onion.tpl"
@@ -9420,6 +9543,7 @@ run_session_velocity_selftests
 
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 run_githook_selftests
+run_regen_baselines_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).
 # Core-only: já pula gracioso sem plugins/ (ver função). O `|| true` é rede de segurança —
@@ -9589,6 +9713,7 @@ run_aside_router_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
+run_projection_name_selftests
 run_kg_reverify_schema_selftests() {
   # WIRE-IN 2026-08-13 (Elenxo de mecanismos, P5): o kg-reverify-schema-check.sh nasceu em
   # 2026-08-12 com selftest embutido (6 casos) e ZERO consumidores — o autor da guarda contra

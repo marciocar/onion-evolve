@@ -78,7 +78,17 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-[ ${#SURFACES[@]} -eq 0 ] && SURFACES=("${REPO_DIR}/site")
+# P3 na prática: a superfície default era SÓ `site/` — e o incidente que criou esta guarda foi o
+# vazamento do CONSOLE, que é projeção gerada e publicada. Medido em 2026-08-17: o console e o mapa
+# ficavam FORA da auditoria default, então a guarda nasceu cega justamente para a superfície do seu
+# próprio incidente de origem. Agora entram por padrão (ambos estavam limpos ao serem incluídos —
+# ampliar cobertura aqui não trocou verde por vermelho, só deixou de ser cego).
+if [ ${#SURFACES[@]} -eq 0 ]; then
+  SURFACES=("${REPO_DIR}/site")
+  for extra in "${REPO_DIR}/docs/onion/federation-console.html" "${REPO_DIR}/docs/onion/federation-map.md"; do
+    [ -e "${extra}" ] && SURFACES+=("${extra}")
+  done
+fi
 
 # ── run_audit — auditoria compartilhada (P2/P3/P4) ───────────────────────────
 # Varre as SURFACES contra TERMS_CI (nomes, caixa-insensível — pegam identificador)
@@ -356,6 +366,76 @@ if [ "${n_terms}" -lt 2 ]; then
   echo "  (P5) Sem termos a guarda passaria verde para sempre: é NO-OP, não aprovação."
   echo "  Confira o vocabulário de marcadores (${MARKERS}) contra members.yaml."
   exit 1
+fi
+
+# ── P6: o TRECHO PROJETADO do `name:` tem de ser o próprio slug ──────────────
+#
+# O PONTO CEGO QUE ESTE BLOCO FECHA (medido 2026-08-17, e é o pressuposto da guarda, não um caso):
+# a convenção do console é publicar só o que vem ANTES de " (" no `name:` — o parêntese é anotação
+# interna. Toda a força desta guarda mira a ANOTAÇÃO; o trecho anterior era tratado como seguro
+# POR CONSTRUÇÃO. E foi ali que um nome de cliente sob NDA entrou e APARECEU no console publicado,
+# com a guarda verde: o termo não era derivado (o próprio membro o introduzia) e a metade "segura"
+# não era conferida por ninguém.
+#
+# ⚠️ POLARIDADE, que é o que faz esta guarda funcionar: NÃO é lista de nomes proibidos — essas falham
+# pelo VOCABULÁRIO (o nome novo nunca está nela; 4 ocorrências dessa classe nesta casa). É a
+# INVARIANTE "projetado == slug" com allowlist de ids ISENTOS, que falha FECHADA: membro novo tem de
+# cumprir, e a isenção é ato deliberado com motivo escrito. O modo-de-falha vira excesso de bloqueio,
+# que é visível, em vez de vazamento, que não é.
+#
+# Normalização: minúsculas, só alfanumérico — variação de CAIXA do próprio slug é o mesmo nome, não
+# nome de terceiro, então passa sem precisar de isenção.
+#
+# A ISENÇÃO SE DECLARA NO DADO, NÃO NO CÓDIGO: `projection_name_exempt: true` no membro. A 1ª versão
+# trazia a allowlist como variável AQUI e a REGRA 36 (vendor-scrub) a reprovou com razão — este script
+# é VENDORIZADO e viaja para todo adotante, então id de adotante escrito nele é vazamento cross-tenant
+# por adoção. Declarar no members.yaml é melhor por dois motivos, não um: não há id em código vendorizado,
+# e a isenção fica visível na revisão do próprio membro que ela isenta.
+p6_bad="$(awk '
+  function norm(s) { s=tolower(s); gsub(/[^a-z0-9]/,"",s); return s }
+  /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ {
+    if (cur_id != "") check()
+    cur_id=$0; sub(/^[[:space:]]*-[[:space:]]*id:[[:space:]]*/,"",cur_id); sub(/[[:space:]]*(#.*)?$/,"",cur_id)
+    cur_name=""; cur_exempt=0; next
+  }
+  /^[[:space:]]+projection_name_exempt:[[:space:]]*true[[:space:]]*(#.*)?$/ { if (cur_id != "") cur_exempt=1; next }
+  /^[[:space:]]+name:[[:space:]]*/ {
+    if (cur_id != "" && cur_name == "") {
+      cur_name=$0; sub(/^[[:space:]]+name:[[:space:]]*/,"",cur_name)
+      # ⚠️ COMENTÁRIO DE FIM DE LINHA sai ANTES de qualquer coisa. O gerador do console lê o YAML
+      # com parser (que descarta o comentário), então comentário NÃO é projetado — e a 1ª versão
+      # desta checagem, que não o descartava, acusou FALSO-POSITIVO num membro cujo `name:` traz
+      # justamente a anotação "# id/name públicos = SÓ <slug>". Guarda que discorda do gerador
+      # sobre o que é projetado mede outra coisa que não a superfície.
+      sub(/[[:space:]]+#.*$/,"",cur_name)
+      sub(/[[:space:]]+$/,"",cur_name)
+      gsub(/^["'"'"']|["'"'"']$/,"",cur_name)
+    }
+    next
+  }
+  END { if (cur_id != "") check() }
+  function check() {
+    if (cur_name == "") return
+    if (cur_exempt) return
+    short=cur_name; sub(/ \(.*$/,"",short)
+    if (norm(short) != norm(cur_id)) printf "%s\t%s\n", cur_id, short
+  }
+' "${MEMBERS}" 2>/dev/null || true)"
+
+if [ -n "${p6_bad}" ]; then
+  while IFS="$(printf '\t')" read -r bid bshort; do
+    [ -n "${bid}" ] || continue
+    if [ "${FORMAT}" = "tsv" ]; then
+      printf 'HARD\tNOME-PROJETADO\tdocs/evolution/federation/members.yaml\tmembro %s projeta "%s" (trecho antes do parêntese) em vez do slug — esse trecho VAI para o console/mapa publicados; use o id e deixe o rótulo humano DENTRO do parêntese (P6)\n' "${bid}" "${bshort}"
+    else
+      echo "✗ HARD projection-safety (P6): membro '${bid}' projeta \"${bshort}\", não o slug."
+      echo "  O trecho antes de \" (\" é o que o console/mapa PUBLICAM. Nome de terceiro ali vaza com a guarda verde."
+      echo "  Corrija em members.yaml:  name: ${bid} (<rótulo humano aqui dentro>)"
+    fi
+  done <<EOF
+${p6_bad}
+EOF
+  [ "${FORMAT}" = "tsv" ] || exit 1
 fi
 
 if [ "${FORMAT}" = "tsv" ]; then
