@@ -1,6 +1,6 @@
 ---
 branch: feat/adopt-seeds-first-graph
-pr: 0
+pr: 629
 date: 2026-08-17
 reviewed_diff_sha256: 75e84b8aff60db21a2c8cbd54d3275fddfefe4f3fa8871d6eeb5940ed5330a4f
 findings_total: 4
