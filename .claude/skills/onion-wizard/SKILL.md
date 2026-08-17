@@ -56,6 +56,10 @@ Movimentos longos (adopt faseado) são retomáveis — o próprio `/meta:adopt` 
 `.claude/sessions/adopt-<slug>/STATE.md`. Não duplique: delegue e deixe o comando retomar.
 
 ## Elenxo — auto-refutável e poroso
+
+> *Elenxo* é o método do Onion: a fonte-única que **se refuta em público** para se superar (5 etapas
+> obrigatórias). Definição completa:
+> [`onion-elenxo-doctrine.md`](../../../docs/knowledge-base/concepts/onion-elenxo-doctrine.md).
 - **Mostre o raciocínio** de cada recomendação (por que `hub` e não `standalone`) — o maestro pega um erro seu.
 - **Admita a fronteira:** o que é gated (convite/transferência/desacople) você **não** executa — diga isso e
   aponte o caminho manual, sem fingir que faz.

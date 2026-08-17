@@ -79,6 +79,10 @@ virar hub; deixa eu te conduzir" → wizard.
 
 ## Elenxo — admita a fronteira
 
+> *Elenxo* é o método do Onion: a fonte-única que **se refuta em público** para se superar (5 etapas
+> obrigatórias). Definição completa:
+> [`onion-elenxo-doctrine.md`](../../../docs/knowledge-base/concepts/onion-elenxo-doctrine.md).
+
 - **Não finja completude:** aponte o que se aprende **usando/perguntando**, não lendo ("isto você pega no 1º
   adopt real"). Onboarding honesto marca o que não cobre.
 - **Distinga-se do wizard sempre:** se a pessoa quer FAZER agora, não ensine em círculos — **entregue ao

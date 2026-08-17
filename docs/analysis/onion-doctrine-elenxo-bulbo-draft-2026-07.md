@@ -1,8 +1,27 @@
-# [RASCUNHO — GATED, não publicar] Elenxo & Bulbo — a fonte-da-verdade que se refuta em público
+# [GRADUADO — superado, preservado] Elenxo & Bulbo — a fonte-da-verdade que se refuta em público
 
-> Rascunho da 1ª página da área de doutrinas do Onion. **Gated**: aguarda alinhamento do maestro
-> (crítica em andamento) + a área de publicação de doutrinas ainda não existe. Não é superfície
-> pública nem vendorizada. Montado por workflow (5 agentes, ciência verificada).
+> ## ⬆️ Este rascunho GRADUOU em 2026-08-17
+>
+> **SSOT viva:** `docs/knowledge-base/concepts/onion-elenxo-doctrine.md` — a doutrina graduada para a
+> **KB vendorizada**, que viaja a todo adotante sem escopo de path.
+>
+> **O gatilho da graduação foi um defeito de alcance medido em adoção de campo:** a definição
+> prescritiva do Elenxo (as 5 etapas) morava só na skill `onion-patterns`, escopada por
+> `paths: [".claude/**", "docs/onion/**"]` — enquanto a *palavra* viajava solta em 4 KBs vendorizadas
+> como termo estabelecido. Um adotante real encontrou o termo em prosa normativa, não tinha definição
+> alcançável, e teve de grepar o repositório.
+>
+> **Este arquivo fica.** Não por arquivo morto: por *Aufhebung* — a superação cancela, **preserva** e
+> eleva. É a versão autobiográfica, em 1ª pessoa, que a KB destilou; e apagá-la depois de superada
+> transformaria a vitrine em propaganda, que é exatamente o que a doutrina proíbe.
+>
+> **Fronteira que permanece gated:** a graduação foi para a superfície **vendorizada** (adotantes),
+> **não** para a superfície **pública**. A área pública de doutrinas segue sendo decisão do maestro.
+
+---
+
+> Rascunho original (2026-07-22) da 1ª página da área de doutrinas do Onion. Montado por workflow
+> (5 agentes, ciência verificada).
 
 ---
 

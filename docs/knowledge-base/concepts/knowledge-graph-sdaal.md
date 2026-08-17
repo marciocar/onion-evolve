@@ -118,7 +118,7 @@ camadas** (campo `layer`, default `audit` — retrocompatível):
     vivo AGORA e alguém precisa reconciliar"* — não *"um run devolveu veredito DRIFTED"*. Se o
     label já foi atualizado com a verdade medida, o nó **não** é `drifted`: ele é `confirmed`, e o
     veredito do run vira a **aresta** `SUPERSEDES` + o nó da posição superada. Confundir os dois é
-    erro medido (Elenxo 2026-08-07): produz nó `drifted` que não diverge de nada, ocupa o topo do
+    erro medido ([Elenxo](onion-elenxo-doctrine.md) 2026-08-07): produz nó `drifted` que não diverge de nada, ocupa o topo do
     radar e — porque a guarda de reconciliação só conta superseder `confirmed` — deixa a aresta
     recém-criada **invisível**, um fail-open.
 - **migalha unificada**: aresta `TRACES_TO` → `{file:line | task | commit | env | reason | snapshot}`

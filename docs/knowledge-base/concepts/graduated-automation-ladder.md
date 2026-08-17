@@ -2,7 +2,7 @@
 
 > **Status: CANDIDATO** — esta KB **não inventa doutrina**: ela **nomeia e unifica** uma escada que o Onion
 > já sobe, espalhada em ~6 docs que nunca se citaram como família. Entra no core **por uso** (padrão
-> `candidato`). O movimento Elenxo que a gerou vive no grafo:
+> `candidato`). O movimento [Elenxo](onion-elenxo-doctrine.md) que a gerou vive no grafo:
 > `graduated-automation-elenxo-2026-07.kg.yaml` (grafo interno do core; não vendorizado) — **em síntese:**
 > nele os claims C1/C2/C3 ("temos automação graduada" / "AUTOMATE pronto" / "a escada está completa") são
 > **refutados**, e a superação (nomear a escada única, mecanizar os degraus baixos, deixar AUTOMATE ser ganho)

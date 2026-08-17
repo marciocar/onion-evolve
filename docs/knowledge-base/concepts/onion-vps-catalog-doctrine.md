@@ -16,7 +16,7 @@
 | **Versão** | 1.0.0 |
 | **Data de Criação** | 2026-08-05 |
 | **Categoria** | Conceitos |
-| **Origem** | Elenxo de framing F0 (2026-07-31, `wf_8a8eca55`, 2 steelman + 1 juiz Opus) → `D_framing_catalogo`; endurecida pela reprovação de F2 (`stack-harmonia-2026-08`) e pelo incidente de exposição de rede (2026-08-05) |
+| **Origem** | [Elenxo](onion-elenxo-doctrine.md) de framing F0 (2026-07-31, `wf_8a8eca55`, 2 steelman + 1 juiz Opus) → `D_framing_catalogo`; endurecida pela reprovação de F2 (`stack-harmonia-2026-08`) e pelo incidente de exposição de rede (2026-08-05) |
 | **Comando/artefato relacionado** | `onion-vps-logto` (esqueleto de referência vivo) · `onion-vps-docker-firewall` (contenção durável) · adapters `task-manager`/`forge` (precedente 1→N sem registry) |
 | **Lei (L0)** | [`integrations.md`](../../meta-specs/integrations.md) — esta KB **cita**, não recopia; **não é** um 2º site-de-edição da lei |
 | **Padrão-pai** | [Doutrina de Abstração](onion-abstraction-doctrine.md) (o Teste do Eixo que cada tool corre) · `onion-adr-sdaal-nested-two-level-2026-07` (ADR de análise do core — recursão canal→solução) |
