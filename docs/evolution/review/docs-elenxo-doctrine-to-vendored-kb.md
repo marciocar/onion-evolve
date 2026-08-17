@@ -2,14 +2,14 @@
 branch: docs/elenxo-doctrine-to-vendored-kb
 pr: 630
 date: 2026-08-17
-reviewed_diff_sha256: d99adfd142678ecc9b9c2f4497e52781aa52cf45ca2dff073ae845c4c95f6060
-findings_total: 5
-findings_real: 3
-findings_fixed: 2
+reviewed_diff_sha256: 28a13f04877f25a05131d5f1610c7315b0ba2ae9e149e734f44e19fdfc2b9234
+findings_total: 7
+findings_real: 5
+findings_fixed: 4
 tokens: 0
-duration_min: 40
-verdict: CONFORME-COM-UM-ACHADO-CONTRA-A-PROPRIA-CURA-E-UM-REGISTRADO-SEM-CURA
-reviewer: passada adversarial manual (3 ataques dirigidos) + medição no vivo; sem subagentes por restrição da sessão
+duration_min: 65
+verdict: CONFORME-DEPOIS-QUE-O-REVISOR-DO-CI-CORRIGIU-A-MINHA-PROPRIA-AUDITORIA
+reviewer: passada adversarial manual (3 ataques dirigidos) + revisor do CI (2 achados que a manual perdeu, ambos confirmados por medição) + medição no vivo; sem subagentes por restrição da sessão
 REVISOU: true
 ---
 
@@ -24,6 +24,13 @@ A passada adversarial foi **manual**, não orquestrada: esta sessão está sob r
 subagentes sem pedido explícito. Rodei **3 ataques dirigidos** ao meu próprio diff em vez de N lentes
 independentes. Isso é **menos** que uma refutação adversarial de verdade — e por isso **este PR não é
 um Elenxo**, é uma revisão. Usar o nome certo é a primeira exigência da doutrina que o PR entrega.
+
+> **E o limite não ficou teórico — ele cobrou.** O revisor do CI achou **2 defeitos reais que a minha
+> passada perdeu** (Achados 2-corrigido e 4), ambos confirmados por medição minha depois. Os dois são
+> da **mesma família do que eu estava curando**: link que não resolve, e contagem que não foi varrida
+> inteira. Uma lente sozinha — ainda que a minha, ainda que atenta — **não é fan-out de lentes
+> independentes**; e a etapa 1 do Elenxo existe exatamente porque *lente única não vê o próprio ponto
+> cego*. Este resíduo é a evidência empírica disso, colhida contra o autor.
 
 ## Achado 1 — o grafo não sabia que a doutrina graduou (REAL, curado)
 
@@ -54,24 +61,53 @@ autorizou vendorizar, não publicar.
 
 Radar depois: **exit 0**, 21 nós / 16 arestas, sem contradição estrutural.
 
-## Achado 2 — link morto que EU introduzi no plugin (REAL, registrado SEM cura)
+## Achado 2 — link morto que EU introduzi no plugin (REAL — e a MINHA CONTAGEM ESTAVA ERRADA)
 
-Ao ligar as 4 KBs à definição, o link em `knowledge-graph-sdaal.md` viajou para dentro do plugin
-(`plugins/onion-work-tools/kb/`), onde o alvo **não está embarcado**.
+> ### ⚠️ Correção deste achado, feita depois que o revisor do CI me pegou
+>
+> A versão original desta seção dizia **"o meu é o 5º de uma classe pré-existente"** — contando **1
+> link novo**. **Errado, e medido:** eram **3**. O revisor do CI achou os outros dois — as skills
+> `onion-onboarding` e `onion-wizard` **também** são embarcadas no plugin, e o link que eu pus nelas
+> foi copiado sem a profundidade extra de `plugins/onion-work-tools/`, resolvendo para
+> `plugins/docs/knowledge-base/…` (confirmado inexistente por `realpath` + `ls`).
+>
+> Meu erro de método foi específico: verifiquei o link **na KB** e supus que as **skills** herdavam a
+> mesma resolução. Não herdam — vivem em profundidade diferente dentro do plugin. **Um resíduo que
+> conta errado sobre si mesmo é pior que um resíduo ausente**, porque dá impressão de auditoria.
+>
+> **Curado, pelo mecanismo que o assembler já oferecia** (não por máquina nova): a doutrina entrou em
+> `DOCS=()` do manifesto, então ela **embarca** em `kb/` e o rewrite converte as referências para
+> `${CLAUDE_PLUGIN_ROOT}/kb/onion-elenxo-doctrine.md`. Os **3** links novos resolvem.
+>
+> ### E o preço da cura, que eu também não tinha medido
+>
+> Embarcar a doutrina trouxe junto a seção **"🔗 Relacionados"** dela — **7 irmãs que não estão no
+> plugin**. Placar medido, sem arredondar:
+>
+> | Momento | Links mortos em `plugins/onion-work-tools/kb/` |
+> |---|---|
+> | Antes deste PR | **4** (`inference-mitigation`, `onion-dogfooding-doctrine`, `onion-guardrails`, `specification-driven-ai-abstraction-layer`) |
+> | Depois da cura | **11** (as 4 acima + as 7 "Relacionados" da doutrina) |
+>
+> **Mantive assim, e a razão é declarada:** o que se ganha é a **definição presente e legível** dentro
+> do plugin — que é o propósito inteiro deste PR — e o que se perde são links de **rodapé**. Conteúdo
+> degradado, não conteúdo quebrado. Mas **o número piorou**, e enterrar isso seria exatamente a
+> propaganda que a doutrina proíbe. **Decisão do maestro** se o plugin deve embarcar as 7 irmãs,
+> deixar assim, ou o assembler passar a converter link-de-irmã-não-embarcada em plain-text.
 
-Medi antes de reagir, e a medição mudou a conclusão: o plugin **já convivia com 4 links mortos da
-mesma forma** (`inference-mitigation`, `onion-dogfooding-doctrine`, `onion-guardrails`,
-`specification-driven-ai-abstraction-layer`). O meu é o **5º de uma classe pré-existente**, não um
-defeito novo que eu criei.
+**O que aconteceu.** Ao ligar as 4 KBs e as 2 skills à definição, esses links viajaram para dentro do
+plugin (`plugins/onion-work-tools/`), onde o alvo **não estava embarcado**.
 
-**A lacuna real é de guarda:** `kb-vendored-link-check.sh` varre `docs/knowledge-base/**` e **não**
-varre `plugins/**/kb/`. É a mesma família dos três pontos cegos de filtro de path desta casa
-(`plugins/` #241, `docs/` #254, `ops/` #509) — e repare que o **primeiro deles foi exatamente
-`plugins/`**.
+**A lacuna estrutural, que a cura NÃO fecha:** `kb-vendored-link-check.sh` varre
+`docs/knowledge-base/**` e **não** varre `plugins/**/kb/`. Por isso o lint passou verde nas duas
+vezes em que eu estava errado — nem no meu primeiro erro (3 links), nem no segundo (11 links). Foi
+**revisor humano-equivalente**, não guarda, que pegou; e o gate seguiu verde o tempo todo.
 
-**Não curei**, e a escolha é declarada: embarcar mais doutrina no plugin resolve 1 dos 5, e estender a
-guarda a `plugins/**/kb/` é mecanismo novo que o maestro não pediu. Registro para não ser redescoberto
-como surpresa — e porque a métrica honesta aqui é **5 links mortos**, não 4.
+É a mesma família dos três pontos cegos de filtro de path desta casa (`plugins/` #241, `docs/` #254,
+`ops/` #509) — e repare qual foi o **primeiro** deles: `plugins/`. **Quarta ocorrência da classe.**
+
+Estender a guarda a `plugins/**/kb/` é mecanismo novo que o maestro não pediu; fica **registrado sem
+cura**, com o número honesto na tabela acima.
 
 ## Achado 3 — `8 skills` onde são 11 (REAL, curado de passagem)
 
@@ -80,6 +116,21 @@ de deriva de contagem **não pega** essa forma composta — pegou os `90 → 91`
 passou reto pelo número de skills ao lado.
 
 Curado. Fica o registro de que a regra de contagem tem cobertura desigual por recurso.
+
+## Achado 4 — varri os TOTAIS e esqueci o SUB-TOTAL (REAL, curado)
+
+Também do revisor do CI: `docs/INDEX.md:29` dizia **"49 em `concepts/`"**. São **50** (`find`), porque
+este PR acrescenta um arquivo a esse diretório. Eu tinha atualizado as **duas contagens-total** da
+mesma hunk (`90→91` KBs, `91→92` arquivos) e passado reto pelo **sub-total logo abaixo**.
+
+E o revisor pegou **um** dos dois sítios: a **linha 104** (a árvore ASCII) dizia 49 também. Curei os
+dois.
+
+**Terceira vez, no mesmo PR, com o mesmo eixo.** O `INDEX.md` avisa de si mesmo na linha 598 que a
+cura anterior desta classe *"parou em 1/4"* — eu li esse aviso, citei-o no PR body como se fosse
+lição aprendida, e **reincidi na linha seguinte do mesmo arquivo**. Ler o aviso não é o mecanismo;
+enquanto não houver feeder de lint para sub-totais de `docs/<seção>`, a única cura é **conferir a
+soma**, não confiar na varredura.
 
 ## Os dois ataques que não acharam nada (e por isso valem)
 

@@ -177,6 +177,7 @@
 - onion-testing **requires** agent:test-engineer
 - onion-testing **requires** agent:test-planner
 - onion-work-tools **loads** embed:kb/knowledge-graph-sdaal.md
+- onion-work-tools **loads** embed:kb/onion-elenxo-doctrine.md
 - onion-work-tools **loads** when:diary -> run:validation/diary-index.sh
 - onion-work-tools **loads** when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)
 - onion-work-tools **loads** when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)
@@ -571,6 +572,7 @@ onion-testing	requires	agent:test-agent
 onion-testing	requires	agent:test-engineer	
 onion-testing	requires	agent:test-planner	
 onion-work-tools	loads	embed:kb/knowledge-graph-sdaal.md	
+onion-work-tools	loads	embed:kb/onion-elenxo-doctrine.md	
 onion-work-tools	loads	when:diary -> run:validation/diary-index.sh	
 onion-work-tools	loads	when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)	
 onion-work-tools	loads	when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)	

@@ -26,7 +26,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **642 arquivos markdown** em `docs/`
 - **21 arquivos** em `docs/onion/` (Sistema Onion)
 - **92 arquivos** em `docs/knowledge-base/` (Knowledge Bases: 91 KBs — conteúdo + (sub)categoria READMEs — + `index.md`)
-  - 49 em `concepts/` (Conceitos fundamentais)
+  - 50 em `concepts/` (Conceitos fundamentais)
   - 9 em `frameworks/` (Frameworks e metodologias)
   - 6 em `tools/` (Ferramentas, incl. Agent Skills, PostgreSQL e VPS Tool Repo Skeleton)
   - 3 em `platforms/`, 3 em `patterns/`, 1 em `architectures/`, 2 em `meta/`
@@ -101,7 +101,7 @@ docs/
 │   └── sistema-engenharia-reversa-guia-uso.md  # Engenharia reversa
 │
 ├── knowledge-base/             # Knowledge Bases (91 arquivos, incl. index)
-│   ├── concepts/               # Conceitos fundamentais (49 arquivos)
+│   ├── concepts/               # Conceitos fundamentais (50 arquivos)
 │   ├── frameworks/             # Frameworks e metodologias (9 arquivos)
 │   ├── platforms/              # Plataformas e tecnologias (3 arquivos)
 │   ├── tools/                  # Ferramentas e recursos (6 arquivos)
