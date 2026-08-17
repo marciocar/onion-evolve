@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 101 entradas · **Stale:** 0 · **Compartilháveis:** 89 · **Com significância:** 41
+**Total:** 102 entradas · **Stale:** 0 · **Compartilháveis:** 90 · **Com significância:** 42
 
 Gerado em: 2026-08-17
 
@@ -14,6 +14,7 @@ Gerado em: 2026-08-17
 |---|---|---|---|---|---|---|
 | 2026-08-17 | error | collective 📤 | teste-do-gatilho-contra-a-propria-proposta | Propus construir uma guarda de base-de-branch e só rodei o Teste do Gatilho quando o maestro perguntou 'o que o Onion pede e tem valor de fato nisso?'. O teste REPROVOU a minha própria proposta em três frentes. A diretriz de rodar esse teste ANTES de propor existe como memória desde 05/08 — o problema não é conhecimento, é APLICAÇÃO, e o gatilho eficaz continua sendo social. | 2026-11-17 | static |
 | 2026-08-17 | error | collective 📤 | o-mecanismo-confiava-no-proprio-pressuposto | Uma adoção real de campo achou DOIS defeitos com a mesma forma: em ambos o comentário do mecanismo descrevia o modo-de-falha com precisão, e a máquina não alcançava o que a prosa dizia. O passo do adopt que regenerava 1 de 5 baselines trazia escrito ao lado 'o gate nasceria reprovando o adotante no dia 1 e seria desligado'; a guarda de projeção auditava a anotação entre parênteses e tratava como segura, por construção, exatamente a metade do campo que o gerador publica. Prosa certa não é guarda. | 2026-11-17 | static |
+| 2026-08-17 | error | collective 📤 | minha-auditoria-contou-1-onde-eram-3 | Escrevi um resíduo de revisão auto-auditando meu PR com rigor — e o resíduo CONTAVA ERRADO sobre si mesmo: declarei 1 link morto novo onde eram 3. Quem me pegou foi o revisor do CI, não eu, e o defeito era da MESMA família que o PR estava curando. É evidência empírica, colhida contra o autor, de por que a etapa 1 do Elenxo exige lentes INDEPENDENTES: lente única não vê o próprio ponto cego — nem quando está explicitamente procurando por ele. | 2026-11-17 | static |
 | 2026-08-17 | observation | collective 📤 | cron-da-bancada-e-a-rede-por-provar | A bancada saiu do gate de todo PR (12 min → 49s) atrás de um filtro de path — e filtro de path já criou TRÊS pontos cegos nesta casa. A rede que o justifica é um cron noturno que AINDA NÃO DISPAROU. Enquanto não disparar, o filtro está nu e eu não sei disso. | 2026-08-18 | dynamic |
 | 2026-08-16 | error | collective 📤 | elenxo-reduzido-ao-revisor | Chamei o MÉTODO pelo nome de uma das suas jogadas: 'Elenxo' virou, na minha boca, 'subagente que ataca'. Medido: 12 nós criados na sessão, ZERO com review_after; zero entradas de diário numa sessão densa de achados. Rodei o corpo sem o relógio — e quem pegou foi o maestro, gate social, não instrumento. | 2026-11-16 | static |
 | 2026-08-16 | learning | collective 📤 | dogfood-que-refutou-a-propria-cura | Rodei o dogfood que reabriria um NÃO CONSTRUIR de 14 dias e o resultado foi 3/3 NÃO MUDOU — a sessão-controle achou o grafo sozinha nos três casos, uma delas citando nó com arquivo:linha. O gate não reabre. E o desenho do meu teste tinha um limite que eu só vi depois: testei 'acha quando perguntado', não 'consulta enquanto ocupado' — que é o modo de falha real. | 2026-10-16 | dynamic |
