@@ -2,7 +2,7 @@
 date: 2026-08-17
 instance: onion-evolve
 type: error
-classification: collective 📤
+classification: collective
 tags: [auto-auditoria, lente-unica, residuo-r56, revisor-do-ci, ponto-cego, contagem, reincidencia, elenxo-etapa-1]
 affects: [meta, engineering, validation]
 breadcrumb_for: []
