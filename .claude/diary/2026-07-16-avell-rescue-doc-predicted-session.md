@@ -2,7 +2,7 @@
 date: 2026-07-16
 instance: onion-evolve
 type: learning
-classification: public 📤
+classification: public
 tags: [rescue, avell, coexistence, in-repo-knowledge, prediction, dogfood, git]
 affects: [identity, infra, method]
 breadcrumb_for: [catch-up, meta:kg, meta:co-evolve]

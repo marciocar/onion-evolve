@@ -64,6 +64,20 @@ while IFS= read -r f; do
       ;;
   esac
 
+  # classification: enum EXATO na LINHA INTEIRA — não só no campo 2. O awk acima ($2) engolia
+  # sufixo em silêncio: `collective 📤` lia como `collective` e o defeito ficava invisível. O 📤
+  # é o SHARE_MARKER que ESTE script acrescenta ao índice (projeção) — escrevê-lo no frontmatter
+  # é copiar a projeção para dentro da fonte (fonte≠derivação invertido). 3 ocorrências até
+  # 2026-08-18 (2 de 07-16 + 1 de 08-17): recorrência vira mecanismo, não nota.
+  CLASS_LINE=$(awk '/^classification:/{sub(/^classification:[ ]*/, ""); print; exit}' "$f" 2>/dev/null || echo "")
+  case "$CLASS_LINE" in
+    public|protected|collective) : ;;
+    *)
+      echo "ERRO: $(basename "$f"): classification '${CLASS_LINE}' inválida — enum exato public|protected|collective; marcador de exibição (📤/⏰) pertence ao ÍNDICE, nunca ao frontmatter" >&2
+      INVALID=$((INVALID + 1))
+      ;;
+  esac
+
   CCLASS=$(awk '/^conflict_class:/{print $2; exit}' "$f" 2>/dev/null || echo "")
   VWHEN=$(awk '/^valid_when:/{sub(/^valid_when:[ ]*/, ""); print; exit}' "$f" 2>/dev/null || echo "")
   if [ -n "$CCLASS" ]; then
