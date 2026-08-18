@@ -9023,6 +9023,19 @@ run_diary_crumbs_selftests() {
      && ! grep -q 'significance: "' "${d}/.claude/diary/index.md"; then
     record_pass "diary-crumbs: significance não-vazia → surfaça no índice (pipe escapado, aspas removidas)"
   else record_fail "diary-crumbs: significance não-vazia" "esperava a frase no índice com '|' virando '/'; rc=${rc}"; fi
+  rm -f "${d}/.claude/diary/2026-01-09-sig-entry.md"
+
+  # (h) MARCADOR DE EXIBIÇÃO NO FRONTMATTER → FALHA alto (guarda de 2026-08-18). O 📤 é o
+  # SHARE_MARKER que o PRÓPRIO diary-index.sh acrescenta ao índice — escrevê-lo na fonte é
+  # projeção copiada para dentro da origem (fonte≠derivação invertido). O drift real: 3
+  # migalhas com `classification: collective 📤` passaram batido porque o awk lia só o $2 e
+  # engolia o sufixo em silêncio. A guarda valida a LINHA inteira contra o enum.
+  printf -- '---\ndate: 2026-01-10\ntype: learning\nclassification: collective 📤\nreview_after: 2099-01-01\nconflict_class: static\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-10-marker-in-source.md"
+  rc=0; out="$(bash "${di}" "${d}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q "pertence ao ÍNDICE"; then
+    record_pass "diary-crumbs: (h) marcador 📤 no frontmatter → exit 1 (projeção não entra na fonte)"
+  else record_fail "diary-crumbs: (h) marcador na fonte" "esperava exit 1 + erro nomeado; rc=${rc} out='$(printf '%s' "${out}" | head -2)'"; fi
 
   rm -rf "${d}"
 }

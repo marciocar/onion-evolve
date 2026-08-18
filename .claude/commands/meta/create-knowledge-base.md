@@ -107,58 +107,59 @@ Use `@research-agent` ou `WebSearch` para coletar:
 
 ### Fase 3 — Geração
 
-Salve em `docs/knowledge-base/<category>/<slug-do-topic>.md` seguindo o template:
+Salve em `docs/knowledge-base/<category>/<slug-do-topic>.md`.
+
+> **Escolha a FAMÍLIA antes do template** (corrigido em 2026-08-18, medido): a versão anterior
+> deste comando prescrevia UM template rígido que **apenas 2 das 86 KBs** do corpus seguiam — o
+> gerador descrevia uma forma que 2% usava, e faria a próxima KB nascer fora de família. As
+> famílias REAIS, medidas por seção-assinatura: **38 REFERÊNCIA** · **5 DOUTRINA** (as demais são
+> variações livres sobre o núcleo comum). O invariante é o **núcleo**, não a lista de seções.
+
+**Núcleo comum (obrigatório nas duas famílias):** título → bloco `## 📋 Metadata` (Versão, Data,
+Categoria, Fontes) → seções temáticas → fecho com integrações/relacionados. Cite fontes com URL;
+conteúdo sem fonte marcado `[INFERÊNCIA]`.
+
+**FAMÍLIA A — REFERÊNCIA TÉCNICA** (default; a forma dominante do corpus). Para temas externos:
+ferramenta, API, framework, prática de mercado. As seções abaixo são **sugestão de cobertura, não
+contrato** — inclua as que o tema pede, corte as que não fazem sentido:
 
 ```markdown
 # {{topic}} - Knowledge Base
 
----
-
 ## 📋 Metadata
-
 | Campo | Valor |
 |-------|-------|
 | **Versão** | 1.0.0 |
 | **Data de Criação** | YYYY-MM-DD |
-| **Última Atualização** | YYYY-MM-DD |
 | **Categoria** | {{category}} |
 | **Fontes Principais** | <lista numerada de URLs> |
 
----
-
-## 📋 Visão Geral
-[O que é, para que serve, contexto histórico se relevante]
-
-## 🎯 Casos de Uso
-- Caso 1 — quando aplicar
-- Caso 2 — quando aplicar
-- Anti-casos — quando NÃO aplicar
-
-## ⚡ Quick Start
-[Setup mínimo executável: comandos, código, configs]
-
-## 🔧 Configuração e uso
-[Configurações detalhadas, opções, integrações]
-
-## 💡 Best Practices
-[Recomendações validadas pela comunidade, com fonte]
-
-## ⚠️ Limitações e Gotchas
-[Pontos de atenção, bugs conhecidos, restrições]
-
+## 📋 Visão Geral          ← o que é, para que serve
+## 🎯 Casos de Uso          ← quando aplicar + anti-casos
+## ⚡ Quick Start           ← setup mínimo executável (se o tema é operável)
+## 💡 Best Practices        ← recomendações com fonte
+## ⚠️ Limitações e Gotchas  ← pontos de atenção, restrições
 ## 🔗 Integração com o Sistema Onion
-[Como esse tema se conecta a comandos/agentes/outras KBs do projeto]
-
 ## 🔗 Referências
-- [Fonte 1 - título](url)
-- [Fonte 2 - título](url)
-- KBs relacionadas: [<topic>](../<category>/<topic>.md)
-
----
-
-**Última atualização**: YYYY-MM-DD
-**Fonte principal**: <url>
 ```
+
+**FAMÍLIA B — DOUTRINA** (quando o tema é norma, critério ou método INTERNO que precisa poder
+**reprovar** — ex.: `onion-abstraction-doctrine`, `onion-elenxo-doctrine`). A forma segue o
+grupo-par das doutrinas existentes:
+
+```markdown
+# <Nome da doutrina> — <a tese em meia linha>
+
+## 📋 Metadata               ← inclui Origem (o dano/medição que a motivou) e réguas irmãs
+## 🎯 Por que esta doutrina existe   ← o incidente/medição fundador, não abstração
+## <A régua>                 ← as condições/etapas com O QUE REPROVA cada uma
+## <Limites declarados>      ← onde NÃO há gate mecânico e por quê (medido, não presumido)
+## 🧭 Invariantes            ← numerados, verificáveis
+## 🔗 Relacionados           ← as doutrinas irmãs por link relativo
+```
+
+> Nova forma que não cabe em A nem B? Compare com a **família** mais próxima do corpus antes de
+> inventar — a régua de alinhamento é o grupo-par real, nunca este arquivo isolado.
 
 ---
 
@@ -172,7 +173,7 @@ Salve em `docs/knowledge-base/<category>/<slug-do-topic>.md` seguindo o template
 📁 Arquivo: docs/knowledge-base/<category>/<slug>.md
 
 📊 CONTEÚDO:
-   ∟ Seções: 8
+   ∟ Família: <REFERÊNCIA | DOUTRINA> · Seções: <n>
    ∟ Linhas: ~N (< 400)
    ∟ Referências: N
 

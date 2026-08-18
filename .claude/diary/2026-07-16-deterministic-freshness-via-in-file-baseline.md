@@ -2,7 +2,7 @@
 date: 2026-07-16
 instance: onion-evolve
 type: innovation
-classification: public 📤
+classification: public
 tags: [kg-sdaal, freshness, determinism, gate-design, kg-radar, verified_at]
 affects: [meta, engineering]
 breadcrumb_for: [meta:kg, meta:evolve]

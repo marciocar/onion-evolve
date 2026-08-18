@@ -67,20 +67,26 @@ nodes:
     label: "VALOR 1 FEITO — o assembler converte link-de-irma-NAO-embarcada em plain-text no empacotamento; a classe virou IMPOSSIVEL por construcao (caso (e4) na bancada guarda a regressao)"
   - id: D_ALINHAR_GERADOR_DE_KB
     node_type: decision
+    trace: .claude/commands/meta/create-knowledge-base.md
     layer: audit
-    plane: DEV
+    plane: PROD
     impact: 4
-    confidence: 0.85
-    status: open
-    label: "VALOR 2 — /meta:create-knowledge-base passa a descrever as FAMILIAS reais do corpus (doutrina, referencia-tecnica), nao um template unico que 2% usa"
+    confidence: 0.9
+    status: done
+    verified_at: 2026-08-18
+    verified_against: "Fase 3 reescrita com as 2 familias MEDIDAS (38 REFERENCIA / 5 DOUTRINA / template antigo cobria 2 de 86) + nucleo comum invariante + gatilho de escolha; numeros medidos ancorados no proprio comando"
+    label: "VALOR 2 FEITO — o gerador descreve as familias REAIS do corpus (referencia default + doutrina), com as secoes da referencia rebaixadas de contrato a sugestao"
   - id: D_GUARDA_DO_MARCADOR_NA_FONTE
     node_type: decision
+    trace: .claude/validation/diary-index.sh
     layer: audit
-    plane: DEV
+    plane: PROD
     impact: 3
-    confidence: 0.85
-    status: open
-    label: "VALOR 3 — curar as 2 migalhas remanescentes E nascer guarda: marcador de exibicao no frontmatter reprova, porque 3 ocorrencias e recorrencia, e recorrencia vira mecanismo"
+    confidence: 0.95
+    status: done
+    verified_at: 2026-08-18
+    verified_against: "2 migalhas de 07-16 curadas (grep de frontmatter = ZERO); guarda de enum na LINHA inteira no diary-index.sh; caso (h) na bancada (kind 8/8 sob set -euo pipefail); mutante honesto = versao de HEAD engole (rc=0) e a guarda reprova (rc=1)"
+    label: "VALOR 3 FEITO — marcador de exibicao no frontmatter agora REPROVA (exit 1); a classe de 3 ocorrencias virou mecanismo, e o awk que lia so o campo 2 nao engole mais sufixo"
 
   # ---- questao GATED: parado, mas sob controle ----
   - id: Q_ALARME_DE_AUSENCIA_DE_AGENDADO
