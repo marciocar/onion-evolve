@@ -176,6 +176,28 @@ while IFS= read -r f; do
   case "${f}" in *.sh) sed -i 's|\${1:-\${REPO_ROOT}}|${1:-$(pwd)}|g' "${f}" 2>/dev/null ;; esac
 done < <(find "${DEST}" -type f ! -path "*/.claude-plugin/*" 2>/dev/null)
 
+# ---------------------------------------------------------------------------
+# IRMÃ-NÃO-EMBARCADA → PLAIN-TEXT (cura POR CONSTRUÇÃO — medido em 2026-08-18).
+# Uma KB embarcada em kb/ cita as irmãs por link relativo (`[X](irma.md)`). Quando a irmã NÃO está
+# no manifesto, o link resolve dentro do plugin para um arquivo que não existe: MORTO. Medição que
+# motivou: 15 links mortos em DOIS plugins (onion-work-tools 12, onion-engineering 3), acumulados em
+# três PRs sem que guarda nenhuma acusasse — o kb-vendored-link-check testa outro predicado (link
+# core-privado) e não varre plugins/. A cura aqui é por construção, não por detecção: o próprio
+# empacotamento converte o link em plain-text (o título permanece legível; só a âncora morre), então
+# a classe deixa de ser possível. Fonte≠derivação: a SSOT em docs/knowledge-base segue com os links
+# vivos — a conversão é só na CÓPIA do plugin, onde o alvo de fato não existe.
+# ---------------------------------------------------------------------------
+if [ -d "${DEST}/kb" ]; then
+  for f in "${DEST}/kb/"*.md; do
+    [ -f "${f}" ] || continue
+    while IFS= read -r tgt; do
+      [ -f "${DEST}/kb/${tgt}" ] && continue
+      tgt_esc="$(printf '%s' "${tgt}" | sed 's/\./\\./g')"
+      sed -i -E "s|\[([^][]*)\]\(${tgt_esc}(#[^)]*)?\)|\1|g" "${f}"
+    done < <(grep -oE '\]\([a-z0-9-]+\.md(#[^)]*)?\)' "${f}" | sed -E 's/^\]\(([a-z0-9-]+\.md).*/\1/' | sort -u)
+  done
+fi
+
 # Proveniência content-addressed (padrão gh skill): repository + ref + tree_sha.
 # tree_sha = hash do CONTEÚDO da WORKING-TREE das fontes (NÃO `ls-tree HEAD`) — assim é consistente
 # no pre-commit (onde HEAD≠staged) e independente de SRC/DEST absolutos. Lista "blobsha relpath"

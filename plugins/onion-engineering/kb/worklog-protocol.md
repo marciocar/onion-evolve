@@ -16,7 +16,7 @@
 
 - [Prompt Caching — Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) (jun/2026)
 - [Claude Code — Overview](https://docs.claude.com/en/docs/claude-code/overview) (jun/2026)
-- KBs irmãs (citadas, não duplicadas): [Context Window Optimization](context-window-optimization.md), [Spec-Driven Development](spec-driven-development.md), [Agent Orchestration](agent-orchestration.md)
+- KBs irmãs (citadas, não duplicadas): Context Window Optimization, Spec-Driven Development, Agent Orchestration
 
 ---
 
@@ -94,7 +94,7 @@ resume_command: claude --resume <id>   # conveniência opcional (ver §2)
 
 ## 4. Protocolo de leitura escalonado (Tier 0→3)
 
-Aplica diretamente [Context Window Optimization §Progressive Loading e §Reference Instead of Include](context-window-optimization.md). **Nunca** faça `cat` da pasta (anti-pattern "Context Dump").
+Aplica diretamente Context Window Optimization §Progressive Loading e §Reference Instead of Include. **Nunca** faça `cat` da pasta (anti-pattern "Context Dump").
 
 ```
 TIER 0 (sempre, ~1KB):  STATE.md             → o que fazer agora
@@ -109,7 +109,7 @@ TIER 3 (nunca default): histórico de notes.md, fases já [DONE], registros arch
 
 ## 5. Ordenação prompt-cache-friendly
 
-Aplica [Context Window Optimization §Prompt Caching](context-window-optimization.md) — "estável → volátil", porque o cache só cobre o prefixo comum e qualquer mudança antecipada o invalida.
+Aplica Context Window Optimization §Prompt Caching — "estável → volátil", porque o cache só cobre o prefixo comum e qualquer mudança antecipada o invalida.
 
 - **Dentro do `STATE.md`:** `Objective → Constraints → Map` (estável) primeiro; `## NEXT` e transcript (volátil) no fim. Ao avançar, **só a cauda muda** → o prefixo estável permanece quente em cada turno de `/engineer/work`.
 - **Entre arquivos** (ordem de leitura que o comando emite): `CLAUDE.md` (auto) → seção de `architecture.md` (estável) → prefixo de `STATE.md` → `STATE.md.NEXT` (volátil) → bloco da fase atual de `plan.md` → diffs/erros vivos. Nunca leia um arquivo de 40KB **entre** dois blocos estáveis.
@@ -151,7 +151,7 @@ Amarre as escritas do worklog aos limites de `/compact` para não perder nada na
 
 ## 8. Enquadramento conceitual
 
-O worklog é uma instância de **Spec-Anchored Development** ([Spec-Driven Development](spec-driven-development.md) §níveis): a spec (objetivo + plano + decisões) é mantida e coevolui com o código — exatamente o loop de checkpoint. Em fases que fazem fan-out (orquestradas pela ferramenta nativa **Workflow**, mai/2026), os workers leem `STATE.md` + um bloco de fase como prefixo cacheável compartilhado com o orquestrador (ver [Agent Orchestration](agent-orchestration.md) §caching em orquestração).
+O worklog é uma instância de **Spec-Anchored Development** (Spec-Driven Development §níveis): a spec (objetivo + plano + decisões) é mantida e coevolui com o código — exatamente o loop de checkpoint. Em fases que fazem fan-out (orquestradas pela ferramenta nativa **Workflow**, mai/2026), os workers leem `STATE.md` + um bloco de fase como prefixo cacheável compartilhado com o orquestrador (ver Agent Orchestration §caching em orquestração).
 
 ---
 

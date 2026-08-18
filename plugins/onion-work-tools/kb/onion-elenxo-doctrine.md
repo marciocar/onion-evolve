@@ -18,9 +18,9 @@
 | **Data de Criação** | 2026-08-17 (rascunho original: 2026-07-22) |
 | **Categoria** | Conceitos |
 | **Origem** | Defeito de alcance medido em adoção de campo (2026-08-17): a definição existia, viajava no manifesto, e era **inalcançável por construção** |
-| **Superfície** | **Vendorizada** — viaja a todo adotante. **Não é superfície pública**: a área pública de doutrinas é decisão separada do maestro ([porta pública ≠ core privado](public-door-vs-private-core.md)) |
-| **Régua irmã** | [Teste do Eixo](onion-abstraction-doctrine.md) (o que merece virar abstração) — mesmo padrão: **prescrição que reprova**, não rótulo que descreve |
-| **Motor de execução** | O Elenxo é caro; a escolha de *quando* pagá-lo é [economia de motores](onion-engine-economy.md) + [esteira de promoção](onion-promotion-ladder.md) |
+| **Superfície** | **Vendorizada** — viaja a todo adotante. **Não é superfície pública**: a área pública de doutrinas é decisão separada do maestro (porta pública ≠ core privado) |
+| **Régua irmã** | Teste do Eixo (o que merece virar abstração) — mesmo padrão: **prescrição que reprova**, não rótulo que descreve |
+| **Motor de execução** | O Elenxo é caro; a escolha de *quando* pagá-lo é economia de motores + esteira de promoção |
 
 ---
 
@@ -65,7 +65,7 @@ afirmando-a com mais convicção; prova-a **sobrevivendo à tentativa honesta de
 > refutação" seria só uma imprecisão de nome; como *prescrição*, é **não-conformidade** — e é isso que
 > permite **reprovar**.
 >
-> Mesmo padrão do [Teste do Eixo](onion-abstraction-doctrine.md), que não descreve abstrações
+> Mesmo padrão do Teste do Eixo, que não descreve abstrações
 > existentes: define 3 condições, e por isso pôde reprovar 3 propostas em 3 dias.
 
 O diferencial do Onion não é ter uma fonte única — SSOT é prática comum. O diferencial é **o que essa
@@ -152,7 +152,7 @@ que é ciência estabelecida do que é engenharia nossa por cima.
 
 Aqui mora o **KG-SSOT-first**: tudo o que é publicado (documentação, KB, changelog) é **projeção**,
 nunca fonte paralela. A fonte única vive no Knowledge Graph. Ver
-[knowledge-graph-sdaal.md](knowledge-graph-sdaal.md) e [fonte ≠ derivação](source-vs-derivation.md).
+[knowledge-graph-sdaal.md](knowledge-graph-sdaal.md) e fonte ≠ derivação.
 
 Ciência por trás, costurada de duas peças: **projeção fonte→derivação** é CQRS (Greg Young, 2010,
 sobre o Command-Query Separation de Bertrand Meyer, 1988); o **Knowledge Graph** como estrutura foi
@@ -173,7 +173,7 @@ não é "pensar sobre o passado": é o passo que **redefine a previsão seguinte
 
 ### 4. Adaptação — como se muda
 
-**Dogfood-first movido a dialética** (ver [dogfooding doctrine](onion-dogfooding-doctrine.md)). O
+**Dogfood-first movido a dialética** (ver dogfooding doctrine). O
 sistema roda contra a realidade — o adotante, o CI, o lint — e quando erra, o erro **não se esconde**:
 expõe-se na vitrine, com data de re-teste. Essa exposição é a antítese. A correção que nasce dela não
 é patch silencioso, é **mecanismo** — vira regra, vira gate, vira KB.
@@ -290,13 +290,13 @@ Registrado como ato de honestidade, não como lacuna a preencher.
 
 ## 🔗 Relacionados
 
-- [Teste do Eixo / Doutrina de Abstração](onion-abstraction-doctrine.md) — a régua irmã: prescrição que reprova
+- Teste do Eixo / Doutrina de Abstração — a régua irmã: prescrição que reprova
 - [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — onde a etapa 5 aterrissa
-- [Dogfooding Doctrine](onion-dogfooding-doctrine.md) — como sei que ficou certo
-- [Esteira de promoção](onion-promotion-ladder.md) — as camadas antes de uma ideia virar artefato
-- [Escada de automação graduada](graduated-automation-ladder.md) — nasceu de um Elenxo
-- [Fonte ≠ Derivação](source-vs-derivation.md) — a fronteira que o invariante 6 aplica
-- [Método de trabalho do Onion](onion-working-method.md) — onde o Elenxo entra na execução
+- Dogfooding Doctrine — como sei que ficou certo
+- Esteira de promoção — as camadas antes de uma ideia virar artefato
+- Escada de automação graduada — nasceu de um Elenxo
+- Fonte ≠ Derivação — a fronteira que o invariante 6 aplica
+- Método de trabalho do Onion — onde o Elenxo entra na execução
 
 ---
 

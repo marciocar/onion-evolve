@@ -1,0 +1,123 @@
+# KG SDAAL — BACKLOG DE CONTROLE dos 5 resíduos colhidos nos PRs #630/#631.
+# Nasce por ordem do maestro (2026-08-18): "não fique nada sem controle e parado". O grafo E o
+# mecanismo de controle: item executado vira decision `done` com verified_at; item que o Teste do
+# Gatilho REPROVA vira question `open` com GATILHO NOMEADO — parado, mas sob controle, nunca esquecido.
+# ⚠️ A ordem de execução aqui e por VALOR DECLARADO, nao pela atencao do radar: o radar ordena por
+# impact x confidence x grau NAO-DIRECIONADO, logo nao expressa precedencia (C_ORDEM_DO_RADAR_NAO_E_
+# ORDEM_DE_EXECUCAO, em fios-abertos). Usar o radar como fila seria o defeito que ele mesmo adverte.
+meta:
+  id: residuos-2026-08-18
+  schema_version: "1"
+  date: 2026-08-18
+nodes:
+  # ---- evidencia: o que foi MEDIDO (nao estimado) ----
+  - id: E_PLUGIN_DEAD_LINKS_15
+    node_type: evidence
+    trace: docs/evolution/review/docs-elenxo-doctrine-to-vendored-kb.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-18
+    verified_against: "varredura de plugins/*/kb/*.md resolvendo cada link irmao contra o disco: 15 mortos em DOIS plugins (onion-work-tools 12, onion-engineering 3)"
+    label: "15 links irmaos MORTOS nos kb/ dos plugins — e sao DOIS plugins, nao um; as contagens anteriores (4, depois 11) mediram so onion-work-tools"
+  - id: E_KB_GENERATOR_DRIFT
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-18
+    verified_against: "grep '## ⚡ Quick Start' em docs/knowledge-base: 2 arquivos de 91"
+    label: "o template de /meta:create-knowledge-base descreve forma que so 2 de 91 KBs usam — o gerador e que esta fora do corpus, nao os documentos"
+  - id: E_DIARY_MARKER_IN_SOURCE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-18
+    verified_against: "grep '^classification: .*📤' em .claude/diary: 3 ocorrencias historicas (2 de 07-16 + 1 minha de 08-17, esta ja curada)"
+    label: "o marcador de EXIBICAO 📤 (SHARE_MARKER do diary-index.sh:93) foi escrito dentro do frontmatter 3x — projecao gravada na fonte, fonte-diferente-de-derivacao invertido"
+  - id: E_NENHUM_AGENDADO_PAROU
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-18
+    verified_against: "gh run list --event=schedule: 1 run na historia do repo; 1 unico workflow declara schedule; zero paradas observadas"
+    label: "TESTE DO GATILHO do alarme-de-ausencia: zero agendados pararam silenciosamente aqui — o gatilho NAO disparou"
+
+  # ---- decisao: o que EXECUTAR, em ordem de valor declarado ----
+  - id: D_CURA_POR_CONSTRUCAO_NO_ASSEMBLER
+    node_type: decision
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: done
+    verified_at: 2026-08-18
+    verified_against: "medido nos 2 plugins regenerados: 15 links mortos -> 0, titulos legiveis; kind da bancada 11/11 sob set -euo pipefail; MUTANTE (assembler sem a cura) reprovado com dead=12 — assercao load-bearing"
+    label: "VALOR 1 FEITO — o assembler converte link-de-irma-NAO-embarcada em plain-text no empacotamento; a classe virou IMPOSSIVEL por construcao (caso (e4) na bancada guarda a regressao)"
+  - id: D_ALINHAR_GERADOR_DE_KB
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "VALOR 2 — /meta:create-knowledge-base passa a descrever as FAMILIAS reais do corpus (doutrina, referencia-tecnica), nao um template unico que 2% usa"
+  - id: D_GUARDA_DO_MARCADOR_NA_FONTE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    label: "VALOR 3 — curar as 2 migalhas remanescentes E nascer guarda: marcador de exibicao no frontmatter reprova, porque 3 ocorrencias e recorrencia, e recorrencia vira mecanismo"
+
+  # ---- questao GATED: parado, mas sob controle ----
+  - id: Q_ALARME_DE_AUSENCIA_DE_AGENDADO
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.4
+    status: open
+    label: "GATED por Teste do Gatilho — alarme para agendado que PARA de rodar. GATILHO NOMEADO: a 1a vez que um run com event=schedule for observado ausente por >48h. Construir antes disso e catedral, que a propria doutrina do Elenxo proibe"
+
+  # ---- a regra que ordenou este backlog ----
+  - id: R_MECANISMO_ANTES_DE_INSTANCIA
+    node_type: rule
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "ordem de valor = MECANISMO antes de INSTANCIA: curar por construcao (impossivel) vale mais que guarda (detectavel), que vale mais que corrigir a ocorrencia (some no proximo commit)"
+
+edges:
+  - from: E_PLUGIN_DEAD_LINKS_15
+    to: D_CURA_POR_CONSTRUCAO_NO_ASSEMBLER
+    edge_type: SUPPORTS
+  - from: E_KB_GENERATOR_DRIFT
+    to: D_ALINHAR_GERADOR_DE_KB
+    edge_type: SUPPORTS
+  - from: E_DIARY_MARKER_IN_SOURCE
+    to: D_GUARDA_DO_MARCADOR_NA_FONTE
+    edge_type: SUPPORTS
+  - from: E_NENHUM_AGENDADO_PAROU
+    to: Q_ALARME_DE_AUSENCIA_DE_AGENDADO
+    edge_type: SUPPORTS
+  - from: D_CURA_POR_CONSTRUCAO_NO_ASSEMBLER
+    to: R_MECANISMO_ANTES_DE_INSTANCIA
+    edge_type: DEPENDS_ON
+  - from: D_GUARDA_DO_MARCADOR_NA_FONTE
+    to: R_MECANISMO_ANTES_DE_INSTANCIA
+    edge_type: DEPENDS_ON
