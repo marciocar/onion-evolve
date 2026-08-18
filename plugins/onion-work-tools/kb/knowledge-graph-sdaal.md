@@ -99,7 +99,7 @@ Investigações longas degradam para **log cronológico**: cada achado é datado
 
 ## O modelo
 
-Um arquivo `.kg.yaml` (espírito [SDAAL](specification-driven-ai-abstraction-layer.md): spec
+Um arquivo `.kg.yaml` (espírito SDAAL: spec
 estruturada executável por IA) com **nós tipados** e **arestas tipadas ponderadas**, em **duas
 camadas** (campo `layer`, default `audit` — retrocompatível):
 
@@ -386,7 +386,7 @@ com passivo existente tolerado em baseline decrescente) é tratado à parte, par
 especificação aqui — ele vive em
 [`${CLAUDE_PLUGIN_ROOT}/validation/kg-provenance-coverage.sh`](${CLAUDE_PLUGIN_ROOT}/validation/kg-provenance-coverage.sh)
 (REGRA 29 do lint), e a **doutrina da catraca** que o torna adotável está em
-[`onion-guardrails.md`](onion-guardrails.md).
+`onion-guardrails.md`.
 
 > ⚠️ **"Coberto" ≠ "verificado" — a cobertura é por CITAÇÃO, não por conteúdo.** O gate responde
 > *"existe nó que cite este documento?"*, e um nó que o cite **sem sustentá-lo** satisfaz o gate. Isso é
@@ -421,7 +421,7 @@ reflection) ou doc de achado — que aponta para o `.kg.yaml` onde a investigaç
 E `--schema`** (exit 0). Pendurado, não-grafo, ou radar-reprova ⇒ **HARD**. O gate vive em
 [`${CLAUDE_PLUGIN_ROOT}/validation/kg-born-marker.sh`](${CLAUDE_PLUGIN_ROOT}/validation/kg-born-marker.sh) (REGRA 43 do lint),
 e o **marcador `kg:` é o pressuposto — o gate o prova** (com mutation test da severidade), na regra de
-admissão da casa ([`inference-mitigation.md`](inference-mitigation.md)).
+admissão da casa (`inference-mitigation.md`).
 
 > ⚠️ **Por que NÃO tem catraca/baseline — e por que isso é o CORRETO, não frouxidão.** A REGRA 29 precisa
 > de catraca porque cobra **ausência** (doc sem nó = violação): sem baseline reprovaria dezenas de legados
@@ -429,7 +429,7 @@ admissão da casa ([`inference-mitigation.md`](inference-mitigation.md)).
 > **não é violação**. As ~72 migalhas existentes não declaram `kg:` — e o gate **nasce silencioso**, sem
 > retro-reprovar ninguém. Só o `kg:` **declarado-mas-inválido** reprova. `missing != violation` ⇒ não há
 > passivo a tolerar ⇒ não há baseline. Pôr catraca aqui **repetiria** o erro que a 29 existe para não
-> repetir. (Ver a doutrina da catraca em [`onion-guardrails.md`](onion-guardrails.md) — referenciada, não
+> repetir. (Ver a doutrina da catraca em `onion-guardrails.md` — referenciada, não
 > reescrita: a 29 é por citação **com** catraca; a 43 é por marcador **sem** catraca, e a diferença é
 > exatamente `missing != violation`.)
 
@@ -457,7 +457,7 @@ O campo usa vários rótulos para **dois** conceitos em **dois** níveis. A rég
 - ⚠️ **"KG-runtime" — não usar.** Sinônimo redundante de SSOT-as-runtime; nasceu do salad, não de uma
   distinção real.
 - **"Dogfood KG SDAAL" / "Dogfood KG-SSOT SDAAL" não são conceitos** — são *rodadas de dogfood* deste
-  padrão (ver [dogfooding-doctrine §🚦 item 3](onion-dogfooding-doctrine.md), os dois sentidos de re-dogfood).
+  padrão (ver dogfooding-doctrine §🚦 item 3, os dois sentidos de re-dogfood).
 
 ### Por que mecanismo, e não "lembre-se de consultar"
 
@@ -672,7 +672,7 @@ instância implementa com seu stack; o core permanece determinístico até a esc
 - **≠ `/meta:graph`**: aquele é a lente sócio-técnica da *spec-as-code* (estrutura do framework);
   este é o grafo do *conhecimento de uma investigação* (claims/decisões/evidência). Complementares.
 - **Parentesco**: protocolo de re-teste do diário (`/meta:diary review`); doutrina de dogfood
-  ([onion-dogfooding-doctrine](onion-dogfooding-doctrine.md)) — "invoque o artefato e observe" é a
+  (onion-dogfooding-doctrine) — "invoque o artefato e observe" é a
   regra PROD-plane em outra roupa.
 - **Origem e crédito**: uma instância adotante, auditoria de produção (evidência: radar priorizou cura de
   raiz sobre paliativos; reconciliou 6 auto-correções como `REFUTES`; integridade pegou 3 órfãos).

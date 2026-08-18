@@ -7105,6 +7105,30 @@ run_assemble_plugin_selftests() {
   else record_fail "assemble-plugin: compliance template" "template não bundlado ou ref não reescrita"; fi
   rm -rf "${d}"
 
+  # (e4) IRMÃ-NÃO-EMBARCADA → PLAIN-TEXT (a cura por construção de 2026-08-18, e ela é MEDIDA
+  # NO ARTEFATO REAL, não em fixture): monta onion-work-tools num tmp e exige (i) ZERO link
+  # irmão morto em kb/ — a classe que acumulou 15 em dois plugins sem guarda nenhuma acusar —
+  # e (ii) que o TÍTULO da irmã convertida permaneça legível (plain-text, não amputação).
+  local mwt dwt
+  mwt="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion-work-tools.manifest.sh"
+  if [ ! -f "${mwt}" ]; then record_skip "assemble-plugin: (e4) manifesto work-tools ausente"; else
+    dwt="$(mktemp -d)"
+    bash "${helper}" "${mwt}" "${REPO_ROOT}" "${dwt}/wt" >/dev/null 2>&1
+    local dead=0 t
+    for f in "${dwt}/wt/kb/"*.md; do
+      [ -f "${f}" ] || continue
+      while IFS= read -r t; do
+        [ -f "${dwt}/wt/kb/${t}" ] || dead=$((dead+1))
+      done < <(grep -oE '\]\([a-z0-9-]+\.md(#[^)]*)?\)' "${f}" 2>/dev/null | sed -E 's/^\]\(([a-z0-9-]+\.md).*/\1/' | sort -u)
+    done
+    if [ "${dead}" -eq 0 ] && grep -q 'Dogfooding Doctrine' "${dwt}/wt/kb/onion-elenxo-doctrine.md" 2>/dev/null; then
+      record_pass "assemble-plugin: (e4) irmã-não-embarcada vira plain-text (0 links mortos; título legível)"
+    else
+      record_fail "assemble-plugin: (e4) links irmãos mortos" "dead=${dead} no kb/ montado (esperado 0), ou o título da irmã sumiu junto com o link"
+    fi
+    rm -rf "${dwt}"
+  fi
+
   # (h) SKILLS (dir) + HOOKS (script) — fixture bundlando uma skill e um hook reais do repo.
   local mfx dh; mfx="$(mktemp)"; dh="$(mktemp -d)"
   cat > "${mfx}" <<'MFX'
