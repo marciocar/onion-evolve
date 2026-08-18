@@ -14,7 +14,7 @@ conflict_class: static
 significance: "RE-TESTADO E FECHADO em 2026-08-18: o cron DISPAROU (run 32100701318, event=schedule, main, 824 asserções / 0 falhas) — a rede debaixo do filtro de path existe e funciona, provada por CONTAGEM e não por exit code. Fica a lição do desenho: a migalha nasceu com review_after de 1 dia porque a capacidade era DECLARADA e não verificada, e o relógio de 1 dia foi o que a trouxe de volta para ser medida. E o cron atrasou 35 min (04:52Z, não 04:17Z) — margem de tolerância é parte do teste, não ruído."
 ---
 
-# O cron que justifica o filtro — e que ainda não provou existir
+# [FECHADO em 2026-08-18 — o cron disparou] O cron que justifica o filtro — e que ainda não provou existir
 
 **O que foi feito (2026-08-17, PR #625).** A bancada (`lint-selftest.sh`, 689 asserções) saiu
 do workflow de gate e foi para `onion-selftest.yml`, que roda **só quando a maquinaria muda**
