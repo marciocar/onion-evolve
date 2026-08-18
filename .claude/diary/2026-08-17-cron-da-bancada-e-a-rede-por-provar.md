@@ -3,14 +3,15 @@ date: 2026-08-17
 instance: onion-evolve
 type: observation
 classification: collective
-tags: [ci, schedule, cron, filtro-de-path, ponto-cego, verificacao-pendente]
+tags: [ci, schedule, cron, filtro-de-path, ponto-cego, verificacao-fechada, rede-provada]
 affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
-next_recommended: "Rodar a verificação de uma linha abaixo e fechar (ou reabrir) a rede do filtro de path."
-review_after: 2026-08-18
-conflict_class: dynamic
-significance: "A bancada saiu do gate de todo PR (12 min → 49s) atrás de um filtro de path — e filtro de path já criou TRÊS pontos cegos nesta casa. A rede que o justifica é um cron noturno que AINDA NÃO DISPAROU. Enquanto não disparar, o filtro está nu e eu não sei disso."
+next_recommended: ""
+review_after: 2026-11-18
+retested_at: 2026-08-18
+conflict_class: static
+significance: "RE-TESTADO E FECHADO em 2026-08-18: o cron DISPAROU (run 32100701318, event=schedule, main, 824 asserções / 0 falhas) — a rede debaixo do filtro de path existe e funciona, provada por CONTAGEM e não por exit code. Fica a lição do desenho: a migalha nasceu com review_after de 1 dia porque a capacidade era DECLARADA e não verificada, e o relógio de 1 dia foi o que a trouxe de volta para ser medida. E o cron atrasou 35 min (04:52Z, não 04:17Z) — margem de tolerância é parte do teste, não ruído."
 ---
 
 # O cron que justifica o filtro — e que ainda não provou existir
@@ -57,3 +58,38 @@ meu ref local **desatualizado** (sem `fetch` desde o merge). Um `git fetch` inve
 resposta. Terceira vez no mesmo par de dias em que **medir no ref/lugar errado** quase virou
 afirmação: `.git/hooks` em vez de `core.hooksPath`, `$?` depois de pipe, e agora `origin/main`
 velho. O padrão não é falta de cuidado — é que a leitura errada **responde com confiança**.
+
+---
+
+## RE-TESTE — 2026-08-18 (a rede deixou de ser promessa)
+
+Esta migalha nasceu com `review_after` de **um dia** — o prazo mais curto que já usei — porque o que
+ela registrava não era um erro, era uma **capacidade declarada e não verificada**: um `schedule:`
+escrito no YAML não é um cron que dispara. O relógio curto era o mecanismo, e funcionou: trouxe o
+item de volta para ser medido em vez de envelhecer como fato presumido.
+
+**Medido hoje:**
+
+| O que | Valor |
+|---|---|
+| Run | `32100701318` — `event=schedule`, branch `main` |
+| Disparo | **2026-08-18T04:52:01Z** (a janela declarada é 04:17Z — **35 min de atraso**) |
+| Duração | 11m44s |
+| Placar da bancada | **824 passaram · 0 pularam · 0 falharam** |
+
+**Fecha, e o veredito é: a rede existe.** O filtro de path que tirou a bancada do gate de todo PR
+(12 min → 49s) tem, de fato, alguém por baixo — a suíte inteira roda na `main` todo dia,
+independente de qual path o PR tocou. Era exatamente isso que faltava nos três pontos cegos
+anteriores (`plugins/` #241, `docs/` #254, `ops/` #509): lá o filtro **não tinha mais nada**.
+
+**Três coisas para levar adiante, e nenhuma é "prestar atenção":**
+
+1. **`success` não foi o que fechou isto.** O que fechou foi a **contagem** — 824/0/0. Um job que
+   falhasse em abrir a suíte também sairia verde; e `Pularam: 0` é o campo que prova que nenhuma
+   guarda ficou sem exercitar o SUT.
+2. **O cron atrasou 35 minutos**, e isso é o comportamento normal do GitHub sob carga. Qualquer
+   verificação futura desta rede precisa de **margem de tolerância** — checar às 04:17 em ponto e
+   concluir "não disparou" seria um falso negativo por desenho do instrumento.
+3. **A separação valeu.** Na véspera eu havia disparado a mesma suíte por `workflow_dispatch` na
+   `main` (824/0/0 também). Aquilo provou o **corpo** da rede sem provar o **despertador** — e
+   declarar a diferença foi o que permitiu, hoje, saber exatamente o que ainda estava aberto.
