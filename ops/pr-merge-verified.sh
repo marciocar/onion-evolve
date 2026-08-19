@@ -46,6 +46,24 @@ die() { printf '✗ %s\n' "$*"; exit 1; }
 # no PR #623 isso ESCONDEU a verdade (o lint tinha reprovado): mensagem errada é diagnóstico
 # errado, e mandou o autor procurar problema de acesso onde havia regressão. Agora a saída é
 # capturada SEM matar o script, e quem decide é o conteúdo — não o código de saída do gh.
+# ⚠️ ANCORAGEM NO HEAD (defeito medido no PR #634, 2026-08-19): entre um push novo e o GitHub
+# REGISTRAR os checks dele há uma janela em que `gh pr checks` ainda mostra os checks do commit
+# ANTERIOR — e o merge saiu 1 SEGUNDO depois de os runs novos nascerem, lendo verde velho. A cura:
+# amarrar a leitura ao SHA do head e exigir que os check-runs DESSE SHA existam e estejam completos.
+# (Sem check-run algum para o head = a janela da corrida → recusar e mandar esperar, nunca assumir.)
+HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOid' 2>/dev/null)"
+[ -z "$HEAD_SHA" ] && die "não consegui ler o headRefOid do PR #${PR}"
+OWNER_REPO="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRepository,headRepositoryOwner \
+  --jq '.headRepositoryOwner.login + "/" + .headRepository.name' 2>/dev/null)"
+head_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs" \
+  --jq '.check_runs[] | .name + "\t" + .status + "\t" + (.conclusion // "-")' 2>/dev/null)"
+[ -z "$head_runs" ] && die "ZERO check-runs registrados para o head ${HEAD_SHA:0:8} — provável janela pós-push; espere os checks nascerem (a corrida do #634)"
+printf '%s\n' "$head_runs" | awk -F'\t' '$2!="completed"{exit 1}' \
+  || die "check-run do head ${HEAD_SHA:0:8} ainda não-completo — merge recusado (esperar não é opcional)"
+printf '%s\n' "$head_runs" | awk -F'\t' '$3=="failure"||$3=="cancelled"||$3=="timed_out"{exit 1}' \
+  || die "check-run do head ${HEAD_SHA:0:8} concluiu em falha — merge recusado"
+say "✓ check-runs ancorados no head ${HEAD_SHA:0:8}: todos completos, nenhum falho"
+
 checks="$(gh pr checks "$PR" "${REPO_ARG[@]}" 2>&1)"
 GHRC=$?
 [ -z "$checks" ] && die "não consegui ler os checks do PR #${PR} (saída vazia, rc=${GHRC})"
