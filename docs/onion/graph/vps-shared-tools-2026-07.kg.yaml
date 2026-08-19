@@ -55,8 +55,8 @@ nodes:
     impact: 4
     confidence: 0.95
     verified_at: 2026-08-19
-    verified_against: "caddy validate OK + reload + curl com Host header (308 https-redirect) + upstream 401 sem chave E 401 com chave errada (a auth do WAHA barra); DNS ainda NAO criado (dig vazio; NS dns-parking/Hostinger, sem API na VPS — registro A e ato do maestro no hPanel)"
-    label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-08-19): waha.onionevolve.com -> 127.0.0.1:3999 via /etc/caddy/conf.d/waha.caddy (convencao de bloco opcional da casa). Motivo: integracao de app externo (Lovable) — o app na nuvem nao alcanca loopback. O bind do container SEGUE no localhost (o Caddy e o unico expositor; TLS na frente, X-Api-Key do WAHA em toda chamada). PENDENTE-COM-DONO: (1) registro A waha->179.197.65.94 no hPanel (maestro); (2) cert ACME emite sozinho quando o DNS propagar (Caddy re-tenta); desligar = rm do .caddy + reload"
+    verified_against: "PONTA A PONTA em 2026-08-19: caddy validate+reload OK; DNS criado VIA API Hostinger (PUT zones append, verificado por RELEITURA da zona, nao pelo eco do PUT) apos o maestro informar o token em ~/.config/hostinger; resolucao publica OK; cert Let s Encrypt emitido (valido ate 2026-11-17); https://waha.onionevolve.com/api/sessions devolve 401 JSON do WAHA sem chave E com chave errada — cadeia DNS->TLS->Caddy->auth inteira viva"
+    label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-08-19): waha.onionevolve.com -> 127.0.0.1:3999 via /etc/caddy/conf.d/waha.caddy (convencao de bloco opcional da casa). Motivo: integracao de app externo (Lovable) — o app na nuvem nao alcanca loopback. O bind do container SEGUE no localhost (o Caddy e o unico expositor; TLS na frente, X-Api-Key do WAHA em toda chamada). PENDENTES RESOLVIDOS em 2026-08-19: registro A criado via API Hostinger (token em ~/.config/hostinger, informado pelo maestro) e cert ACME emitido. Desligar = rm do .caddy + reload; revogar acesso = trocar WAHA_API_KEY no compose"
 
   # ── TOOL 3: EMAIL (gap) ──
   - id: ENT_email

@@ -2,7 +2,7 @@
 branch: ops/waha-public-route
 pr: 634
 date: 2026-08-19
-reviewed_diff_sha256: 09071bcbc3fb1c039567ea5a5ddfdc9534073d101b61a36d800a895e3101101d
+reviewed_diff_sha256: d922b1a64ecfd1cf2beb0528f55ff3566fb7281d4a189f465ff0573a0d03c380
 findings_total: 4
 findings_real: 1
 findings_fixed: 1
@@ -50,3 +50,14 @@ funcionou na primeira oportunidade.
 - Grafo: radar exit 0 após a aresta; lint 0 HARD.
 - O guia de integração (Lovable) foi entregue ao maestro como arquivo — prescreve chave em
   Secrets + edge-function proxy, nunca `fetch` do browser.
+
+## Adendo (mesma sessão) — os pendentes RESOLVERAM, e o dono era eu
+
+Depois do resíduo original, o maestro informou: *"você tem as chaves e acessos para hostinger"*.
+Localizado `~/.config/hostinger/token` (48 chars), validado contra a API (GET da zona → 200) e o
+registro A criado com `PUT … {"overwrite": false}` — **append, sem sobrescrever a zona** — e
+verificado por **releitura da zona** (não pelo eco do PUT, que só diz "Request accepted").
+
+Cadeia medida de ponta a ponta: resolução pública OK → cert **Let's Encrypt emitido** (válido até
+2026-11-17) → `https://waha.onionevolve.com/api/sessions` devolve o **401 JSON do WAHA**. O nó do
+grafo foi atualizado no mesmo movimento (pendente-com-dono → resolvido).
