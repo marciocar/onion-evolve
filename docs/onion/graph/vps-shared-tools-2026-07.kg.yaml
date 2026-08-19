@@ -48,6 +48,16 @@ nodes:
     label: "WHATSAPP: o unico lado VIVO hoje e o WAHA — container onion-vps-waha (devlikeapro/waha:latest), running desde 2026-08-05, bind 127.0.0.1:3999, API responde 401 (exige key). O whatsapp-sender NAO ESTA VIVO: zero processo (ps), zero container (docker ps -a), zero unit systemd, sem pm2 instalado. O CODIGO e a sessao pareada (.wwebjs_auth, mtime 2026-07-05) EXISTEM EM DISCO, mas em /home/onion/onion-bridge/workspaces/7f2a16301adad917/whatsapp-sender (workspace de agente do bridge, 234M, sem .git) e NAO em ~onion/whatsapp-sender, que e o caminho que o parecer de 2026-07-05 e o rotulo anterior afirmavam. RESSALVA SOBRE A PROPRIA MEDICAO: o worker do M8 concluiu que nao havia nem diretorio — a busca dele foi incompleta e o diretorio existe; o que nao existe e o SERVICO. Pesquisa research/whatsapp-api-2026-07 decide eixo oficial x nao-oficial (regulado->Cloud API; dogfood->WAHA>Evolution)"
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
 
+  - id: E_waha_public_route_caddy
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-08-19
+    verified_against: "caddy validate OK + reload + curl com Host header (308 https-redirect) + upstream 401 sem chave E 401 com chave errada (a auth do WAHA barra); DNS ainda NAO criado (dig vazio; NS dns-parking/Hostinger, sem API na VPS — registro A e ato do maestro no hPanel)"
+    label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-08-19): waha.onionevolve.com -> 127.0.0.1:3999 via /etc/caddy/conf.d/waha.caddy (convencao de bloco opcional da casa). Motivo: integracao de app externo (Lovable) — o app na nuvem nao alcanca loopback. O bind do container SEGUE no localhost (o Caddy e o unico expositor; TLS na frente, X-Api-Key do WAHA em toda chamada). PENDENTE-COM-DONO: (1) registro A waha->179.197.65.94 no hPanel (maestro); (2) cert ACME emite sozinho quando o DNS propagar (Caddy re-tenta); desligar = rm do .caddy + reload"
+
   # ── TOOL 3: EMAIL (gap) ──
   - id: ENT_email
     node_type: entity
@@ -318,6 +328,10 @@ nodes:
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
 
 edges:
+  # a rota publica e materia da direcao dual-WAHA-default: o lado vivo ganhou alcance externo
+  - from: E_waha_public_route_caddy
+    to: D_whatsapp_dual_waha_default
+    edge_type: SUPPORTS
   - from: D_whatsapp_dual_waha_default
     to: C_dual_adapter_presumido_construido
     edge_type: SUPERSEDES
