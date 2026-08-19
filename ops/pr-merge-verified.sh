@@ -55,7 +55,7 @@ HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOi
 [ -z "$HEAD_SHA" ] && die "não consegui ler o headRefOid do PR #${PR}"
 OWNER_REPO="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRepository,headRepositoryOwner \
   --jq '.headRepositoryOwner.login + "/" + .headRepository.name' 2>/dev/null)"
-head_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs" \
+head_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
   --jq '.check_runs[] | .name + "\t" + .status + "\t" + (.conclusion // "-")' 2>/dev/null)"
 [ -z "$head_runs" ] && die "ZERO check-runs registrados para o head ${HEAD_SHA:0:8} — provável janela pós-push; espere os checks nascerem (a corrida do #634)"
 printf '%s\n' "$head_runs" | awk -F'\t' '$2!="completed"{exit 1}' \
