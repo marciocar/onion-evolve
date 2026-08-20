@@ -58,6 +58,16 @@ nodes:
     verified_against: "PONTA A PONTA em 2026-08-19: caddy validate+reload OK; DNS criado VIA API Hostinger (PUT zones append, verificado por RELEITURA da zona, nao pelo eco do PUT) apos o maestro informar o token em ~/.config/hostinger; resolucao publica OK; cert Let s Encrypt emitido (valido ate 2026-11-17); https://waha.onionevolve.com/api/sessions devolve 401 JSON do WAHA sem chave E com chave errada — cadeia DNS->TLS->Caddy->auth inteira viva"
     label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-08-19): waha.onionevolve.com -> 127.0.0.1:3999 via /etc/caddy/conf.d/waha.caddy (convencao de bloco opcional da casa). Motivo: integracao de app externo (Lovable) — o app na nuvem nao alcanca loopback. O bind do container SEGUE no localhost (o Caddy e o unico expositor; TLS na frente, X-Api-Key do WAHA em toda chamada). PENDENTES RESOLVIDOS em 2026-08-19: registro A criado via API Hostinger (token em ~/.config/hostinger, informado pelo maestro) e cert ACME emitido. Desligar = rm do .caddy + reload; revogar acesso = trocar WAHA_API_KEY no compose"
 
+  - id: E_librechat_install_started
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-20
+    verified_against: "repo onion-vps-librechat commitado (7338dcb) com 5 imagens pinadas puxadas (listagem provada); vhost chat.onionevolve.com validado+recarregado; app OIDC sqov79y2x3s6qawreafga no Logto via Management API (releitura); 8 segredos onion/librechat-* no pass; PENDENTE: chave Anthropic (maestro) -> primeiro boot"
+    label: "LIBRECHAT ENTROU NO CATALOGO por plano aprovado do maestro (2026-08-20): face de chat multiusuario da casa (chat.onionevolve.com), SSO Logto, so-Anthropic v1, escopo completo com RAG. Pesquisa-fonte: docs/evolution/research/librechat-2026-08/ (3 exploracoes, mapa TRANSFERE/DESENHA/NAO-VALE). NAO e adapter SDAAL: e consumidor das ferramentas do catalogo"
+
   # ── TOOL 3: EMAIL (gap) ──
   - id: ENT_email
     node_type: entity
@@ -328,6 +338,10 @@ nodes:
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
 
 edges:
+  # o LibreChat entra como CONSUMIDOR do catalogo (Logto/Caddy), sob o framing decidido
+  - from: E_librechat_install_started
+    to: D_framing_catalogo
+    edge_type: SUPPORTS
   # a rota publica e materia da direcao dual-WAHA-default: o lado vivo ganhou alcance externo
   - from: E_waha_public_route_caddy
     to: D_whatsapp_dual_waha_default

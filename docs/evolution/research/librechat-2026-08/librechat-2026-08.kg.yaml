@@ -1,0 +1,165 @@
+# KG SDAAL — pesquisa LibreChat×Onion (2026-08-20). FONTE dos achados das 3 exploracoes
+# paralelas (padrao-VPS/headroom · estado LibreChat ago-2026 · mapa de integracao); o
+# SYNTHESIS.md ao lado e PROJECAO deste grafo. Claims externos verificados com URL na
+# exploracao (verify-external-for-current); a fonte por claim vive na sintese.
+meta:
+  id: librechat-2026-08
+  schema_version: "1"
+  date: 2026-08-20
+nodes:
+  # ---- estado externo (evidencia verificada com fonte) ----
+  - id: E_LIBRECHAT_V087_STABLE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "changelog oficial librechat.ai (v0.8.7 23-24/jun/2026; v0.8.8-rc1 14/ago) + GitHub Releases API; cadencia ~1 minor/4-6 semanas"
+    label: "LibreChat v0.8.7 e a stable atual; projeto adquirido pela ClickHouse (nov/2025), segue MIT; sinais enterprise fortes (Prometheus/OTel, Admin Panel, role sync OIDC)"
+  - id: E_SKILLS_FORMATO_IDENTICO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "docs/features/skills + changelog v0.8.6 + PR #13293 (skillSync.github, config 1.3.13): SKILL.md com name/description/allowed-tools/always-apply; sync por owner/repo/paths/interval"
+    label: "O ACHADO QUE MUDA O DESENHO: LibreChat adotou Agent Skills no MESMO formato SKILL.md do Claude Code + GitHub Skill Sync — o repo Onion pode ser LIDO como fonte viva de skills, sem porte"
+  - id: E_OIDC_GENERICO_SEM_GUIA_LOGTO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: ".env.example do main (46 vars OPENID_/ANTHROPIC_) + indice OAuth2-OIDC da doc: guias p/ Auth0/Cognito/Entra/Keycloak/Authelia/Authentik — Logto AUSENTE em doc e comunidade"
+    label: "OIDC generico e 1a classe (OPENID_* completo, role sync, PKCE) mas NAO existe guia Logto no mundo — a instalacao da casa e pioneira; riscos herdados do precedente Vaultwarden: ES384, /oidc no issuer, sem offline_access"
+  - id: E_PLUGINS_DEPRECADOS_AGENTS_MCP
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "docs/development/tools_and_plugins abre com 'This page is deprecated'; recomenda MCP + OpenAPI Actions; Agents e 'the most capable endpoint' (docs/compatibility)"
+    label: "Endpoint Plugins legado esta DEPRECADO; o caminho atual e Agents + MCP (streamable-http p/ producao) + Actions — qualquer integracao Onion nasce nesses tres, nunca no legado"
+  - id: E_ROADMAP_MANDA_ESPERAR
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "blog 2026-02-18 roadmap (Q1: Admin Panel, Dynamic Context, Code Interpreter open-source; Q2: Workflows/approval gates/background agents) + Discussion #11860 (H2 prometido, NAO publicado ate 20/ago)"
+    label: "O roadmap oficial cobre exatamente o que seria tentador construir: seeder de agentes (Admin Panel), motor de fan-out (Workflows Q2), sandbox (code-interpreter open-source) — ESPERAR e mais barato que construir divida"
+  - id: E_PEGADINHAS_OPERACIONAIS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "Issue #12538 (meili indexa VAZIO em silencio, primary key ambigua) · Discussion #12884 (1o-usuario-admin NAO funciona com OIDC) · #10684 (latest quebra upgrade) · .env.example (Mongo sem auth por default)"
+    label: "As 4 pegadinhas que o plano da casa ja neutraliza: pins em vez de latest; janela de admin LOCAL; verificacao de busca POR COMPORTAMENTO (nao pelo log de sync); Mongo sem-ports em rede isolada com limite declarado"
+  - id: E_HEADROOM_SWAP_100
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "free -h no host: swap 8G 100% consumido, 11Gi 'disponiveis' majoritariamente page cache; consumidores reais: 2 VS Code servers ~3.5G + ~7 processos claude ~6G; docker atual ~3.6G"
+    label: "O headroom REAL de RAM e apertado (swap 100%): o stack entra com mem_limit em TUDO (api 1g, mongo/meili/vectordb 512m, rag 1g) e a higiene de sessoes orfas e decisao do maestro, nao minha"
+
+  # ---- o mapa (decisoes de integracao, lente Aristoteles) ----
+  - id: D_FRONTEIRA_CONSULTA_VS_EXECUCAO
+    node_type: decision
+    trace: docs/evolution/research/librechat-2026-08/SYNTHESIS.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "FRONTEIRA HONESTA do mapa: LibreChat = face de CONSULTA/distribuicao/multiusuario (OIDC, ACL, RAG, artifacts); Claude Code/Bridge = face de EXECUCAO sobre o repo (filesystem, git, bash). Reimplementar bash/git via MCP para o LibreChat 'virar' Claude Code e NAO-VALE por construcao"
+  - id: D_TOP5_INTEGRACOES
+    node_type: decision
+    trace: docs/evolution/research/librechat-2026-08/SYNTHESIS.md
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "Top-5 por valor: (1) skillSync.github->repo Onion [BAIXO] (2) agente Onion-KB com File Search das KBs [BAIXO/MEDIO] (3) MCP onion-kg read-only streamable-http [MEDIO, DESENHA] (4) Bridge-como-MCP = braco executor [MEDIO/ALTO] (5) 5-8 agentes-vitrine a mao [BAIXO] — NUNCA os 51 (sem import/export, Discussion #10019)"
+  - id: D_STACK_PADRAO_ONION_VPS
+    node_type: decision
+    trace: /home/marcio/onion-vps-librechat/docker-compose.yml
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "repo onion-vps-librechat commitado (7338dcb): 5 servicos pinados (api v0.8.7, mongo 8.0.20, meili 1.35.1, pgvector 0.8.0-pg15, rag v0.9.0 — tags conferidas no registry), compose config valida com segredos reais, fail-closed provado por recusa, app OIDC sqov79y2x3s6qawreafga provisionado via Management API e verificado por releitura"
+    label: "DECISOES DO MAESTRO SELADAS: chat.onionevolve.com · SSO Logto obrigatorio (janela do 1o admin local) · so Anthropic server-key · escopo COMPLETO (5 containers com RAG) — e o stack ja esta construido no padrao da casa"
+
+  # ---- a fronteira aberta (a etapa do maestro) ----
+  - id: Q_KG_RUNTIME_NO_LIBRECHAT
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "PESQUISA F4b (+etapa do maestro): como read(KG)->verify->act->write(KG) executa numa conversa LibreChat? Hipoteses: read-first via skill always-apply + tools do MCP onion-kg; map so via Bridge-como-MCP; write(KG) e a perna critica (I3) — write-via-Bridge com gate OU write-como-proposta que o core sela (rima com federacao: adotante sinaliza, core sela). Risco a nomear: memory nativo do LibreChat como fonte paralela ao grafo. Gatilho: stack no ar + MCP onion-kg desenhado"
+  - id: Q_EMBEDDINGS_KEY_PENDENTE
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: "RAG exige provider de embeddings (Anthropic nao tem): chave OpenAI text-embedding-3-small pendente do maestro (pass onion/librechat-openai-embeddings-key); sem ela o stack sobe e o File Search fica INERTE — declarado, nao bloqueante. Gatilho: o maestro inserir a chave"
+
+edges:
+  - from: E_SKILLS_FORMATO_IDENTICO
+    to: D_TOP5_INTEGRACOES
+    edge_type: SUPPORTS
+  - from: E_PLUGINS_DEPRECADOS_AGENTS_MCP
+    to: D_TOP5_INTEGRACOES
+    edge_type: SUPPORTS
+  - from: E_PLUGINS_DEPRECADOS_AGENTS_MCP
+    to: D_FRONTEIRA_CONSULTA_VS_EXECUCAO
+    edge_type: SUPPORTS
+  - from: E_ROADMAP_MANDA_ESPERAR
+    to: D_TOP5_INTEGRACOES
+    edge_type: CONSTRAINS
+  - from: E_LIBRECHAT_V087_STABLE
+    to: D_STACK_PADRAO_ONION_VPS
+    edge_type: SUPPORTS
+  - from: E_PEGADINHAS_OPERACIONAIS
+    to: D_STACK_PADRAO_ONION_VPS
+    edge_type: CONSTRAINS
+  - from: E_HEADROOM_SWAP_100
+    to: D_STACK_PADRAO_ONION_VPS
+    edge_type: CONSTRAINS
+  - from: E_OIDC_GENERICO_SEM_GUIA_LOGTO
+    to: D_STACK_PADRAO_ONION_VPS
+    edge_type: CONSTRAINS
+  - from: D_FRONTEIRA_CONSULTA_VS_EXECUCAO
+    to: Q_KG_RUNTIME_NO_LIBRECHAT
+    edge_type: DEPENDS_ON
+  - from: D_TOP5_INTEGRACOES
+    to: Q_KG_RUNTIME_NO_LIBRECHAT
+    edge_type: DEPENDS_ON
+  # a chave de embeddings condiciona a parte RAG do stack decidido
+  - from: Q_EMBEDDINGS_KEY_PENDENTE
+    to: D_STACK_PADRAO_ONION_VPS
+    edge_type: CONSTRAINS
