@@ -47,12 +47,15 @@ nodes:
     label: "WRITE-LEG (a perna critica, I3): agente LibreChat NUNCA escreve grafo de outro repo direto — escreve COMO PROPOSTA que o dono sela. Formas: (1) tool MCP de write com gate no SERVIDOR (o server e o escritor do proprio repo — caso da PoC: ingerir_documento_colado escreve porque o MCP E o dono do caso); (2) proposta em fila p/ o core selar (rima com federacao: adotante sinaliza, core sela — so muda o transporte). O 'memory' nativo do LibreChat NAO e destino de conhecimento: fonte paralela ao grafo e o anti-padrao fonte-diferente-de-derivacao"
   - id: Q_ONION_KG_MCP_NEXT
     node_type: question
+    trace: /home/marcio/onion-evolve/ops/mcp-onion-kg/server.py
     layer: audit
-    plane: DEV
+    plane: PROD
     impact: 4
-    confidence: 0.6
-    status: open
-    label: "PROXIMO CONCRETO (F6.3, agora fundado): MCP onion-kg read-only (kg_radar, kb_search, diary, inventory; streamable-http no padrao do assistente-pdi) da aos agentes do core a mesma perna que a PoC ja tem. Gatilho: ordem do maestro (o desenho esta pronto; o precedente de rede/allowlist ja foi pago no assistente-pdi)"
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
+    label: "RESOLVIDA — o MCP onion-kg esta VIVO: os agentes do core tem a mesma perna read(KG) que a PoC; o write segue proposta-que-o-core-sela (fila ainda nao construida, gated por demanda)"
 edges:
   - from: E_FIELD_HALLUCINATION_KG
     to: D_READ_LEG_DESIGN
