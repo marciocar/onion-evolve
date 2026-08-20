@@ -124,9 +124,11 @@ nodes:
     layer: audit
     plane: PROD
     impact: 3
-    confidence: 0.8
-    status: open
-    label: "RAG exige provider de embeddings (Anthropic nao tem): chave OpenAI text-embedding-3-small pendente do maestro (pass onion/librechat-openai-embeddings-key); sem ela o stack sobe e o File Search fica INERTE — declarado, nao bloqueante. Gatilho: o maestro inserir a chave"
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "o maestro inseriu as DUAS chaves no pass (anthropic validada com 200 na API; openai-embeddings presente); o rag_api subiu healthy com EMBEDDINGS_PROVIDER=openai"
+    label: "RESOLVIDO no mesmo dia: chave de embeddings inserida pelo maestro; File Search operacional (teste de upload real fica na checklist de UI do maestro)"
 
 edges:
   - from: E_SKILLS_FORMATO_IDENTICO
