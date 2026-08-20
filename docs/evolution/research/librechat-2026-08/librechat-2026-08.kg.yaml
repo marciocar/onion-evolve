@@ -128,8 +128,10 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.5
-    status: open
-    label: "PESQUISA F4b (+etapa do maestro): como read(KG)->verify->act->write(KG) executa numa conversa LibreChat? Hipoteses: read-first via skill always-apply + tools do MCP onion-kg; map so via Bridge-como-MCP; write(KG) e a perna critica (I3) — write-via-Bridge com gate OU write-como-proposta que o core sela (rima com federacao: adotante sinaliza, core sela). Risco a nomear: memory nativo do LibreChat como fonte paralela ao grafo. Gatilho: stack no ar + MCP onion-kg desenhado"
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "F4b EXECUTADA no gatilho real (agente da PoC alucinou skills/kg-ssot e negou a capacidade): pesquisa propria em docs/evolution/research/librechat-kg-runtime-2026-08/ (radar exit 0) — read-leg=tools MCP+instructions+skill always-apply; map=pipeline do servidor; write=proposta nunca direto (I3); memory nativo descartado como destino"
+    label: "RESPONDIDA — era a PESQUISA F4b (+etapa do maestro): como read(KG)->verify->act->write(KG) executa numa conversa LibreChat? Hipoteses: read-first via skill always-apply + tools do MCP onion-kg; map so via Bridge-como-MCP; write(KG) e a perna critica (I3) — write-via-Bridge com gate OU write-como-proposta que o core sela (rima com federacao: adotante sinaliza, core sela). Risco a nomear: memory nativo do LibreChat como fonte paralela ao grafo. Gatilho: stack no ar + MCP onion-kg desenhado"
   - id: Q_EMBEDDINGS_KEY_PENDENTE
     node_type: question
     layer: audit
