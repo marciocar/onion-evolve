@@ -79,6 +79,17 @@ nodes:
     verified_against: "free -h no host: swap 8G 100% consumido, 11Gi 'disponiveis' majoritariamente page cache; consumidores reais: 2 VS Code servers ~3.5G + ~7 processos claude ~6G; docker atual ~3.6G"
     label: "O headroom REAL de RAM e apertado (swap 100%): o stack entra com mem_limit em TUDO (api 1g, mongo/meili/vectordb 512m, rag 1g) e a higiene de sessoes orfas e decisao do maestro, nao minha"
 
+  - id: E_SKILLSYNC_DORMANT_V087
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "lido no CODIGO da imagem v0.8.7 em producao: /app/api/server/services/Skills/sync.js exporta initializeGitHubSkillSync e grep na imagem inteira mostra ZERO callers fora do teste; corroborado pelo comportamento (boot aceita o schema, colecoes skillsync* existem com 0 docs, PAT valido com ZERO trafego, zero logs do servico). PR #13293 mergeou 2026-06-11, ANTES do corte do v0.8.7 (06-24) — codigo embarcou, wiring nao"
+    label: "CORRECAO DA PESQUISA (dogfood de campo): o GitHub Skill Sync esta DORMANT no v0.8.7 — servico completo embarcado, inicializador nunca chamado; o wiring do boot ficou p/ o v0.8.8. A fiacao da casa (yaml+PAT+envrc) esta pronta e liga sozinha no upgrade; gatilho mecanico = check-version.sh acusar v0.8.8 stable"
+
   # ---- o mapa (decisoes de integracao, lente Aristoteles) ----
   - id: D_FRONTEIRA_CONSULTA_VS_EXECUCAO
     node_type: decision
@@ -134,6 +145,10 @@ edges:
   - from: E_SKILLS_FORMATO_IDENTICO
     to: D_TOP5_INTEGRACOES
     edge_type: SUPPORTS
+  # o dormant nao derruba a integracao #1 — ADIA: limita o timing, nao o desenho
+  - from: E_SKILLSYNC_DORMANT_V087
+    to: D_TOP5_INTEGRACOES
+    edge_type: CONSTRAINS
   - from: E_PLUGINS_DEPRECADOS_AGENTS_MCP
     to: D_TOP5_INTEGRACOES
     edge_type: SUPPORTS
