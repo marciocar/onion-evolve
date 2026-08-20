@@ -2,7 +2,7 @@
 branch: feat/mcp-onion-framework
 pr: PENDENTE
 date: 2026-08-20
-reviewed_diff_sha256: 
+reviewed_diff_sha256: 8f9b80ad852bac9bfb8f88220494f0effcd917f340edfa30e593e1b481b35b1c
 findings_total: 2
 findings_real: 0
 findings_fixed: 0
