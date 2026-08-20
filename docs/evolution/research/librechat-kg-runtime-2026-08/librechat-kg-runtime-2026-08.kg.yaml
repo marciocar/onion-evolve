@@ -1,0 +1,71 @@
+# KG SDAAL — F4b: como o ciclo KG-SSOT (read->verify->act->write) executa DENTRO do LibreChat.
+# Etapa pedida pelo maestro (+etapa 2026-08-20) e ABERTA pelo gatilho real: o 1o agente com MCP
+# (assistente-pdi, PoC) ALUCINOU uma skill kg-ssot inexistente e concluiu que a capacidade nao
+# existia — o modo de falha previsto na hipotese, agora medido em campo.
+meta:
+  id: librechat-kg-runtime-2026-08
+  schema_version: "1"
+  date: 2026-08-20
+nodes:
+  - id: E_FIELD_HALLUCINATION_KG
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "transcript da PoC: agente sem tools de grafo tentou read_file('skills/kg-ssot/SKILL.md'), recebeu erro, e concluiu 'nao existe kg-ssot' — capacidade tratada como ausente; agravado por config quebrada (tools renomeadas sem alias). O maestro nomeou a tese: 'nao adianta levar o assistente sem levar o KG-SSOT-first e o runtime SDAAL'"
+    label: "PROVA DE CAMPO da F4b: agente LibreChat sem a perna KG nao degrada gracioso — ALUCINA o caminho e nega a capacidade. A doutrina precisa viajar COM o agente, nao ficar implicita"
+  - id: E_POC_MCP_HAS_KG_RUNTIME
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "sessao da PoC: ingerir_documento_colado -> dossie segmentado -> GRAFO do caso -> radar rc=0; h1..h5+navegar_caso operam sobre o grafo. O padrao ja existe do lado do MCP"
+    label: "O MCP da PoC JA CARREGA o runtime KG do lado do servidor (texto->grafo->radar como pipeline de ingestao) — o que falta e o LADO DO AGENTE: saber que o grafo e a fonte e usa-lo primeiro"
+  - id: D_READ_LEG_DESIGN
+    node_type: decision
+    trace: docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    label: "READ-LEG (desenho): (a) as TOOLS MCP sao o read(KG) do agente — navegar/radar/consultar expostos pelo proprio MCP do dominio (a PoC ja tem; o onion-kg fara o mesmo p/ o core, F6.3); (b) as INSTRUCTIONS do agente carregam a disciplina read-first (consultar o grafo ANTES de responder estado, citar no/aresta, nunca inventar caminho de skill); (c) skill always-apply via skillSync e o transporte NATURAL da doutrina — o repo ja e fonte viva das skills"
+  - id: D_WRITE_LEG_AS_PROPOSAL
+    node_type: decision
+    trace: docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    label: "WRITE-LEG (a perna critica, I3): agente LibreChat NUNCA escreve grafo de outro repo direto — escreve COMO PROPOSTA que o dono sela. Formas: (1) tool MCP de write com gate no SERVIDOR (o server e o escritor do proprio repo — caso da PoC: ingerir_documento_colado escreve porque o MCP E o dono do caso); (2) proposta em fila p/ o core selar (rima com federacao: adotante sinaliza, core sela — so muda o transporte). O 'memory' nativo do LibreChat NAO e destino de conhecimento: fonte paralela ao grafo e o anti-padrao fonte-diferente-de-derivacao"
+  - id: Q_ONION_KG_MCP_NEXT
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "PROXIMO CONCRETO (F6.3, agora fundado): MCP onion-kg read-only (kg_radar, kb_search, diary, inventory; streamable-http no padrao do assistente-pdi) da aos agentes do core a mesma perna que a PoC ja tem. Gatilho: ordem do maestro (o desenho esta pronto; o precedente de rede/allowlist ja foi pago no assistente-pdi)"
+edges:
+  - from: E_FIELD_HALLUCINATION_KG
+    to: D_READ_LEG_DESIGN
+    edge_type: SUPPORTS
+  - from: E_POC_MCP_HAS_KG_RUNTIME
+    to: D_READ_LEG_DESIGN
+    edge_type: SUPPORTS
+  - from: E_POC_MCP_HAS_KG_RUNTIME
+    to: D_WRITE_LEG_AS_PROPOSAL
+    edge_type: SUPPORTS
+  - from: D_READ_LEG_DESIGN
+    to: Q_ONION_KG_MCP_NEXT
+    edge_type: DEPENDS_ON
+  - from: D_WRITE_LEG_AS_PROPOSAL
+    to: Q_ONION_KG_MCP_NEXT
+    edge_type: DEPENDS_ON
