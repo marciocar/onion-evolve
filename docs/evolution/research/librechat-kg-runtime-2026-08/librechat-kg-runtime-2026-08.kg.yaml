@@ -40,9 +40,11 @@ nodes:
     node_type: decision
     trace: docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md
     layer: audit
-    plane: DEV
+    plane: PROD
     impact: 5
-    confidence: 0.8
+    confidence: 0.9
+    verified_at: 2026-08-20
+    verified_against: "CONSTRUIDO: propose_kg_write (onion-exec, Camada 1) grava na fila docs/evolution/kg-inbox/ e NUNCA no grafo vivo — testado: proposta caiu na fila, grafo vivo intacto. A fila tem _sealed/_rejected (Aufhebung). Bridge-como-MCP Camada 1 no ar: 4 tools; Camada 2 (prompt livre) gated por ACL. Log LibreChat: 3 servers 19 tools"
     status: confirmed
     label: "WRITE-LEG (a perna critica, I3): agente LibreChat NUNCA escreve grafo de outro repo direto — escreve COMO PROPOSTA que o dono sela. Formas: (1) tool MCP de write com gate no SERVIDOR (o server e o escritor do proprio repo — caso da PoC: ingerir_documento_colado escreve porque o MCP E o dono do caso); (2) proposta em fila p/ o core selar (rima com federacao: adotante sinaliza, core sela — so muda o transporte). O 'memory' nativo do LibreChat NAO e destino de conhecimento: fonte paralela ao grafo e o anti-padrao fonte-diferente-de-derivacao"
   - id: Q_ONION_KG_MCP_NEXT
