@@ -65,8 +65,8 @@ nodes:
     impact: 4
     confidence: 0.9
     verified_at: 2026-08-20
-    verified_against: "repo onion-vps-librechat commitado (7338dcb) com 5 imagens pinadas puxadas (listagem provada); vhost chat.onionevolve.com validado+recarregado; app OIDC sqov79y2x3s6qawreafga no Logto via Management API (releitura); 8 segredos onion/librechat-* no pass; PENDENTE: chave Anthropic (maestro) -> primeiro boot"
-    label: "LIBRECHAT ENTROU NO CATALOGO por plano aprovado do maestro (2026-08-20): face de chat multiusuario da casa (chat.onionevolve.com), SSO Logto, so-Anthropic v1, escopo completo com RAG. Pesquisa-fonte: docs/evolution/research/librechat-2026-08/ (3 exploracoes, mapa TRANSFERE/DESENHA/NAO-VALE). NAO e adapter SDAAL: e consumidor das ferramentas do catalogo"
+    verified_against: "BOOT VERIFICADO 2026-08-20: 5/5 healthy, https 200 via Caddy, cadeia SSO ate /sign-in do Logto (302 client_id+S256 -> 303), registro fechado provado por 403, 1 admin no Mongo, chave Anthropic valida (200 na API), backup provado COMO ROOT e decifravel, cron 03:30+seg09:05; repo onion-vps-librechat commits 7338dcb+c943a9b"
+    label: "LIBRECHAT NO AR (2026-08-20, boot verificado por comportamento): face de chat multiusuario da casa (chat.onionevolve.com), SSO Logto, so-Anthropic v1, escopo completo com RAG. Pesquisa-fonte: docs/evolution/research/librechat-2026-08/ (3 exploracoes, mapa TRANSFERE/DESENHA/NAO-VALE). NAO e adapter SDAAL: e consumidor das ferramentas do catalogo"
 
   # ── TOOL 3: EMAIL (gap) ──
   - id: ENT_email
