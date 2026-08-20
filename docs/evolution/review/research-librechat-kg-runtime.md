@@ -1,8 +1,8 @@
 ---
 branch: research/librechat-kg-runtime
-pr: PENDENTE
+pr: 642
 date: 2026-08-20
-reviewed_diff_sha256: PENDENTE
+reviewed_diff_sha256: d19c5635a3082faf5ddb090cb67b368a1a74f218a3a937692d9242fc98e58c47
 findings_total: 2
 findings_real: 1
 findings_fixed: 1
