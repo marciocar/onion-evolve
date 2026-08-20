@@ -139,7 +139,7 @@ nodes:
     status: confirmed
     verified_at: 2026-08-20
     verified_against: "o maestro inseriu as DUAS chaves no pass (anthropic validada com 200 na API; openai-embeddings presente); o rag_api subiu healthy com EMBEDDINGS_PROVIDER=openai"
-    label: "RESOLVIDO no mesmo dia: chave de embeddings inserida pelo maestro; File Search operacional (teste de upload real fica na checklist de UI do maestro)"
+    label: "FECHADO COMPLETO (2026-08-20): chave inserida E a via RAG provada de ponta a ponta — agente Onion-KB (F6.2) com 793 embeddings e resposta citando arquivo-fonte via Agents API. A integracao #2 do top-5 esta ENTREGUE; a #1 (skillSync) fiada e dormant ate v0.8.8"
 
 edges:
   - from: E_SKILLS_FORMATO_IDENTICO
