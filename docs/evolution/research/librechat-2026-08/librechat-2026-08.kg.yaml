@@ -88,7 +88,7 @@ nodes:
     status: confirmed
     verified_at: 2026-08-20
     verified_against: "lido no CODIGO da imagem v0.8.7 em producao: /app/api/server/services/Skills/sync.js exporta initializeGitHubSkillSync e grep na imagem inteira mostra ZERO callers fora do teste; corroborado pelo comportamento (boot aceita o schema, colecoes skillsync* existem com 0 docs, PAT valido com ZERO trafego, zero logs do servico). PR #13293 mergeou 2026-06-11, ANTES do corte do v0.8.7 (06-24) — codigo embarcou, wiring nao"
-    label: "CORRECAO DA PESQUISA em 2 rodadas de dogfood: (1) DORMANT no v0.8.7 — zero callers; (2) upgrade REAL p/ v0.8.8-rc1 mediu que a hipotese liga-sozinho-no-upgrade era FALSA: nem no rc1 ha caller de boot — o desenho pos-ClickHouse gere o sync pelo ADMIN PANEL (skillsynccredentials por tenant; request-scoped recusa config==server, lido no codigo do rc1). Painel subiu (pin 1.0.0, loopback 3027); resta a config na UI. A correcao da correcao tambem e aresta"
+    label: "CORRECAO DA PESQUISA em 2 rodadas de dogfood: (1) DORMANT no v0.8.7 — zero callers; (2) upgrade REAL p/ v0.8.8-rc1 mediu que a hipotese liga-sozinho-no-upgrade era FALSA: nem no rc1 ha caller de boot — o desenho pos-ClickHouse gere o sync pelo ADMIN PANEL (skillsynccredentials por tenant; request-scoped recusa config==server, lido no codigo do rc1). Painel subiu (pin 1.0.0, loopback 3027) e FECHOU O CICLO em 2026-08-20: enabled ligado no painel (o gate final — github.enabled default off) + POST /api/admin/skills/sync/run = 11/11 skills sincronizadas; cron diario skill-sync-run.sh como mecanismo de fonte-viva. Correcao em 3 rodadas, todas aresta"
 
   # ---- o mapa (decisoes de integracao, lente Aristoteles) ----
   - id: D_FRONTEIRA_CONSULTA_VS_EXECUCAO
