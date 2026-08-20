@@ -1,8 +1,8 @@
 ---
 branch: feat/mcp-onion-exec
-pr: PENDENTE
+pr: 644
 date: 2026-08-20
-reviewed_diff_sha256: 
+reviewed_diff_sha256: 4ca2d1c9e19125897e759a6abc8f3847ace0ad72be7e32a5f19a374132918326
 findings_total: 3
 findings_real: 0
 findings_fixed: 0
