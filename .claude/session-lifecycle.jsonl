@@ -7,3 +7,6 @@
 {"session_id":"82c43083-1493-4cc7-a8f7-25ee6bdab745","branch":"docs/arquitetura-identidade-onion-vps","started_at":1785963173,"ended_at":1786408369,"duration_s":445196}
 {"session_id":"5a0f6bf1-1ff8-4f51-8028-2b8bc74f0295","branch":"docs/context-freshness-2026-08","started_at":1786571451,"ended_at":1786671754,"duration_s":100303}
 {"session_id":"02020771-c9f4-41d8-962d-703e843abbab","branch":"ops/verified-merge","started_at":1786909487,"ended_at":1786909494,"duration_s":7}
+{"session_id":"bd4bc083-7a11-47fc-a864-f80952b301c6","branch":"feat/adopt-seeds-first-graph","started_at":1786571507,"ended_at":1786987879,"duration_s":416372}
+{"session_id":"e772113b-24d4-44cf-90cc-17701e665971","branch":"main","started_at":1786987879,"ended_at":1787230066,"duration_s":242187}
+{"session_id":"3263fca6-128c-4b01-b771-347b1a017482","branch":"main","started_at":1787240454,"ended_at":1787240470,"duration_s":16}

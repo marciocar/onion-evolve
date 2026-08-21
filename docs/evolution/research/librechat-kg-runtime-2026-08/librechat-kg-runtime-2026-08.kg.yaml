@@ -54,10 +54,10 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.9
-    status: confirmed
+    status: done
     verified_at: 2026-08-20
     verified_against: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
-    label: "RESOLVIDA — o MCP onion-kg esta VIVO: os agentes do core tem a mesma perna read(KG) que a PoC; o write segue proposta-que-o-core-sela (fila ainda nao construida, gated por demanda)"
+    label: "RESOLVIDA — o MCP onion-kg esta VIVO: os agentes do core tem a mesma perna read(KG) que a PoC; o write segue proposta-que-o-core-sela (fila kg-inbox CONSTRUIDA e recebendo — ver E_SERVER_LEGS_PROVEN; a SELAGEM e que segue manual — ver Q_SEALING_NO_MECHANISM)"
   - id: E_AGENTE_VITRINE_ONION
     node_type: evidence
     layer: audit
@@ -81,6 +81,57 @@ nodes:
     verified_against: "duvida do maestro ('um MCP do Framework e suas verticais?') respondida por CONSTRUCAO: 3 MCPs, uma identidade, tres EIXOS separados por RISCO — onion-kg (conhecimento, read), onion-exec (acao contida), onion-framework (identidade, read). Log LibreChat: 4 configured servers and 24 tools. NAO fundir num so: colapsar read+exec numa porta obriga proteger tudo no nivel do mais perigoso"
     label: "A TRIADE de MCPs do Onion: separar por RISCO (nao por origem) e a decisao — o onion-framework (identidade: verticais/comandos/agentes/cunhagens) e a 3a natureza que faz o chat CONHECER o Onion, complementar a conhecimento(kg) e acao(exec)"
 
+  - id: E_SERVER_LEGS_PROVEN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-21
+    verified_against: "pre-run direto nos 3 MCPs (curl JSON-RPC, 2026-08-21): READ(KG) kg_list=67 grafos + kb_search 'Elenxo'=13 ocorrencias com arquivo:linha; VERIFY run_lint exit 0 (saida real de violacoes) + kg_radar exit; ACT run_inventory exit 0 (inventario gerado); WRITE propose_kg_write -> proposta caiu em kg-inbox/dogfood-prerun-test-*.proposal.kg.yaml E o grafo vivo F4b ficou INTACTO (git limpo) — I3 provado por comportamento; IDENTIDADE describe_coinage 'Elenxo'. Reconcilia o descompasso de redacao: a fila kg-inbox ESTA construida e recebe (a clausula 'fila ainda nao construida' de Q_ONION_KG_MCP_NEXT era stale de 08-20)"
+    label: "As pernas de SERVIDOR do loop read->verify->act->write-como-proposta estao VIVAS e provadas por COMPORTAMENTO (nao declaracao): curl direto nos MCPs, saidas reais, e o grafo vivo intacto apos a proposta (I3)"
+  - id: D_DOGFOOD_PROTOCOL
+    node_type: decision
+    trace: docs/evolution/research/librechat-kg-runtime-2026-08/DOGFOOD-PROTOCOL.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-21
+    verified_against: "protocolo versionado em DOGFOOD-PROTOCOL.md: Parte A (pernas de servidor) pre-rodada por mim com evidencia real; Parte B (comportamento-do-chat: deferencia-ao-grafo, alucinacao, write-nao-vai-para-memory, disciplina write-leg do Elenxo) entregue ao maestro p/ rodar na UI. Escopo honesto declarado: Runtime=comportamento, Dogfood=metodo, Elenxo=parcial (so write-leg), SDAAL=conhecimento"
+    label: "COMO se testa a doutrina profunda na bancada: um protocolo de DOGFOOD que verifica por comportamento (nao declaracao) e ataca o MODO-DE-FALHA (a alucinacao que abriu o F4b; o furo 7/9 de nao-consulta). As 5 coisas nomeadas nao se testam igual — o protocolo declara o escopo de cada uma"
+  - id: Q_SEALING_NO_MECHANISM
+    node_type: question
+    trace: docs/evolution/kg-inbox/README.md
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: 2026-08-21
+    verified_against: "verificado contra o vivo: grep por kg-inbox|proposal.kg.yaml|_sealed|_rejected em .claude/commands/ e .claude/validation/ = VAZIO (nenhum /meta:* nem guarda processa a fila); e ls docs/evolution/kg-inbox/*.proposal.kg.yaml = 2 propostas pendentes (gap-web-search, grana-ai-mapeamento). A selagem e ato manual de sessao do core (README da fila)"
+    label: "BURACO exposto pelo protocolo: a SELAGEM da fila kg-inbox nao tem mecanismo — nenhum /meta:* nem guarda processa a fila; a costura no grafo vivo e ato manual de sessao do core. E ja ha 2 propostas pendentes (gap-web-search, grana-ai-mapeamento). Gatilho p/ mecanizar /meta:kg-inbox = o ACUMULO (ja em 2), fix-must-become-mechanism — mas gated (nao catedral antes do volume forcar)"
+  - id: Q_MAP_LEG_GATED
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    label: "BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_colado). O loop na bancada vai de read ate write-como-proposta, mas nao INGERE documento em grafo. Gated: nasce quando houver consumidor nomeado de ingestao no core"
+  - id: E_LINT_SLOW_VIA_MCP
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-21
+    verified_against: "medido no pre-run: run_lint via onion-exec levou ~103s (vs ~16-28s local) — provavel pressao de swap/cwd do server. curl com max-time 30/90 devolveu 0 bytes (BrokenPipe no server); so max-time 200 capturou o exit 0"
+    label: "RESSALVA de dogfood: run_lint via MCP leva ~103s — pela UI do LibreChat um tool-call tao longo provavelmente estoura o timeout. Ferramenta lenta e um modo-de-falha real da bancada, nao happy-path"
+
 edges:
   - from: E_AGENTE_VITRINE_ONION
     to: D_TRIADE_MCP_POR_EIXO
@@ -102,4 +153,31 @@ edges:
     edge_type: DEPENDS_ON
   - from: D_WRITE_LEG_AS_PROPOSAL
     to: Q_ONION_KG_MCP_NEXT
+    edge_type: DEPENDS_ON
+  - from: E_SERVER_LEGS_PROVEN
+    to: D_DOGFOOD_PROTOCOL
+    edge_type: SUPPORTS
+  - from: E_LINT_SLOW_VIA_MCP
+    to: D_DOGFOOD_PROTOCOL
+    edge_type: SUPPORTS
+  - from: E_LINT_SLOW_VIA_MCP
+    to: E_SERVER_LEGS_PROVEN
+    edge_type: SUPPORTS
+  - from: E_SERVER_LEGS_PROVEN
+    to: Q_ONION_KG_MCP_NEXT
+    edge_type: SUPPORTS
+  - from: D_DOGFOOD_PROTOCOL
+    to: Q_ONION_KG_MCP_NEXT
+    edge_type: DEPENDS_ON
+  - from: D_DOGFOOD_PROTOCOL
+    to: Q_SEALING_NO_MECHANISM
+    edge_type: SUPPORTS
+  - from: D_DOGFOOD_PROTOCOL
+    to: Q_MAP_LEG_GATED
+    edge_type: SUPPORTS
+  - from: Q_SEALING_NO_MECHANISM
+    to: D_WRITE_LEG_AS_PROPOSAL
+    edge_type: DEPENDS_ON
+  - from: Q_MAP_LEG_GATED
+    to: E_POC_MCP_HAS_KG_RUNTIME
     edge_type: DEPENDS_ON
