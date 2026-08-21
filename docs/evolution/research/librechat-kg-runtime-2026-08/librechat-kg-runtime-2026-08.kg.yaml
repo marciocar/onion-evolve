@@ -58,7 +58,22 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
     label: "RESOLVIDA — o MCP onion-kg esta VIVO: os agentes do core tem a mesma perna read(KG) que a PoC; o write segue proposta-que-o-core-sela (fila ainda nao construida, gated por demanda)"
+  - id: D_TRIADE_MCP_POR_EIXO
+    node_type: decision
+    trace: docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: "duvida do maestro ('um MCP do Framework e suas verticais?') respondida por CONSTRUCAO: 3 MCPs, uma identidade, tres EIXOS separados por RISCO — onion-kg (conhecimento, read), onion-exec (acao contida), onion-framework (identidade, read). Log LibreChat: 4 configured servers and 24 tools. NAO fundir num so: colapsar read+exec numa porta obriga proteger tudo no nivel do mais perigoso"
+    label: "A TRIADE de MCPs do Onion: separar por RISCO (nao por origem) e a decisao — o onion-framework (identidade: verticais/comandos/agentes/cunhagens) e a 3a natureza que faz o chat CONHECER o Onion, complementar a conhecimento(kg) e acao(exec)"
+
 edges:
+  - from: D_TRIADE_MCP_POR_EIXO
+    to: Q_ONION_KG_MCP_NEXT
+    edge_type: SUPPORTS
   - from: E_FIELD_HALLUCINATION_KG
     to: D_READ_LEG_DESIGN
     edge_type: SUPPORTS
