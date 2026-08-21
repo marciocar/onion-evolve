@@ -1,0 +1,34 @@
+# PROPOSTA de escrita no grafo — fila kg-inbox (write-leg F4b).
+# origem: onion-chat-conversa-usuario-2026-08-20 · recebida: 20260821-215136 · NÃO É FONTE até o core selar (I3).
+meta:
+  schema_version: 1
+  baseline: "2026-08-20"
+nodes:
+  - id: Q_WEB_SEARCH_GAP
+    node_type: question
+    label: "O Onion (face conversavel, MCPs onion-framework/onion-kg/onion-exec) nao tem tool de busca/crawling web — como mapear um dominio externo (ex.: site grana.ai) quando pedido pelo usuario?"
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: open
+  - id: E_NO_WEB_TOOL
+    node_type: evidence
+    label: "Sessao de chat 2026-08-20: usuario pediu 'mapear o site grana.ai' e depois 'e agora pela SerpAPI'; nenhuma das 3 MCPs conectadas (onion-framework, onion-kg, onion-exec) expõe fetch/crawl/SerpAPI; kb_search por 'SerpAPI' e 'grana.ai' retornou 0 ocorrencias no corpus"
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+  - id: D_ROUTE_TO_BRIDGE
+    node_type: decision
+    label: "Enquanto a gap nao for resolvida, requisicoes de mapeamento de dominio externo via web devem ser roteadas ao Claude Code/Bridge (execucao plena), nao respondidas por invencao nesta face conversavel"
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: open
+edges:
+  - from: E_NO_WEB_TOOL
+    edge_type: SUPPORTS
+    to: Q_WEB_SEARCH_GAP
+  - from: D_ROUTE_TO_BRIDGE
+    edge_type: DEPENDS_ON
+    to: Q_WEB_SEARCH_GAP

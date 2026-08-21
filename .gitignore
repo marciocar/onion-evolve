@@ -46,3 +46,7 @@ node_modules/
 .claude/settings.local.json
 # Registro MCP do projeto-alvo (cópia de .mcp.json.example; pode conter config específica)
 .mcp.json
+
+# Python bytecode (MCP servers em ops/) — nunca versionar
+__pycache__/
+*.pyc

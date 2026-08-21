@@ -1,0 +1,62 @@
+# PROPOSTA de escrita no grafo — fila kg-inbox (write-leg F4b).
+# origem: onion-chat-conversa-usuario-2026-08-21-meta-kg-map · recebida: 20260821-215957 · NÃO É FONTE até o core selar (I3).
+meta:
+  schema_version: 1
+  baseline: "2026-08-21"
+  id: grana-ai-mapeamento-2026-08
+  date: "2026-08-21"
+nodes:
+  - id: E_GRANA_HOMEPAGE
+    node_type: evidence
+    label: "Screenshot fornecido pelo usuario da homepage grana.ai (hero/above-the-fold), capturado 2026-08-21"
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-08-21"
+    trace: "screenshot do usuario, chat 2026-08-21, url https://grana.ai"
+  - id: C_CATEGORIA_RECEBIVEIS
+    node_type: claim
+    label: "grana.ai atua em negociacao/antecipacao de recebiveis de cartao de credito (fintech B2B) — headline: 'O jeito mais inteligente de negociar recebiveis de cartao'"
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_against: "deploy"
+    verified_at: "2026-08-21"
+  - id: C_MODELO_MULTIACQUIRER
+    node_type: claim
+    label: "Produto agrega recebiveis de multiplas adquirentes num painel unico (Cielo, Stone, Rede, Getnet, C6 Pay visiveis) com agenda de recebiveis futuros e criacao de contrato"
+    plane: PROD
+    impact: 3
+    confidence: 0.7
+    status: confirmed
+    verified_against: "deploy"
+    verified_at: "2026-08-21"
+  - id: Q_F0_INCOMPLETO
+    node_type: question
+    label: "F0 (inventario exaustivo) esta INCOMPLETO: faltam telas Funcionalidades, Login/produto logado, footer, pricing/termos — mapeamento atual cobre so 1 tela (hero)"
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: open
+  - id: Q_MODELO_COBRANCA
+    node_type: question
+    label: "Modelo de cobranca/taxas e publico-alvo (porte de lojista PF/PJ) nao sao visiveis na tela capturada — nao pode ser afirmado sem mais evidencia"
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: open
+edges:
+  - from: E_GRANA_HOMEPAGE
+    edge_type: SUPPORTS
+    to: C_CATEGORIA_RECEBIVEIS
+  - from: E_GRANA_HOMEPAGE
+    edge_type: SUPPORTS
+    to: C_MODELO_MULTIACQUIRER
+  - from: Q_F0_INCOMPLETO
+    edge_type: DEPENDS_ON
+    to: C_CATEGORIA_RECEBIVEIS
+  - from: Q_MODELO_COBRANCA
+    edge_type: DEPENDS_ON
+    to: C_MODELO_MULTIACQUIRER
