@@ -65,8 +65,15 @@ def propose_kg_write(a):
         raise ValueError('slug: kebab-case [a-z0-9-], 2-49 chars')
     if not yaml_body or 'nodes:' not in yaml_body:
         raise ValueError('kg_yaml: corpo .kg.yaml com ao menos nodes:')
-    if len(yaml_body) > 200_000:
-        raise ValueError('kg_yaml grande demais (>200KB)')
+    # TETO REAL = o transporte, não o server: o LibreChat corta ARGUMENTO de tool call em 65536
+    # bytes ANTES de chegar aqui (medido pela sessão da PoC 2026-08-20 num edital de 65 pág).
+    # Declarar 200KB seria guarda inalcançável (a família declarado≠verificado). ~60KB deixa
+    # margem para o resto do JSON-RPC. Uma PROPOSTA (nós/arestas) que passe disso é sinal de que
+    # não é proposta — é documento; esse caminho é ingestão-por-arquivo, não tool call de chat.
+    if len(yaml_body) > 60_000:
+        raise ValueError('kg_yaml > ~60KB: o transporte de tool call do LibreChat corta em 64KB. '
+                         'Uma proposta de grafo não deveria passar disso; documento grande vai por '
+                         'ingestão-por-arquivo (como a PoC faz), não por esta tool.')
     ts = time.strftime('%Y%m%d-%H%M%S')
     fname = f'{slug}-{ts}.proposal.kg.yaml'
     fpath = os.path.join(INBOX, fname)
