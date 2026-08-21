@@ -58,6 +58,17 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
     label: "RESOLVIDA — o MCP onion-kg esta VIVO: os agentes do core tem a mesma perna read(KG) que a PoC; o write segue proposta-que-o-core-sela (fila ainda nao construida, gated por demanda)"
+  - id: E_AGENTE_VITRINE_ONION
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-21
+    verified_against: "agent_onion_702171 'Onion' criado no LibreChat com os 15 tools dos 3 MCPs + ACL, instructions read-first (F4b), sonnet-5; sobrevive a restart. Onion KB (RAG) curado no mesmo dia: os 793 embeddings re-apontados ao agente novo (owned-by-agent-id era a causa do erro que o maestro viu), responde as 5 etapas do Elenxo citando onion-kb-conceitos-1.md. Ressalva: Agents API headless sobe RAG mas nao o pool MCP (limite do beta) — via UI funciona"
+    label: "A TRIADE tem consumidor: o agente-vitrine 'Onion' liga os 3 MCPs de uma vez com a disciplina read-first embutida — o maestro conversa com o framework sem montar selecao a mao. E o Onion KB (RAG) foi curado (embeddings re-apontados, zero re-embed)"
+
   - id: D_TRIADE_MCP_POR_EIXO
     node_type: decision
     trace: docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md
@@ -71,6 +82,9 @@ nodes:
     label: "A TRIADE de MCPs do Onion: separar por RISCO (nao por origem) e a decisao — o onion-framework (identidade: verticais/comandos/agentes/cunhagens) e a 3a natureza que faz o chat CONHECER o Onion, complementar a conhecimento(kg) e acao(exec)"
 
 edges:
+  - from: E_AGENTE_VITRINE_ONION
+    to: D_TRIADE_MCP_POR_EIXO
+    edge_type: SUPPORTS
   - from: D_TRIADE_MCP_POR_EIXO
     to: Q_ONION_KG_MCP_NEXT
     edge_type: SUPPORTS
