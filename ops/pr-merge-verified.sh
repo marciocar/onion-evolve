@@ -83,9 +83,20 @@ else
 fi
 
 # 3 — o RC do merge, que é o defeito de origem
-gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${DEL[@]}"
-rc=$?
-[ "$rc" -ne 0 ] && die "gh pr merge saiu com rc=${rc} — NÃO declaro merge (foi exatamente assim que o #618 'mergeou' sem mergear)"
+# ESTRATÉGIA COM FALLBACK (defeito medido 2026-08-21, PR #645): --rebase falha em stack
+# RE-APONTADA ("This branch can't be rebased") — o topo, cujo GitHub re-apontou p/ main após
+# o merge da base. O helper conhece a stack (--keep-branch) mas cravava --rebase e recusava um
+# merge legítimo (4/4 verdes, CLEAN). Agora: tenta --rebase; se a saída disser "can't be
+# rebased", degrada p/ --squash com os MESMOS gates já validados (checks+veredito lidos acima).
+# NÃO afrouxa nada: o squash só muda como o histórico entra, não SE os gates passaram.
+merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${DEL[@]}" 2>&1)"; rc=$?
+if [ "$rc" -ne 0 ]; then
+  if printf '%s' "$merge_out" | grep -qi "can't be rebased\|cannot be rebased"; then
+    say "⚠️  --rebase recusado (stack re-apontada); degradando p/ --squash com os mesmos gates"
+    merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --squash "${DEL[@]}" 2>&1)"; rc=$?
+  fi
+fi
+[ "$rc" -ne 0 ] && die "gh pr merge saiu com rc=${rc} — NÃO declaro merge (foi assim que o #618 'mergeou' sem mergear). Saída: $(printf '%s' "$merge_out" | tail -1)"
 
 # 4 — prova independente: o ESTADO, não o comando
 state="$(gh pr view "$PR" "${REPO_ARG[@]}" --json state,mergedAt --jq '"\(.state)|\(.mergedAt)"' 2>/dev/null)"
