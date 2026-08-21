@@ -4,14 +4,15 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 102 entradas · **Stale:** 0 · **Compartilháveis:** 90 · **Com significância:** 42
+**Total:** 103 entradas · **Stale:** 0 · **Compartilháveis:** 91 · **Com significância:** 43
 
-Gerado em: 2026-08-18
+Gerado em: 2026-08-21
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-08-21 | error | collective 📤 | merge-verified-rebase-nao-serve-stack-reapontada | O pr-merge-verified.sh usa --rebase fixo. Numa stack empilhada cujo topo o GitHub RE-APONTOU para main após o merge da base, o rebase falha ('This branch can't be rebased') e o helper recusa — corretamente (não declara sucesso falso), mas o merge legítimo (checks 4/4 verdes, mergeable CLEAN) fica travado exigindo squash manual. A guarda não errou; ela é INCOMPLETA para a topologia de stack que a própria casa usa. | 2026-11-21 | static |
 | 2026-08-17 | error | collective 📤 | teste-do-gatilho-contra-a-propria-proposta | Propus construir uma guarda de base-de-branch e só rodei o Teste do Gatilho quando o maestro perguntou 'o que o Onion pede e tem valor de fato nisso?'. O teste REPROVOU a minha própria proposta em três frentes. A diretriz de rodar esse teste ANTES de propor existe como memória desde 05/08 — o problema não é conhecimento, é APLICAÇÃO, e o gatilho eficaz continua sendo social. | 2026-11-17 | static |
 | 2026-08-17 | error | collective 📤 | o-mecanismo-confiava-no-proprio-pressuposto | Uma adoção real de campo achou DOIS defeitos com a mesma forma: em ambos o comentário do mecanismo descrevia o modo-de-falha com precisão, e a máquina não alcançava o que a prosa dizia. O passo do adopt que regenerava 1 de 5 baselines trazia escrito ao lado 'o gate nasceria reprovando o adotante no dia 1 e seria desligado'; a guarda de projeção auditava a anotação entre parênteses e tratava como segura, por construção, exatamente a metade do campo que o gerador publica. Prosa certa não é guarda. | 2026-11-17 | static |
 | 2026-08-17 | error | collective 📤 | minha-auditoria-contou-1-onde-eram-3 | Escrevi um resíduo de revisão auto-auditando meu PR com rigor — e o resíduo CONTAVA ERRADO sobre si mesmo: declarei 1 link morto novo onde eram 3. Quem me pegou foi o revisor do CI, não eu, e o defeito era da MESMA família que o PR estava curando. É evidência empírica, colhida contra o autor, de por que a etapa 1 do Elenxo exige lentes INDEPENDENTES: lente única não vê o próprio ponto cego — nem quando está explicitamente procurando por ele. | 2026-11-17 | static |
