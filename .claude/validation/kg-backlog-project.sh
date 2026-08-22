@@ -51,7 +51,7 @@ for g in "${GRAPHS[@]}"; do
 done
 
 n_graphs="${#GRAPHS[@]}"
-n_owners="$(cut -f2 "$TMP" 2>/dev/null | sort -u | grep -c . || echo 0)"
+n_owners="$(cut -f2 "$TMP" | sort -u | grep -c . || true)"
 
 # monta o markdown (ordena por atenção desc DENTRO de cada owner; owners por tamanho desc)
 render() {
@@ -64,7 +64,8 @@ render() {
     printf '_Nenhum fio aberto nos grafos marcados. (Para incluir um grafo, adicione `# kg-backlog-guard: on` + um `TETO:` no seu `meta:`.)_\n'
     return
   fi
-  # owners ordenados por nº de itens desc
+  # owners ordenados por nº de itens desc (set -f: owner é campo livre, blinda glob)
+  set -f
   for owner in $(cut -f2 "$TMP" | sort | uniq -c | sort -rn | awk '{$1="";sub(/^ /,"");print}' | tr ' ' '\027'); do
     o="$(printf '%s' "$owner" | tr '\027' ' ')"
     cnt="$(awk -F'\t' -v o="$o" '$2==o' "$TMP" | grep -c .)"
@@ -76,6 +77,7 @@ render() {
     done
     printf '\n'
   done
+  set +f
 }
 
 if [ "$MODE" = "--check" ]; then
