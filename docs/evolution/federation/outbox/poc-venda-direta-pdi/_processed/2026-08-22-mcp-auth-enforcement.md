@@ -6,7 +6,7 @@ to: poc-venda-direta-pdi (adotante de campo — PoC)
 re: AUTENTICACAO_DO_MCP_PENDENTE (item de backlog com dono "Onion Core")
 type: downstream-announce
 classe: COORDENAÇÃO — ação recomendada (segurança/defesa-em-profundidade)
-status: a transportar (rascunho na staging do core)
+status: transportado ao inbound/ da PoC (2026-08-22; commit no repo da PoC pendente do lado deles)
 ---
 
 # 🔐 Sinal técnico — o MCP `assistente-pdi` não enforça auth
