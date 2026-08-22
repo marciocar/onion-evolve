@@ -1,3 +1,4 @@
+# REJEITADO: contexto de negocio da Grana.Ai (recebiveis/multi-adquirente) NAO mora no core — pertence ao repo da Grana (I3, fronteira de repo). O gap que isto revela (destino de escrita do papel-de-negocio) virou Q_TENANT_WRITE_DESTINATION no grafo F4b. · 2026-08-21 · sessao do core
 # PROPOSTA de escrita no grafo — fila kg-inbox (write-leg F4b).
 # origem: onion-chat-conversa-usuario-2026-08-21-meta-kg-map · recebida: 20260821-215957 · NÃO É FONTE até o core selar (I3).
 meta:
