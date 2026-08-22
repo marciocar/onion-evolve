@@ -200,7 +200,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 - `@branch-test-planner` - Cobertura de testes para mudanças do branch
 - `@branch-metaspec-checker` - Validação de conformidade com metaspecs do branch
 
-### 📋 Comandos Disponíveis (102 total — listagem parcial dos principais)
+### 📋 Comandos Disponíveis (103 total — listagem parcial dos principais)
 
 > ⚠️ **Listagem parcial e sujeita a drift — a SSOT é outra.** Alguns comandos abaixo não existem
 > mais ou nunca existiram (ex.: `/engineer/deploy`, `/git/rebase`, `/validate/architecture`).

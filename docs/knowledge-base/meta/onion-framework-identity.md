@@ -122,7 +122,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 │  COMMANDS         │  AGENTS (.claude/agents/)                 │
 │  (.claude/        │  51 especialistas em 9 categorias:        │
 │  commands/)       │    development · product · git            │
-│  102 workflows em │    meta · compliance · testing             │
+│  103 workflows em │    meta · compliance · testing             │
 │  10 categorias    │    review · research · deployment          │
 ├──────────────────┴──────────────────────────────────────────┤
 │  ABSTRAÇÕES (.claude/utils/) — padrão SDAAL                    │
@@ -137,7 +137,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 ### As 5 camadas
 
-1. **Comandos** (`.claude/commands/`) — 102 arquivos Markdown invocáveis por categoria (`/product:*`, `/engineer:*`, `/git:*`, `/docs:*`, `/meta:*`, `/validate:*`, `/test:*`, `/design:*`, `/development:*`, `/quick:*`). Cada um define `allowed-tools` (escopo de permissão), `model` (tier de custo) e a lógica de orquestração. Comandos definem **o que fazer e como** — não *quem sabe fazer*.
+1. **Comandos** (`.claude/commands/`) — 103 arquivos Markdown invocáveis por categoria (`/product:*`, `/engineer:*`, `/git:*`, `/docs:*`, `/meta:*`, `/validate:*`, `/test:*`, `/design:*`, `/development:*`, `/quick:*`). Cada um define `allowed-tools` (escopo de permissão), `model` (tier de custo) e a lógica de orquestração. Comandos definem **o que fazer e como** — não *quem sabe fazer*.
 2. **Agentes** (`.claude/agents/`) — 51 especialistas em 9 categorias (development, product, git, meta, compliance, testing, review, research, deployment). Sabem **fazer**: `@jira-specialist` opera JQL+ADF, `@metaspec-gate-keeper` valida arquitetura, `@react-developer` escreve componentes.
 3. **Skills** (`.claude/skills/`) — 11 programas de orquestração de alto nível. `onion-orchestration` é o mais poderoso: autora scripts `Workflow` nativos do Claude Code para fan-out paralelo de agentes, com tiering de modelos por tier (haiku para scan/classificação, sonnet para raciocínio, opus para julgamento adversarial — sem fixar versão exata).
 4. **Abstrações** (`.claude/utils/`) — padrão SDAAL em dois eixos: **Task Manager** (Jira/ClickUp/Asana/Linear, API-first com MCP opcional) e **Forge** (GitHub hoje, GitLab/Bitbucket com costura pronta). Comandos nunca chamam a API do provider direto — sempre via adapter, que resolve transporte, formatação e fallback.
@@ -274,7 +274,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 | Métrica | Valor | Fonte |
 |---------|-------|-------|
-| Comandos invocáveis | 102 (10 categorias + root) | `docs/onion/inventory.md` (SSOT gerada) |
+| Comandos invocáveis | 103 (10 categorias + root) | `docs/onion/inventory.md` (SSOT gerada) |
 | Agentes especializados | 51 (9 categorias) | `docs/onion/inventory.md` (SSOT gerada) |
 | Skills | 11 | `docs/onion/inventory.md` (SSOT gerada) |
 | Knowledge Bases | 91 | `docs/onion/inventory.md` (SSOT gerada) |
@@ -354,7 +354,7 @@ grafo: `docs/onion/graph/onion-identity-2026-07.kg.yaml` → `C_CORE_NAO_E_FAMIL
 | Escopo | Instruções para uma sessão | Framework reutilizável instalável |
 | Task Manager | Não existe | 4 providers via SDAAL (API-first) |
 | Compliance | Não existe | ISO 27001, SOC2, PMBOK, ISO 22301 integrados |
-| Orquestração | Manual, caso a caso | 102 workflows + 51 agentes + 11 skills |
+| Orquestração | Manual, caso a caso | 103 workflows + 51 agentes + 11 skills |
 | Multi-repo | Não existe | Federation v2 com topologia peer |
 | Auto-evolução | Não existe | `/meta:evolve` audita 10 dimensões |
 | Sessions retomáveis | Não existe | `STATE.md` + worklog persistente |
