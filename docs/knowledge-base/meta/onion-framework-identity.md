@@ -488,7 +488,7 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 
 Duas rodadas no mesmo dia:
 
-**(a) resync de inventário** → SSOT: 103 comandos / 51 agentes / **11 skills** / **87 KBs** / 10
+**(a) resync de inventário** → SSOT: 102 comandos / 51 agentes / **11 skills** / **87 KBs** / 10
 dimensões. O resync de 2026-07-24 deixara a KB inconsistente **consigo mesma** (o pitch dizia 102
 comandos e a tabela §6 dizia 99); §3, §6 e §7 passaram a derivar da mesma SSOT.
 
