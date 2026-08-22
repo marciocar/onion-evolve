@@ -30,7 +30,7 @@ kg: docs/onion/graph/technical-context-core-2026-07.kg.yaml
 | Arquivo | O que cobre |
 |---------|-------------|
 | [`ai-development-guide.md`](02-ai-context/ai-development-guide.md) | Style guide para quem **edita o próprio framework**: idioma por camada (pt-BR/inglês), naming/formatação, fronteiras de arquitetura §4.2/4.3, as **59 regras do lint** (53 HARD/11 SOFT), guardrails R15.2/R15.3b de conteúdo não-confiável, gotchas e checklist pré-PR. |
-| [`codebase-guide.md`](02-ai-context/codebase-guide.md) | Mapa de diretórios (`.claude/` + `docs/`), 103 comandos / 51 agentes / 11 skills, utils SDAAL, scripts de validação (âncoras `inventory.sh`, `onion-version.sh`), hooks de ciclo de vida de sessão e fluxo de dados/integrações. |
+| [`codebase-guide.md`](02-ai-context/codebase-guide.md) | Mapa de diretórios (`.claude/` + `docs/`), 104 comandos / 51 agentes / 11 skills, utils SDAAL, scripts de validação (âncoras `inventory.sh`, `onion-version.sh`), hooks de ciclo de vida de sessão e fluxo de dados/integrações. |
 
 ## Camada 3 — Domínio (`03-domain/`)
 

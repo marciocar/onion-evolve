@@ -6,6 +6,9 @@ meta:
   id: librechat-kg-runtime-2026-08
   schema_version: "1"
   date: 2026-08-20
+  # kg-backlog-guard: on
+  # ↑ opt-in da projeção de backlog (docs/backlog.md) + guarda REGRA 58 (cap+carimbo).
+  # ═══ TETO: 25 NÓS ═══ (grafo vivo do F4b; onda nova exige onda COLHIDA — feche antes de abrir)
 nodes:
   - id: E_FIELD_HALLUCINATION_KG
     node_type: evidence
