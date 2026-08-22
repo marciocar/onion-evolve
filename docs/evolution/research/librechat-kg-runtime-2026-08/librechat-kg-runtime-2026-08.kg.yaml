@@ -109,7 +109,7 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.9
-    status: open
+    status: done
     verified_at: 2026-08-21
     verified_against: "verificado contra o vivo: grep por kg-inbox|proposal.kg.yaml|_sealed|_rejected em .claude/commands/ e .claude/validation/ = VAZIO (nenhum /meta:* nem guarda processa a fila); e ls docs/evolution/kg-inbox/*.proposal.kg.yaml = 2 propostas pendentes (gap-web-search, grana-ai-mapeamento). A selagem e ato manual de sessao do core (README da fila)"
     label: "BURACO exposto pelo protocolo: a SELAGEM da fila kg-inbox nao tem mecanismo — nenhum /meta:* nem guarda processa a fila; a costura no grafo vivo e ato manual de sessao do core. E ja ha 2 propostas pendentes (gap-web-search, grana-ai-mapeamento). Gatilho p/ mecanizar /meta:kg-inbox = o ACUMULO (ja em 2), fix-must-become-mechanism — mas gated (nao catedral antes do volume forcar)"
@@ -131,6 +131,54 @@ nodes:
     verified_at: 2026-08-21
     verified_against: "medido no pre-run: run_lint via onion-exec levou ~103s (vs ~16-28s local) — provavel pressao de swap/cwd do server. curl com max-time 30/90 devolveu 0 bytes (BrokenPipe no server); so max-time 200 capturou o exit 0"
     label: "RESSALVA de dogfood: run_lint via MCP leva ~103s — pela UI do LibreChat um tool-call tao longo provavelmente estoura o timeout. Ferramenta lenta e um modo-de-falha real da bancada, nao happy-path"
+
+  - id: E_SEALING_MECHANISM
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-21
+    verified_against: "CONSTRUIDO E DOGFOODADO: comando /meta:kg-inbox (.claude/commands/meta/kg-inbox.md) processa a fila — lista, radar advisory, triagem (fronteira I3 primeiro), sela (integra no grafo vivo + git mv _sealed) ou rejeita (git mv _rejected + motivo). Rodado nas 2 propostas paradas: gap-web-search SELADA neste grafo; grana-ai-mapeamento REJEITADA (contexto de negocio da Grana nao mora no core, I3). Fila 2->0"
+    label: "A SELAGEM tem mecanismo: /meta:kg-inbox e o portao unico que escreve o grafo vivo a partir da fila (do core, radar exit 0 como gate de selagem). Fecha Q_SEALING_NO_MECHANISM — a fila nao acumula mais sem controle"
+  - id: Q_WEB_SEARCH_GAP
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: open
+    label: "A face conversavel do Onion (MCPs onion-framework/kg/exec) nao tem tool de busca/crawling web — como mapear um dominio externo quando pedido pelo usuario? [SELADO da kg-inbox: gap-web-search, origem chat 2026-08-20]"
+  - id: E_NO_WEB_TOOL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-21
+    verified_against: "chat 2026-08-20: usuario pediu mapear site externo; nenhuma das 3 MCPs expoe fetch/crawl/SerpAPI; kb_search por 'SerpAPI'/'grana.ai' = 0 ocorrencias no corpus"
+    label: "Evidencia da gap: as 3 MCPs conectadas nao expoem tool de web — a face conversavel e cega a dominio externo"
+  - id: D_ROUTE_TO_BRIDGE
+    node_type: decision
+    trace: docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: open
+    label: "Enquanto a gap de web nao for resolvida: requisicoes de mapeamento de dominio externo vao ao Claude Code/Bridge (execucao plena), nao respondidas por invencao na face conversavel"
+  - id: Q_TENANT_WRITE_DESTINATION
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_at: 2026-08-21
+    verified_against: "achado da 1a selagem: a proposta grana-ai-mapeamento (contexto de negocio da Grana) caiu na fila do CORE porque o onion-exec so escreve na kg-inbox do core — mas por I3 esse conhecimento mora no repo da Grana. Rejeitada do core; o destino correto nao existe ainda"
+    label: "BURACO revelado pela selagem: a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adotante), nao a kg-inbox do core. Hoje toda proposta cai no core — risco de fonte-paralela por repo. Gated: nasce quando houver multi-tenant KG routing"
 
 edges:
   - from: E_AGENTE_VITRINE_ONION
@@ -181,3 +229,21 @@ edges:
   - from: Q_MAP_LEG_GATED
     to: E_POC_MCP_HAS_KG_RUNTIME
     edge_type: DEPENDS_ON
+  - from: E_SEALING_MECHANISM
+    to: Q_SEALING_NO_MECHANISM
+    edge_type: SUPPORTS
+  - from: E_NO_WEB_TOOL
+    to: Q_WEB_SEARCH_GAP
+    edge_type: SUPPORTS
+  - from: D_ROUTE_TO_BRIDGE
+    to: Q_WEB_SEARCH_GAP
+    edge_type: DEPENDS_ON
+  - from: E_NO_WEB_TOOL
+    to: D_TRIADE_MCP_POR_EIXO
+    edge_type: SUPPORTS
+  - from: Q_TENANT_WRITE_DESTINATION
+    to: D_WRITE_LEG_AS_PROPOSAL
+    edge_type: DEPENDS_ON
+  - from: E_SEALING_MECHANISM
+    to: Q_TENANT_WRITE_DESTINATION
+    edge_type: SUPPORTS
