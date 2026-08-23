@@ -1462,6 +1462,17 @@ nodes:
     verified_against: "reconcedido e provado por comportamento 2026-08-23 (ordem do maestro): via Management API do Logto (token m-default), a role humana bridge-user NAO tinha bridge:write ANTES (GET /roles/{}/scopes = ausente); POST /roles/{}/scopes {scopeIds:[bridge:write]} concedeu; GET DEPOIS = PRESENTE. O servico (bridge-operator) NAO recebeu. Grant cirurgico (um POST), sem rodar o --apply inteiro"
     trace: ops/bridge-auth/logto-provision.sh
     label: "bridge:write RECONCEDIDO a role humana (bridge-user) em 2026-08-23 — restaura o estado que D_capability_by_scope afirmava (capacidade SO a pessoa; servico segue READ_ONLY). O chamador humano volta ao conjunto completo de tools; o M2M nao. Supera o achado E_bridge_write_grant_absent (grant ausente) que a re-verificacao pegara"
+  - id: E_d5_granaai_acolhida_2026_08
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-23
+    verified_against: "acolhimento provado por comportamento 2026-08-23 (ordem do maestro): a org orfa no Logto (nome comercial, id 9mt40fgqoudb, membro marciog) foi RENOMEADA para o id publico do membro via PATCH /organizations; ANTES nome comercial / DEPOIS name=granaai; a projecao --project-federation passou a reportar '✅ sem divergencia: Logto == SSOT' e granaai saiu de 'sem org'. Mapa docs/onion/federation-orgs.json regenerado (--write-org-map)"
+    trace: docs/onion/federation-orgs.json
+    label: "D5 RESOLVIDO: a org orfa do Logto (que a re-verificacao pegou em ato) foi ACOLHIDA — renomeada ao id publico do membro (granaai), casando a regra org.name==id-do-membro do projetor. Logto == SSOT de novo; nome comercial saiu do Logto (doutrina id-nao-comercial). O projetor NUNCA absorve por conta propria (D5); a decisao foi do maestro e a execucao, cirurgica"
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -2028,3 +2039,6 @@ edges:
   - from: E_bridge_write_regranted_2026_08
     to: E_bridge_write_grant_absent_2026_08
     edge_type: SUPERSEDES
+  - from: E_d5_granaai_acolhida_2026_08
+    to: D_logto_is_projection
+    edge_type: SUPPORTS
