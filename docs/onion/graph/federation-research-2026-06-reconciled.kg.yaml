@@ -2,6 +2,7 @@
 # Dogfood do gate de proveniência invertido: 10 documentos cujo conhecimento vivia FORA do grafo.
 # Camada audit. Nós de junho = plane DEV (o que a pesquisa acreditava); reconciliação = plane PROD.
 meta:
+  # kg-backlog-archive: on  # ARQUIVO de pesquisa (2026-06): 319 abertos epistemicos historicos — some do backlog (superficie de controle limpa), segue visivel no radar --open-tsv (decisao do maestro 2026-08-23)
   id: federation-research-2026-06-reconciled
   schema_version: "1"
   baseline: 2026-07-21
