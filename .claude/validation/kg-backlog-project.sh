@@ -32,7 +32,12 @@ mapfile -t GRAPHS < <( {
   git ls-files '*.kg.yaml' | while read -r g; do
     grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-guard:[[:space:]]*on\b' "$g" 2>/dev/null && echo "$g"
   done
-} | grep -v '/fixtures/' | sort -u )
+} | grep -v '/fixtures/' | sort -u | while read -r g; do
+  # opt-OUT: grafo que se declara ARQUIVO/pesquisa some do backlog (segue no radar --open-tsv).
+  # Decisao do maestro 2026-08-23: superficie de controle limpa > completude (federation-research
+  # de 2026-06 era 63% do backlog, ruido historico afundando o sinal da fila de decisao).
+  grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-archive:[[:space:]]*on\b' "$g" 2>/dev/null || echo "$g"
+done )
 
 TMP="$(mktemp)"; trap 'rm -f "$TMP"' EXIT
 n_open=0

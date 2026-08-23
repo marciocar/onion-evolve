@@ -31,6 +31,11 @@ em `docs/evolution/research/`). Fica **de fora** só o arquivo de pesquisa/discu
 ordenada por atenção — o topo é o que "custa caro estar errado". O marcador `# kg-backlog-guard: on`
 segue sendo o opt-in **da guarda REGRA 58** (cap + carimbo), agora desacoplado do escopo da projeção.
 
+**Opt-OUT de arquivo** (decisão do maestro 2026-08-23): um grafo que se declara `# kg-backlog-archive: on`
+no `meta:` **sai do backlog** (mas segue no radar `--open-tsv`). Nasceu porque a `federation-research`
+de 2026-06 (319 abertos epistêmicos históricos) era 63% do backlog — ruído afundando o sinal da fila de
+decisão. Superfície de controle limpa > completude: o backlog é a fila ACIONÁVEL, não o arquivo.
+
 ## Procedimento
 
 1. **Regenerar** (default): `bash .claude/validation/kg-backlog-project.sh` — consome
