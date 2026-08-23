@@ -43,9 +43,9 @@ for g in "${GRAPHS[@]}"; do
   declare -A OWN=()
   while IFS=$'\t' read -r nid now; do OWN["$nid"]="$now"; done < <(
     awk '
+      /^[^[:space:]]/ { id="" }                               # top-level (nodes:/edges:/meta:) sai do escopo do no
       /^[[:space:]]*- id:/ { id=$0; sub(/^[[:space:]]*- id:[[:space:]]*/,"",id); sub(/[[:space:]]*$/,"",id); next }
       /^[[:space:]]*owner:/ && id!="" { o=$0; sub(/^[^:]*:[[:space:]]*/,"",o); gsub(/"/,"",o); print id"\t"o; id="" }
-      /^[[:space:]]*- id:/ { }
     ' "$g" )
   while IFS=$'\t' read -r file id typ plane st imp conf att vat trace c11 label; do
     [ -n "${id:-}" ] || continue
@@ -68,7 +68,7 @@ render() {
   printf '> radar: impact × incerteza × status). **Sem corte** — nada fica invisível.\n\n'
   printf '**%s itens abertos** em %s grafo(s) com aberto (de %s no escopo) · %s grupo(s). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".\n\n' "$n_open" "$n_with_open" "$n_graphs" "$n_owners"
   if [ "$n_open" -eq 0 ]; then printf '_Nada aberto no escopo._\n'; return; fi
-  # grupos (owner|grafo) ordenados por MAIOR atenção do grupo, depois por tamanho
+  # grupos ordenados por MAIOR atenção do grupo (empate: ordem estável do sort)
   cut -f2 "$TMP" | sort -u | while read -r grp; do
     maxatt="$(awk -F'\t' -v g="$grp" '$2==g{if($1+0>m)m=$1+0}END{printf "%.2f",m}' "$TMP")"
     printf '%s\t%s\n' "$maxatt" "$grp"
