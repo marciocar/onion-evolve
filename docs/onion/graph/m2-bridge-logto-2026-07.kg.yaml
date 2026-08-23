@@ -70,7 +70,7 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.9
-    status: open
+    status: superseded
     verified_against: endpoint-vivo
     verified_at: 2026-07-29
     label: "Logto self-hosted 1.41.0 VIVO em auth.onionevolve.com (OIDC, emite JWT assinado + JWKS) desde 2026-07-25 — mas SEM NENHUM CONSUMIDOR plugado, nem o bridge. Capacidade de identidade já paga e ociosa. Com o flip deixa de ser ociosa E deixa de ser opcional (vira caminho crítico — C_logto_now_critical). FIX N: o sinal-fonte recebeu CORREÇÃO formal (Q_source_correction) — citar as duas juntas"
@@ -188,7 +188,7 @@ nodes:
     confidence: 1.0
     verified_at: 2026-08-09
     verified_against: varredura-host-wide-dos-3-drop-ins-com-caminhador-de-cadeia-em-srv1812846
-    status: confirmed
+    status: superseded
     label: "RESPONDIDA 2026-08-09 por varredura host-wide EM srv1812846, e a preocupacao PROCEDIA. A classe tem TRES membros (nao um): os drop-ins de `system.slice`, `caddy.service` e `onion-bridge.service`. Dois valem; UM E INERTE — o do BRIDGE. Ele declara MemoryMin=256M/MemoryLow=512M para `onion-bridge.service`, que hoje esta `LoadState=not-found`; o bridge que roda e `onion-vps-bridge.service`, com MemoryMin=0 e MemoryLow=0. O servico ganhou o prefixo `onion-vps-` e o drop-in ficou para tras, protegendo um FANTASMA. A medicao de 29/07 (E_floors_effective_measured_20260729) estava CERTA quando foi feita e DRIFTOU depois — nao foi erro de quem mediu, foi o mundo andando. METODO, e ele importa: enumerar por RUNTIME (`systemctl list-unit-files --type=service`) achou UM SO membro, porque perde slice (nao e service) e perde unit inexistente (nao responde a `show`). Quem achou os tres foi `grep` nos ARQUIVOS de unit. Enumerar pelo que responde ao runtime e cego justamente para o caso que interessa: a configuracao orfa. SUGESTAO CLARA (nao executada — mudanca em producao e do maestro): renomear o diretorio do drop-in para `onion-vps-bridge.service.d/` e `daemon-reload`, o que restaura os 256M/512M que ja se pretendia dar."
 
   # ---- FIX B: PATH-TRAVERSAL FURA A ALLOWLIST (bypass REAL) ----
@@ -713,7 +713,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: confirmed
+    status: superseded
     verified_at: 2026-07-26
     verified_against: logto-db-consultada-read-only
     label: "PERGUNTA 4 RESPONDIDA — e a resposta e NAO. Consulta read-only ao postgres do Logto (docker exec, psql -U logto): a tabela users tem UM registro e ele vive no tenant ADMIN (o login do console), nao no tenant DEFAULT. O tenant default tem ZERO usuarios e ZERO applications (a tabela applications so traz os built-in do Logto, todos no tenant admin) e a tabela resources so traz os built-in (*.logto.app/api, logto.io/api) — nenhum API Resource do bridge existe ainda. sign_up esta ABERTO nos dois tenants (username+password, verify:false). CONSEQUENCIA DIRETA: o P3.4 (desligar sign-up ANTES do login humano do P4.2) FECHARIA o caminho do maestro exatamente como o spec temia. Criar o usuario no tenant DEFAULT vira PRE-REQUISITO explicito do flip, antes do P3.4"
@@ -748,8 +748,9 @@ nodes:
     layer: audit
     plane: PROD
     impact: 4
-    confidence: 0.95
+    confidence: 0.8
     status: confirmed
+    reverify_note: "reverify-2026-08-23 (4/5 PARCIAL): a TESE (console fora do caminho critico; provisionar via M2M) segue valida. Mas o ESTADO citado como evidencia DRIFTOU: o console foi LIGADO por decisao do maestro em 2026-08-10 (arquivo .caddy sem .disabled; console.onionevolve.com 302), controlado por console.sh on|off|status. Claim do app m-default nao re-medido (token MAPI indisponivel)"
     verified_at: 2026-07-26
     verified_against: caddy-conf-e-logto-db-medidos
     label: "O CONSOLE NAO ESTA NO CAMINHO CRITICO — o objetivo e PROVISIONAR o tenant, nao entrar numa tela. Medido: o vhost console.onionevolve.com existe PRONTO e DESLIGADO (conf.d/logto-console.caddy.disabled; o Caddyfile importa *.caddy, e .disabled nunca carrega — dai o TLS falhar), o console vive so em 127.0.0.1:3012 (HTTP 302), e auth.onionevolve.com e o ISSUER OIDC (porta 3011) — bater nele no browser da /unknown-session. As duas saidas obvias sao ruins: expor o console publica o painel do provedor de identidade que esta virando caminho critico (e o sign_up esta ABERTO nos dois tenants); tunel SSH e inviavel do celular, que e como o maestro opera. A saida BOA dissolve o problema: o app M2M 'm-default' ja existe COM secret e ha o papel machine:mapi:default — da para provisionar headless pela Management API. Melhor que clicar: reproduzivel, auditavel, versionado, sem exposicao nova. E e o MESMO caminho que o P1-P3 precisa (API Resource + app M2M + app SPA/PKCE + role)"
@@ -760,8 +761,9 @@ nodes:
     layer: audit
     plane: PROD
     impact: 5
-    confidence: 1.0
+    confidence: 0.8
     status: confirmed
+    reverify_note: "reverify-2026-08-23 (6/8 PARCIAL): 6 confirmadas (M2M service, SPA/PKCE, resource, scope, role->app, bind docker 127.0.0.1:3011/3012). Nao medidas: idempotencia (exigiria re-executar = mutacao) e /root/.onion-logto-bootstrap (ausente hoje)"
     verified_at: 2026-07-26
     verified_against: logto-api-e-db-conferidos
     label: "P1-P3 EXECUTADOS HEADLESS 2026-07-26, por script versionado e IDEMPOTENTE (re-run diz 'ja existe' nos 5 passos). No tenant default: usuario do maestro (senha aleatoria em /root/.onion-logto-bootstrap 0600, NUNCA no transcript, a trocar no 1o login) · API Resource https://bridge.onionevolve.com · scope bridge:invoke · app M2M onion-bridge-service · app SPA PUBLICO onion-bridge-pwa (PKCE, zero secret no device) · role M2M bridge-operator com o scope, atribuida ao app de servico. CONFERIDO DE FONTE INDEPENDENTE (psql no banco, nao a saida do script): users default=1, 2 apps, resource presente. O bootstrap circular foi quebrado com vhost do console LOOPBACK-ONLY (bind 127.0.0.1 + tls internal), autorizado nominalmente pelo maestro — zero exposicao publica, e o ss confirma 127.0.0.1:443"
@@ -772,8 +774,9 @@ nodes:
     layer: audit
     plane: PROD
     impact: 5
-    confidence: 1.0
+    confidence: 0.75
     status: confirmed
+    reverify_note: "reverify-2026-08-23 (2/4 PARCIAL): mecanismo RFC 8707 + ES384 + aud-binding vivo (reconfirmado com client PAT_EXCHANGE). MAS o client original m-default esta INVALIDADO (invalid_client; janela EXPIRA 2026-08-10 passou) — a prova especifica nao e mais reproduzivel como descrita"
     verified_at: 2026-07-26
     verified_against: token-emitido-e-decodificado
     label: "P4.1 PROVADO — PLANO A. Token client_credentials do app onion-bridge-service com resource=https://bridge.onionevolve.com decodificado (node, base64url nativo): aud=https://bridge.onionevolve.com · scope=bridge:invoke · iss=https://auth.onionevolve.com/oidc · header alg=ES384 typ=at+jwt. O Logto 1.41.0 self-hosted HONRA Resource Indicators (RFC 8707) e emite audiencia vinculada. A escada B1->B2->B3 do §3.6 NAO sera necessaria e o aud-binding do §3.3 se sustenta. ALG A PINAR: ES384 (nao RS256). Prova colateral de que o binding e REAL, e nao decorativo: durante o bootstrap, apresentar um token com aud=https://default.logto.app/api ao endpoint do tenant admin devolveu ERR_JWT_CLAIM_VALIDATION_FAILED/aud — o gate rejeitou o uso errado antes de qualquer codigo nosso"
@@ -784,8 +787,9 @@ nodes:
     layer: audit
     plane: PROD
     impact: 5
-    confidence: 1.0
+    confidence: 0.75
     status: confirmed
+    reverify_note: "reverify-2026-08-23 (8/9 PARCIAL): DRIFT real — P11 (08-13) removeu o caminho legado do binario (BRIDGE_AUTH_MODE/AUTH_TOKEN nao existem; boot assert 'auth: enforce', nao 'dual-legacy'). Sub-claims tecnicas (ES384 pinado, fail-closed, cache JWKS 1h/60s) seguem CONFIRMED. 'PROVAS 7/7' com caso 'legado 200' obsoleto"
     verified_at: 2026-07-27
     verified_against: bridge-reiniciado-e-7-provas-executadas
     label: "P5 VIVO 2026-07-27. src/identity.ts instalado no bridge (copia REVISAVEL no repo — codigo de seguranca que so existe no host e codigo que ninguem revisa). authGuard tenta OIDC PRIMEIRO; o legado so e alcancavel sob BRIDGE_AUTH_MODE=dual-legacy. Sem `jose`: o bridge e producao SEM repo git e o alg e PINADO (ES384), o que fecha a confusao de algoritmo — em troca, cada caso negativo foi PROVADO contra o issuer vivo. Verificacao ES384 = ECDSA P-384 + SHA-384 com assinatura IEEE-P1363 (nao DER). Fail-closed em toda excecao (JWKS fora do ar nao vira 'pode entrar'). JWKS com cache 1h + piso de re-fetch 60s (kid desconhecido pode ser rotacao, mas re-buscar por request faria de um token forjado um amplificador de DoS). Assert de boot: 'JWKS OK (1 chave ES384) | auth: dual-legacy'. PROVAS 7/7 contra app.onionevolve.com/commands: OIDC valido 200 · legado 200 (janela) · sem token 401 · aud de OUTRO recurso 401 · sem scope bridge:invoke 401 · assinatura adulterada 401 · lixo 401. BONUS: C_permission_mode_fail_open CORRIGIDO — o default do PERMISSION_MODE deixou de ser bypassPermissions"
@@ -821,8 +825,9 @@ nodes:
     layer: audit
     plane: PROD
     impact: 5
-    confidence: 0.9
+    confidence: 0.75
     status: confirmed
+    reverify_note: "reverify-2026-08-23 (6/8 PARCIAL): PKCE S256 e role bridge-user (scope bridge:invoke, marciocar) CONFIRMADOS ao vivo. DRIFT de infra: o dominio publico migrou bridge.onionevolve.com (HTTP 000, nao resolve) -> app.onionevolve.com (redirect_uris no Logto). trace stale: web-oidc.ts -> web/src/auth/oidc.ts. Nao medido: client-publico real + pacote de regressao completo"
     verified_at: 2026-07-27
     verified_against: bundle-servido-e-authorize-medidos
     label: "P6 VIVO 2026-07-27 — a PWA agora faz Authorization Code + PKCE. TRES escolhas de desenho: (1) client PUBLICO, zero segredo no device; (2) redirect na RAIZ e nao /callback, porque o bridge serve a PWA com catch-all estatico SEM fallback de SPA — /callback daria 404 e exigiria mudar o roteamento do servidor; na raiz o ?code= chega e o app limpa a URL com replaceState: ZERO mudanca no servidor; (3) getToken() continua SINCRONO — e a costura unica por onde todo o app ja passava, entao o login entra por ali e nada mais muda. BURACO DO P3 FECHADO no caminho: todas as roles eram MachineToMachine e o usuario NAO TINHA ROLE — o token humano sairia sem bridge:invoke e o gate recusaria: login funcionaria e acesso nao, o pior desfecho (parece configurado, nao e). Criada role bridge-user (type User) com o scope, atribuida. PROVAS: 6/6 marcas de PKCE no bundle SERVIDO (nao no build), authorize com os parametros reais devolve 303 -> /sign-in?app_id=<spa>, banco confirma marcio->bridge-user->bridge:invoke, redirect URIs raiz+/callback, refresh token 14d. Regressao: OIDC 200 · convite legado 200 (janela) · sem token 401 · PWA 200. FRONTEIRA: o login humano completo (senha + troca do code) NAO foi executado — exige browser; e o passo do maestro"
@@ -834,8 +839,9 @@ nodes:
     layer: audit
     plane: PROD
     impact: 5
-    confidence: 1.0
+    confidence: 0.8
     status: confirmed
+    reverify_note: "reverify-2026-08-23 (9/14 PARCIAL): nucleo do flip PRESERVADO (AUTH_TOKEN sumiu inteiro do .env; 401/200/200/401 batem). MAS prova de superficie OBSOLETA: unit renomeado onion-bridge->onion-vps-bridge; rotas /admin/tokens|/admin/stats|/a2a hoje 404 (sumiram do source). Prova positiva exige OIDC interativo (nao read-only)"
     verified_at: 2026-07-27
     verified_against: bridge-reiniciado-e-gates-medidos-pos-flip
     label: "P7 O FLIP EXECUTADO 2026-07-27 (carta branca do maestro). Removida a linha BRIDGE_AUTH_MODE=dual-legacy do .env (backup .env.bak-pre-flip-20260727-152720; rollback = re-adicionar + restart, segundos) e systemctl restart onion-bridge. Boot mede 'JWKS OK (1 chave ES384) | auth: ENFORCE' e o AVISO dual-legacy SUMIU. PROVAS em localhost:8787 (probe barato /commands, que NAO dispara o Agent SDK): sem token 401 · AUTH_TOKEN legado 401 (era 200 na baseline pre-flip) · convite courtesy 401 (era 200) · POST /chat com AUTH_TOKEN 401 (barrado no gate, agente nao roda). CONTROLES intactos: /health 200 · PWA raiz 200 · /admin/tokens com AUTH_TOKEN 200 (adminGuard nao olha authMode) · /a2a com token a2a 403 (handler, nao 401 — gate vivo). ESCOPO: so P7 por decisao do maestro; convites courtesy/byok podem ser cortados (sem usuario dependente). PROVA POSITIVA FECHADA 2026-07-27: login humano OIDC na PWA -> /chat EXECUTOU o Agent SDK (custo/tokens medidos na propria UI) e /commands 200 (menu de comandos carregou). PRE-REQUISITO DESCOBERTO NO CAMINHO: o maestro criou a conta 'marciocar' por SIGN-UP (o sign-up do Logto esta ABERTO — P3.4 nunca executado) e ela nasceu SEM role; a camada 2 do RBAC (D_rbac_two_layers) SEGUROU — token sem scope bridge:invoke -> 401 — e o acesso so liberou apos atribuir a role bridge-user a marciocar (INSERT em users_roles no DB do Logto + re-login). /admin/stats segue 401 sob OIDC: ESPERADO, confirma C_p9_blocked_no_admin_oidc (adminGuard so AUTH_TOKEN, Identity OIDC sem conceito de admin). GAP ABERTO: sign-up do tenant default ABERTO (fechar = P3.4)."
@@ -870,8 +876,9 @@ nodes:
     layer: audit
     plane: PROD
     impact: 5
-    confidence: 1.0
+    confidence: 0.9
     status: confirmed
+    reverify_note: "reverify-2026-08-23 (7/8): 7 medidas confirmam; AUTH_TOKEN removido do binario inteiro (08-13, reforco). Lacuna: claim 6 (identidade-de-servico 200/401) exige JWT M2M real, nao medido read-only"
     verified_at: 2026-07-27
     verified_against: rotas-medidas-apos-restart-e-remocao
     label: "P9 COMPLETO 2026-07-27. (1) scope bridge:admin criado e concedido SO a role humana — o app de servico NAO recebe (M2M nao cunha convite; conceder por conveniencia e como menor privilegio morre). (2) adminGuard passou a exigir identidade com bridge:admin; verifyAccessToken ganhou parametro `required` para exigir outro scope sem duplicar a verificacao de assinatura/audiencia — um caminho de validacao, dois niveis de acesso. (3) a2aGuard perdeu o bypass do segredo de admin: so o pool dedicado entra (zero trafego em 30 dias, fechar nao interrompeu ninguem). (4) AUTH_TOKEN REMOVIDO do .env. PROVAS apos restart: segredo aposentado => 401 em /commands, /admin/stats E /a2a (era 200 no admin); identidade de SERVICO => 200 em /commands e 401 em /admin (menor privilegio visivel); pool a2a => 400 (passa o guard, falha no payload); PWA e /health => 200. FRONTEIRA: o caminho ADMIN pelo token HUMANO nao foi provado por esta sessao — exige browser e a role e do maestro; recusei conceder bridge:admin ao servico 'para testar'"
@@ -919,7 +926,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: confirmed
+    status: superseded
     verified_at: 2026-07-28
     verified_against: grants-no-db-e-toolset-medido-no-ar
     label: "P10 — CAPACIDADE por identidade via scope `bridge:write` (autorizado nominalmente pelo maestro apos o classificador barrar a versao que eu ia inventar sozinho). Concedido SO a role humana; o app de SERVICO nao recebe. Sem o scope: Read/Grep/Glob/WebFetch/WebSearch/TodoWrite — le e propoe. Com ele: conjunto completo. `Task` fica de fora de proposito — um subagente poderia receber o conjunto completo e a restricao vazaria pelo delegado. Provisionamento incorporado ao script idempotente (passo 9), nao aplicado a mao"
@@ -956,8 +963,8 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-28
-    verified_against: adr-ratificado-e-fatia-1-medida
+    verified_at: 2026-08-23
+    verified_against: "reverificado ao vivo 2026-08-23: dry-run logto-provision --project-federation (sem --apply) — direção repo->Logto e org-roles idempotentes confirmadas; D5 capturado em ato (org orfa (nome comercial no Logto redigido; id publico candidato: granaai) reportada, nao absorvida)"
     label: "PADRAO: o members.yaml (sob o KG) e o SSOT; o Logto e PROJECAO dele, por projetor idempotente, sempre repo->Logto e NUNCA o inverso. Dois registros editaveis dos dois lados divergem — institucionalizar declarado!=verificado na camada de IDENTIDADE seria o pior lugar possivel. D5: se alguem criar org a mao no console, o projetor REPORTA a divergencia e nao a absorve"
 
   - id: C_role_field_is_overloaded
@@ -1109,7 +1116,7 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: confirmed
+    status: superseded
     verified_at: 2026-07-28
     verified_against: relacao-usuario-org-papel-lida-no-banco
     label: "A ORG DEIXOU DE SER ESQUELETO: `marcio em onion-dist como standalone`, lido das relacoes org-usuario-papel. Nota de rigor: a contagem crua deu 'orgs com membro: 2' e eu conferi em vez de aceitar — o segundo e a org interna do proprio Logto no tenant `admin` (pre-existente). No tenant `default` e exatamente 1, como esperado; minha query e que conflava tenants"
@@ -1146,8 +1153,8 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
-    verified_against: 7-orgs-removidas-e-projetor-mudado
+    verified_at: 2026-08-23
+    verified_against: "reverificado 2026-08-23: --project-federation report-only (nenhum POST), 5 orgs reais (nenhuma vazia), guarda de --enroll exigindo id no members.yaml confirmada no codigo"
     label: "DECISAO DO MAESTRO (2026-07-28): org NASCE NA 1a MATRICULA, nao em massa. As 7 vazias foram removidas; `--project-federation` deixou de criar organizacoes e passou a RELATAR quem do SSOT ainda nao tem org (a lacuna fica visivel sem virar lixo); `--enroll` cria sob demanda, exigindo que o id exista no members.yaml. Mudou o MECANISMO, nao so o estado — sem isso a proxima rodada do projetor recriaria as 7"
 
   - id: E_dormant_privileged_duplicate
@@ -1287,8 +1294,8 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
-    verified_against: quatro-casos-medidos-no-ar
+    verified_at: 2026-08-23
+    verified_against: "reverificado 2026-08-23: 5 mecanicas reproduzidas ao vivo (401 sem token, 401 M2M nao-org, 200 sha-correto, 403 nomeando conflito). Nota: clone servido 1 anuncio atrasado vs outbox (drift de sync, nao do endpoint)"
     label: "PULL DOWNSTREAM VIVO em GET /federation/inbox/:member. Medido: token de org do pulse-mais puxa os 12 proprios com sha; pedir o inbox de OUTRO membro devolve 403 nomeando o conflito ('identidade pertence a pulse-mais, pediu granaai'); sem token 401; token do bridge-service (nao-org) 401. Os 12 baixados sao BYTE-IDENTICOS ao que o core anunciou. O adotante real nao foi tocado — a prova de clone-novo rodou em diretorio temporario"
 
   - id: C_org_token_has_no_org_claim
@@ -1361,8 +1368,8 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
-    verified_against: denominador-com-diretorio-fantasma
+    verified_at: 2026-08-23
+    verified_against: "reverificado 2026-08-23: lint real 0 disparos (outbox limpo) + reproducao sintetica isolada (staging vazia + anuncio so em _processed/) disparou SOFT como esperado. Sem drift"
     label: "REGRA 46 [SOFT] — diretorio de outbox sem membro correspondente. NAO duplica a regra SOFT preexistente: aquela olha so a STAGING (1o nivel), e o caso real tinha a staging VAZIA com os 25 todos em _processed/ — por isso o drift sobreviveu 19 dias. Provado com denominador: diretorio fantasma com anuncio SO em _processed => a nova DISPARA, a SOFT preexistente da 0 disparos. Enquanto a entrega era `cp --target`, o nome do diretorio nao importava; o pull tornou a convencao EXECUTAVEL e a divergencia apareceu no 1o uso real. SEVERIDADE CORRIGIDA PELO SELFTEST: eu escrevi HARD e o caso (7) da REGRA 28 reprovou — ele defende 'SOFT, nunca HARD' desde 2026-07-19, porque anuncio orfao PRE-EXISTENTE bloquearia o CI de qualquer adotante que ja tenha um. Eu reverti uma decisao documentada sem saber que existia, e a guarda mecanica me pegou onde a leitura nao pegou"
 
   - id: C_vendor_scrub_caught_me_again
@@ -1389,6 +1396,61 @@ nodes:
     verified_against: host-vps-medido
     label: "RE-VERIFY (kg-freshness 2026-07-29, medido read-only): o fix do teto de ancestral SEGUE EFETIVO. cat /sys/fs/cgroup/system.slice/memory.min => 402653184 (384M); caddy.service=67108864 (64M); onion-bridge.service=268435456 (256M); drop-in 10-memory-protection.conf presente. Com memory_recursiveprot a protecao do ancestral desce as folhas — os floors de caddy/bridge estao EFETIVOS, confirmando a supersessao de C_ancestor_cap_zeroes_floors. RESSALVA: mede o caso caddy/bridge, NAO a classe host-wide de Q_floors_effective (varredura dos demais floors segue gated)"
 
+  - id: E_logto_now_critical_2026_08
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-23
+    verified_against: "medido ao vivo 2026-08-23: container Logto roda 1.42.0 (nao 1.41.0); e o bridge JA E CONSUMIDOR — src/identity.ts+server.ts validam tokens OIDC do Logto ativamente (verifyAccessToken no middleware, JWKS_URI=auth.onionevolve.com, .env com M2M do Logto)"
+    trace: docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+    label: "Logto NAO esta mais ocioso: 1.42.0 vivo E consumido pelo bridge (valida OIDC no caminho critico). O flip que E_logto_live descrevia como futuro/gated JA ACONTECEU — a verdade andou (versao + consumo), o no antigo nao errou na origem"
+  - id: E_bridge_write_grant_absent_2026_08
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-23
+    verified_against: "medido ao vivo 2026-08-23 (Logto roles_scopes): o scope bridge:write EXISTE mas NAO esta atribuido a role nenhuma (nem bridge-user nem bridge-operator). Codigo de enforcement integro (chat.ts, commit 7e736ba2)"
+    trace: docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+    label: "GRANT AUSENTE: hoje NENHUM chamador (humano ou servico) carrega bridge:write — todos rodam READ_ONLY_TOOLS. O mecanismo sobrevive; o estado de concessao que D_capability_by_scope afirmava vigente nao se firmou. Cura: reconceder via logto-provision.sh --apply e reverificar"
+  - id: E_logto_tenant_provisioned_2026_08
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-23
+    verified_against: "medido ao vivo 2026-08-23 (docker exec psql): tenant default tem 3 users (nicole, marciog, marciocar), 9 applications (incl. onion-bridge-service/onion-bridge-pwa), o API Resource 'Onion Bridge' (https://bridge.onionevolve.com) existe, e sign_in_mode=SignIn nos dois tenants (registro fechado)"
+    trace: /home/marcio/onion-vps-logto/docker-compose.yml
+    label: "O tenant default NAO esta mais vazio: 3 users, 9 apps, resource do bridge existe, sign-up FECHADO. O pre-requisito que E_p0 descrevia (criar user antes do flip) foi cumprido E o P3.4 (desligar sign-up) tambem ja foi aplicado, na ordem recomendada. O snapshot de 07-26 foi ultrapassado pela linha do tempo"
+  - id: E_floors_now_effective_2026_08
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-23
+    verified_against: "medido ao vivo 2026-08-23 (systemctl show): a correcao sugerida FOI aplicada — o drop-in agora e onion-vps-bridge.service.d/ (onion-bridge.service.d/ nao existe mais); onion-vps-bridge.service carrega MemoryMin=256M/MemoryLow=512M (loaded/active)"
+    trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
+    label: "Os floors de memoria AGORA PROTEGEM o alvo certo: onion-vps-bridge.service com MemoryMin=256M/MemoryLow=512M; o drop-in fantasma (que apontava para o unit renomeado) sumiu. Os 3 drop-ins protegem os 3 alvos (system.slice, caddy, onion-vps-bridge). A classe do achado FECHA — nenhum floor inerte"
+  - id: E_org_membership_grows_2026_08
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-23
+    verified_against: "medido ao vivo 2026-08-23: a relacao nucleo (marciocar em onion-dist como standalone) segue verdadeira. Mas o tenant default tem HOJE 2 orgs com membro, nao 1: onion-dist/marciocar/standalone (original) + granaai/marciog/admin (novo, provavelmente via --enroll)"
+    trace: ops/bridge-auth/logto-provision.sh
+    label: "A cardinalidade DRIFTOU: 'tenant default = exatamente 1 org com membro' virou 2 (+ granaai/marciog/admin). Se o onboarding continua (o adotante granaai via --enroll), a claim do no deveria ser sobre cardinalidade CRESCENTE, nao um valor fixo. A relacao nucleo segue medida e verdadeira"
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -1937,3 +1999,18 @@ edges:
   - from: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
     to: C_a2a_gate_narrow
     edge_type: TRACES_TO
+  - from: E_logto_now_critical_2026_08
+    to: E_logto_live
+    edge_type: SUPERSEDES
+  - from: E_bridge_write_grant_absent_2026_08
+    to: D_capability_by_scope
+    edge_type: SUPERSEDES
+  - from: E_logto_tenant_provisioned_2026_08
+    to: E_p0_logto_tenant_measured
+    edge_type: SUPERSEDES
+  - from: E_floors_now_effective_2026_08
+    to: Q_floors_effective
+    edge_type: SUPERSEDES
+  - from: E_org_membership_grows_2026_08
+    to: E_org_has_member_with_role
+    edge_type: SUPERSEDES
