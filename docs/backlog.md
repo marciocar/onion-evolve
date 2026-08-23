@@ -1,9 +1,9 @@
 # Backlog vivo — projeção dos grafos ⚙️ GERADO
 
 > Gerado por `.claude/validation/kg-backlog-project.sh` a partir dos nós `status: open` da
-> camada canônica (`docs/onion/graph/`) + grafos marcados. **Não editar à mão**: feche o
+> camada canônica (`docs/onion/graph/`, exceto arquivos opt-OUT) + grafos marcados. **Não editar à mão**: feche o
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
-> radar: impact × incerteza × status). **Sem corte** — nada fica invisível.
+> radar: impact × incerteza × status). Sem corte NO ESCOPO; 1 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
 **188 itens abertos** em 28 grafo(s) com aberto (de 40 no escopo) · 28 grupo(s). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 

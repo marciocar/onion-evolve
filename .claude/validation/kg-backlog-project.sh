@@ -7,7 +7,8 @@
 #             fecha no grafo (status ≠ open) → some daqui sozinho. O grafo é a
 #             fonte; este .md deriva (nunca editar à mão).
 #
-# Escopo    : a CAMADA CANÔNICA inteira (docs/onion/graph/*.kg.yaml) UNIÃO os
+# Escopo    : a CAMADA CANÔNICA (docs/onion/graph/*.kg.yaml) EXCETO grafos opt-OUT
+#             (# kg-backlog-archive: on — arquivos de pesquisa), UNIÃO os
 #             grafos marcados `# kg-backlog-guard: on` em qualquer lugar (ex.: o
 #             F4b em docs/evolution/research/). Exclui fixtures e o arquivo de
 #             pesquisa/discussão histórica (docs/discussions, docs/evolution/*
@@ -64,13 +65,14 @@ done
 n_graphs="${#GRAPHS[@]}"
 n_with_open="$(cut -f4 "$TMP" | sort -u | grep -c . || true)"
 n_owners="$(cut -f2 "$TMP" | sort -u | grep -c . || true)"
+n_archived="$(git ls-files 'docs/onion/graph/*.kg.yaml' '*.kg.yaml' 2>/dev/null | sort -u | while read -r g; do grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-archive:[[:space:]]*on\b' "$g" 2>/dev/null && echo x; done | grep -c . || true)"
 
 render() {
   printf '# Backlog vivo — projeção dos grafos ⚙️ GERADO\n\n'
   printf '> Gerado por `.claude/validation/kg-backlog-project.sh` a partir dos nós `status: open` da\n'
-  printf '> camada canônica (`docs/onion/graph/`) + grafos marcados. **Não editar à mão**: feche o\n'
+  printf '> camada canônica (`docs/onion/graph/`, exceto arquivos opt-OUT) + grafos marcados. **Não editar à mão**: feche o\n'
   printf '> item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do\n'
-  printf '> radar: impact × incerteza × status). **Sem corte** — nada fica invisível.\n\n'
+  printf '> radar: impact × incerteza × status). Sem corte NO ESCOPO; %s grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.\n\n' "$n_archived"
   printf '**%s itens abertos** em %s grafo(s) com aberto (de %s no escopo) · %s grupo(s). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".\n\n' "$n_open" "$n_with_open" "$n_graphs" "$n_owners"
   if [ "$n_open" -eq 0 ]; then printf '_Nada aberto no escopo._\n'; return; fi
   # grupos ordenados por MAIOR atenção do grupo (empate: ordem estável do sort)
