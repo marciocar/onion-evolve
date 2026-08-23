@@ -17,6 +17,23 @@
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+# ── GUARDA ANTI-COMMIT-NA-DEFAULT-BRANCH (cura de recorrência: 2026-08-23, 2 slips numa sessão) ──
+# O fluxo Onion é feature-branch → PR → merge (CI + passada adversarial REGRA 56). Commit LOCAL
+# direto na default branch PULA os dois — foi assim que o escopo abrangente do backlog foi para main
+# sem revisão. Bloqueia; a cura é branchar. Escape consciente (merge/hotfix) = --no-verify.
+# CORE-ONLY: vive no hook PRÓPRIO do core (difere do template vendorizado) — não viaja ao adotante,
+# que pode ter fluxo trunk-based (a lição "o core é o pior oráculo do que viaja").
+_ONION_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
+_ONION_DEFAULT="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')"
+[ -n "${_ONION_DEFAULT}" ] || _ONION_DEFAULT=main
+if [ "${_ONION_BRANCH}" = "${_ONION_DEFAULT}" ]; then
+  echo "🛑 Onion pre-commit — commit DIRETO na default branch (${_ONION_DEFAULT}) BLOQUEADO." >&2
+  echo "   O fluxo é feature-branch → PR → merge (CI + REGRA 56). Commit em ${_ONION_DEFAULT} pula os dois." >&2
+  echo "   Cure: git branch <nome-em-ingles> && git switch <nome>   (o commit staged vai junto)" >&2
+  echo "   Escape consciente (merge/hotfix): git commit --no-verify" >&2
+  exit 1
+fi
 LINT="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
 
 # Sem o linter no repo (ex.: projeto-alvo sem .claude/validation) → não bloqueia.
