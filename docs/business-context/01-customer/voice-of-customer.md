@@ -1,6 +1,6 @@
 # Voz do Cliente
 
-**Última Atualização:** 2026-07-13
+**Última Atualização:** 2026-08-23
 
 > ⚠️ **Gap conhecido:** o Onion não tem base de clientes externos ainda. Este arquivo é **N=1 (maestro) + os adotantes de campo + sinais da pesquisa**, não voz-de-mercado. A contagem viva se **deriva**, não se copia: `grep -c '^ *kind: adopter' docs/evolution/federation/members.yaml` (régua canônica em [`decisions.md`](../decisions.md)). Enriquecer quando houver campo. Majoritariamente `[INFERIDO]`.
 
@@ -16,7 +16,7 @@
 
 - **Curva de entrada** — 3 dimensões, muitos comandos/agentes; "qual uso agora?" (mitigado por `/onion`, mas real).
 - **Claude Code-only** — barreira para quem usa outras ferramentas (é escolha deliberada, mas custa alcance).
-- **Complexidade para leigo** — bloqueia P6 (Onion Pessoal) inteiramente hoje.
+- **Complexidade para leigo** — é o gap central do P6 (Onion Pessoal); mas o app companheiro está EM CONSTRUÇÃO ATIVA (F0 fechado no device), não bloqueado. [corrigido 2026-08-23: /meta:context-freshness pegou este #4 — o claim envelheceu contra a realidade]
 
 ## Padrões de pedido (feature requests)
 
