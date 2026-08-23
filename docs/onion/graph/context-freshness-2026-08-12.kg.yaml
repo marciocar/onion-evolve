@@ -150,6 +150,17 @@ nodes:
     label: "✅ D8 RATIFICADA: 'adotante' = `kind: adopter` no `members.yaml` (8 hoje), NAO 'membros nao-source' (11). A diferenca sao TRES membros e ela e semantica: `distillation` e `method` NAO vendorizam (`onion_version: n/a`), e `door` vendoriza para DISTRIBUIR o bundle, nao para usar num projeto. Adotante = quem instala o framework para TRABALHAR com ele. ⚠️ A CURA NAO E ATUALIZAR O NUMERO — e fazer a prosa APONTAR: `metrics.md`, `voice-of-customer.md` e `index.md` passam a citar `grep -c '^ *kind: adopter' members.yaml` em vez de carregar a propria copia. Atualizar 4->8 curaria o caso e deixaria a classe viva: o drift sobreviveu a DUAS auditorias justamente porque cada doc mantinha o proprio numero. ⚠️ A ANCORA `^ *` E LOAD-BEARING: sem ela o grep devolve 9 (a 9a e legenda comentada do schema). ACHADO LATERAL: `index.md` carregava o mesmo drift e a auditoria NAO o viu — o comando exclui `README`/`index.md` do escopo por convencao. Convencao de escopo cria ponto cego, e este custou um doc inteiro."
     trace: "docs/business-context/decisions.md"
 
+  - id: E_VOICE_OF_CUSTOMER_P6_DRIFT_2026_08_23
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-23
+    verified_against: "re-run do /meta:context-freshness em 2026-08-23 (11 dias apos o run 08-12): o voice-of-customer.md afirmava 'Complexidade para leigo bloqueia P6 (Onion Pessoal) INTEIRAMENTE hoje', com carimbo Ultima Atualizacao 2026-07-13 — mas a realidade (memoria onion-pessoal-app-state) e app EM CONSTRUCAO ATIVA, F0 fechado no device. Instancia fresca da tese C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO: a nota de frescor blindava um claim que envelheceu. CORRIGIDO no mesmo movimento (linha 19 + re-carimbo). Nota de calibragem: o run haiku de 08-23 over-flaggou #2 (rastreabilidade) em 12/13 business; o spot-check mostrou que a maioria TEM secao Fontes, falta ancoragem por-numero — consistente com o juiz opus de 08-12 que ja estreitara a tese para #4-por-numero, nao #2"
+    trace: docs/business-context/01-customer/voice-of-customer.md
+    label: "RE-AUDITORIA 08-23: 1 drift #4 REAL pego e CORRIGIDO — voice-of-customer dizia P6/Onion Pessoal 'bloqueado inteiramente' (claim envelhecido sob carimbo de 07-13); a realidade e construcao ativa. Confirma a tese do grafo (frescor blinda numero errado) 11 dias depois. O #2 do run haiku foi over-flag (calibragem registrada)"
 edges:
   - from: I_REFRESH_APLICADO_E_A_GUARDA_CALOU
     to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
@@ -196,3 +207,6 @@ edges:
   - from: A_RUN_DA_AUDITORIA_DE_CONTEXTO
     to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA
     edge_type: TRACES_TO
+  - from: E_VOICE_OF_CUSTOMER_P6_DRIFT_2026_08_23
+    to: C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO
+    edge_type: SUPPORTS
