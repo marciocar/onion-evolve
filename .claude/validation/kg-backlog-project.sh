@@ -2,22 +2,22 @@
 # =============================================================================
 # kg-backlog-project.sh — projeta docs/backlog.md a partir dos nós `status: open`
 #
-# Propósito : a VISÃO HUMANA do trabalho aberto. Projeção PURA dos grafos que
-#             optaram-in (marcador `# kg-backlog-guard: on`) — reescrita a cada
-#             run. Item fecha no grafo (status != open) → some daqui sozinho.
-#             NÃO é fonte: os grafos são a fonte; este .md deriva.
-#             (Graduação da inovação da PoC — o adotante-oráculo — MELHORADA:
-#              consome `kg-radar --open-tsv` em vez de regex, e lê `owner:` como
-#              campo do nó em vez de derivá-lo do id.)
+# Propósito : a VISÃO HUMANA do trabalho aberto do core — a fila de decisão/
+#             execução num lugar só. Projeção PURA: reescrita a cada run; item
+#             fecha no grafo (status ≠ open) → some daqui sozinho. O grafo é a
+#             fonte; este .md deriva (nunca editar à mão).
+#
+# Escopo    : a CAMADA CANÔNICA inteira (docs/onion/graph/*.kg.yaml) UNIÃO os
+#             grafos marcados `# kg-backlog-guard: on` em qualquer lugar (ex.: o
+#             F4b em docs/evolution/research/). Exclui fixtures e o arquivo de
+#             pesquisa/discussão histórica (docs/discussions, docs/evolution/*
+#             não-marcado) — ruído epistêmico, visível só via `kg-radar --open-tsv`.
+#             Decisão do maestro (2026-08-23): "nada sem controle" = fila inteira.
+#
+# Fonte     : `kg-radar --open-tsv` (a atenção já vem calculada, coluna 8 — a
+#             régua do radar, não recalculada). Ordena por atenção, SEM corte.
 #
 # Uso       : bash .claude/validation/kg-backlog-project.sh [--write|--check]
-#               --write (default) : (re)escreve docs/backlog.md
-#               --check           : compara o recomputado vs o commitado (advisory)
-#
-# Escopo    : grafos com `# kg-backlog-guard: on` (mesmo opt-in da guarda REGRA 58
-#             — escopo curado por construção; os ~614 abertos históricos ficam de
-#             fora até o grafo virar trabalho vivo e optar-in). Fonte de atenção:
-#             a coluna 8 do `--open-tsv` (a régua do radar, não recalculada).
 # =============================================================================
 set -uo pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
@@ -26,65 +26,67 @@ RADAR=".claude/validation/kg-radar.sh"
 OUT="docs/backlog.md"
 MODE="${1:---write}"
 
-# grafos que optaram-in
-mapfile -t GRAPHS < <(git ls-files '*.kg.yaml' | grep -v '/fixtures/' | while read -r g; do
-  grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-guard:[[:space:]]*on\b' "$g" 2>/dev/null && echo "$g"
-done)
+# escopo: canônico ∪ marcado (dedup, sem fixtures)
+mapfile -t GRAPHS < <( {
+  git ls-files 'docs/onion/graph/*.kg.yaml'
+  git ls-files '*.kg.yaml' | while read -r g; do
+    grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-guard:[[:space:]]*on\b' "$g" 2>/dev/null && echo "$g"
+  done
+} | grep -v '/fixtures/' | sort -u )
 
 TMP="$(mktemp)"; trap 'rm -f "$TMP"' EXIT
 n_open=0
 for g in "${GRAPHS[@]}"; do
+  [ -f "$g" ] || continue
   base="$(basename "$g" .kg.yaml)"
+  # mapa id→owner do grafo, UMA passada (owner é raro; ausente → fallback grafo)
+  declare -A OWN=()
+  while IFS=$'\t' read -r nid now; do OWN["$nid"]="$now"; done < <(
+    awk '
+      /^[[:space:]]*- id:/ { id=$0; sub(/^[[:space:]]*- id:[[:space:]]*/,"",id); sub(/[[:space:]]*$/,"",id); next }
+      /^[[:space:]]*owner:/ && id!="" { o=$0; sub(/^[^:]*:[[:space:]]*/,"",o); gsub(/"/,"",o); print id"\t"o; id="" }
+      /^[[:space:]]*- id:/ { }
+    ' "$g" )
   while IFS=$'\t' read -r file id typ plane st imp conf att vat trace c11 label; do
     [ -n "${id:-}" ] || continue
-    # owner: campo do nó (varre o bloco até o próximo `- id:`); fallback = grafo
-    owner="$(awk -v want="$id" '
-      $0 ~ ("^[[:space:]]*- id:[[:space:]]*" want "[[:space:]]*$") { inblk=1; next }
-      inblk && /^[[:space:]]*- id:/ { exit }
-      inblk && /^[[:space:]]*owner:/ { sub(/^[^:]*:[[:space:]]*/,""); gsub(/"/,""); print; exit }
-    ' "$g")"
-    [ -n "$owner" ] || owner="$base"
-    # TSV interno: atenção \t owner \t id \t grafo \t label
+    owner="${OWN[$id]:-$base}"
     printf '%s\t%s\t%s\t%s\t%s\n' "${att:-0}" "$owner" "$id" "$base" "${label:-}" >> "$TMP"
     n_open=$((n_open+1))
   done < <(bash "$RADAR" "$g" --open-tsv 2>/dev/null)
+  unset OWN
 done
 
 n_graphs="${#GRAPHS[@]}"
+n_with_open="$(cut -f4 "$TMP" | sort -u | grep -c . || true)"
 n_owners="$(cut -f2 "$TMP" | sort -u | grep -c . || true)"
 
-# monta o markdown (ordena por atenção desc DENTRO de cada owner; owners por tamanho desc)
 render() {
   printf '# Backlog vivo — projeção dos grafos ⚙️ GERADO\n\n'
-  printf '> Gerado por `.claude/validation/kg-backlog-project.sh` a partir dos nós `status: open`\n'
-  printf '> dos grafos que optaram-in (`# kg-backlog-guard: on`). **Não editar à mão**: feche o item\n'
-  printf '> no grafo (status ≠ open) e ele sai daqui. Ordem = atenção (a régua do radar). Sem corte.\n\n'
-  printf '**%s itens abertos** em %s grafo(s) · %s owner(s). Fonte exaustiva (todos os grafos): `kg-radar --open-tsv`.\n\n' "$n_open" "$n_graphs" "$n_owners"
-  if [ "$n_open" -eq 0 ]; then
-    printf '_Nenhum fio aberto nos grafos marcados. (Para incluir um grafo, adicione `# kg-backlog-guard: on` + um `TETO:` no seu `meta:`.)_\n'
-    return
-  fi
-  # owners ordenados por nº de itens desc (set -f: owner é campo livre, blinda glob)
-  set -f
-  for owner in $(cut -f2 "$TMP" | sort | uniq -c | sort -rn | awk '{$1="";sub(/^ /,"");print}' | tr ' ' '\027'); do
-    o="$(printf '%s' "$owner" | tr '\027' ' ')"
-    cnt="$(awk -F'\t' -v o="$o" '$2==o' "$TMP" | grep -c .)"
-    printf '## %s — %s item(ns)\n\n' "$o" "$cnt"
+  printf '> Gerado por `.claude/validation/kg-backlog-project.sh` a partir dos nós `status: open` da\n'
+  printf '> camada canônica (`docs/onion/graph/`) + grafos marcados. **Não editar à mão**: feche o\n'
+  printf '> item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do\n'
+  printf '> radar: impact × incerteza × status). **Sem corte** — nada fica invisível.\n\n'
+  printf '**%s itens abertos** em %s grafo(s) com aberto (de %s no escopo) · %s grupo(s). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".\n\n' "$n_open" "$n_with_open" "$n_graphs" "$n_owners"
+  if [ "$n_open" -eq 0 ]; then printf '_Nada aberto no escopo._\n'; return; fi
+  # grupos (owner|grafo) ordenados por MAIOR atenção do grupo, depois por tamanho
+  cut -f2 "$TMP" | sort -u | while read -r grp; do
+    maxatt="$(awk -F'\t' -v g="$grp" '$2==g{if($1+0>m)m=$1+0}END{printf "%.2f",m}' "$TMP")"
+    printf '%s\t%s\n' "$maxatt" "$grp"
+  done | sort -t$'\t' -k1,1nr | while IFS=$'\t' read -r _m grp; do
+    cnt="$(awk -F'\t' -v g="$grp" '$2==g' "$TMP" | grep -c . || true)"
+    printf '## %s — %s item(ns)\n\n' "$grp" "$cnt"
     printf '| Atenção | Nó | Grafo | O que é |\n|--:|---|---|---|\n'
-    awk -F'\t' -v o="$o" '$2==o' "$TMP" | sort -t$'\t' -k1,1nr | while IFS=$'\t' read -r att own id gr label; do
+    awk -F'\t' -v g="$grp" '$2==g' "$TMP" | sort -t$'\t' -k1,1nr | while IFS=$'\t' read -r att own id gr label; do
       lbl="$(printf '%s' "$label" | tr '|' '·' | cut -c1-130)"
       printf '| %.1f | `%s` | %s | %s |\n' "${att:-0}" "$id" "$gr" "$lbl"
     done
     printf '\n'
   done
-  set +f
 }
 
 if [ "$MODE" = "--check" ]; then
-  cur="$(cat "$OUT" 2>/dev/null || true)"
-  new="$(render)"
-  if [ "$cur" = "$new" ]; then echo "backlog.md: em dia ($n_open abertos)"; exit 0
-  else echo "backlog.md: DRIFT (advisory) — rode /meta:backlog para regenerar"; exit 0; fi
+  if [ "$(cat "$OUT" 2>/dev/null || true)" = "$(render)" ]; then echo "backlog.md: em dia ($n_open abertos)"; else echo "backlog.md: DRIFT (advisory) — rode /meta:backlog"; fi
+  exit 0
 fi
 render > "$OUT"
-echo "✓ $OUT gerado: $n_open abertos · $n_graphs grafo(s) marcado(s) · $n_owners owner(s)"
+echo "✓ $OUT gerado: $n_open abertos · $n_with_open grafo(s) com aberto (de $n_graphs no escopo)"

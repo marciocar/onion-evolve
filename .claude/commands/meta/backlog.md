@@ -1,6 +1,6 @@
 ---
 name: backlog
-description: "Regenerar docs/backlog.md — a projeção humana do trabalho ABERTO do core, a partir dos nós abertos (status open) dos grafos que optaram-in (`# kg-backlog-guard on`). Use para ver os fios abertos num lugar só, ordenados por atenção (a régua do radar), agrupados por owner. Projeção pura: item fecha no grafo → some daqui sozinho. A fonte é o grafo; este .md deriva."
+description: "Regenerar docs/backlog.md — a projeção humana do trabalho ABERTO do core, a partir dos nós abertos (status open) da camada canônica (docs/onion/graph) + grafos marcados. Use para ver os fios abertos num lugar só, ordenados por atenção (a régua do radar), agrupados por owner. Projeção pura: item fecha no grafo → some daqui sozinho. A fonte é o grafo; este .md deriva."
 model: haiku
 category: meta
 tags: [backlog, kg, projection, open-threads, self-evolution, ssot]
@@ -21,13 +21,15 @@ no grafo → aparece no backlog → fecha no grafo → some daqui sozinho* (proj
 > nó no grafo (`status:` ≠ `open`, com carimbo) e regenere. É a doutrina do próprio `fios-abertos.kg.yaml`:
 > *"backlog de documento ordena item morto"* — por isso a projeção é pura, não uma lista paralela.
 
-## Escopo — opt-in por marcador (mata o ruído)
+## Escopo — a camada canônica inteira (decisão do maestro, 2026-08-23: "nada sem controle")
 
-Só entram os grafos com **`# kg-backlog-guard: on`** no `meta:` (o mesmo opt-in da guarda REGRA 58).
-Grafo de pesquisa/discussão histórica **não** opta-in → seus abertos epistêmicos não viram ruído no
-backlog. Para incluir um grafo de trabalho vivo: adicione `# kg-backlog-guard: on` + um `# ═══ TETO: N
-NÓS ═══` no `meta:` dele (a guarda passa a cobrar cap + carimbo de `done`). A visão **exaustiva** (todos
-os grafos, sem curadoria) continua sendo `bash .claude/validation/kg-radar.sh <grafo> --open-tsv`.
+Entram **todos os grafos de `docs/onion/graph/*.kg.yaml`** (a camada canônica = a fila de decisão/
+execução do core) **UNIÃO** os grafos marcados `# kg-backlog-guard: on` em qualquer lugar (ex.: o F4b
+em `docs/evolution/research/`). Fica **de fora** só o arquivo de pesquisa/discussão histórica
+(`docs/discussions/`, `docs/evolution/*` não-marcado) — ruído epistêmico, visível só via
+`kg-radar --open-tsv`. Assim o backlog mostra a fila inteira (o flip de auth, federation, pricing…),
+ordenada por atenção — o topo é o que "custa caro estar errado". O marcador `# kg-backlog-guard: on`
+segue sendo o opt-in **da guarda REGRA 58** (cap + carimbo), agora desacoplado do escopo da projeção.
 
 ## Procedimento
 
