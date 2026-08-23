@@ -1413,7 +1413,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.9
-    status: confirmed
+    status: superseded
     verified_at: 2026-08-23
     verified_against: "medido ao vivo 2026-08-23 (Logto roles_scopes): o scope bridge:write EXISTE mas NAO esta atribuido a role nenhuma (nem bridge-user nem bridge-operator). Codigo de enforcement integro (chat.ts, commit 7e736ba2)"
     trace: docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
@@ -1451,6 +1451,17 @@ nodes:
     verified_against: "medido ao vivo 2026-08-23: a relacao nucleo (marciocar em onion-dist como standalone) segue verdadeira. Mas o tenant default tem HOJE 2 orgs com membro, nao 1: onion-dist/marciocar/standalone (original) + granaai/marciog/admin (novo, provavelmente via --enroll)"
     trace: ops/bridge-auth/logto-provision.sh
     label: "A cardinalidade DRIFTOU: 'tenant default = exatamente 1 org com membro' virou 2 (+ granaai/marciog/admin). Se o onboarding continua (o adotante granaai via --enroll), a claim do no deveria ser sobre cardinalidade CRESCENTE, nao um valor fixo. A relacao nucleo segue medida e verdadeira"
+  - id: E_bridge_write_regranted_2026_08
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-23
+    verified_against: "reconcedido e provado por comportamento 2026-08-23 (ordem do maestro): via Management API do Logto (token m-default), a role humana bridge-user NAO tinha bridge:write ANTES (GET /roles/{}/scopes = ausente); POST /roles/{}/scopes {scopeIds:[bridge:write]} concedeu; GET DEPOIS = PRESENTE. O servico (bridge-operator) NAO recebeu. Grant cirurgico (um POST), sem rodar o --apply inteiro"
+    trace: ops/bridge-auth/logto-provision.sh
+    label: "bridge:write RECONCEDIDO a role humana (bridge-user) em 2026-08-23 — restaura o estado que D_capability_by_scope afirmava (capacidade SO a pessoa; servico segue READ_ONLY). O chamador humano volta ao conjunto completo de tools; o M2M nao. Supera o achado E_bridge_write_grant_absent (grant ausente) que a re-verificacao pegara"
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -2013,4 +2024,7 @@ edges:
     edge_type: SUPERSEDES
   - from: E_org_membership_grows_2026_08
     to: E_org_has_member_with_role
+    edge_type: SUPERSEDES
+  - from: E_bridge_write_regranted_2026_08
+    to: E_bridge_write_grant_absent_2026_08
     edge_type: SUPERSEDES
