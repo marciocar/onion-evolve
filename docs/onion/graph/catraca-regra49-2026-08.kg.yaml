@@ -320,8 +320,8 @@ nodes:
     confidence: 0.9
     status: open
     verified_at: 2026-08-24
-    verified_against: "granaai medida ao vivo 2026-08-24: pin 6cc162f3 (adotado), develop aa7732e6, onion/vendor 2720c904 — o update para 617bb56 nao aplicou (rolou de volta pelo bug acima). A PoC (greenfield) atualizou; a granaai (regulada) NAO, ate a cura."
-    label: "BLOQUEIO ACIONAVEL: a granaai segue no pin ANTIGO (6cc162f3, ~1 mes atras) — o update para o core de hoje esbarra em E_UPDATE_FILTER_REMOVIDO_COLLISION. Sai deste estado quando D_CURE_AMEND for construida e o update re-rodar limpo"
+    verified_against: "dogfood REAL 2026-08-24 (clone descartavel): com a cura o update da granaai NAO contamina mais (vendor 0 chaves estrangeiras). MAS a granaai segue com lint HARD — nao por REMOVIDO (curado), e sim por NO-BASELINE (46 HARD): ela nunca teve baseline de catraca proprio (estado PRE-catraca, medido no develop aa7732e6 ANTES de qualquer update). Ou seja: a contaminacao esta curada; o bloqueio remanescente e OUTRO (E_GRANAAI_NOBASELINE_PREEXISTING) e independe do update."
+    label: "PARCIALMENTE RESOLVIDA: a CONTAMINACAO (chave estrangeira → REMOVIDO) esta curada por D_CURE_PRESERVE_ADOPTER_BASELINE, provado no dogfood real. Resta o bloqueio SEPARADO E PRE-EXISTENTE: a granaai nao tem baseline proprio (NO-BASELINE fail-closed), que precisa ser emitido do corpus dela — rastreado por D_ADOPT_MUST_EMIT_MISSING_BASELINES. Nao re-abrir isto como bug do --update"
   - id: C_REGULATED_ADOPTER_IS_THE_ORACLE
     node_type: claim
     layer: audit
@@ -340,9 +340,9 @@ nodes:
     confidence: 0.9
     status: done
     verified_at: 2026-08-24
-    verified_against: "implementada em .claude/utils/adopt/vendor-branch.sh (_update): apos o tar-x do framework no worktree do onion/vendor, `git checkout -- '.claude/validation/*-baseline.txt'` restaura os baselines do vendor ANTES do durable-commit. Provada por run_vendor_baseline_removido_selftests em lint-selftest.sh (GREEN com a cura + RED/MUT sem a linha = load-bearing)."
+    verified_against: "implementada em .claude/utils/adopt/vendor-branch.sh (_update): apos o tar-x do framework no worktree do onion/vendor, um loop reseta os *-baseline.txt ao ESTADO DE HEAD DO VENDOR — (A) rastreado no vendor → `git checkout HEAD --`; (B) untracked (veio do core no tar-x) → `rm`. Cobre os DOIS estados de campo MEDIDOS (2026-08-24): poc(47)/gustavo(48) tem baseline rastreado no vendor; granaai/arandek NAO tem. Provada por run_vendor_baseline_removido_selftests (A/GREEN + B/GREEN + RED/MUT que remove o bloco entre marcadores e reproduz a contaminacao nos DOIS) + dogfood REAL num clone da granaai (update curado: vendor 0 chaves estrangeiras, develop sem baseline do core)."
     trace: .claude/utils/adopt/vendor-branch.sh
-    label: "CURA IMPLEMENTADA (supersede D_CURE_AMEND): o baseline de catraca e LEDGER LOCAL do adotante — nunca vem do core. Filtrar na FONTE (o onion/vendor NUNCA carrega baseline do core) mantem HEAD, merge-base E todos os ancestrais limpos — robusto contra qual regra de _baseline_ref dispara. Uma linha no _update: `git checkout -- *-baseline.txt` apos o tar-x. Baseline NOVO do core segue via regen-baselines --auto (novo→emit do corpus do alvo). NAO toca a catraca critica"
+    label: "CURA IMPLEMENTADA (supersede D_CURE_AMEND): o baseline de catraca e LEDGER LOCAL do adotante; o --update JAMAIS deve ADIANTAR nem ADICIONAR o baseline do core ao vendor. CORRECAO do rationale (medido no campo, refutando a 1a redacao): o vendor JA carregava o baseline do core em poc/gustavo (contaminados por updates PRE-cura) — a cura nao 'mantem o vendor limpo', ela o RESETA ao proprio HEAD (restaura rastreado / remove untracked), o merge 3-way toma *ours* e nenhum ancestral (HEAD, merge-base, Regra 2 no onion/vendor) carrega a chave estrangeira. NAO toca a catraca critica. O veneno JA congelado em poc/gustavo fica inerte (scrub = follow-up, ver M2)"
   - id: E_CURE_REPRODUCED_AND_FIXED
     node_type: evidence
     layer: audit
@@ -351,9 +351,38 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: 2026-08-24
-    verified_against: "bancada run_vendor_baseline_removido_selftests (lint-selftest.sh) + reproducao isolada com os helpers reais (core sintetico: baseline com chave estrangeira docs/discussions/core-only/foreign.kg.yaml + grafo FORA do manifest): SEM a cura → kg-verificacao/REMOVIDO HARD:1 exit 1 (RED); COM a cura → onion/vendor sem contaminacao, HARD:0 exit 0 (GREEN); mutacao que remove a linha da cura reproduz o RED (prova load-bearing)."
+    verified_against: "bancada run_vendor_baseline_removido_selftests (3 casos: A/GREEN baseline rastreado, B/GREEN vendor sem baseline=granaai, RED/MUT que remove o bloco entre marcadores e contamina os DOIS) + reproducoes isoladas dos dois estados + dogfood REAL num clone descartavel da granaai (nunca o repo real): update com o helper curado → vendor 0 chaves estrangeiras, develop sem baseline do core; update ANTIGO (fork, medido antes) → 47 REMOVIDO + vendor contaminado. A revisao adversarial (branch-code-reviewer) refutou minha 1a cura (checkout so cobria o estado A; no-op na granaai) — verificado e ESTENDIDO."
     trace: .claude/validation/lint-selftest.sh
-    label: "REPRODUZIDO E CURADO por comportamento: o bug so aparece quando o cwd da catraca e a arvore do ADOTANTE (medir no repo do core dava 47 falso — testar-no-caminho-errado). A cura fecha o RED; a bancada guarda o RED/MUT para que o defeito nunca volte em silencio"
+    label: "REPRODUZIDO E CURADO por comportamento em AMBOS os estados de campo. A revisao adversarial pegou que a 1a versao (so `checkout`) era NO-OP na granaai (vendor sem baseline rastreado) — o dogfood real confirmou e a cura foi estendida (remove o untracked). Medir no repo do core dava 47 falso (testar-no-caminho-errado); o cwd tem de ser a arvore do ADOTANTE"
+  - id: E_GRANAAI_NOBASELINE_PREEXISTING
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-24
+    verified_against: "clone da granaai, develop PRE-update (aa7732e6, sem meu update): a catraca ja emite [kg-verificacao/NO-BASELINE] baseline AUSENTE, rc=1. Nenhuma branch da granaai (develop/vendor/main/feat/*) rastreia kg-verification-baseline.txt. Logo o NO-BASELINE independe do --update — e estado PRE-catraca do adotante."
+    trace: .claude/validation/kg-verification-coverage.sh
+    label: "A granaai esta em estado PRE-catraca: nunca teve baseline de catraca proprio, entao a catraca fail-close (NO-BASELINE) independentemente de qualquer update. O '47 REMOVIDO' que o fork viu era o baseline ESTRANGEIRO do core chegando (a unica fonte de baseline que ela ja teve) e sendo filtrado — sintoma da contaminacao, nao do NO-BASELINE. Curada a contaminacao, o NO-BASELINE aflora como o problema de base, separado"
+  - id: D_ADOPT_MUST_EMIT_MISSING_BASELINES
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.75
+    status: open
+    trace: .claude/commands/meta/adopt.md
+    label: "FOLLOW-UP (gatilho: a granaai — ou qualquer adotante PRE-catraca — precisa passar o lint): o fluxo de --update/adopt deve GARANTIR que os *-baseline.txt exigidos EXISTAM na integracao, EMITINDO do corpus do ALVO quando ausentes (regen so processa baseline ja presente; nao cria o que falta). Fecha o NO-BASELINE de E_GRANAAI_NOBASELINE_PREEXISTING e o gap 'baseline de catraca NOVO do core → adotante emite o proprio'. Escopo SEPARADO da cura de contaminacao (nao mistura). Alternativa mais barata: o adotante roda `kg-verification-coverage.sh --emit-baseline` uma vez"
+  - id: D_SCRUB_FROZEN_POISON_IN_VENDORS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.6
+    status: open
+    trace: .claude/utils/adopt/vendor-branch.sh
+    label: "FOLLOW-UP M2 (gatilho: o veneno congelado voltar a incomodar): poc(47)/gustavo(48) tem chaves estrangeiras JA rastreadas no onion/vendor, congeladas inertes pela cura (vendor==merge-base → merge toma *ours*). A cura NAO as remove, so as impede de avancar. Scrub/re-seed do baseline do vendor removeria o passivo latente. Hoje inerte; promover so se a equivalencia vendor==merge-base quebrar"
 edges:
   # o defeito e a forma da cura
   - from: E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS
@@ -470,5 +499,14 @@ edges:
     to: E_UPDATE_FILTER_REMOVIDO_COLLISION
     edge_type: DEPENDS_ON
   - from: Q_GRANAAI_UPDATE_BLOCKED
+    to: D_CURE_PRESERVE_ADOPTER_BASELINE
+    edge_type: DEPENDS_ON
+  - from: E_GRANAAI_NOBASELINE_PREEXISTING
+    to: Q_GRANAAI_UPDATE_BLOCKED
+    edge_type: SUPPORTS
+  - from: D_ADOPT_MUST_EMIT_MISSING_BASELINES
+    to: E_GRANAAI_NOBASELINE_PREEXISTING
+    edge_type: DEPENDS_ON
+  - from: D_SCRUB_FROZEN_POISON_IN_VENDORS
     to: D_CURE_PRESERVE_ADOPTER_BASELINE
     edge_type: DEPENDS_ON

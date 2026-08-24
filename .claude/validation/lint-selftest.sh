@@ -3508,8 +3508,13 @@ run_vendor_baseline_removido_selftests() {
     printf 'source_commit: local\nrole: source\n' > "$d/.claude/.onion-version"
   }
 
-  # Roda o ciclo adopt→seed→update→catraca com o helper $vbh; ecoa "HARD:<n>".
-  _vbr_cycle() { local vbh="$1" work core ad ib pin rc
+  # Roda adopt→seed→update com o helper $vbh no ESTADO $st (A=adotante rastreia baseline no vendor;
+  # B=adotante SEM baseline rastreado — o caso do oráculo pré-catraca). Ecoa o nº de chaves ESTRANGEIRAS que
+  # o onion/vendor carrega APÓS o update — a invariante-raiz que cobre os dois estados: o vendor JAMAIS
+  # deve adquirir/adiantar o baseline do core (seja restaurando o do adotante em A, seja removendo o
+  # untracked em B). Medir o vendor (não a catraca downstream) evita o ruído do NO-BASELINE, que em B é
+  # estado PRÉ-EXISTENTE do adotante e independe do update (medido no dogfood real de um adotante pré-catraca, 2026-08-24).
+  _vbr_vendor_foreign() { local vbh="$1" st="$2" work core ad ib pin
     work="$(mktemp -d)"; core="$work/core"; ad="$work/adopter"
     mkdir -p "$core"; git -C "$core" init -q
     _vbr_core "$core" 1 "$vbh"; git -C "$core" add -A; git -C "$core" commit -qm "core v1"
@@ -3517,38 +3522,52 @@ run_vendor_baseline_removido_selftests() {
     ( cd "$core" && git archive HEAD -- .claude/commands .claude/utils .claude/validation docs/meta-specs ) | tar -x -C "$ad"
     printf 'source_commit: v1\nrole: adopted\n' > "$ad/.claude/.onion-version"
     bash "$ad/.claude/utils/adopt/regen-baselines.sh" "$ad" --emit >/dev/null 2>&1 || true
-    git -C "$ad" add -A; git -C "$ad" commit -qm "adopt v1"
+    # ESTADO B: o adotante NÃO rastreia o baseline (adotante pré-catraca, sem baseline próprio)
+    [ "$st" = "B" ] && rm -f "$ad/.claude/validation/kg-verification-baseline.txt"
+    git -C "$ad" add -A; git -C "$ad" commit -qm "adopt v1 (estado $st)"
     ib="$(git -C "$ad" rev-parse --abbrev-ref HEAD)"
     bash "$vbh" seed "$ad" "$ib" >/dev/null 2>&1 || true
     _vbr_core "$core" 2 "$vbh"; git -C "$core" add -A; git -C "$core" commit -qm "core v2"
     pin="$(git -C "$core" rev-parse --short=12 HEAD)"
     bash "$vbh" update "$ad" "$core" "$pin" "$ib" >/dev/null 2>&1 || true
-    bash "$ad/.claude/utils/adopt/regen-baselines.sh" "$ad" >/dev/null 2>&1 || true
-    local out; out="$(bash "$cov" "$ad" 2>&1)"; rc=0; bash "$cov" "$ad" >/dev/null 2>&1 || rc=$?
-    printf '%s' "$out" | grep -qE 'REMOVIDO' && printf 'REMOVIDO rc=%s\n' "$rc" || printf 'CLEAN rc=%s\n' "$rc"
+    # nº de chaves estrangeiras (core-only) que o onion/vendor carrega após o update. grep -c JÁ imprime
+    # "0" quando não há match (e sai 1) — NÃO encadear `|| printf 0`, que DUPLICA o zero ("0\n0").
+    local _fk; _fk="$(git -C "$ad" show onion/vendor:.claude/validation/kg-verification-baseline.txt 2>/dev/null \
+      | grep -cE 'foreign\.kg\.yaml::E_FOREIGN_CORE_ONLY')"
+    printf '%s' "${_fk:-0}"
     rm -rf "$work" 2>/dev/null
   }
 
-  # (a) GREEN — o helper REAL (com a cura): o adotante NÃO é cobrado por chave estrangeira.
-  local green; green="$(_vbr_cycle "$vb")"
-  if printf '%s' "$green" | grep -q 'CLEAN rc=0'; then
-    record_pass "vendor-baseline-removido: (GREEN) baseline do core NÃO contamina o adotante via --update"
-  else record_fail "vendor-baseline-removido: (GREEN)" "esperava CLEAN rc=0, veio '${green}' — a cura não segura"; fi
+  # (a/b) GREEN — o helper REAL (com a cura): em AMBOS os estados o vendor NÃO adquire o baseline do core.
+  local a b
+  a="$(_vbr_vendor_foreign "$vb" A)"; b="$(_vbr_vendor_foreign "$vb" B)"
+  if [ "$a" = "0" ]; then
+    record_pass "vendor-baseline-removido: (A/GREEN) baseline RASTREADO no vendor → update não adquire chave do core"
+  else record_fail "vendor-baseline-removido: (A/GREEN)" "vendor carregou ${a} chave(s) estrangeira(s) — a cura não segura o estado A"; fi
+  if [ "$b" = "0" ]; then
+    record_pass "vendor-baseline-removido: (B/GREEN) vendor SEM baseline (pré-catraca) → update remove o untracked do core"
+  else record_fail "vendor-baseline-removido: (B/GREEN)" "vendor carregou ${b} chave(s) estrangeira(s) — a cura não segura o estado B (pré-catraca)"; fi
 
-  # (b) RED/MUT — remove a linha da cura: o bug DEVE voltar (prova que a linha é load-bearing). O helper
-  # mutado precisa dos IRMÃOS (durable-commit.sh, regen-baselines.sh) ao lado — o vendor-branch resolve-os
-  # por `$HERE` (dirname do próprio script); num mktemp isolado o update falharia por outro motivo e daria
-  # CLEAN por acidente, não pela cura (testar-no-caminho-errado-é-não-testar).
+  # (c) RED/MUT — remove o BLOCO da cura (entre os marcadores D_CURE-baseline-preserve): em AMBOS os
+  # estados o vendor DEVE voltar a adquirir a chave do core (prova que o bloco é load-bearing). O helper
+  # mutado precisa dos IRMÃOS ao lado — o vendor-branch os resolve por `$HERE`; num mktemp isolado o
+  # update falharia por outro motivo e daria falso-verde (testar-no-caminho-errado-é-não-testar).
   local mutdir; mutdir="$(mktemp -d)"
   cp "${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh" "${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh" "$mutdir/"
-  grep -vF "checkout -- '.claude/validation/*-baseline.txt'" "$vb" > "$mutdir/vendor-branch.sh"
-  local red; red="$(_vbr_cycle "$mutdir/vendor-branch.sh")"
-  if printf '%s' "$red" | grep -q 'REMOVIDO rc=1'; then
-    record_pass "vendor-baseline-removido: (RED/MUT) sem a cura o REMOVIDO volta — a linha é load-bearing"
-  else record_fail "vendor-baseline-removido: (RED/MUT)" "esperava REMOVIDO rc=1, veio '${red}' — o teste não prova a cura"; fi
+  awk '/^  # >>> D_CURE-baseline-preserve/{skip=1} !skip{print} /^  # <<< D_CURE-baseline-preserve/{skip=0}' \
+    "$vb" > "$mutdir/vendor-branch.sh"
+  # sanidade: a mutação removeu MESMO o bloco (senão o RED não prova nada — guarda-por-lista-falha-pelo-vocabulário)
+  if [ "$(grep -c 'D_CURE-baseline-preserve' "$mutdir/vendor-branch.sh")" != "0" ]; then
+    record_fail "vendor-baseline-removido: (RED/MUT setup)" "awk não removeu o bloco da cura — o teste não prova nada"
+  else
+    local ra rb; ra="$(_vbr_vendor_foreign "$mutdir/vendor-branch.sh" A)"; rb="$(_vbr_vendor_foreign "$mutdir/vendor-branch.sh" B)"
+    if [ "$ra" != "0" ] && [ "$rb" != "0" ]; then
+      record_pass "vendor-baseline-removido: (RED/MUT) sem o bloco da cura o vendor adquire a chave do core em A e B — load-bearing"
+    else record_fail "vendor-baseline-removido: (RED/MUT)" "esperava contaminação em ambos (A=${ra} B=${rb}), o bloco não é load-bearing ou o teste não reproduz"; fi
+  fi
   rm -rf "$mutdir" 2>/dev/null
 
-  unset -f _vbr_core _vbr_cycle
+  unset -f _vbr_core _vbr_vendor_foreign
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
 }
 
