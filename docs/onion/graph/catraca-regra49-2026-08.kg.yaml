@@ -309,9 +309,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
+    status: superseded
     trace: .claude/commands/meta/adopt.md
-    label: "CURA proposta (minima, NAO toca a guarda critica): no fluxo --update, dobrar os *-baseline.txt FILTRADOS no PROPRIO commit do merge (git commit --amend --only <baselines> apos regen-baselines) — o HEAD nunca carrega a chave estrangeira, o REMOVIDO nao ve remocao. Muda o ADOPT, nao a catraca. Validavel no proprio oraculo (re-rodar o update da granaai = fix→re-dogfood). Alternativa evitada: isentar chave-estrangeira NA guarda (mexe no critico)"
+    label: "CURA proposta (minima, NAO toca a guarda critica): no fluxo --update, dobrar os *-baseline.txt FILTRADOS no PROPRIO commit do merge (git commit --amend --only <baselines> apos regen-baselines) — o HEAD nunca carrega a chave estrangeira, o REMOVIDO nao ve remocao. Muda o ADOPT, nao a catraca. Validavel no proprio oraculo (re-rodar o update da granaai = fix→re-dogfood). Alternativa evitada: isentar chave-estrangeira NA guarda (mexe no critico). [SUPERSEDIDA por D_CURE_PRESERVE_ADOPTER_BASELINE: a reproducao provou que dobrar-no-merge sozinho VAZA — a Regra 2 de _baseline_ref percorre para dentro do onion/vendor, que ainda carregaria as chaves]"
   - id: Q_GRANAAI_UPDATE_BLOCKED
     node_type: question
     layer: audit
@@ -332,6 +332,28 @@ nodes:
     verified_at: 2026-08-24
     verified_against: "duas rodadas do mesmo comando no mesmo dia: PoC greenfield (--update) passou; granaai regulada (--update) bateu no bug. A diferenca e a HISTORIA de baseline committado — que so o adotante antigo/regulado tem"
     label: "DOGFOOD: o adotante REGULADO com historia de baseline e o oraculo que o GREENFIELD nao pode ser. A PoC (fresh, sem baseline previo) nao podia acionar a colisao REMOVIDO; a granaai sim. O campo revela o modo-de-falha que a instalacao limpa esconde — instancia fresca da doutrina dogfood"
+  - id: D_CURE_PRESERVE_ADOPTER_BASELINE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: done
+    verified_at: 2026-08-24
+    verified_against: "implementada em .claude/utils/adopt/vendor-branch.sh (_update): apos o tar-x do framework no worktree do onion/vendor, `git checkout -- '.claude/validation/*-baseline.txt'` restaura os baselines do vendor ANTES do durable-commit. Provada por run_vendor_baseline_removido_selftests em lint-selftest.sh (GREEN com a cura + RED/MUT sem a linha = load-bearing)."
+    trace: .claude/utils/adopt/vendor-branch.sh
+    label: "CURA IMPLEMENTADA (supersede D_CURE_AMEND): o baseline de catraca e LEDGER LOCAL do adotante — nunca vem do core. Filtrar na FONTE (o onion/vendor NUNCA carrega baseline do core) mantem HEAD, merge-base E todos os ancestrais limpos — robusto contra qual regra de _baseline_ref dispara. Uma linha no _update: `git checkout -- *-baseline.txt` apos o tar-x. Baseline NOVO do core segue via regen-baselines --auto (novo→emit do corpus do alvo). NAO toca a catraca critica"
+  - id: E_CURE_REPRODUCED_AND_FIXED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-24
+    verified_against: "bancada run_vendor_baseline_removido_selftests (lint-selftest.sh) + reproducao isolada com os helpers reais (core sintetico: baseline com chave estrangeira docs/discussions/core-only/foreign.kg.yaml + grafo FORA do manifest): SEM a cura → kg-verificacao/REMOVIDO HARD:1 exit 1 (RED); COM a cura → onion/vendor sem contaminacao, HARD:0 exit 0 (GREEN); mutacao que remove a linha da cura reproduz o RED (prova load-bearing)."
+    trace: .claude/validation/lint-selftest.sh
+    label: "REPRODUZIDO E CURADO por comportamento: o bug so aparece quando o cwd da catraca e a arvore do ADOTANTE (medir no repo do core dava 47 falso — testar-no-caminho-errado). A cura fecha o RED; a bancada guarda o RED/MUT para que o defeito nunca volte em silencio"
 edges:
   # o defeito e a forma da cura
   - from: E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS
@@ -437,3 +459,16 @@ edges:
   - from: C_REGULATED_ADOPTER_IS_THE_ORACLE
     to: E_UPDATE_FILTER_REMOVIDO_COLLISION
     edge_type: SUPPORTS
+  # a cura implementada supersede a proposta, ancorada na evidencia da bancada
+  - from: D_CURE_PRESERVE_ADOPTER_BASELINE
+    to: D_CURE_AMEND_FILTERED_BASELINE_INTO_MERGE
+    edge_type: SUPERSEDES
+  - from: E_CURE_REPRODUCED_AND_FIXED
+    to: D_CURE_PRESERVE_ADOPTER_BASELINE
+    edge_type: SUPPORTS
+  - from: D_CURE_PRESERVE_ADOPTER_BASELINE
+    to: E_UPDATE_FILTER_REMOVIDO_COLLISION
+    edge_type: DEPENDS_ON
+  - from: Q_GRANAAI_UPDATE_BLOCKED
+    to: D_CURE_PRESERVE_ADOPTER_BASELINE
+    edge_type: DEPENDS_ON
