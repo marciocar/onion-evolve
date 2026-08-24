@@ -12,7 +12,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 
 - 🤖 **104 comandos invocáveis** Claude Code em 10 categorias + root (+ 26 fragmentos compartilhados em `common/` e 11 READMEs de categoria)
 - 🎯 **51 agentes de IA especializados** em 9 categorias
-- 🧩 **11 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes; `onion-{engineering,product,compliance}-context` — resolvers de SSOT por vertical; `onion-wizard` / `onion-onboarding` — a Condução (FAZER × CONHECER); `onion-retro` — retro/feedback como spec-as-code)
+- 🧩 **12 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes; `onion-{engineering,product,compliance}-context` — resolvers de SSOT por vertical; `onion-wizard` / `onion-onboarding` — a Condução (FAZER × CONHECER); `onion-retro` — retro/feedback como spec-as-code)
 - 📚 **91 Knowledge Bases** estruturadas para consumo por IA (+ KB viva `agentic-patterns/` + vertical `education/`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente com ativação automática
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
@@ -55,7 +55,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 3 em `design/`, 1 em `development/`, 1 em `quick/`
   - 3 no root: `onion.md`, `warm-up.md`, `catch-up.md`
   - **não-invocáveis**: 26 fragmentos em `common/` (11 templates + 15 prompts, incl. READMEs) e 11 READMEs de categoria
-- **11 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`, `onion-engineering-context`, `onion-product-context`, `onion-compliance-context`, `onion-wizard`, `onion-onboarding`, `onion-retro`)
+- **12 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`, `onion-engineering-context`, `onion-product-context`, `onion-compliance-context`, `onion-wizard`, `onion-onboarding`, `onion-retro`)
 - **51 agentes** IA distribuídos em:
   - 20 em `development/` (frontend, backend, infra, integrações)
   - 9 em `product/` (gestão e narrativa)
@@ -69,7 +69,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **642 arquivos** de documentação markdown em `docs/`
 - **104 comandos invocáveis** em 10 categorias + root (+ 26 fragmentos `common/` + 11 READMEs de categoria)
 - **51 agentes** especializados em 9 categorias
-- **11 skills** (`.claude/skills/`) · **91 Knowledge Bases**
+- **12 skills** (`.claude/skills/`) · **91 Knowledge Bases**
 
 ---
 

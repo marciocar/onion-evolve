@@ -11,7 +11,7 @@ Bem-vindo ao índice da documentação do **Sistema Onion**. Este documento orga
 O **Sistema Onion** é um **framework template em `.claude/`** — instalável em qualquer projeto (novo, legado ou regulado), plataforma única Claude Code, sem produto npm e sem CLI standalone. Inclui:
 - 🤖 **104 comandos invocáveis** Claude Code em 10 categorias
 - 🎯 **51 agentes de IA especializados** em 9 categorias
-- 🧩 **11 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`, `onion-onboarding`, `onion-wizard`, `onion-retro`, `onion-engineering-context`, `onion-product-context`, `onion-compliance-context`)
+- 🧩 **12 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`, `onion-onboarding`, `onion-wizard`, `onion-retro`, `onion-engineering-context`, `onion-product-context`, `onion-compliance-context`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
 - 🏗️ **Spec as Code Multi-Context** — business, technical e meta-specs
@@ -25,7 +25,7 @@ O **Sistema Onion** é um **framework template em `.claude/`** — instalável e
 - **16 documentos** em `docs/onion/`
 - **104 comandos invocáveis** Claude Code em `.claude/commands/`
 - **51 agentes** IA em `.claude/agents/`
-- **11 skills** em `.claude/skills/`
+- **12 skills** em `.claude/skills/`
 
 ---
 
