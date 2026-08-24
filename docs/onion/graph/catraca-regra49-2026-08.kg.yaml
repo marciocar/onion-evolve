@@ -293,6 +293,45 @@ nodes:
     label: "Divida que sai deste PR de proposito: um `git mv` de UM grafo para qualquer pasta `fixtures/` tirou CINCO entradas do baseline de uma vez, com o gate mandando remove-las e os nos intactos no disco, versionados, afirmando sobre producao. A cura exige resolver a chave por hash em TODO o universo antes de concluir remocao, mais uma classe MUDOU-DE-PATH para o rename legitimo — e mexe na convencao `grep -v '/fixtures/'` que e da casa inteira (kg-radar-integrity.sh:41), nao deste PR."
     trace: ".claude/validation/kg-radar-integrity.sh"
 
+  - id: E_UPDATE_FILTER_REMOVIDO_COLLISION
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-24
+    verified_against: "medido por comportamento no /meta:adopt --update da granaai (2026-08-24, via fork em worktree isolado): o merge de onion/vendor traz o baseline do core (merge=union) com 47 chaves onion-pessoal-marcio ao HEAD da develop; regen-baselines --filter filtra o WORKING TREE (47→0), mas kg-verificacao/REMOVIDO le o baseline do HEAD COMMITTADO (git show HEAD:baseline, 47) vs o working (0) e classifica a filtragem como no-removido-sem-aposentar → 47 HARD. Os ARQUIVOS onion-pessoal NAO vazaram (0 na granaai antes e depois). Roll back limpo, granaai intocada."
+    label: "BUG de mecanismo no --update de adotante NAO-greenfield: regen-baselines (filtra divida estrangeira no working) COLIDE com kg-verificacao/REMOVIDO (compara contra o HEAD committado, que o merge deixou nao-filtrado) → 47 HARD sobre nos que o adotante NUNCA teve. Greenfield (PoC) nao bate (sem baseline prévio); regulado-com-historia (granaai) bate"
+  - id: D_CURE_AMEND_FILTERED_BASELINE_INTO_MERGE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    trace: .claude/commands/meta/adopt.md
+    label: "CURA proposta (minima, NAO toca a guarda critica): no fluxo --update, dobrar os *-baseline.txt FILTRADOS no PROPRIO commit do merge (git commit --amend --only <baselines> apos regen-baselines) — o HEAD nunca carrega a chave estrangeira, o REMOVIDO nao ve remocao. Muda o ADOPT, nao a catraca. Validavel no proprio oraculo (re-rodar o update da granaai = fix→re-dogfood). Alternativa evitada: isentar chave-estrangeira NA guarda (mexe no critico)"
+  - id: Q_GRANAAI_UPDATE_BLOCKED
+    node_type: question
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: 2026-08-24
+    verified_against: "granaai medida ao vivo 2026-08-24: pin 6cc162f3 (adotado), develop aa7732e6, onion/vendor 2720c904 — o update para 617bb56 nao aplicou (rolou de volta pelo bug acima). A PoC (greenfield) atualizou; a granaai (regulada) NAO, ate a cura."
+    label: "BLOQUEIO ACIONAVEL: a granaai segue no pin ANTIGO (6cc162f3, ~1 mes atras) — o update para o core de hoje esbarra em E_UPDATE_FILTER_REMOVIDO_COLLISION. Sai deste estado quando D_CURE_AMEND for construida e o update re-rodar limpo"
+  - id: C_REGULATED_ADOPTER_IS_THE_ORACLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-24
+    verified_against: "duas rodadas do mesmo comando no mesmo dia: PoC greenfield (--update) passou; granaai regulada (--update) bateu no bug. A diferenca e a HISTORIA de baseline committado — que so o adotante antigo/regulado tem"
+    label: "DOGFOOD: o adotante REGULADO com historia de baseline e o oraculo que o GREENFIELD nao pode ser. A PoC (fresh, sem baseline previo) nao podia acionar a colisao REMOVIDO; a granaai sim. O campo revela o modo-de-falha que a instalacao limpa esconde — instancia fresca da doutrina dogfood"
 edges:
   # o defeito e a forma da cura
   - from: E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS
@@ -385,4 +424,16 @@ edges:
     edge_type: SUPPORTS
   - from: C_MEDIR_NO_CHECKOUT_VELHO_E_MEDIR_O_PASSADO
     to: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
+    edge_type: SUPPORTS
+  - from: E_UPDATE_FILTER_REMOVIDO_COLLISION
+    to: C_GUARDA_QUE_PUNE_CONFORMIDADE_E_PIOR_QUE_NENHUMA
+    edge_type: SUPPORTS
+  - from: D_CURE_AMEND_FILTERED_BASELINE_INTO_MERGE
+    to: E_UPDATE_FILTER_REMOVIDO_COLLISION
+    edge_type: DEPENDS_ON
+  - from: Q_GRANAAI_UPDATE_BLOCKED
+    to: D_CURE_AMEND_FILTERED_BASELINE_INTO_MERGE
+    edge_type: DEPENDS_ON
+  - from: C_REGULATED_ADOPTER_IS_THE_ORACLE
+    to: E_UPDATE_FILTER_REMOVIDO_COLLISION
     edge_type: SUPPORTS
