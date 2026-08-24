@@ -159,6 +159,17 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   [ -n "$mf" ] || { echo "ERRO: manifest vazio (core sem framework?)." >&2; git -C "$T" worktree remove --force "$wt" 2>/dev/null; return 2; }
   # shellcheck disable=SC2046
   ( cd "$SRC" && git archive HEAD -- $(printf '%s ' $mf) ) | tar -x -C "$wt" 2>/dev/null
+  # CURA (D_CURE, 2026-08-24): o baseline de catraca é LEDGER LOCAL do adotante — só encolhe por
+  # medição e é a memória da dívida DELE. Não é framework: NUNCA deve vir do core. O manifest inclui
+  # `.claude/validation/` inteiro, então o `tar -x` acima sobrescreve os baselines do vendor com os do
+  # core (que cobrem grafos core-only — docs/discussions/…). Sem restaurar aqui, o merge traz essas
+  # chaves ESTRANGEIRAS ao HEAD do adotante e a catraca o cobra por passivo alheio (`REMOVIDO` HARD) no
+  # exato ato de filtrá-las — reproduzido em 2026-08-24 (run_vendor_baseline_removido_selftests). Filtrar
+  # na FONTE (o vendor nunca carrega baseline do core) mantém HEAD, merge-base E todos os ancestrais
+  # limpos — robusto contra qual regra de `_baseline_ref` dispara (a Regra 2 percorre para dentro do
+  # onion/vendor). Baseline NOVO do core (que o vendor ainda não tinha) não é restaurável por HEAD e
+  # segue adiante: o `regen-baselines.sh --auto` do update o re-emite do corpus do ALVO (novo → emit).
+  git -C "$wt" checkout -- '.claude/validation/*-baseline.txt' 2>/dev/null || true
   bash "$HERE/durable-commit.sh" "$wt" update "$PIN" "$VENDOR" >/dev/null 2>&1
   git -C "$T" worktree remove --force "$wt" 2>/dev/null
 

@@ -3475,6 +3475,84 @@ run_vendor_branch_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo vendor-baseline-REMOVIDO — a colisão entre o `--update` e a catraca REGRA 49 (D_CURE,
+# 2026-08-24). O baseline de catraca é LEDGER LOCAL do adotante (só encolhe por medição); o manifest
+# do vendor inclui `.claude/validation/` inteiro, então sem a cura o `tar -x` sobrescreve os baselines
+# do onion/vendor com os do CORE — que cobrem grafos core-only (docs/discussions/…). O merge traz essas
+# chaves ESTRANGEIRAS ao HEAD do adotante e a catraca o cobra por passivo alheio (`REMOVIDO` HARD) no
+# exato ato de filtrá-las. Um adotante REGULADO com histórico de baseline achou o bug; o
+# greenfield da PoC não podia (sem baseline prévio). A cura: o vendor NUNCA carrega baseline do core.
+# Este selftest REPRODUZ o RED (via mutação que remove a cura) e prova o GREEN (com a cura) — a linha
+# `git checkout -- '*-baseline.txt'` do vendor-branch.sh é load-bearing.
+run_vendor_baseline_removido_selftests() {
+  local vb="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
+  local cov="${REPO_ROOT}/.claude/validation/kg-verification-coverage.sh"
+  if [ ! -f "$vb" ] || [ ! -f "$cov" ]; then
+    record_fail "vendor-baseline-removido" "helper ausente: vendor-branch.sh ou kg-verification-coverage.sh"; return
+  fi
+  export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
+
+  # core sintético: manifest mínimo + baseline com CHAVE ESTRANGEIRA + grafo core-only FORA do manifest.
+  # `$vbh` = helper vendor-branch sob teste (o real, ou o mutado sem a cura).
+  _vbr_core() { local d="$1" v="$2" vbh="$3"
+    mkdir -p "$d/.claude/commands" "$d/.claude/utils/adopt" "$d/.claude/validation" "$d/docs/meta-specs" "$d/docs/discussions/core-only"
+    printf 'cmd v%s\n' "$v" > "$d/.claude/commands/foo.md"
+    printf 'meta v%s\n' "$v" > "$d/docs/meta-specs/x.md"
+    cp "$vbh" "$d/.claude/utils/adopt/vendor-branch.sh"
+    cp "${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh" "${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh" "$d/.claude/utils/adopt/"
+    cp "$cov" "$d/.claude/validation/"
+    printf 'meta:\n  domain: core-only\nnodes:\n  - id: E_FOREIGN_CORE_ONLY\n    node_type: evidence\n    plane: PROD\n    impact: 5\n    confidence: 0.9\n    label: "no core-only que o adotante nunca teve"\n' \
+      > "$d/docs/discussions/core-only/foreign.kg.yaml"
+    printf '# Baseline REGRA 49\ndocs/discussions/core-only/foreign.kg.yaml::E_FOREIGN_CORE_ONLY\n' \
+      > "$d/.claude/validation/kg-verification-baseline.txt"
+    printf 'source_commit: local\nrole: source\n' > "$d/.claude/.onion-version"
+  }
+
+  # Roda o ciclo adopt→seed→update→catraca com o helper $vbh; ecoa "HARD:<n>".
+  _vbr_cycle() { local vbh="$1" work core ad ib pin rc
+    work="$(mktemp -d)"; core="$work/core"; ad="$work/adopter"
+    mkdir -p "$core"; git -C "$core" init -q
+    _vbr_core "$core" 1 "$vbh"; git -C "$core" add -A; git -C "$core" commit -qm "core v1"
+    mkdir -p "$ad/src"; git -C "$ad" init -q; printf 'produto\n' > "$ad/src/app.js"
+    ( cd "$core" && git archive HEAD -- .claude/commands .claude/utils .claude/validation docs/meta-specs ) | tar -x -C "$ad"
+    printf 'source_commit: v1\nrole: adopted\n' > "$ad/.claude/.onion-version"
+    bash "$ad/.claude/utils/adopt/regen-baselines.sh" "$ad" --emit >/dev/null 2>&1 || true
+    git -C "$ad" add -A; git -C "$ad" commit -qm "adopt v1"
+    ib="$(git -C "$ad" rev-parse --abbrev-ref HEAD)"
+    bash "$vbh" seed "$ad" "$ib" >/dev/null 2>&1 || true
+    _vbr_core "$core" 2 "$vbh"; git -C "$core" add -A; git -C "$core" commit -qm "core v2"
+    pin="$(git -C "$core" rev-parse --short=12 HEAD)"
+    bash "$vbh" update "$ad" "$core" "$pin" "$ib" >/dev/null 2>&1 || true
+    bash "$ad/.claude/utils/adopt/regen-baselines.sh" "$ad" >/dev/null 2>&1 || true
+    local out; out="$(bash "$cov" "$ad" 2>&1)"; rc=0; bash "$cov" "$ad" >/dev/null 2>&1 || rc=$?
+    printf '%s' "$out" | grep -qE 'REMOVIDO' && printf 'REMOVIDO rc=%s\n' "$rc" || printf 'CLEAN rc=%s\n' "$rc"
+    rm -rf "$work" 2>/dev/null
+  }
+
+  # (a) GREEN — o helper REAL (com a cura): o adotante NÃO é cobrado por chave estrangeira.
+  local green; green="$(_vbr_cycle "$vb")"
+  if printf '%s' "$green" | grep -q 'CLEAN rc=0'; then
+    record_pass "vendor-baseline-removido: (GREEN) baseline do core NÃO contamina o adotante via --update"
+  else record_fail "vendor-baseline-removido: (GREEN)" "esperava CLEAN rc=0, veio '${green}' — a cura não segura"; fi
+
+  # (b) RED/MUT — remove a linha da cura: o bug DEVE voltar (prova que a linha é load-bearing). O helper
+  # mutado precisa dos IRMÃOS (durable-commit.sh, regen-baselines.sh) ao lado — o vendor-branch resolve-os
+  # por `$HERE` (dirname do próprio script); num mktemp isolado o update falharia por outro motivo e daria
+  # CLEAN por acidente, não pela cura (testar-no-caminho-errado-é-não-testar).
+  local mutdir; mutdir="$(mktemp -d)"
+  cp "${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh" "${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh" "$mutdir/"
+  grep -vF "checkout -- '.claude/validation/*-baseline.txt'" "$vb" > "$mutdir/vendor-branch.sh"
+  local red; red="$(_vbr_cycle "$mutdir/vendor-branch.sh")"
+  if printf '%s' "$red" | grep -q 'REMOVIDO rc=1'; then
+    record_pass "vendor-baseline-removido: (RED/MUT) sem a cura o REMOVIDO volta — a linha é load-bearing"
+  else record_fail "vendor-baseline-removido: (RED/MUT)" "esperava REMOVIDO rc=1, veio '${red}' — o teste não prova a cura"; fi
+  rm -rf "$mutdir" 2>/dev/null
+
+  unset -f _vbr_core _vbr_cycle
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+}
+
+# ---------------------------------------------------------------------------
 # Modo compose-settings — exercita .claude/utils/scope/compose-settings.sh (RFC-0005 plano 2:
 # settings.json N-camadas de escopo framework→empresa→time→pessoa). Self-contained em mktemp.
 #   (a) merge type-aware: escalar last-wins · objeto recursa · array união (hooks/permissions)
@@ -9528,6 +9606,9 @@ run_guardrails_selftests
 
 # Modo vendor-branch — --update via merge de onion/vendor (Achado #2: never-clobber estrutural).
 run_vendor_branch_selftests
+
+# Modo vendor-baseline-REMOVIDO — a cura D_CURE (2026-08-24): o baseline (ledger local) não vem do core.
+run_vendor_baseline_removido_selftests
 
 # Modo compose-settings — settings.json N-camadas de escopo (RFC-0005 plano 2).
 run_compose_settings_selftests
