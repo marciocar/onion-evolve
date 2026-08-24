@@ -78,6 +78,17 @@ nodes:
     verified_against: "branch-code-reviewer adversarial (veredito 🔴 no commit inicial) provou 2 vazamentos reais: C1 (regex v1 cego a federacao/evolve/absorb-skill e a grafos FORA de docs/onion/graph — incl. o life-KG marcio.kg.yaml) e C2 (bypass por DIRETORIO-PAI: declarar commands/meta arrasta a fabrica sem casar a string). Guarda reescrita para checar a EXPANSAO (o que o assembler copiaria), nao a string. Provada RED (C1 abrangente + C2 dir-pai) + GREEN (upstream/produto/reais) + selftest run_moat_boundary_selftests 3/3."
     trace: .claude/validation/lint-artifacts.sh
     label: "A 1a guarda VAZAVA por dois caminhos que a revisao adversarial pegou (declarado≠verificado: o conserto estava na working tree, nao no commit). C1: regex fraco. C2: bypass estrutural por dir-pai — nenhum regex fecha, so checar a EXPANSAO. Endurecida e provada. Exemplo vivo de behavior-over-declaration: o revisor mediu o que o commit FAZIA, nao o que o header afirmava."
+  - id: E_PUBLISH_WIZARD_BORN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-24
+    verified_against: ".claude/skills/onion-publish/SKILL.md criada e auto-descoberta (aparece na lista de skills do harness). Conduz: orient(role:source) → confirma moat → colhe alvo → materialize-marketplace-repo.sh → valida → PARA no push (human-gated I3). É CORE-ONLY (nao entra em plugin — publicar e ato da FONTE; distribui-la seria meta-fabrica)."
+    trace: .claude/skills/onion-publish/SKILL.md
+    label: "FASE 3 FEITA: a skill wizard onion-publish (par de onion-wizard) conduz a publicacao do marketplace, delegando ao helper deterministico e parando no push. Core-only por desenho — consistente com o moat (nao distribui a capacidade de gerar marketplace)."
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED
     to: E_ONION_CORE_PLUGIN_BORN
@@ -94,3 +105,6 @@ edges:
   - from: E_MOAT_GUARD_HARDENED_BY_REVIEW
     to: D_MOAT_BOUNDARY_IS_MECHANISM
     edge_type: SUPPORTS
+  - from: E_PUBLISH_WIZARD_BORN
+    to: Q_MATERIALIZE_HELPER_NEXT
+    edge_type: DEPENDS_ON
