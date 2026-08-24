@@ -3,7 +3,7 @@ title: "Revisao — materializacao do bug do --update (self-review)"
 date: 2026-08-24
 branch: docs/materialize-update-removido-bug
 reviewer: "self-review (autor) — 4 nos de grafo materializando um achado dogfood verificado por comportamento"
-reviewed_diff_sha256: 
+reviewed_diff_sha256: ba0639f8f460aa7b6d6a719b4b2828fb71c42a6875560dac7700e2e369285efb
 findings_total: 3
 findings_real: 0
 verdict: APROVADO
