@@ -160,16 +160,32 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   # shellcheck disable=SC2046
   ( cd "$SRC" && git archive HEAD -- $(printf '%s ' $mf) ) | tar -x -C "$wt" 2>/dev/null
   # CURA (D_CURE, 2026-08-24): o baseline de catraca é LEDGER LOCAL do adotante — só encolhe por
-  # medição e é a memória da dívida DELE. Não é framework: NUNCA deve vir do core. O manifest inclui
-  # `.claude/validation/` inteiro, então o `tar -x` acima sobrescreve os baselines do vendor com os do
-  # core (que cobrem grafos core-only — docs/discussions/…). Sem restaurar aqui, o merge traz essas
-  # chaves ESTRANGEIRAS ao HEAD do adotante e a catraca o cobra por passivo alheio (`REMOVIDO` HARD) no
-  # exato ato de filtrá-las — reproduzido em 2026-08-24 (run_vendor_baseline_removido_selftests). Filtrar
-  # na FONTE (o vendor nunca carrega baseline do core) mantém HEAD, merge-base E todos os ancestrais
-  # limpos — robusto contra qual regra de `_baseline_ref` dispara (a Regra 2 percorre para dentro do
-  # onion/vendor). Baseline NOVO do core (que o vendor ainda não tinha) não é restaurável por HEAD e
-  # segue adiante: o `regen-baselines.sh --auto` do update o re-emite do corpus do ALVO (novo → emit).
-  git -C "$wt" checkout -- '.claude/validation/*-baseline.txt' 2>/dev/null || true
+  # medição e é a memória da dívida DELE. Não é framework, e o update NUNCA deve ADIANTAR nem ADICIONAR
+  # o baseline do core ao vendor. O manifest inclui `.claude/validation/` inteiro, então o `tar -x`
+  # acima traz os `*-baseline.txt` do core (que cobrem grafos core-only — docs/discussions/…). Se
+  # deixados, o `durable-commit` os grava no onion/vendor, o merge os leva ao HEAD do adotante e a
+  # catraca o cobra por passivo alheio (`REMOVIDO` HARD) no ato de filtrá-los. Medido no campo
+  # (2026-08-24): há DOIS estados de vendor e a cura tem de cobrir os dois —
+  #   (A) baseline JÁ RASTREADO no vendor (adotantes contaminados por updates PRÉ-cura): `checkout`
+  #       restaura o do vendor a HEAD, o merge 3-way toma *ours* (vendor==merge-base), o veneno fica
+  #       INERTE (congelado — o scrub do histórico é follow-up separado, ver grafo M2);
+  #   (B) SEM baseline rastreado no vendor (adotante PRÉ-catraca — o ESTADO DO ORÁCULO): o do core chega
+  #       como UNTRACKED; `checkout` é no-op; sem removê-lo o `durable-commit` o grava e o bug volta.
+  # Logo: restaura o rastreado E remove o untracked que o tar-x trouxe → o vendor fica EXATAMENTE no seu
+  # estado de HEAD, robusto contra qual regra de `_baseline_ref` dispara (a Regra 2 percorre para dentro
+  # do onion/vendor). Baseline de catraca GENUINAMENTE novo do core segue via `regen-baselines.sh --auto`
+  # do update, que o (re)emite do corpus do ALVO (novo → emit) — nunca herdado do core.
+  # >>> D_CURE-baseline-preserve (run_vendor_baseline_removido_selftests remove ESTE bloco p/ provar load-bearing) >>>
+  for _bl in "$wt"/.claude/validation/*-baseline.txt; do
+    [ -e "$_bl" ] || continue                      # nullglob off: sem match, o literal não existe
+    _rel="${_bl#"$wt"/}"
+    if git -C "$wt" cat-file -e "HEAD:$_rel" 2>/dev/null; then
+      git -C "$wt" checkout HEAD -- "$_rel" 2>/dev/null || true   # (A) rastreado → restaura ao HEAD do vendor
+    else
+      rm -f "$_bl"                                                # (B) untracked (veio do core no tar-x) → remove
+    fi
+  done
+  # <<< D_CURE-baseline-preserve <<<
   bash "$HERE/durable-commit.sh" "$wt" update "$PIN" "$VENDOR" >/dev/null 2>&1
   git -C "$T" worktree remove --force "$wt" 2>/dev/null
 
