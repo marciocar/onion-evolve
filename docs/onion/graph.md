@@ -83,6 +83,17 @@
 - **onion** --has-member--> test-planner
 - **onion** --has-member--> whisper-specialist
 - **onion** --has-member--> zen-engine-specialist
+- **onion** --loads--> embed:kb/behavior-over-declaration.md
+- **onion** --loads--> embed:kb/knowledge-graph-sdaal.md
+- **onion** --loads--> embed:kb/onion-dogfooding-doctrine.md
+- **onion** --loads--> when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
+- **onion** --provides--> dogfood-doctrine
+- **onion** --provides--> knowledge-graph-runtime
+- **onion** --provides--> language-standards
+- **onion** --provides--> master-orchestration
+- **onion** --provides--> sdaal-forge
+- **onion** --provides--> sdaal-task-manager
+- **onion** --provides--> session-runtime
 - **onion** --related--> /engineer/pr
 - **onion** --related--> /engineer/start
 - **onion** --related--> /engineer/work
@@ -95,10 +106,23 @@
 - **onion** --related--> product-agent
 - **onion** --related--> task-specialist
 - **onion** --related--> test-engineer
+- **onion** --requires--> skill:onion-orchestration
 - **onion** --serves--> maestro
 
 ## Capacidades por vertical (requires / provides / loads)
 
+- onion **loads** embed:kb/behavior-over-declaration.md
+- onion **loads** embed:kb/knowledge-graph-sdaal.md
+- onion **loads** embed:kb/onion-dogfooding-doctrine.md
+- onion **loads** when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
+- onion **provides** dogfood-doctrine
+- onion **provides** knowledge-graph-runtime
+- onion **provides** language-standards
+- onion **provides** master-orchestration
+- onion **provides** sdaal-forge
+- onion **provides** sdaal-task-manager
+- onion **provides** session-runtime
+- onion **requires** skill:onion-orchestration
 - onion-compliance **loads** when:build -> resolve:compliance-context (skill onion-compliance-context)
 - onion-compliance **loads** when:framework=iso27001 -> template:compliance_iso27001_template.md
 - onion-compliance **loads** when:framework=soc2 -> template:compliance_soc2_template.md
@@ -428,6 +452,17 @@ onion	has-member	test-engineer
 onion	has-member	test-planner	
 onion	has-member	whisper-specialist	
 onion	has-member	zen-engine-specialist	
+onion	loads	embed:kb/behavior-over-declaration.md	
+onion	loads	embed:kb/knowledge-graph-sdaal.md	
+onion	loads	embed:kb/onion-dogfooding-doctrine.md	
+onion	loads	when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)	
+onion	provides	dogfood-doctrine	
+onion	provides	knowledge-graph-runtime	
+onion	provides	language-standards	
+onion	provides	master-orchestration	
+onion	provides	sdaal-forge	
+onion	provides	sdaal-task-manager	
+onion	provides	session-runtime	
 onion	related	/engineer/pr	
 onion	related	/engineer/start	
 onion	related	/engineer/work	
@@ -440,6 +475,7 @@ onion	related	jira-specialist
 onion	related	product-agent	
 onion	related	task-specialist	
 onion	related	test-engineer	
+onion	requires	skill:onion-orchestration	
 onion	serves	maestro	
 onion-arthur	adopts	onion-evolve	
 onion-arthur	mode	greenfield	
