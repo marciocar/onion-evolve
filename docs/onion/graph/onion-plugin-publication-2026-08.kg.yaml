@@ -56,15 +56,28 @@ nodes:
     label: "A fronteira L1-distribui/L2-L3-moat virou MECANISMO, nao disciplina: vazar a meta-fabrica ou o SSOT privado num plugin publicavel e erro de LINT. Checa a DECLARACAO (manifesto), o ponto unico onde o que-se-publica e decidido. behavior-over-declaration: a cura e a guarda, nao a lembranca."
 
   - id: Q_MATERIALIZE_HELPER_NEXT
-    node_type: question
+    node_type: decision
     layer: audit
-    plane: DEV
+    plane: PROD
     impact: 3
-    confidence: 0.8
-    status: open
-    trace: docs/analysis/onion-adr-family-repo-topology-2026-07.md
-    label: "FASE 2 (aberta): o helper materialize-marketplace-repo.sh (o project-door que faltava) — monta TODOS os plugins fresco + marketplace.json (name onion-plugins, sources relative-path, self-contained) + README num dir-alvo; push HUMAN-GATED (I3). Depois: skill wizard onion-publish (Fase 3) e o repo publico marciocar/onion-plugins (Fase 5)."
+    confidence: 0.9
+    status: done
+    verified_at: 2026-08-24
+    verified_against: "materialize-marketplace-repo.sh criado + testado por comportamento: materializa 8 plugins num tmp (name onion-plugins, sources relative-path, README), 0 vazamento de moat, commit no alvo SEM push (I3). Selftest run_materialize_repo_selftests 2/2."
+    trace: .claude/utils/marketplace/materialize-marketplace-repo.sh
+    label: "FASE 2 FEITA: o helper materialize-marketplace-repo.sh (o project-door que faltava) monta TODOS os plugins fresco + marketplace.json (name onion-plugins, self-contained) + README num dir-alvo; push HUMAN-GATED (I3). Falta: skill wizard onion-publish (Fase 3) e o repo publico marciocar/onion-plugins (Fase 5, o maestro cria+push)."
 
+  - id: E_MOAT_GUARD_HARDENED_BY_REVIEW
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-24
+    verified_against: "branch-code-reviewer adversarial (veredito 🔴 no commit inicial) provou 2 vazamentos reais: C1 (regex v1 cego a federacao/evolve/absorb-skill e a grafos FORA de docs/onion/graph — incl. o life-KG marcio.kg.yaml) e C2 (bypass por DIRETORIO-PAI: declarar commands/meta arrasta a fabrica sem casar a string). Guarda reescrita para checar a EXPANSAO (o que o assembler copiaria), nao a string. Provada RED (C1 abrangente + C2 dir-pai) + GREEN (upstream/produto/reais) + selftest run_moat_boundary_selftests 3/3."
+    trace: .claude/validation/lint-artifacts.sh
+    label: "A 1a guarda VAZAVA por dois caminhos que a revisao adversarial pegou (declarado≠verificado: o conserto estava na working tree, nao no commit). C1: regex fraco. C2: bypass estrutural por dir-pai — nenhum regex fecha, so checar a EXPANSAO. Endurecida e provada. Exemplo vivo de behavior-over-declaration: o revisor mediu o que o commit FAZIA, nao o que o header afirmava."
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED
     to: E_ONION_CORE_PLUGIN_BORN
@@ -77,4 +90,7 @@ edges:
     edge_type: DEPENDS_ON
   - from: C_INSTALL_IS_NOT_ADOPT
     to: E_PROJECT_DOOR_GATE_OPENED
+    edge_type: SUPPORTS
+  - from: E_MOAT_GUARD_HARDENED_BY_REVIEW
+    to: D_MOAT_BOUNDARY_IS_MECHANISM
     edge_type: SUPPORTS

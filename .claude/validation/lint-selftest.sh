@@ -785,44 +785,91 @@ run_moat_boundary_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   [ -d "${vdir}" ] || { record_pass "moat-boundary: sem verticals/ — nada a testar"; return; }
-  local mf="${vdir}/__mbguard__.manifest.sh"
+  local mf="${vdir}/__mbguard__.manifest.sh" out rc
   trap 'rm -f "'"${mf}"'"' RETURN
-  local out rc=0
-  # (a) RED — fonte de meta-fábrica + grafo privado nos arrays → HARD
+  # grep pela violação da PRÓPRIA fixture (a guarda varre TODOS os manifestos — evita contaminação)
+  local sig='__mbguard__.manifest.sh: manifesto de plugin PUBLIC'
+  # (a) RED abrangente — todo tipo de moat que o revisor apontou (C1): auto-evolução, federação
+  #     downstream+ledger, absorb-skill (fábrica), grafo FORA de docs/onion/graph (o life-KG privado).
   cat > "${mf}" <<'RED'
 PLUGIN_NAME="__mbguard__"
 PLUGIN_VERSION="0.1.0"
 PLUGIN_DESC="fixture"
 KEYWORDS=(test)
-COMMANDS=(".claude/commands/meta/create-vertical.md")
-DOCS=("docs/onion/graph/fios-abertos.kg.yaml")
+COMMANDS=(".claude/commands/meta/evolve.md" ".claude/commands/meta/federation-publish.md" ".claude/commands/meta/co-deliver.md" ".claude/commands/meta/absorb-skill.md")
+DOCS=("docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml")
+UTILS=(".claude/utils/federation")
 CONFORMANCE="bronze"
 PROVIDES=("x")
 REQUIRES=()
 LOADS=()
 RED
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'fonte de MOAT'; then
-    record_pass "moat-boundary: (a) meta-fábrica/grafo no manifesto → HARD"
-  else record_fail "moat-boundary: (a)" "vazamento de moat não pego: rc=${rc}"; fi
-  # (b) GREEN — só fontes de CAPACIDADE (skill/comando de runtime) → sem MOAT
-  cat > "${mf}" <<'GREEN'
+  if printf '%s' "${out}" | grep -qF "${sig}"; then
+    record_pass "moat-boundary: (a) evolve/federação/absorb-skill/life-KG → HARD (C1 do revisor)"
+  else record_fail "moat-boundary: (a)" "vazamento C1 não pego: rc=${rc}"; fi
+  # (b) RED por DIRETÓRIO-PAI (C2): declarar commands/meta (dir) arrasta a fábrica; a guarda checa a
+  #     EXPANSÃO, não a string — tem de pegar mesmo sem nenhum arquivo de fábrica citado literalmente.
+  cat > "${mf}" <<'RED'
 PLUGIN_NAME="__mbguard__"
 PLUGIN_VERSION="0.1.0"
 PLUGIN_DESC="fixture"
 KEYWORDS=(test)
-COMMANDS=(".claude/commands/warm-up.md")
+COMMANDS=(".claude/commands/meta")
+CONFORMANCE="bronze"
+PROVIDES=("x")
+REQUIRES=()
+LOADS=()
+RED
+  rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -qF "${sig}"; then
+    record_pass "moat-boundary: (b) declaração por DIRETÓRIO-PAI → HARD pela expansão (C2 do revisor)"
+  else record_fail "moat-boundary: (b)" "bypass por dir-pai não pego: rc=${rc}"; fi
+  # (c) GREEN — capacidade + upstream (co-evolve/co-relay) + produto (create-task-structure) + dir de
+  #     skill/utils limpos: NÃO dispara (o comentário que MENCIONA meta-fábrica também não).
+  cat > "${mf}" <<'GREEN'
+PLUGIN_NAME="__mbguard__"
+PLUGIN_VERSION="0.1.0"
+PLUGIN_DESC="fixture cita create-vertical/adopt no comentario mas nao nos arrays"
+KEYWORDS=(test)
+COMMANDS=(".claude/commands/warm-up.md" ".claude/commands/meta/co-evolve.md" ".claude/commands/product/create-task-structure.md")
 SKILLS=(".claude/skills/onion")
+UTILS=(".claude/utils/task-manager")
 CONFORMANCE="bronze"
 PROVIDES=("x")
 REQUIRES=()
 LOADS=()
 GREEN
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if ! printf '%s' "${out}" | grep -q 'fonte de MOAT'; then
-    record_pass "moat-boundary: (b) só capacidade → sem HARD (comentário que MENCIONA meta-fábrica não dispara)"
-  else record_fail "moat-boundary: (b)" "falso-positivo em manifesto de capacidade limpo"; fi
+  if ! printf '%s' "${out}" | grep -qF "${sig}"; then
+    record_pass "moat-boundary: (c) capacidade+upstream+produto+dir limpos → sem HARD"
+  else record_fail "moat-boundary: (c)" "falso-positivo em manifesto de capacidade limpo"; fi
   rm -f "${mf}"
+}
+
+# Modo materialize-repo — o helper materialize-marketplace-repo.sh (project-door). Monta TODOS os plugins
+# publicáveis num dir-alvo self-contained (marketplace.json name=onion-plugins) e NÃO faz push (I3). O
+# selftest materializa num tmp (--no-commit), afirma as invariantes e a 2ª guarda de moat por arquivo.
+run_materialize_repo_selftests() {
+  local helper="${SCRIPT_DIR}/../utils/marketplace/materialize-marketplace-repo.sh"
+  [ -f "${helper}" ] || { record_pass "materialize-repo: helper ausente — nada a testar"; return; }
+  local tgt; tgt="$(mktemp -d)/onion-plugins"
+  trap 'rm -rf "'"$(dirname "${tgt}")"'"' RETURN
+  local rc=0; bash "${helper}" "${tgt}" --no-commit >/dev/null 2>&1 || rc=$?
+  # (a) materializa self-contained: exit 0, name público, >=2 plugins, README
+  if [ "${rc}" -eq 0 ] && grep -q '"name": "onion-plugins"' "${tgt}/.claude-plugin/marketplace.json" 2>/dev/null \
+     && [ "$(find "${tgt}/plugins" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | grep -c .)" -ge 2 ] \
+     && [ -f "${tgt}/README.md" ]; then
+    record_pass "materialize-repo: (a) repo self-contained (name onion-plugins, plugins, README)"
+  else record_fail "materialize-repo: (a)" "materialize falhou (rc=${rc}) ou faltou name/plugins/README"; fi
+  # (b) 2ª guarda de moat: ZERO arquivo de meta-fábrica/grafo no repo materializado
+  local leak; leak="$(find "${tgt}/plugins" -type f \( -name 'create-vertical.md' -o -name 'create-command.md' \
+    -o -name 'create-skill.md' -o -name 'adopt.md' -o -name 'federation-*.md' -o -name 'co-deliver.md' \
+    -o -name '*.kg.yaml' \) 2>/dev/null | grep -c . || true)"
+  if [ "${leak}" = "0" ]; then
+    record_pass "materialize-repo: (b) zero fonte de meta-fábrica/grafo no repo público (moat intacto)"
+  else record_fail "materialize-repo: (b)" "${leak} vazamento(s) de moat no repo materializado"; fi
+  rm -rf "$(dirname "${tgt}")" 2>/dev/null
 }
 
 # REGRA 48 — referência de caminho `.claude/…` em backtick (prosa) que não resolve.
@@ -10036,6 +10083,7 @@ run_aside_router_selftests
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
 run_moat_boundary_selftests
+run_materialize_repo_selftests
 run_projection_name_selftests
 run_kg_reverify_schema_selftests() {
   # WIRE-IN 2026-08-13 (Elenxo de mecanismos, P5): o kg-reverify-schema-check.sh nasceu em

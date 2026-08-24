@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+# =============================================================================
+# materialize-marketplace-repo.sh — o "project-door" que faltava (ADR family-repo-topology D5/F5).
+#
+# Materializa um repo PÚBLICO de marketplace (ex.: onion-plugins) a partir do SOURCE (o core):
+# monta TODOS os plugins publicáveis fresco (loop sobre verticals/*.manifest.sh) num <TARGET>/plugins/,
+# gera <TARGET>/.claude-plugin/marketplace.json (self-contained, sources relative-path) + README.
+#
+# FRONTEIRA (moat): só empacota o que os manifestos declaram — e a REGRA 61 (check_moat_boundary) já
+# reprova qualquer manifesto que liste meta-fábrica ou grafo privado. Aqui, uma 2ª guarda em cinto-e-
+# suspensório: recusa materializar se algum plugin montado contiver ARQUIVO de meta-fábrica ou *.kg.yaml.
+#
+# I3 (um escritor por repo): comita NO <TARGET> (repo próprio do maestro, escritor único) mas NUNCA faz
+# push — o push é human-gated. Nunca escreve em repo de terceiro nem toca o remote.
+#
+# Uso:  bash materialize-marketplace-repo.sh <TARGET> [--name <marketplace-name>] [--no-commit]
+#       <TARGET>        dir do repo-alvo (vazio ou já-git). Default do name: onion-plugins.
+# Saída: relatório por plugin; exit 0 ok · 2 erro de precondição · 3 vazamento de moat (aborta).
+# Determinístico, sem jq. Exercitado por lint-selftest.sh (run_materialize_repo_selftests).
+# =============================================================================
+set -uo pipefail
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SRC="$(git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || true)"
+VDIR="${HERE}/verticals"
+ASM="${HERE}/assemble-plugin.sh"
+GEN="${HERE}/generate-marketplace.sh"
+
+TARGET=""; MKT_NAME="onion-plugins"; DO_COMMIT=1
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --name) MKT_NAME="${2:-}"; shift 2 ;;
+    --no-commit) DO_COMMIT=0; shift ;;
+    -*) echo "materialize: opção desconhecida '$1'" >&2; exit 2 ;;
+    *) [ -z "${TARGET}" ] && TARGET="$1" || { echo "materialize: alvo já informado ('${TARGET}')" >&2; exit 2; }; shift ;;
+  esac
+done
+
+[ -n "${TARGET}" ] || { echo "uso: materialize-marketplace-repo.sh <TARGET> [--name <n>] [--no-commit]" >&2; exit 2; }
+[ -n "${SRC}" ] || { echo "ERRO: não consegui resolver o SOURCE (core) a partir de ${HERE}." >&2; exit 2; }
+[ -f "${ASM}" ] && [ -f "${GEN}" ] || { echo "ERRO: assemble-plugin.sh / generate-marketplace.sh ausentes." >&2; exit 2; }
+[ -d "${VDIR}" ] || { echo "ERRO: verticals/ ausente em ${VDIR}." >&2; exit 2; }
+
+# GUARDA DE PAPEL: só a FONTE materializa (o core lê os próprios manifestos e escreve o repo público).
+# Um adotante/consumidor não tem os manifestos-fonte completos e não deve gerar marketplace.
+_role="$(awk -F': *' '/^role:/{print $2; exit}' "${SRC}/.claude/.onion-version" 2>/dev/null || true)"
+if [ -n "${_role}" ] && [ "${_role}" != "source" ]; then
+  echo "ERRO: materialize só roda na FONTE (role: source); aqui role='${_role}'." >&2; exit 2
+fi
+
+mkdir -p "${TARGET}/plugins" "${TARGET}/.claude-plugin" || { echo "ERRO: não consegui criar ${TARGET}." >&2; exit 2; }
+
+# Semeia o top-level do marketplace.json com o NOME PÚBLICO (o generate preserva o topo existente).
+if [ ! -f "${TARGET}/.claude-plugin/marketplace.json" ]; then
+  cat > "${TARGET}/.claude-plugin/marketplace.json" <<JSON
+{
+  "name": "${MKT_NAME}",
+  "owner": { "name": "Onion - Marcio Carvalho" },
+  "metadata": {
+    "description": "Marketplace publico do Sistema Onion — o framework operacional como plugins instalaveis (/plugin marketplace add).",
+    "version": "0.1.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": []
+}
+JSON
+fi
+
+# Monta cada plugin publicável fresco no TARGET (SRC=core lê a fonte; DEST=alvo/plugins/<nome>).
+count=0
+for m in "${VDIR}"/*.manifest.sh; do
+  [ -f "${m}" ] || continue
+  case "$(basename "${m}")" in __*) continue ;; esac   # ignora fixtures de teste
+  pname="$( set +u; . "${m}" >/dev/null 2>&1; printf '%s' "${PLUGIN_NAME:-}" )"
+  [ -n "${pname}" ] || { echo "⚠️  ${m}: sem PLUGIN_NAME — pulado." >&2; continue; }
+  rm -rf "${TARGET}/plugins/${pname}"
+  if bash "${ASM}" "${m}" "${SRC}" "${TARGET}/plugins/${pname}" >/dev/null 2>&1; then
+    echo "  ✓ ${pname}"
+    count=$((count+1))
+  else
+    echo "ERRO: falha ao montar '${pname}' de ${m}." >&2; exit 2
+  fi
+done
+[ "${count}" -gt 0 ] || { echo "ERRO: nenhum plugin montado." >&2; exit 2; }
+
+# 2ª GUARDA DE MOAT (cinto-e-suspensório): nenhum plugin materializado pode conter ARQUIVO de
+# meta-fábrica nem grafo privado. A REGRA 61 já barra na declaração; aqui barra no resultado.
+# Nomes ESPECÍFICOS da meta-fábrica (comandos achatados no plugin → só o basename resta; um glob
+# `create-*` false-positivaria em create-task-structure, comando de PRODUTO legítimo). + federação
+# downstream/ledger + QUALQUER grafo .kg.yaml.
+leak="$(find "${TARGET}/plugins" -type f \( \
+        -name 'create-abstraction.md' -o -name 'create-agent.md' -o -name 'create-agent-express.md' \
+        -o -name 'create-command.md' -o -name 'create-knowledge-base.md' -o -name 'create-skill.md' \
+        -o -name 'create-vertical.md' -o -name 'adopt.md' -o -name 'evolve.md' \
+        -o -name 'co-announce.md' -o -name 'co-deliver.md' -o -name 'federation-*.md' -o -name 'absorb-skill.md' \
+        -o -name 'assemble-plugin.sh' -o -name 'generate-marketplace.sh' -o -name 'decouple-source.sh' \
+        -o -name '*.kg.yaml' \) 2>/dev/null || true)"
+if [ -n "${leak}" ]; then
+  echo "ABORTA (moat): plugin materializado contém fonte de meta-fábrica/grafo privado:" >&2
+  printf '%s\n' "${leak}" | sed 's/^/    /' >&2
+  exit 3
+fi
+
+# Gera o marketplace.json self-contained (varre TARGET/plugins/*, preserva o topo semeado acima).
+bash "${GEN}" "${TARGET}" > "${TARGET}/.claude-plugin/marketplace.json.new" 2>/dev/null \
+  && mv "${TARGET}/.claude-plugin/marketplace.json.new" "${TARGET}/.claude-plugin/marketplace.json" \
+  || { echo "ERRO: generate-marketplace falhou." >&2; exit 2; }
+
+# README com instruções de instalação (canal PLUGIN — não adopt).
+cat > "${TARGET}/README.md" <<README
+# ${MKT_NAME} — Marketplace público do Sistema Onion 🧅
+
+Instale o Onion (ou verticais) como **plugin do Claude Code** — capacidade read-only, atualizável
+pelo gerenciador de plugins. **Não** é adoção/vendorização (esse é outro canal, \`/meta:adopt\`).
+
+## Instalar
+
+\`\`\`
+/plugin marketplace add marciocar/${MKT_NAME}
+/plugin install onion@${MKT_NAME}
+\`\`\`
+
+\`onion\` é o núcleo operacional (orquestrador + skills core + runtime + motores KG-SSOT + SDAAL +
+doutrina). Verticais de domínio (engineering, product, compliance, design, docs, testing) e o
+\`onion-work-tools\` são plugins adicionais no mesmo marketplace.
+
+## Atualizar
+
+\`\`\`
+/plugin marketplace update ${MKT_NAME}
+\`\`\`
+
+## O que NÃO vem aqui (por desenho — moat)
+
+A meta-fábrica (gerar novos comandos/verticais/adotantes) e os grafos privados do core ficam no
+repositório-fonte. Aqui está a **capacidade operacional**; o seu grafo de conhecimento é **seu**
+(KG-SSOT-First: o plugin traz o motor, você constrói o SSOT).
+
+---
+🧅 Gerado do source por \`materialize-marketplace-repo.sh\` (Sistema Onion).
+README
+
+echo "Onion: marketplace '${MKT_NAME}' materializado em ${TARGET} (${count} plugins)."
+
+# I3: comita NO alvo (escritor único = o repo do maestro), NUNCA push.
+if [ "${DO_COMMIT}" -eq 1 ]; then
+  git -C "${TARGET}" rev-parse --git-dir >/dev/null 2>&1 || git -C "${TARGET}" init -q
+  git -C "${TARGET}" add -A
+  if git -C "${TARGET}" diff --cached --quiet 2>/dev/null; then
+    echo "  (nada a commitar — já atualizado)"
+  else
+    git -C "${TARGET}" commit -q --no-verify -m "chore(marketplace): materializa ${MKT_NAME} (${count} plugins) do source Onion" \
+      && echo "  ✓ commit no alvo (SEM push — I3: o push é human-gated)."
+  fi
+fi
