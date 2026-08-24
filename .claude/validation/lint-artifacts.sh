@@ -1217,19 +1217,40 @@ PY
 check_moat_boundary() {
   if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in */utils/marketplace/*) : ;; *) return 0 ;; esac; fi
   [ "${IS_DERIVED}" -eq 1 ] && return 0
-  local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals" m src bad
+  local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals" root="${REPO_ROOT}" m src entry files ef bn bad abs
   [ -d "${vdir}" ] || return 0
-  # meta-fábrica (código de auto-replicação) + grafo privado (SSOT do core = KG-SSOT-First: grafo é do adotante)
-  local moat_re='(commands/meta/create-|commands/meta/adopt\.md|utils/adopt|utils/marketplace|decouple-source|docs/onion/graph/)'
+  # DENYLIST por BASENAME de meta-fábrica/federação-downstream (comandos achatam no plugin → basename é
+  # o que resta) + por PATH (utils/adopt|marketplace|federation, e QUALQUER *.kg.yaml — o SSOT é do
+  # adotante). co-evolve/co-relay (UPSTREAM) são permitidos por desenho; co-announce/co-deliver (DOWNSTREAM)
+  # e federation-* (ledger L3) não. absorb-skill e evolve são fábrica.
+  local moat_base='^(create-(abstraction|agent|agent-express|command|knowledge-base|skill|vertical)|absorb-skill|adopt|evolve|federation-.*|co-announce|co-deliver|decouple-source|assemble-plugin|generate-marketplace)\.(md|sh)$'
+  local moat_path='(/utils/adopt/|/utils/marketplace/|/utils/federation/|\.kg\.yaml$)'
   for m in "${vdir}"/*.manifest.sh; do
     [ -f "${m}" ] || continue
-    # sourcia num subshell isolado (o manifesto é só declaração de arrays); +u p/ arrays não-declarados
     src="$( set +u; . "${m}" >/dev/null 2>&1; printf '%s\n' \
       "${COMMANDS[@]-}" "${AGENTS[@]-}" "${UTILS[@]-}" "${VALIDATION[@]-}" \
-      "${SKILLS[@]-}" "${HOOKS[@]-}" "${DOCS[@]-}" "${TEMPLATES[@]-}" 2>/dev/null )"
-    bad="$(printf '%s\n' "${src}" | grep -nE "${moat_re}" || true)"
+      "${SKILLS[@]-}" "${HOOKS[@]-}" "${DOCS[@]-}" "${TEMPLATES[@]-}" 2>/dev/null | grep -v '^[[:space:]]*$' )"
+    bad=""
+    while IFS= read -r entry; do
+      [ -n "${entry}" ] || continue
+      # EXPANDE como o assembler (dir → cp -R arrasta tudo; arquivo/inexistente → ele mesmo). Fecha o
+      # bypass por diretório-pai (declarar commands/meta arrastaria a fábrica sem casar a string).
+      abs="${root}/${entry}"
+      if [ -d "${abs}" ]; then
+        files="$(cd "${root}" && find "${entry}" -type f 2>/dev/null)"
+      else
+        files="${entry}"
+      fi
+      while IFS= read -r ef; do
+        [ -n "${ef}" ] || continue
+        bn="$(basename "${ef}")"
+        if printf '%s' "${bn}" | grep -qE "${moat_base}" || printf '%s' "/${ef}" | grep -qE "${moat_path}"; then
+          bad="${bad}${entry}→${ef} "
+        fi
+      done <<< "${files}"
+    done <<< "${src}"
     if [ -n "${bad}" ]; then
-      violation "HARD" "utils/marketplace/verticals/$(basename "${m}")" "manifesto de plugin PUBLICÁVEL declara fonte de MOAT (meta-fábrica ou grafo privado do core): $(printf '%s' "${bad}" | tr '\n' ' ' | cut -c1-180). Remova — publicar auto-replicação/SSOT-privado quebra a doutrina L1-distribui/L2-L3-moat (o plugin leva o MOTOR, o grafo é do adotante)."
+      violation "HARD" "utils/marketplace/verticals/$(basename "${m}")" "manifesto de plugin PUBLICÁVEL arrasta fonte de MOAT (meta-fábrica/federação/grafo — checado pela EXPANSÃO do que o assembler copiaria, não só a string declarada): $(printf '%s' "${bad}" | cut -c1-240). Estreite a declaração — o plugin leva o MOTOR, nunca a fábrica nem o SSOT privado."
     fi
   done
 }
