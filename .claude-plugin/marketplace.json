@@ -57,6 +57,13 @@
       "description": "Ferramentas de trabalho cross-cutting do Onion (nao meta-fabrica): knowledge-graph (kg + radar soberano), diario de aprendizado, orquestracao, validacao de metaspec, freshness de KB/contexto, constelacao de estudos, recover, setup de integracoes, e co-evolucao upstream (co-evolve/co-relay). Distribuido a source/hub/standalone.",
       "version": "0.1.0",
       "author": { "name": "Onion - Marcio Carvalho" }
+    },
+    {
+      "name": "onion",
+      "source": "./plugins/onion",
+      "description": "Nucleo operacional do Sistema Onion: o orquestrador mestre (skill onion) + skills core (language-standards, patterns, validation, orchestration) + runtime (warm-up/catch-up) + os motores (kg-radar: knowledge-graph SSOT como runtime, doutrina Elenxo/Dogfood) + guardas (hook exit-2 deterministico, aside-router) + abstracoes SDAAL (task-manager Jira/ClickUp/Asana/Linear, forge github). Instala a capacidade; o adotante gera os PROPRIOS grafos. Nao inclui a meta-fabrica.",
+      "version": "0.1.0",
+      "author": { "name": "Onion - Marcio Carvalho" }
     }
   ]
 }

@@ -1,0 +1,80 @@
+meta:
+  id: onion-plugin-publication-2026-08
+  schema_version: "1"
+  baseline: 2026-08-24
+  # A publicacao do Onion como plugin+marketplace num repo PUBLICO (onion-plugins), gerada do source.
+  # O ADR de topologia de familia marcou o elo source->repo-publico (project-door) como GATED ate haver
+  # gatilho; o pedido do maestro (2026-08-24) e o gatilho. Fase 1: o plugin-nucleo `onion` + a guarda de moat.
+
+nodes:
+  - id: E_PROJECT_DOOR_GATE_OPENED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-24
+    verified_against: "onion-adr-family-repo-topology-2026-07.md D5/F5: 'o core sabe empacotar in-repo e ser adotado, mas NAO sabe empurrar bundle para repo git publico externo' — project-door.sh gated-until-trigger (>=2 doors). O maestro pediu explicitamente o repo publico onion-plugins → gatilho disparado."
+    trace: docs/analysis/onion-adr-family-repo-topology-2026-07.md
+    label: "O elo source->repo-publico-de-plugin (project-door) estava GATED por doutrina ate haver gatilho concreto. O pedido do maestro (criar onion-plugins) e o gatilho: o gate abre e o gerador nasce."
+
+  - id: C_INSTALL_IS_NOT_ADOPT
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-24
+    verified_against: "docs oficiais Claude Code (plugin-marketplaces.md) + diario 2026-07-08: install = /plugin marketplace add + /plugin install → capacidade read-only namespaced, atualiza por /plugin marketplace update (tag/SHA). SEM vendor-branch, SEM --update, SEM merge 3-way. Adopt (vendoriza+co-evolui) e canal SEPARADO. Coexistem por camada."
+    trace: docs/analysis/onion-plugin-marketplace-runbook-2026-07.md
+    label: "O canal de INSTALACAO (plugin) nao tem linkage de adopt: instala capacidade read-only, atualiza pelo plugin manager, nunca por merge. A cura da catraca-baseline (REGRA 49) nem se aplica (sem vendorizacao). Adopt segue como canal separado p/ quem customiza."
+
+  - id: E_ONION_CORE_PLUGIN_BORN
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-24
+    verified_against: "verticals/onion.manifest.sh + assemble-plugin.sh → plugins/onion/ (exit 0, tree_sha=b05c5e8b): skills(onion mestre+language-standards+patterns+validation+orchestration) + commands(warm-up/catch-up/onion) + agents(onion) + validation(kg-radar+lib) + hooks(exit-2+aside-router) + utils(task-manager+forge) + kb(dogfood/kg-sdaal/behavior). Prova de moat por ARQUIVO: 0 create-*/adopt/marketplace, 0 *.kg.yaml, 0 dir adopt/marketplace."
+    trace: .claude/utils/marketplace/verticals/onion.manifest.sh
+    label: "Nasceu o plugin-nucleo `onion` — o 'plugin do Onion' em si (orquestrador+skills core+runtime+motores+guardas+SDAAL+doutrina), a lacuna que o onion-work-tools nao cobria. Empacota so CAPACIDADE; o grafo do adotante nao viaja (KG-SSOT-First: leva o MOTOR, nao os dados)."
+
+  - id: D_MOAT_BOUNDARY_IS_MECHANISM
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: done
+    verified_at: 2026-08-24
+    verified_against: "REGRA 61 (check_moat_boundary em lint-artifacts.sh): sourcia cada verticals/*.manifest.sh e REPROVA HARD se um array declarar meta-fabrica (create-*/adopt/marketplace/decouple) ou docs/onion/graph/*. Provada RED (fixture com create-vertical+adopt+grafo → HARD) + GREEN (so capacidade → limpo; comentario que MENCIONA meta-fabrica nao dispara, pois checa os ARRAYS via source, nao a prosa). Selftest run_moat_boundary_selftests 2/2."
+    trace: .claude/validation/lint-artifacts.sh
+    label: "A fronteira L1-distribui/L2-L3-moat virou MECANISMO, nao disciplina: vazar a meta-fabrica ou o SSOT privado num plugin publicavel e erro de LINT. Checa a DECLARACAO (manifesto), o ponto unico onde o que-se-publica e decidido. behavior-over-declaration: a cura e a guarda, nao a lembranca."
+
+  - id: Q_MATERIALIZE_HELPER_NEXT
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    trace: docs/analysis/onion-adr-family-repo-topology-2026-07.md
+    label: "FASE 2 (aberta): o helper materialize-marketplace-repo.sh (o project-door que faltava) — monta TODOS os plugins fresco + marketplace.json (name onion-plugins, sources relative-path, self-contained) + README num dir-alvo; push HUMAN-GATED (I3). Depois: skill wizard onion-publish (Fase 3) e o repo publico marciocar/onion-plugins (Fase 5)."
+
+edges:
+  - from: E_PROJECT_DOOR_GATE_OPENED
+    to: E_ONION_CORE_PLUGIN_BORN
+    edge_type: CAUSES
+  - from: D_MOAT_BOUNDARY_IS_MECHANISM
+    to: E_ONION_CORE_PLUGIN_BORN
+    edge_type: SUPPORTS
+  - from: Q_MATERIALIZE_HELPER_NEXT
+    to: E_ONION_CORE_PLUGIN_BORN
+    edge_type: DEPENDS_ON
+  - from: C_INSTALL_IS_NOT_ADOPT
+    to: E_PROJECT_DOOR_GATE_OPENED
+    edge_type: SUPPORTS

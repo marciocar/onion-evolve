@@ -1207,6 +1207,34 @@ PY
 }
 
 # ===========================================================================
+# REGRA 61 — Fronteira de MOAT: manifesto de plugin publicável não vaza meta-fábrica nem grafo privado [HARD]
+# previne: publicar a AUTO-REPLICAÇÃO (create-*/adopt/marketplace/decouple) ou o SSOT PRIVADO do core
+#           (docs/onion/graph/*) num plugin distribuível. A doutrina L1-distribui/L2-L3-moat vira
+#           MECANISMO: vazar o moat é erro de lint, não questão de lembrar. Checa as FONTES DECLARADAS
+#           (arrays do manifesto), não a prosa — sourcia o manifesto (como o assemble-plugin.sh faz),
+#           então comentário/descrição que MENCIONE a meta-fábrica não dispara; só a lista real de fontes.
+# ===========================================================================
+check_moat_boundary() {
+  if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in */utils/marketplace/*) : ;; *) return 0 ;; esac; fi
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals" m src bad
+  [ -d "${vdir}" ] || return 0
+  # meta-fábrica (código de auto-replicação) + grafo privado (SSOT do core = KG-SSOT-First: grafo é do adotante)
+  local moat_re='(commands/meta/create-|commands/meta/adopt\.md|utils/adopt|utils/marketplace|decouple-source|docs/onion/graph/)'
+  for m in "${vdir}"/*.manifest.sh; do
+    [ -f "${m}" ] || continue
+    # sourcia num subshell isolado (o manifesto é só declaração de arrays); +u p/ arrays não-declarados
+    src="$( set +u; . "${m}" >/dev/null 2>&1; printf '%s\n' \
+      "${COMMANDS[@]-}" "${AGENTS[@]-}" "${UTILS[@]-}" "${VALIDATION[@]-}" \
+      "${SKILLS[@]-}" "${HOOKS[@]-}" "${DOCS[@]-}" "${TEMPLATES[@]-}" 2>/dev/null )"
+    bad="$(printf '%s\n' "${src}" | grep -nE "${moat_re}" || true)"
+    if [ -n "${bad}" ]; then
+      violation "HARD" "utils/marketplace/verticals/$(basename "${m}")" "manifesto de plugin PUBLICÁVEL declara fonte de MOAT (meta-fábrica ou grafo privado do core): $(printf '%s' "${bad}" | tr '\n' ' ' | cut -c1-180). Remova — publicar auto-replicação/SSOT-privado quebra a doutrina L1-distribui/L2-L3-moat (o plugin leva o MOTOR, o grafo é do adotante)."
+    fi
+  done
+}
+
+# ===========================================================================
 # REGRA 21 — Grafo (docs/onion/graph.md) sincronizado com a spec-as-code [HARD]
 # previne: docs/onion/graph.md desatualizado vs a spec-as-code
 #           graph.md é GERADO por graph.sh (actors.yaml + capability + frontmatter).
@@ -3262,6 +3290,7 @@ check_site_inventory_sync
 check_plugins_sync
 check_capability_conformance
 check_role_bundle_sync
+check_moat_boundary
 check_bundled_command_script_deps
 check_graph_sync
 check_federation_map_sync

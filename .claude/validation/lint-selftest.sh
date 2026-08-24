@@ -777,6 +777,54 @@ run_vendor_scrub_selftests() {
   rm -f "${tf}"
 }
 
+# Modo moat-boundary — REGRA 61. Um manifesto de plugin publicável NÃO pode declarar fonte de
+# meta-fábrica (create-*/adopt/marketplace/decouple) nem grafo privado (docs/onion/graph/*). A guarda
+# vira MECANISMO (vazar o moat = HARD). Fixture: manifesto temporário no verticals/ real; RED (fonte de
+# moat no array) dispara, GREEN (só fontes de capacidade) não — o padrão do vendor-scrub.
+run_moat_boundary_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
+  [ -d "${vdir}" ] || { record_pass "moat-boundary: sem verticals/ — nada a testar"; return; }
+  local mf="${vdir}/__mbguard__.manifest.sh"
+  trap 'rm -f "'"${mf}"'"' RETURN
+  local out rc=0
+  # (a) RED — fonte de meta-fábrica + grafo privado nos arrays → HARD
+  cat > "${mf}" <<'RED'
+PLUGIN_NAME="__mbguard__"
+PLUGIN_VERSION="0.1.0"
+PLUGIN_DESC="fixture"
+KEYWORDS=(test)
+COMMANDS=(".claude/commands/meta/create-vertical.md")
+DOCS=("docs/onion/graph/fios-abertos.kg.yaml")
+CONFORMANCE="bronze"
+PROVIDES=("x")
+REQUIRES=()
+LOADS=()
+RED
+  rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'fonte de MOAT'; then
+    record_pass "moat-boundary: (a) meta-fábrica/grafo no manifesto → HARD"
+  else record_fail "moat-boundary: (a)" "vazamento de moat não pego: rc=${rc}"; fi
+  # (b) GREEN — só fontes de CAPACIDADE (skill/comando de runtime) → sem MOAT
+  cat > "${mf}" <<'GREEN'
+PLUGIN_NAME="__mbguard__"
+PLUGIN_VERSION="0.1.0"
+PLUGIN_DESC="fixture"
+KEYWORDS=(test)
+COMMANDS=(".claude/commands/warm-up.md")
+SKILLS=(".claude/skills/onion")
+CONFORMANCE="bronze"
+PROVIDES=("x")
+REQUIRES=()
+LOADS=()
+GREEN
+  rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
+  if ! printf '%s' "${out}" | grep -q 'fonte de MOAT'; then
+    record_pass "moat-boundary: (b) só capacidade → sem HARD (comentário que MENCIONA meta-fábrica não dispara)"
+  else record_fail "moat-boundary: (b)" "falso-positivo em manifesto de capacidade limpo"; fi
+  rm -f "${mf}"
+}
+
 # REGRA 48 — referência de caminho `.claude/…` em backtick (prosa) que não resolve.
 # Fixture VIVE sob .claude/ (raiz da guarda) com nome improvável, removida no RETURN — único
 # jeito de exercitar a guarda REAL via --only. Dois casos: (A) reage a ref morta; (B) NÃO
@@ -9987,6 +10035,7 @@ run_aside_router_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
 run_vendor_scrub_selftests
+run_moat_boundary_selftests
 run_projection_name_selftests
 run_kg_reverify_schema_selftests() {
   # WIRE-IN 2026-08-13 (Elenxo de mecanismos, P5): o kg-reverify-schema-check.sh nasceu em

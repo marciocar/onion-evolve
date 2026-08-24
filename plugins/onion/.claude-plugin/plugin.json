@@ -1,0 +1,10 @@
+{
+  "name": "onion",
+  "version": "0.1.0",
+  "description": "Nucleo operacional do Sistema Onion: o orquestrador mestre (skill onion) + skills core (language-standards, patterns, validation, orchestration) + runtime (warm-up/catch-up) + os motores (kg-radar: knowledge-graph SSOT como runtime, doutrina Elenxo/Dogfood) + guardas (hook exit-2 deterministico, aside-router) + abstracoes SDAAL (task-manager Jira/ClickUp/Asana/Linear, forge github). Instala a capacidade; o adotante gera os PROPRIOS grafos. Nao inclui a meta-fabrica.",
+  "author": { "name": "Onion - Marcio Carvalho" },
+  "homepage": "https://github.com/marciocar/onion-evolve",
+  "repository": "https://github.com/marciocar/onion-evolve",
+  "license": "MIT",
+  "keywords": ["onion","orchestration","knowledge-graph","sdaal","dogfood","elenxo","runtime"]
+}

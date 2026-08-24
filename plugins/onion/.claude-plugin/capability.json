@@ -1,0 +1,8 @@
+{
+  "name": "onion",
+  "version": "0.1.0",
+  "conformance": "silver",
+  "provides": ["master-orchestration","knowledge-graph-runtime","sdaal-task-manager","sdaal-forge","session-runtime","dogfood-doctrine","language-standards"],
+  "requires": ["skill:onion-orchestration"],
+  "loads": ["embed:kb/onion-dogfooding-doctrine.md","embed:kb/knowledge-graph-sdaal.md","embed:kb/behavior-over-declaration.md","when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)"]
+}
