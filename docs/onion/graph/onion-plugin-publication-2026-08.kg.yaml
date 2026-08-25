@@ -89,6 +89,17 @@ nodes:
     verified_against: ".claude/skills/onion-publish/SKILL.md criada e auto-descoberta (aparece na lista de skills do harness). Conduz: orient(role:source) → confirma moat → colhe alvo → materialize-marketplace-repo.sh → valida → PARA no push (human-gated I3). É CORE-ONLY (nao entra em plugin — publicar e ato da FONTE; distribui-la seria meta-fabrica)."
     trace: .claude/skills/onion-publish/SKILL.md
     label: "FASE 3 FEITA: a skill wizard onion-publish (par de onion-wizard) conduz a publicacao do marketplace, delegando ao helper deterministico e parando no push. Core-only por desenho — consistente com o moat (nao distribui a capacidade de gerar marketplace)."
+  - id: E_PUBLIC_REPO_LIVE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-25
+    verified_against: "gh repo view marciocar/onion-plugins → PUBLIC, branch master, url https://github.com/marciocar/onion-plugins. marketplace.json remoto: name onion-plugins, 8 plugins relative-path. plugin.json do onion acessivel via API. Verificacao final de moat ANTES do push: 0 meta-fabrica, 0 grafo, 0 dir sensivel, 0 segredo REAL (so mencao de var em docs), 0 nome comercial."
+    trace: .claude/utils/marketplace/materialize-marketplace-repo.sh
+    label: "FASE 5 FEITA (2026-08-25): o repo publico marciocar/onion-plugins esta NO AR, 8 plugins, instalavel por /plugin marketplace add. O maestro autorizou; a verificacao final de moat (irreversivel) passou limpa. O ciclo source→repo-publico (project-door) fechou de ponta a ponta."
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED
     to: E_ONION_CORE_PLUGIN_BORN
@@ -108,3 +119,6 @@ edges:
   - from: E_PUBLISH_WIZARD_BORN
     to: Q_MATERIALIZE_HELPER_NEXT
     edge_type: DEPENDS_ON
+  - from: E_PUBLIC_REPO_LIVE
+    to: E_PROJECT_DOOR_GATE_OPENED
+    edge_type: SUPPORTS
