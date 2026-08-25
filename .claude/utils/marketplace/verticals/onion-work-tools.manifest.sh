@@ -25,6 +25,10 @@ COMMANDS=(
   ".claude/commands/meta/setup-code-review.md"
   ".claude/commands/meta/co-evolve.md"
   ".claude/commands/meta/co-relay.md"
+  # backlog: projeta o trabalho ABERTO dos grafos DO ADOTANTE (pareia com kg/kg-radar; runtime KG)
+  ".claude/commands/meta/backlog.md"
+  # analise rapida generica (template padrao)
+  ".claude/commands/quick/analysis.md"
 )
 # Agente que metaspec-validate delega.
 AGENTS=(
@@ -36,6 +40,9 @@ UTILS=(".claude/utils/diagnose")
 # Motores determinísticos que os comandos cabeiam (kg→radar+console; diary→index; constellation→map).
 VALIDATION=(
   ".claude/validation/kg-radar.sh"
+  # motores do /meta:backlog (projeta o backlog dos grafos do adotante)
+  ".claude/validation/kg-backlog-project.sh"
+  ".claude/validation/kg-backlog-check.sh"
   # SITIO UNICO do fator de status — sem ele o radar e a lente saem 2 (fail-loud, nunca default).
   ".claude/validation/lib/status-factor.awk"
   ".claude/validation/kg-console.sh"
