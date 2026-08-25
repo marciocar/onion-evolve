@@ -798,7 +798,7 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: confirmed
+    status: superseded
     label: "curl onionevolve.com (HTTP 200, 45884 bytes) serve 98 comandos / 82 KBs / 8 skills; a SSOT (docs/onion/inventory.md) diz 102 / 87 / 11 desde 2026-07-30 — o publico segue defasado"
     trace: "curl https://onionevolve.com x docs/onion/inventory.md"
     verified_at: 2026-08-04
@@ -813,8 +813,31 @@ nodes:
     status: confirmed
     label: "A CAUSA DA DEFASAGEM DO SITE MUDOU — nao e mais autoria atrasada (07-17), e DEPLOY parado: site/index.html NO REPO ja diz 102/51/87 e a string data-n=\"98\" NAO EXISTE MAIS no fonte (grep -c = 0 com o arquivo comprovadamente presente); o commit 2785f02 (2026-07-30) atualizou inventory.md E site/index.html NO MESMO COMMIT. A VPS serve um build anterior a 07-30. Consequencia pratica: a correcao NAO e reescrever a copy (ja esta certa) — e republicar"
     trace: "git show --stat 2785f02 (toca inventory.md + site/index.html); grep -c 'data-n=\"98\"' site/index.html = 0; data-n do fonte = 102/51/87 vs servidos 98/51/82"
-    verified_at: 2026-08-04
-    verified_against: "site/index.html @ 27ce2b4 (mtime 2026-07-30 08:47) x resposta viva de onionevolve.com em 2026-08-04"
+    verified_at: 2026-08-25
+    verified_against: "CONSEQUENCIA EXECUTADA 2026-08-25 (PR #671): ops/deploy-site.sh nasceu (allowlist + --check por hash + --selftest 14/14) e republicou — curl vivo passou a servir 104 comandos/12 skills; ver E_SITE_DEPLOY_MECHANIZED_0825"
+
+  - id: E_SITE_DEPLOY_MECHANIZED_0825
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "A CURA DO LAG VIROU MECANISMO (2026-08-25, PR #671): ops/deploy-site.sh — allowlist de entradas (mini/ e pulse-mais/ inalcancaveis por construcao), --check por hash fonte x vivo (exit 1 em drift ou *.bak* na derivacao), --selftest sandbox 16/16 com os ataques de DUAS rodadas de revisao adversarial congelados (symlink-no-topo que alcancava mini/, fonte vazia que apagava o vivo com veredito verde, quick-check do rsync pulando arquivo alterado no mesmo segundo, nome-com-newline contornando o prune do mini/, injecao via TMPDIR no trap). Republicado: o vivo serve 104 comandos/12 skills; os 14 *.bak* publicos sairam na 1a execucao do script (mesma sessao, antes do re-check do revisor — que mediu 0); /federacao/ repatriada para site/ (fonte≠derivacao)"
+    trace: "ops/deploy-site.sh --selftest (16 pass/0 fail); ops/deploy-site.sh --check (6/6 verde); curl onionevolve.com -> '104 comandos'/'12 skills'; docs/evolution/review/feat-site-reform-f0-deploy.md"
+    verified_at: 2026-08-25
+    verified_against: "execucao real na KVM 8 em 2026-08-25: selftest + check + curl do vivo pos-deploy"
+
+  - id: Q_FEDERACAO_VISIBILITY_GATE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: "site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nada impede religar graph.sh --map para a superficie publica e publicar membros sem visibilidade publica — incluindo cliente sob NDA. GATILHO NOMEADO: qualquer retomada de regeneracao de /federacao/ (ou refresh do snapshot) exige ANTES (a) campo visibility: public|private no members.yaml e (b) regra de lint que reprove projecao publica de membro nao-public. Ate la, o snapshot congelado E o estado seguro"
+    trace: "docs/evolution/review/feat-site-reform-f0-deploy.md (R3, NOVO-4); site/README.md §federacao"
+    verified_against: "members.yaml sem campo visibility em 2026-08-25; grep -rn 'site/federacao' = so a allowlist do deploy-site.sh (nenhum gerador aponta para la)"
 
   - id: Q_TESTEMUNHO_NAO_MEDIVEL_0804
     node_type: question
@@ -1198,6 +1221,17 @@ edges:
   - from: E_SITE_DEPLOY_STALE_0804
     to: C_SITE_LAG_E_DEPLOY_NAO_AUTORIA_0804
     edge_type: SUPPORTS
+  # site: a cura virou mecanismo (2026-08-25) — o stale de 08-04 sai de cena
+  - from: E_SITE_DEPLOY_MECHANIZED_0825
+    to: E_SITE_DEPLOY_STALE_0804
+    edge_type: SUPERSEDES
+  - from: E_SITE_DEPLOY_MECHANIZED_0825
+    to: C_SITE_LAG_E_DEPLOY_NAO_AUTORIA_0804
+    edge_type: SUPPORTS
+  # federacao publica: o congelamento e declaracao; o gate mecanico segue aberto
+  - from: Q_FEDERACAO_VISIBILITY_GATE
+    to: E_SITE_DEPLOY_MECHANIZED_0825
+    edge_type: DEPENDS_ON
   # a pergunta aberta pende dos dois nos que vieram UNVERIFIABLE
   - from: Q_TESTEMUNHO_NAO_MEDIVEL_0804
     to: E_PORTE_PARA_O_CURSO
