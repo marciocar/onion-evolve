@@ -872,6 +872,40 @@ run_materialize_repo_selftests() {
   rm -rf "$(dirname "${tgt}")" 2>/dev/null
 }
 
+# Modo plugin-hooks-json — o assemble tem de gerar hooks/hooks.json (auto-descoberto) para os hooks
+# empacotados ATIVAREM na instalação. Dogfood 2026-08-25: sem isto, install → Hooks: 0 (a guarda exit-2
+# viajava inerte). Fixture: core sintético com 1 hook + settings.json ligando-o a um evento; assemble →
+# hooks.json com o evento certo. (a) gerado+evento; (b) MUT: hook sem evento no settings → não registra.
+run_plugin_hooks_json_selftests() {
+  local asm="${SCRIPT_DIR}/../utils/marketplace/assemble-plugin.sh"
+  [ -f "${asm}" ] || { record_pass "plugin-hooks-json: assemble ausente — nada a testar"; return; }
+  local w; w="$(mktemp -d)"; trap 'rm -rf "'"$w"'"' RETURN
+  export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
+  local src="$w/core"; mkdir -p "$src/.claude/hooks"; git -C "$src" init -q 2>/dev/null
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$src/.claude/hooks/my-guard.sh"; chmod +x "$src/.claude/hooks/my-guard.sh"
+  printf '{ "hooks": { "PostToolUse": [ { "hooks": [ { "type":"command", "command":"bash .claude/hooks/my-guard.sh" } ] } ] } }\n' > "$src/.claude/settings.json"
+  git -C "$src" add -A 2>/dev/null; git -C "$src" commit -qm init 2>/dev/null
+  cat > "$w/m.manifest.sh" <<'MAN'
+PLUGIN_NAME="hooktest"; PLUGIN_VERSION="0.1.0"; PLUGIN_DESC="x"; KEYWORDS=(t)
+HOOKS=(".claude/hooks/my-guard.sh")
+CONFORMANCE="bronze"; PROVIDES=("x"); REQUIRES=(); LOADS=()
+MAN
+  local dest="$w/plug"
+  bash "${asm}" "$w/m.manifest.sh" "$src" "$dest" >/dev/null 2>&1
+  # (a) hooks.json gerado com o evento PostToolUse apontando pro hook via CLAUDE_PLUGIN_ROOT
+  if [ -f "$dest/hooks/hooks.json" ] && grep -q 'PostToolUse' "$dest/hooks/hooks.json" \
+     && grep -q 'CLAUDE_PLUGIN_ROOT.*my-guard.sh' "$dest/hooks/hooks.json"; then
+    record_pass "plugin-hooks-json: (a) assemble gera hooks.json com o evento do core → hook ATIVA no install"
+  else record_fail "plugin-hooks-json: (a)" "hooks.json ausente ou sem evento/path correto"; fi
+  # (b) hook NÃO ligado no settings do core → não entra no hooks.json (não inventa evento)
+  printf '{ "hooks": {} }\n' > "$src/.claude/settings.json"; git -C "$src" add -A 2>/dev/null; git -C "$src" commit -qm nohooks 2>/dev/null
+  rm -rf "$dest"; bash "${asm}" "$w/m.manifest.sh" "$src" "$dest" >/dev/null 2>&1
+  if [ ! -f "$dest/hooks/hooks.json" ] || ! grep -q 'my-guard' "$dest/hooks/hooks.json" 2>/dev/null; then
+    record_pass "plugin-hooks-json: (b) hook sem evento no core → NÃO registrado (não inventa evento)"
+  else record_fail "plugin-hooks-json: (b)" "registrou hook sem evento — inventou"; fi
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+}
+
 # REGRA 48 — referência de caminho `.claude/…` em backtick (prosa) que não resolve.
 # Fixture VIVE sob .claude/ (raiz da guarda) com nome improvável, removida no RETURN — único
 # jeito de exercitar a guarda REAL via --only. Dois casos: (A) reage a ref morta; (B) NÃO
@@ -10084,6 +10118,7 @@ run_aside_router_selftests
 run_vendor_scrub_selftests
 run_moat_boundary_selftests
 run_materialize_repo_selftests
+run_plugin_hooks_json_selftests
 run_projection_name_selftests
 run_kg_reverify_schema_selftests() {
   # WIRE-IN 2026-08-13 (Elenxo de mecanismos, P5): o kg-reverify-schema-check.sh nasceu em
