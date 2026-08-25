@@ -1,0 +1,75 @@
+---
+// Seção nova da reforma 2026-08: o POUSO do tráfego do webinar NewHack #22
+// ("Uma Demissão de Distância", 25.08.2026 — o slide final aponta para este site).
+// Doutrina de copy: lidera pelo MECANISMO verificável; Company Brain / Second Brain
+// entram como aparte de tradução, nunca como rótulo de hero (pesquisa 2026-08:
+// a categoria satura; a precisão é a fisga).
+---
+
+<section class="sec sec-alt" id="demissao">
+  <div class="wrap">
+    <p class="kicker">a tese · para quem chegou pelo webinar</p>
+    <h2>O conhecimento da sua empresa está a uma demissão de distância.</h2>
+    <p class="lead">
+      A resposta não é outra wiki. <strong>Fonte única de verdade não é um lugar — é um
+      ciclo</strong>, e o Onion o executa em cada sessão de trabalho:
+    </p>
+
+    <div class="ciclo">
+      <div class="ciclo-etapa">
+        <span class="ciclo-verbo">read</span>
+        <p>ler o grafo <em>antes</em> de decidir — não "quando lembrar"</p>
+      </div>
+      <div class="ciclo-seta" aria-hidden="true">→</div>
+      <div class="ciclo-etapa">
+        <span class="ciclo-verbo">verify</span>
+        <p>cruzar com o mundo vivo antes de virar premissa</p>
+      </div>
+      <div class="ciclo-seta" aria-hidden="true">→</div>
+      <div class="ciclo-etapa">
+        <span class="ciclo-verbo">act</span>
+        <p>agir guiado pelo que leu — a spec é o programa</p>
+      </div>
+      <div class="ciclo-seta" aria-hidden="true">→</div>
+      <div class="ciclo-etapa">
+        <span class="ciclo-verbo">write</span>
+        <p>o que a ação descobriu volta pra dentro</p>
+      </div>
+    </div>
+
+    <div class="conta-card">
+      <p class="conta-titulo">Você não aponta o que é importante. O grafo aponta — com uma conta.</p>
+      <p class="conta-formula"><code>atenção = impacto × confiança × status × (1 + conexões)</code></p>
+      <p class="conta-nota">
+        Determinístico, <strong>sem IA</strong>, refazível no papel. Enquanto o mercado usa
+        mais inferência para gerenciar memória, aqui a prioridade sai de aritmética que
+        qualquer pessoa audita — e o nó <em>refutado</em> não some: fica na história,
+        explicando o porquê da decisão que o superou.
+      </p>
+    </div>
+
+    <p class="traducao">
+      O mercado chama essa camada de <strong>Company Brain</strong> (na empresa) e
+      <strong>Second Brain</strong> (em você, n&nbsp;=&nbsp;1). Aqui é a mesma engenharia em duas
+      escalas — memória, significado e governança — com uma diferença que você pode conferir:
+      <a href="/maquinaria/">a máquina inteira está documentada, com a conta aberta →</a>
+    </p>
+  </div>
+</section>
+
+<style is:global>
+  #demissao .kicker { font-size:.74rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--purple); margin-bottom:.9rem; }
+  #demissao h2 { font-size:clamp(28px,4vw,44px); margin-bottom:1rem; }
+  #demissao .lead { max-width:64ch; color:var(--text-body); margin-bottom:2rem; }
+  #demissao .ciclo { display:flex; align-items:stretch; gap:10px; flex-wrap:wrap; margin-bottom:2.2rem; }
+  #demissao .ciclo-etapa { flex:1 1 180px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.1rem; }
+  #demissao .ciclo-verbo { font-family:var(--mono); font-weight:700; color:var(--orange); font-size:.9rem; letter-spacing:.06em; }
+  #demissao .ciclo-etapa p { font-size:.88rem; color:var(--text-body); line-height:1.5; margin-top:.35rem; }
+  #demissao .ciclo-seta { align-self:center; color:var(--text-muted); font-weight:700; }
+  #demissao .conta-card { background:var(--bg-deep); color:#F5EFE8; border-radius:var(--radius-lg); padding:1.6rem 1.8rem; margin-bottom:1.8rem; }
+  #demissao .conta-titulo { font-family:var(--display); font-size:1.15rem; margin-bottom:.7rem; }
+  #demissao .conta-formula code { font-family:var(--mono); font-size:1rem; color:#FFB38A; background:rgba(255,255,255,.06); padding:.4rem .8rem; border-radius:6px; display:inline-block; }
+  #demissao .conta-nota { font-size:.9rem; color:rgba(245,239,232,.78); margin-top:.8rem; max-width:66ch; }
+  #demissao .traducao { max-width:68ch; color:var(--text-body); }
+  @media (max-width:720px){ #demissao .ciclo-seta { display:none; } }
+</style>

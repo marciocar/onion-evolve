@@ -1,6 +1,6 @@
 // Coleção das migalhas — os posts JÁ nasceram "Astro-shaped de propósito"
 // (site/historia/migalhas/README.md): o glob aponta para onde eles SEMPRE viveram,
-// para o pipeline legado (migalhas-generate.sh) seguir funcionando até o cutover (F2).
+// — a aposta do ADR de julho pagou no cutover (2026-08-25): viraram o input direto da coleção.
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 

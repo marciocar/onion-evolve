@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**60 regras** no total — **54 HARD**, **11 SOFT**.
+**60 regras** no total — **54 HARD**, **12 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -144,7 +144,7 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 |---:|-------|:----------:|---------------|
 | 30 | Segurança de PROJEÇÃO: nome comercial de membro privado não sai | HARD | nome comercial de membro privado vazando em superfície pública |
 | 33 | Segurança de projeção no HISTÓRICO DE FEDERAÇÃO (mailbox-aware) | HARD | nome privado vazando no histórico de federação (mailbox) |
-| 34 | Migalhas: superfícies DERIVADAS da fonte, sem drift | HARD | migalha (superfície derivada) driftando da fonte |
+| 34 | Site: a derivação nunca vira fonte | HARD + SOFT | o build do site (derivação) entrando no git como se fosse fonte |
 | 35 | Site público não linka deep-link do repo PRIVADO (404 garantido) | HARD | site público linkando deep-link de repo privado — 404 garantido |
 | 36 | Superfície VENDORIZADA sem nome comercial de cliente | HARD | nome comercial de cliente vazando em superfície vendorizada |
 | 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT | link vivo em superfície vendorizada para caminho core-privado — morto no adotante |

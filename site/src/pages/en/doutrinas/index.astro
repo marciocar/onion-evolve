@@ -1,0 +1,473 @@
+---
+// /en/doutrinas/ — the English mirror of the public doctrines page (F4, reform 2026-08).
+//
+// Same editorial contract as the pt-BR page, and it does not change: one-line thesis →
+// THE SCAR (the real, dated mistake that produced it) → the mechanism that enforces it.
+// A doctrine without a scar is a slogan; a scar without a mechanism is a complaint.
+// Where there is no mechanism, this page says so.
+//
+// FOLLOW-UP (known, accepted for now): Base.astro hardcodes lang="pt-BR", so this page
+// ships with the wrong html lang attribute. The layout needs a `lang` prop before /en/
+// grows past the two key pages.
+import Base from '../../../layouts/Base.astro';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import '../../../styles/doutrinas.css';
+
+// The named-inventions table is a TRANSCRIPTION of the internal knowledge base §1.5,
+// derived on 2026-08-25 — frozen-in-time class. Parsing the cells was deliberately
+// refused: they carry internal paths and adopter names that must not leave the repo.
+// Only the ROW COUNT is read from the file, so this page can flag its own drift instead
+// of ageing in silence (source ≠ derivation applied to itself).
+let kbCount: number | null = null;
+try {
+  const kb = readFileSync(
+    fileURLToPath(new URL('../../../../../docs/knowledge-base/meta/onion-framework-identity.md', import.meta.url)),
+    'utf8',
+  );
+  const bloco = kb.split('## 1.5')[1]?.split('\n## ')[0] ?? '';
+  kbCount = bloco.split('\n').filter((l) => /^\|\s*\*\*/.test(l)).length;
+} catch {
+  kbCount = null; // built outside the core repo: no check, and no broken build
+}
+
+const inventions = [
+  { name: 'Dogfood Doctrine', what: 'every core change is validated by running the real artifact; the fix is a new dogfood input, not the end of one.', home: 'internal knowledge base', status: 'active' },
+  { name: 'Modernization Doctrine', what: 'which refactoring pattern to apply without breaking the framework’s invariants.', home: 'internal knowledge base', status: 'active' },
+  { name: 'Abstraction Doctrine', what: 'when something deserves to become an abstraction — the Axis Test and the Trigger Test, both of which can fail a proposal.', home: 'internal knowledge base', status: 'active since 2026-07-17' },
+  { name: 'Economy of Motors', what: 'three engines are available (the large model, the small model as a tool, the deterministic shell); use the cheapest one that can do the job.', home: 'internal knowledge base', status: 'active' },
+  { name: 'SDAAL', what: 'one interface, N providers: the specification is the artifact and the model is the runtime that executes it.', home: 'internal knowledge base + whitepaper', status: 'active' },
+  { name: 'KG SDAAL', what: 'investigations and domains modelled as a typed graph, with truths reconciled through refutation and supersession edges.', home: 'internal knowledge base', status: 'active — now infrastructure (radar, console, commands, lint guards)' },
+  { name: 'SSOT-as-runtime', what: 'the source of truth is a program that runs: read the graph, verify against the living artifact, act, write back.', home: 'internal knowledge base', status: 'active — mechanism on the write leg; the read leg is declared as advice' },
+  { name: 'gated-until-trigger', what: 'an artifact is born from the use that proves it, never from symmetry or from a plan.', home: 'internal knowledge base', status: 'active' },
+  { name: 'declared ≠ verified', what: 'a stamp, a document or a branch is a hypothesis; only the living artifact is proof.', home: 'internal knowledge base', status: 'active' },
+  { name: 'source ≠ derivation', what: 'the source and our reading of it live in physically separate artifacts; the derivation cites, it never rewrites.', home: 'internal knowledge base', status: 'active' },
+  { name: 'Phased Resumable Pattern', what: 'a durable session with state on disk and cold resumption; phases are never merged.', home: 'internal architecture decision', status: 'provisional — yet to be written into the constitution' },
+  { name: 'Capability Contract', what: 'what an adopting repository can expect from the framework, in machine-verifiable tiers.', home: 'internal architecture decision', status: 'active — decision plus mechanism (blocking lint guard)' },
+  { name: 'Co-Evolution Protocol', what: 'a bidirectional signal between the core and its adopters, carried by versioned files — no coupled runtime between repositories.', home: 'internal protocol + commands', status: 'active' },
+  { name: 'Breadcrumbs', what: 'an explicit signal left inside the artifact that forces absorption instead of accommodation — with a re-test deadline.', home: 'internal knowledge base + diary command', status: 'active' },
+  { name: 'Object-led discovery', what: 'the thing that knows about the object is the object itself: the maestro steers with it, the model executes with the right parts.', home: 'internal knowledge base + architecture decision', status: 'active' },
+  { name: 'Autobiographical Marketing', what: 'the framework tells its own story; the commits are the autobiography.', home: 'internal manual', status: 'manual prose only — still no mechanism' },
+  { name: "Maestro's Aside", what: 'a typed side channel: a marker at the start of a message injects the canonical route — recall, not a block.', home: 'internal knowledge base + runtime hook', status: 'active since 2026-08-04' },
+];
+---
+
+<Base
+  lang="en"
+  title="Doctrines — Onion Evolve"
+  description="The seven doctrines that govern the Onion framework, each with the dated scar that produced it and the mechanism that enforces it: Elenxo, Bulb, behaviour over declaration, source-as-runtime, declared ≠ verified, source ≠ derivation, and dogfood."
+  path="/en/doutrinas/"
+>
+
+<section class="dh">
+  <div class="dh-glow g1" aria-hidden="true"></div>
+  <div class="dh-glow g2" aria-hidden="true"></div>
+  <div class="dh-in">
+    <span class="eyebrow sans">The open display case · 7 doctrines</span>
+    <h1>I am not asking you to believe any of this. <em>I am asking you to check it.</em></h1>
+    <p class="sub">These are the seven doctrines that govern me. Not one of them was designed in a meeting:
+    each was born from a mistake of mine, with a date on it, and none became doctrine until it had a
+    mechanism that enforces it against me when I forget.</p>
+    <p class="sig sans">— Onion, a living framework, in the first person</p>
+
+    <div class="pacto sans">
+      <div><b>The thesis</b><span>What the doctrine demands, in one sentence you can disagree with.</span></div>
+      <div><b>The scar</b><span>The real, dated mistake that produced it. It stays on display after being fixed — deleting it would turn the display case into advertising.</span></div>
+      <div><b>The mechanism</b><span>The guard that makes it executable. Where no mechanism exists, this page says so.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="dindex sans">
+  <div class="dindex-in">
+    <span>The seven</span>
+    <a href="#elenxo">1 · Elenxo</a>
+    <a href="#bulbo">2 · The Bulb</a>
+    <a href="#comportamento">3 · Behaviour over declaration</a>
+    <a href="#ssot-as-runtime">4 · Source as runtime</a>
+    <a href="#declarado-verificado">5 · Declared ≠ verified</a>
+    <a href="#fonte-derivacao">6 · Source ≠ derivation</a>
+    <a href="#dogfood">7 · Dogfood</a>
+  </div>
+</div>
+
+<div class="lang sans">Também disponível em <a href="/doutrinas/">português</a>.</div>
+
+<section class="doutrinas">
+
+  <!-- ─────────── 1 · Elenxo ─────────── -->
+  <article class="dcard" id="elenxo">
+    <div class="dcard-head">
+      <span class="dnum sans">01</span>
+      <h2>Elenxo</h2>
+      <span class="alias">from the Greek <em>élenchos</em> — refutation</span>
+    </div>
+    <p class="sintese">The single source that refutes itself in public in order to surpass itself. Five
+    stages, all mandatory — miss one and it goes by a different name.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">The scar — <span class="data">2026-08-17</span></b>
+        <p>The prescriptive definition of Elenxo lived in exactly one place, and that place was only loaded
+        when a file from one specific path entered context. Meanwhile the <em>word</em> travelled freely to
+        everyone who adopts the framework, inside texts that used it with normative weight: "independent
+        verification is part of Elenxo, it is not optional". The measured result: someone adopting the
+        framework met a term carrying an obligation, had no reachable definition of it, and had to grep the
+        repository for one.</p>
+        <p>The defect was not one of writing — it was one of <strong>reach</strong>. The prose described what
+        ought to happen, and the machinery could not reach what the prose said. Two weeks earlier, a second
+        scar in the same family: of six runs that declared themselves Elenxo, <strong>two narrated the
+        refutation in prose with an empty graph</strong> — the fifth and sixth occurrence of the same failure.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">The mechanism that enforces it</b>
+        <p>The name is a <strong>prescription, not a label</strong>: each of the five stages ships with what
+        it fails. Lenses that read each other are one lens with N voices, not a fan-out. Attacking the weak
+        version of a position is an empty win. Without a worker whose mandate is to <em>refute</em>, with
+        "refuted" as the default verdict, it is not Elenxo — it is synthesis. A synthesis that does not
+        preserve the strongest surviving objection against its own conclusion does not count. And the fifth:
+        the new idea supersedes the old one <em>without erasing it</em>, as an edge in the graph, with an
+        auditable genealogy.</p>
+        <p>The fifth stage — the one that fails most — does have an executable guard: a checker requires an
+        investigation to be born as a graph, and the linter fails a refutation that stayed in prose.</p>
+      </div>
+      <p class="bloco limite">The limit, declared rather than hidden: <strong>there is no mechanical gate for
+      Elenxo as a whole.</strong> We tried demanding a refutation trail from anyone declaring the method, and
+      the measurement killed the candidate — of the runs that <em>did</em> include an adversarial stage, two
+      of four would have failed; of the runs that did <em>not</em>, two of two would have passed. Correlation
+      from zero to inverted: the gate would have punished precisely those who refuted. Conformance here is
+      read by a human against the table of five stages, and saying that out loud is what the doctrine demands
+      of itself.</p>
+    </div>
+  </article>
+
+  <!-- ─────────── 2 · The Bulb ─────────── -->
+  <article class="dcard" id="bulbo">
+    <div class="dcard-head">
+      <span class="dnum sans">02</span>
+      <h2>The Bulb</h2>
+      <span class="alias">the architecture: 4 layers + porosity</span>
+    </div>
+    <p class="sintese">Cut an onion bulb in half and it reveals every layer at once, with nothing hidden. If
+    you cut and cannot see, it is not a bulb — it is a cult with nice formatting.</p>
+    <div class="dbody">
+      <div class="bloco">
+        <b class="sans">The body</b>
+        <p>Four concentric layers: the <strong>substrate</strong> that reasons (the Transformer — established
+        science, which I do not reinvent; I orchestrate on top of it); the <strong>source</strong>, where
+        everything published is a projection and never a parallel source; <strong>learning</strong>, which is
+        self-regulated — I set my own re-test dates; and <strong>adaptation</strong>, which is dogfood driven
+        by dialectic. Cutting across all four is the property without which none of them works:
+        <strong>epistemic porosity</strong>. Every good principle hides a question it cannot answer itself,
+        and mine is: <em>if everything derives from the source, where does the new truth that contradicts the
+        source come in?</em> A system that only checks internal consistency can be perfectly consistent and
+        perfectly wrong. Coherence is not truth.</p>
+      </div>
+      <div class="bloco cicatriz">
+        <b class="sans">The scar — <span class="data">the Bulb page got its own science wrong</span></b>
+        <p>On a page that presents itself as scientific, I cited the science badly. I attributed the
+        self-regulated learning cycle to Pintrich when it belongs to <strong>Zimmerman (2002)</strong>. I
+        called the triad "thesis/antithesis/synthesis" Hegelian, when it is <strong>Chalybäus (1837)</strong>
+        vocabulary — Hegel's term is <em>Aufhebung</em>, and it is more demanding, because it does not let the
+        original thesis disappear. Both corrections stayed on the page, with the error visible beside them.
+        And when we went looking for whoever invented "Single Source of Truth", we found no recorded founder —
+        so we <strong>did not invent a father for the concept</strong> just to make the table look complete.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">The mechanism that enforces it</b>
+        <p>Porosity is structural, not courtesy, and it rests on three hard rules: anything current or
+        emerging is verified against the live external source, never from what I already know;
+        <em>coverage is not truth</em> — a guard confirming that a node <em>cites</em> a document does not
+        confirm that the content <em>supports</em> it; and declared is not verified. A deterministic radar
+        fails structural contradictions in the graph, and the corrected error <strong>stays on display with a
+        re-test date</strong>: deleting it would turn the display case into advertising and break the very
+        supersession it records.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- ─────────── 3 · Behaviour over declaration ─────────── -->
+  <article class="dcard" id="comportamento">
+    <div class="dcard-head">
+      <span class="dnum sans">03</span>
+      <h2>Behaviour over declaration</h2>
+    </div>
+    <p class="sintese">An artifact lies about itself; behaviour does not know how to lie. Do not trust what it
+    <em>says</em> it does — trust what it runs, catches and ships.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">The scar — <span class="data">2026-07-25, three cases in one day</span></b>
+        <p><strong>A green CI guard was read as "covered".</strong> It ran, it passed, it reported zero
+        violations. Of the eight real crossings of the boundary it existed to protect, it caught
+        <strong>one</strong>. The worst of them — a user-facing production route — crossed the boundary
+        through an internal wrapper whose name the guard did not know.</p>
+        <p><strong>A branch existed and the prose called it "the integration branch".</strong> The actual
+        deploy triggers implemented none of that: it did not build, did not deploy, did not gate anything. It
+        was 95 commits behind and 43 days stale. Two declarative sources agreed, and both were lying.</p>
+        <p><strong>An inherited version pin was treated as transport.</strong> Everything else in the
+        inherited artifact was reviewed sceptically; the version came along unquestioned. It was five minor
+        releases behind, in an authentication component, and the interval contained concrete security fixes.
+        The gap surfaced only because <strong>the maestro asked</strong> — the session's own audit never found
+        it.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">The mechanism that enforces it</b>
+        <p>A guard's acceptance test is not "it runs and passes" — it is <strong>"does it catch the case that
+        made it exist?"</strong>. If the guard was born from a concrete finding, that finding becomes its
+        mandatory fixture; green on the first run without that fixture is an alarm, not a success. Deploy
+        topology is read from workflow triggers, never from the prose next to them. And version pins are
+        explicit, with a checker that compares against the current release on a schedule — never a floating
+        latest.</p>
+        <p>The parent rule: <strong>the cure is never discipline.</strong> "Next time I will pay more
+        attention" is a null cure — it is always a checker, a fixture or a mechanism that makes the behaviour
+        prove itself, repeatably.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- ─────────── 4 · Source as runtime ─────────── -->
+  <article class="dcard" id="ssot-as-runtime">
+    <div class="dcard-head">
+      <span class="dnum sans">04</span>
+      <h2>Source as runtime</h2>
+      <span class="alias">the graph is the first act</span>
+    </div>
+    <p class="sintese">The source of truth is a program that runs — read the graph, verify against the living
+    artifact, act, write back. A graph consulted <em>when you remember</em> is not a source of truth: it is
+    documentation.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">The scar — <span class="data">2026-08-16</span></b>
+        <p>This doctrine's own heading used to read <em>"mechanism, not advice"</em>. Measurement killed the
+        second half of that heading, and the record stays here because deleting it would be advertising.</p>
+        <p>The <strong>write</strong> leg is a mechanism, and that is measurable: the radar fails structural
+        contradictions, the schema is a guard, freshness has a baseline in the linter, and 63 of 63
+        deliveries carry a signed review residue. The <strong>read</strong> leg is not. No automatic hook
+        reads the graph; what orders the read is text the model obeys — precisely the category this doctrine
+        calls advice. An internal study replayed nine real cases: <strong>seven failed by non-consultation,
+        zero by "I consulted and did not find"</strong>. Three candidate cures covered 1 of 9, 1 of 9 and 0 of
+        9 — verdict: do not build. What actually triggered consultation in reality was <strong>a human
+        asking</strong>: a social gate, not an instrument. In three cases I ignored, three times within
+        minutes, a graph I had just written myself.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">The mechanism that enforces it</b>
+        <p>The half that is a mechanism stays enforced: deterministic radar, schema as a guard, a freshness
+        baseline in the linter, a signed residue per delivery. The half that is advice stays
+        <strong>declared as advice</strong>, with a named trigger for reopening the decision — fire the
+        consultation by hand, two or three times in a real session, recording whether the injected verdict
+        actually <em>changed</em> the answer. Announcing a mechanism where there is only advice would be
+        declared ≠ verified applied to myself, and it would be the third time in that class.</p>
+      </div>
+      <p class="bloco limite">The doctrine stands anyway, because it remains correct as a direction. What left
+      the text was not the requirement — it was the claim of a delivered capability.</p>
+    </div>
+  </article>
+
+  <!-- ─────────── 5 · Declared ≠ verified ─────────── -->
+  <article class="dcard" id="declarado-verificado">
+    <div class="dcard-head">
+      <span class="dnum sans">05</span>
+      <h2>Declared ≠ verified</h2>
+    </div>
+    <p class="sintese">A stamp, a document, a summary and a branch are hypotheses; only the living artifact is
+    proof. The worst truth is the one you are not sure about — certainty is a property of the evidence, not a
+    tone of voice.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">The scar — <span class="data">2026-07-02, the forged stamp</span></b>
+        <p>I announced to an organisation that trusts me: <em>"you already have that fix"</em>. I was reading
+        a recorded version stamp — and it had been copied from the wrong place. It was lying.</p>
+        <p>The people who trusted me ran the verification exactly as I had recommended, compared the stamp
+        against the actual files, and <strong>corrected me with concrete proof</strong>. The announcement was
+        false, and it was not my audit that found it: it was the field.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">The mechanism that enforces it</b>
+        <p>A verification was born that <strong>never accepts a stamp on its own</strong>: it checks the stamp
+        against the real history and against a sample of the content actually delivered. It caught a second
+        divergence the first time it ran — and, months later, two of three audited repositories carried an
+        invalid stamp.</p>
+        <p>The family grew in the same shape, each member with its own guard: <em>a clean working tree is a
+        hypothesis</em> (live sessions light a beacon); <em>where the data lives is a hypothesis</em> until you
+        trace who actually reads it in code — in a real audit, the obviously named table was nearly empty while
+        the engine read another one that was complete; <em>branch lineage is a hypothesis</em> until you cross
+        it with the deployed commit.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- ─────────── 6 · Source ≠ derivation ─────────── -->
+  <article class="dcard" id="fonte-derivacao">
+    <div class="dcard-head">
+      <span class="dnum sans">06</span>
+      <h2>Source ≠ derivation</h2>
+    </div>
+    <p class="sintese">Source knowledge and my reading of it live in physically separate artifacts. The
+    derivation cites; it never rewrites. If the source changes, how many places do I edit? The right answer is
+    <em>one</em>.</p>
+    <div class="dbody">
+      <div class="bloco cicatriz">
+        <b class="sans">The scar — <span class="data">2026-07-20</span></b>
+        <p>An orchestrated audit run: <strong>70 agents, zero execution errors, 50 confirmed findings and 10
+        refuted</strong>, all in structured JSON. And <strong>none of it reached the source</strong>. The
+        knowledge was born, was validated, and evaporated outside it.</p>
+        <p>The root cause was not in the execution, which ran clean — it was in the plan. It reserved one
+        phase for "build the graph" and the next for "evaluate", with the evaluation's output written into
+        loose markdown, <em>alongside</em> the graph instead of <em>out of</em> it. The report became a
+        parallel source inside the very instrument that exists to prevent parallel sources. And the most
+        incriminating part: I already had the correct diagnosis written down — the phrase "mechanism, not
+        advice" was already on the page — and still left the write leg as advice. The one who built the
+        missing mechanism was an adopter; I only had the text.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">The mechanism that enforces it</b>
+        <p>A provenance guard treats a new knowledge artifact that does not exist in the source as a blocking
+        violation, with the old backlog tolerated on a ratchet that only tightens. Wherever a deterministic
+        generator exists, the boundary is guarded by the linter: the framework's canonical counts are
+        <strong>generated from the filesystem</strong>, and editing them by hand is a violation — the prose is
+        not allowed to disagree with the disk.</p>
+      </div>
+      <p class="bloco limite">The limit, said out loud: that guard's coverage is <strong>by citation, not by
+      content</strong>. It answers "is there a node that cites this document?", and a node that cites it
+      without supporting it satisfies the guard. That is deliberate — coverage has to be decidable by script,
+      and judging whether the citation supports the claim is semantic. Reading "covered" as "checked" would be
+      exactly the false assurance the previous doctrine exists to kill.</p>
+    </div>
+  </article>
+
+  <!-- ─────────── 7 · Dogfood ─────────── -->
+  <article class="dcard" id="dogfood">
+    <div class="dcard-head">
+      <span class="dnum sans">07</span>
+      <h2>Dogfood</h2>
+      <span class="alias">the master pattern of evolution</span>
+    </div>
+    <p class="sintese">Plans, specs and the happy path give false confidence. Only running reveals what is
+    missing — and the fix is a new dogfood input, not the end of one.</p>
+    <div class="dbody">
+      <div class="bloco">
+        <b class="sans">What the doctrine never waives</b>
+        <p>Actually run it, do not validate it on paper: a green linter and an approved plan are not "done".
+        Test the failure mode — missing input, resource that already exists, resumption, collision — not the
+        path you already know works. Close the loop, because the fix itself can introduce a regression. And
+        treat a reviewer's or a subagent's verdict as a <strong>hypothesis to verify with evidence</strong>,
+        never as an order.</p>
+      </div>
+      <div class="bloco cicatriz">
+        <b class="sans">The scar — <span class="data">2026-07-21, green at home and red abroad</span></b>
+        <p>I found out that <strong>the core is the worst place to test what travels</strong>. One of my
+        security guards was green here and failing in <em>every</em> repository that adopts me — because the
+        core is the only place where the files the guard itself depends on exist. Running the test at home was
+        running it in the one environment where it could not fail: a false proof of health.</p>
+        <p>In the same round, a travelling knowledge index pointed at targets that do not travel with it — a
+        dangling link in every adopter, invisible here. And while auditing version stamps, five of my own
+        fixtures used fictional stamps: in the test bench I was practising exactly the habit that had let the
+        real garbage through.</p>
+      </div>
+      <div class="bloco mecanismo">
+        <b class="sans">The mechanism that enforces it</b>
+        <p>Two complementary layers. The <strong>mechanical gate</strong> is deterministic and always runs, on
+        pre-commit and in CI: a conformance linter, a self-test of the guards themselves against fixtures, and
+        the inventory generator that keeps the counts honest. The <strong>usage gate</strong> is live: if you
+        changed an invocable artifact, invoke it and watch.</p>
+        <p>And the third layer, which fixes the blind spot in the first two: <strong>frontier dogfood</strong>
+        — whatever travels proves itself by running <em>once inside an adopter's clone</em>, where the files
+        only the core has do not exist. A guard that depends on a core-only file needs a graceful degradation
+        path — and that path needs its own fixture, otherwise the degradation is advice, not mechanism.</p>
+      </div>
+    </div>
+  </article>
+
+</section>
+
+<!-- ─────────── coinages ─────────── -->
+<section class="cunhagens">
+  <div class="sec-head">
+    <span class="kicker sans">Borrowed vs. ours</span>
+    <h2>What I borrowed, and what I coined</h2>
+    <p>A rule since the first draft: what is science cites the real source; what is mine declares my own
+    authorship — and the two never blur. Mixing them is either pretending to have discovered what someone else
+    proved, or lending credit away for an idea that is mine. Both frauds are cheap, and neither will be
+    committed.</p>
+  </div>
+  <div class="duas">
+    <div>
+      <h3>Borrowed — the science I cite</h3>
+      <ul>
+        <li><strong>The substrate that reasons</strong> — the Transformer architecture, established and not
+        mine in any degree.<span class="fonte">Vaswani et al., <em>Attention Is All You Need</em>, NeurIPS 2017 (arXiv:1706.03762)</span></li>
+        <li><strong>Source vs. projection</strong> — separating where a fact <em>lives</em> from where it is <em>queried</em>.<span class="fonte">CQRS, Greg Young (2010), on Bertrand Meyer's Command-Query Separation (1988)</span></li>
+        <li><strong>Knowledge graphs</strong> — typed nodes and edges to represent knowledge.<span class="fonte">Popularised by Singhal/Google (2012); rooted in Quillian (1968) and RDF/W3C</span></li>
+        <li><strong>Self-regulated learning</strong> — the forethought → performance → self-reflection cycle I recalibrate with.<span class="fonte">Zimmerman (2002) — <em>not</em> Pintrich; attribution corrected in public</span></li>
+        <li><strong>Dialectical supersession</strong> — negating while preserving.<span class="fonte"><em>Aufhebung</em>, Hegel — <em>not</em> the thesis/antithesis/synthesis triad, which is Chalybäus (1837)</span></li>
+        <li><strong>Every fact lives in exactly one place</strong> — the technical root of which a single source of truth is a special case.<span class="fonte">Normalisation, E. F. Codd, CACM 1970. "Single Source of Truth" itself has no recorded founder, and I will not invent one.</span></li>
+        <li><strong>Dogfooding</strong> — eat your own food before serving it.<span class="fonte">Attributed to Paul Maritz (1988, paraphrase; exact date unconfirmed)</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Mine — coined in this framework</h3>
+      <ul>
+        <li><strong>Elenxo</strong> — the method: the single source that refutes itself in public in order to surpass itself.<span class="fonte">Coined in this framework (drafted 2026-07-22, graduated 2026-08-17). The vocabulary is borrowed from the Greek <em>élenchos</em>; the application is ours.</span></li>
+        <li><strong>The Bulb</strong> — the architecture: four layers plus the transversal porosity.<span class="fonte">Coined in this framework, 2026. Our name for our own composition.</span></li>
+        <li><strong>SDAAL</strong> — the layer that makes everything published a projection, never a parallel source.<span class="fonte">Coined in this framework, 2026. Anchored in Hoare (1969), Meyer's Design by Contract (1992), Cockburn's Hexagonal Architecture (2005) and the Adapter pattern (GoF, 1994) — the synthesis is ours.</span></li>
+        <li><strong>Source as runtime / source ≠ derivation</strong> — the graph is the source; everything else is derived from it.<span class="fonte">Coined in this framework, 2026. Built on Codd's normalisation principle.</span></li>
+        <li><strong>Epistemic porosity</strong> — the requirement that the source stay structurally open to the external truth that contradicts it.<span class="fonte">Coined in this framework, 2026. A relative of Popper's falsifiability (1934) — a neighbour, not the same concept.</span></li>
+        <li><strong>Frontier dogfood</strong> — whoever adopts the framework is the oracle: the real test happens away from home, in someone else's use.<span class="fonte">Coined in this framework, 2026. No direct precedent located.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── named inventions ─────────── -->
+<section class="invencoes">
+  <div class="sec-head">
+    <span class="kicker sans">The catalogue</span>
+    <h2>The {inventions.length} named inventions</h2>
+    <p>The entry criterion is strict: it emerged from practice (it was not designed), it earned a name of its
+    own, and it has a citable canonical home. <strong>A name without a home is an orphan</strong> — it only
+    joins the list once the home exists. The opposite has happened here: two names were announced to adopters
+    before they had a home. That is declared ≠ verified applied to myself, which is why the rule became "the
+    home first, the row second".</p>
+  </div>
+  <div class="tbl-wrap">
+    <table class="inv">
+      <thead>
+        <tr><th>Invention</th><th>What it is</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {inventions.map((inv) => (
+          <tr>
+            <td class="nome">{inv.name}<span class="casa">home: {inv.home}</span></td>
+            <td class="oque">{inv.what}</td>
+            <td class="status">{inv.status}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  {kbCount !== null && kbCount !== inventions.length && (
+    <p class="nota-drift"><strong>This table has drifted.</strong> The internal source now lists {kbCount}
+    named inventions; this page was frozen with {inventions.length}. The derivation is behind the source —
+    stated here rather than hidden, because that is exactly what doctrine 6 demands.</p>
+  )}
+  <p class="nota-fonte">Transcribed from the internal knowledge base on 2026-08-25 — frozen-in-time class.
+  Each invention's canonical home is named as text, not linked: it lives in a private repository.</p>
+</section>
+
+<!-- ─────────── closing ─────────── -->
+<section class="fecho">
+  <div class="fecho-in">
+    <h2>At no point on this page did I ask for trust.</h2>
+    <p>What stayed on display: the corrected scientific attribution, the triad returned to its rightful
+    owner, the authorship I refused to invent, the incident where my own porosity failed, the doctrine
+    heading that measurement cut in half, and the stamp I announced as true while it was false.</p>
+    <p>If any of those points is wrong, the display case is open. <strong>Come and catch me — and the date is
+    already set for me to catch myself first.</strong></p>
+    <div class="cta sans">
+      <a class="primary" href="/historia/migalhas/">The breadcrumbs — the mistakes, in order</a>
+      <a class="ghost" href="/historia/">The full autobiography</a>
+    </div>
+  </div>
+</section>
+
+</Base>

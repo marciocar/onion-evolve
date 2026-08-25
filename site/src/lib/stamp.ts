@@ -5,7 +5,7 @@
 //   · inventario-vivo    — lido de docs/onion/inventory.md (SSOT gerada do filesystem)
 //   · congelado-no-tempo — medido no instante do build e carimbado com a data
 //   · estado-de-programa — afirmação sobre o runtime (subdomínios, serviços)
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -60,4 +60,24 @@ export function historiaGit() {
     porMes,
     stamp: { classe: 'congelado-no-tempo', em } as Stamp,
   };
+}
+
+/**
+ * Plugins publicáveis no marketplace — nomes e CONTAGEM lidos dos manifestos
+ * (`.claude/utils/marketplace/verticals/*.manifest.sh`), a SSOT do que se publica.
+ * Classe inventario-vivo: se um plugin nasce ou sai, a página muda sozinha.
+ * O núcleo `onion` vem primeiro; o resto em ordem alfabética.
+ */
+export function pluginsPublicados() {
+  const dir = `${repoRoot}/.claude/utils/marketplace/verticals`;
+  const em = new Date().toISOString().slice(0, 10);
+  const nomes = readdirSync(dir)
+    .filter((f) => f.endsWith(".manifest.sh") && !f.startsWith("__"))
+    .map((f) => {
+      const m = readFileSync(`${dir}/${f}`, 'utf-8').match(/^PLUGIN_NAME="([^"]+)"/m);
+      if (!m) throw new Error(`site-stamp: manifesto sem PLUGIN_NAME — ${f}`);
+      return m[1];
+    })
+    .sort((a, b) => (a === 'onion' ? -1 : b === 'onion' ? 1 : a.localeCompare(b)));
+  return { nomes, stamp: { classe: 'inventario-vivo', em } as Stamp };
 }

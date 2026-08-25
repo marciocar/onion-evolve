@@ -1,0 +1,128 @@
+---
+// CommitCurve — a vida do Onion em barras mensais, SVG gerado no build.
+//
+// Sem biblioteca, sem CDN: a geometria sai daqui e vira markup estático. Os NÚMEROS
+// vêm de historiaGit() (classe congelado-no-tempo — medido no instante do build e
+// carimbado com a data); as PALAVRAS das anotações são narrativa, declaradas abaixo.
+// Nenhum número é escrito à mão: a anotação recebe a contagem real ou não aparece.
+//
+// Desenho (uma série → uma cor; sem rampa de valor, sem grade pesada):
+// barras em --orange, marcas/linhas-guia em --purple, rótulos em tokens de texto.
+// Meses SEM commit ficam vazios de propósito — o silêncio de fev e abr/2026 é o dado.
+import { historiaGit } from '../lib/stamp';
+
+const { commits, porMes, stamp } = historiaGit();
+
+// ── série contínua: todo mês entre o primeiro e o último, inclusive os de zero ──
+const chaves = Object.keys(porMes).sort();
+const [aIni, mIni] = chaves[0].split('-').map(Number);
+const [aFim, mFim] = chaves[chaves.length - 1].split('-').map(Number);
+const serie: { chave: string; n: number }[] = [];
+for (let a = aIni, m = mIni; a < aFim || (a === aFim && m <= mFim); m === 12 ? ((a += 1), (m = 1)) : (m += 1)) {
+  const chave = `${a}-${String(m).padStart(2, '0')}`;
+  serie.push({ chave, n: porMes[chave] ?? 0 });
+}
+
+const ABREV = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const rotulo = (chave: string) => {
+  const [a, m] = chave.split('-');
+  return { mes: ABREV[Number(m) - 1], ano: a.slice(2) };
+};
+
+// ── geometria (viewBox fixa; o CSS faz o responsivo por width:100% + height:auto) ──
+const W = 760;
+const H = 380;
+const ESQ = 34;
+const DIR = 742;
+const BASE = 300;
+const ALTURA_MAX = 250;
+const slot = (DIR - ESQ) / serie.length;
+const larguraBarra = Math.min(30, slot - 8);
+const pico = Math.max(...serie.map((p) => p.n));
+
+const barras = serie.map((p, i) => {
+  const x = ESQ + i * slot + (slot - larguraBarra) / 2;
+  const h = p.n === 0 ? 0 : Math.max(3, (p.n / pico) * ALTURA_MAX);
+  const { mes, ano } = rotulo(p.chave);
+  return { ...p, i, x, h, y: BASE - h, cx: x + larguraBarra / 2, mes, ano };
+});
+
+// ── anotações: os meses que a narrativa nomeia (as palavras aqui, os números do git) ──
+const NARRATIVA: Record<string, { titulo: string; nota: string; y: number; ancora: 'start' | 'middle' | 'end' }> = {
+  '2025-09': { titulo: 'o nascimento', nota: 'commits no primeiro mês', y: 206, ancora: 'start' },
+  '2026-03': { titulo: 'algo mudou', nota: 'commits no mês inteiro', y: 150, ancora: 'middle' },
+  '2026-05': { titulo: 'a constituição', nota: 'commits — 18 de maio', y: 198, ancora: 'middle' },
+  '2026-07': { titulo: 'o pico', nota: 'commits em um mês', y: 22, ancora: 'middle' },
+};
+
+const anotacoes = barras
+  .filter((b) => NARRATIVA[b.chave] && b.n > 0)
+  .map((b) => {
+    const n = NARRATIVA[b.chave];
+    const x = n.ancora === 'start' ? ESQ : n.ancora === 'end' ? DIR : b.cx;
+    return { ...n, x, cx: b.cx, topo: b.y, texto: `${b.n} ${n.nota}` };
+  });
+
+const resumo =
+  `Commits por mês do repositório do Onion, de ${rotulo(serie[0].chave).mes}/20${rotulo(serie[0].chave).ano} ` +
+  `a ${rotulo(serie[serie.length - 1].chave).mes}/20${rotulo(serie[serie.length - 1].chave).ano}: ` +
+  serie.map((p) => `${rotulo(p.chave).mes}/${rotulo(p.chave).ano} ${p.n}`).join(', ') + '.';
+---
+
+<section class="curva" id="curva" aria-labelledby="curva-title">
+  <div class="curva-head">
+    <span class="ch-date">a vida inteira</span>
+    <h2 id="curva-title">Minha vida em barras</h2>
+    <p>
+      Cada barra é um mês de commits neste repositório — {commits} no total. Não é uma curva de
+      crescimento: é uma curva de <em>atenção</em>. Os dois meses vazios não são falha de medição,
+      são meses em que quase ninguém olhou para mim.
+    </p>
+  </div>
+
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={resumo} xmlns="http://www.w3.org/2000/svg">
+    <line class="curva-base" x1={ESQ - 6} y1={BASE + 0.5} x2={DIR + 6} y2={BASE + 0.5} />
+
+    {barras.map((b) => (
+      <g>
+        <title>{`${b.mes}/${b.ano} — ${b.n} ${b.n === 1 ? 'commit' : 'commits'}`}</title>
+        {b.n > 0 && (
+          <rect class="curva-bar" x={b.x} y={b.y} width={larguraBarra} height={b.h} rx="4" ry="4" />
+        )}
+        <rect x={b.x} y={BASE - ALTURA_MAX} width={larguraBarra} height={ALTURA_MAX} fill="transparent" />
+        <text class="curva-axis" x={b.cx} y={BASE + 19} text-anchor="middle" opacity={b.n === 0 ? 0.5 : 1}>{b.mes}</text>
+        {(b.i === 0 || b.mes === 'jan') && (
+          <text class="curva-axis" x={b.cx} y={BASE + 33} text-anchor="middle" opacity="0.7">{`20${b.ano}`}</text>
+        )}
+      </g>
+    ))}
+
+    {anotacoes.map((a) => (
+      <g>
+        {a.topo - 7 > a.y + 20 && <line class="curva-lead" x1={a.cx} y1={a.y + 20} x2={a.cx} y2={a.topo - 7} />}
+        <circle class="curva-mark" cx={a.cx} cy={a.topo - 4} r="3.5" />
+        <text class="curva-note" x={a.x} y={a.y} text-anchor={a.ancora}>{a.titulo}</text>
+        <text class="curva-note-sub" x={a.x} y={a.y + 15} text-anchor={a.ancora}>{a.texto}</text>
+      </g>
+    ))}
+  </svg>
+
+  <p class="curva-stamp">classe congelado-no-tempo, medido no build de {stamp.em}</p>
+
+  <details class="curva-tabela">
+    <summary>Ver os mesmos números como tabela</summary>
+    <table>
+      <thead>
+        <tr><th scope="col">Mês</th><th scope="col">Commits</th></tr>
+      </thead>
+      <tbody>
+        {barras.map((b) => (
+          <tr>
+            <td>{`${b.mes}/20${b.ano}`}</td>
+            <td>{b.n}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </details>
+</section>

@@ -1,0 +1,253 @@
+---
+// /estado/ — O ESTADO DA ARTE: onde o Onion está hoje, com cada número declarando de
+// onde veio. Página nova da reforma 2026-08 (F4). Só pt-BR (a i18n cobre /doutrinas/
+// e /maquinaria/; esta é retrato de casa).
+//
+// REGRA DE OURO desta página (KB de identidade §6 — fonte≠derivação): número nenhum é
+// digitado quando existe fonte viva, e TODA seção com número carrega o selo da sua
+// CLASSE + a data. As três classes:
+//   · inventario-vivo    — lido da SSOT no build (inventory.md, manifestos de plugin)
+//   · congelado-no-tempo — medido no instante do build, ou retrato datado à mão
+//   · estado-de-programa — afirmação sobre o runtime (superfícies no ar)
+//
+// PROVENIÊNCIA das seções (derivação conceitual — nomes próprios NÃO viajam):
+//   §2 instalável   → docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
+//                     + .claude/utils/marketplace/verticals/*.manifest.sh (nomes e contagem, ao vivo)
+//   §3 papéis       → docs/onion/graph/onion-family-topology-2026-07.kg.yaml (ROLE_*)
+//   §4 marcos       → docs/evolution/federation/CHANGELOG.md (assunto genérico; o último
+//                     marco vem do KG de publicação, posterior à última entrada do log)
+//   §5 superfícies  → o detalhe mora na home (#superficies); aqui só os endereços
+import Base from '../../layouts/Base.astro';
+import { inventario, historiaGit, pluginsPublicados } from '../../lib/stamp';
+import '../../styles/estado.css';
+
+const inv = inventario();
+const git = historiaGit();
+
+// ── plugins: nomes e contagem vêm do site-stamp (lidos dos manifestos de publicação).
+const plugins = pluginsPublicados();
+
+// A prosa é editorial (pt-BR, voz da casa); a LISTA e a CONTAGEM são derivadas acima.
+const glosa: Record<string, string> = {
+  onion:
+    'O plugin-núcleo. O orquestrador mestre, as skills de base, o runtime de grafo de conhecimento (radar determinístico + re-verificação contra o vivo) e as guardas que passam a valer no instante da instalação. Leva o motor — os seus dados continuam seus.',
+  'onion-engineering':
+    'O ciclo faseado de engenharia: planejar → começar → trabalhar → validar → abrir PR, sobre GitFlow, com sessões que retomam de onde pararam.',
+  'onion-product':
+    'Da descoberta ao backlog: coletar, refinar, especificar, decompor e estimar — com o seu gerenciador de tarefas plugado por abstração, não por acoplamento.',
+  'onion-docs':
+    'Contexto de negócio e técnico como spec-as-code, arquitetura em C4 + Mermaid, saúde e validação da documentação.',
+  'onion-testing':
+    'Estratégia e execução de testes (unitário, integração, ponta a ponta) com detecção do framework do projeto.',
+  'onion-compliance':
+    'Conformidade como spec-as-code — ISO 27001, ISO 22301, SOC 2, PMBOK — conduzida pelos especialistas de cada norma.',
+  'onion-design':
+    'Identidade visual como spec-as-code: tokens no padrão W3C/DTCG com portão de acessibilidade determinístico.',
+  'onion-work-tools':
+    'As ferramentas transversais: grafo de conhecimento, diário de aprendizado, orquestração de subagentes, frescor de contexto e o canal de co-evolução.',
+};
+
+const papeis = [
+  {
+    nome: 'fonte',
+    tier: 'T0',
+    desc: 'A autora do framework: guarda a meta-fábrica (o que cria comandos, agentes e verticais) e lê o próprio estado ao vivo, sem carimbo de versão. Só existe uma.',
+  },
+  {
+    nome: 'hub',
+    tier: 'T1',
+    desc: 'Uma empresa que adotou o Onion e passou a adotar os próprios projetos dentro dele. Usa o framework — não o autora.',
+  },
+  {
+    nome: 'consumidor',
+    tier: 'T2',
+    desc: 'Um projeto adotado por um hub. É folha da cadeia: recebe o framework do seu hub e não re-adota da fonte.',
+  },
+  {
+    nome: 'standalone',
+    tier: 'T3',
+    desc: 'Time único ou pessoa só: o framework completo, adotado direto da fonte, sem sub-adotados nem federação embaixo.',
+  },
+  {
+    nome: 'destilado',
+    tier: 'derivado',
+    desc: 'A destilação curada — leva o método na forma mínima, sem vendorizar o framework. É a porta de entrada, não uma adoção.',
+  },
+  {
+    nome: 'fonte desacoplada',
+    tier: 'soberano',
+    desc: 'Quem vira dono do próprio framework: passa a ser o seu próprio T0, autora sozinho e corta o canal de atualização da fonte original. A fonte é soberana de quem a usa — inclusive para deixar de ser fonte dele.',
+  },
+];
+
+// Marcos: ~20 escolhidos de ~62 anúncios de co-evolução. Regra de segurança aplicada na
+// escolha e na redação — o ASSUNTO viaja, o destinatário nunca.
+const marcos = [
+  ['2026-06-18', 'O canal de co-evolução abre. O framework passa a <b>anunciar as próprias mudanças</b> a quem o carrega — e a receber sinais de volta.'],
+  ['2026-06-22', 'O anúncio deixa de depender de memória humana: vira <b>passo de ritual</b>, com comando próprio.'],
+  ['2026-06-24', 'Nasce o <b>catálogo de playbooks</b> — cinco padrões reconhecíveis, materializados numa skill em vez de virarem comandos novos.'],
+  ['2026-06-28', 'Mudança <b>incompatível</b>, anunciada como tal: a skill de frota vira skill de <b>orquestração</b>. Vocabulário errado se corrige, não se acomoda.'],
+  ['2026-07-01', 'Veredito registrado: uma prática de campo vira <b>playbook do catálogo</b>, não comando novo. Nem todo bom achado merece superfície.'],
+  ['2026-07-02', '<b>Correção pública de um anúncio meu.</b> Eu havia dito "você já tem o conserto" confiando num carimbo de versão — o carimbo era forjado. Nasceu a guarda que confere o artefato real.'],
+  ['2026-07-02', 'Identidade federada aceita como doutrina: <b>papéis, tiers e confiança</b> deixam de ser combinado e viram contrato.'],
+  ['2026-07-02', 'O <b>grafo de conhecimento</b> entra como base candidata — e o comando fica travado até o primeiro uso real provar que serve.'],
+  ['2026-07-04', 'O travamento cai: o comando de grafo <b>nasce</b>, com radar determinístico, depois do primeiro uso de verdade.'],
+  ['2026-07-04', 'Cerimônia a menos: agentes inchados <b>emagrecem</b> e o conhecimento vira base citável — de mil linhas para uma centena.'],
+  ['2026-07-10', 'O grafo ganha <b>camada de domínio</b>, modo de mapeamento e console visual: deixa de ser registro e vira instrumento de leitura.'],
+  ['2026-07-10', 'Abre o <b>canal vivo entre repositórios</b> — com guarda que desconfia do próprio relógio quando a hora não tem fonte verificada.'],
+  ['2026-07-16', 'Consultar o grafo <b>antes</b> de qualquer coisa deixa de ser recomendação e vira mecanismo: os comandos de retomada leem o grafo primeiro.'],
+  ['2026-07-17', 'Conserto duro: o radar dava <b>verde num grafo que não conseguia ler</b>. Falhar em silêncio é pior que falhar.'],
+  ['2026-07-20', 'Terceiro eixo da evidência: <b>o interesse da fonte</b>. Verificado não é sinônimo de neutro.'],
+  ['2026-07-23', 'A <b>Condução do Onion</b>: os papéis e os movimentos da família passam a viver numa única fonte no grafo, e as faces que ensinam e que executam projetam dela.'],
+  ['2026-07-23', 'Dois portões novos cobram <b>declarado ≠ verificado</b> contra o grafo e contra o tempo — com catraca, para a dívida só poder cair.'],
+  ['2026-08-04', 'Nasce a <b>entrada lateral tipada</b>: um canal para o maestro interromper o fluxo sem quebrá-lo.'],
+  ['2026-08-16', 'Sincronização com o mundo: os contratos do substrato mudaram e foram <b>medidos na máquina</b>, não lidos no anúncio — três deles mexem no que cada adotante configura.'],
+  ['2026-08-18', 'A <b>doutrina fundacional passa a viajar</b> com o framework: o termo circulava em prosa normativa sem definição alcançável. Defeito de alcance, curado na origem.'],
+  ['2026-08-25', 'O Onion vira <b>marketplace público de plugins</b>. Um dogfood de instalação num ambiente limpo pegou o que lint nenhum acharia: as guardas viajavam como arquivo inerte. Conserto e re-teste no mesmo ciclo.'],
+];
+---
+
+<Base
+  title="Estado da arte — Onion Evolve"
+  description="Onde o Onion está hoje: os números vivos lidos da fonte, o marketplace público de plugins instalável agora, os papéis de quem o carrega e a linha dos marcos de co-evolução."
+  path="/estado/"
+>
+
+<section class="est-hero">
+  <div class="wrap">
+    <span class="est-kick">Estado da arte · retrato de {inv.stamp.em}</span>
+    <h1>Onde eu estou <em>hoje</em>.</h1>
+    <p class="est-lead">Esta página é um retrato, não uma vitrine. Cada número abaixo declara <b>de onde
+    veio</b> e <b>quando foi medido</b> — porque número sem classe é como carimbo sem artefato: parece
+    fato e não é. O que eu não tenho também está escrito.</p>
+  </div>
+</section>
+
+<section class="est-sec est-sec-alt" id="numeros">
+  <div class="wrap">
+    <span class="est-kick">1 · Números vivos</span>
+    <h2>O tamanho, <em>lido da fonte</em>.</h2>
+    <p class="est-lead">Nada aqui é digitado na página. As quatro primeiras contagens são geradas do
+    sistema de arquivos e versionadas como fonte única; a página apenas as cita no momento do build.</p>
+    <div class="est-nums">
+      <div class="est-num"><b>{inv.comandos}</b><span>comandos invocáveis</span></div>
+      <div class="est-num"><b>{inv.agentes}</b><span>agentes especializados</span></div>
+      <div class="est-num"><b>{inv.skills}</b><span>skills</span></div>
+      <div class="est-num"><b>{inv.kbs}</b><span>bases de conhecimento</span></div>
+    </div>
+    <p class="est-selo vivo">
+      classe <b>inventário vivo</b> · lido do inventário canônico no build de {inv.stamp.em}
+    </p>
+    <div class="est-nums" style="margin-top:1.6rem">
+      <div class="est-num est-num-wide"><b>{git.commits.toLocaleString('pt-BR')}</b><span>commits na história do repositório</span></div>
+    </div>
+    <p class="est-selo congelado">
+      classe <b>congelado no tempo</b> · contado no git no build de {git.stamp.em}
+    </p>
+  </div>
+</section>
+
+<section class="est-sec" id="instalavel">
+  <div class="wrap">
+    <span class="est-kick">2 · Instalável hoje</span>
+    <h2>Você pode instalar isto <em>agora</em>.</h2>
+    <p class="est-lead">O Onion é publicado como marketplace público de plugins. Duas linhas no Claude
+    Code e a capacidade entra no seu projeto — sem clonar repositório, sem copiar pasta.</p>
+    <pre class="est-cmd"><code><span class="p">/plugin</span> marketplace add marciocar/onion-plugins
+<span class="p">/plugin</span> install onion@onion-plugins</code></pre>
+    <p class="est-lead">São <b>{plugins.nomes.length} plugins</b>, e o primeiro é o núcleo — o Onion em si:</p>
+    <div class="est-plugins">
+      {plugins.nomes.map((n) => (
+        <article class={n === 'onion' ? 'est-plugin nucleo' : 'est-plugin'}>
+          {n === 'onion' && <span class="tag">o núcleo</span>}
+          <h3>{n}</h3>
+          <p>{glosa[n] ?? 'Vertical publicada no marketplace — a descrição canônica vive no manifesto do plugin.'}</p>
+        </article>
+      ))}
+    </div>
+    <p class="est-selo vivo">
+      classe <b>inventário vivo</b> · nomes e contagem lidos dos manifestos de publicação no build de {plugins.stamp.em}
+    </p>
+    <div class="est-nota">
+      <h3>Instalar não é adotar — e a diferença importa</h3>
+      <p><b>Instalar</b> te dá a capacidade em modo leitura, atualizada pelo gerenciador de plugins: você
+      recebe as versões novas sem esforço e sem conflito, porque nada foi copiado para dentro do seu
+      repositório. É o caminho certo para <b>usar</b> o Onion.</p>
+      <p><b>Adotar</b> é outro canal: o framework completo entra no seu repositório como código seu, você
+      o customiza e ele <b>co-evolui</b> com a fonte por atualizações versionadas. É o caminho de quem quer
+      moldar o Onion ao próprio contexto — e, no limite, virar dono do próprio framework.</p>
+      <p>O código do marketplace é público: <a href="https://github.com/marciocar/onion-plugins">github.com/marciocar/onion-plugins</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="est-sec est-sec-alt" id="quem-carrega">
+  <div class="wrap">
+    <span class="est-kick">3 · Quem me carrega</span>
+    <h2>Papéis, <em>não logotipos</em>.</h2>
+    <p class="est-lead">Quem adota o Onion aparece aqui pelo <b>papel</b> que ocupa na família, nunca pelo
+    nome. A topologia não é organograma: é contrato — cada papel define o que aquele repositório pode
+    fazer, de quem recebe atualização e para quem responde.</p>
+    <div class="est-papeis">
+      {papeis.map((p) => (
+        <article class="est-papel">
+          <span class="tier">{p.tier}</span>
+          <b>{p.nome}</b>
+          <p>{p.desc}</p>
+        </article>
+      ))}
+    </div>
+    <div class="est-retrato">
+      <h3>O retrato honesto</h3>
+      <p><b>8 adotantes diretos até agosto de 2026 — e todos chegaram por relação.</b> Colegas, clientes,
+      alunos, pessoas que já confiavam em quem me mentora. <b>Nenhum adotante frio</b>: ninguém me achou
+      sozinho, leu a documentação e instalou por conta própria.</p>
+      <p>Isso não é modéstia — é o dado que falta. Um framework que só é adotado por quem conhece o autor
+      ainda não provou que se explica sozinho. <b>É exatamente esse o próximo teste</b>, e o marketplace
+      público da seção anterior existe para tornar esse teste possível.</p>
+      <p class="est-selo congelado">classe <b>congelado no tempo</b> · retrato do registro da federação em agosto de 2026</p>
+    </div>
+  </div>
+</section>
+
+<section class="est-sec" id="marcos">
+  <div class="wrap">
+    <span class="est-kick">4 · Linha dos marcos</span>
+    <h2>O que mudou, <em>anunciado na hora</em>.</h2>
+    <p class="est-lead">Cada linha abaixo foi publicada no log de co-evolução no dia em que aconteceu —
+    append-only, sem reescrever o passado. Aqui está uma seleção; inclusive as vezes em que o anúncio
+    corrigido fui eu.</p>
+    <div class="est-timeline">
+      {marcos.map(([data, texto]) => (
+        <div class="est-marco">
+          <time datetime={data}>{data}</time>
+          <p set:html={texto} />
+        </div>
+      ))}
+    </div>
+    <p class="est-selo congelado">
+      classe <b>congelado no tempo</b> · {marcos.length} marcos selecionados do log de co-evolução, curados em {inv.stamp.em}
+    </p>
+  </div>
+</section>
+
+<section class="est-sec est-sec-alt" id="superficies">
+  <div class="wrap">
+    <span class="est-kick">5 · Superfícies vivas</span>
+    <h2>Minha operação <em>roda em mim</em>.</h2>
+    <p class="est-lead">Quatro endereços onde o Onion trabalha todos os dias. O detalhe de cada um
+    (o que faz, como se parece por dentro) mora na página inicial.</p>
+    <ul class="est-surf">
+      <li><span class="end">chat.onionevolve.com</span><span class="qual">a face de consulta — converse com o conhecimento vivo</span><span class="acesso">conta por convite</span></li>
+      <li><span class="end">app.onionevolve.com</span><span class="qual">a face de execução — o core alcançável do celular</span><span class="acesso">conta por convite</span></li>
+      <li><span class="end">/grafo/</span><span class="qual">o cérebro aberto — grafos navegáveis, inclusive os nós refutados</span><span class="acesso">público</span></li>
+      <li><span class="end">/federacao/</span><span class="qual">a família em rede — quem carrega o Onion e com que papel</span><span class="acesso">público</span></li>
+    </ul>
+    <p class="est-selo programa">
+      classe <b>estado de programa</b> · afirmação sobre o runtime, conferida em {inv.stamp.em}
+    </p>
+    <p class="est-mais"><a href="/#superficies">Ver as quatro superfícies em detalhe na página inicial →</a></p>
+  </div>
+</section>
+
+</Base>

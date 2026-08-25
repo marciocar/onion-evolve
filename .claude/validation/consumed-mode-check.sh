@@ -51,9 +51,9 @@
 #
 # LACUNAS REAIS QUE ELE ACHOU à época — ⚠️ AMBAS FECHADAS DESDE ENTÃO (Elenxo 2026-08-13:
 # lint-selftest.sh:6023 exercita `inventory.sh --markdown`; :6078 exercita
-# `migalhas-generate.sh --check`; o próprio instrumento devolve `0 sem teste` hoje):
+# um --check consumido pela produção; o próprio instrumento devolve `0 sem teste` hoje):
 #   · inventory.sh          — a produção consome `--markdown` (era lacuna; coberto)
-#   · migalhas-generate.sh  — a produção consome `--check` (era lacuna; coberto)
+#   · migalhas-generate.sh  — (HISTÓRICO: aposentado no cutover Astro 2026-08-25; o par sumiu da medição)
 #
 # O QUE FALTAVA para virar REGRA (registro de 2026-08-06 — ⚠️ o ciclo FOI puxado: a REGRA 59
 # [HARD] existe e consome este script, ver o topo deste cabeçalho): (a) distinguir invocação de

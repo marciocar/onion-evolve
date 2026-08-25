@@ -1,0 +1,184 @@
+---
+// RadarWidget — "o radar no papel": a fórmula de atenção do grafo, interativa.
+//
+// SÍTIO ÚNICO DA FÓRMULA NO SITE. As duas línguas (/maquinaria/ e /en/maquinaria/)
+// importam ESTE componente — a conta não é reescrita duas vezes. É o mesmo motivo
+// pelo qual o fator de status vive num arquivo só no core: duas cópias divergem, e
+// a divergência aparece como "qual nó é o mais urgente", que é a única pergunta que
+// o instrumento responde.
+//
+// FIDELIDADE À FONTE: fórmula e fatores são cópia do radar determinístico do core
+// (atenção = impacto × confiança × fator-de-estado × (1 + ligações); open/confirmed
+// 1,0 · drifted 1,3 · unverifiable 1,0 · refuted 0 · superseded 0,2 · done 0,1).
+// O default reproduz o nó do teto de desconto do grafo didático: 5 × 0,9 × 1 × (1+4) = 22,5.
+interface Props {
+  lang?: 'pt' | 'en';
+}
+const { lang = 'pt' } = Astro.props;
+const en = lang === 'en';
+const locale = en ? 'en-US' : 'pt-BR';
+
+const t = en
+  ? {
+      legend: 'Attention calculator',
+      impact: 'Impact',
+      impactHint: 'the price of being wrong here — 1 to 5',
+      confidence: 'Confidence',
+      confidenceHint: 'how well it holds up — 0 to 1',
+      status: 'Status',
+      statusHint: 'what the graph knows about this node',
+      links: 'Connections',
+      linksHint: 'how many edges touch it',
+      result: 'Attention',
+      resetLabel: 'Back to the example',
+      note: 'Deterministic, no AI, redoable on paper.',
+      statuses: [
+        ['open', 'open — ×1'],
+        ['confirmed', 'confirmed — ×1'],
+        ['drifted', 'drifted — ×1.3'],
+        ['unverifiable', 'unverifiable — ×1'],
+        ['refuted', 'refuted — ×0'],
+        ['superseded', 'superseded — ×0.2'],
+        ['done', 'done — ×0.1'],
+      ],
+    }
+  : {
+      legend: 'Calculadora de atenção',
+      impact: 'Impacto',
+      impactHint: 'o preço de errar aqui — 1 a 5',
+      confidence: 'Confiança',
+      confidenceHint: 'o quanto se sustenta — 0 a 1',
+      status: 'Estado',
+      statusHint: 'o que o grafo sabe sobre este nó',
+      links: 'Ligações',
+      linksHint: 'quantas arestas encostam nele',
+      result: 'Atenção',
+      resetLabel: 'Voltar ao exemplo',
+      note: 'Determinístico, sem IA, refazível no papel.',
+      statuses: [
+        ['open', 'em aberto — ×1'],
+        ['confirmed', 'confirmado — ×1'],
+        ['drifted', 'divergiu — ×1,3'],
+        ['unverifiable', 'não verificável — ×1'],
+        ['refuted', 'refutado — ×0'],
+        ['superseded', 'superado — ×0,2'],
+        ['done', 'encerrado — ×0,1'],
+      ],
+    };
+---
+
+<div class="radar" data-locale={locale}>
+  <fieldset class="radar-inputs">
+    <legend class="sr-only">{t.legend}</legend>
+
+    <label class="radar-field">
+      <span class="rf-name">{t.impact} <b id="rw-impact-out">5</b></span>
+      <input id="rw-impact" type="range" min="1" max="5" step="1" value="5" />
+      <span class="rf-hint">{t.impactHint}</span>
+    </label>
+
+    <label class="radar-field">
+      <span class="rf-name">{t.confidence} <b id="rw-conf-out">0,90</b></span>
+      <input id="rw-conf" type="range" min="0" max="1" step="0.05" value="0.9" />
+      <span class="rf-hint">{t.confidenceHint}</span>
+    </label>
+
+    <label class="radar-field">
+      <span class="rf-name">{t.status}</span>
+      <select id="rw-status">
+        {t.statuses.map(([v, rot]) => <option value={v} selected={v === 'confirmed'}>{rot}</option>)}
+      </select>
+      <span class="rf-hint">{t.statusHint}</span>
+    </label>
+
+    <label class="radar-field">
+      <span class="rf-name">{t.links} <b id="rw-deg-out">4</b></span>
+      <input id="rw-deg" type="range" min="0" max="8" step="1" value="4" />
+      <span class="rf-hint">{t.linksHint}</span>
+    </label>
+  </fieldset>
+
+  <div class="radar-out">
+    <div class="ro-work" id="rw-work" aria-hidden="true">5 × 0,90 × 1 × (1 + 4)</div>
+    <output class="ro-value" id="rw-value" for="rw-impact rw-conf rw-status rw-deg" aria-live="polite">
+      <span class="ro-label">{t.result}</span><b id="rw-num">22,5</b>
+    </output>
+    <button type="button" class="ro-reset" id="rw-reset">{t.resetLabel}</button>
+  </div>
+
+  <p class="radar-note">{t.note}</p>
+</div>
+
+<script is:inline>
+  // A fórmula do radar, verbatim. Sem dependência, sem rede, sem modelo.
+  (function () {
+    var raiz = document.querySelector('.radar');
+    if (!raiz) return;
+    var locale = raiz.getAttribute('data-locale') || 'pt-BR';
+
+    // Fator de estado — a tabela do core. `refuted` zera (some do topo, não do mapa);
+    // `drifted` passa de 1 de propósito: nó que acabou de provar que o mundo andou é
+    // MAIS urgente que um confirmado de mesmo peso.
+    var FATOR = {
+      open: 1.0,
+      confirmed: 1.0,
+      drifted: 1.3,
+      unverifiable: 1.0,
+      refuted: 0.0,
+      superseded: 0.2,
+      done: 0.1
+    };
+
+    function atencao(impacto, confianca, estado, ligacoes) {
+      return impacto * confianca * FATOR[estado] * (1 + ligacoes);
+    }
+
+    var elImpacto = document.getElementById('rw-impact');
+    var elConf = document.getElementById('rw-conf');
+    var elEstado = document.getElementById('rw-status');
+    var elGrau = document.getElementById('rw-deg');
+    var outImpacto = document.getElementById('rw-impact-out');
+    var outConf = document.getElementById('rw-conf-out');
+    var outGrau = document.getElementById('rw-deg-out');
+    var outConta = document.getElementById('rw-work');
+    var outNum = document.getElementById('rw-num');
+    var btnReset = document.getElementById('rw-reset');
+
+    function fmt(n, casas) {
+      return n.toLocaleString(locale, { minimumFractionDigits: casas, maximumFractionDigits: casas });
+    }
+
+    function render() {
+      var impacto = parseInt(elImpacto.value, 10);
+      var confianca = parseFloat(elConf.value);
+      var estado = elEstado.value;
+      var ligacoes = parseInt(elGrau.value, 10);
+      var fator = FATOR[estado];
+      var valor = atencao(impacto, confianca, estado, ligacoes);
+
+      outImpacto.textContent = String(impacto);
+      outConf.textContent = fmt(confianca, 2);
+      outGrau.textContent = String(ligacoes);
+      outConta.textContent =
+        impacto + ' × ' + fmt(confianca, 2) + ' × ' + fmt(fator, fator % 1 === 0 ? 0 : 1) +
+        ' × (1 + ' + ligacoes + ')';
+      outNum.textContent = fmt(Math.round(valor * 100) / 100, valor % 1 === 0 ? 0 : (valor * 10) % 1 === 0 ? 1 : 2);
+      raiz.setAttribute('data-zero', valor === 0 ? 'sim' : 'nao');
+    }
+
+    [elImpacto, elConf, elEstado, elGrau].forEach(function (el) {
+      el.addEventListener('input', render);
+      el.addEventListener('change', render);
+    });
+
+    btnReset.addEventListener('click', function () {
+      elImpacto.value = '5';
+      elConf.value = '0.9';
+      elEstado.value = 'confirmed';
+      elGrau.value = '4';
+      render();
+    });
+
+    render();
+  })();
+</script>

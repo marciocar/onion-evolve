@@ -1,0 +1,102 @@
+/* Estilos da /doutrinas/ (pt) e /en/doutrinas/ (EN) — F4 da reforma 2026-08.
+   Só tokens de global.css; nada de cor literal nova. O contrato editorial da página
+   (síntese → cicatriz → mecanismo) tem forma própria: a cicatriz é a única faixa com
+   fundo, porque é a parte que a maioria dos sites esconde. */
+
+.sans { font-family: var(--sans); }
+
+/* ─── hero ─── */
+.dh { position:relative; overflow:hidden; padding:8.5rem 1.5rem 3.5rem; text-align:center; }
+.dh-glow { position:absolute; border-radius:50%; filter:blur(90px); opacity:.5; pointer-events:none; }
+.dh-glow.g1 { width:400px; height:400px; background:var(--purple-glow); top:-14%; left:-6%; }
+.dh-glow.g2 { width:340px; height:340px; background:var(--orange-glow); bottom:-22%; right:-4%; }
+.dh-in { position:relative; max-width:52rem; margin:0 auto; }
+.eyebrow { display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+           color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow);
+           padding:.4rem 1rem; border-radius:99px; margin-bottom:1.5rem; }
+.dh h1 { font-size:clamp(2.1rem, 5.5vw, 3.4rem); }
+.dh h1 em { color:var(--orange); font-style:italic; }
+.dh .sub { margin:1.5rem auto 0; max-width:40rem; color:var(--text-body); font-size:1.1rem; }
+.dh .sig { margin-top:1rem; color:var(--text-muted); font-size:.93rem; font-style:italic; }
+
+/* ─── contrato editorial (o que a página promete) ─── */
+.pacto { max-width:52rem; margin:2.6rem auto 0; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; text-align:left; }
+.pacto div { border:1px solid var(--border); border-radius:var(--radius); padding:.85rem 1rem; background:var(--bg-card); }
+.pacto b { display:block; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--orange); margin-bottom:.25rem; }
+.pacto span { font-size:.88rem; color:var(--text-body); line-height:1.5; }
+@media (max-width:720px){ .pacto { grid-template-columns:1fr; } }
+
+/* ─── índice de âncoras ─── */
+.dindex { border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--bg-glass); }
+.dindex-in { max-width:1080px; margin:0 auto; padding:1.1rem 24px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.dindex-in > span { font-size:.72rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--text-muted); margin-right:.4rem; }
+.dindex-in a { font-size:.83rem; font-weight:600; text-decoration:none; color:var(--text-body);
+               border:1px solid var(--border); background:var(--bg-card); padding:.34rem .8rem; border-radius:99px; transition:.18s; }
+.dindex-in a:hover { border-color:var(--border-warm); color:var(--orange); }
+
+/* ─── as doutrinas ─── */
+.doutrinas { max-width:1080px; margin:0 auto; padding:4rem 24px 1rem; display:grid; gap:2.2rem; }
+.dcard { border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--bg-card); overflow:hidden; }
+.dcard-head { padding:1.7rem 1.9rem 0; display:flex; gap:1rem; align-items:baseline; flex-wrap:wrap; }
+.dnum { font-family:var(--mono); font-size:.78rem; font-weight:700; color:var(--orange);
+        background:var(--orange-dim); border:1px solid var(--border-warm); border-radius:99px; padding:.22rem .6rem; }
+.dcard-head h2 { font-size:1.6rem; }
+.dcard-head .alias { font-size:.85rem; color:var(--text-muted); font-family:var(--mono); }
+.sintese { margin:1rem 1.9rem 1.5rem; padding-left:1.1rem; border-left:3px solid var(--orange);
+           font-family:var(--display); font-size:1.22rem; line-height:1.45; color:var(--text); text-wrap:pretty; }
+.dbody { padding:0 1.9rem 1.8rem; display:grid; gap:1.1rem; }
+.bloco b { display:block; font-size:.71rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; margin-bottom:.45rem; }
+.bloco p { color:var(--text-body); font-size:.99rem; }
+.bloco p + p { margin-top:.7rem; }
+.cicatriz { background:var(--orange-dim); border:1px solid var(--border-warm); border-radius:var(--radius); padding:1.1rem 1.25rem; }
+.cicatriz b { color:var(--orange); }
+.mecanismo b { color:var(--green); }
+.mecanismo { border-left:3px solid var(--green); padding-left:1.1rem; }
+.limite { font-size:.9rem; color:var(--text-muted); font-style:italic; border-top:1px dashed var(--border); padding-top:.9rem; }
+.dcard .data { font-family:var(--mono); font-size:.8rem; color:var(--text-muted); }
+
+/* ─── cunhagens ─── */
+.cunhagens { max-width:1080px; margin:3.5rem auto 0; padding:0 24px; }
+.sec-head { max-width:44rem; margin-bottom:1.8rem; }
+.kicker { display:block; font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--orange); margin-bottom:.6rem; }
+.sec-head h2 { font-size:clamp(1.6rem,3.4vw,2.1rem); }
+.sec-head p { margin-top:.8rem; color:var(--text-body); }
+.duas { display:grid; grid-template-columns:1fr 1fr; gap:1.4rem; }
+@media (max-width:820px){ .duas { grid-template-columns:1fr; } }
+.duas > div { border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--bg-card); padding:1.5rem 1.6rem; }
+.duas h3 { font-size:1.15rem; margin-bottom:.9rem; }
+.duas ul { list-style:none; display:grid; gap:.8rem; }
+.duas li { font-size:.93rem; color:var(--text-body); line-height:1.55; }
+.duas li strong { color:var(--text); }
+.duas li .fonte { display:block; font-size:.82rem; color:var(--text-muted); margin-top:.15rem; }
+
+/* ─── tabela das invenções ─── */
+.invencoes { max-width:1080px; margin:3.5rem auto 0; padding:0 24px; }
+.tbl-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--bg-card); }
+table.inv { width:100%; border-collapse:collapse; min-width:620px; }
+table.inv th, table.inv td { text-align:left; padding:.78rem 1.1rem; border-bottom:1px solid var(--border); vertical-align:top; }
+table.inv th { font-size:.71rem; letter-spacing:.13em; text-transform:uppercase; color:var(--text-muted); background:var(--bg-glass); }
+table.inv tr:last-child td { border-bottom:0; }
+table.inv td.nome { font-weight:700; white-space:nowrap; }
+table.inv td.oque { color:var(--text-body); font-size:.93rem; }
+table.inv td.status { font-size:.87rem; color:var(--text-muted); }
+.casa { display:block; font-size:.77rem; color:var(--text-muted); font-weight:400; font-family:var(--mono); margin-top:.2rem; }
+.nota-drift { margin-top:1rem; font-size:.87rem; color:var(--text-body); background:var(--purple-dim);
+              border:1px solid var(--purple-glow); border-radius:var(--radius); padding:.8rem 1rem; }
+.nota-fonte { margin-top:1rem; font-size:.85rem; color:var(--text-muted); font-style:italic; }
+
+/* ─── fecho ─── */
+.fecho { max-width:1080px; margin:4rem auto 0; padding:0 24px 5rem; }
+.fecho-in { border:1px solid var(--border-warm); border-radius:var(--radius-lg); background:var(--bg-deep); color:#F3EDE6;
+            padding:2.6rem 2.2rem; text-align:center; }
+.fecho-in h2 { font-size:clamp(1.5rem,3.2vw,2rem); color:#FFF8F0; }
+.fecho-in p { margin:1rem auto 0; max-width:44rem; color:rgba(243,237,230,.82); }
+.fecho-in .cta { margin-top:1.6rem; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.fecho-in .cta a { font-size:.88rem; font-weight:700; text-decoration:none; padding:.62rem 1.15rem; border-radius:99px; }
+.fecho-in .cta a.primary { background:var(--orange); color:#fff; }
+.fecho-in .cta a.ghost { border:1px solid rgba(243,237,230,.3); color:#F3EDE6; }
+
+/* ─── troca de idioma ─── */
+.lang { max-width:1080px; margin:0 auto; padding:1.4rem 24px 0; text-align:right; font-size:.83rem; color:var(--text-muted); }
+.lang a { font-weight:600; text-decoration:none; }
+.lang a:hover { text-decoration:underline; }

@@ -1,0 +1,215 @@
+---
+// Migalhas — o diário vivo, agora projetado DA COLEÇÃO (F2 da reforma 2026-08).
+//
+// MUDANÇA DE PARADIGMA vs o legado: em site/historia/migalhas/index.html os posts eram
+// que o gerador legado (aposentado no cutover 2026-08-25) injetava entre marcadores no HTML.
+// Aqui a página INTEIRA nasce de getCollection('migalhas') — os marcadores morrem com o
+// cutover. O chrome (hero, manifesto, filtros, lazyload, rodapé) veio VERBATIM do legado.
+//
+// O corpo dos posts é convertido pelas mesmas regras do gerador (parágrafo por linha em
+// branco; *x*→<em>; `x`→<code>; [t](u)→<a>) para o HTML sair idêntico ao da projeção —
+// as três seções são fixas por contrato do frontmatter, não markdown livre.
+import Base from '../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import '../../../styles/migalhas.css';
+
+const LABEL: Record<string, string> = {
+  learning: 'Aprendizado', innovation: 'Inovação', decision: 'Decisão',
+  error: 'Erro', observation: 'Observação', reflection: 'Reflexão',
+};
+const MES = ['janeiro','fevereiro','março','abril','maio','junho',
+             'julho','agosto','setembro','outubro','novembro','dezembro'];
+
+/** 2026-07-21 → "21 de julho de 2026" (UTC: a data do frontmatter é um dia civil, não um instante) */
+const humano = (d: Date) => `${d.getUTCDate()} de ${MES[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/** Inverso do extrator do diário — o mesmo subconjunto de markdown que o gerador aceitava. */
+function mdParaHtml(md: string): string {
+  return md
+    .trim()
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) =>
+      `<p>${esc(p)
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/`(.+?)`/g, '<code>$1</code>')
+        .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')}</p>`
+    )
+    .join('');
+}
+
+/** As três seções são contrato: extrai o corpo de cada `## <título>` até o próximo `##`. */
+function secao(corpo: string, nome: string): string {
+  const m = corpo.match(new RegExp(`##\\s*${nome}\\s*\\n([\\s\\S]*?)(?=\\n##\\s|$)`));
+  return m ? m[1].trim() : '';
+}
+
+// ordem do legado: data desc, empate desfeito pelo slug desc
+const posts = (await getCollection('migalhas')).sort((a, b) => {
+  const d = b.data.date.getTime() - a.data.date.getTime();
+  return d !== 0 ? d : b.data.slug.localeCompare(a.data.slug);
+});
+
+const artigos = posts
+  .map((p) => {
+    const { slug, type, title, date, review_after } = p.data;
+    const corpo = p.body ?? '';
+    const prova =
+      mdParaHtml(secao(corpo, 'A prova')) +
+      `<a class="pr-link" href="/historia/migalhas/provas/#prova-${slug}">ver a prova →</a>`;
+    return `  <article class="post" id="post-${slug}" data-type="${type}" data-date="${iso(date)}">
+    <div class="post-head">
+      <span class="p-type ${type} sans">${LABEL[type] ?? type}</span>
+      <span class="p-date">${humano(date)}</span>
+    </div>
+    <h2>${esc(title)}</h2>
+    <h3>O que descobri</h3>
+    ${mdParaHtml(secao(corpo, 'O que descobri'))}
+    <h3>A prova</h3>
+    ${prova}
+    <h3>Onde isso nos levou</h3>
+    ${mdParaHtml(secao(corpo, 'Onde isso nos levou'))}
+    <div class="status sans" data-state="revisao" data-review="${iso(review_after!)}" data-review-label="${humano(review_after!)}">
+      <span class="dot" aria-hidden="true"></span>
+<span class="status-text">Sob revisão — calculando…</span>
+    </div>
+  </article>`;
+  })
+  .join('\n\n');
+---
+
+<Base
+  title="Migalhas — o diário vivo do Onion Evolve"
+  description="Migalhas: o diário de sessão do Onion Evolve, publicado ao vivo. Cada lição carrega prova (PR real) e uma data de re-teste — nada fica permanente sem ser checado de novo."
+  path="/historia/migalhas/"
+>
+  <div class="mig">
+    <main>
+      <section class="hero">
+        <span class="eyebrow sans">🍞 O diário, ao vivo</span>
+        <h1>Lições com <em>data de validade.</em></h1>
+        <p class="sub">Todo blog técnico promete "aprendemos algo". O nosso mostra a prova — e marca o dia em
+        que essa mesma lição será re-testada. Se não passar, fica escrito aqui, sem apagar nada.</p>
+        <p class="pitch">Nenhuma entrada é permanente por padrão. É o diário de sessão do framework, publicado.</p>
+      </section>
+
+      <div class="innov-box">
+        <div class="innov">
+          <b>Por que isso é diferente:</b> cada post abaixo nasceu de uma entrada real do nosso diário de
+          sessão — com uma data marcada para eu mesmo voltar e conferir se a lição ainda é verdade. Não
+          conheço outro blog técnico que faça isso. É a mesma disciplina da nossa <a href="/#prova" style="color:#fff;text-decoration:underline">Prova Viva</a>, aplicada ao próprio ato de aprender em público.
+        </div>
+      </div>
+
+      <div class="filters sans" role="group" aria-label="filtrar por tipo">
+        <button class="filter-btn on" data-filter="all" aria-pressed="true">Todos</button>
+        <button class="filter-btn" data-filter="learning" aria-pressed="false">Aprendizado</button>
+        <button class="filter-btn" data-filter="innovation" aria-pressed="false">Inovação</button>
+        <button class="filter-btn" data-filter="decision" aria-pressed="false">Decisão</button>
+        <button class="filter-btn" data-filter="error" aria-pressed="false">Erro</button>
+        <button class="filter-btn" data-filter="reflection" aria-pressed="false">Reflexão</button>
+        <button class="filter-btn" data-filter="observation" aria-pressed="false">Observação</button>
+      </div>
+
+      <p id="filter-status" class="sans" style="position:absolute;width:1px;height:1px;overflow:hidden" aria-live="polite"></p>
+      <div class="feed" id="feed"><Fragment set:html={artigos} /></div>
+
+      <div class="load-wrap">
+        <p class="load-count sans" id="load-count" aria-live="polite"></p>
+        <div id="sentinel" aria-hidden="true"></div>
+        <button class="load-more sans" id="load-more" type="button" hidden>Carregar mais migalhas</button>
+      </div>
+    </main>
+
+    <footer class="site">
+      <p>Migalhas é o diário de sessão do <a href="/">Onion Evolve</a>, publicado com curadoria — nunca em
+      bruto. Assine em <a href="/historia/migalhas/feed.xml">RSS</a>. Parte da autobiografia:
+      <a href="/historia/">leia a história completa ←</a></p>
+    </footer>
+  </div>
+</Base>
+
+<script is:inline>
+(function(){
+  // contagem regressiva real até review_after (calculada no navegador do visitante; singular/plural corretos)
+  function dia(n) { return n === 1 ? 'dia' : 'dias'; }
+  document.querySelectorAll('.status[data-review]').forEach(function(el){
+    var review = new Date(el.dataset.review + 'T00:00:00');
+    var now = new Date();
+    var days = Math.ceil((review - now) / 86400000);
+    var label = el.dataset.reviewLabel;
+    var textEl = el.querySelector('.status-text');
+    if (days < 0) {
+      el.dataset.state = 'vencida';
+      textEl.innerHTML = '<b>Vencida há ' + Math.abs(days) + ' ' + dia(Math.abs(days)) + '</b> — aguardando re-teste em sessão real';
+    } else if (days === 0) {
+      textEl.innerHTML = '<b>Re-teste é hoje</b> (' + label + ')';
+    } else {
+      textEl.innerHTML = 'Sob revisão em <b>' + days + ' ' + dia(days) + '</b> (re-teste em ' + label + ')';
+    }
+  });
+
+  // ---- ordem (mais recente → mais antiga) + lazyload (mostra 5, carrega +5 no scroll) + filtro ----
+  var PAGE = 5;
+  var shown = PAGE;
+  var currentFilter = 'all';
+  var feed = document.getElementById('feed');
+  var posts = Array.prototype.slice.call(feed.querySelectorAll('.post'));
+  var statusEl = document.getElementById('filter-status');
+  var countEl = document.getElementById('load-count');
+  var loadBtn = document.getElementById('load-more');
+  var sentinel = document.getElementById('sentinel');
+  var labels = {all:'Todos', learning:'Aprendizado', innovation:'Inovação', decision:'Decisão', error:'Erro',
+                reflection:'Reflexão', observation:'Observação'};
+
+  // garante a ordem por data (desc); empate = mantém a ordem do documento
+  posts.sort(function(a, b){
+    var da = a.dataset.date || '', db = b.dataset.date || '';
+    if (da === db) return 0;
+    return da < db ? 1 : -1;
+  });
+  posts.forEach(function(p){ feed.appendChild(p); });
+
+  function matching(){
+    return posts.filter(function(p){ return currentFilter === 'all' || p.dataset.type === currentFilter; });
+  }
+  function render(){
+    var m = matching();
+    posts.forEach(function(p){ p.classList.add('hide'); });
+    m.forEach(function(p, i){ if (i < shown) p.classList.remove('hide'); });
+    var remaining = Math.max(0, m.length - shown);
+    if (loadBtn) loadBtn.hidden = remaining === 0;
+    if (sentinel) sentinel.style.display = remaining === 0 ? 'none' : '';
+    if (countEl) countEl.textContent = remaining === 0
+      ? (m.length + (m.length === 1 ? ' migalha' : ' migalhas'))
+      : ('mostrando ' + Math.min(shown, m.length) + ' de ' + m.length);
+    if (statusEl) statusEl.textContent = labels[currentFilter] + ': ' + m.length + (m.length === 1 ? ' post' : ' posts');
+  }
+  function loadMore(){ shown += PAGE; render(); }
+
+  // filtro por tipo (reseta a janela do lazyload)
+  var btns = document.querySelectorAll('.filter-btn');
+  btns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      btns.forEach(function(b){ b.classList.remove('on'); b.setAttribute('aria-pressed','false'); });
+      btn.classList.add('on'); btn.setAttribute('aria-pressed','true');
+      currentFilter = btn.dataset.filter; shown = PAGE; render();
+    });
+  });
+
+  if (loadBtn) loadBtn.addEventListener('click', loadMore);
+
+  // auto-carrega ao chegar perto do fim (fallback: o botão "Carregar mais" sempre funciona)
+  if ('IntersectionObserver' in window && sentinel) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) loadMore(); });
+    }, { rootMargin: '400px 0px' });
+    io.observe(sentinel);
+  }
+
+  render();
+})();
+</script>

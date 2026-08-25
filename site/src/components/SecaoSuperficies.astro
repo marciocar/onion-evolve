@@ -1,0 +1,82 @@
+---
+// Seção nova da reforma 2026-08: as SUPERFÍCIES VIVAS — prova de dogfood, não promessa.
+// Regra de copy (decisão do maestro 2026-08-25): honestidade sobre auth — chat e app
+// exigem conta (SSO); o CTA é "peça um convite", nunca sugestão de acesso aberto.
+// Canal do convite decidido pelo maestro (2026-08-25): LinkedIn — o mesmo canal
+// público do deck NewHack #22.
+const INVITE_HREF = 'https://www.linkedin.com/in/marciocar/';
+
+const superficies = [
+  {
+    nome: 'chat.onionevolve.com',
+    papel: 'a face de consulta',
+    desc: 'Converse com o conhecimento do Onion: RAG sobre a base viva + o grafo real via conector read-only. O mesmo grafo que você navega em /grafo/, respondendo.',
+    auth: 'conta com SSO · registro por convite',
+    demo: '> qual doutrina cobre "declarado ≠ verificado"?\n… consultando o grafo (kg, read-only) …',
+  },
+  {
+    nome: 'app.onionevolve.com',
+    papel: 'a face de execução',
+    desc: 'O Onion-Bridge: o core rodando no servidor, alcançável do celular. Sessões por streaming, threads persistentes, identidade OIDC — foi por aqui que esta página nasceu.',
+    auth: 'identidade OIDC · escopo bridge:invoke',
+    demo: '> /engineer:work\n… sessão retomada de onde parou …',
+  },
+  {
+    nome: '/grafo/',
+    papel: 'o cérebro, aberto',
+    desc: 'Grafos de conhecimento navegáveis, com o radar determinístico rodando em cima — inclusive os nós refutados, que a wiki apagaria.',
+    auth: 'público',
+    demo: 'atenção 22.5 · decisão ✓ teto de 10%\natenção 0.0 · afirmação ✗ refutada (na história)',
+  },
+  {
+    nome: '/federacao/',
+    papel: 'a família, em rede',
+    desc: 'O console da federação: quem carrega o Onion, com que papel, e o histórico de comunicações entre core e adotantes.',
+    auth: 'público · retrato de 10 jul 2026',
+    demo: 'source → hub → consumer\n📬 co-evolução: sinal ↑ · anúncio ↓',
+  },
+];
+---
+
+<section class="sec" id="superficies">
+  <div class="wrap">
+    <p class="kicker">superfícies vivas · dogfood, não demo</p>
+    <h2>Minha operação roda em mim.</h2>
+    <p class="lead">
+      Nada abaixo é maquete: são as superfícies onde o Onion trabalha todos os dias —
+      publicadas porque autobiografia se prova, não se conta.
+    </p>
+    <div class="surf-grid">
+      {superficies.map((s) => (
+        <article class="surf-card">
+          <header>
+            <span class="surf-nome">{s.nome}</span>
+            <span class="surf-papel">{s.papel}</span>
+          </header>
+          <pre class="surf-demo" aria-hidden="true">{s.demo}</pre>
+          <p class="surf-desc">{s.desc}</p>
+          <footer class="surf-auth">{s.auth}</footer>
+        </article>
+      ))}
+    </div>
+    <p class="surf-cta">
+      As duas primeiras pedem conta — <a href={INVITE_HREF}>peça um convite</a>. As duas
+      últimas estão abertas agora.
+    </p>
+  </div>
+</section>
+
+<style is:global>
+  #superficies .kicker { font-size:.74rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--purple); margin-bottom:.9rem; }
+  #superficies h2 { font-size:clamp(28px,4vw,44px); margin-bottom:1rem; }
+  #superficies .lead { max-width:64ch; color:var(--text-body); margin-bottom:2rem; }
+  #superficies .surf-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; margin-bottom:1.6rem; }
+  #superficies .surf-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.2rem 1.3rem; display:flex; flex-direction:column; gap:.7rem; }
+  #superficies .surf-card header { display:flex; flex-direction:column; gap:.15rem; }
+  #superficies .surf-nome { font-family:var(--mono); font-weight:700; font-size:.92rem; color:var(--text); }
+  #superficies .surf-papel { font-size:.74rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--orange); }
+  #superficies .surf-demo { font-family:var(--mono); font-size:.74rem; line-height:1.55; background:var(--bg-deep); color:#D8CFC6; border-radius:8px; padding:.7rem .85rem; white-space:pre-wrap; overflow-x:auto; }
+  #superficies .surf-desc { font-size:.9rem; color:var(--text-body); line-height:1.55; flex:1; }
+  #superficies .surf-auth { font-size:.76rem; color:var(--text-muted); border-top:1px dashed var(--border); padding-top:.6rem; }
+  #superficies .surf-cta { color:var(--text-body); }
+</style>

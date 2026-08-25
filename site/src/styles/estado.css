@@ -1,0 +1,102 @@
+/* Estilos da /estado/ — o estado da arte do Onion (F4 da reforma 2026-08).
+   Não reusa home.css (aquele é escopado à home): as classes daqui são próprias,
+   prefixadas .est-*, e consomem SÓ os tokens de global.css.
+
+   Uma decisão de forma que é de conteúdo: o SELO DE CLASSE (.est-selo) tem estilo
+   próprio e visível em toda seção com número — sem ele o site redrifta (KB de
+   identidade §6). Três classes, três cores: vivo (verde), congelado (âmbar/laranja),
+   programa (roxo). */
+
+/* ─── hero ─── */
+.est-hero { padding:9rem 0 3.5rem; position:relative; overflow:hidden; }
+.est-hero::after { content:''; position:absolute; width:420px; height:420px; border-radius:50%;
+                   background:var(--orange-glow); filter:blur(110px); opacity:.42; top:-14%; right:-6%; pointer-events:none; }
+.est-hero .wrap { position:relative; z-index:1; }
+.est-kick { display:block; font-size:.74rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+            color:var(--purple); margin-bottom:.9rem; }
+.est-hero h1 { font-size:clamp(2rem,5.2vw,3.4rem); margin-bottom:1.1rem; }
+.est-hero h1 em { color:var(--orange); font-style:italic; }
+.est-lead { max-width:64ch; color:var(--text-body); font-size:1.06rem; }
+
+/* ─── seções ─── */
+.est-sec { padding:76px 0; }
+.est-sec-alt { background:var(--bg-glass); border-block:1px solid var(--border); }
+.est-sec h2 { font-size:clamp(1.6rem,3.6vw,2.4rem); margin-bottom:.8rem; }
+.est-sec h2 em { color:var(--orange); font-style:italic; }
+
+/* ─── selo de classe de número ─── */
+.est-selo { display:inline-flex; align-items:center; gap:.5rem; margin-top:1.2rem;
+            font-family:var(--mono); font-size:.72rem; line-height:1.5; color:var(--text-muted);
+            border:1px dashed var(--border); border-radius:99px; padding:.35rem .85rem; }
+.est-selo::before { content:''; width:7px; height:7px; border-radius:50%; flex:none; background:var(--text-muted); }
+.est-selo.vivo::before { background:var(--green); }
+.est-selo.congelado::before { background:var(--orange-light); }
+.est-selo.programa::before { background:var(--purple); }
+.est-selo b { font-weight:700; color:var(--text-body); }
+
+/* ─── números ─── */
+.est-nums { display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:14px; margin-top:2rem; }
+.est-num { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg);
+           padding:1.2rem 1rem; text-align:center; }
+.est-num b { display:block; font-family:var(--display); font-size:2.4rem; font-weight:600; line-height:1;
+             color:var(--orange); letter-spacing:-.02em; }
+.est-num span { display:block; margin-top:.4rem; font-size:.8rem; color:var(--text-muted); }
+.est-num-wide { grid-column:span 2; }
+@media (max-width:520px){ .est-num-wide { grid-column:span 1; } }
+
+/* ─── instalável hoje ─── */
+.est-cmd { font-family:var(--mono); font-size:.86rem; background:var(--bg-deep); color:#F0E7DE;
+           border-radius:var(--radius); padding:1rem 1.15rem; overflow-x:auto; margin:1.6rem 0 1.2rem;
+           white-space:pre; }
+.est-cmd .p { color:var(--orange-light); }
+.est-plugins { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:1.4rem; }
+.est-plugin { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.1rem 1.2rem; }
+.est-plugin.nucleo { border-color:var(--border-warm); background:linear-gradient(180deg,var(--orange-dim),var(--bg-card) 60%); }
+.est-plugin h3 { font-family:var(--mono); font-size:.9rem; font-weight:700; letter-spacing:0; color:var(--text); margin-bottom:.15rem; }
+.est-plugin .tag { display:inline-block; font-size:.66rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+                   color:var(--orange); margin-bottom:.5rem; }
+.est-plugin p { font-size:.88rem; color:var(--text-body); line-height:1.55; }
+.est-nota { margin-top:1.8rem; background:var(--bg-card); border:1px solid var(--border); border-left:3px solid var(--purple);
+            border-radius:var(--radius); padding:1.1rem 1.3rem; }
+.est-nota h3 { font-size:1.02rem; margin-bottom:.5rem; }
+.est-nota p { font-size:.93rem; color:var(--text-body); }
+.est-nota p + p { margin-top:.6rem; }
+
+/* ─── papéis ─── */
+.est-papeis { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-top:1.8rem; }
+.est-papel { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.05rem 1.2rem; }
+.est-papel b { display:block; font-family:var(--mono); font-size:.86rem; color:var(--text); }
+.est-papel .tier { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--purple); }
+.est-papel p { margin-top:.45rem; font-size:.88rem; color:var(--text-body); line-height:1.55; }
+.est-retrato { margin-top:1.9rem; background:var(--bg-card); border:1px solid var(--border-warm);
+               border-radius:var(--radius-lg); padding:1.3rem 1.45rem; }
+.est-retrato h3 { font-size:1.05rem; margin-bottom:.55rem; }
+.est-retrato p { font-size:.95rem; color:var(--text-body); }
+.est-retrato p + p { margin-top:.6rem; }
+
+/* ─── timeline ─── */
+.est-timeline { position:relative; margin-top:2.2rem; padding-left:26px; }
+.est-timeline::before { content:''; position:absolute; left:6px; top:8px; bottom:8px; width:2px;
+                        background:linear-gradient(180deg,var(--orange-glow),var(--purple-glow)); border-radius:2px; }
+.est-marco { position:relative; padding:0 0 1.35rem 0; }
+.est-marco::before { content:''; position:absolute; left:-26px; top:.5rem; width:9px; height:9px; border-radius:50%;
+                     background:var(--bg); border:2px solid var(--orange); box-sizing:border-box; }
+.est-marco:last-child { padding-bottom:0; }
+.est-marco:last-child::before { background:var(--orange); }
+.est-marco time { display:block; font-family:var(--mono); font-size:.74rem; color:var(--text-muted); letter-spacing:.02em; }
+.est-marco p { font-size:.96rem; color:var(--text-body); line-height:1.6; }
+.est-marco p b { color:var(--text); font-weight:650; }
+
+/* ─── superfícies (resumo) ─── */
+.est-surf { list-style:none; margin-top:1.6rem; display:grid; gap:10px; }
+.est-surf li { display:flex; flex-wrap:wrap; align-items:baseline; gap:.7rem;
+               background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:.8rem 1rem; }
+.est-surf .end { font-family:var(--mono); font-size:.86rem; font-weight:700; color:var(--text); }
+.est-surf .qual { font-size:.9rem; color:var(--text-body); }
+.est-surf .acesso { margin-left:auto; font-size:.74rem; color:var(--text-muted); }
+@media (max-width:640px){ .est-surf .acesso { margin-left:0; } }
+.est-mais { margin-top:1.3rem; font-size:.95rem; }
+
+/* O selo dentro do retrato: .est-retrato p vence por especificidade e engoliria a
+   tipografia do selo — devolvida aqui, explícita. */
+.est-retrato .est-selo { font-size:.72rem; color:var(--text-muted); margin-top:1rem; }

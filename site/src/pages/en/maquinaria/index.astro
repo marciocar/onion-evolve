@@ -1,0 +1,383 @@
+---
+// /en/maquinaria/ — the EN twin of /maquinaria/ (F4 of the 2026-08 reform).
+//
+// The URL segment stays `maquinaria` on purpose: it is the same page, not a
+// different one, and a stable slug across languages keeps the pair obvious.
+// pt-BR is the house language; EN exists only on the shareable key pages.
+//
+// The prose is TRANSLATED, but the widget is the SAME component — the attention
+// formula is never rewritten twice. Two copies drift, and the drift shows up as
+// "which node is most urgent", the only question the instrument answers.
+import Base from '../../../layouts/Base.astro';
+import RadarWidget from '../../../components/RadarWidget.astro';
+import '../../../styles/maquinaria.css';
+---
+
+<Base
+  title="The machinery — how Onion decides where to look"
+  description="The mechanism behind the method: the cell of the graph, the deterministic attention formula (run it yourself), the read→verify→act→write loop on a real case, the agent/skill/workflow stack, and 2026's three hardest criticisms answered with mechanism."
+  path="/en/maquinaria/"
+  lang="en"
+>
+
+<div class="mq">
+<main>
+  <span class="eyebrow">⚙️ The mechanism</span>
+  <h1>Everyone promises the AI will <em>remember</em>. Here is the arithmetic that decides what it reads first.</h1>
+  <p class="sub">This page has no label to sell. It has the cell of the graph, the arithmetic that orders
+  attention — which you can check on paper — the loop that corrects its own mistake, and the three
+  hardest criticisms the category took in 2026, answered with mechanism instead of adjectives.</p>
+
+  <ul class="mq-toc">
+    <li><a href="#cell">The cell</a></li>
+    <li><a href="#radar">The radar on paper</a></li>
+    <li><a href="#loop">The loop</a></li>
+    <li><a href="#stack">The stack</a></li>
+    <li><a href="#criticisms">Three criticisms</a></li>
+    <li><a href="#try">Try it</a></li>
+  </ul>
+
+  <!-- ══════════════ 1. THE CELL ══════════════ -->
+  <section id="cell">
+    <h2>The cell of the graph: one node and one edge</h2>
+    <p>Knowledge here is not a document. It is a set of typed assertions, each with an identifier whose
+    prefix already says <strong>what kind of thing it is</strong> — because a hunch and a measurement
+    must not look like the same sentence.</p>
+
+    <div class="mq-grid">
+      <div><b>D_</b><span>decision — what was settled</span></div>
+      <div><b>E_</b><span>evidence — what was measured</span></div>
+      <div><b>C_</b><span>claim — what is believed</span></div>
+      <div><b>Q_</b><span>question — what is still open</span></div>
+      <div><b>A_</b><span>artifact — the concrete thing cited</span></div>
+    </div>
+
+    <p>A whole example, from a fictional company — Café Aroma — that decided discounts are capped
+    at 10%:</p>
+
+<pre><span class="c">nodes:</span>
+  - id: <span class="n">D_desconto_max_10</span>
+    node_type: decision
+    impact: 5              <span class="c"># the price of being wrong here: high</span>
+    confidence: 0.9
+    status: confirmed
+    label: <span class="s">"Discount cap: 10%, no exceptions"</span>
+    verified_at: 2026-08-25
+    verified_against: <span class="s">"current sales playbook"</span>
+
+  - id: <span class="n">E_black_friday_2024</span>
+    node_type: evidence
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: <span class="s">"BF 2024: 30% off -&gt; churn 3x within 6 months"</span>
+
+<span class="c">edges:</span>
+  - from: <span class="n">E_black_friday_2024</span>
+    to:   <span class="n">D_desconto_max_10</span>
+    edge_type: <span class="k">SUPPORTS</span>   <span class="c"># the decision is not floating: it has ground</span></pre>
+
+    <h3>The four numbers every node carries</h3>
+    <table class="mq-table">
+      <thead>
+        <tr><th>Field</th><th>Range</th><th>What it actually means</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>impact</td><td>1 to 5</td>
+          <td><strong>The price of the error</strong>, not the importance. The question is not "is this
+          relevant?", it is "how much does it cost if this is wrong?". A pricing decision and a
+          formatting preference can be equally <em>relevant</em> and never cost the same.</td>
+        </tr>
+        <tr>
+          <td>confidence</td><td>0 to 1</td>
+          <td>How well the assertion holds up. Not enthusiasm: 0.6 is something you would defend in a
+          meeting and would not bet the company on.</td>
+        </tr>
+        <tr>
+          <td>status</td><td>enum</td>
+          <td>What the graph already knows about that node — and each value becomes a multiplier in the
+          next section's arithmetic: <b>open ×1</b> · <b>confirmed ×1</b> · <b>drifted ×1.3</b> ·
+          <b>unverifiable ×1</b> · <b>refuted ×0</b> · <b>superseded ×0.2</b> · <b>done ×0.1</b>.</td>
+        </tr>
+        <tr>
+          <td>verified_at</td><td>date</td>
+          <td><strong>An expiry stamp.</strong> It says when someone measured this against the real
+          world — and, in the neighbouring field, against what. A node with no stamp is flagged ⚠
+          <strong>STALE</strong> by the instrument itself. That is not a failure; it is the map admitting
+          that point may have aged without telling anyone.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="mq-callout">
+      <p>Note the <b>×0</b> on refuted. A truth that falls is <strong>not deleted</strong>: it changes
+      status, gains a <code>REFUTES</code> edge from whatever knocked it down, and is worth zero in the
+      attention arithmetic. It disappears from the top of the queue, <strong>not from history</strong>.
+      Whoever arrives later reads what was believed before and why it changed — which is exactly what a
+      <code>git merge</code> on a prose document destroys without leaving a trace.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ 2. THE RADAR ══════════════ -->
+  <section id="radar">
+    <h2>The radar on paper</h2>
+    <p>A graph with hundreds of assertions makes "read everything" an empty instruction. So every node
+    gets a number — its <strong>attention</strong> — and that number is
+    <strong>computed, not opined</strong>:</p>
+
+    <div class="mq-formula">
+      attention = <b>impact</b> × <b>confidence</b> × <b>status factor</b> × (1 + <b>connections</b>)
+    </div>
+
+    <p>That is all of it. Four fields that were already in the file, three multiplications and one
+    addition. The <strong>(1 + connections)</strong> term is centrality: the more things touch a node,
+    the more expensive it is to be wrong there — an isolated decision is wrong on its own, a decision
+    holding up four others is wrong in five places.</p>
+
+    <p>Move the controls. The example is preloaded with the 10% cap from the previous section — impact 5,
+    confidence 0.9, confirmed, four edges touching it:</p>
+
+    <RadarWidget lang="en" />
+
+    <p>Drag the status to <em>refuted</em> and watch attention fall to zero with nothing else changing:
+    that is the map saying "this is still on record, and it is no longer where you look". Drag it to
+    <em>drifted</em> and it climbs <strong>above</strong> confirmed — a node that just proved the world
+    moved is more urgent than one that is merely up to date, because somebody has to reconcile.</p>
+
+    <div class="mq-callout">
+      <p>None of this arithmetic goes through a model. It is a script — same input, same output, zero
+      cost, auditable line by line. You just ran the same calculation that orders the real work queue,
+      in your browser, with no network.</p>
+    </div>
+
+    <div class="mq-caveat">
+      <h3>What the arithmetic does not do</h3>
+      <p>It measures <strong>where to look</strong>, never <strong>what is true</strong>. High attention
+      does not mean "this is correct": it means "if this is wrong, it hurts". And the arithmetic is only
+      as good as the numbers somebody typed — an inflated impact promotes a node that did not deserve it.
+      The instrument orders the queue; it does not audit its contents. We publish this alongside the
+      formula on purpose: an instrument that does not declare its own limit is worse than no instrument.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ 3. THE LOOP ══════════════ -->
+  <section id="loop">
+    <h2>The loop: <span style="font-family:var(--mono);font-size:.85em">read → verify → act → write</span></h2>
+    <p>The graph is not a dead file someone consults. It is the first and the last act of every piece of
+    work: you read before deciding, you measure against the world before believing, you act, and what was
+    learned goes back stamped. The best way to show that is a case where <strong>the victim of the mistake
+    was this very site</strong>.</p>
+
+    <p>For roughly a month, the home page here <strong>lied</strong> — it advertised an inventory of 98
+    commands when the real number was already 102. Nobody had written anything wrong.</p>
+
+    <ol class="mq-cycle">
+      <li>
+        <h3>read</h3>
+        <p>The graph already had a node about it, from July: <em>"the site is out of date"</em>, with the
+        cause pinned on <strong>lagging authorship</strong> — somebody needed to rewrite the page. The
+        node was there, plausible, and would have been enough to generate the wrong task.</p>
+      </li>
+      <li>
+        <h3>verify</h3>
+        <p>Instead of believing the node, we measured. We fetched the <strong>live</strong> page and
+        compared it with the source in the repository. The source was <strong>right</strong>: a commit
+        from 30 July had updated the inventory and the page <em>in the same commit</em>, and the old
+        string no longer existed in the file at all. The node was right about the symptom and
+        <strong>wrong about the cause</strong>. What was broken was not the writing — it was
+        <strong>publishing</strong>, which existed only as prose: a procedure someone was supposed to
+        remember to run.</p>
+      </li>
+      <li>
+        <h3>act</h3>
+        <p>The obvious fix — rewrite the page — would have fixed nothing. And republishing by hand is the
+        same failure waiting for next month. So what shipped was not a republish: it was the
+        <strong>publishing mechanism</strong>, with a closed list of what may go live, a hash check that
+        compares source against the live site and fails on divergence, and a self-test that freezes the
+        attacks found across two rounds of adversarial review — including the worst of them: an empty
+        source that wiped the entire site <em>while returning a green verdict</em>.</p>
+      </li>
+      <li>
+        <h3>write</h3>
+        <p>The old node was neither corrected nor deleted: it was marked <strong>superseded</strong>, with
+        the date it was measured and against what. A new node, linked to it, records the mechanism that was
+        born and what it now serves. If the drift ever returns, whoever arrives finds the whole story — the
+        symptom, the wrong cause, the right cause, and the guard that stayed.</p>
+      </li>
+    </ol>
+
+    <div class="mq-callout">
+      <p>The lesson, and the reason the loop has four verbs rather than three: <strong>verification was
+      against the live thing, not against the repository</strong>. A clean history would have confirmed
+      the wrong version of the facts with all the authority of a passing test.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ 4. THE STACK ══════════════ -->
+  <section id="stack">
+    <h2>The stack: who acts, what it knows how to do, in what order</h2>
+    <p>Three pieces, and the distinction between them is what keeps the whole thing from collapsing into
+    one giant prompt:</p>
+
+    <div class="mq-stack">
+      <div>
+        <h3>Agent <small>who acts</small></h3>
+        <p>A role with a declared boundary: which tools it may use, what context it carries, and what is
+        <em>not</em> its call to make. A specialist with scope, not a generic assistant — and the boundary
+        exists so that its answer can be checked by whoever called it.</p>
+      </div>
+      <div>
+        <h3>Skill <small>what it knows how to do</small></h3>
+        <p>A named, versioned procedure that any agent loads when the subject comes up. Knowledge as
+        executable instruction, in the repository, reviewable in a diff — not a pasted prompt that lives
+        only in the head of whoever wrote it.</p>
+      </div>
+      <div>
+        <h3>Workflow <small>in what order</small></h3>
+        <p>The sequence of phases, resumable: each phase has an input, an output, and durable state on
+        disk. The session dies, the work does not. It is what lets a long investigation outlive the
+        context window — and lets somebody else continue where it stopped.</p>
+      </div>
+    </div>
+
+    <h3>Economy of Motors: use the cheapest motor that can do the job</h3>
+    <p>None of that decides on its own <em>what to execute with</em>. That choice is explicit, and there
+    are three motors:</p>
+    <ol>
+      <li><strong>Transformer (the large model)</strong> — judgement, synthesis, trade-offs, prose,
+      orchestration. Expensive, slow and non-deterministic. Use it when the task requires understanding
+      <em>intent</em>.</li>
+      <li><strong>SLM as a tool</strong> — a small, specialised model behind an interface, for a narrow
+      repetitive task (extract, classify, redact sensitive data locally). It never orchestrates: it is a
+      tool, not an agent.</li>
+      <li><strong>Shell — the deterministic one</strong> — plain scripts for everything the model gets
+      wrong: counting, diffing, detecting drift, applying a fixed format. Same input, same output, zero
+      cost, auditable.</li>
+    </ol>
+    <p>The rule is one line: <strong>the cheapest motor that can do the job</strong>. And the most common
+    mistake is not reaching for too small a model — it is using the <em>model</em> to count. The radar in
+    the previous section is shell for exactly that reason: if the attention queue depended on inference,
+    it would change its mind between two identical runs, and an instrument that does that is not an
+    instrument.</p>
+  </section>
+
+  <!-- ══════════════ 5. THREE CRITICISMS ══════════════ -->
+  <section id="criticisms">
+    <h2>2026's three criticisms, answered with mechanism</h2>
+    <p>Knowledge graphs wired to agents took three serious objections this year. They are criticisms
+    <strong>of the category</strong> — not of any named product — and all three are right about a real
+    failure mode. They deserve an answer in terms of what the machine does, not in adjectives.</p>
+
+    <div class="mq-crit">
+      <blockquote>
+        <span class="crit-tag">Criticism 1 · cost</span>
+        "The agent should not be walking the graph by inference. Double inference doubles the cost: you pay
+        the model to find out where to look, then pay again to think about what it found."
+      </blockquote>
+      <p>It is right, and that is precisely why <strong>the model does not walk the graph here</strong>.
+      Attention is computed <strong>before</strong> any LLM call, by deterministic arithmetic: impact ×
+      confidence × status factor × (1 + connections) — the same calculation you just ran above, in your
+      browser, with no network and no tokens. What reaches the model is already an <strong>ordered
+      queue</strong>; it reads the top, not the whole map.</p>
+      <p>The double inference the criticism describes happens when the graph is treated as an index the
+      model has to <em>interpret</em> in order to know where to look. Here the graph is the <strong>input
+      to a function</strong>, and the function decides. The model comes in afterwards, for the part where
+      it is irreplaceable: judging the content. And because the arithmetic is the same every time, it is
+      reproducible — two identical runs return the same queue, which no inference-based traversal
+      guarantees.</p>
+    </div>
+
+    <div class="mq-crit">
+      <blockquote>
+        <span class="crit-tag">Criticism 2 · epistemics</span>
+        "Inference written back into the graph becomes fact. With no epistemic layer, yesterday's guess is
+        read tomorrow as a measurement, and the system starts citing itself as a source."
+      </blockquote>
+      <p>This is the most serious of the three, because it describes exactly how a graph turns into a
+      laundering machine for guesses: the model infers, the inference is written, and on the next read it
+      is indistinguishable from something somebody measured. The answer here is that the epistemic layer
+      <strong>is not optional — it is the schema</strong>. Every node is <strong>typed</strong> (decision,
+      evidence, claim, question, artifact), carries a <strong>confidence</strong> from 0 to 1, a declared
+      <strong>status</strong>, and states <strong>what</strong> it was verified against and
+      <strong>when</strong>. A claim at confidence 0.6 with no verification stamp does not look like a
+      measured piece of evidence — not in the file, and not in the radar queue, which treats it as
+      something else.</p>
+      <p>And when two truths collide, they <strong>do not overwrite each other</strong>. The new one enters
+      linked to the old by <code>REFUTES</code> or <code>SUPERSEDES</code>, and the old one stays: it
+      changes status and is demoted in the arithmetic — refuted is worth zero, superseded is worth a fifth.
+      The knocked-down node remains on the map, with the edge that knocked it down pointing at it. That is
+      the difference between a system that rewrites the past and one that <strong>reconciles</strong>.
+      Correcting does not erase; it supersedes.</p>
+    </div>
+
+    <div class="mq-crit">
+      <blockquote>
+        <span class="crit-tag">Criticism 3 · security</span>
+        "Graph poisoning. If memory steers the agent, planting a false node is cheaper than writing an
+        exploit — and far harder to notice."
+      </blockquote>
+      <p>Also right, and it is the one that grows in importance as graphs become infrastructure: whoever
+      writes to the graph steers the agent. Two things hold this down here, and neither of them is trust.</p>
+      <p>The first is <strong>the order of the verbs</strong>: nothing enters without
+      <code>read → verify</code>. Writing is the <em>last</em> act, and the node carries the field declaring
+      what it was measured against and on what date. A node missing that field is flagged by the instrument
+      itself, automatically — it does not depend on an attentive reviewer that day. The second is that
+      writing <strong>is not a runtime side effect</strong>: it is a <strong>commit</strong>. It goes through
+      a diff, a review and a history, and it shows up in the same place where people already look at code.
+      A node that appeared without anyone having measured anything appears as a new line in a review. The
+      graph has <strong>provenance, not faith</strong>.</p>
+      <p>What that does <em>not</em> solve, stated plainly: <strong>coverage is not truth</strong>. The check
+      requires provenance to exist, not to be good — a shallow, generic node passes. Being in the graph means
+      somebody modelled it, <strong>not that somebody checked it</strong>. As long as whatever feeds the map
+      is a process with adversarial review, that flank stays closed; the day it becomes a rushed routine, the
+      check goes green over a hollow map — and then it lies with the authority of a passing test.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ 6. TRY IT ══════════════ -->
+  <section id="try">
+    <h2>Try it in your own domain (15 minutes)</h2>
+    <p>None of this requires installing the framework, creating an account, or handing over any data. The
+    method travels as <strong>schema + method</strong>. Take <strong>one</strong> decision you made
+    <em>this week</em> — one still warm enough that you remember the argument — and write down four
+    things:</p>
+    <ol>
+      <li><strong>What I decided.</strong> One sentence, in the indicative. That becomes a <code>D_</code>
+      node. Give it an impact from 1 to 5 by answering <em>"how much does it cost if this is wrong?"</em>.</li>
+      <li><strong>What holds it up.</strong> The facts you used — a number, an incident, a test, a customer
+      conversation. Each becomes an <code>E_</code> node linked to the decision by <code>SUPPORTS</code>.</li>
+      <li><strong>What I refuted.</strong> The alternative that looked reasonable and was discarded. It is
+      the most valuable of the four and the one every document loses: it becomes a <code>C_</code> node with
+      <code>status: refuted</code> and a <code>REFUTES</code> edge coming from the evidence that knocked it
+      down. Three months from now, when somebody proposes exactly that again, the answer is already
+      written.</li>
+      <li><strong>What is still open.</strong> The doubt you did not resolve and decided anyway. It becomes a
+      <code>Q_</code> node. That is not a weakness of the map — it is the most honest part of it. A map of
+      certainties only is a map that forgot to mark where it ends.</li>
+    </ol>
+    <p>Run the attention arithmetic on each node, by hand or with the widget above, and sort. Whatever lands
+    on top is where your team's next hour should go. If the result surprises you, the exercise already paid
+    for itself: that surprise is the gap between the queue you <em>think</em> you have and the one your own
+    numbers describe.</p>
+
+    <div class="mq-cta">
+      <a class="btn" href="https://github.com/marciocar/onion-mini" target="_blank" rel="noopener">Start with onion-mini →</a>
+      <p class="cta-sub">Public, no signup — the minimal schema and the radar, to run in your own domain today.</p>
+    </div>
+
+    <div class="mq-callout">
+      <p>If you run it, <strong>show it</strong>. Post your file (anonymised) or tell us what the radar caught
+      that the prose was hiding. It is the kind of thing we want to see work outside our own house — and a
+      counterexample is more useful here than a compliment.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <p>This page describes the mechanism the house runs on itself, every day.
+  <a href="/historia/">the story of how it was born ←</a> · <a href="/maquinaria/" hreflang="pt-BR">Ler em português</a></p>
+</footer>
+</div>
+
+</Base>
