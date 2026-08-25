@@ -624,12 +624,6 @@ run_kg_freshness_selftests() {
 # mostrar um grafo que não existe. (V3) é o teste que sustenta a dívida.
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
-# Modo migalhas-generate — REGRA 34. O gerador projeta posts/*.md nas 3 superfícies
-# entre os marcadores ONION:GEN. Fixture self-contained (chrome mínimo + 1 post),
-# roda o gerador, verifica que a projeção saiu, que --check acusa drift após edição
-# manual, e (mutation) que quebrar a substituição-por-marcador faz o --check FALHAR.
-# ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
 # Modo site-deeplink — REGRA 35. Deep-link do repo PRIVADO em site/ dá 404 no
 # público. Os dois lados: link 404 → HARD; home do repo (sem /pull|commit) e
 # link interno de Provas → limpo. Cobre o trap do set -e (grep sem match não
@@ -960,82 +954,6 @@ run_site_deeplink_selftests() {
     record_pass "site-deeplink: (b) home do repo + link interno → limpo (grep-sem-match não aborta)"
   else record_fail "site-deeplink: (b)" "falso-positivo em link permitido"; fi
   rm -f "${tf}"
-}
-
-run_migalhas_generate_selftests() {
-  local gen="${SCRIPT_DIR}/migalhas-generate.sh"
-  local tmp
-  [ -f "${gen}" ] || return 0
-  command -v python3 >/dev/null 2>&1 || { record_skip "migalhas-generate: python3 ausente (skip gracioso, coerente com REGRA 34)"; return; }
-  tmp="$(mktemp -d)"
-  trap 'rm -rf "${tmp}"' RETURN
-  local M="${tmp}/site/historia/migalhas"
-  mkdir -p "${M}/posts" "${M}/provas"
-
-  # superfícies mínimas com os marcadores (chrome irrelevante para o teste)
-  printf '<html><body>\n<div class="feed" id="feed">\n<!-- ONION:GEN posts START -->\nVELHO\n<!-- ONION:GEN posts END -->\n</div>\n</body></html>\n' > "${M}/index.html"
-  printf '<html><body>\n<div class="feed">\n<!-- ONION:GEN provas START -->\nVELHO\n<!-- ONION:GEN provas END -->\n</div>\n</body></html>\n' > "${M}/provas/index.html"
-  printf '<rss><channel>\n<lastBuildDate>x</lastBuildDate>\n<!-- ONION:GEN items START -->\nVELHO\n<!-- ONION:GEN items END -->\n</channel></rss>\n' > "${M}/feed.xml"
-  cat > "${M}/posts/2026-07-01-caso.md" <<'PEOF'
----
-slug: 2026-07-01-caso
-type: learning
-date: 2026-07-01
-review_after: 2026-10-01
-title: "Um título de teste"
-rss: "Um resumo de teste."
-prs:
-  - {label: "PR #7", status: "mergeado", meta: "1 jul · 1 arquivo · +1 −0"}
----
-## O que descobri
-Parágrafo *um*.
-
-## A prova
-Parágrafo dois.
-
-## Onde isso nos levou
-Parágrafo três.
-PEOF
-
-  # o gerador precisa do git-root p/ resolver ROOT; força via cwd + fallback do script
-  MIGALHAS_ROOT="${tmp}" bash "${gen}" >/dev/null 2>&1
-  # (a) projetou nas 3 superfícies?
-  if grep -q 'id="post-2026-07-01-caso"' "${M}/index.html" \
-     && grep -q 'id="prova-2026-07-01-caso"' "${M}/provas/index.html" \
-     && grep -q '#post-2026-07-01-caso' "${M}/feed.xml"; then
-    record_pass "migalhas-generate: (a) projeta o post nas 3 superfícies entre os marcadores"
-  else record_fail "migalhas-generate: (a)" "post não projetado nas 3 superfícies"; fi
-
-  # (b) PR label verbatim + pr-link derivado do slug
-  if grep -q 'PR #7' "${M}/provas/index.html" \
-     && grep -q 'href="/historia/migalhas/provas/#prova-2026-07-01-caso"' "${M}/index.html"; then
-    record_pass "migalhas-generate: (b) label do PR verbatim + pr-link derivado do slug"
-  else record_fail "migalhas-generate: (b)" "label/pr-link errados"; fi
-
-  # (c) --check: em sincronia após gerar → exit 0
-  local rc=0; MIGALHAS_ROOT="${tmp}" bash "${gen}" --check >/dev/null 2>&1 || rc=$?
-  if [ "${rc}" -eq 0 ]; then
-    record_pass "migalhas-generate: (c) --check exit 0 quando em sincronia"
-  else record_fail "migalhas-generate: (c)" "--check acusou drift num estado recém-gerado (rc=${rc})"; fi
-
-  # (d) --check: edição manual na região gerada → exit 1 (o drift-guard)
-  sed -i 's/Um título de teste/EDITADO A MAO/' "${M}/index.html"
-  rc=0; MIGALHAS_ROOT="${tmp}" bash "${gen}" --check >/dev/null 2>&1 || rc=$?
-  if [ "${rc}" -ne 0 ]; then
-    record_pass "migalhas-generate: (d) --check exit 1 após edição manual (drift detectado)"
-  else record_fail "migalhas-generate: (d)" "edição manual não foi detectada como drift"; fi
-
-  # (MUT) quebrar a substituição-por-marcador (splice não escreve) → --check nunca acusa drift
-  MIGALHAS_ROOT="${tmp}" bash "${gen}" >/dev/null 2>&1 || true   # re-sincroniza
-  sed 's/if MODE!="--check": open(path,"w",encoding="utf-8").write(new)/pass  # MUTADO/' "${gen}" > "${tmp}/mut.sh"
-  sed -i 's/Um título de teste/EDITADO DE NOVO/' "${M}/index.html"
-  MIGALHAS_ROOT="${tmp}" bash "${tmp}/mut.sh" --check >/dev/null 2>&1 || true
-  # com o write mutado, o --check ainda deve DETECTAR (só o write foi neutralizado, não o compare).
-  # o que a mutação quebra é a ESCRITA: provamos que sem escrever, gerar não conserta o drift.
-  MIGALHAS_ROOT="${tmp}" bash "${tmp}/mut.sh" >/dev/null 2>&1 || true   # "gera" com write mutado
-  if grep -q 'EDITADO DE NOVO' "${M}/index.html"; then
-    record_pass "migalhas-generate: (MUT) sem a escrita, gerar NÃO conserta o drift — a escrita é load-bearing"
-  else record_fail "migalhas-generate: (MUT)" "o drift sumiu sem a escrita — o teste não prova nada"; fi
 }
 
 # Modo rules-registry — REGRA 39. O gerador projeta os docstrings '# REGRA N — …' de
@@ -6344,37 +6262,6 @@ run_consumed_modes_selftests() {
     else record_fail "modos: (c) kg-view default" "rc=${rc}; o default divergiu de --markdown (a producao invoca sem flag)"; fi
   fi
 
-  # (d)(e) migalhas-generate.sh sem flag e --check. Um GERA, o outro VERIFICA.
-  #
-  # ⚠️ EM SANDBOX, NUNCA NA ARVORE VIVA — e as duas razoes foram MEDIDAS por passada adversarial:
-  #   · o modo SEM FLAG e modo de ESCRITA. A 1a versao o rodava contra o repo real, regenerava as
-  #     superficies e APAGAVA o drift que a REGRA 34 existe para pegar. Bancada que conserta o que
-  #     o gate deveria acusar e pior que bancada ausente: ela produz o verde que esconde.
-  #   · e o (d) tomava a linha-base DEPOIS de ja ter invocado `--check` uma vez — media o delta
-  #     entre a 2a e a 3a corrida, entao um `--check` que ESCREVE passava. Vacuo por ordem.
-  # O sandbox e um clone git de verdade (`git archive` + `git init` + commit): sem `.git` o
-  # `git status` do proprio caso nao funciona, e a medicao mentiria de novo.
-  local mig="${SCRIPT_DIR}/migalhas-generate.sh"
-  if [ ! -f "${mig}" ]; then record_skip "modos: (d) migalhas-generate.sh ausente"; else
-    local sb dirty_before dirty_after
-    sb="$(mktemp -d)"
-    if git -C "${REPO_ROOT}" archive HEAD 2>/dev/null | tar -x -C "${sb}" 2>/dev/null; then
-      ( cd "${sb}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm b ) >/dev/null 2>&1
-      # (d) LINHA-BASE ANTES DE QUALQUER INVOCACAO
-      dirty_before="$(cd "${sb}" && git status --porcelain | wc -l)"
-      rc=0; out="$(cd "${sb}" && bash .claude/validation/migalhas-generate.sh --check 2>&1)" || rc=$?
-      dirty_after="$(cd "${sb}" && git status --porcelain | wc -l)"
-      if [ "${dirty_before}" = "${dirty_after}" ]; then
-        record_pass "modos: (d) migalhas-generate --check NAO escreve (verificar != gerar), medido do estado ZERO"
-      else record_fail "modos: (d) --check escreve" "o modo de VERIFICACAO alterou a arvore: ${dirty_before} -> ${dirty_after}"; fi
-      # (e) o modo de ESCRITA, exercitado onde ele PODE escrever — e provando que escreveu
-      rc=0; out="$(cd "${sb}" && bash .claude/validation/migalhas-generate.sh 2>&1)" || rc=$?
-      if [ "${rc}" -eq 0 ] || [ "${rc}" -eq 1 ]; then
-        record_pass "modos: (e) migalhas-generate SEM flag roda em SANDBOX (rc=${rc}) — nunca na arvore viva"
-      else record_fail "modos: (e) migalhas sem flag" "rc=${rc} (erro de execucao): $(printf '%s' "${out}" | head -c 200)"; fi
-    else record_skip "modos: (d)(e) sandbox git nao montou"; fi
-    rm -rf "${sb}"
-  fi
 }
 
 # _fixture_done_nu <src.kg.yaml> <dst.yaml> — produz um backlog cujo ÚNICO defeito é DONE-NU.
@@ -10235,12 +10122,46 @@ run_deploy_site_selftests() {
   fi
 }
 
+# REGRA 34 pós-cutover (derivação commitada) — a regra HARD nova entrou sem rede
+# (achado da revisão adversarial da reforma). Fixture em sandbox git REAL: a regra
+# exige índice ([ -e .git ] skip sem ele — o que o sandbox principal, cp -a, prova
+# pelo caminho do skip em toda fixture que roda).
+run_site_derivation_selftests() {
+  local sb2 out rc
+  sb2="$(mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sb2}/.claude"
+  cp "${SANDBOX}/CLAUDE.md" "${sb2}/CLAUDE.md" 2>/dev/null || printf '# stub\n' > "${sb2}/CLAUDE.md"
+  mkdir -p "${sb2}/docs" "${sb2}/site/dist"
+  printf 'x' > "${sb2}/site/dist/leak.html"
+  ( cd "${sb2}" && git init -q . && git add site/dist ) >/dev/null 2>&1
+  rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/CLAUDE.md" 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'DERIVACAO-COMMITADA'; then
+    record_pass "site-derivation: (a) dist TRACKED em repo git → HARD"
+  else record_fail "site-derivation: (a)" "dist tracked não acusou (rc=${rc})"; fi
+  ( cd "${sb2}" && git rm -rq --cached site/dist ) >/dev/null 2>&1
+  rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/CLAUDE.md" 2>&1)" || rc=$?
+  if ! printf '%s' "${out}" | grep -q 'DERIVACAO-COMMITADA'; then
+    record_pass "site-derivation: (b) dist untracked → limpo"
+  else record_fail "site-derivation: (b)" "falso-positivo com dist fora do índice"; fi
+  # (c) VOLUME acima do buffer do pipe (~64KB de ls-files): a asserção que importa não é
+  # "acusou" — é "o lint CHEGOU AO SUMÁRIO". A 1ª cura do SIGPIPE morria muda (rc=141)
+  # exatamente aqui, com um caso N=1 sendo estruturalmente incapaz de pegar (re-revisão).
+  local i
+  for i in $(seq 1 1500); do printf 'x' > "${sb2}/site/dist/f-longo-nome-para-encher-o-buffer-${i}.html"; done
+  ( cd "${sb2}" && git add site/dist ) >/dev/null 2>&1
+  rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/CLAUDE.md" 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'DERIVACAO-COMMITADA' && printf '%s' "${out}" | grep -q 'Sumário'; then
+    record_pass "site-derivation: (c) 1500 arquivos tracked → acusa E o lint chega ao sumário (rc=${rc}, não 141)"
+  else record_fail "site-derivation: (c)" "sob volume: rc=${rc}; acusou=$(printf '%s' "${out}" | grep -c 'DERIVACAO-COMMITADA'); sumário=$(printf '%s' "${out}" | grep -c 'Sumário')"; fi
+  rm -rf "${sb2}"
+}
+
 run_hook_autofix_selftests
 run_kg_reverify_schema_selftests
 run_backtick_ref_selftests
 run_site_deeplink_selftests
-run_migalhas_generate_selftests
 run_deploy_site_selftests
+run_site_derivation_selftests
 run_rules_registry_selftests
 run_onion_version_tracked_selftests
 run_hub_role_guard_selftests

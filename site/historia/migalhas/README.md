@@ -1,19 +1,26 @@
 # Migalhas — como publicar (o manual)
 
-> **Modelo mental em uma linha:** você edita **UM** arquivo de fonte; um gerador projeta as **três**
-> superfícies. Você nunca edita o HTML/RSS à mão.
+> **Modelo mental em uma linha:** você edita **UM** arquivo de fonte; o **build Astro** projeta as
+> superfícies. Você nunca edita HTML/RSS à mão — eles nem existem mais no repo.
 
-Este diretório é uma instância de `fonte≠derivação` ([doutrina](../../../docs/knowledge-base/concepts/source-vs-derivation.md)):
+Este diretório é uma instância de `fonte≠derivação` ([doutrina](../../../docs/knowledge-base/concepts/source-vs-derivation.md)).
+**Cutover 2026-08-25 (F2 da reforma):** o `migalhas-generate.sh` foi **aposentado** — a aposta do ADR
+de julho ("posts Astro-shaped de propósito") pagou, e os mesmos `posts/*.md` viraram o input direto
+da coleção Astro, sem retrabalho:
 
 ```
-posts/*.md   ──►  migalhas-generate.sh  ──►  index.html  +  provas/index.html  +  feed.xml
- (a FONTE)         (o GERADOR, determinístico)      (as 3 PROJEÇÕES, derivadas)
+posts/*.md  ──►  build Astro (site/src/)  ──►  dist/historia/migalhas/{index.html, provas/, feed.xml}
+ (a FONTE)        (as páginas .astro leem              (as PROJEÇÕES, derivadas — dist/ é
+                   a coleção `migalhas`)                 gitignored e vai ao ar pelo deploy)
 ```
 
-- A **fonte** é `posts/YYYY-MM-DD-slug.md` — um arquivo por migalha.
-- As **três superfícies** são geradas. Você **não** as edita à mão — a REGRA 34 do lint reprova (HARD)
-  qualquer edição na região entre os marcadores `<!-- ONION:GEN ... -->`. O *chrome* (cabeçalho, CSS,
-  navegação, JS) fica **fora** dos marcadores e continua editável à mão.
+- A **fonte** é `posts/YYYY-MM-DD-slug.md` — um arquivo por migalha (31 dos 41 originais usam
+  data+slug descritivo; esse é o padrão).
+- As superfícies são **build**: `ops/deploy-site.sh` builda por dentro (deploy E `--check`) e publica
+  `dist/`. A REGRA 34 mudou de roupa mantendo o espírito: o que reprova (HARD) agora é **derivação
+  commitada** (`site/dist*` tracked no git).
+- Quem renderiza: `site/src/pages/historia/migalhas/index.astro` (+ `provas/index.astro` e
+  `feed.xml.js`), sobre a coleção definida em `site/src/content.config.ts`.
 
 ---
 
@@ -41,13 +48,14 @@ O que existe como evidência.
 A consequência — o que mudou no jeito de trabalhar.
 ```
 
-**2. Gere as superfícies:**
+**2. Confira o build** (opcional — o deploy builda sozinho):
 
 ```bash
-bash .claude/validation/migalhas-generate.sh
+cd site && npx astro build   # o post novo entra em dist/historia/migalhas/ + feed
 ```
 
-**3. Revise o diff** (`git diff site/historia/migalhas/`) e **4. faça deploy** (ver abaixo).
+**3. Revise o diff** (`git diff site/historia/migalhas/posts/`) e **4. faça deploy**
+(`ops/deploy-site.sh` — ele builda por dentro e publica).
 
 ### O campo `prs` (opcional)
 
@@ -103,8 +111,8 @@ cp $S/historia/migalhas/feed.xml          $W/historia/migalhas/feed.xml
 
 | Trava | O quê |
 |---|---|
-| **REGRA 34** (`lint-artifacts.sh`) | superfície editada à mão vs fonte → **HARD**. O litmus "edito em um" virou estrutural. |
-| **`--check`** | `migalhas-generate.sh --check` não escreve; sai 1 se algo divergiu (é o que a REGRA 34 roda). |
+| **REGRA 34** (`lint-artifacts.sh`) | derivação commitada (`site/dist*` tracked) → **HARD**. O litmus "edito em um" segue estrutural — a fonte é `posts/` + `src/`; o HTML não existe mais no repo para ser editado à mão. |
+| **`ops/deploy-site.sh --check`** | builda por dentro e compara dist×webroot por hash; sai 1 em drift (bancada própria: `--selftest`). |
 | **Projeção segura** (REGRA 30) | nome comercial de parceiro numa superfície pública → HARD. |
 | **Curadoria público-safe** | o repo é privado; a página de Provas só mostra metadado objetivo, nunca o corpo do PR. |
 
@@ -112,7 +120,8 @@ cp $S/historia/migalhas/feed.xml          $W/historia/migalhas/feed.xml
 
 - `posts/*.md` é **Astro-shaped** de propósito: quando o blog migrar para SSG-git/Astro (D1 do
   [ADR](../../../docs/analysis/onion-adr-blog-publication-generator-2026-07.md)), estes arquivos viram o input
-  do Astro sem retrabalho. O gerador atual é a projeção interina até lá.
+  do Astro sem retrabalho. **A aposta pagou em 2026-08-25**: os mesmos arquivos viraram a coleção
+  Astro sem tocar em um post; a "projeção interina" (o gerador) foi aposentada nesse dia.
 - Dia-da-semana do RSS é calculado por Sakamoto (determinístico, sem relógio — `datetime` é bloqueado no
   harness). Verificado contra o feed vivo.
 - A voz autoral do maestro (ensaios — D3) é **gated**: nasce quando o 1º ensaio real provar o contêiner.

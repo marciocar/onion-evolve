@@ -1,0 +1,87 @@
+meta:
+  id: cafe-aroma-demo
+  schema_version: "1"
+  # GRAFO DIDÁTICO PÚBLICO — a Café Aroma é a empresa FICTÍCIA do livro do maestro e do
+  # webinar NewHack #22 ("Uma Demissão de Distância", 2026-08-25). Este é o exemplo de
+  # 6 nós dos slides 15/21/23, materializado como .kg.yaml real para o /grafo/ público
+  # do onionevolve.com (F5 da reforma do site): quem aprendeu a ler a célula no deck
+  # navega aqui o mesmo grafo, com o radar de verdade rodando em cima.
+  # Zero risco REGRA 30 por construção: todo nome é ficção declarada.
+
+nodes:
+  - id: D_desconto_max_10
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "Teto de desconto: 10%, sem exceção — a política da Ana, no playbook comercial"
+    trace: "playbook-comercial.md §Política de desconto (fictício — deck NewHack #22, cena 1/6)"
+
+  - id: E_black_friday_2024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: "BF 2024: 30% de desconto → churn 3× em 6 meses — o Ricardo esteve lá; relatório no CRM. Cliente que entra por preço, sai por preço"
+    trace: "relatorio-churn-bf2024 (CRM fictício — deck NewHack #22, cena 3/6)"
+
+  - id: C_desconto_fecha_mais
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: refuted
+    label: "\"Mais desconto fecha mais\" — o Lucas, 3 semanas de casa, querendo a primeira meta. Parecia razoável; metade aprovaria. A BF 2024 refutou: fica na história explicando o porquê do teto"
+    trace: "conversa comercial (fictícia — deck NewHack #22, cena 2/6)"
+
+  - id: E_pesquisa_precos
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "Pesquisa de preços da concorrência que sustenta o patamar — feita há ~14 meses; todo dado envelhece antes de avisar. O radar acusa STALE sozinho: verdade também vence"
+    trace: "pesquisa-concorrencia-2025 (fictícia — deck NewHack #22, cena 5/6)"
+
+  - id: Q_excecao_enterprise
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "Cliente enterprise com contrato de 3 anos merece exceção ao teto? Dúvida ABERTA — sobe para a Ana como pergunta explícita, não como desconto escondido"
+    trace: "proposta do hotel (fictícia — deck NewHack #22, cena 6/6)"
+
+  - id: D_politica_antiga_20
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: superseded
+    label: "Teto de 20% — a política ANTIGA, de antes da BF 2024. Superada, não apagada: o nó tracejado explica o desenho que o substituiu. Corrigir não apaga; supera"
+    trace: "playbook-comercial.md v1 (fictício — deck NewHack #22, cena 4/6)"
+
+edges:
+  - from: E_black_friday_2024
+    to: D_desconto_max_10
+    edge_type: SUPPORTS
+  - from: E_black_friday_2024
+    to: C_desconto_fecha_mais
+    edge_type: REFUTES
+  - from: E_pesquisa_precos
+    to: D_desconto_max_10
+    edge_type: SUPPORTS
+  - from: D_desconto_max_10
+    to: D_politica_antiga_20
+    edge_type: SUPERSEDES
+  - from: Q_excecao_enterprise
+    to: D_desconto_max_10
+    edge_type: DEPENDS_ON

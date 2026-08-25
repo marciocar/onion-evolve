@@ -1,0 +1,113 @@
+/* Estilos das duas superfícies do diário — PORTADOS VERBATIM do <style> legado de
+   site/historia/migalhas/index.html e .../provas/index.html (jul/2026).
+
+   Só é carregado nestas duas páginas (import no .astro), nunca no chrome global.
+   Onde os dois legados DIVERGEM no mesmo seletor (hero, feed, footer), a regra vem
+   escopada por `.mig` / `.provas` — a classe do <main> de cada página. Onde coincidem,
+   a regra é única. Tokens, nav e reset já vêm do global.css do Base. */
+
+/* ── base: o diário é serifado (o global.css do site é sans) ───────────────── */
+html body { font-family:Georgia, 'Times New Roman', serif; }
+.sans { font-family:var(--sans); }
+
+/* ── hero (comum) ──────────────────────────────────────────────────────────── */
+.hero { max-width:760px; margin:0 auto; text-align:center; }
+.eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:.72rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase;
+           color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow); padding:.45rem 1.05rem; border-radius:99px; margin-bottom:1.4rem; }
+.hero h1 { font-weight:600; letter-spacing:-.015em; }
+.hero h1 em { color:var(--orange); font-style:italic; }
+.hero .sub { font-family:var(--sans); color:var(--text-body); }
+
+/* ── hero (divergências entre os dois legados) ─────────────────────────────── */
+.mig .hero { padding:118px 24px 30px; }
+.mig .hero h1 { font-size:clamp(2rem,5.2vw,3.2rem); line-height:1.12; }
+.mig .hero .sub { font-size:1.05rem; max-width:600px; margin:1.3rem auto 0; }
+.mig .hero .pitch { margin-top:1.4rem; font-family:var(--sans); font-size:.92rem; color:var(--text-muted); font-style:italic; }
+
+.provas .hero { padding:118px 24px 24px; }
+.provas .hero h1 { font-size:clamp(1.8rem,4.6vw,2.8rem); line-height:1.14; }
+.provas .hero .sub { font-size:1.02rem; max-width:620px; margin:1.2rem auto 0; }
+
+/* ── feed (divergências) ───────────────────────────────────────────────────── */
+.feed { max-width:760px; margin:0 auto; display:flex; flex-direction:column; }
+.mig .feed { padding:2.4rem 24px 1rem; gap:1.6rem; }
+.provas .feed { padding:2.2rem 24px 4rem; gap:1.4rem; }
+
+/* ── migalhas: filtros ─────────────────────────────────────────────────────── */
+.filters { max-width:760px; margin:1.8rem auto 0; padding:0 24px; display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; }
+.filter-btn { font-family:var(--sans); font-size:.8rem; font-weight:600; color:var(--text-muted); background:var(--bg-card);
+              border:1px solid var(--border); padding:.45rem 1rem; border-radius:99px; cursor:pointer; transition:.15s; }
+.filter-btn:hover { border-color:var(--border-warm); color:var(--text); }
+.filter-btn.on { background:var(--orange); color:#fff; border-color:var(--orange); }
+
+/* ── migalhas: o card do post ──────────────────────────────────────────────── */
+.post { scroll-margin-top:80px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.8rem 2rem;
+        box-shadow:0 2px 12px -8px rgba(28,22,18,.14); transition:opacity .25s ease, transform .25s ease; }
+.post.hide { display:none; }
+.post-head { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; margin-bottom:1rem; }
+.p-type { font-family:var(--mono); font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:.25rem .65rem; border-radius:99px; }
+.p-type.learning    { color:var(--purple); background:var(--purple-dim); }
+.p-type.error       { color:#B4231F; background:rgba(180,35,31,.09); }
+.p-type.innovation  { color:#A8380A; background:var(--orange-dim); }
+.p-type.decision    { color:#256B41; background:rgba(47,122,78,.1); }
+.p-type.reflection  { color:#8A5A05; background:rgba(184,121,10,.11); }
+.p-type.observation { color:#1F5F6B; background:rgba(31,95,107,.1); }
+.p-date { font-family:var(--mono); font-size:.76rem; color:var(--text-muted); }
+.post h2 { font-size:1.45rem; font-weight:600; letter-spacing:-.01em; margin-bottom:1rem; line-height:1.25; }
+.post h3 { font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--text-muted); margin:1.1rem 0 .4rem; }
+.post h3:first-of-type { margin-top:0; }
+.post p { font-size:.98rem; color:var(--text-body); }
+.post .pr-link { display:inline-block; margin-left:.4rem; font-family:var(--mono); font-size:.82rem; }
+.post .pr-ref { display:inline-block; margin-left:.4rem; font-family:var(--mono); font-size:.78rem; color:var(--text-muted);
+                background:var(--orange-dim); border:1px solid var(--border); padding:.05rem .45rem; border-radius:6px; white-space:nowrap; }
+
+/* ── migalhas: o selo de validade (o dot é pintado pelo JS de contagem) ────── */
+.status { margin-top:1.3rem; padding-top:1.1rem; border-top:1px dashed var(--border); display:flex; align-items:center; gap:.6rem; font-family:var(--sans); font-size:.83rem; }
+.status .dot { width:9px; height:9px; border-radius:50%; flex:none; }
+.status[data-state="confirmada"] .dot { background:var(--green); }
+.status[data-state="revisao"] .dot { background:var(--amber,#B8790A); animation:pulse-dot 2s ease-in-out infinite; }
+.status[data-state="vencida"] .dot { background:var(--orange); animation:pulse-dot 1.2s ease-in-out infinite; }
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+.status b { color:var(--text); }
+
+/* ── migalhas: lazyload ────────────────────────────────────────────────────── */
+.load-wrap { max-width:760px; margin:0 auto; padding:0 24px 5rem; text-align:center; }
+.load-more { font-family:var(--sans); font-size:.85rem; font-weight:600; color:var(--orange); background:var(--bg-card);
+             border:1px solid var(--border-warm); padding:.7rem 1.6rem; border-radius:99px; cursor:pointer; transition:.15s; }
+.load-more:hover { background:var(--orange); color:#fff; }
+.load-count { font-family:var(--sans); font-size:.78rem; color:var(--text-muted); margin-bottom:.9rem; }
+#sentinel { height:1px; }
+
+/* ── caixa escura: manifesto (migalhas) e nota (provas) ────────────────────── */
+.innov-box { max-width:760px; margin:0 auto 1rem; padding:0 24px; }
+.innov { background:#1C1612; color:#F4F1EC; border-radius:var(--radius-lg); padding:1.5rem 1.8rem; font-family:var(--sans); font-size:.92rem; }
+.innov b { color:var(--orange-light); }
+.note { max-width:760px; margin:1.2rem auto 0; padding:0 24px; }
+.note-in { background:#1C1612; color:#F4F1EC; border-radius:var(--radius-lg); padding:1.3rem 1.6rem; font-family:var(--sans); font-size:.88rem; }
+.note-in b { color:var(--orange-light,#EA580C); }
+
+/* ── provas: o card da prova ───────────────────────────────────────────────── */
+.pcard { scroll-margin-top:80px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.5rem 1.8rem;
+         box-shadow:0 2px 12px -8px rgba(28,22,18,.14); }
+.pc-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:.7rem; margin-bottom:.6rem; }
+.pc-date { font-family:var(--mono); font-size:.74rem; color:var(--text-muted); }
+.pcard h2 { font-size:1.16rem; font-weight:600; letter-spacing:-.01em; line-height:1.3; }
+.pc-desc { font-size:.94rem; color:var(--text-body); margin:.3rem 0 1rem; }
+.pc-prs { list-style:none; display:flex; flex-direction:column; gap:.4rem; }
+.pc-prs li { display:flex; flex-wrap:wrap; align-items:center; gap:.55rem; font-family:var(--sans); font-size:.82rem; padding:.5rem .7rem;
+             background:var(--orange-dim); border:1px solid var(--border); border-radius:8px; }
+.pr-n { font-family:var(--mono); font-weight:700; color:var(--text); }
+.pr-merged { display:inline-flex; align-items:center; gap:.3rem; color:var(--green); font-weight:600; }
+.pr-merged::before { content:"●"; font-size:.7em; }
+.pr-meta { color:var(--text-muted); font-family:var(--mono); font-size:.76rem; }
+
+/* ── rodapé (divergência: só o padding-top) ────────────────────────────────── */
+footer.site { max-width:760px; margin:0 auto; text-align:center; color:var(--text-muted); font-family:var(--sans); font-size:.85rem; border-top:1px solid var(--border); }
+footer.site a { font-weight:600; }
+.mig footer.site { padding:2.5rem 24px 3.5rem; }
+.provas footer.site { padding:2.4rem 24px 3.5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .status .dot { animation:none; }
+  html { scroll-behavior:auto; }
+}

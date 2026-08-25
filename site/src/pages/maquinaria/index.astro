@@ -1,0 +1,381 @@
+---
+// /maquinaria/ — a página do mecanismo verificável (F4 da reforma 2026-08).
+//
+// ABSORVE duas páginas antigas, por decisão do plano de nav (8→6):
+//   · site/historia/grafo/index.html  → a anatomia do nó e a fórmula de atenção
+//   · site/convite/index.html         → o "tente você mesmo" (exercício de 15 min)
+// O que é NOVO aqui: o widget que roda a fórmula ao vivo, o ciclo narrado sobre um
+// caso real (o drift deste próprio site), a pilha agente/skill/workflow com a
+// Economy of Motors, e as três críticas de 2026 respondidas por mecanismo.
+//
+// FRONTEIRA EDITORIAL (a mesma da antiga /grafo/): publica-se FORMA E MÉTODO.
+// O exemplo do YAML é o grafo didático da Café Aroma — empresa FICTÍCIA declarada,
+// zero risco de projeção por construção. Nenhum nome de adotante, nenhum caminho
+// interno, nenhum host. O caso do drift é contado pelos fatos públicos (datas,
+// número de PR), sem citar o arquivo que o corrigiu.
+//
+// PAR EN: src/pages/en/maquinaria/index.astro — prosa traduzida, MESMO componente
+// de widget (a fórmula não é reescrita duas vezes).
+import Base from '../../layouts/Base.astro';
+import RadarWidget from '../../components/RadarWidget.astro';
+import '../../styles/maquinaria.css';
+---
+
+<Base
+  title="A máquina — como o Onion decide onde olhar"
+  description="O mecanismo por trás do método: a célula do grafo, a fórmula determinística de atenção (rode você mesmo), o ciclo read→verify→act→write num caso real, a pilha agente/skill/workflow e as três críticas de 2026 respondidas por mecanismo."
+  path="/maquinaria/"
+>
+
+<div class="mq">
+<main>
+  <span class="eyebrow">⚙️ O mecanismo</span>
+  <h1>Todo mundo promete que a IA <em>lembra</em>. Aqui está a conta que decide o que ela lê primeiro.</h1>
+  <p class="sub">Esta página não tem rótulo para vender. Tem a célula do grafo, a aritmética que ordena
+  a atenção — que você pode conferir no papel —, o ciclo que corrige o próprio erro e as três críticas
+  mais duras que a categoria levou em 2026, respondidas com mecanismo em vez de adjetivo.</p>
+
+  <ul class="mq-toc">
+    <li><a href="#celula">A célula</a></li>
+    <li><a href="#radar">O radar no papel</a></li>
+    <li><a href="#ciclo">O ciclo</a></li>
+    <li><a href="#pilha">A pilha</a></li>
+    <li><a href="#criticas">As três críticas</a></li>
+    <li><a href="#experimente">Experimente</a></li>
+  </ul>
+
+  <!-- ══════════════ 1. A CÉLULA ══════════════ -->
+  <section id="celula">
+    <h2>A célula do grafo: um nó e uma aresta</h2>
+    <p>Conhecimento aqui não é documento. É um conjunto de afirmações tipadas, cada uma com um
+    identificador cujo prefixo já diz <strong>que tipo de coisa ela é</strong> — porque um palpite e
+    uma medição não podem parecer a mesma frase.</p>
+
+    <div class="mq-grid">
+      <div><b>D_</b><span>decisão — o que foi resolvido</span></div>
+      <div><b>E_</b><span>evidência — o que foi medido</span></div>
+      <div><b>C_</b><span>afirmação — o que se acredita</span></div>
+      <div><b>Q_</b><span>pergunta — o que segue em aberto</span></div>
+      <div><b>A_</b><span>artefato — a coisa concreta citada</span></div>
+    </div>
+
+    <p>Um exemplo inteiro, de uma empresa fictícia — a Café Aroma — que decidiu que desconto tem
+    teto de 10%:</p>
+
+<pre><span class="c">nodes:</span>
+  - id: <span class="n">D_desconto_max_10</span>
+    node_type: decision
+    impact: 5              <span class="c"># o preco de errar aqui: alto</span>
+    confidence: 0.9
+    status: confirmed
+    label: <span class="s">"Teto de desconto: 10%, sem excecao"</span>
+    verified_at: 2026-08-25
+    verified_against: <span class="s">"playbook comercial vigente"</span>
+
+  - id: <span class="n">E_black_friday_2024</span>
+    node_type: evidence
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    label: <span class="s">"BF 2024: 30% de desconto -&gt; churn 3x em 6 meses"</span>
+
+<span class="c">edges:</span>
+  - from: <span class="n">E_black_friday_2024</span>
+    to:   <span class="n">D_desconto_max_10</span>
+    edge_type: <span class="k">SUPPORTS</span>   <span class="c"># a decisao nao esta solta: tem chao</span></pre>
+
+    <h3>Os quatro números que todo nó carrega</h3>
+    <table class="mq-table">
+      <thead>
+        <tr><th>Campo</th><th>Faixa</th><th>O que significa de verdade</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>impact</td><td>1 a 5</td>
+          <td><strong>O preço do erro</strong>, não a importância. A pergunta não é "isso é relevante?",
+          é "quanto custa se isto estiver errado?". Uma decisão de precificação e uma preferência de
+          formatação podem ser igualmente <em>relevantes</em> e nunca custar o mesmo.</td>
+        </tr>
+        <tr>
+          <td>confidence</td><td>0 a 1</td>
+          <td>O quanto a afirmação se sustenta. Não é entusiasmo: 0,6 é uma coisa que você defenderia
+          numa reunião e não apostaria a empresa.</td>
+        </tr>
+        <tr>
+          <td>status</td><td>enum</td>
+          <td>O que o grafo já sabe sobre esse nó — e cada valor vira um multiplicador na conta da
+          próxima seção: <b>em aberto ×1</b> · <b>confirmado ×1</b> · <b>divergiu ×1,3</b> ·
+          <b>não verificável ×1</b> · <b>refutado ×0</b> · <b>superado ×0,2</b> · <b>encerrado ×0,1</b>.</td>
+        </tr>
+        <tr>
+          <td>verified_at</td><td>data</td>
+          <td><strong>Carimbo de validade.</strong> Diz quando alguém mediu isso contra o mundo real
+          — e, no campo vizinho, contra o quê. Um nó sem carimbo é sinalizado ⚠ <strong>STALE</strong>
+          pelo próprio instrumento. Não é reprovação; é o mapa admitindo que aquele ponto pode ter
+          envelhecido sem avisar.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="mq-callout">
+      <p>Repare no <b>×0</b> do refutado. Uma verdade que cai <strong>não é apagada</strong>: ela troca
+      de estado, ganha a aresta <code>REFUTES</code> de quem a derrubou, e passa a valer zero na conta
+      de atenção. Ela some do topo da fila, <strong>não da história</strong>. Quem chegar depois lê o que
+      se pensava antes e o motivo de ter mudado — que é exatamente o que um <code>git merge</code> num
+      documento em prosa destrói sem deixar registro.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ 2. O RADAR ══════════════ -->
+  <section id="radar">
+    <h2>O radar no papel</h2>
+    <p>Um grafo com centenas de afirmações torna "leia tudo" uma instrução vazia. Então cada nó recebe
+    um número — a <strong>atenção</strong> — e esse número é <strong>calculado, não opinado</strong>:</p>
+
+    <div class="mq-formula">
+      atenção = <b>impacto</b> × <b>confiança</b> × <b>fator do estado</b> × (1 + <b>ligações</b>)
+    </div>
+
+    <p>É só isso. Quatro campos que já estavam no arquivo, três multiplicações e uma soma. O
+    <strong>(1 + ligações)</strong> é a centralidade: quanto mais coisas encostam num nó, mais caro sai
+    errar nele — uma decisão isolada erra sozinha, uma decisão que sustenta outras quatro erra em cinco
+    lugares.</p>
+
+    <p>Mexa nos controles. O exemplo já vem carregado com o teto de 10% da seção anterior — impacto 5,
+    confiança 0,9, confirmado, quatro arestas encostando nele:</p>
+
+    <RadarWidget lang="pt" />
+
+    <p>Arraste o estado até <em>refutado</em> e veja a atenção cair a zero sem que nada mais mude: é o
+    mapa dizendo "isto continua registrado, e não é mais para onde você olha". Arraste até
+    <em>divergiu</em> e ela <strong>sobe acima</strong> do confirmado — um nó que acabou de provar que o
+    mundo andou é mais urgente que um que está apenas em dia, porque alguém precisa reconciliar.</p>
+
+    <div class="mq-callout">
+      <p>Nenhuma dessas contas passa por um modelo. É um script — mesma entrada, mesma saída, custo
+      zero, auditável linha a linha. Você acabou de rodar o mesmo cálculo que ordena a fila de trabalho
+      real, no seu navegador, sem rede.</p>
+    </div>
+
+    <div class="mq-caveat">
+      <h3>O que a conta não faz</h3>
+      <p>Ela mede <strong>onde olhar</strong>, nunca <strong>o que é verdade</strong>. Atenção alta não
+      significa "isto está certo": significa "se isto estiver errado, dói". E a conta é tão boa quanto os
+      números que alguém digitou — um impacto inflado sobe um nó que não merecia. O instrumento ordena a
+      fila; ele não confere o conteúdo dela. Publicamos isto junto com a fórmula de propósito: um
+      instrumento que não declara o próprio limite é pior que instrumento nenhum.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ 3. O CICLO ══════════════ -->
+  <section id="ciclo">
+    <h2>O ciclo: <span style="font-family:var(--mono);font-size:.85em">read → verify → act → write</span></h2>
+    <p>O grafo não é arquivo morto que alguém consulta. Ele é o primeiro e o último ato de todo trabalho:
+    lê-se antes de decidir, mede-se contra o mundo antes de acreditar, age-se, e o que se aprendeu volta
+    carimbado. O melhor jeito de mostrar isso é um caso em que <strong>a vítima do erro foi este site</strong>.</p>
+
+    <p>Por volta de um mês, a página inicial daqui <strong>mentiu</strong> — ela anunciava um inventário
+    de 98 comandos quando o número real já era 102. Ninguém tinha escrito nada errado.</p>
+
+    <ol class="mq-cycle">
+      <li>
+        <h3>read</h3>
+        <p>O grafo já tinha um nó sobre isso, de julho: <em>"o site está defasado"</em>, com a causa
+        apontada para <strong>autoria atrasada</strong> — alguém precisava reescrever a página. O nó
+        estava lá, plausível, e teria bastado para gerar uma tarefa errada.</p>
+      </li>
+      <li>
+        <h3>verify</h3>
+        <p>Em vez de acreditar no nó, medimos. Baixamos a página <strong>viva</strong> e comparamos com a
+        fonte no repositório. A fonte estava <strong>certa</strong>: um commit de 30 de julho tinha
+        atualizado o inventário e a página <em>no mesmo commit</em>, e a string antiga nem existia mais
+        no arquivo. O nó estava certo no sintoma e <strong>errado na causa</strong>. O que estava
+        quebrado não era a escrita — era a <strong>publicação</strong>, que existia só como prosa: um
+        procedimento que alguém devia lembrar de executar.</p>
+      </li>
+      <li>
+        <h3>act</h3>
+        <p>A correção óbvia — reescrever a página — não corrigiria nada. E republicar à mão é a mesma
+        falha esperando o mês seguinte. Então o que foi entregue não foi uma republicação: foi o
+        <strong>mecanismo</strong> de publicação, com lista fechada do que pode ir ao ar, uma verificação
+        por hash que compara fonte e site vivo e falha quando divergem, e um autoteste que congela os
+        ataques encontrados em duas rodadas de revisão adversarial — inclusive o pior deles: uma fonte
+        vazia que apagava o site inteiro <em>devolvendo veredito verde</em>.</p>
+      </li>
+      <li>
+        <h3>write</h3>
+        <p>O nó antigo não foi corrigido nem apagado: foi marcado como <strong>superado</strong>, com a
+        data em que foi medido e contra o que. Um nó novo, ligado a ele, registra o mecanismo que nasceu
+        e o que passou a servir. Se a defasagem voltar, quem chegar depois encontra a história inteira —
+        o sintoma, a causa errada, a causa certa e a guarda que ficou.</p>
+      </li>
+    </ol>
+
+    <div class="mq-callout">
+      <p>A lição, e a razão de o ciclo ter quatro verbos e não três: <strong>a verificação foi contra o
+      vivo, não contra o repositório</strong>. Um histórico limpo teria confirmado, com toda a
+      autoridade de um teste que passa, a versão errada dos fatos.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ 4. A PILHA ══════════════ -->
+  <section id="pilha">
+    <h2>A pilha: quem age, o que sabe fazer, em que ordem</h2>
+    <p>Três peças, e a distinção entre elas é o que impede a coisa toda de virar um prompt gigante:</p>
+
+    <div class="mq-stack">
+      <div>
+        <h3>Agente <small>quem age</small></h3>
+        <p>Um papel com fronteira declarada: quais ferramentas pode usar, que contexto carrega, e o que
+        <em>não</em> lhe cabe decidir. É um especialista com escopo, não um assistente genérico — e a
+        fronteira existe para que a resposta dele possa ser conferida por quem o chamou.</p>
+      </div>
+      <div>
+        <h3>Skill <small>o que se sabe fazer</small></h3>
+        <p>Um procedimento nomeado e versionado, que qualquer agente carrega quando o assunto aparece.
+        Conhecimento em forma de instrução executável, no repositório, revisável em diff — não um prompt
+        colado que só existe na cabeça de quem escreveu.</p>
+      </div>
+      <div>
+        <h3>Workflow <small>em que ordem</small></h3>
+        <p>A sequência de fases, retomável: cada fase tem entrada, saída e estado durável em disco. A
+        sessão cai, o trabalho não. É o que permite que uma investigação longa sobreviva ao fim da
+        janela de contexto — e que outra pessoa continue de onde parou.</p>
+      </div>
+    </div>
+
+    <h3>Economy of Motors: use o motor mais barato que dá conta</h3>
+    <p>Nada disso escolhe sozinho <em>com o quê</em> executar. Essa escolha é explícita, e são três
+    motores:</p>
+    <ol>
+      <li><strong>Transformer (o modelo grande)</strong> — juízo, síntese, trade-off, texto, orquestração.
+      Caro, lento e não determinístico. Use quando a tarefa exige entender <em>intenção</em>.</li>
+      <li><strong>SLM como ferramenta</strong> — um modelo pequeno e especializado, atrás de uma interface,
+      para tarefa estreita e repetitiva (extrair, classificar, redigir dado sensível localmente). Nunca
+      orquestra: é ferramenta, não agente.</li>
+      <li><strong>Shell — o determinístico</strong> — script puro para tudo aquilo em que o modelo erra:
+      contar, comparar, detectar divergência, aplicar formato fixo. Mesma entrada, mesma saída, custo
+      zero, auditável.</li>
+    </ol>
+    <p>A regra é uma linha: <strong>o motor mais barato que dá conta</strong>. E o erro mais comum não é
+    usar um modelo pequeno demais — é usar o <em>modelo</em> para contar. O radar da seção anterior é
+    shell exatamente por isso: se a fila de atenção dependesse de inferência, ela mudaria de opinião entre
+    duas execuções idênticas, e um instrumento que faz isso não é instrumento.</p>
+  </section>
+
+  <!-- ══════════════ 5. AS TRÊS CRÍTICAS ══════════════ -->
+  <section id="criticas">
+    <h2>As três críticas de 2026, respondidas por mecanismo</h2>
+    <p>Grafos de conhecimento acoplados a agentes levaram três objeções sérias este ano. São críticas
+    <strong>à categoria</strong> — não a um produto — e todas as três estão certas sobre um modo de falha
+    real. Vale responder com o que a máquina faz, não com adjetivo.</p>
+
+    <div class="mq-crit">
+      <blockquote>
+        <span class="crit-tag">Crítica 1 · custo</span>
+        "O agente não deveria caminhar o grafo por inferência. Dupla inferência dobra o custo: você paga o
+        modelo para descobrir onde olhar e paga de novo para pensar sobre o que achou."
+      </blockquote>
+      <p>Está certa, e é por isso que aqui <strong>o modelo não caminha o grafo</strong>. A atenção é
+      computada <strong>antes</strong> de qualquer chamada ao LLM, por aritmética determinística: impacto ×
+      confiança × fator de estado × (1 + ligações) — a mesma conta que você acabou de rodar acima, no seu
+      navegador, sem rede e sem token. O que chega ao modelo já é uma <strong>fila ordenada</strong>; ele
+      lê o topo, não o mapa inteiro.</p>
+      <p>A dupla inferência que a crítica descreve acontece quando o grafo é tratado como um índice que o
+      modelo precisa <em>interpretar</em> para saber onde olhar. Aqui o grafo é <strong>entrada de uma
+      função</strong>, e a função é que decide. O modelo entra depois, para a parte em que ele é
+      insubstituível: julgar o conteúdo. E como a conta é a mesma toda vez, ela é reproduzível — duas
+      execuções idênticas devolvem a mesma fila, o que nenhuma travessia por inferência garante.</p>
+    </div>
+
+    <div class="mq-crit">
+      <blockquote>
+        <span class="crit-tag">Crítica 2 · epistemologia</span>
+        "Inferência escrita de volta no grafo vira fato. Sem uma camada epistêmica, o palpite de ontem é
+        lido amanhã como medição, e o sistema passa a se citar como fonte."
+      </blockquote>
+      <p>Esta é a mais séria das três, porque descreve exatamente como um grafo vira máquina de lavar
+      palpite: o modelo infere, a inferência é gravada, e na leitura seguinte ela é indistinguível de
+      algo que alguém mediu. A resposta aqui é que a camada epistêmica <strong>não é opcional — é o
+      schema</strong>. Todo nó é <strong>tipado</strong> (decisão, evidência, afirmação, pergunta,
+      artefato), carrega uma <strong>confiança</strong> de 0 a 1, um <strong>estado</strong> declarado, e
+      diz <strong>contra o que</strong> foi verificado e <strong>quando</strong>. Uma afirmação de
+      confiança 0,6 sem carimbo de verificação não se parece com uma evidência medida — nem no arquivo,
+      nem na fila do radar, que a trata como outra coisa.</p>
+      <p>E quando duas verdades colidem, elas <strong>não se sobrescrevem</strong>. A nova entra ligada à
+      velha por <code>REFUTES</code> ou <code>SUPERSEDES</code>, e a velha permanece: troca de estado e é
+      rebaixada na conta — refutada vale zero, superada vale um quinto. O nó derrubado continua no mapa,
+      com a aresta que o derrubou apontando para ele. É a diferença entre um sistema que reescreve o
+      passado e um que <strong>reconcilia</strong>. Corrigir não apaga; supera.</p>
+    </div>
+
+    <div class="mq-crit">
+      <blockquote>
+        <span class="crit-tag">Crítica 3 · segurança</span>
+        "Envenenamento do grafo. Se a memória dirige o agente, plantar um nó falso é mais barato que
+        escrever um exploit — e muito mais difícil de perceber."
+      </blockquote>
+      <p>Também está certa, e é a que mais cresce em importância à medida que grafos viram infraestrutura:
+      quem escreve no grafo dirige o agente. Duas coisas seguram isso aqui, e nenhuma delas é confiança.</p>
+      <p>A primeira é <strong>a ordem dos verbos</strong>: nada entra sem <code>read → verify</code>.
+      Escrever é o <em>último</em> ato, e o nó carrega o campo que declara contra o que foi medido e em que
+      data. Um nó sem esse campo é sinalizado pelo próprio instrumento, automaticamente — não depende de um
+      revisor atento naquele dia. A segunda é que a escrita <strong>não é efeito colateral de runtime</strong>:
+      ela é um <strong>commit</strong>. Passa por diff, por revisão e por histórico, e fica visível no
+      mesmo lugar onde já se olha para código. Um nó que apareceu sem que ninguém tivesse medido nada
+      aparece como uma linha nova numa revisão. O grafo tem <strong>proveniência, não fé</strong>.</p>
+      <p>O que isso <em>não</em> resolve, e fica declarado: <strong>cobertura não é verdade</strong>. A
+      verificação exige que exista proveniência, não que ela seja boa — um nó raso e genérico passa. Estar
+      no grafo significa que alguém modelou, <strong>não que alguém conferiu</strong>. Enquanto quem
+      alimenta o mapa for um processo com revisão adversarial, esse flanco fica fechado; no dia em que virar
+      rotina apressada, a verificação fica verde sobre um mapa oco — e aí ela mente com a autoridade de um
+      teste que passou.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════ 6. EXPERIMENTE ══════════════ -->
+  <section id="experimente">
+    <h2>Experimente no seu domínio (15 minutos)</h2>
+    <p>Nada disto exige instalar o framework, criar conta ou entregar dado nenhum. O método viaja como
+    <strong>schema + método</strong>. Pegue <strong>uma</strong> decisão que você tomou <em>esta semana</em>
+    — uma que ainda esteja quente o suficiente para você lembrar do que foi discutido — e escreva quatro
+    coisas:</p>
+    <ol>
+      <li><strong>O que eu decidi.</strong> Uma frase, no indicativo. Vira um nó <code>D_</code>. Dê a ela
+      um impacto de 1 a 5 respondendo <em>"quanto custa se isto estiver errado?"</em>.</li>
+      <li><strong>O que sustenta.</strong> Os fatos que você usou — um número, um incidente, um teste, uma
+      conversa com cliente. Cada um vira um nó <code>E_</code> ligado à decisão por
+      <code>SUPPORTS</code>.</li>
+      <li><strong>O que eu refutei.</strong> A alternativa que parecia razoável e foi descartada. É a mais
+      valiosa das quatro e a que todo documento perde: vira um nó <code>C_</code> com
+      <code>status: refuted</code> e uma aresta <code>REFUTES</code> saindo da evidência que a derrubou.
+      Daqui a três meses, quando alguém propuser exatamente isso de novo, a resposta já está escrita.</li>
+      <li><strong>O que segue aberto.</strong> A dúvida que você não resolveu e decidiu mesmo assim. Vira
+      um nó <code>Q_</code>. Não é fraqueza do mapa — é a parte mais honesta dele. Um mapa só de certezas
+      é um mapa que esqueceu de anotar onde termina.</li>
+    </ol>
+    <p>Rode a conta de atenção em cada nó, à mão ou com o widget acima, e ordene. O que ficar no topo é
+    onde a próxima hora do seu time deveria ir. Se o resultado te surpreender, o exercício já valeu: essa
+    surpresa é a diferença entre a fila que você <em>acha</em> que tem e a que os seus próprios números
+    descrevem.</p>
+
+    <div class="mq-cta">
+      <a class="btn" href="https://github.com/marciocar/onion-mini" target="_blank" rel="noopener">Comece pelo onion-mini →</a>
+      <p class="cta-sub">Público, sem cadastro — o schema mínimo e o radar, para rodar no seu domínio hoje.</p>
+    </div>
+
+    <div class="mq-callout">
+      <p>Se rodar, <strong>mostre</strong>. Poste o seu arquivo (anonimizado) ou conte o que o radar pegou
+      que a prosa escondia. É o tipo de coisa que a gente quer ver funcionar fora da nossa própria casa —
+      e um contraexemplo é mais útil aqui do que um elogio.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <p>Esta página descreve o mecanismo que a casa usa em si mesma, todo dia.
+  <a href="/historia/">a história de como ele nasceu ←</a> · <a href="/en/maquinaria/" hreflang="en">Read in English</a></p>
+</footer>
+</div>
+
+</Base>

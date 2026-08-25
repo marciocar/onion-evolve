@@ -2785,32 +2785,46 @@ check_federation_projection() {
 }
 
 # ===========================================================================
-# REGRA 34 — Migalhas: superfícies DERIVADAS da fonte, sem drift [HARD]
-# previne: migalha (superfície derivada) driftando da fonte
-#   ADR onion-adr-blog-publication-generator-2026-07 (D2). As 3 superfícies
-#   (index.html/provas/feed.xml) são PROJEÇÃO de site/historia/migalhas/posts/*.md
-#   pelo migalhas-generate.sh. Editar a região gerada à mão (entre os marcadores
-#   ONION:GEN) = fonte paralela = o drift que 12 de 41 posts já sofreram (feed≠provas,
-#   medido na migração 2026-07-22). Regenerou? verde. Editou à mão? HARD. É o litmus
-#   de source-vs-derivation.md ("edito em UM") virado ESTRUTURAL. Skip gracioso sem
-#   python3 (exit 3 do gerador). Chrome (fora dos marcadores) é livre.
+# REGRA 34 — Site: a derivação nunca vira fonte [HARD]
+# previne: o build do site (derivação) entrando no git como se fosse fonte
+#   HISTÓRIA: nasceu no ADR onion-adr-blog-publication-generator-2026-07 (D2) como
+#   guarda de drift do migalhas-generate.sh (marcadores ONION:GEN). No cutover Astro
+#   (F2 da reforma, 2026-08-25) o gerador foi aposentado — as superfícies viraram
+#   build (site/src/ → site/dist/, gitignored) e o drift fonte×vivo passou ao
+#   ops/deploy-site.sh --check (que builda por dentro; bancada própria). O que resta
+#   para o lint é o litmus de source-vs-derivation.md virado estrutural no novo
+#   pipeline: dist commitado = fonte paralela = HARD.
 # ===========================================================================
 check_migalhas_sync() {
-  local gen="${SCRIPT_DIR}/migalhas-generate.sh"
-  local mig="${REPO_ROOT}/site/historia/migalhas"
-  [ -f "${gen}" ] || return 0
-  [ -d "${mig}/posts" ] || return 0
-  if [ -n "${ONLY_PATH}" ]; then
-    case "${ONLY_PATH}" in "${mig}"/*|"${gen}") : ;; *) return 0 ;; esac
+  # CUTOVER 2026-08-25 (reforma do site, F2): o migalhas-generate.sh foi APOSENTADO —
+  # as superfícies agora são build Astro (site/src/ → site/dist/, deployado por
+  # ops/deploy-site.sh, que builda por dentro nos DOIS modos). A REGRA 34 muda de
+  # roupa mantendo o espírito (derivação nunca vira fonte): o que reprova agora é
+  # DERIVAÇÃO COMMITADA — dist/ (ou variação dist-*) tracked no git. O drift
+  # fonte×vivo é responsabilidade do ops/deploy-site.sh --check (bancada própria,
+  # run_deploy_site_selftests).
+  # Sandbox/arquivo (sem .git — a bancada copia com cp -a): sem índice não há "tracked";
+  # skip declarado, nunca abort — a 1ª versão rodava git aqui e MATAVA o lint inteiro
+  # dentro do sandbox, silenciando todo check subsequente (pego pela bancada, 3 fixtures).
+  [ -e "${REPO_ROOT}/.git" ] || return 0
+  # Captura SEM pipe: `git | head` sob pipefail tomava SIGPIPE quando a saída passava do
+  # buffer — e o veredito INVERTIA sob volume (quanto maior a derivação commitada, mais
+  # fraco o veredito). Medido pela revisão adversarial: N=800 → HARD, N=1500 → SOFT.
+  local tracked=""
+  if ! tracked="$(git -C "${REPO_ROOT}" ls-files 'site/dist*')"; then
+    violation "SOFT" "site/dist*" \
+      "[migalhas/NAO-VERIFICADO] não consegui ler o índice git — a REGRA 34 declara que NÃO SABE (em vez de verde mudo)"
+    return 0
   fi
-  local rc=0
-  bash "${gen}" --check >/dev/null 2>&1 || rc=$?
-  case "${rc}" in
-    0) : ;;                                  # em sincronia
-    3) : ;;                                  # python3 ausente — skip gracioso
-    *) violation "HARD" "site/historia/migalhas/" \
-         "[migalhas/DRIFT] superfícies divergem da fonte posts/*.md — regenere: bash .claude/validation/migalhas-generate.sh (NÃO edite a região entre os marcadores ONION:GEN à mão)" ;;
-  esac
+  # here-string, NÃO pipe: `printf | head` movia o SIGPIPE do git p/ o printf e o
+  # statement simples sob set -e MATAVA o lint inteiro com dist grande (rc=141 mudo,
+  # 10 regras silenciadas — medido pela re-revisão com 1500 arquivos). O here-string
+  # não tem processo escritor para levar SIGPIPE.
+  tracked="$(head -5 <<< "${tracked}")"
+  if [ -n "${tracked}" ]; then
+    violation "HARD" "site/dist*" \
+      "[migalhas/DERIVACAO-COMMITADA] o build do site (dist) está TRACKED no git — a derivação nunca vira fonte (fonte≠derivação). Remova do índice: git rm -r --cached site/dist* (primeiros: $(printf '%s' "${tracked}" | tr '\n' ' '))"
+  fi
 }
 
 # ===========================================================================
@@ -2840,7 +2854,7 @@ check_site_no_private_deeplinks() {
       [ -n "${h}" ] || continue
       violation "HARD" "${f#${REPO_ROOT}/}" "[site/404-privado] deep-link p/ repo PRIVADO dá 404 no público: ${h} — aponte para /historia/migalhas/provas/ (prova público-segura)"
     done <<< "${hits}"
-  done < <(find "${site}" -type f \( -name '*.html' -o -name '*.xml' -o -name '*.md' \) 2>/dev/null | sort)
+  done < <(find "${site}" -type f -not -path '*/dist*/*' -not -path '*/node_modules/*' \( -name '*.html' -o -name '*.xml' -o -name '*.md' -o -name '*.astro' \) 2>/dev/null | sort)
 }
 
 # ===========================================================================

@@ -1,0 +1,82 @@
+---
+// Provas — a face público-segura das Migalhas (F2 da reforma 2026-08).
+//
+// Mesmo paradigma da página irmã: os cards nascem de getCollection('migalhas'), não mais
+// da projeção de provas do gerador legado (aposentado no cutover 2026-08-25). O chrome (hero, nota
+// escura sobre o repo privado, rodapé) veio VERBATIM do legado.
+//
+// CURADORIA: o card usa só `rss` (o resumo já curado) e os metadados OBJETIVOS de `prs`
+// (label/status/meta). Nenhum link de PR, nenhum corpo cru — o repo é privado de propósito.
+import Base from '../../../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import '../../../../styles/migalhas.css';
+
+const LABEL: Record<string, string> = {
+  learning: 'Aprendizado', innovation: 'Inovação', decision: 'Decisão',
+  error: 'Erro', observation: 'Observação', reflection: 'Reflexão',
+};
+const MES = ['janeiro','fevereiro','março','abril','maio','junho',
+             'julho','agosto','setembro','outubro','novembro','dezembro'];
+
+const humano = (d: Date) => `${d.getUTCDate()} de ${MES[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// mesma ordem da página das migalhas: data desc, empate pelo slug desc
+const posts = (await getCollection('migalhas')).sort((a, b) => {
+  const d = b.data.date.getTime() - a.data.date.getTime();
+  return d !== 0 ? d : b.data.slug.localeCompare(a.data.slug);
+});
+
+const cards = posts
+  .map((p) => {
+    const { slug, type, title, date, rss, prs } = p.data;
+    const lista = (prs ?? [])
+      .map(
+        (x) =>
+          `      <li><span class="pr-n">${esc(x.label)}</span> <span class="pr-merged sans">${x.status}</span> <span class="pr-meta">${esc(x.meta ?? '')}</span></li>`
+      )
+      .join('\n');
+    const bloco = lista ? `\n    <ul class="pc-prs">\n${lista}\n    </ul>` : '';
+    return `  <article class="pcard" id="prova-${slug}">
+    <div class="pc-head"><span class="pc-date sans">${humano(date)} · ${LABEL[type] ?? type}</span></div>
+    <h2>${esc(title)}</h2>
+    <p class="pc-desc">${esc(rss ?? '')}</p>${bloco}
+  </article>`;
+  })
+  .join('\n\n');
+---
+
+<Base
+  title="Provas — as migalhas por trás dos números"
+  description="A prova público-segura de cada migalha: o que mudou e os metadados objetivos de cada PR (merged, data, arquivos, linhas). O repositório é privado; aqui a prova é aberta sem abrir o código."
+  path="/historia/migalhas/provas/"
+>
+  <div class="provas">
+    <main>
+      <section class="hero">
+        <span class="eyebrow sans">🔎 A prova, aberta</span>
+        <h1>As migalhas <em>por trás dos números.</em></h1>
+        <p class="sub">Cada lição das <a href="/historia/migalhas/">Migalhas</a> nasceu de mudanças reais, mergeadas
+        e testadas. O repositório é privado — então aqui está a prova sem abrir o código: o que mudou, e para cada
+        PR o que dá para conferir de fora (mergeado, quando, quantos arquivos e linhas).</p>
+      </section>
+
+      <div class="note">
+        <div class="note-in">
+          <b>Por que não linkamos direto o PR:</b> o repositório é privado (contém contexto de parceiros que não
+          pode ser público). Em vez de um link que ninguém abre, publicamos o que é <b>seguro e verificável</b>:
+          o status <em>mergeado</em>, a data e o tamanho de cada mudança. O conteúdo sensível fica no repositório;
+          a existência e o tamanho da prova ficam aqui.
+        </div>
+      </div>
+
+      <div class="feed"><Fragment set:html={cards} /></div>
+    </main>
+
+    <footer class="site">
+      <p>Provas das <a href="/historia/migalhas/">Migalhas</a> do <a href="/">Onion Evolve</a>. Metadados
+      objetivos (mergeado, data, tamanho) — o conteúdo sensível fica no repositório privado.
+      <a href="/historia/">leia a história completa ←</a></p>
+    </footer>
+  </div>
+</Base>

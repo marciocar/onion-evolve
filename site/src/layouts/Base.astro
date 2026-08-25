@@ -9,13 +9,42 @@ interface Props {
   description: string;
   /** caminho canônico da página, ex.: "/historia/" */
   path?: string;
+  /** língua da página. pt-BR é a casa; 'en' só nas páginas-chave compartilháveis. */
+  lang?: 'pt-BR' | 'en';
 }
-const { title, description, path = '/' } = Astro.props;
+const { title, description, path = '/', lang = 'pt-BR' } = Astro.props;
 const canonical = new URL(path, Astro.site).href;
+const en = lang === 'en';
+
+// A nav troca de rótulo, não de estrutura: as entradas que NÃO têm par em inglês
+// continuam apontando para o pt-BR (é a casa). Só onde a versão EN existe o link muda.
+const nav = en
+  ? {
+      tagline: 'the autobiography of a living framework',
+      links: [
+        { href: '/historia/', label: 'Story' },
+        { href: '/historia/migalhas/', label: 'Breadcrumbs' },
+        { href: '/en/doutrinas/', label: 'Doctrines' },
+        { href: '/en/maquinaria/', label: 'Machinery' },
+        { href: '/estado/', label: 'State' },
+      ],
+      cta: 'Start',
+    }
+  : {
+      tagline: 'a autobiografia de um framework vivo',
+      links: [
+        { href: '/historia/', label: 'História' },
+        { href: '/historia/migalhas/', label: 'Migalhas' },
+        { href: '/doutrinas/', label: 'Doutrinas' },
+        { href: '/maquinaria/', label: 'Máquina' },
+        { href: '/estado/', label: 'Estado' },
+      ],
+      cta: 'Começar',
+    };
 ---
 
 <!doctype html>
-<html lang="pt-BR">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -36,14 +65,10 @@ const canonical = new URL(path, Astro.site).href;
   <body>
     <nav>
       <div class="nav-in">
-        <a class="brand" href="/">🧅 Onion Evolve <small>a autobiografia de um framework vivo</small></a>
+        <a class="brand" href="/">🧅 Onion Evolve <small>{nav.tagline}</small></a>
         <div class="nav-links">
-          <a href="/historia/">História</a>
-          <a href="/historia/migalhas/">Migalhas</a>
-          <a href="/doutrinas/">Doutrinas</a>
-          <a href="/maquinaria/">Máquina</a>
-          <a href="/estado/">Estado</a>
-          <a class="nav-cta" href="/#comecar">Começar</a>
+          {nav.links.map((l) => <a href={l.href}>{l.label}</a>)}
+          <a class="nav-cta" href="/#comecar">{nav.cta}</a>
         </div>
       </div>
     </nav>

@@ -1,0 +1,142 @@
+/* /maquinaria/ — a página do mecanismo verificável (F4 da reforma 2026-08).
+   Absorve a anatomia do grafo (antiga /historia/grafo/) e o "tente você mesmo"
+   do antigo convite. Tokens vêm do global.css; aqui só o que é desta página.
+   Serve pt-BR e EN — nenhuma regra depende do idioma. */
+
+.mq main { max-width: 760px; margin: 0 auto; padding: 104px 24px 0; }
+.mq p { color: var(--text-body); margin-bottom: 1rem; font-size: 1rem; }
+.mq p strong { color: var(--text); }
+.mq h2 { font-size: 1.55rem; margin-bottom: .9rem; }
+.mq h3 { font-size: 1.05rem; margin: 1.7rem 0 .5rem; font-weight: 600; }
+.mq section { margin: 3.4rem 0; scroll-margin-top: 84px; }
+.mq ul, .mq ol { margin: .8rem 0 1rem 1.25rem; }
+.mq li { color: var(--text-body); margin: .45rem 0; }
+.mq code { font-family: var(--mono); font-size: .86em; background: var(--orange-dim);
+           padding: .1rem .35rem; border-radius: 5px; }
+
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+           clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+/* ── hero ── */
+.mq .eyebrow { display:inline-block; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+               color:var(--orange); background:var(--orange-dim); padding:.3rem .8rem; border-radius:99px;
+               margin-bottom:1.1rem; font-weight:700; }
+.mq h1 { font-size:clamp(2rem,5.5vw,3rem); margin-bottom:1rem; }
+.mq h1 em { color:var(--orange); font-style:italic; font-family:var(--display); }
+.mq .sub { font-size:1.08rem; color:var(--text-body); max-width:62ch; }
+
+/* ── índice da página ── */
+.mq-toc { display:flex; flex-wrap:wrap; gap:.4rem .5rem; margin:2rem 0 0; padding:0; list-style:none; }
+.mq-toc li { margin:0; }
+.mq-toc a { display:inline-block; font-size:.8rem; font-weight:600; text-decoration:none; color:var(--text-muted);
+            border:1px solid var(--border); border-radius:99px; padding:.32rem .78rem; }
+.mq-toc a:hover { color:var(--orange); border-color:var(--border-warm); }
+
+/* ── código YAML ── */
+.mq pre { background:var(--bg-deep); color:#F4F1EC; border-radius:var(--radius); padding:1.15rem 1.3rem;
+          overflow-x:auto; margin:1.1rem 0; font-family:var(--mono); font-size:.79rem; line-height:1.7; }
+.mq pre .c { color:#9C948C; }
+.mq pre .k { color:var(--orange-light); font-weight:600; }
+.mq pre .s { color:#7FB88C; }
+.mq pre .n { color:#C9A8F0; }
+
+/* ── tabela de prefixos / fatores ── */
+.mq-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:1px;
+           background:var(--border); border:1px solid var(--border); border-radius:var(--radius);
+           overflow:hidden; margin:1.4rem 0; }
+.mq-grid div { background:var(--bg-card); padding:.9rem 1.05rem; }
+.mq-grid b { display:block; font-family:var(--mono); font-size:.95rem; color:var(--orange); }
+.mq-grid span { font-size:.84rem; color:var(--text-muted); }
+
+.mq-table { width:100%; border-collapse:collapse; margin:1.2rem 0; font-size:.9rem; }
+.mq-table th, .mq-table td { text-align:left; padding:.55rem .7rem; border-bottom:1px solid var(--border);
+                             vertical-align:top; color:var(--text-body); }
+.mq-table th { font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); font-weight:700; }
+.mq-table td:first-child { font-family:var(--mono); color:var(--text); white-space:nowrap; }
+.mq-table td b { font-variant-numeric:tabular-nums; }
+
+/* ── fórmula ── */
+.mq-formula { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
+              padding:1.15rem 1.3rem; margin:1.3rem 0; font-family:var(--mono); font-size:.88rem;
+              color:var(--text-body); overflow-x:auto; }
+.mq-formula b { color:var(--orange); font-weight:600; }
+
+/* ── o widget ── */
+.radar { border:1px solid var(--border-warm); border-radius:var(--radius-lg); background:var(--bg-card);
+         padding:1.4rem 1.4rem 1.1rem; margin:1.5rem 0; display:grid; gap:1.3rem;
+         grid-template-columns:minmax(0,1.15fr) minmax(210px,.85fr); align-items:start; }
+.radar-inputs { border:0; padding:0; margin:0; display:grid; gap:1rem; }
+.radar-field { display:grid; gap:.28rem; }
+.rf-name { font-size:.82rem; font-weight:700; color:var(--text); letter-spacing:.01em; }
+.rf-name b { font-family:var(--mono); color:var(--orange); font-variant-numeric:tabular-nums; margin-left:.3rem; }
+.rf-hint { font-size:.74rem; color:var(--text-muted); }
+.radar-field input[type="range"] { width:100%; accent-color:var(--orange); height:1.4rem; }
+.radar-field select { font:inherit; font-size:.86rem; padding:.4rem .55rem; border:1px solid var(--border);
+                      border-radius:7px; background:var(--bg); color:var(--text); width:100%; }
+
+.radar-out { border-left:1px solid var(--border); padding-left:1.3rem; display:grid; gap:.55rem; align-content:start; }
+.ro-work { font-family:var(--mono); font-size:.78rem; color:var(--text-muted); font-variant-numeric:tabular-nums; }
+.ro-value { display:block; }
+.ro-label { display:block; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); font-weight:700; }
+.ro-value b { font-family:var(--mono); font-size:2.7rem; font-weight:600; color:var(--orange);
+              letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1.1; }
+.radar[data-zero="sim"] .ro-value b { color:var(--text-muted); }
+.ro-reset { font:inherit; font-size:.76rem; font-weight:600; color:var(--text-muted); background:none;
+            border:1px solid var(--border); border-radius:99px; padding:.3rem .8rem; cursor:pointer;
+            justify-self:start; }
+.ro-reset:hover { color:var(--orange); border-color:var(--border-warm); }
+.radar-note { grid-column:1 / -1; margin:0; padding-top:.9rem; border-top:1px solid var(--border);
+              font-size:.8rem; color:var(--text-muted); font-style:italic; }
+@media (max-width:660px) {
+  .radar { grid-template-columns:1fr; }
+  .radar-out { border-left:0; border-top:1px solid var(--border); padding-left:0; padding-top:1rem; }
+}
+
+/* ── o ciclo (4 verbos) ── */
+.mq-cycle { list-style:none; margin:1.4rem 0; padding:0; display:grid; gap:0; }
+.mq-cycle li { position:relative; padding:0 0 1.3rem 1.6rem; border-left:2px solid var(--border); margin:0; }
+.mq-cycle li:last-child { border-left-color:transparent; padding-bottom:0; }
+.mq-cycle li::before { content:""; position:absolute; left:-6px; top:.45rem; width:10px; height:10px;
+                       border-radius:99px; background:var(--orange); }
+.mq-cycle h3 { margin:0 0 .25rem; font-family:var(--mono); font-size:.85rem; letter-spacing:.06em;
+               text-transform:uppercase; color:var(--orange); }
+.mq-cycle p:last-child { margin-bottom:0; }
+
+/* ── as três críticas ── */
+.mq-crit { border:1px solid var(--border); border-radius:var(--radius); background:var(--bg-card);
+           padding:1.25rem 1.35rem; margin:1.3rem 0; }
+.mq-crit blockquote { margin:0 0 .9rem; padding-left:.95rem; border-left:3px solid var(--purple);
+                      font-family:var(--display); font-style:italic; font-size:1.02rem; color:var(--text);
+                      line-height:1.5; }
+.mq-crit .crit-tag { display:block; font-family:var(--sans); font-style:normal; font-size:.68rem;
+                     letter-spacing:.12em; text-transform:uppercase; color:var(--purple); font-weight:700;
+                     margin-bottom:.4rem; }
+.mq-crit p:last-child { margin-bottom:0; }
+
+/* ── a pilha ── */
+.mq-stack { display:grid; gap:1px; background:var(--border); border:1px solid var(--border);
+            border-radius:var(--radius); overflow:hidden; margin:1.3rem 0; }
+.mq-stack > div { background:var(--bg-card); padding:1rem 1.15rem; }
+.mq-stack h3 { margin:0 0 .3rem; font-size:.98rem; }
+.mq-stack h3 small { font-family:var(--sans); font-weight:400; font-size:.76rem; color:var(--text-muted); margin-left:.45rem; }
+.mq-stack p { margin:0; font-size:.92rem; }
+
+/* ── caixas ── */
+.mq-caveat { border-left:3px solid #B8790A; background:rgba(184,121,10,.06);
+             padding:1.05rem 1.3rem; border-radius:0 var(--radius) var(--radius) 0; margin:1.6rem 0; }
+.mq-caveat h3 { margin-top:0; color:#B8790A; }
+.mq-caveat p:last-child { margin-bottom:0; }
+.mq-callout { background:var(--bg-card); border:1px solid var(--border); border-left:3px solid var(--orange);
+              border-radius:var(--radius); padding:1rem 1.3rem; margin:1.2rem 0; font-size:.95rem; }
+.mq-callout p:last-child { margin-bottom:0; }
+
+/* ── CTA ── */
+.mq-cta { text-align:center; padding:2.2rem 0 .6rem; }
+.mq-cta a.btn { display:inline-block; font-size:.95rem; font-weight:600; color:#fff; background:var(--orange);
+                border:1px solid var(--orange); padding:.78rem 1.75rem; border-radius:99px; text-decoration:none; }
+.mq-cta a.btn:hover { background:var(--orange-light); }
+.mq-cta .cta-sub { font-size:.82rem; color:var(--text-muted); margin-top:.7rem; }
+
+.mq footer.site { max-width:760px; margin:3rem auto 0; padding:2.4rem 24px 3.5rem; text-align:center;
+                  color:var(--text-muted); font-size:.85rem; border-top:1px solid var(--border); }
+.mq footer.site a { font-weight:600; }

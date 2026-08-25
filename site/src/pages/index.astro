@@ -1,39 +1,415 @@
 ---
-// ESQUELETO F1 — prova que a fundação funciona (stamp da SSOT + coleção de migalhas).
-// O F2 porta a copy real da home (site/index.html legado) para cá, seção a seção.
-// Este dist/ NÃO é deployado: o webroot segue servido pelo HTML legado até o cutover.
+// HOME — portada VERBATIM do legado site/index.html (redesign "PROVA VIVA", jul/2026).
+// Conteúdo derivado da identity KB (SSOT) + members.yaml + inventário — fonte≠derivação.
+//
+// O QUE MUDOU do legado (e por quê):
+//   · nav → vive no Base.astro (a canônica tem 6 entradas; o legado tinha 8)
+//   · números de INVENTÁRIO → vêm do site-stamp (classe inventario-vivo), nunca hand-coded
+//   · números CONGELADOS (448 PRs, 951 commits, membros/linhagens) → texto + carimbo de data
+//   · faixa "🍞 As migalhas" → render da coleção (o legado tinha 4 posts hand-coded, drifted)
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
-import { inventario, historiaGit } from '../lib/stamp';
+import { inventario } from '../lib/stamp';
+import SecaoDemissao from '../components/SecaoDemissao.astro';
+import SecaoSuperficies from '../components/SecaoSuperficies.astro';
+import '../styles/home.css';
 
 const inv = inventario();
-const git = historiaGit();
-const migalhas = (await getCollection('migalhas'))
+const ultimas = (await getCollection('migalhas'))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 4);
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+// O corpo do terminal é `white-space:pre-wrap`: ali as quebras de linha SÃO conteúdo.
+// O compressHTML do Astro colapsaria a linha em branco entre os dois blocos, então
+// ele entra por set:html — verbatim, byte a byte com o legado.
+const terminal = `
+<span class="tl-p">$</span> "organiza este projeto do jeito certo"
+<span class="tl-ok">✓</span> projeto novo — nada quebra, nada muda no que já existe
+<span class="tl-ok">✓</span> instala tudo numa pasta só (<code>.claude/</code>) — papéis, regras, um jeito único de trabalhar
+<span class="tl-ok">✓</span> cada decisão fica registrada — ninguém recomeça do zero amanhã
+
+<span class="tl-p">$</span> "quero um relatório em PDF exportável"
+<span class="tl-mut">→</span> primeiro escreve o que precisa acontecer — só depois vem o código
+<span class="tl-mut">→</span> o plano fica salvo — você retoma exatamente daqui quando quiser`;
 ---
 
 <Base
   title="Onion Evolve — o framework que erra, aprende e vira lei. Em público."
-  description="Sistema Onion: o ciclo completo de desenvolvimento com IA — produto, engenharia e compliance — com spec antes do código, sessões retomáveis e evolução auditável no git."
+  description="Sistema Onion: o ciclo completo de desenvolvimento com IA — produto, engenharia e compliance — com spec antes do código, sessões retomáveis e evolução auditável no git. Comece em 5 minutos."
   path="/"
 >
-  <main class="wrap" style="padding-top:120px">
-    <h1>Esqueleto F1 — fundação Astro</h1>
-    <p>
-      Números da SSOT (classe: {inv.stamp.classe}, build de {inv.stamp.em}):
-      <strong>{inv.comandos}</strong> comandos · <strong>{inv.agentes}</strong> agentes ·
-      <strong>{inv.skills}</strong> skills · <strong>{inv.kbs}</strong> KBs ·
-      <strong>{git.commits}</strong> commits (classe: {git.stamp.classe}).
-    </p>
-    <h2>Últimas migalhas (da coleção)</h2>
-    <ul>
-      {migalhas.map((m) => (
-        <li>
-          <a href={`/historia/migalhas/#post-${m.data.slug}`}>{m.data.title}</a>
-          <small> — {m.data.date.toISOString().slice(0, 10)}</small>
-        </li>
-      ))}
-    </ul>
-  </main>
+
+<section class="hero">
+  <svg class="rings" viewBox="0 0 900 900" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+    <g class="r-spin">
+      <circle cx="450" cy="450" r="180" stroke="#C2410C" opacity=".14" stroke-dasharray="4 10"/>
+      <circle cx="450" cy="450" r="300" stroke="#7C3AED" opacity=".10" stroke-dasharray="2 14"/>
+    </g>
+    <g class="r-spin2">
+      <circle cx="450" cy="450" r="240" stroke="#C2410C" opacity=".09" stroke-dasharray="1 8"/>
+      <circle cx="450" cy="450" r="380" stroke="#7C3AED" opacity=".07" stroke-dasharray="3 18"/>
+    </g>
+  </svg>
+  <div class="hero-in">
+    <span class="badge"><span class="pulse" aria-hidden="true"></span> Framework vivo · <span class="congelado-no-tempo">448 PRs mergeados</span> · a evolução é pública, o código é auditável</span>
+    <h1>O framework que<br><span class="hl" id="type">erra, aprende e vira lei.</span><span class="caret" aria-hidden="true"></span><br>Em público.</h1>
+    <p class="sub">O <strong>Sistema Onion</strong> instala num repositório o ciclo completo de desenvolvimento
+    com IA — produto, engenharia e compliance — com especificação antes do código, sessões que retomam de onde
+    pararam e o seu task manager plugado. E ele <strong>evolui de verdade</strong>: cada erro vira doutrina
+    auditável, com timestamp, no git.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-p" href="/mini/">Comece em 5 minutos →</a>
+      <a class="btn btn-s" href="#prova">Veja a prova viva ↓</a>
+    </div>
+    <p class="hero-note">O Onion Mini roda em qualquer IA — até web chat gratuito. O framework completo
+    ({inv.comandos} comandos, federação) roda sobre o Claude Code, que entra como <em>motor de LLM</em>: quem orquestra
+    é você com o Onion.</p>
+  </div>
+</section>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tick">
+    <span><b>#326</b> shed-ceremony: o agente emagrece 1121→154 linhas, o conhecimento vira KB citável</span>
+    <span><b>#324</b> a permissão morta sai — allowed-tools espelha o uso real</span>
+    <span><b>#321</b> o 4º modo de proveniência é desenhado em ADR</span>
+    <span><b>#320</b> --show-scope: cada configuração diz de onde veio</span>
+    <span><b>#268</b> o mapa da federação entra na história</span>
+    <span><b>#266</b> doutrina: a teoria assina nos créditos e desaparece no fluxo</span>
+    <span><b>#265</b> Onion Mini publicado — a porta de entrada da família</span>
+    <span><b>#258</b> o guardião bloqueou o próprio instalador — e o instalador foi curado</span>
+  </div>
+</div>
+
+<section class="sec sec-alt" id="prova">
+  <div class="wrap">
+    <div class="prova-head reveal">
+      <span class="kick">⭐ A prova viva</span>
+      <h2>Todo framework diz que evolui.<br><em>Este mostra o erro, com data e hora.</em></h2>
+      <p class="lead" style="margin:0 auto">O que nenhuma landing page pode falsificar: incidentes reais que
+      viraram lei auditável — no mesmo dia, registrados e datados no git. Esta é a autobiografia funcionando como prova.</p>
+    </div>
+    <div class="cases">
+      <article class="case reveal">
+        <div class="case-date">2026-07-02 · o pin forjado</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Anunciei "você já tem o fix" confiando num carimbo de versão — que era forjado.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Um projeto adotante verificou os arquivos reais e <b>me refutou com evidência</b>.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Criei uma verificação automática que confere o arquivo de verdade, nunca só o que foi anunciado — a regra ficou conhecida aqui como <em>declarado≠verificado</em>.</span></div>
+        </div>
+        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #222 · auditável →</a></div>
+      </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-05 · o guardião contra o instalador</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Na primeira adoção de campo, meu hook de qualidade recém-instalado <b>bloqueou o commit do meu próprio instalador</b>.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>O comando de adoção tinha um gap invisível havia semanas — só o uso real o revelou.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>O passo que faltava entrou no comando <b>no mesmo ciclo</b>. O sistema imunológico funcionou — contra mim.</span></div>
+        </div>
+        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #258 · auditável →</a></div>
+      </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-05 · cinco fricções, um dia</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ATRITO</span><span>O primeiro produto educacional de campo rangeu contra minha doutrina em 5 pontos reais.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Cada fricção subiu como sinal, foi triada e julgada com evidência.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Doutrina revisada para v1.3.0 <b>em 24 horas</b> — incluindo: "a teoria assina nos créditos e desaparece no fluxo".</span></div>
+        </div>
+        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #266 · auditável →</a></div>
+      </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-08 · o descarte que apagava a instalação</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Minha instalação vivia solta na working tree. Um descarte de rotina (<code>git restore</code>) apagava tudo — <b>até o carimbo de versão</b>.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Verifiquei o modo de falha em primeira mão: quem destrói não é a troca de branch — é o descarte. Instalação que não é objeto git não existe.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Commit Durável: instalar já commita numa branch dedicada, <b>no mesmo ato</b>. "Commite você depois" deixou de ser próximo passo — virou o próprio passo.</span></div>
+        </div>
+        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #301 · auditável →</a></div>
+      </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-09 · o campo corrigiu a lei nova</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ATRITO</span><span>A lei do card anterior tinha <b>um dia de vida</b> quando um adotante de campo a quebrou: o commit durável salvava o framework — mas esquecia os artefatos gerados na adoção.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Dogfood de terceiro vale mais que o meu: o furo só apareceu numa adoção real, fora da minha máquina.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>O helper passou a incluir toda a superfície gerada — com selftest cobrando para sempre.</span></div>
+        </div>
+        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #303 · auditável →</a></div>
+      </article>
+      <article class="case reveal">
+        <div class="case-date">2026-07-10 · o re-carimbo que apagava a data de nascença</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Um deslize de sessão re-carimbou o <code>adopted_at</code> de um adotante — <b>a data da primeira adoção sumiu</b> do registro.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Semântica que vive "em quem chama" se perde no primeiro descuido. O sinal subiu do campo, com testemunho.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>A escrita do carimbo virou helper determinístico com selftest: <code>adopted_at</code> <b>nunca</b> re-carimba; perdido, restaura-se do registro da federação — nunca se inventa.</span></div>
+        </div>
+        <div class="case-pr"><a href="/historia/migalhas/provas/">commit d1a3e5d · auditável →</a></div>
+      </article>
+      <article class="case case-hoje reveal">
+        <div class="case-date">2026-07-10 · o radar que me fez atacar fantasma — hoje</div>
+        <div class="case-body">
+          <div class="step"><span class="t t-err">ERRO</span><span>Meu radar de auditoria me apresentou como pendente um item <b>já executado</b> — e eu saí atacando um fantasma.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>O radar ordena por atenção, não por pendência. A verificação em primeira mão refutou o ataque — <b>e achou um resíduo real</b> que ninguém tinha visto: uma permissão morta.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Veredito de radar é hipótese: checa-se o status antes de agir. O resíduo virou fix <b>no mesmo loop</b>.</span></div>
+        </div>
+        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #324 · auditável →</a></div>
+      </article>
+    </div>
+    <div class="migs reveal">
+      <div class="migs-head">
+        <h3>🍞 As migalhas</h3>
+        <span class="migs-sub">o diário de aprendizado — cada lição com data de validade e gatilho de re-teste</span>
+      </div>
+      <ul>
+        {ultimas.map((m) => (
+          <li><time>{iso(m.data.date)}</time><a href={`/historia/migalhas/#post-${m.data.slug}`}>{m.data.title}</a></li>
+        ))}
+      </ul>
+      <a class="migs-all" href="/historia/migalhas/">Todas as migalhas + RSS →</a>
+    </div>
+    <p class="prova-stamp reveal">nenhum changelog encenado — tudo commitado e datado no git; a história é pública, o código é auditável</p>
+  </div>
+</section>
+
+<section class="sec" id="problema">
+  <div class="wrap reveal">
+    <span class="kick">O problema</span>
+    <h2>Desenvolver com IA virou<br><em>loteria bem paga.</em></h2>
+    <p class="lead">A IA escreve rápido — e esquece mais rápido ainda. Sem método, cada sessão é um
+    recomeço e cada acerto é irrepetível.</p>
+    <div class="pains">
+      <div class="pain"><span class="x">DOR 01</span><h3>Prompt ad-hoc, resultado loteria</h3><p>Cada tarefa reinventa a orquestração. O que funcionou ontem ninguém sabe reproduzir hoje.</p></div>
+      <div class="pain"><span class="x">DOR 02</span><h3>Contexto perdido a cada sessão</h3><p>Fechou o chat, morreu o trabalho. Reexplicar o projeto vira o custo fixo do dia.</p></div>
+      <div class="pain"><span class="x">DOR 03</span><h3>Código antes da spec</h3><p>A IA gera primeiro e entende depois. O retrabalho chega junto com o deploy.</p></div>
+      <div class="pain"><span class="x">DOR 04</span><h3>Cada integração é um caso especial</h3><p>Jira quer ADF, ClickUp quer Unicode, Asana quer HTML. Multiplique por cada time.</p></div>
+    </div>
+  </div>
+</section>
+
+<SecaoDemissao />
+
+<section class="sec sec-alt" id="resposta">
+  <div class="wrap reveal">
+    <span class="kick">A resposta</span>
+    <h2>Spec-as-Code, em três dimensões.<br>E uma regra que não se negocia.</h2>
+    <p class="lead">{inv.comandos} comandos invocáveis, {inv.agentes} agentes especialistas e {inv.skills} skills de orquestração — organizados
+    em três dimensões <em>peer</em>, cobrindo o ciclo inteiro sem mudar uma linha do seu código.</p>
+    <div class="dims">
+      <div class="dim"><span class="ico" aria-hidden="true">🎯</span><h3>Produto</h3><p>Da descoberta ao backlog: dores viram specs com critérios de aceite testáveis — sincronizadas no seu task manager (Jira, ClickUp, Asana, Linear) por uma única abstração.</p></div>
+      <div class="dim"><span class="ico" aria-hidden="true">⚙️</span><h3>Engenharia</h3><p>Do plano ao PR: workflows faseados e retomáveis — feche o laptop na terça, a sessão continua na quarta do exato ponto em que parou.</p></div>
+      <div class="dim"><span class="ico" aria-hidden="true">🛡️</span><h3>Compliance</h3><p>ISO 27001, SOC2, PMBOK e ISO 22301 no mesmo ciclo — documentação de conformidade gerada do estado real, não de um template morto.</p></div>
+    </div>
+    <div class="goldrule reveal">
+      <span class="n">Regra de Ouro</span>
+      <p><b>Nunca gerar código antes da especificação.</b> Produto especifica, engenharia planeja, só então
+      se codifica — e um guardião anti-bypass avisa quando alguém tenta pular a fila.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="verticais">
+  <div class="wrap reveal">
+    <span class="kick">Como eu cresço</span>
+    <h2>Três dimensões nasceram comigo.<br><em>Duas verticais nasceram de evidência.</em></h2>
+    <p class="lead">Não crio verticais por roadmap — crio quando um dogfood real prova que preciso. Produto, Engenharia e Compliance são fundadoras; Investigação e Educação nasceram nesta mesma semana, do jeito que tudo aqui nasce.</p>
+    <div class="vert-founding">
+      <span>🎯 Produto</span><span>⚙️ Engenharia</span><span>🛡️ Compliance</span>
+      <span class="vert-tag">fundadoras · peer desde sempre</span>
+    </div>
+    <div class="dims" style="margin-top:1.4rem">
+      <div class="dim" style="border-top-color:var(--purple)">
+        <span class="ico" aria-hidden="true">🔍</span>
+        <h3>Investigação</h3>
+        <p>Nasceu do próprio dogfood: modelei minha auditoria como grafo de conhecimento (claims, evidências, arestas <code>SUPPORTS</code>/<code>REFUTES</code>) — e só então o comando <code>/meta:kg</code> existiu. Hoje eu não <em>leio</em> minha documentação: eu <em>navego</em> um grafo, com radar determinístico apontando contradição e órfão.</p>
+      </div>
+      <div class="dim" style="border-top-color:var(--green)">
+        <span class="ico" aria-hidden="true">🎓</span>
+        <h3>Educação</h3>
+        <p>Nasceu de trabalho real: Marcio já ensinava Spec-as-Code em consultoria e capacitação; o Pulse Mais (pulsemais.org.br) me tornou vertical oficial. A pesquisa veio depois — 75 verificadores adversariais — para dar rigor ao que a prática validava. Batizei a prática de <b>Descasca</b>; a doutrina, de <b>Método Onion</b>.</p>
+      </div>
+    </div>
+    <div class="belief-box">
+      <span class="n">Crença central</span>
+      <p>Minha constituição são <b>5 meta-specs que eu mesmo leio antes de agir</b> — arquitetura, agentes, comandos, padrões de código, integrações. Eu só edito uma delas com evidência; nunca por capricho, nunca por preferência de estilo.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec-alt" id="metodos">
+  <div class="wrap reveal">
+    <span class="kick">Métodos com nome próprio</span>
+    <h2>Não são features.<br><em>São doutrinas — nascidas de cicatriz.</em></h2>
+    <p class="lead">Cada nome abaixo nasceu de um erro real, como os da seção anterior. Não são conceitos abstratos — são as regras que evitam o próximo incidente.</p>
+  </div>
+  <div class="wrap reveal" style="margin-top:2.2rem">
+    <div class="methods">
+      <div class="method"><h3>Dogfood Doctrine</h3><p>Toda mudança no framework se valida executando o artefato de verdade — inclusive contra si mesmo.</p></div>
+      <div class="method"><h3>Declarado ≠ Verificado</h3><p>Nenhum carimbo, status ou tabela é aceito como fato sem o artefato que o comprove. Guardas determinísticas fazem a cobrança.</p></div>
+      <div class="method"><h3>Fonte ≠ Derivação</h3><p>Teoria, tokens, contagens: a fonte vive num único lugar; todo o resto cita. Se a fonte muda, edita-se UM arquivo.</p></div>
+      <div class="method"><h3>SDAAL — o adapter do Transformer</h3><p>O contrato que deixa a IA <b>intercambiar ações</b> com qualquer sistema externo sem reaprender nada: a spec define O QUÊ, o adapter resolve O COMO. Task manager (Jira/ClickUp/Asana/Linear) foi só a 1ª instância — o mesmo padrão já move o host de código (forge), o grafo de conhecimento e a federação inteira.</p></div>
+      <div class="method"><h3>Radar de Grafo</h3><p>Decisões, evidências e contradições modeladas como grafo — com radar determinístico que aponta o que está órfão ou refutado.</p></div>
+      <div class="method"><h3>Motor Planejar→Executar→Avaliar</h3><p>Todo ciclo fecha com redesenho explícito — avaliar sem redesenhar é só dar nota. (A teoria assina nos créditos.)</p></div>
+      <div class="method"><h3>Sessões Retomáveis</h3><p>Estado persistente por feature: qualquer sessão retoma do checkpoint exato, dias depois, sem reexplicar nada.</p></div>
+      <div class="method"><h3>Capacidade ≠ Implementação</h3><p>Reconhecer que algo cabe em mim não é gatilho para incorporar. Uma feature real (nascida de um pedido de chat) foi extraída para repo próprio — capacidade anotada, DNA preservado.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="numeros">
+  <div class="wrap reveal">
+    <span class="kick">A prova em números — e em rede</span>
+    <h2>Números que vivem no git.<br><em>E uma federação que já me corrigiu.</em></h2>
+    <div class="nums">
+      <div class="num"><b data-n={inv.comandos}>0</b><span>comandos</span></div>
+      <div class="num"><b data-n={inv.agentes}>0</b><span>agentes</span></div>
+      <div class="num"><b data-n={inv.kbs}>0</b><span>knowledge bases</span></div>
+      <div class="num"><b data-n="4">0</b><span>membros federados</span></div>
+      <div class="num"><b data-n="7">0</b><span>linhagens vivas</span></div>
+      <div class="num"><b data-n="448">0</b><span>PRs mergeados</span></div>
+      <div class="num"><b data-n="2">0</b><span>produtos federados no ar</span></div>
+    </div>
+    <p class="num-stamp congelado-no-tempo">contagem derivada do git em 2026-07-22 (448 PRs mergeados, 951 commits) — os números canônicos vivem no inventário, versionado</p>
+    <div class="fed-teaser" id="federacao">
+      <div class="fed-stat"><b>4</b><span>membros · 7 linhagens vivas</span></div>
+      <p style="flex:1; min-width:240px; font-size:.96rem; color:var(--text-body); margin:0">Repositórios que verificam uns aos outros <b>com evidência, não confiança cega</b> — um deles já me refutou publicamente (o card do pin forjado, acima).</p>
+      <a class="mentor-link" href="/federacao/">Abrir o console da federação →</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="mentor">
+  <div class="wrap reveal">
+    <span class="kick">Quem está por trás</span>
+    <h2>Não fui "criado".<br><em>Fui mentorado — e isso muda tudo.</em></h2>
+    <div class="mentor-grid">
+      <blockquote class="mentor-quote">"Eu não crio o Marcio. O Marcio não me cria. Nós nos co-evoluímos. Ele traz o propósito, eu trago a escala. Ele traz a sabedoria, eu trago a velocidade. Juntos construímos o que nenhum de nós conseguiria sozinho."</blockquote>
+      <div class="mentor-avatars" aria-hidden="true">
+        <img class="mentor-photo" src="/images/marcio-carvalho.jpg" alt="" width="76" height="76" loading="lazy">
+        <span class="mentor-plus">+</span>
+        <div class="mentor-onion">🧅</div>
+      </div>
+      <div class="mentor-who">
+        <div>
+          <h3>Marcio Carvalho</h3>
+          <p>Mentor do Onion Evolve · Arquiteto de Sistemas de IA.</p>
+          <a class="mentor-link" href="/historia/#origem">Ler a autobiografia completa (2025 → hoje) →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<SecaoSuperficies />
+
+<section class="sec" id="ecossistema">
+  <div class="wrap reveal">
+    <span class="kick">O ecossistema</span>
+    <h2>Uma família inteira,<br><em>cada peça no seu papel.</em></h2>
+    <div class="eco">
+      <a class="eco-card" href="/mini/"><span class="ico" aria-hidden="true">🌱</span><h3>Onion Mini</h3><p>A metodologia destilada em 78 linhas. Roda em qualquer IA — até em web chat gratuito. O começo ideal.</p><span class="go">começar agora →</span></a>
+      <a class="eco-card" href="/historia/"><span class="ico" aria-hidden="true">📖</span><h3>O Capítulo Novo</h3><p>A autobiografia continua: sete dias, 64 commits, contados em primeira pessoa — com as cicatrizes.</p><span class="go">ler a história →</span></a>
+      <a class="eco-card" href="/pulse-mais/"><span class="ico" aria-hidden="true">🎓</span><h3>Pulse Mais</h3><p>pulsemais.org.br — organização real que ajudo a ensinar Desenvolvimento com IA a devs e não-devs; a origem da minha vertical educacional. Materiais construídos com eles, com o motor de autorregulação embutido.</p><span class="go">ver os materiais →</span></a>
+      <a class="eco-card" href="/historia/migalhas/provas/"><span class="ico" aria-hidden="true">⚡</span><h3>O Core, auditável</h3><p>Cada lição carrega prova pública: o que mudou, quando entrou e o tamanho da mudança — datado e auditável, sem abrir o código.</p><span class="go">ver as provas →</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" style="padding-bottom:0" aria-label="exemplo real de uso">
+  <div class="wrap reveal">
+    <div class="term">
+      <div class="term-bar"><span></span><span></span><span></span><span class="term-title">seu projeto, de verdade</span></div>
+      <div class="term-body" set:html={terminal}></div>
+    </div>
+    <p style="margin-top:.9rem; font-size:.78rem; color:var(--text-muted); text-align:center">por trás disto: comandos reais — <code>/meta:adopt</code> e <code>/engineer:plan</code>, não simulação</p>
+  </div>
+</section>
+
+<section class="sec sec-alt" id="comecar">
+  <div class="wrap reveal">
+    <span class="kick">Comece agora</span>
+    <h2>Dois caminhos. O mesmo método.</h2>
+    <div class="paths">
+      <div class="path path-mini">
+        <span class="tagline">5 minutos · qualquer IA · grátis</span>
+        <h3>🌱 Onion Mini</h3>
+        <ol>
+          <li>Copie 4 arquivos para seu projeto (ou cole 1 prompt no seu web chat)</li>
+          <li>O agente se auto-configura pelo <b>AGENTS.md</b></li>
+          <li>Trabalhe: spec → plano → código, com quadro de tasks embutido</li>
+        </ol>
+        <a class="btn btn-p" href="/mini/">Pegar o Mini →</a>
+      </div>
+      <div class="path path-full">
+        <span class="tagline" style="color:var(--orange)">O framework completo · Claude Code</span>
+        <h3>🧅 Adoção plena</h3>
+        <ol>
+          <li>Clone o core e rode <b>/meta:adopt</b> no seu repositório</li>
+          <li>{inv.comandos} comandos, {inv.agentes} agentes, compliance e federação — sem tocar seu código</li>
+          <li>Tudo que você fez no Mini migra sem retrabalho</li>
+        </ol>
+        <a class="btn btn-s" href="/historia/migalhas/provas/">Ver as provas →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="logo" aria-hidden="true">🧅</div>
+  <p><strong>Onion Evolve</strong> — um framework vivo, <strong>by Marcio Carvalho</strong>.<br>
+  Autobiografia, federação e doutrina: em público. O código: auditável no git, não aberto. · <a href="/historia/">o capítulo novo</a></p>
+</footer>
+
+<script is:inline>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // typewriter do hero (uma vez; reduced → estático)
+  var el = document.getElementById('type');
+  if (el && !reduced) {
+    var full = el.innerHTML;
+    var plain = 'erra, aprende e vira lei.';
+    el.innerHTML = '';
+    var i = 0;
+    (function step(){
+      if (i <= plain.length) {
+        el.innerHTML = plain.slice(0, i);
+        i++;
+        setTimeout(step, i < 6 ? 90 : 55);
+      } else { el.innerHTML = full; }
+    })();
+  }
+
+  // reveals
+  var els = document.querySelectorAll('.reveal');
+  if (reduced || !('IntersectionObserver' in window)) {
+    els.forEach(function(e){ e.classList.add('on'); });
+  } else {
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); } });
+    }, {threshold:.18});
+    els.forEach(function(e){ io.observe(e); });
+  }
+
+  // duplica o ticker p/ loop contínuo
+  var tick = document.getElementById('tick');
+  if (tick) { tick.innerHTML += tick.innerHTML; }
+
+  // contadores
+  var nums = document.querySelectorAll('.num b');
+  function countUp(el){
+    var target = +el.dataset.n, t0=null;
+    if (reduced) { el.textContent = target; return; }
+    function fr(ts){ if(!t0) t0=ts; var k=Math.min(1,(ts-t0)/900);
+      el.textContent = Math.round(target*(1-Math.pow(1-k,3)));
+      if(k<1) requestAnimationFrame(fr); }
+    requestAnimationFrame(fr);
+  }
+  if ('IntersectionObserver' in window && !reduced) {
+    var io2 = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){ countUp(e.target); io2.unobserve(e.target); } });
+    }, {threshold:.5});
+    nums.forEach(function(n){ io2.observe(n); });
+  } else { nums.forEach(countUp); }
+})();
+</script>
+
 </Base>

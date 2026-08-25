@@ -123,7 +123,7 @@ EOF
 ${TERMS_CS}
 EOF
     done <<EOF
-$(find "${s}" -type f \( -name '*.html' -o -name '*.xml' -o -name '*.md' -o -name '*.json' -o -name '*.yaml' -o -name '*.txt' \) 2>/dev/null | sort)
+$(find "${s}" -type f -not -path '*/dist*/*' \( -name '*.html' -o -name '*.xml' -o -name '*.md' -o -name '*.json' -o -name '*.yaml' -o -name '*.txt' -o -name '*.astro' \) 2>/dev/null | sort)
 EOF
   done
   echo "  Arquivos varridos: ${scanned}"
@@ -460,7 +460,7 @@ EOF
 ${TERMS_CS}
 EOF
     done <<EOF
-$(find "${s}" -type f \( -name '*.html' -o -name '*.xml' -o -name '*.md' -o -name '*.json' -o -name '*.yaml' -o -name '*.txt' \) 2>/dev/null | sort)
+$(find "${s}" -type f -not -path '*/dist*/*' \( -name '*.html' -o -name '*.xml' -o -name '*.md' -o -name '*.json' -o -name '*.yaml' -o -name '*.txt' -o -name '*.astro' \) 2>/dev/null | sort)
 EOF
   done
   exit 0

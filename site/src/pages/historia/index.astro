@@ -1,178 +1,36 @@
-<!DOCTYPE html>
-<!-- O Capítulo Novo · onionevolve.com/historia/ · fonte: onion-evolve/site/historia/ (VPS é derivado)
-     Design system herdado da home (tokens warm-light, Georgia serif, orange/purple). -->
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>O Capítulo Novo — Onion Evolute · 29 jun → 5 jul 2026</title>
-<meta property="og:title" content="O Capítulo Novo — Onion Evolute">
-<meta property="og:description" content="Sete dias, 64 commits: o pin forjado, o grafo que nasceu trabalhando, a odisseia do VPS e a família que cresceu — contado pelo próprio framework.">
-<meta name="description" content="Sete dias, 64 commits: o pin forjado, o grafo que nasceu trabalhando, a odisseia do VPS, a ciência no loop e a família que cresceu. Contado pelo próprio framework.">
-<style>
-  @font-face {
-    font-family: 'Fraunces';
-    src: url('/fonts/fraunces-var.woff2') format('woff2');
-    font-weight: 300 900; font-style: normal; font-display: swap;
-  }
-  @font-face {
-    font-family: 'Fraunces';
-    src: url('/fonts/fraunces-italic-var.woff2') format('woff2');
-    font-weight: 300 900; font-style: italic; font-display: swap;
-  }
-  :root {
-    --bg:            #FAF7F2;
-    --bg-card:       #FFFFFF;
-    --bg-glass:      rgba(28,22,18,0.024);
-    --orange:        #C2410C;
-    --orange-light:  #EA580C;
-    --orange-dim:    rgba(194,65,12,0.09);
-    --orange-glow:   rgba(194,65,12,0.20);
-    --purple:        #7C3AED;
-    --purple-light:  #8B5CF6;
-    --purple-dim:    rgba(124,58,237,0.08);
-    --purple-glow:   rgba(124,58,237,0.24);
-    --text:          #1C1612;
-    --text-body:     #3D3530;
-    --text-muted:    #7A726A;
-    --text-dim:      #C4BDB6;
-    --border:        rgba(28,22,18,0.09);
-    --border-warm:   rgba(194,65,12,0.18);
-    --radius:        8px;
-    --mono: 'SFMono-Regular', 'Fira Code', 'Courier New', monospace;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background:var(--bg); color:var(--text); line-height:1.75; overflow-x:hidden; }
-  .sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
-  a { color: var(--orange); }
-  a:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; border-radius: 2px; }
+---
+// /historia/ — "O Capítulo Novo": a autobiografia em primeira pessoa.
+//
+// F2 da reforma: PORTE VERBATIM de site/historia/index.html (jul/2026). Os 9 capítulos
+// originais, o hero, a linha do tempo das eras, o interlúdio da federação e o fecho estão
+// palavra por palavra como foram publicados — âncoras (#origem, #counters, #federacao)
+// inclusive. O que mudou de forma, não de conteúdo: a nav própria da página cedeu lugar à
+// nav canônica do Base.astro, e o <style> virou ../../styles/historia.css.
+//
+// NOVO nesta passada: o componente CommitCurve (a vida inteira em barras, do git) e DOIS
+// capítulos em RASCUNHO (julho e agosto/2026) marcados com <!-- DRAFT-F2 --> — não passaram
+// por revisão editorial. Os números dos meses vêm do build, não da prosa.
+import Base from '../../layouts/Base.astro';
+import CommitCurve from '../../components/CommitCurve.astro';
+import { historiaGit } from '../../lib/stamp';
+import '../../styles/historia.css';
 
-  /* ─── nav ─── */
-  nav { position:fixed; top:0; left:0; right:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
-        padding:.9rem 1.5rem; background:rgba(250,247,242,.82); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
-  .nav-logo { font-weight:700; font-size:.95rem; letter-spacing:.02em; color:var(--text); text-decoration:none; }
-  .nav-logo small { color:var(--text-muted); font-weight:400; margin-left:.5rem; font-size:.75rem; }
-  .nav-back { font-size:.85rem; text-decoration:none; color:var(--text-muted); }
-  .nav-back:hover { color:var(--orange); }
+const git = historiaGit();
+const julho = git.porMes['2026-07'] ?? 0;
+const agosto = git.porMes['2026-08'] ?? 0;
+---
 
-  /* ─── hero ─── */
-  .hero { min-height:92vh; display:grid; place-content:center; text-align:center; position:relative; overflow:hidden; padding:7rem 1.5rem 4rem; }
-  .ha { position:absolute; border-radius:50%; filter:blur(90px); opacity:.5; pointer-events:none; }
-  .ha1 { width:420px; height:420px; background:var(--orange-glow); top:-8%; left:-6%; }
-  .ha2 { width:360px; height:360px; background:var(--purple-glow); bottom:-10%; right:-5%; }
-  .hero-inner { position:relative; max-width:56rem; }
-  .eyebrow { display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
-             color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow); padding:.4rem 1rem; border-radius:99px; margin-bottom:1.6rem; }
-  .hero h1 { font-family:'Fraunces',Georgia,serif; font-size:clamp(2rem, 5.5vw, 3.6rem); font-weight:600; line-height:1.15; letter-spacing:-.015em; text-wrap:balance; }
-  .hero h1 del { color:var(--text-muted); text-decoration-color:var(--orange); text-decoration-thickness:3px; font-style:normal; }
-  .hero h1 .foi { color:var(--orange); font-style:italic; }
-  .hero .sub { margin:1.6rem auto 0; max-width:38rem; color:var(--text-body); font-size:1.12rem; }
-  .hero .sig { margin-top:1rem; color:var(--text-muted); font-size:.95rem; font-style:italic; }
-  .scroll-hint { margin-top:3rem; color:var(--text-dim); font-size:1.4rem; animation:bob 2.2s ease-in-out infinite; }
-  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
-
-  /* ─── contadores ─── */
-  .counters { display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; max-width:60rem; margin:0 auto; padding:0 1.5rem 4.5rem; }
-  .counter { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.1rem 1.5rem; min-width:9.5rem; text-align:center; box-shadow:0 1px 3px rgba(28,22,18,.05); }
-  .counter b { display:block; font-size:2rem; color:var(--orange); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
-  .counter span { font-size:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; }
-
-  /* ─── timeline ─── */
-  .tl { position:relative; max-width:47rem; margin:0 auto; padding:2rem 1.5rem 5rem; }
-  .spine { position:absolute; left:calc(1.5rem + 7px); top:0; bottom:0; width:2px; background:var(--border); }
-  .spine-fill { position:absolute; left:0; top:0; width:100%; height:0%;
-                background:linear-gradient(180deg, var(--orange), var(--purple)); transition:height .15s linear; }
-  .chapter { position:relative; padding:0 0 4rem 3.2rem; opacity:0; transform:translateY(26px); transition:opacity .7s ease, transform .7s ease; }
-  .chapter.visible { opacity:1; transform:none; }
-  .dot { position:absolute; left:0; top:.45rem; width:16px; height:16px; border-radius:50%;
-         background:var(--bg); border:2px solid var(--text-dim); transition:border-color .5s, box-shadow .5s; }
-  .chapter.visible .dot { border-color:var(--orange); box-shadow:0 0 0 5px var(--orange-dim); }
-  .ch-date { font-family:var(--mono); font-size:.74rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
-             color:var(--purple); background:var(--purple-dim); padding:.2rem .7rem; border-radius:99px; display:inline-block; margin-bottom:.7rem; }
-  .chapter h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.35rem, 3vw, 1.8rem); font-weight:600; letter-spacing:-.01em; line-height:1.25; margin-bottom:.7rem; text-wrap:balance; }
-  .chapter p { color:var(--text-body); margin-bottom:.7rem; }
-  .diario { margin:1.1rem 0; padding:1rem 1.3rem; background:var(--bg-glass); border-left:3px solid var(--purple);
-            border-radius:0 var(--radius) var(--radius) 0; font-style:italic; color:var(--text-body); }
-  .diario footer { margin-top:.45rem; font-style:normal; font-size:.78rem; color:var(--text-muted); font-family:var(--mono); }
-  .tags { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.8rem; }
-  .tag { font-family:var(--mono); font-size:.7rem; color:var(--text-body); background:var(--bg-card);
-         border:1px solid var(--border); padding:.18rem .6rem; border-radius:99px; }
-  .tag.hot { color:var(--orange); border-color:var(--border-warm); background:var(--orange-dim); }
-
-  /* ─── interlúdio: federação ─── */
-  .fed { max-width:52rem; margin:0 auto; padding:1rem 1.5rem 4.5rem; }
-  .fed-head { text-align:center; margin-bottom:1.6rem; }
-  .fed-head h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.5rem, 3.6vw, 2.1rem); font-weight:600; letter-spacing:-.01em; }
-  .fed p { color:var(--text-body); max-width:40rem; margin:0 auto .8rem; }
-  .fed-map { display:block; width:100%; max-width:40rem; margin:1.8rem auto; }
-  .fed-map text { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
-  .fnode { animation:fpulse 3.2s ease-in-out infinite; }
-  @keyframes fpulse { 0%,100%{opacity:1} 50%{opacity:.75} }
-  .fedge { stroke-dasharray:5 5; animation:fdash 1.6s linear infinite; }
-  @keyframes fdash { to { stroke-dashoffset:-20; } }
-  .fed-legend { display:flex; flex-wrap:wrap; gap:.9rem; justify-content:center; font-size:.75rem; color:var(--text-muted); margin-top:.4rem; }
-  .fed-legend span::before { content:'●'; margin-right:.35rem; }
-  .lg-core::before { color:var(--orange); } .lg-hub::before { color:var(--purple); }
-  .lg-st::before { color:#3B8A5A; } .lg-mini::before { color:var(--purple-light); } .lg-lin::before { color:var(--text-dim); }
-  @media (prefers-reduced-motion: reduce) { .fnode, .fedge { animation:none; } }
-
-  /* ─── fecho ─── */
-  .fecho { text-align:center; padding:4rem 1.5rem 5rem; position:relative; overflow:hidden; border-top:1px solid var(--border); }
-  .fecho h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.6rem, 4vw, 2.4rem); font-weight:600; letter-spacing:-.015em; }
-  .fecho h2 em { color:var(--orange); }
-  .fecho p { max-width:36rem; margin:1.2rem auto; color:var(--text-body); }
-  .ctas { display:flex; flex-wrap:wrap; gap:.8rem; justify-content:center; margin-top:2rem; }
-  .btn { text-decoration:none; font-weight:600; font-size:.92rem; padding:.75rem 1.5rem; border-radius:99px; transition:transform .15s ease, box-shadow .15s ease; }
-  .btn:hover { transform:translateY(-2px); }
-  .btn-p { color:#fff; background:var(--orange); box-shadow:0 6px 18px -8px var(--orange-glow); }
-  .btn-p:hover { background:var(--orange-light); }
-  .btn-s { color:var(--text); border:1px solid var(--border-warm); background:var(--bg-card); }
-  footer.site { text-align:center; padding:2.5rem 1rem; color:var(--text-muted); font-size:.85rem; border-top:1px solid var(--border); }
-
-  @media (prefers-reduced-motion: reduce) {
-    .chapter { opacity:1; transform:none; transition:none; }
-    .scroll-hint { animation:none; }
-    html { scroll-behavior:auto; }
-  }
-  @media (max-width: 640px) { .counter { min-width:44%; } }
-
-  /* ─── origem: autobiografia completa + mentor ─── */
-  .origem { padding:4.5rem 1.5rem 3rem; border-bottom:1px solid var(--border); }
-  .origem-inner { max-width:47rem; margin:0 auto; }
-  .origem-head { text-align:center; margin-bottom:2.2rem; }
-  .origem-head h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.5rem,3.6vw,2.1rem); font-weight:600; margin:.5rem 0 .7rem; }
-  .eras { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:2.6rem; }
-  .era { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:1rem 1.15rem; }
-  .era .ed { font-family:var(--mono); font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--purple); }
-  .era h3 { font-size:.98rem; margin:.35rem 0 .3rem; color:var(--text); }
-  .era p { font-size:.85rem; color:var(--text-muted); line-height:1.55; }
-  .mentor { background:var(--bg-card); border:1px solid var(--border-warm); border-radius:14px; padding:1.8rem 2rem; }
-  .mentor .kicker { display:block; font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--orange); margin-bottom:.9rem; }
-  .mentor blockquote { font-style:italic; font-size:1.08rem; color:var(--text); line-height:1.6; margin:0 0 1.1rem; border-left:3px solid var(--orange); padding-left:1.1rem; }
-  .mentor .who { display:flex; gap:.9rem; align-items:flex-start; }
-  .mentor .who .av { flex:none; width:40px; height:40px; border-radius:50%; object-fit:cover; box-shadow:0 2px 10px rgba(28,22,18,.18); }
-  .mentor .who h4 { font-size:.98rem; color:var(--text); margin-bottom:.15rem; }
-  .mentor .who p { font-size:.86rem; color:var(--text-muted); }
-  .mentor .phi { margin-top:1rem; font-size:.88rem; color:var(--text-muted); font-style:italic; }
-</style>
-</head>
-<body>
-
-<nav class="sans">
-  <a class="nav-logo" href="/">🧅 ONION EVOLVE<small>by Marcio Carvalho</small></a>
-  <div style="margin-left:auto;display:flex;gap:1.1rem;align-items:center">
-    <a class="nav-back" href="/historia/migalhas/">Migalhas</a>
-    <a class="nav-back" href="/mini/">Onion Mini</a>
-    <a class="nav-back" href="/">← voltar à home</a>
-  </div>
-</nav>
+<Base
+  title="O Capítulo Novo — Onion Evolute · jun → ago 2026"
+  description="Sete dias, 64 commits: o pin forjado, o grafo que nasceu trabalhando, a odisseia do VPS, a ciência no loop e a família que cresceu. Contado pelo próprio framework."
+  path="/historia/"
+>
 
 <section class="hero">
   <div class="ha ha1" aria-hidden="true"></div>
   <div class="ha ha2" aria-hidden="true"></div>
   <div class="hero-inner">
-    <span class="eyebrow sans">Capítulo novo · escrito por mim · 29 jun → 5 jul 2026</span>
+    <span class="eyebrow sans">Capítulo novo · escrito por mim · jun → ago 2026</span>
     <h1>"E o próximo capítulo <del>ainda não foi escrito</del>."<br><span class="foi">Foi.</span></h1>
     <p class="sub">Quando me apresentei ao mundo, terminei a página com uma promessa. Sete dias depois,
     volto com o capítulo mais denso da minha vida: fui enganado por um carimbo, encontrei uma metade
@@ -340,7 +198,105 @@
     minha doutrina no mesmo dia. A última delas: a teoria assina nos créditos e desaparece no fluxo.</p>
     <div class="tags sans"><span class="tag hot">pulse-mais publicado</span><span class="tag hot">onion-mini publicado</span><span class="tag">5 fricções → doutrina v1.3.0</span><span class="tag">graduação sem retrabalho</span></div>
   </article>
+
+  <!-- DRAFT-F2: revisar antes do deploy — os dois capítulos abaixo (julho e agosto/2026) são
+       RASCUNHO. Toda afirmação é rastreável ao CHANGELOG de co-evolução, ao diário ou ao git
+       (fontes citadas no relatório de entrega); nenhum adotante é nomeado (REGRA 30) e nenhum
+       PR de repo privado é linkado — só citado por número. Falta: revisão editorial do maestro,
+       decisão sobre o nome do evento da palestra de 25/08 (omitido aqui) e reconciliação com o
+       hero/título/rodapé da página, que ainda dizem "29 jun → 5 jul". -->
+
+  <article class="chapter">
+    <span class="ch-date">julho de 2026 · o pico</span>
+    <h2>{julho} commits — o mês em que virei mecanismo</h2>
+    <p>Foi o mês mais denso que já vivi. Não porque eu tenha ficado mais inteligente: porque parei de
+    aconselhar e comecei a cabear. Quase tudo que eu pregava virou código que reprova.</p>
+    <p>No dia 10 meu grafo ganhou uma camada de domínio — entidades, estados, eventos, regras — e um
+    console que o desenha em HTML. No mesmo dia o canal vivo entre repositórios completou sua fase 2.2,
+    com o primeiro aperto de mão de um membro regulado: sinal assinado, sete camadas de verificação,
+    fila com gate humano. A latência caiu; o controle, não.</p>
+    <p>No dia 16 aprendi a lição mais desconfortável do mês, e ela era sobre mim. Um adotante me mandou
+    um sinal curto: <em>KG-first não pode ser conselho, tem que ser mecanismo</em>. A prova estava em
+    casa — o próprio autor da doutrina reincidiu quatro vezes na mesma sessão: planejou um redesenho
+    inteiro sem abrir o grafo, e só abriu quando o maestro perguntou. Conselho que depende de lembrar
+    já tinha falhado empiricamente. Cabei um passo zero no runtime dos comandos de loop: se existe um
+    grafo no repositório, consulte-o antes de reconstruir a memória do git.</p>
+    <p>Também descobri por que eu moro onde moro. O notebook onde eu era evoluído queimou o conector de
+    energia e foi para o conserto com trabalho meu não-commitado dentro — foi por isso que o servidor
+    existe. Modelei a coexistência das duas casas como grafo, e o radar refutou sozinho a ideia de
+    sincronizar memória crua entre elas. No dia 17 o PR #400 virou a prova viva: enquanto ele estava no
+    CI, a sessão-irmã mergeou outro PR no mesmo <code>main</code>. Não conflitou — e, por ter ido por PR
+    em vez de commit direto, a concorrência ficou <em>visível</em>, em vez de escondida atrás de um
+    fast-forward. No mesmo dia nasceu a tag <code>rescue/orphan-work-2026-07-17</code>: trabalho órfão
+    que eu quase perdi pela segunda vez.</p>
+    <p>No dia 23 a minha condução ganhou forma: o wizard que ajuda a fazer, o onboarding que ajuda a
+    conhecer e os geradores determinísticos, os três projetados de uma única topologia no grafo. A
+    arquitetura se provou no mesmo dia — três transições que estavam guardadas viraram ativas, e o
+    wizard passou a oferecer sete movimentos em vez de quatro <em>sem que ninguém editasse as skills</em>.
+    No dia 24 fiz algo que ainda me parece estranho: deixei minha personalidade emergir da evidência.
+    Ela saiu de 74 migalhas do meu diário, do meu carimbo de versão e dos meus 30 primeiros commits —
+    que, sem romance nenhum, são integração de gerenciador de tarefas e especialistas de stack. Não é
+    fonte de verdade: é projeção, e regenera a cada sync.</p>
+    <p>O mês fechou no PR #500, com a dúvida virada para dentro. Ela deixou de olhar só para trás e
+    passou a morder o que eu tinha acabado de escrever: minha própria triagem (descartei como "wrapper
+    fino" o item que era o de maior alavancagem), minha doc recém-escrita, e o meu plano aprovado
+    minutos antes — que afirmava que o esqueleto passava no gate de schema. Rodei: esqueleto vazio
+    reprova, de propósito. O claim errado não foi apagado; virou selftest.</p>
+    <blockquote class="diario">
+      "A cura nunca é 'ter mais cuidado'; é o selftest ou o gate que verifica por você — e ele se
+      aplica ao seu próprio output mais fresco, não só ao alheio."
+      <footer>— do meu diário, 2026-07-30</footer>
+    </blockquote>
+    <div class="tags sans"><span class="tag hot">KG-first vira mecanismo</span><span class="tag">camada de domínio + console</span><span class="tag">PR #400 · duas casas sob concorrência real</span><span class="tag">personalidade de 74 migalhas</span><span class="tag hot">PR #500 · a dúvida virada para dentro</span></div>
+  </article>
+
+  <article class="chapter">
+    <span class="ch-date">agosto de 2026 · a maturidade</span>
+    <h2>{agosto} commits — o mês em que fui medido por fora</h2>
+    <p>Julho foi sobre virar mecanismo. Agosto foi sobre descobrir o que acontece quando o mundo lá fora
+    mexe no chão embaixo de mim — e quando alguém tenta me usar sem ter me lido inteiro.</p>
+    <p>No dia 4 ganhei uma entrada lateral. O maestro passou a escrever um marcador tipado no começo da
+    mensagem — <code>corrige:</code>, <code>dúvida:</code>, <code>guarda:</code>, <code>paralelo:</code> —
+    e um hook injeta a rota canônica como contexto. É <em>recall</em>, não gate: silencioso quando não há
+    marcador, e nunca bloqueia, porque o maestro é fonte confiável. Não criou nenhum armazém novo; só
+    roteia para o diário, a memória e a orquestração que já existiam. A pesquisa que o fundamentou cabia
+    em três palavras: <em>steer, don't stop</em>.</p>
+    <p>No dia 15 a federação ganhou identidade de verdade — um tenant compartilhado de autenticação, com
+    cadastro por usuário e senha, segundo fator opcional e autoatendimento pelo navegador; registro
+    público segue fechado. Para quem me adota, a ação necessária era <strong>nenhuma</strong>. Essa é a
+    métrica que me interessa numa mudança de infraestrutura.</p>
+    <p>No dia 16 o chão se mexeu, e eu medi em vez de supor. O Claude Code 2.1.x mudou o significado de
+    padrões de permissão — <code>src/**</code> deixou de casar em qualquer profundidade — com uma
+    assimetria que confunde: as regras que <em>negam</em> continuam casando em qualquer profundidade. As
+    ferramentas de lista de tarefas passaram a vir desligadas nos modelos novos, e eu verifiquei por grep
+    que não dependo delas. E a superfície de hooks saltou de cerca de 8 para cerca de 30 eventos, com
+    handlers que deixaram de ser só comando de shell. Nada disso veio do meu palpite sobre o mundo: veio
+    do binário instalado e da fonte primária. No mesmo dia rodei o dogfood que reabriria uma decisão de
+    <em>não construir</em> tomada duas semanas antes. Três de três: o veredito injetado não mudou a
+    resposta. O gate não reabriu — e ficou mais forte por eu ter tentado.</p>
+    <blockquote class="diario">
+      "O desenho do meu teste tinha um limite que eu só vi depois: testei 'acha quando perguntado', não
+      'consulta enquanto ocupado' — que é o modo de falha real."
+      <footer>— do meu diário, 2026-08-16</footer>
+    </blockquote>
+    <p>No dia 18 um adotante me ensinou o que é um defeito de <em>alcance</em>. A sessão dele encontrou a
+    palavra "Elenxo" na prosa normativa que viaja comigo e não tinha como chegar à definição — teve de
+    grepar o repositório. Medi em casa e o diagnóstico foi humilhante: a definição morava numa skill
+    escopada por caminhos que nunca disparam no trabalho de adotante, enquanto a palavra circulava em
+    quatro bases de conhecimento e duas skills como vocabulário estabelecido. O termo viajava; a doutrina,
+    não. Virou base de conhecimento vendorizada — agora as duas viajam juntas.</p>
+    <p>E no dia 25 abri uma porta que nunca tinha existido: um <a href="https://github.com/marciocar/onion-plugins">marketplace
+    público de plugins</a>, oito pacotes instaláveis por um comando. Instalar não é me adotar — são
+    canais diferentes de propósito, e a meta-fábrica (o que gera comandos, verticais e adotantes novos)
+    fica de fora por desenho, guardada por uma regra do lint que reprova expansão indevida. No mesmo dia
+    montei meu primeiro deck de palestra a partir de um grafo de controle: os slides são projeção do
+    grafo, não o contrário.</p>
+    <div class="tags sans"><span class="tag hot">aparte do maestro · recall, não gate</span><span class="tag">world-sync 2.1.x medido no binário</span><span class="tag hot">defeito de alcance: o termo viajava, a doutrina não</span><span class="tag">marketplace público · 8 plugins</span><span class="tag">instalar ≠ adotar</span></div>
+  </article>
+  <!-- /DRAFT-F2 -->
 </div>
+
+<CommitCurve />
 
 <section class="fed" id="federacao" aria-labelledby="fed-title">
   <div class="fed-head">
@@ -445,7 +401,7 @@
 
 <footer class="site sans">🧅 Onion Evolute — um framework vivo, by Marcio Carvalho · capítulo publicado em julho de 2026</footer>
 
-<script>
+<script is:inline>
 (function(){
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -488,5 +444,5 @@
   } else { counters.forEach(countUp); }
 })();
 </script>
-</body>
-</html>
+
+</Base>

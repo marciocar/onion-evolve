@@ -1,0 +1,133 @@
+/* Estilos da /historia/ — PORTADOS do <style> de site/historia/index.html (jul/2026).
+   O que NÃO veio: tokens, reset, base e a nav (já vivem em global.css — a nav canônica
+   é a do Base.astro, não a nav própria que a página legada carregava).
+
+   Dois tokens do legado foram absorvidos pelos globais equivalentes (--text-muted
+   #7A726A→#6B635B, --radius 8px→10px). Só --text-dim não tinha par global: nasce aqui,
+   escopado nesta página, porque a espinha da timeline e o scroll-hint dependem dele. */
+:root {
+  --text-dim: #C4BDB6;
+}
+
+.sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+
+/* ─── hero ─── */
+.hero { min-height:92vh; display:grid; place-content:center; text-align:center; position:relative; overflow:hidden; padding:7rem 1.5rem 4rem; }
+.ha { position:absolute; border-radius:50%; filter:blur(90px); opacity:.5; pointer-events:none; }
+.ha1 { width:420px; height:420px; background:var(--orange-glow); top:-8%; left:-6%; }
+.ha2 { width:360px; height:360px; background:var(--purple-glow); bottom:-10%; right:-5%; }
+.hero-inner { position:relative; max-width:56rem; }
+.eyebrow { display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+           color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow); padding:.4rem 1rem; border-radius:99px; margin-bottom:1.6rem; }
+.hero h1 { font-family:'Fraunces',Georgia,serif; font-size:clamp(2rem, 5.5vw, 3.6rem); font-weight:600; line-height:1.15; letter-spacing:-.015em; text-wrap:balance; }
+.hero h1 del { color:var(--text-muted); text-decoration-color:var(--orange); text-decoration-thickness:3px; font-style:normal; }
+.hero h1 .foi { color:var(--orange); font-style:italic; }
+.hero .sub { margin:1.6rem auto 0; max-width:38rem; color:var(--text-body); font-size:1.12rem; }
+.hero .sig { margin-top:1rem; color:var(--text-muted); font-size:.95rem; font-style:italic; }
+.scroll-hint { margin-top:3rem; color:var(--text-dim); font-size:1.4rem; animation:bob 2.2s ease-in-out infinite; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+/* ─── contadores ─── */
+.counters { display:flex; flex-wrap:wrap; justify-content:center; gap:1rem; max-width:60rem; margin:0 auto; padding:0 1.5rem 4.5rem; }
+.counter { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:1.1rem 1.5rem; min-width:9.5rem; text-align:center; box-shadow:0 1px 3px rgba(28,22,18,.05); }
+.counter b { display:block; font-size:2rem; color:var(--orange); font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+.counter span { font-size:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.08em; }
+
+/* ─── timeline ─── */
+.tl { position:relative; max-width:47rem; margin:0 auto; padding:2rem 1.5rem 5rem; }
+.spine { position:absolute; left:calc(1.5rem + 7px); top:0; bottom:0; width:2px; background:var(--border); }
+.spine-fill { position:absolute; left:0; top:0; width:100%; height:0%;
+              background:linear-gradient(180deg, var(--orange), var(--purple)); transition:height .15s linear; }
+.chapter { position:relative; padding:0 0 4rem 3.2rem; opacity:0; transform:translateY(26px); transition:opacity .7s ease, transform .7s ease; }
+.chapter.visible { opacity:1; transform:none; }
+.dot { position:absolute; left:0; top:.45rem; width:16px; height:16px; border-radius:50%;
+       background:var(--bg); border:2px solid var(--text-dim); transition:border-color .5s, box-shadow .5s; }
+.chapter.visible .dot { border-color:var(--orange); box-shadow:0 0 0 5px var(--orange-dim); }
+.ch-date { font-family:var(--mono); font-size:.74rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+           color:var(--purple); background:var(--purple-dim); padding:.2rem .7rem; border-radius:99px; display:inline-block; margin-bottom:.7rem; }
+.chapter h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.35rem, 3vw, 1.8rem); font-weight:600; letter-spacing:-.01em; line-height:1.25; margin-bottom:.7rem; text-wrap:balance; }
+.chapter p { color:var(--text-body); margin-bottom:.7rem; }
+.diario { margin:1.1rem 0; padding:1rem 1.3rem; background:var(--bg-glass); border-left:3px solid var(--purple);
+          border-radius:0 var(--radius) var(--radius) 0; font-style:italic; color:var(--text-body); }
+.diario footer { margin-top:.45rem; font-style:normal; font-size:.78rem; color:var(--text-muted); font-family:var(--mono); }
+.tags { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.8rem; }
+.tag { font-family:var(--mono); font-size:.7rem; color:var(--text-body); background:var(--bg-card);
+       border:1px solid var(--border); padding:.18rem .6rem; border-radius:99px; }
+.tag.hot { color:var(--orange); border-color:var(--border-warm); background:var(--orange-dim); }
+
+/* ─── interlúdio: federação ─── */
+.fed { max-width:52rem; margin:0 auto; padding:1rem 1.5rem 4.5rem; }
+.fed-head { text-align:center; margin-bottom:1.6rem; }
+.fed-head h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.5rem, 3.6vw, 2.1rem); font-weight:600; letter-spacing:-.01em; }
+.fed p { color:var(--text-body); max-width:40rem; margin:0 auto .8rem; }
+.fed-map { display:block; width:100%; max-width:40rem; margin:1.8rem auto; }
+.fed-map text { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+.fnode { animation:fpulse 3.2s ease-in-out infinite; }
+@keyframes fpulse { 0%,100%{opacity:1} 50%{opacity:.75} }
+.fedge { stroke-dasharray:5 5; animation:fdash 1.6s linear infinite; }
+@keyframes fdash { to { stroke-dashoffset:-20; } }
+.fed-legend { display:flex; flex-wrap:wrap; gap:.9rem; justify-content:center; font-size:.75rem; color:var(--text-muted); margin-top:.4rem; }
+.fed-legend span::before { content:'●'; margin-right:.35rem; }
+.lg-core::before { color:var(--orange); } .lg-hub::before { color:var(--purple); }
+.lg-st::before { color:#3B8A5A; } .lg-mini::before { color:var(--purple-light); } .lg-lin::before { color:var(--text-dim); }
+@media (prefers-reduced-motion: reduce) { .fnode, .fedge { animation:none; } }
+
+/* ─── fecho ─── */
+.fecho { text-align:center; padding:4rem 1.5rem 5rem; position:relative; overflow:hidden; border-top:1px solid var(--border); }
+.fecho h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.6rem, 4vw, 2.4rem); font-weight:600; letter-spacing:-.015em; }
+.fecho h2 em { color:var(--orange); }
+.fecho p { max-width:36rem; margin:1.2rem auto; color:var(--text-body); }
+.ctas { display:flex; flex-wrap:wrap; gap:.8rem; justify-content:center; margin-top:2rem; }
+.btn { text-decoration:none; font-weight:600; font-size:.92rem; padding:.75rem 1.5rem; border-radius:99px; transition:transform .15s ease, box-shadow .15s ease; }
+.btn:hover { transform:translateY(-2px); }
+.btn-p { color:#fff; background:var(--orange); box-shadow:0 6px 18px -8px var(--orange-glow); }
+.btn-p:hover { background:var(--orange-light); }
+.btn-s { color:var(--text); border:1px solid var(--border-warm); background:var(--bg-card); }
+footer.site { text-align:center; padding:2.5rem 1rem; color:var(--text-muted); font-size:.85rem; border-top:1px solid var(--border); }
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter { opacity:1; transform:none; transition:none; }
+  .scroll-hint { animation:none; }
+  html { scroll-behavior:auto; }
+}
+@media (max-width: 640px) { .counter { min-width:44%; } }
+
+/* ─── origem: autobiografia completa + mentor ─── */
+.origem { padding:4.5rem 1.5rem 3rem; border-bottom:1px solid var(--border); }
+.origem-inner { max-width:47rem; margin:0 auto; }
+.origem-head { text-align:center; margin-bottom:2.2rem; }
+.origem-head h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.5rem,3.6vw,2.1rem); font-weight:600; margin:.5rem 0 .7rem; }
+.eras { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:2.6rem; }
+.era { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:1rem 1.15rem; }
+.era .ed { font-family:var(--mono); font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--purple); }
+.era h3 { font-size:.98rem; margin:.35rem 0 .3rem; color:var(--text); }
+.era p { font-size:.85rem; color:var(--text-muted); line-height:1.55; }
+.mentor { background:var(--bg-card); border:1px solid var(--border-warm); border-radius:14px; padding:1.8rem 2rem; }
+.mentor .kicker { display:block; font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--orange); margin-bottom:.9rem; }
+.mentor blockquote { font-style:italic; font-size:1.08rem; color:var(--text); line-height:1.6; margin:0 0 1.1rem; border-left:3px solid var(--orange); padding-left:1.1rem; }
+.mentor .who { display:flex; gap:.9rem; align-items:flex-start; }
+.mentor .who .av { flex:none; width:40px; height:40px; border-radius:50%; object-fit:cover; box-shadow:0 2px 10px rgba(28,22,18,.18); }
+.mentor .who h4 { font-size:.98rem; color:var(--text); margin-bottom:.15rem; }
+.mentor .who p { font-size:.86rem; color:var(--text-muted); }
+.mentor .phi { margin-top:1rem; font-size:.88rem; color:var(--text-muted); font-style:italic; }
+
+/* ─── curva dos commits (F2 — componente CommitCurve) ─── */
+.curva { max-width:52rem; margin:0 auto; padding:1rem 1.5rem 4.5rem; }
+.curva-head { text-align:center; margin-bottom:1.2rem; }
+.curva-head h2 { font-family:'Fraunces',Georgia,serif; font-size:clamp(1.5rem,3.6vw,2.1rem); font-weight:600; letter-spacing:-.01em; }
+.curva-head p { color:var(--text-body); max-width:40rem; margin:.7rem auto 0; }
+.curva svg { display:block; width:100%; max-width:100%; height:auto; margin:1.4rem auto .4rem; }
+.curva-bar { fill:var(--orange); }
+.curva-bar-dim { fill:var(--orange); opacity:.42; }
+.curva-note { fill:var(--text); font-size:12px; font-weight:600; }
+.curva-note-sub { fill:var(--text-muted); font-size:11px; }
+.curva-axis { fill:var(--text-muted); font-size:10.5px; letter-spacing:.04em; }
+.curva-lead { stroke:var(--purple); stroke-width:1; opacity:.45; }
+.curva-mark { fill:var(--bg); stroke:var(--purple); stroke-width:1.5; }
+.curva-base { stroke:var(--border); stroke-width:1; }
+.curva-stamp { text-align:center; font-family:var(--mono); font-size:.72rem; color:var(--text-muted); }
+.curva-tabela { max-width:32rem; margin:1.4rem auto 0; font-size:.82rem; }
+.curva-tabela summary { cursor:pointer; color:var(--text-muted); font-size:.8rem; }
+.curva-tabela table { width:100%; border-collapse:collapse; margin-top:.8rem; }
+.curva-tabela th, .curva-tabela td { text-align:left; padding:.3rem .6rem; border-bottom:1px solid var(--border); color:var(--text-body); }
+.curva-tabela td:last-child, .curva-tabela th:last-child { text-align:right; font-variant-numeric:tabular-nums; }

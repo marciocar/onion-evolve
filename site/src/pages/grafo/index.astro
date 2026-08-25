@@ -1,0 +1,45 @@
+---
+// /grafo/ — os grafos de conhecimento navegáveis (F5 da reforma 2026-08).
+// O console é gerado por mecanismo interno determinístico (kg-console) como HTML
+// self-contained (zero CDN) e servido de public/grafo/<slug>/. v1: o Café Aroma
+// (fictício por construção — o exemplo didático do webinar). A fatia do grafo
+// autobiográfico real entra numa rodada futura, após revisão nó-a-nó (gate do
+// maestro — REGRA 30 e afins).
+import Base from '../../layouts/Base.astro';
+---
+
+<Base
+  title="O grafo, vivo — knowledge graphs navegáveis do Onion"
+  description="Grafos de conhecimento reais e navegáveis, com o radar determinístico rodando em cima: atenção calculada por aritmética, nós refutados preservados na história."
+  path="/grafo/"
+>
+  <main class="wrap" style="padding-top:120px; padding-bottom:80px">
+    <p class="kicker" style="font-size:.74rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--purple);margin-bottom:.9rem">chega de slide</p>
+    <h1 style="font-size:clamp(30px,4.4vw,50px);margin-bottom:1rem">O grafo, vivo.</h1>
+    <p style="max-width:66ch;color:var(--text-body);margin-bottom:2.4rem">
+      Todo mundo diz que "estrutura conhecimento". Aqui você navega o grafo de verdade:
+      cada nó com tipo, dono e prazo de validade; cada aresta dizendo o que um fato
+      <em>faz</em> com o outro; o nó refutado tracejado, contando a história que a wiki
+      apagaria. E a atenção que ordena tudo sai de uma conta — não de uma opinião:
+      <code style="font-family:var(--mono);background:var(--bg-glass);padding:.15rem .5rem;border-radius:6px">atenção = impacto × confiança × status × (1 + conexões)</code>
+    </p>
+
+    <article style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.6rem 1.8rem;max-width:640px">
+      <p style="font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--orange)">grafo didático · 6 nós</p>
+      <h2 style="font-size:1.5rem;margin:.4rem 0 .6rem">☕ Café Aroma — por que o desconto máximo é 10%?</h2>
+      <p style="font-size:.92rem;color:var(--text-body);margin-bottom:1rem">
+        A empresa fictícia do webinar, com o cérebro ligado: a decisão da Ana sustentada
+        pela evidência do Ricardo, a afirmação do Lucas refutada sem ser apagada, a política
+        antiga superada explicando a atual, uma dúvida aberta e uma evidência envelhecendo
+        à vista de todos. Clique nos nós; a conta do radar está em cada um.
+      </p>
+      <a href="/grafo/cafe-aroma/" style="font-weight:700">navegar o grafo →</a>
+    </article>
+
+    <p style="margin-top:2rem;font-size:.88rem;color:var(--text-muted);max-width:60ch">
+      Próximo desta página: uma fatia do grafo <em>autobiográfico</em> real do framework —
+      publicada após a revisão nó a nó que toda projeção pública exige por aqui.
+      A honestidade sobre o que ainda não está no ar também é doutrina.
+    </p>
+  </main>
+</Base>
