@@ -51,6 +51,8 @@ DOCS=(
   "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
   "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
   "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
+  # a identidade: quem instala aprende O QUE E o Onion (pitch, invencoes, posicionamento)
+  "docs/knowledge-base/meta/onion-framework-identity.md"
 )
 
 # Capability Contract.
