@@ -15,6 +15,9 @@ COMMANDS=(
   ".claude/commands/warm-up.md"
   ".claude/commands/catch-up.md"
   ".claude/commands/onion.md"
+  # kg-freshness: a re-verificacao do grafo contra o vivo (mede+re-carimba). Runtime KG do ADOTANTE
+  # (opera sobre os grafos DELE — KG-SSOT-First), par do kg-radar (o detector, ja em VALIDATION).
+  ".claude/commands/meta/kg-freshness.md"
 )
 # O agente orquestrador mestre.
 AGENTS=(
@@ -52,7 +55,7 @@ DOCS=(
 
 # Capability Contract.
 CONFORMANCE="silver"
-PROVIDES=("master-orchestration" "knowledge-graph-runtime" "sdaal-task-manager" "sdaal-forge" "session-runtime" "dogfood-doctrine" "language-standards")
+PROVIDES=("master-orchestration" "knowledge-graph-runtime" "kg-freshness-reverify" "sdaal-task-manager" "sdaal-forge" "session-runtime" "dogfood-doctrine" "language-standards")
 REQUIRES=(
   "skill:onion-orchestration"
 )

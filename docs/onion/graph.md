@@ -89,6 +89,7 @@
 - **onion** --loads--> embed:kb/onion-dogfooding-doctrine.md
 - **onion** --loads--> when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
 - **onion** --provides--> dogfood-doctrine
+- **onion** --provides--> kg-freshness-reverify
 - **onion** --provides--> knowledge-graph-runtime
 - **onion** --provides--> language-standards
 - **onion** --provides--> master-orchestration
@@ -117,6 +118,7 @@
 - onion **loads** embed:kb/onion-dogfooding-doctrine.md
 - onion **loads** when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
 - onion **provides** dogfood-doctrine
+- onion **provides** kg-freshness-reverify
 - onion **provides** knowledge-graph-runtime
 - onion **provides** language-standards
 - onion **provides** master-orchestration
@@ -459,6 +461,7 @@ onion	loads	embed:kb/knowledge-graph-sdaal.md
 onion	loads	embed:kb/onion-dogfooding-doctrine.md	
 onion	loads	when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)	
 onion	provides	dogfood-doctrine	
+onion	provides	kg-freshness-reverify	
 onion	provides	knowledge-graph-runtime	
 onion	provides	language-standards	
 onion	provides	master-orchestration	
