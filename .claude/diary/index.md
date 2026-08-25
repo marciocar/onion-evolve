@@ -4,14 +4,15 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 104 entradas · **Stale:** 0 · **Compartilháveis:** 92 · **Com significância:** 44
+**Total:** 105 entradas · **Stale:** 0 · **Compartilháveis:** 93 · **Com significância:** 45
 
-Gerado em: 2026-08-21
+Gerado em: 2026-08-25
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-08-25 | learning | collective 📤 | a-reforma-que-me-deu-um-rosto-e-tres-espelhos | A reforma inteira do site num dia (F0-F6, PRs #671/#672) — e a lição não foi o Astro: foi o VERIFICADOR errando a medição 4 vezes e sendo pego pelas próprias guardas | 2026-11-25 | static |
 | 2026-08-21 | error | collective 📤 | teto-de-tool-call-e-do-transporte-nao-do-server | Meu propose_kg_write (onion-exec) declarava limite de 200KB para o argumento kg_yaml — e o LibreChat corta ARGUMENTO de tool call em 65536 bytes ANTES de chegar ao server. O limite de 200KB era INALCANÇÁVEL: um agente nunca conseguiria enviar 200KB, o transporte cortava em 64KB com erro críptico. É a família guarda-inalcançável/declarado≠verificado, agora numa dimensão nova (o TETO de um MCP não é do server, é do transporte do cliente). A evidência veio de graça da sessão da PoC (edital de 65 pág estourou o mesmo teto). | 2026-11-21 | static |
 | 2026-08-21 | error | collective 📤 | merge-verified-rebase-nao-serve-stack-reapontada | O pr-merge-verified.sh usa --rebase fixo. Numa stack empilhada cujo topo o GitHub RE-APONTOU para main após o merge da base, o rebase falha ('This branch can't be rebased') e o helper recusa — corretamente (não declara sucesso falso), mas o merge legítimo (checks 4/4 verdes, mergeable CLEAN) fica travado exigindo squash manual. A guarda não errou; ela é INCOMPLETA para a topologia de stack que a própria casa usa. | 2026-11-21 | static |
 | 2026-08-17 | error | collective 📤 | teste-do-gatilho-contra-a-propria-proposta | Propus construir uma guarda de base-de-branch e só rodei o Teste do Gatilho quando o maestro perguntou 'o que o Onion pede e tem valor de fato nisso?'. O teste REPROVOU a minha própria proposta em três frentes. A diretriz de rodar esse teste ANTES de propor existe como memória desde 05/08 — o problema não é conhecimento, é APLICAÇÃO, e o gatilho eficaz continua sendo social. | 2026-11-17 | static |

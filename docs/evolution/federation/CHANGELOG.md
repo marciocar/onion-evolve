@@ -8,6 +8,17 @@
 
 ---
 
+## 2026-08-25 · O site renasceu — autobiografia completa, doutrinas públicas e o diário em dia · COMPATÍVEL · alvo: todos
+
+O onionevolve.com foi reformado de ponta a ponta (PRs #671/#672): virou projeto Astro com todo
+número derivado da SSOT em build time, a história ganhou os capítulos de julho e agosto, o diário
+público saltou de 41 para 62 migalhas, e nasceram quatro superfícies novas — **/doutrinas/** (a
+área pública que o gate Q_PUBLICATION_AREA esperava: as 7 doutrinas com cicatriz datada e
+mecanismo, em pt e /en/), **/maquinaria/** (o radar refazível no papel + as três críticas de 2026
+respondidas por mecanismo), **/estado/** e **/grafo/** (o Café Aroma navegável). Para adotantes:
+nada muda na maquinaria vendorizada — a novidade citável é que as doutrinas que já viajam com
+vocês agora têm endereço público para apontar a terceiros.
+
 ## 2026-08-18 · A doutrina do Elenxo agora VIAJA com você — e três mecanismos novos na maquinaria vendorizada · COMPATÍVEL (com AÇÃO recomendada) · alvo: todos
 
 - **Contexto (o sinal veio de um adotante — obrigado):** numa adoção de campo, a sessão do adotante
