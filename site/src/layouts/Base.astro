@@ -1,0 +1,52 @@
+---
+// Layout base — o chrome único de todas as páginas (F1 da reforma 2026-08).
+// A nav canônica tem 6 entradas (decisão do plano: 8→6; Provas via Migalhas,
+// "O grafo" absorvido por /maquinaria/).
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** caminho canônico da página, ex.: "/historia/" */
+  path?: string;
+}
+const { title, description, path = '/' } = Astro.props;
+const canonical = new URL(path, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧅</text></svg>"
+    />
+    <link rel="preload" href="/fonts/fraunces-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/fraunces-italic-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="alternate" type="application/rss+xml" title="Migalhas — o diário vivo do Onion Evolve" href="/historia/migalhas/feed.xml" />
+  </head>
+  <body>
+    <nav>
+      <div class="nav-in">
+        <a class="brand" href="/">🧅 Onion Evolve <small>a autobiografia de um framework vivo</small></a>
+        <div class="nav-links">
+          <a href="/historia/">História</a>
+          <a href="/historia/migalhas/">Migalhas</a>
+          <a href="/doutrinas/">Doutrinas</a>
+          <a href="/maquinaria/">Máquina</a>
+          <a href="/estado/">Estado</a>
+          <a class="nav-cta" href="/#comecar">Começar</a>
+        </div>
+      </div>
+    </nav>
+    <slot />
+  </body>
+</html>
