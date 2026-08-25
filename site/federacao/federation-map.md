@@ -1,7 +1,8 @@
-# Mapa de Adoções — Federação Onion (GERADO; não editar à mão)
+# Mapa de Adoções — Federação Onion (snapshot congelado de 2026-07-10)
 
-> Gerado por `.claude/validation/graph.sh --map` de `docs/evolution/federation/members.yaml` (SSOT).
-> **Derivado**, não desenhado à mão — muda quando o `members.yaml` muda. Renderiza no GitHub sem build.
+<!-- snapshot congelado — não regenerar; contexto no repo (site/README.md) -->
+
+> Retrato de **10 de julho de 2026** — preservado como registro histórico.
 
 ```mermaid
 flowchart TD

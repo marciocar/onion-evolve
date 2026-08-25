@@ -10217,11 +10217,30 @@ run_hook_autofix_selftests() {
   rm -rf "${hc}"
 }
 
+# Deploy do site (ops/deploy-site.sh) — a bancada dele é embutida (--selftest, sandbox
+# em mktemp, sem sudo, nunca toca fonte/webroot reais). Nasceu da revisão adversarial do
+# PR #671 (R9: "nada invoca o mecanismo"): os casos são os ataques que REFUTARAM as
+# guardas (symlink-no-topo alcançava mini/, fonte vazia apagava o vivo com veredito
+# verde, quick-check do rsync pulava arquivo alterado no mesmo segundo).
+run_deploy_site_selftests() {
+  local ds="${REPO_ROOT}/ops/deploy-site.sh"
+  if [ ! -f "${ds}" ]; then record_skip "deploy-site: ops/deploy-site.sh ausente"; return; fi
+  command -v rsync >/dev/null 2>&1 || { record_skip "deploy-site: rsync ausente (skip gracioso)"; return; }
+  local rc=0 out
+  out="$(bash "${ds}" --selftest 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "deploy-site: bancada sandbox verde ($(printf '%s' "${out}" | grep -o '[0-9]* pass' | head -1))"
+  else
+    record_fail "deploy-site: --selftest" "rc=${rc}: $(printf '%s' "${out}" | grep '✗' | head -3)"
+  fi
+}
+
 run_hook_autofix_selftests
 run_kg_reverify_schema_selftests
 run_backtick_ref_selftests
 run_site_deeplink_selftests
 run_migalhas_generate_selftests
+run_deploy_site_selftests
 run_rules_registry_selftests
 run_onion_version_tracked_selftests
 run_hub_role_guard_selftests
