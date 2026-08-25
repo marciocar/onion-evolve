@@ -1,0 +1,39 @@
+---
+// ESQUELETO F1 — prova que a fundação funciona (stamp da SSOT + coleção de migalhas).
+// O F2 porta a copy real da home (site/index.html legado) para cá, seção a seção.
+// Este dist/ NÃO é deployado: o webroot segue servido pelo HTML legado até o cutover.
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { inventario, historiaGit } from '../lib/stamp';
+
+const inv = inventario();
+const git = historiaGit();
+const migalhas = (await getCollection('migalhas'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 4);
+---
+
+<Base
+  title="Onion Evolve — o framework que erra, aprende e vira lei. Em público."
+  description="Sistema Onion: o ciclo completo de desenvolvimento com IA — produto, engenharia e compliance — com spec antes do código, sessões retomáveis e evolução auditável no git."
+  path="/"
+>
+  <main class="wrap" style="padding-top:120px">
+    <h1>Esqueleto F1 — fundação Astro</h1>
+    <p>
+      Números da SSOT (classe: {inv.stamp.classe}, build de {inv.stamp.em}):
+      <strong>{inv.comandos}</strong> comandos · <strong>{inv.agentes}</strong> agentes ·
+      <strong>{inv.skills}</strong> skills · <strong>{inv.kbs}</strong> KBs ·
+      <strong>{git.commits}</strong> commits (classe: {git.stamp.classe}).
+    </p>
+    <h2>Últimas migalhas (da coleção)</h2>
+    <ul>
+      {migalhas.map((m) => (
+        <li>
+          <a href={`/historia/migalhas/#post-${m.data.slug}`}>{m.data.title}</a>
+          <small> — {m.data.date.toISOString().slice(0, 10)}</small>
+        </li>
+      ))}
+    </ul>
+  </main>
+</Base>
