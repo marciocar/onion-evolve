@@ -111,6 +111,17 @@ nodes:
     verified_against: "medido nos manifestos: /meta:kg + kb-freshness + context-freshness estao em onion-work-tools (distribuidos); kg-freshness NAO estava em NENHUM plugin (core-only). kg-freshness re-verifica os grafos do adotante contra o vivo (mede+re-carimba) — e runtime KG-SSOT do adotante, nao meta-fabrica nem grafo privado. Gap, nao moat. Achado por duvida do maestro apos a publicacao."
     trace: .claude/utils/marketplace/verticals/onion.manifest.sh
     label: "GAP de cobertura: o runtime KG do plugin `onion` levava o MOTOR (kg-radar) mas nao a re-verificacao (kg-freshness), que ficava core-only. Nao e moat — kg-freshness opera sobre os grafos DO ADOTANTE (KG-SSOT-First). Curado: kg-freshness entra no nucleo `onion`, junto do kg-radar, fechando a historia do runtime KG."
+  - id: E_HOOKS_INERT_ON_INSTALL_FIXED
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-25
+    verified_against: "dogfood de INSTALL num Claude Code limpo (claude 2.1.243): claude plugin marketplace add marciocar/onion-plugins + install onion@onion-plugins → skills/comandos/agente OK, mas `details` mostrou Hooks: 0 — os 2 hooks (exit-2 guard PostToolUse + aside-router UserPromptSubmit) viajavam como ARQUIVO INERTE. Causa: assemble-plugin.sh so copiava o .sh, deixava o registro 'a cargo do consumidor'. Cura: assemble gera hooks/hooks.json (auto-descoberto) mapeando cada hook ao evento do settings.json do core, path ${CLAUDE_PLUGIN_ROOT}. Re-dogfood: install → Hooks: 2. Provado por comportamento."
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "DOGFOOD de INSTALL pegou o que lint nenhum acharia: o plugin empacotava os hooks mas nao os ATIVAVA (Hooks: 0) — a guarda exit-2 (a capacidade que 'compra' o acoplamento ao Claude Code) chegava morta. Assemble agora gera o hooks.json que o Claude Code auto-descobre. Instalar o onion = ganhar a guarda de verdade. fix→re-dogfood no mesmo loop."
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED
     to: E_ONION_CORE_PLUGIN_BORN
@@ -133,6 +144,9 @@ edges:
   - from: E_PUBLIC_REPO_LIVE
     to: E_PROJECT_DOOR_GATE_OPENED
     edge_type: SUPPORTS
+  - from: E_HOOKS_INERT_ON_INSTALL_FIXED
+    to: E_ONION_CORE_PLUGIN_BORN
+    edge_type: CONSTRAINS
   - from: E_KGFRESHNESS_GAP_IN_PLUGIN
     to: E_ONION_CORE_PLUGIN_BORN
     edge_type: CONSTRAINS

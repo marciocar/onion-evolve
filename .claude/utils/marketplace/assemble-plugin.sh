@@ -131,11 +131,44 @@ if [ "${#SKILLS[@]}" -gt 0 ]; then
   mkdir -p "${DEST}/skills" 2>/dev/null
   for s in "${SKILLS[@]}"; do cp -R "${SRC}/${s}" "${DEST}/skills/" 2>/dev/null; done
 fi
-# hooks/ — arquivos (scripts). Só cria a pasta se houver. (Registro via hooks/hooks.json fica a cargo
-# do manifesto/consumidor — o assembler só empacota o script; a cópia é o escopo desta fase.)
+# hooks/ — arquivos (scripts) + REGISTRO. Sem o hooks.json o Claude Code empacota o hook mas NÃO o
+# ativa (dogfood 2026-08-25: install → "Hooks: 0", a guarda exit-2 viajava inerte). O hooks.json é
+# AUTO-DESCOBERTO (como commands/agents/skills); geramos mapeando cada hook empacotado ao EVENTO que o
+# core lhe atribui em settings.json, com o path reescrito para ${CLAUDE_PLUGIN_ROOT}. Nunca invento
+# evento: se o hook não estiver ligado no settings do core, ele não entra no hooks.json (fail-loud no
+# relatório abaixo), pois hook sem evento é ruído inerte.
 if [ "${#HOOKS[@]}" -gt 0 ]; then
   mkdir -p "${DEST}/hooks" 2>/dev/null
   for h in "${HOOKS[@]}"; do cp "${SRC}/${h}" "${DEST}/hooks/" 2>/dev/null && chmod +x "${DEST}/hooks/$(basename "${h}")" 2>/dev/null; done
+  python3 - "${SRC}" "${DEST}/hooks/hooks.json" "${HOOKS[@]}" <<'PYHOOK'
+import json, sys, os, glob
+src, out = sys.argv[1], sys.argv[2]
+bundled = [os.path.basename(h) for h in sys.argv[3:]]
+events = {}
+for fp in sorted(glob.glob(os.path.join(src, ".claude", "settings*.json"))):
+    try: d = json.load(open(fp))
+    except Exception: continue
+    for event, arr in (d.get("hooks") or {}).items():
+        for grp in (arr or []):
+            for hk in (grp.get("hooks") or []):
+                cmd = hk.get("command", "")
+                for bn in bundled:
+                    if bn in cmd and bn not in events.get(event, []):
+                        events.setdefault(event, []).append(bn)
+result = {"hooks": {}}
+for event, bns in events.items():
+    result["hooks"][event] = [
+        {"hooks": [{"type": "command", "command": f'bash "${{CLAUDE_PLUGIN_ROOT}}/hooks/{bn}"'}]}
+        for bn in bns
+    ]
+mapped = {bn for bns in events.values() for bn in bns}
+missing = [bn for bn in bundled if bn not in mapped]
+if missing:
+    sys.stderr.write("AVISO assemble: hook(s) sem evento no settings.json do core (NÃO registrados): %s\n" % ", ".join(missing))
+if result["hooks"]:
+    with open(out, "w") as fh:
+        json.dump(result, fh, indent=2, ensure_ascii=False); fh.write("\n")
+PYHOOK
 fi
 # kb/ — KB de framework embarcado (tipo A). Só cria a pasta se houver.
 if [ "${#DOCS[@]}" -gt 0 ]; then
