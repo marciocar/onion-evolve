@@ -137,11 +137,13 @@ nodes:
   - id: Q_PUBLICATION_AREA
     node_type: question
     layer: audit
-    plane: DEV
+    plane: PROD
     impact: 3
-    confidence: 0.4
-    status: open
-    label: "a area de publicacao de doutrinas ainda nao existe — onde e como a pagina gradua de gated a publica (grupo fechado primeiro)?"
+    confidence: 0.9
+    status: done
+    label: "RESPONDIDA E GRADUADA (2026-08-25, reforma do site, PR #672): a area publica de doutrinas E a pagina /doutrinas/ do onionevolve.com (pt + /en/) — 7 doutrinas no formato sintese→cicatriz-datada→mecanismo-que-cobra + a tabela das 17 invencoes derivada da KB. O gatilho foi o pedido do maestro (gated-until-trigger respeitada: 39 dias entre o gate abrir como pergunta e o uso real prova-lo); o conteudo passou por gate explicito do maestro E revisao adversarial (residuo feat-site-reform-f1-astro). O 'grupo fechado primeiro' foi SUPERADO pelo proprio gatilho: o webinar publico de 25/08 aponta para o site"
+    verified_at: 2026-08-25
+    verified_against: "curl https://onionevolve.com/doutrinas/ -> 200 com as 7 doutrinas ancoradas; /en/doutrinas/ -> 200 lang=en; deploy 11/11 verde"
   - id: Q_BULBO_DIAGRAM
     node_type: question
     layer: audit
@@ -149,7 +151,17 @@ nodes:
     impact: 2
     confidence: 0.4
     status: open
-    label: "um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco?"
+    label: "um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZADO 2026-08-25: a doutrina GRADUOU em /doutrinas/ como texto; o visual segue candidato aberto para a pagina]"
+
+  - id: Q_RADAR_WIDGET_PARALLEL_FORMULA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: "o RadarWidget de /maquinaria/ (site) DUPLICA a tabela de statusFactor do kg-radar.sh (conferida fator a fator na revisao adversarial: bate hoje, incluindo drifted 1.3) — e uma fonte paralela sem amarra. GATILHO NOMEADO: qualquer mudanca nos fatores do kg-radar.sh OU a 1a divergencia observada exige derivar a tabela do motor em build time (o stamp.ts ja mostra o padrao). Achado 8 da revisao do PR #672, parqueado por decisao"
+    verified_against: "grep dos fatores em site/src/components/RadarWidget.astro x .claude/validation/kg-radar.sh linhas 10-11 em 2026-08-25 (identicos)"
 
   # ---- entidades (as ancoras cientificas — emprestimo, citado) ----
   - id: ENT_TRANSFORMER
@@ -278,3 +290,7 @@ edges:
   - from: E_ADOPTER_DID_NOT_KNOW_ELENXO
     to: C_POROSITY_STRUCTURAL
     edge_type: SUPPORTS
+  # a divida do widget nasce da mesma graduacao que fechou a pergunta da area publica
+  - from: Q_RADAR_WIDGET_PARALLEL_FORMULA
+    to: Q_PUBLICATION_AREA
+    edge_type: DEPENDS_ON
