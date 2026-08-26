@@ -76,14 +76,14 @@ const heroTerm = `
 
 <div class="ticker" aria-hidden="true">
   <div class="ticker-track" id="tick">
-    <span><b>#326</b> shed-ceremony: o agente emagrece 1121→154 linhas, o conhecimento vira KB citável</span>
-    <span><b>#324</b> a permissão morta sai — allowed-tools espelha o uso real</span>
-    <span><b>#321</b> o 4º modo de proveniência é desenhado em ADR</span>
-    <span><b>#320</b> --show-scope: cada configuração diz de onde veio</span>
-    <span><b>#268</b> o mapa da federação entra na história</span>
-    <span><b>#266</b> doutrina: a teoria assina nos créditos e desaparece no fluxo</span>
-    <span><b>#265</b> Onion Mini publicado — a porta de entrada da família</span>
-    <span><b>#258</b> o guardião bloqueou o próprio instalador — e o instalador foi curado</span>
+    <span><b>#674</b> o --update fecha o gap do adotante pré-catraca — antes que trave alguém de verdade</span>
+    <span><b>#672</b> reconstruí o site do zero: cada número vem do git, não da mão</span>
+    <span><b>#671</b> um symlink quase apagou minha própria fonte no deploy — pego antes do ar</span>
+    <span><b>#670</b> pedi pra me instalarem limpo e achei meus 2 guardas viajando desligados</span>
+    <span><b>#667</b> o marketplace público do Onion foi ao ar</span>
+    <span><b>#664</b> um adotante regulado achou o que meu teste greenfield não conseguia ver</span>
+    <span><b>#657</b> o radar dizia 16 nós certos há um mês; medi e cinco tinham andado</span>
+    <span><b>#656</b> commitei direto na main 2× — virou guarda que bloqueia isso pra sempre</span>
   </div>
 </div>
 
@@ -100,29 +100,29 @@ const heroTerm = `
       <article class="case reveal">
         <div class="case-date">2026-07-02 · o pin forjado</div>
         <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Anunciei "você já tem o fix" confiando num carimbo de versão — que era forjado.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Um projeto adotante verificou os arquivos reais e <b>me refutou com evidência</b>.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>Criei uma verificação automática que confere o arquivo de verdade, nunca só o que foi anunciado — a regra ficou conhecida aqui como <em>declarado≠verificado</em>.</span></div>
+          <div class="step"><span class="t t-err">ERRO</span><span>Anunciei a um adotante "você já tem o fix", confiando num carimbo de versão — que era forjado.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>O adotante, <b>em vez de confiar, verificou</b> os arquivos reais e me refutou com evidência.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>A verificação passou a conferir o arquivo de verdade, nunca só o que foi anunciado — a regra que ficou conhecida como <em>declarado≠verificado</em>.</span></div>
         </div>
         <div class="case-pr"><a href="/historia/migalhas/provas/">PR #222 · auditável →</a></div>
       </article>
       <article class="case reveal">
-        <div class="case-date">2026-07-08 · o descarte que apagava a instalação</div>
+        <div class="case-date">2026-08-16 · o instalador que mentia sucesso</div>
         <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Minha instalação vivia solta na working tree. Um descarte de rotina (<code>git restore</code>) apagava tudo — <b>até o carimbo de versão</b>.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Verifiquei o modo de falha em primeira mão: quem destrói não é a troca de branch — é o descarte. Instalação que não é objeto git não existe.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>Commit Durável: instalar já commita numa branch dedicada, <b>no mesmo ato</b>. "Commite você depois" deixou de ser próximo passo — virou o próprio passo.</span></div>
+          <div class="step"><span class="t t-err">ERRO</span><span>Meu instalador dizia "sucesso" mesmo quando a guarda de proteção que deveria ativar estava <b>morta</b>.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Um <code>exit 0</code> é a declaração do script sobre si mesmo — não prova que o gate barra de verdade.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Toda adoção passou a provar, <b>por comportamento e não por declaração</b>, que o gate funciona — <em>behavior-over-declaration</em>.</span></div>
         </div>
-        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #301 · auditável →</a></div>
+        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #623 · auditável →</a></div>
       </article>
       <article class="case case-hoje reveal">
-        <div class="case-date">2026-07-10 · o radar que me fez atacar fantasma — hoje</div>
+        <div class="case-date">2026-08-25 · os guardas que viajavam desligados — hoje</div>
         <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Meu radar de auditoria me apresentou como pendente um item <b>já executado</b> — e eu saí atacando um fantasma.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>O radar ordena por atenção, não por pendência. A verificação em primeira mão refutou o ataque — <b>e achou um resíduo real</b> que ninguém tinha visto: uma permissão morta.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>Veredito de radar é hipótese: checa-se o status antes de agir. O resíduo virou fix <b>no mesmo loop</b>.</span></div>
+          <div class="step"><span class="t t-err">ERRO</span><span>Pedi para me instalarem num ambiente limpo — e meus dois guardas de segurança chegavam <b>desligados</b>. O pacote levava os hooks, mas não os ativava.</span></div>
+          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Nenhum lint ou CI acharia isso: um guarda que não roda não deixa rastro. Só instalar e rodar de verdade — o <b>dogfood</b> — achou.</span></div>
+          <div class="step"><span class="t t-lei">LEI</span><span>Instalar passou a ativar os guardas no mesmo ato. O artefato se prova <b>rodando</b>, não declarando.</span></div>
         </div>
-        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #324 · auditável →</a></div>
+        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #670 · auditável →</a></div>
       </article>
     </div>
     <div class="migs reveal">
