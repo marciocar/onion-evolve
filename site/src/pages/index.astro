@@ -100,24 +100,6 @@ const terminal = `
         <div class="case-pr"><a href="/historia/migalhas/provas/">PR #222 · auditável →</a></div>
       </article>
       <article class="case reveal">
-        <div class="case-date">2026-07-05 · o guardião contra o instalador</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Na primeira adoção de campo, meu hook de qualidade recém-instalado <b>bloqueou o commit do meu próprio instalador</b>.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>O comando de adoção tinha um gap invisível havia semanas — só o uso real o revelou.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>O passo que faltava entrou no comando <b>no mesmo ciclo</b>. O sistema imunológico funcionou — contra mim.</span></div>
-        </div>
-        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #258 · auditável →</a></div>
-      </article>
-      <article class="case reveal">
-        <div class="case-date">2026-07-05 · cinco fricções, um dia</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ATRITO</span><span>O primeiro produto educacional de campo rangeu contra minha doutrina em 5 pontos reais.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Cada fricção subiu como sinal, foi triada e julgada com evidência.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>Doutrina revisada para v1.3.0 <b>em 24 horas</b> — incluindo: "a teoria assina nos créditos e desaparece no fluxo".</span></div>
-        </div>
-        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #266 · auditável →</a></div>
-      </article>
-      <article class="case reveal">
         <div class="case-date">2026-07-08 · o descarte que apagava a instalação</div>
         <div class="case-body">
           <div class="step"><span class="t t-err">ERRO</span><span>Minha instalação vivia solta na working tree. Um descarte de rotina (<code>git restore</code>) apagava tudo — <b>até o carimbo de versão</b>.</span></div>
@@ -125,24 +107,6 @@ const terminal = `
           <div class="step"><span class="t t-lei">LEI</span><span>Commit Durável: instalar já commita numa branch dedicada, <b>no mesmo ato</b>. "Commite você depois" deixou de ser próximo passo — virou o próprio passo.</span></div>
         </div>
         <div class="case-pr"><a href="/historia/migalhas/provas/">PR #301 · auditável →</a></div>
-      </article>
-      <article class="case reveal">
-        <div class="case-date">2026-07-09 · o campo corrigiu a lei nova</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ATRITO</span><span>A lei do card anterior tinha <b>um dia de vida</b> quando um adotante de campo a quebrou: o commit durável salvava o framework — mas esquecia os artefatos gerados na adoção.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Dogfood de terceiro vale mais que o meu: o furo só apareceu numa adoção real, fora da minha máquina.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>O helper passou a incluir toda a superfície gerada — com selftest cobrando para sempre.</span></div>
-        </div>
-        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #303 · auditável →</a></div>
-      </article>
-      <article class="case reveal">
-        <div class="case-date">2026-07-10 · o re-carimbo que apagava a data de nascença</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Um deslize de sessão re-carimbou o <code>adopted_at</code> de um adotante — <b>a data da primeira adoção sumiu</b> do registro.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Semântica que vive "em quem chama" se perde no primeiro descuido. O sinal subiu do campo, com testemunho.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>A escrita do carimbo virou helper determinístico com selftest: <code>adopted_at</code> <b>nunca</b> re-carimba; perdido, restaura-se do registro da federação — nunca se inventa.</span></div>
-        </div>
-        <div class="case-pr"><a href="/historia/migalhas/provas/">commit d1a3e5d · auditável →</a></div>
       </article>
       <article class="case case-hoje reveal">
         <div class="case-date">2026-07-10 · o radar que me fez atacar fantasma — hoje</div>
@@ -211,10 +175,6 @@ const terminal = `
     <span class="kick">Como eu cresço</span>
     <h2>Três dimensões nasceram comigo.<br><em>Duas verticais nasceram de evidência.</em></h2>
     <p class="lead">Não crio verticais por roadmap — crio quando um dogfood real prova que preciso. Produto, Engenharia e Compliance são fundadoras; Investigação e Educação nasceram nesta mesma semana, do jeito que tudo aqui nasce.</p>
-    <div class="vert-founding">
-      <span>🎯 Produto</span><span>⚙️ Engenharia</span><span>🛡️ Compliance</span>
-      <span class="vert-tag">fundadoras · peer desde sempre</span>
-    </div>
     <div class="dims" style="margin-top:1.4rem">
       <div class="dim" style="border-top-color:var(--purple)">
         <span class="ico" aria-hidden="true">🔍</span>
@@ -224,12 +184,8 @@ const terminal = `
       <div class="dim" style="border-top-color:var(--green)">
         <span class="ico" aria-hidden="true">🎓</span>
         <h3>Educação</h3>
-        <p>Nasceu de trabalho real: Marcio já ensinava Spec-as-Code em consultoria e capacitação; o Pulse Mais (pulsemais.org.br) me tornou vertical oficial. A pesquisa veio depois — 75 verificadores adversariais — para dar rigor ao que a prática validava. Batizei a prática de <b>Descasca</b>; a doutrina, de <b>Método Onion</b>.</p>
+        <p>Nasceu de trabalho real: Marcio já ensinava Spec-as-Code em consultoria e capacitação; o Pulse Mais (pulsemais.org.br) me tornou vertical oficial. A pesquisa veio depois — 75 verificadores adversariais — para dar rigor ao que a prática validava. Batizei a prática de <b>Descasca</b>; a doutrina, de <b>Método Onion</b>. <a href="/pulse-mais/">Ver os materiais do aluno →</a></p>
       </div>
-    </div>
-    <div class="belief-box">
-      <span class="n">Crença central</span>
-      <p>Minha constituição são <b>5 meta-specs que eu mesmo leio antes de agir</b> — arquitetura, agentes, comandos, padrões de código, integrações. Eu só edito uma delas com evidência; nunca por capricho, nunca por preferência de estilo.</p>
     </div>
   </div>
 </section>
@@ -244,13 +200,9 @@ const terminal = `
     <div class="methods">
       <div class="method"><h3>Dogfood Doctrine</h3><p>Toda mudança no framework se valida executando o artefato de verdade — inclusive contra si mesmo.</p></div>
       <div class="method"><h3>Declarado ≠ Verificado</h3><p>Nenhum carimbo, status ou tabela é aceito como fato sem o artefato que o comprove. Guardas determinísticas fazem a cobrança.</p></div>
-      <div class="method"><h3>Fonte ≠ Derivação</h3><p>Teoria, tokens, contagens: a fonte vive num único lugar; todo o resto cita. Se a fonte muda, edita-se UM arquivo.</p></div>
-      <div class="method"><h3>SDAAL — o adapter do Transformer</h3><p>O contrato que deixa a IA <b>intercambiar ações</b> com qualquer sistema externo sem reaprender nada: a spec define O QUÊ, o adapter resolve O COMO. Task manager (Jira/ClickUp/Asana/Linear) foi só a 1ª instância — o mesmo padrão já move o host de código (forge), o grafo de conhecimento e a federação inteira.</p></div>
-      <div class="method"><h3>Radar de Grafo</h3><p>Decisões, evidências e contradições modeladas como grafo — com radar determinístico que aponta o que está órfão ou refutado.</p></div>
-      <div class="method"><h3>Motor Planejar→Executar→Avaliar</h3><p>Todo ciclo fecha com redesenho explícito — avaliar sem redesenhar é só dar nota. (A teoria assina nos créditos.)</p></div>
-      <div class="method"><h3>Sessões Retomáveis</h3><p>Estado persistente por feature: qualquer sessão retoma do checkpoint exato, dias depois, sem reexplicar nada.</p></div>
-      <div class="method"><h3>Capacidade ≠ Implementação</h3><p>Reconhecer que algo cabe em mim não é gatilho para incorporar. Uma feature real (nascida de um pedido de chat) foi extraída para repo próprio — capacidade anotada, DNA preservado.</p></div>
+      <div class="method"><h3>SDAAL — o adapter do Transformer</h3><p>O contrato que deixa a IA <b>intercambiar ações</b> com qualquer sistema externo sem reaprender nada: a spec define O QUÊ, o adapter resolve O COMO — task manager, forge, grafo e federação inteira.</p></div>
     </div>
+    <p style="text-align:center;margin-top:1.4rem"><a class="mentor-link" href="/doutrinas/">Ver as 8 doutrinas com nome próprio →</a></p>
   </div>
 </section>
 
@@ -264,10 +216,10 @@ const terminal = `
       <div class="num"><b data-n={inv.kbs}>0</b><span>knowledge bases</span></div>
       <div class="num"><b data-n="4">0</b><span>membros federados</span></div>
       <div class="num"><b data-n="7">0</b><span>linhagens vivas</span></div>
-      <div class="num"><b data-n="448">0</b><span>PRs mergeados</span></div>
+      <div class="num"><b data-n="667">0</b><span>PRs mergeados</span></div>
       <div class="num"><b data-n="2">0</b><span>produtos federados no ar</span></div>
     </div>
-    <p class="num-stamp congelado-no-tempo">contagem derivada do git em 2026-07-22 (448 PRs mergeados, 951 commits) — os números canônicos vivem no inventário, versionado</p>
+    <p class="num-stamp congelado-no-tempo">contagem derivada do git em 2026-08-26 (667 PRs mergeados, 1384 commits) — os números canônicos vivem no inventário, versionado</p>
     <div class="fed-teaser" id="federacao">
       <div class="fed-stat"><b>4</b><span>membros · 7 linhagens vivas</span></div>
       <p style="flex:1; min-width:240px; font-size:.96rem; color:var(--text-body); margin:0">Repositórios que verificam uns aos outros <b>com evidência, não confiança cega</b> — um deles já me refutou publicamente (o card do pin forjado, acima).</p>
@@ -306,8 +258,6 @@ const terminal = `
     <h2>Uma família inteira,<br><em>cada peça no seu papel.</em></h2>
     <div class="eco">
       <a class="eco-card" href="/mini/"><span class="ico" aria-hidden="true">🌱</span><h3>Onion Mini</h3><p>A metodologia destilada em 78 linhas. Roda em qualquer IA — até em web chat gratuito. O começo ideal.</p><span class="go">começar agora →</span></a>
-      <a class="eco-card" href="/historia/"><span class="ico" aria-hidden="true">📖</span><h3>O Capítulo Novo</h3><p>A autobiografia continua: sete dias, 64 commits, contados em primeira pessoa — com as cicatrizes.</p><span class="go">ler a história →</span></a>
-      <a class="eco-card" href="/pulse-mais/"><span class="ico" aria-hidden="true">🎓</span><h3>Pulse Mais</h3><p>pulsemais.org.br — organização real que ajudo a ensinar Desenvolvimento com IA a devs e não-devs; a origem da minha vertical educacional. Materiais construídos com eles, com o motor de autorregulação embutido.</p><span class="go">ver os materiais →</span></a>
       <a class="eco-card" href="/historia/migalhas/provas/"><span class="ico" aria-hidden="true">⚡</span><h3>O Core, auditável</h3><p>Cada lição carrega prova pública: o que mudou, quando entrou e o tamanho da mudança — datado e auditável, sem abrir o código.</p><span class="go">ver as provas →</span></a>
     </div>
   </div>
