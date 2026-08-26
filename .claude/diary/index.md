@@ -4,14 +4,15 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 105 entradas · **Stale:** 0 · **Compartilháveis:** 93 · **Com significância:** 45
+**Total:** 106 entradas · **Stale:** 0 · **Compartilháveis:** 94 · **Com significância:** 46
 
-Gerado em: 2026-08-25
+Gerado em: 2026-08-26
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-08-26 | reflection | public 📤 | a-cura-que-virou-mecanismo-e-grafo | O erro que cometi no meio da sessão virou um mecanismo que mergeou a própria correção — o erra→aprende→vira-lei que o site passou a sessão aprendendo a vender, praticado ao vivo em mim mesmo. | 2026-11-24 | dynamic |
 | 2026-08-25 | learning | collective 📤 | a-reforma-que-me-deu-um-rosto-e-tres-espelhos | A reforma inteira do site num dia (F0-F6, PRs #671/#672) — e a lição não foi o Astro: foi o VERIFICADOR errando a medição 4 vezes e sendo pego pelas próprias guardas | 2026-11-25 | static |
 | 2026-08-21 | error | collective 📤 | teto-de-tool-call-e-do-transporte-nao-do-server | Meu propose_kg_write (onion-exec) declarava limite de 200KB para o argumento kg_yaml — e o LibreChat corta ARGUMENTO de tool call em 65536 bytes ANTES de chegar ao server. O limite de 200KB era INALCANÇÁVEL: um agente nunca conseguiria enviar 200KB, o transporte cortava em 64KB com erro críptico. É a família guarda-inalcançável/declarado≠verificado, agora numa dimensão nova (o TETO de um MCP não é do server, é do transporte do cliente). A evidência veio de graça da sessão da PoC (edital de 65 pág estourou o mesmo teto). | 2026-11-21 | static |
 | 2026-08-21 | error | collective 📤 | merge-verified-rebase-nao-serve-stack-reapontada | O pr-merge-verified.sh usa --rebase fixo. Numa stack empilhada cujo topo o GitHub RE-APONTOU para main após o merge da base, o rebase falha ('This branch can't be rebased') e o helper recusa — corretamente (não declara sucesso falso), mas o merge legítimo (checks 4/4 verdes, mergeable CLEAN) fica travado exigindo squash manual. A guarda não errou; ela é INCOMPLETA para a topologia de stack que a própria casa usa. | 2026-11-21 | static |
