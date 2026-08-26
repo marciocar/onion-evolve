@@ -3,30 +3,48 @@
    este arquivo começa exatamente onde o global termina (hero em diante).
    Importado por src/pages/index.astro. */
 
-/* ── hero ── */
-.hero { min-height:82svh; display:grid; place-content:center; text-align:center; padding:120px 24px 50px; overflow:hidden; }
-.rings { position:absolute; inset:0; display:grid; place-content:center; pointer-events:none; opacity:.5; }
-.rings circle { fill:none; stroke-width:1.2; transform-origin:center; }
-.r-spin { animation:ringspin 90s linear infinite; transform-origin:center; transform-box:fill-box; }
-.r-spin2 { animation:ringspin 140s linear infinite reverse; transform-origin:center; transform-box:fill-box; }
-@keyframes ringspin { to { transform:rotate(360deg); } }
-.hero-in { position:relative; max-width:880px; }
-.badge { display:inline-flex; align-items:center; gap:9px; font-size:.74rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase;
-         color:var(--purple); background:var(--purple-dim); border:1px solid var(--purple-glow); padding:.48rem 1.05rem; border-radius:99px; margin-bottom:1.8rem; }
-.badge .pulse { width:8px; height:8px; border-radius:50%; background:var(--green); animation:bpulse 2s ease-in-out infinite; }
-@keyframes bpulse { 0%,100%{box-shadow:0 0 0 0 rgba(47,122,78,.5)} 50%{box-shadow:0 0 0 6px rgba(47,122,78,0)} }
-.hero h1 { font-size:clamp(1.9rem, 4.4vw, 3.15rem); font-variation-settings:'opsz' 32; }
-.hero h1 .hl { background:linear-gradient(115deg, var(--orange), var(--purple)); -webkit-background-clip:text; background-clip:text; color:transparent; font-style:italic; }
-.caret { display:inline-block; width:3px; height:.9em; background:var(--orange); vertical-align:-.1em; animation:blink 1s steps(1) infinite; }
-@keyframes blink { 50%{opacity:0} }
-.hero .sub { max-width:640px; margin:1.7rem auto 0; font-size:1.14rem; color:var(--text-body); }
-.hero-ctas { display:flex; flex-wrap:wrap; gap:.8rem; justify-content:center; margin-top:2.2rem; }
-.btn { display:inline-flex; align-items:center; gap:.5rem; text-decoration:none; font-weight:700; font-size:.95rem; padding:.85rem 1.7rem; border-radius:99px; transition:transform .16s ease, box-shadow .16s ease; }
+/* ── hero (faixa DARK, laranja vivo — redesign 2026-08: "o conhecimento na cabeça das pessoas") ── */
+.hero { --h-ground:#0A0806; --h-ink:#FDF9F3; --h-mut:#D2C6B7; --h-dim:#93856F;
+        --h-orange:#FF6A2B; --h-orange-hot:#FF8C42; --h-purple:#C074FF; --h-line:#3D3128; --h-line-strong:#5B4B3C;
+        position:relative; min-height:90svh; display:grid; place-content:center; text-align:center;
+        padding:132px 24px 66px; overflow:hidden; background:var(--h-ground); color:var(--h-ink); }
+.hero-aura { position:absolute; inset:-30% -10% auto -10%; height:130%; z-index:0; pointer-events:none; filter:blur(64px); opacity:.6; }
+.hero-aura::before, .hero-aura::after { content:""; position:absolute; border-radius:50%; }
+.hero-aura::before { width:52vw; height:52vw; left:2vw; top:-14vw; background:radial-gradient(circle at 40% 40%, var(--h-orange) 0%, transparent 62%); }
+.hero-aura::after { width:46vw; height:46vw; right:2vw; top:-6vw; background:radial-gradient(circle at 60% 40%, var(--h-purple) 0%, transparent 62%); }
+.hero-grid { position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.5;
+             background-image:linear-gradient(var(--h-line) 1px,transparent 1px),linear-gradient(90deg,var(--h-line) 1px,transparent 1px); background-size:64px 64px;
+             -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 26%,#000 30%,transparent 80%); mask-image:radial-gradient(ellipse 80% 70% at 50% 26%,#000 30%,transparent 80%); }
+.hero-in { position:relative; z-index:1; max-width:900px; }
+.badge { display:inline-flex; align-items:center; gap:9px; font-family:var(--mono); font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+         color:var(--h-orange); background:rgba(255,106,43,.1); border:1px solid rgba(255,106,43,.38); padding:.5rem 1.1rem; border-radius:99px; margin-bottom:1.9rem; }
+.badge .pulse { width:8px; height:8px; border-radius:50%; background:var(--h-orange); animation:bpulse 2s ease-in-out infinite; }
+@keyframes bpulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,106,43,.55)} 50%{box-shadow:0 0 0 7px rgba(255,106,43,0)} }
+.hero h1 { font-size:clamp(2.3rem, 6vw, 4.5rem); font-variation-settings:'opsz' 40; color:var(--h-ink); line-height:1.03; }
+.hero h1 .hl { color:var(--h-orange); font-style:italic; -webkit-text-fill-color:currentColor; text-shadow:0 0 44px rgba(255,106,43,.5); }
+.hero h1 .hl2 { color:var(--h-purple); font-style:italic; text-shadow:0 0 44px rgba(192,116,255,.42); }
+.hero .sub { max-width:660px; margin:1.9rem auto 0; font-size:clamp(1.08rem, 1.7vw, 1.3rem); color:var(--h-mut); line-height:1.62; }
+.hero .sub strong { color:var(--h-ink); font-weight:600; }
+.hero-ctas { display:flex; flex-wrap:wrap; gap:.8rem; justify-content:center; margin-top:2.3rem; }
+.btn { display:inline-flex; align-items:center; gap:.5rem; text-decoration:none; font-weight:700; font-size:.95rem; padding:.9rem 1.8rem; border-radius:99px; transition:transform .16s ease, box-shadow .16s ease, background .2s; }
 .btn:hover { transform:translateY(-2px); }
-.btn-p { color:#fff; background:var(--orange); box-shadow:0 10px 26px -12px var(--orange-glow); }
-.btn-p:hover { background:var(--orange-light); }
-.btn-s { color:var(--text); border:1.5px solid var(--border-warm); background:var(--bg-card); }
-.hero-note { margin-top:.9rem; font-size:.8rem; color:var(--text-muted); }
+.hero .btn-p { color:#170a02; background:var(--h-orange); box-shadow:0 10px 40px -8px rgba(255,106,43,.6); }
+.hero .btn-p:hover { background:var(--h-orange-hot); }
+.hero .btn-s { color:var(--h-ink); border:1.5px solid var(--h-line-strong); background:transparent; }
+.hero .btn-s:hover { border-color:var(--h-orange); color:var(--h-orange-hot); }
+.hero-note { max-width:660px; margin:1.5rem auto 0; font-size:.83rem; color:var(--h-dim); line-height:1.62; }
+.hero-note strong { color:var(--h-mut); font-weight:600; }
+/* terminal do hero — a trilha de decisão */
+.hero-term { margin:2.5rem auto 0; max-width:680px; text-align:left; border:1px solid var(--h-line-strong); border-radius:8px;
+             background:linear-gradient(180deg,#151110,#0f0c0b); overflow:hidden; box-shadow:0 30px 80px -40px #000; }
+.ht-bar { display:flex; align-items:center; gap:8px; padding:11px 15px; border-bottom:1px solid var(--h-line); background:#120f0e; }
+.ht-bar i { width:11px; height:11px; border-radius:50%; background:var(--h-line-strong); }
+.ht-bar i:first-child { background:rgba(255,107,103,.4); }
+.ht-bar span { margin-left:8px; font-family:var(--mono); font-size:.72rem; color:var(--h-dim); letter-spacing:.03em; }
+.ht-body { padding:18px 20px; font-family:var(--mono); font-size:.82rem; line-height:1.85; white-space:pre-wrap; color:var(--h-mut); overflow-x:auto; }
+.ht-body .p { color:var(--h-orange); } .ht-body .ok { color:#57D06F; } .ht-body .ar { color:var(--h-purple); }
+.ht-body .c { color:var(--h-ink); background:#241d18; padding:1px 6px; border-radius:3px; font-size:.79rem; }
+@media (max-width:560px){ .ht-body { font-size:.74rem; } }
 
 /* ── ticker ── */
 .ticker { border-block:1px solid var(--border); background:var(--bg-card); overflow:hidden; padding:.6rem 0; }
