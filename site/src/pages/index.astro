@@ -10,11 +10,15 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { inventario } from '../lib/stamp';
+import { ticker, prova } from '../lib/vitrines';
 import SecaoDemissao from '../components/SecaoDemissao.astro';
 import SecaoSuperficies from '../components/SecaoSuperficies.astro';
 import '../styles/home.css';
 
 const inv = inventario();
+// Vitrines projetadas do grafo (build valida a seleção contra pr-decision-history.kg.yaml)
+const tickerItems = ticker();
+const provaCards = prova();
 const ultimas = (await getCollection('migalhas'))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 4);
@@ -76,14 +80,9 @@ const heroTerm = `
 
 <div class="ticker" aria-hidden="true">
   <div class="ticker-track" id="tick">
-    <span><b>#674</b> o --update fecha o gap do adotante pré-catraca — antes que trave alguém de verdade</span>
-    <span><b>#672</b> reconstruí o site do zero: cada número vem do git, não da mão</span>
-    <span><b>#671</b> um symlink quase apagou minha própria fonte no deploy — pego antes do ar</span>
-    <span><b>#670</b> pedi pra me instalarem limpo e achei meus 2 guardas viajando desligados</span>
-    <span><b>#667</b> o marketplace público do Onion foi ao ar</span>
-    <span><b>#664</b> um adotante regulado achou o que meu teste greenfield não conseguia ver</span>
-    <span><b>#657</b> o radar dizia 16 nós certos há um mês; medi e cinco tinham andado</span>
-    <span><b>#656</b> commitei direto na main 2× — virou guarda que bloqueia isso pra sempre</span>
+    {tickerItems.map((t) => (
+      <span><b>#{t.n}</b> {t.text}</span>
+    ))}
   </div>
 </div>
 
@@ -97,33 +96,17 @@ const heroTerm = `
       evidência</b>. Isto é o histórico de decisões funcionando como prova — não um changelog encenado.</p>
     </div>
     <div class="cases">
-      <article class="case reveal">
-        <div class="case-date">2026-07-02 · o pin forjado</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Anunciei a um adotante "você já tem o fix", confiando num carimbo de versão — que era forjado.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>O adotante, <b>em vez de confiar, verificou</b> os arquivos reais e me refutou com evidência.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>A verificação passou a conferir o arquivo de verdade, nunca só o que foi anunciado — a regra que ficou conhecida como <em>declarado≠verificado</em>.</span></div>
-        </div>
-        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #222 · auditável →</a></div>
-      </article>
-      <article class="case reveal">
-        <div class="case-date">2026-08-16 · o instalador que mentia sucesso</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Meu instalador dizia "sucesso" mesmo quando a guarda de proteção que deveria ativar estava <b>morta</b>.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Um <code>exit 0</code> é a declaração do script sobre si mesmo — não prova que o gate barra de verdade.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>Toda adoção passou a provar, <b>por comportamento e não por declaração</b>, que o gate funciona — <em>behavior-over-declaration</em>.</span></div>
-        </div>
-        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #623 · auditável →</a></div>
-      </article>
-      <article class="case case-hoje reveal">
-        <div class="case-date">2026-08-25 · os guardas que viajavam desligados — hoje</div>
-        <div class="case-body">
-          <div class="step"><span class="t t-err">ERRO</span><span>Pedi para me instalarem num ambiente limpo — e meus dois guardas de segurança chegavam <b>desligados</b>. O pacote levava os hooks, mas não os ativava.</span></div>
-          <div class="step"><span class="t t-apr">APRENDIZADO</span><span>Nenhum lint ou CI acharia isso: um guarda que não roda não deixa rastro. Só instalar e rodar de verdade — o <b>dogfood</b> — achou.</span></div>
-          <div class="step"><span class="t t-lei">LEI</span><span>Instalar passou a ativar os guardas no mesmo ato. O artefato se prova <b>rodando</b>, não declarando.</span></div>
-        </div>
-        <div class="case-pr"><a href="/historia/migalhas/provas/">PR #670 · auditável →</a></div>
-      </article>
+      {provaCards.map((c, i) => (
+        <article class="case reveal">
+          <div class="case-date">{c.date} · {c.titulo}{i === provaCards.length - 1 ? ' — hoje' : ''}</div>
+          <div class="case-body">
+            <div class="step"><span class="t t-err">ERRO</span><span>{c.erro}</span></div>
+            <div class="step"><span class="t t-apr">APRENDIZADO</span><span>{c.aprendizado}</span></div>
+            <div class="step"><span class="t t-lei">LEI</span><span>{c.lei}</span></div>
+          </div>
+          <div class="case-pr"><a href="/historia/migalhas/provas/">PR #{c.n} · auditável →</a></div>
+        </article>
+      ))}
     </div>
     <div class="migs reveal">
       <div class="migs-head">
