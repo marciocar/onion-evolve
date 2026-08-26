@@ -6991,6 +6991,39 @@ run_regen_baselines_selftests() {
   rm -rf "${d}"
 }
 
+# Modo regen-ensure-from — adotante PRE-CATRACA (D_ADOPT_MUST_EMIT_MISSING_BASELINES). Sem o baseline
+# proprio, a catraca fica NO-BASELINE (fail-closed) apos o update. `--ensure-from <SOURCE>` semeia stub
+# p/ cada baseline que o core DEFINE mas o alvo NAO tem, e o loop emite do CORPUS DO ADOTANTE. Dogfood
+# real num adotante pré-catraca (2026-08-25): rc 1→0. (a) cura resolve; (b) MUT sem --ensure-from → NO-BASELINE fica.
+run_regen_ensure_from_selftests() {
+  local regen="${SCRIPT_DIR}/../utils/adopt/regen-baselines.sh"
+  local cov="${SCRIPT_DIR}/kg-verification-coverage.sh"
+  [ -f "${regen}" ] && [ -f "${cov}" ] || { record_pass "regen-ensure-from: helper ausente — nada a testar"; return; }
+  export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
+  _mk_preca() { local ad="$1"; mkdir -p "$ad/.claude/validation/lib"
+    cp "${cov}" "$ad/.claude/validation/"; cp "${SCRIPT_DIR}/lib/"*.awk "$ad/.claude/validation/lib/" 2>/dev/null || true
+    printf 'source_commit: x\nrole: adopted\n' > "$ad/.claude/.onion-version"
+    git -C "$ad" init -q; git -C "$ad" add -A; git -C "$ad" commit -qm adopt >/dev/null 2>&1; }
+  local w; w="$(mktemp -d)"; trap 'rm -rf "'"$w"'"' RETURN
+  # (a) com --ensure-from: NO-BASELINE some, catraca passa
+  local ad="$w/a"; _mk_preca "$ad"
+  local rc0=0; bash "${cov}" "$ad" >/dev/null 2>&1 || rc0=$?
+  bash "${regen}" "$ad" --ensure-from "${REPO_ROOT}" >/dev/null 2>&1 || true
+  local rc1=0; bash "${cov}" "$ad" >/dev/null 2>&1 || rc1=$?
+  if [ "$rc0" -ne 0 ] && [ "$rc1" -eq 0 ] && [ -f "$ad/.claude/validation/kg-verification-baseline.txt" ]; then
+    record_pass "regen-ensure-from: (a) pré-catraca NO-BASELINE (rc=$rc0) → --ensure-from emite → catraca passa (rc=$rc1)"
+  else record_fail "regen-ensure-from: (a)" "esperava rc antes!=0 e depois=0 (veio $rc0→$rc1) + baseline presente"; fi
+  # (b) MUT: sem --ensure-from, o NO-BASELINE PERSISTE (a flag é load-bearing)
+  local adb="$w/b"; _mk_preca "$adb"
+  bash "${regen}" "$adb" >/dev/null 2>&1 || true
+  local rc2=0; bash "${cov}" "$adb" >/dev/null 2>&1 || rc2=$?
+  if [ "$rc2" -ne 0 ] && [ ! -f "$adb/.claude/validation/kg-verification-baseline.txt" ]; then
+    record_pass "regen-ensure-from: (b) sem --ensure-from o NO-BASELINE persiste — a flag é load-bearing"
+  else record_fail "regen-ensure-from: (b)" "sem a flag o baseline apareceu/passou (rc=$rc2) — o teste não prova"; fi
+  unset -f _mk_preca
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+}
+
 # Modo seed-adoption-graph — exercita .claude/utils/adopt/seed-adoption-graph.sh.
 #
 # O QUE PROTEGE (achado de campo, 2026-08-17): a adoção entregava todos os RECURSOS e ZERO ESTADO —
@@ -9833,6 +9866,7 @@ run_session_velocity_selftests
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 run_githook_selftests
 run_regen_baselines_selftests
+run_regen_ensure_from_selftests
 run_seed_adoption_graph_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).
