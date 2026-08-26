@@ -32,39 +32,45 @@ const terminal = `
 <span class="tl-p">$</span> "quero um relatório em PDF exportável"
 <span class="tl-mut">→</span> primeiro escreve o que precisa acontecer — só depois vem o código
 <span class="tl-mut">→</span> o plano fica salvo — você retoma exatamente daqui quando quiser`;
+
+// Terminal do hero — o histórico de decisões (o porquê, não só o quê). Mesma técnica
+// set:html do terminal acima: aqui as quebras de linha SÃO conteúdo (white-space:pre-wrap).
+const heroTerm = `
+<span class="p">›</span> "por que migramos o billing?" — decisão de 8 meses atrás
+<span class="ok">✓</span> o <span class="c">porquê</span>, as alternativas descartadas, quem decidiu — do grafo
+<span class="ar">→</span> um documento guardaria o QUÊ. o Onion guarda o <span class="c">PORQUÊ</span>.
+<span class="ar">→</span> ninguém re-litiga a decisão nem repete o erro — mesmo sem quem decidiu
+
+<span class="p">›</span> # verificado por mecanismo. nenhum LLM adivinhou. você audita.`;
 ---
 
 <Base
-  title="Onion Evolve — o framework que erra, aprende e vira lei. Em público."
-  description="Sistema Onion: o ciclo completo de desenvolvimento com IA — produto, engenharia e compliance — com spec antes do código, sessões retomáveis e evolução auditável no git. Comece em 5 minutos."
+  title="Onion Evolve — o conhecimento da sua empresa, um ativo que você audita"
+  description="O Sistema Onion transforma o histórico de decisões da empresa num grafo vivo e verificável — o cérebro operacional (Company Brain / Second Brain) de onde saem código, compliance e produto, com trilha auditável. Verificado por mecanismo, não por palpite de IA."
   path="/"
 >
 
 <section class="hero">
-  <svg class="rings" viewBox="0 0 900 900" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
-    <g class="r-spin">
-      <circle cx="450" cy="450" r="180" stroke="#C2410C" opacity=".14" stroke-dasharray="4 10"/>
-      <circle cx="450" cy="450" r="300" stroke="#7C3AED" opacity=".10" stroke-dasharray="2 14"/>
-    </g>
-    <g class="r-spin2">
-      <circle cx="450" cy="450" r="240" stroke="#C2410C" opacity=".09" stroke-dasharray="1 8"/>
-      <circle cx="450" cy="450" r="380" stroke="#7C3AED" opacity=".07" stroke-dasharray="3 18"/>
-    </g>
-  </svg>
+  <div class="hero-aura" aria-hidden="true"></div>
+  <div class="hero-grid" aria-hidden="true"></div>
   <div class="hero-in">
-    <span class="badge"><span class="pulse" aria-hidden="true"></span> Framework vivo · a evolução é pública, o código é auditável</span>
-    <h1>O framework que<br><span class="hl" id="type">erra, aprende e vira lei.</span><span class="caret" aria-hidden="true"></span><br>Em público.</h1>
-    <p class="sub">O <strong>Sistema Onion</strong> instala num repositório o ciclo completo de desenvolvimento
-    com IA — produto, engenharia e compliance — com especificação antes do código, sessões que retomam de onde
-    pararam e o seu task manager plugado. E ele <strong>evolui de verdade</strong>: cada erro vira doutrina
-    auditável, com timestamp, no git.</p>
+    <span class="badge"><span class="pulse" aria-hidden="true"></span> Second Brain · Company Brain — o cérebro operacional da empresa</span>
+    <h1>Seu maior ativo é o <span class="hl">conhecimento</span>.<br>E ele mora na <span class="hl2">cabeça das pessoas</span>.</h1>
+    <p class="sub"><strong>Documento guardado não é decisão guardada.</strong> O que vira lenda quando alguém sai é
+    o <strong>porquê</strong> — o histórico de decisões. O <strong>Sistema Onion</strong> transforma isso num
+    <strong>grafo vivo e verificável</strong>: o cérebro operacional de onde sai código, compliance e produto —
+    com trilha que você <strong>audita</strong>, não um palpite de IA.</p>
     <div class="hero-ctas">
-      <a class="btn btn-p" href="/mini/">Comece em 5 minutos →</a>
-      <a class="btn btn-s" href="#prova">Veja a prova viva ↓</a>
+      <a class="btn btn-p" href="/mini/">▶ Ver funcionando no seu repo · 5 min</a>
+      <a class="btn btn-s" href="#prova">A prova viva ↓</a>
     </div>
-    <p class="hero-note">O Onion Mini roda em qualquer IA — até web chat gratuito. O framework completo
-    ({inv.comandos} comandos, federação) roda sobre o Claude Code, que entra como <em>motor de LLM</em>: quem orquestra
-    é você com o Onion.</p>
+    <p class="hero-note">Todo mundo promete um "Company Brain". A diferença: o seu você <strong>audita</strong> — a
+    verdade é conferida por mecanismo, não por mais um palpite de IA, e ele prova a própria disciplina rodando de
+    verdade, em público.</p>
+    <div class="hero-term" role="img" aria-label="O histórico de decisões respondendo o porquê">
+      <div class="ht-bar"><i></i><i></i><i></i><span>o histórico de decisões — o porquê, não só o quê</span></div>
+      <div class="ht-body" set:html={heroTerm}></div>
+    </div>
   </div>
 </section>
 
@@ -311,22 +317,6 @@ const terminal = `
 <script is:inline>
 (function(){
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  // typewriter do hero (uma vez; reduced → estático)
-  var el = document.getElementById('type');
-  if (el && !reduced) {
-    var full = el.innerHTML;
-    var plain = 'erra, aprende e vira lei.';
-    el.innerHTML = '';
-    var i = 0;
-    (function step(){
-      if (i <= plain.length) {
-        el.innerHTML = plain.slice(0, i);
-        i++;
-        setTimeout(step, i < 6 ? 90 : 55);
-      } else { el.innerHTML = full; }
-    })();
-  }
 
   // reveals
   var els = document.querySelectorAll('.reveal');
