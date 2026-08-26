@@ -10156,6 +10156,22 @@ run_deploy_site_selftests() {
   fi
 }
 
+# Install da config do Caddy (ops/install-caddy-config.sh) — bancada embutida (--selftest,
+# sandbox mktemp, stubs de caddy/systemctl, sem sudo, nunca toca /etc nem recarrega). Os
+# casos são as guardas: validate-falha-não-toca, backup-criado, idempotência, drift-acusa,
+# reload-falha-faz-rollback, fonte-ausente-die. Nasceu de o Caddyfile viver só na VPS (2026-08-26).
+run_install_caddy_config_selftests() {
+  local cs="${REPO_ROOT}/ops/install-caddy-config.sh"
+  if [ ! -f "${cs}" ]; then record_skip "install-caddy-config: ops/install-caddy-config.sh ausente"; return; fi
+  local rc=0 out
+  out="$(bash "${cs}" --selftest 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "install-caddy-config: bancada sandbox verde ($(printf '%s' "${out}" | grep -o '[0-9]* pass' | head -1))"
+  else
+    record_fail "install-caddy-config: --selftest" "rc=${rc}: $(printf '%s' "${out}" | grep '✗' | head -3)"
+  fi
+}
+
 # REGRA 34 pós-cutover (derivação commitada) — a regra HARD nova entrou sem rede
 # (achado da revisão adversarial da reforma). Fixture em sandbox git REAL: a regra
 # exige índice ([ -e .git ] skip sem ele — o que o sandbox principal, cp -a, prova
@@ -10195,6 +10211,7 @@ run_kg_reverify_schema_selftests
 run_backtick_ref_selftests
 run_site_deeplink_selftests
 run_deploy_site_selftests
+run_install_caddy_config_selftests
 run_site_derivation_selftests
 run_rules_registry_selftests
 run_onion_version_tracked_selftests
