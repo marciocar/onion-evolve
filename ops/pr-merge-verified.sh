@@ -19,12 +19,16 @@
 #  4. PROVA INDEPENDENTE: relê o estado do PR na API; só declara sucesso se `state=MERGED`
 #     e `mergedAt` não for nulo. O sucesso é afirmado pelo ESTADO, nunca pelo comando.
 #
-# Uso: bash ops/pr-merge-verified.sh <numero> [--repo owner/nome]
+# Uso: bash ops/pr-merge-verified.sh <numero> [--repo owner/nome] [--keep-branch] [--sync]
+#   --sync: após PROVAR o merge pelo estado, faz `git checkout main + pull --ff-only` — o sync
+#           gated que substitui o `checkout main` encadeado à mão (que me deixou em main após um
+#           merge recusado, 2026-08-26). Superação de sync-only-after-merge-succeeds, virada mecanismo.
 set -uo pipefail
 
 PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch]}"; shift || true
 REPO_ARG=()
 DEL=(--delete-branch)
+DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ramo do merge PROVADO
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
@@ -33,6 +37,7 @@ while [ $# -gt 0 ]; do
     # empilhado em cima, use --keep-branch; o GitHub re-aponta o filho, e a branch se
     # apaga à mão depois. Sem esta opção o mecanismo teria destruído um PR ao "acertar".
     --keep-branch) DEL=(); shift ;;
+    --sync) DO_SYNC=1; shift ;;
     *) shift ;;
   esac
 done
@@ -102,6 +107,17 @@ fi
 state="$(gh pr view "$PR" "${REPO_ARG[@]}" --json state,mergedAt --jq '"\(.state)|\(.mergedAt)"' 2>/dev/null)"
 case "$state" in
   MERGED\|null) die "estado diz MERGED mas mergedAt é nulo — inconsistente, não declaro" ;;
-  MERGED\|*)    printf '✓ PR #%s MERGED — provado pelo ESTADO (mergedAt=%s)\n' "$PR" "${state#*|}" ;;
+  MERGED\|*)
+    printf '✓ PR #%s MERGED — provado pelo ESTADO (mergedAt=%s)\n' "$PR" "${state#*|}"
+    # SUPERAÇÃO (2026-08-26): o sync de main vive AQUI DENTRO — estruturalmente inacessível
+    # sem o merge provado pelo estado. Cura o erro que me deixou em main após um merge RECUSADO
+    # (o `checkout main` encadeado, não condicionado). Agora "não consigo" repetir, nem esquecendo.
+    if [ "${DO_SYNC:-0}" = 1 ]; then
+      say "sync: merge provado — checkout main + pull"
+      git checkout main -q && git pull --ff-only origin main -q \
+        && say "main sincronizada: $(git rev-parse --short HEAD)" \
+        || die "merge PROVADO, mas o sync de main falhou — resolva à mão (git checkout main && git pull --ff-only)"
+    fi
+    ;;
   *)            die "o merge retornou 0 mas o estado do PR é '${state%%|*}' — declaração ≠ verificação" ;;
 esac
