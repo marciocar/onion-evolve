@@ -318,10 +318,11 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.9
-    status: open
+    status: done
     verified_at: 2026-08-24
     verified_against: "dogfood REAL 2026-08-24 (clone descartavel): com a cura o update da granaai NAO contamina mais (vendor 0 chaves estrangeiras). MAS a granaai segue com lint HARD — nao por REMOVIDO (curado), e sim por NO-BASELINE (46 HARD): ela nunca teve baseline de catraca proprio (estado PRE-catraca, medido no develop aa7732e6 ANTES de qualquer update). Ou seja: a contaminacao esta curada; o bloqueio remanescente e OUTRO (E_GRANAAI_NOBASELINE_PREEXISTING) e independe do update."
-    label: "PARCIALMENTE RESOLVIDA: a CONTAMINACAO (chave estrangeira → REMOVIDO) esta curada por D_CURE_PRESERVE_ADOPTER_BASELINE, provado no dogfood real. Resta o bloqueio SEPARADO E PRE-EXISTENTE: a granaai nao tem baseline proprio (NO-BASELINE fail-closed), que precisa ser emitido do corpus dela — rastreado por D_ADOPT_MUST_EMIT_MISSING_BASELINES. Nao re-abrir isto como bug do --update"
+    status_note: "RESOLVIDA 2026-08-25"
+    label: "RESOLVIDA: os DOIS bloqueios curados e provados no dogfood real do clone da granaai — (1) CONTAMINACAO (chave estrangeira → REMOVIDO) por D_CURE_PRESERVE_ADOPTER_BASELINE; (2) NO-BASELINE (pre-catraca) por D_ADOPT_MUST_EMIT_MISSING_BASELINES (--ensure-from emite do corpus dela). Update da granaai agora fecha limpo (kg-verification rc=0). Falta so o maestro RODAR o update real na granaai quando quiser (a maquinaria esta pronta)."
   - id: C_REGULATED_ADOPTER_IS_THE_ORACLE
     node_type: claim
     layer: audit
@@ -368,11 +369,13 @@ nodes:
   - id: D_ADOPT_MUST_EMIT_MISSING_BASELINES
     node_type: decision
     layer: audit
-    plane: DEV
+    plane: PROD
     impact: 3
-    confidence: 0.75
-    status: open
-    trace: .claude/commands/meta/adopt.md
+    confidence: 0.9
+    status: done
+    verified_at: 2026-08-25
+    verified_against: "implementado: regen-baselines.sh ganhou --ensure-from <SOURCE> (semeia stub p/ cada baseline que o core define mas o alvo NAO tem; o loop --auto emite do CORPUS DO ADOTANTE). adopt.md passa --ensure-from no update. Provado por reproducao (adotante pre-catraca: catraca rc 1→0) + DOGFOOD REAL num clone da granaai (update+ensure-from → kg-verification-coverage rc=0, HARD:0, NO-BASELINE resolvido, baseline emitido do corpus dela com 0 chaves). Selftest run_regen_ensure_from_selftests 2/2 (a: cura; b/MUT: sem a flag o NO-BASELINE persiste = load-bearing)."
+    trace: .claude/utils/adopt/regen-baselines.sh
     label: "FOLLOW-UP (gatilho: a granaai — ou qualquer adotante PRE-catraca — precisa passar o lint): o fluxo de --update/adopt deve GARANTIR que os *-baseline.txt exigidos EXISTAM na integracao, EMITINDO do corpus do ALVO quando ausentes (regen so processa baseline ja presente; nao cria o que falta). Fecha o NO-BASELINE de E_GRANAAI_NOBASELINE_PREEXISTING e o gap 'baseline de catraca NOVO do core → adotante emite o proprio'. Escopo SEPARADO da cura de contaminacao (nao mistura). Alternativa mais barata: o adotante roda `kg-verification-coverage.sh --emit-baseline` uma vez"
   - id: D_SCRUB_FROZEN_POISON_IN_VENDORS
     node_type: decision
@@ -510,3 +513,6 @@ edges:
   - from: D_SCRUB_FROZEN_POISON_IN_VENDORS
     to: D_CURE_PRESERVE_ADOPTER_BASELINE
     edge_type: DEPENDS_ON
+  - from: D_ADOPT_MUST_EMIT_MISSING_BASELINES
+    to: Q_GRANAAI_UPDATE_BLOCKED
+    edge_type: SUPPORTS

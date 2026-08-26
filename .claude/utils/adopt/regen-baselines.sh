@@ -58,6 +58,7 @@ while [ $# -gt 0 ]; do
     --auto)   MODE=auto; shift ;;
     --filter) MODE=filter; shift ;;
     --emit|--emit-baseline) MODE=emit; shift ;;
+    --ensure-from) ENSURE_FROM="${2:-}"; shift 2 ;;
     -*) echo "regen-baselines: opção desconhecida '$1'" >&2; exit 2 ;;
     *) [ -z "${DEST}" ] && DEST="$1" || { echo "regen-baselines: alvo já informado ('${DEST}')" >&2; exit 2; }; shift ;;
   esac
@@ -67,6 +68,7 @@ if [ -z "${DEST}" ] || [ ! -d "${DEST}" ]; then
   exit 2
 fi
 
+: "${ENSURE_FROM:=}"
 VDIR="${DEST}/.claude/validation"
 if [ ! -d "${VDIR}" ]; then
   echo "⊘ regen-baselines: ${VDIR} não existe — nada a regenerar (alvo sem maquinaria vendorizada)." >&2
@@ -107,6 +109,23 @@ count_keys() {
 
 unresolved=0
 regenerated=0
+
+# ── --ensure-from: adotante PRE-CATRACA (sem baseline proprio) ficaria com a catraca em FAIL-CLOSED
+# (NO-BASELINE) apos o update, porque o loop abaixo so itera baselines PRESENTES. Semeia um STUB VAZIO
+# para cada baseline que o SOURCE (core) DEFINE mas o alvo NAO tem — o loop --auto entao o trata como
+# "1a chegada -> emit" e o preenche do CORPUS DO ADOTANTE (nunca do core). Fecha D_ADOPT_MUST_EMIT_
+# MISSING_BASELINES (adotante pré-catraca): o motor viaja, o baseline nasce do alvo.
+if [ -n "${ENSURE_FROM}" ] && [ -d "${ENSURE_FROM}/.claude/validation" ]; then
+  shopt -s nullglob
+  for _sb in "${ENSURE_FROM}/.claude/validation"/*-baseline.txt; do
+    _bn="$(basename "${_sb}")"
+    if [ ! -e "${VDIR}/${_bn}" ]; then
+      printf '# Baseline semeado por regen-baselines --ensure-from (sera emitido do corpus do alvo).\n' > "${VDIR}/${_bn}"
+      printf '  + %-38s AUSENTE no alvo → stub semeado (sera emitido do corpus do adotante)\n' "${_bn}"
+    fi
+  done
+  shopt -u nullglob
+fi
 
 shopt -s nullglob
 for bpath in "${VDIR}"/*-baseline.txt; do

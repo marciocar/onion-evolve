@@ -382,7 +382,7 @@ fi
 #        não depende de ninguém lembrar de passar uma flag (disciplina), e adoção de repo LEGADO
 #        (que TEM história) continua emitindo, como deve.
 if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ]; then
-  bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$DEST" || true
+  bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$DEST" --ensure-from "$SOURCE_ROOT" || true
 fi
 ```
 
