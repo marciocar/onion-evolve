@@ -1,68 +1,69 @@
-# ÍNDICE + CATEGORIZAÇÃO dos 672 PRs mergeados (fase 2). Classe via hub E_CLASS_* (TRACES_TO);
-# publicável via 2ª aresta p/ E_VITRINE_<surface>. Classe/seleção são HEURÍSTICA determinística
-# (prefixo+keyword), refinável por orquestração. SSOT da qual as vitrines do site projetam.
+# ÍNDICE + CATEGORIZAÇÃO + REFINO dos 672 PRs (fase 2b). Classe LLM p/ os 155 publicáveis
+# (heurística p/ o resto), arestas semânticas PR↔PR do refino. SUPERSEDES/REFUTES foram mapeadas
+# p/ DEPENDS_ON/CAUSES (não-reconciliadoras): entre PRs shipados o alvo não vira superseded/refuted.
+# SSOT da qual as vitrines do site projetam (ver pr-showcase-selection-2026-08.md).
 meta:
   schema_version: 1
   baseline: "2026-06-13"
 nodes:
   - id: E_PR_DECISION_LOG
     node_type: entity
-    label: "O log de decisoes do onion-evolve — 672 PRs mergeados; SSOT da qual as vitrines do site projetam"
+    label: "O log de decisoes do onion-evolve — 672 PRs; SSOT da qual as vitrines do site projetam"
     plane: PROD
     impact: 5
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-26
-    verified_against: "gh pr list --state merged (672, 2026-06-13..08-26)"
+    verified_against: "gh pr list --state merged (672)"
     trace: "docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
   - id: E_CLASS_INCIDENTE
     node_type: entity
-    label: "Classe: incidente — 50 PRs (heuristica prefixo+keyword)"
+    label: "Classe: incidente — 85 PRs (refino LLM nos publicaveis, heuristica no resto)"
     plane: PROD
     impact: 3
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-26
-    verified_against: "categorizacao deterministica fase 2"
+    verified_against: "fase 2b"
   - id: E_CLASS_DOUTRINA
     node_type: entity
-    label: "Classe: doutrina — 170 PRs (heuristica prefixo+keyword)"
+    label: "Classe: doutrina — 111 PRs (refino LLM nos publicaveis, heuristica no resto)"
     plane: PROD
     impact: 3
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-26
-    verified_against: "categorizacao deterministica fase 2"
+    verified_against: "fase 2b"
   - id: E_CLASS_MARCO
     node_type: entity
-    label: "Classe: marco — 31 PRs (heuristica prefixo+keyword)"
+    label: "Classe: marco — 26 PRs (refino LLM nos publicaveis, heuristica no resto)"
     plane: PROD
     impact: 3
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-26
-    verified_against: "categorizacao deterministica fase 2"
+    verified_against: "fase 2b"
   - id: E_CLASS_MECANISMO
     node_type: entity
-    label: "Classe: mecanismo — 224 PRs (heuristica prefixo+keyword)"
+    label: "Classe: mecanismo — 245 PRs (refino LLM nos publicaveis, heuristica no resto)"
     plane: PROD
     impact: 3
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-26
-    verified_against: "categorizacao deterministica fase 2"
+    verified_against: "fase 2b"
   - id: E_CLASS_ROTINA
     node_type: entity
-    label: "Classe: rotina — 197 PRs (heuristica prefixo+keyword)"
+    label: "Classe: rotina — 205 PRs (refino LLM nos publicaveis, heuristica no resto)"
     plane: PROD
     impact: 3
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-26
-    verified_against: "categorizacao deterministica fase 2"
+    verified_against: "fase 2b"
   - id: E_VITRINE_PROVA
     node_type: entity
-    label: "Vitrine publicavel: prova — PRs selecionados p/ projetar nesta superficie do site"
+    label: "Vitrine: prova — 72 PRs selecionados p/ projetar"
     plane: PROD
     impact: 3
     confidence: 1.0
@@ -70,7 +71,7 @@ nodes:
     verified_at: 2026-08-26
   - id: E_VITRINE_HISTORIA
     node_type: entity
-    label: "Vitrine publicavel: historia — PRs selecionados p/ projetar nesta superficie do site"
+    label: "Vitrine: historia — 55 PRs selecionados p/ projetar"
     plane: PROD
     impact: 3
     confidence: 1.0
@@ -78,7 +79,7 @@ nodes:
     verified_at: 2026-08-26
   - id: E_VITRINE_TICKER
     node_type: entity
-    label: "Vitrine publicavel: ticker — PRs selecionados p/ projetar nesta superficie do site"
+    label: "Vitrine: ticker — 4 PRs selecionados p/ projetar"
     plane: PROD
     impact: 3
     confidence: 1.0
@@ -6849,10 +6850,7 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_8
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_8
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_ROTINA
   - from: PR_9
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -6873,16 +6871,13 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_14
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MECANISMO
   - from: PR_14
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
   - from: PR_15
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_15
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_ROTINA
   - from: PR_16
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -6904,18 +6899,12 @@ edges:
   - from: PR_22
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
-  - from: PR_22
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
   - from: PR_23
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
   - from: PR_24
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_24
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_ROTINA
   - from: PR_25
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -6939,19 +6928,19 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_30
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_30
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_31
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
   - from: PR_32
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_32
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_33
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -6987,10 +6976,10 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_44
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_44
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_45
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -7005,10 +6994,10 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_49
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_49
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_50
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
@@ -7035,10 +7024,10 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_58
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_58
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_59
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -7074,7 +7063,7 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_70
     edge_type: TRACES_TO
-    to: E_CLASS_MECANISMO
+    to: E_CLASS_ROTINA
   - from: PR_71
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -7113,10 +7102,10 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_82
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_82
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_83
     edge_type: TRACES_TO
     to: E_CLASS_INCIDENTE
@@ -7128,7 +7117,7 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_85
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MECANISMO
   - from: PR_85
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -7221,10 +7210,10 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_115
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_115
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_116
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -7308,7 +7297,7 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_143
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MARCO
   - from: PR_143
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -7338,10 +7327,7 @@ edges:
     to: E_VITRINE_PROVA
   - from: PR_151
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_151
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_152
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -7395,7 +7381,7 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_169
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MARCO
   - from: PR_169
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -7410,19 +7396,16 @@ edges:
     to: E_VITRINE_PROVA
   - from: PR_172
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_172
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_173
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
   - from: PR_174
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_174
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_175
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -7446,10 +7429,10 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_182
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_182
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_183
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -7500,10 +7483,10 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_198
     edge_type: TRACES_TO
-    to: E_CLASS_INCIDENTE
+    to: E_CLASS_DOUTRINA
   - from: PR_198
     edge_type: TRACES_TO
-    to: E_VITRINE_PROVA
+    to: E_VITRINE_HISTORIA
   - from: PR_199
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
@@ -7587,19 +7570,19 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_222
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_222
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_223
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
   - from: PR_224
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_224
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_225
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -7644,16 +7627,16 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_237
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_237
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_238
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
   - from: PR_239
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MARCO
   - from: PR_239
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -7716,7 +7699,7 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_254
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MARCO
   - from: PR_254
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -7731,10 +7714,10 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_258
     edge_type: TRACES_TO
-    to: E_CLASS_INCIDENTE
+    to: E_CLASS_MARCO
   - from: PR_258
     edge_type: TRACES_TO
-    to: E_VITRINE_PROVA
+    to: E_VITRINE_HISTORIA
   - from: PR_259
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -7845,19 +7828,13 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_293
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
-  - from: PR_293
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_294
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
   - from: PR_295
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
-  - from: PR_295
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_296
     edge_type: TRACES_TO
     to: E_CLASS_MARCO
@@ -7890,10 +7867,7 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_304
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
-  - from: PR_304
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_305
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -7959,10 +7933,7 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_326
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_326
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_ROTINA
   - from: PR_328
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
@@ -8049,10 +8020,7 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_355
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_355
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_356
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -8088,10 +8056,7 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_367
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
-  - from: PR_367
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_368
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -8121,10 +8086,7 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_376
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_376
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_377
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -8184,10 +8146,10 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_396
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_396
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_397
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
@@ -8241,10 +8203,10 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_413
     edge_type: TRACES_TO
-    to: E_CLASS_INCIDENTE
+    to: E_CLASS_DOUTRINA
   - from: PR_413
     edge_type: TRACES_TO
-    to: E_VITRINE_PROVA
+    to: E_VITRINE_HISTORIA
   - from: PR_414
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -8271,7 +8233,7 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_422
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MECANISMO
   - from: PR_422
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -8325,10 +8287,10 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_438
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_438
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_439
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -8382,10 +8344,10 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_454
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_454
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_455
     edge_type: TRACES_TO
     to: E_CLASS_INCIDENTE
@@ -8469,16 +8431,10 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_481
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
-  - from: PR_481
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_482
     edge_type: TRACES_TO
-    to: E_CLASS_INCIDENTE
-  - from: PR_482
-    edge_type: TRACES_TO
-    to: E_VITRINE_PROVA
+    to: E_CLASS_MECANISMO
   - from: PR_483
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -8520,10 +8476,10 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_496
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_496
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_497
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -8532,10 +8488,10 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_499
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_499
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_500
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -8610,19 +8566,19 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_521
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_521
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_522
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
   - from: PR_523
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_523
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_524
     edge_type: TRACES_TO
     to: E_CLASS_INCIDENTE
@@ -8631,22 +8587,19 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_526
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_526
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
-  - from: PR_527
-    edge_type: TRACES_TO
-    to: E_CLASS_INCIDENTE
-  - from: PR_527
-    edge_type: TRACES_TO
     to: E_VITRINE_PROVA
+  - from: PR_527
+    edge_type: TRACES_TO
+    to: E_CLASS_MECANISMO
+  - from: PR_527
+    edge_type: TRACES_TO
+    to: E_VITRINE_TICKER
   - from: PR_528
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
-  - from: PR_528
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
   - from: PR_529
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -8697,10 +8650,10 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_544
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MECANISMO
   - from: PR_544
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_TICKER
   - from: PR_545
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -8712,10 +8665,10 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_547
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_547
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_548
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -8748,10 +8701,10 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_555
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
+    to: E_CLASS_INCIDENTE
   - from: PR_555
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_556
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -8772,22 +8725,22 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_561
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_561
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_562
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_562
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_563
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_563
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_564
     edge_type: TRACES_TO
     to: E_CLASS_INCIDENTE
@@ -8808,16 +8761,13 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_567
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_567
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_568
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
-  - from: PR_568
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
   - from: PR_569
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
@@ -8829,16 +8779,16 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_571
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_571
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_572
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_572
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_573
     edge_type: TRACES_TO
     to: E_CLASS_INCIDENTE
@@ -8853,16 +8803,16 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_576
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_576
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_577
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
   - from: PR_578
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MARCO
   - from: PR_578
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -8871,16 +8821,16 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_580
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_580
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_581
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_581
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_582
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -8901,10 +8851,10 @@ edges:
     to: E_VITRINE_PROVA
   - from: PR_586
     edge_type: TRACES_TO
-    to: E_CLASS_INCIDENTE
+    to: E_CLASS_DOUTRINA
   - from: PR_586
     edge_type: TRACES_TO
-    to: E_VITRINE_PROVA
+    to: E_VITRINE_HISTORIA
   - from: PR_587
     edge_type: TRACES_TO
     to: E_CLASS_INCIDENTE
@@ -8925,7 +8875,7 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_590
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MECANISMO
   - from: PR_590
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -8937,10 +8887,10 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_592
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_593
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MECANISMO
   - from: PR_593
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -8949,10 +8899,10 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_594
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_595
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MARCO
   - from: PR_595
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -8964,10 +8914,10 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_598
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_598
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_599
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -8976,7 +8926,7 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_601
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MARCO
   - from: PR_601
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -8985,7 +8935,7 @@ edges:
     to: E_CLASS_INCIDENTE
   - from: PR_602
     edge_type: TRACES_TO
-    to: E_VITRINE_PROVA
+    to: E_VITRINE_TICKER
   - from: PR_603
     edge_type: TRACES_TO
     to: E_CLASS_INCIDENTE
@@ -8997,16 +8947,16 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_605
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_605
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_606
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
   - from: PR_606
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_TICKER
   - from: PR_607
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -9021,10 +8971,7 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_611
     edge_type: TRACES_TO
-    to: E_CLASS_INCIDENTE
-  - from: PR_611
-    edge_type: TRACES_TO
-    to: E_VITRINE_PROVA
+    to: E_CLASS_ROTINA
   - from: PR_612
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -9045,7 +8992,7 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_618
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_619
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -9060,16 +9007,13 @@ edges:
     to: E_CLASS_DOUTRINA
   - from: PR_623
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_624
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
   - from: PR_625
     edge_type: TRACES_TO
-    to: E_CLASS_INCIDENTE
-  - from: PR_625
-    edge_type: TRACES_TO
-    to: E_VITRINE_PROVA
+    to: E_CLASS_MECANISMO
   - from: PR_626
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -9081,16 +9025,16 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_629
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
+    to: E_CLASS_INCIDENTE
   - from: PR_629
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_630
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_630
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_631
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -9099,19 +9043,16 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_633
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_633
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_ROTINA
   - from: PR_634
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
   - from: PR_635
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_635
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_636
     edge_type: TRACES_TO
     to: E_CLASS_MARCO
@@ -9126,7 +9067,7 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_639
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MARCO
   - from: PR_639
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -9153,10 +9094,10 @@ edges:
     to: E_CLASS_MECANISMO
   - from: PR_646
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_646
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_647
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -9174,7 +9115,7 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_650
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
+    to: E_CLASS_MECANISMO
   - from: PR_650
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -9201,16 +9142,13 @@ edges:
     to: E_VITRINE_PROVA
   - from: PR_657
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
+    to: E_CLASS_INCIDENTE
   - from: PR_657
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_658
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
-  - from: PR_658
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_ROTINA
   - from: PR_659
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
@@ -9225,16 +9163,16 @@ edges:
     to: E_CLASS_ROTINA
   - from: PR_663
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
+    to: E_CLASS_INCIDENTE
   - from: PR_663
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_664
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_664
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_665
     edge_type: TRACES_TO
     to: E_CLASS_DOUTRINA
@@ -9243,10 +9181,7 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_666
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
-  - from: PR_666
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_667
     edge_type: TRACES_TO
     to: E_CLASS_MARCO
@@ -9255,31 +9190,25 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_668
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
-  - from: PR_668
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_669
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
-  - from: PR_669
-    edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_CLASS_MECANISMO
   - from: PR_670
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
+    to: E_CLASS_INCIDENTE
   - from: PR_670
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_671
     edge_type: TRACES_TO
-    to: E_CLASS_MARCO
+    to: E_CLASS_INCIDENTE
   - from: PR_671
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_672
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_MARCO
   - from: PR_672
     edge_type: TRACES_TO
     to: E_VITRINE_HISTORIA
@@ -9291,10 +9220,10 @@ edges:
     to: E_VITRINE_HISTORIA
   - from: PR_674
     edge_type: TRACES_TO
-    to: E_CLASS_DOUTRINA
+    to: E_CLASS_INCIDENTE
   - from: PR_674
     edge_type: TRACES_TO
-    to: E_VITRINE_HISTORIA
+    to: E_VITRINE_PROVA
   - from: PR_675
     edge_type: TRACES_TO
     to: E_CLASS_ROTINA
@@ -9310,3 +9239,186 @@ edges:
   - from: PR_679
     edge_type: TRACES_TO
     to: E_CLASS_MECANISMO
+  - from: PR_304
+    edge_type: DEPENDS_ON
+    to: PR_299
+  - from: PR_376
+    edge_type: DEPENDS_ON
+    to: PR_375
+  - from: PR_398
+    edge_type: DEPENDS_ON
+    to: PR_375
+  - from: PR_15
+    edge_type: DEPENDS_ON
+    to: PR_14
+  - from: PR_29
+    edge_type: DEPENDS_ON
+    to: PR_10
+  - from: PR_30
+    edge_type: DEPENDS_ON
+    to: PR_29
+  - from: PR_44
+    edge_type: DEPENDS_ON
+    to: PR_43
+  - from: PR_58
+    edge_type: DEPENDS_ON
+    to: PR_49
+  - from: PR_82
+    edge_type: DEPENDS_ON
+    to: PR_81
+  - from: PR_83
+    edge_type: DEPENDS_ON
+    to: PR_26
+  - from: PR_83
+    edge_type: DEPENDS_ON
+    to: PR_81
+  - from: PR_150
+    edge_type: DEPENDS_ON
+    to: PR_143
+  - from: PR_151
+    edge_type: DEPENDS_ON
+    to: PR_143
+  - from: PR_169
+    edge_type: DEPENDS_ON
+    to: PR_143
+  - from: PR_169
+    edge_type: DEPENDS_ON
+    to: PR_151
+  - from: PR_171
+    edge_type: CAUSES
+    to: PR_169
+  - from: PR_172
+    edge_type: DEPENDS_ON
+    to: PR_169
+  - from: PR_172
+    edge_type: DEPENDS_ON
+    to: PR_171
+  - from: PR_174
+    edge_type: DEPENDS_ON
+    to: PR_169
+  - from: PR_198
+    edge_type: DEPENDS_ON
+    to: PR_195
+  - from: PR_455
+    edge_type: DEPENDS_ON
+    to: PR_454
+  - from: PR_519
+    edge_type: DEPENDS_ON
+    to: PR_512
+  - from: PR_527
+    edge_type: DEPENDS_ON
+    to: PR_526
+  - from: PR_528
+    edge_type: DEPENDS_ON
+    to: PR_527
+  - from: PR_546
+    edge_type: CAUSES
+    to: PR_547
+  - from: PR_547
+    edge_type: CAUSES
+    to: PR_546
+  - from: PR_550
+    edge_type: CAUSES
+    to: PR_546
+  - from: PR_553
+    edge_type: DEPENDS_ON
+    to: PR_550
+  - from: PR_557
+    edge_type: DEPENDS_ON
+    to: PR_555
+  - from: PR_564
+    edge_type: DEPENDS_ON
+    to: PR_563
+  - from: PR_229
+    edge_type: DEPENDS_ON
+    to: PR_222
+  - from: PR_231
+    edge_type: DEPENDS_ON
+    to: PR_229
+  - from: PR_237
+    edge_type: DEPENDS_ON
+    to: PR_229
+  - from: PR_242
+    edge_type: CAUSES
+    to: PR_243
+  - from: PR_243
+    edge_type: DEPENDS_ON
+    to: PR_242
+  - from: PR_245
+    edge_type: DEPENDS_ON
+    to: PR_239
+  - from: PR_246
+    edge_type: DEPENDS_ON
+    to: PR_239
+  - from: PR_279
+    edge_type: DEPENDS_ON
+    to: PR_254
+  - from: PR_293
+    edge_type: DEPENDS_ON
+    to: PR_292
+  - from: PR_567
+    edge_type: DEPENDS_ON
+    to: PR_566
+  - from: PR_568
+    edge_type: CAUSES
+    to: PR_569
+  - from: PR_569
+    edge_type: DEPENDS_ON
+    to: PR_568
+  - from: PR_573
+    edge_type: DEPENDS_ON
+    to: PR_571
+  - from: PR_592
+    edge_type: CAUSES
+    to: PR_590
+  - from: PR_594
+    edge_type: DEPENDS_ON
+    to: PR_592
+  - from: PR_594
+    edge_type: DEPENDS_ON
+    to: PR_593
+  - from: PR_598
+    edge_type: CAUSES
+    to: PR_593
+  - from: PR_664
+    edge_type: CAUSES
+    to: PR_674
+  - from: PR_666
+    edge_type: DEPENDS_ON
+    to: PR_665
+  - from: PR_667
+    edge_type: DEPENDS_ON
+    to: PR_665
+  - from: PR_667
+    edge_type: DEPENDS_ON
+    to: PR_666
+  - from: PR_671
+    edge_type: DEPENDS_ON
+    to: PR_672
+  - from: PR_672
+    edge_type: DEPENDS_ON
+    to: PR_671
+  - from: PR_673
+    edge_type: DEPENDS_ON
+    to: PR_672
+  - from: PR_674
+    edge_type: DEPENDS_ON
+    to: PR_664
+  - from: PR_633
+    edge_type: DEPENDS_ON
+    to: PR_630
+  - from: PR_646
+    edge_type: DEPENDS_ON
+    to: PR_635
+  - from: PR_648
+    edge_type: DEPENDS_ON
+    to: PR_644
+  - from: PR_649
+    edge_type: DEPENDS_ON
+    to: PR_648
+  - from: PR_650
+    edge_type: DEPENDS_ON
+    to: PR_644
+  - from: PR_658
+    edge_type: DEPENDS_ON
+    to: PR_657
