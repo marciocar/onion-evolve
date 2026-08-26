@@ -1,0 +1,45 @@
+# Caddyfile do onionevolve.com — FONTE VERSIONADA (config-as-code).
+#
+# POR QUE EXISTE (medido 2026-08-26): este arquivo vivia SÓ em /etc/caddy/Caddyfile na
+# KVM 8, com backups à mão em /root/Caddyfile.bak-*. Nesta sessão o matcher de cache
+# estava errado, a home aparentava "não atualizar", e não havia onde revisar a config.
+# Mesma doutrina de ops/gpg-protect-key.sh: conhecimento operacional que fica "temporário"
+# evapora e volta como incidente. Agora o git é a SSOT; /etc/caddy é derivação.
+# Instalar/validar/recarregar: ops/install-caddy-config.sh (idempotente, com guardas).
+#
+# CACHE (corrigido 2026-08-26 pela pesquisa de estado da arte):
+#  · HTML → "no-cache" (NÃO "no-store"): revalida a cada uso MAS preserva o 304 via ETag
+#    que o file_server do Caddy já emite. "no-store" mataria o 304 e pagaria banda cheia.
+#  · Assets com hash (/_astro/*) → "immutable" por 1 ano (o nome muda quando o conteúdo muda).
+#  · matcher @html cobre *.html E os índices de diretório (paths terminando em /), senão a
+#    raiz "/" (que serve index.html) fica sem header — foi o bug que fez a home "não mudar".
+
+onionevolve.com, www.onionevolve.com {
+    root * /var/www/onion-landing
+    redir /convite/ /maquinaria/#experimente 301
+    redir /convite /maquinaria/#experimente 301
+    redir /historia/grafo/ /maquinaria/ 301
+    redir /historia/grafo /maquinaria/ 301
+    encode gzip
+    @html path *.html */
+    header @html Cache-Control "no-cache"
+    @assets path /_astro/*
+    header @assets Cache-Control "public, max-age=31536000, immutable"
+    file_server
+}
+
+app.onionevolve.com {
+    reverse_proxy 127.0.0.1:8787
+}
+
+# Logto — provedor de identidade do core (adicionado 2026-07-25).
+# Só o endpoint OIDC (:3011) é público. O console admin (:3012) fica no loopback
+# de propósito: é o painel de controle do IdP, e expor isso à internet amplia a
+# superfície sem necessidade. Acesso por túnel: ssh -L 3012:127.0.0.1:3012 <vps>
+auth.onionevolve.com {
+    reverse_proxy 127.0.0.1:3011
+}
+
+# Blocos opcionais, ligados/desligados por arquivo (ver /etc/caddy/conf.d/).
+# Glob que não casa nada é no-op — com tudo desligado, o Caddyfile segue válido.
+import /etc/caddy/conf.d/*.caddy
