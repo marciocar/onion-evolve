@@ -2,7 +2,7 @@
 title: 'ADR — Runtime de orquestração autônoma de fios: escada graduada de autonomia (Audit→Automate) com moat determinístico'
 date: 2026-07-18
 type: adr
-status: proposed — GATED até o checkpoint da Fase 2 (TRIAL autorizado pela aprovação do plano; aceite no 1º lote)
+status: accepted (degrau AUDIT) — o runtime foi MECANIZADO e dogfoodado em 2026-08-27 pelo /meta:drive (Censo `kg-drive-project.sh` #692 + laço `drive.md` #693; superação em `docs/onion/graph/drive-superacao-2026-08.kg.yaml`). Selado pelo maestro. ⚠️ Aceite QUALIFICADO: o dogfood exercitou a rota **research** + o laço P0-P6 completo (fio real conduzido ao checkpoint na catraca), NÃO a rota **execution→PR-verde** — essa e o lote completo se exercitam nos próximos drives reais. AUTOMATE (auto-merge) segue GATED (Fase 2)
 decision-scope: co-evolution / autonomy (o core conduz os fios pendentes com autonomia graduada)
 supersedes: none
 extends:
@@ -85,6 +85,16 @@ rebases sozinho), **budget-capped**, **retomável** (`resumeFromRunId`):
 - **Worktree própria + beacon-check** (não colidir com a árvore/ sessões vivas — I3).
 - **`declarado≠verificado`** · **selar só com dogfood** (este ADR nasce GATED; aceite no checkpoint da Fase 2).
 
-## 1º dogfood (o gate)
+## 1º dogfood (o gate) — REALIZADO 2026-08-27
 A **Fase 2** (1ª passada, TRIAL no AUDIT) é o dogfood: conduz os fios reais a PR verde e produz **1 lote**. O
 aceite do maestro nesse checkpoint **sela** este ADR (`proposed → accepted`). Sem esse dogfood, o contrato não sela.
+
+**O que de fato aconteceu (behavior-over-declaration):** o runtime virou o comando `/meta:drive` (era prosa
+neste ADR). O 1º drive real (`catraca --max-nodes 1`) conduziu um fio **end-to-end** — censo pegou
+`Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES` (research, o mesmo que o `/meta:realign` flagara), avançou
+(mediu as 5 classes), selou AUTO (append de evidência), checkpoint `kg-radar` rc=0 + `realign --check`
+ALINHADO, **sem merge** (AUDIT respeitado). E o driver aplicou a **própria tabela de selagem a si mesmo**:
+apendou a evidência e **parou no flip deste status** (`proposed→accepted`), porque status-de-verdade é
+selo humano. O maestro selou. **Aceite qualificado:** provou a rota **research** + o laço; a rota
+**execution→PR-verde** e o **lote completo** ficam para os próximos drives (achado #1 do resíduo
+`feat-meta-drive-phase1.md`). AUTOMATE segue GATED.
