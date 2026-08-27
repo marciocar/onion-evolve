@@ -278,8 +278,8 @@ nodes:
     impact: 4
     confidence: 0.9
     status: open
-    verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_against: "host-vps re-medido 2026-08-27 via 1o /meta:drive na onda m2-bridge (CONFIRMED, o gap persiste): onion-vps-logto min=0/low=0/max=1073741824(1GB) · onion-vps-logto-postgres min=0/low=0/max=536870912(512MB) — piso 0 e teto exato da claim. ⚠ lição verify-read-path: os scopes docker do ADOTANTE arandek dao max=max; medir o container do CORE (docker ps -> id -> scope), nao um scope docker qualquer, senao da DRIFTED falso"
+    verified_at: 2026-08-27
     label: "GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: os scopes docker-<hash>.scope sob system.slice têm memory.min=0 memory.low=0, e memory.max = 1073741824 (logto) / 536870912 (postgres). Causa: o nome do scope muda a cada recriação, então o drop-in fixo de Caddy/bridge não se aplica. Fecho em D_logto_same_protection_tier (slice pai + slice auth + compose)"
 
   # ---- FIX E: O COMANDO DE PROVA DO RFC 8707 ESTAVA QUEBRADO ----
