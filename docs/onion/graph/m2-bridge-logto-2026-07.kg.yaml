@@ -853,10 +853,21 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: open
+    status: superseded
     verified_at: 2026-07-27
     verified_against: bridge-source-lido-pos-flip
     label: "P9 NAO pode seguir 'na mesma janela do P8' como manda D_retire_legacy_immediately — ACHADO do flip (dogfood). Medido no server.ts: adminGuard (~linha 27) aceita APENAS config.authToken; a2aGuard (~linha 38) aceita config.authToken OU a2aTokens; NENHUM dos dois olha o authMode nem chama verifyAccessToken. E o Identity OIDC (identity.ts) so tem subject/scopes/isMachine — SEM conceito de admin. Logo apagar o AUTH_TOKEN (P9) mataria o /admin/* inteiro (401 sempre, sem reposicao) e o caminho admin do /a2a. A doutrina 'aposentar imediatamente' assumia legado==execucao; mas o AUTH_TOKEN tambem carrega admin/a2a, superficies que o OIDC ainda nao cobre. PRE-REQUISITO do P9: um caminho admin via OIDC (scope/sub -> admin) — trabalho NAO feito, decidido GATED com o maestro em 2026-07-27."
+  - id: C_p9_prereq_done_admin_oidc
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-27
+    verified_against: "server.ts vivo lido via sudo (1o /meta:drive na onda m2-bridge): adminGuard L225 chama verifyAccessToken(bearer,'bridge:admin') — OIDC com escopo admin; a2aGuard L37 so config.a2aTokens.has(bearer), bypass do admin REMOVIDO"
+    trace: /home/onion/onion-bridge/src/server.ts:225
+    label: "SUPERA C_p9: o pre-requisito que C_p9 dizia NAO-feito (caminho admin via OIDC, scope/sub->admin) ESTA FEITO. Medido 2026-08-27 no server.ts vivo: adminGuard (L225) NAO usa mais config.authToken — chama verifyAccessToken(bearer,'bridge:admin'), OIDC com escopo dedicado; a2aGuard (L37) aceita SO config.a2aTokens, o bypass do segredo de admin foi removido (comentario no codigo: 'P9 — o bypass do segredo de admin SAIU'). Logo P9 (aposentar o AUTH_TOKEN legado) deixou de estar bloqueado — o bridge avancou desde 2026-07-27. C_p9 nao errou (estava certo quando escrito); a realidade andou (DRIFTED). Achado do /meta:drive medindo o vivo."
 
   - id: C_flip_was_partial
     node_type: claim
@@ -2042,3 +2053,6 @@ edges:
   - from: E_d5_granaai_acolhida_2026_08
     to: D_logto_is_projection
     edge_type: SUPPORTS
+  - from: C_p9_prereq_done_admin_oidc
+    to: C_p9_blocked_no_admin_oidc
+    edge_type: SUPERSEDES
