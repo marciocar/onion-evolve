@@ -11,7 +11,7 @@ Bem-vindo ao sistema Onion v3.0! Este guia vai te ajudar a começar rapidamente 
 | Comandos | 104 | Organizados em 10 categorias + root |
 | Agentes | 51 | 9 categorias especializadas |
 | Skills | 12 | Orquestração, validação e resolvers de contexto |
-| Knowledge Bases | 91 | Documentação estruturada |
+| Knowledge Bases | 92 | Documentação estruturada |
 
 ## 📋 Checklist de Setup
 
@@ -52,7 +52,7 @@ seu-projeto/
 ├── docs/
 │   ├── onion/              # Documentação do framework
 │   ├── meta-specs/         # Constituição do sistema (L0)
-│   └── knowledge-base/     # 91 Knowledge Bases estruturadas
+│   └── knowledge-base/     # 92 Knowledge Bases estruturadas
 ├── .env                    # Variáveis de ambiente (NÃO commitar)
 ├── .env.example            # Template de variáveis
 ├── .claudeignore           # Otimização do context window
