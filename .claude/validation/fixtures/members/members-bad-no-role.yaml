@@ -1,0 +1,30 @@
+# FIXTURE (fail) — adopter sem 'role'. trust-topology-check exit-2 na origem;
+# o validador deve barrar ANTES do commit. Dados fictícios.
+version: 2
+trust_policy_version: 1
+members:
+  - id: onion-evolve
+    name: onion-evolve
+    role: source
+    kind: source
+    path: "."
+    personality_summary: "A fonte (T0)."
+    specializations: [framework-template]
+    personality_last_sync: 2026-01-01
+  - id: sem-role
+    name: sem-role
+    kind: adopter
+    parent: onion-evolve
+    local_path: "/tmp/sem-role"
+    onion_version: abcdef123456
+    adopted_at: 2026-01-02
+    mode: greenfield
+    personality_summary: "Faltou o role."
+    specializations: [example]
+    personality_last_sync: 2026-01-02
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      exposes_downstream: []

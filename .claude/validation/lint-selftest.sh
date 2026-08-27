@@ -2977,6 +2977,45 @@ run_contract_fixture() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo members — exit code de members-validate.sh (par de /meta:federation-member).
+# Espelha run_contract_fixture: fail exige exatamente rc=1 (registro inválido);
+# rc=2 (uso/arquivo) e rc=3 (python+yaml ausente) NÃO passam por 'fail' — mascarariam
+# um fixture-path quebrado ou ambiente sem yaml como sucesso.
+# ---------------------------------------------------------------------------
+run_members_fixture() {
+  local fixture="$1" verdict="$2"
+  local src="${FIX_DIR}/${fixture}"
+
+  if [ ! -f "${src}" ]; then
+    record_fail "${fixture}" "fixture inexistente: ${src}"
+    return
+  fi
+
+  local rc=0
+  bash "${SCRIPT_DIR}/members-validate.sh" "${src}" >/dev/null 2>&1 || rc=$?
+
+  if [ "${rc}" -eq 3 ]; then
+    record_skip "${fixture}: python3+yaml ausente (members-validate exit 3, gracioso)"
+    return
+  fi
+
+  case "${verdict}" in
+    pass)
+      if [ "${rc}" -eq 0 ]; then record_pass "${fixture}"
+      else record_fail "${fixture}" "esperava exit 0, veio ${rc}"; fi
+      ;;
+    fail)
+      if [ "${rc}" -eq 1 ]; then record_pass "${fixture}"
+      elif [ "${rc}" -eq 0 ]; then record_fail "${fixture}" "esperava exit 1, veio 0 (validador não pegou membro inválido)"
+      else record_fail "${fixture}" "esperava exit 1, veio ${rc} (uso/arquivo inexistente? fixture path quebrado?)"; fi
+      ;;
+    *)
+      record_fail "${fixture}" "verdict desconhecido '${verdict}'"
+      ;;
+  esac
+}
+
+# ---------------------------------------------------------------------------
 # Modo merge — exercita .claude/utils/adopt/merge-onion-hooks.sh (gap do
 # /meta:adopt --update). A fonte é o settings.json REAL do sandbox (acompanha a
 # SSOT de hooks sozinho — sem expected.json acoplado). Para cada fixture-alvo,
@@ -9627,6 +9666,7 @@ if [ -f "${MANIFEST}" ]; then
       lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" ;;
       fix)      run_fix_fixture "${fixture}" "${target}" "${verdict}" ;;
       contract) run_contract_fixture "${fixture}" "${verdict}" ;;
+      members)  run_members_fixture "${fixture}" "${verdict}" ;;
       kg)       run_kg_fixture "${fixture}" "${verdict}" ;;
       merge)    run_merge_fixture "${fixture}" ;;
       *)        record_fail "${fixture:-?}" "kind desconhecido '${kind}'" ;;

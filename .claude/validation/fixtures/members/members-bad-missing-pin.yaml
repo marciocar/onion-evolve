@@ -1,0 +1,32 @@
+# FIXTURE (fail) — adopter (vendoriza) com onion_version 'n/a'. Só distillation/
+# method podem ser n/a; um adopter sem pin VERIFICADO é o defeito que o
+# pin-integrity-check.sh previne na origem. Dados fictícios.
+version: 2
+trust_policy_version: 1
+members:
+  - id: onion-evolve
+    name: onion-evolve
+    role: source
+    kind: source
+    path: "."
+    personality_summary: "A fonte (T0)."
+    specializations: [framework-template]
+    personality_last_sync: 2026-01-01
+  - id: sem-pin
+    name: sem-pin
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    local_path: "/tmp/sem-pin"
+    onion_version: n/a
+    adopted_at: 2026-01-02
+    mode: greenfield
+    personality_summary: "Adopter que finge não vendorizar."
+    specializations: [example]
+    personality_last_sync: 2026-01-02
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      exposes_downstream: []

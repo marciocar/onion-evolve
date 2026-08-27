@@ -1,6 +1,8 @@
 # Manifesto de fixtures do auto-teste de guardas (lint-selftest.sh)
 # Colunas TAB-separadas: kind	fixture	target	verdict	keyword
-#   kind    : lint | fix | contract | merge | kg
+#   kind    : lint | fix | contract | members | merge | kg
+#             members: roda members-validate.sh <fixture> e assere o exit contra
+#                    o veredito (pass=exit 0 | fail=exit 1); target/keyword = '-'.
 #             merge: exercita .claude/utils/adopt/merge-onion-hooks.sh com a
 #                    fixture como settings.json-ALVO; target/verdict/keyword = '-'
 #                    (asserção é semântica: presença + preservação + idempotência).
@@ -8,7 +10,7 @@
 #   target  : subdir do repo onde injetar (só kind=lint; use '-' p/ contract).
 #             Evite campos vazios no MEIO da linha: IFS=tab colapsa tabs
 #             consecutivos. Campos vazios só no FIM (ex.: keyword) são seguros.
-#   verdict : lint -> bad|good|exempt ; contract/kg -> pass|fail (kg = exit de kg-radar.sh --integrity)
+#   verdict : lint -> bad|good|exempt ; contract/members/kg -> pass|fail (kg = exit de kg-radar.sh --integrity)
 #   keyword : substring esperada na violação (só verdict=bad; vazio caso contrário)
 # Linhas iniciadas por '#' e linhas em branco são ignoradas.
 kind	fixture	target	verdict	keyword
@@ -24,6 +26,10 @@ lint	r16-count-drift/good-cmd-count.md	docs	good
 lint	r16-count-drift/exempt-snapshot.md	docs	exempt
 contract	contracts/bad-no-fixtures.md	-	fail
 contract	contracts/good-contract.md	-	pass
+members	members/members-good.yaml	-	pass	
+members	members/members-bad-no-role.yaml	-	fail	
+members	members/members-bad-dup-id.yaml	-	fail	
+members	members/members-bad-missing-pin.yaml	-	fail	
 merge	adopt-settings-merge/target-empty.json	-	-
 merge	adopt-settings-merge/target-with-own.json	-	-
 lint	r17-frontmatter-colon/bad-unquoted-colon.md	.claude/agents/development	bad	não-aspado
