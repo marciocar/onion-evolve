@@ -1,0 +1,36 @@
+# Fixture kg-drive: A e C prontos (sem predecessor aberto); B bloqueado por A (B DEPENDS_ON A, A open).
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: A_FUNDACAO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 1.0
+    verified_against: plano
+    label: "pergunta-raiz, sem predecessor — pronta (research)"
+  - id: B_DEPENDE_DE_A
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_against: plano
+    trace: b.sh
+    label: "decisao que depende de A — bloqueada enquanto A estiver open (execution)"
+  - id: C_SOLTA
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_against: plano
+    trace: c.sh
+    label: "afirmacao sem predecessor — pronta (verification)"
+edges:
+  - from: B_DEPENDE_DE_A
+    edge_type: DEPENDS_ON
+    to: A_FUNDACAO
+  - from: C_SOLTA
+    edge_type: SUPPORTS
+    to: A_FUNDACAO
