@@ -1,0 +1,33 @@
+# FIXTURE (pass) — registro mínimo bem-formado: a fonte + um adopter válido.
+# Exercita members-validate.sh (par de /meta:federation-member). Dados fictícios.
+version: 2
+trust_policy_version: 1
+members:
+  - id: onion-evolve
+    name: onion-evolve
+    role: source
+    kind: source
+    remote: github.com/exemplo/onion-evolve
+    path: "."
+    personality_summary: "A fonte (T0)."
+    specializations: [framework-template]
+    personality_last_sync: 2026-01-01
+  - id: exemplo-adopter
+    name: exemplo-adopter
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    remote: github.com/exemplo/exemplo-adopter
+    local_path: "/tmp/exemplo-adopter"
+    onion_version: abcdef123456
+    adopted_at: 2026-01-02
+    mode: greenfield
+    personality_summary: "Adopter de exemplo."
+    specializations: [example]
+    personality_last_sync: 2026-01-02
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      exposes_downstream: []

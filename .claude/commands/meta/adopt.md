@@ -629,7 +629,9 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/write-stamp.sh" "$INSTALL_DIR" \
   (`DEST="$INSTALL_DIR"`, `OP=adopt`, `PIN=$SRC_COMMIT`, `PREV` vazio na 1ª adoção). O relatório fica em
   `docs/evolution/inbound/` do alvo (git-visível) → o hook "you have mail" o sinaliza na sessão do alvo.
 - **Próximos NO ALVO:** `/warm-up` → `/onion` → `/docs:build-tech-docs`.
-- **Rampa da federação:** oferecer registrar o alvo como membro (`members.yaml`).
+- **Rampa da federação:** oferecer **rodar** `/meta:federation-member register --id <slug> --target <INSTALL_DIR>`
+  (o pin já carimbado desta adoção entra VERIFICADO por `pin-integrity-check.sh`). Human-in-the-loop —
+  oferece, não força; mas agora há **mecanismo** (OP-1 REGISTRAR), não só edição manual de `members.yaml`.
 
 ---
 

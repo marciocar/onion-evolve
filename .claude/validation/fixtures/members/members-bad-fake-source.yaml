@@ -1,0 +1,23 @@
+# FIXTURE (fail) — escape-hatch fechado (achado M1 da revisão adversarial): um adopter
+# marcado role:source evadiria o pin VERIFICADO. role:source ⇔ kind:source é obrigatório.
+# Dados fictícios.
+version: 2
+trust_policy_version: 1
+members:
+  - id: onion-evolve
+    name: onion-evolve
+    role: source
+    kind: source
+    path: "."
+    personality_summary: "A fonte (T0)."
+    specializations: [framework-template]
+    personality_last_sync: 2026-01-01
+  - id: fake-source
+    name: fake-source
+    role: source
+    kind: adopter
+    parent: onion-evolve
+    local_path: "/tmp/fake-source"
+    personality_summary: "Adopter fingindo ser fonte p/ evadir o pin."
+    specializations: [example]
+    personality_last_sync: 2026-01-02
