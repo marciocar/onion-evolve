@@ -1,0 +1,27 @@
+# Fixture kg-drive: A confirmed (fechado) → B (DEPENDS_ON A) fica PRONTO. Prova a guarda liberando.
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: A_FEITO
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-15
+    verified_against: medido
+    trace: a.sh
+    label: "predecessor ja fechado"
+  - id: B_LIBERADO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_against: plano
+    trace: b.sh
+    drive_kind: execution
+    label: "depende de A, que fechou → PRONTO (e com drive_kind explicito)"
+edges:
+  - from: B_LIBERADO
+    edge_type: DEPENDS_ON
+    to: A_FEITO

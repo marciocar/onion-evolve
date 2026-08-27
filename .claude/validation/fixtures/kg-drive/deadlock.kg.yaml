@@ -1,0 +1,28 @@
+# Fixture kg-drive: ciclo X<->Y, ambos open → fila-pronta VAZIA com abertos = DEADLOCK (--check exit 1).
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: X_ESPERA_Y
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_against: plano
+    trace: x.sh
+    label: "X depende de Y"
+  - id: Y_ESPERA_X
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_against: plano
+    trace: y.sh
+    label: "Y depende de X (ciclo)"
+edges:
+  - from: X_ESPERA_Y
+    edge_type: DEPENDS_ON
+    to: Y_ESPERA_X
+  - from: Y_ESPERA_X
+    edge_type: DEPENDS_ON
+    to: X_ESPERA_Y

@@ -10206,6 +10206,38 @@ run_realign_selftests() {
   done
 }
 
+# /meta:drive — o CENSO (kg-drive-project.sh) projeta a FILA-PRONTA de um plano-grafo:
+# nós open com predecessores DEPENDS_ON fechados. GUARDA-DA-GUARDA: o `--check` só sai rc=1
+# no DEADLOCK (há aberto mas fila-pronta vazia). Inclui a regressão do bug do --open-tsv VAZIO.
+run_drive_selftests() {
+  local ds="${REPO_ROOT}/.claude/validation/kg-drive-project.sh"
+  local fx="${REPO_ROOT}/.claude/validation/fixtures/kg-drive"
+  if [ ! -f "${ds}" ]; then record_skip "drive: kg-drive-project.sh ausente"; return; fi
+  if [ ! -d "${fx}" ]; then record_skip "drive: fixtures/kg-drive ausente"; return; fi
+  # caso: nome-da-fixture | substring esperada na linha --check | rc esperado
+  local -a cases=(
+    "ready-and-blocked|READY: pronto=2 bloqueado=1|0"
+    "deadlock|DEADLOCK: pronto=0 bloqueado=2|1"
+    "predecessor-closed|READY: pronto=1 bloqueado=0|0"
+    "all-done|DONE: pronto=0 bloqueado=0 (aberto=0)|0"
+  )
+  local c name want wantrc rc out f
+  for c in "${cases[@]}"; do
+    name="${c%%|*}"; c="${c#*|}"; want="${c%|*}"; wantrc="${c##*|}"
+    f="${fx}/${name}.kg.yaml"
+    if [ ! -f "${f}" ]; then record_fail "drive: fixture ${name}" "fixture ausente: ${f}"; continue; fi
+    rc=0; out="$(bash "${ds}" "${f}" --check 2>&1)" || rc=$?
+    if [ "${rc}" != "${wantrc}" ]; then
+      record_fail "drive: ${name} (rc)" "esperava rc=${wantrc}, veio rc=${rc}: ${out}"; continue
+    fi
+    if printf '%s' "${out}" | grep -qF "${want}"; then
+      record_pass "drive: ${name} censo/fila-pronta (rc=${rc})"
+    else
+      record_fail "drive: ${name} (censo)" "esperava '${want}' em: ${out}"
+    fi
+  done
+}
+
 # REGRA 34 pós-cutover (derivação commitada) — a regra HARD nova entrou sem rede
 # (achado da revisão adversarial da reforma). Fixture em sandbox git REAL: a regra
 # exige índice ([ -e .git ] skip sem ele — o que o sandbox principal, cp -a, prova
@@ -10247,6 +10279,7 @@ run_site_deeplink_selftests
 run_deploy_site_selftests
 run_install_caddy_config_selftests
 run_realign_selftests
+run_drive_selftests
 run_site_derivation_selftests
 run_rules_registry_selftests
 run_onion_version_tracked_selftests

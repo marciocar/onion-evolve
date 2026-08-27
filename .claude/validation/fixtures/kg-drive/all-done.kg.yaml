@@ -1,0 +1,29 @@
+# Fixture kg-drive: REGRESSÃO do bug do arquivo-vazio. Todos os nós FECHADOS → --open-tsv vazio.
+# Antes do fix (FILENAME==ARGV[n] em vez de FNR==1{part++}) as arestas vazavam como "nós abertos".
+# Esperado: DONE, pronto=0 bloqueado=0 aberto=0.
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: D_FEITO
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-15
+    verified_against: medido
+    trace: d.sh
+    label: "trabalho concluido"
+  - id: E_PROVA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-08-15
+    verified_against: execucao
+    trace: e.sh
+    label: "evidencia que apoia"
+edges:
+  - from: E_PROVA
+    edge_type: SUPPORTS
+    to: D_FEITO
