@@ -79,6 +79,15 @@ nodes:
     verified_at: 2026-08-27
     verified_against: "ENTREGUE: /meta:federation-member register (OP-1) + validador determinístico members-validate.sh (par 6a) + 4 fixtures verdes no lint-selftest + adopt.md:632 agora INVOCA o comando (não só sugere). members-validate valid:true no members.yaml vivo (13 membros); as 3 fixtures bad reprovam com erro nomeado (role/dup-id/pin). Branch feat/federation-member-op1-register. Gate da plataforma segue FECHADO e intocado (Q_gatilho)."
     label: "OP-1 REGISTRAR (create): comando /meta:federation-member register que escreve a entrada do membro no ledger seguindo o template comentado, reusando o pin já VERIFICADO por pin-integrity-check.sh. FECHADO: virou mecanismo — o passo final de /meta:adopt (que só sugeria) agora invoca o comando"
+  - id: Q_members_ci_gate
+    node_type: question
+    trace: .claude/validation/members-validate.sh
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: "M2 (revisão adversarial 2026-08-27): members-validate.sh valida na ROTA do comando (Passo 7) e no selftest sobre fixtures, mas NÃO é gate HARD do lint-artifacts.sh sobre o members.yaml VIVO — edição manual com erro semântico-mas-parseável (id dup, trust faltando, pin n/a em adopter) passaria no CI. Header já suavizado p/ não prometer além do que está ligado (behavior-over-declaration). GATILHO p/ ligar HARD: 1a mutação manual que o CI deixou passar OU o nascimento de OP-2/3/4 (aí o validador vira pré-condição compartilhada). Custo: check_members_valid espelhando REGRA 38 (gracioso sem python+yaml) + REGRA nova + catraca REGRA 49"
   - id: C_op_promote
     node_type: claim
     trace: docs/evolution/federation/members.yaml:57
@@ -319,6 +328,10 @@ edges:
     edge_type: DEPENDS_ON
   - from: C_op_register
     to: E_pin_integrity_check
+    edge_type: DEPENDS_ON
+  # M2: ligar o validador como gate HARD do CI depende do validador que OP-1 entregou
+  - from: Q_members_ci_gate
+    to: C_op_register
     edge_type: DEPENDS_ON
   - from: C_op_promote
     to: D_spec_now_build_gated

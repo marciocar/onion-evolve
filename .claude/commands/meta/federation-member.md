@@ -71,14 +71,11 @@ Seguir o **template comentado** de `members.yaml` como forma canônica. Campos:
   kinds vendorizantes.
 - Para `kind` que **não vendoriza** (`distillation`/`method`): `onion_version: n/a`, pin-check pulado.
 
-### Passo 5 — Guarda de projeção no ponto de escrita (REGRA 30 / P6)
-- O `name:` — o trecho **antes de `(`** — deve `norm()`-igualar o `id` (lowercase, sem
-  não-alfanuméricos). Nome comercial/humano vai **dentro de parênteses**, ou marque
-  `projection_name_exempt: true`. Confirmar rodando, após escrever:
-  ```bash
-  bash .claude/validation/projection-safety.sh
-  ```
-  (gate HARD anti-vazamento de confidencial em superfície derivada).
+### Passo 5 — Forma do `name:` antes de escrever (REGRA 30 / P6)
+- **Ao montar o campo** `name:`, o trecho **antes de `(`** deve `norm()`-igualar o `id` (lowercase,
+  sem não-alfanuméricos). Nome comercial/humano vai **dentro de parênteses**, ou marque
+  `projection_name_exempt: true`. (A **confirmação** por `projection-safety.sh` — gate HARD
+  anti-vazamento — roda **depois** da escrita, no Passo 8b.)
 
 ### Passo 6 — Escrever a entrada
 - **Editar** `members.yaml`: inserir o bloco YAML ao **fim da lista `members:`**, imediatamente **antes**
@@ -97,6 +94,13 @@ bash .claude/validation/federation-console.sh > docs/onion/federation-console.ht
 ```
 - `docs/onion/agent-card.json` (REGRA 25) só muda se o membro trouxer bloco `a2a:` com kids que o core
   pina — regenerar via `a2a-agent-card.sh` **só nesse caso** e conferir por `git diff`.
+
+### Passo 8b — Confirmar projeção segura (REGRA 30)
+```bash
+bash .claude/validation/projection-safety.sh
+```
+- Gate HARD anti-vazamento de nome confidencial em superfície derivada. Falha → **reverter** e revisar
+  o `name:` (Passo 5) / `projection_name_exempt`.
 
 ### Passo 9 — Confirmar verde
 ```bash

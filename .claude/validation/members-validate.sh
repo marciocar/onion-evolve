@@ -4,10 +4,21 @@
 #
 # Propósito : O "teste que falha se um membro quebrar o registro". É o validador
 #             determinístico que a spec m3-federation-admin nomeia como
-#             pré-requisito de qualquer OP de mutação (OP-1..4): barra membro
-#             mal-formado ANTES do commit — hoje só há yaml.safe_load tolerante
-#             e awk frouxo (bug FED-2-0). NÃO reimplementa a P6 de nome-projetado
-#             (isso é projection-safety.sh — guarda-única, invocada à parte).
+#             pré-requisito de qualquer OP de mutação (OP-1..4) — hoje só há
+#             yaml.safe_load tolerante e awk frouxo (bug FED-2-0). NÃO reimplementa
+#             a P6 de nome-projetado (isso é projection-safety.sh, guarda-única).
+#
+# Onde RODA hoje (behavior-over-declaration — o alcance exato, sem prometer mais):
+#             (1) Passo 7 de /meta:federation-member (barra o membro ANTES do commit
+#             na rota do comando) e (2) lint-selftest sobre as fixtures. NÃO é ainda
+#             gate HARD do lint sobre o members.yaml VIVO — uma edição MANUAL com erro
+#             semântico-mas-parseável passaria no CI. Ligar isto ao lint-artifacts.sh
+#             é fio nomeado no grafo (m3-federation-admin: D_members_ci_gate).
+#
+# Obrigatórios por membro derivado: id(único) name role kind parent onion_version
+#             adopted_at mode personality_summary specializations personality_last_sync
+#             trust(5 listas). OPCIONAIS (não checados): remote, local_path, a2a,
+#             lineages, exposes, etc. A fonte (kind:source ⇔ role:source) é isenta.
 #
 # Uso       : bash .claude/validation/members-validate.sh [<path-do-members.yaml>] [--json]
 #               <path> : caminho PASSADO COMO ARGUMENTO; default = o members.yaml
@@ -110,9 +121,17 @@ if isinstance(doc, dict):
         if kind not in KINDS:
             err(f"{tag}: 'kind' inválido ou ausente ('{kind}'); esperado {sorted(KINDS)}")
 
-        # a fonte (source) é o único membro sem parent/onion_version/trust — por papel.
-        if role == "source":
+        # A isenção de parent/onion_version/trust é da FONTE — e a fonte se reconhece pela
+        # NATUREZA (kind==source), não só pelo tier. Isentar só por role:source abria escape-hatch:
+        # um adopter marcado role:source evadia o pin VERIFICADO (o false-green de pin que este
+        # validador existe p/ matar). Exigir role:source ⇔ kind:source fecha o buraco.
+        is_source_role = role == "source"
+        is_source_kind = kind == "source"
+        if is_source_role != is_source_kind:
+            err(f"{tag}: 'role:source' e 'kind:source' têm de vir juntos (fonte≠derivação); veio role='{role}' kind='{kind}'")
+        if is_source_role and is_source_kind:
             continue
+        # membro derivado (ou role/kind mistos, já sinalizados acima): validação plena abaixo.
 
         if not m.get("parent"):
             err(f"{tag}: 'parent' ausente (obrigatório salvo role:source)")
@@ -143,6 +162,11 @@ if isinstance(doc, dict):
                     err(f"{tag}: trust.'{tl}' ausente")
                 elif not isinstance(trust[tl], list):
                     err(f"{tag}: trust.'{tl}' não é lista")
+
+    # Invariante do ledger: fonte≠derivação → EXATAMENTE uma fonte (kind:source).
+    n_sources = sum(1 for m in members if isinstance(m, dict) and m.get("kind") == "source")
+    if n_sources != 1:
+        err(f"registro: esperado EXATAMENTE 1 membro fonte (kind:source), encontrado {n_sources} (fonte≠derivação: uma só fonte)")
 elif doc is not None:
     err("documento raiz não é um mapa (esperado: chaves version/trust_policy_version/members)")
 

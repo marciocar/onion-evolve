@@ -30,6 +30,7 @@ members	members/members-good.yaml	-	pass
 members	members/members-bad-no-role.yaml	-	fail	
 members	members/members-bad-dup-id.yaml	-	fail	
 members	members/members-bad-missing-pin.yaml	-	fail	
+members	members/members-bad-fake-source.yaml	-	fail	
 merge	adopt-settings-merge/target-empty.json	-	-
 merge	adopt-settings-merge/target-with-own.json	-	-
 lint	r17-frontmatter-colon/bad-unquoted-colon.md	.claude/agents/development	bad	não-aspado
