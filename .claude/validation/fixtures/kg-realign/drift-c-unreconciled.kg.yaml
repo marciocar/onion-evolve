@@ -1,0 +1,28 @@
+# Fixture kg-realign: drift tipo (c) — desorganiza passado/futuro. Alvo de SUPERSEDES segue
+# confirmed (Aufhebung nao aplicada). O radar NAO reprova isso; o realign da dente (rc=1).
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: C_SUPERSEDED_BUT_CONFIRMED
+    node_type: claim
+    label: "afirmacao antiga que foi superada mas nunca virou superseded"
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-15
+    verified_against: "medicao"
+    trace: "x.sh"
+  - id: D_SUPERSEDER
+    node_type: decision
+    label: "decisao nova que supera a antiga"
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-08-15
+    verified_against: "medicao"
+    trace: "y.sh"
+edges:
+  - from: D_SUPERSEDER
+    edge_type: SUPERSEDES
+    to: C_SUPERSEDED_BUT_CONFIRMED

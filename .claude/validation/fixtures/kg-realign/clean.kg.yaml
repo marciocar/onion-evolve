@@ -1,0 +1,27 @@
+# Fixture kg-realign: SEM drift — o realign deve dar ALINHADO, rc=0, todos zeros.
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: D_PLAN_STEP
+    node_type: decision
+    label: "passo do plano, ancorado a artefato via trace"
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-08-15
+    verified_against: "execucao medida"
+    trace: "ops/step.sh"
+  - id: E_PROOF
+    node_type: evidence
+    label: "evidencia que apoia o passo"
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-15
+    verified_against: "execucao"
+    trace: "ops/step.sh"
+edges:
+  - from: E_PROOF
+    edge_type: SUPPORTS
+    to: D_PLAN_STEP

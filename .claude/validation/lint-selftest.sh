@@ -10172,6 +10172,40 @@ run_install_caddy_config_selftests() {
   fi
 }
 
+# /meta:realign — o motor de revisão em camadas (kg-realign-project.sh) classifica drift
+# em (a)/(b)/(c) + commitment/binding sobre fixtures com um drift plantado de cada tipo.
+# GUARDA-DA-GUARDA: o `--check` só sai rc=1 no tipo-(c) (o dente); os demais informam sem bloquear.
+run_realign_selftests() {
+  local rs="${REPO_ROOT}/.claude/validation/kg-realign-project.sh"
+  local fx="${REPO_ROOT}/.claude/validation/fixtures/kg-realign"
+  if [ ! -f "${rs}" ]; then record_skip "realign: kg-realign-project.sh ausente"; return; fi
+  if [ ! -d "${fx}" ]; then record_skip "realign: fixtures/kg-realign ausente"; return; fi
+  # caso: nome-da-fixture | substring esperada na linha --check | rc esperado
+  local -a cases=(
+    "clean|ALINHADO: (c)=0 (b)=0 (a)=0 · commit=0 bind=0|0"
+    "drift-c-unreconciled|REALINHAR: (c)=1|1"
+    "drift-b-costly|(b)=1|0"
+    "drift-a-benign|(a)=1|0"
+    "drift-northstar|commit=1 bind=1|0"
+    "bind-fp-supported-decision|bind=0|0"
+  )
+  local c name want wantrc rc out f
+  for c in "${cases[@]}"; do
+    name="${c%%|*}"; c="${c#*|}"; want="${c%|*}"; wantrc="${c##*|}"
+    f="${fx}/${name}.kg.yaml"
+    if [ ! -f "${f}" ]; then record_fail "realign: fixture ${name}" "fixture ausente: ${f}"; continue; fi
+    rc=0; out="$(bash "${rs}" "${f}" --check 2>&1)" || rc=$?
+    if [ "${rc}" != "${wantrc}" ]; then
+      record_fail "realign: ${name} (rc)" "esperava rc=${wantrc}, veio rc=${rc}: ${out}"; continue
+    fi
+    if printf '%s' "${out}" | grep -qF "${want}"; then
+      record_pass "realign: ${name} classifica e sela (rc=${rc})"
+    else
+      record_fail "realign: ${name} (classificação)" "esperava '${want}' em: ${out}"
+    fi
+  done
+}
+
 # REGRA 34 pós-cutover (derivação commitada) — a regra HARD nova entrou sem rede
 # (achado da revisão adversarial da reforma). Fixture em sandbox git REAL: a regra
 # exige índice ([ -e .git ] skip sem ele — o que o sandbox principal, cp -a, prova
@@ -10212,6 +10246,7 @@ run_backtick_ref_selftests
 run_site_deeplink_selftests
 run_deploy_site_selftests
 run_install_caddy_config_selftests
+run_realign_selftests
 run_site_derivation_selftests
 run_rules_registry_selftests
 run_onion_version_tracked_selftests

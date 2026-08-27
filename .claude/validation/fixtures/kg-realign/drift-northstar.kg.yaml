@@ -1,0 +1,40 @@
+# Fixture kg-realign: camada 3 — commitment-drift (objetivo aberto de alto impacto sem apoio) E
+# binding-drift (decisao sem trace: nem TRACES_TO/SUPPORTS — no solto). Ambos abaixo do limiar.
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: Q_ABANDONED_GOAL
+    node_type: question
+    label: "objetivo de alto impacto que ficou aberto e ninguem apoiou"
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: open
+    verified_at: 2026-08-15
+    verified_against: "plano"
+    trace: "goal.md"
+  - id: D_LOOSE
+    node_type: decision
+    label: "decisao sem vinculo a artefato nenhum"
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    verified_at: 2026-08-15
+    verified_against: "plano"
+  - id: E_ANCHOR
+    node_type: evidence
+    label: "evidencia so para D_LOOSE nao ficar orfa"
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-15
+    verified_against: "x"
+    trace: "e.sh"
+edges:
+  - from: D_LOOSE
+    edge_type: DEPENDS_ON
+    to: E_ANCHOR
+  - from: D_LOOSE
+    edge_type: DEPENDS_ON
+    to: Q_ABANDONED_GOAL

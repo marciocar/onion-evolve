@@ -1,0 +1,29 @@
+# Fixture kg-realign: REGRESSÃO do binding-drift (achado do dogfood do corpus real, 2026-08-27).
+# Uma `decision` SEM trace: e SEM vínculo de SAÍDA, mas que é ALVO de `evidence SUPPORTS decision`
+# (apoio de ENTRADA), ESTÁ vinculada — NÃO é nó solto. O bind deve dar 0. Antes do fix dava 1
+# (a regra só olhava binding[from], cega ao apoio de entrada — 3 FPs medidos num só grafo audit).
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: D_SUPPORTED_NO_TRACE
+    node_type: decision
+    label: "decisao sem trace: e sem vinculo de saida, mas apoiada por evidencia (alvo de SUPPORTS)"
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: done
+    verified_at: 2026-08-15
+    verified_against: "medicao"
+  - id: E_BACKS_IT
+    node_type: evidence
+    label: "evidencia que apoia a decisao acima — o vinculo existe, so que na direcao de entrada"
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-15
+    verified_against: "execucao"
+    trace: "proof.sh"
+edges:
+  - from: E_BACKS_IT
+    edge_type: SUPPORTS
+    to: D_SUPPORTED_NO_TRACE
