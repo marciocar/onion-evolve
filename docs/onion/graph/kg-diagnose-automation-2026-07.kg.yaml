@@ -27,6 +27,8 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-08-27
+    verified_against: "kg.md lido no vivo (L434/454/435-436/358): automacao = so fan-out mecanico (scaffold/candidatos/gate-do-radar); PAUSA e selo sao humanos ('o humano sela'); NAO existe --auto de diagnostico (transform tem auto legitimo, o 'ao contrario' do label) — linha vermelha INTACTA"
     label: "LINHA VERMELHA: a automação substitui só o fan-out MECÂNICO (scaffold, extract/consolidate, candidatos, gate-do-radar). NUNCA o selo na PAUSA. Não existe --auto de diagnóstico de propósito (ao contrário do transform, onde auto é legítimo p/ tasks)"
     trace: ".claude/commands/meta/kg.md"
   - id: E_gap_scaffold
