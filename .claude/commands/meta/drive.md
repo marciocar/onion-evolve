@@ -54,7 +54,7 @@ estouro). Um nó **em-voo nunca é re-selecionado** (status monotônico).
 
 ### P3 — Por nó (orquestra via `onion-orchestration`; teto 16 workers, budget/worker)
 1. **CLASSIFICAR** `drive_kind` (campo do nó, senão julgue: `question`→research · `claim`→verification · `decision`→execution/decision).
-2. **BEACON** `bash .claude/utils/session-beacon.sh check <repo>` **antes** de qualquer switch de worktree (I3).
+2. **BEACON** `bash .claude/validation/session-beacon.sh check <repo>` **antes** de qualquer switch de worktree (I3).
 3. **AVANÇAR** — roteie por KIND:
    | KIND | avançar = | delega a |
    |---|---|---|
