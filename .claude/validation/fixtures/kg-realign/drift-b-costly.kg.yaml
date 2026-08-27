@@ -1,0 +1,27 @@
+# Fixture kg-realign: drift tipo (b) — custoso no futuro. Claim UNANCHORED (verified_at sem
+# verified_against) e HA um no que DEPENDS_ON dela — se ela mente, o dependente cai junto.
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: C_UNANCHORED_LOADBEARING
+    node_type: claim
+    label: "afirmacao com carimbo mas sem alvo, e algo depende dela"
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-15
+    trace: "load.sh"
+  - id: D_DEPENDENT
+    node_type: decision
+    label: "decisao que depende da afirmacao acima"
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: open
+    verified_at: 2026-08-15
+    verified_against: "plano"
+    trace: "dep.sh"
+edges:
+  - from: D_DEPENDENT
+    edge_type: DEPENDS_ON
+    to: C_UNANCHORED_LOADBEARING

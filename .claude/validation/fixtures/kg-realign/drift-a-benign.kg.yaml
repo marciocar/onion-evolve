@@ -1,0 +1,26 @@
+# Fixture kg-realign: drift tipo (a) — inocuo. Claim UNANCHORED SEM dependentes: baixo custo.
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: C_UNANCHORED_LEAF
+    node_type: claim
+    label: "afirmacao com carimbo mas sem alvo, e nada depende dela"
+    plane: PROD
+    impact: 2
+    confidence: 0.7
+    status: confirmed
+    verified_at: 2026-08-15
+    trace: "leaf.sh"
+  - id: E_UNRELATED
+    node_type: evidence
+    label: "evidencia solta so para o grafo nao ser trivial"
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-15
+    verified_against: "x"
+    trace: "e.sh"
+edges:
+  - from: C_UNANCHORED_LEAF
+    edge_type: SUPPORTS
+    to: E_UNRELATED
