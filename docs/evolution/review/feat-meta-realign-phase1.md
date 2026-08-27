@@ -3,7 +3,7 @@ title: "Revisão — /meta:realign Fase 1 (a revisão em camadas do plano × o v
 date: 2026-08-27
 branch: feat/meta-realign-phase1
 reviewer: "self-review (autor) + dogfood adversarial read-only do corpus real (fork, 73 grafos)"
-reviewed_diff_sha256: 0a0f648577635a3b9c50b7941fab5b8399925cfd6cf30a05b86fede2dd1c6f16
+reviewed_diff_sha256: d7aa1b06544cf4f85b093cc33029f4bcf6f610355d98b5cac9ba2bbedcaae086
 findings_total: 4
 findings_real: 1
 verdict: APROVADO
