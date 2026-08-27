@@ -3,12 +3,12 @@ title: "Revisão — drive m3-federation (C_command_side_gap DRIFTED, C_not_back
 date: 2026-08-27
 branch: fix/kg-refresh-command-side-drift
 reviewer: "self-review (drive/verification) + medição executada contra o vivo + radar --integrity"
-reviewed_diff_sha256: aa8f4ee069723a350d624732b15c05d4fcec96cf7b5d940f9cdaa370b02282c2
-findings_total: 0
-findings_real: 0
+reviewed_diff_sha256: a9a236b851ed6cc3d0047da8ed40def9dd169f34d019c698695c22522ba8aa24
+findings_total: 1
+findings_real: 1
 verdict: APROVADO
-tokens: 7000
-duration_min: 9
+tokens: 8000
+duration_min: 12
 ---
 
 # Resíduo — REGRA 56 (passada /meta:drive, degrau AUDIT)
@@ -39,9 +39,12 @@ maestro) — `drifted` é a saída legítima do freshness, não um truth-flip.
 C_not_backstage saiu da fila (confirmed); C_command_side_gap segue visível (drifted = residual
 OP-2/3/4 é trabalho aberto real).
 
-## Achado colateral (registrado, não corrigido aqui)
-O comando `/meta:drive` referencia `.claude/utils/session-beacon.sh` (P3 BEACON) que **não existe**
-nesse caminho — ponteiro morto. Fora do escopo deste refresh; fica p/ fio próprio.
+## Achado #1 — CORRIGIDO neste PR (dogfood da própria passada)
+O `/meta:drive` P3 BEACON chamava `.claude/utils/session-beacon.sh` (No such file) — o script vive em
+`.claude/validation/session-beacon.sh`. O passo BEACON (guarda I3 antes de switch de worktree) falhava
+em TODO drive. Achado ao rodar a passada de verdade; **fix→re-testado no mesmo loop** (doutrina
+dogfood): `.claude/validation/session-beacon.sh check .` → exit 0, lista os beacons. Corrigido em
+`drive.md:57` neste PR (não one-off, não fio adiado).
 
 ## Veredito
 **APROVADO.** Refresh determinístico por medição, `--integrity` verde, nada flipado sem base.
