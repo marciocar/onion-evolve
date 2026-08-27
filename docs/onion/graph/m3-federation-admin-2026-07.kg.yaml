@@ -61,13 +61,15 @@ nodes:
   # ---- GAP CENTRAL + OPERAÇÕES DE MUTAÇÃO (claim) ----
   - id: C_command_side_gap
     node_type: claim
-    trace: .claude/commands/meta/adopt.md:545
+    trace: .claude/commands/meta/federation-member.md
     layer: audit
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
-    label: "GAP confirmado: existe read-model completo (SSOT + event-log + 3 read-views) e 1 gate de escrita determinístico (trust-topology-check, mas só grava LOG de decisão). NENHUMA mutação do registro (members.yaml) tem comando dedicado — /meta:adopt só SUGERE registrar; toda mutação é edição manual de YAML + commit"
+    status: drifted
+    verified_at: 2026-08-27
+    verified_against: "DRIFTED pelo OP-1 (PR #697, medido no drive 2026-08-27): a manchete 'NENHUMA mutação tem comando dedicado; /meta:adopt só SUGERE' caiu parcialmente — /meta:federation-member register EXISTE e adopt.md:632 agora INVOCA o comando (não mais 'oferecer registrar' passivo). O gap PERSISTE só para OP-2/3/4 (promote/update/revoke seguem 100% edição manual de YAML): grep em .claude/commands/meta/ = zero comando promote/update/revoke."
+    label: "GAP (parcial após OP-1): read-model completo + 1 gate de escrita (trust-topology-check, só LOG). OP-1 REGISTRAR virou comando dedicado (/meta:federation-member register; adopt INVOCA). Restam SEM comando OP-2 PROMOVER / OP-3 ATUALIZAR / OP-4 REVOGAR — mutação por edição manual de YAML + commit"
   - id: C_op_register
     node_type: claim
     trace: .claude/commands/meta/federation-member.md
@@ -189,7 +191,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.85
-    status: open
+    status: confirmed
+    verified_at: 2026-08-27
+    verified_against: "CONFIRMED (drive 2026-08-27): a fronteira segue fisicamente amarrada — federation-console.sh:6 ainda declara 'NAO e plataforma (Backstage/Port = over-engineering p/ N pequeno)', read-only/zero-backend; e a premissa N=8 segue de pé: 0 membros role:consumer (T2) em members.yaml. Nada exige plataforma."
     label: "ANTI-plataforma p/ N=8: Backstage/Port custam 3+ engenheiros + US$450k/ano e só compensam a 200-1000+ devs (S3·F1). A fronteira 'NÃO é plataforma' JÁ está fisicamente amarrada ao artefato (federation-console.sh:6-9) e travada por REGRA 24/38 — read-only projeção, zero backend/DB, git como event store"
   - id: C_reuse_readmodel
     node_type: claim
