@@ -44,7 +44,6 @@ docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::7d7801c9e26f
 docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::a87c11a1ef0f
 docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::e9a670c07fbe
 docs/onion/graph/colaboracao-onion-2026-07.kg.yaml::ef01f06d8799
-docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml::3253df7386c0
 docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml::58040018761a
 docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml::77155224e1ef
 docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml::8c2b97fb23fd

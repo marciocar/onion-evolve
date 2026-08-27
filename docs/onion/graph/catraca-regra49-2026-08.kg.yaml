@@ -386,6 +386,16 @@ nodes:
     status: open
     trace: .claude/utils/adopt/vendor-branch.sh
     label: "FOLLOW-UP M2 (gatilho: o veneno congelado voltar a incomodar): poc(47)/gustavo(48) tem chaves estrangeiras JA rastreadas no onion/vendor, congeladas inertes pela cura (vendor==merge-base → merge toma *ours*). A cura NAO as remove, so as impede de avancar. Scrub/re-seed do baseline do vendor removeria o passivo latente. Hoje inerte; promover so se a equivalencia vendor==merge-base quebrar"
+  - id: E_PRIMEIRO_DOGFOOD_REAL
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-27
+    verified_against: "D_linha_vermelha medido contra kg.md (STALE-MISSING->OK); baseline 47->46; coverage rc=0"
+    label: "PRIMEIRO DOGFOOD REAL da catraca (2026-08-27, surgido do 1o /meta:realign invocado pelo maestro): D_linha_vermelha (kg-diagnose-automation, PROD/imp5) foi MEDIDO contra o kg.md vivo — linha vermelha intacta (automacao so no fan-out mecanico L434/454, selo humano na PAUSA L435/358, sem --auto de diagnostico) —, carimbado, e SAIU do baseline (47->46). A propriedade fundadora da REGRA 49 ('so encolhe por MEDICAO') executou sobre dado REAL pela 1a vez, nao mais sintetica; coverage rc=0. PARCIAL: 1 caminho exercido (PASSIVO->medido->removido); as 2 classes HARD (NO-BASELINE, REGRESSAO) e as demais seguem sem execucao de campo — por isso a Q permanece open."
+    trace: ".claude/validation/kg-verification-baseline.txt"
 edges:
   # o defeito e a forma da cura
   - from: E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS
@@ -515,4 +525,7 @@ edges:
     edge_type: DEPENDS_ON
   - from: D_ADOPT_MUST_EMIT_MISSING_BASELINES
     to: Q_GRANAAI_UPDATE_BLOCKED
+    edge_type: SUPPORTS
+  - from: E_PRIMEIRO_DOGFOOD_REAL
+    to: Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES
     edge_type: SUPPORTS
