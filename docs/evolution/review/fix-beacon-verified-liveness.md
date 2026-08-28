@@ -3,7 +3,7 @@ title: "Revisão — farol de sessão mede o dono (informado ≠ verificado)"
 date: 2026-08-28
 branch: fix/beacon-verified-liveness
 reviewer: "2 revisores adversariais em paralelo (código do motor + cobertura de bancada), com execução e mutação; + dogfood do hook pelo caminho real"
-reviewed_diff_sha256: PLACEHOLDER
+reviewed_diff_sha256: 61db9650578e6f1e888e3208ccef7a09d8f05619aef77e2ea58965ec8014f8e2
 findings_total: 13
 findings_real: 11
 verdict: APROVADO_APOS_CORRECAO
