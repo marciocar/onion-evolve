@@ -2225,6 +2225,28 @@ _apply_fix_file() {            # $1=arquivo  $2=programa sed -E
   rm -f "${tmp}"
 }
 
+# --fix da REGRA 62. FUNÇÃO PRÓPRIA, não um bloco dentro de run_inventory_fixes: lá o
+# `[ -n "${cmd}" ] || return 0` sai ANTES, então qualquer falha alheia do inventory.sh
+# fazia o autofix do backlog sumir sem aviso e a R62 virar HARD manual (achado adversarial).
+# E CONTABILIZA a escrita: mutar arquivo rastreado e o relatório dizer "nada a fazer" é
+# behavior-over-declaration invertido dentro da própria ferramenta que a prega.
+run_backlog_projection_fix() {
+  [ "${IS_DERIVED}" -eq 0 ] || return 0
+  local gen="${SCRIPT_DIR}/kg-backlog-project.sh" out="${REPO_ROOT}/docs/backlog.md"
+  [ -f "${gen}" ] && [ -f "${out}" ] || return 0
+  local tmp; tmp="$(mktemp)"
+  # o rc do gerador MANDA: ele agora recusa (exit 2) quando o radar falha, quando um grafo
+  # enumerado sumiu do worktree, ou sem iconv. `[ -s ]` sozinho NÃO basta — a saída
+  # destrutiva medida na revisão era PLAUSÍVEL (cabeçalho + "nada aberto"), não vazia.
+  if bash "${gen}" --markdown > "${tmp}" 2>/dev/null && [ -s "${tmp}" ] \
+     && ! diff -q "${out}" "${tmp}" >/dev/null 2>&1; then
+    cp "${tmp}" "${out}"
+    FIX_LOG+=("docs/backlog.md: projeção regenerada (REGRA 62)")
+    FIXED_FILES=$(( FIXED_FILES + 1 ))
+  fi
+  rm -f "${tmp}"
+}
+
 run_inventory_fixes() {
   local env_out cmd agent cats agent_cats kb skill prog
   env_out="$(bash "${SCRIPT_DIR}/inventory.sh" --env 2>/dev/null || true)"
@@ -2239,20 +2261,6 @@ run_inventory_fixes() {
   # REGRA 8 — a SSOT é REGENERADA (nunca editada frase-a-frase); materializa a
   # verdade que as frases derivam. inventory.md é isento das reescritas seguintes.
   bash "${SCRIPT_DIR}/inventory.sh" --markdown > "${REPO_ROOT}/docs/onion/inventory.md" 2>/dev/null || true
-
-  # REGRA 62 — a projeção do backlog entra no --fix pela mesma razão que o inventário: a
-  # catraca liga docs/backlog.md ao conteúdo de 45 grafos, então TODO PR que abre ou fecha
-  # um nó passaria a exigir reprojeção à mão. `_gen_into` já separa QUEBRA de drift na
-  # DETECÇÃO; aqui a escrita é condicionada ao gerador ter tido sucesso — nunca `> arquivo`
-  # direto, que zeraria a projeção boa se o gerador recusasse (é o modo destrutivo que a
-  # guarda de enumeração-vazia acabou de provar existir).
-  if [ -f "${SCRIPT_DIR}/kg-backlog-project.sh" ] && [ "${IS_DERIVED}" -eq 0 ]; then
-    local _bl_tmp; _bl_tmp="$(mktemp)"
-    if bash "${SCRIPT_DIR}/kg-backlog-project.sh" --markdown > "${_bl_tmp}" 2>/dev/null && [ -s "${_bl_tmp}" ]; then
-      cp "${_bl_tmp}" "${REPO_ROOT}/docs/backlog.md"
-    fi
-    rm -f "${_bl_tmp}"
-  fi
 
   # Mesmo conjunto de frases canônicas da detecção (REGRA 16). Frases com DUAS
   # contagens reescrevem ambas numa só substituição (o \N preserva o miolo/cauda).
@@ -3363,6 +3371,7 @@ echo "=== Onion Lint — iniciando validação em ${CLAUDE_DIR} ==="
 echo ""
 
 if [ "${FIX_MODE}" -eq 1 ]; then
+  run_backlog_projection_fix
   run_inventory_fixes
   if [ "${FIXED_FILES}" -gt 0 ]; then
     echo "=== --fix: ${FIXED_FILES} arquivo(s) realinhado(s) à SSOT ==="

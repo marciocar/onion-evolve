@@ -10532,8 +10532,10 @@ run_backlog_projection_selftests() {
     record_skip "backlog-projection: sem-iconv — não foi possível montar PATH sem iconv (cenário não montado)"
   else
     rc=0
-    ( cd "${sb}" && PATH="${fakebin}" bash .claude/validation/kg-backlog-project.sh --markdown >/dev/null 2>&1 ) || rc=$?
-    if [ "${rc}" -eq 2 ]; then
+    ( cd "${sb}" && PATH="${fakebin}" bash .claude/validation/kg-backlog-project.sh --markdown >/dev/null 2>"${sb}/ic.err" ) || rc=$?
+    # casa a RAZÃO, não só o código: um exit 2 vindo da guarda de enumeração (ex.: `git`
+    # faltando no PATH falso) passaria igual e o caso mediria outra coisa.
+    if [ "${rc}" -eq 2 ] && grep -q 'iconv AUSENTE' "${sb}/ic.err" 2>/dev/null; then
       record_pass "backlog-projection: sem iconv → gerador RECUSA (render não-reproduzível não nasce)"
     else record_fail "backlog-projection: sem iconv" "esperava exit 2, veio ${rc} — render dependeria do ambiente"; fi
   fi
@@ -10543,7 +10545,10 @@ run_backlog_projection_selftests() {
   #     chamar de quebra, então viraria "drift" e a mensagem mandaria REGENERAR POR CIMA da
   #     projeção boa. Falha aberta que vira DESTRUTIVA; o gerador tem de recusar antes.
   local sbng
-  sbng="$(mktemp -d)"
+  # TMPDIR fixo: se TMPDIR apontar para dentro de um worktree git, `git rev-parse
+  # --show-toplevel` resolve o ROOT para o repo HOSPEDEIRO e o --write deste caso
+  # escreveria no docs/backlog.md dele — o teste vazando para fora do sandbox.
+  sbng="$(TMPDIR=/tmp mktemp -d)"
   cp -a "${REPO_ROOT}/.claude" "${sbng}/.claude"
   cp -a "${REPO_ROOT}/docs"    "${sbng}/docs"
   before="$(sha256sum "${sbng}/docs/backlog.md" | cut -d' ' -f1)"
@@ -10553,6 +10558,43 @@ run_backlog_projection_selftests() {
     record_pass "backlog-projection: enumeração vazia → QUEBRA (recusa; não sobrescreve a projeção boa)"
   else record_fail "backlog-projection: enumeração vazia" "esperava rc=2 e arquivo intacto; rc=${rc} mutou=$([ "${before}" = "${after}" ] && echo nao || echo SIM)"; fi
   rm -rf "${sbng}"
+
+
+  # (g) LOCALE — o eixo que uma catraca byte-a-byte COMPRA e que nenhum outro caso tocava.
+  #     Medido na revisão adversarial: `sort` sem LC_ALL=C troca a ordem de nós empatados
+  #     sob en_US, e `printf '%.1f'` sob LC_NUMERIC com vírgula grava `38,0` no lugar de
+  #     `38.2` — 190 erros em stderr E exit 0, o que faria o lint mandar GRAVAR o lixo.
+  #     O script pina `export LC_ALL=C`; este caso prova que a pinagem sobrevive ao chamador.
+  local loc found_alt=""
+  for loc in en_US.utf8 en_US.UTF-8 C.utf8; do
+    if locale -a 2>/dev/null | grep -qx "${loc}"; then found_alt="${loc}"; break; fi
+  done
+  if [ -n "${found_alt}" ]; then
+    ( cd "${sb}" && LC_ALL="${found_alt}" bash .claude/validation/kg-backlog-project.sh --markdown > "${sb}/loc.out" 2>/dev/null )
+    if diff -q "${sb}/md.out" "${sb}/loc.out" >/dev/null 2>&1; then
+      record_pass "backlog-projection: render idêntico sob locale ${found_alt} (pinagem sobrevive ao chamador)"
+    else record_fail "backlog-projection: locale" "render diverge sob ${found_alt} — a catraca HARD acusaria o AMBIENTE, não o conteúdo"; fi
+  else
+    record_skip "backlog-projection: locale — nenhum locale alternativo instalado (SUT não exercido)"
+  fi
+
+  # (h) RADAR QUEBRADO → QUEBRA, não perda calada. Era o buraco mais grave: o rc do radar
+  #     era descartado, um grafo ilegível fazia dezenas de itens sumirem, o --fix gravava a
+  #     perda e a REGRA 62 reportava ZERO violações — a guarda selando a própria doença.
+  local sbrd
+  sbrd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${REPO_ROOT}/.claude" "${sbrd}/.claude"
+  cp -a "${REPO_ROOT}/docs"    "${sbrd}/docs"
+  ( cd "${sbrd}" && git init -q && git add -A >/dev/null 2>&1 \
+    && git -c user.email=t@t -c user.name=t commit -qm seed >/dev/null 2>&1 ) || true
+  rm -f "${sbrd}/.claude/validation/lib/status-factor.awk"   # o radar passa a sair != 0
+  before="$(sha256sum "${sbrd}/docs/backlog.md" | cut -d' ' -f1)"
+  rc=0; ( cd "${sbrd}" && bash .claude/validation/kg-backlog-project.sh --write >/dev/null 2>"${sbrd}/rd.err" ) || rc=$?
+  after="$(sha256sum "${sbrd}/docs/backlog.md" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 2 ] && [ "${before}" = "${after}" ] && grep -q 'kg-radar FALHOU' "${sbrd}/rd.err" 2>/dev/null; then
+    record_pass "backlog-projection: radar quebrado → QUEBRA (não some item calado nem sobrescreve)"
+  else record_fail "backlog-projection: radar quebrado" "esperava rc=2 + intacto + razão; rc=${rc} mutou=$([ "${before}" = "${after}" ] && echo nao || echo SIM)"; fi
+  rm -rf "${sbrd}"
 
   rm -rf "${fakebin}" "${sb}"
 }

@@ -461,7 +461,7 @@ nodes:
     status: confirmed
     verified_at: 2026-08-28
     trace: ".claude/validation/lint-artifacts.sh"
-    verified_against: 'bancada run_backlog_projection_selftests 6/6 + 3 mutacoes que reprovam (regra desligada / args fail-open / guarda de enumeracao removida)'
+    verified_against: 'bancada run_backlog_projection_selftests 8/8 (inclui locale e radar-quebrado, os dois eixos que a revisao adversarial provou descobertos) + 5 mutacoes que reprovam + CI: lint rodou em runner diferente e a regra NAO disparou (render deterministico entre maquinas)'
     label: 'REGRA 62 [HARD]: docs/backlog.md tem de bater com a regeneracao da fonte. Fecha a classe que Q_INDICE_DO_DIARIO_SEM_CATRACA nomeou — projecao GERADA que envelhece calada — no unico artefato onde a comparacao e deterministica hoje. Pendurar a deteccao no LINT (e nao num cron) da o gatilho sem ferir o MOAT de auto-inicio: a maquina DETECTA, o humano ATUA. Pre-requisitos que a entrega exigiu, ambos assimetrias dentro de familia ja curada: modo --markdown (stdout) que o _gen_into exige e que os tres irmaos ja tinham, e `case` de args FECHADO com exit 2 (o MODE=${1:---write} era fail-open num caminho de ESCRITA: --dry-run sobrescrevia em silencio). CORE-ONLY por IS_DERIVED — o core e o pior oraculo do que viaja'
 
   - id: E_ENUMERACAO_VAZIA_ERA_DESTRUTIVA
@@ -483,6 +483,26 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'grep de owner: em todo o corpus .kg.yaml = 0 ocorrencias; 3 lugares em prosa afirmavam o agrupamento'
     label: 'MESMA ASSINATURA QUE ORIGINOU A REGRA 58, noutro artefato: o campo `owner:` e LIDO pelo projetor desde a origem e NUNCA foi escrito por ninguem (0 ocorrencias no corpus), enquanto a descricao do comando, o procedimento e o /meta:realign afirmavam agrupamento por owner. Prosa que sobrevive ao mecanismo. Cura escolhida: NAO construir o mecanismo (o gatilho disparou para HONESTIDADE, e `owner` cai do lado VEDADO do invariante de escopo da onda) — a projecao passa a IMPRIMIR que zero nos declaram owner e que o agrupamento efetivo e por grafo'
+
+  - id: E_A_GUARDA_SELAVA_A_PROPRIA_DOENCA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'revisao adversarial reproduziu com comando: 1 grafo ilegivel => 27 itens somem, --fix grava, REGRA 62 reporta ZERO violacoes; e sem status-factor.awk o backlog vai de 39469 para 785 bytes com exit 0'
+    label: 'A 1a VERSAO DA REGRA 62 CERTIFICAVA DE VERDE A PERDA SILENCIOSA QUE ELA EXISTE PARA IMPEDIR. O gerador chamava `kg-radar --open-tsv 2>/dev/null` dentro de process substitution: stderr descartado e RC NUNCA LIDO. Um unico grafo ingramatical fazia dezenas de itens sumirem da projecao, o --fix gravava a perda, e a guarda dizia "em sincronia". Eu havia fechado a porta da falha destrutiva pelo lado do `git ls-files` e a MESMA destruicao entrava intacta pelo lado do radar. `[ -s ]` nao protegia: a saida destrutiva era PLAUSIVEL (cabecalho + "nada aberto"), nao vazia. Cura: rc do radar lido por grafo, grafo enumerado-mas-ausente = QUEBRA, e sanidade enumerados==processados'
+
+  - id: E_RENDER_ERA_LOCALE_DEPENDENTE
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'revisao adversarial: diff entre C.UTF-8 e en_US.UTF-8 troca a ordem de dois nos empatados em 7.5; sob pt_BR o printf emite 38,0 no lugar de 38.2 com 190 erros em stderr E exit 0'
+    label: 'CATRACA BYTE-A-BYTE COMPRA UM EIXO QUE EU NAO TINHA PINADO. Eu escrevi, ao instalar o pre-requisito do iconv, que "guarda que acusa o ambiente e pior que guarda nenhuma" — e deixei SEIS `sort` sem LC_ALL=C e um `printf %.1f` lendo LC_NUMERIC. Consequencias medidas: em en_US a ordem de nos empatados inverte (a guarda HARD reprova repo CERTO); sob locale de virgula decimal o printf grava `38,0`, sai exit 0, e o lint manda REGENERAR — quem obedece grava lixo. O locale do maestro e pt_BR. Os irmaos (graph.sh, kg-view.sh) ja pinavam; este era o unico fora do padrao. Cura `export LC_ALL=C`, verificada NO-OP no artefato atual'
 
 edges:
   - from: C_LACUNA_E_COBERTURA
@@ -643,4 +663,13 @@ edges:
     edge_type: SUPPORTS
   - from: C_PROSA_PROMETIA_OWNER_INEXISTENTE
     to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_A_GUARDA_SELAVA_A_PROPRIA_DOENCA
+    to: D_REGRA62_CATRACA_DE_PROJECAO
+    edge_type: CONSTRAINS
+  - from: E_RENDER_ERA_LOCALE_DEPENDENTE
+    to: D_REGRA62_CATRACA_DE_PROJECAO
+    edge_type: CONSTRAINS
+  - from: E_A_GUARDA_SELAVA_A_PROPRIA_DOENCA
+    to: C_GUARDA_QUE_GRITA_ERRADO
     edge_type: SUPPORTS
