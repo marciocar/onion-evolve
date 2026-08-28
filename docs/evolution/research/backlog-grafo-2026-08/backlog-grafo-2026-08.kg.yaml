@@ -65,7 +65,12 @@ nodes:
 
   - id: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
     node_type: question
-    plane: PROD
+    # plane: DEV, e o CI corrigiu isto: como PROD com impact>=4 e sem verified_at, o no
+    # AFIRMARIA sobre producao sem nunca ter olhado (guarda kg-verificacao/NOVO). E ele nao
+    # afirma — PERGUNTA. A propria doutrina do fios-abertos ja dizia por que: "o backlog
+    # afirma sobre TRABALHO, nao sobre producao". A resposta e que sera PROD, quando a
+    # lente L1 medir; a pergunta e trabalho.
+    plane: DEV
     impact: 5
     confidence: 0.8
     status: open
