@@ -3,9 +3,9 @@ title: "Revisão — F0 da Onda 1 (o achado do realign vira grafo)"
 date: 2026-08-28
 branch: research/backlog-graph-2026-08
 reviewer: "self-review — grafo puro, verificado pelos gates determinísticos do radar (integridade/schema/frescor) + realign + isolamento da baseline medido"
-reviewed_diff_sha256: 60779f2ae79fe13e150d4732faedc7dff274cb4e330c77bca6e6ad4362990f66
-findings_total: 4
-findings_real: 4
+reviewed_diff_sha256: 1c7fd5b14a857514bcfa347ddb6e718f7a1d0af756734ca8a49d1262aae01619
+findings_total: 6
+findings_real: 6
 verdict: APROVADO
 tokens: 14000
 duration_min: 19
@@ -41,6 +41,18 @@ o que é opinião.
    A guarda da REGRA 56 devolveu **exit 0** mesmo assim: ela verifica que o artefato existe e que o
    SHA casa, **não que o texto faz sentido**. Mais um caso da família da sessão — *o gate diz OK e
    ainda assim é preciso olhar o conteúdo*. Reescrito com `<<'EOF'`.
+
+5. **A catraca da REGRA 62 pegou ESTE PR, no primeiro dia útil dela.** Quando regenerei o backlog
+   localmente, o `.kg.yaml` novo ainda era **untracked** — e o projetor enumera por
+   `git ls-files`, então ele não contava como grafo opt-OUT. Depois do commit passou a contar, e o
+   cabeçalho drifou de *"1 grafo(s) de arquivo (opt-OUT)"* para 2. Exatamente a classe que a regra
+   existe para pegar. Dogfood não-encenado.
+
+6. **O CI corrigiu o `plane` de um nó.** `Q_PARADO_DE_PROPOSITO_OU_ABANDONADO` estava `plane: PROD`
+   com impact 5 e sem `verified_at`: a guarda `kg-verificacao/NOVO` acusou que o nó **afirmaria
+   sobre produção sem nunca ter olhado**. E ele não afirma — pergunta. A doutrina do `fios-abertos`
+   já dizia por quê: *"o backlog afirma sobre TRABALHO, não sobre produção"*. Virou `DEV`; a
+   **resposta** é que será PROD, quando a lente L1 medir.
 
 ## Disciplinas aplicadas na escrita dos nós
 
