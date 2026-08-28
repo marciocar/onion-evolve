@@ -9236,6 +9236,12 @@ run_session_beacon_selftests() {
   local hk="${REPO_ROOT}/.claude/hooks/session-beacon-hook.sh"
   if [ ! -f "${sb}" ]; then record_fail "session-beacon" "script ausente: ${sb}"; return; fi
   local d out rc
+  # DETERMINISMO do veredito: a sonda de dono elegeria o `claude` ancestral quando a
+  # bancada roda numa sessão, e NADA no CI — o mesmo teste daria `live` aqui e `declared`
+  # lá. Apontando a sonda para o pid 1 (comm=systemd, nunca `claude`) ela falha SEMPRE,
+  # e os casos herdados exercitam o ramo `declared` nos dois lugares. Os casos com dono
+  # medido (j..m) escrevem owner_pid/owner_start à mão, sem depender da sonda.
+  export ONION_BEACON_OWNER_PID=1
 
   d="$(mktemp -d)"; git -C "${d}" init -q
   mkdir -p "${d}/.claude/validation" "${d}/.claude/hooks"
@@ -9252,9 +9258,9 @@ run_session_beacon_selftests() {
 
   # (b) check com farol VIVO alheio → exit 1 e lista 🕯️ (regressão colisão W1×W2)
   rc=0; out="$(bash "${sb}" check "${d}")" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q '🕯️ VIVA: sess-alpha'; then
-    record_pass "session-beacon: check detecta sessão viva alheia → exit 1 (regressão W1×W2)"
-  else record_fail "session-beacon: check vivo" "esperava exit 1 + 🕯️; out='${out}' rc=${rc}"; fi
+  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q '🕯️ DECLARADA (dono NÃO verificado): sess-alpha'; then
+    record_pass "session-beacon: farol sem dono medido → DECLARADA + exit 1 (conservador; regressão W1×W2)"
+  else record_fail "session-beacon: check vivo" "esperava exit 1 + DECLARADA; out='${out}' rc=${rc}"; fi
 
   # (c) --ignore da própria sessão → exit 0 (sessão não se auto-bloqueia)
   rc=0; bash "${sb}" check "${d}" --ignore "sess-alpha" >/dev/null || rc=$?
@@ -9282,9 +9288,18 @@ run_session_beacon_selftests() {
     bash "${sb}" up "${d}" "sess-other"
     rc=0; out="$(cd "${d}" && printf '{"session_id":"sess-self"}' | bash .claude/hooks/session-beacon-hook.sh up)" || rc=$?
     if [ "${rc}" -eq 0 ] && [ -f "${d}/.claude/beacons/sess-self.beacon" ] \
-       && printf '%s' "${out}" | grep -q 'OUTRA sessão viva'; then
+       && printf '%s' "${out}" | grep -q 'farol aceso neste repo'; then
       record_pass "session-beacon: hook acende farol + avisa colisão no boot (exit 0)"
     else record_fail "session-beacon: hook" "esperava farol+aviso+0; out='${out}' rc=${rc}"; fi
+
+    # (f2) INFORMADO ≠ VERIFICADO (correção do maestro 2026-08-28): o aviso não pode
+    # AFIRMAR sessão alheia viva — tem de se declarar não-verificado E mandar verificar
+    # quem é e o que faz. Sem este teste, a próxima reescrita do texto silenciosamente
+    # volta a afirmar, e a sessão que lê volta a invocar I3 contra fantasma.
+    if printf '%s' "${out}" | grep -q 'INFORMADO, NÃO VERIFICADO' \
+       && printf '%s' "${out}" | grep -q 'VERIFIQUE QUEM É E O QUE FAZ'; then
+      record_pass "session-beacon: aviso se declara NÃO-VERIFICADO e manda verificar quem/o quê"
+    else record_fail "session-beacon: aviso informado≠verificado" "o aviso voltou a AFIRMAR sessão viva sem mandar verificar; out='${out}'"; fi
 
     # (g) hook sem session_id (harness antigo) → no-op silencioso exit 0
     rc=0; out="$(cd "${d}" && printf '{}' | bash .claude/hooks/session-beacon-hook.sh up)" || rc=$?
@@ -9310,6 +9325,82 @@ run_session_beacon_selftests() {
     record_pass "session-beacon: hat explícito novo sobrescreve + sobrevive ao refresh"
   else record_fail "session-beacon: hat override" "novo hat não venceu: $(grep '^hat:' "${d}/.claude/beacons/sess-hat.beacon")"; fi
   bash "${sb}" down "${d}" "sess-hat"
+
+  # ── DONO MEDIDO (a metade verificável do farol; correção 2026-08-28) ──────
+  # Modo-de-falha de campo: 2 faróis anunciados como VIVOS no core não tinham dono nenhum
+  # e nunca haviam recebido um prompt — o aviso de colisão I3 disparou contra fantasmas.
+  local live_start dead_pid dead_start
+  set_beacon_owner() { # $1=beacon $2=pid $3=starttime — substitui, não apenda (awk pega o 1º)
+    sed -i '/^owner_pid:/d;/^owner_start:/d' "$1"
+    printf 'owner_pid: %s\nowner_start: %s\n' "$2" "$3" >> "$1"
+  }
+
+  # (j) dono VIVO medido → live, e BLOQUEIA (o farol legítimo segue protegendo I3)
+  bash "${sb}" up "${d}" "sess-dono"
+  live_start="$(sed 's/.*) //' "/proc/$$/stat" 2>/dev/null | awk '{print $20}')"
+  if [ -n "${live_start}" ]; then
+    set_beacon_owner "${d}/.claude/beacons/sess-dono.beacon" "$$" "${live_start}"
+    out="$(bash "${sb}" verdict "${d}/.claude/beacons/sess-dono.beacon")"
+    rc=0; bash "${sb}" check "${d}" --ignore sess-alpha >/dev/null || rc=$?
+    if [ "${out}" = "live" ] && [ "${rc}" -eq 1 ]; then
+      record_pass "session-beacon: dono vivo medido → live + bloqueia (I3 preservado)"
+    else record_fail "session-beacon: dono vivo" "esperava live+exit1; veredito='${out}' rc=${rc}"; fi
+
+    # (k) REUSO DE PID: mesmo pid, starttime diferente → orphan, NUNCA live. Sem isto o
+    # pid sozinho volta a mentir assim que o kernel recicla o número.
+    set_beacon_owner "${d}/.claude/beacons/sess-dono.beacon" "$$" "1"
+    out="$(bash "${sb}" verdict "${d}/.claude/beacons/sess-dono.beacon")"
+    if [ "${out}" = "orphan" ]; then
+      record_pass "session-beacon: pid reciclado (starttime≠) → orphan, não live"
+    else record_fail "session-beacon: reuso de pid" "esperava orphan, veio '${out}'"; fi
+  else
+    record_pass "session-beacon: dono medido — pulado (sem /proc neste host)"
+  fi
+  bash "${sb}" down "${d}" "sess-dono"
+
+  # (l) dono MEDIDO MORTO → orphan: NÃO bloqueia e o sweep remove. É o que impede o
+  # fantasma de travar o repo por 8h de TTL depois de a sessão sumir sem SessionEnd.
+  ( exec sleep 30 ) & dead_pid=$!
+  dead_start="$(sed 's/.*) //' "/proc/${dead_pid}/stat" 2>/dev/null | awk '{print $20}')"
+  kill "${dead_pid}" 2>/dev/null || true; wait "${dead_pid}" 2>/dev/null || true
+  if [ -n "${dead_start}" ] && [ ! -r "/proc/${dead_pid}/stat" ]; then
+    # sandbox PRÓPRIO: no compartilhado sobram os beacons vivos do teste do hook, e o
+    # exit 1 viria DELES — o teste passaria/falharia por motivo alheio ao que afirma medir.
+    local dorf; dorf="$(mktemp -d)"; git -C "${dorf}" init -q
+    bash "${sb}" up "${dorf}" "sess-orfa"
+    set_beacon_owner "${dorf}/.claude/beacons/sess-orfa.beacon" "${dead_pid}" "${dead_start}"
+    out="$(bash "${sb}" verdict "${dorf}/.claude/beacons/sess-orfa.beacon")"
+    rc=0; bash "${sb}" check "${dorf}" >/dev/null || rc=$?
+    bash "${sb}" sweep "${dorf}"
+    if [ "${out}" = "orphan" ] && [ "${rc}" -eq 0 ] && [ ! -f "${dorf}/.claude/beacons/sess-orfa.beacon" ]; then
+      record_pass "session-beacon: dono morto → órfã não bloqueia + sweep remove (fantasma não trava o repo)"
+    else record_fail "session-beacon: órfã" "esperava orphan+exit0+removido; veredito='${out}' rc=${rc}"; fi
+    rm -rf "${dorf}"
+  else
+    record_pass "session-beacon: órfã — pulado (sem /proc neste host)"
+  fi
+
+  # (m) a sonda NÃO pode eleger um shell transitório só porque o cmdline dele contém
+  # "claude" (o path `~/.claude/shell-snapshots/…` contém). Bug REAL do dogfood
+  # 2026-08-28: elegia o shell do próprio hook, que morre em segundos — o farol viraria
+  # órfã com a sessão VIVA, o erro na direção perigosa. Prova: partindo de um bash cujo
+  # cmdline carrega "claude", nenhum dono é gravado (comm=bash, não claude).
+  ( exec -a "/home/fake/.claude/shell-snapshots/snapshot-bash.sh" sleep 30 ) & dead_pid=$!
+  if [ -r "/proc/${dead_pid}/cmdline" ]; then
+    ONION_BEACON_OWNER_PID="${dead_pid}" bash "${sb}" up "${d}" "sess-sonda"
+    # A sonda SOBE por desenho: se houver um `claude` ancestral legítimo (bancada rodando
+    # dentro de uma sessão) ele é eleito — e isso é correto. O que a regressão prova é que
+    # o DECOY do hop 0 NÃO é o eleito: o código antigo (`*claude*` no cmdline) o pegaria de
+    # imediato, porque o path do snapshot de shell contém "claude".
+    out="$(awk -F': ' '/^owner_pid:/{print $2; exit}' "${d}/.claude/beacons/sess-sonda.beacon" 2>/dev/null || true)"
+    if [ "${out}" != "${dead_pid}" ]; then
+      record_pass "session-beacon: sonda não elege processo não-claude com 'claude' no cmdline (comm decide)"
+    else record_fail "session-beacon: sonda" "elegeu o decoy do hop 0: owner_pid=${out} == ${dead_pid}"; fi
+    bash "${sb}" down "${d}" "sess-sonda"
+  else
+    record_pass "session-beacon: sonda — pulado (sem /proc neste host)"
+  fi
+  kill "${dead_pid}" 2>/dev/null || true; wait "${dead_pid}" 2>/dev/null || true
 
   # (i) key-by-worktree: 'up' grava a linha `worktree:` = toplevel realpath; refresh preserva.
   # É o que a COLUNA PRESENÇA do mapa da constelação lê p/ atribuir o beacon à estrela certa.
@@ -9352,8 +9443,9 @@ run_session_beacon_selftests() {
   rm -rf "${main}"
 
   rm -rf "${d}"
-}
 
+  unset ONION_BEACON_OWNER_PID   # não vazar o determinismo da sonda p/ outros modos
+}
 # ---------------------------------------------------------------------------
 # Modo constellation-map — exercita .claude/validation/constellation-map.sh (o 🗺️ MAPA da
 # Constelação de Estudos, Fase 1). READ-ONLY, SÓ-METADADOS. Self-contained (dir de

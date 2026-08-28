@@ -125,6 +125,51 @@ verifica contra a fonte externa viva, nunca do cutoff).
   errada) de **provisionamento** (não encadear com `&&`, para não trocar erro de config por
   indisponibilidade de auth); o entrypoint termina em `npm start`.
 
+
+## Caso 4 — farol de sessão: o sinal que a máquina emite para a máquina
+
+- **Declarado:** no boot, o hook do farol injetava `🕯️ Onion farol: OUTRA sessão viva neste
+  repo — …`. A sessão que leu **repassou ao maestro como observação própria**, com recomendação
+  de conduta anexa ("um escritor por repo (I3): coordene antes de checkout/escrita"). Nenhuma
+  medição foi feita: a declaração do mecanismo virou fato no relato, e o rótulo de origem se
+  perdeu no caminho.
+- **Verificado:** "viva" era `refreshed_at` dentro de um TTL de 480 min — **um carimbo que a
+  própria sessão escreve**. E `refreshed_at` só avança no `UserPromptSubmit`: toda sessão que
+  nasce e some sem `SessionEnd` (crash, kill, conexão de Remote Control, resume abortado) lia
+  como VIVA por 8 horas. Medidos no core: os **2** faróis anunciados tinham
+  `started_at == refreshed_at` (jamais receberam **um** prompt) e **nenhum processo
+  correspondente**; um deles nascera 150s antes da própria sessão que leu o aviso, na mesma
+  branch e worktree — era, com toda probabilidade, **ela mesma**. Quem furou o relato foi o
+  maestro, perguntando "a viva pode ser você mesmo ou pelo uso do remote control".
+- **Modo de falha:** **guarda que roda e mente** — o degrau caro acima de "guarda que ninguém vê"
+  e "guarda que ninguém roda". Ela não falha em silêncio: emite um aviso confiante, sem rótulo
+  de confiabilidade, que o consumidor não tem como calibrar sozinho. Efeito composto: aciona uma
+  invariante real (I3), travando trabalho legítimo por até 8h — e **guarda que grita errado
+  ensina a ignorar guarda**.
+- **Trace:** `.claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md`;
+  `docs/onion/graph/guardas-revisao-2026-08.kg.yaml` (`E_FAROL_ANUNCIAVA_FANTASMA`,
+  `C_GUARDA_QUE_GRITA_ERRADO`, `D_MEDIR_O_DONO_NAO_O_CARIMBO`, `D_AVISO_CARREGA_O_QUE_VALE`).
+- **Cura (mecanismo), em duas metades que não se substituem:**
+  1. **Medir** — o beacon grava `owner_pid` + `owner_start` (starttime do `/proc`, defesa contra
+     **reuso de pid**) e o veredito passa a ser observado: `live` · `declared` (dono não medido —
+     cai no TTL e **bloqueia**, conservador) · `orphan` (dono medido morto — não bloqueia) ·
+     `stale`. **A direção do erro é escolhida explicitamente**: um falso `orphan` (diz morta,
+     está viva) reabre o incidente que criou a guarda; um falso `declared` custa uma verificação
+     — logo ausência de prova cai no comportamento antigo, **nunca** em "pode escrever".
+  2. **Rotular e mandar verificar** — medir não basta enquanto o aviso **afirma**. O sinal passa
+     a carregar o que vale: rótulo (`VIVA` = dono medido × `DECLARADA` = não medido), a pista
+     `NUNCA refrescou (0 prompts)`, e a ordem de **não relatar como sessão alheia viva o que não
+     foi medido**. Testado no gate: o selftest reprova se o aviso perder qualquer das duas.
+- **Corolário do dogfood:** a 1ª sonda casava `*claude*` no **cmdline** e elegeu o **shell
+  transitório do próprio hook** — cujo path carrega `~/.claude/shell-snapshots/…`. Esse shell
+  morre em segundos: o farol viraria `orphan` **com a sessão viva**, o erro na direção proibida.
+  **Substring de path não é identidade**; a cura casa por `comm`. E o mesmo dogfood expôs um
+  `exit 1` espúrio do `up` (cadeia `&&` como última instrução sob `set -e`) que o `|| true` do
+  hook mascarava — [exit code não é a verificação](../../concepts/onion-dogfooding-doctrine.md).
+- **Corolário da cópia:** o mapa da constelação carregava uma **segunda** implementação da regra
+  de "vivo" por TTL. Cura no motor não alcança cópia — a regra passou a morar num lugar só
+  (`session-beacon.sh verdict`). **Regra copiada envelhece separada.**
+
 ---
 
 ## A regra generalizável

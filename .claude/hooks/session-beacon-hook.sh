@@ -23,13 +23,26 @@ REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 SB="$REPO/.claude/validation/session-beacon.sh"
 [ -f "$SB" ] || exit 0
 
+# Ponto de partida da sonda de DONO: o pai DESTE hook — o processo que sustenta a
+# sessão (ou um shell logo abaixo dele). A sonda sobe daqui até achar o `claude`;
+# passar explicitamente encurta a subida e não depende do formato do spawn.
+export ONION_BEACON_OWNER_PID="$PPID"
+
 case "$MODE" in
   up)
     bash "$SB" up "$REPO" "$sid" 2>/dev/null || true
     others="$(bash "$SB" check "$REPO" --ignore "$sid" 2>/dev/null)" || {
-      # exit 1 do check = há sessão VIVA alheia → avisar no boot (colisão W1×W2/W3)
+      # exit 1 do check = há farol alheio aceso → avisar no boot (colisão W1×W2/W3)
+      #
+      # O AVISO SE APRESENTA COMO DECLARAÇÃO, NÃO COMO FATO (correção do maestro
+      # 2026-08-28): "informado é diferente de verificado". A versão anterior afirmava
+      # "OUTRA sessão viva" — e a sessão que lia isso tratava como fato consumado,
+      # invocando I3 contra faróis que não tinham dono nenhum. O `check` agora ROTULA
+      # (VIVA = dono medido · DECLARADA = não medido), mas o rótulo só vira conduta se
+      # o aviso MANDAR verificar quem é e o que faz. Por isso a instrução viaja junto
+      # da lista: quem recebe o aviso não tem como saber, sozinho, o que ele vale.
       msg="$(printf '%s' "$others" | grep '^🕯️' | tr '\n' '; ' | sed 's/"/\\"/g')"
-      printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"🕯️ Onion farol: OUTRA sessão viva neste repo — %s. Um escritor por repo (I3): coordene com o maestro antes de checkout/escrita."}}\n' "$msg"
+      printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"🕯️ Onion farol: há OUTRO farol aceso neste repo — %s. ⚠️ ISTO É INFORMADO, NÃO VERIFICADO — farol é carimbo que a própria sessão escreveu. ANTES de tratar como escritor concorrente (I3), VERIFIQUE QUEM É E O QUE FAZ: (1) `bash .claude/validation/session-beacon.sh check .` e leia o rótulo — VIVA = dono medido vivo; DECLARADA = dono NAO medido, pode ser fantasma; (2) `NUNCA refrescou` = a sessão jamais recebeu um prompt (presença sem escritor — assinatura de conexão de Remote Control, resume abortado ou crash, e pode ser sua própria); (3) na dúvida, confirme com o maestro DE QUEM é a sessão. Só depois de verificado, coordene antes de checkout/escrita — e NÃO relate ao maestro como sessão alheia viva o que você não mediu."}}\n' "$msg"
     }
     ;;
   refresh)
