@@ -443,6 +443,16 @@ nodes:
     verified_against: 'casos k/k2/k3/k4/k5 da bancada + mutacao MUT-E (restaurar o curto-circuito reprova 3 casos)'
     label: 'CURA DA CURA: `orphan` deixou de ser corolario de "dono nao encontrado" e passou a exigir CONJUNCAO — dono medido morto E heartbeat parado alem da janela de graca (30min, ONION_BEACON_ORPHAN_GRACE_MIN) E /proc legivel AQUI (proc_available separa "nao ha o que medir" de "prova de morte") E o beacon ser DESTA maquina (campo host, que ja era gravado e nao tinha consumidor). Assim o poder de matar fantasma sobrevive quase inteiro (8h->30min) e fica IMPOSSIVEL declarar morta uma sessao que acabou de agir. Corolario: teste que nao isola sandbox mede o vizinho — o caso do dono vivo ganhou sandbox proprio'
 
+  - id: Q_INDICE_DO_DIARIO_SEM_CATRACA
+    node_type: question
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_at: 2026-08-28
+    verified_against: 'medido: migalha do PR #700 existia no disco e NAO no index.md; lint passou 0 HARD; diary-index.sh regenerou 106->107'
+    label: 'LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do inventario (inventory.sh) e dos plugins (REGRA 19). Consequencia observada: escrevi a migalha do farol e nao rodei o diary-index.sh — a entrada ficou INVISIVEL no Tier-0 pointer que as sessoes leem para se orientar, e o lint passou verde. Migalha fora do indice nao orienta ninguem, que e o oposto do proposito dela. Quem pegou foi o MAESTRO perguntando, nao mecanismo — a mesma assinatura de C_LACUNA_E_COBERTURA. GATILHO para fechar: a proxima migalha escrita nesta instancia (o custo de errar de novo ja esta medido; a cura e uma checagem determinística de projecao-vs-fonte no lint, irma da que ja existe para inventario)'
+
 edges:
   - from: C_LACUNA_E_COBERTURA
     to: Q_GUARDAS_COERENTES
@@ -591,3 +601,6 @@ edges:
   - from: D_ORFAO_EXIGE_TRES_PROVAS
     to: D_MEDIR_O_DONO_NAO_O_CARIMBO
     edge_type: CONSTRAINS
+  - from: Q_INDICE_DO_DIARIO_SEM_CATRACA
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
