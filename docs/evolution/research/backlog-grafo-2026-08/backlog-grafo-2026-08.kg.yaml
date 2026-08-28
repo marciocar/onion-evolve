@@ -9,11 +9,14 @@ meta:
   label: 'Onda 1 — o que "gerir trabalho aberto" significa quando a FONTE e grafo e a projecao e pura'
   baseline: 2026-08-28
   trace: "docs/onion/graph/guardas-revisao-2026-08.kg.yaml"
+  note: >
+    Projecao humana deste grafo: SYNTHESIS.md (derivacao, nunca fonte — divergiu, o grafo ganha).
 
 nodes:
   # ── a pergunta da onda (north-star) ──────────────────────────────────────
   - id: Q_ONDA1_GERIR_BACKLOG_GRAFO
     node_type: question
+    trace: "docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
     plane: DEV
     impact: 5
     confidence: 0.9
