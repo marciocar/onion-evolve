@@ -87,7 +87,9 @@ presence_of() {
   # A regra de "vivo" mora num lugar só: `session-beacon.sh verdict` (SSOT). Antes daqui
   # havia uma CÓPIA da regra por TTL — e cópia de regra envelhece separada: quando o farol
   # aprendeu a medir o dono (2026-08-28), esta coluna continuaria pintando "live" para
-  # fantasma. Sem o subcomando (motor antigo numa worktree irmã) cai no TTL de antes.
+  # fantasma. O motor viaja JUNTO no plugin (manifesto do onion-work-tools) — o fallback
+  # por TTL abaixo cobre só instalação AMPUTADA (motor removido/antigo AO LADO deste
+  # script; `${BASH_SOURCE[0]%/*}` é sempre o diretório LOCAL, nunca o de uma irmã).
   local sb="${BASH_SOURCE[0]%/*}/session-beacon.sh" verdict
   for bf in "$wt"/.claude/beacons/*.beacon; do
     [[ -f "$bf" ]] || continue

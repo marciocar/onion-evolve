@@ -31,6 +31,11 @@ export ONION_BEACON_OWNER_PID="$PPID"
 case "$MODE" in
   up)
     bash "$SB" up "$REPO" "$sid" 2>/dev/null || true
+    # SWEEP antes do CHECK: a metade que MATA fantasma não tinha gatilho nenhum — nada
+    # no settings.json chamava `sweep`, então beacons órfãos/stale se acumulavam e
+    # seguiam bloqueando. Medido no core: 23 beacons, 20 stale (achado adversarial
+    # 2026-08-28). Varrer aqui é barato e roda antes de qualquer veredito ser emitido.
+    bash "$SB" sweep "$REPO" 2>/dev/null || true
     others="$(bash "$SB" check "$REPO" --ignore "$sid" 2>/dev/null)" || {
       # exit 1 do check = há farol alheio aceso → avisar no boot (colisão W1×W2/W3)
       #

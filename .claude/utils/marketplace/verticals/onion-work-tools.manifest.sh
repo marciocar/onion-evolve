@@ -55,6 +55,11 @@ VALIDATION=(
   ".claude/validation/kg-narrate-validate.sh"
   ".claude/validation/diary-index.sh"
   ".claude/validation/constellation-map.sh"
+  # O MOTOR vai JUNTO do consumidor, pelo mesmo motivo do par kg-provenance/resolve acima:
+  # a coluna PRESENÇA do mapa pergunta "esta sessão está viva?" ao `session-beacon.sh
+  # verdict`. Sem ele, o mapa cai no fallback por TTL — exatamente a régua que este PR
+  # provou errada (fantasma lido como vivo por 8h) — e degrada EM SILÊNCIO no adotante.
+  ".claude/validation/session-beacon.sh"
   # Gate de proveniência invertido (modo `kg backfill`). O resolve-integration-branch
   # vai JUNTO de propósito: sem o irmão, o coverage cai para a catraca FRACA (compara
   # contra HEAD, onde um baseline que cresceu e já foi commitado passa despercebido).
