@@ -49,7 +49,7 @@ default 15) — abaixo dele é informativo, não dispara realinhamento (evita ce
    - **(c)** → reconciliar no grafo: novo nó + `SUPERSEDES`/`REFUTES` **datado**, alvo → `superseded`/
      `refuted` (Aufhebung — nunca apagar). Repair determinístico, custo-zero de LLM.
    - **(b)** de alta atenção → delegar a `/meta:kg-freshness` (mede vs o vivo, propõe-não-escreve).
-   - **camada 3** acima do limiar → julgamento; **dente = achado vira nó com `owner:`** no grafo (visível
+   - **camada 3** acima do limiar → julgamento; **dente = achado vira nó no grafo** (visível
      no `/meta:backlog`), não um `.md` lateral. LLM-replan é a exceção cara, não o default.
 5. **Fechar o loop:** após qualquer escrita, `kg-radar <grafo> --integrity --schema` tem de sair 0 (o
    radar é o revisor da própria reconciliação — [[grafo-sempre-atualizado]]).

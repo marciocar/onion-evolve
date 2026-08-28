@@ -9,6 +9,7 @@
 
 # ── STRUCTURAL — auto-POR-CONSTRUÇÃO (derivação determinística do SSOT, sempre segura; modo estrutural) ──
 inventory-regen|STRUCTURAL|docs/knowledge-base/concepts/onion-guardrails.md
+backlog-project-regen|STRUCTURAL|docs/knowledge-base/concepts/onion-guardrails.md
 plugin-assemble|STRUCTURAL|docs/knowledge-base/concepts/onion-guardrails.md
 graph-map-console-regen|STRUCTURAL|docs/knowledge-base/concepts/onion-guardrails.md
 lint-count-autofix|STRUCTURAL|docs/knowledge-base/concepts/onion-guardrails.md

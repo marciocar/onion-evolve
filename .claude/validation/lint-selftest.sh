@@ -10459,6 +10459,104 @@ run_realign_selftests() {
 # /meta:drive — o CENSO (kg-drive-project.sh) projeta a FILA-PRONTA de um plano-grafo:
 # nós open com predecessores DEPENDS_ON fechados. GUARDA-DA-GUARDA: o `--check` só sai rc=1
 # no DEADLOCK (há aberto mas fila-pronta vazia). Inclui a regressão do bug do --open-tsv VAZIO.
+# ---------------------------------------------------------------------------
+# REGRA 62 — projeção gerada em sincronia (docs/backlog.md). A guarda nasceu de dano
+# medido: uma migalha ficou INVISÍVEL numa projeção e o lint passou verde (PR #700/#701).
+# Os casos cobrem os modos de falha, não só o happy-path — inclusive os dois que eu
+# quase enviei: escrita silenciosa por arg desconhecido, e render não-reproduzível.
+# Usa `--only=` para escopar a varredura (a regra é de par-fixo e roda mesmo assim):
+# 5s por passada em vez de minutos, sem perder o que se afirma medir.
+# ---------------------------------------------------------------------------
+run_backlog_projection_selftests() {
+  local gen="${REPO_ROOT}/.claude/validation/kg-backlog-project.sh"
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${gen}" ] || [ ! -f "${lint}" ]; then
+    record_skip "backlog-projection: gerador ou lint ausente (SUT não exercido)"; return
+  fi
+  if ! command -v iconv >/dev/null 2>&1; then
+    record_skip "backlog-projection: iconv ausente nesta máquina (SUT não exercido)"; return
+  fi
+  local sb out rc before after
+  sb="$(mktemp -d)"
+  cp -a "${REPO_ROOT}/.claude" "${sb}/.claude"
+  cp -a "${REPO_ROOT}/docs"    "${sb}/docs"
+  cp "${REPO_ROOT}/CLAUDE.md"  "${sb}/CLAUDE.md" 2>/dev/null || printf '# stub\n' > "${sb}/CLAUDE.md"
+  # sandbox git REAL: o projetor enumera por `git ls-files`. Sem índice ele não enxerga
+  # grafo nenhum — e o caso "em dia" passaria/falharia por ausência de git, não pelo SUT.
+  # (Foi assim que este próprio caso reprovou na 1a rodada, e o achado virou a guarda de
+  # enumeração-vazia do gerador.)
+  ( cd "${sb}" && git init -q && git add -A >/dev/null 2>&1 \
+    && git -c user.email=t@t -c user.name=t commit -qm seed >/dev/null 2>&1 ) || true
+
+  # (a) EM DIA → a regra cala. Roda ANTES do drift: se já viesse sujo, o caso (b) passaria
+  #     por motivo errado e nunca saberíamos.
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'projeção desatualizada'; then
+    record_fail "backlog-projection: em-dia" "acusou drift num sandbox pristino (falso-positivo): ${out}"
+  else record_pass "backlog-projection: projeção em dia → regra cala"; fi
+
+  # (b) DRIFT → HARD. O modo de falha que a guarda existe para pegar.
+  printf '\nLINHA-INTRUSA-DO-SELFTEST\n' >> "${sb}/docs/backlog.md"
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'projeção desatualizada vs a fonte'; then
+    record_pass "backlog-projection: drift → HARD (projeção que envelhece calada)"
+  else record_fail "backlog-projection: drift" "a guarda NÃO pegou o drift: ${out}"; fi
+
+  # (c) ARG DESCONHECIDO: a asserção que importa é a NÃO-MUTAÇÃO, não o exit code — o modo
+  #     de falha era `MODE="${1:---write}"` mandando um typo para o ramo de ESCRITA.
+  before="$(sha256sum "${sb}/docs/backlog.md" | cut -d' ' -f1)"
+  rc=0; (cd "${sb}" && bash .claude/validation/kg-backlog-project.sh --dry-run >/dev/null 2>&1) || rc=$?
+  after="$(sha256sum "${sb}/docs/backlog.md" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 2 ] && [ "${before}" = "${after}" ]; then
+    record_pass "backlog-projection: arg desconhecido → exit 2 e arquivo INTACTO (sem escrita silenciosa)"
+  else record_fail "backlog-projection: arg desconhecido" "esperava rc=2 e arquivo intacto; rc=${rc} mutou=$([ "${before}" = "${after}" ] && echo nao || echo SIM)"; fi
+
+  # (d) PARIDADE de render: `--markdown` (stdout, o que o lint compara) tem de ser
+  #     byte-idêntico ao que `--write` grava. Senão a catraca compara dois renderizadores.
+  ( cd "${sb}" && bash .claude/validation/kg-backlog-project.sh --markdown > "${sb}/md.out" 2>/dev/null
+    bash .claude/validation/kg-backlog-project.sh --write >/dev/null 2>&1 )
+  if diff -q "${sb}/md.out" "${sb}/docs/backlog.md" >/dev/null 2>&1; then
+    record_pass "backlog-projection: --markdown byte-idêntico a --write (paridade de render)"
+  else record_fail "backlog-projection: paridade" "--markdown diverge de --write — a catraca compararia 2 renderizadores"; fi
+
+  # (e) SEM iconv → o gerador RECUSA em vez de emitir render não-reproduzível. Guarda que
+  #     acusa o ambiente é pior que guarda nenhuma; aqui o gerador falha alto e o
+  #     `_gen_into` do lint traduz isso em QUEBRA, nunca em "regenere por cima".
+  local fakebin f b
+  fakebin="$(mktemp -d)"
+  for f in /usr/bin/* /bin/*; do
+    b="$(basename "${f}")"; [ "${b}" = "iconv" ] && continue
+    ln -sf "${f}" "${fakebin}/${b}" 2>/dev/null || true
+  done
+  if PATH="${fakebin}" command -v iconv >/dev/null 2>&1; then
+    record_skip "backlog-projection: sem-iconv — não foi possível montar PATH sem iconv (cenário não montado)"
+  else
+    rc=0
+    ( cd "${sb}" && PATH="${fakebin}" bash .claude/validation/kg-backlog-project.sh --markdown >/dev/null 2>&1 ) || rc=$?
+    if [ "${rc}" -eq 2 ]; then
+      record_pass "backlog-projection: sem iconv → gerador RECUSA (render não-reproduzível não nasce)"
+    else record_fail "backlog-projection: sem iconv" "esperava exit 2, veio ${rc} — render dependeria do ambiente"; fi
+  fi
+
+  # (f) ENUMERAÇÃO VAZIA = QUEBRA, não drift. Sem índice git o projetor enxergaria ZERO
+  #     grafos e emitiria um backlog quase-vazio — não vazio o bastante para o `_gen_into`
+  #     chamar de quebra, então viraria "drift" e a mensagem mandaria REGENERAR POR CIMA da
+  #     projeção boa. Falha aberta que vira DESTRUTIVA; o gerador tem de recusar antes.
+  local sbng
+  sbng="$(mktemp -d)"
+  cp -a "${REPO_ROOT}/.claude" "${sbng}/.claude"
+  cp -a "${REPO_ROOT}/docs"    "${sbng}/docs"
+  before="$(sha256sum "${sbng}/docs/backlog.md" | cut -d' ' -f1)"
+  rc=0; ( cd "${sbng}" && bash .claude/validation/kg-backlog-project.sh --write >/dev/null 2>&1 ) || rc=$?
+  after="$(sha256sum "${sbng}/docs/backlog.md" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 2 ] && [ "${before}" = "${after}" ]; then
+    record_pass "backlog-projection: enumeração vazia → QUEBRA (recusa; não sobrescreve a projeção boa)"
+  else record_fail "backlog-projection: enumeração vazia" "esperava rc=2 e arquivo intacto; rc=${rc} mutou=$([ "${before}" = "${after}" ] && echo nao || echo SIM)"; fi
+  rm -rf "${sbng}"
+
+  rm -rf "${fakebin}" "${sb}"
+}
+
 run_drive_selftests() {
   local ds="${REPO_ROOT}/.claude/validation/kg-drive-project.sh"
   local fx="${REPO_ROOT}/.claude/validation/fixtures/kg-drive"
@@ -10529,6 +10627,7 @@ run_site_deeplink_selftests
 run_deploy_site_selftests
 run_install_caddy_config_selftests
 run_realign_selftests
+run_backlog_projection_selftests
 run_drive_selftests
 run_site_derivation_selftests
 run_rules_registry_selftests

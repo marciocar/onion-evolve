@@ -451,7 +451,38 @@ nodes:
     status: open
     verified_at: 2026-08-28
     verified_against: 'medido: migalha do PR #700 existia no disco e NAO no index.md; lint passou 0 HARD; diary-index.sh regenerou 106->107'
-    label: 'LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do inventario (inventory.sh) e dos plugins (REGRA 19). Consequencia observada: escrevi a migalha do farol e nao rodei o diary-index.sh — a entrada ficou INVISIVEL no Tier-0 pointer que as sessoes leem para se orientar, e o lint passou verde. Migalha fora do indice nao orienta ninguem, que e o oposto do proposito dela. Quem pegou foi o MAESTRO perguntando, nao mecanismo — a mesma assinatura de C_LACUNA_E_COBERTURA. GATILHO para fechar: a proxima migalha escrita nesta instancia (o custo de errar de novo ja esta medido; a cura e uma checagem determinística de projecao-vs-fonte no lint, irma da que ja existe para inventario)'
+    label: 'LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do inventario (inventory.sh) e dos plugins (REGRA 19). Consequencia observada: escrevi a migalha do farol e nao rodei o diary-index.sh — a entrada ficou INVISIVEL no Tier-0 pointer que as sessoes leem para se orientar, e o lint passou verde. Migalha fora do indice nao orienta ninguem, que e o oposto do proposito dela. Quem pegou foi o MAESTRO perguntando, nao mecanismo — a mesma assinatura de C_LACUNA_E_COBERTURA. GATILHO REFINADO POR MEDICAO (2026-08-28, ao TENTAR implementar a cura): a cura prescrita NAO e diretamente aplicavel ao indice do diario, por DOIS bloqueios medidos. (1) diary-index.sh faz REPO=${1:-...} — o 1o argumento e o CAMINHO DO REPO, nao uma flag: chama-lo com --markdown criaria um diretorio chamado --markdown, e ele nao tem modo stdout, que e o que _gen_into exige. (2) o indice embute `Gerado em: <hoje>` — comparacao por bytes dispararia TODO DIA por mudanca so de data, uma maquina de falso-positivo. A catraca nasceu (REGRA 62) cobrindo SO docs/backlog.md, que e deterministico. Fechar este no agora seria fecha-lo por decreto. GATILHO: dar ao diary-index.sh modo stdout E declarar a linha `Gerado em:` como volatil-ignorada (ha precedente: o plugins-sync ignora provenance pelo mesmo motivo)'
+
+  - id: D_REGRA62_CATRACA_DE_PROJECAO
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-28
+    trace: ".claude/validation/lint-artifacts.sh"
+    verified_against: 'bancada run_backlog_projection_selftests 6/6 + 3 mutacoes que reprovam (regra desligada / args fail-open / guarda de enumeracao removida)'
+    label: 'REGRA 62 [HARD]: docs/backlog.md tem de bater com a regeneracao da fonte. Fecha a classe que Q_INDICE_DO_DIARIO_SEM_CATRACA nomeou — projecao GERADA que envelhece calada — no unico artefato onde a comparacao e deterministica hoje. Pendurar a deteccao no LINT (e nao num cron) da o gatilho sem ferir o MOAT de auto-inicio: a maquina DETECTA, o humano ATUA. Pre-requisitos que a entrega exigiu, ambos assimetrias dentro de familia ja curada: modo --markdown (stdout) que o _gen_into exige e que os tres irmaos ja tinham, e `case` de args FECHADO com exit 2 (o MODE=${1:---write} era fail-open num caminho de ESCRITA: --dry-run sobrescrevia em silencio). CORE-ONLY por IS_DERIVED — o core e o pior oraculo do que viaja'
+
+  - id: E_ENUMERACAO_VAZIA_ERA_DESTRUTIVA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'a propria bancada reprovou no 1o caso; mutacao removendo a guarda devolve `mutou=SIM` — a projecao boa E sobrescrita'
+    label: 'A BANCADA ACHOU UM DEFEITO DESTRUTIVO QUE EU IA ENVIAR. O projetor enumera grafos por `git ls-files`; sem indice git (ou com GIT_DIR torto — incidente ja medido em 2026-08-04, 4 falsos de uma vez) isso devolve VAZIO e o render sai com cabecalho e ZERO itens. Nao e vazio o bastante para o _gen_into chamar de QUEBRA, entao viraria DRIFT e a mensagem mandaria REGENERAR POR CIMA — sobrescrevendo a projecao boa por uma quase-vazia. Falha aberta que vira DESTRUTIVA, exatamente a classe que o _gen_into existe para impedir, entrando pelo lado do GERADOR. Cura: enumeracao vazia com docs/onion/graph presente = QUEBRA, recusa com exit 2'
+
+  - id: C_PROSA_PROMETIA_OWNER_INEXISTENTE
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'grep de owner: em todo o corpus .kg.yaml = 0 ocorrencias; 3 lugares em prosa afirmavam o agrupamento'
+    label: 'MESMA ASSINATURA QUE ORIGINOU A REGRA 58, noutro artefato: o campo `owner:` e LIDO pelo projetor desde a origem e NUNCA foi escrito por ninguem (0 ocorrencias no corpus), enquanto a descricao do comando, o procedimento e o /meta:realign afirmavam agrupamento por owner. Prosa que sobrevive ao mecanismo. Cura escolhida: NAO construir o mecanismo (o gatilho disparou para HONESTIDADE, e `owner` cai do lado VEDADO do invariante de escopo da onda) — a projecao passa a IMPRIMIR que zero nos declaram owner e que o agrupamento efetivo e por grafo'
 
 edges:
   - from: C_LACUNA_E_COBERTURA
@@ -602,5 +633,14 @@ edges:
     to: D_MEDIR_O_DONO_NAO_O_CARIMBO
     edge_type: CONSTRAINS
   - from: Q_INDICE_DO_DIARIO_SEM_CATRACA
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_ENUMERACAO_VAZIA_ERA_DESTRUTIVA
+    to: D_REGRA62_CATRACA_DE_PROJECAO
+    edge_type: CONSTRAINS
+  - from: D_REGRA62_CATRACA_DE_PROJECAO
+    to: Q_INDICE_DO_DIARIO_SEM_CATRACA
+    edge_type: SUPPORTS
+  - from: C_PROSA_PROMETIA_OWNER_INEXISTENTE
     to: C_LACUNA_E_COBERTURA
     edge_type: SUPPORTS
