@@ -1,0 +1,185 @@
+# kg-backlog-archive: on
+#   O grafo da pesquisa NAO entra em docs/backlog.md — e ele que MEDE aquela fila. Sem este
+#   marcador, os nos desta onda entrariam nos 190 e contaminariam a propria baseline que a
+#   pesquisa esta medindo (efeito observador sobre a metrica). Segue visivel no --open-tsv.
+meta:
+  id: backlog-grafo-2026-08
+  schema_version: '1'
+  layer: audit
+  label: 'Onda 1 — o que "gerir trabalho aberto" significa quando a FONTE e grafo e a projecao e pura'
+  baseline: 2026-08-28
+  trace: "docs/onion/graph/guardas-revisao-2026-08.kg.yaml"
+
+nodes:
+  # ── a pergunta da onda (north-star) ──────────────────────────────────────
+  - id: Q_ONDA1_GERIR_BACKLOG_GRAFO
+    node_type: question
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    verified_against: 'onda aberta 2026-08-28; fecha na F6 com veredito ENTREGUE ou NAO-CONSTRUIR-COM-RAZAO'
+    label: 'NORTH-STAR DA ONDA 1: o que "gerir trabalho aberto" significa quando a FONTE e um grafo e a projecao e PURA (reescrita, nunca lista paralela)? A pergunta nasce de uma resposta ja dada — "nao falta comando, falta catraca" (REGRA 62, PR #704 mergeado) — e do que aquela entrega NAO respondeu. GATILHO DE FECHAMENTO: a F6, com o delta da taxa de mortalidade medido entre F1 e F6'
+
+  - id: D_INVARIANTE_DE_ESCOPO_DA_ONDA1
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-28
+    trace: "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml"
+    verified_against: 'invariante gravado na F0 para ser checado na porta da F3, como o plano aprovado prescreve'
+    label: 'A ONDA 1 E PROIBIDA DE CONSTRUIR QUALQUER COISA QUE PRESSUPONHA A RESPOSTA DA FRONTEIRA (Onda 2). VERBOS VEDADOS: atribuir responsavel · data de entrega · sprint · estimativa · sincronizar status com provider · notificar. VERBOS PERMITIDOS: ordenar · medir · envelhecer · limitar · triar · projetar · reprovar — todos operacoes SOBRE O GRAFO, indiferentes a quem executa. Consequencia ja exercida: `owner:` cai do lado VEDADO, o que enquadrou a decisao de NAO construi-lo e apenas tornar sua morte visivel'
+
+  # ── as medicoes da F1 (feitas no planejamento, agora tipadas) ────────────
+  - id: E_61PCT_DO_BACKLOG_PASSOU_DE_UM_MES
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'git log -S "  - id: <ID>" -- <grafo> | tail -1 sobre os 186 abertos do escopo do projetor; cobertura 186/186, ~2min de shell'
+    label: 'DISTRIBUICAO DE IDADE, medida com cobertura 100%: >60 dias = 0 · 31-60 dias = 113 (61%) · 8-30 = 67 (36%) · 0-7 = 6 (3%) · media 31 dias. Este retrato inteiro e INVISIVEL na superficie atual, e custou dois minutos de shell — sem tocar o schema, sem LLM, sem campo novo'
+
+  - id: E_TOPO_NASCEU_NUMA_RAJADA_E_NAO_SE_MOVEU
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'idade derivada do git para os 15 itens de maior atencao: 12 dos 15 nasceram entre 25 e 26/07'
+    label: 'DOZE DOS QUINZE ITENS DE MAIOR ATENCAO NASCERAM NA MESMA RAJADA (25-26/07) E NENHUM SE MOVEU EM 33 DIAS. Nada no topo e recente. E a assinatura de um plano-grafo ESCRITO UMA VEZ E NUNCA CONDUZIDO'
+
+  - id: C_O_DRIVER_CONDUZ_O_GRAFO_VAZIO
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: open
+    verified_at: 2026-08-28
+    verified_against: 'kg-drive-project.sh:30 e kg-realign-project.sh:29 fixam fios-abertos; medido: fios-abertos = 0 abertos (20/20 teto) enquanto docs/backlog.md = 190'
+    label: 'A ASSIMETRIA CENTRAL: o backlog projeta 190 abertos em 29 grafos, e /meta:drive e /meta:realign tem `fios-abertos.kg.yaml` HARDCODED como default — grafo que esta com ZERO abertos. O driver conduz o grafo vazio; a fila cheia nao tem condutor. Segue ABERTO porque a leitura ainda esta em disputa (ver Q_PARADO_DE_PROPOSITO_OU_ABANDONADO)'
+
+  - id: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
+    node_type: question
+    plane: PROD
+    impact: 5
+    confidence: 0.8
+    status: open
+    verified_against: 'as duas leituras exigem acoes OPOSTAS e nenhuma e observavel na superficie atual (a tabela tem 4 colunas: Atencao/No/Grafo/O que e)'
+    label: 'A PRIMEIRA PERGUNTA QUE A ONDA TEM DE RESPONDER, e ela e um DISSENSO REGISTRADO: o desenhista gateou o handoff backlog->drive dizendo "ninguem esta bloqueado — o maestro le o topo e digita"; a MEDICAO contradiz (61% acima de um mes, topo parado ha 33 dias). Ou os itens estao parados DELIBERADAMENTE — e a fila precisa DIZER isso, o que hoje ela nao diz — ou a fila nao esta sendo trabalhada. GATILHO: a lente L1 da F4 (absorcao/uso real) mede por git e por sessao, nao pergunta'
+
+  - id: E_45PCT_SAO_PERGUNTA_PARADA_SOB_CONTROLE
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'kg-radar --open-tsv sobre o escopo do projetor (186 itens): 183 open + 2 drifted + 1 unverifiable; dos open, 83 question / 54 claim / 35 decision'
+    label: 'QUASE METADE DO BACKLOG NAO E TRABALHO PENDENTE: 83 dos 183 abertos (45%) sao `question`, e a cauda longa delas e gated com gatilho nomeado ("parado SOB CONTROLE != orfao"). Mas a tabela projetada nao tem coluna de TIPO, STATUS nem IDADE — quem le nao distingue "trabalho que espera alguem" de "pergunta que espera um gatilho", e essas duas coisas exigem acoes opostas'
+
+  - id: E_DOIS_DRIFTED_NAO_RECONCILIADOS
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'os 2 drifted do escopo: E_floors_effective_measured_20260729 e C_command_side_gap — este ultimo marcado pela PROPRIA sessao anterior'
+    label: 'O MECANISMO PRODUZ `drifted` E NINGUEM OS RECONCILIA. Pelo status-factor.awk o `drifted` pesa 1.3 — ele SOBE no radar de proposito, porque alguem precisa reconciliar. Um dos dois foi marcado pela sessao imediatamente anterior e continua la'
+
+  # ── o teto como pre-condicao mecanica ────────────────────────────────────
+  - id: C_TETO_CHEIO_E_PRE_CONDICAO_NAO_BOA_PRATICA
+    node_type: claim
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'kg-backlog-check.sh docs/onion/graph/fios-abertos.kg.yaml => OK 20/20 nos'
+    label: 'fios-abertos esta em 20/20 — TETO CHEIO. Um no novo estoura o TETO (HARD). Logo "colher a onda anterior" nao e boa pratica: e PRE-CONDICAO MECANICA para a Onda 1 conseguir registrar o proprio compromisso. A escassez e a feature — o programa nao PODE despejar 30 itens, e forcado a colher e escolher'
+
+  # ── a perna externa, com o limite medido ─────────────────────────────────
+  - id: E_REDDIT_INACESSIVEL_DESTE_HARNESS
+    node_type: evidence
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'WebFetch em www.reddit.com e old.reddit.com => "unable to fetch" nos dois; site:reddit.com na WebSearch nao devolve threads'
+    label: 'REDDIT E INACESSIVEL DESTE HARNESS — medido, nao suposto. HN Algolia (API JSON estruturada), Lobsters, arxiv e LeadDev funcionam. Decisao do maestro: substituir o eixo por fontes verificadas, com a razao REGISTRADA — sem este no, a proxima sessao re-tenta em silencio e paga de novo. Eixo que ninguem consegue executar e eixo decorativo'
+
+  - id: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    verified_at: 2026-08-28
+    verified_against: 'busca externa 2026-08-28; NAO LIDOS na integra — F2 ainda deve ler e ligar cada um por SUPPORTS/REFUTES a uma claim nossa'
+    label: 'PRIOR-ART LOCALIZADO (titulos e ids verificados, conteudo NAO auditado): arXiv 2604.11378 "From Agent Loops to Structured Graphs: A Scheduler-Theoretic Framework for LLM Agent Execution" bate DIRETO na lacuna de ordem de execucao; 2606.22741 GRADE (grafo de dependencia+execucao); 2511.18194 Agent-as-a-Graph; 2502.06472 KARMA (utility scoring + multi-armed bandit para priorizar — a alternativa externa a nossa regua de atencao); LeadDev 2026 (3 tiers por blast radius, comparavel a escada graduada). Segue `open`: citar titulo NAO e ter lido'
+
+  # ── o que a onda ja entregou, antes de comecar ───────────────────────────
+  - id: D_ENTREGA_ANTECIPADA_REGRA62
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-28
+    trace: "docs/evolution/review/feat-backlog-projection-ratchet.md"
+    verified_against: 'PR #704 MERGED (84c659e9); bancada 8/8; 5 mutacoes reprovam; CI em runner distinto nao disparou a regra'
+    label: 'O TRABALHO DE MECANISMO QUE JA TINHA GATILHO FOI ENTREGUE ANTES DA ONDA, de proposito: ele nao depende da pesquisa. REGRA 62 (catraca de projecao) + `--markdown` + `case` de args fechado + iconv fail-loud + LC_ALL pinado + rc do radar lido. Duas lacunas foram RESOLVIDAS POR SUBTRACAO em vez de mecanismo: `owner:` (a projecao passa a IMPRIMIR que zero nos o declaram) e o indice do diario (segue aberto com gatilho refinado por medicao)'
+
+  - id: C_O_PROGRAMA_SO_EXISTIA_FORA_DA_SSOT
+    node_type: claim
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'grep pelos ids nomeados no plano em docs/onion/graph e docs/evolution/research => ZERO ocorrencias; o plano aprovado (33KB) esta fora do repositorio (git: "outside repository")'
+    label: 'ACHADO DO PROPRIO /meta:realign, e a razao de este arquivo existir: o programa de tres ondas aprovado hoje NAO tinha casa em grafo nenhum — vivia so num arquivo de plano de 33KB FORA do repositorio, e as medicoes que o sustentam viviam so em prosa. O realign dizia ALINHADO com razao (os grafos existentes coerem) e era CEGO ao que nunca foi escrito. E o caso-ouro da porosidade que a doutrina do Elenxo descreve: conhecimento que nasce, e validado, e evapora fora da SSOT. O dente do realign e "achado vira NO, nao .md lateral" — este commit e esse dente'
+
+edges:
+  - from: E_61PCT_DO_BACKLOG_PASSOU_DE_UM_MES
+    to: Q_ONDA1_GERIR_BACKLOG_GRAFO
+    edge_type: SUPPORTS
+  - from: E_TOPO_NASCEU_NUMA_RAJADA_E_NAO_SE_MOVEU
+    to: C_O_DRIVER_CONDUZ_O_GRAFO_VAZIO
+    edge_type: SUPPORTS
+  - from: E_TOPO_NASCEU_NUMA_RAJADA_E_NAO_SE_MOVEU
+    to: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
+    edge_type: CAUSES
+  - from: E_45PCT_SAO_PERGUNTA_PARADA_SOB_CONTROLE
+    to: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
+    edge_type: CONSTRAINS
+  - from: E_DOIS_DRIFTED_NAO_RECONCILIADOS
+    to: C_O_DRIVER_CONDUZ_O_GRAFO_VAZIO
+    edge_type: SUPPORTS
+  - from: C_TETO_CHEIO_E_PRE_CONDICAO_NAO_BOA_PRATICA
+    to: Q_ONDA1_GERIR_BACKLOG_GRAFO
+    edge_type: CONSTRAINS
+  - from: D_INVARIANTE_DE_ESCOPO_DA_ONDA1
+    to: Q_ONDA1_GERIR_BACKLOG_GRAFO
+    edge_type: CONSTRAINS
+  - from: E_REDDIT_INACESSIVEL_DESTE_HARNESS
+    to: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
+    edge_type: CONSTRAINS
+  - from: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
+    to: C_O_DRIVER_CONDUZ_O_GRAFO_VAZIO
+    edge_type: SUPPORTS
+  - from: D_ENTREGA_ANTECIPADA_REGRA62
+    to: Q_ONDA1_GERIR_BACKLOG_GRAFO
+    edge_type: SUPPORTS
+  - from: C_O_PROGRAMA_SO_EXISTIA_FORA_DA_SSOT
+    to: Q_ONDA1_GERIR_BACKLOG_GRAFO
+    edge_type: CAUSES
+  - from: C_O_PROGRAMA_SO_EXISTIA_FORA_DA_SSOT
+    to: D_ENTREGA_ANTECIPADA_REGRA62
+    edge_type: CONSTRAINS
