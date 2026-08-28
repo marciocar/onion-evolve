@@ -3,9 +3,9 @@ title: "Revisão — gatilhos de W2/W3 saem do arquivo externo e viram grafo"
 date: 2026-08-28
 branch: research/gated-triggers-w2-w3
 reviewer: "self-review — achado nasceu de pergunta cética do maestro; ausência CONFIRMADA por grep com rc e stderr à vista antes de qualquer escrita"
-reviewed_diff_sha256: c5e7f2e7c9b3b4887e8351955ebc2419bef9e7b23bb5d5599dddeb57dc333d60
-findings_total: 3
-findings_real: 3
+reviewed_diff_sha256: 40903b5ee2f29b4b8776affb98dd904fafb82c49565d210c270cbfa28f02ff28
+findings_total: 4
+findings_real: 4
 verdict: APROVADO
 tokens: 16000
 duration_min: 12
@@ -30,6 +30,12 @@ Seis nós `question`/`decision` + o plano trazido para dentro do repo como proje
    leva cabeçalho declarando ser **derivação** e uma tabela dos **quatro pontos** em que medições
    posteriores já o superaram — inclusive a minha proposta de aging (derrubada) e a citação falsa do
    KARMA. É a tese fundadora do `fios-abertos` aplicada ao próprio artefato desta onda.
+
+4. **O CI achou o que eu não achei.** O `SYNTHESIS.md` nasceu **sem nenhum nó o citando em
+   `trace:`** — a guarda `proveniência-invertida` acusou: *"achado estruturado nasce no grafo; o
+   markdown é vista"*. Ironia registrada: o PR que traz um documento para dentro do repo **para não
+   evaporar** quase o deixou como prosa solta, que é a mesma doença noutra embalagem. Curado na forma
+   do irmão `kg-read-leg-2026-08`.
 
 ## Disciplina
 
