@@ -21,6 +21,17 @@
 # Uso       : bash .claude/validation/kg-backlog-project.sh [--write|--check]
 # =============================================================================
 set -uo pipefail
+# LOCALE PINADO — a razao e a mesma que instalou o pre-requisito do iconv, e o defeito e
+# PIOR. Medido na revisao adversarial (2026-08-28):
+#   · `sort` sem LC_ALL=C usa a collation do locale no DESEMPATE: em en_US.UTF-8 dois nos
+#     de atencao 7.5 trocam de ordem vs C.UTF-8 → a catraca HARD acusa DRIFT num repo CERTO.
+#   · `printf '%.1f'` do bash le LC_NUMERIC: sob pt_BR.UTF-8 (o locale do maestro!) ele
+#     emite `38,0` no lugar de `38.2` — 190 erros em stderr e MESMO ASSIM exit 0, entao o
+#     `_gen_into` chama de sucesso, o diff da DRIFT, e a mensagem manda REGENERAR: quem
+#     obedecer GRAVA a projecao corrompida.
+# Os irmaos ja pinam (graph.sh:164,222 · kg-view.sh:103,104) — este era o unico fora do
+# padrao. Verificado no-op no artefato atual: com LC_ALL=C a saida e byte-identica.
+export LC_ALL=C
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$ROOT"
 RADAR=".claude/validation/kg-radar.sh"
@@ -82,11 +93,22 @@ if [ "${#GRAPHS[@]}" -eq 0 ] && [ -d docs/onion/graph ]; then
   exit 2
 fi
 
-TMP="$(mktemp)"; trap 'rm -f "$TMP"' EXIT
+TMP="$(mktemp)"
 n_open=0
 n_owner_declared=0   # quantos nos DECLARARAM owner: hoje ZERO no corpus inteiro
+RERR="$(mktemp)"; RTSV="$(mktemp)"
+trap 'rm -f "$TMP" "$RERR" "$RTSV"' EXIT
+n_processed=0
 for g in "${GRAPHS[@]}"; do
-  [ -f "$g" ] || continue
+  # Grafo ENUMERADO mas AUSENTE do worktree (sparse-checkout, submodulo, `rm` sem `git rm`)
+  # era `continue` — os itens dele sumiam CALADOS da projecao e a catraca carimbava
+  # "em sincronia". Item que some em silencio e exatamente o que esta guarda existe para
+  # impedir; deixa-lo passar aqui seria a guarda selando a propria doenca.
+  if [ ! -f "$g" ]; then
+    echo "kg-backlog-project: grafo ENUMERADO mas ausente do worktree: $g" >&2
+    echo "  Isto e QUEBRA, nao 'zero itens': gerar agora perderia os itens dele em silencio." >&2
+    exit 2
+  fi
   base="$(basename "$g" .kg.yaml)"
   # mapa id→owner do grafo, UMA passada (owner é raro; ausente → fallback grafo)
   declare -A OWN=()
@@ -96,14 +118,36 @@ for g in "${GRAPHS[@]}"; do
       /^[[:space:]]*- id:/ { id=$0; sub(/^[[:space:]]*- id:[[:space:]]*/,"",id); sub(/[[:space:]]*$/,"",id); next }
       /^[[:space:]]*owner:/ && id!="" { o=$0; sub(/^[^:]*:[[:space:]]*/,"",o); gsub(/"/,"",o); print id"\t"o; id="" }
     ' "$g" )
+  # O rc do radar era DESCARTADO (`2>/dev/null` dentro de process substitution). Medido:
+  # UM grafo ingramatical fazia 27 itens sumirem, o `--fix` gravava a perda, e a REGRA 62
+  # reportava ZERO violacoes — a guarda selando de verde a perda silenciosa que ela existe
+  # para impedir. Agora o radar roda ANTES, com rc lido e stderr preservado.
+  # rc capturado em variavel: dentro de `if ! cmd`, o `$?` do corpo ja e o do PROPRIO if,
+  # nao o do comando — a 1a versao desta mensagem imprimia "exit 0" para uma falha real.
+  _rrc=0; bash "$RADAR" "$g" --open-tsv > "$RTSV" 2>"$RERR" || _rrc=$?
+  if [ "$_rrc" -ne 0 ]; then
+    echo "kg-backlog-project: kg-radar FALHOU em $g (exit $_rrc)" >&2
+    sed 's/^/  radar: /' "$RERR" >&2
+    echo "  Isto e QUEBRA: os itens deste grafo sumiriam da projecao sem aviso." >&2
+    exit 2
+  fi
   while IFS=$'\t' read -r file id typ plane st imp conf att vat trace c11 label; do
     [ -n "${id:-}" ] || continue
     if [ -n "${OWN[$id]:-}" ]; then owner="${OWN[$id]}"; n_owner_declared=$((n_owner_declared + 1)); else owner="$base"; fi
     printf '%s\t%s\t%s\t%s\t%s\n' "${att:-0}" "$owner" "$id" "$base" "${label:-}" >> "$TMP"
     n_open=$((n_open+1))
-  done < <(bash "$RADAR" "$g" --open-tsv 2>/dev/null)
+  done < "$RTSV"
   unset OWN
+  n_processed=$((n_processed + 1))
 done
+
+# Sanidade final: todo grafo enumerado foi processado. Cinto sobre suspensorio — se algum
+# caminho novo voltar a "pular" um grafo, isto reprova antes de a projecao ser escrita.
+if [ "$n_processed" -ne "${#GRAPHS[@]}" ]; then
+  echo "kg-backlog-project: processei $n_processed de ${#GRAPHS[@]} grafos enumerados." >&2
+  echo "  Diferenca = itens perdidos em silencio. QUEBRA." >&2
+  exit 2
+fi
 
 n_graphs="${#GRAPHS[@]}"
 n_with_open="$(cut -f4 "$TMP" | sort -u | grep -c . || true)"
