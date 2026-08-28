@@ -35,9 +35,17 @@ carimbo como medição.
 - **Cura A (medir):** o beacon grava `owner_pid` + `owner_start` (starttime do `/proc`, defesa contra
   **reuso de pid**). Vereditos: `live` (dono medido vivo) · `declared` (dono não medido — cai no TTL,
   **bloqueia**, conservador) · `orphan` (dono medido morto — não bloqueia, `sweep` remove) · `stale`.
-- **Direção do erro, escolhida:** falso `orphan` (diz morta, está viva) reabre o incidente W1×W2 que
-  criou o farol; falso `declared` custa uma verificação. Por isso **ausência de prova cai no
-  comportamento antigo, nunca em "pode escrever"**.
+- **Direção do erro, escolhida — e eu a QUEBREI na 1ª versão.** A regra é: falso `orphan` (diz
+  morta, está viva) reabre o incidente W1×W2 que criou o farol; falso `declared` custa uma
+  verificação. Mas o `beacon_verdict` que escrevi curto-circuitava no dono e **nunca olhava o
+  heartbeat**: uma sessão que trocou de processo (resume/restart com o mesmo sid) ou lida de outra
+  visão de `/proc` (container, `hidepid`, outra máquina) saía `orphan` **com heartbeat de segundos
+  atrás** — `check` devolvia 0 e autorizava outra sessão a escrever por cima. Foi um revisor
+  adversarial que derrubou, **em execução**, a invariante que meu próprio cabeçalho declarava.
+  Cura: `orphan` passou a exigir dono morto **E** heartbeat parado além de uma janela de graça
+  (30 min) **E** `/proc` legível aqui **E** o beacon ser desta máquina. O poder de matar fantasma
+  sobrevive quase inteiro (8h → 30 min) e virou **impossível** declarar morta uma sessão que
+  acabou de agir.
 - **Cura B (o pedido do maestro):** o aviso agora **se declara não-verificado e manda verificar quem é
   e o que faz** — rótulo (`VIVA` vs `DECLARADA`), a pista `NUNCA refrescou (0 prompts)`, e a ordem
   explícita de não relatar como sessão alheia viva o que não foi medido.
@@ -47,6 +55,16 @@ carimbo como medição.
   por **identidade do executável** (`comm` = `claude`), com teste de regressão dedicado.
 - **Cópia da regra:** o mapa da constelação tinha uma **segunda** implementação do "vivo" por TTL.
   Passou a consumir `session-beacon.sh verdict` — a regra vive num lugar só, senão envelhece separada.
+
+- **A lição dentro da lição:** eu escrevi no cabeçalho do script que "ausência de prova cai no lado
+  conservador" e **não implementei isso** — declarei a invariante em prosa e deixei o código
+  contradizê-la. É o defeito deste próprio diário aplicado a mim: *declarado ≠ verificado* vale
+  também para o que EU declaro sobre o MEU código. O que separou foi ter mandado um revisor
+  adversarial **executar**, não ler.
+- **A bancada estava cega no ponto que mais importava:** o revisor mutou o motor para o veredito
+  `live` deixar de bloquear — matando a proteção I3 inteira — e a suíte passou **toda verde**. O
+  caso rodava num sandbox compartilhado, e o `exit 1` que ele conferia vinha dos beacons do teste
+  vizinho. Teste que não isola mede o vizinho, não o SUT.
 
 ## Next crumb
 - Ao receber sinal de hook/motd no boot: **rotular a fonte antes de repassar**. "O farol declara X" ≠
