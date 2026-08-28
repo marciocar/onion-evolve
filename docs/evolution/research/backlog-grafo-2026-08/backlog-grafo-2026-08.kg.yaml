@@ -125,10 +125,10 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.85
-    status: open
+    status: drifted
     verified_at: 2026-08-28
-    verified_against: 'busca externa 2026-08-28; NAO LIDOS na integra — F2 ainda deve ler e ligar cada um por SUPPORTS/REFUTES a uma claim nossa'
-    label: 'PRIOR-ART LOCALIZADO (titulos e ids verificados, conteudo NAO auditado): arXiv 2604.11378 "From Agent Loops to Structured Graphs: A Scheduler-Theoretic Framework for LLM Agent Execution" bate DIRETO na lacuna de ordem de execucao; 2606.22741 GRADE (grafo de dependencia+execucao); 2511.18194 Agent-as-a-Graph; 2502.06472 KARMA (utility scoring + multi-armed bandit para priorizar — a alternativa externa a nossa regua de atencao); LeadDev 2026 (3 tiers por blast radius, comparavel a escada graduada). Segue `open`: citar titulo NAO e ter lido'
+    verified_against: 'AUDITADO no P3 do drive: os 4 papers foram LIDOS (KARMA direto do PDF, 20/26 paginas). A leitura DERRUBOU parte da propria citacao'
+    label: 'DRIFTOU AO SER LIDO — e a ressalva deste no ("citar titulo NAO e ter lido") pegou o proprio autor dele. Dos 5 itens citados, UM era FALSO: a alegacao de que KARMA usa utility scoring + multi-armed bandit veio de um resumo de busca ALUCINADO por terceiro e nao existe no paper (ver E_KARMA2502_CITACAO_MAB_E_FALSA). Os outros dois auditados SUSTENTAM nosso limite declarado em vez de refuta-lo: SGH (2604.11378) exclui do proprio escopo grafos cuja dependencia nao e conhecida antes da execucao — que e a definicao de grafo epistemico; GRADE (2606.22741), com bancada de 6 corpora reais, usa o grafo de dependencia so como DIAGNOSTICO POS-HOC e nunca reordena. Agent-as-a-Graph (2511.18194) e de outro problema (retrieval de tool) e NAO virou no: forcar aresta ali seria guarda que passa sempre'
 
   # ── o que a onda ja entregou, antes de comecar ───────────────────────────
   - id: D_ENTREGA_ANTECIPADA_REGRA62
@@ -171,6 +171,46 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'git log --follow -- docs/backlog.md => 8 commits, 7 da construcao (22-28/08); para os 190 ids, primeira citacao em commit ANTES de 2026-08-22 = 24, DEPOIS = 13'
     label: 'A LENTE L1 (absorcao/uso real), medida por git em vez de perguntada. docs/backlog.md tem SEIS DIAS e quase todos os commits que o tocam sao da sua propria construcao. Dos 37 abertos com rastro, 24 nasceram no historico ANTES da projecao existir. Conclusao com o teto declarado: a projecao ainda NAO PODE ter mudado a selecao de trabalho, e afirmar que ela e "sub-usada" seria tao infundado quanto afirmar que e util — e jovem demais para as duas coisas. O que a medicao DERRUBA e a premissa da propria pergunta (parado/abandonado), nao o valor da superficie'
+
+  - id: E_KARMA2502_CITACAO_MAB_E_FALSA
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'leitura direta do PDF via Read (20/26 paginas de arxiv.org/pdf/2502.06472: corpo 1-9 + Limitations + apendice de prompts 11-20); ZERO ocorrencias de "multi-armed bandit", "Central Coordination Agent" ou "utility scor*"'
+    label: 'A CITACAO ERA FACTUALMENTE FALSA, E O ERRO FOI MEU. Nao existe Central Coordination Agent nem multi-armed bandit no KARMA; existe um Central Controller (Fig.2, sem detalhe algoritmico) e um Evaluator Agent que faz GATE BINARIO de qualidade (sigmoide + limiar, eq.12-15) sobre um triplo JA EXTRAIDO — nao ordenacao de qual tarefa processar primeiro. A alegacao veio de um resumo de busca alucinado por terceiro que eu repassei sem ler o paper. E o modo de falha que o proprio no-pai declarava, cometido pelo autor do no'
+
+  - id: E_SGH2604_ESCOPO_EXCLUI_GRAFO_EPISTEMICO
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'WebFetch em /html e /pdf de 2604.11378, 2 leituras convergentes; paper e POSITION/DESIGN, autor unico, ZERO experimento ("not a production implementation or empirical results") — peso rebaixado por isso'
+    label: 'SGH propoe DAG estatico + despacho por PRONTIDAO TOPOLOGICA PURA (sem peso de prioridade/urgencia/custo) e declara o proprio limite: escopo e "verifiable engineering tasks" com dependencia conhecida ANTES da execucao, excluindo tarefas exploratorias e "tasks without fully known dependencies at planning time" — o que descreve, por definicao, um grafo EPISTEMICO onde claim e evidence EMERGEM da investigacao. Fonte fraca (N=0), mas o dado relevante e o LIMITE declarado, nao o resultado'
+
+  - id: E_GRADE2606_DIAGNOSTICO_NAO_REORDENA
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'WebFetch em /abs e /html de 2606.22741; validado em 6 corpora REAIS (tau-bench, tau2-bench, SWE-agent, SWE-Gym, OpenHands, AgentRewardBench) + Who&When (126 runs falhos) + FLORA-Bench (~6e5 pares)'
+    label: 'MESMO A LITERATURA MAIS ROBUSTA NAO CONVERTE DEPENDENCIA EM PRIORIDADE. GRADE constroi grafo de duas camadas sobre trace real de agente, mas e explicitamente DIAGNOSTICO POS-HOC: mantem a ordem original da trace FIXA e usa a dependencia para LOCALIZAR FALHA, nunca para reordenar execucao. Reforca que a conversao dependencia->ordem (nossa Fase 2 gated) e passo a parte e nao-trivial — prudencia alinhada ao estado da arte, nao omissao'
+
+  - id: E_GRADE2606_HUB_CONCENTRACAO_SUPERA_GRAU_BRUTO
+    node_type: evidence
+    plane: DEV
+    impact: 2
+    confidence: 0.5
+    status: open
+    verified_at: 2026-08-28
+    verified_against: 'mesma leitura de 2606.22741; achado de DOMINIO DIFERENTE (predicao de falha em trace de execucao, nao triagem de backlog epistemico) — transferencia e ANALOGIA, nao medicao sobre o nosso grafo'
+    label: 'A TENTATIVA HONESTA DE REFUTAR A NOSSA REGUA, e ela nao caiu — mas deixou um fio. GRADE mede que "hub concentration" (centralidade DIRIGIDA/normalizada) prediz falha melhor e TRANSFERE entre corpora, enquanto contagem crua falha na transferencia. Sugere que grau NAO-DIRECIONADO bruto (nosso "1+grau") pode ser instrumento mais cego que uma centralidade dirigida. Fica OPEN de proposito: e hipotese analogica de outro dominio, nao medicao sobre o nosso corpus. GATILHO: medir as duas reguas sobre os nossos 45 grafos e comparar o que cada uma poe no topo'
 
 edges:
   - from: E_61PCT_DO_BACKLOG_PASSOU_DE_UM_MES
@@ -215,3 +255,23 @@ edges:
   - from: E_O_TRABALHO_PRECEDE_A_PROJECAO
     to: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
     edge_type: SUPPORTS
+  # CONSTRAINS, nao REFUTES — e o radar que forcou a precisao. REFUTES exige alvo
+  # `refuted`/`superseded`, e (a) o no NAO foi refutado como um todo: 1 de 5 citacoes era
+  # falsa, as outras sustentam; (b) o label do alvo JA absorveu a correcao por medicao, entao
+  # refutar conteudo que nao afirma mais aquilo e aresta mal-tipada. A refutacao da citacao
+  # falsa vive INTEIRA no label de E_KARMA2502_CITACAO_MAB_E_FALSA, que e onde ela e
+  # consultavel. ALTERNATIVA CANONICA (Aufhebung estrita: alvo -> superseded + no sucessor)
+  # exige FLIP DE STATUS DE VERDADE, que o /meta:drive manda PARAR para o maestro selar —
+  # fica proposta no checkpoint, nao executada pelo driver.
+  - from: E_KARMA2502_CITACAO_MAB_E_FALSA
+    to: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
+    edge_type: CONSTRAINS
+  - from: E_SGH2604_ESCOPO_EXCLUI_GRAFO_EPISTEMICO
+    to: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
+    edge_type: SUPPORTS
+  - from: E_GRADE2606_DIAGNOSTICO_NAO_REORDENA
+    to: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
+    edge_type: SUPPORTS
+  - from: E_GRADE2606_HUB_CONCENTRACAO_SUPERA_GRAU_BRUTO
+    to: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
+    edge_type: CONSTRAINS
