@@ -212,6 +212,69 @@ nodes:
     verified_against: 'mesma leitura de 2606.22741; achado de DOMINIO DIFERENTE (predicao de falha em trace de execucao, nao triagem de backlog epistemico) — transferencia e ANALOGIA, nao medicao sobre o nosso grafo'
     label: 'A TENTATIVA HONESTA DE REFUTAR A NOSSA REGUA, e ela nao caiu — mas deixou um fio. GRADE mede que "hub concentration" (centralidade DIRIGIDA/normalizada) prediz falha melhor e TRANSFERE entre corpora, enquanto contagem crua falha na transferencia. Sugere que grau NAO-DIRECIONADO bruto (nosso "1+grau") pode ser instrumento mais cego que uma centralidade dirigida. Fica OPEN de proposito: e hipotese analogica de outro dominio, nao medicao sobre o nosso corpus. GATILHO: medir as duas reguas sobre os nossos 45 grafos e comparar o que cada uma poe no topo'
 
+  # ── GATILHOS de W2/W3, registrados CEDO (a correcao do maestro, 2026-08-28) ──
+  # O plano os programava para a F6. Errado: `gated-work-derives-fresh` diz que o que
+  # sobrevive ao tempo e o GATILHO ("quando X acontecer, isto vai doer assim"), e o "como"
+  # apodrece. Guardar o gatilho para o fim e por a parte duravel no lugar mais fragil.
+  # Aqui vai SO a pergunta e a condicao de disparo — NENHUM desenho de solucao.
+  - id: Q_FRONTEIRA_GRAFO_X_TASK_MANAGER
+    node_type: question
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    verified_against: 'medido 2026-08-28: grep bidirecional entre .claude/utils/task-manager e .claude/validation/kg-*.sh => ZERO referencias cruzadas; nenhum L0/ADR/KB declara a fronteira'
+    label: 'ONDA 2 — a fronteira entre a fila EPISTEMICA (grafo) e a fila de ENTREGA (provider) NAO esta declarada em lugar nenhum, e ha TRES nocoes de "backlog" sem reconciliacao (grafo · provider · business-context no Mini). A regua que resolveria e architecture.md §8 regra 4 (dono distinto x ritmo distinto x decisao distinta, os tres JUNTOS) e nunca foi aplicada a esse par. GATILHO LITERAL: W1 entregue E existir medicao do RITMO das duas filas no MESMO periodo (cadencia de flip de status nos .kg.yaml, derivada do git, vs cadencia no provider). Sem os dois numeros lado a lado a regra 4 nao e aplicavel e a ADR seria PROSA'
+
+  - id: Q_SINCRONIZACAO_BIDIRECIONAL
+    node_type: question
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_against: 'medido: zero sincronizacao nas duas direcoes; nenhum campo do schema de no guarda id externo'
+    label: 'ONDA 2 — as duas camadas sao ESTANQUES por construcao: um no `open` nunca vira issue no provider, e uma task fechada la nunca fecha um no. GATILHO LITERAL: um caso REAL em que um item do grafo precisou virar tarefa no provider (ou o inverso) e foi feito A MAO pelo menos DUAS vezes, com os dois casos citaveis. Ate la, ZERO SINCRONIZACAO E O ESTADO CORRETO — o que falta e DECLARAR isso, nao construir ponte. Regua da casa: autoria de guardrail se PUXA por caso concreto recorrente, nunca se EMPURRA por hipotese'
+
+  - id: D_NAO_PRE_DESENHAR_PROVIDER_SDAAL_DE_BACKLOG
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-28
+    trace: "docs/knowledge-base/concepts/onion-abstraction-doctrine.md"
+    verified_against: 'Teste do Eixo/Gatilho da doutrina de abstracao: SDAAL gradua com 2o provider REAL, nunca por simetria'
+    label: 'NAO-COMPROMISSO EXPLICITO, escrito para impedir que alguem (inclusive eu) desenhe factory/interface/adapter de "backlog store" por simetria. SDAAL so gradua com SEGUNDO PROVIDER REAL. Desenhar a abstracao antes disso repete o anti-padrao que m3-federation-admin ja refutou por escrito, e e a catedral do .onion/ na sua forma mais tentadora: elegante, simetrica, e sem usuario'
+
+  - id: Q_O_QUE_VIAJA_DO_BACKLOG
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    verified_against: 'precedente que da a FORMA do gatilho: este proprio mecanismo nasceu do gerador PoC de um adotante (o "adotante-oraculo", citado em meta/backlog.md)'
+    label: 'ONDA 3 — o que do backlog VIAJA para o adotante, e o que, se viajar, vira divida em N repos? GATILHO LITERAL: um adotante PEDIR explicitamente, OU um adotante fiar a mao um equivalente e o sinal chegar por docs/evolution/inbox/. Nunca por simetria de plugin. O precedente e forte: a versao anterior deste mecanismo veio de um adotante, nao de um desenho nosso'
+
+  - id: Q_BACKLOG_FEDERADO
+    node_type: question
+    plane: DEV
+    impact: 2
+    confidence: 0.85
+    status: open
+    verified_against: 'estado medido: nenhum adotante tem backlog-grafo vivo hoje'
+    label: 'ONDA 3 — visao agregada de backlog entre adotantes. GATILHO LITERAL: DOIS OU MAIS adotantes com backlog-grafo vivo E um pedido explicito de visao agregada. Nunca antes. Um agregador sem duas fontes reais e dashboard de si mesmo'
+
+  - id: D_AGREGACAO_CROSS_REPO_E_MOAT
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-28
+    trace: ".claude/validation/automation-ladder-registry.txt"
+    verified_against: 'invariante I3 (um escritor por repo) + o degrau MOAT da escada graduada, que nao tem gatilho de promocao por desenho'
+    label: 'MOAT PERMANENTE, sem gatilho de promocao: LER ou ESCREVER backlog atravessando a fronteira de repo fere I3 (um escritor por repo). Isto nao e "ainda nao" — e "nunca automatizar". Registrado como decisao e nao como pergunta justamente para que ninguem o reabra como se fosse fio gated esperando amadurecer'
+
 edges:
   - from: E_61PCT_DO_BACKLOG_PASSOU_DE_UM_MES
     to: Q_ONDA1_GERIR_BACKLOG_GRAFO
@@ -274,4 +337,22 @@ edges:
     edge_type: SUPPORTS
   - from: E_GRADE2606_HUB_CONCENTRACAO_SUPERA_GRAU_BRUTO
     to: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
+    edge_type: CONSTRAINS
+  - from: Q_FRONTEIRA_GRAFO_X_TASK_MANAGER
+    to: Q_ONDA1_GERIR_BACKLOG_GRAFO
+    edge_type: DEPENDS_ON
+  - from: Q_SINCRONIZACAO_BIDIRECIONAL
+    to: Q_FRONTEIRA_GRAFO_X_TASK_MANAGER
+    edge_type: DEPENDS_ON
+  - from: D_NAO_PRE_DESENHAR_PROVIDER_SDAAL_DE_BACKLOG
+    to: Q_SINCRONIZACAO_BIDIRECIONAL
+    edge_type: CONSTRAINS
+  - from: Q_O_QUE_VIAJA_DO_BACKLOG
+    to: Q_FRONTEIRA_GRAFO_X_TASK_MANAGER
+    edge_type: DEPENDS_ON
+  - from: Q_BACKLOG_FEDERADO
+    to: Q_O_QUE_VIAJA_DO_BACKLOG
+    edge_type: DEPENDS_ON
+  - from: D_AGREGACAO_CROSS_REPO_E_MOAT
+    to: Q_BACKLOG_FEDERADO
     edge_type: CONSTRAINS
