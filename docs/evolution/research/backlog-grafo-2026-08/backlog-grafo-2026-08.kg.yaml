@@ -61,10 +61,11 @@ nodes:
     status: open
     verified_at: 2026-08-28
     verified_against: 'kg-drive-project.sh:30 e kg-realign-project.sh:29 fixam fios-abertos; medido: fios-abertos = 0 abertos (20/20 teto) enquanto docs/backlog.md = 190'
-    label: 'A ASSIMETRIA CENTRAL: o backlog projeta 190 abertos em 29 grafos, e /meta:drive e /meta:realign tem `fios-abertos.kg.yaml` HARDCODED como default — grafo que esta com ZERO abertos. O driver conduz o grafo vazio; a fila cheia nao tem condutor. Segue ABERTO porque a leitura ainda esta em disputa (ver Q_PARADO_DE_PROPOSITO_OU_ABANDONADO)'
+    label: 'A ASSIMETRIA, REFINADA PELA MEDICAO (P3 do drive, 2026-08-28) — a versao anterior EXAGERAVA. Medido: (1) o `fios-abertos` e DEFAULT, nao trava — os dois scripts aceitam `*.kg.yaml` como argumento (linha 34), e o drive JA conduziu um grafo nao-default (a sessao drive-m3-federation-2026-08-27); (2) 37 dos 190 itens abertos (19%) JA aparecem citados em commits, logo a fila NAO esta sem condutor. O QUE PERSISTE, e por isso segue open: nao ha LACO CROSS-GRAFO — nada pega o topo do backlog e o entrega ao driver; conduzir exige o maestro ler a projecao e digitar o caminho. O default aponta para um grafo com ZERO abertos, entao a invocacao nua (`/meta:drive` sem argumento) e sempre um no-op'
 
   - id: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
     node_type: question
+    verified_at: 2026-08-28
     # plane: DEV, e o CI corrigiu isto: como PROD com impact>=4 e sem verified_at, o no
     # AFIRMARIA sobre producao sem nunca ter olhado (guarda kg-verificacao/NOVO). E ele nao
     # afirma — PERGUNTA. A propria doutrina do fios-abertos ja dizia por que: "o backlog
@@ -72,10 +73,10 @@ nodes:
     # lente L1 medir; a pergunta e trabalho.
     plane: DEV
     impact: 5
-    confidence: 0.8
-    status: open
-    verified_against: 'as duas leituras exigem acoes OPOSTAS e nenhuma e observavel na superficie atual (a tabela tem 4 colunas: Atencao/No/Grafo/O que e)'
-    label: 'A PRIMEIRA PERGUNTA QUE A ONDA TEM DE RESPONDER, e ela e um DISSENSO REGISTRADO: o desenhista gateou o handoff backlog->drive dizendo "ninguem esta bloqueado — o maestro le o topo e digita"; a MEDICAO contradiz (61% acima de um mes, topo parado ha 33 dias). Ou os itens estao parados DELIBERADAMENTE — e a fila precisa DIZER isso, o que hoje ela nao diz — ou a fila nao esta sendo trabalhada. GATILHO: a lente L1 da F4 (absorcao/uso real) mede por git e por sessao, nao pergunta'
+    confidence: 0.9
+    status: confirmed
+    verified_against: 'medido no P3 do drive: backlog.md nasceu 2026-08-22 (8 commits, 7 deles da propria construcao); dos 37 abertos com rastro em commit, 24 foram citados ANTES de a projecao existir e 13 depois'
+    label: 'A PRIMEIRA PERGUNTA QUE A ONDA TEM DE RESPONDER, e ela e um DISSENSO REGISTRADO: o desenhista gateou o handoff backlog->drive dizendo "ninguem esta bloqueado — o maestro le o topo e digita"; a MEDICAO contradiz (61% acima de um mes, topo parado ha 33 dias). Ou os itens estao parados DELIBERADAMENTE — e a fila precisa DIZER isso, o que hoje ela nao diz — ou a fila nao esta sendo trabalhada. RESPONDIDA NO P3 (2026-08-28), e a resposta DISSOLVE a dicotomia: nao e "parado de proposito" NEM "abandonado" — e TRABALHADO POR OUTRO CAMINHO. A projecao tem SEIS DIAS (nasceu 22/08) e dos 37 itens abertos com rastro em commit, 24 foram citados ANTES de ela existir. O trabalho na fila PRECEDE a superficie que deveria orienta-lo: o maestro trabalha os grafos direto. Logo a pergunta certa nao era "a fila esta parada?" e sim "a projecao mudou a SELECAO de trabalho?" — e a resposta honesta hoje e QUE NAO HA EVIDENCIA DISSO, porque ela e nova demais para ter provado o contrario. Corolario que muda o alvo da onda: o valor de uma superficie de controle nao se mede pelo que ela mostra, e sim por ela mudar o que se escolhe fazer — e esse e um teste que so o TEMPO roda'
 
   - id: E_45PCT_SAO_PERGUNTA_PARADA_SOB_CONTROLE
     node_type: evidence
@@ -151,6 +152,26 @@ nodes:
     verified_against: 'grep pelos ids nomeados no plano em docs/onion/graph e docs/evolution/research => ZERO ocorrencias; o plano aprovado (33KB) esta fora do repositorio (git: "outside repository")'
     label: 'ACHADO DO PROPRIO /meta:realign, e a razao de este arquivo existir: o programa de tres ondas aprovado hoje NAO tinha casa em grafo nenhum — vivia so num arquivo de plano de 33KB FORA do repositorio, e as medicoes que o sustentam viviam so em prosa. O realign dizia ALINHADO com razao (os grafos existentes coerem) e era CEGO ao que nunca foi escrito. E o caso-ouro da porosidade que a doutrina do Elenxo descreve: conhecimento que nasce, e validado, e evapora fora da SSOT. O dente do realign e "achado vira NO, nao .md lateral" — este commit e esse dente'
 
+  - id: E_A_FILA_E_PARCIALMENTE_CONDUZIDA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'git log --all --grep=<id> para os 190 ids extraidos de docs/backlog.md => 37 com commit; grep GRAPH= em kg-drive-project.sh:30,34 e kg-realign-project.sh:30,34; .claude/sessions/drive-m3-federation-2026-08-27 conduziu grafo nao-default'
+    label: 'MEDICAO QUE REFINA (e em parte DERRUBA) a manchete de C_O_DRIVER_CONDUZ_O_GRAFO_VAZIO. 37 de 190 abertos (19%) tem commit citando seu id — a fila e trabalhada, so nao POR AQUI. E o hardcode e default, nao trava: linha 34 dos dois scripts aceita `*.kg.yaml`, e ha precedente de uso com grafo nao-default. Registrado como medicao contra o vivo no P3 de um /meta:drive, nao como impressao: o driver medindo a propria assimetria que o motivou'
+
+  - id: E_O_TRABALHO_PRECEDE_A_PROJECAO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'git log --follow -- docs/backlog.md => 8 commits, 7 da construcao (22-28/08); para os 190 ids, primeira citacao em commit ANTES de 2026-08-22 = 24, DEPOIS = 13'
+    label: 'A LENTE L1 (absorcao/uso real), medida por git em vez de perguntada. docs/backlog.md tem SEIS DIAS e quase todos os commits que o tocam sao da sua propria construcao. Dos 37 abertos com rastro, 24 nasceram no historico ANTES da projecao existir. Conclusao com o teto declarado: a projecao ainda NAO PODE ter mudado a selecao de trabalho, e afirmar que ela e "sub-usada" seria tao infundado quanto afirmar que e util — e jovem demais para as duas coisas. O que a medicao DERRUBA e a premissa da propria pergunta (parado/abandonado), nao o valor da superficie'
+
 edges:
   - from: E_61PCT_DO_BACKLOG_PASSOU_DE_UM_MES
     to: Q_ONDA1_GERIR_BACKLOG_GRAFO
@@ -188,3 +209,9 @@ edges:
   - from: C_O_PROGRAMA_SO_EXISTIA_FORA_DA_SSOT
     to: D_ENTREGA_ANTECIPADA_REGRA62
     edge_type: CONSTRAINS
+  - from: E_A_FILA_E_PARCIALMENTE_CONDUZIDA
+    to: C_O_DRIVER_CONDUZ_O_GRAFO_VAZIO
+    edge_type: CONSTRAINS
+  - from: E_O_TRABALHO_PRECEDE_A_PROJECAO
+    to: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
+    edge_type: SUPPORTS
