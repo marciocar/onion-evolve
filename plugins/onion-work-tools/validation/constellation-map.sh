@@ -84,8 +84,19 @@ presence_of() {
   [[ -n "$br" ]] || { echo "dark"; return; }
   wt="$(worktree_for_branch "$br")"
   [[ -n "$wt" && -d "$wt/.claude/beacons" ]] || { echo "dark"; return; }
+  # A regra de "vivo" mora num lugar só: `session-beacon.sh verdict` (SSOT). Antes daqui
+  # havia uma CÓPIA da regra por TTL — e cópia de regra envelhece separada: quando o farol
+  # aprendeu a medir o dono (2026-08-28), esta coluna continuaria pintando "live" para
+  # fantasma. Sem o subcomando (motor antigo numa worktree irmã) cai no TTL de antes.
+  local sb="${BASH_SOURCE[0]%/*}/session-beacon.sh" verdict
   for bf in "$wt"/.claude/beacons/*.beacon; do
     [[ -f "$bf" ]] || continue
+    verdict=""
+    [[ -f "$sb" ]] && verdict="$(ONION_BEACON_TTL_MIN="$TTL_MIN" bash "$sb" verdict "$bf" 2>/dev/null || true)"
+    if [[ -n "$verdict" ]]; then
+      [[ "$verdict" == "live" || "$verdict" == "declared" ]] && { echo "live"; return; }
+      continue
+    fi
     ref="$(awk -F': ' '/^refreshed_at:/{print $2; exit}' "$bf" 2>/dev/null || true)"
     age=$(( (NOW - ${ref:-0}) / 60 ))
     if [[ "$age" -le "$TTL_MIN" ]]; then echo "live"; return; fi

@@ -14,14 +14,34 @@
 #   session-beacon.sh up      <repo> <session_id> [hat]     # cria/refresca o farol
 #   session-beacon.sh down    <repo> <session_id>           # apaga o farol
 #   session-beacon.sh check   <repo> [--ignore <session_id>]# lista faróis; exit 1 se há FRESCO alheio
-#   session-beacon.sh sweep   <repo>                        # remove faróis stale
+#   session-beacon.sh sweep   <repo>                        # remove faróis stale/órfãos
+#   session-beacon.sh verdict <arquivo.beacon>              # live|orphan|declared|stale (SSOT do veredito)
 #
-# Frescor: refreshed_at dentro de ONION_BEACON_TTL_MIN (default 480 min). Stale é
-# listado mas não bloqueia (sessão morta sem cleanup não pode travar o repo para sempre).
+# DECLARADO ≠ VERIFICADO (correção do maestro 2026-08-28, medida). Até aqui "viva" era
+# só `refreshed_at` dentro do TTL — um CARIMBO que a própria sessão escreveu. Mas
+# `refreshed_at` só avança no UserPromptSubmit, então toda sessão que nasce e some sem
+# SessionEnd (crash, kill, conexão de Remote Control, resume abortado) lia como VIVA por
+# até 8h. Medido no core: 2 faróis anunciados como VIVOS tinham `started_at == refreshed_at`
+# (jamais receberam um prompt) e NENHUM processo correspondente — o aviso de colisão I3
+# disparou contra fantasmas. Cura: medir o DONO (behavior-over-declaration), não o carimbo.
+#
+# Vereditos (o `check` os rotula; `verdict` os expõe como SSOT p/ outros leitores):
+#   live     — dono registrado E ainda vivo (pid existe com o MESMO starttime). Bloqueia.
+#   declared — sem dono registrado (harness sem /proc, beacon antigo, dono não identificável):
+#              cai no frescor por TTL. Bloqueia — conservador por desenho, ver abaixo.
+#   orphan   — dono registrado e MORTO. NÃO bloqueia; `sweep` remove.
+#   stale    — sem dono e refreshed_at fora do TTL. NÃO bloqueia; `sweep` remove.
+#
+# Direção do erro (escolha deliberada): um falso "órfã" (diz morta, está viva) reabre
+# exatamente o incidente W1×W2 que criou o farol; um falso "declarada" só custa uma
+# verificação. Por isso o dono só é registrado quando IDENTIFICADO com confiança, e a
+# ausência de prova cai no comportamento antigo, nunca em "pode escrever".
+#
+# Frescor: refreshed_at dentro de ONION_BEACON_TTL_MIN (default 480 min).
 set -euo pipefail
 
-CMD="${1:?uso: session-beacon.sh <up|down|check|sweep> <repo> ...}"
-REPO="${2:?uso: session-beacon.sh <up|down|check|sweep> <repo> ...}"
+CMD="${1:?uso: session-beacon.sh <up|down|check|sweep|verdict> <repo|beacon> ...}"
+REPO="${2:?uso: session-beacon.sh <up|down|check|sweep|verdict> <repo|beacon> ...}"
 TTL_MIN="${ONION_BEACON_TTL_MIN:-480}"
 BEACON_DIR="$REPO/.claude/beacons"
 
@@ -57,6 +77,63 @@ now_epoch() { date +%s; }
 # started_at/ended_at/duração. Apendado em `down` (fim limpo) e `sweep` (a sessão
 # morreu sem cleanup — ended_at = último refresh). merge=union no .gitattributes
 # evita conflito entre sessões concorrentes.
+# ── DONO DO FAROL (a metade VERIFICÁVEL) ────────────────────────────────────
+# starttime do processo (campo 22 de /proc/<pid>/stat), a defesa contra REUSO DE PID:
+# pid sozinho volta a mentir quando o kernel recicla o número. O `comm` do stat pode
+# conter espaços e parênteses, então corta-se tudo até o ÚLTIMO ')' e conta-se dali
+# (campos 3..N viram 1..N-2, logo o 22 vira o 20).
+proc_starttime() { # $1 = pid → starttime em jiffies, ou vazio
+  local pid="$1"
+  case "$pid" in ''|*[!0-9]*) return 0 ;; esac
+  [ -r "/proc/$pid/stat" ] || return 0
+  sed 's/.*) //' "/proc/$pid/stat" 2>/dev/null | awk '{print $20}' 2>/dev/null || true
+}
+
+# Sobe a árvore de processos procurando o DONO real da sessão (o processo `claude`).
+# Por que subir: o hook roda dentro de um bash filho, cujo pid morre em segundos — gravá-lo
+# como dono produziria "órfã" instantânea, o erro na direção PERIGOSA (diz morta, está viva).
+# Não achou claude em até 6 saltos → devolve vazio, e o beacon fica `declared` (conservador).
+owner_probe() { # $1 = pid inicial → "pid starttime", ou vazio
+  local pid="${1:-}" hops=0 comm argv0 st
+  while [ -n "$pid" ] && [ "$pid" -gt 1 ] 2>/dev/null && [ "$hops" -lt 6 ]; do
+    # IDENTIDADE do executável, NUNCA substring do cmdline. Medido no dogfood
+    # 2026-08-28: casar `*claude*` no cmdline elegia o SHELL TRANSITÓRIO do próprio
+    # hook como dono — o cmdline dele carrega `/home/<user>/.claude/shell-snapshots/…`,
+    # que contém "claude". Esse shell morre em segundos e o farol viraria `orphan` com
+    # a sessão VIVA: exatamente o erro na direção perigosa que este desenho proíbe.
+    comm="$(cat "/proc/$pid/comm" 2>/dev/null || true)"
+    argv0="$(tr '\0' '\n' < "/proc/$pid/cmdline" 2>/dev/null | head -1 || true)"
+    if [ "$comm" = "claude" ] || [ "${argv0##*/}" = "claude" ]; then
+      st="$(proc_starttime "$pid")"
+      [ -n "$st" ] && { printf '%s %s' "$pid" "$st"; return 0; }
+    fi
+    # ppid = campo 4 do stat → campo 2 depois do corte do comm
+    pid="$(sed 's/.*) //' "/proc/$pid/stat" 2>/dev/null | awk '{print $2}' 2>/dev/null || true)"
+    case "$pid" in ''|*[!0-9]*) return 0 ;; esac
+    hops=$((hops + 1))
+  done
+  return 0
+}
+
+# Veredito de UM beacon — a SSOT que `check`, `sweep` e leitores externos (mapa da
+# constelação) consomem, para que a regra de "vivo" exista num lugar só.
+beacon_verdict() { # $1 = arquivo .beacon → live|orphan|declared|stale
+  local B="$1" opid ost ref age now
+  [ -f "$B" ] || { echo stale; return 0; }
+  opid="$(awk -F': ' '/^owner_pid:/{print $2; exit}' "$B" 2>/dev/null || true)"
+  ost="$(awk -F': ' '/^owner_start:/{print $2; exit}' "$B" 2>/dev/null || true)"
+  if [ -n "$opid" ] && [ -n "$ost" ]; then
+    # MEDIDO: o dono existe e é o MESMO processo (starttime bate)? Senão, morreu.
+    if [ "$(proc_starttime "$opid")" = "$ost" ]; then echo live; else echo orphan; fi
+    return 0
+  fi
+  # Sem dono registrado: só resta o carimbo — declarado, não verificado.
+  now="$(now_epoch)"
+  ref="$(awk -F': ' '/^refreshed_at:/{print $2; exit}' "$B" 2>/dev/null || true)"
+  age=$(( (now - ${ref:-0}) / 60 ))
+  if [ "$age" -le "$TTL_MIN" ]; then echo declared; else echo stale; fi
+}
+
 LEDGER="$REPO/.claude/session-lifecycle.jsonl"
 ledger_append() { # $1 = arquivo .beacon · $2 = ended_at (epoch)
   local B="$1" ended="$2" sid br started dur
@@ -92,6 +169,17 @@ case "$CMD" in
       HAT="$(awk -F': ' '/^hat:/{print $2; exit}' "$B" 2>/dev/null || true)"
       [ "$HAT" = "—" ] && HAT=""
     fi
+    # DONO: quem sustenta esta sessão. O chamador informa o pid de partida
+    # (ONION_BEACON_OWNER_PID; o hook passa o seu $PPID) e a sonda SOBE até achar o
+    # processo `claude`. Preservado entre refreshes como started_at/hat: se a sonda
+    # falhar num refresh, o dono já medido NÃO é perdido (perdê-lo degradaria um
+    # veredito verificado de volta para declarado).
+    OWNER="$(owner_probe "${ONION_BEACON_OWNER_PID:-$PPID}")"
+    OWNER_PID="${OWNER%% *}"; OWNER_START="${OWNER##* }"
+    if [ -z "$OWNER" ]; then
+      OWNER_PID="$(awk -F': ' '/^owner_pid:/{print $2; exit}' "$B" 2>/dev/null || true)"
+      OWNER_START="$(awk -F': ' '/^owner_start:/{print $2; exit}' "$B" 2>/dev/null || true)"
+    fi
     {
       echo "session_id: $SID"
       echo "branch: $(git -C "$REPO" branch --show-current 2>/dev/null || echo unknown)"
@@ -100,6 +188,14 @@ case "$CMD" in
       echo "host: $(hostname 2>/dev/null || echo unknown)"
       echo "started_at: $STARTED"
       echo "refreshed_at: $(now_epoch)"
+      # if-block, NÃO um `a && b && { }`: sob `set -e` uma cadeia && falha como ÚLTIMA
+      # instrução do grupo faz o `up` inteiro sair 1 — e sem dono elegível (todo CI, todo
+      # host sem /proc) isso é o caso NORMAL, não o excepcional. Medido: exit 1 com o
+      # beacon escrito corretamente. O hook mascarava com `|| true`; a bancada, não.
+      if [ -n "${OWNER_PID:-}" ] && [ -n "${OWNER_START:-}" ]; then
+        echo "owner_pid: $OWNER_PID"
+        echo "owner_start: $OWNER_START"
+      fi
     } > "$B"
     ;;
   down)
@@ -120,13 +216,24 @@ case "$CMD" in
         REF="$(awk -F': ' '/^refreshed_at:/{print $2; exit}' "$B")"
         BR="$(awk -F': ' '/^branch:/{print $2; exit}' "$B")"
         HAT="$(awk -F': ' '/^hat:/{print $2; exit}' "$B")"
+        STA="$(awk -F': ' '/^started_at:/{print $2; exit}' "$B")"
         AGE_MIN=$(( (NOW - ${REF:-0}) / 60 ))
-        if [ "$AGE_MIN" -le "$TTL_MIN" ]; then
-          echo "🕯️ VIVA: $SID branch=$BR hat=$HAT age=${AGE_MIN}min"
-          FRESH=$((FRESH + 1))
-        else
-          echo "(stale) $SID branch=$BR age=${AGE_MIN}min — sweep remove"
-        fi
+        # `started_at == refreshed_at` = a sessão NUNCA recebeu um UserPromptSubmit.
+        # Presença sem escritor: ninguém digitou nada nela. Foi esta pista que revelou
+        # os dois faróis-fantasma de 2026-08-28 — por isso ela vai impressa, não inferida.
+        NEVER=""; [ -n "${STA:-}" ] && [ "$STA" = "${REF:-}" ] && NEVER=" ⚠️ NUNCA refrescou (0 prompts)"
+        case "$(beacon_verdict "$B")" in
+          live)
+            echo "🕯️ VIVA (dono verificado): $SID branch=$BR hat=$HAT age=${AGE_MIN}min${NEVER}"
+            FRESH=$((FRESH + 1)) ;;
+          declared)
+            echo "🕯️ DECLARADA (dono NÃO verificado): $SID branch=$BR hat=$HAT age=${AGE_MIN}min${NEVER}"
+            FRESH=$((FRESH + 1)) ;;
+          orphan)
+            echo "(órfã) $SID branch=$BR age=${AGE_MIN}min — dono MEDIDO morto; sweep remove${NEVER}" ;;
+          *)
+            echo "(stale) $SID branch=$BR age=${AGE_MIN}min — sweep remove" ;;
+        esac
       done
     fi
     # exit 1 = há sessão viva alheia → NÃO opere na working tree sem falar com o maestro
@@ -138,16 +245,23 @@ case "$CMD" in
       for B in "$BEACON_DIR"/*.beacon; do
         [ -f "$B" ] || continue
         REF="$(awk -F': ' '/^refreshed_at:/{print $2; exit}' "$B")"
-        AGE_MIN=$(( (NOW - ${REF:-0}) / 60 ))
-        if [ "$AGE_MIN" -gt "$TTL_MIN" ]; then
-          ledger_append "$B" "${REF:-$NOW}"   # morreu sem cleanup → ended_at = último refresh
-          rm -f "$B"
-        fi
+        # Órfão sai JUNTO com o stale: o dono foi medido morto, não há o que esperar do TTL.
+        # É o que impede o fantasma de bloquear o repo por 8h depois de a sessão sumir.
+        case "$(beacon_verdict "$B")" in
+          orphan|stale)
+            ledger_append "$B" "${REF:-$NOW}"   # morreu sem cleanup → ended_at = último refresh
+            rm -f "$B" ;;
+        esac
       done
     fi
     ;;
+  verdict)
+    # SSOT do veredito p/ leitores externos (mapa da constelação). $2 é o ARQUIVO .beacon
+    # aqui — não o repo — porque o leitor já o localizou na worktree que estava varrendo.
+    beacon_verdict "$REPO"
+    ;;
   *)
-    echo "ERROR: subcomando desconhecido '$CMD' (up|down|check|sweep)" >&2
+    echo "ERROR: subcomando desconhecido '$CMD' (up|down|check|sweep|verdict)" >&2
     exit 2
     ;;
 esac

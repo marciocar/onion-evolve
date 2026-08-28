@@ -359,6 +359,69 @@ nodes:
     label: 'DECISAO DO MAESTRO (2026-08-04), em DOIS tempos. Primeiro o VETO: "nao podemos ficar mudando e bagunçando a doutrina" — a correcao de 2 linhas do _find, ja testada, foi REVERTIDA e virou estudo da familia. Depois, revisto o caminho a luz do padrao Onion+Claude Code de agosto/2026 (worktree nativo em .claude/worktrees/ desde a v2.1.49; v2.1.218 de 22/07 endureceu a fronteira do git -C em subagente isolado), veio o GO para F1+F2. O que mudou entre um e outro NAO foi a pressa: foi descobrir que o antidoto ja existia no repo (safe-count.sh, nascido 2026-08-03) e que NENHUMA das 38 guardas o usava — logo a cura certa era o CONTRATO, nao o remendo'
     trace: 'docs/evolution/worktree-convention-2026.md + .claude/utils/safe-count.sh'
 
+  # ── 2026-08-28: a guarda que anunciava fantasma (farol de sessao) ─────────
+  - id: E_FAROL_ANUNCIAVA_FANTASMA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'medicao dos beacons vivos + /proc: 2 faroes anunciados VIVOS, ambos com started_at == refreshed_at e sem processo'
+    label: 'o farol definia VIVA como refreshed_at dentro do TTL de 480min — carimbo que a propria sessao escreve. Como refreshed_at so avanca no UserPromptSubmit, toda sessao que some sem SessionEnd (crash, Remote Control, resume abortado) lia VIVA por 8h. Medidos no core: 2 faroes anunciados como vivos NUNCA receberam um prompt e NAO tinham processo — um deles nasceu 150s antes da propria sessao que leu o aviso, mesma branch e worktree'
+
+  - id: C_GUARDA_QUE_GRITA_ERRADO
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'o farol aciona I3 (um escritor por repo); fantasma travava o repo por ate 8h'
+    label: 'INSTANCIA DA LACUNA DE COBERTURA no lado caro: nao e guarda que ninguem ve nem guarda que ninguem roda — e guarda que RODA E MENTE. Ela nao falha em silencio: emite um aviso confiante que a sessao leitora repassa como fato ao maestro, com recomendacao de conduta junto. Guarda que grita errado ensina a ignorar guarda'
+
+  - id: D_MEDIR_O_DONO_NAO_O_CARIMBO
+    node_type: decision
+    trace: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'session-beacon.sh verdict + 5 casos medidos (live/declared/orphan/reuso-de-pid/sonda) + selftest dedicado'
+    label: 'CURA A (behavior-over-declaration): o beacon grava owner_pid + owner_start (starttime do /proc, defesa contra REUSO DE PID) e o veredito passa a ser MEDIDO — live (dono vivo) · declared (dono nao medido: cai no TTL e BLOQUEIA, conservador) · orphan (dono medido morto: nao bloqueia, sweep remove) · stale. Direcao do erro escolhida: falso orphan reabre o incidente W1xW2 que criou o farol, falso declared so custa uma verificacao — logo ausencia de prova cai no comportamento antigo, NUNCA em pode-escrever'
+
+  - id: D_AVISO_CARREGA_O_QUE_VALE
+    node_type: decision
+    trace: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'session-beacon-hook.sh + caso (f2) do selftest: o aviso tem de conter INFORMADO, NAO VERIFICADO e VERIFIQUE QUEM E O QUE FAZ'
+    label: 'CURA B (correcao do maestro: informado e diferente de verificado): rotular o veredito nao basta se o aviso segue AFIRMANDO. O motd passa a se declarar nao-verificado e a MANDAR verificar quem e e o que faz — rotulo (VIVA vs DECLARADA), a pista NUNCA refrescou (0 prompts), e a ordem de nao relatar como sessao alheia viva o que nao foi medido. Sinal e instrucao de como le-lo viajam JUNTOS, porque quem recebe nao tem como saber sozinho o que o sinal vale'
+
+  - id: E_SONDA_ELEGEU_O_SHELL_DO_HOOK
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'dogfood do hook pelo caminho real: owner_pid gravado = bash transitorio (comm=bash), nao o processo claude'
+    label: 'O DOGFOOD PEGOU O BUG NA DIRECAO PERIGOSA: a 1a sonda casava *claude* no CMDLINE e elegia o shell transitorio do proprio hook, cujo path carrega ~/.claude/shell-snapshots/. Esse shell morre em segundos — o farol viraria orphan COM A SESSAO VIVA, exatamente o erro que o desenho proibe. Cura: casar por IDENTIDADE do executavel (comm = claude), com teste de regressao dedicado. Substring de path nao e identidade'
+
+  - id: C_REGRA_COPIADA_ENVELHECE_SEPARADA
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-28
+    verified_against: 'constellation-map.sh presence_of tinha 2a implementacao do vivo por TTL; passou a chamar session-beacon.sh verdict'
+    label: 'o mapa da constelacao carregava uma SEGUNDA implementacao da regra de vivo (TTL copiado). Cura no motor nao alcanca copia: quando o farol aprendeu a medir o dono, a coluna PRESENCA continuaria pintando live para fantasma. A regra de vivo passou a morar num lugar so (subcomando verdict), com fallback ao TTL para worktree irma de motor antigo'
+
 edges:
   - from: C_LACUNA_E_COBERTURA
     to: Q_GUARDAS_COERENTES
@@ -463,3 +526,35 @@ edges:
   - from: D_ESTUDAR_FAMILIA_ANTES_DE_CORRIGIR_0804
     to: E_FUROPRUNE_LINT_0804
     edge_type: CAUSES
+
+  # ── 2026-08-28: o farol que mentia, e as duas curas ──
+  - from: E_FAROL_ANUNCIAVA_FANTASMA
+    to: C_GUARDA_QUE_GRITA_ERRADO
+    edge_type: SUPPORTS
+  - from: C_GUARDA_QUE_GRITA_ERRADO
+    to: C_LACUNA_E_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_FAROL_ANUNCIAVA_FANTASMA
+    to: D_MEDIR_O_DONO_NAO_O_CARIMBO
+    edge_type: CAUSES
+  # o diagnostico nao foi revogado pela cura — ele a CAUSOU. SUPERSEDES aqui seria
+  # dizer que 'guarda que grita errado' deixou de valer como classe, e ela vale
+  # (o radar pegou a incoerencia: alvo confirmed recebendo SUPERSEDES sem reconciliar)
+  - from: C_GUARDA_QUE_GRITA_ERRADO
+    to: D_MEDIR_O_DONO_NAO_O_CARIMBO
+    edge_type: CAUSES
+  - from: C_GUARDA_QUE_GRITA_ERRADO
+    to: D_AVISO_CARREGA_O_QUE_VALE
+    edge_type: CAUSES
+  - from: D_AVISO_CARREGA_O_QUE_VALE
+    to: D_MEDIR_O_DONO_NAO_O_CARIMBO
+    edge_type: DEPENDS_ON
+  - from: E_SONDA_ELEGEU_O_SHELL_DO_HOOK
+    to: D_MEDIR_O_DONO_NAO_O_CARIMBO
+    edge_type: CONSTRAINS
+  - from: C_REGRA_COPIADA_ENVELHECE_SEPARADA
+    to: D_MEDIR_O_DONO_NAO_O_CARIMBO
+    edge_type: CONSTRAINS
+  - from: C_REGRA_COPIADA_ENVELHECE_SEPARADA
+    to: C_DUPLICACAO_4_CLONES
+    edge_type: SUPPORTS
