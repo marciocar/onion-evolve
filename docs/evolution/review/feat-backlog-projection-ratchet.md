@@ -3,7 +3,7 @@ title: "Revisão — REGRA 62: catraca de projeção gerada (backlog)"
 date: 2026-08-28
 branch: feat/backlog-projection-ratchet
 reviewer: "revisão adversarial de código com EXECUÇÃO e mutação (veredito inicial 🔴 vermelho) + dogfood do gerador + CI em runner distinto"
-reviewed_diff_sha256: PLACEHOLDER
+reviewed_diff_sha256: 06879b52eb68d792d5d8651ccd09464d78f6e1bc513912e2431539e407d4f576
 findings_total: 13
 findings_real: 11
 verdict: APROVADO_APOS_CORRECAO
