@@ -996,6 +996,63 @@ check_inventory_sync() {
 }
 
 # ===========================================================================
+# REGRA 62 — Projeção GERADA em sincronia com a fonte (docs/backlog.md) [HARD]
+# previne: projeção gerada que envelhece calada — o item existe no grafo e some da superfície que as sessões leem
+#
+# Gatilho medido (2026-08-28, PR #700/#701): escrevi uma migalha de diário e não rodei o
+# `diary-index.sh`. A entrada existia no disco e NAO no index.md — o Tier-0 pointer que as
+# sessões leem. O lint passou VERDE. Quem pegou foi o maestro perguntando, não mecanismo:
+# a mesma assinatura de C_LACUNA_E_COBERTURA ("guarda que ninguém vê e guarda que ninguém
+# roda falham igual"). O nó Q_INDICE_DO_DIARIO_SEM_CATRACA prescreveu a cura literal —
+# "uma checagem determinística de projeção-vs-fonte no lint, irmã da que já existe para
+# inventário" — e o resíduo do PR #703 classificou docs/backlog.md como irmão da lacuna.
+#
+# Por que aqui e não num cron: `/meta:backlog` não era chamado por NADA (nem hook, nem cron,
+# nem lint) e auto-início é MOAT declarado (drive.md:22). Pendurar a detecção no lint dá o
+# gatilho sem ferir a invariante: a máquina DETECTA, o humano ATUA.
+#
+# CORE-ONLY por desenho: um adotante não versiona docs/backlog.md nem o diário do core.
+# "O CORE É O PIOR ORÁCULO DO QUE VIAJA" — 11 falsos-positivos no 1o adotante ensinaram.
+# ===========================================================================
+check_generated_projection_sync() {
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+
+  # {arquivo rastreado | gerador | comando de regeneração p/ a mensagem}
+  #
+  # SÓ o backlog, e a ausência do diário aqui é MEDIÇÃO, não esquecimento. Dois bloqueios
+  # reais, achados ao tentar (2026-08-28):
+  #   (1) `diary-index.sh` faz `REPO="${1:-...}"` — o 1o argumento é o CAMINHO DO REPO, não
+  #       uma flag. Chamá-lo com `--markdown` criaria um diretório chamado `--markdown`.
+  #       Ele não tem modo stdout, que é o que `_gen_into` exige.
+  #   (2) o índice embute `Gerado em: <hoje>`. Comparação por bytes dispararia TODO DIA por
+  #       mudança só de data — máquina de falso-positivo, a classe que esta regra existe
+  #       para não ser.
+  # Por isso Q_INDICE_DO_DIARIO_SEM_CATRACA segue ABERTO, com o gatilho refinado pelo que
+  # se mediu, em vez de fechado por decreto. Ver o nó em guardas-revisao-2026-08.kg.yaml.
+  local -a projections=(
+    "docs/backlog.md|${SCRIPT_DIR}/kg-backlog-project.sh|/meta:backlog"
+  )
+
+  local row tracked gen fixcmd tmp
+  for row in "${projections[@]}"; do
+    tracked="${REPO_ROOT}/${row%%|*}"; row="${row#*|}"
+    gen="${row%%|*}"; fixcmd="${row#*|}"
+
+    # ausência do PAR (gerador ou projeção) = fora de escopo, não violação: é assim que
+    # a R58 escapa de julgar repo que não tem o artefato. Silêncio aqui é correto.
+    [ -f "${gen}" ] || continue
+    [ -f "${tracked}" ] || continue
+
+    tmp="$(mktemp)"
+    if _gen_into "${tmp}" "${tracked}" "${tracked}" -- bash "${gen}" --markdown &&
+       ! diff -q "${tracked}" "${tmp}" >/dev/null 2>&1; then
+      violation "HARD" "${tracked}" "projeção desatualizada vs a fonte — regenere com '${fixcmd}'. Projeção que envelhece calada é pior que ausente: o item existe no disco e some da superfície que as sessões leem."
+    fi
+    rm -f "${tmp}"
+  done
+}
+
+# ===========================================================================
 # REGRA 19 — Plugins de vertical (plugins/*) sincronizados com as fontes [HARD]
 # previne: plugin de vertical driftando das fontes — bundle de adoção errado
 #           Cada plugins/<name> é GERADO por assemble-plugin.sh a partir de
@@ -2183,6 +2240,20 @@ run_inventory_fixes() {
   # verdade que as frases derivam. inventory.md é isento das reescritas seguintes.
   bash "${SCRIPT_DIR}/inventory.sh" --markdown > "${REPO_ROOT}/docs/onion/inventory.md" 2>/dev/null || true
 
+  # REGRA 62 — a projeção do backlog entra no --fix pela mesma razão que o inventário: a
+  # catraca liga docs/backlog.md ao conteúdo de 45 grafos, então TODO PR que abre ou fecha
+  # um nó passaria a exigir reprojeção à mão. `_gen_into` já separa QUEBRA de drift na
+  # DETECÇÃO; aqui a escrita é condicionada ao gerador ter tido sucesso — nunca `> arquivo`
+  # direto, que zeraria a projeção boa se o gerador recusasse (é o modo destrutivo que a
+  # guarda de enumeração-vazia acabou de provar existir).
+  if [ -f "${SCRIPT_DIR}/kg-backlog-project.sh" ] && [ "${IS_DERIVED}" -eq 0 ]; then
+    local _bl_tmp; _bl_tmp="$(mktemp)"
+    if bash "${SCRIPT_DIR}/kg-backlog-project.sh" --markdown > "${_bl_tmp}" 2>/dev/null && [ -s "${_bl_tmp}" ]; then
+      cp "${_bl_tmp}" "${REPO_ROOT}/docs/backlog.md"
+    fi
+    rm -f "${_bl_tmp}"
+  fi
+
   # Mesmo conjunto de frases canônicas da detecção (REGRA 16). Frases com DUAS
   # contagens reescrevem ambas numa só substituição (o \N preserva o miolo/cauda).
   prog="s/[0-9]+( comandos invocáveis)/${cmd}\1/g"
@@ -3320,6 +3391,7 @@ check_no_worker_orchestrator_agent
 check_branch_agent_distinction
 check_rules_pathscoped
 check_inventory_sync
+check_generated_projection_sync
 check_claude_md_counts
 check_site_inventory_sync
 check_plugins_sync

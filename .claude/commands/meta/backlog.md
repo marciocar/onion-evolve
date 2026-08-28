@@ -1,13 +1,13 @@
 ---
 name: backlog
-description: "Regenerar docs/backlog.md — a projeção humana do trabalho ABERTO do core, a partir dos nós abertos (status open) da camada canônica (docs/onion/graph) + grafos marcados. Use para ver os fios abertos num lugar só, ordenados por atenção (a régua do radar), agrupados por owner. Projeção pura: item fecha no grafo → some daqui sozinho. A fonte é o grafo; este .md deriva."
+description: "Regenerar docs/backlog.md — a projeção humana do trabalho ABERTO do core, a partir dos nós abertos (status open) da camada canônica (docs/onion/graph) + grafos marcados. Use para ver os fios abertos num lugar só, ordenados por atenção (a régua do radar), agrupados por grafo (o campo `owner:` é lido, mas HOJE nenhum nó o declara — a projeção imprime isso). Projeção pura: item fecha no grafo → some daqui sozinho. A fonte é o grafo; este .md deriva."
 model: haiku
 category: meta
 tags: [backlog, kg, projection, open-threads, self-evolution, ssot]
 version: "1.0.0"
 updated: "2026-08-22"
 allowed-tools: Read Bash(bash .claude/validation/kg-backlog-project.sh*) Bash(bash .claude/validation/kg-radar.sh*) Bash(bash .claude/validation/kg-backlog-check.sh*) Bash(bash .claude/validation/lint-artifacts.sh*)
-argument-hint: "[--check]  (sem arg = regenera docs/backlog.md · --check = só reporta drift, advisory)"
+argument-hint: "[--check|--markdown]  (sem arg = regenera docs/backlog.md · --check = reporta drift, advisory · --markdown = emite em stdout)"
 ---
 
 # 🧅 /meta:backlog — a projeção humana do trabalho aberto
@@ -40,11 +40,17 @@ decisão. Superfície de controle limpa > completude: o backlog é a fila ACION�
 
 1. **Regenerar** (default): `bash .claude/validation/kg-backlog-project.sh` — consome
    `kg-radar --open-tsv` de cada grafo marcado (a **atenção já vem calculada**, coluna 8 — a régua do
-   radar, não recalculada), agrupa por **`owner:`** (campo do nó; fallback = nome do grafo), ordena por
+   radar, não recalculada), agrupa por **`owner:`** quando o nó o declara — **hoje ZERO nós declaram**
+   no corpus inteiro, então o agrupamento efetivo é o **fallback: nome do grafo**, e o cabeçalho da
+   projeção IMPRIME essa medição em vez de prometer o eixo. Ordena por
    atenção desc, **sem corte** (item recém-criado nunca some), e escreve `docs/backlog.md`.
-2. **`--check`** (advisory): `bash .claude/validation/kg-backlog-project.sh --check` — compara o
+2. **`--markdown`**: emite a projeção em **stdout** sem tocar o arquivo. É o modo que a
+   **REGRA 62** consome (o `_gen_into` do lint exige gerador que escreva em stdout) e o mesmo que
+   `inventory.sh`/`kg-view.sh`/`graph.sh` já tinham. Por ser a *mesma* função `render` do `--write`,
+   a paridade é estrutural, não uma promessa.
+3. **`--check`** (advisory): `bash .claude/validation/kg-backlog-project.sh --check` — compara o
    recomputado vs o commitado e diz se drifou. Não é gate (projeção-sob-demanda, como o oráculo-PoC fez).
-3. **Reportar**: os contadores (N abertos · M grafos · K owners) e o path. Se algum grafo marcado
+4. **Reportar**: os contadores (N abertos · M grafos · K owners) e o path. Se algum grafo marcado
    mudou de cap/estado, lembre que `kg-backlog-check.sh` (REGRA 58) é quem cobra o cap+carimbo.
 
 ## Saída
@@ -53,6 +59,19 @@ decisão. Superfície de controle limpa > completude: o backlog é a fila ACION�
    ◆ docs/backlog.md (ordenado por atenção, sem corte)
    ▶ item fecha no grafo → some na próxima projeção
 ```
+
+## 🔒 A catraca (REGRA 62, desde 2026-08-28)
+
+O drift desta projeção agora **reprova no lint** — `docs/backlog.md` tem de bater com a regeneração
+da fonte. Nasceu de dano medido: uma migalha de diário ficou **invisível** numa projeção irmã e o lint
+passou verde; quem pegou foi o maestro perguntando, não mecanismo. Pendurar a detecção no lint (e não
+num cron) dá o gatilho **sem ferir o MOAT de auto-início**: a máquina detecta, o humano atua. O `--fix`
+regenera junto, para que a catraca não vire fricção em todo PR que abre ou fecha um nó.
+
+Dois modos de falha do próprio gerador foram fechados junto: **arg desconhecido** agora recusa
+(`exit 2`) em vez de cair no ramo de escrita, e **enumeração vazia** (sem índice git / `GIT_DIR` torto)
+é tratada como **QUEBRA**, não como "zero abertos" — antes ela sobrescreveria a projeção boa por uma
+quase-vazia.
 
 ## ⚠️ Notas
 - **Melhoria sobre o gerador da PoC** (o adotante-oráculo, que originou este mecanismo): consome
