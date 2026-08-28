@@ -40,6 +40,16 @@ mapfile -t GRAPHS < <( {
   grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-archive:[[:space:]]*on\b' "$g" 2>/dev/null || echo "$g"
 done )
 
+# Saneador de UTF-8 do rotulo truncado. Existe porque a SUPERFICIE DE CONTROLE precisa
+# ser grep-avel: com um byte invalido, o grep trata docs/backlog.md como BINARIO e
+# SUPRIME A SAIDA — uma busca por um no aberto devolve vazio como se ele nao existisse
+# (medido em 2026-08-28: 11 bytes invalidos, 2 buscas minhas mentindo em silencio).
+if command -v iconv >/dev/null 2>&1; then
+  _utf8_sane() { iconv -c -f UTF-8 -t UTF-8; }
+else
+  _utf8_sane() { cat; }
+fi
+
 TMP="$(mktemp)"; trap 'rm -f "$TMP"' EXIT
 n_open=0
 for g in "${GRAPHS[@]}"; do
@@ -84,7 +94,15 @@ render() {
     printf '## %s — %s item(ns)\n\n' "$grp" "$cnt"
     printf '| Atenção | Nó | Grafo | O que é |\n|--:|---|---|---|\n'
     awk -F'\t' -v g="$grp" '$2==g' "$TMP" | sort -t$'\t' -k1,1nr | while IFS=$'\t' read -r att own id gr label; do
-      lbl="$(printf '%s' "$label" | tr '|' '·' | cut -c1-130)"
+      # `sed`, NAO `tr`: o `tr` opera em BYTES e mapeia o `|` (0x7C) para o PRIMEIRO byte
+      # de `·` (U+00B7 = C2 B7), gravando um 0xC2 solto — UTF-8 invalido. Consequencia
+      # medida em 2026-08-28: 11 bytes invalidos em docs/backlog.md, e o grep passa a
+      # tratar a SUPERFICIE DE CONTROLE como binario, suprimindo a saida EM SILENCIO
+      # (uma busca por um no aberto devolvia vazio como se ele nao existisse).
+      # E o `cut -c` conta BYTES (medido aqui mesmo, sob LANG=C.UTF-8): corta `ç` (C3 A7)
+      # ao meio e deixa um C3 solto. `iconv -c` DESCARTA a sequencia incompleta — cura
+      # deterministica que nao depende de locale. Sem iconv, degrada para o corte cru.
+      lbl="$(printf '%s' "$label" | sed 's/|/·/g' | cut -c1-130 | _utf8_sane)"
       printf '| %.1f | `%s` | %s | %s |\n' "${att:-0}" "$id" "$gr" "$lbl"
     done
     printf '\n'
