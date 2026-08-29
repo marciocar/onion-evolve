@@ -5,9 +5,9 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**190 itens abertos** em 29 grafo(s) com aberto (de 45 no escopo) · 29 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**189 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
-## m2-bridge-logto-2026-07 — 44 item(ns)
+## m2-bridge-logto-2026-07 — 43 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -29,7 +29,6 @@
 | 10.8 | `C_docker_floor_gap` | m2-bridge-logto-2026-07 | GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: |
 | 10.8 | `D_posture_anchored_correctly` | m2-bridge-logto-2026-07 | FIX G — a POSTURA (o maestro executa o flip de auth, a sessão especifica) se MANTÉM, mas ancorada onde de fato se ancora: (1)  |
 | 10.8 | `Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA` | m2-bridge-logto-2026-07 | PRE-EXISTENTE, mas o P11 ELEVOU O RAIO — e essa mudanca de risco precisa morar aqui: antes, numa queda do Logto, o caminho legad |
-| 10.4 | `E_floors_effective_measured_20260729` | m2-bridge-logto-2026-07 | RE-VERIFY (kg-freshness 2026-07-29, medido read-only): o fix do teto de ancestral SEGUE EFETIVO. cat /sys/fs/cgroup/system.slice/m |
 | 10.2 | `C_pkce_moves_credential_to_device` | m2-bridge-logto-2026-07 | FIX I — RISCO NOVO QUE A v2 NÃO NOMEAVA: com PKCE o material bearer passa a VIVER NO BROWSER DA PWA (localStorage por padrão n |
 | 10.2 | `D_logto_not_ssot` | m2-bridge-logto-2026-07 | INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorizaç |
 | 9.6 | `C_a2a_gate_narrow` | m2-bridge-logto-2026-07 | [ATUALIZADO 2026-07-27 pós-flip P7: a cláusula final CAIU — o bridge/PWA NÃO segue mais autenticado só por AUTH_TOKEN; /chat |
@@ -56,14 +55,13 @@
 | 2.4 | `Q_default_api_resource_b1` | m2-bridge-logto-2026-07 | FIX J — o 'default API resource do tenant' era apresentado como FALLBACK PREFERIDO (B1) SEM VERIFICAÇÃO NENHUMA: tão VPS-DECL |
 | 1.6 | `Q_byok_courtesy_mode` | m2-bridge-logto-2026-07 | INFERÊNCIA A VERIFICAR: a citação '2 modos cortesia-login + BYOK (X-Anthropic-Key)' vem do app-irmão onion-pessoal-app, NÃO d |
 
-## m3-federation-admin-2026-07 — 18 item(ns)
+## m3-federation-admin-2026-07 — 17 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 64.0 | `D_spec_now_build_gated` | m3-federation-admin-2026-07 | SPEC-agora / BUILD-gated — especificar o command-side (mutação de members.yaml) + modelo de auth (Logto Organizations) SEM con |
 | 18.0 | `C_reuse_readmodel` | m3-federation-admin-2026-07 | REUSAR o read-model já entregue: console HTML (F1.3), federation-radar (3 checks advisory), pin-integrity-check (gate real), grap |
 | 15.6 | `C_auth_logto_sdaal` | m3-federation-admin-2026-07 | AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariân |
-| 11.7 | `C_command_side_gap` | m3-federation-admin-2026-07 | GAP (parcial após OP-1): read-model completo + 1 gate de escrita (trust-topology-check, só LOG). OP-1 REGISTRAR virou comando de |
 | 11.2 | `C_op_update` | m3-federation-admin-2026-07 | OP-3 ATUALIZAR (pin/trust/specializations/personality_summary): escrever onion_version novo (pós pin-integrity-check) e editar a  |
 | 8.4 | `C_op_promote` | m3-federation-admin-2026-07 | OP-2 PROMOVER (role: standalone→hub / consumer→T2): atualizar o campo role: no members.yaml do core. Hoje --promote-hub só re |
 | 8.4 | `C_trust_matrix_stays_onion` | m3-federation-admin-2026-07 | RBAC do Logto (admin/member por org) é grosso demais p/ a matriz fina (can_receive_from/can_advise_to/can_correct_to/diary_readab |
@@ -221,6 +219,12 @@
 | 5.4 | `C_BOLETIM_INFORM` | constellation-dialogic-layer-2026-07 | 3o uso: o boletim core->estrela INFORMA a estrela do que virou main (simetrico ao carteiro star->core PUSH) — 3 travas: contexto |
 | 4.0 | `D_ISOLATION_EXTENSION_GATED` | constellation-dialogic-layer-2026-07 | GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao |
 | 3.6 | `D_BOLETIM_CANDIDATE` | constellation-dialogic-layer-2026-07 | documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por es |
+
+## fios-abertos — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.2 | `Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE` | fios-abertos | O QUE FALTA DA ONDA, e o gatilho de fechamento e um NUMERO, nao uma impressao: a F6 fecha quando o DELTA DA TAXA DE MORTALIDADE en |
 
 ## context-freshness-2026-08-12 — 2 item(ns)
 

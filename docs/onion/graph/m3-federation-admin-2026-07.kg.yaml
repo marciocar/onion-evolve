@@ -66,8 +66,8 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: drifted
-    verified_at: 2026-08-27
+    status: confirmed
+    verified_at: 2026-08-29
     verified_against: "DRIFTED pelo OP-1 (PR #697, medido no drive 2026-08-27): a manchete 'NENHUMA mutação tem comando dedicado; /meta:adopt só SUGERE' caiu parcialmente — /meta:federation-member register EXISTE e adopt.md:632 agora INVOCA o comando (não mais 'oferecer registrar' passivo). O gap PERSISTE só para OP-2/3/4 (promote/update/revoke seguem 100% edição manual de YAML): grep em .claude/commands/meta/ = zero comando promote/update/revoke."
     label: "GAP (parcial após OP-1): read-model completo + 1 gate de escrita (trust-topology-check, só LOG). OP-1 REGISTRAR virou comando dedicado (/meta:federation-member register; adopt INVOCA). Restam SEM comando OP-2 PROMOVER / OP-3 ATUALIZAR / OP-4 REVOGAR — mutação por edição manual de YAML + commit"
   - id: C_op_register

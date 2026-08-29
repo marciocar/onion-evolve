@@ -39,8 +39,6 @@ meta:
   # Rotina (branches, higiene) NÃO entra aqui — vai para checklist. O grafo é para RISCO.
 
 nodes:
-  # ── AS TESES QUE ORDENAM ────────────────────────────────────────────────────────────────────
-
   - id: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
     node_type: claim
     plane: DEV
@@ -63,266 +61,65 @@ nodes:
     label: "O radar ordena por `impact × confidence × statusFactor × (1 + grau)`, e o grau e NAO-DIRECIONADO: `DEPENDS_ON` nao afunda o bloqueado, SOBE OS DOIS. Logo a topologia NAO expressa precedencia, e nenhuma escrita de aresta faz o radar emitir ordem de execucao. Isso nao e defeito a consertar — e limite a DECLARAR, porque a tentacao de reconcilia-lo mexendo em `impact`/`confidence` e o defeito fundador da REGRA 49 cometido na autoria."
     trace: ".claude/validation/kg-radar.sh"
 
-  - id: W1_METRICA_NAO_FORJAVEL
-    node_type: decision
-    plane: DEV
-    status: confirmed
-    impact: 5
-    confidence: 1.0
-    verified_at: 2026-08-08
-    verified_against: duas-portas-reproduzidas-pelo-juiz-do-elenxo-de-559
-    label: "Onda 1 — fechar o que torna a metrica forjavel, ANTES de produzir numero com ela. Duas portas encolhem o baseline da REGRA 49 sem verificacao nenhuma (`git mv` para qualquer `fixtures/` tirou CINCO entradas de uma vez; `REMOVIDO` e SOFT), e o `IFS=$'\\t'` corrompe o desempacotador de registros que a onda seguinte vai exercitar. Medir com metrica forjavel produz relatorio infalsificavel."
-    trace: ".claude/validation/kg-verification-coverage.sh"
 
-  - id: W2_DOGFOOD_DAS_CINCO_CLASSES
+  # ══ ONDA 5 — GESTAO DE BACKLOG (colhida a onda anterior no MESMO commit) ══
+  # NENHUM FATO NASCE AQUI. Os fatos vivem em backlog-grafo-2026-08.kg.yaml; aqui mora o
+  # COMPROMISSO, citando o id alheio — como o contrato de fronteira deste arquivo exige.
+  - id: W5_GESTAO_DE_BACKLOG
     node_type: decision
     plane: DEV
-    status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-08
-    verified_against: emit-baseline-identico-ao-baseline-versionado-logo-o-laco-nunca-executou
-    label: "Onda 2 — as CINCO classes de saida da catraca da REGRA 49 tem evidencia 100% SINTETICA: `--emit-baseline` e identico ao baseline versionado, logo o laco nunca executou no corpus real, nem uma vez. Nao precisa dos 48 nos, precisa de CINCO — um por classe, incluindo as duas HARD. E NAO os de `proto/` (50% do passivo): sao homogeneos, sairiam todos como CARIMBADO e deixariam as duas HARD sem execucao."
-    trace: ".claude/validation/kg-verification-baseline.txt"
+    status: confirmed
+    verified_at: 2026-08-29
+    trace: "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml"
+    verified_against: 'Onda 1 aberta e conduzida em 2026-08-28: 25 nos no grafo de pesquisa, 5 PRs mergeados (#704-#708), REGRA 62 viva no lint'
+    label: 'Onda 5 — a pergunta "nao e hora de um comando de gestao de backlog?" respondida com NAO: faltava CATRACA, nao superficie. O trabalho de mecanismo com gatilho disparado foi entregue ANTES da pesquisa, de proposito (nao dependia dela). O que resta da onda e a pesquisa em si, cujo grafo proprio (backlog-grafo-2026-08) tem 25 nos e censo vivo. AQUI so o compromisso'
 
-  - id: W3_PRODUCAO_CONTIDA
+  - id: I_R62_CATRACA_DE_PROJECAO
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: done
+    verified_at: 2026-08-28
+    trace: "docs/evolution/review/feat-backlog-projection-ratchet.md"
+    verified_against: 'PR #704 MERGED; bancada run_backlog_projection_selftests 8/8 e 5 mutacoes que reprovam; CI em runner distinto nao disparou a regra (determinismo entre maquinas provado pelo ambiente)'
+    label: 'PAGO — REGRA 62 [HARD]: docs/backlog.md tem de bater com a regeneracao da fonte, detectado no LINT (nao em cron, para nao ferir o MOAT de auto-inicio). O caminho ate ela achou TRES defeitos destrutivos que a leitura nao tinha achado: enumeracao vazia sobrescrevendo a projecao boa, `MODE=${1:---write}` fail-open num caminho de ESCRITA, e render LOCALE-DEPENDENTE que faria a catraca acusar o AMBIENTE (sob virgula decimal o printf gravava 38,0 e saia exit 0)'
+
+  - id: I_GATILHOS_W2W3_REGISTRADOS_CEDO
     node_type: decision
     plane: DEV
-    status: confirmed
-    impact: 5
-    confidence: 1.0
-    verified_at: 2026-08-08
-    verified_against: docker-ps-e-.env-de-producao-lidos-nesta-sessao
-    label: "Onda 3 — o que ja esta exposto em producao HOJE, e os dois sobreviveram a revalidacao. Esta onda so pode vir depois do Passo 0 porque a manchete dela ja caiu uma vez: o item de maior impacto que a fundava (`o artefato que RODA nao e o do repo`) foi REFUTADO ao ser medido."
-    trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
-
-  - id: W4_REGRA_SEM_TESTE
-    node_type: decision
-    plane: DEV
-    status: confirmed
-    impact: 5
-    confidence: 0.8
-    verified_at: 2026-08-08
-    verified_against: consumed-mode-check.sh-rodado-nesta-sessao-30-pares-4-sem-teste
-    label: "Onda 4 — o gate regra-sem-teste, declarado 'o fio aberto de maior valor'. E ele NAO precisa nascer do zero: o `consumed-mode-check.sh` ja e, nas palavras do proprio cabecalho, 'a generalizacao mecanica' dele, com join OBSERVADO (le a invocacao real dos dois lados) em vez de heuristica por nome — que foi como a 1a tentativa morreu, com 8 falsos positivos."
-    trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
-
-  - id: E_DOIS_ITENS_DE_PRODUCAO_SEGUEM_VIVOS
-    node_type: evidence
-    plane: PROD
-    status: confirmed
-    impact: 5
-    confidence: 1.0
-    verified_at: 2026-08-08
-    verified_against: docker-ps-mais-grep-no-src-de-producao-mais-.env-linha-4
-    label: "Os outros dois de producao SOBREVIVERAM a revalidacao. (1) O WAHA segue de pe — `onion-vps-waha`, Up 2 dias — e a unica ocorrencia de waha/3999/whatsapp em todo o `src/` de PRODUCAO e um COMENTARIO em `meter.ts:10` citando-o como exemplo historico: nao e uso, e orfao. (2) `PERMISSION_MODE=bypassPermissions` segue na LINHA 4 do `.env` de producao, atras de porta publica — identidade na borda nao reduz o que o agente pode fazer depois de entrar."
-    trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
-
-  - id: E_CONSUMED_MODE_CHECK_FUNCIONA_E_ESTA_DESLIGADO
-    node_type: evidence
-    plane: DEV
-    status: confirmed
     impact: 4
-    confidence: 1.0
-    verified_at: 2026-08-08
-    verified_against: script-rodado-nesta-sessao-rc-1-e-grep-de-consumidores-com-stderr-visivel
-    label: "DERRUBA o veredito 'apagar, nao ligar' que eu mesmo escrevi no plano, e o derruba por EXECUCAO. Rodado, ele devolve: 30 pares de producao, 4 SEM TESTE nomeados (`inventory.sh --markdown`, `kg-view.sh` sem flag, `migalhas-generate.sh` sem flag e `--check`), mais 3 isencoes CONTADAS ('1 flag dinamica, 2 cobertos por delegacao'). Nao e guarda cega — e o oposto. O que falta: ZERO consumidores (a unica mencao na bancada e um comentario) e nenhum modo `--selftest` proprio (a linha 56 trata `$1` como raiz do repo, entao `--selftest` vira diretorio invalido, exit 2)."
-    trace: ".claude/validation/consumed-mode-check.sh"
-
-  - id: I_FECHAR_GIT_MV_E_REMOVIDO
-    node_type: decision
-    plane: PROD
-    status: done
-    verified_at: 2026-08-09
-    verified_against: um-git-mv-para-fixtures-passou-de-5-SOFT-exit-0-para-5-HARD-exit-1-medido-em-sandbox
-    impact: 5
-    confidence: 1.0
-    label: "PAGO no #562. `git mv` de UM grafo para `fixtures/` tirava CINCO entradas do baseline com `exit 0` e o gate MANDANDO remove-las; agora sao CINCO HARD MUDOU-DE-PATH e `exit 1`. Apagar o no virou HARD REMOVIDO, e o `mv` LEGITIMO (chave reescrita) segue `exit 0` — a cura nao pune conformidade. O universo passou a varrer TUDO com 7a coluna de escopo: resolver a chave exige o corpus inteiro, filtrar o escopo e OUTRA pergunta."
-    trace: ".claude/validation/kg-verification-coverage.sh"
-
-  - id: I_IFS_PARA_037
-    node_type: decision
-    plane: PROD
-    status: done
-    verified_at: 2026-08-09
-    verified_against: no-medido-e-carimbado-sem-campo-status-passou-de-HARD-FUGA-para-SOFT-CARIMBADO
-    impact: 4
-    confidence: 1.0
-    label: "PAGO no #561. TAB e IFS-whitespace: campo vazio some e o resto desliza, e a guarda acusava de FUGIR (`status:2026-08-08`) justamente quem tinha acabado de MEDIR e carimbar. 10 sitios internos migrados para `\037`; o TSV de saida fica em TAB, que e contrato externo. O Elenxo confirmou os 10 load-bearing por mutacao um a um."
-    trace: ".claude/validation/kg-verification-coverage.sh"
-
-  - id: I_STATUSFACTOR_EM_SITIO_UNICO
-    node_type: decision
-    plane: PROD
-    status: done
-    verified_at: 2026-08-09
-    verified_against: bancada-742-0-0-mais-lint-0-hard-mais-58-de-58-grafos-em-paridade-por-vetor
-    impact: 4
-    confidence: 1.0
-    label: "PAGO nesta branch. Eram CINCO scripts com `function statusFactor`, dois defasados: a lente pesava 0.00 o no `D_email_plus_logto_connector` (`unverifiable`) que o radar pesa 8.00, e o `--assert-parity` nao via porque comparava CONTAGEM. Agora ha UM arquivo (`lib/status-factor.awk`) e a ausencia dele e `exit 2` NOMEANDO o arquivo. ⚠️ A comparacao de peso passou por TRES versoes e as duas primeiras eram minhas: so-o-TOPO passava VERDE no mutante (o no afetado nao era o topo daquele grafo); a SOMA era cega a 53-64% do peso (4 dos 7 slots fora POR CONSTRUCAO) e ao CANCELAMENTO (10.40+8.00 == 8.00+10.40 inverte a ordem de urgencia sem mudar a soma). Hoje e VETOR `id -> peso` de TODOS os nos, comparado com `diff`, nomeando o culpado — e isso dissolveu a denylist replicada que eu declarara como divida, porque ela so existia para poder somar. A passada adversarial (55 brutos -> 18 defeitos) tambem mostrou que o portao exercitava 1 de 58 grafos, e naquele 1 o defeito curado era INVISIVEL; estendido aos 58, achou drift de parser REAL na hora — a lente parseava `eon[]` e nao o contava no grau, e os 5 grafos que reprovaram eram EXATAMENTE os 5 que usam `on:`."
-    trace: ".claude/validation/kg-view.sh"
-
-  - id: I_PRIMEIROS_CINCO_NOS_DO_BASELINE
-    node_type: decision
-    plane: PROD
-    verified_at: 2026-08-09
-    verified_against: as-5-classes-com-prova-de-campo-1-em-producao-e-4-em-sandbox-git-real
-    status: done
-    impact: 5
-    confidence: 1.0
-    label: "PAGO. As CINCO classes tem prova de CAMPO — no real do baseline, nunca fixture. CARIMBADO em PRODUCAO (#564: baseline 48->47, e a medicao achou um piso de memoria protegendo unit inexistente). As outras quatro em sandbox `git archive`+`git init`, com CONTROLE de 47 SOFT / 0 HARD antes de cada mutacao. REMOVIDO, FUGA-SEM-ARESTA e FUGA-DE-ESCOPO mordem UMA vez cada, nomeando o no e a razao; RECONCILIADO sai SOFT com 0 HARD. O par que mais importa: a MESMA reetiqueta de EN_MAESTRO da HARD sem a aresta e SOFT com ela — A ARESTA E O DISCRIMINADOR, provado no corpus real. ⚠️ CORRECAO DE LEITURA do plano original: as tres HARD NAO sao saidas legitimas do baseline, e sim o que acontece quando alguem sai errado; o dogfood delas e TENTAR E SER RECUSADO, nunca CONSEGUIR. ⚠️ E o 1o sandbox que montei MENTIU: `git archive | tar -x` nao cria `.git`, o `load_universe` varre com `git ls-files`, e as tres mutacoes deram 47 REMOVIDO — o baseline INTEIRO. Editar um no nao apaga 47; foi o universo vazio. Sexta vez nesta sessao que medi o artefato errado, e o que salvou foi o CONTROLE. FICA DEVENDO: uma refutacao GENUINA de no real (o RECONCILIADO de campo foi em condicoes de campo, nao uma reconciliacao de verdade) — ela depende de uma medicao que derrube um no, e fabricar uma seria o oposto do ponto."
-    trace: ".claude/validation/kg-verification-baseline.txt"
-
-  - id: I_CONTER_O_QUE_ESTA_EXPOSTO
-    node_type: decision
-    plane: PROD
-    verified_at: 2026-08-10
-    verified_against: chave-nova-200-chave-antiga-401-config-env-so-hash-sessao-WORKING
-    status: done
-    impact: 4
-    confidence: 1.0
-    label: "EXECUTADO 2026-08-10, pelo maestro e por mim, com o que resta DECLARADO como limite de PRODUTO. (A) BRIDGE: o drop-in de memoria protegia `onion-bridge.service`, unit inexistente desde o rename para o prefixo `onion-vps-`; o bridge vivo rodava com MemoryMin=0. Movido + `NoNewPrivileges=yes`; verificado no cgroup (memory.min=268435456, ancestral de 384M concedendo o piso INTEIRO) e por `/health` 200. ⚠️ EU DERRUBEI O SERVICO no caminho sugerindo `ProtectHome=yes` junto — `/home` inacessivel quebra um servico cujo ExecStart vive em `/home/onion/onion-bridge` (203/EXEC, 8 restarts). E eu JA TINHA LIDO o WorkingDirectory nesta mesma sessao: nao faltou dado, faltou usar o que se mediu. (B) WAHA: chave da API ROTACIONADA e o container passou a receber so o HASH — `.envrc`/`up.sh` exportam `sha512:$(printf %s "$(pass show ...)" | sha512sum)`. Verificado nas quatro pontas: `docker inspect` mostra hash, chave nova autentica 200, chave ANTIGA da 401, e a sessao do WhatsApp sobreviveu (bind mount no host, medido antes de agir). A rotacao antes do hash foi o que tornou INERTE a chave que vazara em transcript de sessao anterior. ⚠️ MINHA MEDICAO ERROU DUAS VEZES no caminho e as duas por metodo: procurei o VALOR em arquivos e conclui \"a credencial so existe no container, recriar perde\" — falso, o `pass` (GPG) e a fonte e guarda CIFRADO, meu metodo nao podia achar; e afirmei ter matado um shell preso conferindo um padrao DIFERENTE do que matei. LIMITE DE PRODUTO, sem cura por configuracao: `WAHA_DASHBOARD_PASSWORD` e comparado em TEXTO PURO (`apps/app_sdk/auth.js` usa `password.value` num mapa de basic-auth; `sha512` so existe no `ApiKeyAuthFactory`). Mitigacao possivel, nao cura: rotacionar tambem a senha, para que o valor exposto ao `docker inspect` ao menos nao seja o que ja circulou — o que deixou de ser opcional em [[I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO]]. ⚠️ CARIMBO CORRIGIDO PELO REVISOR (#574): eu havia deixado `status: confirmed` com carimbo PROD completo, enquanto os outros seis `decision`/PROD verificados do arquivo estao `done` — e `statusFactor(confirmed)=1.0` contra `done=0.1` fazia um item JA EXECUTADO pesar 10x no radar. Colher e mudar o STATUS, nao so escrever o carimbo; carimbo sem status e meia-colheita, e a metade que falta e justamente a que o instrumento le."
-    trace: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
-
-  - id: I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO
-    node_type: decision
-    plane: PROD
-    verified_at: 2026-08-10
-    verified_against: senha-nova-48hex-dashboard-200-qualquer-outra-401-api-e-sessao-WORKING-intactas
-    impact: 4
-    confidence: 1.0
-    status: done
-    label: "ROTACIONADA PELO MAESTRO 2026-08-10, minutos depois de nascer. VERIFICACAO POR DEDUCAO, DELIBERADAMENTE — nao reteste do valor vazado: reexecuta-lo escreveria o segredo mais uma vez, repetindo em miniatura a falha que este no registra. A deducao e fechada porque as tres pontas sao medidas: a comparacao do dashboard e IGUALDADE DE TEXTO PURO (`apps/app_sdk/auth.js`, `password.value` num mapa de basic-auth), a senha atual tem 48 hex contra 32 da vazada, e qualquer valor diferente do atual devolve 401 — logo o vazado nao autentica. Chave da API (200) e sessao do WhatsApp (`default`/`WORKING`) intactas: a rotacao do dashboard nao toca nelas. ⚠️ O LIMITE DE PRODUTO PERMANECE e nao foi curado por isto: `WAHA_DASHBOARD_PASSWORD` continua em TEXTO PURO no `Config.Env`, visivel a `docker inspect` — rotacionar troca QUAL valor esta exposto, nunca o fato de estar. DEPENDIA DO MAESTRO — eu nao consegui executar. 2026-08-10, medindo o dashboard do WAHA a pedido dele, escolhi `curl -w '%{url_effective}'` para mostrar a cadeia de redirect. Esse formato reimprime a URL COM AS CREDENCIAIS EMBUTIDAS: a senha do dashboard saiu em CLARO no transcript desta sessao. Nao foi o servidor que vazou — foi a MINHA escolha de formato de saida, num comando cujo proposito era conferir seguranca. E o agravante e que o vazamento anterior (chave da API em transcript) tinha acabado de ser curado por rotacao NESTA MESMA SESSAO: repeti a classe que estava fechando. LICAO MECANIZAVEL, nao \"vou prestar atencao\": `-u user:senha` com `%{url_effective}` (ou `-v`, ou `%{url}`) e uma combinacao que IMPRIME SEGREDO por construcao — para conferir redirect autenticado, usar `-o /dev/null -w '%{http_code}'` e, se a cadeia importar, `%{num_redirects}`, nunca a URL efetiva. ⚠️ NAO CONSEGUI ROTACIONAR: duas tentativas bloqueadas pelo classificador de permissoes (rotacao de credencial nao passa por mim neste ambiente), e insistir seria contornar a intencao da negativa. O comando esta entregue ao maestro. ENQUANTO NAO RODAR: a senha vazada e VALIDA, e o raio e `127.0.0.1:3999` — sem rota da internet nem da rede local, so quem ja tem shell na VPS ou le este transcript. Raio pequeno NAO e cura; e a razao de isto ser impact 4 e nao 5."
-    trace: "/home/marcio/onion-vps-waha/.envrc"
-
-  - id: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
-    node_type: decision
-    plane: PROD
-    verified_at: 2026-08-09
-    verified_against: regra-59-ligada-com-31-pares-0-sem-teste-e-bancada-759-0-0
-    status: done
-    impact: 4
-    confidence: 1.0
-    label: "PAGO, e NA ORDEM que este no prescreveu: `--selftest` -> bloco na bancada -> fechar os 5 modos -> SO ENTAO o wire-in (REGRA 59). Ligar antes seria acender guarda que nunca se provou, e o CI reprovaria por divida pre-existente em vez de por regressao. O parse era o bloqueio real: `${1:-...}` engolia QUALQUER flag como caminho, entao `--selftest` dava `cd --selftest` e exit 2 — o script que existe para achar MODO SEM TESTE nao conseguia rodar o proprio teste. O detector agora se prova em 4 casos (coberto->silencio · descoberto->acusa NOMEANDO script E flag · mesmo script com flag diferente ainda acusa · fonte ausente->exit 2). Os 5 modos fechados com ASSERCAO, nunca invocacao vazia: chamar o modo so para satisfazer o detector viraria contador de invocacoes. E a REGRA 59, na 1a corrida, acusou o buraco que ELA MESMA criou — o lint passou a invocar `consumed-mode-check --format tsv` e a bancada so o chamava com `--selftest`. Corrigido no caso (0). Estado: 31 pares de producao, 0 sem teste."
-    trace: ".claude/validation/consumed-mode-check.sh"
-  # ── AS COLETAS (question: entram no --freshness-tsv e envelhecem sozinhas) ──────────────────
-
-  - id: Q_QUANTAS_DAS_52_REGRAS_JA_JUNTAM_SOZINHAS
-    node_type: question
-    plane: DEV
-    verified_at: 2026-08-10
-    verified_against: re-medido-sobre-59-regras-47-com-cobertura-declarada-12-sem
-    status: confirmed
-    impact: 5
     confidence: 0.9
-    label: "RE-MEDIDO 2026-08-10 sobre as 59 regras vivas (a classificacao anterior era contra 52 e DRIFTOU quando as regras 55-60 nasceram). Numero novo: 47 COM cobertura declarada, 12 SEM (8, 9, 10, 24, 25, 26, 27, 32, 38, 50, 51, 52). ⚠️ RESSALVA DE METODO, e ela importa: esta medicao responde \"quantas tem bloco de selftest ou fixture propria\", que e PROXIMO mas NAO IDENTICO a pergunta original (\"quantas juntam automatico, 16 via manifest + 10 por delegacao\"). Sao duas reguas; a nova e mais grossa e mais facil de reproduzir. Declarar isso e o ponto — trocar a regua em silencio e como um numero envelhece sem ninguem notar, que foi exatamente o que aconteceu com o 52. A TESE ORIGINAL SOBREVIVE E FICA MAIS FORTE: tratar as descobertas como bloqueio e o que transforma o fio de maior valor em item que nunca comeca. Com 47 de 59 ja cobertas, a catraca do W4 nasceria sobre 80%% do universo, nao sobre metade. As 12 sem cobertura sao a fila, nao o obstaculo."
-    trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
+    status: done
+    verified_at: 2026-08-29
+    trace: "docs/evolution/review/research-gated-triggers-w2-w3.md"
+    verified_against: 'PR #708 MERGED; 6 nos gated no grafo de pesquisa, com DEPENDS_ON que os deixa BLOQUEADOS no censo ate a Onda 1 fechar'
+    label: 'PAGO, e a licao vale mais que o item: eu havia programado os gatilhos de W2/W3 para nascerem na F6 — ERRADO. `gated-work-derives-fresh` diz que o GATILHO e o que sobrevive ao tempo e o "como" apodrece; guardar o duravel para o fim o deixava exposto num arquivo FORA do repositorio. Quem pegou foi o maestro perguntando se o plano tinha se perdido'
 
-  - id: Q_REGRA56_INSATISFAZIVEL_NO_SEGUNDO_COMMIT
+  - id: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
     node_type: question
-    plane: PROD
-    verified_at: 2026-08-10
-    verified_against: pr-571-mergeado-e-tres-commits-consecutivos-sem-no-verify
-    status: confirmed
-    impact: 4
-    confidence: 1.0
-    label: "RESPONDIDO E CURADO (PR #571). O no exigia \"MEDIR o gatilho exato antes de mexer\" — medido: 23 commits de UMA sessao com `--no-verify DECLARADO`, cada um sendo alguem que OBEDECEU (escreveu o residuo, calculou o hash) e mesmo assim teve de contornar. A raiz: `DIFF_SHA` comparava `BASE..HEAD`, so COMMITS, e no pre-commit o HEAD e o commit ANTERIOR — o conteudo em stage nao entrava na conta e o hash prospectivo NAO PODIA casar. A cura repetiu a escolha do `_baseline_ref` da REGRA 49: a SITUACAO decide (arvore suja -> indice; limpa -> HEAD, o CI inalterado). Prova: tres commits consecutivos passaram pelo hook SEM bypass, depois de 23 seguidos com ele. ⚠️ ESTE NO FICOU ABERTO POR UM CICLO depois de curado, e eu quase o apresentei ao maestro como tarefa DELE — colher e parte da cura, nao formalidade. TETO DECLARADO: `git diff --quiet HEAD` como detector de pre-commit e HEURISTICA, nao contexto; o caso do `--amend` nao foi medido e a regra nao o cobre."
-    trace: ".claude/validation/review-artifact-check.sh"
-
-  - id: I_GUARDA_DE_IDIOMA_DE_IDENTIFICADOR
-    node_type: decision
-    plane: PROD
-    verified_at: 2026-08-10
-    verified_against: regra-60-mergeada-com-as-4-curas-do-juiz-medidas-baseline-7-para-4
-    status: done
-    impact: 4
-    confidence: 1.0
-    label: "PAGO. E o caminho ate aqui vale mais que o resultado. ⚠️ ESTE ROTULO JA MENTIU: por horas ele afirmou \"FECHADO SEM MERGE, 3 de 4 disseram CAI, a conclusao que vale e que grep sobre LINHA e o instrumento errado\". O juiz dissera FICA-COM-RESSALVA e medira 324 scripts de terceiros com 810 extracoes e ZERO falsos — \"o motor esta certo, nao mexa nisso\". Eu reproduzi UM modo de falha (heredoc lido como declaracao), generalizei dele para o instrumento inteiro, FECHEI o PR, e nao corrigi o no quando fui refutado. Foi a revisao de alinhamento que pegou: o diagnostico que prometi ao \"proximo ciclo\" vivia nos COMENTARIOS DO PR — zero mencoes no grafo — que e literalmente C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO, a tese fundadora deste arquivo, violada por mim. AS 4 CURAS, todas medidas: (a) elidir corpo das aspas ANTES de cortar comentario, e cortar `#` so quando INICIA token — mata DOIS achados de uma vez (o falso-positivo de string e o `sed` que decapitava a linha em `$#`/`${v#pfx}`, invisibilizando 3 declaracoes pt-BR REAIS em 27 arquivos de arg-parsing); (b) baseline regenerado DEPOIS: 7 -> 4, saindo os 2 FANTASMAS (prosa em string carimbada como divida) mais o `alvoPendente` ja curado no #570, e ZERO entradas novas; (c) universo = rastreado UNIAO nao-rastreado, com exit 2 no vazio — o pior caso era o adotante recem-adotado, com 51 scripts no disco e 0 rastreados, recebendo \"✅ nenhum identificador NOVO\" no dia 1; (d) a fixture do caso (e) passou a conter declaracao DENTRO de comentario, porque sem isso o caso NAO PODIA FALHAR — apagar o strip inteiro mantinha 7/7 verdes. A LICAO QUE FICA, e ela e sobre mim: eu quase descartei um instrumento que funciona por ter medido UM caso e concluido sobre TODOS. A medicao do juiz (324 scripts, 0 falsos) e o tipo de evidencia que eu nao produzi antes de decidir descartar."
-    trace: "docs/meta-specs/code-standards.md"
-
-  - id: C_RENAME_MATA_ANCORA_EM_SILENCIO
-    node_type: claim
     plane: DEV
-    status: confirmed
     impact: 4
-    confidence: 1.0
-    verified_at: 2026-08-09
-    verified_against: duas-ancoras-quebradas-por-rename-na-mesma-sessao-uma-pega-pela-guarda-outra-nao
-    label: "Renomear identificador MATA ancora de `sed`/`grep` que o cita, e o silencio e o padrao. Duas vezes nesta sessao: `SUMARIO_IMPRESSO`→`SUMMARY_PRINTED` matou a injecao do trap no runner extraido (ninguem viu — o runner so parou de gritar), e `achou`→`found` matou a mutacao do caso (p) (a guarda-da-guarda ACUSOU: 'a mutacao NAO foi aplicada'). A diferenca entre os dois desfechos e ter ou nao ter `_prove_mutation` no caminho. Corolario pratico: rename exige RE-RODAR o que depende de texto, e ancora que cita identificador merece a nota dizendo isso."
-    trace: ".claude/validation/lint-selftest.sh"
-
-  - id: I_TEMPORARIO_EVAPORA_E_VOLTA_COMO_INCIDENTE
-    node_type: decision
-    plane: PROD
-    status: done
-    impact: 4
-    confidence: 1.0
-    verified_at: 2026-08-15
-    verified_against: mecanismo-recusou-e-destruiu-o-arquivo-exposto-na-propria-execucao
-    label: "O script que protegeu a chave GPG raiz (2026-08-11) FUNCIONOU e foi apagado na mesma sessão, marcado 'temporário'. Quatro dias depois o maestro repetiu a receita de memória (`printf senha > /tmp/np.txt && bash ~/protege-chave.sh`) — o script não existia mais, e o `shred` que ele fazia no fim TAMBÉM NÃO. MEDIDO: a senha ficou em modo 0644 (`-rw-rw-r--`) por ~1h15 numa máquina com CINCO contas com shell, incluindo a conta COMPARTILHADA de uma equipe de membro da federação (id `granaai`). Mesma classe de [[I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO]], por caminho novo: não foi a medição que vazou, foi o PROCEDIMENTO que evaporou. Cura como mecanismo (não conselho): `ops/gpg-protect-key.sh` versionado — RECUSA arquivo de senha legível por outros (o defeito exato), é CIENTE DO ESTADO (a v1 assumia senha antiga vazia e falharia obscuro hoje), tem `--check` que não muda nada, e destrói o arquivo no `trap EXIT` mesmo quando RECUSA. Provado no próprio incidente: rodado sobre `/tmp/np.txt`, recusou com a instrução certa e o arquivo saiu por `shred`. Corolário: procedimento sensível não é 'temporário' — o que evapora volta como exposição."
-    trace: "ops/gpg-protect-key.sh"
+    confidence: 0.85
+    status: open
+    verified_against: 'censo vivo do grafo de pesquisa: 4 prontos / 4 bloqueados; a F1 (taxa de mortalidade) ainda nao rodou'
+    label: 'O QUE FALTA DA ONDA, e o gatilho de fechamento e um NUMERO, nao uma impressao: a F6 fecha quando o DELTA DA TAXA DE MORTALIDADE entre F1 e F6 for medido. A baseline a bater e 33% (5 de 15, medicao fundadora de 2026-08-08). Se hoje for maior, a projecao pura nao esta funcionando; se menor, funciona e a onda muda de alvo. GATILHO: rodar a F1 com amostra re-verificada contra o vivo'
 
 edges:
-  - from: I_TEMPORARIO_EVAPORA_E_VOLTA_COMO_INCIDENTE
-    to: I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO
+  - from: I_R62_CATRACA_DE_PROJECAO
+    to: W5_GESTAO_DE_BACKLOG
     edge_type: SUPPORTS
-  - from: I_FECHAR_GIT_MV_E_REMOVIDO
-    to: W1_METRICA_NAO_FORJAVEL
+  - from: I_GATILHOS_W2W3_REGISTRADOS_CEDO
+    to: W5_GESTAO_DE_BACKLOG
     edge_type: SUPPORTS
-  - from: I_IFS_PARA_037
-    to: W1_METRICA_NAO_FORJAVEL
-    edge_type: SUPPORTS
-  - from: I_STATUSFACTOR_EM_SITIO_UNICO
-    to: W2_DOGFOOD_DAS_CINCO_CLASSES
-    edge_type: SUPPORTS
-  - from: I_PRIMEIROS_CINCO_NOS_DO_BASELINE
-    to: W2_DOGFOOD_DAS_CINCO_CLASSES
-    edge_type: SUPPORTS
-  - from: I_CONTER_O_QUE_ESTA_EXPOSTO
-    to: W3_PRODUCAO_CONTIDA
-    edge_type: SUPPORTS
-  - from: I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO
-    to: W3_PRODUCAO_CONTIDA
-    edge_type: SUPPORTS
-  - from: I_SENHA_DO_DASHBOARD_VAZOU_NA_MINHA_MEDICAO
-    to: I_CONTER_O_QUE_ESTA_EXPOSTO
-    edge_type: CONSTRAINS
-  - from: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
-    to: W4_REGRA_SEM_TESTE
-    edge_type: SUPPORTS
-  - from: Q_QUANTAS_DAS_52_REGRAS_JA_JUNTAM_SOZINHAS
-    to: W4_REGRA_SEM_TESTE
-    edge_type: SUPPORTS
-  - from: Q_REGRA56_INSATISFAZIVEL_NO_SEGUNDO_COMMIT
-    to: W1_METRICA_NAO_FORJAVEL
-    edge_type: SUPPORTS
-  - from: W2_DOGFOOD_DAS_CINCO_CLASSES
-    to: W1_METRICA_NAO_FORJAVEL
+  - from: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
+    to: W5_GESTAO_DE_BACKLOG
     edge_type: DEPENDS_ON
-  - from: W4_REGRA_SEM_TESTE
-    to: W2_DOGFOOD_DAS_CINCO_CLASSES
-    edge_type: DEPENDS_ON
-  - from: I_PRIMEIROS_CINCO_NOS_DO_BASELINE
-    to: I_FECHAR_GIT_MV_E_REMOVIDO
-    edge_type: DEPENDS_ON
-  - from: E_DOIS_ITENS_DE_PRODUCAO_SEGUEM_VIVOS
-    to: W3_PRODUCAO_CONTIDA
-    edge_type: SUPPORTS
-  - from: E_CONSUMED_MODE_CHECK_FUNCIONA_E_ESTA_DESLIGADO
-    to: I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA
-    edge_type: CAUSES
-  - from: E_CONSUMED_MODE_CHECK_FUNCIONA_E_ESTA_DESLIGADO
+  - from: W5_GESTAO_DE_BACKLOG
     to: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
-    edge_type: SUPPORTS
-  - from: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
-    to: W1_METRICA_NAO_FORJAVEL
-    edge_type: SUPPORTS
-  - from: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
-    to: W1_METRICA_NAO_FORJAVEL
+    edge_type: DEPENDS_ON
+  - from: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
+    to: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
     edge_type: CONSTRAINS
-  - from: I_GUARDA_DE_IDIOMA_DE_IDENTIFICADOR
-    to: W4_REGRA_SEM_TESTE
-    edge_type: SUPPORTS
-  - from: C_RENAME_MATA_ANCORA_EM_SILENCIO
-    to: W1_METRICA_NAO_FORJAVEL
-    edge_type: SUPPORTS
