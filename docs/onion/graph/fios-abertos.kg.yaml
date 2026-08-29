@@ -102,10 +102,11 @@ nodes:
     node_type: question
     plane: DEV
     impact: 4
-    confidence: 0.85
-    status: open
-    verified_against: 'censo vivo do grafo de pesquisa: 4 prontos / 4 bloqueados; a F1 (taxa de mortalidade) ainda nao rodou'
-    label: 'O QUE FALTA DA ONDA, e o gatilho de fechamento e um NUMERO, nao uma impressao: a F6 fecha quando o DELTA DA TAXA DE MORTALIDADE entre F1 e F6 for medido. A baseline a bater e 33% (5 de 15, medicao fundadora de 2026-08-08). Se hoje for maior, a projecao pura nao esta funcionando; se menor, funciona e a onda muda de alvo. GATILHO: rodar a F1 com amostra re-verificada contra o vivo'
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-29
+    verified_against: 'MEDIDO: amostra sistematica reproduzivel de 15 dos 192 itens (1 a cada 13, ordenada por atencao, 12 grafos distintos), cada um com comando decisivo executado contra o vivo. 9 mortos = 60% vs baseline 33%'
+    label: 'RESPONDIDA, e a resposta e RUIM: a mortalidade SUBIU de 33%% para 60%% — quase dobrou. 9 de 15 mortos (6 entregues, 1 refutado, 1 respondida, 1 obsoleto), zero nao-verificaveis. A leitura que importa: A PROJECAO PURA NAO CUROU O DRIFT. Trocar documento por grafo curou a FONTE do drift, nao o drift — o projetor le `status: open` com fidelidade perfeita e, se ninguem fecha o no, republica o cadaver com fidelidade perfeita. Os seis entregues foram feitos COM CAPRICHO e nenhum voltou ao grafo: e `grafo-sempre-atualizado` falhando no ponto exato que ela nomeia. RESSALVA DE HONESTIDADE, declarada pelo proprio medidor: sem acesso sudo ao bridge e ao Postgres, 4 dos 9 teriam sido NAO-VERIFICAVEIS e o numero cairia para 33%% — empatando a baseline por artefato de ACESSO, nao por realidade'
 
   # ══ ELENXO do decreto da colheita (2026-08-29) — 4 lentes cegas + refutador ══
   - id: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
@@ -174,21 +175,61 @@ nodes:
     node_type: decision
     plane: DEV
     impact: 4
-    confidence: 0.85
-    status: open
-    trace: "docs/onion/graph/fios-abertos.kg.yaml"
-    verified_against: 'cura escolhida pelo refutador sobre a que eu propunha (mover para irmao arquivado), por ser mais barata e por nao criar passivo novo'
-    label: 'A CURA QUE SOBREVIVEU — e NAO e a que eu propunha. Descartado "mover os nos para um .kg.yaml irmao": o refutador mostrou que preserva conteudo (verdadeiro) mas NAO preserva envelhecimento (dilema fechado da baseline) nem arestas cross-arquivo (86%), e que `archive: on` ja produziu o cemiterio previsto — 319 nos ABERTOS invisiveis a projecao humana. A cura barata e MECANIZAR A PROMESSA QUE JA ESTA ESCRITA: o commit de colheita tem de EMITIR os ids colhidos com label no residuo da R56/R58 — gate sobre artefato que ja existe, sem segundo grafo e sem inventar relogio que o freshness provadamente nao tem. GATILHO: a proxima colheita'
+    confidence: 0.95
+    status: done
+    verified_at: 2026-08-29
+    trace: ".claude/validation/lint-artifacts.sh"
+    verified_against: 'REGRA 63 [HARD] implementada e provada: bancada run_harvest_residue_selftests 3/3 (sem residuo · residuo parcial · residuo completo) + 2 mutacoes que reprovam no caso certo; testada contra o cenario real da colheita de 28/08'
+    label: 'PAGO — REGRA 63 [HARD]: quem REMOVE no de um .kg.yaml tem de NOMEAR os ids removidos no residuo da revisao, que a REGRA 56 ja obriga a existir. Custo zero de estrutura nova: nao proibe colher, nao obriga arquivar (o Elenxo derrubou "mover" como cura), so mecaniza a promessa que JA ESTAVA ESCRITA no meta:. Deteccao deterministica pelo diff (`-  - id:`), so morde quando ha remocao — PR que nao colhe nao e julgado. Provado contra o cenario que a motivou: a colheita de 28/08 removeu 18 ids e o residuo nomeava 2; a guarda acusa exatamente os que faltam, um a um'
 
   - id: C_DISSENSO_ARQUIVAR_TROCA_PERDA_POR_PASSIVO
     node_type: claim
     plane: PROD
     impact: 4
-    confidence: 0.8
-    status: open
+    confidence: 0.6
+    status: drifted
     verified_at: 2026-08-29
-    verified_against: 'medido: federation-research com archive: on esconde 319 nos `open` de docs/backlog.md; e com os 18 de volta o topo do radar seria 40.0 de W1_METRICA_NAO_FORJAVEL — uma onda ENTREGUE — com zero `open` em 20'
-    label: 'O DISSENSO PRESERVADO CONTRA A PROPRIA CONCLUSAO, como a etapa 4 do Elenxo exige. Arquivar troca uma perda que se SABE ter por um passivo que NAO se sabe ter: a delecao e perda VISIVEL, datada e auditavel (o commit a nomeia); o arquivamento e retencao SEM CONSUMIDOR, sem relogio e fora da projecao — e isso ja foi medido nesta casa, com 319 fios abertos invisiveis. Mais: a formula de atencao mostra por que o teto existe — reter os 18 poria uma onda ENTREGUE no topo do radar por puro grau. Fica `open` porque nao foi resolvido, e quem retomar tem de enfrenta-lo antes de mexer no decreto'
+    verified_against: 'RE-MEDIDO no P3 do drive (2026-08-29): existe docs/onion/graph/federation-research-2026-06-reconciled-radar.md (10KB, gerado por kg-view.sh) e ele esta EM DIA (byte-identico a regeneracao); o frescor do grafo arquivado emite 87 OK + 71 UNANCHORED, nao silencio'
+    label: 'DISSENSO MEDIDO E PARCIALMENTE REFUTADO — o drive conduziu a propria objecao que o Elenxo preservou, e ela nao sobreviveu inteira. CAI a parte forte: arquivamento NAO e retencao "sem consumidor e fora da projecao" — o grafo arquivado TEM projecao humana viva (`-radar.md`, 10KB, gerada pelo kg-view.sh) e ela esta EM DIA. E nao e "sem relogio": o frescor emite 87 OK + 71 UNANCHORED, ou seja, o instrumento fala sobre ele. SOBREVIVE a parte estreita: os 319 abertos ficam fora de `docs/backlog.md`, que e a superficie de DECISAO — ficar fora da fila acionavel e diferente de ficar invisivel. E sobrevive intacto o argumento da REGUA: reter os 18 poria uma onda ENTREGUE no topo do radar por puro grau nao-direcionado. Fica DRIFTED com confidence rebaixada de 0.8 para 0.6: a objecao vale menos do que valia quando foi escrita, e quem a retomar tem de retoma-la nesta forma menor'
+
+  - id: E_ARQUIVADO_TEM_PROJECAO_E_RELOGIO
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-29
+    verified_against: 'ls + kg-view.sh --markdown | diff => docs/onion/graph/federation-research-2026-06-reconciled-radar.md existe (10373 bytes) e bate byte-a-byte com a regeneracao; kg-radar --freshness-tsv no mesmo grafo => 87 OK + 71 UNANCHORED'
+    label: 'MEDICAO QUE ENCOLHE O DISSENSO. A objecao dizia que arquivar cria "retencao sem consumidor, sem relogio e fora da projecao". Duas das tres partes caem: o grafo arquivado tem PROJECAO HUMANA VIVA e EM DIA, e o frescor FALA sobre ele (87 OK + 71 UNANCHORED). O que resta e mais estreito e continua verdadeiro: ele fica fora de docs/backlog.md, a superficie de DECISAO. Ficar fora da fila acionavel != ficar invisivel — e a diferenca entre as duas coisas era exatamente o que a objecao borrava'
+
+  - id: E_A_ATENCAO_NAO_PROTEGE_CONTRA_MORTE
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-29
+    verified_against: 'na amostra de 15: D_gate_oidc_dual (atencao 119.0, o TOPO absoluto da fila) esta MORTO-entregue; D_ROUTE_TO_BRIDGE (3.2, quase o piso) tambem. Mortos aparecem em toda a faixa'
+    label: 'A ORDEM DE ATENCAO NAO PROTEGE CONTRA ITEM MORTO — e isso e estrutural, nao acidente. A formula e impact x confidence x statusFactor x (1+grau): NADA nela mede idade nem frescor. Logo o topo da fila pode estar morto ha semanas e o instrumento continua o exibindo como "o que custa caro estar errado". O item de atencao 119.0 esta entregue desde o flip P7/P9. Corolario: a regua responde bem a pergunta que faz, e a pergunta que ela faz nao inclui "isto ainda existe?"'
+
+  - id: E_O_GATED_E_A_METADE_QUE_FUNCIONA
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-29
+    verified_against: 'os 3 itens gated da amostra (C_sota_subscription, D_QUADRO_CITACOES e o D2 do pricing) estavam TODOS parados sob controle, com gatilho intacto e nao-disparado: zero falso-positivo'
+    label: 'CONTRAPONTO MEDIDO, e ele credita a maquinaria: enquanto 60%% da amostra apodreceu, os itens GATED com gatilho nomeado tiveram ZERO falso-positivo — todos parados sob controle, todos com gatilho intacto. "Parado SOB CONTROLE != orfao" nao e retorica: e a metade da maquina que esta funcionando. O que apodrece e o item que alguem PAGOU e nao carimbou, nao o item que espera gatilho'
+
+  - id: Q_CENSO_EM_VEZ_DE_AMOSTRA
+    node_type: question
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    verified_against: 'a amostra de 15 existiu para ser COMPARAVEL a baseline; agora que a resposta e "subiu", o proximo passo natural e o censo — que alem do numero devolve a LISTA dos mortos, isto e, o trabalho de fechamento ja pronto'
+    label: 'O QUE A MEDICAO DEIXOU EM ABERTO, com o metodo ja escrito pelo proprio medidor. A amostra tem vies conhecido e DECLARADO: 4 dos 15 cairam no m2-bridge (22%% dos itens, e o grafo que mais executou), a regua de "entregue" e generosa com no de spec, e quem mediu escolheu os proprios comandos de veredito. O censo dissolve os tres — 192 nos, um worker cada, e o /meta:kg-freshness JA FAZ ISSO (consome --freshness-tsv, mede contra o vivo, worker nunca escreve). GATILHO: rodar /meta:kg-freshness sobre a fila inteira. Hipotese barata a testar junto: nenhum dos 6 entregues tinha `verified_at` recente — se `verified_at` ausente/velho predizer morte, vira sinal mecanico no radar'
 
 edges:
   - from: I_R62_CATRACA_DE_PROJECAO
@@ -229,4 +270,19 @@ edges:
     edge_type: CONSTRAINS
   - from: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
     to: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
+    edge_type: SUPPORTS
+  - from: E_ARQUIVADO_TEM_PROJECAO_E_RELOGIO
+    to: C_DISSENSO_ARQUIVAR_TROCA_PERDA_POR_PASSIVO
+    edge_type: CONSTRAINS
+  - from: E_A_ATENCAO_NAO_PROTEGE_CONTRA_MORTE
+    to: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
+    edge_type: SUPPORTS
+  - from: E_O_GATED_E_A_METADE_QUE_FUNCIONA
+    to: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
+    edge_type: CONSTRAINS
+  - from: Q_CENSO_EM_VEZ_DE_AMOSTRA
+    to: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
+    edge_type: DEPENDS_ON
+  - from: E_A_ATENCAO_NAO_PROTEGE_CONTRA_MORTE
+    to: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
     edge_type: SUPPORTS

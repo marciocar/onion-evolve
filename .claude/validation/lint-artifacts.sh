@@ -1053,6 +1053,67 @@ check_generated_projection_sync() {
 }
 
 # ===========================================================================
+# REGRA 63 — Colheita de grafo emite os ids colhidos no resíduo de revisão [HARD]
+# previne: nó removido de um .kg.yaml sem registro consultável de que existiu — a promessa "a história fica no artefato de revisão" cumprida só na letra
+#
+# Gatilho MEDIDO (Elenxo de 2026-08-29, PR #710). O `meta:` do fios-abertos promete que,
+# ao colher, "a história fica no git E no artefato de revisão". Medição: o git cumpre; o
+# RESÍDUO não cumpre nada. O da colheita de 2026-08-28 (chore-harvest-fios-abertos-onda1)
+# nomeia 2 ids — os PRESERVADOS — e ZERO dos 18 apagados. Consequência medida: 14 dos 18
+# conceitos não existem hoje em nenhum artefato consultável do repo.
+#
+# Esta regra NÃO proíbe colher e NÃO obriga a arquivar — o Elenxo derrubou "mover" como
+# cura (não preserva envelhecimento; `archive: on` já produziu 319 abertos fora da fila).
+# Ela mecaniza a promessa que JÁ ESTÁ ESCRITA: quem apaga um nó, NOMEIA o que apagou, no
+# artefato que a REGRA 56 já obriga a existir. Custo zero de estrutura nova.
+#
+# Só morde quando há remoção de nó: PR que não colhe não é julgado.
+# ===========================================================================
+check_harvest_names_removed_nodes() {
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  command -v git >/dev/null 2>&1 || return 0
+
+  local default_branch base branch slug art
+  # `|| true` OBRIGATORIO: sob `set -euo pipefail` (linha 74), um pipeline cujo PRIMEIRO
+  # elemento falha devolve erro mesmo com o `sed` sucedendo — e a atribuicao morta MATA O
+  # LINT INTEIRO, deixando toda guarda posterior sem rodar. Medido: em sandbox sem git, 11
+  # fixtures falharam com "esperava violacao, nenhuma apareceu" — o lint abortava aqui e as
+  # guardas seguintes nunca eram alcancadas. `2>/dev/null` esconde o stderr, NAO o exit code.
+  default_branch="$(git -C "${REPO_ROOT}" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##' || true)"
+  [ -n "${default_branch}" ] || default_branch="main"
+  base="$(git -C "${REPO_ROOT}" merge-base "origin/${default_branch}" HEAD 2>/dev/null        || git -C "${REPO_ROOT}" merge-base "${default_branch}" HEAD 2>/dev/null || true)"
+  [ -n "${base}" ] || return 0
+
+  branch="$(git -C "${REPO_ROOT}" branch --show-current 2>/dev/null || true)"
+  [ -n "${branch}" ] || return 0
+  [ "${branch}" = "${default_branch}" ] && return 0   # em main não há PR a julgar
+
+  # ids REMOVIDOS de qualquer .kg.yaml neste ramo. `-  - id:` é a assinatura da colheita.
+  local removed
+  removed="$(git -C "${REPO_ROOT}" diff --no-ext-diff --no-color "${base}" HEAD -- '*.kg.yaml' 2>/dev/null \
+             | grep -E '^-[[:space:]]*-[[:space:]]*id:' \
+             | sed -E 's/^-[[:space:]]*-[[:space:]]*id:[[:space:]]*//; s/[[:space:]]*$//' | sort -u || true)"
+  [ -n "${removed}" ] || return 0   # não houve colheita → nada a julgar
+
+  slug="$(printf '%s' "${branch}" | tr '/' '-')"
+  art="${REPO_ROOT}/docs/evolution/review/${slug}.md"
+  if [ ! -f "${art}" ]; then
+    violation "HARD" "docs/evolution/review/${slug}.md" "este ramo REMOVE nó(s) de .kg.yaml e não há resíduo de revisão — a colheita tem de NOMEAR o que apagou (a REGRA 56 já exige o artefato; esta exige o conteúdo)"
+    return
+  fi
+
+  local id missing=0 missing_ids=""
+  while IFS= read -r id; do
+    [ -n "${id}" ] || continue
+    grep -qF "${id}" "${art}" || { missing=$((missing + 1)); missing_ids="${missing_ids} ${id}"; }
+  done <<< "${removed}"
+
+  if [ "${missing}" -gt 0 ]; then
+    violation "HARD" "docs/evolution/review/${slug}.md" "colheita sem registro: ${missing} id(s) removido(s) de .kg.yaml NÃO aparecem no resíduo —${missing_ids}. O que se apaga sem nomear deixa de existir para quem vier depois: 14 de 18 conceitos da colheita de 2026-08-28 não existem hoje em nenhum artefato consultável"
+  fi
+}
+
+# ===========================================================================
 # REGRA 19 — Plugins de vertical (plugins/*) sincronizados com as fontes [HARD]
 # previne: plugin de vertical driftando das fontes — bundle de adoção errado
 #           Cada plugins/<name> é GERADO por assemble-plugin.sh a partir de
@@ -3401,6 +3462,7 @@ check_branch_agent_distinction
 check_rules_pathscoped
 check_inventory_sync
 check_generated_projection_sync
+check_harvest_names_removed_nodes
 check_claude_md_counts
 check_site_inventory_sync
 check_plugins_sync
