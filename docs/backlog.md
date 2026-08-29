@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**190 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**192 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m2-bridge-logto-2026-07 — 43 item(ns)
 
@@ -221,11 +221,13 @@
 | 4.0 | `D_ISOLATION_EXTENSION_GATED` | constellation-dialogic-layer-2026-07 | GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao |
 | 3.6 | `D_BOLETIM_CANDIDATE` | constellation-dialogic-layer-2026-07 | documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por es |
 
-## fios-abertos — 1 item(ns)
+## fios-abertos — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
+| 10.2 | `D_MECANIZAR_A_PROMESSA_QUE_JA_ESTA_ESCRITA` | fios-abertos | A CURA QUE SOBREVIVEU — e NAO e a que eu propunha. Descartado "mover os nos para um .kg.yaml irmao": o refutador mostrou que pre |
 | 10.2 | `Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE` | fios-abertos | O QUE FALTA DA ONDA, e o gatilho de fechamento e um NUMERO, nao uma impressao: a F6 fecha quando o DELTA DA TAXA DE MORTALIDADE en |
+| 6.4 | `C_DISSENSO_ARQUIVAR_TROCA_PERDA_POR_PASSIVO` | fios-abertos | O DISSENSO PRESERVADO CONTRA A PROPRIA CONCLUSAO, como a etapa 4 do Elenxo exige. Arquivar troca uma perda que se SABE ter por um  |
 
 ## context-freshness-2026-08-12 — 2 item(ns)
 
