@@ -10467,6 +10467,66 @@ run_realign_selftests() {
 # Usa `--only=` para escopar a varredura (a regra é de par-fixo e roda mesmo assim):
 # 5s por passada em vez de minutos, sem perder o que se afirma medir.
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# REGRA 63 — colheita nomeia o que apagou. Nasceu do Elenxo de 2026-08-29: o `meta:` do
+# fios-abertos promete que a história fica "no git E no artefato de revisão"; o git cumpre,
+# o resíduo não — o da colheita de 28/08 nomeia 2 ids (os preservados) e ZERO dos 18
+# apagados, e 14 dos 18 conceitos não existem hoje em nenhum artefato consultável.
+# Os três casos são os três estados reais: sem resíduo · resíduo parcial · resíduo completo.
+# ---------------------------------------------------------------------------
+run_harvest_residue_selftests() {
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_skip "harvest-residue: lint ausente (SUT não exercido)"; return; fi
+  local sb out
+  sb="$(TMPDIR=/tmp mktemp -d)"
+  if ! git clone -q --no-hardlinks "${REPO_ROOT}" "${sb}" 2>/dev/null; then
+    record_skip "harvest-residue: clone do repo falhou (cenário não montado)"; rm -rf "${sb}"; return
+  fi
+  cp "${lint}" "${sb}/.claude/validation/lint-artifacts.sh"
+  ( cd "${sb}" && git -c user.email=t@t -c user.name=t commit -qam guard >/dev/null 2>&1 ) || true
+
+  # o alvo: dois nós que existem no grafo do core e serão removidos no sandbox
+  local n1="E_O_RELOGIO_NAO_ESTAVA_ANDANDO" n2="E_A_ASSIMETRIA_ERA_INSINUACAO"
+  if ! grep -q "${n1}" "${sb}/docs/onion/graph/fios-abertos.kg.yaml" 2>/dev/null; then
+    record_skip "harvest-residue: nós-alvo ausentes no grafo (cenário não montado)"; rm -rf "${sb}"; return
+  fi
+  ( cd "${sb}" && git checkout -q -b test/harvest-case
+    python3 - "${n1}" "${n2}" <<'PY'
+import io,sys
+p='docs/onion/graph/fios-abertos.kg.yaml'; s=io.open(p,encoding='utf-8').read()
+for nid in sys.argv[1:]:
+    i=s.index('  - id: '+nid); j=s.index('\n  - id: ',i+5); s=s[:i]+s[j+1:]
+io.open(p,'w',encoding='utf-8').write(s)
+PY
+    git -c user.email=t@t -c user.name=t commit -qam "colheita" >/dev/null 2>&1 ) || true
+
+  # (a) SEM resíduo → HARD
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'não há resíduo de revisão'; then
+    record_pass "harvest-residue: colheita SEM resíduo → HARD"
+  else record_fail "harvest-residue: sem resíduo" "a guarda não pegou colheita sem resíduo"; fi
+
+  # (b) resíduo PARCIAL → HARD nomeando SÓ o que falta
+  mkdir -p "${sb}/docs/evolution/review"
+  printf -- '---\ntitle: x\n---\nColhi %s.\n' "${n1}" > "${sb}/docs/evolution/review/test-harvest-case.md"
+  ( cd "${sb}" && git add -A && git -c user.email=t@t -c user.name=t commit -qam parcial >/dev/null 2>&1 ) || true
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q "colheita sem registro" && printf '%s' "${out}" | grep -q "${n2}" \
+     && ! printf '%s' "${out}" | grep -q "— ${n1}"; then
+    record_pass "harvest-residue: resíduo PARCIAL → HARD só sobre o id não-nomeado"
+  else record_fail "harvest-residue: parcial" "esperava HARD citando ${n2} e não ${n1}: ${out}"; fi
+
+  # (c) resíduo COMPLETO → cala
+  printf -- '---\ntitle: x\n---\nColhi %s e %s.\n' "${n1}" "${n2}" > "${sb}/docs/evolution/review/test-harvest-case.md"
+  ( cd "${sb}" && git add -A && git -c user.email=t@t -c user.name=t commit -qam completo >/dev/null 2>&1 ) || true
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if ! printf '%s' "${out}" | grep -q 'colheita sem registro'; then
+    record_pass "harvest-residue: resíduo COMPLETO → guarda cala (sem falso-positivo)"
+  else record_fail "harvest-residue: completo" "falso-positivo com resíduo completo: ${out}"; fi
+
+  rm -rf "${sb}"
+}
+
 run_backlog_projection_selftests() {
   local gen="${REPO_ROOT}/.claude/validation/kg-backlog-project.sh"
   local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
@@ -10669,6 +10729,7 @@ run_site_deeplink_selftests
 run_deploy_site_selftests
 run_install_caddy_config_selftests
 run_realign_selftests
+run_harvest_residue_selftests
 run_backlog_projection_selftests
 run_drive_selftests
 run_site_derivation_selftests
