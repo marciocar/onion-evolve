@@ -504,6 +504,16 @@ nodes:
     verified_against: 'revisao adversarial: diff entre C.UTF-8 e en_US.UTF-8 troca a ordem de dois nos empatados em 7.5; sob pt_BR o printf emite 38,0 no lugar de 38.2 com 190 erros em stderr E exit 0'
     label: 'CATRACA BYTE-A-BYTE COMPRA UM EIXO QUE EU NAO TINHA PINADO. Eu escrevi, ao instalar o pre-requisito do iconv, que "guarda que acusa o ambiente e pior que guarda nenhuma" — e deixei SEIS `sort` sem LC_ALL=C e um `printf %.1f` lendo LC_NUMERIC. Consequencias medidas: em en_US a ordem de nos empatados inverte (a guarda HARD reprova repo CERTO); sob locale de virgula decimal o printf grava `38,0`, sai exit 0, e o lint manda REGENERAR — quem obedece grava lixo. O locale do maestro e pt_BR. Os irmaos (graph.sh, kg-view.sh) ja pinavam; este era o unico fora do padrao. Cura `export LC_ALL=C`, verificada NO-OP no artefato atual'
 
+  - id: Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: open
+    verified_at: 2026-08-29
+    verified_against: 'python3 -c "yaml.safe_load(...)" sobre os 75 .kg.yaml rastreados (sem fixtures): 71 validos, 4 invalidos. Apos a colheita do fios-abertos restam 3: identidade-onion-vps-2026-08 (l.142), bridge-produto-2026-08 (l.278), scope-inheritance-2026 (l.555)'
+    label: 'DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML de verdade — aspas quebradas dentro de `label:` (ex.: um `sha512:$(...)` com aspas embutidas, um `"recuperei a senha"` dentro de string simples, um `\$in` em string dupla). NADA nunca pegou porque o radar e awk LINHA-A-LINHA e tolera; qualquer consumidor com parser real quebra. O fios-abertos era um deles e voltou a ser valido por acidente da colheita — os nos defeituosos sairam. GATILHO para fechar: consertar os 3 restantes E nascer a guarda determinística (um `yaml.safe_load` por arquivo no lint) — mas NESTA ORDEM, porque guarda HARD antes do conserto reprova o repo inteiro'
+
 edges:
   - from: C_LACUNA_E_COBERTURA
     to: Q_GUARDAS_COERENTES
@@ -672,4 +682,7 @@ edges:
     edge_type: CONSTRAINS
   - from: E_A_GUARDA_SELAVA_A_PROPRIA_DOENCA
     to: C_GUARDA_QUE_GRITA_ERRADO
+    edge_type: SUPPORTS
+  - from: Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO
+    to: C_LACUNA_E_COBERTURA
     edge_type: SUPPORTS
