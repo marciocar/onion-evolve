@@ -107,6 +107,89 @@ nodes:
     verified_against: 'censo vivo do grafo de pesquisa: 4 prontos / 4 bloqueados; a F1 (taxa de mortalidade) ainda nao rodou'
     label: 'O QUE FALTA DA ONDA, e o gatilho de fechamento e um NUMERO, nao uma impressao: a F6 fecha quando o DELTA DA TAXA DE MORTALIDADE entre F1 e F6 for medido. A baseline a bater e 33% (5 de 15, medicao fundadora de 2026-08-08). Se hoje for maior, a projecao pura nao esta funcionando; se menor, funciona e a onda muda de alvo. GATILHO: rodar a F1 com amostra re-verificada contra o vivo'
 
+  # ══ ELENXO do decreto da colheita (2026-08-29) — 4 lentes cegas + refutador ══
+  - id: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-29
+    trace: "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
+    verified_against: 'Elenxo completo: 4 lentes cegas entre si (doutrina, instrumento, prior-art, adversarial-de-forja) + refutador com mandato de destruir e default REPROVADO'
+    label: 'O decreto "colher = DELETAR, a historia fica no git e no artefato de revisao" foi submetido ao Elenxo — era o unico invariante da maquinaria exercido sem nunca ter sido testado, e quem o exerceu (eu, na colheita de 9e4aaecc) o declarou nao-validado no proprio residuo. VEREDITO: sobrevive em FORMA MAIS FRACA. O refutador derrubou 4 das 8 evidencias e 2 dos 3 beneficios da cura que eu propunha'
+
+  - id: E_O_RELOGIO_NAO_ESTAVA_ANDANDO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-29
+    verified_against: 'kg-radar --freshness-tsv sobre o arquivo PRE-colheita (git show 9e4aaecc^): 20 OK, ZERO stale. STALE-OLD e relativo a meta.baseline (kg-radar.sh:358), nao a um relogio'
+    label: 'REFUTA a acusacao mais retorica contra o decreto. "Colher mata o relogio de re-teste" pressupoe que ele estava andando — e nao estava: os 20 nos pre-colheita saiam 20 OK / 0 STALE. O frescor e RELATIVO A BASELINE, nao ao tempo, e o dilema e fechado nas duas pontas: baseline congelada => 18/18 OK para sempre; baseline bumpada => 18/18 STALE de uma vez, massa de falso-alarme sobre item PAGO. Arquivar nao ressuscita relogio nenhum porque nao havia relogio'
+
+  - id: E_A_ASSIMETRIA_ERA_INSINUACAO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-08-29
+    verified_against: 'censo pre-colheita: ZERO nos `open` (11 confirmed + 9 done); C_RENAME_MATA_ANCORA_EM_SILENCIO — um C_ que registra erro do autor — TAMBEM foi colhido (2 ocorrencias antes, 0 grafos vivos hoje)'
+    label: 'REFUTA o achado mais grave contra mim, e por isso vai registrado com destaque. A lente adversarial mediu que 7 dos 18 colhidos registravam ERRO DO PROPRIO AUTOR e sumiram, enquanto as 2 teses preservadas CREDITAM o autor — insinuando vies. O refutador testou a hipotese nula e ela CAIU dos dois lados: um `C_` de erro proprio foi colhido junto, e o arquivo tinha ZERO nos open. A regra aplicada foi "fechado sai, tese fundadora fica" e levou embora erro e credito UNIFORMEMENTE. A perda e real; o vies nao esta provado'
+
+  - id: E_O_TETO_NAO_CAUSOU_DESVIO
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-08-29
+    verified_against: 'medido: 378 commits entre 15/08 e 29/08, 4 tocando o arquivo, 1696 linhas `- id:` em OUTROS grafos; e ZERO ocorrencias de bloqueio por TETO em toda a historia'
+    label: 'NUMEROS REPRODUZEM, INFERENCIA CAI. O arquivo ficou 20/20 por 14 dias e 1696 ids nasceram noutros grafos — mas isso e o DESENHO, nao desvio: o proprio meta: diz em caixa-alta "NENHUM FATO NASCE AQUI" e "no so entra para ser ponta de aresta cross-grafo". Procurou-se evidencia de alguem BLOQUEADO pelo teto: nenhuma. Correlacao confundida com causa, e eu quase a repassei como achado'
+
+  - id: E_NENHUM_KG_YAML_JAMAIS_FOI_DELETADO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-29
+    verified_against: 'git log --diff-filter=D --name-only -- "*.kg.yaml" => VAZIO; unico precedente de aposentar grafo grande e `# kg-backlog-archive: on` (federation-research, revisado e aprovado)'
+    label: 'O PRIOR-ART QUE VALE E O DE DENTRO DE CASA, e a conclusao que eu montava nao o usava. Placar medido do repo: ZERO arquivos .kg.yaml deletados em toda a historia x UM arquivamento por marcador. A casa ja tem uma pratica de aposentadoria, ela e o marcador — e ele nao apaga'
+
+  - id: C_A_METADE_DA_PROMESSA_QUE_E_FALSA
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-29
+    trace: "docs/evolution/review/chore-harvest-fios-abertos-onda1.md"
+    verified_against: 'o residuo da colheita (70 linhas) menciona 2 ids — os PRESERVADOS — e zero dos 18 apagados; 14 dos 18 ids nao existem hoje em NENHUM artefato do repo'
+    label: 'O QUE SOBREVIVEU AO REFUTADOR, e e o dano real. O meta: promete que a historia fica "no git E no artefato de revisao". O git CUMPRE a letra; o residuo NAO cumpre nada — eu mesmo escrevi o da colheita de ontem e ele nomeia so os dois preservados. Resultado medido: 14 de 18 conceitos nao existem em lugar nenhum consultavel. A promessa e METADE falsa, e a metade falsa e a unica que um humano leria'
+
+  - id: D_MECANIZAR_A_PROMESSA_QUE_JA_ESTA_ESCRITA
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    trace: "docs/onion/graph/fios-abertos.kg.yaml"
+    verified_against: 'cura escolhida pelo refutador sobre a que eu propunha (mover para irmao arquivado), por ser mais barata e por nao criar passivo novo'
+    label: 'A CURA QUE SOBREVIVEU — e NAO e a que eu propunha. Descartado "mover os nos para um .kg.yaml irmao": o refutador mostrou que preserva conteudo (verdadeiro) mas NAO preserva envelhecimento (dilema fechado da baseline) nem arestas cross-arquivo (86%), e que `archive: on` ja produziu o cemiterio previsto — 319 nos ABERTOS invisiveis a projecao humana. A cura barata e MECANIZAR A PROMESSA QUE JA ESTA ESCRITA: o commit de colheita tem de EMITIR os ids colhidos com label no residuo da R56/R58 — gate sobre artefato que ja existe, sem segundo grafo e sem inventar relogio que o freshness provadamente nao tem. GATILHO: a proxima colheita'
+
+  - id: C_DISSENSO_ARQUIVAR_TROCA_PERDA_POR_PASSIVO
+    node_type: claim
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: open
+    verified_at: 2026-08-29
+    verified_against: 'medido: federation-research com archive: on esconde 319 nos `open` de docs/backlog.md; e com os 18 de volta o topo do radar seria 40.0 de W1_METRICA_NAO_FORJAVEL — uma onda ENTREGUE — com zero `open` em 20'
+    label: 'O DISSENSO PRESERVADO CONTRA A PROPRIA CONCLUSAO, como a etapa 4 do Elenxo exige. Arquivar troca uma perda que se SABE ter por um passivo que NAO se sabe ter: a delecao e perda VISIVEL, datada e auditavel (o commit a nomeia); o arquivamento e retencao SEM CONSUMIDOR, sem relogio e fora da projecao — e isso ja foi medido nesta casa, com 319 fios abertos invisiveis. Mais: a formula de atencao mostra por que o teto existe — reter os 18 poria uma onda ENTREGUE no topo do radar por puro grau. Fica `open` porque nao foi resolvido, e quem retomar tem de enfrenta-lo antes de mexer no decreto'
+
 edges:
   - from: I_R62_CATRACA_DE_PROJECAO
     to: W5_GESTAO_DE_BACKLOG
@@ -123,3 +206,27 @@ edges:
   - from: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
     to: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
     edge_type: CONSTRAINS
+  - from: E_O_RELOGIO_NAO_ESTAVA_ANDANDO
+    to: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
+    edge_type: SUPPORTS
+  - from: E_A_ASSIMETRIA_ERA_INSINUACAO
+    to: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
+    edge_type: SUPPORTS
+  - from: E_O_TETO_NAO_CAUSOU_DESVIO
+    to: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
+    edge_type: SUPPORTS
+  - from: E_NENHUM_KG_YAML_JAMAIS_FOI_DELETADO
+    to: C_A_METADE_DA_PROMESSA_QUE_E_FALSA
+    edge_type: SUPPORTS
+  - from: C_A_METADE_DA_PROMESSA_QUE_E_FALSA
+    to: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
+    edge_type: CONSTRAINS
+  - from: C_A_METADE_DA_PROMESSA_QUE_E_FALSA
+    to: D_MECANIZAR_A_PROMESSA_QUE_JA_ESTA_ESCRITA
+    edge_type: CAUSES
+  - from: C_DISSENSO_ARQUIVAR_TROCA_PERDA_POR_PASSIVO
+    to: D_MECANIZAR_A_PROMESSA_QUE_JA_ESTA_ESCRITA
+    edge_type: CONSTRAINS
+  - from: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
+    to: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
+    edge_type: SUPPORTS
