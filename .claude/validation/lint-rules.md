@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**62 regras** no total — **56 HARD**, **12 SOFT**.
+**62 regras** no total — **56 HARD**, **13 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -97,7 +97,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 50 | Contagens do SITE público sincronizadas com a SSOT | HARD | pitch público driftando da SSOT — número que mente para quem não pode conferir |
 | 59 | Modo que a produção consome é exercitado pela bancada | HARD | guarda que roda no gate por um caminho que nenhum teste percorreu — o modo consumido |
 | 62 | Projeção GERADA em sincronia com a fonte (docs/backlog.md) | HARD | projeção gerada que envelhece calada — o item existe no grafo e some da superfície que as sessões leem |
-| 63 | Colheita de grafo emite os ids colhidos no resíduo de revisão | HARD | nó removido de um .kg.yaml sem registro consultável de que existiu — a promessa "a história fica no artefato de revisão" cumprida só na letra |
+| 63 | Colheita de grafo emite os ids colhidos no resíduo de revisão | HARD + SOFT | nó removido de um .kg.yaml sem registro consultável de que existiu — a promessa "a história fica no artefato de revisão" cumprida só na letra |
 
 ## KG & proveniência
 
