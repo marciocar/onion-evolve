@@ -2,13 +2,15 @@ meta:
   id: kg-freshness-dogfood-2026-08
   schema_version: "1"
   baseline: 2026-08-29
-  # O PRIMEIRO DOGFOOD REAL DE /meta:kg-freshness — e ele reprovou a si mesmo.
+  # O 3o USO de /meta:kg-freshness — e ele reprovou a si mesmo, e depois a revisao me reprovou.
   #
-  # O comando nasceu em 2026-08-12 para pegar "um nó impact 5 / confidence 0.95 que mente com
-  # carimbo do dia e nenhum mecanismo do repo o vê". Em 2026-08-29 ele rodou pela primeira vez
-  # ponta a ponta, sobre os 8 nós de MAIOR ATENÇÃO do grafo M2 (bridge+Logto). Resultado:
-  # ZERO dos 8 sobrevive com um CONFIRMED válido, e três defeitos de SUBSTRATO impediram os
-  # workers de sequer nascer nas duas primeiras tentativas.
+  # O comando nasceu em 2026-07-27 e ganhou as guardas de schema em 2026-08-12. ⚠️ NAO e o
+  # primeiro dogfood: ele ja rodara ponta a ponta em 2026-08-12 com 16 workers (wf_7804d86f-3a7),
+  # e o commit de nascimento ja narra um dogfood com achado real. Esta e a 3a passada — a
+  # correcao veio da revisao adversarial deste proprio PR, que derrubou a frase original.
+  # Em 2026-08-29 ele rodou sobre os 8 nos de MAIOR ATENCAO do grafo M2 (bridge+Logto).
+  # TRES tentativas falharam antes da boa, uma por defeito de substrato — e em duas delas os
+  # workers NASCERAM e morreram no primeiro turno de API, o que e diferente de nao nascer.
   #
   # ⚠️ NADA foi carimbado no grafo M2. É a regra do comando: o worker mede, o maestro sela.
   # Nenhum `verified_at` novo saiu desta passada — que é o desfecho CORRETO, não uma falha.
@@ -19,7 +21,14 @@ meta:
   #
   # Custo: fan-out 548.677 tokens / 111 tool-uses / 4m52s (8 workers sonnet-medium);
   #        juiz    283.808 tokens /  53 tool-uses / 3m42s (4 juízes opus-high).
-  # Runs: wf_86d657c4-3d9 (medição) · wf_cac2ae81-4a2 (juízo adversarial).
+  # Runs: wf_5261e050-96d (falhou: bash indefinido) · wf_3790d38b-6a8 (falhou: parallel/promises)
+  #       wf_6aa135ec-1e2 (falhou: 400 allOf, 8x) · wf_86d657c4-3d9 (medicao, 8 workers)
+  #       wf_cac2ae81-4a2 (juizo adversarial) · wf_56959265-e4e (revisao REGRA 56, 3 lentes)
+  #       wf_742e3a39-e7f (sonda: a API aceita a cura?)
+  #
+  # ⚠️ A REVISAO ADVERSARIAL DESTE PR ACHOU 36 DEFEITOS REAIS NELE, dois de severidade ALTA que
+  # REFUTAM nos centrais. Estao reconciliados abaixo por arestas REFUTES/SUPERSEDES — a posicao
+  # derrubada FICA, que e o desenho.
 
 nodes:
   # ═══════════════ O ACHADO-RAIZ: o schema do próprio comando nunca rodou ═══════════════
@@ -30,7 +39,7 @@ nodes:
     impact: 5
     confidence: 1.0
     verified_at: 2026-08-29
-    verified_against: "8 de 8 workers, run wf_3790d38b-6a8"
+    verified_against: "8 de 8 workers, run wf_6aa135ec-1e2 (o run wf_3790d38b-6a8 citado na 1a versao estava ERRADO: la o erro foi outro, e a revisao pegou)"
     label: 'MEDIDO 2026-08-29: o `KgReverifySchema` de /meta:kg-freshness é RECUSADO pela API antes de qualquer worker nascer. Erro literal, oito vezes: `400 tools.custom.input_schema: input_schema does not support oneOf, allOf, or anyOf at the top level`. As TRÊS GUARDAS do schema — cada uma documentada no comando como paga por um erro real desta casa, com um bloco inteiro explicando como a GUARDA 2 fecha a porta dos fundos da GUARDA 1 — vivem dentro de um `allOf:` de topo e portanto NUNCA rodaram uma única vez desde 2026-08-12.'
     trace: ".claude/commands/meta/kg-freshness.md (bloco KgReverifySchema, chave allOf)"
 
@@ -48,7 +57,7 @@ nodes:
   - id: C_A_GUARDA_BLOQUEIA_A_PROPRIA_CURA
     node_type: claim
     plane: PROD
-    status: confirmed
+    status: refuted
     impact: 5
     confidence: 1.0
     verified_at: 2026-08-29
@@ -59,7 +68,7 @@ nodes:
   - id: D_GUARDAS_MIGRAM_PARA_O_FANIN
     node_type: decision
     plane: DEV
-    status: open
+    status: superseded
     impact: 5
     confidence: 0.9
     label: 'PROPOSTA AO MAESTRO (não tomada): as três GUARDAS saem do schema e vão para o fan-in em JS. Não é degradação — é PROMOÇÃO. No fan-in elas (a) de fato rodam, (b) conseguem o que o schema NUNCA poderia: comparar `claims_measured` com `claims_total`, que é a comparação entre propriedades que JSON Schema puro não faz e que o próprio comando já admite num bloco ⚠️. PROVADO NESTA PASSADA: implementadas no fan-in, as guardas dispararam DUAS vezes em 8 nós na sua primeira execução da história (E_p7_flip_live e E_p1p3_provisioned, ambos rebaixados de DRIFTED a UNVERIFIABLE por `blocked_by` não-vazio). A guarda estrutural precisa mudar junto: deixar de exigir `if:`/`then:` no schema e passar a exigir que o comando DECLARE onde as guardas moram e que o sítio nomeado exista.'
@@ -74,7 +83,7 @@ nodes:
     confidence: 1.0
     verified_at: 2026-08-29
     verified_against: "ReferenceError no run wf_5261e050-96d"
-    label: 'MEDIDO: `bash is not defined`. O template canônico de `write(KG)` da skill onion-orchestration — declarado no texto como "a SHAPE do passo 7, não opcional" para toda orquestração da classe FINDINGS — chama `await bash(...)`, `await write(...)` e `await editFrontmatter(...)`. Nenhuma dessas primitivas existe no runtime do Workflow. `grep` no repo inteiro mostra que as três aparecem APENAS na própria skill: o template nunca foi executado por ninguém. Uma fase obrigatória que não roda é uma fase que não existe.'
+    label: 'MEDIDO: `bash is not defined`. O template canônico de `write(KG)` da skill onion-orchestration — declarado no texto como "a SHAPE do passo 7, não opcional" para toda orquestração da classe FINDINGS — chama `await bash(...)`, `await write(...)` e `await editFrontmatter(...)`. Nenhuma dessas primitivas existe no runtime do Workflow. As três aparecem em TRÊS arquivos versionados: `.claude/skills/onion-orchestration/SKILL.md` e as duas cópias de plugin (`plugins/onion/`, `plugins/onion-work-tools/`, md5 42df7c85). ⚠️ CORREÇÃO DA REVISÃO: a 1ª versão dizia "apenas na própria skill" e o `trace:` nomeava só `.claude/` — subestimando o raio, porque os plugins são o canal de instalação. Nenhum consumidor as chama: o template nunca foi executado por ninguém. Uma fase obrigatória que não roda é uma fase que não existe.'
     trace: ".claude/skills/onion-orchestration/SKILL.md:165,174,178"
 
   - id: E_PARALLEL_EXEMPLOS_CANONICOS_QUEBRADOS
@@ -85,7 +94,7 @@ nodes:
     confidence: 1.0
     verified_at: 2026-08-29
     verified_against: "TypeError no run wf_3790d38b-6a8"
-    label: 'MEDIDO: `TypeError: parallel() expects an array of functions, not promises. Wrap each call: () => agent(...)`. Os exemplos copy-paste da skill onion-orchestration ensinam `files.map((f) => agent(...))` — que passa PROMISES e falha no runtime. A doc da própria ferramenta Workflow traz a forma certa (`f => () => agent(...)`). São três exemplos afetados (fan-out-and-synthesize, o de mutação por partição, e o template de write(KG)). Quem seguir a skill ao pé da letra não roda; quem já rodou consertou inline e nunca curou a fonte — o padrão que [[fix-must-become-mechanism]] nomeia.'
+    label: 'MEDIDO: `TypeError: parallel() expects an array of functions, not promises. Wrap each call: () => agent(...)`. Os exemplos copy-paste da skill onion-orchestration ensinam `files.map((f) => agent(...))` — que passa PROMISES e falha no runtime. A doc da própria ferramenta Workflow traz a forma certa (`f => () => agent(...)`). São DOIS exemplos afetados (fan-out-and-synthesize, linha 121; mutação por partição, linha 142). ⚠️ CORREÇÃO DA REVISÃO: a 1ª versão contava TRÊS, somando o template de write(KG) — que não chama `parallel()` e está quebrado pelo OUTRO defeito. Contar o mesmo bloco duas vezes é a MESMA manobra de denominador que este grafo acusa nos workers. E O RAIO É MAIOR QUE O TRACE: o defeito está em TRÊS arquivos versionados — `.claude/` mais as duas cópias de plugin (md5 42df7c85 idêntico), que são o CANAL DE INSTALAÇÃO. Curar só `.claude/` deixa duas cópias quebradas na porta por onde os adotantes recebem a skill. Quem seguir a skill ao pé da letra não roda; quem já rodou consertou inline e nunca curou a fonte — o padrão que [[fix-must-become-mechanism]] nomeia.'
     trace: ".claude/skills/onion-orchestration/SKILL.md (blocos javascript)"
 
   # ═══════════════ O que a medição do grafo M2 revelou ═══════════════
@@ -97,7 +106,7 @@ nodes:
     confidence: 1.0
     verified_at: 2026-08-29
     verified_against: "runs wf_86d657c4-3d9 (8 workers) + wf_cac2ae81-4a2 (4 juízes opus/high)"
-    label: 'O NÚMERO DESTA PASSADA: dos 8 nós de maior atenção do grafo M2, ZERO sobrevive com um CONFIRMED válido. Vereditos brutos dos workers: 3 CONFIRMED · 3 DRIFTED · 2 UNVERIFIABLE. As guardas do fan-in rebaixaram 2 DRIFTED a UNVERIFIABLE (cobertura parcial). E o juiz adversarial opus/high, disparado pela regra dos >30% de DRIFTED, REPROVOU 4 de 4 — inclusive os três CONFIRMED. Todos os 8 carregavam `status: confirmed` e `verified_at` recente; nenhum tinha medição que o sustentasse. É a tese fundadora do comando, provada contra o próprio corpus que ele deveria proteger.'
+    label: 'O NÚMERO DESTA PASSADA: dos 8 nós de maior atenção do grafo M2, ZERO sobrevive com um CONFIRMED válido. Vereditos brutos dos workers: 3 CONFIRMED · 3 DRIFTED · 2 UNVERIFIABLE. As guardas do fan-in rebaixaram 2 DRIFTED a UNVERIFIABLE (cobertura parcial). E o juiz adversarial opus/high, disparado pela regra dos >30% de DRIFTED, REPROVOU 4 de 4 — inclusive os três CONFIRMED. Todos os 8 carregavam `status: confirmed`. ⚠️ CORRECAO DA REVISAO: a 1a versao dizia "nenhum tinha medicao que o sustentasse" — FALSO. QUATRO dos 8 trazem `reverify_note` de 2026-08-23 com re-verificacao ao vivo. O que o numero diz honestamente e mais estreito e ainda assim serio: sob o protocolo desta passada, nenhum dos 8 alcancou um CONFIRMED que sobrevivesse ao juiz. Tres foram julgados falsos; os outros cinco nao sobreviveram por INVERIFICABILIDADE, que e coisa diferente de estar errado. É a tese fundadora do comando, provada contra o próprio corpus que ele deveria proteger.'
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
 
   - id: C_WORKERS_ENCOLHEM_O_DENOMINADOR
@@ -112,14 +121,14 @@ nodes:
     trace: "run wf_cac2ae81-4a2"
 
   - id: C_TAMANHO_DO_NO_PREVE_VERIFICABILIDADE
-    node_type: claim
+    node_type: question
     plane: PROD
-    status: confirmed
+    status: open
     impact: 4
-    confidence: 0.85
+    confidence: 0.6
     verified_at: 2026-08-29
     verified_against: "campo coverage, primeira execução da história"
-    label: 'ACHADO QUE SÓ EXISTE PORQUE O CAMPO `coverage` RODOU: o tamanho do nó prevê se ele é verificável. Os 4 nós que alcançaram cobertura TOTAL têm em média 3,5 afirmações independentes; os 4 que ficaram PARCIAL têm 9,0 — 2,6× maiores. Todo nó com ≥8 afirmações voltou parcial. `E_p7_flip_live` carrega QUATORZE afirmações independentes num único nó: não é um nó, é um documento vestido de nó. E o TIPO também prevê: os 3 nós `decision` confirmaram integralmente (afirmam o que foi decidido, legível em código/config); os 3 `evidence` vieram todos parciais (afirmam o que se observou num instante, raramente re-observável read-only). Total: 50 afirmações em 8 nós, 35 medidas — 70% de cobertura real, número que nunca existiu antes.'
+    label: 'O TAMANHO DO NÓ PREVÊ SE ELE É VERIFICÁVEL? ⚠️ REBAIXADO DE CLAIM CONFIRMADA A QUESTION PELA REVISÃO, e a razão é humilhante: os números da 1ª versão (média 3,5 × 9,0 = "2,6×"; "70% de cobertura real, número que nunca existiu antes") são calculados sobre os `claims_total` DECLARADOS PELOS WORKERS — exatamente os denominadores que o nó vizinho C_WORKERS_ENCOLHEM_O_DENOMINADOR declara subcontados em ~48% e julgados desonestos em 3 de 4. O grafo publicou como real justamente o número que a própria passada provou inflado. Recontando com os juízes onde eles existem (só nos 4 nós TOTAL): o denominador vai a ≥63, a cobertura cai de 70% para ~56%, a média do lado TOTAL sobe de 3,5 para 6,75 e a razão desaba de 2,6× para ~1,33×. E o universal "todo nó com ≥8 afirmações voltou parcial" é FALSIFICADO pelo próprio corpus: C_console_not_the_path tem 9 pela contagem do juiz e voltou TOTAL. O que sobrevive é a DIREÇÃO, não a magnitude — e ainda assim sobre n=8 com viés declarado. Correção factual junto: a tipologia dos 8 é 3 decision + QUATRO evidence + 1 claim (a 1ª versão disse 3+3, deixando 2 nós fora da conta sem avisar); os 4 evidence voltaram todos PARCIAL, o que é mais forte que o afirmado, mas o `claim` alcançou TOTAL, e é justamente ele que quebra o "o TIPO prevê". GATILHO PARA VIRAR CLAIM: recontagem por juiz nos 8, não nos 4.'
     trace: "run wf_86d657c4-3d9"
 
   - id: C_READONLY_CONFUNDE_POST_COM_MUTACAO
@@ -129,8 +138,8 @@ nodes:
     impact: 5
     confidence: 0.9
     verified_at: 2026-08-29
-    verified_against: "3 dos 4 nós parciais bloqueados pela mesma causa"
-    label: 'O BLOQUEADOR DOMINANTE NÃO É ACESSO — É A CLÁUSULA READ-ONLY DO PRÓPRIO COMANDO. Três dos quatro nós parciais travaram em "precisa de POST": cunhar um JWT M2M via `client_credentials`, mandar payload ao `/a2a`, re-rodar um script idempotente. Um worker escreveu verbatim: "Não é falta de acesso: é limite do protocolo de medição". A cláusula CONFUNDE POST com MUTAÇÃO — pedir um token por client_credentials é leitura semântica, não escrita. Consequência estrutural: num grafo de auth/identidade, a MAIORIA das evidências é inverificável por construção, e o comando produz UNVERIFIABLE em série sem que nada esteja errado com o grafo. A cláusula precisa distinguir "muda estado durável" de "usa verbo POST".'
+    verified_against: "2 dos 4 nos parciais, `blocked_by` verbatim (a 1a versao dizia 3, corrigido pela revisao)"
+    label: 'O BLOQUEADOR DOMINANTE NÃO É ACESSO — É A CLÁUSULA READ-ONLY DO PRÓPRIO COMANDO. DOIS dos quatro nós parciais travaram em "precisa de POST": cunhar um JWT M2M via `client_credentials` (E_pull_endpoint_works) e mandar payload ao `/a2a` (E_p9_complete). ⚠️ CORREÇÃO DA REVISÃO: a 1ª versão dizia TRÊS e somava E_p1p3_provisioned — mas re-rodar logto-provision.sh É mutação de verdade, não confusão POST-vs-mutação; e o quarto (E_p7_flip_live) travou por login OIDC interativo, segredos e journal rotacionado. Um worker escreveu verbatim: "Não é falta de acesso: é limite do protocolo de medição". A cláusula CONFUNDE POST com MUTAÇÃO — pedir um token por client_credentials é leitura semântica, não escrita. Consequência, declarada no tamanho da amostra (2 de 4 — não "a maioria"): num grafo de auth/identidade a cláusula bloqueia uma fatia grande das evidências, e o comando produz UNVERIFIABLE em série sem que nada esteja errado com o grafo. A cláusula precisa distinguir "muda estado durável" de "usa verbo POST".'
     trace: ".claude/commands/meta/kg-freshness.md Passo 3, cláusula READ-ONLY"
 
   - id: C_TABELA_DE_SELAGEM_SEM_CELULA_PARA_DRIFT_PARCIAL
@@ -164,7 +173,7 @@ nodes:
     confidence: 0.95
     verified_at: 2026-08-29
     verified_against: "grep por BASH_SOURCE/SCRIPT_DIR/cd no script: ZERO"
-    label: 'A CAUSA, E ELA É PIOR QUE O ESPELHO: `logto-provision.sh` resolve o SSOT por CAMINHO RELATIVO — `MEMBERS="${MEMBERS_YAML:-docs/evolution/federation/members.yaml}"` — e o script NÃO TEM ANCORAGEM NENHUMA a si mesmo: `grep` por `BASH_SOURCE`, `SCRIPT_DIR` e `cd "` devolve ZERO. Logo QUAL members.yaml é projetado no Logto depende do DIRETÓRIO DE QUEM CHAMA, não da identidade do SSOT. A única proteção é o comentário "rode da raiz do core" e um `[ -f ... ]` que PASSA NAS DUAS RAÍZES — fail-open para o SSOT errado. Rodar `--apply` de dentro de /home/onion/onion-evolve projetaria a federação com 4 dias de atraso, apagando um adotante do cálculo. É [[behavior-over-declaration]] na camada de IDENTIDADE — exatamente o lugar que o nó D_logto_is_projection nomeia, no próprio label, como "o pior lugar possível" para institucionalizar declarado ≠ verificado. GATILHO DE CURA: ancorar o script ao próprio repo (BASH_SOURCE → git rev-parse --show-toplevel) e fazer o guard recusar quando a raiz resolvida não for a do git do próprio script.'
+    label: 'A CAUSA, E ELA É PIOR QUE O ESPELHO: `logto-provision.sh` resolve o SSOT por CAMINHO RELATIVO — `MEMBERS="${MEMBERS_YAML:-docs/evolution/federation/members.yaml}"` — e o script NÃO TEM ANCORAGEM NENHUMA a si mesmo: `grep` por `BASH_SOURCE`, `SCRIPT_DIR` e `cd "` devolve ZERO. Logo QUAL members.yaml é projetado no Logto depende do DIRETÓRIO DE QUEM CHAMA, não da identidade do SSOT. A única proteção é o comentário "rode da raiz do core" e um `[ -f ... ]` que PASSA NAS DUAS RAÍZES — fail-open para o SSOT errado. ⚠️ CORREÇÃO DA REVISÃO, em duas frentes. (1) NÃO foi a causa medida do 9-vs-8: nesta passada o projetor resolveu o arquivo CERTO (o dry-run imprimiu 9); o 8 veio de OUTRO worker que leu o espelho direto, por caminho absoluto, sem invocar o projetor. A falta de ancoragem é risco LATENTE — medido e real, mas latente. (2) O dano anunciado era maior que o medido: `--project-federation` não cria nem apaga organizations (decisão de 2026-07-28), e o `--enroll` com SSOT caduco FALHA FECHADO (exit 7). O efeito real é uma linha de relatório errada e um falso-positivo de divergência D5. É [[behavior-over-declaration]] na camada de IDENTIDADE — exatamente o lugar que o nó D_logto_is_projection nomeia, no próprio label, como "o pior lugar possível" para institucionalizar declarado ≠ verificado. GATILHO DE CURA: ancorar o script ao próprio repo (BASH_SOURCE → git rev-parse --show-toplevel) e fazer o guard recusar quando a raiz resolvida não for a do git do próprio script.'
     trace: "ops/bridge-auth/logto-provision.sh:257,330,484"
 
   # ═══════════════ Drift medido no grafo M2 (para o maestro selar, NÃO carimbado) ═══════════════
@@ -197,7 +206,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.8
-    label: 'O `reverify_note:` é um campo que REGISTRA drift sem RECONCILIAR — e o radar não o lê. Dois nós desta passada (`C_console_not_the_path`, `E_p7_flip_live`) trazem reverify_note de 2026-08-23 descrevendo drift real, e ambos continuam `status: confirmed`. O campo virou o lugar onde a verdade medida vai morrer sem consequência mecânica. PERGUNTA: o radar deve passar a reprovar nó com `reverify_note` cujo `status` não mudou desde a data da nota? GATILHO: a decisão do maestro sobre a tabela de selagem — se nascer a célula do drift parcial (C_TABELA_DE_SELAGEM_SEM_CELULA_PARA_DRIFT_PARCIAL), esta pergunta se responde junto.'
+    label: 'O `reverify_note:` é um campo que REGISTRA drift sem RECONCILIAR — e o radar não o lê. QUATRO dos 8 nós desta passada (`C_console_not_the_path`, `E_p1p3_provisioned`, `E_p7_flip_live`, `E_p9_complete`) trazem reverify_note de 2026-08-23 e TODOS continuam `status: confirmed`. ⚠️ CORREÇÃO DA REVISÃO: a 1ª versão citava dois — METADE da amostra exibe o modo-de-falha, não um quarto, o que FORTALECE a pergunta. O campo virou o lugar onde a verdade medida vai morrer sem consequência mecânica. PERGUNTA: o radar deve passar a reprovar nó com `reverify_note` cujo `status` não mudou desde a data da nota? GATILHO: a decisão do maestro sobre a tabela de selagem — se nascer a célula do drift parcial (C_TABELA_DE_SELAGEM_SEM_CELULA_PARA_DRIFT_PARCIAL), esta pergunta se responde junto.'
     trace: "este grafo"
 
   - id: Q_CENSO_DOS_63_CORTADOS
@@ -209,28 +218,67 @@ nodes:
     label: 'Esta passada mediu 8 de 71 nós de UM grafo, e 8 de 8 falharam. A amostra tem viés DECLARADO para cima (escolhi por atenção, isto é, pelos nós mais caros de errar) e para baixo (grafo de auth, onde a cláusula READ-ONLY bloqueia mais que a média). Os 63 cortados têm atenção máxima 15,0 e média 8,9. PERGUNTA: a taxa de 8/8 se sustenta fora do topo, ou o topo é justamente onde o carimbo envelhece mais? GATILHO: rodar /meta:kg-freshness sobre os 63 restantes DEPOIS que a cura do schema estiver em main — medir com o instrumento quebrado seria repetir o erro que este grafo documenta.'
     trace: "este grafo"
 
+  # ═══════════ RECONCILIAÇÃO — o que a revisão adversarial deste PR derrubou ═══════════
+  - id: E_CURA_MEDIDA_NOS_DOIS_LADOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-29
+    verified_against: 'sonda wf_742e3a39-e7f (API) + sandbox da guarda (rc=0)'
+    label: 'A CURA EXISTE, É PEQUENA, E ESTÁ MEDIDA NOS DOIS LADOS. As MESMAS três guardas, reescritas como cadeia `if`/`then`/`else` ANINHADA no topo — sem `allOf`/`anyOf`/`oneOf` — (a) são ACEITAS pela API: a sonda wf_742e3a39-e7f devolveu `{"verdict":"CONFIRMED","blocked_by":"","coverage":"TOTAL",...}`, `aceito_pela_api: true`; e (b) PASSAM na guarda estrutural: rc=0, "if/then ancorados". A restrição da API, pelo texto do próprio erro, é sobre `oneOf/allOf/anyOf` NO TOPO — e a cadeia aninhada não usa nenhum. Logo a cura é uma reestruturação de ~12 linhas no schema, e a guarda NÃO precisa mudar.'
+    trace: '.claude/commands/meta/kg-freshness.md (bloco KgReverifySchema)'
+
+  - id: E_SO_A_GUARDA_1_DISPAROU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-29
+    verified_against: 'ordem de avaliação no fan-in de wf_86d657c4-3d9'
+    label: 'A GUARDA 2 NUNCA DISPAROU, e isso derruba o argumento de venda da migração. No fan-in a GUARDA 1 (blocked_by não-vazio com veredito ≠ UNVERIFIABLE) roda ANTES e já converte E_p7_flip_live e E_p1p3_provisioned para UNVERIFIABLE; quando a GUARDA 2 é avaliada, a condição `verdict !== UNVERIFIABLE` já é falsa. Foi UMA guarda que disparou duas vezes, não duas guardas. E a comparação `claims_measured × claims_total` — vendida como a PROMOÇÃO do fan-in — é CEGA ao modo-de-falha dominante: encolher o denominador mantém `measured == total`, e portanto passa por ela intacto. Quem pegou a subcontagem foi o juiz adversarial, não a comparação.'
+    trace: 'este grafo · fan-in do script de medição'
+
+  - id: C_O_JUIZ_ADVERSARIAL_E_A_CURA_DA_SUBCONTAGEM
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-29
+    verified_against: '4 juízes opus/high, 3 de 4 contagens julgadas desonestas'
+    label: 'O QUE DE FATO CURA A SUBCONTAGEM É O JUIZ ADVERSARIAL, NÃO O SCHEMA — e o comando já dizia isso por escrito ("só o gate humano o pega"); o que faltava era mecanizá-lo. Medido nesta passada: nenhum mecanismo automático viu a subcontagem de ~48%; o juiz opus/high, com o label integral em mãos e mandato de refutar, pegou 3 de 4. E a prova mais dura é reflexiva: a MESMA passada de juízo, virada contra ESTE grafo, achou 36 defeitos reais — dois deles refutando nós centrais meus. O juiz não é ornamento do fluxo: é a etapa sem a qual o fluxo publica o próprio erro com carimbo.'
+    trace: 'wf_cac2ae81-4a2 (juízo dos workers) · wf_56959265-e4e (juízo deste grafo)'
+
+  - id: C_SKILL_DE_ORQUESTRACAO_E_COPY_PASTE_MORTO
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-29
+    verified_against: 'dois defeitos independentes, ambos medidos por execução'
+    label: 'A skill `onion-orchestration` — o cérebro operacional de fan-out desta casa — carrega código de exemplo que NÃO RODA, em duas camadas independentes: primitivas inexistentes no template de write(KG) e a forma errada de `parallel()` em dois exemplos. Nenhum dos dois é sutil; ambos falham no primeiro segundo. A conclusão que os dois sustentam juntos é a que importa: os blocos de código da skill nunca foram executados como estão escritos. Quem já orquestrou nesta casa consertou inline e não curou a fonte — o padrão que [[fix-must-become-mechanism]] nomeia, aqui com raio triplicado pelos plugins.'
+    trace: '.claude/skills/onion-orchestration/SKILL.md + 2 cópias em plugins/'
+
+  - id: D_CURA_E_RESTRUTURAR_O_SCHEMA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.95
+    label: 'PROPOSTA AO MAESTRO (substitui a anterior): a cura do /meta:kg-freshness é REESTRUTURAR o schema — trocar o `allOf` de topo pela cadeia `if`/`then`/`else` aninhada, ~12 linhas — e NÃO mover as guardas para o fan-in. Medido: a cadeia aninhada passa na API e passa na guarda estrutural, então nada mais precisa mudar. A proposta anterior (migrar tudo para o fan-in) tinha duas premissas falsas: que a guarda bloqueava a correção (não bloqueia) e que a comparação de cobertura seria a promoção (é cega ao modo-de-falha dominante). O que DEVE ir para o fan-in é apenas o que o schema comprovadamente não faz: a comparação entre propriedades, como rede secundária. E o juiz adversarial deixa de ser condicional aos >30% e passa a ser etapa fixa — é ele que pega a subcontagem.'
+    trace: 'este grafo'
+
 edges:
-  - from: E_ALLOF_RECUSADO_PELA_API
-    to: E_ZERO_DE_OITO_SOBREVIVE
-    edge_type: CAUSES
   - from: E_ALLOF_RECUSADO_PELA_API
     to: C_A_GUARDA_BLOQUEIA_A_PROPRIA_CURA
     edge_type: SUPPORTS
   - from: E_GUARDA_ESTRUTURAL_APROVA_O_INUTILIZAVEL
     to: C_A_GUARDA_BLOQUEIA_A_PROPRIA_CURA
     edge_type: SUPPORTS
-  - from: D_GUARDAS_MIGRAM_PARA_O_FANIN
-    to: C_A_GUARDA_BLOQUEIA_A_PROPRIA_CURA
-    edge_type: DEPENDS_ON
-  - from: E_ALLOF_RECUSADO_PELA_API
-    to: D_GUARDAS_MIGRAM_PARA_O_FANIN
-    edge_type: SUPPORTS
-  - from: E_TEMPLATE_WRITE_KG_CHAMA_PRIMITIVA_INEXISTENTE
-    to: E_PARALLEL_EXEMPLOS_CANONICOS_QUEBRADOS
-    edge_type: SUPPORTS
-  - from: E_PARALLEL_EXEMPLOS_CANONICOS_QUEBRADOS
-    to: E_ALLOF_RECUSADO_PELA_API
-    edge_type: CAUSES
   - from: C_WORKERS_ENCOLHEM_O_DENOMINADOR
     to: E_ZERO_DE_OITO_SOBREVIVE
     edge_type: SUPPORTS
@@ -243,12 +291,6 @@ edges:
   - from: C_TABELA_DE_SELAGEM_SEM_CELULA_PARA_DRIFT_PARCIAL
     to: E_ZERO_DE_OITO_SOBREVIVE
     edge_type: SUPPORTS
-  - from: C_PROJETOR_DE_IDENTIDADE_SEM_ANCORA
-    to: E_ESPELHO_CADUCO_DO_SSOT_DA_FEDERACAO
-    edge_type: CAUSES
-  - from: E_ESPELHO_CADUCO_DO_SSOT_DA_FEDERACAO
-    to: C_WORKERS_ENCOLHEM_O_DENOMINADOR
-    edge_type: SUPPORTS
   - from: E_ADMIN_STATS_NAO_EXISTE_MAIS
     to: C_TABELA_DE_SELAGEM_SEM_CELULA_PARA_DRIFT_PARCIAL
     edge_type: SUPPORTS
@@ -258,9 +300,39 @@ edges:
   - from: E_ADMIN_STATS_NAO_EXISTE_MAIS
     to: Q_REVERIFY_NOTE_E_PROSA_GRAMPEADA
     edge_type: SUPPORTS
-  - from: Q_CENSO_DOS_63_CORTADOS
-    to: D_GUARDAS_MIGRAM_PARA_O_FANIN
-    edge_type: DEPENDS_ON
   - from: E_ZERO_DE_OITO_SOBREVIVE
     to: Q_CENSO_DOS_63_CORTADOS
     edge_type: SUPPORTS
+  - from: E_CURA_MEDIDA_NOS_DOIS_LADOS
+    to: C_A_GUARDA_BLOQUEIA_A_PROPRIA_CURA
+    edge_type: REFUTES
+  - from: D_CURA_E_RESTRUTURAR_O_SCHEMA
+    to: D_GUARDAS_MIGRAM_PARA_O_FANIN
+    edge_type: SUPERSEDES
+  - from: E_SO_A_GUARDA_1_DISPAROU
+    to: D_GUARDAS_MIGRAM_PARA_O_FANIN
+    edge_type: REFUTES
+  - from: E_CURA_MEDIDA_NOS_DOIS_LADOS
+    to: D_CURA_E_RESTRUTURAR_O_SCHEMA
+    edge_type: SUPPORTS
+  - from: E_ALLOF_RECUSADO_PELA_API
+    to: D_CURA_E_RESTRUTURAR_O_SCHEMA
+    edge_type: SUPPORTS
+  - from: E_SO_A_GUARDA_1_DISPAROU
+    to: C_O_JUIZ_ADVERSARIAL_E_A_CURA_DA_SUBCONTAGEM
+    edge_type: SUPPORTS
+  - from: C_WORKERS_ENCOLHEM_O_DENOMINADOR
+    to: C_O_JUIZ_ADVERSARIAL_E_A_CURA_DA_SUBCONTAGEM
+    edge_type: SUPPORTS
+  - from: E_TEMPLATE_WRITE_KG_CHAMA_PRIMITIVA_INEXISTENTE
+    to: C_SKILL_DE_ORQUESTRACAO_E_COPY_PASTE_MORTO
+    edge_type: SUPPORTS
+  - from: E_PARALLEL_EXEMPLOS_CANONICOS_QUEBRADOS
+    to: C_SKILL_DE_ORQUESTRACAO_E_COPY_PASTE_MORTO
+    edge_type: SUPPORTS
+  - from: E_ESPELHO_CADUCO_DO_SSOT_DA_FEDERACAO
+    to: C_PROJETOR_DE_IDENTIDADE_SEM_ANCORA
+    edge_type: SUPPORTS
+  - from: Q_CENSO_DOS_63_CORTADOS
+    to: D_CURA_E_RESTRUTURAR_O_SCHEMA
+    edge_type: DEPENDS_ON
