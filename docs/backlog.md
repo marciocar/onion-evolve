@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**191 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**190 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m2-bridge-logto-2026-07 — 43 item(ns)
 
@@ -221,12 +221,11 @@
 | 4.0 | `D_ISOLATION_EXTENSION_GATED` | constellation-dialogic-layer-2026-07 | GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao |
 | 3.6 | `D_BOLETIM_CANDIDATE` | constellation-dialogic-layer-2026-07 | documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por es |
 
-## fios-abertos — 2 item(ns)
+## fios-abertos — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 9.4 | `C_DISSENSO_ARQUIVAR_TROCA_PERDA_POR_PASSIVO` | fios-abertos | DISSENSO MEDIDO E PARCIALMENTE REFUTADO — o drive conduziu a propria objecao que o Elenxo preservou, e ela nao sobreviveu inteir |
-| 6.8 | `Q_CENSO_EM_VEZ_DE_AMOSTRA` | fios-abertos | O QUE A MEDICAO DEIXOU EM ABERTO, com o metodo ja escrito pelo proprio medidor. A amostra tem vies conhecido e DECLARADO: 4 dos 15 |
+| 10.2 | `D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA` | fios-abertos | PROPOSTA AO MAESTRO (decisao NAO-TOMADA — `drive_kind: decision`, o driver propoe, nao executa): trocar o censo por AMOSTRA ESTR |
 
 ## context-freshness-2026-08-12 — 2 item(ns)
 
