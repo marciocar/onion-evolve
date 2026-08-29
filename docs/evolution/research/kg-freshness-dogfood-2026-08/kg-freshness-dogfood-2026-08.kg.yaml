@@ -347,7 +347,7 @@ nodes:
     verified_at: 2026-08-29
     verified_against: 'padrao-ouro sha256 c975fce6 carimbado ANTES do fan-out; 16 workers + 7 juizes; 4 grafos fora do m2'
     label: 'A CALIBRACAO QUE D_JUIZ_CALIBRACAO_GATED PEDIA, EXECUTADA. Ouro: 40 afirmacoes contadas pelo contexto principal em 8 nos, hash carimbado antes de qualquer worker. Resultados nos 7 nos-ouro medidos: workers declararam 19 afirmacoes, o ouro conta 34 — SUBCONTAGEM DE 44% FORA DO M2 (m2 era ~48%: o fenomeno e geral, nao do grafo). Juiz vs ouro: EXATO em 4/7 (57%), SOBRE-conta em 3/7, SUB-conta em 0/7 — o juiz NUNCA erra na direcao que importa. Das 5 acusacoes de subcontagem, o ouro sustenta 4 e rejeita 1 (C_LACUNA: juiz contou 4, ouro diz 2) — TAXA DE FALSO-POSITIVO NA ACUSACAO: 1/5 = 20%. E dois resultados fora da contagem: (a) o juiz APROVOU 1 de 7 (o REFUTED do EN_MAESTRO) — "o juiz sempre reprova" esta refutado; (b) o juiz pegou um worker APRESENTANDO UM LS CURADO como saida de comando (10 de 14 itens; EN_REPO) re-rodando o comando — a classe de defeito que nem schema nem fan-in podem ver. Teto declarado: n=7, juizes sobre-contam por granularidade (somas: worker 19 · juiz 44 · ouro 34), e o ouro e UMA contagem de UM contador.'
-    trace: 'gold-standard.md sha256 c975fce64fca59396887a5f07443e7fa28069f0e2c6d9f24269f412575b4d240'
+    trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/calibration-gold-standard-2026-08-29.md (sha256 c975fce64fca59396887a5f07443e7fa28069f0e2c6d9f24269f412575b4d240)'
 
   - id: E_BARRAGEM_DO_SCHEMA_MEDIDA_EM_PRODUCAO
     node_type: evidence
