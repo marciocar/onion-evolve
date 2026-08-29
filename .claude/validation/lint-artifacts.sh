@@ -1081,8 +1081,19 @@ check_harvest_names_removed_nodes() {
   # guardas seguintes nunca eram alcancadas. `2>/dev/null` esconde o stderr, NAO o exit code.
   default_branch="$(git -C "${REPO_ROOT}" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##' || true)"
   [ -n "${default_branch}" ] || default_branch="main"
-  base="$(git -C "${REPO_ROOT}" merge-base "origin/${default_branch}" HEAD 2>/dev/null        || git -C "${REPO_ROOT}" merge-base "${default_branch}" HEAD 2>/dev/null || true)"
-  [ -n "${base}" ] || return 0
+  # Resolucao de base em CASCATA, e o silencio final e DECLARADO. No CI o checkout costuma nao
+  # ter `main` local nem `origin/HEAD` setado: a versao anterior devolvia base vazia e retornava
+  # 0 CALADA — a guarda ficava MORTA no unico ambiente que a executa em todo PR. Fail-open com
+  # cara de aprovacao, a mesma classe que este PR corrige noutros dois pontos.
+  local ref
+  for ref in "origin/${default_branch}" "${default_branch}" "origin/main" "main" "origin/master"; do
+    base="$(git -C "${REPO_ROOT}" merge-base "${ref}" HEAD 2>/dev/null || true)"
+    [ -n "${base}" ] && break
+  done
+  if [ -z "${base}" ]; then
+    violation "SOFT" "docs/onion/graph" "REGRA 63 nao pode julgar: nenhuma base de comparacao resolvivel (tentadas origin/${default_branch}, ${default_branch}, origin/main, main, origin/master). A guarda declara que NAO SABE em vez de passar em silencio"
+    return 0
+  fi
 
   branch="$(git -C "${REPO_ROOT}" branch --show-current 2>/dev/null || true)"
   [ -n "${branch}" ] || return 0

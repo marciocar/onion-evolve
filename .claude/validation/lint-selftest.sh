@@ -10479,52 +10479,91 @@ run_harvest_residue_selftests() {
   if [ ! -f "${lint}" ]; then record_skip "harvest-residue: lint ausente (SUT não exercido)"; return; fi
   local sb out
   sb="$(TMPDIR=/tmp mktemp -d)"
-  if ! git clone -q --no-hardlinks "${REPO_ROOT}" "${sb}" 2>/dev/null; then
-    record_skip "harvest-residue: clone do repo falhou (cenário não montado)"; rm -rf "${sb}"; return
-  fi
+  # sandbox AUTO-CONTIDO: `git init` + `main` explícita. A 1a versão clonava o repo e dependia
+  # de `origin/main` existir — no CI o checkout não tem `main` local, a base não resolvia, e a
+  # guarda ficava MUDA: o teste falhava lá e passava aqui. Bancada que depende da topologia do
+  # ambiente mede o ambiente, não o SUT.
+  mkdir -p "${sb}/.claude/validation" "${sb}/docs/onion/graph" "${sb}/docs/evolution/review"
   cp "${lint}" "${sb}/.claude/validation/lint-artifacts.sh"
-  ( cd "${sb}" && git -c user.email=t@t -c user.name=t commit -qam guard >/dev/null 2>&1 ) || true
+  cp -a "${REPO_ROOT}/.claude/validation/lib" "${sb}/.claude/validation/" 2>/dev/null || true
+  printf '# stub\n' > "${sb}/CLAUDE.md"
+  printf 'framework: onion-evolve\nrole: source\n' > "${sb}/.claude/.onion-version"
+  cat > "${sb}/docs/onion/graph/alvo.kg.yaml" <<'KG'
+meta:
+  id: alvo
+  schema_version: '1'
+nodes:
+  - id: N_PRIMEIRO
+    node_type: claim
+    plane: DEV
+    impact: 1
+    confidence: 0.5
+    status: open
+    label: 'primeiro'
+  - id: N_SEGUNDO
+    node_type: claim
+    plane: DEV
+    impact: 1
+    confidence: 0.5
+    status: open
+    label: 'segundo'
+edges:
+  - from: N_PRIMEIRO
+    to: N_SEGUNDO
+    edge_type: SUPPORTS
+KG
+  ( cd "${sb}" && git init -q -b main && git add -A \
+    && git -c user.email=t@t -c user.name=t commit -qm base ) >/dev/null 2>&1 || {
+      record_skip "harvest-residue: git init falhou (cenário não montado)"; rm -rf "${sb}"; return; }
 
-  # o alvo: dois nós que existem no grafo do core e serão removidos no sandbox
-  local n1="E_O_RELOGIO_NAO_ESTAVA_ANDANDO" n2="E_A_ASSIMETRIA_ERA_INSINUACAO"
-  if ! grep -q "${n1}" "${sb}/docs/onion/graph/fios-abertos.kg.yaml" 2>/dev/null; then
-    record_skip "harvest-residue: nós-alvo ausentes no grafo (cenário não montado)"; rm -rf "${sb}"; return
-  fi
+  # a colheita: remove os dois nós num ramo
   ( cd "${sb}" && git checkout -q -b test/harvest-case
-    python3 - "${n1}" "${n2}" <<'PY'
-import io,sys
-p='docs/onion/graph/fios-abertos.kg.yaml'; s=io.open(p,encoding='utf-8').read()
-for nid in sys.argv[1:]:
-    i=s.index('  - id: '+nid); j=s.index('\n  - id: ',i+5); s=s[:i]+s[j+1:]
+    python3 - <<'PY'
+import io
+p='docs/onion/graph/alvo.kg.yaml'; s=io.open(p,encoding='utf-8').read()
+for nid in ('N_PRIMEIRO','N_SEGUNDO'):
+    i=s.index('  - id: '+nid)
+    j=s.find('\n  - id: ', i+5)
+    if j<0: j=s.index('\nedges:', i)
+    s=s[:i]+s[j+1:]
 io.open(p,'w',encoding='utf-8').write(s)
 PY
-    git -c user.email=t@t -c user.name=t commit -qam "colheita" >/dev/null 2>&1 ) || true
+    git -c user.email=t@t -c user.name=t commit -qam colheita ) >/dev/null 2>&1 || true
 
   # (a) SEM resíduo → HARD
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
   if printf '%s' "${out}" | grep -q 'não há resíduo de revisão'; then
     record_pass "harvest-residue: colheita SEM resíduo → HARD"
-  else record_fail "harvest-residue: sem resíduo" "a guarda não pegou colheita sem resíduo"; fi
+  else record_fail "harvest-residue: sem resíduo" "a guarda não pegou colheita sem resíduo: ${out}"; fi
 
-  # (b) resíduo PARCIAL → HARD nomeando SÓ o que falta
-  mkdir -p "${sb}/docs/evolution/review"
-  printf -- '---\ntitle: x\n---\nColhi %s.\n' "${n1}" > "${sb}/docs/evolution/review/test-harvest-case.md"
-  ( cd "${sb}" && git add -A && git -c user.email=t@t -c user.name=t commit -qam parcial >/dev/null 2>&1 ) || true
+  # (b) resíduo PARCIAL → HARD só sobre o id não-nomeado
+  printf -- '---\ntitle: x\n---\nColhi N_PRIMEIRO.\n' > "${sb}/docs/evolution/review/test-harvest-case.md"
+  ( cd "${sb}" && git add -A && git -c user.email=t@t -c user.name=t commit -qam parcial ) >/dev/null 2>&1 || true
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q "colheita sem registro" && printf '%s' "${out}" | grep -q "${n2}" \
-     && ! printf '%s' "${out}" | grep -q "— ${n1}"; then
+  if printf '%s' "${out}" | grep -q 'colheita sem registro' && printf '%s' "${out}" | grep -q 'N_SEGUNDO' \
+     && ! printf '%s' "${out}" | grep -q -- '— N_PRIMEIRO'; then
     record_pass "harvest-residue: resíduo PARCIAL → HARD só sobre o id não-nomeado"
-  else record_fail "harvest-residue: parcial" "esperava HARD citando ${n2} e não ${n1}: ${out}"; fi
+  else record_fail "harvest-residue: parcial" "esperava HARD citando N_SEGUNDO e não N_PRIMEIRO: ${out}"; fi
 
   # (c) resíduo COMPLETO → cala
-  printf -- '---\ntitle: x\n---\nColhi %s e %s.\n' "${n1}" "${n2}" > "${sb}/docs/evolution/review/test-harvest-case.md"
-  ( cd "${sb}" && git add -A && git -c user.email=t@t -c user.name=t commit -qam completo >/dev/null 2>&1 ) || true
+  printf -- '---\ntitle: x\n---\nColhi N_PRIMEIRO e N_SEGUNDO.\n' > "${sb}/docs/evolution/review/test-harvest-case.md"
+  ( cd "${sb}" && git add -A && git -c user.email=t@t -c user.name=t commit -qam completo ) >/dev/null 2>&1 || true
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
   if ! printf '%s' "${out}" | grep -q 'colheita sem registro'; then
     record_pass "harvest-residue: resíduo COMPLETO → guarda cala (sem falso-positivo)"
   else record_fail "harvest-residue: completo" "falso-positivo com resíduo completo: ${out}"; fi
 
-  rm -rf "${sb}"
+  # (d) SEM base resolvível → SOFT que DECLARA, nunca silêncio (o modo que matava a guarda no CI)
+  local sbo
+  sbo="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${sb}/.claude" "${sbo}/.claude"; cp -a "${sb}/docs" "${sbo}/docs"; cp "${sb}/CLAUDE.md" "${sbo}/"
+  ( cd "${sbo}" && git init -q -b solta && git add -A \
+    && git -c user.email=t@t -c user.name=t commit -qm unica ) >/dev/null 2>&1 || true
+  out="$(cd "${sbo}" && bash .claude/validation/lint-artifacts.sh --only="${sbo}/CLAUDE.md" 2>&1 || true)"
+  if printf '%s' "${out}" | grep -q 'REGRA 63 nao pode julgar'; then
+    record_pass "harvest-residue: sem base resolvível → SOFT que DECLARA (não silêncio)"
+  else record_fail "harvest-residue: sem base" "a guarda ficou MUDA sem base — é o fail-open que a matava no CI: ${out}"; fi
+  rm -rf "${sbo}" "${sb}"
 }
 
 run_backlog_projection_selftests() {
