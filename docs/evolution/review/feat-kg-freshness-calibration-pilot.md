@@ -3,7 +3,7 @@ title: "Revisão — o piloto calibrado: o juiz tem taxa, e ela é 20% de FP na 
 date: 2026-08-29
 branch: feat/kg-freshness-calibration-pilot
 reviewer: "o próprio desenho do piloto é a revisão em três camadas independentes: padrão-ouro humano carimbado ANTES do fan-out (sha c975fce6) × 16 workers sonnet/medium × 7 juízes opus/high; divergências resolvidas contra o ouro, e o ouro exposto a contra-prova (1 acusação do juiz rejeitada CONTRA o juiz, nenhuma contra o ouro sustentada)"
-reviewed_diff_sha256: 3d7cdf9c649029546563a283ee6ba21f62d924ceb1f9659b51e4a46801957ad2
+reviewed_diff_sha256: 830a4a21ef27e46ce136fe936741489ff854d1d24bb6a09b1c6c009a02c04698
 findings_total: 7
 findings_real: 7
 verdict: APROVADO
