@@ -128,9 +128,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.85
-    status: drifted
-    verified_at: 2026-08-28
-    verified_against: 'AUDITADO no P3 do drive: os 4 papers foram LIDOS (KARMA direto do PDF, 20/26 paginas). A leitura DERRUBOU parte da propria citacao'
+    status: superseded
+    verified_at: 2026-08-29
+    verified_against: 'SELO DO MAESTRO 2026-08-29 (Aufhebung estrita): alvo preservado e superado por E_PRIOR_ART_AUDITADO_POR_LEITURA; a aresta REFUTES do achado do KARMA fica de pe, com genealogia auditavel'
     label: 'DRIFTOU AO SER LIDO — e a ressalva deste no ("citar titulo NAO e ter lido") pegou o proprio autor dele. Dos 5 itens citados, UM era FALSO: a alegacao de que KARMA usa utility scoring + multi-armed bandit veio de um resumo de busca ALUCINADO por terceiro e nao existe no paper (ver E_KARMA2502_CITACAO_MAB_E_FALSA). Os outros dois auditados SUSTENTAM nosso limite declarado em vez de refuta-lo: SGH (2604.11378) exclui do proprio escopo grafos cuja dependencia nao e conhecida antes da execucao — que e a definicao de grafo epistemico; GRADE (2606.22741), com bancada de 6 corpora reais, usa o grafo de dependencia so como DIAGNOSTICO POS-HOC e nunca reordena. Agent-as-a-Graph (2511.18194) e de outro problema (retrieval de tool) e NAO virou no: forcar aresta ali seria guarda que passa sempre'
 
   # ── o que a onda ja entregou, antes de comecar ───────────────────────────
@@ -278,6 +278,16 @@ nodes:
     verified_against: 'invariante I3 (um escritor por repo) + o degrau MOAT da escada graduada, que nao tem gatilho de promocao por desenho'
     label: 'MOAT PERMANENTE, sem gatilho de promocao: LER ou ESCREVER backlog atravessando a fronteira de repo fere I3 (um escritor por repo). Isto nao e "ainda nao" — e "nunca automatizar". Registrado como decisao e nao como pergunta justamente para que ninguem o reabra como se fosse fio gated esperando amadurecer'
 
+  - id: E_PRIOR_ART_AUDITADO_POR_LEITURA
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-29
+    verified_against: 'os 4 papers LIDOS (KARMA direto do PDF, 20/26 paginas; SGH e GRADE via extracao com 2 leituras convergentes); veredito por tese registrado nos nos irmaos'
+    label: 'SUCESSOR do no superado — o prior-art depois de LIDO, nao citado. Fica de pe: (1) SGH (2604.11378) exclui do proprio escopo grafos cuja dependencia nao e conhecida antes da execucao — a definicao de grafo epistemico; (2) GRADE (2606.22741), com 6 corpora REAIS, usa dependencia so como diagnostico POS-HOC e nunca reordena. CAIU: a citacao do KARMA. NAO ENTROU: Agent-as-a-Graph (2511.18194), que e de outro problema — forcar aresta ali seria guarda que passa sempre. O saldo e que a literatura que constroi DAG dirigido de verdade CONFIRMA nosso limite declarado em vez de contradize-lo'
+
 edges:
   - from: E_61PCT_DO_BACKLOG_PASSOU_DE_UM_MES
     to: Q_ONDA1_GERIR_BACKLOG_GRAFO
@@ -321,17 +331,12 @@ edges:
   - from: E_O_TRABALHO_PRECEDE_A_PROJECAO
     to: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
     edge_type: SUPPORTS
-  # CONSTRAINS, nao REFUTES — e o radar que forcou a precisao. REFUTES exige alvo
-  # `refuted`/`superseded`, e (a) o no NAO foi refutado como um todo: 1 de 5 citacoes era
-  # falsa, as outras sustentam; (b) o label do alvo JA absorveu a correcao por medicao, entao
-  # refutar conteudo que nao afirma mais aquilo e aresta mal-tipada. A refutacao da citacao
-  # falsa vive INTEIRA no label de E_KARMA2502_CITACAO_MAB_E_FALSA, que e onde ela e
-  # consultavel. ALTERNATIVA CANONICA (Aufhebung estrita: alvo -> superseded + no sucessor)
-  # exige FLIP DE STATUS DE VERDADE, que o /meta:drive manda PARAR para o maestro selar —
-  # fica proposta no checkpoint, nao executada pelo driver.
+  # REFUTES, agora que o maestro selou o flip (2026-08-29). A forma canonica exigia alvo
+  # `superseded` — o radar recusou a versao anterior com exit 1, e estava certo. O driver
+  # havia parado aqui de proposito: flip de status de verdade e selo humano, nao auto-avanco.
   - from: E_KARMA2502_CITACAO_MAB_E_FALSA
     to: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
-    edge_type: CONSTRAINS
+    edge_type: REFUTES
   - from: E_SGH2604_ESCOPO_EXCLUI_GRAFO_EPISTEMICO
     to: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
     edge_type: SUPPORTS
@@ -359,3 +364,12 @@ edges:
   - from: D_AGREGACAO_CROSS_REPO_E_MOAT
     to: Q_BACKLOG_FEDERADO
     edge_type: CONSTRAINS
+  - from: E_PRIOR_ART_AUDITADO_POR_LEITURA
+    to: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
+    edge_type: SUPERSEDES
+  - from: E_SGH2604_ESCOPO_EXCLUI_GRAFO_EPISTEMICO
+    to: E_PRIOR_ART_AUDITADO_POR_LEITURA
+    edge_type: SUPPORTS
+  - from: E_GRADE2606_DIAGNOSTICO_NAO_REORDENA
+    to: E_PRIOR_ART_AUDITADO_POR_LEITURA
+    edge_type: SUPPORTS

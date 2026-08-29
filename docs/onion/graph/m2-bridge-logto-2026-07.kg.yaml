@@ -1402,8 +1402,8 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: drifted
-    verified_at: 2026-07-29
+    status: confirmed
+    verified_at: 2026-08-29
     verified_against: host-vps-medido
     label: "RE-VERIFY (kg-freshness 2026-07-29, medido read-only): o fix do teto de ancestral SEGUE EFETIVO. cat /sys/fs/cgroup/system.slice/memory.min => 402653184 (384M); caddy.service=67108864 (64M); onion-bridge.service=268435456 (256M); drop-in 10-memory-protection.conf presente. Com memory_recursiveprot a protecao do ancestral desce as folhas — os floors de caddy/bridge estao EFETIVOS, confirmando a supersessao de C_ancestor_cap_zeroes_floors. RESSALVA: mede o caso caddy/bridge, NAO a classe host-wide de Q_floors_effective (varredura dos demais floors segue gated)"
 
