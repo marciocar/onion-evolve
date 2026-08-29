@@ -3,7 +3,7 @@ title: "Revisão — Elenxo sobre a cura: REPROVOU as três, e a cura saiu maior
 date: 2026-08-29
 branch: fix/kg-freshness-schema-cure
 reviewer: "Elenxo completo (run wf_26433f93-c5d): 3 lentes cegas sonnet/medium + steelman opus/high + refutador opus/high com default REPROVADO; as objeções A2/A3/A4 foram re-medidas pelo autor (tabela-verdade determinística + sandbox) antes de qualquer edição"
-reviewed_diff_sha256: e31f30dc3f176d69d2857c597abea498e7e8b7d38e0de386ebf830c93cab5535
+reviewed_diff_sha256: 7a1a1d071bf45cafe2985f16fb1fd324c9f85f207618f666219f705adc1e4898
 findings_total: 8
 findings_real: 8
 verdict: REPROVADO_E_RETOMADO
