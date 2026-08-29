@@ -111,6 +111,15 @@ print(" ".join(problems))
   if [ "${n_cond}" -eq 0 ]; then
     _viol GUARDA-AUSENTE "o schema não tem nenhuma condicional 'if:'/'then:' — as GUARDAS sumiram"
   fi
+
+  # (d) FORMATO-RECUSADO-PELA-API — catraca nascida do 1º run real (2026-08-29): a API recusa
+  #     `oneOf`/`allOf`/`anyOf` no TOPO do input_schema (400, medido 8/8 no run wf_6aa135ec-1e2),
+  #     e este schema viveu 17 dias nessa forma com a guarda dizendo OK. A guarda agora recusa a
+  #     forma que o substrato recusa. Só chave REAL conta (indentação de topo, 2 espaços) —
+  #     comentário `//` citando o histórico não dispara.
+  if printf '%s\n' "${schema}" | grep -qE '^  (allOf|anyOf|oneOf):'; then
+    _viol FORMATO-RECUSADO-PELA-API "o schema usa allOf/anyOf/oneOf no TOPO — a API recusa essa forma (400, medido 2026-08-29) e as guardas nunca rodam. Use a cadeia if/then/else aninhada com raiz na COBERTURA (equivalência provada por tabela-verdade; raiz no verdict DIVERGE em 2 casos)"
+  fi
   case " ${missing} " in
     *" if "*) _viol IF-SEM-REQUIRED "há bloco 'if:' sem 'required:' no escopo — um 'if' assim NÃO dispara quando a chave é OMITIDA, e a guarda vira verde-vazia para quem simplesmente não escreve o campo" ;;
   esac
@@ -139,7 +148,23 @@ if [ "${1:-}" = "--selftest" ]; then
     VIOL=0
   }
 
+  # A fixture BOM espelha a FORMA CANÔNICA REAL (cadeia aninhada, raiz na cobertura) — até
+  # 2026-08-29 ela canonizava o `allOf` que a API recusa, e a bancada validava um formato morto.
   BOM='const KgReverifySchema = {
+  type: "object",
+  required: ["node_id", "kg_file", "method", "observed", "verdict", "divergence", "blocked_by",
+             "claims_total", "claims_measured", "coverage"],
+  properties: { node_id: { type: "string" } },
+  if: { required: ["coverage"], properties: { coverage: { const: "PARCIAL" } } },
+  then: { required: ["verdict", "blocked_by"], properties: {} },
+  else: {
+    if: { required: ["verdict"], properties: { verdict: { const: "UNVERIFIABLE" } } },
+    then: { required: ["blocked_by"], properties: {} },
+    else: { required: ["blocked_by"], properties: {} },
+  },
+};'
+  # a forma MORTA (allOf no topo), preservada como caso de acusação da catraca nova
+  MORTO='const KgReverifySchema = {
   type: "object",
   required: ["node_id", "kg_file", "method", "observed", "verdict", "divergence", "blocked_by",
              "claims_total", "claims_measured", "coverage"],
@@ -160,9 +185,10 @@ if [ "${1:-}" = "--selftest" ]; then
   _case "then sem required"                  "${BOM/then: \{ required: \[\"blocked_by\"\], /then: \{ }" "THEN-SEM-REQUIRED"
   _case "if sem required"                    "${BOM/if: \{ required: \[\"verdict\"\], /if: \{ }" "IF-SEM-REQUIRED"
   _case "schema sumiu do comando"            "# comando sem schema nenhum" "SCHEMA-AUSENTE"
+  _case "allOf no topo (forma que a API recusa)" "${MORTO}" "FORMATO-RECUSADO-PELA-API"
 
   if [ "${failures}" -gt 0 ]; then echo "${failures} caso(s) falharam"; exit 1; fi
-  echo "6/6 — a guarda acusa o que deve e passa o que deve"
+  echo "7/7 — a guarda acusa o que deve e passa o que deve"
   exit 0
 fi
 
