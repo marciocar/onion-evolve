@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**189 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**190 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m2-bridge-logto-2026-07 — 43 item(ns)
 
@@ -129,7 +129,7 @@
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 | 6.6 | `Q_p4_instrument` | company-brain-market-2026-07 | Pré-req de D2/mais-valor: instrumentar 1-2 prospects P4 reais + 'valor medido por adotante'. Sem isso, 'Company Brain regulado'  |
 
-## guardas-revisao-2026-08 — 7 item(ns)
+## guardas-revisao-2026-08 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -137,6 +137,7 @@
 | 9.0 | `C_R45_COBERTURA_FALSA` | guardas-revisao-2026-08 | a R45 cobre 1 de 9 raizes vendorizadas — 46 links vivos p/ caminho core-privado em 21 arquivos ficam fora; o baseline em 0 decla |
 | 8.1 | `C_DUPLICACAO_4_CLONES` | guardas-revisao-2026-08 | REGRAS 21/38/24/25 sao clones byte-identicos apos normalizar literais — helper economizaria ~69 linhas e daria UM lugar p/ o 2>/ |
 | 8.1 | `Q_INDICE_DO_DIARIO_SEM_CATRACA` | guardas-revisao-2026-08 | LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do |
+| 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
 | 6.0 | `C_DOCSTRINGS_STALE` | guardas-revisao-2026-08 | R45 diz "nasce com 101" (baseline tem 0) e R44 diz "tudo em HUMAN" (15 classes, 1 MONITORED) — declarado != verificado DENTRO da |
 | 5.4 | `C_R28_R46_DOUBLE_FIRING` | guardas-revisao-2026-08 | R28 classe (1) e R46 detectam a MESMA condicao — um dir orfao com 3 anuncios emite 4 SOFT para um fato so; cura e amputar a clas |
 | 5.4 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
