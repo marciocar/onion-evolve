@@ -154,7 +154,10 @@ const KgReverifySchema = {
     observed: { type: "string", minLength: 1 },  // o que voltou, verbatim, não interpretado
     verdict:  { enum: ["CONFIRMED", "DRIFTED", "REFUTED", "UNVERIFIABLE"] },
     divergence: { type: "string" },  // o que o nó afirma × o que se mediu ("" se CONFIRMED)
-    blocked_by: { type: "string" },  // SÓ em UNVERIFIABLE — ver as guardas abaixo
+    blocked_by: { type: "string" },  // SEMPRE PRESENTE: "" quando nada bloqueou; não-vazio SÓ em UNVERIFIABLE.
+                                     // ⚠️ NUNCA OMITA (medido 2026-08-29, 1º piloto): um worker leu o antigo
+                                     // "SÓ em UNVERIFIABLE", OMITIU a chave num CONFIRMED, e a barragem do schema
+                                     // o rejeitou 5/5 vezes — nó inteiro descartado por um comentário ambíguo.
     proposed_write: { type: "string" },  // YAML proposto; o worker NÃO escreve
     // COBERTURA — o antídoto do nó COMPOSTO. Quantas das afirmações independentes do nó
     // a medição alcançou. Declarada ANTES do veredito, de propósito: obriga a CONTAR as
