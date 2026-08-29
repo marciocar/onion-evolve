@@ -163,33 +163,33 @@ const KgReverifySchema = {
     claims_measured: { type: "integer", minimum: 0 },
     coverage: { enum: ["TOTAL", "PARCIAL"] },
   },
-  allOf: [
-    // GUARDA 1 (2026-08-12): blocked_by não-vazio com veredito != UNVERIFIABLE é contradição —
-    // o worker diz "não consegui medir" e "está confirmado" na mesma respiração.
-    {
-      if:   { required: ["verdict"], properties: { verdict: { not: { const: "UNVERIFIABLE" } } } },
-      then: { required: ["blocked_by"], properties: { blocked_by: { const: "" } } },
+  // ⚠️ AS 3 GUARDAS VIVEM NUMA CADEIA if/then/else ANINHADA, COM RAIZ NA COBERTURA — e a
+  // raiz NÃO é escolha de estilo, é MEDIDA. Historial (2026-08-29, 1º run real do comando):
+  //   (a) a forma anterior — `allOf:` no topo — foi RECUSADA pela API 8/8 vezes, erro literal
+  //       `400 input_schema does not support oneOf, allOf, or anyOf at the top level`
+  //       (run wf_6aa135ec-1e2). As guardas NUNCA tinham rodado.
+  //   (b) esta cadeia foi provada EQUIVALENTE ao allOf por tabela-verdade: 15/15 casos idênticos
+  //       (jsonschema 4.26, inclui omissões de chave). E foi provada ACEITA pela API
+  //       (sonda wf_742e3a39-e7f).
+  //   (c) a raiz ALTERNATIVA — encadear a partir da GUARDA 1 (verdict) — DIVERGE do allOf em
+  //       2 casos medidos: `{CONFIRMED, PARCIAL, blocked_by:""}` passa nela e é rejeitado pelo
+  //       allOf. Esse payload é exatamente o modo-de-falha dominante (mediu parte, declarou o
+  //       todo). NÃO reordene a cadeia sem refazer a tabela-verdade.
+  // Semântica: coverage=PARCIAL ⇒ (GUARDA 2) verdict=UNVERIFIABLE + blocked_by não-vazio;
+  // senão, verdict=UNVERIFIABLE ⇒ (GUARDA 3) blocked_by não-vazio; senão (GUARDA 1) blocked_by="".
+  if:   { required: ["coverage"], properties: { coverage: { const: "PARCIAL" } } },
+  then: {
+    required: ["verdict", "blocked_by"],
+    properties: {
+      verdict:    { const: "UNVERIFIABLE" },
+      blocked_by: { type: "string", minLength: 1 },
     },
-    // GUARDA 2 — fecha a porta dos fundos da GUARDA 1. Sem ela o worker escapa APAGANDO o
-    // blocked_by e mantendo CONFIRMED: o rastro some e o defeito fica invisível.
-    // Cobertura PARCIAL só admite UNVERIFIABLE, e aí blocked_by volta a ser obrigatório.
-    {
-      if:   { required: ["coverage"], properties: { coverage: { const: "PARCIAL" } } },
-      then: {
-        required: ["verdict", "blocked_by"],
-        properties: {
-          verdict:    { const: "UNVERIFIABLE" },
-          blocked_by: { type: "string", minLength: 1 },
-        },
-      },
-    },
-    // GUARDA 3 — UNVERIFIABLE tem de dizer POR QUE. Sem ela, "não consegui medir" com
-    // blocked_by vazio valida: a GUARDA 1 não dispara (o `if` falha) e a 2 só cobre PARCIAL.
-    {
-      if:   { required: ["verdict"], properties: { verdict: { const: "UNVERIFIABLE" } } },
-      then: { required: ["blocked_by"], properties: { blocked_by: { type: "string", minLength: 1 } } },
-    },
-  ],
+  },
+  else: {
+    if:   { required: ["verdict"], properties: { verdict: { const: "UNVERIFIABLE" } } },
+    then: { required: ["blocked_by"], properties: { blocked_by: { type: "string", minLength: 1 } } },
+    else: { required: ["blocked_by"], properties: { blocked_by: { const: "" } } },
+  },
 };
 ```
 

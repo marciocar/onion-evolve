@@ -222,7 +222,7 @@ nodes:
   - id: E_CURA_MEDIDA_NOS_DOIS_LADOS
     node_type: evidence
     plane: PROD
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 1.0
     verified_at: 2026-08-29
@@ -266,11 +266,76 @@ nodes:
   - id: D_CURA_E_RESTRUTURAR_O_SCHEMA
     node_type: decision
     plane: DEV
-    status: open
+    status: superseded
     impact: 5
     confidence: 0.95
     label: 'PROPOSTA AO MAESTRO (substitui a anterior): a cura do /meta:kg-freshness é REESTRUTURAR o schema — trocar o `allOf` de topo pela cadeia `if`/`then`/`else` aninhada, ~12 linhas — e NÃO mover as guardas para o fan-in. Medido: a cadeia aninhada passa na API e passa na guarda estrutural, então nada mais precisa mudar. A proposta anterior (migrar tudo para o fan-in) tinha duas premissas falsas: que a guarda bloqueava a correção (não bloqueia) e que a comparação de cobertura seria a promoção (é cega ao modo-de-falha dominante). O que DEVE ir para o fan-in é apenas o que o schema comprovadamente não faz: a comparação entre propriedades, como rede secundária. E o juiz adversarial deixa de ser condicional aos >30% e passa a ser etapa fixa — é ele que pega a subcontagem.'
     trace: 'este grafo'
+
+  # ═══════════ ELENXO 2026-08-29 (run wf_26433f93-c5d) — alinhamento e superação ═══════════
+  - id: E_ELENXO_REPROVOU_AS_TRES
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-29
+    verified_against: 'run wf_26433f93-c5d: 3 lentes cegas + steelman + refutador opus/high'
+    label: 'O ELENXO SOBRE A CURA REPROVOU AS TRES SUB-DECISOES (A=schema, B=juiz fixo, C=censo->amostra), e o fio que as unia, nas palavras do refutador: "em cada sub-decisao, a evidencia que autoriza a mudanca foi colhida pelo lado que ACEITA, nunca pelo lado que REJEITA". A sonda do schema so mediu aceitacao; o juiz foi promovido sem padrao-ouro; e a amostra era consequencia orcamentaria de uma decisao de tiering nao discutida. Das objecoes, DUAS cairam por medicao subsequente (a equivalencia da cadeia e a cura-fora-do-repo, ambas resolvidas no mesmo PR) e DUAS sobreviveram como nos preservados (juiz sem padrao-ouro; B e C acopladas).'
+    trace: 'runs wf_26433f93-c5d'
+
+  - id: E_EQUIVALENCIA_POR_TABELA_VERDADE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-29
+    verified_against: 'jsonschema 4.26, tabela-verdade de 15 casos (12 combinatorios + 3 omissoes de chave)'
+    label: 'A OBJECAO A2 DO REFUTADOR, RESOLVIDA POR MEDICAO DETERMINISTICA — e ela salvou o schema de um aninhamento errado. A cadeia if/then/else com RAIZ NA COBERTURA e equivalente ao allOf original em 15/15 casos (zero divergencias). A cadeia com raiz na GUARDA 1 (verdict) — "a cadeia natural", que qualquer um escreveria primeiro — DIVERGE em 2 casos, e um deles e o contra-exemplo literal do refutador: {CONFIRMED, PARCIAL, blocked_by:""} passa nela e e rejeitado pelo allOf. Esse payload e o modo-de-falha dominante (mediu parte, declarou o todo). SUPERSEDE E_CURA_MEDIDA_NOS_DOIS_LADOS porque aquela evidencia media ACEITACAO e FORMA, nunca a barragem — o refutador tinha razao no rotulo "dois lados".'
+    trace: 'sessao 2026-08-29, tabela-verdade reproduzivel'
+
+  - id: E_SCHEMA_CURADO_E_CATRACA_NO_REPO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-29
+    verified_against: 'kg-reverify-schema-check.sh --selftest 7/7 + mutante de producao acusado + schema real rc=0'
+    label: 'A CURA DEIXOU DE SER PROSA: (1) o KgReverifySchema em kg-freshness.md agora E a cadeia raiz-na-cobertura, com o historial da recusa da API e o aviso de nao-reordenar gravados como comentario no proprio schema; (2) a guarda estrutural ganhou a catraca FORMATO-RECUSADO-PELA-API — recusa allOf/anyOf/oneOf de topo, a forma que viveu 17 dias com OK verde; (3) a fixture BOM da bancada deixou de canonizar o formato morto e o allOf virou o 7o caso DE ACUSACAO. Isto responde a objecao A3 (a cura nao estava no repo) e A4 (a guarda precisava mudar sim — o "nada mais precisa mudar" do D_CURA era falso, e por isso ele esta superseded, nao done).'
+    trace: '.claude/commands/meta/kg-freshness.md · .claude/validation/kg-reverify-schema-check.sh'
+
+  - id: C_JUIZ_SEM_PADRAO_OURO
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-08-29
+    verified_against: 'argumento do refutador conferido contra os runs: 4/4 reprovacoes sem contagem independente'
+    label: 'OBJECAO PRESERVADA DO ELENXO (o no que impede o juiz-fixo hoje): o juiz adversarial NUNCA FOI CALIBRADO. Reprovou 4 de 4 com mandato de refutar e default REPROVADO — com n=4 e ZERO padrao-ouro, e impossivel distinguir "o juiz esta certo" de "o juiz sempre reprova". Promove-lo a etapa fixa seria CONFIRMED-por-plausibilidade sobre o proprio verificador — o erro que o comando existe para nao cometer, aplicado uma camada acima. NUANCE MEDIDA A FAVOR do juiz: nesta sessao os seus achados foram RE-MEDIDOS pelo autor antes de aceitos, e sustentaram-se (subcontagem, populacao trocada, no circular) — mas re-medicao do aceito nao e taxa de falso-positivo. O caminho esta em D_JUIZ_CALIBRACAO_GATED.'
+    trace: 'runs wf_cac2ae81-4a2 · wf_56959265-e4e · wf_d68dc607-bce'
+
+  - id: C_JUIZ_E_CENSO_SAO_UMA_DECISAO
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-29
+    verified_against: 'aritmetica do steelman conferida: 190 x 68.585 = 13,0M'
+    label: 'OBJECAO PRESERVADA DO ELENXO (o acoplamento que ninguem tinha visto): B (juiz fixo) e C (censo vs amostra) SAO A MESMA DECISAO. Com juiz opus/high fixo, o censo dos 190 custa 26,5M e nao cabe; SEM o juiz, custa 13,0M e cabe com folga. Ou seja: "o censo nao cabe" nao era um fato do mundo — era a consequencia orcamentaria de uma escolha de tiering feita sobre n=4 e nunca discutida como escolha. Por isso NENHUMA das duas decisoes duplicadas (D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA em fios-abertos · Q_CENSO_DOS_63_CORTADOS aqui) fecha agora: fechar C antes de decidir B seria selar a consequencia antes da causa. Teto declarado do proprio numero: 13,0M extrapola o unitario de um grafo de auth para 30 grafos — serve para exibir o ACOPLAMENTO, nao para orcar.'
+    trace: 'este grafo'
+
+  - id: D_JUIZ_CALIBRACAO_GATED
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    label: 'PROPOSTA AO MAESTRO (a que sobrou de pe depois do Elenxo, no lugar do juiz-fixo): CALIBRAR ANTES DE FIXAR. Desenho minimo: na proxima passada de re-verificacao, o autor conta as afirmacoes de N nos INDEPENDENTEMENTE (padrao-ouro humano barato, ~15min) ANTES de ler o juiz; a concordancia juiz-vs-humano da a taxa de falso-positivo que hoje nao existe. Juiz calibrado com taxa conhecida => ai sim a promocao a etapa fixa se decide com numero, e a decisao B destrava a C (qual duplicata do censo fecha). GATILHO: a proxima invocacao real de /meta:kg-freshness — que ja vai rodar com o schema curado deste PR. Enquanto isso o juiz PERMANECE no contrato atual (condicional aos >30%), e os seus vereditos seguem sendo o que sempre foram: PROPOSTA que o maestro sela, nunca selagem.'
+    trace: '.claude/commands/meta/kg-freshness.md (tiering, juiz adversarial)'
 
 edges:
   - from: E_ALLOF_RECUSADO_PELA_API
@@ -336,3 +401,30 @@ edges:
   - from: Q_CENSO_DOS_63_CORTADOS
     to: D_CURA_E_RESTRUTURAR_O_SCHEMA
     edge_type: DEPENDS_ON
+  - from: E_EQUIVALENCIA_POR_TABELA_VERDADE
+    to: E_CURA_MEDIDA_NOS_DOIS_LADOS
+    edge_type: SUPERSEDES
+  - from: E_SCHEMA_CURADO_E_CATRACA_NO_REPO
+    to: D_CURA_E_RESTRUTURAR_O_SCHEMA
+    edge_type: SUPERSEDES
+  - from: E_EQUIVALENCIA_POR_TABELA_VERDADE
+    to: E_SCHEMA_CURADO_E_CATRACA_NO_REPO
+    edge_type: SUPPORTS
+  - from: E_ELENXO_REPROVOU_AS_TRES
+    to: E_SCHEMA_CURADO_E_CATRACA_NO_REPO
+    edge_type: CAUSES
+  - from: E_ELENXO_REPROVOU_AS_TRES
+    to: C_JUIZ_SEM_PADRAO_OURO
+    edge_type: SUPPORTS
+  - from: E_ELENXO_REPROVOU_AS_TRES
+    to: C_JUIZ_E_CENSO_SAO_UMA_DECISAO
+    edge_type: SUPPORTS
+  - from: C_JUIZ_SEM_PADRAO_OURO
+    to: C_O_JUIZ_ADVERSARIAL_E_A_CURA_DA_SUBCONTAGEM
+    edge_type: CONSTRAINS
+  - from: D_JUIZ_CALIBRACAO_GATED
+    to: C_JUIZ_SEM_PADRAO_OURO
+    edge_type: DEPENDS_ON
+  - from: C_JUIZ_E_CENSO_SAO_UMA_DECISAO
+    to: Q_CENSO_DOS_63_CORTADOS
+    edge_type: CONSTRAINS
