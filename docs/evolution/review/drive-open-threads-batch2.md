@@ -3,9 +3,9 @@ title: "Revisão — lote 2 do drive: REGRA 63, a onda fecha, e duas regressões
 date: 2026-08-29
 branch: drive/open-threads-batch2
 reviewer: "medição executada por nó (P3 do /meta:drive) + agente dedicado para a taxa de mortalidade + gates determinísticos; as duas regressões foram achadas pelo próprio gate, não por revisão"
-reviewed_diff_sha256: 1b572af618173d4839419c845544e35141d65455b7437cdf2f2039ee0fb95a91
-findings_total: 7
-findings_real: 7
+reviewed_diff_sha256: d99a91aea2b503d4537a7785325514395126a8db8c2639dd0224aacc9b8276ae
+findings_total: 8
+findings_real: 8
 verdict: APROVADO
 tokens: 210000
 duration_min: 58
@@ -54,6 +54,15 @@ Três nós conduzidos, uma guarda HARD nova, e **o número que fecha a Onda 1**.
    stderr, **não o exit code**. É a **mesma classe** que corrigi hoje de manhã no
    `kg-backlog-project.sh` — repetida no mesmo dia, noutro arquivo. A cura ficou comentada na linha,
    com a medição junto.
+
+8. **Regressão minha nº3, e o CI a achou depois de eu já ter "terminado".** O selftest passou aqui
+   878/0 e **reprovou no CI**: no checkout de lá não há `main` local nem `origin/HEAD`, o
+   `merge-base` não resolvia, e a regra **retornava 0 em silêncio** — a REGRA 63 estaria **morta no
+   único ambiente que a executa em todo PR**. E a bancada não pegava porque **clonava o repo
+   ambiente**, herdando um `origin/main` que existe aqui e não lá: *bancada que depende da topologia
+   do ambiente mede o ambiente, não o SUT*. Curado nos dois lados — cascata de resolução + **SOFT que
+   declara** quando não há base, e bancada **auto-contida** com um quarto caso para o próprio
+   fail-open.
 
 ## Disciplina
 
