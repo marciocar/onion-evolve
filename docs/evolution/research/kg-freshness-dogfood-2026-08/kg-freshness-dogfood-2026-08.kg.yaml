@@ -337,6 +337,40 @@ nodes:
     label: 'PROPOSTA AO MAESTRO (a que sobrou de pe depois do Elenxo, no lugar do juiz-fixo): CALIBRAR ANTES DE FIXAR. Desenho minimo: na proxima passada de re-verificacao, o autor conta as afirmacoes de N nos INDEPENDENTEMENTE (padrao-ouro humano barato, ~15min) ANTES de ler o juiz; a concordancia juiz-vs-humano da a taxa de falso-positivo que hoje nao existe. Juiz calibrado com taxa conhecida => ai sim a promocao a etapa fixa se decide com numero, e a decisao B destrava a C (qual duplicata do censo fecha). GATILHO: a proxima invocacao real de /meta:kg-freshness — que ja vai rodar com o schema curado deste PR. Enquanto isso o juiz PERMANECE no contrato atual (condicional aos >30%), e os seus vereditos seguem sendo o que sempre foram: PROPOSTA que o maestro sela, nunca selagem.'
     trace: '.claude/commands/meta/kg-freshness.md (tiering, juiz adversarial)'
 
+  # ═══════════ PILOTO CALIBRADO 2026-08-29 (runs wf_86dccc06-a90 + wf_832e0a15-0bf) ═══════════
+  - id: E_CALIBRACAO_DO_JUIZ_MEDIDA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-29
+    verified_against: 'padrao-ouro sha256 c975fce6 carimbado ANTES do fan-out; 16 workers + 7 juizes; 4 grafos fora do m2'
+    label: 'A CALIBRACAO QUE D_JUIZ_CALIBRACAO_GATED PEDIA, EXECUTADA. Ouro: 40 afirmacoes contadas pelo contexto principal em 8 nos, hash carimbado antes de qualquer worker. Resultados nos 7 nos-ouro medidos: workers declararam 19 afirmacoes, o ouro conta 34 — SUBCONTAGEM DE 44% FORA DO M2 (m2 era ~48%: o fenomeno e geral, nao do grafo). Juiz vs ouro: EXATO em 4/7 (57%), SOBRE-conta em 3/7, SUB-conta em 0/7 — o juiz NUNCA erra na direcao que importa. Das 5 acusacoes de subcontagem, o ouro sustenta 4 e rejeita 1 (C_LACUNA: juiz contou 4, ouro diz 2) — TAXA DE FALSO-POSITIVO NA ACUSACAO: 1/5 = 20%. E dois resultados fora da contagem: (a) o juiz APROVOU 1 de 7 (o REFUTED do EN_MAESTRO) — "o juiz sempre reprova" esta refutado; (b) o juiz pegou um worker APRESENTANDO UM LS CURADO como saida de comando (10 de 14 itens; EN_REPO) re-rodando o comando — a classe de defeito que nem schema nem fan-in podem ver. Teto declarado: n=7, juizes sobre-contam por granularidade (somas: worker 19 · juiz 44 · ouro 34), e o ouro e UMA contagem de UM contador.'
+    trace: 'gold-standard.md sha256 c975fce64fca59396887a5f07443e7fa28069f0e2c6d9f24269f412575b4d240'
+
+  - id: E_BARRAGEM_DO_SCHEMA_MEDIDA_EM_PRODUCAO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-08-29
+    verified_against: 'transcript do worker REC2 no run wf_86dccc06-a90: 5 tentativas, 5 rejeicoes'
+    label: 'O LADO DA BARRAGEM — a unica medicao que faltava ao schema curado — CHEGOU EM PRODUCAO: um worker devolveu CONFIRMED omitindo `blocked_by`, e a cadeia if/then/else o rejeitou 5/5 vezes ("must have required property blocked_by"), descartando o no com o descarte NOMEADO no fan-in. A objecao A1 do Elenxo ("so se mediu aceitacao") esta agora respondida pelos dois lados. O CUSTO REVELADO: a omissao foi INDUZIDA por comentario meu no proprio schema ("blocked_by: SO em UNVERIFIABLE") — o worker obedeceu ao comentario e o schema o puniu. Comentario corrigido no mesmo PR ("SEMPRE PRESENTE: vazio quando nada bloqueou"). Um comentario que contradiz o schema que anota e a forma mais barata de perder um worker por no.'
+    trace: '.claude/commands/meta/kg-freshness.md (comentario do blocked_by)'
+
+  - id: E_ACHADOS_DE_CONTEUDO_DO_PILOTO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-29
+    verified_against: 'vereditos finais do run wf_86dccc06-a90; propostas NAO carimbadas nos grafos-alvo'
+    label: 'O QUE O PILOTO MEDIU NOS 4 GRAFOS (15/16; vereditos: 12 CONFIRMED, 2 DRIFTED, 1 REFUTED — nao-confirmados 20%, contra 100% no topo do m2): (1) EN_MAESTRO REFUTADO com juiz APROVANDO a refutacao — "unico que relaya sinais ao core" caiu por commit de terceiro no historico do core (PR #298); (2) Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA DRIFTED — o estado mudou desde 08-13; (3) REC_STAGING_ROT DRIFTED. NADA FOI CARIMBADO nos grafos-alvo: os proposed_write dos workers aguardam o selo do maestro, como o comando manda. E o juiz REPROVOU a medicao de 6 dos 7 nos-ouro — inclusive CONFIRMEDs cuja cobertura declarada TOTAL nao resiste a contagem (C_TRES: 3 declaradas, 7 no ouro): CONFIRMED de no composto continua sendo o desfecho mais barato de fabricar, e o piloto o mediu de novo.'
+    trace: 'runs wf_86dccc06-a90 · wf_832e0a15-0bf'
+
 edges:
   - from: E_ALLOF_RECUSADO_PELA_API
     to: C_A_GUARDA_BLOQUEIA_A_PROPRIA_CURA
@@ -428,3 +462,15 @@ edges:
   - from: C_JUIZ_E_CENSO_SAO_UMA_DECISAO
     to: Q_CENSO_DOS_63_CORTADOS
     edge_type: CONSTRAINS
+  - from: E_CALIBRACAO_DO_JUIZ_MEDIDA
+    to: D_JUIZ_CALIBRACAO_GATED
+    edge_type: SUPPORTS
+  - from: E_BARRAGEM_DO_SCHEMA_MEDIDA_EM_PRODUCAO
+    to: E_SCHEMA_CURADO_E_CATRACA_NO_REPO
+    edge_type: SUPPORTS
+  - from: E_CALIBRACAO_DO_JUIZ_MEDIDA
+    to: C_JUIZ_SEM_PADRAO_OURO
+    edge_type: SUPPORTS
+  - from: E_ACHADOS_DE_CONTEUDO_DO_PILOTO
+    to: E_CALIBRACAO_DO_JUIZ_MEDIDA
+    edge_type: SUPPORTS
