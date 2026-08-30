@@ -165,6 +165,8 @@ nodes:
     impact: 2
     confidence: 0.5
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 7: worker CONFIRMED e juiz opus/high APROVOU (wf_ad4b2d7a-591)"
     label: "Narração LIVE opcional (POST a um LLM 'explique esta seleção') como enhancement que degrada gracioso offline — gated; a pré-cozida é o default de propósito"
     trace: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"
 edges:

@@ -151,6 +151,8 @@ nodes:
     impact: 2
     confidence: 0.4
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 7: worker CONFIRMED e juiz opus/high APROVOU (wf_ad4b2d7a-591)"
     label: "um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZADO 2026-08-25: a doutrina GRADUOU em /doutrinas/ como texto; o visual segue candidato aberto para a pagina]"
 
   - id: Q_RADAR_WIDGET_PARALLEL_FORMULA

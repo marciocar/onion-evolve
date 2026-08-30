@@ -247,7 +247,9 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: 'CENSO COMPLETO 2026-08-30: 189/190 medidos em 7 lotes (o 190o e este proprio no), 92 mortos selados (49%), backlog 190->~100; PRs #717-#723; juiz fixo em todos os CONFIRMED; 2 REFUTED retidos para o maestro'
     impact: 5
     confidence: 1.0
     label: 'SELADO PELO MAESTRO 2026-08-30 (supersede D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA): executar o CENSO dos ~190 itens abertos do docs/backlog.md com o /meta:kg-freshness curado — juiz FIXO escopado aos CONFIRMED, corte declarado. EM LOTES retomaveis (o censo completo custa ~19-24M tok ao unitario medido e nao cabe numa sessao): cada lote = fan-out + juizo + checkpoint de selagem, comecando pelo topo de atencao do backlog. A decisao-mae e D_C_CENSO_190_JUIZ_EM_CONFIRMED no grafo kg-freshness-dogfood-2026-08; este no e a PONTA DE EXECUCAO na fila do drive. Entregavel final: a LISTA DOS MORTOS dos 190.'
