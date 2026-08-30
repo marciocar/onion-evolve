@@ -13,6 +13,8 @@ nodes:
     impact: 4
     confidence: 0.9
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1: worker CONFIRMED e juiz opus/high APROVOU a medicao (run wf_113a587e-715)"
     label: 'as guardas nascidas reativamente formam um sistema coerente, sem sobreposicao cega nem lacuna?'
 
   # ── o diagnostico central ─────────────────────────────────────────────────

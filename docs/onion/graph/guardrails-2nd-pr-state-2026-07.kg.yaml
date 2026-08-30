@@ -73,10 +73,11 @@ nodes:
   - id: C_SURFACE_REMAINS_GATED
     node_type: claim
     plane: PROD
-    status: open
+    status: done
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-24
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O no descreve o fio #4 (/meta:guardrails) como GATED — residuo aberto aguardando decisao do maestro. Mas o PROPRIO arquivo kg registra, 7 dias depois, que a decisao FOI tomada (D_N"
     label: "o UNICO residuo real e a superficie /meta:guardrails — GATED (fio #4 do promotion-plan). Relabel ONION-Rn amplo = docs-pass opcional; fios #2/#5 = pesquisa, nao entrega"
     trace: "docs/discussions/guardrails-nemo-lens/promotion-plan.md:34"
 

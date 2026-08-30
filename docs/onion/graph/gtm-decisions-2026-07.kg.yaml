@@ -35,7 +35,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.65
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó trata D5 como decisão ABERTA entre 4 opções (A escada/B adiar/C bundle/D segmentado) com apenas uma diretriz de piso de preço. O vivo (mesmo trace file, PR #480 de 2026-07-29,"
     label: "D5 — preço por camada (treino→certificação→compliance-pack→curadoria SOTA): A (escada por comparáveis) vs B (adiar/sob-consulta) vs C (bundle único) vs D (segmentado por comprador). Diretriz: ticket premium ($129+) > pipoca ($5-10)"
   - id: D_D3
     node_type: decision
@@ -79,7 +81,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.65
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): As 4 mecânicas da recomendação foram INCORPORADAS pela decisão do maestro (decisions.md, ratificação parcial 2026-07-29) e REFINADAS num KG irmão mais granular (d5-pricing-2026-07."
     label: "REC D5: BLEND A+B — escada por comparáveis SÓ p/ degraus vendíveis já (treino day-rate ~$1.2-2k; certificação $795-$1.5k + renovação baixa); trava 'sob consulta'/faixa larga p/ compliance-pack ($15-40k/ano citável não-fechado) e SOTA até 2-3 cases instrumentados. SOTA amarrado a D2 gated"
   - id: C_D3_rec
     node_type: claim

@@ -176,7 +176,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó D_fix_ancestor_floor está status=open descrevendo um FIX AINDA A APLICAR ('Comando: drop-in ... + daemon-reload + systemctl set-property'), mas a medição ao vivo mostra que as"
     label: "FIX A fecho — o conserto NÃO é mexer em Caddy/bridge (estão corretos no nível deles): é DECLARAR A PROTEÇÃO NO ANCESTRAL. MEDIDO: system.slice é filho direto de -.slice (raiz), e filho-direto-da-raiz NÃO TEM TETO ACIMA (o kernel usa o caminho curto pai==raiz), então basta UM nível. Comando: drop-in /etc/systemd/system/system.slice.d/10-memory-protection.conf com [Slice] MemoryMin=384M MemoryLow=768M (= soma APERTADA do que os descendentes reivindicam: 64+256 e 128+512, +folga) + daemon-reload + systemctl set-property --runtime. ATENÇÃO: memory.min é reserva DURA e não-reclamável — inflá-la aproxima o OOM global; manter apertado e SOMAR ao acrescentar serviço"
 
   - id: Q_floors_effective
@@ -211,7 +213,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): A função canonicalPath especificada (laço de decode de 3 voltas, negação em '..'/'//'/'  '/%2e/%2f/%5c/byte de controle, defesa-em-profundidade) NUNCA foi construída como mecanismo"
     label: "FIX B fecho — GUARDA DE CANONICALIZAÇÃO OBRIGATÓRIA (canonicalPath), fail-closed: (1) decodifica em laço curto (3 voltas, pega %252e duplo-encode) e erro de decode => PROTEGIDO; (2) QUALQUER path que, no BRUTO ou em qualquer rodada decodificada, contenha '..', '//', '\\', %2e, %2f, %5c ou byte de controle => PROTEGIDO — não normaliza, NEGA; (3) ainda mudando na 3a volta => PROTEGIDO; (4) NUNCA assumir 'c.req.path já vem normalizado' sem prova, e mesmo com prova a guarda PERMANECE (defesa em profundidade — a premissa 'o framework normaliza' muda numa bump sem aviso). PROPRIEDADE que a torna segura: a guarda só sabe NEGAR MAIS — descasamento com o router só pode gerar 401 a mais, nunca 401 a menos. RODADA contra corpus: 12/12 ataques bloqueados, 11/11 paths legítimos abertos (inclusive /assets/logo%20final.svg)"
 
   # ---- FIX C: ORDEM DE REGISTRO DO MIDDLEWARE (Hono) ----
@@ -233,6 +237,8 @@ nodes:
     impact: 5
     confidence: 0.9
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1: worker CONFIRMED e juiz opus/high APROVOU a medicao (run wf_113a587e-715)"
     label: "FIX C fecho — EXIGÊNCIA no P5: app.use('*', requireIdentity) é o PRIMEIRO handler registrado, antes de TODA rota, de TODO app.route()/app.mount() e de TODO serveStatic. Nada de 'quase no topo'. Sub-app montado por app.route() só herda se o use global vier antes. E vira MECANISMO, não disciplina — ASSERTION DE BOOT que derruba o serviço: if (app.routes.findIndex(r => r.handler === requireIdentity) !== 0) { console.error('[FATAL] ...'); process.exit(1) }. Sem a assertion, 'o middleware é o primeiro' é afirmação de code review — a classe de garantia que o repo já decidiu não aceitar (fix-must-become-mechanism). P0.2b levanta a ordem atual; teste #14 prova"
 
   # ---- FIX D: SLICE PATH ERRADO (erro COMPOSTO com o fix A) ----
@@ -256,6 +262,8 @@ nodes:
     impact: 4
     confidence: 0.8
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1: worker CONFIRMED e juiz opus/high APROVOU a medicao (run wf_113a587e-715)"
     label: "FIX D+A fecho — elevar Logto+Postgres ao MESMO patamar, agora em 3 CAMADAS (a v2 tinha 2 e a de baixo era decorativa): (1) /etc/systemd/system/onion.slice EXPLÍCITO com MemoryMin=512M/MemoryLow=768M — o slice PAI, sem o qual a camada 2 é decorativa (teto de ancestral); (2) /etc/systemd/system/onion-auth.slice com os mesmos floors; (3) compose: mem_reservation (memory.low) + oom_score_adj -500 (este funciona, medido) + cgroup_parent: onion-auth.slice. VERIFICAÇÃO no path REAL: systemctl show -p Slice, cat /sys/fs/cgroup/onion.slice/onion-auth.slice/memory.min, systemd-cgls e check_floor() percorrendo a cadeia. Se os containers não entrarem no slice, fica só o oom_score_adj e o gap é DECLARADO E ABERTO"
 
   - id: Q_docker_cgroup_driver
@@ -302,7 +310,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): As 4 claims do label seguem TECNICAMENTE VERDADEIRAS (re-medidas ao vivo hoje, idênticas ao que o label descreve) — mas o nó é um DECISION com status:open, e uma decisão de 'qual c"
     label: "FIX E fecho — e o 'fix óbvio' TAMBÉM não serve: jq -R 'split(\".\")|.[1]|@base64d|fromjson' FALHA IGUAL (medido: jq-1.7 implementa @base64d como base64 ESTRITO, não base64url — com payload contendo '-' retorna 'is not valid base64 data', exit 5; ele tolera padding ausente, não o alfabeto). COMANDOS CORRETOS, ambos validados neste host: PRIMÁRIO decode_jwt() em node (MESMO runtime do bridge, v22.23.1, Buffer.from(s,'base64url') nativo, distingue 'NAO E JWT / token opaco' de 'meu decoder quebrou'); FALLBACK jq com gsub('-';'+')|gsub('_';'/') + repadding EXPLÍCITO. REGRA: a prova NUNCA silencia stderr e SEMPRE separa os 3 vereditos (3 partes+aud ok / 3 partes+aud errado / token opaco)"
 
   # ---- FIX F: A ORDEM DOS PASSOS ERA CIRCULAR ----
@@ -378,7 +388,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.85
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó está status=open (decisão pendente de execução), mas o desenho que ele descreve (gate OIDC duplo: 1 resource + PKCE humano + client_credentials serviço, mesmo middleware, subs"
     label: "GATE OIDC DUPLO: 1 API Resource (https://bridge.onionevolve.com) + 2 clients. (a) HUMANO = SPA/Native PÚBLICO com Authorization Code+PKCE — ZERO client_secret distribuído, sub = id do USUÁRIO (fecha o alvo 'não há QUEM'), revogável por pessoa. (b) SERVIÇO = M2M client_credentials, secret só no servidor (pass do VPS), sub == client_id. MESMA audiência, MESMO middleware, UM caminho de validação (distingue quem DEPOIS de validar). Substitui o AUTH_TOKEN; NÃO altera o bypassPermissions. Custo nomeado: C_pkce_moves_credential_to_device"
 
   - id: D_rbac_two_layers
@@ -470,7 +482,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó descreve um mecanismo de fail-closed EM VIGOR para BRIDGE_AUTH_MODE (default enforce, parsing fail-closed, opt-out nomeado com data de expiração, WARN a cada boot, FLIP = remo"
     label: "FAIL-CLOSED (aprovado pelos verifies, PRESERVADO): BRIDGE_AUTH_MODE com AUSENTE = enforce; qualquer valor que não seja exatamente 'dual-legacy' (typo, vazio, 'false', '0') também cai em enforce (falhar fechado inclui falhar fechado no PARSING). O opt-out é explícito, nomeado, comentado com DATA DE EXPIRAÇÃO CONCRETA (fix K: '# EXPIRA 2026-08-08', não mais o placeholder '2026-07-2X' que ia COLADO pro EnvironmentFile) e loga WARN a cada boot. O FLIP (P7) é REMOVER a linha — o estado seguro é o estado SEM configuração, e o rollback é re-adicionar"
 
   - id: D_legacy_fn_defined
@@ -527,7 +541,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó descreve uma deliberação de risco sobre 'o flip que vai criar dependência dura' — mas o flip já foi executado, endurecido e estabilizado há semanas: P11 (2026-08-13) removeu A"
     label: "O flip CRIA uma dependência dura que não existia (hoje o bridge compara uma string sozinho). Sob Logto-down: JWKS cacheado (cacheMaxAge 10min/cooldown 30s) segue validando JWTs já emitidos até rotação/expiração => 200; emissão de token novo falha => depois da expiração, 401 = entrada INACESSÍVEL. Fail-closed: SEGURO, porém INDISPONÍVEL. RECUSADO explicitamente: fallback 'se o Logto não responder, aceita o AUTH_TOKEN' — DOWNGRADE ACIONÁVEL POR ATACANTE (derrubar o IdP reativa o segredo). Mitigações: /health do bridge NÃO consulta o Logto (senão vira loop de restart); SSH por chave independe do Logto — o maestro nunca fica trancado fora da MÁQUINA, só da conveniência mobile, e é isso que sustenta o rollback do P7"
 
   - id: C_logto_lower_tier_ok
@@ -590,7 +606,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.85
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): A_spec_turnkey descreve um desenho ESPECÍFICO (gate OIDC duplo + guarda de canonicalização dedicada `canonicalPath` com laço de decode de 3 voltas fail-closed + `app.use('*', requi"
     label: "SPEC TURNKEY M2 v3 (este doc, corrigido pelos 14 fixes A-N do 2º verify adversarial) — desenho do gate OIDC DUPLO + guarda de canonicalização + ordem de middleware por assertion + passos LINEARES reversíveis + endurecimento QUE PROTEGE DE FATO + 23 provas. Segurança defensiva; NÃO promete L1-L6. As posições superadas ficam inline marcadas, não apagadas. LIÇÃO-EIXO da revisão: CONFIGURADO NÃO É PROTEGIDO, DECLARADO NÃO É VERIFICADO — apareceu 3x (floor zerado pelo ancestral, allowlist atravessada por %2e%2e, comando de prova que rotearia a um plano-B mais fraco por bug de shell), e as 3 só apareceram porque alguém RODOU O COMANDO em vez de reler o texto"
 
   - id: A_flip_steps_reversible
@@ -600,7 +618,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.85
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó descreve um plano turnkey ABERTO (P0 pré-flight -> ... -> P9 aposentar) com a propriedade explícita 'Reversível em segundos por UMA LINHA DE ENV até P8'. A medição mostra que "
     label: "PASSOS TURNKEY v3 (ordem LINEAR, cada um com rollback): P0 pré-flight (P0.1 systemd/Caddyfile · P0.2 ENUMERAR ROTAS · P0.2b ORDEM DE REGISTRO · P0.2c onde vive o /a2a · P0.3 SSE · P0.4 cortesia/BYOK · P0.5 sign-up · P0.6 CGROUP DRIVER do docker) -> P1 API Resource -> P2 M2M App -> P3 role+atribuição+SPA PKCE+sign-up OFF+token curto -> P4 PROVAS (RFC 8707 com decode_jwt que funciona · prova do B1 · emissão humana · registrar o plano) -> P5 middleware (use PRIMEIRO + assertion de boot + guarda de path + alg pinado + legacyAuthTokenOk definida + EXPIRA 2026-08-08) -> P6 os DOIS chamadores mandam Bearer -> P7 O FLIP = REMOVER a linha -> P8 as 23 provas -> P9 aposentar na MESMA janela. Reversível em segundos por UMA LINHA DE ENV até P8"
 
   - id: A_verification
@@ -610,7 +630,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.85
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): A_verification é o relatório v3 (23 provas) que sustentava a segurança do FLIP proposto pelas decisões D_default_deny_routes/D_fail_closed_default/D_gate_oidc_dual/D_path_canon_gua"
     label: "VERIFICAÇÃO v3 (23 provas; a v2 tinha 19). NOVAS/CORRIGIDAS: #3 prova do B1 (fix J); #12 PATH-TRAVERSAL — o MESMO corpus de 12 payloads que a guarda passou em bancada (%2e%2e, ..%2f, %2f%2f, //, %252e duplo-encode, %zz decode inválido, %00, %5c, sob /icons e /.well-known) todos 401 contra o host real, com --path-as-is OBRIGATÓRIO (sem ele o próprio curl normaliza e o teste vira teatro), MAIS o contra-teste que impede zelo cego: /assets/logo%20final.svg segue 200 (espaço percent-encoded não é traversal; guarda que nega isso quebra a PWA e será desligada); #13 nenhum 5xx no traversal (exceção não-tratada poderia contornar o gate); #14 ORDEM — assertion de boot não dispara, requireIdentity no índice 0, e teste NEGATIVO em dev (mover o use => o serviço TEM de morrer no boot); #21 FLOORS EFETIVOS via check_floor() percorrendo a cadeia (antes do fix, medido: TETO DE ANCESTRAL system.slice=0) + oom_score_adj do processo; #22 slice no PATH REAL /sys/fs/cgroup/onion.slice/onion-auth.slice/; #23 /a2a segue gateado após o flip. MANTIDAS: emissão M2M+HUMANA, 401 sem/inválido/expirado/AUDIÊNCIA ERRADA, 403 sem scope, 200 nos dois, assets 200 sem token, /health 200, mutação em prefixo aberto 401, env some/lixo => 401, AUTH_TOKEN recusado após P9, janela real do JWKS medida"
 
   # ---- ENDURECIMENTO (estado, com o frescor honesto) ----
