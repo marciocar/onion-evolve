@@ -1,10 +1,14 @@
-# adapter: a2a-live — 🔒 GATED (endpoint = stub F2.2 na VPS; gate de segurança já EXISTE no core)
+# adapter: a2a-live — endpoint VIVO desde 2026-07-09; ACEITAÇÃO segue humana (gated)
 
-> **ENDPOINT NÃO IMPLEMENTADO** (canal vivo fica no repo privado `~/onion-bridge` da VPS). Mas a **fundação de
-> segurança do receptor JÁ EXISTE no core** (F2.2 fase-1): o gate `a2a-verify.sh` (verificação-antes-de-agir,
-> 6 camadas, fail-safe) + `a2a-ssrf-check.sh` + o Agent Card gerado. Este contrato agora aponta para eles.
-> `detect-transport.sh` só retorna `a2a-live` via `FEDERATION_TRANSPORT=a2a-live` explícito, avisando que o
-> **canal** é stub. Nada aqui abre socket.
+> **CORREÇÃO 2026-08-30 (censo, juiz adversarial): o endpoint ESTÁ implementado e VIVO.** A frase
+> anterior — "ENDPOINT NÃO IMPLEMENTADO" — ficou CADUCA e quase virou carimbo: um worker a citou como
+> evidência e o juiz mediu **200** em `GET /.well-known/agent-card.json` (serviço `onion-vps-bridge`
+> ativo; `POST /a2a` com a2aGuard + pool de token dedicado; 1º handshake real registrado no diário em
+> **2026-07-09**). O que SEGUE gated é a **ACEITAÇÃO**: todo payload entra em `data/a2a-pending/` e só
+> vira inbox por ato humano (`a2a-accept.sh`) — o transporte nunca é auto-selecionado. Doutrina:
+> declaração de doc ≠ estado do sistema ([[behavior-over-declaration]]); este cabeçalho agora descreve
+> o que o sistema FAZ.
+
 
 ## Desenho (fundamentado — pesquisa `research/federation-2026/G1` + RFC-0004 §3)
 

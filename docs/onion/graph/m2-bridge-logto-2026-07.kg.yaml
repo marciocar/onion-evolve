@@ -441,7 +441,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
+    status: refuted
     label: "DEFAULT-DENY (aprovado pelos verifies, PRESERVADO): o middleware É montado globalmente, mas existe uma ALLOWLIST ANCORADA do que é ABERTO (assets da PWA, /health, /callback do OIDC, .well-known — só GET/HEAD). INVARIANTE: toda rota que toca o Agent SDK está coberta POR CONSTRUÇÃO — rota nova nasce PROTEGIDA. O inverso (lista de rotas protegidas) falha do lado errado: UM POST /invoke esquecido = bypass TOTAL. Auditoria vira 'a allowlist tem algo que não devia?' (lista curta e fixa) em vez de 'listei todas?'. MAS o default-deny só vale se D_path_canon_guard e D_middleware_order_first estiverem no lugar — sem eles, é allowlist furada e middleware pulável"
 
   - id: Q_route_inventory
@@ -1540,6 +1540,18 @@ nodes:
     verified_against: "acolhimento provado por comportamento 2026-08-23 (ordem do maestro): a org orfa no Logto (nome comercial, id 9mt40fgqoudb, membro marciog) foi RENOMEADA para o id publico do membro via PATCH /organizations; ANTES nome comercial / DEPOIS name=granaai; a projecao --project-federation passou a reportar '✅ sem divergencia: Logto == SSOT' e granaai saiu de 'sem org'. Mapa docs/onion/federation-orgs.json regenerado (--write-org-map)"
     trace: docs/onion/federation-orgs.json
     label: "D5 RESOLVIDO: a org orfa do Logto (que a re-verificacao pegou em ato) foi ACOLHIDA — renomeada ao id publico do membro (granaai), casando a regra org.name==id-do-membro do projetor. Logto == SSOT de novo; nome comercial saiu do Logto (doutrina id-nao-comercial). O projetor NUNCA absorve por conta propria (D5); a decisao foi do maestro e a execucao, cirurgica"
+  - id: E_default_deny_never_existed
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff) + selo do maestro 2026-08-30: leitura do src vivo e do historico git completo do server.ts"
+    label: "REFUTA [D_default_deny_routes]: o default-deny por middleware global + allowlist ancorada NUNCA foi implementado — nem em producao nem em NENHUM ponto do historico git. O codigo sempre praticou o modelo INVERSO que o proprio label nomeia como perigoso: lista fixa de rotas PROTEGIDAS (authGuard/a2aGuard rota-a-rota), com todo o resto aberto por default (incluindo o catch-all estatico). A decisao foi escrita como se descrevesse o sistema, e o sistema nunca a conheceu. A superficie de risco que ela mitigaria segue mapeada por Q_route_inventory (vivo). Selado REFUTED pelo maestro em 2026-08-30."
+    trace: "/home/onion/onion-bridge/src/server.ts (historico completo)"
+
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -2112,3 +2124,6 @@ edges:
   - from: C_p9_prereq_done_admin_oidc
     to: C_p9_blocked_no_admin_oidc
     edge_type: SUPERSEDES
+  - from: E_default_deny_never_existed
+    to: D_default_deny_routes
+    edge_type: REFUTES

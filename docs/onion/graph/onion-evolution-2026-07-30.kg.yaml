@@ -78,7 +78,7 @@ nodes:
     plane: DEV
     impact: 1
     confidence: 0.6
-    status: open
+    status: refuted
     label: "D7/opportunistic (baixo valor): docs de DISCUSSÃO (onion-pessoal-marcio, proto/README, technical-context/contributing) usam links relativos internos que RESOLVEM mas divergem da convenção de links absolutos do .claude/. Fora da superfície de comando/agente — cosmético"
     trace: "docs/discussions/onion-pessoal-marcio/"
   # ── REFUTADOS (a auto-correção — o que a auditoria pegou de si mesma) ──
@@ -128,6 +128,17 @@ nodes:
     verified_against: relatorio-escrito
     label: "O relatório do evolve (projeção deste grafo — vista markdown, não fonte paralela)"
     trace: "docs/analysis/onion-evolution-2026-07-30.md"
+  - id: E_no_absolute_link_convention
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-08-30
+    verified_against: "censo lote 7 (run wf_05b33768-48c) + selo do maestro 2026-08-30: code-standards.md par.2.5 linha 91 + varredura dos 55 arquivos de .claude/commands/"
+    label: "REFUTA [C_d7_discussion_links]: a 'convencao de links absolutos do .claude/' que o no dizia divergida NAO EXISTE — a SSOT (docs/meta-specs/code-standards.md par.2.5) manda exatamente o OPOSTO ('sempre paths relativos, nao absolutos') e a pratica dos 55 arquivos de .claude/commands/ e 100%% relativa. Os docs de discussao estavam CONFORMES; a divergencia era com uma regra imaginada. Selado REFUTED pelo maestro em 2026-08-30."
+    trace: "docs/meta-specs/code-standards.md"
+
 edges:
   - from: D_veredito_saudavel
     to: Q_saude_do_framework
@@ -165,3 +176,6 @@ edges:
   - from: A_relatorio_evolve
     to: D_veredito_saudavel
     edge_type: TRACES_TO
+  - from: E_no_absolute_link_convention
+    to: C_d7_discussion_links
+    edge_type: REFUTES
