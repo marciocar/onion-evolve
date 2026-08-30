@@ -15,7 +15,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.5
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O no ficou aberto como pergunta guarda-chuva, mas ambas as claims que ele contem ja foram respondidas e confirmadas dentro do proprio grafo (C_IDENTITY_CANON, C_FLOW_EVOLUTION) e a"
     label: "o que o Onion e de verdade hoje vs o pitch, e qual o fluxo real"
   - id: Q_ICP
     node_type: question
@@ -191,7 +193,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.8
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O label registra uma DECISAO em aberto de 2026-07-11: adotar KG SDAAL vivo como 'padrao CANDIDATO' para o conhecimento das verticais. O vivo mostra que isso deixou de ser candidato"
     label: "construir conhecimento das verticais como KG SDAAL vivo (padrao candidato)"
     trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md"
   - id: D_PHASE_ORDER

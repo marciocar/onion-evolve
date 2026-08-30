@@ -72,7 +72,9 @@ nodes:
   - id: ENT_email
     node_type: entity
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O label de ENT_email afirma 3 coisas: (1) servico de email NAO EXISTE / gap nomeado; (2) Logto SEM conector de email travou convite por org, forcando o redesenho --enroll; (3) um s"
     impact: 4
     confidence: 0.9
     label: "EMAIL: NAO EXISTE — gap nomeado. Logto SEM conector de email travou convite por org (forcou redesenho --enroll). Servico de email na VPS destravaria convites E seria ferramenta de membro"

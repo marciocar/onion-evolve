@@ -5,26 +5,39 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**190 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**175 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
-## m2-bridge-logto-2026-07 — 43 item(ns)
+## m3-federation-admin-2026-07 — 17 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 119.0 | `D_gate_oidc_dual` | m2-bridge-logto-2026-07 | GATE OIDC DUPLO: 1 API Resource (https://bridge.onionevolve.com) + 2 clients. (a) HUMANO = SPA/Native PÚBLICO com Authorization C |
-| 51.0 | `A_flip_steps_reversible` | m2-bridge-logto-2026-07 | PASSOS TURNKEY v3 (ordem LINEAR, cada um com rollback): P0 pré-flight (P0.1 systemd/Caddyfile · P0.2 ENUMERAR ROTAS · P0.2b ORD |
+| 64.0 | `D_spec_now_build_gated` | m3-federation-admin-2026-07 | SPEC-agora / BUILD-gated — especificar o command-side (mutação de members.yaml) + modelo de auth (Logto Organizations) SEM con |
+| 18.0 | `C_reuse_readmodel` | m3-federation-admin-2026-07 | REUSAR o read-model já entregue: console HTML (F1.3), federation-radar (3 checks advisory), pin-integrity-check (gate real), grap |
+| 15.6 | `C_auth_logto_sdaal` | m3-federation-admin-2026-07 | AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariân |
+| 11.2 | `C_op_update` | m3-federation-admin-2026-07 | OP-3 ATUALIZAR (pin/trust/specializations/personality_summary): escrever onion_version novo (pós pin-integrity-check) e editar a  |
+| 8.4 | `C_op_promote` | m3-federation-admin-2026-07 | OP-2 PROMOVER (role: standalone→hub / consumer→T2): atualizar o campo role: no members.yaml do core. Hoje --promote-hub só re |
+| 8.4 | `C_trust_matrix_stays_onion` | m3-federation-admin-2026-07 | RBAC do Logto (admin/member por org) é grosso demais p/ a matriz fina (can_receive_from/can_advise_to/can_correct_to/diary_readab |
+| 7.0 | `Q_gatilho` | m3-federation-admin-2026-07 | GATILHO objetivo do build: o 1º membro role:consumer (T2) REAL em members.yaml (introduz hub-owner que precisa de visão/ação e |
+| 5.8 | `C_op_revoke` | m3-federation-admin-2026-07 | OP-4 REVOGAR/DESATIVAR (status: retired / remover linhagem obsoleta): nenhum script/comando existe; o padrão observado é anotar  |
+| 5.6 | `C_commodity_vs_diff` | m3-federation-admin-2026-07 | FRONTEIRA commodity-BUY (Logto) × diferencial-BUILD (Onion): comprar identidade/sessão/token/MFA/CRUD de org/Secret Vault (undif |
+| 5.2 | `C_p3_self_service` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): self-service de onboarding multi-squad (mata a dor 'cada dev usa IA de um jeito; nenhuma trilha'). O  |
+| 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
+| 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
+| 3.6 | `C_p3_agg_view` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): visão agregada de adoção/consistência entre N repos/times DA MESMA empresa (multi-tenant no senti |
+| 3.6 | `C_p4_gate_visibility` | m3-federation-admin-2026-07 | REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e |
+| 3.6 | `Q_members_ci_gate` | m3-federation-admin-2026-07 | M2 (revisão adversarial 2026-08-27): members-validate.sh valida na ROTA do comando (Passo 7) e no selftest sobre fixtures, mas N |
+| 3.3 | `Q_auth_decision` | m3-federation-admin-2026-07 | Plugar Logto no command-side é decisão do maestro, ainda NÃO tomada (o bridge hoje usa AUTH_TOKEN próprio, não Logto). Auth b |
+| 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
+
+## m2-bridge-logto-2026-07 — 34 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
 | 45.0 | `D_default_deny_routes` | m2-bridge-logto-2026-07 | DEFAULT-DENY (aprovado pelos verifies, PRESERVADO): o middleware É montado globalmente, mas existe uma ALLOWLIST ANCORADA do que  |
-| 38.2 | `A_verification` | m2-bridge-logto-2026-07 | VERIFICAÇÃO v3 (23 provas; a v2 tinha 19). NOVAS/CORRIGIDAS: #3 prova do B1 (fix J); #12 PATH-TRAVERSAL — o MESMO corpus de 12 |
-| 36.0 | `D_fail_closed_default` | m2-bridge-logto-2026-07 | FAIL-CLOSED (aprovado pelos verifies, PRESERVADO): BRIDGE_AUTH_MODE com AUSENTE = enforce; qualquer valor que não seja exatamente |
-| 27.0 | `D_fix_ancestor_floor` | m2-bridge-logto-2026-07 | FIX A fecho — o conserto NÃO é mexer em Caddy/bridge (estão corretos no nível deles): é DECLARAR A PROTEÇÃO NO ANCESTRAL. |
 | 25.6 | `D_resource_plan_b` | m2-bridge-logto-2026-07 | ESCADA A->B1->B2->B3 (aprovada pelos verifies, PRESERVADA) — PROVA ANTES do desenho depender (P4.1) + PLANO-B escrito: A = resou |
 | 22.4 | `D_logto_same_protection_tier` | m2-bridge-logto-2026-07 | FIX D+A fecho — elevar Logto+Postgres ao MESMO patamar, agora em 3 CAMADAS (a v2 tinha 2 e a de baixo era decorativa): (1) /etc/ |
 | 18.0 | `D_middleware_order_first` | m2-bridge-logto-2026-07 | FIX C fecho — EXIGÊNCIA no P5: app.use('*', requireIdentity) é o PRIMEIRO handler registrado, antes de TODA rota, de TODO app. |
-| 18.0 | `D_path_canon_guard` | m2-bridge-logto-2026-07 | FIX B fecho — GUARDA DE CANONICALIZAÇÃO OBRIGATÓRIA (canonicalPath), fail-closed: (1) decodifica em laço curto (3 voltas, pe |
-| 17.0 | `C_logto_now_critical` | m2-bridge-logto-2026-07 | O flip CRIA uma dependência dura que não existia (hoje o bridge compara uma string sozinho). Sob Logto-down: JWKS cacheado (cach |
-| 14.4 | `D_proof_command_fixed` | m2-bridge-logto-2026-07 | FIX E fecho — e o 'fix óbvio' TAMBÉM não serve: jq -R 'split(\".\")·.[1]·@base64d·fromjson' FALHA IGUAL (medido: jq-1.7 im |
 | 13.5 | `C_hono_registration_order_bypass` | m2-bridge-logto-2026-07 | FIX C — no Hono a cadeia segue a ORDEM DE REGISTRO: um handler registrado ANTES do app.use('*', requireIdentity) responde SEM PA |
-| 12.8 | `A_spec_turnkey` | m2-bridge-logto-2026-07 | SPEC TURNKEY M2 v3 (este doc, corrigido pelos 14 fixes A-N do 2º verify adversarial) — desenho do gate OIDC DUPLO + guarda de c |
 | 11.4 | `D_pin_jwt_algorithms` | m2-bridge-logto-2026-07 | ALG PINADO (aprovado pelos verifies, PRESERVADO): no jwtVerify (jose) do §3.3, fixar explicitamente algorithms: ['RS256'] (ou ['E |
 | 10.8 | `C_docker_floor_gap` | m2-bridge-logto-2026-07 | GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: |
 | 10.8 | `D_posture_anchored_correctly` | m2-bridge-logto-2026-07 | FIX G — a POSTURA (o maestro executa o flip de auth, a sessão especifica) se MANTÉM, mas ancorada onde de fato se ancora: (1)  |
@@ -55,28 +68,6 @@
 | 2.4 | `Q_default_api_resource_b1` | m2-bridge-logto-2026-07 | FIX J — o 'default API resource do tenant' era apresentado como FALLBACK PREFERIDO (B1) SEM VERIFICAÇÃO NENHUMA: tão VPS-DECL |
 | 1.6 | `Q_byok_courtesy_mode` | m2-bridge-logto-2026-07 | INFERÊNCIA A VERIFICAR: a citação '2 modos cortesia-login + BYOK (X-Anthropic-Key)' vem do app-irmão onion-pessoal-app, NÃO d |
 
-## m3-federation-admin-2026-07 — 17 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 64.0 | `D_spec_now_build_gated` | m3-federation-admin-2026-07 | SPEC-agora / BUILD-gated — especificar o command-side (mutação de members.yaml) + modelo de auth (Logto Organizations) SEM con |
-| 18.0 | `C_reuse_readmodel` | m3-federation-admin-2026-07 | REUSAR o read-model já entregue: console HTML (F1.3), federation-radar (3 checks advisory), pin-integrity-check (gate real), grap |
-| 15.6 | `C_auth_logto_sdaal` | m3-federation-admin-2026-07 | AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariân |
-| 11.2 | `C_op_update` | m3-federation-admin-2026-07 | OP-3 ATUALIZAR (pin/trust/specializations/personality_summary): escrever onion_version novo (pós pin-integrity-check) e editar a  |
-| 8.4 | `C_op_promote` | m3-federation-admin-2026-07 | OP-2 PROMOVER (role: standalone→hub / consumer→T2): atualizar o campo role: no members.yaml do core. Hoje --promote-hub só re |
-| 8.4 | `C_trust_matrix_stays_onion` | m3-federation-admin-2026-07 | RBAC do Logto (admin/member por org) é grosso demais p/ a matriz fina (can_receive_from/can_advise_to/can_correct_to/diary_readab |
-| 7.0 | `Q_gatilho` | m3-federation-admin-2026-07 | GATILHO objetivo do build: o 1º membro role:consumer (T2) REAL em members.yaml (introduz hub-owner que precisa de visão/ação e |
-| 5.8 | `C_op_revoke` | m3-federation-admin-2026-07 | OP-4 REVOGAR/DESATIVAR (status: retired / remover linhagem obsoleta): nenhum script/comando existe; o padrão observado é anotar  |
-| 5.6 | `C_commodity_vs_diff` | m3-federation-admin-2026-07 | FRONTEIRA commodity-BUY (Logto) × diferencial-BUILD (Onion): comprar identidade/sessão/token/MFA/CRUD de org/Secret Vault (undif |
-| 5.2 | `C_p3_self_service` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): self-service de onboarding multi-squad (mata a dor 'cada dev usa IA de um jeito; nenhuma trilha'). O  |
-| 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
-| 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
-| 3.6 | `C_p3_agg_view` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): visão agregada de adoção/consistência entre N repos/times DA MESMA empresa (multi-tenant no senti |
-| 3.6 | `C_p4_gate_visibility` | m3-federation-admin-2026-07 | REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e |
-| 3.6 | `Q_members_ci_gate` | m3-federation-admin-2026-07 | M2 (revisão adversarial 2026-08-27): members-validate.sh valida na ROTA do comando (Passo 7) e no selftest sobre fixtures, mas N |
-| 3.3 | `Q_auth_decision` | m3-federation-admin-2026-07 | Plugar Logto no command-side é decisão do maestro, ainda NÃO tomada (o bridge hoje usa AUTH_TOKEN próprio, não Logto). Auth b |
-| 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
-
 ## d5-pricing-2026-07 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -89,13 +80,11 @@
 | 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
 | 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
 
-## onion-identity-2026-07 — 26 item(ns)
+## onion-identity-2026-07 — 24 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 29.2 | `C_NS1_KG` | onion-identity-2026-07 | NS1: framework que constroi conhecimento reconciliavel vivo (KG); edge mais forte, negocio nao provado |
-| 20.0 | `D_METHOD_KG` | onion-identity-2026-07 | construir conhecimento das verticais como KG SDAAL vivo (padrao candidato) |
-| 17.5 | `Q_IDENTITY` | onion-identity-2026-07 | o que o Onion e de verdade hoje vs o pitch, e qual o fluxo real |
 | 10.8 | `Q_CUSTO_DO_PORTE_NUNCA_MEDIDO` | onion-identity-2026-07 | A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara qu |
 | 10.0 | `C_ANCORA_SOLTA_79PCT` | onion-identity-2026-07 | A CONTRADICAO MEDIDA DENTRO DA PROPRIA DECISAO DE VALOR: 77 runs de orquestracao com transcript · 19 sinteses versionadas (25%)  |
 | 9.6 | `D_PHASE_ORDER` | onion-identity-2026-07 | metodo+grafo primeiro; preenchimento das verticais depois (verticais vazias) |
@@ -166,45 +155,6 @@
 |--:|---|---|---|
 | 20.0 | `D_CENSO_190_EM_LOTES` | fios-abertos | SELADO PELO MAESTRO 2026-08-30 (supersede D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA): executar o CENSO dos ~190 itens abertos do docs/bac |
 
-## gtm-decisions-2026-07 — 7 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 15.6 | `D_D5` | gtm-decisions-2026-07 | D5 — preço por camada (treino→certificação→compliance-pack→curadoria SOTA): A (escada por comparáveis) vs B (adiar/sob |
-| 13.0 | `C_D5_rec` | gtm-decisions-2026-07 | REC D5: BLEND A+B — escada por comparáveis SÓ p/ degraus vendíveis já (treino day-rate ~$1.2-2k; certificação $795-$1.5k + |
-| 7.5 | `D_D2_activation` | gtm-decisions-2026-07 | D2-ATIVAÇÃO — ligar o flywheel de moeda-dado (SSOT 6 camadas L1-L6 de mitigação de inferência, dogfoodado). Direção RATIF |
-| 6.0 | `Q_d6_message_vs_pipeline` | gtm-decisions-2026-07 | D6 mistura 'comprador da MENSAGEM' com 'comprador que fatura PRIMEIRO' — o maestro precisa decidir se D6 é POSICIONAMENTO (a qu |
-| 5.0 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
-| 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
-| 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
-
-## vps-shared-tools-2026-07 — 15 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 14.4 | `ENT_email` | vps-shared-tools-2026-07 | EMAIL: NAO EXISTE — gap nomeado. Logto SEM conector de email travou convite por org (forcou redesenho --enroll). Servico de emai |
-| 10.8 | `A_analysis_structure` | vps-shared-tools-2026-07 | ESTRUTURA DE ANALISE INICIAL (4 fases, antes do plano): F0 frame+invariantes+Elenxo catalogo-vs-plataforma · F1 pesquisa por-tool |
-| 10.8 | `Q_juiz_adversarial_nao_rodou_m8` | vps-shared-tools-2026-07 | ABERTO: a corrida serial do M8 voltou com 44% de veredito DRIFTED (4/9), acima do limiar de 30% que o /meta:kg-freshness usa para  |
-| 9.0 | `Q_monitoring_stack` | vps-shared-tools-2026-07 | PESQUISA+ELENXO: stack de observabilidade — Langfuse (LLM) × OpenTelemetry (traces/metrics padrao) × P2(?) × afins. Eixo: LLM |
-| 8.0 | `D_email_plus_logto_connector` | vps-shared-tools-2026-07 | DIRECAO: construir o servico de EMAIL E LIGAR o conector de email no LOGTO (destrava convite por org, o gap medido). Um so servico |
-| 6.3 | `ENT_monitoring` | vps-shared-tools-2026-07 | MONITORAMENTO/OBSERVABILIDADE: candidato, zero desenho. Maestro nomeou P2 (a esclarecer — Prometheus/Posthog/Phoenix?), Langfuse |
-| 6.0 | `Q_email_logto_conector_nunca_medido` | vps-shared-tools-2026-07 | ABERTO: D_email_plus_logto_connector e DIRECAO pura ('construir o servico de EMAIL e ligar o conector'), sem estado material mediv |
-| 6.0 | `Q_email_provider` | vps-shared-tools-2026-07 | PESQUISA: provider de email — SMTP self-host (Postfix/maddy) vs transacional (Resend/Postmark/SES) — deliverability, custo, e  |
-| 4.8 | `C_axis_email` | vps-shared-tools-2026-07 | TESTE-DO-EIXO email: SMTP self-host x API transacional (Resend/Postmark/SES) — SDAAL-CANDIDATO se >=2 reais intencionados; hoje  |
-| 4.8 | `C_axis_monitoring` | vps-shared-tools-2026-07 | TESTE-DO-EIXO monitoramento: DIVIDE em (a) obs-de-MAQUINA (PM2/OTel/Prometheus) = contratos DISTINTOS nao-intercambiaveis -> STACK |
-| 4.2 | `C_dissent_auth_transversal` | vps-shared-tools-2026-07 | DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como da |
-| 4.0 | `Q_p2_clarify` | vps-shared-tools-2026-07 | ESCLARECER com o maestro: o que e 'P2' no monitoramento? (Prometheus? Posthog? Phoenix/Arize? Pydantic Logfire?) — nome nao reso |
-| 4.0 | `Q_tunneling` | vps-shared-tools-2026-07 | PESQUISA+ELENXO: ngrok × Cloudflare Tunnel × Tailscale Funnel × Caddy-so. Para QUE (dev-preview? webhook inbound? exposicao efe |
-| 3.6 | `ENT_tunneling` | vps-shared-tools-2026-07 | EXPOSICAO/TUNNELING: ngrok nomeado como interessante. Avaliar fit vs o Caddy ja vivo + alternativas (Cloudflare Tunnel, Tailscale  |
-| 3.2 | `C_axis_tunneling` | vps-shared-tools-2026-07 | TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de |
-
-## guardrails-2nd-pr-state-2026-07 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 13.5 | `C_SURFACE_REMAINS_GATED` | guardrails-2nd-pr-state-2026-07 | o UNICO residuo real e a superficie /meta:guardrails — GATED (fio #4 do promotion-plan). Relabel ONION-Rn amplo = docs-pass opci |
-| 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
-
 ## identidade-onion-vps-2026-08 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -226,6 +176,25 @@
 | 5.4 | `C_BOLETIM_INFORM` | constellation-dialogic-layer-2026-07 | 3o uso: o boletim core->estrela INFORMA a estrela do que virou main (simetrico ao carteiro star->core PUSH) — 3 travas: contexto |
 | 4.0 | `D_ISOLATION_EXTENSION_GATED` | constellation-dialogic-layer-2026-07 | GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao |
 | 3.6 | `D_BOLETIM_CANDIDATE` | constellation-dialogic-layer-2026-07 | documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por es |
+
+## vps-shared-tools-2026-07 — 14 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.8 | `A_analysis_structure` | vps-shared-tools-2026-07 | ESTRUTURA DE ANALISE INICIAL (4 fases, antes do plano): F0 frame+invariantes+Elenxo catalogo-vs-plataforma · F1 pesquisa por-tool |
+| 10.8 | `Q_juiz_adversarial_nao_rodou_m8` | vps-shared-tools-2026-07 | ABERTO: a corrida serial do M8 voltou com 44% de veredito DRIFTED (4/9), acima do limiar de 30% que o /meta:kg-freshness usa para  |
+| 9.0 | `Q_monitoring_stack` | vps-shared-tools-2026-07 | PESQUISA+ELENXO: stack de observabilidade — Langfuse (LLM) × OpenTelemetry (traces/metrics padrao) × P2(?) × afins. Eixo: LLM |
+| 8.0 | `D_email_plus_logto_connector` | vps-shared-tools-2026-07 | DIRECAO: construir o servico de EMAIL E LIGAR o conector de email no LOGTO (destrava convite por org, o gap medido). Um so servico |
+| 6.3 | `ENT_monitoring` | vps-shared-tools-2026-07 | MONITORAMENTO/OBSERVABILIDADE: candidato, zero desenho. Maestro nomeou P2 (a esclarecer — Prometheus/Posthog/Phoenix?), Langfuse |
+| 6.0 | `Q_email_logto_conector_nunca_medido` | vps-shared-tools-2026-07 | ABERTO: D_email_plus_logto_connector e DIRECAO pura ('construir o servico de EMAIL e ligar o conector'), sem estado material mediv |
+| 6.0 | `Q_email_provider` | vps-shared-tools-2026-07 | PESQUISA: provider de email — SMTP self-host (Postfix/maddy) vs transacional (Resend/Postmark/SES) — deliverability, custo, e  |
+| 4.8 | `C_axis_email` | vps-shared-tools-2026-07 | TESTE-DO-EIXO email: SMTP self-host x API transacional (Resend/Postmark/SES) — SDAAL-CANDIDATO se >=2 reais intencionados; hoje  |
+| 4.8 | `C_axis_monitoring` | vps-shared-tools-2026-07 | TESTE-DO-EIXO monitoramento: DIVIDE em (a) obs-de-MAQUINA (PM2/OTel/Prometheus) = contratos DISTINTOS nao-intercambiaveis -> STACK |
+| 4.2 | `C_dissent_auth_transversal` | vps-shared-tools-2026-07 | DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como da |
+| 4.0 | `Q_p2_clarify` | vps-shared-tools-2026-07 | ESCLARECER com o maestro: o que e 'P2' no monitoramento? (Prometheus? Posthog? Phoenix/Arize? Pydantic Logfire?) — nome nao reso |
+| 4.0 | `Q_tunneling` | vps-shared-tools-2026-07 | PESQUISA+ELENXO: ngrok × Cloudflare Tunnel × Tailscale Funnel × Caddy-so. Para QUE (dev-preview? webhook inbound? exposicao efe |
+| 3.6 | `ENT_tunneling` | vps-shared-tools-2026-07 | EXPOSICAO/TUNNELING: ngrok nomeado como interessante. Avaliar fit vs o Caddy ja vivo + alternativas (Cloudflare Tunnel, Tailscale  |
+| 3.2 | `C_axis_tunneling` | vps-shared-tools-2026-07 | TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de |
 
 ## context-freshness-2026-08-12 — 2 item(ns)
 
@@ -275,6 +244,16 @@
 | 6.0 | `Q_COUNTABLE_CRITERIA` | graduated-automation-elenxo-2026-07 | Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de |
 | 6.0 | `Q_PREDICTIVE_ALERTS` | graduated-automation-elenxo-2026-07 | Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela  |
 
+## gtm-decisions-2026-07 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.5 | `D_D2_activation` | gtm-decisions-2026-07 | D2-ATIVAÇÃO — ligar o flywheel de moeda-dado (SSOT 6 camadas L1-L6 de mitigação de inferência, dogfoodado). Direção RATIF |
+| 6.0 | `Q_d6_message_vs_pipeline` | gtm-decisions-2026-07 | D6 mistura 'comprador da MENSAGEM' com 'comprador que fatura PRIMEIRO' — o maestro precisa decidir se D6 é POSICIONAMENTO (a qu |
+| 5.0 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
+| 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
+| 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
+
 ## arandek-adoption-dogfood-2026-07 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -314,6 +293,12 @@
 | 5.1 | `D_QUADRO_CITACOES` | onion-doctrine-elenxo-bulbo-2026-07 | quadro de citacoes do maestro NASCEU (gated): as formulacoes recorrentes dele, atribuidas+datadas (verbatim vs parafrase marcado)  |
 | 4.8 | `Q_RADAR_WIDGET_PARALLEL_FORMULA` | onion-doctrine-elenxo-bulbo-2026-07 | o RadarWidget de /maquinaria/ (site) DUPLICA a tabela de statusFactor do kg-radar.sh (conferida fator a fator na revisao adversari |
 | 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
+
+## guardrails-2nd-pr-state-2026-07 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
 
 ## kg-console-rich-design-2026-07 — 2 item(ns)
 
