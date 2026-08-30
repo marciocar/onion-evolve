@@ -127,7 +127,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.5
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O nó pedia CONSTRUIR a agregação por-adotante dos 4 sinais (o trabalho de instrumentação em si). Esse trabalho foi ENTREGUE integralmente: 4/4 scripts determinísticos exi"
     label: "GATE de instrumentação: 'valor medido por adotante' (metrics.md `[a instrumentar]`) — agregação por adotante de 4 sinais que já têm mecanismo host no core (ciclos concluídos via STATE.md barato-primeiro; frescor via /meta:context-freshness; velocidade/retrabalho via git+done_log; saúde federação via /meta:federation-status). Sem série temporal, nenhum degrau migra p/ preço-por-outcome (barreira BCG 2025)"
   - id: Q_p4_interviews
     node_type: question

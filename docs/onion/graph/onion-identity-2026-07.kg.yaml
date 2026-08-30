@@ -204,7 +204,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): A decisao de ordem de fase foi seguida ATE O FIM e ambas as pernas ja aconteceram no vivo: (1) metodo+grafo foi construido primeiro (este .kg.yaml de 2026-07 e a prova), "
     label: "metodo+grafo primeiro; preenchimento das verticais depois (verticais vazias)"
     trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:1"
   - id: D_NO_DISTORT
@@ -913,8 +915,8 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 1.0
-    status: open
-    verified_at: 2026-08-06
+    status: superseded
+    verified_at: 2026-08-30
     verified_against: "contagem-direta-transcripts-x-sinteses-x-grafos-irmaos"
     label: "A CONTRADICAO MEDIDA DENTRO DA PROPRIA DECISAO DE VALOR: 77 runs de orquestracao com transcript · 19 sinteses versionadas (25%) · 16 com grafo irmao (21%). QUATRO EM CADA CINCO ORQUESTRACOES NAO DEIXARAM RASTRO NO GRAFO. E o vazamento tem forma conhecida e datada: em 2026-08-06 a corrida serial do M8 mediu 4 DRIFTED contra o host vivo, escreveu na sintese, e a SSOT seguiu afirmando que o whatsapp-sender estava VIVO por 12 HORAS — ate alguem ir procurar. O /meta:kg-freshness declara o contrato certo ('o worker propoe, o maestro sela') e o SELO NAO TEM FORCING FUNCTION. Com NS1 escolhido, este laco E O PRODUTO operando a 21%, nao divida de higiene. FALSIFICADOR: se a medicao do volume mostrar que existe UM unico veredito sem selo (o do M8), entao e conserto manual e mecanizar seria catedral pelo portao 4 — a medicao decide, nao a vontade"
 

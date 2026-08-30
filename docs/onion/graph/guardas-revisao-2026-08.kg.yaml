@@ -207,8 +207,8 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.9
-    status: open
-    verified_at: 2026-08-03
+    status: done
+    verified_at: 2026-08-30
     verified_against: 'varredura de links markdown vivos p/ caminho core-privado fora de docs/knowledge-base'
     label: 'a R45 cobre 1 de 9 raizes vendorizadas — 46 links vivos p/ caminho core-privado em 21 arquivos ficam fora; o baseline em 0 declara vitoria falsa'
 

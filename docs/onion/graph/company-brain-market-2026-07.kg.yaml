@@ -250,7 +250,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.75
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O nó é composto (3 afirmações) e o veredito diverge por afirmação, mas a soma aponta para OBSOLETO, não para 'segue vivo como estava escrito': (1) a tática específica pro"
     label: "MAIS-PRÓXIMO (menor esforço × maior prob.): re-embalar ativos que já existem — nomear o KG como 'Company Brain de projeto' no material P4 + publicar a doutrina de inferência como thought-leadership. Zero código novo, risco doutrinário ~zero, alavanca whitespace. Amarra em D6=MENSAGEM P4"
   - id: D_mais_valor
     node_type: decision

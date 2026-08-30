@@ -156,7 +156,9 @@ nodes:
   - id: Q_monitoring_stack
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O nó está status:open pedindo pesquisa que já foi EXECUTADA e RESPONDIDA (com Elenxo real: 4 pesquisas orquestradas + crítico adversarial + verificação independente do ma"
     impact: 3
     confidence: 1.0
     label: "PESQUISA+ELENXO: stack de observabilidade — Langfuse (LLM) × OpenTelemetry (traces/metrics padrao) × P2(?) × afins. Eixo: LLM-observability vs infra-observability vs os dois; self-host na VPS vs SaaS; custo/atrito. verify-external-for-current OBRIGATORIO (versoes/GA mudam)"
@@ -268,7 +270,9 @@ nodes:
   - id: Q_juiz_adversarial_nao_rodou_m8
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O núcleo mecânico do nó (claim 1: o limiar de 30% DRIFTED gateava o juiz adversarial e por isso ele não rodou no M8 apesar de 44% de drift; claim 4: um contraditório pega"
     impact: 4
     confidence: 0.9
     label: "ABERTO: a corrida serial do M8 voltou com 44% de veredito DRIFTED (4/9), acima do limiar de 30% que o /meta:kg-freshness usa para escolher TIER de juiz (opus/high, Passo 3 linha 117) — e nenhum juiz rodou. CORRECAO DE LEITURA (Elenxo 2026-08-07): isso e TIERING nao executado, NAO precondicao de escrita; o gate do Passo 4 e o maestro, e o maestro selou. O peso real vem de outro lugar: o worker do M8 ERROU de fato numa medicao (afirmou que nao havia diretorio; ele existe em /home/onion/onion-bridge/workspaces/7f2a16301adad917/whatsapp-sender), e foi so a leitura humana que pegou. Um contraditorio teria pego mais barato"
