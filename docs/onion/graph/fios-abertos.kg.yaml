@@ -222,17 +222,6 @@ nodes:
     verified_against: 'os 3 itens gated da amostra (C_sota_subscription, D_QUADRO_CITACOES e o D2 do pricing) estavam TODOS parados sob controle, com gatilho intacto e nao-disparado: zero falso-positivo'
     label: 'CONTRAPONTO MEDIDO, e ele credita a maquinaria: enquanto 60%% da amostra apodreceu, os itens GATED com gatilho nomeado tiveram ZERO falso-positivo — todos parados sob controle, todos com gatilho intacto. "Parado SOB CONTROLE != orfao" nao e retorica: e a metade da maquina que esta funcionando. O que apodrece e o item que alguem PAGOU e nao carimbou, nao o item que espera gatilho'
 
-  - id: Q_CENSO_EM_VEZ_DE_AMOSTRA
-    node_type: question
-    plane: DEV
-    impact: 4
-    confidence: 0.9
-    verified_at: 2026-08-29
-    status: done
-    verified_against: 'a amostra de 15 existiu para ser COMPARAVEL a baseline; agora que a resposta e "subiu", o proximo passo natural e o censo — que alem do numero devolve a LISTA dos mortos, isto e, o trabalho de fechamento ja pronto'
-    label: 'RESPONDIDA 2026-08-29 pelo custo unitario medido. ⚠️ A 1a REDACAO DESTA RESPOSTA FOI REPROVADA PELA REVISAO E ESTA RETIRADA: ela acusava o no de "errar por 3x" ("a fila nao e 192, sao 612") tendo TROCADO A POPULACAO — os 192 sempre foram os ITENS ABERTOS do docs/backlog.md (hoje 191), enquanto os 612 eram nos PROD/impact>=4, uma populacao 96%% JA FECHADA. Foi a MESMA manobra de denominador que esta casa acabara de medir nos workers, cometida na pagina seguinte. A RESPOSTA COM O DENOMINADOR CERTO: 191 itens x 139.537 tok/no = 26,7M tokens. Continua sem caber numa sessao (orcamento restante ~14,5M), mas por margem de 1,8x e nao de 6x — e o veredito honesto e "nao cabe DE UMA VEZ", nao "nao cabe". O motivo FORTE de nao rodar agora sobrevive intacto e nao e preco: no mesmo dia mediu-se que o schema do /meta:kg-freshness e RECUSADO pela API e que os workers subcontam o denominador em ~48%%. Censo com instrumento quebrado nao dissolve vies — multiplica-o. A hipotese barata (idade do carimbo predizendo drift) foi testada e CAIU: o carimbo codifica o proprio resultado, entao o preditor era circular; o no que a afirmava foi removido deste lote.'
-    trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/'
-
   - id: E_CUSTO_UNITARIO_DA_REVERIFICACAO
     node_type: evidence
     plane: PROD
@@ -248,11 +237,21 @@ nodes:
     node_type: decision
     drive_kind: decision
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.85
     label: 'PROPOSTA AO MAESTRO (decisao NAO-TOMADA — `drive_kind: decision`, o driver propoe, nao executa): trocar o censo por AMOSTRA ESTRATIFICADA, e so depois de curado o instrumento. (a) Estratificar por grafo e por status dissolve os vieses que o Q_CENSO nomeia sem pagar a populacao inteira. (b) O juizo adversarial deixa de ser condicional aos >30%% e vira ETAPA FIXA: foi ele, e so ele, que pegou a subcontagem de 48%% — e foi ele que reprovou ESTE lote em 8 achados ALTA. ⚠️ O item de PRE-FILTRO POR IDADE DE CARIMBO, que a 1a redacao trazia, foi RETIRADO: o preditor era circular e o no que o afirmava saiu do lote. ⚠️ E ESTA PROPOSTA NAO E SOBERANA: a mesma pergunta ja existe ABERTA no grafo de origem como `Q_CENSO_DOS_63_CORTADOS`, com o MESMO gatilho (rodar depois que a cura do schema estiver em main). Duas propostas abertas sobre re-verificacao-em-escala em dois arquivos, e o radar nao cruza arquivos — quem selar deve fechar UMA das duas, nao ambas.'
     trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/'
+
+  - id: D_CENSO_190_EM_LOTES
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 1.0
+    label: 'SELADO PELO MAESTRO 2026-08-30 (supersede D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA): executar o CENSO dos ~190 itens abertos do docs/backlog.md com o /meta:kg-freshness curado — juiz FIXO escopado aos CONFIRMED, corte declarado. EM LOTES retomaveis (o censo completo custa ~19-24M tok ao unitario medido e nao cabe numa sessao): cada lote = fan-out + juizo + checkpoint de selagem, comecando pelo topo de atencao do backlog. A decisao-mae e D_C_CENSO_190_JUIZ_EM_CONFIRMED no grafo kg-freshness-dogfood-2026-08; este no e a PONTA DE EXECUCAO na fila do drive. Entregavel final: a LISTA DOS MORTOS dos 190.'
+    trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/ (D_C_CENSO_190_JUIZ_EM_CONFIRMED)'
 
 edges:
   - from: I_R62_CATRACA_DE_PROJECAO
@@ -303,18 +302,18 @@ edges:
   - from: E_O_GATED_E_A_METADE_QUE_FUNCIONA
     to: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
     edge_type: CONSTRAINS
-  - from: Q_CENSO_EM_VEZ_DE_AMOSTRA
+  - from: D_CENSO_190_EM_LOTES
     to: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
     edge_type: DEPENDS_ON
   - from: E_A_ATENCAO_NAO_PROTEGE_CONTRA_MORTE
     to: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
     edge_type: SUPPORTS
   - from: E_CUSTO_UNITARIO_DA_REVERIFICACAO
-    to: Q_CENSO_EM_VEZ_DE_AMOSTRA
-    edge_type: SUPPORTS
-  - from: E_CUSTO_UNITARIO_DA_REVERIFICACAO
     to: D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA
     edge_type: SUPPORTS
-  - from: D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA
-    to: Q_CENSO_EM_VEZ_DE_AMOSTRA
-    edge_type: DEPENDS_ON
+  - from: D_CENSO_190_EM_LOTES
+    to: D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA
+    edge_type: SUPERSEDES
+  - from: E_CUSTO_UNITARIO_DA_REVERIFICACAO
+    to: D_CENSO_190_EM_LOTES
+    edge_type: SUPPORTS

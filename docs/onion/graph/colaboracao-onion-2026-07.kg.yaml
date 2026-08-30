@@ -18,7 +18,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: confirmed
+    status: refuted
     label: "maestro/mantenedor — dono do core; unico que relaya sinais ao core"
   - id: EN_VISITANTE
     node_type: entity
@@ -27,6 +27,8 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-08-30
+    verified_against: "piloto kg-freshness 2026-08-29: worker mediu papel contra o vivo (canais de escrita no repo); selo do maestro 2026-08-30"
     label: "colaborador visitante — acesso repo-only; entrega sinais como arquivos"
   - id: EN_REPO
     node_type: entity
@@ -230,6 +232,8 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-08-30
+    verified_against: "piloto kg-freshness 2026-08-29: worker CONFIRMED; selo do maestro 2026-08-30"
     label: "particao de visibilidade — uma SSOT, duas projecoes (interna completa x client-safe despida)"
   - id: IN_CLIENT_SAFE
     node_type: invariant
@@ -295,6 +299,16 @@ nodes:
     confidence: 0.5
     status: open
     label: "perfil colaborador-visitante + boundary de autorizacao de relay ainda nao formalizados no core"
+  - id: C_MAESTRO_NAO_E_UNICO_RELAY
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-30
+    verified_against: "git log do core: commit 5e511195 (PR #298, mesclado em main) de colaborador externo escrevendo direto em docs/evolution/inbox/ — selado pelo maestro 2026-08-30"
+    label: "REFUTA a exclusividade do relay (piloto kg-freshness 2026-08-29, juiz APROVOU a refutacao): o historico do core mostra commit de terceiro (colaborador registrado em members.yaml) escrevendo direto no caminho de relay. C1 (dono do core) confirma; C2 (unico que relaya) caiu pelo ATO — behavior-over-declaration: mesmo commit marcado como teste, o ato de relay foi de terceiro. Selado REFUTED pelo maestro em 2026-08-30."
 edges:
   # domain — papeis e canais
   - from: EN_VISITANTE
@@ -436,3 +450,6 @@ edges:
   - from: Q_AUTORIZACAO_NAO_FORMALIZADA
     to: RU_RELAY_MAESTRO
     edge_type: DEPENDS_ON
+  - from: C_MAESTRO_NAO_E_UNICO_RELAY
+    to: EN_MAESTRO
+    edge_type: REFUTES

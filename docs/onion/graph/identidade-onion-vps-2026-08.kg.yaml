@@ -208,7 +208,7 @@ nodes:
     plane: PROD
     verified_at: 2026-08-13
     verified_against: pass-sem-entrada-restic-cron-do-root-sem-offsite-e-o-script-saindo-exit-3-declarando-que-nao-fez
-    status: open
+    status: superseded
     impact: 4
     confidence: 1.0
     label: "⚠️ ATUALIZADO 2026-08-13 — O BLOQUEIO DEIXOU DE SER CONCEITUAL E VIROU UMA CONTA. Com [Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS] FECHADO (o maestro confirmou a copia fora), a armadilha circular que este no descrevia — 'a senha do repositorio nao pode morar dentro do cofre que ele protege' — esta RESOLVIDA: a senha pode viver no `pass`, porque a chave que a protege nao morre mais junto com a maquina. MEDIDO HOJE, e o mecanismo segue DESARMADO: `pass` sem entrada `restic`, `crontab -l` do root sem linha offsite, e `backup-offsite.sh` saindo **exit 3** — declarando que NAO FEZ, em vez de sair 0 parecendo que fez. ⚠️ DISTINCAO QUE O MAESTRO PEDIU EXPLICITAMENTE: ele fez um backup MANUAL (`onion-backup-offsite-20260811.tar.gz`), que e real e vale — mas nao e o mecanismo. Manual e ponto-no-tempo que depende de alguem lembrar; `restic` e incremental, versionado, com prova de restauracao no cron, e com destino de imutabilidade-do-lado-do-servidor sobrevive ate ao antipadrao dos 9 segundos de [E_ANTIPADRAO_MEDIDO_EM_PRODUCAO]. FALTA EXATAMENTE: `pass insert onion/restic-repo` + `pass insert onion/restic-password` + uma linha de cron. HISTORICO: O QUE JA ESTA FEITO: o backup do cofre e `.tar.gpg` cifrado para a MESMA chave GPG que ja e raiz do `pass` (reusar em vez de inventar — uma chave a mais e um segredo a mais para perder), com PROVA DE RESTAURACAO (decifra e devolve banco + chave de assinatura), rotacao 14, no cron. O QUE FALTA: sai do mesmo disco. PESQUISA DATADA APONTA: `restic` como ferramenta (S3-compat nativo, chave separavel; borg 2.0 ainda em beta e 1.4 e SSH-only), destino `rsync.net` (imutabilidade ZFS do lado do SERVIDOR, nao depende do cliente cooperar) ou Hetzner Storage Box (custo), e a regra virou **3-2-1-1-0**: +1 copia IMUTAVEL, +0 = ultimo teste de restore com ZERO erros como criterio FORMAL. ⚠️ A ARMADILHA ESPECIFICA DE COFRE: a senha do repositorio de backup NAO PODE morar dentro do cofre que ele protege — se o cofre corrompe, perde-se o dado E a chave ao mesmo tempo. Isto e problema circular documentado, nao teoria."
@@ -226,7 +226,7 @@ nodes:
   - id: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
     node_type: question
     plane: PROD
-    verified_at: 2026-08-12
+    verified_at: 2026-08-30
     verified_against: grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo
     trace: docs/analysis/arandek-repo-exposure-2026-08.md
     status: open
@@ -280,7 +280,7 @@ nodes:
   - id: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
     node_type: evidence
     plane: PROD
-    verified_at: 2026-08-12
+    verified_at: 2026-08-30
     verified_against: cinco-nos-com-duas-linhas-verified-at-e-o-tsv-do-radar-devolvendo-a-ultima
     status: confirmed
     impact: 4
@@ -341,6 +341,16 @@ nodes:
     confidence: 1.0
     label: "REFINA [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] sem contradiza-lo: a lacuna e real, mas o mecanismo que a fecha JA EXISTE ESCRITO. `backup-offsite.sh` (commit `31cd4f9`) usa `restic`, e o binario esta instalado (`/usr/bin/restic`). Ele sai com **exit 3** declarando que NAO FEZ, em vez de sair 0 parecendo que fez — o oposto do fail-open que derrubou o Logto no `I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE`. FALTAM EXATAMENTE TRES COISAS, e as tres sao do maestro: `pass insert onion/restic-repo`, `pass insert onion/restic-password` (destino e conta a contratar) e a linha de cron. MEDIDO com stderr visivel (nao `2>/dev/null`, que confunde 'falhou' com 'nao ha'): o cron do root tem 4 entradas — logto/backup.sh, check-version, bridge-backup, vaultwarden/backup.sh — e NENHUMA offsite; `find` por `*.tar.gpg` acha UM artefato, no mesmo `/dev/sda1`; `~/.password-store` nao tem entrada `restic`. CONSEQUENCIA PARA A LEITURA DO NO PAI: aquilo nao e pesquisa a fazer, e um interruptor esperando destino contratado."
     trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh"
+
+  - id: Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-30
+    verified_against: "piloto kg-freshness 2026-08-29 (worker mediu: pass ls mostra onion/restic-repo e onion/restic-password PRESENTES; cron e systemd seguem sem linha offsite); selo do maestro 2026-08-30"
+    label: "SUPERSEDE [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] com a verdade de 2026-08-29: a lacuna de 08-13 FECHOU PELA METADE. O pass JA TEM onion/restic-repo e onion/restic-password — o guard de exit 3 do backup-offsite.sh nao trava mais por falta de credencial. O QUE FALTA AGORA E EXATAMENTE UMA LINHA: cron ou systemd-timer chamando o offsite (medido: crontab do root e systemd sem entrada). A armadilha circular esta resolvida desde a custodia externa da chave GPG; o custo de fechar caiu de tres passos para um. GATILHO: o maestro mandar armar a linha."
 
 edges:
   - from: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
@@ -427,3 +437,6 @@ edges:
   - from: Q_LACUNA_DECISAO_MAIS_CODIGO
     to: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
     edge_type: SUPPORTS
+  - from: Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO
+    to: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
+    edge_type: SUPERSEDES
