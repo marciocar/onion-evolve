@@ -3,7 +3,7 @@ title: "Revisão — o lote de selagem do piloto: 4 decisões do maestro aplicad
 date: 2026-08-30
 branch: feat/pilot-sealing-batch
 reviewer: "o conteúdo selado JÁ passou por 3 camadas (padrão-ouro sha c975fce6 × workers × juízes opus/high, PR #715); este PR só APLICA os selos do maestro (AskUserQuestion 2026-08-30, 4 respostas) pela tabela de selagem do /meta:kg-freshness — cada flip conferido pelo radar (--integrity --schema exit 0 nos 6 grafos)"
-reviewed_diff_sha256: df1465edfc0cbff55a4b628fa24a32249a22937282197f6b59eea9eea055bb68
+reviewed_diff_sha256: bbf41b0010b151cd84458f3b9d01f359ddf5d80f09f5d9496949ddf31f992efb
 findings_total: 2
 findings_real: 2
 verdict: APROVADO
