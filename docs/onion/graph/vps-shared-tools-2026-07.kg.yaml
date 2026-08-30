@@ -167,7 +167,9 @@ nodes:
   - id: Q_email_provider
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó pede uma PESQUISA em aberto (SMTP self-host x transacional, e cruzar com a lista de conectores do Logto). Ambas as afirmações foram RESOLVIDAS e IMPLEMENTADAS no viv"
     impact: 3
     confidence: 1.0
     label: "PESQUISA: provider de email — SMTP self-host (Postfix/maddy) vs transacional (Resend/Postmark/SES) — deliverability, custo, e compatibilidade com o CONECTOR do Logto (o Logto tem lista de conectores de email suportados: cruzar)"
@@ -281,7 +283,9 @@ nodes:
   - id: Q_email_logto_conector_nunca_medido
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): A question so existe para segurar viva a leitura UNVERIFIABLE do worker do M8 ('sem estado material medivel'). Essa leitura MORREU: o estado material do conector de email"
     impact: 3
     confidence: 1.0
     label: "ABERTO: D_email_plus_logto_connector e DIRECAO pura ('construir o servico de EMAIL e ligar o conector'), sem estado material medivel — o worker do M8 devolveu UNVERIFIABLE e RECUSOU-SE a inventar uma medicao substituta, que e o contrato funcionando. Esta question existe porque o Passo 4 manda, para UNVERIFIABLE, rebaixar confidence E/OU abrir question + DEPENDS_ON: sem ela o veredito ficava mecanicamente inerte (statusFactor unverifiable == confirmed == 1.0), isto e, um selo que nao muda nada"

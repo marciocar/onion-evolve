@@ -169,7 +169,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.6
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): A pergunta pedia que o maestro decidisse se D6 era posicionamento OU pipeline, e reclamava que o card não distinguia as duas leituras. O vivo mostra que o maestro já deci"
     label: "D6 mistura 'comprador da MENSAGEM' com 'comprador que fatura PRIMEIRO' — o maestro precisa decidir se D6 é POSICIONAMENTO (a quem falar) ou PIPELINE (a quem vender antes). A recomendação assume perguntas separadas; o card não distingue"
   - id: Q_open_trigger
     node_type: question

@@ -100,6 +100,8 @@ nodes:
     impact: 3
     confidence: 1.0
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
     label: "granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETERMINADO por design"
     trace: "docs/evolution/federation/members.yaml:131"
   - id: C_PERSONALITY_SEEDS

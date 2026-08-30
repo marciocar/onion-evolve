@@ -85,7 +85,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.6
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó ficou aberto (status: open) mas a pergunta foi RESPONDIDA e RATIFICADA pelo maestro no mesmo dia de criação (2026-07-11), num documento que cita a pergunta quase pal"
     label: "papel canonico da develop: integracao GitFlow ou lane de framework"
   # ---- claims confirmados (o que ja sabemos) ----
   - id: C_IDENTITY_CANON
@@ -187,7 +189,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.7
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): A afirmacao (claim unica) segue status:open e sem verified_at neste grafo, mas o MESMO achado (mesmo trace-fonte) ja foi verificado, confirmado (verified_at 2026-07-21 no"
     label: "KG e a tecnica certa quando o conhecimento deixa de ser monotonico (contradicao/Schranke)"
     trace: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md"
   # ---- decisoes ----
@@ -592,7 +596,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.7
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O plano de experimento (probe orgânico + concierge, com guardas) nunca foi executado — os artefatos de A foram construídos (one-pager, /convite/, channel-posts.md) mas fi"
     label: "experimento cold-adopter: probe organico (onion-mini+one-pager) + concierge arms-length; 4-6 semanas, guarda anti-vaidade/anti-v4.0"
     trace: "docs/analysis/onion-experiment-cold-adopter-2026-07.md"
   # ---- re-verificacao 2026-07-17 (fan-out de 24 nos contra o vivo; append-mostly) ----
@@ -733,8 +739,8 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.8
-    status: open
-    verified_at: 2026-08-02
+    status: done
+    verified_at: 2026-08-30
     verified_against: relato-do-maestro-2026-08-02
     label: "CONSUMO EM FATIAS NAO E HIPOTESE — JA HOUVE TESTE: criacao de plugin e skills para o Onion, incluindo testes de INSTALACAO E USO DAS SKILLS DE FORMA SEPARADA, e uso do Onion (inclusive com a ponte junto ao Claude Code) COMO PARTE, sendo usado por outros projetos. ABERTO porque o RESULTADO desses testes nao esta registrado em lugar nenhum do repo — e conhecimento que existe fora do grafo. Proximo passo: o maestro relata o que mostraram, ou roda-se um teste novo com medicao"
 
