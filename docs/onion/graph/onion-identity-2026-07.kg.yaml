@@ -416,7 +416,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.55
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó registra uma tensão 'não reconciliada' congelada em 2026-07-11. No vivo, a tensão foi explicitamente reconciliada em 2026-07-25 pela decisão D6 (docs/business-contex"
     label: "tensao nao reconciliada: ICP estreito (regulado+multi-repo) vs 4 personas amplas da KB"
     trace: "F2 Q2"
   - id: C_COMPLIANCE_RARE
@@ -593,7 +595,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.3
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): Os fatos-base do claim (b) seguem tecnicamente verdadeiros hoje (control-plane de governança-de-evolução ainda não escrito, LICENSE ainda MIT) e (a) é fato histórico conf"
     label: "NS4: control-plane hospedado + open-core BSL (1 prova regulada granaai; control-plane nao escrito; maior gap desejo-vs-poder)"
     trace: "F2 Q5"
   - id: D_COLD_ADOPTER_EXP

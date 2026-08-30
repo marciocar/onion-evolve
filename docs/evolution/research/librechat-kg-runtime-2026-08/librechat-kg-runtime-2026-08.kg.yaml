@@ -172,7 +172,9 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.8
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O item não foi 'resolvido' no sentido de a política ter sido executada com sucesso contra o cenário original — ele ficou OBSOLETO: o mundo mudou por baixo. A decisão pres"
     label: "Enquanto a gap de web nao for resolvida: requisicoes de mapeamento de dominio externo vao ao Claude Code/Bridge (execucao plena), nao respondidas por invencao na face conversavel"
   - id: Q_TENANT_WRITE_DESTINATION
     node_type: question

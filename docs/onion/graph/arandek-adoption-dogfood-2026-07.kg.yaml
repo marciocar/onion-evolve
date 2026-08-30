@@ -299,7 +299,9 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.8
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó declara relay PENDENTE; o vivo mostra o relay já ENTREGUE e commitado no core (b01d740a, 2026-07-25) — um dia antes de qualquer verificação possível já estar obsolet"
     label: "relay do sinal (docs/evolution/inbox do arandek → inbox do core via /meta:co-relay) pendente — território da sessão do adotante (I3)"
     trace: "arandek docs/evolution/inbox/2026-07-24-sinal-adocao-arandek.md"
 

@@ -75,6 +75,8 @@ nodes:
     impact: 2
     confidence: 0.6
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6: worker CONFIRMED e juiz opus/high APROVOU (run wf_2d6173e4-9bf)"
     label: "Follow-up GATED (2º passo): um comando que ROLA a sequência extract→consolidate→candidatos disparando agentes sozinho? Mereceria seu próprio gate. Este PR entrega o scaffold + a doutrina, não o orquestrador — a decisão do maestro foi 'scaffold + doutrina'"
     trace: ".claude/commands/meta/kg.md"
   - id: A_helper

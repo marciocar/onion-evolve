@@ -5,9 +5,9 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**120 itens abertos** em 29 grafo(s) com aberto (de 45 no escopo) · 29 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**102 itens abertos** em 28 grafo(s) com aberto (de 45 no escopo) · 28 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
-## m3-federation-admin-2026-07 — 17 item(ns)
+## m3-federation-admin-2026-07 — 16 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -26,10 +26,9 @@
 | 3.6 | `C_p3_agg_view` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): visão agregada de adoção/consistência entre N repos/times DA MESMA empresa (multi-tenant no senti |
 | 3.6 | `C_p4_gate_visibility` | m3-federation-admin-2026-07 | REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e |
 | 3.6 | `Q_members_ci_gate` | m3-federation-admin-2026-07 | M2 (revisão adversarial 2026-08-27): members-validate.sh valida na ROTA do comando (Passo 7) e no selftest sobre fixtures, mas N |
-| 3.3 | `Q_auth_decision` | m3-federation-admin-2026-07 | Plugar Logto no command-side é decisão do maestro, ainda NÃO tomada (o bridge hoje usa AUTH_TOKEN próprio, não Logto). Auth b |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
 
-## m2-bridge-logto-2026-07 — 21 item(ns)
+## m2-bridge-logto-2026-07 — 17 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -48,11 +47,7 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2 — PROVA NOVA no P0.6: a semântica de cgroup_parent DEPENDE do cgroup driver do docker. MEDIDO hoje: driver = systemd (h |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 | 4.2 | `Q_p10_mutation_not_run` | m2-bridge-logto-2026-07 | FRONTEIRA DECLARADA: o controle de mutacao (remover o filtro e reprovar que o canario passa) NAO foi rodado — exigiria desligar  |
-| 3.6 | `Q_gated_m3` | m2-bridge-logto-2026-07 | GATED (não neste flip): RBAC MULTI-OPERADOR / plataforma admin M3 (Logto Organizations só no gatilho 1º role:consumer real) — |
-| 3.6 | `Q_pwa_sse_headers` | m2-bridge-logto-2026-07 | FIX M — MANTIDO E DESTACADO (§3.4d próprio, não mais nota de rodapé). LOAD-BEARING a confirmar (P0.3): EventSource NÃO perm |
 | 3.4 | `C_console_autooff_gap` | m2-bridge-logto-2026-07 | GAP: console.sh só tem on/off/status manuais (medido: o case tem on) off) status) e mais nada; console desligado agora). Fecho: n |
-| 3.0 | `Q_slices_2_to_4_unexercised` | m2-bridge-logto-2026-07 | As fatias 2-4 (Organizations = membros, org roles = tiers, convites, a2a por app) sao DESENHO, nao medicao. So a fatia 1 (um M2M a |
-| 2.4 | `Q_default_api_resource_b1` | m2-bridge-logto-2026-07 | FIX J — o 'default API resource do tenant' era apresentado como FALLBACK PREFERIDO (B1) SEM VERIFICAÇÃO NENHUMA: tão VPS-DECL |
 | 1.6 | `Q_byok_courtesy_mode` | m2-bridge-logto-2026-07 | INFERÊNCIA A VERIFICAR: a citação '2 modos cortesia-login + BYOK (X-Anthropic-Key)' vem do app-irmão onion-pessoal-app, NÃO d |
 
 ## d5-pricing-2026-07 — 6 item(ns)
@@ -66,7 +61,7 @@
 | 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
 | 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
 
-## onion-identity-2026-07 — 11 item(ns)
+## onion-identity-2026-07 — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -78,9 +73,7 @@
 | 6.4 | `D_NO_DISTORT` | onion-identity-2026-07 | nao entortar doutrina: lane-de-conhecimento e GitFlow coexistem (eixos diferentes) |
 | 6.0 | `Q_TESTEMUNHO_NAO_MEDIVEL_0804` | onion-identity-2026-07 | nos da classe TESTEMUNHO (verified_against: relato-do-maestro-*) sao estruturalmente nao-re-verificaveis por maquina: afirmam INTE |
 | 4.8 | `C_NS2_PORTABLE` | onion-identity-2026-07 | NS2: metodo portatil/destilavel, familia multi-plataforma (onion-mini + Custom GPT reais; familia nao verificada) |
-| 3.3 | `C_ICP_TENSION` | onion-identity-2026-07 | tensao nao reconciliada: ICP estreito (regulado+multi-repo) vs 4 personas amplas da KB |
 | 3.0 | `Q_BRANCH_MAIN` | onion-identity-2026-07 | onde a main-produto entra no mapa de linhagens do members.yaml |
-| 2.4 | `C_NS4_CONTROLPLANE` | onion-identity-2026-07 | NS4: control-plane hospedado + open-core BSL (1 prova regulada granaai; control-plane nao escrito; maior gap desejo-vs-poder) |
 
 ## company-brain-market-2026-07 — 3 item(ns)
 
@@ -132,7 +125,7 @@
 | 7.2 | `Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO` | identidade-onion-vps-2026-08 | SUPERSEDE [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] com a verdade de 2026-08-29: a lacuna de 08-13 FECHOU PELA METADE. O pass JA TEM oni |
 | 6.0 | `Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO` | identidade-onion-vps-2026-08 | O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de m |
 
-## vps-shared-tools-2026-07 — 6 item(ns)
+## vps-shared-tools-2026-07 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -140,16 +133,14 @@
 | 6.3 | `ENT_monitoring` | vps-shared-tools-2026-07 | MONITORAMENTO/OBSERVABILIDADE: candidato, zero desenho. Maestro nomeou P2 (a esclarecer — Prometheus/Posthog/Phoenix?), Langfuse |
 | 4.2 | `C_dissent_auth_transversal` | vps-shared-tools-2026-07 | DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como da |
 | 4.0 | `Q_tunneling` | vps-shared-tools-2026-07 | PESQUISA+ELENXO: ngrok × Cloudflare Tunnel × Tailscale Funnel × Caddy-so. Para QUE (dev-preview? webhook inbound? exposicao efe |
-| 3.6 | `ENT_tunneling` | vps-shared-tools-2026-07 | EXPOSICAO/TUNNELING: ngrok nomeado como interessante. Avaliar fit vs o Caddy ja vivo + alternativas (Cloudflare Tunnel, Tailscale  |
 | 3.2 | `C_axis_tunneling` | vps-shared-tools-2026-07 | TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de |
 
-## librechat-kg-runtime-2026-08 — 3 item(ns)
+## librechat-kg-runtime-2026-08 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.1 | `Q_TENANT_WRITE_DESTINATION` | librechat-kg-runtime-2026-08 | BURACO revelado pela selagem: a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/ad |
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
-| 3.2 | `D_ROUTE_TO_BRIDGE` | librechat-kg-runtime-2026-08 | Enquanto a gap de web nao for resolvida: requisicoes de mapeamento de dominio externo vao ao Claude Code/Bridge (execucao plena),  |
 
 ## gtm-decisions-2026-07 — 4 item(ns)
 
@@ -160,21 +151,19 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## arandek-adoption-dogfood-2026-07 — 4 item(ns)
+## arandek-adoption-dogfood-2026-07 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.2 | `D_GREP_OLD_PIN` | arandek-adoption-dogfood-2026-07 | BACKLOG (nao implementado; priorizar e do maestro). No /meta:adopt --update, apos reescrever o .onion-version: `grep -rl <pin-anti |
 | 7.2 | `Q_ARANDEK_UPDATE` | arandek-adoption-dogfood-2026-07 | quando o arandek rodar /meta:adopt --update, recebe os 6 fixes; o contorno do D1 dele (technical-context ponteiro) simplifica p/ d |
-| 3.2 | `Q_RELAY` | arandek-adoption-dogfood-2026-07 | relay do sinal (docs/evolution/inbox do arandek → inbox do core via /meta:co-relay) pendente — território da sessão do adota |
 | 2.0 | `Q_PIN_GREP_WORTH_IT` | arandek-adoption-dogfood-2026-07 | FRONTEIRA DECLARADA PELO PROPRIO ADOTANTE (R15.2 — registrada como observacao, nao como pedido): 'pode ser que o custo nao compe |
 
-## federation-health-2026-07 — 2 item(ns)
+## federation-health-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
-| 3.6 | `C_ADOPTER_PERSONALITY_SEEDS_PENDING` | federation-health-2026-07 | 6 dos 7 adotantes seguem personality_summary SEED MANUAL datado (o 7o, marcio-pessoal, e gated/n-a soberano) — o sync e por-inst |
 
 ## graduated-automation-elenxo-2026-07 — 2 item(ns)
 
@@ -189,13 +178,12 @@
 |--:|---|---|---|
 | 5.6 | `Q_excecao_enterprise` | cafe-aroma-demo | Cliente enterprise com contrato de 3 anos merece exceção ao teto? Dúvida ABERTA — sobe para a Ana como pergunta explícita, n |
 
-## constellation-dialogic-layer-2026-07 — 3 item(ns)
+## constellation-dialogic-layer-2026-07 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 5.4 | `C_BOLETIM_INFORM` | constellation-dialogic-layer-2026-07 | 3o uso: o boletim core->estrela INFORMA a estrela do que virou main (simetrico ao carteiro star->core PUSH) — 3 travas: contexto |
 | 4.0 | `D_ISOLATION_EXTENSION_GATED` | constellation-dialogic-layer-2026-07 | GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao |
-| 3.6 | `D_BOLETIM_CANDIDATE` | constellation-dialogic-layer-2026-07 | documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por es |
 
 ## elenxo-mecanismos-lint-2026-08-13 — 1 item(ns)
 
@@ -217,35 +205,18 @@
 |--:|---|---|---|
 | 4.8 | `C_S4` | granaai-doctrine-absorption-2026-07 | FEATURE: /meta:kg map projeto (canonicalizacao de monorepo) — hoje map area existe, projeto/monorepo aberto |
 
-## colaboracao-onion-2026-07 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.0 | `Q_AUTORIZACAO_NAO_FORMALIZADA` | colaboracao-onion-2026-07 | perfil colaborador-visitante + boundary de autorizacao de relay ainda nao formalizados no core |
-| 3.0 | `Q_RETRO_PENDENTE` | colaboracao-onion-2026-07 | o que a retro do Gustavo vai confirmar/refutar sobre o processo? |
-
 ## guardrails-2nd-pr-state-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
 
-## onion-evolution-2026-07-30 — 5 item(ns)
+## onion-evolution-2026-07-30 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 3.2 | `C_d3_storypoints_dup` | onion-evolution-2026-07-30 | D3/recommended: workflow de story-points duplicado em 3 comandos (task/estimate/feature, ~100 linhas cumulativas). Padrão: consol |
-| 2.8 | `C_d2_analysis_diff` | onion-evolution-2026-07-30 | D2/opportunistic: /quick:analysis × /meta:analyze-complex-problem — mesmo verbo, mesmo destino (docs/analysis/), sem nota de di |
 | 2.8 | `C_d3_comment_dup` | onion-evolution-2026-07-30 | D3/opportunistic: template de comentário Unicode duplicado entre product/task.md e product/feature.md (~40 linhas). Padrão: comm |
-| 2.4 | `C_d2_test_diff` | onion-evolution-2026-07-30 | D2/opportunistic (ENFRAQUECIDO na verificação): test-agent × test-planner. O corpo do test-agent JÁ TEM '### Com test-planner: |
 | 1.2 | `C_d7_discussion_links` | onion-evolution-2026-07-30 | D7/opportunistic (baixo valor): docs de DISCUSSÃO (onion-pessoal-marcio, proto/README, technical-context/contributing) usam links |
-
-## kg-console-rich-design-2026-07 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 2.4 | `Q_f3_wow` | kg-console-rich-design-2026-07 | F3 wow polish (partículas em arestas, semantic-zoom, minimapa, scrollytelling) — gated, eye-candy destacável; vai por último  |
-| 2.0 | `Q_live_narration` | kg-console-rich-design-2026-07 | Narração LIVE opcional (POST a um LLM 'explique esta seleção') como enhancement que degrada gracioso offline — gated; a pré |
 
 ## kg-diagnose-automation-2026-07 — 1 item(ns)
 
@@ -271,4 +242,10 @@
 |--:|---|---|---|
 | 2.4 | `Q_volume_not_reproduced` | vendor-multi-branch-2026-07 | Reproduzimos a CLASSE (conflito contabil em codigo de aplicacao por vendor branch-especifico), NAO os 110 arquivos. O volume depen |
 | 2.0 | `Q_three_or_more_branches` | vendor-multi-branch-2026-07 | Tres ou mais integration branches nao foram exercitadas. A convencao por-branch se estende por CONSTRUCAO, mas isso e inferencia,  |
+
+## kg-console-rich-design-2026-07 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.0 | `Q_live_narration` | kg-console-rich-design-2026-07 | Narração LIVE opcional (POST a um LLM 'explique esta seleção') como enhancement que degrada gracioso offline — gated; a pré |
 

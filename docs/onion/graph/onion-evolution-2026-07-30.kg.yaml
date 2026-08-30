@@ -39,7 +39,9 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.8
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O item pedia consolidar o workflow de story-points duplicado em task/estimate/feature dentro de common/prompts/story-points-gate.md (que já existia 'parcial'). Isso foi e"
     label: "D3/recommended: workflow de story-points duplicado em 3 comandos (task/estimate/feature, ~100 linhas cumulativas). Padrão: consolidar em common/prompts/story-points-gate.md (já existe parcial); comandos só invocam"
     trace: ".claude/commands/product/{task,estimate,feature}.md"
   # ── SOBREVIVENTES (opportunistic) ──
@@ -48,7 +50,9 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.6
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó registrava uma lacuna pontual (description do frontmatter sem a linha de diferenciação self-differentiating vs @test-planner) que já foi ENTREGUE — a linha existe ho"
     label: "D2/opportunistic (ENFRAQUECIDO na verificação): test-agent × test-planner. O corpo do test-agent JÁ TEM '### Com test-planner:'; só falta a linha de diferenciação na DESCRIPTION (frontmatter) — um orquestrador que escolhe por description sozinha não desambigua. Padrão: self-differentiating description"
     trace: ".claude/agents/testing/test-agent.md:1-6"
   - id: C_d2_analysis_diff
@@ -56,7 +60,9 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.7
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó pedia exatamente uma linha 'Diferença vs analyze-complex-problem: caminho RÁPIDO, sem tipagem, sem gate' na descrição de /quick:analysis, seguindo o molde create-age"
     label: "D2/opportunistic: /quick:analysis × /meta:analyze-complex-problem — mesmo verbo, mesmo destino (docs/analysis/), sem nota de diferenciação. Padrão: linha 'Diferença vs analyze-complex-problem: caminho RÁPIDO, sem tipagem, sem gate' (molde create-agent vs create-agent-express)"
     trace: ".claude/commands/quick/analysis.md:2-8"
   - id: C_d3_comment_dup

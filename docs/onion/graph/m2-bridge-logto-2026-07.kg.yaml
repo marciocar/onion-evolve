@@ -473,7 +473,9 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.6
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó era uma pergunta LOAD-BEARING a confirmar: 'a PWA consome SSE por EventSource?' — com o risco de o caminho humano quebrar após o flip OIDC, e a prescrição de migrar "
     label: "FIX M — MANTIDO E DESTACADO (§3.4d próprio, não mais nota de rodapé). LOAD-BEARING a confirmar (P0.3): EventSource NÃO permite header customizado — não manda Authorization. É limitação da API do browser, não do desenho. Se a PWA consome SSE por EventSource, o CAMINHO HUMANO NÃO FUNCIONA depois do flip; o caminho correto é migrar para fetch + ReadableStream (aceita header, e dá controle de reconexão/abort que o EventSource não dá). RECUSADO explicitamente: token por QUERY STRING — vaza no log de acesso do Caddy, no header Referer e no histórico; um bearer com poder de bypassPermissions num log de acesso é o mesmo buraco com outra roupa. Se um ticket de curta duração por query for a única saída, vira decisão do maestro com risco declarado e PRAZO, não default do spec"
 
   # ---- F3 (preservado): ENFORCEMENT FAIL-CLOSED ----
@@ -603,7 +605,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.4
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): A pergunta presume que o fallback B1 (default API resource) ainda precisa de um passo de prova próprio porque poderia ser adotado. Mas o Plano A (resource honrado via RFC"
     label: "FIX J — o 'default API resource do tenant' era apresentado como FALLBACK PREFERIDO (B1) SEM VERIFICAÇÃO NENHUMA: tão VPS-DECLARADO quanto o RFC 8707 que ele deveria substituir. Adotá-lo assim é trocar uma suposição por outra. Agora tem PASSO DE PROVA PRÓPRIO (P4.1b): marcar o recurso como default no console, pedir token SEM o parâmetro resource= e decodificar. VERDE do B1 = 3 partes E aud contém https://bridge.onionevolve.com sem ter mandado resource=. Qualquer outra coisa = B1 REPROVADO => descer para B2"
 
   - id: D_resource_plan_b
@@ -721,7 +725,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.6
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó é um bucket composto de 7 itens declarados GATED 'não neste flip, derivar fresco quando o gate abrir' (gatilho: 1º role:consumer real). A medição mostra que o gatilh"
     label: "GATED (não neste flip): RBAC MULTI-OPERADOR / plataforma admin M3 (Logto Organizations só no gatilho 1º role:consumer real) — o login humano PKCE SAIU do gated; o que segue gated é a MALHA multi-operador. Também gated: ENDURECIMENTO DA PWA como cliente (CSP completa, SRI, auditoria de dependência, storage fora do localStorage — este flip só fixa as 3 mitigações baratas e NOMEIA que a PWA entrou na base de confiança, D_pkce_risk_mitigations); Caddy forward_auth/oauth2-proxy (redundante com PKCE in-app); RBAC fino por operação; revisão do bypassPermissions do SDK (eixo separado); cgroup delegation ao dockerd (se cgroup_parent não pegar); AUDITORIA DOS DEMAIS FLOORS do host com check_floor (o fix A é uma CLASSE, não um caso). Derivar fresco quando o gate abrir"
 
   - id: E_ancestor_floor_applied
@@ -1052,7 +1058,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.5
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O no afirma que fatias 2-4 sao DESENHO, nao medicao, e que nada deve ser afirmado como funcionando antes de roda-las. O vivo mostra o oposto: as tres fatias FORAM rodadas"
     label: "As fatias 2-4 (Organizations = membros, org roles = tiers, convites, a2a por app) sao DESENHO, nao medicao. So a fatia 1 (um M2M app por chamador) tem prova. Nao afirmar que as outras funcionam antes de roda-las. A fatia 2 depende do campo `kind:` (ver C_role_field_is_overloaded)"
 
 
