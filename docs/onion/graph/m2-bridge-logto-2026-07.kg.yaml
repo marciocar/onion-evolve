@@ -714,7 +714,9 @@ nodes:
     plane: PROD
     impact: 2
     confidence: 0.4
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 7 (run wf_05b33768-48c): os 2 modos cortesia+BYOK sairam do binario com o P11 — a pergunta ficou sem objeto"
     label: "INFERÊNCIA A VERIFICAR: a citação '2 modos cortesia-login + BYOK (X-Anthropic-Key)' vem do app-irmão onion-pessoal-app, NÃO do bridge. Não confirmado que o bridge tem esse par nem se OIDC deve gatear ambos — confirmar no host no P0.4"
 
   # ---- O QUE FICA GATED ----

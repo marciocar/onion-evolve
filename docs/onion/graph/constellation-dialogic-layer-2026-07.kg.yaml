@@ -258,6 +258,8 @@ nodes:
     impact: 4
     confidence: 0.5
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 7: worker CONFIRMED e juiz opus/high APROVOU (wf_ad4b2d7a-591)"
     label: "GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao nossa — candidato, nao promocao"
 
   # ---- trabalho de D_ARISTOTLE_HOME_CANDIDATE (nomear o vivido; ATO gated) ----
