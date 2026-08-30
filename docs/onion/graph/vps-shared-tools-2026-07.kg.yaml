@@ -115,10 +115,10 @@ nodes:
   - id: D_email_plus_logto_connector
     node_type: decision
     plane: DEV
-    status: unverifiable
+    status: superseded
     impact: 4
     confidence: 0.5
-    verified_at: 2026-07-31
+    verified_at: 2026-08-30
     verified_against: direcao-do-maestro+m8-serial-2026-08-reverificado
     label: "DIRECAO: construir o servico de EMAIL E LIGAR o conector de email no LOGTO (destrava convite por org, o gap medido). Um so servico serve duas bocas: ferramenta de membro + connector do Logto"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"

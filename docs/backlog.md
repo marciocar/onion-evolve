@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**160 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**146 itens abertos** em 30 grafo(s) com aberto (de 45 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 17 item(ns)
 
@@ -29,7 +29,7 @@
 | 3.3 | `Q_auth_decision` | m3-federation-admin-2026-07 | Plugar Logto no command-side é decisão do maestro, ainda NÃO tomada (o bridge hoje usa AUTH_TOKEN próprio, não Logto). Auth b |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
 
-## m2-bridge-logto-2026-07 — 31 item(ns)
+## m2-bridge-logto-2026-07 — 26 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -43,11 +43,6 @@
 | 10.2 | `D_logto_not_ssot` | m2-bridge-logto-2026-07 | INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorizaç |
 | 9.6 | `C_a2a_gate_narrow` | m2-bridge-logto-2026-07 | [ATUALIZADO 2026-07-27 pós-flip P7: a cláusula final CAIU — o bridge/PWA NÃO segue mais autenticado só por AUTH_TOKEN; /chat |
 | 9.6 | `D_pkce_risk_mitigations` | m2-bridge-logto-2026-07 | FIX I fecho — mitigações BARATAS fixadas neste flip (P3.5): (1) ACCESS TOKEN CURTO 10-15min + ROTAÇÃO DE REFRESH TOKEN (Logt |
-| 8.1 | `D_legacy_fn_defined` | m2-bridge-logto-2026-07 | FIX K — legacyAuthTokenOk() era USADA (v2:219) e NUNCA DEFINIDA: num spec turnkey, um placeholder no caminho de auth é onde o o |
-| 8.1 | `D_steps_renumbered` | m2-bridge-logto-2026-07 | FIX F fecho — ORDEM LINEAR: P0 pré-flight -> P1 API RESOURCE -> P2 M2M APP (sem role ainda) -> P3 ROLE/PERMISSÃO (P3.1 criar r |
-| 8.1 | `Q_seven_orgs_still_empty` | m2-bridge-logto-2026-07 | O MECANISMO esta provado, a POVOACAO nao: 1 de 8 organizacoes tem membro. As outras 7 precisam de pessoas reais com conta no Logto |
-| 8.0 | `Q_resource_indicators` | m2-bridge-logto-2026-07 | LOAD-BEARING (não nota de rodapé): o aud-binding do §3.3 DEPENDE de o Logto 1.41.0 self-hosted honrar resource=<api-identifier> |
-| 7.5 | `Q_a2a_after_flip` | m2-bridge-logto-2026-07 | FIX L1 — PROVA NOVA: na v2 o /a2a era 'CASO À PARTE' sem NENHUM teste, ou seja uma exceção sem verificação. Agora: o DEFAUL |
 | 7.2 | `Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP` | m2-bridge-logto-2026-07 | PRE-EXISTENTE, achado pelo 6o Elenxo ao procurar 'outra rota cara fora do rate-limit': POST /a2a faz spawnSync do gate do core (a2 |
 | 6.8 | `C_real_precedent` | m2-bridge-logto-2026-07 | NÃO é hipotético: precedente REAL de escrita de código de um celular por esse caminho (SDK bypassPermissions + git local no VP |
 | 6.8 | `D_rbac_two_layers` | m2-bridge-logto-2026-07 | Corolário do grant duplo — com PKCE, sign-up ABERTO no Logto = qualquer pessoa vira usuário do tenant e passa em iss/aud. Fech |
@@ -76,18 +71,15 @@
 | 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
 | 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
 
-## onion-identity-2026-07 — 22 item(ns)
+## onion-identity-2026-07 — 19 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 29.2 | `C_NS1_KG` | onion-identity-2026-07 | NS1: framework que constroi conhecimento reconciliavel vivo (KG); edge mais forte, negocio nao provado |
 | 10.8 | `Q_CUSTO_DO_PORTE_NUNCA_MEDIDO` | onion-identity-2026-07 | A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara qu |
-| 8.0 | `Q_MARKET` | onion-identity-2026-07 | onde somos unicos vs commodity (mercado jul2026, lente edge-core Hagel) |
 | 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
-| 7.5 | `Q_COLD_ADOPTER_0717` | onion-identity-2026-07 | org externa e o mesmo que adotante frio? pulse-mais e ORGANIZACAO REAL E EXTERNA (members.yaml:93, correcao do maestro) mas o repo |
 | 7.4 | `C_COMPLIANCE_RARE` | onion-identity-2026-07 | compliance-no-loop = vertical RARA que casa com ICP regulado; prova de campo em granaai |
 | 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
-| 7.2 | `Q_METHOD` | onion-identity-2026-07 | como heranca-polimorfismo (RFC-0004/0005) se aplica a construcao de conhecimento |
 | 7.0 | `D_COLD_ADOPTER_EXP` | onion-identity-2026-07 | experimento cold-adopter: probe organico (onion-mini+one-pager) + concierge arms-length; 4-6 semanas, guarda anti-vaidade/anti-v4. |
 | 6.4 | `C_FATIAS_JA_TESTADAS` | onion-identity-2026-07 | CONSUMO EM FATIAS NAO E HIPOTESE — JA HOUVE TESTE: criacao de plugin e skills para o Onion, incluindo testes de INSTALACAO E USO |
 | 6.4 | `D_NO_DISTORT` | onion-identity-2026-07 | nao entortar doutrina: lane-de-conhecimento e GitFlow coexistem (eixos diferentes) |
@@ -111,25 +103,23 @@
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 | 6.6 | `Q_p4_instrument` | company-brain-market-2026-07 | Pré-req de D2/mais-valor: instrumentar 1-2 prospects P4 reais + 'valor medido por adotante'. Sem isso, 'Company Brain regulado'  |
 
-## guardas-revisao-2026-08 — 7 item(ns)
+## guardas-revisao-2026-08 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 21.6 | `Q_GUARDAS_COERENTES` | guardas-revisao-2026-08 | as guardas nascidas reativamente formam um sistema coerente, sem sobreposicao cega nem lacuna? |
-| 8.1 | `C_DUPLICACAO_4_CLONES` | guardas-revisao-2026-08 | REGRAS 21/38/24/25 sao clones byte-identicos apos normalizar literais — helper economizaria ~69 linhas e daria UM lugar p/ o 2>/ |
 | 8.1 | `Q_INDICE_DO_DIARIO_SEM_CATRACA` | guardas-revisao-2026-08 | LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do |
 | 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
 | 6.0 | `C_DOCSTRINGS_STALE` | guardas-revisao-2026-08 | R45 diz "nasce com 101" (baseline tem 0) e R44 diz "tudo em HUMAN" (15 classes, 1 MONITORED) — declarado != verificado DENTRO da |
 | 5.4 | `C_R28_R46_DOUBLE_FIRING` | guardas-revisao-2026-08 | R28 classe (1) e R46 detectam a MESMA condicao — um dir orfao com 3 anuncios emite 4 SOFT para um fato so; cura e amputar a clas |
 | 5.4 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
 
-## catraca-regra49-2026-08 — 4 item(ns)
+## catraca-regra49-2026-08 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 20.0 | `Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES` | catraca-regra49-2026-08 | As CINCO classes novas nao tem NENHUMA cobertura de campo. `--emit-baseline` e hoje identico ao baseline versionado, logo o laco d |
 | 12.8 | `C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA` | catraca-regra49-2026-08 | Fio de METODO, e e o que esta rodada mais ensina. Dois dos quatro achados confirmados (a direcao da aresta e o `git mv` para `fixt |
-| 8.0 | `Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE` | catraca-regra49-2026-08 | Divida que sai deste PR de proposito: um `git mv` de UM grafo para qualquer pasta `fixtures/` tirou CINCO entradas do baseline de  |
 | 2.4 | `D_SCRUB_FROZEN_POISON_IN_VENDORS` | catraca-regra49-2026-08 | FOLLOW-UP M2 (gatilho: o veneno congelado voltar a incomodar): poc(47)/gustavo(48) tem chaves estrangeiras JA rastreadas no onion/ |
 
 ## elenxos-2026-08-07 — 4 item(ns)
@@ -157,12 +147,11 @@
 | 6.0 | `Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO` | identidade-onion-vps-2026-08 | O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de m |
 | 5.4 | `Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO` | identidade-onion-vps-2026-08 | A guarda `vps-exposure-check.sh` cobre o lado de CA (bind publico em container vivo, conector upstream, backup em claro) e roda di |
 
-## vps-shared-tools-2026-07 — 12 item(ns)
+## vps-shared-tools-2026-07 — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 10.8 | `A_analysis_structure` | vps-shared-tools-2026-07 | ESTRUTURA DE ANALISE INICIAL (4 fases, antes do plano): F0 frame+invariantes+Elenxo catalogo-vs-plataforma · F1 pesquisa por-tool |
-| 8.0 | `D_email_plus_logto_connector` | vps-shared-tools-2026-07 | DIRECAO: construir o servico de EMAIL E LIGAR o conector de email no LOGTO (destrava convite por org, o gap medido). Um so servico |
 | 6.3 | `ENT_monitoring` | vps-shared-tools-2026-07 | MONITORAMENTO/OBSERVABILIDADE: candidato, zero desenho. Maestro nomeou P2 (a esclarecer — Prometheus/Posthog/Phoenix?), Langfuse |
 | 6.0 | `Q_email_logto_conector_nunca_medido` | vps-shared-tools-2026-07 | ABERTO: D_email_plus_logto_connector e DIRECAO pura ('construir o servico de EMAIL e ligar o conector'), sem estado material mediv |
 | 6.0 | `Q_email_provider` | vps-shared-tools-2026-07 | PESQUISA: provider de email — SMTP self-host (Postfix/maddy) vs transacional (Resend/Postmark/SES) — deliverability, custo, e  |
@@ -174,13 +163,6 @@
 | 3.6 | `ENT_tunneling` | vps-shared-tools-2026-07 | EXPOSICAO/TUNNELING: ngrok nomeado como interessante. Avaliar fit vs o Caddy ja vivo + alternativas (Cloudflare Tunnel, Tailscale  |
 | 3.2 | `C_axis_tunneling` | vps-shared-tools-2026-07 | TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de |
 
-## granaai-doctrine-absorption-2026-07 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.1 | `C_S3b` | granaai-doctrine-absorption-2026-07 | FEATURE: --update deixa docs/onion/inventory.md stale (inventory.sh so roda na Fase 3 da adocao) — lint HARD bloqueia o 1o commi |
-| 4.8 | `C_S4` | granaai-doctrine-absorption-2026-07 | FEATURE: /meta:kg map projeto (canonicalizacao de monorepo) — hoje map area existe, projeto/monorepo aberto |
-
 ## librechat-kg-runtime-2026-08 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -189,22 +171,6 @@
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
 | 6.0 | `Q_WEB_SEARCH_GAP` | librechat-kg-runtime-2026-08 | A face conversavel do Onion (MCPs onion-framework/kg/exec) nao tem tool de busca/crawling web — como mapear um dominio externo q |
 | 3.2 | `D_ROUTE_TO_BRIDGE` | librechat-kg-runtime-2026-08 | Enquanto a gap de web nao for resolvida: requisicoes de mapeamento de dominio externo vao ao Claude Code/Bridge (execucao plena),  |
-
-## federation-health-2026-07 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.0 | `C_METAGAMIFY_VENDOR_VNEXTPIN` | federation-health-2026-07 | metagamify onion/vendor tem 1 pin INVALIDO na historia: '2026-07-12' (uma DATA, nao commit — vnextpin). Merge-base pode ficar er |
-| 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
-| 3.6 | `C_ADOPTER_PERSONALITY_SEEDS_PENDING` | federation-health-2026-07 | 6 dos 7 adotantes seguem personality_summary SEED MANUAL datado (o 7o, marcio-pessoal, e gated/n-a soberano) — o sync e por-inst |
-
-## graduated-automation-elenxo-2026-07 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.0 | `Q_MONITORED_RUNG` | graduated-automation-elenxo-2026-07 | Onda 2: como nomear+mecanizar o degrau MONITORADO (shadow, roda+observado)? promover o onion-effect-gate.sh orfao; dogfood INTERNO |
-| 6.0 | `Q_COUNTABLE_CRITERIA` | graduated-automation-elenxo-2026-07 | Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de |
-| 6.0 | `Q_PREDICTIVE_ALERTS` | graduated-automation-elenxo-2026-07 | Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela  |
 
 ## gtm-decisions-2026-07 — 5 item(ns)
 
@@ -230,6 +196,20 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 6.0 | `Q_ORCAMENTO_DE_CI_MEDIDO_CONTRA_ARTEFATO_41PCT_MENOR` | context-freshness-2026-08-12 | O `contributing.md` apresenta um ORCAMENTO DE CI como 'medido 2026-07-20': '~7,5min total, teto timeout-minutes: 15', com o lint e |
+
+## federation-health-2026-07 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
+| 3.6 | `C_ADOPTER_PERSONALITY_SEEDS_PENDING` | federation-health-2026-07 | 6 dos 7 adotantes seguem personality_summary SEED MANUAL datado (o 7o, marcio-pessoal, e gated/n-a soberano) — o sync e por-inst |
+
+## graduated-automation-elenxo-2026-07 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `Q_COUNTABLE_CRITERIA` | graduated-automation-elenxo-2026-07 | Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de |
+| 6.0 | `Q_PREDICTIVE_ALERTS` | graduated-automation-elenxo-2026-07 | Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela  |
 
 ## cafe-aroma-demo — 1 item(ns)
 
@@ -270,6 +250,12 @@
 | 5.1 | `D_QUADRO_CITACOES` | onion-doctrine-elenxo-bulbo-2026-07 | quadro de citacoes do maestro NASCEU (gated): as formulacoes recorrentes dele, atribuidas+datadas (verbatim vs parafrase marcado)  |
 | 4.8 | `Q_RADAR_WIDGET_PARALLEL_FORMULA` | onion-doctrine-elenxo-bulbo-2026-07 | o RadarWidget de /maquinaria/ (site) DUPLICA a tabela de statusFactor do kg-radar.sh (conferida fator a fator na revisao adversari |
 | 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
+
+## granaai-doctrine-absorption-2026-07 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `C_S4` | granaai-doctrine-absorption-2026-07 | FEATURE: /meta:kg map projeto (canonicalizacao de monorepo) — hoje map area existe, projeto/monorepo aberto |
 
 ## colaboracao-onion-2026-07 — 3 item(ns)
 

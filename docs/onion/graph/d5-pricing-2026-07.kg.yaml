@@ -148,6 +148,8 @@ nodes:
     impact: 5
     confidence: 0.5
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3: worker CONFIRMED e juiz opus/high APROVOU (run wf_5f6d1c0f-ecd)"
     label: "GATE D2: a assinatura SOTA vende o mecanismo L1-L6 (classificação-por-inferência + gate-por-propósito + ε-ledger) que segue GATED — construído+dogfoodado + threat model N-tenant verificado (hoje só N=1 pessoal). Cotar número antes = declarado≠verificado = queima de moat. Nenhum preço SOTA a cliente antes deste gate"
   - id: Q_train_cert_chaining
     node_type: question

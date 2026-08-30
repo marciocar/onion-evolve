@@ -56,6 +56,8 @@ nodes:
     impact: 5
     confidence: 0.5
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3: worker CONFIRMED e juiz opus/high APROVOU (run wf_5f6d1c0f-ecd)"
     label: "D2-ATIVAÇÃO — ligar o flywheel de moeda-dado (SSOT 6 camadas L1-L6 de mitigação de inferência, dogfoodado). Direção RATIFICADA (local-first+destilado); ativação `gated`. Gate: declarado≠verificado — não vender garantia não-construída"
 
   # ---- RECOMENDAÇÕES (claim, SUPPORTS a decisão) ----

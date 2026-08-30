@@ -33,7 +33,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.4
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): A pergunta Q_MARKET foi congelada como snapshot 'mercado jul2026, lente edge-core Hagel' dentro do grafo de identidade. Duas das suas 3 claims-componentes (commodity, len"
     label: "onde somos unicos vs commodity (mercado jul2026, lente edge-core Hagel)"
   - id: Q_VALUE
     node_type: question
@@ -57,7 +59,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.6
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): A pergunta pressupoe que o metodo de construcao de conhecimento sairia de mapear heranca-polimorfismo do RFC-0004/0005 (federacao inter-instancia / escopo-vs-versao) para"
     label: "como heranca-polimorfismo (RFC-0004/0005) se aplica a construcao de conhecimento"
   - id: Q_BRANCH_MAIN
     node_type: question
@@ -644,7 +648,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.5
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): A pergunta ficou OPEN mas foi respondida por trabalho posterior no próprio grafo: o critério 'org externa real não equivale a adotante frio quando a operação (repo/CTO/co"
     label: "org externa e o mesmo que adotante frio? pulse-mais e ORGANIZACAO REAL E EXTERNA (members.yaml:93, correcao do maestro) mas o repo e de Marcio — decide o caveat de orbita e o pitch"
     trace: "docs/evolution/federation/members.yaml:93"
 

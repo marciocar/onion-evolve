@@ -88,9 +88,9 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: open
+    status: superseded
     verified_against: pin
-    verified_at: 2026-07-23
+    verified_at: 2026-08-30
     label: "metagamify onion/vendor tem 1 pin INVALIDO na historia: '2026-07-12' (uma DATA, nao commit — vnextpin). Merge-base pode ficar errada; dano latente. Fix e adopter-side (sessao do rhilo re-stampa o vendor); --audit-vendor detecta do core."
     trace: "docs/evolution/federation/members.yaml:61"
   - id: C_GRANAAI_LINEAGES_UNKNOWN

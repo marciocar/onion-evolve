@@ -29,6 +29,8 @@ nodes:
     impact: 5
     confidence: 0.7
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3: worker CONFIRMED e juiz opus/high APROVOU (run wf_5f6d1c0f-ecd)"
     label: "GATILHO objetivo do build: o 1º membro role:consumer (T2) REAL em members.yaml (introduz hub-owner que precisa de visão/ação escopada ao próprio subgrafo) OU o 1º contrato breaking registrado em contracts/. Hoje: 0 T2; o diretório contracts/ AINDA NÃO EXISTE (nasce no 1º /meta:federation-register) → gate FECHADO"
   - id: Q_onprem_tension
     node_type: question
