@@ -80,7 +80,9 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó descreve um bug ('--update deixa inventory.md stale, lint HARD bloqueia o 1º commit') que já foi corrigido no vivo em 2026-07-18 (commit 773d5e4a), 6 semanas antes d"
     label: "FEATURE: --update deixa docs/onion/inventory.md stale (inventory.sh so roda na Fase 3 da adocao) — lint HARD bloqueia o 1o commit do adotante"
   - id: C_S4
     node_type: claim

@@ -124,7 +124,9 @@ nodes:
   - id: Q_MONITORED_RUNG
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó é composto (3 afirmações independentes) e o veredito é misto: (a) e (c) seguem vivas/abertas — nada as entregou; (b) está morta E já foi corrigida DENTRO do próprio "
     impact: 4
     confidence: 1.0
     label: "Onda 2: como nomear+mecanizar o degrau MONITORADO (shadow, roda+observado)? promover o onion-effect-gate.sh orfao; dogfood INTERNO primeiro (decisao do maestro, nao no Pedro)"

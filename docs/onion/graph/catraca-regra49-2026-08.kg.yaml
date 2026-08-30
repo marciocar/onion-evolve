@@ -285,10 +285,10 @@ nodes:
   - id: Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE
     node_type: question
     plane: PROD
-    status: open
+    status: done
     impact: 4
     confidence: 1.0
-    verified_at: 2026-08-08
+    verified_at: 2026-08-30
     verified_against: git-mv-de-um-arquivo-tirando-5-entradas-de-uma-vez-com-exit-0
     label: "Divida que sai deste PR de proposito: um `git mv` de UM grafo para qualquer pasta `fixtures/` tirou CINCO entradas do baseline de uma vez, com o gate mandando remove-las e os nos intactos no disco, versionados, afirmando sobre producao. A cura exige resolver a chave por hash em TODO o universo antes de concluir remocao, mais uma classe MUDOU-DE-PATH para o rename legitimo — e mexe na convencao `grep -v '/fixtures/'` que e da casa inteira (kg-radar-integrity.sh:41), nao deste PR."
     trace: ".claude/validation/kg-radar-integrity.sh"

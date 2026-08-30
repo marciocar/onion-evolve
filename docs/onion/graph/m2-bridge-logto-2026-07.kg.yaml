@@ -335,7 +335,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó descreve uma DECISÃO de ordenação (P0 pré-flight -> ... -> P9 aposentar, linear, sem passo consumindo artefato de passo posterior) que estava status=open (pendente d"
     label: "FIX F fecho — ORDEM LINEAR: P0 pré-flight -> P1 API RESOURCE -> P2 M2M APP (sem role ainda) -> P3 ROLE/PERMISSÃO (P3.1 criar role, P3.2 atribuir a M2M+maestro, P3.3 SPA pública PKCE, P3.4 sign-up OFF, P3.5 token curto+refresh rotation) -> P4 PROVA (P4.1 RFC 8707, P4.1b prova do B1, P4.2 emissão humana, P4.3 registrar o plano adotado no spec+KG) -> P5 middleware -> P6 os dois chamadores -> P7 O FLIP -> P8 verificar -> P9 aposentar. Nenhum passo consome artefato de passo posterior"
 
   # ---- FIX I: RISCO NOVO DO PKCE (não nomeado na v2) ----
@@ -455,7 +457,9 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.5
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O trabalho que o nó descreve como decisão pendente/prova a fazer já foi ENTREGUE e está vivo em produção: o /a2a tem cobertura dupla real e independente (a2aGuard por Bea"
     label: "FIX L1 — PROVA NOVA: na v2 o /a2a era 'CASO À PARTE' sem NENHUM teste, ou seja uma exceção sem verificação. Agora: o DEFAULT é COBERTURA DUPLA (requireIdentity E a2a-verify.sh, 6 camadas), a exceção exige justificativa escrita, e o TESTE #23 prova o que foi decidido — cobertura dupla: POST /a2a com envelope a2a válido e SEM Bearer => 401, e com Bearer válido mas envelope inválido => rejeitado pelo a2a-verify (não 200), provando as duas camadas vivas e INDEPENDENTES; exceção documentada: POST /a2a sem Bearer não dá 200 por conta do gate a2a, e o teste #16 confirma que /a2a não entrou na allowlist. P0.2c resolve onde ele vive"
 
   - id: Q_pwa_sse_headers
@@ -498,7 +502,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó descreve a CORREÇÃO da função legacyAuthTokenOk() (defini-la com leitura de AUTH_TOKEN, dual-header x-auth-token/Bearer, comparação em tempo constante via crypto.tim"
     label: "FIX K — legacyAuthTokenOk() era USADA (v2:219) e NUNCA DEFINIDA: num spec turnkey, um placeholder no caminho de auth é onde o operador improvisa (e improviso em comparação de segredo costuma virar '==' com vazamento por timing). Agora DEFINIDA: lê process.env.AUTH_TOKEN (ausente => nega), aceita x-auth-token ou o Bearer legado, compara em TEMPO CONSTANTE (crypto.timingSafeEqual, com checagem de comprimento antes para não estourar), e vive numa função SÓ para o P9 ser exclusão cirúrgica. Também corrigido o outro placeholder: '2026-07-2X' (v2:303,469) => 2026-08-08"
 
   - id: D_retire_legacy_immediately
@@ -581,7 +587,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.5
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó está aberto como pergunta pendente ('Q aberta até P4.1 provar'), mas P4.1 JÁ ACONTECEU e a resposta foi A (Logto self-hosted honra resource=<api-identifier> RFC 8707"
     label: "LOAD-BEARING (não nota de rodapé): o aud-binding do §3.3 DEPENDE de o Logto 1.41.0 self-hosted honrar resource=<api-identifier> (RFC 8707). Se não honrar, o Logto tende a emitir token OPACO (userinfo), não JWT com aud do bridge — e a validação local NÃO FUNCIONA. Q aberta até o P4.1 provar contra o endpoint real, com o comando corrigido (C_proof_command_broken)"
 
   - id: Q_default_api_resource_b1
@@ -1166,8 +1174,8 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.9
-    status: open
-    verified_at: 2026-07-28
+    status: superseded
+    verified_at: 2026-08-30
     verified_against: contagem-por-org-no-tenant-default
     label: "O MECANISMO esta provado, a POVOACAO nao: 1 de 8 organizacoes tem membro. As outras 7 precisam de pessoas reais com conta no Logto, e criar identidade humana e ato do maestro — o `--enroll` se recusa a criar (exit 7) de proposito. Nao dizer 'a federacao esta no Logto' enquanto 7 orgs estiverem vazias"
 

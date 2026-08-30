@@ -177,8 +177,8 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.9
-    status: open
-    verified_at: 2026-08-03
+    status: done
+    verified_at: 2026-08-30
     verified_against: 'normalizacao e diff dos corpos das REGRAS 21, 38, 24, 25'
     label: 'REGRAS 21/38/24/25 sao clones byte-identicos apos normalizar literais — helper economizaria ~69 linhas e daria UM lugar p/ o 2>/dev/null que engole erro de gerador'
 
