@@ -1087,7 +1087,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: open
-    verified_at: 2026-07-28
+    verified_at: 2026-08-30
     verified_against: metodo-da-propria-escrita
     label: "DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem por passo do script. O RESULTADO esta verificado no ar (a API .well-known/sign-in-exp devolve identifiers: []), mas o METODO nao e reprodutivel por mecanismo. Virar passo do logto-provision.sh antes de considerar o hardening completo"
 
@@ -1313,7 +1313,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.5
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): A pergunta pressupõe que o pull criaria um SEGUNDO registro editável (a la Logto-como-projeção) que poderia divergir do arquivo-fallback. A construção real (não existia q"
     label: "NAO RESPONDIDO pelo ADR: hoje o correio funciona OFFLINE — o arquivo esta la e o adotante le quando quiser. Com pull, bridge fora do ar = federacao muda. Se o arquivo continuar valendo como fallback, QUAL E A VERDADE quando os dois divergirem? Sem resposta, o fallback vira o segundo registro editavel dos dois lados que o ADR logto-as-projection existe para impedir"
 
 

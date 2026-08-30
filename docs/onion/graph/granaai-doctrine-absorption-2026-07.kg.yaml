@@ -91,6 +91,8 @@ nodes:
     impact: 2
     confidence: 0.8
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5: worker CONFIRMED e juiz opus/high APROVOU (run wf_1c9263d8-6c9)"
     label: "FEATURE: /meta:kg map projeto (canonicalizacao de monorepo) — hoje map area existe, projeto/monorepo aberto"
   - id: C_OLD_FAILOPEN
     node_type: claim

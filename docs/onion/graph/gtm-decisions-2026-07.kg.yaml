@@ -180,6 +180,8 @@ nodes:
     impact: 4
     confidence: 0.55
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5: worker CONFIRMED e juiz opus/high APROVOU (run wf_1c9263d8-6c9)"
     label: "Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É o que realmente falta fechar em D1 — nenhuma fonte externa resolve, é decisão do maestro"
   - id: Q_instrument_metrics
     node_type: question

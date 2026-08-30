@@ -352,6 +352,17 @@ nodes:
     verified_against: "piloto kg-freshness 2026-08-29 (worker mediu: pass ls mostra onion/restic-repo e onion/restic-password PRESENTES; cron e systemd seguem sem linha offsite); selo do maestro 2026-08-30"
     label: "SUPERSEDE [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] com a verdade de 2026-08-29: a lacuna de 08-13 FECHOU PELA METADE. O pass JA TEM onion/restic-repo e onion/restic-password — o guard de exit 3 do backup-offsite.sh nao trava mais por falta de credencial. O QUE FALTA AGORA E EXATAMENTE UMA LINHA: cron ou systemd-timer chamando o offsite (medido: crontab do root e systemd sem entrada). A armadilha circular esta resolvida desde a custodia externa da chave GPG; o custo de fechar caiu de tres passos para um. GATILHO: o maestro mandar armar a linha."
 
+  - id: E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO
+    node_type: evidence
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5 (run wf_2349bf29-ea0): compose rastreado no git do adotante, portas sem prefixo de bind + segredo literal de fallback; mesma classe do achado arandek (redigido, nao enviado)"
+    label: "O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotante ativo com o mesmo defeito de exposicao do achado arandek: docker-compose rastreado no git com portas sem prefixo de bind (Docker publica em todas as interfaces por default — e nesta VPS o Docker FURA o ufw) e segredo literal como fallback. Detalhes especificos (repo, portas, valores) ficam FORA deste no de proposito: e material de comunicacao sensivel, e a decisao de comunicar e do maestro — como no arandek, que segue redigido e nao-enviado por ordem. ACAO PENDENTE (decisao do maestro): (a) comunicar os dois adotantes; (b) decidir a regra de lint de compose para role adotante que o Q_GUARDA propoe — a classe agora tem 2 instancias medidas."
+    trace: "runs wf_2349bf29-ea0 · docs/analysis/onion-vps-network-exposure-2026-08.md (a contencao do core)"
+
 edges:
   - from: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
     to: C_NO_COMPOSTO_RECEBE_VEREDITO_ATOMICO
@@ -440,3 +451,6 @@ edges:
   - from: Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO
     to: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     edge_type: SUPERSEDES
+  - from: E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO
+    to: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
+    edge_type: SUPPORTS

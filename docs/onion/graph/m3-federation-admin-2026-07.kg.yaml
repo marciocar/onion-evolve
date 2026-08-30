@@ -40,6 +40,8 @@ nodes:
     impact: 4
     confidence: 0.6
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5: worker CONFIRMED e juiz opus/high APROVOU (run wf_1c9263d8-6c9)"
     label: "TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code-only RATIFICADA. Direção do spec: servir auditoria de P4 a partir de artefatos que JÁ existem dentro do Claude Code (sessions/git/CI), não infra on-prem nova"
   - id: Q_auth_decision
     node_type: question
@@ -151,6 +153,8 @@ nodes:
     impact: 4
     confidence: 0.65
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5: worker CONFIRMED e juiz opus/high APROVOU (run wf_1c9263d8-6c9)"
     label: "REQ P3 (SHOULD condicional): self-service de onboarding multi-squad (mata a dor 'cada dev usa IA de um jeito; nenhuma trilha'). O hub JÁ é 'federação como camada de time' (D7) — a plataforma admin é a superfície natural do onboarding org"
   - id: C_p3_agg_view
     node_type: claim

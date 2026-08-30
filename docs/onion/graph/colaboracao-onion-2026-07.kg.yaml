@@ -125,7 +125,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.5
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): O label diz 'instrumento criado; coleta em andamento' (status open) — a 1a metade segue verdadeira, mas a 2a morreu: a retro de campo que gerou o instrumento já estava FE"
     label: "retro do parceiro (Gustavo) — instrumento criado; coleta em andamento"
   - id: C_SPEC_MULTIPLICADOR
     node_type: claim

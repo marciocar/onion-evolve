@@ -29,7 +29,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): O nó descreve um gap (MCP não declarado + sem gate + prosa sequencial sem fan-out) que já não existe no vivo: o arquivo `.claude/agents/development/system-documentation-o"
     label: "D6/recommended: system-documentation-orchestrator usa mcp_code-understanding_* (4 chamadas sequenciais em prosa) mas NÃO o declara no frontmatter tools: e não gateia sua ausência. As 4 leituras independentes são candidatas a Workflow fan-out (o próprio arquivo já cita Workflow 2 linhas abaixo). Padrão: declarar+gatear o MCP + prosa-sequencial→fan-out"
     trace: ".claude/agents/development/system-documentation-orchestrator.md:6-13,177-201"
   - id: C_d3_storypoints_dup
