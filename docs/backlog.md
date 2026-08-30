@@ -160,15 +160,11 @@
 | 8.0 | `Q_SDAAL_EXECUTAVEL_ONDE_PARA` | elenxos-2026-08-07 | ABERTO: a F4 abriu a primeira peca EXECUTAVEL dentro de `.claude/utils/forge/` — necessaria porque um step de Actions e shell pu |
 | 5.4 | `E_ALLOWLIST_NO_KG_VIEW` | elenxos-2026-08-07 | SITIO 3 (NAO CURADO): kg-view.sh:101-107 carrega uma COPIA de statusFactor que nao conhece os status novos — retorna -1, clampad |
 
-## identidade-onion-vps-2026-08 — 5 item(ns)
+## fios-abertos — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 20.0 | `Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA` | identidade-onion-vps-2026-08 | ⚠️ ATUALIZADO 2026-08-13 — O BLOQUEIO DEIXOU DE SER CONCEITUAL E VIROU UMA CONTA. Com [Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS]  |
-| 12.0 | `Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO` | identidade-onion-vps-2026-08 | ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. Medido em `/home/marcio/onion-adopt-arandek/dock |
-| 12.0 | `Q_LACUNA_DECISAO_MAIS_CODIGO` | identidade-onion-vps-2026-08 | A OPORTUNIDADE, e ela e de diferenciacao e nao de divida. A pesquisa nao achou NENHUM sistema publico que una grafo de DECISAO e g |
-| 6.0 | `Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO` | identidade-onion-vps-2026-08 | O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de m |
-| 5.4 | `Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO` | identidade-onion-vps-2026-08 | A guarda `vps-exposure-check.sh` cobre o lado de CA (bind publico em container vivo, conector upstream, backup em claro) e roda di |
+| 20.0 | `D_CENSO_190_EM_LOTES` | fios-abertos | SELADO PELO MAESTRO 2026-08-30 (supersede D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA): executar o CENSO dos ~190 itens abertos do docs/bac |
 
 ## gtm-decisions-2026-07 — 7 item(ns)
 
@@ -209,6 +205,16 @@
 | 13.5 | `C_SURFACE_REMAINS_GATED` | guardrails-2nd-pr-state-2026-07 | o UNICO residuo real e a superficie /meta:guardrails — GATED (fio #4 do promotion-plan). Relabel ONION-Rn amplo = docs-pass opci |
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
 
+## identidade-onion-vps-2026-08 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.0 | `Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO` | identidade-onion-vps-2026-08 | ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. Medido em `/home/marcio/onion-adopt-arandek/dock |
+| 12.0 | `Q_LACUNA_DECISAO_MAIS_CODIGO` | identidade-onion-vps-2026-08 | A OPORTUNIDADE, e ela e de diferenciacao e nao de divida. A pesquisa nao achou NENHUM sistema publico que una grafo de DECISAO e g |
+| 7.2 | `Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO` | identidade-onion-vps-2026-08 | SUPERSEDE [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] com a verdade de 2026-08-29: a lacuna de 08-13 FECHOU PELA METADE. O pass JA TEM oni |
+| 6.0 | `Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO` | identidade-onion-vps-2026-08 | O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de m |
+| 5.4 | `Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO` | identidade-onion-vps-2026-08 | A guarda `vps-exposure-check.sh` cobre o lado de CA (bind publico em container vivo, conector upstream, backup em claro) e roda di |
+
 ## constellation-dialogic-layer-2026-07 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -220,12 +226,6 @@
 | 5.4 | `C_BOLETIM_INFORM` | constellation-dialogic-layer-2026-07 | 3o uso: o boletim core->estrela INFORMA a estrela do que virou main (simetrico ao carteiro star->core PUSH) — 3 travas: contexto |
 | 4.0 | `D_ISOLATION_EXTENSION_GATED` | constellation-dialogic-layer-2026-07 | GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao |
 | 3.6 | `D_BOLETIM_CANDIDATE` | constellation-dialogic-layer-2026-07 | documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por es |
-
-## fios-abertos — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 10.2 | `D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA` | fios-abertos | PROPOSTA AO MAESTRO (decisao NAO-TOMADA — `drive_kind: decision`, o driver propoe, nao executa): trocar o censo por AMOSTRA ESTR |
 
 ## context-freshness-2026-08-12 — 2 item(ns)
 

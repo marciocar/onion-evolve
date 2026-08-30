@@ -124,7 +124,14 @@ Contrato do worker (cada cláusula paga por um erro real desta casa):
   `CONFIRMED` é o desfecho que não pede justificativa, e por isso é para onde um worker escorrega.
 
 Tiering: `sonnet`/`medium` no worker (derivar o método pede raciocínio, não é mecânico);
-`opus`/`high` num juiz adversarial se > 30% vier DRIFTED/REFUTED.
+`opus`/`high` no **juiz adversarial — etapa FIXA** (decisão do maestro 2026-08-30, sobre
+calibração com padrão-ouro: FP 20% na acusação de subcontagem, SUB 0/7 — nunca erra na direção
+perigosa — e o único mecanismo que pegou um `ls` curado vendido como observed verbatim). Os
+vereditos do juiz PERMANECEM PROPOSTA que o maestro sela. Em runs grandes o juízo PODE ser
+escopado aos vereditos CONFIRMED (o desfecho barato de fabricar), com o corte DECLARADO no
+relatório. ⚠️ A regra anterior — juiz condicional a ">30% DRIFTED" — foi REMOVIDA por furo
+medido: o gatilho dependia do AUTOJULGAMENTO dos workers, exatamente o que o juiz existe para
+auditar (subcontagem de 44-48% medida em dois corpora).
 
 Schema de retorno:
 

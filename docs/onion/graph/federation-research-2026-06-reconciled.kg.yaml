@@ -1174,7 +1174,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: 2026-08-30
     trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md §4-§6; .claude/utils/federation-transport/factory.md (a2a-live nunca auto)"
     label: "CONFIRMOU-SE e virou doutrina: RFC-0004 ratifica 'só sinais gated, nunca IA-fala-IA autônoma', git-async de invariante absoluto para default-com-exceção-gated, a2a-live NUNCA auto-selecionado, fail-safe (ausência de gate válido = veto). A pergunta de junho sobre 'quando habilitar IA-fala-IA' foi respondida: gated sim, autônoma nunca"
   - id: REC_MEMBERS_YAML_CURATED_REGISTRY
@@ -1201,7 +1201,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: PROD
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 0.95
     verified_at: 2026-07-21
@@ -8112,6 +8112,16 @@ nodes:
     confidence: 0.7
     trace: ""
     label: "A pergunta comercial de junho ('como monetizar/distribuir') não foi respondida nem abandonada — foi RE-FORMULADA em outro plano: virou topologia de repositórios (porta pública ≠ core privado, onion-mini como entrada, doors por plataforma). O core não decide por licença; decide por estrutura de arquivos"
+  - id: REC_STAGING_ROT_2026_08_REMEASURED
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-30
+    verified_against: "piloto kg-freshness 2026-08-29: worker re-mediu as 4 afirmacoes ao vivo; selo do maestro 2026-08-30"
+    label: "SUPERSEDE [REC_STAGING_ROT_AND_MISSING_MAILBOX] (2026-07-21) com a verdade de 2026-08-29: TRES das quatro afirmacoes seguem verdadeiras e re-medidas (os 11 anuncios apodrecidos ate 13 dias; a causa membro method-only sem caixa postal; o fix caixa-postal-nao-e-framework, vivo e recebendo correio ate 2026-08-18). A QUARTA driftou: o label citava a REGRA 28 com 3 classes SOFT — em 2026-08 a revisao do double-firing AMPUTOU a classe de outbox orfao (absorvida pela REGRA 46), deixando a 28 com 2 classes. No que cita numero de classes de uma guarda apodrece quando a guarda e refatorada — mesma classe do /admin/stats do m2."
+
 edges:
   - from: G1_INTERRUPT_STATES
     to: G1_GATED_HANDSHAKE_DESIGN
@@ -11371,3 +11381,6 @@ edges:
   - from: SY6_ev_mcp_json_ausente
     to: B6_16_mcp_padrao_de_fato
     edge_type: DEPENDS_ON
+  - from: REC_STAGING_ROT_2026_08_REMEASURED
+    to: REC_STAGING_ROT_AND_MISSING_MAILBOX
+    edge_type: SUPERSEDES
