@@ -105,7 +105,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): As 4 afirmações do label seguem tecnicamente verdadeiras e re-medidas hoje sem contradição — mas o nó é um DECISION que registra uma correção documental (postura + citaçã"
     label: "FIX G — a POSTURA (o maestro executa o flip de auth, a sessão especifica) se MANTÉM, mas ancorada onde de fato se ancora: (1) doutrina 'docs de deploy são declaração; O SERVIDOR É O VERIFICADO' (vps-lineage-odyssey:48) e (2) RISCO DE LOCKOUT — errar o gate de identidade da própria porta de entrada tranca o operador fora, e o rollback exige acesso ao host por outro canal. Citação de I3 corrigida nos 4 lugares"
 
   - id: C_hardening_applied_by_core_session
@@ -344,7 +346,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O label descreve uma superfície de risco fixada no desenho de julho/2026 ('bridge:invoke é o ÚNICO scope... não há token de leitura'). Em 2026-08-15 o bridge implementou "
     label: "FIX I — RISCO NOVO QUE A v2 NÃO NOMEAVA: com PKCE o material bearer passa a VIVER NO BROWSER DA PWA (localStorage por padrão no SDK do Logto), com o MESMO PODER DE EXECUÇÃO — bridge:invoke é o ÚNICO scope e por trás dele está o Agent SDK em bypassPermissions; não há 'token de leitura'. O flip MOVE, não elimina, a superfície: de 'um segredo num EnvironmentFile no servidor' para 'um token num device'. Três vetores: ARMAZENAMENTO (localStorage é legível por qualquer JS da origem e persiste), XSS (dependência comprometida ou sw.js envenenado EXFILTRA o bearer e ganha execução de agente no clone do core), PERDA DE DEVICE (o token válido vai junto). Um spec de segurança que só lista ganhos não é um spec de segurança"
 
   - id: D_pkce_risk_mitigations
@@ -564,7 +568,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.95
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O label descrevia o mecanismo como 'fixar algorithms: ['RS256'] (ou ['ES256']...) no jwtVerify (jose)' — a implementação real diverge na FORMA (não usa a lib jose nem jwt"
     label: "ALG PINADO (aprovado pelos verifies, PRESERVADO): no jwtVerify (jose) do §3.3, fixar explicitamente algorithms: ['RS256'] (ou ['ES256'], conforme o alg REAL que o Logto emitir, provado no P4.1 decodificando o HEADER do JWT — agora com o decode_jwt que funciona, D_proof_command_fixed). Nunca deixar a lib herdar o alg do header do token: endurecimento padrão contra CONFUSÃO DE ALGORITMO (alg:none, HS256 com chave pública como segredo). Custo zero, uma linha"
 
   # ---- F6 (preservado + fix J): RFC 8707 LOAD-BEARING ----

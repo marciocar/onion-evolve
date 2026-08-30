@@ -98,6 +98,8 @@ nodes:
     impact: 4
     confidence: 0.7
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2: worker CONFIRMED e juiz opus/high APROVOU (run wf_8906ab14-786)"
     label: "OP-2 PROMOVER (role: standalone→hub / consumer→T2): atualizar o campo role: no members.yaml do core. Hoje --promote-hub só re-carimba o STAMP local do adotante; federation-radar ③ detecta drift pós-hoc mas não corrige"
   - id: C_op_update
     node_type: claim

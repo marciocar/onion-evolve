@@ -165,7 +165,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.7
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O nó pede 'propor' (fase de proposta/backlog) 6-7 produtos deriváveis ao core, citando 3 nominalmente. O vivo mostra que a proposta foi SUPERADA por entrega real: os 3 pr"
     label: "propor 6 produtos deriaveis ao core (gerador de vertical, deck de treino, retro-skill, etc.)"
   - id: Q_RETRO_PENDENTE
     node_type: question

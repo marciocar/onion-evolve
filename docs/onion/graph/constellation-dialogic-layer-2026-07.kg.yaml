@@ -93,7 +93,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.6
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O label tem duas afirmações independentes, ambas medidas e ambas batendo com o vivo — mas isso significa que o TRABALHO do nó já foi ENTREGUE, não que segue aberto. Claim"
     label: "dar casa canonica a Aristoteles e candidato gated, nao promocao agora"
 
   # ---- a trava (rule) ----
@@ -103,7 +105,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.75
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): A regra pedia UM mecanismo (não tratar confidence atribuída como medição sem dogfood real). Esse mecanismo FOI construído e amadureceu — só que por um caminho diferente e"
     label: "nao tratar confidence ATRIBUIDA como medicao sem dogfood real (honrar os dois-quantitativos)"
 
   # ---- duvidas / incomodos (questions — a fronteira honesta) ----
@@ -286,7 +290,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.65
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O nó está em status:open como se a recomendação ainda estivesse pendente/gated, mas as 3 afirmações do label já foram TODAS entregues no vivo: a KB foi criada em docs/kno"
     label: "recomendacao: casa = KB focada da regua de transferencia, cross-link SDAAL/adopt (o vivido) + Hegel/Bloom (irmas) — promocao focada; o ATO de escrever no core e gated pela nossa autorizacao"
 
   # ---- ancoras (entidades) ----
