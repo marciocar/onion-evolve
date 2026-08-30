@@ -3,7 +3,7 @@ title: "Revisão — censo lote 4: 53%, o experimento que a decisão atropelou, 
 date: 2026-08-30
 branch: drive/census-batch4
 reviewer: "mesmo desenho selado: 30 workers × 13 juízes opus/high nos CONFIRMED × tabela de selagem; radar exit 0 nos grafos tocados"
-reviewed_diff_sha256: aceda1776d3fccd900a8c29f36fdb1281f2f98f9abb1f063fc6c847cb1c6c906
+reviewed_diff_sha256: fa8ec617f4a6c34d5722df1ca94e9e320e8793a8a29b9425cbbdc26915ea2ad1
 findings_total: 16
 findings_real: 16
 verdict: APROVADO
@@ -46,3 +46,12 @@ Reprovações continuam majoritariamente do tipo "vida certa, selo TOTAL inflado
 
 **120/190 medidos (63%) · 61 mortos selados · backlog 190 → 130.** Restam ~70 (atenção ≤5,4 — a
 cauda fina). Retomável pelo mesmo desenho; args de exclusão acumulados no scratchpad da sessão.
+
+## Achado do CI deste próprio PR (e a cura, no mesmo lote)
+
+O `selftest` REPROVOU o lote: o caso **status-factor (c)** usava um **grafo vivo como fixture**
+("o grafo com nó `unverifiable`" = `vps-shared-tools`) — e o censo do lote 3 flipou o **último**
+`unverifiable` daquele arquivo. Sem a classe no insumo, o mutante produz saída idêntica e a
+prova-de-mutação morre por vácuo. **Fixture viva é empréstimo com prazo.** Cura: o caso agora
+SINTETIZA o próprio grafo (como o caso (d) já fazia). Dogfood provado nos dois lados:
+`rc_int=0` · `rc_mut=1`.

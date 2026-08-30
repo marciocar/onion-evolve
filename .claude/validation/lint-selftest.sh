@@ -1274,9 +1274,15 @@ run_kg_status_factor_selftests() {
   #     do seu proprio dir e o radar aponta para a canonica.
   #     ⚠️ E o `rm -rf` vem DEPOIS de provar: a 1a versao apagava o tmp antes, e `cmp` contra arquivo
   #     apagado devolve 2 — a guarda-da-guarda nº1 ficava morta por construcao.
-  g="${REPO_ROOT}/docs/onion/graph/vps-shared-tools-2026-07.kg.yaml"
-  if [ ! -f "$g" ]; then record_skip "status-factor: (c) grafo com no unverifiable ausente"; else
+  # ⚠️ FIXTURE SINTETICA (2026-08-30): a 1a versao usava um grafo VIVO como insumo
+  # (vps-shared-tools, "o grafo com no unverifiable") — e o censo de backlog flipou o ULTIMO
+  # `unverifiable` daquele arquivo, matando a prova por vacuo no CI (mutante = original quando
+  # a classe nao ocorre). Fixture viva e emprestimo com prazo: o caso agora SINTETIZA o proprio
+  # grafo, como o (d) ja fazia.
+  if true; then
     d="$(mktemp -d)"; mkdir -p "$d/lib"; cp "${view}" "$d/"
+    g="$d/unv.kg.yaml"
+    printf 'meta:\n  id: t-unv\n  schema_version: "1"\nnodes:\n  - id: C_A\n    node_type: claim\n    layer: domain\n    plane: DEV\n    status: unverifiable\n    impact: 4\n    confidence: 0.8\n    label: "no unverifiable sintetico para a prova de paridade"\n  - id: C_B\n    node_type: claim\n    layer: domain\n    plane: DEV\n    status: confirmed\n    impact: 3\n    confidence: 0.9\n    label: "vizinho para dar grau"\nedges:\n  - from: C_A\n    to: C_B\n    edge_type: SUPPORTS\n' > "$g"
     sed 's/if (s == "unverifiable") return 1.0/if (s == "unverifiable") return -1/' "${lib}" > "$d/lib/status-factor.awk"
     local rc_int rc_mut
     # `cmd; rc=$?` mata a suite sob `set -e` — quinta vez nesta sessao. Use `|| rc=$?`.
