@@ -347,7 +347,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.6
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O no esta status:open como se 'documentar o boletim como padrao candidato' fosse trabalho pendente, mas as 3 afirmacoes do label ja estao TODAS entregues e conferindo com"
     label: "documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por estetica"
 edges:
   # a prova viva sustenta a tese e a epistemologia

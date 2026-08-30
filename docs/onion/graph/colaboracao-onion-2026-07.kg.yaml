@@ -177,7 +177,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.5
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O label diz pergunta ABERTA dependendo de retro 'em coleta'. No vivo a retro fechou ha 4 semanas (2026-07-29/30) com resposta concreta e favoravel (NPS 10, CSAT 10x8 em 4"
     label: "o que a retro do Gustavo vai confirmar/refutar sobre o processo?"
   # ---- LOTE 2: evidencias da pesquisa "colaboracao moderna 2026" ----
   - id: E_RESEARCH
@@ -301,7 +303,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.5
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó afirma que o perfil colaborador-visitante E o boundary de autorizacao de relay 'ainda nao' estao formalizados no core. Isso deixou de ser verdade em 2026-07-30 (PR #"
     label: "perfil colaborador-visitante + boundary de autorizacao de relay ainda nao formalizados no core"
   - id: C_MAESTRO_NAO_E_UNICO_RELAY
     node_type: claim

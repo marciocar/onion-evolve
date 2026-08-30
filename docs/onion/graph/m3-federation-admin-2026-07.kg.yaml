@@ -50,7 +50,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.55
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O label tem 4 afirmações independentes: (C1) a decisão de plugar Logto no command-side 'ainda NÃO foi tomada'; (C2) 'o bridge hoje usa AUTH_TOKEN próprio, não Logto'; (C3"
     label: "Plugar Logto no command-side é decisão do maestro, ainda NÃO tomada (o bridge hoje usa AUTH_TOKEN próprio, não Logto). Auth backend só entra no gatilho MULTI-OPERADOR (1º role:consumer real) — NÃO é pré-requisito das OP-1..4 (nativas, editam members.yaml + commit, zero backend). Limite operacional a registrar: Logto OSS self-hosted = 1 conta admin no console (multi-admin exige Cloud ou toda gestão de org via Management API pelo control-plane)"
   - id: Q_wake_session
     node_type: question

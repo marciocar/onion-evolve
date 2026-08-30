@@ -154,7 +154,9 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.6
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó Q_f3_wow estava com status 'open' descrevendo F3 (partículas em arestas, semantic-zoom, minimapa, scrollytelling) como trabalho gated/pendente que 'vai por último de"
     label: "F3 wow polish (partículas em arestas, semantic-zoom, minimapa, scrollytelling) — gated, eye-candy destacável; vai por último de propósito"
     trace: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"
   - id: Q_live_narration

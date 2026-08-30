@@ -94,7 +94,9 @@ nodes:
   - id: ENT_tunneling
     node_type: entity
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): ENT_tunneling pede 'avaliar fit vs Caddy + alternativas (Cloudflare Tunnel, Tailscale Funnel), via pesquisa+Elenxo' como trabalho ABERTO. Esse trabalho JÁ FOI FEITO — e a"
     impact: 2
     confidence: 0.6
     label: "EXPOSICAO/TUNNELING: ngrok nomeado como interessante. Avaliar fit vs o Caddy ja vivo + alternativas (Cloudflare Tunnel, Tailscale Funnel). Pesquisa + Elenxo"
