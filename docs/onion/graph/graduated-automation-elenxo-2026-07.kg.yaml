@@ -135,6 +135,8 @@ nodes:
     node_type: question
     plane: DEV
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
     impact: 3
     confidence: 1.0
     label: "Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela acontecer"
@@ -143,6 +145,8 @@ nodes:
     node_type: question
     plane: DEV
     status: open
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
     impact: 3
     confidence: 1.0
     label: "Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de subir a AUTO"

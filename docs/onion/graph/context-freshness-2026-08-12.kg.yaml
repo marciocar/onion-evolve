@@ -99,9 +99,9 @@ nodes:
   - id: Q_ORCAMENTO_DE_CI_MEDIDO_CONTRA_ARTEFATO_41PCT_MENOR
     node_type: question
     plane: PROD
-    verified_at: 2026-08-12
+    verified_at: 2026-08-30
     verified_against: wc-l-do-lint-3191-contra-2261-declarado-e-timeout-minutes-25-contra-15-declarado
-    status: open
+    status: done
     impact: 3
     confidence: 1.0
     label: "O `contributing.md` apresenta um ORCAMENTO DE CI como 'medido 2026-07-20': '~7,5min total, teto timeout-minutes: 15', com o lint em '2261 linhas'. MEDIDO HOJE: `timeout-minutes` vivo e **25**; o lint tem **3191** linhas (+41%). ⚠️ O AGRAVANTE E A FORMA: numero apresentado como MEDICAO carrega autoridade que numero solto nao tem — o leitor nao o questiona. E o juiz notou o que a acusacao original nao viu: se o lint cresceu 41%, o '~7,5min' inteiro foi medido contra outro artefato e precisa ser RE-MEDIDO, nao so os dois numeros pegos. GATILHO: re-medir o orcamento do §3.1 inteiro numa execucao real de CI antes de recarimbar."

@@ -75,7 +75,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.7
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó está status:open como se fosse trabalho pendente, mas as 3 afirmações do label já estão TODAS entregues e verificadas contra o vivo: (1) a pesquisa segue guardada co"
     label: "guardar como pesquisa de core design-only/gated, NAO mesclar — julgamento conjunto (nao promovido)"
   - id: D_DOGFOOD_IS_ENGINE
     node_type: decision

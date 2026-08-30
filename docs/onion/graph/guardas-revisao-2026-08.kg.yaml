@@ -187,8 +187,8 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.9
-    status: open
-    verified_at: 2026-08-03
+    status: done
+    verified_at: 2026-08-30
     verified_against: 'leitura dos corpos: R28 classe (1) e R46 detectam a mesma condicao'
     label: 'R28 classe (1) e R46 detectam a MESMA condicao — um dir orfao com 3 anuncios emite 4 SOFT para um fato so; cura e amputar a classe (1) da R28'
 
@@ -198,7 +198,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: open
-    verified_at: 2026-08-03
+    verified_at: 2026-08-30
     verified_against: 'leitura do lint-selftest.sh — STRICT reprova skip por tooling, nao regra sem fixture'
     label: 'nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca'
 
@@ -258,8 +258,8 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 1.0
-    status: open
-    verified_at: 2026-08-03
+    status: done
+    verified_at: 2026-08-30
     verified_against: 'contagem real dos baselines vs o que o docstring afirma'
     label: 'R45 diz "nasce com 101" (baseline tem 0) e R44 diz "tudo em HUMAN" (15 classes, 1 MONITORED) — declarado != verificado DENTRO da propria guarda'
 

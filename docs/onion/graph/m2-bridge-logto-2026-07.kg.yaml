@@ -47,7 +47,9 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.85
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O fato histórico do label (o incidente de escrita de código a partir de um celular por bypassPermissions+git-local aconteceu) continua verdadeiro — não é isso que morreu."
     label: "NÃO é hipotético: precedente REAL de escrita de código de um celular por esse caminho (SDK bypassPermissions + git local no VPS). Escrita real já aconteceu — o buraco é risco materializado, não teórico"
 
   - id: C_a2a_gate_narrow
@@ -406,7 +408,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O no descreve um fecho em 2 camadas: (1) sign-up desligado (P3.4) e (2) role concede bridge:invoke restrito, com usuario-sem-role levando '403 insufficient_scope (!= 401)"
     label: "Corolário do grant duplo — com PKCE, sign-up ABERTO no Logto = qualquer pessoa vira usuário do tenant e passa em iss/aud. Fecho em 2 CAMADAS: (1) desligar o sign-up na Sign-in Experience (P3.4); (2) role bridge-operator concede o scope bridge:invoke só ao maestro e ao client M2M — usuário sem role recebe JWT válido SEM scope e leva 403 insufficient_scope (≠ 401). A camada 2 sustenta o fecho mesmo se a 1 for reaberta por engano"
 
   - id: D_logto_not_ssot
@@ -682,7 +686,9 @@ nodes:
     plane: PROD
     impact: 2
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó pede uma HIGIENE DE CITAÇÃO ainda pendente ('as duas fontes têm de ser citadas JUNTAS'; status: open). No vivo, essa higiene já foi APLICADA: o documento que origina"
     label: "FIX N — HIGIENE DE FONTE: o sinal citado por este spec (inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md) RECEBEU CORREÇÃO FORMAL. A correção REFUTA o diagnóstico do entrypoint ('o 503 do staging do Arandek vinha de seed && node init.mjs && npm start') — a causa real era AUTO-SHUTDOWN AGENDADO (min=0/max=0, desired=0, num sábado fora da janela seg-sex 07:00-21:00). NÃO ATINGE o que o M2 cita daquele sinal (Logto 1.41.0 vivo, pin+verifier), MAS as duas fontes têm de ser citadas JUNTAS: citar o sinal sem a correção reintroduz por transporte uma inferência já refutada. É a MESMA CLASSE de erro desta revisão — observação correta promovida a causa"
 
   - id: Q_vps_declared
@@ -692,7 +698,9 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.5
-    status: open
+    status: done
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó lista 8 lacunas de medição declaradas em 2026-07-05/07-26 ('o que esta sessão NÃO mediu'). Nesta passada, todas as 8 foram medidas diretamente no host vivo (VPS = a "
     label: "VPS-DECLARADO ('o servidor é o verificado') — o que esta sessão NÃO mediu: valor real do AUTH_TOKEN vivo; systemd unit/Caddyfile reais do bridge (inclusive se o reverse_proxy preserva o header Authorization e se não loga query string); config real de bypassPermissions/allowedTools do Agent SDK; inventário e ORDEM DE REGISTRO das rotas do Hono; como a PWA consome o SSE; modos cortesia/BYOK; estado do sign-up no Logto; onde vive o /a2a. P0 pré-flight resolve lendo no host antes de agir. NOTA: a v3 introduziu a distinção host-vps-MEDIDO vs host-vps-DECLARADO justamente porque o fix A mostrou que 'verificado' vinha sendo usado para configuração"
 
   - id: Q_byok_courtesy_mode

@@ -151,7 +151,9 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 1.0
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O no foi selado (2026-08-21) descrevendo 'as 3 MCPs onion-framework/kg/exec conectadas' como fato vivo, e a pergunta era como cobrir a lacuna de busca web DENTRO dessa tr"
     label: "A face conversavel do Onion (MCPs onion-framework/kg/exec) nao tem tool de busca/crawling web — como mapear um dominio externo quando pedido pelo usuario? [SELADO da kg-inbox: gap-web-search, origem chat 2026-08-20]"
   - id: E_NO_WEB_TOOL
     node_type: evidence
