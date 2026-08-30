@@ -345,7 +345,7 @@ nodes:
   - id: Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO
     node_type: question
     plane: PROD
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.9
     verified_at: 2026-08-30
@@ -362,6 +362,17 @@ nodes:
     verified_against: "censo lote 5 (run wf_2349bf29-ea0): compose rastreado no git do adotante, portas sem prefixo de bind + segredo literal de fallback; mesma classe do achado arandek (redigido, nao enviado)"
     label: "O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotante ativo com o mesmo defeito de exposicao do achado arandek: docker-compose rastreado no git com portas sem prefixo de bind (Docker publica em todas as interfaces por default — e nesta VPS o Docker FURA o ufw) e segredo literal como fallback. Detalhes especificos (repo, portas, valores) ficam FORA deste no de proposito: e material de comunicacao sensivel, e a decisao de comunicar e do maestro — como no arandek, que segue redigido e nao-enviado por ordem. ACAO PENDENTE (decisao do maestro): (a) comunicar os dois adotantes; (b) decidir a regra de lint de compose para role adotante que o Q_GUARDA propoe — a classe agora tem 2 instancias medidas."
     trace: "runs wf_2349bf29-ea0 · docs/analysis/granaai-compose-exposure-2026-08.md (material de comunicacao, REDIGIDO-NAO-ENVIADO) · docs/analysis/onion-vps-network-exposure-2026-08.md"
+
+  - id: Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-30
+    verified_against: "prova real executada 2026-08-30 apos destrave do GPG: offsite-cron.sh rc=5 — o guard anti-local barrou; valor de onion/restic-repo tem 12 chars sem esquema remoto e E IDENTICO ao de onion/restic-password"
+    label: "SUPERSEDE [Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO] com a verdade MEDIDA na 1a prova real: o OFFSITE NUNCA EXISTIU. Em 08-13 a MESMA string entrou nos DOIS campos do pass (restic-repo E restic-password) — o restic tratou a senha como CAMINHO, criou um repo LOCAL com esse nome (o diretorio acidental, ja renomeado para restic-local-acidental-2026-08-13) e o 1o backup real foi para o mesmo disco. O mecanismo em si esta PROVADO NA DIRECAO DA FALHA: cron armado, wrapper fail-loud, e o guard anti-local barrou exatamente o que devia (rc=5, nada enviado). FALTAM DOIS INSUMOS QUE SO O MAESTRO TEM: (1) o destino real — pass insert onion/restic-repo com esquema remoto (as chaves R2 ja existem no pass; conta/bucket sao dado dele; o script recomenda destino com imutabilidade do lado do servidor); (2) a decisao sobre a senha exposta como nome de diretorio desde 08-13 — a cura de classe seria rotacao, que esta PARADA POR ORDEM do maestro: registrado, nao proposto. Com o insumo (1), a prova roda no ato."
+    trace: "/home/marcio/onion-vps-vaultwarden/offsite-cron.sh · logs/offsite-cron.log"
 
 edges:
   - from: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
@@ -454,3 +465,6 @@ edges:
   - from: E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO
     to: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
     edge_type: SUPPORTS
+  - from: Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO
+    to: Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO
+    edge_type: SUPERSEDES
