@@ -147,7 +147,9 @@ nodes:
   - id: Q_p2_clarify
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): Claim (A) — 'P2' segue literalmente não-nomeado — permanece tecnicamente verdadeiro (zero resolução no repo), mas claim (B) — que essa ambiguidade BLOQUEIA a pesquisa de "
     impact: 2
     confidence: 1.0
     label: "ESCLARECER com o maestro: o que e 'P2' no monitoramento? (Prometheus? Posthog? Phoenix/Arize? Pydantic Logfire?) — nome nao resolvido; bloqueia a pesquisa de observabilidade"
@@ -231,7 +233,9 @@ nodes:
   - id: C_axis_email
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): O nó é um TESTE-DO-EIXO com 4 afirmações independentes: (1) decidir entre SMTP self-host (Postfix/maddy) x API transacional (Resend/Postmark/SES); (2) SDAAL-candidato SE "
     impact: 3
     confidence: 0.8
     label: "TESTE-DO-EIXO email: SMTP self-host x API transacional (Resend/Postmark/SES) — SDAAL-CANDIDATO se >=2 reais intencionados; hoje provavelmente 1 -> script-gated no 2o. Conector do Logto e concern SEPARADO (config do proprio Logto). Decidir na F1"
@@ -240,7 +244,9 @@ nodes:
   - id: C_axis_monitoring
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
+    verified_at: 2026-08-30
+    verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): A premissa do nó — que falta um ELENXO-DE-FRAMING para decidir se monitoramento é STACK ou SDAAL-candidato, a ser feito 'na F1' — está MORTA: a pesquisa foi feita (embora"
     impact: 3
     confidence: 0.8
     label: "TESTE-DO-EIXO monitoramento: DIVIDE em (a) obs-de-MAQUINA (PM2/OTel/Prometheus) = contratos DISTINTOS nao-intercambiaveis -> STACK, NAO SDAAL unico; (b) obs-de-IA/tokens (Langfuse/Phoenix/Helicone) = LLM-obs intercambiavel -> SDAAL-candidato se >=2 reais. Decidir por sub-dimensao na F1"

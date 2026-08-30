@@ -62,10 +62,10 @@ nodes:
   - id: E_ALLOWLIST_NO_KG_VIEW
     node_type: evidence
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.9
-    verified_at: 2026-08-07
+    verified_at: 2026-08-30
     verified_against: elenxo-556-medicao-do-refutador-em-kg-view-json-vs-radar
     label: "SITIO 3 (NAO CURADO): kg-view.sh:101-107 carrega uma COPIA de statusFactor que nao conhece os status novos — retorna -1, clampado a 0. Os nos mais urgentes do grafo renderizam com peso 0.0 na projecao, e `--assert-parity` passa VERDE porque so compara contagem de nos e arestas, nunca PESO"
 
