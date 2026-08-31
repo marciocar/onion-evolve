@@ -3,7 +3,7 @@ title: "Revisão — a classe virou mecanismo: REGRA 64 + branch na granaai + pa
 date: 2026-08-31
 branch: feat/compose-exposure-rule
 reviewer: "REGRA 64 provada por mutação nos dois lados (4/4 no ruim, 0 no curado) + bancada auto-contida 3/3 no padrão awk-extração; o pre-commit vendorizado da granaai foi respeitado e o bypass documentado no próprio commit deles"
-reviewed_diff_sha256: 0ca89453673a894d509755d29ccca4c804173dca45fe86fccc2bfcd54e82db0c
+reviewed_diff_sha256: f9d521d18be5f95a03631a3400d00cfd823c2253c50cc2c8de20b82f0257f357
 findings_total: 3
 findings_real: 3
 verdict: APROVADO
