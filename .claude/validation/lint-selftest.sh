@@ -10480,6 +10480,57 @@ run_realign_selftests() {
 # apagados, e 14 dos 18 conceitos não existem hoje em nenhum artefato consultável.
 # Os três casos são os três estados reais: sem resíduo · resíduo parcial · resíduo completo.
 # ---------------------------------------------------------------------------
+
+run_compose_exposure_selftests() {
+  # REGRA 64 — bancada AUTO-CONTIDA (lição da fixture-viva, censo 2026-08-30): sandbox git
+  # próprio + função extraída do lint VIVO por awk (o padrão da bancada da R46 — não uma cópia
+  # que envelhece) + violation() stub que conta.
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  [ -f "${lint}" ] || { record_skip "compose-exposure: lint ausente"; return; }
+  local d; d="$(mktemp -d)"
+  ( cd "$d" && git init -q ) || { record_fail "compose-exposure: sandbox" "git init falhou"; rm -rf "$d"; return; }
+  awk '/^check_compose_exposure\(\)/,/^}/' "${lint}" > "$d/f.sh"
+  if ! grep -q 'check_compose_exposure' "$d/f.sh"; then
+    record_fail "compose-exposure: extração" "a função sumiu do lint — a guarda foi removida?"; rm -rf "$d"; return
+  fi
+  cat > "$d/docker-compose.yml" <<'FIX'
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+    ports:
+      - 5435:5432
+      - 127.0.0.1:8080:80
+FIX
+  ( cd "$d" && git add -A )
+  local out
+  out="$(cd "$d" && REPO_ROOT="$d" bash -c 'violation(){ echo "V[$1] $2 :: $3"; }; source f.sh; check_compose_exposure' 2>&1)" || true
+  local n_port n_fall
+  n_port="$(printf '%s\n' "${out}" | grep -c 'SEM prefixo de bind' || true)"
+  n_fall="$(printf '%s\n' "${out}" | grep -c 'FALLBACK LITERAL' || true)"
+  if [ "${n_port}" -eq 1 ] && [ "${n_fall}" -eq 1 ]; then
+    record_pass "compose-exposure: acusa porta sem bind E fallback de segredo (1+1); o 127.0.0.1 cala"
+  else
+    record_fail "compose-exposure: acusação" "esperava 1+1; veio porta=${n_port} fallback=${n_fall}: $(printf '%s' "${out}" | head -2)"
+  fi
+  sed -i 's|- 5435:5432|- 127.0.0.1:5435:5432|; s|${DB_PASSWORD:-postgres123}|${DB_PASSWORD:?defina}|' "$d/docker-compose.yml"
+  ( cd "$d" && git add -A )
+  out="$(cd "$d" && REPO_ROOT="$d" bash -c 'violation(){ echo "V[$1] $2 :: $3"; }; source f.sh; check_compose_exposure' 2>&1)" || true
+  if printf '%s\n' "${out}" | grep -q 'REGRA 64'; then
+    record_fail "compose-exposure: falso-positivo" "compose curado ainda acusa"
+  else
+    record_pass "compose-exposure: compose curado passa limpo"
+  fi
+  printf 'services:\n  x:\n    ports:\n      - 9999:9999\n' > "$d/docker-compose.dev.yml"
+  out="$(cd "$d" && REPO_ROOT="$d" bash -c 'violation(){ echo "V[$1] $2 :: $3"; }; source f.sh; check_compose_exposure' 2>&1)" || true
+  if printf '%s\n' "${out}" | grep -q '9999'; then
+    record_fail "compose-exposure: escopo" "UNTRACKED foi acusado — escopo declarado é git ls-files"
+  else
+    record_pass "compose-exposure: untracked fica fora (rascunho não é artefato)"
+  fi
+  rm -rf "$d"
+}
+
 run_harvest_residue_selftests() {
   local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
   if [ ! -f "${lint}" ]; then record_skip "harvest-residue: lint ausente (SUT não exercido)"; return; fi
@@ -10775,6 +10826,7 @@ run_deploy_site_selftests
 run_install_caddy_config_selftests
 run_realign_selftests
 run_harvest_residue_selftests
+run_compose_exposure_selftests
 run_backlog_projection_selftests
 run_drive_selftests
 run_site_derivation_selftests
