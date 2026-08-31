@@ -32,6 +32,12 @@
 .hero .btn-p:hover { background:var(--h-orange-hot); }
 .hero .btn-s { color:var(--h-ink); border:1.5px solid var(--h-line-strong); background:transparent; }
 .hero .btn-s:hover { border-color:var(--h-orange); color:var(--h-orange-hot); }
+.hero-mech { display:flex; flex-wrap:wrap; justify-content:center; gap:.5rem .9rem; list-style:none;
+  margin:1.1rem auto 0; padding:0; max-width:820px; }
+.hero-mech li { font-size:.8rem; color:var(--h-mut); border:1px solid rgba(255,255,255,.12);
+  border-radius:999px; padding:.35rem .8rem; background:rgba(255,255,255,.03); }
+.hero-mech li b { color:var(--h-orange); font-weight:700; margin-right:.35rem; }
+.hero-mech li code { font-size:.75rem; }
 .hero-note { max-width:660px; margin:1.5rem auto 0; font-size:.83rem; color:var(--h-dim); line-height:1.62; }
 .hero-note strong { color:var(--h-mut); font-weight:600; }
 /* terminal do hero — a trilha de decisão */

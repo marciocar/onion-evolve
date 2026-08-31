@@ -238,7 +238,7 @@ nodes:
   - id: C_SUBE_EMPACOTAMENTO_PUBLICO_O_QUE_A_LANDING_DI
     node_type: claim
     plane: PROD
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 0.85
     verified_at: 2026-08-31
@@ -598,6 +598,17 @@ nodes:
     label: 'Objecoes SOBREVIVENTES preservadas: (1) o defeito acoplamento-declarado-nao-usado NAO esta curado — settings.json do core segue com ZERO PreToolUse (a prova foi em sandbox; gatilho: 1o uso real); (2) provar o primitivo nao prova o moat — FailproofAI produtiza o mesmo primitivo em 12 harnesses; (3) a bancada vendorizada exercita a REGRA 65 no adotante mesmo sem o arquivo (por isso degrade SOFT); (4) baseline sem granularidade de lacuna ganhou o campo descartes; (5) os 5 vetos/dia sao testemunho nao-reproduzivel — rebaixados no doc.'
     trace: "docs/evolution/review/feat-meta-radar-surface.md"
 
+  - id: E_HERO_VIVO_JA_LIDERA_PELO_MECANISMO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-08-31
+    verified_against: 'site/src/pages/index.astro (reforma 2026-08-25): hero = grafo vivo e verificavel + trilha que voce audita + verificado por mecanismo, nenhum LLM adivinhou; o confronto mediu docs/materials/landing-page.md (06-28) — artefato MORTO, nao a superficie publicada'
+    label: 'DRIFT no veredito SUBESTIMADO do empacotamento: a evidencia interna citava o landing-page.md de junho, mas o hero VIVO ja lidera pelo mecanismo desde a reforma de 08-25. O que restava do veredito (a regua de PROVAS no hero) foi entregue: strip hero-mech com 3 provas ESTAVEIS (exit 2 sob bypass, 0 tokens, catraca-so-desce) — sem contagens pereciveis, a licao count-drift aplicada ao proprio site. GATILHO ABERTO: aposentar/supersedar docs/materials/landing-page.md (32 refs — cirurgia propria).'
+    trace: "site/src/pages/index.astro · site/src/styles/home.css"
+
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
     to: Q_MAESTRO_VIVO
@@ -752,3 +763,6 @@ edges:
   - from: E_ELENXO_DA_PASSADA_ONDA6
     to: C_TESE_MOAT_GATES
     edge_type: SUPPORTS
+  - from: E_HERO_VIVO_JA_LIDERA_PELO_MECANISMO
+    to: C_SUBE_EMPACOTAMENTO_PUBLICO_O_QUE_A_LANDING_DI
+    edge_type: SUPERSEDES
