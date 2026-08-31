@@ -1,7 +1,7 @@
 ---
 title: "arandek — mensagem pronta: fallbacks de senha no compose (complemento do achado de 08)"
 date: 2026-08-31
-status: REDIGIDO-PRONTO-PARA-ENVIO
+status: ENVIADO-2026-08-31 (via carteiro-local, inbound do arandek)
 kg: docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: "granaai — exposição de compose (classe arandek, 2ª instância)"
 date: 2026-08-30
-status: REDIGIDO-NAO-ENVIADO
+status: ENVIADO-2026-08-31 (via carteiro-local, inbound da granaai)
 kg: docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml
 ---
 

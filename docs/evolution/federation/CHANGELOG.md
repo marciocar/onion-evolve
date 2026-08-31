@@ -8,6 +8,12 @@
 
 ---
 
+
+## 2026-08-31 · Lote adopt --update no pin 219e9a5f + REGRA 64 (exposição de compose) · COMPATÍVEL · alvo: granaai, arandek, mvp-venda-direta-pdi
+
+- Os 3 adotantes locais atualizados ao pin `219e9a5f365b` (`.claude/rules/` no vendor, REGRA 64 com catraca de legado, baseline de compose seedável). mvp: aplicado direto na main local (0 HARD); arandek: branch `chore/onion-update-3ed62001` (89→4 HARD, gate de pre-commit religado via husky); granaai: branches `chore/onion-update-158f47c7` (56→6) + `fix/compose-bind-and-secret-fallback`.
+- Anúncios entregues via carteiro-local no `inbound/` de cada um (2026-08-31); rascunhos em `outbox/<id>/_processed/`.
+- Ação p/ os alvos: revisar/mergear as branches; granaai e arandek priorizarem os fixes de compose (bind + fallback de senha).
 ## 2026-08-25 · O site renasceu — autobiografia completa, doutrinas públicas e o diário em dia · COMPATÍVEL · alvo: todos
 
 O onionevolve.com foi reformado de ponta a ponta (PRs #671/#672): virou projeto Astro com todo
