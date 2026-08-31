@@ -3594,6 +3594,18 @@ check_radar_staleness() {
   if [ "${axes}" -eq 0 ]; then
     violation "HARD" "${bl}" "REGRA 65: arquivo de baselines presente mas SEM eixos legíveis — fail-loud, nunca conformidade por ausência"
   fi
+  # Gatilho de VERSÃO (ordem do maestro, 2026-08-31: "sempre ver se as estratégias estão adequadas"
+  # a cada versão do Claude Code — mecanizado, não lembrado): se a baseline E3 declara cc_version e
+  # o binário instalado difere, a plataforma mudou desde a última rodada de estratégia → SOFT.
+  # Sem binário `claude` no ambiente (ex.: CI) não há o que comparar — silêncio deliberado.
+  local pinned_cc installed_cc
+  pinned_cc=$(grep -oE 'cc_version:[[:space:]]*"[0-9][0-9.]*"' "${bl}" | head -1 | grep -oE '[0-9][0-9.]*')
+  if [ -n "${pinned_cc}" ] && command -v "${ONION_CC_BIN:-claude}" >/dev/null 2>&1; then
+    installed_cc=$("${ONION_CC_BIN:-claude}" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+    if [ -n "${installed_cc}" ] && [ "${installed_cc}" != "${pinned_cc}" ]; then
+      violation "SOFT" "${bl}" "REGRA 65: Claude Code mudou de versão desde a última rodada de estratégia (rodada=${pinned_cc}, instalado=${installed_cc}) — adequação não re-medida; rode /meta:radar E3-claude-code-delta"
+    fi
+  fi
 }
 
 check_kg_verification_coverage

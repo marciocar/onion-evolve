@@ -3,15 +3,22 @@ title: "Revisão — superfície /meta:radar + REGRA 65 (percepção externa com
 date: 2026-08-31
 branch: feat/meta-radar-surface
 reviewer: "REGRA 65 provada por execução nos 4 modos (fresco silêncio / velho SOFT nomeado / ilegível HARD / vazio HARD); bancada nova run_radar_staleness_selftests 4/4 via harness com as opções do runner (bancada completa >10min sob carga — declarado); regenerações por gerador (inventory/graph/registry/backlog); contagens 107→108 varridas por grep"
-reviewed_diff_sha256: 5ee5b8125bfe4d6aa3022d762bca3d6b796131beb9d9d5629730c0d622c248c7
-findings_total: 12
-findings_real: 12
+reviewed_diff_sha256: 21329dadf8c934c380b8f459405b8683c328dd5eca272d4efa69de6f796d0c8f
+findings_total: 13
+findings_real: 13
 verdict: APROVADO
 tokens: 0
 duration_min: 35
 ---
 
 # Resíduo — REGRA 56
+
+## Gatilho de versão (ordem do maestro, 2ª extensão)
+
+"Sempre ver se as estratégias estão adequadas" a cada versão do Claude Code — MECANIZADO: a
+baseline E3 ganhou `cc_version`; instalada ≠ rodada ⇒ SOFT nomeando as duas versões e mandando
+rodar /meta:radar E3. Caso (f) na bancada (6/6); costura SDAAL: binário injetável por
+ONION_CC_BIN (a 1ª versão furava no CI — command -v ignorava o stub; curado antes do commit).
 
 ## Passada Elenxo da Onda 6 (mandato REFUTAR, opus/high)
 

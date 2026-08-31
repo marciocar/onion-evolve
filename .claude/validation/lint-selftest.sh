@@ -10698,6 +10698,15 @@ run_radar_staleness_selftests() {
     record_pass "radar-staleness: (e) ambiente sem date -d degrada SOFT declarando 'não medida' (nunca HARD no artefato)"
   else record_fail "radar-staleness: (e)" "degradação de ambiente errada (rc=${rc}): ${out}"; fi
 
+  # (f) gatilho de VERSÃO: cc_version da baseline ≠ binário instalado ⇒ SOFT nomeando as duas
+  printf '#!/usr/bin/env bash\necho "9.9.9 (Claude Code)"\n' > "$d/bin/claude-stub"
+  chmod +x "$d/bin/claude-stub"
+  printf 'axes:\n  - id: E3\n    last_run: %s\n    cc_version: "1.0.0"\n' "${fresh_date}" > "$d/ccver.yaml"
+  rc=0; out="$(ONION_CC_BIN="$d/bin/claude-stub" ONION_RADAR_BASELINES="$d/ccver.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'mudou de versão desde a última rodada de estratégia (rodada=1.0.0, instalado=9.9.9)'; then
+    record_pass "radar-staleness: (f) troca de versão do Claude Code dispara SOFT de re-medição de estratégia"
+  else record_fail "radar-staleness: (f)" "gatilho de versão não disparou (rc=${rc}): ${out}"; fi
+
   rm -rf "$d"
 }
 
