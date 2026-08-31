@@ -14,6 +14,7 @@ axes:
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
     last_run: 2026-08-31
+    cc_version: "2.1.252"   # versão do Claude Code na rodada — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
     descartes: "3/11"
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E4-capital
