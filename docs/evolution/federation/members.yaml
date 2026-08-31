@@ -351,8 +351,11 @@ members:
     kind: adopter       # projeto que vendoriza o framework
     parent: onion-evolve
     remote: github.com/marciocar/poc-venda-direta-pdi   # PRIVADO
-    local_path: "/home/marcio/poc-venda-direta-pdi"
-    onion_version: b9580a520e5b   # pin da adoção (2026-08-17); confirmar com pin-integrity-check.sh
+    # ── SUCESSÃO (selo do maestro 2026-08-31): o projeto evoluiu de PoC para MVP. O slug do
+    #    membro PERMANECE (identificador de segurança/NDA, não de fase); o VIVO mudou de casa; a
+    #    PoC fica como histórico em /home/marcio/poc-venda-direta-pdi (pin congelado b9580a520e5b).
+    local_path: "/home/marcio/mvp-venda-direta-pdi"
+    onion_version: 219e9a5f365b   # pin do update 2026-08-31 (mvp); confirmar com pin-integrity-check.sh
     adopted_at: 2026-08-17
     mode: greenfield              # repo novo; gate PROVADO por execução na adoção; lint 0 HARD / 4 SOFT
     # ⚠️ CONFIDENCIALIDADE — este membro carrega material de TERCEIRO sob NDA em análise no Jurídico
