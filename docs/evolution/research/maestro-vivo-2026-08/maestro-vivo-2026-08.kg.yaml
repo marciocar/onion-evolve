@@ -1,0 +1,682 @@
+meta:
+  id: maestro-vivo-2026-08
+  schema_version: "1"
+  baseline: 2026-08-31
+  # kg-backlog-guard: on
+  # ═══ TETO: 60 NÓS. Grafo de programa fechado: cresce só por selagem do maestro (carteira/radar). ═══
+  # Programa MAESTRO-VIVO: a pergunta do maestro virou 3 fases medidas (F0 interno, F1 mundo, F2 confronto).
+  # Gerado DETERMINISTICAMENTE dos JSONs do programa (gerador no historico da sessao); prosa e projecao.
+  # Runs: wf_6e6ef552-897 (F0, 8 workers) · wf_6a4da33e-97e (F1, 6 scans+6 juizes) · wf_e27840db-527 (F2, 6 confrontos+6 Elenxos).
+  # Selagem: nos refuted daqui NASCERAM reconciliados (par evidencia+aresta no mesmo commit) — nenhum flip de no pre-existente.
+
+nodes:
+  - id: Q_MAESTRO_VIVO
+    node_type: question
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-31
+    verified_against: 'programa maestro-vivo: F0 wf_6e6ef552-897 + F1 wf_6a4da33e-97e + F2 wf_e27840db-527'
+    label: 'A pergunta do maestro (2026-08-31): temos /meta:* que aja como a VERSAO VIVA do maestro — mapear estado interno, ver o mundo, achar ligacoes subestimadas/ineficiencias/erros, e gerir esforco para explorar a maquinaria ao maximo? RESPOSTA MEDIDA: parcialmente — 7 instrumentos de introspeccao+conducao, ZERO de percepcao externa recorrente; este programa entrega a passada e propoe a superficie permanente (gated).'
+
+  - id: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-31
+    verified_against: 'exploracao dirigida 2026-08-31 (agente Explore, 30 tool-uses)'
+    label: 'MEDIDO: a superficie /meta:* tem 7 instrumentos de introspeccao/conducao (evolve D1-D10 100%% introspectivo e sem WebSearch no allowed-tools; drive executa fila sem decidir o que entra; realign com camada north-star parcial; backlog ordena sem priorizar; orchestrate reativo; constellation so estudos; analyze-complex-problem pre-KG) e NENHUM de percepcao externa. O canal-radar (S9) e semente parada desde 2026-07-06, …'
+    trace: '.claude/commands/meta/evolve.md · docs/analysis/onion-research-seed-research-radar-channel-2026-07.md'
+
+  - id: E_F0_SKILLS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
+    label: 'F0 capacidade x uso — skills: total 12, medidos 12, vivos 7, sub-usados 3, nunca-exercitados 2. Destaques: onion-retro [nunca-exercitado]; onion-compliance-context [nunca-exercitado]; onion-validation [sub-usado]. Evidencia por item no JSON do programa.'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F0_GUARDAS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
+    label: 'F0 capacidade x uso — guardas: total 58, medidos 58, vivos 47, sub-usados 4, nunca-exercitados 7. Destaques: cycle-completion.sh, context-freshness-metric.sh, federation-engagement.sh (.claude/validation/) [nunca-exercitado]; federation-inbox-scan.sh, federation-status-scan.sh, federation-contract-validate.sh (.claude/validation/) [sub-usado]; session-velocity.sh (.claude/validation/) [sub-usado]. Evidencia por item…'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F0_COMANDOS_META
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
+    label: 'F0 capacidade x uso — comandos-meta: total 41, medidos 40, vivos 17, sub-usados 7, nunca-exercitados 16. Destaques: meta:federation-status [nunca-exercitado]; meta:federation-publish [nunca-exercitado]; meta:metaspec-validate [nunca-exercitado]. Evidencia por item no JSON do programa.'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F0_DOUTRINAS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
+    label: 'F0 capacidade x uso — doutrinas: total 57, medidos 57, vivos 39, sub-usados 16, nunca-exercitados 2. Destaques: behavior-sensor-three-gates.md [nunca-exercitado]; kg-getting-started.md [nunca-exercitado]; onion-promotion-ladder.md [sub-usado]. Evidencia por item no JSON do programa.'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F0_COMANDOS_WORKFLOW
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
+    label: 'F0 capacidade x uso — comandos-workflow: total 64, medidos 64, vivos 7, sub-usados 11, nunca-exercitados 46. Destaques: validate/ (6 comandos: workflow, collab/three-amigos, collab/pair-testing, qa-points/estimate, test-strategy/analyze, test-strategy/create) [nunca-exercitado]; test/ (e2e.md, integration.md, unit.md) [nunca-exercitado]; engineer/start.md + engineer/work.md (entrada do ciclo faseado invariante decla…'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F0_FEDERACAO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
+    label: 'F0 capacidade x uso — federacao: total 59, medidos 36, vivos 24, sub-usados 7, nunca-exercitados 5. Destaques: decouple-source.sh / invite-collaborator.sh / transfer-ownership.sh (.claude/utils/adopt/) [nunca-exercitado]; a2a-live transport (a2a-accept.sh, a2a-verify.sh, a2a-ssrf-check.sh + jwks/granaai-1.pem, jwks/metagamify-1.pem) [sub-usado]; mail-receiver.sh (.claude/utils/co-evolution/) — acelerador ntfy da co-…'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F0_AGENTES
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
+    label: 'F0 capacidade x uso — agentes: total 51, medidos 51, vivos 14, sub-usados 31, nunca-exercitados 6. Destaques: claude-code-specialist [nunca-exercitado]; linux-security-specialist [nunca-exercitado]; nx-migration-specialist [nunca-exercitado]. Evidencia por item no JSON do programa.'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F0_ORQUESTRACAO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
+    label: 'F0 capacidade x uso — orquestracao: total 7, medidos 7, vivos 3, sub-usados 3, nunca-exercitados 1. Destaques: contrato de frontmatter run_id/tokens/agents/duration_min [sub-usado]; /meta:orchestrate (comando) [sub-usado]; .claude/commands/common/prompts/orchestration-fallback.md [sub-usado]. Evidencia por item no JSON do programa.'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F1_E1_KG_AGENTE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
+    label: 'F1 scan-mundo E1-kg-agente (6 findings aprovados por juiz adversarial que ABRIU as fontes): Cloudflare lançou ''Agent Memory'' como serviço gerenciado da própria nuvem — infra-gigante ; Cognee: US$7.5M seed para ''memória para agentes de IA'' via vetor+KG a partir de documentos; Graphon AI: US$8,3M seed para camada de ''inteligência pré-modelo'' multimodal — não é playe; Hyper (YC, lote de 2026): ''company brain'' auto-diri…'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F1_E2_SELF_IMPROVING
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
+    label: 'F1 scan-mundo E2-self-improving (6 findings aprovados por juiz adversarial que ABRIU as fontes): Warp: self-improvement loop de duas skills sobre Claude, em produção real com escala grand; PrimeIntellect prime-agent: RLM + Continual Harness com comando /refine que promove trajet; Kulaxyz/self-learning-skills: harvesting de ''golden path'' em skill/rule com gate de promoç; KiroCrew: workspace persistente com skill synt…'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F1_E3_CLAUDE_CODE_DELTA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
+    label: 'F1 scan-mundo E3-claude-code-delta (8 findings aprovados por juiz adversarial que ABRIU as fontes): Claude Code v2.1.251 (28/08) — hooks de troca de modelo + streaming de subagente para Remo; Claude Code v2.1.251 — correções de segurança em path traversal de plugin e symlink em fer; Design skill (research preview) lançada 17/08 — ''ideia/screenshot vira artboard editável''; Auto mode virou default com allow/deny escri…'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F1_E4_CAPITAL
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
+    label: 'F1 scan-mundo E4-capital (5 findings aprovados por juiz adversarial que ABRIU as fontes): SpaceX adquire Cursor (Anysphere) por US$60B — maior M&A de startup VC-backed; HappyRobot levanta US$150M Série C a US$1.2B — agentes de voz/operação empresarial; Zenity levanta US$125M — governança/segurança de agentes de IA empresariais; OpenAI adquire Ona para dar a Codex ambientes cloud de execução longa. Fontes+datas no JS…'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F1_E5_GATES_DETERMINISTICOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
+    label: 'F1 scan-mundo E5-gates-deterministicos (5 findings aprovados por juiz adversarial que ABRIU as fontes): NIST CAISI lança AI Agent Standards Initiative (fev/2026); FailproofAI — hook-based policy enforcement, 12 harnesses, 1.6k stars; Sponsio — contratos LTL determinísticos sub-milissegundo, 438 stars; Statewright — máquina de estados restringe toolset por fase, 489 stars. Fontes+datas no JSON do programa; 13 finding…'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: E_F1_E6_FRONTEIRA_MODELOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
+    label: 'F1 scan-mundo E6-fronteira-modelos (4 findings aprovados por juiz adversarial que ABRIU as fontes): Família Claude 5 confirmada e hierarquizada (Sonnet 5, Opus 5, Fable 5/Mythos-class); Sonnet 5 traz auto-verificação nativa como capacidade agentic nova; OpenAI: GPT-5.6 ''Sol'' é o topo agentic/coding, com corte de preço de 20-33% em ago/2026; Google: Gemini 3.5 Flash lidera agentic; Gemini 3.5 Pro atrasado, 3.7 Flash …'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+
+  - id: C_TESE_MOAT_GATES
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-08-31
+    verified_against: 'Elenxo SUSTENTADA-COM-EMENDAS (wf_e27840db-527)'
+    label: 'Tese do confronto [moat-gates]: O moat do Onion é real e o mundo acabou de validá-lo com capital e com números — mas nós compramos o acoplamento com uma capacidade que nunca exercitamos (PreToolUse/exit 2 bloqueante = ZERO no repo), medimos as guardas por wire-in em vez de captura, e vendemos exatamente a metade comoditizada (contagem de comandos/agentes) enquanto a metade defensável (64 REGRAS + 6 catracas com base…'
+
+  - id: E_ELENXO_MOAT_GATES
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'refutador opus/high, mandato REFUTAR, default REPROVADO'
+    label: 'Elenxo [moat-gates] SUSTENTADA-COM-EMENDAS: 3 veredito(s) derrubado(s) (A catraca com baseline como UNICO — ''zero par no mundo medid: Complacência disfarçada de medição, em três camadas. (1) O veredito prova unicid; Empacotamento público — ''a landing vende a metade comoditiza: Testou o caminho errado, que é não ter testado. O veredito mede `docs/materials/; Distribuição do moat — ''quem instala recebe 1 radar e 2 sen…'
+
+  - id: C_ERRA_O_EXIT_2_DETERMINISTICO_DE_HOOK_COMO_A_C
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[ERRADO] O exit 2 determinístico de hook como ''a capacidade que COMPRA o acoplamento'' (CLAUDE.md, correção de 2026-08-16) — interno: O modo BLOQUEANTE não existe neste repo. `.claude/settings.json` declara SessionStart/UserPromptSubmit/SessionEnd/PreCompact/PostToolUse — ZERO PreToolUse. Dos 7 hooks, um único usa `exit 2`: `.claude | externo: F1/E5 ''FailproofAI — hook-based policy enforcement'' (https://github.com/Fa…'
+
+  - id: C_VALI_A_TESE_MAE_VERIFICACAO_DETERMINISTICA_LL
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[VALIDADO] A tese-mãe: verificação determinística > LLM julgando LLM (radar sem-LLM, gate mecânico) — interno: `.claude/validation/kg-radar.sh:1-40` é motor puro (bash/awk, fórmula de atenção explícita: peso = impact × confidence × fator-de-status, sem uma chamada de modelo) e é a ÚNICA validação que viaja no | externo: F1/E5 ''Sponsio'' (https://github.com/SponsioLabs/Sponsio, 438★): monitor LTL checa toda chamada de…'
+
+  - id: C_UNIC_CATRACA_COM_BASELINE_O_PASSIVO_LEGADO_CO
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[UNICO] Catraca com baseline — o passivo legado congelado que só pode DIMINUIR (REGRA 62, REGRA 64, 6 arquivos *-baseline.txt) — interno: 6 baselines vivos em `.claude/validation/`: compose-exposure (4), doctrine-freshness (3), identifier-language (3), kb-vendored-link (47), kg-coverage (3), kg-verification (45); 23 ocorrências de ''catr | externo: BUSCA FEITA no F1: os 5 achados do eixo E5 são NIST CAISI (identidade…'
+
+  - id: C_SUBE_EMPACOTAMENTO_PUBLICO_O_QUE_A_LANDING_DI
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[SUBESTIMADO] Empacotamento público — o que a landing diz que o Onion é — interno: `grep -ni ''exit 2|hook|catraca|gate|regra|lint'' docs/materials/landing-page.md` = ZERO em 122 linhas; `grep -ci ''grafo|kg''` = ZERO também. O que ela vende (linhas 11-90) é ''82 comandos · 49 agentes · | externo: F1/E3 ''headcount'' (https://github.com/cbrock84/headcount, criado 2026-08-28): 803★ em 3 DIAS entregando de graça 16 departame…'
+
+  - id: C_INEF_DISTRIBUICAO_DO_MOAT_O_QUE_O_CANAL_DE_IN
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[INEFICIENTE] Distribuição do moat — o que o canal de INSTALAÇÃO (plugin/marketplace) efetivamente leva — interno: `find plugins -name ''lint-artifacts.sh'' -o -name ''lint-selftest.sh'' -o -name ''lint-rules.md''` = 0. `plugins/onion/validation/` contém apenas kg-radar.sh + lib/, e `plugins/onion/hooks/hooks.json` decl | externo: F1/E5 ''FailproofAI'': distribui as 39 políticas COMO o produto, em 12 harnesses — a política …'
+
+  - id: C_INEF_A_REGUA_COM_QUE_MEDIMOS_AS_PROPRIAS_GUAR
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[INEFICIENTE] A régua com que medimos as próprias guardas (''47/58 vivas'') — interno: A métrica é WIRE-IN (grep + git log), não CAPTURA. O próprio F0 registra os dois lados do erro: `cycle-completion.sh`, `context-freshness-metric.sh` e `federation-engagement.sh` foram declarados ''4/4 | externo: F1/E5 ''Obsidian Security'' ($85M, 2026-08-05) vende exatamente RUNTIME enforcement e um MCP Server Inventory que mapeia cada…'
+
+  - id: C_SUBE_O_COMPRADOR_COM_GATILHO_DE_COMPRA_A_DIME
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[SUBESTIMADO] O comprador com gatilho de compra: a dimensão compliance sobre gate determinístico — interno: Compliance é uma das 3 dimensões peer declaradas no CLAUDE.md, e é a única cuja skill de contexto o F0 marcou nunca-exercitada: `docs/compliance-context/README.md` diz literalmente ''Esta pasta deve pe | externo: F1/E5 ''NIST CAISI AI Agent Standards Initiative'' (https://www.nist.gov/news-events/news/2026/02/ann…'
+
+  - id: C_TESE_FEDERACAO_CAPITAL
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-08-31
+    verified_against: 'Elenxo SUSTENTADA-COM-EMENDAS (wf_e27840db-527)'
+    label: 'Tese do confronto [federacao-capital]: A metade da federação que construímos e deixamos ociosa — ledger de contratos, console de drift/CI por membro, catraca de pin — é exatamente a metade que o capital de 2026 está pagando (Obsidian US$85M, Zenity US$125M); e a metade que está viva — o correio doc-bridge, 116 entregas + 89 sinais — é exatamente a metade que os outros estão dando de graça (cumora 3.349★ em 11 dias, …'
+
+  - id: E_ELENXO_FEDERACAO_CAPITAL
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'refutador opus/high, mandato REFUTAR, default REPROVADO'
+    label: 'Elenxo [federacao-capital] SUSTENTADA-COM-EMENDAS: 2 veredito(s) derrubado(s) (doc-bridge git-async: /meta:co-announce → co-deliver / co-re: O VALIDADO foi concedido sobre evidência com três defeitos medidos hoje, dois de; Carteiro-local com entrega-sem-commit (invariante I3) — vere: A unicidade é declarada por AUSÊNCIA numa busca que nunca procurou. Reproduzi o ). Objecoes SOBREVIVENTES (preservadas): O CORTE da te…'
+
+  - id: C_ERRA_FEDERATION_ENGAGEMENT_SH_O_SINAL_DE_SAUD
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[ERRADO] federation-engagement.sh — o sinal de saúde da própria fronteira-de-venda (SINAL 4 da instrumentação valor-por-adotante) — interno: Rodei a guarda hoje (read-only): `bash .claude/validation/federation-engagement.sh --summary-json` → `{"members":12,"active":12,"dormant":0,"never":0}`. O `--jsonl` mostra 8 dos 12 membros com a MESMA | externo: F1 #19 — Obsidian Security, Series D de US$85M (fintech.global, 20…'
+
+  - id: C_SUBE_A_METADE_FORMAL_DA_FEDERACAO_META_FEDERA
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[SUBESTIMADO] A metade formal da federação: /meta:federation-publish, /meta:federation-status, /meta:federation-register (+ federation-contract-validate.sh, federation-status-scan.sh) — interno: F0, comandos-meta: `git log --format=''%ad %h %s'' --all | grep -iE ''federation-(publish|register)''` = 0 linhas; `/meta:federation-status` = 0 execuções em todo o histórico (as 5 menções em docs/analysi | externo: F1 #19 (Obsi…'
+
+  - id: C_INEF_D7_A_FRONTEIRA_DE_VENDA_E_A_FEDERACAO_HU
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[INEFICIENTE] D7 — "a fronteira de venda é a federação" (hub = adoção de EMPRESA / federação como camada de time) — interno: D7 está em docs/business-context/decisions.md:23-29 e é reafirmado como invariante em gtm-decision-brief-2026-07.md:116-118 ("nenhum ramo precifica o framework/standalone em si, só os degraus de cima" | externo: A camada de time está sendo comoditizada de graça e em velocidade, nesta janela: F…'
+
+  - id: C_INEF_A2A_LIVE_CANAL_VIVO_COM_ACEITE_GATED_A2A
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[INEFICIENTE] a2a-live: canal vivo com aceite gated (a2a-accept.sh / a2a-verify.sh / a2a-ssrf-check.sh + jwks/*.pem RS256) — interno: F0, família federação, etiqueta **sub-usado**: `git log -1 --format=%ad -- .claude/utils/federation-transport/a2a-*.sh` → 2026-07-09/07-10, 52-53 dias sem um commit; `jwks/` tem exatamente 2 pares (gr | externo: F1 #15 — NIST/NCCoE (nist.gov, 2026-02-17) propõe adaptar OAuth2/OIDC/SPI…'
+
+  - id: C_TESE_ESTRATEGIA_PRECO
+    node_type: claim
+    plane: PROD
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'Elenxo REPROVADA (wf_e27840db-527)'
+    label: 'Tese do confronto [estrategia-preco]: Os quatro degraus do D5 seguem COTÁVEIS em ago/2026 — nada nos 34 achados aprovados os refuta, e a queda de 20-33% no preço do insumo (token) só aumenta a margem do dia entregue. O que caducou não é o NÚMERO, é a ÂNCORA e a PROVA: a escada precifica serviço humano e conhecimento e entrega de graça, desde 25/08 no marketplace público, exatamente o mecanismo determinístico (guarda…'
+
+  - id: E_ELENXO_ESTRATEGIA_PRECO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'refutador opus/high, mandato REFUTAR, default REPROVADO'
+    label: 'Elenxo [estrategia-preco] REPROVADA: 5 veredito(s) derrubado(s) (DEGRAU 1 — treino/consultoria $1.800-3.000/dia (C_treino_dat: VALIDADO é complacência sobre um claim que nunca passou pelo próprio teste. deci; DEGRAU 2 — selo Onion Certified Implementer ~$1.250 (C_cert_: UNICO é refutado pelo arquivo que o próprio veredito cita. Ele declara ''BUSCA FE; DEGRAU 3 — compliance-pack $15-40k/ano (C_compliance_pack) —: A ev…'
+
+  - id: C_ERRA_GATE_DE_INSTRUMENTACAO_VALOR_POR_ADOTANT
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[ERRADO] Gate de instrumentação valor-por-adotante — a precondição de preço-por-outcome (Q_instrument_value_per_adopter) — interno: d5-pricing-2026-07.kg.yaml:130-133 carimba `status: done`, `verified_at: 2026-08-30`, justificando com ''4/4 scripts determinísticos exi[stem]''. O F0 mede o contrário do outro lado: `cycle-completion.s | externo: O padrão que funciona em escala medida traz a metade que nos falta: Warp (c…'
+
+  - id: C_SUBE_Q_COLD_ADOPTER_EXISTE_PULL_DOS_DIFERENCI
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[SUBESTIMADO] Q_COLD_ADOPTER — existe pull dos diferenciais raros fora da órbita? (o desempate do NS1) — interno: onion-identity-2026-07.kg.yaml:492-500 (Q_COLD_ADOPTER open, confidence 0.3) e :347-355 (C_MARKET_PULL `refuted`); o experimento desenhado para responder (:603, D_COLD_ADOPTER_EXP) está `superseded` e | externo: O diferenciador raro TEM pull frio comprovado no mundo, em forma instalável de um passo: Fail…'
+
+  - id: C_SUBE_A_ESCADA_D5_INTEIRA_O_MOAT_DECLARADO_MEC
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[SUBESTIMADO] A escada D5 inteira × o moat declarado (mecanismo verificável: exit-2, 64 REGRAS, catraca, radar sem-LLM) — interno: Os 4 degraus (d5-pricing-2026-07.kg.yaml:30, :38, :46, :54) precificam serviço humano (dia), credencial, pacote documental e assinatura de curadoria. NENHUM precifica o mecanismo — que o CLAUDE.md dec | externo: Duas semanas de agosto/2026 puseram US$210M no mecanismo que damos de graça:…'
+
+  - id: C_TESE_AUTO_EVOLUCAO
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-08-31
+    verified_against: 'Elenxo SUSTENTADA-COM-EMENDAS (wf_e27840db-527)'
+    label: 'Tese do confronto [auto-evolucao]: Não estamos atrás do eixo E2 — estamos à frente no PRODUTO do loop e atrás no GATILHO dele. O mundo (Warp, Kulaxyz, PrimeIntellect) promove aprendizado a CONSELHO revisável (skill/prompt); nós promovemos a GATE determinístico ancorado em grafo — 64 REGRAS nascidas de falha real (12→66→86 commits/mês jun→ago) e 268 nós falsificados-e-preservados (162 superseded + 106 refuted de 2.56…'
+
+  - id: E_ELENXO_AUTO_EVOLUCAO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'refutador opus/high, mandato REFUTAR, default REPROVADO'
+    label: 'Elenxo [auto-evolucao] SUSTENTADA-COM-EMENDAS: 4 veredito(s) derrubado(s) (Gatilho da auto-melhoria (W7/MOAT: driver maestro-invocado, : NÃO-SEQUITUR CAUSAL, MEDIDO. O veredito atribui os 32 dias sem /meta:evolve ao d; onion-retro — captura de aprendizado no fechamento de ciclo: DUAS QUEDAS. (1) MEDIDO NO CAMINHO ERRADO: a própria SKILL.md declara a proveniê; Restrição determinística de ferramentas por fase (allowed…'
+
+  - id: C_SUBE_CRITERIOS_CONTAVEIS_DE_PROMOCAO_NA_ESCAD
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[SUBESTIMADO] Critérios contáveis de promoção na escada de automação graduada (+ rollback do promovido) — interno: docs/onion/graph/graduated-automation-elenxo-2026-07.kg.yaml:95-102 (E_RUNGS_MISSING) nomeia o degrau faltante (c): ''CRITERIOS de promocao CONTAVEIS (N execucoes provadas => sobe; hoje e juizo humano) | externo: F1 E2 #22 (Kulaxyz/self-learning-skills, 938★, https://github.com/Kulaxyz/self-learning-skil…'
+
+  - id: C_SUBE_FECHAMENTO_DE_NO_DO_GRAFO_FRESCOR_DA_PRO
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[SUBESTIMADO] Fechamento de nó do grafo / frescor da própria memória (censo, kg-freshness) — interno: O número está nos nossos próprios commits. 74dc3ab2 (censo lote 1, 2026-08-30): 16/30 = 53% de mortalidade no topo do backlog, e ''9 dos 15 flips são decisões pagas e não carimbadas há 17 dias''. d52a7d | externo: F1 E2 #25 (Lobu, https://lobu.ai/blog/self-improving-agents-are-event-sourced/, 2026-07-28): o gargalo de…'
+
+  - id: C_VALI_PRODUTO_DO_LOOP_DE_AUTO_MELHORIA_REGRA_D
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[VALIDADO] Produto do loop de auto-melhoria: REGRA determinística de lint em vez de conselho em prompt — interno: 64 REGRAS no .claude/validation/lint-artifacts.sh (63 distintas medidas no arquivo), quase todas nascidas de uma falha real e não de simetria. A taxa é crescente e contável: commits citando REGRA — 12 | externo: F1 E5 #17 (SponsioLabs/Sponsio, 438★): contratos determinísticos checados em 0,005-0,14ms, 5.…'
+
+  - id: C_TESE_KG_VS_PLATAFORMA
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-08-31
+    verified_against: 'Elenxo SUSTENTADA-COM-EMENDAS (wf_e27840db-527)'
+    label: 'Tese do confronto [kg-vs-plataforma]: A absorção-como-feature está comendo a MEMÓRIA (guardar e recuperar), não o GRAFO (governar e reprovar): dos 6 achados aprovados do eixo E1, o único player de plataforma é a Cloudflare — e o finding dela diz literalmente que o Agent Memory NÃO usa knowledge graph. Logo a ameaça real ao Onion não vem de fora, vem da nossa própria assimetria medida: 13 REGRAs HARD do lint protegem…'
+
+  - id: E_ELENXO_KG_VS_PLATAFORMA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'refutador opus/high, mandato REFUTAR, default REPROVADO'
+    label: 'Elenxo [kg-vs-plataforma] SUSTENTADA-COM-EMENDAS: 3 veredito(s) derrubado(s) (kg-radar.sh — scorer determinístico de atenção sobre grafo v: REGRESSÃO CONTRA ADR RATIFICADA. A cláusula ''o único'' já foi REFUTADA por mediçã; Decisão de CEDER a camada de memória à plataforma (parar de : CITA A PROPOSTA E IGNORA A MEDIÇÃO QUE A REFUTOU. O veredito cita claude-code-2.; Soberania e exportabilidade do KG — YAML plano em git…'
+
+  - id: C_ERRA_PERNA_DE_LEITURA_DO_KG_READ_KG_DISPARAR_
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[ERRADO] Perna de LEITURA do KG — read(KG) disparar no momento da decisão — interno: docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md (PR #510, replay de 9 casos reais): 7 de 9 falhas por NÃO-CONSULTA, ZERO por ''consultei e não achei''; as três curas candidatas cobriram 1/9, 1/ | externo: F1 #18 (E5, aprovado): statewright/statewright, 489★, Show HN 2026-05-12 com 126 pontos — restringe QUAIS ferramentas o ag…'
+
+  - id: C_INEF_MANUTENCAO_DO_GRAFO_FECHAR_O_NO_NAO_SO_C
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[INEFICIENTE] Manutenção do grafo — FECHAR o nó, não só carimbar verified_at (/meta:kg-freshness + censo de mortalidade) — interno: docs/onion/graph/fios-abertos.kg.yaml:109 (verbatim): ''a mortalidade SUBIU de 33% para 60% — quase dobrou. 9 de 15 mortos (6 entregues, 1 refutado, 1 respondida, 1 obsoleto)... A PROJEÇÃO PURA NÃO CUR | externo: F1 #20 (E2, aprovado): Warp, no blog oficial da Anthropic (https://claude.c…'
+
+  - id: C_VALI_GRAFO_COMO_CAMADA_DE_VERDADE_GOVERNADA_A
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[VALIDADO] Grafo como camada de VERDADE GOVERNADA — a perna da escrita, protegida por script — interno: docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md:41 — ''write: 6 gates HARD no CI, resultado medível (103/103 docs cobertos, 50/50 grafos íntegros)''. Hoje o acervo cresceu: 13 REGRAs HARD n | externo: F1 #13 (E1, aprovado): Cruxible (https://github.com/cruxible-ai/cruxible) apareceu 2× no HN em jul/2026…'
+
+  - id: C_TESE_MASSA_MORTA_COMANDOS
+    node_type: claim
+    plane: PROD
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'Elenxo REPROVADA (wf_e27840db-527)'
+    label: 'Tese do confronto [massa-morta-comandos]: A massa morta do Onion não é excesso de superfície — é a ausência do único mecanismo que o próprio Onion já PROVOU fazer um artefato viver: uma REGRA HARD que exija o ARTEFATO que ele produz. O quarteto pré-PR é o experimento controlado: os quatro agentes são invocados no mesmo arquivo, na mesma linha, no mesmo fan-out; só um (branch-code-reviewer) tem uma regra HARD cobrand…'
+
+  - id: E_ELENXO_MASSA_MORTA_COMANDOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'refutador opus/high, mandato REFUTAR, default REPROVADO'
+    label: 'Elenxo [massa-morta-comandos] REPROVADA: 6 veredito(s) derrubado(s) (O gate de uso da própria superfície: 107 comandos + 51 agent: O ''ZERO'' é artefato de busca por VOCABULÁRIO, o modo de falha já registrado nest; Vinculação de agente/comando a uma REGRA HARD que exige o ar: O ''experimento controlado'' NUNCA RODOU. Log de invocação real (53 transcripts de; Superfície ampla já particionada em 8 plugins/marketplace (a: …'
+
+  - id: C_ERRA_A_HIPOTESE_DE_QUE_A_MASSA_MORTA_E_CUSTO_
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-08-31
+    verified_against: 'confronto opus/high + sobreviveu ao Elenxo (wf_e27840db-527)'
+    label: '[ERRADO] A hipótese de que a massa morta é custo de manter a família multi-IDE congelada — interno: Medido e refutado: `grep -rln ''onion-cursor|onion-antigravity|onion-copilot'' .claude/ --include=*.sh` devolve ZERO — nenhum script, gate, manifesto ou assembler do core referencia qualquer repo da fam | externo: F1 #4 — Relay (automação de workflow com IA) fechou as portas e o fundador foi para o Chrome do Google; e F…'
+
+  - id: D_CARTEIRA_REFILL_FIOS
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    label: 'PROPOSTA (selo do maestro): reabastecer fios-abertos (TETO 20) com a carteira derivada do confronto — os itens e gatilhos nomeados estao na SYNTHESIS §Carteira. Criterio: veredito ERRADO/SUBESTIMADO de impacto 5 primeiro; nada re-litiga D1-D8/NS1.'
+
+  - id: D_META_RADAR_DESENHO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    label: 'PROPOSTA (gated — implementar e decisao do maestro): superficie permanente de percepcao externa /meta:radar — maestro-invocada (W7 intacto, sem cron), 6 eixos com baseline DATADA por eixo, staleness pendurada no LINT (como REGRA 62 fez com o backlog: a maquina detecta idade, o humano roda), juiz-fixo, write(KG) em grafo proprio. Fecha S9_q_radar_mechanism. Desenho na SYNTHESIS §Radar.'
+
+  - id: E_CUSTO_PROGRAMA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-08-31
+    verified_against: 'usage dos 3 task-notifications (wf_6e6ef552/6a4da33e/e27840db)'
+    label: 'Custo real do programa: F0 704.639 tok/8 agentes/5m37s · F1 849.030 tok/12 agentes/12m · F2 1.318.472 tok/12 agentes/12m50s = 2.872.141 tokens, 32 agentes — ESTOUROU o teto declarado de 2,5M em 15%%; causa: F2 opus/high consumiu 47%% acima do projetado. Licao p/ o proximo programa: projetar F2 por medida de F1, nao por chute.'
+
+edges:
+  - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    to: Q_MAESTRO_VIVO
+    edge_type: SUPPORTS
+  - from: E_F0_SKILLS
+    to: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    edge_type: SUPPORTS
+  - from: E_F0_GUARDAS
+    to: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    edge_type: SUPPORTS
+  - from: E_F0_COMANDOS_META
+    to: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    edge_type: SUPPORTS
+  - from: E_F0_DOUTRINAS
+    to: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    edge_type: SUPPORTS
+  - from: E_F0_COMANDOS_WORKFLOW
+    to: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    edge_type: SUPPORTS
+  - from: E_F0_FEDERACAO
+    to: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    edge_type: SUPPORTS
+  - from: E_F0_AGENTES
+    to: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    edge_type: SUPPORTS
+  - from: E_F0_ORQUESTRACAO
+    to: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
+    edge_type: SUPPORTS
+  - from: E_ELENXO_MOAT_GATES
+    to: C_TESE_MOAT_GATES
+    edge_type: SUPPORTS
+  - from: C_ERRA_O_EXIT_2_DETERMINISTICO_DE_HOOK_COMO_A_C
+    to: C_TESE_MOAT_GATES
+    edge_type: SUPPORTS
+  - from: C_VALI_A_TESE_MAE_VERIFICACAO_DETERMINISTICA_LL
+    to: C_TESE_MOAT_GATES
+    edge_type: SUPPORTS
+  - from: C_UNIC_CATRACA_COM_BASELINE_O_PASSIVO_LEGADO_CO
+    to: C_TESE_MOAT_GATES
+    edge_type: SUPPORTS
+  - from: C_SUBE_EMPACOTAMENTO_PUBLICO_O_QUE_A_LANDING_DI
+    to: C_TESE_MOAT_GATES
+    edge_type: SUPPORTS
+  - from: C_INEF_DISTRIBUICAO_DO_MOAT_O_QUE_O_CANAL_DE_IN
+    to: C_TESE_MOAT_GATES
+    edge_type: SUPPORTS
+  - from: C_INEF_A_REGUA_COM_QUE_MEDIMOS_AS_PROPRIAS_GUAR
+    to: C_TESE_MOAT_GATES
+    edge_type: SUPPORTS
+  - from: C_SUBE_O_COMPRADOR_COM_GATILHO_DE_COMPRA_A_DIME
+    to: C_TESE_MOAT_GATES
+    edge_type: SUPPORTS
+  - from: E_ELENXO_FEDERACAO_CAPITAL
+    to: C_TESE_FEDERACAO_CAPITAL
+    edge_type: SUPPORTS
+  - from: C_ERRA_FEDERATION_ENGAGEMENT_SH_O_SINAL_DE_SAUD
+    to: C_TESE_FEDERACAO_CAPITAL
+    edge_type: SUPPORTS
+  - from: C_SUBE_A_METADE_FORMAL_DA_FEDERACAO_META_FEDERA
+    to: C_TESE_FEDERACAO_CAPITAL
+    edge_type: SUPPORTS
+  - from: C_INEF_D7_A_FRONTEIRA_DE_VENDA_E_A_FEDERACAO_HU
+    to: C_TESE_FEDERACAO_CAPITAL
+    edge_type: SUPPORTS
+  - from: C_INEF_A2A_LIVE_CANAL_VIVO_COM_ACEITE_GATED_A2A
+    to: C_TESE_FEDERACAO_CAPITAL
+    edge_type: SUPPORTS
+  - from: E_ELENXO_ESTRATEGIA_PRECO
+    to: C_TESE_ESTRATEGIA_PRECO
+    edge_type: REFUTES
+  - from: E_ELENXO_AUTO_EVOLUCAO
+    to: C_TESE_AUTO_EVOLUCAO
+    edge_type: SUPPORTS
+  - from: C_SUBE_CRITERIOS_CONTAVEIS_DE_PROMOCAO_NA_ESCAD
+    to: C_TESE_AUTO_EVOLUCAO
+    edge_type: SUPPORTS
+  - from: C_SUBE_FECHAMENTO_DE_NO_DO_GRAFO_FRESCOR_DA_PRO
+    to: C_TESE_AUTO_EVOLUCAO
+    edge_type: SUPPORTS
+  - from: C_VALI_PRODUTO_DO_LOOP_DE_AUTO_MELHORIA_REGRA_D
+    to: C_TESE_AUTO_EVOLUCAO
+    edge_type: SUPPORTS
+  - from: E_ELENXO_KG_VS_PLATAFORMA
+    to: C_TESE_KG_VS_PLATAFORMA
+    edge_type: SUPPORTS
+  - from: C_ERRA_PERNA_DE_LEITURA_DO_KG_READ_KG_DISPARAR_
+    to: C_TESE_KG_VS_PLATAFORMA
+    edge_type: SUPPORTS
+  - from: C_INEF_MANUTENCAO_DO_GRAFO_FECHAR_O_NO_NAO_SO_C
+    to: C_TESE_KG_VS_PLATAFORMA
+    edge_type: SUPPORTS
+  - from: C_VALI_GRAFO_COMO_CAMADA_DE_VERDADE_GOVERNADA_A
+    to: C_TESE_KG_VS_PLATAFORMA
+    edge_type: SUPPORTS
+  - from: E_ELENXO_MASSA_MORTA_COMANDOS
+    to: C_TESE_MASSA_MORTA_COMANDOS
+    edge_type: REFUTES
+  - from: Q_MAESTRO_VIVO
+    to: D_META_RADAR_DESENHO
+    edge_type: DEPENDS_ON
+  - from: E_F1_E1_KG_AGENTE
+    to: C_TESE_KG_VS_PLATAFORMA
+    edge_type: TRACES_TO
+  - from: E_F1_E2_SELF_IMPROVING
+    to: C_TESE_AUTO_EVOLUCAO
+    edge_type: TRACES_TO
+  - from: E_F1_E3_CLAUDE_CODE_DELTA
+    to: C_TESE_MASSA_MORTA_COMANDOS
+    edge_type: TRACES_TO
+  - from: E_F1_E4_CAPITAL
+    to: C_TESE_FEDERACAO_CAPITAL
+    edge_type: TRACES_TO
+  - from: E_F1_E5_GATES_DETERMINISTICOS
+    to: C_TESE_MOAT_GATES
+    edge_type: TRACES_TO
+  - from: E_F1_E6_FRONTEIRA_MODELOS
+    to: C_TESE_ESTRATEGIA_PRECO
+    edge_type: TRACES_TO
+  - from: C_ERRA_GATE_DE_INSTRUMENTACAO_VALOR_POR_ADOTANT
+    to: C_TESE_ESTRATEGIA_PRECO
+    edge_type: TRACES_TO
+  - from: C_SUBE_Q_COLD_ADOPTER_EXISTE_PULL_DOS_DIFERENCI
+    to: C_TESE_ESTRATEGIA_PRECO
+    edge_type: TRACES_TO
+  - from: C_SUBE_A_ESCADA_D5_INTEIRA_O_MOAT_DECLARADO_MEC
+    to: C_TESE_ESTRATEGIA_PRECO
+    edge_type: TRACES_TO
+  - from: C_ERRA_A_HIPOTESE_DE_QUE_A_MASSA_MORTA_E_CUSTO_
+    to: C_TESE_MASSA_MORTA_COMANDOS
+    edge_type: TRACES_TO
+  - from: C_TESE_MOAT_GATES
+    to: D_CARTEIRA_REFILL_FIOS
+    edge_type: SUPPORTS
+  - from: C_TESE_KG_VS_PLATAFORMA
+    to: D_CARTEIRA_REFILL_FIOS
+    edge_type: SUPPORTS
+  - from: E_CUSTO_PROGRAMA
+    to: Q_MAESTRO_VIVO
+    edge_type: TRACES_TO
