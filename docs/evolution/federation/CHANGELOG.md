@@ -9,6 +9,12 @@
 ---
 
 
+## 2026-08-31 · metagamify: adopt --update ao pin cd7de56e + gate husky religado · COMPATÍVEL · alvo: metagamify
+
+- Branch-proposta `chore/onion-update-cd7de56e` pushed (base: HEAD de `chore/onion-framework`; árvore em-voo intocada). Pin `21213cc6c3d6`→`cd7de56e81c8`; dogfood 44→1 HARD (local, nomeado no inbound); gate de pre-commit estava INERTE sob husky e foi encadeado + provado por sonda.
+- Anúncio entregue via carteiro-local (2026-08-31); rascunho em `outbox/metagamify/_processed/`.
+- Ação p/ o alvo: revisar/mergear a branch; curar o 1 HARD local.
+
 ## 2026-08-31 · Lote adopt --update no pin 219e9a5f + REGRA 64 (exposição de compose) · COMPATÍVEL · alvo: granaai, arandek, mvp-venda-direta-pdi
 
 - Os 3 adotantes locais atualizados ao pin `219e9a5f365b` (`.claude/rules/` no vendor, REGRA 64 com catraca de legado, baseline de compose seedável). mvp: aplicado direto na main local (0 HARD); arandek: branch `chore/onion-update-3ed62001` (89→4 HARD, gate de pre-commit religado via husky); granaai: branches `chore/onion-update-158f47c7` (56→6) + `fix/compose-bind-and-secret-fallback`.
