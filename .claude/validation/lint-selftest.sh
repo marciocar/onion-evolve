@@ -6447,7 +6447,13 @@ run_kg_backlog_selftests() {
   # (c) TETO lido DO ARQUIVO. Passar do teto reprova; e o numero da mensagem vem do `meta:`,
   #     nunca de constante no script — um numero aqui e outro la seria o mesmo
   #     `declarado != verificado` que esta regra existe para fechar.
-  awk '/^edges:/ && !done { for (k=0;k<3;k++) printf "    - id: N_ENCHENDO_%d\n      node_type: question\n      plane: DEV\n      status: open\n      impact: 1\n      confidence: 1.0\n      label: \"enchendo %d\"\n\n", k, k; done=1 } {print}' \
+  # A fixture NAO pode assumir que o vivo esta NO teto (classe (b3), reincidiu em 2026-08-31:
+  # a colheita da Onda 6 deixou o vivo em 7 nos, +3 fixos = 10/20 e o caso "passou" sem morder).
+  # Enche ate ULTRAPASSAR o teto declarado no proprio arquivo, contando os nos existentes.
+  _declared_cap=$(grep -oE 'TETO:[[:space:]]*[0-9]+' "${bg}" | head -1 | grep -oE '[0-9]+')
+  _existing_nodes=$(grep -cE '^[[:space:]]*- id: ' "${bg}")
+  _fillers_needed=$(( _declared_cap + 1 - _existing_nodes )); [ "${_fillers_needed}" -lt 1 ] && _fillers_needed=1
+  awk -v n="${_fillers_needed}" '/^edges:/ && !done { for (k=0;k<n;k++) printf "    - id: N_ENCHENDO_%d\n      node_type: question\n      plane: DEV\n      status: open\n      impact: 1\n      confidence: 1.0\n      label: \"enchendo %d\"\n\n", k, k; done=1 } {print}' \
     "${bg}" > "$d/teto.yaml"
   rc=0; out="$(bash "${helper}" "$d/teto.yaml" 2>&1)" || rc=$?
   if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'TETO' && printf '%s' "${out}" | grep -q 'teto declarado 20'; then

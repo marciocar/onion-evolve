@@ -554,6 +554,17 @@ nodes:
     label: 'MEDIDO 2026-08-31: o exit 2 de PreToolUse barra a acao SOB bypassPermissions — a frase-moat do CLAUDE.md e VERDADEIRA e agora exercitada. O veredito ERRADO do confronto acertou o diagnostico (nunca-exercitada) e a cura (provar) fechou no mesmo dia. Aberto com gatilho: 1o uso REAL de PreToolUse no core fecha a distancia sandbox->producao.'
     trace: "docs/analysis/pretooluse-proof-2026-08.md"
 
+  - id: E_BENCHMARK_DO_GATE_PUBLICADO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-08-31
+    verified_against: 'medicoes 2026-08-31: lint 132.3-132.9s sob carga (16s historico ocioso), 0 tokens, 63 regras/218 HARD, 6 catracas/84 chaves, 5 vetos reais no dia, bancada 882/884 — e as 2 reprovacoes foram achado (fixture live-dependente curada no mesmo PR)'
+    label: 'I_BENCHMARK_DO_GATE pago: o numero substituiu a narrativa (docs/analysis/onion-gate-benchmark-2026-08.md). Brinde do dogfood: medir a bancada expos um selftest que dependia do vivo estar no teto — curado (fixture enche ate teto+1 lido do proprio arquivo).'
+    trace: "docs/analysis/onion-gate-benchmark-2026-08.md"
+
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
     to: Q_MAESTRO_VIVO
@@ -695,4 +706,7 @@ edges:
     edge_type: TRACES_TO
   - from: E_PRETOOLUSE_BARRA_SOB_BYPASS
     to: C_ERRA_O_EXIT_2_DETERMINISTICO_DE_HOOK_COMO_A_C
+    edge_type: SUPPORTS
+  - from: E_BENCHMARK_DO_GATE_PUBLICADO
+    to: C_TESE_MOAT_GATES
     edge_type: SUPPORTS
