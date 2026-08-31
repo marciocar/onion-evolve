@@ -10655,6 +10655,41 @@ PY
   rm -rf "${sbo}" "${sb}"
 }
 
+
+run_radar_staleness_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  # REGRA 65 — fixtures sintéticas, ZERO dependência do arquivo vivo (lição do kg-backlog (c),
+  # curada no MESMO dia em que esta família nasceu).
+  local d; d="$(mktemp -d)"
+  local rc out fresh_date; fresh_date="$(date +%F)"
+
+  printf 'axes:\n  - id: EA\n    last_run: %s\n' "${fresh_date}" > "$d/fresco.yaml"
+  rc=0; out="$(ONION_RADAR_BASELINES="$d/fresco.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'REGRA 65'; then
+    record_fail "radar-staleness: (a)" "eixo fresco gerou violação: ${out}"
+  else record_pass "radar-staleness: (a) eixo com rodada de hoje fica em silêncio"; fi
+
+  printf 'axes:\n  - id: EB\n    last_run: 2026-01-01\n' > "$d/velho.yaml"
+  rc=0; out="$(ONION_RADAR_BASELINES="$d/velho.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q "REGRA 65: eixo 'EB' do radar de mundo está VELHO"; then
+    record_pass "radar-staleness: (b) eixo velho vira SOFT nomeando o eixo e a idade"
+  else record_fail "radar-staleness: (b)" "eixo velho não acusado: ${out}"; fi
+
+  printf 'axes:\n  - id: EC\n    last_run: ontem\n' > "$d/ruim.yaml"
+  rc=0; out="$(ONION_RADAR_BASELINES="$d/ruim.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q "last_run ilegível" && [ "${rc}" -ne 0 ]; then
+    record_pass "radar-staleness: (c) data ilegível é HARD fail-loud (rc!=0)"
+  else record_fail "radar-staleness: (c)" "data ilegível não reprovou (rc=${rc}): ${out}"; fi
+
+  printf '# vazio\n' > "$d/vazio.yaml"
+  rc=0; out="$(ONION_RADAR_BASELINES="$d/vazio.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'SEM eixos legíveis' && [ "${rc}" -ne 0 ]; then
+    record_pass "radar-staleness: (d) arquivo presente sem eixos é HARD (nunca conformidade por ausência)"
+  else record_fail "radar-staleness: (d)" "baseline vazia passou (rc=${rc}): ${out}"; fi
+
+  rm -rf "$d"
+}
+
 run_backlog_projection_selftests() {
   local gen="${REPO_ROOT}/.claude/validation/kg-backlog-project.sh"
   local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
@@ -10860,6 +10895,7 @@ run_realign_selftests
 run_harvest_residue_selftests
 run_compose_exposure_selftests
 run_backlog_projection_selftests
+run_radar_staleness_selftests
 run_drive_selftests
 run_site_derivation_selftests
 run_rules_registry_selftests
