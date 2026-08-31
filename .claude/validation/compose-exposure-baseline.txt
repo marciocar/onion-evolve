@@ -1,0 +1,4 @@
+# Baseline da REGRA 64 — exposições de compose LEGADAS toleradas (PASSIVO; só encolhe).
+# Chave: <arquivo>::sha1(linha-sem-espaços)[:12]. Cure a linha e a chave sai junto.
+# (O core não tem compose rastreado — baseline vazio, catraca armada; adotantes semeiam o seu
+#  do próprio corpus via regen-baselines --ensure-from + compose-exposure-check.sh.)
