@@ -3,15 +3,24 @@ title: "Revisão — superfície /meta:radar + REGRA 65 (percepção externa com
 date: 2026-08-31
 branch: feat/meta-radar-surface
 reviewer: "REGRA 65 provada por execução nos 4 modos (fresco silêncio / velho SOFT nomeado / ilegível HARD / vazio HARD); bancada nova run_radar_staleness_selftests 4/4 via harness com as opções do runner (bancada completa >10min sob carga — declarado); regenerações por gerador (inventory/graph/registry/backlog); contagens 107→108 varridas por grep"
-reviewed_diff_sha256: 25faab4f85f7437b55e94513324a634b3fb372a271cedb23bc82ae450e35d7d7
-findings_total: 1
-findings_real: 1
+reviewed_diff_sha256: 5ee5b8125bfe4d6aa3022d762bca3d6b796131beb9d9d5629730c0d622c248c7
+findings_total: 12
+findings_real: 12
 verdict: APROVADO
 tokens: 0
 duration_min: 35
 ---
 
 # Resíduo — REGRA 56
+
+## Passada Elenxo da Onda 6 (mandato REFUTAR, opus/high)
+
+Vereditos: prova SUSTENTADA-COM-EMENDAS · benchmark SUSTENTADA-COM-EMENDAS (2 células erradas:
+63→64 regras, 218→88+11 pontos de emissão) · **peça REPROVADA** (republicava veredito derrubado
+em f2-confronto.json:327 — recorte + prior art aplicados) · REGRA 65 SUSTENTADA-COM-EMENDAS
+(date -d GNU-only virava HARD contra o artefato → cadeia GNU/BSD/awk + degrade SOFT, caso (e) na
+bancada 5/5). Todas as emendas aplicadas NESTE commit; objeções sobreviventes preservadas em
+E_ELENXO_DA_PASSADA_ONDA6. Merge do lote: só até #738 (as emendas moram aqui no topo da stack).
 
 I_RADAR_SURFACE (Onda 6): /meta:radar nasce maestro-invocado com baseline datada por eixo
 (seed = rodada 0 do programa) e REGRA 65 no lint (SOFT por eixo vencido; ilegível/vazio = HARD

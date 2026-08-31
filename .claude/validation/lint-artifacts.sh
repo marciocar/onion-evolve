@@ -3549,7 +3549,10 @@ check_kg_provenance_coverage
 # o eixo mais velho (panorama de modelos) com 65 dias citando um lineup já superado. O desenho segue
 # o padrão da REGRA 62: a máquina DETECTA a idade no lint, o humano dispara a rodada (/meta:radar) —
 # nunca cron/auto-start (MOAT W7). Opt-in pela PRESENÇA de docs/onion/radar-baselines.yaml
-# (superfície do core; adotante sem o arquivo não recebe a regra). Arquivo presente e ilegível é
+# (superfície do core; adotante sem o arquivo não recebe a regra PELO GATE — mas RECEBE a bancada:
+# o selftest sintetiza a própria fixture via ONION_RADAR_BASELINES, então a regra é exercitada em
+# todo adotante pelo caminho da bancada; por isso a degradação de ambiente é SOFT, nunca HARD).
+# Arquivo presente e ilegível é
 # HARD fail-loud: guarda que não sabe o que cobrar jamais afirma conformidade (P0 da REGRA 30).
 check_radar_staleness() {
   local bl="${ONION_RADAR_BASELINES:-${REPO_ROOT}/docs/onion/radar-baselines.yaml}"
@@ -3567,9 +3570,17 @@ check_radar_staleness() {
           violation "HARD" "${bl}" "REGRA 65: eixo '${axis}' com last_run ilegível ('${lr}') — baseline datada é o contrato; corrija ou remova o eixo"
           continue
         fi
-        local lr_epoch; lr_epoch=$(LC_ALL=C date -d "${lr}" +%s 2>/dev/null || echo 0)
-        if [ "${lr_epoch}" -eq 0 ]; then
-          violation "HARD" "${bl}" "REGRA 65: eixo '${axis}' com data não-computável ('${lr}')"
+        # Portabilidade (emenda do Elenxo 2026-08-31): GNU date -d → BSD date -j → awk/mktime.
+        # O formato JA foi provado por regex acima; se nenhum date/awk parseia, o defeito é do
+        # AMBIENTE, não do artefato — degrade SOFT declarando que a idade NÃO foi medida (P0 da
+        # REGRA 30: guarda que não sabe medir declara, nunca reprova o arquivo).
+        local lr_epoch
+        lr_epoch=$(LC_ALL=C date -d "${lr}" +%s 2>/dev/null \
+          || LC_ALL=C date -j -f '%Y-%m-%d' "${lr}" +%s 2>/dev/null \
+          || awk -v d="${lr}" 'BEGIN{split(d,a,"-"); print mktime(a[1]" "a[2]" "a[3]" 12 0 0)}' 2>/dev/null \
+          || echo 0)
+        if [ -z "${lr_epoch}" ] || [ "${lr_epoch}" -le 0 ]; then
+          violation "SOFT" "${bl}" "REGRA 65: idade do eixo '${axis}' NÃO MEDIDA neste ambiente (date sem -d/-j e awk sem mktime) — degradação declarada, não conformidade"
           continue
         fi
         local age=$(( (today_epoch - lr_epoch) / 86400 ))

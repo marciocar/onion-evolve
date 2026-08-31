@@ -18,11 +18,11 @@ condições declarados).
 
 | Métrica | Valor medido | Condição |
 |---|---|---|
-| Latência do lint completo (63 REGRAS, 218 emissões HARD possíveis) | **132,3–132,9 s** (2 amostras) | VPS compartilhada SOB CARGA; o histórico registra **16 s** em máquina ociosa (memória `onion-lint-perf-hotspot`, pós-PR #357) e >7 min no pior caso de carga |
+| Latência do lint completo (64 REGRAS, 88 pontos de emissão HARD + 11 de severidade variável) | **132,3–132,9 s** (2 amostras) | VPS compartilhada SOB CARGA; o histórico registra **16 s** em máquina ociosa (memória `onion-lint-perf-hotspot`, pós-PR #357 — corpus de julho, NÃO re-medido no corpus atual) e >7 min no pior caso de carga |
 | Custo de tokens por execução do gate | **0** | é bash/awk puro — nenhuma chamada de modelo |
-| Regras registradas | **63** (registry gerado de docstrings; severidade = união do emitido com o declarado) | `rules-registry.sh` |
+| Regras registradas | **64** (registry gerado de docstrings; severidade = união do emitido com o declarado) | `rules-registry.sh` |
 | Catracas de passivo legado (baselines versionados) | **6 arquivos, 84 chaves congeladas** no core | dívida que só pode DIMINUIR; adotantes carregam as suas (ex.: 38 chaves de compose num adopt real) |
-| Vetos REAIS numa única sessão de trabalho (2026-08-31) | **5 bloqueios de commit** (console drift, campos de resíduo, TETO ausente, colheita sem registro ×2) + **≥8 intervenções da guarda anti-fail-open do shell** (exit-code-de-pipe, contagem com stderr engolido, branch pt-BR, PR sem passada) | cada um era defeito real; nenhum chegou ao CI |
+| Vetos REAIS numa única sessão de trabalho (2026-08-31) | **5 bloqueios de commit** (console drift, campos de resíduo, TETO ausente, colheita sem registro ×2) + **≥8 intervenções da guarda anti-fail-open do shell** (exit-code-de-pipe, contagem com stderr engolido, branch pt-BR, PR sem passada) | OBSERVADO NA SESSÃO, não-reproduzível por comando — os SHAs dos commits bloqueados são o rastro; célula rebaixada a testemunho pelo Elenxo |
 | Bancada de selftests do lint | ver rodapé (rodada em background nesta data) | `lint-selftest.sh` — testes que provam que as guardas MORDEM (inclui mutações que têm de reprovar) |
 
 ## Por que estes números vendem o que a narrativa não vendia
@@ -40,7 +40,7 @@ condições declarados).
 
 ```bash
 time bash .claude/validation/lint-artifacts.sh   # latência, 0 tokens
-bash .claude/validation/rules-registry.sh        # 63 regras
+bash .claude/validation/rules-registry.sh        # 64 regras
 for b in .claude/validation/*-baseline.txt; do grep -vc '^#' "$b"; done  # 84 chaves
 bash .claude/validation/lint-selftest.sh         # bancada completa
 ```
@@ -53,3 +53,11 @@ o expôs, e a cura (fixture enche até ultrapassar o teto lido do próprio arqui
 mesmo PR; (2) `rules-registry (f)` acusou o estado em-voo da branch (resíduo ainda não escrito) —
 sensibilidade conhecida da bancada ao branch, não defeito. O benchmark medir a bancada e a
 bancada devolver um defeito da própria bancada é o loop de dogfood funcionando.
+
+## Emendas do Elenxo (2026-08-31, mesma passada)
+
+O refutador da passada derrubou 2 células da 1ª versão: "63 regras" (a própria stack apendou a
+REGRA 65 — 64) e "218 emissões HARD" (contagem de PALAVRA por grep; o número real de pontos de
+emissão é 88 + 11 de severidade variável — 2,5× inflado). Corrigidas acima; ficam registradas
+porque um doc de números que se auto-refuta pelo comando que manda rodar é a classe
+declarado≠verificado que o gate existe para matar.

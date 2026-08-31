@@ -10687,6 +10687,17 @@ run_radar_staleness_selftests() {
     record_pass "radar-staleness: (d) arquivo presente sem eixos é HARD (nunca conformidade por ausência)"
   else record_fail "radar-staleness: (d)" "baseline vazia passou (rc=${rc}): ${out}"; fi
 
+  # (e) ambiente sem date -d/-j: degrade SOFT DECLARANDO "não medida" — nunca HARD no artefato
+  #     (emenda do Elenxo 2026-08-31; P0 da REGRA 30). Stub de date que recusa -d e -j.
+  mkdir -p "$d/bin"
+  printf '#!/usr/bin/env bash\nfor a in "$@"; do case "$a" in -d|-j) exit 1;; esac; done\nexec /usr/bin/date "$@"\n' > "$d/bin/date"
+  chmod +x "$d/bin/date"
+  printf 'axes:\n  - id: EE\n    last_run: 2026-01-01\n' > "$d/semd.yaml"
+  rc=0; out="$(PATH="$d/bin:$PATH" ONION_RADAR_BASELINES="$d/semd.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'NÃO MEDIDA neste ambiente' && ! printf '%s' "${out}" | grep -q "eixo 'EE' com data não-computável"; then
+    record_pass "radar-staleness: (e) ambiente sem date -d degrada SOFT declarando 'não medida' (nunca HARD no artefato)"
+  else record_fail "radar-staleness: (e)" "degradação de ambiente errada (rc=${rc}): ${out}"; fi
+
   rm -rf "$d"
 }
 
