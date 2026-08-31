@@ -1,0 +1,619 @@
+{
+ "descartados": 0,
+ "familias": [
+  {
+   "familia": "skills",
+   "itens_total": 12,
+   "medidos": 12,
+   "vivos": 7,
+   "sub_usados": 3,
+   "nunca_exercitados": 2,
+   "achados": [
+    {
+     "item": "onion-retro",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "find . -iname \"*retro*\" | grep -vi node_modules só devolve ./.claude/skills/onion-retro e ./plugins/onion-work-tools/skills/onion-retro — nenhum arquivo de saída (par pergunta/resposta, nota agregada, migalha de diário) em lugar nenhum do repo. grep -rl onion-retro .claude/diary/*.md = 0.",
+     "oportunidade": "A skill promete capturar aprendizado de fechamento de ciclo como spec-as-code, mas nunca produziu 1 retro real — vale rodar num ciclo fechado real (ex.: encerramento de fase do drive) para provar o mecanismo ou descobrir por que ninguém a aciona."
+    },
+    {
+     "item": "onion-compliance-context",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "docs/compliance-context/README.md diz literalmente 'Esta pasta deve permanecer vazia neste repositório-mãe' e seu único arquivo não muda desde 2026-06-27 (65 dias). grep -rl onion-compliance-context .claude/commands/ = 0 e diário = 0 menções.",
+     "oportunidade": "É a única das 3 skills de contexto (compliance/engineering/product) sem NENHUM sinal de exercício em lugar nenhum — vale ao menos um dogfood sintético (rodar /docs:build-compliance-docs num projeto-alvo) para confirmar que o resolver funciona antes de um adotante regulado precisar dele."
+    },
+    {
+     "item": "onion-validation",
+     "etiqueta": "sub-usado",
+     "evidencia": "Única menção em diário é .claude/diary/2026-07-03-sandbox-selftest-exposes-latent-bugs.md, 59 dias atrás — fora da janela de 45 dias. refs_outside estático (grep em .md) = 54, mas é citação de convenção em templates, não invocação recente registrada.",
+     "oportunidade": "Apesar de citada em templates o tempo todo, o único rastro de USO ativo (não apenas de padrão declarado) tem quase 2 meses — vale checar se /meta:create-agent e /meta:create-skill recentes de fato a acionaram ou se viraram checklist mental sem a skill."
+    },
+    {
+     "item": "onion-engineering-context",
+     "etiqueta": "sub-usado",
+     "evidencia": "grep -rl onion-engineering-context .claude/commands/ = 0 (nenhum comando cita o nome da skill explicitamente) e diário = 0 menções, mas git log -1 -- docs/technical-context/ = 2026-08-27 (4 dias atrás), evidência indireta de que o artefato que ela resolve foi tocado sem rastro da skill em si.",
+     "oportunidade": "O contrato de resolver de contexto de engenharia depende de auto-ativação por descrição (sem grep de nome), o que torna seu uso opaco — vale um marcador explícito (linha de diário) quando ela de fato bootstrap/resolve, para o uso deixar de ser invisível à medição."
+    },
+    {
+     "item": "onion-product-context",
+     "etiqueta": "sub-usado",
+     "evidencia": "grep -rl onion-product-context .claude/commands/ = 0 e diário = 0 menções; git log -1 -- docs/business-context/ = 2026-08-23 (8 dias atrás) mostra o artefato-alvo vivo, mas sem prova de que o resolver desta skill (vs. edição manual) foi o caminho.",
+     "oportunidade": "Mesmo padrão do irmão de engenharia: alto valor declarado ('SSOT mínimo de negócio'), zero rastro textual de invocação — instrumentar o próprio bootstrap para deixar 1 linha verificável quando dispara."
+    },
+    {
+     "item": "onion-publish",
+     "etiqueta": "vivo",
+     "evidencia": "Commit 4e069429 \"docs(kg): Fase 5 feita — o repo público onion-plugins está no ar (project-door fechado)\" em 2026-08-25 prova execução real de ponta a ponta, não só criação da skill (42825bd6 feat(skill): skill wizard onion-publish).",
+     "oportunidade": "Uso comprovado e recente — nenhuma ação necessária, é referência positiva de skill que saiu do papel."
+    },
+    {
+     "item": "onion-orchestration",
+     "etiqueta": "vivo",
+     "evidencia": "10 menções em .claude/diary/*.md datadas entre 2026-07-01 e 2026-08-02 (grep -l onion-orchestration .claude/diary/*.md); grep -rl onion-orchestration --include=*.md . fora do próprio dir = 208.",
+     "oportunidade": "Nenhuma — uso denso e recorrente, é a skill mais exercitada da família fora do orquestrador master."
+    },
+    {
+     "item": "onion-onboarding + onion-wizard",
+     "etiqueta": "vivo",
+     "evidencia": "Ambas citadas no mesmo diário .claude/diary/2026-08-17-minha-auditoria-contou-1-onde-eram-3.md (17 dias atrás), correlacionado ao commit ef361183 fix(plugin,docs): o revisor do CI corrigiu a MINHA auditoria.",
+     "oportunidade": "Par Condução (conhecer/fazer) com sinal recente e correlacionado — sem oportunidade de correção, só registrar como par saudável."
+    },
+    {
+     "item": "onion-patterns",
+     "etiqueta": "vivo",
+     "evidencia": "refs_outside = 107 arquivos citam o nome (grep -rl onion-patterns), diário em 2026-07-18-autonomous-thread-runtime-graduated-ladder.md, e git log --since=\"45 days ago\" -i --grep=\"create-agent\\|create-command\\|create-skill\" = 3 commits em 45 dias.",
+     "oportunidade": "Nenhuma — acionada mecanicamente toda vez que um artefato .claude/ novo nasce, uso saudável e proporcional ao valor declarado."
+    },
+    {
+     "item": "onion (orquestrador master)",
+     "etiqueta": "vivo",
+     "evidencia": "grep -rl \"skill onion\\|@onion\\b\" --include=*.md . | grep -v skills/onion/ = 81 referências fora do próprio arquivo; CLAUDE.md o cita como '@onion — orquestrador master / ponto de entrada'.",
+     "oportunidade": "Nenhuma — é o hub declarado e usado, coerente com o papel de ponto de entrada do framework."
+    },
+    {
+     "item": "language-standards",
+     "etiqueta": "vivo",
+     "evidencia": "60 arquivos fora do próprio dir citam language-standards (grep -rl); diário em 2026-07-19-onion-is-the-hero-platform-is-base.md; git log --oneline -5 confirma 100% dos commits recentes com assunto pt-BR + prefixo Conventional em inglês.",
+     "oportunidade": "Nenhuma — a melhor evidência de uso é comportamental (todo commit obedece a convenção), não apenas textual."
+    }
+   ]
+  },
+  {
+   "achados": [
+    {
+     "item": "cycle-completion.sh, context-freshness-metric.sh, federation-engagement.sh (.claude/validation/)",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "Criados 2026-07-28 (PR #481/#482) e declarados '4/4 sinais vivos' no diário .claude/diary/2026-07-29-d5-closed-verify-live-before-acting.md:21. `grep -c \"cycle-completion.sh\" .claude/validation/lint-artifacts.sh` = 0; `grep -rl \"cycle-completion.sh\\|context-freshness-metric.sh\\|federation-engagement.sh\" .claude/commands/` = vazio (nenhum comando os invoca); nenhum .jsonl de saída existe no repo além de session-lifecycle.jsonl (que pertence ao session-velocity, não a estes). Só aparecem em `lint-selftest.sh` (o script testa a si mesmo, ninguém consome a saída).",
+     "oportunidade": "Ou wire-los a um comando/cron que realmente produza e leia o relatório, ou remover a instrumentação e a alegação de 'vivo' no diário."
+    },
+    {
+     "item": "federation-inbox-scan.sh, federation-status-scan.sh, federation-contract-validate.sh (.claude/validation/)",
+     "etiqueta": "sub-usado",
+     "evidencia": "Verbatim do próprio diário .claude/diary/2026-07-21-capability-never-met-reality.md:26-28: 'federation-contract-validate.sh existe e funciona. Em mais de cinco semanas, nenhum federation-check ou rollback foi jamais exercido contra um caso real.' `find .claude/validation -iname 'contracts' -o -path '*fixtures/contracts*'` só acha o fixture `good-contract.md`; `docs/evolution/federation/` não tem nenhum contrato registrado real. Wired em 4 comandos (federation-check/status/rollback/publish/register.md) mas git log dos 3 scripts para em 2026-06-14/15 (78+ dias) e `grep -c` em lint-selftest.sh = 0/0/4.",
+     "oportunidade": "Rodar o handshake contra um adotante real (ou fechar/arquivar a Federação formal) antes de desenhar transporte novo em cima dela."
+    },
+    {
+     "item": "session-velocity.sh (.claude/validation/)",
+     "etiqueta": "sub-usado",
+     "evidencia": "Selftest existe (lint-selftest.sh:10087) e o feed que ele lê está vivo (`wc -l .claude/session-lifecycle.jsonl` = 43, alimentado por session-beacon-hook.sh a cada sessão), mas `grep -rl session-velocity.sh .claude/commands/` = vazio e `grep -c session-velocity.sh .claude/validation/lint-artifacts.sh` = 0 — nenhum comando gera/lê o relatório de velocidade além do próprio selftest.",
+     "oportunidade": "Expor a métrica num comando (ex.: /meta:evolve ou um novo /meta:metrics) para que os dados já coletados virem decisão."
+    },
+    {
+     "item": "consumed-mode-check.sh (.claude/validation/)",
+     "etiqueta": "vivo",
+     "evidencia": "docs/analysis/elenxo-mecanismos-lint-2026-08-13.md:64 registra que o CABEÇALHO do script mentia sobre seu próprio wire-in ('NÃO está ligado como REGRA HARD' ficou stale); corrigido em 2026-08-13 e hoje `grep -n check_consumed_modes .claude/validation/lint-artifacts.sh` mostra REGRA 59 [HARD] chamando-o em lint-artifacts.sh:679-3551 — roda em todo PR que toca .claude/**.",
+     "oportunidade": "Nenhuma — caso resolvido, citado como exemplo de cura do padrão declarado≠verificado."
+    },
+    {
+     "item": "federation-radar.sh (.claude/validation/)",
+     "etiqueta": "vivo",
+     "evidencia": "git log -1 mostra fix em 2026-08-10 (#572) com mensagem 'a guarda morria antes de julgar em 3 de 3 adotantes reais' — bug encontrado contra 3 adotantes de produção, não fixture.",
+     "oportunidade": "Nenhuma — sinal de uso real recente e forte."
+    },
+    {
+     "item": "vps-exposure-check.sh (.claude/validation/)",
+     "etiqueta": "vivo",
+     "evidencia": "`grep -rl vps-exposure-check.sh .claude/commands .github` = vazio (parece zero-consumidor), mas docs/analysis/elenxo-mecanismos-lint-2026-08-13.md:68-69 documenta explicitamente: 'vps-exposure-check.sh aparece como zero-consumidor no grep mas roda por systemd timer — consumo se mede pelo runtime, não só pelo grep.'",
+     "oportunidade": "Nenhuma ação — mas serve de alerta metodológico: grep sozinho sub-mede uso quando o consumidor é um timer externo ao repo."
+    },
+    {
+     "item": "aside-router.sh (.claude/validation/) + aside-router-hook.sh (.claude/hooks/)",
+     "etiqueta": "vivo",
+     "evidencia": "aside-router-hook.sh está wired em .claude/settings.json:66 (dispara em toda sessão) e chama .claude/validation/aside-router.sh; `grep -c aside-router.sh .claude/hooks/aside-router-hook.sh` = 12 referências internas. Fora do gate lint-artifacts.sh (0 refs lá), mas o hook o exercita a cada sessão real.",
+     "oportunidade": "Nenhuma."
+    },
+    {
+     "item": "compose-exposure-check.sh (.claude/validation/)",
+     "etiqueta": "vivo",
+     "evidencia": "git log -1 = 2026-08-31 (hoje), mensagem 'REGRA 64 ganha catraca — 38 HARD legados no 1º update de adotante provaram a falta'; tem baseline (compose-exposure-baseline.txt) e selftest, e docs/evolution/review/feat-r64-ratchet.md documenta a descoberta real dos 38 HARD legados num adotante.",
+     "oportunidade": "Nenhuma — landing recentíssimo com evidência de bug real encontrado."
+    },
+    {
+     "item": "members-validate.sh (.claude/validation/)",
+     "etiqueta": "vivo",
+     "evidencia": "Wired em .claude/commands/meta/federation-member.md; git log -1 = 2026-08-27; memória `m3-federation-op1-register-state` confirma 'OP-1 REGISTRAR entregue (PR #697 merged): /meta:federation-member register + members-validate.sh' — uso real recente, distinto da família federation-*-scan.sh (que nunca rodou contra caso real).",
+     "oportunidade": "Nenhuma."
+    },
+    {
+     "item": "kg-drive-project.sh, kg-realign-project.sh (.claude/validation/)",
+     "etiqueta": "vivo",
+     "evidencia": "Wired em .claude/commands/meta/drive.md e realign.md; `git log -1` = 2026-08-27/08-28 (esta semana); memória bridge-evolve-program-state cita 'G1 SELADO 08-14' via /meta:drive — comandos centrais do loop faseado, tocados ativamente.",
+     "oportunidade": "Nenhuma."
+    },
+    {
+     "item": "Os 7 hooks (.claude/hooks/*.sh)",
+     "etiqueta": "vivo",
+     "evidencia": "Todos os 7 aparecem wired em .claude/settings.json (linhas 26,32,38,44,56,66,78,90,103) cobrindo SessionStart/PreCompact/PostToolUse; `bash-empty-result-guard.sh` disparou de fato NESTA MESMA sessão (bloqueou meu próprio comando com 2>/dev/null), prova ao vivo de execução na hora da medição.",
+     "oportunidade": "Nenhuma — família com maior taxa de exercício comprovado do inventário."
+    },
+    {
+     "item": "resolve-production-branch.sh (.claude/validation/)",
+     "etiqueta": "vivo",
+     "evidencia": "Wired em .claude/commands/meta/adopt.md; git log -1 = 2026-07-22; múltiplas memórias de adoções reais executadas (arandek, arthur, pedro, BW&P/HPE) via /meta:adopt no período recente confirmam o caminho de produção sendo percorrido, mesmo com 0 refs em lint-artifacts.sh (fora do gate de REGRA, dentro do fluxo de comando).",
+     "oportunidade": "Nenhuma."
+    }
+   ],
+   "familia": "guardas (.claude/validation/*.sh + .claude/hooks/*.sh)",
+   "itens_total": 58,
+   "medidos": 58,
+   "vivos": 47,
+   "sub_usados": 4,
+   "nunca_exercitados": 7
+  },
+  {
+   "achados": [
+    {
+     "item": "meta:federation-status",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`git log --oneline --all | grep -ci '/meta:federation-status'` = 0. `grep -rn \"/meta:federation-status\\b\" docs/analysis docs/evolution` só devolve 5 ocorrências, todas descrevendo o DESENHO (ex.: onion-federation-design-v2-2026-06.md:91 '| Monitor / status | `/meta:federation-status` | lê ledger + forge CI...') — nenhuma é log de execução real.",
+     "oportunidade": "O 'console read-only' da federação formal (drift + CI por membro) existe só no papel; validar que roda de verdade antes de confiar nele em incidente real."
+    },
+    {
+     "item": "meta:federation-publish",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`git log --format='%ad %h %s' --date=short --all | grep -iE 'federation-(publish|register)'` = vazio (0 linhas). `grep -n 'registered_at\\|joined\\|onboarded' docs/evolution/federation/members.yaml` = vazio. As 2 menções recentes em docs/analysis só citam o fluxo desenhado ('producer escreve bump de contrato + entrada no CHANGELOG'), nunca um bump real gravado por esse comando.",
+     "oportunidade": "O ledger de contratos formais (a metade 'federação formal' do RFC-0003) nunca foi de fato escrito pelo comando dedicado — todo tráfego real hoje passa pelo doc-bridge leve (co-announce/co-relay), que É vivo."
+    },
+    {
+     "item": "meta:metaspec-validate",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`git log --oneline --all | grep -ci '/meta:metaspec-validate'` = 0. As 4 menções em docs/analysis são normativas: onion-orchestration-topology-adr-2026-06-21.md:217 diz que ADR deveria ser validado 'com evidência citada — não como prova [automática]', e onion-evolution-2026-07-04.md:23 apenas RECOMENDA rodá-lo como fix de um achado (sem confirmação de execução).",
+     "oportunidade": "O gate de conformidade arquitetural citado no CLAUDE.md ('Valide mudanças arquiteturais com @metaspec-gate-keeper') nunca foi chamado via este comando — checar se o agente é usado por outro caminho ou se o gate é só aspiracional."
+    },
+    {
+     "item": "meta:orchestrate",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`git log --format='%ad %h %s' --date=short --all | grep -i orchestrate` só devolve 2 commits, e nenhum menciona `/meta:orchestrate` — são a palavra 'orchestrated' em mensagens sobre outro trabalho. As 10 menções recentes em docs/analysis citam o comando só como 'precedente' de nomenclatura (ex. onion-orchestration-ontology-2026-06.md:122 'skill `onion-orchestration` · comando `/meta:orchestrate`') — nunca como execução.",
+     "oportunidade": "A skill `onion-orchestration` parece ter assumido na prática o papel que o comando dedicado deveria cobrir — decidir se o comando é redundante ou se falta ligá-lo de fato."
+    },
+    {
+     "item": "meta:kb-freshness",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`grep -rl kb-freshness docs/evolution/review` = vazio (0 arquivos). As 5 menções em docs/analysis são desenho comparativo (ex. onion-adr-toolbox-lifecycle-2026-06.md:64 'Frescor: `/meta:kb-freshness` + `/meta:context-freshness` — estender'); nenhuma é log de rodada real, diferente do irmão `/meta:context-freshness` que TEM 1 arquivo real em docs/evolution/review/chore-ctx-freshness-voice-p6-fix.md ('Fecha o /meta:context-freshness de 08-23').",
+     "oportunidade": "Dos 2 irmãos de frescor (KB vs contexto de domínio), só o de contexto foi de fato rodado uma vez — o de KB (94 arquivos em docs/knowledge-base) nunca recebeu auditoria de frescor real."
+    },
+    {
+     "item": "meta:setup-code-review",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`grep -rn \"/meta:setup-code-review\\b\" docs/analysis docs/evolution` devolve 1 linha só, em docs/evolution/review/fix-review-dirty-tree-guard.md:30, e ela descreve o QUE o arquivo distribuído FAZ ('o arquivo é distribuído por `/meta:setup-code-review`'), não uma invocação. `git log --oneline --all | grep -ci setup-code-review` = 0.",
+     "oportunidade": "O comando que instala o workflow de code review automático em CI nunca foi rodado no próprio core — o CI de review do onion-evolve pode ter sido configurado à mão, fora do mecanismo declarado."
+    },
+    {
+     "item": "meta:setup-integration",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`git log --oneline --all | grep -ci setup-integration` = 0. As 3 menções são instruções PARA outros rodarem (docs/evolution/inbox/_processed/2026-07-24-sinal-adocao-arandek.md:79: 'cp .env.example .env` + `/meta:setup-integration`') — nunca uma confirmação de que rodou no core.",
+     "oportunidade": "O comando de bootstrap de integrações (task manager/forge) é recomendado a adotantes mas o próprio core nunca demonstrou usá-lo — risco de o fluxo estar desatualizado sem dogfood."
+    },
+    {
+     "item": "meta:create-agent-express",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`grep -rln \"/meta:create-agent-express\\b\" . --include=*.md | grep -v .claude/commands/meta` devolve só `.claude/agents/meta/README.md` (auto-referência de categoria) e uma cópia em worktree — zero menção em docs/analysis, docs/evolution ou git log.",
+     "oportunidade": "Existem 51 agentes no inventário mas nenhum tem rastro de ter nascido pelo atalho 'express' — confirmar se o fluxo completo `/meta:create-agent` é sempre preferido, e se o express vale manter."
+    },
+    {
+     "item": "meta:create-abstraction",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`git log --oneline --all | grep -ci create-abstraction` = 0. A única menção recente (docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md via a busca por menções) é comparativa, sem evidência de execução; total de menções em docs = 2, 1 dentro dos últimos 45 dias.",
+     "oportunidade": "O template SDAAL (Task Manager, Forge) foi implementado nos dois adapters reais sem passar pelo comando dedicado — verificar se o comando reflete o padrão que os adapters de fato seguem."
+    },
+    {
+     "item": "meta:personality-sync",
+     "etiqueta": "sub-usado",
+     "evidencia": "`.claude/identity/personality.md` tem front-matter `generated: 2026-07-24` e `review_after: 2026-08-23` — hoje é 2026-08-31, ou seja, o prazo de revisão venceu há 8 dias sem novo sync. `git log --oneline -- .claude/identity/personality.md` mostra 1 único commit (`d7807bf7`) na vida do arquivo.",
+     "oportunidade": "O mecanismo 'a personalidade emerge do uso e regenera a cada sync' rodou 1 vez e nunca foi re-executado no prazo que ele mesmo declara — reforça memória já registrada (key-rotation-parked) do padrão 'gatilho social, não mecânico'; vale um cron ou lembrete."
+    },
+    {
+     "item": "meta:recover",
+     "etiqueta": "sub-usado",
+     "evidencia": "`git log --format='%ad %h %s' --date=short --all | grep -i recover` mostra o uso real mais recente em `2026-07-16` (commit c9226499, resgate de pesquisa nunca pushada) — 46 dias antes de hoje (2026-08-31), 1 dia fora da janela de 45 dias definida na tarefa.",
+     "oportunidade": "É natural que uma ferramenta de recuperação de desastre seja rara — mas por ser justamente o 'último recurso', vale confirmar que ainda funciona (dry-run) já que não é exercitada há mais de 1 mês e meio."
+    },
+    {
+     "item": "meta:constellation",
+     "etiqueta": "sub-usado",
+     "evidencia": "`git log --oneline --since=\"45 days ago\" | grep -ci /meta:constellation` = 1 e `git log --oneline --all | grep -ci /meta:constellation` também = 1 — a ÚNICA execução da vida do comando caiu dentro da janela. docs/analysis/onion-adr-constellation-operating-model-2026-07.md:70 descreve a Fase 1 ('mapa') como 'gatilho: já cumprido'.",
+     "oportunidade": "O 'mapa de estrelas' da constelação de repos foi gerado 1 vez e tratado como marco cumprido, não como rotina — decidir se ele deveria ser recorrente (drift do mapa vs. realidade) ou se de fato é ritual único."
+    }
+   ],
+   "familia": "comandos-meta",
+   "itens_total": 41,
+   "medidos": 40,
+   "vivos": 17,
+   "sub_usados": 7,
+   "nunca_exercitados": 16
+  },
+  {
+   "achados": [
+    {
+     "item": "behavior-sensor-three-gates.md",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "grep -rln \"behavior-sensor-three-gates\" . --include=\"*.md\" (fora .git) só devolve: docs/knowledge-base/index.md (que o rotula '**CANDIDATO**') + 2 arquivos de inbox de 2026-07-13 (fora da janela de 45 dias). grep -rl no .claude/ inteiro = 0 hits.",
+     "oportunidade": "Ou promover de 'CANDIDATO' para doutrina de fato (achar 1 consumidor real) ou remover do índice — hoje ocupa espaço de inventário sem nenhum leitor."
+    },
+    {
+     "item": "kg-getting-started.md",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "grep -rln \"kg-getting-started\" . só devolve o próprio docs/knowledge-base/concepts/onion-kg-ontology-hierarchy.md (auto-referência, 3 linhas: 8, 31, 106). Zero hit em .claude/, zero em comandos, zero em outro doc externo à família KG.",
+     "oportunidade": "É a 'rampa' declarada para quem chega ao KG, mas nada aponta um recém-chegado até ela — linkar de /meta:kg ou de meta:adopt onde o KG é introduzido."
+    },
+    {
+     "item": "onion-promotion-ladder.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "único hit em .claude/ é uma cópia obsoleta dentro de .claude/worktrees/. O próprio grafo docs/onion/graph/graduated-automation-elenxo-2026-07.kg.yaml:63 admite: 'a DOUTRINA existe ~75% mas ESPALHADA em 6 docs sem citar-se como familia... 2 escadas nunca unidas'.",
+     "oportunidade": "A doutrina se autodiagnostica fragmentada — vale a sessão de unificação que o próprio nó do grafo já pede, antes de citá-la como se fosse coesa."
+    },
+    {
+     "item": "decision-snapshot-retention.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "grep -rln no repo (fora worktrees) só acha 3 arquivos, todos de 2026-06-22 (federation/CHANGELOG.md, outbox/_processed, analysis) — mais de 60 dias antes de hoje (2026-08-31), fora da janela de 45 dias.",
+     "oportunidade": "Doutrina de retenção de snapshot de decisão não tem nenhum consumidor nos últimos 2 meses; confirmar se ainda é referência viva ou arquivar como histórico."
+    },
+    {
+     "item": "onion-r-taxonomy.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "grep -rln \"onion-r-taxonomy.md\" .claude docs (fora index/worktrees) devolve só: 2 arquivos de sessão arquivada (.claude/sessions/archived/2026-07-19_onion-guardrails/), 1 diário (2026-07-19) e o próprio onion-guardrails.md. Nenhuma das 10+ .sh de .claude/validation/ que enforçam REGRAs cita este arquivo (grep -n \"onion-r-taxonomy\" nelas = 0 matches de fato, o hit anterior era falso-positivo de grep em 'REGRA').",
+     "oportunidade": "A taxonomia que deveria explicar a numeração das REGRAs não é citada por nenhum script que as aplica — ligar a doc à origem (comentário no validation script) fecharia o loop declarado→mecanismo."
+    },
+    {
+     "item": "transfer-heuristic-aristotle.md",
+     "etiqueta": "sub-usado",
+     "evidencia": ".claude/commands/meta/adopt.md:27 cita a doc em UMA linha-ponteiro ('régua de transferência'); os demais 6 hits são todos inbox processado de 2026-07-12/07-16 (fora da janela de 45 dias). Nenhum comando ou agente aplica a heurística além do link solto.",
+     "oportunidade": "A régua de transferência (lente Aristóteles) é citada mas não operacionalizada em nenhum passo verificável do /meta:adopt — hoje é decoração de link, não critério de decisão."
+    },
+    {
+     "item": "secret-handling-agent.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "grep -rl \"secret-handling-agent.md\" .claude/ --include=\"*.md\" --include=\"*.sh\" --include=\"*.yaml\" --include=\"*.yml\" devolve 5 arquivos no total (contagem tabular gerada), a menor contagem entre doutrinas de segurança da família.",
+     "oportunidade": "Doutrina de manuseio de segredo tem alto valor declarado (segurança) mas baixíssima superfície de citação — auditar se @secret-handling-agent realmente é invocado a partir dela ou se o agente evoluiu em paralelo à doc."
+    },
+    {
+     "item": "constellation-of-studies.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "tem comando real .claude/commands/meta/constellation.md (git log: criado 2026-07-19, 'feat(constellation): the study map'), mas a única sessão que a exercitou (.claude/sessions/archived/farol-organizer/) está ARQUIVADA e o comando não recebeu commit desde 07-19 (>45 dias sem toque).",
+     "oportunidade": "Mecanismo (/meta:constellation) existe e não é o problema — está dormente; um dogfood recente validaria se ainda funciona contra o filesystem atual."
+    },
+    {
+     "item": "configuration-management.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "8 hits totais em .claude/ (tabela de referência), último commit de conteúdo em 2026-06-27 — mais de 60 dias sem edição e sem confirmação de leitura por comando ativo.",
+     "oportunidade": "Verificar se a doutrina de configuration-management ainda reflete o estado real dos comandos de configuração antes de citá-la como atual."
+    },
+    {
+     "item": "discussion-worktrees-pattern.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "grep -rln \"discussion-worktrees-pattern.md\" (fora worktrees) devolve só docs/INDEX.md, docs/discussions/README.md, 1 inbox de 07-12, docs/onion/graph e docs/knowledge-base/index.md — todas listagens/índices, nenhum consumidor operacional citando o padrão para decidir algo.",
+     "oportunidade": "Padrão de worktree para discussão só aparece em listagens de inventário; falta um comando (ex: parte do onion-wizard) que efetivamente aplique a regra documentada."
+    },
+    {
+     "item": "parallel-work-worktrees-pattern.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "mesmo perfil do par acima: hits só em docs/onion/remote-parallel-operation.md e docs/knowledge-base/index.md — nenhum script ou comando de .claude/ referencia o arquivo (0 hits em .claude/ nas checagens .sh/.md/.yaml).",
+     "oportunidade": "O padrão gêmeo de worktrees paralelos também não tem consumidor mecânico; considerar fundir os dois docs-irmãos (discussion + parallel-work) já que nenhum tem tração isolada."
+    },
+    {
+     "item": "onion-vps-catalog-doctrine.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "0 hits em .claude/ (comandos/agentes/skills/hooks/validation), mas É citado por 3 grafos/.kg.yaml de investigação recentes (docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml de 2026-08-05, docs/knowledge-base/tools/vps-tool-repo-skeleton.md de 2026-08-10) — uso real mas só na camada de auditoria/pesquisa, nunca virou mecanismo (comando/lint).",
+     "oportunidade": "Doutrina viva na investigação mas ausente da maquinaria — o próximo passo natural é um validation script que catalogue os serviços onion-vps-* citados na doc, fechando declarado→verificável."
+    }
+   ],
+   "familia": "doutrinas (docs/knowledge-base/concepts/*.md + agentic-patterns/ai-strategies/*.md)",
+   "itens_total": 57,
+   "medidos": 57,
+   "vivos": 39,
+   "sub_usados": 16,
+   "nunca_exercitados": 2
+  },
+  {
+   "familia": "comandos-workflow (.claude/commands/{engineer,product,git,docs,design,development,quick,validate,test})",
+   "itens_total": 64,
+   "medidos": 64,
+   "vivos": 7,
+   "sub_usados": 11,
+   "nunca_exercitados": 46,
+   "achados": [
+    {
+     "item": "validate/ (6 comandos: workflow, collab/three-amigos, collab/pair-testing, qa-points/estimate, test-strategy/analyze, test-strategy/create)",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "grep -rl -- \"validate:collab:three-amigos\" .claude/diary docs/evolution .claude/sessions docs/analysis docs/onion docs/backlog.md docs/knowledge-base -> 0 arquivos (idem p/ pair-testing, qa-points:estimate, test-strategy:analyze/create). O unico hit de validate:workflow e auto-referencia em docs/onion/specs-metaspecs-flow.html. docs/analysis/onion-evolution-2026-06-15.md:35 cita three-amigos.md:82 so para apontar um bug hardcoded, nunca uma execucao real.",
+     "oportunidade": "A categoria inteira (declarada 3a dimensao peer, compliance/QA) nunca saiu do papel — validar se ainda vale manter 6 comandos ou consolidar/arquivar."
+    },
+    {
+     "item": "test/ (e2e.md, integration.md, unit.md)",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "grep -rl -- \"test:e2e\" $SEARCH_DIRS so acha docs/onion/practical-examples.md (guia, auto-referencia); test:unit so aparece em 2 tabelas de capacidade (docs/knowledge-base/meta/onion-framework-identity.md:206, docs/analysis/onion-product-material-raw-2026-06.md:187). find . -iname \"*.test.*\" so devolve arquivos de node_modules (zod/devalue), zero produzido pelo framework.",
+     "oportunidade": "A geracao/execucao de suite de testes e 100% declarativa (tabela de capacidade) — nenhuma evidencia de que o comando alguma vez rodou."
+    },
+    {
+     "item": "engineer/start.md + engineer/work.md (entrada do ciclo faseado invariante declarado no CLAUDE.md)",
+     "etiqueta": "sub-usado",
+     "evidencia": "ls .claude/sessions/ mostra so sessoes drive-* (2026-08-27/28/29, do /meta:drive) e adopt-*; ZERO sessao nomeada por feature via engineer/start nos ultimos 45 dias. Ultima mencao real em diario: .claude/diary/2026-07-18-write-kg-closing-step-bookend.md (engineer:work) e .claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md (engineer:plan) — nenhuma depois disso.",
+     "oportunidade": "O ciclo engineer/plan->work que o CLAUDE.md chama de 'invariante do framework' foi na pratica substituido por /meta:drive nas ultimas ~6 semanas — vale atualizar a doutrina ou reativar o ciclo."
+    },
+    {
+     "item": "engineer/hotfix.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "git log --all --format=%s | grep -c \"hotfix/\" -> 1 (uma unica branch hotfix em toda a historia do repo, desde 2025-09-21).",
+     "oportunidade": "Comando critico para producao usado uma unica vez desde a fundacao do repo; sem forcar um exercicio real, nao ha garantia de que o fluxo ainda funciona sob pressao."
+    },
+    {
+     "item": "engineer/bump.md, engineer/docs.md, engineer/help.md, engineer/validate-phase-sync.md, engineer/warm-up.md",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "grep -rl -- \"engineer:bump\" .claude/diary docs/evolution .claude/sessions docs/analysis docs/onion docs/backlog.md docs/knowledge-base -> 0 (idem para engineer:docs, engineer:help, engineer:validate-phase-sync, engineer:warm-up, todos 0 na mesma varredura).",
+     "oportunidade": "5 dos 12 comandos de engineer/ nao tem nenhum rastro fora do proprio arquivo — candidatos a poda ou a um dogfood forcado."
+    },
+    {
+     "item": "18 de 21 comandos product/ (analyze-pain-price, branding, check, checklist-sync, consolidate-meetings, convert-to-tasks, create-task-structure, estimate, extract-meeting, feature, light-arch, presentation, refine, task-check, transform-consolidated, validate-task, warm-up, whisper)",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "Mesma varredura (.claude/diary, docs/evolution, .claude/sessions, docs/analysis, docs/onion, docs/backlog.md, docs/knowledge-base): product:checklist-sync, product:estimate, product:consolidate-meetings, product:task-check, product:validate-task, product:presentation -> 0 hits cada; os demais (branding, check, feature, light-arch, warm-up, create-task-structure, transform-consolidated) -> 1 hit cada, todos em tabelas de capacidade (onion-framework-identity.md) ou docs auto-referentes, nunca em diario/sessao.",
+     "oportunidade": "A vertical de Produto — declarada peer de Engenharia — tem so 3 de 21 comandos com algum sinal (collect, spec, task), e nenhum vivo; o eixo produto do framework e majoritariamente teorico no proprio repo core."
+    },
+    {
+     "item": "product:collect, product:spec, product:task",
+     "etiqueta": "sub-usado",
+     "evidencia": "product:spec aparece em docs/analysis/onion-evolution-2026-07-04.md, -07-08.md, -07-17.md, -07-30.md (ultimo rastro 07-30, fora da janela de 45 dias cujo corte e 2026-07-17); product:collect 4 hits, mais antigos ainda.",
+     "oportunidade": "Unico trio do product/ com sinal real, mas nenhum toque nos ultimos ~30 dias — checar se o /meta:drive tambem engoliu o fluxo de produto."
+    },
+    {
+     "item": "design/generate.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "8 hits em docs/analysis/onion-adr-design-extends-kg-2026-07.md, docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml (2026-08-16) e outros — mas find . -iname \"*brand*variant*\" -o -iname \"*generated-identit*\" -> 0 artefato de saida no filesystem.",
+     "oportunidade": "Discutido/planejado em ADR e KG, mas nenhum artefato de identidade gerado localmente sobrevive no repo — confirmar se roda fora do core ou nunca produziu saida persistida."
+    },
+    {
+     "item": "design/identity.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "Artefato real existe (docs/design-context/brief.md, foundations/color.tokens.json etc.) mas git log -1 --format=%ad --date=short -- docs/design-context/ -> 2026-06-28, e git log --format=%ad -- docs/design-context/ | tail -1 -> 2026-06-22. Nada depois disso em mais de 2 meses.",
+     "oportunidade": "Um exercicio real e completo, mas parado ha 2 meses — a vertical de design (recem-promovida no CLAUDE.md) nao teve segundo ciclo de uso desde o nascimento."
+    },
+    {
+     "item": "docs/build-compliance-docs.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "9 hits em diarios/analises, mas git log -1 --format=%ad --date=short -- docs/compliance-context/ -> 2026-06-27 (mais de 60 dias atras), enquanto docs/business-context/ e docs/technical-context/ foram tocados em 08-23 e 08-27.",
+     "oportunidade": "A 3a dimensao peer (compliance) esta visivelmente atras das outras duas em frescor de contexto — sinal concreto de assimetria entre as 'tres dimensoes peer' declaradas no CLAUDE.md."
+    },
+    {
+     "item": "git/code-review.md, git/fast-commit.md, git/help.md, git/init.md",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "grep -rl -- \"git:code-review\" $SEARCH_DIRS e git:fast-commit so acham docs/onion/commands-guide.md (guia, auto-referencia); git:help so commands-guide.md+engineering-flows.md; git:init so analises antigas (2026-06) e os mesmos 2 guias — nenhum diario/sessao real.",
+     "oportunidade": "4 dos 6 comandos git/ (fast-commit, code-review, help, init) nao tem rastro de uso fora da propria documentacao — enquanto git/flow e git/sync (193 merges no historico, doutrina de sync pos-merge na memoria) claramente carregam o peso real do ciclo git."
+    },
+    {
+     "item": "development/runflow-dev.md (unica entrada da categoria development/)",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "grep -rl -- \"development:runflow-dev\" $SEARCH_DIRS -> 0 arquivos.",
+     "oportunidade": "Categoria inteira (1 item) sem nenhum sinal de uso — avaliar se development/ como categoria separada ainda se justifica ou deve fundir com engineer/."
+    }
+   ]
+  },
+  {
+   "achados": [
+    {
+     "item": "decouple-source.sh / invite-collaborator.sh / transfer-ownership.sh (.claude/utils/adopt/)",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`grep -rn \"decouple-source.sh|invite-collaborator.sh|transfer-ownership.sh\" .claude/commands/` → RC=1 (zero match); `grep -rn ... .claude/skills/` → RC=1 (zero match); `git log --oneline -- <os 3 arquivos>` → 1 commit no total (o de criação). São citados só em prosa (CHANGELOG.md, onion-guided-lifecycle.md) como as 3 transições canônicas de topologia ('desacoplar', 'convidar', 'transferir'), mas nenhum comando/skill os invoca de fato.",
+     "oportunidade": "Ou wire-in real no onion-wizard/adopt.md (as 3 transições viram alcançáveis), ou reclassificar a doutrina de 'transições canônicas' para 'scripts standalone documentados' — hoje a KB promete um caminho que não existe na maquinaria."
+    },
+    {
+     "item": "a2a-live transport (a2a-accept.sh, a2a-verify.sh, a2a-ssrf-check.sh + jwks/granaai-1.pem, jwks/metagamify-1.pem)",
+     "etiqueta": "sub-usado",
+     "evidencia": "`git log -1 --format=%ad -- .claude/utils/federation-transport/a2a-*.sh` → 2026-07-09/07-10 (nenhum commit desde então, 52-53 dias); CHANGELOG.md linha 629: '## 2026-07-10 · a2a-live: F2.2 COMPLETO'; `grep -rl a2a-live docs/evolution/federation/outbox/*/_processed/2026-08*.md` → zero arquivos de agosto citam a2a-live; próprio CHANGELOG diz 'git-async continua sendo o default — a2a-live é exceção gated'.",
+     "oportunidade": "É o mesmo padrão já nomeado no CLAUDE.md para o SendMessage: capacidade construída e proclamada ('canal vivo', handshake com membro regulado) mas exercitada 1x e ociosa desde — medir antes de citar como prova viva de novo."
+    },
+    {
+     "item": "mail-receiver.sh (.claude/utils/co-evolution/) — acelerador ntfy da co-evolução",
+     "etiqueta": "sub-usado",
+     "evidencia": "`grep -n mail-receiver .claude/utils/co-evolution/co-deliver.sh .claude/utils/co-evolution/co-relay.sh` → zero match, apesar do cabeçalho do próprio arquivo dizer 'chamado pelos carteiros (co-deliver/co-relay) após entregar'; `grep -rn 'NTFY_TOPIC|NTFY_URL' .env` → zero (sem default público por design, então sem push real hoje); só é exercitado por `lint-selftest.sh` (selftest sintético).",
+     "oportunidade": "O acoplamento declarado no cabeçalho (carteiros chamam o receiver) não existe no código dos carteiros — ou emenda a chamada real em co-deliver.sh/co-relay.sh, ou corrige o comentário para não prometer o que não roda."
+    },
+    {
+     "item": "task-manager adapters/asana.md e adapters/linear.md",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`git log --oneline -- .claude/utils/task-manager/adapters/asana.md` (idem linear.md) → só 4 commits, todos de refactor/fix-de-doc em massa (7ca6932a criação SDAAL, 9e0ae920 migração, 0923c817/4447934a fix de link quebrado por /meta:evolve) — nenhum de uso real; `.env.example` tem TASK_MANAGER_PROVIDER=jira como default; o próprio CLAUDE.md declara 'Asana e Linear são integralmente cobertos pelo @task-specialist genérico' sem especialista dedicado, ao contrário de jira/clickup que têm 22 commits em 45 dias na família adjacente.",
+     "oportunidade": "Confirma o próprio texto do CLAUDE.md — mas nunca foi medido: nenhuma sessão real rodou com TASK_MANAGER_PROVIDER=asana|linear até hoje. Vale marcar explicitamente como 'não-exercitado, mantido por design SDAAL' em vez de deixar implícito."
+    },
+    {
+     "item": "co-deliver.sh / co-relay.sh (.claude/utils/co-evolution/)",
+     "etiqueta": "vivo",
+     "evidencia": "outbox/metagamify/_processed → 51 arquivos entregues; outbox/granaai/_processed → 17; outbox/pulse-mais/_processed → 13; entregas datadas até 2026-08-31 (hoje) em outbox/arandek e outbox/granaai (pendentes não processados de hoje); wired em .claude/commands/meta/co-deliver.md e co-relay.md.",
+     "oportunidade": "Nenhuma — é o carteiro-local mais usado da família; serve de referência do que 'vivo' significa nesta medição."
+    },
+    {
+     "item": "inbox-pull.sh (.claude/utils/federation-transport/)",
+     "etiqueta": "vivo",
+     "evidencia": "`grep -n inbox-pull.sh .claude/hooks/co-evolution-inbox-check.sh` → linha 47, chamado pelo hook de início-de-sessão (motd 📬); último commit 2026-07-28 (#474, endpoint /federation/inbox/:member 'live and proven').",
+     "oportunidade": "Nenhuma — mecanismo de pull roda em toda sessão que dispara o hook; é o caminho real de recebimento, ao contrário do a2a-live."
+    },
+    {
+     "item": "adopt.md → write-stamp/scope-claude-gitignore/merge-onion-hooks/merge-prettierignore/install-onion-githook/offer-onion-ci/seed-adoption-graph/regen-baselines/durable-commit/vendor-branch (10 scripts)",
+     "etiqueta": "vivo",
+     "evidencia": "`grep -n <cada-script> .claude/commands/meta/adopt.md` → todos aparecem invocados por `bash \"$SOURCE_ROOT/.claude/utils/adopt/<script>\"` no fluxo real do comando; vendor-branch.sh tem commit em 2026-08-31 (hoje) e 7 consumidores fora do dir; regen-baselines.sh commit 2026-08-26; 22 commits em .claude/utils/adopt/ nos últimos 45 dias.",
+     "oportunidade": "Nenhuma — é o núcleo ativo de /meta:adopt, consistente com os 22 commits recentes na pasta."
+    },
+    {
+     "item": "forge github adapter (post-review-comment.sh + factory.md via engineer/pr.md, meta/federation-status.md)",
+     "etiqueta": "vivo",
+     "evidencia": "`grep -rl forge/factory .claude/commands/engineer/pr.md .claude/commands/meta/federation-status.md` → 2 consumidores reais fora de utils/forge; commit 422c61d3 em 45 dias ('o revisor devolve, o Onion posta — lacuna da spec fecha NA SPEC', #558).",
+     "oportunidade": "Nenhuma — abstração usada no caminho crítico de PR/review."
+    },
+    {
+     "item": "reconcile-inputs.sh e resolve-target.sh (.claude/utils/co-evolution/)",
+     "etiqueta": "vivo",
+     "evidencia": "`grep -n reconcile-inputs.sh|resolve-target.sh .claude/commands/meta/co-announce.md` → linhas 9, 41, 43 (allowed-tools + chamada real); reconcile-inputs.sh commit 2026-08-10 (dentro de 45 dias); co-announce alimenta outbox com entregas até 2026-08-31.",
+     "oportunidade": "Nenhuma — molde do extrator citado em 5+ ADRs, e de fato roda dentro do fluxo /meta:co-announce ativo."
+    },
+    {
+     "item": "gitlab/bitbucket forge adapters",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`find .claude/utils/forge -iname '*gitlab*' -o -iname '*bitbucket*'` não retorna arquivo algum (só github.md e none.md existem em adapters/); CLAUDE.md e .env.example rotulam explicitamente 'gitlab/bitbucket: 🔜 costura pronta (não implementado)'.",
+     "oportunidade": "Item honestamente declarado como não-implementado — nenhuma ação necessária além de manter a declaração explícita (evita a promessa implícita que os 3 scripts de adopt/topologia cometem)."
+    },
+    {
+     "item": "jwks/*.pem (chaves RS256 de granaai e metagamify para a2a-live)",
+     "etiqueta": "sub-usado",
+     "evidencia": "`git log -1 --format=%ad -- jwks/granaai-1.pem` → 2026-07-09; `git log -1 --format=%ad -- jwks/metagamify-1.pem` → 2026-07-10; nenhum outro membro (arandek, pulse-mais, onion-*) tem par de chaves — só 2 dos ~13 membros do federation chegaram a fazer opt-in do canal, e nenhum desde julho.",
+     "oportunidade": "Mesma causa-raiz do a2a-live como um todo: 2 chaves geradas, 1 handshake provado, zero renovação/expansão em quase 2 meses — medir antes de citar 'canal vivo aberto a remetentes' como estado atual."
+    }
+   ],
+   "familia": "federacao",
+   "itens_total": 59,
+   "medidos": 36,
+   "vivos": 24,
+   "sub_usados": 7,
+   "nunca_exercitados": 5
+  },
+  {
+   "achados": [
+    {
+     "item": "claude-code-specialist",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`grep -rl \"@claude-code-specialist\\b\" .claude/commands` → 0 arquivos. `git log --all -i --grep=\"claude-code-specialist\" --oneline | wc -l` → 0 commits, nunca. Só aparece em catálogos (SKILL.md, README.md) e é citado por NOME em CLAUDE.md §Agentes Especializados (mais usados)",
+     "oportunidade": "CLAUDE.md declara este agente entre os 'mais usados' mas ele nunca foi invocado nem wireado em nenhum comando — ou promove-o a um wire real, ou corrige a declaração."
+    },
+    {
+     "item": "linux-security-specialist",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`grep -rl \"@linux-security-specialist\\b\" .claude/commands` → 0. `git log --all -i --grep=\"linux-security-specialist\" --oneline` → 0 commits em toda a história do repo (mesmo com a VPS real do core tendo passagens de hardening documentadas em memória, ex. onion-vps-docker-ufw-bypass-contained)",
+     "oportunidade": "Existe trabalho real de hardening da VPS do core (achados de segurança em docs/analysis/) que nunca passou por este especialista declarado — desperdício de expertise já modelada."
+    },
+    {
+     "item": "nx-migration-specialist",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`grep -rl \"@nx-migration-specialist\\b\" .claude/commands` → 0. `git log --all -i --grep=\"nx-migration-specialist\" --oneline` → 0 commits",
+     "oportunidade": "Sem nenhum comando que o wireie e nenhuma evidência de invocação — candidato a poda ou a receber um ponto de entrada real."
+    },
+    {
+     "item": "nx-monorepo-specialist",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "Wireado em 2 comandos (`grep -rl \"@nx-monorepo-specialist\\b\" .claude/commands` → 2), mas `git log --all -i --grep=\"nx-monorepo-specialist\" --oneline` → 0 commits em toda a história — nem sequer housekeeping o tocou",
+     "oportunidade": "É o caso mais caro da lista: TEM wiring declarado em 2 comandos mas ZERO rastro de uso — o wiring existe só no papel."
+    },
+    {
+     "item": "zen-engine-specialist",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`grep -rl \"@zen-engine-specialist\\b\" .claude/commands` → 0 (só aparece em catálogos SKILL.md/onion.md). `git log --all -i --grep=\"zen-engine-specialist\"` → 3 commits, todos de manutenção (`fix(docs): repair broken cross-references`, `docs(agents): completa frontmatter`, `scrub vendorizado`) — nenhum produzindo trabalho real de JDM/regras de negócio",
+     "oportunidade": "3 aparições em git log são 100% housekeeping do próprio framework, não trabalho de domínio — o especialista nunca fez o que foi desenhado para fazer."
+    },
+    {
+     "item": "corporate-compliance-specialist",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "`grep -rl \"@corporate-compliance-specialist\\b\" .claude/commands` → 0. `git log --all -i --grep=\"corporate-compliance-specialist\"` → 1 commit único (72e55e5c, 2026-06-27, 'saneamento de quick-wins do backlog /meta:evolve') — manutenção de frontmatter, não uso real, e >60 dias atrás",
+     "oportunidade": "Categoria `review/` tem só 2 agentes; este está sem nenhum wiring de comando e sem uso desde criação."
+    },
+    {
+     "item": "iso-27001/iso-22301/soc2/pmbok-specialists (vertical compliance)",
+     "etiqueta": "sub-usado",
+     "evidencia": "Os 4 têm exatamente 1 commit cada em `git log --all -i --grep=\"<slug>\"` — todos o MESMO commit (346dc297, 2026-06-27, 'completa frontmatter expertise/related_agents nos 5 outliers'). 45 dias: `--since=2026-07-17` → 0 para todos. Nenhum tem evidência de produzir um documento de compliance real desde então",
+     "oportunidade": "Compliance é uma das 3 dimensões peer declaradas do Onion (CLAUDE.md), mas os 4 especialistas de framework regulatório não têm nenhuma evidência de terem gerado output de domínio nos últimos 2+ meses — a dimensão está viva só na doutrina."
+    },
+    {
+     "item": "test-engineer",
+     "etiqueta": "sub-usado",
+     "evidencia": "Wireado em 8 comandos (`grep -rl \"@test-engineer\\b\" .claude/commands` → 8, 2º maior wiring da família depois de gitflow-specialist), mas `git log --all -i --grep=\"test-engineer\" --oneline` → apenas 2 commits em toda a história, nenhum nos últimos 45 dias",
+     "oportunidade": "É o caso clássico de 'caro e sub-usado': o maior investimento de wiring (8 pontos de entrada) com o menor retorno de rastro de uso — vale investigar se os comandos que o citam realmente o disparam em produção."
+    },
+    {
+     "item": "clickup-specialist",
+     "etiqueta": "sub-usado",
+     "evidencia": "Wireado em 3 comandos, 11 menções totais em `git log --all -i --grep=\"clickup-specialist\"`, mas `--since=2026-07-17` → 0. `.env` não existe no repo (`sem .env`), então não há confirmação de que ClickUp seja provider ativo hoje",
+     "oportunidade": "É o único especialista dedicado de task-manager citado no roteamento do CLAUDE.md (par de @jira-specialist) — mas sem provider ativo comprovado nem atividade recente, sua carga real é incerta."
+    },
+    {
+     "item": "branch-test-planner / branch-documentation-writer / branch-metaspec-checker (vs. branch-code-reviewer)",
+     "etiqueta": "sub-usado",
+     "evidencia": "Todos wireados junto a @branch-code-reviewer em `.claude/commands/engineer/pre-pr.md:45-48` (o 'quarteto'), mas branch-code-reviewer tem 10 commits reais de revisão adversarial R56 nos últimos 45 dias (ex. `aedf133e`, 2026-08-27: 'Passada adversarial (branch-code-reviewer) sobre o PR #697: 5 achados reais, 0 HARD') enquanto os outros 3 têm tot=1,2,10 e 45d=0 cada. O próprio /meta:evolve flagou o desequilíbrio: `docs/analysis/onion-evolution-2026-07-04.md:27` — 'Cluster branch-*: só 2 de 4 pares têm a distinção autodocumentada... a doutrina lista o cluster como NÃO resolvido'",
+     "oportunidade": "O quarteto pré-PR está assimétrico — só branch-code-reviewer mostra uso real recorrente com achados citáveis; padrão a replicar nos outros 3, cuja redundância já foi identificada há 2 meses e segue sem resolução."
+    },
+    {
+     "item": "mermaid-specialist",
+     "etiqueta": "sub-usado",
+     "evidencia": "202 citações em arquivos de todo o repo (`grep -rln \"@mermaid-specialist\\b\" . | wc -l`), majoritariamente recomendações genéricas em docs ('use @mermaid-specialist para diagramas'), mas `git log --all -i --grep=\"mermaid-specialist\"` → só 10 commits totais, 0 nos últimos 45 dias",
+     "oportunidade": "Alta citação em prosa não é uso — a proporção 202 menções-em-docs vs 10 commits reais sugere que é mais recomendado do que efetivamente invocado."
+    },
+    {
+     "item": "gamma-api-specialist / presentation-orchestrator / whisper-specialist / postgres-specialist / docker-specialist / runflow-specialist",
+     "etiqueta": "sub-usado",
+     "evidencia": "Todos com `git log --all -i --grep=\"<slug>\"` mostrando SOMENTE commits de manutenção do próprio framework ('shed-ceremony', 'fix(lint): frontmatter YAML inválido', 'backlog v2 fan-out'), nunca um commit de produção de trabalho de domínio (gerar deck Gamma, transcrever Whisper, migrar schema Postgres, hardening Docker) desde a criação original — ex.: whisper-specialist último commit real é 2025-12-16 ('feat: add Whisper integration'), gamma-api-specialist é 2025-10-27 ('adiciona /product/presentation')",
+     "oportunidade": "6 especialistas de SDK/integração ficaram parados desde o commit de criação — todo rastro posterior é housekeeping do repo, nunca trabalho novo no domínio deles."
+    }
+   ],
+   "familia": "agentes",
+   "itens_total": 51,
+   "medidos": 51,
+   "vivos": 14,
+   "sub_usados": 31,
+   "nunca_exercitados": 6
+  },
+  {
+   "familia": "orquestracao",
+   "itens_total": 7,
+   "medidos": 7,
+   "vivos": 3,
+   "sub_usados": 3,
+   "nunca_exercitados": 1,
+   "achados": [
+    {
+     "item": "skill onion-orchestration (SKILL.md)",
+     "etiqueta": "vivo",
+     "evidencia": "git log -1 --format='%ad %h %s' -- .claude/skills/onion-orchestration/SKILL.md → '2026-08-05 d1fb7552 feat(kg): REGRA 55 ... M6 (custo do run) (#546)' — 26 dias atrás, dentro da janela de 45",
+     "oportunidade": "a skill está viva e seu contrato de custo (run_id/tokens/agents) é o item mais recente — bom candidato a próximo dogfood do próprio inventário."
+    },
+    {
+     "item": "Workflow tool — run_id real (wf_*) em SYNTHESIS.md",
+     "etiqueta": "vivo",
+     "evidencia": "grep -l '^run_id:' docs/evolution/research/*/SYNTHESIS.md → 13 arquivos; ex. bridge-produto-2026-08/SYNTHESIS.md: 'run_id: wf_f6c09d35-8a7 | agents: 16 | tokens: 1204235'",
+     "oportunidade": "a ferramenta Workflow está em uso real de fan-out com custo atribuível — nenhuma ação necessária, é o item mais saudável da família."
+    },
+    {
+     "item": "docs/knowledge-base/concepts/agent-orchestration.md",
+     "etiqueta": "vivo",
+     "evidencia": "git log -1 --format='%ad %h' -- docs/knowledge-base/concepts/agent-orchestration.md → 2026-07-25 6a5be64e (37 dias atrás); grep -rl '/meta:orchestrate' docs/ .claude/diary devolveu 30 arquivos citando-o",
+     "oportunidade": "KB amplamente referenciado; nenhuma lacuna detectada."
+    },
+    {
+     "item": "contrato de frontmatter run_id/tokens/agents/duration_min",
+     "etiqueta": "sub-usado",
+     "evidencia": "13/23 SYNTHESIS.md têm run_id (grep -l '^run_id:' docs/evolution/research/*/SYNTHESIS.md | wc -l → 13; find docs/evolution/research -name SYNTHESIS.md | wc -l → 23) — subiu de 2/42 (medido 08-06) mas ainda falha em 10; o mais grave: backlog-grafo-2026-08/SYNTHESIS.md foi criado em 2026-08-28 (git log --diff-filter=A → '2026-08-28 e9423265'), 23 dias DEPOIS do contrato existir (05-08), e SEM run_id — violação recente, não resíduo antigo",
+     "oportunidade": "o gatilho declarado no próprio SKILL.md ('se a próxima síntese nascer sem os 4 campos, mecanize') já disparou — backlog-grafo-2026-08 é esse caso; falta agir sobre o próprio critério de mecanização que a skill escreveu."
+    },
+    {
+     "item": "/meta:orchestrate (comando)",
+     "etiqueta": "sub-usado",
+     "evidencia": "git log --since='45 days ago' --oneline -- .claude/commands/meta/orchestrate.md → 2 commits, ambos edições de doc (model tiering, write-KG), não invocações; as 30 citações a '/meta:orchestrate' em docs são majoritariamente análises de jun/jul (onion-federation-design-review-2026-06.md, onion-orchestration-ontology-2026-06.md etc.), não research recente que o cite como produtor",
+     "oportunidade": "confirmar se /meta:orchestrate ainda é o ponto de entrada preferido ou se a prática migrou para invocar Workflow direto via skill (13 wf_ ids sem menção ao comando nos SYNTHESIS mais novos)."
+    },
+    {
+     "item": ".claude/commands/common/prompts/orchestration-fallback.md",
+     "etiqueta": "sub-usado",
+     "evidencia": "git log -1 --format='%ad %h' -- .claude/commands/common/prompts/orchestration-fallback.md → 2026-06-28 (64 dias, fora da janela de 45); único consumidor: grep -rl 'orchestration-fallback' .claude/commands --include='*.md' | grep -v worktrees → apenas .claude/commands/engineer/pre-pr.md",
+     "oportunidade": "padrão de degradação com 1 único consumidor e sem edição há 64 dias — checar se pre-pr.md realmente precisou do fallback nas últimas execuções ou se é só texto morto copiado."
+    },
+    {
+     "item": ".claude/validation/orchestration-smoke-test.md",
+     "etiqueta": "nunca-exercitado",
+     "evidencia": "cabeçalho do arquivo: 'Execução: manual — não existe runner automático'; git log -1 -- .claude/validation/orchestration-smoke-test.md → 2026-06-28 (64 dias); grep -rn 'orchestration-smoke-test' --include='*.sh' --include='*.yml' --include='*.md' . --exclude-dir=worktrees devolveu SÓ 2 linhas: o próprio arquivo e um comentário em lint-artifacts.sh:2185 citando-o como exemplo de falso-positivo do parser de tabelas — nunca como execução",
+     "oportunidade": "smoke test do /meta:orchestrate nunca rodou (nem manualmente, a julgar pela ausência de checklist preenchido) e não está no CI — ou automatiza como gate real, ou aposenta o arquivo."
+    }
+   ]
+  }
+ ]
+}

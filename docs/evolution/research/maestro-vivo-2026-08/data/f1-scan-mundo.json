@@ -1,0 +1,546 @@
+{
+ "scans": [
+  {
+   "eixo": "E4-capital",
+   "findings": [
+    {
+     "titulo": "SpaceX adquire Cursor (Anysphere) por US$60B — maior M&A de startup VC-backed",
+     "fato": "SpaceX exerceu opção de compra da Cursor por US$60B em ações (merger triangular reverso), anunciado em 16/jun/2026, com fechamento previsto para Q3/2026; taxa de rescisão de US$1,5B + US$8,5B em computação caso o deal caia. Cursor havia cruzado US$1B de ARR em novembro anterior.",
+     "source": "https://www.cnbc.com/2026/06/16/spacex-spcx-cursor-acquisition-ipo.html",
+     "source_date": "2026-06-16",
+     "relevancia_onion": "Confirma que dev-tooling agentic (IDE/coding assistant) virou ativo de infraestrutura estratégica cotado em dezenas de bilhões — reforça a tese de que orquestração+verificação determinística (o moat do Onion) é o diferencial defensável quando o front-end de coding vira commodity de gigante."
+    },
+    {
+     "titulo": "Cognition (Devin) negocia rodada a US$40B+, alta de 50% em <3 meses desde os US$26B de maio",
+     "fato": "Em 12-13/ago/2026, Cognition AI entrou em negociações iniciais para captar mais de US$1B a uma valuation acima de US$40B, ante US$26B na rodada de maio/2026 — impulsionado por ARR se aproximando de US$1B; termos ainda não fechados.",
+     "source": "https://techcrunch.com/2026/08/12/ai-coding-startup-cognition-reportedly-already-in-talks-to-raise-at-40b-valuation/",
+     "source_date": "2026-08-12",
+     "relevancia_onion": "Capital está pagando prêmio por agentes de coding autônomos com receita real, não por ferramentas de chat — valida a aposta do Onion em orquestração acoplada a Claude Code como camada de verificação sobre esses agentes, em vez de competir como mais um agente de coding."
+    },
+    {
+     "titulo": "HappyRobot levanta US$150M Série C a US$1.2B — agentes de voz/operação empresarial",
+     "fato": "HappyRobot fechou Série C de US$150M com valuation pós-money de US$1.2B em 04/ago/2026, liderada por Prysm Capital com Eurazeo co-liderando — parte de uma onda de ~US$633M em rodadas de agentes concentradas nos primeiros 12 dias de agosto/2026 (junto com Zenity, US$125M).",
+     "source": "https://the-agent-report.com/2026/08/ai-agent-funding-surge-august-2026/",
+     "source_date": "2026-08-13",
+     "relevancia_onion": "O capital está premiando agentes que produzem resultado operacional mensurável (não chatbots genéricos) — alinhado à tese do Onion de que o valor está em orquestração ANCORADA em resultado verificável, não em wrappers de LLM."
+    },
+    {
+     "titulo": "Zenity levanta US$125M — governança/segurança de agentes de IA empresariais",
+     "fato": "Zenity, plataforma de segurança e governança para agentes de IA empresariais, fechou rodada de US$125M por volta de 02/ago/2026, parte da mesma onda de agosto que incluiu HappyRobot e a negociação da Cognition.",
+     "source": "https://the-agent-report.com/2026/08/ai-agent-funding-surge-august-2026/",
+     "source_date": "2026-08-13",
+     "relevancia_onion": "Escassez de capital aponta para 'governança/segurança de agente' como categoria quente — adjacente à guarda determinística (exit 2 de hook, REGRA 62 catraca) que o Onion já implementa; sinaliza mercado validando a tese de verificação mecânica sobre agentes."
+    },
+    {
+     "titulo": "OpenAI adquire Ona para dar a Codex ambientes cloud de execução longa",
+     "fato": "OpenAI anunciou aquisição da Ona (ex-Gitpod), startup de ambientes cloud para agentes, para permitir que o Codex execute tarefas de coding mais longas; anunciado em 11/jun/2026, termos não divulgados.",
+     "source": "https://www.cnbc.com/2026/06/11/open-ai-ona-acquisition-codex.html",
+     "source_date": "2026-06-11",
+     "relevancia_onion": "Consolidação de infraestrutura de execução (sandboxes/ambientes) em torno dos grandes labs mostra que a camada de 'onde o agente roda' está sendo internalizada pelos donos de modelo — reforça que o Onion deve competir na camada de orquestração/KG, não tentar ser infraestrutura de execução."
+    },
+    {
+     "titulo": "Relay (automação de workflow com IA) fecha as portas — fundador vai para o Chrome do Google",
+     "fato": "Relay, startup de automação de workflows via IA, encerrou operações: clientes do tier gratuito perderam acesso em 15/ago/2026 e os pagantes em 14/set/2026; fechamento sinalizado desde julho, fundador e equipe foram absorvidos pelo time do Chrome (Google).",
+     "source": "https://techcrunch.com/2026/08/17/ai-automation-startup-relay-shuts-down-staff-joins-googles-chrome-team/",
+     "source_date": "2026-08-17",
+     "relevancia_onion": "Morte de startup de automação de workflow (categoria adjacente a orquestração de agentes) por acqui-hire em vez de tração própria é sinal de que 'automação genérica sem verificação/moat' não sustenta negócio independente — reforça a tese de que mecanismo verificável é o que resiste."
+    },
+    {
+     "titulo": "ChatGPT Atlas (navegador nativo de IA da OpenAI) desligado após <10 meses",
+     "fato": "O navegador nativo de IA da OpenAI, Atlas, foi oficialmente descontinuado em 09/ago/2026, menos de 10 meses após o lançamento — apontado como falha da estratégia 'Chrome killer'.",
+     "source": "https://finance.biggo.com/news/9b38e76e-8ac0-4389-8a1b-29dea82c1329",
+     "source_date": "2026-08-09",
+     "relevancia_onion": "Mesmo um grande lab (OpenAI) matou uma aposta de produto agentic-first em menos de um ano — evidência de que 'wrapper de interface' sem mecanismo diferenciado morre rápido mesmo com capital ilimitado, reforçando a doutrina onion-moat-verifiable-mechanism."
+    }
+   ],
+   "lacunas_declaradas": [
+    "Não encontrei evidência direta de M&A ou funding round especificamente para uma startup de 'memória de agente' (categoria Mem0/Zep/Letta) com evento datado em jun-ago/2026 — os achados de memória (Interloom, xmemory) são de meses anteriores (mar/2026) e não puderam ser recortados para a janela pedida com fonte primária.",
+    "Não confirmei nenhuma 'morte' (shutdown) especificamente de uma startup de KG/memória-de-agente ou de dev-tooling agentic estrito (só automação de workflow genérica e navegador); se existir morte nesse nicho mais estreito em jun-ago/2026, não foi localizada nesta passada.",
+    "O status final da negociação da Cognition (se o round de US$40B+ foi de fato fechado, e por quanto) não estava confirmado na data das fontes — ainda em 'talks' em 12-13/ago/2026; não há confirmação de fechamento posterior verificada nesta pesquisa.",
+    "Não busquei comparação direta com a baseline de 2026-07-25 (Company Brain/reconciliação-LLM) porque essa baseline é de arquitetura de produto, não de eventos de capital — não há correspondência 1:1 a reconciliar; registro isso como lacuna metodológica, não como achado."
+   ],
+   "metodo": "Rodei 4 WebSearch iniciais cobrindo funding de agentes (geral), memória de agente (Series A/seed), mortes de dev-tooling agentic, e M&A de coding agents — depois 4 chamadas de verificação (WebFetch no artigo-fonte de agosto + WebSearch cruzado para SpaceX/Cursor, Cognition/US$40B, e mortes com 'ran out of'). Priorizei buscas por trajetória temporal (ago/2026, jul-ago/2026) em vez de nomes já conhecidos, mas a superfície retornada foi dominada por players já grandes (Cognition, OpenAI, SpaceX) — não achei um 'furo' equivalente ao Graphify nesta passada; marcado como lacuna de cobertura, não como ausência de eventos."
+  },
+  {
+   "eixo": "E6-fronteira-modelos",
+   "metodo": "1) WebSearch direto nos 3 grandes (Anthropic/OpenAI/Google) por lineup+preço ago/2026, seguido de WebFetch em fontes primárias (anthropic.com/news/claude-sonnet-5) para validar detalhes — o fetch do openai.com/index/gpt-5-6 retornou 403, então recorri a WebSearch adicional citando a página oficial via cache de busca (developers.openai.com/api/docs/models, OpenAI Developer Community) em vez de desistir. 2) search-by-trajectory não se aplicou literalmente (GitHub/HN) pois o eixo é lançamento oficial de modelo, não projeto emergente de código aberto — mas apliquei o princípio equivalente: busquei por TERMOS DE TRAJETÓRIA (\"Claude Fable Anthropic model announcement\", \"Gemini 3.7 Flash blog.google\") em vez de assumir que o nome conhecido da baseline (Opus 4.8) ainda era o topo — isso expôs Claude Opus 5 (24/07/2026) e Claude Fable 5/Mythos-class (09/06/2026), que a baseline antiga não citava. 3) follow-the-money: registrei valuation da Sierra AI ($15,8B) como contexto do comparável de preço B2B. 4) Nenhum teto de WebSearch foi atingido; não houve necessidade de fallback para WebFetch sobre DuckDuckGo/Bing.",
+   "findings": [
+    {
+     "titulo": "Família Claude 5 confirmada e hierarquizada (Sonnet 5, Opus 5, Fable 5/Mythos-class)",
+     "fato": "Claude Sonnet 5 lançado em 30/06/2026 a $2/$10 por milhão de tokens (in/out) — preço promocional tornado permanente em 11/08/2026 (o aumento programado para $3/$15 em 01/09/2026 foi cancelado). Claude Opus 5 lançado em 24/07/2026 a $5/$25/milhão, com system card oficial datado de 24/07/2026; supera Opus 4.8 (não 4.6) em Frontier-Bench v0.1 e triplica o 2º melhor modelo em ARC-AGI 3. Acima de ambos existe Claude Fable 5 (classe 'Mythos'), lançado 09/06/2026, com safeguards que bloqueiam respostas de alto risco (cyber/bio) e fallback automático para Opus 4.8; sofreu controle de exportação dos EUA por 3 semanas (12/06 a 01/07/2026), depois revertido.",
+     "source": "https://www.anthropic.com/news/claude-sonnet-5 ; https://www-cdn.anthropic.com/c5fbac3f0b1280a933ebd26d3cb8bb9f5bdeaf48/Claude%20Opus%205%20System%20Card.pdf ; https://techcrunch.com/2026/06/09/anthropic-released-claude-fable-5-its-most-powerful-model-publicly-days-after-warning-ai-is-getting-too-dangerous/",
+     "source_date": "2026-06-30 / 2026-07-24 / 2026-06-09",
+     "relevancia_onion": "A baseline interna citava Opus 4.8 como topo — na verdade Opus 4.8 já é o modelo DE FALLBACK/base de comparação de um tier acima (Fable 5/Mythos), o que reposiciona onde o Onion (acoplado por capacidade ao Claude Code) deve mirar seu tiering evergreen: o 'máximo do modelo' hoje não é Opus, é Fable."
+    },
+    {
+     "titulo": "Sonnet 5 traz auto-verificação nativa como capacidade agentic nova",
+     "fato": "Testers relatam que Sonnet 5 'verifica sua própria saída sem ser explicitamente solicitado' (self-verification), além de planejamento autônomo, uso de ferramentas (browser/terminal) e follow-through sustentado em tarefas multi-etapa em nível que 'meses atrás exigia modelos maiores e mais caros'.",
+     "source": "https://www.anthropic.com/news/claude-sonnet-5",
+     "source_date": "2026-06-30",
+     "relevancia_onion": "Auto-verificação nativa do modelo é adjacente (não substituta) ao radar determinístico sem-LLM do Onion — reforça a tese de que o moat do Onion é o MECANISMO verificável, não a inteligência bruta do modelo, já que mesmo modelos que 'se verificam' seguem sem produzir grafo auditável."
+    },
+    {
+     "titulo": "OpenAI: GPT-5.6 'Sol' é o topo agentic/coding, com corte de preço de 20-33% em ago/2026",
+     "fato": "GPT-5.6 Sol: $4/milhão input (era $5) e $20/milhão output (era $30) — corte de 20% no input e ~33% no output, vigente pelo menos até 21/11/2026 (preço promocional). GPT-5.2 (lançado 10/12/2025) caiu para $0,88/$7 por milhão, contexto de 400K tokens, posicionado como tier médio; GPT-5.6 Sol e GPT-5.5 são o tier frontier para coding/reasoning/agentic, com GPT-5.3 Codex como especialista agentic dedicado a engenharia de software.",
+     "source": "https://community.openai.com/t/20-price-reduction-for-gpt-5-6-sol-api-codex-credits-and-chatgpt-work/1391726 ; https://developers.openai.com/api/docs/models/gpt-5.6-sol",
+     "source_date": "2026-08-24",
+     "relevancia_onion": "Guerra de preço agressiva entre os 3 grandes (cortes de 20-50% em semanas) valida a doutrina do Onion de nunca fixar modelo/preço em documentação — o tiering deve ler config em runtime, nunca hardcode, pois o topo muda de nome e preço em ciclo de semanas."
+    },
+    {
+     "titulo": "Google: Gemini 3.5 Flash lidera agentic; Gemini 3.5 Pro atrasado, 3.7 Flash tomou a vaga de 'melhor disponível'",
+     "fato": "Gemini 3.5 Flash (lançado I/O, 19/05/2026) é otimizado para tarefas agentic e coding, superando Gemini 3.1 Pro em Terminal-Bench 2.1, GDPval-AA e MCP Atlas. Gemini 3.5 Pro, anunciado para 'mês seguinte' ao I/O, permanece NÃO lançado em 31/08/2026 após atrasos repetidos — o modelo mais capaz disponível é Gemini 3.7 Flash (lançado 13/08/2026), com Gemini 3.1 Pro ainda como tier 'Pro' nominal. Gemini 3.7 Flash via API: $0,75/milhão input e $3,75/milhão output (Google cortou o preço em 13/08/2026 para igualar ao 3.7 Flash).",
+     "source": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/ ; https://www.axios.com/2026/08/13/google-gemini-37-flash ; https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-3-7-flash/",
+     "source_date": "2026-05-19 / 2026-08-13",
+     "relevancia_onion": "Google atrasando repetidamente o tier 'Pro' e promovendo Flash a topo de facto é outro sinal de que a régua do Onion (efficiency-over-economy, tiering por capacidade) não pode assumir hierarquia estável de nomes — o modelo 'mais capaz hoje' muda de FAMÍLIA, não só de versão."
+    },
+    {
+     "titulo": "Comparável B2B: Glean (busca/agente corporativo) cobra por assento + consumo, sem rate card público",
+     "fato": "Glean pratica ~$50-75+/usuário/mês (base $45-50 + add-on de IA $15/usuário/mês), com contrato enterprise mínimo de ~100 assentos (~$60K/ano ACV mínimo); usa FlexCredits para medir consumo de recursos intensivos além de limiar incluso (100 queries em modo 'thinking' por usuário/semana). Nenhum rate card público — cotação customizada por vendas direta.",
+     "source": "https://www.glean.com/perspectives/comparing-costs-scaling-ai-search-solutions-in-2026 ; https://www.vendr.com/marketplace/glean",
+     "source_date": "2026 (sem data de post específica, conteúdo corrente em ago/2026)",
+     "relevancia_onion": "Glean é o comparável mais próximo do 'Company Brain' que a memória do Onion já descartou como não-moat (SEO apenas) — confirma que o preço de mercado para 'busca corporativa + IA' já precifica por assento+consumo, não por outcome, o que é o espaço que o Onion evita competir de frente."
+    },
+    {
+     "titulo": "Comparável B2B: Sierra (agentes de atendimento) usa preço por OUTCOME, sem tiers públicos",
+     "fato": "Sierra cobra por resolução bem-sucedida (outcome-based pricing), sem tiers/self-serve/rate público; estimativas de terceiros apontam contratos anuais a partir de ~$150K/ano, com setup fee de $50K-$200K e total do primeiro ano de $200K-$350K+; deployments levam 3-7 meses. Valuation da empresa citada em $15,8B.",
+     "source": "https://sierra.ai/blog/outcome-based-pricing-for-ai-agents ; https://valueaddvc.com/blog/how-does-sierra-ai-make-money-outcome-based-pricing-enterprise-agents-and-the-business-model-breakdown",
+     "source_date": "2026 (post oficial da Sierra + análise datada em 2026)",
+     "relevancia_onion": "Outcome-based pricing é o modelo de precificação mais alinhado à proposta de valor de orquestração+verificação determinística do Onion (paga-se pelo resultado verificado, não pelo assento) — comparável direto para eventual monetização de um produto Onion-hospedado."
+    },
+    {
+     "titulo": "Comparável B2B: Harvey AI (jurídico) — preço por assento extremo, escalonado por porte do cliente",
+     "fato": "Harvey cobra $1.200-$2.000+/usuário/mês em firmas mid-market (uso ilimitado), caindo para ~$100-$200/assento em escala Am Law 100 (desconto por volume/multi-ano acima de 200 assentos); mínimo de 20-50 assentos; contratos anuais medianos em $175K/ano (baseado em 4 relatos de compradores terceiros); sem price page pública.",
+     "source": "https://thelegalprompts.com/blog/harvey-ai-pricing ; https://costbench.com/software/ai-legal-tools/harvey-ai/",
+     "source_date": "2026 (conteúdo corrente ago/2026)",
+     "relevancia_onion": "Mostra o teto do que um produto de conhecimento verticalizado B2B consegue cobrar por assento quando o domínio é de alto risco/alto valor (jurídico) — referência de teto de preço caso o Onion mire verticais de compliance/governança regulada."
+    }
+   ],
+   "lacunas_declaradas": [
+    "Não confirmei se existe modelo Claude 5 acima de Fable 5 (ex.: 'Mythos 5' citado como par de Fable 5 nos controles de exportação) — não localizei página oficial de anúncio do Mythos 5 em si, só menções colaterais na cobertura do Fable 5; ficou indeterminado se Mythos 5 é modelo separado, codinome interno, ou sinônimo de Fable 5.",
+    "Não verifiquei diretamente a página oficial openai.com/index/gpt-5-6 (retornou HTTP 403 ao WebFetch) — os dados de GPT-5.6 Sol vêm de fontes secundárias (OpenAI Developer Community, developers.openai.com/api/docs) que citam a página oficial, não da página em si.",
+    "Não encontrei preço de assinatura consumer confirmado para Gemini 3.7 Flash / Gemini 3.1 Pro em plano pago (só a tarifa API); os números de plano consumer ($7,99-$249,99/mês) vieram de agregador terceiro (costbench.com), não da página oficial gemini.google.com/pricing — não confirmado como fato.",
+    "Não pesquisei comparável de preço para Perplexity Enterprise nem Writer/Notion AI, que ajudariam a fechar o quadro B2B de produtos 'de conhecimento' (mais próximos do KG-first do Onion) — ficou coberto só o lado 'agente de atendimento/jurídico/busca corporativa', faltando o lado 'assistente de conhecimento generalista'."
+   ]
+  },
+  {
+   "eixo": "E1-kg-agente",
+   "metodo": "1) search-by-trajectory no GitHub via api.github.com/search/repositories com `created:&gt;2026-03-01 sort=stars` (termos \"knowledge graph agent memory\") — achou repos NOVOS de 2026 (Agent_Memory_Techniques, swarmvault, sage-wiki, caura, dkg, mycelium, mentedb) não presentes na baseline de 08-02, evitando o viés de nome-conhecido. 2) HN Algolia search_by_date sobre o mesmo eixo, filtrado por created_at desde meados de 2026 — capturou lançamentos/discussões (Cruxible, Hyper/YC, agent-memory benchmarks) por trajetória temporal, não por marca. 3) follow-the-money: WebSearch dirigido a funding/aquisição de Zep, Mem0, Cognee, Graphon AI, Letta (rodadas com valor e data, quando disponíveis). 4) WebSearch para checar mortes/sunsets no espaço (\"shuts down\", \"sunset\", \"pivot\" 2026) — achou Flowise (adjacente, não é KG) e nenhuma morte confirmada de player KG-first. 5) WebFetch em página de comparação de mercado (fountaincity.tech, publicada/atualizada mai-jul/2026) para mapear os 8 sistemas e quais usam KG de fato. 6) WebSearch sobre memória nativa de Anthropic/OpenAI/Google para medir \"virou feature de outro\". Nenhum WebSearch bateu no teto; não foi necessário cair para WebFetch sobre DuckDuckGo/Bing.",
+   "findings": [
+    {
+     "titulo": "Anthropic e OpenAI internalizaram memória — a categoria virou feature das próprias plataformas de modelo",
+     "fato": "Em 2026 Anthropic, Google e OpenAI embarcaram memória nativa com arquiteturas default diferentes: Anthropic com o memory tool (diretório /memories controlado pelo dev, funciona em todos os modelos Claude 4+) e a primitiva 'Dreaming' (06-05-2026) que roda assíncrono entre sessões consolidando padrões (explicitamente modelada em consolidação hipocampal); OpenAI com 'saved memories' + 'reference chat history' (Dreaming V3, jun/2026) no ChatGPT e migração da Assistants API (deprecada 26-08-2026) para Responses API + Conversations API server-managed no lado dev.",
+     "source": "https://www.graphlit.com/blog/survey-of-ai-agent-memory-frameworks (citando anúncios oficiais Anthropic/OpenAI de 2026)",
+     "source_date": "2026 (múltiplos anúncios ao longo do ano, memory tool e Dreaming em 05-06/2026)",
+     "relevancia_onion": "É o DELTA mais crítico: a plataforma-modelo (inclusive a própria Anthropic, substrato do Onion) está absorvendo memória-como-feature — reforça que o moat do Onion não pode ser 'ter memória', tem que ser o KG determinístico + verificação + orquestração ancorada, algo que o memory tool nativo não oferece."
+    },
+    {
+     "titulo": "Mem0 fechou Series A de US$24M (jul/2025, anunciado e amplamente coberto até 2026) e virou a camada de memória cross-vendor de fato",
+     "fato": "Mem0 levantou US$20M de Series A liderada pela Basis Set Ventures (com Peak XV, GitHub Fund, YC, e anjos-CEO de Datadog/Supabase/PostHog/Weights&Biases), totalizando US$24M; em meados de 2026 reporta ~41-48 mil stars no GitHub, 14M downloads e 186M chamadas de API por trimestre, e publicou integrações com Anthropic SDK, OpenAI Agents SDK e Google ADK — se posicionando como camada de memória agnóstica de fornecedor de modelo.",
+     "source": "https://techcrunch.com/2025/10/28/mem0-raises-24m-from-yc-peak-xv-and-basis-set-to-build-the-memory-layer-for-ai-apps/",
+     "source_date": "2025-10-28 (cobertura consolidada em relatórios 2026, ex. mem0.ai/blog/state-of-ai-agent-memory-2026)",
+     "relevancia_onion": "Mem0 é vetor+KG+KV híbrido (não KG-puro) e virou o 'padrão de fato' comercial citado em toda comparação 2026 — útil como referência de UX/benchmark (LOCOMO) mas não é concorrente direto do KG determinístico do Onion, que é sobre verificação/orquestração, não personalização de app."
+    },
+    {
+     "titulo": "Letta pivotou de 'memória' para 'agente de codificação com runtime próprio' — Letta Code é hoje o centro de gravidade da empresa",
+     "fato": "A Letta (ex-MemGPT, Berkeley, US$10M seed set/2024) lançou Letta Code (42.5% no Terminal-Bench, #1 agente open-source model-agnostic), com app desktop lançado em abril/2026 e Channels substituindo o antigo LettaBot em maio/2026; reformulou a arquitetura de memória para 'programmatic context management' com versionamento git-based (fev/2026). Não usa knowledge graph — usa modelo de memória em 3 camadas estilo SO (RAM/disk).",
+     "source": "https://www.letta.com/ (site oficial, estado refletido em coberturas de jun/2026) e https://www.hpcwire.com/bigdatawire/this-just-in/letta-emerges-from-stealth-with-10m-to-build-ai-agents-with-advanced-memory/",
+     "source_date": "2026-06 (estado da empresa) / 2024-09 (funding original)",
+     "relevancia_onion": "Confirma o padrão 'morreu como categoria pura, virou feature/produto adjacente': Letta não é mais 'memória' isolada, é um concorrente de agente de codificação — sinal de que 'ser só camada de memória' não sustenta empresa sozinha, reforçando a tese do Onion de amarrar KG a verificação/orquestração, não vender memória pura."
+    },
+    {
+     "titulo": "Cloudflare lançou 'Agent Memory' como serviço gerenciado da própria nuvem — infra-gigante entrando na categoria (feature, não startup)",
+     "fato": "Cloudflare anunciou Agent Memory em beta privado em 17-04-2026, rodando sobre Workers, Durable Objects e Vectorize, com memória tipada (Facts/Events/Instructions/Tasks) e não usa knowledge graph — mas promete 'memories are yours; every memory is exportable', diferencial ante concorrentes.",
+     "source": "https://fountaincity.tech/resources/blog/agent-memory-knowledge-systems-compared/",
+     "source_date": "2026-05-04 (publicado), atualizado 2026-07-07",
+     "relevancia_onion": "Outro sinal de 'virou feature de outro': hyperscaler (Cloudflare) empacotando memória de agente como primitiva de infraestrutura — pressiona o espaço de startups puras de memória e valida que o diferencial competitivo real está em cima (verificação/governança), não na primitiva de armazenamento."
+    },
+    {
+     "titulo": "Cognee: US$7.5M seed para 'memória para agentes de IA' via vetor+KG a partir de documentos não-estruturados",
+     "fato": "A Cognee levantou US$7,5M em seed para construir memória de agentes de IA combinando vetores e knowledge graph extraídos de documentos não estruturados; é citada em toda comparação de mercado 2026 como um dos 4 sistemas (de 8 avaliados) que de fato usa KG (ao lado de Mem0, Zep/Graphiti, e a abordagem markdown-vault).",
+     "source": "https://www.cognee.ai/blog/cognee-news/cognee-raises-seven-million-five-hundred-thousand-dollars-seed",
+     "source_date": "2026 (release da Cognee, refletido em fountaincity.tech 2026-05/07)",
+     "relevancia_onion": "Delta vs baseline (que só citava Zep/Graphiti+Graphify): Cognee é o 3º pilar KG real do mercado em 2026 — mas foca em ingestão de documento não-estruturado para KG, não em verificação/orquestração determinística; nicho complementar, não sobreposto ao Onion."
+    },
+    {
+     "titulo": "Graphon AI: US$8,3M seed para camada de 'inteligência pré-modelo' multimodal — não é player de agente, é infraestrutura de dados",
+     "fato": "Graphon AI levantou US$8,3M seed liderado pela Novera Ventures para transformar documentos, vídeo, áudio, imagens, logs e bancos de dados em memória relacional persistente, permitindo que LLMs/agentes raciocinem com precisão sobre grandes contextos — posicionado como camada pré-modelo, não como produto de agente per se.",
+     "source": "https://www.tamradar.com/funding-rounds/graphon-ai-seed-8-3m",
+     "source_date": "2026 (rodada seed, cobertura TAMradar)",
+     "relevancia_onion": "Delta novo (fora da baseline): mostra dinheiro migrando para a CAMADA DE DADOS que alimenta KG/memória (ETL multimodal → grafo relacional), sugerindo que a disputa está subindo um nível — de 'ter um KG' para 'alimentar o KG direito', algo que o Onion já resolve via layer:domain do /meta:kg.",
+     "fato_2": null
+    },
+    {
+     "titulo": "Hyper (YC, lote de 2026): 'company brain' auto-dirigido para desenvolvimento agêntico — reforça e expande a categoria já nomeada pela YC",
+     "fato": "Hyper, batch YC 2026, se posiciona como 'the self-driving company brain' — camada de contexto/memória organizacional para acelerar desenvolvimento agêntico; apareceu em discussão no HN em 03-06-2026 com 79 pontos, mostrando tração orgânica na comunidade técnica.",
+     "source": "https://heyhyper.ai/ e https://hn.algolia.com/api/v1/search_by_date (thread 2026-06-03, 79 pontos)",
+     "source_date": "2026-06-03",
+     "relevancia_onion": "Confirma e refina o rótulo 'Company Brain' já citado na baseline (YC nomeou a categoria) — Hyper é a instância concreta de 2026 desse rótulo; útil para benchmarking de GTM/posicionamento do Onion como framework KG-first, já que ambos miram 'contexto organizacional para agentes', mas o Onion aposta em verificação determinística onde Hyper aposta em auto-dirigibilidade.",
+     "fato_2": null
+    },
+    {
+     "titulo": "Emergiu subcategoria 'governança/verdade governada' sobre KG de agente — Cruxible (open-source) trata KG como camada de 'truth' auditável, não só memória",
+     "fato": "Cruxible (github.com/cruxible-ai/cruxible) apareceu duas vezes no HN em jul/2026 (08-07 e 14-07) como 'open-source governed truth layer for AI agents' e 'Terraform-like ontology config para estado governado de agentes' — trata o grafo como uma camada de VERDADE com config declarativa versionável (analogia direta a Terraform), não como cache de memória conversacional.",
+     "source": "https://github.com/cruxible-ai/cruxible",
+     "source_date": "2026-07-08 e 2026-07-14 (posts HN Algolia)",
+     "relevancia_onion": "É o achado mais próximo estruturalmente do Onion no espaço: um projeto tratando o grafo como camada de GOVERNANÇA/VERDADE declarativa (não retrieval) — vale monitorar como concorrente conceitual direto do /meta:kg + REGRA de catraca/lint determinístico do Onion, apesar de ainda ser pequeno (1-2 pontos no HN, early-stage)."
+    },
+    {
+     "titulo": "Nenhuma morte confirmada de player KG-first 'puro' foi encontrada — os sunsets identificados no período são adjacentes (agent-builders no-code), não memória/KG",
+     "fato": "Busca por 'agent memory startup shuts down/sunset/pivot 2026' só confirmou encerramentos de PRODUTOS de outra categoria: Flowise (agent builder no-code adquirido pela Workday em ago/2025) anunciou wind-down em 29-07-2026 com EOL em 31-08-2026, e o OpenAI Agent Builder (canvas visual) recebeu aviso de depreciação com shutdown em 30-11-2026 — nenhum dos dois é um player de knowledge-graph/memória estruturada.",
+     "source": "https://www.stackone.com/blog/ai-agent-builder-sunset/",
+     "source_date": "2026-07-29 (anúncio Flowise) / referência OpenAI Agent Builder shutdown 2026-11-30",
+     "relevancia_onion": "Importante para a baseline por ausência: apesar da pergunta pedir 'o que morreu', a pesquisa não encontrou morte de KG-memory player no período — o que sugere que a categoria ainda está em expansão/consolidação por absorção de plataforma (ver findings de Anthropic/OpenAI/Cloudflare), não por mortalidade de startup."
+    }
+   ],
+   "lacunas_declaradas": [
+    "Não confirmada nenhuma aquisição (M&A) direta de player KG-first de memória de agente no período — a busca por 'Zep Graphiti acquired 2026' só retornou ruído (empresa de químicos de limpeza homônima); não há evidência de M&A real neste eixo até 31-08-2026, mas isso pode ser lacuna de busca, não ausência de fato — recomenda-se nova varredura focada em 'memory layer acquired by' + nomes específicos (Mem0, Cognee, Graphon) antes de declarar 'nenhum M&A ocorreu'.",
+    "Valuation da Series A da Mem0 (US$24M, jul/2025) não está publicamente divulgada — bases consultadas (PitchBook/Crunchbase) mostram o valor redacted.",
+    "dkg (decentralized knowledge graph, ~145 stars, criado mar/2026) apareceu na trajetória do GitHub mas não foi aprofundado — não verificado se tem empresa/funding por trás ou é projeto comunitário puro; fica como pista não confirmada.",
+    "Não foi possível confirmar se o Graphify (100k★ citado na baseline) sofreu evento de mercado (funding/aquisição/morte) entre 08-02 e 08-31/2026 — não apareceu em nenhuma das buscas desta rodada, o que é neutro (nem confirma continuidade nem mudança), não negativo.",
+    "Não verificado profundamente o status do Neo4j GraphRAG / parcerias com labs de modelo no período — ficou fora do escopo desta passada por falta de tempo de busca."
+   ]
+  },
+  {
+   "eixo": "E5-gates-deterministicos",
+   "metodo": "1) search-by-trajectory via api.github.com/search/repositories com created:>2026-02/03 + sort=stars, duas rodadas de query (\"agent guardrails\", \"agent attestation\"/\"agent provenance\") — evita viés de nome conhecido. 2) HN Algolia search_by_date com query \"agent guardrails deterministic\" e numericFilters created_at_i>1772582400 (~fev/2026) — retornou 19 stories/Show HN entre mar/2026 e 31/ago/2026, todas na mesma tese. 3) WebSearch geral para termos-chave (policy-as-code, SLSA/C2PA para agentes, NIST) e para follow-the-money (rodada Obsidian Security). 4) WebFetch nos 5 repos/projetos mais citados (FailproofAI, Sponsio, Statewright, NIST CAISI, Obsidian) para extrair mecanismo, adoção (stars/forks) e data de lançamento — WebFetch usado em vez de abrir cada página manualmente pois WebSearch por si não entrega o conteúdo completo do repo/produto. Não usei GitHub API autenticada (só busca pública, sujeita a rate-limit e a resultados que a ferramenta resume via modelo intermediário — tratado como fonte primária pois trouxe URL+contagens verificáveis).",
+   "findings": [
+    {
+     "titulo": "NIST CAISI lança AI Agent Standards Initiative (fev/2026)",
+     "fato": "Em 17/fev/2026, o Center for AI Standards and Innovation (CAISI) do NIST lançou formalmente a 'AI Agent Standards Initiative', primeiro programa federal dos EUA dedicado a padrões de interoperabilidade e segurança para agentes autônomos, com 3 pilares (padrões liderados pela indústria, protocolos open-source comunitários, pesquisa fundacional de identidade/segurança); o NCCoE publicou concept paper propondo adaptar OAuth2/OIDC/SPIFFE-SPIRE para identidade não-humana de agentes.",
+     "source": "https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure",
+     "source_date": "2026-02-17",
+     "relevancia_onion": "Valida que a régua de 'verificação determinística de agente' está virando pauta regulatória/institucional, não só prática de framework — mas o foco do NIST é IDENTIDADE/autorização (quem é o agente), enquanto a tese do Onion é sobre GATE DE AÇÃO (o que o agente pode fazer) — eixos complementares, não sobrepostos."
+    },
+    {
+     "titulo": "FailproofAI — hook-based policy enforcement, 12 harnesses, 1.6k stars",
+     "fato": "Repositório FailproofAI/failproofai, criado 2026-04-06, oferece 'observability and enforcement for AI agent harnesses' via sistema de hooks com 3 decisões (allow/deny/instruct), 39 políticas built-in (leak de API key, SQL destrutivo, privilege escalation), integrando 12 harnesses incluindo Claude Code, Codex, Copilot, Cursor Agent, Devin, Antigravity; 1.6k stars, 413 forks, 596 commits.",
+     "source": "https://github.com/FailproofAI/failproofai",
+     "source_date": "2026-08-31 (estado do repo consultado)",
+     "relevancia_onion": "É o concorrente mais próximo da tese do Onion na prática — mesmo mecanismo (hook que bloqueia ação antes de executar) mas GENERALIZADO cross-harness (12 CLIs) em vez de acoplado a um único substrato; maior adoção (1.6k★) entre os achados de trajetória sugere que 'hook determinístico' como categoria já tem tração de mercado além do Onion."
+    },
+    {
+     "titulo": "Sponsio — contratos LTL determinísticos sub-milissegundo, 438 stars",
+     "fato": "SponsioLabs/Sponsio (criado 2026-04-04) implementa um 'Fuzzy LTL (Linear Temporal Logic) Monitor' que compila regras em linguagem natural em contratos formais, checando toda chamada de função do agente com latência de 0.005-0.14ms (5.000-60.000x mais rápido que LLM-as-judge), com 16 bundles de contrato pré-construídos; 438 stars, 25 forks; funciona sobre LangChain/Claude Agent/OpenAI Agents/MCP.",
+     "source": "https://github.com/SponsioLabs/Sponsio",
+     "source_date": "2026-08-31 (estado do repo consultado)",
+     "relevancia_onion": "Diverge da tese do Onion na FORMA (verificação formal/LTL compilada de linguagem natural, não hook de shell com exit code) mas converge na TESE CENTRAL — determinístico > LLM-julgando-LLM — e prova esse ganho com número (5000-60000x mais rápido), evidência empírica que reforça o argumento do Onion contra 'conselho em prompt'."
+    },
+    {
+     "titulo": "Statewright — máquina de estados restringe toolset por fase, 489 stars",
+     "fato": "statewright/statewright (criado 2026-05-03, v0.3.0 candidate) restringe quais ferramentas o agente pode chamar em cada fase de um workflow (ex.: fase 'planning' só permite leitura); bloqueia comandos destrutivos como rm -rf mesmo com bash liberado; testado em subset do SWE-bench, elevou taxa de sucesso de modelo local de 2/10 para 10/10 com as mesmas tarefas só restringindo o espaço de ferramentas; 489 stars, 22 forks, Show HN em 2026-05-12 com 126 pontos.",
+     "source": "https://github.com/statewright/statewright",
+     "source_date": "2026-08-31 (estado do repo consultado); HN 2026-05-12",
+     "relevancia_onion": "Achado mais forte para a tese: dado empírico de que restrição determinística de tool-access (não confiança no modelo) melhora resultado mensurável — argumento quantitativo que o Onion pode citar para defender catraca/gate mecânico sobre governança apenas em prompt/CLAUDE.md."
+    },
+    {
+     "titulo": "Obsidian Security levanta $85M Series D para 'runtime enforcement' de agentes corporativos",
+     "fato": "Em agosto de 2026 a Obsidian Security anunciou rodada Series D de $85 milhões para escalar seu produto de segurança de agentes de IA; a empresa define 'agentic guardrails' como 'regras de enforcement determinístico aplicadas a agentes de IA em runtime, independente do que o modelo pretende fazer', com runtime enforcement lançado para Microsoft Copilot (Q1 2026) e expandido para outras plataformas (incl. Anthropic Claude) no Q2 2026; produto inclui MCP Server Inventory (mapeamento de todo MCP server da empresa aos agentes que o invocam).",
+     "source": "https://fintech.global/2026/08/05/obsidian-security-lands-85m-to-police-rogue-ai-agents/",
+     "source_date": "2026-08-05",
+     "relevancia_onion": "Sinal follow-the-money: capital de risco está apostando pesado ($85M) na MESMA tese ('enforcement determinístico > confiar na intenção do modelo') só que como categoria de segurança corporativa/MCP-inventory, não como framework de orquestração KG-first — mostra que a tese do Onion tem validação de mercado só que num nicho adjacente (governança de acesso, não verificação de qualidade/output)."
+    },
+    {
+     "titulo": "Onda de projetos 'deterministic guardrails' em HN, mar-ago/2026 — fragmentação, baixa adoção individual",
+     "fato": "Busca HN Algolia por 'agent guardrails deterministic' entre 2026-03 e 2026-08 retornou pelo menos 12 lançamentos distintos com essa tese explícita no título/pitch: SteerPlane, OpenLore, Pokayoke, SAMF, Arbiter, CodeLedger, Railyard, HELmR, Agent Vault (Infisical), Fabro, além de Statewright e Sponsio já citados — a maioria com pontuação HN baixa (1-5 pontos) e sem menção de tração significativa, indicando categoria populosa e fragmentada sem vencedor claro ainda.",
+     "source": "https://hn.algolia.com/api/v1/search_by_date?query=agent+guardrails+deterministic&tags=story",
+     "source_date": "consulta em 2026-08-31, cobrindo posts de 2026-03-09 a 2026-08-31",
+     "relevancia_onion": "Para o Onion isso é sinal de MERCADO NASCENTE e não-consolidado: a tese 'gate mecânico > prompt' está sendo redescoberta por >12 times independentes no mesmo semestre, mas nenhum ainda dominou — janela de diferenciação ainda aberta para quem acoplar a doutrina a um mecanismo mais amplo (KG + dogfood + catraca), que nenhum desses projetos citados declara ter."
+    },
+    {
+     "titulo": "Policy-as-Prompt e autoformalização — convergência acadêmica em compilar linguagem natural para regra formal",
+     "fato": "Papers arXiv de 2026 ('Autoformalization of Agent Instructions into Policy-as-Code', 2606.26649; 'Policy-as-Prompt: Turning AI Governance Rules into Guardrails for AI Agents', 2509.23994; 'Type-Checked Compliance: Deterministic Guardrails for Agentic Financial Systems Using Lean 4 Theorem Proving', 2604.01483) descrevem abordagens para converter regras de governança em linguagem natural em guardrails formais/verificáveis (policy-as-code, prova de teorema Lean 4), citando Open Policy Agent/Rego como padrão de fato em infra de nuvem sendo adaptado para agentes.",
+     "source": "https://arxiv.org/pdf/2606.26649",
+     "source_date": "2026 (preprint, mês exato não confirmado no fetch)",
+     "relevancia_onion": "Mostra uma escola alternativa à do Onion: em vez de hook/exit-2 imperativo, compilar a REGRA em artefato formal verificável (Rego/Lean4) — mecanicamente determinístico também, mas por PROVA em vez de EXECUÇÃO; é uma direção que o Onion poderia citar como 'convergência com divergência de camada' (regra-como-dado vs regra-como-script)."
+    }
+   ],
+   "lacunas_declaradas": [
+    "Não confirmei se algum desses projetos (FailproofAI, Sponsio, Statewright) especificamente targeta Claude Code hooks com exit code 2 (o mecanismo exato do Onion) vs. outros modelos de interceptação — os fetches descrevem 'hooks' e 'bloqueio' genericamente sem confirmar a semântica exit 0/1/2 específica do Claude Code.",
+    "Não verifiquei taxa de adoção real (usuários ativos, não só stars/forks) de nenhum projeto citado — GitHub stars é proxy fraco de uso em produção.",
+    "Não encontrei nenhum concorrente direto que combine gate mecânico + Knowledge Graph vivo + dogfood determinístico como o Onion propõe — não consegui confirmar se isso é ausência real de mercado ou apenas lacuna da minha busca (não testei queries como 'KG agent verification' ou 'graph-based agent audit').",
+    "A believabilidade dos números da Sponsio (5000-60000x mais rápido que LLM-judge) vem só do próprio README/marketing do projeto — não achei benchmark independente confirmando.",
+    "Não confirmei a data exata (mês) dos 3 papers arXiv citados sobre policy-as-code — o WebFetch não retornou data de submissão explícita, só o ano inferido do ID arXiv (260x = 2026)."
+   ]
+  },
+  {
+   "eixo": "E2-self-improving",
+   "metodo": "1) search-by-trajectory via api.github.com/search/repositories?q=self-improving+agent+created:%3E2026-03-01&sort=stars (curl direto, JSON verificado — não usei o resumo alucinável do WebFetch como fonte final, conferi números crus). 2) HN Algolia search_by_date para \"self-improving agent\" com filtro de data ≥ jun/2026 (via WebFetch sobre a API). 3) WebSearch aberto para \"self-play coding agent verifier ago 2026\" e \"agent memory framework launch agosto 2026 produção\" (follow-the-money implícito: adoção/stars, não anúncio de paper). 4) WebFetch individual nos READMEs/blog-posts das 6 fontes mais promissoras para extrair mecanismo real (não só o teaser da busca) e checar se é uso medível vs. vaporware. Todas as datas de source_date vêm do conteúdo (created_at do repo, data do post), nunca da data de hoje.",
+   "findings": [
+    {
+     "titulo": "Warp: self-improvement loop de duas skills sobre Claude, em produção real com escala grande",
+     "fato": "Warp construiu um loop com uma skill 'inner' (executa a tarefa, ex. code review de PR) e uma skill 'outer/improver' que roda em SCHEDULE (não por-tarefa), agrega feedback humano dado em comentários de PR do GitHub, identifica o gap entre a sugestão do agente e a expectativa humana, e propõe edições revisáveis/aprováveis/mergeáveis na skill base — via PR normal, nunca write direto. Anunciado no blog oficial da Anthropic (claude.com/blog) em 29/08/2026, com números de escala: 10M+ sessões Claude Code rodadas dentro do Warp até a data, 400K+ sessões/semana correntes, 40M conversas totais do Warp Agent; o padrão já roda em múltiplos agentes especializados (spec-writing, review, triage) no repo open-source do próprio Warp, cada um com loop de auto-melhoria independente.",
+     "source": "https://claude.com/blog/how-warp-builds-self-improving-agents-on-claude",
+     "source_date": "2026-08-29",
+     "relevancia_onion": "É o análogo mais próximo e MEDIDO em produção do padrão diary→skill do Onion: separar o agente que EXECUTA do agente que OBSERVA e promove aprendizado a skill versionada e revisável via PR — valida a aposta do Onion (skills/agentes/diário) contra escala real, não teoria."
+    },
+    {
+     "titulo": "PrimeIntellect prime-agent: RLM + Continual Harness com comando /refine que promove trajetória a skill/memória versionada",
+     "fato": "Repositório PrimeIntellect-ai/prime-agent, criado em 08/05/2026, 19.372 stars (líder absoluto da busca por trajetória em 'self-improving agent'). Combina um Recursive Language Model (contexto como variáveis) com um 'Continual Harness' que armazena prompts suplementares, memórias e descrições de skill. O comando `/refine` persiste lições revisáveis extraídas da trajetória corrente como prompts/memórias/skills reusáveis, mantendo o system prompt base imutável e gravando snapshots para rollback. `/autonomous` roda dentro de orçamentos configuráveis de turno/token/tempo com quality gates definidos pelo usuário. Repos-irmãos (Verifiers, PRIME-RL) sugerem infraestrutura formal de avaliação, mas o README não detalha números de produção.",
+     "source": "https://github.com/PrimeIntellect-ai/prime-agent",
+     "source_date": "2026-08-05",
+     "relevancia_onion": "Mecanismo de rollback + snapshot em cima de skills promovidas é uma cura que o Onion ainda não tem explicitamente (o diário promove, mas não versiona/reverte skill promovida) — gap acionável para o mecanismo de auto-evolução do core."
+    },
+    {
+     "titulo": "Kulaxyz/self-learning-skills: harvesting de 'golden path' em skill/rule com gate de promoção explícito, cross-tool (Claude Code/Codex/Cursor)",
+     "fato": "938 stars, criado 28/06/2026. Reconhece dentro de uma sessão um caminho que exigiu múltiplas tentativas ou conhecimento não-óbvio, documenta o procedimento (inclusive o que NÃO funcionou) sem prompting especial, e só promove a skill reusável quando passa por 3 critérios de gate: uma verificação que passou (teste, exit limpo), um padrão de falha nomeado, e pelo menos um beco-sem-saída documentado como descartado. Grava em `skills/<nome>/SKILL.md` (Claude Code/Codex), `.cursor/rules/learned/<nome>.mdc` (Cursor) ou AGENTS.md (outros).",
+     "source": "https://github.com/Kulaxyz/self-learning-skills",
+     "source_date": "2026-06-28",
+     "relevancia_onion": "É quase um espelho ponta-a-ponta do padrão erro-recorrente-vira-registro-com-cura já praticado no Onion (memória do maestro), mas formalizado como skill instalável com GATE de promoção — vale comparar o gate deles (3 critérios) contra o critério tácito do Onion."
+    },
+    {
+     "titulo": "KiroCrew: workspace persistente com skill synthesis automática e busca semântica local, comunidade não-oficial em torno do Kiro (AWS)",
+     "fato": "kirodotdev/KiroCrew, criado 16/07/2026, 3.480 stars, 4.542 commits, 632 issues abertas, 273 PRs — sinal de tração real mas também de instabilidade (issue count alto). NÃO é projeto oficial da AWS Kiro (é comunidade), mas opera sobre `kiro-cli` via Agent Client Protocol. Mecanismo: memória de preferências/contexto/'lições duráveis' de correções e falhas de tarefa; padrões repetidos viram skills reusáveis inspecionáveis automaticamente; embeddings locais (in-process) dão retrieval semântico, com fallback para busca por palavra-chave até o embedding terminar de baixar/indexar; memória é editável/inspecionável via dashboard.",
+     "source": "https://github.com/kirodotdev/KiroCrew",
+     "source_date": "2026-07-16",
+     "relevancia_onion": "O fallback declarado (embedding indisponível → keyword search) é um padrão de degradação graciosa que o Onion já pratica no task-manager/forge SDAAL — evidência de que é convenção emergente no espaço de agentes com memória, não peculiaridade do Onion."
+    },
+    {
+     "titulo": "Meta/FAIR HyperAgents: self-improvement via par Task-Agent + Meta-Agent que reescreve o próprio código do Task-Agent",
+     "fato": "facebookresearch/HyperAgents, criado 19/03/2026, 2.702 stars, paper companheiro no arXiv (2603.19461, autores Jenny Zhang, Bingchen Zhao e colaboradores, publicado por Meta AI Research). Arquitetura dual: um Task-Agent resolve o problema; um Meta-Agent analisa a performance do Task-Agent e GERA versões melhoradas do próprio código do Task-Agent, criando um loop onde agentes reescrevem sua própria estratégia com base em métricas observadas ao longo de iterações — seleção de variantes superiores para a geração seguinte. Repo avisa explicitamente que executa código não-confiável gerado por modelo (risco de segurança declarado).",
+     "source": "https://github.com/facebookresearch/HyperAgents",
+     "source_date": "2026-03-19",
+     "relevancia_onion": "É o extremo oposto do Onion no espectro de risco/controle: auto-modificação de código sem humano no loop (vs. o Onion, onde toda promoção de skill/mecanismo passa por PR e revisão) — útil como contraponto de doutrina ao 'behavior-over-declaration' e ao gate humano do Onion."
+    },
+    {
+     "titulo": "Lobu: tese de que agente auto-melhora só se o passado for queryable (event-sourcing em vez de arquivo/markdown)",
+     "fato": "Post de blog datado de 28/07/2026 argumenta que o gargalo de agentes em 2026 não é mais a inteligência do modelo, mas gestão de contexto (dados de cliente, regras de negócio, estado corrente). Propõe log append-only (estilo git) em vez de memória tipo arquivo/markdown (crítica implícita ao padrão ChatGPT memory / CLAUDE.md), com 'connectors' observando sistemas externos via API/webhook, um proxy log append-only registrando observações sem duplicar o sistema-fonte, 'automations' (trigger+prompt+SQL) gerando mutações, e approval gates humanos antes de qualquer write. Cita apenas o próprio workspace da Lobu (~230 mil eventos) como evidência — nenhum case externo citado.",
+     "source": "https://lobu.ai/blog/self-improving-agents-are-event-sourced/",
+     "source_date": "2026-07-28",
+     "relevancia_onion": "Contrapõe diretamente a abordagem do Onion (memória em markdown/CLAUDE.md + grafo .kg.yaml versionado em git): o argumento de queryability já é satisfeito pelo próprio git+KG do Onion, mas vale registrar como crítica externa a examinar (o Onion não tem log de EVENTOS append-only separado do grafo de decisão)."
+    }
+   ],
+   "lacunas_declaradas": [
+    "Não confirmei números de produção/uso real para PrimeIntellect prime-agent (README não declara clientes ou volume de sessões, só infraestrutura) — só stars como proxy.",
+    "Não verifiquei se KiroCrew (3.480 stars) tem uso medível fora do próprio ecossistema Kiro/AWS-adjacente; o alto número de issues abertas (632) pode indicar instabilidade, não confirmei triagem.",
+    "wienerdog-ai/wienerdog (memória+skills para Claude Code/Codex, mecanismo 'dreaming' noturno) foi encontrado na HN mas tem apenas 14 stars — descartado dos findings por falta de uso medível, mas o mecanismo (promoção noturna via quality gates) é conceitualmente próximo ao diário do Onion e pode merecer olhar futuro se crescer.",
+    "Não confirmei a existência ou não de um framework dominante especificamente de 'self-play em código' (estilo AlphaZero) com adoção medível em produção — os achados de arXiv (2604.25067, 2608.03392) são pesquisa, não harness com stars/uso; nenhum candidato de trajetória cruzou o filtro de produção real nessa sub-frente.",
+    "Não testei se algum destes frameworks (Warp, prime-agent, KiroCrew, self-learning-skills) tem qualquer integração ou menção explícita ao Sistema Onion ou a padrões equivalentes de KG determinístico — não há evidência de que algum concorrente já cobre o moat do radar sem-LLM do Onion."
+   ]
+  },
+  {
+   "eixo": "E3-claude-code-delta",
+   "findings": [
+    {
+     "titulo": "Claude Code v2.1.251 (28/08) — hooks de troca de modelo + streaming de subagente para Remote Control",
+     "fato": "Release oficial adicionou eventos de hook PreModelSwitch/PostModelSwitch (bloquear, confirmar ou anotar uma troca de modelo), SessionStart resume hooks agora recebem staleness da sessão e custo estimado de re-cache, e streaming ao vivo das tool calls/resultados de um subagente em foreground para clientes Remote Control (subagentes em background continuam só com status).",
+     "source": "https://code.claude.com/docs/en/changelog",
+     "source_date": "2026-08-28",
+     "relevancia_onion": "Hook de bloqueio em troca de modelo é exatamente o tipo de exit-2 determinístico que o CLAUDE.md do Onion já cita como a capacidade que 'compra' o acoplamento — nova superfície para a doutrina de guardas mecânicas."
+    },
+    {
+     "titulo": "Claude Code v2.1.251 — correções de segurança em path traversal de plugin e symlink em ferramentas de arquivo",
+     "fato": "O mesmo release corrigiu: (1) plugin marketplace permitindo comandos com paths que escapavam do diretório do plugin (agora rejeitado com erro de path-traversal); (2) Read/Write/Edit seguindo um symlink trocado dentro do diretório de trabalho DEPOIS da checagem de permissão, podendo ler/escrever fora do local aprovado; (3) Grep/Glob não aplicando regras Read(...) deny a arquivos alcançados via caminho de busca symlinked.",
+     "source": "https://code.claude.com/docs/en/changelog",
+     "source_date": "2026-08-28",
+     "relevancia_onion": "Confirma que o próprio Anthropic está endurecendo a superfície de plugin/marketplace contra escape de sandbox — relevante para a REGRA 61 (guarda de MOAT) e para qualquer plano do Onion de publicar plugins via marketplace."
+    },
+    {
+     "titulo": "Design skill (research preview) lançada 17/08 — 'ideia/screenshot vira artboard editável'",
+     "fato": "Anthropic lançou em 17/08/2026 uma skill /design em research preview que transforma uma ideia, screenshot ou design existente em artboards editáveis no Claude Design, disponível tanto na CLI quanto no app desktop.",
+     "source": "https://origami.sa/en/blog/claude-code-august-2026/",
+     "source_date": "2026-08-2026 (post de agosto/2026)",
+     "relevancia_onion": "Expande a vertical design/ do próprio Onion (design:identity, design:generate) — capacidade nativa equivalente que pode reduzir o gap que o Onion cobre hoje via agentes próprios de design system."
+    },
+    {
+     "titulo": "Auto mode virou default com allow/deny escritos como frases (v2.1.245-250, agosto/2026)",
+     "fato": "Anthropic tornou o 'auto mode' o novo default de permissões em Claude Code, com regras allow/deny que o usuário escreve como sentenças em linguagem natural em vez de padrões glob; primeiro-launch em contas com esse default agora inicia direto em auto mode (bug fix confirmado no changelog de 28/08 corrigindo caso em que ainda caía em default mode).",
+     "source": "https://origami.sa/en/blog/claude-code-august-2026/",
+     "source_date": "2026-08-2026",
+     "relevancia_onion": "Muda a superfície de permissões que as guardas do Onion (hooks, REGRA 49 catraca) precisam considerar — regras em linguagem natural são uma nova classe de configuração a auditar/versionar."
+    },
+    {
+     "titulo": "Plugin marketplace oficial cruza 200 plugins; segurança endurecida (headersHelper) em 20/08",
+     "fato": "Após o lançamento do marketplace oficial de plugins em maio/2026, o catálogo oficial passou de 200 plugins até agosto; em 20/08/2026 Claude Code adicionou um headersHelper para autenticação em marketplaces via URL e entradas de catálogo, parte de um pacote mais amplo de 'tighter MCP and plugin security'.",
+     "source": "https://blockchain.news/ainews/claude-marketplace-accelerates-agent-setup",
+     "source_date": "2026-08-2026",
+     "relevancia_onion": "Crescimento do marketplace oficial (não só comunitário) é o campo competitivo direto onde o /meta:adopt e a skill onion-publish do Onion vão operar — a barra de segurança subiu (headersHelper), relevante para o plano de publicação em onion-plugins."
+    },
+    {
+     "titulo": "'Build with Claude' — marketplace comunitário com 82 plugins/155 skills/117 subagentes, MIT, lançado 23/08",
+     "fato": "Novo marketplace comunitário 'buildwithclaude.com' foi divulgado publicamente em 23/08/2026, agregando 82 plugins, 155 skills, 117 subagentes, 177 comandos e 33 hooks — tudo MIT/open source, instalável via uma única fonte de marketplace adicionada.",
+     "source": "https://www.buildwithclaude.com/subagents",
+     "source_date": "2026-08-23",
+     "relevancia_onion": "É um concorrente direto de escopo ao inventário do próprio Onion (107 comandos/51 agentes/12 skills) — mostra a fragmentação continuando via agregação de terceiros, não consolidação de convenção."
+    },
+    {
+     "titulo": "'headcount' (cbrock84) — 803★ em 3 dias — Claude Code como 'empresa' de 16 departamentos/146 skills",
+     "fato": "Repo criado em 28/08/2026, já com 803 estrelas ao momento da coleta: plugin que estrutura agentes Claude Code como organograma corporativo (CEO, Tecnologia, Segurança, Finanças, Marketing...), princípio de 'exclusive write surface, não por tópico' para evitar colisão de agentes, skills namespaced por departamento (`security:threat-modeling`), com departamentos revisores (Segurança/Legal) cujo bloqueio não pode ser sobreposto pelas áreas revisadas.",
+     "source": "https://github.com/cbrock84/headcount",
+     "source_date": "2026-08-28",
+     "relevancia_onion": "Estrutura quase isomórfica às 9 categorias de agentes do Onion, mas GRATUITA e virando trajetória (800★/3 dias) — pressão direta de comoditização sobre a promessa de 'orquestração por categoria' que o Onion vende; falta ao concorrente o componente que o Onion tem como moat declarado: verificação determinística ancorada em KG."
+    },
+    {
+     "titulo": "'cumora' — 3.349★ (criado 17/08) — chat de equipe multi-plataforma com agentes como 'teammates' (Claude Code/Codex)",
+     "fato": "Repo yetone/cumora, criado 17/08/2026, já o novo repo mais estrelado da trajetória pós-corte: 'Where agent teams gather' — chat cross-platform onde agentes de IA são membros de equipe de primeira classe, com opção de cérebro na nuvem ou bring-your-own (Claude Code / Codex).",
+     "source": "https://github.com/yetone/cumora",
+     "source_date": "2026-08-17",
+     "relevancia_onion": "Aponta um eixo de fragmentação NOVO desde o corte: não mais só frameworks de skills/orquestração solo, mas camada de coordenação social/chat multi-agente — categoria adjacente ao SendMessage/Teams do Claude Code que o Onion hoje declara não usar."
+    },
+    {
+     "titulo": "AsDecided segue ativo mas sem sinal de tração pública no GitHub (repos satélite com 0-2★)",
+     "fato": "Busca por 'asdecided' no GitHub só retorna repos satélite (scoop-bucket, homebrew-tap, sdk, connectors, editors) com 0-2 estrelas cada; o produto principal ('decision infrastructure for AI coding agents', citado na baseline com 290★) não aparece como repo público separado — sugere que o core do produto é fechado/privado.",
+     "source": "https://github.com/asdecided/scoop-bucket",
+     "source_date": "2026-07-28",
+     "relevancia_onion": "Sem mudança de trajetória observável desde 08-16 para este concorrente de tese direta (decisão como spec-as-code, próximo do que o Onion faz com KG/ADR) — não há delta confirmado a reportar aqui."
+    },
+    {
+     "titulo": "Anthropic lança MHS (Model Hardware Standard) em research preview — 27/08",
+     "fato": "Anthropic anunciou um novo padrão, 'Model Hardware Standard' (MHS), para permitir que Claude interaja melhor com robôs e equipamento de laboratório/manufatura, liberado em research preview para desenvolvedores de ciência, robótica e manufatura testarem.",
+     "source": "https://www.bloomberg.com/news/articles/2026-08-27/anthropic-tests-new-way-for-claude-to-work-with-robots-and-scientific-lab-tools",
+     "source_date": "2026-08-27",
+     "relevancia_onion": "Fora do escopo direto de orquestração de código, mas mostra a Anthropic expandindo o padrão de 'protocolo aberto acoplado ao harness' (mesmo espírito do MCP) para hardware — sinaliza que a estratégia de 'capacidade por acoplamento' da própria Anthropic está se replicando em novos domínios."
+    },
+    {
+     "titulo": "Self-hosted environments para Claude Code em beta público (agosto/2026)",
+     "fato": "Claude Code ganhou ambientes self-hosted em beta público, permitindo times rodarem sessões na própria infraestrutura com acesso a rede interna, tooling customizado e controles de compliance, com runners fixos ou sob demanda, disponível para planos Team e Enterprise.",
+     "source": "https://releasebot.io/updates/anthropic/claude-code",
+     "source_date": "2026-08-2026",
+     "relevancia_onion": "Ambientes self-hosted são terreno fértil para a proposta de compliance/governança do Onion (3ª dimensão peer) — abre espaço para os comandos /meta:setup-integration e verticais de compliance operarem sobre infraestrutura própria do cliente."
+    }
+   ],
+   "lacunas_declaradas": [
+    "Cruxible: nenhum repositório ou anúncio de produto encontrado sob esse nome exato no GitHub ou em busca web direta desde 08-16; não foi possível confirmar trajetória, rodada ou morte — pode ser produto fechado sem presença pública indexada.",
+    "Hyper (YC): nenhuma notícia de funding round ou anúncio específico datado entre 08-16 e 08-31 foi encontrada; apenas material institucional geral sem data recente confirmável.",
+    "'ponytail' (~104k★ na baseline) e 'loop-engineering'/'omnigent'/'gsd-core': não foram re-consultados nesta passada para variação de estrelas desde 08-16 — o eixo desta pesquisa priorizou trajetória NOVA (repos nascidos após o corte), não a re-medição dos incumbentes já mapeados.",
+    "A convenção .agents/ citada na baseline não teve atualização de adoção/contagem verificada nesta janela — nenhuma fonte datada 08-16..08-31 encontrada sobre o tema.",
+    "Números de M&A/aquisição no espaço 'agentic coding framework' não foram encontrados para a janela 08-16..08-31 — busca 'follow-the-money' não retornou evento de M&A específico e datado neste eixo (só rounds genéricos de agentic AI fora do escopo de dev tooling)."
+   ],
+   "metodo": "Rodei WebSearch para localizar o changelog oficial (code.claude.com/docs/en/changelog) e fiz WebFetch dele filtrando 08-16..08-31 (versões 2.1.245-2.1.251). Para trajetória, usei curl direto em api.github.com/search/repositories com created:>2026-08-01/08-16 e sort=stars (não WebFetch, para evitar alucinação do sumarizador — validei isso comparando uma primeira leitura via WebFetch, que trouxe números divergentes do curl real, e descartei a primeira). Rodei follow-the-money nos 3 concorrentes citados na baseline (Cruxible/AsDecided/Hyper) via WebSearch + checagem de repos GitHub satélite; sem confirmação datada, movi para lacunas. Toda source_date reflete a data do conteúdo, não a de hoje."
+  }
+ ],
+ "vereditos": [
+  {
+   "eixo": "E2-self-improving",
+   "aprovados": [
+    "Warp: self-improvement loop de duas skills sobre Claude, em produção real com escala grande",
+    "PrimeIntellect prime-agent: RLM + Continual Harness com comando /refine que promove trajetória a skill/memória versionada",
+    "Kulaxyz/self-learning-skills: harvesting de 'golden path' em skill/rule com gate de promoção explícito, cross-tool (Claude Code/Codex/Cursor)",
+    "KiroCrew: workspace persistente com skill synthesis automática e busca semântica local, comunidade não-oficial em torno do Kiro (AWS)",
+    "Meta/FAIR HyperAgents: self-improvement via par Task-Agent + Meta-Agent que reescreve o próprio código do Task-Agent",
+    "Lobu: tese de que agente auto-melhora só se o passado for queryable (event-sourcing em vez de arquivo/markdown)"
+   ],
+   "reprovados": [],
+   "observacao": "Eixo de qualidade alta e incomum: as 6 fontes abriram, e cada número foi conferido na origem (GitHub API bateu exato em stars/criação para prime-agent 19.372/08-05, Kulaxyz 938/06-28, KiroCrew 3.480/07-16 com 4.542 commits + 632 issues + 273 PRs, HyperAgents 2.702/03-19; a página da Anthropic traz verbatim \"10M Claude Code sessions run inside Warp to date, 400K+ per week\" e \"40M total Warp Agent conversations\"; o post da Lobu confirma ~230k eventos e nenhum case externo). Um defeito único a corrigir antes de citar: o post do Warp é de 26/08/2026, não 29/08 como o finding afirma — erro de metadado, não de substância, mas o eixo tem 5 findings de fato duro e 1 de tese declarada como tese (Lobu), sem opinião vestida de fato."
+  },
+  {
+   "eixo": "E4-capital",
+   "aprovados": [
+    "SpaceX adquire Cursor (Anysphere) por US$60B — maior M&A de startup VC-backed",
+    "HappyRobot levanta US$150M Série C a US$1.2B — agentes de voz/operação empresarial",
+    "Zenity levanta US$125M — governança/segurança de agentes de IA empresariais",
+    "OpenAI adquire Ona para dar a Codex ambientes cloud de execução longa",
+    "Relay (automação de workflow com IA) fecha as portas — fundador vai para o Chrome do Google"
+   ],
+   "reprovados": [
+    {
+     "titulo": "Cognition (Devin) negocia rodada a US$40B+, alta de 50% em <3 meses desde os US$26B de maio",
+     "motivo": "Extrapolação vestida de fato no campo `fato`. A fonte (TechCrunch, 12/ago/2026) abre e confirma o núcleo — negociações acima de US$40B, >US$1B de captação, US$26B em maio/2026 — mas contradiz a cláusula de ARR: diz que a empresa tinha 'US$492M de annualized revenue run rate' três meses antes e que a valuation de US$40B é 'based on ACHIEVING a $1 billion annualized revenue run rate' (meta prospectiva, base do múltiplo). O finding converte a meta em estado atual ('impulsionado por ARR se aproximando de US$1B'), inflando o ARR reportado em ~2x. Reprovado como está; re-aprovável trocando a cláusula por 'ARR reportado de US$492M em maio/2026; a valuation de US$40B é precificada sobre a meta de US$1B'."
+    },
+    {
+     "titulo": "ChatGPT Atlas (navegador nativo de IA da OpenAI) desligado após <10 meses",
+     "motivo": "Fonte fraca e enquadramento contrariado pelo primário. (1) A URL abre, mas é agregador (BigGo Finance) sem fonte primária: ele mesmo se apoia em imprensa secundária chinesa (Southern Weekly, GeekPark) e cita um comunicado da OpenAI sem link nem contexto. (2) Data desonesta: o `source_date` declarado é 2026-08-09 (a data do EVENTO), mas a publicação do artigo é 2026-08-10. (3) O primário existe e desmente a leitura: a página oficial da OpenAI se chama 'Evolving Atlas into ChatGPT for browser-based agentic work' — as capacidades foram DOBRADAS para dentro do ChatGPT/Codex, não abandonadas; 'apontado como falha da estratégia Chrome killer' é opinião no campo `fato`. Re-aprovável citando o help center da OpenAI e reescrevendo como consolidação (fim do app standalone em 09/ago/2026), não como morte de produto — o que, aliás, enfraquece a relevância declarada."
+    }
+   ],
+   "observacao": "Eixo de qualidade acima da média: 5 de 7 sobreviveram a checagem primária, incluindo o mais improvável — os termos exatos do deal SpaceX/Cursor (merger triangular reverso via subsidiária X67, US$1,5B de rescisão + US$8,5B de deferred services fee) batem com o acordo de 16/jun/2026, e HappyRobot/Zenity conferem contra press releases das próprias empresas. As duas reprovações são do mesmo tipo — o núcleo factual é verdadeiro e o defeito está na cláusula acessória (ARR-meta virando ARR-atual; descontinuação virando 'falha') —, e há duas fragilidades a carregar mesmo nos aprovados: HappyRobot e Zenity citam um agregador desconhecido (the-agent-report.com, publicado em 18/ago, não 13/ago como declarado) cujo agregado próprio de '~US$633M nos primeiros 12 dias de agosto' não é verificável fora dele; e o ARR de US$1B da Cursor 'em novembro anterior' ficou sem confirmação (fontes atuais falam em US$4B anualizados)."
+  },
+  {
+   "eixo": "E1-kg-agente",
+   "aprovados": [
+    "Cloudflare lançou 'Agent Memory' como serviço gerenciado da própria nuvem — infra-gigante entrando na categoria (feature, não startup)",
+    "Cognee: US$7.5M seed para 'memória para agentes de IA' via vetor+KG a partir de documentos não-estruturados",
+    "Graphon AI: US$8,3M seed para camada de 'inteligência pré-modelo' multimodal — não é player de agente, é infraestrutura de dados",
+    "Hyper (YC, lote de 2026): 'company brain' auto-dirigido para desenvolvimento agêntico — reforça e expande a categoria já nomeada pela YC",
+    "Emergiu subcategoria 'governança/verdade governada' sobre KG de agente — Cruxible (open-source) trata KG como camada de 'truth' auditável, não só memória",
+    "Nenhuma morte confirmada de player KG-first 'puro' foi encontrada — os sunsets identificados no período são adjacentes (agent-builders no-code), não memória/KG"
+   ],
+   "reprovados": [
+    {
+     "titulo": "Anthropic e OpenAI internalizaram memória — a categoria virou feature das próprias plataformas de modelo",
+     "motivo": "FALHA DE FONTE. Abri https://www.graphlit.com/blog/survey-of-ai-agent-memory-frameworks: a página NÃO diz nada do que o finding afirma — não menciona diretório /memories, não menciona a primitiva 'Dreaming', não menciona 'saved memories'/'reference chat history' da OpenAI e não menciona a depreciação da Assistants API. Só fala genericamente que a Anthropic 'separates active context editing from a memory tool' e que 'OpenAI's sandbox memory treats memory as durable workspace information'. A alegação de que a página estaria 'citando anúncios oficiais Anthropic/OpenAI de 2026' é falsa. Registro em favor do finding: verifiquei os fatos por fora e eles PROCEDEM — Anthropic Dreaming anunciado em 06-05-2026 no Code with Claude (research preview, consolidação entre sessões), OpenAI 'Dreaming V3' em 04-06-2026 (openai.com/index/chatgpt-memory-dreaming/, recall 41,5%→82,8%) e Assistants API com sunset em 26-08-2026 → Responses + Conversations API. Ou seja: o finding é RECUPERÁVEL, mas do jeito que está a fonte não sustenta a afirmação e este é justamente o finding declarado como delta mais crítico do eixo — reprovado até re-citar as fontes primárias."
+    },
+    {
+     "titulo": "Mem0 fechou Series A de US$24M (jul/2025, anunciado e amplamente coberto até 2026) e virou a camada de memória cross-vendor de fato",
+     "motivo": "DATA E NÚMERO DESONESTOS NO TÍTULO. A fonte citada (TechCrunch, que abri e confirma existir) diz: anúncio em 28-10-2025, Series A de US$20M liderada pela Basis Set, US$24M no TOTAL (inclui US$3,9M de seed antes não anunciado). O título afirma 'Series A de US$24M (jul/2025)' — erra o mês (out, não jul) e erra o tamanho da rodada (a Series A é US$20M; US$24M é o acumulado). O corpo do finding acerta essa distinção, o que agrava: o título contradiz o próprio corpo. Além disso as métricas foram infladas acima da fonte sem citar de onde vêm ('~41-48 mil stars', '14M downloads' vs. 41k stars e 13M+ downloads no TechCrunch); só os 186M de chamadas/trimestre batem (Q3/2025). Reprovado por data/valor; volta aprovado se o título virar 'US$20M Series A (out/2025), US$24M totais' e as métricas de 2026 ganharem fonte própria."
+    },
+    {
+     "titulo": "Letta pivotou de 'memória' para 'agente de codificação com runtime próprio' — Letta Code é hoje o centro de gravidade da empresa",
+     "motivo": "TESE CENTRAL CONTRADITA PELA PRÓPRIA FONTE + especificidades não sustentadas. Abri letta.com: o produto de topo é 'Letta Agent, a self-improving AI agent whose memory, identity, and capabilities evolve with experience', e o Letta Code se apresenta literalmente como 'a memory-first coding agent'. Ou seja, a empresa NÃO abandonou memória — ela empacotou memória dentro de um agente de código; 'pivotou de memória para X' é extrapolação vestida de fato, e é exatamente a inferência que o finding usa para sustentar a relevância_onion ('morreu como categoria pura'). Do que é verificável: o Terminal-Bench 42,5% procede, mas a colocação real é 4º geral / #1 entre model-agnostic open-source (o finding omite o 4º geral), e o app é de abril/2026. Já 'Channels substituindo LettaBot em maio/2026', 'modelo de memória em 3 camadas estilo SO (RAM/disk)' e 'não usa knowledge graph' não aparecem em nenhuma das duas fontes citadas — a segunda (HPCwire) é de set/2024 e só cobre o seed de US$10M."
+    }
+   ],
+   "observacao": "Eixo de qualidade acima da média para pesquisa externa: 6 de 9 findings passaram com fonte que abre e diz exatamente o afirmado (Cloudflare, Cognee, Graphon, Hyper, Cruxible e o achado-por-ausência das mortes conferem até nas datas e nos títulos verbatim do HN). O padrão de falha dos 3 reprovados é o mesmo e é corrigível sem nova pesquisa — o FATO estava certo mas a AMARRAÇÃO estava frouxa: fonte-agregadora citada no lugar do anúncio primário (Anthropic/OpenAI), título divergindo do corpo em data e tamanho de rodada (Mem0) e tese interpretativa de 'pivot' contradita pelo posicionamento explícito da própria empresa (Letta)."
+  },
+  {
+   "eixo": "E6-fronteira-modelos",
+   "aprovados": [
+    "Família Claude 5 confirmada e hierarquizada (Sonnet 5, Opus 5, Fable 5/Mythos-class)",
+    "Sonnet 5 traz auto-verificação nativa como capacidade agentic nova",
+    "OpenAI: GPT-5.6 'Sol' é o topo agentic/coding, com corte de preço de 20-33% em ago/2026",
+    "Google: Gemini 3.5 Flash lidera agentic; Gemini 3.5 Pro atrasado, 3.7 Flash tomou a vaga de 'melhor disponível'"
+   ],
+   "reprovados": [
+    {
+     "titulo": "Comparável B2B: Glean (busca/agente corporativo) cobra por assento + consumo, sem rate card público",
+     "motivo": "NENHUMA das duas fontes citadas sustenta os números do finding. glean.com/perspectives/comparing-costs... (última atualização 2026-06-01) não traz preço algum da Glean — só faixas de indústria ('$60-500/user monthly', '60-70% hidden infrastructure expenses'). vendr.com/marketplace/glean (dados de fev/2026) traz ACV médio de $98.890 sobre 55 deals, faixa $29.880–$208.897, e diz explicitamente que NÃO especifica per-user, seat minimum nem FlexCredits. Ou seja: a base $45-50 + add-on de IA $15/usuário/mês, o mínimo de ~100 assentos, o ACV mínimo de ~$60K, os FlexCredits e o limiar de '100 queries em modo thinking por usuário/semana' são todos NÃO-FONTEADOS. Pior: o piso de $29.880 na própria fonte citada REFUTA o 'ACV mínimo de ~$60K'. Soma-se source_date evasivo ('2026, sem data de post específica') usado para dar ar de corrente a números sem origem."
+    },
+    {
+     "titulo": "Comparável B2B: Sierra (agentes de atendimento) usa preço por OUTCOME, sem tiers públicos",
+     "motivo": "source_date DESONESTO: o post oficial da Sierra (sierra.ai/blog/outcome-based-pricing-for-ai-agents) é de 10/12/2024, não '2026' — o finding o apresenta como material corrente de 2026. Esse post confirma apenas a TESE (outcome-based pricing, 'you pay only when the software achieves specific, valuable outcomes') e não contém um único valor. Da segunda fonte (valueaddvc, post de 23/07/2026, análise de terceiro) sobrevivem só dois números: ~$150K/ano de contrato e valuation de $15,8B (mai/2026, Série E). Os demais são FABRICADOS — nem a fonte oficial nem a análise citam setup fee de $50K-$200K, total de primeiro ano de $200K-$350K+, ou deployments de 3-7 meses. E o $150K é, nas palavras da própria fonte, análise editorial, não confirmação da empresa: opinião de terceiro vestida de fato."
+    },
+    {
+     "titulo": "Comparável B2B: Harvey AI (jurídico) — preço por assento extremo, escalonado por porte do cliente",
+     "motivo": "As duas fontes citadas se CONTRADIZEM no número central e o finding fez merge silencioso: costbench.com diz '$100-$500/user/month' para escritórios; thelegalprompts.com diz '~$1.000-$2.000/user/month' em mid-market. O finding adota só a faixa alta e ainda INFLA o piso de $1.000 (fonte) para $1.200 (finding) — drift numérico sem origem. Idem no mínimo de assentos: ambas as fontes dizem 25-50, o finding escreve '20-50'. Ambas as fontes são blogs de estimativa de terceiros, sem primária, e declaram isso na cara: thelegalprompts afirma que 'Harvey AI does not publish pricing' e que tudo vem de 'triangulating industry reporting... never as confirmed by Harvey'; costbench marca a amostra de 4 relatos como 'small sample, treat as directional anchor'. O finding converte estimativa explicitamente rotulada em fato ('Harvey cobra $1.200-$2.000+'), que é exatamente opinião vestida de fato."
+    }
+   ],
+   "observacao": "O eixo tem duas metades de qualidade oposta: os 4 findings de modelos de fronteira resistiram ao teste adversarial com fontes primárias que abrem e dizem o que se afirma (anthropic.com, blog.google, developers.openai.com, community.openai.com) — inclusive detalhes que eu esperava derrubar, como o controle de exportação do Fable 5 (ordem de 12/06, revogada pelo Commerce em 30/06, volta em 01/07) e o cancelamento do reajuste de $3/$15 do Sonnet 5, ambos confirmados fora das fontes citadas. Já os 3 comparáveis B2B são o padrão inverso — todos apoiados em blogs de estimativa de terceiros que se auto-rotulam como não-confirmados, com números que não constam das fontes citadas (Glean, Sierra) ou que as próprias fontes contradizem (Harvey $100-500 vs $1.000-2.000; piso Glean de $29.880 vs 'mínimo de $60K'), e com um source_date que apresenta um post de dez/2024 da Sierra como material de 2026. Ressalvas nos aprovados, que não derrubam a tese mas devem ser corrigidas antes de qualquer citação: (a) no finding do Claude 5, o controle de exportação NÃO está em nenhuma das 3 fontes citadas (verifiquei à parte — é verdadeiro, mas a fonte está faltando) e 'triplica o 2º melhor modelo em ARC-AGI 3' não foi confirmado (o system card excede o limite de fetch; as secundárias reportam 1,5%→30,2% contra o PRÓPRIO antecessor, não contra o 2º colocado); (b) a permanência do preço do Sonnet 5 é de 10/08, não 11/08; (c) no finding da OpenAI o post citado é de 21/08, não 24/08, e os dados do GPT-5.2/GPT-5.3 Codex não estão em nenhuma das duas fontes (confirmei à parte: 10/12/2025, $0,875/$7, 400K); (d) no finding do Google a cláusula 'cortou o preço para igualar ao 3.7 Flash' é auto-referente/quebrada, e $0,75/$3,75 é preço INTRODUTÓRIO até 31/12/2026, dobrando para $1,50/$7,50 em 01/01/2027 — omitir a validade transforma promoção em corte estrutural, justamente o erro que a relevância_onion do finding diz querer evitar."
+  },
+  {
+   "eixo": "E5-gates-deterministicos",
+   "aprovados": [
+    "NIST CAISI lança AI Agent Standards Initiative (fev/2026)",
+    "FailproofAI — hook-based policy enforcement, 12 harnesses, 1.6k stars",
+    "Sponsio — contratos LTL determinísticos sub-milissegundo, 438 stars",
+    "Statewright — máquina de estados restringe toolset por fase, 489 stars",
+    "Obsidian Security levanta $85M Series D para 'runtime enforcement' de agentes corporativos"
+   ],
+   "reprovados": [
+    {
+     "titulo": "Onda de projetos 'deterministic guardrails' em HN, mar-ago/2026 — fragmentação, baixa adoção individual",
+     "motivo": "A enumeração — que é o próprio conteúdo do finding — não sobrevive à consulta citada. Abri o search_by_date do HN Algolia: a janela (2026-03-09 a 2026-08-31) e a maioria dos nomes conferem, mas (a) Sponsio NÃO aparece nos resultados, embora o finding o inclua no 'pelo menos 12'; (b) 'Agent Vault (Infisical)' é proxy/vault de credencial, não guardrail determinístico, e fez 156 pontos — está dentro do conjunto que o finding descreve como 'pontuação baixa (1-5 pontos) e sem tração significativa', o que o próprio dado desmente; (c) 'Fabro — open-source dark software factory' também não carrega a tese no título/pitch. Sobram ~9-10 lançamentos qualificados, não 12, e a moldura de 'sem tração' é falsa para dois itens da lista (Agent Vault 156 pts, Statewright 126 pts). Núcleo salvável (categoria populosa e fragmentada no semestre), mas o número e a caracterização precisam ser refeitos antes de citar."
+    },
+    {
+     "titulo": "Policy-as-Prompt e autoformalização — convergência acadêmica em compilar linguagem natural para regra formal",
+     "motivo": "Dois erros verificáveis no campo `fato`. (1) A linguagem de política está trocada: o finding afirma que os papers citam 'Open Policy Agent/Rego como padrão de fato em infra de nuvem sendo adaptado para agentes', mas o paper-fonte citado (arXiv 2606.26649, 'Autoformalization of Agent Instructions into Policy-as-Code', 25/jun/2026) escolhe explicitamente o **Cedar** (AWS) como alvo do pipeline, via 'Verification Sandwich' e loop generator-critic — Rego/OPA não é o que o trabalho adota, e o fetch do PDF não sustenta a atribuição. Cedar vs. Rego não é detalhe cosmético num finding cuja tese é 'regra-como-dado formal'. (2) 'Papers arXiv de 2026' é falso para um dos três: 2509.23994 ('Policy-as-Prompt') foi submetido em 28/set/2025 (v2 em 07/nov/2025, aceito no 3rd Regulatable ML Workshop @ NeurIPS 2025). Os três IDs existem e os títulos batem exatamente — a existência não é o problema; a caracterização é."
+    }
+   ],
+   "observacao": "Eixo de qualidade acima da média: 5 dos 7 findings bateram com a fonte no detalhe numérico exato (FailproofAI created_at 2026-04-06 / 1.633★ / 413 forks / 596 commits / allow-deny-instruct / 12 harnesses; Sponsio 438★ / p50 0.0052ms / 16 bundles e o '5.000×–60.000×' está literal no README; Statewright 489★ / v0.3.0 / Show HN 126 pts em 12/05 e o '2 of 10 → 10 of 10' é verbatim, com o próprio finding declarando que é subset de 5 tarefas; Obsidian $85M Série D em 05/08/2026, MCP Server Inventory e o faseamento Q1/Q2 confirmados no site da empresa; NIST 17/02/2026 com os 3 pilares, e o concept paper NCCoE de 05/02 realmente propõe adaptar OAuth 2.0/2.1, OIDC e SPIFFE/SPIRE). Três ressalvas para quem for citar, que não chegaram a reprovar: os números de Sponsio e Statewright são AUTO-REPORTADOS pelo próprio projeto (o baseline de 50-800ms do LLM-as-judge é asserção do vendor, e o SWE-bench é n=5 por modelo) — chamar isso de 'evidência empírica' sobe o status epistêmico do dado; o superlativo 'primeiro programa federal dos EUA' no finding do NIST não está na página e não é sustentável; e tanto o finding do NIST quanto o da Obsidian empacotam sob uma única URL fatos que vêm de outra página (o concept paper NCCoE; o MCP Inventory e a definição de guardrail determinístico, que aparece parafraseada entre aspas mas não é citação literal de definição). As duas reprovações são do mesmo tipo — a fonte existe e é boa, o que falha é a moldura numérica construída em cima dela."
+  },
+  {
+   "eixo": "E3-claude-code-delta",
+   "aprovados": [
+    "Claude Code v2.1.251 (28/08) — hooks de troca de modelo + streaming de subagente para Remote Control",
+    "Claude Code v2.1.251 — correções de segurança em path traversal de plugin e symlink em ferramentas de arquivo",
+    "Design skill (research preview) lançada 17/08 — 'ideia/screenshot vira artboard editável'",
+    "Auto mode virou default com allow/deny escritos como frases (v2.1.245-250, agosto/2026)",
+    "'headcount' (cbrock84) — 803★ em 3 dias — Claude Code como 'empresa' de 16 departamentos/146 skills",
+    "'cumora' — 3.349★ (criado 17/08) — chat de equipe multi-plataforma com agentes como 'teammates' (Claude Code/Codex)",
+    "Anthropic lança MHS (Model Hardware Standard) em research preview — 27/08",
+    "Self-hosted environments para Claude Code em beta público (agosto/2026)"
+   ],
+   "reprovados": [
+    {
+     "titulo": "Plugin marketplace oficial cruza 200 plugins; segurança endurecida (headersHelper) em 20/08",
+     "motivo": "A fonte citada NÃO diz nada disso. Abri https://blockchain.news/ainews/claude-marketplace-accelerates-agent-setup (23/08/2026): o artigo é sobre o marketplace COMUNITÁRIO 'Build with Claude' (82 plugins, 155 skills, 117 subagentes, 177 comandos, 33 hooks, MIT) — não menciona marketplace oficial, nem lançamento em maio/2026, nem '200 plugins', nem headersHelper, nem 'tighter MCP and plugin security'. As citações dos findings #5 e #6 estão TROCADAS entre si. Único pedaço que sobrevive é o headersHelper — e por outra fonte: o changelog oficial o registra em v2.1.238 ('headersHelper on a url marketplace or a catalog entry runs a command that mints HTTP headers'), não pela fonte citada. A contagem '200 plugins no catálogo oficial' fica sem fonte alguma."
+    },
+    {
+     "titulo": "'Build with Claude' — marketplace comunitário com 82 plugins/155 skills/117 subagentes/177 comandos/33 hooks, MIT, lançado 23/08",
+     "motivo": "Duas falhas. (1) Fonte não confere: https://www.buildwithclaude.com/subagents não resolve por DNS neste ambiente e o README do repo real (davepoon/buildwithclaude) declara números materialmente diferentes — 117 agentes, 175 comandos, 28 hooks, 26 SKILLS e 51 PLUGINS (vs. 155 skills e 82 plugins do finding). Os números do finding vêm, na verdade, do artigo da blockchain.news (fonte do #5). (2) Data desonesta: 'novo... divulgado publicamente em 23/08/2026' é falso — `gh api repos/davepoon/buildwithclaude` devolve created_at 2025-07-25, 3.389★, 554 commits. É incumbente de um ano, não delta pós-corte; 23/08 é só a data de um artigo sobre ele."
+    },
+    {
+     "titulo": "AsDecided segue ativo mas sem sinal de tração pública no GitHub (repos satélite com 0-2★)",
+     "motivo": "REFUTADO por medição direta. `gh api repos/asdecided/core` devolve repo PÚBLICO, 292★, criado 2026-06-01, descrição 'Native deterministic engine and read-only MCP server for engineering decisions.' — ele inclusive é linkado da própria página citada (scoop-bucket referencia asdecided/core/releases). O 'fato' afirmado ('o produto principal não aparece como repo público separado — sugere que o core do produto é fechado/privado') é falso. A conclusão de 'sem delta' até pode se sustentar (baseline 290★ → 292★ hoje), mas por contagem, não pelo que o finding afirma; e o source_date 2026-07-28 é de um repo satélite, não da medição alegada."
+    }
+   ],
+   "observacao": "O bloco ancorado em fonte primária é sólido: os 4 findings de changelog/docs oficiais (hooks PreModelSwitch/PostModelSwitch, as 3 correções de symlink/path-traversal, auto mode como default, self-hosted em beta público) bateram verbatim em code.claude.com, e os 2 de trajetória (headcount criado 28/08 com 805★; cumora criado 2026-08-17 com 3.349★) bateram exatamente na API do GitHub — coleta honesta. A degradação está toda no bloco de marketplace/concorrência: dois findings com as citações trocadas entre si (números de um colados na fonte do outro), um 'lançamento' que é repo de julho/2025 e um concorrente declarado sem repo público que tem 292★ à vista — ou seja, quando o eixo saiu da fonte primária para agregador/blog, a atribuição desmontou. Ressalva menor nos aprovados: o intervalo 'v2.1.245-250' do finding de auto mode é imprecisão própria do coletor (o default é de 14/08 e o trabalho de auto mode se espalha de v2.1.232 a v2.1.251) e o finding do MHS cita uma matéria da Bloomberg que retorna 403 — confirmei o título e a data por busca e pelo anúncio oficial da Anthropic, mas a citação canônica devia ser anthropic.com/news/model-hardware-standard-research-preview."
+  }
+ ]
+}
