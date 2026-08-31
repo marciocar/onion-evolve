@@ -3487,20 +3487,34 @@ check_inventory_sync
 # Cura: prefixo de bind (`127.0.0.1:HOST:CONT`) e `${VAR:?mensagem}` no lugar de `${VAR:-literal}`
 # para variáveis *PASSWORD*/*SECRET*/*TOKEN*/*KEY*. Acesso externo legítimo → túnel, não bind 0.0.0.0.
 check_compose_exposure() {
-  local f line n
+  # CATRACA (2026-08-31, dogfood do 1º update de adotante): a 1ª forma era HARD puro e acertou 38
+  # violações LEGADAS num adotante de uma vez — guarda sem catraca sobre dívida pré-existente pune
+  # quem obedece e ensina o --no-verify. Padrão das irmãs (R49/kb-vendored): baseline PASSIVO que
+  # SÓ ENCOLHE — chave nova = HARD; chave tolerada = conta no aviso SOFT; a métrica é diminuir.
+  local BASELINE="${REPO_ROOT}/.claude/validation/compose-exposure-baseline.txt"
+  local f line n key tolerated=0
+  _key() { printf '%s::%s' "$1" "$(printf '%s' "$2" | sed 's/[[:space:]]//g' | sha1sum | cut -c1-12)"; }
+  _hit() { # $1=arquivo $2=linha-conteudo $3=mensagem
+    key="$(_key "$1" "$2")"
+    if [ -f "${BASELINE}" ] && grep -qF "${key}" "${BASELINE}"; then
+      tolerated=$((tolerated+1)); return
+    fi
+    violation "HARD" "$1" "$3 [chave ${key} — legado pré-existente entra no baseline via regen-baselines; NOVO nunca]"
+  }
   while IFS= read -r f; do
     [ -f "${REPO_ROOT}/${f}" ] || continue
-    # (a) porta sem prefixo de bind: "- 8080:80" (com ou sem aspas); "127.0.0.1:8080:80" passa
     while IFS= read -r line; do
       n="${line%%:*}"
-      violation "HARD" "${f}:${n}" "REGRA 64: porta publicada SEM prefixo de bind — o Docker abre em 0.0.0.0 e ignora o firewall do host. Use 127.0.0.1:HOST:CONTAINER (acesso externo legítimo → túnel/SG, nunca bind aberto)"
+      _hit "${f}" "${line#*:}" "REGRA 64 (linha ${n}): porta publicada SEM prefixo de bind — o Docker abre em 0.0.0.0 e ignora o firewall do host. Use 127.0.0.1:HOST:CONTAINER"
     done < <(grep -nE '^[[:space:]]*-[[:space:]]*"?[0-9]+:[0-9]+"?[[:space:]]*(#.*)?$' "${REPO_ROOT}/${f}" || true)
-    # (b) segredo com fallback literal: PASSWORD/SECRET/TOKEN/KEY com ${VAR:-valor}
     while IFS= read -r line; do
       n="${line%%:*}"
-      violation "HARD" "${f}:${n}" "REGRA 64: variável de segredo com FALLBACK LITERAL — sem .env o serviço sobe com credencial conhecida. Troque \${VAR:-literal} por \${VAR:?defina no .env} (falha alto no up)"
+      _hit "${f}" "${line#*:}" "REGRA 64 (linha ${n}): variável de segredo com FALLBACK LITERAL — sem .env o serviço sobe com credencial conhecida. Troque \${VAR:-literal} por \${VAR:?defina no .env}"
     done < <(grep -inE '(PASSWORD|SECRET|TOKEN|_KEY)[A-Z_]*[=:][^#]*\$\{[A-Z_]+:-[^}]+\}' "${REPO_ROOT}/${f}" || true)
   done < <(git -C "${REPO_ROOT}" ls-files 'docker-compose*.yml' '*/docker-compose*.yml' 2>/dev/null)
+  if [ "${tolerated}" -gt 0 ]; then
+    violation "SOFT" "${REPO_ROOT}/.claude/validation/compose-exposure-baseline.txt" "REGRA 64: ${tolerated} exposição(ões) de compose LEGADAS toleradas pelo baseline — a métrica de saúde é este número DIMINUINDO (cure com bind 127.0.0.1: e \${VAR:?}; a chave sai do baseline junto)"
+  fi
 }
 
 check_generated_projection_sync
