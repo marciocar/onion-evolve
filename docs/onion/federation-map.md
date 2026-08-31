@@ -50,6 +50,6 @@ flowchart TD
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
 | onion-arthur | standalone | greenfield | greenfield-adoption, design, branding, storytelling | `165e1e13b11f` |
-| poc-venda-direta-pdi | standalone | greenfield | greenfield-adoption, document-comparison, compliance-nda, public-procurement | `b9580a520e5b` |
+| poc-venda-direta-pdi | standalone | greenfield | greenfield-adoption, document-comparison, compliance-nda, public-procurement | `219e9a5f365b` |
 | arandek | standalone | legacy | field-dogfood, legacy-adoption, monorepo, upstream-signal | `65d8a7501a03` |
 | onion-dist | standalone | greenfield | distribution-algorithms, kg-sdaal-method, research-arm, benchmarking | `e88c1e11e051` |
