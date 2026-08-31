@@ -3,7 +3,7 @@ title: "Revisão — o lote de update fechou: 3 adotantes no pin novo + sucessã
 date: 2026-08-31
 branch: feat/member-succession-mvp
 reviewer: "cada alvo dogfoodado no próprio lint pós-update (mvp 0 HARD; arandek 89→4, todos locais/transição; granaai 56→6, todos locais); members-validate rc=0; pin-integrity do mvp pin-ok"
-reviewed_diff_sha256: 30bfabc29f1e5f51811e81a1ff2624abf105076423a9d8ae4e5106bcf9d3fa7b
+reviewed_diff_sha256: 34b8542bee7cd99cef9f519b9e7b8640471372a16efa26f46fa168cdc3d265b4
 findings_total: 4
 findings_real: 4
 verdict: APROVADO
