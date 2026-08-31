@@ -1,0 +1,23 @@
+# Baselines DATADAS do radar de mundo — atualizadas por /meta:radar (nunca à mão sem rodada).
+# A REGRA 65 lê este arquivo: eixo mais velho que RADAR_STALE_DAYS (45) vira aviso SOFT no lint —
+# a máquina detecta a idade, o humano decide rodar (W7 intacto: nenhum cron, nenhum auto-start).
+# Presença do arquivo é o opt-in (superfície do CORE; adotante sem o arquivo não recebe a regra).
+axes:
+  - id: E1-kg-agente
+    last_run: 2026-08-31
+    kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
+  - id: E2-self-improving
+    last_run: 2026-08-31
+    kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
+  - id: E3-claude-code-delta
+    last_run: 2026-08-31
+    kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
+  - id: E4-capital
+    last_run: 2026-08-31
+    kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
+  - id: E5-gates-deterministicos
+    last_run: 2026-08-31
+    kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
+  - id: E6-fronteira-modelos
+    last_run: 2026-08-31
+    kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml

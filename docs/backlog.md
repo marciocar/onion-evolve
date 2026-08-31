@@ -127,6 +127,12 @@
 | 8.0 | `I_RADAR_SURFACE` | fios-abertos | Implementar /meta:radar: comando maestro-invocado com 6 eixos e baseline DATADA por eixo, staleness detectada por regra SOFT no li |
 | 6.4 | `I_HERO_PELO_MECANISMO` | fios-abertos | Reescrever o hero de onionevolve.com pelo MECANISMO (gate que veta + catraca que congela passivo + radar sem-LLM), nao pelas conta |
 
+## maestro-vivo-2026-08 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 11.2 | `D_META_RADAR_DESENHO` | maestro-vivo-2026-08 | PROPOSTA (gated — implementar e decisao do maestro): superficie permanente de percepcao externa /meta:radar — maestro-invocada |
+
 ## vps-shared-tools-2026-07 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -152,12 +158,6 @@
 | 5.0 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
-
-## maestro-vivo-2026-08 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 7.5 | `D_META_RADAR_DESENHO` | maestro-vivo-2026-08 | PROPOSTA (gated — implementar e decisao do maestro): superficie permanente de percepcao externa /meta:radar — maestro-invocada |
 
 ## arandek-adoption-dogfood-2026-07 — 3 item(ns)
 

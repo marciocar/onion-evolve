@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**63 regras** no total — **57 HARD**, **14 SOFT**.
+**64 regras** no total — **58 HARD**, **15 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -125,6 +125,7 @@ Classes de ação (HUMAN→MONITORED→DYNAMIC→AUTO) sobem de degrau com gate 
 | Nº | Regra | Severidade | O que previne |
 |---:|-------|:----------:|---------------|
 | 44 | Integridade da escada de Automação Graduada | HARD | classe sobe de degrau sem gate de promoção alcançável (rung-jump forjado) |
+| 65 | Radar de mundo com baseline DATADA por eixo | HARD + SOFT | decidir estratégia com percepção externa vencida SEM AVISO — o modo-de-falha medido no |
 
 ## Federação
 

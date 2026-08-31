@@ -3542,7 +3542,51 @@ check_evolution_links
 check_knowledge_base_links
 check_research_kg
 check_kg_provenance_coverage
+
+# REGRA 65 — Radar de mundo com baseline DATADA por eixo [SOFT]
+# previne: decidir estratégia com percepção externa vencida SEM AVISO — o modo-de-falha medido no
+# programa MAESTRO-VIVO (2026-08-31): 7 instrumentos de introspecção, zero de percepção externa, e
+# o eixo mais velho (panorama de modelos) com 65 dias citando um lineup já superado. O desenho segue
+# o padrão da REGRA 62: a máquina DETECTA a idade no lint, o humano dispara a rodada (/meta:radar) —
+# nunca cron/auto-start (MOAT W7). Opt-in pela PRESENÇA de docs/onion/radar-baselines.yaml
+# (superfície do core; adotante sem o arquivo não recebe a regra). Arquivo presente e ilegível é
+# HARD fail-loud: guarda que não sabe o que cobrar jamais afirma conformidade (P0 da REGRA 30).
+check_radar_staleness() {
+  local bl="${ONION_RADAR_BASELINES:-${REPO_ROOT}/docs/onion/radar-baselines.yaml}"
+  [ -f "${bl}" ] || return 0
+  local stale_days="${RADAR_STALE_DAYS:-45}"
+  local today_epoch; today_epoch=$(date +%s)
+  local axes=0 stale=0 axis="" lr=""
+  while IFS= read -r line; do
+    case "${line}" in
+      *"- id: "*) axis="${line#*- id: }"; lr="" ;;
+      *"last_run: "*)
+        lr="${line#*last_run: }"
+        axes=$((axes+1))
+        if ! printf '%s' "${lr}" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+          violation "HARD" "${bl}" "REGRA 65: eixo '${axis}' com last_run ilegível ('${lr}') — baseline datada é o contrato; corrija ou remova o eixo"
+          continue
+        fi
+        local lr_epoch; lr_epoch=$(LC_ALL=C date -d "${lr}" +%s 2>/dev/null || echo 0)
+        if [ "${lr_epoch}" -eq 0 ]; then
+          violation "HARD" "${bl}" "REGRA 65: eixo '${axis}' com data não-computável ('${lr}')"
+          continue
+        fi
+        local age=$(( (today_epoch - lr_epoch) / 86400 ))
+        if [ "${age}" -gt "${stale_days}" ]; then
+          stale=$((stale+1))
+          violation "SOFT" "${bl}" "REGRA 65: eixo '${axis}' do radar de mundo está VELHO (${age}d > ${stale_days}d) — a percepção externa venceu; rode /meta:radar ${axis}"
+        fi
+        ;;
+    esac
+  done < "${bl}"
+  if [ "${axes}" -eq 0 ]; then
+    violation "HARD" "${bl}" "REGRA 65: arquivo de baselines presente mas SEM eixos legíveis — fail-loud, nunca conformidade por ausência"
+  fi
+}
+
 check_kg_verification_coverage
+check_radar_staleness
 check_kg_radar_integrity
 check_kg_trace_resolve
 check_review_artifact
