@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**62 regras** no total — **56 HARD**, **13 SOFT**.
+**63 regras** no total — **57 HARD**, **13 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -140,7 +140,7 @@ Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.
 
 ## Projeção & privacidade
 
-O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e deep-link privado nunca vazam.
+O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e deep-link privado nunca vazam; e o compose commitado nunca publica porta em 0.0.0.0 nem sobe com segredo de fallback.
 
 | Nº | Regra | Severidade | O que previne |
 |---:|-------|:----------:|---------------|
@@ -151,6 +151,7 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 36 | Superfície VENDORIZADA sem nome comercial de cliente | HARD | nome comercial de cliente vazando em superfície vendorizada |
 | 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT | link vivo em superfície vendorizada para caminho core-privado — morto no adotante |
 | 61 | Fronteira de MOAT: manifesto de plugin publicável não vaza meta-fábrica nem grafo privado | HARD | publicar a AUTO-REPLICAÇÃO (create-*/adopt/marketplace/decouple) ou o SSOT PRIVADO do core |
+| 64 | Compose sem bind local ou com segredo em fallback literal | HARD | porta publicada em todas as interfaces (o Docker ignora o firewall do HOST — ufw/iptables |
 
 ## Processo com resíduo
 

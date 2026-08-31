@@ -3472,8 +3472,40 @@ check_no_worker_orchestrator_agent
 check_branch_agent_distinction
 check_rules_pathscoped
 check_inventory_sync
+
+# REGRA 64 — Compose sem bind local ou com segredo em fallback literal [HARD]
+# previne: porta publicada em todas as interfaces (o Docker ignora o firewall do HOST — ufw/iptables
+# do host não seguram a DOCKER-USER chain) e serviço subindo com senha conhecida quando o .env falta.
+#
+# Gatilho MEDIDO, e a classe tem DUAS instâncias (um caso é caso, dois é classe): arandek 2026-08
+# (compose commitado com binds/segredos — achado redigido) e um segundo adotante em 2026-08-30
+# (censo, run wf_2349bf29-ea0: `5435:5432`/`6379:6379` sem prefixo + `:-postgres123` de fallback).
+# Nuance medida com o maestro (2026-08-31): em produção AWS, security groups ficam FORA do host e
+# não são furados pelo Docker — mas dev local/VPS/CI não têm SG, e o fallback de segredo viaja
+# INTACTO para qualquer ambiente. Por isso as duas metades são HARD.
+# Escopo: docker-compose*.yml RASTREADOS pelo git (untracked é rascunho local, não artefato).
+# Cura: prefixo de bind (`127.0.0.1:HOST:CONT`) e `${VAR:?mensagem}` no lugar de `${VAR:-literal}`
+# para variáveis *PASSWORD*/*SECRET*/*TOKEN*/*KEY*. Acesso externo legítimo → túnel, não bind 0.0.0.0.
+check_compose_exposure() {
+  local f line n
+  while IFS= read -r f; do
+    [ -f "${REPO_ROOT}/${f}" ] || continue
+    # (a) porta sem prefixo de bind: "- 8080:80" (com ou sem aspas); "127.0.0.1:8080:80" passa
+    while IFS= read -r line; do
+      n="${line%%:*}"
+      violation "HARD" "${f}:${n}" "REGRA 64: porta publicada SEM prefixo de bind — o Docker abre em 0.0.0.0 e ignora o firewall do host. Use 127.0.0.1:HOST:CONTAINER (acesso externo legítimo → túnel/SG, nunca bind aberto)"
+    done < <(grep -nE '^[[:space:]]*-[[:space:]]*"?[0-9]+:[0-9]+"?[[:space:]]*(#.*)?$' "${REPO_ROOT}/${f}" || true)
+    # (b) segredo com fallback literal: PASSWORD/SECRET/TOKEN/KEY com ${VAR:-valor}
+    while IFS= read -r line; do
+      n="${line%%:*}"
+      violation "HARD" "${f}:${n}" "REGRA 64: variável de segredo com FALLBACK LITERAL — sem .env o serviço sobe com credencial conhecida. Troque \${VAR:-literal} por \${VAR:?defina no .env} (falha alto no up)"
+    done < <(grep -inE '(PASSWORD|SECRET|TOKEN|_KEY)[A-Z_]*[=:][^#]*\$\{[A-Z_]+:-[^}]+\}' "${REPO_ROOT}/${f}" || true)
+  done < <(git -C "${REPO_ROOT}" ls-files 'docker-compose*.yml' '*/docker-compose*.yml' 2>/dev/null)
+}
+
 check_generated_projection_sync
 check_harvest_names_removed_nodes
+check_compose_exposure
 check_claude_md_counts
 check_site_inventory_sync
 check_plugins_sync

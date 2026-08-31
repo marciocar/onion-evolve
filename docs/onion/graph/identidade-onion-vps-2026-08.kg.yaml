@@ -383,6 +383,17 @@ nodes:
     label: "O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda do host) mas nao protege contra credencial roubada apagando o remoto — a limitacao conhecida do Object Lock com restic. A evolucao decidida com o maestro (2026-08-31): rsync.net (snapshot ZFS server-side) como segundo destino via restic copy, SEM retrabalho. GATILHO: o maestro contratar a conta — decisao de custo dele, sem urgencia; o risco coberto por este gate e o mais raro da matriz."
     trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh (recomendacoes de destino no cabecalho)"
 
+  - id: E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-31
+    verified_against: "dogfood 4/4 acusacoes no compose ruim + 0 no curado; bancada 3/3 (acusa, cura passa, untracked fora); registry regenerado com a 64 classificada"
+    label: "A CLASSE VIROU MECANISMO (selo do maestro 2026-08-31, fix-must-become-mechanism): nasceu a REGRA 64 [HARD] no lint — compose RASTREADO com porta sem prefixo de bind ou segredo em fallback literal reprova. Vendoriza para todo adotante via plugin: o 3o caso e pego pelo CI antes de existir, sem depender de comunicacao. E as duas instancias medidas foram tratadas: granaai recebeu branch fix/compose-bind-and-secret-fallback (pushed, commit 1b5afab00 — 2 binds + 1 fallback curados; o time revisa e mergeia); arandek tem pacote mensagem+patch PRONTO-RETIDO (docs/analysis/arandek-compose-fallbacks-message-2026-08.md — 3 fallbacks; portas ja limpas). CONTEXTO DO MAESTRO incorporado: producao de ambos roda na AWS em outras contas — SG cobre porta (nao e furada pelo Docker), NAO cobre fallback de senha, que viaja intacto."
+    trace: ".claude/validation/lint-artifacts.sh (REGRA 64) · docs/analysis/granaai-compose-exposure-2026-08.md"
+
 edges:
   - from: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
     to: C_NO_COMPOSTO_RECEBE_VEREDITO_ATOMICO
@@ -480,3 +491,9 @@ edges:
   - from: Q_MAIS_UM_IMUTAVEL_GATED
     to: Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO
     edge_type: TRACES_TO
+  - from: E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64
+    to: E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO
+    edge_type: SUPPORTS
+  - from: E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64
+    to: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
+    edge_type: SUPPORTS

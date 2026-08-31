@@ -28,9 +28,13 @@ O `docker-compose.yml` **rastreado no git** da granaai (`/home/marcio/granaai`, 
 - **Nesta VPS a exposição NÃO está viva** (medido 2026-08-30): nada escuta em `:5435`; os Redis
   presentes estão todos em `127.0.0.1`; o `onion-vps-docker-firewall` (DOCKER-USER default-deny)
   está ativo desde 08-05.
-- O risco é **latente e viaja com o repo**: vale em **qualquer máquina** onde alguém rode
-  `docker compose up` sem `.env` — dev local, outra VPS, CI. A equipe granaai tem 4 chaves de
-  acesso e o repo é compartilhado.
+- **Contexto do maestro (2026-08-31): a produção roda na AWS, em outra conta** — a cópia daqui é
+  espelho. Isso recalibra as duas metades do risco:
+  - **Portas sem bind**: na AWS, *security groups* ficam FORA do host — o bypass Docker-vs-ufw não
+    os fura. A exposição lá depende da SG estar fechada (a conferir por eles, 1 minuto no console).
+    Em dev local/outros hosts sem SG, o risco original vale integral.
+  - **Fallback `:-postgres123`**: viaja **intacto** para qualquer ambiente, AWS incluída — sobe
+    com senha conhecida onde quer que o `.env` falte. É a metade que a SG não cobre.
 
 ## Por que é CLASSE, não caso
 
