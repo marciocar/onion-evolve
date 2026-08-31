@@ -543,6 +543,17 @@ nodes:
     verified_against: 'usage dos 3 task-notifications (wf_6e6ef552/6a4da33e/e27840db)'
     label: 'Custo real do programa: F0 704.639 tok/8 agentes/5m37s · F1 849.030 tok/12 agentes/12m · F2 1.318.472 tok/12 agentes/12m50s = 2.872.141 tokens, 32 agentes — ESTOUROU o teto declarado de 2,5M em 15%%; causa: F2 opus/high consumiu 47%% acima do projetado. Licao p/ o proximo programa: projetar F2 por medida de F1, nao por chute.'
 
+  - id: E_PRETOOLUSE_BARRA_SOB_BYPASS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-08-31
+    verified_against: 'claude -p --dangerously-skip-permissions em sandbox: comando com marcador proibido BLOQUEADO (exit 2 do PreToolUse; prova.txt ausente) e controle PASSOU (controle.txt criado) — veredito pelo filesystem, nao pela mensagem'
+    label: 'MEDIDO 2026-08-31: o exit 2 de PreToolUse barra a acao SOB bypassPermissions — a frase-moat do CLAUDE.md e VERDADEIRA e agora exercitada. O veredito ERRADO do confronto acertou o diagnostico (nunca-exercitada) e a cura (provar) fechou no mesmo dia. Aberto com gatilho: 1o uso REAL de PreToolUse no core fecha a distancia sandbox->producao.'
+    trace: "docs/analysis/pretooluse-proof-2026-08.md"
+
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
     to: Q_MAESTRO_VIVO
@@ -682,3 +693,6 @@ edges:
   - from: E_CUSTO_PROGRAMA
     to: Q_MAESTRO_VIVO
     edge_type: TRACES_TO
+  - from: E_PRETOOLUSE_BARRA_SOB_BYPASS
+    to: C_ERRA_O_EXIT_2_DETERMINISTICO_DE_HOOK_COMO_A_C
+    edge_type: SUPPORTS
