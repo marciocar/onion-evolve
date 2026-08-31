@@ -3477,9 +3477,9 @@ check_inventory_sync
 # previne: porta publicada em todas as interfaces (o Docker ignora o firewall do HOST — ufw/iptables
 # do host não seguram a DOCKER-USER chain) e serviço subindo com senha conhecida quando o .env falta.
 #
-# Gatilho MEDIDO, e a classe tem DUAS instâncias (um caso é caso, dois é classe): arandek 2026-08
-# (compose commitado com binds/segredos — achado redigido) e um segundo adotante em 2026-08-30
-# (censo, run wf_2349bf29-ea0: `5435:5432`/`6379:6379` sem prefixo + `:-postgres123` de fallback).
+# Gatilho MEDIDO, e a classe tem DUAS instâncias (um caso é caso, dois é classe): dois adotantes
+# distintos, 2026-08 — compose commitado com porta sem prefixo e/ou segredo de fallback (achados
+# redigidos no core privado; run wf_2349bf29-ea0). Nomes ficam FORA desta superfície: ela vendoriza.
 # Nuance medida com o maestro (2026-08-31): em produção AWS, security groups ficam FORA do host e
 # não são furados pelo Docker — mas dev local/VPS/CI não têm SG, e o fallback de segredo viaja
 # INTACTO para qualquer ambiente. Por isso as duas metades são HARD.
