@@ -10528,6 +10528,32 @@ FIX
   else
     record_pass "compose-exposure: untracked fica fora (rascunho não é artefato)"
   fi
+  # CATRACA: o que o EMISSOR emite, o lint TOLERA (paridade por execução — a receita da chave
+  # vive em dois sítios e esta é a guarda que os mantém iguais); linha NOVA segue HARD.
+  sed -i 's|- 127.0.0.1:5435:5432|- 5435:5432|' "$d/docker-compose.yml"   # reintroduz a dívida
+  ( cd "$d" && git add -A )
+  ( cd "$d" && REPO_ROOT="$d" bash "${REPO_ROOT}/.claude/validation/compose-exposure-check.sh" --emit-baseline > .claude-baseline.txt 2>/dev/null ) || true
+  mkdir -p "$d/.claude/validation" && mv "$d/.claude-baseline.txt" "$d/.claude/validation/compose-exposure-baseline.txt"
+  out="$(cd "$d" && REPO_ROOT="$d" bash -c 'violation(){ echo "V[$1] $2 :: $3"; }; source f.sh; check_compose_exposure' 2>&1)" || true
+  if printf '%s\n' "${out}" | grep -q 'V\[HARD\]'; then
+    record_fail "compose-exposure: catraca" "dívida emitida pelo emissor AINDA sai HARD — receita de chave divergiu entre emissor e lint"
+  elif printf '%s\n' "${out}" | grep -q 'toleradas pelo baseline'; then
+    record_pass "compose-exposure: catraca — dívida legada tolerada (SOFT agregado), paridade emissor↔lint provada"
+  else
+    record_fail "compose-exposure: catraca" "nem HARD nem SOFT agregado — a guarda calou: $(printf '%s' "${out}" | head -1)"
+  fi
+  printf '    ports:\n      - 7777:7777\n' >> "$d/docker-compose.yml"
+  ( cd "$d" && git add -A )
+  out="$(cd "$d" && REPO_ROOT="$d" bash -c 'violation(){ echo "V[$1] $2 :: $3"; }; source f.sh; check_compose_exposure' 2>&1)" || true
+  # a mensagem da violação carrega linha+chave, não o conteúdo — medir pelo QUE A GUARDA EMITE:
+  # exatamente 1 HARD (a linha nova) com a dívida antiga ainda tolerada (SOFT agregado presente).
+  local n_hard
+  n_hard="$(printf '%s\n' "${out}" | grep -c 'V\[HARD\]' || true)"
+  if [ "${n_hard}" -eq 1 ] && printf '%s\n' "${out}" | grep -q 'toleradas pelo baseline'; then
+    record_pass "compose-exposure: linha NOVA fora do baseline segue HARD (1 exata) com o legado ainda tolerado"
+  else
+    record_fail "compose-exposure: crescimento" "esperava 1 HARD + SOFT agregado; veio hard=${n_hard}: $(printf '%s' "${out}" | head -2)"
+  fi
   rm -rf "$d"
 }
 
