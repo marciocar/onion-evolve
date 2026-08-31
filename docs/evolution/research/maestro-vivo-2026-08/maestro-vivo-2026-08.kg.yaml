@@ -518,9 +518,11 @@ nodes:
   - id: D_CARTEIRA_REFILL_FIOS
     node_type: decision
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.8
+    verified_at: 2026-08-31
+    verified_against: 'selo-por-ato: /meta:drive invocado pelo maestro imediatamente apos a proposta; Onda 6 aberta no fios-abertos (E_SELO_POR_ATO_REGISTRADO) — interpretacao registrada e reversivel'
     label: 'PROPOSTA (selo do maestro): reabastecer fios-abertos (TETO 20) com a carteira derivada do confronto — os itens e gatilhos nomeados estao na SYNTHESIS §Carteira. Criterio: veredito ERRADO/SUBESTIMADO de impacto 5 primeiro; nada re-litiga D1-D8/NS1.'
 
   - id: D_META_RADAR_DESENHO

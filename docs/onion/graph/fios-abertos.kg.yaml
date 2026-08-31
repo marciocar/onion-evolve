@@ -33,289 +33,98 @@ meta:
   # kg-backlog-guard: on
   # ↑ opt-in da REGRA 58, DELIBERADAMENTE separado da linha do TETO: se o escopo fosse o
   #   proprio TETO, apagar aquela linha DESLIGARIA a guarda em vez de disparar o SEM-TETO.
+  # Onda 6 aberta 2026-08-31 (carteira do programa MAESTRO-VIVO); ondas 1-5 COLHIDAS no mesmo commit — historia no git (blame deste arquivo) e nos residuos de revisao.
   # ═══ TETO: 20 NÓS. Onda nova exige onda COLHIDA. ═══
   # Colher = onda e itens saem no MESMO commit; a história fica no git e no artefato de revisão.
   # O radar impede meia-colheita: item sem onda → aresta órfã (HARD); onda sem item → grau 0 (HARD).
   # Rotina (branches, higiene) NÃO entra aqui — vai para checklist. O grafo é para RISCO.
 
 nodes:
-  - id: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
-    node_type: claim
-    plane: DEV
-    status: confirmed
-    impact: 5
-    confidence: 1.0
-    verified_at: 2026-08-08
-    verified_against: 15-itens-do-inventario-revalidados-um-a-um-contra-o-vivo-5-mortos
-    label: "Tese fundadora deste arquivo, e ela nasceu MEDIDA: revalidando 15 itens do inventario contra o vivo, CINCO ja estavam mortos (33%) — 4 entregues (R45 tem 43 entradas de baseline e nao 0; double-firing amputado; o `2>/dev/null` do gerador curado por `_gen_into`; R3 virou allowlist) e 1 refutado (producao alcancou o repo). O inventario vinha da §7 de onion-guardas-mapa-2026-08, snapshot de 03/08. Backlog montado de DOCUMENTO, e nao de ARTEFATO, ordena itens mortos — e a mesma sessao ja tinha cometido isso com o GIT_DIR, diagnosticando num checkout de julho um bug curado em 04/08."
-    trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
-
-  - id: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
-    node_type: claim
-    plane: DEV
-    status: confirmed
-    impact: 5
-    confidence: 0.95
-    verified_at: 2026-08-08
-    verified_against: formula-de-atencao-do-kg-radar-lida-contra-a-topologia-deste-arquivo
-    label: "O radar ordena por `impact × confidence × statusFactor × (1 + grau)`, e o grau e NAO-DIRECIONADO: `DEPENDS_ON` nao afunda o bloqueado, SOBE OS DOIS. Logo a topologia NAO expressa precedencia, e nenhuma escrita de aresta faz o radar emitir ordem de execucao. Isso nao e defeito a consertar — e limite a DECLARAR, porque a tentacao de reconcilia-lo mexendo em `impact`/`confidence` e o defeito fundador da REGRA 49 cometido na autoria."
-    trace: ".claude/validation/kg-radar.sh"
-
-
-  # ══ ONDA 5 — GESTAO DE BACKLOG (colhida a onda anterior no MESMO commit) ══
-  # NENHUM FATO NASCE AQUI. Os fatos vivem em backlog-grafo-2026-08.kg.yaml; aqui mora o
-  # COMPROMISSO, citando o id alheio — como o contrato de fronteira deste arquivo exige.
-  - id: W5_GESTAO_DE_BACKLOG
+  - id: W6_CARTEIRA_MAESTRO_VIVO
     node_type: decision
     plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-29
-    trace: "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml"
-    verified_against: 'Onda 1 aberta e conduzida em 2026-08-28: 25 nos no grafo de pesquisa, 5 PRs mergeados (#704-#708), REGRA 62 viva no lint'
-    label: 'Onda 5 — a pergunta "nao e hora de um comando de gestao de backlog?" respondida com NAO: faltava CATRACA, nao superficie. O trabalho de mecanismo com gatilho disparado foi entregue ANTES da pesquisa, de proposito (nao dependia dela). O que resta da onda e a pesquisa em si, cujo grafo proprio (backlog-grafo-2026-08) tem 25 nos e censo vivo. AQUI so o compromisso'
+    verified_at: 2026-08-31
+    trace: "docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml"
+    verified_against: 'programa MAESTRO-VIVO (PR #733 merged): F0 capacidade x uso + F1 mundo com juiz-fixo + F2 confronto com Elenxo; carteira proposta em D_CARTEIRA_REFILL_FIOS'
+    label: 'Onda 6 — a carteira do confronto interno x mundo: 5 itens que exploram o que o programa mediu (a frase-moat nao exercitada, o numero que falta ao gate, o ativo sem par, o hero commodity, a percepcao externa ausente). Criterio de entrada: veredito ERRADO/SUBESTIMADO/UNICO de impacto 5.'
 
-  - id: I_R62_CATRACA_DE_PROJECAO
-    node_type: decision
-    plane: PROD
-    impact: 4
-    confidence: 0.95
-    status: done
-    verified_at: 2026-08-28
-    trace: "docs/evolution/review/feat-backlog-projection-ratchet.md"
-    verified_against: 'PR #704 MERGED; bancada run_backlog_projection_selftests 8/8 e 5 mutacoes que reprovam; CI em runner distinto nao disparou a regra (determinismo entre maquinas provado pelo ambiente)'
-    label: 'PAGO — REGRA 62 [HARD]: docs/backlog.md tem de bater com a regeneracao da fonte, detectado no LINT (nao em cron, para nao ferir o MOAT de auto-inicio). O caminho ate ela achou TRES defeitos destrutivos que a leitura nao tinha achado: enumeracao vazia sobrescrevendo a projecao boa, `MODE=${1:---write}` fail-open num caminho de ESCRITA, e render LOCALE-DEPENDENTE que faria a catraca acusar o AMBIENTE (sob virgula decimal o printf gravava 38,0 e saia exit 0)'
-
-  - id: I_GATILHOS_W2W3_REGISTRADOS_CEDO
-    node_type: decision
+  - id: E_SELO_POR_ATO_REGISTRADO
+    node_type: evidence
     plane: DEV
     impact: 4
-    confidence: 0.9
-    status: done
-    verified_at: 2026-08-29
-    trace: "docs/evolution/review/research-gated-triggers-w2-w3.md"
-    verified_against: 'PR #708 MERGED; 6 nos gated no grafo de pesquisa, com DEPENDS_ON que os deixa BLOQUEADOS no censo ate a Onda 1 fechar'
-    label: 'PAGO, e a licao vale mais que o item: eu havia programado os gatilhos de W2/W3 para nascerem na F6 — ERRADO. `gated-work-derives-fresh` diz que o GATILHO e o que sobrevive ao tempo e o "como" apodrece; guardar o duravel para o fim o deixava exposto num arquivo FORA do repositorio. Quem pegou foi o maestro perguntando se o plano tinha se perdido'
-
-  - id: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
-    node_type: question
-    plane: DEV
-    impact: 4
-    confidence: 0.9
+    confidence: 0.8
     status: confirmed
-    verified_at: 2026-08-29
-    verified_against: 'MEDIDO: amostra sistematica reproduzivel de 15 dos 192 itens (1 a cada 13, ordenada por atencao, 12 grafos distintos), cada um com comando decisivo executado contra o vivo. 9 mortos = 60% vs baseline 33%'
-    label: 'RESPONDIDA, e a resposta e RUIM: a mortalidade SUBIU de 33%% para 60%% — quase dobrou. 9 de 15 mortos (6 entregues, 1 refutado, 1 respondida, 1 obsoleto), zero nao-verificaveis. A leitura que importa: A PROJECAO PURA NAO CUROU O DRIFT. Trocar documento por grafo curou a FONTE do drift, nao o drift — o projetor le `status: open` com fidelidade perfeita e, se ninguem fecha o no, republica o cadaver com fidelidade perfeita. Os seis entregues foram feitos COM CAPRICHO e nenhum voltou ao grafo: e `grafo-sempre-atualizado` falhando no ponto exato que ela nomeia. RESSALVA DE HONESTIDADE, declarada pelo proprio medidor: sem acesso sudo ao bridge e ao Postgres, 4 dos 9 teriam sido NAO-VERIFICAVEIS e o numero cairia para 33%% — empatando a baseline por artefato de ACESSO, nao por realidade'
+    verified_at: 2026-08-31
+    verified_against: 'sequencia da sessao: relatorio da carteira entregue -> /meta:drive invocado pelo maestro como mensagem seguinte, sem outro texto'
+    label: 'INTERPRETACAO REGISTRADA E REVERSIVEL: o maestro invocou /meta:drive imediatamente apos a proposta da carteira; o driver leu o ato como selo de D_CARTEIRA_REFILL_FIOS e abriu a Onda 6. Se a leitura estiver errada, reverter a onda e um commit — e esta evidencia e o lugar onde a reversao se ancora.'
 
-  # ══ ELENXO do decreto da colheita (2026-08-29) — 4 lentes cegas + refutador ══
-  - id: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
-    node_type: claim
-    plane: PROD
+  - id: I_PROVA_PRETOOLUSE
+    node_type: decision
+    plane: DEV
     impact: 5
     confidence: 0.9
-    status: confirmed
-    verified_at: 2026-08-29
-    trace: "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
-    verified_against: 'Elenxo completo: 4 lentes cegas entre si (doutrina, instrumento, prior-art, adversarial-de-forja) + refutador com mandato de destruir e default REPROVADO'
-    label: 'O decreto "colher = DELETAR, a historia fica no git e no artefato de revisao" foi submetido ao Elenxo — era o unico invariante da maquinaria exercido sem nunca ter sido testado, e quem o exerceu (eu, na colheita de 9e4aaecc) o declarou nao-validado no proprio residuo. VEREDITO: sobrevive em FORMA MAIS FRACA. O refutador derrubou 4 das 8 evidencias e 2 dos 3 beneficios da cura que eu propunha'
+    status: open
+    verified_against: 'gatilho: F2 moat-gates veredito ERRADO — a frase-moat do CLAUDE.md (exit 2 PreToolUse barra sob bypassPermissions) tem ZERO PreToolUse no settings.json deste repo'
+    label: 'Provar OU corrigir a frase-moat: escrever 1 PreToolUse minimo em sandbox e MEDIR o bloqueio sob bypassPermissions (claude -p). Barrar = a frase ganha lastro e vira demo; nao barrar = propor a reescrita ao maestro (flip de CLAUDE.md e humano). Qualquer resultado fecha o fio.'
 
-  - id: E_O_RELOGIO_NAO_ESTAVA_ANDANDO
-    node_type: evidence
-    plane: PROD
-    impact: 4
-    confidence: 1.0
-    status: confirmed
-    verified_at: 2026-08-29
-    verified_against: 'kg-radar --freshness-tsv sobre o arquivo PRE-colheita (git show 9e4aaecc^): 20 OK, ZERO stale. STALE-OLD e relativo a meta.baseline (kg-radar.sh:358), nao a um relogio'
-    label: 'REFUTA a acusacao mais retorica contra o decreto. "Colher mata o relogio de re-teste" pressupoe que ele estava andando — e nao estava: os 20 nos pre-colheita saiam 20 OK / 0 STALE. O frescor e RELATIVO A BASELINE, nao ao tempo, e o dilema e fechado nas duas pontas: baseline congelada => 18/18 OK para sempre; baseline bumpada => 18/18 STALE de uma vez, massa de falso-alarme sobre item PAGO. Arquivar nao ressuscita relogio nenhum porque nao havia relogio'
-
-  - id: E_A_ASSIMETRIA_ERA_INSINUACAO
-    node_type: evidence
-    plane: PROD
-    impact: 4
-    confidence: 0.95
-    status: confirmed
-    verified_at: 2026-08-29
-    verified_against: 'censo pre-colheita: ZERO nos `open` (11 confirmed + 9 done); C_RENAME_MATA_ANCORA_EM_SILENCIO — um C_ que registra erro do autor — TAMBEM foi colhido (2 ocorrencias antes, 0 grafos vivos hoje)'
-    label: 'REFUTA o achado mais grave contra mim, e por isso vai registrado com destaque. A lente adversarial mediu que 7 dos 18 colhidos registravam ERRO DO PROPRIO AUTOR e sumiram, enquanto as 2 teses preservadas CREDITAM o autor — insinuando vies. O refutador testou a hipotese nula e ela CAIU dos dois lados: um `C_` de erro proprio foi colhido junto, e o arquivo tinha ZERO nos open. A regra aplicada foi "fechado sai, tese fundadora fica" e levou embora erro e credito UNIFORMEMENTE. A perda e real; o vies nao esta provado'
-
-  - id: E_O_TETO_NAO_CAUSOU_DESVIO
-    node_type: evidence
+  - id: I_BENCHMARK_DO_GATE
+    node_type: decision
     plane: DEV
-    impact: 3
+    impact: 5
     confidence: 0.85
-    status: confirmed
-    verified_at: 2026-08-29
-    verified_against: 'medido: 378 commits entre 15/08 e 29/08, 4 tocando o arquivo, 1696 linhas `- id:` em OUTROS grafos; e ZERO ocorrencias de bloqueio por TETO em toda a historia'
-    label: 'NUMEROS REPRODUZEM, INFERENCIA CAI. O arquivo ficou 20/20 por 14 dias e 1696 ids nasceram noutros grafos — mas isso e o DESENHO, nao desvio: o proprio meta: diz em caixa-alta "NENHUM FATO NASCE AQUI" e "no so entra para ser ponta de aresta cross-grafo". Procurou-se evidencia de alguem BLOQUEADO pelo teto: nenhuma. Correlacao confundida com causa, e eu quase a repassei como achado'
+    status: open
+    verified_against: 'gatilho: F2 moat-gates VALIDADO sem numero — o mundo publica metrica (Sponsio 5000-60000x; Statewright 2/10->10/10) e nos publicamos narrativa'
+    label: 'Publicar o numero que ja temos: latencia do gate completo (lint wall-time), custo de token ZERO, contagem de vetos reais capturados, tamanho da bancada. docs/analysis + no de evidencia no grafo do programa.'
 
-  - id: E_NENHUM_KG_YAML_JAMAIS_FOI_DELETADO
-    node_type: evidence
-    plane: PROD
-    impact: 4
-    confidence: 1.0
-    status: confirmed
-    verified_at: 2026-08-29
-    verified_against: 'git log --diff-filter=D --name-only -- "*.kg.yaml" => VAZIO; unico precedente de aposentar grafo grande e `# kg-backlog-archive: on` (federation-research, revisado e aprovado)'
-    label: 'O PRIOR-ART QUE VALE E O DE DENTRO DE CASA, e a conclusao que eu montava nao o usava. Placar medido do repo: ZERO arquivos .kg.yaml deletados em toda a historia x UM arquivamento por marcador. A casa ja tem uma pratica de aposentadoria, ela e o marcador — e ele nao apaga'
-
-  - id: C_A_METADE_DA_PROMESSA_QUE_E_FALSA
-    node_type: claim
-    plane: PROD
+  - id: I_PECA_CATRACA
+    node_type: decision
+    plane: DEV
     impact: 5
-    confidence: 1.0
-    status: confirmed
-    verified_at: 2026-08-29
-    trace: "docs/evolution/review/chore-harvest-fios-abertos-onda1.md"
-    verified_against: 'o residuo da colheita (70 linhas) menciona 2 ids — os PRESERVADOS — e zero dos 18 apagados; 14 dos 18 ids nao existem hoje em NENHUM artefato do repo'
-    label: 'O QUE SOBREVIVEU AO REFUTADOR, e e o dano real. O meta: promete que a historia fica "no git E no artefato de revisao". O git CUMPRE a letra; o residuo NAO cumpre nada — eu mesmo escrevi o da colheita de ontem e ele nomeia so os dois preservados. Resultado medido: 14 de 18 conceitos nao existem em lugar nenhum consultavel. A promessa e METADE falsa, e a metade falsa e a unica que um humano leria'
-
-  - id: D_MECANIZAR_A_PROMESSA_QUE_JA_ESTA_ESCRITA
-    node_type: decision
-    plane: DEV
-    impact: 4
-    confidence: 0.95
-    status: done
-    verified_at: 2026-08-29
-    trace: ".claude/validation/lint-artifacts.sh"
-    verified_against: 'REGRA 63 [HARD] implementada e provada: bancada run_harvest_residue_selftests 3/3 (sem residuo · residuo parcial · residuo completo) + 2 mutacoes que reprovam no caso certo; testada contra o cenario real da colheita de 28/08'
-    label: 'PAGO — REGRA 63 [HARD]: quem REMOVE no de um .kg.yaml tem de NOMEAR os ids removidos no residuo da revisao, que a REGRA 56 ja obriga a existir. Custo zero de estrutura nova: nao proibe colher, nao obriga arquivar (o Elenxo derrubou "mover" como cura), so mecaniza a promessa que JA ESTAVA ESCRITA no meta:. Deteccao deterministica pelo diff (`-  - id:`), so morde quando ha remocao — PR que nao colhe nao e julgado. Provado contra o cenario que a motivou: a colheita de 28/08 removeu 18 ids e o residuo nomeava 2; a guarda acusa exatamente os que faltam, um a um'
-
-  - id: C_DISSENSO_ARQUIVAR_TROCA_PERDA_POR_PASSIVO
-    node_type: claim
-    plane: PROD
-    impact: 4
-    confidence: 0.6
-    status: confirmed
-    verified_at: 2026-08-29
-    verified_against: 'RE-MEDIDO no P3 do drive (2026-08-29): existe docs/onion/graph/federation-research-2026-06-reconciled-radar.md (10KB, gerado por kg-view.sh) e ele esta EM DIA (byte-identico a regeneracao); o frescor do grafo arquivado emite 87 OK + 71 UNANCHORED, nao silencio'
-    label: 'DISSENSO MEDIDO E PARCIALMENTE REFUTADO — o drive conduziu a propria objecao que o Elenxo preservou, e ela nao sobreviveu inteira. CAI a parte forte: arquivamento NAO e retencao "sem consumidor e fora da projecao" — o grafo arquivado TEM projecao humana viva (`-radar.md`, 10KB, gerada pelo kg-view.sh) e ela esta EM DIA. E nao e "sem relogio": o frescor emite 87 OK + 71 UNANCHORED, ou seja, o instrumento fala sobre ele. SOBREVIVE a parte estreita: os 319 abertos ficam fora de `docs/backlog.md`, que e a superficie de DECISAO — ficar fora da fila acionavel e diferente de ficar invisivel. E sobrevive intacto o argumento da REGUA: reter os 18 poria uma onda ENTREGUE no topo do radar por puro grau nao-direcionado. RECONCILIADO 2026-08-29 (drive passada 3), com o escopo da refutacao MEDIDO e menor do que a 1a redacao sugeria: a projecao -radar.md e byte-identica ao que o kg-view.sh gera hoje (10373 = 10373), mas ela e um TOP-25 — cita 30 dos 319 abertos, e o frescor cobre 62 dos 319. Ou seja, 257 abertos seguem sem projecao E sem veredito. A metade forte da objecao cai, sim, mas so em ~10-19%% do grafo, nao no todo. A forma estreita foi RE-MEDIDA e confirma: 319 abertos, ZERO citados em docs/backlog.md. Confidence fica em 0.6 e o no sai de `drifted` porque a divergencia esta reconciliada NO LABEL, que e onde a passada 2 a escreveu'
-
-  - id: E_ARQUIVADO_TEM_PROJECAO_E_RELOGIO
-    node_type: evidence
-    plane: PROD
-    impact: 3
-    confidence: 1.0
-    status: confirmed
-    verified_at: 2026-08-29
-    verified_against: 'ls + kg-view.sh --markdown | diff => docs/onion/graph/federation-research-2026-06-reconciled-radar.md existe (10373 bytes) e bate byte-a-byte com a regeneracao; kg-radar --freshness-tsv no mesmo grafo => 87 OK + 71 UNANCHORED'
-    label: 'MEDICAO QUE ENCOLHE O DISSENSO. A objecao dizia que arquivar cria "retencao sem consumidor, sem relogio e fora da projecao". Duas das tres partes caem: o grafo arquivado tem PROJECAO HUMANA VIVA e EM DIA, e o frescor FALA sobre ele (87 OK + 71 UNANCHORED). O que resta e mais estreito e continua verdadeiro: ele fica fora de docs/backlog.md, a superficie de DECISAO. Ficar fora da fila acionavel != ficar invisivel — e a diferenca entre as duas coisas era exatamente o que a objecao borrava'
-
-  - id: E_A_ATENCAO_NAO_PROTEGE_CONTRA_MORTE
-    node_type: evidence
-    plane: PROD
-    impact: 4
-    confidence: 0.9
-    status: confirmed
-    verified_at: 2026-08-29
-    verified_against: 'na amostra de 15: D_gate_oidc_dual (atencao 119.0, o TOPO absoluto da fila) esta MORTO-entregue; D_ROUTE_TO_BRIDGE (3.2, quase o piso) tambem. Mortos aparecem em toda a faixa'
-    label: 'A ORDEM DE ATENCAO NAO PROTEGE CONTRA ITEM MORTO — e isso e estrutural, nao acidente. A formula e impact x confidence x statusFactor x (1+grau): NADA nela mede idade nem frescor. Logo o topo da fila pode estar morto ha semanas e o instrumento continua o exibindo como "o que custa caro estar errado". O item de atencao 119.0 esta entregue desde o flip P7/P9. Corolario: a regua responde bem a pergunta que faz, e a pergunta que ela faz nao inclui "isto ainda existe?"'
-
-  - id: E_O_GATED_E_A_METADE_QUE_FUNCIONA
-    node_type: evidence
-    plane: PROD
-    impact: 3
-    confidence: 0.9
-    status: confirmed
-    verified_at: 2026-08-29
-    verified_against: 'os 3 itens gated da amostra (C_sota_subscription, D_QUADRO_CITACOES e o D2 do pricing) estavam TODOS parados sob controle, com gatilho intacto e nao-disparado: zero falso-positivo'
-    label: 'CONTRAPONTO MEDIDO, e ele credita a maquinaria: enquanto 60%% da amostra apodreceu, os itens GATED com gatilho nomeado tiveram ZERO falso-positivo — todos parados sob controle, todos com gatilho intacto. "Parado SOB CONTROLE != orfao" nao e retorica: e a metade da maquina que esta funcionando. O que apodrece e o item que alguem PAGOU e nao carimbou, nao o item que espera gatilho'
-
-  - id: E_CUSTO_UNITARIO_DA_REVERIFICACAO
-    node_type: evidence
-    plane: PROD
-    status: confirmed
-    impact: 4
-    confidence: 0.9
-    verified_at: 2026-08-29
-    verified_against: 'manifests dos runs wf_86d657c4-3d9 e wf_cac2ae81-4a2 (soma por agente conferida contra totalTokens)'
-    label: 'O PRECO DE RE-VERIFICAR UM NO, MEDIDO: 68.585 tokens de medicao (548.677 / 8 workers sonnet-medium) mais 70.952 de juizo adversarial (283.808 / 4 juizes opus-high) = 139.537 tokens por no com juizo fixo. Os tokens sao exatos — a soma por agente bate com o totalTokens dos dois manifests, sem overhead de orquestrador. TRES TETOS DECLARADOS, todos apontados pela revisao adversarial deste lote: (a) os 8 nos vem TODOS de um unico grafo (m2-bridge-logto-2026-07) — justamente o que a amostra anterior ja nomeava como vies; (b) o juizo opus-high fixo e 51% do custo e vem de n=4 — e uma escolha de TIERING, nao uma constante do trabalho; (c) qualquer multiplicacao disto por uma populacao e EXTRAPOLACAO, nao medicao. A 1a versao carimbava confidence 1.0 sobre um total extrapolado E sobre contagens de corpus que nao reproduziram (dizia 3.029 e 612; a recontagem independente deu 3.290 e 611, dos quais 24 sao fixtures de bancada). Tudo isso saiu: fica so o custo unitario, que reproduz.'
-    trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/'
-
-  - id: D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA
-    node_type: decision
-    drive_kind: decision
-    plane: DEV
-    status: superseded
-    impact: 4
     confidence: 0.85
-    label: 'PROPOSTA AO MAESTRO (decisao NAO-TOMADA — `drive_kind: decision`, o driver propoe, nao executa): trocar o censo por AMOSTRA ESTRATIFICADA, e so depois de curado o instrumento. (a) Estratificar por grafo e por status dissolve os vieses que o Q_CENSO nomeia sem pagar a populacao inteira. (b) O juizo adversarial deixa de ser condicional aos >30%% e vira ETAPA FIXA: foi ele, e so ele, que pegou a subcontagem de 48%% — e foi ele que reprovou ESTE lote em 8 achados ALTA. ⚠️ O item de PRE-FILTRO POR IDADE DE CARIMBO, que a 1a redacao trazia, foi RETIRADO: o preditor era circular e o no que o afirmava saiu do lote. ⚠️ E ESTA PROPOSTA NAO E SOBERANA: a mesma pergunta ja existe ABERTA no grafo de origem como `Q_CENSO_DOS_63_CORTADOS`, com o MESMO gatilho (rodar depois que a cura do schema estiver em main). Duas propostas abertas sobre re-verificacao-em-escala em dois arquivos, e o radar nao cruza arquivos — quem selar deve fechar UMA das duas, nao ambas.'
-    trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/'
+    status: open
+    verified_against: 'gatilho: F2 moat-gates UNICO — busca no F1 nao achou par para catraca-de-passivo-legado; prova de campo: 38 HARD legados tolerados num adopt real sem travar merge'
+    label: 'A peca publica do unico ativo sem par medido: ligue o gate hoje num repo que reprova, sem parar ninguem — o passivo congela e so desce. ANONIMIZADA (vendor-scrub: nome de adotante NAO entra em material publico). Draft em docs/materials; publicacao no site e ato do maestro.'
 
-  - id: D_CENSO_190_EM_LOTES
+  - id: I_RADAR_SURFACE
     node_type: decision
-    drive_kind: execution
     plane: DEV
-    status: done
-    verified_at: 2026-08-30
-    verified_against: 'CENSO COMPLETO 2026-08-30: 189/190 medidos em 7 lotes (o 190o e este proprio no), 92 mortos selados (49%), backlog 190->~100; PRs #717-#723; juiz fixo em todos os CONFIRMED; 2 REFUTED retidos para o maestro'
     impact: 5
-    confidence: 1.0
-    label: 'SELADO PELO MAESTRO 2026-08-30 (supersede D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA): executar o CENSO dos ~190 itens abertos do docs/backlog.md com o /meta:kg-freshness curado — juiz FIXO escopado aos CONFIRMED, corte declarado. EM LOTES retomaveis (o censo completo custa ~19-24M tok ao unitario medido e nao cabe numa sessao): cada lote = fan-out + juizo + checkpoint de selagem, comecando pelo topo de atencao do backlog. A decisao-mae e D_C_CENSO_190_JUIZ_EM_CONFIRMED no grafo kg-freshness-dogfood-2026-08; este no e a PONTA DE EXECUCAO na fila do drive. Entregavel final: a LISTA DOS MORTOS dos 190.'
-    trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/ (D_C_CENSO_190_JUIZ_EM_CONFIRMED)'
+    confidence: 0.8
+    status: open
+    verified_against: 'gatilho: D_META_RADAR_DESENHO (programa) + S9_q_radar_mechanism parada desde 2026-07-06'
+    label: 'Implementar /meta:radar: comando maestro-invocado com 6 eixos e baseline DATADA por eixo, staleness detectada por regra SOFT no lint (padrao REGRA 62: a maquina detecta, o humano roda), juiz-fixo, write(KG) por rodada com SUPERSEDES da baseline anterior. Path vendorizado: PR-verde fica para merge do maestro.'
+
+  - id: I_HERO_PELO_MECANISMO
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    verified_against: 'gatilho: F2 SUBESTIMADO — landing 64 dias velha vende contagens (commodity de 72h no mundo medido: headcount 803 estrelas em 3 dias) e nao cita gate/catraca/grafo uma unica vez'
+    label: 'Reescrever o hero de onionevolve.com pelo MECANISMO (gate que veta + catraca que congela passivo + radar sem-LLM), nao pelas contagens. Draft-as-PR; deploy e MOAT (ato do maestro). NAO selecionado nesta passada (max-nodes 4) — proximo censo o pega.'
 
 edges:
-  - from: I_R62_CATRACA_DE_PROJECAO
-    to: W5_GESTAO_DE_BACKLOG
+  - from: I_PROVA_PRETOOLUSE
+    to: W6_CARTEIRA_MAESTRO_VIVO
     edge_type: SUPPORTS
-  - from: I_GATILHOS_W2W3_REGISTRADOS_CEDO
-    to: W5_GESTAO_DE_BACKLOG
+  - from: I_BENCHMARK_DO_GATE
+    to: W6_CARTEIRA_MAESTRO_VIVO
     edge_type: SUPPORTS
-  - from: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
-    to: W5_GESTAO_DE_BACKLOG
+  - from: I_PECA_CATRACA
+    to: W6_CARTEIRA_MAESTRO_VIVO
+    edge_type: SUPPORTS
+  - from: I_RADAR_SURFACE
+    to: W6_CARTEIRA_MAESTRO_VIVO
+    edge_type: SUPPORTS
+  - from: I_HERO_PELO_MECANISMO
+    to: W6_CARTEIRA_MAESTRO_VIVO
+    edge_type: SUPPORTS
+  - from: E_SELO_POR_ATO_REGISTRADO
+    to: W6_CARTEIRA_MAESTRO_VIVO
+    edge_type: SUPPORTS
+  - from: I_BENCHMARK_DO_GATE
+    to: I_PROVA_PRETOOLUSE
     edge_type: DEPENDS_ON
-  - from: W5_GESTAO_DE_BACKLOG
-    to: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
-    edge_type: DEPENDS_ON
-  - from: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
-    to: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
-    edge_type: CONSTRAINS
-  - from: E_O_RELOGIO_NAO_ESTAVA_ANDANDO
-    to: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
-    edge_type: SUPPORTS
-  - from: E_A_ASSIMETRIA_ERA_INSINUACAO
-    to: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
-    edge_type: SUPPORTS
-  - from: E_O_TETO_NAO_CAUSOU_DESVIO
-    to: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
-    edge_type: SUPPORTS
-  - from: E_NENHUM_KG_YAML_JAMAIS_FOI_DELETADO
-    to: C_A_METADE_DA_PROMESSA_QUE_E_FALSA
-    edge_type: SUPPORTS
-  - from: C_A_METADE_DA_PROMESSA_QUE_E_FALSA
-    to: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
-    edge_type: CONSTRAINS
-  - from: C_A_METADE_DA_PROMESSA_QUE_E_FALSA
-    to: D_MECANIZAR_A_PROMESSA_QUE_JA_ESTA_ESCRITA
-    edge_type: CAUSES
-  - from: C_DISSENSO_ARQUIVAR_TROCA_PERDA_POR_PASSIVO
-    to: D_MECANIZAR_A_PROMESSA_QUE_JA_ESTA_ESCRITA
-    edge_type: CONSTRAINS
-  - from: C_DECRETO_DA_COLHEITA_SUBMETIDO_AO_ELENXO
-    to: C_BACKLOG_DE_DOCUMENTO_ORDENA_ITEM_MORTO
-    edge_type: SUPPORTS
-  - from: E_ARQUIVADO_TEM_PROJECAO_E_RELOGIO
-    to: C_DISSENSO_ARQUIVAR_TROCA_PERDA_POR_PASSIVO
-    edge_type: CONSTRAINS
-  - from: E_A_ATENCAO_NAO_PROTEGE_CONTRA_MORTE
-    to: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
-    edge_type: SUPPORTS
-  - from: E_O_GATED_E_A_METADE_QUE_FUNCIONA
-    to: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
-    edge_type: CONSTRAINS
-  - from: D_CENSO_190_EM_LOTES
-    to: Q_ONDA1_FECHA_COM_DELTA_DE_MORTALIDADE
-    edge_type: DEPENDS_ON
-  - from: E_A_ATENCAO_NAO_PROTEGE_CONTRA_MORTE
-    to: C_ORDEM_DO_RADAR_NAO_E_ORDEM_DE_EXECUCAO
-    edge_type: SUPPORTS
-  - from: E_CUSTO_UNITARIO_DA_REVERIFICACAO
-    to: D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA
-    edge_type: SUPPORTS
-  - from: D_CENSO_190_EM_LOTES
-    to: D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA
-    edge_type: SUPERSEDES
-  - from: E_CUSTO_UNITARIO_DA_REVERIFICACAO
-    to: D_CENSO_190_EM_LOTES
-    edge_type: SUPPORTS

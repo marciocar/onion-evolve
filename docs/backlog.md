@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**100 itens abertos** em 28 grafo(s) com aberto (de 46 no escopo) · 28 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**104 itens abertos** em 29 grafo(s) com aberto (de 46 no escopo) · 29 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 16 item(ns)
 
@@ -117,12 +117,15 @@
 | 6.0 | `Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO` | identidade-onion-vps-2026-08 | O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de m |
 | 4.8 | `Q_MAIS_UM_IMUTAVEL_GATED` | identidade-onion-vps-2026-08 | O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda d |
 
-## maestro-vivo-2026-08 — 2 item(ns)
+## fios-abertos — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 12.0 | `D_CARTEIRA_REFILL_FIOS` | maestro-vivo-2026-08 | PROPOSTA (selo do maestro): reabastecer fios-abertos (TETO 20) com a carteira derivada do confronto — os itens e gatilhos nomead |
-| 7.5 | `D_META_RADAR_DESENHO` | maestro-vivo-2026-08 | PROPOSTA (gated — implementar e decisao do maestro): superficie permanente de percepcao externa /meta:radar — maestro-invocada |
+| 13.5 | `I_PROVA_PRETOOLUSE` | fios-abertos | Provar OU corrigir a frase-moat: escrever 1 PreToolUse minimo em sandbox e MEDIR o bloqueio sob bypassPermissions (claude -p). Bar |
+| 12.8 | `I_BENCHMARK_DO_GATE` | fios-abertos | Publicar o numero que ja temos: latencia do gate completo (lint wall-time), custo de token ZERO, contagem de vetos reais capturado |
+| 8.5 | `I_PECA_CATRACA` | fios-abertos | A peca publica do unico ativo sem par medido: ligue o gate hoje num repo que reprova, sem parar ninguem — o passivo congela e so |
+| 8.0 | `I_RADAR_SURFACE` | fios-abertos | Implementar /meta:radar: comando maestro-invocado com 6 eixos e baseline DATADA por eixo, staleness detectada por regra SOFT no li |
+| 6.4 | `I_HERO_PELO_MECANISMO` | fios-abertos | Reescrever o hero de onionevolve.com pelo MECANISMO (gate que veta + catraca que congela passivo + radar sem-LLM), nao pelas conta |
 
 ## vps-shared-tools-2026-07 — 5 item(ns)
 
@@ -149,6 +152,12 @@
 | 5.0 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
+
+## maestro-vivo-2026-08 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.5 | `D_META_RADAR_DESENHO` | maestro-vivo-2026-08 | PROPOSTA (gated — implementar e decisao do maestro): superficie permanente de percepcao externa /meta:radar — maestro-invocada |
 
 ## arandek-adoption-dogfood-2026-07 — 3 item(ns)
 
