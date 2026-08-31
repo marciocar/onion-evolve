@@ -66,8 +66,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
-    verified_against: 'gatilho: F2 moat-gates veredito ERRADO — a frase-moat do CLAUDE.md (exit 2 PreToolUse barra sob bypassPermissions) tem ZERO PreToolUse no settings.json deste repo'
+    status: done
+    verified_at: 2026-08-31
+    verified_against: 'PAGO: PR #735 MERGED 2026-08-31T22:52Z — frase-moat PROVADA em sandbox sob bypassPermissions (veredito pelo filesystem), envelope declarado, emendas do Elenxo aplicadas. Objecao sobrevivente segue: core com ZERO PreToolUse (gatilho: 1o uso real)'
     label: 'Provar OU corrigir a frase-moat: escrever 1 PreToolUse minimo em sandbox e MEDIR o bloqueio sob bypassPermissions (claude -p). Barrar = a frase ganha lastro e vira demo; nao barrar = propor a reescrita ao maestro (flip de CLAUDE.md e humano). Qualquer resultado fecha o fio.'
 
   - id: I_BENCHMARK_DO_GATE
@@ -75,8 +76,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.85
-    status: open
-    verified_against: 'gatilho: F2 moat-gates VALIDADO sem numero — o mundo publica metrica (Sponsio 5000-60000x; Statewright 2/10->10/10) e nos publicamos narrativa'
+    status: done
+    verified_at: 2026-08-31
+    verified_against: 'PAGO: PR #736 MERGED 2026-08-31T22:52Z — docs/analysis/onion-gate-benchmark-2026-08.md (64 regras, 0 tokens, 84 chaves, bancada 882/884) + cura do selftest live-dependente; 2 celulas corrigidas pelo Elenxo antes do merge'
     label: 'Publicar o numero que ja temos: latencia do gate completo (lint wall-time), custo de token ZERO, contagem de vetos reais capturados, tamanho da bancada. docs/analysis + no de evidencia no grafo do programa.'
 
   - id: I_PECA_CATRACA
