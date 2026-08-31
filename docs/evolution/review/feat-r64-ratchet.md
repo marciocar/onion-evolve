@@ -3,7 +3,7 @@ title: "Revisão — R64 ganha catraca: o 1º update de adotante mediu 38 HARD l
 date: 2026-08-31
 branch: feat/r64-ratchet
 reviewer: "dogfood da bancada 5/5 (incl. paridade emissor↔lint POR EXECUÇÃO e o caso de crescimento, que a 1ª redação media pelo conteúdo que a mensagem não carrega — pego pela própria bancada)"
-reviewed_diff_sha256: f2bcf7caed027152784a40736970a8bf373d53fd3dc4ffc70321eb7142803496
+reviewed_diff_sha256: 73baa2474d7b86393a11a2c9cef8f61437077b338bb99e0738e981d264b634a6
 findings_total: 2
 findings_real: 2
 verdict: APROVADO
