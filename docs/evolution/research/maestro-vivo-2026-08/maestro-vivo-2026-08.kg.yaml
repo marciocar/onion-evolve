@@ -565,6 +565,17 @@ nodes:
     label: 'I_BENCHMARK_DO_GATE pago: o numero substituiu a narrativa (docs/analysis/onion-gate-benchmark-2026-08.md). Brinde do dogfood: medir a bancada expos um selftest que dependia do vivo estar no teto — curado (fixture enche ate teto+1 lido do proprio arquivo).'
     trace: "docs/analysis/onion-gate-benchmark-2026-08.md"
 
+  - id: E_PECA_CATRACA_REDIGIDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-08-31
+    verified_against: 'draft completo em docs/materials/catraca-passivo-legado-piece-2026-08.md; varredura de nomes de adotante = 0 ocorrencias (vendor-scrub respeitado); numeros vem do benchmark medido no mesmo dia'
+    label: 'I_PECA_CATRACA pago (draft): a peca publica do ativo sem par — ligue o gate hoje num repo que reprova; caso real anonimizado (38 legados congelados, 0 merge travado). PUBLICAR no site e ato do maestro (status DRAFT-PARA-PUBLICACAO no frontmatter).'
+    trace: "docs/materials/catraca-passivo-legado-piece-2026-08.md"
+
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
     to: Q_MAESTRO_VIVO
@@ -708,5 +719,8 @@ edges:
     to: C_ERRA_O_EXIT_2_DETERMINISTICO_DE_HOOK_COMO_A_C
     edge_type: SUPPORTS
   - from: E_BENCHMARK_DO_GATE_PUBLICADO
+    to: C_TESE_MOAT_GATES
+    edge_type: SUPPORTS
+  - from: E_PECA_CATRACA_REDIGIDA
     to: C_TESE_MOAT_GATES
     edge_type: SUPPORTS
