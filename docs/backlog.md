@@ -112,10 +112,10 @@
 |--:|---|---|---|
 | 12.0 | `Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO` | identidade-onion-vps-2026-08 | ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. Medido em `/home/marcio/onion-adopt-arandek/dock |
 | 12.0 | `Q_LACUNA_DECISAO_MAIS_CODIGO` | identidade-onion-vps-2026-08 | A OPORTUNIDADE, e ela e de diferenciacao e nao de divida. A pesquisa nao achou NENHUM sistema publico que una grafo de DECISAO e g |
-| 10.0 | `Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO` | identidade-onion-vps-2026-08 | SUPERSEDE [Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO] com a verdade MEDIDA na 1a prova real: o OFFSITE NUNCA EXISTIU. Em 08-13 a M |
 | 9.5 | `E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO` | identidade-onion-vps-2026-08 | O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotan |
 | 8.1 | `Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO` | identidade-onion-vps-2026-08 | A guarda `vps-exposure-check.sh` cobre o lado de CA (bind publico em container vivo, conector upstream, backup em claro) e roda di |
 | 6.0 | `Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO` | identidade-onion-vps-2026-08 | O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de m |
+| 4.8 | `Q_MAIS_UM_IMUTAVEL_GATED` | identidade-onion-vps-2026-08 | O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda d |
 
 ## vps-shared-tools-2026-07 — 5 item(ns)
 

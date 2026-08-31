@@ -366,13 +366,22 @@ nodes:
   - id: Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO
     node_type: question
     plane: PROD
-    status: open
+    status: done
     impact: 5
     confidence: 1.0
-    verified_at: 2026-08-30
-    verified_against: "prova real executada 2026-08-30 apos destrave do GPG: offsite-cron.sh rc=5 — o guard anti-local barrou; valor de onion/restic-repo tem 12 chars sem esquema remoto e E IDENTICO ao de onion/restic-password"
+    verified_at: 2026-08-31
+    verified_against: "PROVA REAL EXECUTADA 2026-08-31: maestro forneceu a Global API Key (pass onion/cloudflare-api-token); account-ID descoberto via API; bucket pre-existente onion-vps-backup reutilizado (o que eu criei foi removido); snapshot 81a0846f ENVIADO ao R2 e conferido do lado remoto; prova de restauracao devolveu 95 arquivos com integridade verificada, no errors; cron diario 13:00 UTC armado"
     label: "SUPERSEDE [Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO] com a verdade MEDIDA na 1a prova real: o OFFSITE NUNCA EXISTIU. Em 08-13 a MESMA string entrou nos DOIS campos do pass (restic-repo E restic-password) — o restic tratou a senha como CAMINHO, criou um repo LOCAL com esse nome (o diretorio acidental, ja renomeado para restic-local-acidental-2026-08-13) e o 1o backup real foi para o mesmo disco. O mecanismo em si esta PROVADO NA DIRECAO DA FALHA: cron armado, wrapper fail-loud, e o guard anti-local barrou exatamente o que devia (rc=5, nada enviado). FALTAM DOIS INSUMOS QUE SO O MAESTRO TEM: (1) o destino real — pass insert onion/restic-repo com esquema remoto (as chaves R2 ja existem no pass; conta/bucket sao dado dele; o script recomenda destino com imutabilidade do lado do servidor); (2) a decisao sobre a senha exposta como nome de diretorio desde 08-13 — a cura de classe seria rotacao, que esta PARADA POR ORDEM do maestro: registrado, nao proposto. Com o insumo (1), a prova roda no ato."
     trace: "/home/marcio/onion-vps-vaultwarden/offsite-cron.sh · logs/offsite-cron.log"
+
+  - id: Q_MAIS_UM_IMUTAVEL_GATED
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda do host) mas nao protege contra credencial roubada apagando o remoto — a limitacao conhecida do Object Lock com restic. A evolucao decidida com o maestro (2026-08-31): rsync.net (snapshot ZFS server-side) como segundo destino via restic copy, SEM retrabalho. GATILHO: o maestro contratar a conta — decisao de custo dele, sem urgencia; o risco coberto por este gate e o mais raro da matriz."
+    trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh (recomendacoes de destino no cabecalho)"
 
 edges:
   - from: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
@@ -468,3 +477,6 @@ edges:
   - from: Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO
     to: Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO
     edge_type: SUPERSEDES
+  - from: Q_MAIS_UM_IMUTAVEL_GATED
+    to: Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO
+    edge_type: TRACES_TO
