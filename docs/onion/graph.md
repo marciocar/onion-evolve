@@ -636,7 +636,7 @@ pmbok-specialist	related	product-agent
 pmbok-specialist	related	security-information-master	
 poc-venda-direta-pdi	adopts	onion-evolve	
 poc-venda-direta-pdi	mode	greenfield	
-poc-venda-direta-pdi	pin	b9580a520e5b	
+poc-venda-direta-pdi	pin	219e9a5f365b	
 poc-venda-direta-pdi	specialization	compliance-nda	
 poc-venda-direta-pdi	specialization	document-comparison	
 poc-venda-direta-pdi	specialization	greenfield-adoption	
