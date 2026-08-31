@@ -44,12 +44,26 @@ exit 0
 A verificação é pelo **estado do filesystem**, não pela mensagem do modelo: o arquivo do caso
 proibido não existe; o do controle existe. Bloqueio de AÇÃO, não conselho.
 
+## Envelope testado (e o que NÃO foi)
+
+Provado: sessão com cwd no project dir, hook de projeto confiado, matcher `Bash`, marcador
+literal. NÃO testados (declarado): sessão iniciada fora do project dir (settings de projeto nem
+carregam), `--settings <arquivo>`, repo antes do aceite de confiança, e contorno do matcher por
+codificação (base64/python) — o hook de string-match é demo, não política; política real compara
+INTENÇÃO estruturada (tool_input), não substring.
+
+Artefatos commitados (re-executável): `docs/evolution/research/maestro-vivo-2026-08/data/pretooluse-sandbox/`.
+
 ## O que muda
 
 - A frase do CLAUDE.md **ganha lastro medido** — nenhuma reescrita necessária. O veredito ERRADO
   do F2 acertou no diagnóstico (capacidade não-exercitada) e a cura proposta (provar) foi executada
   no mesmo ciclo; o nó do confronto permanece como história.
-- O sandbox acima é a **demo pública** mais barata do moat: 15 linhas reproduzem o bloqueio.
+- O sandbox acima é a demo mais barata do **substrato** — o primitivo existe e barra; o MOAT é o
+  que se constrói sobre ele, e o F1/E5 mostra que outros já constroem sobre o mesmo primitivo
+  (FailproofAI, 1,6k★, 12 harnesses). A frase do CLAUDE.md ganha lastro na metade "a capacidade
+  existe e barra sob bypass"; a metade "compra o acoplamento" segue sustentada só pelo conjunto
+  (catraca+radar+bancada), não por este primitivo isolado. (Emenda do Elenxo da passada.)
 - Fica aberto (gatilho nomeado no grafo): usar PreToolUse de verdade no core — o primeiro caso de
   uso real (ex.: barrar troca de modelo via PreModelSwitch, ou push forçado) fecha a distância
   entre provado-em-sandbox e exercitado-em-produção.

@@ -551,8 +551,8 @@ nodes:
     confidence: 1.0
     verified_at: 2026-08-31
     verified_against: 'claude -p --dangerously-skip-permissions em sandbox: comando com marcador proibido BLOQUEADO (exit 2 do PreToolUse; prova.txt ausente) e controle PASSOU (controle.txt criado) — veredito pelo filesystem, nao pela mensagem'
-    label: 'MEDIDO 2026-08-31: o exit 2 de PreToolUse barra a acao SOB bypassPermissions — a frase-moat do CLAUDE.md e VERDADEIRA e agora exercitada. O veredito ERRADO do confronto acertou o diagnostico (nunca-exercitada) e a cura (provar) fechou no mesmo dia. Aberto com gatilho: 1o uso REAL de PreToolUse no core fecha a distancia sandbox->producao.'
-    trace: "docs/analysis/pretooluse-proof-2026-08.md"
+    label: 'MEDIDO 2026-08-31: o exit 2 de PreToolUse barra a acao SOB bypassPermissions — a metade 'barra sob bypass' da frase-moat e VERDADEIRA e exercitada; a metade 'compra o acoplamento' se sustenta pelo CONJUNTO, nao pelo primitivo (Elenxo da passada: FailproofAI produtiza o mesmo primitivo). O veredito ERRADO do confronto acertou o diagnostico (nunca-exercitada) e a cura (provar) fechou no mesmo dia. Aberto com gatilho: 1o uso REAL de PreToolUse no core fecha a distancia sandbox->producao.'
+    trace: "docs/analysis/pretooluse-proof-2026-08.md · docs/evolution/research/maestro-vivo-2026-08/data/pretooluse-sandbox/OBSERVADO.md"
 
   - id: E_BENCHMARK_DO_GATE_PUBLICADO
     node_type: evidence
@@ -573,7 +573,7 @@ nodes:
     confidence: 0.9
     verified_at: 2026-08-31
     verified_against: 'draft completo em docs/materials/catraca-passivo-legado-piece-2026-08.md; varredura de nomes de adotante = 0 ocorrencias (vendor-scrub respeitado); numeros vem do benchmark medido no mesmo dia'
-    label: 'I_PECA_CATRACA pago (draft): a peca publica do ativo sem par — ligue o gate hoje num repo que reprova; caso real anonimizado (38 legados congelados, 0 merge travado). PUBLICAR no site e ato do maestro (status DRAFT-PARA-PUBLICACAO no frontmatter).'
+    label: 'I_PECA_CATRACA pago (draft, REPROVADO pelo Elenxo na 1a versao e emendado na mesma passada: recorte declarado — catraca e arte consolidada em analise estatica; o sem-par e aplica-la a regras de doutrina/agente) — ligue o gate hoje num repo que reprova; caso real anonimizado (38 legados congelados, 0 merge travado). PUBLICAR no site e ato do maestro (status DRAFT-PARA-PUBLICACAO no frontmatter).'
     trace: "docs/materials/catraca-passivo-legado-piece-2026-08.md"
 
   - id: E_RADAR_SURFACE_CONSTRUIDA
@@ -586,6 +586,17 @@ nodes:
     verified_against: 'comando .claude/commands/meta/radar.md + REGRA 65 no lint (provada nos 4 modos: fresco/velho/ilegivel/vazio) + bancada run_radar_staleness_selftests 4/4 + baseline seed datada de hoje (rodada 0 = o F1 do programa); path vendorizado — merge e do maestro'
     label: 'I_RADAR_SURFACE construida ate PR-verde: /meta:radar (maestro-invocado, W7 intacto) + REGRA 65 (a maquina detecta a idade, o humano roda) + baselines datadas dos 6 eixos seedadas com a rodada 0. D_META_RADAR_DESENHO segue open ate o merge do maestro selar a superficie.'
     trace: ".claude/commands/meta/radar.md · docs/onion/radar-baselines.yaml"
+
+  - id: E_ELENXO_DA_PASSADA_ONDA6
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-08-31
+    verified_against: 'refutador opus/high sobre as 4 entregas, mandato REFUTAR: prova SUSTENTADA-COM-EMENDAS, benchmark SUSTENTADO-COM-EMENDAS (2 celulas factualmente erradas), peca REPROVADA (republicou veredito ja derrubado no f2-confronto.json:327), radar SUSTENTADO-COM-EMENDAS (date -d GNU-only virava HARD contra o artefato). TODAS as emendas aplicadas na mesma passada'
+    label: 'Objecoes SOBREVIVENTES preservadas: (1) o defeito acoplamento-declarado-nao-usado NAO esta curado — settings.json do core segue com ZERO PreToolUse (a prova foi em sandbox; gatilho: 1o uso real); (2) provar o primitivo nao prova o moat — FailproofAI produtiza o mesmo primitivo em 12 harnesses; (3) a bancada vendorizada exercita a REGRA 65 no adotante mesmo sem o arquivo (por isso degrade SOFT); (4) baseline sem granularidade de lacuna ganhou o campo descartes; (5) os 5 vetos/dia sao testemunho nao-reproduzivel — rebaixados no doc.'
+    trace: "docs/evolution/review/feat-meta-radar-surface.md"
 
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
@@ -737,4 +748,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_RADAR_SURFACE_CONSTRUIDA
     to: D_META_RADAR_DESENHO
+    edge_type: SUPPORTS
+  - from: E_ELENXO_DA_PASSADA_ONDA6
+    to: C_TESE_MOAT_GATES
     edge_type: SUPPORTS
