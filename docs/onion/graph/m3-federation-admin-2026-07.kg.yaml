@@ -18,6 +18,8 @@ nodes:
     impact: 5
     confidence: 0.8
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED — ver E_CENSO0901_D_spec_now_build_gated (SUPERSEDES); label preservado como historia'
     label: "SPEC-agora / BUILD-gated — especificar o command-side (mutação de members.yaml) + modelo de auth (Logto Organizations) SEM construir; o build só liga no gatilho objetivo. Read-model já existe e basta ao operador-único de hoje"
 
   # ---- GATILHO + TENSÕES (question) ----
@@ -154,6 +156,8 @@ nodes:
     impact: 3
     confidence: 0.6
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED — ver E_CENSO0901_C_p4_gate_visibility (SUPERSEDES); label preservado como historia'
     label: "REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e trilha acima de velocidade'. Serve do que existe, sem prometer isolamento/classificação por sensibilidade (D2/L1-L6, gated)"
   - id: C_p3_self_service
     node_type: claim
@@ -357,6 +361,26 @@ nodes:
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — Lido o nó completo (linhas 161-169) e seu contexto no grafo (D_spec_now_build_gated, Q_gat'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O conteúdo do claim (P3 SHOULD-condicional, gated por D2) continua factualmente certo hoje, mas o MECANISMO de gate a que ele pertence morreu por substituição: o ADR 2026-08 (onion-adr-hosted-service-identity) refuta formalmente o irmão C_naive_admin_platform desta mesma spec e decreta que a spec in'
 
+  - id: E_CENSO0901_D_spec_now_build_gated
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 5/5 — Li o nó completo (label linha 13-21) + trace (docs/analysis/onion-m3-federation-admin-spec'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: A postura central ("build só liga no gatilho objetivo") foi parcialmente superada pela prática: OP-1 (mutação real de members.yaml) foi construído e endurecido em CI (REGRA 66) sem o gatilho técnico nomeado (1º T2 real OU 1º contrato em contracts/) ter disparado — ambos seguem em zero hoje. O que so'
+
+  - id: E_CENSO0901_C_p4_gate_visibility
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 2/2 — Lido o nó completo (linhas 149-157) e seu contexto no grafo: edge C_p4_gate_visibility SUP'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó não está errado nem foi entregue — foi SUPERSEDIDO no mecanismo: o gate a que ele pertencia (D_spec_now_build_gated / Q_gatilho técnico de 2026-07) foi substituído pelo ADR de 2026-08 por um gate de negócio explícito e mais barato de checar ("≥1 federado no Logto consumindo recurso hospedado").'
+
 edges:
   # o GAP motiva o spec; a decisão é registrada no artefato
   - from: C_command_side_gap
@@ -486,4 +510,10 @@ edges:
     edge_type: SUPERSEDES
   - from: E_CENSO0901_C_p3_agg_view
     to: C_p3_agg_view
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_D_spec_now_build_gated
+    to: D_spec_now_build_gated
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_C_p4_gate_visibility
+    to: C_p4_gate_visibility
     edge_type: SUPERSEDES

@@ -875,9 +875,10 @@ nodes:
     impact: 4
     confidence: 0.9
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 3/3 claims; juiz APROVADO. grep -n "visibility" docs/evolution/federation/members.yaml (contagem de ocorrên => 3 claims medidos: (1) site/public/federacao/ continua um snapshot estático (index.html + federation-…'
     label: "site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nada impede religar graph.sh --map para a superficie publica e publicar membros sem visibilidade publica — incluindo cliente sob NDA. GATILHO NOMEADO: qualquer retomada de regeneracao de /federacao/ (ou refresh do snapshot) exige ANTES (a) campo visibility: public|private no members.yaml e (b) regra de lint que reprove projecao publica de membro nao-public. Ate la, o snapshot congelado E o estado seguro"
     trace: "docs/evolution/review/feat-site-reform-f0-deploy.md (R3, NOVO-4); site/README.md §federacao"
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. grep -c "visibility" docs/evolution/federation/members.yaml (=0); grep -rln "vis => members.yaml SEM campo visibility (grep=0, confirma o verified_against original de 08-25 ainda vale …'
 
   - id: Q_TESTEMUNHO_NAO_MEDIVEL_0804
     node_type: question
@@ -886,6 +887,8 @@ nodes:
     impact: 4
     confidence: 0.5
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 5/5 claims; juiz APROVADO. 1) Lido o nó completo (linhas 882-890) e as 2 edges DEPENDS_ON (linhas 1308-1313 => O nó afirma 5 coisas: (1) nós TESTEMUNHO (verified_against: relato-do-maestro-*) são estruturalmente…'
     label: "nos da classe TESTEMUNHO (verified_against: relato-do-maestro-*) sao estruturalmente nao-re-verificaveis por maquina: afirmam INTENCAO ('proposito de negocio') ou fato de campo fora do repo ('alunos reais usaram'), e a unica checagem disponivel — o texto que codificou o relato — e circular. Hoje eles passam nos tres vereditos do radar exibindo carimbo fresco, indistinguiveis de um no medido. Precisam de marcador proprio (ex.: evidence_class: testimony) para o radar parar de trata-los como mensuraveis?"
     trace: "/meta:kg-freshness 2026-08-04 — 2 de 16 nos vieram UNVERIFIABLE por esta razao, ambos de alta atencao (E_PORTE_PARA_O_CURSO 20.0, D_CLAUDE_CODE_POR_CAPACIDADE 15.0)"
 
@@ -896,6 +899,8 @@ nodes:
     impact: 4
     confidence: 0.9
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 7/7 claims; juiz APROVADO. 1) Leitura completa do nó (linhas 892-900) e contagem de afirmações no label: (C => Os 3 números seguem inexistentes em todo o repo: nenhum grep por custo-de-porte/capacidades-perdidas…'
     label: "A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara que Claude-Code-only foi 'conclusao de experimento real, nao restricao de nascenca', e a decisao de 2026-05-18 e citada como FECHADA. Mas TRES numeros nunca existiram: (1) o CUSTO DO PORTE — quanto custou portar para Cursor/Antigravity/Codex, em tempo e retrabalho; (2) O QUE SE PERDEU ao parar de gastar energia com agnosticismo — quais capacidades ficaram para tras, nominalmente; (3) o CUSTO DE SAIR — o que custaria hoje reverter o acoplamento, que e o unico numero capaz de transformar o TESTE DO TERRENO ALUGADO ('so vale construir em terreno alugado se gerar mais valor do que preparar terreno proprio') de intuicao em conta. A razao de abandono foi QUALITATIVA — e isso nao e defeito da decisao, e defeito do REGISTRO. Consequencia observada: cada rodada de identidade/portabilidade redescobre esta lacuna do zero, ao menos duas vezes ate aqui (2026-08-02 e 2026-08-06). ESTE NO NAO PEDE A MEDICAO — pede que a lacuna pare de ser invisivel. Vizinho de Q_TESTEMUNHO_NAO_MEDIVEL_0804, mas nao o mesmo: la o problema e ser nao-re-verificavel por maquina; aqui o numero nunca foi produzido por ninguem, nem uma vez"
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
 

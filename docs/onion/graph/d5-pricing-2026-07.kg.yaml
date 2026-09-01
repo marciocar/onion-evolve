@@ -17,6 +17,8 @@ nodes:
     impact: 5
     confidence: 0.65
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 4/4 claims; juiz APROVADO. Lido o nó D_D5 inteiro (label + 4 edges SUPPORTS de claims + edge SUPPORTS de A_ => decisions.md §D5 segue rotulado `parcialmente ratificado (2026-07-29)` — idêntico ao status:open do …'
     label: "D5 — preço por camada (escada treino→certificação→compliance-pack→SOTA). Blend A+B: degraus 1-2 vendíveis-já (comparável direto); degraus 3-4 sob-consulta (gated D6/D2). Diretriz: ticket premium ($129+) > pipoca ($5-10); vender selo/curadoria, não o texto; preço-por-outcome só após instrumentar. Quem decide os números = maestro"
 
   # ---- CLAIMS DE PREÇO POR CAMADA (SUPPORTS D_D5) ----
@@ -164,6 +166,8 @@ nodes:
     impact: 3
     confidence: 0.55
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 3/3 claims; juiz APROVADO. Lido o nó inteiro (label, trace ausente — herda decisions.md via edge TRACES_TO→ => A decisão do maestro em 2026-07-29 (decisions.md D5) fixou preços dos degraus 1 e 2 separadamente, m…'
     label: "Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento de percepção de valor entre dia-avulso ($1.8-3k) e cert inicial (~$1.25k). Só instrumentando 3+ engajamentos se confirma que não colidem. Decisão do maestro"
 
   # ---- ENTIDADE — a diretriz D5 que rege toda a escada ----

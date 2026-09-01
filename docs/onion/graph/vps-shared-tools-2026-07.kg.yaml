@@ -187,6 +187,8 @@ nodes:
     status: open
     impact: 2
     confidence: 1.0
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED — ver E_CENSO0901_Q_tunneling (SUPERSEDES); label preservado como historia'
     label: "PESQUISA+ELENXO: ngrok × Cloudflare Tunnel × Tailscale Funnel × Caddy-so. Para QUE (dev-preview? webhook inbound? exposicao efemera de adotante sem servidor?) — o caso-de-uso decide; ligar ao downstream-by-pull ja desenhado (adotante sem servidor)"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
@@ -220,7 +222,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-08-06
+    verified_at: 2026-09-01
     verified_against: dissent-do-juiz-elenxo+m8-serial-2026-08-reverificado
     label: "DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como dado. O catalogo-puro trata Logto como 'so mais uma entrada' e nao tem lar limpo p/ 'auth e o chao comum'. SE a divida de integracao ponto-a-ponto se acumular, o catalogo pode pagar MAIS que uma fina camada de auth compartilhada. NAO vira o veredito: (a) Logto=projecao de members.yaml ja da lar doutrinario (nao camada nova); (b) a cura, se morder, e UMA composicao de auth-compartilhada PUXADA pela propria demanda — ainda catalogo-nativa, pull-driven, nunca plataforma preemptiva"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
@@ -391,6 +393,16 @@ nodes:
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — 1) Leitura do nó (linhas 257-264) e do irmão ENT_tunneling (linhas 94-104, já status:super'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pedia decidir, na F1, se tunneling era SDAAL-candidato ou script-gated entre 3 providers concretos (ngrok/Cloudflare Tunnel/Tailscale). A pesquisa F2b (stack-harmonia-2026-08, 08-01) respondeu de forma que torna a pergunta original mal-colocada: nenhum dos 3 providers é necessário — "tunneling"'
 
+  - id: E_CENSO0901_Q_tunneling
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 3/3 — Leitura do nó Q_tunneling (linhas 184-191) + dos nós-irmãos já selados nesta mesma passada'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede pesquisa+Elenxo comparando 4 providers concretos para decidir "para quê" e ligar ao downstream-by-pull. O vivo superou: a pesquisa (F2b-pesquisa-tunneling, 2026-08-01) já rodou e concluiu que a pergunta estava mal-colocada — "tunneling" nem é a capacidade certa (é "ingresso autenticado", j'
+
 edges:
   # o LibreChat entra como CONSUMIDOR do catalogo (Logto/Caddy), sob o framing decidido
   - from: E_librechat_install_started
@@ -487,4 +499,7 @@ edges:
     edge_type: SUPERSEDES
   - from: E_CENSO0901_C_axis_tunneling
     to: C_axis_tunneling
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_Q_tunneling
+    to: Q_tunneling
     edge_type: SUPERSEDES

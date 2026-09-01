@@ -547,7 +547,7 @@ nodes:
     node_type: question
     layer: audit
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: 2026-09-01
     verified_against: medido-pelo-6o-elenxo-gate-falso-de-5s-health-foi-de-9-6ms-a-3-99s-durante-um-unico-post-a2a
     status: open
     impact: 4

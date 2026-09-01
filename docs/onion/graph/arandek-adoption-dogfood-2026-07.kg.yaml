@@ -351,6 +351,8 @@ nodes:
     impact: 2
     confidence: 0.5
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 1/1 claims; juiz APROVADO. Lido o nó inteiro (linhas 347-354) e a aresta CONSTRAINS para D_GREP_OLD_PIN (li => A pergunta ("vale medir quantos artefatos derivados citam pin antes de implementar D_GREP_OLD_PIN") …'
     label: "FRONTEIRA DECLARADA PELO PROPRIO ADOTANTE (R15.2 — registrada como observacao, nao como pedido): 'pode ser que o custo nao compense para uma classe de erro que so morde quem escreve frontmatter a mao'. Vale medir quantos artefatos derivados citam pin nos adotantes reais antes de implementar"
 
   - id: E_CENSO0901_Q_ARANDEK_UPDATE

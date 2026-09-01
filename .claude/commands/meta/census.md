@@ -53,7 +53,7 @@ allowed-tools: Bash, Read, Write, Edit, Task, Workflow
 ## Seção obrigatória do relatório: `valeu-a-pena`
 
 tokens REAIS (da notificação do run) ÷ nós medidos, comparado ao histórico
-(2026-08-30: ~68k/nó · 2026-09-01: ~74k/nó). Regressão de custo/nó é ACHADO do relatório, não
+(2026-08-30: ~68k/nó · 2026-09-01 revisão: ~74k/nó · 2026-09-01 rodada-1 do comando: ~80k/nó — 1.768.062÷22, JUIZ INCLUSO). Regressão de custo/nó é ACHADO do relatório, não
 rodapé — e recalibra o `price_per_node` da próxima invocação (atualize este doc).
 
 ## Referências
