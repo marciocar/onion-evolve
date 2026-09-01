@@ -10668,7 +10668,7 @@ run_members_registry_selftests() {
 
   # (b) registro INVÁLIDO reprova HARD nomeando o rc do validador
   local d; d="$(mktemp -d)"
-  printf 'members:\n  - id: quebrado\n' > "$d/bad.yaml"
+  printf '# Registro de membros da co-evolução Onion (fixture)\nmembers:\n  - id: quebrado\n' > "$d/bad.yaml"
   rc=0; out="$(ONION_MEMBERS_FILE="$d/bad.yaml" bash "${lint}" --only=docs/evolution/federation/members.yaml 2>&1)" || rc=$?
   if printf '%s' "${out}" | grep -q 'REGRA 66: registro da federação INVÁLIDO' && [ "${rc}" -ne 0 ]; then
     record_pass "members-registry: (b) registro inválido é HARD com rc do validador"

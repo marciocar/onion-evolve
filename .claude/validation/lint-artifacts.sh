@@ -3618,6 +3618,16 @@ check_kg_verification_coverage
 check_members_registry() {
   local mf="${ONION_MEMBERS_FILE:-${REPO_ROOT}/docs/evolution/federation/members.yaml}"
   [ -f "${mf}" ] || return 0
+  # Escopo por MARCADOR do registro real (1ª linha do vivo): sandboxes de OUTRAS famílias da
+  # bancada fabricam members.yaml sintético e a 66 disparava dentro deles (medido 2026-09-01:
+  # a mensagem citou o id da fixture e reprovou a família outbox). Trade-off declarado: remover
+  # o marcador desliga o gate — evasão visível em diff; o CI de members segue como 2ª camada.
+  grep -q "Registro de membros da co-evolução" "${mf}" || return 0
+  # Core-only pelo PAPEL, não só pelo dado: quem carrega .claude/.onion-version é adotante (ou
+  # sandbox de bancada que se declara adotante) — o registro da federação é responsabilidade do
+  # CORE; fora dele, silêncio. Fecha o disparo dentro de sandboxes que APPENDAM fixtures ao
+  # members real copiado (2ª rodada do mesmo incidente de 2026-09-01).
+  [ -f "${REPO_ROOT}/.claude/.onion-version" ] && return 0
   local mv="${SCRIPT_DIR}/members-validate.sh"
   if [ ! -f "${mv}" ]; then
     violation "HARD" "${mf}" "REGRA 66: members.yaml presente mas members-validate.sh AUSENTE — a guarda não sabe cobrar; fail-loud, nunca conformidade por ausência"
