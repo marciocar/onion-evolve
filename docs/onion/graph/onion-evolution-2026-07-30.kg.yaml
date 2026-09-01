@@ -71,6 +71,8 @@ nodes:
     impact: 2
     confidence: 0.7
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED — ver E_CENSO0901_C_d3_comment_dup (SUPERSEDES); label preservado como historia'
     label: "D3/opportunistic: template de comentário Unicode duplicado entre product/task.md e product/feature.md (~40 linhas). Padrão: common/prompts/ snippet (formatação é implementação, não decisão)"
     trace: ".claude/commands/product/{task,feature}.md"
   - id: C_d7_discussion_links
@@ -139,6 +141,16 @@ nodes:
     label: "REFUTA [C_d7_discussion_links]: a 'convencao de links absolutos do .claude/' que o no dizia divergida NAO EXISTE — a SSOT (docs/meta-specs/code-standards.md par.2.5) manda exatamente o OPOSTO ('sempre paths relativos, nao absolutos') e a pratica dos 55 arquivos de .claude/commands/ e 100%% relativa. Os docs de discussao estavam CONFORMES; a divergencia era com uma regra imaginada. Selado REFUTED pelo maestro em 2026-08-30."
     trace: "docs/meta-specs/code-standards.md"
 
+  - id: E_CENSO0901_C_d3_comment_dup
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 2/2 — Lido o nó (label linha 74, trace linha 75). Medido o trace verbatim: `sed -n ''190,270p'' '
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: A claim original ("~40 linhas de template Unicode duplicado entre task.md e feature.md") não sobrevive à medição: task.md foi refatorado (não se sabe por qual PR exato — não é o #504, que tratou de estimativa) para uma nota curta que delega formatação ao adapter; feature.md ficou para trás, ainda em'
+
 edges:
   - from: D_veredito_saudavel
     to: Q_saude_do_framework
@@ -179,3 +191,6 @@ edges:
   - from: E_no_absolute_link_convention
     to: C_d7_discussion_links
     edge_type: REFUTES
+  - from: E_CENSO0901_C_d3_comment_dup
+    to: C_d3_comment_dup
+    edge_type: SUPERSEDES

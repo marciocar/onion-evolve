@@ -55,6 +55,12 @@ def stamp(t, nid, vag):
     if 'verified_at:' in blk:
         blk = re.sub(r'verified_at:\s*\S+', f'verified_at: {HOJE}', blk, count=1)
         blk = re.sub(r"verified_against:\s*(?:'(?:[^']|'')*'|\"[^\"]*\")", f"verified_against: '{vag}'", blk, count=1)
+        # DEDUPE (lei do carimbo, 2ª mordida 2026-09-01): rodadas sucessivas deixavam pares extras
+        # (o radar reprova verified_against repetido) — só o PRIMEIRO par sobrevive.
+        for pat in (r"\n\s*verified_against:\s*(?:'(?:[^']|'')*'|\"[^\"]*\")", r'\n\s*verified_at:\s*\S+'):
+            ms = list(re.finditer(pat, blk))
+            for m in reversed(ms[1:]):
+                blk = blk[:m.start()] + blk[m.end():]
         return t[:i] + blk + t[j:], True
     k = blk.find('\n    label:')
     if k < 0: return t, False

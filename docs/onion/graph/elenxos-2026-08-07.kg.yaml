@@ -190,7 +190,7 @@ nodes:
     status: open
     impact: 4
     confidence: 1.0
-    verified_at: 2026-08-07
+    verified_at: 2026-09-01
     verified_against: uma-unica-peca-executavel-em-utils-forge
     label: "ABERTO: a F4 abriu a primeira peca EXECUTAVEL dentro de `.claude/utils/forge/` — necessaria porque um step de Actions e shell puro e nao ha LLM para ler a spec. A regra declarada no README e 'materializar so o que tem consumidor nao-LLM MEDIDO', e hoje isso e um (o CI). Mas a fronteira e opiniao ate ser testada: qual e o gatilho para a 2a? E se forem 5, o SDAAL virou codigo com documentacao ao lado, que e o oposto do que a KB do padrao declara"
 

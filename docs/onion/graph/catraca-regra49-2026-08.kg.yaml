@@ -277,7 +277,7 @@ nodes:
     status: open
     impact: 5
     confidence: 1.0
-    verified_at: 2026-08-08
+    verified_at: 2026-09-01
     verified_against: emit-baseline-identico-ao-baseline-versionado-logo-o-laco-nunca-executou
     label: "As CINCO classes novas nao tem NENHUMA cobertura de campo. `--emit-baseline` e hoje identico ao baseline versionado, logo o laco da guarda de direcao nunca executou no corpus real, nem uma vez — toda a evidencia e sintetica. O primeiro no que sair do baseline de verdade, via `/meta:kg-freshness`, e o PRIMEIRO dogfood real desta guarda, e e ai que ela vale ou cai. O verde do CI nao substitui essa medicao, e este no existe para nao deixar que substitua."
     trace: ".claude/validation/kg-verification-baseline.txt"
@@ -418,6 +418,16 @@ nodes:
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — git log --oneline -- .claude/validation/kg-verification-coverage.sh (histórico completo do'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A parte histórica do claim (duas classes confirmadas eram a mesma classe reaparecendo em campo diferente) segue verdadeira e já está registrada (edges SUPPORTS de E_O_FECHO_ERA_FALSO_TRES_ROTAS_ABERTAS e Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE, este último já `done`). Mas a PREVISÃO que o nó existe para'
 
+  - id: E_CENSO0901_Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 4/4 — git log --oneline -- .claude/validation/kg-verification-baseline.txt (achei 88099af3 e e86'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: A premissa central ("toda a evidência é sintética"; "o laço nunca executou no corpus real, nem uma vez") está morta: 3 dogfoods reais já ocorreram desde 2026-08-08 — REMOVIDO (08-24, <membro>), CARIMBADO (08-27, D_linha_vermelha) e mais 13 saídas medidas (09-01) — todos registrados NO PRÓPRIO grafo '
+
 edges:
   # o defeito e a forma da cura
   - from: E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS
@@ -556,4 +566,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_CENSO0901_C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_
     to: C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_
+    to: Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES
     edge_type: SUPERSEDES
