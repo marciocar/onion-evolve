@@ -3,7 +3,7 @@ title: "Revisão — peça pública da catraca (draft anonimizado)"
 date: 2026-08-31
 branch: feat/ratchet-public-piece
 reviewer: "varredura de nomes de adotante na peça = 0 (vendor-scrub à mão, a REGRA 36 não cobre docs/materials); números citados vêm do benchmark medido no mesmo dia; publicação explicitamente gated ao maestro no frontmatter"
-reviewed_diff_sha256: 4dbac8efb52ad71003269822abf66ace65e69cff001e2e682c52962a18b479c4
+reviewed_diff_sha256: 8f04ae6f0e4c5d458a4dadec1c83af94ba327e09e04e5329a28ec302dd6d0948
 findings_total: 0
 findings_real: 0
 verdict: APROVADO
