@@ -3,7 +3,7 @@ title: "Revisão — régua de provas do mecanismo no hero (+ drift do veredito 
 date: 2026-08-31
 branch: feat/hero-mechanism-numbers
 reviewer: "achado da passada: o confronto mediu landing-page.md MORTO (06-28) e o hero vivo (08-25) já lidera pelo mecanismo — veredito supersedido com evidência, não republicado (a lição da peça aplicada no mesmo dia); provas do strip são ESTÁVEIS por desenho (0 contagens perecíveis — a classe count-drift não entra no site); build Astro 2x rc=0"
-reviewed_diff_sha256: 0236b6d56639f13e3ac099606a37bbfbacc7a7f352a92452efc3bcf780df76a4
+reviewed_diff_sha256: 4d0b2443eac7b237b42ad8849fc2eac7d2fcc161ac07b47f2fa3fcecd03a2b4c
 findings_total: 1
 findings_real: 1
 verdict: APROVADO
