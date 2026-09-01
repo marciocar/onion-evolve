@@ -33,6 +33,7 @@ meta:
   # kg-backlog-guard: on
   # ↑ opt-in da REGRA 58, DELIBERADAMENTE separado da linha do TETO: se o escopo fosse o
   #   proprio TETO, apagar aquela linha DESLIGARIA a guarda em vez de disparar o SEM-TETO.
+  # Onda 7 aberta 2026-09-01 (gatilhos DISPARADOS da Onda 6); Onda 6 COLHIDA no mesmo commit (5/5 pagos, PRs #734-#742).
   # Onda 6 aberta 2026-08-31 (carteira do programa MAESTRO-VIVO); ondas 1-5 COLHIDAS no mesmo commit — historia no git (blame deste arquivo) e nos residuos de revisao.
   # ═══ TETO: 20 NÓS. Onda nova exige onda COLHIDA. ═══
   # Colher = onda e itens saem no MESMO commit; a história fica no git e no artefato de revisão.
@@ -40,96 +41,76 @@ meta:
   # Rotina (branches, higiene) NÃO entra aqui — vai para checklist. O grafo é para RISCO.
 
 nodes:
-  - id: W6_CARTEIRA_MAESTRO_VIVO
+  - id: W7_GATILHOS_DISPARADOS
     node_type: decision
     plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-31
+    verified_at: 2026-09-01
     trace: "docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml"
-    verified_against: 'programa MAESTRO-VIVO (PR #733 merged): F0 capacidade x uso + F1 mundo com juiz-fixo + F2 confronto com Elenxo; carteira proposta em D_CARTEIRA_REFILL_FIOS'
-    label: 'Onda 6 — a carteira do confronto interno x mundo: 5 itens que exploram o que o programa mediu (a frase-moat nao exercitada, o numero que falta ao gate, o ativo sem par, o hero commodity, a percepcao externa ausente). Criterio de entrada: veredito ERRADO/SUBESTIMADO/UNICO de impacto 5.'
+    verified_against: 'Onda 6 fechada 5/5 (PRs #734-#742 merged); cada item desta onda nasce de gatilho NOMEADO que ja disparou — nenhum inventado'
+    label: 'Onda 7 — pagar os gatilhos que a propria Onda 6 disparou: o 1o PreToolUse REAL (objecao sobrevivente do Elenxo), a landing morta (32 refs, veredito supersedido), o passivo de 41 nos sem verified_at (a metrica e diminuir), e o M2 da federacao (members no lint vivo, predecessor OP-1 entregue).'
 
-  - id: E_SELO_POR_ATO_REGISTRADO
+  - id: E_SELO_POR_ATO_ONDA7
     node_type: evidence
     plane: DEV
-    impact: 4
+    impact: 3
     confidence: 0.8
     status: confirmed
-    verified_at: 2026-08-31
-    verified_against: 'sequencia da sessao: relatorio da carteira entregue -> /meta:drive invocado pelo maestro como mensagem seguinte, sem outro texto'
-    label: 'INTERPRETACAO REGISTRADA E REVERSIVEL: o maestro invocou /meta:drive imediatamente apos a proposta da carteira; o driver leu o ato como selo de D_CARTEIRA_REFILL_FIOS e abriu a Onda 6. Se a leitura estiver errada, reverter a onda e um commit — e esta evidencia e o lugar onde a reversao se ancora.'
+    verified_at: 2026-09-01
+    verified_against: 'sequencia: relatorio de fechamento da Onda 6 nomeou os gatilhos -> /meta:drive invocado em seguida; 3o uso do padrao na sessao, nunca revertido pelo maestro'
+    label: 'Selo-por-ato registrado e reversivel (padrao E_SELO_POR_ATO_REGISTRADO da Onda 6): a invocacao de /meta:drive sobre censo DONE, apos relatorio com gatilhos nomeados, foi lida como curadoria selada da Onda 7.'
 
-  - id: I_PROVA_PRETOOLUSE
+  - id: I_PRETOOLUSE_USO_REAL
     node_type: decision
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: done
-    verified_at: 2026-08-31
-    verified_against: 'PAGO: PR #735 MERGED 2026-08-31T22:52Z — frase-moat PROVADA em sandbox sob bypassPermissions (veredito pelo filesystem), envelope declarado, emendas do Elenxo aplicadas. Objecao sobrevivente segue: core com ZERO PreToolUse (gatilho: 1o uso real)'
-    label: 'Provar OU corrigir a frase-moat: escrever 1 PreToolUse minimo em sandbox e MEDIR o bloqueio sob bypassPermissions (claude -p). Barrar = a frase ganha lastro e vira demo; nao barrar = propor a reescrita ao maestro (flip de CLAUDE.md e humano). Qualquer resultado fecha o fio.'
+    status: open
+    verified_against: 'gatilho (E_ELENXO_DA_PASSADA_ONDA6): o core segue com ZERO PreToolUse — acoplamento-declarado-nao-usado so fecha no 1o uso real'
+    label: 'O 1o PreToolUse de producao do core: negar git push --force para main (a acao irreversivel mais barata de barrar), registrado em .claude/settings.json + hook proprio + prova por sonda na propria sessao. Fecha a objecao sobrevivente do Elenxo.'
 
-  - id: I_BENCHMARK_DO_GATE
+  - id: I_APOSENTAR_LANDING_MORTA
     node_type: decision
     plane: DEV
-    impact: 5
+    impact: 4
     confidence: 0.85
-    status: done
-    verified_at: 2026-08-31
-    verified_against: 'PAGO: PR #736 MERGED 2026-08-31T22:52Z — docs/analysis/onion-gate-benchmark-2026-08.md (64 regras, 0 tokens, 84 chaves, bancada 882/884) + cura do selftest live-dependente; 2 celulas corrigidas pelo Elenxo antes do merge'
-    label: 'Publicar o numero que ja temos: latencia do gate completo (lint wall-time), custo de token ZERO, contagem de vetos reais capturados, tamanho da bancada. docs/analysis + no de evidencia no grafo do programa.'
+    status: open
+    verified_against: 'gatilho (E_HERO_VIVO_JA_LIDERA_PELO_MECANISMO): o confronto mediu artefato morto de 06-28; veredito ja supersedido no grafo'
+    label: 'Aposentar docs/materials/landing-page.md: banner SUPERSEDIDO apontando o hero vivo + corrigir apenas as referencias VIVAS (nao tocar historico); a peca deixa de enganar o proximo confronto.'
 
-  - id: I_PECA_CATRACA
-    node_type: decision
-    plane: DEV
-    impact: 5
-    confidence: 0.85
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: PR #737 MERGED 2026-09-01T01:06Z — draft anonimizado com recorte declarado pelo Elenxo (catraca e arte consolidada; o sem-par e aplica-la a regras de agente); publicar no site e ato do maestro'
-    label: 'A peca publica do unico ativo sem par medido: ligue o gate hoje num repo que reprova, sem parar ninguem — o passivo congela e so desce. ANONIMIZADA (vendor-scrub: nome de adotante NAO entra em material publico). Draft em docs/materials; publicacao no site e ato do maestro.'
-
-  - id: I_RADAR_SURFACE
-    node_type: decision
-    plane: DEV
-    impact: 5
-    confidence: 0.8
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: PR #738 MERGED 2026-09-01T01:19Z — /meta:radar + REGRA 65 (bancada 6/6 no CI) + baselines datadas + gatilho cc_version; fecha S9'
-    label: 'Implementar /meta:radar: comando maestro-invocado com 6 eixos e baseline DATADA por eixo, staleness detectada por regra SOFT no lint (padrao REGRA 62: a maquina detecta, o humano roda), juiz-fixo, write(KG) por rodada com SUPERSEDES da baseline anterior. Path vendorizado: PR-verde fica para merge do maestro.'
-
-  - id: I_HERO_PELO_MECANISMO
+  - id: I_CARIMBAR_PASSIVO_KG
     node_type: decision
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: PR #739 MERGED 2026-09-01T01:22Z — strip hero-mech com 3 provas estaveis no hero VIVO; veredito da landing morta supersedido no grafo; deploy e ato do maestro'
-    label: 'Reescrever o hero de onionevolve.com pelo MECANISMO (gate que veta + catraca que congela passivo + radar sem-LLM), nao pelas contagens. Draft-as-PR; deploy e MOAT (ato do maestro). NAO selecionado nesta passada (max-nodes 4) — proximo censo o pega.'
+    status: open
+    verified_against: 'gatilho (kg-verificacao/PASSIVO, todo lint): 41 nos plane:PROD impact>=4 sem verified_at tolerados — a metrica de saude e este numero DIMINUINDO'
+    label: 'Rodada /meta:kg-freshness num lote do baseline (8-10 nos por atencao): worker mede, CONFIRMED com medicao executada carimba (tabela de selagem), REFUTED/flip fica proposto. Meta: baseline 41 -> <=33.'
+
+  - id: I_MEMBERS_NO_LINT_VIVO
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    verified_against: 'gatilho (Q_members_ci_gate, m3-federation, at. 3.6): OP-1 REGISTRAR entregue (PR #697) — o M2 e o gate HARD do members-validate no lint'
+    label: 'M2 da federacao: members-validate.sh vira REGRA do lint (HARD em members.yaml invalido), com bancada — o ledger deixa de depender de invocacao manual.'
 
 edges:
-  - from: I_PROVA_PRETOOLUSE
-    to: W6_CARTEIRA_MAESTRO_VIVO
+  - from: I_PRETOOLUSE_USO_REAL
+    to: W7_GATILHOS_DISPARADOS
     edge_type: SUPPORTS
-  - from: I_BENCHMARK_DO_GATE
-    to: W6_CARTEIRA_MAESTRO_VIVO
+  - from: I_APOSENTAR_LANDING_MORTA
+    to: W7_GATILHOS_DISPARADOS
     edge_type: SUPPORTS
-  - from: I_PECA_CATRACA
-    to: W6_CARTEIRA_MAESTRO_VIVO
+  - from: I_CARIMBAR_PASSIVO_KG
+    to: W7_GATILHOS_DISPARADOS
     edge_type: SUPPORTS
-  - from: I_RADAR_SURFACE
-    to: W6_CARTEIRA_MAESTRO_VIVO
+  - from: I_MEMBERS_NO_LINT_VIVO
+    to: W7_GATILHOS_DISPARADOS
     edge_type: SUPPORTS
-  - from: I_HERO_PELO_MECANISMO
-    to: W6_CARTEIRA_MAESTRO_VIVO
+  - from: E_SELO_POR_ATO_ONDA7
+    to: W7_GATILHOS_DISPARADOS
     edge_type: SUPPORTS
-  - from: E_SELO_POR_ATO_REGISTRADO
-    to: W6_CARTEIRA_MAESTRO_VIVO
-    edge_type: SUPPORTS
-  - from: I_BENCHMARK_DO_GATE
-    to: I_PROVA_PRETOOLUSE
-    edge_type: DEPENDS_ON
