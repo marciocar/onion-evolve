@@ -609,6 +609,17 @@ nodes:
     label: 'DRIFT no veredito SUBESTIMADO do empacotamento: a evidencia interna citava o landing-page.md de junho, mas o hero VIVO ja lidera pelo mecanismo desde a reforma de 08-25. O que restava do veredito (a regua de PROVAS no hero) foi entregue: strip hero-mech com 3 provas ESTAVEIS (exit 2 sob bypass, 0 tokens, catraca-so-desce) — sem contagens pereciveis, a licao count-drift aplicada ao proprio site. GATILHO ABERTO: aposentar/supersedar docs/materials/landing-page.md (32 refs — cirurgia propria).'
     trace: "site/src/pages/index.astro · site/src/styles/home.css"
 
+  - id: E_PRETOOLUSE_EM_PRODUCAO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-09-01
+    verified_against: 'sonda VIVA na propria sessao: force-push a main vetado ANTES de executar (exit 2); bateria 7/7 apos a cura do falso-positivo por vocabulario (o veto pegou o proprio commit da feature — julgamento passou a ser POR LINHA DE INVOCACAO)'
+    label: 'A objecao sobrevivente do Elenxo FECHOU: o core tem PreToolUse REAL desde 2026-09-01 (protecao de main contra force-push), registrado em settings.json e provado em producao. E o 1o dogfood ja rendeu cura de classe: guarda-por-vocabulario nao julga string inteira, julga a linha que invoca.'
+    trace: ".claude/hooks/pretooluse-protect-main.sh · .claude/settings.json"
+
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
     to: Q_MAESTRO_VIVO
@@ -766,3 +777,6 @@ edges:
   - from: E_HERO_VIVO_JA_LIDERA_PELO_MECANISMO
     to: C_SUBE_EMPACOTAMENTO_PUBLICO_O_QUE_A_LANDING_DI
     edge_type: SUPERSEDES
+  - from: E_PRETOOLUSE_EM_PRODUCAO
+    to: E_ELENXO_DA_PASSADA_ONDA6
+    edge_type: SUPPORTS
