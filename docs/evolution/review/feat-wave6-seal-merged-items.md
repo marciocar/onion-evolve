@@ -3,7 +3,7 @@ title: "Revisão — selagem dos itens mergeados da Onda 6 (I_PROVA, I_BENCHMARK
 date: 2026-08-31
 branch: feat/wave6-seal-merged-items
 reviewer: "flip open→done só de itens com PR MERGED provado pelo estado (mergedAt citado no carimbo); selo do lote = ordem explícita do maestro ('PRs abertos para superar'); radar exit 0; backlog re-projetado"
-reviewed_diff_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+reviewed_diff_sha256: 32a0b473f12177af2b4990dbd4c7f4f660b8de719d96226f8981b3a3ed4c5155
 findings_total: 0
 findings_real: 0
 verdict: APROVADO

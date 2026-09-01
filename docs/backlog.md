@@ -117,6 +117,12 @@
 | 6.0 | `Q_A_SENHA_DA_CHAVE_QUEBROU_A_AUTOMACAO` | identidade-onion-vps-2026-08 | O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de m |
 | 4.8 | `Q_MAIS_UM_IMUTAVEL_GATED` | identidade-onion-vps-2026-08 | O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda d |
 
+## maestro-vivo-2026-08 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 11.2 | `D_META_RADAR_DESENHO` | maestro-vivo-2026-08 | PROPOSTA (gated — implementar e decisao do maestro): superficie permanente de percepcao externa /meta:radar — maestro-invocada |
+
 ## vps-shared-tools-2026-07 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -150,12 +156,6 @@
 | 5.0 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
-
-## maestro-vivo-2026-08 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 7.5 | `D_META_RADAR_DESENHO` | maestro-vivo-2026-08 | PROPOSTA (gated — implementar e decisao do maestro): superficie permanente de percepcao externa /meta:radar — maestro-invocada |
 
 ## arandek-adoption-dogfood-2026-07 — 3 item(ns)
 
