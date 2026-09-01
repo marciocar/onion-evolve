@@ -3,7 +3,7 @@ title: "Revisão — superfície /meta:radar + REGRA 65 (percepção externa com
 date: 2026-08-31
 branch: feat/meta-radar-surface
 reviewer: "REGRA 65 provada por execução nos 4 modos (fresco silêncio / velho SOFT nomeado / ilegível HARD / vazio HARD); bancada nova run_radar_staleness_selftests 4/4 via harness com as opções do runner (bancada completa >10min sob carga — declarado); regenerações por gerador (inventory/graph/registry/backlog); contagens 107→108 varridas por grep"
-reviewed_diff_sha256: 806cf28cbf87eea003c81c8393cde7a0e9cd79749321db7da9a71524a033b6ef
+reviewed_diff_sha256: 56751e065128480923c7845dce1d526544947123311e9f0b31e8c997b2a78e08
 findings_total: 13
 findings_real: 13
 verdict: APROVADO
