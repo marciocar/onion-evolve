@@ -3,7 +3,7 @@ title: "Revisão — Onda 8 paga: GTM persistido, fechamentos triviais, lineage 
 date: 2026-09-01
 branch: feat/gtm-and-closures
 reviewer: "tudo provado por execução: coleta GTM real (4/4 medidores, idempotência re-run, cron instalado, agregador lido); members-validate rc=0 pós-lineage; radar 0 nos 4 grafos; auto-off provado por timer real no repo onion-logto (achou o console ligado por esquecimento — o caso do gap); selos da onda só com entrega provada (PR/commit citados); censo DONE"
-reviewed_diff_sha256: d07ebfbc8ec84dff4684dd590dc086213726279d182d8add099c260594e57ae3
+reviewed_diff_sha256: e781368fc21135e1490f45616a051fc252b21f5960a42e12fa316696668c6b0a
 findings_total: 1
 findings_real: 1
 verdict: APROVADO
