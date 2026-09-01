@@ -67,8 +67,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
-    verified_against: 'gatilho (E_ELENXO_DA_PASSADA_ONDA6): o core segue com ZERO PreToolUse — acoplamento-declarado-nao-usado so fecha no 1o uso real'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: PR #748 MERGED 2026-09-01T12:17Z (ex-#744, fechado pela mecanica de stack) — 1o PreToolUse de producao, veto vivo na sessao; 2 falsos-positivos de producao curados no mesmo dia (vocabulario e push-nu)'
     label: 'O 1o PreToolUse de producao do core: negar git push --force para main (a acao irreversivel mais barata de barrar), registrado em .claude/settings.json + hook proprio + prova por sonda na propria sessao. Fecha a objecao sobrevivente do Elenxo.'
 
   - id: I_APOSENTAR_LANDING_MORTA
@@ -76,8 +77,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: open
-    verified_against: 'gatilho (E_HERO_VIVO_JA_LIDERA_PELO_MECANISMO): o confronto mediu artefato morto de 06-28; veredito ja supersedido no grafo'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: PR #745 MERGED 2026-09-01T12:24Z — banner SUPERSEDIDO + 3 superficies vivas corrigidas'
     label: 'Aposentar docs/materials/landing-page.md: banner SUPERSEDIDO apontando o hero vivo + corrigir apenas as referencias VIVAS (nao tocar historico); a peca deixa de enganar o proximo confronto.'
 
   - id: I_CARIMBAR_PASSIVO_KG
@@ -85,8 +87,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
-    verified_against: 'gatilho (kg-verificacao/PASSIVO, todo lint): 41 nos plane:PROD impact>=4 sem verified_at tolerados — a metrica de saude e este numero DIMINUINDO'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: PR #747 MERGED 2026-09-01T13:01Z — baseline 41→28 por medicao (10 CONF, 2 DRIFT+SUPERSEDES, 1 REFUTED executando selo #724, 2 UNVERIFIABLE)'
     label: 'Rodada /meta:kg-freshness num lote do baseline (8-10 nos por atencao): worker mede, CONFIRMED com medicao executada carimba (tabela de selagem), REFUTED/flip fica proposto. Meta: baseline 41 -> <=33.'
 
   - id: I_MEMBERS_NO_LINT_VIVO
@@ -94,8 +97,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
-    verified_against: 'gatilho (Q_members_ci_gate, m3-federation, at. 3.6): OP-1 REGISTRAR entregue (PR #697) — o M2 e o gate HARD do members-validate no lint'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: PR #746 MERGED 2026-09-01T12:39Z — REGRA 66 no gate (fecha Q_members_ci_gate); bancada 3/3 + escopo por marcador+papel'
     label: 'M2 da federacao: members-validate.sh vira REGRA do lint (HARD em members.yaml invalido), com bancada — o ledger deixa de depender de invocacao manual.'
 
 edges:

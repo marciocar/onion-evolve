@@ -16,9 +16,14 @@ printf '%s' "$push_lines" | grep -qE '(--force([^-]|$)|--force-with-lease|[[:spa
 main_target=0
 printf '%s' "$push_lines" | grep -qE '[[:space:]]main([[:space:]]|$|:)' && main_target=1
 if [ "$main_target" -eq 0 ]; then
-  # sem refspec explícito: o alvo é a branch corrente
-  cur=$(git branch --show-current 2>/dev/null)
-  [ "$cur" = "main" ] && main_target=1
+  # Fallback branch-corrente SÓ para push NU (flags apenas, sem remote/refspec): um push com alvo
+  # explícito que não cita main não pode herdar o veto da branch onde a sessão está SENTADA —
+  # o 2º falso-positivo de produção (2026-09-01): loop de merge parado em main pushava "$br" de
+  # feature e era vetado. Push nu = a linha termina após push+flags.
+  if printf '%s' "$push_lines" | grep -qE 'git[[:space:]]+push([[:space:]]+-[^[:space:]]+)*[[:space:]]*$'; then
+    cur=$(git branch --show-current 2>/dev/null)
+    [ "$cur" = "main" ] && main_target=1
+  fi
 fi
 if [ "$main_target" -eq 1 ]; then
   echo "GUARDA-PRETOOLUSE: force-push para MAIN negado (hook de produção, Onda 7) — reescrever a história da main é irreversível; se for deliberado, o maestro roda fora da sessão." >&2

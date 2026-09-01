@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**103 itens abertos** em 29 grafo(s) com aberto (de 46 no escopo) · 29 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**99 itens abertos** em 28 grafo(s) com aberto (de 46 no escopo) · 28 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 16 item(ns)
 
@@ -132,15 +132,6 @@
 | 4.2 | `C_dissent_auth_transversal` | vps-shared-tools-2026-07 | DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como da |
 | 4.0 | `Q_tunneling` | vps-shared-tools-2026-07 | PESQUISA+ELENXO: ngrok × Cloudflare Tunnel × Tailscale Funnel × Caddy-so. Para QUE (dev-preview? webhook inbound? exposicao efe |
 | 3.2 | `C_axis_tunneling` | vps-shared-tools-2026-07 | TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de |
-
-## fios-abertos — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 9.0 | `I_PRETOOLUSE_USO_REAL` | fios-abertos | O 1o PreToolUse de producao do core: negar git push --force para main (a acao irreversivel mais barata de barrar), registrado em . |
-| 6.8 | `I_APOSENTAR_LANDING_MORTA` | fios-abertos | Aposentar docs/materials/landing-page.md: banner SUPERSEDIDO apontando o hero vivo + corrigir apenas as referencias VIVAS (nao toc |
-| 6.4 | `I_CARIMBAR_PASSIVO_KG` | fios-abertos | Rodada /meta:kg-freshness num lote do baseline (8-10 nos por atencao): worker mede, CONFIRMED com medicao executada carimba (tabel |
-| 6.4 | `I_MEMBERS_NO_LINT_VIVO` | fios-abertos | M2 da federacao: members-validate.sh vira REGRA do lint (HARD em members.yaml invalido), com bancada — o ledger deixa de depende |
 
 ## librechat-kg-runtime-2026-08 — 2 item(ns)
 
