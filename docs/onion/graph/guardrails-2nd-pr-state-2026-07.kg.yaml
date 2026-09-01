@@ -173,6 +173,8 @@ nodes:
     status: open
     impact: 2
     confidence: 1.0
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. Leitura do nó completo (label+trace) + edges de/para o nó (D_GUARDRAIL_PULL_NOT_ => O nó pede: join-reverso (arquivo→guardrails que o governam) só vira ferramenta barata SE guardas pas…'
     label: "GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar escopo machine-readable (ex.: campo # scope: por guarda, consumido por um resolver). E uma decisao de mecanismo maior, gated na demanda real (hoje: hipotetica, N=0 pediu). NAO pre-cozinhar"
     trace: ".claude/validation/lint-artifacts.sh"
 

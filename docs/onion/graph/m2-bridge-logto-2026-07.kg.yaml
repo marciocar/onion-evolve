@@ -60,7 +60,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: open
-    verified_at: 2026-07-27
+    verified_at: 2026-09-01
     verified_against: host-vps-medido-pos-flip
     label: "[ATUALIZADO 2026-07-27 pós-flip P7: a cláusula final CAIU — o bridge/PWA NÃO segue mais autenticado só por AUTH_TOKEN; /chat e /commands agora exigem OIDC. Medido: /a2a segue caso à parte (a2aGuard não olha authMode) — 403 com token a2a = gate vivo, 3 tokens dedicados no pool.] Mitigação parcial existente NÃO cobre o bridge: a2a-verify.sh (6 camadas, fail-safe) gateia SÓ o canal /a2a (handshake entre cores, propose-only) — canal diferente e mais estreito"
 
@@ -231,6 +231,8 @@ nodes:
     impact: 5
     confidence: 0.9
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_hono_registration_order_bypass (SUPERSEDES); label preservado como historia'
     label: "FIX C — no Hono a cadeia segue a ORDEM DE REGISTRO: um handler registrado ANTES do app.use('*', requireIdentity) responde SEM PASSAR POR ELE = BYPASS TOTAL do default-deny. Silencioso, e invisível para qualquer teste que só exercite as rotas que alguém lembrou de listar. A v2 dizia 'montado globalmente' sem nunca exigir a POSIÇÃO — e 'montado globalmente' é verdade mesmo quando um app.route()/serveStatic veio antes"
 
   - id: D_middleware_order_first
@@ -279,7 +281,7 @@ nodes:
     confidence: 0.85
     status: open
     verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_at: 2026-09-01
     label: "FIX L2 — PROVA NOVA no P0.6: a semântica de cgroup_parent DEPENDE do cgroup driver do docker. MEDIDO hoje: driver = systemd (há /sys/fs/cgroup/system.slice/docker-<hash>.scope e NÃO há /sys/fs/cgroup/docker). Com driver systemd, cgroup_parent recebe NOME DE SLICE (onion-auth.slice); com cgroupfs, recebe CAMINHO (/onion-auth). Errar NÃO GERA ERRO — os containers ficam onde estavam e o floor não se aplica (falha silenciosa). Segue question e não claim porque um daemon.json novo muda o driver sem aviso: RE-CONFERIR no dia com docker info --format '{{.CgroupDriver}}'"
 
   - id: C_docker_floor_gap
@@ -421,6 +423,8 @@ nodes:
     impact: 4
     confidence: 0.85
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 5/5 claims; juiz APROVADO. Medido ao vivo no host (srv1812846, sudo -n) contra /home/onion/onion-bridge/src => 5 sub-afirmações no label, todas medidas: (1) "Logto = emissor/validador de identidade" — CONFIRMADO…'
     label: "INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorização de domínio (membro/tier/escopo) é do control-plane Onion (members.yaml). O scope do JWT é ESPELHO de permissão, não a fonte da verdade. Vale também no plano B3: a allowlist de client_id mora no BRIDGE, não no Logto"
 
   # ---- F2 (preservado): ROUTE-SCOPING default-deny ----
@@ -531,7 +535,7 @@ nodes:
     node_type: question
     layer: audit
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: 2026-09-01
     verified_against: medido-pelo-6o-elenxo-idp-inalcancavel-3-reqs-seguidas-5s-cada-uma-fetch-novo-ao-jwks-por-request
     status: open
     impact: 4
@@ -620,6 +624,8 @@ nodes:
     impact: 4
     confidence: 0.8
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_D_resource_plan_b (SUPERSEDES); label preservado como historia'
     label: "ESCADA A->B1->B2->B3 (aprovada pelos verifies, PRESERVADA) — PROVA ANTES do desenho depender (P4.1) + PLANO-B escrito: A = resource honrado (§3.3 como está) -> B1 = marcar como DEFAULT API RESOURCE, agora COM PROVA PRÓPRIA (Q_default_api_resource_b1) -> B2 = token opaco: validar por GET /oidc/me (round-trip por request, cache 60s; acopla MAIS — Logto down fecha na hora) -> B3 ÚLTIMO RECURSO = iss+exp+scope+ALLOWLIST de client_id no bridge, com risco DECLARADO (sem aud-binding, token de outra audiência do mesmo tenant é replayável) e data de revisão. B3 só com aceite explícito do maestro. Em NENHUM cenário afrouxa para 'aceita qualquer JWT do issuer'. P4.3 registra no spec+KG o plano adotado ANTES de escrever o middleware"
 
   # ---- OS ARTEFATOS (spec + passos + verificação) ----
@@ -681,7 +687,7 @@ nodes:
     confidence: 0.85
     status: open
     verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_at: 2026-09-01
     label: "GAP: console.sh só tem on/off/status manuais (medido: o case tem on) off) status) e mais nada; console desligado agora). Fecho: no case on) agendar systemd-run --unit=onion-logto-console-autooff --on-active=30m em modo SYSTEM (sudo, NÃO --user — timers de usuário morrem com a sessão SSH); no case off) parar o timer. Reversível, sem estado persistente"
 
   # ---- FONTES E O QUE É VPS-DECLARADO ----
@@ -1015,7 +1021,7 @@ nodes:
     impact: 3
     confidence: 0.7
     status: open
-    verified_at: 2026-07-28
+    verified_at: 2026-09-01
     verified_against: controle-recusado-por-desenho
     label: "FRONTEIRA DECLARADA: o controle de mutacao (remover o filtro e reprovar que o canario passa) NAO foi rodado — exigiria desligar uma guarda de seguranca no bridge VIVO, mesma familia do que ja se recusou em P9 (conceder bridge:admin ao servico 'so para testar'). Logo, 'a guarda e load-bearing' esta apoiado na enumeracao + no canario, nao em mutacao. Fechar com fixture fora de producao quando houver ambiente de teste do bridge"
 
@@ -1553,6 +1559,36 @@ nodes:
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff) + selo do maestro 2026-08-30: leitura do src vivo e do historico git completo do server.ts"
     label: "REFUTA [D_default_deny_routes]: o default-deny por middleware global + allowlist ancorada NUNCA foi implementado — nem em producao nem em NENHUM ponto do historico git. O codigo sempre praticou o modelo INVERSO que o proprio label nomeia como perigoso: lista fixa de rotas PROTEGIDAS (authGuard/a2aGuard rota-a-rota), com todo o resto aberto por default (incluindo o catch-all estatico). A decisao foi escrita como se descrevesse o sistema, e o sistema nunca a conheceu. A superficie de risco que ela mitigaria segue mapeada por Q_route_inventory (vivo). Selado REFUTED pelo maestro em 2026-08-30."
     trace: "/home/onion/onion-bridge/src/server.ts (historico completo)"
+
+  - id: E_CENSO0901_D_resource_plan_b
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 10/10 — 1) Lido o nó inteiro (linhas 615-623) e contadas as claims do label (composto, 10 afirmaçõ'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede um PLANO DE CONTINGÊNCIA (A→B1→B2→B3) a ser seguido SE o Plano A falhasse nas provas, com B3 gated por aceite explícito do maestro. O vivo mostra que A não falhou — está em produção com aud-binding real (RFC 8707) — e nenhuma linha de B2/B3 foi escrita. O nó-irmão Q_default_api_resource_b1'
+
+  - id: E_CENSO0901_C_hono_registration_order_bypass
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — Lido o nó inteiro (linha 226-234) + os 2 nós ligados por CONSTRAINS/TRACES_TO (D_middlewar'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: A premissa do claim — um `app.use(''*'', requireIdentity)` GLOBAL cuja ORDEM DE REGISTRO decide bypass-total — não corresponde à arquitetura real. A produção nunca adotou middleware global; foi para guardas POR ROTA (authGuard/adminGuard/a2aGuard), cada uma escrita e verificada linha-a-linha antes d'
+
+  - id: E_CENSO0901_Q_p10_mutation_not_run
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — 1) `grep -n "Q_p10_mutation_not_run" -A 40 docs/onion/graph/m2-bridge-logto-2026-07.kg.yam'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: A premissa que mantinha o nó bloqueado ("exigiria desligar uma guarda no bridge VIVO" / sem ambiente de teste) mudou: existe hoje um clone local rodável fora de produção (`/home/marcio/onion-bridge-dev`, `npm run dev`) — exatamente o "quando houver ambiente de teste do bridge" que o próprio nó defin'
 
 edges:
   - from: E_floors_effective_measured_20260729
@@ -2129,3 +2165,12 @@ edges:
   - from: E_default_deny_never_existed
     to: D_default_deny_routes
     edge_type: REFUTES
+  - from: E_CENSO0901_D_resource_plan_b
+    to: D_resource_plan_b
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_C_hono_registration_order_bypass
+    to: C_hono_registration_order_bypass
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_Q_p10_mutation_not_run
+    to: Q_p10_mutation_not_run
+    edge_type: SUPERSEDES

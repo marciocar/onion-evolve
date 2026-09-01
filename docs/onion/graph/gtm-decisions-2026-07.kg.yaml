@@ -190,6 +190,8 @@ nodes:
     impact: 5
     confidence: 0.5
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_instrument_metrics (SUPERSEDES); label preservado como historia'
     label: "Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de metodologia dev). Sem isso, preço de compliance-pack/SOTA é chute educado; D4 fica sem valor por degrau"
   - id: Q_p4_no_field_proof
     node_type: question
@@ -198,6 +200,8 @@ nodes:
     impact: 4
     confidence: 0.55
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. git log --oneline --since=2026-07-25 -- docs/business-context/decisions.md; grep => decisions.md (ratificado 2026-07-25, última tocada 2026-08-13 no commit dd0f3ffb, texto inalterado d…'
     label: "Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Falta entrevistar 1-2 prospects regulados + reconciliar 'Claude Code-only' com demanda enterprise de multi-ambiente/on-prem (pressão sobre M3)"
 
   - id: E_maestro_ratify_20260725
@@ -210,6 +214,16 @@ nodes:
     status: confirmed
     verified_at: 2026-07-25
     label: "Maestro ratificou 2026-07-25: D6 CINDIDO (MENSAGEM=P4 / PIPELINE=P3), D1=A (camadas), D3=C (desacoplar mentoria do app-consumer). Aplicado em decisions.md. D5 segue parcial (blend, número pendente instrumentação); D2-ativação segue gated"
+
+  - id: E_CENSO0901_Q_instrument_metrics
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — git log --oneline -- .claude/validation/{cycle-completion,context-freshness-metric,session'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (07-2026) não sabe que a camada "barato-primeiro" da instrumentação FOI construída (4 scripts determinísticos, testados, rodáveis) em 2026-07-28 — mas o entregável que o nó realmente pede (um NÚMERO único de "valor medido por adotante" + benchmark de conversão free→paid) continua tão ausente qu'
 
 edges:
   # ratificação do maestro (2026-07-25) SUPPORTS as decisões fechadas
@@ -298,3 +312,6 @@ edges:
   - from: Q_instrument_metrics
     to: D_D5
     edge_type: TRACES_TO
+  - from: E_CENSO0901_Q_instrument_metrics
+    to: Q_instrument_metrics
+    edge_type: SUPERSEDES

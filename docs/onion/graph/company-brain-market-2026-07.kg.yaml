@@ -262,6 +262,8 @@ nodes:
     impact: 5
     confidence: 0.6
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_D_mais_valor (SUPERSEDES); label preservado como historia'
     label: "MAIS-VALOR: fechar o gap N-tenant do L1 (schema-masking multi-tenant) — transforma 'Personal Brain N=1' em 'Company Brain provável' (segmento ~35% CAGR, dor $1,3tri). MAS gated: depende do gate D2-ativação; mais-valor NÃO é mais-próximo, são fases do mesmo caminho"
   - id: D_amarra_d3_d6
     node_type: decision
@@ -282,6 +284,8 @@ nodes:
     impact: 5
     confidence: 0.55
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. grep -n "schema-masking|fatia-por-propósito|L1-L6" docs/knowledge-base/concepts/ => O nó tem 4 afirmações: (1) o gap N-tenant é o mais crítico p/ virar "Company" (vs pessoal); (2) a pr…'
     label: "Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo grafo, RBAC real). Falta desenho + prova de campo do L1 (schema-masking + fatia-por-propósito) em contexto multi-usuário. Trava D_mais_valor"
   - id: Q_p4_instrument
     node_type: question
@@ -290,7 +294,29 @@ nodes:
     impact: 4
     confidence: 0.55
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_p4_instrument (SUPERSEDES); label preservado como historia'
     label: "Pré-req de D2/mais-valor: instrumentar 1-2 prospects P4 reais + 'valor medido por adotante'. Sem isso, 'Company Brain regulado' é chute educado. Mesma lacuna Q_instrument do brief GTM. Zero adotante P4 provado hoje"
+
+  - id: E_CENSO0901_D_mais_valor
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — 1) Lidas as 4 afirmações do label (fechar gap N-tenant do L1/schema-masking; transforma Pe'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: A decisão do nó (fechar N-tenant/schema-masking PORQUE isso destrava ''Company Brain provável'' como segmento de mercado a vender) foi superada por uma correção de GTM datada e já implantada (2026-08-26, commit fae0b529): Company Brain deixou de ser a promessa de venda e virou apenas rótulo de SEO/e'
+
+  - id: E_CENSO0901_Q_p4_instrument
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — Li o nó (1 claim: ''instrumentar 1-2 prospects P4 reais + valor medido por adotante''). Bu'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (aberto desde 07-25) dizia ''Zero adotante P4 provado hoje''. Isso morreu: entre 2026-08-04 e 2026-08-27 rodou uma PoC real com prospect real (HPE Autos, via oferta <cliente-poc>), com material de cliente sob NDA, entrega em reunião confirmada, e o resultado foi PROVADO e CONFIRMADO PELO CLIENT'
 
 edges:
   # 2026-08-02 — o mundo mudou em 7 dias: a YC nomeou a categoria como fonte primária.
@@ -395,3 +421,9 @@ edges:
   - from: E_onion_l1l6_gated
     to: Q_ntenant_proof
     edge_type: SUPPORTS
+  - from: E_CENSO0901_D_mais_valor
+    to: D_mais_valor
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_Q_p4_instrument
+    to: Q_p4_instrument
+    edge_type: SUPERSEDES

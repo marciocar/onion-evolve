@@ -291,6 +291,8 @@ nodes:
     impact: 3
     confidence: 0.8
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_ARANDEK_UPDATE (SUPERSEDES); label preservado como historia'
     label: "quando o arandek rodar /meta:adopt --update, recebe os 6 fixes; o contorno do D1 dele (technical-context ponteiro) simplifica p/ declarar context.technical → docs/specs/"
     trace: "próximo trabalho no adotante"
 
@@ -338,6 +340,8 @@ nodes:
     impact: 3
     confidence: 0.8
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. grep -n ''D_GREP_OLD_PIN'' -A40 docs/onion/graph/<adotante-a>-adoption-dogfood-2 => O nó pede: apos /meta:adopt --update reescrever .onion-version, rodar `grep -rl <pin-antigo>` no rep…'
     label: "BACKLOG (nao implementado; priorizar e do maestro). No /meta:adopt --update, apos reescrever o .onion-version: `grep -rl <pin-antigo>` no repo do adotante (excluindo .git/ e node_modules/) e reportar a CONTAGEM no relatorio — 'N referencias ao pin anterior neste repo — revise'. DETECTA, nao conserta: corrigir cada artefato exigiria entender a semantica de cada um (uma memoria pode citar o pin historicamente de proposito). Custo: um grep + uma linha. Toque em .claude/commands/meta/adopt.md, com selftest plantando um pin antigo"
 
   - id: Q_PIN_GREP_WORTH_IT
@@ -348,6 +352,16 @@ nodes:
     confidence: 0.5
     status: open
     label: "FRONTEIRA DECLARADA PELO PROPRIO ADOTANTE (R15.2 — registrada como observacao, nao como pedido): 'pode ser que o custo nao compense para uma classe de erro que so morde quem escreve frontmatter a mao'. Vale medir quantos artefatos derivados citam pin nos adotantes reais antes de implementar"
+
+  - id: E_CENSO0901_Q_ARANDEK_UPDATE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — 1) git -C onion-evolve merge-base --is-ancestor d6aba0e 65d8a7501a03 (confirma que o pin d'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó estava formulado como pergunta em aberto sobre um evento futuro ("quando... rodar"); o evento não só ocorreu como foi superado por múltiplos ciclos adicionais de update no adotante. A pergunta não tem mais objeto: já foi respondida pelo próprio comportamento do adotante, e a segunda cláusula (s'
 
 edges:
   - from: E_GAP2_ZERO
@@ -461,3 +475,6 @@ edges:
   - from: Q_PIN_GREP_WORTH_IT
     to: D_GREP_OLD_PIN
     edge_type: CONSTRAINS
+  - from: E_CENSO0901_Q_ARANDEK_UPDATE
+    to: Q_ARANDEK_UPDATE
+    edge_type: SUPERSEDES

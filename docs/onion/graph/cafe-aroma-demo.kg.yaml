@@ -56,6 +56,8 @@ nodes:
     impact: 4
     confidence: 0.7
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. Read docs/onion/graph/cafe-aroma-demo.kg.yaml inteiro (meta: header + nó Q_excec => O nó Q_excecao_enterprise (1 claim: a pergunta em si) tem label "Cliente enterprise com contrato de …'
     label: "Cliente enterprise com contrato de 3 anos merece exceção ao teto? Dúvida ABERTA — sobe para a Ana como pergunta explícita, não como desconto escondido"
     trace: "proposta do hotel (fictícia — deck NewHack #22, cena 6/6)"
 

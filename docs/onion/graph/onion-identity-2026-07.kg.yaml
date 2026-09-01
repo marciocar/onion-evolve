@@ -72,6 +72,8 @@ nodes:
     impact: 3
     confidence: 0.5
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. 1) `grep -n "Q_BRANCH_MAIN" -A 8 docs/onion/graph/onion-identity-2026-07.kg.yaml => members.yaml (<hub-t1>, HEAD atual) declara `lineages:` com apenas duas chaves: `framework:` (branch…'
     label: "onde a main-produto entra no mapa de linhagens do members.yaml"
   - id: Q_CLIENT_SCOPE
     node_type: question
@@ -228,6 +230,8 @@ nodes:
     impact: 4
     confidence: 0.8
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_D_NO_DISTORT (SUPERSEDES); label preservado como historia'
     label: "nao entortar doutrina: lane-de-conhecimento e GitFlow coexistem (eixos diferentes)"
     trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:2.1"
   # ---- evidencias ----
@@ -428,6 +432,8 @@ nodes:
     impact: 4
     confidence: 0.62
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_COMPLIANCE_RARE (SUPERSEDES); label preservado como historia'
     label: "compliance-no-loop = vertical RARA que casa com ICP regulado; prova de campo em granaai"
     trace: "F2 Q3/Q5"
   - id: C_KG_BIZ_UNPROVEN
@@ -476,6 +482,8 @@ nodes:
     impact: 5
     confidence: 0.65
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 2/2 claims; juiz APROVADO. grep -n "C_NS1_KG" -A10 (label lido); leitura de Q_NORTHSTAR/D_NORTHSTAR_NS1_KG  => O label tem 2 afirmações independentes: (1) NS1 = framework que constrói conhecimento reconciliável …'
     label: "NS1: framework que constroi conhecimento reconciliavel vivo (KG); edge mais forte, negocio nao provado"
     trace: "F2 Q5"
   - id: C_NS3_EDU
@@ -589,6 +597,8 @@ nodes:
     impact: 4
     confidence: 0.6
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_NS2_PORTABLE (SUPERSEDES); label preservado como historia'
     label: "NS2: metodo portatil/destilavel, familia multi-plataforma (onion-mini + Custom GPT reais; familia nao verificada)"
     trace: "F2 Q5"
   - id: C_NS4_CONTROLPLANE
@@ -867,7 +877,7 @@ nodes:
     status: open
     label: "site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nada impede religar graph.sh --map para a superficie publica e publicar membros sem visibilidade publica — incluindo cliente sob NDA. GATILHO NOMEADO: qualquer retomada de regeneracao de /federacao/ (ou refresh do snapshot) exige ANTES (a) campo visibility: public|private no members.yaml e (b) regra de lint que reprove projecao publica de membro nao-public. Ate la, o snapshot congelado E o estado seguro"
     trace: "docs/evolution/review/feat-site-reform-f0-deploy.md (R3, NOVO-4); site/README.md §federacao"
-    verified_against: "members.yaml sem campo visibility em 2026-08-25; grep -rn 'site/federacao' = so a allowlist do deploy-site.sh (nenhum gerador aponta para la)"
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. grep -c "visibility" docs/evolution/federation/members.yaml (=0); grep -rln "vis => members.yaml SEM campo visibility (grep=0, confirma o verified_against original de 08-25 ainda vale …'
 
   - id: Q_TESTEMUNHO_NAO_MEDIVEL_0804
     node_type: question
@@ -945,6 +955,36 @@ nodes:
     verified_at: 2026-08-30
     verified_against: "contagem-direta-transcripts-x-sinteses-x-grafos-irmaos"
     label: "A CONTRADICAO MEDIDA DENTRO DA PROPRIA DECISAO DE VALOR: 77 runs de orquestracao com transcript · 19 sinteses versionadas (25%) · 16 com grafo irmao (21%). QUATRO EM CADA CINCO ORQUESTRACOES NAO DEIXARAM RASTRO NO GRAFO. E o vazamento tem forma conhecida e datada: em 2026-08-06 a corrida serial do M8 mediu 4 DRIFTED contra o host vivo, escreveu na sintese, e a SSOT seguiu afirmando que o whatsapp-sender estava VIVO por 12 HORAS — ate alguem ir procurar. O /meta:kg-freshness declara o contrato certo ('o worker propoe, o maestro sela') e o SELO NAO TEM FORCING FUNCTION. Com NS1 escolhido, este laco E O PRODUTO operando a 21%, nao divida de higiene. FALSIFICADOR: se a medicao do volume mostrar que existe UM unico veredito sem selo (o do M8), entao e conserto manual e mecanizar seria catedral pelo portao 4 — a medicao decide, nao a vontade"
+
+  - id: E_CENSO0901_D_NO_DISTORT
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — grep -n \"eixos diferentes\\|coexistem\\|nao entortar\" docs/ CLAUDE.md — achou docs/analy'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó está status: open no grafo, mas o trabalho que ele descreve (aplicar a diretriz "não entortar doutrina" ao decidir o papel da develop) foi CONCLUÍDO, RATIFICADO e ENTREGUE em 2026-07-11 — o mesmo dia da investigação. O status open é resíduo de carimbagem: o nó nunca foi fechado no grafo apesar '
+
+  - id: E_CENSO0901_C_NS2_PORTABLE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — grep -n "C_NS2_PORTABLE" -A20 docs/onion/graph/onion-identity-2026-07.kg.yaml (localizou o'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó descreve NS2 como candidata de north-star em aberto com uma ressalva pendente ("família não verificada"). Isso morreu em duas camadas: (a) Q_NORTHSTAR foi decidida em 2026-08-06 (D_NORTHSTAR_NS1_KG) escolhendo NS1-KG, não NS2 — NS2 foi explicitamente descartada como norte e redirecionada para Q'
+
+  - id: E_CENSO0901_C_COMPLIANCE_RARE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — grep no nó (linhas 424-432) + trace F2 Q3/Q5; leitura de C_ICP_REGULATED/C_ICP_TENSION (já'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (F2, jul/2026, status open) foi SUPERSEDIDO por D6 (decisions.md, ratificado 2026-07-25): as claims 1 e 2 (vertical rara + casa com ICP regulado) viraram decisão canônica confirmada ("whitespace compliance-peer confirmado", diferencial #1 em strategy.md) — não precisam mais ser "claim aberta", '
 
 edges:
   - from: D_NORTHSTAR_NS1_KG
@@ -1271,3 +1311,12 @@ edges:
   - from: Q_TESTEMUNHO_NAO_MEDIVEL_0804
     to: D_CLAUDE_CODE_POR_CAPACIDADE
     edge_type: DEPENDS_ON
+  - from: E_CENSO0901_D_NO_DISTORT
+    to: D_NO_DISTORT
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_C_NS2_PORTABLE
+    to: C_NS2_PORTABLE
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_C_COMPLIANCE_RARE
+    to: C_COMPLIANCE_RARE
+    edge_type: SUPERSEDES

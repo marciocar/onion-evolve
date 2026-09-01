@@ -96,6 +96,8 @@ nodes:
     impact: 3
     confidence: 0.4
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 2/2 claims; juiz APROVADO. Leitura do nó (label/trace/edges) + E_NENHUM_AGENDADO_PAROU; `grep -rl "schedule => Único workflow com `schedule:` continua sendo .github/workflows/onion-selftest.yml ("Onion Guard Sel…'
     label: "GATED por Teste do Gatilho — alarme para agendado que PARA de rodar. GATILHO NOMEADO: a 1a vez que um run com event=schedule for observado ausente por >48h. Construir antes disso e catedral, que a propria doutrina do Elenxo proibe"
 
   # ---- a regra que ordenou este backlog ----

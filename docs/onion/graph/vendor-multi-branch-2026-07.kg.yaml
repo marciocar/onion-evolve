@@ -107,7 +107,7 @@ nodes:
     impact: 2
     confidence: 0.6
     status: open
-    verified_at: 2026-07-27
+    verified_at: 2026-09-01
     verified_against: fixture-vs-repo-do-adotante
     label: "Reproduzimos a CLASSE (conflito contabil em codigo de aplicacao por vendor branch-especifico), NAO os 110 arquivos. O volume depende da divergencia real do repo do adotante e nao foi medido la. Nao afirmar igualdade"
 
@@ -134,6 +134,16 @@ nodes:
     verified_at: 2026-07-27
     verified_against: fixture-do-caso-do-adotante-executada
     label: "O adotante propos que o criterio fosse 'o merge toca paths FORA do manifesto?' — que e EXATAMENTE o que _vendor_is_framework_pure ja faz, so que ANTES de mergear (eles tiveram que revisar 194 arquivos para concluir framework-only; o guard conclui sem sujar a arvore). REPRODUZIDO em vez de deduzido: fixture sem baseline limpa, vendor do HEAD da propria develop, produto divergente => exit 0, 2 arquivos de framework, 0 de app, produto intacto. Convergencia INDEPENDENTE: eles chegaram pelo uso, o teste chegou pela medicao das duas fixtures"
+
+  - id: E_CENSO0901_Q_volume_not_reproduced
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — Lido o nó inteiro (label/trace) + o edge DEPENDS_ON→C_field_report. CONTADAS as claims do '
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: A pergunta "o volume real (110 arquivos) foi medido no repo do adotante?" foi respondida — com "não foi, e não precisou ser". No mesmo dia (2026-07-27), o próprio update na branch develop do <hub-t1> (o cenário exato do incidente) completou com 0 arquivos de app tocados (commit d8434efc), e a mensag'
 
 edges:
   - from: E_reproduction_3_tries
@@ -175,3 +185,6 @@ edges:
   - from: E_guard_already_covers
     to: C_warn_is_not_a_stop
     edge_type: SUPPORTS
+  - from: E_CENSO0901_Q_volume_not_reproduced
+    to: Q_volume_not_reproduced
+    edge_type: SUPERSEDES
