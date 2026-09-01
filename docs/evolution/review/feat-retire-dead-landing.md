@@ -3,7 +3,7 @@ title: "Revisão — aposenta a landing morta (banner + refs vivas; histórico i
 date: 2026-09-01
 branch: feat/retire-dead-landing
 reviewer: "escopo cirúrgico: banner SUPERSEDIDO no artefato + 3 superfícies VIVAS corrigidas (INDEX, materials/README, design/identity vendorizado) + plugins re-assemblados; refs históricas (analysis, resíduos, worktree alheia) deliberadamente intocadas — histórico não se reescreve"
-reviewed_diff_sha256: 4877087d6c077bfc59bd162094b7ef679098a87c5d1e81e99028f0ebe89e659d
+reviewed_diff_sha256: 6004611425ca59d94049a4931ae00263924415bb298c6febd7ccb3dfc5afee54
 findings_total: 0
 findings_real: 0
 verdict: APROVADO
