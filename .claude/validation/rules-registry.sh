@@ -159,7 +159,7 @@ CATEGORIES = [
      [44, 65]),
     ("Federação",
      "Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.",
-     [24, 25, 28, 38, 46]),
+     [24, 25, 28, 38, 46, 66]),
     ("Projeção & privacidade",
      "O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e "
      "deep-link privado nunca vazam; e o compose commitado nunca publica porta em "
