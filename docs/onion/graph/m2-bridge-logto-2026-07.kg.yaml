@@ -230,7 +230,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_hono_registration_order_bypass (SUPERSEDES); label preservado como historia'
     label: "FIX C — no Hono a cadeia segue a ORDEM DE REGISTRO: um handler registrado ANTES do app.use('*', requireIdentity) responde SEM PASSAR POR ELE = BYPASS TOTAL do default-deny. Silencioso, e invisível para qualquer teste que só exercite as rotas que alguém lembrou de listar. A v2 dizia 'montado globalmente' sem nunca exigir a POSIÇÃO — e 'montado globalmente' é verdade mesmo quando um app.route()/serveStatic veio antes"
@@ -623,7 +623,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
+    status: refuted
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_D_resource_plan_b (SUPERSEDES); label preservado como historia'
     label: "ESCADA A->B1->B2->B3 (aprovada pelos verifies, PRESERVADA) — PROVA ANTES do desenho depender (P4.1) + PLANO-B escrito: A = resource honrado (§3.3 como está) -> B1 = marcar como DEFAULT API RESOURCE, agora COM PROVA PRÓPRIA (Q_default_api_resource_b1) -> B2 = token opaco: validar por GET /oidc/me (round-trip por request, cache 60s; acopla MAIS — Logto down fecha na hora) -> B3 ÚLTIMO RECURSO = iss+exp+scope+ALLOWLIST de client_id no bridge, com risco DECLARADO (sem aud-binding, token de outra audiência do mesmo tenant é replayável) e data de revisão. B3 só com aceite explícito do maestro. Em NENHUM cenário afrouxa para 'aceita qualquer JWT do issuer'. P4.3 registra no spec+KG o plano adotado ANTES de escrever o middleware"
@@ -1020,7 +1020,7 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.7
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: controle-recusado-por-desenho
     label: "FRONTEIRA DECLARADA: o controle de mutacao (remover o filtro e reprovar que o canario passa) NAO foi rodado — exigiria desligar uma guarda de seguranca no bridge VIVO, mesma familia do que ja se recusou em P9 (conceder bridge:admin ao servico 'so para testar'). Logo, 'a guarda e load-bearing' esta apoiado na enumeracao + no canario, nao em mutacao. Fechar com fixture fora de producao quando houver ambiente de teste do bridge"
