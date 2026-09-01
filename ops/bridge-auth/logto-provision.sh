@@ -657,11 +657,15 @@ if [ "${APPLY}" = "1" ] && [ -n "${_spa:-}" ]; then
     say "   raiz adicionada aos redirect URIs"
   fi
   # Refresh token: sem isto o humano re-loga a cada hora (accessTokenTtl=3600).
-  if api GET "/applications/${_spa}" | jq -e '.customClientMetadata.alwaysIssueRefreshToken == true' >/dev/null 2>&1; then
-    say "   refresh token já habilitado"
+  # O check compara o ESTADO DESEJADO COMPLETO (a 1ª versão só olhava a chave velha e pulou a
+  # rotação recém-adicionada — declarado≠verificado dentro do próprio idempotente, 2026-09-01).
+  if api GET "/applications/${_spa}" | jq -e '.customClientMetadata.alwaysIssueRefreshToken == true and .customClientMetadata.rotateRefreshToken == true' >/dev/null 2>&1; then
+    say "   refresh token já habilitado (com rotação)"
   else
     api PATCH "/applications/${_spa}" \
-      '{"customClientMetadata":{"alwaysIssueRefreshToken":true,"refreshTokenTtlInDays":14}}' >/dev/null
+      '{"customClientMetadata":{"alwaysIssueRefreshToken":true,"refreshTokenTtlInDays":14,"rotateRefreshToken":true}}' >/dev/null
+  # rotateRefreshToken (etapa 2, 2026-09-01): cada uso do refresh emite um novo e invalida o velho —
+  # token vazado morre no 1o replay. TTL de acesso segue 3600 por DECISAO selada (UX > janela curta; ver E_TTL_TRADEOFF no grafo M2).
     say "   refresh token habilitado (14 dias)"
   fi
 else

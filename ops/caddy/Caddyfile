@@ -29,6 +29,11 @@ onionevolve.com, www.onionevolve.com {
 }
 
 app.onionevolve.com {
+    # CSP (etapa 2 da ordem de 2026-09-01, fecha metade barata do E_REFUTA_D_pkce_risk_mitigations):
+    # o PWA serve só assets próprios + fala com o próprio host e com o OIDC do Logto.
+    header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://auth.onionevolve.com; frame-ancestors 'none'; base-uri 'self'"
+    header X-Content-Type-Options "nosniff"
+    header Referrer-Policy "strict-origin-when-cross-origin"
     reverse_proxy 127.0.0.1:8787
 }
 
