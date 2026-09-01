@@ -3,7 +3,7 @@ title: "Revisão — M2 da federação: members.yaml no gate (REGRA 66)"
 date: 2026-09-01
 branch: feat/members-lint-gate
 reviewer: "bancada 3/3 (vivo passa · inválido HARD com rc · rota validador-ausente fail-loud); costura SDAAL ONION_MEMBERS_FILE para testabilidade; core-only por dado (adotante sem o yaml = silêncio); registry regenerado (66 em Federação)"
-reviewed_diff_sha256: 9333a80a87fd97ba786e662482188b24e48bcaea2ea88e05856b54b678c1f48e
+reviewed_diff_sha256: 1171dd7f5a8c5bf235022a4c6800ea6a017b5aa9f356bfd703b68a08014f41a8
 findings_total: 2
 findings_real: 2
 verdict: APROVADO
