@@ -36,6 +36,12 @@ members:
         #  - DNS onionevolve.com @ e app → 179.197.65.94 (via API Hostinger; www CNAME → raiz). TTL 300.
         #  - ACESSO maestro (2026-07-10): ssh/mosh na porta 2222 (alt — a rede do notebook filtra a 22
         #    de saída; a 22 segue aberta p/ outras origens). Lição: diário 2026-07-10-ssh-alt-port-2222.
+      product:                # Q_BRANCH_MAIN respondida (Onda 8, 2026-09-01): a main-PRODUTO no mapa.
+        host: srv1812846      # mesma máquina; o que roda EM PRODUÇÃO a partir da main:
+        branch: main          # site (deploy do site/), app.onionevolve.com (bridge com clone
+                              # dedicado /home/onion/onion-evolve, deploy-key própria) e o IdP.
+                              # Pin: HEAD da main no momento do deploy (bridge atualiza por
+                              # ops/update-bridge.sh; site por ops/install-caddy-config.sh + deploy).
       vps-bridge:             # RETIRADO 2026-07-08 — srv1475924 (KVM 1) mantido como rollback (IP antigo 187.77.236.211), depois deletado.
         status: retired       # papel (cwd do bridge + host do site) migrado p/ a workstation acima.
         # Histórico preservado: clone que TRABALHAVA (não espelho passivo); pin c09ae7fb99ed verificado
