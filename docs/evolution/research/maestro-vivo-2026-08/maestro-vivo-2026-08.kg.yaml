@@ -643,6 +643,17 @@ nodes:
     label: 'Revisao-total do backlog a pedido do maestro: a listagem REAL vive em docs/analysis/backlog-real-2026-09.md — 14 reais-acionaveis + 5 gatilhos disparados = material da proxima onda; 42 gated medidos; 15 mortos-candidatos propostos para selo; 21 a re-medir (o juiz pegou medicao-no-arquivo-errado, contagem conveniente e gatilho declarado-nao-medido — as MESMAS classes da calibracao de 08-29).'
     trace: "docs/analysis/backlog-real-2026-09.md"
 
+  - id: E_META_CENSUS_NASCEU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-01
+    verified_against: 'dogfood ponta-a-ponta do modo-de-falha do TETO (wf_15ebe561-003): teto 150k selecionou 2/8 por atencao, nomeou 6 NAO_MEDIDO_POR_TETO, juiz reprovou os 2 CONFIRMED preguicosos e a selagem recusou carimbo (0 stamps — AUDIT integro); extrator provou retomada KG-runtime (22 a-medir pos-revisao = exatamente os reprovados); bancada census-extract 3/3'
+    label: 'A forma que rodou 2x a 5M+ renascendo em /tmp virou COMANDO: /meta:census (extrator determinstico + molde versionado com teto que PARA por contagem + selagem AUDIT + listagem-projecao). Ordem do maestro cumprida: KG-SSOT first/runtime (estado de retomada = carimbo nos grafos) e custo mecanico (incremental default; custo/no observado 88k no dogfood vs price 74k — recalibrar na 1a rodada real).'
+    trace: ".claude/commands/meta/census.md · docs/analysis/backlog-real-census-dogfood-2026-09-01.md"
+
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
     to: Q_MAESTRO_VIVO
@@ -807,5 +818,8 @@ edges:
     to: D_META_RADAR_DESENHO
     edge_type: SUPERSEDES
   - from: E_REVISAO_TOTAL_BACKLOG_0901
+    to: Q_MAESTRO_VIVO
+    edge_type: SUPPORTS
+  - from: E_META_CENSUS_NASCEU
     to: Q_MAESTRO_VIVO
     edge_type: SUPPORTS
