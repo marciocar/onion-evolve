@@ -98,7 +98,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.6
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_members_ci_gate (SUPERSEDES); label preservado como historia'
     label: "M2 (revisão adversarial 2026-08-27): members-validate.sh valida na ROTA do comando (Passo 7) e no selftest sobre fixtures, mas NÃO é gate HARD do lint-artifacts.sh sobre o members.yaml VIVO — edição manual com erro semântico-mas-parseável (id dup, trust faltando, pin n/a em adopter) passaria no CI. Header já suavizado p/ não prometer além do que está ligado (behavior-over-declaration). GATILHO p/ ligar HARD: 1a mutação manual que o CI deixou passar OU o nascimento de OP-2/3/4 (aí o validador vira pré-condição compartilhada). Custo: check_members_valid espelhando REGRA 38 (gracioso sem python+yaml) + REGRA nova + catraca REGRA 49"
@@ -212,7 +212,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.7
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_trust_matrix_stays_onion (SUPERSEDES); label preservado como historia'
     label: "RBAC do Logto (admin/member por org) é grosso demais p/ a matriz fina (can_receive_from/can_advise_to/can_correct_to/diary_readable_by/exposes_downstream). Essa autorização fica ENFORCED no control-plane Onion lendo members.yaml como dado; Logto Orgs = PROJEÇÃO da topologia hub, nunca a fonte"

@@ -240,7 +240,7 @@ nodes:
     verified_at: 2026-09-01
     verified_against: vps-exposure-check-varre-docker-ps-e-diretorios-locais-nao-le-compose-de-repo-adotante
     trace: docs/analysis/arandek-repo-exposure-2026-08.md
-    status: open
+    status: superseded
     impact: 3
     confidence: 0.9
     label: "A guarda `vps-exposure-check.sh` cobre o lado de CA (bind publico em container vivo, conector upstream, backup em claro) e roda diaria por systemd timer. Ela nao cobre — e por desenho nao poderia, no formato atual — o lado do ADOTANTE: um `docker-compose.yml` no repo dele que publica em `0.0.0.0` so vira risco quando ele sobe no host DELE, que eu nao meco. Esta e a lacuna que [Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO] expos: o achado saiu de `grep` MANUAL meu, nao de mecanismo — e por [[fix-must-become-mechanism]] achado que so existe porque alguem olhou nao se repete sozinho. CANDIDATO (nao decidido, nao pre-cozinhar): regra de lint que, em repo com `role: adopted`, acuse porta publicada sem prefixo de bind e segredo literal em compose rastreado. GATILHO PARA DECIDIR: o segundo adotante com o mesmo defeito — um caso e caso, dois e classe."

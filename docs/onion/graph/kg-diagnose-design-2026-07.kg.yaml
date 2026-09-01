@@ -94,7 +94,7 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.6
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_automacao_pipeline (SUPERSEDES); label preservado como historia'
     label: "Follow-up GATED: um orquestrador que encadeia extract→consolidate→diagnose automaticamente? Decisão do maestro: NÃO agora — o dogfood fez humano-no-loop de propósito (a PAUSA é o valor); automatizar arrisca engessar a cadência. Este PR entrega o método canônico, não o orquestrador"

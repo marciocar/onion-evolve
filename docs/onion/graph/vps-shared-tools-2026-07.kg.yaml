@@ -196,7 +196,7 @@ nodes:
   - id: A_analysis_structure
     node_type: artifact
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.9
     verified_at: 2026-09-01

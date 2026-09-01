@@ -263,7 +263,7 @@ nodes:
   - id: C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
     impact: 5
     confidence: 0.85
     verified_at: 2026-09-01

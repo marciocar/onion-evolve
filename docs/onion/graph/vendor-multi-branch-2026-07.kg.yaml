@@ -108,7 +108,7 @@ nodes:
     plane: PROD
     impact: 2
     confidence: 0.6
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: fixture-vs-repo-do-adotante
     label: "Reproduzimos a CLASSE (conflito contabil em codigo de aplicacao por vendor branch-especifico), NAO os 110 arquivos. O volume depende da divergencia real do repo do adotante e nao foi medido la. Nao afirmar igualdade"

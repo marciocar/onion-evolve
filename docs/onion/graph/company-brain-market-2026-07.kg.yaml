@@ -261,7 +261,7 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.6
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_D_mais_valor (SUPERSEDES); label preservado como historia'
     label: "MAIS-VALOR: fechar o gap N-tenant do L1 (schema-masking multi-tenant) — transforma 'Personal Brain N=1' em 'Company Brain provável' (segmento ~35% CAGR, dor $1,3tri). MAS gated: depende do gate D2-ativação; mais-valor NÃO é mais-próximo, são fases do mesmo caminho"
@@ -293,7 +293,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.55
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_p4_instrument (SUPERSEDES); label preservado como historia'
     label: "Pré-req de D2/mais-valor: instrumentar 1-2 prospects P4 reais + 'valor medido por adotante'. Sem isso, 'Company Brain regulado' é chute educado. Mesma lacuna Q_instrument do brief GTM. Zero adotante P4 provado hoje"
