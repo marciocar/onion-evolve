@@ -1,0 +1,67 @@
+{
+ "run_id": "wf_15ebe561-003",
+ "medidos": [
+  {
+   "node_id": "D_D5",
+   "kg_file": "docs/onion/graph/d5-pricing-2026-07.kg.yaml",
+   "method": "Lido o nó D_D5 inteiro (label + edges SUPPORTS/DEPENDS_ON/TRACES_TO). Contadas 4 afirmações no label: (1) blend A+B degraus 1-2 vendíveis-já; (2) degraus 3-4 sob-consulta gated D6/D2; (3) diretriz ticket premium/vender selo/preço-por-outcome só após instrumentar; (4) quem decide os números = maestro. Medido contra o vivo: `git log --oneline -10 -- docs/business-context/decisions.md` (D5 não editada desde 336f0605, 2026-07-29, PR #480 — a ratificação PARCIAL que o nó já registra); `sed -n` na seção `## D5` de decisions.md (linhas 78-90, ainda diz \"parcialmente ratificado\", mesmos 4 degraus/mesmas faixas); grep por \"P4 entrevist|teste de campo\" em business-context/onion/graph/analysis — zero evidência de entrevista P4 conduzida ou teste de campo do degrau 1 registrado desde 07-29 (só menções ao gate ainda aberto, inclusive em docs/analysis/backlog-real-2026-09.md linha 42, que resume o mesmo gate). Sub-nós Q_p4_interviews e Q_train_cert_chaining seguem status:open sem novo verified_at de fechamento.",
+   "observed": "decisions.md §D5 (linhas 78-90) é byte-a-byte a mesma decisão parcial que o nó já capturava: degrau 1 NÃO fixado (aguarda teste de campo), degrau 2 só inicial (renovação gated no diretório público), degraus 3-4 sob-consulta/gated D6-D2, instrumentação autorizada. Nenhum commit tocou decisions.md#D5 desde 336f0605 (2026-07-29). Nenhuma entrevista P4 nem teste de campo do degrau 1 aparece em nenhum artefato do repo — os dois \"faltas\" nomeados pela própria decisão seguem em aberto, idênticos.",
+   "verdict": "CONFIRMED",
+   "divergence": "",
+   "blocked_by": "",
+   "claims_total": 4,
+   "claims_measured": 4,
+   "coverage": "TOTAL",
+   "realidade": "GATED",
+   "proximo_passo": "Maestro conduzir 1-2 entrevistas P4 (fecha Q_p4_interviews) e testar degrau 1 em 2-3 propostas reais lendo a conversão (fecha o \"teste de campo\" citado em decisions.md linha 90) — só então D_D5 sai de open para ratificação completa.",
+   "gatilho": "entrevistas P4 conduzidas e registradas em decisions.md (D6) + teste de campo do degrau 1 com conversão lida",
+   "gatilho_disparou": "NAO",
+   "juiz": "REPROVADO"
+  },
+  {
+   "node_id": "D_spec_now_build_gated",
+   "kg_file": "docs/onion/graph/m3-federation-admin-2026-07.kg.yaml",
+   "method": "Lido o nó completo (label/trace) + os 27 nós filhos e as edges do grafo. Medido contra o vivo: `grep -n \"role:\" docs/evolution/federation/members.yaml` (0 role:consumer, 9 standalone/1 hub/1 source); `ls docs/evolution/federation/contracts/` (NO_CONTRACTS_DIR); `grep -n \"REGRA 66\" .claude/validation/lint-artifacts.sh` + `git log --oneline --all | grep 6799c8df\\|4b749df5\\|3554f13d` (M2 CI-gate confirmado entregue); lido docs/analysis/onion-adr-hosted-service-identity-2026-08.md (commit 44173a95, 2026-08-01) seção 6, que nomeia e redefine o gate deste MESMO nó; lida a linha 91 de docs/analysis/backlog-real-2026-09.md (censo anterior já flagou este nó para re-medição pelo motivo exato \"gatilho medido mas ERRADO\"); lidos os nós-filho C_op_register (status:done, verified_at 2026-08-27, \"Gate da plataforma segue FECHADO e intocado\") e Q_members_ci_gate/E_CENSO0901_Q_members_ci_gate (DRIFTED, M2 entregue via REGRA 66); cruzado com a memória de sessão bridge-evolve-program-state.md (org Grana.AI real, multi-usuário, criada no Logto 2026-08-15, com admin dashboard/quotas/MGM já em produção desde F4/2026-08-14).",
+   "observed": "O label carrega 4 afirmações: (1) especificar o command-side SEM construir; (2) especificar o modelo de auth (Logto) SEM construir; (3) o build só liga no gatilho objetivo; (4) o read-model já existe e basta ao operador-único de hoje. Medidas as 4: (4) segue verdadeira — E_members_yaml intacto, ainda 1 operador. (2) segue verdadeira — Q_auth_decision (verified 2026-08-30) confirma que plugar Logto no command-side \"ainda NÃO foi tomada\". Mas (1) e (3) já NÃO são verdadeiras isoladas: o command-side JÁ FOI parcialmente CONSTRUÍDO sem esperar o gatilho — OP-1 REGISTRAR (comando /meta:federation-member register + members-validate.sh) foi entregue em 2026-08-27, e o próprio nó que o registra anota explicitamente \"Gate da plataforma segue FECHADO e intocado\" — ou seja, o build aconteceu APESAR do gate fechado, sob a justificativa implícita de que um comando nativo isolado não é \"a plataforma\". Some a isso M2 (Q_members_ci_gate): o gate HARD de CI sobre members.yaml (REGRA 66, PRs 6799c8df/4b749df5/3554f13d) também já foi entregue. Adicionalmente, um ADR posterior (onion-adr-hosted-service-identity-2026-08, commit 44173a95, 2026-08-01) nomeia formalmente este nó/sua irmã C_naive_admin_platform e REDEFINE o gatilho da plataforma administrativa para um critério de negócio (\"existe ao menos 1 federado migrado para o Logto consumindo recurso hospedado?\") — e diz textualmente que a refutação anterior \"não é ressuscitada nem reafirmada — é re-derivada fresca quando o gate abrir\". Esse novo gate nunca foi formalmente remedido contra este nó específico (só contra os filhos Q_gatilho/Q_auth_decision, sob o critério TÉCNICO antigo). Um censo anterior (docs/analysis/backlog-real-2026-09.md:91) já sinalizou exatamente esta lacuna: \"O gatilho foi medido, mas o gatilho ERRADO — e este é o nó que POSSUI o gate.\"",
+   "verdict": "DRIFTED",
+   "divergence": "A postura binária \"spec-agora / build-gated\" (nada se constrói até o gatilho) não sobreviveu inteira: 2 das 4 metades do label furaram na prática — OP-1 (registro) e M2 (gate HARD de CI) do command-side JÁ FORAM construídos, com o próprio registro do trabalho anotando que isso aconteceu \"apesar\" do gate da plataforma seguir fechado (distinção implícita entre \"op nativa de baixo custo\" e \"plataforma\", nunca formalizada no nó). Paralelamente, um ADR de 2026-08-01 redefiniu o próprio gatilho deste nó para um critério de negócio (federado real consumindo recurso hospedado via Logto) que nunca foi remedido explicitamente contra D_spec_now_build_gated — só contra os filhos, sob o critério técnico antigo (0 T2/sem contracts/, que segue fechado, confirmado nesta medição).",
+   "blocked_by": "",
+   "claims_total": 4,
+   "claims_measured": 4,
+   "coverage": "TOTAL",
+   "realidade": "GATED",
+   "proximo_passo": "Reescrever o nó para separar as duas realidades distintas: (a) ops nativas isoladas de baixo custo (OP-1 registrar, M2 CI-gate) — JÁ ENTREGUES, fora do gate; (b) a plataforma completa (OP-2/3/4 restantes + auth Logto no command-side) — segue GATED, e o gatilho que a governa hoje é o do ADR onion-adr-hosted-service-identity-2026-08 (critério de negócio), não mais só o Q_gatilho técnico antigo; então remedir esse gatilho de negócio especificamente (há federado real consumindo recurso hospedado no Logto além do próprio maestro? — checar org Grana.AI no bridge) antes de reafirmar ou revogar o gate.",
+   "gatilho": "1º membro role:consumer (T2) real em members.yaml OU 1º contrato breaking em contracts/ (critério técnico original, Q_gatilho) — SUBSTITUÍDO em 2026-08-01 pelo ADR por: \"existe ao menos 1 federado migrado para o Logto consumindo recurso hospedado?\" (critério de negócio, nunca remedido explicitamente contra este nó)",
+   "gatilho_disparou": "NAO",
+   "juiz": "REPROVADO"
+  }
+ ],
+ "juizo": [
+  {
+   "aprovados": [],
+   "reprovados": [
+    {
+     "node_id": "D_spec_now_build_gated",
+     "motivo": "GATILHO DECLARADO, NÃO MEDIDO — e o próprio worker confessa isso no campo. Ele acertou em nomear o gatilho vigente (o ADR docs/analysis/onion-adr-hosted-service-identity-2026-08.md:90-98,132 substituiu em 2026-08-01 o critério técnico pelo de negócio: '≥1 federado migrado ao Logto consumindo recurso hospedado'), curando metade da reprovação anterior. Mas o `method` só executa comandos do critério MORTO (grep role: em members.yaml, ls contracts/, grep REGRA 66) e mesmo assim carimba `gatilho_disparou: NAO` para o critério VIVO, que ele mesmo descreve como 'nunca remedido explicitamente contra este nó'. Não é dúvida teórica: há material vivo no próprio repo que obriga a medir antes de fechar o gate — docs/onion/federation-orgs.json mapeia 5 orgs federadas no Logto (granaai, arandek, metagamify, pulse-mais, onion-dist) desde 2026-08-23 (commit 7769f732, 'Logto == SSOT'); m2-bridge-logto-2026-07.kg.yaml traz E_org_membership_grows_2026_08 ('a cardinalidade DRIFTOU: 1 org com membro virou 2') e E_pull_endpoint_works ('token de org do pulse-mais puxa os 12 próprios com sha') — identidade de federado consumindo recurso hospedado do bridge. O ADR chama o gate de 'factual e barato de verificar'; o worker não o verificou e ainda assim declarou fechado. Defeito secundário de contagem: o method reporta '9 standalone/1 hub/1 source', enquanto o vivo tem 11 linhas `role: standalone` em 13 entradas (as 2 omitidas — a destilação da linha 213 e a porta da 245 — não são declaradas como filtro, então o número sai não-reconciliado)."
+    },
+    {
+     "node_id": "D_D5",
+     "motivo": "MORTE NÃO PROCURADA — reincidência exata da metade (b) da reprovação anterior. A metade (a) foi curada (a contagem virou 4/4 honesta contra o label, e confere: as 4 afirmações estão em decisions.md:82-90; verifiquei também que dd0f3ffb de 2026-08-13 não tocou o §D5). Mas o CONFIRMED se apoia só em reler o próprio trace (decisions.md) + git log — nenhum comando procura o que mataria o nó. E a morte está a UM grep (`grep -rln 'd5-pricing|D_D5' docs/`): docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml, em disco desde 2026-08-31 (commit 439b9b78, um dia ANTES da medição), contém (i) C_TESE_ESTRATEGIA_PRECO com `status: refuted` — a tese 'os quatro degraus do D5 seguem COTÁVEIS' foi derrubada pelo Elenxo wf_e27840db-527, o que atinge de frente a afirmação (1) 'degraus 1-2 vendíveis-já'; (ii) E_ELENXO_ESTRATEGIA_PRECO, 'Elenxo [estrategia-preco] REPROVADA: 5 veredito(s) derrubado(s)', citando nominalmente C_treino_daterate ('VALIDADO é complacência sobre um claim que nunca passou pelo próprio teste'), C_cert_selo e C_compliance_pack — os claims que SUPPORTS D_D5; (iii) o fato novo de 25/08 (mecanismo determinístico entregue de graça no marketplace público) que o Elenxo aponta como caducidade da ÂNCORA, sem uma linha do worker sobre isso; e (iv) C_ERRA_GATE_DE_INSTRUMENTACAO_VALOR_POR_ADOTANT, que marca [ERRADO] o irmão Q_instrument_value_per_adopter do MESMO arquivo (d5-pricing-2026-07.kg.yaml:127-137, `status: done`, verified_at 2026-08-30) — precisamente o gate da afirmação (3) 'preço-por-outcome só após instrumentar'. CONFIRMED 4/4 sem tocar em nada disso é o mesmo veredito complacente que o Elenxo já nomeou."
+    }
+   ]
+  }
+ ],
+ "nao_medidos_por_teto": [
+  "Q_SDAAL_EXECUTAVEL_ONDE_PARA",
+  "Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES",
+  "C_auth_logto_sdaal",
+  "D_pkce_risk_mitigations",
+  "Q_LACUNA_DECISAO_MAIS_CODIGO",
+  "Q_CUSTO_DO_PORTE_NUNCA_MEDIDO"
+ ],
+ "parametros": {
+  "teto": 150000,
+  "price_per_node": 74000,
+  "max_nos": 2
+ }
+}

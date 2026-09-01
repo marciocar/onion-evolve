@@ -10657,6 +10657,34 @@ PY
 
 
 
+
+run_census_extract_selftests() {
+  local ex="${SCRIPT_DIR}/kg-census-extract.sh"
+  local d rc out; d="$(mktemp -d)"
+  mkdir -p "$d/docs/onion/graph"
+  # fixture sintética: 2 nós open (1 fresco de hoje, 1 velho), backlog declarando 2
+  printf 'meta:\n  id: fx\nnodes:\n  - id: N_FRESCO\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: %s\n    label: "a"\n  - id: N_VELHO\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: 2026-01-01\n    label: "b"\n' "$(date +%F)" > "$d/docs/onion/graph/fx.kg.yaml"
+  printf '**2 itens abertos**\n| 9.0 | `N_FRESCO` | fx | a |\n| 3.0 | `N_VELHO` | fx | b |\n' > "$d/backlog.md"
+  # (a) partição correta FRESCO/A-MEDIR
+  out="$(cd "$d" && ONION_CENSUS_ROOT="$d" ONION_CENSUS_BACKLOG="$d/backlog.md" bash "${ex}" --format summary 2>&1)"; rc=$?
+  if [ $rc -eq 0 ] && printf '%s' "$out" | grep -q '1 A-MEDIR' && printf '%s' "$out" | grep -q '1 FRESCOS'; then
+    record_pass "census-extract: (a) partição FRESCO/A-MEDIR correta na fixture sintética"
+  else record_fail "census-extract: (a)" "partição errada (rc=$rc): $out"; fi
+  # (b) descompasso contagem ⇒ exit 2 fail-loud
+  printf '**5 itens abertos**\n| 9.0 | `N_FRESCO` | fx | a |\n' > "$d/backlog.md"
+  rc=0; out="$(cd "$d" && ONION_CENSUS_ROOT="$d" ONION_CENSUS_BACKLOG="$d/backlog.md" bash "${ex}" 2>&1)" || rc=$?
+  if [ $rc -eq 2 ] && printf '%s' "$out" | grep -q 'FAIL-LOUD'; then
+    record_pass "census-extract: (b) contagem divergente é exit 2 fail-loud (população errada não se mede)"
+  else record_fail "census-extract: (b)" "descompasso não reprovou (rc=$rc): $out"; fi
+  # (c) --floor corta e DECLARA
+  printf '**2 itens abertos**\n| 9.0 | `N_FRESCO` | fx | a |\n| 3.0 | `N_VELHO` | fx | b |\n' > "$d/backlog.md"
+  out="$(cd "$d" && ONION_CENSUS_ROOT="$d" ONION_CENSUS_BACKLOG="$d/backlog.md" bash "${ex}" --floor 5 --format summary 2>&1)"; rc=$?
+  if [ $rc -eq 0 ] && printf '%s' "$out" | grep -q '1 cortados pelo piso 5.0 (corte DECLARADO)'; then
+    record_pass "census-extract: (c) --floor corta e o corte é DECLARADO (nunca silêncio)"
+  else record_fail "census-extract: (c)" "piso sem declaração (rc=$rc): $out"; fi
+  rm -rf "$d"
+}
+
 run_members_registry_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   # REGRA 66 — sem depender do estado do vivo além do caso (a), que é o canário da fixture
@@ -10945,6 +10973,7 @@ run_compose_exposure_selftests
 run_backlog_projection_selftests
 run_radar_staleness_selftests
 run_members_registry_selftests
+run_census_extract_selftests
 run_drive_selftests
 run_site_derivation_selftests
 run_rules_registry_selftests
