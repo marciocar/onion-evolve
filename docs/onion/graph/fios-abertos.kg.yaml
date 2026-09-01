@@ -58,8 +58,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.9
-    status: open
-    verified_against: 'gatilho: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA (m2, at. 10.8) — REAL na listagem; fix de 1 arquivo em identity.ts'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: PR onion-bridge#65 aberto (fix jwksAttemptedAt, tsc rc=0) — merge/deploy do bridge e ato do maestro'
     label: 'Bridge: implementar jwksAttemptedAt (piso na TENTATIVA, nao so no sucesso) em src/identity.ts — PR na branch do clone dev; merge/deploy do bridge e do maestro.'
 
   - id: I_LINT_VE_WORKFLOWS
@@ -67,8 +68,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: open
-    verified_against: 'gatilho: E_LINT_NAO_ENXERGA_WORKFLOWS (elenxos-2026-08-07, at. 8.0) — as regras SDAAL nao varrem .github/workflows'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: PR #758 (REGRA 10 estendida a .github/workflows; bancada 2/2; vivo em silencio)'
     label: 'Estender o _find das regras SDAAL (no-direct-provider-calls e irmas) para incluir .github/workflows/*.yml, com caso de bancada provando a mordida.'
 
   - id: I_GTM_JSONL_PERSISTIDO
@@ -76,8 +78,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
-    verified_against: 'gatilho: Q_instrument_metrics (gtm-decisions, at. 5.0) — instrumentacao AUTORIZADA em D5 07-29; scripts emitem --jsonl e nada persiste'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: ops/gtm/collect-metrics.sh + ledgers em docs/onion/metrics/ (coleta real 4/4, idempotencia provada, cron 12:30 instalado, --resumo agregador)'
     label: 'Persistir a saida --jsonl dos scripts de instrumentacao GTM num ledger versionado + cron diario (precedente offsite-cron) + agregador simples de leitura.'
 
   - id: I_CONSOLE_AUTOOFF
@@ -85,8 +88,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.85
-    status: open
-    verified_against: 'gatilho: C_console_autooff_gap (m2, at. 3.4) — console.sh liga sem auto-desligamento; proposta ja medida: systemd-run --on-active'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: onion-logto@master — systemd-run transient 60min, timer provado; dogfood achou o console LIGADO por esquecimento (o caso real)'
     label: 'onion-vps-logto/console.sh: case on) ganha systemd-run --unit=onion-logto-console-autooff desligando o console admin apos janela — o loopback nao fica aberto por esquecimento.'
 
   - id: I_FECHAMENTOS_TRIVIAIS
@@ -94,8 +98,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: open
-    verified_against: 'gatilho: 3 recarimbos + C_reuse_readmodel->done ja MEDIDOS na revisao-total (proximo_passo de 1 linha cada)'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: C_reuse_readmodel->done, recarimbo C_a2a_gate_narrow, selo C_commodity_vs_diff, Q_BRANCH_MAIN->done (lineage product no members.yaml, validate rc=0)'
     label: 'Fechamentos de grafo ja medidos: C_reuse_readmodel->done (recomendacao cumprida via REGRA 66), recarimbo C_a2a_gate_narrow, selo C_commodity_vs_diff, Q_BRANCH_MAIN (lineage product no members.yaml).'
 
 edges:

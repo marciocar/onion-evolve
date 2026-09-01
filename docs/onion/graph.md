@@ -556,6 +556,7 @@ onion-engineering	requires	agent:nodejs-specialist
 onion-engineering	requires	agent:postgres-specialist	
 onion-engineering	requires	agent:react-developer	
 onion-engineering	requires	skill:onion-engineering-context	
+onion-evolve	lineage	product	
 onion-evolve	lineage	vps-bridge	
 onion-evolve	lineage	workstation	
 onion-evolve	specialization	breadcrumbs	

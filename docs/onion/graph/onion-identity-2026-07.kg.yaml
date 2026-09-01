@@ -71,9 +71,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.5
-    status: open
+    status: done
     verified_at: 2026-09-01
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. 1) `grep -n "Q_BRANCH_MAIN" -A 8 docs/onion/graph/onion-identity-2026-07.kg.yaml => members.yaml (<hub-t1>, HEAD atual) declara `lineages:` com apenas duas chaves: `framework:` (branch…'
+    verified_against: 'I_FECHAMENTOS_TRIVIAIS (Onda 8): lineage product adicionada ao members.yaml (host srv1812846, branch main, consumidores nomeados: site+bridge+IdP); members-validate rc=0'
     label: "onde a main-produto entra no mapa de linhagens do members.yaml"
   - id: Q_CLIENT_SCOPE
     node_type: question

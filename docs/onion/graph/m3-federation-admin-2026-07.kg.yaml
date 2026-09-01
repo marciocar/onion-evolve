@@ -201,9 +201,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.7
-    status: open
+    status: confirmed
     verified_at: 2026-09-01
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. Lido o nó (label completo) e as arestas de saída (C_commodity_vs_diff SUPPORTS C => A fronteira declarada no claim (Logto = commodity identidade/sessão/MFA/CRUD-org/Secret-Vault; Onion…'
+    verified_against: 'selo Onda 8 (2026-09-01): medicao da revisao-total (README Logto + members.yaml) sem contra-evidencia'
     label: "FRONTEIRA commodity-BUY (Logto) × diferencial-BUILD (Onion): comprar identidade/sessão/token/MFA/CRUD de org/Secret Vault (undifferentiated); construir a tradução papel-grosso→semântica de tier (D7) + matriz de confiança fina de members.yaml (nunca delegável ao Logto sem duplicar a SSOT)"
   - id: C_trust_matrix_stays_onion
     node_type: claim
@@ -234,9 +234,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.75
-    status: open
+    status: done
     verified_at: 2026-09-01
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 6/6 claims; juiz APROVADO. ls -la + grep verbatim nos 5 artefatos citados no label (federation-console.sh,  => Os 5 artefatos que o nó pede para REUSAR (não redesenhar) estão todos vivos: federation-console.sh (…'
+    verified_against: 'I_FECHAMENTOS_TRIVIAIS (Onda 8): recomendacao CUMPRIDA — evolucao por extensao (REGRA 66/M2, PR #746) sem redesenho; medido na revisao-total e no censo r1'
     label: "REUSAR o read-model já entregue: console HTML (F1.3), federation-radar (3 checks advisory), pin-integrity-check (gate real), graph.sh --map (Mermaid), seletor fino key:value. Os '4 slices' do SYNTHESIS JÁ foram construídos — tratar como 'entregue, avaliar evolução', não redesenhar"
   - id: C_naive_admin_platform
     node_type: claim
