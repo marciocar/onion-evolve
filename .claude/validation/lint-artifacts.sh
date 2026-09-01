@@ -3609,7 +3609,29 @@ check_radar_staleness() {
 }
 
 check_kg_verification_coverage
+# REGRA 66 — Registro da federação validado no gate (members.yaml) [HARD]
+# previne: membro quebrado entrando calado no ledger — o M2 da spec m3-federation-admin
+# (Q_members_ci_gate): o validador existia desde o OP-1 (PR #697) mas só rodava por invocação
+# manual; registro que depende de disciplina degrada (behavior-over-declaration). CORE-only por
+# dado: o adotante não carrega docs/evolution/federation/members.yaml — ausência = silêncio.
+# Validador ilegível/ausente com o dado presente = HARD fail-loud (P0 da REGRA 30).
+check_members_registry() {
+  local mf="${ONION_MEMBERS_FILE:-${REPO_ROOT}/docs/evolution/federation/members.yaml}"
+  [ -f "${mf}" ] || return 0
+  local mv="${SCRIPT_DIR}/members-validate.sh"
+  if [ ! -f "${mv}" ]; then
+    violation "HARD" "${mf}" "REGRA 66: members.yaml presente mas members-validate.sh AUSENTE — a guarda não sabe cobrar; fail-loud, nunca conformidade por ausência"
+    return 0
+  fi
+  local out rc=0
+  out=$(bash "${mv}" "${mf}" 2>&1) || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    violation "HARD" "${mf}" "REGRA 66: registro da federação INVÁLIDO (members-validate rc=${rc}): $(printf '%s' "${out}" | tail -2 | tr '\n' ' ' | cut -c1-160)"
+  fi
+}
+
 check_radar_staleness
+check_members_registry
 check_kg_radar_integrity
 check_kg_trace_resolve
 check_review_artifact

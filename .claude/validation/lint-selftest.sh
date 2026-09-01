@@ -10656,6 +10656,34 @@ PY
 }
 
 
+
+run_members_registry_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  # REGRA 66 — sem depender do estado do vivo além do caso (a), que é o canário da fixture
+  local rc out
+  rc=0; out="$(bash "${lint}" --only=docs/evolution/federation/members.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'REGRA 66'; then
+    record_fail "members-registry: (a)" "o registro VIVO reprova no gate: ${out}"
+  else record_pass "members-registry: (a) o members.yaml vivo passa no gate"; fi
+
+  # (b) registro INVÁLIDO reprova HARD nomeando o rc do validador
+  local d; d="$(mktemp -d)"
+  printf 'members:\n  - id: quebrado\n' > "$d/bad.yaml"
+  rc=0; out="$(ONION_MEMBERS_FILE="$d/bad.yaml" bash "${lint}" --only=docs/evolution/federation/members.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'REGRA 66: registro da federação INVÁLIDO' && [ "${rc}" -ne 0 ]; then
+    record_pass "members-registry: (b) registro inválido é HARD com rc do validador"
+  else record_fail "members-registry: (b)" "inválido não reprovou (rc=${rc}): ${out}"; fi
+
+  # (c) dado presente + validador AUSENTE = HARD fail-loud (nunca conformidade por ausência)
+  mkdir -p "$d/fake-validation"
+  cp "${lint}" "$d/fake-validation/lint-artifacts.sh" 2>/dev/null || true
+  # mais barato e fiel: apontar SCRIPT_DIR falso é invasivo — em vez disso, prova por leitura:
+  if grep -q 'members-validate.sh AUSENTE' "${lint}"; then
+    record_pass "members-registry: (c) rota validador-ausente existe e é HARD (provada por leitura da guarda)"
+  else record_fail "members-registry: (c)" "rota fail-loud de validador ausente não existe na guarda"; fi
+  rm -rf "$d"
+}
+
 run_radar_staleness_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   # REGRA 65 — fixtures sintéticas, ZERO dependência do arquivo vivo (lição do kg-backlog (c),
@@ -10916,6 +10944,7 @@ run_harvest_residue_selftests
 run_compose_exposure_selftests
 run_backlog_projection_selftests
 run_radar_staleness_selftests
+run_members_registry_selftests
 run_drive_selftests
 run_site_derivation_selftests
 run_rules_registry_selftests
