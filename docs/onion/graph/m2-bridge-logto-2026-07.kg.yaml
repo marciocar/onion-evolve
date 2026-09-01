@@ -1600,6 +1600,17 @@ nodes:
     verified_against: 'census r2 (wf_102a9bec-52f): REFUTED 3/3 — Lido o nó inteiro (label), contadas 3 claims: (1) access token curto 10-15min + rotação de refresh token; (2) . Selo do maestro: ordem vai-na-ordem 2026-09-01 (etapa 1 da sequencia aprovada)'
     label: 'MEDIDO: As 3 mitigações "baratas" que o nó declara como FIXADAS neste flip não foram implementadas como descrito — e a (1) foi implementada na direção CONTRÁRIA por decisão deliberada de UX (accessTokenTtl=3600s, refresh de 14 dias sem rotação). CSP (2) nunca existiu em lugar nenhum (nem Caddy, nem server.ts). Procedimento de '
 
+  - id: D_TTL_UX_TRADEOFF
+    node_type: decision
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'etapa 2 da ordem vai-na-ordem (2026-09-01): CSP no ar (curl -sI mediu os 3 headers), rotateRefreshToken aplicado e provado por re-run idempotente (com rotacao), SUSPENSAO.md escrito; accessTokenTtl mantido 3600 por decisao'
+    label: 'DECISAO SELADA (substitui a metade TTL do refutado D_pkce_risk_mitigations): accessTokenTtl fica em 3600s — a exigencia de 10-15min do flip original trocava UX por janela curta; a compensacao real e a ROTACAO de refresh (vazado morre no 1o replay) + CSP + procedimento de suspensao. As 3 mitigacoes agora EXISTEM no vivo, na forma ajustada.'
+    trace: "ops/caddy/Caddyfile · ops/bridge-auth/logto-provision.sh · ops/bridge-auth/SUSPENSAO.md"
+
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -2187,3 +2198,6 @@ edges:
   - from: E_REFUTA_D_pkce_risk_mitigations
     to: D_pkce_risk_mitigations
     edge_type: REFUTES
+  - from: D_TTL_UX_TRADEOFF
+    to: D_pkce_risk_mitigations
+    edge_type: SUPERSEDES
