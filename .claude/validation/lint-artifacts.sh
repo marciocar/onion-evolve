@@ -1684,6 +1684,19 @@ ${lines}"
   done < <(
     _find "${CLAUDE_DIR}/commands" "${CLAUDE_DIR}/agents" -name "*.md" -print0 2>/dev/null
   )
+  # .github/workflows também é CONSUMIDOR (E_LINT_NAO_ENXERGA_WORKFLOWS, Onda 8 2026-09-01):
+  # um step de Actions é shell puro — chamada direta a provider ali é a MESMA dívida SDAAL,
+  # e ficava invisível porque o _find só via .claude/. Workflows não têm allowlist de adapter.
+  while IFS= read -r -d '' file; do
+    if grep -qE "${pattern}" "${file}"; then
+      local wlines
+      wlines=$(grep -nE "${pattern}" "${file}" | head -3 | sed 's/^/      /')
+      violation "HARD" "${file}" "chamada direta a provider em WORKFLOW (use a peça executável do adapter — SDAAL §9). Ocorrências:
+${wlines}"
+    fi
+  done < <(
+    _find "${REPO_ROOT}/.github/workflows" -name "*.yml" -print0 2>/dev/null
+  )
 }
 
 # ===========================================================================

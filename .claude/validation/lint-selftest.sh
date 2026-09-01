@@ -10658,6 +10658,32 @@ PY
 
 
 
+
+run_sdaal_workflows_selftests() {
+  # Testa a FUNÇÃO com REPO_ROOT sintético (fixture fora do repo não seria varrida pelo _find
+  # real — lição da 1ª redação desta própria família, 2026-09-01).
+  local d; d="$(mktemp -d)"
+  mkdir -p "$d/.github/workflows" "$d/.claude/commands" "$d/.claude/agents"
+  printf 'name: t\njobs:\n  x:\n    steps:\n      - run: curl mcp_ClickUp_create\n' > "$d/.github/workflows/bad.yml"
+  printf 'name: t\njobs:\n  x:\n    steps:\n      - run: echo ok\n' > "$d/.github/workflows/good.yml"
+  local out
+  out="$(bash -c '
+    set -euo pipefail
+    REPO_ROOT="'"$d"'"; CLAUDE_DIR="'"$d"'/.claude"; ONLY_PATH=""
+    _find() { local o=(); for a in "$@"; do o+=("$a"); done; find "${o[@]}"; }
+    violation() { echo "V[$1] $2 :: ${3%%$'"'"'\n'"'"'*}"; }
+    source <(sed -n "/^check_no_direct_provider_calls()/,/^}$/p" "'"${SCRIPT_DIR}"'/lint-artifacts.sh")
+    check_no_direct_provider_calls
+  ' 2>&1)"
+  if printf '%s' "${out}" | grep -q 'provider em WORKFLOW' && printf '%s' "${out}" | grep -q 'bad.yml'; then
+    record_pass "sdaal-workflows: (a) provider direto em .github/workflows é HARD"
+  else record_fail "sdaal-workflows: (a)" "não mordeu: ${out}"; fi
+  if printf '%s' "${out}" | grep -q 'good.yml'; then
+    record_fail "sdaal-workflows: (b)" "workflow limpo acusado: ${out}"
+  else record_pass "sdaal-workflows: (b) workflow limpo fica em silêncio"; fi
+  rm -rf "$d"
+}
+
 run_census_extract_selftests() {
   local ex="${SCRIPT_DIR}/kg-census-extract.sh"
   local d rc out; d="$(mktemp -d)"
@@ -10974,6 +11000,7 @@ run_backlog_projection_selftests
 run_radar_staleness_selftests
 run_members_registry_selftests
 run_census_extract_selftests
+run_sdaal_workflows_selftests
 run_drive_selftests
 run_site_derivation_selftests
 run_rules_registry_selftests
