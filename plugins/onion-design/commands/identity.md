@@ -94,7 +94,7 @@ progresso na task via a abstração (`taskManager.addComment`) só se já houver
 
 Rodar **no próprio onion-evolve**: a identidade do Onion (`docs/design-context/` já tem foundations/
 semantic reais — #D97757/#8A2BE2) é o caso de teste. Fase 2 → gate verde → materializar o `theme.css`
-do Onion → aplicar num material (`docs/materials/landing-page.md`). Testar **modo de falha** (token
+do Onion → aplicar num material do projeto (ex.: a página viva em `site/src/pages/index.astro`). Testar **modo de falha** (token
 fora da escala, contraste insuficiente, alias órfão) — o gate deve barrar. Fix → re-rodar.
 
 ## Saída esperada

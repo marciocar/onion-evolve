@@ -154,7 +154,7 @@ docs/
 │
 ├── materials/                  # Materiais derivados externos (Fase 4 — 10 arquivos)
 │   ├── README.md               # Índice e guia de uso dos materiais
-│   ├── landing-page.md         # Esqueleto da landing page
+│   ├── landing-page.md         # SUPERSEDIDO pelo site vivo (histórico)
 │   ├── manual-toc.md           # Sumário do manual técnico
 │   ├── case-studies.md         # 3 case studies desenvolvidos
 │   ├── brand-book.md           # Brand book derivado do design-context
@@ -303,7 +303,7 @@ Guias de aplicação do Onion em projetos novos, legados ou regulados:
 Esqueletos de materiais externos derivados da KB canônica de identidade ([onion-framework-identity.md](knowledge-base/meta/onion-framework-identity.md), SSOT):
 
 - **[Materiais — README](materials/README.md)** - Índice e mapa de uso (KB → material) por perfil
-- **[Landing Page](materials/landing-page.md)** - Esqueleto de 7 seções (hero → CTA)
+- **[Landing Page](materials/landing-page.md)** - SUPERSEDIDO — o site vivo (site/src/) é a fonte; arquivo mantido pelo histórico
 - **[Manual — Sumário](materials/manual-toc.md)** - TOC de 11 capítulos (conteúdo existente ✅ / a escrever 🔲)
 - **[Estudos de Caso](materials/case-studies.md)** - 3 casos desenvolvidos (Federation v2, /meta:evolve, Cursor→Native)
 - **[Brand Book](materials/brand-book.md)** - Derivado do `design-context/` (tokens → identidade aplicada)
