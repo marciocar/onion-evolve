@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**102 itens abertos** em 29 grafo(s) com aberto (de 46 no escopo) · 29 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**99 itens abertos** em 28 grafo(s) com aberto (de 46 no escopo) · 28 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 16 item(ns)
 
@@ -132,14 +132,6 @@
 | 4.2 | `C_dissent_auth_transversal` | vps-shared-tools-2026-07 | DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como da |
 | 4.0 | `Q_tunneling` | vps-shared-tools-2026-07 | PESQUISA+ELENXO: ngrok × Cloudflare Tunnel × Tailscale Funnel × Caddy-so. Para QUE (dev-preview? webhook inbound? exposicao efe |
 | 3.2 | `C_axis_tunneling` | vps-shared-tools-2026-07 | TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de |
-
-## fios-abertos — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.5 | `I_PECA_CATRACA` | fios-abertos | A peca publica do unico ativo sem par medido: ligue o gate hoje num repo que reprova, sem parar ninguem — o passivo congela e so |
-| 8.0 | `I_RADAR_SURFACE` | fios-abertos | Implementar /meta:radar: comando maestro-invocado com 6 eixos e baseline DATADA por eixo, staleness detectada por regra SOFT no li |
-| 6.4 | `I_HERO_PELO_MECANISMO` | fios-abertos | Reescrever o hero de onionevolve.com pelo MECANISMO (gate que veta + catraca que congela passivo + radar sem-LLM), nao pelas conta |
 
 ## librechat-kg-runtime-2026-08 — 2 item(ns)
 

@@ -86,8 +86,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.85
-    status: open
-    verified_against: 'gatilho: F2 moat-gates UNICO — busca no F1 nao achou par para catraca-de-passivo-legado; prova de campo: 38 HARD legados tolerados num adopt real sem travar merge'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: PR #737 MERGED 2026-09-01T01:06Z — draft anonimizado com recorte declarado pelo Elenxo (catraca e arte consolidada; o sem-par e aplica-la a regras de agente); publicar no site e ato do maestro'
     label: 'A peca publica do unico ativo sem par medido: ligue o gate hoje num repo que reprova, sem parar ninguem — o passivo congela e so desce. ANONIMIZADA (vendor-scrub: nome de adotante NAO entra em material publico). Draft em docs/materials; publicacao no site e ato do maestro.'
 
   - id: I_RADAR_SURFACE
@@ -95,8 +96,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.8
-    status: open
-    verified_against: 'gatilho: D_META_RADAR_DESENHO (programa) + S9_q_radar_mechanism parada desde 2026-07-06'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: PR #738 MERGED 2026-09-01T01:19Z — /meta:radar + REGRA 65 (bancada 6/6 no CI) + baselines datadas + gatilho cc_version; fecha S9'
     label: 'Implementar /meta:radar: comando maestro-invocado com 6 eixos e baseline DATADA por eixo, staleness detectada por regra SOFT no lint (padrao REGRA 62: a maquina detecta, o humano roda), juiz-fixo, write(KG) por rodada com SUPERSEDES da baseline anterior. Path vendorizado: PR-verde fica para merge do maestro.'
 
   - id: I_HERO_PELO_MECANISMO
@@ -104,8 +106,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
-    verified_against: 'gatilho: F2 SUBESTIMADO — landing 64 dias velha vende contagens (commodity de 72h no mundo medido: headcount 803 estrelas em 3 dias) e nao cita gate/catraca/grafo uma unica vez'
+    status: done
+    verified_at: 2026-09-01
+    verified_against: 'PAGO: PR #739 MERGED 2026-09-01T01:22Z — strip hero-mech com 3 provas estaveis no hero VIVO; veredito da landing morta supersedido no grafo; deploy e ato do maestro'
     label: 'Reescrever o hero de onionevolve.com pelo MECANISMO (gate que veta + catraca que congela passivo + radar sem-LLM), nao pelas contagens. Draft-as-PR; deploy e MOAT (ato do maestro). NAO selecionado nesta passada (max-nodes 4) — proximo censo o pega.'
 
 edges:
