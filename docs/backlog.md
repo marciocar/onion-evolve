@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**81 itens abertos** em 25 grafo(s) com aberto (de 46 no escopo) · 25 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**86 itens abertos** em 26 grafo(s) com aberto (de 46 no escopo) · 26 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 14 item(ns)
 
@@ -144,6 +144,16 @@
 |--:|---|---|---|
 | 7.2 | `D_GREP_OLD_PIN` | arandek-adoption-dogfood-2026-07 | BACKLOG (nao implementado; priorizar e do maestro). No /meta:adopt --update, apos reescrever o .onion-version: `grep -rl <pin-anti |
 | 2.0 | `Q_PIN_GREP_WORTH_IT` | arandek-adoption-dogfood-2026-07 | FRONTEIRA DECLARADA PELO PROPRIO ADOTANTE (R15.2 — registrada como observacao, nao como pedido): 'pode ser que o custo nao compe |
+
+## fios-abertos — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.2 | `I_JWKS_ATTEMPTED_AT` | fios-abertos | Bridge: implementar jwksAttemptedAt (piso na TENTATIVA, nao so no sucesso) em src/identity.ts — PR na branch do clone dev; merge |
+| 6.8 | `I_LINT_VE_WORKFLOWS` | fios-abertos | Estender o _find das regras SDAAL (no-direct-provider-calls e irmas) para incluir .github/workflows/*.yml, com caso de bancada pro |
+| 6.4 | `I_GTM_JSONL_PERSISTIDO` | fios-abertos | Persistir a saida --jsonl dos scripts de instrumentacao GTM num ledger versionado + cron diario (precedente offsite-cron) + agrega |
+| 5.4 | `I_FECHAMENTOS_TRIVIAIS` | fios-abertos | Fechamentos de grafo ja medidos: C_reuse_readmodel->done (recomendacao cumprida via REGRA 66), recarimbo C_a2a_gate_narrow, selo C |
+| 5.1 | `I_CONSOLE_AUTOOFF` | fios-abertos | onion-vps-logto/console.sh: case on) ganha systemd-run --unit=onion-logto-console-autooff desligando o console admin apos janela  |
 
 ## federation-health-2026-07 — 1 item(ns)
 
