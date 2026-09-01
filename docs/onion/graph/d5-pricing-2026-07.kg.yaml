@@ -43,6 +43,8 @@ nodes:
     impact: 4
     confidence: 0.6
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. 1) Lido o nó inteiro (label, edges SUPPORTS/DEPENDS_ON) em docs/onion/graph/d5-p => decisions.md linha 86 (ainda vigente, não editada desde a decisão original): "Degrau 3 — compliance-…'
     label: "DEGRAU 3 Compliance-pack (cunha P4): faixa $15k-40k/ano CITÁVEL não-fechado. Terço inferior do mercado compliance-automation (abaixo/na mediana Vanta $20k até Drata-Foundation $25-50k; muito abaixo de GRC enterprise $50-500k). Vende compliance-as-code (spec auditável), NÃO monitoramento contínuo. SOB-CONSULTA (gated D6: zero P4 entrevistado + escopo aberto). Confiança: média"
   - id: C_sota_subscription
     node_type: claim
@@ -51,6 +53,8 @@ nodes:
     impact: 4
     confidence: 0.45
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. Lido o nó inteiro (label + edges) e o gate Q_d2_l1l6_activation associado. Cruza => decisions.md §D2 (ativação) segue `gated`: "threat model N-tenant verificado... a verificar" — texto…'
     label: "DEGRAU 4 Assinatura SOTA: $150-400/mês indiv. · $250-600 base + $60-120/seat empresa. Acima das ferramentas de codificação genéricas (Cursor/Copilot/Claude Code Max) — vende curadoria+governança de contexto federado, não assistência de código. SOB-CONSULTA (gated D2: vende L1-L6 não-construído; cotar = declarado≠verificado = queima de moat). Faixa = ancoragem, não oferta. Confiança: baixa"
 
   # ---- EVIDÊNCIA — comparáveis 2026 (evidence, url no label) ----
@@ -139,6 +143,8 @@ nodes:
     impact: 4
     confidence: 0.55
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. grep -n "P4|compliance-pack" docs/business-context/decisions.md; git log -p --fo => docs/business-context/decisions.md (linha 86, ainda vigente, sem edição desde 07-28) segue dizendo v…'
     label: "Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entrevistas P4 como pendência; falta também fechar o escopo do pack v1 (frameworks, nº artefatos, acompanhamento de auditoria) p/ achar custo-base/margem"
   - id: Q_d2_l1l6_activation
     node_type: question

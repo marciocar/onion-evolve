@@ -95,8 +95,20 @@ nodes:
     impact: 2
     confidence: 0.6
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_automacao_pipeline (SUPERSEDES); label preservado como historia'
     label: "Follow-up GATED: um orquestrador que encadeia extract→consolidate→diagnose automaticamente? Decisão do maestro: NÃO agora — o dogfood fez humano-no-loop de propósito (a PAUSA é o valor); automatizar arrisca engessar a cadência. Este PR entrega o método canônico, não o orquestrador"
     trace: ".claude/commands/meta/kg.md"
+  - id: E_CENSO0901_Q_automacao_pipeline
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — Lido o nó completo (label/trace, linhas 92-99) + a única aresta (DEPENDS_ON → D_diagnose_m'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó ficou aberto (status:open) como se a pergunta seguisse pendente, mas ela já foi respondida e a resposta já foi construída no mesmo dia (PR #500): automação parcial mecânica com PAUSA preservada, documentada em .claude/commands/meta/kg.md §"Automação parcial" e materializada em scaffold-diagnose'
+
 edges:
   - from: E_map_e_software_diagnose_e_negocio
     to: C_p6_wrapper_fino
@@ -131,3 +143,6 @@ edges:
   - from: Q_automacao_pipeline
     to: D_diagnose_mode
     edge_type: DEPENDS_ON
+  - from: E_CENSO0901_Q_automacao_pipeline
+    to: Q_automacao_pipeline
+    edge_type: SUPERSEDES

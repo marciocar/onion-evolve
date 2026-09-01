@@ -87,6 +87,8 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_ENT_monitoring (SUPERSEDES); label preservado como historia'
     label: "MONITORAMENTO/OBSERVABILIDADE: candidato, zero desenho. Maestro nomeou P2 (a esclarecer — Prometheus/Posthog/Phoenix?), Langfuse (LLM observability), OpenTelemetry (traces/metrics) e afins. Exige pesquisa documentada (verify-external-for-current) + Elenxo de stack"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
@@ -195,6 +197,8 @@ nodes:
     status: open
     impact: 4
     confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_A_analysis_structure (SUPERSEDES); label preservado como historia'
     label: "ESTRUTURA DE ANALISE INICIAL (4 fases, antes do plano): F0 frame+invariantes+Elenxo catalogo-vs-plataforma · F1 pesquisa por-tool documentada born-in-KG (verify-external) · F2 arquitetura cross-tool (SDAAL/bridge/Logto-spine) · F3 Elenxo por-decisao-real → F4 sintese que DERIVA a doutrina + o plano faseado gated"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
@@ -260,6 +264,8 @@ nodes:
     status: open
     impact: 2
     confidence: 0.8
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_axis_tunneling (SUPERSEDES); label preservado como historia'
     label: "TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de provider (dev-preview? webhook inbound? adotante-sem-servidor via downstream-by-pull?). Se 1 real intencionado -> script-gated. Caso-de-uso decide na F1"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
@@ -355,6 +361,36 @@ nodes:
     label: "SUPERADA (era a SSOT ate 2026-08-06): 'WHATSAPP: whatsapp-sender VIVO (~onion/whatsapp-sender, whatsapp-web.js nao-oficial, repo privado)'. O parecer de 2026-07-05 registrava reinstalacao. A re-medicao no host vivo NAO achou processo, container nem unit systemd; o CODIGO existe em disco, mas em /home/onion/onion-bridge/workspaces/7f2a16301adad917/whatsapp-sender — NAO em ~onion/whatsapp-sender, que e o caminho que esta afirmacao superada dava — e a SSOT seguiu afirmando VIVO por 12h ate alguem ir procurar. Restaurada aqui porque foi APAGADA (label reescrito no #552), nao rebaixada"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
 
+  - id: E_CENSO0901_ENT_monitoring
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — Leitura do nó completo + das arestas SUPPORTS que apontam para ele (Q_monitoring_stack, C_'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede "pesquisa documentada + Elenxo de stack" como trabalho ABERTO ("zero desenho"). Isso já foi feito e respondido: F2 (stack-harmonia-2026-08, 2026-08-01) rodou o Elenxo (4 pesquisas + crítico adversarial + verificação independente) e o veredito sobrevivente é explícito — Langfuse/OTel/Promet'
+
+  - id: E_CENSO0901_A_analysis_structure
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 5/5 — Lido o nó inteiro + os nós relacionados (D_structured_plan_and_doctrine, C_escada_analise_'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede uma escada sequencial F0→F4 que segue tecnicamente incompleta (F2 reprovada e nunca refeita; F3/F4 nunca rodaram como fases formais). Mas o OBJETIVO da escada — "síntese que deriva a doutrina + o plano faseado gated" — já foi alcançado por um mecanismo diferente e mais leve, já em produção'
+
+  - id: E_CENSO0901_C_axis_tunneling
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — 1) Leitura do nó (linhas 257-264) e do irmão ENT_tunneling (linhas 94-104, já status:super'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pedia decidir, na F1, se tunneling era SDAAL-candidato ou script-gated entre 3 providers concretos (ngrok/Cloudflare Tunnel/Tailscale). A pesquisa F2b (stack-harmonia-2026-08, 08-01) respondeu de forma que torna a pergunta original mal-colocada: nenhum dos 3 providers é necessário — "tunneling"'
+
 edges:
   # o LibreChat entra como CONSUMIDOR do catalogo (Logto/Caddy), sob o framing decidido
   - from: E_librechat_install_started
@@ -443,3 +479,12 @@ edges:
   - from: C_axis_tunneling
     to: ENT_tunneling
     edge_type: SUPPORTS
+  - from: E_CENSO0901_ENT_monitoring
+    to: ENT_monitoring
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_A_analysis_structure
+    to: A_analysis_structure
+    edge_type: SUPERSEDES
+  - from: E_CENSO0901_C_axis_tunneling
+    to: C_axis_tunneling
+    edge_type: SUPERSEDES

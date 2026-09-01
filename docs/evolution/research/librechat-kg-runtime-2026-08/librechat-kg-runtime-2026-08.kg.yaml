@@ -123,6 +123,8 @@ nodes:
     impact: 3
     confidence: 0.85
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. Lida a label completa do nó (1 claim: "a perna MAP — ingestão doc→grafo — não te => Nenhuma ferramenta de ingestão doc→grafo existe no core hoje — o servidor MCP onion-kg (ops/mcp-onio…'
     label: "BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_colado). O loop na bancada vai de read ate write-como-proposta, mas nao INGERE documento em grafo. Gated: nasce quando houver consumidor nomeado de ingestao no core"
   - id: E_LINT_SLOW_VIA_MCP
     node_type: evidence
@@ -183,8 +185,8 @@ nodes:
     impact: 3
     confidence: 0.9
     status: open
-    verified_at: 2026-08-21
-    verified_against: "achado da 1a selagem: a proposta grana-ai-mapeamento (contexto de negocio da Grana) caiu na fila do CORE porque o onion-exec so escreve na kg-inbox do core — mas por I3 esse conhecimento mora no repo da Grana. Rejeitada do core; o destino correto nao existe ainda"
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. grep -n "Q_TENANT_WRITE_DESTINATION" -A40 no arquivo do nó; cat docs/evolution/k => O nó (1 claim: "destino correto para escrita de conhecimento no papel-de-negócio do tenant não exist…'
     label: "BURACO revelado pela selagem: a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adotante), nao a kg-inbox do core. Hoje toda proposta cai no core — risco de fonte-paralela por repo. Gated: nasce quando houver multi-tenant KG routing"
 
 edges:

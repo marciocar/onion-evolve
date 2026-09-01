@@ -154,7 +154,7 @@ nodes:
   - id: Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA
     node_type: question
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: 2026-09-01
     verified_against: 8o-elenxo-no-caminho-benigno-a-guarda-nao-emite-nada-e-log-sem-guarda-e-indistinguivel-de-guarda-muda
     status: open
     impact: 3

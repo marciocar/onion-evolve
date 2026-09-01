@@ -3,7 +3,7 @@ meta:
   schema_version: "1"
   baseline: 2026-08-31
   # kg-backlog-guard: on
-  # ═══ TETO: 60 NÓS. Grafo de programa fechado: cresce só por selagem do maestro (carteira/radar). ═══
+  # ═══ TETO: 70 NÓS. Subido 60→70 em 2026-09-01: o grafo acumula evidências de selagem das ondas (5 nós de E_ desde o merge); cresce só por selagem. ═══
   # Programa MAESTRO-VIVO: a pergunta do maestro virou 3 fases medidas (F0 interno, F1 mundo, F2 confronto).
   # Gerado DETERMINISTICAMENTE dos JSONs do programa (gerador no historico da sessao); prosa e projecao.
   # Runs: wf_6e6ef552-897 (F0, 8 workers) · wf_6a4da33e-97e (F1, 6 scans+6 juizes) · wf_e27840db-527 (F2, 6 confrontos+6 Elenxos).
@@ -531,6 +531,8 @@ nodes:
     status: open
     impact: 5
     confidence: 0.75
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_D_META_RADAR_DESENHO (SUPERSEDES); label preservado como historia'
     label: 'PROPOSTA (gated — implementar e decisao do maestro): superficie permanente de percepcao externa /meta:radar — maestro-invocada (W7 intacto, sem cron), 6 eixos com baseline DATADA por eixo, staleness pendurada no LINT (como REGRA 62 fez com o backlog: a maquina detecta idade, o humano roda), juiz-fixo, write(KG) em grafo proprio. Fecha S9_q_radar_mechanism. Desenho na SYNTHESIS §Radar.'
 
   - id: E_CUSTO_PROGRAMA
@@ -619,6 +621,27 @@ nodes:
     verified_against: 'sonda VIVA na propria sessao: force-push a main vetado ANTES de executar (exit 2); bateria 7/7 apos a cura do falso-positivo por vocabulario (o veto pegou o proprio commit da feature — julgamento passou a ser POR LINHA DE INVOCACAO)'
     label: 'A objecao sobrevivente do Elenxo FECHOU: o core tem PreToolUse REAL desde 2026-09-01 (protecao de main contra force-push), registrado em settings.json e provado em producao. E o 1o dogfood ja rendeu cura de classe: guarda-por-vocabulario nao julga string inteira, julga a linha que invoca.'
     trace: ".claude/hooks/pretooluse-protect-main.sh · .claude/settings.json"
+
+  - id: E_CENSO0901_D_META_RADAR_DESENHO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 6/6 — grep -n "D_META_RADAR_DESENHO" -A60 no kg.yaml (leitura do nó + evidências vizinhas E_RADA'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: A proposta foi INTEGRALMENTE ENTREGUE e MERGEADA na main desde a rodada anterior (08-31→09-01): comando /meta:radar, REGRA 65 (staleness por eixo + extensão para versão do Claude Code), baselines datadas dos 6 eixos, bancada de selftest 4/4, revisão adversarial do Elenxo com emendas aplicadas na mes'
+
+  - id: E_REVISAO_TOTAL_BACKLOG_0901
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-01
+    verified_against: 'wf_2944480c-98f: 72 medidos (0 descartes) + 27 frescos citados = 99/99; juiz fixo reprovou 21/72 (29%) — sem carimbo, listados; 29 carimbos aplicados, 22 SUPERSEDES; custo real 5.388.890 tokens vs teto 4,5M (+20%, declarado)'
+    label: 'Revisao-total do backlog a pedido do maestro: a listagem REAL vive em docs/analysis/backlog-real-2026-09.md — 14 reais-acionaveis + 5 gatilhos disparados = material da proxima onda; 42 gated medidos; 15 mortos-candidatos propostos para selo; 21 a re-medir (o juiz pegou medicao-no-arquivo-errado, contagem conveniente e gatilho declarado-nao-medido — as MESMAS classes da calibracao de 08-29).'
+    trace: "docs/analysis/backlog-real-2026-09.md"
 
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
@@ -779,4 +802,10 @@ edges:
     edge_type: SUPERSEDES
   - from: E_PRETOOLUSE_EM_PRODUCAO
     to: E_ELENXO_DA_PASSADA_ONDA6
+    edge_type: SUPPORTS
+  - from: E_CENSO0901_D_META_RADAR_DESENHO
+    to: D_META_RADAR_DESENHO
+    edge_type: SUPERSEDES
+  - from: E_REVISAO_TOTAL_BACKLOG_0901
+    to: Q_MAESTRO_VIVO
     edge_type: SUPPORTS

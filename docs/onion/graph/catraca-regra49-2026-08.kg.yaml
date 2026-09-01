@@ -266,7 +266,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.85
-    verified_at: 2026-08-08
+    verified_at: 2026-09-01
     verified_against: dois-dos-quatro-achados-confirmados-nao-sao-variantes-do-defeito-curado
     label: "Fio de METODO, e e o que esta rodada mais ensina. Dois dos quatro achados confirmados (a direcao da aresta e o `git mv` para `fixtures/`) NAO sao variantes do defeito curado — sao a MESMA CLASSE reaparecendo num campo diferente a cada rodada. A pergunta que sobra nao e 'esta porta fechou?', e 'por que este guarda e fundado num predicado que aceita qualquer coisa que TOQUE o no, num arquivo que qualquer `git mv` remove do universo?'. Enquanto a identidade do no for `path::hash` e o alibi for proximidade, cada Elenxo rende mais um `sed` de uma linha."
     trace: "docs/evolution/review/fix-catraca-regra49.md"
@@ -385,6 +385,8 @@ nodes:
     confidence: 0.6
     status: open
     trace: .claude/utils/adopt/vendor-branch.sh
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 5/5 claims; juiz APROVADO. Lidos os 2 adotantes citados (poc(47)=/home/marcio/poc-venda-direta-pdi, gustavo => <membro-t2>: onion/vendor HEAD=54849f7 possui 52 linhas de baseline rastreado, incluindo chaves `oni…'
     label: "FOLLOW-UP M2 (gatilho: o veneno congelado voltar a incomodar): poc(47)/gustavo(48) tem chaves estrangeiras JA rastreadas no onion/vendor, congeladas inertes pela cura (vendor==merge-base → merge toma *ours*). A cura NAO as remove, so as impede de avancar. Scrub/re-seed do baseline do vendor removeria o passivo latente. Hoje inerte; promover so se a equivalencia vendor==merge-base quebrar"
   - id: E_PRIMEIRO_DOGFOOD_REAL
     node_type: evidence
@@ -406,6 +408,16 @@ nodes:
     verified_against: "kg-verification-coverage.sh --format tsv rodado no corpus real: 46 PASSIVO, ZERO das outras 4 classes (corpus limpo)"
     label: "AVANCO do 1o /meta:drive (dogfood da Fase 1, catraca --max-nodes 1): o driver pegou Q_PRIMEIRO_DOGFOOD (research, atencao 15) e mediu o estado REAL das 5 classes. Achado: o corpus emite SO PASSIVO (46 nos) de forma continua; as outras 4 (NO-BASELINE, REGRESSAO, OBSOLETA, CARIMBADO) so disparam em EVENTO TRANSITORIO — CARIMBADO ja disparou de verdade 1x (D_linha_vermelha, pre-commit do #691), as 2 HARD so quando alguem adiciona no nao-baselineado (fixtures do selftest) ou cresce o baseline. Consequencia: a premissa da Q ('100% sintetico') e agora medivelmente PARCIAL — PASSIVO e real-continuo, CARIMBADO disparou real 1x; falta exercitar de campo as 2 HARD (fora do selftest) e OBSOLETA. A Q segue open, mas mais afiada."
     trace: ".claude/validation/kg-verification-coverage.sh"
+  - id: E_CENSO0901_C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-01
+    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — git log --oneline -- .claude/validation/kg-verification-coverage.sh (histórico completo do'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: A parte histórica do claim (duas classes confirmadas eram a mesma classe reaparecendo em campo diferente) segue verdadeira e já está registrada (edges SUPPORTS de E_O_FECHO_ERA_FALSO_TRES_ROTAS_ABERTAS e Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE, este último já `done`). Mas a PREVISÃO que o nó existe para'
+
 edges:
   # o defeito e a forma da cura
   - from: E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS
@@ -542,3 +554,6 @@ edges:
   - from: E_CINCO_CLASSES_ESTADO_MEDIDO
     to: Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES
     edge_type: SUPPORTS
+  - from: E_CENSO0901_C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_
+    to: C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA
+    edge_type: SUPERSEDES
