@@ -33,6 +33,7 @@ meta:
   # kg-backlog-guard: on
   # ↑ opt-in da REGRA 58, DELIBERADAMENTE separado da linha do TETO: se o escopo fosse o
   #   proprio TETO, apagar aquela linha DESLIGARIA a guarda em vez de disparar o SEM-TETO.
+  # Onda 8 aberta 2026-09-01 (etapa 3 da ordem vai-na-ordem: os REAIS executaveis da revisao-total); Onda 7 COLHIDA no mesmo commit (4/4 pagos, PRs #743-#749).
   # Onda 7 aberta 2026-09-01 (gatilhos DISPARADOS da Onda 6); Onda 6 COLHIDA no mesmo commit (5/5 pagos, PRs #734-#742).
   # Onda 6 aberta 2026-08-31 (carteira do programa MAESTRO-VIVO); ondas 1-5 COLHIDAS no mesmo commit — historia no git (blame deste arquivo) e nos residuos de revisao.
   # ═══ TETO: 20 NÓS. Onda nova exige onda COLHIDA. ═══
@@ -41,80 +42,75 @@ meta:
   # Rotina (branches, higiene) NÃO entra aqui — vai para checklist. O grafo é para RISCO.
 
 nodes:
-  - id: W7_GATILHOS_DISPARADOS
+  - id: W8_REAIS_EXECUTAVEIS
     node_type: decision
     plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
     verified_at: 2026-09-01
-    trace: "docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml"
-    verified_against: 'Onda 6 fechada 5/5 (PRs #734-#742 merged); cada item desta onda nasce de gatilho NOMEADO que ja disparou — nenhum inventado'
-    label: 'Onda 7 — pagar os gatilhos que a propria Onda 6 disparou: o 1o PreToolUse REAL (objecao sobrevivente do Elenxo), a landing morta (32 refs, veredito supersedido), o passivo de 41 nos sem verified_at (a metrica e diminuir), e o M2 da federacao (members no lint vivo, predecessor OP-1 entregue).'
+    trace: "docs/analysis/backlog-real-2026-09.md"
+    verified_against: 'etapa 3 da ordem explicita do maestro (vai na ordem, 2026-09-01); itens = secao 1 da listagem REAL, so os executaveis pelo condutor'
+    label: 'Onda 8 — pagar os REAIS: o fix do JWKS no bridge, o lint enxergando .github/workflows, a instrumentacao GTM persistida, o auto-off do console Logto, e os fechamentos triviais de grafo que a revisao-total ja mediu.'
 
-  - id: E_SELO_POR_ATO_ONDA7
-    node_type: evidence
-    plane: DEV
-    impact: 3
-    confidence: 0.8
-    status: confirmed
-    verified_at: 2026-09-01
-    verified_against: 'sequencia: relatorio de fechamento da Onda 6 nomeou os gatilhos -> /meta:drive invocado em seguida; 3o uso do padrao na sessao, nunca revertido pelo maestro'
-    label: 'Selo-por-ato registrado e reversivel (padrao E_SELO_POR_ATO_REGISTRADO da Onda 6): a invocacao de /meta:drive sobre censo DONE, apos relatorio com gatilhos nomeados, foi lida como curadoria selada da Onda 7.'
-
-  - id: I_PRETOOLUSE_USO_REAL
+  - id: I_JWKS_ATTEMPTED_AT
     node_type: decision
     plane: DEV
-    impact: 5
+    impact: 4
     confidence: 0.9
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: PR #748 MERGED 2026-09-01T12:17Z (ex-#744, fechado pela mecanica de stack) — 1o PreToolUse de producao, veto vivo na sessao; 2 falsos-positivos de producao curados no mesmo dia (vocabulario e push-nu)'
-    label: 'O 1o PreToolUse de producao do core: negar git push --force para main (a acao irreversivel mais barata de barrar), registrado em .claude/settings.json + hook proprio + prova por sonda na propria sessao. Fecha a objecao sobrevivente do Elenxo.'
+    status: open
+    verified_against: 'gatilho: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA (m2, at. 10.8) — REAL na listagem; fix de 1 arquivo em identity.ts'
+    label: 'Bridge: implementar jwksAttemptedAt (piso na TENTATIVA, nao so no sucesso) em src/identity.ts — PR na branch do clone dev; merge/deploy do bridge e do maestro.'
 
-  - id: I_APOSENTAR_LANDING_MORTA
+  - id: I_LINT_VE_WORKFLOWS
     node_type: decision
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: PR #745 MERGED 2026-09-01T12:24Z — banner SUPERSEDIDO + 3 superficies vivas corrigidas'
-    label: 'Aposentar docs/materials/landing-page.md: banner SUPERSEDIDO apontando o hero vivo + corrigir apenas as referencias VIVAS (nao tocar historico); a peca deixa de enganar o proximo confronto.'
+    status: open
+    verified_against: 'gatilho: E_LINT_NAO_ENXERGA_WORKFLOWS (elenxos-2026-08-07, at. 8.0) — as regras SDAAL nao varrem .github/workflows'
+    label: 'Estender o _find das regras SDAAL (no-direct-provider-calls e irmas) para incluir .github/workflows/*.yml, com caso de bancada provando a mordida.'
 
-  - id: I_CARIMBAR_PASSIVO_KG
+  - id: I_GTM_JSONL_PERSISTIDO
     node_type: decision
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: PR #747 MERGED 2026-09-01T13:01Z — baseline 41→28 por medicao (10 CONF, 2 DRIFT+SUPERSEDES, 1 REFUTED executando selo #724, 2 UNVERIFIABLE)'
-    label: 'Rodada /meta:kg-freshness num lote do baseline (8-10 nos por atencao): worker mede, CONFIRMED com medicao executada carimba (tabela de selagem), REFUTED/flip fica proposto. Meta: baseline 41 -> <=33.'
+    status: open
+    verified_against: 'gatilho: Q_instrument_metrics (gtm-decisions, at. 5.0) — instrumentacao AUTORIZADA em D5 07-29; scripts emitem --jsonl e nada persiste'
+    label: 'Persistir a saida --jsonl dos scripts de instrumentacao GTM num ledger versionado + cron diario (precedente offsite-cron) + agregador simples de leitura.'
 
-  - id: I_MEMBERS_NO_LINT_VIVO
+  - id: I_CONSOLE_AUTOOFF
     node_type: decision
     plane: DEV
-    impact: 4
-    confidence: 0.8
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: PR #746 MERGED 2026-09-01T12:39Z — REGRA 66 no gate (fecha Q_members_ci_gate); bancada 3/3 + escopo por marcador+papel'
-    label: 'M2 da federacao: members-validate.sh vira REGRA do lint (HARD em members.yaml invalido), com bancada — o ledger deixa de depender de invocacao manual.'
+    impact: 3
+    confidence: 0.85
+    status: open
+    verified_against: 'gatilho: C_console_autooff_gap (m2, at. 3.4) — console.sh liga sem auto-desligamento; proposta ja medida: systemd-run --on-active'
+    label: 'onion-vps-logto/console.sh: case on) ganha systemd-run --unit=onion-logto-console-autooff desligando o console admin apos janela — o loopback nao fica aberto por esquecimento.'
+
+  - id: I_FECHAMENTOS_TRIVIAIS
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_against: 'gatilho: 3 recarimbos + C_reuse_readmodel->done ja MEDIDOS na revisao-total (proximo_passo de 1 linha cada)'
+    label: 'Fechamentos de grafo ja medidos: C_reuse_readmodel->done (recomendacao cumprida via REGRA 66), recarimbo C_a2a_gate_narrow, selo C_commodity_vs_diff, Q_BRANCH_MAIN (lineage product no members.yaml).'
 
 edges:
-  - from: I_PRETOOLUSE_USO_REAL
-    to: W7_GATILHOS_DISPARADOS
+  - from: I_JWKS_ATTEMPTED_AT
+    to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS
-  - from: I_APOSENTAR_LANDING_MORTA
-    to: W7_GATILHOS_DISPARADOS
+  - from: I_LINT_VE_WORKFLOWS
+    to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS
-  - from: I_CARIMBAR_PASSIVO_KG
-    to: W7_GATILHOS_DISPARADOS
+  - from: I_GTM_JSONL_PERSISTIDO
+    to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS
-  - from: I_MEMBERS_NO_LINT_VIVO
-    to: W7_GATILHOS_DISPARADOS
+  - from: I_CONSOLE_AUTOOFF
+    to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS
-  - from: E_SELO_POR_ATO_ONDA7
-    to: W7_GATILHOS_DISPARADOS
+  - from: I_FECHAMENTOS_TRIVIAIS
+    to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS
