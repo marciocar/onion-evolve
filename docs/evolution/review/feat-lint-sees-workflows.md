@@ -3,7 +3,7 @@ title: "Revisão — o lint SDAAL enxerga .github/workflows (I_LINT_VE_WORKFLOWS
 date: 2026-09-01
 branch: feat/lint-sees-workflows
 reviewer: "extensão da REGRA 10 a workflows (consumidor sem allowlist de adapter); bancada 2/2 pelo harness-da-função (a 1ª redação com fixture fora do REPO_ROOT não seria varrida — corrigida antes de commitar); dogfood no vivo: workflows reais em silêncio; lint 0-HARD"
-reviewed_diff_sha256: 07647b45c450156e9cde0a03fc8e70b6bbc11645a6154d3dc8de97d02570283d
+reviewed_diff_sha256: 2d242746267488e40f97fb5688c76170ed2b266893e2346ce113df963028fed1
 findings_total: 1
 findings_real: 1
 verdict: APROVADO
