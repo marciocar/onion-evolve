@@ -1,3 +1,9 @@
+> ⚠️ **SUPERSEDIDO (2026-09-01).** Este esqueleto de junho foi superado pelo **site vivo**
+> (onionevolve.com — fonte em `site/src/pages/index.astro`, reforma de 2026-08-25): o hero real
+> lidera pelo MECANISMO (gate/exit 2 · 0 tokens · catraca), não por contagens. Registrado no grafo
+> do programa MAESTRO-VIVO (`E_HERO_VIVO_JA_LIDERA_PELO_MECANISMO`). Mantido pelo histórico;
+> NÃO use como fonte de copy — o confronto de 2026-08-31 quase decidiu estratégia em cima dele.
+
 # Landing Page — Sistema Onion (Esqueleto)
 
 **Status:** Esqueleto (Fase 4 — Materiais Derivados)

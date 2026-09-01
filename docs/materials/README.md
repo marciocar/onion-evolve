@@ -1,5 +1,8 @@
 # Materiais Derivados — Sistema Onion
 
+> ⚠️ **landing-page.md está SUPERSEDIDO (2026-09-01)** — o site vivo (`site/src/`) é a fonte de copy; as linhas abaixo que o citam valem só como histórico de estrutura.
+
+
 > Esqueletos de materiais externos gerados na **Fase 4** do plano de identidade e produto.
 > Fonte primária de todos eles: [Onion: Identidade e Produto](../knowledge-base/meta/onion-framework-identity.md) (SSOT canônica, Fase 3).
 
