@@ -3,7 +3,7 @@ title: "Revisão — o 1º PreToolUse de produção (protege main de force-push)
 date: 2026-09-01
 branch: feat/pretooluse-protect-main
 reviewer: "bateria 7/7 (3 vetos certos incl. -qf e operador &&; 4 liberações certas incl. o caso-classe: prosa/heredoc citando o vocabulário num comando composto — o falso-positivo foi MEDIDO no próprio commit desta feature e curado por julgamento POR LINHA DE INVOCAÇÃO); sonda viva vetou antes de executar; settings.json validado"
-reviewed_diff_sha256: c6670c87566a182034f9a66e62961a83b446b6f1abf9b25bb18b979e35c85f54
+reviewed_diff_sha256: c2914e4c083864cd7ff5e8809fd5209a76c4fed9849443a72d0635fe0f6cf8c8
 findings_total: 1
 findings_real: 1
 verdict: APROVADO
