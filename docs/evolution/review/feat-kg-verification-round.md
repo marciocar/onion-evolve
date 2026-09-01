@@ -3,7 +3,7 @@ title: "Revisão — rodada de verificação do passivo KG (baseline 41→28)"
 date: 2026-09-01
 branch: feat/kg-verification-round
 reviewer: "15 workers sonnet/medium (0 descartes, guardas de cobertura no fan-in); selagem pela tabela: 10 CONFIRMED carimbados com medição verbatim SANITIZADA (nomes de membros → slugs; a guarda projeção/NOME pegou o vazamento e a 1ª sanitização por regex comeu 3 nós — restaurado do git e refeito na FONTE); 2 DRIFTED com SUPERSEDES; 1 REFUTED executando selo PRÉ-EXISTENTE do maestro (PR #724, mesmo fato); 2 UNVERIFIABLE intocados (blocked_by nomeado); radar exit 0 nos 4 grafos; baseline re-emitida só encolhe"
-reviewed_diff_sha256: 96ae5303ab1a033eddba2c6d7b9b6426b88fee432d3a5780760faf7512d32bc4
+reviewed_diff_sha256: 2b668c27af34d092ac82fa0e0fa8c85df7d86a3ba04d579734c5cfc13b292a1b
 findings_total: 3
 findings_real: 3
 verdict: APROVADO
