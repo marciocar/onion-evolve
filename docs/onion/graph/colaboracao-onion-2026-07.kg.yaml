@@ -37,6 +37,8 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. cd /home/marcio/onion-evolve && ls -la docs/evolution/inbox/ docs/evolution/outbox/ docs/e => Claim 1 (repositório é meio de colaboração assíncrona): CONFIRMADO ao vivo. `docs/evolution/{inbox,outbox,inbo…'
     label: "repositorio — meio de colaboracao assincrona e SSOT-de-registro"
   - id: EN_VERTICAL
     node_type: entity
@@ -45,6 +47,8 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. cd /home/marcio/onion-evolve && test -f .claude/commands/meta/create-vertical.md && echo E => EXISTS. Linha 123: "`.claude/skills/<slug>/SKILL.md` — hub-roteador homônimo (deriva da SSOT viva, nunca hardc…'
     label: "vertical Onion (book/SSOT + hub + helpers) — produzida a partir de spec"
   - id: ST_SINAL_INBOX
     node_type: state
@@ -69,6 +73,8 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. 1) grep -nE "cp |git add|git commit|git push" .claude/utils/co-evolution/co-relay.sh 2) ls => (1) linha 154: `cp "$f" "${DEST_DIR}/${base}"` — único transporte no script; ZERO ocorrências de git add/commi…'
     label: "relay — maestro transporta o sinal ao inbox do core (entrega-sem-commit)"
   - id: IN_I3
     node_type: invariant
@@ -77,6 +83,8 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. grep -n "IN_I3" docs/onion/graph/colaboracao-onion-2026-07.kg.yaml; sed -n ''73,80p'' docs => Nó IN_I3 (invariant, layer domain, plane PROD, impact 5, confidence 1.0, status confirmed) tem label "I3 — um …'
     label: "I3 — um escritor por recurso; entrega-sem-commit (sem commit cross-repo)"
   - id: RU_RELAY_MAESTRO
     node_type: rule
@@ -84,7 +92,9 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: confirmed
+    status: refuted
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): refutado — ver E_RELAY_NAO_EXCLUSIVO_2026_09; flip executa selo pre-existente do maestro (PR #724)'
     label: "so o maestro relaya/tria; o visitante entrega, nao relaya"
   - id: RU_BRANCH_TWO_TIER
     node_type: rule
@@ -101,6 +111,8 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. 1) grep -rn "SSOT-de-registro" --include="*.md" --include="*.yaml" . | grep -v node_module => (1) "SSOT-de-registro" aparece em 3 lugares vivos: o próprio label do nó EN_REPO (linha 40 do mesmo grafo), o …'
     label: "git e o SSOT-de-registro canonico; ambientes sao vistas que leem/escrevem de volta"
   # ---- camada audit (epistemica — teses e evidencias do que funciona) ----
   - id: E_TREINO_OK
@@ -110,6 +122,8 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. Nó sem `trace`/`verified_against` prévios. Evento é externo ao repo (engajamento de consul => 3 claims independentes checadas: (1) "treino de cliente ocorreu a partir de specs" — confirmado pelo relay 202…'
     label: "treino de cliente entregue com sucesso a partir de specs (2026-07-15)"
   - id: E_DIARY_MIGALHAS
     node_type: evidence
@@ -248,6 +262,8 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. 1) grep -n "IN_CLIENT_SAFE" -A 10 docs/onion/graph/colaboracao-onion-2026-07.kg.yaml (leit => (2) REALEXIT=0; saída: "Arquivos varridos: 855 / OK ✓ — nenhuma superfície carrega termo sensível." — o gate r…'
     label: "artefato que sai (cliente/core) passa por gate determinístico grep client-safe = 0"
   - id: EN_KG_CLIENTE
     node_type: entity
@@ -256,6 +272,8 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED — ver E_MEDIDO_EN_KG_CLIENTE_2026_09 (SUPERSEDES); label de julho preservado como historia'
     label: "KG do engajamento — confidencial (nos 🔒 marcados); fica no repo dev, nunca sai"
   - id: EN_KG_COLAB
     node_type: entity
@@ -264,6 +282,8 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. 1) `grep -inE "<adotante-a>|<adotante-b>|<adotante-c>|<adotante-d>|bwp|hpe|pedro|arthur|cl => Comando 1 (identificadores conhecidos de cliente/adotante): saída vazia, `grep` retornou exit code 1 (zero mat…'
     label: "KG de colaboracao (este) — meta-Onion, sem dado de cliente; shareable ao core"
   - id: EN_MARCA
     node_type: entity
@@ -317,6 +337,26 @@ nodes:
     verified_at: 2026-08-30
     verified_against: "git log do core: commit 5e511195 (PR #298, mesclado em main) de colaborador externo escrevendo direto em docs/evolution/inbox/ — selado pelo maestro 2026-08-30"
     label: "REFUTA a exclusividade do relay (piloto kg-freshness 2026-08-29, juiz APROVOU a refutacao): o historico do core mostra commit de terceiro (colaborador registrado em members.yaml) escrevendo direto no caminho de relay. C1 (dono do core) confirma; C2 (unico que relaya) caiu pelo ATO — behavior-over-declaration: mesmo commit marcado como teste, o ato de relay foi de terceiro. Selado REFUTED pelo maestro em 2026-08-30."
+  - id: E_MEDIDO_EN_KG_CLIENTE_2026_09
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED 3/3 — cd /home/marcio/<membro-t2> && ls -la docs/<dominio-t2>/graph/<dominio-t2>.kg.yaml && grep -c ''🔒'' '
+    label: 'MEDIDO 2026-09-01, a verdade atual supera o label de julho: O label afirma ''nos 🔒 marcados'' (plural, marcação estrutural explícita por nó). No vivo: só 1 nó (D_UPSELL) está marcado como confidencial, e o marcador real é ⚠️ num comentário de cabeçalho do arquivo — não 🔒, não um campo por nó, não plural. As outras duas cláusulas do label (''fica no repo dev'' e ''nunca sai'') s'
+
+  - id: E_RELAY_NAO_EXCLUSIVO_2026_09
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): REFUTED 2/2 — git log --all --format=''%H %an'' -- docs/evolution/inbox/ | grep -v "Marcio Carvalho". FLIP NAO E NOVO: executa o selo do maestro de 2026-08-31 (PR #724, C_MAESTRO_NAO_E_UNICO_RELAY, mesmo fato: commit 5e511195/PR #298 por terceiro na rota de relay)'
+    label: 'MEDIDO: O nó afirma DUAS coisas: (1) ''só o maestro relaya/tria'' e (2) ''o visitante entrega, não relaya''. O histórico do git mostra 4 commits de um colaborador externo (Mauricio Matos, registrado como membro) escrevendo DIRETO em docs/evolution/inbox/ — o caminho de relay em si, não uma entrega para tria'
+
 edges:
   # domain — papeis e canais
   - from: EN_VISITANTE
@@ -460,4 +500,10 @@ edges:
     edge_type: DEPENDS_ON
   - from: C_MAESTRO_NAO_E_UNICO_RELAY
     to: EN_MAESTRO
+    edge_type: REFUTES
+  - from: E_MEDIDO_EN_KG_CLIENTE_2026_09
+    to: EN_KG_CLIENTE
+    edge_type: SUPERSEDES
+  - from: E_RELAY_NAO_EXCLUSIVO_2026_09
+    to: RU_RELAY_MAESTRO
     edge_type: REFUTES

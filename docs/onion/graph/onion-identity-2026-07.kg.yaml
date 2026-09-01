@@ -517,6 +517,8 @@ nodes:
     impact: 4
     confidence: 0.8
     status: confirmed
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. WebSearch: ''YC Requests for Startups "Company Brain" Summer 2026'' => Confirmado por múltiplas fontes independentes (modelence.com, aigrants.in, vccafe.com, theaiopportunities.com, extruct.a…'
     label: "eixo knowledge-centric esta QUENTE — 'Company Brain' virou aposta YC RFS Summer 2026"
     trace: "KC research"
   - id: C_PEER_UNIQUE

@@ -452,6 +452,8 @@ nodes:
     impact: 4
     confidence: 0.5
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 4/4 claims medidas ao vivo. sudo -n grep -n "app\.get(\|app\.post(\|app\.use(\|app\.route(\|app\.mount(" /home/onion/o => Rodando no próprio host (srv1812846) com sudo -n: (1) server.ts vivo mostra 46 registros app.get/post/... e middlewares…'
     label: "VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumera com comando — dump de RUNTIME (app.routes, comportamento) como autoritativo + grep na fonte (agora incluindo route|mount) como rede de segurança — e classifica cada rota PROTEGIDA/ABERTA/DUPLO-GATE. P0.2b anota o ÍNDICE de cada handler (fix C). P0.2c localiza o /a2a (fix L1)"
 
   - id: Q_a2a_after_flip

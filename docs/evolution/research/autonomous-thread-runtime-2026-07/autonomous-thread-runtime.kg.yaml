@@ -88,6 +88,8 @@ nodes:
     impact: 5
     confidence: 0.85
     status: open
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED — ver E_MEDIDO_D_RUNTIME_CONTRACT_2026_09 (SUPERSEDES); label de julho preservado como historia'
     label: "DECISAO (proposed-GATED): escada graduada Nivel0/AUDIT/AUTOMATE-gated/MOAT; 1a passada so no AUDIT (main humano); sela so apos dogfood da Fase 2"
     trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
   - id: C_W6_PERITEM
@@ -107,6 +109,16 @@ nodes:
     confidence: 0.9
     status: open
     label: "GATE: o contrato so sela (proposed->accepted) apos o dogfood da Fase 2 (1a passada AUDIT produz 1 lote aceito pelo maestro)"
+  - id: E_MEDIDO_D_RUNTIME_CONTRACT_2026_09
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-01
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED 3/3 — cat docs/evolution/research/autonomous-thread-runtime-2026-07/autonomous-thread-runtime.kg.yaml (nó '
+    label: 'MEDIDO 2026-09-01, a verdade atual supera o label de julho: Claim 1 (status=open) DRIFTED: a fonte primária do próprio nó (o ADR) já registra "accepted (degrau AUDIT)" com selo do maestro em 2026-08-27 — o nó não reflete mais a decisão real, que evoluiu de proposta para aceite parcial/qualificado (AUDIT selado; AUTOMATE ainda gated). Claim 2 (trace existe) CONFIRMED. Claim 3 (g'
+
 edges:
   - from: E_SRC_GRADUATED
     to: C_GRADUATED_LADDER
@@ -138,3 +150,6 @@ edges:
   - from: C_GATED
     to: D_RUNTIME_CONTRACT
     edge_type: DEPENDS_ON
+  - from: E_MEDIDO_D_RUNTIME_CONTRACT_2026_09
+    to: D_RUNTIME_CONTRACT
+    edge_type: SUPERSEDES
