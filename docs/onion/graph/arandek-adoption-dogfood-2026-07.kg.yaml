@@ -290,7 +290,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.8
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_ARANDEK_UPDATE (SUPERSEDES); label preservado como historia'
     label: "quando o arandek rodar /meta:adopt --update, recebe os 6 fixes; o contorno do D1 dele (technical-context ponteiro) simplifica p/ declarar context.technical → docs/specs/"

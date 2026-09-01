@@ -229,7 +229,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_D_NO_DISTORT (SUPERSEDES); label preservado como historia'
     label: "nao entortar doutrina: lane-de-conhecimento e GitFlow coexistem (eixos diferentes)"
@@ -598,7 +598,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.6
-    status: open
+    status: superseded
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_NS2_PORTABLE (SUPERSEDES); label preservado como historia'
     label: "NS2: metodo portatil/destilavel, familia multi-plataforma (onion-mini + Custom GPT reais; familia nao verificada)"

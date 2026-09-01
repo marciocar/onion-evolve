@@ -364,7 +364,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
+    status: refuted
     label: "FIX I fecho — mitigações BARATAS fixadas neste flip (P3.5): (1) ACCESS TOKEN CURTO 10-15min + ROTAÇÃO DE REFRESH TOKEN (Logto suporta — ligar); preferir memória+refresh se o SDK permitir, aceitando re-login mais frequente como custo de segurança; (2) CSP restritiva no Caddy (default-src 'self', sem unsafe-inline/unsafe-eval) + SRI + lockfile auditado; (3) perda de device => SUSPENDER O USUÁRIO NO LOGTO ANTES de qualquer outra coisa (procedimento escrito). E a declaração honesta: a BASE DE CONFIANÇA CRESCEU de 'host+AUTH_TOKEN' para 'host+Logto+PWA+device' — trade real, saldo positivo em N=1 com device do maestro, REAVALIAR se entrar 2º operador (vira input do M3). Endurecimento pleno da PWA como cliente = GATED"
 
   # ---- F1 (preservado): O CALLER É HÍBRIDO ----
@@ -1590,6 +1590,16 @@ nodes:
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — 1) `grep -n "Q_p10_mutation_not_run" -A 40 docs/onion/graph/m2-bridge-logto-2026-07.kg.yam'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A premissa que mantinha o nó bloqueado ("exigiria desligar uma guarda no bridge VIVO" / sem ambiente de teste) mudou: existe hoje um clone local rodável fora de produção (`/home/marcio/onion-bridge-dev`, `npm run dev`) — exatamente o "quando houver ambiente de teste do bridge" que o próprio nó defin'
 
+  - id: E_REFUTA_D_pkce_risk_mitigations
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-01
+    verified_against: 'census r2 (wf_102a9bec-52f): REFUTED 3/3 — Lido o nó inteiro (label), contadas 3 claims: (1) access token curto 10-15min + rotação de refresh token; (2) . Selo do maestro: ordem vai-na-ordem 2026-09-01 (etapa 1 da sequencia aprovada)'
+    label: 'MEDIDO: As 3 mitigações "baratas" que o nó declara como FIXADAS neste flip não foram implementadas como descrito — e a (1) foi implementada na direção CONTRÁRIA por decisão deliberada de UX (accessTokenTtl=3600s, refresh de 14 dias sem rotação). CSP (2) nunca existiu em lugar nenhum (nem Caddy, nem server.ts). Procedimento de '
+
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -2174,3 +2184,6 @@ edges:
   - from: E_CENSO0901_Q_p10_mutation_not_run
     to: Q_p10_mutation_not_run
     edge_type: SUPERSEDES
+  - from: E_REFUTA_D_pkce_risk_mitigations
+    to: D_pkce_risk_mitigations
+    edge_type: REFUTES
