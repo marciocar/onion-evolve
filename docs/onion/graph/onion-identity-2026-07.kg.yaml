@@ -504,6 +504,8 @@ nodes:
     impact: 5
     confidence: 0.3
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_102a9bec-52f): 1/1 claims; juiz APROVADO. Lido o nó (linhas 500-508). Contagem verbatim em HEAD (5a2c50f3, árvore limpa ex => members.yaml em HEAD tem exatamente 13 membros / 9 kind:adopter (não 15/10 como o round anterior ale…'
     label: "existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio)"
     trace: "F2 gap #1 (o desempate)"
   # ==== camada pesquisa knowledge-centric (2026-07-11) + candidatos NS completos ====
