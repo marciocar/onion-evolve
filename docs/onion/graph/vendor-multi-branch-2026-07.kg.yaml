@@ -98,6 +98,8 @@ nodes:
     impact: 2
     confidence: 0.5
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_102a9bec-52f): 3/3 claims; juiz APROVADO. Lido o nó inteiro (label, sem trace — nó tipo question sem evidência anexada) +  => Nenhum clone no parque local tem 3+ integration branches com onion/vendor por branch. O maior caso r…'
     label: "Tres ou mais integration branches nao foram exercitadas. A convencao por-branch se estende por CONSTRUCAO, mas isso e inferencia, nao medicao. Abrir fixture se um adotante real aparecer com esse shape"
 
   - id: Q_volume_not_reproduced

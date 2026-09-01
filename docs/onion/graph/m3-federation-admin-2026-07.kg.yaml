@@ -191,6 +191,8 @@ nodes:
     impact: 4
     confidence: 0.65
     status: open
+    verified_at: 2026-09-01
+    verified_against: '/meta:census 2026-09-01 (wf_102a9bec-52f): 6/6 claims; juiz APROVADO. Lido o nó completo (label/trace/edges). Localizada a fonte exata do trace (docs/ => O doc-fonte (onion-m3-federation-admin-spec-2026-07.md §4) segue palavra-por-palavra o que o label r…'
     label: "AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariância. ILUSTRATIVO/não-comprometido (re-derivar no gatilho): forma SDAAL (3ª instância, factory/interface/adapter), protocolo/tipo-de-client, mapa Organization Logto↔tier (source=global/M2M, hub=1 org, consumer=org-member, standalone=SEM org). Read-side segue público; OP-1..4 nativas sem auth p/ operador-único"
   - id: C_commodity_vs_diff
     node_type: claim

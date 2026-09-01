@@ -665,6 +665,17 @@ nodes:
     label: '1a rodada REAL do /meta:census: valeu-a-pena MEDIDO — 80k/no com juiz incluso (vs 74k da revisao manual SEM retomada); a retomada KG-runtime reduziu a populacao de 72 para 22 e desta para 6; o dedupe do carimbo virou lei no census-seal (2a mordida da mesma classe). Restam 6 A-MEDIR: 5 reprovados-de-novo + 1 alvo de REFUTED proposto.'
     trace: "docs/analysis/backlog-real-2026-09-01-r1.md"
 
+  - id: E_CENSUS_RODADA2
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-01
+    verified_against: 'wf_102a9bec-52f: 6/6 medidos, juiz aprovou 3/reprovou 2 (3a reincidencia dos mesmos: contagem-inflada e trace-nao-medido); 5 CONF/1 REFUTED; 521k = 87k/no; A-MEDIR 6→3; seal com cura indent-agnostica+fail-barulhento exercitada (3 carimbos, radar 0)'
+    label: 'Rodada 2 do /meta:census: populacao 99→3 em duas rodadas do comando (72→22→6→3). ACHADO DE SEGURANCA proposto ao maestro: D_pkce_risk_mitigations REFUTED — as 3 mitigacoes prometidas no flip NUNCA foram implantadas e a (1) foi na direcao OPOSTA por UX (token 1h, refresh 14d SEM rotacao; sem CSP; sem procedimento de suspensao). CRONICOS nomeados (3a reincidencia, tratamento distinto): Q_LACUNA (claims externas exigem WebSearch que o worker sonnet pula) e Q_SENHA (label drifted, re-modelagem manual).'
+    trace: "docs/analysis/backlog-real-2026-09-01-r2.md"
+
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO
     to: Q_MAESTRO_VIVO
@@ -835,5 +846,8 @@ edges:
     to: Q_MAESTRO_VIVO
     edge_type: SUPPORTS
   - from: E_CENSUS_RODADA1
+    to: E_META_CENSUS_NASCEU
+    edge_type: SUPPORTS
+  - from: E_CENSUS_RODADA2
     to: E_META_CENSUS_NASCEU
     edge_type: SUPPORTS

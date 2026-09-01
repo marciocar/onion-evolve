@@ -62,9 +62,12 @@ def stamp(t, nid, vag):
             for m in reversed(ms[1:]):
                 blk = blk[:m.start()] + blk[m.end():]
         return t[:i] + blk + t[j:], True
-    k = blk.find('\n    label:')
-    if k < 0: return t, False
-    blk = blk[:k] + f"\n    verified_at: {HOJE}\n    verified_against: '{vag}'" + blk[k:]
+    # Indent-agnóstico (3ª mordida, 2026-09-01): grafos antigos usam 3/5 espaços — busca fixa
+    # de 4 falhava CALADA e o alvo DRIFTED ficava sem carimbo (D_pkce voltou à fila por isso).
+    m = re.search(r'\n(\s+)label:', blk)
+    if not m: return t, False
+    ind = m.group(1)
+    blk = blk[:m.start()] + f"\n{ind}verified_at: {HOJE}\n{ind}verified_against: '{vag}'" + blk[m.start():]
     return t[:i] + blk + t[j:], True
 
 def seal(consol):
@@ -98,7 +101,8 @@ def seal(consol):
                     f"    label: 'MEDIDO {HOJE}, o vivo superou o no: {sanitize(m['divergence'],terms)[:300]}'\n\nedges:")
             t = t.replace('\nedges:', '\n' + node, 1)
             t = t.rstrip() + f"\n  - from: {nid_new}\n    to: {m['node_id']}\n    edge_type: SUPERSEDES\n"
-            t, _ = stamp(t, m['node_id'], f"{RUN}: DRIFTED — ver {nid_new} (SUPERSEDES); label preservado como historia")
+            t, ok2 = stamp(t, m['node_id'], f"{RUN}: DRIFTED — ver {nid_new} (SUPERSEDES); label preservado como historia")
+            if not ok2: skip.append(m['node_id'] + ':stamp-alvo-FALHOU')  # nunca silencioso (3ª mordida)
             files[p] = t; sup += 1
     for p, t in files.items(): open(os.path.join(ROOT, p), 'w').write(t)
     for p in files:
