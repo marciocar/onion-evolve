@@ -59,9 +59,9 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.8
-    status: open
-    verified_at: 2026-09-01
-    verified_against: host-vps-medido-pos-flip
+    status: confirmed
+    verified_at: 2026-09-02
+    verified_against: 'host-vps-medido-pos-flip (recarimbo Onda 8, 2026-09-01) — claim medida VERDADEIRA: /a2a 403 com token a2a, a2aGuard nao olha authMode; flip open->confirmed no fechamento W8 (2026-09-02)'
     label: "[ATUALIZADO 2026-07-27 pós-flip P7: a cláusula final CAIU — o bridge/PWA NÃO segue mais autenticado só por AUTH_TOKEN; /chat e /commands agora exigem OIDC. Medido: /a2a segue caso à parte (a2aGuard não olha authMode) — 403 com token a2a = gate vivo, 3 tokens dedicados no pool.] Mitigação parcial existente NÃO cobre o bridge: a2a-verify.sh (6 camadas, fail-safe) gateia SÓ o canal /a2a (handshake entre cores, propose-only) — canal diferente e mais estreito"
 
   # ---- ENTIDADES (o terreno) ----
@@ -535,8 +535,8 @@ nodes:
     node_type: question
     layer: audit
     plane: PROD
-    verified_at: 2026-09-01
-    verified_against: medido-pelo-6o-elenxo-idp-inalcancavel-3-reqs-seguidas-5s-cada-uma-fetch-novo-ao-jwks-por-request
+    verified_at: 2026-09-02
+    verified_against: 'gatilho DISPAROU: PR onion-bridge#65 OPEN (ver E_W8_JWKS_PR65_ABERTO); segue open ate merge+deploy pelo maestro — o storm em PROD nao mudou ainda'
     status: open
     impact: 4
     confidence: 0.9
@@ -685,9 +685,9 @@ nodes:
     plane: PROD
     impact: 2
     confidence: 0.85
-    status: open
-    verified_against: host-vps-medido
-    verified_at: 2026-09-01
+    status: superseded
+    verified_against: 'fechamento W8 2026-09-02: SUPERSEDED por E_W8_CONSOLE_AUTOOFF_VIVO (auto-off medido no vivo); label preservado como historia'
+    verified_at: 2026-09-02
     label: "GAP: console.sh só tem on/off/status manuais (medido: o case tem on) off) status) e mais nada; console desligado agora). Fecho: no case on) agendar systemd-run --unit=onion-logto-console-autooff --on-active=30m em modo SYSTEM (sudo, NÃO --user — timers de usuário morrem com a sessão SSH); no case off) parar o timer. Reversível, sem estado persistente"
 
   # ---- FONTES E O QUE É VPS-DECLARADO ----
@@ -1611,6 +1611,28 @@ nodes:
     label: 'DECISAO SELADA (substitui a metade TTL do refutado D_pkce_risk_mitigations): accessTokenTtl fica em 3600s — a exigencia de 10-15min do flip original trocava UX por janela curta; a compensacao real e a ROTACAO de refresh (vazado morre no 1o replay) + CSP + procedimento de suspensao. As 3 mitigacoes agora EXISTEM no vivo, na forma ajustada.'
     trace: "ops/caddy/Caddyfile · ops/bridge-auth/logto-provision.sh · ops/bridge-auth/SUSPENSAO.md"
 
+  - id: E_W8_CONSOLE_AUTOOFF_VIVO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-09-02
+    verified_against: 'grep -n systemd-run /home/marcio/onion-vps-logto/console.sh => linhas 30-37: sudo systemd-run --unit=onion-logto-console-autooff --on-active=60min no case on), com aviso fail-loud se o timer nao armar (onion-logto@master, Onda 8, I_CONSOLE_AUTOOFF em fios-abertos)'
+    label: "PAGO (Onda 8, 2026-09-01): o GAP deixou de existir — console.sh arma auto-off transitorio de 60min via systemd-run em modo SYSTEM no case on) (sobrevive ao fim da sessao SSH), e o case off) para o timer. O dogfood achou o console LIGADO por esquecimento — exatamente o caso que o gap descrevia. Janela escolhida: 60min (nao os 30 do desenho) por pedido de uso real do painel."
+
+  - id: E_W8_JWKS_PR65_ABERTO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-09-02
+    verified_against: 'gh pr view 65 -R <forge>/onion-bridge => OPEN "fix(identity): piso do JWKS vale na falha (jwksAttemptedAt)"; tsc rc=0 no clone dev (fix/jwks-attempt-floor)'
+    label: "O GATILHO 'PR proprio no bridge' DISPAROU (Onda 8, 2026-09-01): PR onion-bridge#65 implementa jwksAttemptedAt (piso de 60s na TENTATIVA, nao so no sucesso). A pergunta NAO fecha aqui: plane PROD segue com o storm ate merge+deploy do bridge — ato do maestro (MOAT: deploy). Fecha em Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA quando o vivo medir 1 fetch por janela durante queda do IdP."
+
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -2201,3 +2223,9 @@ edges:
   - from: D_TTL_UX_TRADEOFF
     to: D_pkce_risk_mitigations
     edge_type: SUPERSEDES
+  - from: E_W8_CONSOLE_AUTOOFF_VIVO
+    to: C_console_autooff_gap
+    edge_type: SUPERSEDES
+  - from: E_W8_JWKS_PR65_ABERTO
+    to: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
+    edge_type: SUPPORTS

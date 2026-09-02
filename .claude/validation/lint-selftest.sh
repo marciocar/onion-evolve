@@ -10711,6 +10711,25 @@ run_census_extract_selftests() {
   rm -rf "$d"
 }
 
+run_census_seal_selftests() {
+  # (d) TIPO DA ARESTA PELA REALIDADE (2026-09-02): DRIFTED+GATED refina (CONSTRAINS, alvo open);
+  # DRIFTED+MORTO supera (SUPERSEDES). Incondicional deixou 13 alvos open sob SUPERSEDES em 8 grafos.
+  local seal="${REPO_ROOT}/.claude/utils/census/census-seal.py"
+  local d rc out g; d="$(mktemp -d)"; mkdir -p "$d/docs/onion/graph"; g="docs/onion/graph/fx.kg.yaml"
+  printf 'meta:\n  id: fx\nnodes:\n  - id: N_GATED\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: 2026-01-01\n    verified_against: x\n    label: "a"\n  - id: N_MORTO\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: 2026-01-01\n    verified_against: x\n    label: "b"\n\nedges:\n  - from: N_GATED\n    to: N_MORTO\n    edge_type: SUPPORTS\n' > "$d/$g"
+  python3 - "$d/c.json" "$g" <<'PY'
+import json,sys
+m=lambda n,r: {"node_id":n,"kg_file":sys.argv[2],"verdict":"DRIFTED","realidade":r,"gatilho_disparou":"NAO","juiz":"APROVADO","claims_total":1,"claims_measured":1,"method":"m","observed":"o","divergence":"d"}
+json.dump({"run_id":"wf_fixture","medidos":[m("N_GATED","GATED"),m("N_MORTO","MORTO-CANDIDATO")],"juizo":{},"nao_medidos_por_teto":[],"parametros":{}},open(sys.argv[1],'w'))
+PY
+  rc=0; out="$(ONION_CENSUS_ROOT="$d" python3 "${seal}" seal "$d/c.json" 2>&1)" || rc=$?
+  if [ $rc -eq 0 ] && grep -qE 'to: N_GATED\n?' "$d/$g" && awk '/to: N_GATED/{getline; print}' "$d/$g" | grep -q CONSTRAINS \
+     && awk '/to: N_MORTO/{getline; print}' "$d/$g" | grep -q SUPERSEDES; then
+    record_pass "census-seal: (d) DRIFTED+GATED vira CONSTRAINS (alvo segue open) e DRIFTED+MORTO vira SUPERSEDES"
+  else record_fail "census-seal: (d)" "aresta pela realidade nao aplicada (rc=$rc): $out $(grep -A1 'to: N_' "$d/$g")"; fi
+  rm -rf "$d"
+}
+
 run_members_registry_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   # REGRA 66 — sem depender do estado do vivo além do caso (a), que é o canário da fixture
@@ -11000,6 +11019,7 @@ run_backlog_projection_selftests
 run_radar_staleness_selftests
 run_members_registry_selftests
 run_census_extract_selftests
+run_census_seal_selftests
 run_sdaal_workflows_selftests
 run_drive_selftests
 run_site_derivation_selftests

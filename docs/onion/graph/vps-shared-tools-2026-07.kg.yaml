@@ -84,11 +84,11 @@ nodes:
   - id: ENT_monitoring
     node_type: entity
     plane: DEV
-    status: open
+    status: superseded
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-01
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_ENT_monitoring (SUPERSEDES); label preservado como historia'
+    verified_at: 2026-09-02
+    verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_CENSO0901_ENT_monitoring — o trabalho que pedia (pesquisa+Elenxo de stack) FOI feito em F2 stack-harmonia-2026-08 com veredito sobrevivente; label preservado como historia'
     label: "MONITORAMENTO/OBSERVABILIDADE: candidato, zero desenho. Maestro nomeou P2 (a esclarecer — Prometheus/Posthog/Phoenix?), Langfuse (LLM observability), OpenTelemetry (traces/metrics) e afins. Exige pesquisa documentada (verify-external-for-current) + Elenxo de stack"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
@@ -184,11 +184,11 @@ nodes:
   - id: Q_tunneling
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
     impact: 2
     confidence: 1.0
-    verified_at: 2026-09-01
-    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED — ver E_CENSO0901_Q_tunneling (SUPERSEDES); label preservado como historia'
+    verified_at: 2026-09-02
+    verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_CENSO0901_Q_tunneling — pergunta mal-colocada, respondida em F2b stack-harmonia-2026-08 (ingresso autenticado, nao tunneling); label preservado como historia'
     label: "PESQUISA+ELENXO: ngrok × Cloudflare Tunnel × Tailscale Funnel × Caddy-so. Para QUE (dev-preview? webhook inbound? exposicao efemera de adotante sem servidor?) — o caso-de-uso decide; ligar ao downstream-by-pull ja desenhado (adotante sem servidor)"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 
@@ -263,11 +263,11 @@ nodes:
   - id: C_axis_tunneling
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
     impact: 2
     confidence: 0.8
-    verified_at: 2026-09-01
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_axis_tunneling (SUPERSEDES); label preservado como historia'
+    verified_at: 2026-09-02
+    verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_CENSO0901_C_axis_tunneling — o eixo SDAAL-vs-script entre 3 providers ficou sem objeto — nenhum dos 3 e necessario (F2b stack-harmonia); label preservado como historia'
     label: "TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de provider (dev-preview? webhook inbound? adotante-sem-servidor via downstream-by-pull?). Se 1 real intencionado -> script-gated. Caso-de-uso decide na F1"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
 

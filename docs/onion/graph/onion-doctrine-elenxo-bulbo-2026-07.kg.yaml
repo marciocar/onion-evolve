@@ -57,8 +57,8 @@ nodes:
     impact: 3
     confidence: 0.85
     status: open
-    verified_at: 2026-09-01
-    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED — ver E_CENSO0901_D_QUADRO_CITACOES (SUPERSEDES); label preservado como historia'
+    verified_at: 2026-09-02
+    verified_against: 'reconciliacao 2026-09-02: E_CENSO0901 REFINA (CONSTRAINS) — o gate antigo (area de doutrinas) DISPAROU em 2026-08-25, mas o quadro NAO foi construido; gatilho novo = o maestro valida as formulacoes (verbatim vs parafrase) a partir do draft docs/analysis/onion-quadro-citacoes-draft-2026-07.md — ato dele, o condutor nao atribui citacoes sozinho'
     label: "quadro de citacoes do maestro NASCEU (gated): as formulacoes recorrentes dele, atribuidas+datadas (verbatim vs parafrase marcado) — distinto das cunhagens (termos); mesma area de doutrinas futura"
 
   # ---- aferido (as teses) ----
@@ -311,4 +311,4 @@ edges:
     edge_type: DEPENDS_ON
   - from: E_CENSO0901_D_QUADRO_CITACOES
     to: D_QUADRO_CITACOES
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS

@@ -431,9 +431,9 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.62
-    status: open
-    verified_at: 2026-09-01
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_COMPLIANCE_RARE (SUPERSEDES); label preservado como historia'
+    status: superseded
+    verified_at: 2026-09-02
+    verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_CENSO0901_C_COMPLIANCE_RARE — as claims viraram decisao canonica D6 (decisions.md ratificado 2026-07-25, diferencial #1 em strategy.md); a prova de campo mora em Q_p4_no_field_proof (gtm), que segue open'
     label: "compliance-no-loop = vertical RARA que casa com ICP regulado; prova de campo em granaai"
     trace: "F2 Q3/Q5"
   - id: C_KG_BIZ_UNPROVEN

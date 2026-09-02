@@ -274,11 +274,11 @@ nodes:
   - id: Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES
     node_type: question
     plane: PROD
-    status: open
+    status: superseded
     impact: 5
     confidence: 1.0
-    verified_at: 2026-09-01
-    verified_against: emit-baseline-identico-ao-baseline-versionado-logo-o-laco-nunca-executou
+    verified_at: 2026-09-02
+    verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_CENSO0901 — a premissa (0 dogfood real) morreu: 3 dogfoods reais registrados no proprio grafo desde 2026-08-08; label preservado como historia'
     label: "As CINCO classes novas nao tem NENHUMA cobertura de campo. `--emit-baseline` e hoje identico ao baseline versionado, logo o laco da guarda de direcao nunca executou no corpus real, nem uma vez — toda a evidencia e sintetica. O primeiro no que sair do baseline de verdade, via `/meta:kg-freshness`, e o PRIMEIRO dogfood real desta guarda, e e ai que ela vale ou cai. O verde do CI nao substitui essa medicao, e este no existe para nao deixar que substitua."
     trace: ".claude/validation/kg-verification-baseline.txt"
 

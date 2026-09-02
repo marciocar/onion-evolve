@@ -190,8 +190,8 @@ nodes:
     impact: 5
     confidence: 0.5
     status: open
-    verified_at: 2026-09-01
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_instrument_metrics (SUPERSEDES); label preservado como historia'
+    verified_at: 2026-09-02
+    verified_against: 'reconciliacao 2026-09-02: E_CENSO0901 REFINA (CONSTRAINS), nao supera — a Onda 8 pagou a PERSISTENCIA (ops/gtm/collect-metrics.sh + 4 ledgers jsonl + cron 12:30, I_GTM_JSONL_PERSISTIDO) mas o entregavel do no (NUMERO unico de valor por adotante + benchmark free->paid) segue ausente; gatilho: 1a serie de 30 dias nos ledgers'
     label: "Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de metodologia dev). Sem isso, preço de compliance-pack/SOTA é chute educado; D4 fica sem valor por degrau"
   - id: Q_p4_no_field_proof
     node_type: question
@@ -314,4 +314,4 @@ edges:
     edge_type: TRACES_TO
   - from: E_CENSO0901_Q_instrument_metrics
     to: Q_instrument_metrics
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS

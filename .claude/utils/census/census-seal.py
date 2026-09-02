@@ -6,7 +6,7 @@
 #       census-seal.py list <consolidado.json> <out.md> [frescos.json]
 #
 # Tabela (postura AUDIT — /meta:drive): CONFIRMED+juiz-APROVADO → carimba verified_at ·
-# DRIFTED → nó E_CENSO<data>_* + SUPERSEDES + carimbo do alvo (status do alvo INTOCADO — flip
+# DRIFTED → nó E_CENSO<data>_* + aresta PELA REALIDADE (SUPERSEDES se MORTO/FORA, senão CONSTRAINS) + carimbo do alvo (status INTOCADO — flip
 # é do maestro) · REPROVADO/REFUTED/UNVERIFIABLE → intocado, listado.
 #
 # LEI DA SANITIZAÇÃO (2 disparos da guarda projeção/NOME em 2026-09-01): termos vêm de
@@ -20,11 +20,14 @@
 # =============================================================================
 import json, re, sys, subprocess, datetime, os
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+# SCRIPTS = onde vivem radar/projection-safety/members (o core); ROOT = onde vivem os GRAFOS a selar.
+# Separados para a bancada apontar ONION_CENSUS_ROOT a uma fixture (mesma costura do extrator).
+SCRIPTS = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+ROOT = os.environ.get('ONION_CENSUS_ROOT', SCRIPTS)
 HOJE = datetime.date.today().isoformat()
 
 def derived_terms():
-    out = subprocess.run(['bash', os.path.join(ROOT, '.claude/validation/projection-safety.sh'), '--emit-terms'],
+    out = subprocess.run(['bash', os.path.join(SCRIPTS, '.claude/validation/projection-safety.sh'), '--emit-terms'],
                          capture_output=True, text=True).stdout.split()
     return [t for t in out if len(t) >= 4]
 
@@ -34,7 +37,7 @@ def sanitize(s, terms):
         s = re.sub(r'\b' + re.escape(t) + r'\b', '<membro>', s)
     # Ids de membro vêm do members.yaml EM RUNTIME — nunca hardcoded: literal de adotante
     # neste arquivo viaja vendorizado para todo mundo (vendor-scrub pegou a 1ª versão, 2026-09-01).
-    mf = os.path.join(ROOT, 'docs/evolution/federation/members.yaml')
+    mf = os.path.join(SCRIPTS, 'docs/evolution/federation/members.yaml')
     if os.path.exists(mf):
         ids = re.findall(r'^\s*-\s*id:\s*([\w.-]+)', open(mf).read(), re.M)
         for mid in ids:
@@ -100,13 +103,20 @@ def seal(consol):
                     f"    verified_against: '{RUN}: DRIFTED {m['claims_measured']}/{m['claims_total']} — {sanitize(m['method'],terms)[:90]}'\n"
                     f"    label: 'MEDIDO {HOJE}, o vivo superou o no: {sanitize(m['divergence'],terms)[:300]}'\n\nedges:")
             t = t.replace('\nedges:', '\n' + node, 1)
-            t = t.rstrip() + f"\n  - from: {nid_new}\n    to: {m['node_id']}\n    edge_type: SUPERSEDES\n"
-            t, ok2 = stamp(t, m['node_id'], f"{RUN}: DRIFTED — ver {nid_new} (SUPERSEDES); label preservado como historia")
+            # TIPO DA ARESTA PELA REALIDADE (lei de 2026-09-02, regra do proprio radar): SUPERSEDES
+            # diz "deixou de valer" e exige flip do alvo — mas um DRIFTED cuja realidade e GATED ou
+            # REAL-ACIONAVEL ainda tem TRABALHO pendente; flipa-lo apagaria o item do backlog. Ali o
+            # superseder apenas REFINA => CONSTRAINS, alvo segue open. Medido: 13 alvos de SUPERSEDES
+            # ficaram open em 8 grafos apos 2 censos por esta escolha ser incondicional.
+            et = 'SUPERSEDES' if m.get('realidade') in ('MORTO-CANDIDATO', 'FORA-DO-CORE') else 'CONSTRAINS'
+            t = t.rstrip() + f"\n  - from: {nid_new}\n    to: {m['node_id']}\n    edge_type: {et}\n"
+            nota = 'flip para superseded PROPOSTO ao maestro' if et == 'SUPERSEDES' else 'REFINA, alvo segue open'
+            t, ok2 = stamp(t, m['node_id'], f"{RUN}: DRIFTED — ver {nid_new} ({et}: {nota}); label preservado como historia")
             if not ok2: skip.append(m['node_id'] + ':stamp-alvo-FALHOU')  # nunca silencioso (3ª mordida)
             files[p] = t; sup += 1
     for p, t in files.items(): open(os.path.join(ROOT, p), 'w').write(t)
     for p in files:
-        rc = subprocess.run(['bash', os.path.join(ROOT, '.claude/validation/kg-radar.sh'),
+        rc = subprocess.run(['bash', os.path.join(SCRIPTS, '.claude/validation/kg-radar.sh'),
                              os.path.join(ROOT, p), '--integrity', '--schema'],
                             capture_output=True).returncode
         if rc != 0:
