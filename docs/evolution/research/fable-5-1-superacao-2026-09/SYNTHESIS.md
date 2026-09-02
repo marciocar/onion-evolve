@@ -167,3 +167,17 @@ experimentos com métrica** — não uma superação. O achado de maior valor (l
 **reprova** a pergunta como foi feita: antes de "o 5.1 supera o quê?", a pergunta é "o Onion aceita autorização
 de texto onde?". `D_AUDITAR_GATES_TEXTUAIS` é a próxima onda. Regressão a evitar: rodada seguinte **sem**
 experimento comportamental é leitura repetida — `C_RODADA_100_LEITURA_0_COMPORTAMENTO` barra isso.
+
+## Fechamento 2026-09-02 (apêndice datado) — `D_HOOK_PREMODELSWITCH_GUARDA` sai de declarado para observado
+
+**Medido**, não lido: `PreModelSwitch` e `PostModelSwitch` **disparam** no `/model` da sessão principal
+(2.1.258), com `from_model`/`to_model`/`requested_model`/`source` **e custo** (`estimated_cache_write_usd`
+3,13 a 156k de contexto — a troca invalida o cache; `pricing: catalog`). O binário contém *"model switch
+blocked by a PreModelSwitch hook"*: o Pre **veta**, não só registra. Evidência:
+`E_PREMODELSWITCH_DISPARO_MEDIDO_0902` → `data/probe-premodelswitch.md`.
+
+Pré-condição **nova** que a medição descobriu: o evento só existe em processo ≥ 2.1.251. A sessão rodava
+2.1.247 com o binário **já deletado do disco** (disco em 2.1.258); o picker mostrava Fable 5.1 bloqueado
+num sistema atualizado — ele reflete o **processo**, não o disco. A REGRA 65 compara `cc_version` do
+disco e é cega a isto (fio candidato, não aberto). A decisão segue `open`: **o que a guarda faz** (vetar
+downgrade? avisar custo de cache? registrar por modelo?) é selo do maestro.
