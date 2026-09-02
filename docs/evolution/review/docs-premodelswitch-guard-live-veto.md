@@ -28,3 +28,10 @@ processo-vs-disco (#768) → guarda entregue (#770) → **veto observado ao vivo
 
 - Nenhum nó novo (grafo no TETO 34/34): a observação vive no `verified_against` da própria decisão.
 - Opção 2 (confirmação por custo de cache) segue não selada.
+
+## Correção (2026-09-02, após o merge — o maestro corrigiu)
+
+O achado 1 ("não precisou reiniciar") estava **errado**: o maestro saiu com `/exit` e voltou com
+`claude --resume` antes de tentar o `/model`. O sinal estava disponível (id de sessão nos paths de tarefa
+mudou de `a331b306` para `d7888077`) e eu inferi em vez de medir. Conclusão correta: **hooks novos em
+`settings.json` exigem reiniciar a sessão**. Carimbo do nó corrigido em `fix/kg-premodelswitch-restart-correction`.

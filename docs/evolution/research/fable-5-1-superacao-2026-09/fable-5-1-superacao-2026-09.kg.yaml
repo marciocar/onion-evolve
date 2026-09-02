@@ -198,7 +198,7 @@ nodes:
     impact: 4
     confidence: 0.95
     verified_at: 2026-09-02
-    verified_against: 'VETO AO VIVO no /model do maestro (sessao a331b306, main 1b795de2, SEM reiniciar — settings.json recarregado na sessao): picker respondeu "Model switch to Sonnet 5 was blocked by a PreModelSwitch hook: GUARDA-PREMODELSWITCH: troca claude-fable-5-1 → claude-sonnet-5 NEGADA"; log .claude/sessions/model-switch.jsonl 18:28:27Z decision=block, requested=sonnet, source=picker, cache_write_usd=1.83; selo 1+3 do maestro; entregue em #770'
+    verified_against: 'VETO AO VIVO no /model do maestro (main 1b795de2, APOS /exit + claude --resume — processo novo, sessao d7888077; a 1a redacao dizia "sem reiniciar" por inferencia e estava ERRADA: hooks novos em settings.json exigem reiniciar): picker respondeu "Model switch to Sonnet 5 was blocked by a PreModelSwitch hook: GUARDA-PREMODELSWITCH: troca claude-fable-5-1 → claude-sonnet-5 NEGADA"; log .claude/sessions/model-switch.jsonl 18:28:27Z decision=block, requested=sonnet, source=picker, cache_write_usd=1.83; selo 1+3 do maestro; entregue em #770'
     label: 'DECISAO PROPOSTA: hook PreModelSwitch (2.1.251+) como guarda determinística contra troca/downgrade silencioso de modelo — vetar (exit 2) ou pelo menos registrar (from_model→to_model) toda troca que saia da baseline declarada (REGRA 65 ganha um eixo de MODELO alem de cc_version). E o unico mecanismo de plataforma que dispara por modelo. PRE-CONDICAO: provar em dogfood que o hook dispara no /model desta versao (declarado no CHANGELOG, nao observado) — fixture no lint-selftest. GATILHO: 1o incidente de modelo trocado sem o maestro saber OU a proxima rodada do radar E3.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-claude-code.md'
 
