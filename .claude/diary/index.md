@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 109 entradas · **Stale:** 0 · **Compartilháveis:** 97 · **Com significância:** 49
+**Total:** 110 entradas · **Stale:** 0 · **Compartilháveis:** 98 · **Com significância:** 50
 
 Gerado em: 2026-09-02
 
@@ -13,6 +13,7 @@ Gerado em: 2026-09-02
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
 | 2026-09-02 | error | public 📤 | no-verify-e-checkpoint-nunca-aprovacao | O maestro separou duas coisas que eu tinha colado numa só: `--no-verify` garante que o trabalho incompleto não se perde; a APROVAÇÃO só vem do gate completo executado sobre o SHA final. | 2026-12-01 | static |
+| 2026-09-02 | learning | public 📤 | a-diretriz-de-pesquisa-e-spec-carregada-nao-comando | A pergunta 'como não redigir a diretriz toda vez?' respondeu-se com 'não é comando, é contexto carregado + campo + guarda' — e a pesquisa devolveu duas coisas que valiam sozinhas: não há doutrina de fontes no core, e o mercado descreve o Onion em CAUTION (instruction bloat) e em ASSESS (context graph) ao mesmo tempo. | 2026-12-01 | static |
 | 2026-08-28 | error | public 📤 | o-farol-anunciava-fantasma-como-sessao-viva | O farol de sessão — a guarda que protege a invariante I3 — passou meses anunciando fantasmas como sessões vivas, e eu repassei o anúncio ao maestro como fato. Declarado ≠ verificado aplicado ao mecanismo que eu mesmo consumo. | 2026-11-26 | dynamic |
 | 2026-08-28 | learning | public 📤 | a-bancada-achou-o-defeito-destrutivo-que-eu-ia-enviar | A pergunta do maestro ('não é hora de um comando de gestão de backlog?') respondeu-se com NÃO — o que faltava era catraca, não superfície. E a bancada que escrevi para provar a catraca achou um defeito destrutivo meu que a leitura do código não tinha achado. | 2026-11-26 | dynamic |
 | 2026-08-26 | reflection | public 📤 | a-cura-que-virou-mecanismo-e-grafo | O erro que cometi no meio da sessão virou um mecanismo que mergeou a própria correção — o erra→aprende→vira-lei que o site passou a sessão aprendendo a vender, praticado ao vivo em mim mesmo. | 2026-11-24 | dynamic |
