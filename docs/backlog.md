@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**78 itens abertos** em 25 grafo(s) com aberto (de 48 no escopo) · 25 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**77 itens abertos** em 25 grafo(s) com aberto (de 48 no escopo) · 25 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 12 item(ns)
 
@@ -73,13 +73,12 @@
 | 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
 | 5.4 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
 
-## fable-5-1-superacao-2026-09 — 12 item(ns)
+## fable-5-1-superacao-2026-09 — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 16.8 | `Q_EXP_JUIZ_FABLE_CALIBRACAO` | fable-5-1-superacao-2026-09 | EXPERIMENTO: juiz do kg-freshness/censo opus/high → fable/high SO na faixa CONFIRMED. Metrica: re-rodar a calibracao contra o ME |
+| 19.6 | `Q_EXP_JUIZ_FABLE_CALIBRACAO` | fable-5-1-superacao-2026-09 | EXPERIMENTO: juiz do kg-freshness/censo opus/high → fable/high SO na faixa CONFIRMED. Metrica: re-rodar a calibracao contra o ME |
 | 12.0 | `D_AUDITAR_GATES_TEXTUAIS` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA (S1): auditar todo gate do Onion que dependa de texto/declaracao do modelo em vez de exit 2 ou estado lido — ca |
-| 9.6 | `Q_PROBE_WORKFLOW_ALIAS` | fable-5-1-superacao-2026-09 | MEDIR o alias `fable` no Workflow tool (1 turno, schema com o campo model da resposta) — pre-condicao de Q_EXP_JUIZ_FABLE_CALIBR |
 | 8.4 | `D_HOOK_PREMODELSWITCH_GUARDA` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA: hook PreModelSwitch (2.1.251+) como guarda determinística contra troca/downgrade silencioso de modelo — vetar |
 | 6.4 | `C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE` | fable-5-1-superacao-2026-09 | HIPOTESE (nao selada; EMENDA DO JUIZ: 1M de contexto NAO e novidade do 5.1 — Opus 5 e Fable 5 ja eram 1M, agent-orchestration.md |
 | 5.6 | `D_TIERING_SSOT_UNICA_E_EFFORT` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA (2 partes, sem experimento de modelo): (a) a tabela de tiering replicada em ~8 docs vira UMA fonte (agent-orchest |
