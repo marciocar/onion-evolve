@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**80 itens abertos** em 26 grafo(s) com aberto (de 49 no escopo) · 26 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**87 itens abertos** em 27 grafo(s) com aberto (de 50 no escopo) · 27 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 12 item(ns)
 
@@ -43,6 +43,18 @@
 | 10.8 | `Q_CUSTO_DO_PORTE_NUNCA_MEDIDO` | onion-identity-2026-07 | A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara qu |
 | 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
 | 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
+
+## meta-research-lens-2026-09 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 25.5 | `Q_DIRETRIZ_DE_PESQUISA_VIRA_MAQUINARIA` | meta-research-lens-2026-09 | Como a diretriz de pesquisa que o maestro re-digita a cada pesquisa/decisao (lente Onion, fontes atuais, Claude Code na versao atu |
+| 24.0 | `D_F1_FUNDACAO_FRAGMENTO_CAMPOS_GUARDAS_CORPUS` | meta-research-lens-2026-09 | F1 (1 PR, fundacao): (a) .claude/commands/common/prompts/research-doctrine.md — as 10 clausulas do maestro como checklist execut |
+| 18.8 | `D_F2_MOTOR_WORKFLOW_ONION_RESEARCH_E_SKILL` | meta-research-lens-2026-09 | F2 (1 PR, motor): (a) .claude/workflows/onion-research.js DERIVADO do /deep-research embutido (mesmos schemas e votacao 3/2) com:  |
+| 14.0 | `D_PODA_INSTRUCTION_BLOAT_MEDIDA` | meta-research-lens-2026-09 | DECISAO PROPOSTA (fio proprio, GATED): medir o que do CLAUDE.md/skills/rules carrega SEMPRE vs sob demanda (InstructionsLoaded hoo |
+| 11.2 | `D_F3_MODO_DECISAO_COM_ELENXO` | meta-research-lens-2026-09 | F3 (1 PR, decisao): sem comando novo — a skill ganha modo "para decidir": corpus -> lacunas -> pesquisa SO nas lacunas -> Elenxo |
+| 9.0 | `D_F4_REVISITA_REGRA65_E_MODO_REVISIT` | meta-research-lens-2026-09 | F4 (1 PR, revisita): REGRA 65 passa a varrer review_after dos grafos de pesquisa e das fontes do roster (SOFT); /onion-research -- |
+| 6.3 | `D_BUSCA_COMO_SDAAL_GATED` | meta-research-lens-2026-09 | DECISAO PROPOSTA (GATED): adapter de busca em .claude/utils/search/ (irmao do task-manager: WebSearch nativo default; MCP Exa/Tavi |
 
 ## elenxos-2026-08-07 — 2 item(ns)
 
