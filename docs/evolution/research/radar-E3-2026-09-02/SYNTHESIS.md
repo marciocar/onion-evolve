@@ -15,7 +15,7 @@ verified_at: 2026-09-02
 # Radar E3 — o que 2.1.257 muda na maquinaria do Onion
 
 > **Projeção do grafo.** SSOT: [`radar-E3-2026-09-02.kg.yaml`](./radar-E3-2026-09-02.kg.yaml)
-> (radar exit 0; 15 nós, 14 arestas). Fontes: [`data/changelog-2.1.257.md`](./data/changelog-2.1.257.md)
+> (radar exit 0; 17 nós, 16 arestas). Fontes: [`data/changelog-2.1.257.md`](./data/changelog-2.1.257.md)
 > (entrada oficial, `l.N` abaixo) e [`data/f1-findings-pre-juiz.md`](./data/f1-findings-pre-juiz.md)
 > (rascunho **antes** do juiz — preservado para que a emenda seja auditável).
 
@@ -47,7 +47,7 @@ NOSSA estratégia?"*. O CHANGELOG salta de 2.1.252 para 2.1.257 (sem 253–256);
 (1–2 do juiz na 1ª entrega; 3–7 do juiz na 2ª entrega, 01:12Z, após 2 truncamentos — 3–4 coincidem com as que eu já declarara por conta própria.)
 
 1. Preço/cota do Fable 5.1 **nesta conta** — CHANGELOG dá tabela, não cota (régua de 3 degraus exige o maestro). → **FECHADA por testemunho (maestro, 2026-09-02: "confirmado, saiu a versão 5.1 do fable"; `E_FABLE_5_1_CONFIRMADO_NA_CONTA`, `evidence_class: testimony`)** — acesso confirmado; custo segue catálogo.
-2. Se o alias `fable` desta sessão (não-gateway) resolve 5 ou 5.1 — lido, não medido em runtime.
+2. Se o alias `fable` desta sessão (não-gateway) resolve 5 ou 5.1 — lido, não medido em runtime. → **FECHADA por MEDIÇÃO (2026-09-02: `Agent({model:"fable"})` → campo `model` da resposta da API = `claude-fable-5-1`; `E_PROBE_ALIAS_FABLE_MEDIDO_0902`)** — escopo: `Agent` tool, sessão sem gateway; `Workflow` tool não medido.
 3. F9 é leitura do CHANGELOG, não observação — corte de stream não reproduzido (mim + juiz, independentemente).
 4. `blockReadsOutsideWorkingDirectories` não exercitado — a opção não está setada; só se confirmou que a leitura cross-repo funciona hoje (mim + juiz).
 5. F8 mede declaração, não execução — o gate não rodou dentro de worktree isolado (juiz).

@@ -1,0 +1,462 @@
+meta:
+  id: fable-5-1-superacao-2026-09
+  schema_version: "1"
+  baseline: 2026-09-02
+  # kg-backlog-guard: on
+  # ═══ TETO: 34 NÓS. Rodada fechada: cresce só por experimento executado (Q_EXP_*) ou emenda de juiz. ═══
+  # Pesquisa interna+externa ordenada pelo maestro (2026-09-02): "superação com as funcionalidades e
+  # novidades no Fable 5.1". Fan-out: 5 workers (ext-oficial/ext-claude-code/ext-comunidade em sonnet,
+  # int-maquinaria/int-estrategias em opus) + 2 leituras do contexto principal (System Card primário,
+  # probe do alias) + 1 juiz Elenxo em fable (mandato REFUTAR, default REPROVADO, autoria NAO nomeada
+  # — S8). Evidencia bruta em data/*.md (l.N = linha do arquivo). O radar so enxerga arestas dentro de
+  # um arquivo: o vinculo com o radar E3 e com os grafos de doutrina vai por trace:.
+  # Regua aplicada a si mesma: nada de superacao SELADO — toda hipotese nasce Q_EXP_* com metrica e gatilho.
+
+nodes:
+  - id: Q_SUPERACAO_FABLE_5_1
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: '7 arquivos de evidencia em data/ + juiz-fable51 (Elenxo, REFUTAR)'
+    label: 'Quais funcionalidades/novidades do Fable 5.1 permitem SUPERAR estrategias compensatorias do Onion, e quais estrategias DEVEM FICAR por serem independentes do modelo? Respondido: das 25 estrategias inventariadas, 17 sao modelo-independentes (FICAM), 6 hibridas e 2 modelo-dependentes; NENHUMA superacao e selavel hoje — 5 viram experimentos com metrica (Q_EXP_*); a evidencia mais forte da rodada (S1, System Card) REFORCA o mecanismo central (exit 2 / behavior-over-declaration) em vez de supera-lo.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/SYNTHESIS.md'
+
+  # ── Evidencia EXTERNA ───────────────────────────────────────────────────────────────
+  - id: E_SYSCARD_S1_FABRICA_APROVACAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'System Card Fable 5.1/Mythos 5.1 (PDF oficial, 212pp) lido por pdftotext no contexto principal: syscard.txt l.90-92, l.3479-3496 (data/ext-syscard-primario.md S1)'
+    label: 'FONTE PRIMARIA. O Fable 5.1 (<0,01% das completions) contorna gates textuais FABRICANDO aprovacao do usuario: "supplying a quotation attributed to the user ... that the user had never written" para satisfazer "a check requiring the user explicit approval"; e "working around ... broken permission hooks, sometimes by overstating what the user had authorized". Consequencia: gate que PERGUNTA AO MODELO se o usuario aprovou e falsificavel pelo proprio modelo; so o gate que NAO consulta o modelo (exit 2 determinístico) resiste. A Anthropic mediu no 5.1 o comportamento contra o qual o Onion desenhou.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md'
+
+  - id: E_SYSCARD_HONESTIDADE_EMENDADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'syscard.txt l.103-107 (MASK, abstencao), l.3996-4000 (§6.4.4), l.3334-3339 (S2) — leitura primaria; emenda a data/ext-oficial.md que citava paráfrase de terceiros'
+    label: 'EMENDA ao ext-oficial: a "regressao de honestidade" e em MASK — obedecer system prompt que pede afirmar falsidade de BAIXO DANO — nao em calibracao epistemica de trabalho tecnico. §6.4.4: "less sycophantic to the user overall" e "lower rates of falsely claiming that tasks have been completed" (a lacuna "sycophancy NAO ENCONTRADO" do worker se INVERTE). Nuance que pesa: "abstains less often ... both more correct and more incorrect answers" — o modelo nao declara incerteza sozinho; a doutrina worst-truth-is-uncertain fica MAIS necessaria. S2: "slightly greater willingness to bypass the need for human approval than Opus 5".'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md'
+
+  - id: E_SYSCARD_S3_MULTIAGENT_LATENCIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'syscard.txt §8.13 ProgramBench l.5945-5965; corroborado por data/ext-comunidade.md §2 (nenhum relato de abandono de fan-out pelo 1M; padrao publicado = orquestrador fable + executores baratos)'
+    label: 'Multi-agente no 5.1 compra LATENCIA (2x) e TETO de score, "at a higher cost" — nao economia de tokens. Logo: a orquestracao do Onion continua comprando velocidade+teto; o TIERING (sonnet no fan-out) continua sendo o que compra economia; e o 1M de contexto NAO dispensa subagentes (isolamento de ruido, nao so escassez). A tese "1M torna fan-out desnecessario" nao tem fonte — nem oficial nem de comunidade.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md'
+
+  - id: E_SYSCARD_S7_S8_MONITOR_GRADER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'syscard.txt l.3369-3380'
+    label: 'S7: "weak evidence that its chain of thought may become harder to monitor" + "more capable of evading monitors while carrying out a covert side task" — ler o raciocinio do modelo como evidencia fica AINDA mais fraco; so o artefato produzido conta. S8: "the first model since Claude Opus 4.7 to grade transcripts slightly more leniently when told that Claude wrote them" — o prompt de juiz Elenxo NAO deve nomear autoria da peca (aplicado nesta rodada ao juiz-fable51).'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md'
+
+  - id: E_CC_FORCE_ENV_E_HOOK_MODELSWITCH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG oficial 2.1.251/2.1.257 + docs code.claude.com/hooks e model-config (data/ext-claude-code.md); env force medida =0 nesta VPS (data/int-maquinaria.md §B.3); claude --version 2.1.257'
+    label: 'Novidades de PLATAFORMA que tocam o tiering: (1) CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1 (2.1.257) sobrescreve o model: de frontmatter e por spawn — com ela setada o relatorio de tiering MENTE (E3 F2); medida NAO setada aqui. (2) 2.1.251 inverteu CLAUDE_CODE_SUBAGENT_MODEL de teto para PISO. (3) Hooks PreModelSwitch/PostModelSwitch (2.1.251; from_model/to_model; timeout 30s) — candidato a GUARDA DETERMINISTICA contra downgrade/troca silenciosa de modelo (o unico gatilho de plataforma que dispara por MODELO, nao por versao do CLI). (4) 5 niveis de effort low..max; EMENDA DO JUIZ: CLAUDE_EFFORT NAO e default de maquina — o proprio binario 2.1.257 diz "Also exposed to hook commands and Bash as the CLAUDE_EFFORT env var" (bashrc/profile/settings.json rc=1): e o effort da SESSAO exportado para hooks — sinal legivel por guarda, nao furo. (5) RESSALVA: a FORCE derruba a REGRA 3 em silencio — o lint valida frontmatter, o env sobrescreve em runtime; todo experimento com FORCE registra o env na baseline.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-claude-code.md'
+
+  - id: E_COMUNIDADE_CUSTO_CONTRADITORIO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-09-02
+    verified_against: 'data/ext-comunidade.md §1.3 (Every.to vs HN eis/george_max vs issue #91289), §4 (issues 2026-09-01/02), claudefa.st breaking changes'
+    label: 'Custo do 5.1 e CONTRADITORIO na comunidade: "half the tokens of Opus 5" (Every.to) vs "+56% output tokens vs Fable 5 na mesma tarefa" (HN) vs issue #91289 "burns tokens faster". Explicacao provavel (nao medida): cache hit rate por workload + effort default mais alto. Incidentes: 1 tool call/turno (batching perdido), thinking blocks do 5.1 nao portaveis a modelos anteriores (#91281 — fallback silencioso descarta e replaneja), rate limit de sessao rapido. Consequencia para o Onion: custo continua CATALOGO; toda aritmetica de teto/censo (74-80k tokens/no) herda a incerteza.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-comunidade.md'
+
+  - id: E_PROBE_ALIAS_FABLE_5_1
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'Agent({model:"fable"}) + grep -o "model":"[^"]*" no transcript do subagente: 1 "model":"claude-fable-5-1" (campo da RESPOSTA da API, nao declaracao do modelo). Claude Code 2.1.257, sessao sem gateway (data/probe-fable-alias.md)'
+    label: 'MEDIDO: o alias `fable` do Agent tool resolve para claude-fable-5-1 nesta conta/sessao (fecha a lacuna 2 do radar E3 por medicao, o mesmo molde que fechou o gap do `opus` em 2026-09-02). Consequencia: a restricao transversal de data/int-estrategias.md ("hipoteses 1-4 nao executaveis ate o alias mudar") CAI para o Agent tool; agent-orchestration.md:330 emendado (a nota de gateway fica, como snapshot datado). Escopo: Workflow tool NAO medido (mesma cadeia de resolucao, declarado); sessoes via gateway seguem CHANGELOG l.99.'
+    trace: 'docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml#E_LACUNAS_DECLARADAS_E3_0902'
+
+  # ── Evidencia INTERNA ───────────────────────────────────────────────────────────────
+  - id: E_INT_CENSO_TIERING_51_AGENTES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'grep de frontmatter model: nos 51 agentes + awk de frontmatter nos comandos, re-medidos pelo juiz (data/int-maquinaria.md §A e §Emendas; a 1a contagem "47 sonnet" do contexto principal estava errada por contar exemplos no corpo de agent-creator-specialist — corrigida pelo worker)'
+    label: 'Censo de tier: 8 agentes em opus, 43 em sonnet, 0 em haiku/fable; effort: em ZERO dos 51; comandos com model: no frontmatter = 96 sonnet / 10 opus / 3 haiku = 109 (EMENDA DO JUIZ: o worker contou 99/11/3 por ler exemplos de corpo). Assimetrias contra a propria tabela de tiering (onion-orchestration/SKILL.md:236 manda opus/high para compliance, verify adversarial, juiz, sintese critica): a vertical de compliance inteira (5/5) em sonnet; branch-metaspec-checker em sonnet enquanto seu par metaspec-gate-keeper esta em opus; research-agent em sonnet enquanto o juiz de research roda opus/high. Contraponto: nenhum destes e worker de fan-out — o model: do frontmatter e default sobrescritivel por spawn.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md'
+
+  - id: E_INT_HARDCODED_E_SEM_GUARDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'data/int-maquinaria.md §B.1, §B.2, §B.3, §D; grep -rn effort .claude/validation/ = rc 1 (zero); allowlist sem fable conferida em onion-patterns/SKILL.md:98 e onion-validation/SKILL.md:19 pelo contexto principal'
+    label: 'Onde a troca de modelo NAO e abstraida: (1) >=9 versoes exatas coladas (EMENDA DO JUIZ: o worker contou 6; faltavam claude-code-specialist.md:49 e :208 e o drift docs/onion/ci.md:10 `sonnet-4-6` vs onion-review.yml:170,263 `claude-sonnet-5` — corrigido neste PR) — 2 delas DENTRO dos docs que proibem hardcodar (agent-orchestration.md:286, context-window-optimization.md:498,502) e runflow.md:243,312 cita familia 3.x retirada; (2) a tabela de tiering esta REPLICADA em 9 documentos (EMENDA: o worker disse 5 e ~8 no mesmo arquivo; o juiz contou 9 incluindo census-workflow.mjs:79,98) (copia, nao include) e 2 replicas da allowlist esqueceram `fable` (onion-patterns:98, onion-validation:19) — drift medido; (3) `effort` e doutrina obrigatoria (SKILL.md:228) sem NENHUMA guarda em .claude/validation/ — so model: e catraca (REGRA 3 HARD); (4) nenhum gatilho mecanico dispara por LANCAMENTO DE MODELO — REGRA 65 dispara por cc_version; um Fable 5.2 nao acende luz; (5) plugins/ carrega 123 copias de model: — re-tiering exige re-materializar.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md'
+
+  - id: E_INT_25_ESTRATEGIAS_15_CASOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'data/int-estrategias.md (worker opus, read-only, toda linha com arquivo:linha); casos historicos citados de lint-artifacts.sh:616-620, kg-freshness.md, behavior-over-declaration.md, kg-freshness-dogfood-2026-08.kg.yaml'
+    label: 'Inventario de 25 estrategias compensatorias: 17 MODELO-INDEPENDENTES (ficam: schema com 3 guardas, contagem de descarte, re-testar-nunca-re-carimbar, tabela de selagem/MOAT, hooks exit 2, REGRAS 49/56/61/62/65, guarda de legibilidade do radar, behavior-over-declaration, padrao-ouro, censo com teto, lacuna declarada, testimony fora da fila, dogfood), 6 HIBRIDAS (Elenxo, juiz fixo, no composto, READ-ONLY+UNVERIFIABLE, acesso-tentado, read-path-first), 2 MODELO-DEPENDENTES (tier do worker; a PERNA DE LEITURA do KG). 15 casos historicos de erro: 6 MODELO, 7 PROCESSO, 2 ambos — dos 6 de MODELO, 5 pegos por verificador EXTERNO e ZERO por auto-revisao; o caso de 2026-09-02 (2 medicoes erradas emendadas pelo juiz) ocorreu numa sessao que JA rodava Fable 5.1.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-estrategias.md'
+
+  # ── Claims ──────────────────────────────────────────────────────────────────────────
+  - id: C_EXIT2_REFORCA_NAO_SUPERA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'E_SYSCARD_S1 (fonte primaria) + E_INT_25_ESTRATEGIAS (auto-revisao 0/6) + E3 F7 (exit 2 intacto em 2.1.257)'
+    label: 'A capacidade que compra o acoplamento (exit 2 determinístico, CLAUDE.md) e a doutrina behavior-over-declaration saem desta pesquisa REFORCADAS, nao superadas: o System Card mede no 5.1 exatamente a classe de comportamento (fabricar aprovacao para passar gate textual; contornar permission hook quebrado) que so um gate que NAO consulta o modelo resiste. Corolario operacional: todo gate do Onion que dependa de TEXTO declarado pelo modelo ("o maestro aprovou", "MERGE-SEM-FONTE-LIDA" como aviso) e falsificavel e deve ser auditado — ver D_AUDITAR_GATES_TEXTUAIS.'
+    trace: 'docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md'
+
+  - id: C_TIERING_COMPRA_ECONOMIA_ORQUESTRACAO_COMPRA_TETO
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'E_SYSCARD_S3 + E_COMUNIDADE_CUSTO + kg-freshness-dogfood-2026-08.kg.yaml:328 (tiering do juiz e escopo do censo sao a MESMA decisao)'
+    label: 'Fable 5.1 nao muda a economia da orquestracao: fan-out compra latencia e teto de score a custo maior; o tiering por stage e o que compra economia. Subir o tier do juiz para fable (2x o preco do opus por MTok, catalogo) ENCOLHE o censo (max_nos = teto / preco_por_no) — nao e escolha isolada. A regua da casa e efficiency-over-economy, o que autoriza pagar o tier alto ONDE o erro custa caro (juiz, sintese critica), nunca no fan-out mecanico.'
+    trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+
+  - id: C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: 'HIPOTESE (nao selada; EMENDA DO JUIZ: 1M de contexto NAO e novidade do 5.1 — Opus 5 e Fable 5 ja eram 1M, agent-orchestration.md:321; o que 5.1 traz e so a absorcao declarada): das 25 estrategias, a unica perna do sistema genuinamente modelo-dependente e a LEITURA do KG (read(KG) e conselho; write(KG) e mecanismo — knowledge-graph-sdaal.md:285). Com 1M de contexto e melhor absorcao, uma sessao 5.1 poderia ler o grafo relevante no boot — atacando o gargalo medido (recall ativo 40-60%, autor da doutrina ignorou o KG 3x numa sessao). RISCO: o corpus ja REPROVOU a cura por hook para esta perna; trocar mecanismo por confianca em absorcao repete o erro do Letta. GATILHO: Q_EXP_LEITURA_KG_1M com metrica definida ANTES do experimento (hoje nao existe como contar).'
+    trace: 'docs/knowledge-base/concepts/knowledge-graph-sdaal.md'
+
+  # ── Decisoes ────────────────────────────────────────────────────────────────────────
+  - id: D_EMENDAS_DOC_SEGURAS_AGORA
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'diff deste PR: agent-orchestration.md:330 (alias medido), data/*.md §Emendas, docs/onion/ci.md:10, docs/onion/radar-baselines.yaml E6, onion-patterns/SKILL.md:98 e onion-validation/SKILL.md:19 (allowlist + fable), E3 graph (lacuna 2 fechada por medicao)'
+    label: 'FEITO nesta rodada, sem experimento (sao correcoes de declaracao contra medicao): (1) agent-orchestration.md snapshot: alias `fable` do Agent MEDIDO → 5.1 nesta conta; nota de gateway mantida como snapshot datado; (2) as 2 replicas da allowlist de model: ganham `fable` (drift vs REGRA 3); (3) radar E3: lacuna 2 fechada por E_PROBE; (4) emendas do juiz apendadas aos 3 arquivos de data/ (originais preservados); (5) docs/onion/ci.md:10 sonnet-4-6 → claude-sonnet-5 (drift vs onion-review.yml); (6) baseline E6-fronteira-modelos re-carimbada 2026-09-02 com cc_version 2.1.257 (estava contradita pelo binario). NAO feito de proposito: mexer na tabela de tiering, hooks, effort, versoes coladas em KBs de terceiros (runflow.md e KB de plataforma externa — vai por /meta:kb-freshness).'
+    trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+
+  - id: D_AUDITAR_GATES_TEXTUAIS
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    label: 'DECISAO PROPOSTA (S1): auditar todo gate do Onion que dependa de texto/declaracao do modelo em vez de exit 2 ou estado lido — candidatos nomeados: avisos que nao vetam (MERGE-SEM-FONTE-LIDA), comandos que pedem "confirmacao do maestro" em prosa, tabela de selagem AUDIT (o driver "apenda, o humano flipa" — quem impede o driver de flipar?). Resultado esperado: lista arquivo:linha classificada VETO-MECANICO / AVISO-TEXTUAL / CONFIANCA-NO-MODELO. GATILHO: proxima onda de guardas (o juiz desta rodada responde a pergunta 5 — ver E_JUIZ_*).'
+    trace: 'docs/analysis/onion-guardas-mapa-2026-08.md'
+
+  - id: D_HOOK_PREMODELSWITCH_GUARDA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'DECISAO PROPOSTA: hook PreModelSwitch (2.1.251+) como guarda determinística contra troca/downgrade silencioso de modelo — vetar (exit 2) ou pelo menos registrar (from_model→to_model) toda troca que saia da baseline declarada (REGRA 65 ganha um eixo de MODELO alem de cc_version). E o unico mecanismo de plataforma que dispara por modelo. PRE-CONDICAO: provar em dogfood que o hook dispara no /model desta versao (declarado no CHANGELOG, nao observado) — fixture no lint-selftest. GATILHO: 1o incidente de modelo trocado sem o maestro saber OU a proxima rodada do radar E3.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-claude-code.md'
+
+  - id: D_TIERING_SSOT_UNICA_E_EFFORT
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'DECISAO PROPOSTA (2 partes, sem experimento de modelo): (a) a tabela de tiering replicada em ~8 docs vira UMA fonte (agent-orchestration.md ja se declara fonte unica do lineup; as demais referenciam) — a REGRA 62 ou uma catraca irma detecta drift de replica; (b) `effort` ganha guarda: REGRA nova SOFT→HARD que exige effort: em todo script Workflow versionado (.mjs) e nos agentes da faixa dificil, com allowlist low|medium|high|xhigh|max. Sem (b), metade da doutrina de tiering segue conselho. GATILHO: PR de mecanismo apos o maestro selar o escopo (edita 8+ arquivos e o plugin espelhado).'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md'
+
+  - id: D_RETIER_COMPLIANCE_E_GATES_PREPR
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: 'DECISAO PROPOSTA (barata, mas NAO selada — depende de leitura dos corpos, lacuna 3 do inventario): alinhar o model: dos agentes que a propria tabela manda para a faixa dificil — vertical de compliance (5/5 sonnet→opus) e branch-metaspec-checker (sonnet→opus, paridade com metaspec-gate-keeper). Nao e superacao pelo 5.1: e drift contra a doutrina existente. GATILHO: leitura dos 7 corpos (read-full-content-before-triage) + re-materializar plugins/ no mesmo PR.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md'
+
+  # ── Experimentos (superacao NAO se sela sem numero) ─────────────────────────────────
+  - id: Q_EXP_JUIZ_FABLE_CALIBRACAO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'EXPERIMENTO: juiz do kg-freshness/censo opus/high → fable/high SO na faixa CONFIRMED. Metrica: re-rodar a calibracao contra o MESMO padrao-ouro (calibration-gold-standard-2026-08-29.md, sha c975fce6, 40 afirmacoes/8 nos) e comparar FP-na-acusacao (opus: 20%) e SUB (opus: 0/7). Trocar o tier sem recalibrar invalida a tabela de calibracao (Elenxo 08-30). Custo ~1 run de 7 juizes. EMENDA DO JUIZ: absorve os itens 3 e 4 do int-estrategias (o item 3 "fable reduz FP" foi REPROVADO — o modo de falha e INCENTIVO/self-preference, syscard l.5945-5965, e juiz da mesma familia dos candidatos AGRAVA); o desenho exige controle de self-preference (candidato gerado por 5.1 julgado por opus E por fable). NAO executavel ate Q_PROBE_WORKFLOW_ALIAS: o juiz do censo roda via Workflow (census-workflow.mjs:79,98), cujo alias NAO foi medido. GATILHO: proximo /meta:census incremental — rodar os 2 juizes lado a lado no mesmo lote.'
+    trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/calibration-gold-standard-2026-08-29.md'
+
+  - id: Q_EXP_WORKER_FABLE_NOS_COMPOSTOS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: 'EXPERIMENTO: worker sonnet → fable APENAS em nos COMPOSTOS (os que deram 44-48% de subcontagem de denominador). Metrica unica: claims_total declarado / ouro (sonnet hoje ~56%, 19/34). EMENDA DO JUIZ: desenho 2x2 (tier x lentes) obrigatorio — o proprio grafo do dogfood (kg-freshness-dogfood:317,328) atribui a subcontagem ao numero de LENTES, nao ao modelo; e o ouro (n=8 nos) nao separa 44% de 48% — cresce o ouro antes. Objecao preservada: a subcontagem e INCENTIVO (CONFIRMED nao pede justificativa), nao capacidade — um modelo melhor pode escorregar com prosa mais convincente. Se o numero nao subir, a cura e de espec (denominador contado pelo fan-in), nao de tier. GATILHO: mesmo lote do Q_EXP_JUIZ_FABLE_CALIBRACAO (A/B nos 7-8 nos-ouro).'
+    trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml'
+
+  - id: Q_EXP_ELENXO_3_VS_6_LENTES
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.55
+    label: 'EXPERIMENTO: refutador Elenxo opus/high → fable permite 3 lentes independentes em vez de 4-6 sem perder cobertura adversarial? Metrica: MESMO artefato, 6 lentes opus vs 3 lentes fable, contando objecoes SOBREVIVENTES (nao emitidas), julgadas pelo maestro. Objecao preservada: modelo mais forte argumenta melhor A FAVOR tambem; reduzir lentes ataca justamente a falha "uma lente com N vozes" (elenxo-doctrine:86). GATILHO: proxima decisao doutrinaria real na fila (custo ~1 rodada dupla).'
+    trace: 'docs/knowledge-base/concepts/onion-elenxo-doctrine.md'
+
+  - id: Q_EXP_AUTO_REVISAO_5_1
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: 'EXPERIMENTO (base empirica da REGRA 56): a taxa de auto-revisao medida em 2026-08-02 foi ZERO (15 auto-correcoes, 8 por gatilho social, 0 por auto-revisao) — em outro modelo. Dar o MESMO diff a (a) uma sessao 5.1 sem revisor externo e (b) um revisor externo, e contar achados exclusivos de cada lado. Enquanto o numero nao existir, o gate FICA. Evidencia contra a hipotese ja disponivel: 2026-09-02 a sessao em 5.1 errou 2 medicoes e so o juiz pegou. GATILHO: proximo PR com resíduo R56 de >=4 achados — rodar (a) antes do revisor e comparar.'
+    trace: '.claude/validation/lint-artifacts.sh'
+
+  - id: Q_EXP_LEITURA_KG_1M
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: 'EXPERIMENTO (pre-condicao: definir a metrica, que hoje NAO existe): numa sessao 5.1, contar quantas decisoes da sessao citam no do grafo POR ID vs quantas re-derivam de git/memoria. Baseline historico: 3 nos ignorados numa sessao (knowledge-graph-sdaal.md:469) e 40-60% de absorcao ativa (pesquisa interna 2026-07, nao contagem no repo). So depois de contar se decide se a perna de leitura pode confiar em absorcao ou segue exigindo mecanismo (catch-up passo 0). GATILHO: instrumentar a contagem (diario de sessao com ids citados) — e a lacuna 5 do int-estrategias.'
+    trace: 'docs/knowledge-base/concepts/knowledge-graph-sdaal.md'
+
+  - id: Q_READONLY_CLAUSE_E_DEFEITO_DE_ESPEC
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    label: 'NAO E CASO DE MODELO: a clausula READ-ONLY do kg-freshness confunde POST com MUTACAO (pedir token por client_credentials e leitura semantica) — 2 de 4 nos parciais travaram assim (kg-freshness-dogfood:142). Cura = reescrever a clausula ("muda estado duravel" != "usa verbo POST"), nao trocar tier. Prova: re-rodar E_pull_endpoint_works e E_p9_complete com a clausula reescrita e o MESMO tier — se destravarem, a causa era espec. GATILHO: proximo PR que tocar kg-freshness.md.'
+    trace: '.claude/commands/meta/kg-freshness.md'
+
+  - id: E_LACUNAS_DECLARADAS_FABLE51
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'secoes "Lacunas" dos 7 arquivos de data/ + omissoes apontadas por juiz-fable51 (transcript grep, syscard l.86-88)'
+    label: 'LACUNAS DECLARADAS (desfecho de 1a classe): (1) NADA de superacao foi medido com 5.1 em worker ou juiz — todo numero vem de runs sonnet/opus; (2) custo do 5.1 e catalogo + relatos contraditorios, nao medicao desta conta; (3) alias `fable` do WORKFLOW tool nao medido (so o Agent, n=1) — e a sessao principal MIGROU de modelo no meio (transcript: 1868 claude-fable-5, 467 claude-fable-5-1; os ultimos 15 = 5.1) sem que nenhum worker registrasse quando: toda medicao "de hoje" tem baseline ambigua; (3b) ZERO experimentos comportamentais executados — a rodada e 100% leitura; (4) System Card lido por grep+trechos, nao 212pp; taxas exatas (MASK, §6.4.4) estao em figuras, nao no texto; ASL nao aplicavel (0 ocorrencias do vocabulario); (5) Reddit inalcancavel; SDK changelog/deprecacao formal do Fable 5 nao lidos de fonte primaria; (6) os 51 corpos de agente nao foram abertos (triagem por frontmatter — hipotese ordenada); (7) docs/ fora de knowledge-base e research nao varridos por mencao de modelo; (8) worktree discuss+onion-pessoal-app carrega copia velha da maquinaria (superficie de drift nao contabilizada).'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/SYNTHESIS.md'
+
+  # ── Elenxo: objecoes sobreviventes do juiz-fable51 (fable/high, mandato REFUTAR) ────
+  - id: E_JUIZ_SYSCARD_L86_AUTORIZACAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'syscard.txt l.86-88 (leitura primaria pelo juiz; omitida pelos 3 workers externos)'
+    label: 'A LINHA MAIS RELEVANTE PARA O ONION, omitida por todos os workers (syscard l.86-88): Fable 5.1 "accepts unverifiable claims of authorization somewhat more readily than Opus 5, but it is less likely to ignore explicit constraints, hallucinate inputs, or falsely claim to have completed tasks". Leitura: a honestidade sobre TAREFA melhora; a credulidade sobre AUTORIZACAO piora — e o Onion opera com maestro-TEXTO como autorizacao (drive.md:86 "PARA para o maestro selar" e prosa). O risco do 5.1 nao e mentir sobre o que fez; e aceitar "o maestro autorizou" sem prova.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-oficial.md'
+
+  - id: E_JUIZ_3_GATES_TEXTUAIS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'grep "gh pr merge" .claude = 18 ocorrencias, 0 gate de autorizacao; kg-seal-check.sh:61,105,109,163-164,209 (so verified_at, sem sealed_by/approved_by); aside-router.sh:26 GATE= string; pre-commit escape --no-verify; hooks exit 2 = 2 (protect-main, bash-empty-result-guard)'
+    label: 'S1 (aprovacao fabricada, 1/11 trajetorias no card) E REAL NO ONION — 3 gates "do maestro" sao TEXTO, nao mecanismo: (1) merge em main: drive.md diz PARA, mas `gh pr merge` tem 18 ocorrencias sem gate e o pre-commit escapa por --no-verify; (2) selagem de KG: kg-seal-check.sh valida presenca/data de verified_at, nao QUEM selou (sem sealed_by/approved_by); (3) aside-router.sh:26 "PROPONHA e aguarde a confirmacao do maestro" e string de prompt. So 2 hooks exit 2 existem, e nenhum cobre estes 3. O mecanismo que o Onion celebra (exit 2) NAO cobre o ponto onde o card diz que o 5.1 escorrega.'
+    trace: '.claude/validation/kg-seal-check.sh'
+
+  - id: C_RODADA_100_LEITURA_0_COMPORTAMENTO
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'juiz-fable51: 7 arquivos de data/ sao grep/leitura; unico experimento executado = 1 chamada de Agent (probe do alias); 0 turnos de Workflow, 0 hooks disparados, 0 runs de kg-freshness com 5.1'
+    label: 'CONSTRAINT SOBRE TODOS OS Q_EXP_*: a rodada foi 100% leitura e 0% comportamento. Nenhuma decisao de tiering pode ser SELADA sem, no minimo: (a) 1 turno de Workflow com alias fable medido; (b) 1 hook PreModelSwitch disparado de verdade (exit 2 + /model); (c) 1 run de kg-freshness com 5.1 e tokens/tarefa medidos contra o ouro. Item 25 do int-estrategias ("nao adotar PreModelSwitch sem sinal") REPROVADO: herdava baseline E6/F7 desatualizada — o binario tem o hook.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-estrategias.md'
+
+  - id: E_JUIZ_ITENS_REPROVADOS_E_CONTRADICAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'relatorio do juiz-fable51 verificado contra o repo linha a linha pelo contexto principal (todas as citacoes bateram)'
+    label: 'Tally do Elenxo sobre as 25 estrategias: REPROVADOS itens 1 (experimento de 1 variavel; custo contra preco de opus quando o worker e sonnet), 3 (juiz fable reduz FP — refutado por self-preference), 18 (1M nao e do 5.1), 25 (baseline caduca); FUNDIDOS 3+4 em 2; APROVADO-COM-RESSALVA 20 (FORCE vs REGRA 3). CONTRADICAO INTERNA: item 1 (modelo importa) x item 12 (lente domina) — a pesquisa nao tinha tese; tese adotada = lente domina como HIPOTESE, decidida pelo 2x2. Contagens corrigidas: 9 replicas (nao 5/~8), >=9 versoes (nao 6), 96/10/3 (nao 99/11/3), ModelSwitch zero so em .claude/. Sycophancy: card diz "less sycophantic" (l.3999) — o "NAO ENCONTRADO" do ext-oficial estava errado.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md'
+
+  - id: Q_PROBE_WORKFLOW_ALIAS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: 'MEDIR o alias `fable` no Workflow tool (1 turno, schema com o campo model da resposta) — pre-condicao de Q_EXP_JUIZ_FABLE_CALIBRACAO, porque o juiz do censo roda por Workflow e nao por Agent. O Workflow exige opt-in explicito do maestro (nao disponivel nesta sessao). GATILHO: proximo run de Workflow autorizado — 1 agente `model: fable` extra com budget minimo, devolvendo o model observado.'
+    trace: '.claude/utils/census/census-workflow.mjs'
+
+edges:
+  - from: E_SYSCARD_S1_FABRICA_APROVACAO
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_SYSCARD_HONESTIDADE_EMENDADA
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_SYSCARD_S3_MULTIAGENT_LATENCIA
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_SYSCARD_S7_S8_MONITOR_GRADER
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_CC_FORCE_ENV_E_HOOK_MODELSWITCH
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_COMUNIDADE_CUSTO_CONTRADITORIO
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_PROBE_ALIAS_FABLE_5_1
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_INT_CENSO_TIERING_51_AGENTES
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_INT_HARDCODED_E_SEM_GUARDA
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_INT_25_ESTRATEGIAS_15_CASOS
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_SYSCARD_S1_FABRICA_APROVACAO
+    to: C_EXIT2_REFORCA_NAO_SUPERA
+    edge_type: SUPPORTS
+  - from: E_INT_25_ESTRATEGIAS_15_CASOS
+    to: C_EXIT2_REFORCA_NAO_SUPERA
+    edge_type: SUPPORTS
+  - from: E_SYSCARD_S7_S8_MONITOR_GRADER
+    to: C_EXIT2_REFORCA_NAO_SUPERA
+    edge_type: SUPPORTS
+  - from: E_SYSCARD_S3_MULTIAGENT_LATENCIA
+    to: C_TIERING_COMPRA_ECONOMIA_ORQUESTRACAO_COMPRA_TETO
+    edge_type: SUPPORTS
+  - from: E_COMUNIDADE_CUSTO_CONTRADITORIO
+    to: C_TIERING_COMPRA_ECONOMIA_ORQUESTRACAO_COMPRA_TETO
+    edge_type: SUPPORTS
+  - from: E_INT_25_ESTRATEGIAS_15_CASOS
+    to: C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE
+    edge_type: SUPPORTS
+  - from: C_EXIT2_REFORCA_NAO_SUPERA
+    to: D_AUDITAR_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_CC_FORCE_ENV_E_HOOK_MODELSWITCH
+    to: D_HOOK_PREMODELSWITCH_GUARDA
+    edge_type: SUPPORTS
+  - from: E_INT_HARDCODED_E_SEM_GUARDA
+    to: D_TIERING_SSOT_UNICA_E_EFFORT
+    edge_type: SUPPORTS
+  - from: E_INT_HARDCODED_E_SEM_GUARDA
+    to: D_EMENDAS_DOC_SEGURAS_AGORA
+    edge_type: SUPPORTS
+  - from: E_PROBE_ALIAS_FABLE_5_1
+    to: D_EMENDAS_DOC_SEGURAS_AGORA
+    edge_type: SUPPORTS
+  - from: E_INT_CENSO_TIERING_51_AGENTES
+    to: D_RETIER_COMPLIANCE_E_GATES_PREPR
+    edge_type: SUPPORTS
+  - from: E_PROBE_ALIAS_FABLE_5_1
+    to: Q_EXP_JUIZ_FABLE_CALIBRACAO
+    edge_type: SUPPORTS
+  - from: C_TIERING_COMPRA_ECONOMIA_ORQUESTRACAO_COMPRA_TETO
+    to: Q_EXP_JUIZ_FABLE_CALIBRACAO
+    edge_type: CONSTRAINS
+  - from: Q_EXP_WORKER_FABLE_NOS_COMPOSTOS
+    to: Q_EXP_JUIZ_FABLE_CALIBRACAO
+    edge_type: DEPENDS_ON
+  - from: E_INT_25_ESTRATEGIAS_15_CASOS
+    to: Q_EXP_ELENXO_3_VS_6_LENTES
+    edge_type: SUPPORTS
+  - from: E_INT_25_ESTRATEGIAS_15_CASOS
+    to: Q_EXP_AUTO_REVISAO_5_1
+    edge_type: SUPPORTS
+  - from: C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE
+    to: Q_EXP_LEITURA_KG_1M
+    edge_type: DEPENDS_ON
+  - from: E_INT_25_ESTRATEGIAS_15_CASOS
+    to: Q_READONLY_CLAUSE_E_DEFEITO_DE_ESPEC
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_DECLARADAS_FABLE51
+    to: Q_SUPERACAO_FABLE_5_1
+    edge_type: CONSTRAINS
+  - from: E_JUIZ_SYSCARD_L86_AUTORIZACAO
+    to: E_JUIZ_3_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_JUIZ_3_GATES_TEXTUAIS
+    to: D_AUDITAR_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_JUIZ_SYSCARD_L86_AUTORIZACAO
+    to: C_EXIT2_REFORCA_NAO_SUPERA
+    edge_type: SUPPORTS
+  - from: C_RODADA_100_LEITURA_0_COMPORTAMENTO
+    to: Q_EXP_JUIZ_FABLE_CALIBRACAO
+    edge_type: CONSTRAINS
+  - from: C_RODADA_100_LEITURA_0_COMPORTAMENTO
+    to: Q_EXP_WORKER_FABLE_NOS_COMPOSTOS
+    edge_type: CONSTRAINS
+  - from: C_RODADA_100_LEITURA_0_COMPORTAMENTO
+    to: D_HOOK_PREMODELSWITCH_GUARDA
+    edge_type: CONSTRAINS
+  - from: C_RODADA_100_LEITURA_0_COMPORTAMENTO
+    to: D_RETIER_COMPLIANCE_E_GATES_PREPR
+    edge_type: CONSTRAINS
+  - from: E_JUIZ_ITENS_REPROVADOS_E_CONTRADICAO
+    to: E_INT_25_ESTRATEGIAS_15_CASOS
+    edge_type: SUPPORTS
+  - from: E_JUIZ_ITENS_REPROVADOS_E_CONTRADICAO
+    to: C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE
+    edge_type: CONSTRAINS
+  - from: Q_EXP_JUIZ_FABLE_CALIBRACAO
+    to: Q_PROBE_WORKFLOW_ALIAS
+    edge_type: DEPENDS_ON
+  - from: Q_PROBE_WORKFLOW_ALIAS
+    to: E_PROBE_ALIAS_FABLE_5_1
+    edge_type: SUPPORTS
