@@ -18,8 +18,8 @@ nodes:
     impact: 5
     confidence: 0.8
     status: open
-    verified_at: 2026-09-01
-    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED — ver E_CENSO0901_D_spec_now_build_gated (SUPERSEDES); label preservado como historia'
+    verified_at: 2026-09-02
+    verified_against: 'reconciliacao 2026-09-02 (regra do radar): E_CENSO0901 REFINA (CONSTRAINS) — o MECANISMO de gate mudou (ADR hosted-service-identity 2026-08: >=1 federado no Logto consumindo recurso hospedado), o conteudo segue pendente sob o gate novo; gatilho medido = 0 hoje'
     label: "SPEC-agora / BUILD-gated — especificar o command-side (mutação de members.yaml) + modelo de auth (Logto Organizations) SEM construir; o build só liga no gatilho objetivo. Read-model já existe e basta ao operador-único de hoje"
 
   # ---- GATILHO + TENSÕES (question) ----
@@ -156,8 +156,8 @@ nodes:
     impact: 3
     confidence: 0.6
     status: open
-    verified_at: 2026-09-01
-    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED — ver E_CENSO0901_C_p4_gate_visibility (SUPERSEDES); label preservado como historia'
+    verified_at: 2026-09-02
+    verified_against: 'reconciliacao 2026-09-02 (regra do radar): E_CENSO0901 REFINA (CONSTRAINS) — o MECANISMO de gate mudou (ADR hosted-service-identity 2026-08: >=1 federado no Logto consumindo recurso hospedado), o conteudo segue pendente sob o gate novo; gatilho medido = 0 hoje'
     label: "REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e trilha acima de velocidade'. Serve do que existe, sem prometer isolamento/classificação por sensibilidade (D2/L1-L6, gated)"
   - id: C_p3_self_service
     node_type: claim
@@ -178,8 +178,8 @@ nodes:
     impact: 3
     confidence: 0.6
     status: open
-    verified_at: 2026-09-01
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_p3_agg_view (SUPERSEDES); label preservado como historia'
+    verified_at: 2026-09-02
+    verified_against: 'reconciliacao 2026-09-02 (regra do radar): E_CENSO0901 REFINA (CONSTRAINS) — o MECANISMO de gate mudou (ADR hosted-service-identity 2026-08: >=1 federado no Logto consumindo recurso hospedado), o conteudo segue pendente sob o gate novo; gatilho medido = 0 hoje'
     label: "REQ P3 (SHOULD condicional): visão agregada de adoção/consistência entre N repos/times DA MESMA empresa (multi-tenant no sentido 'uma empresa, N squads', nunca cross-empresa) + métricas de ROI/consistência p/ comprador org. GATED: qualquer flywheel de dado cross-tenant (é D2)"
 
   # ---- AUTH + FRONTEIRA (claim) ----
@@ -512,10 +512,10 @@ edges:
     edge_type: SUPERSEDES
   - from: E_CENSO0901_C_p3_agg_view
     to: C_p3_agg_view
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: E_CENSO0901_D_spec_now_build_gated
     to: D_spec_now_build_gated
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: E_CENSO0901_C_p4_gate_visibility
     to: C_p4_gate_visibility
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS

@@ -103,6 +103,16 @@ nodes:
     verified_against: 'PAGO: C_reuse_readmodel->done, recarimbo C_a2a_gate_narrow, selo C_commodity_vs_diff, Q_BRANCH_MAIN->done (lineage product no members.yaml, validate rc=0)'
     label: 'Fechamentos de grafo ja medidos: C_reuse_readmodel->done (recomendacao cumprida via REGRA 66), recarimbo C_a2a_gate_narrow, selo C_commodity_vs_diff, Q_BRANCH_MAIN (lineage product no members.yaml).'
 
+  - id: E_W8_FECHAMENTO_FONTES
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-09-02
+    verified_against: 'radar --integrity --schema exit 0 nos 9 grafos tocados; 0 alvos de SUPERSEDES pendentes (eram 13 em 8 grafos); bancada census-seal (d) PASS e FAIL com a regra removida'
+    label: 'Fechamento dos nos-FONTE da Onda 8 (o fios-abertos marcava done, as fontes seguiam open): C_console_autooff_gap e E_LINT_NAO_ENXERGA_WORKFLOWS SUPERSEDED por evidencia medida; C_a2a_gate_narrow open->confirmed; Q_JWKS segue open com E_W8_JWKS_PR65_ABERTO (fecha no deploy do maestro). ACHADO no caminho: o census-seal emitia SUPERSEDES para TODO DRIFTED — 13 alvos ainda com trabalho pendente ficaram open sob SUPERSEDES; 7 refinados para CONSTRAINS (regra do radar), 6 flipados para superseded (premissa morta); e a regra virou mecanismo: aresta pela realidade (MORTO/FORA => SUPERSEDES, senao CONSTRAINS).'
+
 edges:
   - from: I_JWKS_ATTEMPTED_AT
     to: W8_REAIS_EXECUTAVEIS
@@ -117,5 +127,8 @@ edges:
     to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS
   - from: I_FECHAMENTOS_TRIVIAIS
+    to: W8_REAIS_EXECUTAVEIS
+    edge_type: SUPPORTS
+  - from: E_W8_FECHAMENTO_FONTES
     to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS

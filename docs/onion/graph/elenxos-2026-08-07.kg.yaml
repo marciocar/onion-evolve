@@ -201,18 +201,18 @@ nodes:
     status: open
     impact: 4
     confidence: 1.0
-    verified_at: 2026-09-01
-    verified_against: zero-usos-do-adapter-forge-em-qualquer-workflow
+    verified_at: 2026-09-02
+    verified_against: 'reconciliacao 2026-09-02 (regra do radar): E_CENSO0901 apenas REFINA (cura PARCIAL — 3 ops com consumidor shell-puro, as demais nao) => CONSTRAINS; a pergunta segue open, gated no 1o consumidor sem-LLM das ops restantes'
     label: "ABERTO, e a F4 so tapou o primeiro caso: o SDAAL e Markdown lido por LLM ('documentacao substitui codigo executavel'). Um step de GitHub Actions e SHELL PURO — nao ha LLM ali para ler a spec. Logo um workflow NUNCA pode 'chamar a abstracao', e foi por isso que o onion-review postava com `gh api` cru: sem isencao declarada, e literalmente a operacao que setup-code-review.md:71 manda fazer pelo adapter, no workflow que esse mesmo comando distribui. Medido: ZERO usos do adapter em qualquer workflow. A F4 materializou UMA operacao (addReviewComment, transporte cli). As outras 14 seguem sem consumidor nao-LLM"
 
   - id: E_LINT_NAO_ENXERGA_WORKFLOWS
     node_type: evidence
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 1.0
-    verified_at: 2026-09-01
-    verified_against: escopo-das-REGRAS-10-e-11-em-lint-artifacts-sh
+    verified_at: 2026-09-02
+    verified_against: 'fechamento W8 2026-09-02: SUPERSEDED por E_W8_LINT_VE_WORKFLOWS (PR #758); label preservado como historia'
     label: "POR QUE NINGUEM VIU: as REGRAS 10 e 11 (anti-provider-direto e forge-method-existe) varrem APENAS `.claude/commands` e `.claude/agents`. `.github/workflows/` e `.claude/validation/*.sh` estao FORA do alcance do linter. O mesmo vale para review-artifact-check.sh:87, que escreve 'pergunta-se ao forge' no comentario e chama `gh pr view` na linha seguinte"
 
   - id: E_CENSO0901_Q_SDAAL_NAO_TEM_CONSUMIDOR_SEM_LLM
@@ -224,6 +224,16 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 6/6 — git log -1 --format=%ad --date=short 422c61d3 (data do commit que introduziu o nó); grep -'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó captura o diagnóstico ANTES do fix — mas o mesmo commit/PR (#558) que o escreveu também SHIPOU a cura parcial: 3 operações (addReviewComment, getReviewComments, updateReviewComment) ganharam consumidor shell-puro (post-review-comment.sh) com uso real em produção (onion-review.yml), não zero. O '
+
+  - id: E_W8_LINT_VE_WORKFLOWS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'lint-artifacts.sh:1687-1698 — a REGRA 10 (anti-provider-direto) varre .github/workflows/*.yml como CONSUMIDOR, violacao HARD; bancada sdaal-workflows (a-b) prova a mordida; PR #758 (Onda 8, 2026-09-01)'
+    label: "PAGO (Onda 8): a cegueira que este no denunciava CAIU para a REGRA 10 — .github/workflows/*.yml entrou no _find e chamada direta a provider num step de Actions e HARD. RESTO DECLARADO, nao dividia: .claude/validation/*.sh e review-artifact-check.sh:87 (gh pr view) seguem fora do alcance — sao a PECA EXECUTAVEL do adapter (transporte cli, forge/factory.md), nao consumidor; a REGRA 11 (forge-method-existe) segue restrita a commands/agents por desenho."
 
 edges:
   - from: E_JSON_SCHEMA_NAO_PASSA
@@ -291,4 +301,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_CENSO0901_Q_SDAAL_NAO_TEM_CONSUMIDOR_SEM_LLM
     to: Q_SDAAL_NAO_TEM_CONSUMIDOR_SEM_LLM
+    edge_type: CONSTRAINS
+  - from: E_W8_LINT_VE_WORKFLOWS
+    to: E_LINT_NAO_ENXERGA_WORKFLOWS
     edge_type: SUPERSEDES

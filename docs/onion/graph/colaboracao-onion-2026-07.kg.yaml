@@ -271,9 +271,9 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: confirmed
-    verified_at: 2026-09-01
-    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED — ver E_MEDIDO_EN_KG_CLIENTE_2026_09 (SUPERSEDES); label de julho preservado como historia'
+    status: superseded
+    verified_at: 2026-09-02
+    verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_MEDIDO_EN_KG_CLIENTE_2026_09 (marcador real e 1 no com aviso de cabecalho, nao N nos com lock); label preservado como historia'
     label: "KG do engajamento — confidencial (nos 🔒 marcados); fica no repo dev, nunca sai"
   - id: EN_KG_COLAB
     node_type: entity

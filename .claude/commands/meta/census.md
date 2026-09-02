@@ -45,7 +45,10 @@ allowed-tools: Bash, Read, Write, Edit, Task, Workflow
 3. **Selar** (F3): salvar o resultado consolidado em
    `docs/evolution/research/census-<data>/data/` e rodar
    `python3 .claude/utils/census/census-seal.py seal <consolidado.json>` — radar exit 0 em todo
-   grafo tocado ou ABORTA antes do commit.
+   grafo tocado ou ABORTA antes do commit. **Aresta pela realidade** (2026-09-02): DRIFTED com
+   realidade `MORTO-CANDIDATO`/`FORA-DO-CORE` recebe `SUPERSEDES` (flip do alvo proposto);
+   `GATED`/`REAL-ACIONAVEL` recebe `CONSTRAINS` (o superseder REFINA, o alvo segue `open` —
+   flipar apagaria trabalho pendente do backlog; 13 alvos ficaram assim após 2 censos).
 4. **Projetar** (F4): `census-seal.py list <consolidado.json> docs/analysis/backlog-real-<data>.md <alvos.json>`
    + `kg-backlog-project.sh --write` + nó `evidence` do run no grafo de programa vigente.
 5. **PR** com resíduo REGRA 56; merge pelo fluxo normal.
