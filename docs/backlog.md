@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**77 itens abertos** em 25 grafo(s) com aberto (de 48 no escopo) · 25 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**80 itens abertos** em 26 grafo(s) com aberto (de 49 no escopo) · 26 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 12 item(ns)
 
@@ -73,12 +73,11 @@
 | 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
 | 5.4 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
 
-## fable-5-1-superacao-2026-09 — 11 item(ns)
+## fable-5-1-superacao-2026-09 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 19.6 | `Q_EXP_JUIZ_FABLE_CALIBRACAO` | fable-5-1-superacao-2026-09 | EXPERIMENTO: juiz do kg-freshness/censo opus/high → fable/high SO na faixa CONFIRMED. Metrica: re-rodar a calibracao contra o ME |
-| 12.0 | `D_AUDITAR_GATES_TEXTUAIS` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA (S1): auditar todo gate do Onion que dependa de texto/declaracao do modelo em vez de exit 2 ou estado lido — ca |
 | 8.4 | `D_HOOK_PREMODELSWITCH_GUARDA` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA: hook PreModelSwitch (2.1.251+) como guarda determinística contra troca/downgrade silencioso de modelo — vetar |
 | 6.4 | `C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE` | fable-5-1-superacao-2026-09 | HIPOTESE (nao selada; EMENDA DO JUIZ: 1M de contexto NAO e novidade do 5.1 — Opus 5 e Fable 5 ja eram 1M, agent-orchestration.md |
 | 5.6 | `D_TIERING_SSOT_UNICA_E_EFFORT` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA (2 partes, sem experimento de modelo): (a) a tabela de tiering replicada em ~8 docs vira UMA fonte (agent-orchest |
@@ -98,6 +97,15 @@
 | 6.4 | `Q_REFUTES_EDGE_SEM_PAR` | identidade-onion-vps-2026-08 | A lacuna REAL que restou do Q_LACUNA refutado: a aresta REFUTES tipada (refutacao como cidada de 1a classe do grafo, com reconcili |
 | 5.4 | `Q_SENHA_CHAVE_ESTADO_2026_09` | identidade-onion-vps-2026-08 | ESTADO ATUAL da chave GPG com passphrase (substitui o no de 08-12 que misturava >=9 afirmacoes): a protecao FICA (decisao do maest |
 | 4.8 | `Q_MAIS_UM_IMUTAVEL_GATED` | identidade-onion-vps-2026-08 | O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda d |
+
+## audit-textual-gates-2026-09 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.4 | `D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO` | audit-textual-gates-2026-09 | DECISAO PROPOSTA: dos 4 itens do MOAT do /meta:drive (merge · deploy · repo alheio · relogio), o merge ganhou veto neste PR; de |
+| 4.8 | `Q_REGRA56_VERACIDADE_DOS_ACHADOS` | audit-textual-gates-2026-09 | Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria ses |
+| 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
+| 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
 
 ## company-brain-market-2026-07 — 1 item(ns)
 

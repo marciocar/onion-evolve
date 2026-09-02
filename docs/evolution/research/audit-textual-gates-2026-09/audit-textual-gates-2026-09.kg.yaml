@@ -1,0 +1,369 @@
+meta:
+  id: audit-textual-gates-2026-09
+  schema_version: "1"
+  baseline: 2026-09-02
+  # kg-backlog-guard: on
+  # ═══ TETO: 26 NÓS. Auditoria fechada: cresce só por gate novo medido ou cura executada (E_CURA_*). ═══
+  # Execucao da D_AUDITAR_GATES_TEXTUAIS (fable-5-1-superacao-2026-09.kg.yaml), selada pelo maestro em
+  # 2026-09-02 ("sela e executa"). Pergunta: de todo gate do Onion, qual e VETO-MECANICO (exit 2 /
+  # estado lido, nao consulta o modelo), qual e AVISO-TEXTUAL (sinal que o modelo pode ignorar) e qual e
+  # CONFIANCA-NO-MODELO (campo/prosa que o proprio modelo escreve)? Fan-out: 3 workers read-only
+  # (gates-mech: hooks+ops+utils+githooks · gates-ci: validation+workflows · gates-prose: comandos/
+  # agentes/skills, 107 hits) + medicao no contexto principal (probes contra os hooks, bancada nova).
+  # Amostra dos achados dos workers RE-MEDIDA antes de entrar aqui (core.hooksPath, review-artifact-
+  # check.sh:205-211, kg-seal-check sem autor, onion-review.yml:493, os 6 invólucros). Regua: gate em
+  # prosa nao e gate (System Card 5.1 S1); toda cura desta rodada e MECANISMO com bancada, nao doutrina.
+
+nodes:
+  - id: Q_GATES_TEXTUAIS
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: '3 relatorios de worker + probes no contexto principal (docs/analysis/onion-gates-textuais-2026-09.md); bancada run_pretooluse_veto_selftests 32/32'
+    label: 'Quais gates do Onion sao VETO-MECANICO, AVISO-TEXTUAL ou CONFIANCA-NO-MODELO? Respondido: ANTES desta rodada a sessao tinha 1 unico veto incondicional (protect-main, so force-push) — o merge em main, o push nao-force em main e a REST de merge eram PROSA; os 58 HARD do lint e o onion-review-verdict sao AVISO no host (privado sem Pro, 403 na protection); 6 REGRAs (29/42/49/56/57/58) sao catraca de atestacao = CONFIANCA; 29 gates em prosa, 1 coberto por mecanismo (REGRA 61). CURADO no mesmo PR: 2o veto (merge-gate) + 2 buracos do 1o (HEAD:main; invólucros command/\/env/exec/sh -c/git -C/sudo -u/$( )). O que fica CONFIANCA sem cura barata tem gatilho nomeado.'
+    trace: 'docs/analysis/onion-gates-textuais-2026-09.md'
+
+  # ── Evidencia: o estado ANTES (medido) ──────────────────────────────────────────────
+  - id: E_VETO_UNICO_ANTES_DA_RODADA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: '.claude/settings.json (PreToolUse: 1 hook antes do PR); gates-mech: 8 hooks lidos por inteiro — 5 nunca usam exit 2 por desenho; .claude/utils/federation-transport/inbox-pull.sh:45 (sha256, SessionStart)'
+    label: 'Antes desta rodada a SESSAO tinha exatamente 1 veto incondicional: pretooluse-protect-main.sh (force-push para main). O 2o veto mecanico da casa (inbox-pull.sh:45, sha256 do arquivo baixado) nao protege acao do modelo — descarta download corrompido. Os outros 6 hooks registrados sao motd/side-effect/aviso (exit 0 sempre; aside-router "NUNCA bloqueia" l.8-9; session-beacon "INFORMADO, NAO VERIFICADO" l.50). `gh pr merge N`, `git push origin main` e `gh api pulls/N/merge` nao tinham veto NENHUM — so o "PARE" em prosa do /meta:drive.'
+    trace: '.claude/settings.json'
+
+  - id: E_HOST_SEM_PROTECAO_CI_E_AVISO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: '.github/workflows/onion-review.yml:493 ("nenhum check e obrigatorio. Vermelho aqui INFORMA; merge segue possivel"); gh api repos/.../branches/main/protection = 403 (medido nesta sessao); ops/pr-merge-verified.sh l.1-119'
+    label: 'O repo e PRIVADO sem GitHub Pro: branch protection devolve 403, logo TODO check de CI — os 58 HARD do lint-artifacts, o selftest, o onion-review-verdict — e AVISO-TEXTUAL no host: `gh pr merge` com CI vermelho MERGEIA. O unico lugar onde o CI vira veto e ops/pr-merge-verified.sh (le check-runs do head SHA, exige onion-review-verdict SUCCESS, prova state=MERGED) — e ele era VOLUNTARIO: nada forcava o modelo a usa-lo em vez do `gh pr merge` cru.'
+    trace: '.github/workflows/onion-review.yml'
+
+  - id: E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: '.claude/validation/review-artifact-check.sh:205-211 (case ''|*[!0-9]* → so exige NUMERO), l.190-198 (reviewed_diff_sha256 recalculado pelo script = unico campo com verificacao cruzada), l.14-18 (cabecalho admite "NAO julga a qualidade da revisao")'
+    label: 'REGRA 56 (residuo de revisao): so `reviewed_diff_sha256` e verificado contra algo que o modelo nao controla (o script recalcula o hash do diff). `findings_total: 0`, `findings_real: 0`, `verdict: APROVADO` passam sempre que forem numericos/presentes — CONFIANCA-NO-MODELO. Um residuo fabricado pelo mesmo modelo que fez o diff e indistinguivel de um real para este gate; a prova de revisao adversarial real vem de FORA (onion-review workflow), nao deste campo.'
+    trace: '.claude/validation/review-artifact-check.sh'
+
+  - id: E_KG_SEAL_NAO_SABE_QUEM_SELOU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'grep -n "sealed_by|approved_by|git log|author" .claude/validation/kg-seal-check.sh = 0 hits (medido); bloco de julgamento l.118-222 opera so sobre verified_at/status/arestas/confidence'
+    label: 'REGRA 57 (kg-seal-check): CONFIRMED exige verified_at >= dia do run; DRIFTED exige status ou SUPERSEDES; REFUTED e SOFT (2 de 6 clausulas). Nenhuma clausula checa QUEM selou nem se a medicao aconteceu — todos os campos julgados sao do proprio .kg.yaml que o modelo edita. A tabela de selagem do /meta:drive ("o driver apenda, o humano flipa") nao tem mecanismo: quem impede o driver de flipar e prosa. Sem cura determinística barata: autor git e o mesmo (o maestro opera pela sessao).'
+    trace: '.claude/validation/kg-seal-check.sh'
+
+  - id: E_CATRACAS_SAO_ATESTACAO_AUTODECLARADA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'gates-ci: 58 REGRAs [HARD] levantadas em lint-artifacts.sh; REGRA 49 (l.~2561) "LIMITE HONESTO (igual a 42): nao checa se o carimbo e VERDADE, so que existe"; kg-backlog-check.sh:60-61,75 (DONE-NU: val() so normaliza formato); kg-backlog-check.sh:70-71 (TETO editavel no mesmo commit)'
+    label: 'Das 58 REGRAs HARD do lint, 6 sao catraca de atestacao (29 proveniencia, 42 frescor, 49 verificacao PROD, 56 residuo, 57 selo, 58 DONE-NU): checam PRESENCA/FORMATO de um campo que o proprio modelo escreve, e o codigo se auto-documenta assim. Sao CONFIANCA-NO-MODELO por construcao — e isso NAO e defeito de implementacao: e o teto de qualquer gate que nao tem fonte externa ao modelo. As outras 52 checam drift MECANICO entre artefatos do filesystem (contagens, links, ids, hashes) — sao verdade verificavel, mas AVISO no host.'
+    trace: '.claude/validation/lint-artifacts.sh'
+
+  - id: E_POSTTOOLUSE_E_SINAL_POS_FATO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: '.claude/hooks/bash-empty-result-guard.sh l.24-27 ("nao bloqueia nem desfaz"), l.36-37 (sem jq a guarda inteira se cala), 8 detectores (l.151/159/165/255/257/270/296/299/341); disparou 3x nesta propria sessao sobre probes'
+    label: 'O PostToolUse (bash-empty-result-guard) e AVISO-TEXTUAL estrutural: o comando JA executou; exit 2 so entrega stderr ao modelo. Vale como sinal (disparou sozinho 4x na sessao de 08-31 e 3x nesta — [[gatilho-mecanico-funciona-sem-o-maestro]]) mas nao e veto, e sem jq se cala em silencio deliberado. Classificacao correta: a familia certa para o que ele faz — nao se promove a veto o que julga depois do fato.'
+    trace: '.claude/hooks/bash-empty-result-guard.sh'
+
+  - id: E_ASIDE_ROUTER_GATE_E_PROMPT
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: '.claude/validation/aside-router.sh:26 GATE="PROPONHA e aguarde a confirmacao do maestro (Ato 3/W6) ANTES de executar." — string injetada no prompt; aside-router-hook.sh l.8-9 "NUNCA bloqueia (sem exit 2)"'
+    label: 'O "GATE" do aside-router e uma string de prompt (UserPromptSubmit injeta contexto) — AVISO-TEXTUAL por desenho, e o desenho esta certo: o roteador nao sabe o que o modelo vai executar; so o PreToolUse sabe. Vale registrar porque o NOME (GATE) sugere veto; o comportamento e conselho.'
+    trace: '.claude/validation/aside-router.sh'
+
+  - id: E_PROSA_29_GATES_1_COBERTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'gates-prose: 107 hits (PARE/aguarde/confirmacao/gate humano) em .claude/commands|agents|skills → 19 descartados (menção/falso-positivo "comPARE") → 29 gates distintos; tabela em docs/analysis/onion-gates-textuais-2026-09.md §4'
+    label: '29 gates em PROSA (21 INTERNA · 9 OUTWARD-FACING · 5 IRREVERSIVEL, 3 mistos). So 1 tem mecanismo por tras: onion-publish/SKILL.md:22,50,51,71 (vazamento de moat) coberto pela REGRA 61 check_moat_boundary. Os 8 IRREVERSIVEL/OUTWARD sem mecanismo, por consequencia: (1) cluster MOAT do /meta:drive:20,23,86 (merge no main · deploy · escrever repo alheio · agendar por relogio); (2) untrusted-content-provenance.md:30,33 (R15); (3) agents/meta/onion.md:767; (4) gamma-api-specialist.md:115 (key); (5) federation-rollback.md; (6) orchestrate.md:181; (7) co-announce.md:177 (repo alheio); (8) onion-publish/SKILL.md:58-59 (push do marketplace, W6). O item 1 ganhou mecanismo NESTE PR para o merge; deploy/repo alheio/relogio seguem prosa.'
+    trace: '.claude/commands/meta/drive.md'
+
+  - id: E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'gates-mech: 7 scripts de ops/*.sh lidos por inteiro (deploy-site, install-caddy-config, update-bridge, bridge-backup, gpg-protect-key, verify-adopter-gate, pr-merge-verified) — todos com die()/exit 1-2 internos; nenhum hook forca a invocacao; comandos crus (rsync, systemctl, sudo cp, gpg) passam livres'
+    label: 'Todo ops/*.sh e VETO-MECANICO por DENTRO (uma vez chamado, die() barra o passo seguinte) e CONFIANCA-NO-MODELO na INVOCACAO: nada impede rodar `rsync`/`systemctl restart`/`sudo cp` cru fora do wrapper. A forma da cura e a mesma do merge-gate: PreToolUse que reconhece o comando cru e aponta o wrapper. Nao aplicada nesta rodada para deploy/bridge — o vocabulario cru (rsync/systemctl) e legitimo em dezenas de usos nao-deploy, e a guarda por lista falha pelo vocabulario; precisa de assinatura mais especifica (alvo = path servido) — ver D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO.'
+    trace: 'ops/pr-merge-verified.sh'
+
+  - id: E_UTILS_GUARDAS_SEM_HOOK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'grep de onion-untrusted-wrap em .claude/hooks/ e settings.json = 0 (gates-mech); a2a-verify.sh l.5-7 "endpoint vivo fica no repo da VPS"; a2a-accept.sh:34-35 RECUSADO exit 1 so se invocado'
+    label: 'As guardas de .claude/utils/ (onion-untrusted-wrap R15 — PROTOTIPO declarado; a2a-verify/a2a-ssrf-check; a2a-accept) sao VETO-MECANICO internas e CONFIANCA-NO-MODELO na invocacao dentro deste corpus: nenhum hook as chama; o unico chamador real de a2a-verify vive no repo do bridge (fora do corpus). Conteudo externo pode entrar cru no contexto se o modelo nao seguir a instrucao em common/prompts/untrusted-content-provenance.md.'
+    trace: '.claude/utils/guardrails/onion-untrusted-wrap.sh'
+
+  - id: E_PRECOMMIT_CONDICIONAL_A_CONFIG_LOCAL
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'git config core.hooksPath = /home/marcio/onion-evolve/.githooks (medido nesta sessao); .git/hooks/pre-commit inexistente (so .sample); .githooks/pre-commit:30-36 (main/develop), :122-127 (HARD), :142-149 (selftest das guardas se toca validation/)'
+    label: 'Os 5 vetos do .githooks/pre-commit (commit em main/develop, HARD do lint, schema do kg-freshness, auto-fix fora do stage, regressao da bancada) sao VETO-MECANICO CONDICIONAL: dependem de `core.hooksPath` LOCAL (config nao versionada — clone fresco nasce sem guarda) e caem com `--no-verify` (escape documentado no proprio hook). Nesta maquina esta armado (medido). O relatorio do gates-ci ("nenhum pre-commit instalado") estava PARCIALMENTE errado: leu .git/hooks/, nao core.hooksPath — discrepancia entre workers resolvida por medicao, nao por voto.'
+    trace: '.githooks/pre-commit'
+
+  # ── Evidencia: buracos achados por BANCADA (nao por leitura) ─────────────────────────
+  - id: E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'bancada run_pretooluse_veto_selftests (nova nesta rodada): `git push -f origin HEAD:main` contra protect-main v1 → rc=0; regex v1 exigia ESPACO antes de main; corrigida para ([[:space:]]|:)(refs/heads/)?main; caso "protect-main: -f HEAD:main → VETO" verde'
+    label: 'O unico veto que a casa tinha (protect-main, 2026-09-01) nasceu SEM bancada e deixava passar `git push -f origin HEAD:main` e `x:main` — o refspec com dois-pontos. Achado pela bancada escrita nesta auditoria, nao pela leitura dos workers. Confirma a doutrina: veto sem bancada e declaracao ([[behavior-over-declaration]]); e um gate que existe ha 1 dia ja tinha um buraco de vocabulario.'
+    trace: '.claude/hooks/pretooluse-protect-main.sh'
+
+  - id: E_BURACO_INVOLUCROS_NOS_DOIS_VETOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'probes no contexto principal (2026-09-02): command git push -f origin main · \git push · env git push · exec gh pr merge · bash -c "git push -f origin main" · git -C . push --force origin HEAD:main · sudo -u x git push origin main · out=$(gh pr merge 1) → TODOS rc=0 nos dois hooks antes da lib; apontado por gates-mech (3 formas), ampliado pela bancada (sudo -u, $( ))'
+    label: 'Os dois vetos casavam `^git push`/`^gh pr merge` no INICIO da linha de invocacao: qualquer INVOLUCRO (`command`, `\`, `env`, `exec`, `sudo -u x`, `sh -c "…"`, `$( )`, opcoes globais `git -C/-c`) passava com rc=0. E a classe guarda-por-lista-falha-pelo-vocabulario do lado de fora ([[guarda-por-lista-falha-pelo-vocabulario]]): a logica estava certa, o vocabulario nao. 2 dos 8 invólucros (sudo -u, $( )) so apareceram na 2a rodada da bancada, depois da 1a cura — a bancada achou o que a leitura nao achou, duas vezes seguidas.'
+    trace: '.claude/hooks/lib/invocation-lines.sh'
+
+  # ── Evidencia: CURAS executadas nesta rodada (mecanismo + bancada) ───────────────────
+  - id: E_CURA_MERGE_GATE_2O_VETO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: '.claude/hooks/pretooluse-merge-gate.sh registrado em settings.json (PreToolUse Bash, 2o da lista); veto AO VIVO nesta sessao: `gh pr merge 0` → "GUARDA-PRETOOLUSE: gh pr merge direto negado" (hook captado sem reiniciar a sessao); bancada 32/32'
+    label: 'CURA 1 (mecanismo): pretooluse-merge-gate.sh veta (exit 2) `gh pr merge`, `gh api …/pulls/N/merge` e `git push` nao-force com alvo main (refspec explicito ou push nu sentado em main), apontando o unico caminho permitido: `bash ops/pr-merge-verified.sh <PR> --sync`. Efeito de 2a ordem: como esse script exige check-runs completos + onion-review-verdict SUCCESS, os 58 HARD e o revisor semantico passam de AVISO a VETO DE FATO no caminho da sessao — sem branch protection. Fronteiras declaradas: so ve a string do modelo (o script chama gh pr merge por dentro e passa — e o desejado); se DESARMA sem ops/pr-merge-verified.sh (adotante via /meta:adopt copia .claude/, nao ops/); escape = o maestro fora da sessao, sem flag.'
+    trace: '.claude/hooks/pretooluse-merge-gate.sh'
+
+  - id: E_CURA_LIB_INVOCACAO_PARTILHADA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: '.claude/hooks/lib/invocation-lines.sh (onion_invocation_lines: heredoc fora · split por && || ; | $( ` <( >( · desembrulha 1 nivel de sh -c · tira \ command exec env nohup time sudo builtin VAR=val · colapsa git -C/-c) sourced pelos 2 hooks; bancada 32/32 incl. 11 casos de involucro; falso-positivo de heredoc/echo/prosa continua passando'
+    label: 'CURA 2 (mecanismo): a normalizacao mora numa lib UNICA sourced pelos dois vetos — dois hooks com duas regexes divergem de novo (foi assim que o HEAD:main escapou de um e nao do outro). Fronteira declarada no cabecalho: 2o nivel de `-c`, `eval`, script em arquivo, funcao/alias, subprocess de outra linguagem seguem invisiveis — o PreToolUse so ve a string do modelo. Isso e teto de PLATAFORMA, nao desta lib; o que nasce fora da string e CONFIANCA-NO-MODELO por construcao.'
+    trace: '.claude/hooks/lib/invocation-lines.sh'
+
+  - id: E_CURA_BANCADA_DOS_VETOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'run_pretooluse_veto_selftests em lint-selftest.sh (sandbox git com ops/pr-merge-verified.sh; _pv/_case; 32 casos: 11 protect-main + 21 merge-gate); 32/32 no runner isolado com set -euo pipefail ([[bancada-espelha-o-runner]]) — a bancada completa estourou 10 min na VPS carregada'
+    label: 'CURA 3 (bancada): os vetos ganharam familia propria no selftest — cada veto e cada NAO-veto (heredoc, echo, feature/main-thing, caminho verificado, desarme sem ops/) e um caso. A bancada achou 3 buracos que 3 workers lendo o codigo nao acharam (HEAD:main, sudo -u, $( )). A guarda de guardas (pre-commit :142-149) roda esta familia quando validation/ muda.'
+    trace: '.claude/validation/lint-selftest.sh'
+
+  # ── Claims ─────────────────────────────────────────────────────────────────────────
+  - id: C_CONTAGEM_POS_RODADA
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'consolidacao dos 3 relatorios + probes; tabela em docs/analysis/onion-gates-textuais-2026-09.md §2'
+    label: 'Contagem DEPOIS deste PR. VETO-MECANICO na sessao: 2 hooks PreToolUse (force-push main; merge/push main) + 1 sha256 (inbox-pull) + 5 condicionais do pre-commit (hooksPath local). AVISO-TEXTUAL: ~63 (52 HARD de drift mecanico + 11 checagens de script) — no host; no caminho da sessao viram veto de fato via merge-gate→pr-merge-verified. CONFIANCA-NO-MODELO: 6 catracas de atestacao (29/42/49/56/57/58) + invocacao de todo ops/ e utils/ + 28 dos 29 gates em prosa. A razao VETO:CONFIANCA continua ~1:10 — a rodada moveu o item de MAIOR consequencia (merge), nao a massa.'
+    trace: 'docs/analysis/onion-gates-textuais-2026-09.md'
+
+  - id: C_ATESTACAO_NAO_TEM_CURA_DETERMINISTICA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-02
+    verified_against: 'E_REGRA56 + E_KG_SEAL + E_CATRACAS; alternativas consideradas e descartadas: sealed_by por autor git (mesmo autor — o maestro opera pela sessao), assinatura GPG por campo (catedral sem gatilho), exigir findings_real>0 (pune revisao limpa real)'
+    label: 'Os 6 gates de atestacao nao tem cura determinística barata: a unica fonte externa ao modelo para "houve revisao"/"houve medicao" e um REVISOR EXTERNO — e a casa ja o tem (onion-review workflow, veredito lido por pr-merge-verified, agora obrigatorio no caminho da sessao). A cura correta nao e endurecer o campo; e garantir que o revisor externo esteja no caminho critico, o que o merge-gate faz. O residual (campo fabricado + revisor externo enganado) e o teto medido pelo System Card (<0,01%) e fica declarado, nao escondido.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml'
+
+  - id: C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: '3 buracos achados so por bancada (HEAD:main, sudo -u x, $( )) contra 3 apontados por leitura (command/\/bash -c, gates-mech) — mesma rodada, mesmos hooks'
+    label: 'Auditoria de gate por LEITURA (3 workers, corpus inteiro) achou a classe (involucros) mas nao as instancias que a bancada achou em 2 rodadas (HEAD:main, sudo -u, $( )). Consequencia doutrinaria: classificar um gate como VETO-MECANICO exige bancada com casos de bypass — sem ela, e VETO-DECLARADO. A REGRA 59 (modo de producao exercitado pela bancada) ja cobre o principio; o pre-commit :142-149 ja roda a bancada quando validation/ muda; o que faltava era a FAMILIA dos vetos, que agora existe.'
+    trace: '.claude/validation/lint-selftest.sh'
+
+  # ── Abertos com gatilho nomeado ───────────────────────────────────────────────────
+  - id: D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'DECISAO PROPOSTA: dos 4 itens do MOAT do /meta:drive (merge · deploy · repo alheio · relogio), o merge ganhou veto neste PR; deploy (rsync/systemctl/sudo cp fora de ops/deploy-site.sh e ops/update-bridge.sh), escrita em repo alheio (git -C /home/marcio/<adotante> push) e relogio (crontab/CronCreate/systemd timer) seguem PROSA. Cura na mesma forma (PreToolUse + lib + bancada), mas a assinatura tem de ser por ALVO (path servido, remote alheio, unidade timer), nao por vocabulario — rsync/systemctl sao legitimos fora de deploy. GATILHO: 1o dogfood em que a sessao executa deploy/cron/push-alheio fora do wrapper (o PostToolUse ja avisa; quando avisar, vira veto), OU a proxima onda de guardas.'
+    trace: '.claude/commands/meta/drive.md'
+
+  - id: Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: 'O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotante do core) nasce sem os 5 vetos condicionais e nada acusa. O adotante tem install-onion-githook.sh; o core se auto-instala? GATILHO: proximo clone fresco do core OU proxima worktree que commite em main sem o hook disparar (o sintoma). Candidato de cura: SessionStart que mede core.hooksPath e AVISA (nao veta — e config do humano).'
+    trace: '.githooks/pre-commit'
+
+  - id: Q_R15_WRAP_NO_CAMINHO_CRITICO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: 'onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted-content-provenance.md. PostToolUse sobre WebFetch/Read de inbox que envolva o conteudo e a forma; o custo (latencia + falso-positivo em conteudo legitimo) nao foi medido. GATILHO: 1a injecao observada em conteudo externo numa sessao de drive (PR #452 mediu 0% sem ela ate agora) OU o R15 sair de PROTOTIPO.'
+    trace: '.claude/utils/guardrails/onion-untrusted-wrap.sh'
+
+  - id: Q_REGRA56_VERACIDADE_DOS_ACHADOS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: 'Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria sessao? Sem numero hoje. A medicao e o experimento Q_EXP_AUTO_REVISAO_5_1 (fable KG): achados exclusivos da auto-revisao vs revisor externo no mesmo diff. Se a taxa for ~0 (como em 08-02), o campo e cerimonia e a cura e retirar a auto-revisao do caminho, nao endurecer o campo. GATILHO: proximo PR com residuo >= 4 achados (o mesmo do experimento).'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml'
+
+edges:
+  - from: E_VETO_UNICO_ANTES_DA_RODADA
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_HOST_SEM_PROTECAO_CI_E_AVISO
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_KG_SEAL_NAO_SABE_QUEM_SELOU
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_CATRACAS_SAO_ATESTACAO_AUTODECLARADA
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_POSTTOOLUSE_E_SINAL_POS_FATO
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_ASIDE_ROUTER_GATE_E_PROMPT
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_PROSA_29_GATES_1_COBERTO
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_UTILS_GUARDAS_SEM_HOOK
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_PRECOMMIT_CONDICIONAL_A_CONFIG_LOCAL
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE
+    to: C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA
+    edge_type: SUPPORTS
+  - from: E_BURACO_INVOLUCROS_NOS_DOIS_VETOS
+    to: C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA
+    edge_type: SUPPORTS
+  - from: E_BURACO_INVOLUCROS_NOS_DOIS_VETOS
+    to: E_CURA_LIB_INVOCACAO_PARTILHADA
+    edge_type: SUPPORTS
+  - from: E_HOST_SEM_PROTECAO_CI_E_AVISO
+    to: E_CURA_MERGE_GATE_2O_VETO
+    edge_type: SUPPORTS
+  - from: E_CURA_MERGE_GATE_2O_VETO
+    to: C_CONTAGEM_POS_RODADA
+    edge_type: SUPPORTS
+  - from: E_CURA_LIB_INVOCACAO_PARTILHADA
+    to: C_CONTAGEM_POS_RODADA
+    edge_type: SUPPORTS
+  - from: E_CURA_BANCADA_DOS_VETOS
+    to: C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA
+    edge_type: SUPPORTS
+  - from: E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE
+    to: C_ATESTACAO_NAO_TEM_CURA_DETERMINISTICA
+    edge_type: SUPPORTS
+  - from: E_KG_SEAL_NAO_SABE_QUEM_SELOU
+    to: C_ATESTACAO_NAO_TEM_CURA_DETERMINISTICA
+    edge_type: SUPPORTS
+  - from: E_CATRACAS_SAO_ATESTACAO_AUTODECLARADA
+    to: C_ATESTACAO_NAO_TEM_CURA_DETERMINISTICA
+    edge_type: SUPPORTS
+  - from: E_CURA_MERGE_GATE_2O_VETO
+    to: C_ATESTACAO_NAO_TEM_CURA_DETERMINISTICA
+    edge_type: SUPPORTS
+  - from: C_CONTAGEM_POS_RODADA
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: C_ATESTACAO_NAO_TEM_CURA_DETERMINISTICA
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA
+    to: Q_GATES_TEXTUAIS
+    edge_type: SUPPORTS
+  - from: D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO
+    to: E_PROSA_29_GATES_1_COBERTO
+    edge_type: DEPENDS_ON
+  - from: D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO
+    to: E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA
+    edge_type: DEPENDS_ON
+  - from: Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO
+    to: E_PRECOMMIT_CONDICIONAL_A_CONFIG_LOCAL
+    edge_type: DEPENDS_ON
+  - from: Q_R15_WRAP_NO_CAMINHO_CRITICO
+    to: E_UTILS_GUARDAS_SEM_HOOK
+    edge_type: DEPENDS_ON
+  - from: Q_REGRA56_VERACIDADE_DOS_ACHADOS
+    to: E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE
+    edge_type: DEPENDS_ON

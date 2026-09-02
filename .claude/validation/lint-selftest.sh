@@ -3718,6 +3718,77 @@ run_compose_settings_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo pretooluse-veto — exercita os DOIS únicos vetos exit-2 da casa (PreToolUse Bash):
+# hooks/pretooluse-protect-main.sh (force-push main) e hooks/pretooluse-merge-gate.sh (merge/push em
+# main fora do caminho verificado). A auditoria D_AUDITAR_GATES_TEXTUAIS (2026-09-02) mediu que o
+# único veto existente NÃO tinha bancada — um veto sem teste é declaração ([[exit-code-nao-e-a-
+# verificacao]]). Cada caso é um payload REAL de PreToolUse ({"tool_input":{"command":…}}); o SUT é
+# a string do modelo, o oráculo é o rc (2 = veto, 0 = passa). Modo-de-falha coberto: o veto que
+# NÃO dispara (prosa/heredoc citando o vocabulário) e o que dispara demais (feature branch).
+# ---------------------------------------------------------------------------
+run_pretooluse_veto_selftests() {
+  local pm="${REPO_ROOT}/.claude/hooks/pretooluse-protect-main.sh"
+  local mg="${REPO_ROOT}/.claude/hooks/pretooluse-merge-gate.sh"
+  if [ ! -f "${pm}" ] || [ ! -f "${mg}" ]; then record_fail "pretooluse-veto" "hook ausente: ${pm} / ${mg}"; return; fi
+  if ! command -v python3 >/dev/null 2>&1; then record_skip "pretooluse-veto: python3 ausente → pulado"; return; fi
+  # sandbox: repo git com ops/pr-merge-verified.sh (o caminho verificado EXISTE → gate armado)
+  local d; d="$(mktemp -d)"
+  git -C "${d}" init -q; git -C "${d}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m base
+  git -C "${d}" branch -M main; mkdir -p "${d}/ops"; : > "${d}/ops/pr-merge-verified.sh"
+  # _pv <hook> <branch-corrente> <comando> → imprime o rc do hook
+  _pv() {
+    local hook="$1" br="$2" c="$3" rc=0
+    git -C "${d}" checkout -q "${br}" 2>/dev/null || git -C "${d}" checkout -q -b "${br}"
+    printf '{"tool_input":{"command":%s}}' "$(python3 -c 'import json,sys;print(json.dumps(sys.argv[1]))' "${c}")" \
+      | (cd "${d}" && CLAUDE_PROJECT_DIR="${d}" bash "${hook}" >/dev/null 2>&1) || rc=$?
+    printf '%s' "${rc}"
+  }
+  _case() {  # <nome> <esperado> <hook> <branch> <comando>
+    local got; got="$(_pv "$3" "$4" "$5")"
+    if [ "${got}" = "$2" ]; then record_pass "pretooluse-veto: $1 (rc=$2)"
+    else record_fail "pretooluse-veto: $1" "esperava rc=$2, veio rc=${got} — cmd: $5"; fi
+  }
+  # protect-main (força)
+  _case "protect-main: force-push main → VETO"            2 "${pm}" feat 'git push --force origin main'
+  _case "protect-main: -f HEAD:main → VETO"                2 "${pm}" feat 'git push -f origin HEAD:main'
+  _case "protect-main: force nu sentado em main → VETO"    2 "${pm}" main 'git push --force-with-lease'
+  _case "protect-main: force-push feature → passa"         0 "${pm}" feat 'git push --force-with-lease origin feat'
+  _case "protect-main: push simples main → passa (não é dele)" 0 "${pm}" feat 'git push origin main'
+  _case "protect-main: heredoc citando force-push → passa" 0 "${pm}" feat $'cat <<EOF\nnunca git push --force origin main\nEOF'
+  # merge-gate (merge/push em main fora do caminho verificado)
+  _case "merge-gate: gh pr merge → VETO"                   2 "${mg}" feat 'gh pr merge 1 --rebase'
+  _case "merge-gate: gh pr merge encadeado → VETO"         2 "${mg}" feat 'cd x && gh pr merge 1'
+  _case "merge-gate: gh api pulls/N/merge → VETO"          2 "${mg}" feat 'gh api -X PUT repos/o/r/pulls/1/merge'
+  _case "merge-gate: git push origin main → VETO"          2 "${mg}" feat 'git push origin main'
+  _case "merge-gate: git push HEAD:main → VETO"            2 "${mg}" feat 'git push -u origin HEAD:main'
+  _case "merge-gate: push nu sentado em main → VETO"       2 "${mg}" main 'git push'
+  _case "merge-gate: push nu em feature → passa"           0 "${mg}" feat 'git push'
+  _case "merge-gate: push de feature → passa"              0 "${mg}" feat 'git push origin feat'
+  _case "merge-gate: branch feature/main-thing → passa"    0 "${mg}" feat 'git push origin feature/main-thing'
+  _case "merge-gate: caminho verificado → passa"           0 "${mg}" feat 'bash ops/pr-merge-verified.sh 1 --sync'
+  _case "merge-gate: gh pr view → passa"                   0 "${mg}" feat 'gh pr view 1 --json state'
+  _case "merge-gate: heredoc citando gh pr merge → passa"  0 "${mg}" feat $'cat <<EOF\ngh pr merge is dangerous\nEOF'
+  _case "merge-gate: heredoc + invocação real depois → VETO" 2 "${mg}" feat $'cat > f <<\'MD\'\ngit push origin main\nMD\ngh pr merge 1'
+  _case "merge-gate: echo citando → passa"                 0 "${mg}" feat 'echo "gh pr merge"'
+  # invólucros — a classe medida pela auditoria de 2026-09-02 (todos passavam rc=0 nos DOIS vetos)
+  _case "protect-main: command git push -f main → VETO"    2 "${pm}" feat 'command git push -f origin main'
+  _case "protect-main: \\git push -f main → VETO"          2 "${pm}" feat '\git push -f origin main'
+  _case "protect-main: env git push -f main → VETO"        2 "${pm}" feat 'FOO=1 env git push -f origin main'
+  _case "protect-main: bash -c \"git push -f main\" → VETO" 2 "${pm}" feat 'bash -c "git push -f origin main"'
+  _case "protect-main: git -C dir push -f main → VETO"     2 "${pm}" feat 'git -C /tmp -c a=b push --force origin HEAD:main'
+  _case "merge-gate: command gh pr merge → VETO"           2 "${mg}" feat 'command gh pr merge 1'
+  _case "merge-gate: exec gh pr merge → VETO"              2 "${mg}" feat 'exec gh pr merge 1'
+  _case "merge-gate: sh -c \"gh api pulls/N/merge\" → VETO" 2 "${mg}" feat 'sh -c "gh api -X PUT repos/o/r/pulls/3/merge"'
+  _case "merge-gate: sudo git push origin main → VETO"     2 "${mg}" feat 'sudo -u x git push origin main'
+  _case "merge-gate: \$(gh pr merge) subshell → VETO"      2 "${mg}" feat 'out=$(gh pr merge 1)'
+  _case "merge-gate: bash -c push de feature → passa"      0 "${mg}" feat 'bash -c "git push origin feat"'
+  # desarme: sem ops/pr-merge-verified.sh (adotante) o gate NÃO veta o único caminho de merge
+  rm -f "${d}/ops/pr-merge-verified.sh"
+  _case "merge-gate: sem caminho verificado → DESARMA (passa)" 0 "${mg}" feat 'gh pr merge 1'
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo resolve-target — exercita .claude/utils/co-evolution/resolve-target.sh (F1.2: targeting fino
 # por seletor no alvo:, reusando graph.sh --triples). Asserções ESTRUTURAIS (não fixam nomes de membro
 # → robusto a mudança de roster). Pula o que depende de membros sem python+yaml.
@@ -11064,6 +11135,7 @@ run_family_topology_selftests
 run_decouple_source_selftests
 run_kg_view_selftests
 run_kg_status_factor_selftests
+run_pretooluse_veto_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
 run_kg_scope_selftests
