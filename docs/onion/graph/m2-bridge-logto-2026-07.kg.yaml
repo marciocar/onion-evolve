@@ -1633,6 +1633,18 @@ nodes:
     verified_against: 'gh pr view 65 -R <forge>/onion-bridge => OPEN "fix(identity): piso do JWKS vale na falha (jwksAttemptedAt)"; tsc rc=0 no clone dev (fix/jwks-attempt-floor)'
     label: "O GATILHO 'PR proprio no bridge' DISPAROU (Onda 8, 2026-09-01): PR onion-bridge#65 implementa jwksAttemptedAt (piso de 60s na TENTATIVA, nao so no sucesso). A pergunta NAO fecha aqui: plane PROD segue com o storm ate merge+deploy do bridge — ato do maestro (MOAT: deploy). Fecha em Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA quando o vivo medir 1 fetch por janela durante queda do IdP."
 
+  - id: E_W9_A2A_ASYNC_PR66_ABERTO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-09-02
+    verified_against: "bancada Hono app.request com gate falso dormindo 5s, no worktree fix/a2a-async-spawn do onion-bridge; gh pr view 66 -R marciocar/onion-bridge = OPEN"
+    label: "CURA de Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP proposta (drive W9, 2026-09-02): PR #66 do onion-bridge troca spawnSync por spawn assincrono com o MESMO fail-safe. Medido antes/depois na bancada: /health durante um POST /a2a foi de 4820ms para 1,1ms. Modo-de-falha preservado: gate de 20s => SIGKILL aos 15s => 403 veto; gate exit 1 sem stdout => 403 veto em 40ms; zero orfaos apos o kill. A pergunta FECHA quando o PR for mergeado e deployado (ato do maestro; producao ainda roda spawnSync em /home/onion/onion-bridge/src/a2a.ts:51, medido por sudo -n grep)."
+    trace: "https://github.com/marciocar/onion-bridge/pull/66"
+
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -2228,4 +2240,7 @@ edges:
     edge_type: SUPERSEDES
   - from: E_W8_JWKS_PR65_ABERTO
     to: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
+    edge_type: SUPPORTS
+  - from: E_W9_A2A_ASYNC_PR66_ABERTO
+    to: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
     edge_type: SUPPORTS
