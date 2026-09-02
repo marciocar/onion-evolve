@@ -362,6 +362,17 @@ nodes:
     label: 'MEDIDO: PreModelSwitch e PostModelSwitch DISPARAM no /model da sessao principal (2.1.258). Payload: from_model, to_model, requested_model, source=picker, context_tokens, prompt_cache_warm, cache_ttl, estimated_cache_write_usd (3.13 USD a 156k ctx — a troca invalida o cache), pricing=catalog. O binario contem "model switch blocked by a PreModelSwitch hook": o Pre pode VETAR. PRE-CONDICAO do D_HOOK_PREMODELSWITCH_GUARDA satisfeita — sai de declarado para observado. Pre-condicao nova descoberta: o evento so existe em processo >= 2.1.251; a sessao rodava 2.1.247 com o binario ja deletado do disco (picker reflete o PROCESSO, nao o disco) — reiniciar foi obrigatorio. Sonda removida apos medir (adopt copia .claude/).'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md'
 
+  - id: E_GUARDA_PREMODELSWITCH_APLICADA_0902
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'bancada run_premodelswitch_guard_selftests 11/11 + radar-staleness (h)/(i) 2/2 no runner; lint --only radar-baselines.yaml sem HARD com session_models presente; hook piped com payload real do E_PREMODELSWITCH_DISPARO_MEDIDO_0902 (fable-5-1 rc=0, fable-5-1[1m] rc=0, sonnet-5 rc=2)'
+    label: 'APLICADO (selo do maestro "1 + 3": veta downgrade, loga sempre): premodelswitch-guard.sh em PreModelSwitch e PostModelSwitch (settings.json, vendorizado); baseline = session_models no eixo E6 de radar-baselines.yaml (claude-fable-5-1, claude-opus-5; sufixo [1m] ignorado); to_model fora da lista = exit 2 com rota de escape (rodada E6, nunca /model); sem baseline (adotante) = desarma e loga; baseline sem a chave = fail-loud (veto) E HARD no lint (check_session_models_baseline) para nao desarmar por omissao; log .claude/sessions/model-switch.jsonl com allow|block|disarmed|unreadable|applied. Fronteira: processo < 2.1.251 nao chama o hook (par com session-version-drift.sh). Veto AO VIVO no /model do maestro ainda NAO observado — a decisao continua open ate isso.'
+    trace: '.claude/hooks/premodelswitch-guard.sh'
+
 edges:
   - from: E_SYSCARD_S1_FABRICA_APROVACAO
     to: Q_SUPERACAO_FABLE_5_1
@@ -493,5 +504,8 @@ edges:
     to: Q_EXP_JUIZ_FABLE_CALIBRACAO
     edge_type: SUPPORTS
   - from: E_PREMODELSWITCH_DISPARO_MEDIDO_0902
+    to: D_HOOK_PREMODELSWITCH_GUARDA
+    edge_type: SUPPORTS
+  - from: E_GUARDA_PREMODELSWITCH_APLICADA_0902
     to: D_HOOK_PREMODELSWITCH_GUARDA
     edge_type: SUPPORTS

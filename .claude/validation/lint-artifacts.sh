@@ -3634,6 +3634,22 @@ check_radar_staleness() {
   fi
 }
 
+# REGRA 65b — baseline de modelo da SESSÃO legível (session_models no eixo E6) [HARD]
+# previne: a guarda PreModelSwitch (premodelswitch-guard.sh) se desarmar por OMISSÃO — sem a chave, a
+# guarda faz fail-loud no /model (veta tudo) e este gate acusa ANTES, no lint. Escopo: o arquivo REAL
+# do core (ONION_SESSION_MODELS_FILE só para a bancada) — os fixtures da REGRA 65 (ONION_RADAR_BASELINES)
+# não carregam a chave e não devem disparar isto. Sem o arquivo (adotante) = silêncio: a guarda desarma.
+check_session_models_baseline() {
+  local f="${ONION_SESSION_MODELS_FILE:-${REPO_ROOT}/docs/onion/radar-baselines.yaml}"
+  [ -f "${f}" ] || return 0
+  local n
+  n=$(awk '/^[[:space:]]*session_models:[[:space:]]*(#.*)?$/ {f=1; next} f && /^[[:space:]]*-[[:space:]]*/ {c++; next} f {f=0} END{print c+0}' "${f}")
+  if [ "${n}" -eq 0 ]; then
+    violation "HARD" "${f}" "REGRA 65: baseline presente mas SEM 'session_models:' legível (eixo E6) — a guarda PreModelSwitch não sabe o que cobrar e passa a vetar toda troca (fail-loud); declare o lineup admitido como modelo da sessão"
+  fi
+}
+
+check_session_models_baseline
 check_kg_verification_coverage
 # REGRA 66 — Registro da federação validado no gate (members.yaml) [HARD]
 # previne: membro quebrado entrando calado no ledger — o M2 da spec m3-federation-admin

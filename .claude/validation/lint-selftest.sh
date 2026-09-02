@@ -3730,6 +3730,50 @@ run_compose_settings_selftests() {
 # previne: a classe medida em 2026-09-02 — sessão rodando binário deletado (2.1.247) com o disco em
 # 2.1.258; picker/hooks refletem o PROCESSO e o lint dizia "instalado=2.1.258". A bancada fabrica um
 # `claude` sintético (symlink → versions/X, como o instalador real) e injeta o caminho do processo.
+# ── premodelswitch-guard (PreModelSwitch/PostModelSwitch): veta downgrade, loga sempre ─────────
+# previne: troca silenciosa do modelo da sessão para fora do lineup declarado (diretriz always-
+# latest-max só tinha prosa). Baseline sintético via ONION_RADAR_BASELINES; log via
+# ONION_MODEL_SWITCH_LOG. O evento em si foi medido ao vivo (E_PREMODELSWITCH_DISPARO_MEDIDO_0902);
+# aqui se prova a DECISÃO do hook sobre o payload, não o disparo.
+run_premodelswitch_guard_selftests() {
+  local hk="${REPO_ROOT}/.claude/hooks/premodelswitch-guard.sh"
+  if [ ! -f "${hk}" ]; then record_fail "premodelswitch-guard" "hook ausente: ${hk}"; return; fi
+  if ! command -v python3 >/dev/null 2>&1; then record_skip "premodelswitch-guard: python3 ausente → pulado"; return; fi
+  local d; d="$(mktemp -d)"
+  printf 'axes:\n  - id: E6-fronteira-modelos\n    last_run: 2026-09-02\n    session_models:   # comentário\n      - claude-fable-5-1\n      - "claude-opus-5"\n  - id: E7\n    last_run: 2026-09-02\n' > "${d}/bl.yaml"
+  printf 'axes:\n  - id: E6-fronteira-modelos\n    last_run: 2026-09-02\n' > "${d}/bl-sem-lista.yaml"
+  # _pg <baseline|""> <event> <to_model> → rc
+  _pg() {
+    local bl="$1" rc=0
+    printf '{"hook_event_name":"%s","from_model":"claude-opus-5[1m]","to_model":"%s","requested_model":"%s","source":"picker","context_tokens":1000,"estimated_cache_write_usd":0.5}' "$2" "$3" "$3" \
+      | ONION_RADAR_BASELINES="${bl:-${d}/nao-existe.yaml}" ONION_MODEL_SWITCH_LOG="${d}/log.jsonl" CLAUDE_PROJECT_DIR="${d}" bash "${hk}" >/dev/null 2>&1 || rc=$?
+    printf '%s' "${rc}"
+  }
+  _case() {  # <nome> <esperado> <baseline> <event> <to>
+    local got; got="$(_pg "$3" "$4" "$5")"
+    if [ "${got}" = "$2" ]; then record_pass "premodelswitch-guard: $1 (rc=$2)"
+    else record_fail "premodelswitch-guard: $1" "esperava rc=$2, veio rc=${got} — to=$5"; fi
+  }
+  _case "Pre → fable-5-1 (no lineup) → passa"            0 "${d}/bl.yaml" PreModelSwitch claude-fable-5-1
+  _case "Pre → opus-5 (no lineup, com aspas) → passa"    0 "${d}/bl.yaml" PreModelSwitch claude-opus-5
+  _case "Pre → fable-5-1[1m] (sufixo ignorado) → passa"  0 "${d}/bl.yaml" PreModelSwitch 'claude-fable-5-1[1m]'
+  _case "Pre → sonnet-5 → VETO"                          2 "${d}/bl.yaml" PreModelSwitch claude-sonnet-5
+  _case "Pre → haiku-4-5 → VETO"                         2 "${d}/bl.yaml" PreModelSwitch claude-haiku-4-5-20251001
+  _case "Pre → fable-5 (geração anterior) → VETO"        2 "${d}/bl.yaml" PreModelSwitch claude-fable-5
+  _case "Pre sem baseline (adotante) → DESARMA"          0 ""            PreModelSwitch claude-sonnet-5
+  _case "Pre baseline sem session_models → fail-loud VETO" 2 "${d}/bl-sem-lista.yaml" PreModelSwitch claude-fable-5-1
+  _case "Post → sonnet-5 → passa (só loga)"              0 "${d}/bl.yaml" PostModelSwitch claude-sonnet-5
+  local rc=0; printf '' | ONION_MODEL_SWITCH_LOG="${d}/log.jsonl" bash "${hk}" >/dev/null 2>&1 || rc=$?
+  [ "${rc}" = 0 ] && record_pass "premodelswitch-guard: payload vazio → passa (rc=0)" || record_fail "premodelswitch-guard: payload vazio" "rc=${rc}"
+  # log: 9 eventos → 9 linhas, com as decisões esperadas
+  local n; n="$(grep -c . "${d}/log.jsonl" 2>/dev/null || echo 0)"
+  if [ "${n}" = 9 ] && grep -q '"decision":"block"' "${d}/log.jsonl" && grep -q '"decision":"disarmed"' "${d}/log.jsonl" \
+     && grep -q '"decision":"unreadable"' "${d}/log.jsonl" && grep -q '"event":"PostModelSwitch".*"decision":"applied"' "${d}/log.jsonl"; then
+    record_pass "premodelswitch-guard: log 9/9 com allow/block/disarmed/unreadable/applied"
+  else record_fail "premodelswitch-guard: log" "esperava 9 linhas com todas as decisões, veio ${n}: $(head -c 300 "${d}/log.jsonl" 2>/dev/null)"; fi
+  rm -rf "${d}"
+}
+
 run_version_drift_selftests() {
   local hk="${REPO_ROOT}/.claude/hooks/session-version-drift.sh"
   if [ ! -f "${hk}" ]; then record_fail "version-drift" "hook ausente: ${hk}"; return; fi
@@ -10964,6 +11008,18 @@ run_radar_staleness_selftests() {
     record_pass "radar-staleness: (g) sessão em binário velho: SOFT nomeia processo=2.1.247 + 2º SOFT processo≠disco (reinicie)"
   else record_fail "radar-staleness: (g)" "processo/disco não distinguidos (rc=${rc}): ${out}"; fi
 
+  # (h) session_models: chave ausente no arquivo REAL ⇒ HARD (a guarda PreModelSwitch desarmaria por omissão)
+  printf 'axes:\n  - id: E6-fronteira-modelos\n    last_run: %s\n' "${fresh_date}" > "$d/sm-sem.yaml"
+  printf 'axes:\n  - id: E6-fronteira-modelos\n    last_run: %s\n    session_models:\n      - claude-fable-5-1\n' "${fresh_date}" > "$d/sm-com.yaml"
+  rc=0; out="$(ONION_SESSION_MODELS_FILE="$d/sm-sem.yaml" ONION_RADAR_BASELINES="$d/sm-com.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q "SEM 'session_models:' legível"; then
+    record_pass "radar-staleness: (h) baseline sem session_models ⇒ HARD (guarda de modelo não desarma por omissão)"
+  else record_fail "radar-staleness: (h)" "esperava HARD nomeando session_models (rc=${rc}): ${out}"; fi
+  rc=0; out="$(ONION_SESSION_MODELS_FILE="$d/sm-com.yaml" ONION_RADAR_BASELINES="$d/sm-com.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if ! printf '%s' "${out}" | grep -q "session_models"; then
+    record_pass "radar-staleness: (i) baseline com session_models ⇒ silêncio"
+  else record_fail "radar-staleness: (i)" "falso positivo (rc=${rc}): ${out}"; fi
+
   rm -rf "$d"
 }
 
@@ -11189,6 +11245,7 @@ run_kg_view_selftests
 run_kg_status_factor_selftests
 run_pretooluse_veto_selftests
 run_version_drift_selftests
+run_premodelswitch_guard_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
 run_kg_scope_selftests
