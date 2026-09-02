@@ -68,6 +68,16 @@
             "statusMessage": "Roteando aparte do maestro (Onion)"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-version-drift.sh\"",
+            "timeout": 5,
+            "statusMessage": "Conferindo versão do processo vs disco (Onion)"
+          }
+        ]
       }
     ],
     "SessionEnd": [

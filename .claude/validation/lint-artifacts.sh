@@ -3611,13 +3611,26 @@ check_radar_staleness() {
   # a cada versão do Claude Code — mecanizado, não lembrado): se a baseline E3 declara cc_version e
   # o binário instalado difere, a plataforma mudou desde a última rodada de estratégia → SOFT.
   # Sem binário `claude` no ambiente (ex.: CI) não há o que comparar — silêncio deliberado.
-  local pinned_cc installed_cc
+  # PROCESSO > DISCO (medido 2026-09-02): o auto-updater troca o binário com a sessão viva; a sessão
+  # do maestro rodou 2.1.247 por 6 dias com o disco em 2.1.258 e esta regra dizia "instalado=2.1.258".
+  # Picker, hooks e capacidades refletem o PROCESSO — quando o lint roda DENTRO de uma sessão
+  # (pre-commit), a versão que importa é a do processo (CLAUDE_CODE_EXECPATH); e processo ≠ disco
+  # é um 2º SOFT próprio, porque a cura é outra (reiniciar a sessão, não rodar o radar).
+  local pinned_cc installed_cc disk_cc proc_cc exec_path
   pinned_cc=$(grep -oE 'cc_version:[[:space:]]*"[0-9][0-9.]*"' "${bl}" | head -1 | grep -oE '[0-9][0-9.]*')
-  if [ -n "${pinned_cc}" ] && command -v "${ONION_CC_BIN:-claude}" >/dev/null 2>&1; then
-    installed_cc=$("${ONION_CC_BIN:-claude}" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-    if [ -n "${installed_cc}" ] && [ "${installed_cc}" != "${pinned_cc}" ]; then
-      violation "SOFT" "${bl}" "REGRA 65: Claude Code mudou de versão desde a última rodada de estratégia (rodada=${pinned_cc}, instalado=${installed_cc}) — adequação não re-medida; rode /meta:radar E3-claude-code-delta"
-    fi
+  exec_path="${ONION_CC_EXECPATH-${CLAUDE_CODE_EXECPATH:-}}"   # `-` e não `:-`: override DEFINIDO-vazio isola a bancada do vazamento da sessão
+  [ -n "${exec_path}" ] && proc_cc=$(printf '%s' "${exec_path##*/}" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+' || true)
+  if command -v "${ONION_CC_BIN:-claude}" >/dev/null 2>&1; then
+    disk_cc=$("${ONION_CC_BIN:-claude}" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+  fi
+  local src_label="instalado"
+  installed_cc="${disk_cc:-}"
+  if [ -n "${proc_cc:-}" ]; then installed_cc="${proc_cc}"; src_label="processo"; fi
+  if [ -n "${pinned_cc}" ] && [ -n "${installed_cc}" ] && [ "${installed_cc}" != "${pinned_cc}" ]; then
+    violation "SOFT" "${bl}" "REGRA 65: Claude Code mudou de versão desde a última rodada de estratégia (rodada=${pinned_cc}, ${src_label}=${installed_cc}) — adequação não re-medida; rode /meta:radar E3-claude-code-delta"
+  fi
+  if [ -n "${proc_cc:-}" ] && [ -n "${disk_cc:-}" ] && [ "${proc_cc}" != "${disk_cc}" ]; then
+    violation "SOFT" "${bl}" "REGRA 65: esta sessão roda o Claude Code ${proc_cc} mas o disco já tem ${disk_cc} — picker/hooks/capacidades refletem o PROCESSO; reinicie a sessão (/exit → claude --continue) antes de medir adequação"
   fi
 }
 
