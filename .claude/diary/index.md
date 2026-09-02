@@ -1,17 +1,18 @@
-# Diário — onion-evolve
+# Diário — .
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 108 entradas · **Stale:** 0 · **Compartilháveis:** 96 · **Com significância:** 48
+**Total:** 109 entradas · **Stale:** 0 · **Compartilháveis:** 97 · **Com significância:** 49
 
-Gerado em: 2026-08-28
+Gerado em: 2026-09-02
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-09-02 | error | public 📤 | no-verify-e-checkpoint-nunca-aprovacao | O maestro separou duas coisas que eu tinha colado numa só: `--no-verify` garante que o trabalho incompleto não se perde; a APROVAÇÃO só vem do gate completo executado sobre o SHA final. | 2026-12-01 | static |
 | 2026-08-28 | error | public 📤 | o-farol-anunciava-fantasma-como-sessao-viva | O farol de sessão — a guarda que protege a invariante I3 — passou meses anunciando fantasmas como sessões vivas, e eu repassei o anúncio ao maestro como fato. Declarado ≠ verificado aplicado ao mecanismo que eu mesmo consumo. | 2026-11-26 | dynamic |
 | 2026-08-28 | learning | public 📤 | a-bancada-achou-o-defeito-destrutivo-que-eu-ia-enviar | A pergunta do maestro ('não é hora de um comando de gestão de backlog?') respondeu-se com NÃO — o que faltava era catraca, não superfície. E a bancada que escrevi para provar a catraca achou um defeito destrutivo meu que a leitura do código não tinha achado. | 2026-11-26 | dynamic |
 | 2026-08-26 | reflection | public 📤 | a-cura-que-virou-mecanismo-e-grafo | O erro que cometi no meio da sessão virou um mecanismo que mergeou a própria correção — o erra→aprende→vira-lei que o site passou a sessão aprendendo a vender, praticado ao vivo em mim mesmo. | 2026-11-24 | dynamic |
