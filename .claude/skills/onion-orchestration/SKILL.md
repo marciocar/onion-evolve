@@ -103,6 +103,11 @@ Nativas" (fonte única).
 8. **Relatório ao usuário** em pt-BR: padrão escolhido, nº de workers, tier de
    modelo, budget gasto, o resultado consolidado **e onde o `write(KG)` persistiu** (path do `.md`
    + `.kg.yaml` + veredito do radar).
+   **Antes de declarar o tier, cheque o ambiente:** `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` (Claude Code
+   ≥ 2.1.257) aplica UM modelo a todo subagente **ignorando** `model` por spawn e por definição de
+   agente — com ela setada, o tiering declarado no relatório é falso. Se `env | grep -c
+   CLAUDE_CODE_SUBAGENT_MODEL` ≠ 0, imprima **AVISO: tiering declarado ≠ executado (env force)**
+   e o modelo efetivo (behavior-over-declaration; radar E3 2026-09-02).
 
 ## Padrões → primitivas
 

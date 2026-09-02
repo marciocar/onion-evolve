@@ -124,6 +124,13 @@ Contrato do worker (cada cláusula paga por um erro real desta casa):
   um worker declarou `permission denied` em `/home/onion/onion-bridge/src/`, carimbou o nó por
   inferência indireta, e `sudo ls` lia o diretório — ele já usara `sudo` em quatro comandos da
   mesma medição. Falta de acesso é hipótese até você ter tentado ([[verify-access-before-specifying]]).
+  **Distinga o bloqueio de FS do bloqueio de HARNESS** (delta Claude Code 2.1.257, radar E3
+  2026-09-02): com `permissions.blockReadsOutsideWorkingDirectories` ativo, leitura fora dos
+  working dirs (`/home/marcio/<adotante>`, `/home/onion/onion-bridge`) é recusada pelo *harness* —
+  `sudo` **não vence**, porque a parede não é o filesystem. Nesse caso devolva `UNVERIFIABLE` com
+  `blocked_by: harness bloqueia leitura fora dos working dirs (<path>)` sem gastar elevação; o
+  maestro decide liberar o diretório (`--add-dir`) e re-rodar. Elevar contra a parede errada é o
+  mesmo erro de 2026-08-12 com o sinal invertido.
 - **Nó COMPOSTO: o veredito é do TODO, não da maioria.** Um nó que afirma N mecânicas
   independentes recebe UM `verdict`. Mediu 3 de 3 ⇒ o veredito que a medição disser. Mediu 2 de 3
   ⇒ **`UNVERIFIABLE`**, com `blocked_by` nomeando a parte não medida — nunca arredonde para cima.
