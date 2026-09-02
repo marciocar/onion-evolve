@@ -3958,6 +3958,18 @@ run_write_stamp_selftests() {
   if grep -q '^role: hub$' "${wsb}/h/.claude/.onion-version" && grep -q '^source_commit: bbb222$' "${wsb}/h/.claude/.onion-version"; then
     record_pass "write-stamp: --role hub grava hub; update sem --role PRESERVA hub (não rebaixa)"
   else record_fail "write-stamp: role hub" "$(cat "${wsb}/h/.claude/.onion-version")"; fi
+  # 6. D_GREP_OLD_PIN: update com pin novo AVISA os artefatos que citam o pin antigo — e só os
+  #    fora da história (inbox/inbound/diary excluídos; medição 2026-09-02: 19/22 eram história).
+  rm -rf "${wsb}/p"; mkdir -p "${wsb}/p/.claude" "${wsb}/p/docs/evolution/inbox" "${wsb}/p/docs/tech"
+  bash "${helper}" "${wsb}/p" --framework onion-evolve --commit 0123456789ab --commit-date 2026-08-01 >/dev/null 2>&1
+  printf 'pin 0123456789ab citado na SSOT viva\n' > "${wsb}/p/docs/tech/index.md"
+  printf 'sinal histórico cita 0123456789ab\n' > "${wsb}/p/docs/evolution/inbox/2026-08-01-sinal.md"
+  local pin_err; pin_err="$(bash "${helper}" "${wsb}/p" --framework onion-evolve --commit fedcba987654 --commit-date 2026-09-01 2>&1 >/dev/null || true)"
+  if printf '%s' "${pin_err}" | grep -q '^AVISO: 1 referência' \
+     && printf '%s' "${pin_err}" | grep -q 'docs/tech/index.md' \
+     && ! printf '%s' "${pin_err}" | grep -q 'inbox'; then
+    record_pass "write-stamp: (D_GREP_OLD_PIN) update avisa 1 citação viva do pin antigo; história (inbox) excluída"
+  else record_fail "write-stamp: grep-old-pin" "${pin_err}"; fi
   # 5. --role inválido → exit 2 (só adopted|hub)
   if ! bash "${helper}" "${wsb}/h" --framework x --commit c --commit-date 2026-07-23 --role banana >/dev/null 2>&1; then
     record_pass "write-stamp: --role inválido → rejeitado (exit 2)"
