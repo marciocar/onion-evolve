@@ -36,6 +36,27 @@ onion_invocation_lines() {
       | sed -E 's/^[[:space:]]+//; s/^(\$\(|\(|\{)[[:space:]]*//' \
       | sed -E 's/^(ba|z|da)?sh[[:space:]]+-[A-Za-z]*c[A-Za-z]*[[:space:]]+(["'"'"'])(.*)\2[[:space:]]*$/\3/')
   done
+  # ESCOPO (falso-positivo medido 2026-09-02, adoção da um adotante greenfield): `git -C /outro/repo push origin main`
+  # era vetado — a guarda julga a string sem saber que o alvo é OUTRO repositório. Uma linha cujo `-C <dir>`
+  # / `--git-dir=` / `--work-tree=` resolve para fora da raiz deste projeto NÃO é assunto desta guarda: sai
+  # aqui, antes do colapso das opções globais (que apagaria a evidência). `-C .` e `-C <raiz>` continuam.
+  local root; root="$(cd "${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}" 2>/dev/null && pwd -P)"
+  lines=$(printf '%s\n' "$lines" | while IFS= read -r ln; do
+    tgt=""
+    if printf '%s' "$ln" | grep -qE '^[[:space:]]*(\\|command[[:space:]]+|exec[[:space:]]+|env[[:space:]]+)?git[[:space:]]+(-c[[:space:]]+[^[:space:]]+[[:space:]]+)*-C[[:space:]]+[^[:space:]]+'; then
+      tgt=$(printf '%s' "$ln" | sed -E 's/^[[:space:]]*(\\|command[[:space:]]+|exec[[:space:]]+|env[[:space:]]+)?git[[:space:]]+(-c[[:space:]]+[^[:space:]]+[[:space:]]+)*-C[[:space:]]+([^[:space:]]+).*/\3/')
+    elif printf '%s' "$ln" | grep -qE '^[[:space:]]*git[[:space:]]+.*--(git-dir|work-tree)=[^[:space:]]+'; then
+      tgt=$(printf '%s' "$ln" | sed -E 's/.*--(git-dir|work-tree)=([^[:space:]]+).*/\2/; s#/\.git$##')
+    fi
+    if [ -n "$tgt" ]; then
+      tgt="${tgt%\"}"; tgt="${tgt#\"}"; tgt="${tgt%\'}"; tgt="${tgt#\'}"
+      # só é "outro repo" se o alvo É um repositório git cuja raiz difere da nossa; `-C /tmp` (dir sem .git)
+      # é truque de invólucro e continua vetado (caso da auditoria: `git -C /tmp -c a=b push --force origin HEAD:main`)
+      top="$(git -C "$tgt" rev-parse --show-toplevel 2>/dev/null)"; top="${top:+$(cd "$top" 2>/dev/null && pwd -P)}"
+      if [ -n "$top" ] && [ -n "$root" ] && [ "$top" != "$root" ]; then continue; fi   # outro repo: não é nosso veto
+    fi
+    printf '%s\n' "$ln"
+  done)
   printf '%s\n' "$lines" | sed -E '
     :p
     s/^\\//

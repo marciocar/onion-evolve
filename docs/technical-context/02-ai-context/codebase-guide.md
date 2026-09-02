@@ -27,7 +27,7 @@ onion-evolve/
 ├── .claude/                    # o FRAMEWORK propriamente dito (o "produto")
 │   ├── commands/                # 109 comandos invocáveis, 10 categorias
 │   ├── agents/                  # 51 agentes especializados, 9 categorias
-│   ├── skills/                  # 12 skills (Claude Code-nativas)
+│   ├── skills/                  # 13 skills (Claude Code-nativas)
 │   ├── utils/                   # abstrações SDAAL (task-manager, forge, ...)
 │   ├── validation/               # scripts determinísticos (lint, inventory, kg-radar...)
 │   ├── hooks/                    # hooks de ciclo de vida de sessão (SessionStart, PreCompact...)

@@ -673,6 +673,14 @@ react-developer	related	nodejs-specialist
 research-agent	related	/meta/create-knowledge-base	
 research-agent	related	product-agent	
 research-agent	related	storytelling-business-specialist	
+sacola-de-ideias	adopts	onion-evolve	
+sacola-de-ideias	mode	greenfield	
+sacola-de-ideias	pin	8e2517724c0a	
+sacola-de-ideias	specialization	astro-site	
+sacola-de-ideias	specialization	greenfield-dogfood	
+sacola-de-ideias	specialization	institutional	
+sacola-de-ideias	tier	standalone	
+sacola-de-ideias	trust-advises	onion-evolve	
 security-information-master	related	/docs/build-compliance-docs	
 security-information-master	related	iso-22301-specialist	
 security-information-master	related	iso-27001-specialist	

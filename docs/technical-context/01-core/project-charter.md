@@ -41,7 +41,7 @@ Não há métricas de produto (não é um app com usuários finais) — o crité
 |---|---|---|
 | Comandos invocáveis | 109 comandos em 10 categorias (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `design`, `development`, `quick`) + `onion.md`, `warm-up.md`, `catch-up.md` no root | `docs/onion/inventory.md:8-9,15-29` (SSOT gerada) |
 | Agentes especializados | 51 agentes em 9 categorias (`compliance`, `deployment`, `development`, `git`, `meta`, `product`, `research`, `review`, `testing`) | `docs/onion/inventory.md:9,33-45` |
-| Skills | 12 skills em `.claude/skills/` (`onion` orquestrador; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration`; entre outras) | `docs/onion/inventory.md:10`; `CLAUDE.md:13` |
+| Skills | 13 skills em `.claude/skills/` (`onion` orquestrador; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration`; entre outras) | `docs/onion/inventory.md:10`; `CLAUDE.md:13` |
 | Knowledge Bases | 93 KBs em `docs/knowledge-base/` (contagem inclui READMEs de (sub)categoria, exclui `index.md`) | `docs/onion/inventory.md:11` |
 | Task Manager Abstraction | Camada SDAAL plugável — Jira, ClickUp, Asana, Linear — via `.claude/utils/task-manager/` | `CLAUDE.md:14,20-38` |
 | Forge (host remoto) | Abstração SDAAL irmã do task-manager — GitHub hoje (`cli` default via `gh`, `api` fallback); GitLab/Bitbucket com "costura pronta", não implementado | `CLAUDE.md` §Forge; `.claude/utils/forge/adapters/github.md` |

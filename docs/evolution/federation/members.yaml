@@ -434,6 +434,27 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  - id: sacola-de-ideias
+    name: Sacola de Ideias (site institucional — Astro)
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter               # site institucional da empresa do maestro; vendoriza o framework cheio
+    parent: onion-evolve
+    remote: github.com/marciocar/sacola-de-ideias   # PRIVADO
+    local_path: "/home/marcio/sacola-de-ideias"
+    onion_version: 8e2517724c0a   # pin = main do core no dia da adoção (F1 da lente de pesquisa); VERIFICAR com pin-integrity-check.sh após o 1º push
+    adopted_at: 2026-09-02
+    mode: greenfield              # site Astro recém-criado (1 página) → TX_create; framework cheio + canais de co-evolução
+    personality_summary: "Site institucional da Sacola de Ideias (empresa do maestro, um dos criadores do Arandek e do Onion): Astro 7, pt-BR, sem CDN. Nasceu já com a lente de pesquisa (F1) — e foi o 1º adotante a medir que a rule research-lens faz o greenfield nascer com 1 HARD (sinal upstream 2026-09-02)."
+    specializations: [astro-site, institutional, greenfield-dogfood]
+    personality_last_sync: 2026-09-02   # seed manual
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
