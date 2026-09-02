@@ -3649,6 +3649,61 @@ check_session_models_baseline() {
   fi
 }
 
+
+# REGRA 67 — Grafo de pesquisa com REVISITA carimbada (meta.review_after) [SOFT]
+# previne: pesquisa que envelhece em silêncio — 27 grafos em docs/evolution/research/ sem nenhuma data de
+# revisita (medido 2026-09-02, meta-research-lens). Irmã da REGRA 65 (eixos do radar têm last_run; o diário
+# tem review_after; o grafo de pesquisa não tinha nada). CATRACA sem retro-ruído: exige a chave só em grafo
+# NOVO (meta.baseline >= 2026-09-02); nos antigos só acusa se a chave existir e estiver vencida. A máquina
+# detecta, o maestro roda /onion-research --revisit (F4) — nunca cron (MOAT W7). Dir sobrescrevível para a
+# bancada (ONION_RESEARCH_KG_DIR); sem o dir (adotante) = silêncio.
+check_research_kg_review_after() {
+  local dir="${ONION_RESEARCH_KG_DIR:-${REPO_ROOT}/docs/evolution/research}"
+  [ -d "${dir}" ] || return 0
+  local today; today=$(date +%F)
+  local f base ra
+  while IFS= read -r f; do
+    [ -f "${f}" ] || continue
+    base=$(grep -m1 -oE '^\s*baseline:\s*[0-9]{4}-[0-9]{2}-[0-9]{2}' "${f}" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' || true)
+    ra=$(grep -m1 -oE '^\s*review_after:\s*[0-9]{4}-[0-9]{2}-[0-9]{2}' "${f}" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' || true)
+    if [ -z "${ra}" ]; then
+      if [ -n "${base}" ] && [ "${base}" \> "2026-09-01" ]; then
+        violation "SOFT" "${f}" "REGRA 67: grafo de pesquisa NOVO (baseline ${base}) sem meta.review_after — carimbe a revisita (ferramenta 30d · modelos 45d · mercado 90d · benchmark 120d · doutrina 12m); doutrina: common/prompts/research-doctrine.md"
+      fi
+    elif [ "${ra}" \< "${today}" ]; then
+      violation "SOFT" "${f}" "REGRA 67: revisita VENCIDA (review_after ${ra} < hoje ${today}) — o conhecimento deste grafo pode estar caduco; re-meça (/meta:kg-freshness nos nós PROD; /onion-research --revisit no externo) e carimbe de novo"
+    fi
+  done < <(find "${dir}" -mindepth 2 -maxdepth 2 -name '*.kg.yaml' 2>/dev/null | sort)
+}
+
+# REGRA 68 — Confiança alta com fonte fraca [SOFT]
+# previne: evidência externa "confirmada" com confidence >= 0.8 apoiada em fonte de baixa autoridade
+# (source_tier <= 3 na escala DREAM 1-10) ou em blog de FORNECEDOR SOBRE CONCORRENTE (source_kind
+# vendor-on-competitor — toda comparação de ferramentas de busca lida em 2026-09-02 era de concorrente
+# direto). Opt-in pela PRESENÇA dos campos: nó sem source_tier/source_kind é silêncio (não retro-reprova
+# os 80+ grafos). Doutrina: common/prompts/research-doctrine.md cláusula 7.
+check_kg_source_tier_confidence() {
+  local dir="${ONION_RESEARCH_KG_DIR:-${REPO_ROOT}/docs/evolution/research}"
+  [ -d "${dir}" ] || return 0
+  local f
+  while IFS= read -r f; do
+    [ -f "${f}" ] || continue
+    awk -v F="${f}" '
+      function flush(){ if(id!="" && conf!="" && (tier!="" || kind!="")){
+          c=conf+0; t=(tier==""?99:tier+0);
+          if(c>=0.8 && (t<=3 || kind=="vendor-on-competitor")) printf "%s\t%s\t%s\t%s\t%s\n", F,id,conf,(tier==""?"-":tier),(kind==""?"-":kind) } }
+      /^[[:space:]]*-[[:space:]]+id:[[:space:]]*/ { flush(); id=$0; sub(/^[[:space:]]*-[[:space:]]+id:[[:space:]]*/,"",id); conf="";tier="";kind=""; next }
+      /^[[:space:]]*confidence:[[:space:]]*/ { conf=$0; sub(/^[[:space:]]*confidence:[[:space:]]*/,"",conf); sub(/[[:space:]]*#.*$/,"",conf) }
+      /^[[:space:]]*source_tier:[[:space:]]*/ { tier=$0; sub(/^[[:space:]]*source_tier:[[:space:]]*/,"",tier); sub(/[[:space:]]*#.*$/,"",tier) }
+      /^[[:space:]]*source_kind:[[:space:]]*/ { kind=$0; sub(/^[[:space:]]*source_kind:[[:space:]]*/,"",kind); sub(/[[:space:]]*#.*$/,"",kind); gsub(/["'"'"']/,"",kind) }
+      END{ flush() }' "${f}" | while IFS=$'\t' read -r file nid conf tier kind; do
+        violation "SOFT" "${file}" "REGRA 68: nó ${nid} tem confidence ${conf} com fonte fraca (source_tier ${tier}, source_kind ${kind}) — confiança alta exige fonte primária/alta autoridade ou corroboração cruzada; rebaixe a confiança ou cite a primária (doutrina: research-doctrine.md §7)"
+      done
+  done < <(find "${dir}" -mindepth 2 -maxdepth 2 -name '*.kg.yaml' 2>/dev/null | sort)
+}
+
+check_research_kg_review_after
+check_kg_source_tier_confidence
 check_session_models_baseline
 check_kg_verification_coverage
 # REGRA 66 — Registro da federação validado no gate (members.yaml) [HARD]

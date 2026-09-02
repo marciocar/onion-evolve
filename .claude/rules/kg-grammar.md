@@ -22,6 +22,8 @@ paths:
 | `status:` | `open` `confirmed` `drifted` `unverifiable` `refuted` `superseded` `done` | valores fora do enum passam sem gate — **11 circulando hoje**. `drifted`/`unverifiable` são a SAÍDA de `/meta:kg-freshness` e existem desde 2026-08-06: sem elas, selar um drift só dava para **recusar** (exit 1) ou **mentir de `refuted`**, que zera a atenção do nó que acabou de provar que a realidade andou |
 | `impact:` / `confidence:` | 1–5 / 0–1 | — |
 | `verified_at:` / `verified_against:` | data + o que foi medido | ausente em nó `PROD` → `STALE-MISSING` |
+| `valid_from:` · `source_tier:` (1–10) · `source_kind:` | opcionais em `evidence` — bi-temporal (o fato ≠ a verificação) e autoridade da fonte | confundir `valid_from` com `verified_at`; tier alto em blog de concorrente (`vendor-on-competitor`) |
+| `meta.review_after:` | data de revisita (grafos de pesquisa) | ausente em grafo novo de pesquisa → SOFT; vencido → SOFT |
 
 **Formato estrito:** o radar é `awk`, não parser YAML. Uma chave por linha; listas com `- id:` /
 `- from:`. `id` em **inglês**, `label` em **pt-BR**.

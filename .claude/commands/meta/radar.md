@@ -48,6 +48,8 @@ introspecção e **zero percepção externa recorrente** (S9 parada desde 07-06)
    por eixo, schemas com `source`+`source_date` obrigatórios, `.filter(Boolean)` + contagem de
    descarte). Método nos prompts: **search-by-trajectory** (created:> + sort=stars, HN Algolia)
    e **follow-the-money** — buscar por nome conhecido só acha incumbente.
+   A lente inteira (corpus primeiro, tiers de fonte, bi-temporal, revisita) vive em
+   [`common/prompts/research-doctrine.md`](../common/prompts/research-doctrine.md) — referencie, não copie.
 3. **write(KG)** + radar exit 0 + SYNTHESIS com contrato de custo (run_id/tokens/agents/duration).
 4. **Selar a baseline**: atualizar `last_run` e `kg:` do eixo em `docs/onion/radar-baselines.yaml`
    **no mesmo commit** do grafo — baseline sem rodada é o carimbo-sem-medição que o

@@ -2,6 +2,7 @@ meta:
   id: radar-E3-2026-09-02
   schema_version: "1"
   baseline: 2026-09-02
+  review_after: 2026-10-17   # revisita (versao do Claude Code 45d (= REGRA 65)) — REGRA 67
   # kg-backlog-guard: on
   # ═══ TETO: 20 NÓS. Rodada fechada: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
   # Rodada 1 do /meta:radar, eixo E3 (claude-code-delta): delta 2.1.252 (baseline 2026-08-31,

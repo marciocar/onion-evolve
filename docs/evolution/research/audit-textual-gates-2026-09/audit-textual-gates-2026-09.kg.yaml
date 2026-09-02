@@ -2,6 +2,7 @@ meta:
   id: audit-textual-gates-2026-09
   schema_version: "1"
   baseline: 2026-09-02
+  review_after: 2026-12-31   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
   # ═══ TETO: 26 NÓS. Auditoria fechada: cresce só por gate novo medido ou cura executada (E_CURA_*). ═══
   # Execucao da D_AUDITAR_GATES_TEXTUAIS (fable-5-1-superacao-2026-09.kg.yaml), selada pelo maestro em

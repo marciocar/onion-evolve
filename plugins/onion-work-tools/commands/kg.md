@@ -69,6 +69,7 @@ meta:
   id: <slug>
   schema_version: "1"        # versão da gramática — o radar RECUSA (--schema) se divergir da que entende
   baseline: AAAA-MM-DD       # opcional: nó PROD com verified_at anterior a esta data = STALE-OLD (--freshness)
+  review_after: AAAA-MM-DD   # grafos de PESQUISA: quando revisitar (cadência por tipo — ferramenta 30d · modelos 45d · mercado 90d · benchmark 120d · doutrina 12m); vencido = SOFT no lint
   date: AAAA-MM-DD
 nodes:
   - id: C_MEU_CLAIM          # prefixos por convenção: C_ claim · E_ evidence · D_ decision · Q_ question · A_ artifact
@@ -82,6 +83,10 @@ nodes:
                              # drifted/unverifiable: saída de re-verificação (/meta:kg-freshness)
     verified_against: branch # nomeia o ALVO verificado (branch|commit|deploy|config|dump:) — rastreia por frescor mesmo em DEV; obrigatório junto de verified_at EM node_type: claim (ausente = ⚠ UNANCHORED); nos demais tipos a âncora é trace:/TRACES_TO
     verified_at: AAAA-MM-DD  # quando a claim foi cruzada com o vivo (nó PROD ou com verified_against; ausente = ⚠ STALE-MISSING)
+    valid_from: AAAA-MM-DD   # opcional (evidence): quando o FATO passou a valer — bi-temporal: ≠ verified_at (quando VOCÊ verificou)
+    source_tier: 8           # opcional (evidence): autoridade da fonte 1-10 (escala DREAM: 9-10 definitiva · 7-8 alta · 4-6 moderada · 1-3 baixa)
+    source_kind: primary     # opcional (evidence): primary | paper | engineer | analyst | forum | vendor-on-competitor | aggregator
+                             # confidence ≥ 0.8 com tier ≤ 3 ou vendor-on-competitor = SOFT no lint (doutrina: common/prompts/research-doctrine.md)
     label: "afirmacao verificavel em uma frase"
     trace: "arquivo:linha"   # migalha inline (o radar ignora; humanos e LLMs seguem)
 edges:
@@ -109,6 +114,7 @@ eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção de um a
 - Vazio → `ls docs/onion/graph/*.kg.yaml` e propor o existente mais recente.
 
 ### Passo 2 — Modelar (o juízo é seu; a estrutura é do schema)
+- **Pesquisa?** Antes de modelar, a lente: [`research-doctrine.md`](../common/prompts/research-doctrine.md) (corpus primeiro via `kg-corpus-grep.sh`, mercado invariante, tier de fonte, bi-temporal, revisita).
 - Cada **achado** vira `claim` com `plane` honesto (conclusão tirada de branch = DEV; medição do
   artefato vivo = PROD) e `trace` para a fonte.
 - Cada **verificação** vira `evidence` + aresta `SUPPORTS` ou `REFUTES`. Refutou? O claim **fica**
