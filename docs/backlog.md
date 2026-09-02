@@ -78,7 +78,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 19.6 | `Q_EXP_JUIZ_FABLE_CALIBRACAO` | fable-5-1-superacao-2026-09 | EXPERIMENTO: juiz do kg-freshness/censo opus/high → fable/high SO na faixa CONFIRMED. Metrica: re-rodar a calibracao contra o ME |
-| 8.4 | `D_HOOK_PREMODELSWITCH_GUARDA` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA: hook PreModelSwitch (2.1.251+) como guarda determinística contra troca/downgrade silencioso de modelo — vetar |
+| 11.2 | `D_HOOK_PREMODELSWITCH_GUARDA` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA: hook PreModelSwitch (2.1.251+) como guarda determinística contra troca/downgrade silencioso de modelo — vetar |
 | 6.4 | `C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE` | fable-5-1-superacao-2026-09 | HIPOTESE (nao selada; EMENDA DO JUIZ: 1M de contexto NAO e novidade do 5.1 — Opus 5 e Fable 5 ja eram 1M, agent-orchestration.md |
 | 5.6 | `D_TIERING_SSOT_UNICA_E_EFFORT` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA (2 partes, sem experimento de modelo): (a) a tabela de tiering replicada em ~8 docs vira UMA fonte (agent-orchest |
 | 5.4 | `D_RETIER_COMPLIANCE_E_GATES_PREPR` | fable-5-1-superacao-2026-09 | DECISAO PROPOSTA (barata, mas NAO selada — depende de leitura dos corpos, lacuna 3 do inventario): alinhar o model: dos agentes  |
