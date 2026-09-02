@@ -129,6 +129,30 @@
           }
         ]
       }
+    ],
+    "PreModelSwitch": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/premodelswitch-guard.sh\"",
+            "timeout": 5,
+            "statusMessage": "Guarda de modelo da sessão (Onion): veta downgrade fora do lineup"
+          }
+        ]
+      }
+    ],
+    "PostModelSwitch": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/premodelswitch-guard.sh\"",
+            "timeout": 5,
+            "statusMessage": "Registrando troca de modelo (Onion)"
+          }
+        ]
+      }
     ]
   }
 }
