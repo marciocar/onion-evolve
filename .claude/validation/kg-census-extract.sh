@@ -51,7 +51,7 @@ def node_block(t,nid):
     if i<0: return None
     ends=[x for x in (t.find('\n  - id: ',i+1), t.find('\nedges:',i+1)) if x>0]
     return t[i:min(ends) if ends else len(t)]
-cache={}; frescos=[]; medir=[]; cortados_floor=0
+cache={}; frescos=[]; medir=[]; testemunho=[]; cortados_floor=0
 cutoff=(datetime.date.today()-datetime.timedelta(days=window)).isoformat()
 for r in rows:
     p=paths[r['grafo']]
@@ -65,11 +65,14 @@ for r in rows:
     lab=re.search(r"label:\s*'((?:[^']|'')*)'", b) or re.search(r'label:\s*"([^"]*)"', b)
     r['label']=(lab.group(1) if lab else '')[:300]
     if r['atencao']<floor: cortados_floor+=1; continue
+    # TESTEMUNHO (evidence_class: testimony): a fonte é relato — medir é circular. Sai NOMEADO,
+    # nunca para a fila de workers (74k tokens/nó para concluir UNVERIFIABLE por construção).
+    if re.search(r'^\s*evidence_class:\s*testimony\b', b, re.M): testemunho.append(r); continue
     (frescos if r['verified_at']>=cutoff else medir).append(r)
 out={'declarado':declared,'janela_dias':window,'piso_atencao':floor,
-     'frescos':frescos,'medir':medir,'cortados_pelo_piso':cortados_floor}
+     'frescos':frescos,'medir':medir,'testemunho':testemunho,'cortados_pelo_piso':cortados_floor}
 if fmt=='summary':
-    print(f"censo-extract: {declared} abertos → {len(medir)} A-MEDIR · {len(frescos)} FRESCOS (janela {window}d) · {cortados_floor} cortados pelo piso {floor} (corte DECLARADO)")
+    print(f"censo-extract: {declared} abertos → {len(medir)} A-MEDIR · {len(frescos)} FRESCOS (janela {window}d) · {len(testemunho)} TESTEMUNHO (não-mensuráveis, nomeados) · {cortados_floor} cortados pelo piso {floor} (corte DECLARADO)")
 else:
     print(json.dumps(out, ensure_ascii=False))
 PYEOF

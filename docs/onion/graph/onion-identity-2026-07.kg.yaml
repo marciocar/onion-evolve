@@ -691,24 +691,26 @@ nodes:
   - id: E_ORIGEM_CURSOR_AGNOSTICO
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV   # era PROD; relato não cruza com artefato vivo (reclassificado 2026-09-02)
     impact: 5
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-02
     verified_against: relato-do-maestro-2026-08-02
+    evidence_class: testimony   # fonte é RELATO — não re-verificável por máquina (Q_TESTEMUNHO_NAO_MEDIVEL_0804)
     label: "ORIGEM: o Onion nasceu nos experimentos do maestro com o CURSOR, e desde o inicio buscando ser AGNOSTICO. O repo mais antigo da familia e onion-architect (marciocar/onion-architect, criado 2025-12-01, publico, 'framework de comandos Cursor com abstracao de Task Manager') — a abstracao de provider ja estava la, antes de existir Claude Code no desenho"
     trace: "https://github.com/marciocar/onion-architect"
 
   - id: E_PORTE_PARA_O_CURSO
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV   # era PROD; relato não cruza com artefato vivo (reclassificado 2026-09-02)
     impact: 5
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-02
     verified_against: relato-do-maestro-2026-08-02
+    evidence_class: testimony   # fonte é RELATO — não re-verificável por máquina (Q_TESTEMUNHO_NAO_MEDIVEL_0804)
     label: "O MULTI-IDE FOI ATO DELIBERADO COM PROPOSITO DE NEGOCIO, nao dispersao: para atender ao Curso de Desenvolvimento com IA (spec-as-code) na PULSE MAIS, a versao Cursor foi TRANSPORTADA para Claude, Antigravity, Codex e outros — cada repo adaptado as REGRAS DA FERRAMENTA. Os ALUNOS usaram o onion-portable como padrao. Ou seja: houve USO DE CAMPO com alunos reais, nao prova de conceito"
 
   - id: E_FAMILIA_MULTIIDE_CONGELADA
@@ -726,12 +728,13 @@ nodes:
   - id: D_CLAUDE_CODE_POR_CAPACIDADE
     node_type: decision
     layer: audit
-    plane: PROD
+    plane: DEV   # era PROD; relato não cruza com artefato vivo (reclassificado 2026-09-02)
     impact: 5
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-02
     verified_against: relato-do-maestro-2026-08-02
+    evidence_class: testimony   # fonte é RELATO — não re-verificável por máquina (Q_TESTEMUNHO_NAO_MEDIVEL_0804)
     label: "A DECISAO FOI TECNICA, NAO ABANDONO DO AGNOSTICISMO: optou-se por PARAR DE GASTAR ENERGIA sendo agnostico e assumir o Claude Code como ferramenta principal PARA PODER USAR RECURSOS MODERNOS — nominalmente o SendMessage entre agentes no modo Teams. Trade-off explicito: capacidade de fronteira > portabilidade horizontal. Isto REENQUADRA a linha 'Plataforma unica: Claude Code' do CLAUDE.md: ela e a CONCLUSAO de um experimento multi-IDE de escala real, nao uma restricao de origem"
     trace: "docs/analysis/onion-review-2026-05.md"
 
@@ -760,12 +763,13 @@ nodes:
   - id: C_FATIAS_JA_TESTADAS
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV   # era PROD; relato não cruza com artefato vivo (reclassificado 2026-09-02)
     impact: 4
     confidence: 0.8
     status: done
     verified_at: 2026-08-30
     verified_against: relato-do-maestro-2026-08-02
+    evidence_class: testimony   # fonte é RELATO — não re-verificável por máquina (Q_TESTEMUNHO_NAO_MEDIVEL_0804)
     label: "CONSUMO EM FATIAS NAO E HIPOTESE — JA HOUVE TESTE: criacao de plugin e skills para o Onion, incluindo testes de INSTALACAO E USO DAS SKILLS DE FORMA SEPARADA, e uso do Onion (inclusive com a ponte junto ao Claude Code) COMO PARTE, sendo usado por outros projetos. ABERTO porque o RESULTADO desses testes nao esta registrado em lugar nenhum do repo — e conhecimento que existe fora do grafo. Proximo passo: o maestro relata o que mostraram, ou roda-se um teste novo com medicao"
 
   - id: C_ERRO_CONSOLIDADO_VS_DIVIDIDO
@@ -888,7 +892,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.5
-    status: open
+    status: done
     verified_at: 2026-09-01
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 5/5 claims; juiz APROVADO. 1) Lido o nó completo (linhas 882-890) e as 2 edges DEPENDS_ON (linhas 1308-1313 => O nó afirma 5 coisas: (1) nós TESTEMUNHO (verified_against: relato-do-maestro-*) são estruturalmente…'
     label: "nos da classe TESTEMUNHO (verified_against: relato-do-maestro-*) sao estruturalmente nao-re-verificaveis por maquina: afirmam INTENCAO ('proposito de negocio') ou fato de campo fora do repo ('alunos reais usaram'), e a unica checagem disponivel — o texto que codificou o relato — e circular. Hoje eles passam nos tres vereditos do radar exibindo carimbo fresco, indistinguiveis de um no medido. Precisam de marcador proprio (ex.: evidence_class: testimony) para o radar parar de trata-los como mensuraveis?"
@@ -992,6 +996,18 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — grep no nó (linhas 424-432) + trace F2 Q3/Q5; leitura de C_ICP_REGULATED/C_ICP_TENSION (já'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (F2, jul/2026, status open) foi SUPERSEDIDO por D6 (decisions.md, ratificado 2026-07-25): as claims 1 e 2 (vertical rara + casa com ICP regulado) viraram decisão canônica confirmada ("whitespace compliance-peer confirmado", diferencial #1 em strategy.md) — não precisam mais ser "claim aberta", '
+
+  - id: E_W9_TESTIMONY_MECANIZADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-09-02
+    verified_against: "bash .claude/validation/kg-radar.sh <este grafo> --freshness (ℹ 4 nó(s) TESTEMUNHO; 0 TESTIMONY-UNMARKED); --freshness-tsv | grep -c TESTIMONY$ = 4; bancada kg-freshness (c3) e census-extract (d)"
+    label: "RESPOSTA a Q_TESTEMUNHO_NAO_MEDIVEL_0804 (drive W9, 2026-09-02): SIM, precisam de marcador proprio — e ele existe: evidence_class: testimony (default ausente = measured). O radar para de tratar o testemunho como mensuravel (nao cobra STALE-OLD; verdict TESTIMONY; conta em linha propria), acusa relato SEM marcador (TESTIMONY-UNMARKED, so quando o alvo COMECA por relato- — o carimbo de censo que CITA o vocabulario nao e acusado, a classe guarda-por-vocabulario mordeu no 1o dogfood) e acusa testemunho que se diz PROD (MISPLANED: relato nao cruza com artefato vivo). O extrator do censo nao enfileira testemunho (74k tokens/no para concluir UNVERIFIABLE por construcao). Os 4 nos desta SSOT (E_ORIGEM_CURSOR_AGNOSTICO, E_PORTE_PARA_O_CURSO, D_CLAUDE_CODE_POR_CAPACIDADE, C_FATIAS_JA_TESTADAS) foram classificados e reclassificados PROD->DEV; E_FAMILIA_MULTIIDE_CONGELADA segue medido (fonte primaria gh-api; o relato apoia). Teto declarado: o marcador e opt-in — relato carimbado com alvo que NAO comece por relato- continua invisivel."
+    trace: ".claude/validation/kg-radar.sh"
 
 edges:
   - from: D_NORTHSTAR_NS1_KG
@@ -1327,3 +1343,6 @@ edges:
   - from: E_CENSO0901_C_COMPLIANCE_RARE
     to: C_COMPLIANCE_RARE
     edge_type: SUPERSEDES
+  - from: E_W9_TESTIMONY_MECANIZADO
+    to: Q_TESTEMUNHO_NAO_MEDIVEL_0804
+    edge_type: SUPPORTS

@@ -409,6 +409,20 @@ run_kg_freshness_selftests() {
     record_pass "kg-freshness: superseded/refuted não cobrados; nó vivo sem carimbo ainda cobrado"
   else record_fail "kg-freshness: superseded-not-chased" "rc=${rc} out=${out}"; fi
 
+  # (c3) TESTEMUNHO (2026-09-02): marcado não é cobrado por STALE-OLD e sai como TESTIMONY no TSV;
+  #      relato sem marcador é acusado; carimbo que só CITA o vocabulário não é; testimony+PROD é MISPLANED.
+  rc=0; out=$(bash "${radar}" "${fx}/testimony.kg.yaml" --freshness 2>&1) || rc=$?
+  local tsv; tsv=$(bash "${radar}" "${fx}/testimony.kg.yaml" --freshness-tsv 2>/dev/null | awk -F'\t' '$1=="T_MARCADO"{print $11}')
+  if [ "${rc}" -eq 0 ] \
+     && ! grep -q 'STALE-OLD: T_MARCADO' <<<"${out}" \
+     && grep -q '2 nó(s) TESTEMUNHO' <<<"${out}" \
+     && grep -q 'TESTIMONY-UNMARKED: T_NU' <<<"${out}" \
+     && ! grep -q 'TESTIMONY-UNMARKED: T_CITA' <<<"${out}" \
+     && grep -q 'MISPLANED: T_PROD' <<<"${out}" \
+     && [ "${tsv}" = "TESTIMONY" ]; then
+    record_pass "kg-freshness: (c3) testimony não cobra STALE-OLD, TSV=TESTIMONY; relato nu acusado; citação não; testimony+PROD é MISPLANED"
+  else record_fail "kg-freshness: testimony" "rc=${rc} tsv=${tsv} out=${out}"; fi
+
   # (d) schema-divergent --schema: schema_version ≠ radar → RECUSA com exit 1 (não é aviso)
   rc=0; out=$(bash "${radar}" "${sx}/schema-divergent.kg.yaml" --schema 2>&1) || rc=$?
   if [ "${rc}" -eq 1 ] && grep -q 'schema_version divergente' <<<"${out}"; then
@@ -10720,6 +10734,13 @@ run_census_extract_selftests() {
   if [ $rc -eq 0 ] && printf '%s' "$out" | grep -q '1 cortados pelo piso 5.0 (corte DECLARADO)'; then
     record_pass "census-extract: (c) --floor corta e o corte é DECLARADO (nunca silêncio)"
   else record_fail "census-extract: (c)" "piso sem declaração (rc=$rc): $out"; fi
+  # (d) TESTEMUNHO sai NOMEADO, nunca para a fila de workers (medir relato é circular e custa 74k/nó)
+  printf 'meta:\n  id: fx\nnodes:\n  - id: N_VELHO\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: 2026-01-01\n    label: "b"\n  - id: N_RELATO\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: 2026-01-01\n    verified_against: relato-x\n    evidence_class: testimony\n    label: "c"\n' > "$d/docs/onion/graph/fx.kg.yaml"
+  printf '**2 itens abertos**\n| 9.0 | `N_VELHO` | fx | b |\n| 3.0 | `N_RELATO` | fx | c |\n' > "$d/backlog.md"
+  out="$(cd "$d" && ONION_CENSUS_ROOT="$d" ONION_CENSUS_BACKLOG="$d/backlog.md" bash "${ex}" --format summary 2>&1)"; rc=$?
+  if [ $rc -eq 0 ] && printf '%s' "$out" | grep -q '1 A-MEDIR' && printf '%s' "$out" | grep -q '1 TESTEMUNHO'; then
+    record_pass "census-extract: (d) testimony sai da fila A-MEDIR, NOMEADO como TESTEMUNHO"
+  else record_fail "census-extract: (d)" "testemunho não particionado (rc=$rc): $out"; fi
   rm -rf "$d"
 }
 

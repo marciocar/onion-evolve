@@ -1,0 +1,56 @@
+# Fixture: classe TESTEMUNHO (evidence_class: testimony, 2026-09-02 — Q_TESTEMUNHO_NAO_MEDIVEL_0804).
+# Espera (--freshness, exit 0): T_MARCADO NÃO recebe STALE-OLD (re-carimbar relato é circular) e
+# conta na linha ℹ TESTEMUNHO; T_NU (alvo começa por `relato-`, sem marcador) → TESTIMONY-UNMARKED;
+# T_CITA (carimbo de censo que só CITA "relato-do-maestro-*") → NADA (guarda-por-vocabulário);
+# T_PROD (testimony + plane:PROD) → MISPLANED. No --freshness-tsv, T_MARCADO tem verdict TESTIMONY.
+meta:
+  id: fixture-testimony
+  schema_version: "1"
+  baseline: 2026-08-10
+nodes:
+  - id: T_MARCADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-02
+    verified_against: relato-do-maestro-2026-08-02
+    evidence_class: testimony
+    label: "origem relatada pelo maestro (não re-verificável por máquina)"
+  - id: T_NU
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: relato-de-aluno-2026-08-20
+    label: "claim carimbada por relato, sem se classificar"
+  - id: T_CITA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    verified_at: 2026-08-20
+    verified_against: '/meta:census 2026-08-20: nós TESTEMUNHO (verified_against: relato-do-maestro-*) são…'
+    label: "pergunta cujo carimbo CITA o vocabulário do relato"
+  - id: T_PROD
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-20
+    verified_against: relato-do-maestro-2026-08-20
+    evidence_class: testimony
+    label: "testemunho que se diz PROD"
+edges:
+  - from: T_MARCADO
+    to: T_CITA
+    edge_type: SUPPORTS

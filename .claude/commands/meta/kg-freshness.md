@@ -82,6 +82,12 @@ bash .claude/validation/kg-radar.sh <arquivo> --freshness-tsv | sort -t$'\t' -k7
 11 colunas: `id · node_type · plane · status · impact · confidence · atenção · verified_at ·
 verified_against · trace · verdict`.
 
+**`verdict: TESTIMONY` NUNCA entra na fila.** Nó com `evidence_class: testimony` (fonte é
+RELATO — intenção, fato de campo fora do repo) é não-re-verificável por construção: o worker
+concluiria `UNVERIFIABLE` a 74k tokens/nó. O radar o conta em linha própria (`ℹ N nó(s) TESTEMUNHO`),
+acusa `TESTIMONY-UNMARKED` quando o alvo começa por `relato-` sem o marcador, e `MISPLANED` quando
+testemunho se diz `plane: PROD`. (Q_TESTEMUNHO_NAO_MEDIVEL_0804, mecanizado 2026-09-02.)
+
 **Diga em voz alta no relatório:** nós com `verdict: OK` **permanecem na fila**. O carimbo diz
 se a SSOT está bem-formada; a **atenção** diz o que custa caro estar errado. Re-verifica-se
 pelo **custo do erro**, não pela ausência do carimbo — senão o fluxo nasce cego ao caso que o
