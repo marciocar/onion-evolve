@@ -201,6 +201,28 @@ nodes:
     label: 'FECHA A LACUNA 2 POR MEDICAO: o alias `fable` do Agent tool desta sessao (nao-gateway) resolve para claude-fable-5-1 — o mesmo molde que fechou o gap do `opus` (Q_E3_DELTA_2_1_257). Escopo: Workflow tool NAO medido; sessoes via gateway seguem o CHANGELOG l.99. Detalhe e consequencias na pesquisa de superacao (fable-5-1-superacao-2026-09.kg.yaml, E_PROBE_ALIAS_FABLE_5_1).'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-fable-alias.md'
 
+  - id: E_REGRA65_CEGA_AO_PROCESSO_0902
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: '/proc/<pid>/exe da sessao interativa do maestro → …/versions/2.1.247 (deleted), iniciada 2026-08-27; disco (symlink ~/.local/bin/claude) → 2.1.258; picker do /model: "Fable 5.1 (disabled) — Update to 2.1.255+"; lint REGRA 65 dizia instalado=2.1.258'
+    label: 'MEDIDO: o auto-updater troca o binario com a sessao VIVA — a sessao do maestro rodou 2.1.247 por 6 dias com o disco em 2.1.258. Picker de modelo, hooks (PreModelSwitch so existe em >= 2.1.251) e capacidades refletem o PROCESSO, nao o disco. A REGRA 65 comparava cc_version com `claude --version` (DISCO) e afirmava "instalado=2.1.258": declarado != verificado, exatamente a classe que a regra existe para pegar. Dano: Fable 5.1 invisivel por 6 dias; 1 rodada de medicao do hook perdida. 4 sessoes abaixo de 2.1.255 no host naquele momento.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md'
+
+  - id: D_REGRA65_MEDE_O_PROCESSO
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'hook session-version-drift.sh no UserPromptSubmit: drift simulado (ONION_CC_EXECPATH=…/2.1.247) emitiu o aviso com as 2 versoes, 2a vez calou (rate-limit), sem drift calou; bancada run_version_drift_selftests 5/5 com claude sintetico (symlink → versions/X) + radar-staleness (f)/(g) 2/2; lint REGRA 65 prefere CLAUDE_CODE_EXECPATH e emite SOFT proprio processo != disco. O 1o commit foi REPROVADO pelo pre-commit: o CLAUDE_CODE_EXECPATH da sessao VAZAVA para dentro do fixture (f) e o caso mudava de resultado entre CI e pre-commit — cura: override ONION_CC_EXECPATH vale quando DEFINIDO (mesmo vazio), a bancada isola'
+    label: 'APLICADO: (a) hook UserPromptSubmit session-version-drift.sh compara a versao do PROCESSO (CLAUDE_CODE_EXECPATH, senao /proc/$CLAUDE_PID/exe com deteccao de "(deleted)") com a do DISCO e avisa 1x por (sessao, versao-do-disco) — no UserPromptSubmit e nao no SessionStart porque o drift nasce DEPOIS do inicio, quando o updater roda; nunca bloqueia (reiniciar e ato do maestro). (b) a REGRA 65 passa a ler o processo quando roda dentro de uma sessao e ganha um 2o SOFT "processo != disco — reinicie" (cura diferente: reiniciar, nao rodar o radar). Vendorizado em todo adotante (settings.json) — e sobre o Claude Code, nao sobre o core. Gatilho disparado: E_REGRA65_CEGA_AO_PROCESSO_0902. Fronteira: nao detecta processo velho a partir do CI (sem sessao) — la o disco e a unica verdade.'
+    trace: '.claude/hooks/session-version-drift.sh'
+
 edges:
   - from: E_F1_FABLE_5_1_DEFAULT
     to: Q_E3_DELTA_2_1_257
@@ -248,5 +270,11 @@ edges:
     to: E_LACUNAS_DECLARADAS_E3_0902
     edge_type: SUPPORTS
   - from: E_PROBE_ALIAS_FABLE_MEDIDO_0902
+    to: E_LACUNAS_DECLARADAS_E3_0902
+    edge_type: SUPPORTS
+  - from: E_REGRA65_CEGA_AO_PROCESSO_0902
+    to: D_REGRA65_MEDE_O_PROCESSO
+    edge_type: SUPPORTS
+  - from: E_REGRA65_CEGA_AO_PROCESSO_0902
     to: E_LACUNAS_DECLARADAS_E3_0902
     edge_type: SUPPORTS

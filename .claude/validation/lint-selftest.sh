@@ -3726,6 +3726,49 @@ run_compose_settings_selftests() {
 # a string do modelo, o oráculo é o rc (2 = veto, 0 = passa). Modo-de-falha coberto: o veto que
 # NÃO dispara (prosa/heredoc citando o vocabulário) e o que dispara demais (feature branch).
 # ---------------------------------------------------------------------------
+# ── session-version-drift (UserPromptSubmit): processo ≠ disco ────────────────────────────────
+# previne: a classe medida em 2026-09-02 — sessão rodando binário deletado (2.1.247) com o disco em
+# 2.1.258; picker/hooks refletem o PROCESSO e o lint dizia "instalado=2.1.258". A bancada fabrica um
+# `claude` sintético (symlink → versions/X, como o instalador real) e injeta o caminho do processo.
+run_version_drift_selftests() {
+  local hk="${REPO_ROOT}/.claude/hooks/session-version-drift.sh"
+  if [ ! -f "${hk}" ]; then record_fail "version-drift" "hook ausente: ${hk}"; return; fi
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/bin" "${d}/versions" "${d}/state"
+  : > "${d}/versions/2.1.258"; chmod +x "${d}/versions/2.1.258"
+  ln -s "${d}/versions/2.1.258" "${d}/bin/claude"
+  # _vd <execpath> <state-dir> → stdout do hook (rc sempre 0 — hook nunca bloqueia)
+  _vd() {
+    local rc=0 out
+    out="$(ONION_CC_EXECPATH="$1" ONION_CC_BIN="${d}/bin/claude" ONION_VERSION_DRIFT_STATE_DIR="$2" \
+      CLAUDE_CODE_SESSION_ID=bench CLAUDE_PID= bash "${hk}" </dev/null 2>/dev/null)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  local r
+  r="$(_vd /x/versions/2.1.247 "${d}/state")"
+  case "${r}" in
+    "0|"*2.1.247*2.1.258*) record_pass "version-drift: processo 2.1.247 vs disco 2.1.258 → AVISA (rc=0)" ;;
+    *) record_fail "version-drift: processo≠disco" "esperava aviso com as 2 versões e rc=0, veio: ${r:0:120}" ;;
+  esac
+  r="$(_vd /x/versions/2.1.247 "${d}/state")"
+  [ "${r}" = "0|" ] && record_pass "version-drift: 2ª vez mesma (sessão,disco) → CALA (rate-limit)" \
+    || record_fail "version-drift: rate-limit" "esperava silêncio, veio: ${r:0:120}"
+  r="$(_vd /x/versions/2.1.258 "${d}/state")"
+  [ "${r}" = "0|" ] && record_pass "version-drift: processo == disco → silêncio" \
+    || record_fail "version-drift: iguais" "esperava silêncio, veio: ${r:0:120}"
+  r="$(_vd "" "${d}/state")"
+  [ "${r}" = "0|" ] && record_pass "version-drift: sem sinal do processo → silêncio (não inventa)" \
+    || record_fail "version-drift: sem sinal" "esperava silêncio, veio: ${r:0:120}"
+  # disco avançou de novo → avisa de novo (marker é por versão do disco)
+  : > "${d}/versions/2.1.259"; chmod +x "${d}/versions/2.1.259"; ln -sfn "${d}/versions/2.1.259" "${d}/bin/claude"
+  r="$(_vd /x/versions/2.1.247 "${d}/state")"
+  case "${r}" in
+    "0|"*2.1.259*) record_pass "version-drift: disco andou 2.1.258→2.1.259 → AVISA de novo" ;;
+    *) record_fail "version-drift: disco andou" "esperava novo aviso citando 2.1.259, veio: ${r:0:120}" ;;
+  esac
+  rm -rf "${d}"
+}
+
 run_pretooluse_veto_selftests() {
   local pm="${REPO_ROOT}/.claude/hooks/pretooluse-protect-main.sh"
   local mg="${REPO_ROOT}/.claude/hooks/pretooluse-merge-gate.sh"
@@ -10907,10 +10950,19 @@ run_radar_staleness_selftests() {
   printf '#!/usr/bin/env bash\necho "9.9.9 (Claude Code)"\n' > "$d/bin/claude-stub"
   chmod +x "$d/bin/claude-stub"
   printf 'axes:\n  - id: E3\n    last_run: %s\n    cc_version: "1.0.0"\n' "${fresh_date}" > "$d/ccver.yaml"
-  rc=0; out="$(ONION_CC_BIN="$d/bin/claude-stub" ONION_RADAR_BASELINES="$d/ccver.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  # ONION_CC_EXECPATH= (definido-vazio) isola a bancada do CLAUDE_CODE_EXECPATH da sessão que a roda —
+  # sem isso o caso muda de resultado conforme roda no CI (sem sessão) ou no pre-commit (dentro de uma).
+  rc=0; out="$(ONION_CC_EXECPATH= ONION_CC_BIN="$d/bin/claude-stub" ONION_RADAR_BASELINES="$d/ccver.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
   if printf '%s' "${out}" | grep -q 'mudou de versão desde a última rodada de estratégia (rodada=1.0.0, instalado=9.9.9)'; then
     record_pass "radar-staleness: (f) troca de versão do Claude Code dispara SOFT de re-medição de estratégia"
   else record_fail "radar-staleness: (f)" "gatilho de versão não disparou (rc=${rc}): ${out}"; fi
+
+  # (g) PROCESSO > DISCO (2026-09-02): dentro de uma sessão a versão que importa é a do processo
+  # (CLAUDE_CODE_EXECPATH); processo ≠ disco é um 2º SOFT próprio (cura = reiniciar, não radar).
+  rc=0; out="$(ONION_CC_EXECPATH=/x/versions/2.1.247 ONION_CC_BIN="$d/bin/claude-stub" ONION_RADAR_BASELINES="$d/ccver.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q 'rodada=1.0.0, processo=2.1.247)' && printf '%s' "${out}" | grep -q 'roda o Claude Code 2.1.247 mas o disco já tem 9.9.9'; then
+    record_pass "radar-staleness: (g) sessão em binário velho: SOFT nomeia processo=2.1.247 + 2º SOFT processo≠disco (reinicie)"
+  else record_fail "radar-staleness: (g)" "processo/disco não distinguidos (rc=${rc}): ${out}"; fi
 
   rm -rf "$d"
 }
@@ -11136,6 +11188,7 @@ run_decouple_source_selftests
 run_kg_view_selftests
 run_kg_status_factor_selftests
 run_pretooluse_veto_selftests
+run_version_drift_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
 run_kg_scope_selftests
