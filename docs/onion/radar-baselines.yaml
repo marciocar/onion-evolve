@@ -13,10 +13,10 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-08-31
-    cc_version: "2.1.252"   # versão do Claude Code na rodada — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "3/11"
-    kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
+    last_run: 2026-09-02
+    cc_version: "2.1.257"   # versão do Claude Code na rodada — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "0/11"       # rodada 1: 7 achados meus (3 aprovados, 4 emendados) + 4 omissões do juiz; 0 descartados
+    kg: docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml

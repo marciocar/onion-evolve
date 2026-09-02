@@ -82,6 +82,12 @@ bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --freshness-tsv | so
 11 colunas: `id · node_type · plane · status · impact · confidence · atenção · verified_at ·
 verified_against · trace · verdict`.
 
+**`verdict: TESTIMONY` NUNCA entra na fila.** Nó com `evidence_class: testimony` (fonte é
+RELATO — intenção, fato de campo fora do repo) é não-re-verificável por construção: o worker
+concluiria `UNVERIFIABLE` a 74k tokens/nó. O radar o conta em linha própria (`ℹ N nó(s) TESTEMUNHO`),
+acusa `TESTIMONY-UNMARKED` quando o alvo começa por `relato-` sem o marcador, e `MISPLANED` quando
+testemunho se diz `plane: PROD`. (Q_TESTEMUNHO_NAO_MEDIVEL_0804, mecanizado 2026-09-02.)
+
 **Diga em voz alta no relatório:** nós com `verdict: OK` **permanecem na fila**. O carimbo diz
 se a SSOT está bem-formada; a **atenção** diz o que custa caro estar errado. Re-verifica-se
 pelo **custo do erro**, não pela ausência do carimbo — senão o fluxo nasce cego ao caso que o
@@ -118,6 +124,13 @@ Contrato do worker (cada cláusula paga por um erro real desta casa):
   um worker declarou `permission denied` em `/home/onion/onion-bridge/src/`, carimbou o nó por
   inferência indireta, e `sudo ls` lia o diretório — ele já usara `sudo` em quatro comandos da
   mesma medição. Falta de acesso é hipótese até você ter tentado ([[verify-access-before-specifying]]).
+  **Distinga o bloqueio de FS do bloqueio de HARNESS** (delta Claude Code 2.1.257, radar E3
+  2026-09-02): com `permissions.blockReadsOutsideWorkingDirectories` ativo, leitura fora dos
+  working dirs (`/home/marcio/<adotante>`, `/home/onion/onion-bridge`) é recusada pelo *harness* —
+  `sudo` **não vence**, porque a parede não é o filesystem. Nesse caso devolva `UNVERIFIABLE` com
+  `blocked_by: harness bloqueia leitura fora dos working dirs (<path>)` sem gastar elevação; o
+  maestro decide liberar o diretório (`--add-dir`) e re-rodar. Elevar contra a parede errada é o
+  mesmo erro de 2026-08-12 com o sinal invertido.
 - **Nó COMPOSTO: o veredito é do TODO, não da maioria.** Um nó que afirma N mecânicas
   independentes recebe UM `verdict`. Mediu 3 de 3 ⇒ o veredito que a medição disser. Mediu 2 de 3
   ⇒ **`UNVERIFIABLE`**, com `blocked_by` nomeando a parte não medida — nunca arredonde para cima.

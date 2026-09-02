@@ -1,0 +1,223 @@
+meta:
+  id: radar-E3-2026-09-02
+  schema_version: "1"
+  baseline: 2026-09-02
+  # kg-backlog-guard: on
+  # ═══ TETO: 20 NÓS. Rodada fechada: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
+  # Rodada 1 do /meta:radar, eixo E3 (claude-code-delta): delta 2.1.252 (baseline 2026-08-31,
+  # E_F1_E3_CLAUDE_CODE_DELTA em maestro-vivo-2026-08.kg.yaml) -> 2.1.257 (instalado, `claude --version`).
+  # Gatilho: REGRA 65 SOFT (cc_version da baseline != binario). Fonte primaria: CHANGELOG.md oficial
+  # (data/changelog-2.1.257.md, linhas citadas por l.N). Juiz adversarial opus/high, mandato REFUTAR:
+  # 7 achados meus -> 3 APROVADOS, 4 EMENDADOS (numeros/afirmacoes corrigidos AQUI, nao no rascunho);
+  # 4 OMISSOES do juiz viraram F8-F11. Rascunho pre-juiz preservado em data/f1-findings-pre-juiz.md.
+  # O radar so enxerga arestas dentro de um arquivo: o vinculo com a baseline vai por trace:.
+
+nodes:
+  - id: Q_E3_DELTA_2_1_257
+    node_type: question
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'claude --version = 2.1.257 + CHANGELOG oficial entrada 2.1.257 (l.8-114) + juiz-e3 opus/high'
+    label: 'O que o delta 2.1.252->2.1.257 do Claude Code muda na maquinaria do Onion? (nao "quebrou algo?" — "o que isto muda na NOSSA estrategia?", ordem do maestro 2026-08-31). Respondido: 11 achados, nenhum quebra; 2 reforcam o gate (F5, F11); 3 mudam doutrina (F2 tiering, F4 acesso, F9 modo-de-falha de worker); 1 abre superficie (F8 worktree); 1 muda snapshot (F1).'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml#E_F1_E3_CLAUDE_CODE_DELTA'
+
+  - id: E_F1_FABLE_5_1_DEFAULT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG 2.1.257 l.10 + l.99; juiz EMENDOU (omitia l.99)'
+    label: 'F1 EMENDADO. Fable 5.1 (`claude-fable-5-1`) e o novo default Fable — 1M ctx, $10/$50 por MTok, cache read $0.25 (l.10). MAS l.99: em sessoes via gateway os aliases `fable`/`best` seguem resolvendo para Fable 5 "for now"; 5.1 so por `/model`. Workflow/Agent so aceitam o alias `fable` — e o MESMO gap de runtime que a KB ja nomeia para `opus` (agent-orchestration.md:319). Atualizar o snapshot para "5.1 e o frontier" sem essa nota reproduz declarado != executado.'
+    trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+
+  - id: E_F2_SUBAGENT_MODEL_FORCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG l.13; grep -c ^model: .claude/agents = 51/60; onion-orchestration/SKILL.md:123,144,171; grep SUBAGENT_MODEL_FORCE na maquinaria = 0'
+    label: 'F2 APROVADO. `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` aplica um so modelo a TODO subagente ignorando `model` por spawn e por definicao de agente (l.13). E exatamente o que o tiering-por-fase do Onion declara: 51 de 60 agentes trazem `model:` no frontmatter e a skill fixa model por spawn. Com a env setada, o relatorio de tiering MENTE (declara opus/high no juiz, executa o modelo forcado). Mencoes na maquinaria: 0 — nenhuma guarda hoje.'
+    trace: '.claude/skills/onion-orchestration/SKILL.md'
+
+  - id: D_TIERING_CHECA_ENV_FORCE
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-02
+    verified_against: 'derivada de E_F2_SUBAGENT_MODEL_FORCE; PROPOSTA — selagem e do maestro'
+    label: 'APLICADO (texto): o passo 8 da onion-orchestration ("declare o tier de cada fase") checa `CLAUDE_CODE_SUBAGENT_MODEL_FORCE`/`CLAUDE_CODE_SUBAGENT_MODEL` no ambiente e, se setadas, imprime AVISO "tiering declarado != executado (env force)" — behavior-over-declaration. Nota na KB agent-orchestration.md ("Primitivas Nativas"). Gatilho de mecanizar no lint: 1a orquestracao real rodando com a env setada.'
+    trace: '.claude/skills/onion-orchestration/SKILL.md'
+
+  - id: E_F3_BYPASS_EM_PROJECT_SETTINGS_IGNORADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG l.98; grep -l bypassPermissions em 26 settings*.json (/home/marcio/*/.claude + core) rc=1 (ausencia); onion-bridge src/workspace.ts:105 + config.ts:28; juiz EMENDOU 2 numeros'
+    label: 'F3 EMENDADO. `defaultMode: "bypassPermissions"` em `.claude/settings.json`/`settings.local.json` de PROJETO passa a ser IGNORADO (como "auto"); vale so em user/managed settings ou `--permission-mode` (l.98). Medido: 26 settings*.json varridos (nao "10 adotantes"), 0 ocorrencias, rc=1 = ausencia e nao erro. O bridge ESCREVE `.claude/settings.json` no workspace do convidado com `defaultMode: "default"` (workspace.ts:105) e o bypass vem de `config.permissionMode` do SDK (config.ts:28, fail-closed) — nao de settings. Impacto hoje: nenhum; a doutrina "exit 2 barra ate sob bypassPermissions" segue valida.'
+    trace: 'CLAUDE.md'
+
+  - id: E_F4_BLOCK_READS_FORA_WORKDIR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG l.16; kg-freshness.md:120-126 ("Bloqueio de acesso so vale TENTADO", cita /home/onion/onion-bridge/src/)'
+    label: 'F4 APROVADO. Auto mode ganha prompt unico antes da 1a leitura fora dos working dirs + `permissions.blockReadsOutsideWorkingDirectories` (l.16). O censo, o kg-freshness e o drive LEEM adotantes em /home/marcio/* e o bridge em /home/onion a partir da sessao do core. Se o bloqueio for ativado, workers passam a devolver UNVERIFIABLE por acesso — e a elevacao que a doutrina manda tentar (`sudo`) NAO vence esse bloqueio: e o harness, nao o FS. A doutrina precisa do caso distinto.'
+    trace: '.claude/commands/meta/kg-freshness.md'
+
+  - id: D_KG_FRESHNESS_DISTINGUE_BLOQUEIO_DE_HARNESS
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'edicao aplicada nesta rodada em kg-freshness.md (paragrafo apos "Bloqueio de acesso so vale TENTADO")'
+    label: 'APLICADO: kg-freshness.md distingue bloqueio de FS (elevar com sudo) de bloqueio de HARNESS (`blockReadsOutsideWorkingDirectories`: sudo nao vence; o worker devolve UNVERIFIABLE com blocked_by: "harness bloqueia leitura fora dos working dirs" e o maestro decide adicionar o dir via --add-dir). Sem isso o worker gastaria a elevacao contra a parede errada.'
+    trace: '.claude/commands/meta/kg-freshness.md'
+
+  - id: E_F5_GUARDAS_REFORCADAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG l.53 (permissions.ask em subshell), l.61 (deny Read/Edit cobre < file e tac/egrep), l.54 (plugin nao le fora via symlink); find plugins -type l | wc -l = 0 (rc=0); juiz EMENDOU: minha 1a medicao foi em .claude/plugins, que NAO EXISTE (fail-open)'
+    label: 'F5 EMENDADO (medicao fail-open corrigida). Tres reforcos de permissao: (a) `permissions.ask` agora vale dentro de comando composto/subshell em auto mode; (b) deny de Read()/Edit() em Bash cobre `< file` e leitores como tac/egrep; (c) plugin nao le fora do proprio dir por componente symlink. Re-medido no alvo REAL (plugins/, 8 plugins, manifesto .claude-plugin/marketplace.json): 0 symlinks. A 1a medicao rodou `find` sobre `.claude/plugins` inexistente — a classe que a guarda anti-fail-open do core existe para pegar, e o juiz pegou. Impacto: so reforco.'
+    trace: 'docs/evolution/research/radar-E3-2026-09-02/data/f1-findings-pre-juiz.md'
+
+  - id: E_F6_DETACHED_MORRE_NO_STOP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG l.69; grep -n setsid .claude/validation/lint-selftest.sh = so o decoy (l.9536-9537), morto por kill explicito (l.9555)'
+    label: 'F6 APROVADO (correcao factual do juiz): comandos que se destacam do shell (`timeout`/`setsid`) agora morrem no task stop / saida do Claude Code (l.69). Unico setsid do core e o decoy do selftest — que nao "auto-termina pelo sleep 30": e morto por `kill` explicito; e a mudanca so age em stop/exit, nao no fim normal. Efeito liquido: higiene a favor, sem impacto.'
+    trace: '.claude/validation/lint-selftest.sh'
+
+  - id: E_F7_EXIT2_INTACTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'grep -c "exit 2\|PreToolUse\|memory tool" na entrada 2.1.257 = 0 (rc=1); "hook" 2x (l.54, l.86), nenhuma toca semantica de bloqueio; juiz EMENDOU o non-sequitur'
+    label: 'F7 EMENDADO. Sem sinal no delta sobre hooks novos (PreModelSwitch etc.), memory tool nativo ou semantica do exit 2: a capacidade que compra o acoplamento permanece intacta. CORRIGIDO: "reforcada por F5a" era non-sequitur — `permissions.ask` em subshell e regra de permissao do harness, nao hook PreToolUse; e "sem sinal sobre hooks" e impreciso: l.54 muda o path de componente `hooks` de plugin (symlink recusado).'
+    trace: 'docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md'
+
+  - id: E_F8_WORKTREE_ISOLADO_VIABILIZOU
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG l.63 + l.72; git worktree list = 1 worktree linkado ativo (.claude/worktrees/discuss+onion-pessoal-app); grep -c "<<" lint-selftest.sh = 82 linhas com heredoc; isolation: "worktree" so em comentario (orchestrate.md:174) — 0 usos reais'
+    label: 'F8 (omissao apontada pelo juiz). Worktree isolado deixou de ser inviavel para a maquinaria: sessoes worktree-isoladas recusavam loops Bash, $VAR, "$(...)" e heredocs como "too complex to verify" (l.63), e git sandboxed em worktree linkado perdia escrita no .git comum apos cd (l.72). O gate e shell com dezenas de heredocs — antes disto, fan-out isolado nao rodava a bancada. A superficie `isolation: worktree` segue declarada-e-nao-exercitada (0 usos reais) — a categoria que o CLAUDE.md trata como divida. Gatilho: 1a mutacao concorrente com sobreposicao real.'
+    trace: '.claude/commands/meta/orchestrate.md'
+
+  - id: E_F9_WORKER_CORTADO_CONTINUA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG l.49 (subagente cortado mid-stream continua sozinho) + l.62 (transcript > 5 MB falhava "No transcript found"); 15 comandos em .claude/commands/meta/ fazem fan-out'
+    label: 'F9 (omissao apontada pelo juiz). O modo de falha dos workers MUDOU e a doutrina assume o antigo: subagente cortado no meio do stream (sleep, queda, erro de servidor) agora continua em vez de terminar incompleto (l.49); retomar/mensagear subagente com transcript > 5 MB falhava (l.62) — modo real em censo longo. Consequencia: "worker devolveu resposta incompleta" deixa de ser sintoma de CORTE e vira sintoma de CONTEUDO — muda o que um UNVERIFIABLE significa e o que o juiz fixo deve suspeitar.'
+    trace: '.claude/commands/meta/census.md'
+
+  - id: E_F10_SETTINGS_POS_STARTUP_VALEM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG l.18; onion-bridge src/workspace.ts:44-47,105 (GUEST_SETTINGS escrito em runtime, settingSources:[project]); adopt.md:175-184 (instala/mescla .claude/settings.json no alvo)'
+    label: 'F10 (omissao apontada pelo juiz). Settings de uma `.claude/` criada DEPOIS do startup passam a valer sem restart (l.18). Dois pontos do Onion dependiam disso sem saber: (a) o bridge escreve `.claude/settings.json` do convidado em runtime; (b) `/meta:adopt` instala/mescla settings no alvo, inclusive --in-place. Antes, repo adotado no mesmo processo podia rodar com os settings recem-instalados NAO carregados — bug latente que a plataforma fechou.'
+    trace: '.claude/commands/meta/adopt.md'
+
+  - id: E_F11_CONTAINMENT_ESCAPE_CONVERGE_COM_SSRF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'CHANGELOG l.12; a2a-ssrf-check.sh:69 nega 169.254.* (link-local-metadata); grep curl/wget/getent/dig no helper = 0 (rc=1); _ssrf em lint-selftest.sh:4223 so passa string'
+    label: 'F11 (nota do juiz, sem impacto medido). Auto mode ganha regra Containment Escape: fetch de metadata-credencial de nuvem, evasao de egress e alcance cross-tenant deixam de ser auto-aprovados (l.12). Converge com a guarda propria do Onion (a2a-ssrf-check.sh ja nega 169.254.*). Sem friccao no gate: nem a guarda nem o selftest fazem rede. Relevante so ao A2A do bridge, que faz fetch real.'
+    trace: '.claude/utils/federation-transport/a2a-ssrf-check.sh'
+
+  - id: E_LACUNAS_DECLARADAS_E3_0902
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'juiz-e3, secao LACUNAS DECLARADAS (itens 1-2; itens 3-4 declarados por mim — o resto da secao do juiz chegou truncado 2x) (molde E_REDDIT_INALCANCAVEL)'
+    label: 'LACUNAS DECLARADAS da rodada (desfecho de 1a classe, nunca finding): (1) preco/disponibilidade do Fable 5.1 NA CONTA do maestro — CHANGELOG da tabela, nao cota; a regua de 3 degraus (GA != liberado na conta != sem custo) exige confirmacao humana; (2) se o alias `fable` desta sessao (nao-gateway) resolve para 5 ou 5.1 — l.99 fala de "gateway sessions"; nao medi o runtime (exigiria spawnar `fable` e observar o modelo efetivo); (3, minha) F9 nao reproduzido em runtime (corte de stream e nao-deterministico) — lido, nao medido; (4, minha) blockReadsOutsideWorkingDirectories nao ativado para observar o erro exato que o worker recebe.'
+    trace: 'docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md'
+
+edges:
+  - from: E_F1_FABLE_5_1_DEFAULT
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F2_SUBAGENT_MODEL_FORCE
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F2_SUBAGENT_MODEL_FORCE
+    to: D_TIERING_CHECA_ENV_FORCE
+    edge_type: SUPPORTS
+  - from: E_F3_BYPASS_EM_PROJECT_SETTINGS_IGNORADO
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F4_BLOCK_READS_FORA_WORKDIR
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F4_BLOCK_READS_FORA_WORKDIR
+    to: D_KG_FRESHNESS_DISTINGUE_BLOQUEIO_DE_HARNESS
+    edge_type: SUPPORTS
+  - from: E_F5_GUARDAS_REFORCADAS
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F6_DETACHED_MORRE_NO_STOP
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F7_EXIT2_INTACTO
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F8_WORKTREE_ISOLADO_VIABILIZOU
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F9_WORKER_CORTADO_CONTINUA
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F10_SETTINGS_POS_STARTUP_VALEM
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_F11_CONTAINMENT_ESCAPE_CONVERGE_COM_SSRF
+    to: Q_E3_DELTA_2_1_257
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_DECLARADAS_E3_0902
+    to: Q_E3_DELTA_2_1_257
+    edge_type: CONSTRAINS
