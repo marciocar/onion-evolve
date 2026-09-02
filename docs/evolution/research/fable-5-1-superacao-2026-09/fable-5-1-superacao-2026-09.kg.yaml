@@ -330,11 +330,24 @@ nodes:
   - id: Q_PROBE_WORKFLOW_ALIAS
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 4
-    confidence: 0.8
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'Workflow run wf_5f0d93a6-28b: transcript do agente {model:fable} = "model":"claude-fable-5-1" (E_PROBE_WORKFLOW_ALIAS_MEDIDO_0902)'
     label: 'MEDIR o alias `fable` no Workflow tool (1 turno, schema com o campo model da resposta) — pre-condicao de Q_EXP_JUIZ_FABLE_CALIBRACAO, porque o juiz do censo roda por Workflow e nao por Agent. O Workflow exige opt-in explicito do maestro (nao disponivel nesta sessao). GATILHO: proximo run de Workflow autorizado — 1 agente `model: fable` extra com budget minimo, devolvendo o model observado.'
     trace: '.claude/utils/census/census-workflow.mjs'
+
+  - id: E_PROBE_WORKFLOW_ALIAS_MEDIDO_0902
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'Workflow run wf_5f0d93a6-28b (opt-in do maestro em texto proprio): agent {model:fable} → transcript "model":"claude-fable-5-1" (1x); controle {model:opus} → "claude-opus-5" (2x); campo da RESPOSTA da API, casado ao alias pelo meta.json; Claude Code 2.1.257, sem gateway; 94k tokens, 7,8s'
+    label: 'FECHA Q_PROBE_WORKFLOW_ALIAS POR MEDICAO: o alias `fable` do Workflow tool resolve para claude-fable-5-1 — igual ao Agent (E_PROBE_ALIAS_FABLE_5_1). Consequencia: Q_EXP_JUIZ_FABLE_CALIBRACAO deixa de estar bloqueada por alias (o juiz do censo roda por Workflow, census-workflow.mjs:79,98). Auto-declaracao dos workers NAO e a medicao (env_hint = desconhecido nos dois). Teto: 1 sessao, 1 versao do CC, sem gateway.'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-workflow-alias.md'
 
 edges:
   - from: E_SYSCARD_S1_FABRICA_APROVACAO
@@ -459,4 +472,10 @@ edges:
     edge_type: DEPENDS_ON
   - from: Q_PROBE_WORKFLOW_ALIAS
     to: E_PROBE_ALIAS_FABLE_5_1
+    edge_type: SUPPORTS
+  - from: E_PROBE_WORKFLOW_ALIAS_MEDIDO_0902
+    to: Q_PROBE_WORKFLOW_ALIAS
+    edge_type: SUPPORTS
+  - from: E_PROBE_WORKFLOW_ALIAS_MEDIDO_0902
+    to: Q_EXP_JUIZ_FABLE_CALIBRACAO
     edge_type: SUPPORTS

@@ -112,6 +112,9 @@ citação dele foi conferida linha a linha pelo contexto principal antes de entr
 4. **`Q_PROBE_WORKFLOW_ALIAS`** — o juiz do censo roda por `Workflow` (`census-workflow.mjs:79,98`), não por
    `Agent`; o alias medido **não transfere**. Pré-condição de `Q_EXP_JUIZ_FABLE_CALIBRACAO`. (`Workflow` exige
    opt-in do maestro — gatilho: próximo run autorizado, 1 agente extra com budget mínimo.)
+   **→ FECHADA 2026-09-02** por opt-in do maestro em texto próprio: run `wf_5f0d93a6-28b`, alias `fable` →
+   `claude-fable-5-1` (controle `opus` → `claude-opus-5`), 94k tokens/8 s. `data/probe-workflow-alias.md`,
+   nó `E_PROBE_WORKFLOW_ALIAS_MEDIDO_0902`. Os 5 `Q_EXP_*` ficam executáveis — o próximo `/meta:census` é o gatilho.
 
 **Tally sobre as 25 estratégias (`E_JUIZ_ITENS_REPROVADOS_E_CONTRADICAO`):** REPROVADOS 1 (experimento de 1
 variável; custo contra preço de opus quando o worker é sonnet), 3 (juiz fable reduz FP — refutado por
