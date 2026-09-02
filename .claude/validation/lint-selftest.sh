@@ -3932,6 +3932,13 @@ run_pretooluse_veto_selftests() {
   _case "merge-gate: echo citando → passa"                 0 "${mg}" feat 'echo "gh pr merge"'
   # invólucros — a classe medida pela auditoria de 2026-09-02 (todos passavam rc=0 nos DOIS vetos)
   _case "protect-main: command git push -f main → VETO"    2 "${pm}" feat 'command git push -f origin main'
+  # escopo (2026-09-02): alvo em OUTRO repo não é assunto destes vetos; `-C .` e `-C <raiz>` continuam sendo
+  mkdir -p "${d}/outro-repo"; git -C "${d}/outro-repo" init -q
+  _case "merge-gate: git -C /outro/repo push origin main → passa (não é nosso repo)"  0 "${mg}" feat "git -C ${d}/outro-repo push origin main"
+  _case "protect-main: git -C /outro/repo push -f origin main → passa (não é nosso repo)" 0 "${pm}" feat "git -C ${d}/outro-repo push -f origin main"
+  _case "merge-gate: git -C . push origin main → VETO"        2 "${mg}" feat 'git -C . push origin main'
+  _case "merge-gate: git -C <raiz> push origin main → VETO"   2 "${mg}" feat "git -C ${d} push origin main"
+  _case "merge-gate: git --git-dir=/outro/.git push origin main → passa" 0 "${mg}" feat "git --git-dir=${d}/outro-repo/.git push origin main"
   _case "protect-main: \\git push -f main → VETO"          2 "${pm}" feat '\git push -f origin main'
   _case "protect-main: env git push -f main → VETO"        2 "${pm}" feat 'FOO=1 env git push -f origin main'
   _case "protect-main: bash -c \"git push -f main\" → VETO" 2 "${pm}" feat 'bash -c "git push -f origin main"'

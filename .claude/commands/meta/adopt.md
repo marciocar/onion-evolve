@@ -200,6 +200,21 @@ Este repo é **CONSUMIDOR** do Onion. O protocolo canônico (3 fluxos) vive no c
 para receber relatórios de update/anúncios do core (downstream). Rode `/meta:co-evolve` para ler/gerenciar.
 PTR
 fi
+# (2b) semente de PESQUISA — a rule .claude/rules/research-lens.md declara `paths: docs/evolution/research/**`;
+#      sem UM arquivo rastreado ali a REGRA 53 reprova HARD no dia 1 (medido 2026-09-02 na adoção da
+#      um adotante greenfield: TODO adotante greenfield nascia vermelho). O README também ensina a lente.
+if [ ! -f "$DEST/docs/evolution/research/README.md" ]; then
+  mkdir -p "$DEST/docs/evolution/research"
+  cat > "$DEST/docs/evolution/research/README.md" <<'PTR'
+# Pesquisas deste repo (grafo primeiro)
+
+Toda pesquisa/estudo/decisão nasce aqui como `<slug>-<AAAA-MM>/<slug>-<AAAA-MM>.kg.yaml` (SSOT) com a
+prosa como projeção. A lente carrega sozinha ao tocar esta pasta (`.claude/rules/research-lens.md`);
+a doutrina inteira está em `.claude/commands/common/prompts/research-doctrine.md`. Comece por
+`bash .claude/validation/kg-corpus-grep.sh <tema>` — o que os grafos já sabem — e, para pesquisar,
+`/onion-research <pergunta>`.
+PTR
+fi
 
 # (3) branch de integração — setar git config local (CONVENIÊNCIA p/ `git flow` cru; o durável é o
 #     .onion-version, passo abaixo). No install, INTEGRATION_BRANCH vem do PASSO 0e (via STATE.md);
