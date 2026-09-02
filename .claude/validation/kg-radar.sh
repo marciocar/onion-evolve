@@ -199,6 +199,11 @@ section == "nodes" && nid != "" {
   if (line ~ /^[[:space:]]*impact:/)     { v = line; sub(/^[[:space:]]*impact:/, "", v);     impact[nid] = trim(v) + 0 }
   if (line ~ /^[[:space:]]*confidence:/) { v = line; sub(/^[[:space:]]*confidence:/, "", v); conf[nid] = trim(v) + 0 }
   if (line ~ /^[[:space:]]*status:/)     { v = line; sub(/^[[:space:]]*status:/, "", v);     nstatus[nid] = trim(v) }
+  # evidence_class (opt-in, 2026-09-02, Q_TESTEMUNHO_NAO_MEDIVEL_0804): `testimony` marca o nó cuja
+  # fonte é RELATO (intenção, fato de campo fora do repo) — a única checagem disponível é o texto
+  # que codificou o relato, circular por construção. Sem o marcador, esses nós passavam nos três
+  # vereditos com carimbo fresco, indistinguíveis de um nó medido. Default (ausente) = measured.
+  if (line ~ /^[[:space:]]*evidence_class:/) { v = line; sub(/^[[:space:]]*evidence_class:/, "", v); eclass[nid] = trim(v) }
   if (line ~ /^[[:space:]]*verified_against:/) {
     v = line; sub(/^[[:space:]]*verified_against:/, "", v)
     if (nid in verifiedAgainst && verifiedAgainst[nid] != trim(v)) dupKey[nid "|verified_against"] = verifiedAgainst[nid] " -> " trim(v)
@@ -354,6 +359,7 @@ END {
       id = fsorted[i]
       if (!(id in elegivel)) continue
       if (verifiedAt[id] == "") verdict = "STALE-MISSING"
+      else if (eclass[id] == "testimony") verdict = "TESTIMONY"   # não re-verificável por máquina — consumidor NÃO enfileira
       else if (verifiedAgainst[id] == "" && ntype[id] == "claim") verdict = "UNANCHORED"
       else if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") verdict = "STALE-OLD"
       else verdict = "OK"
@@ -629,7 +635,7 @@ END {
     # declare verified_against: (opt-in — nomeia o artefato MÓVEL que rastreia: branch/commit/
     # deploy/config). Um nó DEV que aponta p/ branch/commit também apodrece (sinal de campo
     # ssot-como-runtime, §2: C_CONSOLIDATION_MAP stale). Não inunda claims epistêmicos comuns.
-    fwarns = 0; ntracked = 0; fsuppressed = 0
+    fwarns = 0; ntracked = 0; fsuppressed = 0; ftestimony = 0
     for (i = 1; i <= nn; i++) {
       id = order[i]
       if (plane[id] != "PROD" && verifiedAgainst[id] == "") continue
@@ -666,9 +672,28 @@ END {
         } else if (verifiedAgainst[id] == "") {
           fsuppressed++   # supressão CONTADA, nunca silenciosa — ver linha-resumo abaixo
         }
-        if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") {
+        if (eclass[id] == "testimony") {
+          # TESTEMUNHO: re-carimbar seria circular (a fonte é o relato). Não cobra STALE-OLD; CONTA
+          # em linha própria para o leitor saber que o carimbo fresco NÃO é medição.
+          ftestimony++
+        } else if (metaBaseline != "" && verifiedAt[id] "" < metaBaseline "") {
           print "  ⚠ STALE-OLD: " id " (verified_at " verifiedAt[id] " anterior à baseline " metaBaseline " — a verdade pode ter envelhecido)"; fwarns++
         }
+      }
+      # TESTIMONY-UNMARKED — o alvo declarado É um relato (`relato-*`) mas o nó não se classifica:
+      # continua a passar por medido. Determinístico: só o vocabulário já usado por esta casa.
+      # Só o PRIMEIRO token do alvo, e só quando ele COMEÇA por `relato` — um carimbo de censo que
+      # CITA "relato-do-maestro-*" no texto não é relato (guarda-por-lista falha pelo vocabulário:
+      # no 1º dogfood o próprio nó da pergunta foi acusado por citar o padrão), e um alvo MISTO
+      # cuja fonte primária é medida (`gh-api-...-e-relato-...`) segue medido: o relato ali apoia.
+      va1 = verifiedAgainst[id]; sub(/[[:space:](].*$/, "", va1)
+      if (eclass[id] != "testimony" && va1 ~ /^relato(-|_|$)/) {
+        print "  ⚠ TESTIMONY-UNMARKED: " id " (verified_against: " verifiedAgainst[id] " é RELATO sem evidence_class: testimony — o carimbo passa por medição; classifique)"; fwarns++
+      }
+      # TESTEMUNHO + plane:PROD é a MESMA contradição do MISPLANED: PROD afirma "cruzei com o
+      # artefato vivo"; relato não cruza com artefato nenhum.
+      if (eclass[id] == "testimony" && plane[id] == "PROD") {
+        print "  ⚠ MISPLANED: " id " (plane:PROD mas evidence_class: testimony — relato não é artefato vivo; reclassifique para plane:DEV)"; fwarns++
       }
       # MISPLANED — CONTRADIÇÃO INTERNA ao próprio nó, e vale para TODOS os tipos.
       # `plane: PROD` afirma "cruzei com o ARTEFATO VIVO"; `verified_against: branch|commit`
@@ -694,6 +719,7 @@ END {
     # `if` próprio, FORA da cadeia else-if: a supressão tem de aparecer mesmo quando fwarns==0.
     # Uma linha no lugar de N, e o filtro fica auditável em vez de mágico.
     if (fsuppressed > 0) print "  ℹ " fsuppressed " nó(s) não-claim com carimbo sem verified_against: — não cobrados (evidência/decisão/domínio/artefato ancoram por trace:/TRACES_TO; pergunta não afirma)"
+    if (ftestimony > 0) print "  ℹ " ftestimony " nó(s) TESTEMUNHO (evidence_class: testimony) — carimbo é RELATO, não medição; não re-verificáveis por máquina, não enfileirados (atenção continua contando)"
     print ""
   }
 
