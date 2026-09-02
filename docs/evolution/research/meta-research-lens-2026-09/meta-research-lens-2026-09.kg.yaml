@@ -240,10 +240,12 @@ nodes:
 
   - id: D_F2_MOTOR_WORKFLOW_ONION_RESEARCH_E_SKILL
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
     impact: 5
-    confidence: 0.75
+    confidence: 0.85
+    verified_at: 2026-09-02
+    verified_against: 'DOGFOOD ao vivo: Workflow wf_9dad8645-eda sobre o NAO-VERIFICADO #1 (teto de WebSearch). Rodada 1 FALHOU ALTO (17 agentes, 1,08M tokens, 0 claims) por 3 defeitos de desenho (orcamento first-come, fetch sem prompt dirigido, sem retry raw) — corrigidos no script; rodada 2 retomada do cache (31 agentes acumulados, 1,33M) escreveu docs/evolution/research/websearch-cap-2026-09/ com radar exit 0, 3 achados (tier 3 nao promovido a high), mercado declarado sem sinal, review_after 30d. Custo/no ~220k (regressao vs 68-74k do censo, causa = rodada 1). A pergunta aberta certa foi deterministica: grep no binario 2.1.258 fechou 2 NAO-VERIFICADOS (default 200 + contador de sessao; MAX_CONCURRENT_SUBAGENTS=20). Bancada run_research_workflow_selftests 5/5. Skill onion-research fora do plugin onion (manifest enumera; decisao declarada).'
     label: 'F2 (1 PR, motor): (a) .claude/workflows/onion-research.js DERIVADO do /deep-research embutido (mesmos schemas e votacao 3/2) com: fase 0 corpus (saida do kg-corpus-grep como contexto), angulos com EIXOS FIXOS sempre presentes (claude-code-versao-atual, mercado-capital, repos-por-trajetoria, analistas, comunidade) + angulos do tema, source_tier/source_kind por fonte, orcamento em args (MAX_FETCH/MAX_VERIFY parametrizados; excedente NOMEADO), tiering por fase (coleta sonnet/medium, verify+sintese opus/high ou fable), fase final write(KG) por agente com Write + radar exit 0 + review_after; (b) skill .claude/skills/onion-research/SKILL.md auto-ativada por description ("pesquisa, estado da arte, mercado, comparar, decidir entre...") que injeta !`kg-corpus-grep` e o fragmento, e conduz ao workflow; (c) docs/onion/radar-sources.yaml (roster por eixo e cadencia) lido pelo workflow; (d) /meta:radar --axis <slug> ad-hoc gravando baseline datada. Dogfood: 1 pergunta real pequena (o NAO-VERIFICADO "teto de WebSearch por sessao") medindo custo/no vs os 68-74k/no do censo. Custo ~1-1,5M. DEPENDS_ON F1.'
     trace: 'docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md'
 

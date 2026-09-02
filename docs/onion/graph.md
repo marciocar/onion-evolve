@@ -62,6 +62,7 @@
 - **onion** --has-member--> onion-patterns
 - **onion** --has-member--> onion-product-context
 - **onion** --has-member--> onion-publish
+- **onion** --has-member--> onion-research
 - **onion** --has-member--> onion-retro
 - **onion** --has-member--> onion-validation
 - **onion** --has-member--> onion-wizard
@@ -434,6 +435,7 @@ onion	has-member	onion-orchestration
 onion	has-member	onion-patterns	
 onion	has-member	onion-product-context	
 onion	has-member	onion-publish	
+onion	has-member	onion-research	
 onion	has-member	onion-retro	
 onion	has-member	onion-validation	
 onion	has-member	onion-wizard	
