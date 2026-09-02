@@ -14,6 +14,11 @@
 #   - adopted_at perdido no stamp antigo (re-carimbo pré-fix) → restaura do members.yaml do core
 #     (--members + --member-id); sem como restaurar → NÃO inventa (omite + warning; fail-safe).
 #   - integration_branch ausente no antigo e sem arg → PRESERVA a ausência (resolução por PR).
+#   - Update com pin NOVO ≠ antigo → DETECTA (não conserta) artefatos que ainda citam o pin antigo:
+#     `grep -rl <8 hex do pin antigo>` no repo, EXCLUINDO história (docs/evolution/inbox|inbound,
+#     .claude/diary, .git, node_modules). Medido 2026-09-02 em 10 adotantes locais (Q_PIN_GREP_WORTH_IT):
+#     22 arquivos citavam pin anterior, 19 eram história legítima — sem a exclusão o aviso é ruído;
+#     com ela, os 3 restantes eram SSOT viva (technical-context/index.md, project.kg.yaml) — o alvo.
 #
 # Uso : write-stamp.sh <target_root> --framework <n> --commit <sha> --commit-date <AAAA-MM-DD>
 #         [--adopted-from <url>] [--mode <m>] [--role <adopted|hub>] [--integration-branch <b>]
@@ -60,6 +65,7 @@ if [ -f "${STAMP}" ]; then
   # PRESERVA o role do stamp antigo (um update não rebaixa um hub p/ adopted).
   old_role="$(field role)";  [ -z "${ROLE}" ] && [ -n "${old_role}" ] && ROLE="${old_role}"
   ADOPTED_AT="$(field adopted_at)"
+  OLD_COMMIT="$(field source_commit)"
 else
   ADOPTED_AT="$(date +%F)"
 fi
@@ -94,4 +100,15 @@ mkdir -p "${TARGET}/.claude"
   [ -n "${MODE}" ]         && printf 'mode: %s\n'         "${MODE}"
   [ -n "${IBRANCH}" ]      && printf 'integration_branch: %s\n' "${IBRANCH}"
 } > "${STAMP}"
+# D_GREP_OLD_PIN — detecta, não conserta: corrigir cada artefato exige a semântica de cada um.
+OLD_COMMIT="${OLD_COMMIT:-}"
+if [ -n "${OLD_EXISTS}" ] && [ -n "${OLD_COMMIT}" ] && [ "${OLD_COMMIT:0:8}" != "${COMMIT:0:8}" ]; then
+  stale="$(grep -rl --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=inbox --exclude-dir=inbound \
+    --exclude-dir=diary --exclude=.onion-version -- "${OLD_COMMIT:0:8}" "${TARGET}" 2>/dev/null || true)"
+  if [ -n "${stale}" ]; then
+    n="$(printf '%s\n' "${stale}" | grep -c .)"
+    echo "AVISO: ${n} referência(s) ao pin anterior (${OLD_COMMIT:0:8}) neste repo, fora da história — revise:" >&2
+    printf '%s\n' "${stale}" | sed "s#^${TARGET}/##; s#^#  · #" >&2
+  fi
+fi
 echo "stamp escrito: ${STAMP} ($([ -n "${OLD_EXISTS}" ] && echo "update — adopted_at preservado: ${ADOPTED_AT:-<ausente>}" || echo "adoção — adopted_at: ${ADOPTED_AT}"))"

@@ -339,7 +339,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.8
-    status: open
+    status: done
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. grep -n ''D_GREP_OLD_PIN'' -A40 docs/onion/graph/<adotante-a>-adoption-dogfood-2 => O nó pede: apos /meta:adopt --update reescrever .onion-version, rodar `grep -rl <pin-antigo>` no rep…'
     label: "BACKLOG (nao implementado; priorizar e do maestro). No /meta:adopt --update, apos reescrever o .onion-version: `grep -rl <pin-antigo>` no repo do adotante (excluindo .git/ e node_modules/) e reportar a CONTAGEM no relatorio — 'N referencias ao pin anterior neste repo — revise'. DETECTA, nao conserta: corrigir cada artefato exigiria entender a semantica de cada um (uma memoria pode citar o pin historicamente de proposito). Custo: um grep + uma linha. Toque em .claude/commands/meta/adopt.md, com selftest plantando um pin antigo"
@@ -350,7 +350,7 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.5
-    status: open
+    status: done
     verified_at: 2026-09-01
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 1/1 claims; juiz APROVADO. Lido o nó inteiro (linhas 347-354) e a aresta CONSTRAINS para D_GREP_OLD_PIN (li => A pergunta ("vale medir quantos artefatos derivados citam pin antes de implementar D_GREP_OLD_PIN") …'
     label: "FRONTEIRA DECLARADA PELO PROPRIO ADOTANTE (R15.2 — registrada como observacao, nao como pedido): 'pode ser que o custo nao compense para uma classe de erro que so morde quem escreve frontmatter a mao'. Vale medir quantos artefatos derivados citam pin nos adotantes reais antes de implementar"
@@ -364,6 +364,18 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — 1) git -C onion-evolve merge-base --is-ancestor d6aba0e 65d8a7501a03 (confirma que o pin d'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó estava formulado como pergunta em aberto sobre um evento futuro ("quando... rodar"); o evento não só ocorreu como foi superado por múltiplos ciclos adicionais de update no adotante. A pergunta não tem mais objeto: já foi respondida pelo próprio comportamento do adotante, e a segunda cláusula (s'
+
+  - id: E_W9_PIN_GREP_MEDIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-09-02
+    verified_against: "grep -rl <8hex do pin anterior> em /home/marcio/{aura,gustavo-pulga,mvp-venda-direta-pdi,<adotante-a>,onion-arthur,onion-pedro,onion-standalone,poc-venda-direta-pdi,pulse-mais,rhilo-metagamify} (pins anteriores lidos do git log do .onion-version)"
+    label: "RESPOSTA a Q_PIN_GREP_WORTH_IT (drive W9, 2026-09-02): dos 10 adotantes locais, 5 tiveram update; 4 deles ainda citam pin anterior em 22 arquivos — 19 sao historia legitima (docs/evolution/inbox|inbound processados, que DEVEM citar o pin da epoca) e 3 sao SSOT viva (technical-context/index.md no <adotante-a>; project.kg.yaml e onion-adoption.kg.yaml no mvp-venda-direta-pdi). Conclusao: o grep vale UM grep — mas so com exclusao de historia, senao 86% e ruido. Implementado em write-stamp.sh (detecta, nao conserta; bancada + mutacao provadas)."
+    trace: ".claude/utils/adopt/write-stamp.sh"
 
 edges:
   - from: E_GAP2_ZERO
@@ -480,3 +492,9 @@ edges:
   - from: E_CENSO0901_Q_ARANDEK_UPDATE
     to: Q_ARANDEK_UPDATE
     edge_type: SUPERSEDES
+  - from: E_W9_PIN_GREP_MEDIDO
+    to: Q_PIN_GREP_WORTH_IT
+    edge_type: SUPPORTS
+  - from: E_W9_PIN_GREP_MEDIDO
+    to: D_GREP_OLD_PIN
+    edge_type: SUPPORTS
