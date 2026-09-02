@@ -9,12 +9,19 @@ except Exception: print("")' 2>/dev/null)
 [ -z "$cmd" ] && exit 0
 # Julga POR LINHA DE INVOCAÇÃO, nunca a string inteira: heredoc/prosa num comando composto que
 # apenas CITA o vocabulário não pode vetar (falso-positivo medido no 1º dogfood, 2026-09-01 —
-# a classe guarda-por-vocabulário; o veto pegou o próprio commit desta feature).
-push_lines=$(printf '%s\n' "$cmd" | grep -E '^[[:space:]]*git[[:space:]]+push|(&&|\|\||;)[[:space:]]*git[[:space:]]+push')
+# a classe guarda-por-vocabulário; o veto pegou o próprio commit desta feature). A redução mora na
+# lib partilhada com o merge-gate desde a auditoria de 2026-09-02, que mediu `command git push -f
+# origin main`, `\git push`, `env git push`, `bash -c "…"` e `git -C . push` passando rc=0 aqui.
+# shellcheck source=lib/invocation-lines.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib/invocation-lines.sh"
+push_lines=$(onion_invocation_lines "$cmd" | grep -E '^git[[:space:]]+push([[:space:]]|$)' || true)
 [ -z "$push_lines" ] && exit 0
 printf '%s' "$push_lines" | grep -qE '(--force([^-]|$)|--force-with-lease|[[:space:]]-[a-eg-z]*f[a-z]*([[:space:]]|$))' || exit 0
 main_target=0
-printf '%s' "$push_lines" | grep -qE '[[:space:]]main([[:space:]]|$|:)' && main_target=1
+# `HEAD:main` / `x:main` / `refs/heads/main` também são alvo main — a v1 exigia ESPAÇO antes de
+# `main` e deixava passar o refspec com dois-pontos (buraco achado pela bancada da auditoria
+# D_AUDITAR_GATES_TEXTUAIS, 2026-09-02: `git push -f origin HEAD:main` saía rc=0).
+printf '%s' "$push_lines" | grep -qE '([[:space:]]|:)(refs/heads/)?main([[:space:]]|$|:)' && main_target=1
 if [ "$main_target" -eq 0 ]; then
   # Fallback branch-corrente SÓ para push NU (flags apenas, sem remote/refspec): um push com alvo
   # explícito que não cita main não pode herdar o veto da branch onde a sessão está SENTADA —

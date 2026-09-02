@@ -183,9 +183,11 @@ nodes:
   - id: D_AUDITAR_GATES_TEXTUAIS
     node_type: decision
     plane: DEV
-    status: open
+    status: confirmed
     impact: 5
-    confidence: 0.8
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'SELADA pelo maestro em texto proprio (2026-09-02: "sela e executa a D_AUDITAR_GATES_TEXTUAIS"); execucao = docs/analysis/onion-gates-textuais-2026-09.md + grafo audit-textual-gates-2026-09'
     label: 'DECISAO PROPOSTA (S1): auditar todo gate do Onion que dependa de texto/declaracao do modelo em vez de exit 2 ou estado lido — candidatos nomeados: avisos que nao vetam (MERGE-SEM-FONTE-LIDA), comandos que pedem "confirmacao do maestro" em prosa, tabela de selagem AUDIT (o driver "apenda, o humano flipa" — quem impede o driver de flipar?). Resultado esperado: lista arquivo:linha classificada VETO-MECANICO / AVISO-TEXTUAL / CONFIANCA-NO-MODELO. GATILHO: proxima onda de guardas (o juiz desta rodada responde a pergunta 5 — ver E_JUIZ_*).'
     trace: 'docs/analysis/onion-guardas-mapa-2026-08.md'
 
