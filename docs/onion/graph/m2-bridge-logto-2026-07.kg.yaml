@@ -536,10 +536,10 @@ nodes:
     layer: audit
     plane: PROD
     verified_at: 2026-09-02
-    verified_against: 'gatilho DISPAROU: PR onion-bridge#65 OPEN (ver E_W8_JWKS_PR65_ABERTO); segue open ate merge+deploy pelo maestro — o storm em PROD nao mudou ainda'
+    verified_against: 'CURA DEPLOYADA 2026-09-02 (E_W9_BRIDGE_DEPLOY_0902: jwksAttemptedAt em /home/onion/onion-bridge/src/identity.ts, 4 ocorrencias); segue open porque o criterio de fechamento e MEDICAO no vivo — 1 fetch por janela de 60s durante queda real do IdP — e nao se simula queda do Logto em producao. GATILHO: 1a queda real do IdP (journal do onion-vps-bridge)'
     status: open
-    impact: 4
-    confidence: 0.9
+    impact: 3
+    confidence: 0.95
     label: "PRE-EXISTENTE, mas o P11 ELEVOU O RAIO — e essa mudanca de risco precisa morar aqui: antes, numa queda do Logto, o caminho legado ainda autenticava (degradado); agora NINGUEM autentica (queda total) E cada request re-busca o JWKS (medido pelo 6o Elenxo com IdP num buraco negro: 3 reqs seguidas, 5s cada, um fetch novo por request — retry storm contra a dependencia que ja esta caindo). O piso de 60s (identity.ts:41) so guarda o ramo force=true; o ramo normal so retorna cedo com cache POPULADO e fresco, e jwksFetchedAt so atualiza no sucesso. CURA DESENHADA pelo Elenxo (jwksAttemptedAt marcando a TENTATIVA + timeout de 5s no fetch + jwksSelfCheck reportando ok=cache.size>0). GATILHO: PR proprio no bridge; e o /health mentindo ok:true durante queda do IdP entra na mesma cura."
     trace: "/home/onion/onion-bridge/src/identity.ts"
 
@@ -547,11 +547,11 @@ nodes:
     node_type: question
     layer: audit
     plane: PROD
-    verified_at: 2026-09-01
-    verified_against: medido-pelo-6o-elenxo-gate-falso-de-5s-health-foi-de-9-6ms-a-3-99s-durante-um-unico-post-a2a
-    status: open
+    verified_at: 2026-09-02
+    verified_against: 'FECHADA por deploy (ver E_W9_BRIDGE_DEPLOY_0902): sudo -n grep spawnSync /home/onion/onion-bridge/src/a2a.ts = so o comentario da l.88; spawn( presente; bench pre-merge 4820ms->1,1ms; medicao em PROD sob request a2a real = proximo uso real'
+    status: done
     impact: 4
-    confidence: 0.9
+    confidence: 0.95
     label: "PRE-EXISTENTE, achado pelo 6o Elenxo ao procurar 'outra rota cara fora do rate-limit': POST /a2a faz spawnSync do gate do core (a2a.ts:50, timeout 15s) — e spawnSync BLOQUEIA o event loop do Node inteiro. Medido com gate falso dormindo 5s: /health foi de 9,6ms a 3,99s durante UM unico request a2a; todos os streams SSE de /chat congelam junto. Um remetente a2a (autenticado por token de pool, nao identidade) pode negar servico ao bridge inteiro dentro do timeout. CURA: spawn assincrono (execFile+promise) + rate-limit proprio no /a2a. GATILHO: PR proprio no bridge, junto ou apos o do JWKS."
     trace: "/home/onion/onion-bridge/src/a2a.ts"
 
@@ -1645,6 +1645,18 @@ nodes:
     label: "CURA de Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP proposta (drive W9, 2026-09-02): PR #66 do onion-bridge troca spawnSync por spawn assincrono com o MESMO fail-safe. Medido antes/depois na bancada: /health durante um POST /a2a foi de 4820ms para 1,1ms. Modo-de-falha preservado: gate de 20s => SIGKILL aos 15s => 403 veto; gate exit 1 sem stdout => 403 veto em 40ms; zero orfaos apos o kill. A pergunta FECHA quando o PR for mergeado e deployado (ato do maestro; producao ainda roda spawnSync em /home/onion/onion-bridge/src/a2a.ts:51, medido por sudo -n grep)."
     trace: "https://github.com/marciocar/onion-bridge/pull/66"
 
+  - id: E_W9_BRIDGE_DEPLOY_0902
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-09-02
+    verified_against: "ops/update-bridge.sh rc=0 (clone 5c40b1cc, bridge 1f7fb3f1, invocacao 75264042); systemctl show onion-vps-bridge: ActiveState=active, NRestarts=0, ActiveEnterTimestamp 02:07:16Z; journal -3min: 0 error/unhandled; /health 3x ~0,25ms; sudo -n git -C /home/onion/onion-bridge log = merges #65 e #66 no topo"
+    label: "DEPLOY do bridge por ORDEM do maestro (2026-09-02, 'faça deploy do bridge'): PRs onion-bridge#65 (jwksAttemptedAt) e #66 (spawn assincrono) mergeados apos typecheck do merge conjunto no clone dev (tsc rc=0; o bridge nao tem CI nem suite de testes — gate = typecheck + bench do PR). Deploy pelo mecanismo ops/update-bridge.sh (1o update com delta pelo script — o ramo cheio provou-se ponta-a-ponta, fio da memoria onion-bridge-update-state fechado). Falso alarme registrado: systemctl status onion-bridge (unit FANTASMA de 08-05, failed) — a unit real e onion-vps-bridge; medir a unit errada e nao medir."
+    trace: "ops/update-bridge.sh"
+
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -2243,4 +2255,10 @@ edges:
     edge_type: SUPPORTS
   - from: E_W9_A2A_ASYNC_PR66_ABERTO
     to: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
+    edge_type: SUPPORTS
+  - from: E_W9_BRIDGE_DEPLOY_0902
+    to: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
+    edge_type: SUPPORTS
+  - from: E_W9_BRIDGE_DEPLOY_0902
+    to: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
     edge_type: SUPPORTS

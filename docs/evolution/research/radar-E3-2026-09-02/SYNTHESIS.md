@@ -46,7 +46,7 @@ NOSSA estratégia?"*. O CHANGELOG salta de 2.1.252 para 2.1.257 (sem 253–256);
 
 (1–2 do juiz na 1ª entrega; 3–7 do juiz na 2ª entrega, 01:12Z, após 2 truncamentos — 3–4 coincidem com as que eu já declarara por conta própria.)
 
-1. Preço/cota do Fable 5.1 **nesta conta** — CHANGELOG dá tabela, não cota (régua de 3 degraus exige o maestro).
+1. Preço/cota do Fable 5.1 **nesta conta** — CHANGELOG dá tabela, não cota (régua de 3 degraus exige o maestro). → **FECHADA por testemunho (maestro, 2026-09-02: "confirmado, saiu a versão 5.1 do fable"; `E_FABLE_5_1_CONFIRMADO_NA_CONTA`, `evidence_class: testimony`)** — acesso confirmado; custo segue catálogo.
 2. Se o alias `fable` desta sessão (não-gateway) resolve 5 ou 5.1 — lido, não medido em runtime.
 3. F9 é leitura do CHANGELOG, não observação — corte de stream não reproduzido (mim + juiz, independentemente).
 4. `blockReadsOutsideWorkingDirectories` não exercitado — a opção não está setada; só se confirmou que a leitura cross-repo funciona hoje (mim + juiz).

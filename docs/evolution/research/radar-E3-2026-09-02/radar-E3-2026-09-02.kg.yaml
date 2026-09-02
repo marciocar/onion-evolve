@@ -178,6 +178,18 @@ nodes:
     label: 'LACUNAS DECLARADAS da rodada (desfecho de 1a classe, nunca finding): (1) preco/disponibilidade do Fable 5.1 NA CONTA do maestro — CHANGELOG da tabela, nao cota; a regua de 3 degraus (GA != liberado na conta != sem custo) exige confirmacao humana; (2) se o alias `fable` desta sessao (nao-gateway) resolve para 5 ou 5.1 — l.99 fala de "gateway sessions"; nao medi o runtime (exigiria spawnar `fable` e observar o modelo efetivo); (3) F9 e leitura do CHANGELOG, nao observacao — corte de stream nao reproduzido (declarado por mim E pelo juiz, independentemente); (4) blockReadsOutsideWorkingDirectories nao exercitado — a opcao nao esta setada; so se confirmou que a leitura cross-repo funciona hoje (idem, mim E juiz); (5, juiz) F8 mede DECLARACAO, nao execucao — o gate nao rodou dentro de worktree isolado; (6, juiz) sem WebSearch/WebFetch — nada cruzado com fonte externa; (7, juiz) 2.1.258 fora do escopo — seus 2 fixes nao avaliados (proxima rodada do E3).'
     trace: 'docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md'
 
+  - id: E_FABLE_5_1_CONFIRMADO_NA_CONTA
+    node_type: evidence
+    plane: DEV
+    evidence_class: testimony
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'RELATO do maestro (2026-09-02, respondendo ao item "confirmar cota do Fable 5.1 nesta conta" do relatorio do W9): "confirmado, saiu a versão 5.1 do fable" — testemunho, nao medicao (por isso evidence_class: testimony e plane: DEV). Corroboracao observada: esta sessao roda como claude-fable-5-1 (identidade de modelo reportada pelo harness da sessao 72998cdc)'
+    label: 'LACUNA 1 FECHADA POR TESTEMUNHO: o maestro confirma que o Fable 5.1 esta disponivel nesta conta (2026-09-02). Preco/cota continuam nao-medidos por maquina (o relato cobre ACESSO, nao custo) — o que muda: a regua de 3 degraus (GA != liberado na conta != sem custo) tem o 2o degrau satisfeito; o 3o (custo) segue declaracao de catalogo ($10/$50 por MTok, CHANGELOG 2.1.257 l.10).'
+    trace: 'docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md'
+
 edges:
   - from: E_F1_FABLE_5_1_DEFAULT
     to: Q_E3_DELTA_2_1_257
@@ -221,3 +233,6 @@ edges:
   - from: E_LACUNAS_DECLARADAS_E3_0902
     to: Q_E3_DELTA_2_1_257
     edge_type: CONSTRAINS
+  - from: E_FABLE_5_1_CONFIRMADO_NA_CONTA
+    to: E_LACUNAS_DECLARADAS_E3_0902
+    edge_type: SUPPORTS
