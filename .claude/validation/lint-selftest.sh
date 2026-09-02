@@ -3738,6 +3738,29 @@ run_compose_settings_selftests() {
 # ── research-lens (F1): kg-corpus-grep + REGRA 67 (review_after) + REGRA 68 (tier×confiança) ───────
 # previne: o passo 0 "o corpus primeiro" sem mecanismo, e pesquisa que envelhece/confia em fonte fraca
 # sem ninguém ver. Fixtures sintéticas em dir próprio (ONION_RESEARCH_KG_DIR / ONION_KG_CORPUS_FILES).
+# ── research-workflow (F2): o workflow salvo é sintaticamente válido, a skill tem description, o roster lê ──
+# previne: script de workflow quebrado (o modo-de-falha medido: `node --check` sozinho MENTE porque o
+# corpo tem `return` de topo — o runtime embrulha em async; a bancada embrulha igual), skill sem
+# auto-ativação, roster de fontes ilegível (a guarda de fontes nasceria verde-vazia).
+run_research_workflow_selftests() {
+  local wf="${REPO_ROOT}/.claude/workflows/onion-research.js" sk="${REPO_ROOT}/.claude/skills/onion-research/SKILL.md" rs="${REPO_ROOT}/docs/onion/radar-sources.yaml"
+  for f in "${wf}" "${sk}" "${rs}"; do [ -f "${f}" ] || { record_fail "research-workflow" "ausente: ${f}"; return; }; done
+  if ! command -v node >/dev/null 2>&1; then record_skip "research-workflow: node ausente → sintaxe não verificada"; else
+    local d; d="$(mktemp -d)"
+    { printf 'const args={};const agent=async()=>({});const pipeline=async()=>[];const parallel=async()=>[];const phase=()=>{};const log=()=>{};\n(async()=>{\n'; awk 'f{print} /^}$/ && !f {f=1}' "${wf}"; printf '\n})();\n'; } > "${d}/wf.check.mjs"
+    if node --check "${d}/wf.check.mjs" >/dev/null 2>&1; then record_pass "research-workflow: (a) onion-research.js válido com o corpo embrulhado em async (como o runtime)"
+    else record_fail "research-workflow: (a)" "node --check reprovou: $(node --check "${d}/wf.check.mjs" 2>&1 | head -3)"; fi
+    grep -q "^export const meta = {" "${wf}" && grep -q "name: 'onion-research'" "${wf}" && record_pass "research-workflow: (b) meta literal com name onion-research" || record_fail "research-workflow: (b)" "meta ausente/alterado"
+    rm -rf "${d}"
+  fi
+  if awk '/^---$/{c++; next} c==1' "${sk}" | grep -q "^description:"; then record_pass "research-workflow: (c) SKILL.md tem description (auto-ativação)"
+  else record_fail "research-workflow: (c)" "SKILL.md sem description no frontmatter"; fi
+  grep -q "argument-hint" "${sk}" && record_fail "research-workflow: (d)" "argument-hint não é aceito em SKILL.md (2.1.258)" || record_pass "research-workflow: (d) SKILL.md sem chave proibida argument-hint"
+  local n; n=$(grep -cE '^  - id: ' "${rs}")
+  [ "${n}" -ge 5 ] && grep -q "vendor-on-competitor" "${rs}" && record_pass "research-workflow: (e) radar-sources.yaml com ${n} eixos e tier vendor-on-competitor declarado" \
+    || record_fail "research-workflow: (e)" "roster com ${n} eixos ou sem vendor-on-competitor"
+}
+
 run_research_lens_selftests() {
   # `lint` é LOCAL por família no runner (não existe no escopo global): o 1º envio reprovou no gate com
   # `bash "" --only=…` (rc=1, saída vazia) enquanto o runner isolado — que a definia globalmente — passava 8/8.
@@ -11297,6 +11320,7 @@ run_pretooluse_veto_selftests
 run_version_drift_selftests
 run_premodelswitch_guard_selftests
 run_research_lens_selftests
+run_research_workflow_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
 run_kg_scope_selftests

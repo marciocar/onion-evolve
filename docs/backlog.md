@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**85 itens abertos** em 27 grafo(s) com aberto (de 50 no escopo) · 27 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**85 itens abertos** em 28 grafo(s) com aberto (de 51 no escopo) · 28 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 12 item(ns)
 
@@ -44,12 +44,11 @@
 | 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
 | 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
 
-## meta-research-lens-2026-09 — 6 item(ns)
+## meta-research-lens-2026-09 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 25.5 | `Q_DIRETRIZ_DE_PESQUISA_VIRA_MAQUINARIA` | meta-research-lens-2026-09 | Como a diretriz de pesquisa que o maestro re-digita a cada pesquisa/decisao (lente Onion, fontes atuais, Claude Code na versao atu |
-| 18.8 | `D_F2_MOTOR_WORKFLOW_ONION_RESEARCH_E_SKILL` | meta-research-lens-2026-09 | F2 (1 PR, motor): (a) .claude/workflows/onion-research.js DERIVADO do /deep-research embutido (mesmos schemas e votacao 3/2) com:  |
 | 14.0 | `D_PODA_INSTRUCTION_BLOAT_MEDIDA` | meta-research-lens-2026-09 | DECISAO PROPOSTA (fio proprio, GATED): medir o que do CLAUDE.md/skills/rules carrega SEMPRE vs sob demanda (InstructionsLoaded hoo |
 | 11.2 | `D_F3_MODO_DECISAO_COM_ELENXO` | meta-research-lens-2026-09 | F3 (1 PR, decisao): sem comando novo — a skill ganha modo "para decidir": corpus -> lacunas -> pesquisa SO nas lacunas -> Elenxo |
 | 9.0 | `D_F4_REVISITA_REGRA65_E_MODO_REVISIT` | meta-research-lens-2026-09 | F4 (1 PR, revisita): REGRA 65 passa a varrer review_after dos grafos de pesquisa e das fontes do roster (SOFT); /onion-research -- |
@@ -97,6 +96,12 @@
 | 4.5 | `Q_READONLY_CLAUSE_E_DEFEITO_DE_ESPEC` | fable-5-1-superacao-2026-09 | NAO E CASO DE MODELO: a clausula READ-ONLY do kg-freshness confunde POST com MUTACAO (pedir token por client_credentials e leitura |
 | 4.0 | `Q_EXP_LEITURA_KG_1M` | fable-5-1-superacao-2026-09 | EXPERIMENTO (pre-condicao: definir a metrica, que hoje NAO existe): numa sessao 5.1, contar quantas decisoes da sessao citam no do |
 | 3.3 | `Q_EXP_ELENXO_3_VS_6_LENTES` | fable-5-1-superacao-2026-09 | EXPERIMENTO: refutador Elenxo opus/high → fable permite 3 lentes independentes em vez de 4-6 sem perder cobertura adversarial? M |
+
+## websearch-cap-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.2 | `Q_WEBSEARCH_CAP_2_1_258` | websearch-cap-2026-09 | Qual e o teto de chamadas WebSearch por sessao no Claude Code 2.1.258 — a env var CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION, seu  |
 
 ## identidade-onion-vps-2026-08 — 5 item(ns)
 

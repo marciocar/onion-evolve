@@ -1,0 +1,56 @@
+# Roster de FONTES por eixo e cadência — a doutrina de escolha de fontes como DADO (F2 do plano
+# meta-research-lens-2026-09; a pesquisa mediu que o core não tinha nenhuma). Lido pelo workflow
+# onion-research (eixos fixos) e, em F4, pela REGRA 65 (fonte do roster sem `last_checked` dentro
+# da cadência = SOFT). Cada fonte carrega o tier DEFAULT (escala DREAM 1-10) — o nó de evidência
+# pode rebaixar/subir por artigo; `vendor-on-competitor` é sempre suspeito por desenho.
+# Cadências (justificadas com datas em data/ext-sota…): semanal · mensal · trimestral · anual.
+# Presença do arquivo = opt-in (superfície do CORE); o adotante sem ele usa só os eixos fixos genéricos.
+axes:
+  - id: claude-code-atual
+    cadence: weekly
+    sources:
+      - { url: "https://code.claude.com/docs/en/changelog", kind: primary, tier: 10, note: "changelog oficial — gatilho de re-medição de estratégia (REGRA 65)" }
+      - { url: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md", kind: primary, tier: 10 }
+      - { url: "https://www.anthropic.com/engineering", kind: engineer, tier: 9, note: "posts de engenharia (harness design, auto mode, multi-agent)" }
+      - { url: "https://code.claude.com/docs/llms.txt", kind: primary, tier: 10, note: "índice da doc — descobrir páginas antes de explorar" }
+  - id: mercado-capital
+    cadence: weekly
+    sources:
+      - { url: "https://techcrunch.com/tag/artificial-intelligence/", kind: aggregator, tier: 6, note: "filtrar por M&A/rodadas de 'AI coding'" }
+      - { url: "https://www.cnbc.com/technology/", kind: aggregator, tier: 6 }
+      - { url: "https://cursor.com/blog", kind: primary, tier: 8, note: "fonte primária do maior deal do ano (SpaceX, 2026-08)" }
+      - { url: "https://www.ycombinator.com/rfs", kind: analyst, tier: 8, cadence: monthly }
+      - { url: "https://nathanbenaich.substack.com/archive", kind: analyst, tier: 7, cadence: monthly, note: "State of AI newsletter" }
+      - { url: "https://a16z.com/", kind: analyst, tier: 7, cadence: monthly, note: "Big Ideas / Notes on AI apps — interesse próprio: investidor" }
+  - id: analistas
+    cadence: quarterly
+    sources:
+      - { url: "https://www.thoughtworks.com/radar", kind: analyst, tier: 9, note: "2 volumes/ano (abril, novembro) — maior densidade por palavra medida em 2026-09" }
+      - { url: "https://www.gartner.com/en/research/methodologies/gartner-hype-cycle", kind: analyst, tier: 8, note: "gartner.com devolve 403 — números chegam via terceiro; marcar aggregator quando for o caso" }
+      - { url: "https://menlovc.com/perspective/", kind: analyst, tier: 7, note: "State of GenAI in the Enterprise" }
+      - { url: "https://www.forrester.com/blogs/", kind: analyst, tier: 8, cadence: yearly, note: "Predictions saem em outubro" }
+      - { url: "https://survey.stackoverflow.co/", kind: primary, tier: 9, cadence: yearly }
+      - { url: "https://www.stateof.ai/", kind: analyst, tier: 8, cadence: yearly }
+  - id: repos-trajetoria
+    cadence: weekly
+    sources:
+      - { url: "https://api.github.com/search/repositories?q=<tema>+created:>AAAA-MM-DD&sort=stars&order=desc", kind: primary, tier: 8, note: "search-by-trajectory — nunca por nome; estrelas sem controle de inflação (tier 8, não 10)" }
+      - { url: "https://hn.algolia.com/api/v1/search_by_date?query=<tema>&tags=story", kind: forum, tier: 5, note: "sinal de trajetória; corrobora, não decide" }
+  - id: comunidade
+    cadence: weekly
+    sources:
+      - { url: "https://news.ycombinator.com/", kind: forum, tier: 4 }
+      - { url: "https://www.reddit.com/r/ClaudeAI/", kind: forum, tier: 3, note: "frequentemente inalcançável (medido 2026-09): lacuna declarada, não finding" }
+      - { url: "https://github.com/anthropics/claude-code/issues", kind: forum, tier: 6, note: "dor real de uso; tier acima de fórum genérico porque é o tracker oficial" }
+  - id: literatura
+    cadence: quarterly
+    sources:
+      - { url: "https://arxiv.org/list/cs.AI/recent", kind: paper, tier: 8, note: "buscar por termo: temporal knowledge graph, memory conflict, deep research agent, source credibility" }
+      - { url: "https://research.perplexity.ai/", kind: engineer, tier: 8, note: "WANDR, Search-as-Code — fornecedor sobre si mesmo (não sobre concorrente)" }
+      - { url: "https://www.microsoft.com/en-us/research/blog/", kind: engineer, tier: 8, note: "GraphRAG / LazyGraphRAG" }
+  - id: busca-agentica
+    cadence: monthly
+    sources:
+      - { url: "https://exa.ai/", kind: vendor-on-competitor, tier: 3, note: "todo comparativo de busca lido em 2026-09 era de concorrente direto — sempre suspeito" }
+      - { url: "https://firecrawl.dev/blog", kind: vendor-on-competitor, tier: 3 }
+      - { url: "https://parallel.ai/articles", kind: vendor-on-competitor, tier: 3 }

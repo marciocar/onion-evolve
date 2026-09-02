@@ -1,0 +1,60 @@
+---
+description: >
+  Pesquisa com a lente do Onion — estado da arte, "como o mercado faz X", "vale a pena Y", comparar
+  opções, tendência, benchmark, "o que mudou em 2026", contexto para uma decisão. Ative quando o
+  usuário pedir pesquisa, estudo, levantamento, estado da arte, comparação de ferramentas/abordagens,
+  "pesquise", "o que existe sobre", "está atual?", mesmo sem dizer "pesquisa". Injeta o CORPUS (o que
+  os grafos já sabem) antes de qualquer busca, fixa os eixos invariantes (Claude Code atual, mercado/
+  capital, trajetória, analistas, comunidade) e conduz ao workflow salvo /onion-research, que grava o
+  resultado em .kg.yaml bi-temporal com tier de fonte e radar exit 0. NÃO ative para bug/código local
+  nem para perguntas que o corpus já responde (aí a resposta é o próprio corpus).
+---
+
+# 🔭 onion-research — pesquisar com o corpus primeiro e o mercado sempre
+
+A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 cláusulas). Esta skill é o
+**caminho executável** dela — o maestro não redige a diretriz; ela chega como contexto e a maquinaria valida.
+
+## Contexto injetado (0 tokens de raciocínio — lido antes de você pensar)
+
+**Hoje:** !`date +%F`
+**Claude Code (disco / processo):** !`claude --version 2>/dev/null | head -1` / !`basename "${CLAUDE_CODE_EXECPATH:-?}"`
+**O que os grafos JÁ sabem sobre `$ARGUMENTS`:**
+!`bash .claude/validation/kg-corpus-grep.sh $ARGUMENTS 2>&1 | head -40`
+
+**Roster de fontes por eixo:** `docs/onion/radar-sources.yaml` (tier default por fonte; `vendor-on-competitor` sempre suspeito).
+
+## Etapas
+
+1. **Corpus primeiro.** Leia o bloco acima. Igual → transfere (responda do corpus e pare, ou cite os nós);
+   diferente/ausente → desenha a pesquisa. Nunca re-derive o que um nó `confirmed` com `verified_at`
+   recente já diz — cite o id.
+2. **Gênero da pergunta** (dirige o pipeline): `qa` (fato) · `landscape` (estado da arte/mercado) ·
+   `decision` (opções para o maestro selar) · `validation` (hipótese a refutar). Diga qual.
+3. **Orçamento** (declare, nunca silencie): `maxFetch` (default 15) e `maxVerify` (default 25); excedente
+   volta NOMEADO no retorno. Custo típico medido: 68–74k tokens por nó no censo — compare no `valeu-a-pena`.
+4. **Rode o workflow** — o comando é o opt-in do `Workflow`:
+   ```
+   Workflow({ scriptPath: '.claude/workflows/onion-research.js', args: {
+     question: '<pergunta>', corpus: '<bloco do corpus acima, verbatim>', today: '<hoje>',
+     slug: '<kebab-case>', kgPath: 'docs/evolution/research/<slug>-<AAAA-MM>/<slug>-<AAAA-MM>.kg.yaml',
+     budget: { maxFetch: 15, maxVerify: 25 } } })
+   ```
+   Fases: Corpus → Scope (ângulos do tema + 5 eixos fixos) → Search → Fetch (tier/kind/validFrom por fonte)
+   → Verify (3 votos, 2 refutam; `vendor-on-competitor` sem primária = refutada) → Synthesize (seção
+   **mercado obrigatória**) → **write(KG)** (o agente escreve o grafo e prova radar exit 0; sem 0 o run
+   devolve erro).
+5. **Depois do run** (o que o workflow não faz): `SYNTHESIS.md` como PROJEÇÃO do grafo com o contrato de
+   custo no frontmatter (`kg:`, `run_id`, `tokens`, `agents`, `duration_min`) e as seções **NÃO-VERIFICADOS**
+   (do retorno: `unverified`, `refuted` por fonte fraca, `notVerifiedByBudget`, `budgetDropped`) e
+   **valeu-a-pena** (tokens ÷ nós); `meta.review_after` pela cadência do tipo dominante (REGRA 67);
+   `docs/backlog.md` regenerado se houver nó open; resíduo REGRA 56; PR pelo fluxo normal.
+6. **Se a pergunta é para DECIDIR** (F3, quando existir): o resultado vira nó `decision` open com as opções e
+   `CONSTRAINS`; o maestro sela — você nunca sela sozinho.
+
+## Fronteiras declaradas
+
+- Só a sessão principal roda o workflow (opt-in por comando); subagente não orquestra.
+- Sem WebSearch disponível o workflow degrada: use `WebFetch` sobre fontes do roster e declare.
+- Não há cota de busca entre sessões (a plataforma zera em `/clear`): o orçamento é seu, por rodada.
+- Revisita periódica (F4): a REGRA 67 avisa; o maestro roda `--revisit` — nunca cron (MOAT W7).

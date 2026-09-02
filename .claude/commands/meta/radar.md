@@ -43,6 +43,10 @@ introspecção e **zero percepção externa recorrente** (S9 parada desde 07-06)
 
 1. **Escopo**: sem argumento → eixos acusados pela REGRA 65 (`bash .claude/validation/lint-artifacts.sh`
    ou leia `docs/onion/radar-baselines.yaml`); `E<N>` → só o eixo; `--all` → os 6.
+   `--axis <slug>` → eixo AD-HOC (tema livre fora de E1–E6): a rodada usa a lente de
+   `common/prompts/research-doctrine.md` e o workflow `/onion-research`; ao selar, o eixo entra em
+   `docs/onion/radar-baselines.yaml` como `AX-<slug>` com `last_run` e `kg:` — a REGRA 65 passa a
+   cobrar a idade dele como dos demais. Fontes por eixo: `docs/onion/radar-sources.yaml`.
 2. **Fan-out** via skill `onion-orchestration` — molde EXECUTÁVEL: o F1 do programa
    (`data/f1-scan-mundo.json` guarda o shape; pipeline scan `sonnet/medium` → juiz `opus/high`
    por eixo, schemas com `source`+`source_date` obrigatórios, `.filter(Boolean)` + contagem de
