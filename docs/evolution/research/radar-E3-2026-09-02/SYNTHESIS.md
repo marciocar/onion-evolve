@@ -44,12 +44,15 @@ NOSSA estratégia?"*. O CHANGELOG salta de 2.1.252 para 2.1.257 (sem 253–256);
 
 ## Lacunas declaradas (desfecho de 1ª classe)
 
-(1–2 do juiz; 3–4 minhas — a seção do juiz chegou truncada duas vezes a partir do 3º item.)
+(1–2 do juiz na 1ª entrega; 3–7 do juiz na 2ª entrega, 01:12Z, após 2 truncamentos — 3–4 coincidem com as que eu já declarara por conta própria.)
 
 1. Preço/cota do Fable 5.1 **nesta conta** — CHANGELOG dá tabela, não cota (régua de 3 degraus exige o maestro).
 2. Se o alias `fable` desta sessão (não-gateway) resolve 5 ou 5.1 — lido, não medido em runtime.
-3. F9 não reproduzido (corte de stream é não-determinístico).
-4. `blockReadsOutsideWorkingDirectories` não ativado para observar o erro exato que o worker recebe.
+3. F9 é leitura do CHANGELOG, não observação — corte de stream não reproduzido (mim + juiz, independentemente).
+4. `blockReadsOutsideWorkingDirectories` não exercitado — a opção não está setada; só se confirmou que a leitura cross-repo funciona hoje (mim + juiz).
+5. F8 mede declaração, não execução — o gate não rodou dentro de worktree isolado (juiz).
+6. Sem WebSearch/WebFetch — nada cruzado com fonte externa (juiz).
+7. 2.1.258 fora do escopo — seus 2 fixes não avaliados; entram na próxima rodada do E3 (juiz).
 
 ## Edições aplicadas nesta rodada (mesmo commit da baseline)
 
