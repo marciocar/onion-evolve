@@ -95,7 +95,7 @@ updated: "YYYY-MM-DD"
 ---
 name: nome-agente
 description: Descrição da especialização
-model: sonnet|opus|haiku
+model: sonnet|opus|haiku|fable
 category: development|product|meta|compliance|review|testing|research|git|deployment
 tags: [tag1, tag2]
 expertise: [area1, area2, area3]

@@ -190,6 +190,17 @@ nodes:
     label: 'LACUNA 1 FECHADA POR TESTEMUNHO: o maestro confirma que o Fable 5.1 esta disponivel nesta conta (2026-09-02). Preco/cota continuam nao-medidos por maquina (o relato cobre ACESSO, nao custo) — o que muda: a regua de 3 degraus (GA != liberado na conta != sem custo) tem o 2o degrau satisfeito; o 3o (custo) segue declaracao de catalogo ($10/$50 por MTok, CHANGELOG 2.1.257 l.10).'
     trace: 'docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md'
 
+  - id: E_PROBE_ALIAS_FABLE_MEDIDO_0902
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-02
+    verified_against: 'Agent({model:"fable"}) + grep "model":"..." no transcript do subagente = 1x "claude-fable-5-1" (campo da RESPOSTA da API, nao declaracao do modelo); Claude Code 2.1.257; sessao sem gateway'
+    label: 'FECHA A LACUNA 2 POR MEDICAO: o alias `fable` do Agent tool desta sessao (nao-gateway) resolve para claude-fable-5-1 — o mesmo molde que fechou o gap do `opus` (Q_E3_DELTA_2_1_257). Escopo: Workflow tool NAO medido; sessoes via gateway seguem o CHANGELOG l.99. Detalhe e consequencias na pesquisa de superacao (fable-5-1-superacao-2026-09.kg.yaml, E_PROBE_ALIAS_FABLE_5_1).'
+    trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-fable-alias.md'
+
 edges:
   - from: E_F1_FABLE_5_1_DEFAULT
     to: Q_E3_DELTA_2_1_257
@@ -234,5 +245,8 @@ edges:
     to: Q_E3_DELTA_2_1_257
     edge_type: CONSTRAINS
   - from: E_FABLE_5_1_CONFIRMADO_NA_CONTA
+    to: E_LACUNAS_DECLARADAS_E3_0902
+    edge_type: SUPPORTS
+  - from: E_PROBE_ALIAS_FABLE_MEDIDO_0902
     to: E_LACUNAS_DECLARADAS_E3_0902
     edge_type: SUPPORTS

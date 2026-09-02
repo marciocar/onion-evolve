@@ -7,7 +7,7 @@ O Sistema Onion mantém **duas GitHub Actions nativas** que validam PRs que toca
 | Workflow | Arquivo | Gatilho | O que faz | Secret |
 |---|---|---|---|---|
 | **Onion Artifact Linter** | `.github/workflows/onion-validate.yml` | PR tocando `.claude/**` ou `docs/meta-specs/**` | Linter **determinístico** (`.claude/validation/lint-artifacts.sh`): frontmatter, kebab-case, limites de linha, ausência de `gpt-4` em campo `model`, ausência de vaporware, proibição de agente worker-orchestrator — **seguido** do auto-teste das guardas (`.claude/validation/lint-selftest.sh`) | nenhum |
-| **Onion Code Review (Claude)** | `.github/workflows/onion-review.yml` | PR (`opened`/`synchronize`) | Revisão **semântica** via Claude (`sonnet-4-6`) aplicando a doutrina do `@metaspec-gate-keeper` contra `docs/meta-specs/` | `ANTHROPIC_API_KEY` |
+| **Onion Code Review (Claude)** | `.github/workflows/onion-review.yml` | PR (`opened`/`synchronize`) | Revisão **semântica** via Claude (`claude-sonnet-5` — o `--model` de `onion-review.yml:170,263`) aplicando a doutrina do `@metaspec-gate-keeper` contra `docs/meta-specs/` | `ANTHROPIC_API_KEY` |
 
 ## Camadas complementares
 

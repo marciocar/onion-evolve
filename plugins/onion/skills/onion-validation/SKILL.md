@@ -16,7 +16,7 @@ allowed-tools: Bash(find .claude/*) Bash(wc -l*) Bash(grep*)
 |-------|------|------------|
 | `name` | string | kebab-case, único |
 | `description` | string | 1-2 linhas claras |
-| `model` | string | `sonnet` \| `opus` \| `haiku` |
+| `model` | string | `sonnet` \| `opus` \| `haiku` \| `fable` |
 | `category` | string | categoria válida (ver lista) |
 | `tags` | array | 3-7 itens |
 | `version` | string | `"3.0.0"` ou superior |

@@ -24,6 +24,7 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E6-fronteira-modelos
-    last_run: 2026-08-31
-    descartes: "3/7 (os 3 comparáveis B2B de preço reprovados pelo juiz — a metade preço do eixo NÃO ficou medida na rodada 0)"
-    kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
+    last_run: 2026-09-02
+    cc_version: "2.1.257"
+    descartes: "4/25 estratégias reprovadas pelo juiz Elenxo (itens 1, 3, 18, 25) + 3 contagens corrigidas; preço do Fable 5.1 = catálogo, não medido"
+    kg: docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
