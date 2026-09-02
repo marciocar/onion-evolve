@@ -3,7 +3,7 @@ title: "Revisão — Drive W9: 3 nós reais fechados por mecanismo + radar E3 ro
 date: 2026-09-02
 branch: drive/w9-real-nodes
 reviewer: "revisão do condutor com medições executadas: write-stamp dogfood em clone real (AVISO 1 referência, inbox excluído) + bancada caso 6 PASS/FAIL sob mutação; bench a2a spawnSync 4820ms vs spawn 1,1ms (t0 antes do yield, artefato de medição corrigido); radar freshness fixture testimony (TESTIMONY/TESTIMONY-UNMARKED/MISPLANED) PASS + census-extract (d) 1 A-MEDIR/1 TESTEMUNHO; E3: juiz opus/high re-mediu no vivo (26 settings rc=1; plugins/ 0 symlinks; setsid só decoy); lint-artifacts rc=0, 0 HARD; radar --integrity --schema exit 0 nos 4 grafos tocados"
-reviewed_diff_sha256: c28ddf508bc05305e15b30e856f9e7aef46c40d725ceae9771e739b361f9a61d
+reviewed_diff_sha256: 5d40b6454f84f5010ae71b138e060a34a89eed9eea3abe149aa57aad37d377fb
 findings_total: 4
 findings_real: 4
 verdict: APROVADO
