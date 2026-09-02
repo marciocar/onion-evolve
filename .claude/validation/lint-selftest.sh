@@ -3735,6 +3735,56 @@ run_compose_settings_selftests() {
 # latest-max só tinha prosa). Baseline sintético via ONION_RADAR_BASELINES; log via
 # ONION_MODEL_SWITCH_LOG. O evento em si foi medido ao vivo (E_PREMODELSWITCH_DISPARO_MEDIDO_0902);
 # aqui se prova a DECISÃO do hook sobre o payload, não o disparo.
+# ── research-lens (F1): kg-corpus-grep + REGRA 67 (review_after) + REGRA 68 (tier×confiança) ───────
+# previne: o passo 0 "o corpus primeiro" sem mecanismo, e pesquisa que envelhece/confia em fonte fraca
+# sem ninguém ver. Fixtures sintéticas em dir próprio (ONION_RESEARCH_KG_DIR / ONION_KG_CORPUS_FILES).
+run_research_lens_selftests() {
+  # `lint` é LOCAL por família no runner (não existe no escopo global): o 1º envio reprovou no gate com
+  # `bash "" --only=…` (rc=1, saída vazia) enquanto o runner isolado — que a definia globalmente — passava 8/8.
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  local cg="${REPO_ROOT}/.claude/validation/kg-corpus-grep.sh"
+  if [ ! -f "${cg}" ]; then record_fail "research-lens" "script ausente: ${cg}"; return; fi
+  if ! command -v python3 >/dev/null 2>&1; then record_skip "research-lens: python3 ausente → pulado"; return; fi
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/g1" "${d}/g2" "${d}/g3" "${d}/g4"
+  local past future; past="2026-01-01"; future="2099-01-01"
+  # g1: NOVO (baseline hoje) sem review_after → SOFT 67 ; g2: vencido → SOFT 67 ; g3: futuro → silêncio ; g4: antigo sem chave → silêncio
+  printf 'meta:\n  id: g1\n  schema_version: "1"\n  baseline: 2026-09-02\nnodes:\n  - id: E_BLOG_CONCORRENTE\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 3\n    confidence: 0.9\n    source_tier: 2\n    source_kind: vendor-on-competitor\n    label: "comparacao de busca escrita por concorrente"\n  - id: E_DOC_OFICIAL\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 3\n    confidence: 0.9\n    source_tier: 9\n    source_kind: primary\n    label: "changelog oficial do Claude Code"\nedges:\n' > "${d}/g1/g1.kg.yaml"
+  printf 'meta:\n  id: g2\n  schema_version: "1"\n  baseline: 2026-01-01\n  review_after: %s\nnodes:\n  - id: C_X\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: "x"\nedges:\n' "${past}" > "${d}/g2/g2.kg.yaml"
+  printf 'meta:\n  id: g3\n  schema_version: "1"\n  baseline: 2026-09-02\n  review_after: %s\nnodes:\n  - id: C_Y\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: "y"\nedges:\n' "${future}" > "${d}/g3/g3.kg.yaml"
+  printf 'meta:\n  id: g4\n  schema_version: "1"\n  baseline: 2026-01-01\nnodes:\n  - id: C_Z\n    node_type: claim\n    plane: DEV\n    status: superseded\n    impact: 2\n    confidence: 0.5\n    label: "z premodelswitch antigo"\nedges:\n' > "${d}/g4/g4.kg.yaml"
+  local rc=0 out
+  out="$(ONION_RESEARCH_KG_DIR="${d}" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q "REGRA 67: grafo de pesquisa NOVO (baseline 2026-09-02) sem meta.review_after" && printf '%s' "${out}" | grep -q "g1/g1.kg.yaml"; then
+    record_pass "research-lens: (a) grafo NOVO sem review_after ⇒ SOFT 67 (catraca sem retro-ruído)"
+  else record_fail "research-lens: (a)" "esperava SOFT 67 em g1 (rc=${rc}): ${out:0:300}"; fi
+  if printf '%s' "${out}" | grep -q "REGRA 67: revisita VENCIDA (review_after ${past}"; then
+    record_pass "research-lens: (b) review_after vencido ⇒ SOFT 67"
+  else record_fail "research-lens: (b)" "esperava VENCIDA em g2: ${out:0:300}"; fi
+  if ! printf '%s' "${out}" | grep -q "g3/g3.kg.yaml" && ! printf '%s' "${out}" | grep -q "g4/g4.kg.yaml"; then
+    record_pass "research-lens: (c) review_after futuro e grafo antigo sem chave ⇒ silêncio"
+  else record_fail "research-lens: (c)" "falso positivo em g3/g4: ${out:0:300}"; fi
+  if printf '%s' "${out}" | grep -q "REGRA 68: nó E_BLOG_CONCORRENTE tem confidence 0.9 com fonte fraca (source_tier 2, source_kind vendor-on-competitor)"; then
+    record_pass "research-lens: (d) confiança 0.9 + tier 2 vendor-on-competitor ⇒ SOFT 68"
+  else record_fail "research-lens: (d)" "esperava SOFT 68 em E_BLOG_CONCORRENTE: ${out:0:300}"; fi
+  if ! printf '%s' "${out}" | grep -q "E_DOC_OFICIAL"; then
+    record_pass "research-lens: (e) confiança 0.9 + tier 9 primary ⇒ silêncio"
+  else record_fail "research-lens: (e)" "falso positivo em E_DOC_OFICIAL: ${out:0:300}"; fi
+  # corpus-grep: acha por termo no label, esconde superseded por default, mostra com --all-status, fail-loud sem corpus
+  local files; files="$(printf '%s\n' "${d}/g1/g1.kg.yaml" "${d}/g4/g4.kg.yaml")"
+  out="$(ONION_KG_CORPUS_FILES="${files}" bash "${cg}" concorrente 2>&1)"; rc=$?
+  if [ "${rc}" = 0 ] && printf '%s' "${out}" | grep -q "E_BLOG_CONCORRENTE" && printf '%s' "${out}" | grep -q "^# corpus: 2 grafos"; then
+    record_pass "research-lens: (f) kg-corpus-grep acha por termo no label e conta o corpus"
+  else record_fail "research-lens: (f)" "rc=${rc}: ${out:0:200}"; fi
+  out="$(ONION_KG_CORPUS_FILES="${files}" bash "${cg}" premodelswitch 2>&1)"
+  if ! printf '%s' "${out}" | grep -q "C_Z" && ONION_KG_CORPUS_FILES="${files}" bash "${cg}" premodelswitch --all-status 2>&1 | grep -q "C_Z"; then
+    record_pass "research-lens: (g) superseded escondido por default, visível com --all-status"
+  else record_fail "research-lens: (g)" "filtro de status errado: ${out:0:200}"; fi
+  rc=0; ONION_KG_CORPUS_FILES= ONION_KG_CORPUS_ROOT="${d}/vazio" bash "${cg}" x >/dev/null 2>&1 || rc=$?
+  [ "${rc}" = 2 ] && record_pass "research-lens: (h) corpus vazio ⇒ exit 2 (fail-loud, nunca '0 achados')" \
+    || record_fail "research-lens: (h)" "esperava exit 2, veio ${rc}"
+  rm -rf "${d}"
+}
+
 run_premodelswitch_guard_selftests() {
   local hk="${REPO_ROOT}/.claude/hooks/premodelswitch-guard.sh"
   if [ ! -f "${hk}" ]; then record_fail "premodelswitch-guard" "hook ausente: ${hk}"; return; fi
@@ -11246,6 +11296,7 @@ run_kg_status_factor_selftests
 run_pretooluse_veto_selftests
 run_version_drift_selftests
 run_premodelswitch_guard_selftests
+run_research_lens_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
 run_kg_scope_selftests

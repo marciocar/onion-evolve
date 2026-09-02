@@ -2,6 +2,7 @@ meta:
   id: meta-research-lens-2026-09
   schema_version: "1"
   baseline: 2026-09-02
+  review_after: 2026-12-01   # revisita (mercado/doutrina 90d) — REGRA 67
   # kg-backlog-guard: on
   # ═══ TETO: 34 NÓS. Rodada fechada: cresce por dogfood de fase (F1-F4) ou emenda de Elenxo. ═══
   # Ordem do maestro (2026-09-02): "como podemos estruturar um conjunto /meta:* para eu não precisar
@@ -228,10 +229,12 @@ nodes:
   # ── DECISÕES (plano de execução — nascem open; o maestro sela) ─────────────────────────
   - id: D_F1_FUNDACAO_FRAGMENTO_CAMPOS_GUARDAS_CORPUS
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
     impact: 5
-    confidence: 0.8
+    confidence: 0.9
+    verified_at: 2026-09-02
+    verified_against: 'selo do maestro ("Vamos atacar D_F1..F4"); DOGFOOD: kg-corpus-grep.sh PreModelSwitch → 8 nos (81 grafos via git ls-files; o glob antigo via 27), "instruction bloat" → 2 nos, corpus vazio → exit 2; bancada run_research_lens_selftests 8/8; lint no corpus real 0 HARD; radar exit 0 nos 4 grafos carimbados com review_after; entregue no PR feat/research-lens-f1'
     label: 'F1 (1 PR, fundacao): (a) .claude/commands/common/prompts/research-doctrine.md — as 10 clausulas do maestro como checklist executavel, citado por radar.md, @research-agent, /meta:kg; (b) .claude/rules/research-lens.md com paths: docs/evolution/research/** (carga preguicosa); (c) schema do KG ganha valid_from:, source_tier:, source_kind: no no de evidencia e meta.review_after: (kg.md + kg-radar --freshness-tsv mostra tier); (d) lint: SOFT review_after vencido (irma da REGRA 65) + SOFT confianca alta com fonte fraca; (e) .claude/validation/kg-corpus-grep.sh <tema> -> nos de todos os grafos com data/veredito/tier (~20 linhas sobre o glob de kg-census-extract.sh:44); (f) bancada. Dogfood: rodar o grep para "PreModelSwitch" e "instruction bloat" e conferir que devolve os nos desta sessao. Custo ~300-500k. GATILHO: selo do maestro.'
     trace: 'docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md'
 

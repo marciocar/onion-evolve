@@ -103,6 +103,8 @@ Antes de mergulhar, estabeleça:
 - **Considerações futuras**: Como isso pode evoluir?
 
 ### Fase 3: Verificação e Referência Cruzada
+- **Doutrina de pesquisa do Onion** (corpus primeiro via `kg-corpus-grep.sh`, mercado/capital invariante, tier de fonte
+  1–10 com `vendor-on-competitor` sempre suspeito, bi-temporal, revisita): `.claude/commands/common/prompts/research-doctrine.md`
 - **Credibilidade da fonte**: Verifique informação através de múltiplas fontes
 - **Verificação de atualidade**: Garanta que informação é atual e relevante
 - **Resolução de conflito**: Quando fontes discordam, investigue por quê

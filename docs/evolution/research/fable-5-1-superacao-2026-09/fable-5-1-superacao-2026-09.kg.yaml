@@ -2,6 +2,7 @@ meta:
   id: fable-5-1-superacao-2026-09
   schema_version: "1"
   baseline: 2026-09-02
+  review_after: 2026-10-17   # revisita (lineup de modelos 45d) — REGRA 67
   # kg-backlog-guard: on
   # ═══ TETO: 34 NÓS. Rodada fechada: cresce só por experimento executado (Q_EXP_*) ou emenda de juiz. ═══
   # Pesquisa interna+externa ordenada pelo maestro (2026-09-02): "superação com as funcionalidades e

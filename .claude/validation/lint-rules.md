@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**65 regras** no total — **59 HARD**, **15 SOFT**.
+**67 regras** no total — **59 HARD**, **17 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -117,6 +117,8 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 55 | O `trace:` de um nó APONTA para alvo que EXISTE | HARD | âncora declarada que não resolve — quem tenta voltar ao "porquê" cai no vazio |
 | 57 | O veredito do run está SELADO no grafo que ele julgou | HARD | run que mede e não sela — a SSOT segue afirmando o que a medição já derrubou |
 | 58 | O backlog cumpre as promessas do próprio `meta:` | HARD | backlog que promete teto e carimbo no cabeçalho e não cobra nenhum dos dois — inchando |
+| 67 | Grafo de pesquisa com REVISITA carimbada (meta.review_after) | SOFT | pesquisa que envelhece em silêncio — 27 grafos em docs/evolution/research/ sem nenhuma data de |
+| 68 | Confiança alta com fonte fraca | SOFT | evidência externa "confirmada" com confidence >= 0.8 apoiada em fonte de baixa autoridade |
 
 ## Automação Graduada
 
