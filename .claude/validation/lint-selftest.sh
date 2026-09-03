@@ -10750,7 +10750,7 @@ run_selftest_lanes_selftests() {
   defs="$(grep -cE '^run_[a-z0-9_]+_selftests\(\) \{' "${sut}")"
   if [ "${defs}" -eq "${n}" ]; then
     record_pass "selftest-lanes: (b) ${defs} famílias definidas = ${n} invocadas (nenhuma fantasma)"
-  else record_fail "selftest-lanes: (b) família fantasma" "definidas=${defs} invocadas=${n}: $(diff <(grep -oE '^run_[a-z0-9_]+_selftests\(\)' "${sut}" | sed -E 's/^run_(.*)_selftests\(\)/\1/' | sort) <(printf '%s\n' "${out}" | sort) | grep '^[<>]' | head -3 | tr '\n' ' ')"; fi
+  else record_fail "selftest-lanes: (b) família fantasma" "definidas=${defs} invocadas=${n}: $(diff <(grep -oE '^run_[a-z0-9_]+_selftests\(\)' "${sut}" | sed -E 's/^run_(.*)_selftests\(\)/\1/' | sort) <(printf '%s\n' "${out}" | sort) | grep '^[<>]' | sed -n '1,3p' | tr '\n' ' ')"; fi
   # (c) --families roda SÓ a família pedida (ladder_integrity = 1 caso)
   out="$(bash "${sut}" --families ladder_integrity 2>&1 || true)"
   n="$(printf '%s\n' "${out}" | grep -c '^  ✓' || true)"
@@ -10815,7 +10815,7 @@ PYI
   else record_fail "selftest-lanes: (l) vacuidade" "rc=${rc}; $(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
   # (m) SHARD do manifest: 4 fixtures reais no manifest da cópia; 2 workers ⇒ cada linha exatamente uma vez
   local mf="${d}/.claude/validation/fixtures/manifest.tsv"
-  { grep -E '^kind' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv"; grep -E '^lint' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv" | head -4; } > "${mf}"
+  { grep -E '^kind' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv"; grep -E '^lint' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv" | sed -n '1,4p'; } > "${mf}"   # sed drena: `| head` dava EPIPE ao grep (exit 2) e matou o worker 0 no CI (2 cores)
   out="$(bash "${copy}" --families fixtures --jobs 2 2>&1)" && rc=0 || rc=$?
   n="$(printf '%s\n' "${out}" | grep -c '^  ✓' || true)"
   if [ "${rc}" -eq 0 ] && [ "${n}" -eq 4 ] && printf '%s\n' "${out}" | grep -q 'Passaram : 4'; then
@@ -10924,7 +10924,9 @@ run_kg_reverify_schema_selftests() {
   if printf '%s\n' "${st_out}" | grep -qE '^[0-9]+/[0-9]+ ' && ! printf '%s\n' "${st_out}" | grep -q '✗'; then
     record_pass "kg-reverify-schema: selftest embutido verde ($(printf '%s' "${st_out}" | grep -oE '^[0-9]+/[0-9]+' | tail -1))"
   else
-    record_fail "kg-reverify-schema: selftest" "reprovou ou não somou — rode bash ${chk} --selftest"
+    # (2026-09-03) 3ª reprovação desta guarda no gate com o helper passando isolado (24/24 sob 8× concorrência):
+    # a causa é ambiental e a mensagem antiga descartava a saída — agora ela vem junto (classe bench-flaky).
+    record_fail "kg-reverify-schema: selftest" "reprovou ou não somou — rode bash ${chk} --selftest · últimas linhas: [$(printf '%s\n' "${st_out}" | grep -vE '^\s*$' | tail -4 | tr '\n' '|' | cut -c1-400)]"
   fi
   # (b) o schema real do repo está conforme
   if bash "${chk}" >/dev/null 2>&1; then
