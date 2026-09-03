@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**112 itens abertos** em 32 grafo(s) com aberto (de 54 no escopo) · 32 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**111 itens abertos** em 32 grafo(s) com aberto (de 54 no escopo) · 32 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 12 item(ns)
 
@@ -192,13 +192,6 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## fios-abertos — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 6.8 | `Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE` | fios-abertos | A bancada vendorizada (lint-selftest.sh) NAO PODE passar no adotante: medido em 2026-09-02 no 1o adotante greenfield do pin 8e2517 |
-| 3.0 | `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO` | fios-abertos | PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-ver |
-
 ## federation-health-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -248,6 +241,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
+
+## fios-abertos — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.0 | `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO` | fios-abertos | PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-ver |
 
 ## catraca-regra49-2026-08 — 1 item(ns)
 

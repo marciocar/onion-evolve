@@ -131,6 +131,9 @@ SELFTEST_LIST=0; SELFTEST_MAP=0; SELFTEST_TIMING="${ONION_SELFTEST_TIMING:-0}"
 SELFTEST_JOBS="${ONION_SELFTEST_JOBS:-1}"; SELFTEST_FAMILIES="${ONION_SELFTEST_FAMILIES:-}"
 SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFECTED_STAGED=0; SELFTEST_DRY=0
 SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHARD:-}"
+# papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
+SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
+SELFTEST_CORE_ONLY_FAMILIES="resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -168,8 +171,19 @@ _family() {
   # FILA (faixa paralela): cada worker percorre o script e REIVINDICA a família com mkdir atômico; quem pegou
   # uma pesada fica para trás e os outros seguem — balanceamento dinâmico sem tabela de tempos. `fixtures`
   # é fatiada (shard) e roda em todos. Ao terminar, marca done/: o pai acusa reivindicada-sem-done.
+  # CORE-ONLY por DADO (Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE, cura (a), 2026-09-03): mapa família-a-família na
+  # cópia de um adotante greenfield com o .claude/ atual e role: adopted — 118 passam; estas 12 reprovam porque testam
+  # SSOT/maquinaria que SÓ o core tem (radar-baselines, members.yaml, radar-sources, marketplace, moat, outbox, bundling,
+  # registro de regras). No adotante pulam com ⊘ VISÍVEL; no core rodam. Re-medir ao adicionar família nova.
   if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then
     mkdir "${SELFTEST_QUEUE}/claimed/${name}" 2>/dev/null || return 0
+  fi
+  if [ "${SELFTEST_ROLE}" = "adopted" ]; then
+    case ",${SELFTEST_CORE_ONLY_FAMILIES}," in *",${name},"*)
+      record_skip "${name}: core-only (role: adopted — testa SSOT/maquinaria que só o core tem)"
+      if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then : > "${SELFTEST_QUEUE}/done/${name}"; fi
+      return 0 ;;
+    esac
   fi
   t0="${SECONDS}"
   "${fn}"
@@ -4214,13 +4228,13 @@ run_resolve_target_selftests() {
     record_skip "resolve-target: seletor sobre membros pulado (sem python+yaml — gracioso)"; return; fi
   local todos hub
   todos="$(bash "${helper}" todos 2>/dev/null | LC_ALL=C sort)"
-  hub="$(bash "${helper}" 'tier:hub' 2>/dev/null | grep -v '^$' | LC_ALL=C sort)"
+  hub="$(bash "${helper}" 'tier:hub' 2>/dev/null | grep -v '^$' | LC_ALL=C sort || true)"   # adotante sem membro hub: grep vazio sob pipefail MATAVA a suíte (medido na cópia da Sacola, 2026-09-03)
   if [ -n "${todos}" ] && [ -z "$(comm -23 <(printf '%s\n' "${hub}") <(printf '%s\n' "${todos}"))" ]; then
     record_pass "resolve-target: todos não-vazio + tier:hub ⊆ todos"
   else record_fail "resolve-target: subconjunto" "tier:hub não é subconjunto de todos"; fi
   local a b
-  a="$(bash "${helper}" 'tier:standalone' 2>/dev/null | grep -v '^$' | LC_ALL=C sort)"
-  b="$(bash "${helper}" 'tier:standalone,mode:regulated' 2>/dev/null | grep -v '^$' | LC_ALL=C sort)"
+  a="$(bash "${helper}" 'tier:standalone' 2>/dev/null | grep -v '^$' | LC_ALL=C sort || true)"   # adotante sem membro desse tier: grep vazio sob pipefail matava a suíte
+  b="$(bash "${helper}" 'tier:standalone,mode:regulated' 2>/dev/null | grep -v '^$' | LC_ALL=C sort || true)"   # adotante sem membro desse tier: grep vazio sob pipefail matava a suíte
   if [ -z "$(comm -23 <(printf '%s\n' "${b}") <(printf '%s\n' "${a}"))" ]; then
     record_pass "resolve-target: AND é interseção (a,b ⊆ a)"
   else record_fail "resolve-target: AND" "interseção não é subconjunto de a"; fi
@@ -9027,6 +9041,7 @@ KGEOF
     s0="$(printf '%s' "${o0}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
 
     # (1) documento NOVO sem nó e fora do baseline ⇒ soma exatamente 1 HARD.
+    mkdir -p "$(dirname "${sb}/${probe_novo}")"   # adotante sem docs/analysis/: o printf abortava a suíte (medido na cópia da Sacola, 2026-09-03)
     printf '# sonda nova\n' > "${sb}/${probe_novo}"
     o1="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe_novo}" 2>&1 || true)"
     h1="$(printf '%s' "${o1}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
@@ -10408,6 +10423,15 @@ if [ -f "${MANIFEST}" ]; then
     [ "${kind}" = "kind" ] && continue           # header
     _shard_k=$(( _shard_k + 1 ))
     [ $(( (_shard_k - 1) % _shard_n )) -eq "${_shard_i}" ] || continue
+    # CORE-ONLY no adotante (Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE, cura (a), 2026-09-03): em repo
+    # derivado (role: adopted no stamp) o inventory_scope_excluded() do lint exclui tudo fora de docs/onion/, logo as
+    # fixtures de contagem (r16) e de links de evolução (r22) são INSATISFAZÍVEIS lá — medido no 1º adotante
+    # greenfield (9 ✗ + 1 ✗). Pula com ⊘ VISÍVEL (nunca silêncio); no core (role ausente/source) roda tudo.
+    if [ "${SELFTEST_ROLE}" = "adopted" ]; then
+      case "${fixture}" in r16-count-drift/*|r22-evolution-links/*)
+        record_skip "fixtures: ${fixture} — core-only (role: adopted; escopo derivado torna a asserção insatisfazível)"; continue ;;
+      esac
+    fi
     case "${kind}" in
       lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" ;;
       fix)      run_fix_fixture "${fixture}" "${target}" "${verdict}" ;;
@@ -10910,6 +10934,36 @@ run_instructions_loaded_selftests() {
   rm -rf "${d}"
 }
 _family run_instructions_loaded_selftests
+
+# Modo core-only-role — Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE, cura (a): com o stamp `role: adopted`, as famílias
+# e fixtures core-only pulam com ⊘ VISÍVEL; sem stamp (core) rodam. Medido família-a-família na cópia de um adotante
+# greenfield (2026-09-03): 118 passam, 12 são core-only por SSOT/maquinaria, 3 abortos de robustez curados.
+run_core_only_role_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/lint-selftest.sh" d out
+  d="$(mktemp -d)"; cp -a "${REPO_ROOT}/.claude" "${d}/.claude"; cp -a "${REPO_ROOT}/docs" "${d}/docs"; cp -a "${REPO_ROOT}/CLAUDE.md" "${d}/CLAUDE.md"
+  rm -rf "${d}/.claude/sessions" "${d}/.claude/worktrees"
+  printf 'framework: onion-evolve\nsource_commit: 0000000\nrole: adopted\n' > "${d}/.claude/.onion-version"
+  # (a) adotante: família core-only ⇒ ⊘ e sem ✗/✓ dela; família comum roda normalmente
+  out="$(bash "${d}/.claude/validation/lint-selftest.sh" --families rules_registry,ladder_integrity 2>&1 || true)"
+  if _emit "${out}" | grep -q '⊘ rules_registry: core-only (role: adopted' && ! _emit "${out}" | grep -q 'rules-registry: (' \
+     && _emit "${out}" | grep -q '✓ ladder-integrity'; then
+    record_pass "core-only-role: (a) role adopted ⇒ família core-only pula com ⊘ nomeando o motivo; família comum roda"
+  else record_fail "core-only-role: (a)" "$(_emit "${out}" | grep -E '⊘|✗|Passaram' | head -3 | tr '\n' '|' | cut -c1-240)"; fi
+  # (b) adotante: fixtures r16/r22 ⇒ ⊘ (nunca ✗) — só as 4 primeiras linhas r16 do manifest, para não pagar 94 lints
+  { grep -E '^kind' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv"; grep -E '^lint\s+r16-count-drift/' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv" | sed -n '1,2p'; grep -E '^lint\s+r12-' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv" | sed -n '1p'; } > "${d}/.claude/validation/fixtures/manifest.tsv"
+  out="$(bash "${d}/.claude/validation/lint-selftest.sh" --families fixtures 2>&1 || true)"
+  if [ "$(_emit "${out}" | grep -c '⊘ fixtures: r16-count-drift/')" -eq 2 ] && ! _emit "${out}" | grep -q '✗ r16' && _emit "${out}" | grep -qE '✓ r12-'; then
+    record_pass "core-only-role: (b) role adopted ⇒ fixtures r16 ⊘ (2/2), fixture comum ✓"
+  else record_fail "core-only-role: (b) fixtures" "$(_emit "${out}" | grep -E '⊘|✗|✓' | head -4 | tr '\n' '|' | cut -c1-240)"; fi
+  # (c) core (sem stamp): a mesma família core-only RODA
+  rm -f "${d}/.claude/.onion-version"
+  out="$(bash "${d}/.claude/validation/lint-selftest.sh" --families rules_registry 2>&1 || true)"
+  if _emit "${out}" | grep -q '✓ rules-registry: (' && ! _emit "${out}" | grep -q 'core-only'; then
+    record_pass "core-only-role: (c) sem stamp (core) ⇒ a família core-only roda"
+  else record_fail "core-only-role: (c) core" "$(_emit "${out}" | grep -E '⊘|✗|✓' | head -3 | tr '\n' '|' | cut -c1-200)"; fi
+  rm -rf "${d}"
+}
+_family run_core_only_role_selftests
 
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois
@@ -11571,9 +11625,9 @@ run_backlog_projection_selftests() {
 
   # (c) ARG DESCONHECIDO: a asserção que importa é a NÃO-MUTAÇÃO, não o exit code — o modo
   #     de falha era `MODE="${1:---write}"` mandando um typo para o ramo de ESCRITA.
-  before="$(sha256sum "${sb}/docs/backlog.md" | cut -d' ' -f1)"
+  before="$( [ -f "${sb}/docs/backlog.md" ] && sha256sum "${sb}/docs/backlog.md" | cut -d' ' -f1 || echo ausente )"   # adotante sem docs/backlog.md: a asserção é NÃO-MUTAÇÃO, e "ausente→ausente" também prova
   rc=0; (cd "${sb}" && bash .claude/validation/kg-backlog-project.sh --dry-run >/dev/null 2>&1) || rc=$?
-  after="$(sha256sum "${sb}/docs/backlog.md" | cut -d' ' -f1)"
+  after="$( [ -f "${sb}/docs/backlog.md" ] && sha256sum "${sb}/docs/backlog.md" | cut -d' ' -f1 || echo ausente )"   # adotante sem docs/backlog.md: a asserção é NÃO-MUTAÇÃO, e "ausente→ausente" também prova
   if [ "${rc}" -eq 2 ] && [ "${before}" = "${after}" ]; then
     record_pass "backlog-projection: arg desconhecido → exit 2 e arquivo INTACTO (sem escrita silenciosa)"
   else record_fail "backlog-projection: arg desconhecido" "esperava rc=2 e arquivo intacto; rc=${rc} mutou=$([ "${before}" = "${after}" ] && echo nao || echo SIM)"; fi
