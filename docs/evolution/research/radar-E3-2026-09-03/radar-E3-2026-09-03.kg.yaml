@@ -188,7 +188,7 @@ nodes:
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'LACUNAS DECLARADAS (desfecho de 1a classe) — todas exigem sessao NOVA em processo 2.1.259 (a mudanca segue o processo, nao o disco): (1) frontmatter model: chega a emitir PreModelSwitch, e com qual source:? o unico evento registrado tem source=picker (/model manual); invocar /warm-up e ler a 2a linha de .claude/sessions/model-switch.jsonl. (2) o que acontece com o comando APOS o veto — roda no modelo da sessao, erra, ou aborta calado? e a pergunta que decide se as 96 declaracoes sonnet sao incomodo ou quebra. (3) mesmo probe para model: haiku (meta/backlog.md, meta/co-evolve.md, meta/inventory.md), que resolveria para fora do lineup; para model: opus a expectativa e liberacao. (4) como --permission-prompts none compoe com bypassPermissions e qual vence (importa ao degrau AUDIT do /meta:drive). (5) versao do PROCESSO das sessoes vivas da VPS: disco em 2.1.259, baseline registrava 2.1.257 — a estrategia desta rodada foi medida a partir de baseline vencida, por construcao (e o gatilho). Tentativa minha: invocar a skill onion-patterns pela ferramenta Skill num job em background gerou 0 eventos — e a skill nem declara model: real.'
-    trace: '.claude/sessions/model-switch.jsonl'
+    trace: '.claude/hooks/premodelswitch-guard.sh'   # o log model-switch.jsonl e local, nao rastreado (o CI acusou TARGET-MISSING)
 edges:
   - from: E_F1_MODEL_FRONTMATTER_VALE_INTERATIVO
     to: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP

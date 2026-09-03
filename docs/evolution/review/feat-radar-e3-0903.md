@@ -3,7 +3,7 @@ title: "Revisão — radar E3 rodada 2: delta Claude Code 2.1.257 → 2.1.259 (j
 date: 2026-09-03
 branch: feat/radar-e3-0903
 reviewer: "juiz adversarial opus/high (mandato REFUTAR, abriu a fonte, re-executou os greps): 1 aprovado, 8 emendados, 2 reprovados, 8 omissões — tudo incorporado ao grafo; rascunho pré-juiz preservado em data/"
-reviewed_diff_sha256: b5b77e46b3e60579db6bf38c4accc04eeacc7908fac12f463a209deba55fc3ff
+reviewed_diff_sha256: bcf530c77657f292a950ff4cb6a9929386c545103b0d2f04fda6d6e63b9b22d2
 findings_total: 4
 findings_real: 4
 verdict: APROVADO
