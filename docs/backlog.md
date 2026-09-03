@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**85 itens abertos** em 28 grafo(s) com aberto (de 51 no escopo) · 28 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**86 itens abertos** em 29 grafo(s) com aberto (de 51 no escopo) · 29 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 12 item(ns)
 
@@ -151,6 +151,12 @@
 | 7.5 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
+
+## fios-abertos — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.8 | `Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE` | fios-abertos | A bancada vendorizada (lint-selftest.sh) NAO PODE passar no adotante: medido em 2026-09-02 no 1o adotante greenfield do pin 8e2517 |
 
 ## federation-health-2026-07 — 1 item(ns)
 
