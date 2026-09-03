@@ -72,4 +72,6 @@ jobs:
         # está bom" de "não verifiquei" — no CI só o primeiro vale verde.
         env:
           ONION_SELFTEST_STRICT: '1'
-        run: bash .claude/validation/lint-selftest.sh
+        # --jobs auto: faixa paralela (D_BANCADA_FAIXAS_E_MAPA, 2026-09-03) — cada worker é um
+        # processo --child com o mesmo cabeçalho; worker sem trailer de soma = FALHA no pai.
+        run: bash .claude/validation/lint-selftest.sh --jobs auto

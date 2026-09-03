@@ -131,18 +131,27 @@ fi
 # copiando a árvore). Assim a quebra de fixture/guarda é pega LOCAL, não só no CI — sem
 # penalizar todo commit. CI roda sempre (onion-validate.yml).
 #
-# CUSTO MEDIDO — 2026-08-13: **1136s (18,9 min)**, 802 casos (Elenxo re-mediu; era 921s/612
+# CUSTO MEDIDO — 2026-09-03 (faixa afetada + paralelo, D_BANCADA_FAIXAS_E_MAPA): bancada INTEIRA em
+# 8 workers = **472s** (fila dinâmica; 980 casos) contra 1037s serial no mesmo dia e 1218s no CI serial;
+# um commit que toca 1 helper roda só as famílias que o citam (+ as sem referência) — segundos a poucos
+# minutos. Histórico: 2026-08-13: **1136s (18,9 min)**, 802 casos (Elenxo re-mediu; era 921s/612
 # em 2026-08-06 — o número cresceu 23% e +190 casos SEM ninguém re-carimbar). Este comentário declarava
 # "~1min" e ninguém tinha cronometrado: 15x de desvio, um caso de `behavior-over-declaration`
 # no lugar mais caro, porque é por este número que se decide se vale rodar local. Se você
 # mexer aqui, RE-MEDIR e trocar a linha — número de gate sem carimbo versionado é como a
 # regressão cresce sem ninguém ver (é o mesmo modo de falha que apagou o histórico de
 # ~16s do lint-artifacts.sh, que chegou a 86s antes dos gates de --only; re-medido 2026-08-13 pós-cura do kg-view: **78s** — o número deste comentário TAMBÉM já esteve 2x stale, cumpra a instrução acima).
+# FAIXA pre-commit (D_BANCADA_FAIXAS_E_MAPA, 2026-09-03): o gatilho era "qualquer arquivo em
+# .claude/validation/ ⇒ as 131 famílias, em série" (1136s medidos em 2026-08-13). Agora o gatilho
+# cobre o DOMÍNIO inteiro da bancada (validation/hooks/utils, ops/, .githooks, workflows) — antes um
+# commit só em hooks/ ou ops/ não rodava bancada nenhuma local — e a bancada seleciona as famílias
+# AFETADAS pelos arquivos staged (mapa derivado + failsafe: infra da bancada ou arquivo desconhecido
+# ⇒ tudo) e roda em paralelo (`--jobs auto`). A faixa completa continua no CI (STRICT) e no cron.
 SELFTEST="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
 if [ -f "${SELFTEST}" ] \
-   && git diff --cached --name-only --diff-filter=ACMR | grep -qE '^\.claude/validation/'; then
-  echo "🧪 Onion pre-commit — mudança em .claude/validation/ → rodando self-test das guardas…"
-  if ! bash "${SELFTEST}"; then
+   && git diff --cached --name-only --diff-filter=ACMR | grep -qE '^(\.claude/(validation|hooks|utils)/|ops/|\.githooks/|\.github/workflows/)'; then
+  echo "🧪 Onion pre-commit — mudança no domínio da bancada → self-test das guardas AFETADAS (paralelo)…"
+  if ! bash "${SELFTEST}" --affected-staged --jobs auto; then
     echo ""
     echo "❌ Commit bloqueado: self-test das guardas falhou acima. Corrija ou use 'git commit --no-verify' para pular."
     exit 1

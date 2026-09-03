@@ -102,6 +102,209 @@ SKIPPED_CASES=()
 # aqui generalizada para a suíte inteira em vez de um gate só.
 STRICT="${ONION_SELFTEST_STRICT:-0}"
 
+# ── FAIXAS — seleção de famílias, paralelismo e mapa família→arquivo ─────────────────────────
+# D_BANCADA_FAIXAS_E_MAPA (selo do maestro 2026-09-03; evidência: docs/analysis/bancada-faixas-e-mapa-2026-09.md).
+# A bancada era O(famílias × lint), single-thread, ~14 min no CI e >25 min na VPS sob carga, e o
+# pre-commit a disparava INTEIRA por qualquer arquivo em .claude/validation/. Três faixas:
+#   pre-commit : famílias AFETADAS pelos arquivos staged (mapa + failsafe), em paralelo
+#   PR/CI      : tudo, em paralelo, STRICT
+#   cron diário: tudo (a rede debaixo do filtro de paths do CI)
+# Invariantes:
+#   • Sem argumento = comportamento antigo (serial, tudo). Adotante sem nproc/python3 → serial/tudo.
+#   • O mapa família→arquivo é DERIVADO do corpo de cada família (--map): não há tabela para driftar.
+#   • FAILSAFE (recusa no incerto): arquivo de infraestrutura da bancada (este script, o lint, o
+#     registro de regras, o manifest, hooks/lib, .githooks, workflows) ⇒ TUDO; arquivo do domínio da
+#     bancada citado por NENHUMA família ⇒ TUDO; família que não cita arquivo nenhum ⇒ roda SEMPRE.
+#   • Paralelo: cada worker é um processo `--child` com sua lista de famílias e o MESMO cabeçalho
+#     (set -e, unsets, sandbox própria). O pai só agrega: worker que termina sem o trailer de soma
+#     conta como FALHA — a doutrina "a bancada não pode morrer calada" vale por worker.
+# Uso:
+#   --list                     imprime os nomes das famílias (sem rodar nada)
+#   --map                      imprime o mapa família<TAB>arquivo derivado ('*' = sem referência)
+#   --families a,b,c           roda só estas famílias
+#   --affected <paths…>        seleciona famílias pelos arquivos dados (failsafe acima)
+#   --affected-staged          idem, com `git diff --cached --name-only`
+#   --jobs N|auto              N workers (auto = nproc); 1 = serial (default)
+#   --timing                   imprime ⏱ por família (para calibrar a partição)
+#   --dry-run                  imprime a seleção (faixa) e sai sem rodar nada
+SELFTEST_LIST=0; SELFTEST_MAP=0; SELFTEST_TIMING="${ONION_SELFTEST_TIMING:-0}"
+SELFTEST_JOBS="${ONION_SELFTEST_JOBS:-1}"; SELFTEST_FAMILIES="${ONION_SELFTEST_FAMILIES:-}"
+SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFECTED_STAGED=0; SELFTEST_DRY=0
+SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHARD:-}"
+# HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
+# se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
+# bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
+unset ONION_SELFTEST_CHILD ONION_SELFTEST_QUEUE ONION_SELFTEST_SHARD ONION_SELFTEST_FAMILIES ONION_SELFTEST_TIMING ONION_SELFTEST_JOBS
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --list) SELFTEST_LIST=1 ;;
+    --map) SELFTEST_MAP=1 ;;
+    --timing) SELFTEST_TIMING=1 ;;
+    --child) SELFTEST_CHILD=1 ;;
+    --dry-run) SELFTEST_DRY=1 ;;
+    --jobs) shift; SELFTEST_JOBS="${1:-1}" ;;
+    --jobs=*) SELFTEST_JOBS="${1#--jobs=}" ;;
+    --families) shift; SELFTEST_FAMILIES="${1:-}" ;;
+    --families=*) SELFTEST_FAMILIES="${1#--families=}" ;;
+    --affected-staged) SELFTEST_AFFECTED_STAGED=1 ;;
+    --affected) shift; while [ $# -gt 0 ]; do case "$1" in --*) break ;; esac; SELFTEST_AFFECTED+=("$1"); shift; done; continue ;;
+    -h|--help) sed -n '/^# Uso:/,/^SELFTEST_LIST=/p' "${BASH_SOURCE[0]}" | grep -v '^SELFTEST_LIST='; exit 0 ;;
+    *) echo "lint-selftest: argumento desconhecido '$1' (veja --help)" >&2; exit 2 ;;
+  esac
+  shift
+done
+if [ "${SELFTEST_JOBS}" = "auto" ]; then SELFTEST_JOBS="$(nproc 2>/dev/null || echo 1)"; fi
+case "${SELFTEST_JOBS}" in ''|*[!0-9]*) SELFTEST_JOBS=1 ;; esac
+[ "${SELFTEST_JOBS}" -ge 1 ] || SELFTEST_JOBS=1
+
+# Envolve cada invocação top-level: `_family run_x_selftests`. Nome da família = x.
+_family() {
+  local fn="$1" name t0
+  name="${fn#run_}"; name="${name%_selftests}"
+  if [ "${SELFTEST_LIST}" = "1" ]; then echo "${name}"; return 0; fi
+  if [ -n "${SELFTEST_FAMILIES}" ]; then
+    case ",${SELFTEST_FAMILIES}," in *",${name},"*) ;; *) return 0 ;; esac
+  fi
+  # FILA (faixa paralela): cada worker percorre o script e REIVINDICA a família com mkdir atômico; quem pegou
+  # uma pesada fica para trás e os outros seguem — balanceamento dinâmico sem tabela de tempos. `fixtures`
+  # é fatiada (shard) e roda em todos. Ao terminar, marca done/: o pai acusa reivindicada-sem-done.
+  if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then
+    mkdir "${SELFTEST_QUEUE}/claimed/${name}" 2>/dev/null || return 0
+  fi
+  t0="${SECONDS}"
+  "${fn}"
+  if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then : > "${SELFTEST_QUEUE}/done/${name}"; fi
+  # Família que instala `trap … RETURN` (limpeza de tmp) deixaria o trap armado para o retorno DESTE
+  # wrapper, onde as `local` dela já não existem — sob set -u isso matou a suíte no 1º dogfood da faixa
+  # (2026-09-03: "line 166: tmp: unbound variable"). O trap dela já disparou no retorno dela; desarma aqui.
+  trap - RETURN
+  if [ "${SELFTEST_TIMING}" = "1" ]; then echo "  ⏱ ${name} $(( SECONDS - t0 ))s"; fi
+  return 0
+}
+
+# Mapa família→arquivo, derivado do corpo de cada família (python3; sem ele → vazio → failsafe TUDO).
+_selftest_family_map() {
+  command -v python3 >/dev/null 2>&1 || return 1
+  python3 - "${BASH_SOURCE[0]}" <<'PYMAP'
+import re, sys
+L = open(sys.argv[1], encoding="utf-8").read().split("\n"); cur = None; fams = {}
+for ln in L:
+    m = re.match(r"^run_([a-z0-9_]+)_selftests\(\) \{", ln)
+    if m: cur = m.group(1); fams[cur] = set(); continue
+    if cur and ln.startswith("}"): cur = None; continue
+    if not cur: continue
+    for p in re.findall(r"(?:\$\{?REPO_ROOT\}?|\$\{?SCRIPT_DIR\}?)/((?:\.claude|ops|docs|plugins|\.githooks|\.github)/[A-Za-z0-9_./-]+)", ln): fams[cur].add(p)
+    for p in re.findall(r"\$\{?SCRIPT_DIR\}?/([A-Za-z0-9_.-]+\.sh)", ln): fams[cur].add(".claude/validation/" + p)
+    if re.search(r"\brun_(lint|fix)_fixture\b|\$\{?LINT\}?\b", ln): fams[cur].add(".claude/validation/lint-artifacts.sh")
+    if re.search(r"\brun_kg_fixture\b", ln): fams[cur].add(".claude/validation/kg-radar.sh")
+    if re.search(r"\$\{?(FIX_DIR|MANIFEST)\}?", ln): fams[cur].add(".claude/validation/fixtures/")
+for f in sorted(fams):
+    if fams[f]:
+        for p in sorted(fams[f]): print(f"{f}\t{p}")
+    else: print(f"{f}\t*")
+PYMAP
+}
+
+# Seleciona famílias pelos arquivos tocados. Imprime a lista (vírgulas) ou ALL; o motivo vai ao stderr.
+_selftest_affected_families() {
+  local map p hit known sel="" always
+  if ! map="$(_selftest_family_map)" || [ -z "${map}" ]; then
+    echo "ALL"; echo "  failsafe: mapa família→arquivo indisponível (python3 ausente?) → tudo" >&2; return 0
+  fi
+  for p in "$@"; do
+    case "${p}" in
+      .claude/validation/lint-selftest.sh|.claude/validation/lint-artifacts.sh|.claude/validation/rules-registry.sh|.claude/validation/lint-rules.md|.claude/validation/fixtures/manifest.tsv|.claude/hooks/lib/*|.githooks/*|.github/workflows/*)
+        echo "ALL"; echo "  failsafe: ${p} é infraestrutura da bancada → tudo" >&2; return 0 ;;
+    esac
+    # exato = arquivo citado, ou diretório citado que NÃO é raiz de domínio (fixtures/ conta; .claude/validation/ não)
+    hit="$(printf '%s\n' "${map}" | awk -F'\t' -v p="${p}" '$2==p || ($2 ~ /\/$/ && index(p,$2)==1) {print $1}' | sort -u | paste -sd, -)"
+    known="$(printf '%s\n' "${map}" | awk -F'\t' -v p="${p}" '$2==p || ($2 ~ /\/$/ && $2 !~ /^(\.claude\/|\.claude\/(validation|hooks|utils)\/|ops\/)$/ && index(p,$2)==1) {print $1}' | head -1)"
+    if [ -n "${known}" ]; then
+      sel="${sel:+${sel},}${hit}"
+    else
+      case "${p}" in
+        .claude/validation/*|.claude/hooks/*|.claude/utils/*|ops/*)
+          echo "ALL"; echo "  failsafe: ${p} não é citado por nenhuma família → tudo (recusa no incerto)" >&2; return 0 ;;
+      esac
+    fi
+  done
+  always="$(printf '%s\n' "${map}" | awk -F'\t' '$2=="*"{print $1}' | paste -sd, -)"
+  sel="${sel:+${sel},}${always}"
+  printf '%s\n' "${sel}" | tr ',' '\n' | grep -v '^$' | sort -u | paste -sd, -
+}
+
+if [ "${SELFTEST_MAP}" = "1" ]; then _selftest_family_map; exit "$?"; fi
+
+if [ "${SELFTEST_AFFECTED_STAGED}" = "1" ]; then
+  while IFS= read -r p; do [ -n "${p}" ] && SELFTEST_AFFECTED+=("${p}"); done \
+    < <(git -C "${REPO_ROOT}" diff --cached --name-only --diff-filter=ACMR 2>/dev/null)
+  SELFTEST_AFFECTED_STAGED=2   # marcador: seleção pedida, mesmo que nada esteja staged
+fi
+if { [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ] || [ "${SELFTEST_AFFECTED_STAGED}" = "2" ]; } && [ -z "${SELFTEST_FAMILIES}" ] && [ "${SELFTEST_CHILD}" = "0" ]; then
+  if [ "${#SELFTEST_AFFECTED[@]}" -eq 0 ]; then
+    _sel="ALL"; echo "  failsafe: nada staged para mapear → tudo" >&2
+  else
+    _sel="$(_selftest_affected_families "${SELFTEST_AFFECTED[@]}")"
+  fi
+  if [ "${_sel}" = "ALL" ]; then
+    echo "faixa: TODAS as famílias (failsafe — motivo acima)"
+  else
+    SELFTEST_FAMILIES="${_sel}"
+    echo "faixa: $(printf '%s' "${_sel}" | tr ',' '\n' | grep -c .) famílias afetadas por ${#SELFTEST_AFFECTED[@]} arquivo(s): ${_sel}"
+  fi
+fi
+
+if [ "${SELFTEST_DRY}" = "1" ]; then
+  echo "dry-run: famílias=${SELFTEST_FAMILIES:-<todas>} jobs=${SELFTEST_JOBS}"; SUMMARY_PRINTED=1; exit 0
+fi
+
+# Pai paralelo: lista, particiona, dispara --child por grupo, agrega trailers. Nenhuma família roda no pai.
+if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTEST_LIST}" = "0" ]; then
+  _fams=()
+  while IFS= read -r f; do
+    [ -n "${f}" ] || continue
+    if [ -n "${SELFTEST_FAMILIES}" ]; then case ",${SELFTEST_FAMILIES}," in *",${f},"*) ;; *) continue ;; esac; fi
+    _fams+=("${f}")
+  done < <(bash "${BASH_SOURCE[0]}" --list)
+  _n="${#_fams[@]}"; _j="${SELFTEST_JOBS}"; [ "${_j}" -gt "${_n}" ] && _j="${_n}"
+  if [ "${_n}" -gt 0 ] && [ "${_j}" -gt 1 ]; then
+    _tdir="$(mktemp -d)"; _pids=(); _t0="${SECONDS}"
+    mkdir -p "${_tdir}/q/claimed" "${_tdir}/q/done"
+    _all_csv="$(printf '%s\n' "${_fams[@]}" | paste -sd, -)"
+    echo "=== Onion Lint Selftest — faixa paralela: ${_n} famílias em ${_j} workers ==="
+    for (( i=0; i<_j; i++ )); do
+      ONION_SELFTEST_CHILD=1 ONION_SELFTEST_FAMILIES="${_all_csv}" ONION_SELFTEST_STRICT="${STRICT}" \
+        ONION_SELFTEST_QUEUE="${_tdir}/q" ONION_SELFTEST_SHARD="${i}/${_j}" ONION_SELFTEST_TIMING="${SELFTEST_TIMING}" \
+        bash "${BASH_SOURCE[0]}" --child > "${_tdir}/${i}.out" 2>&1 &
+      _pids[i]=$!
+    done
+    for (( i=0; i<_j; i++ )); do
+      _rc=0; wait "${_pids[i]}" || _rc=$?
+      grep -vE '^#ONION_SELFTEST_' "${_tdir}/${i}.out" || true
+      _counts="$(grep -E '^#ONION_SELFTEST_COUNTS ' "${_tdir}/${i}.out" | tail -1 || true)"
+      if [ -z "${_counts}" ]; then
+        FAIL=$((FAIL + 1)); FAILED_CASES+=("worker ${i} ABORTOU sem somar (exit ${_rc})")
+        echo "  ✗✗ worker ${i} terminou SEM o trailer de soma (exit ${_rc}) — os casos dele NÃO contam como verdes"
+      else
+        set -- ${_counts}; PASS=$((PASS + $2)); FAIL=$((FAIL + $3)); SKIP=$((SKIP + $4))
+        while IFS=$'\t' read -r _tag _case; do FAILED_CASES+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_FAILED\t' "${_tdir}/${i}.out" || true)
+        while IFS=$'\t' read -r _tag _case; do SKIPPED_CASES+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_SKIPPED\t' "${_tdir}/${i}.out" || true)
+      fi
+    done
+    for _fam in "${_fams[@]}"; do
+      [ "${_fam}" = "fixtures" ] && continue
+      if [ ! -d "${_tdir}/q/claimed/${_fam}" ]; then
+        FAIL=$((FAIL + 1)); FAILED_CASES+=("família ${_fam} NUNCA foi reivindicada por worker nenhum")
+      elif [ ! -f "${_tdir}/q/done/${_fam}" ]; then
+        FAIL=$((FAIL + 1)); FAILED_CASES+=("família ${_fam} reivindicada e NÃO concluída (worker morreu no meio dela)")
+      fi
+    done
+    rm -rf "${_tdir}"
+    echo ""; echo "=== faixa paralela: ${_n} famílias / ${_j} workers (fila dinâmica) em $(( SECONDS - _t0 ))s ==="
+    SELFTEST_FAMILIES="-"   # nenhuma família roda no pai; o sumário abaixo usa a agregação
+  fi
+fi
+
 # Nota: o loop de fixtures (lint/fix/contract/merge) é core-only — exige as fixtures
 # vendorizadas em ${FIX_DIR}. Um adotante não as vendoriza, então NÃO abortamos aqui:
 # o loop abaixo (ver "Loop do manifest") fica condicional e os modos self-contained
@@ -1026,7 +1229,10 @@ run_rules_registry_selftests() {
   else record_fail "rules-registry: (g)" "regra sem previne não detectada (rc=${rc}, esperado 2)"; fi
 
   # (f) GUARD verde no estado real (--only escopa ao doc)
-  if bash "${lint}" --only="${doc}" 2>&1 | grep -q 'OK ✓'; then
+  # (2026-09-03) era `bash lint | grep -q 'OK ✓'`: o grep -q fecha o pipe no 1º match, o lint leva SIGPIPE e,
+  # sob pipefail, o `if` vê falha — corrida que só aparecia com a bancada em paralelo (2 runs de 8 workers, 2×).
+  local f_out; f_out="$(bash "${lint}" --only="${doc}" 2>&1 || true)"
+  if printf '%s\n' "${f_out}" | grep -q 'OK ✓'; then
     record_pass "rules-registry: (f) REGRA 39 verde no estado real (--only lint-rules.md)"
   else record_fail "rules-registry: (f)" "REGRA 39 acusou o estado real (deveria estar em paridade)"; fi
 }
@@ -1374,17 +1580,21 @@ run_kg_status_factor_selftests() {
   if [ ! -f "${asm}" ] || [ ! -f "${mf}" ]; then record_skip "status-factor: (h) assembler/manifesto ausente"; else
     d="$(mktemp -d)"
     sed 's#^\s*"\.claude/validation/lib/status-factor\.awk".*$##' "${mf}" > "$d/sem-lib.manifest.sh"
-    local rc_ok rc_sem dirty_before dirty_after
-    rc_ok=0;  bash "${asm}" "${mf}"                  >/dev/null 2>&1 || rc_ok=$?
+    # (2026-09-03, Elenxo das faixas) ANTES este caso montava no plugins/onion-work-tools/ REAL (dest default do
+    # assembler = SRC/plugins/<nome>, com rm -rf): regravava provenance.json no repo vivo a cada bancada e, sob
+    # --jobs, corria com plugins_sync (que lê esse diretório). Agora o destino é um mktemp e "não tocou no
+    # destino" é medido pelo snapshot da árvore, não por git status do repo vivo.
+    local rc_ok rc_sem dirty_before dirty_after dest="$d/dest"
+    rc_ok=0;  bash "${asm}" "${mf}" "${REPO_ROOT}" "${dest}" >/dev/null 2>&1 || rc_ok=$?
     # ⚠️ ABORTAR SEM ESTRAGAR. A 1a versao desta guarda desistia DEPOIS de copiar: o destino ficava
     #    em ruinas (21 arquivos sujos, `plugin.json` deletado) e o lint acusava "fora de sincronia".
     #    Guarda que aborta destruindo e pior que o defeito que recusa — por isso o caso mede o
     #    ESTADO DO DESTINO, nao so o exit code.
-    dirty_before="$(git -C "${REPO_ROOT}" status --porcelain plugins/ 2>/dev/null | wc -l)"
-    rc_sem=0; bash "${asm}" "$d/sem-lib.manifest.sh" >/dev/null 2>&1 || rc_sem=$?
-    dirty_after="$(git -C "${REPO_ROOT}" status --porcelain plugins/ 2>/dev/null | wc -l)"
+    dirty_before="$(cd "${dest}" 2>/dev/null && find . -type f -printf '%p %s\n' | sort | md5sum | cut -c1-32 || echo none)"
+    rc_sem=0; bash "${asm}" "$d/sem-lib.manifest.sh" "${REPO_ROOT}" "${dest}" >/dev/null 2>&1 || rc_sem=$?
+    dirty_after="$(cd "${dest}" 2>/dev/null && find . -type f -printf '%p %s\n' | sort | md5sum | cut -c1-32 || echo none)"
     if [ "${dirty_before}" != "${dirty_after}" ]; then
-      record_fail "status-factor: (h) recusa DESTRUTIVA" "o assembler abortou DEPOIS de tocar no destino: plugins/ passou de ${dirty_before} para ${dirty_after} arquivos sujos"
+      record_fail "status-factor: (h) recusa DESTRUTIVA" "o assembler abortou DEPOIS de tocar no destino: snapshot do destino passou de ${dirty_before} para ${dirty_after} sujos"
     else
       _prove_mutation "status-factor: (h) manifesto SEM a lib ABORTA a montagem, sem tocar no destino" \
                       "${mf}" "$d/sem-lib.manifest.sh" "${rc_ok}" "${rc_sem}"
@@ -3387,9 +3597,6 @@ run_vendor_pin_selftests() {
          GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
   # Fixture PRÓPRIA: as chamadas abaixo sujam o estado do alvo (bootstrap do
   # vendor), então não podem compartilhar a fixture do run_vendor_branch_selftests
-
-# Modo vendor-pin — o pin entra provando ser commit (achado de campo 2026-07-21).
-run_vendor_pin_selftests
   # — foi o que quebrou a suíte na 1ª tentativa.
   local core t ib
   core="$(mktemp -d)/c"; t="$(mktemp -d)/a"
@@ -3397,7 +3604,7 @@ run_vendor_pin_selftests
   printf 'cmd\n' > "$core/.claude/commands/foo.md"
   git -C "$core" add -A; git -C "$core" commit -qm "core"
   rm -rf "$t"; mkdir -p "$t/src"; git -C "$t" init -q
-  printf 'produto\n' > "$t/src/app.js"; git -C "$t" archive --format=tar HEAD 2>/dev/null | true
+  printf 'produto\n' > "$t/src/app.js"   # (2026-09-03: havia aqui um `git archive HEAD | true` em repo SEM commit — sob pipefail matava a suíte; a família nunca tinha rodado)
   git -C "$core" archive HEAD -- .claude | tar -x -C "$t"
   git -C "$t" add -A; git -C "$t" commit -qm "adopt"
   ib="$(git -C "$t" rev-parse --abbrev-ref HEAD)"
@@ -3436,6 +3643,9 @@ run_vendor_pin_selftests
   rm -f "${t}.mut.sh"
 
 }
+
+# Modo vendor-pin — o pin entra provando ser commit (achado de campo 2026-07-21). ⚠️ Até 2026-09-03 esta linha estava DENTRO do corpo da função: a família nunca rodou — o --list da faixa a expôs..
+_family run_vendor_pin_selftests
 
 run_vendor_branch_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
@@ -6787,20 +6997,21 @@ run_kg_backlog_selftests() {
       #    `x="$(cmd)"` sob `set -e` ABORTA a suite inteira quando cmd falha. Esta armadilha ja
       #    matou a bancada duas vezes nesta sessao; aqui ela e GARANTIDA, porque o mutante EXISTE
       #    para produzir HARD.
-      h_ctrl="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-      h_ctrl="$(printf '%s' "${h_ctrl}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
+      local e_ctrl_out e_mut_out
+      e_ctrl_out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+      h_ctrl="$(printf '%s' "${e_ctrl_out}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
       # mesma razão de (b): mutar um `open` existente depende do CONTEÚDO do arquivo vivo, e o
       # backlog zerado torna o `sed` um no-op. Aqui não há `_prove_mutation` para avisar — o caso
       # apenas compararia dois lints idênticos e passaria a medir o nada.
       _fixture_done_nu "${sb}/docs/onion/graph/fios-abertos.kg.yaml" "${sb}/.done-nu.tmp"
       mv "${sb}/.done-nu.tmp" "${sb}/docs/onion/graph/fios-abertos.kg.yaml"
-      h_mut="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-      h_mut="$(printf '%s' "${h_mut}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
+      e_mut_out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+      h_mut="$(printf '%s' "${e_mut_out}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
       if [ -z "${h_ctrl}" ] || [ -z "${h_mut}" ]; then
         record_fail "kg-backlog: (e) atravessa o gate" "nao consegui ler o contador HARD do lint (ctrl='${h_ctrl}' mut='${h_mut}') — o caso mediria o nada"
       elif [ "${h_mut}" -gt "${h_ctrl}" ]; then
         record_pass "kg-backlog: (e) a violacao CONTA no lint inteiro (HARD ${h_ctrl}→${h_mut}), nao so aparece"
-      else record_fail "kg-backlog: (e) FAIL-OPEN" "o lint imprimiu a acusacao e o contador NAO subiu (HARD ${h_ctrl}→${h_mut}): subshell, fio solto no dispatcher, ou arquivo fora de escopo"; fi
+      else record_fail "kg-backlog: (e) FAIL-OPEN" "o lint imprimiu a acusacao e o contador NAO subiu (HARD ${h_ctrl}→${h_mut}): subshell, fio solto no dispatcher, ou arquivo fora de escopo — HARD só-no-mutante: [$(diff <(printf '%s\n' "${e_ctrl_out}" | grep HARD | sort) <(printf '%s\n' "${e_mut_out}" | grep HARD | sort) | grep '^>' | head -3 | tr '\n' '|' | cut -c1-300)] (intermitente 1/4 em paralelo, 2026-09-03: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO)"; fi
     else record_skip "kg-backlog: (e) sandbox git nao montou"; fi
     rm -rf "${sb}"
   fi
@@ -10165,15 +10376,22 @@ run_guardrails_selftests() {
 # ---------------------------------------------------------------------------
 # Loop do manifest (TAB-separado; ignora '#' e header)
 # ---------------------------------------------------------------------------
-echo "=== Onion Lint Selftest — auto-teste das guardas ==="
-echo ""
+if [ "${SELFTEST_LIST}${SELFTEST_CHILD}" = "00" ]; then echo "=== Onion Lint Selftest — auto-teste das guardas ==="; echo ""; fi
 
+run_fixtures_selftests() {
+# SHARD (faixa paralela): ONION_SELFTEST_SHARD=i/n → este worker processa só as linhas do manifest
+# cujo índice % n == i. A família `fixtures` é ~97% do tempo serial (94 casos × ~10 s); sem fatiar,
+# paralelizar por família não ganha nada. Sem a variável = tudo (serial).
+local _shard_i=0 _shard_n=1 _shard_k=0
+case "${SELFTEST_SHARD:-}" in */*) _shard_i="${SELFTEST_SHARD%/*}"; _shard_n="${SELFTEST_SHARD#*/}" ;; esac
 if [ -f "${MANIFEST}" ]; then
   while IFS=$'\t' read -r kind fixture target verdict keyword || [ -n "${kind:-}" ]; do
     kind="${kind:-}"
     [ -z "${kind}" ] && continue
     [ "${kind#\#}" != "${kind}" ] && continue   # linha de comentário
     [ "${kind}" = "kind" ] && continue           # header
+    _shard_k=$(( _shard_k + 1 ))
+    [ $(( (_shard_k - 1) % _shard_n )) -eq "${_shard_i}" ] || continue
     case "${kind}" in
       lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" ;;
       fix)      run_fix_fixture "${fixture}" "${target}" "${verdict}" ;;
@@ -10187,115 +10405,117 @@ if [ -f "${MANIFEST}" ]; then
 else
   record_skip "fixtures: manifest ausente → loop de fixture pulado (core-only; adotante não vendoriza fixtures/)"
 fi
+}
+_family run_fixtures_selftests
 
 # Modo kg-freshness/schema — guardas de frescor + versão de schema (ADR kg-freshness-gate F1).
-run_kg_freshness_selftests
+_family run_kg_freshness_selftests
 
 # Modo kg-provenance — guarda de proveniência de decisão (ITEM2).
-run_kg_provenance_selftests
+_family run_kg_provenance_selftests
 
 # Modo reconcile — o ⚠ de alvo de SUPERSEDES não reconciliado (primeiro teste do bloco)
-run_kg_reconcile_selftests
+_family run_kg_reconcile_selftests
 
 # Modo state — a fila de abertos, complementar ao radar por construção
-run_kg_state_selftests
-run_kg_open_queue_selftests
-run_kg_trace_resolve_selftests
-run_kg_seal_check_selftests
-run_post_review_comment_selftests
-run_status_reverificacao_selftests
-run_worklog_precompact_breadcrumb_selftests
-run_aside_router_hook_selftests
-run_worklog_capture_session_selftests
+_family run_kg_state_selftests
+_family run_kg_open_queue_selftests
+_family run_kg_trace_resolve_selftests
+_family run_kg_seal_check_selftests
+_family run_post_review_comment_selftests
+_family run_status_reverificacao_selftests
+_family run_worklog_precompact_breadcrumb_selftests
+_family run_aside_router_hook_selftests
+_family run_worklog_capture_session_selftests
 
 # Modo kg-label-collision — conteúdo de label não pode ser lido como configuração
 # (sinal de campo onion-pessoal-app, 2026-07-19).
-run_kg_label_collision_selftests
+_family run_kg_label_collision_selftests
 
 # Modo resolve — não vem do manifest (cenários self-contained, sem fixture-file).
-run_resolve_selftests
+_family run_resolve_selftests
 
 # Modo resolve-production — irmão do resolve-integration (branch de PRODUÇÃO).
-run_resolve_production_selftests
+_family run_resolve_production_selftests
 
 # Modo durable-commit — commit durável da instalação (fix do incidente uncommitted-descartável).
-run_durable_commit_selftests
+_family run_durable_commit_selftests
 
 # Modo guardrails — helpers R15 (cerca de proveniência + gate de efeito); a guarda das guardas.
-run_guardrails_selftests
+_family run_guardrails_selftests
 
 # Modo vendor-branch — --update via merge de onion/vendor (Achado #2: never-clobber estrutural).
-run_vendor_branch_selftests
+_family run_vendor_branch_selftests
 
 # Modo vendor-baseline-REMOVIDO — a cura D_CURE (2026-08-24): o baseline (ledger local) não vem do core.
-run_vendor_baseline_removido_selftests
+_family run_vendor_baseline_removido_selftests
 
 # Modo compose-settings — settings.json N-camadas de escopo (RFC-0005 plano 2).
-run_compose_settings_selftests
+_family run_compose_settings_selftests
 
 # Modo resolve-scope-layers — fecha o loop do compose-settings (descobre a cadeia de escopo).
-run_resolve_scope_layers_selftests
+_family run_resolve_scope_layers_selftests
 
 # Modo show-scope — proveniência-por-chave do compositor (RFC-0005 Fase 2, `--show-scope`).
-run_show_scope_selftests
+_family run_show_scope_selftests
 
 # Modo resolve-target — targeting fino por seletor no alvo: (F1.2 federação — mata o ruído).
-run_resolve_target_selftests
+_family run_resolve_target_selftests
 
 # Modo reconcile-inputs — insumos determinísticos do /meta:co-announce --reconcile (conciliação de backlog).
-run_reconcile_inputs_selftests
+_family run_reconcile_inputs_selftests
 
 # Modo federation-radar — radar de saúde-de-verificação da federação (ADR federation-kg-audit-overlay).
-run_federation_radar_selftests
+_family run_federation_radar_selftests
 
 # Modo federation-console — console estático read-only do SSOT (F1.3 federação).
-run_federation_console_selftests
-run_kg_console_selftests
-run_kg_narrate_validate_selftests
-run_site_inventory_selftests
-run_adopted_role_selftests
-run_write_stamp_selftests
+_family run_federation_console_selftests
+_family run_kg_console_selftests
+_family run_kg_narrate_validate_selftests
+_family run_site_inventory_selftests
+_family run_adopted_role_selftests
+_family run_write_stamp_selftests
 
 # Modo mail-receiver — acelerador "receiver que acorda" (F1.4 federação).
-run_mail_receiver_selftests
+_family run_mail_receiver_selftests
 
 # Modo detect-transport — resolução SDAAL da via de transporte (F2.1 federação).
-run_detect_transport_selftests
+_family run_detect_transport_selftests
 
 # Modo a2a-ssrf — anti-SSRF da URL de webhook A2A (camada 4 do gate a2a-verify, F2.2 fundação).
-run_a2a_ssrf_selftests
+_family run_a2a_ssrf_selftests
 
 # Modo a2a-verify — gate "verificação-antes-de-agir" do a2a-live (F2.2 fundação; 6 camadas + fail-safe).
-run_a2a_verify_selftests
+_family run_a2a_verify_selftests
 
 # Modo agent-card — gerador do Agent Card A2A do core, filtrado ao próprio core (F2.2 fundação; confidencialidade).
-run_agent_card_selftests
+_family run_agent_card_selftests
 
 # Modo a2a-accept — o ato humano fila→inbox que fecha o gate (F2.2; recusa não-verificado).
-run_a2a_accept_selftests
+_family run_a2a_accept_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
-run_prettierignore_selftests
+_family run_prettierignore_selftests
 
 # Modo scope-gitignore — escopa ignore cego de .claude/ no adotante (sinal de campo).
-run_scope_gitignore_selftests
+_family run_scope_gitignore_selftests
 
 # Modo task-manager-hook — hook lê ambiente primeiro, .env fallback honesto (sinal de campo D2).
-run_task_manager_hook_selftests
-run_kg_verification_selftests
-run_kg_ratchet_direction_selftests
-run_kg_backlog_selftests
-run_consumed_modes_selftests
-run_vps_exposure_selftests
-run_identifier_language_selftests
-run_safe_count_selftests
-run_scan_sanity_selftests
-run_generator_failure_selftests
-run_line_limits_selftests
-run_kg_radar_integrity_selftests
-run_review_verdict_selftests
-run_empty_result_guard_selftests
-run_review_artifact_selftests
+_family run_task_manager_hook_selftests
+_family run_kg_verification_selftests
+_family run_kg_ratchet_direction_selftests
+_family run_kg_backlog_selftests
+_family run_consumed_modes_selftests
+_family run_vps_exposure_selftests
+_family run_identifier_language_selftests
+_family run_safe_count_selftests
+_family run_scan_sanity_selftests
+_family run_generator_failure_selftests
+_family run_line_limits_selftests
+_family run_kg_radar_integrity_selftests
+_family run_review_verdict_selftests
+_family run_empty_result_guard_selftests
+_family run_review_artifact_selftests
 
 # Modo cycle-completion — métrica de ciclos concluídos vs abandonados (D5 instrumentação,
 # barato-primeiro). Classifica done/open-stale/no-signal e mantém o SEM-sinal FORA do
@@ -10329,7 +10549,7 @@ run_cycle_completion_selftests() {
   else record_fail "cycle-completion: phase:DONE" "não contou phase:DONE como done: ${out}"; fi
   rm -rf "${d}"
 }
-run_cycle_completion_selftests
+_family run_cycle_completion_selftests
 
 # Modo federation-engagement — sinal 4 (ativo/dormente por membro; proxy doc-bridge).
 run_federation_engagement_selftests() {
@@ -10351,7 +10571,7 @@ run_federation_engagement_selftests() {
   else record_fail "federation-engagement" "esperado members3/active1/dormant1/never1, veio: ${out}"; fi
   rm -rf "${d}"
 }
-run_federation_engagement_selftests
+_family run_federation_engagement_selftests
 
 # Modo context-freshness-metric — sinal 2 (camada determinística: carimbo ≤ threshold).
 run_context_freshness_metric_selftests() {
@@ -10373,7 +10593,7 @@ run_context_freshness_metric_selftests() {
   else record_fail "context-freshness-metric" "esperado docs3/current1/stale1/nostamp1, veio: ${out}"; fi
   rm -rf "${d}"
 }
-run_context_freshness_metric_selftests
+_family run_context_freshness_metric_selftests
 
 # Modo session-velocity — sinal 3 (duração de sessão via ledger de ciclo-de-vida).
 # Cobre: beacon down apenda o ledger (só timestamps); opt-in (sem ledger tracked → não
@@ -10413,79 +10633,79 @@ run_session_velocity_selftests() {
   else record_fail "session-velocity: mediana" "esperado sessions3/median3600, veio: ${out}"; fi
   rm -f "${led}"
 }
-run_session_velocity_selftests
+_family run_session_velocity_selftests
 
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
-run_githook_selftests
-run_regen_baselines_selftests
-run_regen_ensure_from_selftests
-run_seed_adoption_graph_selftests
+_family run_githook_selftests
+_family run_regen_baselines_selftests
+_family run_regen_ensure_from_selftests
+_family run_seed_adoption_graph_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).
 # Core-only: já pula gracioso sem plugins/ (ver função). O `|| true` é rede de segurança —
 # um abort imprevisto sob set -e jamais esconde os modos self-contained seguintes (de-id).
-run_assemble_plugin_selftests || true
-run_marketplace_generate_selftests || true
-run_bootstrap_vertical_selftests || true
-run_scaffold_book_selftests || true
-run_scaffold_diagnose_selftests || true
+_family run_assemble_plugin_selftests || true
+_family run_marketplace_generate_selftests || true
+_family run_bootstrap_vertical_selftests || true
+_family run_scaffold_book_selftests || true
+_family run_scaffold_diagnose_selftests || true
 
 # Modo plugins-sync — drift-guard (REGRA 19): committed bate com a regeneração da fonte.
-run_plugins_sync_selftests || true
+_family run_plugins_sync_selftests || true
 
 # Modo capability — Capability Contract (REGRA 20): contrato honesto + resolução de requires.
-run_capability_selftests
+_family run_capability_selftests
 
 # Modo role-bundle — mapa role→bundle (REGRA 37): resolver + consistência dos verticais.
-run_role_bundle_selftests
+_family run_role_bundle_selftests
 
 # Modo graph — lente sócio-técnica (REGRA 21): graph.md em-sync + determinismo + atores + impacto.
-run_graph_selftests
+_family run_graph_selftests
 
 # Modo design-tokens — idem (cenários self-contained, sem fixture-file).
-run_design_tokens_selftests
+_family run_design_tokens_selftests
 
 # Modo co-relay — idem (carteiro upstream; adotante+core em mktemp, sem fixture-file).
-run_corelay_selftests
+_family run_corelay_selftests
 
 # Modo co-deliver — carteiro downstream (resolução local_path do members.yaml; sinal 2026-07-10).
-run_codeliver_selftests
+_family run_codeliver_selftests
 
 # Modo de-identification — baseline determinístico (adapter regex da abstração SDAAL): redação + round-trip + no-op + determinismo.
-run_de_identification_selftests
+_family run_de_identification_selftests
 
 # Modo trust-topology — topologia de confiança RFC-0003 (regressão FED-2-0 + modos de falha; sandbox via --repo).
-run_trust_topology_selftests
+_family run_trust_topology_selftests
 
 # Modo onion-version — detecção de papel source/adopted via stamp (regressão FED-3-1; repo temp).
-run_onion_version_selftests
+_family run_onion_version_selftests
 
 # Modo pin-integrity — pin do stamp é hipótese: guard do /meta:adopt --update (incidente de campo 06-30; sandbox git).
-run_pin_integrity_selftests
+_family run_pin_integrity_selftests
 
 # Modo session-beacon — farol de sessão: I3 inclui sessões vivas (colisão W1×W2 de 2026-07-02; sandbox git).
-run_session_beacon_selftests
+_family run_session_beacon_selftests
 
 # Modo constellation-map — 🗺️ o MAPA da Constelação de Estudos (Fase 1): só-metadados, presença por worktree (sandbox git).
-run_constellation_map_selftests
+_family run_constellation_map_selftests
 
 # Modo mail-hook — "you have mail" + gatilho de reflexão ⏰ (motd silencioso, 3 sinais, exit 0; sandbox).
-run_mail_hook_selftests
+_family run_mail_hook_selftests
 
 # Modo diary-crumbs — estrutura de decisão da migalha: conflict_class/valid_when (enabler breadcrumbs 2026-07; sandbox).
-run_diary_crumbs_selftests
+_family run_diary_crumbs_selftests
 
 # Modo outbox-channel — REGRA 28 do lint: anúncio em staging p/ membro SEM canal de recepção (achado 2026-07-19; sandbox).
-run_outbox_channel_selftests
+_family run_outbox_channel_selftests
 
 # Modo kg-coverage — REGRA 29: gate de proveniência INVERTIDO com catraca (sinal de um adotante regulado 2026-07-20).
-run_kg_coverage_selftests
+_family run_kg_coverage_selftests
 
 # Modo doctrine-freshness — REGRA 42: gate de FRESCOR DOUTRINÁRIO com catraca (irmão temporal da 29; world-sync 2026-07-20/23).
-run_doctrine_freshness_selftests
+_family run_doctrine_freshness_selftests
 
 # Modo kg-born-marker — REGRA 43: integridade do marcador kg: (proveniência virada p/ DENTRO; radar sub-usado, maestro 2026-07-23).
-run_kg_born_marker_selftests
+_family run_kg_born_marker_selftests
 
 # Modo ladder-integrity — REGRA 44: integridade da escada de Automação Graduada (rung-jump sem prova = HARD; máxima do maestro 2026-07-24).
 run_ladder_integrity_selftests() {
@@ -10497,7 +10717,7 @@ run_ladder_integrity_selftests() {
     record_fail "ladder-integrity: escada" "o selftest embutido do helper falhou"
   fi
 }
-run_ladder_integrity_selftests
+_family run_ladder_integrity_selftests
 
 # Modo kb-vendored-link — REGRA 45: link vendorizado não aponta caminho core-privado (catraca; guard core-side do bug de campo de adotante real).
 run_kb_vendored_link_selftests() {
@@ -10509,7 +10729,105 @@ run_kb_vendored_link_selftests() {
     record_fail "kb-vendored-link" "o selftest embutido do helper falhou"
   fi
 }
-run_kb_vendored_link_selftests
+_family run_kb_vendored_link_selftests
+
+# Modo selftest-lanes — as FAIXAS da bancada (D_BANCADA_FAIXAS_E_MAPA, 2026-09-03): --list/--map/--families/
+# --affected (mapa derivado + failsafe)/--jobs (pai agrega trailers; worker sem soma = FALHA). Inclui a guarda
+# que teria pego a família-fantasma `vendor_pin` (invocação dentro do próprio corpo por 44 dias): toda família
+# DEFINIDA tem de aparecer no --list.
+run_selftest_lanes_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
+  if [ ! -f "${sut}" ]; then record_fail "selftest-lanes" "bancada ausente: ${sut}"; return; fi
+  local out rc n defs
+  # (a) --list: só nomes, ≥100, inclui fixtures e vendor_pin
+  out="$(bash "${sut}" --list 2>/dev/null || true)"
+  n="$(printf '%s\n' "${out}" | grep -c .)"
+  if [ "${n}" -ge 100 ] && ! printf '%s\n' "${out}" | grep -qvE '^[a-z0-9_]+$' \
+     && printf '%s\n' "${out}" | grep -qx fixtures && printf '%s\n' "${out}" | grep -qx vendor_pin; then
+    record_pass "selftest-lanes: (a) --list = ${n} nomes puros, com fixtures e vendor_pin"
+  else record_fail "selftest-lanes: (a) --list" "n=${n}; linhas não-nome: $(printf '%s\n' "${out}" | grep -vE '^[a-z0-9_]+$' | head -2 | tr '\n' '|')"; fi
+  # (b) GUARDA DA FANTASMA: toda família definida é invocada no top-level (definições == --list)
+  defs="$(grep -cE '^run_[a-z0-9_]+_selftests\(\) \{' "${sut}")"
+  if [ "${defs}" -eq "${n}" ]; then
+    record_pass "selftest-lanes: (b) ${defs} famílias definidas = ${n} invocadas (nenhuma fantasma)"
+  else record_fail "selftest-lanes: (b) família fantasma" "definidas=${defs} invocadas=${n}: $(diff <(grep -oE '^run_[a-z0-9_]+_selftests\(\)' "${sut}" | sed -E 's/^run_(.*)_selftests\(\)/\1/' | sort) <(printf '%s\n' "${out}" | sort) | grep '^[<>]' | head -3 | tr '\n' ' ')"; fi
+  # (c) --families roda SÓ a família pedida (ladder_integrity = 1 caso)
+  out="$(bash "${sut}" --families ladder_integrity 2>&1 || true)"
+  n="$(printf '%s\n' "${out}" | grep -c '^  ✓' || true)"
+  if [ "${n}" -eq 1 ] && printf '%s\n' "${out}" | grep -q '^OK ✓'; then
+    record_pass "selftest-lanes: (c) --families ladder_integrity ⇒ 1 ✓ e OK"
+  else record_fail "selftest-lanes: (c) --families" "✓=${n}; $(printf '%s\n' "${out}" | tail -1)"; fi
+  # (d) --map cobre toda família listada
+  out="$(bash "${sut}" --map 2>/dev/null || true)"
+  local missing; missing="$(comm -23 <(bash "${sut}" --list | sort -u) <(printf '%s\n' "${out}" | cut -f1 | sort -u) | sed -n '1,3p' | tr '\n' ' ')"
+  if [ -n "${out}" ] && [ -z "${missing}" ]; then record_pass "selftest-lanes: (d) --map cobre todas as famílias listadas"
+  else record_fail "selftest-lanes: (d) --map" "sem entrada: ${missing:-<mapa vazio>}"; fi
+  # (e) --affected por helper conhecido seleciona a família dele e NÃO as outras
+  out="$(bash "${sut}" --affected .claude/validation/ladder-integrity-check.sh --dry-run 2>&1 || true)"
+  if printf '%s\n' "${out}" | grep -q '^dry-run: famílias=.*ladder_integrity' && ! printf '%s\n' "${out}" | grep -q 'vendor_pin'; then
+    record_pass "selftest-lanes: (e) --affected helper ⇒ seleciona ladder_integrity, não vendor_pin"
+  else record_fail "selftest-lanes: (e) --affected" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
+  # (f) failsafe: infraestrutura da bancada ⇒ TUDO
+  out="$(bash "${sut}" --affected .claude/validation/lint-artifacts.sh --dry-run 2>&1 || true)"
+  if printf '%s\n' "${out}" | grep -q 'famílias=<todas>' && printf '%s\n' "${out}" | grep -q 'failsafe'; then
+    record_pass "selftest-lanes: (f) failsafe: lint-artifacts.sh ⇒ todas"
+  else record_fail "selftest-lanes: (f) failsafe infra" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
+  # (g) failsafe: arquivo do domínio citado por ninguém ⇒ TUDO (recusa no incerto)
+  out="$(bash "${sut}" --affected .claude/validation/zz-nao-existe.sh --dry-run 2>&1 || true)"
+  if printf '%s\n' "${out}" | grep -q 'famílias=<todas>' && printf '%s\n' "${out}" | grep -q 'nenhuma família'; then
+    record_pass "selftest-lanes: (g) failsafe: arquivo desconhecido no domínio ⇒ todas"
+  else record_fail "selftest-lanes: (g) failsafe desconhecido" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
+  # (h)(i)(j) cópia hermética com famílias sintéticas (REPO_ROOT da cópia = sandbox)
+  # o top-level da bancada copia .claude/docs/CLAUDE.md p/ o sandbox e lê inventory.sh --env (grep vazio sob
+  # pipefail aborta): a cópia leva .claude/ e docs/ inteiros (33 MB) — REPO_ROOT da cópia = este sandbox
+  local d; d="$(mktemp -d)"
+  cp -a "${REPO_ROOT}/.claude" "${d}/.claude"; cp -a "${REPO_ROOT}/docs" "${d}/docs"; cp -a "${REPO_ROOT}/CLAUDE.md" "${d}/CLAUDE.md"
+  python3 - "${d}/.claude/validation/lint-selftest.sh" <<'PYI'
+import sys; p=sys.argv[1]; s=open(p).read()
+i=s.rindex('echo "=== Sumário do auto-teste de guardas ==="')
+# insere antes do bloco list/child (que precede o cabeçalho do sumário)
+k=s.rfind('if [ "${SELFTEST_LIST}" = "1" ]; then SUMMARY_PRINTED=1; exit 0; fi', 0, i)
+syn='run_zz_ok_selftests() { record_pass "zz ok"; }\n_family run_zz_ok_selftests\nrun_zz_ok2_selftests() { record_pass "zz ok2"; }\n_family run_zz_ok2_selftests\nrun_zz_abort_selftests() { exit 3; }\n_family run_zz_abort_selftests\n'
+s=s[:k]+syn+s[k:]; open(p,"w").write(s)
+PYI
+  local copy="${d}/.claude/validation/lint-selftest.sh"
+  out="$(bash "${copy}" --families zz_ok,zz_ok2 --jobs 2 2>&1)" && rc=0 || rc=$?
+  if [ "${rc}" -eq 0 ] && printf '%s\n' "${out}" | grep -q 'Passaram : 2' && printf '%s\n' "${out}" | grep -q 'faixa paralela: 2 famílias / 2 workers'; then
+    record_pass "selftest-lanes: (h) --jobs 2 agrega 2 workers ⇒ Passaram 2, exit 0"
+  else record_fail "selftest-lanes: (h) --jobs agrega" "rc=${rc}; $(printf '%s\n' "${out}" | grep -E 'Passaram|faixa' | tr '\n' '|' | cut -c1-140)"; fi
+  out="$(bash "${copy}" --families zz_ok,zz_abort --jobs 2 2>&1)" && rc=0 || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s\n' "${out}" | grep -q 'ABORTOU sem somar' && printf '%s\n' "${out}" | grep -q 'zz_abort reivindicada e NÃO concluída' && ! printf '%s\n' "${out}" | grep -q '^OK ✓'; then
+    record_pass "selftest-lanes: (i) worker que aborta ⇒ FALHA no pai (exit 1): sem trailer + família reivindicada-e-não-concluída nomeada"
+  else record_fail "selftest-lanes: (i) worker abortado" "rc=${rc}; $(printf '%s\n' "${out}" | grep -E 'ABORTOU|Passaram|^OK|FALHOU' | tr '\n' '|' | cut -c1-160)"; fi
+  out="$(bash "${copy}" --families zz_ok --child 2>&1 || true)"
+  if printf '%s\n' "${out}" | grep -qx '#ONION_SELFTEST_COUNTS 1 0 0'; then
+    record_pass "selftest-lanes: (j) --child imprime o trailer de soma (1 0 0)"
+  else record_fail "selftest-lanes: (j) trailer" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
+  # (k) default = serial, tudo (comportamento antigo preservado)
+  out="$(bash "${copy}" --dry-run 2>&1 || true)"
+  if printf '%s\n' "${out}" | grep -qx 'dry-run: famílias=<todas> jobs=1'; then
+    record_pass "selftest-lanes: (k) sem argumento = serial e todas as famílias (compat)"
+  else record_fail "selftest-lanes: (k) default" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
+  # (l) VACUIDADE: seleção que não exerce guarda nenhuma NÃO é verde
+  out="$(bash "${copy}" --families zz_nao_existe 2>&1)" && rc=0 || rc=$?
+  if [ "${rc}" -eq 1 ] && printf '%s\n' "${out}" | grep -q 'NENHUMA guarda foi exercida'; then
+    record_pass "selftest-lanes: (l) --families inexistente ⇒ FALHOU por vacuidade (0 guardas ≠ verde)"
+  else record_fail "selftest-lanes: (l) vacuidade" "rc=${rc}; $(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
+  # (m) SHARD do manifest: 4 fixtures reais no manifest da cópia; 2 workers ⇒ cada linha exatamente uma vez
+  local mf="${d}/.claude/validation/fixtures/manifest.tsv"
+  { grep -E '^kind' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv"; grep -E '^lint' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv" | head -4; } > "${mf}"
+  out="$(bash "${copy}" --families fixtures --jobs 2 2>&1)" && rc=0 || rc=$?
+  n="$(printf '%s\n' "${out}" | grep -c '^  ✓' || true)"
+  if [ "${rc}" -eq 0 ] && [ "${n}" -eq 4 ] && printf '%s\n' "${out}" | grep -q 'Passaram : 4'; then
+    record_pass "selftest-lanes: (m) fixtures fatiada em 2 workers ⇒ 4 casos, cada linha do manifest uma vez"
+  else record_fail "selftest-lanes: (m) shard" "rc=${rc} ✓=${n}; $(printf '%s\n' "${out}" | grep -E 'Passaram|ABORTOU' | tr '\n' '|' | cut -c1-120)"; fi
+  out="$(ONION_SELFTEST_SHARD=1/2 bash "${copy}" --families fixtures --child 2>&1 || true)"
+  if printf '%s\n' "${out}" | grep -qx '#ONION_SELFTEST_COUNTS 2 0 0'; then
+    record_pass "selftest-lanes: (n) ONION_SELFTEST_SHARD=1/2 ⇒ metade do manifest (2 de 4)"
+  else record_fail "selftest-lanes: (n) shard child" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
+  rm -rf "${d}"
+}
+_family run_selftest_lanes_selftests
 
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois
@@ -10583,16 +10901,16 @@ printf "%s/%s" "${PASS}" "${SKIP}"' 2>/dev/null || true)"
     fi
   else record_fail "selftest-outcomes: (f) env de hook" "GIT_DIR envenenado sobrevive ao preâmbulo"; fi
 }
-run_selftest_outcomes_selftests
-run_shell_pipefail_robustness_selftests
-run_aside_router_selftests
+_family run_selftest_outcomes_selftests
+_family run_shell_pipefail_robustness_selftests
+_family run_aside_router_selftests
 
 # Modo kg-view — REGRA 31: lente derivada, determinística e em paridade com o motor.
-run_vendor_scrub_selftests
-run_moat_boundary_selftests
-run_materialize_repo_selftests
-run_plugin_hooks_json_selftests
-run_projection_name_selftests
+_family run_vendor_scrub_selftests
+_family run_moat_boundary_selftests
+_family run_materialize_repo_selftests
+_family run_plugin_hooks_json_selftests
+_family run_projection_name_selftests
 run_kg_reverify_schema_selftests() {
   # WIRE-IN 2026-08-13 (Elenxo de mecanismos, P5): o kg-reverify-schema-check.sh nasceu em
   # 2026-08-12 com selftest embutido (6 casos) e ZERO consumidores — o autor da guarda contra
@@ -11324,43 +11642,43 @@ run_site_derivation_selftests() {
   rm -rf "${sb2}"
 }
 
-run_hook_autofix_selftests
-run_kg_reverify_schema_selftests
-run_backtick_ref_selftests
-run_site_deeplink_selftests
-run_deploy_site_selftests
-run_install_caddy_config_selftests
-run_realign_selftests
-run_harvest_residue_selftests
-run_compose_exposure_selftests
-run_backlog_projection_selftests
-run_radar_staleness_selftests
-run_members_registry_selftests
-run_census_extract_selftests
-run_census_seal_selftests
-run_sdaal_workflows_selftests
-run_drive_selftests
-run_site_derivation_selftests
-run_rules_registry_selftests
-run_onion_version_tracked_selftests
-run_hub_role_guard_selftests
-run_inventory_adopter_scope_selftests
-run_family_topology_selftests
-run_decouple_source_selftests
-run_kg_view_selftests
-run_kg_status_factor_selftests
-run_pretooluse_veto_selftests
-run_version_drift_selftests
-run_premodelswitch_guard_selftests
-run_research_lens_selftests
-run_research_workflow_selftests
+_family run_hook_autofix_selftests
+_family run_kg_reverify_schema_selftests
+_family run_backtick_ref_selftests
+_family run_site_deeplink_selftests
+_family run_deploy_site_selftests
+_family run_install_caddy_config_selftests
+_family run_realign_selftests
+_family run_harvest_residue_selftests
+_family run_compose_exposure_selftests
+_family run_backlog_projection_selftests
+_family run_radar_staleness_selftests
+_family run_members_registry_selftests
+_family run_census_extract_selftests
+_family run_census_seal_selftests
+_family run_sdaal_workflows_selftests
+_family run_drive_selftests
+_family run_site_derivation_selftests
+_family run_rules_registry_selftests
+_family run_onion_version_tracked_selftests
+_family run_hub_role_guard_selftests
+_family run_inventory_adopter_scope_selftests
+_family run_family_topology_selftests
+_family run_decouple_source_selftests
+_family run_kg_view_selftests
+_family run_kg_status_factor_selftests
+_family run_pretooluse_veto_selftests
+_family run_version_drift_selftests
+_family run_premodelswitch_guard_selftests
+_family run_research_lens_selftests
+_family run_research_workflow_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
-run_kg_scope_selftests
+_family run_kg_scope_selftests
 
 # Modo projection-safety — REGRA 30: nome comercial de membro privado não sai do repo privado.
-run_projection_safety_selftests
-run_federation_projection_selftests
+_family run_projection_safety_selftests
+_family run_federation_projection_selftests
 
 # ---------------------------------------------------------------------------
 # Sumário
@@ -11370,6 +11688,13 @@ run_federation_projection_selftests
 #    SIGPIPE no meio da soma — medido: `rc=141`, sumário truncado, stderr VAZIO. Exatamente a
 #    "leitura confortável" que esta guarda existe para remover. O desarme foi para DEPOIS do
 #    veredito final, que é o único ponto em que a suíte de fato chegou ao fim.
+if [ "${SELFTEST_LIST}" = "1" ]; then SUMMARY_PRINTED=1; exit 0; fi
+if [ "${SELFTEST_CHILD}" = "1" ]; then
+  for c in "${FAILED_CASES[@]}"; do printf '#ONION_SELFTEST_FAILED\t%s\n' "${c}"; done
+  for c in "${SKIPPED_CASES[@]}"; do printf '#ONION_SELFTEST_SKIPPED\t%s\n' "${c}"; done
+  echo "#ONION_SELFTEST_COUNTS ${PASS} ${FAIL} ${SKIP}"
+  SUMMARY_PRINTED=1; exit 0
+fi
 echo ""
 echo "=== Sumário do auto-teste de guardas ==="
 echo "  Passaram : ${PASS}"
@@ -11390,6 +11715,15 @@ if [ "${STRICT}" = "1" ] && [ "${SKIP}" -gt 0 ]; then
   echo "FALHOU (STRICT) — ${SKIP} guarda(s) não puderam ser exercidas neste ambiente."
   echo "  ONION_SELFTEST_STRICT=1 exige capacidade completa: instale o tooling ausente"
   echo "  (jq, python3, python3-yaml, git, openssl) ou rode sem STRICT para o degrade local."
+  SUMMARY_PRINTED=1; exit 1
+fi
+
+# VACUIDADE (faixas, 2026-09-03): seleção/partição que não exerce guarda NENHUMA não é verde — é
+# "não verifiquei". Sem isto, `--families inexistente` ou um pai cujos workers todos morreram
+# antes do trailer sairia "OK ✓" com Passaram 0 (medido no dogfood da própria faixa).
+if [ "$(( PASS + FAIL + SKIP ))" -eq 0 ]; then
+  echo "FALHOU — NENHUMA guarda foi exercida (seleção vazia? famílias inexistentes? workers mortos?)."
+  echo "  famílias pedidas: ${SELFTEST_FAMILIES:-<todas>} · jobs: ${SELFTEST_JOBS}"
   SUMMARY_PRINTED=1; exit 1
 fi
 

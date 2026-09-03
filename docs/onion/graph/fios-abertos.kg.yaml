@@ -132,14 +132,32 @@ nodes:
     trace: 'docs/evolution/inbox/_processed/2026-09-03-sinal-adocao-deveria-entregar-claude-md-fundido.md'
   - id: D_BANCADA_FAIXAS_E_MAPA
     node_type: decision
-    plane: DEV
+    plane: PROD
     impact: 4
-    confidence: 0.8
-    status: open
-    label: 'DECISAO PROPOSTA (pergunta do maestro 2026-09-02: "~830 nao e muito? nao deveria ter uma separacao?"): a bancada lint-selftest.sh (~850 casos, O(casos x lint), single-thread, ~14 min CI / >25 min VPS) passa a ter (1) paralelismo por nucleo (cada caso ja e sandbox isolado), (2) mapa familia->globs com git diff proprio e FAILSAFE (tocar lint/harness/regras/mapa => tudo), (3) tres faixas: pre-commit = afetado + faixa rapida (contagem, vendor-scrub, registro, projecoes, lint --only), PR = familias tocadas, CI = completo. Embasamento: pesquisa em 4 eixos (pre-commit.com so staged; Mergify/merge-queue = escopo declarado + prova + recusa; bats --jobs; Git t/ make -jN + prove; mercado: selecao de teste nao e o escasso) + 6 reprovacoes de gate em 24 h por classes baratas. Opcoes: A = 3 faixas com mapa+failsafe (recomendada); B = so paralelizar (ganho sem risco, insuficiente para o pre-commit na VPS); C = manter tudo-no-pre-commit (status quo, 25 min sob carga). NAO fazer: PTS por ML, plataforma paga, tj-actions/changed-files (CVE-2025-30066), mutation como escore, deletar familias quietas. Gatilho: selo do maestro; dogfood = a propria bancada reprovando um mutante fora do mapa (failsafe) antes de selar. Maestro sela.'
+    confidence: 0.9
+    status: done
+    label: 'DECISAO PROPOSTA (pergunta do maestro 2026-09-02: "~830 nao e muito? nao deveria ter uma separacao?"): a bancada lint-selftest.sh (~850 casos, O(casos x lint), single-thread, ~14 min CI / >25 min VPS) passa a ter (1) paralelismo por nucleo (cada caso ja e sandbox isolado), (2) mapa familia->globs com git diff proprio e FAILSAFE (tocar lint/harness/regras/mapa => tudo), (3) tres faixas: pre-commit = afetado + faixa rapida (contagem, vendor-scrub, registro, projecoes, lint --only), PR = familias tocadas, CI = completo. Embasamento: pesquisa em 4 eixos (pre-commit.com so staged; Mergify/merge-queue = escopo declarado + prova + recusa; bats --jobs; Git t/ make -jN + prove; mercado: selecao de teste nao e o escasso) + 6 reprovacoes de gate em 24 h por classes baratas. Opcoes: A = 3 faixas com mapa+failsafe (recomendada); B = so paralelizar (ganho sem risco, insuficiente para o pre-commit na VPS); C = manter tudo-no-pre-commit (status quo, 25 min sob carga). NAO fazer: PTS por ML, plataforma paga, tj-actions/changed-files (CVE-2025-30066), mutation como escore, deletar familias quietas. Gatilho: selo do maestro; dogfood = a propria bancada reprovando um mutante fora do mapa (failsafe) antes de selar. Maestro sela.' # SELADA 2026-09-03: opcao A EXECUTADA e mergeada (PR das faixas) — ver E_BANCADA_FAIXAS_MEDIDA
+    verified_at: '2026-09-03'
+    verified_against: 'run #4 paralelo: 994 casos / 0 falhas / 519 s (par8-final2.log); hook pre-commit --affected-staged --jobs auto; CI --jobs auto'
+    trace: 'docs/analysis/bancada-faixas-e-mapa-2026-09.md'
+  - id: E_BANCADA_FAIXAS_MEDIDA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: 'MEDIDO 2026-09-03 na VPS (8 vCPU, load ~1-2): bancada serial = 1037 s (17m17; fixtures 1004 s = 97%, 94 casos x ~10,7 s cada um = 1 lint --only); --jobs 8 round-robin estatico = 800 s (max worker 795 s; LPT reconstruido daria 394 s); --jobs 8 com FILA DINAMICA (mkdir atomico por familia + shard do manifest) = 472 s, 980 casos, 131 familias. CI serial no mesmo dia = 1218 s. Lint completo e DETERMINISTICO sob carga (7 copias de git archive HEAD, 6 concorrentes: 8 HARD identicos, 137 s cada vs 119 s ocioso). Achados colaterais: familia vendor_pin FANTASMA desde 2026-07-21 (invocacao dentro do proprio corpo); trap RETURN de 27 familias vazava para o wrapper; idioma lint | grep -q sob pipefail (SIGPIPE) so falhava em paralelo; vacuidade (0 casos = OK) curada.'
     trace: 'docs/analysis/bancada-faixas-e-mapa-2026-09.md'
     verified_at: '2026-09-03'
-    verified_against: 'pesquisa 4 eixos (run de 2026-09-02) + 6 reprovacoes de gate medidas em 2026-09-02/03 + pre-gate.sh no scratch'
+    verified_against: 'runs medidos: serial.log, par8.log (800 s), par8q.log (472 s), lintload (7 lints); CI selftest run 33715418241 (20m18s)'
+  - id: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: 'PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-verified_at) falhou 1 vez em 4 runs paralelos de 8 workers (HARD 9->9) e nunca em serie? O lint mostrou-se deterministico sob carga (E_BANCADA_FAIXAS_MEDIDA), nao ha timeout no caminho do lint, o sandbox e privado. Suspeitos: leitura do repo vivo pelo lint do sandbox (git sem origin, provenance), parse do contador (sed|tail -1) sob saida truncada. Gatilho: proxima ocorrencia — o caso agora imprime as HARD so-do-mutante na mensagem de falha; dai abre-se a causa.'
+    verified_against: 'f-par.log (1 falha), par8.log/par8q.log/f-par2.log (0 falhas), 2026-09-03'
 
 edges:
   - from: I_JWKS_ATTEMPTED_AT
@@ -168,4 +186,10 @@ edges:
     edge_type: DEPENDS_ON
   - from: D_BANCADA_FAIXAS_E_MAPA
     to: W8_REAIS_EXECUTAVEIS
+    edge_type: DEPENDS_ON
+  - from: E_BANCADA_FAIXAS_MEDIDA
+    to: D_BANCADA_FAIXAS_E_MAPA
+    edge_type: SUPPORTS
+  - from: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
+    to: D_BANCADA_FAIXAS_E_MAPA
     edge_type: DEPENDS_ON

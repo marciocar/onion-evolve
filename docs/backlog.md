@@ -191,7 +191,7 @@
 |--:|---|---|---|
 | 6.8 | `Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE` | fios-abertos | A bancada vendorizada (lint-selftest.sh) NAO PODE passar no adotante: medido em 2026-09-02 no 1o adotante greenfield do pin 8e2517 |
 | 6.4 | `D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO` | fios-abertos | DECISAO PROPOSTA (sinal upstream do 1o adotante greenfield, 2026-09-03; maestro verbatim: "fundir da melhor forma para aproveitame |
-| 6.4 | `D_BANCADA_FAIXAS_E_MAPA` | fios-abertos | DECISAO PROPOSTA (pergunta do maestro 2026-09-02: "~830 nao e muito? nao deveria ter uma separacao?"): a bancada lint-selftest.sh  |
+| 3.0 | `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO` | fios-abertos | PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-ver |
 
 ## federation-health-2026-07 — 1 item(ns)
 

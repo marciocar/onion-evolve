@@ -389,7 +389,7 @@ As 4 camadas acima validam o **projeto-alvo**. A 5ª camada é **meta**: valida 
 |---|---|
 | `.claude/validation/fixtures/**` | Artefatos mínimos, cada um isolando UMA regra (casos `bad`/`good`/`exempt`) |
 | `.claude/validation/fixtures/manifest.tsv` | Registro `kind · fixture · target · verdict · keyword` — uma linha por fixture |
-| `.claude/validation/lint-selftest.sh` | Runner: injeta cada fixture e assere o veredito real vs esperado |
+| `.claude/validation/lint-selftest.sh` | Runner: injeta cada fixture e assere o veredito real vs esperado. **Faixas** (2026-09-03): `--list`/`--map` (mapa família→arquivo DERIVADO do corpo das famílias), `--families`, `--affected <paths>`/`--affected-staged` (failsafe: infra da bancada ou arquivo não citado ⇒ tudo), `--jobs N\|auto` (workers `--child` com fila dinâmica; worker sem trailer de soma ou família reivindicada-e-não-concluída = FALHA; 0 guardas exercidas = FALHA), `--timing`, `--dry-run` |
 
 ### Como funciona
 
