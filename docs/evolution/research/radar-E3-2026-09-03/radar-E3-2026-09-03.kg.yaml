@@ -1,0 +1,237 @@
+meta:
+  id: radar-E3-2026-09-03
+  schema_version: "1"
+  baseline: 2026-09-03
+  review_after: 2026-10-18   # revisita: versao do Claude Code, 45d (= REGRA 65) — REGRA 67
+  # kg-backlog-guard: on
+  # ═══ TETO: 20 NÓS. Rodada fechada: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
+  # Rodada 2 do /meta:radar, eixo E3 (claude-code-delta): delta 2.1.257 (baseline 2026-09-02,
+  # radar-E3-2026-09-02.kg.yaml) -> 2.1.259 (processo E binario, `claude --version` + REGRA 65).
+  # Gatilho: REGRA 65 SOFT (cc_version 2.1.257 != processo 2.1.259). Fonte primaria: CHANGELOG.md
+  # oficial (data/changelog-2.1.258-259.md; l.N = linha desse arquivo). 2.1.258 = 2 itens irrelevantes
+  # (macOS 12, remoto). Juiz adversarial opus/high, mandato REFUTAR, abriu as fontes e re-executou as
+  # medicoes: 11 achados meus -> 1 APROVADO, 8 EMENDADOS (6 linhas citadas erradas, 2 medicoes locais
+  # invertidas/superestimadas), 2 REPROVADOS (F5 leu allow como deny; F8 hook Stop inexistente).
+  # Rascunho pre-juiz preservado em data/f1-findings-pre-juiz.md; numeros corrigidos AQUI.
+  # O radar so enxerga arestas dentro de um arquivo: o vinculo com a baseline vai por trace:.
+nodes:
+  - id: Q_E3_DELTA_2_1_259
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: 'O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestracao, forge, MCP, segredos, headless)? Rodada 2 do E3. ABERTA no que depende de medicao humana: o veto do frontmatter model: em sessao interativa NOVA (ver E_LACUNAS).'
+    verified_against: 'CHANGELOG 2.1.258-259 (data/), juiz opus/high 2026-09-03; baseline anterior: docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml'
+    trace: 'docs/evolution/research/radar-E3-2026-09-03/data/f1-findings-pre-juiz.md'
+  - id: E_F1_MODEL_FRONTMATTER_VALE_INTERATIVO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.17; medicao frontmatter-only (awk entre os dois ---): commands 109 (96 sonnet/10 opus/3 haiku), skills 0, agents 51; juiz EMENDOU (meu grep contava exemplos no corpo: 111/1/163)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F1 EMENDADO. 2.1.259 corrige "frontmatter model: em custom commands e skills era IGNORADO em sessoes interativas" (l.17): passa a valer. Exposicao REAL do core: 109 comandos com model: (96 sonnet, 10 opus, 3 haiku); NENHUMA skill (as 2 ocorrencias em onion-patterns sao exemplos no corpo); 51 agentes (43 sonnet, 8 opus) — agentes sempre foram honrados (subagente), o delta e so em COMANDOS. Consequencia esperada: invocar /warm-up (model: sonnet) no picker de uma sessao Fable pede troca para sonnet; a guarda PreModelSwitch (lineup claude-fable-5-1/claude-opus-5, radar-baselines.yaml:34-35) VETA nos dois ramos, porque a plataforma resolve o apelido (evento medido 2026-09-02: requested=sonnet, to=claude-sonnet-5, decision=block). O que acontece com o comando APOS o veto NAO foi medido (E_LACUNAS). Estrategia: os 96 `model: sonnet` sao um DOWNGRADE latente da doutrina "sempre o maximo" que a plataforma agora executa — decisao proposta em D_COMANDOS_SEM_MODEL_OU_NO_LINEUP.'
+    trace: 'docs/evolution/research/radar-E3-2026-09-03/SYNTHESIS.md'
+  - id: E_F2_AUTO_MODE_MANTEM_SESSAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.12 (eu citara l.10 = cache OAuth; juiz corrigiu)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F2 EMENDADO. l.12: auto mode nao roda mais um turno num modelo que ele NAO SUPORTA quando o frontmatter de comando/skill nomeia um — o turno mantem o modelo da sessao. NAO e "em auto mode a sessao vence": e o contrapeso de l.17 recortado ao caso nao-suportado. Para o core (Fable/Opus no lineup) nao muda nada por si; combina com F1.'
+    trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+  - id: E_F3_PERMISSION_PROMPTS_NONE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.4; .claude/settings.json (3 vetos exit 2: 2 PreToolUse + 1 PreModelSwitch, sem bypass alterado)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F3 EMENDADO. l.4: `--permission-prompts none` para hosts headless — tudo que pediria prompt e NEGADO automaticamente, e o modo de permissao ativo (incl. auto) segue decidindo. Sob bypassPermissions (o que o core usa nos jobs da VPS) a flag NAO altera nada; o valor e para adotante headless SEM bypass (fail-closed por default). Nao muda a doutrina: o exit 2 determinístico de hook continua sendo a capacidade que compra o acoplamento.'
+    trace: 'CLAUDE.md'
+  - id: E_F4_CLAUDE_JSON_CONCORRENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.7; contagem "40 processos claude" e da memoria de 2026-09-02 e NAO foi re-medida nesta rodada (juiz)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F4 EMENDADO. l.7: sessoes concorrentes deixam de reverter em silencio as mudancas de ~/.claude.json (trust do workspace nao reseta; estado MCP/projeto nao se perde). A VPS do core roda dezenas de sessoes (numero de 09-02, nao re-medido): perda de trust/MCP entre sessoes era sintoma plausivel e nunca registrado. Nota, sem acao.'
+    trace: 'docs/analysis/onion-vps-network-exposure-2026-08.md'
+  - id: E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.9; grep -n deny .claude/settings.json .claude/settings.local.json = vazio; settings.json:12 "Bash(grep * .env)" esta em permissions.ALLOW (juiz REPROVOU minha leitura: li allow como deny)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F5 REPROVADO e substituido. l.9 amplia a cobertura de deny rules Read() do Bash (valores de opcao como -f.env/@file, operandos de git diff/grep, compostos cd DIR && cat FILE; grep -r/cp -r sobre dir com arquivo negado passa a perguntar). Medido: o core NAO tem deny rule nenhuma; a linha 12 do settings.json e um ALLOW de `Bash(grep * .env)` — sentido contrario. Antes de adotar deny estilo Read(./.env) e preciso rever esse allow. A doutrina da casa (segredo nunca em claro no repo + pass) nao depende de deny rule; a cobertura nova e OPCAO, nao lacuna.'
+    trace: '.claude/settings.json'
+  - id: E_F6_PLUGIN_VALIDATE_JSON
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.6; .claude/skills/onion-publish/SKILL.md:9 (allowed-tools) e :55-56 (passo 5, --strict manual); lint-artifacts.sh:2284 delega validacao YAML ao plugin validate (juiz EMENDOU: nao e novo, ja e usado manualmente)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F6 EMENDADO. l.6: `claude plugin validate --json` da relatorio legivel por maquina. O core JA usa `claude plugin validate --strict` como passo MANUAL opcional em onion-publish e o lint delega a validacao YAML a ele: --json nao entra do zero, ele torna um passo existente CONSUMIVEL POR GATE (parse do JSON no assemble/publish). Oportunidade concreta, pequena.'
+    trace: '.claude/skills/onion-publish/SKILL.md'
+  - id: E_F7_MANAGED_MCP_E_ALLOWLIST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.3 e l.37 (eu citara l.38 = filtro do VSCode; juiz corrigiu)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F7 EMENDADO. l.3: `managedMcpServers` (organizacao entrega servidores HTTP/SSE a todos; entradas com comando sao puladas). l.37: `allowedMcpServers` passa a governar SO servidores adicionados por usuario — servidor gerenciado literal que a allowlist filtrava CARREGA no upgrade; usar deniedMcpServers. O core e MCP-opcional (SDAAL); impacto so em adotante corporativo com managed settings. Nota.'
+    trace: 'docs/meta-specs/integrations.md'
+  - id: E_F8_STOP_HOOK_NAO_SE_APLICA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.29 (eu citara l.30 = MCP no navegador); settings.json configura SessionStart/UserPromptSubmit/SessionEnd/PreCompact/PostToolUse/PreToolUse/PreModelSwitch/PostModelSwitch — SEM hook Stop (juiz REPROVOU)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F8 REPROVADO e reduzido a nota. l.29: Stop hooks bloqueantes faziam o turno seguinte perder o raciocinio e, em alguns modelos, o cache. O core NAO tem hook Stop; os vetos sao PreToolUse e PreModelSwitch, fora do escopo de l.29. Vale so se o core vier a adotar um Stop bloqueante.'
+    trace: '.claude/settings.json'
+  - id: E_F9_WORKTREE_E_WORKFLOW
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.20, l.27, l.31, l.36 (eu citara l.21/l.32; juiz corrigiu); git worktree list (worktree viva em .claude/worktrees/); .claude/workflows/onion-research.js (36 KB)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F9 EMENDADO. l.20: isolamento aceita worktrees criadas por hook; l.31: sessao isolada por worktree deixa de recusar loops/xargs/launchers; l.36: resultado de subagente aninhado fica no transcript do pai (resume e transcript compartilhado preservam); l.27: RESUME de workflow nao roda mais copias duplicadas dos agentes enquanto o run anterior ainda sai. O juiz subiu l.27 de nota para CORRECAO DE CUSTO: um resume do /onion-research (~1,3M tokens no modo research) dobraria a corrida. Tudo a favor da orquestracao do core; nada a mudar.'
+    trace: '.claude/workflows/onion-research.js'
+  - id: E_F10_GITLAB_NA_PLATAFORMA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.5 e l.35; .claude/utils/forge/adapters/ = github.md + none.md (github.md:9 declara-se o unico implementado; gitlab/bitbucket = costura em factory.md/detector.md)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F10 APROVADO. l.5: `glab mr create/merge/close/reopen/note/update` reconhecido (MR !N no sumario, badge no rodape); l.35: /install-github-app explica ser GitHub-only e aponta docs de GitLab CI/CD. A plataforma esta costurando GitLab; o forge SDAAL do core tem gitlab "costura pronta, nao implementado". Sinal estrategico: a demanda do lado da plataforma cresce; o adapter gitlab sobe na fila quando um adotante pedir.'
+    trace: '.claude/utils/forge/adapters/github.md'
+  - id: E_F11_MANAGED_SETTINGS_FAIL_LOUD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.25 (eu citara l.24 = identidade do repo; juiz corrigiu); .claude/hooks/premodelswitch-guard.sh (baseline ilegivel = exit 2 nomeando o arquivo)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'F11 EMENDADO. l.25: managed settings ilegiveis (arquivo, drop-in, plist MDM, HKLM) deixam de ser IGNORADOS em silencio: o Claude Code recusa iniciar e nomeia a fonte. E o mesmo padrao que premodelswitch-guard.sh ja implementa (baseline presente mas ilegivel = VETO nomeando o arquivo, nunca liberacao silenciosa) — a plataforma convergiu com a doutrina fail-loud da casa.'
+    trace: '.claude/hooks/premodelswitch-guard.sh'
+  - id: E_OMISSOES_JUIZ_0903
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'CHANGELOG l.26, l.28, l.22, l.16, l.24, l.33, l.39+l.44 (2.1.258), l.13; juiz opus/high verificou CLAUDE_CODE_MAX_CONTEXT_TOKENS ausente no core'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: '8 OMISSOES do rascunho, apontadas pelo juiz: (1) l.26 Stop nao parava agentes de background nem workflows em sessao de controle remoto; agora tarefas mortas seguem visiveis e re-paraveis — a mais grave: o core roda agentes/Workflow e o maestro opera por controle remoto na VPS. (2) l.28 URL de marketplace no github.com com barra final ou ?/# gerava clone inutilizavel — cai na publicacao human-gated do onion-plugins. (3) l.22 servidor MCP que cai durante a listagem de tools aparecia conectado e sem tools em vez de reportar erro — classe declarado != verificado que a casa nomeia. (4) l.16 --resume falhava e --continue abria vazio com anexo sem payload — o core depende de sessoes retomaveis (foi /exit + --resume que provou o veto do PreModelSwitch). (5) l.24 deteccao de repositorio perdia identidade apos falha transitoria de sonda git — irma de l.20 para quem opera worktrees. (6) l.33 /workflows formata resultado JSON com quebras reais e dobra os longos — observabilidade do onion-research.js. (7) l.39 + 2.1.258 l.44: sessoes remotas/agendadas travando apos aprovacao de permissao de connector com sessao pausada e falhando com conteudo vazio — atinge sessoes agendadas na VPS; o descarte de 2.1.258 inteira no cabecalho foi presumido, nao julgado (macOS 12 e de fato fora de escopo em VPS Linux). (8) l.13 CLAUDE_CODE_MAX_CONTEXT_TOKENS ignorado para IDs estilo Vertex — o core nao define a variavel (so mencao comentada em KB): omissao legitima, duvida fechada.'
+    trace: 'docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md'
+  - id: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    label: 'DECISAO PROPOSTA (maestro sela): 109 comandos do core declaram model: (96 sonnet) e, com l.17 de 2.1.259, isso passa a pedir troca de modelo em sessao interativa — contra a doutrina "sempre o maximo" e contra a guarda PreModelSwitch, que vai VETAR (lineup fable-5-1/opus-5) a cada /comando. Opcoes: (A) REMOVER model: do frontmatter dos comandos (o comando roda no modelo da sessao; tiering continua nos AGENTES, onde e legitimo) — recomendada; (B) trocar os 96 sonnet por um valor do lineup (mantem o campo, sem downgrade; mas "opus" em comando de conversa nao tem sentido se a sessao e Fable); (C) ampliar o lineup com sonnet (abandona a doutrina). Pre-requisito: a lacuna E_LACUNAS_E3_0903 (o que acontece ao comando apos o veto) — se o veto QUEBRAR o comando, (A) vira urgente. Gatilho: medicao interativa do maestro OU selo.'
+    verified_against: 'E_F1_MODEL_FRONTMATTER_VALE_INTERATIVO; guarda 1+3 (PR #770); baseline E6 session_models'
+    trace: 'docs/onion/radar-baselines.yaml'
+  - id: E_LACUNAS_E3_0903
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'tentativa: Skill onion-patterns invocada via ferramenta Skill num job em background => 0 eventos em .claude/sessions/model-switch.jsonl; a skill nem declara model: (exemplos no corpo)'
+    source_tier: 9
+    source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
+    label: 'LACUNAS DECLARADAS (desfecho de 1a classe) — todas exigem sessao NOVA em processo 2.1.259 (a mudanca segue o processo, nao o disco): (1) frontmatter model: chega a emitir PreModelSwitch, e com qual source:? o unico evento registrado tem source=picker (/model manual); invocar /warm-up e ler a 2a linha de .claude/sessions/model-switch.jsonl. (2) o que acontece com o comando APOS o veto — roda no modelo da sessao, erra, ou aborta calado? e a pergunta que decide se as 96 declaracoes sonnet sao incomodo ou quebra. (3) mesmo probe para model: haiku (meta/backlog.md, meta/co-evolve.md, meta/inventory.md), que resolveria para fora do lineup; para model: opus a expectativa e liberacao. (4) como --permission-prompts none compoe com bypassPermissions e qual vence (importa ao degrau AUDIT do /meta:drive). (5) versao do PROCESSO das sessoes vivas da VPS: disco em 2.1.259, baseline registrava 2.1.257 — a estrategia desta rodada foi medida a partir de baseline vencida, por construcao (e o gatilho). Tentativa minha: invocar a skill onion-patterns pela ferramenta Skill num job em background gerou 0 eventos — e a skill nem declara model: real.'
+    trace: '.claude/sessions/model-switch.jsonl'
+edges:
+  - from: E_F1_MODEL_FRONTMATTER_VALE_INTERATIVO
+    to: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
+    edge_type: SUPPORTS
+  - from: E_F2_AUTO_MODE_MANTEM_SESSAO
+    to: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_E3_0903
+    to: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
+    edge_type: DEPENDS_ON
+  - from: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_F3_PERMISSION_PROMPTS_NONE
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_F4_CLAUDE_JSON_CONCORRENTE
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_F6_PLUGIN_VALIDATE_JSON
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_F7_MANAGED_MCP_E_ALLOWLIST
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_F8_STOP_HOOK_NAO_SE_APLICA
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_F9_WORKTREE_E_WORKFLOW
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_F10_GITLAB_NA_PLATAFORMA
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_F11_MANAGED_SETTINGS_FAIL_LOUD
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_OMISSOES_JUIZ_0903
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_E3_0903
+    to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
