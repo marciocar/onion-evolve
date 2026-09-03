@@ -1,7 +1,6 @@
 ---
 name: federation-register
 description: Registra e valida um contrato de federação (spec-as-code) localmente em UM repo, contra o ledger git. Bootstrapa o ledger se ausente, roda a validação determinística (tests:+fixtures obrigatórios) e, em sucesso, grava+commita o contrato em contracts/<id>.md. NÃO anuncia aos consumers — o CHANGELOG/inbox é responsabilidade do /meta:federation-publish. É o "átomo" da Onion Federation (Fase 1) — testável num repo só.
-model: sonnet
 category: meta
 tags: [federation, contract, spec-as-code, ledger, validation, sdaal]
 version: "1.1.0"

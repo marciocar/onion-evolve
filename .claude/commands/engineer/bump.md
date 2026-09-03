@@ -1,7 +1,6 @@
 ---
 name: bump
 description: Bump de versão seguindo semver. Incrementa major, minor ou patch.
-model: sonnet
 allowed-tools: Read Edit Bash(uv *)
 category: engineer
 tags: [version, release, semver]

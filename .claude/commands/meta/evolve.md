@@ -6,7 +6,6 @@ description: |
   Read-only sobre .claude/: propõe, não muta. Escreve em DOIS lugares — o .kg.yaml de
   auditoria (destino dos achados) e o relatório em docs/analysis/ (projeção do grafo);
   mais a memória de sessão em D10, exceção declarada fora do repo.
-model: opus
 category: meta
 tags: [evolve, audit, orchestration, self-evolution, modernization]
 version: "1.4.0"

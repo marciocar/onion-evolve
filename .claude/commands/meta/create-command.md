@@ -3,7 +3,6 @@ name: create-command
 description: |
   Criação de novos comandos Claude Code com análise de contexto.
   Use para criar comandos que seguem padrões do Sistema Onion.
-model: sonnet
 allowed-tools: Read Write Bash(ls *) Bash(grep *)
 
 parameters:

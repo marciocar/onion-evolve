@@ -3,7 +3,6 @@ name: analyze-pain-price
 description: |
   Análise de Dor e Precificação do Cliente.
   Executa análise profunda de dores e precificação estratégica via @pain-price-specialist.
-model: sonnet
 allowed-tools: Read Glob
 category: product
 tags: [pain, pricing, discovery, value]

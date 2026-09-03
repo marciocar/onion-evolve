@@ -1,7 +1,6 @@
 ---
 name: backlog
 description: "Regenerar docs/backlog.md — a projeção humana do trabalho ABERTO do core, a partir dos nós abertos (status open) da camada canônica (docs/onion/graph) + grafos marcados. Use para ver os fios abertos num lugar só, ordenados por atenção (a régua do radar), agrupados por grafo (o campo `owner:` é lido, mas HOJE nenhum nó o declara — a projeção imprime isso). Projeção pura: item fecha no grafo → some daqui sozinho. A fonte é o grafo; este .md deriva."
-model: haiku
 category: meta
 tags: [backlog, kg, projection, open-threads, self-evolution, ssot]
 version: "1.0.0"

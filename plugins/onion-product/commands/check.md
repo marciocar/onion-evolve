@@ -1,7 +1,6 @@
 ---
 name: check
 description: Verificar requisitos contra meta-specs do projeto.
-model: sonnet
 allowed-tools: Read Glob
 category: product
 tags: [validation, metaspec, product]

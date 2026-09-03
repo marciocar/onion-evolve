@@ -5,7 +5,6 @@ description: >
   fixo, sela pela tabela AUDIT e projeta a listagem REAL. KG-SSOT first e runtime: o estado de
   retomada É o carimbo nos grafos; re-invocar mede só o que resta. Incremental e com teto que
   PARA (não que declara) — nasceu porque a forma rodou 2x a 5M+ renascendo em /tmp.
-model: opus
 category: meta
 tags: [census, backlog, kg, verification, orchestration, cost-discipline]
 version: "1.0.0"

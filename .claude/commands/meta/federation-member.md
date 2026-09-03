@@ -1,7 +1,6 @@
 ---
 name: federation-member
 description: Muta o registro de membros da federação (members.yaml) — OP-1 REGISTRAR neste ciclo (create). Valida a entrada por validador determinístico (members-validate.sh), verifica o pin por pin-integrity-check, regenera as projeções read-only (map/console) e commita no core. Ação por argumento (register); promote/update/revoke são costuras futuras (gated). NÃO é o /meta:federation-register (esse é o ledger de CONTRATOS, objeto diferente).
-model: sonnet
 category: meta
 tags: [federation, members, ledger, register, sdaal, spec-as-code]
 version: "1.0.0"

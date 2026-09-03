@@ -1,7 +1,6 @@
 ---
 name: inventory
 description: Regenerar o inventário canônico do Sistema Onion (comandos, agentes, skills, KBs) a partir do filesystem. Use para atualizar docs/onion/inventory.md após criar/remover recursos e manter as contagens (CLAUDE.md, index) em sincronia — a SSOT que o lint protege.
-model: haiku
 category: meta
 tags: [inventory, ssot, counts, generator, self-evolution]
 version: "1.0.0"

@@ -3,7 +3,6 @@ name: sync
 description: |
   Sincronização automática de branches com GitFlow e proteção de branches críticas.
   Use após merge de PRs para manter branches atualizadas.
-model: sonnet
 allowed-tools: Bash(git *) Read Bash(cat .env*)
 
 parameters:

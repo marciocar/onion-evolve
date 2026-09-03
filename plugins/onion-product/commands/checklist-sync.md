@@ -1,7 +1,6 @@
 ---
 name: checklist-sync
 description: Sincronizar e monitorar checklists do Task Manager (checklist nativo é capacidade resolvida pelo adapter).
-model: sonnet
 allowed-tools: Read Bash(cat .env*)
 category: product
 tags: [checklist, sync, monitoring]

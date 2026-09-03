@@ -1,7 +1,6 @@
 ---
 description: Revisão em camadas da jornada do plano × o vivo — o "selo realinhado" (passado/presente/futuro)
 allowed-tools: Bash, Read
-model: sonnet
 ---
 
 # 🧭 /meta:realign — selar o plano realinhado com o vivo

@@ -1,7 +1,6 @@
 ---
 name: build-index
 description: Gerar e atualizar índices de documentação em docs/ a partir da estrutura real (contagens escaneadas, nunca hardcoded).
-model: sonnet
 category: docs
 tags: [index, navigation, documentation, spec-as-code]
 version: "3.1.0"

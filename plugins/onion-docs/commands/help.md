@@ -1,7 +1,6 @@
 ---
 name: help
 description: Ajuda interativa para comandos de documentação Onion.
-model: sonnet
 allowed-tools: Read
 category: docs
 tags: [help, documentation, guide]

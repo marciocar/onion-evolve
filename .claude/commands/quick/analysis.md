@@ -3,7 +3,6 @@ name: analysis
 description: |
   Análise rápida usando template padrão.
   Diferença vs /meta:analyze-complex-problem: este é o caminho RÁPIDO (template único, sem tipagem, sem gate); o analyze-complex-problem é a análise estruturada para casos críticos (migrações, arquitetura, performance).
-model: sonnet
 allowed-tools: Read Write
 category: quick
 tags: [analysis, quick, template]

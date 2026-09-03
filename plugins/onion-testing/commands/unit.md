@@ -3,7 +3,6 @@ name: unit
 description: |
   Gera e executa testes unitários automaticamente com detecção de framework.
   Use para criar testes seguindo padrões do projeto e executá-los com coverage.
-model: sonnet
 allowed-tools: Read Write Bash(find *) Bash(ls *) Bash(npm *) Bash(pnpm *) Bash(pytest *) Bash(go *) Bash(cargo *) Bash(mvn *)
 
 parameters:

@@ -8352,7 +8352,7 @@ run_graph_selftests() {
   if _emit "${T}" | grep -q "^maestro	gates	assistant" \
      && _emit "${T}" | grep -q "^onion	serves	maestro"; then
     record_pass "graph: atores+comunicação presentes (maestro/assistant/onion)"
-  else record_fail "graph: atores" "arestas de ator/comunicação ausentes"; fi
+  else record_fail "graph: atores" "arestas de ator/comunicação ausentes — triplas=$(_emit "${T}" | grep -c .) · 1as: [$(_emit "${T}" | head -3 | tr '\n\t' '| ' | cut -c1-160)] · stderr: [$(bash "${gen}" --triples 2>&1 >/dev/null | head -2 | tr '\n' '|' | cut -c1-160)] (intermitente 1/15 em paralelo, 2026-09-03)"; fi
 
   if bash "${gen}" --impact design-system-specialist 2>/dev/null | grep -q "onion-design"; then
     record_pass "graph: --impact retorna dependentes reais"
@@ -8382,7 +8382,7 @@ run_graph_selftests() {
        && _emit "${M}" | grep -q -- '-->|adopts|' \
        && _emit "${M}" | grep -q 'classDef source'; then
       record_pass "graph: --map emite Mermaid derivado (flowchart + adopts + classDef)"
-    else record_fail "graph: --map" "mapa Mermaid inválido (falta flowchart/adopts/classDef)"; fi
+    else record_fail "graph: --map" "mapa Mermaid inválido (falta flowchart/adopts/classDef) — linhas=$(_emit "${M}" | grep -c .) · 1as: [$(_emit "${M}" | head -2 | tr '\n' '|' | cut -c1-120)] · stderr: [$(bash "${gen}" --map 2>&1 >/dev/null | head -2 | tr '\n' '|' | cut -c1-160)] (intermitente em paralelo, 2026-09-03 — mesma classe de graph: atores)"; fi
     # determinismo do --map (compara dois valores capturados — ambos sem newline final)
     local M2; M2="$(bash "${gen}" --map 2>/dev/null)"
     if [ "$(printf '%s' "${M}" | sha256sum)" = "$(printf '%s' "${M2}" | sha256sum)" ]; then
@@ -10964,6 +10964,60 @@ run_core_only_role_selftests() {
   rm -rf "${d}"
 }
 _family run_core_only_role_selftests
+
+# Modo model-ladder — a ESCADA de modelos (D_COMANDOS_SEM_MODEL_OU_NO_LINEUP, selo 2026-09-03: piso Sonnet + opção A):
+# guarda com piso só-por-fallback e campo ladder; aviso de degradação por prompt; REGRA 70 (fallbackModel projetado);
+# REGRA 71 (comando sem model:); sonda de acesso por degrau com `claude` falso.
+run_model_ladder_selftests() {
+  local hk="${REPO_ROOT}/.claude/hooks/premodelswitch-guard.sh" nt="${REPO_ROOT}/.claude/hooks/session-degraded-notice.sh"
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh" probe="${REPO_ROOT}/ops/model-lineup-probe.sh"
+  for f in "${hk}" "${nt}" "${lint}" "${probe}"; do [ -f "${f}" ] || { record_fail "model-ladder" "ausente: ${f}"; return; }; done
+  local d out rc; d="$(mktemp -d)"
+  printf 'axes:\n  - id: E6-fronteira-modelos\n    session_models:\n      - claude-fable-5-1\n      - claude-opus-5\n    session_floor: claude-sonnet-5\n' > "${d}/bl.yaml"
+  _sw() { # from to requested source → rc ; log em ${d}/log.jsonl
+    printf '{"session_id":"sess-1","hook_event_name":"PreModelSwitch","from_model":"%s","to_model":"%s","requested_model":"%s","source":"%s","context_tokens":10,"estimated_cache_write_usd":0.1}' "$1" "$2" "$3" "$4" \
+      | ONION_RADAR_BASELINES="${d}/bl.yaml" ONION_MODEL_SWITCH_LOG="${d}/log.jsonl" CLAUDE_PROJECT_DIR="${d}" CLAUDE_CODE_SESSION_ID=sess-1 bash "${hk}" >/dev/null 2>"${d}/err"; echo $?; }
+  # (a) piso pelo picker ⇒ VETO (exit 2) nomeando o piso
+  rc="$(_sw claude-fable-5-1 claude-sonnet-5 sonnet picker)"
+  if [ "${rc}" = 2 ] && grep -q "PISO da escada" "${d}/err"; then record_pass "model-ladder: (a) piso pelo /model ⇒ VETO nomeando o piso"
+  else record_fail "model-ladder: (a) piso/picker" "rc=${rc}: $(head -c 120 "${d}/err")"; fi
+  # (b) piso por fallback ⇒ permite, ladder=degraded, aviso no stderr
+  rc="$(_sw claude-fable-5-1 claude-sonnet-5 sonnet fallback)"
+  if [ "${rc}" = 0 ] && tail -1 "${d}/log.jsonl" | grep -q '"decision":"allow","ladder":"degraded"' && grep -q "DEGRADADA" "${d}/err"; then
+    record_pass "model-ladder: (b) piso por fallback ⇒ permite com ladder=degraded e aviso"
+  else record_fail "model-ladder: (b) piso/fallback" "rc=${rc}; $(tail -1 "${d}/log.jsonl" | cut -c1-160)"; fi
+  # (c) aviso de degradação a cada prompt enquanto degradado; silêncio após restored
+  out="$(printf '{"session_id":"sess-1","hook_event_name":"UserPromptSubmit","prompt":"x"}' | ONION_MODEL_SWITCH_LOG="${d}/log.jsonl" CLAUDE_PROJECT_DIR="${d}" CLAUDE_CODE_SESSION_ID=sess-1 bash "${nt}" 2>&1 || true)"
+  rc="$(_sw claude-sonnet-5 claude-fable-5-1 fable picker)"
+  local out2; out2="$(printf '{"session_id":"sess-1","hook_event_name":"UserPromptSubmit","prompt":"x"}' | ONION_MODEL_SWITCH_LOG="${d}/log.jsonl" CLAUDE_PROJECT_DIR="${d}" CLAUDE_CODE_SESSION_ID=sess-1 bash "${nt}" 2>&1 || true)"
+  if _emit "${out}" | grep -q "DEGRADADA na escada" && _emit "${out}" | grep -q "claude-sonnet-5" && [ -z "${out2}" ] && [ "${rc}" = 0 ] && tail -1 "${d}/log.jsonl" | grep -q '"ladder":"restored"'; then
+    record_pass "model-ladder: (c) aviso a cada prompt enquanto degradado; volta ao primário ⇒ ladder=restored e silêncio"
+  else record_fail "model-ladder: (c) aviso" "out='${out:0:80}' out2='${out2:0:40}' rc=${rc}"; fi
+  # (d) fora da escada pelo picker ⇒ VETO (o 1+3 continua)
+  rc="$(_sw claude-fable-5-1 claude-haiku-4-5 haiku picker)"
+  if [ "${rc}" = 2 ]; then record_pass "model-ladder: (d) fora da escada ⇒ VETO (1+3 intacto)"; else record_fail "model-ladder: (d) fora" "rc=${rc}"; fi
+  # (e) REGRA 70: settings.fallbackModel diverge da escada ⇒ HARD; projetado ⇒ silêncio
+  printf '{"fallbackModel":["claude-opus-5"]}\n' > "${d}/s-bad.json"; printf '{"fallbackModel":["claude-opus-5","claude-sonnet-5"]}\n' > "${d}/s-ok.json"
+  out="$(ONION_RADAR_BASELINES="${d}/bl.yaml" ONION_SETTINGS_JSON="${d}/s-bad.json" bash "${lint}" --only="${d}/s-bad.json" 2>&1 || true)"
+  local out_ok; out_ok="$(ONION_RADAR_BASELINES="${d}/bl.yaml" ONION_SETTINGS_JSON="${d}/s-ok.json" bash "${lint}" --only="${d}/s-ok.json" 2>&1 || true)"
+  if _emit "${out}" | grep -q "REGRA 70 (" && _emit "${out}" | grep -q "diverge da escada" && ! _emit "${out_ok}" | grep -q "REGRA 70 ("; then
+    record_pass "model-ladder: (e) REGRA 70: fallbackModel divergente ⇒ HARD; projetado da escada ⇒ silêncio"
+  else record_fail "model-ladder: (e) REGRA 70" "bad: $(_emit "${out}" | grep -c 'REGRA 70') ok: $(_emit "${out_ok}" | grep -c 'REGRA 70')"; fi
+  # (f) REGRA 71: comando com model: ⇒ HARD (fixture dentro de .claude/commands numa cópia)
+  mkdir -p "${d}/repo/.claude/commands/quick"; cp -a "${REPO_ROOT}/.claude/validation" "${d}/repo/.claude/validation"
+  printf -- '---\nname: probe-model\ndescription: x\nmodel: sonnet\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-03"\n---\n# x\n' > "${d}/repo/.claude/commands/quick/probe-model.md"
+  out="$(cd "${d}/repo" && bash .claude/validation/lint-artifacts.sh --only="${d}/repo/.claude/commands/quick/probe-model.md" 2>&1 || true)"
+  if _emit "${out}" | grep -q "REGRA 71 (" && _emit "${out}" | grep -q "comando declara model:"; then record_pass "model-ladder: (f) REGRA 71: comando com model: ⇒ HARD"
+  else record_fail "model-ladder: (f) REGRA 71" "$(_emit "${out}" | grep -E 'REGRA 71|HARD' | head -2 | tr '\n' '|' | cut -c1-200)"; fi
+  # (g) sonda: claude falso — primário ok, fallback ok, piso negado ⇒ TSV com 3 linhas e exit 1
+  mkdir -p "${d}/bin"; printf '#!/usr/bin/env bash\ncase "$*" in *claude-sonnet-5*) echo "Error: model not available on this plan" >&2; exit 1;; esac; echo ok\n' > "${d}/bin/claude"; chmod +x "${d}/bin/claude"
+  out="$(ONION_CC_BIN="${d}/bin/claude" bash "${probe}" --baseline "${d}/bl.yaml" --jsonl "${d}/probe.jsonl" --timeout 5 2>&1)" && rc=0 || rc=$?
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -qE $'^claude-fable-5-1\tok' && _emit "${out}" | grep -qE $'^claude-sonnet-5\tdenied' && [ "$(wc -l < "${d}/probe.jsonl")" -eq 3 ]; then
+    record_pass "model-ladder: (g) sonda: ok/ok/denied por degrau, jsonl datado, exit 1 quando algum degrau nega"
+  else record_fail "model-ladder: (g) sonda" "rc=${rc}; $(_emit "${out}" | head -4 | tr '\n' '|' | cut -c1-200)"; fi
+  rm -rf "${d}"
+}
+_family run_model_ladder_selftests
 
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois

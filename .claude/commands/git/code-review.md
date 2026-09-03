@@ -3,7 +3,6 @@ name: code-review
 description: |
   [Alias] Redireciona para /meta:setup-code-review (setup de code review no CI).
   Mantido por compatibilidade — code review automático é configuração de CI, não GitFlow.
-model: sonnet
 allowed-tools: Read
 category: git
 tags: [alias, code-review, ci-cd]

@@ -4,7 +4,6 @@ description: |
   Orquestra subagentes em paralelo (fan-out/fan-in) sobre uma tarefa,
   via a ferramenta nativa Workflow. Use para auditorias, migrações, review e
   pesquisa amplas.
-model: opus
 category: meta
 tags: [orchestrator-worker, orchestration, parallel, workflow]
 version: "1.2.0"

@@ -4,7 +4,6 @@ description: |
   Valida um artefato/decisão contra as metaspecs vigentes, aplicando a
   constituição do @metaspec-gate-keeper. Executa as leituras no fluxo principal
   (confiável) e produz relatório com evidência citada.
-model: sonnet
 allowed-tools: Read Grep Glob Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/*) Bash(ls *) Bash(grep *) Bash(wc *) Bash(diff *)
 category: meta
 tags: [metaspec, validation, conformance, architecture]

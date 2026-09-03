@@ -4,7 +4,6 @@ description: |
   Consolida múltiplas reuniões usando o Consolidador de Reuniões.
   Aceita pasta ou arquivos individuais para análise profunda, identificando divergências, convergências e insights estratégicos.
   Use para transformar múltiplas reuniões em conhecimento estratégico consolidado.
-model: sonnet
 allowed-tools: Read Write Bash(find *) Bash(ls *)
 
 parameters:

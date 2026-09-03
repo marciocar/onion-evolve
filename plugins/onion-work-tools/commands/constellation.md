@@ -1,7 +1,6 @@
 ---
 description: 🗺️ O MAPA da Constelação de Estudos — visão macro das N estrelas (estudos discuss/*) lendo SÓ os metadados (frontmatter+Tier-0) de cada SEED. Painel com phase · next_action · colisão de scope_globs · convergência de objective_tags · presença (farol vivo por worktree). Read-only, sob convite.
 name: constellation
-model: sonnet
 allowed-tools: Read Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/constellation-map.sh*)
 argument-hint: "[--json]"
 category: meta

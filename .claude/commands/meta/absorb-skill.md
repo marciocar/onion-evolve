@@ -7,7 +7,6 @@ description: |
   skill já existe (contribuição de um colaborador, pacote de terceiro) e precisa ser trazida
   para dentro sem herdar dívida (CDN, fonte remota, convenção divergente). Nasceu de dogfood de
   campo (uma skill de identidade visual absorvida num engajamento real, 2026-07).
-model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(bash .claude/validation/*) Bash(ls *) Bash(grep *)
 
 parameters:

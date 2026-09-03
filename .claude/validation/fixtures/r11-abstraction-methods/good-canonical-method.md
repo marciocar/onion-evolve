@@ -1,7 +1,6 @@
 ---
 name: good-canonical-method
 description: fixture r11 — comando chama método canônico searchTasks de ITaskManager, caso legítimo vizinho
-model: haiku
 category: meta
 tags: [fixture]
 ---

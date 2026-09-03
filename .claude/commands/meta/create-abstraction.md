@@ -3,7 +3,6 @@ name: create-abstraction
 description: |
   Geração de camada de abstração seguindo o padrão SDAAL.
   Use para criar abstrações agnósticas de provedor (Task Manager, Notification, Storage).
-model: sonnet
 allowed-tools: Read Write Bash(ls *) Bash(mkdir *) Bash(grep *)
 
 parameters:

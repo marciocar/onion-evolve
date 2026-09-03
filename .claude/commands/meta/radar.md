@@ -5,7 +5,6 @@ description: >
   ecossistema Claude Code, capital, gates determinísticos, fronteira de modelos) contra a
   baseline DATADA da última rodada, com juiz adversarial por eixo. Maestro-invocado, nunca
   agendado (MOAT W7); a REGRA 65 detecta a idade no lint e o humano dispara.
-model: opus
 category: meta
 tags: [radar, research, market, external-perception, orchestration]
 version: "1.0.0"

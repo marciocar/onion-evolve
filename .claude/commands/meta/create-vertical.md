@@ -4,7 +4,6 @@ description: |
   Scaffolda uma VERTICAL (hub homônimo + help contextual + resolver de SSOT/book +
   bootstrap) para qualquer sujeito — uma dimensão do framework ou um projeto-cliente.
   Orquestrador fino que compõe os helpers F1 + os create-* + fecha com /meta:inventory.
-model: sonnet
 allowed-tools: Read Write Bash(bash .claude/utils/vertical/*) Bash(bash .claude/utils/marketplace/*) Bash(bash .claude/validation/*) Bash(ls *) Bash(grep *) Bash(git *)
 
 parameters:

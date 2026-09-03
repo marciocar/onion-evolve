@@ -1,7 +1,6 @@
 ---
 name: co-relay
 description: 'Carteiro-LOCAL do doc-bridge (UPSTREAM) — espelho do /meta:co-deliver. Relaya um sinal do adotante (docs/evolution/inbox/) direto no inbox/ do CORE que vive na MESMA máquina, para o hook "you have mail" sinalizar 📬 sem o maestro copiar à mão. ENTREGA-SEM-COMMIT (o adotante nunca commita no repo alheio — invariante I3); o commit + triagem é da sessão do core. Dissolve o incidente "commit cross-repo na branch errada" (sinal S2): sem commit, não há pergunta de branch/push. Roda só no ADOTANTE.'
-model: sonnet
 category: meta
 tags: [co-evolution, upstream, transport, carteiro, inbox, relay, bridge]
 version: "1.1.0"

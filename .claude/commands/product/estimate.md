@@ -4,7 +4,6 @@ description: |
   Orquestra estimativas de story points utilizando o Framework de Story Points.
   Use para estimar tarefas, quebrar épicos e calibrar velocity do time.
   Integra com @story-points-framework-specialist e framework completo.
-model: sonnet
 allowed-tools: Read Bash(cat .env*)
 
 parameters:

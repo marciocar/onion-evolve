@@ -78,6 +78,14 @@
             "statusMessage": "Conferindo versão do processo vs disco (Onion)"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-degraded-notice.sh\""
+          }
+        ]
       }
     ],
     "SessionEnd": [
@@ -164,5 +172,9 @@
         ]
       }
     ]
-  }
+  },
+  "fallbackModel": [
+    "claude-opus-5",
+    "claude-sonnet-5"
+  ]
 }

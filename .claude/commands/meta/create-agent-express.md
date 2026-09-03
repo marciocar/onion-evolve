@@ -1,7 +1,6 @@
 ---
 name: create-agent-express
 description: 'Criar agente de forma rápida e simplificada. Diferença vs /meta:create-agent: este é o caminho RÁPIDO (mínimo de prompts, sem descoberta de contexto profunda); o create-agent faz análise completa do ecossistema antes de criar.'
-model: sonnet
 allowed-tools: Read Write
 category: meta
 tags: [agent, creation, quick]

@@ -6,7 +6,6 @@ description: |
   WCAG, materializa via design-sink) → material (reusa apresentação/Canva).
   Faseado e retomável. Fonte manual nesta versão; geração por IA (diverge/converge)
   chega numa fase futura. Delega a @design-system-specialist.
-model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(bash .claude/validation/*) Bash(bash .claude/utils/design-sink/*)
 category: design
 tags: [design, tokens, identity, wcag, branding]

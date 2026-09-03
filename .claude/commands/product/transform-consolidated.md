@@ -3,7 +3,6 @@ name: transform-consolidated
 description: |
   Transforma documentos consolidados (reuniões ou documentos) em contexto estruturado para criação de tasks.
   Interage com usuário de forma padronizada para extrair ações acionáveis e gerar contexto para /product/collect ou /product/task.
-model: sonnet
 allowed-tools: Read Write Bash(find *) Bash(mkdir *) Bash(ls *)
 
 parameters:

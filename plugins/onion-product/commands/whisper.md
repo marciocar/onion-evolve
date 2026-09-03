@@ -3,7 +3,6 @@ name: whisper
 description: |
   Facilita o uso eficiente do agente Whisper para transcrição de áudio.
   Detecta necessidade do usuário e delega para @whisper-specialist com contexto otimizado.
-model: sonnet
 allowed-tools: Read Bash(ls *)
 
 parameters:

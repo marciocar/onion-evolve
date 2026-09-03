@@ -170,12 +170,13 @@ nodes:
     trace: 'docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md'
   - id: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
     impact: 5
-    confidence: 0.8
-    label: 'DECISAO PROPOSTA (maestro sela): 109 comandos do core declaram model: (96 sonnet) e, com l.17 de 2.1.259, isso passa a pedir troca de modelo em sessao interativa — contra a doutrina "sempre o maximo" e contra a guarda PreModelSwitch, que vai VETAR (lineup fable-5-1/opus-5) a cada /comando. Opcoes: (A) REMOVER model: do frontmatter dos comandos (o comando roda no modelo da sessao; tiering continua nos AGENTES, onde e legitimo) — recomendada; (B) trocar os 96 sonnet por um valor do lineup (mantem o campo, sem downgrade; mas "opus" em comando de conversa nao tem sentido se a sessao e Fable); (C) ampliar o lineup com sonnet (abandona a doutrina). Pre-requisito: a lacuna E_LACUNAS_E3_0903 (o que acontece ao comando apos o veto) — se o veto QUEBRAR o comando, (A) vira urgente. Gatilho: medicao interativa do maestro OU selo.'
-    verified_against: 'E_F1_MODEL_FRONTMATTER_VALE_INTERATIVO; guarda 1+3 (PR #770); baseline E6 session_models'
+    confidence: 0.9
+    label: 'DECISAO PROPOSTA (maestro sela): 109 comandos do core declaram model: (96 sonnet) e, com l.17 de 2.1.259, isso passa a pedir troca de modelo em sessao interativa — contra a doutrina "sempre o maximo" e contra a guarda PreModelSwitch, que vai VETAR (lineup fable-5-1/opus-5) a cada /comando. Opcoes: (A) REMOVER model: do frontmatter dos comandos (o comando roda no modelo da sessao; tiering continua nos AGENTES, onde e legitimo) — recomendada; (B) trocar os 96 sonnet por um valor do lineup (mantem o campo, sem downgrade; mas "opus" em comando de conversa nao tem sentido se a sessao e Fable); (C) ampliar o lineup com sonnet (abandona a doutrina). Pre-requisito: a lacuna E_LACUNAS_E3_0903 (o que acontece ao comando apos o veto) — se o veto QUEBRAR o comando, (A) vira urgente. Gatilho: medicao interativa do maestro OU selo.' # SELADA 2026-09-03 (maestro: piso Sonnet SIM + opcao A): escada session_models + session_floor; guarda com ladder e piso so-por-fallback; aviso por prompt; fallbackModel projetado (REGRA 70); comandos sem model: (REGRA 71, 109 removidos); sonda ops/model-lineup-probe.sh
+    verified_at: '2026-09-03'
+    verified_against: 'familia model_ladder 7/7 (guarda: piso/picker veta, piso/fallback degraded, restored, fora veta; aviso; REGRA 70; REGRA 71; sonda) + lint real sem REGRA 70/71 + 109 comandos sem model: no frontmatter'
     trace: 'docs/onion/radar-baselines.yaml'
   - id: E_LACUNAS_E3_0903
     node_type: evidence
@@ -187,8 +188,33 @@ nodes:
     verified_against: 'tentativa: Skill onion-patterns invocada via ferramenta Skill num job em background => 0 eventos em .claude/sessions/model-switch.jsonl; a skill nem declara model: (exemplos no corpo)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
-    label: 'LACUNAS DECLARADAS (desfecho de 1a classe) — todas exigem sessao NOVA em processo 2.1.259 (a mudanca segue o processo, nao o disco): (1) frontmatter model: chega a emitir PreModelSwitch, e com qual source:? o unico evento registrado tem source=picker (/model manual); invocar /warm-up e ler a 2a linha de .claude/sessions/model-switch.jsonl. (2) o que acontece com o comando APOS o veto — roda no modelo da sessao, erra, ou aborta calado? e a pergunta que decide se as 96 declaracoes sonnet sao incomodo ou quebra. (3) mesmo probe para model: haiku (meta/backlog.md, meta/co-evolve.md, meta/inventory.md), que resolveria para fora do lineup; para model: opus a expectativa e liberacao. (4) como --permission-prompts none compoe com bypassPermissions e qual vence (importa ao degrau AUDIT do /meta:drive). (5) versao do PROCESSO das sessoes vivas da VPS: disco em 2.1.259, baseline registrava 2.1.257 — a estrategia desta rodada foi medida a partir de baseline vencida, por construcao (e o gatilho). Tentativa minha: invocar a skill onion-patterns pela ferramenta Skill num job em background gerou 0 eventos — e a skill nem declara model: real.'
+    label: 'LACUNAS DECLARADAS (desfecho de 1a classe) — todas exigem sessao NOVA em processo 2.1.259 (a mudanca segue o processo, nao o disco): (1) frontmatter model: chega a emitir PreModelSwitch, e com qual source:? o unico evento registrado tem source=picker (/model manual); invocar /warm-up e ler a 2a linha de .claude/sessions/model-switch.jsonl. (2) o que acontece com o comando APOS o veto — roda no modelo da sessao, erra, ou aborta calado? e a pergunta que decide se as 96 declaracoes sonnet sao incomodo ou quebra. (3) mesmo probe para model: haiku (meta/backlog.md, meta/co-evolve.md, meta/inventory.md), que resolveria para fora do lineup; para model: opus a expectativa e liberacao. (4) como --permission-prompts none compoe com bypassPermissions e qual vence (importa ao degrau AUDIT do /meta:drive). (5) versao do PROCESSO das sessoes vivas da VPS: disco em 2.1.259, baseline registrava 2.1.257 — a estrategia desta rodada foi medida a partir de baseline vencida, por construcao (e o gatilho). (6) [escada, 2026-09-03] o fallback NATIVO (sobrecarga) dispara PreModelSwitch? com que source? — a guarda trata source != picker como fallback; e o que acontece quando a COTA do Fable fecha no Max (troca automatica? bloqueio?) — nao ha fallback por cota no binario. Tentativa minha: invocar a skill onion-patterns pela ferramenta Skill num job em background gerou 0 eventos — e a skill nem declara model: real.'
     trace: '.claude/hooks/premodelswitch-guard.sh'   # o log model-switch.jsonl e local, nao rastreado (o CI acusou TARGET-MISSING)
+  - id: E_FALLBACK_NATIVO_MEDIDO_0903
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'binario 2.1.259 (strings): chave de settings fallbackModel (aceita LISTA — merge especial), flag --fallback-model, classe FallbackTriggeredError(originalModel, fallbackModel, reason="overloaded") apos retries de 529, headers x-cc-fallback-from-model/-trigger/-category; NAO encontrado fallback por COTA do plano'
+    source_tier: 10
+    source_kind: primary
+    label: 'A plataforma TEM fallback nativo de modelo: settings.json:fallbackModel (lista ordenada) e --fallback-model (headless) disparam em SOBRECARGA da API (529 apos retries; FallbackTriggeredError reason=overloaded) com headers x-cc-fallback-*. Nao ha, no binario, fallback por COTA de plano (o teto do Fable no Max): quando a cota fecha, o comportamento e lacuna (E_LACUNAS). Consequencia de desenho: a escada da casa (session_models + session_floor) e a SSOT; fallbackModel e PROJECAO dela (REGRA 70), para a plataforma nunca cair fora da guarda.'
+    trace: 'docs/onion/radar-baselines.yaml'
+  - id: E_ESCADA_DE_MODELOS_IMPLEMENTADA_0903
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'familia model_ladder 7/7; 6 transicoes testadas a mao na guarda; lint real sem REGRA 70/71; 109 comandos sem model:'
+    source_tier: 10
+    source_kind: primary
+    label: 'IMPLEMENTADO (selo do maestro: piso Sonnet SIM, opcao A): (1) escada na baseline E6 — session_models [fable-5-1, opus-5] (troca livre) + session_floor claude-sonnet-5 (so por fallback, source != picker); (2) guarda PreModelSwitch: campo ladder (degraded|restored|same) no log, piso pelo /model = VETO nomeando o piso, piso por fallback = permite com aviso; (3) hook UserPromptSubmit session-degraded-notice.sh avisa a cada prompt enquanto degradado, cala ao restored; (4) settings.json:fallbackModel = [opus-5, sonnet-5] PROJETADO (REGRA 70 HARD paridade); (5) REGRA 71 HARD: comando nao declara model: — 109 comandos limpos, template e skill onion-patterns atualizados; (6) ops/model-lineup-probe.sh: acesso por degrau (ok|denied|timeout), TSV + jsonl, exit 1 se algum degrau nega — mecaniza o "confirmado na conta" da rodada E6. Reorganizacao quando surge modelo novo = REGRA 65 dispara a rodada E6 -> sonda -> edita a escada (1 arquivo) -> lint projeta -> guarda le.'
+    trace: '.claude/hooks/premodelswitch-guard.sh'
+
 edges:
   - from: E_F1_MODEL_FRONTMATTER_VALE_INTERATIVO
     to: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
@@ -234,4 +260,10 @@ edges:
     edge_type: SUPPORTS
   - from: E_LACUNAS_E3_0903
     to: Q_E3_DELTA_2_1_259
+    edge_type: SUPPORTS
+  - from: E_FALLBACK_NATIVO_MEDIDO_0903
+    to: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
+    edge_type: SUPPORTS
+  - from: E_ESCADA_DE_MODELOS_IMPLEMENTADA_0903
+    to: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
     edge_type: SUPPORTS

@@ -1,7 +1,6 @@
 ---
 name: sync-sessions
 description: Sincronizar e organizar sessões de trabalho do Sistema Onion.
-model: sonnet
 allowed-tools: Read Write Edit Glob Bash(find *) Bash(git *)
 category: docs
 tags: [sessions, sync, organization]

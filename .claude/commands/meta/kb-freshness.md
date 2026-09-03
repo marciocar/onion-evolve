@@ -7,7 +7,6 @@ description: |
   via onion-orchestration: um worker por KB (ou por diretório), retornando veredito
   CURRENT/STALE/HISTORICAL + pontos desatualizados + direção de atualização.
   Consolida tudo num relatório priorizado de ações de refresh.
-model: opus
 category: meta
 tags: [kb, freshness, orchestration, validation]
 version: "1.0.0"

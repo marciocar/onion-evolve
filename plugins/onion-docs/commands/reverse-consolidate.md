@@ -3,7 +3,6 @@ name: reverse-consolidate
 description: |
   Engenharia reversa de projetos para gerar documentação consolidada.
   Use como pré-processador para /docs/build-tech-docs.
-model: sonnet
 allowed-tools: Read Bash(test -d *) Bash(ls *) Bash(grep *)
 
 parameters:

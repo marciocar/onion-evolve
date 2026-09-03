@@ -1,7 +1,6 @@
 ---
 name: co-evolve
 description: Orienta a sessão na co-evolução Onion core↔derivados — detecta o papel do repo (core/consumidor via .claude/.onion-version), lê o inbox de mensagens pendentes, mostra a posição nos 3 fluxos e como sinalizar/gerenciar. Use no início de sessão ou quando o hook avisar 📬.
-model: haiku
 category: meta
 tags: [co-evolution, inbox, bridge, federation, onboarding, sdaal]
 version: "1.4.0"

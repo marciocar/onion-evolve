@@ -3,7 +3,6 @@ name: work
 description: |
   Continuar trabalho em feature ativa. Lê sessão e identifica próxima fase.
   Atualiza progresso via Task Manager abstraction.
-model: sonnet
 allowed-tools: Bash(git *) Bash(cat .env*) Bash(ls *) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*) Read Write Edit Grep Glob
 category: engineer
 tags: [development, workflow, session, kg-first]
