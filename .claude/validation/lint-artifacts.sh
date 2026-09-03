@@ -273,6 +273,38 @@ check_scan_sanity() {
 # ---------------------------------------------------------------------------
 # Função auxiliar: emitir violação
 # ---------------------------------------------------------------------------
+# ── Nome junto do número (reforço do maestro 2026-09-03: "REGRA 65" sozinho não diz o que é) ────────────
+# Toda linha VIOLATION sai como "REGRA N (Título): mensagem". O título vem do cabeçalho `# REGRA N — Título [SEV]`
+# deste arquivo, e a regra de uma mensagem sem prefixo é a da função que chamou violation() — a MESMA associação
+# que rules-registry.sh usa (o 1º `nome() {` após o cabeçalho). Mecanismo, não disciplina: quem lê o lint não
+# precisa abrir lint-rules.md para saber de que regra se trata.
+declare -A RULE_TITLE=() RULE_OF_FUNC=(); RULE_MAP_BUILT=0
+_rule_map_build() {
+  RULE_MAP_BUILT=1
+  local line n t fn pend=""
+  while IFS= read -r line; do
+    case "${line}" in
+      "# REGRA "[0-9]*" — "*)
+        n="${line#\# REGRA }"; n="${n%% *}"; t="${line#*— }"; t="${t% \[*}"
+        RULE_TITLE["${n}"]="${t}"; pend="${n}" ;;
+      [a-z_]*"() {"*)
+        if [ -n "${pend}" ]; then fn="${line%%(*}"; RULE_OF_FUNC["${fn}"]="${pend}"; pend=""; fi ;;
+    esac
+  done < "${BASH_SOURCE[0]}"
+}
+_rule_label() {   # $1 = mensagem · $2 = função chamadora → mensagem com "REGRA N (Título)" na frente
+  local rule="$1" caller="$2" n="" t=""
+  [ "${RULE_MAP_BUILT}" = 1 ] || _rule_map_build
+  if [[ "${rule}" =~ ^REGRA\ ([0-9]+) ]]; then n="${BASH_REMATCH[1]}"; else n="${RULE_OF_FUNC[${caller}]:-}"; fi
+  [ -n "${n}" ] && t="${RULE_TITLE[${n}]:-}"
+  if [ -z "${t}" ]; then printf '%s' "${rule}"; return 0; fi
+  case "${rule}" in
+    "REGRA ${n} ("*) printf '%s' "${rule}" ;;                                   # já vem com título
+    "REGRA ${n}"*)   printf '%s' "REGRA ${n} (${t})${rule#REGRA ${n}}" ;;      # número sem título → insere
+    *)               printf '%s' "REGRA ${n} (${t}): ${rule}" ;;               # sem prefixo → prefixa pela função
+  esac
+}
+
 violation() {
   local severity="$1"   # HARD | SOFT
   local file="$2"
@@ -280,6 +312,7 @@ violation() {
 
   # Caminho relativo à raiz do repo para mensagens mais legíveis
   local rel_file="${file#${REPO_ROOT}/}"
+  rule="$(_rule_label "${rule}" "${FUNCNAME[1]:-}")"
 
   echo "VIOLATION: ${rel_file}: ${rule}"
   TOTAL_COUNT=$(( TOTAL_COUNT + 1 ))

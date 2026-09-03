@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 112 entradas · **Stale:** 0 · **Compartilháveis:** 100 · **Com significância:** 51
+**Total:** 113 entradas · **Stale:** 0 · **Compartilháveis:** 101 · **Com significância:** 51
 
 Gerado em: 2026-09-03
 
@@ -12,6 +12,7 @@ Gerado em: 2026-09-03
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-09-03 | learning | public 📤 | regra-n-titulo-o-numero-e-chave-o-titulo-e-significado | — | 2026-12-02 | static |
 | 2026-09-03 | learning | public 📤 | onda-da-lente-de-pesquisa-fechada-dogfood-derrubou-8 | Em 24 h a diretriz de pesquisa que o maestro redigia a cada rodada virou spec carregada + workflow salvo com três modos, e o próprio workflow achou 7 defeitos meus em dogfood — o mecanismo julgou o mecanismo. | 2026-12-02 | static |
 | 2026-09-03 | learning | public 📤 | bancada-em-faixas-a-familia-fantasma-e-tres-defeitos-latentes | — | 2026-12-02 | static |
 | 2026-09-02 | error | public 📤 | no-verify-e-checkpoint-nunca-aprovacao | O maestro separou duas coisas que eu tinha colado numa só: `--no-verify` garante que o trabalho incompleto não se perde; a APROVAÇÃO só vem do gate completo executado sobre o SHA final. | 2026-12-01 | static |
