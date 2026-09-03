@@ -3,9 +3,9 @@ title: "Revisão — bancada em faixas: fila dinâmica, mapa derivado + failsafe
 date: 2026-09-03
 branch: feat/bench-lanes
 reviewer: "condutor com dogfood EXECUTADO (4 runs paralelos completos + 2 subconjuntos + baseline serial + teste de carga do lint); Elenxo adversarial em Sonnet (Opus devolveu 529 três vezes): 6 objeções, 1 SOBREVIVEU (achado 8) e foi curada antes do commit"
-reviewed_diff_sha256: b914746d29948db6d4bc8ff2d3f15e0fb6b3f933e1a3fbdba647b04ac40728f6
-findings_total: 11
-findings_real: 11
+reviewed_diff_sha256: e0c07b5f9320fe41b509cf9d5fe81b26270b79cdaf018a57851c4cf261d1e8be
+findings_total: 12
+findings_real: 12
 verdict: APROVADO
 tokens: 900000
 duration_min: 240
@@ -37,6 +37,11 @@ paralelo; CI roda tudo em paralelo. **Medido**: serial 1037 s → fila dinâmica
 10. **`kg-reverify-schema: selftest` reprovou o 2º gate** (classe já em memória: reprova no gate, passa isolado — 3ª vez). O helper
    passou 24/24 sob 8× concorrência: a causa é AMBIENTAL (env/cwd herdado no worker; a fila muda a ordem), não CPU. A mensagem
    descartava a saída; agora mostra as últimas 4 linhas — a próxima ocorrência se explica. Gate refeito.
+11. **Classe sistêmica de EPIPE** (2º CI vermelho: `graph: members ingest`, `printf: write error: Broken pipe` na linha 8347): `printf '%s'
+   "$grande" | grep -q` com saída > 64 KB — o leitor fecha antes do escritor terminar e, sob pipefail, o `if` vê o EPIPE do printf.
+   337 sítios com esse idioma; latente há meses, exposto pela agenda paralela no runner de 2 cores. Cura de mecanismo: `_emit`
+   (printf imune a EPIPE, `|| true`) substituído em 489 ocorrências (`| grep -q`, `| head`, `| sed -n`) — o status do
+   pipeline passa a ser o do leitor. Smoke: graph/kg_reverify_schema/rules_registry/selftest_lanes/kg_status_factor em 4 workers, 43 ✓.
 
 Declarado: tier do Elenxo abaixo do padrão (Sonnet) por indisponibilidade do Opus; `pre-gate.sh` segue no scratch (o pre-commit
 agora cobre a faixa afetada).
