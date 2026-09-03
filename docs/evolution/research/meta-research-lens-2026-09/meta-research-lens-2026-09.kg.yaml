@@ -262,10 +262,12 @@ nodes:
 
   - id: D_F4_REVISITA_REGRA65_E_MODO_REVISIT
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
     impact: 4
-    confidence: 0.75
+    confidence: 0.85
+    verified_at: 2026-09-03
+    verified_against: 'DOGFOOD ao vivo: --revisit em whatsapp-api-2026-07 (baseline 2026-07-17). Rodada 1 (cadencia do seletor = 90d): 0 nos vencidos, 76k, parou — correto. Rodada 2 (cadenceDays=30, override novo): 21 agentes, 1,37M, mas 4 refutacoes CAUSADAS pelo placeholder de citacao do modo revisita (o verificador leu a instrucao como citacao) — grafo revertido, cura: verificador RE-BUSCA a fonte e extrai a citacao atual; corpus automatico = o proprio grafo. Rodada 3 (relancada do cache, 1,32M): 1 reconfirmado, 5 SUPERSEDES com nos E_*_REVISITA_20260903, 5 antigos → superseded (2 ja refuted), review_after 2026-07-17 → 2026-10-03, radar exit 0 (61 nos). Dois TDZ (REVISIT/webText antes da declaracao) pegos por executar o corpo com stubs (caso (i) da bancada, 9/9); REGRA 69 (roster last_checked vs cadencia) com bancada (i) da familia research-lens 9/9.'
     label: 'F4 (1 PR, revisita): REGRA 65 passa a varrer review_after dos grafos de pesquisa e das fontes do roster (SOFT); /onion-research --revisit <grafo> re-mede so nos STALE (kg-freshness para o interno, web para o externo), apenda evidencia datada + SUPERSEDES, atualiza review_after. Sem cron (MOAT W7): routines na nuvem e cron local ficam como opcao GATED do maestro. Dogfood: revisitar o grafo de pesquisa mais velho do corpus. Custo ~300k. DEPENDS_ON F1.'
     trace: 'docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md'
 

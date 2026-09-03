@@ -3702,6 +3702,32 @@ check_kg_source_tier_confidence() {
   done < <(find "${dir}" -mindepth 2 -maxdepth 2 -name '*.kg.yaml' 2>/dev/null | sort)
 }
 
+
+# REGRA 69 — Roster de fontes com revisita vencida (docs/onion/radar-sources.yaml) [SOFT]
+# previne: fonte de rotina (semanal/mensal/trimestral/anual) esquecida — o roster nasceu na F2 como DADO da
+# doutrina de fontes; sem cobrança de idade vira lista decorativa. Cobra só fonte que DECLARA last_checked
+# (opt-in por presença — o roster novo não nasce vermelho); a cadência vem do eixo (ou da própria fonte).
+# A máquina detecta, o maestro roda /onion-research --revisit (MOAT W7: sem cron). Arquivo ausente = silêncio.
+check_radar_sources_freshness() {
+  local f="${ONION_RADAR_SOURCES:-${REPO_ROOT}/docs/onion/radar-sources.yaml}"
+  [ -f "${f}" ] || return 0
+  local today; today=$(date +%s)
+  awk -v F="${f}" -v today="${today}" '
+    function days(c){ return c=="weekly"?7:c=="monthly"?30:c=="quarterly"?90:c=="yearly"?365:45 }
+    function epoch(d,  a){ split(d,a,"-"); return mktime(a[1]" "a[2]" "a[3]" 00 00 00") }
+    /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ { axis=$0; sub(/^[[:space:]]*-[[:space:]]*id:[[:space:]]*/,"",axis); acad="" }
+    /^[[:space:]]*cadence:[[:space:]]*/ && !/url:/ { acad=$0; sub(/^[[:space:]]*cadence:[[:space:]]*/,"",acad) }
+    /url:/ && /last_checked:/ {
+      url=$0; sub(/.*url:[[:space:]]*"?/,"",url); sub(/"?[[:space:]]*,.*/,"",url)
+      lc=$0; sub(/.*last_checked:[[:space:]]*"?/,"",lc); sub(/"?[[:space:]]*[,}].*/,"",lc)
+      cad=acad; if ($0 ~ /cadence:/) { cad=$0; sub(/.*cadence:[[:space:]]*/,"",cad); sub(/[[:space:]]*[,}].*/,"",cad) }
+      if (lc ~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) { age=int((today-epoch(lc))/86400); if (age>days(cad)) printf "%s\t%s\t%s\t%d\t%s\n", axis, url, cad, age, lc }
+    }' "${f}" | while IFS=$'\t' read -r axis url cad age lc; do
+      violation "SOFT" "${f}" "REGRA 69: fonte do roster VENCIDA — eixo ${axis}, ${url} (cadência ${cad}, last_checked ${lc}, ${age}d) — re-leia na próxima rodada (/onion-research --revisit ou /meta:radar --axis ${axis}) e carimbe last_checked"
+    done
+}
+
+check_radar_sources_freshness
 check_research_kg_review_after
 check_kg_source_tier_confidence
 check_session_models_baseline

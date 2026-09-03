@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**91 itens abertos** em 30 grafo(s) com aberto (de 52 no escopo) · 30 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**110 itens abertos** em 31 grafo(s) com aberto (de 53 no escopo) · 31 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 12 item(ns)
 
@@ -55,14 +55,37 @@
 | 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
 | 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
 
-## meta-research-lens-2026-09 — 4 item(ns)
+## meta-research-lens-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 25.5 | `Q_DIRETRIZ_DE_PESQUISA_VIRA_MAQUINARIA` | meta-research-lens-2026-09 | Como a diretriz de pesquisa que o maestro re-digita a cada pesquisa/decisao (lente Onion, fontes atuais, Claude Code na versao atu |
 | 14.0 | `D_PODA_INSTRUCTION_BLOAT_MEDIDA` | meta-research-lens-2026-09 | DECISAO PROPOSTA (fio proprio, GATED): medir o que do CLAUDE.md/skills/rules carrega SEMPRE vs sob demanda (InstructionsLoaded hoo |
-| 9.0 | `D_F4_REVISITA_REGRA65_E_MODO_REVISIT` | meta-research-lens-2026-09 | F4 (1 PR, revisita): REGRA 65 passa a varrer review_after dos grafos de pesquisa e das fontes do roster (SOFT); /onion-research -- |
 | 6.3 | `D_BUSCA_COMO_SDAAL_GATED` | meta-research-lens-2026-09 | DECISAO PROPOSTA (GATED): adapter de busca em .claude/utils/search/ (irmao do task-manager: WebSearch nativo default; MCP Exa/Tavi |
+
+## whatsapp-api-2026-07 — 19 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 25.2 | `Q_WHATSAPP_API_REVISITA_20260903` | whatsapp-api-2026-07 | O que mudou no panorama de APIs de WhatsApp para o Onion (WAHA vs Meta Cloud API vs alternativas) desde 2026-07-17 — preços, li |
+| 3.2 | `C_S1_F10` | whatsapp-api-2026-07 | WhatsApp Business Platform é viável tecnicamente para fintech regulada (sem bloqueio de setor), mas exige due … |
+| 3.2 | `C_S1_F8` | whatsapp-api-2026-07 | Onboarding como Tech Provider exige: app Meta com caso de uso WhatsApp, portfólio de negócio conectado, acesso… |
+| 3.2 | `C_S2_F7` | whatsapp-api-2026-07 | Diferença prática Cloud API direto vs BSP: a Cloud API da Meta é gratuita de acesso (paga-se só por mensagem/c… |
+| 3.2 | `C_S2_F8` | whatsapp-api-2026-07 | Posicionamento fintech: Blip fez parceria com Efí Bank (instituição de pagamento autorizada pelo Banco Central… |
+| 3.2 | `C_S2_F9` | whatsapp-api-2026-07 | Portabilidade de número entre BSPs é suportada oficialmente (o novo BSP inicia solicitação, requer autorização… |
+| 3.2 | `C_S3_F1` | whatsapp-api-2026-07 | Evolution API é provavelmente o mais adotado em produtos/automação no-code em 2026 (integra com n8n, hospedage… |
+| 3.2 | `C_S4_F7` | whatsapp-api-2026-07 | Para fintech regulada no Brasil, usar canal não-oficial cria exposição dupla: risco contratual com a Meta (ban… |
+| 3.2 | `C_S4_F9` | whatsapp-api-2026-07 | Telemetria de biblioteca não-oficial que envia IP do servidor da fintech a terceiro pode configurar tratamento… |
+| 3.2 | `C_S5_F5` | whatsapp-api-2026-07 | EVENTO 2025→2026: Meta intensificou detecção e banimento de números associados a plataformas WhatsApp não-ofic… |
+| 3.2 | `C_S5_F9` | whatsapp-api-2026-07 | Tendência de mercado 2026: pressão dupla empurra para a API oficial — (a) Meta aumentando fiscalização/banimen… |
+| 2.4 | `C_S2_F11` | whatsapp-api-2026-07 | O 'Meta Tech Provider Program' é o programa oficial da Meta pelo qual ISVs/SaaS/plataformas empresariais se cr… |
+| 2.4 | `C_S2_F4` | whatsapp-api-2026-07 | Twilio cobra uma taxa própria de US$0,005 por mensagem (inbound ou outbound) além da tarifa por template da Me… |
+| 2.4 | `C_S2_F6` | whatsapp-api-2026-07 | Take Blip (Blip) é apontado como líder de mercado brasileiro para médias/grandes empresas via WhatsApp Busines… |
+| 2.4 | `C_S4_F5` | whatsapp-api-2026-07 | A Meta já tomou ação legal formal (notificações DMCA) contra projetos que fizeram engenharia reversa do WhatsA… |
+| 2.4 | `C_S4_F6` | whatsapp-api-2026-07 | Não há evidência de ação judicial (lawsuit, distinta de takedown administrativo) movida pela Meta contra desen… |
+| 2.4 | `C_S4_F8` | whatsapp-api-2026-07 | Rastreabilidade e retenção de comunicação com cliente por atendente/autoria é apontada como relevante para con… |
+| 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
+| 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
 
 ## elenxos-2026-08-07 — 2 item(ns)
 
@@ -162,11 +185,12 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## fios-abertos — 1 item(ns)
+## fios-abertos — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 6.8 | `Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE` | fios-abertos | A bancada vendorizada (lint-selftest.sh) NAO PODE passar no adotante: medido em 2026-09-02 no 1o adotante greenfield do pin 8e2517 |
+| 6.4 | `D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO` | fios-abertos | DECISAO PROPOSTA (sinal upstream do 1o adotante greenfield, 2026-09-03; maestro verbatim: "fundir da melhor forma para aproveitame |
 
 ## federation-health-2026-07 — 1 item(ns)
 

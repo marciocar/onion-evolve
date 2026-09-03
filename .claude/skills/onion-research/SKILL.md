@@ -62,4 +62,8 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
 - Só a sessão principal roda o workflow (opt-in por comando); subagente não orquestra.
 - Sem WebSearch disponível o workflow degrada: use `WebFetch` sobre fontes do roster e declare.
 - Não há cota de busca entre sessões (a plataforma zera em `/clear`): o orçamento é seu, por rodada.
-- Revisita periódica (F4): a REGRA 67 avisa; o maestro roda `--revisit` — nunca cron (MOAT W7).
+- **Revisita** (F4): a REGRA 67 (grafo vencido) e a REGRA 69 (fonte do roster vencida) avisam no lint; você roda
+  `Workflow({scriptPath: '.claude/workflows/onion-research.js', args: { question: '<a pergunta original>', revisit: '<caminho do .kg.yaml>', today, budget, cadenceDays: <opcional: força a cadência — "revisite agora"> }})`
+  — só os nós de evidência vencidos (verified_at anterior a hoje − cadência) são re-medidos pela mesma votação;
+  confirmados ganham `verified_at` novo, refutados ganham nó novo + `SUPERSEDES` (Aufhebung), e `meta.review_after`
+  avança. Nunca cron (MOAT W7). Nós sem URL: `/meta:kg-freshness`.

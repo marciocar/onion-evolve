@@ -3747,7 +3747,7 @@ run_research_workflow_selftests() {
   for f in "${wf}" "${sk}" "${rs}"; do [ -f "${f}" ] || { record_fail "research-workflow" "ausente: ${f}"; return; }; done
   if ! command -v node >/dev/null 2>&1; then record_skip "research-workflow: node ausente → sintaxe não verificada"; else
     local d; d="$(mktemp -d)"
-    { printf 'const args={};const agent=async()=>({});const pipeline=async()=>[];const parallel=async()=>[];const phase=()=>{};const log=()=>{};\n(async()=>{\n'; awk 'f{print} /^}$/ && !f {f=1}' "${wf}"; printf '\n})();\n'; } > "${d}/wf.check.mjs"
+    { printf 'const args={};const agent=async()=>({});const pipeline=async(items,...st)=>Promise.all(items.map(async(i,ix)=>{let r=i;for(const f of st)r=await f(r,i,ix);return r}));const parallel=async(th)=>Promise.all(th.map(t=>t()));const phase=()=>{};const log=()=>{};\n(async()=>{\n'; awk 'f{print} /^}$/ && !f {f=1}' "${wf}"; printf '\n})();\n'; } > "${d}/wf.check.mjs"
     if node --check "${d}/wf.check.mjs" >/dev/null 2>&1; then record_pass "research-workflow: (a) onion-research.js válido com o corpo embrulhado em async (como o runtime)"
     else record_fail "research-workflow: (a)" "node --check reprovou: $(node --check "${d}/wf.check.mjs" 2>&1 | head -3)"; fi
     grep -q "^export const meta = {" "${wf}" && grep -q "name: 'onion-research'" "${wf}" && record_pass "research-workflow: (b) meta literal com name onion-research" || record_fail "research-workflow: (b)" "meta ausente/alterado"
@@ -3763,6 +3763,19 @@ run_research_workflow_selftests() {
   grep -q "const KG_SCHEMA_DECISION" "${wf}" && grep -q "pattern: '^D_'" "${wf}" && grep -q "constrainsEdges: { type: 'integer', minimum: 1 }" "${wf}" && grep -q "MODO DECISÃO — LEIA PRIMEIRO" "${wf}" \
     && record_pass "research-workflow: (g) write(KG) em modo decisão exige D_ + CONSTRAINS pelo schema (fail-loud no JS)" \
     || record_fail "research-workflow: (g)" "contrato de decisão não exigido pelo schema do write(KG)"
+  grep -q "const REVISIT = String(A.revisit" "${wf}" && grep -q "phase('Revisit')" "${wf}" && grep -q "SUPERSEDES para o nó antigo" "${wf}" \
+    && record_pass "research-workflow: (h) modo revisita: seleciona nós vencidos, re-mede, apenda SUPERSEDES (F4)" \
+    || record_fail "research-workflow: (h)" "modo revisita ausente/incompleto (F4)"
+  # (i) EXECUTAR o corpo com stubs pega o que `node --check` não pega: TDZ/ordem de declaração (medido 2026-09-03:
+  # "Cannot access 'REVISIT' before initialization" derrubou o run em 37 ms, 0 agentes). O stub de agent() devolve
+  # objeto vazio; o script pode falhar DEPOIS por forma de dado — só ReferenceError/SyntaxError contam.
+  if command -v node >/dev/null 2>&1; then
+    local d2; d2="$(mktemp -d)"
+    { printf '%s\n' 'const args={question:"q",today:"2026-01-01",revisit:"x.kg.yaml"};const agent=async()=>({angles:[{label:"a",query:"q"}],objections:[{target:"t",kind:"finding",survives:true,evidence:"e"}],options:["A","B"],recommendation:"r",nodes:[{id:"E_X",claim:"c",sourceUrl:"https://x.example/y",verifiedAt:"2026-01-01",sourceTier:5,sourceKind:"primary"}],reviewAfter:"2026-02-01",cadenceDays:30,results:[{url:"https://x.example/y",title:"t",relevance:"high"}],claims:[{claim:"c",quote:"q",importance:"central"}],sourceQuality:"primary",sourceKind:"primary",sourceTier:9,refuted:false,evidence:"e",confidence:"high",summary:"s",findings:[],caveats:"",unverifiedList:[],market:"m",kgPath:"k",radarExit:0,nodes:1,edges:1,decisionNodeId:"D_X",optionNodeIds:["C_A","C_B"],constrainsEdges:1});const pipeline=async()=>[];const parallel=async()=>[];const phase=()=>{};const log=()=>{};' '(async()=>{'; awk 'f{print} /^}$/ && !f {f=1}' "${wf}"; printf '%s\n' '})().catch(e=>{ if (/ReferenceError|SyntaxError/.test(String(e))) { console.error(String(e)); process.exit(3) } });'; } > "${d2}/wf.run.mjs"
+    if node "${d2}/wf.run.mjs" >/dev/null 2>"${d2}/err"; then record_pass "research-workflow: (i) corpo EXECUTA com stubs sem ReferenceError/SyntaxError (ordem de declaração)"
+    else if grep -qE "ReferenceError|SyntaxError" "${d2}/err"; then record_fail "research-workflow: (i)" "$(head -c 200 "${d2}/err")"; else record_pass "research-workflow: (i) corpo EXECUTA com stubs sem ReferenceError/SyntaxError (ordem de declaração)"; fi; fi
+    rm -rf "${d2}"
+  fi
   local n; n=$(grep -cE '^  - id: ' "${rs}")
   [ "${n}" -ge 5 ] && grep -q "vendor-on-competitor" "${rs}" && record_pass "research-workflow: (e) radar-sources.yaml com ${n} eixos e tier vendor-on-competitor declarado" \
     || record_fail "research-workflow: (e)" "roster com ${n} eixos ou sem vendor-on-competitor"
@@ -3812,6 +3825,12 @@ run_research_lens_selftests() {
   rc=0; ONION_KG_CORPUS_FILES= ONION_KG_CORPUS_ROOT="${d}/vazio" bash "${cg}" x >/dev/null 2>&1 || rc=$?
   [ "${rc}" = 2 ] && record_pass "research-lens: (h) corpus vazio ⇒ exit 2 (fail-loud, nunca '0 achados')" \
     || record_fail "research-lens: (h)" "esperava exit 2, veio ${rc}"
+  # REGRA 69 — roster de fontes: last_checked vencido pela cadência ⇒ SOFT; fresco/sem last_checked ⇒ silêncio
+  printf 'axes:\n  - id: ax1\n    cadence: weekly\n    sources:\n      - { url: "https://a.example/x", kind: primary, tier: 9, last_checked: "2026-01-01" }\n      - { url: "https://b.example/y", kind: primary, tier: 9, last_checked: "%s" }\n      - { url: "https://c.example/z", kind: forum, tier: 4 }\n' "$(date +%F)" > "${d}/roster.yaml"
+  rc=0; out="$(ONION_RADAR_SOURCES="${d}/roster.yaml" ONION_RESEARCH_KG_DIR="${d}/nao-existe" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if printf '%s' "${out}" | grep -q "REGRA 69: fonte do roster VENCIDA — eixo ax1, https://a.example/x (cadência weekly" && ! printf '%s' "${out}" | grep -q "b.example" && ! printf '%s' "${out}" | grep -q "c.example"; then
+    record_pass "research-lens: (i) REGRA 69: fonte com last_checked vencido ⇒ SOFT; fresca e sem carimbo ⇒ silêncio"
+  else record_fail "research-lens: (i)" "REGRA 69 errada (rc=${rc}): ${out:0:300}"; fi
   rm -rf "${d}"
 }
 
