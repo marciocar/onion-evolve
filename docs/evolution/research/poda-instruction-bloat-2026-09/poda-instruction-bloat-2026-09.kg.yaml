@@ -10,7 +10,7 @@ meta:
                              # qualquer update do Claude Code (migalha cc-version-e-gatilho-de-estrategia +
                              # REGRA 65). Se a plataforma mudar a carga de skills, TODA a recomendação vira pó.
   # kg-backlog-guard: on
-  # ═══ TETO: 19 NÓS. Rodada fechada em 2 fontes externas úteis (1 paper tier 7, 1 analista tier 6) + 1
+  # ═══ TETO: 20 NÓS. Rodada fechada em 2 fontes externas úteis (1 paper tier 7, 1 analista tier 6) + 1 (2026-09-03: +1 — pre-requisito da decisao RESOLVIDO no binario, E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903)
   #     medição local tier 10. Cresce SÓ por: (a) medição própria nova (replay de poda no tier menor, spec
   #     do hook InstructionsLoaded), ou (b) emenda de Elenxo. Não cresce por mais busca externa. ═══
   # Pergunta do maestro (2026-09-03): o que podar do CLAUDE.md (246 linhas) e das skills do core para curar
@@ -265,6 +265,18 @@ nodes:
     source_kind: analyst
     label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre) — era o UNICO mecanismo causal ligando tamanho a comportamento, e e exatamente o que o corpus observou ao vivo. Sem esse mecanismo a recomendacao fica sem teoria e a poda vira contagem de linhas. Faltou olhar o proprio grafo kg-read-leg-2026-08, que corrobora a literatura com controle empirico. Limite imposto em duas direcoes: contra a opcao D, porque existe dano observado que NAO depende de esgotar a janela (0,5% de 1M nao esgota nada, e o caso C1 falhou assim mesmo); e sobre a decisao inteira, porque fixa a metrica certa — a poda se justifica por ATENCAO e comportamento, nunca por bytes.'
     trace: 'docs/evolution/research/kg-read-leg-2026-08/'
+  - id: E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-03
+    verified_against: 'binario instalado 2.1.259 (~/.local/share/claude/versions/2.1.259, strings): schema Toe = base + file_path + memory_type in [User,Project,Local,Managed] + load_reason in Eoe=[session_start,nested_traversal,path_glob_match,include,compact] + globs? + trigger_file_path? + parent_file_path?; 15 ocorrencias'
+    source_tier: 10
+    source_kind: primary
+    label: 'PRE-REQUISITO da decisao RESOLVIDO (tier 10, o binario): o hook InstructionsLoaded entrega file_path, memory_type (User|Project|Local|Managed), load_reason (session_start|nested_traversal|path_glob_match|include|compact), globs, trigger_file_path, parent_file_path. Registra CARGA e motivo — NAO distingue carregou de influenciou. Consequencia para a opcao C re-especificada: o hook mede COBERTURA (camada L1, barata, mecanismo: hook logger + censo por arquivo x motivo, candidatas = SO-SESSION-START e NUNCA); INFLUENCIA exige replay de comportamento (camada L2, cara, dirigida pelas candidatas do L1, nos dois tiers). A decisao deixa de ter dependencia e passa a ter ORDEM: L1 agora, L2 quando o censo tiver >= 20 sessoes ou 14 dias.'
+    trace: 'docs/analysis/poda-instrucoes-protocolo-2026-09.md'
 
 edges:
   # ── evidências sustentam a pergunta ──
@@ -372,3 +384,6 @@ edges:
   - from: E_OBJECAO_LOST_IN_THE_MIDDLE_E_O_MECANISMO_CAUSAL
     to: C_OPCAO_D_NAO_PODAR
     edge_type: CONSTRAINS
+  - from: E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903
+    to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    edge_type: SUPPORTS

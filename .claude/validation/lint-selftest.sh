@@ -10878,6 +10878,39 @@ run_claude_md_fuse_selftests() {
 }
 _family run_claude_md_fuse_selftests
 
+# Modo instructions-loaded — L1 da poda de instruções (D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS, opção C): o hook
+# InstructionsLoaded registra CARGA (file/memory_type/load_reason) num jsonl fora do git; o censo projeta por arquivo ×
+# motivo e marca candidatas (SO-SESSION-START / NUNCA). Nunca veta; nunca decide — a decisão de podar é por comportamento (L2).
+run_instructions_loaded_selftests() {
+  local hook="${REPO_ROOT}/.claude/hooks/instructions-loaded-log.sh" census="${REPO_ROOT}/.claude/validation/instructions-loaded-census.sh"
+  if [ ! -f "${hook}" ] || [ ! -f "${census}" ]; then record_fail "instructions-loaded" "hook ou censo ausente"; return; fi
+  if ! command -v python3 >/dev/null 2>&1; then record_skip "instructions-loaded: python3 ausente"; return; fi
+  local d out rc; d="$(mktemp -d)"; mkdir -p "${d}/.claude/rules" "${d}/.claude/skills/x"
+  printf -- '---\npaths: ["docs/**"]\n---\n# r\n' > "${d}/.claude/rules/r1.md"; printf -- '---\npaths: ["src/**"]\n---\n# s\n' > "${d}/.claude/skills/x/SKILL.md"
+  # (a) hook: payload real (shape do binário 2.1.259) → 1 linha JSON com file relativo e load_reason; exit 0
+  rc=0; printf '{"session_id":"abcdef123456","transcript_path":"/t","cwd":"%s","hook_event_name":"InstructionsLoaded","file_path":"%s/.claude/rules/r1.md","memory_type":"Project","load_reason":"path_glob_match","globs":["docs/**"],"trigger_file_path":"%s/docs/a.md"}' "${d}" "${d}" "${d}" \
+    | ONION_INSTRUCTIONS_LOG="${d}/log.jsonl" CLAUDE_PROJECT_DIR="${d}" bash "${hook}" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(wc -l < "${d}/log.jsonl")" -eq 1 ] && grep -q '"file": ".claude/rules/r1.md"' "${d}/log.jsonl" && grep -q '"load_reason": "path_glob_match"' "${d}/log.jsonl" && grep -q '"trigger": "docs/a.md"' "${d}/log.jsonl"; then
+    record_pass "instructions-loaded: (a) hook apende 1 linha (file relativo, load_reason, trigger) e sai 0"
+  else record_fail "instructions-loaded: (a) hook" "rc=${rc}; $(cat "${d}/log.jsonl" 2>/dev/null | head -c 200)"; fi
+  # (b) hook com payload vazio/inválido → exit 0 e nada escrito (instrumento nunca derruba a sessão)
+  rc=0; printf 'nao-e-json' | ONION_INSTRUCTIONS_LOG="${d}/log2.jsonl" CLAUDE_PROJECT_DIR="${d}" bash "${hook}" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ ! -s "${d}/log2.jsonl" ]; then record_pass "instructions-loaded: (b) payload inválido ⇒ exit 0, nada escrito"
+  else record_fail "instructions-loaded: (b) inválido" "rc=${rc}; bytes=$(wc -c < "${d}/log2.jsonl" 2>/dev/null || echo 0)"; fi
+  # (c) censo: r1 carregou por glob (candidata -), CLAUDE.md por session_start em 2 sessões, skill x com paths: nunca → NUNCA
+  printf '%s\n' '{"ts":"t","session":"s1","file":"CLAUDE.md","memory_type":"Project","load_reason":"session_start","trigger":""}' '{"ts":"t","session":"s2","file":"CLAUDE.md","memory_type":"Project","load_reason":"session_start","trigger":""}' >> "${d}/log.jsonl"
+  out="$(bash "${census}" --log "${d}/log.jsonl" --root "${d}" 2>&1 || true)"
+  if _emit "${out}" | grep -qE $'^CLAUDE.md\t2\t2\t0' && _emit "${out}" | grep -qE $'^.claude/rules/r1.md\t1\t0\t1' && _emit "${out}" | grep -qE $'^.claude/skills/x/SKILL.md\t0\t.*\tNUNCA$'; then
+    record_pass "instructions-loaded: (c) censo por arquivo × motivo, sessões distintas contadas, paths: que nunca casou ⇒ NUNCA"
+  else record_fail "instructions-loaded: (c) censo" "$(_emit "${out}" | head -4 | tr '\n' '|' | cut -c1-300)"; fi
+  # (d) censo sem log ⇒ exit 3 nomeando a causa (não é zero silencioso)
+  rc=0; out="$(bash "${census}" --log "${d}/nao-existe.jsonl" --root "${d}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 3 ] && _emit "${out}" | grep -q "sem censo"; then record_pass "instructions-loaded: (d) sem log ⇒ exit 3 declarando (nunca 0 calado)"
+  else record_fail "instructions-loaded: (d) sem log" "rc=${rc}; ${out:0:120}"; fi
+  rm -rf "${d}"
+}
+_family run_instructions_loaded_selftests
+
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois
 #
@@ -10969,13 +11002,16 @@ run_kg_reverify_schema_selftests() {
   # (a) selftest embutido — ASSERINDO O PLACAR, não só o rc (Elenxo 2026-08-13/B2: "6/6" era
   #     string livre nunca conferida; um 7º caso deixaria a bancada anunciando número morto).
   local st_out
-  st_out="$(bash "${chk}" --selftest 2>&1)" || true
+  # (2026-09-03, 4ª reprovação no gate com o helper passando isolado — 24/24 sob concorrência): o selftest do helper é
+  # HERMÉTICO por desenho; o que muda de worker para worker é o AMBIENTE herdado (export de outra família). Roda-se
+  # em ambiente limpo — se ainda falhar, as linhas ✗ do helper vêm na mensagem.
+  st_out="$(env -i PATH="${PATH}" HOME="${HOME}" LC_ALL="${LC_ALL:-C}" TMPDIR="${TMPDIR:-/tmp}" bash "${chk}" --selftest 2>&1)" || true
   if _emit "${st_out}" | grep -qE '^[0-9]+/[0-9]+ ' && ! _emit "${st_out}" | grep -q '✗'; then
     record_pass "kg-reverify-schema: selftest embutido verde ($(printf '%s' "${st_out}" | grep -oE '^[0-9]+/[0-9]+' | tail -1))"
   else
     # (2026-09-03) 3ª reprovação desta guarda no gate com o helper passando isolado (24/24 sob 8× concorrência):
     # a causa é ambiental e a mensagem antiga descartava a saída — agora ela vem junto (classe bench-flaky).
-    record_fail "kg-reverify-schema: selftest" "reprovou ou não somou — rode bash ${chk} --selftest · últimas linhas: [$(printf '%s\n' "${st_out}" | grep -vE '^\s*$' | tail -4 | tr '\n' '|' | cut -c1-400)]"
+    record_fail "kg-reverify-schema: selftest" "reprovou ou não somou — rode bash ${chk} --selftest · linhas ✗ do helper: [$(printf '%s\n' "${st_out}" | grep -E '✗|falharam' | tr '\n' '|' | cut -c1-400)]"
   fi
   # (b) o schema real do repo está conforme
   if bash "${chk}" >/dev/null 2>&1; then
