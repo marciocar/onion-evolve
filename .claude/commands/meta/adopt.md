@@ -558,11 +558,21 @@ fi
 - Criar `docs/{business,technical,compliance}-context/` em `$INSTALL_DIR` (templates vazios). **Estes são
   a governança L1+ do ALVO** (domínio); as meta-specs copiadas são o **L0 do framework**. O
   `@metaspec-gate-keeper` dual-mode valida o alvo contra o L1+.
-- **Gerar o CLAUDE.md — com never-clobber** (NÃO sobrescrever o do alvo, se houver):
+- **Gerar o CLAUDE.md — FUNDIR boilerplate, never-clobber para regras** (D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO,
+  sinal do 1º adotante greenfield 2026-09-03: quem abre o repo pelo `CLAUDE.md` — o arquivo que o harness carrega —
+  tem de VER o Onion). O helper classifica o `CLAUDE.md` existente: **boilerplate** de template (Astro/Next/Vite: só
+  comandos, estrutura e links; sem marcador de regra nem prosa ≥ 25 palavras) ⇒ funde, com o original preservado
+  integralmente numa seção nomeada; **regras reais** ⇒ recusa (exit 3) e vale o never-clobber de antes:
   ```bash
-  [ -f "$INSTALL_DIR/CLAUDE.md" ] && OUT="$INSTALL_DIR/CLAUDE.onion.md" || OUT="$INSTALL_DIR/CLAUDE.md"
-  # escrever o skeleton em "$OUT" (merge de CLAUDE.onion.md → CLAUDE.md fica a cargo do maestro)
+  FUSE="$INSTALL_DIR/.claude/utils/adopt/claude-md-fuse.sh"
+  # escrever o skeleton em "$TMP_SKEL" primeiro (identidade + roteamento + idioma + contextos + entrada + branches)
+  if [ ! -f "$INSTALL_DIR/CLAUDE.md" ]; then cp "$TMP_SKEL" "$INSTALL_DIR/CLAUDE.md"
+  elif bash "$FUSE" --fuse "$INSTALL_DIR/CLAUDE.md" "$TMP_SKEL" "$INSTALL_DIR/CLAUDE.md.fused"; then
+    mv "$INSTALL_DIR/CLAUDE.md.fused" "$INSTALL_DIR/CLAUDE.md"      # boilerplate: fundido, diff visível no commit da adoção
+  else cp "$TMP_SKEL" "$INSTALL_DIR/CLAUDE.onion.md"                # regras reais: never-clobber (merge = decisão do maestro)
+  fi
   ```
+  Implementação de referência da fusão: o `CLAUDE.md` da Sacola de Ideias (adotante greenfield, 2026-09-03).
   Skeleton mínimo: identidade do projeto + roteamento Task Manager + idioma (skill `language-standards`)
   + contextos L1+ + entrada `/onion`·`/warm-up` + **estratégia de branches** (produto vs integração:
   `${INTEGRATION_BRANCH}` é o alvo dos PRs de evolução Onion; ver `.onion-version`).
