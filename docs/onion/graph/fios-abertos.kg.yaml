@@ -130,6 +130,16 @@ nodes:
     status: open
     label: 'DECISAO PROPOSTA (sinal upstream do 1o adotante greenfield, 2026-09-03; maestro verbatim: "fundir da melhor forma para aproveitamento do Onion, o core deveria mandar pronto e resolvido"): hoje o /meta:adopt, ao achar CLAUDE.md pre-existente, deixa CLAUDE.onion.md ao lado (never-clobber) e um item "fundir ou nao — decisao do maestro" — resultado: quem abre o repo pelo CLAUDE.md (o arquivo que o harness carrega) NAO ve o Onion (papel, contextos, warm-up, gate). Opcoes: (1) FUNDIR na adocao quando o CLAUDE.md existente e reconhecivel como boilerplate de template (Astro/Next/Vite: so comandos e links, sem regras de projeto) — o conteudo vira secao "Desenvolvimento" do esqueleto Onion-first; never-clobber segue para CLAUDE.md com regras reais; (2) sempre fundir, original preservado integralmente em secao nomeada, diff visivel no commit da adocao; (3) manter e so avisar mais alto. Recomendacao do adotante: (1). Implementacao de referencia: o CLAUDE.md fundido da sacola-de-ideias. GATILHO: proxima adocao greenfield OU selo do maestro.'
     trace: 'docs/evolution/inbox/_processed/2026-09-03-sinal-adocao-deveria-entregar-claude-md-fundido.md'
+  - id: D_BANCADA_FAIXAS_E_MAPA
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: 'DECISAO PROPOSTA (pergunta do maestro 2026-09-02: "~830 nao e muito? nao deveria ter uma separacao?"): a bancada lint-selftest.sh (~850 casos, O(casos x lint), single-thread, ~14 min CI / >25 min VPS) passa a ter (1) paralelismo por nucleo (cada caso ja e sandbox isolado), (2) mapa familia->globs com git diff proprio e FAILSAFE (tocar lint/harness/regras/mapa => tudo), (3) tres faixas: pre-commit = afetado + faixa rapida (contagem, vendor-scrub, registro, projecoes, lint --only), PR = familias tocadas, CI = completo. Embasamento: pesquisa em 4 eixos (pre-commit.com so staged; Mergify/merge-queue = escopo declarado + prova + recusa; bats --jobs; Git t/ make -jN + prove; mercado: selecao de teste nao e o escasso) + 6 reprovacoes de gate em 24 h por classes baratas. Opcoes: A = 3 faixas com mapa+failsafe (recomendada); B = so paralelizar (ganho sem risco, insuficiente para o pre-commit na VPS); C = manter tudo-no-pre-commit (status quo, 25 min sob carga). NAO fazer: PTS por ML, plataforma paga, tj-actions/changed-files (CVE-2025-30066), mutation como escore, deletar familias quietas. Gatilho: selo do maestro; dogfood = a propria bancada reprovando um mutante fora do mapa (failsafe) antes de selar. Maestro sela.'
+    trace: 'docs/analysis/bancada-faixas-e-mapa-2026-09.md'
+    verified_at: '2026-09-03'
+    verified_against: 'pesquisa 4 eixos (run de 2026-09-02) + 6 reprovacoes de gate medidas em 2026-09-02/03 + pre-gate.sh no scratch'
 
 edges:
   - from: I_JWKS_ATTEMPTED_AT
@@ -154,5 +164,8 @@ edges:
     to: W8_REAIS_EXECUTAVEIS
     edge_type: DEPENDS_ON
   - from: D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO
+    to: W8_REAIS_EXECUTAVEIS
+    edge_type: DEPENDS_ON
+  - from: D_BANCADA_FAIXAS_E_MAPA
     to: W8_REAIS_EXECUTAVEIS
     edge_type: DEPENDS_ON
