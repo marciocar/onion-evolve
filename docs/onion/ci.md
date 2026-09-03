@@ -12,7 +12,7 @@ O Sistema Onion mantém **duas GitHub Actions nativas** que validam PRs que toca
 ## Camadas complementares
 
 - **Determinística** (linter): sempre roda, sem secret — cobre estrutura, YAML e nomenclatura.
-- **Auto-teste de guardas** (selftest): roda logo após o linter, no mesmo job, sem secret. Injeta fixtures conhecidas (`.claude/validation/fixtures/`) e confirma que cada guarda ainda reage — uma regra que silenciosamente parar de funcionar (regex quebrada, allowlist larga) passa a **falhar o CI** em vez de degradar em silêncio. Detalhes: [testing-validation-system.md](./testing-validation-system.md).
+- **Auto-teste de guardas** (selftest): job próprio (`onion-selftest.yml`), sem secret, em faixa paralela (`--jobs auto`, fila dinâmica; ~8 min em 8 vCPU contra ~20 min serial). Injeta fixtures conhecidas (`.claude/validation/fixtures/`) e confirma que cada guarda ainda reage — uma regra que silenciosamente parar de funcionar (regex quebrada, allowlist larga) passa a **falhar o CI** em vez de degradar em silêncio. Detalhes: [testing-validation-system.md](./testing-validation-system.md).
 - **Semântica** (revisor Claude): roda quando `ANTHROPIC_API_KEY` está configurado como secret do repositório; degrada graciosamente (pula) se ausente.
 
 ## Hook local (pre-commit) — opt-in
