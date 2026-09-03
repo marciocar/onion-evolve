@@ -118,8 +118,10 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.85
-    status: open
-    label: 'A bancada vendorizada (lint-selftest.sh) NAO PODE passar no adotante: medido em 2026-09-02 no 1o adotante greenfield do pin 8e2517724c0a — SELFTEST_RC=1, 19 casos ✗ (18 em r16-count-drift, 1 em r22-evolution-links) e a suite aborta antes da soma sob set -e. Causa estrutural: inventory_scope_excluded() exclui fixtures e, em repo derivado, tudo fora de docs/onion/ e CLAUDE.onion.md (posto de proposito em 2026-08-06 para o adotante nao nascer vermelho) — o que torna as assercoes dessas familias insatisfaziveis la. Opcoes: (a) marcar as familias core-only e pular quando o stamp diz role: adopted; (b) fixtures proprias do adotante; (c) nao vendorizar a bancada. GATILHO: proximo /meta:adopt --update de um adotante (medir la) OU o maestro selar (a).'
+    status: done
+    label: 'A bancada vendorizada (lint-selftest.sh) NAO PODE passar no adotante: medido em 2026-09-02 no 1o adotante greenfield do pin 8e2517724c0a — SELFTEST_RC=1, 19 casos ✗ (18 em r16-count-drift, 1 em r22-evolution-links) e a suite aborta antes da soma sob set -e. Causa estrutural: inventory_scope_excluded() exclui fixtures e, em repo derivado, tudo fora de docs/onion/ e CLAUDE.onion.md (posto de proposito em 2026-08-06 para o adotante nao nascer vermelho) — o que torna as assercoes dessas familias insatisfaziveis la. Opcoes: (a) marcar as familias core-only e pular quando o stamp diz role: adopted; (b) fixtures proprias do adotante; (c) nao vendorizar a bancada. GATILHO: proximo /meta:adopt --update de um adotante (medir la) OU o maestro selar (a).' # RESPONDIDA 2026-09-03 (cura (a) selada): ver E_BANCADA_NO_ADOTANTE_MEDIDA_0903
+    verified_at: '2026-09-03'
+    verified_against: 'copia da Sacola com .claude/ atual e role: adopted: 789 ok / 0 falhas / 66 skips visiveis, rc=0 (adopter-bench4)'
     trace: 'docs/evolution/inbox/_processed/2026-09-02-sinal-research-lens-rule-nasce-hard-no-adotante.md'
 
   - id: D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO
@@ -160,6 +162,16 @@ nodes:
     status: open
     label: 'PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-verified_at) falhou 1 vez em 4 runs paralelos de 8 workers (HARD 9->9) e nunca em serie? O lint mostrou-se deterministico sob carga (E_BANCADA_FAIXAS_MEDIDA), nao ha timeout no caminho do lint, o sandbox e privado. Suspeitos: leitura do repo vivo pelo lint do sandbox (git sem origin, provenance), parse do contador (sed|tail -1) sob saida truncada. Gatilho: proxima ocorrencia — o caso agora imprime as HARD so-do-mutante na mensagem de falha; dai abre-se a causa. 2a OCORRENCIA 2026-09-03 (gate do adopt, 1/1 run paralelo; serie passa): a mensagem nova mostrou HARD so-no-mutante = [] — o lint do mutante NAO viu no novo. Causa candidata achada no codigo: _fixture_done_nu fazia cat >> no FIM do arquivo, e fios-abertos termina em edges: — o no-fixture caia sob edges, nao sob nodes (o parser tolerava as vezes). Curado: o no entra antes de edges:. Se recorrer com a cura, a causa e outra.'
     verified_against: 'f-par.log (1 falha), par8.log/par8q.log/f-par2.log (0 falhas), 2026-09-03'
+  - id: E_BANCADA_NO_ADOTANTE_MEDIDA_0903
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: 'MEDIDO 2026-09-03 na copia de um adotante greenfield (Sacola) com o .claude/ ATUAL e role: adopted, familia a familia em serie (mapa v2): 118 famílias passam; 12 reprovam por SSOT/maquinaria que so o core tem (radar-baselines, members.yaml, radar-sources, marketplace, moat, outbox, bundling, registro de regras); 3 abortam por robustez (pipeline vazio sob pipefail em resolve_target; docs/analysis/ ausente em kg_coverage; docs/backlog.md ausente em backlog_projection) e, curadas, reprovam por semantica do core. Cura (a): SELFTEST_ROLE do stamp + SELFTEST_CORE_ONLY_FAMILIES (15, por dado) + fixtures r16/r22 pulam com skip VISIVEL nomeando o motivo; no core rodam. Prova de ponta a ponta com --jobs 4: 789 ok / 0 falhas / 66 skips (15 familias x1 + 44 fixtures + 7 tooling), rc=0, 136 s. O mapa v1 (pin velho) misturava helpers ausentes com core-only — so o mapa com .claude/ atual separa as causas. STRICT no adotante reprova os skips: declarado, decisao do adotante.'
+    trace: 'docs/evolution/review/fix-bench-adopter-core-only.md'
+    verified_at: '2026-09-03'
+    verified_against: 'adopter-map2.tsv (134 familias em serie) + adopter-bench4.log (--jobs 4) na copia $CLAUDE_JOB_DIR/tmp/adopter-copy'
 
 edges:
   - from: I_JWKS_ATTEMPTED_AT
@@ -195,3 +207,6 @@ edges:
   - from: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
     to: D_BANCADA_FAIXAS_E_MAPA
     edge_type: DEPENDS_ON
+  - from: E_BANCADA_NO_ADOTANTE_MEDIDA_0903
+    to: Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE
+    edge_type: SUPPORTS
