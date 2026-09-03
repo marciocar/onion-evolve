@@ -344,26 +344,8 @@ if [ -f "$DEST/.claude/validation/graph.sh" ]; then
   bash "$DEST/.claude/validation/graph.sh" --markdown > "$DEST/docs/onion/graph.md" 2>/dev/null || true
 fi
 
-# (8c) SEMENTE DO KG — o primeiro `.kg.yaml` do adotante (achado de campo, 2026-08-17).
-#      A adoção entregava todos os RECURSOS (warm-up, catch-up, onion, 11 skills, agentes, comandos)
-#      e ZERO ESTADO. E o passo 0 do /warm-up é "se existir um .kg.yaml, consulte-o PRIMEIRO",
-#      resolvido ao vivo por `git ls-files '*.kg.yaml'` — com zero grafos ele não falha, fica VAZIO,
-#      a sessão degrada para ler prosa, e o conhecimento do projeto continua preso ao contexto de uma
-#      conversa. Foi assim que um adotante real nasceu (2026-08-17) e o dono perguntou, com razão:
-#      "não tem nem KG para mapear? como vou operar sem ficar preso a uma sessão?".
-#
-#      ⚠️ E A CAUSA TEM A FORMA DE UM ACHADO ANTERIOR: a medição de 2026-08-16 viu grafo autoral em
-#      3 de 7 adotantes e ia atribuir a não-uso — exatamente como ia culpar o adotante pelo zero de
-#      resíduos R56 até se medir que a guarda NUNCA FOI VENDORIZADA. Parte do "não usam KG" é
-#      CAPACIDADE QUE NUNCA ENVIAMOS: a adoção nunca semeou o primeiro nó.
-#
-#      A semente NÃO inventa o domínio do adotante: carrega só o que a adoção verifica de si (pin,
-#      modo, papel, integração, e o gate como `confirmed` OU `open` conforme (6) tenha provado ou
-#      deferido) mais UMA `question` aberta pedindo o primeiro nó de domínio — que o radar afunda na
-#      seção ESTADO a cada leitura. Never-clobber: alvo que JÁ tem grafo não recebe nada.
-if [ -f "$SOURCE_ROOT/.claude/utils/adopt/seed-adoption-graph.sh" ]; then
-  bash "$SOURCE_ROOT/.claude/utils/adopt/seed-adoption-graph.sh" "$DEST" "${GATE_FLAG:-}" || true
-fi
+# (8c) SEMENTE DO KG — movida para DEPOIS do carimbo (Fase 5): o seed lê mode/role/source_commit do stamp; rodando antes, os três saíam "(não carimbado)" (medido 2026-09-02, num adotante greenfield).
+
 
 # (9) BASELINES de catraca — REGENERA **TODOS** do corpus do alvo (mesmo padrão do passo 8, mesma razão).
 #     O manifesto copia `.claude/validation/` INTEIRO, então TODO baseline DO CORE viaja junto. Sem
@@ -628,6 +610,27 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/write-stamp.sh" "$INSTALL_DIR" \
 # integration_branch: só entra se foi escolha explícita (--integration-branch); sem escolha o helper omite —
 # o resolve-integration-branch.sh detecta a cada PR (develop-se-existe-senão a branch principal).
 ```
+
+# (8c) SEMENTE DO KG — o primeiro `.kg.yaml` do adotante (achado de campo, 2026-08-17).
+#      A adoção entregava todos os RECURSOS (warm-up, catch-up, onion, 11 skills, agentes, comandos)
+#      e ZERO ESTADO. E o passo 0 do /warm-up é "se existir um .kg.yaml, consulte-o PRIMEIRO",
+#      resolvido ao vivo por `git ls-files '*.kg.yaml'` — com zero grafos ele não falha, fica VAZIO,
+#      a sessão degrada para ler prosa, e o conhecimento do projeto continua preso ao contexto de uma
+#      conversa. Foi assim que um adotante real nasceu (2026-08-17) e o dono perguntou, com razão:
+#      "não tem nem KG para mapear? como vou operar sem ficar preso a uma sessão?".
+#
+#      ⚠️ E A CAUSA TEM A FORMA DE UM ACHADO ANTERIOR: a medição de 2026-08-16 viu grafo autoral em
+#      3 de 7 adotantes e ia atribuir a não-uso — exatamente como ia culpar o adotante pelo zero de
+#      resíduos R56 até se medir que a guarda NUNCA FOI VENDORIZADA. Parte do "não usam KG" é
+#      CAPACIDADE QUE NUNCA ENVIAMOS: a adoção nunca semeou o primeiro nó.
+#
+#      A semente NÃO inventa o domínio do adotante: carrega só o que a adoção verifica de si (pin,
+#      modo, papel, integração, e o gate como `confirmed` OU `open` conforme (6) tenha provado ou
+#      deferido) mais UMA `question` aberta pedindo o primeiro nó de domínio — que o radar afunda na
+#      seção ESTADO a cada leitura. Never-clobber: alvo que JÁ tem grafo não recebe nada.
+if [ -f "$SOURCE_ROOT/.claude/utils/adopt/seed-adoption-graph.sh" ]; then
+  bash "$SOURCE_ROOT/.claude/utils/adopt/seed-adoption-graph.sh" "$INSTALL_DIR" "${GATE_FLAG:-}" || true
+fi
 
 - **Commit durável (obrigatório):** aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
   (`DEST="$INSTALL_DIR"`, `OP=adopt`, `PIN=$SRC_COMMIT`, `BR=onion/adopt` — a branch que a Fase 2 já criou)

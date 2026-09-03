@@ -64,7 +64,7 @@ fi
 SLUG="$(basename "$(cd "${DEST}" && pwd)")"
 STAMP="${DEST}/.claude/.onion-version"
 _f() { [ -f "${STAMP}" ] && awk -v k="$1" '$1==k":"{print $2; exit}' "${STAMP}" || true; }
-PIN="$(_f commit)";        [ -n "${PIN}" ]  || PIN="(não carimbado)"
+PIN="$(_f source_commit)"; [ -n "${PIN}" ] || PIN="$(_f commit)"; [ -n "${PIN}" ] || PIN="(não carimbado)"   # write-stamp escreve source_commit (medido 2026-09-02: saía "(não carimbado)" em toda adoção)
 MODE="$(_f mode)";         [ -n "${MODE}" ] || MODE="(não carimbado)"
 ROLE="$(_f role)";         [ -n "${ROLE}" ] || ROLE="(não carimbado)"
 IB="$(_f integration_branch)"; [ -n "${IB}" ] || IB="(não declarado — resolvido por PR)"
